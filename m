@@ -2,200 +2,367 @@ Return-Path: <SRS0=f1VZ=XN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49049C4CEC4
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Sep 2019 09:39:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FB86C4CEC4
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Sep 2019 11:44:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 08B36218AF
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Sep 2019 09:39:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3FFD621907
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Sep 2019 11:44:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="PwdS/Eix";
-	dkim=pass (1024-bit key) header.d=marvell.onmicrosoft.com header.i=@marvell.onmicrosoft.com header.b="m5Y1H/qs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l3QQBuiM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726772AbfIRJjr (ORCPT
+        id S1727807AbfIRLoU (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 18 Sep 2019 05:39:47 -0400
-Received: from mx0a-0016f401.pphosted.com ([67.231.148.174]:2146 "EHLO
-        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726382AbfIRJjr (ORCPT
+        Wed, 18 Sep 2019 07:44:20 -0400
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:46894 "EHLO
+        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727608AbfIRLoT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 18 Sep 2019 05:39:47 -0400
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-        by mx0a-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id x8I9ZQYs010577;
-        Wed, 18 Sep 2019 02:39:38 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : content-type : content-transfer-encoding :
- mime-version; s=pfpt0818; bh=1YxlYm7hz6Dp6VyliP4Ie2oWjHnMdKc0ZotKYsLPgUU=;
- b=PwdS/Eix0lTovrdbD+vwCPESn0DiYp0FalOJZf/rxpDC0NKmMeHUfQ21795vDGbX8jOF
- 2ejJSBwDBEAlWdhpOXocC56u8kpuwwstr5PLcbVtNC33ZsWpa4OfGLMBwguzhb4rGc+k
- vo7R/23cSE/5ESvO/Uqe82lfhRj/n4yhrppjinrBNqsPVFwtT73+9Etf8JvMpLRfN4ai
- XkeX0TdAUJ69DpydZOw3vgsLK2EyhQ6ksPQbRNVTJJHWVjKD0IBNCWYoAQGA+kGGjNsp
- Hq/6ghvhw6wbNkA+7WMPQIWRxovDnfJ9NYI/xQpAGG7w2FAkBfOpRhmo2Uc+TuseP4Ek nQ== 
-Received: from sc-exch02.marvell.com ([199.233.58.182])
-        by mx0a-0016f401.pphosted.com with ESMTP id 2v37mg252n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-        Wed, 18 Sep 2019 02:39:38 -0700
-Received: from SC-EXCH02.marvell.com (10.93.176.82) by SC-EXCH02.marvell.com
- (10.93.176.82) with Microsoft SMTP Server (TLS) id 15.0.1367.3; Wed, 18 Sep
- 2019 02:39:36 -0700
-Received: from NAM01-BN3-obe.outbound.protection.outlook.com (104.47.33.54) by
- SC-EXCH02.marvell.com (10.93.176.82) with Microsoft SMTP Server (TLS) id
- 15.0.1367.3 via Frontend Transport; Wed, 18 Sep 2019 02:39:36 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=D2yx5RYURJij2Uy3szT8DyJR+vTdAdIFVxli4sxjS3YzqaRjmWMLCDhUdRWdbs8LKj4RKFlR1QTKUgtls0hB2miMjdARg8xOoF3G2hrPLa3jyxjBqx3jyNd7DHTm/qlE6fdj8PXw32WkpSYyZy+Q30v6zckK3Xs5BPZi3iPO60xpyOakkKabfgH+lreihgDZFzM5EbD76kQP/qyC26XOyEeib8tQSpklUGGr94FhAh3QwsBkM6KK5BNUcUfaUFhRxnUJMZY7RUE6hqjBDYtOmWmtTDaa024nb6r1VBWW3l1HaZcl+XlOGENzKPOl0FkZnOro//FbiUgkSHcZMIPdZA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1YxlYm7hz6Dp6VyliP4Ie2oWjHnMdKc0ZotKYsLPgUU=;
- b=KPgiOkJ68mArcl0lanhIKQks/v4XVx3OAouJ7UBX4/D0cxDAgnf/s32vMUtsmUIKd2MALklUTHHbbFjjnNHH0uxajSSnpe2U0ZFmraOfIbJ1MBERyQQaPwKCCcJ93PDjqt0mGZek2Zy8Rb+U15GaqQLmtiaOnpkgFNhxRfcq55KS7GWa+YgAvCPmYS4OQhBDt/SLI6NtblGkixf4VwXpiOOLma0ue81DXegSyOBVmDDclbeBmt//VEVC8WwBmr1rmApcwyUUJBb32KHBE4r4Lr43FtVNXEmSV7xm5wIycymklzCt3+uRT7wt6JIUAb3BuL2RcIW2kHYqlDM+oPSYxw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
+        Wed, 18 Sep 2019 07:44:19 -0400
+Received: by mail-ed1-f68.google.com with SMTP id t3so4115355edw.13
+        for <linux-crypto@vger.kernel.org>; Wed, 18 Sep 2019 04:44:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=marvell.onmicrosoft.com; s=selector2-marvell-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1YxlYm7hz6Dp6VyliP4Ie2oWjHnMdKc0ZotKYsLPgUU=;
- b=m5Y1H/qsVVRxMM1Ge9YckR4d5Mhyugr9pnd7PnrvBT1If7Iazv55lqa91LUcDjSh9BQOTDAHC2njeDNGUfMNh1l1JYrNi+9z9kyyLNXBOhh+63PLsBLczyuJlV4RgdJsIPCgVfe02Yfrnh0JoDIqppf3uMqXdXWlWVFktlQsoOY=
-Received: from MN2PR18MB2797.namprd18.prod.outlook.com (20.179.22.16) by
- MN2PR18MB3085.namprd18.prod.outlook.com (20.179.21.16) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2284.18; Wed, 18 Sep 2019 09:39:35 +0000
-Received: from MN2PR18MB2797.namprd18.prod.outlook.com
- ([fe80::2010:7134:bdcf:8ad9]) by MN2PR18MB2797.namprd18.prod.outlook.com
- ([fe80::2010:7134:bdcf:8ad9%7]) with mapi id 15.20.2263.023; Wed, 18 Sep 2019
- 09:39:35 +0000
-From:   Nagadheeraj Rottela <rnagadheeraj@marvell.com>
-To:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>
-CC:     Srikanth Jampala <jsrikanth@marvell.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Nagadheeraj Rottela <rnagadheeraj@marvell.com>
-Subject: [PATCH] crypto: cavium/nitrox - Add mailbox message to get mcode info
- in VF
-Thread-Topic: [PATCH] crypto: cavium/nitrox - Add mailbox message to get mcode
- info in VF
-Thread-Index: AQHVbgT7evuBeNkKn0+ndI98tEnhjw==
-Date:   Wed, 18 Sep 2019 09:39:34 +0000
-Message-ID: <20190918093901.6477-1-rnagadheeraj@marvell.com>
-Accept-Language: en-IN, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: BMXPR01CA0025.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:b00:c::11) To MN2PR18MB2797.namprd18.prod.outlook.com
- (2603:10b6:208:a0::16)
-x-ms-exchange-messagesentrepresentingtype: 1
-x-mailer: git-send-email 2.13.6
-x-originating-ip: [115.113.156.2]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 7ada9b43-7afb-44d5-d30b-08d73c1c1d77
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600167)(711020)(4605104)(1401327)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:MN2PR18MB3085;
-x-ms-traffictypediagnostic: MN2PR18MB3085:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MN2PR18MB3085AAC11D3C2EDB70DCB54AD68E0@MN2PR18MB3085.namprd18.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:257;
-x-forefront-prvs: 01644DCF4A
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(396003)(346002)(366004)(376002)(136003)(189003)(199004)(86362001)(2906002)(256004)(66946007)(66556008)(15650500001)(36756003)(2501003)(6116002)(81166006)(81156014)(54906003)(6486002)(107886003)(110136005)(8676002)(3846002)(8936002)(1076003)(316002)(50226002)(5660300002)(66066001)(7736002)(305945005)(102836004)(6506007)(4326008)(55236004)(386003)(26005)(6512007)(25786009)(64756008)(186003)(66476007)(66446008)(486006)(478600001)(71190400001)(99286004)(71200400001)(476003)(2616005)(14454004)(6436002)(52116002)(6606295002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR18MB3085;H:MN2PR18MB2797.namprd18.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: marvell.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: L8CTZ48z1rEuT7adXcHnOtAHag4eBb0AHwhhvYVf/ZZKM93nD6tkxLsNhsxEE+qoD7UnDQ3Pk7928ogK2VjTWhNeP0VZ0rmhsyqjjTnXFcsSXBE5BNMb548uALex/qFIsGmRoWmXv6pnbJGZfMBMIAckGbuEnk3FzqSfJml/7MYvaZp7C9qWpoT9aC+oKehCDtTfvEMlGiToe7bz11mfSjMQU3NsJHFd6N22DUEoOxKsDJQLmMsMYD4KKR6w7g6AuYf/o4pj22vgsnoPxdrSVYIxkb5tm8BwMcSZqTvQ2x4xywu1ZR6v+s0nCDmCltES3DpxfAed+iJEhi7J/acv7SKVoiUdTftovUwN5OS8tiuciAPV2ielTkPx0sk3gUNVJTyuZzHLJYW7WOa7bPzDAQheB1itjpdZz5LC9kmmAVc=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7ada9b43-7afb-44d5-d30b-08d73c1c1d77
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Sep 2019 09:39:34.9516
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: r2A490Cj97sDMKq0ri+KWeZ9CzOik0GupTocX1Jd3z8D9vyR0CW0lfFR3OPJmO2I3WyHQPXkmBlg8vdIbSb7XTAiVkQNHk2Dpl9GIjCkPDQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR18MB3085
-X-OriginatorOrg: marvell.com
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.70,1.0.8
- definitions=2019-09-18_06:2019-09-17,2019-09-18 signatures=0
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=iZkZOaAGLL3DOBQGBHi9RUqlxs60HiKY1fa+AGeVEzU=;
+        b=l3QQBuiMahL2+3LUrsMuEBw9TMsOZvoAMgcXuFoAVt/G7WKFGf3uEj977uMo8G3KV8
+         9EW7reSnejij5RPta7Blich/D8Ie36VbwtAg3yf3O3K/Bm0WCg2QmWy+z7PlTgfGyozy
+         992mMEyx/t/h1BtLD+lwt9OVrZApG5Mf2FPxMpFcib4jkfK6Dgj4Q0g0dtaD93ebmj6W
+         KyCpvttXO/UPY6pkrRm9yfBji/a7ZpaoWRexfuftSva1XjH/gBC690j+NTWoyRRJ+ZPO
+         HL0AunYgxdyP37dU/K5rCLRKRb+U4x2YsF24nZ6HBNKDjOTgmOf74Hj887hKqyUJehXU
+         Z5fw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=iZkZOaAGLL3DOBQGBHi9RUqlxs60HiKY1fa+AGeVEzU=;
+        b=FmET9ZWa6E8RtYPqkJ3CBbtyYeqfvGmIZHgULkgcwv1/KZt1mA/8rDSWn9bwzVLGgV
+         44l1Gcv4tGP3SOu/Q0gZAlZtAhQ0WwtAcJWy0jTOPDF05JBc1CqwTSZ3vr+UDZf+YN7Z
+         DSgJSDPNgPzk2VptVZhP4w0PHiZFLasIvOh6SN9lPpeF1eJ17y5iFDLG3+BNlmYpy/Gt
+         i1xLTfQqSy3ZwhIk5ScdfWtYmZrtmg/sMZT91Zr6/nYGy97WGxznuE+WXzKmHLM26fat
+         yEgFxM8ydqnoVWzKNoEV91ryQ8SGGREu5/EV/GCA/gQf/PydcXdu4xq4u++tBJuZbGnU
+         z7xQ==
+X-Gm-Message-State: APjAAAWDeLcdTt2n68u3M28nzwYGl876sYALZteCJbgiG9DQ20KspVpO
+        6tiDxuBFim5Xzkutkar6+xFHam8L
+X-Google-Smtp-Source: APXvYqzDZQYG8/1ZpqzsPsTW5SlgDOXykjm/KjgCZZx1R9WboPfLXo9s65Ww4IqqlZJm71jEkV0tpQ==
+X-Received: by 2002:a17:907:10c5:: with SMTP id rv5mr9012483ejb.262.1568807056858;
+        Wed, 18 Sep 2019 04:44:16 -0700 (PDT)
+Received: from localhost.localdomain.com ([188.204.2.113])
+        by smtp.gmail.com with ESMTPSA id s21sm1003738edi.85.2019.09.18.04.44.15
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 18 Sep 2019 04:44:16 -0700 (PDT)
+From:   Pascal van Leeuwen <pascalvanl@gmail.com>
+X-Google-Original-From: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     antoine.tenart@bootlin.com, herbert@gondor.apana.org.au,
+        davem@davemloft.net,
+        Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
+Subject: [PATCH] crypto: inside-secure - Add support for the EIP196
+Date:   Wed, 18 Sep 2019 12:41:26 +0200
+Message-Id: <1568803286-8111-1-git-send-email-pvanleeuwen@verimatrix.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add support to get microcode information in VF from PF via mailbox
-message.
+This patch adds support for the EIP196, which is an EIP197 derivative
+that has no classification hardware and a simplified record cache.
 
-Signed-off-by: Nagadheeraj Rottela <rnagadheeraj@marvell.com>
-Reviewed-by: Srikanth Jampala <jsrikanth@marvell.com>
+The patch has been tested with the eip196b-ie and eip197c-iewxkbc
+configurations on the Xilinx VCU118 development board as well as on the
+Macchiatobin board (Marvell A8K - EIP197b-ieswx), including the crypto
+extra tests.
+
+Note that this patchset applies on top of the earlier submitted
+"Add support for eip197f_iewc" series.
+
+Signed-off-by: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
 ---
- drivers/crypto/cavium/nitrox/nitrox_dev.h | 15 +++++++++++++++
- drivers/crypto/cavium/nitrox/nitrox_mbx.c |  8 ++++++++
- 2 files changed, 23 insertions(+)
+ drivers/crypto/inside-secure/safexcel.c      | 69 ++++++++++++++++++++++------
+ drivers/crypto/inside-secure/safexcel.h      | 30 +++++++++++-
+ drivers/crypto/inside-secure/safexcel_ring.c |  1 +
+ 3 files changed, 86 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_dev.h b/drivers/crypto/cav=
-ium/nitrox/nitrox_dev.h
-index 2217a2736c8e..c2d0c23fb81b 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_dev.h
-+++ b/drivers/crypto/cavium/nitrox/nitrox_dev.h
-@@ -109,6 +109,13 @@ struct nitrox_q_vector {
- 	};
- };
-=20
-+enum mcode_type {
-+	MCODE_TYPE_INVALID,
-+	MCODE_TYPE_AE,
-+	MCODE_TYPE_SE_SSL,
-+	MCODE_TYPE_SE_IPSEC,
-+};
+diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+index c40eb1b..9fb4947 100644
+--- a/drivers/crypto/inside-secure/safexcel.c
++++ b/drivers/crypto/inside-secure/safexcel.c
+@@ -484,6 +484,14 @@ static int safexcel_hw_setup_cdesc_rings(struct safexcel_crypto_priv *priv)
+ 		cd_fetch_cnt = ((1 << priv->hwconfig.hwcfsize) /
+ 				cd_size_rnd) - 1;
+ 	}
++	/*
++	 * Since we're using command desc's way larger than formally specified,
++	 * we need to check whether we can fit even 1 for low-end EIP196's!
++	 */
++	if (!cd_fetch_cnt) {
++		dev_err(priv->dev, "Unable to fit even 1 command desc!\n");
++		return -ENODEV;
++	}
+ 
+ 	for (i = 0; i < priv->config.rings; i++) {
+ 		/* ring base address */
+@@ -608,8 +616,8 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
+ 		writel(EIP197_DxE_THR_CTRL_RESET_PE,
+ 		       EIP197_HIA_DFE_THR(priv) + EIP197_HIA_DFE_THR_CTRL(pe));
+ 
+-		if (priv->flags & SAFEXCEL_HW_EIP197)
+-			/* Reset HIA input interface arbiter (EIP197 only) */
++		if (priv->flags & EIP197_PE_ARB)
++			/* Reset HIA input interface arbiter (if present) */
+ 			writel(EIP197_HIA_RA_PE_CTRL_RESET,
+ 			       EIP197_HIA_AIC(priv) + EIP197_HIA_RA_PE_CTRL(pe));
+ 
+@@ -756,22 +764,28 @@ static int safexcel_hw_init(struct safexcel_crypto_priv *priv)
+ 	/* Clear any HIA interrupt */
+ 	writel(GENMASK(30, 20), EIP197_HIA_AIC_G(priv) + EIP197_HIA_AIC_G_ACK);
+ 
+-	if (priv->flags & SAFEXCEL_HW_EIP197) {
++	if (priv->flags & EIP197_SIMPLE_TRC) {
++		writel(EIP197_STRC_CONFIG_INIT |
++		       EIP197_STRC_CONFIG_LARGE_REC(EIP197_CS_TRC_REC_WC) |
++		       EIP197_STRC_CONFIG_SMALL_REC(EIP197_CS_TRC_REC_WC),
++		       priv->base + EIP197_STRC_CONFIG);
++		writel(EIP197_PE_EIP96_TOKEN_CTRL2_CTX_DONE,
++		       EIP197_PE(priv) + EIP197_PE_EIP96_TOKEN_CTRL2(0));
++	} else if (priv->flags & SAFEXCEL_HW_EIP197) {
+ 		ret = eip197_trc_cache_init(priv);
+ 		if (ret)
+ 			return ret;
++	}
+ 
+-		priv->flags |= EIP197_TRC_CACHE;
+-
++	if (priv->flags & EIP197_ICE) {
+ 		ret = eip197_load_firmwares(priv);
+ 		if (ret)
+ 			return ret;
+ 	}
+ 
+-	safexcel_hw_setup_cdesc_rings(priv);
+-	safexcel_hw_setup_rdesc_rings(priv);
+-
+-	return 0;
++	return safexcel_hw_setup_cdesc_rings(priv) ?:
++	       safexcel_hw_setup_rdesc_rings(priv) ?:
++	       0;
+ }
+ 
+ /* Called with ring's lock taken */
+@@ -1371,7 +1385,7 @@ static int safexcel_probe_generic(void *pdev,
+ 				  int is_pci_dev)
+ {
+ 	struct device *dev = priv->dev;
+-	u32 peid, version, mask, val, hiaopt;
++	u32 peid, version, mask, val, hiaopt, hwopt, peopt;
+ 	int i, ret, hwctg;
+ 
+ 	priv->context_pool = dmam_pool_create("safexcel-context", dev,
+@@ -1433,13 +1447,16 @@ static int safexcel_probe_generic(void *pdev,
+ 	 */
+ 	version = readl(EIP197_GLOBAL(priv) + EIP197_VERSION);
+ 	if (((priv->flags & SAFEXCEL_HW_EIP197) &&
+-	     (EIP197_REG_LO16(version) != EIP197_VERSION_LE)) ||
++	     (EIP197_REG_LO16(version) != EIP197_VERSION_LE) &&
++	     (EIP197_REG_LO16(version) != EIP196_VERSION_LE)) ||
+ 	    ((!(priv->flags & SAFEXCEL_HW_EIP197) &&
+ 	     (EIP197_REG_LO16(version) != EIP97_VERSION_LE)))) {
+ 		/*
+ 		 * We did not find the device that matched our initial probing
+ 		 * (or our initial probing failed) Report appropriate error.
+ 		 */
++		dev_err(priv->dev, "Probing for EIP97/EIP19x failed - no such device (read %08x)\n",
++			version);
+ 		return -ENODEV;
+ 	}
+ 
+@@ -1447,6 +1464,14 @@ static int safexcel_probe_generic(void *pdev,
+ 	hwctg = version >> 28;
+ 	peid = version & 255;
+ 
++	/* Detect EIP206 processing pipe */
++	version = readl(EIP197_PE(priv) + + EIP197_PE_VERSION(0));
++	if (EIP197_REG_LO16(version) != EIP206_VERSION_LE) {
++		dev_err(priv->dev, "EIP%d: EIP206 not detected\n", peid);
++		return -ENODEV;
++	}
++	priv->hwconfig.ppver = EIP197_VERSION_MASK(version);
 +
- /**
-  * mbox_msg - Mailbox message data
-  * @type: message type
-@@ -128,6 +135,14 @@ union mbox_msg {
- 		u64 chipid: 8;
- 		u64 vfid: 8;
- 	} id;
-+	struct {
-+		u64 type: 2;
-+		u64 opcode: 6;
-+		u64 count: 4;
-+		u64 info: 40;
-+		u64 next_se_grp: 3;
-+		u64 next_ae_grp: 3;
-+	} mcode_info;
+ 	/* Detect EIP96 packet engine and version */
+ 	version = readl(EIP197_PE(priv) + EIP197_PE_EIP96_VERSION(0));
+ 	if (EIP197_REG_LO16(version) != EIP96_VERSION_LE) {
+@@ -1455,10 +1480,13 @@ static int safexcel_probe_generic(void *pdev,
+ 	}
+ 	priv->hwconfig.pever = EIP197_VERSION_MASK(version);
+ 
++	hwopt = readl(EIP197_GLOBAL(priv) + EIP197_OPTIONS);
+ 	hiaopt = readl(EIP197_HIA_AIC(priv) + EIP197_HIA_OPTIONS);
+ 
+ 	if (priv->flags & SAFEXCEL_HW_EIP197) {
+ 		/* EIP197 */
++		peopt = readl(EIP197_PE(priv) + EIP197_PE_OPTIONS(0));
++
+ 		priv->hwconfig.hwdataw  = (hiaopt >> EIP197_HWDATAW_OFFSET) &
+ 					  EIP197_HWDATAW_MASK;
+ 		priv->hwconfig.hwcfsize = ((hiaopt >> EIP197_CFSIZE_OFFSET) &
+@@ -1471,6 +1499,15 @@ static int safexcel_probe_generic(void *pdev,
+ 					  EIP197_N_PES_MASK;
+ 		priv->hwconfig.hwnumrings = (hiaopt >> EIP197_N_RINGS_OFFSET) &
+ 					    EIP197_N_RINGS_MASK;
++		if (hiaopt & EIP197_HIA_OPT_HAS_PE_ARB)
++			priv->flags |= EIP197_PE_ARB;
++		if (EIP206_OPT_ICE_TYPE(peopt) == 1)
++			priv->flags |= EIP197_ICE;
++		/* If not a full TRC, then assume simple TRC */
++		if (!(hwopt & EIP197_OPT_HAS_TRC))
++			priv->flags |= EIP197_SIMPLE_TRC;
++		/* EIP197 always has SOME form of TRC */
++		priv->flags |= EIP197_TRC_CACHE;
+ 	} else {
+ 		/* EIP97 */
+ 		priv->hwconfig.hwdataw  = (hiaopt >> EIP197_HWDATAW_OFFSET) &
+@@ -1492,18 +1529,24 @@ static int safexcel_probe_generic(void *pdev,
+ 			break;
+ 	}
+ 	priv->hwconfig.hwnumraic = i;
++	/* Low-end EIP196 may not have any ring AIC's ... */
++	if (!priv->hwconfig.hwnumraic) {
++		dev_err(priv->dev, "No ring interrupt controller present!\n");
++		return -ENODEV;
++	}
+ 
+ 	/* Get supported algorithms from EIP96 transform engine */
+ 	priv->hwconfig.algo_flags = readl(EIP197_PE(priv) +
+ 				    EIP197_PE_EIP96_OPTIONS(0));
+ 
+ 	/* Print single info line describing what we just detected */
+-	dev_info(priv->dev, "EIP%d:%x(%d,%d,%d,%d)-HIA:%x(%d,%d,%d),PE:%x,alg:%08x\n",
++	dev_info(priv->dev, "EIP%d:%x(%d,%d,%d,%d)-HIA:%x(%d,%d,%d),PE:%x/%x,alg:%08x\n",
+ 		 peid, priv->hwconfig.hwver, hwctg, priv->hwconfig.hwnumpes,
+ 		 priv->hwconfig.hwnumrings, priv->hwconfig.hwnumraic,
+ 		 priv->hwconfig.hiaver, priv->hwconfig.hwdataw,
+ 		 priv->hwconfig.hwcfsize, priv->hwconfig.hwrfsize,
+-		 priv->hwconfig.pever, priv->hwconfig.algo_flags);
++		 priv->hwconfig.ppver, priv->hwconfig.pever,
++		 priv->hwconfig.algo_flags);
+ 
+ 	safexcel_configure(priv);
+ 
+diff --git a/drivers/crypto/inside-secure/safexcel.h b/drivers/crypto/inside-secure/safexcel.h
+index 25dfd8a..c2524e1 100644
+--- a/drivers/crypto/inside-secure/safexcel.h
++++ b/drivers/crypto/inside-secure/safexcel.h
+@@ -17,9 +17,11 @@
+ #define EIP197_HIA_VERSION_BE			0xca35
+ #define EIP197_HIA_VERSION_LE			0x35ca
+ #define EIP97_VERSION_LE			0x9e61
++#define EIP196_VERSION_LE			0x3bc4
+ #define EIP197_VERSION_LE			0x3ac5
+ #define EIP96_VERSION_LE			0x9f60
+ #define EIP201_VERSION_LE			0x36c9
++#define EIP206_VERSION_LE			0x31ce
+ #define EIP197_REG_LO16(reg)			(reg & 0xffff)
+ #define EIP197_REG_HI16(reg)			((reg >> 16) & 0xffff)
+ #define EIP197_VERSION_MASK(reg)		((reg >> 16) & 0xfff)
+@@ -27,6 +29,15 @@
+ 						((reg >> 4) & 0xf0) | \
+ 						((reg >> 12) & 0xf))
+ 
++/* EIP197 HIA OPTIONS ENCODING */
++#define EIP197_HIA_OPT_HAS_PE_ARB		BIT(29)
++
++/* EIP206 OPTIONS ENCODING */
++#define EIP206_OPT_ICE_TYPE(n)			((n>>8)&3)
++
++/* EIP197 OPTIONS ENCODING */
++#define EIP197_OPT_HAS_TRC			BIT(31)
++
+ /* Static configuration */
+ #define EIP197_DEFAULT_RING_SIZE		400
+ #define EIP197_MAX_TOKENS			19
+@@ -160,12 +171,16 @@
+ #define EIP197_PE_EIP96_FUNCTION_EN(n)		(0x1004 + (0x2000 * (n)))
+ #define EIP197_PE_EIP96_CONTEXT_CTRL(n)		(0x1008 + (0x2000 * (n)))
+ #define EIP197_PE_EIP96_CONTEXT_STAT(n)		(0x100c + (0x2000 * (n)))
++#define EIP197_PE_EIP96_TOKEN_CTRL2(n)		(0x102c + (0x2000 * (n)))
+ #define EIP197_PE_EIP96_FUNCTION2_EN(n)		(0x1030 + (0x2000 * (n)))
+ #define EIP197_PE_EIP96_OPTIONS(n)		(0x13f8 + (0x2000 * (n)))
+ #define EIP197_PE_EIP96_VERSION(n)		(0x13fc + (0x2000 * (n)))
+ #define EIP197_PE_OUT_DBUF_THRES(n)		(0x1c00 + (0x2000 * (n)))
+ #define EIP197_PE_OUT_TBUF_THRES(n)		(0x1d00 + (0x2000 * (n)))
++#define EIP197_PE_OPTIONS(n)			(0x1ff8 + (0x2000 * (n)))
++#define EIP197_PE_VERSION(n)			(0x1ffc + (0x2000 * (n)))
+ #define EIP197_MST_CTRL				0xfff4
++#define EIP197_OPTIONS				0xfff8
+ #define EIP197_VERSION				0xfffc
+ 
+ /* EIP197-specific registers, no indirection */
+@@ -181,6 +196,7 @@
+ #define EIP197_TRC_ECCADMINSTAT			0xf0838
+ #define EIP197_TRC_ECCDATASTAT			0xf083c
+ #define EIP197_TRC_ECCDATA			0xf0840
++#define EIP197_STRC_CONFIG			0xf43f0
+ #define EIP197_FLUE_CACHEBASE_LO(n)		(0xf6000 + (32 * (n)))
+ #define EIP197_FLUE_CACHEBASE_HI(n)		(0xf6004 + (32 * (n)))
+ #define EIP197_FLUE_CONFIG(n)			(0xf6010 + (32 * (n)))
+@@ -331,6 +347,14 @@
+ #define EIP197_ADDRESS_MODE			BIT(8)
+ #define EIP197_CONTROL_MODE			BIT(9)
+ 
++/* EIP197_PE_EIP96_TOKEN_CTRL2 */
++#define EIP197_PE_EIP96_TOKEN_CTRL2_CTX_DONE	BIT(3)
++
++/* EIP197_STRC_CONFIG */
++#define EIP197_STRC_CONFIG_INIT			BIT(31)
++#define EIP197_STRC_CONFIG_LARGE_REC(s)		(s<<8)
++#define EIP197_STRC_CONFIG_SMALL_REC(s)		(s<<0)
++
+ /* EIP197_FLUE_CONFIG */
+ #define EIP197_FLUE_CONFIG_MAGIC		0xc7000004
+ 
+@@ -472,7 +496,7 @@ struct result_data_desc {
+ 	u16 application_id;
+ 	u16 rsvd1;
+ 
+-	u32 rsvd2;
++	u32 rsvd2[5];
+ } __packed;
+ 
+ 
+@@ -731,12 +755,16 @@ struct safexcel_register_offsets {
+ enum safexcel_flags {
+ 	EIP197_TRC_CACHE	= BIT(0),
+ 	SAFEXCEL_HW_EIP197	= BIT(1),
++	EIP197_PE_ARB		= BIT(2),
++	EIP197_ICE		= BIT(3),
++	EIP197_SIMPLE_TRC	= BIT(4),
  };
-=20
- /**
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_mbx.c b/drivers/crypto/cav=
-ium/nitrox/nitrox_mbx.c
-index 02ee95064841..b51b0449b478 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_mbx.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_mbx.c
-@@ -25,6 +25,7 @@ enum mbx_msg_opcode {
- 	MSG_OP_VF_UP,
- 	MSG_OP_VF_DOWN,
- 	MSG_OP_CHIPID_VFID,
-+	MSG_OP_MCODE_INFO =3D 11,
- };
-=20
- struct pf2vf_work {
-@@ -73,6 +74,13 @@ static void pf2vf_send_response(struct nitrox_device *nd=
-ev,
- 		vfdev->nr_queues =3D 0;
- 		atomic_set(&vfdev->state, __NDEV_NOT_READY);
- 		break;
-+	case MSG_OP_MCODE_INFO:
-+		msg.data =3D 0;
-+		msg.mcode_info.count =3D 2;
-+		msg.mcode_info.info =3D MCODE_TYPE_SE_SSL | (MCODE_TYPE_AE << 5);
-+		msg.mcode_info.next_se_grp =3D 1;
-+		msg.mcode_info.next_ae_grp =3D 1;
-+		break;
- 	default:
- 		msg.type =3D MBX_MSG_TYPE_NOP;
- 		break;
---=20
-2.13.6
+ 
+ struct safexcel_hwconfig {
+ 	enum safexcel_eip_algorithms algo_flags;
+ 	int hwver;
+ 	int hiaver;
++	int ppver;
+ 	int pever;
+ 	int hwdataw;
+ 	int hwcfsize;
+diff --git a/drivers/crypto/inside-secure/safexcel_ring.c b/drivers/crypto/inside-secure/safexcel_ring.c
+index 5323e91..9237ba7 100644
+--- a/drivers/crypto/inside-secure/safexcel_ring.c
++++ b/drivers/crypto/inside-secure/safexcel_ring.c
+@@ -180,6 +180,7 @@ struct safexcel_result_desc *safexcel_add_rdesc(struct safexcel_crypto_priv *pri
+ 
+ 	rdesc->first_seg = first;
+ 	rdesc->last_seg = last;
++	rdesc->result_size = EIP197_RD64_RESULT_SIZE;
+ 	rdesc->particle_size = len;
+ 	rdesc->data_lo = lower_32_bits(data);
+ 	rdesc->data_hi = upper_32_bits(data);
+-- 
+1.8.3.1
 
