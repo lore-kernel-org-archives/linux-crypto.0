@@ -2,141 +2,106 @@ Return-Path: <SRS0=4UkV=XO=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6176C49ED7
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Sep 2019 14:09:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2799CC49ED7
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Sep 2019 16:05:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B33E82067B
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Sep 2019 14:09:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F1EA621927
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Sep 2019 16:05:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mBvRSHwQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728519AbfISOJt (ORCPT
+        id S2404061AbfISQFE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Sep 2019 10:09:49 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:57389 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727642AbfISOJt (ORCPT
+        Thu, 19 Sep 2019 12:05:04 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:37739 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2404060AbfISQFE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Sep 2019 10:09:49 -0400
-Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
- (mreue012 [212.227.15.129]) with ESMTPA (Nemesis) id
- 1Mrfgi-1hpxqe1rC0-00ndmR; Thu, 19 Sep 2019 16:09:20 +0200
-From:   Arnd Bergmann <arnd@arndb.de>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Thu, 19 Sep 2019 12:05:04 -0400
+Received: by mail-io1-f65.google.com with SMTP id b19so9034185iob.4;
+        Thu, 19 Sep 2019 09:05:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=I36Yq2VwXBdLTsy979OXOJLPrf5I1O04uwmTwfk7AV0=;
+        b=mBvRSHwQhaiwSHy+grn5OzxBpH/5Wz/XXFK+oCIKRx1CQ42bj/yMQM7F8U9m20+5vp
+         LsinHDd6aJQaqzp3ENiu6ksW/RNxH/miqtR8eZII+AbtMRWregMnmj6LAEbmw4khObgj
+         YvMgUTZRGBWBvB6y28l7GhnSzcQIvIeZqS6k7cvDm2c76dtMBtSJx0ypJhbo3dqQ1zwQ
+         gCSC3KCpTio4j1lt0TwrAw7XY2UEcTpJsxAKQHd83O5t1W4NsdCsGbQl+ucb3bIk92su
+         UT6imsMlxAiuIwtVjO46s/t2UtOttudfVMD288QdJy8loTF6l98nue+4Sb8kZ6TWkNq1
+         gn/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=I36Yq2VwXBdLTsy979OXOJLPrf5I1O04uwmTwfk7AV0=;
+        b=el+Pnfg+Fbje+qxec2DzdDddnHu+vJDzMCKjGP0Fghi2KVKHk1pE6w8BJg2ps4JNmx
+         E1l587E5bLTa7mdOxWR2bIYaZtYFOhcZorOlKaLXeVi+AV7q+8fqGdCxzLpncpM4zy5P
+         /63qfy3KibwqMEttbu670JGr4z+fOubdCUtCZzuNnxBpBn0RuQEwKaGVJvqpz4hPh+7v
+         qiVXONZ//G4wkcjJn6FM0amcczxe+HThcktIEexYlqvqrgGt6VoegggjuaZqvZ2LiW/s
+         ClY+0Xwrh8iQN+evDuyAs0r7/Px5xHDIBjDJyDMMEPsC/r5HQ0dsPkii+McBImXW8kGd
+         8uNg==
+X-Gm-Message-State: APjAAAXVos459A0JGI50yZskZIHW+eMx/jBuU2Ccm4BV7yhf9aQeAp7H
+        2O0CL6HXje2nIEQMUWSG4LOFiAY+eZ8=
+X-Google-Smtp-Source: APXvYqy5MiUiVetTSZ6weYK7h2G0HbJvg8EoGoDMZN3TqjAR6UODgxa2cp1ASQ5wkOShprtBASzzbQ==
+X-Received: by 2002:a5d:8908:: with SMTP id b8mr918621ion.237.1568909102290;
+        Thu, 19 Sep 2019 09:05:02 -0700 (PDT)
+Received: from cs-dulles.cs.umn.edu (cs-dulles.cs.umn.edu. [128.101.35.54])
+        by smtp.googlemail.com with ESMTPSA id g8sm5902449ioc.0.2019.09.19.09.05.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Sep 2019 09:05:01 -0700 (PDT)
+From:   Navid Emamdoost <navid.emamdoost@gmail.com>
+To:     ghook@amd.com
+Cc:     emamd001@umn.edu, smccaman@umn.edu, kjlu@umn.edu,
+        Navid Emamdoost <navid.emamdoost@gmail.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Zhou Wang <wangzhou1@hisilicon.com>
-Cc:     Arnd Bergmann <arnd@arndb.de>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Kenneth Lee <liguozhu@hisilicon.com>,
-        John Garry <john.garry@huawei.com>,
-        Mao Wenan <maowenan@huawei.com>,
-        Hao Fang <fanghao11@huawei.com>,
-        Shiju Jose <shiju.jose@huawei.com>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] [v2] crypto: hisilicon - allow compile-testing on x86
-Date:   Thu, 19 Sep 2019 16:09:06 +0200
-Message-Id: <20190919140917.1290556-1-arnd@arndb.de>
-X-Mailer: git-send-email 2.20.0
-In-Reply-To: <20190919140650.1289963-2-arnd@arndb.de>
-References: <20190919140650.1289963-2-arnd@arndb.de>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:U629Hd3cGnU8BwGfZLZmPjR9EqhyF7LggzzKaHMqmPXJG5SOoaG
- 56qWhLWW1tp3/1dhLgYLQaT2/VQYhnegAH24c+wTg/NKoqMW/uChNHZvLu2bF93uuiDxa0M
- /tmHdUwK7VHvYB3oyEYu66CoaWEUwJ179MbitGhoXO7b5Fm3B3L5rC8KbrGxvlCIKNJKdyT
- 8nDarTIeVn1ho1o4uQHxg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:EkShJhDQDqY=:qIOWDGVLQmjV8bKEgwt4Ov
- 3uj4+TxUABsXndAQ/dtvDmhlYgngeGssU3jdIGXldoJhuzhZvfBlYQ3r9lPXgff/T4NX5bszl
- I0aCwXe8pqFOPlB3ZXC2XxwNhfkVGJ6jt53i3YVrOsZ0HL0R3dMLDVAVPJ+H22NWJEXAEj9i3
- 0qLdhFGlhYVgmkpjMsMmG3FTXHAgN1mymMd9DKXfLtz0USx7gEHLr3cIRk/R5X/gudfzr38hj
- FA+xWPNWez8ryGCwqx5V7H0J8UfNbBnG0sA7qnRL8i1EXnCCJJXrdjMN/5S2aULq3XJH2J8q8
- bwP71nD/OLFCRsAzRomZMcHmncdhTAAOY1QByrJJhYI/gnF+mELnXKuCAH7UnQoPqCelOopbW
- jUpCcXNw+BVlm3riZgiU7LWaXAHC7Om6Tb7EiLF9teAszU9DlPDnfzuwJyTz8UAQOVLel3Jjc
- q2b8Wg/cNyr2zWDbzfoaumBRAUMPOdo+jWYRCMH8P6vtAJOINXonL1cAVy1KDfiGhP6BQ7lAz
- 703n+miWAxpUk3nIQf6bmykFL3FvTAkl7STw1RvbzZ7KjvP4dx108MZG4Vme2HP1p6rt3G0g/
- pAr9sLvLM0WpVJHuC2cw0TsrH13pFmfuevknC9wOkHvAcp24N/zWvkIxIvrleKWufcll+uFYE
- BvmumgFhPsb8QV2SwIWucUhV6zUY1ckw6tYJ4lfeuA9u2dC5IEZoXkM3Jt6OkB0c6GaeiVdFV
- a/d0o6ESZR5TFkEYufvCxnqRiwJXTk+NG2Zx4UcaL7QzAI6x+nuVIMZhPsWoSzTXGb6jUuaga
- fq0QC8zBhsApd1Not5VCsdafp3VIEcdoVnggnfS0kZ9iGiiEEE+JurBC3n53c9BJNffpma9kd
- xTPmXuUFdyb8yT8H7JbQ==
+Subject: [PATCH v2] crypto: ccp - Release all allocated memory if sha type is invalid
+Date:   Thu, 19 Sep 2019 11:04:48 -0500
+Message-Id: <20190919160449.4303-1-navid.emamdoost@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <7ffc6a77-f4e3-7db9-4ec6-53d6e01d881d@amd.com>
+References: <7ffc6a77-f4e3-7db9-4ec6-53d6e01d881d@amd.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-To avoid missing arm64 specific warnings that get introduced
-in this driver, allow compile-testing on all 64-bit architectures.
+Release all allocated memory if sha type is invalid:
+In ccp_run_sha_cmd, if the type of sha is invalid, the allocated
+hmac_buf should be released.
 
-The only actual arm64 specific code in this driver is an open-
-coded 128 bit MMIO write. On non-arm64 the same can be done
-using memcpy_toio. What I also noticed is that the mmio store
-(either one) is not endian-safe, this will only work on little-
-endian configurations, so I also add a Kconfig dependency on
-that, regardless of the architecture.
-Finally, a depenndecy on CONFIG_64BIT is needed because of the
-writeq().
+v2: fix the goto.
 
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Signed-off-by: Navid Emamdoost <navid.emamdoost@gmail.com>
 ---
-v2: actually add !CPU_BIG_ENDIAN dependency as described in the
-changelog
----
- drivers/crypto/hisilicon/Kconfig | 9 ++++++---
- drivers/crypto/hisilicon/qm.c    | 6 ++++++
- 2 files changed, 12 insertions(+), 3 deletions(-)
+ drivers/crypto/ccp/ccp-ops.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
-index ebaf91e0146d..7bfcaa7674fd 100644
---- a/drivers/crypto/hisilicon/Kconfig
-+++ b/drivers/crypto/hisilicon/Kconfig
-@@ -16,14 +16,15 @@ config CRYPTO_DEV_HISI_SEC
+diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
+index 9bc3c62157d7..440df9208f8f 100644
+--- a/drivers/crypto/ccp/ccp-ops.c
++++ b/drivers/crypto/ccp/ccp-ops.c
+@@ -1782,8 +1782,9 @@ static int ccp_run_sha_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 			       LSB_ITEM_SIZE);
+ 			break;
+ 		default:
++			kfree(hmac_buf);
+ 			ret = -EINVAL;
+-			goto e_ctx;
++			goto e_data;
+ 		}
  
- config CRYPTO_DEV_HISI_QM
- 	tristate
--	depends on ARM64 && PCI && PCI_MSI
-+	depends on ARM64 || COMPILE_TEST
-+	depends on PCI && PCI_MSI
- 	help
- 	  HiSilicon accelerator engines use a common queue management
- 	  interface. Specific engine driver may use this module.
- 
- config CRYPTO_HISI_SGL
- 	tristate
--	depends on ARM64
-+	depends on ARM64 || COMPILE_TEST
- 	help
- 	  HiSilicon accelerator engines use a common hardware scatterlist
- 	  interface for data format. Specific engine driver may use this
-@@ -31,7 +32,9 @@ config CRYPTO_HISI_SGL
- 
- config CRYPTO_DEV_HISI_ZIP
- 	tristate "Support for HiSilicon ZIP accelerator"
--	depends on ARM64 && PCI && PCI_MSI
-+	depends on PCI && PCI_MSI
-+	depends on ARM64 || (COMPILE_TEST && 64BIT)
-+	depends on !CPU_BIG_ENDIAN || COMPILE_TEST
- 	select CRYPTO_DEV_HISI_QM
- 	select CRYPTO_HISI_SGL
- 	select SG_SPLIT
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index f975c393a603..a8ed699081b7 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -331,6 +331,12 @@ static void qm_mb_write(struct hisi_qm *qm, const void *src)
- 	void __iomem *fun_base = qm->io_base + QM_MB_CMD_SEND_BASE;
- 	unsigned long tmp0 = 0, tmp1 = 0;
- 
-+	if (!IS_ENABLED(CONFIG_ARM64)) {
-+		memcpy_toio(fun_base, src, 16);
-+		wmb();
-+		return;
-+	}
-+
- 	asm volatile("ldp %0, %1, %3\n"
- 		     "stp %0, %1, %2\n"
- 		     "dsb sy\n"
+ 		memset(&hmac_cmd, 0, sizeof(hmac_cmd));
 -- 
-2.20.0
+2.17.1
 
