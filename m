@@ -2,137 +2,106 @@ Return-Path: <SRS0=4UkV=XO=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64FD1C3A5A6
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Sep 2019 14:07:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0210C3A5A6
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Sep 2019 14:07:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 437CB20882
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Sep 2019 14:07:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ADDC22067B
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Sep 2019 14:07:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389056AbfISOHc (ORCPT
+        id S2388639AbfISOH7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Sep 2019 10:07:32 -0400
-Received: from mout.kundenserver.de ([217.72.192.74]:36263 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387729AbfISOHc (ORCPT
+        Thu, 19 Sep 2019 10:07:59 -0400
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:39944 "EHLO
+        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387729AbfISOH6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Sep 2019 10:07:32 -0400
-Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
- (mreue108 [212.227.15.145]) with ESMTPA (Nemesis) id
- 1MoNu2-1hr3gK0pC4-00opsW; Thu, 19 Sep 2019 16:07:08 +0200
-From:   Arnd Bergmann <arnd@arndb.de>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Zhou Wang <wangzhou1@hisilicon.com>
-Cc:     Arnd Bergmann <arnd@arndb.de>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Kenneth Lee <liguozhu@hisilicon.com>,
-        Shiju Jose <shiju.jose@huawei.com>,
-        Mao Wenan <maowenan@huawei.com>,
-        John Garry <john.garry@huawei.com>,
-        Hao Fang <fanghao11@huawei.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] crypto: hisilicon - allow compile-testing on x86
-Date:   Thu, 19 Sep 2019 16:05:53 +0200
-Message-Id: <20190919140650.1289963-2-arnd@arndb.de>
-X-Mailer: git-send-email 2.20.0
-In-Reply-To: <20190919140650.1289963-1-arnd@arndb.de>
-References: <20190919140650.1289963-1-arnd@arndb.de>
+        Thu, 19 Sep 2019 10:07:58 -0400
+Received: by mail-qt1-f196.google.com with SMTP id x5so4357890qtr.7;
+        Thu, 19 Sep 2019 07:07:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=cxoOCzciOIRUmGCqyjlsgINy4NQTOCEgzeg4ovLh364=;
+        b=EmQfLV/lExPB7whTzZ6ypsrApa3MZ20V9toLnApO1hPAkNo77RzQf71M7oZrcXGAhN
+         rs0blTAVDE0tw2hSVrRGhC7FtvcMJ0tv57MXufCqIsdiae1WKhKzMqKsZf+teO2Xff7Y
+         eH3tELBaBpWXMBXNPSPYCv/svEqNE+hQwB/ucQ+HgkzgsFnFo1Najmn2XlqCvSGgPvdQ
+         496qXuLmoIgCCnOlYfxVyMzQOrLqmHwXA4HXTWxOGEcagmM/ngMK0xhRSfEr6Bpb13Ku
+         JS4rQjbWWEMFjHEMKN+VpFMkyoKNE0DVedQcqtfy108RF/n2JcY7rJibcvIH0rXVRrbR
+         DQsg==
+X-Gm-Message-State: APjAAAVjm81ERUPemh6/9ycoGJj3LaDqIkMzOOX16mrT+yHE+eaMHpst
+        zIEPsRYXBtHkj6uAL8694Tarapqud6bcmZZreGQ=
+X-Google-Smtp-Source: APXvYqxp9XwIdKdieheUSfger0G1a2hQOOM18F3Vp8toqKNPWaEiuqIsjbwq7SYflxqHQsx5t4BctbkPx+KKCeJNscI=
+X-Received: by 2002:ac8:342a:: with SMTP id u39mr3343955qtb.7.1568902077622;
+ Thu, 19 Sep 2019 07:07:57 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:L7yFWwAi2zf3EJZdDKTARe8DorH4eKw0qZyaUsxtBx/h0sffIYB
- e8Yw7mJLacGWfYTjz4p2DANakmc5fVkH/g00PMf2e9O1XYMlOk1l9xJxm4dQs8vPVJ16+rW
- csMCYx6e//nqUPpv7OHqtkaKee/me8uL0b+EsluvjkwWo59IhiAorJzdzcYzqgrqZYmJkLU
- R978hgPWrh33xNCwQgCiw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:U87jcL4Z/TM=:4pPibzFIUuSk1FSlna8JIa
- T2nINl/0ftlVxAFJw5TvQotaV3QAxh0CEfYUye6n2JfiDGNokKz57ptxjUrBf2vz2TdIUdMxi
- AhTKxNm8XdNCKKd81fyVb7CNYtTl77RahdYc6lfTsI2N+olkAmsz7q1uvFVQ2d3p6plPKFEOM
- n/Y4EZE7uxkU6kFJWcLYM5/bhVCBtCda/xUfd/70kENzzBfaFMVPTmoCO4GD85ulqxNzt3wTk
- e4RMXRAsi83Gng7ye+j/vEK0e5ahzw2MMDN2ASZJ3GzylxmnV815NK+q/h1tIwIjtd/ABIMQA
- tRvfoYBJaboNV1RNI26EzaVSxaSG85OivNGNV6juW6X4uZR7JHxJYYhHYuHt1Hm9sqvZLz2eC
- qwpKUSlhOtr/hE/RSYoRdAa/EvqBGkaETpZyeLvk4N/3RouOegrAijQLaZ+lTav7Z8+watKLa
- T5y+1PjoUtPrLNbvxHCe/zlVe+lzpJATYgKTLfKiMA2yQyEi/+MFBkqOR4OIMT9RqwDaNJzxD
- 2JqpLbStGTmNK7QQlu2+f/DkjPxF7fHsD6Mgg+EURLmd9Ar+KzxQcLlENUCWTGp5gahqSnKil
- QBA7ziFNzoG26Xywr0RAefqpr/yvU2PZnd7OCjp6Vd1YRt8N0kAgJsuoLMbCKspn1O4+3ZMpH
- lI1hkLH5r58vCzA4O+DniOTR3Kv/GT+44//nJRw46TP6aixs4lcHVN6g2Jo2f8xWU3CPR+Rpq
- v6DRTcTki+eJMLpitaEagg+eFsRLj0HPqr6JPFssFVdhMOnANGyNHT8SG2W2KrnXnLJ0ldhCw
- djVMui3MN2gphpYoSiMRZJZaAXqbBS0fIUj3RRc3WuR4K7QiL37OkujZGndeS1NUTFsmtkP1T
- RxTer+YX4QlPFeijdx6Q==
+References: <20190906152250.1450649-1-arnd@arndb.de> <20190906152250.1450649-2-arnd@arndb.de>
+ <20190913091718.GA6382@gondor.apana.org.au> <5D833821.5000504@hisilicon.com> <20190919134813.GB29320@gondor.apana.org.au>
+In-Reply-To: <20190919134813.GB29320@gondor.apana.org.au>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Thu, 19 Sep 2019 16:07:41 +0200
+Message-ID: <CAK8P3a0gw0rZ-gfeh+VWL3t2qmj=a3aVV0s12tGw92fbUcfpxQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] crypto: hisilicon - avoid unused function warning
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Zhou Wang <wangzhou1@hisilicon.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Hao Fang <fanghao11@huawei.com>,
+        Kenneth Lee <liguozhu@hisilicon.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-To avoid missing arm64 specific warnings that get introduced
-in this driver, allow compile-testing on all 64-bit architectures.
+On Thu, Sep 19, 2019 at 3:48 PM Herbert Xu <herbert@gondor.apana.org.au> wrote:
+>
+> On Thu, Sep 19, 2019 at 04:11:13PM +0800, Zhou Wang wrote:
+> > On 2019/9/13 17:17, Herbert Xu wrote:
+> > > On Fri, Sep 06, 2019 at 05:22:30PM +0200, Arnd Bergmann wrote:
+> > >> The only caller of hisi_zip_vf_q_assign() is hidden in an #ifdef,
+> > >> so the function causes a warning when CONFIG_PCI_IOV is disabled:
+> > >>
+> > >> drivers/crypto/hisilicon/zip/zip_main.c:740:12: error: unused function 'hisi_zip_vf_q_assign' [-Werror,-Wunused-function]
+> > >>
+> > >> Move it into the same #ifdef.
+> > >>
+> > >> Fixes: 79e09f30eeba ("crypto: hisilicon - add SRIOV support for ZIP")
+> > >> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> > >> ---
+> > >>  drivers/crypto/hisilicon/zip/zip_main.c | 2 ++
+> > >>  1 file changed, 2 insertions(+)
+> > >
+> > > Please find a way to fix this warning without reducing compiler
+> > > coverage.  I prefer to see any compile issues immediately rather
+> > > than through automated build testing.
+> > >
+> > > Thanks,
+> > >
+> >
+> > Sorry for missing this patch.
+> >
+> > Seems other drivers also do like using #ifdef. Do you mean something like this:
+> > #ifdef CONFIG_PCI_IOV
+> > sriov_enable()
+> > ...
+> > #else
+> > /* stub */
+> > sriov_enable()
+> > ...
+> > #endif
+>
+> For an unused warning the unused compiler attribute would seem
+> to be the way to go.
 
-The only actual arm64 specific code in this driver is an open-
-coded 128 bit MMIO write. On non-arm64 the same can be done
-using memcpy_toio. What I also noticed is that the mmio store
-(either one) is not endian-safe, this will only work on little-
-endian configurations, so I also add a Kconfig dependency on
-that, regardless of the architecture.
-Finally, a depenndecy on CONFIG_64BIT is needed because of the
-writeq().
+I sent an update patch now that also removes the first #ifdef, plus one
+that enables compile-testing on x86 (with some caveats).
 
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/crypto/hisilicon/Kconfig | 8 +++++---
- drivers/crypto/hisilicon/qm.c    | 6 ++++++
- 2 files changed, 11 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
-index ebaf91e0146d..dfbd668a431e 100644
---- a/drivers/crypto/hisilicon/Kconfig
-+++ b/drivers/crypto/hisilicon/Kconfig
-@@ -16,14 +16,15 @@ config CRYPTO_DEV_HISI_SEC
- 
- config CRYPTO_DEV_HISI_QM
- 	tristate
--	depends on ARM64 && PCI && PCI_MSI
-+	depends on ARM64 || COMPILE_TEST
-+	depends on PCI && PCI_MSI
- 	help
- 	  HiSilicon accelerator engines use a common queue management
- 	  interface. Specific engine driver may use this module.
- 
- config CRYPTO_HISI_SGL
- 	tristate
--	depends on ARM64
-+	depends on ARM64 || COMPILE_TEST
- 	help
- 	  HiSilicon accelerator engines use a common hardware scatterlist
- 	  interface for data format. Specific engine driver may use this
-@@ -31,7 +32,8 @@ config CRYPTO_HISI_SGL
- 
- config CRYPTO_DEV_HISI_ZIP
- 	tristate "Support for HiSilicon ZIP accelerator"
--	depends on ARM64 && PCI && PCI_MSI
-+	depends on PCI && PCI_MSI
-+	depends on ARM64 || (COMPILE_TEST && 64BIT)
- 	select CRYPTO_DEV_HISI_QM
- 	select CRYPTO_HISI_SGL
- 	select SG_SPLIT
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index f975c393a603..a8ed699081b7 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -331,6 +331,12 @@ static void qm_mb_write(struct hisi_qm *qm, const void *src)
- 	void __iomem *fun_base = qm->io_base + QM_MB_CMD_SEND_BASE;
- 	unsigned long tmp0 = 0, tmp1 = 0;
- 
-+	if (!IS_ENABLED(CONFIG_ARM64)) {
-+		memcpy_toio(fun_base, src, 16);
-+		wmb();
-+		return;
-+	}
-+
- 	asm volatile("ldp %0, %1, %3\n"
- 		     "stp %0, %1, %2\n"
- 		     "dsb sy\n"
--- 
-2.20.0
-
+      Arnd
