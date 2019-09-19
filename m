@@ -4,109 +4,135 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FA69C4CEC4
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Sep 2019 14:07:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64FD1C3A5A6
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Sep 2019 14:07:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2FF6A208C0
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Sep 2019 14:07:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 437CB20882
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Sep 2019 14:07:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388656AbfISOHR (ORCPT
+        id S2389056AbfISOHc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Sep 2019 10:07:17 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:42117 "EHLO
+        Thu, 19 Sep 2019 10:07:32 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:36263 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387729AbfISOHQ (ORCPT
+        with ESMTP id S2387729AbfISOHc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Sep 2019 10:07:16 -0400
+        Thu, 19 Sep 2019 10:07:32 -0400
 Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
  (mreue108 [212.227.15.145]) with ESMTPA (Nemesis) id
- 1MORIm-1iZmOB2Z3e-00PuQo; Thu, 19 Sep 2019 16:06:53 +0200
+ 1MoNu2-1hr3gK0pC4-00opsW; Thu, 19 Sep 2019 16:07:08 +0200
 From:   Arnd Bergmann <arnd@arndb.de>
-To:     Zhou Wang <wangzhou1@hisilicon.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Zhou Wang <wangzhou1@hisilicon.com>
 Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
         Kenneth Lee <liguozhu@hisilicon.com>,
         Shiju Jose <shiju.jose@huawei.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] [v2] crypto: hisilicon - avoid unused function warning
-Date:   Thu, 19 Sep 2019 16:05:52 +0200
-Message-Id: <20190919140650.1289963-1-arnd@arndb.de>
+        Mao Wenan <maowenan@huawei.com>,
+        John Garry <john.garry@huawei.com>,
+        Hao Fang <fanghao11@huawei.com>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 2/2] crypto: hisilicon - allow compile-testing on x86
+Date:   Thu, 19 Sep 2019 16:05:53 +0200
+Message-Id: <20190919140650.1289963-2-arnd@arndb.de>
 X-Mailer: git-send-email 2.20.0
+In-Reply-To: <20190919140650.1289963-1-arnd@arndb.de>
+References: <20190919140650.1289963-1-arnd@arndb.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:ZwJdmyrwyvAI76lZVS7F1Q8hQNWt/yXcQvcpDiKbJDFJbDM1PnS
- SCGltrDG4/QulNus1EXaz8kBZEpEXCtB/frd0rciuFNCTO+cYNMAVjrPCi28ANd2PY7Fe1X
- mrNE0r9FQQKm8SiQPru/4aPaWmLIi7nqLg6p1e4IHPRuWHA5TTFJ+CVXZrkq9+XWmCSvmac
- 0k0J8et2IJZT/RVHuUh1A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:AyJRZaop9Qw=:JWNvO9GCfOBjZv2Q7mViev
- bp0qwy3iPUvTA+bEAXvfHqIFUOhkyk3yd01jpqubGOzLzGZh9jtJa/kMjpisnGrQyBaKBOwQQ
- NfvzbxBRpoB33nXZxA1jnKmkPMpxvEJpjWOFr56tp2z8TUQI7KX42wiqLcX28gssl8u3s+PJy
- kBBx2LXL6kTT9Zxhg3eqg88VXYWPnN51k+jHHeLu4MFz6zbJJMEE6+40fwA0CowRW1TmaQCoi
- WA9e8++HhDftI4+uEel42ouL6ZtBgX2EAERrk627wJiLXrye0THl2lCWOxYNHyoZu+lIisajA
- Pe9li7AS35xA8zSwJmvFBX0PD+VN8VKfMWyPxglV834ktXL4Yhdmt8c5cxZB/Q5H61L+aLgsl
- XJZUyWO5EOuZrzz9u8S5V7QR5uz1bhBafL6fKmlwPfIiSDNkjLCKA9mfXngr8qUggIp235+6n
- 1DkM/7QNxNHd1qt78yeCq5/zUJkG+XNRHhHwecXvEzvmZKrvR5HSdLeDWdalK7edXxgs2hBtm
- DJn7SWVGrkpIV7jOIAcCjftXcJULc6Gc28qQe+9GuC2xOWNl4sWLkftBVP8BuAEFx2rxleujp
- ED1fiYdZP0GLnYjZ128Je1y2RBhgbY5f81PqTpLqLg/JcbYMfejIErIOWghJhhTq9jeYYUggI
- hx62hXGvs8LdNFVaRAKQbDIXoH5vJDiZ5+FhgAvk7XO2d3MiGTe1pkB8T+xc3TpfkGdgfKwJW
- OU3HQ9Q89XVo1BiyHszCTpvUGYttRbWO4S7FweB3SGLYTEFPEzh2yQSjqZmHfCmDVIM/Krspb
- th2eOzGKRS9MwIUWcdVdRBbG5G5nHRY4MPFf04IO5O0Sgt5+WWiCwWdg1tYC5Csg7eY+ISUMP
- gswxLundN5wmNmm4jHiA==
+X-Provags-ID: V03:K1:L7yFWwAi2zf3EJZdDKTARe8DorH4eKw0qZyaUsxtBx/h0sffIYB
+ e8Yw7mJLacGWfYTjz4p2DANakmc5fVkH/g00PMf2e9O1XYMlOk1l9xJxm4dQs8vPVJ16+rW
+ csMCYx6e//nqUPpv7OHqtkaKee/me8uL0b+EsluvjkwWo59IhiAorJzdzcYzqgrqZYmJkLU
+ R978hgPWrh33xNCwQgCiw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:U87jcL4Z/TM=:4pPibzFIUuSk1FSlna8JIa
+ T2nINl/0ftlVxAFJw5TvQotaV3QAxh0CEfYUye6n2JfiDGNokKz57ptxjUrBf2vz2TdIUdMxi
+ AhTKxNm8XdNCKKd81fyVb7CNYtTl77RahdYc6lfTsI2N+olkAmsz7q1uvFVQ2d3p6plPKFEOM
+ n/Y4EZE7uxkU6kFJWcLYM5/bhVCBtCda/xUfd/70kENzzBfaFMVPTmoCO4GD85ulqxNzt3wTk
+ e4RMXRAsi83Gng7ye+j/vEK0e5ahzw2MMDN2ASZJ3GzylxmnV815NK+q/h1tIwIjtd/ABIMQA
+ tRvfoYBJaboNV1RNI26EzaVSxaSG85OivNGNV6juW6X4uZR7JHxJYYhHYuHt1Hm9sqvZLz2eC
+ qwpKUSlhOtr/hE/RSYoRdAa/EvqBGkaETpZyeLvk4N/3RouOegrAijQLaZ+lTav7Z8+watKLa
+ T5y+1PjoUtPrLNbvxHCe/zlVe+lzpJATYgKTLfKiMA2yQyEi/+MFBkqOR4OIMT9RqwDaNJzxD
+ 2JqpLbStGTmNK7QQlu2+f/DkjPxF7fHsD6Mgg+EURLmd9Ar+KzxQcLlENUCWTGp5gahqSnKil
+ QBA7ziFNzoG26Xywr0RAefqpr/yvU2PZnd7OCjp6Vd1YRt8N0kAgJsuoLMbCKspn1O4+3ZMpH
+ lI1hkLH5r58vCzA4O+DniOTR3Kv/GT+44//nJRw46TP6aixs4lcHVN6g2Jo2f8xWU3CPR+Rpq
+ v6DRTcTki+eJMLpitaEagg+eFsRLj0HPqr6JPFssFVdhMOnANGyNHT8SG2W2KrnXnLJ0ldhCw
+ djVMui3MN2gphpYoSiMRZJZaAXqbBS0fIUj3RRc3WuR4K7QiL37OkujZGndeS1NUTFsmtkP1T
+ RxTer+YX4QlPFeijdx6Q==
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The only caller of hisi_zip_vf_q_assign() is hidden in an #ifdef,
-so the function causes a warning when CONFIG_PCI_IOV is disabled:
+To avoid missing arm64 specific warnings that get introduced
+in this driver, allow compile-testing on all 64-bit architectures.
 
-drivers/crypto/hisilicon/zip/zip_main.c:740:12: error: unused function 'hisi_zip_vf_q_assign' [-Werror,-Wunused-function]
+The only actual arm64 specific code in this driver is an open-
+coded 128 bit MMIO write. On non-arm64 the same can be done
+using memcpy_toio. What I also noticed is that the mmio store
+(either one) is not endian-safe, this will only work on little-
+endian configurations, so I also add a Kconfig dependency on
+that, regardless of the architecture.
+Finally, a depenndecy on CONFIG_64BIT is needed because of the
+writeq().
 
-Replace the #ifdef with an IS_ENABLED() check that leads to the
-function being dropped based on the configuration.
-
-Fixes: 79e09f30eeba ("crypto: hisilicon - add SRIOV support for ZIP")
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- drivers/crypto/hisilicon/zip/zip_main.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+ drivers/crypto/hisilicon/Kconfig | 8 +++++---
+ drivers/crypto/hisilicon/qm.c    | 6 ++++++
+ 2 files changed, 11 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index 6e0ca75585d4..1b2ee96c888d 100644
---- a/drivers/crypto/hisilicon/zip/zip_main.c
-+++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -785,7 +785,6 @@ static int hisi_zip_clear_vft_config(struct hisi_zip *hisi_zip)
+diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
+index ebaf91e0146d..dfbd668a431e 100644
+--- a/drivers/crypto/hisilicon/Kconfig
++++ b/drivers/crypto/hisilicon/Kconfig
+@@ -16,14 +16,15 @@ config CRYPTO_DEV_HISI_SEC
  
- static int hisi_zip_sriov_enable(struct pci_dev *pdev, int max_vfs)
- {
--#ifdef CONFIG_PCI_IOV
- 	struct hisi_zip *hisi_zip = pci_get_drvdata(pdev);
- 	int pre_existing_vfs, num_vfs, ret;
+ config CRYPTO_DEV_HISI_QM
+ 	tristate
+-	depends on ARM64 && PCI && PCI_MSI
++	depends on ARM64 || COMPILE_TEST
++	depends on PCI && PCI_MSI
+ 	help
+ 	  HiSilicon accelerator engines use a common queue management
+ 	  interface. Specific engine driver may use this module.
  
-@@ -815,9 +814,6 @@ static int hisi_zip_sriov_enable(struct pci_dev *pdev, int max_vfs)
- 	}
+ config CRYPTO_HISI_SGL
+ 	tristate
+-	depends on ARM64
++	depends on ARM64 || COMPILE_TEST
+ 	help
+ 	  HiSilicon accelerator engines use a common hardware scatterlist
+ 	  interface for data format. Specific engine driver may use this
+@@ -31,7 +32,8 @@ config CRYPTO_HISI_SGL
  
- 	return num_vfs;
--#else
--	return 0;
--#endif
- }
+ config CRYPTO_DEV_HISI_ZIP
+ 	tristate "Support for HiSilicon ZIP accelerator"
+-	depends on ARM64 && PCI && PCI_MSI
++	depends on PCI && PCI_MSI
++	depends on ARM64 || (COMPILE_TEST && 64BIT)
+ 	select CRYPTO_DEV_HISI_QM
+ 	select CRYPTO_HISI_SGL
+ 	select SG_SPLIT
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index f975c393a603..a8ed699081b7 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -331,6 +331,12 @@ static void qm_mb_write(struct hisi_qm *qm, const void *src)
+ 	void __iomem *fun_base = qm->io_base + QM_MB_CMD_SEND_BASE;
+ 	unsigned long tmp0 = 0, tmp1 = 0;
  
- static int hisi_zip_sriov_disable(struct pci_dev *pdev)
-@@ -948,7 +944,8 @@ static struct pci_driver hisi_zip_pci_driver = {
- 	.id_table		= hisi_zip_dev_ids,
- 	.probe			= hisi_zip_probe,
- 	.remove			= hisi_zip_remove,
--	.sriov_configure	= hisi_zip_sriov_configure,
-+	.sriov_configure	= IS_ENABLED(CONFIG_PCI_IOV) ?
-+					hisi_zip_sriov_configure : 0,
- 	.err_handler		= &hisi_zip_err_handler,
- };
- 
++	if (!IS_ENABLED(CONFIG_ARM64)) {
++		memcpy_toio(fun_base, src, 16);
++		wmb();
++		return;
++	}
++
+ 	asm volatile("ldp %0, %1, %3\n"
+ 		     "stp %0, %1, %2\n"
+ 		     "dsb sy\n"
 -- 
 2.20.0
 
