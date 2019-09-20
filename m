@@ -6,71 +6,65 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A674C49ED7
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Sep 2019 13:00:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86806C49ED7
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Sep 2019 13:01:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 021C12073F
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Sep 2019 13:00:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6400120665
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Sep 2019 13:01:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726118AbfITNAW (ORCPT
+        id S1726808AbfITNBa (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Sep 2019 09:00:22 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:34572 "EHLO fornost.hmeau.com"
+        Fri, 20 Sep 2019 09:01:30 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:34598 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726104AbfITNAW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Sep 2019 09:00:22 -0400
+        id S1726807AbfITNBa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 20 Sep 2019 09:01:30 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1iBIVz-0007oL-Gk; Fri, 20 Sep 2019 23:00:00 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Sep 2019 22:59:57 +1000
-Date:   Fri, 20 Sep 2019 22:59:57 +1000
+        id 1iBIWF-0007oQ-9S; Fri, 20 Sep 2019 23:00:16 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Sep 2019 23:00:12 +1000
+Date:   Fri, 20 Sep 2019 23:00:12 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Pascal van Leeuwen <pascalvanl@gmail.com>
-Cc:     linux-crypto@vger.kernel.org, antoine.tenart@bootlin.com,
-        davem@davemloft.net,
-        Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
-Subject: Re: [PATCHv4] crypto: inside-secure - Fix unused variable warning
- when CONFIG_PCI=n
-Message-ID: <20190920125957.GB23242@gondor.apana.org.au>
-References: <1568365480-7700-1-git-send-email-pvanleeuwen@verimatrix.com>
+To:     Yunfeng Ye <yeyunfeng@huawei.com>
+Cc:     davem@davemloft.net, john.garry@huawei.com,
+        Jonathan.Cameron@huawei.com, mcgrof@kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] crypto: hisilicon - Fix double free in
+ sec_free_hw_sgl()
+Message-ID: <20190920130012.GC23242@gondor.apana.org.au>
+References: <c9c52443-59a6-f909-f98b-eddffe999c2b@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1568365480-7700-1-git-send-email-pvanleeuwen@verimatrix.com>
+In-Reply-To: <c9c52443-59a6-f909-f98b-eddffe999c2b@huawei.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Sep 13, 2019 at 11:04:40AM +0200, Pascal van Leeuwen wrote:
-> This patch fixes an unused variable warning from the compiler when the
-> driver is being compiled without PCI support in the kernel.
+On Sun, Sep 15, 2019 at 05:26:56PM +0800, Yunfeng Ye wrote:
+> There are two problems in sec_free_hw_sgl():
 > 
-> changes since v1:
-> - capture the platform_register_driver error code as well
-> - actually return the (last) error code
-> - swapped registration to do PCI first as that's just for development
->   boards anyway, so in case both are done we want the platform error
->   or no error at all if that passes
-> - also fixes some indentation issue in the affected code
+> First, when sgl_current->next is valid, @hw_sgl will be freed in the
+> first loop, but it free again after the loop.
 > 
-> changes since v2:
-> - handle the situation where both CONFIG_PCI and CONFIG_OF are undefined
->   by always returning a -EINVAL error
-> - only unregister PCI or OF if it was previously successfully registered
+> Second, sgl_current and sgl_current->next_sgl is not match when
+> dma_pool_free() is invoked, the third parameter should be the dma
+> address of sgl_current, but sgl_current->next_sgl is the dma address
+> of next chain, so use sgl_current->next_sgl is wrong.
 > 
-> changes since v3:
-> - if *both* PCI and OF are configured, then return success if *either*
->   registration was OK, also ensuring exit is called and PCI unregister
->   occurs (eventually) if only OF registration fails
+> Fix this by deleting the last dma_pool_free() in sec_free_hw_sgl(),
+> modifying the condition for while loop, and matching the address for
+> dma_pool_free().
 > 
-> Signed-off-by: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
+> Fixes: 915e4e8413da ("crypto: hisilicon - SEC security accelerator driver")
+> Signed-off-by: Yunfeng Ye <yeyunfeng@huawei.com>
 > ---
->  drivers/crypto/inside-secure/safexcel.c | 40 ++++++++++++++++++++++++---------
->  1 file changed, 29 insertions(+), 11 deletions(-)
+>  drivers/crypto/hisilicon/sec/sec_algs.c | 13 +++++++------
+>  1 file changed, 7 insertions(+), 6 deletions(-)
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
