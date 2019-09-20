@@ -2,168 +2,173 @@ Return-Path: <SRS0=j/4y=XP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.0 required=3.0 tests=DATE_IN_FUTURE_06_12,
+	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B565C4CEC9
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Sep 2019 06:35:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19E97C49ED7
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Sep 2019 08:14:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DC9D9208C0
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Sep 2019 06:35:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D497221882
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Sep 2019 08:14:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="dKfpp3HQ";
-	dkim=pass (1024-bit key) header.d=marvell.onmicrosoft.com header.i=@marvell.onmicrosoft.com header.b="OxVaNqVW"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="WKhrHeZA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437490AbfITGfd (ORCPT
+        id S2393246AbfITIOr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Sep 2019 02:35:33 -0400
-Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:51022 "EHLO
-        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2389232AbfITGfc (ORCPT
+        Fri, 20 Sep 2019 04:14:47 -0400
+Received: from gateway33.websitewelcome.com ([192.185.146.97]:28948 "EHLO
+        gateway33.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2393270AbfITIOr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Sep 2019 02:35:32 -0400
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-        by mx0b-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id x8K6ZNiP007318;
-        Thu, 19 Sep 2019 23:35:23 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : content-type : content-transfer-encoding :
- mime-version; s=pfpt0818; bh=rngoyzlBH6vGkSpJkkBhNPybkkyQx4aKB0mxu7s9HiM=;
- b=dKfpp3HQ/SagFCVlCkEHFUCX0ailmIJDDmVk1lWHASGxXy+b+Ec2OVhLWtMgs3YzSVEj
- M4FNJNgRty0CbHJxbGP3LX12wRZfCFrnMq1MYFMca7IA4fYn0HSAl14l/wLrEgTUOzMT
- 4IS6jYD8+cICjYwQgLEiDY4GAlV5bcn0b6L5I2uvMmzyDTqWcKuLQ6Se+gjDN794Ej/Q
- 3c3VNwAFP8/I++FOCsHoTt7XJPuuZ6MEE5PQ9cBGh5FOWa2Je+Z9uj+P2ZgkyrpR8Ksh
- lkhRf1eiMDTAGqqnR79fTQM2r+aAsLg0aS88dWHoT2mLvqUzM3FhyeBq4Cj+8UDUduem xQ== 
-Received: from sc-exch01.marvell.com ([199.233.58.181])
-        by mx0b-0016f401.pphosted.com with ESMTP id 2v3vcfpxdg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-        Thu, 19 Sep 2019 23:35:23 -0700
-Received: from SC-EXCH04.marvell.com (10.93.176.84) by SC-EXCH01.marvell.com
- (10.93.176.81) with Microsoft SMTP Server (TLS) id 15.0.1367.3; Thu, 19 Sep
- 2019 23:35:20 -0700
-Received: from NAM02-CY1-obe.outbound.protection.outlook.com (104.47.37.50) by
- SC-EXCH04.marvell.com (10.93.176.84) with Microsoft SMTP Server (TLS) id
- 15.0.1367.3 via Frontend Transport; Thu, 19 Sep 2019 23:35:20 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=h3uDg/VuzdLpABsqupSXtgYNL3iY3pL66Fivb98O6uWOfQDX+eepehhETc4mgMIHO2eLJvUXjxLDxBOn9r2unr7+s6wEIYJv+mmBO412Ui4t/8hxQAwiRaT1BxVoGu0DHmjesJGxYKMAxsXnHFRO6WXr0iVuzgMVWsOszXWqCmFKNFAzgj54eGQM4JEx0vp5JuZ3S5Uz+Pf7a5si0RN7x3+d2TNc+O0XNA44OREBR9+XArGTvsTiV8HnVwbdou7J/hw0oulqQv0sfxJ3imziqumsNHD3AiOKLmH3nqCLLvCuXq8KOTZAilVJg0WoaiGIVpXR+bAg2cwTCu15W1FxIw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rngoyzlBH6vGkSpJkkBhNPybkkyQx4aKB0mxu7s9HiM=;
- b=HL/Ed47Md+v6aFm7Z5RPt1HVOtcxNK/0rwWioFnbBfEyctP8t+Fg9tezWKLU2SsbydMbvoBNaDptj+Oe6QuyZKqq6Te8pJdZI8h0smAutmfhpHA+o7qWZYCmAY53R2q/oIVvQ3yc3BPtJQHLTKYp34KEn2Xl1Ime2uRFAJiKu3xDhdxkQWDb/Eo5ogxzxR7zEPD/q5KG0aSvGgp56eU66khoHiqt6+hqATTy7rWPGX7TE5LQdP3Ys4/MDVIP2YKJXggSfvE+JaoYB5wVxX2WZWeMpoMRj3zCo/qhJ43dfdWvIREr5WcUQMYzdWWIbvN681C60zA/x3SLG/epzgan9Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=marvell.onmicrosoft.com; s=selector2-marvell-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rngoyzlBH6vGkSpJkkBhNPybkkyQx4aKB0mxu7s9HiM=;
- b=OxVaNqVWAB8hv0Fzhq8oQ5OhmzKtFPqBkC5gFvWFgvgtB3Ha7GvhBQHew0BGHZTvLNfNz243L9VfGJDIBEbWL6GzcXt/rZvHRVKcKFERvyqpV3MuWzMZdaJdqzZv/fZ1e5liE21z/+bwgyUmQ6NNzdAzHibpD9mhvOmZbOqQQP8=
-Received: from MN2PR18MB2605.namprd18.prod.outlook.com (20.179.83.161) by
- MN2PR18MB2735.namprd18.prod.outlook.com (20.179.23.142) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2284.19; Fri, 20 Sep 2019 06:35:19 +0000
-Received: from MN2PR18MB2605.namprd18.prod.outlook.com
- ([fe80::2809:977c:6a8c:7d79]) by MN2PR18MB2605.namprd18.prod.outlook.com
- ([fe80::2809:977c:6a8c:7d79%4]) with mapi id 15.20.2263.028; Fri, 20 Sep 2019
- 06:35:19 +0000
-From:   Phani Kiran Hemadri <phemadri@marvell.com>
-To:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
-CC:     "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "Phani Kiran Hemadri" <phemadri@marvell.com>
-Subject: [PATCH] crypto: cavium/nitrox - fix firmware assignment to AE cores
-Thread-Topic: [PATCH] crypto: cavium/nitrox - fix firmware assignment to AE
- cores
-Thread-Index: AQHVb32S74CgRaLSIEO7NCZ9zEpA8A==
-Date:   Fri, 20 Sep 2019 06:35:19 +0000
-Message-ID: <20190920063439.26486-1-phemadri@marvell.com>
-Accept-Language: en-IN, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: BMXPR01CA0004.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:b00:d::14) To MN2PR18MB2605.namprd18.prod.outlook.com
- (2603:10b6:208:106::33)
-x-ms-exchange-messagesentrepresentingtype: 1
-x-mailer: git-send-email 2.17.2
-x-originating-ip: [115.113.156.2]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 7f5654b7-e0e9-49d2-6514-08d73d94b497
-x-microsoft-antispam: BCL:0;PCL:0;RULEID:(2390118)(7020095)(4652040)(8989299)(5600167)(711020)(4605104)(1401327)(4534185)(7168020)(4627221)(201703031133081)(201702281549075)(8990200)(2017052603328)(7193020);SRVR:MN2PR18MB2735;
-x-ms-traffictypediagnostic: MN2PR18MB2735:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MN2PR18MB27356B05439054C6E2BB4B84D6880@MN2PR18MB2735.namprd18.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2043;
-x-forefront-prvs: 0166B75B74
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(346002)(396003)(376002)(136003)(39860400002)(199004)(189003)(81166006)(256004)(1730700003)(386003)(86362001)(55236004)(52116002)(71200400001)(5660300002)(6486002)(2906002)(71190400001)(6512007)(5640700003)(66066001)(99286004)(6436002)(2351001)(186003)(81156014)(36756003)(2616005)(26005)(1076003)(6506007)(54906003)(8676002)(7736002)(14454004)(476003)(66946007)(64756008)(66556008)(6116002)(66446008)(25786009)(3846002)(107886003)(478600001)(2501003)(6916009)(305945005)(4326008)(50226002)(8936002)(66476007)(316002)(102836004)(486006);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR18MB2735;H:MN2PR18MB2605.namprd18.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: marvell.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam-message-info: bmF6fsmjKnwgkZC4A4yXrSycXehY7t83duSENtakNcWGD5sEqcXgR9yEPKeGnL3EBUPk0DvNHYUw1JvRdJmIs+FhNWILVkMNIRKWtqDEIDHTVkzUWPeyjX+RWETvGBWFrtjH7Jpvck8CgKkbhqdo+zCaofQhS+QTbXWyEeW+sTN28GA1tmsrAfSSMpAwg/efaYCAs9ehib/EbaQd7XtFJKMrJI+rIRh3tV7C9+LrihZQ5wv/44PrGSab/cP7ogrE51pGjpvSPjUqexzcNRZvMxzk9YcX4VLYrdhmSsYMR2qfyVxi3TDk8UlFrYztQO+LL7KqRoL54ltIWNX71c1X9lFL6sWp5tCsPOph3mVzIc11G0kkymZWdUjKHGSYxky2YjjR5LC01lyxlXmi5T0BuRy7i7Iz7CaW5QaAkDPnoeo=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        Fri, 20 Sep 2019 04:14:47 -0400
+X-Greylist: delayed 1201 seconds by postgrey-1.27 at vger.kernel.org; Fri, 20 Sep 2019 04:14:46 EDT
+Received: from cm14.websitewelcome.com (cm14.websitewelcome.com [100.42.49.7])
+        by gateway33.websitewelcome.com (Postfix) with ESMTP id 1FECAEF315
+        for <linux-crypto@vger.kernel.org>; Fri, 20 Sep 2019 02:54:45 -0500 (CDT)
+Received: from gator4166.hostgator.com ([108.167.133.22])
+        by cmsmtp with SMTP
+        id BDkbiotez2qH7BDkbihIvJ; Fri, 20 Sep 2019 02:54:45 -0500
+X-Authority-Reason: nr=8
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=u2e/2BHw25iG9XmeS+oLxWICM2YK8K1PTSI4WlXyItI=; b=WKhrHeZAwbfaOH9z1HXNkws/kH
+        Z5lp2Fy2YSqkZmXq2ZtieyQq1ZL4ddGfTSGTG1oO/1cKu9H2NRdOs6SLWtQLaG9lg3Et1oTJufmo/
+        hcKEknDefjLJazj2kIJWtpL+Z8HeejXv/xfquNJpha3yHqETDuFEo+fHL/358OQBEv/d68EWVES+g
+        8rQbpFV+hczJ9OuYt7sHQsQUpx386S87KHwzreSll6GNyVpqGbcDPV6ccAC4BPsz089B1+dotZlxz
+        LAElEvNWy8nbWoCZ2ZsCPDlb314HpXcnw6KtuOlhV2x2ntGEbmKyRQXSF4TntDrVi/07fUxkKpSQ+
+        DCEQpNRA==;
+Received: from lfbn-1-12653-249.w90-90.abo.wanadoo.fr ([90.90.196.249]:49830 helo=[192.168.1.21])
+        by gator4166.hostgator.com with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
+        (Exim 4.92)
+        (envelope-from <gustavo@embeddedor.com>)
+        id 1iBDka-001wtw-Ki; Fri, 20 Sep 2019 02:54:44 -0500
+Subject: Re: [PATCH] crypto: talitos - fix missing break in switch statement
+To:     Christophe Leroy <christophe.leroy@c-s.fr>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20190909052952.GA32131@embeddedor>
+ <b2c4faf9-9b10-882d-57db-bcbc3ed2a025@c-s.fr>
+From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Openpgp: preference=signencrypt
+Autocrypt: addr=gustavo@embeddedor.com; keydata=
+ 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
+ VtSixD1uOgytAP7RWS474w==
+Message-ID: <742902ac-0825-95c2-6e34-d70c6d810607@embeddedor.com>
+Date:   Fri, 20 Sep 2019 09:53:23 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7f5654b7-e0e9-49d2-6514-08d73d94b497
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Sep 2019 06:35:19.2897
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: mDEyZmCJV42n7K5d2Kr/PQuVrdjVKL/ySFOaazBlJGAC7Em9NMWG3U84HxQM1B13VSgjAHFdroVkIgZgPVH1MA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR18MB2735
-X-OriginatorOrg: marvell.com
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.70,1.0.8
- definitions=2019-09-20_01:2019-09-19,2019-09-20 signatures=0
+In-Reply-To: <b2c4faf9-9b10-882d-57db-bcbc3ed2a025@c-s.fr>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 90.90.196.249
+X-Source-L: No
+X-Exim-ID: 1iBDka-001wtw-Ki
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: lfbn-1-12653-249.w90-90.abo.wanadoo.fr ([192.168.1.21]) [90.90.196.249]:49830
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 4
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch fixes assigning UCD block number of Asymmetric crypto
-firmware to AE cores of CNN55XX device.
+Hi all,
 
-Fixes: a7268c4d4205 ("crypto: cavium/nitrox - Add support for loading asymm=
-etric crypto firmware")
-Signed-off-by: Phani Kiran Hemadri <phemadri@marvell.com>
-Reviewed-by: Srikanth Jampala <jsrikanth@marvell.com>
+Friendly ping:
 
----
- drivers/crypto/cavium/nitrox/nitrox_main.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+Who can take this?
 
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_main.c b/drivers/crypto/ca=
-vium/nitrox/nitrox_main.c
-index bc924980e10c..c4632d84c9a1 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_main.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_main.c
-@@ -103,8 +103,7 @@ static void write_to_ucd_unit(struct nitrox_device *nde=
-v, u32 ucode_size,
- 	offset =3D UCD_UCODE_LOAD_BLOCK_NUM;
- 	nitrox_write_csr(ndev, offset, block_num);
-=20
--	code_size =3D ucode_size;
--	code_size =3D roundup(code_size, 8);
-+	code_size =3D roundup(ucode_size, 16);
- 	while (code_size) {
- 		data =3D ucode_data[i];
- 		/* write 8 bytes at a time */
-@@ -220,11 +219,11 @@ static int nitrox_load_fw(struct nitrox_device *ndev)
-=20
- 	/* write block number and firmware length
- 	 * bit:<2:0> block number
--	 * bit:3 is set SE uses 32KB microcode
--	 * bit:3 is clear SE uses 64KB microcode
-+	 * bit:3 is set AE uses 32KB microcode
-+	 * bit:3 is clear AE uses 64KB microcode
- 	 */
- 	core_2_eid_val.value =3D 0ULL;
--	core_2_eid_val.ucode_blk =3D 0;
-+	core_2_eid_val.ucode_blk =3D 2;
- 	if (ucode_size <=3D CNN55XX_UCD_BLOCK_SIZE)
- 		core_2_eid_val.ucode_len =3D 1;
- 	else
---=20
-2.17.2
+Thanks
+--
+Gustavo
 
+On 9/10/19 01:06, Christophe Leroy wrote:
+> 
+> 
+> Le 09/09/2019 à 07:29, Gustavo A. R. Silva a écrit :
+>> Add missing break statement in order to prevent the code from falling
+>> through to case CRYPTO_ALG_TYPE_AHASH.
+>>
+>> Fixes: aeb4c132f33d ("crypto: talitos - Convert to new AEAD interface")
+>> Cc: stable@vger.kernel.org
+>> Reported-by: kbuild test robot <lkp@intel.com>
+>> Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
+> 
+> Reviewed-by: Christophe Leroy <christophe.leroy@c-s.fr>
+> 
+>> ---
+>>   drivers/crypto/talitos.c | 1 +
+>>   1 file changed, 1 insertion(+)
+>>
+>> diff --git a/drivers/crypto/talitos.c b/drivers/crypto/talitos.c
+>> index c9d686a0e805..4818ae427098 100644
+>> --- a/drivers/crypto/talitos.c
+>> +++ b/drivers/crypto/talitos.c
+>> @@ -3140,6 +3140,7 @@ static int talitos_remove(struct platform_device *ofdev)
+>>               break;
+>>           case CRYPTO_ALG_TYPE_AEAD:
+>>               crypto_unregister_aead(&t_alg->algt.alg.aead);
+>> +            break;
+>>           case CRYPTO_ALG_TYPE_AHASH:
+>>               crypto_unregister_ahash(&t_alg->algt.alg.hash);
+>>               break;
+>>
