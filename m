@@ -1,107 +1,128 @@
-Return-Path: <SRS0=4UkV=XO=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=j/4y=XP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 529A6C49ED7
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Sep 2019 21:33:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13B39C49ED7
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Sep 2019 04:36:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 22D3C21907
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Sep 2019 21:33:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oQHv0p38"
+	by mail.kernel.org (Postfix) with ESMTP id E4FE3206C2
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Sep 2019 04:36:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390274AbfISVdc (ORCPT
+        id S2392221AbfITEf7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Sep 2019 17:33:32 -0400
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:43344 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390087AbfISVdb (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Sep 2019 17:33:31 -0400
-Received: by mail-qt1-f193.google.com with SMTP id c3so6142817qtv.10
-        for <linux-crypto@vger.kernel.org>; Thu, 19 Sep 2019 14:33:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=xd9djg4ZRInQK4PJ0owr0vHD3gVJUKPRxwMSxJDmg4o=;
-        b=oQHv0p38vP/Ijcd+wWuwLDNq2oI/EpvE62fN3fdohzueHvB0bay02mwhPmLazeuRZE
-         zEUlAOLbwKrg22kmyt1+0rXYaA18MzehZTZ9K5yWRNDuKc9sD0YY3GzfzYfPlJXZvtMR
-         uKF3/eDcYQmOhH2dctAMJc31sa1r+EagiwEGO8ploVlUepvmXa480h60KNhdBhLa+jK7
-         k9yMK+XG+zf12LH7rIr72mN4v7e0PRky5OJtBZMYH/BrTvkexNAFMSGkS5ccuHKUcds9
-         iqiYF+69RhJLdK75JUECDy/WNa5weazuy+lsIjJQKyN01/NzbeXAV9S6OTqLaU3SSy/b
-         oQDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=xd9djg4ZRInQK4PJ0owr0vHD3gVJUKPRxwMSxJDmg4o=;
-        b=Qi9L/T/ohNeywqk2CNrh1PNDkR4pAObGGfCQeWQn5EU8L/UxuJikvT+DL91RU8m1vi
-         Ogk4EKiEcUMENyg724MqHCvFeqowBJzHOBZzyvGakfqk/v+QDQsdbY1Ob0xCGGMtoI3s
-         1OZHjea5Rk/kYWeYg13vOmS7MTSqXJoQyicZxQ6HgHmGTkPF0VEQdo3FDrhF84ZeCa7W
-         x0eJejhCa+aZKaDjtJmRZwLipeKT/I8UlDY2GFZ1zKxKQ3kmQdeE8klTTel7rCk9L4JC
-         opsQVhO1WM7v0CSswHrT/fHrPOeCjgviM9Bd1UTJZnm5jxU+vBgO7z6IypzU/tlUhNal
-         kkGA==
-X-Gm-Message-State: APjAAAVqlyUxjxbOX7VHVsdDkJxMw05zLJ9EOR/K6sfi/m5oVYrfEtXV
-        pNEplOErZZgbxHCv7E0OMRQ=
-X-Google-Smtp-Source: APXvYqw9E/c51b0XjHTLXttNPW8SPW46/35SI0KXUVVpHjxBjzeLniXFzNFLVjwU9dxnH3ZoeFqtlQ==
-X-Received: by 2002:ad4:4382:: with SMTP id s2mr9808785qvr.90.1568928810270;
-        Thu, 19 Sep 2019 14:33:30 -0700 (PDT)
-Received: from gateway.troianet.com.br (ipv6.troianet.com.br. [2804:688:21:4::2])
-        by smtp.gmail.com with ESMTPSA id t40sm6031805qta.36.2019.09.19.14.33.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Sep 2019 14:33:29 -0700 (PDT)
-From:   Eneas U de Queiroz <cotequeiroz@gmail.com>
+        Fri, 20 Sep 2019 00:35:59 -0400
+Received: from a.mx.secunet.com ([62.96.220.36]:51502 "EHLO a.mx.secunet.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2392019AbfITEf7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 20 Sep 2019 00:35:59 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by a.mx.secunet.com (Postfix) with ESMTP id EDC20205B2;
+        Fri, 20 Sep 2019 06:35:57 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+        by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id DL2If1nkOnUZ; Fri, 20 Sep 2019 06:35:57 +0200 (CEST)
+Received: from mail-essen-01.secunet.de (mail-essen-01.secunet.de [10.53.40.204])
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by a.mx.secunet.com (Postfix) with ESMTPS id 4AD95205A9;
+        Fri, 20 Sep 2019 06:35:57 +0200 (CEST)
+Received: from gauss2.secunet.de (10.182.7.193) by mail-essen-01.secunet.de
+ (10.53.40.204) with Microsoft SMTP Server id 14.3.439.0; Fri, 20 Sep 2019
+ 06:35:57 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)      id E5D903182607;
+ Fri, 20 Sep 2019 06:35:56 +0200 (CEST)
+Date:   Fri, 20 Sep 2019 06:35:56 +0200
+From:   Steffen Klassert <steffen.klassert@secunet.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     Eneas U de Queiroz <cotequeiroz@gmail.com>,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH] crypto: qce - add CRYPTO_ALG_KERN_DRIVER_ONLY flag
-Date:   Thu, 19 Sep 2019 18:33:02 -0300
-Message-Id: <20190919213302.9174-1-cotequeiroz@gmail.com>
-X-Mailer: git-send-email 2.21.0
+        Eric Biggers <ebiggers@google.com>
+CC:     <linux-crypto@vger.kernel.org>
+Subject: [PATCH] crypto: pcrypt - forbid recursive instantiation
+Message-ID: <20190920043556.GP2879@gauss3.secunet.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Set the CRYPTO_ALG_KERN_DRIVER_ONLY flag to all algorithms exposed by
-the qce driver, since they are all hardware accelerated, accessible
-through a kernel driver only, and not available directly to userspace.
+If the pcrypt template is used multiple times in an algorithm, then a
+deadlock occurs because all pcrypt instances share the same
+padata_instance, which completes requests in the order submitted.  That
+is, the inner pcrypt request waits for the outer pcrypt request while
+the outer request is already waiting for the inner.
 
-Signed-off-by: Eneas U de Queiroz <cotequeiroz@gmail.com>
+Fix this by making pcrypt forbid instantiation if pcrypt appears in the
+underlying ->cra_driver_name or if an underlying algorithm needs a
+fallback.  This is somewhat of a hack, but it's a simple fix that should
+be sufficient to prevent the deadlock.
 
-diff --git a/drivers/crypto/qce/ablkcipher.c b/drivers/crypto/qce/ablkcipher.c
-index 7a98bf5cc967..f0b59a8bbed0 100644
---- a/drivers/crypto/qce/ablkcipher.c
-+++ b/drivers/crypto/qce/ablkcipher.c
-@@ -380,7 +380,7 @@ static int qce_ablkcipher_register_one(const struct qce_ablkcipher_def *def,
+Reproducer:
+
+	#include <linux/if_alg.h>
+	#include <sys/socket.h>
+	#include <unistd.h>
+
+	int main()
+	{
+		struct sockaddr_alg addr = {
+			.salg_type = "aead",
+			.salg_name = "pcrypt(pcrypt(rfc4106-gcm-aesni))"
+		};
+		int algfd, reqfd;
+		char buf[32] = { 0 };
+
+		algfd = socket(AF_ALG, SOCK_SEQPACKET, 0);
+		bind(algfd, (void *)&addr, sizeof(addr));
+		setsockopt(algfd, SOL_ALG, ALG_SET_KEY, buf, 20);
+		reqfd = accept(algfd, 0, 0);
+		write(reqfd, buf, 32);
+		read(reqfd, buf, 16);
+	}
+
+Reported-by: syzbot+56c7151cad94eec37c521f0e47d2eee53f9361c4@syzkaller.appspotmail.com
+Fixes: 5068c7a883d1 ("crypto: pcrypt - Add pcrypt crypto parallelization wrapper")
+Cc: <stable@vger.kernel.org> # v2.6.34+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+[SK: also require that the underlying algorithm doesn't need a fallback]
+Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+---
+ crypto/pcrypt.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
+index 543792e0ebf0..932a77b61b47 100644
+--- a/crypto/pcrypt.c
++++ b/crypto/pcrypt.c
+@@ -198,6 +198,12 @@ static void pcrypt_free(struct aead_instance *inst)
+ static int pcrypt_init_instance(struct crypto_instance *inst,
+ 				struct crypto_alg *alg)
+ {
++	/* Recursive pcrypt deadlocks due to the shared padata_instance */
++	if (!strncmp(alg->cra_driver_name, "pcrypt(", 7) ||
++	    strstr(alg->cra_driver_name, "(pcrypt(") ||
++	    strstr(alg->cra_driver_name, ",pcrypt("))
++		return -EINVAL;
++
+ 	if (snprintf(inst->alg.cra_driver_name, CRYPTO_MAX_ALG_NAME,
+ 		     "pcrypt(%s)", alg->cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
+ 		return -ENAMETOOLONG;
+@@ -236,7 +242,7 @@ static int pcrypt_create_aead(struct crypto_template *tmpl, struct rtattr **tb,
+ 	ctx = aead_instance_ctx(inst);
+ 	crypto_set_aead_spawn(&ctx->spawn, aead_crypto_instance(inst));
  
- 	alg->cra_priority = 300;
- 	alg->cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC |
--			 CRYPTO_ALG_NEED_FALLBACK;
-+			 CRYPTO_ALG_NEED_FALLBACK | CRYPTO_ALG_KERN_DRIVER_ONLY;
- 	alg->cra_ctxsize = sizeof(struct qce_cipher_ctx);
- 	alg->cra_alignmask = 0;
- 	alg->cra_type = &crypto_ablkcipher_type;
-diff --git a/drivers/crypto/qce/sha.c b/drivers/crypto/qce/sha.c
-index 0853e74583ad..95ab16fc8fd6 100644
---- a/drivers/crypto/qce/sha.c
-+++ b/drivers/crypto/qce/sha.c
-@@ -495,7 +495,7 @@ static int qce_ahash_register_one(const struct qce_ahash_def *def,
- 	base = &alg->halg.base;
- 	base->cra_blocksize = def->blocksize;
- 	base->cra_priority = 300;
--	base->cra_flags = CRYPTO_ALG_ASYNC;
-+	base->cra_flags = CRYPTO_ALG_ASYNC | CRYPTO_ALG_KERN_DRIVER_ONLY;
- 	base->cra_ctxsize = sizeof(struct qce_sha_ctx);
- 	base->cra_alignmask = 0;
- 	base->cra_module = THIS_MODULE;
+-	err = crypto_grab_aead(&ctx->spawn, name, 0, 0);
++	err = crypto_grab_aead(&ctx->spawn, name, 0, CRYPTO_ALG_NEED_FALLBACK);
+ 	if (err)
+ 		goto out_free_inst;
+ 
+-- 
+2.17.1
+
