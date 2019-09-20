@@ -6,65 +6,61 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86806C49ED7
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Sep 2019 13:01:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97F3FC49ED7
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Sep 2019 13:02:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6400120665
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Sep 2019 13:01:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7490C208C0
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Sep 2019 13:02:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726808AbfITNBa (ORCPT
+        id S1726135AbfITNCQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Sep 2019 09:01:30 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:34598 "EHLO fornost.hmeau.com"
+        Fri, 20 Sep 2019 09:02:16 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:34604 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726807AbfITNBa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Sep 2019 09:01:30 -0400
+        id S1726807AbfITNCQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 20 Sep 2019 09:02:16 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1iBIWF-0007oQ-9S; Fri, 20 Sep 2019 23:00:16 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Sep 2019 23:00:12 +1000
-Date:   Fri, 20 Sep 2019 23:00:12 +1000
+        id 1iBIWN-0007ow-V7; Fri, 20 Sep 2019 23:00:25 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Sep 2019 23:00:21 +1000
+Date:   Fri, 20 Sep 2019 23:00:21 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Yunfeng Ye <yeyunfeng@huawei.com>
-Cc:     davem@davemloft.net, john.garry@huawei.com,
-        Jonathan.Cameron@huawei.com, mcgrof@kernel.org,
+Cc:     wangzhou1@hisilicon.com, davem@davemloft.net,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] crypto: hisilicon - Fix double free in
- sec_free_hw_sgl()
-Message-ID: <20190920130012.GC23242@gondor.apana.org.au>
-References: <c9c52443-59a6-f909-f98b-eddffe999c2b@huawei.com>
+Subject: Re: [PATCH] crypto: hisilicon - Fix return value check in
+ hisi_zip_acompress()
+Message-ID: <20190920130021.GD23242@gondor.apana.org.au>
+References: <23be2eb5-8256-0c19-aef9-994974d11c9d@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c9c52443-59a6-f909-f98b-eddffe999c2b@huawei.com>
+In-Reply-To: <23be2eb5-8256-0c19-aef9-994974d11c9d@huawei.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Sep 15, 2019 at 05:26:56PM +0800, Yunfeng Ye wrote:
-> There are two problems in sec_free_hw_sgl():
+On Mon, Sep 16, 2019 at 02:38:25PM +0800, Yunfeng Ye wrote:
+> The return valude of add_comp_head() is int, but @head_size is size_t,
+> which is a unsigned type.
 > 
-> First, when sgl_current->next is valid, @hw_sgl will be freed in the
-> first loop, but it free again after the loop.
+> 	size_t head_size;
+> 	...
+> 	if (head_size < 0)  // it will never work
+> 		return -ENOMEM
 > 
-> Second, sgl_current and sgl_current->next_sgl is not match when
-> dma_pool_free() is invoked, the third parameter should be the dma
-> address of sgl_current, but sgl_current->next_sgl is the dma address
-> of next chain, so use sgl_current->next_sgl is wrong.
+> Modify the type of @head_size to int, then change the type to size_t
+> when invoke hisi_zip_create_req() as a parameter.
 > 
-> Fix this by deleting the last dma_pool_free() in sec_free_hw_sgl(),
-> modifying the condition for while loop, and matching the address for
-> dma_pool_free().
-> 
-> Fixes: 915e4e8413da ("crypto: hisilicon - SEC security accelerator driver")
+> Fixes: 62c455ca853e ("crypto: hisilicon - add HiSilicon ZIP accelerator support")
 > Signed-off-by: Yunfeng Ye <yeyunfeng@huawei.com>
 > ---
->  drivers/crypto/hisilicon/sec/sec_algs.c | 13 +++++++------
->  1 file changed, 7 insertions(+), 6 deletions(-)
+>  drivers/crypto/hisilicon/zip/zip_crypto.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
