@@ -2,92 +2,99 @@ Return-Path: <SRS0=j/4y=XP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_2 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0E2BC49ED7
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Sep 2019 15:53:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F7F8C4CECD
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Sep 2019 16:23:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6E7BE20C01
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Sep 2019 15:53:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="c9fcWv65";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="YMyChGGA"
+	by mail.kernel.org (Postfix) with ESMTP id 5D0FB208C0
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Sep 2019 16:23:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1568996637;
+	bh=SDWrzZuVG71v0J2X6nPbnKE1kFEZUtHXnpXPTYAQdcM=;
+	h=References:In-Reply-To:From:Date:Subject:To:List-ID:From;
+	b=Y3sCtgQi16NJLN91AVl1UXdlyHPBLAAF1dcpjYdm0tKCOxVrhOk294a8l/3DjDiBv
+	 HMrMobGDIXnvSmhEL//ili1oqenq2tBVrfyw0lvpFTWMb1gDXcEzNWoSbpoxXpaoeO
+	 DI1sIezV8SS2Qcoh2Y7SsxPrp+pOEP2Dd/+qgfBI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404221AbfITPxb (ORCPT
+        id S2388571AbfITQX4 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Sep 2019 11:53:31 -0400
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:37706 "EHLO
-        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2404583AbfITPxb (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Sep 2019 11:53:31 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 16E368EE19C;
-        Fri, 20 Sep 2019 08:53:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1568994811;
-        bh=pLZxfGnwgV0W/U6tVbXsrcOVpVeJXJ9PgmIXKjKhaM8=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=c9fcWv65wre+1MQv9uN6OJoZ6S0aOhkxGirxDTPiEn176gszxlr6Crn/jEg2IsgXu
-         pC+cyPwLIOZF4iTtMV1+gK8hbKo58QvkHMzbXi6lahMZkpra3QJYZw2ZxRjI9K9kr4
-         TgHgLxL36O7QkpMcIMerf4GO1umAGocE2Wuvb17c=
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id 03Zw01ncXwbb; Fri, 20 Sep 2019 08:53:30 -0700 (PDT)
-Received: from jarvis.lan (unknown [50.35.76.230])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Fri, 20 Sep 2019 12:23:56 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42530 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388479AbfITQX4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 20 Sep 2019 12:23:56 -0400
+Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 71CE28EE109;
-        Fri, 20 Sep 2019 08:53:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1568994810;
-        bh=pLZxfGnwgV0W/U6tVbXsrcOVpVeJXJ9PgmIXKjKhaM8=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=YMyChGGA6Y6XBcqBUTwwugNdf1tWlhLBz1IpNw8w2wgyfVjlb3YcQDISwHhQXDPiN
-         Ohw1uZ4qSsCGP9Zhbg0Orl0GDBpyb+ZqgY6R4OsAUgUf6BSi4KkwsO/otzsvQON3cT
-         h309a/0Dw652hHHGqIFNGeXoB+mdSieh6ivHV8Ks=
-Message-ID: <1568994809.3645.2.camel@HansenPartnership.com>
-Subject: Re: [PATCH v6 01/12] tpm-buf: move from static inlines to real
- functions
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Cc:     linux-integrity@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Date:   Fri, 20 Sep 2019 08:53:29 -0700
-In-Reply-To: <20190920140642.GB9578@linux.intel.com>
-References: <1568031408.6613.29.camel@HansenPartnership.com>
-         <1568031476.6613.30.camel@HansenPartnership.com>
-         <20190920140459.GA9578@linux.intel.com>
-         <20190920140642.GB9578@linux.intel.com>
+        by mail.kernel.org (Postfix) with ESMTPSA id E6B5721882;
+        Fri, 20 Sep 2019 16:23:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1568996635;
+        bh=SDWrzZuVG71v0J2X6nPbnKE1kFEZUtHXnpXPTYAQdcM=;
+        h=References:In-Reply-To:From:Date:Subject:To:From;
+        b=Y0NPYxXS5lxvCc5BrOJBS+38DHx4Vw4tGLuccuPjWhQHZjLN1+SP2QJbwffe6Fo6R
+         SGaBxYr0YFTOcZZ74KP24FDLyP9h6k+pQ2VXu9tF4gCqFBfBD4s3DyPTPENUcLZ1/t
+         wlNhYEZpL/2F2pyw54AFDUqkleli+20BjzwXfEhY=
+Received: by mail-ot1-f52.google.com with SMTP id g13so6665160otp.8;
+        Fri, 20 Sep 2019 09:23:54 -0700 (PDT)
+X-Gm-Message-State: APjAAAUCuy/u1YNhM7UeufgJOQkz3xHxAarqU3FarpNdvQ8qgvTl0NPW
+        aJJ0pKtxXvVhqUHS4LjkIkKkYoDrCP9QP9RJFjQ=
+X-Google-Smtp-Source: APXvYqzVXOyysg9607AyFbe3o2oRNE6mFVRauJhZAfa1N2RVl6I/Rt2f5iakVGo4VwLzm014Px6jKLwO2nAgy6rn4nA=
+X-Received: by 2002:a9d:6c9a:: with SMTP id c26mr12313571otr.241.1568996634274;
+ Fri, 20 Sep 2019 09:23:54 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190918173141.4314-1-krzk@kernel.org> <20190918173141.4314-5-krzk@kernel.org>
+In-Reply-To: <20190918173141.4314-5-krzk@kernel.org>
+From:   Krzysztof Kozlowski <krzk@kernel.org>
+Date:   Fri, 20 Sep 2019 18:23:41 +0200
+X-Gmail-Original-Message-ID: <CAJKOXPfQFg5wC-JcHUs8btYJRfpC=NW2FOpWTHkTD6zekzHV0A@mail.gmail.com>
+Message-ID: <CAJKOXPfQFg5wC-JcHUs8btYJRfpC=NW2FOpWTHkTD6zekzHV0A@mail.gmail.com>
+Subject: Re: [PATCH v2 5/8] dt-bindings: watchdog: Convert Samsung SoC
+ watchdog bindings to json-schema
+To:     Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Wim Van Sebroeck <wim@linux-watchdog.org>,
+        Guenter Roeck <linux@roeck-us.net>, linux-clk@vger.kernel.org,
+        devicetree@vger.kernel.org,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        dri-devel@lists.freedesktop.org, linux-leds@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        "linux-samsung-soc@vger.kernel.org" 
+        <linux-samsung-soc@vger.kernel.org>, linux-pwm@vger.kernel.org,
+        linux-tegra@vger.kernel.org, bcm-kernel-feedback-list@broadcom.com,
+        linux-rpi-kernel@lists.infradead.org,
+        linux-amlogic@lists.infradead.org,
+        linux-mediatek@lists.infradead.org,
+        linux-rockchip@lists.infradead.org,
+        linux-riscv@lists.infradead.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-crypto@vger.kernel.org, linux-watchdog@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.26.6 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 2019-09-20 at 17:06 +0300, Jarkko Sakkinen wrote:
-> On Fri, Sep 20, 2019 at 05:06:15PM +0300, Jarkko Sakkinen wrote:
-> > On Mon, Sep 09, 2019 at 01:17:56PM +0100, James Bottomley wrote:
-> > > This separates out the old tpm_buf_... handling functions from
-> > > static
-> > > inlines in tpm.h and makes them their own tpm-buf.c file.  This
-> > > is a
-> > > precursor so we can add new functions for other TPM type handling
-> > > 
-> > > Signed-off-by: James Bottomley <James.Bottomley@HansenPartnership
-> > > .com>
-> > 
-> > What about TPM_BUF_2B that gets added in this commit?
-> 
-> Probably just a glitch in rebasing/squashing?
+On Wed, 18 Sep 2019 at 19:32, Krzysztof Kozlowski <krzk@kernel.org> wrote:
+>
+> Convert Samsung S3C/S5P/Exynos watchdog bindings to DT schema format
+> using json-schema.
+>
+> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+>
+> ---
+>
+> Changes since v1:
+> 1. Indent example with four spaces (more readable),
+> 2. Remove unneeded timeout-sec description.
 
-Well a glitch in splitting one patch into three, yes.  I'll fix it up.
+Superseded by v3 (although named v2...).
 
-James
-
+Best regards,
+Krzysztof
