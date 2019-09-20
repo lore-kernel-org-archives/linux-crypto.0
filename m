@@ -6,61 +6,81 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97F3FC49ED7
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Sep 2019 13:02:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FFB3C49ED7
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Sep 2019 13:03:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7490C208C0
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Sep 2019 13:02:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1873F208C3
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Sep 2019 13:03:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726135AbfITNCQ (ORCPT
+        id S1727004AbfITNDd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Sep 2019 09:02:16 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:34604 "EHLO fornost.hmeau.com"
+        Fri, 20 Sep 2019 09:03:33 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:34610 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726807AbfITNCQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Sep 2019 09:02:16 -0400
+        id S1726996AbfITNDd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 20 Sep 2019 09:03:33 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1iBIWN-0007ow-V7; Fri, 20 Sep 2019 23:00:25 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Sep 2019 23:00:21 +1000
-Date:   Fri, 20 Sep 2019 23:00:21 +1000
+        id 1iBIZF-0007tI-SV; Fri, 20 Sep 2019 23:03:22 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Sep 2019 23:03:20 +1000
+Date:   Fri, 20 Sep 2019 23:03:20 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Yunfeng Ye <yeyunfeng@huawei.com>
-Cc:     wangzhou1@hisilicon.com, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: hisilicon - Fix return value check in
- hisi_zip_acompress()
-Message-ID: <20190920130021.GD23242@gondor.apana.org.au>
-References: <23be2eb5-8256-0c19-aef9-994974d11c9d@huawei.com>
+To:     Laurent Vivier <lvivier@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, Amit Shah <amit@kernel.org>,
+        linux-crypto@vger.kernel.org, Matt Mackall <mpm@selenic.com>
+Subject: Re: [PATCH] hw_random: don't wait on add_early_randomness()
+Message-ID: <20190920130319.GA23697@gondor.apana.org.au>
+References: <20190917095450.11625-1-lvivier@redhat.com>
+ <20190917124018.GA32437@gondor.apana.org.au>
+ <784e2129-0692-6e55-481d-4319cef9694c@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <23be2eb5-8256-0c19-aef9-994974d11c9d@huawei.com>
+In-Reply-To: <784e2129-0692-6e55-481d-4319cef9694c@redhat.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Sep 16, 2019 at 02:38:25PM +0800, Yunfeng Ye wrote:
-> The return valude of add_comp_head() is int, but @head_size is size_t,
-> which is a unsigned type.
+On Tue, Sep 17, 2019 at 03:02:26PM +0200, Laurent Vivier wrote:
+> On 17/09/2019 14:40, Herbert Xu wrote:
+> > On Tue, Sep 17, 2019 at 11:54:50AM +0200, Laurent Vivier wrote:
+> >> add_early_randomness() is called by hwrng_register() when the
+> >> hardware is added. If this hardware and its module are present
+> >> at boot, and if there is no data available the boot hangs until
+> >> data are available and can't be interrupted.
+> >>
+> >> To avoid that, call rng_get_data() in non-blocking mode (wait=0)
+> >> from add_early_randomness().
+> >>
+> >> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+> >> ---
+> >>  drivers/char/hw_random/core.c | 2 +-
+> >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > Please provide more context in your patch description such as which
+> > driver actually causes a hang here.
 > 
-> 	size_t head_size;
-> 	...
-> 	if (head_size < 0)  // it will never work
-> 		return -ENOMEM
+> I can add in the next version:
 > 
-> Modify the type of @head_size to int, then change the type to size_t
-> when invoke hisi_zip_create_req() as a parameter.
+> "For instance, in the case of virtio-rng, in some cases the host can be
+> not able to provide enough entropy for all the guests.
 > 
-> Fixes: 62c455ca853e ("crypto: hisilicon - add HiSilicon ZIP accelerator support")
-> Signed-off-by: Yunfeng Ye <yeyunfeng@huawei.com>
-> ---
->  drivers/crypto/hisilicon/zip/zip_crypto.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> We can have two easy ways to reproduce the problem but they rely on
+> misconfiguration of the hypervisor or the egd daemon:
+> 
+> - if virtio-rng device is configured to connect to the egd daemon of the
+> host but when the virtio-rng driver asks for data the daemon is not
+> connected,
+> 
+> - if virtio-rng device is configured to connect to the egd daemon of the
+> host but the egd daemon doesn't provide data.
+> 
+> The guest kernel will hang at boot until the virtio-rng driver provides
+> enough data."
 
-Patch applied.  Thanks.
+Patch applied with this addition.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
