@@ -7,50 +7,50 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA80AC3A5A6
-	for <linux-crypto@archiver.kernel.org>; Sun, 22 Sep 2019 18:48:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAB5CC3A5A2
+	for <linux-crypto@archiver.kernel.org>; Sun, 22 Sep 2019 18:59:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B6263214AF
-	for <linux-crypto@archiver.kernel.org>; Sun, 22 Sep 2019 18:48:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7CB0321BE5
+	for <linux-crypto@archiver.kernel.org>; Sun, 22 Sep 2019 18:59:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1569178111;
-	bh=gVJ5XNv35Wj2YquIGuUHJ24XMfhRoDYe2lPrgEnThQ8=;
+	s=default; t=1569178753;
+	bh=e9BSFUibeBe+oRteLZzZcuFsV4x7EMeuZV+E0L70dd0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=rGCWyAh2Dv5/86oQDlbVOYSpjKFZ5bG443J0ArMhToUSKVfs5t62B4joEjV9gRvP0
-	 SkQlshsy55HQhUUsybb4GwtqqUs3fPB6+q8VtLuryAICDirBbaFHXGV9CzDJhF94Mw
-	 3DJjJi+XxbqXq4vbs/wMS7oQbMXgmc2eXDQiuew4=
+	b=D3Y+ekS0OnML+/MP/bbiFAB82J1Fks483D2kiMjURPeQXArv9B6n8NxyOpuEQFI4V
+	 4yvRLx+GYExNaNF/c6gk12WtRGLDlfiPGBqDi4QKIgs7uIUcVVpGQDXEk+nLGrYmb4
+	 /cy8YgeypeN2MdAIIqyj6J8rLrq9PHacN2Qx2w4A=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391627AbfIVSs3 (ORCPT
+        id S2438483AbfIVS7M (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 22 Sep 2019 14:48:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45314 "EHLO mail.kernel.org"
+        Sun, 22 Sep 2019 14:59:12 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34170 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391601AbfIVSs2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 22 Sep 2019 14:48:28 -0400
+        id S2395029AbfIVS7K (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 22 Sep 2019 14:59:10 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 37B602190F;
-        Sun, 22 Sep 2019 18:48:26 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id D87C721BE5;
+        Sun, 22 Sep 2019 18:59:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1569178107;
-        bh=gVJ5XNv35Wj2YquIGuUHJ24XMfhRoDYe2lPrgEnThQ8=;
+        s=default; t=1569178749;
+        bh=e9BSFUibeBe+oRteLZzZcuFsV4x7EMeuZV+E0L70dd0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=EWS9FR1GqnQGVrkOLEwiCyVcqCMDJjSQ1D7hv/7/KFCPBtAquAkL4GWc1jyZJOc7D
-         Z3zP8aNYGxCSq9LOTYrMP92XcRrIq4rXcgd+po+6Fkf3ksv+96rxFJ8namywXr2Hoo
-         +AjhBGqgfLGYiOMiVF3iI7p7bc4riLaXpqZFsGDM=
+        b=I+1Dm9FncHmXkC/E1eOaDTtxvWx8Nls3p81A0X+o8fjGDdo2tVcDl1ZcMgq2jBJqz
+         ng95bESfcB+fbWz8CqrqQybHpgzvvkyd2rteQHN8dlkxhDxUMCQl/T/j8ACiF3MQ01
+         IvPVzk9L9YT1/Ue+a0G78P7dAH8E3m8wxGZU/LfA=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Harald Freudenberger <freude@linux.ibm.com>,
         Vasily Gorbik <gor@linux.ibm.com>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
         linux-s390@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.3 167/203] s390/crypto: xts-aes-s390 fix extra run-time crypto self tests finding
-Date:   Sun, 22 Sep 2019 14:43:13 -0400
-Message-Id: <20190922184350.30563-167-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 74/89] s390/crypto: xts-aes-s390 fix extra run-time crypto self tests finding
+Date:   Sun, 22 Sep 2019 14:57:02 -0400
+Message-Id: <20190922185717.3412-74-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20190922184350.30563-1-sashal@kernel.org>
-References: <20190922184350.30563-1-sashal@kernel.org>
+In-Reply-To: <20190922185717.3412-1-sashal@kernel.org>
+References: <20190922185717.3412-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -84,10 +84,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 6 insertions(+)
 
 diff --git a/arch/s390/crypto/aes_s390.c b/arch/s390/crypto/aes_s390.c
-index d00f84add5f4c..6d2dbb5089d5c 100644
+index 591cbdf615af0..1a906dd7ca7d9 100644
 --- a/arch/s390/crypto/aes_s390.c
 +++ b/arch/s390/crypto/aes_s390.c
-@@ -586,6 +586,9 @@ static int xts_aes_encrypt(struct blkcipher_desc *desc,
+@@ -572,6 +572,9 @@ static int xts_aes_encrypt(struct blkcipher_desc *desc,
  	struct s390_xts_ctx *xts_ctx = crypto_blkcipher_ctx(desc->tfm);
  	struct blkcipher_walk walk;
  
@@ -97,7 +97,7 @@ index d00f84add5f4c..6d2dbb5089d5c 100644
  	if (unlikely(!xts_ctx->fc))
  		return xts_fallback_encrypt(desc, dst, src, nbytes);
  
-@@ -600,6 +603,9 @@ static int xts_aes_decrypt(struct blkcipher_desc *desc,
+@@ -586,6 +589,9 @@ static int xts_aes_decrypt(struct blkcipher_desc *desc,
  	struct s390_xts_ctx *xts_ctx = crypto_blkcipher_ctx(desc->tfm);
  	struct blkcipher_walk walk;
  
