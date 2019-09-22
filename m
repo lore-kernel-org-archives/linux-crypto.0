@@ -1,147 +1,170 @@
-Return-Path: <SRS0=FYQz=XQ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=lF8a=XR=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 454C5C4CEC4
-	for <linux-crypto@archiver.kernel.org>; Sat, 21 Sep 2019 10:27:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B4A5C4360D
+	for <linux-crypto@archiver.kernel.org>; Sun, 22 Sep 2019 02:13:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 26C8D21835
-	for <linux-crypto@archiver.kernel.org>; Sat, 21 Sep 2019 10:27:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2FA4D20C01
+	for <linux-crypto@archiver.kernel.org>; Sun, 22 Sep 2019 02:13:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731120AbfIUK1C (ORCPT
+        id S1727050AbfIVCNw convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 21 Sep 2019 06:27:02 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:57052 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1731118AbfIUK1B (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 21 Sep 2019 06:27:01 -0400
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id D436A1EC664417B2B364;
-        Sat, 21 Sep 2019 18:26:59 +0800 (CST)
-Received: from [127.0.0.1] (10.63.139.185) by DGGEMS401-HUB.china.huawei.com
- (10.3.19.201) with Microsoft SMTP Server id 14.3.439.0; Sat, 21 Sep 2019
- 18:26:49 +0800
-Subject: Re: [PATCH 2/2] [v2] crypto: hisilicon - allow compile-testing on x86
-To:     John Garry <john.garry@huawei.com>, Arnd Bergmann <arnd@arndb.de>
-References: <20190919140650.1289963-2-arnd@arndb.de>
- <20190919140917.1290556-1-arnd@arndb.de>
- <f801a4c1-8fa6-8c14-120c-49c24ec84449@huawei.com>
- <CAK8P3a3jCv--VHu9r4ZTnLXXGaCjdJ6royP5LFk_9RCTTRsRBA@mail.gmail.com>
- <CAK8P3a1AgZePpZdYXh2w1BHAJZZbAjZjN8MZyVS4bPo4gVVgPg@mail.gmail.com>
- <531214d6-2caf-2963-0f57-2cd615a18762@huawei.com>
-CC:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Kenneth Lee <liguozhu@hisilicon.com>,
-        Mao Wenan <maowenan@huawei.com>,
-        "Hao Fang" <fanghao11@huawei.com>,
-        Shiju Jose <shiju.jose@huawei.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Will Deacon <will@kernel.org>
-From:   Zhou Wang <wangzhou1@hisilicon.com>
-Message-ID: <5D85FAEC.9060607@hisilicon.com>
-Date:   Sat, 21 Sep 2019 18:26:52 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:38.0) Gecko/20100101
- Thunderbird/38.5.1
+        Sat, 21 Sep 2019 22:13:52 -0400
+Received: from mga18.intel.com ([134.134.136.126]:64842 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727027AbfIVCNv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 21 Sep 2019 22:13:51 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Sep 2019 19:13:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,534,1559545200"; 
+   d="scan'208";a="182164757"
+Received: from fmsmsx103.amr.corp.intel.com ([10.18.124.201])
+  by orsmga008.jf.intel.com with ESMTP; 21 Sep 2019 19:13:50 -0700
+Received: from FMSMSX110.amr.corp.intel.com (10.18.116.10) by
+ FMSMSX103.amr.corp.intel.com (10.18.124.201) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Sat, 21 Sep 2019 19:13:50 -0700
+Received: from crsmsx104.amr.corp.intel.com (172.18.63.32) by
+ fmsmsx110.amr.corp.intel.com (10.18.116.10) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Sat, 21 Sep 2019 19:13:50 -0700
+Received: from crsmsx101.amr.corp.intel.com ([169.254.1.249]) by
+ CRSMSX104.amr.corp.intel.com ([169.254.6.58]) with mapi id 14.03.0439.000;
+ Sat, 21 Sep 2019 20:13:48 -0600
+From:   "Weiny, Ira" <ira.weiny@intel.com>
+To:     Matthew Wilcox <willy@infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>
+CC:     "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        Atul Gupta <atul.gupta@chelsio.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: RE: [PATCH v2 1/3] mm: Introduce page_size()
+Thread-Topic: [PATCH v2 1/3] mm: Introduce page_size()
+Thread-Index: AQHVcAsqYO/T6JFMt0+7/3dzSRFwbac1twUAgAE+cXA=
+Date:   Sun, 22 Sep 2019 02:13:46 +0000
+Message-ID: <2807E5FD2F6FDA4886F6618EAC48510E89916163@CRSMSX101.amr.corp.intel.com>
+References: <20190721104612.19120-1-willy@infradead.org>
+ <20190721104612.19120-2-willy@infradead.org>
+ <20190723004307.GB10284@iweiny-DESK2.sc.intel.com>
+ <20190723160248.GK363@bombadil.infradead.org>
+ <20190920162848.950dd70264e670a485f410dc@linux-foundation.org>
+ <20190921010948.GD15392@bombadil.infradead.org>
+In-Reply-To: <20190921010948.GD15392@bombadil.infradead.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-titus-metadata-40: eyJDYXRlZ29yeUxhYmVscyI6IiIsIk1ldGFkYXRhIjp7Im5zIjoiaHR0cDpcL1wvd3d3LnRpdHVzLmNvbVwvbnNcL0ludGVsMyIsImlkIjoiMzRhZTQ2ODItNGJhOC00NzFlLWFkYjgtNGM3YjNkMTgyMDU2IiwicHJvcHMiOlt7Im4iOiJDVFBDbGFzc2lmaWNhdGlvbiIsInZhbHMiOlt7InZhbHVlIjoiQ1RQX05UIn1dfV19LCJTdWJqZWN0TGFiZWxzIjpbXSwiVE1DVmVyc2lvbiI6IjE3LjEwLjE4MDQuNDkiLCJUcnVzdGVkTGFiZWxIYXNoIjoiUzZrOEkzeFNObTNzXC9jMW1VaGFzY1BWRnJQV3FkZG5idmRlbitEdHYwbENHRFVFQWYrTU95ZDlKY2swV1VlTG0ifQ==
+x-ctpclassification: CTP_NT
+dlp-product: dlpe-windows
+dlp-version: 11.2.0.6
+dlp-reaction: no-action
+x-originating-ip: [172.18.205.10]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-In-Reply-To: <531214d6-2caf-2963-0f57-2cd615a18762@huawei.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.63.139.185]
-X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2019/9/20 22:16, John Garry wrote:
-> On 20/09/2019 14:36, Arnd Bergmann wrote:
->> On Fri, Sep 20, 2019 at 3:26 PM Arnd Bergmann <arnd@arndb.de> wrote:
->>>
->>> On Fri, Sep 20, 2019 at 10:34 AM John Garry <john.garry@huawei.com> wrote:
->>>
->>>>> +     if (!IS_ENABLED(CONFIG_ARM64)) {
->>>>> +             memcpy_toio(fun_base, src, 16);
->>>>> +             wmb();
->>>>> +             return;
->>>>> +     }
->>>>> +
->>>>>       asm volatile("ldp %0, %1, %3\n"
->>>>>                    "stp %0, %1, %2\n"
->>>>>                    "dsb sy\n"
->>>>>
->>>>
->>>> As I understand, this operation needs to be done atomically. So - even
->>>> though your change is just for compile testing - the memcpy_to_io() may
->>>> not do the same thing on other archs, right?
->>>>
->>>> I just wonder if it's right to make that change, or at least warn the
->>>> imaginary user of possible malfunction for !arm64.
->>>
+> On Fri, Sep 20, 2019 at 04:28:48PM -0700, Andrew Morton wrote:
+> > On Tue, 23 Jul 2019 09:02:48 -0700 Matthew Wilcox <willy@infradead.org>
+> wrote:
+> >
+> > > On Mon, Jul 22, 2019 at 05:43:07PM -0700, Ira Weiny wrote:
+> > > > > diff --git a/drivers/crypto/chelsio/chtls/chtls_io.c
+> > > > > b/drivers/crypto/chelsio/chtls/chtls_io.c
+> > > > > index 551bca6fef24..925be5942895 100644
+> > > > > --- a/drivers/crypto/chelsio/chtls/chtls_io.c
+> > > > > +++ b/drivers/crypto/chelsio/chtls/chtls_io.c
+> > > > > @@ -1078,7 +1078,7 @@ int chtls_sendmsg(struct sock *sk, struct
+> msghdr *msg, size_t size)
+> > > > >  			bool merge;
+> > > > >
+> > > > >  			if (page)
+> > > > > -				pg_size <<= compound_order(page);
+> > > > > +				pg_size = page_size(page);
+> > > > >  			if (off < pg_size &&
+> > > > >  			    skb_can_coalesce(skb, i, page, off)) {
+> > > > >  				merge = 1;
+> > > > > @@ -1105,8 +1105,7 @@ int chtls_sendmsg(struct sock *sk, struct
+> msghdr *msg, size_t size)
+> > > > >
+> __GFP_NORETRY,
+> > > > >  							   order);
+> > > > >  					if (page)
+> > > > > -						pg_size <<=
+> > > > > -
+> 	compound_order(page);
+> > > > > +						pg_size <<= order;
+> > > >
+> > > > Looking at the code I see pg_size should be PAGE_SIZE right before
+> > > > this so why not just use the new call and remove the initial assignment?
+> > >
+> > > This driver is really convoluted.  I wasn't certain I wouldn't break
+> > > it in some horrid way.  I made larger changes to it originally, then
+> > > they touched this part of the driver and I had to rework the patch
+> > > to apply on top of their changes.  So I did something more minimal.
+> > >
+> > > This, on top of what's in Andrew's tree, would be my guess, but I
+> > > don't have the hardware.
+> > >
+> > > diff --git a/drivers/crypto/chelsio/chtls/chtls_io.c
+> > > b/drivers/crypto/chelsio/chtls/chtls_io.c
+> > > index 925be5942895..d4eb0fcd04c7 100644
+> > > --- a/drivers/crypto/chelsio/chtls/chtls_io.c
+> > > +++ b/drivers/crypto/chelsio/chtls/chtls_io.c
+> > > @@ -1073,7 +1073,7 @@ int chtls_sendmsg(struct sock *sk, struct
+> msghdr *msg, size_t size)
+> > >  		} else {
+> > >  			int i = skb_shinfo(skb)->nr_frags;
+> > >  			struct page *page = TCP_PAGE(sk);
+> > > -			int pg_size = PAGE_SIZE;
+> > > +			unsigned int pg_size = 0;
+> > >  			int off = TCP_OFF(sk);
+> > >  			bool merge;
+> > >
+> > > @@ -1092,7 +1092,7 @@ int chtls_sendmsg(struct sock *sk, struct
+> msghdr *msg, size_t size)
+> > >  			if (page && off == pg_size) {
+> > >  				put_page(page);
+> > >  				TCP_PAGE(sk) = page = NULL;
+> > > -				pg_size = PAGE_SIZE;
+> > > +				pg_size = 0;
+> > >  			}
+> > >
+> > >  			if (!page) {
+> > > @@ -1104,15 +1104,13 @@ int chtls_sendmsg(struct sock *sk, struct
+> msghdr *msg, size_t size)
+> > >  							   __GFP_NOWARN |
+> > >  							   __GFP_NORETRY,
+> > >  							   order);
+> > > -					if (page)
+> > > -						pg_size <<= order;
+> > >  				}
+> > >  				if (!page) {
+> > >  					page = alloc_page(gfp);
+> > > -					pg_size = PAGE_SIZE;
+> > >  				}
+> > >  				if (!page)
+> > >  					goto wait_for_memory;
+> > > +				pg_size = page_size(page);
+> > >  				off = 0;
+> > >  			}
+> >
+> > I didn't do anything with this.  I assume the original patch (which
+> > has been in -next since July 22) is good and the above is merely a cleanup?
 > 
-> Hi Arnd,
-> 
->>> It's probably not necessary here. From what I can tell from the documentation,
->>> this is only safe on ARMv8.4 or higher anyway, earlier ARMv8.x implementations
->>> don't guarantee that an stp arrives on the bus in one piece either.
->>>
->>> Usually, hardware like this has no hard requirement on an atomic store,
->>> it just needs the individual bits to arrive in a particular order, and then
->>> triggers the update on the last bit that gets stored. If that is the case here
->>> as well, it might actually be better to use two writeq_relaxed() and
->>> a barrier. This would also solve the endianess issue.
->>
->> See also https://lkml.org/lkml/2018/1/26/554 for a previous attempt
->> to introduce 128-bit MMIO accessors, this got rejected since they
->> are not atomic even on ARMv8.4.
-> 
-> So this is proprietary IP integrated with a proprietary ARMv8 implementation,
-> so there could be a tight coupling, the like of which Will mentioned in that thread,
-> but I'm doubtful.
-> 
-> I'm looking at the electronically translated documentation on this HW, and it reads
-> "The Mailbox operation performed by the CPU cannot be interleaved", and then tells
-> that software should lock against concurrent accesses or alternatively use a 128-bit
-> access. So it seems that the 128b op used is only to guarantee software is atomic.
-> 
-> Wang Zhou can confirm my understanding
+> Yes, just a cleanup.  Since Atul didn't offer an opinion, I assume he doesn't
+> care.
 
-We have to do a 128bit atomic write here to trigger a mailbox. The reason is
-that one QM hardware entity in one accelerator servers QM mailbox MMIO interfaces in
-related PF and VFs.
+Agreed I think what went in is fine.
 
-A mutex can not lock different processing flows in different functions.
-
-As Arnd mentioned, v8.4 extends the support for 16 bytes atomic stp to some kinds of
-normal memory, but for device memory, it is still implementation defined. For this
-SoC(Kunpeng920) which has QM/ZIP, if the address is 128bit aligned, stp will be atomic.
-The offset of QM mailbox is 128bit aligned, so it is safe here.
-
-Best,
-Zhou
-
-> 
-> If true, I see that we seem to be already guaranteeing mutual exclusion in qm_mb(),
-> in taking a mutex.
-> 
-> Thanks,
-> John
-> 
-> 
->>
->>     Arnd
->>
->> .
->>
-> 
-> 
-> 
-> .
-> 
+Ira
 
