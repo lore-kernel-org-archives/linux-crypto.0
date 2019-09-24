@@ -2,206 +2,122 @@ Return-Path: <SRS0=eCgR=XT=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_2 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB3C8C4320D
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Sep 2019 08:08:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1136C4360C
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Sep 2019 11:12:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7D97E214DA
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Sep 2019 08:08:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C8200214D9
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Sep 2019 11:12:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NxoJWtHN"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="d8vGZgqM";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="Gvkj3Ct1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2438965AbfIXIIk (ORCPT
+        id S2408251AbfIXLMn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 24 Sep 2019 04:08:40 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:43472 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2436587AbfIXIIj (ORCPT
+        Tue, 24 Sep 2019 07:12:43 -0400
+Received: from bedivere.hansenpartnership.com ([66.63.167.143]:35492 "EHLO
+        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2388764AbfIXLMn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Sep 2019 04:08:39 -0400
-Received: by mail-wr1-f68.google.com with SMTP id q17so807620wrx.10;
-        Tue, 24 Sep 2019 01:08:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=Hi1ifQQR9gpdPmRZ1GOZNnhiHESsDUToV+uCj5M5hAM=;
-        b=NxoJWtHNY256XL25Cim07uB4YuUcEkGp4Xpw7ePOsYhsTGdon2Dr2B5zkiwa92pnlq
-         Tu4yyXG51bdy0iytfp8LPPWkwsz5JJKsj/jEXFlNHO41LxVQoWvf3ytsFG49CkYIjhv3
-         iEuX1kVXJB7JTZ95HaD+EWnsadj1J3qy0MGnMlfZUSiffmQe5BHG5OFQ9urMZeCC9Ypd
-         pT3PVy/IyhIJ0vqRySbXDYGugnbQE6TEkpccoBGA1tZJfImNe6a+rnKI+qN7+tUT6aqK
-         zm/ZvTwsU8w0qppOnQV9daojHP5xcoj0jl3Ih2+nOJxucLUcKRcR+7U/fIUB1zbaswm1
-         glgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=Hi1ifQQR9gpdPmRZ1GOZNnhiHESsDUToV+uCj5M5hAM=;
-        b=D+bgqPnep7h+B9KBkg/PyNAeWaU6naTZV4hgU2FQqEsZOTlv5Cs9EUbHcgkRHTIexh
-         GV+eANFKoOfjCuU/Wo0b4qvmfIbGffr1gMe1ZCG0HZE8z4SMD2IbaxPcnOJ+CmPHMkSX
-         JumMo4Y+DwrogFQPOWffVQHjpDFV10M/OApmZLFnp0ZI3jir0xYrEKkoNANgCUe4/5xu
-         TV94M5FWGICJAKmdbcf+0d/lQN0qb2ewgOfEL49NnRastLF2h/8g8W4YSqbQ2vzfI/5f
-         fwr0mepUCmouhhnV04Zn/4fTwE3PrcViMI4gTvfwBj+WYR65FTko50cSTdarjgQpCNoP
-         Burw==
-X-Gm-Message-State: APjAAAUBsg5Ych5QjhBrfZPKDSyEQFe87inkNsaNeSFNclPyxdkPxA7A
-        gHwHr+wWpvwIohT4456JqKo=
-X-Google-Smtp-Source: APXvYqyBp86G51lnDZqf2X6fA9zUA+/GeXP/EiBQc20uwIte8LmWVoe6X9w8UA4yJLMs9lTWyum5qw==
-X-Received: by 2002:adf:efcb:: with SMTP id i11mr1255379wrp.69.1569312516938;
-        Tue, 24 Sep 2019 01:08:36 -0700 (PDT)
-Received: from Red.local ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id u22sm1825256wru.72.2019.09.24.01.08.35
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 24 Sep 2019 01:08:36 -0700 (PDT)
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     davem@davemloft.net, herbert@gondor.apana.org.au,
-        mripard@kernel.org, wens@csie.org
-Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-sunxi@googlegroups.com,
-        Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH v3 1/2] crypto: sun4i-ss: simplify enable/disable of the device
-Date:   Tue, 24 Sep 2019 10:08:31 +0200
-Message-Id: <20190924080832.18694-2-clabbe.montjoie@gmail.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20190924080832.18694-1-clabbe.montjoie@gmail.com>
-References: <20190924080832.18694-1-clabbe.montjoie@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Tue, 24 Sep 2019 07:12:43 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 0164A8EE175;
+        Tue, 24 Sep 2019 04:12:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
+        s=20151216; t=1569323563;
+        bh=7Ai2qtIntMWNVtxwe6qQsuPbjf6XjGDzBQonHyILHuw=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=d8vGZgqMBZ+hp7FMGmptBoxa8NuFaKkrg/uzwOKm4OZx0cNPSP663Txtd6GSPLDw7
+         x8DW4Y8HwWJx3JcmQ2uYIo34hrrmgWgs86kHzw7Utkfxfr1VFXp5U9zqjdwEvSx6eU
+         12TEraBTRT3/PXU0i0hzasp4Q2jq9yf//aMYIPl8=
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id eNmijRz7YiHK; Tue, 24 Sep 2019 04:12:42 -0700 (PDT)
+Received: from [192.168.101.242] (unknown [24.246.103.29])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 414818EE12C;
+        Tue, 24 Sep 2019 04:12:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
+        s=20151216; t=1569323562;
+        bh=7Ai2qtIntMWNVtxwe6qQsuPbjf6XjGDzBQonHyILHuw=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=Gvkj3Ct1bv3ybOgiYNYVi1SsR3Fw32GIY4wFNu7MKT+1NsUscSTrhidl5RXHvHNRs
+         co00JrvFBOZ45m/8k/8O7UE33+tRCU0Kf40Xq1JtjmlrL13kwCi1OTMO8vEhoxSVpZ
+         qacEs5VJTkGzU9iTxYMJUcNCrn0i7dS82RNtkbsk=
+Message-ID: <1569323560.24519.6.camel@HansenPartnership.com>
+Subject: Re: [PATCH v6 02/12] tpm-buf: add handling for TPM2B types
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+Cc:     linux-integrity@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-security-module@vger.kernel.org
+Date:   Tue, 24 Sep 2019 07:12:40 -0400
+In-Reply-To: <20190920141826.GC9578@linux.intel.com>
+References: <1568031408.6613.29.camel@HansenPartnership.com>
+         <1568031515.6613.31.camel@HansenPartnership.com>
+         <20190920141826.GC9578@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.26.6 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch regroups resource enabling/disabling in dedicated function.
-This simplify error handling and will permit to support power
-management.
+On Fri, 2019-09-20 at 17:18 +0300, Jarkko Sakkinen wrote:
+> On Mon, Sep 09, 2019 at 01:18:35PM +0100, James Bottomley wrote:
+> > Most complex TPM commands require appending TPM2B buffers to the
+> > command body.  Since TPM2B types are essentially variable size
+> > arrays,it makes it impossible to represent these complex command
+> > arguments as structures and we simply have to build them up using
+> > append primitives like these.
+> > 
+> > Signed-off-by: James Bottomley <James.Bottomley@HansenPartnership.c
+> > om>
+> 
+> I think a better idea would be to have headerless TPM buffers
 
-Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-Acked-by: Maxime Ripard <mripard@kernel.org>
----
- drivers/crypto/sunxi-ss/sun4i-ss-core.c | 77 +++++++++++++++----------
- 1 file changed, 46 insertions(+), 31 deletions(-)
+I thought about that.  The main problem is that most of the
+construct/append functions use the header, and these are the functions
+most useful to the TPM2B operation.
 
-diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-core.c b/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-index 9aa6fe081a27..6c2db5d83b06 100644
---- a/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-+++ b/drivers/crypto/sunxi-ss/sun4i-ss-core.c
-@@ -223,6 +223,45 @@ static struct sun4i_ss_alg_template ss_algs[] = {
- #endif
- };
- 
-+static void sun4i_ss_disable(struct sun4i_ss_ctx *ss)
-+{
-+	if (ss->reset)
-+		reset_control_assert(ss->reset);
-+
-+	clk_disable_unprepare(ss->ssclk);
-+	clk_disable_unprepare(ss->busclk);
-+}
-+
-+static int sun4i_ss_enable(struct sun4i_ss_ctx *ss)
-+{
-+	int err;
-+
-+	err = clk_prepare_enable(ss->busclk);
-+	if (err) {
-+		dev_err(ss->dev, "Cannot prepare_enable busclk\n");
-+		goto err_enable;
-+	}
-+
-+	err = clk_prepare_enable(ss->ssclk);
-+	if (err) {
-+		dev_err(ss->dev, "Cannot prepare_enable ssclk\n");
-+		goto err_enable;
-+	}
-+
-+	if (ss->reset) {
-+		err = reset_control_deassert(ss->reset);
-+		if (err) {
-+			dev_err(ss->dev, "Cannot deassert reset control\n");
-+			goto err_enable;
-+		}
-+	}
-+
-+	return err;
-+err_enable:
-+	sun4i_ss_disable(ss);
-+	return err;
-+}
-+
- static int sun4i_ss_probe(struct platform_device *pdev)
- {
- 	u32 v;
-@@ -269,17 +308,9 @@ static int sun4i_ss_probe(struct platform_device *pdev)
- 		ss->reset = NULL;
- 	}
- 
--	/* Enable both clocks */
--	err = clk_prepare_enable(ss->busclk);
--	if (err) {
--		dev_err(&pdev->dev, "Cannot prepare_enable busclk\n");
--		return err;
--	}
--	err = clk_prepare_enable(ss->ssclk);
--	if (err) {
--		dev_err(&pdev->dev, "Cannot prepare_enable ssclk\n");
--		goto error_ssclk;
--	}
-+	err = sun4i_ss_enable(ss);
-+	if (err)
-+		goto error_enable;
- 
- 	/*
- 	 * Check that clock have the correct rates given in the datasheet
-@@ -288,16 +319,7 @@ static int sun4i_ss_probe(struct platform_device *pdev)
- 	err = clk_set_rate(ss->ssclk, cr_mod);
- 	if (err) {
- 		dev_err(&pdev->dev, "Cannot set clock rate to ssclk\n");
--		goto error_clk;
--	}
--
--	/* Deassert reset if we have a reset control */
--	if (ss->reset) {
--		err = reset_control_deassert(ss->reset);
--		if (err) {
--			dev_err(&pdev->dev, "Cannot deassert reset control\n");
--			goto error_clk;
--		}
-+		goto error_enable;
- 	}
- 
- 	/*
-@@ -387,12 +409,8 @@ static int sun4i_ss_probe(struct platform_device *pdev)
- 			break;
- 		}
- 	}
--	if (ss->reset)
--		reset_control_assert(ss->reset);
--error_clk:
--	clk_disable_unprepare(ss->ssclk);
--error_ssclk:
--	clk_disable_unprepare(ss->busclk);
-+error_enable:
-+	sun4i_ss_disable(ss);
- 	return err;
- }
- 
-@@ -416,10 +434,7 @@ static int sun4i_ss_remove(struct platform_device *pdev)
- 	}
- 
- 	writel(0, ss->base + SS_CTL);
--	if (ss->reset)
--		reset_control_assert(ss->reset);
--	clk_disable_unprepare(ss->busclk);
--	clk_disable_unprepare(ss->ssclk);
-+	sun4i_ss_disable(ss);
- 	return 0;
- }
- 
--- 
-2.21.0
+The other thing that argues against this is that the TPM2B case would
+save nothing if we eliminated the header, because we allocate a page
+for all the data regardless.
+
+>  and also it makes sense to have a separate length field in the
+> struct to keep the code sane given that sometimes the buffer does not
+> store the length.
+
+I'm really not sure about that one.  The header length has to be filled
+in for the non-TPM2B case but right at the moment we have no finish
+function for the buf where it could be, so we'd end up having to
+maintain two lengths in every update operation on non-TPM2B buffers. 
+That seems inefficient and the only slight efficiency we get in the
+TPM2B case is not having to do the big endian conversion from the
+header which doesn't seem to be worth the added complexity.
+
+James
+
+> E.g.
+> 
+> enum tpm_buf_flags {
+> 	TPM_BUF_OVERFLOW	= BIT(0),
+> 	TPM_BUF_HEADERLESS	= BIT(1),
+> };
+> 
+> struct tpm_buf {
+> 	unsigned int length;
+> 	struct page *data_page;
+> 	unsigned int flags;
+> 	u8 *data;
+> };
+> 
+> /Jarkko
+> 
 
