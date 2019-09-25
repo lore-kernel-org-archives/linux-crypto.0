@@ -2,69 +2,209 @@ Return-Path: <SRS0=gkGi=XU=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13E69C4360C
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Sep 2019 12:35:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD769C4360D
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Sep 2019 13:04:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DECB920673
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Sep 2019 12:35:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9EE05222BF
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Sep 2019 13:04:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730516AbfIYMfB (ORCPT
+        id S2405967AbfIYNEz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 25 Sep 2019 08:35:01 -0400
-Received: from mga07.intel.com ([134.134.136.100]:40044 "EHLO mga07.intel.com"
+        Wed, 25 Sep 2019 09:04:55 -0400
+Received: from inva021.nxp.com ([92.121.34.21]:34446 "EHLO inva021.nxp.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726369AbfIYMfB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 25 Sep 2019 08:35:01 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Sep 2019 05:35:00 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.64,548,1559545200"; 
-   d="scan'208";a="203602442"
-Received: from kmakows-mobl.ger.corp.intel.com (HELO localhost) ([10.249.39.225])
-  by fmsmga001.fm.intel.com with ESMTP; 25 Sep 2019 05:34:58 -0700
-Date:   Wed, 25 Sep 2019 15:34:57 +0300
-From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc:     linux-integrity@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Subject: Re: [PATCH v6 02/12] tpm-buf: add handling for TPM2B types
-Message-ID: <20190925123457.GB24028@linux.intel.com>
-References: <1568031408.6613.29.camel@HansenPartnership.com>
- <1568031515.6613.31.camel@HansenPartnership.com>
- <20190920141826.GC9578@linux.intel.com>
- <1569323560.24519.6.camel@HansenPartnership.com>
- <20190925123401.GA24028@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190925123401.GA24028@linux.intel.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        id S2405791AbfIYNEz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 25 Sep 2019 09:04:55 -0400
+Received: from inva021.nxp.com (localhost [127.0.0.1])
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 27B1B2001F1;
+        Wed, 25 Sep 2019 15:04:53 +0200 (CEST)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 185E3200040;
+        Wed, 25 Sep 2019 15:04:53 +0200 (CEST)
+Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id BF03D20634;
+        Wed, 25 Sep 2019 15:04:52 +0200 (CEST)
+From:   Iuliana Prodan <iuliana.prodan@nxp.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-imx <linux-imx@nxp.com>
+Subject: [PATCH] crypto: caam - use mapped_{src,dst}_nents for descriptor
+Date:   Wed, 25 Sep 2019 16:04:36 +0300
+Message-Id: <1569416676-21810-1-git-send-email-iuliana.prodan@nxp.com>
+X-Mailer: git-send-email 2.1.0
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Sep 25, 2019 at 03:34:01PM +0300, Jarkko Sakkinen wrote:
-> On Tue, Sep 24, 2019 at 07:12:40AM -0400, James Bottomley wrote:
-> > I thought about that.  The main problem is that most of the
-> > construct/append functions use the header, and these are the functions
-> > most useful to the TPM2B operation.
-> > 
-> > The other thing that argues against this is that the TPM2B case would
-> > save nothing if we eliminated the header, because we allocate a page
-> > for all the data regardless.
-> 
-> It would be way more clean. There is absolutely nothing TPM2B specific.
+The mapped_{src,dst}_nents _returned_ from the dma_map_sg
+call (which could be less than src/dst_nents) have to be
+used to generate the job descriptors.
 
-Given the recent regression I'm detaching allocation from tpm_buf and
-make it purely a decorator (sending patch today).
+Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
+---
+ drivers/crypto/caam/caampkc.c | 54 ++++++++++++++++++++++++-------------------
+ drivers/crypto/caam/caampkc.h |  8 +++++--
+ 2 files changed, 36 insertions(+), 26 deletions(-)
 
-/Jarkko
+diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.c
+index 83f96d4..71090cd 100644
+--- a/drivers/crypto/caam/caampkc.c
++++ b/drivers/crypto/caam/caampkc.c
+@@ -252,9 +252,9 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
+ 	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
+ 		       GFP_KERNEL : GFP_ATOMIC;
+ 	int sg_flags = (flags == GFP_ATOMIC) ? SG_MITER_ATOMIC : 0;
+-	int sgc;
+ 	int sec4_sg_index, sec4_sg_len = 0, sec4_sg_bytes;
+ 	int src_nents, dst_nents;
++	int mapped_src_nents, mapped_dst_nents;
+ 	unsigned int diff_size = 0;
+ 	int lzeros;
+ 
+@@ -285,13 +285,27 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
+ 				     req_ctx->fixup_src_len);
+ 	dst_nents = sg_nents_for_len(req->dst, req->dst_len);
+ 
+-	if (!diff_size && src_nents == 1)
++	mapped_src_nents = dma_map_sg(dev, req_ctx->fixup_src, src_nents,
++				      DMA_TO_DEVICE);
++	if (unlikely(!mapped_src_nents)) {
++		dev_err(dev, "unable to map source\n");
++		return ERR_PTR(-ENOMEM);
++	}
++	mapped_dst_nents = dma_map_sg(dev, req->dst, dst_nents,
++				      DMA_FROM_DEVICE);
++	if (unlikely(!mapped_dst_nents)) {
++		dev_err(dev, "unable to map destination\n");
++		goto src_fail;
++	}
++
++	if (!diff_size && mapped_src_nents == 1)
+ 		sec4_sg_len = 0; /* no need for an input hw s/g table */
+ 	else
+-		sec4_sg_len = src_nents + !!diff_size;
++		sec4_sg_len = mapped_src_nents + !!diff_size;
+ 	sec4_sg_index = sec4_sg_len;
+-	if (dst_nents > 1)
+-		sec4_sg_len += pad_sg_nents(dst_nents);
++
++	if (mapped_dst_nents > 1)
++		sec4_sg_len += pad_sg_nents(mapped_dst_nents);
+ 	else
+ 		sec4_sg_len = pad_sg_nents(sec4_sg_len);
+ 
+@@ -301,19 +315,7 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
+ 	edesc = kzalloc(sizeof(*edesc) + desclen + sec4_sg_bytes,
+ 			GFP_DMA | flags);
+ 	if (!edesc)
+-		return ERR_PTR(-ENOMEM);
+-
+-	sgc = dma_map_sg(dev, req_ctx->fixup_src, src_nents, DMA_TO_DEVICE);
+-	if (unlikely(!sgc)) {
+-		dev_err(dev, "unable to map source\n");
+-		goto src_fail;
+-	}
+-
+-	sgc = dma_map_sg(dev, req->dst, dst_nents, DMA_FROM_DEVICE);
+-	if (unlikely(!sgc)) {
+-		dev_err(dev, "unable to map destination\n");
+ 		goto dst_fail;
+-	}
+ 
+ 	edesc->sec4_sg = (void *)edesc + sizeof(*edesc) + desclen;
+ 	if (diff_size)
+@@ -324,7 +326,7 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
+ 		sg_to_sec4_sg_last(req_ctx->fixup_src, req_ctx->fixup_src_len,
+ 				   edesc->sec4_sg + !!diff_size, 0);
+ 
+-	if (dst_nents > 1)
++	if (mapped_dst_nents > 1)
+ 		sg_to_sec4_sg_last(req->dst, req->dst_len,
+ 				   edesc->sec4_sg + sec4_sg_index, 0);
+ 
+@@ -335,6 +337,9 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
+ 	if (!sec4_sg_bytes)
+ 		return edesc;
+ 
++	edesc->mapped_src_nents = mapped_src_nents;
++	edesc->mapped_dst_nents = mapped_dst_nents;
++
+ 	edesc->sec4_sg_dma = dma_map_single(dev, edesc->sec4_sg,
+ 					    sec4_sg_bytes, DMA_TO_DEVICE);
+ 	if (dma_mapping_error(dev, edesc->sec4_sg_dma)) {
+@@ -351,11 +356,11 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
+ 	return edesc;
+ 
+ sec4_sg_fail:
+-	dma_unmap_sg(dev, req->dst, dst_nents, DMA_FROM_DEVICE);
++	kfree(edesc);
+ dst_fail:
+-	dma_unmap_sg(dev, req_ctx->fixup_src, src_nents, DMA_TO_DEVICE);
++	dma_unmap_sg(dev, req->dst, dst_nents, DMA_FROM_DEVICE);
+ src_fail:
+-	kfree(edesc);
++	dma_unmap_sg(dev, req_ctx->fixup_src, src_nents, DMA_TO_DEVICE);
+ 	return ERR_PTR(-ENOMEM);
+ }
+ 
+@@ -428,17 +433,18 @@ static int set_rsa_priv_f1_pdb(struct akcipher_request *req,
+ 		return -ENOMEM;
+ 	}
+ 
+-	if (edesc->src_nents > 1) {
++	if (edesc->mapped_src_nents > 1) {
+ 		pdb->sgf |= RSA_PRIV_PDB_SGF_G;
+ 		pdb->g_dma = edesc->sec4_sg_dma;
+-		sec4_sg_index += edesc->src_nents;
++		sec4_sg_index += edesc->mapped_src_nents;
++
+ 	} else {
+ 		struct caam_rsa_req_ctx *req_ctx = akcipher_request_ctx(req);
+ 
+ 		pdb->g_dma = sg_dma_address(req_ctx->fixup_src);
+ 	}
+ 
+-	if (edesc->dst_nents > 1) {
++	if (edesc->mapped_dst_nents > 1) {
+ 		pdb->sgf |= RSA_PRIV_PDB_SGF_F;
+ 		pdb->f_dma = edesc->sec4_sg_dma +
+ 			     sec4_sg_index * sizeof(struct sec4_sg_entry);
+diff --git a/drivers/crypto/caam/caampkc.h b/drivers/crypto/caam/caampkc.h
+index 2c488c9..c68fb4c 100644
+--- a/drivers/crypto/caam/caampkc.h
++++ b/drivers/crypto/caam/caampkc.h
+@@ -112,8 +112,10 @@ struct caam_rsa_req_ctx {
+ 
+ /**
+  * rsa_edesc - s/w-extended rsa descriptor
+- * @src_nents     : number of segments in input scatterlist
+- * @dst_nents     : number of segments in output scatterlist
++ * @src_nents     : number of segments in input s/w scatterlist
++ * @dst_nents     : number of segments in output s/w scatterlist
++ * @mapped_src_nents: number of segments in input h/w link table
++ * @mapped_dst_nents: number of segments in output h/w link table
+  * @sec4_sg_bytes : length of h/w link table
+  * @sec4_sg_dma   : dma address of h/w link table
+  * @sec4_sg       : pointer to h/w link table
+@@ -123,6 +125,8 @@ struct caam_rsa_req_ctx {
+ struct rsa_edesc {
+ 	int src_nents;
+ 	int dst_nents;
++	int mapped_src_nents;
++	int mapped_dst_nents;
+ 	int sec4_sg_bytes;
+ 	dma_addr_t sec4_sg_dma;
+ 	struct sec4_sg_entry *sec4_sg;
+-- 
+2.1.0
+
