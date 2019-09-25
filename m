@@ -1,88 +1,75 @@
-Return-Path: <SRS0=eCgR=XT=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=gkGi=XU=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1214EC4320D
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Sep 2019 11:18:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8098FC432C2
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Sep 2019 01:11:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D4820214DA
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Sep 2019 11:18:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="pmrxJcTU";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="pmrxJcTU"
+	by mail.kernel.org (Postfix) with ESMTP id 5AE12214AF
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Sep 2019 01:11:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2504628AbfIXLSj (ORCPT
+        id S2388463AbfIYBLY (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 24 Sep 2019 07:18:39 -0400
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:35590 "EHLO
-        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2504627AbfIXLSi (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Sep 2019 07:18:38 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 6D7878EE175;
-        Tue, 24 Sep 2019 04:18:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1569323918;
-        bh=2f54yALR7qGp4YgS4aDBSShfe/qfzBqvEZHy6t6kIlI=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=pmrxJcTU1yQtJ/czlBI0uNZUA1ZiJoaKGrYxCSKN9wZELATN4MB7kBctN3usLfLes
-         rdbXGSSh4CeTt5OPTzsz0oUdINhj8PwRKDr9MUWc1O1LxdLv3widGjaEq0mKtSa3f5
-         ta310Rw0R5aqpn0iWw9nzh+wqQAznQ+0j3ZhC1nQ=
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id Sc2zoGPzz6oH; Tue, 24 Sep 2019 04:18:38 -0700 (PDT)
-Received: from [192.168.101.242] (unknown [24.246.103.29])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id B44768EE12C;
-        Tue, 24 Sep 2019 04:18:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1569323918;
-        bh=2f54yALR7qGp4YgS4aDBSShfe/qfzBqvEZHy6t6kIlI=;
-        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-        b=pmrxJcTU1yQtJ/czlBI0uNZUA1ZiJoaKGrYxCSKN9wZELATN4MB7kBctN3usLfLes
-         rdbXGSSh4CeTt5OPTzsz0oUdINhj8PwRKDr9MUWc1O1LxdLv3widGjaEq0mKtSa3f5
-         ta310Rw0R5aqpn0iWw9nzh+wqQAznQ+0j3ZhC1nQ=
-Message-ID: <1569323907.24519.9.camel@HansenPartnership.com>
-Subject: Re: [PATCH v6 05/12] tpm2-sessions: Add full HMAC and
- encrypt/decrypt session handling
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Cc:     linux-integrity@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Date:   Tue, 24 Sep 2019 07:18:27 -0400
-In-Reply-To: <20190920143523.GE9578@linux.intel.com>
-References: <1568031408.6613.29.camel@HansenPartnership.com>
-         <1568031657.6613.34.camel@HansenPartnership.com>
-         <20190920143337.GD9578@linux.intel.com>
-         <20190920143523.GE9578@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.26.6 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+        Tue, 24 Sep 2019 21:11:24 -0400
+Received: from mga07.intel.com ([134.134.136.100]:47679 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2387402AbfIYBLY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 24 Sep 2019 21:11:24 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 24 Sep 2019 18:11:22 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,546,1559545200"; 
+   d="scan'208";a="188634031"
+Received: from wujunyox-mobl3.ger.corp.intel.com (HELO localhost) ([10.249.38.101])
+  by fmsmga008.fm.intel.com with ESMTP; 24 Sep 2019 18:11:15 -0700
+Date:   Wed, 25 Sep 2019 04:11:15 +0300
+From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+To:     Sumit Garg <sumit.garg@linaro.org>
+Cc:     dhowells@redhat.com, peterhuewe@gmx.de, keyrings@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        linux-security-module@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
+        jgg@ziepe.ca, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        jejb@linux.ibm.com, Mimi Zohar <zohar@linux.ibm.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Jerry Snitselaar <jsnitsel@redhat.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Daniel Thompson <daniel.thompson@linaro.org>
+Subject: Re: [Patch v6 4/4] KEYS: trusted: Move TPM2 trusted keys code
+Message-ID: <20190925011115.GA3503@linux.intel.com>
+References: <1568630064-14887-1-git-send-email-sumit.garg@linaro.org>
+ <1568630064-14887-5-git-send-email-sumit.garg@linaro.org>
+ <20190917181415.GA8472@linux.intel.com>
+ <20190917181507.GB8472@linux.intel.com>
+ <CAFA6WYMbUGQ6+-XvR9_qSc=oVe1QSTg4kB-+y6rBmQLq+B6skg@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAFA6WYMbUGQ6+-XvR9_qSc=oVe1QSTg4kB-+y6rBmQLq+B6skg@mail.gmail.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 2019-09-20 at 17:35 +0300, Jarkko Sakkinen wrote:
-> On Fri, Sep 20, 2019 at 05:34:00PM +0300, Jarkko Sakkinen wrote:
-> > On Mon, Sep 09, 2019 at 01:20:57PM +0100, James Bottomley wrote:
+On Wed, Sep 18, 2019 at 11:53:08AM +0530, Sumit Garg wrote:
+> No worries :). I will send next version of patch-set.
 > 
-> Forgot to ask: what is the new field handles?
+> FYI, I will be travelling for Linaro Connect next week so you could
+> expect some delays in my responses.
 
-You mean for the null seed or for the virtual handles?
+These patches will go to v5.5. There is nothing to rush.
 
-For the former, there isn't one since the null seed is maintained as a
-context when not in use, although since the null seed context is loaded
-before an operation it will mostly get 80000000 for the brief time it
-is used.  For the latter, there's no change in the way virtual handles
-are processed.
-
-James
-
+/Jarkko
