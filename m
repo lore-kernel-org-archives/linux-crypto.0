@@ -2,60 +2,60 @@ Return-Path: <SRS0=gkGi=XU=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-14.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98050C43630
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 220AFC432C2
 	for <linux-crypto@archiver.kernel.org>; Wed, 25 Sep 2019 16:14:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6AF7B21D7B
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Sep 2019 16:14:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C1B9421E6F
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Sep 2019 16:14:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X8mFmd4y"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Qp0FkhpY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387919AbfIYQOA (ORCPT
+        id S2388025AbfIYQOA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Wed, 25 Sep 2019 12:14:00 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:51500 "EHLO
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:38789 "EHLO
         mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387965AbfIYQOA (ORCPT
+        with ESMTP id S1732673AbfIYQN7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 25 Sep 2019 12:14:00 -0400
-Received: by mail-wm1-f68.google.com with SMTP id 7so6425647wme.1
-        for <linux-crypto@vger.kernel.org>; Wed, 25 Sep 2019 09:13:56 -0700 (PDT)
+        Wed, 25 Sep 2019 12:13:59 -0400
+Received: by mail-wm1-f68.google.com with SMTP id 3so5622593wmi.3
+        for <linux-crypto@vger.kernel.org>; Wed, 25 Sep 2019 09:13:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=jexsTmRw4CcMhLW8uoTjvTlHKL6BoxHbV8Ic7banI6Y=;
-        b=X8mFmd4yLVNY4oJiYyoojIfqERqJgfrNbslNSa6qiRdZuu52PPgOipL4/TapfpnoXV
-         Gd4QKCJL4rt9CU5owm2CZPGZ3ZkVz/ALcAokE4W2esJICrSkGlJKLICaUw3eHJHAkXiY
-         SHuUYGDildBgadb8Ql/bcmsjs6IAAjM9PBoF9B3SHtJemrn7zXyssy/5BQVgKdarAt6n
-         847KhgVDMxkPCoLWrB5m3152Z+RdUF+dCHFnBctXRIeKeMFefvaTfm3rrBq5VJ8/Korj
-         jteoF8IIgLkfWN82uVEinwWmn3buqdplcWFX39HbO59xJMQ+hFaynNyQJ2qLQ0xvkwHq
-         BpSQ==
+        bh=uBWKnqhE8fyahgPkhqt+j0IcW7qWJLRRdpKLMMQW86E=;
+        b=Qp0FkhpYOsx997N4Zh3/U+JF9Zo4W8WFkYDiwwDmSVpBCttzjutMP6bcuwhuxOoJW4
+         9doLlaLphDUmBVFm4ppHXfRDHhXjuzi/wlmgu6RGuT5T0PtKDpU8YE7b5Gr1zmB6Uj2L
+         fbJhkWFDumqhL6pu6EV80Bw7NRGaKKTajYbT3LCrGf8iWMvniM7O9faf2fijsudnUNXH
+         hMeXlgk7gjedBIWzcTL2DzwMTEzzaegfV8eM8g120pqJ2NA0pXNrMOzAZ78tzdSrwtGg
+         AXbNRHZZeq9lTwg+19jXR/+JAhQ1YYadJlcGzk2PYIfEhwrZa7nOotqP7udP6p/cl7bq
+         TYAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=jexsTmRw4CcMhLW8uoTjvTlHKL6BoxHbV8Ic7banI6Y=;
-        b=slqibDW82HV4/UVdF7xtd9+evCs+k/YdSjMUI+3og2G9SytBFDqFidjcZTGWMSBJl4
-         9s1kh30ubsKVGWLk3yqEm145mwMXFb2X9LLtfjfzeEkR2qJEVG/DfUOEcHls3nl3ioFh
-         EYSQqkNoVh5Pef4wS4A5q2Fa2A+pDhzD8MMw3aQLqt68SOl8GcO6xz43EV7qW9VdciSv
-         E8A0jK7wy9hvRij14zlqUC9p+dOh4RqzdpGPu/RR2etOdQe8FGVuRz2KtebxbrecKPH2
-         Lry4sCsEiXvuwdauzKByA/o0dYvfnpuBaYkASvxgMVrr6CMQ5e+9nE46s3mXl0NNvPMO
-         eg1Q==
-X-Gm-Message-State: APjAAAWnqvf8E6KRHJzHxWLF0NcAhsLjXtBPLlMjfoE3QRIJc507EoGj
-        KF8Xe+YIYQi3WKhY94gxRTQ5tAfAtDDifleC
-X-Google-Smtp-Source: APXvYqyAibRAkTx8Cjw4OYEuyloTPcD0FvaxY4tAD/Tft/xEGSQHog13ymV800nTEmF+zF8thWteFg==
-X-Received: by 2002:a1c:3182:: with SMTP id x124mr9125694wmx.168.1569428035523;
-        Wed, 25 Sep 2019 09:13:55 -0700 (PDT)
+        bh=uBWKnqhE8fyahgPkhqt+j0IcW7qWJLRRdpKLMMQW86E=;
+        b=jGkv26wuuIuMDSNLIvnf6cZoWliu5EYjoscktzNCwnck0kvclRRACRM8t+OlXSEUmH
+         gA6zC015Ydg5ePLx7PztCVgMUKhJIkDKJMolWbR8NBtfYft1QW4j8EXWBSKCz0P2jblU
+         /fKr42maFnhFZtCmP7Lqan8Ec/1K9Bi3dZB51KM91JGw16AQN1rJAdpwKfJXhULF8XOg
+         Zdtqr9To1+6zo9DurV6UK9uXt2NFzN7gvSiOE/GIdwMfFNz9WqShDB5jVAftjT6FxhbW
+         Sa9VXFuvqEVVyPMAoVNESrGQs/w2Q/f4ehGQRwLekyY8k6delQcneLF5tD4Bt5HAKMri
+         FwTg==
+X-Gm-Message-State: APjAAAXXRtqw7nzBAtJwWRHioXT4Dd8eO3gpMglCv9gMUE/sHCzLTehL
+        WRKqxxPr5vmTLSnJNuc07LR4x7+oL4mbifEd
+X-Google-Smtp-Source: APXvYqy2uYVJgbhx2u3tvRPH5CpU+GCsLR7VJgtUWWLdOCVK9be8MAJNZZGc0G/p0Y4bGc9/tPwBeA==
+X-Received: by 2002:a7b:c761:: with SMTP id x1mr8697485wmk.47.1569428032430;
+        Wed, 25 Sep 2019 09:13:52 -0700 (PDT)
 Received: from localhost.localdomain (laubervilliers-657-1-83-120.w92-154.abo.wanadoo.fr. [92.154.90.120])
-        by smtp.gmail.com with ESMTPSA id o70sm4991085wme.29.2019.09.25.09.13.54
+        by smtp.gmail.com with ESMTPSA id o70sm4991085wme.29.2019.09.25.09.13.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Sep 2019 09:13:54 -0700 (PDT)
+        Wed, 25 Sep 2019 09:13:51 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     linux-arm-kernel@lists.infradead.org,
@@ -71,10 +71,11 @@ Cc:     linux-arm-kernel@lists.infradead.org,
         Eric Biggers <ebiggers@google.com>,
         Andy Lutomirski <luto@kernel.org>,
         Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>
-Subject: [RFC PATCH 06/18] crypto: rfc7539 - switch to shash for Poly1305
-Date:   Wed, 25 Sep 2019 18:12:43 +0200
-Message-Id: <20190925161255.1871-7-ard.biesheuvel@linaro.org>
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Andy Polyakov <appro@cryptogams.org>
+Subject: [RFC PATCH 04/18] crypto: arm64/poly1305 - incorporate OpenSSL/CRYPTOGAMS NEON implementation
+Date:   Wed, 25 Sep 2019 18:12:41 +0200
+Message-Id: <20190925161255.1871-5-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190925161255.1871-1-ard.biesheuvel@linaro.org>
 References: <20190925161255.1871-1-ard.biesheuvel@linaro.org>
@@ -85,724 +86,2053 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The RFC7539 template uses an ahash Poly1305 transformation to implement
-the authentication part of the algorithm. Since ahashes operate on
-scatterlists only, this forces the RFC7539 driver to allocate scratch
-buffers in the request context, to ensure that they are allocated from
-the heap.
+This is a straight import of the OpenSSL/CRYPTOGAMS Poly1305 implementation
+for NEON authored by Andy Polyakov, and contributed by him to the OpenSSL
+project. The file 'poly1305-armv8.pl' is taken straight from this upstream
+GitHub repository [0] at commit ec55a08dc0244ce570c4fc7cade330c60798952f,
+and already contains all the changes required to build it as part of a
+Linux kernel module.
 
-However, in practice, all Poly1305 implementations available today are
-shashes wrapped by the generic ahash->shash wrapper, which means we are
-jumping through hoops unnecessarily, especially considering that the
-way this driver invokes the ahash (6 consecutive requests for the key,
-associated data, padding, ciphertext, more padding and the tail) will
-make it very difficult for a true asynchronous implementation to ever
-materialize that can operate efficiently in this context.
+[0] https://github.com/dot-asm/cryptogams
 
-So now that shashes can operate on scatterlists as well as virtually
-mapped buffers, switch the RFC7539 template from ahash to shash for
-the Poly1305 transformation. At the same time, switch to using the
-ChaCha library to generate the Poly1305 key so that we don't have to
-call into the [potentially asynchronous] skcipher twice, with one call
-only operating on 32 bytes of data.
-
+Co-developed-by: Andy Polyakov <appro@cryptogams.org>
+Signed-off-by: Andy Polyakov <appro@cryptogams.org>
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- crypto/chacha20poly1305.c | 513 ++++++--------------
- 1 file changed, 145 insertions(+), 368 deletions(-)
+ arch/arm64/crypto/Kconfig                 |   4 +
+ arch/arm64/crypto/Makefile                |   9 +-
+ arch/arm64/crypto/poly1305-armv8.pl       | 913 ++++++++++++++++++++
+ arch/arm64/crypto/poly1305-core.S_shipped | 835 ++++++++++++++++++
+ arch/arm64/crypto/poly1305-glue.c         | 215 +++++
+ 5 files changed, 1975 insertions(+), 1 deletion(-)
 
-diff --git a/crypto/chacha20poly1305.c b/crypto/chacha20poly1305.c
-index 74e824e537e6..71496a8107f5 100644
---- a/crypto/chacha20poly1305.c
-+++ b/crypto/chacha20poly1305.c
-@@ -20,53 +20,32 @@
+diff --git a/arch/arm64/crypto/Kconfig b/arch/arm64/crypto/Kconfig
+index 4922c4451e7c..6ee2fdfd84aa 100644
+--- a/arch/arm64/crypto/Kconfig
++++ b/arch/arm64/crypto/Kconfig
+@@ -105,6 +105,10 @@ config CRYPTO_CHACHA20_NEON
+ 	select CRYPTO_BLKCIPHER
+ 	select CRYPTO_CHACHA20
  
- struct chachapoly_instance_ctx {
- 	struct crypto_skcipher_spawn chacha;
--	struct crypto_ahash_spawn poly;
-+	struct crypto_shash_spawn poly;
- 	unsigned int saltlen;
- };
- 
- struct chachapoly_ctx {
- 	struct crypto_skcipher *chacha;
--	struct crypto_ahash *poly;
-+	struct crypto_shash *poly;
-+	u32 chacha_key[CHACHA_KEY_SIZE / sizeof(u32)];
- 	/* key bytes we use for the ChaCha20 IV */
- 	unsigned int saltlen;
- 	u8 salt[];
- };
- 
--struct poly_req {
--	/* zero byte padding for AD/ciphertext, as needed */
--	u8 pad[POLY1305_BLOCK_SIZE];
--	/* tail data with AD/ciphertext lengths */
--	struct {
--		__le64 assoclen;
--		__le64 cryptlen;
--	} tail;
--	struct scatterlist src[1];
--	struct ahash_request req; /* must be last member */
--};
--
- struct chacha_req {
- 	u8 iv[CHACHA_IV_SIZE];
--	struct scatterlist src[1];
- 	struct skcipher_request req; /* must be last member */
- };
- 
- struct chachapoly_req_ctx {
- 	struct scatterlist src[2];
- 	struct scatterlist dst[2];
--	/* the key we generate for Poly1305 using Chacha20 */
--	u8 key[POLY1305_KEY_SIZE];
--	/* calculated Poly1305 tag */
--	u8 tag[POLY1305_DIGEST_SIZE];
- 	/* length of data to en/decrypt, without ICV */
- 	unsigned int cryptlen;
--	/* Actual AD, excluding IV */
--	unsigned int assoclen;
- 	/* request flags, with MAY_SLEEP cleared if needed */
- 	u32 flags;
--	union {
--		struct poly_req poly;
--		struct chacha_req chacha;
--	} u;
-+	struct chacha_req chacha;
- };
- 
- static inline void async_done_continue(struct aead_request *req, int err,
-@@ -94,43 +73,114 @@ static void chacha_iv(u8 *iv, struct aead_request *req, u32 icb)
- 	       CHACHA_IV_SIZE - sizeof(leicb) - ctx->saltlen);
- }
- 
--static int poly_verify_tag(struct aead_request *req)
-+static int poly_generate_tag(struct aead_request *req, u8 *poly_tag,
-+			     struct scatterlist *crypt)
- {
-+	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
-+	struct chachapoly_ctx *ctx = crypto_aead_ctx(tfm);
- 	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
--	u8 tag[sizeof(rctx->tag)];
-+	u32 chacha_state[CHACHA_BLOCK_SIZE / sizeof(u32)];
-+	SHASH_DESC_ON_STACK(desc, ctx->poly);
-+	u8 poly_key[POLY1305_KEY_SIZE];
-+	bool skip_ad_pad, atomic;
-+	u8 iv[CHACHA_IV_SIZE];
-+	unsigned int assoclen;
-+	unsigned int padlen;
-+	__le64 tail[4];
++config CRYPTO_POLY1305_NEON
++	tristate "Poly1305 hash function using NEON instructions"
++	depends on KERNEL_MODE_NEON
 +
-+	/*
-+	 * Take the Poly1305 hash of the entire AD plus ciphertext in one go if
-+	 * a) we are not running in ESP mode (which puts data between the AD
-+	 *    and the ciphertext in the input scatterlist), and
-+	 * b) no padding is required between the AD and the ciphertext, and
-+	 * c) the source buffer points to the ciphertext, either because we
-+	 *    are decrypting, or because we are encrypting in place.
-+	 */
-+	if (crypto_aead_ivsize(tfm) == 8) {
-+		if (req->assoclen < 8)
-+			return -EINVAL;
-+		assoclen = req->assoclen - 8;
-+		skip_ad_pad = false;
-+	} else {
-+		assoclen = req->assoclen;
-+		skip_ad_pad = !(assoclen % POLY1305_BLOCK_SIZE) &&
-+			      (crypt == req->src);
+ config CRYPTO_NHPOLY1305_NEON
+ 	tristate "NHPoly1305 hash function using NEON instructions (for Adiantum)"
+ 	depends on KERNEL_MODE_NEON
+diff --git a/arch/arm64/crypto/Makefile b/arch/arm64/crypto/Makefile
+index 0435f2a0610e..164d554422fe 100644
+--- a/arch/arm64/crypto/Makefile
++++ b/arch/arm64/crypto/Makefile
+@@ -50,6 +50,9 @@ sha512-arm64-y := sha512-glue.o sha512-core.o
+ obj-$(CONFIG_CRYPTO_CHACHA20_NEON) += chacha-neon.o
+ chacha-neon-y := chacha-neon-core.o chacha-neon-glue.o
+ 
++obj-$(CONFIG_CRYPTO_POLY1305_NEON) += poly1305-neon.o
++poly1305-neon-y := poly1305-core.o poly1305-glue.o
++
+ obj-$(CONFIG_CRYPTO_NHPOLY1305_NEON) += nhpoly1305-neon.o
+ nhpoly1305-neon-y := nh-neon-core.o nhpoly1305-neon-glue.o
+ 
+@@ -68,11 +71,15 @@ ifdef REGENERATE_ARM64_CRYPTO
+ quiet_cmd_perlasm = PERLASM $@
+       cmd_perlasm = $(PERL) $(<) void $(@)
+ 
++$(src)/poly1305-core.S_shipped: $(src)/poly1305-armv8.pl
++	$(call cmd,perlasm)
++
+ $(src)/sha256-core.S_shipped: $(src)/sha512-armv8.pl
+ 	$(call cmd,perlasm)
+ 
+ $(src)/sha512-core.S_shipped: $(src)/sha512-armv8.pl
+ 	$(call cmd,perlasm)
++
+ endif
+ 
+-clean-files += sha256-core.S sha512-core.S
++clean-files += poly1305-core.S sha256-core.S sha512-core.S
+diff --git a/arch/arm64/crypto/poly1305-armv8.pl b/arch/arm64/crypto/poly1305-armv8.pl
+new file mode 100644
+index 000000000000..6e5576d19af8
+--- /dev/null
++++ b/arch/arm64/crypto/poly1305-armv8.pl
+@@ -0,0 +1,913 @@
++#!/usr/bin/env perl
++# SPDX-License-Identifier: GPL-1.0+ OR BSD-3-Clause
++#
++# ====================================================================
++# Written by Andy Polyakov, @dot-asm, initially for the OpenSSL
++# project.
++# ====================================================================
++#
++# This module implements Poly1305 hash for ARMv8.
++#
++# June 2015
++#
++# Numbers are cycles per processed byte with poly1305_blocks alone.
++#
++#		IALU/gcc-4.9	NEON
++#
++# Apple A7	1.86/+5%	0.72
++# Cortex-A53	2.69/+58%	1.47
++# Cortex-A57	2.70/+7%	1.14
++# Denver	1.64/+50%	1.18(*)
++# X-Gene	2.13/+68%	2.27
++# Mongoose	1.77/+75%	1.12
++# Kryo		2.70/+55%	1.13
++# ThunderX2	1.17/+95%	1.36
++#
++# (*)	estimate based on resources availability is less than 1.0,
++#	i.e. measured result is worse than expected, presumably binary
++#	translator is not almighty;
++
++$flavour=shift;
++$output=shift;
++
++if ($flavour && $flavour ne "void") {
++    $0 =~ m/(.*[\/\\])[^\/\\]+$/; $dir=$1;
++    ( $xlate="${dir}arm-xlate.pl" and -f $xlate ) or
++    ( $xlate="${dir}../../perlasm/arm-xlate.pl" and -f $xlate) or
++    die "can't locate arm-xlate.pl";
++
++    open STDOUT,"| \"$^X\" $xlate $flavour $output";
++} else {
++    open STDOUT,">$output";
++}
++
++my ($ctx,$inp,$len,$padbit) = map("x$_",(0..3));
++my ($mac,$nonce)=($inp,$len);
++
++my ($h0,$h1,$h2,$r0,$r1,$s1,$t0,$t1,$d0,$d1,$d2) = map("x$_",(4..14));
++
++$code.=<<___;
++#ifndef __KERNEL__
++# include "arm_arch.h"
++.extern	OPENSSL_armcap_P
++#endif
++
++.text
++
++// forward "declarations" are required for Apple
++.globl	poly1305_blocks
++.globl	poly1305_emit
++
++.globl	poly1305_init
++.type	poly1305_init,%function
++.align	5
++poly1305_init:
++	cmp	$inp,xzr
++	stp	xzr,xzr,[$ctx]		// zero hash value
++	stp	xzr,xzr,[$ctx,#16]	// [along with is_base2_26]
++
++	csel	x0,xzr,x0,eq
++	b.eq	.Lno_key
++
++#ifndef	__KERNEL__
++	adrp	x17,OPENSSL_armcap_P
++	ldr	w17,[x17,#:lo12:OPENSSL_armcap_P]
++#endif
++
++	ldp	$r0,$r1,[$inp]		// load key
++	mov	$s1,#0xfffffffc0fffffff
++	movk	$s1,#0x0fff,lsl#48
++#ifdef	__AARCH64EB__
++	rev	$r0,$r0			// flip bytes
++	rev	$r1,$r1
++#endif
++	and	$r0,$r0,$s1		// &=0ffffffc0fffffff
++	and	$s1,$s1,#-4
++	and	$r1,$r1,$s1		// &=0ffffffc0ffffffc
++	mov	w#$s1,#-1
++	stp	$r0,$r1,[$ctx,#32]	// save key value
++	str	w#$s1,[$ctx,#48]	// impossible key power value
++
++#ifndef	__KERNEL__
++	tst	w17,#ARMV7_NEON
++
++	adr	$d0,.Lpoly1305_blocks
++	adr	$r0,.Lpoly1305_blocks_neon
++	adr	$d1,.Lpoly1305_emit
++
++	csel	$d0,$d0,$r0,eq
++
++# ifdef	__ILP32__
++	stp	w#$d0,w#$d1,[$len]
++# else
++	stp	$d0,$d1,[$len]
++# endif
++#endif
++	mov	x0,#1
++.Lno_key:
++	ret
++.size	poly1305_init,.-poly1305_init
++
++.type	poly1305_blocks,%function
++.align	5
++poly1305_blocks:
++.Lpoly1305_blocks:
++	ands	$len,$len,#-16
++	b.eq	.Lno_data
++
++	ldp	$h0,$h1,[$ctx]		// load hash value
++	ldp	$h2,x17,[$ctx,#16]	// [along with is_base2_26]
++	ldp	$r0,$r1,[$ctx,#32]	// load key value
++
++#ifdef	__AARCH64EB__
++	lsr	$d0,$h0,#32
++	mov	w#$d1,w#$h0
++	lsr	$d2,$h1,#32
++	mov	w15,w#$h1
++	lsr	x16,$h2,#32
++#else
++	mov	w#$d0,w#$h0
++	lsr	$d1,$h0,#32
++	mov	w#$d2,w#$h1
++	lsr	x15,$h1,#32
++	mov	w16,w#$h2
++#endif
++
++	add	$d0,$d0,$d1,lsl#26	// base 2^26 -> base 2^64
++	lsr	$d1,$d2,#12
++	adds	$d0,$d0,$d2,lsl#52
++	add	$d1,$d1,x15,lsl#14
++	adc	$d1,$d1,xzr
++	lsr	$d2,x16,#24
++	adds	$d1,$d1,x16,lsl#40
++	adc	$d2,$d2,xzr
++
++	cmp	x17,#0			// is_base2_26?
++	add	$s1,$r1,$r1,lsr#2	// s1 = r1 + (r1 >> 2)
++	csel	$h0,$h0,$d0,eq		// choose between radixes
++	csel	$h1,$h1,$d1,eq
++	csel	$h2,$h2,$d2,eq
++
++.Loop:
++	ldp	$t0,$t1,[$inp],#16	// load input
++	sub	$len,$len,#16
++#ifdef	__AARCH64EB__
++	rev	$t0,$t0
++	rev	$t1,$t1
++#endif
++	adds	$h0,$h0,$t0		// accumulate input
++	adcs	$h1,$h1,$t1
++
++	mul	$d0,$h0,$r0		// h0*r0
++	adc	$h2,$h2,$padbit
++	umulh	$d1,$h0,$r0
++
++	mul	$t0,$h1,$s1		// h1*5*r1
++	umulh	$t1,$h1,$s1
++
++	adds	$d0,$d0,$t0
++	mul	$t0,$h0,$r1		// h0*r1
++	adc	$d1,$d1,$t1
++	umulh	$d2,$h0,$r1
++
++	adds	$d1,$d1,$t0
++	mul	$t0,$h1,$r0		// h1*r0
++	adc	$d2,$d2,xzr
++	umulh	$t1,$h1,$r0
++
++	adds	$d1,$d1,$t0
++	mul	$t0,$h2,$s1		// h2*5*r1
++	adc	$d2,$d2,$t1
++	mul	$t1,$h2,$r0		// h2*r0
++
++	adds	$d1,$d1,$t0
++	adc	$d2,$d2,$t1
++
++	and	$t0,$d2,#-4		// final reduction
++	and	$h2,$d2,#3
++	add	$t0,$t0,$d2,lsr#2
++	adds	$h0,$d0,$t0
++	adcs	$h1,$d1,xzr
++	adc	$h2,$h2,xzr
++
++	cbnz	$len,.Loop
++
++	stp	$h0,$h1,[$ctx]		// store hash value
++	stp	$h2,xzr,[$ctx,#16]	// [and clear is_base2_26]
++
++.Lno_data:
++	ret
++.size	poly1305_blocks,.-poly1305_blocks
++
++.type	poly1305_emit,%function
++.align	5
++poly1305_emit:
++.Lpoly1305_emit:
++	ldp	$h0,$h1,[$ctx]		// load hash base 2^64
++	ldp	$h2,$r0,[$ctx,#16]	// [along with is_base2_26]
++	ldp	$t0,$t1,[$nonce]	// load nonce
++
++#ifdef	__AARCH64EB__
++	lsr	$d0,$h0,#32
++	mov	w#$d1,w#$h0
++	lsr	$d2,$h1,#32
++	mov	w15,w#$h1
++	lsr	x16,$h2,#32
++#else
++	mov	w#$d0,w#$h0
++	lsr	$d1,$h0,#32
++	mov	w#$d2,w#$h1
++	lsr	x15,$h1,#32
++	mov	w16,w#$h2
++#endif
++
++	add	$d0,$d0,$d1,lsl#26	// base 2^26 -> base 2^64
++	lsr	$d1,$d2,#12
++	adds	$d0,$d0,$d2,lsl#52
++	add	$d1,$d1,x15,lsl#14
++	adc	$d1,$d1,xzr
++	lsr	$d2,x16,#24
++	adds	$d1,$d1,x16,lsl#40
++	adc	$d2,$d2,xzr
++
++	cmp	$r0,#0			// is_base2_26?
++	csel	$h0,$h0,$d0,eq		// choose between radixes
++	csel	$h1,$h1,$d1,eq
++	csel	$h2,$h2,$d2,eq
++
++	adds	$d0,$h0,#5		// compare to modulus
++	adcs	$d1,$h1,xzr
++	adc	$d2,$h2,xzr
++
++	tst	$d2,#-4			// see if it's carried/borrowed
++
++	csel	$h0,$h0,$d0,eq
++	csel	$h1,$h1,$d1,eq
++
++#ifdef	__AARCH64EB__
++	ror	$t0,$t0,#32		// flip nonce words
++	ror	$t1,$t1,#32
++#endif
++	adds	$h0,$h0,$t0		// accumulate nonce
++	adc	$h1,$h1,$t1
++#ifdef	__AARCH64EB__
++	rev	$h0,$h0			// flip output bytes
++	rev	$h1,$h1
++#endif
++	stp	$h0,$h1,[$mac]		// write result
++
++	ret
++.size	poly1305_emit,.-poly1305_emit
++___
++my ($R0,$R1,$S1,$R2,$S2,$R3,$S3,$R4,$S4) = map("v$_.4s",(0..8));
++my ($IN01_0,$IN01_1,$IN01_2,$IN01_3,$IN01_4) = map("v$_.2s",(9..13));
++my ($IN23_0,$IN23_1,$IN23_2,$IN23_3,$IN23_4) = map("v$_.2s",(14..18));
++my ($ACC0,$ACC1,$ACC2,$ACC3,$ACC4) = map("v$_.2d",(19..23));
++my ($H0,$H1,$H2,$H3,$H4) = map("v$_.2s",(24..28));
++my ($T0,$T1,$MASK) = map("v$_",(29..31));
++
++my ($in2,$zeros)=("x16","x17");
++my $is_base2_26 = $zeros;		# borrow
++
++$code.=<<___;
++.type	poly1305_mult,%function
++.align	5
++poly1305_mult:
++	mul	$d0,$h0,$r0		// h0*r0
++	umulh	$d1,$h0,$r0
++
++	mul	$t0,$h1,$s1		// h1*5*r1
++	umulh	$t1,$h1,$s1
++
++	adds	$d0,$d0,$t0
++	mul	$t0,$h0,$r1		// h0*r1
++	adc	$d1,$d1,$t1
++	umulh	$d2,$h0,$r1
++
++	adds	$d1,$d1,$t0
++	mul	$t0,$h1,$r0		// h1*r0
++	adc	$d2,$d2,xzr
++	umulh	$t1,$h1,$r0
++
++	adds	$d1,$d1,$t0
++	mul	$t0,$h2,$s1		// h2*5*r1
++	adc	$d2,$d2,$t1
++	mul	$t1,$h2,$r0		// h2*r0
++
++	adds	$d1,$d1,$t0
++	adc	$d2,$d2,$t1
++
++	and	$t0,$d2,#-4		// final reduction
++	and	$h2,$d2,#3
++	add	$t0,$t0,$d2,lsr#2
++	adds	$h0,$d0,$t0
++	adcs	$h1,$d1,xzr
++	adc	$h2,$h2,xzr
++
++	ret
++.size	poly1305_mult,.-poly1305_mult
++
++.type	poly1305_splat,%function
++.align	4
++poly1305_splat:
++	and	x12,$h0,#0x03ffffff	// base 2^64 -> base 2^26
++	ubfx	x13,$h0,#26,#26
++	extr	x14,$h1,$h0,#52
++	and	x14,x14,#0x03ffffff
++	ubfx	x15,$h1,#14,#26
++	extr	x16,$h2,$h1,#40
++
++	str	w12,[$ctx,#16*0]	// r0
++	add	w12,w13,w13,lsl#2	// r1*5
++	str	w13,[$ctx,#16*1]	// r1
++	add	w13,w14,w14,lsl#2	// r2*5
++	str	w12,[$ctx,#16*2]	// s1
++	str	w14,[$ctx,#16*3]	// r2
++	add	w14,w15,w15,lsl#2	// r3*5
++	str	w13,[$ctx,#16*4]	// s2
++	str	w15,[$ctx,#16*5]	// r3
++	add	w15,w16,w16,lsl#2	// r4*5
++	str	w14,[$ctx,#16*6]	// s3
++	str	w16,[$ctx,#16*7]	// r4
++	str	w15,[$ctx,#16*8]	// s4
++
++	ret
++.size	poly1305_splat,.-poly1305_splat
++
++#ifdef	__KERNEL__
++.globl	poly1305_blocks_neon
++#endif
++.type	poly1305_blocks_neon,%function
++.align	5
++poly1305_blocks_neon:
++.Lpoly1305_blocks_neon:
++	ldr	$is_base2_26,[$ctx,#24]
++	cmp	$len,#128
++	b.lo	.Lpoly1305_blocks
++
++	.inst	0xd503233f		// paciasp
++	stp	x29,x30,[sp,#-80]!
++	add	x29,sp,#0
++
++	stp	d8,d9,[sp,#16]		// meet ABI requirements
++	stp	d10,d11,[sp,#32]
++	stp	d12,d13,[sp,#48]
++	stp	d14,d15,[sp,#64]
++
++	cbz	$is_base2_26,.Lbase2_64_neon
++
++	ldp	w10,w11,[$ctx]		// load hash value base 2^26
++	ldp	w12,w13,[$ctx,#8]
++	ldr	w14,[$ctx,#16]
++
++	tst	$len,#31
++	b.eq	.Leven_neon
++
++	ldp	$r0,$r1,[$ctx,#32]	// load key value
++
++	add	$h0,x10,x11,lsl#26	// base 2^26 -> base 2^64
++	lsr	$h1,x12,#12
++	adds	$h0,$h0,x12,lsl#52
++	add	$h1,$h1,x13,lsl#14
++	adc	$h1,$h1,xzr
++	lsr	$h2,x14,#24
++	adds	$h1,$h1,x14,lsl#40
++	adc	$d2,$h2,xzr		// can be partially reduced...
++
++	ldp	$d0,$d1,[$inp],#16	// load input
++	sub	$len,$len,#16
++	add	$s1,$r1,$r1,lsr#2	// s1 = r1 + (r1 >> 2)
++
++#ifdef	__AARCH64EB__
++	rev	$d0,$d0
++	rev	$d1,$d1
++#endif
++	adds	$h0,$h0,$d0		// accumulate input
++	adcs	$h1,$h1,$d1
++	adc	$h2,$h2,$padbit
++
++	bl	poly1305_mult
++
++	and	x10,$h0,#0x03ffffff	// base 2^64 -> base 2^26
++	ubfx	x11,$h0,#26,#26
++	extr	x12,$h1,$h0,#52
++	and	x12,x12,#0x03ffffff
++	ubfx	x13,$h1,#14,#26
++	extr	x14,$h2,$h1,#40
++
++	b	.Leven_neon
++
++.align	4
++.Lbase2_64_neon:
++	ldp	$r0,$r1,[$ctx,#32]	// load key value
++
++	ldp	$h0,$h1,[$ctx]		// load hash value base 2^64
++	ldr	$h2,[$ctx,#16]
++
++	tst	$len,#31
++	b.eq	.Linit_neon
++
++	ldp	$d0,$d1,[$inp],#16	// load input
++	sub	$len,$len,#16
++	add	$s1,$r1,$r1,lsr#2	// s1 = r1 + (r1 >> 2)
++#ifdef	__AARCH64EB__
++	rev	$d0,$d0
++	rev	$d1,$d1
++#endif
++	adds	$h0,$h0,$d0		// accumulate input
++	adcs	$h1,$h1,$d1
++	adc	$h2,$h2,$padbit
++
++	bl	poly1305_mult
++
++.Linit_neon:
++	ldr	w17,[$ctx,#48]		// first table element
++	and	x10,$h0,#0x03ffffff	// base 2^64 -> base 2^26
++	ubfx	x11,$h0,#26,#26
++	extr	x12,$h1,$h0,#52
++	and	x12,x12,#0x03ffffff
++	ubfx	x13,$h1,#14,#26
++	extr	x14,$h2,$h1,#40
++
++	cmp	w17,#-1			// is value impossible?
++	b.ne	.Leven_neon
++
++	fmov	${H0},x10
++	fmov	${H1},x11
++	fmov	${H2},x12
++	fmov	${H3},x13
++	fmov	${H4},x14
++
++	////////////////////////////////// initialize r^n table
++	mov	$h0,$r0			// r^1
++	add	$s1,$r1,$r1,lsr#2	// s1 = r1 + (r1 >> 2)
++	mov	$h1,$r1
++	mov	$h2,xzr
++	add	$ctx,$ctx,#48+12
++	bl	poly1305_splat
++
++	bl	poly1305_mult		// r^2
++	sub	$ctx,$ctx,#4
++	bl	poly1305_splat
++
++	bl	poly1305_mult		// r^3
++	sub	$ctx,$ctx,#4
++	bl	poly1305_splat
++
++	bl	poly1305_mult		// r^4
++	sub	$ctx,$ctx,#4
++	bl	poly1305_splat
++	sub	$ctx,$ctx,#48		// restore original $ctx
++	b	.Ldo_neon
++
++.align	4
++.Leven_neon:
++	fmov	${H0},x10
++	fmov	${H1},x11
++	fmov	${H2},x12
++	fmov	${H3},x13
++	fmov	${H4},x14
++
++.Ldo_neon:
++	ldp	x8,x12,[$inp,#32]	// inp[2:3]
++	subs	$len,$len,#64
++	ldp	x9,x13,[$inp,#48]
++	add	$in2,$inp,#96
++	adr	$zeros,.Lzeros
++
++	lsl	$padbit,$padbit,#24
++	add	x15,$ctx,#48
++
++#ifdef	__AARCH64EB__
++	rev	x8,x8
++	rev	x12,x12
++	rev	x9,x9
++	rev	x13,x13
++#endif
++	and	x4,x8,#0x03ffffff	// base 2^64 -> base 2^26
++	and	x5,x9,#0x03ffffff
++	ubfx	x6,x8,#26,#26
++	ubfx	x7,x9,#26,#26
++	add	x4,x4,x5,lsl#32		// bfi	x4,x5,#32,#32
++	extr	x8,x12,x8,#52
++	extr	x9,x13,x9,#52
++	add	x6,x6,x7,lsl#32		// bfi	x6,x7,#32,#32
++	fmov	$IN23_0,x4
++	and	x8,x8,#0x03ffffff
++	and	x9,x9,#0x03ffffff
++	ubfx	x10,x12,#14,#26
++	ubfx	x11,x13,#14,#26
++	add	x12,$padbit,x12,lsr#40
++	add	x13,$padbit,x13,lsr#40
++	add	x8,x8,x9,lsl#32		// bfi	x8,x9,#32,#32
++	fmov	$IN23_1,x6
++	add	x10,x10,x11,lsl#32	// bfi	x10,x11,#32,#32
++	add	x12,x12,x13,lsl#32	// bfi	x12,x13,#32,#32
++	fmov	$IN23_2,x8
++	fmov	$IN23_3,x10
++	fmov	$IN23_4,x12
++
++	ldp	x8,x12,[$inp],#16	// inp[0:1]
++	ldp	x9,x13,[$inp],#48
++
++	ld1	{$R0,$R1,$S1,$R2},[x15],#64
++	ld1	{$S2,$R3,$S3,$R4},[x15],#64
++	ld1	{$S4},[x15]
++
++#ifdef	__AARCH64EB__
++	rev	x8,x8
++	rev	x12,x12
++	rev	x9,x9
++	rev	x13,x13
++#endif
++	and	x4,x8,#0x03ffffff	// base 2^64 -> base 2^26
++	and	x5,x9,#0x03ffffff
++	ubfx	x6,x8,#26,#26
++	ubfx	x7,x9,#26,#26
++	add	x4,x4,x5,lsl#32		// bfi	x4,x5,#32,#32
++	extr	x8,x12,x8,#52
++	extr	x9,x13,x9,#52
++	add	x6,x6,x7,lsl#32		// bfi	x6,x7,#32,#32
++	fmov	$IN01_0,x4
++	and	x8,x8,#0x03ffffff
++	and	x9,x9,#0x03ffffff
++	ubfx	x10,x12,#14,#26
++	ubfx	x11,x13,#14,#26
++	add	x12,$padbit,x12,lsr#40
++	add	x13,$padbit,x13,lsr#40
++	add	x8,x8,x9,lsl#32		// bfi	x8,x9,#32,#32
++	fmov	$IN01_1,x6
++	add	x10,x10,x11,lsl#32	// bfi	x10,x11,#32,#32
++	add	x12,x12,x13,lsl#32	// bfi	x12,x13,#32,#32
++	movi	$MASK.2d,#-1
++	fmov	$IN01_2,x8
++	fmov	$IN01_3,x10
++	fmov	$IN01_4,x12
++	ushr	$MASK.2d,$MASK.2d,#38
++
++	b.ls	.Lskip_loop
++
++.align	4
++.Loop_neon:
++	////////////////////////////////////////////////////////////////
++	// ((inp[0]*r^4+inp[2]*r^2+inp[4])*r^4+inp[6]*r^2
++	// ((inp[1]*r^4+inp[3]*r^2+inp[5])*r^3+inp[7]*r
++	//   \___________________/
++	// ((inp[0]*r^4+inp[2]*r^2+inp[4])*r^4+inp[6]*r^2+inp[8])*r^2
++	// ((inp[1]*r^4+inp[3]*r^2+inp[5])*r^4+inp[7]*r^2+inp[9])*r
++	//   \___________________/ \____________________/
++	//
++	// Note that we start with inp[2:3]*r^2. This is because it
++	// doesn't depend on reduction in previous iteration.
++	////////////////////////////////////////////////////////////////
++	// d4 = h0*r4 + h1*r3   + h2*r2   + h3*r1   + h4*r0
++	// d3 = h0*r3 + h1*r2   + h2*r1   + h3*r0   + h4*5*r4
++	// d2 = h0*r2 + h1*r1   + h2*r0   + h3*5*r4 + h4*5*r3
++	// d1 = h0*r1 + h1*r0   + h2*5*r4 + h3*5*r3 + h4*5*r2
++	// d0 = h0*r0 + h1*5*r4 + h2*5*r3 + h3*5*r2 + h4*5*r1
++
++	subs	$len,$len,#64
++	umull	$ACC4,$IN23_0,${R4}[2]
++	csel	$in2,$zeros,$in2,lo
++	umull	$ACC3,$IN23_0,${R3}[2]
++	umull	$ACC2,$IN23_0,${R2}[2]
++	 ldp	x8,x12,[$in2],#16	// inp[2:3] (or zero)
++	umull	$ACC1,$IN23_0,${R1}[2]
++	 ldp	x9,x13,[$in2],#48
++	umull	$ACC0,$IN23_0,${R0}[2]
++#ifdef	__AARCH64EB__
++	 rev	x8,x8
++	 rev	x12,x12
++	 rev	x9,x9
++	 rev	x13,x13
++#endif
++
++	umlal	$ACC4,$IN23_1,${R3}[2]
++	 and	x4,x8,#0x03ffffff	// base 2^64 -> base 2^26
++	umlal	$ACC3,$IN23_1,${R2}[2]
++	 and	x5,x9,#0x03ffffff
++	umlal	$ACC2,$IN23_1,${R1}[2]
++	 ubfx	x6,x8,#26,#26
++	umlal	$ACC1,$IN23_1,${R0}[2]
++	 ubfx	x7,x9,#26,#26
++	umlal	$ACC0,$IN23_1,${S4}[2]
++	 add	x4,x4,x5,lsl#32		// bfi	x4,x5,#32,#32
++
++	umlal	$ACC4,$IN23_2,${R2}[2]
++	 extr	x8,x12,x8,#52
++	umlal	$ACC3,$IN23_2,${R1}[2]
++	 extr	x9,x13,x9,#52
++	umlal	$ACC2,$IN23_2,${R0}[2]
++	 add	x6,x6,x7,lsl#32		// bfi	x6,x7,#32,#32
++	umlal	$ACC1,$IN23_2,${S4}[2]
++	 fmov	$IN23_0,x4
++	umlal	$ACC0,$IN23_2,${S3}[2]
++	 and	x8,x8,#0x03ffffff
++
++	umlal	$ACC4,$IN23_3,${R1}[2]
++	 and	x9,x9,#0x03ffffff
++	umlal	$ACC3,$IN23_3,${R0}[2]
++	 ubfx	x10,x12,#14,#26
++	umlal	$ACC2,$IN23_3,${S4}[2]
++	 ubfx	x11,x13,#14,#26
++	umlal	$ACC1,$IN23_3,${S3}[2]
++	 add	x8,x8,x9,lsl#32		// bfi	x8,x9,#32,#32
++	umlal	$ACC0,$IN23_3,${S2}[2]
++	 fmov	$IN23_1,x6
++
++	add	$IN01_2,$IN01_2,$H2
++	 add	x12,$padbit,x12,lsr#40
++	umlal	$ACC4,$IN23_4,${R0}[2]
++	 add	x13,$padbit,x13,lsr#40
++	umlal	$ACC3,$IN23_4,${S4}[2]
++	 add	x10,x10,x11,lsl#32	// bfi	x10,x11,#32,#32
++	umlal	$ACC2,$IN23_4,${S3}[2]
++	 add	x12,x12,x13,lsl#32	// bfi	x12,x13,#32,#32
++	umlal	$ACC1,$IN23_4,${S2}[2]
++	 fmov	$IN23_2,x8
++	umlal	$ACC0,$IN23_4,${S1}[2]
++	 fmov	$IN23_3,x10
++
++	////////////////////////////////////////////////////////////////
++	// (hash+inp[0:1])*r^4 and accumulate
++
++	add	$IN01_0,$IN01_0,$H0
++	 fmov	$IN23_4,x12
++	umlal	$ACC3,$IN01_2,${R1}[0]
++	 ldp	x8,x12,[$inp],#16	// inp[0:1]
++	umlal	$ACC0,$IN01_2,${S3}[0]
++	 ldp	x9,x13,[$inp],#48
++	umlal	$ACC4,$IN01_2,${R2}[0]
++	umlal	$ACC1,$IN01_2,${S4}[0]
++	umlal	$ACC2,$IN01_2,${R0}[0]
++#ifdef	__AARCH64EB__
++	 rev	x8,x8
++	 rev	x12,x12
++	 rev	x9,x9
++	 rev	x13,x13
++#endif
++
++	add	$IN01_1,$IN01_1,$H1
++	umlal	$ACC3,$IN01_0,${R3}[0]
++	umlal	$ACC4,$IN01_0,${R4}[0]
++	 and	x4,x8,#0x03ffffff	// base 2^64 -> base 2^26
++	umlal	$ACC2,$IN01_0,${R2}[0]
++	 and	x5,x9,#0x03ffffff
++	umlal	$ACC0,$IN01_0,${R0}[0]
++	 ubfx	x6,x8,#26,#26
++	umlal	$ACC1,$IN01_0,${R1}[0]
++	 ubfx	x7,x9,#26,#26
++
++	add	$IN01_3,$IN01_3,$H3
++	 add	x4,x4,x5,lsl#32		// bfi	x4,x5,#32,#32
++	umlal	$ACC3,$IN01_1,${R2}[0]
++	 extr	x8,x12,x8,#52
++	umlal	$ACC4,$IN01_1,${R3}[0]
++	 extr	x9,x13,x9,#52
++	umlal	$ACC0,$IN01_1,${S4}[0]
++	 add	x6,x6,x7,lsl#32		// bfi	x6,x7,#32,#32
++	umlal	$ACC2,$IN01_1,${R1}[0]
++	 fmov	$IN01_0,x4
++	umlal	$ACC1,$IN01_1,${R0}[0]
++	 and	x8,x8,#0x03ffffff
++
++	add	$IN01_4,$IN01_4,$H4
++	 and	x9,x9,#0x03ffffff
++	umlal	$ACC3,$IN01_3,${R0}[0]
++	 ubfx	x10,x12,#14,#26
++	umlal	$ACC0,$IN01_3,${S2}[0]
++	 ubfx	x11,x13,#14,#26
++	umlal	$ACC4,$IN01_3,${R1}[0]
++	 add	x8,x8,x9,lsl#32		// bfi	x8,x9,#32,#32
++	umlal	$ACC1,$IN01_3,${S3}[0]
++	 fmov	$IN01_1,x6
++	umlal	$ACC2,$IN01_3,${S4}[0]
++	 add	x12,$padbit,x12,lsr#40
++
++	umlal	$ACC3,$IN01_4,${S4}[0]
++	 add	x13,$padbit,x13,lsr#40
++	umlal	$ACC0,$IN01_4,${S1}[0]
++	 add	x10,x10,x11,lsl#32	// bfi	x10,x11,#32,#32
++	umlal	$ACC4,$IN01_4,${R0}[0]
++	 add	x12,x12,x13,lsl#32	// bfi	x12,x13,#32,#32
++	umlal	$ACC1,$IN01_4,${S2}[0]
++	 fmov	$IN01_2,x8
++	umlal	$ACC2,$IN01_4,${S3}[0]
++	 fmov	$IN01_3,x10
++	 fmov	$IN01_4,x12
++
++	/////////////////////////////////////////////////////////////////
++	// lazy reduction as discussed in "NEON crypto" by D.J. Bernstein
++	// and P. Schwabe
++	//
++	// [see discussion in poly1305-armv4 module]
++
++	ushr	$T0.2d,$ACC3,#26
++	xtn	$H3,$ACC3
++	 ushr	$T1.2d,$ACC0,#26
++	 and	$ACC0,$ACC0,$MASK.2d
++	add	$ACC4,$ACC4,$T0.2d	// h3 -> h4
++	bic	$H3,#0xfc,lsl#24	// &=0x03ffffff
++	 add	$ACC1,$ACC1,$T1.2d	// h0 -> h1
++
++	ushr	$T0.2d,$ACC4,#26
++	xtn	$H4,$ACC4
++	 ushr	$T1.2d,$ACC1,#26
++	 xtn	$H1,$ACC1
++	bic	$H4,#0xfc,lsl#24
++	 add	$ACC2,$ACC2,$T1.2d	// h1 -> h2
++
++	add	$ACC0,$ACC0,$T0.2d
++	shl	$T0.2d,$T0.2d,#2
++	 shrn	$T1.2s,$ACC2,#26
++	 xtn	$H2,$ACC2
++	add	$ACC0,$ACC0,$T0.2d	// h4 -> h0
++	 bic	$H1,#0xfc,lsl#24
++	 add	$H3,$H3,$T1.2s		// h2 -> h3
++	 bic	$H2,#0xfc,lsl#24
++
++	shrn	$T0.2s,$ACC0,#26
++	xtn	$H0,$ACC0
++	 ushr	$T1.2s,$H3,#26
++	 bic	$H3,#0xfc,lsl#24
++	 bic	$H0,#0xfc,lsl#24
++	add	$H1,$H1,$T0.2s		// h0 -> h1
++	 add	$H4,$H4,$T1.2s		// h3 -> h4
++
++	b.hi	.Loop_neon
++
++.Lskip_loop:
++	dup	$IN23_2,${IN23_2}[0]
++	add	$IN01_2,$IN01_2,$H2
++
++	////////////////////////////////////////////////////////////////
++	// multiply (inp[0:1]+hash) or inp[2:3] by r^2:r^1
++
++	adds	$len,$len,#32
++	b.ne	.Long_tail
++
++	dup	$IN23_2,${IN01_2}[0]
++	add	$IN23_0,$IN01_0,$H0
++	add	$IN23_3,$IN01_3,$H3
++	add	$IN23_1,$IN01_1,$H1
++	add	$IN23_4,$IN01_4,$H4
++
++.Long_tail:
++	dup	$IN23_0,${IN23_0}[0]
++	umull2	$ACC0,$IN23_2,${S3}
++	umull2	$ACC3,$IN23_2,${R1}
++	umull2	$ACC4,$IN23_2,${R2}
++	umull2	$ACC2,$IN23_2,${R0}
++	umull2	$ACC1,$IN23_2,${S4}
++
++	dup	$IN23_1,${IN23_1}[0]
++	umlal2	$ACC0,$IN23_0,${R0}
++	umlal2	$ACC2,$IN23_0,${R2}
++	umlal2	$ACC3,$IN23_0,${R3}
++	umlal2	$ACC4,$IN23_0,${R4}
++	umlal2	$ACC1,$IN23_0,${R1}
++
++	dup	$IN23_3,${IN23_3}[0]
++	umlal2	$ACC0,$IN23_1,${S4}
++	umlal2	$ACC3,$IN23_1,${R2}
++	umlal2	$ACC2,$IN23_1,${R1}
++	umlal2	$ACC4,$IN23_1,${R3}
++	umlal2	$ACC1,$IN23_1,${R0}
++
++	dup	$IN23_4,${IN23_4}[0]
++	umlal2	$ACC3,$IN23_3,${R0}
++	umlal2	$ACC4,$IN23_3,${R1}
++	umlal2	$ACC0,$IN23_3,${S2}
++	umlal2	$ACC1,$IN23_3,${S3}
++	umlal2	$ACC2,$IN23_3,${S4}
++
++	umlal2	$ACC3,$IN23_4,${S4}
++	umlal2	$ACC0,$IN23_4,${S1}
++	umlal2	$ACC4,$IN23_4,${R0}
++	umlal2	$ACC1,$IN23_4,${S2}
++	umlal2	$ACC2,$IN23_4,${S3}
++
++	b.eq	.Lshort_tail
++
++	////////////////////////////////////////////////////////////////
++	// (hash+inp[0:1])*r^4:r^3 and accumulate
++
++	add	$IN01_0,$IN01_0,$H0
++	umlal	$ACC3,$IN01_2,${R1}
++	umlal	$ACC0,$IN01_2,${S3}
++	umlal	$ACC4,$IN01_2,${R2}
++	umlal	$ACC1,$IN01_2,${S4}
++	umlal	$ACC2,$IN01_2,${R0}
++
++	add	$IN01_1,$IN01_1,$H1
++	umlal	$ACC3,$IN01_0,${R3}
++	umlal	$ACC0,$IN01_0,${R0}
++	umlal	$ACC4,$IN01_0,${R4}
++	umlal	$ACC1,$IN01_0,${R1}
++	umlal	$ACC2,$IN01_0,${R2}
++
++	add	$IN01_3,$IN01_3,$H3
++	umlal	$ACC3,$IN01_1,${R2}
++	umlal	$ACC0,$IN01_1,${S4}
++	umlal	$ACC4,$IN01_1,${R3}
++	umlal	$ACC1,$IN01_1,${R0}
++	umlal	$ACC2,$IN01_1,${R1}
++
++	add	$IN01_4,$IN01_4,$H4
++	umlal	$ACC3,$IN01_3,${R0}
++	umlal	$ACC0,$IN01_3,${S2}
++	umlal	$ACC4,$IN01_3,${R1}
++	umlal	$ACC1,$IN01_3,${S3}
++	umlal	$ACC2,$IN01_3,${S4}
++
++	umlal	$ACC3,$IN01_4,${S4}
++	umlal	$ACC0,$IN01_4,${S1}
++	umlal	$ACC4,$IN01_4,${R0}
++	umlal	$ACC1,$IN01_4,${S2}
++	umlal	$ACC2,$IN01_4,${S3}
++
++.Lshort_tail:
++	////////////////////////////////////////////////////////////////
++	// horizontal add
++
++	addp	$ACC3,$ACC3,$ACC3
++	 ldp	d8,d9,[sp,#16]		// meet ABI requirements
++	addp	$ACC0,$ACC0,$ACC0
++	 ldp	d10,d11,[sp,#32]
++	addp	$ACC4,$ACC4,$ACC4
++	 ldp	d12,d13,[sp,#48]
++	addp	$ACC1,$ACC1,$ACC1
++	 ldp	d14,d15,[sp,#64]
++	addp	$ACC2,$ACC2,$ACC2
++	 ldr	x30,[sp,#8]
++	 .inst	0xd50323bf		// autiasp
++
++	////////////////////////////////////////////////////////////////
++	// lazy reduction, but without narrowing
++
++	ushr	$T0.2d,$ACC3,#26
++	and	$ACC3,$ACC3,$MASK.2d
++	 ushr	$T1.2d,$ACC0,#26
++	 and	$ACC0,$ACC0,$MASK.2d
++
++	add	$ACC4,$ACC4,$T0.2d	// h3 -> h4
++	 add	$ACC1,$ACC1,$T1.2d	// h0 -> h1
++
++	ushr	$T0.2d,$ACC4,#26
++	and	$ACC4,$ACC4,$MASK.2d
++	 ushr	$T1.2d,$ACC1,#26
++	 and	$ACC1,$ACC1,$MASK.2d
++	 add	$ACC2,$ACC2,$T1.2d	// h1 -> h2
++
++	add	$ACC0,$ACC0,$T0.2d
++	shl	$T0.2d,$T0.2d,#2
++	 ushr	$T1.2d,$ACC2,#26
++	 and	$ACC2,$ACC2,$MASK.2d
++	add	$ACC0,$ACC0,$T0.2d	// h4 -> h0
++	 add	$ACC3,$ACC3,$T1.2d	// h2 -> h3
++
++	ushr	$T0.2d,$ACC0,#26
++	and	$ACC0,$ACC0,$MASK.2d
++	 ushr	$T1.2d,$ACC3,#26
++	 and	$ACC3,$ACC3,$MASK.2d
++	add	$ACC1,$ACC1,$T0.2d	// h0 -> h1
++	 add	$ACC4,$ACC4,$T1.2d	// h3 -> h4
++
++	////////////////////////////////////////////////////////////////
++	// write the result, can be partially reduced
++
++	st4	{$ACC0,$ACC1,$ACC2,$ACC3}[0],[$ctx],#16
++	mov	x4,#1
++	st1	{$ACC4}[0],[$ctx]
++	str	x4,[$ctx,#8]		// set is_base2_26
++
++	ldr	x29,[sp],#80
++	ret
++.size	poly1305_blocks_neon,.-poly1305_blocks_neon
++
++.align	5
++.Lzeros:
++.long	0,0,0,0,0,0,0,0
++.asciz	"Poly1305 for ARMv8, CRYPTOGAMS by \@dot-asm"
++.align	2
++#if !defined(__KERNEL__) && !defined(_WIN64)
++.comm	OPENSSL_armcap_P,4,4
++.hidden	OPENSSL_armcap_P
++#endif
++___
++
++foreach (split("\n",$code)) {
++	s/\b(shrn\s+v[0-9]+)\.[24]d/$1.2s/			or
++	s/\b(fmov\s+)v([0-9]+)[^,]*,\s*x([0-9]+)/$1d$2,x$3/	or
++	(m/\bdup\b/ and (s/\.[24]s/.2d/g or 1))			or
++	(m/\b(eor|and)/ and (s/\.[248][sdh]/.16b/g or 1))	or
++	(m/\bum(ul|la)l\b/ and (s/\.4s/.2s/g or 1))		or
++	(m/\bum(ul|la)l2\b/ and (s/\.2s/.4s/g or 1))		or
++	(m/\bst[1-4]\s+{[^}]+}\[/ and (s/\.[24]d/.s/g or 1));
++
++	s/\.[124]([sd])\[/.$1\[/;
++	s/w#x([0-9]+)/w$1/g;
++
++	print $_,"\n";
++}
++close STDOUT;
+diff --git a/arch/arm64/crypto/poly1305-core.S_shipped b/arch/arm64/crypto/poly1305-core.S_shipped
+new file mode 100644
+index 000000000000..8d1c4e420ccd
+--- /dev/null
++++ b/arch/arm64/crypto/poly1305-core.S_shipped
+@@ -0,0 +1,835 @@
++#ifndef __KERNEL__
++# include "arm_arch.h"
++.extern	OPENSSL_armcap_P
++#endif
++
++.text
++
++// forward "declarations" are required for Apple
++.globl	poly1305_blocks
++.globl	poly1305_emit
++
++.globl	poly1305_init
++.type	poly1305_init,%function
++.align	5
++poly1305_init:
++	cmp	x1,xzr
++	stp	xzr,xzr,[x0]		// zero hash value
++	stp	xzr,xzr,[x0,#16]	// [along with is_base2_26]
++
++	csel	x0,xzr,x0,eq
++	b.eq	.Lno_key
++
++#ifndef	__KERNEL__
++	adrp	x17,OPENSSL_armcap_P
++	ldr	w17,[x17,#:lo12:OPENSSL_armcap_P]
++#endif
++
++	ldp	x7,x8,[x1]		// load key
++	mov	x9,#0xfffffffc0fffffff
++	movk	x9,#0x0fff,lsl#48
++#ifdef	__AARCH64EB__
++	rev	x7,x7			// flip bytes
++	rev	x8,x8
++#endif
++	and	x7,x7,x9		// &=0ffffffc0fffffff
++	and	x9,x9,#-4
++	and	x8,x8,x9		// &=0ffffffc0ffffffc
++	mov	w9,#-1
++	stp	x7,x8,[x0,#32]	// save key value
++	str	w9,[x0,#48]	// impossible key power value
++
++#ifndef	__KERNEL__
++	tst	w17,#ARMV7_NEON
++
++	adr	x12,.Lpoly1305_blocks
++	adr	x7,.Lpoly1305_blocks_neon
++	adr	x13,.Lpoly1305_emit
++
++	csel	x12,x12,x7,eq
++
++# ifdef	__ILP32__
++	stp	w12,w13,[x2]
++# else
++	stp	x12,x13,[x2]
++# endif
++#endif
++	mov	x0,#1
++.Lno_key:
++	ret
++.size	poly1305_init,.-poly1305_init
++
++.type	poly1305_blocks,%function
++.align	5
++poly1305_blocks:
++.Lpoly1305_blocks:
++	ands	x2,x2,#-16
++	b.eq	.Lno_data
++
++	ldp	x4,x5,[x0]		// load hash value
++	ldp	x6,x17,[x0,#16]	// [along with is_base2_26]
++	ldp	x7,x8,[x0,#32]	// load key value
++
++#ifdef	__AARCH64EB__
++	lsr	x12,x4,#32
++	mov	w13,w4
++	lsr	x14,x5,#32
++	mov	w15,w5
++	lsr	x16,x6,#32
++#else
++	mov	w12,w4
++	lsr	x13,x4,#32
++	mov	w14,w5
++	lsr	x15,x5,#32
++	mov	w16,w6
++#endif
++
++	add	x12,x12,x13,lsl#26	// base 2^26 -> base 2^64
++	lsr	x13,x14,#12
++	adds	x12,x12,x14,lsl#52
++	add	x13,x13,x15,lsl#14
++	adc	x13,x13,xzr
++	lsr	x14,x16,#24
++	adds	x13,x13,x16,lsl#40
++	adc	x14,x14,xzr
++
++	cmp	x17,#0			// is_base2_26?
++	add	x9,x8,x8,lsr#2	// s1 = r1 + (r1 >> 2)
++	csel	x4,x4,x12,eq		// choose between radixes
++	csel	x5,x5,x13,eq
++	csel	x6,x6,x14,eq
++
++.Loop:
++	ldp	x10,x11,[x1],#16	// load input
++	sub	x2,x2,#16
++#ifdef	__AARCH64EB__
++	rev	x10,x10
++	rev	x11,x11
++#endif
++	adds	x4,x4,x10		// accumulate input
++	adcs	x5,x5,x11
++
++	mul	x12,x4,x7		// h0*r0
++	adc	x6,x6,x3
++	umulh	x13,x4,x7
++
++	mul	x10,x5,x9		// h1*5*r1
++	umulh	x11,x5,x9
++
++	adds	x12,x12,x10
++	mul	x10,x4,x8		// h0*r1
++	adc	x13,x13,x11
++	umulh	x14,x4,x8
++
++	adds	x13,x13,x10
++	mul	x10,x5,x7		// h1*r0
++	adc	x14,x14,xzr
++	umulh	x11,x5,x7
++
++	adds	x13,x13,x10
++	mul	x10,x6,x9		// h2*5*r1
++	adc	x14,x14,x11
++	mul	x11,x6,x7		// h2*r0
++
++	adds	x13,x13,x10
++	adc	x14,x14,x11
++
++	and	x10,x14,#-4		// final reduction
++	and	x6,x14,#3
++	add	x10,x10,x14,lsr#2
++	adds	x4,x12,x10
++	adcs	x5,x13,xzr
++	adc	x6,x6,xzr
++
++	cbnz	x2,.Loop
++
++	stp	x4,x5,[x0]		// store hash value
++	stp	x6,xzr,[x0,#16]	// [and clear is_base2_26]
++
++.Lno_data:
++	ret
++.size	poly1305_blocks,.-poly1305_blocks
++
++.type	poly1305_emit,%function
++.align	5
++poly1305_emit:
++.Lpoly1305_emit:
++	ldp	x4,x5,[x0]		// load hash base 2^64
++	ldp	x6,x7,[x0,#16]	// [along with is_base2_26]
++	ldp	x10,x11,[x2]	// load nonce
++
++#ifdef	__AARCH64EB__
++	lsr	x12,x4,#32
++	mov	w13,w4
++	lsr	x14,x5,#32
++	mov	w15,w5
++	lsr	x16,x6,#32
++#else
++	mov	w12,w4
++	lsr	x13,x4,#32
++	mov	w14,w5
++	lsr	x15,x5,#32
++	mov	w16,w6
++#endif
++
++	add	x12,x12,x13,lsl#26	// base 2^26 -> base 2^64
++	lsr	x13,x14,#12
++	adds	x12,x12,x14,lsl#52
++	add	x13,x13,x15,lsl#14
++	adc	x13,x13,xzr
++	lsr	x14,x16,#24
++	adds	x13,x13,x16,lsl#40
++	adc	x14,x14,xzr
++
++	cmp	x7,#0			// is_base2_26?
++	csel	x4,x4,x12,eq		// choose between radixes
++	csel	x5,x5,x13,eq
++	csel	x6,x6,x14,eq
++
++	adds	x12,x4,#5		// compare to modulus
++	adcs	x13,x5,xzr
++	adc	x14,x6,xzr
++
++	tst	x14,#-4			// see if it's carried/borrowed
++
++	csel	x4,x4,x12,eq
++	csel	x5,x5,x13,eq
++
++#ifdef	__AARCH64EB__
++	ror	x10,x10,#32		// flip nonce words
++	ror	x11,x11,#32
++#endif
++	adds	x4,x4,x10		// accumulate nonce
++	adc	x5,x5,x11
++#ifdef	__AARCH64EB__
++	rev	x4,x4			// flip output bytes
++	rev	x5,x5
++#endif
++	stp	x4,x5,[x1]		// write result
++
++	ret
++.size	poly1305_emit,.-poly1305_emit
++.type	poly1305_mult,%function
++.align	5
++poly1305_mult:
++	mul	x12,x4,x7		// h0*r0
++	umulh	x13,x4,x7
++
++	mul	x10,x5,x9		// h1*5*r1
++	umulh	x11,x5,x9
++
++	adds	x12,x12,x10
++	mul	x10,x4,x8		// h0*r1
++	adc	x13,x13,x11
++	umulh	x14,x4,x8
++
++	adds	x13,x13,x10
++	mul	x10,x5,x7		// h1*r0
++	adc	x14,x14,xzr
++	umulh	x11,x5,x7
++
++	adds	x13,x13,x10
++	mul	x10,x6,x9		// h2*5*r1
++	adc	x14,x14,x11
++	mul	x11,x6,x7		// h2*r0
++
++	adds	x13,x13,x10
++	adc	x14,x14,x11
++
++	and	x10,x14,#-4		// final reduction
++	and	x6,x14,#3
++	add	x10,x10,x14,lsr#2
++	adds	x4,x12,x10
++	adcs	x5,x13,xzr
++	adc	x6,x6,xzr
++
++	ret
++.size	poly1305_mult,.-poly1305_mult
++
++.type	poly1305_splat,%function
++.align	4
++poly1305_splat:
++	and	x12,x4,#0x03ffffff	// base 2^64 -> base 2^26
++	ubfx	x13,x4,#26,#26
++	extr	x14,x5,x4,#52
++	and	x14,x14,#0x03ffffff
++	ubfx	x15,x5,#14,#26
++	extr	x16,x6,x5,#40
++
++	str	w12,[x0,#16*0]	// r0
++	add	w12,w13,w13,lsl#2	// r1*5
++	str	w13,[x0,#16*1]	// r1
++	add	w13,w14,w14,lsl#2	// r2*5
++	str	w12,[x0,#16*2]	// s1
++	str	w14,[x0,#16*3]	// r2
++	add	w14,w15,w15,lsl#2	// r3*5
++	str	w13,[x0,#16*4]	// s2
++	str	w15,[x0,#16*5]	// r3
++	add	w15,w16,w16,lsl#2	// r4*5
++	str	w14,[x0,#16*6]	// s3
++	str	w16,[x0,#16*7]	// r4
++	str	w15,[x0,#16*8]	// s4
++
++	ret
++.size	poly1305_splat,.-poly1305_splat
++
++#ifdef	__KERNEL__
++.globl	poly1305_blocks_neon
++#endif
++.type	poly1305_blocks_neon,%function
++.align	5
++poly1305_blocks_neon:
++.Lpoly1305_blocks_neon:
++	ldr	x17,[x0,#24]
++	cmp	x2,#128
++	b.lo	.Lpoly1305_blocks
++
++	.inst	0xd503233f		// paciasp
++	stp	x29,x30,[sp,#-80]!
++	add	x29,sp,#0
++
++	stp	d8,d9,[sp,#16]		// meet ABI requirements
++	stp	d10,d11,[sp,#32]
++	stp	d12,d13,[sp,#48]
++	stp	d14,d15,[sp,#64]
++
++	cbz	x17,.Lbase2_64_neon
++
++	ldp	w10,w11,[x0]		// load hash value base 2^26
++	ldp	w12,w13,[x0,#8]
++	ldr	w14,[x0,#16]
++
++	tst	x2,#31
++	b.eq	.Leven_neon
++
++	ldp	x7,x8,[x0,#32]	// load key value
++
++	add	x4,x10,x11,lsl#26	// base 2^26 -> base 2^64
++	lsr	x5,x12,#12
++	adds	x4,x4,x12,lsl#52
++	add	x5,x5,x13,lsl#14
++	adc	x5,x5,xzr
++	lsr	x6,x14,#24
++	adds	x5,x5,x14,lsl#40
++	adc	x14,x6,xzr		// can be partially reduced...
++
++	ldp	x12,x13,[x1],#16	// load input
++	sub	x2,x2,#16
++	add	x9,x8,x8,lsr#2	// s1 = r1 + (r1 >> 2)
++
++#ifdef	__AARCH64EB__
++	rev	x12,x12
++	rev	x13,x13
++#endif
++	adds	x4,x4,x12		// accumulate input
++	adcs	x5,x5,x13
++	adc	x6,x6,x3
++
++	bl	poly1305_mult
++
++	and	x10,x4,#0x03ffffff	// base 2^64 -> base 2^26
++	ubfx	x11,x4,#26,#26
++	extr	x12,x5,x4,#52
++	and	x12,x12,#0x03ffffff
++	ubfx	x13,x5,#14,#26
++	extr	x14,x6,x5,#40
++
++	b	.Leven_neon
++
++.align	4
++.Lbase2_64_neon:
++	ldp	x7,x8,[x0,#32]	// load key value
++
++	ldp	x4,x5,[x0]		// load hash value base 2^64
++	ldr	x6,[x0,#16]
++
++	tst	x2,#31
++	b.eq	.Linit_neon
++
++	ldp	x12,x13,[x1],#16	// load input
++	sub	x2,x2,#16
++	add	x9,x8,x8,lsr#2	// s1 = r1 + (r1 >> 2)
++#ifdef	__AARCH64EB__
++	rev	x12,x12
++	rev	x13,x13
++#endif
++	adds	x4,x4,x12		// accumulate input
++	adcs	x5,x5,x13
++	adc	x6,x6,x3
++
++	bl	poly1305_mult
++
++.Linit_neon:
++	ldr	w17,[x0,#48]		// first table element
++	and	x10,x4,#0x03ffffff	// base 2^64 -> base 2^26
++	ubfx	x11,x4,#26,#26
++	extr	x12,x5,x4,#52
++	and	x12,x12,#0x03ffffff
++	ubfx	x13,x5,#14,#26
++	extr	x14,x6,x5,#40
++
++	cmp	w17,#-1			// is value impossible?
++	b.ne	.Leven_neon
++
++	fmov	d24,x10
++	fmov	d25,x11
++	fmov	d26,x12
++	fmov	d27,x13
++	fmov	d28,x14
++
++	////////////////////////////////// initialize r^n table
++	mov	x4,x7			// r^1
++	add	x9,x8,x8,lsr#2	// s1 = r1 + (r1 >> 2)
++	mov	x5,x8
++	mov	x6,xzr
++	add	x0,x0,#48+12
++	bl	poly1305_splat
++
++	bl	poly1305_mult		// r^2
++	sub	x0,x0,#4
++	bl	poly1305_splat
++
++	bl	poly1305_mult		// r^3
++	sub	x0,x0,#4
++	bl	poly1305_splat
++
++	bl	poly1305_mult		// r^4
++	sub	x0,x0,#4
++	bl	poly1305_splat
++	sub	x0,x0,#48		// restore original x0
++	b	.Ldo_neon
++
++.align	4
++.Leven_neon:
++	fmov	d24,x10
++	fmov	d25,x11
++	fmov	d26,x12
++	fmov	d27,x13
++	fmov	d28,x14
++
++.Ldo_neon:
++	ldp	x8,x12,[x1,#32]	// inp[2:3]
++	subs	x2,x2,#64
++	ldp	x9,x13,[x1,#48]
++	add	x16,x1,#96
++	adr	x17,.Lzeros
++
++	lsl	x3,x3,#24
++	add	x15,x0,#48
++
++#ifdef	__AARCH64EB__
++	rev	x8,x8
++	rev	x12,x12
++	rev	x9,x9
++	rev	x13,x13
++#endif
++	and	x4,x8,#0x03ffffff	// base 2^64 -> base 2^26
++	and	x5,x9,#0x03ffffff
++	ubfx	x6,x8,#26,#26
++	ubfx	x7,x9,#26,#26
++	add	x4,x4,x5,lsl#32		// bfi	x4,x5,#32,#32
++	extr	x8,x12,x8,#52
++	extr	x9,x13,x9,#52
++	add	x6,x6,x7,lsl#32		// bfi	x6,x7,#32,#32
++	fmov	d14,x4
++	and	x8,x8,#0x03ffffff
++	and	x9,x9,#0x03ffffff
++	ubfx	x10,x12,#14,#26
++	ubfx	x11,x13,#14,#26
++	add	x12,x3,x12,lsr#40
++	add	x13,x3,x13,lsr#40
++	add	x8,x8,x9,lsl#32		// bfi	x8,x9,#32,#32
++	fmov	d15,x6
++	add	x10,x10,x11,lsl#32	// bfi	x10,x11,#32,#32
++	add	x12,x12,x13,lsl#32	// bfi	x12,x13,#32,#32
++	fmov	d16,x8
++	fmov	d17,x10
++	fmov	d18,x12
++
++	ldp	x8,x12,[x1],#16	// inp[0:1]
++	ldp	x9,x13,[x1],#48
++
++	ld1	{v0.4s,v1.4s,v2.4s,v3.4s},[x15],#64
++	ld1	{v4.4s,v5.4s,v6.4s,v7.4s},[x15],#64
++	ld1	{v8.4s},[x15]
++
++#ifdef	__AARCH64EB__
++	rev	x8,x8
++	rev	x12,x12
++	rev	x9,x9
++	rev	x13,x13
++#endif
++	and	x4,x8,#0x03ffffff	// base 2^64 -> base 2^26
++	and	x5,x9,#0x03ffffff
++	ubfx	x6,x8,#26,#26
++	ubfx	x7,x9,#26,#26
++	add	x4,x4,x5,lsl#32		// bfi	x4,x5,#32,#32
++	extr	x8,x12,x8,#52
++	extr	x9,x13,x9,#52
++	add	x6,x6,x7,lsl#32		// bfi	x6,x7,#32,#32
++	fmov	d9,x4
++	and	x8,x8,#0x03ffffff
++	and	x9,x9,#0x03ffffff
++	ubfx	x10,x12,#14,#26
++	ubfx	x11,x13,#14,#26
++	add	x12,x3,x12,lsr#40
++	add	x13,x3,x13,lsr#40
++	add	x8,x8,x9,lsl#32		// bfi	x8,x9,#32,#32
++	fmov	d10,x6
++	add	x10,x10,x11,lsl#32	// bfi	x10,x11,#32,#32
++	add	x12,x12,x13,lsl#32	// bfi	x12,x13,#32,#32
++	movi	v31.2d,#-1
++	fmov	d11,x8
++	fmov	d12,x10
++	fmov	d13,x12
++	ushr	v31.2d,v31.2d,#38
++
++	b.ls	.Lskip_loop
++
++.align	4
++.Loop_neon:
++	////////////////////////////////////////////////////////////////
++	// ((inp[0]*r^4+inp[2]*r^2+inp[4])*r^4+inp[6]*r^2
++	// ((inp[1]*r^4+inp[3]*r^2+inp[5])*r^3+inp[7]*r
++	//   ___________________/
++	// ((inp[0]*r^4+inp[2]*r^2+inp[4])*r^4+inp[6]*r^2+inp[8])*r^2
++	// ((inp[1]*r^4+inp[3]*r^2+inp[5])*r^4+inp[7]*r^2+inp[9])*r
++	//   ___________________/ ____________________/
++	//
++	// Note that we start with inp[2:3]*r^2. This is because it
++	// doesn't depend on reduction in previous iteration.
++	////////////////////////////////////////////////////////////////
++	// d4 = h0*r4 + h1*r3   + h2*r2   + h3*r1   + h4*r0
++	// d3 = h0*r3 + h1*r2   + h2*r1   + h3*r0   + h4*5*r4
++	// d2 = h0*r2 + h1*r1   + h2*r0   + h3*5*r4 + h4*5*r3
++	// d1 = h0*r1 + h1*r0   + h2*5*r4 + h3*5*r3 + h4*5*r2
++	// d0 = h0*r0 + h1*5*r4 + h2*5*r3 + h3*5*r2 + h4*5*r1
++
++	subs	x2,x2,#64
++	umull	v23.2d,v14.2s,v7.s[2]
++	csel	x16,x17,x16,lo
++	umull	v22.2d,v14.2s,v5.s[2]
++	umull	v21.2d,v14.2s,v3.s[2]
++	 ldp	x8,x12,[x16],#16	// inp[2:3] (or zero)
++	umull	v20.2d,v14.2s,v1.s[2]
++	 ldp	x9,x13,[x16],#48
++	umull	v19.2d,v14.2s,v0.s[2]
++#ifdef	__AARCH64EB__
++	 rev	x8,x8
++	 rev	x12,x12
++	 rev	x9,x9
++	 rev	x13,x13
++#endif
++
++	umlal	v23.2d,v15.2s,v5.s[2]
++	 and	x4,x8,#0x03ffffff	// base 2^64 -> base 2^26
++	umlal	v22.2d,v15.2s,v3.s[2]
++	 and	x5,x9,#0x03ffffff
++	umlal	v21.2d,v15.2s,v1.s[2]
++	 ubfx	x6,x8,#26,#26
++	umlal	v20.2d,v15.2s,v0.s[2]
++	 ubfx	x7,x9,#26,#26
++	umlal	v19.2d,v15.2s,v8.s[2]
++	 add	x4,x4,x5,lsl#32		// bfi	x4,x5,#32,#32
++
++	umlal	v23.2d,v16.2s,v3.s[2]
++	 extr	x8,x12,x8,#52
++	umlal	v22.2d,v16.2s,v1.s[2]
++	 extr	x9,x13,x9,#52
++	umlal	v21.2d,v16.2s,v0.s[2]
++	 add	x6,x6,x7,lsl#32		// bfi	x6,x7,#32,#32
++	umlal	v20.2d,v16.2s,v8.s[2]
++	 fmov	d14,x4
++	umlal	v19.2d,v16.2s,v6.s[2]
++	 and	x8,x8,#0x03ffffff
++
++	umlal	v23.2d,v17.2s,v1.s[2]
++	 and	x9,x9,#0x03ffffff
++	umlal	v22.2d,v17.2s,v0.s[2]
++	 ubfx	x10,x12,#14,#26
++	umlal	v21.2d,v17.2s,v8.s[2]
++	 ubfx	x11,x13,#14,#26
++	umlal	v20.2d,v17.2s,v6.s[2]
++	 add	x8,x8,x9,lsl#32		// bfi	x8,x9,#32,#32
++	umlal	v19.2d,v17.2s,v4.s[2]
++	 fmov	d15,x6
++
++	add	v11.2s,v11.2s,v26.2s
++	 add	x12,x3,x12,lsr#40
++	umlal	v23.2d,v18.2s,v0.s[2]
++	 add	x13,x3,x13,lsr#40
++	umlal	v22.2d,v18.2s,v8.s[2]
++	 add	x10,x10,x11,lsl#32	// bfi	x10,x11,#32,#32
++	umlal	v21.2d,v18.2s,v6.s[2]
++	 add	x12,x12,x13,lsl#32	// bfi	x12,x13,#32,#32
++	umlal	v20.2d,v18.2s,v4.s[2]
++	 fmov	d16,x8
++	umlal	v19.2d,v18.2s,v2.s[2]
++	 fmov	d17,x10
++
++	////////////////////////////////////////////////////////////////
++	// (hash+inp[0:1])*r^4 and accumulate
++
++	add	v9.2s,v9.2s,v24.2s
++	 fmov	d18,x12
++	umlal	v22.2d,v11.2s,v1.s[0]
++	 ldp	x8,x12,[x1],#16	// inp[0:1]
++	umlal	v19.2d,v11.2s,v6.s[0]
++	 ldp	x9,x13,[x1],#48
++	umlal	v23.2d,v11.2s,v3.s[0]
++	umlal	v20.2d,v11.2s,v8.s[0]
++	umlal	v21.2d,v11.2s,v0.s[0]
++#ifdef	__AARCH64EB__
++	 rev	x8,x8
++	 rev	x12,x12
++	 rev	x9,x9
++	 rev	x13,x13
++#endif
++
++	add	v10.2s,v10.2s,v25.2s
++	umlal	v22.2d,v9.2s,v5.s[0]
++	umlal	v23.2d,v9.2s,v7.s[0]
++	 and	x4,x8,#0x03ffffff	// base 2^64 -> base 2^26
++	umlal	v21.2d,v9.2s,v3.s[0]
++	 and	x5,x9,#0x03ffffff
++	umlal	v19.2d,v9.2s,v0.s[0]
++	 ubfx	x6,x8,#26,#26
++	umlal	v20.2d,v9.2s,v1.s[0]
++	 ubfx	x7,x9,#26,#26
++
++	add	v12.2s,v12.2s,v27.2s
++	 add	x4,x4,x5,lsl#32		// bfi	x4,x5,#32,#32
++	umlal	v22.2d,v10.2s,v3.s[0]
++	 extr	x8,x12,x8,#52
++	umlal	v23.2d,v10.2s,v5.s[0]
++	 extr	x9,x13,x9,#52
++	umlal	v19.2d,v10.2s,v8.s[0]
++	 add	x6,x6,x7,lsl#32		// bfi	x6,x7,#32,#32
++	umlal	v21.2d,v10.2s,v1.s[0]
++	 fmov	d9,x4
++	umlal	v20.2d,v10.2s,v0.s[0]
++	 and	x8,x8,#0x03ffffff
++
++	add	v13.2s,v13.2s,v28.2s
++	 and	x9,x9,#0x03ffffff
++	umlal	v22.2d,v12.2s,v0.s[0]
++	 ubfx	x10,x12,#14,#26
++	umlal	v19.2d,v12.2s,v4.s[0]
++	 ubfx	x11,x13,#14,#26
++	umlal	v23.2d,v12.2s,v1.s[0]
++	 add	x8,x8,x9,lsl#32		// bfi	x8,x9,#32,#32
++	umlal	v20.2d,v12.2s,v6.s[0]
++	 fmov	d10,x6
++	umlal	v21.2d,v12.2s,v8.s[0]
++	 add	x12,x3,x12,lsr#40
++
++	umlal	v22.2d,v13.2s,v8.s[0]
++	 add	x13,x3,x13,lsr#40
++	umlal	v19.2d,v13.2s,v2.s[0]
++	 add	x10,x10,x11,lsl#32	// bfi	x10,x11,#32,#32
++	umlal	v23.2d,v13.2s,v0.s[0]
++	 add	x12,x12,x13,lsl#32	// bfi	x12,x13,#32,#32
++	umlal	v20.2d,v13.2s,v4.s[0]
++	 fmov	d11,x8
++	umlal	v21.2d,v13.2s,v6.s[0]
++	 fmov	d12,x10
++	 fmov	d13,x12
++
++	/////////////////////////////////////////////////////////////////
++	// lazy reduction as discussed in "NEON crypto" by D.J. Bernstein
++	// and P. Schwabe
++	//
++	// [see discussion in poly1305-armv4 module]
++
++	ushr	v29.2d,v22.2d,#26
++	xtn	v27.2s,v22.2d
++	 ushr	v30.2d,v19.2d,#26
++	 and	v19.16b,v19.16b,v31.16b
++	add	v23.2d,v23.2d,v29.2d	// h3 -> h4
++	bic	v27.2s,#0xfc,lsl#24	// &=0x03ffffff
++	 add	v20.2d,v20.2d,v30.2d	// h0 -> h1
++
++	ushr	v29.2d,v23.2d,#26
++	xtn	v28.2s,v23.2d
++	 ushr	v30.2d,v20.2d,#26
++	 xtn	v25.2s,v20.2d
++	bic	v28.2s,#0xfc,lsl#24
++	 add	v21.2d,v21.2d,v30.2d	// h1 -> h2
++
++	add	v19.2d,v19.2d,v29.2d
++	shl	v29.2d,v29.2d,#2
++	 shrn	v30.2s,v21.2d,#26
++	 xtn	v26.2s,v21.2d
++	add	v19.2d,v19.2d,v29.2d	// h4 -> h0
++	 bic	v25.2s,#0xfc,lsl#24
++	 add	v27.2s,v27.2s,v30.2s		// h2 -> h3
++	 bic	v26.2s,#0xfc,lsl#24
++
++	shrn	v29.2s,v19.2d,#26
++	xtn	v24.2s,v19.2d
++	 ushr	v30.2s,v27.2s,#26
++	 bic	v27.2s,#0xfc,lsl#24
++	 bic	v24.2s,#0xfc,lsl#24
++	add	v25.2s,v25.2s,v29.2s		// h0 -> h1
++	 add	v28.2s,v28.2s,v30.2s		// h3 -> h4
++
++	b.hi	.Loop_neon
++
++.Lskip_loop:
++	dup	v16.2d,v16.d[0]
++	add	v11.2s,v11.2s,v26.2s
++
++	////////////////////////////////////////////////////////////////
++	// multiply (inp[0:1]+hash) or inp[2:3] by r^2:r^1
++
++	adds	x2,x2,#32
++	b.ne	.Long_tail
++
++	dup	v16.2d,v11.d[0]
++	add	v14.2s,v9.2s,v24.2s
++	add	v17.2s,v12.2s,v27.2s
++	add	v15.2s,v10.2s,v25.2s
++	add	v18.2s,v13.2s,v28.2s
++
++.Long_tail:
++	dup	v14.2d,v14.d[0]
++	umull2	v19.2d,v16.4s,v6.4s
++	umull2	v22.2d,v16.4s,v1.4s
++	umull2	v23.2d,v16.4s,v3.4s
++	umull2	v21.2d,v16.4s,v0.4s
++	umull2	v20.2d,v16.4s,v8.4s
++
++	dup	v15.2d,v15.d[0]
++	umlal2	v19.2d,v14.4s,v0.4s
++	umlal2	v21.2d,v14.4s,v3.4s
++	umlal2	v22.2d,v14.4s,v5.4s
++	umlal2	v23.2d,v14.4s,v7.4s
++	umlal2	v20.2d,v14.4s,v1.4s
++
++	dup	v17.2d,v17.d[0]
++	umlal2	v19.2d,v15.4s,v8.4s
++	umlal2	v22.2d,v15.4s,v3.4s
++	umlal2	v21.2d,v15.4s,v1.4s
++	umlal2	v23.2d,v15.4s,v5.4s
++	umlal2	v20.2d,v15.4s,v0.4s
++
++	dup	v18.2d,v18.d[0]
++	umlal2	v22.2d,v17.4s,v0.4s
++	umlal2	v23.2d,v17.4s,v1.4s
++	umlal2	v19.2d,v17.4s,v4.4s
++	umlal2	v20.2d,v17.4s,v6.4s
++	umlal2	v21.2d,v17.4s,v8.4s
++
++	umlal2	v22.2d,v18.4s,v8.4s
++	umlal2	v19.2d,v18.4s,v2.4s
++	umlal2	v23.2d,v18.4s,v0.4s
++	umlal2	v20.2d,v18.4s,v4.4s
++	umlal2	v21.2d,v18.4s,v6.4s
++
++	b.eq	.Lshort_tail
++
++	////////////////////////////////////////////////////////////////
++	// (hash+inp[0:1])*r^4:r^3 and accumulate
++
++	add	v9.2s,v9.2s,v24.2s
++	umlal	v22.2d,v11.2s,v1.2s
++	umlal	v19.2d,v11.2s,v6.2s
++	umlal	v23.2d,v11.2s,v3.2s
++	umlal	v20.2d,v11.2s,v8.2s
++	umlal	v21.2d,v11.2s,v0.2s
++
++	add	v10.2s,v10.2s,v25.2s
++	umlal	v22.2d,v9.2s,v5.2s
++	umlal	v19.2d,v9.2s,v0.2s
++	umlal	v23.2d,v9.2s,v7.2s
++	umlal	v20.2d,v9.2s,v1.2s
++	umlal	v21.2d,v9.2s,v3.2s
++
++	add	v12.2s,v12.2s,v27.2s
++	umlal	v22.2d,v10.2s,v3.2s
++	umlal	v19.2d,v10.2s,v8.2s
++	umlal	v23.2d,v10.2s,v5.2s
++	umlal	v20.2d,v10.2s,v0.2s
++	umlal	v21.2d,v10.2s,v1.2s
++
++	add	v13.2s,v13.2s,v28.2s
++	umlal	v22.2d,v12.2s,v0.2s
++	umlal	v19.2d,v12.2s,v4.2s
++	umlal	v23.2d,v12.2s,v1.2s
++	umlal	v20.2d,v12.2s,v6.2s
++	umlal	v21.2d,v12.2s,v8.2s
++
++	umlal	v22.2d,v13.2s,v8.2s
++	umlal	v19.2d,v13.2s,v2.2s
++	umlal	v23.2d,v13.2s,v0.2s
++	umlal	v20.2d,v13.2s,v4.2s
++	umlal	v21.2d,v13.2s,v6.2s
++
++.Lshort_tail:
++	////////////////////////////////////////////////////////////////
++	// horizontal add
++
++	addp	v22.2d,v22.2d,v22.2d
++	 ldp	d8,d9,[sp,#16]		// meet ABI requirements
++	addp	v19.2d,v19.2d,v19.2d
++	 ldp	d10,d11,[sp,#32]
++	addp	v23.2d,v23.2d,v23.2d
++	 ldp	d12,d13,[sp,#48]
++	addp	v20.2d,v20.2d,v20.2d
++	 ldp	d14,d15,[sp,#64]
++	addp	v21.2d,v21.2d,v21.2d
++	 ldr	x30,[sp,#8]
++	 .inst	0xd50323bf		// autiasp
++
++	////////////////////////////////////////////////////////////////
++	// lazy reduction, but without narrowing
++
++	ushr	v29.2d,v22.2d,#26
++	and	v22.16b,v22.16b,v31.16b
++	 ushr	v30.2d,v19.2d,#26
++	 and	v19.16b,v19.16b,v31.16b
++
++	add	v23.2d,v23.2d,v29.2d	// h3 -> h4
++	 add	v20.2d,v20.2d,v30.2d	// h0 -> h1
++
++	ushr	v29.2d,v23.2d,#26
++	and	v23.16b,v23.16b,v31.16b
++	 ushr	v30.2d,v20.2d,#26
++	 and	v20.16b,v20.16b,v31.16b
++	 add	v21.2d,v21.2d,v30.2d	// h1 -> h2
++
++	add	v19.2d,v19.2d,v29.2d
++	shl	v29.2d,v29.2d,#2
++	 ushr	v30.2d,v21.2d,#26
++	 and	v21.16b,v21.16b,v31.16b
++	add	v19.2d,v19.2d,v29.2d	// h4 -> h0
++	 add	v22.2d,v22.2d,v30.2d	// h2 -> h3
++
++	ushr	v29.2d,v19.2d,#26
++	and	v19.16b,v19.16b,v31.16b
++	 ushr	v30.2d,v22.2d,#26
++	 and	v22.16b,v22.16b,v31.16b
++	add	v20.2d,v20.2d,v29.2d	// h0 -> h1
++	 add	v23.2d,v23.2d,v30.2d	// h3 -> h4
++
++	////////////////////////////////////////////////////////////////
++	// write the result, can be partially reduced
++
++	st4	{v19.s,v20.s,v21.s,v22.s}[0],[x0],#16
++	mov	x4,#1
++	st1	{v23.s}[0],[x0]
++	str	x4,[x0,#8]		// set is_base2_26
++
++	ldr	x29,[sp],#80
++	ret
++.size	poly1305_blocks_neon,.-poly1305_blocks_neon
++
++.align	5
++.Lzeros:
++.long	0,0,0,0,0,0,0,0
++.asciz	"Poly1305 for ARMv8, CRYPTOGAMS by @dot-asm"
++.align	2
++#if !defined(__KERNEL__) && !defined(_WIN64)
++.comm	OPENSSL_armcap_P,4,4
++.hidden	OPENSSL_armcap_P
++#endif
+diff --git a/arch/arm64/crypto/poly1305-glue.c b/arch/arm64/crypto/poly1305-glue.c
+new file mode 100644
+index 000000000000..cbf3eaca487e
+--- /dev/null
++++ b/arch/arm64/crypto/poly1305-glue.c
+@@ -0,0 +1,215 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * OpenSSL/Cryptogams accelerated Poly1305 transform for arm64
++ *
++ * Copyright (C) 2019 Linaro Ltd. <ard.biesheuvel@linaro.org>
++ */
++
++#include <asm/neon.h>
++#include <asm/simd.h>
++#include <asm/unaligned.h>
++#include <crypto/algapi.h>
++#include <crypto/internal/hash.h>
++#include <crypto/internal/simd.h>
++#include <linux/cpufeature.h>
++#include <linux/crypto.h>
++#include <linux/module.h>
++
++#define POLY1305_BLOCK_SIZE	16
++#define POLY1305_DIGEST_SIZE	16
++
++struct neon_poly1305_ctx {
++	/* the state owned by the accelerated code */
++	u64 state[24];
++	/* finalize key */
++	u32 s[4];
++	/* partial buffer */
++	u8 buf[POLY1305_BLOCK_SIZE];
++	/* bytes used in partial buffer */
++	unsigned int buflen;
++	/* r key has been set */
++	bool rset;
++	/* s key has been set */
++	bool sset;
++};
++
++asmlinkage void poly1305_init(u64 *state, const u8 *key);
++asmlinkage void poly1305_blocks(u64 *state, const u8 *src, u32 len, u32 hibit);
++asmlinkage void poly1305_blocks_neon(u64 *state, const u8 *src, u32 len, u32 hibit);
++asmlinkage void poly1305_emit(u64 state[], __le32 *digest, const u32 *nonce);
++
++static int neon_poly1305_init(struct shash_desc *desc)
++{
++	struct neon_poly1305_ctx *dctx = shash_desc_ctx(desc);
++
++	dctx->buflen = 0;
++	dctx->rset = false;
++	dctx->sset = false;
++
++	return 0;
++}
++
++static void neon_poly1305_blocks(struct neon_poly1305_ctx *dctx, const u8 *src,
++				 u32 len, u32 hibit, bool do_neon)
++{
++	if (unlikely(!dctx->sset)) {
++		if (!dctx->rset) {
++			poly1305_init(dctx->state, src);
++			src += POLY1305_BLOCK_SIZE;
++			len -= POLY1305_BLOCK_SIZE;
++			dctx->rset = true;
++		}
++		if (len >= POLY1305_BLOCK_SIZE) {
++			dctx->s[0] = get_unaligned_le32(src +  0);
++			dctx->s[1] = get_unaligned_le32(src +  4);
++			dctx->s[2] = get_unaligned_le32(src +  8);
++			dctx->s[3] = get_unaligned_le32(src + 12);
++			src += POLY1305_BLOCK_SIZE;
++			len -= POLY1305_BLOCK_SIZE;
++			dctx->sset = true;
++		}
++		if (len < POLY1305_BLOCK_SIZE)
++			return;
 +	}
- 
--	scatterwalk_map_and_copy(tag, req->src,
--				 req->assoclen + rctx->cryptlen,
--				 sizeof(tag), 0);
--	if (crypto_memneq(tag, rctx->tag, sizeof(tag)))
--		return -EBADMSG;
-+	/* derive the Poly1305 key */
-+	chacha_iv(iv, req, 0);
-+	chacha_init(chacha_state, ctx->chacha_key, iv);
-+	chacha_crypt(chacha_state, poly_key, page_address(ZERO_PAGE(0)),
-+		     sizeof(poly_key), 20);
 +
-+	desc->tfm = ctx->poly;
-+	crypto_shash_init(desc);
-+	crypto_shash_update(desc, poly_key, sizeof(poly_key));
++	len &= ~(POLY1305_BLOCK_SIZE - 1);
 +
-+	atomic = !(rctx->flags & CRYPTO_TFM_REQ_MAY_SLEEP);
-+	if (skip_ad_pad) {
-+		crypto_shash_update_from_sg(desc, crypt,
-+					    assoclen + rctx->cryptlen,
-+					    atomic);
-+	} else {
-+		struct scatterlist sg[2];
++	if (likely(do_neon))
++		poly1305_blocks_neon(dctx->state, src, len, hibit);
++	else
++		poly1305_blocks(dctx->state, src, len, hibit);
++}
 +
-+		crypto_shash_update_from_sg(desc, req->src, assoclen, atomic);
++static void neon_poly1305_do_update(struct neon_poly1305_ctx *dctx,
++				    const u8 *src, u32 len, bool do_neon)
++{
++	if (unlikely(dctx->buflen)) {
++		u32 bytes = min(len, POLY1305_BLOCK_SIZE - dctx->buflen);
 +
-+		padlen = -assoclen % POLY1305_BLOCK_SIZE;
-+		if (padlen)
-+			crypto_shash_update(desc, page_address(ZERO_PAGE(0)),
-+					    padlen);
++		memcpy(dctx->buf + dctx->buflen, src, bytes);
++		src += bytes;
++		len -= bytes;
++		dctx->buflen += bytes;
 +
-+		crypt = scatterwalk_ffwd(sg, crypt, req->assoclen);
-+		crypto_shash_update_from_sg(desc, crypt, rctx->cryptlen,
-+					    atomic);
++		if (dctx->buflen == POLY1305_BLOCK_SIZE) {
++			neon_poly1305_blocks(dctx, dctx->buf,
++					     POLY1305_BLOCK_SIZE, 1, false);
++			dctx->buflen = 0;
++		}
 +	}
 +
-+	tail[0] = 0;
-+	tail[1] = 0;
-+	tail[2] = cpu_to_le64(assoclen);
-+	tail[3] = cpu_to_le64(rctx->cryptlen);
++	if (likely(len >= POLY1305_BLOCK_SIZE)) {
++		neon_poly1305_blocks(dctx, src, len, 1, do_neon);
++		src += round_down(len, POLY1305_BLOCK_SIZE);
++		len %= POLY1305_BLOCK_SIZE;
++	}
 +
-+	padlen = -rctx->cryptlen % POLY1305_BLOCK_SIZE;
-+	crypto_shash_finup(desc, (u8 *)tail + (2 * sizeof(__le64) - padlen),
-+			   padlen + 2 * sizeof(__le64), poly_tag);
- 	return 0;
- }
- 
--static int poly_copy_tag(struct aead_request *req)
-+static int poly_append_tag(struct aead_request *req)
- {
- 	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
-+	u8 poly_tag[POLY1305_DIGEST_SIZE];
-+	int err;
- 
--	scatterwalk_map_and_copy(rctx->tag, req->dst,
-+	err = poly_generate_tag(req, poly_tag, req->dst);
-+	if (err)
-+		return err;
++	if (unlikely(len)) {
++		dctx->buflen = len;
++		memcpy(dctx->buf, src, len);
++	}
++}
 +
-+	scatterwalk_map_and_copy(poly_tag, req->dst,
- 				 req->assoclen + rctx->cryptlen,
--				 sizeof(rctx->tag), 1);
-+				 sizeof(poly_tag), 1);
- 	return 0;
- }
- 
--static void chacha_decrypt_done(struct crypto_async_request *areq, int err)
-+static void chacha_encrypt_done(struct crypto_async_request *areq, int err)
- {
--	async_done_continue(areq->data, err, poly_verify_tag);
-+	async_done_continue(areq->data, err, poly_append_tag);
- }
- 
--static int chacha_decrypt(struct aead_request *req)
-+static int chachapoly_encrypt(struct aead_request *req)
- {
- 	struct chachapoly_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
- 	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
--	struct chacha_req *creq = &rctx->u.chacha;
-+	struct chacha_req *creq = &rctx->chacha;
- 	struct scatterlist *src, *dst;
- 	int err;
- 
--	if (rctx->cryptlen == 0)
-+	rctx->cryptlen = req->cryptlen;
-+	rctx->flags = aead_request_flags(req);
++static int neon_poly1305_update(struct shash_desc *desc,
++				const u8 *src, unsigned int srclen)
++{
++	bool do_neon = crypto_simd_usable() && srclen > 128;
++	struct neon_poly1305_ctx *dctx = shash_desc_ctx(desc);
 +
-+	if (req->cryptlen == 0)
- 		goto skip;
- 
- 	chacha_iv(creq->iv, req, 1);
-@@ -141,273 +191,48 @@ static int chacha_decrypt(struct aead_request *req)
- 		dst = scatterwalk_ffwd(rctx->dst, req->dst, req->assoclen);
- 
- 	skcipher_request_set_callback(&creq->req, rctx->flags,
--				      chacha_decrypt_done, req);
-+				      chacha_encrypt_done, req);
- 	skcipher_request_set_tfm(&creq->req, ctx->chacha);
- 	skcipher_request_set_crypt(&creq->req, src, dst,
--				   rctx->cryptlen, creq->iv);
--	err = crypto_skcipher_decrypt(&creq->req);
-+				   req->cryptlen, creq->iv);
-+	err = crypto_skcipher_encrypt(&creq->req);
- 	if (err)
- 		return err;
- 
- skip:
--	return poly_verify_tag(req);
--}
--
--static int poly_tail_continue(struct aead_request *req)
--{
--	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
--
--	if (rctx->cryptlen == req->cryptlen) /* encrypting */
--		return poly_copy_tag(req);
--
--	return chacha_decrypt(req);
--}
--
--static void poly_tail_done(struct crypto_async_request *areq, int err)
--{
--	async_done_continue(areq->data, err, poly_tail_continue);
--}
--
--static int poly_tail(struct aead_request *req)
--{
--	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
--	struct chachapoly_ctx *ctx = crypto_aead_ctx(tfm);
--	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
--	struct poly_req *preq = &rctx->u.poly;
--	int err;
--
--	preq->tail.assoclen = cpu_to_le64(rctx->assoclen);
--	preq->tail.cryptlen = cpu_to_le64(rctx->cryptlen);
--	sg_init_one(preq->src, &preq->tail, sizeof(preq->tail));
--
--	ahash_request_set_callback(&preq->req, rctx->flags,
--				   poly_tail_done, req);
--	ahash_request_set_tfm(&preq->req, ctx->poly);
--	ahash_request_set_crypt(&preq->req, preq->src,
--				rctx->tag, sizeof(preq->tail));
--
--	err = crypto_ahash_finup(&preq->req);
--	if (err)
--		return err;
--
--	return poly_tail_continue(req);
--}
--
--static void poly_cipherpad_done(struct crypto_async_request *areq, int err)
--{
--	async_done_continue(areq->data, err, poly_tail);
--}
--
--static int poly_cipherpad(struct aead_request *req)
--{
--	struct chachapoly_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
--	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
--	struct poly_req *preq = &rctx->u.poly;
--	unsigned int padlen;
--	int err;
--
--	padlen = -rctx->cryptlen % POLY1305_BLOCK_SIZE;
--	memset(preq->pad, 0, sizeof(preq->pad));
--	sg_init_one(preq->src, preq->pad, padlen);
--
--	ahash_request_set_callback(&preq->req, rctx->flags,
--				   poly_cipherpad_done, req);
--	ahash_request_set_tfm(&preq->req, ctx->poly);
--	ahash_request_set_crypt(&preq->req, preq->src, NULL, padlen);
--
--	err = crypto_ahash_update(&preq->req);
--	if (err)
--		return err;
--
--	return poly_tail(req);
--}
--
--static void poly_cipher_done(struct crypto_async_request *areq, int err)
--{
--	async_done_continue(areq->data, err, poly_cipherpad);
--}
--
--static int poly_cipher(struct aead_request *req)
--{
--	struct chachapoly_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
--	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
--	struct poly_req *preq = &rctx->u.poly;
--	struct scatterlist *crypt = req->src;
--	int err;
--
--	if (rctx->cryptlen == req->cryptlen) /* encrypting */
--		crypt = req->dst;
--
--	crypt = scatterwalk_ffwd(rctx->src, crypt, req->assoclen);
--
--	ahash_request_set_callback(&preq->req, rctx->flags,
--				   poly_cipher_done, req);
--	ahash_request_set_tfm(&preq->req, ctx->poly);
--	ahash_request_set_crypt(&preq->req, crypt, NULL, rctx->cryptlen);
--
--	err = crypto_ahash_update(&preq->req);
--	if (err)
--		return err;
--
--	return poly_cipherpad(req);
--}
--
--static void poly_adpad_done(struct crypto_async_request *areq, int err)
--{
--	async_done_continue(areq->data, err, poly_cipher);
--}
--
--static int poly_adpad(struct aead_request *req)
--{
--	struct chachapoly_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
--	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
--	struct poly_req *preq = &rctx->u.poly;
--	unsigned int padlen;
--	int err;
--
--	padlen = -rctx->assoclen % POLY1305_BLOCK_SIZE;
--	memset(preq->pad, 0, sizeof(preq->pad));
--	sg_init_one(preq->src, preq->pad, padlen);
--
--	ahash_request_set_callback(&preq->req, rctx->flags,
--				   poly_adpad_done, req);
--	ahash_request_set_tfm(&preq->req, ctx->poly);
--	ahash_request_set_crypt(&preq->req, preq->src, NULL, padlen);
--
--	err = crypto_ahash_update(&preq->req);
--	if (err)
--		return err;
--
--	return poly_cipher(req);
--}
--
--static void poly_ad_done(struct crypto_async_request *areq, int err)
--{
--	async_done_continue(areq->data, err, poly_adpad);
--}
--
--static int poly_ad(struct aead_request *req)
--{
--	struct chachapoly_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
--	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
--	struct poly_req *preq = &rctx->u.poly;
--	int err;
--
--	ahash_request_set_callback(&preq->req, rctx->flags,
--				   poly_ad_done, req);
--	ahash_request_set_tfm(&preq->req, ctx->poly);
--	ahash_request_set_crypt(&preq->req, req->src, NULL, rctx->assoclen);
--
--	err = crypto_ahash_update(&preq->req);
--	if (err)
--		return err;
--
--	return poly_adpad(req);
--}
--
--static void poly_setkey_done(struct crypto_async_request *areq, int err)
--{
--	async_done_continue(areq->data, err, poly_ad);
--}
--
--static int poly_setkey(struct aead_request *req)
--{
--	struct chachapoly_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
--	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
--	struct poly_req *preq = &rctx->u.poly;
--	int err;
--
--	sg_init_one(preq->src, rctx->key, sizeof(rctx->key));
--
--	ahash_request_set_callback(&preq->req, rctx->flags,
--				   poly_setkey_done, req);
--	ahash_request_set_tfm(&preq->req, ctx->poly);
--	ahash_request_set_crypt(&preq->req, preq->src, NULL, sizeof(rctx->key));
--
--	err = crypto_ahash_update(&preq->req);
--	if (err)
--		return err;
--
--	return poly_ad(req);
-+	return poly_append_tag(req);
- }
- 
--static void poly_init_done(struct crypto_async_request *areq, int err)
-+static void chacha_decrypt_done(struct crypto_async_request *areq, int err)
- {
--	async_done_continue(areq->data, err, poly_setkey);
-+	aead_request_complete(areq->data, err);
- }
- 
--static int poly_init(struct aead_request *req)
-+static int chachapoly_decrypt(struct aead_request *req)
- {
- 	struct chachapoly_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
- 	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
--	struct poly_req *preq = &rctx->u.poly;
--	int err;
--
--	ahash_request_set_callback(&preq->req, rctx->flags,
--				   poly_init_done, req);
--	ahash_request_set_tfm(&preq->req, ctx->poly);
--
--	err = crypto_ahash_init(&preq->req);
--	if (err)
--		return err;
--
--	return poly_setkey(req);
--}
--
--static void poly_genkey_done(struct crypto_async_request *areq, int err)
--{
--	async_done_continue(areq->data, err, poly_init);
--}
--
--static int poly_genkey(struct aead_request *req)
--{
--	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
--	struct chachapoly_ctx *ctx = crypto_aead_ctx(tfm);
--	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
--	struct chacha_req *creq = &rctx->u.chacha;
-+	struct chacha_req *creq = &rctx->chacha;
-+	u8 calculated_tag[POLY1305_DIGEST_SIZE];
-+	u8 provided_tag[POLY1305_DIGEST_SIZE];
-+	struct scatterlist *src, *dst;
- 	int err;
- 
--	rctx->assoclen = req->assoclen;
--
--	if (crypto_aead_ivsize(tfm) == 8) {
--		if (rctx->assoclen < 8)
--			return -EINVAL;
--		rctx->assoclen -= 8;
--	}
--
--	memset(rctx->key, 0, sizeof(rctx->key));
--	sg_init_one(creq->src, rctx->key, sizeof(rctx->key));
--
--	chacha_iv(creq->iv, req, 0);
--
--	skcipher_request_set_callback(&creq->req, rctx->flags,
--				      poly_genkey_done, req);
--	skcipher_request_set_tfm(&creq->req, ctx->chacha);
--	skcipher_request_set_crypt(&creq->req, creq->src, creq->src,
--				   POLY1305_KEY_SIZE, creq->iv);
-+	rctx->cryptlen = req->cryptlen - POLY1305_DIGEST_SIZE;
-+	rctx->flags = aead_request_flags(req);
- 
--	err = crypto_skcipher_decrypt(&creq->req);
-+	err = poly_generate_tag(req, calculated_tag, req->src);
- 	if (err)
- 		return err;
-+	scatterwalk_map_and_copy(provided_tag, req->src,
-+				 req->assoclen + rctx->cryptlen,
-+				 sizeof(provided_tag), 0);
- 
--	return poly_init(req);
--}
--
--static void chacha_encrypt_done(struct crypto_async_request *areq, int err)
--{
--	async_done_continue(areq->data, err, poly_genkey);
--}
--
--static int chacha_encrypt(struct aead_request *req)
--{
--	struct chachapoly_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
--	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
--	struct chacha_req *creq = &rctx->u.chacha;
--	struct scatterlist *src, *dst;
--	int err;
-+	if (crypto_memneq(calculated_tag, provided_tag, sizeof(provided_tag)))
-+		return -EBADMSG;
- 
--	if (req->cryptlen == 0)
--		goto skip;
-+	if (rctx->cryptlen == 0)
-+		return 0;
- 
- 	chacha_iv(creq->iv, req, 1);
- 
-@@ -417,60 +242,11 @@ static int chacha_encrypt(struct aead_request *req)
- 		dst = scatterwalk_ffwd(rctx->dst, req->dst, req->assoclen);
- 
- 	skcipher_request_set_callback(&creq->req, rctx->flags,
--				      chacha_encrypt_done, req);
-+				      chacha_decrypt_done, req);
- 	skcipher_request_set_tfm(&creq->req, ctx->chacha);
- 	skcipher_request_set_crypt(&creq->req, src, dst,
--				   req->cryptlen, creq->iv);
--	err = crypto_skcipher_encrypt(&creq->req);
--	if (err)
--		return err;
--
--skip:
--	return poly_genkey(req);
--}
--
--static int chachapoly_encrypt(struct aead_request *req)
--{
--	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
--
--	rctx->cryptlen = req->cryptlen;
--	rctx->flags = aead_request_flags(req);
--
--	/* encrypt call chain:
--	 * - chacha_encrypt/done()
--	 * - poly_genkey/done()
--	 * - poly_init/done()
--	 * - poly_setkey/done()
--	 * - poly_ad/done()
--	 * - poly_adpad/done()
--	 * - poly_cipher/done()
--	 * - poly_cipherpad/done()
--	 * - poly_tail/done/continue()
--	 * - poly_copy_tag()
--	 */
--	return chacha_encrypt(req);
--}
--
--static int chachapoly_decrypt(struct aead_request *req)
--{
--	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
--
--	rctx->cryptlen = req->cryptlen - POLY1305_DIGEST_SIZE;
--	rctx->flags = aead_request_flags(req);
--
--	/* decrypt call chain:
--	 * - poly_genkey/done()
--	 * - poly_init/done()
--	 * - poly_setkey/done()
--	 * - poly_ad/done()
--	 * - poly_adpad/done()
--	 * - poly_cipher/done()
--	 * - poly_cipherpad/done()
--	 * - poly_tail/done/continue()
--	 * - chacha_decrypt/done()
--	 * - poly_verify_tag()
--	 */
--	return poly_genkey(req);
-+				   rctx->cryptlen, creq->iv);
-+	return crypto_skcipher_decrypt(&creq->req);
- }
- 
- static int chachapoly_setkey(struct crypto_aead *aead, const u8 *key,
-@@ -482,6 +258,15 @@ static int chachapoly_setkey(struct crypto_aead *aead, const u8 *key,
- 	if (keylen != ctx->saltlen + CHACHA_KEY_SIZE)
- 		return -EINVAL;
- 
-+	ctx->chacha_key[0] = get_unaligned_le32(key);
-+	ctx->chacha_key[1] = get_unaligned_le32(key + 4);
-+	ctx->chacha_key[2] = get_unaligned_le32(key + 8);
-+	ctx->chacha_key[3] = get_unaligned_le32(key + 12);
-+	ctx->chacha_key[4] = get_unaligned_le32(key + 16);
-+	ctx->chacha_key[5] = get_unaligned_le32(key + 20);
-+	ctx->chacha_key[6] = get_unaligned_le32(key + 24);
-+	ctx->chacha_key[7] = get_unaligned_le32(key + 28);
++	if (do_neon)
++		kernel_neon_begin();
++	neon_poly1305_do_update(dctx, src, srclen, do_neon);
++	if (do_neon)
++		kernel_neon_end();
++	return 0;
++}
 +
- 	keylen -= ctx->saltlen;
- 	memcpy(ctx->salt, key + keylen, ctx->saltlen);
- 
-@@ -510,16 +295,16 @@ static int chachapoly_init(struct crypto_aead *tfm)
- 	struct chachapoly_instance_ctx *ictx = aead_instance_ctx(inst);
- 	struct chachapoly_ctx *ctx = crypto_aead_ctx(tfm);
- 	struct crypto_skcipher *chacha;
--	struct crypto_ahash *poly;
-+	struct crypto_shash *poly;
- 	unsigned long align;
- 
--	poly = crypto_spawn_ahash(&ictx->poly);
-+	poly = crypto_spawn_shash(&ictx->poly);
- 	if (IS_ERR(poly))
- 		return PTR_ERR(poly);
- 
- 	chacha = crypto_spawn_skcipher(&ictx->chacha);
- 	if (IS_ERR(chacha)) {
--		crypto_free_ahash(poly);
-+		crypto_free_shash(poly);
- 		return PTR_ERR(chacha);
- 	}
- 
-@@ -531,13 +316,10 @@ static int chachapoly_init(struct crypto_aead *tfm)
- 	align &= ~(crypto_tfm_ctx_alignment() - 1);
- 	crypto_aead_set_reqsize(
- 		tfm,
--		align + offsetof(struct chachapoly_req_ctx, u) +
--		max(offsetof(struct chacha_req, req) +
--		    sizeof(struct skcipher_request) +
--		    crypto_skcipher_reqsize(chacha),
--		    offsetof(struct poly_req, req) +
--		    sizeof(struct ahash_request) +
--		    crypto_ahash_reqsize(poly)));
-+		align +
-+		offsetof(struct chachapoly_req_ctx, chacha.req) +
-+		sizeof(struct skcipher_request) +
-+		crypto_skcipher_reqsize(chacha));
- 
- 	return 0;
- }
-@@ -546,7 +328,7 @@ static void chachapoly_exit(struct crypto_aead *tfm)
- {
- 	struct chachapoly_ctx *ctx = crypto_aead_ctx(tfm);
- 
--	crypto_free_ahash(ctx->poly);
-+	crypto_free_shash(ctx->poly);
- 	crypto_free_skcipher(ctx->chacha);
- }
- 
-@@ -555,7 +337,7 @@ static void chachapoly_free(struct aead_instance *inst)
- 	struct chachapoly_instance_ctx *ctx = aead_instance_ctx(inst);
- 
- 	crypto_drop_skcipher(&ctx->chacha);
--	crypto_drop_ahash(&ctx->poly);
-+	crypto_drop_shash(&ctx->poly);
- 	kfree(inst);
- }
- 
-@@ -566,9 +348,9 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
- 	struct aead_instance *inst;
- 	struct skcipher_alg *chacha;
- 	struct crypto_alg *poly;
--	struct hash_alg_common *poly_hash;
-+	struct shash_alg *poly_hash;
- 	struct chachapoly_instance_ctx *ctx;
--	const char *chacha_name, *poly_name;
-+	const char *chacha_name;
- 	int err;
- 
- 	if (ivsize > CHACHAPOLY_IV_SIZE)
-@@ -584,18 +366,10 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
- 	chacha_name = crypto_attr_alg_name(tb[1]);
- 	if (IS_ERR(chacha_name))
- 		return PTR_ERR(chacha_name);
--	poly_name = crypto_attr_alg_name(tb[2]);
--	if (IS_ERR(poly_name))
--		return PTR_ERR(poly_name);
--
--	poly = crypto_find_alg(poly_name, &crypto_ahash_type,
--			       CRYPTO_ALG_TYPE_HASH,
--			       CRYPTO_ALG_TYPE_AHASH_MASK |
--			       crypto_requires_sync(algt->type,
--						    algt->mask));
--	if (IS_ERR(poly))
--		return PTR_ERR(poly);
--	poly_hash = __crypto_hash_alg_common(poly);
-+	poly_hash = shash_attr_alg(tb[2], 0, 0);
-+	if (IS_ERR(poly_hash))
-+		return PTR_ERR(poly_hash);
-+	poly = &poly_hash->base;
- 
- 	err = -EINVAL;
- 	if (poly_hash->digestsize != POLY1305_DIGEST_SIZE)
-@@ -608,7 +382,7 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
- 
- 	ctx = aead_instance_ctx(inst);
- 	ctx->saltlen = CHACHAPOLY_IV_SIZE - ivsize;
--	err = crypto_init_ahash_spawn(&ctx->poly, poly_hash,
-+	err = crypto_init_shash_spawn(&ctx->poly, poly_hash,
- 				      aead_crypto_instance(inst));
- 	if (err)
- 		goto err_free_inst;
-@@ -630,10 +404,13 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
- 	if (chacha->base.cra_blocksize != 1)
- 		goto out_drop_chacha;
- 
-+	if (strcmp(chacha->base.cra_name, "chacha20") ||
-+	    strcmp(poly->cra_name, "poly1305"))
-+		goto out_drop_chacha;
++static int neon_poly1305_update_from_sg(struct shash_desc *desc,
++					struct scatterlist *sg,
++					unsigned int srclen, int flags)
++{
++	bool do_neon = crypto_simd_usable() && srclen > 128;
++	struct neon_poly1305_ctx *dctx = shash_desc_ctx(desc);
++	struct crypto_hash_walk walk;
++	int nbytes;
 +
- 	err = -ENAMETOOLONG;
- 	if (snprintf(inst->alg.base.cra_name, CRYPTO_MAX_ALG_NAME,
--		     "%s(%s,%s)", name, chacha->base.cra_name,
--		     poly->cra_name) >= CRYPTO_MAX_ALG_NAME)
-+		     "%s(chacha20,poly1305)", name) >= CRYPTO_MAX_ALG_NAME)
- 		goto out_drop_chacha;
- 	if (snprintf(inst->alg.base.cra_driver_name, CRYPTO_MAX_ALG_NAME,
- 		     "%s(%s,%s)", name, chacha->base.cra_driver_name,
-@@ -672,7 +449,7 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
- out_drop_chacha:
- 	crypto_drop_skcipher(&ctx->chacha);
- err_drop_poly:
--	crypto_drop_ahash(&ctx->poly);
-+	crypto_drop_shash(&ctx->poly);
- err_free_inst:
- 	kfree(inst);
- 	goto out_put_poly;
++	if (do_neon) {
++		kernel_neon_begin();
++		flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
++	}
++
++	for (nbytes = crypto_shash_walk_sg(desc, sg, srclen, &walk, flags);
++	     nbytes > 0;
++	     nbytes = crypto_hash_walk_done(&walk, 0))
++		neon_poly1305_do_update(dctx, walk.data, nbytes, do_neon);
++
++	if (do_neon)
++		kernel_neon_end();
++
++	return 0;
++}
++
++static int neon_poly1305_final(struct shash_desc *desc, u8 *dst)
++{
++	struct neon_poly1305_ctx *dctx = shash_desc_ctx(desc);
++	__le32 digest[4];
++	u64 f = 0;
++
++	if (unlikely(!dctx->sset))
++		return -ENOKEY;
++
++	if (unlikely(dctx->buflen)) {
++		dctx->buf[dctx->buflen++] = 1;
++		memset(dctx->buf + dctx->buflen, 0,
++		       POLY1305_BLOCK_SIZE - dctx->buflen);
++		poly1305_blocks(dctx->state, dctx->buf, POLY1305_BLOCK_SIZE, 0);
++	}
++
++	poly1305_emit(dctx->state, digest, dctx->s);
++
++	/* mac = (h + s) % (2^128) */
++	f = (f >> 32) + le32_to_cpu(digest[0]);
++	put_unaligned_le32(f, dst);
++	f = (f >> 32) + le32_to_cpu(digest[1]);
++	put_unaligned_le32(f, dst + 4);
++	f = (f >> 32) + le32_to_cpu(digest[2]);
++	put_unaligned_le32(f, dst + 8);
++	f = (f >> 32) + le32_to_cpu(digest[3]);
++	put_unaligned_le32(f, dst + 12);
++
++	return 0;
++}
++
++static struct shash_alg neon_poly1305_alg = {
++	.init			= neon_poly1305_init,
++	.update			= neon_poly1305_update,
++	.update_from_sg		= neon_poly1305_update_from_sg,
++	.final			= neon_poly1305_final,
++	.digestsize		= POLY1305_DIGEST_SIZE,
++	.descsize		= sizeof(struct neon_poly1305_ctx),
++
++	.base.cra_name		= "poly1305",
++	.base.cra_driver_name	= "poly1305-neon",
++	.base.cra_priority	= 200,
++	.base.cra_blocksize	= POLY1305_BLOCK_SIZE,
++	.base.cra_module	= THIS_MODULE,
++};
++
++static int __init neon_poly1305_mod_init(void)
++{
++	if (!cpu_have_named_feature(ASIMD))
++		return -ENODEV;
++	return crypto_register_shash(&neon_poly1305_alg);
++}
++
++static void __exit neon_poly1305_mod_exit(void)
++{
++	crypto_unregister_shash(&neon_poly1305_alg);
++}
++
++module_init(neon_poly1305_mod_init);
++module_exit(neon_poly1305_mod_exit);
++
++MODULE_LICENSE("GPL v2");
++MODULE_ALIAS_CRYPTO("poly1305");
++MODULE_ALIAS_CRYPTO("poly1305-neon");
 -- 
 2.20.1
 
