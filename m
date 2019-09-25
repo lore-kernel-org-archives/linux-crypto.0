@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EE8CC4360D
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Sep 2019 16:14:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B3EAC32793
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Sep 2019 16:14:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 240E6222BF
+	by mail.kernel.org (Postfix) with ESMTP id E7E712146E
 	for <linux-crypto@archiver.kernel.org>; Wed, 25 Sep 2019 16:14:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="SYIsA/jL"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yF7nxogd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732673AbfIYQOA (ORCPT
+        id S2387908AbfIYQOB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 25 Sep 2019 12:14:00 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:33840 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387919AbfIYQOA (ORCPT
+        Wed, 25 Sep 2019 12:14:01 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:37510 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388006AbfIYQOA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Wed, 25 Sep 2019 12:14:00 -0400
-Received: by mail-wr1-f65.google.com with SMTP id a11so7676954wrx.1
-        for <linux-crypto@vger.kernel.org>; Wed, 25 Sep 2019 09:13:57 -0700 (PDT)
+Received: by mail-wr1-f66.google.com with SMTP id i1so7651741wro.4
+        for <linux-crypto@vger.kernel.org>; Wed, 25 Sep 2019 09:13:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=xupbsCtUMBq0dKLLZcgZZz8OoL1zNg5tE6xYiAmXGow=;
-        b=SYIsA/jLyOT0qlEO7cDTv2aW9SXsCwRwELfU1LJSTg6ZtBdPf/Th6yPkKEhj/J2adr
-         Y2tUqkSPh4P0nJFGCaab9LSoY9FwcwWbEFVGm9sOpeRekjpfxZurAIa5tW9A6QbzDJC0
-         h/JSGGDGnDXTJ95eEqNSHUarUCnxy4vRJyibdJuwzgoGERTNXJC6oAxTYpUHSLFzLBn4
-         cU2WQx4k6LgfVmdjuC5I5IplDoZHPC78rRIiQVHHTaFxfVPjLpzk2dNe/vfd04/019i4
-         YOWgSgvsxyZfu2v1O/drgMNdQfe+7oLX+jhjG24oKtDk0u73q0WP/4tcdBBTc9yMMNs1
-         LZZg==
+        bh=oTkLJDHd3Opt8Q7gQbNEv9bluAfNAUwUozJN7kv8cIw=;
+        b=yF7nxogdOddiZ7APJUWvv8ZOZvf7wdIBsXoh5+aa06OqQerRa+w3xtndhPDTvbyeTs
+         SxCDjPcJJ5qj5HXRHMljeXqQhUcT5u8DVC/xiVUQWc/xL7+i5gE2JMdr8DvOBarsLX5B
+         EawpOjrIVlrozZgzbaV+7ympMMIMlrDR+vcF8xD93tAcRteh3dAQUd6LOhepRf1abFOU
+         kJvyoTfNL3aOgWUg9OLo15VCRpFO8RzefWgCE9X6Zu++89AoZlW3h1MyeCH2qsIp0cPV
+         P92XYhzshGFCxB/VVpNrKiPnXbbjfbGLkRrHxm15wdGgtvLZ667XLMgIGKtHMIEw6LVd
+         7teg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=xupbsCtUMBq0dKLLZcgZZz8OoL1zNg5tE6xYiAmXGow=;
-        b=olWyevibJQZX2qglgUbRhGXvThyUK3TxCISyTjrylJr2tDvgvwcHNzeSedNu5daJsX
-         CPXHiSySbjThUVdKuvN6U90rZl4kVqcGpiBUk6dvqDH33HjjTiG0mHwVZ3xlZx0f+7Be
-         c9swp5mrsXYglujptH/gdV4RKrxDlPvkD9/XaLWK+HG8ZOc0b9pZwfWQmVE7Y26RMKUq
-         RXzHR/Btk8wr7s5wBNc2ARcD6x0Qplmnhx2173Dg9T07AXnBd+pU5V3VW0NMyVdEBPZI
-         eH2P180YJ1zGK/BAF0+v6OsrkrB5kEy1zAU9lqzNmwDzgFgWbckPOqUyEqVew5pg3104
-         wDmw==
-X-Gm-Message-State: APjAAAUoXGqxAxvN5wctOVS0zaOC2eyoUcQ5hDHAs3/C0Pla1dUPG5ph
-        OTtOWCaCJi++FpHjn21t/71W109IrQHi2s5I
-X-Google-Smtp-Source: APXvYqwC8EG0AIcwFUrSnHZLRvuiWV5oBEZ24YsBf/vED1PlaF+hl22X2hkyEdzgxov49IyWVFvLvg==
-X-Received: by 2002:adf:f547:: with SMTP id j7mr10623741wrp.119.1569428037024;
-        Wed, 25 Sep 2019 09:13:57 -0700 (PDT)
+        bh=oTkLJDHd3Opt8Q7gQbNEv9bluAfNAUwUozJN7kv8cIw=;
+        b=NFWAPvlOEnRU3ufsXJryyN9+icRPQWfy9oW4RcXrWvf34v/yw6JolvaVJr9Kek4Xgv
+         dDIHoJ4ePqLoigR3+wnxkPQ1hnWLHn5mzacU7Nqdsz+ywfNSCUAfQ3MxXbwP/zpkRy29
+         SELPAochuazjR68ZGIh6wBTECnp8BrC5bc1AxFudgZ1RfAB7mVIiCth7Mq7SZSg2+EBO
+         UhYPmm3tk5E7wszPmQrtDqQsiR3KuNkwxiYC3zmDtRVfmvScrDtcJ/ASdnb3nQ0mYpl2
+         /YvwS1dPXB/4zsf7+DDWcP2mUpL0b2ddVLLBYbN/g65qdL9B6m6vISBiU5MAFvOqoF7V
+         /JCg==
+X-Gm-Message-State: APjAAAWNsR75aOYmjBuv3UyHGfxK+pbN8XFL/zJN/0xJB6cRyzolskrD
+        6nXUUtY90U+GTczr/Nxa3Z7V9VCjV4Ouscyu
+X-Google-Smtp-Source: APXvYqzc7zDHo2pym+GG6Iqyv/Iy0z/3d/GbL+d0TyOdn6ZMUTam9B5o+BxEoxNyjw7X4aDT9QAIsg==
+X-Received: by 2002:adf:afed:: with SMTP id y45mr10259853wrd.347.1569428038355;
+        Wed, 25 Sep 2019 09:13:58 -0700 (PDT)
 Received: from localhost.localdomain (laubervilliers-657-1-83-120.w92-154.abo.wanadoo.fr. [92.154.90.120])
-        by smtp.gmail.com with ESMTPSA id o70sm4991085wme.29.2019.09.25.09.13.55
+        by smtp.gmail.com with ESMTPSA id o70sm4991085wme.29.2019.09.25.09.13.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Sep 2019 09:13:56 -0700 (PDT)
+        Wed, 25 Sep 2019 09:13:57 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     linux-arm-kernel@lists.infradead.org,
@@ -72,9 +72,9 @@ Cc:     linux-arm-kernel@lists.infradead.org,
         Andy Lutomirski <luto@kernel.org>,
         Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
         Catalin Marinas <catalin.marinas@arm.com>
-Subject: [RFC PATCH 07/18] crypto: rfc7539 - use zero reqsize for sync instantiations without alignmask
-Date:   Wed, 25 Sep 2019 18:12:44 +0200
-Message-Id: <20190925161255.1871-8-ard.biesheuvel@linaro.org>
+Subject: [RFC PATCH 08/18] crypto: testmgr - add a chacha20poly1305 test case
+Date:   Wed, 25 Sep 2019 18:12:45 +0200
+Message-Id: <20190925161255.1871-9-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190925161255.1871-1-ard.biesheuvel@linaro.org>
 References: <20190925161255.1871-1-ard.biesheuvel@linaro.org>
@@ -85,147 +85,72 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Now that we have moved all the scratch buffers that must be allocated
-on the heap out of the request context, we can move the request context
-itself to the stack if we are instantiating a synchronous version of
-the chacha20poly1305 transformation. This allows users of the AEAD to
-allocate the request structure on the stack, removing the need for
-per-packet heap allocations on the en/decryption hot path.
+Add a test case to the RFC7539 (non-ESP) test vector array that
+exercises the newly added code path that may optimize away one
+invocation of the shash when the assoclen is a multiple of the
+Poly1305 block size.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- crypto/chacha20poly1305.c | 51 ++++++++++++--------
- 1 file changed, 32 insertions(+), 19 deletions(-)
+ crypto/testmgr.h | 45 ++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
 
-diff --git a/crypto/chacha20poly1305.c b/crypto/chacha20poly1305.c
-index 71496a8107f5..d171a0c9e837 100644
---- a/crypto/chacha20poly1305.c
-+++ b/crypto/chacha20poly1305.c
-@@ -49,13 +49,14 @@ struct chachapoly_req_ctx {
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index ef7d21f39d4a..5439b37f2b9f 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -18950,6 +18950,51 @@ static const struct aead_testvec rfc7539_tv_template[] = {
+ 			  "\x22\x39\x23\x36\xfe\xa1\x85\x1f"
+ 			  "\x38",
+ 		.clen	= 281,
++	}, {
++		.key	= "\x80\x81\x82\x83\x84\x85\x86\x87"
++			  "\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f"
++			  "\x90\x91\x92\x93\x94\x95\x96\x97"
++			  "\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f",
++		.klen	= 32,
++		.iv	= "\x07\x00\x00\x00\x40\x41\x42\x43"
++			  "\x44\x45\x46\x47",
++		.assoc	= "\x50\x51\x52\x53\xc0\xc1\xc2\xc3"
++			  "\xc4\xc5\xc6\xc7\x44\x45\x46\x47",
++		.alen	= 16,
++		.ptext	= "\x4c\x61\x64\x69\x65\x73\x20\x61"
++			  "\x6e\x64\x20\x47\x65\x6e\x74\x6c"
++			  "\x65\x6d\x65\x6e\x20\x6f\x66\x20"
++			  "\x74\x68\x65\x20\x63\x6c\x61\x73"
++			  "\x73\x20\x6f\x66\x20\x27\x39\x39"
++			  "\x3a\x20\x49\x66\x20\x49\x20\x63"
++			  "\x6f\x75\x6c\x64\x20\x6f\x66\x66"
++			  "\x65\x72\x20\x79\x6f\x75\x20\x6f"
++			  "\x6e\x6c\x79\x20\x6f\x6e\x65\x20"
++			  "\x74\x69\x70\x20\x66\x6f\x72\x20"
++			  "\x74\x68\x65\x20\x66\x75\x74\x75"
++			  "\x72\x65\x2c\x20\x73\x75\x6e\x73"
++			  "\x63\x72\x65\x65\x6e\x20\x77\x6f"
++			  "\x75\x6c\x64\x20\x62\x65\x20\x69"
++			  "\x74\x2e",
++		.plen	= 114,
++		.ctext	= "\xd3\x1a\x8d\x34\x64\x8e\x60\xdb"
++			  "\x7b\x86\xaf\xbc\x53\xef\x7e\xc2"
++			  "\xa4\xad\xed\x51\x29\x6e\x08\xfe"
++			  "\xa9\xe2\xb5\xa7\x36\xee\x62\xd6"
++			  "\x3d\xbe\xa4\x5e\x8c\xa9\x67\x12"
++			  "\x82\xfa\xfb\x69\xda\x92\x72\x8b"
++			  "\x1a\x71\xde\x0a\x9e\x06\x0b\x29"
++			  "\x05\xd6\xa5\xb6\x7e\xcd\x3b\x36"
++			  "\x92\xdd\xbd\x7f\x2d\x77\x8b\x8c"
++			  "\x98\x03\xae\xe3\x28\x09\x1b\x58"
++			  "\xfa\xb3\x24\xe4\xfa\xd6\x75\x94"
++			  "\x55\x85\x80\x8b\x48\x31\xd7\xbc"
++			  "\x3f\xf4\xde\xf0\x8e\x4b\x7a\x9d"
++			  "\xe5\x76\xd2\x65\x86\xce\xc6\x4b"
++			  "\x61\x16\xb3\xb8\x82\x76\x1f\x39"
++			  "\x35\x6f\x26\x8d\x28\x0f\xac\x45"
++			  "\x02\x5d",
++		.clen	= 130,
+ 	},
  };
  
- static inline void async_done_continue(struct aead_request *req, int err,
--				       int (*cont)(struct aead_request *))
-+				       int (*cont)(struct aead_request *,
-+						   struct chachapoly_req_ctx *))
- {
- 	if (!err) {
- 		struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
- 
- 		rctx->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
--		err = cont(req);
-+		err = cont(req, rctx);
- 	}
- 
- 	if (err != -EINPROGRESS && err != -EBUSY)
-@@ -74,11 +75,11 @@ static void chacha_iv(u8 *iv, struct aead_request *req, u32 icb)
- }
- 
- static int poly_generate_tag(struct aead_request *req, u8 *poly_tag,
--			     struct scatterlist *crypt)
-+			     struct scatterlist *crypt,
-+			     struct chachapoly_req_ctx *rctx)
- {
- 	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
- 	struct chachapoly_ctx *ctx = crypto_aead_ctx(tfm);
--	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
- 	u32 chacha_state[CHACHA_BLOCK_SIZE / sizeof(u32)];
- 	SHASH_DESC_ON_STACK(desc, ctx->poly);
- 	u8 poly_key[POLY1305_KEY_SIZE];
-@@ -148,13 +149,13 @@ static int poly_generate_tag(struct aead_request *req, u8 *poly_tag,
- 	return 0;
- }
- 
--static int poly_append_tag(struct aead_request *req)
-+static int poly_append_tag(struct aead_request *req,
-+			   struct chachapoly_req_ctx *rctx)
- {
--	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
- 	u8 poly_tag[POLY1305_DIGEST_SIZE];
- 	int err;
- 
--	err = poly_generate_tag(req, poly_tag, req->dst);
-+	err = poly_generate_tag(req, poly_tag, req->dst, rctx);
- 	if (err)
- 		return err;
- 
-@@ -171,12 +172,17 @@ static void chacha_encrypt_done(struct crypto_async_request *areq, int err)
- 
- static int chachapoly_encrypt(struct aead_request *req)
- {
--	struct chachapoly_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
--	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
-+	struct chachapoly_req_ctx stack_rctx CRYPTO_MINALIGN_ATTR;
-+	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
-+	struct chachapoly_ctx *ctx = crypto_aead_ctx(tfm);
-+	struct chachapoly_req_ctx *rctx = &stack_rctx;
- 	struct chacha_req *creq = &rctx->chacha;
- 	struct scatterlist *src, *dst;
- 	int err;
- 
-+	if (unlikely(crypto_aead_reqsize(tfm) > 0))
-+		rctx = aead_request_ctx(req);
-+
- 	rctx->cryptlen = req->cryptlen;
- 	rctx->flags = aead_request_flags(req);
- 
-@@ -200,7 +206,7 @@ static int chachapoly_encrypt(struct aead_request *req)
- 		return err;
- 
- skip:
--	return poly_append_tag(req);
-+	return poly_append_tag(req, rctx);
- }
- 
- static void chacha_decrypt_done(struct crypto_async_request *areq, int err)
-@@ -210,18 +216,23 @@ static void chacha_decrypt_done(struct crypto_async_request *areq, int err)
- 
- static int chachapoly_decrypt(struct aead_request *req)
- {
--	struct chachapoly_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
--	struct chachapoly_req_ctx *rctx = aead_request_ctx(req);
-+	struct chachapoly_req_ctx stack_rctx CRYPTO_MINALIGN_ATTR;
-+	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
-+	struct chachapoly_ctx *ctx = crypto_aead_ctx(tfm);
-+	struct chachapoly_req_ctx *rctx = &stack_rctx;
- 	struct chacha_req *creq = &rctx->chacha;
- 	u8 calculated_tag[POLY1305_DIGEST_SIZE];
- 	u8 provided_tag[POLY1305_DIGEST_SIZE];
- 	struct scatterlist *src, *dst;
- 	int err;
- 
-+	if (unlikely(crypto_aead_reqsize(tfm) > 0))
-+		rctx = aead_request_ctx(req);
-+
- 	rctx->cryptlen = req->cryptlen - POLY1305_DIGEST_SIZE;
- 	rctx->flags = aead_request_flags(req);
- 
--	err = poly_generate_tag(req, calculated_tag, req->src);
-+	err = poly_generate_tag(req, calculated_tag, req->src, rctx);
- 	if (err)
- 		return err;
- 	scatterwalk_map_and_copy(provided_tag, req->src,
-@@ -314,12 +325,14 @@ static int chachapoly_init(struct crypto_aead *tfm)
- 
- 	align = crypto_aead_alignmask(tfm);
- 	align &= ~(crypto_tfm_ctx_alignment() - 1);
--	crypto_aead_set_reqsize(
--		tfm,
--		align +
--		offsetof(struct chachapoly_req_ctx, chacha.req) +
--		sizeof(struct skcipher_request) +
--		crypto_skcipher_reqsize(chacha));
-+	if (crypto_aead_alignmask(tfm) > 0 ||
-+	    (crypto_aead_get_flags(tfm) & CRYPTO_ALG_ASYNC))
-+		crypto_aead_set_reqsize(
-+			tfm,
-+			align +
-+			offsetof(struct chachapoly_req_ctx, chacha.req) +
-+			sizeof(struct skcipher_request) +
-+			crypto_skcipher_reqsize(chacha));
- 
- 	return 0;
- }
 -- 
 2.20.1
 
