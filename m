@@ -4,58 +4,58 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84B52C432C2
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Sep 2019 16:14:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21A9FC4360D
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Sep 2019 16:14:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 583762146E
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Sep 2019 16:14:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ED3DE21D7F
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Sep 2019 16:14:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XRKs2NYw"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EoCQ8h10"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388451AbfIYQOP (ORCPT
+        id S2439511AbfIYQOS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 25 Sep 2019 12:14:15 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:44534 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388175AbfIYQOO (ORCPT
+        Wed, 25 Sep 2019 12:14:18 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:52610 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2439058AbfIYQOR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 25 Sep 2019 12:14:14 -0400
-Received: by mail-wr1-f65.google.com with SMTP id i18so7615066wru.11
-        for <linux-crypto@vger.kernel.org>; Wed, 25 Sep 2019 09:14:13 -0700 (PDT)
+        Wed, 25 Sep 2019 12:14:17 -0400
+Received: by mail-wm1-f68.google.com with SMTP id r19so4848968wmh.2
+        for <linux-crypto@vger.kernel.org>; Wed, 25 Sep 2019 09:14:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=0Jn67cgHpegjUHsejza3rXvNu+oyRcsIfVJ14lUdJdc=;
-        b=XRKs2NYw1E8U9jJNC8URLm1v/D0E45ZGzjruLuYncb+se4PRgodkTOSbJKomErYA8A
-         aBx3lV2el3sxyCNKIL4eXbNQPuR1xtPQ7AqCKcspizIUydpWF8XSp1d/12gAYylUfZkW
-         Vq2CGQalEf6bYg4NWNLgpr4GZbbJ3I7nj8HX65C6pUaO256ht0C6HhxLS98Arc0Bdtbf
-         t9NJmmRz17ZRwZ2KtyMCn2begsYmiEYQfixNVxYVzjqwsxv2xGCLr4vQAJz+w5NX5tiV
-         0aMtvtcgmSHOgQautTSanq/Mc/wFnViTtqZPwXuEVF+Ycc9wGZRGOk4F+AEA8/eJCIF0
-         qasQ==
+        bh=vpYX5apOE5ovWt54wDvLpgCFg3w7Y3yfqWQuF42X3Ys=;
+        b=EoCQ8h108o9ud79LK9qo/lEUOOMuQ+8osdvhOyjax1WhpI2184srTIyoMNIe740+DL
+         PUcEG2HHc8fCdWvJb0SSJwMZIKVyRKNTMVEsFB/8IU8VDms3Ne0Ef83bLBd2cjCrYtCR
+         SRjrANqSyHMKwUfeqL39Bkzo2NRv8UpRkVkvQL1q6pPRCeKZJ0h9J2+OnNwtpoZnCsk4
+         QZXfquoD3+tk/HriLcgx5buUFhjTYbb1OVamAfkLtzqaItM7tx+AGUk4nIO73VVcZS1E
+         j9+B+x5xSA4YGcEfUl9jsKx6VPygEvioFVenr5YkCjIlbkiIo9ejOO4tZXy3lJXs2H0N
+         lYqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=0Jn67cgHpegjUHsejza3rXvNu+oyRcsIfVJ14lUdJdc=;
-        b=Tom/C8XZ9BClAXDA4/5iq/ZUjoBr6n9Pqws0R1cBMoe1wHduoyGLYkI8njL9MLrSfL
-         Dj7/IC+u9yJEOFHyUgaBxWF5ky1al94kj2UT745bb90DuSu6cWKmBF53iX07QSEmR4PQ
-         z6lsqENrrQ3e3qip6VK5+3zEd2wy239/lmSXe5CoyUWmwvFumQXsPz9mEWf5Up5KBB2c
-         Kgn1LOV575JJDFeoAbyX6otUHsqIR5v/3QPtghC1KsGZb3/g0I0vLK/OC6fZ++kuOpHc
-         urlyVJGFYks66W6vwB51tuOoDwcg/+sbG/H2k/RMWscKHlX1Ht4NvKXl5l0r/iyuEi96
-         2AVg==
-X-Gm-Message-State: APjAAAXH6a0jrNednA2pWB2THuluQnzUywIItqg3z8UjK1tsEUs93yr9
-        QrLbph76jHgAPBeRKKn8ta4mFnfaKhF1tJ04
-X-Google-Smtp-Source: APXvYqxG3ZsPD1p2O9Mgdd9cJrxp7TwXatNXcNgf+8foDbIum7T7zIqBBIHsTAaJyjCie+BmcAs/Ug==
-X-Received: by 2002:adf:e908:: with SMTP id f8mr9903669wrm.210.1569428052551;
-        Wed, 25 Sep 2019 09:14:12 -0700 (PDT)
+        bh=vpYX5apOE5ovWt54wDvLpgCFg3w7Y3yfqWQuF42X3Ys=;
+        b=k5wksaYRRKX2rI9YElXe+8fbIyWv+Gmo4NAi2yeSx9g0ER9nsxCUpgkm2rXM2vy9Zz
+         Vp+NyiA0TG6F4ZO6Ns/dXK+imLjrugpe3idgaaBglQtSsa67S7zDSl9UDZQcsiWJzQp2
+         lnStIAAvPo+S+/r9cNitFo6H8R/kNrMtukuYLXwq084xd26ak7USAD89qcfaTOyw4RQT
+         6pjH7mA2pGBQQU4FzAw/zwisSvCfX1HRx6uWsPDjN2bMrCbXqG7pnzJftnrvTXb1Iz6p
+         2S3NzFBVPhg3GMR+w0LbNQiXCMcBK11p6oZDSt88DDwdU58xAW/7dvn10tcaSx+ybGO2
+         kM8A==
+X-Gm-Message-State: APjAAAUhL0QHJbJ1+dVGdn5kA2NFymLavKzpEidRS1vPTm4/8CpTfenx
+        1AvlRC+Lm9myNo/Zgc0f37XLVnJkESi2Y9ov
+X-Google-Smtp-Source: APXvYqwNRaBDeDani6z4F3/B9eCXG5mzVV5VhoPg/CU7b5DVTv+fWOO/iUVm1vGry6yb/vakYpaOYQ==
+X-Received: by 2002:a1c:7ed7:: with SMTP id z206mr9232689wmc.124.1569428054603;
+        Wed, 25 Sep 2019 09:14:14 -0700 (PDT)
 Received: from localhost.localdomain (laubervilliers-657-1-83-120.w92-154.abo.wanadoo.fr. [92.154.90.120])
-        by smtp.gmail.com with ESMTPSA id o70sm4991085wme.29.2019.09.25.09.14.11
+        by smtp.gmail.com with ESMTPSA id o70sm4991085wme.29.2019.09.25.09.14.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 Sep 2019 09:14:11 -0700 (PDT)
+        Wed, 25 Sep 2019 09:14:13 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     linux-arm-kernel@lists.infradead.org,
@@ -71,11 +71,10 @@ Cc:     linux-arm-kernel@lists.infradead.org,
         Eric Biggers <ebiggers@google.com>,
         Andy Lutomirski <luto@kernel.org>,
         Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Bruno Wolff III <bruno@wolff.to>
-Subject: [RFC PATCH 16/18] netlink: use new strict length types in policy for 5.2
-Date:   Wed, 25 Sep 2019 18:12:53 +0200
-Message-Id: <20190925161255.1871-17-ard.biesheuvel@linaro.org>
+        Catalin Marinas <catalin.marinas@arm.com>
+Subject: [RFC PATCH 17/18] wg switch to lib/crypto algos
+Date:   Wed, 25 Sep 2019 18:12:54 +0200
+Message-Id: <20190925161255.1871-18-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20190925161255.1871-1-ard.biesheuvel@linaro.org>
 References: <20190925161255.1871-1-ard.biesheuvel@linaro.org>
@@ -86,76 +85,61 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Taken from
-https://git.zx2c4.com/WireGuard/commit/src?id=3120425f69003be287cb2d308f89c7a6a0335ff0
-
-Reported-by: Bruno Wolff III <bruno@wolff.to>
 ---
- drivers/net/wireguard/netlink.c | 17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
+ drivers/net/Kconfig              | 6 +++---
+ drivers/net/wireguard/cookie.c   | 4 ++--
+ drivers/net/wireguard/messages.h | 6 +++---
+ 3 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/wireguard/netlink.c b/drivers/net/wireguard/netlink.c
-index 3763e8c14ea5..676d36725120 100644
---- a/drivers/net/wireguard/netlink.c
-+++ b/drivers/net/wireguard/netlink.c
-@@ -21,8 +21,8 @@ static struct genl_family genl_family;
- static const struct nla_policy device_policy[WGDEVICE_A_MAX + 1] = {
- 	[WGDEVICE_A_IFINDEX]		= { .type = NLA_U32 },
- 	[WGDEVICE_A_IFNAME]		= { .type = NLA_NUL_STRING, .len = IFNAMSIZ - 1 },
--	[WGDEVICE_A_PRIVATE_KEY]	= { .len = NOISE_PUBLIC_KEY_LEN },
--	[WGDEVICE_A_PUBLIC_KEY]		= { .len = NOISE_PUBLIC_KEY_LEN },
-+	[WGDEVICE_A_PRIVATE_KEY]	= { .type = NLA_EXACT_LEN, .len = NOISE_PUBLIC_KEY_LEN },
-+	[WGDEVICE_A_PUBLIC_KEY]		= { .type = NLA_EXACT_LEN, .len = NOISE_PUBLIC_KEY_LEN },
- 	[WGDEVICE_A_FLAGS]		= { .type = NLA_U32 },
- 	[WGDEVICE_A_LISTEN_PORT]	= { .type = NLA_U16 },
- 	[WGDEVICE_A_FWMARK]		= { .type = NLA_U32 },
-@@ -30,12 +30,12 @@ static const struct nla_policy device_policy[WGDEVICE_A_MAX + 1] = {
- };
+diff --git a/drivers/net/Kconfig b/drivers/net/Kconfig
+index c26aef673538..3bd4dc662392 100644
+--- a/drivers/net/Kconfig
++++ b/drivers/net/Kconfig
+@@ -77,9 +77,9 @@ config WIREGUARD
+ 	depends on IPV6 || !IPV6
+ 	select NET_UDP_TUNNEL
+ 	select DST_CACHE
+-	select ZINC_CHACHA20POLY1305
+-	select ZINC_BLAKE2S
+-	select ZINC_CURVE25519
++	select CRYPTO_LIB_CHACHA20POLY1305
++	select CRYPTO_LIB_BLAKE2S
++	select CRYPTO_LIB_CURVE25519
+ 	help
+ 	  WireGuard is a secure, fast, and easy to use replacement for IPSec
+ 	  that uses modern cryptography and clever networking tricks. It's
+diff --git a/drivers/net/wireguard/cookie.c b/drivers/net/wireguard/cookie.c
+index bd23a14ff87f..104b739c327f 100644
+--- a/drivers/net/wireguard/cookie.c
++++ b/drivers/net/wireguard/cookie.c
+@@ -10,8 +10,8 @@
+ #include "ratelimiter.h"
+ #include "timers.h"
  
- static const struct nla_policy peer_policy[WGPEER_A_MAX + 1] = {
--	[WGPEER_A_PUBLIC_KEY]				= { .len = NOISE_PUBLIC_KEY_LEN },
--	[WGPEER_A_PRESHARED_KEY]			= { .len = NOISE_SYMMETRIC_KEY_LEN },
-+	[WGPEER_A_PUBLIC_KEY]				= { .type = NLA_EXACT_LEN, .len = NOISE_PUBLIC_KEY_LEN },
-+	[WGPEER_A_PRESHARED_KEY]			= { .type = NLA_EXACT_LEN, .len = NOISE_SYMMETRIC_KEY_LEN },
- 	[WGPEER_A_FLAGS]				= { .type = NLA_U32 },
--	[WGPEER_A_ENDPOINT]				= { .len = sizeof(struct sockaddr) },
-+	[WGPEER_A_ENDPOINT]				= { .type = NLA_MIN_LEN, .len = sizeof(struct sockaddr) },
- 	[WGPEER_A_PERSISTENT_KEEPALIVE_INTERVAL]	= { .type = NLA_U16 },
--	[WGPEER_A_LAST_HANDSHAKE_TIME]			= { .len = sizeof(struct __kernel_timespec) },
-+	[WGPEER_A_LAST_HANDSHAKE_TIME]			= { .type = NLA_EXACT_LEN, .len = sizeof(struct __kernel_timespec) },
- 	[WGPEER_A_RX_BYTES]				= { .type = NLA_U64 },
- 	[WGPEER_A_TX_BYTES]				= { .type = NLA_U64 },
- 	[WGPEER_A_ALLOWEDIPS]				= { .type = NLA_NESTED },
-@@ -44,7 +44,7 @@ static const struct nla_policy peer_policy[WGPEER_A_MAX + 1] = {
+-#include <zinc/blake2s.h>
+-#include <zinc/chacha20poly1305.h>
++#include <crypto/blake2s.h>
++#include <crypto/chacha20poly1305.h>
  
- static const struct nla_policy allowedip_policy[WGALLOWEDIP_A_MAX + 1] = {
- 	[WGALLOWEDIP_A_FAMILY]		= { .type = NLA_U16 },
--	[WGALLOWEDIP_A_IPADDR]		= { .len = sizeof(struct in_addr) },
-+	[WGALLOWEDIP_A_IPADDR]		= { .type = NLA_MIN_LEN, .len = sizeof(struct in_addr) },
- 	[WGALLOWEDIP_A_CIDR_MASK]	= { .type = NLA_U8 }
- };
+ #include <net/ipv6.h>
+ #include <crypto/algapi.h>
+diff --git a/drivers/net/wireguard/messages.h b/drivers/net/wireguard/messages.h
+index 3cfd1c5e9b02..4bbb1f97af04 100644
+--- a/drivers/net/wireguard/messages.h
++++ b/drivers/net/wireguard/messages.h
+@@ -6,9 +6,9 @@
+ #ifndef _WG_MESSAGES_H
+ #define _WG_MESSAGES_H
  
-@@ -591,12 +591,10 @@ static const struct genl_ops genl_ops[] = {
- 		.start = wg_get_device_start,
- 		.dumpit = wg_get_device_dump,
- 		.done = wg_get_device_done,
--		.policy = device_policy,
- 		.flags = GENL_UNS_ADMIN_PERM
- 	}, {
- 		.cmd = WG_CMD_SET_DEVICE,
- 		.doit = wg_set_device,
--		.policy = device_policy,
- 		.flags = GENL_UNS_ADMIN_PERM
- 	}
- };
-@@ -608,6 +606,7 @@ static struct genl_family genl_family __ro_after_init = {
- 	.version = WG_GENL_VERSION,
- 	.maxattr = WGDEVICE_A_MAX,
- 	.module = THIS_MODULE,
-+	.policy = device_policy,
- 	.netnsok = true
- };
+-#include <zinc/curve25519.h>
+-#include <zinc/chacha20poly1305.h>
+-#include <zinc/blake2s.h>
++#include <crypto/blake2s.h>
++#include <crypto/chacha20poly1305.h>
++#include <crypto/curve25519.h>
  
+ #include <linux/kernel.h>
+ #include <linux/param.h>
 -- 
 2.20.1
 
