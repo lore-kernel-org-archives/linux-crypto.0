@@ -2,273 +2,144 @@ Return-Path: <SRS0=nVSz=XV=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18E7DC4360C
-	for <linux-crypto@archiver.kernel.org>; Thu, 26 Sep 2019 12:26:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60BB9C4360C
+	for <linux-crypto@archiver.kernel.org>; Thu, 26 Sep 2019 12:35:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E1C3921D56
-	for <linux-crypto@archiver.kernel.org>; Thu, 26 Sep 2019 12:26:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2A884222BE
+	for <linux-crypto@archiver.kernel.org>; Thu, 26 Sep 2019 12:35:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gKZY6OH5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726010AbfIZM0f (ORCPT
+        id S1726077AbfIZMfK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 26 Sep 2019 08:26:35 -0400
-Received: from inva021.nxp.com ([92.121.34.21]:38354 "EHLO inva021.nxp.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725787AbfIZM0e (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 26 Sep 2019 08:26:34 -0400
-Received: from inva021.nxp.com (localhost [127.0.0.1])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 6A1F020057A;
-        Thu, 26 Sep 2019 14:26:32 +0200 (CEST)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 5BA9C200565;
-        Thu, 26 Sep 2019 14:26:32 +0200 (CEST)
-Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 06B77205E3;
-        Thu, 26 Sep 2019 14:26:31 +0200 (CEST)
-From:   Iuliana Prodan <iuliana.prodan@nxp.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-imx <linux-imx@nxp.com>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>
-Subject: [PATCH v2] crypto: caam - use mapped_{src,dst}_nents for descriptor
-Date:   Thu, 26 Sep 2019 15:26:29 +0300
-Message-Id: <1569500789-7443-1-git-send-email-iuliana.prodan@nxp.com>
-X-Mailer: git-send-email 2.1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+        Thu, 26 Sep 2019 08:35:10 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:33818 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726001AbfIZMfK (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 26 Sep 2019 08:35:10 -0400
+Received: by mail-wr1-f68.google.com with SMTP id a11so2585923wrx.1
+        for <linux-crypto@vger.kernel.org>; Thu, 26 Sep 2019 05:35:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ireY1yMCPk29SNDGqM5QiuQBHqF0oJp5y0+v+RNIhtA=;
+        b=gKZY6OH5LIkgVMOtNK+O5JyGGQ8XxAbRa90jbbI0RFUyuVkx9+6rOCCjXPQ/WNQoGM
+         ic+a9U03U5v8G5b9INspx9IF5jVh2l8UN8uoJEAKRRmILw+7XfSAMEAFMmFn06RbidLG
+         8lXmYacZ13j/F4cMBnxTEtNwri7BuilbhmSmSMP1Mjl6y3QOKoU1J4BvOr1Lq2I4E3pF
+         1X4ECecESJwu5ANhALxm64LejzMLeWTWXEJVYEh9up7PXTn3CHDjDOtlsM4BYy+uMrlI
+         iQjsrv9u3P7j4W3BIRasmG4wiqNekFfnTD9DYrARfLLfYmwX2YlrMOOg1QTX6KsrB7Hm
+         YUJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ireY1yMCPk29SNDGqM5QiuQBHqF0oJp5y0+v+RNIhtA=;
+        b=UaZpK6BZ+Vs/Sr+vgATpY55lLtPz+/MSHsiKIsBfr4jV+vBG8p5khGCSpZHvLrtcQe
+         00xAmilZxaq//pC+cGkzMIAVpdf5Zj1hA0nrr5nvomaKdjJW8Z9NuzYQ/ccOx2TcpiCX
+         Ze1OH8yf/5sSgvfaUvecr4gNrK4iROqwCroAWCzX75GtVZRG9JaBIEPbkK3+zkkmxv3j
+         O0jp7YulmLfX8lJlTpnpC4cLtEo01sjxrUI8cdv5Nlngsj+pQ0C3o1tNvs1aEOnzHJQS
+         l7KUhOUhn3ifbIYysDph/ziC0uIRwJq5M2lUGWK4WnPLz5gKMcYnzO3bolTZoXwfpGKH
+         49HA==
+X-Gm-Message-State: APjAAAV04nfL9r3UVaZusu5dGa/6QhjVYyEfTyZge1COP5YZu6qIBkW4
+        NhRvsC8BIv4bpi1sCnamibovq7unGrw1MqJQW2N1rA==
+X-Google-Smtp-Source: APXvYqxSAFn3hpu7g5o1mCuFFiuYM++BftjSOklvARmfgvUNocjxi4xwNIC60YPTkP9aTyIb9AE1yukHr0va/jLxvMk=
+X-Received: by 2002:a5d:6a81:: with SMTP id s1mr2392154wru.246.1569501307760;
+ Thu, 26 Sep 2019 05:35:07 -0700 (PDT)
+MIME-Version: 1.0
+References: <20190925161255.1871-1-ard.biesheuvel@linaro.org>
+ <20190925161255.1871-19-ard.biesheuvel@linaro.org> <CAHk-=wjYsbxSiV_XKWV3BwGvau_hUvQiQHLOoc7vLUZt0Wqzfw@mail.gmail.com>
+ <CAKv+Gu_YOqvqJ4YC=ixBh-v4fiFTFNpEagHiTRU7Oq4PrhJPkw@mail.gmail.com>
+In-Reply-To: <CAKv+Gu_YOqvqJ4YC=ixBh-v4fiFTFNpEagHiTRU7Oq4PrhJPkw@mail.gmail.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Thu, 26 Sep 2019 14:34:56 +0200
+Message-ID: <CAKv+Gu8JxmU_8byEun17B2d9LjQpR0wRJktUfr-Oax0q4if6Dg@mail.gmail.com>
+Subject: Re: [RFC PATCH 18/18] net: wireguard - switch to crypto API for
+ packet encryption
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Eric Biggers <ebiggers@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The mapped_{src,dst}_nents _returned_ from the dma_map_sg
-call (which could be less than src/dst_nents) have to be
-used to generate the job descriptors.
+On Thu, 26 Sep 2019 at 13:06, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+>
+> On Thu, 26 Sep 2019 at 00:15, Linus Torvalds
+> <torvalds@linux-foundation.org> wrote:
+> >
+> > On Wed, Sep 25, 2019 at 9:14 AM Ard Biesheuvel
+> > <ard.biesheuvel@linaro.org> wrote:
+> > >
+> > > Replace the chacha20poly1305() library calls with invocations of the
+> > > RFC7539 AEAD, as implemented by the generic chacha20poly1305 template.
+> >
+> > Honestly, the other patches look fine to me from what I've seen (with
+> > the small note I had in a separate email for 11/18), but this one I
+> > consider just nasty, and a prime example of why people hate those
+> > crypto lookup routines.
+> >
+> > Some of it is just the fundamental and pointless silly indirection,
+> > that just makes things harder to read, less efficient, and less
+> > straightforward.
+> >
+> > That's exemplified by this part of the patch:
+> >
+> > >  struct noise_symmetric_key {
+> > > -       u8 key[NOISE_SYMMETRIC_KEY_LEN];
+> > > +       struct crypto_aead *tfm;
+> >
+> > which is just one of those "we know what we want and we just want to
+> > use it directly" things, and then the crypto indirection comes along
+> > and makes that simple inline allocation of a small constant size
+> > (afaik it is CHACHA20POLY1305_KEY_SIZE, which is 32) be another
+> > allocation entirely.
+> >
+> > And it's some random odd non-typed thing too, so then you have that
+> > silly and stupid dynamic allocation using a name lookup:
+> >
+> >    crypto_alloc_aead("rfc7539(chacha20,poly1305)", 0, CRYPTO_ALG_ASYNC);
+> >
+> > to create what used to be (and should be) a simple allocation that was
+> > has a static type and was just part of the code.
+> >
+>
+> That crypto_alloc_aead() call does a lot of things under the hood:
+> - use an existing instantiation of rfc7539(chacha20,poly1305) if available,
+> - look for modules that implement the whole transformation directly,
+> - if none are found, instantiate the rfc7539 template, which will
+> essentially do the above for chacha20 and poly1305, potentially using
+> per-arch accelerated implementations if available (for either), or
+> otherwise, fall back to the generic versions.
+>
+> What *I* see as the issue here is not that we need to do this at all,
+> but that we have to do it for each value of the key. IMO, it would be
+> much better to instantiate this thing only once, and have a way of
+> passing a per-request key into it, permitting us to hide the whole
+> thing behind the existing library interface.
+>
 
-Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
----
-Changes since v1:
-- updated, with mapped_{src,dst}_nents, the set_rsa_pub_pdb, set_rsa_priv_f{1,2,3}_pdb functions.
----
- drivers/crypto/caam/caampkc.c | 72 +++++++++++++++++++++++--------------------
- drivers/crypto/caam/caampkc.h |  8 +++--
- 2 files changed, 45 insertions(+), 35 deletions(-)
-
-diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.c
-index 83f96d4..6619c51 100644
---- a/drivers/crypto/caam/caampkc.c
-+++ b/drivers/crypto/caam/caampkc.c
-@@ -252,9 +252,9 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
- 	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
- 		       GFP_KERNEL : GFP_ATOMIC;
- 	int sg_flags = (flags == GFP_ATOMIC) ? SG_MITER_ATOMIC : 0;
--	int sgc;
- 	int sec4_sg_index, sec4_sg_len = 0, sec4_sg_bytes;
- 	int src_nents, dst_nents;
-+	int mapped_src_nents, mapped_dst_nents;
- 	unsigned int diff_size = 0;
- 	int lzeros;
- 
-@@ -285,13 +285,27 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
- 				     req_ctx->fixup_src_len);
- 	dst_nents = sg_nents_for_len(req->dst, req->dst_len);
- 
--	if (!diff_size && src_nents == 1)
-+	mapped_src_nents = dma_map_sg(dev, req_ctx->fixup_src, src_nents,
-+				      DMA_TO_DEVICE);
-+	if (unlikely(!mapped_src_nents)) {
-+		dev_err(dev, "unable to map source\n");
-+		return ERR_PTR(-ENOMEM);
-+	}
-+	mapped_dst_nents = dma_map_sg(dev, req->dst, dst_nents,
-+				      DMA_FROM_DEVICE);
-+	if (unlikely(!mapped_dst_nents)) {
-+		dev_err(dev, "unable to map destination\n");
-+		goto src_fail;
-+	}
-+
-+	if (!diff_size && mapped_src_nents == 1)
- 		sec4_sg_len = 0; /* no need for an input hw s/g table */
- 	else
--		sec4_sg_len = src_nents + !!diff_size;
-+		sec4_sg_len = mapped_src_nents + !!diff_size;
- 	sec4_sg_index = sec4_sg_len;
--	if (dst_nents > 1)
--		sec4_sg_len += pad_sg_nents(dst_nents);
-+
-+	if (mapped_dst_nents > 1)
-+		sec4_sg_len += pad_sg_nents(mapped_dst_nents);
- 	else
- 		sec4_sg_len = pad_sg_nents(sec4_sg_len);
- 
-@@ -301,19 +315,7 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
- 	edesc = kzalloc(sizeof(*edesc) + desclen + sec4_sg_bytes,
- 			GFP_DMA | flags);
- 	if (!edesc)
--		return ERR_PTR(-ENOMEM);
--
--	sgc = dma_map_sg(dev, req_ctx->fixup_src, src_nents, DMA_TO_DEVICE);
--	if (unlikely(!sgc)) {
--		dev_err(dev, "unable to map source\n");
--		goto src_fail;
--	}
--
--	sgc = dma_map_sg(dev, req->dst, dst_nents, DMA_FROM_DEVICE);
--	if (unlikely(!sgc)) {
--		dev_err(dev, "unable to map destination\n");
- 		goto dst_fail;
--	}
- 
- 	edesc->sec4_sg = (void *)edesc + sizeof(*edesc) + desclen;
- 	if (diff_size)
-@@ -324,7 +326,7 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
- 		sg_to_sec4_sg_last(req_ctx->fixup_src, req_ctx->fixup_src_len,
- 				   edesc->sec4_sg + !!diff_size, 0);
- 
--	if (dst_nents > 1)
-+	if (mapped_dst_nents > 1)
- 		sg_to_sec4_sg_last(req->dst, req->dst_len,
- 				   edesc->sec4_sg + sec4_sg_index, 0);
- 
-@@ -335,6 +337,9 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
- 	if (!sec4_sg_bytes)
- 		return edesc;
- 
-+	edesc->mapped_src_nents = mapped_src_nents;
-+	edesc->mapped_dst_nents = mapped_dst_nents;
-+
- 	edesc->sec4_sg_dma = dma_map_single(dev, edesc->sec4_sg,
- 					    sec4_sg_bytes, DMA_TO_DEVICE);
- 	if (dma_mapping_error(dev, edesc->sec4_sg_dma)) {
-@@ -351,11 +356,11 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcipher_request *req,
- 	return edesc;
- 
- sec4_sg_fail:
--	dma_unmap_sg(dev, req->dst, dst_nents, DMA_FROM_DEVICE);
-+	kfree(edesc);
- dst_fail:
--	dma_unmap_sg(dev, req_ctx->fixup_src, src_nents, DMA_TO_DEVICE);
-+	dma_unmap_sg(dev, req->dst, dst_nents, DMA_FROM_DEVICE);
- src_fail:
--	kfree(edesc);
-+	dma_unmap_sg(dev, req_ctx->fixup_src, src_nents, DMA_TO_DEVICE);
- 	return ERR_PTR(-ENOMEM);
- }
- 
-@@ -383,15 +388,15 @@ static int set_rsa_pub_pdb(struct akcipher_request *req,
- 		return -ENOMEM;
- 	}
- 
--	if (edesc->src_nents > 1) {
-+	if (edesc->mapped_src_nents > 1) {
- 		pdb->sgf |= RSA_PDB_SGF_F;
- 		pdb->f_dma = edesc->sec4_sg_dma;
--		sec4_sg_index += edesc->src_nents;
-+		sec4_sg_index += edesc->mapped_src_nents;
- 	} else {
- 		pdb->f_dma = sg_dma_address(req_ctx->fixup_src);
- 	}
- 
--	if (edesc->dst_nents > 1) {
-+	if (edesc->mapped_dst_nents > 1) {
- 		pdb->sgf |= RSA_PDB_SGF_G;
- 		pdb->g_dma = edesc->sec4_sg_dma +
- 			     sec4_sg_index * sizeof(struct sec4_sg_entry);
-@@ -428,17 +433,18 @@ static int set_rsa_priv_f1_pdb(struct akcipher_request *req,
- 		return -ENOMEM;
- 	}
- 
--	if (edesc->src_nents > 1) {
-+	if (edesc->mapped_src_nents > 1) {
- 		pdb->sgf |= RSA_PRIV_PDB_SGF_G;
- 		pdb->g_dma = edesc->sec4_sg_dma;
--		sec4_sg_index += edesc->src_nents;
-+		sec4_sg_index += edesc->mapped_src_nents;
-+
- 	} else {
- 		struct caam_rsa_req_ctx *req_ctx = akcipher_request_ctx(req);
- 
- 		pdb->g_dma = sg_dma_address(req_ctx->fixup_src);
- 	}
- 
--	if (edesc->dst_nents > 1) {
-+	if (edesc->mapped_dst_nents > 1) {
- 		pdb->sgf |= RSA_PRIV_PDB_SGF_F;
- 		pdb->f_dma = edesc->sec4_sg_dma +
- 			     sec4_sg_index * sizeof(struct sec4_sg_entry);
-@@ -493,17 +499,17 @@ static int set_rsa_priv_f2_pdb(struct akcipher_request *req,
- 		goto unmap_tmp1;
- 	}
- 
--	if (edesc->src_nents > 1) {
-+	if (edesc->mapped_src_nents > 1) {
- 		pdb->sgf |= RSA_PRIV_PDB_SGF_G;
- 		pdb->g_dma = edesc->sec4_sg_dma;
--		sec4_sg_index += edesc->src_nents;
-+		sec4_sg_index += edesc->mapped_src_nents;
- 	} else {
- 		struct caam_rsa_req_ctx *req_ctx = akcipher_request_ctx(req);
- 
- 		pdb->g_dma = sg_dma_address(req_ctx->fixup_src);
- 	}
- 
--	if (edesc->dst_nents > 1) {
-+	if (edesc->mapped_dst_nents > 1) {
- 		pdb->sgf |= RSA_PRIV_PDB_SGF_F;
- 		pdb->f_dma = edesc->sec4_sg_dma +
- 			     sec4_sg_index * sizeof(struct sec4_sg_entry);
-@@ -582,17 +588,17 @@ static int set_rsa_priv_f3_pdb(struct akcipher_request *req,
- 		goto unmap_tmp1;
- 	}
- 
--	if (edesc->src_nents > 1) {
-+	if (edesc->mapped_src_nents > 1) {
- 		pdb->sgf |= RSA_PRIV_PDB_SGF_G;
- 		pdb->g_dma = edesc->sec4_sg_dma;
--		sec4_sg_index += edesc->src_nents;
-+		sec4_sg_index += edesc->mapped_src_nents;
- 	} else {
- 		struct caam_rsa_req_ctx *req_ctx = akcipher_request_ctx(req);
- 
- 		pdb->g_dma = sg_dma_address(req_ctx->fixup_src);
- 	}
- 
--	if (edesc->dst_nents > 1) {
-+	if (edesc->mapped_dst_nents > 1) {
- 		pdb->sgf |= RSA_PRIV_PDB_SGF_F;
- 		pdb->f_dma = edesc->sec4_sg_dma +
- 			     sec4_sg_index * sizeof(struct sec4_sg_entry);
-diff --git a/drivers/crypto/caam/caampkc.h b/drivers/crypto/caam/caampkc.h
-index 2c488c9..c68fb4c 100644
---- a/drivers/crypto/caam/caampkc.h
-+++ b/drivers/crypto/caam/caampkc.h
-@@ -112,8 +112,10 @@ struct caam_rsa_req_ctx {
- 
- /**
-  * rsa_edesc - s/w-extended rsa descriptor
-- * @src_nents     : number of segments in input scatterlist
-- * @dst_nents     : number of segments in output scatterlist
-+ * @src_nents     : number of segments in input s/w scatterlist
-+ * @dst_nents     : number of segments in output s/w scatterlist
-+ * @mapped_src_nents: number of segments in input h/w link table
-+ * @mapped_dst_nents: number of segments in output h/w link table
-  * @sec4_sg_bytes : length of h/w link table
-  * @sec4_sg_dma   : dma address of h/w link table
-  * @sec4_sg       : pointer to h/w link table
-@@ -123,6 +125,8 @@ struct caam_rsa_req_ctx {
- struct rsa_edesc {
- 	int src_nents;
- 	int dst_nents;
-+	int mapped_src_nents;
-+	int mapped_dst_nents;
- 	int sec4_sg_bytes;
- 	dma_addr_t sec4_sg_dma;
- 	struct sec4_sg_entry *sec4_sg;
--- 
-2.1.0
-
+Note that we don't have to do the whole dance for each new value of
+the key: subsequent invocations will all succeed at step #1, and grab
+the existing instantiation, but allocate a new TFM structure that
+refers to it. It is this step that we should be able to omit as well
+if the API is changed to allow per-request keys to be passed in via
+the request structure.
