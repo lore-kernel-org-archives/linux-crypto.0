@@ -2,132 +2,323 @@ Return-Path: <SRS0=nVSz=XV=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B61D1C432C2
-	for <linux-crypto@archiver.kernel.org>; Thu, 26 Sep 2019 08:46:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90DE7C432C2
+	for <linux-crypto@archiver.kernel.org>; Thu, 26 Sep 2019 09:06:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7E81E222BE
-	for <linux-crypto@archiver.kernel.org>; Thu, 26 Sep 2019 08:46:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 57541206B7
+	for <linux-crypto@archiver.kernel.org>; Thu, 26 Sep 2019 09:06:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="s7XNIa5t"
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="iTX3QD6w"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726038AbfIZIqM (ORCPT
+        id S1728552AbfIZJGM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 26 Sep 2019 04:46:12 -0400
-Received: from mail-eopbgr140087.outbound.protection.outlook.com ([40.107.14.87]:17488
-        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725890AbfIZIqM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 26 Sep 2019 04:46:12 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jgrcChpzB+9ZPKsI2ZGt8xVQ/GtokTWijIp/dmG6btwhtanwkLqtbu7RbW5sP5gK53j9nY7rnpHvddgoI5+PbSMwCBkTXfqcAYRGqfmGKyVCB9OcOSFMCGAHMuhj5KuuxlAYHrs+quXyApNEKiwa+hiBbJ9WV3CywciMHzkqxsFD8r0gmRi+9Xc6twnrG3Cgoonf3Xfc0NW3C/p+WYdtIBdaJzZAdm7BsPNmo3NZwfIw50/nkDDX7vHwYi1zJfasSkyZAAqqid9P+Jex4ckaZTDssjuKL7dISykZgw/m56DLjYcUCZCxd5GnfGAFojxVshlIEMAO13dL8uA2+wbD2A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FKBg3xVT5WYxa8yreXdCOOqJaeLIACB7fvKdfE82aYI=;
- b=GTfkZIvqjNcHYJAELDzD5Wmm7m5BdwE24+XnIFw/zxK1HoGMaD/drj7tORMvWNINEYvrLWSCLgNzRtKGoxX4rt5zeoTaGGa7wR433isxrRbG/BS1r/u2mMk2e48sGRdJL5DvvLRT+kOzFLbsE5fYDAz/pSm28C6cpg1u3djyB/PiNrLVF/L4Fo+8JOxquDeiUbcAyjQMNcbGVq0tEKgXwnZ9xE81KmmsCUfym81tx+dvD7GvWJPMlrdgSl0fhKFhIbaYL3qMbTrZGyFF7iXuAgu/PFluaX+E+IdDtcnPRmXowLYR+pyfmBP9Nyil0Vd82JCucV1YEfqPrw0c6U6ypg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FKBg3xVT5WYxa8yreXdCOOqJaeLIACB7fvKdfE82aYI=;
- b=s7XNIa5tSumW9yK8cs6zlI8QPPNF75jxfOYPxP9/zrcaHf0yadChzeftgUoOhAW4gW1tCZo3JSVSp2VT44fBjEEZuo4P3WA13PgxsFmbc+ekHuDmpgDLJ+tGQ6epksBJHa5UJT8YXgfQ7PhEwAxL8Q4UDAVhqvjB7nwTUMZ6Gbk=
-Received: from VI1PR04MB4445.eurprd04.prod.outlook.com (20.177.55.161) by
- VI1PR04MB4430.eurprd04.prod.outlook.com (20.177.55.158) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2305.15; Thu, 26 Sep 2019 08:46:08 +0000
-Received: from VI1PR04MB4445.eurprd04.prod.outlook.com
- ([fe80::b0fb:6d6d:1cf1:1e8d]) by VI1PR04MB4445.eurprd04.prod.outlook.com
- ([fe80::b0fb:6d6d:1cf1:1e8d%4]) with mapi id 15.20.2305.013; Thu, 26 Sep 2019
- 08:46:08 +0000
-From:   Iuliana Prodan <iuliana.prodan@nxp.com>
-To:     Horia Geanta <horia.geanta@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>
-CC:     "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>
-Subject: Re: [PATCH] crypto: caam - use mapped_{src,dst}_nents for descriptor
-Thread-Topic: [PATCH] crypto: caam - use mapped_{src,dst}_nents for descriptor
-Thread-Index: AQHVc6HVRilcPP2scEWFlBN1yop6QA==
-Date:   Thu, 26 Sep 2019 08:46:08 +0000
-Message-ID: <VI1PR04MB4445C876D859CE81028D23728C860@VI1PR04MB4445.eurprd04.prod.outlook.com>
-References: <1569416676-21810-1-git-send-email-iuliana.prodan@nxp.com>
- <VI1PR0402MB348551336691838632965ADA98860@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=iuliana.prodan@nxp.com; 
-x-originating-ip: [212.146.100.6]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 7819120a-5e24-4792-bab9-08d7425df994
-x-ms-office365-filtering-ht: Tenant
-x-ms-traffictypediagnostic: VI1PR04MB4430:|VI1PR04MB4430:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <VI1PR04MB44309144C603EF407E9C23708C860@VI1PR04MB4430.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:962;
-x-forefront-prvs: 0172F0EF77
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(346002)(366004)(396003)(39860400002)(136003)(376002)(189003)(199004)(54906003)(44832011)(14454004)(6436002)(256004)(25786009)(476003)(486006)(33656002)(478600001)(4744005)(7696005)(14444005)(86362001)(26005)(2906002)(81156014)(66066001)(55016002)(8676002)(9686003)(446003)(6506007)(53546011)(76176011)(81166006)(66476007)(52536014)(6246003)(6116002)(3846002)(102836004)(229853002)(5660300002)(8936002)(4326008)(99286004)(186003)(66946007)(66556008)(66446008)(7736002)(64756008)(76116006)(71190400001)(71200400001)(91956017)(316002)(74316002)(305945005)(110136005)(6636002)(142933001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR04MB4430;H:VI1PR04MB4445.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ApOMSmRHF0e2rLrD7EWI3ND0rtuFyojjBMjCBIYE5YuWNk6i7hqsiTxdftq7I2tzMzq3nipiwJf/Ua115/gOTqkqpRgbuzDLPcRIQ8DYmgYURmlrhq8juD6f8OPqO3bTinNTQWHwKspLpB4oZ/0Vy05VsYrWbCat6BtMaNZSFMh3IhevZ4K6Ju+hU1iNucjI71Na+ssjfqRD+vY3aEYraRovOatbvh3oMxfQPSM2xVWAKwOQHa5wCGM32s0kCU5S2bOB6wPmqDZhgBRU12zS2tYbJDPnJGNFiI5z87KaG2yR2dHf0I+jMt9ZUM3QUwc1WivCZSqDa8gPiJYw3eAZypIpdpcWE2FNmOG+bxsZegR7brqXaFXFFKfWW1Ng1+dI9RG8EuyESufoodGkbi7rnd8ED2xBO2xmgs01sbkOF4k=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Thu, 26 Sep 2019 05:06:12 -0400
+Received: from frisell.zx2c4.com ([192.95.5.64]:32909 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726151AbfIZJGM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 26 Sep 2019 05:06:12 -0400
+X-Greylist: delayed 400 seconds by postgrey-1.27 at vger.kernel.org; Thu, 26 Sep 2019 05:06:11 EDT
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 50fc4b0d
+        for <linux-crypto@vger.kernel.org>;
+        Thu, 26 Sep 2019 08:13:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
+        :references:in-reply-to:from:date:message-id:subject:to:cc
+        :content-type:content-transfer-encoding; s=mail; bh=C/a/ScbtsuAo
+        2usQTTTVSlNKZCA=; b=iTX3QD6wIlmCveL3eRyySI76IJdz6ppm5S2uFtA7DXYA
+        Vchg4FKmg2zXHnGe+FoXwPm/jK8d1dWzZeVCxVCZSyn+64OJuX6MLTVApldhUnyy
+        mGtK2CSDVp5R2syEKaQ6HY367Y/NtipTZ/OGsOfX1iPHVl+N+aUxbTzhrJQ7mxun
+        CA6GHoJ+M/H8pFw9xDXS3UU7LI8MkHIJRGzBiL5BnDSzFvaJiXWsExotF4dd4WsJ
+        7u9k9ySI3zfG286G6SWLf43MM1D8UmbHS/FuGqq96+JQDMMvXt7ibEgbRxwxR+we
+        0bbZKtJGWj5gH5GzwUVXqbgZlIsMAqf/+DYvv1XbZw==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 31ad2ec8 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO)
+        for <linux-crypto@vger.kernel.org>;
+        Thu, 26 Sep 2019 08:13:37 +0000 (UTC)
+Received: by mail-ot1-f48.google.com with SMTP id f21so1291395otl.13
+        for <linux-crypto@vger.kernel.org>; Thu, 26 Sep 2019 01:59:28 -0700 (PDT)
+X-Gm-Message-State: APjAAAVsxcHC7XUGxPvE4jl8je/PObcsL4uQrS8WGP1vCiFlI0lT6pKx
+        okHRnrWH3g0o4Y//irUxyIATYUnd4LIzhs3Ap7U=
+X-Google-Smtp-Source: APXvYqyO5UX9X3fiYBRFcC2tw9W9x7GeBspCy9izcw06vv1rMPrTR+YDmz6QiN2+ZG6bOYzjiY5GguC0/H4oCQ3jCkY=
+X-Received: by 2002:a9d:65d2:: with SMTP id z18mr1860027oth.52.1569488366735;
+ Thu, 26 Sep 2019 01:59:26 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7819120a-5e24-4792-bab9-08d7425df994
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Sep 2019 08:46:08.1111
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: sjo7jPm7y5PCOP6tPwfQ1wVnZvCdoW0IvyvtzLrYg1FypLrGTNhIdzhuDJnKsJ8Ql/U5Sqb3YD2z1blsL7iEgA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB4430
+References: <20190925161255.1871-1-ard.biesheuvel@linaro.org>
+In-Reply-To: <20190925161255.1871-1-ard.biesheuvel@linaro.org>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Thu, 26 Sep 2019 10:59:14 +0200
+X-Gmail-Original-Message-ID: <CAHmME9oDhnv7aX77oEERof0TGihk4mDe9B_A3AntaTTVsg9aoA@mail.gmail.com>
+Message-ID: <CAHmME9oDhnv7aX77oEERof0TGihk4mDe9B_A3AntaTTVsg9aoA@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/18] crypto: wireguard using the existing crypto API
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Eric Biggers <ebiggers@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 9/26/2019 10:17 AM, Horia Geanta wrote:=0A=
-> On 9/25/2019 4:04 PM, Iuliana Prodan wrote:=0A=
->> @@ -428,17 +433,18 @@ static int set_rsa_priv_f1_pdb(struct akcipher_req=
-uest *req,=0A=
->>   		return -ENOMEM;=0A=
->>   	}=0A=
->>   =0A=
->> -	if (edesc->src_nents > 1) {=0A=
->> +	if (edesc->mapped_src_nents > 1) {=0A=
->>   		pdb->sgf |=3D RSA_PRIV_PDB_SGF_G;=0A=
->>   		pdb->g_dma =3D edesc->sec4_sg_dma;=0A=
->> -		sec4_sg_index +=3D edesc->src_nents;=0A=
->> +		sec4_sg_index +=3D edesc->mapped_src_nents;=0A=
->> +=0A=
->>   	} else {=0A=
->>   		struct caam_rsa_req_ctx *req_ctx =3D akcipher_request_ctx(req);=0A=
->>   =0A=
->>   		pdb->g_dma =3D sg_dma_address(req_ctx->fixup_src);=0A=
->>   	}=0A=
->>   =0A=
->> -	if (edesc->dst_nents > 1) {=0A=
->> +	if (edesc->mapped_dst_nents > 1) {=0A=
->>   		pdb->sgf |=3D RSA_PRIV_PDB_SGF_F;=0A=
->>   		pdb->f_dma =3D edesc->sec4_sg_dma +=0A=
->>   			     sec4_sg_index * sizeof(struct sec4_sg_entry);=0A=
-> AFAICS there are a few other places besides set_rsa_priv_f1_pdb=0A=
-> that should be updated:=0A=
-> 	set_rsa_pub_pdb=0A=
-> 	set_rsa_priv_f2_pdb=0A=
-> 	set_rsa_priv_f3_pdb=0A=
-> Yes, right! I'll update them in v2.=0A=
-=0A=
-Thanks,=0A=
-Iulia=0A=
+ Hi Ard,
+
+Thanks for taking the initiative on this. When I first discussed with
+DaveM porting WireGuard to the crypto API and doing Zinc later
+yesterday, I thought to myself, =E2=80=9CI wonder if Ard might want to work=
+ on
+this with me=E2=80=A6=E2=80=9D and sent you a message on IRC. It didn=E2=80=
+=99t occur to me
+that you were the one who had pushed this endeavor!
+
+I must admit, though, I=E2=80=99m a bit surprised to see how it=E2=80=99s a=
+ppearing.
+When I wrote [1], I had really imagined postponing the goals of Zinc
+entirely, and instead writing a small shim that calls into the
+existing crypto API machinery. I imagined the series to look like
+this:
+
+1. Add blake2s generic as a crypto API shash object.
+2. Add blake2s x86_64 as a crypto API shash object.
+3. Add curve25519 generic as a crypto API dh object.
+4. Add curve25519 x86_64 as a crypto API dh object.
+5. Add curve25519 arm as a crypto API dh object.
+6. The unmodified WireGuard commit.
+7. A =E2=80=9Ccryptoapi.c=E2=80=9D file for WireGuard that provides definit=
+ions of the
+=E2=80=9Cjust functions=E2=80=9D approach of Zinc, but does so in terms of =
+the crypto
+API=E2=80=99s infrastructure, with global per-cpu lists and a few locks to
+handle quick buffer and tfm reuse.
+
+I wouldn=E2=80=99t expect (7) to be pretty, for the various reasons that mo=
+st
+people dislike the crypto API, but at least it would somewhat =E2=80=9Cwork=
+=E2=80=9D,
+not affect the general integrity of WireGuard, and provide a clear
+path forward in an evolutionary manner for gradually, piecemeal,
+swapping out pieces of that for a Zinc-like thing, however that winds
+up appearing.
+
+Instead what we=E2=80=99ve wound up with in this series is a Frankenstein=
+=E2=80=99s
+monster of Zinc, which appears to have basically the same goal as
+Zinc, and even much of the same implementation just moved to a
+different directory, but then skimps on making it actually work well
+and introduces problems. (I=E2=80=99ll elucidate on some specific issues la=
+ter
+in this email so that we can get on the same page with regards to
+security requirements for WireGuard.) I surmise from this Zinc-but-not
+series is that what actually is going on here is mostly some kind of
+power or leadership situation, which is what you=E2=80=99ve described to me
+also at various other points and in person. I also recognize that I am
+at least part way to blame for whatever dynamic there has stagnated
+this process; let me try to rectify that:
+
+A principle objection you=E2=80=99ve had is that Zinc moves to its own
+directory, with its own name, and tries to segment itself off from the
+rest of the crypto API=E2=80=99s infrastructure. You=E2=80=99ve always felt=
+ this
+should be mixed in with the rest of the crypto API=E2=80=99s infrastructure
+and directory structures in one way or another. Let=E2=80=99s do both of th=
+ose
+things =E2=80=93 put this in a directory structure you find appropriate and
+hook this into the rest of the crypto API=E2=80=99s infrastructure in a way
+you find appropriate. I might disagree, which is why Zinc does things
+the way it does, but I=E2=80=99m open to compromise and doing things more y=
+our
+way.
+
+Another objection you=E2=80=99ve had is that Zinc replaces many existing
+implementations with its own. Martin wasn=E2=80=99t happy about that either=
+.
+So let=E2=80=99s not do that, and we=E2=80=99ll have some wholesale replace=
+ment of
+implementations in future patchsets at future dates discussed and
+benched and bikeshedded independently from this.
+
+Finally, perhaps most importantly, Zinc=E2=80=99s been my design rather tha=
+n
+our design. Let=E2=80=99s do this together instead of me git-send-email(1)-=
+ing
+a v37.
+
+If the process of doing that together will be fraught with difficulty,
+I=E2=80=99m still open to the =E2=80=9C7 patch series=E2=80=9D with the ugl=
+y cryptoapi.c
+approach, as described at the top. But I think if we start with Zinc
+and whittle it down in accordance with the above, we=E2=80=99ll get somethi=
+ng
+mutually acceptable, and somewhat similar to this series, with a few
+important exceptions, which illustrate some of the issues I see in
+this RFC:
+
+Issue 1) No fast implementations for the =E2=80=9Cit=E2=80=99s just functio=
+ns=E2=80=9D interface.
+
+This is a deal breaker. I know you disagree here and perhaps think all
+dynamic dispatch should be by loadable modules configured with
+userspace policy and lots of function pointers and dynamically
+composable DSL strings, as the current crypto API does it. But I think
+a lot of other people agree with me here (and they=E2=80=99ve chimed in
+before) that the branch predictor does things better, doesn=E2=80=99t have
+Spectre issues, and is very simple to read and understand. For
+reference, here=E2=80=99s what that kind of thing looks like: [2].
+
+In this case, the relevance is that the handshake in WireGuard is
+extremely performance sensitive, in order to fend off DoS. One of the
+big design gambits in WireGuard is =E2=80=93 can we make it 1-RTT to reduce
+the complexity of the state machine, but keep the crypto efficient
+enough that this is still safe to do from a DoS perspective. The
+protocol succeeds at this goal, but in many ways, just by a hair when
+at scale, and so I=E2=80=99m really quite loathe to decrease handshake
+performance. Here=E2=80=99s where that matters specifically:
+
+- Curve25519 does indeed always appear to be taking tiny 32 byte stack
+inputs in WireGuard. However, your statement, =E2=80=9Cthe fact that they
+operate on small, fixed size buffers means that there is really no
+point in providing alternative, SIMD based implementations of these,
+and we can limit ourselves to generic C library version,=E2=80=9D is just
+plain wrong in this case. Curve25519 only ever operates on 32 byte
+inputs, because these represent curve scalars and points. It=E2=80=99s not
+like a block cipher where parallelism helps with larger inputs or
+something. In this case, there are some pretty massive speed
+improvements between the generic C implementations and the optimized
+ones. Like huge. On both ARM and on Intel. And Curve25519 is the most
+expensive operation in WireGuard, and each handshake message invokes a
+few of them. (Aside - Something to look forward to: I=E2=80=99m in the proc=
+ess
+of getting a formally verified x86_64 ADX implementation ready for
+kernel usage, to replace our existing heavily-fuzzed one, which will
+be cool.)
+
+- Blake2s actually does benefit from the optimized code even for
+relatively short inputs. While you might have been focused on the
+super-super small inputs in noise.c, there are slightly larger ones in
+cookie.c, and these are the most sensitive computations to make in
+terms of DoS resistance; they=E2=80=99re on the =E2=80=9Cfront lines=E2=80=
+=9D of the battle,
+if you will. (Aside - Arguably WireGuard may have benefited from using
+siphash with 128-bit outputs here, or calculated some security metrics
+for DoS resistance in the face of forged 64-bit outputs or something,
+or a different custom MAC, but hindsight is 20/20.)
+
+- While 25519 and Blake2s are already in use, the optimized versions
+of ChaPoly wind up being faster as well, even if it=E2=80=99s just hitting =
+the
+boring SSE code.
+
+- On MIPS, the optimized versions of ChaPoly are a necessity. They=E2=80=99=
+re
+boring integer/scalar code, but they do things that the compiler
+simply cannot do on the platform and we benefit immensely from it.
+
+Taken together, we simply can=E2=80=99t skimp on the implementations availa=
+ble
+on the handshake layer, so we=E2=80=99ll need to add some form of
+implementation selection, whether it=E2=80=99s the method Zinc uses ([2]), =
+or
+something else we cook up together.
+
+Issue 2) Linus=E2=80=99 objection to the async API invasion is more correct
+than he realizes.
+
+I could re-enumerate my objections to the API there, but I think we
+all get it. It=E2=80=99s horrendous looking. Even the introduction of the
+ivpad member (what on earth?) in the skb cb made me shutter. But
+there=E2=80=99s actually another issue at play:
+
+wg_noise_handshake_begin_session=E2=86=92derive_keys=E2=86=92symmetric_key_=
+init is all
+part of the handshake. We cannot afford to allocate a brand new crypto
+object, parse the DSL string, connect all those function pointers,
+etc. The allocations involved here aren=E2=80=99t really okay at all in tha=
+t
+path. That=E2=80=99s why the cryptoapi.c idea above involves just using a p=
+ool
+of pre-allocated objects if we=E2=80=99re going to be using that API at all=
+.
+Also keep in mind that WireGuard instances sometimes have hundreds of
+thousands of peers.
+
+I=E2=80=99d recommend leaving this synchronous as it exists now, as Linus
+suggested, and we can revisit that later down the road. There are a
+number of improvements to the async API we could make down the line
+that could make this viable in WireGuard. For example, I could imagine
+decoupling the creation of the cipher object from its keys and
+intermediate buffers, so that we could in fact allocate the cipher
+objects with their DSLs globally in a safe way, while allowing the
+keys and working buffers to come from elsewhere. This is deep plumbing
+into the async API, but I think we could get there in time.
+
+There=E2=80=99s also a degree of practicality: right now there is zero ChaP=
+oly
+async acceleration hardware anywhere that would fit into the crypto
+API. At some point, it might come to exist and have incredible
+performance, and then we=E2=80=99ll both feel very motivated to make this w=
+ork
+for WireGuard. But it might also not come to be (AES seems to have won
+over most of the industry), in which case, why hassle?
+
+Issue 3) WireGuard patch is out of date.
+
+This is my fault, because I haven=E2=80=99t posted in a long time. There ar=
+e
+some important changes in the main WireGuard repo. I=E2=80=99ll roll anothe=
+r
+patch soon for this so we have something recent to work off of. Sorry
+about that.
+
+Issue 4) FPU register batching?
+
+When I introduced the simd_get/simd_put/simd_relax thing, people
+seemed to think it was a good idea. My benchmarks of it showed
+significant throughput improvements. Your patchset doesn=E2=80=99t have
+anything similar to this. But on the other hand, last I spoke with the
+x86 FPU guys, I thought they might actually be in the process of
+making simd_get/put obsolete with some internal plumbing to make
+restoration lazier. I=E2=80=99ll see tglx later today and will poke him abo=
+ut
+this, as this might already be a non-issue.
+
+
+So given the above, how would you like to proceed? My personal
+preference would be to see you start with the Zinc patchset and rename
+things and change the infrastructure to something that fits your
+preferences, and we can see what that looks like. Less appealing would
+be to do several iterations of you reworking Zinc from scratch and
+going through the exercises all over again, but if you prefer that I
+guess I could cope. Alternatively, maybe this is a lot to chew on, and
+we should just throw caution into the wind, implement cryptoapi.c for
+WireGuard (as described at the top), and add C functions to the crypto
+API sometime later? This is what I had envisioned in [1].
+
+And for the avoidance of doubt, or in case any of the above message
+belied something different, I really am happy and relieved to have an
+opportunity to work on this _with you_, and I am much more open than
+before to compromise and finding practical solutions to the past
+political issues. Also, if you=E2=80=99re into chat, we can always spec som=
+e
+of the nitty-gritty aspects out over IRC or even the old-fashioned
+telephone. Thanks again for pushing this forward.
+
+Regards,
+Jason
+
+[1] https://lore.kernel.org/wireguard/CAHmME9pmfZAp5zd9BDLFc2fWUhtzZcjYZc2a=
+tTPTyNFFmEdHLg@mail.gmail.com/
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/zx2c4/linux.git/tree/li=
+b/zinc/chacha20/chacha20-x86_64-glue.c?h=3Djd/wireguard#n54
