@@ -2,136 +2,299 @@ Return-Path: <SRS0=nVSz=XV=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13BD2C4360C
-	for <linux-crypto@archiver.kernel.org>; Thu, 26 Sep 2019 20:04:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ED88C4360C
+	for <linux-crypto@archiver.kernel.org>; Thu, 26 Sep 2019 20:47:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C82AF21A4A
-	for <linux-crypto@archiver.kernel.org>; Thu, 26 Sep 2019 20:04:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DF9BD22459
+	for <linux-crypto@archiver.kernel.org>; Thu, 26 Sep 2019 20:47:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="cyyGk0ii"
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="1LHJ9pk2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727801AbfIZUE1 (ORCPT
+        id S1728839AbfIZUra (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 26 Sep 2019 16:04:27 -0400
-Received: from mail-eopbgr680089.outbound.protection.outlook.com ([40.107.68.89]:56131
-        "EHLO NAM04-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727764AbfIZUE0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 26 Sep 2019 16:04:26 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FFkhT+UHcgLNf/ZiY8XUvWO5ZKL2CLXhWaYk7spXBk++oy2ohOvM8dkZ7hweUv5LZKPDNgguqEPGXUYQOlM4Hf1xCJtrtwMAPIo96ME4wIkjxMIJD5geqWhk3DF8XkBT8pToEwQ4SYzKT09U4dlZw6A4Yaq6D/zXDzWeeenhGPmPzBVfvHeczWQvwQzkMhHWeyYQezGHt053BSOWICXtbVURsxzEIJqrkVctUhGceQs6Os6ffexRZw0binIQW/GgnziKuk8lcGlAuwaAXAxtBgg5ihXuDLyPasl1tN725Nvyv+6JqmRs4Y6t5Wovk9T+tqmpvAInquBQxVS2oVHzjQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yN7H4kF9fnFzUL7DYbDhV8hxDXUlAWxLIvhZxA5FAZ0=;
- b=XyGZU06RqG0Jb2hKUhJg1Dhko4ZoWK8dZ1le7IDKdFFdZRsChRMPTM/i3ZcJg+Zhxl7+9JrAWpsDUZjJ/S20cH/Vj1nv6QgcAK1Z99YQBguxgx3b6wDaOt3ewv9e66N2gvBWSKqCHVEO8V2hGCvOXvaH6U99Mt9x14GBhaclxRUdYf/CUbpFURHeg5g9DK9jHu7zqF9YvujcKmWRzeo8utCXD48+w1ArVyghY1suaT3qjw9bJ9S4uOfLg4MV6kdqHEC50TqKEc/qMSqGdeOUOqygcovjXGco6Ipk88JTJBgNK01CP3NjVbnqUPiZHYN5jakb604ujBBFhW5q2V8OZQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=verimatrix.com; dmarc=pass action=none
- header.from=verimatrix.com; dkim=pass header.d=verimatrix.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yN7H4kF9fnFzUL7DYbDhV8hxDXUlAWxLIvhZxA5FAZ0=;
- b=cyyGk0iieudjYyWSKcnpRMUH38APEc4qk0s5JOM8ZrmokXIpWJjg70RsftZob+PvzJKnMiRh0vvktRwsjjQZeb893rht2bh53nbDeTwCRsf52nLhSUXiY6kwUzGcHtTcM40FcfmephjYovZ461LB3wIqxGHSCfiqSaQK4bMatM8=
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.146) by
- MN2PR20MB3213.namprd20.prod.outlook.com (52.132.175.86) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2305.17; Thu, 26 Sep 2019 20:04:22 +0000
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::6d07:5f09:97bf:c717]) by MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::6d07:5f09:97bf:c717%7]) with mapi id 15.20.2305.017; Thu, 26 Sep 2019
- 20:04:22 +0000
-From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-CC:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: RE: Chacha-Poly performance on ARM64
-Thread-Topic: Chacha-Poly performance on ARM64
-Thread-Index: AdV0eUDF0FX1qai/QZmAhLVFbJDbJQAAboIAAAplBMA=
-Date:   Thu, 26 Sep 2019 20:04:22 +0000
-Message-ID: <MN2PR20MB2973BB95E110A30A314C59E3CA860@MN2PR20MB2973.namprd20.prod.outlook.com>
-References: <MN2PR20MB2973C550AC7337ED85B874D8CA860@MN2PR20MB2973.namprd20.prod.outlook.com>
- <CAKv+Gu86tW4hw7b3iMDt6U6HnUcf1BWRAcGK8O3xtSj_hdmdQQ@mail.gmail.com>
-In-Reply-To: <CAKv+Gu86tW4hw7b3iMDt6U6HnUcf1BWRAcGK8O3xtSj_hdmdQQ@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pvanleeuwen@verimatrix.com; 
-x-originating-ip: [188.204.2.113]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 2d8a84d9-8993-49a0-9a98-08d742bcb940
-x-ms-traffictypediagnostic: MN2PR20MB3213:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <MN2PR20MB3213D52B2D66C1C0FA5BE133CA860@MN2PR20MB3213.namprd20.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-forefront-prvs: 0172F0EF77
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(346002)(39850400004)(366004)(376002)(396003)(136003)(13464003)(189003)(199004)(33656002)(14454004)(66066001)(86362001)(446003)(74316002)(11346002)(486006)(305945005)(71200400001)(71190400001)(99286004)(26005)(7696005)(102836004)(186003)(6116002)(6506007)(53546011)(2906002)(5660300002)(52536014)(7736002)(476003)(25786009)(6916009)(316002)(478600001)(66946007)(66476007)(66556008)(64756008)(8676002)(66446008)(76116006)(81166006)(81156014)(8936002)(76176011)(3846002)(15974865002)(9686003)(55016002)(6436002)(229853002)(256004)(4326008)(6246003)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB3213;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: verimatrix.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: No9Verx5lKDlMLZL19OgvtKdkCEARgPYBADBhyP7DAklcaJ3TnxjqmE1QGZlBpZ7T1ezT+CtcRPlr/0A7ZMFcBX5Hn5s3FDdXiprKOBSQXCbUPRC/8Gxb4kUSCZC+QYFXEe69KXYVAa2tEi9bSFwPKh6u3HYLxzPmepx5DuLmLdr/Hrf7OpT19QnUjB3ljsNqAqTjm4cJdAPGq6jS1roRAy5z9OteU7XmodVp/soCyZj3zImiVk9uyKqOr0jitN04SO6xI2LJVpCWkUTiATQhcZf7YhPd6wL+9WEmgCGQJ1Kr5NbgJ+djWj/2RqT8KD6LVYSK+9aqGWCpZKdKrOi3rSCU5bF/bSqaVV62oOIv01LjZMyFaLqEHr0g5QcHVADYJIToJYZBqUpv1yxAPRF/PBw75CWI1iZVHjMYB3GxXQ=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Thu, 26 Sep 2019 16:47:30 -0400
+Received: from frisell.zx2c4.com ([192.95.5.64]:38001 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728816AbfIZUra (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 26 Sep 2019 16:47:30 -0400
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 8ceefd07
+        for <linux-crypto@vger.kernel.org>;
+        Thu, 26 Sep 2019 20:01:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
+        :references:in-reply-to:from:date:message-id:subject:to:cc
+        :content-type:content-transfer-encoding; s=mail; bh=odjmu8NOWxa0
+        KFPPRUgXVTFrz7c=; b=1LHJ9pk2cud5unKkdy4Ch7E3MUvcT4Qq2cqsr1bUWVO4
+        acRbOgHdKoDcxSOCr51EquVlpHiLbHoJC9JZLiFN6FT/Qv+gHvgGkns/g8aIicQ+
+        WBb3Pdhn/NgwdNZuwklCXbvObg/Hxy1l9LDx4x4JOCe/7sNilWDIsaVI20D0w+HG
+        gz5SslToNHthbfzGqPuN9CDCIdn5fnV91CdwZTQ1iEKxRW43zmu8Z3OZdFgb+eQj
+        Zv6OMvPVapAgMTMUXur8PPKApKjzm9e5URWaxEK5NtQ1qHgImOdvdJkdtXezaZqt
+        6aEYE3L9SlqEhmBJjwE6zLOZI5JvqBPdfdrncWs/QQ==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 1677263e (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO)
+        for <linux-crypto@vger.kernel.org>;
+        Thu, 26 Sep 2019 20:01:32 +0000 (UTC)
+Received: by mail-oi1-f177.google.com with SMTP id t84so3316315oih.10
+        for <linux-crypto@vger.kernel.org>; Thu, 26 Sep 2019 13:47:26 -0700 (PDT)
+X-Gm-Message-State: APjAAAU1V4GWSkXAwTgaKDgGS311qEBwEXRMShYLWPnvliyOh+svMHmF
+        uSmJSMIYeFLh2rw3pY4MuJlN4tlXBqIFhwWqRfg=
+X-Google-Smtp-Source: APXvYqwmbUdvvol/2cgZvnoKGoii6bLsYJQ67wnVSYO8QGeHSpQ4UZu0wAYgIJcmM01RDSC9slpe0YuBzWlUX7yCrIE=
+X-Received: by 2002:a05:6808:b0d:: with SMTP id s13mr4315089oij.52.1569530845135;
+ Thu, 26 Sep 2019 13:47:25 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: verimatrix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2d8a84d9-8993-49a0-9a98-08d742bcb940
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Sep 2019 20:04:22.1570
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ok/XuK5293Fjun/4DOip+P5JU49keK5Q4oeHaKLW9X63nusM5qAIBEvLlCMaVhL2r15x77tD+imEvm+2ugymp7T3YFRsp9hKxLQjreL4MUM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB3213
+References: <20190925161255.1871-1-ard.biesheuvel@linaro.org>
+ <CAHmME9oDhnv7aX77oEERof0TGihk4mDe9B_A3AntaTTVsg9aoA@mail.gmail.com> <CAKv+Gu-RLRhwDahgvfvr2J9R+3GPM6vh4mjO73VcekusdzbuMA@mail.gmail.com>
+In-Reply-To: <CAKv+Gu-RLRhwDahgvfvr2J9R+3GPM6vh4mjO73VcekusdzbuMA@mail.gmail.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Thu, 26 Sep 2019 22:47:12 +0200
+X-Gmail-Original-Message-ID: <CAHmME9rKFUvsQ6hhsKjxxVSnyNQsTaqBKGABoHibCiCBmfxCOA@mail.gmail.com>
+Message-ID: <CAHmME9rKFUvsQ6hhsKjxxVSnyNQsTaqBKGABoHibCiCBmfxCOA@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/18] crypto: wireguard using the existing crypto API
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Eric Biggers <ebiggers@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBcmQgQmllc2hldXZlbCA8YXJk
-LmJpZXNoZXV2ZWxAbGluYXJvLm9yZz4NCj4gU2VudDogVGh1cnNkYXksIFNlcHRlbWJlciAyNiwg
-MjAxOSA0OjU5IFBNDQo+IFRvOiBQYXNjYWwgVmFuIExlZXV3ZW4gPHB2YW5sZWV1d2VuQHZlcmlt
-YXRyaXguY29tPg0KPiBDYzogTGludXggQ3J5cHRvIE1haWxpbmcgTGlzdCA8bGludXgtY3J5cHRv
-QHZnZXIua2VybmVsLm9yZz4NCj4gU3ViamVjdDogUmU6IENoYWNoYS1Qb2x5IHBlcmZvcm1hbmNl
-IG9uIEFSTTY0DQo+IA0KPiBPbiBUaHUsIDI2IFNlcCAyMDE5IGF0IDE2OjU1LCBQYXNjYWwgVmFu
-IExlZXV3ZW4NCj4gPHB2YW5sZWV1d2VuQHZlcmltYXRyaXguY29tPiB3cm90ZToNCj4gPg0KPiA+
-IEhpLA0KPiA+DQo+ID4gSSdtIGN1cnJlbnRseSBkb2luZyBzb21lIHBlcmZvcm1hbmNlIGJlbmNo
-bWFya2luZyBvbiBhIHF1YWQgY29yZSBDb3J0ZXgNCj4gPiBBNzIgKE1hY2NoaWF0b2JpbiBkZXYg
-Ym9hcmQpIGZvciByZmM3NTM5ZXNwIChDaGFjaGFQb2x5KSBhbmQgdGhlDQo+ID4gcmVsYXRpdmVs
-eSBsb3cgcGVyZm9ybWFuY2Uga2luZCBvZiB0b29rIG1lIGJ5IHN1cnByaXNlLCBjb25zaWRlcmlu
-ZyBob3cNCj4gPiBldmVyeW9uZSAga2VlcHMgc2hvdXRpbmcgaG93IGVmZmljaWVudCBDaGFjaGEt
-UG9seSBpcyBpbiBzb2Z0d2FyZSBvbg0KPiA+IG1vZGVybiBDUFUncy4NCj4gPg0KPiA+IFRoZW4g
-SSBub3RpY2VkIHRoYXQgaXQgd2FzIHVzaW5nIGNoYWNoYTIwLWdlbmVyaWMgZm9yIHRoZSBlbmNy
-eXB0DQo+ID4gZGlyZWN0aW9uLCB3aGlsZSBhIGNoYWNoYTIwLW5lb24gaW1wbGVtZW50YXRpb24g
-ZXhpc3RzIChpdCBhY3R1YWxseQ0KPiA+IERPRVMgdXNlIHRoYXQgb25lIGZvciBkZWNyeXB0aW9u
-KS4gV2h5IHdvdWxkIHRoYXQgYmU/DQo+ID4NCj4gPiBBbHNvLCBpdCBhbHNvIHVzZXMgcG9seTEz
-MDUtZ2VuZXJpYyBpbiBib3RoIGNhc2VzLiBJcyB0aGF0IHRoZSBiZXN0DQo+ID4gcG9zc2libGUg
-b24gQVJNNjQ/IEkgZGlkIGEgcXVpY2sgc2VhcmNoIGluIHRoZSBjb2RlYmFzZSBidXQgY291bGRu
-J3QNCj4gPiBmaW5kIGFueSBBUk02NCBvcHRpbWl6ZWQgdmVyc2lvbiAuLi4NCj4gPg0KPiANCj4g
-VGhlIFBvbHkxMzA1IGltcGxlbWVudGF0aW9uIGlzIHBhcnQgb2YgdGhlIDE4IHBpZWNlIFdpcmVH
-dWFyZCBzZXJpZXMgSQ0KPiBqdXN0IHNlbnQgb3V0IHllc3RlcmRheSAod2hpY2ggSSBrbm93IHlv
-dSBoYXZlIHNlZW4gOi0pKQ0KPiANCkkndmUgc2VlbiB0aGUgc2VyaWVzIGJ1dCBJIG11c3QgaGF2
-ZSBtaXNzZWQgdGhhdCBkZXRhaWwuIEkgaGFkIGh1bmNoIHlvdQ0Kd291bGQgYmUgdGhlIG9uZSB3
-b3JraW5nIG9uIGl0IHRob3VnaCA6LSkgSSdsbCBsb29rIGl0IHVwIGFuZCB0cnkgaXQgDQp0b21v
-cnJvdy4NCg0KPiBUaGUgQ2hhY2hhMjAgY29kZSBzaG91bGQgYmUgdXNlZCBpbiBwcmVmZXJlbmNl
-IHRvIHRoZSBnZW5lcmljIGNvZGUsIHNvDQo+IGlmIHlvdSBlbmQgdXAgd2l0aCB0aGUgd3Jvbmcg
-dmVyc2lvbiwgdGhlcmUncyBhIGJ1ZyBzb21ld2hlcmUgd2UgbmVlZA0KPiB0byBmaXguDQo+IA0K
-WWVzLCBJIHRoaW5rIHNvIHRvby4gSW4gZmFjdCwgSSB0aGluayBpdCBtYXkgYmUgdGhlIHNhbWUg
-YnVnIEkgcmVwb3J0ZWQNCmVhcmxpZXIgcmVnYXJkaW5nIHRoZSBzZWxmdGVzdHMsIHdoZXJlIGl0
-IGFsc28gdW5leHBlY3RlZGx5IHBpY2tlZCB0aGUNCmdlbmVyaWMgaW1wbGVtZW50YXRpb24uIElJ
-UkMgdGhlIHJlc3BvbnNlIEkgZ290IGJhY2sgd2FzIHRoYXQgdGhpcyB3YXMNCmEga25vd24gaXNz
-dWUgd2hlcmUgZm9yIHRoZSB2ZXJ5IGZpcnN0IHVzZSBvZiBhIGNpcGhlciwgdGhlIGdlbmVyaWMg
-DQppbXBsZW1lbnRhdGlvbiBnZXRzIGNob3NlbiBpbnN0ZWFkIG9mIHRoZSBvcHRpbWFsIG9uZS4g
-SSBndWVzcyBubyBvbmUNCmhhcyBsb29rZWQgaW50byB0aGF0IHlldCAuLi4NCg0KPiBBbHNvLCBo
-b3cgZG8geW91IGtub3cgd2hpY2ggZGlyZWN0aW9uIHVzZXMgd2hpY2ggdHJhbnNmb3JtPyANCj4N
-CldlbGwsIHRjcnlwdCBqdXN0IGxvZ3MgdGhhdCB0byB0aGUgbWVzc2FnZSBsb2cuDQoNCj4gV2hh
-dCBhcmUgdGhlIHJlZmNvdW50cyBmb3IgdGhlIHRyYW5zZm9ybXMgaW4gL3Byb2MvY3J5cHRvPw0K
-Pg0KQWxsIHJlZmNudCdzIGluIC9wcm9jL2NyeXB0byBhcmUgMS4NCg0KUmVnYXJkcywNClBhc2Nh
-bCB2YW4gTGVldXdlbg0KU2lsaWNvbiBJUCBBcmNoaXRlY3QsIE11bHRpLVByb3RvY29sIEVuZ2lu
-ZXMgQCBWZXJpbWF0cml4DQp3d3cuaW5zaWRlc2VjdXJlLmNvbQ0K
+Hi Ard,
+
+On Thu, Sep 26, 2019 at 2:07 PM Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
+> attitude goes counter to that, and this is why we have made so little
+> progress over the past year.
+
+I also just haven't submitted much in the past year, taking a bit of a
+break to see how things would settle. Seemed like rushing things
+wasn't prudent, so I slowed down.
+
+> But I am happy with your willingness to collaborate and find common
+> ground, which was also my motivation for spending a considerable
+> amount of time to prepare this patch set.
+
+Super.
+
+> > If the process of doing that together will be fraught with difficulty,
+> > I=E2=80=99m still open to the =E2=80=9C7 patch series=E2=80=9D with the=
+ ugly cryptoapi.c
+> > approach, as described at the top.
+>
+> If your aim is to write ugly code and use that as a munition
+
+No, this is not a matter of munition at all. Please take my words
+seriously; I am entirely genuine here. Three people I greatly respect
+made a very compelling argument to me, prompting the decision in [1].
+The argument was that trying to fix the crypto layer AND trying to get
+WireGuard merged at the same time was ambitious and crazy. Maybe
+instead, they argued, I should just use the old crypto API, get
+WireGuard in, and then begin the Zinc process after. I think
+procedurally, that's probably good advice, and the people I was
+talking to seemed to have a really firm grasp on what works and what
+doesn't in the mainlining process. Now it's possible their judgement
+is wrong, but I really am open, in earnest, to following it. And the
+way that would look would be not trying to fix the crypto API now,
+getting WireGuard in based on whatever we can cobble together based on
+the current foundations with some intermediate file (cryptoapi.c in my
+previous email) to prevent it from infecting WireGuard. This isn't
+"munition"; it's a serious proposal.
+
+The funny thing, though, is that all the while I was under the
+impression somebody had figured out a great way to do this, it turns
+out you were busy with basically Zinc-but-not. So we're back to square
+one: you and I both want the crypto API to change, and now we have to
+figure out a way forward together on how to do this, prompting my last
+email to you, indicating that I was open to all sorts of compromises.
+However, I still remain fully open to following the prior suggestion,
+of not doing that at all right now, and instead basing this on the
+existing crypto API as-is.
+
+[1] https://lore.kernel.org/wireguard/CAHmME9pmfZAp5zd9BDLFc2fWUhtzZcjYZc2a=
+tTPTyNFFmEdHLg@mail.gmail.com/
+
+> > reference, here=E2=80=99s what that kind of thing looks like: [2].
+>
+> This is one of the issues in the 'fix it for everyone else as well'
+> category. If we can improve the crypto API to be less susceptible to
+> these issues (e.g., using static calls), everybody benefits. I'd be
+> happy to collaborate on that.
+
+Good. I'm happy to learn that you're all for having fast
+implementations that underlie the simple function calls.
+
+> > Taken together, we simply can=E2=80=99t skimp on the implementations av=
+ailable
+> > on the handshake layer, so we=E2=80=99ll need to add some form of
+> > implementation selection, whether it=E2=80=99s the method Zinc uses ([2=
+]), or
+> > something else we cook up together.
+>
+> So are you saying that the handshake timing constraints in the
+> WireGuard protocol are so stringent that we can't run it securely on,
+> e.g., an ARM CPU that lacks a NEON unit? Or given that you are not
+> providing accelerated implementations of blake2s or Curve25519 for
+> arm64, we can't run it securely on arm64 at all?
+
+Deployed at scale, the handshake must have a certain performance to
+not be DoS'd. I've spent a long time benching these and attacking my
+own code.  I won't be comfortable with this going in without the fast
+implementations for the handshake. And down the line, too, we can look
+into how to even improve the DoS resistance. I think there's room for
+improvement, and I hope at some point you'll join us in discussions on
+WireGuard internals. But the bottom line is that we need those fast
+primitives.
+
+> Typically, I would prefer to only introduce different versions of the
+> same algorithm if there is a clear performance benefit for an actual
+> use case.
+
+As I was saying, this is indeed the case.
+
+> Framing this as a security issue rather than a performance issue is
+> slightly disingenuous, since people are less likely to challenge it.
+
+I'm not being disingenuous. DoS resistance is a real issue with
+WireGuard. You might argue that FourQ and Siphash would have made
+better choices, and that's an interesting discussion, but it is what
+it is. The thing needs fast implementations. And we're going to have
+to implement that code anyway for other things, so might as well get
+it working well now.
+
+> But the security of any VPN protocol worth its salt
+
+You're not required to use WireGuard.
+
+> Parsing the string and connecting the function pointers happens only
+> once, and only when the transform needs to be instantiated from its
+> constituent parts. Subsequent invocations will just grab the existing
+> object.
+
+That's good to know. It doesn't fully address the issue, though.
+
+> My preference would be to address this by permitting per-request keys
+> in the AEAD layer. That way, we can instantiate the transform only
+> once, and just invoke it with the appropriate key on the hot path (and
+> avoid any per-keypair allocations)
+
+That'd be a major improvement to the async interface, yes.
+
+> > So given the above, how would you like to proceed? My personal
+> > preference would be to see you start with the Zinc patchset and rename
+> > things and change the infrastructure to something that fits your
+> > preferences, and we can see what that looks like. Less appealing would
+> > be to do several iterations of you reworking Zinc from scratch and
+> > going through the exercises all over again, but if you prefer that I
+> > guess I could cope. Alternatively, maybe this is a lot to chew on, and
+> > we should just throw caution into the wind, implement cryptoapi.c for
+> > WireGuard (as described at the top), and add C functions to the crypto
+> > API sometime later? This is what I had envisioned in [1].
+
+> It all depends on whether we are interested in supporting async
+> accelerators or not, and it is clear what my position is on this
+> point.
+
+For a first version of WireGuard, no, I'm really not interested in
+that. Adding it in there is more ambitious than it looks to get it
+right. Async means more buffers, which means the queuing system for
+WireGuard needs to be changed. There's already ongoing research into
+this, and I'm happy to consider that research with a light toward
+maybe having async stuff in the future. But sticking into the code now
+as-is simply does not work from a buffering/queueing perspective. So
+again, let's take an iterative approach here: first we do stuff with
+the simple synchronous API. After the dust has settled, hardware is
+available for testing, Van Jacobson has been taken off the bookshelf
+for a fresh reading, and we've all sat down for a few interesting
+conversations at netdev on queueing and bufferbloat, then let's start
+working this in. In otherwords, just because technically you can glue
+those APIs together, sort of, doesn't mean that approach makes sense
+for the system as a whole.
+
+> I am not convinced that we need accelerated implementations of blake2s
+> and curve25519, but if we do, I'd like those to be implemented as
+> individual modules under arch/*/crypto, with some moduleloader fu for
+> weak symbols or static calls thrown in if we have to. Exposing them as
+> shashes seems unnecessary to me at this point.
+
+We need the accelerated implementations. And we'll need it for chapoly
+too, obviously. So let's work out a good way to hook that all into the
+Zinc-style interface. [2] does it in a very effective way that's
+overall quite good for performance and easy to follow. The
+chacha20-x86_64-glue.c code itself gets called via the static symbol
+chacha20_arch. This is implemented for each platform with a fall back
+to one that returns false, so that the generic code is called. The
+Zinc stuff here is obvious, simple, and I'm pretty sure you know
+what's up with it.
+
+I prefer each of these glue implementations to live in
+lib/zinc/chacha20/chacha20-${ARCH}-glue.c. You don't like that and
+want things in arch/${ARCH}/crypto/chacha20-glue.c. Okay, sure, fine,
+let's do all the naming and organization and political stuff how you
+like, and I'll leave aside my arguments about why I disagree. Let's
+take stock of where that leaves us, in terms of files:
+
+- lib/crypto/chacha20.c: this has a generic implementation, but at the
+top of the generic implementation, it has some code like "if
+(chacha20_arch(..., ..., ...)) return;"
+- arch/crypto/x86_64/chacha20-glue.c: this has the chacha20_arch()
+implementation, which branches out to the various SIMD implementations
+depending on some booleans calculated at module load time.
+- arch/crypto/arm/chacha20-glue.c: this has the chacha20_arch()
+implementation, which branches out to the various SIMD implementations
+depending on some booleans calculated at module load time.
+- arch/crypto/mips/chacha20-glue.c: this has the chacha20_arch()
+implementation, which contains an assembly version that's always run
+unconditionally.
+
+Our goals are that chacha20_arch() from each of these arch glues gets
+included in the lib/crypto/chacha20.c compilation unit. The reason why
+we want it in its own unit is so that the inliner can get rid of
+unreached code and more tightly integrate the branches. For the MIPS
+case, the advantage is clear. Here's how Zinc handles it: [3]. Some
+simple ifdefs and includes. Easy and straightforward. Some people
+might object, though, and it sounds like you might. So let's talk
+about some alternative mechanisms with their pros and cons:
+
+- The zinc method: straightforward, but not everybody likes ifdefs.
+- Stick the filename to be included into a Kconfig variable and let
+the configuration system do the logic: also straightforward. Not sure
+it's kosher, but it would work.
+- Weak symbols: we don't get inlining or the dead code elimination.
+- Function pointers: ditto, plus spectre.
+- Other ideas you might have? I'm open to suggestions here.
+
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/zx2c4/linux.git/tree/li=
+b/zinc/chacha20/chacha20-x86_64-glue.c?h=3Djd/wireguard#n54
+[3] https://git.kernel.org/pub/scm/linux/kernel/git/zx2c4/linux.git/tree/li=
+b/zinc/chacha20/chacha20.c?h=3Djd/wireguard#n19
+
+> What I *don't* want is to merge WireGuard with its own library based
+> crypto now, and extend that later for async accelerators once people
+> realize that we really do need that as well.
+
+I wouldn't worry so much about that. Zinc/library-based-crypto is just
+trying to fulfill the boring synchronous pure-code part of crypto
+implementations. For the async stuff, we can work together on
+improving the existing crypto API to be more appealing, in tandem with
+some interesting research into packet queuing systems. From the other
+thread, you might have seen that already Toke has cool ideas that I
+hope we can all sit down and talk about. I'm certainly not interested
+in "bolting" anything on to Zinc/library-based-crypto, and I'm happy
+to work to improve the asynchronous API for doing asynchronous crypto.
+
+Jason
