@@ -6,24 +6,24 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F620C4360C
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 Sep 2019 03:53:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13437C4360C
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 Sep 2019 04:01:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5AC13207FF
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 Sep 2019 03:53:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DBB1A20835
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 Sep 2019 04:01:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728027AbfI0Dx4 (ORCPT
+        id S1725800AbfI0EB4 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 26 Sep 2019 23:53:56 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:39138 "EHLO fornost.hmeau.com"
+        Fri, 27 Sep 2019 00:01:56 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:39168 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727796AbfI0Dx4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 26 Sep 2019 23:53:56 -0400
+        id S1725769AbfI0EB4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 27 Sep 2019 00:01:56 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1iDhKB-0001tc-SV; Fri, 27 Sep 2019 13:53:45 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Sep 2019 13:53:19 +1000
-Date:   Fri, 27 Sep 2019 13:53:19 +1000
+        id 1iDhRw-0001yA-0u; Fri, 27 Sep 2019 14:01:45 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Sep 2019 14:01:41 +1000
+Date:   Fri, 27 Sep 2019 14:01:41 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Linus Torvalds <torvalds@linux-foundation.org>
 Cc:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>,
@@ -42,7 +42,7 @@ Cc:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>,
         Catalin Marinas <catalin.marinas@arm.com>
 Subject: Re: [RFC PATCH 18/18] net: wireguard - switch to crypto API for
  packet encryption
-Message-ID: <20190927035319.GA23566@gondor.apana.org.au>
+Message-ID: <20190927040140.GA24370@gondor.apana.org.au>
 References: <20190925161255.1871-1-ard.biesheuvel@linaro.org>
  <20190925161255.1871-19-ard.biesheuvel@linaro.org>
  <CAHk-=wjYsbxSiV_XKWV3BwGvau_hUvQiQHLOoc7vLUZt0Wqzfw@mail.gmail.com>
@@ -63,31 +63,39 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 On Thu, Sep 26, 2019 at 07:54:03PM -0700, Linus Torvalds wrote:
 >
-> Side note: almost nobody does this.
-> 
-> Almost every single async interface I've ever seen ends up being "only
-> designed for async".
-> 
-> And I think the reason is that everybody first does the simply
-> synchronous interfaces, and people start using those, and a lot of
-> people are perfectly happy with them. They are simple, and they work
-> fine for the huge majority of users.
+> There's no "read_potentially_async()" interface that just does the
+> synchronous read for any cached portion of the data, and then delays
+> just the IO parts and returns a "here, I gave you X bytes right now,
+> use this cookie to wait for the rest".
 
-The crypto API is not the way it is because of async.  In fact, the
-crypto API started out as sync only and async was essentially
-bolted on top with minimial changes.
+Incidentally this is exactly how the crypto async interface works.
+For example, the same call works whether you're sync or async:
 
-The main reason why the crypto API contains indirections is because
-of the algorithmic flexibility which WireGuard does not need.
+	aead_request_set_callback(req, ...);
+	aead_request_set_crypt(req, ...);
+	err = crypto_aead_encrypt(req);
+	if (err == -EINPROGRESS)
+		/*
+		 * Request is processed asynchronously.
+		 * This cannot occur if the algorithm is sync,
+		 * e.g., when you specifically allocated sync
+		 * algorithms.
+		 */
+	else
+		/* Request was processed synchronously */
 
-Now whether algorithmic flexibility is a good thing or not is a
-different discussion.  But the fact of the matter is that the
-majority of heavy crypto users in our kernel do require this
-flexibility (e.g., IPsec, dmcrypt, fscrypt).
+We even allow the request to be on the stack in the sync case, e.g.,
+with SYNC_SKCIPHER_REQUEST_ON_STACK.
 
-I don't have a beef with the fact that WireGuard is tied to a
-single algorithm.  However, that simply does not work for the
-other users that we will have to continue to support.
+> Maybe nobody would use it. But it really should be possibly to have
+> interfaces where a good synchronous implementation is _possible_
+> without the extra overhead, while also allowing async implementations.
+
+So there is really no async overhead in the crypto API AFAICS if
+you're always doing sync.  What you see as overheads are probably
+the result of having to support multiple underlying algorithms
+(not just accelerations which can indeed be handled without
+indirection at least for CPU-based ones).
 
 Cheers,
 -- 
