@@ -1,207 +1,129 @@
-Return-Path: <SRS0=di3S=XW=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=xkmj=XX=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BB37C4360C
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 Sep 2019 16:24:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4830BC47404
+	for <linux-crypto@archiver.kernel.org>; Sat, 28 Sep 2019 18:06:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1657D21850
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 Sep 2019 16:24:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1569601452;
-	bh=kY+3GXp7gELL7DLAh7u7Htbuj28YpJK9nqVFdw/2w2U=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=oivkC+Fa8r7nPSKcajYVIfap1mv8BWkMyi/ZwDLCBTU9evr6l4SsbIwoIRBhf2RF9
-	 AhlcEbZmGK2AXy6azJEdzd40/uxzDfQXlWf3lhnN/grQ7pR3JCv31p6OtS1uH0+94I
-	 qTC8XgVTSdp7lL2J3HNUwt8DHYci7kcgwUOppuVQ=
+	by mail.kernel.org (Postfix) with ESMTP id 24CE820880
+	for <linux-crypto@archiver.kernel.org>; Sat, 28 Sep 2019 18:06:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727273AbfI0QYL (ORCPT
+        id S1728576AbfI1SGI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 27 Sep 2019 12:24:11 -0400
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:41070 "EHLO
-        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726251AbfI0QYK (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 27 Sep 2019 12:24:10 -0400
-Received: by mail-lj1-f194.google.com with SMTP id f5so3080610ljg.8
-        for <linux-crypto@vger.kernel.org>; Fri, 27 Sep 2019 09:24:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=0ZSEhf5bO/SF1c0tSKvmNNeWxWL147w5YdOvl2Gnjpw=;
-        b=KU36TUyGvfLb65v10CffeuYRR2Y01pARWIeV/Vo2qTbklo0V+XA7MrpdKGqR8Ak/KF
-         7xi3WhZMUWFK5wmMlbUFTMpDFM+pU5EJBRaIuZosAYuB/0qdZiP1XToldMkdMHQ3GmKk
-         gv11WbFW6DUox0vozNZvM6ewmDOPeiEUTX56c=
+        Sat, 28 Sep 2019 14:06:08 -0400
+Received: from mx1.redhat.com ([209.132.183.28]:55874 "EHLO mx1.redhat.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728458AbfI1SGI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 28 Sep 2019 14:06:08 -0400
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com [209.85.160.200])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mx1.redhat.com (Postfix) with ESMTPS id 2EB93859FE
+        for <linux-crypto@vger.kernel.org>; Sat, 28 Sep 2019 18:06:08 +0000 (UTC)
+Received: by mail-qt1-f200.google.com with SMTP id d24so8329527qtn.17
+        for <linux-crypto@vger.kernel.org>; Sat, 28 Sep 2019 11:06:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=0ZSEhf5bO/SF1c0tSKvmNNeWxWL147w5YdOvl2Gnjpw=;
-        b=mZd52DVlvtdhkyQQsN25BQRsNX82pInlP3GNpljIU3FJVO/SAivRMAqu9KehisRrIR
-         Z8VL/w4D6qgq617H+0CBg5UcWDXO+HVLxwUjXQ7sPTz+9ga3gqRHBHm++Wum0cQM8a46
-         a1xYDsixTDfx45p75XiKq0Gh8BnKleuXO0e3qUGh1Ug5cwFlek8x5sOvsirtbvA841i/
-         p7nzqYyFNRWx2O55AFSflGmWZ76WMHrAtcbfFgTGewKql3hcJgtpJACFtxpDkF1/W931
-         ZicXJ8T2GATuIErkiDfs2yKnK6l4Av77dP+JBWnpUULy5E2cULzrrLqfKoGXJ/Z2xmdT
-         XAtQ==
-X-Gm-Message-State: APjAAAWaK91lVP1a5EIjxsEYTpAiJwHjb8uygqaJdlW62X60zkY9z+Wc
-        ctjQb9/ErM7AUNuNpk13ADWGgLzbhd8=
-X-Google-Smtp-Source: APXvYqwtwiZIB7iRiGxLCCOwZ3z7kVL7BbseQP/7yPkCxqr5KJbSXyQ2tm4Iu5V+a73D1Ydiqk+o7g==
-X-Received: by 2002:a2e:58a:: with SMTP id 132mr3360431ljf.132.1569601447364;
-        Fri, 27 Sep 2019 09:24:07 -0700 (PDT)
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com. [209.85.208.173])
-        by smtp.gmail.com with ESMTPSA id x25sm550332ljb.60.2019.09.27.09.24.05
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 27 Sep 2019 09:24:06 -0700 (PDT)
-Received: by mail-lj1-f173.google.com with SMTP id 7so3088173ljw.7
-        for <linux-crypto@vger.kernel.org>; Fri, 27 Sep 2019 09:24:05 -0700 (PDT)
-X-Received: by 2002:a2e:1208:: with SMTP id t8mr3435615lje.84.1569601445451;
- Fri, 27 Sep 2019 09:24:05 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190925161255.1871-1-ard.biesheuvel@linaro.org>
- <20190925161255.1871-19-ard.biesheuvel@linaro.org> <CAHk-=wjYsbxSiV_XKWV3BwGvau_hUvQiQHLOoc7vLUZt0Wqzfw@mail.gmail.com>
- <CH2PR20MB29680F87B32BBF0495720172CA860@CH2PR20MB2968.namprd20.prod.outlook.com>
- <CAHk-=wgR_KsYw2GmZwkG3GmtX6nbyj0LEi7rSqC+uFi3ScTYcw@mail.gmail.com>
- <MN2PR20MB297317D9870A3B93B5E506C9CA810@MN2PR20MB2973.namprd20.prod.outlook.com>
- <CAHk-=wjr1w7x9Rjre_ALnDLASYNjsEHxu6VJpk4eUwZXN0ntqw@mail.gmail.com> <MN2PR20MB2973A696B92A8C5A74A738F1CA810@MN2PR20MB2973.namprd20.prod.outlook.com>
-In-Reply-To: <MN2PR20MB2973A696B92A8C5A74A738F1CA810@MN2PR20MB2973.namprd20.prod.outlook.com>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Fri, 27 Sep 2019 09:23:49 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wj9BSMzoDD31R-ymjGpkpt0u-ndX6+p0ZWsrJFDTAN+zg@mail.gmail.com>
-Message-ID: <CAHk-=wj9BSMzoDD31R-ymjGpkpt0u-ndX6+p0ZWsrJFDTAN+zg@mail.gmail.com>
-Subject: Re: [RFC PATCH 18/18] net: wireguard - switch to crypto API for
- packet encryption
-To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:reply-to
+         :mail-followup-to:references:mime-version:content-disposition
+         :in-reply-to:user-agent;
+        bh=d0byJOIsz1lqJ5hnq+jj0W7I6Ibu7N/QFdfVSTVCzMo=;
+        b=FLGJfWf2J/e0Ox3xWYzvE9nDPppCEEY1j4PST1SXYPfnUa4z3Cl/OyMi/47qjKZuqg
+         hIUKTvuOxhHBJl1bgyNbXAx90Q4tWFdLejFUIZQyrakXAaSbs7NCCysKAKVs6VpvrbSB
+         uvTDFur9l3GVo2oXKPKKxgG6gwNlgjJXoPH/zfTt1k8HP0Q7LsYWSNb8Hw5TUuzlUYGV
+         SKIHC4uBV4OneQMUC+mZ/js+5DtCA+j0WVG5hZrHOzggEvb+WEUQGCTUKapTljMh5uhN
+         83Ngao9cYkiHJiAjYdgnz2lHrXk6l3YXqI0JAJUBVGrjgi5LTHWRfgfregXJ4WkDYEzx
+         5okg==
+X-Gm-Message-State: APjAAAULwTUc+qcWAuTQ7sMoxIPKOn19UiEVxQAWn31jKwWqjHCx56mK
+        ezUmG1pAxI08I/PUiZ4Jgw2+2/IDeIgHWZjrfyeD79BIqu14vPkq3q7wrlwfzYjsC166/u7UxzV
+        3gUS+jHo8xH0KZXDhOzQ/GcOg
+X-Received: by 2002:a37:aa58:: with SMTP id t85mr11009831qke.381.1569693967477;
+        Sat, 28 Sep 2019 11:06:07 -0700 (PDT)
+X-Google-Smtp-Source: APXvYqztxQPbojuWzD2tjs1KlNLYklUTuFbRfAwL7mz2CmOFv1UcY4AcvsgovDjiYI9wdsF0ybTlZg==
+X-Received: by 2002:a37:aa58:: with SMTP id t85mr11009800qke.381.1569693967176;
+        Sat, 28 Sep 2019 11:06:07 -0700 (PDT)
+Received: from localhost (ip70-163-223-149.ph.ph.cox.net. [70.163.223.149])
+        by smtp.gmail.com with ESMTPSA id d40sm5647462qtk.6.2019.09.28.11.06.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 28 Sep 2019 11:06:06 -0700 (PDT)
+Date:   Sat, 28 Sep 2019 11:05:59 -0700
+From:   Jerry Snitselaar <jsnitsel@redhat.com>
+To:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+Cc:     linux-integrity@vger.kernel.org, stable@vger.kernel.org,
+        David Howells <dhowells@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Samuel Neves <sneves@dei.uc.pt>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Eric Biggers <ebiggers@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+        "David S. Miller" <davem@davemloft.net>,
+        "open list:ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] KEYS: asym_tpm: Switch to get_random_bytes()
+Message-ID: <20190928180559.jivt5zlisr43fnva@cantor>
+Reply-To: Jerry Snitselaar <jsnitsel@redhat.com>
+Mail-Followup-To: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        linux-integrity@vger.kernel.org, stable@vger.kernel.org,
+        David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "open list:ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+References: <20190926171601.30404-1-jarkko.sakkinen@linux.intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20190926171601.30404-1-jarkko.sakkinen@linux.intel.com>
+User-Agent: NeoMutt/20180716
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Sep 27, 2019 at 2:58 AM Pascal Van Leeuwen
-<pvanleeuwen@verimatrix.com> wrote:
+On Thu Sep 26 19, Jarkko Sakkinen wrote:
+>Only the kernel random pool should be used for generating random numbers.
+>TPM contributes to that pool among the other sources of entropy. In here it
+>is not, agreed, absolutely critical because TPM is what is trusted anyway
+>but in order to remove tpm_get_random() we need to first remove all the
+>call sites.
 >
-> > I'd want to see wireguard in an end-to-end situation from the very
-> > client hardware. So laptops, phones, desktops. Not the untrusted (to
-> > me) hw in between.
-> >
-> I don't see why the crypto HW would deserve any less trust than, say,
-> the CPU itself. I would say CPU's don't deserve that trust at the moment.
-
-It's not the crypto engine that is part of the untrusted hardware.
-It's the box itself, and the manufacturer, and you having to trust
-that the manufacturer didn't set up some magic knocking sequence to
-disable the encryption.
-
-Maybe the company that makes them is trying to do a good job. But
-maybe they are based in a country that has laws that require
-backdoors.
-
-Say, France. There's a long long history of that kind of thing.
-
-It's all to "fight terrorism", but hey, a little industrial espionage
-is good too, isn't it? So let's just disable GSM encryption based on
-geographic locale and local regulation, shall we.
-
-Yeah, yeah, GSM encryption wasn't all that strong to begin with, but
-it was apparently strong enough that France didn't want it.
-
-So tell me again why I should trust that box that I have no control over?
-
-> Well, that's the general idea of abstraction. It also allows for
-> swapping in any other cipher with minimal effort just _because_ the
-> details were hidden from the application. So it may cost you some
-> effort initially, but it may save you effort later.
-
-We clearly disagree on the utility of crypto agility. You point to
-things like ipsec as an argument for it.
-
-And I point to ipsec as an argument *against* that horror. It's a
-bloated, inefficient, horribly complex mess. And all the "agility" is
-very much part of it.
-
-I also point to GSM as a reason against "agility". It has caused way
-more security problems than it has ever solved. The ":agility" is
-often a way to turn off (or tune down) the encryption, not as a way to
-say "ok, we can improve it later".
-
-That "we can improve it later" is a bedtime story. It's not how it
-gets used. Particularly as the weaknesses are often not primarily in
-the crypto algorithm itself, but in how it gets used or other session
-details.
-
-When you actually want to *improve* security, you throw the old code
-away, and start a new protocol entirely. Eg SSL -> TLS.
-
-So cryptographic agility is way oversold, and often people are
-actively lying about why they want it. And the people who aren't lying
-are ignoring the costs.
-
-One of the reasons _I_ like wireguard is that it just went for simple
-and secure. No BS.
-
-And you say
-
-> Especially since all crypto it uses comes from a single
-> source (DJB), which is frowned upon in the industry.
-
-I'm perhaps not a fan of DJB in all respects, but there's no question
-that he's at least competent.
-
-The "industry practice" of having committees influenced by who knows
-what isn't all that much better. Do you want to talk about NSA
-elliptic curve constant choices?
-
-Anyway, on the costs:
-
-> >  - dynamically allocate buffers at "init time"
+>Cc: stable@vger.kernel.org
+>Fixes: 0c36264aa1d5 ("KEYS: asym_tpm: Add loadkey2 and flushspecific [ver #2]")
+>Signed-off-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+>---
+> crypto/asymmetric_keys/asym_tpm.c | 7 ++-----
+> 1 file changed, 2 insertions(+), 5 deletions(-)
 >
-> Why is that so "wrong"? It sure beats doing allocations on the hot path.
+>diff --git a/crypto/asymmetric_keys/asym_tpm.c b/crypto/asymmetric_keys/asym_tpm.c
+>index 76d2ce3a1b5b..c14b8d186e93 100644
+>--- a/crypto/asymmetric_keys/asym_tpm.c
+>+++ b/crypto/asymmetric_keys/asym_tpm.c
+>@@ -6,6 +6,7 @@
+> #include <linux/kernel.h>
+> #include <linux/seq_file.h>
+> #include <linux/scatterlist.h>
+>+#include <linux/random.h>
+> #include <linux/tpm.h>
+> #include <linux/tpm_command.h>
+> #include <crypto/akcipher.h>
+>@@ -54,11 +55,7 @@ static int tpm_loadkey2(struct tpm_buf *tb,
+> 	}
+>
+> 	/* generate odd nonce */
+>-	ret = tpm_get_random(NULL, nonceodd, TPM_NONCE_SIZE);
+>-	if (ret < 0) {
+>-		pr_info("tpm_get_random failed (%d)\n", ret);
+>-		return ret;
+>-	}
+>+	get_random_bytes(nonceodd, TPM_NONCE_SIZE);
+>
+> 	/* calculate authorization HMAC value */
+> 	ret = TSS_authhmac(authdata, keyauth, SHA1_DIGEST_SIZE, enonce,
+>-- 
+>2.20.1
+>
 
-It's wrong not becasue the allocation is costly (you do that only
-once), but because the dynamic allocation means that you can't embed
-stuff in your own native data structures as a user.
-
-So now accessing those things is no longer dense in the cache.
-
-And it's the cache that matters for a synchronous CPU algorithm. You
-don't want the keys and state to be in some other location when you
-already have your data structures for the stream that could just have
-them right there with the other data.
-
-> And you don't want to have it on the stack initially and then have
-> to _copy_ it to some DMA-able location that you allocate on the fly
-> on the hot path if you _do_ want HW acceleration.
-
-Actually, that's *exactly* what you want. You want keys etc to be in
-regular memory in a location that is convenient to the user, and then
-only if the hardware has issues do you say "ok, copy the key to the
-hardware". Because quite often the hardware will have very special key
-caches that aren't even available to the CPU, because they are on some
-hw-private buffers.
-
-Yes, you want to have a "key identity" model so that the hardware
-doesn't have to reload it all the time, but that's an invalidation
-protocol, not a "put the keys or nonces in special places".
-
-               Linus
+Should tpm_unbind and tpm_sign in asym_tpm.c be switched as well then?
