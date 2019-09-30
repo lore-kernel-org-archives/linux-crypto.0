@@ -2,102 +2,69 @@ Return-Path: <SRS0=wYoS=XZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.5 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-10.0 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBA28C4360C
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Sep 2019 07:36:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2587C4360C
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Sep 2019 08:52:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9649220679
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Sep 2019 07:36:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 81709218DE
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Sep 2019 08:52:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729254AbfI3HgG (ORCPT
+        id S1729995AbfI3IwB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 30 Sep 2019 03:36:06 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:51098 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726314AbfI3HgG (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Sep 2019 03:36:06 -0400
-Received: from bigeasy by Galois.linutronix.de with local (Exim 4.80)
-        (envelope-from <bigeasy@linutronix.de>)
-        id 1iEqDp-0001nY-P4; Mon, 30 Sep 2019 09:35:53 +0200
-Date:   Mon, 30 Sep 2019 09:35:53 +0200
-From:   Sebastian Siewior <bigeasy@linutronix.de>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Samuel Neves <sneves@dei.uc.pt>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Eric Biggers <ebiggers@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Martin Willi <martin@strongswan.org>
-Subject: Re: [RFC PATCH 11/20] crypto: BLAKE2s - x86_64 implementation
-Message-ID: <20190930073553.xy57e75nteiakjyp@linutronix.de>
-References: <20190929173850.26055-1-ard.biesheuvel@linaro.org>
- <20190929173850.26055-12-ard.biesheuvel@linaro.org>
- <CAHmME9q=72-iKnHh0nB2+mO3uNoUerOVoHDY=eBKSoPB32XSsA@mail.gmail.com>
+        Mon, 30 Sep 2019 04:52:01 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:34362 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726008AbfI3IwB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 30 Sep 2019 04:52:01 -0400
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id A30C252865CFBFC00D0F;
+        Mon, 30 Sep 2019 16:51:59 +0800 (CST)
+Received: from localhost.localdomain (10.67.212.132) by
+ DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
+ 14.3.439.0; Mon, 30 Sep 2019 16:51:50 +0800
+From:   Tian Tao <tiantao6@huawei.com>
+To:     <gilad@benyossef.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>, <linux-crypto@vger.kernel.org>
+CC:     <linuxarm@huawei.com>
+Subject: [PATCH] crypto: fix comparison of unsigned expression warnings
+Date:   Mon, 30 Sep 2019 16:49:21 +0800
+Message-ID: <1569833361-47224-1-git-send-email-tiantao6@huawei.com>
+X-Mailer: git-send-email 2.7.4
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAHmME9q=72-iKnHh0nB2+mO3uNoUerOVoHDY=eBKSoPB32XSsA@mail.gmail.com>
-User-Agent: NeoMutt/20180716
+Content-Type: text/plain
+X-Originating-IP: [10.67.212.132]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2019-09-30 04:42:06 [+0200], Jason A. Donenfeld wrote:
-> Hi Sebastian, Thomas,
-Hi Jason,
+This patch fixes the following warnings:
+drivers/crypto/ccree/cc_aead.c:630:5-12: WARNING: Unsigned expression
+compared with zero: seq_len > 0
 
-> On Sun, Sep 29, 2019 at 7:39 PM Ard Biesheuvel
-> <ard.biesheuvel@linaro.org> wrote:
-> > +       for (;;) {
-> > +               const size_t blocks = min_t(size_t, nblocks,
-> > +                                           PAGE_SIZE / BLAKE2S_BLOCK_SIZE);
-> > +
-> > +               kernel_fpu_begin();
-> > +               if (IS_ENABLED(CONFIG_AS_AVX512) && blake2s_use_avx512)
-> > +                       blake2s_compress_avx512(state, block, blocks, inc);
-> > +               else
-> > +                       blake2s_compress_avx(state, block, blocks, inc);
-> > +               kernel_fpu_end();
-> > +
-> > +               nblocks -= blocks;
-> > +               if (!nblocks)
-> > +                       break;
-> > +               block += blocks * BLAKE2S_BLOCK_SIZE;
-> > +       }
-> > +       return true;
-> > +}
-> 
-> I'm wondering if on modern kernels this is actually fine and whether
-> my simd_get/put/relax thing no longer has a good use case.
-> Specifically, I recall last year there were a lot of patches and
-> discussions about doing FPU register restoration lazily -- on context
-> switch or the like. Did those land? Did the theory of action work out
-> in the end?
+Signed-off-by: Tian Tao <tiantao6@huawei.com>
+---
+ drivers/crypto/ccree/cc_aead.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-That optimisation landed in v5.2. With that change (on x86)
-kernel_fpu_end() does almost nothing (and so the following
-kernel_fpu_begin()) and the FPU context will be restored once the task
-returns to user land. (Note that this counts only for user-tasks because
-we don't save the FPU state of a kernel thread.)
-I haven't look at crypto code since that change was merged but looking
-at the snippet from Ard is actually what I was aiming for.
+diff --git a/drivers/crypto/ccree/cc_aead.c b/drivers/crypto/ccree/cc_aead.c
+index d3e8faa..b19291d 100644
+--- a/drivers/crypto/ccree/cc_aead.c
++++ b/drivers/crypto/ccree/cc_aead.c
+@@ -546,7 +546,7 @@ static int cc_aead_setkey(struct crypto_aead *tfm, const u8 *key,
+ 	struct cc_aead_ctx *ctx = crypto_aead_ctx(tfm);
+ 	struct cc_crypto_req cc_req = {};
+ 	struct cc_hw_desc desc[MAX_AEAD_SETKEY_SEQ];
+-	unsigned int seq_len = 0;
++	int seq_len = 0;
+ 	struct device *dev = drvdata_to_dev(ctx->drvdata);
+ 	const u8 *enckey, *authkey;
+ 	int rc;
+-- 
+2.7.4
 
-> Regards,
-> Jason
-
-Sebastian
