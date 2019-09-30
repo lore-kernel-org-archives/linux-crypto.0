@@ -2,138 +2,113 @@ Return-Path: <SRS0=wYoS=XZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C097C35280
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Sep 2019 21:38:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA6C3C32792
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Sep 2019 22:20:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 300FF21D71
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Sep 2019 21:38:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E8452168B
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Sep 2019 22:20:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1569879488;
-	bh=BH/iBL1ZbFK0qZcjnUOmWd7KDaMQ+O4qAsRp9NWpdV4=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=hV5aSnnQq2jfbRny9s5VoSqji3QWgwxm76QDmA7E1x843EJ10XBsPD1jtaDfkOJYF
-	 WRjhqOc4GO8dsy6WXbCwyG3+W8CWzqzc5WZ0qzn+VKy73tStcW6F5/9y1w857nVaoS
-	 tIoyw++J0r42+IVETFYokT/Hqsb16DEfphuTcgyE=
+	s=default; t=1569882026;
+	bh=j8iLoguF2EcEvcUgIK6k1GmmnxdvBP6H3xpQgaWDiXY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=L+We1MEJScRjYA5d9BoieZKVKK+PhydqgP8+X4XL+WX6J6zbmotvbI6V+sOq6v4jG
+	 RHJpEjfQ+7HedYKLewtmkIJbqdiej4EBrZhHUC0e5fLr+XEwzeNLlohv86QVf82Vot
+	 W5/1aZrxUNI/WBptlIi9EWhbtAJCOV3q0N8WjOhA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731233AbfI3ViG (ORCPT
+        id S1732118AbfI3WUX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 30 Sep 2019 17:38:06 -0400
-Received: from mail-lf1-f43.google.com ([209.85.167.43]:46334 "EHLO
-        mail-lf1-f43.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730639AbfI3ViG (ORCPT
+        Mon, 30 Sep 2019 18:20:23 -0400
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:44126 "EHLO
+        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726350AbfI3WUW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Sep 2019 17:38:06 -0400
-Received: by mail-lf1-f43.google.com with SMTP id t8so8152178lfc.13
-        for <linux-crypto@vger.kernel.org>; Mon, 30 Sep 2019 14:38:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ixtEphxdbSY2nxhdSSuwlJ43CSGi6j7e5g55W0WR5ps=;
-        b=XDHWgPO2tzxfiQyNRdnzo5hR74XX4mhCRJG+pVQURE69/fv86sRHLqbR3Xh3C1gd/u
-         UU/z4/3Mjsdm3CYGi8S26KjwIQ0tmQDWgZwJVlNpomeMgLYjCG4+ZgeFj1YgtZhqyL/U
-         HUKEOCcp3//Tp068MpezftV8CG+hOBPc8g8Jw=
+        Mon, 30 Sep 2019 18:20:22 -0400
+Received: by mail-ot1-f68.google.com with SMTP id 21so9769659otj.11;
+        Mon, 30 Sep 2019 15:20:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ixtEphxdbSY2nxhdSSuwlJ43CSGi6j7e5g55W0WR5ps=;
-        b=t4E5s310g3hDaC4Nj9/izu1tDeopW2WkafA/hmlzTpZCWkdnNcqdqm6LI77ZavW9KG
-         ZJiP1aFSri1CdBRt+VTw/UOI+CZHnxlMyhbJ9+yPgal9GZT7k4LEQk8AeKW+ACZExMxT
-         FnBhI6VaDWd4pVpnMVS6beJh3UPKK+ADySrvcts1iyIXKAp51wkC8qp/nUrvGHZCrTVt
-         F+oKmpx0Tq3rXiBqBIs/xwvGrWVb6XFZz/xsM6eELVzj14PTP8FgLdOu7qSa3GP/Ey4q
-         UGjqa02aVheu5b5I05usy0ZcYYKJKlljMdcSMW9LRm+PkOC66gVNUKlqGka0JB5Z3dTk
-         rzOQ==
-X-Gm-Message-State: APjAAAXSOW9Bef80POT2yHkNLOxGu+eUctcLUJ95KPh6ENswYuAoybYS
-        EdFWwXwt8ENlmQkSe9wzIO4p9PxgB9o=
-X-Google-Smtp-Source: APXvYqytlz+x7EX1ThAlbnRdudsjsNSHg6Kros7u5Dxp4r06BjooLxFwUSSM1U19Yv/TbUeQg5h2Yg==
-X-Received: by 2002:a19:98e:: with SMTP id 136mr13030060lfj.156.1569879482838;
-        Mon, 30 Sep 2019 14:38:02 -0700 (PDT)
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com. [209.85.167.43])
-        by smtp.gmail.com with ESMTPSA id y3sm3396785lfh.97.2019.09.30.14.38.01
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 30 Sep 2019 14:38:01 -0700 (PDT)
-Received: by mail-lf1-f43.google.com with SMTP id u28so8200101lfc.5
-        for <linux-crypto@vger.kernel.org>; Mon, 30 Sep 2019 14:38:01 -0700 (PDT)
-X-Received: by 2002:ac2:47f8:: with SMTP id b24mr12877392lfp.134.1569879480494;
- Mon, 30 Sep 2019 14:38:00 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to:user-agent;
+        bh=F7EuIouiHhXnI+Mf2IJX0I4I3pBr8z7vl6hhtN/rydc=;
+        b=nanYkIa88zdOcBjfYJinBCYrY35jvSz2AVXYvp9G2XcgAkEu3fzBFxpJo5neLokxRN
+         dlxdoWvCNz+rI7kgcLGCJxL+Fo2bYc5T0hoW3X1E57CnXdYCqEsi5jYAM6dwbX8In+8/
+         cq/MCKlh3jD1AkgLTlJ715FWF05TC8Iuz9m8DaYEppH9PYvGmiUHBVbtgWUWLhWUgmXc
+         uBDCWMXF8zI4EvCXoSs/t+12/nuf4gNN/j1rnS1A/Uhmfp30RhMvbjk5Dc6wDc88grLX
+         vWd2FdVbhvq6Vz6HDBfx1BgNtfWR5ICBL95TGVGFN7uI6KjgKsK8v86OYum+OMtjYYKv
+         2D5w==
+X-Gm-Message-State: APjAAAVDi1wWxKcOwfwZjad7SZJEo91xV3NDxemY5+5lyAoBRKKFSUhi
+        rrkMabGU6j7lThacGUQPYw==
+X-Google-Smtp-Source: APXvYqwlTz51SdwLtiYS/F6mSjvwoCRn1JCMaKGRrqHAekh5UT3CgLba9X+2enyJqSphfurQyQWK4A==
+X-Received: by 2002:a9d:7844:: with SMTP id c4mr577304otm.273.1569882021729;
+        Mon, 30 Sep 2019 15:20:21 -0700 (PDT)
+Received: from localhost (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
+        by smtp.gmail.com with ESMTPSA id v10sm4017054otk.17.2019.09.30.15.20.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 30 Sep 2019 15:20:21 -0700 (PDT)
+Date:   Mon, 30 Sep 2019 17:20:20 -0500
+From:   Rob Herring <robh@kernel.org>
+To:     Tony Lindgren <tony@atomide.com>
+Cc:     Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-kernel@vger.kernel.org, linux-omap@vger.kernel.org,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        Aaro Koskinen <aaro.koskinen@iki.fi>,
+        Adam Ford <aford173@gmail.com>,
+        Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>,
+        Tero Kristo <t-kristo@ti.com>
+Subject: Re: [PATCH 2/7] hwrng: omap3-rom - Fix missing clock by probing with
+ device tree
+Message-ID: <20190930222020.GA13078@bogus>
+References: <20190914210300.15836-1-tony@atomide.com>
+ <20190914210300.15836-3-tony@atomide.com>
 MIME-Version: 1.0
-References: <20190925161255.1871-1-ard.biesheuvel@linaro.org>
- <20190925161255.1871-19-ard.biesheuvel@linaro.org> <CAHk-=wjYsbxSiV_XKWV3BwGvau_hUvQiQHLOoc7vLUZt0Wqzfw@mail.gmail.com>
- <CH2PR20MB29680F87B32BBF0495720172CA860@CH2PR20MB2968.namprd20.prod.outlook.com>
- <CAHk-=wgR_KsYw2GmZwkG3GmtX6nbyj0LEi7rSqC+uFi3ScTYcw@mail.gmail.com>
- <MN2PR20MB297317D9870A3B93B5E506C9CA810@MN2PR20MB2973.namprd20.prod.outlook.com>
- <CAHk-=wjr1w7x9Rjre_ALnDLASYNjsEHxu6VJpk4eUwZXN0ntqw@mail.gmail.com>
- <MN2PR20MB2973A696B92A8C5A74A738F1CA810@MN2PR20MB2973.namprd20.prod.outlook.com>
- <CAHk-=wj9BSMzoDD31R-ymjGpkpt0u-ndX6+p0ZWsrJFDTAN+zg@mail.gmail.com> <3e5347a2-9aa7-bffb-2343-42eda87a6c83@free.fr>
-In-Reply-To: <3e5347a2-9aa7-bffb-2343-42eda87a6c83@free.fr>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Mon, 30 Sep 2019 14:37:44 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wj=377rsWmvrK_MvL6yamTisj5SWFQZsQH+rjeic8_suA@mail.gmail.com>
-Message-ID: <CAHk-=wj=377rsWmvrK_MvL6yamTisj5SWFQZsQH+rjeic8_suA@mail.gmail.com>
-Subject: Re: France didn't want GSM encryption
-To:     Marc Gonzalez <marc.w.gonzalez@free.fr>
-Cc:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20190914210300.15836-3-tony@atomide.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Sep 30, 2019 at 4:14 AM Marc Gonzalez <marc.w.gonzalez@free.fr> wrote:
->
-> Two statements above have raised at least one of my eyebrows.
->
-> 1) France has laws that require backdoors.
+On Sat, 14 Sep 2019 14:02:55 -0700, Tony Lindgren wrote:
+> Commit 0ed266d7ae5e ("clk: ti: omap3: cleanup unnecessary clock aliases")
+> removed old omap3 clock framework aliases but caused omap3-rom-rng to
+> stop working with clock not found error.
+> 
+> Based on discussions on the mailing list it was requested by Tero Kristo
+> that it would be best to fix this issue by probing omap3-rom-rng using
+> device tree to provide a proper clk property. The other option would be
+> to add back the missing clock alias, but that does not help moving things
+> forward with removing old legacy platform_data.
+> 
+> Let's also add a proper device tree binding and keep it together with
+> the fix.
+> 
+> Cc: devicetree@vger.kernel.org
+> Cc: Aaro Koskinen <aaro.koskinen@iki.fi>
+> Cc: Adam Ford <aford173@gmail.com>
+> Cc: Pali Rohár <pali.rohar@gmail.com>
+> Cc: Rob Herring <robh+dt@kernel.org>
+> Cc: Sebastian Reichel <sre@kernel.org>
+> Cc: Tero Kristo <t-kristo@ti.com>
+> Fixes: 0ed266d7ae5e ("clk: ti: omap3: cleanup unnecessary clock aliases")
+> Reported-by: Aaro Koskinen <aaro.koskinen@iki.fi>
+> Signed-off-by: Tony Lindgren <tony@atomide.com>
+> ---
+>  .../devicetree/bindings/rng/omap3_rom_rng.txt | 27 +++++++++++++++++++
+>  arch/arm/boot/dts/omap3-n900.dts              |  6 +++++
+>  arch/arm/mach-omap2/pdata-quirks.c            | 12 +--------
+>  drivers/char/hw_random/omap3-rom-rng.c        | 17 ++++++++++--
+>  4 files changed, 49 insertions(+), 13 deletions(-)
+>  create mode 100644 Documentation/devicetree/bindings/rng/omap3_rom_rng.txt
+> 
 
-No. But France has a long history on being bad on encryption policies.
-They've gotten better, thankfully.
-
-France was one of the countries that had laws against strong
-encryption back in the 90s. It got better in the early 2000s, but
-there's a long history - and still a push - for some very questionable
-practices.
-
-It was just a couple of years ago that the had discussions about
-mandatory backdoors for encryption in France. Look it up.
-
-Are there other countries that have worse track records? Yes. And in
-the west, the US (and Australia) have had similar issues.
-
-But when it comes to Western Europe, France has been a particular
-problem spot. And I wanted to point out that it's not always the
-obvious problem countries (ie Middle East, China) that everybody
-points to.
-
-> 2) France did not want GSM encryption.
-
-I'm pretty sure that France had the encryption bit off at least during the 90's.
-
-GSM A5/1 isn't great, but as part of the spec there is also A5/0. No,
-it's not used in the West any more.
-
-France was also at least at one time considered a hotbed of industrial
-espionage by other European countries. And the US.
-
-You can try to google for it, but you won't find all that much from
-the bad old days. You can find _some_ stuff still..
-
-  https://apnews.com/4206823c63d58fd956f26fd5efc9a777
-
-but basically French intelligence agencies have been accused of
-extensive industrial espionage for French companies over the years.
-
-Anyway, I'm not trying to point to France as some kind of "worst of
-the worst". I literally picked it as an example because people
-generally _don't_ think of Western European countries as having
-encryption issues, and don't generally associate them with industrial
-espionage. But there really is a history even there.
-
-            Linus
+Acked-by: Rob Herring <robh@kernel.org>
