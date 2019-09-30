@@ -2,438 +2,294 @@ Return-Path: <SRS0=wYoS=XZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4218C35280
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Sep 2019 16:32:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0456C388F3
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Sep 2019 20:39:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A15FC216F4
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Sep 2019 16:32:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D79B22518
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Sep 2019 20:39:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="isZPLgxz"
+	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="rJKZfeud"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732330AbfI3Qcn (ORCPT
+        id S1729748AbfI3Ui7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 30 Sep 2019 12:32:43 -0400
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:40310 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727767AbfI3Qcn (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Sep 2019 12:32:43 -0400
-Received: by mail-pf1-f196.google.com with SMTP id x127so5910408pfb.7
-        for <linux-crypto@vger.kernel.org>; Mon, 30 Sep 2019 09:32:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=TgAtzBTR9GVb1+VVw+AirmCcBrIK/gjv2Ur5vU5bS4Q=;
-        b=isZPLgxzRR2p8XjDSYvy9EQHYeWYPl38+eLTVnyCVxIMrVA8eJpeblRB7CzqBfgJal
-         Wnwu1Yuvf5vq8GtvDcr9/u5mJ9wQ4YDnyJB86JxlPDk1S/OeoHTUHs0PbIb7E6AZzrk2
-         7z+FXgqj1lh2JdlOmn5Krq/vVf1RZ6SIuY6QPAOL0YmUsZ/miJZZdMo8E+tw2UXM5vhc
-         M0vtVMqVuFm3+dr/eP3ouIj93QozF1rs8JGroCcP6wzHm/x5ESxOiaFZv9X+yptjc3D6
-         eLvOEbKE1rx74OPVClwyH9ENhsMfjs8LXFb3r+jZdjXzUF2WPs/oNAcPk0AEexL4/wU/
-         +BNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=TgAtzBTR9GVb1+VVw+AirmCcBrIK/gjv2Ur5vU5bS4Q=;
-        b=b0imEMpr9v7TwMdDxgZ5zZnvEdZ7BtoF1yHfZ2x1d/KtIr9WftFT5uvwK5siHQucfm
-         boyhdIiu/1luQ2mtYdgHpi6CNcZZMSqi9ZQUt4TZ9c4hEnxXrsYsezs3hLf2w0zvRSTx
-         U8oVBQpZF99xCdGYX7bXjwCba9WnWdh6hleEvPc1CI97Aos8c4KzHombCSdzinYCVL65
-         yirg7onOwu7j2e2sYWzGym79ge5pJfeGF54ZIti4jYLAez7FCEImoEiowmYkcn6SZ9n+
-         j7ceeLoMj6qupnfDYYRGsiQvmM7cEYKk/dSIqb2Lfp8oSsMP/YeqNzWWJ8iXsLari1tJ
-         Ga+g==
-X-Gm-Message-State: APjAAAVRtLd935ftTNNiGcgyGSPQywzP0s6AYLz9jNItrDtN7PVXV2Xe
-        9rjEqcyQrzP2GydOTwgY4RQ0+uWB
-X-Google-Smtp-Source: APXvYqw+J/ts23kzVsR8sDR6Ab8dVdc3aYxRGHIdo2QaF1XsIiGfWbRPazVHDiyRpyIp6vbnk0n6gA==
-X-Received: by 2002:a17:90a:1b46:: with SMTP id q64mr59861pjq.97.1569861162828;
-        Mon, 30 Sep 2019 09:32:42 -0700 (PDT)
-Received: from localhost ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id w2sm11865663pfn.57.2019.09.30.09.32.41
-        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
-        Mon, 30 Sep 2019 09:32:42 -0700 (PDT)
-Date:   Mon, 30 Sep 2019 09:32:41 -0700
-From:   Guenter Roeck <linux@roeck-us.net>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        ebiggers@kernel.org
-Subject: Re: [PATCH 15/17] crypto: arm/aes-ce - implement ciphertext stealing
- for CBC
-Message-ID: <20190930163241.GA14355@roeck-us.net>
-References: <20190821143253.30209-1-ard.biesheuvel@linaro.org>
- <20190821143253.30209-16-ard.biesheuvel@linaro.org>
+        Mon, 30 Sep 2019 16:38:59 -0400
+Received: from mail-eopbgr810042.outbound.protection.outlook.com ([40.107.81.42]:46352
+        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729636AbfI3Ui4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 30 Sep 2019 16:38:56 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PfHHkDnRSqOxZzcrwKkGakWhQOj/0nb+rDfJUHmFhghksX/E21MQQJzXc70cEqs+NsV0Lkxkz+CHmLiLydM44lMWELJgdF4g9+arjsirwnAcXw5G7HIK5FGmkzrvrXwVagMlb/LXJvjWa1OuSre7sEYOV+kLsi1/g/fEgDh1s0nTvMTc62AOme1JagFhvaw1Hrj1AoMw4P1ZoWcIR6nr311QsC5Jdl01TSdEIWYqETbbmoyKteX5bDIp8XPsxqDQvSWy8/u3CVGLFgi9LKgLXvK5KNaagWGJeeomZNYunV/WUdjPFrm3pq4is05QaA+zrsPuhtsTg+Ws5sqkKM52Lw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FL1Voe/YukiInIpN+TRUbtVw0raKOWtIDr3KoQi9GxI=;
+ b=QAFGt+HDgz9AL6PK14VeKMM9tl/wjvRcXbN1vNbOMGf1p9SP34PU0i9rjKkDTejNY/Q7q7D1AAMXSxVYGZ27wyDtmOYsFi709bwEoXcqFXpGUuNwCkt5V04/8KipWlMRQC6q7PBT1szbfQZtm0iOKv0AJ+hcyia+wxMq8PFeHydF3K4vkXq5SLKcGsHWAicvAZ2YqOToVhvc5fP6ivQxs3JGFlW+Ubs0x0hX45PohbKMW/xApt4AE3H2Toy7B7nGJpEHV0w2DZmC1srDz8H7h49i5O4UQzNtFhKYl4skpCUyKFXA4g8rwi7/X+aG//PLVopdy/lMAEfhm1kkMAWDDQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=verimatrix.com; dmarc=pass action=none
+ header.from=verimatrix.com; dkim=pass header.d=verimatrix.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FL1Voe/YukiInIpN+TRUbtVw0raKOWtIDr3KoQi9GxI=;
+ b=rJKZfeudlRzsnzrlTxblD3vRbIdxqtu7Wor1QsJCVj8f/TL5wbh2R7u1W0l9TL5B6yyeA7w+kPIkHod4zbmjGdyt3MaR1PIDTj0QxxFcDoh5q5oRVEKeYUGciJGC5Gw7Vv8SGiuYewpJMVLAhZoAOQx5piJSD2+4Cd8wjbTf0t4=
+Received: from CH2PR20MB2968.namprd20.prod.outlook.com (10.255.156.33) by
+ CH2SPR01MB0005.namprd20.prod.outlook.com (10.255.155.138) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2305.17; Mon, 30 Sep 2019 19:04:24 +0000
+Received: from CH2PR20MB2968.namprd20.prod.outlook.com
+ ([fe80::e8b0:cb5f:268e:e3ae]) by CH2PR20MB2968.namprd20.prod.outlook.com
+ ([fe80::e8b0:cb5f:268e:e3ae%5]) with mapi id 15.20.2305.017; Mon, 30 Sep 2019
+ 19:04:23 +0000
+From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+To:     Arnd Bergmann <arnd@arndb.de>,
+        Antoine Tenart <antoine.tenart@bootlin.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+CC:     Pascal van Leeuwen <pascalvanl@gmail.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Eric Biggers <ebiggers@google.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH 2/3] crypto: inside-secure - Reduce stack usage
+Thread-Topic: [PATCH 2/3] crypto: inside-secure - Reduce stack usage
+Thread-Index: AQHVd4jLpZQEIOemw0ukUdKdGUz6fqdEkO9A
+Date:   Mon, 30 Sep 2019 19:04:23 +0000
+Message-ID: <CH2PR20MB2968B7855D241C747BEB68B9CA820@CH2PR20MB2968.namprd20.prod.outlook.com>
+References: <20190930121520.1388317-1-arnd@arndb.de>
+ <20190930121520.1388317-2-arnd@arndb.de>
+In-Reply-To: <20190930121520.1388317-2-arnd@arndb.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=pvanleeuwen@verimatrix.com; 
+x-originating-ip: [188.204.2.113]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: fbdcd030-0bf0-4ec9-c0bb-08d745d901cb
+x-ms-traffictypediagnostic: CH2SPR01MB0005:
+x-ms-exchange-purlcount: 1
+x-microsoft-antispam-prvs: <CH2SPR01MB00058F2AC4E1631B5DF69476CA820@CH2SPR01MB0005.namprd20.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-forefront-prvs: 01762B0D64
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(39850400004)(376002)(346002)(366004)(136003)(189003)(199004)(13464003)(51444003)(256004)(5660300002)(2906002)(478600001)(76116006)(99286004)(9686003)(86362001)(26005)(8676002)(81156014)(6506007)(76176011)(229853002)(53546011)(14444005)(81166006)(8936002)(15974865002)(66946007)(14454004)(66476007)(66446008)(66556008)(6436002)(55016002)(52536014)(7696005)(186003)(33656002)(7736002)(3846002)(71200400001)(305945005)(476003)(74316002)(71190400001)(66066001)(316002)(102836004)(54906003)(446003)(64756008)(25786009)(486006)(4326008)(11346002)(110136005)(6116002)(6246003)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:CH2SPR01MB0005;H:CH2PR20MB2968.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: verimatrix.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: +vQG8ViFzOzrmj/9kjXkYFrZoTfiqqZ4XGy6OjTlRbs88sZSjCtEn8IykEdWTgSd914pCSA+ZgepV2GAzZazEtO2nsvMnzdELfM0Wy50YuvmCdgXlo5tutzvEhrB34jn1iV9A7zh4bqX/Yx8jHMIQnNOqsKCdexUAzpPTorMCRTQewODKy/iFiw7cHt+1RNisJQBEyB/bF6ST+PX709cPWoYdwkz64LXjMIPrLUAjGvo8PkEptTNNRexaA/fAI4NBU48qyDCEZfNdi/2sUNQuJoctJkfbX2tglneG0uwtivg/JP3EVlmtW9n2DyBMKUMG5FceFDrXHG18SypZX5vaeXhA5l8//RgDd5nTXLVxfFTHoKBWqMEsAtuQgZUbNYYBy+pAHtDHEZJ3J9mdppkJsY9y28iuBhhU+wxg6Ae+/I=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="Windows-1252"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20190821143253.30209-16-ard.biesheuvel@linaro.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+X-OriginatorOrg: verimatrix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fbdcd030-0bf0-4ec9-c0bb-08d745d901cb
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Sep 2019 19:04:23.5635
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: EIua5YWqSTkQw1wXlQq9MRxCvR6PggX22phHAxZS+4XZjUng9HT2lLTMOYe13Rnh9ir3nQS/9YD9GNwPrWIZxhArqu3ru2MIngxI+NB8THg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2SPR01MB0005
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Aug 21, 2019 at 05:32:51PM +0300, Ard Biesheuvel wrote:
-> Instead of relying on the CTS template to wrap the accelerated CBC
-> skcipher, implement the ciphertext stealing part directly.
-> 
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> -----Original Message-----
+> From: Arnd Bergmann <arnd@arndb.de>
+> Sent: Monday, September 30, 2019 2:15 PM
+> To: Antoine Tenart <antoine.tenart@bootlin.com>; Herbert Xu <herbert@gond=
+or.apana.org.au>;
+> David S. Miller <davem@davemloft.net>
+> Cc: Arnd Bergmann <arnd@arndb.de>; Pascal Van Leeuwen <pvanleeuwen@verima=
+trix.com>; Pascal
+> van Leeuwen <pascalvanl@gmail.com>; Ard Biesheuvel <ard.biesheuvel@linaro=
+.org>; Eric Biggers
+> <ebiggers@google.com>; linux-crypto@vger.kernel.org; linux-kernel@vger.ke=
+rnel.org
+> Subject: [PATCH 2/3] crypto: inside-secure - Reduce stack usage
+>=20
+> safexcel_aead_setkey() contains three large stack variables, totalling
+> slightly more than the 1024 byte warning limit:
+>=20
+> drivers/crypto/inside-secure/safexcel_cipher.c:303:12: error: stack frame=
+ size of 1032 bytes
+> in function 'safexcel_aead_setkey' [-Werror,-Wframe-larger-than=3D]
+>=20
+Ok, I did not realise that, so thanks for pointing that out to me.
 
-For arm:allmodconfig built with gcc 9.2.0, this patch results in
+> The function already contains a couple of dynamic allocations, so it is
+> likely not performance critical and it can only be called in a context
+> that allows sleeping, so the easiest workaround is to add change it
+> to use dynamic allocations. Combining istate and ostate into a single
+> variable simplifies the allocation at the cost of making it slightly
+> less readable.
+>=20
+Hmmm... I wouldn't exactly consider it to be not performance critical - it
+can be under certain circumstanced, but I guess it's already wasting lots
+of cycles on allocations and key precomputes in safexcel_hmac_setkey, so
+for now dynamically allocating the state is fine.
 
-arch/arm/crypto/aes-ce-core.S: Assembler messages:
-arch/arm/crypto/aes-ce-core.S:299: Error: selected processor does not support `movw ip,:lower16:.Lcts_permute_table' in ARM mode
-arch/arm/crypto/aes-ce-core.S:300: Error: selected processor does not support `movt ip,:upper16:.Lcts_permute_table' in ARM mode
-arch/arm/crypto/aes-ce-core.S:337: Error: selected processor does not support `movw ip,:lower16:.Lcts_permute_table' in ARM mode
-arch/arm/crypto/aes-ce-core.S:338: Error: selected processor does not support `movt ip,:upper16:.Lcts_permute_table' in ARM mode
-arch/arm/crypto/aes-ce-core.S:552: Error: selected processor does not support `movw ip,:lower16:.Lcts_permute_table' in ARM mode
-arch/arm/crypto/aes-ce-core.S:553: Error: selected processor does not support `movt ip,:upper16:.Lcts_permute_table' in ARM mode
-arch/arm/crypto/aes-ce-core.S:638: Error: selected processor does not support `movw ip,:lower16:.Lcts_permute_table' in ARM mode
-arch/arm/crypto/aes-ce-core.S:639: Error: selected processor does not support `movt ip,:upper16:.Lcts_permute_table' in ARM mode
+> Alternatively, it should be possible to shrink these allocations
+> as the extra buffers appear to be largely unnecessary, but doing
+> this would be a much more invasive change.
+>=20
+Actually, for HMAC-SHA512 you DO need all that buffer space.
+You could shrink it to 2 * ctx->state_sz but then your simple indexing
+is no longer going to fly. Not sure if that would be worth the effort.
 
-Any idea how to avoid that ?
+I don't like the part where you dynamically allocate the cryto_aes_ctx
+though, I think that was not necessary considering its a lot smaller.
+And it conflicts with another change I have waiting that gets rid of=20
+aes_expandkey and that struct alltogether (since it was really just
+abused to do a key size check, which was very wasteful since the=20
+function actually generates all roundkeys we don't need at all ...)
 
-Guenter
+So I'll get rid of that struct anyway and doing it in this patch just
+complicates applying your patch to my code or rebasing my stuff later.
 
+> Fixes: 0e17e3621a28 ("crypto: inside-secure - add support for
+> authenc(hmac(sha*),rfc3686(ctr(aes))) suites")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 > ---
->  arch/arm/crypto/aes-ce-core.S |  85 +++++++++
->  arch/arm/crypto/aes-ce-glue.c | 188 ++++++++++++++++++--
->  2 files changed, 256 insertions(+), 17 deletions(-)
-> 
-> diff --git a/arch/arm/crypto/aes-ce-core.S b/arch/arm/crypto/aes-ce-core.S
-> index 763e51604ab6..b978cdf133af 100644
-> --- a/arch/arm/crypto/aes-ce-core.S
-> +++ b/arch/arm/crypto/aes-ce-core.S
-> @@ -284,6 +284,91 @@ ENTRY(ce_aes_cbc_decrypt)
->  	pop		{r4-r6, pc}
->  ENDPROC(ce_aes_cbc_decrypt)
->  
-> +
-> +	/*
-> +	 * ce_aes_cbc_cts_encrypt(u8 out[], u8 const in[], u32 const rk[],
-> +	 *			  int rounds, int bytes, u8 const iv[])
-> +	 * ce_aes_cbc_cts_decrypt(u8 out[], u8 const in[], u32 const rk[],
-> +	 *			  int rounds, int bytes, u8 const iv[])
-> +	 */
-> +
-> +ENTRY(ce_aes_cbc_cts_encrypt)
-> +	push		{r4-r6, lr}
-> +	ldrd		r4, r5, [sp, #16]
-> +
-> +	movw		ip, :lower16:.Lcts_permute_table
-> +	movt		ip, :upper16:.Lcts_permute_table
-> +	sub		r4, r4, #16
-> +	add		lr, ip, #32
-> +	add		ip, ip, r4
-> +	sub		lr, lr, r4
-> +	vld1.8		{q5}, [ip]
-> +	vld1.8		{q6}, [lr]
-> +
-> +	add		ip, r1, r4
-> +	vld1.8		{q0}, [r1]			@ overlapping loads
-> +	vld1.8		{q3}, [ip]
-> +
-> +	vld1.8		{q1}, [r5]			@ get iv
-> +	prepare_key	r2, r3
-> +
-> +	veor		q0, q0, q1			@ xor with iv
-> +	bl		aes_encrypt
-> +
-> +	vtbl.8		d4, {d0-d1}, d10
-> +	vtbl.8		d5, {d0-d1}, d11
-> +	vtbl.8		d2, {d6-d7}, d12
-> +	vtbl.8		d3, {d6-d7}, d13
-> +
-> +	veor		q0, q0, q1
-> +	bl		aes_encrypt
-> +
-> +	add		r4, r0, r4
-> +	vst1.8		{q2}, [r4]			@ overlapping stores
-> +	vst1.8		{q0}, [r0]
-> +
-> +	pop		{r4-r6, pc}
-> +ENDPROC(ce_aes_cbc_cts_encrypt)
-> +
-> +ENTRY(ce_aes_cbc_cts_decrypt)
-> +	push		{r4-r6, lr}
-> +	ldrd		r4, r5, [sp, #16]
-> +
-> +	movw		ip, :lower16:.Lcts_permute_table
-> +	movt		ip, :upper16:.Lcts_permute_table
-> +	sub		r4, r4, #16
-> +	add		lr, ip, #32
-> +	add		ip, ip, r4
-> +	sub		lr, lr, r4
-> +	vld1.8		{q5}, [ip]
-> +	vld1.8		{q6}, [lr]
-> +
-> +	add		ip, r1, r4
-> +	vld1.8		{q0}, [r1]			@ overlapping loads
-> +	vld1.8		{q1}, [ip]
-> +
-> +	vld1.8		{q3}, [r5]			@ get iv
-> +	prepare_key	r2, r3
-> +
-> +	bl		aes_decrypt
-> +
-> +	vtbl.8		d4, {d0-d1}, d10
-> +	vtbl.8		d5, {d0-d1}, d11
-> +	vtbx.8		d0, {d2-d3}, d12
-> +	vtbx.8		d1, {d2-d3}, d13
-> +
-> +	veor		q1, q1, q2
-> +	bl		aes_decrypt
-> +	veor		q0, q0, q3			@ xor with iv
-> +
-> +	add		r4, r0, r4
-> +	vst1.8		{q1}, [r4]			@ overlapping stores
-> +	vst1.8		{q0}, [r0]
-> +
-> +	pop		{r4-r6, pc}
-> +ENDPROC(ce_aes_cbc_cts_decrypt)
-> +
-> +
->  	/*
->  	 * aes_ctr_encrypt(u8 out[], u8 const in[], u32 const rk[], int rounds,
->  	 *		   int blocks, u8 ctr[])
-> diff --git a/arch/arm/crypto/aes-ce-glue.c b/arch/arm/crypto/aes-ce-glue.c
-> index c215792a2494..cdb1a07e7ad0 100644
-> --- a/arch/arm/crypto/aes-ce-glue.c
-> +++ b/arch/arm/crypto/aes-ce-glue.c
-> @@ -35,6 +35,10 @@ asmlinkage void ce_aes_cbc_encrypt(u8 out[], u8 const in[], u32 const rk[],
->  				   int rounds, int blocks, u8 iv[]);
->  asmlinkage void ce_aes_cbc_decrypt(u8 out[], u8 const in[], u32 const rk[],
->  				   int rounds, int blocks, u8 iv[]);
-> +asmlinkage void ce_aes_cbc_cts_encrypt(u8 out[], u8 const in[], u32 const rk[],
-> +				   int rounds, int bytes, u8 const iv[]);
-> +asmlinkage void ce_aes_cbc_cts_decrypt(u8 out[], u8 const in[], u32 const rk[],
-> +				   int rounds, int bytes, u8 const iv[]);
->  
->  asmlinkage void ce_aes_ctr_encrypt(u8 out[], u8 const in[], u32 const rk[],
->  				   int rounds, int blocks, u8 ctr[]);
-> @@ -210,48 +214,182 @@ static int ecb_decrypt(struct skcipher_request *req)
->  	return err;
->  }
->  
-> -static int cbc_encrypt(struct skcipher_request *req)
-> +static int cbc_encrypt_walk(struct skcipher_request *req,
-> +			    struct skcipher_walk *walk)
+>  .../crypto/inside-secure/safexcel_cipher.c    | 53 ++++++++++++-------
+>  1 file changed, 35 insertions(+), 18 deletions(-)
+>=20
+> diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/cry=
+pto/inside-
+> secure/safexcel_cipher.c
+> index ef51f8c2b473..51a4112aa9bc 100644
+> --- a/drivers/crypto/inside-secure/safexcel_cipher.c
+> +++ b/drivers/crypto/inside-secure/safexcel_cipher.c
+> @@ -305,10 +305,10 @@ static int safexcel_aead_setkey(struct crypto_aead =
+*ctfm, const u8
+> *key,
 >  {
->  	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
->  	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
-> -	struct skcipher_walk walk;
->  	unsigned int blocks;
-> -	int err;
-> +	int err = 0;
->  
-> -	err = skcipher_walk_virt(&walk, req, false);
-> -
-> -	while ((blocks = (walk.nbytes / AES_BLOCK_SIZE))) {
-> +	while ((blocks = (walk->nbytes / AES_BLOCK_SIZE))) {
->  		kernel_neon_begin();
-> -		ce_aes_cbc_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
-> +		ce_aes_cbc_encrypt(walk->dst.virt.addr, walk->src.virt.addr,
->  				   ctx->key_enc, num_rounds(ctx), blocks,
-> -				   walk.iv);
-> +				   walk->iv);
->  		kernel_neon_end();
-> -		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
-> +		err = skcipher_walk_done(walk, walk->nbytes % AES_BLOCK_SIZE);
+>  	struct crypto_tfm *tfm =3D crypto_aead_tfm(ctfm);
+>  	struct safexcel_cipher_ctx *ctx =3D crypto_tfm_ctx(tfm);
+> -	struct safexcel_ahash_export_state istate, ostate;
+> +	struct safexcel_ahash_export_state *state;
+>  	struct safexcel_crypto_priv *priv =3D ctx->priv;
+> +	struct crypto_aes_ctx *aes;
+>  	struct crypto_authenc_keys keys;
+> -	struct crypto_aes_ctx aes;
+>  	int err =3D -EINVAL;
+>=20
+>  	if (crypto_authenc_extractkeys(&keys, key, len) !=3D 0)
+> @@ -334,7 +334,14 @@ static int safexcel_aead_setkey(struct crypto_aead *=
+ctfm, const u8 *key,
+>  			goto badkey_expflags;
+>  		break;
+>  	case SAFEXCEL_AES:
+> -		err =3D aes_expandkey(&aes, keys.enckey, keys.enckeylen);
+> +		aes =3D kzalloc(sizeof(*aes), GFP_KERNEL);
+> +		if (!aes) {
+> +			err =3D -ENOMEM;
+> +			goto badkey;
+> +		}
+> +
+> +		err =3D aes_expandkey(aes, keys.enckey, keys.enckeylen);
+> +		kfree(aes);
+>  		if (unlikely(err))
+>  			goto badkey;
+>  		break;
+> @@ -347,56 +354,66 @@ static int safexcel_aead_setkey(struct crypto_aead =
+*ctfm, const u8
+> *key,
+>  	    memcmp(ctx->key, keys.enckey, keys.enckeylen))
+>  		ctx->base.needs_inv =3D true;
+>=20
+> +	state =3D kzalloc(sizeof(struct safexcel_ahash_export_state) * 2, GFP_K=
+ERNEL);
+> +	if (!state) {
+> +		err =3D -ENOMEM;
+> +		goto badkey;
+> +	}
+> +
+>  	/* Auth key */
+>  	switch (ctx->hash_alg) {
+>  	case CONTEXT_CONTROL_CRYPTO_ALG_SHA1:
+>  		if (safexcel_hmac_setkey("safexcel-sha1", keys.authkey,
+> -					 keys.authkeylen, &istate, &ostate))
+> -			goto badkey;
+> +					 keys.authkeylen, &state[0], &state[1]))
+> +			goto badkey_free;
+>  		break;
+>  	case CONTEXT_CONTROL_CRYPTO_ALG_SHA224:
+>  		if (safexcel_hmac_setkey("safexcel-sha224", keys.authkey,
+> -					 keys.authkeylen, &istate, &ostate))
+> -			goto badkey;
+> +					 keys.authkeylen, &state[0], &state[1]))
+> +			goto badkey_free;
+>  		break;
+>  	case CONTEXT_CONTROL_CRYPTO_ALG_SHA256:
+>  		if (safexcel_hmac_setkey("safexcel-sha256", keys.authkey,
+> -					 keys.authkeylen, &istate, &ostate))
+> -			goto badkey;
+> +					 keys.authkeylen, &state[0], &state[1]))
+> +			goto badkey_free;
+>  		break;
+>  	case CONTEXT_CONTROL_CRYPTO_ALG_SHA384:
+>  		if (safexcel_hmac_setkey("safexcel-sha384", keys.authkey,
+> -					 keys.authkeylen, &istate, &ostate))
+> -			goto badkey;
+> +					 keys.authkeylen, &state[0], &state[1]))
+> +			goto badkey_free;
+>  		break;
+>  	case CONTEXT_CONTROL_CRYPTO_ALG_SHA512:
+>  		if (safexcel_hmac_setkey("safexcel-sha512", keys.authkey,
+> -					 keys.authkeylen, &istate, &ostate))
+> -			goto badkey;
+> +					 keys.authkeylen, &state[0], &state[1]))
+> +			goto badkey_free;
+>  		break;
+>  	default:
+>  		dev_err(priv->dev, "aead: unsupported hash algorithm\n");
+> -		goto badkey;
+> +		goto badkey_free;
 >  	}
->  	return err;
->  }
->  
-> -static int cbc_decrypt(struct skcipher_request *req)
-> +static int cbc_encrypt(struct skcipher_request *req)
->  {
-> -	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-> -	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
->  	struct skcipher_walk walk;
-> -	unsigned int blocks;
->  	int err;
->  
->  	err = skcipher_walk_virt(&walk, req, false);
-> +	if (err)
-> +		return err;
-> +	return cbc_encrypt_walk(req, &walk);
-> +}
->  
-> -	while ((blocks = (walk.nbytes / AES_BLOCK_SIZE))) {
-> +static int cbc_decrypt_walk(struct skcipher_request *req,
-> +			    struct skcipher_walk *walk)
-> +{
-> +	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-> +	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
-> +	unsigned int blocks;
-> +	int err = 0;
+>=20
+>  	crypto_aead_set_flags(ctfm, crypto_aead_get_flags(ctfm) &
+>  				    CRYPTO_TFM_RES_MASK);
+>=20
+>  	if (priv->flags & EIP197_TRC_CACHE && ctx->base.ctxr_dma &&
+> -	    (memcmp(ctx->ipad, istate.state, ctx->state_sz) ||
+> -	     memcmp(ctx->opad, ostate.state, ctx->state_sz)))
+> +	    (memcmp(ctx->ipad, &state[0].state, ctx->state_sz) ||
+> +	     memcmp(ctx->opad, &state[1].state, ctx->state_sz)))
+>  		ctx->base.needs_inv =3D true;
+>=20
+>  	/* Now copy the keys into the context */
+>  	memcpy(ctx->key, keys.enckey, keys.enckeylen);
+>  	ctx->key_len =3D keys.enckeylen;
+>=20
+> -	memcpy(ctx->ipad, &istate.state, ctx->state_sz);
+> -	memcpy(ctx->opad, &ostate.state, ctx->state_sz);
+> +	memcpy(ctx->ipad, &state[0].state, ctx->state_sz);
+> +	memcpy(ctx->opad, &state[1].state, ctx->state_sz);
+>=20
+>  	memzero_explicit(&keys, sizeof(keys));
+> +	kfree(state);
 > +
-> +	while ((blocks = (walk->nbytes / AES_BLOCK_SIZE))) {
->  		kernel_neon_begin();
-> -		ce_aes_cbc_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
-> +		ce_aes_cbc_decrypt(walk->dst.virt.addr, walk->src.virt.addr,
->  				   ctx->key_dec, num_rounds(ctx), blocks,
-> -				   walk.iv);
-> +				   walk->iv);
->  		kernel_neon_end();
-> -		err = skcipher_walk_done(&walk, walk.nbytes % AES_BLOCK_SIZE);
-> +		err = skcipher_walk_done(walk, walk->nbytes % AES_BLOCK_SIZE);
->  	}
->  	return err;
->  }
->  
-> +static int cbc_decrypt(struct skcipher_request *req)
-> +{
-> +	struct skcipher_walk walk;
-> +	int err;
-> +
-> +	err = skcipher_walk_virt(&walk, req, false);
-> +	if (err)
-> +		return err;
-> +	return cbc_decrypt_walk(req, &walk);
-> +}
-> +
-> +static int cts_cbc_encrypt(struct skcipher_request *req)
-> +{
-> +	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-> +	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
-> +	int cbc_blocks = DIV_ROUND_UP(req->cryptlen, AES_BLOCK_SIZE) - 2;
-> +	struct scatterlist *src = req->src, *dst = req->dst;
-> +	struct scatterlist sg_src[2], sg_dst[2];
-> +	struct skcipher_request subreq;
-> +	struct skcipher_walk walk;
-> +	int err;
-> +
-> +	skcipher_request_set_tfm(&subreq, tfm);
-> +	skcipher_request_set_callback(&subreq, skcipher_request_flags(req),
-> +				      NULL, NULL);
-> +
-> +	if (req->cryptlen <= AES_BLOCK_SIZE) {
-> +		if (req->cryptlen < AES_BLOCK_SIZE)
-> +			return -EINVAL;
-> +		cbc_blocks = 1;
-> +	}
-> +
-> +	if (cbc_blocks > 0) {
-> +		skcipher_request_set_crypt(&subreq, req->src, req->dst,
-> +					   cbc_blocks * AES_BLOCK_SIZE,
-> +					   req->iv);
-> +
-> +		err = skcipher_walk_virt(&walk, &subreq, false) ?:
-> +		      cbc_encrypt_walk(&subreq, &walk);
-> +		if (err)
-> +			return err;
-> +
-> +		if (req->cryptlen == AES_BLOCK_SIZE)
-> +			return 0;
-> +
-> +		dst = src = scatterwalk_ffwd(sg_src, req->src, subreq.cryptlen);
-> +		if (req->dst != req->src)
-> +			dst = scatterwalk_ffwd(sg_dst, req->dst,
-> +					       subreq.cryptlen);
-> +	}
-> +
-> +	/* handle ciphertext stealing */
-> +	skcipher_request_set_crypt(&subreq, src, dst,
-> +				   req->cryptlen - cbc_blocks * AES_BLOCK_SIZE,
-> +				   req->iv);
-> +
-> +	err = skcipher_walk_virt(&walk, &subreq, false);
-> +	if (err)
-> +		return err;
-> +
-> +	kernel_neon_begin();
-> +	ce_aes_cbc_cts_encrypt(walk.dst.virt.addr, walk.src.virt.addr,
-> +			       ctx->key_enc, num_rounds(ctx), walk.nbytes,
-> +			       walk.iv);
-> +	kernel_neon_end();
-> +
-> +	return skcipher_walk_done(&walk, 0);
-> +}
-> +
-> +static int cts_cbc_decrypt(struct skcipher_request *req)
-> +{
-> +	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-> +	struct crypto_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
-> +	int cbc_blocks = DIV_ROUND_UP(req->cryptlen, AES_BLOCK_SIZE) - 2;
-> +	struct scatterlist *src = req->src, *dst = req->dst;
-> +	struct scatterlist sg_src[2], sg_dst[2];
-> +	struct skcipher_request subreq;
-> +	struct skcipher_walk walk;
-> +	int err;
-> +
-> +	skcipher_request_set_tfm(&subreq, tfm);
-> +	skcipher_request_set_callback(&subreq, skcipher_request_flags(req),
-> +				      NULL, NULL);
-> +
-> +	if (req->cryptlen <= AES_BLOCK_SIZE) {
-> +		if (req->cryptlen < AES_BLOCK_SIZE)
-> +			return -EINVAL;
-> +		cbc_blocks = 1;
-> +	}
-> +
-> +	if (cbc_blocks > 0) {
-> +		skcipher_request_set_crypt(&subreq, req->src, req->dst,
-> +					   cbc_blocks * AES_BLOCK_SIZE,
-> +					   req->iv);
-> +
-> +		err = skcipher_walk_virt(&walk, &subreq, false) ?:
-> +		      cbc_decrypt_walk(&subreq, &walk);
-> +		if (err)
-> +			return err;
-> +
-> +		if (req->cryptlen == AES_BLOCK_SIZE)
-> +			return 0;
-> +
-> +		dst = src = scatterwalk_ffwd(sg_src, req->src, subreq.cryptlen);
-> +		if (req->dst != req->src)
-> +			dst = scatterwalk_ffwd(sg_dst, req->dst,
-> +					       subreq.cryptlen);
-> +	}
-> +
-> +	/* handle ciphertext stealing */
-> +	skcipher_request_set_crypt(&subreq, src, dst,
-> +				   req->cryptlen - cbc_blocks * AES_BLOCK_SIZE,
-> +				   req->iv);
-> +
-> +	err = skcipher_walk_virt(&walk, &subreq, false);
-> +	if (err)
-> +		return err;
-> +
-> +	kernel_neon_begin();
-> +	ce_aes_cbc_cts_decrypt(walk.dst.virt.addr, walk.src.virt.addr,
-> +			       ctx->key_dec, num_rounds(ctx), walk.nbytes,
-> +			       walk.iv);
-> +	kernel_neon_end();
-> +
-> +	return skcipher_walk_done(&walk, 0);
-> +}
-> +
->  static int ctr_encrypt(struct skcipher_request *req)
->  {
->  	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-> @@ -486,6 +624,22 @@ static struct skcipher_alg aes_algs[] = { {
->  	.setkey			= ce_aes_setkey,
->  	.encrypt		= cbc_encrypt,
->  	.decrypt		= cbc_decrypt,
-> +}, {
-> +	.base.cra_name		= "__cts(cbc(aes))",
-> +	.base.cra_driver_name	= "__cts-cbc-aes-ce",
-> +	.base.cra_priority	= 300,
-> +	.base.cra_flags		= CRYPTO_ALG_INTERNAL,
-> +	.base.cra_blocksize	= AES_BLOCK_SIZE,
-> +	.base.cra_ctxsize	= sizeof(struct crypto_aes_ctx),
-> +	.base.cra_module	= THIS_MODULE,
-> +
-> +	.min_keysize		= AES_MIN_KEY_SIZE,
-> +	.max_keysize		= AES_MAX_KEY_SIZE,
-> +	.ivsize			= AES_BLOCK_SIZE,
-> +	.walksize		= 2 * AES_BLOCK_SIZE,
-> +	.setkey			= ce_aes_setkey,
-> +	.encrypt		= cts_cbc_encrypt,
-> +	.decrypt		= cts_cbc_decrypt,
->  }, {
->  	.base.cra_name		= "__ctr(aes)",
->  	.base.cra_driver_name	= "__ctr-aes-ce",
+>  	return 0;
+>=20
+> +badkey_free:
+> +	kfree(state);
+>  badkey:
+>  	crypto_aead_set_flags(ctfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
+>  badkey_expflags:
+> --
+> 2.20.0
+
+Regards,
+Pascal van Leeuwen
+Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
+www.insidesecure.com
+
