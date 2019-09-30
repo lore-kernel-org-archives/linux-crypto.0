@@ -4,204 +4,203 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.0 required=3.0
 	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C2A3C32792
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Sep 2019 12:15:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33B38C32792
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Sep 2019 12:16:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6D35A21855
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Sep 2019 12:15:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 09116218DE
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Sep 2019 12:16:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730503AbfI3MPx (ORCPT
+        id S1727885AbfI3MQY (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 30 Sep 2019 08:15:53 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:53721 "EHLO
+        Mon, 30 Sep 2019 08:16:24 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:48827 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726952AbfI3MPw (ORCPT
+        with ESMTP id S1726314AbfI3MQY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Sep 2019 08:15:52 -0400
+        Mon, 30 Sep 2019 08:16:24 -0400
 Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
  (mreue108 [212.227.15.145]) with ESMTPA (Nemesis) id
- 1N7iGi-1i20Qx123u-014jKc; Mon, 30 Sep 2019 14:15:33 +0200
+ 1MZCX1-1iaW5x1SCX-00V7fF; Mon, 30 Sep 2019 14:16:00 +0200
 From:   Arnd Bergmann <arnd@arndb.de>
 To:     Antoine Tenart <antoine.tenart@bootlin.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
+        "David S. Miller" <davem@davemloft.net>,
+        Bjorn Helgaas <bhelgaas@google.com>
 Cc:     Arnd Bergmann <arnd@arndb.de>,
         Pascal van Leeuwen <pvanleeuwen@verimatrix.com>,
         Pascal van Leeuwen <pascalvanl@gmail.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Eric Biggers <ebiggers@google.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 2/3] crypto: inside-secure - Reduce stack usage
-Date:   Mon, 30 Sep 2019 14:14:34 +0200
-Message-Id: <20190930121520.1388317-2-arnd@arndb.de>
+        Kelsey Skunberg <skunberg.kelsey@gmail.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-pci@vger.kernel.org
+Subject: [PATCH 3/3] crypto: inside-secure - Remove #ifdef checks
+Date:   Mon, 30 Sep 2019 14:14:35 +0200
+Message-Id: <20190930121520.1388317-3-arnd@arndb.de>
 X-Mailer: git-send-email 2.20.0
 In-Reply-To: <20190930121520.1388317-1-arnd@arndb.de>
 References: <20190930121520.1388317-1-arnd@arndb.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:SdTEVKCj+nL7s4r3XJVBnS3lE53zalNAnSIg2b+V4EJzRyGI+uR
- 8DG9WpMpncURT5/MuofVLYgJuTp0ITlNsalANaBtGrU2NDqw2tgKFHHUMmFM+4VJ4QKGFx3
- iIrPKf7qsq98cmF0nFUWmjw9n4sN9/P+MCn3PiriSomIfmSmANKeS4ah43d9rjfVP2uJVLQ
- u93WyhY8XtyBWFOmihZnw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:QgPJF9CNy6o=:Od3xmj3VUEr7X6xLeuQsao
- ZTakSPqN7OVbzd0jza57R8n2fup/HGDmTA8XGtTyfRuTG3jCBvO4evZ1uo5enbP1AAlWSs4Re
- pNBv1pS2sxkTqqWT6mkPAhUs0eUcSN5sZCcJUq5SqER6MYVVuflJ2/xVODpRfVesL6/rxMIBG
- X/cCycplvH5Ss59RVJFiVm1K+OISerhwusKVWhhScah3X2cfUgZciZZgI8TC/+AijLcLYrGwT
- yELKK2JMleMGcou2LxCULyDhT+0xP9dcLct/LZRRHIpOiuGOOIGpdz3jZByzjtwuBgpDO4FKD
- QDJ7mSJ7zyDGnXwtU1X376AVXtJqBWjegxRqE17lRFW1Dm+EnsDTCszeqeb3o96ENAujolXp6
- NHEROAQkrnGUL8GXtio+WiAIUz2IqCeLmu6FpY295BS2JXWtqSe/SVfxtjIr19VFNHr/yeXXx
- TzqNYMdoyxfHoy82U/V9gRmpbiDEkkEogNscqPigzbl2tSgyGfy8barralIjCPUvCFj/KZtHM
- UqWtQ+h40vT6ihqwIsIuuGLd5wE6QYX68DxxLFFvK2PUtmOnPy1iDIxdBt8amhmkr08MsKdWR
- DI/MavST/2PmdynuljmglMgeGTl8/EWrWfssZspzhAUF92b7F941eufeAVjKl/VPgTt0HERwQ
- Vd5DVgX+JIQckHCFyvM+SPRdPudKU9kEy4Tt9SvpsUgJoBVeEBWVACkTqlIF1/CTGQovdxzbJ
- racTcnTrKBdy58HVC4UxrlciYlgfMRskyvjQh7pC/0FMZNTyZVrHhgdq2yFvX6fDHw6J5q/TV
- KabUV/G+ajmJtFFSDKlwZ2cIWcCN3bnpI+sB4VD+uOBfDcsgYitlLlMAbdgEMF6B2VHbpEVos
- DBkvBoHjf9z6iTkJTtiw==
+X-Provags-ID: V03:K1:DhNMaznTViuOF1AalsUIbiZreKsHiyUrkj8fjXw2kpt+XaZVRMO
+ J8YhptUq0zNreRZAe1ciQQ9P+7PwLZ4bVXmZ2zDxUx16GeaoE+uLbSBgsq4VqI/bllMTpUm
+ IuOxnA/ocfiWg7kY8BpiqjzDbShczJ0gkj3X45qj6ROtPYNI1xWVIe84GaxjDxbJJT/Kxf4
+ GCMm4UdcKSxI/O67jRoeA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:iwpPAhAApkg=:vp6ThXb05tXvclIdlpOKKK
+ 9xeCeSq9XRyUpW/bqAqmJKKLGkk0Dmni/pOgc+KWFb/bUqE5jDBE6agHOI3v6VlhEO1iQ7CLV
+ gR4/7DWERudbPYl09MEziUp/oWYSm4xo+QgUD68FnLuodMS1fbyderRJLzO1BcIZN9wuQML2a
+ mz684aYB+X5HJQ2GJrw012PxdMfTu2myUmH7usdIcW/UDg5j1Eacg1YLo5eRtYeX7pYTorqLS
+ 8vdOfsIsU8Xfs7E+d3gXKiSRlVncPB3mjJOtKzh7mmJnSCXbwtpMkwYEVAHjMqVvTaY4/cXC1
+ aDJCggWuHj2cimOinhDTJ88N6x/hQSQY4q5j/F6AsviI/kS6UjqM+lvl1HKXexaK7thGZI5wI
+ L9WFx8+JfUpFIPj9B2dOCwHOSmdn2YeCvoBM9aQ+sStypc1brRCggst6Af1THOj2tWV8qPGF8
+ 3lfwmx2ejW1KKJCqEiWM9mZCo0fwtTmRYxZIpbJDqGSwPBXjtX2lV43tf5wgd+IvKXXosuiPg
+ hkCZYTPNx109UA+M/erLPaX6c+FsKrrkbL/xETUsrW3AXHPXPnc/uolW8A1fo+cz9eVYqJ5jc
+ buENIliHdYaUzgxniz0DavEs/1qAuRJ/br3MXKoYUbnKH7yvrcLso51UfRorcAiLmn+9KeHBC
+ ktYJlTiDUSJqBP9eWE6v2pfR4S2uYCyLMHP8O6/AWmwnGKO/Av3dGrUABq339Es85ycXV9cYd
+ jTK1Loj8PKsbklF1gEbzdEb4MijosQ+QGi//ne7NtoRQiYyyXDU5DHT+OG1UCthO/M3+XADuC
+ u65TN7AgkL4g98Ypd9xTpptk550otgnsWlvWZ16J47yizTnz2fsyiVcxNyk2pLGHZbpcccy+T
+ 64ls0o7jlMI1K1K5AYnA==
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-safexcel_aead_setkey() contains three large stack variables, totalling
-slightly more than the 1024 byte warning limit:
+When both PCI and OF are disabled, no drivers are registered, and
+we get some unused-function warnings:
 
-drivers/crypto/inside-secure/safexcel_cipher.c:303:12: error: stack frame size of 1032 bytes in function 'safexcel_aead_setkey' [-Werror,-Wframe-larger-than=]
+drivers/crypto/inside-secure/safexcel.c:1221:13: error: unused function 'safexcel_unregister_algorithms' [-Werror,-Wunused-function]
+static void safexcel_unregister_algorithms(struct safexcel_crypto_priv *priv)
+drivers/crypto/inside-secure/safexcel.c:1307:12: error: unused function 'safexcel_probe_generic' [-Werror,-Wunused-function]
+static int safexcel_probe_generic(void *pdev,
+drivers/crypto/inside-secure/safexcel.c:1531:13: error: unused function 'safexcel_hw_reset_rings' [-Werror,-Wunused-function]
+static void safexcel_hw_reset_rings(struct safexcel_crypto_priv *priv)
 
-The function already contains a couple of dynamic allocations, so it is
-likely not performance critical and it can only be called in a context
-that allows sleeping, so the easiest workaround is to add change it
-to use dynamic allocations. Combining istate and ostate into a single
-variable simplifies the allocation at the cost of making it slightly
-less readable.
+It's better to make the compiler see what is going on and remove
+such ifdef checks completely. In case of PCI, this is trivial since
+pci_register_driver() is defined to an empty function that makes the
+compiler subsequently drop all unused code silently.
 
-Alternatively, it should be possible to shrink these allocations
-as the extra buffers appear to be largely unnecessary, but doing
-this would be a much more invasive change.
+The global pcireg_rc/ofreg_rc variables are not actually needed here
+since the driver registration does not fail in ways that would make
+it helpful.
 
-Fixes: 0e17e3621a28 ("crypto: inside-secure - add support for authenc(hmac(sha*),rfc3686(ctr(aes))) suites")
+For CONFIG_OF, an IS_ENABLED() check is still required, since platform
+drivers can exist both with and without it.
+
+A little change to linux/pci.h is needed to ensure that
+pcim_enable_device() is visible to the driver. Moving the declaration
+outside of ifdef would be sufficient here, but for consistency with the
+rest of the file, adding an inline helper is probably best.
+
+Fixes: 212ef6f29e5b ("crypto: inside-secure - Fix unused variable warning when CONFIG_PCI=n")
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- .../crypto/inside-secure/safexcel_cipher.c    | 53 ++++++++++++-------
- 1 file changed, 35 insertions(+), 18 deletions(-)
+ drivers/crypto/inside-secure/safexcel.c | 49 ++++++-------------------
+ include/linux/pci.h                     |  1 +
+ 2 files changed, 13 insertions(+), 37 deletions(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-index ef51f8c2b473..51a4112aa9bc 100644
---- a/drivers/crypto/inside-secure/safexcel_cipher.c
-+++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -305,10 +305,10 @@ static int safexcel_aead_setkey(struct crypto_aead *ctfm, const u8 *key,
+diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+index 311bf60df39f..c4e8fd27314c 100644
+--- a/drivers/crypto/inside-secure/safexcel.c
++++ b/drivers/crypto/inside-secure/safexcel.c
+@@ -1547,7 +1547,6 @@ static void safexcel_hw_reset_rings(struct safexcel_crypto_priv *priv)
+ 	}
+ }
+ 
+-#if IS_ENABLED(CONFIG_OF)
+ /* for Device Tree platform driver */
+ 
+ static int safexcel_probe(struct platform_device *pdev)
+@@ -1666,9 +1665,7 @@ static struct platform_driver  crypto_safexcel = {
+ 		.of_match_table = safexcel_of_match_table,
+ 	},
+ };
+-#endif
+ 
+-#if IS_ENABLED(CONFIG_PCI)
+ /* PCIE devices - i.e. Inside Secure development boards */
+ 
+ static int safexcel_pci_probe(struct pci_dev *pdev,
+@@ -1789,54 +1786,32 @@ static struct pci_driver safexcel_pci_driver = {
+ 	.probe         = safexcel_pci_probe,
+ 	.remove        = safexcel_pci_remove,
+ };
+-#endif
+-
+-/* Unfortunately, we have to resort to global variables here */
+-#if IS_ENABLED(CONFIG_PCI)
+-int pcireg_rc = -EINVAL; /* Default safe value */
+-#endif
+-#if IS_ENABLED(CONFIG_OF)
+-int ofreg_rc = -EINVAL; /* Default safe value */
+-#endif
+ 
+ static int __init safexcel_init(void)
  {
- 	struct crypto_tfm *tfm = crypto_aead_tfm(ctfm);
- 	struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
--	struct safexcel_ahash_export_state istate, ostate;
-+	struct safexcel_ahash_export_state *state;
- 	struct safexcel_crypto_priv *priv = ctx->priv;
-+	struct crypto_aes_ctx *aes;
- 	struct crypto_authenc_keys keys;
--	struct crypto_aes_ctx aes;
- 	int err = -EINVAL;
- 
- 	if (crypto_authenc_extractkeys(&keys, key, len) != 0)
-@@ -334,7 +334,14 @@ static int safexcel_aead_setkey(struct crypto_aead *ctfm, const u8 *key,
- 			goto badkey_expflags;
- 		break;
- 	case SAFEXCEL_AES:
--		err = aes_expandkey(&aes, keys.enckey, keys.enckeylen);
-+		aes = kzalloc(sizeof(*aes), GFP_KERNEL);
-+		if (!aes) {
-+			err = -ENOMEM;
-+			goto badkey;
-+		}
+-#if IS_ENABLED(CONFIG_PCI)
++	int ret;
 +
-+		err = aes_expandkey(aes, keys.enckey, keys.enckeylen);
-+		kfree(aes);
- 		if (unlikely(err))
- 			goto badkey;
- 		break;
-@@ -347,56 +354,66 @@ static int safexcel_aead_setkey(struct crypto_aead *ctfm, const u8 *key,
- 	    memcmp(ctx->key, keys.enckey, keys.enckeylen))
- 		ctx->base.needs_inv = true;
+ 	/* Register PCI driver */
+-	pcireg_rc = pci_register_driver(&safexcel_pci_driver);
+-#endif
++	ret = pci_register_driver(&safexcel_pci_driver);
  
-+	state = kzalloc(sizeof(struct safexcel_ahash_export_state) * 2, GFP_KERNEL);
-+	if (!state) {
-+		err = -ENOMEM;
-+		goto badkey;
+-#if IS_ENABLED(CONFIG_OF)
+ 	/* Register platform driver */
+-	ofreg_rc = platform_driver_register(&crypto_safexcel);
+- #if IS_ENABLED(CONFIG_PCI)
+-	/* Return success if either PCI or OF registered OK */
+-	return pcireg_rc ? ofreg_rc : 0;
+- #else
+-	return ofreg_rc;
+- #endif
+-#else
+- #if IS_ENABLED(CONFIG_PCI)
+-	return pcireg_rc;
+- #else
+-	return -EINVAL;
+- #endif
+-#endif
++	if (IS_ENABLED(CONFIG_OF) && !ret) {
++		ret = platform_driver_register(&crypto_safexcel);
++		if (ret)
++			pci_unregister_driver(&safexcel_pci_driver);
 +	}
 +
- 	/* Auth key */
- 	switch (ctx->hash_alg) {
- 	case CONTEXT_CONTROL_CRYPTO_ALG_SHA1:
- 		if (safexcel_hmac_setkey("safexcel-sha1", keys.authkey,
--					 keys.authkeylen, &istate, &ostate))
--			goto badkey;
-+					 keys.authkeylen, &state[0], &state[1]))
-+			goto badkey_free;
- 		break;
- 	case CONTEXT_CONTROL_CRYPTO_ALG_SHA224:
- 		if (safexcel_hmac_setkey("safexcel-sha224", keys.authkey,
--					 keys.authkeylen, &istate, &ostate))
--			goto badkey;
-+					 keys.authkeylen, &state[0], &state[1]))
-+			goto badkey_free;
- 		break;
- 	case CONTEXT_CONTROL_CRYPTO_ALG_SHA256:
- 		if (safexcel_hmac_setkey("safexcel-sha256", keys.authkey,
--					 keys.authkeylen, &istate, &ostate))
--			goto badkey;
-+					 keys.authkeylen, &state[0], &state[1]))
-+			goto badkey_free;
- 		break;
- 	case CONTEXT_CONTROL_CRYPTO_ALG_SHA384:
- 		if (safexcel_hmac_setkey("safexcel-sha384", keys.authkey,
--					 keys.authkeylen, &istate, &ostate))
--			goto badkey;
-+					 keys.authkeylen, &state[0], &state[1]))
-+			goto badkey_free;
- 		break;
- 	case CONTEXT_CONTROL_CRYPTO_ALG_SHA512:
- 		if (safexcel_hmac_setkey("safexcel-sha512", keys.authkey,
--					 keys.authkeylen, &istate, &ostate))
--			goto badkey;
-+					 keys.authkeylen, &state[0], &state[1]))
-+			goto badkey_free;
- 		break;
- 	default:
- 		dev_err(priv->dev, "aead: unsupported hash algorithm\n");
--		goto badkey;
-+		goto badkey_free;
- 	}
++	return ret;
+ }
  
- 	crypto_aead_set_flags(ctfm, crypto_aead_get_flags(ctfm) &
- 				    CRYPTO_TFM_RES_MASK);
+ static void __exit safexcel_exit(void)
+ {
+-#if IS_ENABLED(CONFIG_OF)
+ 	/* Unregister platform driver */
+-	if (!ofreg_rc)
++	if (IS_ENABLED(CONFIG_OF))
+ 		platform_driver_unregister(&crypto_safexcel);
+-#endif
  
- 	if (priv->flags & EIP197_TRC_CACHE && ctx->base.ctxr_dma &&
--	    (memcmp(ctx->ipad, istate.state, ctx->state_sz) ||
--	     memcmp(ctx->opad, ostate.state, ctx->state_sz)))
-+	    (memcmp(ctx->ipad, &state[0].state, ctx->state_sz) ||
-+	     memcmp(ctx->opad, &state[1].state, ctx->state_sz)))
- 		ctx->base.needs_inv = true;
+-#if IS_ENABLED(CONFIG_PCI)
+ 	/* Unregister PCI driver if successfully registered before */
+-	if (!pcireg_rc)
+-		pci_unregister_driver(&safexcel_pci_driver);
+-#endif
++	pci_unregister_driver(&safexcel_pci_driver);
+ }
  
- 	/* Now copy the keys into the context */
- 	memcpy(ctx->key, keys.enckey, keys.enckeylen);
- 	ctx->key_len = keys.enckeylen;
- 
--	memcpy(ctx->ipad, &istate.state, ctx->state_sz);
--	memcpy(ctx->opad, &ostate.state, ctx->state_sz);
-+	memcpy(ctx->ipad, &state[0].state, ctx->state_sz);
-+	memcpy(ctx->opad, &state[1].state, ctx->state_sz);
- 
- 	memzero_explicit(&keys, sizeof(keys));
-+	kfree(state);
-+
- 	return 0;
- 
-+badkey_free:
-+	kfree(state);
- badkey:
- 	crypto_aead_set_flags(ctfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
- badkey_expflags:
+ module_init(safexcel_init);
+diff --git a/include/linux/pci.h b/include/linux/pci.h
+index f9088c89a534..1a6cf19eac2d 100644
+--- a/include/linux/pci.h
++++ b/include/linux/pci.h
+@@ -1686,6 +1686,7 @@ static inline struct pci_dev *pci_get_class(unsigned int class,
+ static inline void pci_set_master(struct pci_dev *dev) { }
+ static inline int pci_enable_device(struct pci_dev *dev) { return -EIO; }
+ static inline void pci_disable_device(struct pci_dev *dev) { }
++static inline int pcim_enable_device(struct pci_dev *pdev) { return -EIO; }
+ static inline int pci_assign_resource(struct pci_dev *dev, int i)
+ { return -EBUSY; }
+ static inline int __pci_register_driver(struct pci_driver *drv,
 -- 
 2.20.0
 
