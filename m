@@ -1,114 +1,80 @@
-Return-Path: <SRS0=wYoS=XZ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=Oe9a=X2=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA6C3C32792
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Sep 2019 22:20:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EAFAECE588
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Oct 2019 05:55:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9E8452168B
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Sep 2019 22:20:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1569882026;
-	bh=j8iLoguF2EcEvcUgIK6k1GmmnxdvBP6H3xpQgaWDiXY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=L+We1MEJScRjYA5d9BoieZKVKK+PhydqgP8+X4XL+WX6J6zbmotvbI6V+sOq6v4jG
-	 RHJpEjfQ+7HedYKLewtmkIJbqdiej4EBrZhHUC0e5fLr+XEwzeNLlohv86QVf82Vot
-	 W5/1aZrxUNI/WBptlIi9EWhbtAJCOV3q0N8WjOhA=
+	by mail.kernel.org (Postfix) with ESMTP id EBBB321783
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Oct 2019 05:55:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dvpx6VZB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732118AbfI3WUX (ORCPT
+        id S1731665AbfJAFzB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 30 Sep 2019 18:20:23 -0400
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:44126 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726350AbfI3WUW (ORCPT
+        Tue, 1 Oct 2019 01:55:01 -0400
+Received: from mail-ed1-f51.google.com ([209.85.208.51]:35671 "EHLO
+        mail-ed1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725777AbfJAFzB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Sep 2019 18:20:22 -0400
-Received: by mail-ot1-f68.google.com with SMTP id 21so9769659otj.11;
-        Mon, 30 Sep 2019 15:20:22 -0700 (PDT)
+        Tue, 1 Oct 2019 01:55:01 -0400
+Received: by mail-ed1-f51.google.com with SMTP id v8so10756682eds.2;
+        Mon, 30 Sep 2019 22:54:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=7eOUI86iG6zJ4Z27pcKDmq/jop2P47fuZYQblHLb7ws=;
+        b=dvpx6VZBtOxAA+f+EcqZhqAA4QhzLtHL96B6j2lCcVrlTYdNjY+7pUd4Qk7Z16cJ+7
+         oFXSbipwGXX/uueSDJCwJtH85erRMzxcd+m6W4Nupunh9LePSFPo+8MWgxLTnd2m63rt
+         40Ej3F5i5o9CGUuLVQDnzhCOCmIQ+F9F96rW2wKZkQS6ha4zHuaItVsWl16bdfwD5wNv
+         xOMvIn/CcQcZfozNUONW7m/oaH3/GNfDnUGyOcnaL0jKzgnXif/VHRaFDga7cADP8bqX
+         u7yoemPiFjo+LLl3wU42n2q/+WrtbbRc/wvphg8k8npXVANU9HXsma5ptBk5Cf/ebEUt
+         PROQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=F7EuIouiHhXnI+Mf2IJX0I4I3pBr8z7vl6hhtN/rydc=;
-        b=nanYkIa88zdOcBjfYJinBCYrY35jvSz2AVXYvp9G2XcgAkEu3fzBFxpJo5neLokxRN
-         dlxdoWvCNz+rI7kgcLGCJxL+Fo2bYc5T0hoW3X1E57CnXdYCqEsi5jYAM6dwbX8In+8/
-         cq/MCKlh3jD1AkgLTlJ715FWF05TC8Iuz9m8DaYEppH9PYvGmiUHBVbtgWUWLhWUgmXc
-         uBDCWMXF8zI4EvCXoSs/t+12/nuf4gNN/j1rnS1A/Uhmfp30RhMvbjk5Dc6wDc88grLX
-         vWd2FdVbhvq6Vz6HDBfx1BgNtfWR5ICBL95TGVGFN7uI6KjgKsK8v86OYum+OMtjYYKv
-         2D5w==
-X-Gm-Message-State: APjAAAVDi1wWxKcOwfwZjad7SZJEo91xV3NDxemY5+5lyAoBRKKFSUhi
-        rrkMabGU6j7lThacGUQPYw==
-X-Google-Smtp-Source: APXvYqwlTz51SdwLtiYS/F6mSjvwoCRn1JCMaKGRrqHAekh5UT3CgLba9X+2enyJqSphfurQyQWK4A==
-X-Received: by 2002:a9d:7844:: with SMTP id c4mr577304otm.273.1569882021729;
-        Mon, 30 Sep 2019 15:20:21 -0700 (PDT)
-Received: from localhost (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
-        by smtp.gmail.com with ESMTPSA id v10sm4017054otk.17.2019.09.30.15.20.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Sep 2019 15:20:21 -0700 (PDT)
-Date:   Mon, 30 Sep 2019 17:20:20 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Tony Lindgren <tony@atomide.com>
-Cc:     Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-kernel@vger.kernel.org, linux-omap@vger.kernel.org,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        Aaro Koskinen <aaro.koskinen@iki.fi>,
-        Adam Ford <aford173@gmail.com>,
-        Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>,
-        Tero Kristo <t-kristo@ti.com>
-Subject: Re: [PATCH 2/7] hwrng: omap3-rom - Fix missing clock by probing with
- device tree
-Message-ID: <20190930222020.GA13078@bogus>
-References: <20190914210300.15836-1-tony@atomide.com>
- <20190914210300.15836-3-tony@atomide.com>
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=7eOUI86iG6zJ4Z27pcKDmq/jop2P47fuZYQblHLb7ws=;
+        b=JLmhAe9u8Sq+3TmPHzfILIF00SubzCMy/YHXM1nHeddArT0IuEsqgubei0sj7xRRlv
+         qRAyWNxN34BtAotXJ811lkMdKkWhtDhvoqp4vxtJw6ndsELmKKVdaEWCnnPPajxaxdDP
+         X979S+5IB60IPq5bwaIGZiWBGjPWGBgiOlR+rL+g8RyBjefUS3dLrkZ0AD2OrCsrkMmD
+         VxeIdmaGdDHW2HUTWkCsFGD2lGZV7FL2F9pHp0ozPGBsWfSCsSO5SyoBkn48r6UP6dpK
+         eheOFLeIOgw70TLP+v7x+mW7YxFHoDrKAIqK4ZTPS89XsrQ7xoHbT70/vB/bFV94nbEB
+         Hmsg==
+X-Gm-Message-State: APjAAAVXNT9/wZtGgfcMpcjuGcBGGKYUL0ZtmoHeQQ7Wg1AOfJQxZ3CY
+        vvyOs8MRwqVa9SmXB+ZKSPVuNHsR1EtVbqeE5ikX5/F4
+X-Google-Smtp-Source: APXvYqzcmpeAUYQ4KNZfxLTzxMNkT9ZglOxVQ7XcAmMxFkZh7muLBaL1xHCfrmkr50MA7803Zz8nsBdEogdG7DzSxJI=
+X-Received: by 2002:a50:ed17:: with SMTP id j23mr23337902eds.248.1569909298460;
+ Mon, 30 Sep 2019 22:54:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20190914210300.15836-3-tony@atomide.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Received: by 2002:aa7:cfc8:0:0:0:0:0 with HTTP; Mon, 30 Sep 2019 22:54:57
+ -0700 (PDT)
+From:   Jari Ruusu <jari.ruusu@gmail.com>
+Date:   Tue, 1 Oct 2019 08:54:57 +0300
+Message-ID: <CACMCwJJz+3w-MhZqHgbr0QVXQpvN9+xuXZoLPgrMwgNcWVXNhw@mail.gmail.com>
+Subject: Announce loop-AES-v3.7p file/swap crypto package
+To:     linux-crypto@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, 14 Sep 2019 14:02:55 -0700, Tony Lindgren wrote:
-> Commit 0ed266d7ae5e ("clk: ti: omap3: cleanup unnecessary clock aliases")
-> removed old omap3 clock framework aliases but caused omap3-rom-rng to
-> stop working with clock not found error.
-> 
-> Based on discussions on the mailing list it was requested by Tero Kristo
-> that it would be best to fix this issue by probing omap3-rom-rng using
-> device tree to provide a proper clk property. The other option would be
-> to add back the missing clock alias, but that does not help moving things
-> forward with removing old legacy platform_data.
-> 
-> Let's also add a proper device tree binding and keep it together with
-> the fix.
-> 
-> Cc: devicetree@vger.kernel.org
-> Cc: Aaro Koskinen <aaro.koskinen@iki.fi>
-> Cc: Adam Ford <aford173@gmail.com>
-> Cc: Pali Rohár <pali.rohar@gmail.com>
-> Cc: Rob Herring <robh+dt@kernel.org>
-> Cc: Sebastian Reichel <sre@kernel.org>
-> Cc: Tero Kristo <t-kristo@ti.com>
-> Fixes: 0ed266d7ae5e ("clk: ti: omap3: cleanup unnecessary clock aliases")
-> Reported-by: Aaro Koskinen <aaro.koskinen@iki.fi>
-> Signed-off-by: Tony Lindgren <tony@atomide.com>
-> ---
->  .../devicetree/bindings/rng/omap3_rom_rng.txt | 27 +++++++++++++++++++
->  arch/arm/boot/dts/omap3-n900.dts              |  6 +++++
->  arch/arm/mach-omap2/pdata-quirks.c            | 12 +--------
->  drivers/char/hw_random/omap3-rom-rng.c        | 17 ++++++++++--
->  4 files changed, 49 insertions(+), 13 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/rng/omap3_rom_rng.txt
-> 
+loop-AES changes since previous release:
+- Worked around kernel interface changes on 5.3 kernels
+- Worked around kernel interface changes on RHEL8 / CentOS8 4.18 kernels
 
-Acked-by: Rob Herring <robh@kernel.org>
+bzip2 compressed tarball is here:
+
+    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7p.tar.bz2
+    md5sum a8e8f2c3fe27b67f332c33555b9d8c8e
+
+    http://loop-aes.sourceforge.net/loop-AES/loop-AES-v3.7p.tar.bz2.sign
+
+-- 
+Jari Ruusu  4096R/8132F189 12D6 4C3A DCDA 0AA4 27BD  ACDF F073 3C80 8132 F189
