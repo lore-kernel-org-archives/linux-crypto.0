@@ -2,190 +2,107 @@ Return-Path: <SRS0=Oe9a=X2=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B30AAC352AA
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Oct 2019 18:42:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0724EC352AA
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Oct 2019 18:49:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8BAE621855
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Oct 2019 18:42:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NuBENbdQ"
+	by mail.kernel.org (Postfix) with ESMTP id DB868215EA
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Oct 2019 18:49:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727036AbfJASmq (ORCPT
+        id S1725884AbfJAStY (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 1 Oct 2019 14:42:46 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:37629 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726514AbfJASly (ORCPT
+        Tue, 1 Oct 2019 14:49:24 -0400
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:44491 "EHLO
+        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725844AbfJAStY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 1 Oct 2019 14:41:54 -0400
-Received: by mail-wr1-f68.google.com with SMTP id i1so16770840wro.4;
-        Tue, 01 Oct 2019 11:41:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=8RScTeZ75nbsv+9yuHpXGe/wKnF3vqAqsp9h8uoT4tg=;
-        b=NuBENbdQZE/kGoNM/ITTDYe0seZt25Z/StnqSpTqFTqOJLYyBQPRgFuEQKDx+XwY5L
-         7GqQXtj/ljrrOYwr/DkyMdZQVOSZqkhHZJVwoDVwxxYEDziI+ybMoriQ0b6UiYd1wH7P
-         cZIJWztP75HNY+1CF8hAOErWwmeU7uxrkrqFomHn7Bq9Be2BUHwF6CshloZturj/8lRa
-         QL1/ZYuFm7eYqojQCbVKKMGXZ7jzvlM2AUken0svzCpSooNPO2egcuupUQViLt4obCuq
-         /fSOWun8DA2un0vB4yxq2gyFlrEeuE6rSjYUDnj/Lyh8DXxXOvOzqBb4R2Ff02jzqEkm
-         zLFA==
+        Tue, 1 Oct 2019 14:49:24 -0400
+Received: by mail-qt1-f193.google.com with SMTP id u40so22962929qth.11;
+        Tue, 01 Oct 2019 11:49:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=8RScTeZ75nbsv+9yuHpXGe/wKnF3vqAqsp9h8uoT4tg=;
-        b=pFhaoFz8u2Vnq6SRO8X3hnboqtqetSsZxgBdsA6jW4ds15ho9uXtpwe50RRD7RAVhM
-         3KCChdLc4rYG9lZDa8dnQgKIhIZR5RRWAyiTgPJUSQUthkcGLiBTzpNqJJjjjwL4yCSh
-         Ne9LOYqMVP3NE22m3tOca/Z+itIjJwiAr3O7Z7tqI2v4nHFiwNnE2/9kyTjruUZyENWw
-         PP2MnDHYjBpN5YjcCM/xoLM0woeQ1XygU80UqmtEaurlxE+CCf93Qq68sVuKAO0jIwBp
-         eXWb8IsXXrRIe9fUAiFO9ZHwepCotTvYgulFX0bfcXRiAQFwI+JzPYEHnpbz/mh9NglI
-         eAeg==
-X-Gm-Message-State: APjAAAVuyWWen9tNActXeth7hUulmH42g1XG7P5S+Y4gfH2nLMepHOV3
-        qxD2wUPVl4mMWKyjOBnockg=
-X-Google-Smtp-Source: APXvYqx5lPO7Frbw7k5tcVmreN/iCtnJ+oksNmprbbANmrVQpyFpzY5b+DiGfDoIO3YAxy9ctRCcLg==
-X-Received: by 2002:a05:6000:186:: with SMTP id p6mr17729145wrx.136.1569955312419;
-        Tue, 01 Oct 2019 11:41:52 -0700 (PDT)
-Received: from Red.localdomain ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id n8sm6788987wma.7.2019.10.01.11.41.51
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 01 Oct 2019 11:41:51 -0700 (PDT)
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     catalin.marinas@arm.com, davem@davemloft.net,
-        herbert@gondor.apana.org.au, linux@armlinux.org.uk,
-        mark.rutland@arm.com, mripard@kernel.org, robh+dt@kernel.org,
-        wens@csie.org, will@kernel.org
-Cc:     devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-sunxi@googlegroups.com,
-        Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH v2 03/11] dt-bindings: crypto: Add DT bindings documentation for sun8i-ce Crypto Engine
-Date:   Tue,  1 Oct 2019 20:41:33 +0200
-Message-Id: <20191001184141.27956-4-clabbe.montjoie@gmail.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191001184141.27956-1-clabbe.montjoie@gmail.com>
-References: <20191001184141.27956-1-clabbe.montjoie@gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=yQ/aeUAODcfHsnJVhrCVPGFZvCnxoF2P68MP76wAWmI=;
+        b=AlZxib+mGrsNLwaQc5WEpQUiZKR30Peq7nNgLoexWN80JZqJjMunu6vMxgokE3Fwjo
+         u7SjYl3tT8ieXMO2jKHaaSeUp8RUOHTF+QpNJ/yEMX1GU52TUtGzwGHR2oE0KtnT0buG
+         zAMABkGQ6lYRlYsZEiKmrfZTyypNyR7nMCMiYYzJIcOyl5WjbdDRatF05ytu1e82miSy
+         T/I56w8/DUa2V/oPI4kMiyXSQt1PQV2E7QrrflERnhS01saWCR6kD1XpYdL/kgUbuEhZ
+         hpUrR4sF/9A/eH0i/bk3dJnGYZ0alB9jXR/zXuvFQoj4vlj+aGnGX4aKaB2CUjAmakoq
+         0voA==
+X-Gm-Message-State: APjAAAX1l/FN+KeajfXT7I2RwJMAs8d8Z7FW6OZCIl0eDBunKMcXh5Ge
+        zxIkdXl7jYtiL0yQoaYO5On4an7AtpNX5yhksOM=
+X-Google-Smtp-Source: APXvYqyKolI0m0eL4KVQA6JY8f/fHGLIsg+k3X/A7B4lxu4r3JPwQIOYgeTZWrWRk1KDX7C5SA8y2/wMSQYTZe1zEKo=
+X-Received: by 2002:a0c:e0c4:: with SMTP id x4mr26961100qvk.176.1569955762750;
+ Tue, 01 Oct 2019 11:49:22 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20190930121520.1388317-1-arnd@arndb.de> <20190930121520.1388317-2-arnd@arndb.de>
+ <CH2PR20MB2968B7855D241C747BEB68B9CA820@CH2PR20MB2968.namprd20.prod.outlook.com>
+ <CAK8P3a0PeocENP6c=ENVrq2X8x-vinM6qhPRDDi_WEf6y73AOQ@mail.gmail.com> <CH2PR20MB29682E2C514733F290CFA3CECA820@CH2PR20MB2968.namprd20.prod.outlook.com>
+In-Reply-To: <CH2PR20MB29682E2C514733F290CFA3CECA820@CH2PR20MB2968.namprd20.prod.outlook.com>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Tue, 1 Oct 2019 20:49:06 +0200
+Message-ID: <CAK8P3a0_ZAdoYkZsb_C2y5gi9u3_Pt-qa3c1FiCMq7_Lax0AYw@mail.gmail.com>
+Subject: Re: [PATCH 2/3] crypto: inside-secure - Reduce stack usage
+To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+Cc:     Antoine Tenart <antoine.tenart@bootlin.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Pascal van Leeuwen <pascalvanl@gmail.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Eric Biggers <ebiggers@google.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch adds documentation for Device-Tree bindings for the
-Crypto Engine cryptographic accelerator driver.
+On Mon, Sep 30, 2019 at 11:09 PM Pascal Van Leeuwen
+<pvanleeuwen@verimatrix.com> wrote:
+> > Subject: Re: [PATCH 2/3] crypto: inside-secure - Reduce stack usage
+> >
+> > On Mon, Sep 30, 2019 at 9:04 PM Pascal Van Leeuwen
+> > <pvanleeuwen@verimatrix.com> wrote:
+> >
+> > > > Alternatively, it should be possible to shrink these allocations
+> > > > as the extra buffers appear to be largely unnecessary, but doing
+> > > > this would be a much more invasive change.
+> > > >
+> > > Actually, for HMAC-SHA512 you DO need all that buffer space.
+> > > You could shrink it to 2 * ctx->state_sz but then your simple indexing
+> > > is no longer going to fly. Not sure if that would be worth the effort.
+> >
+> > Stack allocations can no longer be dynamically sized in the kernel,
+> > so that would not work.
+> >
+> I was actually referring to your kzalloc, not to the original stack
+> based implementation ...
 
-Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
----
- .../bindings/crypto/allwinner,sun8i-ce.yaml   | 92 +++++++++++++++++++
- 1 file changed, 92 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml
+Ok, got it. For the kzalloc version, the size matters much less, as
+this is not coming from a scarce resource and only takes a few more
+cycles to do the initial clearing of the larger struct.
 
-diff --git a/Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml b/Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml
-new file mode 100644
-index 000000000000..9bd26a2eff33
---- /dev/null
-+++ b/Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml
-@@ -0,0 +1,92 @@
-+# SPDX-License-Identifier: GPL-2.0
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/crypto/allwinner,sun8i-ce.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Allwinner Crypto Engine driver
-+
-+maintainers:
-+  - Corentin Labbe <clabbe.montjoie@gmail.com>
-+
-+properties:
-+  compatible:
-+    enum:
-+      - allwinner,sun8i-h3-crypto
-+      - allwinner,sun8i-r40-crypto
-+      - allwinner,sun50i-a64-crypto
-+      - allwinner,sun50i-h5-crypto
-+      - allwinner,sun50i-h6-crypto
-+
-+  reg:
-+    maxItems: 1
-+
-+  interrupts:
-+    maxItems: 1
-+
-+  clocks:
-+    items:
-+      - description: Bus clock
-+      - description: Module clock
-+      - description: MBus clock
-+    minItems: 2
-+    maxItems: 3
-+
-+  clock-names:
-+    items:
-+      - const: bus
-+      - const: mod
-+      - const: ram
-+    minItems: 2
-+    maxItems: 3
-+
-+  resets:
-+    maxItems: 1
-+
-+  reset-names:
-+    const: bus
-+
-+if:
-+  properties:
-+    compatible:
-+      items:
-+        const: allwinner,sun50i-h6-crypto
-+then:
-+  properties:
-+      clocks:
-+        minItems: 3
-+      clock-names:
-+        minItems: 3
-+else:
-+  properties:
-+      clocks:
-+        maxItems: 2
-+      clock-names:
-+        maxItems: 2
-+
-+required:
-+  - compatible
-+  - reg
-+  - interrupts
-+  - clocks
-+  - clock-names
-+  - resets
-+
-+additionalProperties: true
-+
-+examples:
-+  - |
-+    #include <dt-bindings/interrupt-controller/arm-gic.h>
-+    #include <dt-bindings/clock/sun50i-a64-ccu.h>
-+    #include <dt-bindings/reset/sun50i-a64-ccu.h>
-+
-+    crypto: crypto@1c15000 {
-+      compatible = "allwinner,sun8i-h3-crypto";
-+      reg = <0x01c15000 0x1000>;
-+      interrupts = <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>;
-+      clocks = <&ccu CLK_BUS_CE>, <&ccu CLK_CE>;
-+      clock-names = "bus", "mod";
-+      resets = <&ccu RST_BUS_CE>;
-+      reset-names = "bus";
-+    };
-+
--- 
-2.21.0
+> > > And it conflicts with another change I have waiting that gets rid of
+> > > aes_expandkey and that struct alltogether (since it was really just
+> > > abused to do a key size check, which was very wasteful since the
+> > > function actually generates all roundkeys we don't need at all ...)
+> >
+> > Right, this is what I noticed there. With 480 of the 484 bytes gone,
+> > you are well below the warning limit even without the other change.
+> >
+> And by "other change" you mean the safexcel_ahash_export_state?
 
+Yes.
+
+> Ok, good to known, although I do like to improve that one as well,
+> but preferably by not exporting the cache so I don't need the full
+> struct.
+
+Sounds good to me.
+
+      Arnd
