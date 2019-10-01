@@ -2,107 +2,101 @@ Return-Path: <SRS0=Oe9a=X2=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0724EC352AA
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Oct 2019 18:49:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10401C352AA
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Oct 2019 20:54:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DB868215EA
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Oct 2019 18:49:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DF089215EA
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Oct 2019 20:54:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725884AbfJAStY (ORCPT
+        id S1726166AbfJAUyv (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 1 Oct 2019 14:49:24 -0400
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:44491 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725844AbfJAStY (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 1 Oct 2019 14:49:24 -0400
-Received: by mail-qt1-f193.google.com with SMTP id u40so22962929qth.11;
-        Tue, 01 Oct 2019 11:49:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=yQ/aeUAODcfHsnJVhrCVPGFZvCnxoF2P68MP76wAWmI=;
-        b=AlZxib+mGrsNLwaQc5WEpQUiZKR30Peq7nNgLoexWN80JZqJjMunu6vMxgokE3Fwjo
-         u7SjYl3tT8ieXMO2jKHaaSeUp8RUOHTF+QpNJ/yEMX1GU52TUtGzwGHR2oE0KtnT0buG
-         zAMABkGQ6lYRlYsZEiKmrfZTyypNyR7nMCMiYYzJIcOyl5WjbdDRatF05ytu1e82miSy
-         T/I56w8/DUa2V/oPI4kMiyXSQt1PQV2E7QrrflERnhS01saWCR6kD1XpYdL/kgUbuEhZ
-         hpUrR4sF/9A/eH0i/bk3dJnGYZ0alB9jXR/zXuvFQoj4vlj+aGnGX4aKaB2CUjAmakoq
-         0voA==
-X-Gm-Message-State: APjAAAX1l/FN+KeajfXT7I2RwJMAs8d8Z7FW6OZCIl0eDBunKMcXh5Ge
-        zxIkdXl7jYtiL0yQoaYO5On4an7AtpNX5yhksOM=
-X-Google-Smtp-Source: APXvYqyKolI0m0eL4KVQA6JY8f/fHGLIsg+k3X/A7B4lxu4r3JPwQIOYgeTZWrWRk1KDX7C5SA8y2/wMSQYTZe1zEKo=
-X-Received: by 2002:a0c:e0c4:: with SMTP id x4mr26961100qvk.176.1569955762750;
- Tue, 01 Oct 2019 11:49:22 -0700 (PDT)
-MIME-Version: 1.0
-References: <20190930121520.1388317-1-arnd@arndb.de> <20190930121520.1388317-2-arnd@arndb.de>
- <CH2PR20MB2968B7855D241C747BEB68B9CA820@CH2PR20MB2968.namprd20.prod.outlook.com>
- <CAK8P3a0PeocENP6c=ENVrq2X8x-vinM6qhPRDDi_WEf6y73AOQ@mail.gmail.com> <CH2PR20MB29682E2C514733F290CFA3CECA820@CH2PR20MB2968.namprd20.prod.outlook.com>
-In-Reply-To: <CH2PR20MB29682E2C514733F290CFA3CECA820@CH2PR20MB2968.namprd20.prod.outlook.com>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Tue, 1 Oct 2019 20:49:06 +0200
-Message-ID: <CAK8P3a0_ZAdoYkZsb_C2y5gi9u3_Pt-qa3c1FiCMq7_Lax0AYw@mail.gmail.com>
-Subject: Re: [PATCH 2/3] crypto: inside-secure - Reduce stack usage
-To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-Cc:     Antoine Tenart <antoine.tenart@bootlin.com>,
+        Tue, 1 Oct 2019 16:54:51 -0400
+Received: from mga17.intel.com ([192.55.52.151]:14871 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726195AbfJAUyv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 1 Oct 2019 16:54:51 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 01 Oct 2019 13:54:50 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.64,571,1559545200"; 
+   d="scan'208";a="275119848"
+Received: from nbaca1-mobl1.ger.corp.intel.com (HELO localhost) ([10.252.37.57])
+  by orsmga001.jf.intel.com with ESMTP; 01 Oct 2019 13:54:46 -0700
+Date:   Tue, 1 Oct 2019 23:54:45 +0300
+From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+To:     linux-integrity@vger.kernel.org, stable@vger.kernel.org,
+        David Howells <dhowells@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Pascal van Leeuwen <pascalvanl@gmail.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Eric Biggers <ebiggers@google.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        "open list:ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] KEYS: asym_tpm: Switch to get_random_bytes()
+Message-ID: <20191001205445.GC26709@linux.intel.com>
+References: <20190926171601.30404-1-jarkko.sakkinen@linux.intel.com>
+ <20190928180559.jivt5zlisr43fnva@cantor>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20190928180559.jivt5zlisr43fnva@cantor>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Sep 30, 2019 at 11:09 PM Pascal Van Leeuwen
-<pvanleeuwen@verimatrix.com> wrote:
-> > Subject: Re: [PATCH 2/3] crypto: inside-secure - Reduce stack usage
-> >
-> > On Mon, Sep 30, 2019 at 9:04 PM Pascal Van Leeuwen
-> > <pvanleeuwen@verimatrix.com> wrote:
-> >
-> > > > Alternatively, it should be possible to shrink these allocations
-> > > > as the extra buffers appear to be largely unnecessary, but doing
-> > > > this would be a much more invasive change.
-> > > >
-> > > Actually, for HMAC-SHA512 you DO need all that buffer space.
-> > > You could shrink it to 2 * ctx->state_sz but then your simple indexing
-> > > is no longer going to fly. Not sure if that would be worth the effort.
-> >
-> > Stack allocations can no longer be dynamically sized in the kernel,
-> > so that would not work.
-> >
-> I was actually referring to your kzalloc, not to the original stack
-> based implementation ...
+On Sat, Sep 28, 2019 at 11:05:59AM -0700, Jerry Snitselaar wrote:
+> On Thu Sep 26 19, Jarkko Sakkinen wrote:
+> > Only the kernel random pool should be used for generating random numbers.
+> > TPM contributes to that pool among the other sources of entropy. In here it
+> > is not, agreed, absolutely critical because TPM is what is trusted anyway
+> > but in order to remove tpm_get_random() we need to first remove all the > > call sites.  > > 
+> > Cc: stable@vger.kernel.org
+> > Fixes: 0c36264aa1d5 ("KEYS: asym_tpm: Add loadkey2 and flushspecific [ver #2]")
+> > Signed-off-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+> > ---
+> > crypto/asymmetric_keys/asym_tpm.c | 7 ++-----
+> > 1 file changed, 2 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/crypto/asymmetric_keys/asym_tpm.c b/crypto/asymmetric_keys/asym_tpm.c
+> > index 76d2ce3a1b5b..c14b8d186e93 100644
+> > --- a/crypto/asymmetric_keys/asym_tpm.c
+> > +++ b/crypto/asymmetric_keys/asym_tpm.c
+> > @@ -6,6 +6,7 @@
+> > #include <linux/kernel.h>
+> > #include <linux/seq_file.h>
+> > #include <linux/scatterlist.h>
+> > +#include <linux/random.h>
+> > #include <linux/tpm.h>
+> > #include <linux/tpm_command.h>
+> > #include <crypto/akcipher.h>
+> > @@ -54,11 +55,7 @@ static int tpm_loadkey2(struct tpm_buf *tb,
+> > 	}
+> > 
+> > 	/* generate odd nonce */
+> > -	ret = tpm_get_random(NULL, nonceodd, TPM_NONCE_SIZE);
+> > -	if (ret < 0) {
+> > -		pr_info("tpm_get_random failed (%d)\n", ret);
+> > -		return ret;
+> > -	}
+> > +	get_random_bytes(nonceodd, TPM_NONCE_SIZE);
+> > 
+> > 	/* calculate authorization HMAC value */
+> > 	ret = TSS_authhmac(authdata, keyauth, SHA1_DIGEST_SIZE, enonce,
+> > -- 
+> > 2.20.1
+> > 
+> 
+> Should tpm_unbind and tpm_sign in asym_tpm.c be switched as well then?
 
-Ok, got it. For the kzalloc version, the size matters much less, as
-this is not coming from a scarce resource and only takes a few more
-cycles to do the initial clearing of the larger struct.
+Without doubt. Thanks. I'll send an update soon.
 
-> > > And it conflicts with another change I have waiting that gets rid of
-> > > aes_expandkey and that struct alltogether (since it was really just
-> > > abused to do a key size check, which was very wasteful since the
-> > > function actually generates all roundkeys we don't need at all ...)
-> >
-> > Right, this is what I noticed there. With 480 of the 484 bytes gone,
-> > you are well below the warning limit even without the other change.
-> >
-> And by "other change" you mean the safexcel_ahash_export_state?
-
-Yes.
-
-> Ok, good to known, although I do like to improve that one as well,
-> but preferably by not exporting the cache so I don't need the full
-> struct.
-
-Sounds good to me.
-
-      Arnd
+/Jarkko
