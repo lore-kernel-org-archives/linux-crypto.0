@@ -2,247 +2,173 @@ Return-Path: <SRS0=Oe9a=X2=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 731B0ECE58A
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Oct 2019 15:24:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98165ECE58A
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Oct 2019 18:41:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3E27221906
-	for <linux-crypto@archiver.kernel.org>; Tue,  1 Oct 2019 15:24:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1569943479;
-	bh=SRzR/19y35vKtCmezlBxxhi4fuH91TZ/EZTP/Qb2ZBw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=IAQh3e0bH0iTK1yOc9pAp7CqmEUFAhnL/8jGRlL0fVaZIqX48m/hSPkaD6SKzslRr
-	 uyeGKSlJq9UYcQOATsMcw6jqJE6LmL1QSXaWR6TyqNzaTgn0bz4ZE4R0Rj5PvEUbda
-	 ZQcqBIgr31F6qUv9Ayax9CaeNrRjHvwW+1HaH7Qo=
+	by mail.kernel.org (Postfix) with ESMTP id 6D8D32133F
+	for <linux-crypto@archiver.kernel.org>; Tue,  1 Oct 2019 18:41:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BHyyBDtM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389372AbfJAPYe (ORCPT
+        id S1726094AbfJASlt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 1 Oct 2019 11:24:34 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:52180 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389331AbfJAPYd (ORCPT
+        Tue, 1 Oct 2019 14:41:49 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:50553 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725794AbfJASlt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 1 Oct 2019 11:24:33 -0400
-Received: by mail-wm1-f67.google.com with SMTP id 7so3876143wme.1;
-        Tue, 01 Oct 2019 08:24:30 -0700 (PDT)
+        Tue, 1 Oct 2019 14:41:49 -0400
+Received: by mail-wm1-f66.google.com with SMTP id 5so4524934wmg.0;
+        Tue, 01 Oct 2019 11:41:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=STXkb4MVHhVAQzYyM+4y1Q3Kk/1cjA4qQtSJlwmzAqU=;
+        b=BHyyBDtMzSMDoIq0VR0HKtZakAzC6Et0ZbNgrBJ2DhqJF/XyaG79V6/rotfG7EH1YV
+         AbQjHWydZG28xB27MA3rFKI2K78Rmt1F4QkvkgI7bgrJksiwBIf1tXJDeVIGz96LHXRx
+         smLUtt76R3MEJslNjAtnCjgIYKkE5vmdg0+KWQohRholKmOOog29mnqY2a5RsQ2LXgc4
+         4Jdm2D4VkM8DaKgpbejTPJZlTt3eztihy5aTD+m6lBsfgl+r82Nk+6++rHqQrgxg/tig
+         AghUukU9sO43QsmVvEI2uGn2sPOgNfnqdlTWsU+MrlDrf9B2ncyx/pyuRkm/vvYVeL39
+         711Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=qIz20MyIeJ4YRS3q69VVUyLU1/qqd5R6Zf74yV/b9ww=;
-        b=tMJR1DKYuJ/HYqsTxR6if2fyU/wWMRmpHG62KZ1lIyk8JSPisThK+ZTZA0bRN3kEnu
-         iJxykDLKTqLRSjAlHGp4hAzoB6bnBZmdBteJ+qDSgQhAORi7GTtM709ySi2rfGB4vEN3
-         219q4uDcK6YA5/EWxdJU9yAkaUSaKoNT3LKOLeaA6ewjk3RUsN+1TMaiAzLk/V1MUoXW
-         4PTxHFlRMJa4jw/2xO4qPBt6sAvA7L+Bze5tfvRB9I7d4YfzL8lgjmsBDZnTvqVLXWz/
-         XGFDEAGo9bugFgonAmPeD1kBcRCxZnxB4W9aG5bA/UkMWXVtsdEcBCDmbDsbneYAfHYu
-         mP9w==
-X-Gm-Message-State: APjAAAUQXk3ONav8skZU1A/Cql1LXyee9IBgA4syfHBaHommjAKmA5ya
-        mQGyO+Vw1bmJHnRTu+tZJ84=
-X-Google-Smtp-Source: APXvYqzgA01GZd24cae9Ug02bMZVgbmEoHDdIAy+uHttgtTk16j30giNWmxHikB8fPnYof+FbNzouQ==
-X-Received: by 2002:a1c:60c1:: with SMTP id u184mr4104201wmb.32.1569943469278;
-        Tue, 01 Oct 2019 08:24:29 -0700 (PDT)
-Received: from pi3 ([194.230.155.145])
-        by smtp.googlemail.com with ESMTPSA id i1sm4699293wmb.19.2019.10.01.08.24.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Oct 2019 08:24:28 -0700 (PDT)
-Date:   Tue, 1 Oct 2019 17:24:22 +0200
-From:   Krzysztof Kozlowski <krzk@kernel.org>
-To:     Rob Herring <robh@kernel.org>
-Cc:     Mark Rutland <mark.rutland@arm.com>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Wim Van Sebroeck <wim@linux-watchdog.org>,
-        Guenter Roeck <linux@roeck-us.net>, linux-clk@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-leds@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-samsung-soc@vger.kernel.org, linux-pwm@vger.kernel.org,
-        linux-tegra@vger.kernel.org, bcm-kernel-feedback-list@broadcom.com,
-        linux-rpi-kernel@lists.infradead.org,
-        linux-amlogic@lists.infradead.org,
-        linux-mediatek@lists.infradead.org,
-        linux-rockchip@lists.infradead.org,
-        linux-riscv@lists.infradead.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-crypto@vger.kernel.org, linux-watchdog@vger.kernel.org
-Subject: Re: [PATCH v2 2/8] dt-bindings: sram: Convert SRAM bindings to
- json-schema
-Message-ID: <20191001152422.GA31358@pi3>
-References: <20190918173141.4314-1-krzk@kernel.org>
- <20190918173141.4314-2-krzk@kernel.org>
- <20191001140003.GA31344@bogus>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=STXkb4MVHhVAQzYyM+4y1Q3Kk/1cjA4qQtSJlwmzAqU=;
+        b=JiiPxpdDaYa99BJiDS2L50Yc7dGjtCtnH1b+uPqbLaKQeMr7prLYOcv/5Xe8g6dWtF
+         Zk+1w2+fcUIffwwZ/yl8uq+CWTaNDnauVl89Ab/2RIcqsBwuVPW3dn+rRZhOoben+ia9
+         bownUIapvYOP6TB4whCKZ1wJdoKbBP0xR5eCudOpdsMBXKq2n2h9oFiOrJVe2FG5VMDX
+         fpX26TPJ0eBf5L9EiYNrZAe0Vd6w3xntOyqXDJDFvfRK0sl2mxZFp/Xi1gUQbTzYqnZv
+         ZvuWDy32a1Z5ACmJ7JAd9OKwrxzmMyQl20WUIjrqtfzLR2PBiHA9WnHs+4m9vOYzm8vf
+         qa6Q==
+X-Gm-Message-State: APjAAAVSx/+5bxIm++2Vib1b8z7degXw0NXkkGNo5ZYvJ/Cz7cEQJ9Dn
+        Qc4JntJjTQeMLdXRs2ijDl8=
+X-Google-Smtp-Source: APXvYqwRs22/wMw3e9TyrV3739BxRtKCQKwhFfo1Fnr/hRYNZ+WieXnAhX9fucRw49/Ewm6Yd17DCA==
+X-Received: by 2002:a1c:f416:: with SMTP id z22mr4873592wma.19.1569955305894;
+        Tue, 01 Oct 2019 11:41:45 -0700 (PDT)
+Received: from Red.localdomain ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
+        by smtp.googlemail.com with ESMTPSA id n8sm6788987wma.7.2019.10.01.11.41.43
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 01 Oct 2019 11:41:44 -0700 (PDT)
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     catalin.marinas@arm.com, davem@davemloft.net,
+        herbert@gondor.apana.org.au, linux@armlinux.org.uk,
+        mark.rutland@arm.com, mripard@kernel.org, robh+dt@kernel.org,
+        wens@csie.org, will@kernel.org
+Cc:     devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-sunxi@googlegroups.com,
+        Corentin Labbe <clabbe.montjoie@gmail.com>
+Subject: [PATCH v2 00/11] crypto: add sun8i-ce driver for Allwinner crypto engine
+Date:   Tue,  1 Oct 2019 20:41:30 +0200
+Message-Id: <20191001184141.27956-1-clabbe.montjoie@gmail.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20191001140003.GA31344@bogus>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Oct 01, 2019 at 09:00:03AM -0500, Rob Herring wrote:
-> On Wed, Sep 18, 2019 at 07:31:35PM +0200, Krzysztof Kozlowski wrote:
-> > Convert generic mmio-sram bindings to DT schema format using
-> > json-schema.
-> 
-> I've been slow getting to this because I started on the same thing...
-> 
-> > 
-> > Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
-> > 
-> > ---
-> > 
-> > Changes since v1:
-> > 1. Indent example with four spaces (more readable).
-> > ---
-> >  .../devicetree/bindings/sram/sram.txt         |  80 ----------
-> >  .../devicetree/bindings/sram/sram.yaml        | 138 ++++++++++++++++++
-> >  2 files changed, 138 insertions(+), 80 deletions(-)
-> >  delete mode 100644 Documentation/devicetree/bindings/sram/sram.txt
-> >  create mode 100644 Documentation/devicetree/bindings/sram/sram.yaml
-> 
-> > diff --git a/Documentation/devicetree/bindings/sram/sram.yaml b/Documentation/devicetree/bindings/sram/sram.yaml
-> > new file mode 100644
-> > index 000000000000..8d9d6ce494b2
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/sram/sram.yaml
-> > @@ -0,0 +1,138 @@
-> > +# SPDX-License-Identifier: GPL-2.0
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/sram/sram.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: Generic on-chip SRAM
-> > +
-> > +maintainers:
-> > +  - FIXME <who@should.it.be>
-> 
-> You can put me.
+Hello
 
-Sure.
+This patch serie adds support for the Allwinner crypto engine.
+The Crypto Engine is the third generation of Allwinner cryptogaphic offloader.
+The first generation is the Security System already handled by the
+sun4i-ss driver.
+The second is named also Security System and is present on A80 and A83T
+SoCs, originaly this driver supported it also, but supporting both IP bringing
+too much complexity and another driver (sun8i-ss) will came for it.
 
-> 
-> > +
-> > +description: |+
-> > +  Simple IO memory regions to be managed by the genalloc API.
-> > +
-> > +  Each child of the sram node specifies a region of reserved memory. Each
-> > +  child node should use a 'reg' property to specify a specific range of
-> > +  reserved memory.
-> > +
-> > +  Following the generic-names recommended practice, node names should
-> > +  reflect the purpose of the node. Unit address (@<address>) should be
-> > +  appended to the name.
-> > +
-> > +properties:
-> > +  $nodename:
-> > +    pattern: "^sram(@.*)?"
-> > +
-> > +  compatible:
-> > +    items:
-> > +      - enum:
-> > +          - mmio-sram
-> > +          - atmel,sama5d2-securam
-> 
-> I was trying to go down the path of putting all the compatibles for 
-> various SRAM bindings here, but I ran into some issues. I need to 
-> revisit as I've forgotten the exact issue.
-> 
-> This would need to be a 'contains' if this is going to work for others.
+For the moment, the driver support only DES3/AES in ECB/CBC mode.
+Patchs for CTR/CTS/XTS, RSA and RNGs will came later.
 
-OK.
+This serie is tested with CRYPTO_MANAGER_EXTRA_TESTS
+and tested on:
+sun50i-a64-bananapi-m64
+sun50i-a64-pine64-plus
+sun50i-h5-libretech-all-h3-cc
+sun50i-h6-pine-h64
+sun8i-h2-plus-libretech-all-h3-cc
+sun8i-h2-plus-orangepi-r1
+sun8i-h2-plus-orangepi-zero
+sun8i-h3-libretech-all-h3-cc
+sun8i-h3-orangepi-pc
+sun8i-r40-bananapi-m2-ultra
 
-> 
-> > +
-> > +  reg:
-> > +    maxItems: 1
-> > +
-> > +  "#address-cells":
-> > +    description: Should use the same values as the root node.
-> > +
-> > +  "#size-cells":
-> > +    description: Should use the same values as the root node.
-> 
-> I defined both of these to be 1 as 4GB of SRAM should be enough for a 
-> while. We can debate 1 or 2 cells vs. 1, but there's no reason it has to 
-> be the same as the root (unless we're failing to do address 
-> translation).
+Regards
 
-That was copied from txt version. I can adjust them to 1 although this
-is will more than simple conversion.
+Changes since v1:
+- Add sun4i-ss to allwinner directory
+- Cleaned variant structure
+- Renamed clock name from ahb to bus (and mbus to ram)
+- Fixed DT bindings problem reported by mripard
+- Cleaned unneeded status = ""  in R40 DT
+- Removed old unnecessary interrupt_names in A64 DT
+- Added arm64 defconfig
+- Added support for PM functions
+- Splitted probe functions
+- Reworked clock settings
+- made reset mandatory
 
-> 
-> > +
-> > +  ranges:
-> > +    description:
-> > +      Should translate from local addresses within the sram to bus addresses.
-> > +
-> > +  no-memory-wc:
-> > +    description:
-> > +      The flag indicating, that SRAM memory region has not to be remapped
-> > +      as write combining. WC is used by default.
-> > +    type: boolean
-> > +
-> > +  # TODO: additionalProperties: false
-> > +
-> > +patternProperties:
-> > +  "^([a-z]*-)?sram@[a-f0-9]$":
-> > +    type: object
-> > +    description:
-> > +      Each child of the sram node specifies a region of reserved memory.
-> > +    properties:
-> > +      reg:
-> > +        description:
-> > +          IO mem address range, relative to the SRAM range.
-> 
-> maxItems: 1
+Corentin Labbe (11):
+  crypto: Add allwinner subdirectory
+  crypto: Add Allwinner sun8i-ce Crypto Engine
+  dt-bindings: crypto: Add DT bindings documentation for sun8i-ce Crypto
+    Engine
+  ARM: dts: sun8i: R40: add crypto engine node
+  ARM: dts: sun8i: H3: Add Crypto Engine node
+  ARM64: dts: allwinner: sun50i: Add Crypto Engine node on A64
+  ARM64: dts: allwinner: sun50i: Add crypto engine node on H5
+  ARM64: dts: allwinner: sun50i: Add Crypto Engine node on H6
+  sunxi_defconfig: add new Allwinner crypto options
+  arm64: defconfig: add new Allwinner crypto options
+  crypto: sun4i-ss: Move to Allwinner directory
 
-OK
+ .../bindings/crypto/allwinner,sun8i-ce.yaml   |  92 +++
+ MAINTAINERS                                   |   4 +-
+ arch/arm/boot/dts/sun8i-h3.dtsi               |  11 +
+ arch/arm/boot/dts/sun8i-r40.dtsi              |  10 +
+ arch/arm/configs/sunxi_defconfig              |   2 +
+ arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi |  10 +
+ arch/arm64/boot/dts/allwinner/sun50i-h5.dtsi  |  11 +
+ arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi  |  10 +
+ arch/arm64/configs/defconfig                  |   2 +
+ drivers/crypto/Kconfig                        |  28 +-
+ drivers/crypto/Makefile                       |   2 +-
+ drivers/crypto/allwinner/Kconfig              |  60 ++
+ drivers/crypto/allwinner/Makefile             |   2 +
+ .../{sunxi-ss => allwinner/sun4i-ss}/Makefile |   0
+ .../sun4i-ss}/sun4i-ss-cipher.c               |   0
+ .../sun4i-ss}/sun4i-ss-core.c                 |   0
+ .../sun4i-ss}/sun4i-ss-hash.c                 |   0
+ .../sun4i-ss}/sun4i-ss-prng.c                 |   0
+ .../sun4i-ss}/sun4i-ss.h                      |   0
+ drivers/crypto/allwinner/sun8i-ce/Makefile    |   2 +
+ .../allwinner/sun8i-ce/sun8i-ce-cipher.c      | 410 +++++++++++
+ .../crypto/allwinner/sun8i-ce/sun8i-ce-core.c | 666 ++++++++++++++++++
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h  | 259 +++++++
+ 23 files changed, 1552 insertions(+), 29 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml
+ create mode 100644 drivers/crypto/allwinner/Kconfig
+ create mode 100644 drivers/crypto/allwinner/Makefile
+ rename drivers/crypto/{sunxi-ss => allwinner/sun4i-ss}/Makefile (100%)
+ rename drivers/crypto/{sunxi-ss => allwinner/sun4i-ss}/sun4i-ss-cipher.c (100%)
+ rename drivers/crypto/{sunxi-ss => allwinner/sun4i-ss}/sun4i-ss-core.c (100%)
+ rename drivers/crypto/{sunxi-ss => allwinner/sun4i-ss}/sun4i-ss-hash.c (100%)
+ rename drivers/crypto/{sunxi-ss => allwinner/sun4i-ss}/sun4i-ss-prng.c (100%)
+ rename drivers/crypto/{sunxi-ss => allwinner/sun4i-ss}/sun4i-ss.h (100%)
+ create mode 100644 drivers/crypto/allwinner/sun8i-ce/Makefile
+ create mode 100644 drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+ create mode 100644 drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
+ create mode 100644 drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
 
-> 
-> > +
-> > +      compatible:
-> > +        $ref: /schemas/types.yaml#/definitions/string
-> > +        description:
-> > +          Should contain a vendor specific string in the form
-> > +          <vendor>,[<device>-]<usage>
-> > +
-> > +      pool:
-> > +        description:
-> > +          Indicates that the particular reserved SRAM area is addressable
-> > +          and in use by another device or devices.
-> > +        type: boolean
-> > +
-> > +      export:
-> > +        description:
-> > +          Indicates that the reserved SRAM area may be accessed outside
-> > +          of the kernel, e.g. by bootloader or userspace.
-> > +        type: boolean
-> > +
-> > +      protect-exec:
-> > +        description: |
-> > +          Same as 'pool' above but with the additional constraint that code
-> > +          will be run from the region and that the memory is maintained as
-> > +          read-only, executable during code execution. NOTE: This region must
-> > +          be page aligned on start and end in order to properly allow
-> > +          manipulation of the page attributes.
-> > +        type: boolean
-> > +
-> > +      label:
-> > +        $ref: /schemas/types.yaml#/definitions/string
-> 
-> Already has a type definition.
-
-OK
-
-Best regards,
-Krzysztof
+-- 
+2.21.0
 
