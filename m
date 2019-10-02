@@ -7,39 +7,39 @@ X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09A2BC352AA
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Oct 2019 05:55:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 140E7ECE58B
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Oct 2019 06:02:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C430B218DE
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Oct 2019 05:55:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DAFAA21D7B
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Oct 2019 06:02:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1569995706;
-	bh=wtOtOFphvhIR12Sw79063XbPCHTzfD6ZAz0An0TI4w4=;
+	s=default; t=1569996138;
+	bh=CV+keQnc3oa8IaO1/T0MBCxfFNAt5NtFUuPy7+FcG18=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=kCDxaOaI7Lfe9F39VeE+pTGm8U+KBIkdHAmh1a28C2bBQZNAwLU+TsyqkgLTPhorG
-	 ceWTOsDz8HhlfN5kgerBhK5aFoju2ko6D6erkR2vnxuQ+ol1wM0M3k4JUvgiflzSD0
-	 RfsWa/05Prt2sa1X9teetJq8hYzSE8uRKx+ld/SM=
+	b=MoXv83abO2hiQIiz0Qzfo67bAvUQjK/ut53HZ0KDwfUbyMNKeCDGJ6F8GjW5QQYiH
+	 eOMgH8h7qCB0vlLMF4rWUvupSAOI+G0slivzmLXnv8MENXXpx0KX9fgkQHLycvxszF
+	 M+w3Rae/S+/V+npwiNcXjiwgFcdBp+X2NPbAUnFg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726392AbfJBFzD (ORCPT
+        id S1727347AbfJBGCR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Oct 2019 01:55:03 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42624 "EHLO mail.kernel.org"
+        Wed, 2 Oct 2019 02:02:17 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45850 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726152AbfJBFzD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Oct 2019 01:55:03 -0400
+        id S1726806AbfJBGCR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 2 Oct 2019 02:02:17 -0400
 Received: from localhost (lfbn-1-10718-76.w90-89.abo.wanadoo.fr [90.89.68.76])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 365D72086A;
-        Wed,  2 Oct 2019 05:55:01 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4E3BA215EA;
+        Wed,  2 Oct 2019 06:02:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1569995701;
-        bh=wtOtOFphvhIR12Sw79063XbPCHTzfD6ZAz0An0TI4w4=;
+        s=default; t=1569996136;
+        bh=CV+keQnc3oa8IaO1/T0MBCxfFNAt5NtFUuPy7+FcG18=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=H8MbhzvorA/X5IA8IvWZUg8Jo9It3tP9Ey+rxONzf2AMfBEYoE9UM9XWcUGsueedk
-         jgNVjcYcMR3b59MBRVqs+vqqIYPsxYXTC9dsWvVM5SwrQiHY6am21me7k4nGzNxytC
-         j13KLlST3J5UYFqYRYmY6saU0znZuEOvYeB+qpX0=
-Date:   Wed, 2 Oct 2019 07:54:58 +0200
+        b=hM22mscs+qhQMk/S8W5R5oSgacgTbDnofWaJ7YLQekxJSLH6QWK+qdm+Vm9b/JlGM
+         4yCkFlqv+jnEFzQQRrzWH5IHcQkgylDWQJ28A8ABAsMFMWVjZXmIc0rzgJ8pWc3VZ6
+         lTiKwomFwZqq7ruUfUbgXv7Ddax/LbAqjDaorWgA=
+Date:   Wed, 2 Oct 2019 08:02:14 +0200
 From:   Maxime Ripard <mripard@kernel.org>
 To:     Corentin Labbe <clabbe.montjoie@gmail.com>
 Cc:     catalin.marinas@arm.com, davem@davemloft.net,
@@ -48,16 +48,15 @@ Cc:     catalin.marinas@arm.com, davem@davemloft.net,
         will@kernel.org, devicetree@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-sunxi@googlegroups.com
-Subject: Re: [PATCH v2 03/11] dt-bindings: crypto: Add DT bindings
- documentation for sun8i-ce Crypto Engine
-Message-ID: <20191002055458.zo2vdbxodj3ch53g@gilmour>
+Subject: Re: [PATCH v2 05/11] ARM: dts: sun8i: H3: Add Crypto Engine node
+Message-ID: <20191002060214.bu67nkd3y6puknrb@gilmour>
 References: <20191001184141.27956-1-clabbe.montjoie@gmail.com>
- <20191001184141.27956-4-clabbe.montjoie@gmail.com>
+ <20191001184141.27956-6-clabbe.montjoie@gmail.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="2fgyg66uvun6eeak"
+        protocol="application/pgp-signature"; boundary="m5s3egvksjuih2k6"
 Content-Disposition: inline
-In-Reply-To: <20191001184141.27956-4-clabbe.montjoie@gmail.com>
+In-Reply-To: <20191001184141.27956-6-clabbe.montjoie@gmail.com>
 User-Agent: NeoMutt/20180716
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
@@ -65,115 +64,56 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
---2fgyg66uvun6eeak
+--m5s3egvksjuih2k6
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
-On Tue, Oct 01, 2019 at 08:41:33PM +0200, Corentin Labbe wrote:
-> This patch adds documentation for Device-Tree bindings for the
-> Crypto Engine cryptographic accelerator driver.
+On Tue, Oct 01, 2019 at 08:41:35PM +0200, Corentin Labbe wrote:
+> The Crypto Engine is a hardware cryptographic accelerator that supports
+> many algorithms.
+> It could be found on most Allwinner SoCs.
+>
+> This patch enables the Crypto Engine on the Allwinner H3 SoC Device-tree.
 >
 > Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 > ---
->  .../bindings/crypto/allwinner,sun8i-ce.yaml   | 92 +++++++++++++++++++
->  1 file changed, 92 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml
+>  arch/arm/boot/dts/sun8i-h3.dtsi | 11 +++++++++++
+>  1 file changed, 11 insertions(+)
 >
-> diff --git a/Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml b/Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml
-> new file mode 100644
-> index 000000000000..9bd26a2eff33
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml
-> @@ -0,0 +1,92 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/crypto/allwinner,sun8i-ce.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Allwinner Crypto Engine driver
-> +
-> +maintainers:
-> +  - Corentin Labbe <clabbe.montjoie@gmail.com>
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - allwinner,sun8i-h3-crypto
-> +      - allwinner,sun8i-r40-crypto
-> +      - allwinner,sun50i-a64-crypto
-> +      - allwinner,sun50i-h5-crypto
-> +      - allwinner,sun50i-h6-crypto
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  interrupts:
-> +    maxItems: 1
-> +
-> +  clocks:
-> +    items:
-> +      - description: Bus clock
-> +      - description: Module clock
-> +      - description: MBus clock
-> +    minItems: 2
-> +    maxItems: 3
-> +
-> +  clock-names:
-> +    items:
-> +      - const: bus
-> +      - const: mod
-> +      - const: ram
-> +    minItems: 2
-> +    maxItems: 3
-> +
-> +  resets:
-> +    maxItems: 1
-> +
-> +  reset-names:
-> +    const: bus
-> +
-> +if:
-> +  properties:
-> +    compatible:
-> +      items:
-> +        const: allwinner,sun50i-h6-crypto
-> +then:
-> +  properties:
-> +      clocks:
-> +        minItems: 3
-> +      clock-names:
-> +        minItems: 3
-> +else:
-> +  properties:
-> +      clocks:
-> +        maxItems: 2
-> +      clock-names:
-> +        maxItems: 2
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - interrupts
-> +  - clocks
-> +  - clock-names
-> +  - resets
-> +
-> +additionalProperties: true
+> diff --git a/arch/arm/boot/dts/sun8i-h3.dtsi b/arch/arm/boot/dts/sun8i-h3.dtsi
+> index e37c30e811d3..778a23a794c9 100644
+> --- a/arch/arm/boot/dts/sun8i-h3.dtsi
+> +++ b/arch/arm/boot/dts/sun8i-h3.dtsi
+> @@ -153,6 +153,17 @@
+>  			allwinner,sram = <&ve_sram 1>;
+>  		};
+>
+> +		crypto: crypto@1c15000 {
+> +			compatible = "allwinner,sun8i-h3-crypto";
+> +			reg = <0x01c15000 0x1000>;
+> +			interrupts = <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>;
+> +			interrupt-names = "ce_ns";
 
-I guess you meant false here?
+That's not documented in the binding (and I guess unnecessary)
+
+> +			resets = <&ccu RST_BUS_CE>;
+> +			reset-names = "bus";
+> +			clocks = <&ccu CLK_BUS_CE>, <&ccu CLK_CE>;
+> +			clock-names = "bus", "mod";
+
+Nit: we put the clocks before the resets usually
 
 Maxime
 
---2fgyg66uvun6eeak
+--m5s3egvksjuih2k6
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYIAB0WIQRcEzekXsqa64kGDp7j7w1vZxhRxQUCXZQ7rQAKCRDj7w1vZxhR
-xdFbAQCEkUlhME2ax9rLhbr3MrlsTcoOQtlq/F3s52pxJLaI3QD+OMbHPPV//HCY
-MPqSdqIOu1r5jzZjtXPgjsZTo4VsqAo=
-=m0Hw
+iHUEABYIAB0WIQRcEzekXsqa64kGDp7j7w1vZxhRxQUCXZQ9ZQAKCRDj7w1vZxhR
+xQ12AP4v8ngYjx24mlHXpcMOKB1UPEpZ7nVs0R3Z429dTd6YiwD+I2L/8Esrt1co
+O1jvbqC8meSjGLU39z/Mr3MOweUa+Q8=
+=RT92
 -----END PGP SIGNATURE-----
 
---2fgyg66uvun6eeak--
+--m5s3egvksjuih2k6--
