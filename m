@@ -2,173 +2,95 @@ Return-Path: <SRS0=UbUg=X3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_2 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4561DECE58D
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Oct 2019 13:48:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0CD8C35280
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Oct 2019 14:00:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 273F421920
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Oct 2019 13:48:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 808EC21920
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Oct 2019 14:00:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728039AbfJBNr7 (ORCPT
+        id S1726669AbfJBOA2 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Oct 2019 09:47:59 -0400
-Received: from mailgw01.mediatek.com ([210.61.82.183]:54417 "EHLO
-        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1728031AbfJBNr6 (ORCPT
+        Wed, 2 Oct 2019 10:00:28 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:60354 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726150AbfJBOA2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Oct 2019 09:47:58 -0400
-X-UUID: a9454dd52135451797b80bf2ba97a4f6-20191002
-X-UUID: a9454dd52135451797b80bf2ba97a4f6-20191002
-Received: from mtkcas08.mediatek.inc [(172.21.101.126)] by mailgw01.mediatek.com
-        (envelope-from <neal.liu@mediatek.com>)
-        (Cellopoint E-mail Firewall v4.1.10 Build 0809 with TLS)
-        with ESMTP id 727753782; Wed, 02 Oct 2019 21:47:52 +0800
-Received: from mtkcas08.mediatek.inc (172.21.101.126) by
- mtkmbs07n2.mediatek.inc (172.21.101.141) with Microsoft SMTP Server (TLS) id
- 15.0.1395.4; Wed, 2 Oct 2019 21:47:48 +0800
-Received: from [172.21.77.33] (172.21.77.33) by mtkcas08.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1395.4 via Frontend
- Transport; Wed, 2 Oct 2019 21:47:48 +0800
-Message-ID: <1570024070.4002.1.camel@mtkswgap22>
-Subject: Re: [PATCH v4 2/3] dt-bindings: rng: add bindings for MediaTek
- ARMv8 SoCs
-From:   Neal Liu <neal.liu@mediatek.com>
-To:     Rob Herring <robh@kernel.org>
-CC:     Mark Rutland <mark.rutland@arm.com>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        Wed, 2 Oct 2019 10:00:28 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x92DvZuS045082
+        for <linux-crypto@vger.kernel.org>; Wed, 2 Oct 2019 10:00:27 -0400
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2vcuknkkbj-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Wed, 02 Oct 2019 10:00:27 -0400
+Received: from localhost
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <zohar@linux.ibm.com>;
+        Wed, 2 Oct 2019 15:00:25 +0100
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 2 Oct 2019 15:00:22 +0100
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x92E0Lx824183122
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 2 Oct 2019 14:00:21 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 48A62A4067;
+        Wed,  2 Oct 2019 14:00:21 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id D0B2DA4054;
+        Wed,  2 Oct 2019 14:00:19 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.80.234.231])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Wed,  2 Oct 2019 14:00:19 +0000 (GMT)
+Subject: Re: [PATCH] KEYS: asym_tpm: Switch to get_random_bytes()
+From:   Mimi Zohar <zohar@linux.ibm.com>
+To:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        linux-integrity@vger.kernel.org
+Cc:     stable@vger.kernel.org, David Howells <dhowells@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        wsd_upstream <wsd_upstream@mediatek.com>,
-        Sean Wang <sean.wang@kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Crystal Guo =?UTF-8?Q?=28=E9=83=AD=E6=99=B6=29?= 
-        <Crystal.Guo@mediatek.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        "linux-mediatek@lists.infradead.org" 
-        <linux-mediatek@lists.infradead.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        Neal Liu <neal.liu@mediatek.com>
-Date:   Wed, 2 Oct 2019 21:47:50 +0800
-In-Reply-To: <1568771054.21700.7.camel@mtkswgap22>
-References: <1561361052-13072-1-git-send-email-neal.liu@mediatek.com>
-         <1561361052-13072-3-git-send-email-neal.liu@mediatek.com>
-         <20190722171320.GA9806@bogus> <1563848465.31451.4.camel@mtkswgap22>
-         <CAL_Jsq+SRhd=-5O2G_CMfJX9Z188kvA05MQOXaU1J8iExwUixQ@mail.gmail.com>
-         <1568771054.21700.7.camel@mtkswgap22>
+        "David S. Miller" <davem@davemloft.net>,
+        "open list:ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Date:   Wed, 02 Oct 2019 10:00:19 -0400
+In-Reply-To: <20190926171601.30404-1-jarkko.sakkinen@linux.intel.com>
+References: <20190926171601.30404-1-jarkko.sakkinen@linux.intel.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.2.3-0ubuntu6 
-Content-Transfer-Encoding: 7bit
-MIME-Version: 1.0
-X-MTK:  N
+X-Mailer: Evolution 3.20.5 (3.20.5-1.fc24) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 19100214-0012-0000-0000-000003535F73
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19100214-0013-0000-0000-0000218E6336
+Message-Id: <1570024819.4999.119.camel@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-02_06:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=579 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910020135
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Dear Rob,
+On Thu, 2019-09-26 at 20:16 +0300, Jarkko Sakkinen wrote:
+> Only the kernel random pool should be used for generating random numbers.
+> TPM contributes to that pool among the other sources of entropy. In here it
+> is not, agreed, absolutely critical because TPM is what is trusted anyway
+> but in order to remove tpm_get_random() we need to first remove all the
+> call sites.
 
-Just a gentle ping.
+At what point during boot is the kernel random pool available?  Does
+this imply that you're planning on changing trusted keys as well?
 
-Neal
-
-On Wed, 2019-09-18 at 09:44 +0800, Neal Liu wrote:
-> On Tue, 2019-07-23 at 22:35 +0800, Rob Herring wrote:
-> > On Mon, Jul 22, 2019 at 8:21 PM Neal Liu <neal.liu@mediatek.com> wrote:
-> > >
-> > 
-> > Please don't top post to lists.
-> > 
-> > > Dear Rob,
-> > >         You can check my driver for detail:
-> > >         http://patchwork.kernel.org/patch/11012475/ or patchset 3/3
-> > 
-> > I could, or you could just answer my question.
-> > 
-> > >
-> > >         This driver is registered as hardware random number generator, and
-> > > combines with rng-core.
-> > >         We want to add one rng hw based on the dts. Is this proper or do you
-> > > have other suggestion to meet this requirement?
-> > 
-> > It depends. There doesn't appear to be any resource configuration, so
-> > why does it need to be in DT. DT is not the only way instantiate
-> > drivers.
-> > 
-> > Rob
-> > 
-> 
-> We would like to consult more about this patch.
-> We cannot figure out what method should be used instead of DT.
-> The interface to access firmware is "smc" and firmware function only
-> exists on certain platforms.
-> Some DT has similar way, like:
-> http://github.com/torvalds/linux/blob/master/arch/arm64/boot/dts/hisilicon/hi6220-hikey.dts#L470
-> 
-> 	firmware {
-> 		optee {
-> 			compatible = "linaro,optee-tz";
-> 			method = "smc";
-> 		};
-> 	};
-> 
-> Is there any way to instantiate driver on certain platforms without DT?
-> Could you give us some examples?
-> Thanks
-> 
-> > >
-> > >         Thanks
-> > >
-> > >
-> > > On Tue, 2019-07-23 at 01:13 +0800, Rob Herring wrote:
-> > > > On Mon, Jun 24, 2019 at 03:24:11PM +0800, Neal Liu wrote:
-> > > > > Document the binding used by the MediaTek ARMv8 SoCs random
-> > > > > number generator with TrustZone enabled.
-> > > > >
-> > > > > Signed-off-by: Neal Liu <neal.liu@mediatek.com>
-> > > > > ---
-> > > > >  .../devicetree/bindings/rng/mtk-sec-rng.txt        |   10 ++++++++++
-> > > > >  1 file changed, 10 insertions(+)
-> > > > >  create mode 100644 Documentation/devicetree/bindings/rng/mtk-sec-rng.txt
-> > > > >
-> > > > > diff --git a/Documentation/devicetree/bindings/rng/mtk-sec-rng.txt b/Documentation/devicetree/bindings/rng/mtk-sec-rng.txt
-> > > > > new file mode 100644
-> > > > > index 0000000..c04ce15
-> > > > > --- /dev/null
-> > > > > +++ b/Documentation/devicetree/bindings/rng/mtk-sec-rng.txt
-> > > > > @@ -0,0 +1,10 @@
-> > > > > +MediaTek random number generator with TrustZone enabled
-> > > > > +
-> > > > > +Required properties:
-> > > > > +- compatible : Should be "mediatek,mtk-sec-rng"
-> > > >
-> > > > What's the interface to access this?
-> > > >
-> > > > A node with a 'compatible' and nothing else is a sign of something that
-> > > > a parent device should instantiate and doesn't need to be in DT. IOW,
-> > > > what do complete bindings for firmware functions look like?
-> > > >
-> > > > > +
-> > > > > +Example:
-> > > > > +
-> > > > > +hwrng: hwrng {
-> > > > > +   compatible = "mediatek,mtk-sec-rng";
-> > > > > +}
-> > > > > --
-> > > > > 1.7.9.5
-> > > > >
-> > > >
-> > > > _______________________________________________
-> > > > Linux-mediatek mailing list
-> > > > Linux-mediatek@lists.infradead.org
-> > > > http://lists.infradead.org/mailman/listinfo/linux-mediatek
-> > >
-> > >
-> 
-
+Mimi
 
