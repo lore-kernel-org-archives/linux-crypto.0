@@ -2,178 +2,145 @@ Return-Path: <SRS0=UbUg=X3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CE83C352AA
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Oct 2019 16:47:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AB15C352AA
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Oct 2019 16:47:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1E3B121D82
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Oct 2019 16:47:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3FA4221D81
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Oct 2019 16:47:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iJ5or5kJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726708AbfJBQrY (ORCPT
+        id S1727846AbfJBQrz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Oct 2019 12:47:24 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:3236 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726267AbfJBQrX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Oct 2019 12:47:23 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 528A3773250F30F8E166;
-        Thu,  3 Oct 2019 00:47:19 +0800 (CST)
-Received: from [127.0.0.1] (10.202.227.179) by DGGEMS411-HUB.china.huawei.com
- (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Thu, 3 Oct 2019
- 00:47:12 +0800
-Subject: Re: [PATCH 2/2] [v2] crypto: hisilicon - allow compile-testing on x86
-To:     Zhou Wang <wangzhou1@hisilicon.com>, Arnd Bergmann <arnd@arndb.de>
-References: <20190919140650.1289963-2-arnd@arndb.de>
- <20190919140917.1290556-1-arnd@arndb.de>
- <f801a4c1-8fa6-8c14-120c-49c24ec84449@huawei.com>
- <CAK8P3a3jCv--VHu9r4ZTnLXXGaCjdJ6royP5LFk_9RCTTRsRBA@mail.gmail.com>
- <CAK8P3a1AgZePpZdYXh2w1BHAJZZbAjZjN8MZyVS4bPo4gVVgPg@mail.gmail.com>
- <531214d6-2caf-2963-0f57-2cd615a18762@huawei.com>
- <5D85FAEC.9060607@hisilicon.com>
-CC:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Kenneth Lee <liguozhu@hisilicon.com>,
-        Mao Wenan <maowenan@huawei.com>,
-        "Hao Fang" <fanghao11@huawei.com>,
-        Shiju Jose <shiju.jose@huawei.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Will Deacon <will@kernel.org>
-From:   John Garry <john.garry@huawei.com>
-Message-ID: <9ca33e86-9aa5-9cd0-f57d-1a2ad7d73bc9@huawei.com>
-Date:   Wed, 2 Oct 2019 17:47:04 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.3.0
+        Wed, 2 Oct 2019 12:47:55 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:37475 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726267AbfJBQrz (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 2 Oct 2019 12:47:55 -0400
+Received: by mail-pf1-f196.google.com with SMTP id y5so10685422pfo.4
+        for <linux-crypto@vger.kernel.org>; Wed, 02 Oct 2019 09:47:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=8e2f/B7O/eA1P+agxIjcgRsbBkwhMLqm5Md4WJWFegE=;
+        b=iJ5or5kJzrB1SCq2XiBOmrzCAeu+vtDm/AYBk9hrVEcMh2k0SIwGeN/kgGtpsWF+Xw
+         U/pc5NYQP+L/nMtkPUlC92GXUNaHUHf9Ynb7+3oQOKxzUtCp1A+Y6jhH5UjcrDC3K9Qw
+         pSmVv/+ZDqruNjEdK3KQ4h21T+0sEQDhNSE2Uhb/NNFOc+7AxQqWrWIPLIulyXiKlbV2
+         i851tFKRj74upqpHeVxebh78X5Z2ThUHivHzHhvOrBjyV533oZil3ARB6kBy3iPlUyAG
+         Nwf2up+7IEjwSJMN7f7tCnubKRmFYfieEF2oYINJHaMipXFE5MS69gvN+F1fnjM+RHHK
+         Md2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=8e2f/B7O/eA1P+agxIjcgRsbBkwhMLqm5Md4WJWFegE=;
+        b=V4dO68t8lWYzbBuPYvr5nXx90OxHEHKCIJbKhngmIjgI+EYLn3l9FYicM8owODIqSm
+         7hwPlCQ06X6zAafDpI9WDuFXzzlHrxTi2vAFNCPrRuCTDwRPf1GmCfXXuDcs7QVQnep4
+         /5ZODFc70IexDiGmG9jpsPDLf5rVUuIYkFGHMDHsoE15T/cXp1wsszBCxgq2vhQ8XXw4
+         e2TNLpWtSP9BI1DJ3quSJgXWP0NysgHKG+SJwE+J7oNWf1PQtUOxUxEgrXiIuUcLkK6E
+         kMX7S78r0bJxS7L22r2Tkw8bTfVZNeAOCrbin1xcaMMud1TKDtGK7HYT/aNW3a1KaztK
+         i5uw==
+X-Gm-Message-State: APjAAAUYCimuzfYdYYh6fMCNk/Pj1lnsAHlmEZUwSFAWbb5op2gQLNl9
+        DcKJgmGuIPYKOrQXTNJArHLH3Y9P+9Nyc1iBQFb6ew==
+X-Google-Smtp-Source: APXvYqwgl9+x+X7dH+bUehEzb6KtDKnn3rH7pQmlRq4Fq0cBwsVLeefo2nqY3HM+oVWJI1Gj7OTU2RBBSCLSyEkRrLc=
+X-Received: by 2002:a63:2f45:: with SMTP id v66mr4771858pgv.263.1570034872733;
+ Wed, 02 Oct 2019 09:47:52 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <5D85FAEC.9060607@hisilicon.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.227.179]
-X-CFilter-Loop: Reflected
+References: <20191002075448.6453-1-ard.biesheuvel@linaro.org>
+In-Reply-To: <20191002075448.6453-1-ard.biesheuvel@linaro.org>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Wed, 2 Oct 2019 09:47:41 -0700
+Message-ID: <CAKwvOdmr2VX0MObnRScW4suijOLQL24HL3+TPKk8Rkcz0_0ZbA@mail.gmail.com>
+Subject: Re: [PATCH] crypto: aegis128/simd - build 32-bit ARM for v8
+ architecture explicitly
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Nathan Chancellor <natechancellor@gmail.com>,
+        Will Deacon <will@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 21/09/2019 11:26, Zhou Wang wrote:
-> On 2019/9/20 22:16, John Garry wrote:
->> On 20/09/2019 14:36, Arnd Bergmann wrote:
->>> On Fri, Sep 20, 2019 at 3:26 PM Arnd Bergmann <arnd@arndb.de> wrote:
->>>>
->>>> On Fri, Sep 20, 2019 at 10:34 AM John Garry <john.garry@huawei.com> wrote:
->>>>
->>>>>> +     if (!IS_ENABLED(CONFIG_ARM64)) {
->>>>>> +             memcpy_toio(fun_base, src, 16);
->>>>>> +             wmb();
->>>>>> +             return;
->>>>>> +     }
->>>>>> +
->>>>>>       asm volatile("ldp %0, %1, %3\n"
->>>>>>                    "stp %0, %1, %2\n"
->>>>>>                    "dsb sy\n"
->>>>>>
->>>>>
+On Wed, Oct 2, 2019 at 12:55 AM Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
+>
+> Now that the Clang compiler has taken it upon itself to police the
+> compiler command line, and reject combinations for arguments it views
+> as incompatible, the AEGIS128 no longer builds correctly, and errors
+> out like this:
+>
+>   clang-10: warning: ignoring extension 'crypto' because the 'armv7-a'
+>   architecture does not support it [-Winvalid-command-line-argument]
+>
+> So let's switch to armv8-a instead, which matches the crypto-neon-fp-armv8
+> FPU profile we specify. Since neither were actually supported by GCC
+> versions before 4.8, let's tighten the Kconfig dependencies as well so
+> we won't run into errors when building with an ancient compiler.
+>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-***
+Thank you Ard, this fixes the build error for us.  Do you know if the
+"crypto extensions" are mandatory ISA extensions?  I'm running into
+some inconsistencies between how clang parses target arch between
+command line flag, function __attribute__, assembler directive, and
+disassembler.  I see arch's like: armv8-a+crc, armv8-a+sve,
+armv8-a+fp16, armv8-a+memtag, armv8-a+lse, but I'm not familiar with
+the `+...` part of the target arch.
 
->>>>> As I understand, this operation needs to be done atomically. So - even
->>>>> though your change is just for compile testing - the memcpy_to_io() may
->>>>> not do the same thing on other archs, right?
->>>>>
->>>>> I just wonder if it's right to make that change, or at least warn the
->>>>> imaginary user of possible malfunction for !arm64.
->>>>
->>
->> Hi Arnd,
->>
->>>> It's probably not necessary here. From what I can tell from the documentation,
->>>> this is only safe on ARMv8.4 or higher anyway, earlier ARMv8.x implementations
->>>> don't guarantee that an stp arrives on the bus in one piece either.
->>>>
->>>> Usually, hardware like this has no hard requirement on an atomic store,
->>>> it just needs the individual bits to arrive in a particular order, and then
->>>> triggers the update on the last bit that gets stored. If that is the case here
->>>> as well, it might actually be better to use two writeq_relaxed() and
->>>> a barrier. This would also solve the endianess issue.
->>>
->>> See also https://lkml.org/lkml/2018/1/26/554 for a previous attempt
->>> to introduce 128-bit MMIO accessors, this got rejected since they
->>> are not atomic even on ARMv8.4.
->>
->> So this is proprietary IP integrated with a proprietary ARMv8 implementation,
->> so there could be a tight coupling, the like of which Will mentioned in that thread,
->> but I'm doubtful.
->>
->> I'm looking at the electronically translated documentation on this HW, and it reads
->> "The Mailbox operation performed by the CPU cannot be interleaved", and then tells
->> that software should lock against concurrent accesses or alternatively use a 128-bit
->> access. So it seems that the 128b op used is only to guarantee software is atomic.
->>
->> Wang Zhou can confirm my understanding
+Either way, thanks for the patch:
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+Tested-by: Nick Desaulniers <ndesaulniers@google.com>
+Reported-by: <ci_notify@linaro.org>
+Link: https://github.com/ClangBuiltLinux/linux/issues/730
+
+> ---
+>  crypto/Kconfig  | 1 +
+>  crypto/Makefile | 2 +-
+>  2 files changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/crypto/Kconfig b/crypto/Kconfig
+> index e928f88b6206..b138b68329dc 100644
+> --- a/crypto/Kconfig
+> +++ b/crypto/Kconfig
+> @@ -331,6 +331,7 @@ config CRYPTO_AEGIS128
+>  config CRYPTO_AEGIS128_SIMD
+>         bool "Support SIMD acceleration for AEGIS-128"
+>         depends on CRYPTO_AEGIS128 && ((ARM || ARM64) && KERNEL_MODE_NEON)
+> +       depends on !ARM || CC_IS_CLANG || GCC_VERSION >= 40800
+>         default y
+>
+>  config CRYPTO_AEGIS128_AESNI_SSE2
+> diff --git a/crypto/Makefile b/crypto/Makefile
+> index fcb1ee679782..aa740c8492b9 100644
+> --- a/crypto/Makefile
+> +++ b/crypto/Makefile
+> @@ -93,7 +93,7 @@ obj-$(CONFIG_CRYPTO_AEGIS128) += aegis128.o
+>  aegis128-y := aegis128-core.o
+>
+>  ifeq ($(ARCH),arm)
+> -CFLAGS_aegis128-neon-inner.o += -ffreestanding -march=armv7-a -mfloat-abi=softfp
+> +CFLAGS_aegis128-neon-inner.o += -ffreestanding -march=armv8-a -mfloat-abi=softfp
+>  CFLAGS_aegis128-neon-inner.o += -mfpu=crypto-neon-fp-armv8
+>  aegis128-$(CONFIG_CRYPTO_AEGIS128_SIMD) += aegis128-neon.o aegis128-neon-inner.o
+>  endif
+> --
+> 2.20.1
 >
 
-Just to add a few more details here:
 
-> We have to do a 128bit atomic write here to trigger a mailbox. The reason is
-> that one QM hardware entity in one accelerator servers QM mailbox MMIO interfaces in
-> related PF and VFs.
->
-> A mutex can not lock different processing flows in different functions.
-
-This means that we can have userspace drivers and the kernel driver 
-simultaneously accessing these mailboxes.
-
->
-> As Arnd mentioned, v8.4 extends the support for 16 bytes atomic stp to some kinds of
-> normal memory, but for device memory, it is still implementation defined. For this
-> SoC(Kunpeng920) which has QM/ZIP, if the address is 128bit aligned, stp will be atomic.
-> The offset of QM mailbox is 128bit aligned, so it is safe here.
-
-The strange thing (to me) about this hw is that we cannot interleave 
-mailbox accesses on different functions - with 2x 64b accesses, for 
-example. This is the reason that we require 128b accesses.
-
-The upshot is that we can't switch to generic code unfortunately.
-
-But I am not sure if the change is right, as I mentioned originally, 
-above ***.
-
-I'll leave to Arnd's better judgment :)
-
+--
 Thanks,
-John
-
->
-> Best,
-> Zhou
->
->>
->> If true, I see that we seem to be already guaranteeing mutual exclusion in qm_mb(),
->> in taking a mutex.
->>
->> Thanks,
->> John
->>
->>
->>>
->>>     Arnd
->>>
->>> .
->>>
->>
->>
->>
->> .
->>
->
->
-> .
->
-
-
+~Nick Desaulniers
