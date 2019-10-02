@@ -2,60 +2,60 @@ Return-Path: <SRS0=UbUg=X3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A08FECE58A
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Oct 2019 14:18:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75B3DECE58C
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Oct 2019 14:18:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6679C21D7B
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Oct 2019 14:18:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3848421D7B
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Oct 2019 14:18:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KmwOUiyn"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ERGBHDwN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727708AbfJBOR7 (ORCPT
+        id S1728130AbfJBOSA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Oct 2019 10:17:59 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:46329 "EHLO
+        Wed, 2 Oct 2019 10:18:00 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:38528 "EHLO
         mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727771AbfJBOR7 (ORCPT
+        with ESMTP id S1726214AbfJBOR7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Wed, 2 Oct 2019 10:17:59 -0400
-Received: by mail-wr1-f65.google.com with SMTP id o18so19837721wrv.13
-        for <linux-crypto@vger.kernel.org>; Wed, 02 Oct 2019 07:17:57 -0700 (PDT)
+Received: by mail-wr1-f65.google.com with SMTP id w12so19884751wro.5
+        for <linux-crypto@vger.kernel.org>; Wed, 02 Oct 2019 07:17:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=aG4eoMjkkcuaDa5uAXgPjSu7DoIJsA0jc8CLt+o/aME=;
-        b=KmwOUiynwj4F/XpS8h1dJDnUfpoPARmlFUS/869QtrxibLP+gpmvx9ocA6EWTjD+Qy
-         wSdL8KlnCHt8i51EBXK67IU9ZUmS8//ZNQkE7YgfP/EDNpJgFAYKjkxcHYm0yfgz7026
-         RAuOhyxb1mV8xlRw0DVYMKYxi8Vxk9ue4mXD+kL4QlE4MOfeY8j9YRm5OPia64MfuDyi
-         fMt1KBH4Ou/ehhPEJBnW0wvz9GdBS7B/bPzrvQO6QosamlAWoatFAZljg2rfkd/XOl6t
-         eDtoBhdCNguAzDTys1RYpi8PRC+qOi7N1effHgROv4fvB9+cMA1qv3Bm8E0xbdXtemeS
-         ITHQ==
+        bh=Th4AOk+yOVbWHxmbQ0+LoirsQcTHiG+xSQnyDNaRzdU=;
+        b=ERGBHDwNFYQ2/+SXwex99/iOhUtnmJMzmhaBDdyS320tWkXaYRx/JiYm4mHziSIze8
+         xDcLQnLsHS54ZQGvKPNijD69nI6J5huwen++1e4M39wReDUTBwK3gDO38PtGr1O0HOGA
+         LrtuS/UKGf7DMzn7g7jFjZnUzznpGlL5Gdewa43qcr3BJaV+VEx1fPfBBTyebKlQrmKl
+         yXnbEJOH4ee9vQfEsLty8Q69CJENdkGwtPGEzRkAEinN6QO8X6VNBIeH9T/8yOodl6yY
+         IEE15Hns6z240w2HSWFKEn+u0tRrBJeFaxATzRSWwNpDWWeKr7/STxFyw7gXUmAZeKyJ
+         C0jA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=aG4eoMjkkcuaDa5uAXgPjSu7DoIJsA0jc8CLt+o/aME=;
-        b=TdOg39uGaJh4NOideaT/+JUodzba8Bpo5TCl7pf1/SqcyWQejWi/7fqIosd4DTm6qw
-         C7XGw8TlIWAVuLVidLZTM6lYu8GKvC0nJMUyzAAoq3FQdaByYDnz2hhdu0aSYZpbSvUV
-         v3S8qLDmZ5R68IxliHg1JDFRynQYhvBlkiAY8IKzttZ9gKDtAULl4gY2Mrg8e3BghVcv
-         JJwlFB0BKFXQJ0xa1jzlEAtINxvTPHjQMKU3ulByyIu+SGEX3WiIOXhLd7NoCrDMPf9q
-         WjozE7zHxouK36kA3BxKP+7dOmETt6uyaFJwi82bfF9nlUtZUCUVWso33foPgkRwatq1
-         md+A==
-X-Gm-Message-State: APjAAAWVURpHC6oB7ETsQaZ0QSZwn0DGF83p+o8nzQ3uql1IgmxNXZKg
-        vvmrlV623A86tZawIE9RKEY6T7w0P+G+f1ym
-X-Google-Smtp-Source: APXvYqwjknNtpL7CEMWJ90jtetwOd71VceRV3OAXvHuQdUbyKPcrixTTdqHqOmP1paGLusdHcsxg5w==
-X-Received: by 2002:adf:e60d:: with SMTP id p13mr2751308wrm.298.1570025877046;
-        Wed, 02 Oct 2019 07:17:57 -0700 (PDT)
+        bh=Th4AOk+yOVbWHxmbQ0+LoirsQcTHiG+xSQnyDNaRzdU=;
+        b=dtkQqjdp9AZC5s4gZ1UpKxwdqTcC17+6ceG+h9WJgm8y7NnvU9wVPXvpz2y3JjHhfQ
+         McPnQ0N+t2EURlNDbH6IHjGwwet5ojMZVenvmSFvZbXPslkmkzsuA7VoabbaGZzJMnGc
+         NvFULQNPmhrJ35S4m/UB23XX8UcYrl9vktiiq29xDhzAbXNwvo/UOd/BF21pG/caNUnm
+         euDZuXMJ2A6Qa9CEYctFsZZva3gLyudzLmwLGi3m/y04sEuUAaMtrV9CRz7pue6DtY1R
+         qhBKtSnqJBFx73bQtJzP4PYAcdmE3A9E+K31vEWPbPA+AOGBoHzYucigcWJxMmuPI/cJ
+         dVZw==
+X-Gm-Message-State: APjAAAUWP+g9ngR9s4+lPFgplt1CTUFQwaXMP2epjVnZdunfhK2iA8ZV
+        3pfxntvPiwnJ0k5JWv/K/hPDjwNbzZnoZHry
+X-Google-Smtp-Source: APXvYqwymBNqFICvAwnAB3mT341ppVVGb54mGmmexqRAOfCiUm8635jf5ingX4wklnRlSlW+86ZEAw==
+X-Received: by 2002:a5d:5352:: with SMTP id t18mr3070529wrv.72.1570025875144;
+        Wed, 02 Oct 2019 07:17:55 -0700 (PDT)
 Received: from sudo.home ([2a01:cb1d:112:6f00:f145:3252:fc29:76c9])
-        by smtp.gmail.com with ESMTPSA id t13sm41078149wra.70.2019.10.02.07.17.55
+        by smtp.gmail.com with ESMTPSA id t13sm41078149wra.70.2019.10.02.07.17.53
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 02 Oct 2019 07:17:56 -0700 (PDT)
+        Wed, 02 Oct 2019 07:17:54 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
@@ -74,137 +74,690 @@ Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Martin Willi <martin@strongswan.org>,
         Peter Zijlstra <peterz@infradead.org>,
         Josh Poimboeuf <jpoimboe@redhat.com>,
-        Masahiro Yamada <yamada.masahiro@socionext.com>
-Subject: [PATCH v2 11/20] int128: move __uint128_t compiler test to Kconfig
-Date:   Wed,  2 Oct 2019 16:17:04 +0200
-Message-Id: <20191002141713.31189-12-ard.biesheuvel@linaro.org>
+        =?UTF-8?q?Ren=C3=A9=20van=20Dorst?= <opensource@vdorst.com>
+Subject: [PATCH v2 10/20] crypto: mips/poly1305 - import accelerated 32r2 code from Zinc
+Date:   Wed,  2 Oct 2019 16:17:03 +0200
+Message-Id: <20191002141713.31189-11-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191002141713.31189-1-ard.biesheuvel@linaro.org>
 References: <20191002141713.31189-1-ard.biesheuvel@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In order to use 128-bit integer arithmetic in C code, the architecture
-needs to have declared support for it by setting ARCH_SUPPORTS_INT128,
-and it requires a version of the toolchain that supports this at build
-time. This is why all existing tests for ARCH_SUPPORTS_INT128 also test
-whether __SIZEOF_INT128__ is defined, since this is only the case for
-compilers that can support 128-bit integers.
+This integrates the accelerated MIPS 32r2 implementation of ChaCha
+into both the API and library interfaces of the kernel crypto stack.
 
-Let's fold this additional test into the Kconfig declaration of
-ARCH_SUPPORTS_INT128 so that we can also use the symbol in Makefiles,
-e.g., to decide whether a certain object needs to be included in the
-first place.
+The significance of this is that, in addition to becoming available
+as an accelerated library implementation, it can also be used by
+existing crypto API code such as IPsec, using chacha20poly1305.
 
-Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
+Co-developed-by: René van Dorst <opensource@vdorst.com>
+Signed-off-by: René van Dorst <opensource@vdorst.com>
+Co-developed-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm64/Kconfig | 2 +-
- arch/riscv/Kconfig | 2 +-
- arch/x86/Kconfig   | 2 +-
- crypto/ecc.c       | 2 +-
- init/Kconfig       | 4 ++++
- lib/ubsan.c        | 2 +-
- lib/ubsan.h        | 2 +-
- 7 files changed, 10 insertions(+), 6 deletions(-)
+ arch/mips/crypto/Makefile        |   3 +
+ arch/mips/crypto/poly1305-core.S | 407 ++++++++++++++++++++
+ arch/mips/crypto/poly1305-glue.c | 203 ++++++++++
+ crypto/Kconfig                   |   6 +
+ 4 files changed, 619 insertions(+)
 
-diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-index 41a9b4257b72..a591a0673694 100644
---- a/arch/arm64/Kconfig
-+++ b/arch/arm64/Kconfig
-@@ -67,7 +67,7 @@ config ARM64
- 	select ARCH_USE_QUEUED_SPINLOCKS
- 	select ARCH_SUPPORTS_MEMORY_FAILURE
- 	select ARCH_SUPPORTS_ATOMIC_RMW
--	select ARCH_SUPPORTS_INT128 if GCC_VERSION >= 50000 || CC_IS_CLANG
-+	select ARCH_SUPPORTS_INT128 if CC_HAS_INT128 && (GCC_VERSION >= 50000 || CC_IS_CLANG)
- 	select ARCH_SUPPORTS_NUMA_BALANCING
- 	select ARCH_WANT_COMPAT_IPC_PARSE_VERSION if COMPAT
- 	select ARCH_WANT_DEFAULT_TOPDOWN_MMAP_LAYOUT
-diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-index 8eebbc8860bb..75a6c9117622 100644
---- a/arch/riscv/Kconfig
-+++ b/arch/riscv/Kconfig
-@@ -164,7 +164,7 @@ config ARCH_RV32I
- config ARCH_RV64I
- 	bool "RV64I"
- 	select 64BIT
--	select ARCH_SUPPORTS_INT128 if GCC_VERSION >= 50000
-+	select ARCH_SUPPORTS_INT128 if CC_HAS_INT128 && GCC_VERSION >= 50000
- 	select HAVE_FUNCTION_TRACER
- 	select HAVE_FUNCTION_GRAPH_TRACER
- 	select HAVE_FTRACE_MCOUNT_RECORD
-diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-index d6e1faa28c58..f4d9d1e55e5c 100644
---- a/arch/x86/Kconfig
-+++ b/arch/x86/Kconfig
-@@ -24,7 +24,7 @@ config X86_64
- 	depends on 64BIT
- 	# Options that are inherently 64-bit kernel only:
- 	select ARCH_HAS_GIGANTIC_PAGE
--	select ARCH_SUPPORTS_INT128
-+	select ARCH_SUPPORTS_INT128 if CC_HAS_INT128
- 	select ARCH_USE_CMPXCHG_LOCKREF
- 	select HAVE_ARCH_SOFT_DIRTY
- 	select MODULES_USE_ELF_RELA
-diff --git a/crypto/ecc.c b/crypto/ecc.c
-index dfe114bc0c4a..6e6aab6c987c 100644
---- a/crypto/ecc.c
-+++ b/crypto/ecc.c
-@@ -336,7 +336,7 @@ static u64 vli_usub(u64 *result, const u64 *left, u64 right,
- static uint128_t mul_64_64(u64 left, u64 right)
- {
- 	uint128_t result;
--#if defined(CONFIG_ARCH_SUPPORTS_INT128) && defined(__SIZEOF_INT128__)
-+#if defined(CONFIG_ARCH_SUPPORTS_INT128)
- 	unsigned __int128 m = (unsigned __int128)left * right;
+diff --git a/arch/mips/crypto/Makefile b/arch/mips/crypto/Makefile
+index 7f7ea0020cc2..849173749626 100644
+--- a/arch/mips/crypto/Makefile
++++ b/arch/mips/crypto/Makefile
+@@ -7,3 +7,6 @@ obj-$(CONFIG_CRYPTO_CRC32_MIPS) += crc32-mips.o
  
- 	result.m_low  = m;
-diff --git a/init/Kconfig b/init/Kconfig
-index b4daad2bac23..020526f681c0 100644
---- a/init/Kconfig
-+++ b/init/Kconfig
-@@ -785,6 +785,10 @@ config ARCH_SUPPORTS_NUMA_BALANCING
- config ARCH_WANT_BATCHED_UNMAP_TLB_FLUSH
- 	bool
- 
-+config CC_HAS_INT128
-+	def_bool y
-+	depends on !$(cc-option,-D__SIZEOF_INT128__=0)
+ obj-$(CONFIG_CRYPTO_CHACHA_MIPS) += chacha-mips.o
+ chacha-mips-y := chacha-core.o chacha-glue.o
 +
- #
- # For architectures that know their GCC __int128 support is sound
- #
-diff --git a/lib/ubsan.c b/lib/ubsan.c
-index e7d31735950d..b652cc14dd60 100644
---- a/lib/ubsan.c
-+++ b/lib/ubsan.c
-@@ -119,7 +119,7 @@ static void val_to_string(char *str, size_t size, struct type_descriptor *type,
- {
- 	if (type_is_int(type)) {
- 		if (type_bit_width(type) == 128) {
--#if defined(CONFIG_ARCH_SUPPORTS_INT128) && defined(__SIZEOF_INT128__)
-+#if defined(CONFIG_ARCH_SUPPORTS_INT128)
- 			u_max val = get_unsigned_val(type, value);
++obj-$(CONFIG_CRYPTO_POLY1305_MIPS) += poly1305-mips.o
++poly1305-mips-y := poly1305-core.o poly1305-glue.o
+diff --git a/arch/mips/crypto/poly1305-core.S b/arch/mips/crypto/poly1305-core.S
+new file mode 100644
+index 000000000000..4291c156815b
+--- /dev/null
++++ b/arch/mips/crypto/poly1305-core.S
+@@ -0,0 +1,407 @@
++/* SPDX-License-Identifier: GPL-2.0 OR MIT */
++/*
++ * Copyright (C) 2016-2018 René van Dorst <opensource@vdorst.com> All Rights Reserved.
++ * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++ */
++
++#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
++#define MSB 0
++#define LSB 3
++#else
++#define MSB 3
++#define LSB 0
++#endif
++
++#define POLY1305_BLOCK_SIZE 16
++.text
++#define H0 $t0
++#define H1 $t1
++#define H2 $t2
++#define H3 $t3
++#define H4 $t4
++
++#define R0 $t5
++#define R1 $t6
++#define R2 $t7
++#define R3 $t8
++
++#define O0 $s0
++#define O1 $s4
++#define O2 $v1
++#define O3 $t9
++#define O4 $s5
++
++#define S1 $s1
++#define S2 $s2
++#define S3 $s3
++
++#define SC $at
++#define CA $v0
++
++/* Input arguments */
++#define poly	$a0
++#define src	$a1
++#define srclen	$a2
++#define hibit	$a3
++
++/* Location in the opaque buffer
++ * R[0..3], CA, H[0..4]
++ */
++#define PTR_POLY1305_R(n) ( 0 + (n*4)) ## ($a0)
++#define PTR_POLY1305_CA   (16        ) ## ($a0)
++#define PTR_POLY1305_H(n) (20 + (n*4)) ## ($a0)
++
++#define POLY1305_BLOCK_SIZE 16
++#define POLY1305_STACK_SIZE 32
++
++.set	noat
++.align	4
++.globl	poly1305_blocks_mips
++.ent	poly1305_blocks_mips
++poly1305_blocks_mips:
++	.frame	$sp, POLY1305_STACK_SIZE, $ra
++	/* srclen &= 0xFFFFFFF0 */
++	ins	srclen, $zero, 0, 4
++
++	addiu	$sp, -(POLY1305_STACK_SIZE)
++
++	/* check srclen >= 16 bytes */
++	beqz	srclen, .Lpoly1305_blocks_mips_end
++
++	/* Calculate last round based on src address pointer.
++	 * last round src ptr (srclen) = src + (srclen & 0xFFFFFFF0)
++	 */
++	addu	srclen, src
++
++	lw	R0, PTR_POLY1305_R(0)
++	lw	R1, PTR_POLY1305_R(1)
++	lw	R2, PTR_POLY1305_R(2)
++	lw	R3, PTR_POLY1305_R(3)
++
++	/* store the used save registers. */
++	sw	$s0, 0($sp)
++	sw	$s1, 4($sp)
++	sw	$s2, 8($sp)
++	sw	$s3, 12($sp)
++	sw	$s4, 16($sp)
++	sw	$s5, 20($sp)
++
++	/* load Hx and Carry */
++	lw	CA, PTR_POLY1305_CA
++	lw	H0, PTR_POLY1305_H(0)
++	lw	H1, PTR_POLY1305_H(1)
++	lw	H2, PTR_POLY1305_H(2)
++	lw	H3, PTR_POLY1305_H(3)
++	lw	H4, PTR_POLY1305_H(4)
++
++	/* Sx = Rx + (Rx >> 2) */
++	srl	S1, R1, 2
++	srl	S2, R2, 2
++	srl	S3, R3, 2
++	addu	S1, R1
++	addu	S2, R2
++	addu	S3, R3
++
++	addiu	SC, $zero, 1
++
++.Lpoly1305_loop:
++	lwl	O0, 0+MSB(src)
++	lwl	O1, 4+MSB(src)
++	lwl	O2, 8+MSB(src)
++	lwl	O3,12+MSB(src)
++	lwr	O0, 0+LSB(src)
++	lwr	O1, 4+LSB(src)
++	lwr	O2, 8+LSB(src)
++	lwr	O3,12+LSB(src)
++
++#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
++	wsbh	O0
++	wsbh	O1
++	wsbh	O2
++	wsbh	O3
++	rotr	O0, 16
++	rotr	O1, 16
++	rotr	O2, 16
++	rotr	O3, 16
++#endif
++
++	/* h0 = (u32)(d0 = (u64)h0 + inp[0] + c 'Carry_previous cycle'); */
++	addu	H0, CA
++	sltu	CA, H0, CA
++	addu	O0, H0
++	sltu	H0, O0, H0
++	addu	CA, H0
++
++	/* h1 = (u32)(d1 = (u64)h1 + (d0 >> 32) + inp[4]); */
++	addu	H1, CA
++	sltu	CA, H1, CA
++	addu	O1, H1
++	sltu	H1, O1, H1
++	addu	CA, H1
++
++	/* h2 = (u32)(d2 = (u64)h2 + (d1 >> 32) + inp[8]); */
++	addu	H2, CA
++	sltu	CA, H2, CA
++	addu	O2, H2
++	sltu	H2, O2, H2
++	addu	CA, H2
++
++	/* h3 = (u32)(d3 = (u64)h3 + (d2 >> 32) + inp[12]); */
++	addu	H3, CA
++	sltu	CA, H3, CA
++	addu	O3, H3
++	sltu	H3, O3, H3
++	addu	CA, H3
++
++	/* h4 += (u32)(d3 >> 32) + padbit; */
++	addu	H4, hibit
++	addu	O4, H4, CA
++
++	/* D0 */
++	multu	O0, R0
++	maddu	O1, S3
++	maddu	O2, S2
++	maddu	O3, S1
++	mfhi	CA
++	mflo	H0
++
++	/* D1 */
++	multu	O0, R1
++	maddu	O1, R0
++	maddu	O2, S3
++	maddu	O3, S2
++	maddu	O4, S1
++	maddu	CA, SC
++	mfhi	CA
++	mflo	H1
++
++	/* D2 */
++	multu	O0, R2
++	maddu	O1, R1
++	maddu	O2, R0
++	maddu	O3, S3
++	maddu	O4, S2
++	maddu	CA, SC
++	mfhi	CA
++	mflo	H2
++
++	/* D4 */
++	mul	H4, O4, R0
++
++	/* D3 */
++	multu	O0, R3
++	maddu	O1, R2
++	maddu	O2, R1
++	maddu	O3, R0
++	maddu	O4, S3
++	maddu	CA, SC
++	mfhi	CA
++	mflo	H3
++
++	addiu	src, POLY1305_BLOCK_SIZE
++
++	/* h4 += (u32)(d3 >> 32); */
++	addu	O4, H4, CA
++	/* h4 &= 3 */
++	andi	H4, O4, 3
++	/* c = (h4 >> 2) + (h4 & ~3U); */
++	srl	CA, O4, 2
++	ins	O4, $zero, 0, 2
++
++	addu	CA, O4
++
++	/* able to do a 16 byte block. */
++	bne	src, srclen, .Lpoly1305_loop
++
++	/* restore the used save registers. */
++	lw	$s0, 0($sp)
++	lw	$s1, 4($sp)
++	lw	$s2, 8($sp)
++	lw	$s3, 12($sp)
++	lw	$s4, 16($sp)
++	lw	$s5, 20($sp)
++
++	/* store Hx and Carry */
++	sw	CA, PTR_POLY1305_CA
++	sw	H0, PTR_POLY1305_H(0)
++	sw	H1, PTR_POLY1305_H(1)
++	sw	H2, PTR_POLY1305_H(2)
++	sw	H3, PTR_POLY1305_H(3)
++	sw	H4, PTR_POLY1305_H(4)
++
++.Lpoly1305_blocks_mips_end:
++	addiu	$sp, POLY1305_STACK_SIZE
++
++	/* Jump Back */
++	jr	$ra
++.end poly1305_blocks_mips
++.set at
++
++/* Input arguments CTX=$a0, MAC=$a1, NONCE=$a2 */
++#define MAC	$a1
++#define NONCE	$a2
++
++#define G0	$t5
++#define G1	$t6
++#define G2	$t7
++#define G3	$t8
++#define G4	$t9
++
++.set	noat
++.align	4
++.globl	poly1305_emit_mips
++.ent	poly1305_emit_mips
++poly1305_emit_mips:
++	/* load Hx and Carry */
++	lw	CA, PTR_POLY1305_CA
++	lw	H0, PTR_POLY1305_H(0)
++	lw	H1, PTR_POLY1305_H(1)
++	lw	H2, PTR_POLY1305_H(2)
++	lw	H3, PTR_POLY1305_H(3)
++	lw	H4, PTR_POLY1305_H(4)
++
++	/* Add left over carry */
++	addu	H0, CA
++	sltu	CA, H0, CA
++	addu	H1, CA
++	sltu	CA, H1, CA
++	addu	H2, CA
++	sltu	CA, H2, CA
++	addu	H3, CA
++	sltu	CA, H3, CA
++	addu	H4, CA
++
++	/* compare to modulus by computing h + -p */
++	addiu	G0, H0, 5
++	sltu	CA, G0, H0
++	addu	G1, H1, CA
++	sltu	CA, G1, H1
++	addu	G2, H2, CA
++	sltu	CA, G2, H2
++	addu	G3, H3, CA
++	sltu	CA, G3, H3
++	addu	G4, H4, CA
++
++	srl	SC, G4, 2
++
++	/* if there was carry into 131st bit, h3:h0 = g3:g0 */
++	movn	H0, G0, SC
++	movn	H1, G1, SC
++	movn	H2, G2, SC
++	movn	H3, G3, SC
++
++	lwl	G0, 0+MSB(NONCE)
++	lwl	G1, 4+MSB(NONCE)
++	lwl	G2, 8+MSB(NONCE)
++	lwl	G3,12+MSB(NONCE)
++	lwr	G0, 0+LSB(NONCE)
++	lwr	G1, 4+LSB(NONCE)
++	lwr	G2, 8+LSB(NONCE)
++	lwr	G3,12+LSB(NONCE)
++
++	/* mac = (h + nonce) % (2^128) */
++	addu	H0, G0
++	sltu	CA, H0, G0
++
++	/* H1 */
++	addu	H1, CA
++	sltu	CA, H1, CA
++	addu	H1, G1
++	sltu	G1, H1, G1
++	addu	CA, G1
++
++	/* H2 */
++	addu	H2, CA
++	sltu	CA, H2, CA
++	addu	H2, G2
++	sltu	G2, H2, G2
++	addu	CA, G2
++
++	/* H3 */
++	addu	H3, CA
++	addu	H3, G3
++
++#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
++	wsbh	H0
++	wsbh	H1
++	wsbh	H2
++	wsbh	H3
++	rotr	H0, 16
++	rotr	H1, 16
++	rotr	H2, 16
++	rotr	H3, 16
++#endif
++
++	/* store MAC */
++	swl	H0, 0+MSB(MAC)
++	swl	H1, 4+MSB(MAC)
++	swl	H2, 8+MSB(MAC)
++	swl	H3,12+MSB(MAC)
++	swr	H0, 0+LSB(MAC)
++	swr	H1, 4+LSB(MAC)
++	swr	H2, 8+LSB(MAC)
++	swr	H3,12+LSB(MAC)
++
++	jr	$ra
++.end poly1305_emit_mips
++
++#define PR0 $t0
++#define PR1 $t1
++#define PR2 $t2
++#define PR3 $t3
++#define PT0 $t4
++
++/* Input arguments CTX=$a0, KEY=$a1 */
++
++.align	4
++.globl	poly1305_init_mips
++.ent	poly1305_init_mips
++poly1305_init_mips:
++	lwl	PR0, 0+MSB($a1)
++	lwl	PR1, 4+MSB($a1)
++	lwl	PR2, 8+MSB($a1)
++	lwl	PR3,12+MSB($a1)
++	lwr	PR0, 0+LSB($a1)
++	lwr	PR1, 4+LSB($a1)
++	lwr	PR2, 8+LSB($a1)
++	lwr	PR3,12+LSB($a1)
++
++	/* store Hx and Carry */
++	sw	$zero, PTR_POLY1305_CA
++	sw	$zero, PTR_POLY1305_H(0)
++	sw	$zero, PTR_POLY1305_H(1)
++	sw	$zero, PTR_POLY1305_H(2)
++	sw	$zero, PTR_POLY1305_H(3)
++	sw	$zero, PTR_POLY1305_H(4)
++
++#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
++	wsbh	PR0
++	wsbh	PR1
++	wsbh	PR2
++	wsbh	PR3
++	rotr	PR0, 16
++	rotr	PR1, 16
++	rotr	PR2, 16
++	rotr	PR3, 16
++#endif
++
++	lui	PT0, 0x0FFF
++	ori	PT0, 0xFFFC
++
++	/* AND 0x0fffffff; */
++	ext	PR0, PR0, 0, (32-4)
++
++	/* AND 0x0ffffffc; */
++	and	PR1, PT0
++	and	PR2, PT0
++	and	PR3, PT0
++
++	/* store Rx */
++	sw	PR0, PTR_POLY1305_R(0)
++	sw	PR1, PTR_POLY1305_R(1)
++	sw	PR2, PTR_POLY1305_R(2)
++	sw	PR3, PTR_POLY1305_R(3)
++
++	/* Jump Back  */
++	jr	$ra
++.end poly1305_init_mips
+diff --git a/arch/mips/crypto/poly1305-glue.c b/arch/mips/crypto/poly1305-glue.c
+new file mode 100644
+index 000000000000..56ef1469ae6b
+--- /dev/null
++++ b/arch/mips/crypto/poly1305-glue.c
+@@ -0,0 +1,203 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * OpenSSL/Cryptogams accelerated Poly1305 transform for ARM
++ *
++ * Copyright (C) 2019 Linaro Ltd. <ard.biesheuvel@linaro.org>
++ */
++
++#include <asm/unaligned.h>
++#include <crypto/algapi.h>
++#include <crypto/internal/hash.h>
++#include <crypto/internal/poly1305.h>
++#include <linux/cpufeature.h>
++#include <linux/crypto.h>
++#include <linux/module.h>
++
++asmlinkage void poly1305_init_mips(void *state, const u8 *key);
++asmlinkage void poly1305_blocks_mips(void *state, const u8 *src, u32 len, u32 hibit);
++asmlinkage void poly1305_emit_mips(void *state, __le32 *digest, const u32 *nonce);
++
++void poly1305_init(struct poly1305_desc_ctx *dctx, const u8 *key)
++{
++	poly1305_init_mips(&dctx->h, key);
++	dctx->s[0] = get_unaligned_le32(key + 16);
++	dctx->s[1] = get_unaligned_le32(key + 20);
++	dctx->s[2] = get_unaligned_le32(key + 24);
++	dctx->s[3] = get_unaligned_le32(key + 28);
++	dctx->buflen = 0;
++}
++EXPORT_SYMBOL(poly1305_init);
++
++static int mips_poly1305_init(struct shash_desc *desc)
++{
++	struct poly1305_desc_ctx *dctx = shash_desc_ctx(desc);
++
++	dctx->buflen = 0;
++	dctx->rset = 0;
++	dctx->sset = false;
++
++	return 0;
++}
++
++static void mips_poly1305_blocks(struct poly1305_desc_ctx *dctx, const u8 *src,
++				 u32 len, u32 hibit)
++{
++	if (unlikely(!dctx->sset)) {
++		if (!dctx->rset) {
++			poly1305_init_mips(&dctx->h, src);
++			src += POLY1305_BLOCK_SIZE;
++			len -= POLY1305_BLOCK_SIZE;
++			dctx->rset = 1;
++		}
++		if (len >= POLY1305_BLOCK_SIZE) {
++			dctx->s[0] = get_unaligned_le32(src +  0);
++			dctx->s[1] = get_unaligned_le32(src +  4);
++			dctx->s[2] = get_unaligned_le32(src +  8);
++			dctx->s[3] = get_unaligned_le32(src + 12);
++			src += POLY1305_BLOCK_SIZE;
++			len -= POLY1305_BLOCK_SIZE;
++			dctx->sset = true;
++		}
++		if (len < POLY1305_BLOCK_SIZE)
++			return;
++	}
++
++	len &= ~(POLY1305_BLOCK_SIZE - 1);
++
++	poly1305_blocks_mips(&dctx->h, src, len, hibit);
++}
++
++static int mips_poly1305_update(struct shash_desc *desc, const u8 *src,
++				unsigned int len)
++{
++	struct poly1305_desc_ctx *dctx = shash_desc_ctx(desc);
++
++	if (unlikely(dctx->buflen)) {
++		u32 bytes = min(len, POLY1305_BLOCK_SIZE - dctx->buflen);
++
++		memcpy(dctx->buf + dctx->buflen, src, bytes);
++		src += bytes;
++		len -= bytes;
++		dctx->buflen += bytes;
++
++		if (dctx->buflen == POLY1305_BLOCK_SIZE) {
++			mips_poly1305_blocks(dctx, dctx->buf, POLY1305_BLOCK_SIZE, 1);
++			dctx->buflen = 0;
++		}
++	}
++
++	if (likely(len >= POLY1305_BLOCK_SIZE)) {
++		mips_poly1305_blocks(dctx, src, len, 1);
++		src += round_down(len, POLY1305_BLOCK_SIZE);
++		len %= POLY1305_BLOCK_SIZE;
++	}
++
++	if (unlikely(len)) {
++		dctx->buflen = len;
++		memcpy(dctx->buf, src, len);
++	}
++	return 0;
++}
++
++void poly1305_update(struct poly1305_desc_ctx *dctx, const u8 *src,
++		     unsigned int nbytes)
++{
++	if (unlikely(dctx->buflen)) {
++		u32 bytes = min(nbytes, POLY1305_BLOCK_SIZE - dctx->buflen);
++
++		memcpy(dctx->buf + dctx->buflen, src, bytes);
++		src += bytes;
++		nbytes -= bytes;
++		dctx->buflen += bytes;
++
++		if (dctx->buflen == POLY1305_BLOCK_SIZE) {
++			poly1305_blocks_mips(&dctx->h, dctx->buf,
++					     POLY1305_BLOCK_SIZE, 1);
++			dctx->buflen = 0;
++		}
++	}
++
++	if (likely(nbytes >= POLY1305_BLOCK_SIZE)) {
++		unsigned int len = round_down(nbytes, POLY1305_BLOCK_SIZE);
++
++		poly1305_blocks_mips(&dctx->h, src, len, 1);
++		src += len;
++		nbytes %= POLY1305_BLOCK_SIZE;
++	}
++
++	if (unlikely(nbytes)) {
++		dctx->buflen = nbytes;
++		memcpy(dctx->buf, src, nbytes);
++	}
++}
++EXPORT_SYMBOL(poly1305_update);
++
++void poly1305_final(struct poly1305_desc_ctx *dctx, u8 *dst)
++{
++	__le32 digest[4];
++	u64 f = 0;
++
++	if (unlikely(dctx->buflen)) {
++		dctx->buf[dctx->buflen++] = 1;
++		memset(dctx->buf + dctx->buflen, 0,
++		       POLY1305_BLOCK_SIZE - dctx->buflen);
++		poly1305_blocks_mips(&dctx->h, dctx->buf, POLY1305_BLOCK_SIZE, 0);
++	}
++
++	poly1305_emit_mips(&dctx->h, digest, dctx->s);
++
++	/* mac = (h + s) % (2^128) */
++	f = (f >> 32) + le32_to_cpu(digest[0]);
++	put_unaligned_le32(f, dst);
++	f = (f >> 32) + le32_to_cpu(digest[1]);
++	put_unaligned_le32(f, dst + 4);
++	f = (f >> 32) + le32_to_cpu(digest[2]);
++	put_unaligned_le32(f, dst + 8);
++	f = (f >> 32) + le32_to_cpu(digest[3]);
++	put_unaligned_le32(f, dst + 12);
++
++	*dctx = (struct poly1305_desc_ctx){};
++}
++EXPORT_SYMBOL(poly1305_final);
++
++static int mips_poly1305_final(struct shash_desc *desc, u8 *dst)
++{
++	struct poly1305_desc_ctx *dctx = shash_desc_ctx(desc);
++
++	if (unlikely(!dctx->sset))
++		return -ENOKEY;
++
++	poly1305_final(dctx, dst);
++	return 0;
++}
++
++static struct shash_alg mips_poly1305_alg = {
++	.init			= mips_poly1305_init,
++	.update			= mips_poly1305_update,
++	.final			= mips_poly1305_final,
++	.digestsize		= POLY1305_DIGEST_SIZE,
++	.descsize		= sizeof(struct poly1305_desc_ctx),
++
++	.base.cra_name		= "poly1305",
++	.base.cra_driver_name	= "poly1305-mips",
++	.base.cra_priority	= 200,
++	.base.cra_blocksize	= POLY1305_BLOCK_SIZE,
++	.base.cra_module	= THIS_MODULE,
++};
++
++static int __init mips_poly1305_mod_init(void)
++{
++	return crypto_register_shash(&mips_poly1305_alg);
++}
++
++static void __exit mips_poly1305_mod_exit(void)
++{
++	crypto_unregister_shash(&mips_poly1305_alg);
++}
++
++module_init(mips_poly1305_mod_init);
++module_exit(mips_poly1305_mod_exit);
++
++MODULE_LICENSE("GPL v2");
++MODULE_ALIAS_CRYPTO("poly1305");
++MODULE_ALIAS_CRYPTO("poly1305-mips");
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 4a8aafeca8ad..9cc3716de11d 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -718,6 +718,12 @@ config CRYPTO_POLY1305_X86_64
+ 	  in IETF protocols. This is the x86_64 assembler implementation using SIMD
+ 	  instructions.
  
- 			scnprintf(str, size, "0x%08x%08x%08x%08x",
-diff --git a/lib/ubsan.h b/lib/ubsan.h
-index b8fa83864467..7b56c09473a9 100644
---- a/lib/ubsan.h
-+++ b/lib/ubsan.h
-@@ -78,7 +78,7 @@ struct invalid_value_data {
- 	struct type_descriptor *type;
- };
- 
--#if defined(CONFIG_ARCH_SUPPORTS_INT128) && defined(__SIZEOF_INT128__)
-+#if defined(CONFIG_ARCH_SUPPORTS_INT128)
- typedef __int128 s_max;
- typedef unsigned __int128 u_max;
- #else
++config CRYPTO_POLY1305_MIPS
++	tristate "Poly1305 authenticator algorithm (MIPS 32r2 optimized)"
++	depends on CPU_MIPS32_R2
++	select CRYPTO_POLY1305
++	select CRYPTO_ARCH_HAVE_LIB_POLY1305
++
+ config CRYPTO_MD4
+ 	tristate "MD4 digest algorithm"
+ 	select CRYPTO_HASH
 -- 
 2.20.1
 
