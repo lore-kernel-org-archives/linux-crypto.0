@@ -2,60 +2,60 @@ Return-Path: <SRS0=UbUg=X3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75B3DECE58C
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Oct 2019 14:18:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7750C352AA
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Oct 2019 14:18:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3848421D7B
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Oct 2019 14:18:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 72DC6222BE
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Oct 2019 14:18:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ERGBHDwN"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ztqrXJTB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728130AbfJBOSA (ORCPT
+        id S1726444AbfJBOSE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Oct 2019 10:18:00 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:38528 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726214AbfJBOR7 (ORCPT
+        Wed, 2 Oct 2019 10:18:04 -0400
+Received: from mail-wm1-f52.google.com ([209.85.128.52]:50348 "EHLO
+        mail-wm1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727771AbfJBOSE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Oct 2019 10:17:59 -0400
-Received: by mail-wr1-f65.google.com with SMTP id w12so19884751wro.5
-        for <linux-crypto@vger.kernel.org>; Wed, 02 Oct 2019 07:17:56 -0700 (PDT)
+        Wed, 2 Oct 2019 10:18:04 -0400
+Received: by mail-wm1-f52.google.com with SMTP id 5so7435383wmg.0
+        for <linux-crypto@vger.kernel.org>; Wed, 02 Oct 2019 07:18:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Th4AOk+yOVbWHxmbQ0+LoirsQcTHiG+xSQnyDNaRzdU=;
-        b=ERGBHDwNFYQ2/+SXwex99/iOhUtnmJMzmhaBDdyS320tWkXaYRx/JiYm4mHziSIze8
-         xDcLQnLsHS54ZQGvKPNijD69nI6J5huwen++1e4M39wReDUTBwK3gDO38PtGr1O0HOGA
-         LrtuS/UKGf7DMzn7g7jFjZnUzznpGlL5Gdewa43qcr3BJaV+VEx1fPfBBTyebKlQrmKl
-         yXnbEJOH4ee9vQfEsLty8Q69CJENdkGwtPGEzRkAEinN6QO8X6VNBIeH9T/8yOodl6yY
-         IEE15Hns6z240w2HSWFKEn+u0tRrBJeFaxATzRSWwNpDWWeKr7/STxFyw7gXUmAZeKyJ
-         C0jA==
+        bh=zcPKWTJtXhozXv5AW/1+IJHyQ2ZZVHZpVK22pjE8aW4=;
+        b=ztqrXJTBM4q7Un1FqO8/uNvkNpwsx/WwqMSNHIuhRfcl7nq1zZh7cQKgGUwM8HCS4d
+         APf/8pECxQuGdFmAtr8ZTIZ8P/9yGELLNCgUsvOSGZGSPpmlhYObZytQvNqzL1LU1ODg
+         stK0pFHFX2j9vk+fpsyfs3TI18tWOQR8g/LEvXvRVi7iM2telbwxj+yRI2qKI8sbAjkp
+         of6kaG2hzoMAfpILVNmc+07YlRLg8YITJOUhEThEYWMWEFz/z1OVt/R9DvoIYHCsRaHN
+         bdFRfqfejnvp+8aaOBmom5HUVcq0R4KlqR+uDML82EhrJPylU+z7AM10s61qB3PPFkXt
+         E5gQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Th4AOk+yOVbWHxmbQ0+LoirsQcTHiG+xSQnyDNaRzdU=;
-        b=dtkQqjdp9AZC5s4gZ1UpKxwdqTcC17+6ceG+h9WJgm8y7NnvU9wVPXvpz2y3JjHhfQ
-         McPnQ0N+t2EURlNDbH6IHjGwwet5ojMZVenvmSFvZbXPslkmkzsuA7VoabbaGZzJMnGc
-         NvFULQNPmhrJ35S4m/UB23XX8UcYrl9vktiiq29xDhzAbXNwvo/UOd/BF21pG/caNUnm
-         euDZuXMJ2A6Qa9CEYctFsZZva3gLyudzLmwLGi3m/y04sEuUAaMtrV9CRz7pue6DtY1R
-         qhBKtSnqJBFx73bQtJzP4PYAcdmE3A9E+K31vEWPbPA+AOGBoHzYucigcWJxMmuPI/cJ
-         dVZw==
-X-Gm-Message-State: APjAAAUWP+g9ngR9s4+lPFgplt1CTUFQwaXMP2epjVnZdunfhK2iA8ZV
-        3pfxntvPiwnJ0k5JWv/K/hPDjwNbzZnoZHry
-X-Google-Smtp-Source: APXvYqwymBNqFICvAwnAB3mT341ppVVGb54mGmmexqRAOfCiUm8635jf5ingX4wklnRlSlW+86ZEAw==
-X-Received: by 2002:a5d:5352:: with SMTP id t18mr3070529wrv.72.1570025875144;
-        Wed, 02 Oct 2019 07:17:55 -0700 (PDT)
+        bh=zcPKWTJtXhozXv5AW/1+IJHyQ2ZZVHZpVK22pjE8aW4=;
+        b=Xd2apwUvxIrmArv7jy+TX6Twd8Wf1a051Fdh7+4KSMePOTRYxNj7Lq/J6+Erlg5m/8
+         kzA65Wht3wRmF88sAxSsRddTM1Q9s4skpFdQxIJ3+G/d7cNIQjF0jls2PWqqHi7lIFBP
+         mM0+4Ux2AazmRx7/mZrEo/I5AFhCfHLnICtHHUMT/UTuuysVI4QPSm/Gm5gvBC8DdbIq
+         NYofB+KQfjv4vX/UHwDaTL5hrtwVmFDugAz8GKJMV96sstarXJlAIlZtsI9RU5yS48GR
+         J9qM8jKQcBLD/urjaaPknGo7Bn40sJDZle5EvdlFVbvZemYSo/Fd85/xEg7NjRL/rNQj
+         Cr4A==
+X-Gm-Message-State: APjAAAUoPN9R2eBNZVKfsVTE9uWZBAH0+4B7ejmuGDvwvuMhXBm0EH1K
+        otyWJELK4/NrEWhTObegrUhjCuMmwyw51CZb
+X-Google-Smtp-Source: APXvYqwBXWtVdfw4NrF0Tok/mgm14VLpjPaqlpSo77509uNHbL2OAZZNoC9JVRpp4DEi3htrODi6Mw==
+X-Received: by 2002:a05:600c:20a:: with SMTP id 10mr3339278wmi.75.1570025880579;
+        Wed, 02 Oct 2019 07:18:00 -0700 (PDT)
 Received: from sudo.home ([2a01:cb1d:112:6f00:f145:3252:fc29:76c9])
-        by smtp.gmail.com with ESMTPSA id t13sm41078149wra.70.2019.10.02.07.17.53
+        by smtp.gmail.com with ESMTPSA id t13sm41078149wra.70.2019.10.02.07.17.59
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 02 Oct 2019 07:17:54 -0700 (PDT)
+        Wed, 02 Oct 2019 07:17:59 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
@@ -73,691 +73,848 @@ Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Catalin Marinas <catalin.marinas@arm.com>,
         Martin Willi <martin@strongswan.org>,
         Peter Zijlstra <peterz@infradead.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        =?UTF-8?q?Ren=C3=A9=20van=20Dorst?= <opensource@vdorst.com>
-Subject: [PATCH v2 10/20] crypto: mips/poly1305 - import accelerated 32r2 code from Zinc
-Date:   Wed,  2 Oct 2019 16:17:03 +0200
-Message-Id: <20191002141713.31189-11-ard.biesheuvel@linaro.org>
+        Josh Poimboeuf <jpoimboe@redhat.com>
+Subject: [PATCH v2 13/20] crypto: BLAKE2s - x86_64 library implementation
+Date:   Wed,  2 Oct 2019 16:17:06 +0200
+Message-Id: <20191002141713.31189-14-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191002141713.31189-1-ard.biesheuvel@linaro.org>
 References: <20191002141713.31189-1-ard.biesheuvel@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This integrates the accelerated MIPS 32r2 implementation of ChaCha
-into both the API and library interfaces of the kernel crypto stack.
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
 
-The significance of this is that, in addition to becoming available
-as an accelerated library implementation, it can also be used by
-existing crypto API code such as IPsec, using chacha20poly1305.
+These implementations from Samuel Neves support AVX and AVX-512VL.
+Originally this used AVX-512F, but Skylake thermal throttling made
+AVX-512VL more attractive and possible to do with negligable difference.
 
-Co-developed-by: René van Dorst <opensource@vdorst.com>
-Signed-off-by: René van Dorst <opensource@vdorst.com>
-Co-developed-by: Jason A. Donenfeld <Jason@zx2c4.com>
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Signed-off-by: Samuel Neves <sneves@dei.uc.pt>
+Co-developed-by: Samuel Neves <sneves@dei.uc.pt>
+[ardb: move to arch/x86/crypto, wire into lib/crypto framework]
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/mips/crypto/Makefile        |   3 +
- arch/mips/crypto/poly1305-core.S | 407 ++++++++++++++++++++
- arch/mips/crypto/poly1305-glue.c | 203 ++++++++++
- crypto/Kconfig                   |   6 +
- 4 files changed, 619 insertions(+)
+ arch/x86/crypto/Makefile       |   2 +
+ arch/x86/crypto/blake2s-core.S | 685 ++++++++++++++++++++
+ arch/x86/crypto/blake2s-glue.c |  76 +++
+ crypto/Kconfig                 |   6 +
+ 4 files changed, 769 insertions(+)
 
-diff --git a/arch/mips/crypto/Makefile b/arch/mips/crypto/Makefile
-index 7f7ea0020cc2..849173749626 100644
---- a/arch/mips/crypto/Makefile
-+++ b/arch/mips/crypto/Makefile
-@@ -7,3 +7,6 @@ obj-$(CONFIG_CRYPTO_CRC32_MIPS) += crc32-mips.o
+diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+index 759b1a927826..db87c182ce0f 100644
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -48,6 +48,7 @@ ifeq ($(avx_supported),yes)
+ 	obj-$(CONFIG_CRYPTO_CAST6_AVX_X86_64) += cast6-avx-x86_64.o
+ 	obj-$(CONFIG_CRYPTO_TWOFISH_AVX_X86_64) += twofish-avx-x86_64.o
+ 	obj-$(CONFIG_CRYPTO_SERPENT_AVX_X86_64) += serpent-avx-x86_64.o
++	obj-$(CONFIG_CRYPTO_LIB_BLAKE2S_X86) += blake2s-x86_64.o
+ endif
  
- obj-$(CONFIG_CRYPTO_CHACHA_MIPS) += chacha-mips.o
- chacha-mips-y := chacha-core.o chacha-glue.o
-+
-+obj-$(CONFIG_CRYPTO_POLY1305_MIPS) += poly1305-mips.o
-+poly1305-mips-y := poly1305-core.o poly1305-glue.o
-diff --git a/arch/mips/crypto/poly1305-core.S b/arch/mips/crypto/poly1305-core.S
+ # These modules require assembler to support AVX2.
+@@ -70,6 +71,7 @@ serpent-sse2-x86_64-y := serpent-sse2-x86_64-asm_64.o serpent_sse2_glue.o
+ aegis128-aesni-y := aegis128-aesni-asm.o aegis128-aesni-glue.o
+ 
+ nhpoly1305-sse2-y := nh-sse2-x86_64.o nhpoly1305-sse2-glue.o
++blake2s-x86_64-y := blake2s-core.o blake2s-glue.o
+ 
+ ifeq ($(avx_supported),yes)
+ 	camellia-aesni-avx-x86_64-y := camellia-aesni-avx-asm_64.o \
+diff --git a/arch/x86/crypto/blake2s-core.S b/arch/x86/crypto/blake2s-core.S
 new file mode 100644
-index 000000000000..4291c156815b
+index 000000000000..675288fa4cca
 --- /dev/null
-+++ b/arch/mips/crypto/poly1305-core.S
-@@ -0,0 +1,407 @@
++++ b/arch/x86/crypto/blake2s-core.S
+@@ -0,0 +1,685 @@
 +/* SPDX-License-Identifier: GPL-2.0 OR MIT */
 +/*
-+ * Copyright (C) 2016-2018 René van Dorst <opensource@vdorst.com> All Rights Reserved.
++ * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++ * Copyright (C) 2017 Samuel Neves <sneves@dei.uc.pt>. All Rights Reserved.
++ */
++
++#include <linux/linkage.h>
++
++.section .rodata.cst32.BLAKE2S_IV, "aM", @progbits, 32
++.align 32
++IV:	.octa 0xA54FF53A3C6EF372BB67AE856A09E667
++	.octa 0x5BE0CD191F83D9AB9B05688C510E527F
++.section .rodata.cst16.ROT16, "aM", @progbits, 16
++.align 16
++ROT16:	.octa 0x0D0C0F0E09080B0A0504070601000302
++.section .rodata.cst16.ROR328, "aM", @progbits, 16
++.align 16
++ROR328:	.octa 0x0C0F0E0D080B0A090407060500030201
++#ifdef CONFIG_AS_AVX512
++.section .rodata.cst64.BLAKE2S_SIGMA, "aM", @progbits, 640
++.align 64
++SIGMA:
++.long 0, 2, 4, 6, 1, 3, 5, 7, 8, 10, 12, 14, 9, 11, 13, 15
++.long 11, 2, 12, 14, 9, 8, 15, 3, 4, 0, 13, 6, 10, 1, 7, 5
++.long 10, 12, 11, 6, 5, 9, 13, 3, 4, 15, 14, 2, 0, 7, 8, 1
++.long 10, 9, 7, 0, 11, 14, 1, 12, 6, 2, 15, 3, 13, 8, 5, 4
++.long 4, 9, 8, 13, 14, 0, 10, 11, 7, 3, 12, 1, 5, 6, 15, 2
++.long 2, 10, 4, 14, 13, 3, 9, 11, 6, 5, 7, 12, 15, 1, 8, 0
++.long 4, 11, 14, 8, 13, 10, 12, 5, 2, 1, 15, 3, 9, 7, 0, 6
++.long 6, 12, 0, 13, 15, 2, 1, 10, 4, 5, 11, 14, 8, 3, 9, 7
++.long 14, 5, 4, 12, 9, 7, 3, 10, 2, 0, 6, 15, 11, 1, 13, 8
++.long 11, 7, 13, 10, 12, 14, 0, 15, 4, 5, 6, 9, 2, 1, 8, 3
++#endif /* CONFIG_AS_AVX512 */
++
++.text
++#ifdef CONFIG_AS_AVX
++ENTRY(blake2s_compress_avx)
++	movl		%ecx, %ecx
++	testq		%rdx, %rdx
++	je		.Lendofloop
++	.align 32
++.Lbeginofloop:
++	addq		%rcx, 32(%rdi)
++	vmovdqu		IV+16(%rip), %xmm1
++	vmovdqu		(%rsi), %xmm4
++	vpxor		32(%rdi), %xmm1, %xmm1
++	vmovdqu		16(%rsi), %xmm3
++	vshufps		$136, %xmm3, %xmm4, %xmm6
++	vmovdqa		ROT16(%rip), %xmm7
++	vpaddd		(%rdi), %xmm6, %xmm6
++	vpaddd		16(%rdi), %xmm6, %xmm6
++	vpxor		%xmm6, %xmm1, %xmm1
++	vmovdqu		IV(%rip), %xmm8
++	vpshufb		%xmm7, %xmm1, %xmm1
++	vmovdqu		48(%rsi), %xmm5
++	vpaddd		%xmm1, %xmm8, %xmm8
++	vpxor		16(%rdi), %xmm8, %xmm9
++	vmovdqu		32(%rsi), %xmm2
++	vpblendw	$12, %xmm3, %xmm5, %xmm13
++	vshufps		$221, %xmm5, %xmm2, %xmm12
++	vpunpckhqdq	%xmm2, %xmm4, %xmm14
++	vpslld		$20, %xmm9, %xmm0
++	vpsrld		$12, %xmm9, %xmm9
++	vpxor		%xmm0, %xmm9, %xmm0
++	vshufps		$221, %xmm3, %xmm4, %xmm9
++	vpaddd		%xmm9, %xmm6, %xmm9
++	vpaddd		%xmm0, %xmm9, %xmm9
++	vpxor		%xmm9, %xmm1, %xmm1
++	vmovdqa		ROR328(%rip), %xmm6
++	vpshufb		%xmm6, %xmm1, %xmm1
++	vpaddd		%xmm1, %xmm8, %xmm8
++	vpxor		%xmm8, %xmm0, %xmm0
++	vpshufd		$147, %xmm1, %xmm1
++	vpshufd		$78, %xmm8, %xmm8
++	vpslld		$25, %xmm0, %xmm10
++	vpsrld		$7, %xmm0, %xmm0
++	vpxor		%xmm10, %xmm0, %xmm0
++	vshufps		$136, %xmm5, %xmm2, %xmm10
++	vpshufd		$57, %xmm0, %xmm0
++	vpaddd		%xmm10, %xmm9, %xmm9
++	vpaddd		%xmm0, %xmm9, %xmm9
++	vpxor		%xmm9, %xmm1, %xmm1
++	vpaddd		%xmm12, %xmm9, %xmm9
++	vpblendw	$12, %xmm2, %xmm3, %xmm12
++	vpshufb		%xmm7, %xmm1, %xmm1
++	vpaddd		%xmm1, %xmm8, %xmm8
++	vpxor		%xmm8, %xmm0, %xmm10
++	vpslld		$20, %xmm10, %xmm0
++	vpsrld		$12, %xmm10, %xmm10
++	vpxor		%xmm0, %xmm10, %xmm0
++	vpaddd		%xmm0, %xmm9, %xmm9
++	vpxor		%xmm9, %xmm1, %xmm1
++	vpshufb		%xmm6, %xmm1, %xmm1
++	vpaddd		%xmm1, %xmm8, %xmm8
++	vpxor		%xmm8, %xmm0, %xmm0
++	vpshufd		$57, %xmm1, %xmm1
++	vpshufd		$78, %xmm8, %xmm8
++	vpslld		$25, %xmm0, %xmm10
++	vpsrld		$7, %xmm0, %xmm0
++	vpxor		%xmm10, %xmm0, %xmm0
++	vpslldq		$4, %xmm5, %xmm10
++	vpblendw	$240, %xmm10, %xmm12, %xmm12
++	vpshufd		$147, %xmm0, %xmm0
++	vpshufd		$147, %xmm12, %xmm12
++	vpaddd		%xmm9, %xmm12, %xmm12
++	vpaddd		%xmm0, %xmm12, %xmm12
++	vpxor		%xmm12, %xmm1, %xmm1
++	vpshufb		%xmm7, %xmm1, %xmm1
++	vpaddd		%xmm1, %xmm8, %xmm8
++	vpxor		%xmm8, %xmm0, %xmm11
++	vpslld		$20, %xmm11, %xmm9
++	vpsrld		$12, %xmm11, %xmm11
++	vpxor		%xmm9, %xmm11, %xmm0
++	vpshufd		$8, %xmm2, %xmm9
++	vpblendw	$192, %xmm5, %xmm3, %xmm11
++	vpblendw	$240, %xmm11, %xmm9, %xmm9
++	vpshufd		$177, %xmm9, %xmm9
++	vpaddd		%xmm12, %xmm9, %xmm9
++	vpaddd		%xmm0, %xmm9, %xmm11
++	vpxor		%xmm11, %xmm1, %xmm1
++	vpshufb		%xmm6, %xmm1, %xmm1
++	vpaddd		%xmm1, %xmm8, %xmm8
++	vpxor		%xmm8, %xmm0, %xmm9
++	vpshufd		$147, %xmm1, %xmm1
++	vpshufd		$78, %xmm8, %xmm8
++	vpslld		$25, %xmm9, %xmm0
++	vpsrld		$7, %xmm9, %xmm9
++	vpxor		%xmm0, %xmm9, %xmm0
++	vpslldq		$4, %xmm3, %xmm9
++	vpblendw	$48, %xmm9, %xmm2, %xmm9
++	vpblendw	$240, %xmm9, %xmm4, %xmm9
++	vpshufd		$57, %xmm0, %xmm0
++	vpshufd		$177, %xmm9, %xmm9
++	vpaddd		%xmm11, %xmm9, %xmm9
++	vpaddd		%xmm0, %xmm9, %xmm9
++	vpxor		%xmm9, %xmm1, %xmm1
++	vpshufb		%xmm7, %xmm1, %xmm1
++	vpaddd		%xmm1, %xmm8, %xmm11
++	vpxor		%xmm11, %xmm0, %xmm0
++	vpslld		$20, %xmm0, %xmm8
++	vpsrld		$12, %xmm0, %xmm0
++	vpxor		%xmm8, %xmm0, %xmm0
++	vpunpckhdq	%xmm3, %xmm4, %xmm8
++	vpblendw	$12, %xmm10, %xmm8, %xmm12
++	vpshufd		$177, %xmm12, %xmm12
++	vpaddd		%xmm9, %xmm12, %xmm9
++	vpaddd		%xmm0, %xmm9, %xmm9
++	vpxor		%xmm9, %xmm1, %xmm1
++	vpshufb		%xmm6, %xmm1, %xmm1
++	vpaddd		%xmm1, %xmm11, %xmm11
++	vpxor		%xmm11, %xmm0, %xmm0
++	vpshufd		$57, %xmm1, %xmm1
++	vpshufd		$78, %xmm11, %xmm11
++	vpslld		$25, %xmm0, %xmm12
++	vpsrld		$7, %xmm0, %xmm0
++	vpxor		%xmm12, %xmm0, %xmm0
++	vpunpckhdq	%xmm5, %xmm2, %xmm12
++	vpshufd		$147, %xmm0, %xmm0
++	vpblendw	$15, %xmm13, %xmm12, %xmm12
++	vpslldq		$8, %xmm5, %xmm13
++	vpshufd		$210, %xmm12, %xmm12
++	vpaddd		%xmm9, %xmm12, %xmm9
++	vpaddd		%xmm0, %xmm9, %xmm9
++	vpxor		%xmm9, %xmm1, %xmm1
++	vpshufb		%xmm7, %xmm1, %xmm1
++	vpaddd		%xmm1, %xmm11, %xmm11
++	vpxor		%xmm11, %xmm0, %xmm0
++	vpslld		$20, %xmm0, %xmm12
++	vpsrld		$12, %xmm0, %xmm0
++	vpxor		%xmm12, %xmm0, %xmm0
++	vpunpckldq	%xmm4, %xmm2, %xmm12
++	vpblendw	$240, %xmm4, %xmm12, %xmm12
++	vpblendw	$192, %xmm13, %xmm12, %xmm12
++	vpsrldq		$12, %xmm3, %xmm13
++	vpaddd		%xmm12, %xmm9, %xmm9
++	vpaddd		%xmm0, %xmm9, %xmm9
++	vpxor		%xmm9, %xmm1, %xmm1
++	vpshufb		%xmm6, %xmm1, %xmm1
++	vpaddd		%xmm1, %xmm11, %xmm11
++	vpxor		%xmm11, %xmm0, %xmm0
++	vpshufd		$147, %xmm1, %xmm1
++	vpshufd		$78, %xmm11, %xmm11
++	vpslld		$25, %xmm0, %xmm12
++	vpsrld		$7, %xmm0, %xmm0
++	vpxor		%xmm12, %xmm0, %xmm0
++	vpblendw	$60, %xmm2, %xmm4, %xmm12
++	vpblendw	$3, %xmm13, %xmm12, %xmm12
++	vpshufd		$57, %xmm0, %xmm0
++	vpshufd		$78, %xmm12, %xmm12
++	vpaddd		%xmm9, %xmm12, %xmm9
++	vpaddd		%xmm0, %xmm9, %xmm9
++	vpxor		%xmm9, %xmm1, %xmm1
++	vpshufb		%xmm7, %xmm1, %xmm1
++	vpaddd		%xmm1, %xmm11, %xmm11
++	vpxor		%xmm11, %xmm0, %xmm12
++	vpslld		$20, %xmm12, %xmm13
++	vpsrld		$12, %xmm12, %xmm0
++	vpblendw	$51, %xmm3, %xmm4, %xmm12
++	vpxor		%xmm13, %xmm0, %xmm0
++	vpblendw	$192, %xmm10, %xmm12, %xmm10
++	vpslldq		$8, %xmm2, %xmm12
++	vpshufd		$27, %xmm10, %xmm10
++	vpaddd		%xmm9, %xmm10, %xmm9
++	vpaddd		%xmm0, %xmm9, %xmm9
++	vpxor		%xmm9, %xmm1, %xmm1
++	vpshufb		%xmm6, %xmm1, %xmm1
++	vpaddd		%xmm1, %xmm11, %xmm11
++	vpxor		%xmm11, %xmm0, %xmm0
++	vpshufd		$57, %xmm1, %xmm1
++	vpshufd		$78, %xmm11, %xmm11
++	vpslld		$25, %xmm0, %xmm10
++	vpsrld		$7, %xmm0, %xmm0
++	vpxor		%xmm10, %xmm0, %xmm0
++	vpunpckhdq	%xmm2, %xmm8, %xmm10
++	vpshufd		$147, %xmm0, %xmm0
++	vpblendw	$12, %xmm5, %xmm10, %xmm10
++	vpshufd		$210, %xmm10, %xmm10
++	vpaddd		%xmm9, %xmm10, %xmm9
++	vpaddd		%xmm0, %xmm9, %xmm9
++	vpxor		%xmm9, %xmm1, %xmm1
++	vpshufb		%xmm7, %xmm1, %xmm1
++	vpaddd		%xmm1, %xmm11, %xmm11
++	vpxor		%xmm11, %xmm0, %xmm10
++	vpslld		$20, %xmm10, %xmm0
++	vpsrld		$12, %xmm10, %xmm10
++	vpxor		%xmm0, %xmm10, %xmm0
++	vpblendw	$12, %xmm4, %xmm5, %xmm10
++	vpblendw	$192, %xmm12, %xmm10, %xmm10
++	vpunpckldq	%xmm2, %xmm4, %xmm12
++	vpshufd		$135, %xmm10, %xmm10
++	vpaddd		%xmm9, %xmm10, %xmm9
++	vpaddd		%xmm0, %xmm9, %xmm9
++	vpxor		%xmm9, %xmm1, %xmm1
++	vpshufb		%xmm6, %xmm1, %xmm1
++	vpaddd		%xmm1, %xmm11, %xmm13
++	vpxor		%xmm13, %xmm0, %xmm0
++	vpshufd		$147, %xmm1, %xmm1
++	vpshufd		$78, %xmm13, %xmm13
++	vpslld		$25, %xmm0, %xmm10
++	vpsrld		$7, %xmm0, %xmm0
++	vpxor		%xmm10, %xmm0, %xmm0
++	vpblendw	$15, %xmm3, %xmm4, %xmm10
++	vpblendw	$192, %xmm5, %xmm10, %xmm10
++	vpshufd		$57, %xmm0, %xmm0
++	vpshufd		$198, %xmm10, %xmm10
++	vpaddd		%xmm9, %xmm10, %xmm10
++	vpaddd		%xmm0, %xmm10, %xmm10
++	vpxor		%xmm10, %xmm1, %xmm1
++	vpshufb		%xmm7, %xmm1, %xmm1
++	vpaddd		%xmm1, %xmm13, %xmm13
++	vpxor		%xmm13, %xmm0, %xmm9
++	vpslld		$20, %xmm9, %xmm0
++	vpsrld		$12, %xmm9, %xmm9
++	vpxor		%xmm0, %xmm9, %xmm0
++	vpunpckhdq	%xmm2, %xmm3, %xmm9
++	vpunpcklqdq	%xmm12, %xmm9, %xmm15
++	vpunpcklqdq	%xmm12, %xmm8, %xmm12
++	vpblendw	$15, %xmm5, %xmm8, %xmm8
++	vpaddd		%xmm15, %xmm10, %xmm15
++	vpaddd		%xmm0, %xmm15, %xmm15
++	vpxor		%xmm15, %xmm1, %xmm1
++	vpshufd		$141, %xmm8, %xmm8
++	vpshufb		%xmm6, %xmm1, %xmm1
++	vpaddd		%xmm1, %xmm13, %xmm13
++	vpxor		%xmm13, %xmm0, %xmm0
++	vpshufd		$57, %xmm1, %xmm1
++	vpshufd		$78, %xmm13, %xmm13
++	vpslld		$25, %xmm0, %xmm10
++	vpsrld		$7, %xmm0, %xmm0
++	vpxor		%xmm10, %xmm0, %xmm0
++	vpunpcklqdq	%xmm2, %xmm3, %xmm10
++	vpshufd		$147, %xmm0, %xmm0
++	vpblendw	$51, %xmm14, %xmm10, %xmm14
++	vpshufd		$135, %xmm14, %xmm14
++	vpaddd		%xmm15, %xmm14, %xmm14
++	vpaddd		%xmm0, %xmm14, %xmm14
++	vpxor		%xmm14, %xmm1, %xmm1
++	vpunpcklqdq	%xmm3, %xmm4, %xmm15
++	vpshufb		%xmm7, %xmm1, %xmm1
++	vpaddd		%xmm1, %xmm13, %xmm13
++	vpxor		%xmm13, %xmm0, %xmm0
++	vpslld		$20, %xmm0, %xmm11
++	vpsrld		$12, %xmm0, %xmm0
++	vpxor		%xmm11, %xmm0, %xmm0
++	vpunpckhqdq	%xmm5, %xmm3, %xmm11
++	vpblendw	$51, %xmm15, %xmm11, %xmm11
++	vpunpckhqdq	%xmm3, %xmm5, %xmm15
++	vpaddd		%xmm11, %xmm14, %xmm11
++	vpaddd		%xmm0, %xmm11, %xmm11
++	vpxor		%xmm11, %xmm1, %xmm1
++	vpshufb		%xmm6, %xmm1, %xmm1
++	vpaddd		%xmm1, %xmm13, %xmm13
++	vpxor		%xmm13, %xmm0, %xmm0
++	vpshufd		$147, %xmm1, %xmm1
++	vpshufd		$78, %xmm13, %xmm13
++	vpslld		$25, %xmm0, %xmm14
++	vpsrld		$7, %xmm0, %xmm0
++	vpxor		%xmm14, %xmm0, %xmm14
++	vpunpckhqdq	%xmm4, %xmm2, %xmm0
++	vpshufd		$57, %xmm14, %xmm14
++	vpblendw	$51, %xmm15, %xmm0, %xmm15
++	vpaddd		%xmm15, %xmm11, %xmm15
++	vpaddd		%xmm14, %xmm15, %xmm15
++	vpxor		%xmm15, %xmm1, %xmm1
++	vpshufb		%xmm7, %xmm1, %xmm1
++	vpaddd		%xmm1, %xmm13, %xmm13
++	vpxor		%xmm13, %xmm14, %xmm14
++	vpslld		$20, %xmm14, %xmm11
++	vpsrld		$12, %xmm14, %xmm14
++	vpxor		%xmm11, %xmm14, %xmm14
++	vpblendw	$3, %xmm2, %xmm4, %xmm11
++	vpslldq		$8, %xmm11, %xmm0
++	vpblendw	$15, %xmm5, %xmm0, %xmm0
++	vpshufd		$99, %xmm0, %xmm0
++	vpaddd		%xmm15, %xmm0, %xmm15
++	vpaddd		%xmm14, %xmm15, %xmm15
++	vpxor		%xmm15, %xmm1, %xmm0
++	vpaddd		%xmm12, %xmm15, %xmm15
++	vpshufb		%xmm6, %xmm0, %xmm0
++	vpaddd		%xmm0, %xmm13, %xmm13
++	vpxor		%xmm13, %xmm14, %xmm14
++	vpshufd		$57, %xmm0, %xmm0
++	vpshufd		$78, %xmm13, %xmm13
++	vpslld		$25, %xmm14, %xmm1
++	vpsrld		$7, %xmm14, %xmm14
++	vpxor		%xmm1, %xmm14, %xmm14
++	vpblendw	$3, %xmm5, %xmm4, %xmm1
++	vpshufd		$147, %xmm14, %xmm14
++	vpaddd		%xmm14, %xmm15, %xmm15
++	vpxor		%xmm15, %xmm0, %xmm0
++	vpshufb		%xmm7, %xmm0, %xmm0
++	vpaddd		%xmm0, %xmm13, %xmm13
++	vpxor		%xmm13, %xmm14, %xmm14
++	vpslld		$20, %xmm14, %xmm12
++	vpsrld		$12, %xmm14, %xmm14
++	vpxor		%xmm12, %xmm14, %xmm14
++	vpsrldq		$4, %xmm2, %xmm12
++	vpblendw	$60, %xmm12, %xmm1, %xmm1
++	vpaddd		%xmm1, %xmm15, %xmm15
++	vpaddd		%xmm14, %xmm15, %xmm15
++	vpxor		%xmm15, %xmm0, %xmm0
++	vpblendw	$12, %xmm4, %xmm3, %xmm1
++	vpshufb		%xmm6, %xmm0, %xmm0
++	vpaddd		%xmm0, %xmm13, %xmm13
++	vpxor		%xmm13, %xmm14, %xmm14
++	vpshufd		$147, %xmm0, %xmm0
++	vpshufd		$78, %xmm13, %xmm13
++	vpslld		$25, %xmm14, %xmm12
++	vpsrld		$7, %xmm14, %xmm14
++	vpxor		%xmm12, %xmm14, %xmm14
++	vpsrldq		$4, %xmm5, %xmm12
++	vpblendw	$48, %xmm12, %xmm1, %xmm1
++	vpshufd		$33, %xmm5, %xmm12
++	vpshufd		$57, %xmm14, %xmm14
++	vpshufd		$108, %xmm1, %xmm1
++	vpblendw	$51, %xmm12, %xmm10, %xmm12
++	vpaddd		%xmm15, %xmm1, %xmm15
++	vpaddd		%xmm14, %xmm15, %xmm15
++	vpxor		%xmm15, %xmm0, %xmm0
++	vpaddd		%xmm12, %xmm15, %xmm15
++	vpshufb		%xmm7, %xmm0, %xmm0
++	vpaddd		%xmm0, %xmm13, %xmm1
++	vpxor		%xmm1, %xmm14, %xmm14
++	vpslld		$20, %xmm14, %xmm13
++	vpsrld		$12, %xmm14, %xmm14
++	vpxor		%xmm13, %xmm14, %xmm14
++	vpslldq		$12, %xmm3, %xmm13
++	vpaddd		%xmm14, %xmm15, %xmm15
++	vpxor		%xmm15, %xmm0, %xmm0
++	vpshufb		%xmm6, %xmm0, %xmm0
++	vpaddd		%xmm0, %xmm1, %xmm1
++	vpxor		%xmm1, %xmm14, %xmm14
++	vpshufd		$57, %xmm0, %xmm0
++	vpshufd		$78, %xmm1, %xmm1
++	vpslld		$25, %xmm14, %xmm12
++	vpsrld		$7, %xmm14, %xmm14
++	vpxor		%xmm12, %xmm14, %xmm14
++	vpblendw	$51, %xmm5, %xmm4, %xmm12
++	vpshufd		$147, %xmm14, %xmm14
++	vpblendw	$192, %xmm13, %xmm12, %xmm12
++	vpaddd		%xmm12, %xmm15, %xmm15
++	vpaddd		%xmm14, %xmm15, %xmm15
++	vpxor		%xmm15, %xmm0, %xmm0
++	vpsrldq		$4, %xmm3, %xmm12
++	vpshufb		%xmm7, %xmm0, %xmm0
++	vpaddd		%xmm0, %xmm1, %xmm1
++	vpxor		%xmm1, %xmm14, %xmm14
++	vpslld		$20, %xmm14, %xmm13
++	vpsrld		$12, %xmm14, %xmm14
++	vpxor		%xmm13, %xmm14, %xmm14
++	vpblendw	$48, %xmm2, %xmm5, %xmm13
++	vpblendw	$3, %xmm12, %xmm13, %xmm13
++	vpshufd		$156, %xmm13, %xmm13
++	vpaddd		%xmm15, %xmm13, %xmm15
++	vpaddd		%xmm14, %xmm15, %xmm15
++	vpxor		%xmm15, %xmm0, %xmm0
++	vpshufb		%xmm6, %xmm0, %xmm0
++	vpaddd		%xmm0, %xmm1, %xmm1
++	vpxor		%xmm1, %xmm14, %xmm14
++	vpshufd		$147, %xmm0, %xmm0
++	vpshufd		$78, %xmm1, %xmm1
++	vpslld		$25, %xmm14, %xmm13
++	vpsrld		$7, %xmm14, %xmm14
++	vpxor		%xmm13, %xmm14, %xmm14
++	vpunpcklqdq	%xmm2, %xmm4, %xmm13
++	vpshufd		$57, %xmm14, %xmm14
++	vpblendw	$12, %xmm12, %xmm13, %xmm12
++	vpshufd		$180, %xmm12, %xmm12
++	vpaddd		%xmm15, %xmm12, %xmm15
++	vpaddd		%xmm14, %xmm15, %xmm15
++	vpxor		%xmm15, %xmm0, %xmm0
++	vpshufb		%xmm7, %xmm0, %xmm0
++	vpaddd		%xmm0, %xmm1, %xmm1
++	vpxor		%xmm1, %xmm14, %xmm14
++	vpslld		$20, %xmm14, %xmm12
++	vpsrld		$12, %xmm14, %xmm14
++	vpxor		%xmm12, %xmm14, %xmm14
++	vpunpckhqdq	%xmm9, %xmm4, %xmm12
++	vpshufd		$198, %xmm12, %xmm12
++	vpaddd		%xmm15, %xmm12, %xmm15
++	vpaddd		%xmm14, %xmm15, %xmm15
++	vpxor		%xmm15, %xmm0, %xmm0
++	vpaddd		%xmm15, %xmm8, %xmm15
++	vpshufb		%xmm6, %xmm0, %xmm0
++	vpaddd		%xmm0, %xmm1, %xmm1
++	vpxor		%xmm1, %xmm14, %xmm14
++	vpshufd		$57, %xmm0, %xmm0
++	vpshufd		$78, %xmm1, %xmm1
++	vpslld		$25, %xmm14, %xmm12
++	vpsrld		$7, %xmm14, %xmm14
++	vpxor		%xmm12, %xmm14, %xmm14
++	vpsrldq		$4, %xmm4, %xmm12
++	vpshufd		$147, %xmm14, %xmm14
++	vpaddd		%xmm14, %xmm15, %xmm15
++	vpxor		%xmm15, %xmm0, %xmm0
++	vpshufb		%xmm7, %xmm0, %xmm0
++	vpaddd		%xmm0, %xmm1, %xmm1
++	vpxor		%xmm1, %xmm14, %xmm14
++	vpslld		$20, %xmm14, %xmm8
++	vpsrld		$12, %xmm14, %xmm14
++	vpxor		%xmm14, %xmm8, %xmm14
++	vpblendw	$48, %xmm5, %xmm2, %xmm8
++	vpblendw	$3, %xmm12, %xmm8, %xmm8
++	vpunpckhqdq	%xmm5, %xmm4, %xmm12
++	vpshufd		$75, %xmm8, %xmm8
++	vpblendw	$60, %xmm10, %xmm12, %xmm10
++	vpaddd		%xmm15, %xmm8, %xmm15
++	vpaddd		%xmm14, %xmm15, %xmm15
++	vpxor		%xmm0, %xmm15, %xmm0
++	vpshufd		$45, %xmm10, %xmm10
++	vpshufb		%xmm6, %xmm0, %xmm0
++	vpaddd		%xmm15, %xmm10, %xmm15
++	vpaddd		%xmm0, %xmm1, %xmm1
++	vpxor		%xmm1, %xmm14, %xmm14
++	vpshufd		$147, %xmm0, %xmm0
++	vpshufd		$78, %xmm1, %xmm1
++	vpslld		$25, %xmm14, %xmm8
++	vpsrld		$7, %xmm14, %xmm14
++	vpxor		%xmm14, %xmm8, %xmm8
++	vpshufd		$57, %xmm8, %xmm8
++	vpaddd		%xmm8, %xmm15, %xmm15
++	vpxor		%xmm0, %xmm15, %xmm0
++	vpshufb		%xmm7, %xmm0, %xmm0
++	vpaddd		%xmm0, %xmm1, %xmm1
++	vpxor		%xmm8, %xmm1, %xmm8
++	vpslld		$20, %xmm8, %xmm10
++	vpsrld		$12, %xmm8, %xmm8
++	vpxor		%xmm8, %xmm10, %xmm10
++	vpunpckldq	%xmm3, %xmm4, %xmm8
++	vpunpcklqdq	%xmm9, %xmm8, %xmm9
++	vpaddd		%xmm9, %xmm15, %xmm9
++	vpaddd		%xmm10, %xmm9, %xmm9
++	vpxor		%xmm0, %xmm9, %xmm8
++	vpshufb		%xmm6, %xmm8, %xmm8
++	vpaddd		%xmm8, %xmm1, %xmm1
++	vpxor		%xmm1, %xmm10, %xmm10
++	vpshufd		$57, %xmm8, %xmm8
++	vpshufd		$78, %xmm1, %xmm1
++	vpslld		$25, %xmm10, %xmm12
++	vpsrld		$7, %xmm10, %xmm10
++	vpxor		%xmm10, %xmm12, %xmm10
++	vpblendw	$48, %xmm4, %xmm3, %xmm12
++	vpshufd		$147, %xmm10, %xmm0
++	vpunpckhdq	%xmm5, %xmm3, %xmm10
++	vpshufd		$78, %xmm12, %xmm12
++	vpunpcklqdq	%xmm4, %xmm10, %xmm10
++	vpblendw	$192, %xmm2, %xmm10, %xmm10
++	vpshufhw	$78, %xmm10, %xmm10
++	vpaddd		%xmm10, %xmm9, %xmm10
++	vpaddd		%xmm0, %xmm10, %xmm10
++	vpxor		%xmm8, %xmm10, %xmm8
++	vpshufb		%xmm7, %xmm8, %xmm8
++	vpaddd		%xmm8, %xmm1, %xmm1
++	vpxor		%xmm0, %xmm1, %xmm9
++	vpslld		$20, %xmm9, %xmm0
++	vpsrld		$12, %xmm9, %xmm9
++	vpxor		%xmm9, %xmm0, %xmm0
++	vpunpckhdq	%xmm5, %xmm4, %xmm9
++	vpblendw	$240, %xmm9, %xmm2, %xmm13
++	vpshufd		$39, %xmm13, %xmm13
++	vpaddd		%xmm10, %xmm13, %xmm10
++	vpaddd		%xmm0, %xmm10, %xmm10
++	vpxor		%xmm8, %xmm10, %xmm8
++	vpblendw	$12, %xmm4, %xmm2, %xmm13
++	vpshufb		%xmm6, %xmm8, %xmm8
++	vpslldq		$4, %xmm13, %xmm13
++	vpblendw	$15, %xmm5, %xmm13, %xmm13
++	vpaddd		%xmm8, %xmm1, %xmm1
++	vpxor		%xmm1, %xmm0, %xmm0
++	vpaddd		%xmm13, %xmm10, %xmm13
++	vpshufd		$147, %xmm8, %xmm8
++	vpshufd		$78, %xmm1, %xmm1
++	vpslld		$25, %xmm0, %xmm14
++	vpsrld		$7, %xmm0, %xmm0
++	vpxor		%xmm0, %xmm14, %xmm14
++	vpshufd		$57, %xmm14, %xmm14
++	vpaddd		%xmm14, %xmm13, %xmm13
++	vpxor		%xmm8, %xmm13, %xmm8
++	vpaddd		%xmm13, %xmm12, %xmm12
++	vpshufb		%xmm7, %xmm8, %xmm8
++	vpaddd		%xmm8, %xmm1, %xmm1
++	vpxor		%xmm14, %xmm1, %xmm14
++	vpslld		$20, %xmm14, %xmm10
++	vpsrld		$12, %xmm14, %xmm14
++	vpxor		%xmm14, %xmm10, %xmm10
++	vpaddd		%xmm10, %xmm12, %xmm12
++	vpxor		%xmm8, %xmm12, %xmm8
++	vpshufb		%xmm6, %xmm8, %xmm8
++	vpaddd		%xmm8, %xmm1, %xmm1
++	vpxor		%xmm1, %xmm10, %xmm0
++	vpshufd		$57, %xmm8, %xmm8
++	vpshufd		$78, %xmm1, %xmm1
++	vpslld		$25, %xmm0, %xmm10
++	vpsrld		$7, %xmm0, %xmm0
++	vpxor		%xmm0, %xmm10, %xmm10
++	vpblendw	$48, %xmm2, %xmm3, %xmm0
++	vpblendw	$15, %xmm11, %xmm0, %xmm0
++	vpshufd		$147, %xmm10, %xmm10
++	vpshufd		$114, %xmm0, %xmm0
++	vpaddd		%xmm12, %xmm0, %xmm0
++	vpaddd		%xmm10, %xmm0, %xmm0
++	vpxor		%xmm8, %xmm0, %xmm8
++	vpshufb		%xmm7, %xmm8, %xmm8
++	vpaddd		%xmm8, %xmm1, %xmm1
++	vpxor		%xmm10, %xmm1, %xmm10
++	vpslld		$20, %xmm10, %xmm11
++	vpsrld		$12, %xmm10, %xmm10
++	vpxor		%xmm10, %xmm11, %xmm10
++	vpslldq		$4, %xmm4, %xmm11
++	vpblendw	$192, %xmm11, %xmm3, %xmm3
++	vpunpckldq	%xmm5, %xmm4, %xmm4
++	vpshufd		$99, %xmm3, %xmm3
++	vpaddd		%xmm0, %xmm3, %xmm3
++	vpaddd		%xmm10, %xmm3, %xmm3
++	vpxor		%xmm8, %xmm3, %xmm11
++	vpunpckldq	%xmm5, %xmm2, %xmm0
++	vpblendw	$192, %xmm2, %xmm5, %xmm2
++	vpshufb		%xmm6, %xmm11, %xmm11
++	vpunpckhqdq	%xmm0, %xmm9, %xmm0
++	vpblendw	$15, %xmm4, %xmm2, %xmm4
++	vpaddd		%xmm11, %xmm1, %xmm1
++	vpxor		%xmm1, %xmm10, %xmm10
++	vpshufd		$147, %xmm11, %xmm11
++	vpshufd		$201, %xmm0, %xmm0
++	vpslld		$25, %xmm10, %xmm8
++	vpsrld		$7, %xmm10, %xmm10
++	vpxor		%xmm10, %xmm8, %xmm10
++	vpshufd		$78, %xmm1, %xmm1
++	vpaddd		%xmm3, %xmm0, %xmm0
++	vpshufd		$27, %xmm4, %xmm4
++	vpshufd		$57, %xmm10, %xmm10
++	vpaddd		%xmm10, %xmm0, %xmm0
++	vpxor		%xmm11, %xmm0, %xmm11
++	vpaddd		%xmm0, %xmm4, %xmm0
++	vpshufb		%xmm7, %xmm11, %xmm7
++	vpaddd		%xmm7, %xmm1, %xmm1
++	vpxor		%xmm10, %xmm1, %xmm10
++	vpslld		$20, %xmm10, %xmm8
++	vpsrld		$12, %xmm10, %xmm10
++	vpxor		%xmm10, %xmm8, %xmm8
++	vpaddd		%xmm8, %xmm0, %xmm0
++	vpxor		%xmm7, %xmm0, %xmm7
++	vpshufb		%xmm6, %xmm7, %xmm6
++	vpaddd		%xmm6, %xmm1, %xmm1
++	vpxor		%xmm1, %xmm8, %xmm8
++	vpshufd		$78, %xmm1, %xmm1
++	vpshufd		$57, %xmm6, %xmm6
++	vpslld		$25, %xmm8, %xmm2
++	vpsrld		$7, %xmm8, %xmm8
++	vpxor		%xmm8, %xmm2, %xmm8
++	vpxor		(%rdi), %xmm1, %xmm1
++	vpshufd		$147, %xmm8, %xmm8
++	vpxor		%xmm0, %xmm1, %xmm0
++	vmovups		%xmm0, (%rdi)
++	vpxor		16(%rdi), %xmm8, %xmm0
++	vpxor		%xmm6, %xmm0, %xmm6
++	vmovups		%xmm6, 16(%rdi)
++	addq		$64, %rsi
++	decq		%rdx
++	jnz .Lbeginofloop
++.Lendofloop:
++	ret
++ENDPROC(blake2s_compress_avx)
++#endif /* CONFIG_AS_AVX */
++
++#ifdef CONFIG_AS_AVX512
++ENTRY(blake2s_compress_avx512)
++	vmovdqu		(%rdi),%xmm0
++	vmovdqu		0x10(%rdi),%xmm1
++	vmovdqu		0x20(%rdi),%xmm4
++	vmovq		%rcx,%xmm5
++	vmovdqa		IV(%rip),%xmm14
++	vmovdqa		IV+16(%rip),%xmm15
++	jmp		.Lblake2s_compress_avx512_mainloop
++.align 32
++.Lblake2s_compress_avx512_mainloop:
++	vmovdqa		%xmm0,%xmm10
++	vmovdqa		%xmm1,%xmm11
++	vpaddq		%xmm5,%xmm4,%xmm4
++	vmovdqa		%xmm14,%xmm2
++	vpxor		%xmm15,%xmm4,%xmm3
++	vmovdqu		(%rsi),%ymm6
++	vmovdqu		0x20(%rsi),%ymm7
++	addq		$0x40,%rsi
++	leaq		SIGMA(%rip),%rax
++	movb		$0xa,%cl
++.Lblake2s_compress_avx512_roundloop:
++	addq		$0x40,%rax
++	vmovdqa		-0x40(%rax),%ymm8
++	vmovdqa		-0x20(%rax),%ymm9
++	vpermi2d	%ymm7,%ymm6,%ymm8
++	vpermi2d	%ymm7,%ymm6,%ymm9
++	vmovdqa		%ymm8,%ymm6
++	vmovdqa		%ymm9,%ymm7
++	vpaddd		%xmm8,%xmm0,%xmm0
++	vpaddd		%xmm1,%xmm0,%xmm0
++	vpxor		%xmm0,%xmm3,%xmm3
++	vprord		$0x10,%xmm3,%xmm3
++	vpaddd		%xmm3,%xmm2,%xmm2
++	vpxor		%xmm2,%xmm1,%xmm1
++	vprord		$0xc,%xmm1,%xmm1
++	vextracti128	$0x1,%ymm8,%xmm8
++	vpaddd		%xmm8,%xmm0,%xmm0
++	vpaddd		%xmm1,%xmm0,%xmm0
++	vpxor		%xmm0,%xmm3,%xmm3
++	vprord		$0x8,%xmm3,%xmm3
++	vpaddd		%xmm3,%xmm2,%xmm2
++	vpxor		%xmm2,%xmm1,%xmm1
++	vprord		$0x7,%xmm1,%xmm1
++	vpshufd		$0x39,%xmm1,%xmm1
++	vpshufd		$0x4e,%xmm2,%xmm2
++	vpshufd		$0x93,%xmm3,%xmm3
++	vpaddd		%xmm9,%xmm0,%xmm0
++	vpaddd		%xmm1,%xmm0,%xmm0
++	vpxor		%xmm0,%xmm3,%xmm3
++	vprord		$0x10,%xmm3,%xmm3
++	vpaddd		%xmm3,%xmm2,%xmm2
++	vpxor		%xmm2,%xmm1,%xmm1
++	vprord		$0xc,%xmm1,%xmm1
++	vextracti128	$0x1,%ymm9,%xmm9
++	vpaddd		%xmm9,%xmm0,%xmm0
++	vpaddd		%xmm1,%xmm0,%xmm0
++	vpxor		%xmm0,%xmm3,%xmm3
++	vprord		$0x8,%xmm3,%xmm3
++	vpaddd		%xmm3,%xmm2,%xmm2
++	vpxor		%xmm2,%xmm1,%xmm1
++	vprord		$0x7,%xmm1,%xmm1
++	vpshufd		$0x93,%xmm1,%xmm1
++	vpshufd		$0x4e,%xmm2,%xmm2
++	vpshufd		$0x39,%xmm3,%xmm3
++	decb		%cl
++	jne		.Lblake2s_compress_avx512_roundloop
++	vpxor		%xmm10,%xmm0,%xmm0
++	vpxor		%xmm11,%xmm1,%xmm1
++	vpxor		%xmm2,%xmm0,%xmm0
++	vpxor		%xmm3,%xmm1,%xmm1
++	decq		%rdx
++	jne		.Lblake2s_compress_avx512_mainloop
++	vmovdqu		%xmm0,(%rdi)
++	vmovdqu		%xmm1,0x10(%rdi)
++	vmovdqu		%xmm4,0x20(%rdi)
++	vzeroupper
++	retq
++ENDPROC(blake2s_compress_avx512)
++#endif /* CONFIG_AS_AVX512 */
+diff --git a/arch/x86/crypto/blake2s-glue.c b/arch/x86/crypto/blake2s-glue.c
+new file mode 100644
+index 000000000000..cb5f854d739a
+--- /dev/null
++++ b/arch/x86/crypto/blake2s-glue.c
+@@ -0,0 +1,76 @@
++// SPDX-License-Identifier: GPL-2.0 OR MIT
++/*
 + * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
 + */
 +
-+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-+#define MSB 0
-+#define LSB 3
-+#else
-+#define MSB 3
-+#define LSB 0
-+#endif
++#include <crypto/blake2s.h>
++#include <crypto/internal/simd.h>
 +
-+#define POLY1305_BLOCK_SIZE 16
-+.text
-+#define H0 $t0
-+#define H1 $t1
-+#define H2 $t2
-+#define H3 $t3
-+#define H4 $t4
-+
-+#define R0 $t5
-+#define R1 $t6
-+#define R2 $t7
-+#define R3 $t8
-+
-+#define O0 $s0
-+#define O1 $s4
-+#define O2 $v1
-+#define O3 $t9
-+#define O4 $s5
-+
-+#define S1 $s1
-+#define S2 $s2
-+#define S3 $s3
-+
-+#define SC $at
-+#define CA $v0
-+
-+/* Input arguments */
-+#define poly	$a0
-+#define src	$a1
-+#define srclen	$a2
-+#define hibit	$a3
-+
-+/* Location in the opaque buffer
-+ * R[0..3], CA, H[0..4]
-+ */
-+#define PTR_POLY1305_R(n) ( 0 + (n*4)) ## ($a0)
-+#define PTR_POLY1305_CA   (16        ) ## ($a0)
-+#define PTR_POLY1305_H(n) (20 + (n*4)) ## ($a0)
-+
-+#define POLY1305_BLOCK_SIZE 16
-+#define POLY1305_STACK_SIZE 32
-+
-+.set	noat
-+.align	4
-+.globl	poly1305_blocks_mips
-+.ent	poly1305_blocks_mips
-+poly1305_blocks_mips:
-+	.frame	$sp, POLY1305_STACK_SIZE, $ra
-+	/* srclen &= 0xFFFFFFF0 */
-+	ins	srclen, $zero, 0, 4
-+
-+	addiu	$sp, -(POLY1305_STACK_SIZE)
-+
-+	/* check srclen >= 16 bytes */
-+	beqz	srclen, .Lpoly1305_blocks_mips_end
-+
-+	/* Calculate last round based on src address pointer.
-+	 * last round src ptr (srclen) = src + (srclen & 0xFFFFFFF0)
-+	 */
-+	addu	srclen, src
-+
-+	lw	R0, PTR_POLY1305_R(0)
-+	lw	R1, PTR_POLY1305_R(1)
-+	lw	R2, PTR_POLY1305_R(2)
-+	lw	R3, PTR_POLY1305_R(3)
-+
-+	/* store the used save registers. */
-+	sw	$s0, 0($sp)
-+	sw	$s1, 4($sp)
-+	sw	$s2, 8($sp)
-+	sw	$s3, 12($sp)
-+	sw	$s4, 16($sp)
-+	sw	$s5, 20($sp)
-+
-+	/* load Hx and Carry */
-+	lw	CA, PTR_POLY1305_CA
-+	lw	H0, PTR_POLY1305_H(0)
-+	lw	H1, PTR_POLY1305_H(1)
-+	lw	H2, PTR_POLY1305_H(2)
-+	lw	H3, PTR_POLY1305_H(3)
-+	lw	H4, PTR_POLY1305_H(4)
-+
-+	/* Sx = Rx + (Rx >> 2) */
-+	srl	S1, R1, 2
-+	srl	S2, R2, 2
-+	srl	S3, R3, 2
-+	addu	S1, R1
-+	addu	S2, R2
-+	addu	S3, R3
-+
-+	addiu	SC, $zero, 1
-+
-+.Lpoly1305_loop:
-+	lwl	O0, 0+MSB(src)
-+	lwl	O1, 4+MSB(src)
-+	lwl	O2, 8+MSB(src)
-+	lwl	O3,12+MSB(src)
-+	lwr	O0, 0+LSB(src)
-+	lwr	O1, 4+LSB(src)
-+	lwr	O2, 8+LSB(src)
-+	lwr	O3,12+LSB(src)
-+
-+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-+	wsbh	O0
-+	wsbh	O1
-+	wsbh	O2
-+	wsbh	O3
-+	rotr	O0, 16
-+	rotr	O1, 16
-+	rotr	O2, 16
-+	rotr	O3, 16
-+#endif
-+
-+	/* h0 = (u32)(d0 = (u64)h0 + inp[0] + c 'Carry_previous cycle'); */
-+	addu	H0, CA
-+	sltu	CA, H0, CA
-+	addu	O0, H0
-+	sltu	H0, O0, H0
-+	addu	CA, H0
-+
-+	/* h1 = (u32)(d1 = (u64)h1 + (d0 >> 32) + inp[4]); */
-+	addu	H1, CA
-+	sltu	CA, H1, CA
-+	addu	O1, H1
-+	sltu	H1, O1, H1
-+	addu	CA, H1
-+
-+	/* h2 = (u32)(d2 = (u64)h2 + (d1 >> 32) + inp[8]); */
-+	addu	H2, CA
-+	sltu	CA, H2, CA
-+	addu	O2, H2
-+	sltu	H2, O2, H2
-+	addu	CA, H2
-+
-+	/* h3 = (u32)(d3 = (u64)h3 + (d2 >> 32) + inp[12]); */
-+	addu	H3, CA
-+	sltu	CA, H3, CA
-+	addu	O3, H3
-+	sltu	H3, O3, H3
-+	addu	CA, H3
-+
-+	/* h4 += (u32)(d3 >> 32) + padbit; */
-+	addu	H4, hibit
-+	addu	O4, H4, CA
-+
-+	/* D0 */
-+	multu	O0, R0
-+	maddu	O1, S3
-+	maddu	O2, S2
-+	maddu	O3, S1
-+	mfhi	CA
-+	mflo	H0
-+
-+	/* D1 */
-+	multu	O0, R1
-+	maddu	O1, R0
-+	maddu	O2, S3
-+	maddu	O3, S2
-+	maddu	O4, S1
-+	maddu	CA, SC
-+	mfhi	CA
-+	mflo	H1
-+
-+	/* D2 */
-+	multu	O0, R2
-+	maddu	O1, R1
-+	maddu	O2, R0
-+	maddu	O3, S3
-+	maddu	O4, S2
-+	maddu	CA, SC
-+	mfhi	CA
-+	mflo	H2
-+
-+	/* D4 */
-+	mul	H4, O4, R0
-+
-+	/* D3 */
-+	multu	O0, R3
-+	maddu	O1, R2
-+	maddu	O2, R1
-+	maddu	O3, R0
-+	maddu	O4, S3
-+	maddu	CA, SC
-+	mfhi	CA
-+	mflo	H3
-+
-+	addiu	src, POLY1305_BLOCK_SIZE
-+
-+	/* h4 += (u32)(d3 >> 32); */
-+	addu	O4, H4, CA
-+	/* h4 &= 3 */
-+	andi	H4, O4, 3
-+	/* c = (h4 >> 2) + (h4 & ~3U); */
-+	srl	CA, O4, 2
-+	ins	O4, $zero, 0, 2
-+
-+	addu	CA, O4
-+
-+	/* able to do a 16 byte block. */
-+	bne	src, srclen, .Lpoly1305_loop
-+
-+	/* restore the used save registers. */
-+	lw	$s0, 0($sp)
-+	lw	$s1, 4($sp)
-+	lw	$s2, 8($sp)
-+	lw	$s3, 12($sp)
-+	lw	$s4, 16($sp)
-+	lw	$s5, 20($sp)
-+
-+	/* store Hx and Carry */
-+	sw	CA, PTR_POLY1305_CA
-+	sw	H0, PTR_POLY1305_H(0)
-+	sw	H1, PTR_POLY1305_H(1)
-+	sw	H2, PTR_POLY1305_H(2)
-+	sw	H3, PTR_POLY1305_H(3)
-+	sw	H4, PTR_POLY1305_H(4)
-+
-+.Lpoly1305_blocks_mips_end:
-+	addiu	$sp, POLY1305_STACK_SIZE
-+
-+	/* Jump Back */
-+	jr	$ra
-+.end poly1305_blocks_mips
-+.set at
-+
-+/* Input arguments CTX=$a0, MAC=$a1, NONCE=$a2 */
-+#define MAC	$a1
-+#define NONCE	$a2
-+
-+#define G0	$t5
-+#define G1	$t6
-+#define G2	$t7
-+#define G3	$t8
-+#define G4	$t9
-+
-+.set	noat
-+.align	4
-+.globl	poly1305_emit_mips
-+.ent	poly1305_emit_mips
-+poly1305_emit_mips:
-+	/* load Hx and Carry */
-+	lw	CA, PTR_POLY1305_CA
-+	lw	H0, PTR_POLY1305_H(0)
-+	lw	H1, PTR_POLY1305_H(1)
-+	lw	H2, PTR_POLY1305_H(2)
-+	lw	H3, PTR_POLY1305_H(3)
-+	lw	H4, PTR_POLY1305_H(4)
-+
-+	/* Add left over carry */
-+	addu	H0, CA
-+	sltu	CA, H0, CA
-+	addu	H1, CA
-+	sltu	CA, H1, CA
-+	addu	H2, CA
-+	sltu	CA, H2, CA
-+	addu	H3, CA
-+	sltu	CA, H3, CA
-+	addu	H4, CA
-+
-+	/* compare to modulus by computing h + -p */
-+	addiu	G0, H0, 5
-+	sltu	CA, G0, H0
-+	addu	G1, H1, CA
-+	sltu	CA, G1, H1
-+	addu	G2, H2, CA
-+	sltu	CA, G2, H2
-+	addu	G3, H3, CA
-+	sltu	CA, G3, H3
-+	addu	G4, H4, CA
-+
-+	srl	SC, G4, 2
-+
-+	/* if there was carry into 131st bit, h3:h0 = g3:g0 */
-+	movn	H0, G0, SC
-+	movn	H1, G1, SC
-+	movn	H2, G2, SC
-+	movn	H3, G3, SC
-+
-+	lwl	G0, 0+MSB(NONCE)
-+	lwl	G1, 4+MSB(NONCE)
-+	lwl	G2, 8+MSB(NONCE)
-+	lwl	G3,12+MSB(NONCE)
-+	lwr	G0, 0+LSB(NONCE)
-+	lwr	G1, 4+LSB(NONCE)
-+	lwr	G2, 8+LSB(NONCE)
-+	lwr	G3,12+LSB(NONCE)
-+
-+	/* mac = (h + nonce) % (2^128) */
-+	addu	H0, G0
-+	sltu	CA, H0, G0
-+
-+	/* H1 */
-+	addu	H1, CA
-+	sltu	CA, H1, CA
-+	addu	H1, G1
-+	sltu	G1, H1, G1
-+	addu	CA, G1
-+
-+	/* H2 */
-+	addu	H2, CA
-+	sltu	CA, H2, CA
-+	addu	H2, G2
-+	sltu	G2, H2, G2
-+	addu	CA, G2
-+
-+	/* H3 */
-+	addu	H3, CA
-+	addu	H3, G3
-+
-+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-+	wsbh	H0
-+	wsbh	H1
-+	wsbh	H2
-+	wsbh	H3
-+	rotr	H0, 16
-+	rotr	H1, 16
-+	rotr	H2, 16
-+	rotr	H3, 16
-+#endif
-+
-+	/* store MAC */
-+	swl	H0, 0+MSB(MAC)
-+	swl	H1, 4+MSB(MAC)
-+	swl	H2, 8+MSB(MAC)
-+	swl	H3,12+MSB(MAC)
-+	swr	H0, 0+LSB(MAC)
-+	swr	H1, 4+LSB(MAC)
-+	swr	H2, 8+LSB(MAC)
-+	swr	H3,12+LSB(MAC)
-+
-+	jr	$ra
-+.end poly1305_emit_mips
-+
-+#define PR0 $t0
-+#define PR1 $t1
-+#define PR2 $t2
-+#define PR3 $t3
-+#define PT0 $t4
-+
-+/* Input arguments CTX=$a0, KEY=$a1 */
-+
-+.align	4
-+.globl	poly1305_init_mips
-+.ent	poly1305_init_mips
-+poly1305_init_mips:
-+	lwl	PR0, 0+MSB($a1)
-+	lwl	PR1, 4+MSB($a1)
-+	lwl	PR2, 8+MSB($a1)
-+	lwl	PR3,12+MSB($a1)
-+	lwr	PR0, 0+LSB($a1)
-+	lwr	PR1, 4+LSB($a1)
-+	lwr	PR2, 8+LSB($a1)
-+	lwr	PR3,12+LSB($a1)
-+
-+	/* store Hx and Carry */
-+	sw	$zero, PTR_POLY1305_CA
-+	sw	$zero, PTR_POLY1305_H(0)
-+	sw	$zero, PTR_POLY1305_H(1)
-+	sw	$zero, PTR_POLY1305_H(2)
-+	sw	$zero, PTR_POLY1305_H(3)
-+	sw	$zero, PTR_POLY1305_H(4)
-+
-+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-+	wsbh	PR0
-+	wsbh	PR1
-+	wsbh	PR2
-+	wsbh	PR3
-+	rotr	PR0, 16
-+	rotr	PR1, 16
-+	rotr	PR2, 16
-+	rotr	PR3, 16
-+#endif
-+
-+	lui	PT0, 0x0FFF
-+	ori	PT0, 0xFFFC
-+
-+	/* AND 0x0fffffff; */
-+	ext	PR0, PR0, 0, (32-4)
-+
-+	/* AND 0x0ffffffc; */
-+	and	PR1, PT0
-+	and	PR2, PT0
-+	and	PR3, PT0
-+
-+	/* store Rx */
-+	sw	PR0, PTR_POLY1305_R(0)
-+	sw	PR1, PTR_POLY1305_R(1)
-+	sw	PR2, PTR_POLY1305_R(2)
-+	sw	PR3, PTR_POLY1305_R(3)
-+
-+	/* Jump Back  */
-+	jr	$ra
-+.end poly1305_init_mips
-diff --git a/arch/mips/crypto/poly1305-glue.c b/arch/mips/crypto/poly1305-glue.c
-new file mode 100644
-index 000000000000..56ef1469ae6b
---- /dev/null
-+++ b/arch/mips/crypto/poly1305-glue.c
-@@ -0,0 +1,203 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * OpenSSL/Cryptogams accelerated Poly1305 transform for ARM
-+ *
-+ * Copyright (C) 2019 Linaro Ltd. <ard.biesheuvel@linaro.org>
-+ */
-+
-+#include <asm/unaligned.h>
-+#include <crypto/algapi.h>
-+#include <crypto/internal/hash.h>
-+#include <crypto/internal/poly1305.h>
-+#include <linux/cpufeature.h>
-+#include <linux/crypto.h>
++#include <linux/types.h>
++#include <linux/kernel.h>
 +#include <linux/module.h>
 +
-+asmlinkage void poly1305_init_mips(void *state, const u8 *key);
-+asmlinkage void poly1305_blocks_mips(void *state, const u8 *src, u32 len, u32 hibit);
-+asmlinkage void poly1305_emit_mips(void *state, __le32 *digest, const u32 *nonce);
++#include <asm/cpufeature.h>
++#include <asm/fpu/api.h>
++#include <asm/processor.h>
++#include <asm/simd.h>
 +
-+void poly1305_init(struct poly1305_desc_ctx *dctx, const u8 *key)
++asmlinkage void blake2s_compress_avx(struct blake2s_state *state,
++				     const u8 *block, const size_t nblocks,
++				     const u32 inc);
++asmlinkage void blake2s_compress_avx512(struct blake2s_state *state,
++					const u8 *block, const size_t nblocks,
++					const u32 inc);
++
++static bool blake2s_use_avx __ro_after_init;
++static bool blake2s_use_avx512 __ro_after_init;
++
++bool blake2s_compress_arch(struct blake2s_state *state,
++			   const u8 *block, size_t nblocks,
++			   const u32 inc)
 +{
-+	poly1305_init_mips(&dctx->h, key);
-+	dctx->s[0] = get_unaligned_le32(key + 16);
-+	dctx->s[1] = get_unaligned_le32(key + 20);
-+	dctx->s[2] = get_unaligned_le32(key + 24);
-+	dctx->s[3] = get_unaligned_le32(key + 28);
-+	dctx->buflen = 0;
++	/* SIMD disables preemption, so relax after processing each page. */
++	BUILD_BUG_ON(PAGE_SIZE / BLAKE2S_BLOCK_SIZE < 8);
++
++	if (!blake2s_use_avx || !crypto_simd_usable())
++		return false;
++
++	for (;;) {
++		const size_t blocks = min_t(size_t, nblocks,
++					    PAGE_SIZE / BLAKE2S_BLOCK_SIZE);
++
++		kernel_fpu_begin();
++		if (IS_ENABLED(CONFIG_AS_AVX512) && blake2s_use_avx512)
++			blake2s_compress_avx512(state, block, blocks, inc);
++		else
++			blake2s_compress_avx(state, block, blocks, inc);
++		kernel_fpu_end();
++
++		nblocks -= blocks;
++		if (!nblocks)
++			break;
++		block += blocks * BLAKE2S_BLOCK_SIZE;
++	}
++	return true;
 +}
-+EXPORT_SYMBOL(poly1305_init);
++EXPORT_SYMBOL(blake2s_compress_arch);
 +
-+static int mips_poly1305_init(struct shash_desc *desc)
++static int __init blake2s_mod_init(void)
 +{
-+	struct poly1305_desc_ctx *dctx = shash_desc_ctx(desc);
-+
-+	dctx->buflen = 0;
-+	dctx->rset = 0;
-+	dctx->sset = false;
++	blake2s_use_avx =
++		boot_cpu_has(X86_FEATURE_AVX) &&
++		cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL);
++	blake2s_use_avx512 =
++		boot_cpu_has(X86_FEATURE_AVX) &&
++		boot_cpu_has(X86_FEATURE_AVX2) &&
++		boot_cpu_has(X86_FEATURE_AVX512F) &&
++		boot_cpu_has(X86_FEATURE_AVX512VL) &&
++		cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM |
++				  XFEATURE_MASK_AVX512, NULL);
 +
 +	return 0;
 +}
 +
-+static void mips_poly1305_blocks(struct poly1305_desc_ctx *dctx, const u8 *src,
-+				 u32 len, u32 hibit)
-+{
-+	if (unlikely(!dctx->sset)) {
-+		if (!dctx->rset) {
-+			poly1305_init_mips(&dctx->h, src);
-+			src += POLY1305_BLOCK_SIZE;
-+			len -= POLY1305_BLOCK_SIZE;
-+			dctx->rset = 1;
-+		}
-+		if (len >= POLY1305_BLOCK_SIZE) {
-+			dctx->s[0] = get_unaligned_le32(src +  0);
-+			dctx->s[1] = get_unaligned_le32(src +  4);
-+			dctx->s[2] = get_unaligned_le32(src +  8);
-+			dctx->s[3] = get_unaligned_le32(src + 12);
-+			src += POLY1305_BLOCK_SIZE;
-+			len -= POLY1305_BLOCK_SIZE;
-+			dctx->sset = true;
-+		}
-+		if (len < POLY1305_BLOCK_SIZE)
-+			return;
-+	}
-+
-+	len &= ~(POLY1305_BLOCK_SIZE - 1);
-+
-+	poly1305_blocks_mips(&dctx->h, src, len, hibit);
-+}
-+
-+static int mips_poly1305_update(struct shash_desc *desc, const u8 *src,
-+				unsigned int len)
-+{
-+	struct poly1305_desc_ctx *dctx = shash_desc_ctx(desc);
-+
-+	if (unlikely(dctx->buflen)) {
-+		u32 bytes = min(len, POLY1305_BLOCK_SIZE - dctx->buflen);
-+
-+		memcpy(dctx->buf + dctx->buflen, src, bytes);
-+		src += bytes;
-+		len -= bytes;
-+		dctx->buflen += bytes;
-+
-+		if (dctx->buflen == POLY1305_BLOCK_SIZE) {
-+			mips_poly1305_blocks(dctx, dctx->buf, POLY1305_BLOCK_SIZE, 1);
-+			dctx->buflen = 0;
-+		}
-+	}
-+
-+	if (likely(len >= POLY1305_BLOCK_SIZE)) {
-+		mips_poly1305_blocks(dctx, src, len, 1);
-+		src += round_down(len, POLY1305_BLOCK_SIZE);
-+		len %= POLY1305_BLOCK_SIZE;
-+	}
-+
-+	if (unlikely(len)) {
-+		dctx->buflen = len;
-+		memcpy(dctx->buf, src, len);
-+	}
-+	return 0;
-+}
-+
-+void poly1305_update(struct poly1305_desc_ctx *dctx, const u8 *src,
-+		     unsigned int nbytes)
-+{
-+	if (unlikely(dctx->buflen)) {
-+		u32 bytes = min(nbytes, POLY1305_BLOCK_SIZE - dctx->buflen);
-+
-+		memcpy(dctx->buf + dctx->buflen, src, bytes);
-+		src += bytes;
-+		nbytes -= bytes;
-+		dctx->buflen += bytes;
-+
-+		if (dctx->buflen == POLY1305_BLOCK_SIZE) {
-+			poly1305_blocks_mips(&dctx->h, dctx->buf,
-+					     POLY1305_BLOCK_SIZE, 1);
-+			dctx->buflen = 0;
-+		}
-+	}
-+
-+	if (likely(nbytes >= POLY1305_BLOCK_SIZE)) {
-+		unsigned int len = round_down(nbytes, POLY1305_BLOCK_SIZE);
-+
-+		poly1305_blocks_mips(&dctx->h, src, len, 1);
-+		src += len;
-+		nbytes %= POLY1305_BLOCK_SIZE;
-+	}
-+
-+	if (unlikely(nbytes)) {
-+		dctx->buflen = nbytes;
-+		memcpy(dctx->buf, src, nbytes);
-+	}
-+}
-+EXPORT_SYMBOL(poly1305_update);
-+
-+void poly1305_final(struct poly1305_desc_ctx *dctx, u8 *dst)
-+{
-+	__le32 digest[4];
-+	u64 f = 0;
-+
-+	if (unlikely(dctx->buflen)) {
-+		dctx->buf[dctx->buflen++] = 1;
-+		memset(dctx->buf + dctx->buflen, 0,
-+		       POLY1305_BLOCK_SIZE - dctx->buflen);
-+		poly1305_blocks_mips(&dctx->h, dctx->buf, POLY1305_BLOCK_SIZE, 0);
-+	}
-+
-+	poly1305_emit_mips(&dctx->h, digest, dctx->s);
-+
-+	/* mac = (h + s) % (2^128) */
-+	f = (f >> 32) + le32_to_cpu(digest[0]);
-+	put_unaligned_le32(f, dst);
-+	f = (f >> 32) + le32_to_cpu(digest[1]);
-+	put_unaligned_le32(f, dst + 4);
-+	f = (f >> 32) + le32_to_cpu(digest[2]);
-+	put_unaligned_le32(f, dst + 8);
-+	f = (f >> 32) + le32_to_cpu(digest[3]);
-+	put_unaligned_le32(f, dst + 12);
-+
-+	*dctx = (struct poly1305_desc_ctx){};
-+}
-+EXPORT_SYMBOL(poly1305_final);
-+
-+static int mips_poly1305_final(struct shash_desc *desc, u8 *dst)
-+{
-+	struct poly1305_desc_ctx *dctx = shash_desc_ctx(desc);
-+
-+	if (unlikely(!dctx->sset))
-+		return -ENOKEY;
-+
-+	poly1305_final(dctx, dst);
-+	return 0;
-+}
-+
-+static struct shash_alg mips_poly1305_alg = {
-+	.init			= mips_poly1305_init,
-+	.update			= mips_poly1305_update,
-+	.final			= mips_poly1305_final,
-+	.digestsize		= POLY1305_DIGEST_SIZE,
-+	.descsize		= sizeof(struct poly1305_desc_ctx),
-+
-+	.base.cra_name		= "poly1305",
-+	.base.cra_driver_name	= "poly1305-mips",
-+	.base.cra_priority	= 200,
-+	.base.cra_blocksize	= POLY1305_BLOCK_SIZE,
-+	.base.cra_module	= THIS_MODULE,
-+};
-+
-+static int __init mips_poly1305_mod_init(void)
-+{
-+	return crypto_register_shash(&mips_poly1305_alg);
-+}
-+
-+static void __exit mips_poly1305_mod_exit(void)
-+{
-+	crypto_unregister_shash(&mips_poly1305_alg);
-+}
-+
-+module_init(mips_poly1305_mod_init);
-+module_exit(mips_poly1305_mod_exit);
++module_init(blake2s_mod_init);
 +
 +MODULE_LICENSE("GPL v2");
-+MODULE_ALIAS_CRYPTO("poly1305");
-+MODULE_ALIAS_CRYPTO("poly1305-mips");
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 4a8aafeca8ad..9cc3716de11d 100644
+index faca46302a34..30abaadd2de8 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -718,6 +718,12 @@ config CRYPTO_POLY1305_X86_64
- 	  in IETF protocols. This is the x86_64 assembler implementation using SIMD
- 	  instructions.
+@@ -1043,6 +1043,12 @@ config CRYPTO_LIB_BLAKE2S
+ 	tristate "BLAKE2s hash function library"
+ 	depends on CRYPTO_ARCH_HAVE_LIB_BLAKE2S || !CRYPTO_ARCH_HAVE_LIB_BLAKE2S
  
-+config CRYPTO_POLY1305_MIPS
-+	tristate "Poly1305 authenticator algorithm (MIPS 32r2 optimized)"
-+	depends on CPU_MIPS32_R2
-+	select CRYPTO_POLY1305
-+	select CRYPTO_ARCH_HAVE_LIB_POLY1305
++config CRYPTO_LIB_BLAKE2S_X86
++	tristate "BLAKE2s hash function library (x86 accelerated version)"
++	depends on X86 && 64BIT
++	select CRYPTO_LIB_BLAKE2S
++	select CRYPTO_ARCH_HAVE_LIB_BLAKE2S
 +
- config CRYPTO_MD4
- 	tristate "MD4 digest algorithm"
- 	select CRYPTO_HASH
+ comment "Ciphers"
+ 
+ config CRYPTO_LIB_AES
 -- 
 2.20.1
 
