@@ -2,138 +2,175 @@ Return-Path: <SRS0=UbUg=X3=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B7EEC352AA
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Oct 2019 14:47:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F0E6C35280
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Oct 2019 16:14:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0E54B21783
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Oct 2019 14:47:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="klrtSd9x"
+	by mail.kernel.org (Postfix) with ESMTP id E79F3222BE
+	for <linux-crypto@archiver.kernel.org>; Wed,  2 Oct 2019 16:14:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1570032848;
+	bh=kO8M38DmM9I+02SfH1lZx8c4kQqQUy1vQcjLyNx6/UI=;
+	h=From:To:Subject:Date:List-ID:From;
+	b=bpLre4MdnyrEJefQgS5IexTIXJWr9l5abbn1pJjk4nypXrBrLMpxkcfKaDg9UKAzr
+	 40Wefj6BoyjtcZsBkbNl2mYURBWwYwCchAhvCcxTGrdMV2FzkZOVYdd8qRfQFuPZKR
+	 EITpjwzIrxXwyaCnZfClIPXHnsyKAtrKKPwi3QGE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727427AbfJBOrS (ORCPT
+        id S1727003AbfJBQOH (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Oct 2019 10:47:18 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:36238 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726961AbfJBOrK (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Oct 2019 10:47:10 -0400
-Received: by mail-wr1-f67.google.com with SMTP id y19so20011724wrd.3
-        for <linux-crypto@vger.kernel.org>; Wed, 02 Oct 2019 07:47:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=V+28Bfx9nZyZNhk5cPbt+tiyzN/EnbhTEEnFK4bFz+g=;
-        b=klrtSd9x7EFwa+Ec7wdiT3ZU6NGyfGGOIz4UXMXCRHjDyHEjKJDjiRTa/OiN0h+6fF
-         c0z7zCfUDOQ/vG9/HDM6evXq+ROZReXHHyflxjZgIWuDPE1zKFUnY9J9W6yTzm+/QWN7
-         jWHNnCm8R4fqdbqhwbCwWYHkje5Yv42o/kK+YxdN+NnkZSXD5O+ZfXiSQ+9gRehhA7jl
-         I8eMtomtae3UW0tz+b5pIPYPMN1wTq0x1Ezsxpln+PcSXN14/RgYT5l7NPL/DN5JpI+A
-         ilkQ7+xfcRWMZ6aeEeYWC83bAm/9opVbedCjSIPNygFp93eOJUS8WGka+WZRuJCN5/vq
-         LICA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=V+28Bfx9nZyZNhk5cPbt+tiyzN/EnbhTEEnFK4bFz+g=;
-        b=OMDzuGaiaORQIGZLTZNd5n0g32o/I2YgdRoH9X2bhYhypAr+ZsEzqiEi/QmD5GgDsB
-         ce1eAnelfEnjxfzxbvQwmAlpGtq9u5ZwJ11v73BQBOVnz0tbP00Yvpr3XUul9Zcylpml
-         nbt0v2tSDepKlPoNPYgxLE8gCisomdtNFJBtM+0P3Y5cZHeF9x3vlZaQRTZsV0J3pzTB
-         tbf/JDlsdFePBrkzuNQo66JPCppbAFfjZ3F/Nw7Ai6WQrpXKJs8Or28lJms8+hP/m0XD
-         MpM0nr0OEXuZ1KosNXWvHyGmt/6RAouWTykkEMqWVY1Kbn2H+LhcUwAyPgTImaE1kCzy
-         jwew==
-X-Gm-Message-State: APjAAAWBQbhsYg/xqwXyHM18jhjM80D8daRCxQQ0s1I6j8HQMg+hSHXk
-        RejAFnIjVAO4g2pvkJPh+fs=
-X-Google-Smtp-Source: APXvYqxOApt+Ib7W2aca1ctQvpnldVWnhC4F/Z1Qxm2J5MaxNawfJ1Pmu7x+kGhk2leM176w2wovwg==
-X-Received: by 2002:a5d:470e:: with SMTP id y14mr2926417wrq.332.1570027629083;
-        Wed, 02 Oct 2019 07:47:09 -0700 (PDT)
-Received: from archlinux-threadripper ([2a01:4f8:222:2f1b::2])
-        by smtp.gmail.com with ESMTPSA id p7sm7324459wma.34.2019.10.02.07.47.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Oct 2019 07:47:08 -0700 (PDT)
-Date:   Wed, 2 Oct 2019 07:47:06 -0700
-From:   Nathan Chancellor <natechancellor@gmail.com>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        arnd@arndb.de, ndesaulniers@google.com
-Subject: Re: [PATCH] crypto: aegis128/simd - build 32-bit ARM for v8
- architecture explicitly
-Message-ID: <20191002144706.GA957871@archlinux-threadripper>
-References: <20191002075448.6453-1-ard.biesheuvel@linaro.org>
+        Wed, 2 Oct 2019 12:14:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38986 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726215AbfJBQOG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 2 Oct 2019 12:14:06 -0400
+Received: from localhost.localdomain (unknown [194.230.155.145])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4882121D81;
+        Wed,  2 Oct 2019 16:14:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1570032845;
+        bh=kO8M38DmM9I+02SfH1lZx8c4kQqQUy1vQcjLyNx6/UI=;
+        h=From:To:Subject:Date:From;
+        b=pTAciPHwF/1ekI5rhATeOVb8L8s04YFa4IDtpwye5eD2HwpcrP8u9snStb72j0OQe
+         G9ymOpPTDfJDoGksbnBOvrC2FeRLF7Kfn1SNbF2/GdUMvGf3gbj4Tn7K0e7M1ll4vF
+         hajl3K1m4oB7OKu+EQOX+Dp4i73QkHkl3KN7vgOw=
+From:   Krzysztof Kozlowski <krzk@kernel.org>
+To:     Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Kukjin Kim <kgene@kernel.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v3] dt-bindings: rng: exynos4-rng: Convert Exynos PRNG bindings to json-schema
+Date:   Wed,  2 Oct 2019 18:13:40 +0200
+Message-Id: <20191002161340.11846-1-krzk@kernel.org>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191002075448.6453-1-ard.biesheuvel@linaro.org>
-User-Agent: Mutt/1.12.2 (2019-09-21)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Thank you for fixing this, it is much appreciated!
+Convert Samsung Exynos Pseudo Random Number Generator bindings to DT
+schema format using json-schema.
 
-On Wed, Oct 02, 2019 at 09:54:48AM +0200, Ard Biesheuvel wrote:
-> Now that the Clang compiler has taken it upon itself to police the
-> compiler command line, and reject combinations for arguments it views
-> as incompatible, the AEGIS128 no longer builds correctly, and errors
-> out like this:
-> 
->   clang-10: warning: ignoring extension 'crypto' because the 'armv7-a'
->   architecture does not support it [-Winvalid-command-line-argument]
-> 
-> So let's switch to armv8-a instead, which matches the crypto-neon-fp-armv8
-> FPU profile we specify. Since neither were actually supported by GCC
-> versions before 4.8, let's tighten the Kconfig dependencies as well so
-> we won't run into errors when building with an ancient compiler.
-> 
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
 
-Minor nit below but regardless.
+---
 
-Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
-Tested-by: Nathan Chancellor <natechancellor@gmail.com>
+Changes since v2:
+1. Add additionalProperties false,
+2. Include clock header and use defines instead of clock numbers.
 
-> ---
->  crypto/Kconfig  | 1 +
->  crypto/Makefile | 2 +-
->  2 files changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index e928f88b6206..b138b68329dc 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -331,6 +331,7 @@ config CRYPTO_AEGIS128
->  config CRYPTO_AEGIS128_SIMD
->  	bool "Support SIMD acceleration for AEGIS-128"
->  	depends on CRYPTO_AEGIS128 && ((ARM || ARM64) && KERNEL_MODE_NEON)
-> +	depends on !ARM || CC_IS_CLANG || GCC_VERSION >= 40800
+Changes since v1:
+1. Indent example with four spaces (more readable).
+---
+ .../bindings/rng/samsung,exynos4-rng.txt      | 19 --------
+ .../bindings/rng/samsung,exynos4-rng.yaml     | 45 +++++++++++++++++++
+ MAINTAINERS                                   |  2 +-
+ 3 files changed, 46 insertions(+), 20 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/rng/samsung,exynos4-rng.txt
+ create mode 100644 Documentation/devicetree/bindings/rng/samsung,exynos4-rng.yaml
 
-This !ARM is a bit misleading to me given the (ARM || ARM64) requirement
-right above it and the fact that crypto/Makefile gates the addition of
-the NEON files to aegis128-y to $(ARCH) = arm or arm64.
+diff --git a/Documentation/devicetree/bindings/rng/samsung,exynos4-rng.txt b/Documentation/devicetree/bindings/rng/samsung,exynos4-rng.txt
+deleted file mode 100644
+index a13fbdb4bd88..000000000000
+--- a/Documentation/devicetree/bindings/rng/samsung,exynos4-rng.txt
++++ /dev/null
+@@ -1,19 +0,0 @@
+-Exynos Pseudo Random Number Generator
+-
+-Required properties:
+-
+-- compatible  : One of:
+-                - "samsung,exynos4-rng" for Exynos4210 and Exynos4412
+-                - "samsung,exynos5250-prng" for Exynos5250+
+-- reg         : Specifies base physical address and size of the registers map.
+-- clocks      : Phandle to clock-controller plus clock-specifier pair.
+-- clock-names : "secss" as a clock name.
+-
+-Example:
+-
+-	rng@10830400 {
+-		compatible = "samsung,exynos4-rng";
+-		reg = <0x10830400 0x200>;
+-		clocks = <&clock CLK_SSS>;
+-		clock-names = "secss";
+-	};
+diff --git a/Documentation/devicetree/bindings/rng/samsung,exynos4-rng.yaml b/Documentation/devicetree/bindings/rng/samsung,exynos4-rng.yaml
+new file mode 100644
+index 000000000000..3362cb1213c0
+--- /dev/null
++++ b/Documentation/devicetree/bindings/rng/samsung,exynos4-rng.yaml
+@@ -0,0 +1,45 @@
++# SPDX-License-Identifier: GPL-2.0
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/rng/samsung,exynos4-rng.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Samsung Exynos SoC Pseudo Random Number Generator
++
++maintainers:
++  - Krzysztof Kozlowski <krzk@kernel.org>
++
++properties:
++  compatible:
++    enum:
++      - samsung,exynos4-rng                   # for Exynos4210 and Exynos4412
++      - samsung,exynos5250-prng               # for Exynos5250+
++
++  reg:
++    maxItems: 1
++
++  clocks:
++    maxItems: 1
++
++  clock-names:
++    items:
++      - const: secss
++
++required:
++  - compatible
++  - reg
++  - clock-names
++  - clocks
++
++additionalProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/clock/exynos4.h>
++
++    rng@10830400 {
++        compatible = "samsung,exynos4-rng";
++        reg = <0x10830400 0x200>;
++        clocks = <&clock CLK_SSS>;
++        clock-names = "secss";
++    };
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 00b75028b280..b26b2009c230 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -14212,7 +14212,7 @@ L:	linux-crypto@vger.kernel.org
+ L:	linux-samsung-soc@vger.kernel.org
+ S:	Maintained
+ F:	drivers/crypto/exynos-rng.c
+-F:	Documentation/devicetree/bindings/rng/samsung,exynos4-rng.txt
++F:	Documentation/devicetree/bindings/rng/samsung,exynos4-rng.yaml
+ 
+ SAMSUNG EXYNOS TRUE RANDOM NUMBER GENERATOR (TRNG) DRIVER
+ M:	Łukasz Stelmach <l.stelmach@samsung.com>
+-- 
+2.17.1
 
->  	default y
->  
->  config CRYPTO_AEGIS128_AESNI_SSE2
-> diff --git a/crypto/Makefile b/crypto/Makefile
-> index fcb1ee679782..aa740c8492b9 100644
-> --- a/crypto/Makefile
-> +++ b/crypto/Makefile
-> @@ -93,7 +93,7 @@ obj-$(CONFIG_CRYPTO_AEGIS128) += aegis128.o
->  aegis128-y := aegis128-core.o
->  
->  ifeq ($(ARCH),arm)
-> -CFLAGS_aegis128-neon-inner.o += -ffreestanding -march=armv7-a -mfloat-abi=softfp
-> +CFLAGS_aegis128-neon-inner.o += -ffreestanding -march=armv8-a -mfloat-abi=softfp
->  CFLAGS_aegis128-neon-inner.o += -mfpu=crypto-neon-fp-armv8
->  aegis128-$(CONFIG_CRYPTO_AEGIS128_SIMD) += aegis128-neon.o aegis128-neon-inner.o
->  endif
-> -- 
-> 2.20.1
-> 
