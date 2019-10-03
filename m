@@ -2,88 +2,105 @@ Return-Path: <SRS0=iH/+=X4=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00587C32792
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Oct 2019 21:26:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07093C32792
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Oct 2019 21:51:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D046820867
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Oct 2019 21:26:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D7CB3215EA
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Oct 2019 21:51:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729271AbfJCV0Z (ORCPT
+        id S1728600AbfJCVva (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Oct 2019 17:26:25 -0400
-Received: from relay5-d.mail.gandi.net ([217.70.183.197]:36263 "EHLO
-        relay5-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728763AbfJCV0Z (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Oct 2019 17:26:25 -0400
-X-Originating-IP: 83.97.23.51
-Received: from d.localdomain (unknown [83.97.23.51])
-        (Authenticated sender: out@gert.gr)
-        by relay5-d.mail.gandi.net (Postfix) with ESMTPSA id D9DCE1C0007;
-        Thu,  3 Oct 2019 21:26:21 +0000 (UTC)
-Subject: Re: [PATCH] crypto: geode-aes - switch to skcipher for cbc(aes)
- fallback
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au,
-        Jelle de Jong <jelledejong@powercraft.nl>
-References: <20191003133921.29344-1-ard.biesheuvel@linaro.org>
-From:   Gert Robben <t2@gert.gr>
-Message-ID: <64d5c8ec-41c5-1ef2-cc4b-a050bf4c48ba@gert.gr>
-Date:   Thu, 3 Oct 2019 23:26:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        Thu, 3 Oct 2019 17:51:30 -0400
+Received: from mga11.intel.com ([192.55.52.93]:32422 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726982AbfJCVva (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 3 Oct 2019 17:51:30 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Oct 2019 14:51:29 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,253,1566889200"; 
+   d="scan'208";a="191393096"
+Received: from okiselev-mobl1.ccr.corp.intel.com (HELO localhost) ([10.251.93.117])
+  by fmsmga008.fm.intel.com with ESMTP; 03 Oct 2019 14:51:26 -0700
+Date:   Fri, 4 Oct 2019 00:51:25 +0300
+From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+To:     Mimi Zohar <zohar@linux.ibm.com>
+Cc:     David Safford <david.safford@ge.com>,
+        linux-integrity@vger.kernel.org, stable@vger.kernel.org,
+        David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "open list:ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] KEYS: asym_tpm: Switch to get_random_bytes()
+Message-ID: <20191003215125.GA30511@linux.intel.com>
+References: <20190926171601.30404-1-jarkko.sakkinen@linux.intel.com>
+ <1570024819.4999.119.camel@linux.ibm.com>
+ <20191003114119.GF8933@linux.intel.com>
+ <1570107752.4421.183.camel@linux.ibm.com>
+ <20191003175854.GB19679@linux.intel.com>
+ <1570128827.5046.19.camel@linux.ibm.com>
 MIME-Version: 1.0
-In-Reply-To: <20191003133921.29344-1-ard.biesheuvel@linaro.org>
-Content-Type: text/plain; charset=iso-8859-15; format=flowed
-Content-Language: nl-NL
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1570128827.5046.19.camel@linux.ibm.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Op 03-10-2019 om 15:39 schreef Ard Biesheuvel:
-> Commit 79c65d179a40e145 ("crypto: cbc - Convert to skcipher") updated
-> the generic CBC template wrapper from a blkcipher to a skcipher algo,
-> to get away from the deprecated blkcipher interface. However, as a side
-> effect, drivers that instantiate CBC transforms using the blkcipher as
-> a fallback no longer work, since skciphers can wrap blkciphers but not
-> the other way around. This broke the geode-aes driver.
+On Thu, Oct 03, 2019 at 02:53:47PM -0400, Mimi Zohar wrote:
+> [Cc'ing David Safford]
 > 
-> So let's fix it by moving to the sync skcipher interface when allocating
-> the fallback.
+> On Thu, 2019-10-03 at 20:58 +0300, Jarkko Sakkinen wrote:
+> > On Thu, Oct 03, 2019 at 09:02:32AM -0400, Mimi Zohar wrote:
+> > > On Thu, 2019-10-03 at 14:41 +0300, Jarkko Sakkinen wrote:
+> > > > On Wed, Oct 02, 2019 at 10:00:19AM -0400, Mimi Zohar wrote:
+> > > > > On Thu, 2019-09-26 at 20:16 +0300, Jarkko Sakkinen wrote:
+> > > > > > Only the kernel random pool should be used for generating random numbers.
+> > > > > > TPM contributes to that pool among the other sources of entropy. In here it
+> > > > > > is not, agreed, absolutely critical because TPM is what is trusted anyway
+> > > > > > but in order to remove tpm_get_random() we need to first remove all the
+> > > > > > call sites.
+> > > > > 
+> > > > > At what point during boot is the kernel random pool available?  Does
+> > > > > this imply that you're planning on changing trusted keys as well?
+> > > > 
+> > > > Well trusted keys *must* be changed to use it. It is not a choice
+> > > > because using a proprietary random number generator instead of defacto
+> > > > one in the kernel can be categorized as a *regression*.
+> > > 
+> > > I really don't see how using the TPM random number for TPM trusted
+> > > keys would be considered a regression.  That by definition is a
+> > > trusted key.  If anything, changing what is currently being done would
+> > > be the regression. 
+> > 
+> > It is really not a TPM trusted key. It trusted key that gets sealed with
+> > the TPM. The key itself is used in clear by kernel. The random number
+> > generator exists in the kernel to for a reason.
+> > 
+> > It is without doubt a regression.
 > 
-> Cc: Gert Robben <t2@gert.gr>
-> Cc: Jelle de Jong <jelledejong@powercraft.nl>
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> ---
-> Gert, Jelle,
-> 
-> If you can, please try this patch and report back to the list if it solves
-> the Geode issue for you.
+> You're misusing the term "regression" here.  A regression is something
+> that previously worked and has stopped working.  In this case, trusted
+> keys has always been based on the TPM random number generator.  Before
+> changing this, there needs to be some guarantees that the kernel
+> random number generator has a pool of random numbers early, on all
+> systems including embedded devices, not just servers.
 
-Thanks for the patch!
-I tried it on Alix 2C2 / Geode LX800 with Linux 5.4-rc1 (also 5.1-5.3 fwiw).
+I'm not using the term regression incorrectly here. Wrong function
+was used to generate random numbers for the payload here. It is an
+obvious bug.
 
-At least now openssl doesn't give those errors anymore.
-(openssl speed -evp aes-128-cbc -elapsed -engine afalg)
-But looking at the results (<6MB/s), apparently it's not using geode-aes 
-(>30MB/s?).
-In dmesg can be seen:
-
-alg: skcipher: ecb-aes-geode encryption test failed (wrong result) on 
-test vector 1, cfg="out-of-place"
-alg: skcipher: cbc-aes-geode encryption test failed (wrong result) on 
-test vector 2, cfg="out-of-place"
-Geode LX AES 0000:00:01.2: GEODE AES engine enabled.
-
-In /proc/crypto, drivers cbc-aes-geode/ecb-aes-geode are listed with 
-"selftest: unknown". Driver "geode-aes" has "selftest: passed".
-
-I'm happy to test other patches.
-Regards, Gert
+/Jarkko
