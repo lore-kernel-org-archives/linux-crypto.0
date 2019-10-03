@@ -3,124 +3,87 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88364C32792
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Oct 2019 18:53:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8911C10F14
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Oct 2019 21:20:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6C84B20862
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Oct 2019 18:53:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A2AC02133F
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Oct 2019 21:20:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730000AbfJCSx5 (ORCPT
+        id S1730020AbfJCVUr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Oct 2019 14:53:57 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:2564 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730108AbfJCSx5 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Oct 2019 14:53:57 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x93Iqb4h143256
-        for <linux-crypto@vger.kernel.org>; Thu, 3 Oct 2019 14:53:56 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2vdp9c0ubw-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Thu, 03 Oct 2019 14:53:55 -0400
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <zohar@linux.ibm.com>;
-        Thu, 3 Oct 2019 19:53:53 +0100
-Received: from b06avi18626390.portsmouth.uk.ibm.com (9.149.26.192)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 3 Oct 2019 19:53:50 +0100
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06avi18626390.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x93IrKAv36569444
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 3 Oct 2019 18:53:20 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2D3075204E;
-        Thu,  3 Oct 2019 18:53:49 +0000 (GMT)
-Received: from dhcp-9-31-103-196.watson.ibm.com (unknown [9.31.103.196])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 1EDED52050;
-        Thu,  3 Oct 2019 18:53:48 +0000 (GMT)
-Subject: Re: [PATCH] KEYS: asym_tpm: Switch to get_random_bytes()
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        David Safford <david.safford@ge.com>
-Cc:     linux-integrity@vger.kernel.org, stable@vger.kernel.org,
-        David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "open list:ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Date:   Thu, 03 Oct 2019 14:53:47 -0400
-In-Reply-To: <20191003175854.GB19679@linux.intel.com>
-References: <20190926171601.30404-1-jarkko.sakkinen@linux.intel.com>
-         <1570024819.4999.119.camel@linux.ibm.com>
-         <20191003114119.GF8933@linux.intel.com>
-         <1570107752.4421.183.camel@linux.ibm.com>
-         <20191003175854.GB19679@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.20.5 (3.20.5-1.fc24) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19100318-0012-0000-0000-00000353C61D
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19100318-0013-0000-0000-0000218ECE5B
-Message-Id: <1570128827.5046.19.camel@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-03_07:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=3 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=785 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910030155
+        Thu, 3 Oct 2019 17:20:47 -0400
+Received: from mx2.suse.de ([195.135.220.15]:40600 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727789AbfJCVUr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 3 Oct 2019 17:20:47 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id C7475AB87;
+        Thu,  3 Oct 2019 21:20:45 +0000 (UTC)
+Received: by ds.suse.cz (Postfix, from userid 10065)
+        id 50844DA890; Thu,  3 Oct 2019 23:21:01 +0200 (CEST)
+Date:   Thu, 3 Oct 2019 23:21:01 +0200
+From:   David Sterba <dsterba@suse.cz>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     David Sterba <dsterba@suse.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH] crypto: BLAKE2 reference implementation
+Message-ID: <20191003212101.GV2751@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+Mail-Followup-To: dsterba@suse.cz,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        David Sterba <dsterba@suse.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" <linux-crypto@vger.kernel.org>
+References: <cover.1569849051.git.dsterba@suse.com>
+ <8087a8b358b5f97304963a38a17433a416d1382b.1569849051.git.dsterba@suse.com>
+ <CAKv+Gu8tEL+5Q6c7TyQvmNjG+HnxfDa01RdE7UTH_YR+VhTpYQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu8tEL+5Q6c7TyQvmNjG+HnxfDa01RdE7UTH_YR+VhTpYQ@mail.gmail.com>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-[Cc'ing David Safford]
+Hi,
 
-On Thu, 2019-10-03 at 20:58 +0300, Jarkko Sakkinen wrote:
-> On Thu, Oct 03, 2019 at 09:02:32AM -0400, Mimi Zohar wrote:
-> > On Thu, 2019-10-03 at 14:41 +0300, Jarkko Sakkinen wrote:
-> > > On Wed, Oct 02, 2019 at 10:00:19AM -0400, Mimi Zohar wrote:
-> > > > On Thu, 2019-09-26 at 20:16 +0300, Jarkko Sakkinen wrote:
-> > > > > Only the kernel random pool should be used for generating random numbers.
-> > > > > TPM contributes to that pool among the other sources of entropy. In here it
-> > > > > is not, agreed, absolutely critical because TPM is what is trusted anyway
-> > > > > but in order to remove tpm_get_random() we need to first remove all the
-> > > > > call sites.
-> > > > 
-> > > > At what point during boot is the kernel random pool available?  Does
-> > > > this imply that you're planning on changing trusted keys as well?
-> > > 
-> > > Well trusted keys *must* be changed to use it. It is not a choice
-> > > because using a proprietary random number generator instead of defacto
-> > > one in the kernel can be categorized as a *regression*.
-> > 
-> > I really don't see how using the TPM random number for TPM trusted
-> > keys would be considered a regression.  That by definition is a
-> > trusted key.  If anything, changing what is currently being done would
-> > be the regression. 
+thanks for the review.
+
+On Thu, Oct 03, 2019 at 02:18:55PM +0200, Ard Biesheuvel wrote:
+> On Mon, 30 Sep 2019 at 15:12, David Sterba <dsterba@suse.com> wrote:
+> > The patch brings support of several BLAKE2 algorithms (2b, 2s, various
+> > digest lengths). The in-tree user will be btrfs (for checksumming),
+> > we're going to use the BLAKE2b-256 variant. It would be ideal if the
+> > patches get merged to 5.5, thats our target to release the support of
+> > new hashes.
 > 
-> It is really not a TPM trusted key. It trusted key that gets sealed with
-> the TPM. The key itself is used in clear by kernel. The random number
-> generator exists in the kernel to for a reason.
-> 
-> It is without doubt a regression.
+> So this will be used as an alternative to crc32c, and plugged in at
+> runtime depending on the algo described in the fs superblock?
 
-You're misusing the term "regression" here.  A regression is something
-that previously worked and has stopped working.  In this case, trusted
-keys has always been based on the TPM random number generator.  Before
-changing this, there needs to be some guarantees that the kernel
-random number generator has a pool of random numbers early, on all
-systems including embedded devices, not just servers.
+Yes, exactly like that. One checksum for the whole filesystem,
+specificed by a number in the superblock item.
 
-Mimi
+> Is it performance critical?
 
+I'd put it that performance is important and blake2 has been selected as
+the fastest from the modern hashes (ie. sha3 was rejected for that
+reason). We're going to add cryptographically strong hashes (blake2,
+sha256) and a fast one (xxhash). So the users should choose what's the
+best for their usecase given the trade-offs.
+
+If the question is inspired by the current discussions around wireguard
+and library versions, we're fine with using the current API as it's
+reasonable for the hash algorithms.
+
+Improvements regarding reduction of the overhead would be welcome but
+is not important at the moment.
+
+I'll send v2 with the review comments addressed. Thanks.
+
+d.
