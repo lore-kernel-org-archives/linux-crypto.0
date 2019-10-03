@@ -2,88 +2,88 @@ Return-Path: <SRS0=iH/+=X4=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8911C10F14
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Oct 2019 21:20:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00587C32792
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Oct 2019 21:26:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A2AC02133F
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Oct 2019 21:20:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D046820867
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Oct 2019 21:26:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730020AbfJCVUr (ORCPT
+        id S1729271AbfJCV0Z (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Oct 2019 17:20:47 -0400
-Received: from mx2.suse.de ([195.135.220.15]:40600 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727789AbfJCVUr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Oct 2019 17:20:47 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id C7475AB87;
-        Thu,  3 Oct 2019 21:20:45 +0000 (UTC)
-Received: by ds.suse.cz (Postfix, from userid 10065)
-        id 50844DA890; Thu,  3 Oct 2019 23:21:01 +0200 (CEST)
-Date:   Thu, 3 Oct 2019 23:21:01 +0200
-From:   David Sterba <dsterba@suse.cz>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     David Sterba <dsterba@suse.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH] crypto: BLAKE2 reference implementation
-Message-ID: <20191003212101.GV2751@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-Mail-Followup-To: dsterba@suse.cz,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        David Sterba <dsterba@suse.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" <linux-crypto@vger.kernel.org>
-References: <cover.1569849051.git.dsterba@suse.com>
- <8087a8b358b5f97304963a38a17433a416d1382b.1569849051.git.dsterba@suse.com>
- <CAKv+Gu8tEL+5Q6c7TyQvmNjG+HnxfDa01RdE7UTH_YR+VhTpYQ@mail.gmail.com>
+        Thu, 3 Oct 2019 17:26:25 -0400
+Received: from relay5-d.mail.gandi.net ([217.70.183.197]:36263 "EHLO
+        relay5-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728763AbfJCV0Z (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 3 Oct 2019 17:26:25 -0400
+X-Originating-IP: 83.97.23.51
+Received: from d.localdomain (unknown [83.97.23.51])
+        (Authenticated sender: out@gert.gr)
+        by relay5-d.mail.gandi.net (Postfix) with ESMTPSA id D9DCE1C0007;
+        Thu,  3 Oct 2019 21:26:21 +0000 (UTC)
+Subject: Re: [PATCH] crypto: geode-aes - switch to skcipher for cbc(aes)
+ fallback
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au,
+        Jelle de Jong <jelledejong@powercraft.nl>
+References: <20191003133921.29344-1-ard.biesheuvel@linaro.org>
+From:   Gert Robben <t2@gert.gr>
+Message-ID: <64d5c8ec-41c5-1ef2-cc4b-a050bf4c48ba@gert.gr>
+Date:   Thu, 3 Oct 2019 23:26:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKv+Gu8tEL+5Q6c7TyQvmNjG+HnxfDa01RdE7UTH_YR+VhTpYQ@mail.gmail.com>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+In-Reply-To: <20191003133921.29344-1-ard.biesheuvel@linaro.org>
+Content-Type: text/plain; charset=iso-8859-15; format=flowed
+Content-Language: nl-NL
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
-
-thanks for the review.
-
-On Thu, Oct 03, 2019 at 02:18:55PM +0200, Ard Biesheuvel wrote:
-> On Mon, 30 Sep 2019 at 15:12, David Sterba <dsterba@suse.com> wrote:
-> > The patch brings support of several BLAKE2 algorithms (2b, 2s, various
-> > digest lengths). The in-tree user will be btrfs (for checksumming),
-> > we're going to use the BLAKE2b-256 variant. It would be ideal if the
-> > patches get merged to 5.5, thats our target to release the support of
-> > new hashes.
+Op 03-10-2019 om 15:39 schreef Ard Biesheuvel:
+> Commit 79c65d179a40e145 ("crypto: cbc - Convert to skcipher") updated
+> the generic CBC template wrapper from a blkcipher to a skcipher algo,
+> to get away from the deprecated blkcipher interface. However, as a side
+> effect, drivers that instantiate CBC transforms using the blkcipher as
+> a fallback no longer work, since skciphers can wrap blkciphers but not
+> the other way around. This broke the geode-aes driver.
 > 
-> So this will be used as an alternative to crc32c, and plugged in at
-> runtime depending on the algo described in the fs superblock?
+> So let's fix it by moving to the sync skcipher interface when allocating
+> the fallback.
+> 
+> Cc: Gert Robben <t2@gert.gr>
+> Cc: Jelle de Jong <jelledejong@powercraft.nl>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
+> Gert, Jelle,
+> 
+> If you can, please try this patch and report back to the list if it solves
+> the Geode issue for you.
 
-Yes, exactly like that. One checksum for the whole filesystem,
-specificed by a number in the superblock item.
+Thanks for the patch!
+I tried it on Alix 2C2 / Geode LX800 with Linux 5.4-rc1 (also 5.1-5.3 fwiw).
 
-> Is it performance critical?
+At least now openssl doesn't give those errors anymore.
+(openssl speed -evp aes-128-cbc -elapsed -engine afalg)
+But looking at the results (<6MB/s), apparently it's not using geode-aes 
+(>30MB/s?).
+In dmesg can be seen:
 
-I'd put it that performance is important and blake2 has been selected as
-the fastest from the modern hashes (ie. sha3 was rejected for that
-reason). We're going to add cryptographically strong hashes (blake2,
-sha256) and a fast one (xxhash). So the users should choose what's the
-best for their usecase given the trade-offs.
+alg: skcipher: ecb-aes-geode encryption test failed (wrong result) on 
+test vector 1, cfg="out-of-place"
+alg: skcipher: cbc-aes-geode encryption test failed (wrong result) on 
+test vector 2, cfg="out-of-place"
+Geode LX AES 0000:00:01.2: GEODE AES engine enabled.
 
-If the question is inspired by the current discussions around wireguard
-and library versions, we're fine with using the current API as it's
-reasonable for the hash algorithms.
+In /proc/crypto, drivers cbc-aes-geode/ecb-aes-geode are listed with 
+"selftest: unknown". Driver "geode-aes" has "selftest: passed".
 
-Improvements regarding reduction of the overhead would be welcome but
-is not important at the moment.
-
-I'll send v2 with the review comments addressed. Thanks.
-
-d.
+I'm happy to test other patches.
+Regards, Gert
