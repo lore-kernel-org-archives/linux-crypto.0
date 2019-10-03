@@ -2,87 +2,87 @@ Return-Path: <SRS0=iH/+=X4=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A33BCC4CED1
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Oct 2019 13:45:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 815BCECE58B
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Oct 2019 17:59:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7F57F20873
-	for <linux-crypto@archiver.kernel.org>; Thu,  3 Oct 2019 13:45:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5DB622086A
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Oct 2019 17:59:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726119AbfJCNpT (ORCPT
+        id S1731234AbfJCR7G (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 3 Oct 2019 09:45:19 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:38416 "EHLO fornost.hmeau.com"
+        Thu, 3 Oct 2019 13:59:06 -0400
+Received: from mga07.intel.com ([134.134.136.100]:44326 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725874AbfJCNpT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 3 Oct 2019 09:45:19 -0400
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1iG1Pv-0000db-Hw; Thu, 03 Oct 2019 23:45:16 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 03 Oct 2019 23:45:12 +1000
-Date:   Thu, 3 Oct 2019 23:45:12 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Atul Gupta <atul.gupta@chelsio.com>
-Cc:     linux-crypto@vger.kernel.org, smueller@chronox.de,
-        ayush.sawal@chelsio.com
-Subject: Re: [Crypto chcr] crypto: af_alg - cast ki_complete call's ternary
- operator variables to long.
-Message-ID: <20191003134512.GA31972@gondor.apana.org.au>
-References: <20191003063231.8352-1-atul.gupta@chelsio.com>
+        id S1731174AbfJCR7G (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 3 Oct 2019 13:59:06 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 03 Oct 2019 10:59:05 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,253,1566889200"; 
+   d="scan'208";a="343737720"
+Received: from okiselev-mobl1.ccr.corp.intel.com (HELO localhost) ([10.251.93.117])
+  by orsmga004.jf.intel.com with ESMTP; 03 Oct 2019 10:59:00 -0700
+Date:   Thu, 3 Oct 2019 20:58:54 +0300
+From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+To:     Mimi Zohar <zohar@linux.ibm.com>
+Cc:     linux-integrity@vger.kernel.org, stable@vger.kernel.org,
+        David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "open list:ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] KEYS: asym_tpm: Switch to get_random_bytes()
+Message-ID: <20191003175854.GB19679@linux.intel.com>
+References: <20190926171601.30404-1-jarkko.sakkinen@linux.intel.com>
+ <1570024819.4999.119.camel@linux.ibm.com>
+ <20191003114119.GF8933@linux.intel.com>
+ <1570107752.4421.183.camel@linux.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20191003063231.8352-1-atul.gupta@chelsio.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1570107752.4421.183.camel@linux.ibm.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 02, 2019 at 11:32:31PM -0700, Atul Gupta wrote:
-> The ki_complete called from af_alg_async_cb use ternary operator to get
-> the value of second argument.As err is signed int while resultlen is
-> unsigned int, by the precedence rule err is also processed as unsigned
-> int and lose its original value.Hence, it is advised to cast both err
-> and resultlen as long which is expected by the definition of ki_complete
-> call as its 2nd argument. This will retain the original signed value of
-> err.
+On Thu, Oct 03, 2019 at 09:02:32AM -0400, Mimi Zohar wrote:
+> On Thu, 2019-10-03 at 14:41 +0300, Jarkko Sakkinen wrote:
+> > On Wed, Oct 02, 2019 at 10:00:19AM -0400, Mimi Zohar wrote:
+> > > On Thu, 2019-09-26 at 20:16 +0300, Jarkko Sakkinen wrote:
+> > > > Only the kernel random pool should be used for generating random numbers.
+> > > > TPM contributes to that pool among the other sources of entropy. In here it
+> > > > is not, agreed, absolutely critical because TPM is what is trusted anyway
+> > > > but in order to remove tpm_get_random() we need to first remove all the
+> > > > call sites.
+> > > 
+> > > At what point during boot is the kernel random pool available?  Does
+> > > this imply that you're planning on changing trusted keys as well?
+> > 
+> > Well trusted keys *must* be changed to use it. It is not a choice
+> > because using a proprietary random number generator instead of defacto
+> > one in the kernel can be categorized as a *regression*.
 > 
->  Declaration of ki_complete in file linux/include/linux/fs.h  in struct
-> kiocb {...
-> 	void (*ki_complete)(struct kiocb *iocb, long ret, long ret2);
-> 	...
->  }
-> 
->     Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
-> ---
->  crypto/af_alg.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-> index edca099..8e48d97 100644
-> --- a/crypto/af_alg.c
-> +++ b/crypto/af_alg.c
-> @@ -1048,7 +1048,7 @@ void af_alg_async_cb(struct crypto_async_request *_req, int err)
->  	af_alg_free_resources(areq);
->  	sock_put(sk);
->  
-> -	iocb->ki_complete(iocb, err ? err : resultlen, 0);
-> +	iocb->ki_complete(iocb, err ? (long)err : (long)resultlen, 0);
+> I really don't see how using the TPM random number for TPM trusted
+> keys would be considered a regression.  That by definition is a
+> trusted key.  If anything, changing what is currently being done would
+> be the regression. 
 
-Why are you casting err when it's already signed? You can rewrite
-it as
+It is really not a TPM trusted key. It trusted key that gets sealed with
+the TPM. The key itself is used in clear by kernel. The random number
+generator exists in the kernel to for a reason.
 
-	err ?: (int)resultlen
+It is without doubt a regression.
 
-Please also add a fixes header for the commit that introduced this
-bug.
-
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+/Jarkko
