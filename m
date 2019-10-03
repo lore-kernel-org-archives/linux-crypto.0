@@ -1,81 +1,75 @@
-Return-Path: <SRS0=UbUg=X3=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=iH/+=X4=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63923C4360C
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Oct 2019 21:33:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3CA5C10F14
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Oct 2019 06:33:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2B7292070B
-	for <linux-crypto@archiver.kernel.org>; Wed,  2 Oct 2019 21:33:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 90C94222BE
+	for <linux-crypto@archiver.kernel.org>; Thu,  3 Oct 2019 06:33:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727594AbfJBVdE (ORCPT
+        id S1725879AbfJCGdB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 2 Oct 2019 17:33:04 -0400
-Received: from foss.arm.com ([217.140.110.172]:55336 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726491AbfJBVdE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 2 Oct 2019 17:33:04 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5BC251000;
-        Wed,  2 Oct 2019 14:33:03 -0700 (PDT)
-Received: from mbp (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4F54C3F534;
-        Wed,  2 Oct 2019 14:33:02 -0700 (PDT)
-Date:   Wed, 2 Oct 2019 22:32:55 +0100
-From:   Catalin Marinas <catalin.marinas@arm.com>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     Nick Desaulniers <ndesaulniers@google.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        Will Deacon <will@kernel.org>
-Subject: Re: [PATCH] crypto: aegis128/simd - build 32-bit ARM for v8
- architecture explicitly
-Message-ID: <20191002213255.GA6931@mbp>
-References: <20191002075448.6453-1-ard.biesheuvel@linaro.org>
- <CAKwvOdmr2VX0MObnRScW4suijOLQL24HL3+TPKk8Rkcz0_0ZbA@mail.gmail.com>
- <20191002172333.GB3386@arrakis.emea.arm.com>
- <CAKv+Gu_Tytff_hiTETu0h=Wvyr47ygBNGO-EVhJf4hMXug0D6w@mail.gmail.com>
+        Thu, 3 Oct 2019 02:33:01 -0400
+Received: from stargate.chelsio.com ([12.32.117.8]:15228 "EHLO
+        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725860AbfJCGdB (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 3 Oct 2019 02:33:01 -0400
+Received: from beagle7.asicdesigners.com (beagle7.asicdesigners.com [10.192.192.157])
+        by stargate.chelsio.com (8.13.8/8.13.8) with ESMTP id x936WaDE024847;
+        Wed, 2 Oct 2019 23:32:37 -0700
+From:   Atul Gupta <atul.gupta@chelsio.com>
+To:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        smueller@chronox.de
+Cc:     atul.gupta@chelsio.com, ayush.sawal@chelsio.com
+Subject: [Crypto chcr] crypto: af_alg - cast ki_complete call's ternary operator variables to long.
+Date:   Wed,  2 Oct 2019 23:32:31 -0700
+Message-Id: <20191003063231.8352-1-atul.gupta@chelsio.com>
+X-Mailer: git-send-email 2.20.0.rc2.7.g965798d
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKv+Gu_Tytff_hiTETu0h=Wvyr47ygBNGO-EVhJf4hMXug0D6w@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 02, 2019 at 08:09:18PM +0200, Ard Biesheuvel wrote:
-> On Wed, 2 Oct 2019 at 19:23, Catalin Marinas <catalin.marinas@arm.com> wrote:
-> > On Wed, Oct 02, 2019 at 09:47:41AM -0700, Nick Desaulniers wrote:
-> > > I'm running into some inconsistencies between how clang parses target
-> > > arch between command line flag, function __attribute__, assembler
-> > > directive, and disassembler.  I see arch's like: armv8-a+crc,
-> > > armv8-a+sve, armv8-a+fp16, armv8-a+memtag, armv8-a+lse, but I'm not
-> > > familiar with the `+...` part of the target arch.
-> >
-> > This page shows the possible combinations:
-> >
-> > https://sourceware.org/binutils/docs/as/AArch64-Extensions.html#AArch64-Extensions
-> >
-> > Basically if it's an optional feature in ARMv8.0, you pass armv8-a+...
-> > For optional features only in higher versions, it would be
-> > armv8.5-a+memtag. The table above also states whether it's enabled by
-> > default (i.e. mandatory) in an architecture version. SB for example is
-> > supported from 8.0 but only required in 8.5.
-> 
-> I am not convinced (but I haven't checked) that this is used in the
-> same way on 32-bit.
+The ki_complete called from af_alg_async_cb use ternary operator to get
+the value of second argument.As err is signed int while resultlen is
+unsigned int, by the precedence rule err is also processed as unsigned
+int and lose its original value.Hence, it is advised to cast both err
+and resultlen as long which is expected by the definition of ki_complete
+call as its 2nd argument. This will retain the original signed value of
+err.
 
-Ah, I didn't realise this was about 32-bit. I don't think the above
-applies in this case.
+ Declaration of ki_complete in file linux/include/linux/fs.h  in struct
+kiocb {...
+	void (*ki_complete)(struct kiocb *iocb, long ret, long ret2);
+	...
+ }
 
+    Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
+---
+ crypto/af_alg.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/crypto/af_alg.c b/crypto/af_alg.c
+index edca099..8e48d97 100644
+--- a/crypto/af_alg.c
++++ b/crypto/af_alg.c
+@@ -1048,7 +1048,7 @@ void af_alg_async_cb(struct crypto_async_request *_req, int err)
+ 	af_alg_free_resources(areq);
+ 	sock_put(sk);
+ 
+-	iocb->ki_complete(iocb, err ? err : resultlen, 0);
++	iocb->ki_complete(iocb, err ? (long)err : (long)resultlen, 0);
+ }
+ EXPORT_SYMBOL_GPL(af_alg_async_cb);
+ 
 -- 
-Catalin
+1.8.3.1
+
