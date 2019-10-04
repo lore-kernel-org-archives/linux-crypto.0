@@ -6,88 +6,88 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58B73C4360C
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 12:08:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99D1BC4360C
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 13:16:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2E02A2070B
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 12:08:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D71F222C4
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 13:16:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pgMY53uD"
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="kLeufadS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729468AbfJDMIv (ORCPT
+        id S2388246AbfJDNQY (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Oct 2019 08:08:51 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:55618 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729189AbfJDMIu (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Oct 2019 08:08:50 -0400
-Received: by mail-wm1-f68.google.com with SMTP id a6so5541593wma.5
-        for <linux-crypto@vger.kernel.org>; Fri, 04 Oct 2019 05:08:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Ezpc1TYjxOB0JkQz0kZUiCPtLiFf/EuIDYhj9bwvfPw=;
-        b=pgMY53uDf+aYRVZhUeNuzdrnC2w5IYyLH5bF0d+Vb3mjTHNriMSWdu2qpIUC6x1KpS
-         kVvF5lltmFTl7eAyf+uQOAHhtuPjTXllQ4EO+edYbHEB2c97Ua9yPWVkhmkSMQqrI6vw
-         Y8fC7bQb0pKwztP895Ge+MaljLZn9V/1fdAJwKQfBx/L4IoMnIDp09TTehUlFERRoIqY
-         J7qLShxQOk42fZakmBlVVFTownKhRHqt3SdvszkuAyi0lSaeYrlsn/dPxrOV2f8CcG3Y
-         mZbgVHbHg7DOwyoK8V+CgJTMJ34oBa133LCkGd8ACHqWKqKjyuqsEibT56ud/rrXoAtF
-         AY5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Ezpc1TYjxOB0JkQz0kZUiCPtLiFf/EuIDYhj9bwvfPw=;
-        b=k9aBM6OxARzkq8iUYDAsFC0+qGyJAYHg7TMf5rSCY5Rj389gNTWPhAQeKQpPPdXQ0d
-         PYegTQoIF6/sEVAIw700sSzJaMlH9uPlD1U0vSFVR5MxlU8fbu2oTkEg3zM2N7/0ACOu
-         nmHiMP9rlbcTEB5HIY2PfC4ECluZ4nDRhtP5l7e39rqbHoRv4ZM/zlkvbgDOhS9I6K1K
-         EUfsJUMw48uvsI6cCxcxLOb+EyPL2aFvW6wRBEvuRQ8ggtyv1t48TmmWifRZ9KA5ve7/
-         TfUaYuaVVBA3Fwfea04RVHc/w0WKt3RKwS8X2+MwQYvIoel1QIXUqOkvuNn1msMy/uni
-         f8vA==
-X-Gm-Message-State: APjAAAUX1vYOtnMNsu+oybhg1j9PDjm7oiHFYAk01ImWZm5SorB2zxsS
-        W6SkwMNLHEnVm/lsh+R8idASs41vb7Xh+dS4X3CRRQ==
-X-Google-Smtp-Source: APXvYqwMnm+C6Rr1siChqBv06atGJ3shpX+J2x1fwosaNaYId6AOnBxNnPuNAckQuVMdXOTUsRKGgEZOVNBk1261EGs=
-X-Received: by 2002:a7b:cb55:: with SMTP id v21mr1525933wmj.53.1570190928139;
- Fri, 04 Oct 2019 05:08:48 -0700 (PDT)
-MIME-Version: 1.0
-References: <20191003133921.29344-1-ard.biesheuvel@linaro.org>
- <64d5c8ec-41c5-1ef2-cc4b-a050bf4c48ba@gert.gr> <CAKv+Gu8htzzdi5=4z5-E5o+J+bAPO=N4dR75Se=3JOZw8P_tDA@mail.gmail.com>
- <b15ff36b-19dc-2f04-ff2d-f644e30cdfb6@bezdeka.de>
-In-Reply-To: <b15ff36b-19dc-2f04-ff2d-f644e30cdfb6@bezdeka.de>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Fri, 4 Oct 2019 14:08:37 +0200
-Message-ID: <CAKv+Gu-+4z7=gcodpx-ufgvyiPRBorMt=mS2x6W33QtsOMvNyQ@mail.gmail.com>
-Subject: Re: [PATCH] crypto: geode-aes - switch to skcipher for cbc(aes) fallback
-To:     Florian Bezdeka <florian@bezdeka.de>
-Cc:     Gert Robben <t2@gert.gr>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
+        Fri, 4 Oct 2019 09:16:24 -0400
+Received: from frisell.zx2c4.com ([192.95.5.64]:56733 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388234AbfJDNQY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Oct 2019 09:16:24 -0400
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 2383115b;
+        Fri, 4 Oct 2019 12:29:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=date:from:to
+        :cc:subject:message-id:references:mime-version:content-type
+        :in-reply-to; s=mail; bh=ZzuTVC/SsCvt7l1FZ6cDBDQzGk8=; b=kLeufad
+        Sjn/8MzGTXdc7O4UHkSWhHE1wg5gs2wkWT8yoTjR1ClWl408Ry1B3B4cRbBCF2Il
+        hmyPBckVDU2KIDPGZAoVRwRe/NJmvwXEaHhUNIHfdMsnRODXmhP9NUGrFnC9PJXo
+        KTs6lIIlgf2ARSYvmWCCTaepIcIzwXI4FObKWfhATKHNt+wnaRU/HyAUwkRSoxi+
+        gnEAGIk1F5BRNmHtqvE0tVqGLBPOQIy/JRD4Xh5QIg572c8mWUi3E4aHX3uLJKfX
+        Wm7PKWxfA8aZcNCNGbgXraXJRFLP+7VlfN1A49HVRIEuMgzxjtXfykiCM5/vXEBV
+        8oEH6RpRvpS/+fA==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id afcaba72 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
+        Fri, 4 Oct 2019 12:29:28 +0000 (UTC)
+Date:   Fri, 4 Oct 2019 15:16:15 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Jelle de Jong <jelledejong@powercraft.nl>
-Content-Type: text/plain; charset="UTF-8"
+        David Miller <davem@davemloft.net>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Eric Biggers <ebiggers@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Martin Willi <martin@strongswan.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>
+Subject: Re: [PATCH v2 00/20] crypto: crypto API library interfaces for
+ WireGuard
+Message-ID: <20191004131615.GA112631@zx2c4.com>
+References: <20191002141713.31189-1-ard.biesheuvel@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20191002141713.31189-1-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 4 Oct 2019 at 12:21, Florian Bezdeka <florian@bezdeka.de> wrote:
->
-> I'm facing the same problem on one of my VPN gateways.
->
-> I updated the affected system from Debian Stretch to Buster.
-> Therefore the kernel was updated from 4.9.x to 4.19.x
->
-> The supplied patch uses some symbols / functions that were introduced
-> with 4.19 (like crypto_sync_skcipher_clear_flags()) so some additional work
-> has to be done for older LTS kernels.
->
-> Any chance to get a patch working with 4.19?
-> I would be happy to test it.
->
+Hi Ard,
 
-Just replace all occurrences of *sync_skcipher* with *skcipher*
-(including upper case ones), and pass 'CRYPTO_ALG_ASYNC |
-CRYPTO_ALG_NEED_FALLBACK' as the third parameter to
-crypto_alloc_skcipher, then the patch should work with v4.19 as well.
+On Wed, Oct 02, 2019 at 04:16:53PM +0200, Ard Biesheuvel wrote:
+> This is a followup to RFC 'crypto: wireguard with crypto API library interface'
+> [0]. Since no objections were raised to my approach, I've proceeded to fix up
+> some minor issues, and incorporate [most of] the missing MIPS code.
+> 
+> Changes since RFC/v1:
+> - dropped the WireGuard patch itself, and the followup patches - since the
+>   purpose was to illustrate the extent of the required changes, there is no
+>   reason to keep including them.
+> - import the MIPS 32r2 versions of ChaCha and Poly1305, but expose both the
+>   crypto API and library interfaces so that not only WireGuard but also IPsec
+>   and Adiantum can benefit immediately. (The latter required adding support for
+>   the reduced round version of ChaCha to the MIPS asm code)
+> - fix up various minor kconfig/build issues found in randconfig testing
+>   (thanks Arnd!)
+
+Thanks for working on this. By wiring up the accelerated primitives,
+you're essentially implementing Zinc, and I expect that by the end of
+this, we'll wind up with something pretty close to where I started, with
+the critical difference that the directory names are different. Despite
+my initial email about WireGuard moving to the crypto API, it sounds
+like in the end it is likely to stay with Zinc, just without that name.
+
+Jason
