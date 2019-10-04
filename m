@@ -2,640 +2,149 @@ Return-Path: <SRS0=x16Q=X5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=DKIM_ADSP_ALL,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C23EC47404
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 10:24:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB4F4C4360C
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 10:31:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C8BE9207FF
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 10:24:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6343321D71
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 10:31:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=bezdeka.de header.i=@bezdeka.de header.b="O0Db1lV+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727795AbfJDKYg (ORCPT
+        id S1726927AbfJDKbe (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Oct 2019 06:24:36 -0400
-Received: from mx2.suse.de ([195.135.220.15]:37616 "EHLO mx1.suse.de"
+        Fri, 4 Oct 2019 06:31:34 -0400
+Received: from srv1.bezdeka.de ([185.207.107.174]:47946 "EHLO smtp.bezdeka.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726696AbfJDKYg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Oct 2019 06:24:36 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id CF610B17A;
-        Fri,  4 Oct 2019 10:24:32 +0000 (UTC)
-Received: by ds.suse.cz (Postfix, from userid 10065)
-        id 9073FDA7D7; Fri,  4 Oct 2019 12:24:39 +0200 (CEST)
-From:   David Sterba <dsterba@suse.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     David Sterba <dsterba@suse.com>, ard.biesheuvel@linaro.org
-Subject: [PATCH v2] crypto: add blake2b generic implementation
-Date:   Fri,  4 Oct 2019 12:22:37 +0200
-Message-Id: <e31c2030fcfa7f409b2c81adf8f179a8a55a584a.1570184333.git.dsterba@suse.com>
-X-Mailer: git-send-email 2.23.0
+        id S1729310AbfJDKbe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Oct 2019 06:31:34 -0400
+X-Greylist: delayed 591 seconds by postgrey-1.27 at vger.kernel.org; Fri, 04 Oct 2019 06:31:33 EDT
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=bezdeka.de;
+         s=mail201812; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:
+        MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender:Reply-To:
+        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+        Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=moVTyURx1nxoFG5ngLVQGb7DVnfYOZ+3m3pnk+CnaGg=; b=O0Db1lV+QhTYVil93zUYH/ElDu
+        wN2wrgGngRn6HrWzd2VIyy28Xg3dOuzqrKZhSXuVBDPSSRQSghMhdwdlfNyHSNHRP98BNPTwsQ0h0
+        5lAl9AbHgJOPkOiO5N/0SJ0lWH+hz41DPsdTLZ/SwwDPLlbOdTdo2IFfa9LMm5zTVU0VtSu/a/Jxf
+        v3U150AURK9HM4j9ylJEZvNPVx+C4Xrinkc6wGBh/GRS822AypotbvzDO4kqUQr3Rf6m9J7uU6Wha
+        3t8xyNJ755jcYOBcWekKz0YliQD6H7joHmJP1i2Ru26ZIToonHmRcxIJGupycpGO6jTcyTcCOiYbh
+        qcOgm7ow==;
+Received: from [2a02:810d:82bf:fffc:4b4d:6e34:bfdf:330e]
+        by smtp.bezdeka.de with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
+        (Exim 4.92.3)
+        (envelope-from <florian@bezdeka.de>)
+        id 1iGKi5-0004z3-Lg; Fri, 04 Oct 2019 12:21:37 +0200
+Subject: Re: [PATCH] crypto: geode-aes - switch to skcipher for cbc(aes)
+ fallback
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Gert Robben <t2@gert.gr>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jelle de Jong <jelledejong@powercraft.nl>
+References: <20191003133921.29344-1-ard.biesheuvel@linaro.org>
+ <64d5c8ec-41c5-1ef2-cc4b-a050bf4c48ba@gert.gr>
+ <CAKv+Gu8htzzdi5=4z5-E5o+J+bAPO=N4dR75Se=3JOZw8P_tDA@mail.gmail.com>
+From:   Florian Bezdeka <florian@bezdeka.de>
+Message-ID: <b15ff36b-19dc-2f04-ff2d-f644e30cdfb6@bezdeka.de>
+Date:   Fri, 4 Oct 2019 12:21:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAKv+Gu8htzzdi5=4z5-E5o+J+bAPO=N4dR75Se=3JOZw8P_tDA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Authenticated-User: florian@bezdeka.de
+X-Authenticator: plain
+X-Exim-Version: 4.92.3 (build at 30-Sep-2019 11:50:17)
+X-Date: 2019-10-04 12:21:35
+X-Connected-IP: 2a02:810d:82bf:fffc:4b4d:6e34:bfdf:330e:33174
+X-Message-Linecount: 89
+X-Body-Linecount: 70
+X-Message-Size: 3323
+X-Body-Size: 2440
+X-Received-Count: 1
+X-Local-Recipient-Count: 5
+X-Local-Recipient-Defer-Count: 0
+X-Local-Recipient-Fail-Count: 0
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The patch brings support of several BLAKE2 variants (2b with various
-digest lengths). The in-tree user will be btrfs (for checksumming),
-we're going to use the BLAKE2b-256 variant.
+I'm facing the same problem on one of my VPN gateways.
 
-The code is reference implementation taken from the official sources and
-modified only in terms of kernel coding style (whitespace, comments,
-uintXX_t -> uXX types, removed unused prototypes and #ifdefs, removed
-testing code, changed secure_zero_memory -> memzero_explicit, used own
-helpers for unaligned reads/writes and rotations).
+I updated the affected system from Debian Stretch to Buster.
+Therefore the kernel was updated from 4.9.x to 4.19.x
 
-Signed-off-by: David Sterba <dsterba@suse.com>
----
+The supplied patch uses some symbols / functions that were introduced 
+with 4.19 (like crypto_sync_skcipher_clear_flags()) so some additional work
+has to be done for older LTS kernels.
 
-V2:
+Any chance to get a patch working with 4.19?
+I would be happy to test it.
 
-File changes:
+Best regards,
+  Florian
 
-- delete blake2s_generic.c
-- blake2.h:
-  * removed anything blake2s related
-  * renamed to blake2b.h and moved to linux.git/include/crypto/
-- blake-impl.h: removed
-
-Code changes:
-- use get_unaligned/put_unaligned helpers instead of blake's load/store
-- use ror64 instead of blake's rotr64
-- move blake2_init_param to blake2b.c and remove blake2b_param from .h
-- reformat algo specifications to avoid nested structures, whitespace updates
-- definitions of BLAKE2B_*_DIGEST_SIZE moved to .h
-
-
- crypto/Kconfig           |  18 ++
- crypto/Makefile          |   1 +
- crypto/blake2b_generic.c | 452 +++++++++++++++++++++++++++++++++++++++
- include/crypto/blake2b.h |  53 +++++
- 4 files changed, 524 insertions(+)
- create mode 100644 crypto/blake2b_generic.c
- create mode 100644 include/crypto/blake2b.h
-
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index e801450bcb1c..0df1c9079dfa 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -691,6 +691,24 @@ config CRYPTO_XXHASH
- 	  xxHash non-cryptographic hash algorithm. Extremely fast, working at
- 	  speeds close to RAM limits.
- 
-+config CRYPTO_BLAKE2B
-+	tristate "BLAKE2b digest algorithm"
-+	select CRYPTO_HASH
-+	help
-+	  Implementation of cryptographic hash function BLAKE2b (or just BLAKE2),
-+	  optimized for 64bit platforms and can produce digests of any size
-+	  between 1 to 64.
-+
-+	  This module provides the following algorithms:
-+
-+	  - blake2b     - the default 512b digest
-+	  - blake2b-160
-+	  - blake2b-256
-+	  - blake2b-384
-+	  - blake2b-512
-+
-+	  See https://blake2.net for further information.
-+
- config CRYPTO_CRCT10DIF
- 	tristate "CRCT10DIF algorithm"
- 	select CRYPTO_HASH
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 9479e1a45d8c..2318420d3e71 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -74,6 +74,7 @@ obj-$(CONFIG_CRYPTO_STREEBOG) += streebog_generic.o
- obj-$(CONFIG_CRYPTO_WP512) += wp512.o
- CFLAGS_wp512.o := $(call cc-option,-fno-schedule-insns)  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79149
- obj-$(CONFIG_CRYPTO_TGR192) += tgr192.o
-+obj-$(CONFIG_CRYPTO_BLAKE2B) += blake2b_generic.o
- obj-$(CONFIG_CRYPTO_GF128MUL) += gf128mul.o
- obj-$(CONFIG_CRYPTO_ECB) += ecb.o
- obj-$(CONFIG_CRYPTO_CBC) += cbc.o
-diff --git a/crypto/blake2b_generic.c b/crypto/blake2b_generic.c
-new file mode 100644
-index 000000000000..a1847fcb2203
---- /dev/null
-+++ b/crypto/blake2b_generic.c
-@@ -0,0 +1,452 @@
-+// SPDX-License-Identifier: (GPL-2.0-only OR Apache-2.0)
-+/*
-+ * BLAKE2b reference source code package - reference C implementations
-+ *
-+ * Copyright 2012, Samuel Neves <sneves@dei.uc.pt>.  You may use this under the
-+ * terms of the CC0, the OpenSSL Licence, or the Apache Public License 2.0, at
-+ * your option.  The terms of these licenses can be found at:
-+ *
-+ * - CC0 1.0 Universal : http://creativecommons.org/publicdomain/zero/1.0
-+ * - OpenSSL license   : https://www.openssl.org/source/license.html
-+ * - Apache 2.0        : http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * More information about the BLAKE2 hash function can be found at
-+ * https://blake2.net.
-+ */
-+
-+#include <asm/unaligned.h>
-+#include <linux/module.h>
-+#include <linux/string.h>
-+#include <linux/kernel.h>
-+#include <linux/bitops.h>
-+#include <crypto/internal/hash.h>
-+#include <crypto/blake2b.h>
-+
-+struct blake2b_param
-+{
-+	u8  digest_length; /* 1 */
-+	u8  key_length;    /* 2 */
-+	u8  fanout;        /* 3 */
-+	u8  depth;         /* 4 */
-+	u32 leaf_length;   /* 8 */
-+	u32 node_offset;   /* 12 */
-+	u32 xof_length;    /* 16 */
-+	u8  node_depth;    /* 17 */
-+	u8  inner_length;  /* 18 */
-+	u8  reserved[14];  /* 32 */
-+	u8  salt[BLAKE2B_SALTBYTES]; /* 48 */
-+	u8  personal[BLAKE2B_PERSONALBYTES];  /* 64 */
-+} __packed;
-+
-+/* Padded structs result in a compile-time error */
-+enum {
-+	BLAKE2_DUMMY_2 = 1 / (sizeof(struct blake2b_param) == BLAKE2B_OUTBYTES)
-+};
-+
-+static const u64 blake2b_IV[8] =
-+{
-+	0x6a09e667f3bcc908ULL, 0xbb67ae8584caa73bULL,
-+	0x3c6ef372fe94f82bULL, 0xa54ff53a5f1d36f1ULL,
-+	0x510e527fade682d1ULL, 0x9b05688c2b3e6c1fULL,
-+	0x1f83d9abfb41bd6bULL, 0x5be0cd19137e2179ULL
-+};
-+
-+static const u8 blake2b_sigma[12][16] =
-+{
-+	{  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15 },
-+	{ 14, 10,  4,  8,  9, 15, 13,  6,  1, 12,  0,  2, 11,  7,  5,  3 },
-+	{ 11,  8, 12,  0,  5,  2, 15, 13, 10, 14,  3,  6,  7,  1,  9,  4 },
-+	{  7,  9,  3,  1, 13, 12, 11, 14,  2,  6,  5, 10,  4,  0, 15,  8 },
-+	{  9,  0,  5,  7,  2,  4, 10, 15, 14,  1, 11, 12,  6,  8,  3, 13 },
-+	{  2, 12,  6, 10,  0, 11,  8,  3,  4, 13,  7,  5, 15, 14,  1,  9 },
-+	{ 12,  5,  1, 15, 14, 13,  4, 10,  0,  7,  6,  3,  9,  2,  8, 11 },
-+	{ 13, 11,  7, 14, 12,  1,  3,  9,  5,  0, 15,  4,  8,  6,  2, 10 },
-+	{  6, 15, 14,  9, 11,  3,  0,  8, 12,  2, 13,  7,  1,  4, 10,  5 },
-+	{ 10,  2,  8,  4,  7,  6,  1,  5, 15, 11,  9, 14,  3, 12, 13 , 0 },
-+	{  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15 },
-+	{ 14, 10,  4,  8,  9, 15, 13,  6,  1, 12,  0,  2, 11,  7,  5,  3 }
-+};
-+
-+static void blake2b_set_lastnode(struct blake2b_state *S)
-+{
-+	S->f[1] = (u64)-1;
-+}
-+
-+static int blake2b_is_lastblock(const struct blake2b_state *S)
-+{
-+	return S->f[0] != 0;
-+}
-+
-+static void blake2b_set_lastblock(struct blake2b_state *S)
-+{
-+	if (S->last_node)
-+		blake2b_set_lastnode(S);
-+
-+	S->f[0] = (u64)-1;
-+}
-+
-+static void blake2b_increment_counter(struct blake2b_state *S, const u64 inc)
-+{
-+	S->t[0] += inc;
-+	S->t[1] += (S->t[0] < inc);
-+}
-+
-+static void blake2b_init0(struct blake2b_state *S)
-+{
-+	size_t i;
-+
-+	memset(S, 0, sizeof(struct blake2b_state));
-+
-+	for (i = 0; i < 8; ++i)
-+		S->h[i] = blake2b_IV[i];
-+}
-+
-+/* init xors IV with input parameter block */
-+static int blake2b_init_param(struct blake2b_state *S,
-+			      const struct blake2b_param *P)
-+{
-+	const u8 *p = (const u8 *)(P);
-+	size_t i;
-+
-+	blake2b_init0(S);
-+
-+	/* IV XOR ParamBlock */
-+	for (i = 0; i < 8; ++i)
-+		S->h[i] ^= get_unaligned_le64(p + sizeof(S->h[i]) * i);
-+
-+	S->outlen = P->digest_length;
-+	return 0;
-+}
-+
-+int blake2b_init(struct blake2b_state *S, size_t outlen)
-+{
-+	struct blake2b_param P[1];
-+
-+	if ((!outlen) || (outlen > BLAKE2B_OUTBYTES))
-+		return -1;
-+
-+	P->digest_length = (u8)outlen;
-+	P->key_length    = 0;
-+	P->fanout        = 1;
-+	P->depth         = 1;
-+	put_unaligned_le32(0, &P->leaf_length);
-+	put_unaligned_le32(0, &P->node_offset);
-+	put_unaligned_le32(0, &P->xof_length);
-+	P->node_depth    = 0;
-+	P->inner_length  = 0;
-+	memset(P->reserved, 0, sizeof(P->reserved));
-+	memset(P->salt,     0, sizeof(P->salt));
-+	memset(P->personal, 0, sizeof(P->personal));
-+	return blake2b_init_param(S, P);
-+}
-+
-+int blake2b_init_key(struct blake2b_state *S, size_t outlen, const void *key,
-+		     size_t keylen)
-+{
-+	struct blake2b_param P[1];
-+
-+	if ((!outlen) || (outlen > BLAKE2B_OUTBYTES))
-+		return -1;
-+
-+	if (!key || !keylen || keylen > BLAKE2B_KEYBYTES)
-+		return -1;
-+
-+	P->digest_length = (u8)outlen;
-+	P->key_length    = (u8)keylen;
-+	P->fanout        = 1;
-+	P->depth         = 1;
-+	put_unaligned_le32(0, &P->leaf_length);
-+	put_unaligned_le32(0, &P->node_offset);
-+	put_unaligned_le32(0, &P->xof_length);
-+	P->node_depth    = 0;
-+	P->inner_length  = 0;
-+	memset(P->reserved, 0, sizeof(P->reserved));
-+	memset(P->salt,     0, sizeof(P->salt));
-+	memset(P->personal, 0, sizeof(P->personal));
-+
-+	if (blake2b_init_param(S, P) < 0)
-+		return -1;
-+
-+	{
-+		u8 block[BLAKE2B_BLOCKBYTES];
-+
-+		memset(block, 0, BLAKE2B_BLOCKBYTES);
-+		memcpy(block, key, keylen);
-+		blake2b_update(S, block, BLAKE2B_BLOCKBYTES);
-+		memzero_explicit(block, BLAKE2B_BLOCKBYTES);
-+	}
-+	return 0;
-+}
-+
-+#define G(r,i,a,b,c,d)                                  \
-+	do {                                            \
-+		a = a + b + m[blake2b_sigma[r][2*i+0]]; \
-+		d = ror64(d ^ a, 32);                   \
-+		c = c + d;                              \
-+		b = ror64(b ^ c, 24);                   \
-+		a = a + b + m[blake2b_sigma[r][2*i+1]]; \
-+		d = ror64(d ^ a, 16);                   \
-+		c = c + d;                              \
-+		b = ror64(b ^ c, 63);                   \
-+	} while(0)
-+
-+#define ROUND(r)                                \
-+	do {                                    \
-+		G(r,0,v[ 0],v[ 4],v[ 8],v[12]); \
-+		G(r,1,v[ 1],v[ 5],v[ 9],v[13]); \
-+		G(r,2,v[ 2],v[ 6],v[10],v[14]); \
-+		G(r,3,v[ 3],v[ 7],v[11],v[15]); \
-+		G(r,4,v[ 0],v[ 5],v[10],v[15]); \
-+		G(r,5,v[ 1],v[ 6],v[11],v[12]); \
-+		G(r,6,v[ 2],v[ 7],v[ 8],v[13]); \
-+		G(r,7,v[ 3],v[ 4],v[ 9],v[14]); \
-+	} while(0)
-+
-+static void blake2b_compress(struct blake2b_state *S,
-+			     const u8 block[BLAKE2B_BLOCKBYTES])
-+{
-+	u64 m[16];
-+	u64 v[16];
-+	size_t i;
-+
-+	for (i = 0; i < 16; ++i)
-+		m[i] = get_unaligned_le64(block + i * sizeof(m[i]));
-+
-+	for (i = 0; i < 8; ++i)
-+		v[i] = S->h[i];
-+
-+	v[ 8] = blake2b_IV[0];
-+	v[ 9] = blake2b_IV[1];
-+	v[10] = blake2b_IV[2];
-+	v[11] = blake2b_IV[3];
-+	v[12] = blake2b_IV[4] ^ S->t[0];
-+	v[13] = blake2b_IV[5] ^ S->t[1];
-+	v[14] = blake2b_IV[6] ^ S->f[0];
-+	v[15] = blake2b_IV[7] ^ S->f[1];
-+
-+	ROUND(0);
-+	ROUND(1);
-+	ROUND(2);
-+	ROUND(3);
-+	ROUND(4);
-+	ROUND(5);
-+	ROUND(6);
-+	ROUND(7);
-+	ROUND(8);
-+	ROUND(9);
-+	ROUND(10);
-+	ROUND(11);
-+
-+	for (i = 0; i < 8; ++i)
-+		S->h[i] = S->h[i] ^ v[i] ^ v[i + 8];
-+}
-+
-+#undef G
-+#undef ROUND
-+
-+int blake2b_update(struct blake2b_state *S, const void *pin, size_t inlen)
-+{
-+	const unsigned char *in = (const unsigned char *)pin;
-+
-+	if (inlen > 0) {
-+		size_t left = S->buflen;
-+		size_t fill = BLAKE2B_BLOCKBYTES - left;
-+
-+		if (inlen > fill) {
-+			S->buflen = 0;
-+			/* Fill buffer */
-+			memcpy(S->buf + left, in, fill);
-+			blake2b_increment_counter(S, BLAKE2B_BLOCKBYTES);
-+			/* Compress */
-+			blake2b_compress(S, S->buf);
-+			in += fill;
-+			inlen -= fill;
-+			while (inlen > BLAKE2B_BLOCKBYTES) {
-+				blake2b_increment_counter(S, BLAKE2B_BLOCKBYTES);
-+				blake2b_compress(S, in);
-+				in += BLAKE2B_BLOCKBYTES;
-+				inlen -= BLAKE2B_BLOCKBYTES;
-+			}
-+		}
-+		memcpy(S->buf + S->buflen, in, inlen);
-+		S->buflen += inlen;
-+	}
-+	return 0;
-+}
-+
-+int blake2b_final(struct blake2b_state *S, void *out, size_t outlen)
-+{
-+	u8 buffer[BLAKE2B_OUTBYTES] = {0};
-+	size_t i;
-+
-+	if (out == NULL || outlen < S->outlen)
-+		return -1;
-+
-+	if (blake2b_is_lastblock(S))
-+		return -1;
-+
-+	blake2b_increment_counter(S, S->buflen);
-+	blake2b_set_lastblock(S);
-+	/* Padding */
-+	memset(S->buf + S->buflen, 0, BLAKE2B_BLOCKBYTES - S->buflen);
-+	blake2b_compress(S, S->buf);
-+
-+	/* Output full hash to temp buffer */
-+	for (i = 0; i < 8; ++i)
-+		put_unaligned_le64(S->h[i], buffer + sizeof(S->h[i]) * i);
-+
-+	memcpy(out, buffer, S->outlen);
-+	memzero_explicit(buffer, sizeof(buffer));
-+	return 0;
-+}
-+
-+struct digest_desc_ctx {
-+	struct blake2b_state S[1];
-+};
-+
-+static int digest_init(struct shash_desc *desc)
-+{
-+	struct digest_desc_ctx *ctx = shash_desc_ctx(desc);
-+	int ret;
-+
-+	ret = blake2b_init(ctx->S, BLAKE2B_OUTBYTES);
-+	if (ret)
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
-+static int digest_update(struct shash_desc *desc, const u8 *data,
-+			 unsigned int length)
-+{
-+	struct digest_desc_ctx *ctx = shash_desc_ctx(desc);
-+	int ret;
-+
-+	ret = blake2b_update(ctx->S, data, length);
-+	if (ret)
-+		return -EINVAL;
-+	return 0;
-+}
-+
-+static int digest_final(struct shash_desc *desc, u8 *out)
-+{
-+	struct digest_desc_ctx *ctx = shash_desc_ctx(desc);
-+	int ret;
-+
-+	ret = blake2b_final(ctx->S, out, BLAKE2B_OUTBYTES);
-+	if (ret)
-+		return -EINVAL;
-+	return 0;
-+}
-+
-+static int digest_finup(struct shash_desc *desc, const u8 *data,
-+			unsigned int len, u8 *out)
-+{
-+	struct digest_desc_ctx *ctx = shash_desc_ctx(desc);
-+	int ret;
-+
-+	ret = blake2b_update(ctx->S, data, len);
-+	if (ret)
-+		return -EINVAL;
-+	ret = blake2b_final(ctx->S, out, BLAKE2B_OUTBYTES);
-+	if (ret)
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
-+static struct shash_alg blake2b_algs[] = {
-+	{
-+		.digestsize		= BLAKE2B_512_DIGEST_SIZE,
-+		.init			= digest_init,
-+		.update			= digest_update,
-+		.final			= digest_final,
-+		.finup			= digest_finup,
-+		.descsize		= sizeof(struct digest_desc_ctx),
-+		.base.cra_name		= "blake2b",
-+		.base.cra_driver_name	= "blake2b-generic",
-+		.base.cra_priority	= 100,
-+		.base.cra_blocksize	= BLAKE2B_BLOCKBYTES,
-+		.base.cra_ctxsize	= 0,
-+		.base.cra_module	= THIS_MODULE,
-+	}, {
-+		.digestsize		= BLAKE2B_160_DIGEST_SIZE,
-+		.init			= digest_init,
-+		.update			= digest_update,
-+		.final			= digest_final,
-+		.finup			= digest_finup,
-+		.descsize		= sizeof(struct digest_desc_ctx),
-+		.base.cra_name		= "blake2b-160",
-+		.base.cra_driver_name	= "blake2b-160-generic",
-+		.base.cra_priority	= 100,
-+		.base.cra_blocksize	= BLAKE2B_BLOCKBYTES,
-+		.base.cra_ctxsize	= 0,
-+		.base.cra_module	= THIS_MODULE,
-+	}, {
-+		.digestsize		= BLAKE2B_256_DIGEST_SIZE,
-+		.init			= digest_init,
-+		.update			= digest_update,
-+		.final			= digest_final,
-+		.finup			= digest_finup,
-+		.descsize		= sizeof(struct digest_desc_ctx),
-+		.base.cra_name		= "blake2b-256",
-+		.base.cra_driver_name	= "blake2b-256-generic",
-+		.base.cra_priority	= 100,
-+		.base.cra_blocksize	= BLAKE2B_BLOCKBYTES,
-+		.base.cra_ctxsize	= 0,
-+		.base.cra_module	= THIS_MODULE,
-+	}, {
-+		.digestsize		= BLAKE2B_384_DIGEST_SIZE,
-+		.init			= digest_init,
-+		.update			= digest_update,
-+		.final			= digest_final,
-+		.finup			= digest_finup,
-+		.descsize		= sizeof(struct digest_desc_ctx),
-+		.base.cra_name		= "blake2b-384",
-+		.base.cra_driver_name	= "blake2b-384-generic",
-+		.base.cra_priority	= 100,
-+		.base.cra_blocksize	= BLAKE2B_BLOCKBYTES,
-+		.base.cra_ctxsize	= 0,
-+		.base.cra_module	= THIS_MODULE,
-+	}, {
-+		.digestsize		= BLAKE2B_512_DIGEST_SIZE,
-+		.init			= digest_init,
-+		.update			= digest_update,
-+		.final			= digest_final,
-+		.finup			= digest_finup,
-+		.descsize		= sizeof(struct digest_desc_ctx),
-+		.base.cra_name		= "blake2b-512",
-+		.base.cra_driver_name	= "blake2b-512-generic",
-+		.base.cra_priority	= 100,
-+		.base.cra_blocksize	= BLAKE2B_BLOCKBYTES,
-+		.base.cra_ctxsize	= 0,
-+		.base.cra_module	= THIS_MODULE,
-+	}
-+};
-+
-+static int __init blake2b_mod_init(void)
-+{
-+	return crypto_register_shashes(blake2b_algs, ARRAY_SIZE(blake2b_algs));
-+}
-+
-+static void __exit blake2b_mod_fini(void)
-+{
-+	crypto_unregister_shashes(blake2b_algs, ARRAY_SIZE(blake2b_algs));
-+}
-+
-+subsys_initcall(blake2b_mod_init);
-+module_exit(blake2b_mod_fini);
-+
-+MODULE_AUTHOR("David Sterba <kdave@kernel.org>");
-+MODULE_DESCRIPTION("BLAKE2b generic implementation");
-+MODULE_LICENSE("GPL");
-+MODULE_ALIAS_CRYPTO("blake2b");
-+MODULE_ALIAS_CRYPTO("blake2b-generic");
-+MODULE_ALIAS_CRYPTO("blake2b-160");
-+MODULE_ALIAS_CRYPTO("blake2b-160-generic");
-+MODULE_ALIAS_CRYPTO("blake2b-256");
-+MODULE_ALIAS_CRYPTO("blake2b-256-generic");
-+MODULE_ALIAS_CRYPTO("blake2b-384");
-+MODULE_ALIAS_CRYPTO("blake2b-384-generic");
-+MODULE_ALIAS_CRYPTO("blake2b-512");
-+MODULE_ALIAS_CRYPTO("blake2b-512-generic");
-diff --git a/include/crypto/blake2b.h b/include/crypto/blake2b.h
-new file mode 100644
-index 000000000000..94020ae6d075
---- /dev/null
-+++ b/include/crypto/blake2b.h
-@@ -0,0 +1,53 @@
-+/* SPDX-License-Identifier: (GPL-2.0-only OR Apache-2.0) */
-+/*
-+ * BLAKE2 reference source code package - reference C implementations
-+ *
-+ * Copyright 2012, Samuel Neves <sneves@dei.uc.pt>.  You may use this under the
-+ * terms of the CC0, the OpenSSL Licence, or the Apache Public License 2.0, at
-+ * your option.  The terms of these licenses can be found at:
-+ *
-+ * - CC0 1.0 Universal : http://creativecommons.org/publicdomain/zero/1.0
-+ * - OpenSSL license   : https://www.openssl.org/source/license.html
-+ * - Apache 2.0        : http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * More information about the BLAKE2 hash function can be found at
-+ * https://blake2.net.
-+*/
-+
-+#ifndef _CRYPTO_BLAKE2B_H
-+#define _CRYPTO_BLAKE2B_H
-+
-+#include <linux/compiler.h>
-+#include <stddef.h>
-+
-+#define BLAKE2B_160_DIGEST_SIZE		(160 / 8)
-+#define BLAKE2B_256_DIGEST_SIZE		(256 / 8)
-+#define BLAKE2B_384_DIGEST_SIZE		(384 / 8)
-+#define BLAKE2B_512_DIGEST_SIZE		(512 / 8)
-+
-+enum blake2b_constant
-+{
-+	BLAKE2B_BLOCKBYTES    = 128,
-+	BLAKE2B_OUTBYTES      = 64,
-+	BLAKE2B_KEYBYTES      = 64,
-+	BLAKE2B_SALTBYTES     = 16,
-+	BLAKE2B_PERSONALBYTES = 16
-+};
-+
-+struct blake2b_state
-+{
-+	u64      h[8];
-+	u64      t[2];
-+	u64      f[2];
-+	u8       buf[BLAKE2B_BLOCKBYTES];
-+	size_t   buflen;
-+	size_t   outlen;
-+	u8       last_node;
-+};
-+
-+int blake2b_init(struct blake2b_state *S, size_t outlen);
-+int blake2b_init_key(struct blake2b_state *S, size_t outlen, const void *key, size_t keylen);
-+int blake2b_update(struct blake2b_state *S, const void *in, size_t inlen);
-+int blake2b_final(struct blake2b_state *S, void *out, size_t outlen);
-+
-+#endif
--- 
-2.23.0
-
+> On Thu, 3 Oct 2019 at 23:26, Gert Robben <t2@gert.gr> wrote:
+>>
+>> Op 03-10-2019 om 15:39 schreef Ard Biesheuvel:
+>>> Commit 79c65d179a40e145 ("crypto: cbc - Convert to skcipher") updated
+>>> the generic CBC template wrapper from a blkcipher to a skcipher algo,
+>>> to get away from the deprecated blkcipher interface. However, as a side
+>>> effect, drivers that instantiate CBC transforms using the blkcipher as
+>>> a fallback no longer work, since skciphers can wrap blkciphers but not
+>>> the other way around. This broke the geode-aes driver.
+>>>
+>>> So let's fix it by moving to the sync skcipher interface when allocating
+>>> the fallback.
+>>>
+>>> Cc: Gert Robben <t2@gert.gr>
+>>> Cc: Jelle de Jong <jelledejong@powercraft.nl>
+>>> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+>>> ---
+>>> Gert, Jelle,
+>>>
+>>> If you can, please try this patch and report back to the list if it solves
+>>> the Geode issue for you.
+>>
+>> Thanks for the patch!
+>> I tried it on Alix 2C2 / Geode LX800 with Linux 5.4-rc1 (also 5.1-5.3 fwiw).
+>>
+>> At least now openssl doesn't give those errors anymore.
+>> (openssl speed -evp aes-128-cbc -elapsed -engine afalg)
+>> But looking at the results (<6MB/s), apparently it's not using geode-aes
+>> (>30MB/s?).
+>> In dmesg can be seen:
+>>
+>> alg: skcipher: ecb-aes-geode encryption test failed (wrong result) on
+>> test vector 1, cfg="out-of-place"
+>> alg: skcipher: cbc-aes-geode encryption test failed (wrong result) on
+>> test vector 2, cfg="out-of-place"
+>> Geode LX AES 0000:00:01.2: GEODE AES engine enabled.
+>>
+>> In /proc/crypto, drivers cbc-aes-geode/ecb-aes-geode are listed with
+>> "selftest: unknown". Driver "geode-aes" has "selftest: passed".
+>>
+>> I'm happy to test other patches.
+> 
+> Oops, mistake there on my part
+> 
+> Can you replace the two instances of
+> 
+> skcipher_request_set_crypt(req, dst, src, nbytes, desc->info);
+> 
+> with
+> 
+> skcipher_request_set_crypt(req, src, dst, nbytes, desc->info);
+> 
+> please?
+> 
+> 
