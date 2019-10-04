@@ -2,73 +2,121 @@ Return-Path: <SRS0=x16Q=X5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20CE5C4360C
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 13:21:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB36DC47404
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 13:29:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E34DF207FF
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 13:21:27 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="HsM1i/jK"
+	by mail.kernel.org (Postfix) with ESMTP id A86AF207FF
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 13:29:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388313AbfJDNV1 (ORCPT
+        id S2388313AbfJDN3i (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Oct 2019 09:21:27 -0400
-Received: from frisell.zx2c4.com ([192.95.5.64]:47015 "EHLO frisell.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388393AbfJDNVZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Oct 2019 09:21:25 -0400
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id de9def0d;
-        Fri, 4 Oct 2019 12:34:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=date:from:to
-        :cc:subject:message-id:references:mime-version:content-type
-        :in-reply-to; s=mail; bh=6XfAux8GapWPe/AoEu/Dh2tX5BI=; b=HsM1i/j
-        KK+5e+qKSydagNLOhs00fnm4L7eqBYEMjmZEXbUSRq/fR0biea6UG4vzPLLyZlGh
-        /mSmJ63j3zMu4nfkzePNG/srv0rJPhG0ZRPOoAtl2whGiLDoRcjPpzWlnyy5OC09
-        sjGHLDTM4AB0wOopAJ+OjTskyB6b70QFWdaW0PPBImkosEGWd3mdUKlSSe+Gu4NK
-        xSi7J3tNMMahBf4xzfsRnFZ12wi7wxkuhHksvITlA4m3Y473/ovMLq5HsWTBQF3q
-        i1dJSn/oKv5y1Q/msHbBO2KqWS3oOQx/1+faWHMHbwbncafgyk84+BlrpBzOutEv
-        P/bMfTUCYfRMO9Q==
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ff86fe27 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
-        Fri, 4 Oct 2019 12:34:29 +0000 (UTC)
-Date:   Fri, 4 Oct 2019 15:21:17 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+        Fri, 4 Oct 2019 09:29:38 -0400
+Received: from relay8-d.mail.gandi.net ([217.70.183.201]:35301 "EHLO
+        relay8-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387917AbfJDN3i (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Oct 2019 09:29:38 -0400
+X-Originating-IP: 193.36.116.148
+Received: from d.localdomain (unknown [193.36.116.148])
+        (Authenticated sender: out@gert.gr)
+        by relay8-d.mail.gandi.net (Postfix) with ESMTPSA id 8CA771BF206;
+        Fri,  4 Oct 2019 13:29:34 +0000 (UTC)
+Subject: Re: [PATCH] crypto: geode-aes - switch to skcipher for cbc(aes)
+ fallback
 To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     linux-crypto@vger.kernel.org,
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Samuel Neves <sneves@dei.uc.pt>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Eric Biggers <ebiggers@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Martin Willi <martin@strongswan.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: Re: [PATCH v2 01/20] crypto: chacha - move existing library code
- into lib/crypto
-Message-ID: <20191004132117.GB112631@zx2c4.com>
-References: <20191002141713.31189-1-ard.biesheuvel@linaro.org>
- <20191002141713.31189-2-ard.biesheuvel@linaro.org>
+        Jelle de Jong <jelledejong@powercraft.nl>
+References: <20191003133921.29344-1-ard.biesheuvel@linaro.org>
+ <64d5c8ec-41c5-1ef2-cc4b-a050bf4c48ba@gert.gr>
+ <CAKv+Gu8htzzdi5=4z5-E5o+J+bAPO=N4dR75Se=3JOZw8P_tDA@mail.gmail.com>
+From:   Gert Robben <t2@gert.gr>
+Message-ID: <decd3196-8679-7298-7967-25cb231357fb@gert.gr>
+Date:   Fri, 4 Oct 2019 15:29:33 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20191002141713.31189-2-ard.biesheuvel@linaro.org>
+In-Reply-To: <CAKv+Gu8htzzdi5=4z5-E5o+J+bAPO=N4dR75Se=3JOZw8P_tDA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: nl-NL
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 02, 2019 at 04:16:54PM +0200, Ard Biesheuvel wrote:
->  
->  	chacha_permute(x, nrounds);
+Op 04-10-2019 om 08:16 schreef Ard Biesheuvel:
+> On Thu, 3 Oct 2019 at 23:26, Gert Robben <t2@gert.gr> wrote:
+>> Op 03-10-2019 om 15:39 schreef Ard Biesheuvel:
+>>> Commit 79c65d179a40e145 ("crypto: cbc - Convert to skcipher") updated
+>>> the generic CBC template wrapper from a blkcipher to a skcipher algo,
+>>> to get away from the deprecated blkcipher interface. However, as a side
+>>> effect, drivers that instantiate CBC transforms using the blkcipher as
+>>> a fallback no longer work, since skciphers can wrap blkciphers but not
+>>> the other way around. This broke the geode-aes driver.
+>>>
+>>> So let's fix it by moving to the sync skcipher interface when allocating
+>>> the fallback.
+>>>
+>>> Cc: Gert Robben <t2@gert.gr>
+>>> Cc: Jelle de Jong <jelledejong@powercraft.nl>
+>>> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+>>> ---
+>>> Gert, Jelle,
+>>>
+>>> If you can, please try this patch and report back to the list if it solves
+>>> the Geode issue for you.
+>>
+>> Thanks for the patch!
+>> I tried it on Alix 2C2 / Geode LX800 with Linux 5.4-rc1 (also 5.1-5.3 fwiw).
+>>
+>> At least now openssl doesn't give those errors anymore.
+>> (openssl speed -evp aes-128-cbc -elapsed -engine afalg)
+>> But looking at the results (<6MB/s), apparently it's not using geode-aes
+>> (>30MB/s?).
+>> In dmesg can be seen:
+>>
+>> alg: skcipher: ecb-aes-geode encryption test failed (wrong result) on
+>> test vector 1, cfg="out-of-place"
+>> alg: skcipher: cbc-aes-geode encryption test failed (wrong result) on
+>> test vector 2, cfg="out-of-place"
+>> Geode LX AES 0000:00:01.2: GEODE AES engine enabled.
+>>
+>> In /proc/crypto, drivers cbc-aes-geode/ecb-aes-geode are listed with
+>> "selftest: unknown". Driver "geode-aes" has "selftest: passed".
+>>
+>> I'm happy to test other patches.
+> 
+> Oops, mistake there on my part
+> 
+> Can you replace the two instances of
+> 
+> skcipher_request_set_crypt(req, dst, src, nbytes, desc->info);
+> 
+> with
+> 
+> skcipher_request_set_crypt(req, src, dst, nbytes, desc->info);
+> 
+> please?
 
-Interested in porting my single-statement unrolled implementation from
-Zinc to this? I did see performance improvements on various platforms.
+Yes, with that change, now it works in 5.4-rc1:
+
+# openssl speed -evp aes-128-cbc -elapsed -engine afalg
+- - - 8< - - -
+The 'numbers' are in 1000s of bytes per second processed.
+type             16 bytes     64 bytes    256 bytes   1024 bytes   8192 
+bytes  16384 bytes
+aes-128-cbc        125.63k      499.39k     1858.18k     6377.00k 
+25753.93k    31167.08k
+
+I also quickly tried nginx https, that seems to transfer a file correctly.
+And a bit faster, but not by this much, I have to look into that further.
+For now I assume the kernel part seems to be working fine.
+
+Thanks, much appreciated!
+Gert
