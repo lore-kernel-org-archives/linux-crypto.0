@@ -6,70 +6,47 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C7E2C47404
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 15:44:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BC36C47404
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 15:45:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0159A20830
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 15:44:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 082D62133F
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 15:45:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390031AbfJDPoy (ORCPT
+        id S2390044AbfJDPpA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Oct 2019 11:44:54 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:42614 "EHLO fornost.hmeau.com"
+        Fri, 4 Oct 2019 11:45:00 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:42622 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389669AbfJDPoy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Oct 2019 11:44:54 -0400
+        id S2389669AbfJDPpA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Oct 2019 11:45:00 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1iGPkl-0001RR-QK; Sat, 05 Oct 2019 01:44:24 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 05 Oct 2019 01:44:20 +1000
-Date:   Sat, 5 Oct 2019 01:44:20 +1000
+        id 1iGPlE-0001Sy-Ej; Sat, 05 Oct 2019 01:44:53 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 05 Oct 2019 01:44:52 +1000
+Date:   Sat, 5 Oct 2019 01:44:52 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Arnd Bergmann <arnd@arndb.de>
+To:     Eneas U de Queiroz <cotequeiroz@gmail.com>
 Cc:     "David S. Miller" <davem@davemloft.net>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Kenneth Lee <liguozhu@hisilicon.com>,
-        John Garry <john.garry@huawei.com>,
-        Mao Wenan <maowenan@huawei.com>,
-        Hao Fang <fanghao11@huawei.com>,
-        Shiju Jose <shiju.jose@huawei.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] [v2] crypto: hisilicon - allow compile-testing on x86
-Message-ID: <20191004154420.GW5148@gondor.apana.org.au>
-References: <20190919140650.1289963-2-arnd@arndb.de>
- <20190919140917.1290556-1-arnd@arndb.de>
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] crypto: qce - add CRYPTO_ALG_KERN_DRIVER_ONLY flag
+Message-ID: <20191004154452.GZ5148@gondor.apana.org.au>
+References: <20190919213302.9174-1-cotequeiroz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190919140917.1290556-1-arnd@arndb.de>
+In-Reply-To: <20190919213302.9174-1-cotequeiroz@gmail.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Sep 19, 2019 at 04:09:06PM +0200, Arnd Bergmann wrote:
-> To avoid missing arm64 specific warnings that get introduced
-> in this driver, allow compile-testing on all 64-bit architectures.
+On Thu, Sep 19, 2019 at 06:33:02PM -0300, Eneas U de Queiroz wrote:
+> Set the CRYPTO_ALG_KERN_DRIVER_ONLY flag to all algorithms exposed by
+> the qce driver, since they are all hardware accelerated, accessible
+> through a kernel driver only, and not available directly to userspace.
 > 
-> The only actual arm64 specific code in this driver is an open-
-> coded 128 bit MMIO write. On non-arm64 the same can be done
-> using memcpy_toio. What I also noticed is that the mmio store
-> (either one) is not endian-safe, this will only work on little-
-> endian configurations, so I also add a Kconfig dependency on
-> that, regardless of the architecture.
-> Finally, a depenndecy on CONFIG_64BIT is needed because of the
-> writeq().
-> 
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
-> v2: actually add !CPU_BIG_ENDIAN dependency as described in the
-> changelog
-> ---
->  drivers/crypto/hisilicon/Kconfig | 9 ++++++---
->  drivers/crypto/hisilicon/qm.c    | 6 ++++++
->  2 files changed, 12 insertions(+), 3 deletions(-)
+> Signed-off-by: Eneas U de Queiroz <cotequeiroz@gmail.com>
 
 Patch applied.  Thanks.
 -- 
