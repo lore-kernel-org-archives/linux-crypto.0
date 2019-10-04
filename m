@@ -2,101 +2,147 @@ Return-Path: <SRS0=x16Q=X5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66D8CC4360C
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 19:35:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51207C4360C
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 19:38:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3E2A4215EA
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 19:35:05 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KfPgoQZi"
+	by mail.kernel.org (Postfix) with ESMTP id 27F2121D81
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 19:38:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1570217883;
+	bh=WemuqPcE3tQTzUxvDRTlsK9oVDXn+rpSmX0VKv3SLSk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=GhQP9SAp24e7phHb54x7G1mJJoljSA3q8DZmMbptnuPtZSsCKPjtMUxGK839Yw0LM
+	 ceODTqVz79zL83uQfHnKgD1H4FbzdZkiMCmBTYIwNjey3LJ+sNQ3Z9bZUJSlhpef8M
+	 41+fTneS6e2qpJAIZi0OOwv7MuqwzREcU+8FmjSM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729634AbfJDTfE (ORCPT
+        id S1727795AbfJDTiC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Oct 2019 15:35:04 -0400
-Received: from mail-io1-f66.google.com ([209.85.166.66]:36406 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725932AbfJDTfE (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Oct 2019 15:35:04 -0400
-Received: by mail-io1-f66.google.com with SMTP id b136so16026274iof.3;
-        Fri, 04 Oct 2019 12:35:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=YUxdWoMjBc3fq7ZEjHVbfnvWMNYpsAW2uL8SUTPJJOk=;
-        b=KfPgoQZiuCc2H7qvFQGzN/Y3EGPnFsu/TLq9CSR8tecMTpa9YL5eWsqgES34oDbm/Z
-         tBCmz9oK9X/m4/+VrPKpX573tizGffhrsfpuA+Fq69Y2qLjGgld9HOjAHd01oZ83u+Oe
-         IfpTdiUjqLS2q1WMSLKP4SYO6lGOL2hAK3fuICIkeFaCYYGEBCZ2DyuGyNv2KTqUkk7I
-         KQb1aZ8FaukkgvjqFvRKzmxBX1EAfsP/eODyKd0CEqnIZdQbkd0Y6geyteNUOKSTNqcn
-         /XpZgD+IsGXz2qWx9KTOw6csMacDX9jweaZEo3BHAZO4XGnVw+LP8rKJvYE92arFNI4q
-         +LLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=YUxdWoMjBc3fq7ZEjHVbfnvWMNYpsAW2uL8SUTPJJOk=;
-        b=MZTiefsa/zD0rlKyJnXaNkjhKxyXM1RPbiOfRsBzjAXppzdpVXEsMuoNuMbb7UL0XD
-         StXE1INBYwfkI73zbAuORpk1uc3QBCg0KUc6/FT8QWdwM6pVw3g0pWbwPcnA3YhdqbTk
-         0XWZReG3dHpnGJ+HjFibx9C5K2a5pTK2zAXRfXgJvSLWuhLdI26dNRjOdqmwW02tAThC
-         Z86x/deIZhaQiRbpDadvJVNEx7tRQ0TT1d27Rf93LQStQ5vJW01jA5g//b8D5aB1Q4md
-         mqI61eE+ughOjC7Ef3gIldPML4dtt/zOjR45rFV078yk8vaefDXDqdVnXIL309NOfiRj
-         iGPg==
-X-Gm-Message-State: APjAAAWuXZ3QkwcdijV+oJ20x5WQPqQsko2OjLI/I2ZE5tL5mXtDiZ9P
-        Kn6oGyHFRVspaJiNUH3WmBs=
-X-Google-Smtp-Source: APXvYqxdxqTqNQ2D2g2hs/N3xw+sie1sFybvZM7Bv8s50eW0Wl4EA5uLHeMeKaifDlU11aRt9jEhKg==
-X-Received: by 2002:a5d:88d1:: with SMTP id i17mr14654011iol.235.1570217702565;
-        Fri, 04 Oct 2019 12:35:02 -0700 (PDT)
-Received: from cs-dulles.cs.umn.edu (cs-dulles.cs.umn.edu. [128.101.35.54])
-        by smtp.googlemail.com with ESMTPSA id t8sm3372621ild.7.2019.10.04.12.35.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Oct 2019 12:35:01 -0700 (PDT)
-From:   Navid Emamdoost <navid.emamdoost@gmail.com>
-Cc:     emamd001@umn.edu, kjlu@umn.edu, smccaman@umn.edu,
-        Navid Emamdoost <navid.emamdoost@gmail.com>,
+        Fri, 4 Oct 2019 15:38:02 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40718 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725932AbfJDTiC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Oct 2019 15:38:02 -0400
+Received: from gmail.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id F174F215EA;
+        Fri,  4 Oct 2019 19:38:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1570217881;
+        bh=WemuqPcE3tQTzUxvDRTlsK9oVDXn+rpSmX0VKv3SLSk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=kyGO/jAGtqk7t/RQseX+wLZp8LA8UXcIAPntAWXA5EtKG+DjJBU1U9oJiPKn+SaEu
+         Z3z/iVOdxKvoPBlDzzGMkDJXIupqI4888OxqAk2EJDKQBeUksfBRbLApO2erC4hC4M
+         rW0WkcyR4ieQrv5inH01qKQnfvmia0V8gW5f6ABw=
+Date:   Fri, 4 Oct 2019 12:37:59 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Gert Robben <t2@gert.gr>
+Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: user - fix memory leak in crypto_reportstat
-Date:   Fri,  4 Oct 2019 14:34:54 -0500
-Message-Id: <20191004193455.18348-1-navid.emamdoost@gmail.com>
-X-Mailer: git-send-email 2.17.1
-To:     unlisted-recipients:; (no To-header on input)
+        Jelle de Jong <jelledejong@powercraft.nl>
+Subject: Re: [PATCH] crypto: geode-aes - switch to skcipher for cbc(aes)
+ fallback
+Message-ID: <20191004193758.GA244757@gmail.com>
+Mail-Followup-To: Gert Robben <t2@gert.gr>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jelle de Jong <jelledejong@powercraft.nl>
+References: <20191003133921.29344-1-ard.biesheuvel@linaro.org>
+ <64d5c8ec-41c5-1ef2-cc4b-a050bf4c48ba@gert.gr>
+ <CAKv+Gu8htzzdi5=4z5-E5o+J+bAPO=N4dR75Se=3JOZw8P_tDA@mail.gmail.com>
+ <decd3196-8679-7298-7967-25cb231357fb@gert.gr>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <decd3196-8679-7298-7967-25cb231357fb@gert.gr>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In crypto_reportstat, a new skb is created by nlmsg_new(). This skb is
-leaked if crypto_reportstat_alg() fails. Required release for skb is
-added.
+On Fri, Oct 04, 2019 at 03:29:33PM +0200, Gert Robben wrote:
+> Op 04-10-2019 om 08:16 schreef Ard Biesheuvel:
+> > On Thu, 3 Oct 2019 at 23:26, Gert Robben <t2@gert.gr> wrote:
+> > > Op 03-10-2019 om 15:39 schreef Ard Biesheuvel:
+> > > > Commit 79c65d179a40e145 ("crypto: cbc - Convert to skcipher") updated
+> > > > the generic CBC template wrapper from a blkcipher to a skcipher algo,
+> > > > to get away from the deprecated blkcipher interface. However, as a side
+> > > > effect, drivers that instantiate CBC transforms using the blkcipher as
+> > > > a fallback no longer work, since skciphers can wrap blkciphers but not
+> > > > the other way around. This broke the geode-aes driver.
+> > > > 
+> > > > So let's fix it by moving to the sync skcipher interface when allocating
+> > > > the fallback.
+> > > > 
+> > > > Cc: Gert Robben <t2@gert.gr>
+> > > > Cc: Jelle de Jong <jelledejong@powercraft.nl>
+> > > > Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> > > > ---
+> > > > Gert, Jelle,
+> > > > 
+> > > > If you can, please try this patch and report back to the list if it solves
+> > > > the Geode issue for you.
+> > > 
+> > > Thanks for the patch!
+> > > I tried it on Alix 2C2 / Geode LX800 with Linux 5.4-rc1 (also 5.1-5.3 fwiw).
+> > > 
+> > > At least now openssl doesn't give those errors anymore.
+> > > (openssl speed -evp aes-128-cbc -elapsed -engine afalg)
+> > > But looking at the results (<6MB/s), apparently it's not using geode-aes
+> > > (>30MB/s?).
+> > > In dmesg can be seen:
+> > > 
+> > > alg: skcipher: ecb-aes-geode encryption test failed (wrong result) on
+> > > test vector 1, cfg="out-of-place"
+> > > alg: skcipher: cbc-aes-geode encryption test failed (wrong result) on
+> > > test vector 2, cfg="out-of-place"
+> > > Geode LX AES 0000:00:01.2: GEODE AES engine enabled.
+> > > 
+> > > In /proc/crypto, drivers cbc-aes-geode/ecb-aes-geode are listed with
+> > > "selftest: unknown". Driver "geode-aes" has "selftest: passed".
+> > > 
+> > > I'm happy to test other patches.
+> > 
+> > Oops, mistake there on my part
+> > 
+> > Can you replace the two instances of
+> > 
+> > skcipher_request_set_crypt(req, dst, src, nbytes, desc->info);
+> > 
+> > with
+> > 
+> > skcipher_request_set_crypt(req, src, dst, nbytes, desc->info);
+> > 
+> > please?
+> 
+> Yes, with that change, now it works in 5.4-rc1:
+> 
+> # openssl speed -evp aes-128-cbc -elapsed -engine afalg
+> - - - 8< - - -
+> The 'numbers' are in 1000s of bytes per second processed.
+> type             16 bytes     64 bytes    256 bytes   1024 bytes   8192
+> bytes  16384 bytes
+> aes-128-cbc        125.63k      499.39k     1858.18k     6377.00k 25753.93k
+> 31167.08k
+> 
+> I also quickly tried nginx https, that seems to transfer a file correctly.
+> And a bit faster, but not by this much, I have to look into that further.
+> For now I assume the kernel part seems to be working fine.
+> 
+> Thanks, much appreciated!
+> Gert
 
-Fixes: cac5818c25d0 ("crypto: user - Implement a generic crypto statistics")
-Signed-off-by: Navid Emamdoost <navid.emamdoost@gmail.com>
----
- crypto/crypto_user_stat.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/crypto/crypto_user_stat.c b/crypto/crypto_user_stat.c
-index 8bad88413de1..1be95432fa23 100644
---- a/crypto/crypto_user_stat.c
-+++ b/crypto/crypto_user_stat.c
-@@ -328,8 +328,10 @@ int crypto_reportstat(struct sk_buff *in_skb, struct nlmsghdr *in_nlh,
- drop_alg:
- 	crypto_mod_put(alg);
- 
--	if (err)
-+	if (err) {
-+		kfree_skb(skb);
- 		return err;
-+	}
- 
- 	return nlmsg_unicast(net->crypto_nlsk, skb, NETLINK_CB(in_skb).portid);
- }
--- 
-2.17.1
+Can you check whether it passes the extra self-tests too?  I.e. enable
+CONFIG_CRYPTO_MANAGER_EXTRA_TESTS.
 
+- Eric
