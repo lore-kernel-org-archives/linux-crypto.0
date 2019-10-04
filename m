@@ -6,35 +6,35 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99D1BC4360C
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 13:16:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20CE5C4360C
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 13:21:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6D71F222C4
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 13:16:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E34DF207FF
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 13:21:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="kLeufadS"
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="HsM1i/jK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388246AbfJDNQY (ORCPT
+        id S2388313AbfJDNV1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Oct 2019 09:16:24 -0400
-Received: from frisell.zx2c4.com ([192.95.5.64]:56733 "EHLO frisell.zx2c4.com"
+        Fri, 4 Oct 2019 09:21:27 -0400
+Received: from frisell.zx2c4.com ([192.95.5.64]:47015 "EHLO frisell.zx2c4.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388234AbfJDNQY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Oct 2019 09:16:24 -0400
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 2383115b;
-        Fri, 4 Oct 2019 12:29:28 +0000 (UTC)
+        id S2388393AbfJDNVZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Oct 2019 09:21:25 -0400
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id de9def0d;
+        Fri, 4 Oct 2019 12:34:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=date:from:to
         :cc:subject:message-id:references:mime-version:content-type
-        :in-reply-to; s=mail; bh=ZzuTVC/SsCvt7l1FZ6cDBDQzGk8=; b=kLeufad
-        Sjn/8MzGTXdc7O4UHkSWhHE1wg5gs2wkWT8yoTjR1ClWl408Ry1B3B4cRbBCF2Il
-        hmyPBckVDU2KIDPGZAoVRwRe/NJmvwXEaHhUNIHfdMsnRODXmhP9NUGrFnC9PJXo
-        KTs6lIIlgf2ARSYvmWCCTaepIcIzwXI4FObKWfhATKHNt+wnaRU/HyAUwkRSoxi+
-        gnEAGIk1F5BRNmHtqvE0tVqGLBPOQIy/JRD4Xh5QIg572c8mWUi3E4aHX3uLJKfX
-        Wm7PKWxfA8aZcNCNGbgXraXJRFLP+7VlfN1A49HVRIEuMgzxjtXfykiCM5/vXEBV
-        8oEH6RpRvpS/+fA==
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id afcaba72 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
-        Fri, 4 Oct 2019 12:29:28 +0000 (UTC)
-Date:   Fri, 4 Oct 2019 15:16:15 +0200
+        :in-reply-to; s=mail; bh=6XfAux8GapWPe/AoEu/Dh2tX5BI=; b=HsM1i/j
+        KK+5e+qKSydagNLOhs00fnm4L7eqBYEMjmZEXbUSRq/fR0biea6UG4vzPLLyZlGh
+        /mSmJ63j3zMu4nfkzePNG/srv0rJPhG0ZRPOoAtl2whGiLDoRcjPpzWlnyy5OC09
+        sjGHLDTM4AB0wOopAJ+OjTskyB6b70QFWdaW0PPBImkosEGWd3mdUKlSSe+Gu4NK
+        xSi7J3tNMMahBf4xzfsRnFZ12wi7wxkuhHksvITlA4m3Y473/ovMLq5HsWTBQF3q
+        i1dJSn/oKv5y1Q/msHbBO2KqWS3oOQx/1+faWHMHbwbncafgyk84+BlrpBzOutEv
+        P/bMfTUCYfRMO9Q==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ff86fe27 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
+        Fri, 4 Oct 2019 12:34:29 +0000 (UTC)
+Date:   Fri, 4 Oct 2019 15:21:17 +0200
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
 To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Cc:     linux-crypto@vger.kernel.org,
@@ -52,42 +52,23 @@ Cc:     linux-crypto@vger.kernel.org,
         Martin Willi <martin@strongswan.org>,
         Peter Zijlstra <peterz@infradead.org>,
         Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: Re: [PATCH v2 00/20] crypto: crypto API library interfaces for
- WireGuard
-Message-ID: <20191004131615.GA112631@zx2c4.com>
+Subject: Re: [PATCH v2 01/20] crypto: chacha - move existing library code
+ into lib/crypto
+Message-ID: <20191004132117.GB112631@zx2c4.com>
 References: <20191002141713.31189-1-ard.biesheuvel@linaro.org>
+ <20191002141713.31189-2-ard.biesheuvel@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20191002141713.31189-1-ard.biesheuvel@linaro.org>
+In-Reply-To: <20191002141713.31189-2-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Ard,
+On Wed, Oct 02, 2019 at 04:16:54PM +0200, Ard Biesheuvel wrote:
+>  
+>  	chacha_permute(x, nrounds);
 
-On Wed, Oct 02, 2019 at 04:16:53PM +0200, Ard Biesheuvel wrote:
-> This is a followup to RFC 'crypto: wireguard with crypto API library interface'
-> [0]. Since no objections were raised to my approach, I've proceeded to fix up
-> some minor issues, and incorporate [most of] the missing MIPS code.
-> 
-> Changes since RFC/v1:
-> - dropped the WireGuard patch itself, and the followup patches - since the
->   purpose was to illustrate the extent of the required changes, there is no
->   reason to keep including them.
-> - import the MIPS 32r2 versions of ChaCha and Poly1305, but expose both the
->   crypto API and library interfaces so that not only WireGuard but also IPsec
->   and Adiantum can benefit immediately. (The latter required adding support for
->   the reduced round version of ChaCha to the MIPS asm code)
-> - fix up various minor kconfig/build issues found in randconfig testing
->   (thanks Arnd!)
-
-Thanks for working on this. By wiring up the accelerated primitives,
-you're essentially implementing Zinc, and I expect that by the end of
-this, we'll wind up with something pretty close to where I started, with
-the critical difference that the directory names are different. Despite
-my initial email about WireGuard moving to the crypto API, it sounds
-like in the end it is likely to stay with Zinc, just without that name.
-
-Jason
+Interested in porting my single-statement unrolled implementation from
+Zinc to this? I did see performance improvements on various platforms.
