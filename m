@@ -6,60 +6,59 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E975FC4360C
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 15:41:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C995BC47404
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 15:42:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C6FE72133F
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 15:41:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D08C20830
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 15:42:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389628AbfJDPls (ORCPT
+        id S2389917AbfJDPmH (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Oct 2019 11:41:48 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:42494 "EHLO fornost.hmeau.com"
+        Fri, 4 Oct 2019 11:42:07 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:42506 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389131AbfJDPls (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Oct 2019 11:41:48 -0400
+        id S2389690AbfJDPmH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Oct 2019 11:42:07 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1iGPiA-0001Ja-HB; Sat, 05 Oct 2019 01:41:43 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 05 Oct 2019 01:41:40 +1000
-Date:   Sat, 5 Oct 2019 01:41:40 +1000
+        id 1iGPiQ-0001KC-Ef; Sat, 05 Oct 2019 01:41:59 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 05 Oct 2019 01:41:58 +1000
+Date:   Sat, 5 Oct 2019 01:41:58 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Pascal van Leeuwen <pascalvanl@gmail.com>
 Cc:     linux-crypto@vger.kernel.org, antoine.tenart@bootlin.com,
         davem@davemloft.net,
         Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
-Subject: Re: [PATCH 0/2] crypto: inside-secure: [URGENT] Fix stability issue
-Message-ID: <20191004154140.GO5148@gondor.apana.org.au>
-References: <1568714119-29945-1-git-send-email-pvanleeuwen@verimatrix.com>
+Subject: Re: [PATCH 0/3] crypto: inside-secure - Add ESP GCM/GMAC/CCM variants
+Message-ID: <20191004154158.GP5148@gondor.apana.org.au>
+References: <1568714881-30426-1-git-send-email-pvanleeuwen@verimatrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1568714119-29945-1-git-send-email-pvanleeuwen@verimatrix.com>
+In-Reply-To: <1568714881-30426-1-git-send-email-pvanleeuwen@verimatrix.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Sep 17, 2019 at 11:55:17AM +0200, Pascal van Leeuwen wrote:
-> This patchset fixes some issues with the TRC RAM probing that caused
-> instability (random failures) on the Macchiatobin board and incorrect
-> configuration of the TRC for some other corner case RAM configuration.
+On Tue, Sep 17, 2019 at 12:07:58PM +0200, Pascal van Leeuwen wrote:
+> This patchset adds support for the rfc4106(gcm(aes)), rfc4543(gcm(aes))
+> and rfc4309(ccm(aes)) ciphersuites intended for IPsec ESP acceleration.
 > 
-> The patchset has been tested with the eip197c_iewxkbc configuration with
-> 163840 bytes of TRC data RAM and 4096 words of TRC admin RAM on the
-> Xilinx VCU118 development board as well as on the Macchiatobin board
-> (Marvell A8K: EIP197b-ieswx w/ 15350 bytes data RAM & 80 words admin RAM),
+> The patchset has been tested with the eip197c_iewxkbc configuration on the
+> Xilinx VCU118 development boardi as well as on the Macchiatobin board,
 > including the testmgr extra tests.
 > 
-> Pascal van Leeuwen (2):
->   crypto: inside-secure: [URGENT] Fix stability issue with Macchiatobin
->   crypto: inside-secure - Fixed corner case TRC admin RAM probing issue
+> Pascal van Leeuwen (3):
+>   crypto: inside-secure - Added support for the rfc4106(gcm(aes)) AEAD
+>   crypto: inside-secure - Added support for the rfc4543(gcm(aes)) "AEAD"
+>   crypto: inside-secure - Added support for the rfc4309(ccm(aes)) AEAD
 > 
->  drivers/crypto/inside-secure/safexcel.c | 52 +++++++++++++++++++++------------
->  drivers/crypto/inside-secure/safexcel.h |  2 ++
->  2 files changed, 36 insertions(+), 18 deletions(-)
+>  drivers/crypto/inside-secure/safexcel.c        |   3 +
+>  drivers/crypto/inside-secure/safexcel.h        |   8 +-
+>  drivers/crypto/inside-secure/safexcel_cipher.c | 355 ++++++++++++++++++++-----
+>  3 files changed, 295 insertions(+), 71 deletions(-)
 
 All applied.  Thanks.
 -- 
