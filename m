@@ -6,35 +6,35 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5370BC47404
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 13:57:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25020C4360C
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 14:01:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1BF7E20700
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 13:57:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF7CC222C4
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 14:01:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="xOi5Gjcr"
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="m83opc3T"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388333AbfJDN56 (ORCPT
+        id S2389039AbfJDOBF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Oct 2019 09:57:58 -0400
-Received: from frisell.zx2c4.com ([192.95.5.64]:55589 "EHLO frisell.zx2c4.com"
+        Fri, 4 Oct 2019 10:01:05 -0400
+Received: from frisell.zx2c4.com ([192.95.5.64]:54599 "EHLO frisell.zx2c4.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387917AbfJDN56 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Oct 2019 09:57:58 -0400
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 9674039d;
-        Fri, 4 Oct 2019 13:11:03 +0000 (UTC)
+        id S2388417AbfJDOBF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Oct 2019 10:01:05 -0400
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 684a1077;
+        Fri, 4 Oct 2019 13:14:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=date:from:to
         :cc:subject:message-id:references:mime-version:content-type
-        :in-reply-to; s=mail; bh=CFB8npzS86sT0MXoeS6VCr+U7ps=; b=xOi5Gjc
-        rQo5O8Y7JDJUErVFK1vT5YRr9g+WRkaBnG0BvW9hN0T6u5k6uexQku/t23M1C745
-        WnuQiKNcBZ5rRNMdu+5w8BPLdjyVCE5GuYCK/vJtfqPwylyBklMeDSbwIhFruSeW
-        Z2MCI8dSx8AngVtgR1gYmKQXnRB7cddnCtKqVV+O9MSdoZkPX1rSYVRtjMwtdFSg
-        px1mE5+q73VootCZet96TvdeGuO8XU9F5PK624n1dHwUYaO/uWQ4N32G1XdZqaJQ
-        nGIhTwDZMujGtG2gqi7B03Dht9mf2WdR+S/9GoI0xo7GHJp7ZwtEHaaws6/RPSG1
-        FE00BtaJrTsYMSQ==
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 343e1c5e (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
-        Fri, 4 Oct 2019 13:11:02 +0000 (UTC)
-Date:   Fri, 4 Oct 2019 15:57:50 +0200
+        :in-reply-to; s=mail; bh=pE4whhF1RHvIuHUbJe/EDlxqfZg=; b=m83opc3
+        T/n0LM8cUqfND7dsNHp/h/JdHn67Z6IYtrrotfRg9KCioQbLbjzzaTxgYPF5naNx
+        SSQSesvIByC0y7iVH3z98fyCXfOHi8X77ZxU3OuVna87x0I6nBEupo+Daq2rVCkt
+        y5//abKYVGokYCqlFeQqudmMu7jUBIpvQIBSYwju87afjkZGzn3Ei6hCKY0iA5Wb
+        xAzwuIWXe0GHwX6E7k/rWj8biZix0z+hXRIJr76sQNWX8bDTxwVDpaQ8lF/JG9nX
+        kK3nwkSCSaT/Jj8dxmWjvWZ0gn3XEdR9HpFuEVN3sRTu8hHuep6HcO6ZAQyEaIr9
+        GDBdfQxiFdaEnSQ==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id c7e08c3e (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
+        Fri, 4 Oct 2019 13:14:09 +0000 (UTC)
+Date:   Fri, 4 Oct 2019 16:00:57 +0200
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
 To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Cc:     linux-crypto@vger.kernel.org,
@@ -52,41 +52,40 @@ Cc:     linux-crypto@vger.kernel.org,
         Martin Willi <martin@strongswan.org>,
         Peter Zijlstra <peterz@infradead.org>,
         Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: Re: [PATCH v2 14/20] crypto: Curve25519 - generic C library
- implementations and selftest
-Message-ID: <20191004135750.GA114360@zx2c4.com>
+Subject: Re: [PATCH v2 18/20] crypto: arm/Curve25519 - wire up NEON
+ implementation
+Message-ID: <20191004140057.GB114360@zx2c4.com>
 References: <20191002141713.31189-1-ard.biesheuvel@linaro.org>
- <20191002141713.31189-15-ard.biesheuvel@linaro.org>
+ <20191002141713.31189-19-ard.biesheuvel@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20191002141713.31189-15-ard.biesheuvel@linaro.org>
+In-Reply-To: <20191002141713.31189-19-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 02, 2019 at 04:17:07PM +0200, Ard Biesheuvel wrote:
->        - replace .c #includes with Kconfig based object selection
+On Wed, Oct 02, 2019 at 04:17:11PM +0200, Ard Biesheuvel wrote:
+> +bool curve25519_arch(u8 out[CURVE25519_KEY_SIZE],
+> +		     const u8 scalar[CURVE25519_KEY_SIZE],
+> +		     const u8 point[CURVE25519_KEY_SIZE])
+> +{
+> +	if (!have_neon || !crypto_simd_usable())
+> +		return false;
+> +	kernel_neon_begin();
+> +	curve25519_neon(out, scalar, point);
+> +	kernel_neon_end();
+> +	return true;
+> +}
+> +EXPORT_SYMBOL(curve25519_arch);
 
-Cool!
+This now looks more like the Zinc way of doing things, with the _arch
+function returning true or false based on whether or not the
+implementation was available, allowing the generic implementation to
+run.
 
-> +config CRYPTO_ARCH_HAVE_LIB_CURVE25519
-> +	tristate
-> +
-> +config CRYPTO_ARCH_HAVE_LIB_CURVE25519_BASE
-> +	bool
-> +
-> +config CRYPTO_LIB_CURVE25519
-> +	tristate "Curve25519 scalar multiplication library"
-> +	depends on CRYPTO_ARCH_HAVE_LIB_CURVE25519 || !CRYPTO_ARCH_HAVE_LIB_CURVE25519
-
-a || !a ==> true
-
-Did you mean for one of these to be _BASE? Or is this a Kconfig trick of
-a different variety that's intentional?
-
-> +libcurve25519-y					:= curve25519-fiat32.o
-> +libcurve25519-$(CONFIG_ARCH_SUPPORTS_INT128)	:= curve25519-hacl64.o
-
-Nice idea.
+I thought, from looking at the chacha commits earlier, you had done away
+with that style of things in favor of weak symbols, whereby the arch
+implementation would fall back to the generic one, instead of the other
+way around?
