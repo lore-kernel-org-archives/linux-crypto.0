@@ -3,66 +3,68 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93A57C4360C
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 14:39:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDA92C4360C
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 14:50:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6A7C6222C4
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 14:39:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9EFFB207FF
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 14:50:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cCRQm4Ah"
+	dkim=pass (2048-bit key) header.d=amacapital-net.20150623.gappssmtp.com header.i=@amacapital-net.20150623.gappssmtp.com header.b="ni6TIZ2x"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389259AbfJDOjF (ORCPT
+        id S2388982AbfJDOuM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Oct 2019 10:39:05 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:37987 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389260AbfJDOjF (ORCPT
+        Fri, 4 Oct 2019 10:50:12 -0400
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:43017 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388870AbfJDOuM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Oct 2019 10:39:05 -0400
-Received: by mail-wr1-f68.google.com with SMTP id w12so7549556wro.5
-        for <linux-crypto@vger.kernel.org>; Fri, 04 Oct 2019 07:39:03 -0700 (PDT)
+        Fri, 4 Oct 2019 10:50:12 -0400
+Received: by mail-pg1-f193.google.com with SMTP id v27so3867111pgk.10
+        for <linux-crypto@vger.kernel.org>; Fri, 04 Oct 2019 07:50:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=1iRkJgnO4wVgTOHYGwPH4jyH8Xe5sWTO85OE+gYDCMw=;
-        b=cCRQm4AhxWdJsZMyABy73ABvnGRYLxaQMBiPhGNjISMExnI1frj1bgCXIFqmxE7SWw
-         QK7uzWDA07tkyyKaBJKPSMoKOlj4mgLA3kZ5bkYnnFyuXLlj7YeUZyYrmfWWNYuna9Tr
-         5CFAtvEtMAmDztutPXVa6tVMO8T05k2NIf1eSWnRtoqe1wKBhhDIbUzvEXJJgBihse2J
-         Sarajq0hcV/9yCe9wdyKoCbuYk9E3houO3PdZorYneyfTkhcILAL0eoA/JZGD/xQZFtD
-         /TxzyYDTt9BmLAH+iiZAtVL0d7fn0ctUi4iYXzxlsMmYujtlPYPe1KaBdirUfd7SbTCN
-         2DOQ==
+        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
+        h=content-transfer-encoding:from:mime-version:subject:date:message-id
+         :references:cc:in-reply-to:to;
+        bh=O8dxtxZWf+wlgyrNHa8J6WMWv3Y1JgiQq/LyksoMXKo=;
+        b=ni6TIZ2xibkbxn64M/sIQDm9VxBwgdCPw6wV7y74lrPNiOONJfsyfxqmIVyv8bEcHb
+         lvdOfFt73qel+LqVDHiOJ3BH4NlV20rNJ7UG9XnMLtu4z5sTBI6tLW2SH7tIHHtPyhwT
+         C37cOVj8wK6JLS2vk5qLJ7prWHnAdU5UZkruNQCBi69ZghPqHyHa5DT9kz2K9YJnnw2C
+         c1+CPsDxDky2VkHSeEOZB4U8mIloJD1LDyFUsaahZ32lit7LUF1OrakzgYl7Ljc2tKfD
+         916v/4CCBNd8jGVTC6fEktJPb1W5Lj1fTn1IsRQ6vpP6rwO86QKtRfnlkzFlMjEXd2BW
+         bmvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=1iRkJgnO4wVgTOHYGwPH4jyH8Xe5sWTO85OE+gYDCMw=;
-        b=DOTBxCALBZujD3pliHItYSfaU2jR7ozbeyoU/v/PO+FTlkzbiWkRHSsXiCxUM74i0x
-         1kWArfLfnWUnEA/M2ZUw/dWrWBceyTwVc3m6wJoc5cb1jzbMy4dTmWqE08AvZQIXeLhv
-         NcQWjg8u9ySc4ZSdIA/f+WQ2Uo4xKt+ffIWCSj3gl+3D1dhQHbkOy+oysxTA33Td9pH0
-         68+xNihOJdkYysOKf/i+GUjnT6b6Wzxb9KEU8CSWPbWRDnQgypj+DtVamgSnEVW417pu
-         C5uFyIYZJYTRgmw7bM3ViwCuwEOiLQ8YsYnK1VUveOL/mwjDgskB6DDOZqMoY62JsT2e
-         LLzQ==
-X-Gm-Message-State: APjAAAWNMSTqpEBPx2zVJMJgRcQKDOgcpe7N852q4HG9as5ijdkFlgKn
-        bunlUg//rHaaywE9TwK8VZVf6kzlkLMqgd1cbLlXsw==
-X-Google-Smtp-Source: APXvYqztaLKFLY9gajpNQOSrr4VRZ51eKi9gEacNa9s2A6Li85W8BlRVjnUHehfc80ge3jSnHU7q3NTYvXm0kJsj7l8=
-X-Received: by 2002:adf:e5cb:: with SMTP id a11mr11698232wrn.200.1570199943131;
- Fri, 04 Oct 2019 07:39:03 -0700 (PDT)
-MIME-Version: 1.0
-References: <20191002141713.31189-1-ard.biesheuvel@linaro.org>
- <20191002141713.31189-6-ard.biesheuvel@linaro.org> <20191004134644.GE112631@zx2c4.com>
- <CAKv+Gu_X9DBgUiPqcyJ2hOQqi_FEBVpHOr9uG1ZAh-RWv6-z9Q@mail.gmail.com>
-In-Reply-To: <CAKv+Gu_X9DBgUiPqcyJ2hOQqi_FEBVpHOr9uG1ZAh-RWv6-z9Q@mail.gmail.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Fri, 4 Oct 2019 16:38:51 +0200
-Message-ID: <CAKv+Gu8cuMcjqfDyzcShxd8cimjhKrBELjNoJ5xKgWmSzZ4S5g@mail.gmail.com>
-Subject: Re: [PATCH v2 05/20] crypto: mips/chacha - import accelerated 32r2
- code from Zinc
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        h=x-gm-message-state:content-transfer-encoding:from:mime-version
+         :subject:date:message-id:references:cc:in-reply-to:to;
+        bh=O8dxtxZWf+wlgyrNHa8J6WMWv3Y1JgiQq/LyksoMXKo=;
+        b=f1/U0xDz/P/ymJ+qdgRi5YhAgGDf3EAll4onWuWeyCEpc/zv9pmGcGi/Qwt0gNhPqR
+         ZEbZst4a6IRXhQaSwTz7g47fIDy6v0OulOyp5aL/NKWH8YCqtOVgHLW1eYptmam5yzYS
+         ANTA4ANr+PoNus+rPh87wQVupP7VJAtNqEQuU2db9WNazUnqltZrzZhpBCDWrUVtYhub
+         KJmaY4PYfABrKgoytHtGIopw7AcRFHbIHktFSGzOIXjKwglwNh5tIXfz0j8HhPaw5cAw
+         YqJ5k0skfDGFa4CH5//Sz7zLZBAZVwFmzBuIU1kkEInlO9husTgvW58KHbX96PJFIpmv
+         N16Q==
+X-Gm-Message-State: APjAAAV+2BGeq/8EKgXjFp7cVepdV3lvypoRRLX/BpO0VntMQhhU69/5
+        5UU5j2J6VvMIkSCS0xZgOdGNuQ==
+X-Google-Smtp-Source: APXvYqw9qA4GInd4TM1aL92ziNBZXSEOayzESBiKno87Mbd/KgCtIrozyNL00fwU8clacPNAROKiiQ==
+X-Received: by 2002:a17:90a:8416:: with SMTP id j22mr17199825pjn.39.1570200611470;
+        Fri, 04 Oct 2019 07:50:11 -0700 (PDT)
+Received: from ?IPv6:2601:646:c200:1ef2:b800:f509:3b99:5225? ([2601:646:c200:1ef2:b800:f509:3b99:5225])
+        by smtp.gmail.com with ESMTPSA id v20sm812616pgh.89.2019.10.04.07.50.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 04 Oct 2019 07:50:10 -0700 (PDT)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+From:   Andy Lutomirski <luto@amacapital.net>
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH v2 00/20] crypto: crypto API library interfaces for WireGuard
+Date:   Fri, 4 Oct 2019 07:50:09 -0700
+Message-Id: <63B7E067-9D6D-4F42-940D-37EDFCDD2E80@amacapital.net>
+References: <20191004134233.GD112631@zx2c4.com>
+Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
         <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         David Miller <davem@davemloft.net>,
@@ -77,51 +79,59 @@ Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE"
         Catalin Marinas <catalin.marinas@arm.com>,
         Martin Willi <martin@strongswan.org>,
         Peter Zijlstra <peterz@infradead.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>,
-        =?UTF-8?Q?Ren=C3=A9_van_Dorst?= <opensource@vdorst.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Josh Poimboeuf <jpoimboe@redhat.com>
+In-Reply-To: <20191004134233.GD112631@zx2c4.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+X-Mailer: iPhone Mail (17A854)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 4 Oct 2019 at 16:38, Ard Biesheuvel <ard.biesheuvel@linaro.org> wro=
-te:
->
-> On Fri, 4 Oct 2019 at 15:46, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> >
-> > On Wed, Oct 02, 2019 at 04:16:58PM +0200, Ard Biesheuvel wrote:
-> > > This integrates the accelerated MIPS 32r2 implementation of ChaCha
-> > > into both the API and library interfaces of the kernel crypto stack.
-> > >
-> > > The significance of this is that, in addition to becoming available
-> > > as an accelerated library implementation, it can also be used by
-> > > existing crypto API code such as Adiantum (for block encryption on
-> > > ultra low performance cores) or IPsec using chacha20poly1305. These
-> > > are use cases that have already opted into using the abstract crypto
-> > > API. In order to support Adiantum, the core assembler routine has
-> > > been adapted to take the round count as a function argument rather
-> > > than hardcoding it to 20.
-> >
-> > Could you resubmit this with first my original commit and then with you=
-r
-> > changes on top? I'd like to see and be able to review exactly what's
-> > changed. If I recall correctly, Ren=C3=A9 and I were really starved for
-> > registers and tried pretty hard to avoid spilling to the stack, so I'm
-> > interested to learn how you crammed a bit more sauce in there.
-> >
->
-> The round count is passed via the fifth function parameter, so it is
-> already on the stack. Reloading it for every block doesn't sound like
-> a huge deal to me.
->
-> > I also wonder if maybe it'd be better to just leave this as is with 20
-> > rounds, which it was previously optimized for, and just not do
-> > accelerated Adiantum for MIPS. Android has long since given up on the
-> > ISA entirely.
->
-> Adiantum does not depend on Android - anyone running linux on his MIPS
-> router can use it if they want encrypted storage.
 
-But to answer your first question: sure, i will split off the changes.
+
+> On Oct 4, 2019, at 6:42 AM, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+>=20
+> =EF=BB=BFOn Thu, Oct 03, 2019 at 10:43:29AM +0200, Ard Biesheuvel wrote:
+>>> On Wed, 2 Oct 2019 at 16:17, Ard Biesheuvel <ard.biesheuvel@linaro.org> w=
+rote:
+>>>=20
+>> ...
+>>>=20
+>>> In the future, I would like to extend these interfaces to use static cal=
+ls,
+>>> so that the accelerated implementations can be [un]plugged at runtime. Fo=
+r
+>>> the time being, we rely on weak aliases and conditional exports so that t=
+he
+>>> users of the library interfaces link directly to the accelerated version=
+s,
+>>> but without the ability to unplug them.
+>>>=20
+>>=20
+>> As it turns out, we don't actually need static calls for this.
+>> Instead, we can simply permit weak symbol references to go unresolved
+>> between modules (as we already do in the kernel itself, due to the
+>> fact that ELF permits it), and have the accelerated code live in
+>> separate modules that may not be loadable on certain systems, or be
+>> blacklisted by the user.
+>=20
+> You're saying that at module insertion time, the kernel will override
+> weak symbols with those provided by the module itself? At runtime?
+>=20
+> Do you know offhand how this patching works? Is there a PLT that gets
+> patched, and so the calls all go through a layer of function pointer
+> indirection? Or are all call sites fixed up at insertion time and the
+> call instructions rewritten with some runtime patching magic?
+>=20
+> Unless the method is the latter, I would assume that static calls are
+> much faster in general? Or the approach already in this series is
+> perhaps fine enough, and we don't need to break this apart into
+> individual modules complicating everything?
+
+I admit I=E2=80=99m a bit mystified too. I think it would be great to have a=
+ feature where a special type of static call could be redirected by the modu=
+le loader when a module that exports a corresponding symbol is loaded.  Unlo=
+ading such a module would be interesting.
+
+Ard, what exactly are you imagining?=
