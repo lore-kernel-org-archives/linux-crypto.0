@@ -6,54 +6,60 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F423C4360C
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 15:43:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43785C47404
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 15:43:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 61E712133F
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 15:43:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1F34420830
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 15:43:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389798AbfJDPn3 (ORCPT
+        id S2389165AbfJDPne (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Oct 2019 11:43:29 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:42556 "EHLO fornost.hmeau.com"
+        Fri, 4 Oct 2019 11:43:34 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:42562 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389165AbfJDPn3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Oct 2019 11:43:29 -0400
+        id S2389869AbfJDPne (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Oct 2019 11:43:34 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1iGPjT-0001Mn-Hx; Sat, 05 Oct 2019 01:43:04 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 05 Oct 2019 01:43:00 +1000
-Date:   Sat, 5 Oct 2019 01:43:00 +1000
+        id 1iGPjd-0001Ms-Dk; Sat, 05 Oct 2019 01:43:14 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 05 Oct 2019 01:43:11 +1000
+Date:   Sat, 5 Oct 2019 01:43:11 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Nagadheeraj Rottela <rnagadheeraj@marvell.com>
-Cc:     "davem@davemloft.net" <davem@davemloft.net>,
-        Srikanth Jampala <jsrikanth@marvell.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] crypto: cavium/nitrox - Add mailbox message to get mcode
- info in VF
-Message-ID: <20191004154300.GT5148@gondor.apana.org.au>
-References: <20190918093901.6477-1-rnagadheeraj@marvell.com>
+To:     Pascal van Leeuwen <pascalvanl@gmail.com>
+Cc:     linux-crypto@vger.kernel.org, antoine.tenart@bootlin.com,
+        davem@davemloft.net,
+        Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
+Subject: Re: [PATCH] crypto: inside-secure - Add support for the EIP196
+Message-ID: <20191004154311.GU5148@gondor.apana.org.au>
+References: <1568803286-8111-1-git-send-email-pvanleeuwen@verimatrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190918093901.6477-1-rnagadheeraj@marvell.com>
+In-Reply-To: <1568803286-8111-1-git-send-email-pvanleeuwen@verimatrix.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Sep 18, 2019 at 09:39:34AM +0000, Nagadheeraj Rottela wrote:
-> Add support to get microcode information in VF from PF via mailbox
-> message.
+On Wed, Sep 18, 2019 at 12:41:26PM +0200, Pascal van Leeuwen wrote:
+> This patch adds support for the EIP196, which is an EIP197 derivative
+> that has no classification hardware and a simplified record cache.
 > 
-> Signed-off-by: Nagadheeraj Rottela <rnagadheeraj@marvell.com>
-> Reviewed-by: Srikanth Jampala <jsrikanth@marvell.com>
+> The patch has been tested with the eip196b-ie and eip197c-iewxkbc
+> configurations on the Xilinx VCU118 development board as well as on the
+> Macchiatobin board (Marvell A8K - EIP197b-ieswx), including the crypto
+> extra tests.
+> 
+> Note that this patchset applies on top of the earlier submitted
+> "Add support for eip197f_iewc" series.
+> 
+> Signed-off-by: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
 > ---
->  drivers/crypto/cavium/nitrox/nitrox_dev.h | 15 +++++++++++++++
->  drivers/crypto/cavium/nitrox/nitrox_mbx.c |  8 ++++++++
->  2 files changed, 23 insertions(+)
+>  drivers/crypto/inside-secure/safexcel.c      | 69 ++++++++++++++++++++++------
+>  drivers/crypto/inside-secure/safexcel.h      | 30 +++++++++++-
+>  drivers/crypto/inside-secure/safexcel_ring.c |  1 +
+>  3 files changed, 86 insertions(+), 14 deletions(-)
 
 Patch applied.  Thanks.
 -- 
