@@ -2,147 +2,131 @@ Return-Path: <SRS0=x16Q=X5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51207C4360C
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 19:38:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6746C4CED1
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 19:56:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 27F2121D81
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 19:38:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1570217883;
-	bh=WemuqPcE3tQTzUxvDRTlsK9oVDXn+rpSmX0VKv3SLSk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=GhQP9SAp24e7phHb54x7G1mJJoljSA3q8DZmMbptnuPtZSsCKPjtMUxGK839Yw0LM
-	 ceODTqVz79zL83uQfHnKgD1H4FbzdZkiMCmBTYIwNjey3LJ+sNQ3Z9bZUJSlhpef8M
-	 41+fTneS6e2qpJAIZi0OOwv7MuqwzREcU+8FmjSM=
+	by mail.kernel.org (Postfix) with ESMTP id B64BA2133F
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 19:56:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727795AbfJDTiC (ORCPT
+        id S1731037AbfJDT4I convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Oct 2019 15:38:02 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40718 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725932AbfJDTiC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Oct 2019 15:38:02 -0400
-Received: from gmail.com (unknown [104.132.1.77])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id F174F215EA;
-        Fri,  4 Oct 2019 19:38:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1570217881;
-        bh=WemuqPcE3tQTzUxvDRTlsK9oVDXn+rpSmX0VKv3SLSk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=kyGO/jAGtqk7t/RQseX+wLZp8LA8UXcIAPntAWXA5EtKG+DjJBU1U9oJiPKn+SaEu
-         Z3z/iVOdxKvoPBlDzzGMkDJXIupqI4888OxqAk2EJDKQBeUksfBRbLApO2erC4hC4M
-         rW0WkcyR4ieQrv5inH01qKQnfvmia0V8gW5f6ABw=
-Date:   Fri, 4 Oct 2019 12:37:59 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Gert Robben <t2@gert.gr>
-Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
+        Fri, 4 Oct 2019 15:56:08 -0400
+Received: from mx0a-00176a03.pphosted.com ([67.231.149.52]:53736 "EHLO
+        mx0a-00176a03.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730836AbfJDT4I (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Oct 2019 15:56:08 -0400
+Received: from pps.filterd (m0047962.ppops.net [127.0.0.1])
+        by m0047962.ppops.net-00176a03. (8.16.0.42/8.16.0.42) with SMTP id x94JsTeF011265;
+        Fri, 4 Oct 2019 15:56:07 -0400
+From:   "Safford, David (GE Global Research, US)" <david.safford@ge.com>
+To:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+CC:     Mimi Zohar <zohar@linux.ibm.com>,
+        "Wiseman, Monty (GE Global Research, US)" <monty.wiseman@ge.com>,
+        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>,
+        David Howells <dhowells@redhat.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Jelle de Jong <jelledejong@powercraft.nl>
-Subject: Re: [PATCH] crypto: geode-aes - switch to skcipher for cbc(aes)
- fallback
-Message-ID: <20191004193758.GA244757@gmail.com>
-Mail-Followup-To: Gert Robben <t2@gert.gr>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Jelle de Jong <jelledejong@powercraft.nl>
-References: <20191003133921.29344-1-ard.biesheuvel@linaro.org>
- <64d5c8ec-41c5-1ef2-cc4b-a050bf4c48ba@gert.gr>
- <CAKv+Gu8htzzdi5=4z5-E5o+J+bAPO=N4dR75Se=3JOZw8P_tDA@mail.gmail.com>
- <decd3196-8679-7298-7967-25cb231357fb@gert.gr>
+        "David S. Miller" <davem@davemloft.net>,
+        "open list:ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Thread-Topic: Re: [PATCH] KEYS: asym_tpm: Switch to get_random_bytes()
+Thread-Index: AQHVdI4g9L3xPAeMJki3mq4fpV79C6dHrWSAgAFrf4CAABaxAIAAUs4AgAAPVoCAAOxxAIAAnnWA///LRNA=
+Date:   Fri, 4 Oct 2019 19:56:01 +0000
+Message-ID: <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2A38B@ALPMBAPA12.e2k.ad.ge.com>
+References: <20190926171601.30404-1-jarkko.sakkinen@linux.intel.com>
+ <1570024819.4999.119.camel@linux.ibm.com>
+ <20191003114119.GF8933@linux.intel.com>
+ <1570107752.4421.183.camel@linux.ibm.com>
+ <20191003175854.GB19679@linux.intel.com>
+ <1570128827.5046.19.camel@linux.ibm.com>
+ <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2A22E@ALPMBAPA12.e2k.ad.ge.com>
+ <20191004182711.GC6945@linux.intel.com>
+In-Reply-To: <20191004182711.GC6945@linux.intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-dg-ref: =?us-ascii?Q?PG1ldGE+PGF0IG5tPSJib2R5LnR4dCIgcD0iYzpcdXNlcnNcMjEyNDczOTUw?=
+ =?us-ascii?Q?XGFwcGRhdGFccm9hbWluZ1wwOWQ4NDliNi0zMmQzLTRhNDAtODVlZS02Yjg0?=
+ =?us-ascii?Q?YmEyOWUzNWJcbXNnc1xtc2ctZmM1ZWJkODctZTZlMC0xMWU5LThlNWMtYTRj?=
+ =?us-ascii?Q?M2YwYjU5OGE2XGFtZS10ZXN0XGZjNWViZDg5LWU2ZTAtMTFlOS04ZTVjLWE0?=
+ =?us-ascii?Q?YzNmMGI1OThhNmJvZHkudHh0IiBzej0iMTkzMSIgdD0iMTMyMTQ2OTI1NjAy?=
+ =?us-ascii?Q?OTY5NzY4IiBoPSJJb1M3U21NaU54OWR1V0xqclpiM1c5a2d5YUU9IiBpZD0i?=
+ =?us-ascii?Q?IiBibD0iMCIgYm89IjEiIGNpPSJjQUFBQUVSSFUxUlNSVUZOQ2dVQUFFb0NB?=
+ =?us-ascii?Q?QUNvbUxtKzdYclZBYnV1SzdTSmoxQmZ1NjRydEltUFVGOERBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBSEFBQUFEYUFRQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBRUFBUUFCQUFBQUZ0R2VRd0FBQUFBQUFBQUFBQUFBQUo0QUFBQm5BR1VB?=
+ =?us-ascii?Q?WHdCakFHOEFiZ0JtQUdrQVpBQmxBRzRBZEFCcEFHRUFiQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFFQUFBQUFBQUFBQWdBQUFBQUFuZ0FBQUdjQVpRQmZBR2dBYVFCbkFHZ0Fi?=
+ =?us-ascii?Q?QUI1QUdNQWJ3QnVBR1lBYVFCa0FHVUFiZ0IwQUdrQVlRQnNBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBUUFBQUFBQUFBQUNB?=
+ =?us-ascii?Q?QUFBQUFDZUFBQUFad0JsQUY4QWJnQnZBRzRBY0FCMUFHSUFiQUJwQUdNQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
+ =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQkFBQUFBQUFBQUFJQUFBQUFBQT09Ii8+PC9t?=
+ =?us-ascii?Q?ZXRhPg=3D=3D?=
+x-dg-rorf: 
+x-originating-ip: [3.159.19.191]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <decd3196-8679-7298-7967-25cb231357fb@gert.gr>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Subject: [PATCH] KEYS: asym_tpm: Switch to get_random_bytes()
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-04_12:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
+ definitions=main-1910040163
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Oct 04, 2019 at 03:29:33PM +0200, Gert Robben wrote:
-> Op 04-10-2019 om 08:16 schreef Ard Biesheuvel:
-> > On Thu, 3 Oct 2019 at 23:26, Gert Robben <t2@gert.gr> wrote:
-> > > Op 03-10-2019 om 15:39 schreef Ard Biesheuvel:
-> > > > Commit 79c65d179a40e145 ("crypto: cbc - Convert to skcipher") updated
-> > > > the generic CBC template wrapper from a blkcipher to a skcipher algo,
-> > > > to get away from the deprecated blkcipher interface. However, as a side
-> > > > effect, drivers that instantiate CBC transforms using the blkcipher as
-> > > > a fallback no longer work, since skciphers can wrap blkciphers but not
-> > > > the other way around. This broke the geode-aes driver.
-> > > > 
-> > > > So let's fix it by moving to the sync skcipher interface when allocating
-> > > > the fallback.
-> > > > 
-> > > > Cc: Gert Robben <t2@gert.gr>
-> > > > Cc: Jelle de Jong <jelledejong@powercraft.nl>
-> > > > Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> > > > ---
-> > > > Gert, Jelle,
-> > > > 
-> > > > If you can, please try this patch and report back to the list if it solves
-> > > > the Geode issue for you.
-> > > 
-> > > Thanks for the patch!
-> > > I tried it on Alix 2C2 / Geode LX800 with Linux 5.4-rc1 (also 5.1-5.3 fwiw).
-> > > 
-> > > At least now openssl doesn't give those errors anymore.
-> > > (openssl speed -evp aes-128-cbc -elapsed -engine afalg)
-> > > But looking at the results (<6MB/s), apparently it's not using geode-aes
-> > > (>30MB/s?).
-> > > In dmesg can be seen:
-> > > 
-> > > alg: skcipher: ecb-aes-geode encryption test failed (wrong result) on
-> > > test vector 1, cfg="out-of-place"
-> > > alg: skcipher: cbc-aes-geode encryption test failed (wrong result) on
-> > > test vector 2, cfg="out-of-place"
-> > > Geode LX AES 0000:00:01.2: GEODE AES engine enabled.
-> > > 
-> > > In /proc/crypto, drivers cbc-aes-geode/ecb-aes-geode are listed with
-> > > "selftest: unknown". Driver "geode-aes" has "selftest: passed".
-> > > 
-> > > I'm happy to test other patches.
-> > 
-> > Oops, mistake there on my part
-> > 
-> > Can you replace the two instances of
-> > 
-> > skcipher_request_set_crypt(req, dst, src, nbytes, desc->info);
-> > 
-> > with
-> > 
-> > skcipher_request_set_crypt(req, src, dst, nbytes, desc->info);
-> > 
-> > please?
-> 
-> Yes, with that change, now it works in 5.4-rc1:
-> 
-> # openssl speed -evp aes-128-cbc -elapsed -engine afalg
-> - - - 8< - - -
-> The 'numbers' are in 1000s of bytes per second processed.
-> type             16 bytes     64 bytes    256 bytes   1024 bytes   8192
-> bytes  16384 bytes
-> aes-128-cbc        125.63k      499.39k     1858.18k     6377.00k 25753.93k
-> 31167.08k
-> 
-> I also quickly tried nginx https, that seems to transfer a file correctly.
-> And a bit faster, but not by this much, I have to look into that further.
-> For now I assume the kernel part seems to be working fine.
-> 
-> Thanks, much appreciated!
-> Gert
 
+> From: linux-integrity-owner@vger.kernel.org <linux-integrity-
+> owner@vger.kernel.org> On Behalf Of Jarkko Sakkinen
+> Sent: Friday, October 4, 2019 2:27 PM
+> Subject: EXT: Re: [PATCH] KEYS: asym_tpm: Switch to get_random_bytes()
+> 
+> If you are able to call tpm_get_random(), the driver has already registered
+> TPN as hwrng. With this solution you fail to follow the principle of defense in
+> depth. If the TPM random number generator is compromissed (has a bug)
+> using the entropy pool will decrease the collateral damage.
 
-Can you check whether it passes the extra self-tests too?  I.e. enable
-CONFIG_CRYPTO_MANAGER_EXTRA_TESTS.
+And if the entropy pool has a bug or is misconfigured, you lose everything.
+That does not sound like defense in depth to me. In the real world
+I am not aware of a single instance of RNG vulnerability on a TPM.
+I am directly aware of several published vulnerabilities in embedded systems 
+due to a badly ported version of the kernel random pool. In addition, 
+the random generator in a TPM is hardware isolated, and less likely to be
+vulnerable to side channel or memory manipulation errors. The TPM
+RNG is typically FIPS certified.  The use of the TPM RNG was a deliberate
+design choice in trusted keys.
 
-- Eric
+> > Third, as Mimi states, using a TPM is not a "regression". It would be
+> > a regression to change trusted keys _not_ to use the TPM, because that
+> > is what trusted keys are documented to provide to user space.
+> 
+> For asym-tpm.c it is without a question a regression because of the evolution
+> that has happened after trusted keys. For trusted keys using kernel rng
+> would be improvement.
+
+Perhaps this is a language issue, but you are not using "regression" correctly.
+Changing to the kernel pool would not only be a debatable  "improvement", 
+but also would certainly be a change to the documented trusted key  
+behavior, which I thought was frowned upon.
+
+dave
