@@ -4,65 +4,72 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0125C47404
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 15:44:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C7E2C47404
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 15:44:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D17DF21D81
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 15:44:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0159A20830
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 15:44:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389922AbfJDPoX (ORCPT
+        id S2390031AbfJDPoy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Oct 2019 11:44:23 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:42592 "EHLO fornost.hmeau.com"
+        Fri, 4 Oct 2019 11:44:54 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:42614 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389898AbfJDPoX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Oct 2019 11:44:23 -0400
+        id S2389669AbfJDPoy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Oct 2019 11:44:54 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1iGPil-0001Kq-Cx; Sat, 05 Oct 2019 01:42:20 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 05 Oct 2019 01:42:16 +1000
-Date:   Sat, 5 Oct 2019 01:42:16 +1000
+        id 1iGPkl-0001RR-QK; Sat, 05 Oct 2019 01:44:24 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 05 Oct 2019 01:44:20 +1000
+Date:   Sat, 5 Oct 2019 01:44:20 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Markus Elfring <Markus.Elfring@web.de>
-Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        bcm-kernel-feedback-list@broadcom.com,
-        Arnd Bergmann <arnd@arndb.de>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Matt Mackall <mpm@selenic.com>, Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        kernel-janitors@vger.kernel.org,
-        Bartosz Golaszewski <bgolaszewski@baylibre.com>,
-        Himanshu Jha <himanshujha199640@gmail.com>
-Subject: Re: [PATCH] hwrng: iproc-rng200 - Use
- devm_platform_ioremap_resource() in iproc_rng200_probe()
-Message-ID: <20191004154216.GR5148@gondor.apana.org.au>
-References: <0ecb0679-0558-6cbe-af2f-6ee9122a4a7e@web.de>
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Kenneth Lee <liguozhu@hisilicon.com>,
+        John Garry <john.garry@huawei.com>,
+        Mao Wenan <maowenan@huawei.com>,
+        Hao Fang <fanghao11@huawei.com>,
+        Shiju Jose <shiju.jose@huawei.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] [v2] crypto: hisilicon - allow compile-testing on x86
+Message-ID: <20191004154420.GW5148@gondor.apana.org.au>
+References: <20190919140650.1289963-2-arnd@arndb.de>
+ <20190919140917.1290556-1-arnd@arndb.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0ecb0679-0558-6cbe-af2f-6ee9122a4a7e@web.de>
+In-Reply-To: <20190919140917.1290556-1-arnd@arndb.de>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Sep 18, 2019 at 09:19:18AM +0200, Markus Elfring wrote:
-> From: Markus Elfring <elfring@users.sourceforge.net>
-> Date: Wed, 18 Sep 2019 09:09:22 +0200
+On Thu, Sep 19, 2019 at 04:09:06PM +0200, Arnd Bergmann wrote:
+> To avoid missing arm64 specific warnings that get introduced
+> in this driver, allow compile-testing on all 64-bit architectures.
 > 
-> Simplify this function implementation by using a known wrapper function.
+> The only actual arm64 specific code in this driver is an open-
+> coded 128 bit MMIO write. On non-arm64 the same can be done
+> using memcpy_toio. What I also noticed is that the mmio store
+> (either one) is not endian-safe, this will only work on little-
+> endian configurations, so I also add a Kconfig dependency on
+> that, regardless of the architecture.
+> Finally, a depenndecy on CONFIG_64BIT is needed because of the
+> writeq().
 > 
-> This issue was detected by using the Coccinelle software.
-> 
-> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 > ---
->  drivers/char/hw_random/iproc-rng200.c | 9 +--------
->  1 file changed, 1 insertion(+), 8 deletions(-)
+> v2: actually add !CPU_BIG_ENDIAN dependency as described in the
+> changelog
+> ---
+>  drivers/crypto/hisilicon/Kconfig | 9 ++++++---
+>  drivers/crypto/hisilicon/qm.c    | 6 ++++++
+>  2 files changed, 12 insertions(+), 3 deletions(-)
 
 Patch applied.  Thanks.
 -- 
