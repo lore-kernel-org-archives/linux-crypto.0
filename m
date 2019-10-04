@@ -6,62 +6,54 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2471C47404
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 13:52:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89610C47404
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 13:53:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 86E61222C2
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 13:52:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5EF5620700
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 13:53:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="T1B2A3Qh"
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="o4BjnRjJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388849AbfJDNwc (ORCPT
+        id S2388743AbfJDNxJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Oct 2019 09:52:32 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:54319 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388270AbfJDNwc (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Oct 2019 09:52:32 -0400
-Received: by mail-wm1-f66.google.com with SMTP id p7so5931046wmp.4
-        for <linux-crypto@vger.kernel.org>; Fri, 04 Oct 2019 06:52:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=evmVQTADAbH2bwbt5sski1rHfNC4vLA8SFu2OOlAWyc=;
-        b=T1B2A3QhpvtfT7xaS3U8Q+be9NpmzHvU6SqkPP218KWKdpnIDZNblrHoM80yesInI0
-         Gd2hGc73eh1GMgAkJ3Rj8CyCTC0lzlKYtW8lNwBB4rYAPCt0kYUjCWcad0sWyw1UR4HP
-         BJR0jT2l/O3aPVtiFrwNKpq7LnF6b9+ZQeZLX/iIl5/pDsir8qJnw1aNFsrFp0l2kXSL
-         Fexn5hhCO86qUoXJW1asIlugJizJJAUpU3/KT29X6/XFQY7lAHvqKZTBoTZuNOywBQsE
-         zmcYUIAN5hZu2KMstxuaScwfKtR7OMg6w8R+RKFVr2QpY/9fjC8tVsH2nhXqObNlUAq9
-         nSQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=evmVQTADAbH2bwbt5sski1rHfNC4vLA8SFu2OOlAWyc=;
-        b=E8MOeZE72AK5sU+1eF9u2XUcOWLI/olRtJgKlF/GUslWQOIJeHoHmj3Vp2BnJlAf4K
-         a4iORSFKJEgs1X1DIDyVsuQXb3HbayIgUUGpKWZxAm1rJxCaNRIuLtvPGLYFCnn5Z5ea
-         e/1xPy3VeLlT1qdtJ8nCm0PmFEXvSDZqa1PBJQey+RuAsEjA6KXWIgbY+mChyxmduAB9
-         woSAY86kjJJNHiLfZPD77tz+xkbM2tt2eCJ3XZ4/uEI4D3cyx76Ya6V7NA0aPm+ZpuH4
-         FAl4CA/32JiZenwR/LE3b05i7Lg8iVgEIyyi6XGj/SJuIVzpelkmAegsWh8WL73DiipC
-         BVSg==
-X-Gm-Message-State: APjAAAVg4Hr5sr+pQB/GLsv911mtDYE25mja73dprtdlqmhaMYPikoXO
-        LL6n3RiOpbrNt15TsQIbbGGrR24uZg5b7D2limNDWw==
-X-Google-Smtp-Source: APXvYqz7ysmg0Au5HnFggUnLaoYSO+7aRitoLPtaTfS+T9K+IXpfq+sLpjZ6+9BQWEiKvbHjnwa9e0BqFJ/RHRGa7sA=
-X-Received: by 2002:a7b:c451:: with SMTP id l17mr10011017wmi.61.1570197149890;
- Fri, 04 Oct 2019 06:52:29 -0700 (PDT)
+        Fri, 4 Oct 2019 09:53:09 -0400
+Received: from frisell.zx2c4.com ([192.95.5.64]:36251 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388270AbfJDNxJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Oct 2019 09:53:09 -0400
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 97685176
+        for <linux-crypto@vger.kernel.org>;
+        Fri, 4 Oct 2019 13:06:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
+        :references:in-reply-to:from:date:message-id:subject:to:cc
+        :content-type; s=mail; bh=wcwVvtTlIWh12R9ulVoov8VPc7g=; b=o4BjnR
+        jJBHIdtEaZC8/M8PLzCTVc/FI+kkmacCQ6IAW6hM5rglQz6tdZxAT+TpJobFOppY
+        Lhqx/M8gXSsP4qKCyUfH7RRhdudXTxAduJgZOeFdmqwpFMX5Ru8m+ndoH3Dy4V1K
+        LSyB/MgKRMKX490X9lLk287OcfCjlmTeJknHRs7cgpSV5y8FyvokMXJkZz0E/lQp
+        F1G5YR2xzE93xcn5vxvi/KBHIIPcYjzx9RtPbvtMl2tVgbg+NdZAw05g3cd5rXid
+        wg/p1xnDdrWS5MkxjJclVnjnwpdIfL157TZv3bI91W9Rkc+HCustQV+zO+YXA1Iu
+        aVxWdwGBihLoywtQ==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 8843cd2f (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO)
+        for <linux-crypto@vger.kernel.org>;
+        Fri, 4 Oct 2019 13:06:12 +0000 (UTC)
+Received: by mail-ot1-f48.google.com with SMTP id e11so5347319otl.5
+        for <linux-crypto@vger.kernel.org>; Fri, 04 Oct 2019 06:53:06 -0700 (PDT)
+X-Gm-Message-State: APjAAAWScRMmLW/dKJaXA05YcCTgKe6/+svCOcUcag978j2zpdfFIv+T
+        qhG3ifsKocjdKJxto5UTTy1jCf1QDlSJB8Mnd/0=
+X-Google-Smtp-Source: APXvYqyvfJGhcedjiu5OaTs1wbDqc8DtFenzVlaOJvFpe2xMKmYuQ98tG5Px30K5KSqwqL86wLPWnLGHWQxMbgm0Xq8=
+X-Received: by 2002:a9d:3476:: with SMTP id v109mr11080540otb.179.1570197185350;
+ Fri, 04 Oct 2019 06:53:05 -0700 (PDT)
 MIME-Version: 1.0
-References: <20191002141713.31189-1-ard.biesheuvel@linaro.org>
- <CAKv+Gu-+3AWNAK0WWSFQT15Q3r6ak7wGr3ZROyJ35-4GN6=iJQ@mail.gmail.com> <20191004134233.GD112631@zx2c4.com>
-In-Reply-To: <20191004134233.GD112631@zx2c4.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Fri, 4 Oct 2019 15:52:17 +0200
-Message-ID: <CAKv+Gu-Xe-BfYzVDqDaZZ2wawYs8HHHc-CMYPPOU3E=6CPgccA@mail.gmail.com>
-Subject: Re: [PATCH v2 00/20] crypto: crypto API library interfaces for WireGuard
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
+References: <20191002141713.31189-1-ard.biesheuvel@linaro.org> <20191002141713.31189-5-ard.biesheuvel@linaro.org>
+In-Reply-To: <20191002141713.31189-5-ard.biesheuvel@linaro.org>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Fri, 4 Oct 2019 15:52:52 +0200
+X-Gmail-Original-Message-ID: <CAHmME9p3a-sNp_MmMKxX7z9PsTi3DdUrVtX=X4vhr_ep=KdCJw@mail.gmail.com>
+Message-ID: <CAHmME9p3a-sNp_MmMKxX7z9PsTi3DdUrVtX=X4vhr_ep=KdCJw@mail.gmail.com>
+Subject: Re: [PATCH v2 04/20] crypto: arm/chacha - expose ARM ChaCha routine
+ as library function
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         David Miller <davem@davemloft.net>,
         Greg KH <gregkh@linuxfoundation.org>,
@@ -82,92 +74,50 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 4 Oct 2019 at 15:42, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> On Thu, Oct 03, 2019 at 10:43:29AM +0200, Ard Biesheuvel wrote:
-> > On Wed, 2 Oct 2019 at 16:17, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> > >
-> > ...
-> > >
-> > > In the future, I would like to extend these interfaces to use static calls,
-> > > so that the accelerated implementations can be [un]plugged at runtime. For
-> > > the time being, we rely on weak aliases and conditional exports so that the
-> > > users of the library interfaces link directly to the accelerated versions,
-> > > but without the ability to unplug them.
-> > >
-> >
-> > As it turns out, we don't actually need static calls for this.
-> > Instead, we can simply permit weak symbol references to go unresolved
-> > between modules (as we already do in the kernel itself, due to the
-> > fact that ELF permits it), and have the accelerated code live in
-> > separate modules that may not be loadable on certain systems, or be
-> > blacklisted by the user.
->
-> You're saying that at module insertion time, the kernel will override
-> weak symbols with those provided by the module itself? At runtime?
->
+On Wed, Oct 2, 2019 at 4:17 PM Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> Expose the accelerated NEON ChaCha routine directly as a symbol
+> export so that users of the ChaCha library can use it directly.
 
-Yes.
+Eric had some nice code for ChaCha for certain ARM cores that lived in
+Zinc as chacha20-unrolled-arm.S. This code became active for certain
+cores where NEON was bad and for cores with no NEON. The condition for
+it was:
 
-> Do you know offhand how this patching works? Is there a PLT that gets
-> patched, and so the calls all go through a layer of function pointer
-> indirection? Or are all call sites fixed up at insertion time and the
-> call instructions rewritten with some runtime patching magic?
->
+        switch (read_cpuid_part()) {
+       case ARM_CPU_PART_CORTEX_A7:
+       case ARM_CPU_PART_CORTEX_A5:
+               /* The Cortex-A7 and Cortex-A5 do not perform well with the NEON
+                * implementation but do incredibly with the scalar one and use
+                * less power.
+                */
+               break;
+       default:
+               chacha20_use_neon = elf_hwcap & HWCAP_NEON;
+       }
 
-No magic. Take curve25519 for example, when built for ARM:
+...
 
-00000000 <curve25519>:
-   0:   f240 0300       movw    r3, #0
-                        0: R_ARM_THM_MOVW_ABS_NC        curve25519_arch
-   4:   f2c0 0300       movt    r3, #0
-                        4: R_ARM_THM_MOVT_ABS   curve25519_arch
-   8:   b570            push    {r4, r5, r6, lr}
-   a:   4604            mov     r4, r0
-   c:   460d            mov     r5, r1
-   e:   4616            mov     r6, r2
-  10:   b173            cbz     r3, 30 <curve25519+0x30>
-  12:   f7ff fffe       bl      0 <curve25519_arch>
-                        12: R_ARM_THM_CALL      curve25519_arch
-  16:   b158            cbz     r0, 30 <curve25519+0x30>
-  18:   4620            mov     r0, r4
-  1a:   2220            movs    r2, #32
-  1c:   f240 0100       movw    r1, #0
-                        1c: R_ARM_THM_MOVW_ABS_NC       .LANCHOR0
-  20:   f2c0 0100       movt    r1, #0
-                        20: R_ARM_THM_MOVT_ABS  .LANCHOR0
-  24:   f7ff fffe       bl      0 <__crypto_memneq>
-                        24: R_ARM_THM_CALL      __crypto_memneq
-  28:   3000            adds    r0, #0
-  2a:   bf18            it      ne
-  2c:   2001            movne   r0, #1
-  2e:   bd70            pop     {r4, r5, r6, pc}
-  30:   4632            mov     r2, r6
-  32:   4629            mov     r1, r5
-  34:   4620            mov     r0, r4
-  36:   f7ff fffe       bl      0 <curve25519_generic>
-                        36: R_ARM_THM_CALL      curve25519_generic
-  3a:   e7ed            b.n     18 <curve25519+0x18>
+        for (;;) {
+               if (IS_ENABLED(CONFIG_KERNEL_MODE_NEON) && chacha20_use_neon &&
+                   len >= CHACHA20_BLOCK_SIZE * 3 && simd_use(simd_context)) {
+                       const size_t bytes = min_t(size_t, len, PAGE_SIZE);
 
-curve25519_arch is a weak reference. It either gets satisfied at
-module load time, or it doesn't.
+                       chacha20_neon(dst, src, bytes, ctx->key, ctx->counter);
+                       ctx->counter[0] += (bytes + 63) / 64;
+                       len -= bytes;
+                       if (!len)
+                               break;
+                       dst += bytes;
+                       src += bytes;
+                       simd_relax(simd_context);
+               } else {
+                       chacha20_arm(dst, src, len, ctx->key, ctx->counter);
+                       ctx->counter[0] += (len + 63) / 64;
+                       break;
+               }
+       }
 
-If it does get satisfied, the relocations covering the movw/movt pair
-and the one covering the bl instruction get updated so that they point
-to the arch routine.
+It's another instance in which the generic code was totally optimized
+out of Zinc builds.
 
-If it does not get satisfied, the relocations are disregarded, in
-which case the cbz instruction at offset 0x10 jumps over the bl call.
-
-Note that this does not involve any memory accesses. It does involve
-some code patching, but only of the kind the module loader already
-does.
-
-> Unless the method is the latter, I would assume that static calls are
-> much faster in general? Or the approach already in this series is
-> perhaps fine enough, and we don't need to break this apart into
-> individual modules complicating everything?
-
-The big advantage this approach has over Zinc is that the accelerated
-code does not have to stay resident in memory if the cpu is incapable
-of executing it.
+Did these changes make it into the existing tree?
