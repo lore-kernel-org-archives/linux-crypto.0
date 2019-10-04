@@ -2,82 +2,69 @@ Return-Path: <SRS0=x16Q=X5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B774AC47404
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 15:44:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0125C47404
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 15:44:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8BE792133F
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 15:44:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D17DF21D81
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 15:44:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389891AbfJDPoE (ORCPT
+        id S2389922AbfJDPoX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Oct 2019 11:44:04 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:42578 "EHLO fornost.hmeau.com"
+        Fri, 4 Oct 2019 11:44:23 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:42592 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389871AbfJDPoE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Oct 2019 11:44:04 -0400
+        id S2389898AbfJDPoX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Oct 2019 11:44:23 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1iGPkM-0001PO-JT; Sat, 05 Oct 2019 01:43:59 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 05 Oct 2019 01:43:58 +1000
-Date:   Sat, 5 Oct 2019 01:43:58 +1000
+        id 1iGPil-0001Kq-Cx; Sat, 05 Oct 2019 01:42:20 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 05 Oct 2019 01:42:16 +1000
+Date:   Sat, 5 Oct 2019 01:42:16 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Pascal van Leeuwen <pascalvanl@gmail.com>
-Cc:     linux-crypto@vger.kernel.org, antoine.tenart@bootlin.com,
-        davem@davemloft.net,
-        Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
-Subject: Re: [PATCHv4 0/3] crypto: inside-secure: Add support for the
- Chacha20 skcipher and the Chacha20-Poly1305 AEAD suites
-Message-ID: <20191004154358.GV5148@gondor.apana.org.au>
-References: <1568841958-14622-1-git-send-email-pvanleeuwen@verimatrix.com>
+To:     Markus Elfring <Markus.Elfring@web.de>
+Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        bcm-kernel-feedback-list@broadcom.com,
+        Arnd Bergmann <arnd@arndb.de>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Matt Mackall <mpm@selenic.com>, Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org,
+        Bartosz Golaszewski <bgolaszewski@baylibre.com>,
+        Himanshu Jha <himanshujha199640@gmail.com>
+Subject: Re: [PATCH] hwrng: iproc-rng200 - Use
+ devm_platform_ioremap_resource() in iproc_rng200_probe()
+Message-ID: <20191004154216.GR5148@gondor.apana.org.au>
+References: <0ecb0679-0558-6cbe-af2f-6ee9122a4a7e@web.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1568841958-14622-1-git-send-email-pvanleeuwen@verimatrix.com>
+In-Reply-To: <0ecb0679-0558-6cbe-af2f-6ee9122a4a7e@web.de>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Sep 18, 2019 at 11:25:55PM +0200, Pascal van Leeuwen wrote:
-> Extend driver support with chacha20, rfc7539(chacha20,poly1305) and
-> rfc7539esp(chacha20,poly1305) ciphers.
-> The patchset has been tested with the eip197c_iesb and eip197c_iewxkbc
-> configurations on the Xilinx VCU118 development board, including the
-> crypto extra tests.
+On Wed, Sep 18, 2019 at 09:19:18AM +0200, Markus Elfring wrote:
+> From: Markus Elfring <elfring@users.sourceforge.net>
+> Date: Wed, 18 Sep 2019 09:09:22 +0200
 > 
-> Note that this patchset applies on top of the earlier submitted
-> "Add support for the CBCMAC" series.
+> Simplify this function implementation by using a known wrapper function.
 > 
-> changes since v1:
-> - rebased on top of DES library changes done on cryptodev/master
-> - fixed crypto/Kconfig so that generic fallback is compiled as well
+> This issue was detected by using the Coccinelle software.
 > 
-> changes since v2:
-> - made switch entry SAFEXCEL_AES explit and added empty default, as
->   requested by Antoine Tenart. Also needed to make SM4 patches apply.
-> 
-> changes since v3:
-> - for rfc7539 and rfc7539esp, allow more (smaller) AAD lenghts to be
->   handled by the hardware instead of the fallback cipher (this allows
->   running the tcrypt performance tests on the actual hardware)
-> 
-> Pascal van Leeuwen (3):
->   crypto: inside-secure - Added support for the CHACHA20 skcipher
->   crypto: inside-secure - Add support for the Chacha20-Poly1305 AEAD
->   crypto: Kconfig - Add CRYPTO_CHACHA20POLY1305 to CRYPTO_DEV_SAFEXCEL
-> 
->  drivers/crypto/Kconfig                         |   3 +-
->  drivers/crypto/inside-secure/safexcel.c        |   3 +
->  drivers/crypto/inside-secure/safexcel.h        |  11 +
->  drivers/crypto/inside-secure/safexcel_cipher.c | 336 ++++++++++++++++++++++++-
->  4 files changed, 339 insertions(+), 14 deletions(-)
+> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+> ---
+>  drivers/char/hw_random/iproc-rng200.c | 9 +--------
+>  1 file changed, 1 insertion(+), 8 deletions(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
