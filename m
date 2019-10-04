@@ -2,109 +2,83 @@ Return-Path: <SRS0=x16Q=X5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27B60C47404
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 15:43:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B774AC47404
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 15:44:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F33E420830
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 15:43:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1570203837;
-	bh=5+4Rg0O8n5iLx3Ezgy1JDlc8iuGDWmVwnLX2O5wl/Ks=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=y5B6bwFjSQiQjA0MZ9ly2HtNkvi3lAYjGo2YalMdmA3gdFECLB2xzEAH4uvD1orgY
-	 hAL5mP2L4Y2E2OuAEMUtPGEWAX9hzJiMuZWKxrlB5WXMvA0lBuINdKd7HpGWhUaQJJ
-	 6WFptpITkQ9SQhINFglgHHKAYIsW2ODgI7Ke1XvY=
+	by mail.kernel.org (Postfix) with ESMTP id 8BE792133F
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 15:44:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389131AbfJDPn4 (ORCPT
+        id S2389891AbfJDPoE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Oct 2019 11:43:56 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35370 "EHLO mail.kernel.org"
+        Fri, 4 Oct 2019 11:44:04 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:42578 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389891AbfJDPnx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Oct 2019 11:43:53 -0400
-Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 700332133F;
-        Fri,  4 Oct 2019 15:43:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1570203833;
-        bh=5+4Rg0O8n5iLx3Ezgy1JDlc8iuGDWmVwnLX2O5wl/Ks=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=pLqfEKgVMxzpU2Kq1ZnpJzrr9Zedn+iveYLqdEvhR4OZBmDJfxsOIlRk0GsIx7BMo
-         WN8EPKqOeNW+RAZPlh3qXiR2y9i6Cto1TnYnYQsc044HAHI1EjOmaizSGylx3ebFC1
-         bt5DMbTrPKsZe5DwXLi9kZlR78e5fkgdXqsRNc2M=
-Date:   Fri, 4 Oct 2019 08:43:50 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Samuel Neves <sneves@dei.uc.pt>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Martin Willi <martin@strongswan.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: Re: [PATCH v2 04/20] crypto: arm/chacha - expose ARM ChaCha routine
- as library function
-Message-ID: <20191004154350.GA698@sol.localdomain>
-Mail-Followup-To: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Samuel Neves <sneves@dei.uc.pt>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Arnd Bergmann <arnd@arndb.de>, Andy Lutomirski <luto@kernel.org>,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Martin Willi <martin@strongswan.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>
-References: <20191002141713.31189-1-ard.biesheuvel@linaro.org>
- <20191002141713.31189-5-ard.biesheuvel@linaro.org>
- <CAHmME9p3a-sNp_MmMKxX7z9PsTi3DdUrVtX=X4vhr_ep=KdCJw@mail.gmail.com>
- <CAKv+Gu8urn0K5pCHr4Y1qJH+8-wcQ=BXAHVSXO9xt4PwZ14xiw@mail.gmail.com>
- <CAHmME9qYtvhqQ25+E-GW0=6AuAwCPmsCeHpw6cS_zs1XSBpR7A@mail.gmail.com>
+        id S2389871AbfJDPoE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Oct 2019 11:44:04 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
+        id 1iGPkM-0001PO-JT; Sat, 05 Oct 2019 01:43:59 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 05 Oct 2019 01:43:58 +1000
+Date:   Sat, 5 Oct 2019 01:43:58 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Pascal van Leeuwen <pascalvanl@gmail.com>
+Cc:     linux-crypto@vger.kernel.org, antoine.tenart@bootlin.com,
+        davem@davemloft.net,
+        Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
+Subject: Re: [PATCHv4 0/3] crypto: inside-secure: Add support for the
+ Chacha20 skcipher and the Chacha20-Poly1305 AEAD suites
+Message-ID: <20191004154358.GV5148@gondor.apana.org.au>
+References: <1568841958-14622-1-git-send-email-pvanleeuwen@verimatrix.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAHmME9qYtvhqQ25+E-GW0=6AuAwCPmsCeHpw6cS_zs1XSBpR7A@mail.gmail.com>
-User-Agent: Mutt/1.12.2 (2019-09-21)
+In-Reply-To: <1568841958-14622-1-git-send-email-pvanleeuwen@verimatrix.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Oct 04, 2019 at 04:29:57PM +0200, Jason A. Donenfeld wrote:
-> On Fri, Oct 4, 2019 at 4:23 PM Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
-> > How is it relevant whether the boot CPU is A5 or A7? These are bL
-> > little cores that only implement NEON for feature parity with their bl
-> > big counterparts, but CPU intensive tasks are scheduled on big cores,
-> > where NEON performance is much better than scalar.
+On Wed, Sep 18, 2019 at 11:25:55PM +0200, Pascal van Leeuwen wrote:
+> Extend driver support with chacha20, rfc7539(chacha20,poly1305) and
+> rfc7539esp(chacha20,poly1305) ciphers.
+> The patchset has been tested with the eip197c_iesb and eip197c_iewxkbc
+> configurations on the Xilinx VCU118 development board, including the
+> crypto extra tests.
 > 
-> Yea big-little might confuse things indeed. Though the performance
-> difference between the NEON code and the scalar code is not that huge,
-> and I suspect that big-little machines might benefit from
-> unconditionally using the scalar code, given that sometimes they might
-> wind up doing things on the little cores.
+> Note that this patchset applies on top of the earlier submitted
+> "Add support for the CBCMAC" series.
 > 
-> Eric - what did you guys wind up doing on Android with the fast scalar
-> implementation?
+> changes since v1:
+> - rebased on top of DES library changes done on cryptodev/master
+> - fixed crypto/Kconfig so that generic fallback is compiled as well
+> 
+> changes since v2:
+> - made switch entry SAFEXCEL_AES explit and added empty default, as
+>   requested by Antoine Tenart. Also needed to make SM4 patches apply.
+> 
+> changes since v3:
+> - for rfc7539 and rfc7539esp, allow more (smaller) AAD lenghts to be
+>   handled by the hardware instead of the fallback cipher (this allows
+>   running the tcrypt performance tests on the actual hardware)
+> 
+> Pascal van Leeuwen (3):
+>   crypto: inside-secure - Added support for the CHACHA20 skcipher
+>   crypto: inside-secure - Add support for the Chacha20-Poly1305 AEAD
+>   crypto: Kconfig - Add CRYPTO_CHACHA20POLY1305 to CRYPTO_DEV_SAFEXCEL
+> 
+>  drivers/crypto/Kconfig                         |   3 +-
+>  drivers/crypto/inside-secure/safexcel.c        |   3 +
+>  drivers/crypto/inside-secure/safexcel.h        |  11 +
+>  drivers/crypto/inside-secure/safexcel_cipher.c | 336 ++++++++++++++++++++++++-
+>  4 files changed, 339 insertions(+), 14 deletions(-)
 
-We're still just using the NEON implementation from the upstream kernel instead.
-
-- Eric
+All applied.  Thanks.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
