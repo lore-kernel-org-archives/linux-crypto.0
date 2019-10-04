@@ -2,121 +2,129 @@ Return-Path: <SRS0=x16Q=X5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB36DC47404
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 13:29:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEB09C4CED1
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 13:36:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A86AF207FF
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 13:29:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 85BBE222C2
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 13:36:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="2ECfLjBo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388313AbfJDN3i (ORCPT
+        id S2388417AbfJDNg6 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Oct 2019 09:29:38 -0400
-Received: from relay8-d.mail.gandi.net ([217.70.183.201]:35301 "EHLO
-        relay8-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387917AbfJDN3i (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Oct 2019 09:29:38 -0400
-X-Originating-IP: 193.36.116.148
-Received: from d.localdomain (unknown [193.36.116.148])
-        (Authenticated sender: out@gert.gr)
-        by relay8-d.mail.gandi.net (Postfix) with ESMTPSA id 8CA771BF206;
-        Fri,  4 Oct 2019 13:29:34 +0000 (UTC)
-Subject: Re: [PATCH] crypto: geode-aes - switch to skcipher for cbc(aes)
- fallback
+        Fri, 4 Oct 2019 09:36:58 -0400
+Received: from frisell.zx2c4.com ([192.95.5.64]:34139 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388376AbfJDNg6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Oct 2019 09:36:58 -0400
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 74788fea;
+        Fri, 4 Oct 2019 12:50:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=date:from:to
+        :cc:subject:message-id:references:mime-version:content-type
+        :in-reply-to; s=mail; bh=7WFG5JfNXT+cN8gKNsLKv1E0UGI=; b=2ECfLjB
+        o5JWCqOxoUeS+YmVyg83FKnEH8hQ35uSLh4LYRAWFLKoeigs9nw0Gv6Ou3ggM5lM
+        GPrt3Edo9qkftcEVFRwncw8vEqxW7wzBsK4mJNLJQx2XrxuCLk6JlcQFx8clGDD+
+        Afv+DzWCAWSFsaqH93GBsJPGcZ13YHHM5dzX72WYiQrSmoG4V+3oXoQxzqc6ULq1
+        3MP5E9ZOKK4pGEkKNScXsOL+AX9XrxvsmT2wbb2bohnz0pq77Ne0hDKBZrzGYgbu
+        M6sR9vNZ52hfBujV1xDbYrQ2KZql2X4ofUOnrBJJTS3YteW0WlVDRfR9fVeLPs+4
+        CsTm+IUgd369b6w==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 025c9ea3 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
+        Fri, 4 Oct 2019 12:50:01 +0000 (UTC)
+Date:   Fri, 4 Oct 2019 15:36:49 +0200
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
 To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
+Cc:     linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Jelle de Jong <jelledejong@powercraft.nl>
-References: <20191003133921.29344-1-ard.biesheuvel@linaro.org>
- <64d5c8ec-41c5-1ef2-cc4b-a050bf4c48ba@gert.gr>
- <CAKv+Gu8htzzdi5=4z5-E5o+J+bAPO=N4dR75Se=3JOZw8P_tDA@mail.gmail.com>
-From:   Gert Robben <t2@gert.gr>
-Message-ID: <decd3196-8679-7298-7967-25cb231357fb@gert.gr>
-Date:   Fri, 4 Oct 2019 15:29:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        David Miller <davem@davemloft.net>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Eric Biggers <ebiggers@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Martin Willi <martin@strongswan.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>
+Subject: Re: [PATCH v2 02/20] crypto: x86/chacha - expose SIMD ChaCha routine
+ as library function
+Message-ID: <20191004133649.GC112631@zx2c4.com>
+References: <20191002141713.31189-1-ard.biesheuvel@linaro.org>
+ <20191002141713.31189-3-ard.biesheuvel@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <CAKv+Gu8htzzdi5=4z5-E5o+J+bAPO=N4dR75Se=3JOZw8P_tDA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: nl-NL
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20191002141713.31189-3-ard.biesheuvel@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Op 04-10-2019 om 08:16 schreef Ard Biesheuvel:
-> On Thu, 3 Oct 2019 at 23:26, Gert Robben <t2@gert.gr> wrote:
->> Op 03-10-2019 om 15:39 schreef Ard Biesheuvel:
->>> Commit 79c65d179a40e145 ("crypto: cbc - Convert to skcipher") updated
->>> the generic CBC template wrapper from a blkcipher to a skcipher algo,
->>> to get away from the deprecated blkcipher interface. However, as a side
->>> effect, drivers that instantiate CBC transforms using the blkcipher as
->>> a fallback no longer work, since skciphers can wrap blkciphers but not
->>> the other way around. This broke the geode-aes driver.
->>>
->>> So let's fix it by moving to the sync skcipher interface when allocating
->>> the fallback.
->>>
->>> Cc: Gert Robben <t2@gert.gr>
->>> Cc: Jelle de Jong <jelledejong@powercraft.nl>
->>> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
->>> ---
->>> Gert, Jelle,
->>>
->>> If you can, please try this patch and report back to the list if it solves
->>> the Geode issue for you.
->>
->> Thanks for the patch!
->> I tried it on Alix 2C2 / Geode LX800 with Linux 5.4-rc1 (also 5.1-5.3 fwiw).
->>
->> At least now openssl doesn't give those errors anymore.
->> (openssl speed -evp aes-128-cbc -elapsed -engine afalg)
->> But looking at the results (<6MB/s), apparently it's not using geode-aes
->> (>30MB/s?).
->> In dmesg can be seen:
->>
->> alg: skcipher: ecb-aes-geode encryption test failed (wrong result) on
->> test vector 1, cfg="out-of-place"
->> alg: skcipher: cbc-aes-geode encryption test failed (wrong result) on
->> test vector 2, cfg="out-of-place"
->> Geode LX AES 0000:00:01.2: GEODE AES engine enabled.
->>
->> In /proc/crypto, drivers cbc-aes-geode/ecb-aes-geode are listed with
->> "selftest: unknown". Driver "geode-aes" has "selftest: passed".
->>
->> I'm happy to test other patches.
+On Wed, Oct 02, 2019 at 04:16:55PM +0200, Ard Biesheuvel wrote:
+> Wire the existing x86 SIMD ChaCha code into the new ChaCha library
+> interface.
 > 
-> Oops, mistake there on my part
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
+>  arch/x86/crypto/chacha_glue.c | 36 ++++++++++++++++++++
+>  crypto/Kconfig                |  1 +
+>  include/crypto/chacha.h       |  6 ++++
+>  3 files changed, 43 insertions(+)
 > 
-> Can you replace the two instances of
-> 
-> skcipher_request_set_crypt(req, dst, src, nbytes, desc->info);
-> 
-> with
-> 
-> skcipher_request_set_crypt(req, src, dst, nbytes, desc->info);
-> 
-> please?
+> diff --git a/arch/x86/crypto/chacha_glue.c b/arch/x86/crypto/chacha_glue.c
+> index bc62daa8dafd..fd9ef42842cf 100644
+> --- a/arch/x86/crypto/chacha_glue.c
+> +++ b/arch/x86/crypto/chacha_glue.c
+> @@ -123,6 +123,42 @@ static void chacha_dosimd(u32 *state, u8 *dst, const u8 *src,
+>  	}
+>  }
+>  
+> +void hchacha_block(const u32 *state, u32 *stream, int nrounds)
+> +{
+> +	state = PTR_ALIGN(state, CHACHA_STATE_ALIGN);
+> +
+> +	if (!crypto_simd_usable()) {
+> +		hchacha_block_generic(state, stream, nrounds);
+> +	} else {
+> +		kernel_fpu_begin();
+> +		hchacha_block_ssse3(state, stream, nrounds);
+> +		kernel_fpu_end();
+> +	}
+> +}
+> +EXPORT_SYMBOL(hchacha_block);
 
-Yes, with that change, now it works in 5.4-rc1:
+Please correct me if I'm wrong:
 
-# openssl speed -evp aes-128-cbc -elapsed -engine afalg
-- - - 8< - - -
-The 'numbers' are in 1000s of bytes per second processed.
-type             16 bytes     64 bytes    256 bytes   1024 bytes   8192 
-bytes  16384 bytes
-aes-128-cbc        125.63k      499.39k     1858.18k     6377.00k 
-25753.93k    31167.08k
+The approach here is slightly different from Zinc. In Zinc, I had one
+entry point that conditionally called into the architecture-specific
+implementation, and I did it inline using #includes so that in some
+cases it could be optimized out.
 
-I also quickly tried nginx https, that seems to transfer a file correctly.
-And a bit faster, but not by this much, I have to look into that further.
-For now I assume the kernel part seems to be working fine.
+Here, you override the original symbol defined by the generic module
+from the architecture-specific implementation, and in there you decide
+which way to branch.
 
-Thanks, much appreciated!
-Gert
+Your approach has the advantage that you don't need to #include a .c
+file like I did, an ugly yet very effective approach.
+
+But it has two disadvantages:
+
+1. For architecture-specific code that _always_ runs, such as the
+  MIPS32r2 implementation of chacha, the compiler no longer has an
+  opportunity to remove the generic code entirely from the binary,
+  which under Zinc resulted in a smaller module.
+
+2. The inliner can't make optimizations for that call.
+
+Disadvantage (2) might not make much of a difference. Disadvantage (1)
+seems like a bigger deal. However, perhaps the linker is smart and can
+remove the code and symbol? Or if not, is there a way to make the linker
+smart? Or would all this require crazy LTO which isn't going to happen
+any time soon?
