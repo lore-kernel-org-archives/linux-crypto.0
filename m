@@ -6,38 +6,63 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25020C4360C
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 14:01:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0424C4360C
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 14:03:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EF7CC222C4
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 14:01:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 84D5420700
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 14:03:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="m83opc3T"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="P1Gz0jPO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389039AbfJDOBF (ORCPT
+        id S2388960AbfJDODP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Oct 2019 10:01:05 -0400
-Received: from frisell.zx2c4.com ([192.95.5.64]:54599 "EHLO frisell.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388417AbfJDOBF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Oct 2019 10:01:05 -0400
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 684a1077;
-        Fri, 4 Oct 2019 13:14:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=date:from:to
-        :cc:subject:message-id:references:mime-version:content-type
-        :in-reply-to; s=mail; bh=pE4whhF1RHvIuHUbJe/EDlxqfZg=; b=m83opc3
-        T/n0LM8cUqfND7dsNHp/h/JdHn67Z6IYtrrotfRg9KCioQbLbjzzaTxgYPF5naNx
-        SSQSesvIByC0y7iVH3z98fyCXfOHi8X77ZxU3OuVna87x0I6nBEupo+Daq2rVCkt
-        y5//abKYVGokYCqlFeQqudmMu7jUBIpvQIBSYwju87afjkZGzn3Ei6hCKY0iA5Wb
-        xAzwuIWXe0GHwX6E7k/rWj8biZix0z+hXRIJr76sQNWX8bDTxwVDpaQ8lF/JG9nX
-        kK3nwkSCSaT/Jj8dxmWjvWZ0gn3XEdR9HpFuEVN3sRTu8hHuep6HcO6ZAQyEaIr9
-        GDBdfQxiFdaEnSQ==
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id c7e08c3e (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
-        Fri, 4 Oct 2019 13:14:09 +0000 (UTC)
-Date:   Fri, 4 Oct 2019 16:00:57 +0200
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     linux-crypto@vger.kernel.org,
+        Fri, 4 Oct 2019 10:03:15 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:37432 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388197AbfJDODP (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Oct 2019 10:03:15 -0400
+Received: by mail-wr1-f68.google.com with SMTP id p14so6424175wro.4
+        for <linux-crypto@vger.kernel.org>; Fri, 04 Oct 2019 07:03:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Er4SXIgxcEE4aax8T96FM3625i+T61N4koZmZMdahiY=;
+        b=P1Gz0jPO/0QDPA+O8QhWsaRBWzJOIjWu5YAZFYoWor5mx3mVlq7r6ZDhWkJNudnBPm
+         BMK+J8M6GcXZaefnaJP4WYSevLUnDQ36NiM8PUbNkshhkEPEI7yq/pqJZ/0jiqSNR6Xn
+         mWYhoWjIzFjintOMIHoo7HkjjRz+Z/Xti4NueEtNmZLXqArM1Elqw7pOTB4MIPNYP0ZU
+         d1PQ56Tuaho2BazpmXgHyGH9DIeegnKV1udKgIp6nb9wA/uR5n/OBVZK08Jpp54oE13S
+         74+K00H+EMq8nqtQDyWq87qw0M8RGGw5JFZdEsEMAbdMqRhNmvu24s+6llinmFv8FkwI
+         y7CA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Er4SXIgxcEE4aax8T96FM3625i+T61N4koZmZMdahiY=;
+        b=JrMK4cISQ0B4TBMwQGRfAex0fIFI3R2DeK+qVsK2p0eWNUfBNGxUlvCOpls4N4dfhY
+         QYYrqyBOMikfGVza4wzP37UNfSRD766djLPebP8aqtR1seCALG/sxZsrJeEEBMPMMycV
+         Fwj4lze/N+RJPc1VT3PJBrc408ohcbnF//JGZ4t7E2ZvQO7lxTs7hVTea06HlXlt03Rk
+         n5g0P1617N8T7fCHwHA9XHTb7nOPA5dxrTlOmqrg/iNJ/Nr+f0X/5FkmFN+Pqv0qqdf/
+         L52801f0WqiBfUTo9M1xNL8r5d9U6X2mbga/Z7/s/9fK/zPfAtog/9YZNwx3L1W1XQW6
+         lpbA==
+X-Gm-Message-State: APjAAAVZB/vjYeVZEpnm75WrJ+PWReMW1gQDPMEre6kaxXsjFQ3E8/Fc
+        l7DxmWULE+1TD9XxVbwLpEIB5T4c9IslCAWw1pwWIw==
+X-Google-Smtp-Source: APXvYqwNBX5rK+71wVSaKh6+kqftc6hKfFvFgtDtJHaet9Or4UNM1VjLii7ln9o/gDIC2s5oVp38LQT3JF8oXrNuUQc=
+X-Received: by 2002:a5d:61c8:: with SMTP id q8mr6169926wrv.325.1570197792258;
+ Fri, 04 Oct 2019 07:03:12 -0700 (PDT)
+MIME-Version: 1.0
+References: <20191002141713.31189-1-ard.biesheuvel@linaro.org>
+ <20191002141713.31189-15-ard.biesheuvel@linaro.org> <20191004135750.GA114360@zx2c4.com>
+In-Reply-To: <20191004135750.GA114360@zx2c4.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Fri, 4 Oct 2019 16:03:00 +0200
+Message-ID: <CAKv+Gu9Gwu=Qzw=+iREro_JHzCWKAiqtbWrnFq8qozYazNn6XA@mail.gmail.com>
+Subject: Re: [PATCH v2 14/20] crypto: Curve25519 - generic C library
+ implementations and selftest
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         David Miller <davem@davemloft.net>,
         Greg KH <gregkh@linuxfoundation.org>,
@@ -52,40 +77,40 @@ Cc:     linux-crypto@vger.kernel.org,
         Martin Willi <martin@strongswan.org>,
         Peter Zijlstra <peterz@infradead.org>,
         Josh Poimboeuf <jpoimboe@redhat.com>
-Subject: Re: [PATCH v2 18/20] crypto: arm/Curve25519 - wire up NEON
- implementation
-Message-ID: <20191004140057.GB114360@zx2c4.com>
-References: <20191002141713.31189-1-ard.biesheuvel@linaro.org>
- <20191002141713.31189-19-ard.biesheuvel@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20191002141713.31189-19-ard.biesheuvel@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 02, 2019 at 04:17:11PM +0200, Ard Biesheuvel wrote:
-> +bool curve25519_arch(u8 out[CURVE25519_KEY_SIZE],
-> +		     const u8 scalar[CURVE25519_KEY_SIZE],
-> +		     const u8 point[CURVE25519_KEY_SIZE])
-> +{
-> +	if (!have_neon || !crypto_simd_usable())
-> +		return false;
-> +	kernel_neon_begin();
-> +	curve25519_neon(out, scalar, point);
-> +	kernel_neon_end();
-> +	return true;
-> +}
-> +EXPORT_SYMBOL(curve25519_arch);
+On Fri, 4 Oct 2019 at 15:57, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+>
+> On Wed, Oct 02, 2019 at 04:17:07PM +0200, Ard Biesheuvel wrote:
+> >        - replace .c #includes with Kconfig based object selection
+>
+> Cool!
+>
+> > +config CRYPTO_ARCH_HAVE_LIB_CURVE25519
+> > +     tristate
+> > +
+> > +config CRYPTO_ARCH_HAVE_LIB_CURVE25519_BASE
+> > +     bool
+> > +
+> > +config CRYPTO_LIB_CURVE25519
+> > +     tristate "Curve25519 scalar multiplication library"
+> > +     depends on CRYPTO_ARCH_HAVE_LIB_CURVE25519 || !CRYPTO_ARCH_HAVE_LIB_CURVE25519
+>
+> a || !a ==> true
+>
+> Did you mean for one of these to be _BASE? Or is this a Kconfig trick of
+> a different variety that's intentional?
+>
 
-This now looks more like the Zinc way of doing things, with the _arch
-function returning true or false based on whether or not the
-implementation was available, allowing the generic implementation to
-run.
+This ensures that the base module is not builtin when the arch one is
+configured as a module, since in that case, the arch code never gets
+called.
 
-I thought, from looking at the chacha commits earlier, you had done away
-with that style of things in favor of weak symbols, whereby the arch
-implementation would fall back to the generic one, instead of the other
-way around?
+> > +libcurve25519-y                                      := curve25519-fiat32.o
+> > +libcurve25519-$(CONFIG_ARCH_SUPPORTS_INT128) := curve25519-hacl64.o
+>
+> Nice idea.
