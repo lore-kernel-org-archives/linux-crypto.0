@@ -2,79 +2,85 @@ Return-Path: <SRS0=x16Q=X5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D28E9C47404
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 17:53:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37219C4CED1
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 18:20:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B727D21D81
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 17:53:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 12F94215EA
+	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 18:20:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389165AbfJDRxP (ORCPT
+        id S1725907AbfJDSUQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Oct 2019 13:53:15 -0400
-Received: from stargate.chelsio.com ([12.32.117.8]:46060 "EHLO
-        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388880AbfJDRxO (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Oct 2019 13:53:14 -0400
-Received: from beagle7.asicdesigners.com (beagle7.asicdesigners.com [10.192.192.157])
-        by stargate.chelsio.com (8.13.8/8.13.8) with ESMTP id x94Hqr0P005677;
-        Fri, 4 Oct 2019 10:52:53 -0700
-From:   Ayush Sawal <ayush.sawal@chelsio.com>
-To:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        smueller@chronox.de
-Cc:     Atul Gupta <atul.gupta@chelsio.com>
-Subject: [af_alg v2] crypto:af_alg cast ki_complete ternary op to int
-Date:   Fri,  4 Oct 2019 10:50:58 -0700
-Message-Id: <20191004175058.11850-1-ayush.sawal@chelsio.com>
-X-Mailer: git-send-email 2.20.0.rc2.7.g965798d
+        Fri, 4 Oct 2019 14:20:16 -0400
+Received: from mga07.intel.com ([134.134.136.100]:15752 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725730AbfJDSUP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 4 Oct 2019 14:20:15 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 04 Oct 2019 11:20:14 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,257,1566889200"; 
+   d="scan'208";a="205910170"
+Received: from nzaki1-mobl1.ger.corp.intel.com (HELO localhost) ([10.252.4.57])
+  by fmsmga001.fm.intel.com with ESMTP; 04 Oct 2019 11:20:08 -0700
+Date:   Fri, 4 Oct 2019 21:20:07 +0300
+From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+To:     Mimi Zohar <zohar@linux.ibm.com>
+Cc:     David Safford <david.safford@ge.com>,
+        linux-integrity@vger.kernel.org, stable@vger.kernel.org,
+        David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "open list:ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] KEYS: asym_tpm: Switch to get_random_bytes()
+Message-ID: <20191004182007.GA6945@linux.intel.com>
+References: <20190926171601.30404-1-jarkko.sakkinen@linux.intel.com>
+ <1570024819.4999.119.camel@linux.ibm.com>
+ <20191003114119.GF8933@linux.intel.com>
+ <1570107752.4421.183.camel@linux.ibm.com>
+ <20191003175854.GB19679@linux.intel.com>
+ <1570128827.5046.19.camel@linux.ibm.com>
+ <20191003215125.GA30511@linux.intel.com>
+ <20191003215743.GB30511@linux.intel.com>
+ <1570140491.5046.33.camel@linux.ibm.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <1570140491.5046.33.camel@linux.ibm.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-when libkcapi test is executed  using HW accelerator, cipher operation
-return -74.Since af_alg_async_cb->ki_complete treat err as unsigned int,
-libkcapi receive 429467222 even though it expect -ve value.
+On Thu, Oct 03, 2019 at 06:08:11PM -0400, Mimi Zohar wrote:
+> > At the time when trusted keys was introduced I'd say that it was a wrong
+> > design decision and badly implemented code. But you are right in that as
+> > far that code is considered it would unfair to speak of a regression.
+> > 
+> > asym-tpm.c on the other hand this is fresh new code. There has been
+> > *countless* of discussions over the years that random numbers should
+> > come from multiple sources of entropy. There is no other categorization
+> > than a bug for the tpm_get_random() there.
+> 
+> This week's LWN article on "5.4 Merge window, part 2" discusses "boot-
+> time entropy".  This article couldn't have been more perfectly timed.
 
-Hence its required to cast resultlen to int so that proper
-error is returned to libkcapi.
+Do not see any obvious relation to this dicussion. Are you saying that
+you should not use the defacto kernel API's but instead bake your own
+hacks because even defacto stuff bumps into issues from time to time?
 
-AEAD one shot non-aligned test 2(libkcapi test)
-./../bin/kcapi   -x 10   -c "gcm(aes)" -i 7815d4b06ae50c9c56e87bd7
--k ea38ac0c9b9998c80e28fb496a2b88d9 -a
-"853f98a750098bec1aa7497e979e78098155c877879556bb51ddeb6374cbaefc"
--t "c4ce58985b7203094be1d134c1b8ab0b" -q
-"b03692f86d1b8b39baf2abb255197c98"
+And BTW, at the time you call tpm_get_random(), TPM driver is already
+contributing to the entropy pool (registered as hwrng).
 
-Signed-off-by: Ayush Sawal <ayush.sawal@chelsio.com>
-Signed-off-by: Atul Gupta <atul.gupta@chelsio.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-v1: cast err and resultlen to long
-Signed-off-by: Ayush Sawal <ayush.sawal@chelsio.com>
----
- crypto/af_alg.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index 879cf23..0dceaab 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -1043,7 +1043,7 @@ void af_alg_async_cb(struct crypto_async_request *_req, int err)
- 	af_alg_free_resources(areq);
- 	sock_put(sk);
- 
--	iocb->ki_complete(iocb, err ? err : resultlen, 0);
-+	iocb->ki_complete(iocb, err ? err : (int)resultlen, 0);
- }
- EXPORT_SYMBOL_GPL(af_alg_async_cb);
- 
--- 
-1.8.3.1
-
+/Jarkko
