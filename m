@@ -7,39 +7,39 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3207ECE58B
-	for <linux-crypto@archiver.kernel.org>; Sat,  5 Oct 2019 15:20:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 738E7C4740A
+	for <linux-crypto@archiver.kernel.org>; Sat,  5 Oct 2019 15:27:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AA569222CA
-	for <linux-crypto@archiver.kernel.org>; Sat,  5 Oct 2019 15:20:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 477B9222C0
+	for <linux-crypto@archiver.kernel.org>; Sat,  5 Oct 2019 15:27:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="rzPCXieV"
+	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="XIA4YZru"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727980AbfJEPUr (ORCPT
+        id S1727795AbfJEP1r (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 5 Oct 2019 11:20:47 -0400
-Received: from mout.web.de ([212.227.15.4]:39757 "EHLO mout.web.de"
+        Sat, 5 Oct 2019 11:27:47 -0400
+Received: from mout.web.de ([212.227.15.14]:43909 "EHLO mout.web.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725826AbfJEPUr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 5 Oct 2019 11:20:47 -0400
+        id S1725826AbfJEP1r (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 5 Oct 2019 11:27:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
-        s=dbaedf251592; t=1570288821;
-        bh=ZsBiWxP33gqgEWiBytp1B4ziRYQk5nXQ7/5GuWkBq3E=;
+        s=dbaedf251592; t=1570289250;
+        bh=TGPGZ4BC982UpJnrecztHM+J1YSIyZDa1AkZc1zUtX8=;
         h=X-UI-Sender-Class:Cc:References:Subject:To:From:Date:In-Reply-To;
-        b=rzPCXieVz001uGfTgq8V194L4msCMI1U3rZxLwTJeCBAoR7ZcCtgva/CFB4HdVgCj
-         JM/VJIUz249K+SOPQjDw2bLkhx409M5vdXmYM/tiVI3HTwR0ycTyFq6wL3OXRXL+cq
-         PA7lzfbqXut9VZ4rE0E6494uvZ8IH+BYcyBr5PoY=
+        b=XIA4YZruqPkmBOla1K6dSDST2VEXym3xIMA8D6B1MWwpSy/20RmyJRtoB2mGm2s9P
+         v7bqpuUElAGZ7t1g635pLnACP7Zui10tpWETrQj8UV2U5TW+4iz7UFdWqjvYGGWsIC
+         AZElSY5Dnz4tA7AHv8p1ersYWD/fINV7gEavB5XE=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
 Received: from [192.168.1.2] ([93.135.178.111]) by smtp.web.de (mrweb004
- [213.165.67.108]) with ESMTPSA (Nemesis) id 0MfCyA-1iSNmp0fqU-00OqMQ; Sat, 05
- Oct 2019 17:20:21 +0200
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 0MVXnr-1icW4r07xP-00Z3W5; Sat, 05
+ Oct 2019 17:27:30 +0200
 Cc:     Navid Emamdoost <emamd001@umn.edu>, Kangjie Lu <kjlu@umn.edu>,
         Stephen McCamant <smccaman@umn.edu>,
         "David S. Miller" <davem@davemloft.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-References: <20191004192923.17491-1-navid.emamdoost@gmail.com>
-Subject: Re: [PATCH] crypto: user - fix memory leak in crypto_report
+References: <20191004193455.18348-1-navid.emamdoost@gmail.com>
+Subject: Re: [PATCH] crypto: user - fix memory leak in crypto_reportstat
 To:     Navid Emamdoost <navid.emamdoost@gmail.com>,
         linux-crypto@vger.kernel.org
 From:   Markus Elfring <Markus.Elfring@web.de>
@@ -86,44 +86,45 @@ Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
  Z/wsLiWTgKlih2QYULvW61XU+mWsK8+ZlYUrRMpkauN4CJ5yTpvp+Orcz5KixHQmc5tbkLWf
  x0n1QFc1xxJhbzN+r9djSGGN/5IBDfUqSANC8cWzHpWaHmSuU3JSAMB/N+yQjIad2ztTckZY
  pwT6oxng29LzZspTYUEzMz3wK2jQHw+U66qBFk8whA7B2uAU1QdGyPgahLYSOa4XAEGb6wbI FEE=
-Message-ID: <9a7a96ce-7778-12b5-f844-25ba04e627b2@web.de>
-Date:   Sat, 5 Oct 2019 17:20:18 +0200
+Message-ID: <ddfd75b0-f0e7-8eaf-3631-95e2dc81bf63@web.de>
+Date:   Sat, 5 Oct 2019 17:27:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
 MIME-Version: 1.0
-In-Reply-To: <20191004192923.17491-1-navid.emamdoost@gmail.com>
+In-Reply-To: <20191004193455.18348-1-navid.emamdoost@gmail.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-X-Provags-ID: V03:K1:Ov/6Jc669RyGtLr1MH3uF56NlB5JhTOyyDLjphTVS2rvAyVy1tJ
- fmseTOKWZ25Y3sWi6lVIxHiF/rq/JCTd/DASpCSxG4fBJGUmMmaLSFb8gCxfEMRvfKBD8nQ
- hNF+YyP1P/McoRhFNIMQrB4owMPr0kqiI1dX2VINF2Yho4E42VS+yutVnJ72ZLzUA9X/ip1
- OItEpi7G1qZdpd+6R4/nQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:yIzkyXYaBns=:izRFHlQR2mAGH52y9FQZ8s
- n3V6zxjOgUpkA3AGkY/0IQ/KiMVr2VrjI0Dj7mhdYLvt37rOeoUkDB+Qr28cBtEkoYylFUwdm
- Jk1cPLKIz0bfO0AHIcz2hNypISFXsOARPdSgRlAn/9tFf1Hw7Rwf+k0uicJ34T/0JR77mPdAn
- JW9dIZ1bNPrCfe+t3Q1Z8uLf8YJ1AoY1UjwoOTe5Mpyp+jqTjWTD6RwKMVSthdMi60pYcHbOf
- iZ8Ofo3sjWqbHYJww84csqQcBzTChzQztB1hvJmF6HRrvGwKvSRzg+6KieAIbYWD3XGxBTbWh
- gHsvDoMpnHS4fX8L5a7kImQQhCRC8318jLGLvnAFgC7z45DWAdIFxbsEKH6J3S5Cchvjpm2dd
- 3ggqRMpPIffPZZc0oOUrUeHrFyr1o/+sJ3Lu9pUKszCX1HXxa5V7u9WoWIdFLm456MJSvq80X
- iYD0bgqqxcW4sisO/cQfqMSwgDNdohKFlX8Diswc7RPFKYRvaLXabk1kwR8u4ZUW0YXsGYId1
- RuTsJHa3FszlQmpqBEiZcMTkmtRqWekCWGhcXDKJ7mz2ciwEVIss5m9UqKNN7w+RVgebC+n6S
- SJN3UP2m7Z1vQaaf98eypr4qGWps086Qy4bjETAlHe13aSJyPu5omBPrL9NT3SR4uAgRAuLNB
- MMGPzn9pwElyT8eXlpRmqiqYpnT0Ivia2mK2hp/sbNOM3lJhQU3Ap8YwwNBA8n/x0T2BDh1Yu
- AR7VCapTqemvhPqoPj/eLPi/TNjjbecjGNOT9aULLzu4ngj6OhUANfAiLkESjxaqeb2XGp7My
- mxQmDITvh0t5BA48Pqk1D0xOwU1+RMRCGepqUQ7XI69KrrskPIgod3xfJBq9QVpfsunm6NrTz
- qT5IstJHblnOTE5nTor73ZCeOXU4j8z1lKZ/IdkLE7LG4gcXvUIY6BF90mgTrE0vKGz88LgvG
- o8CJAyzqJ8Ok0rBp4Zi4xlV+TwAdJFvmE086LThYyBhs5Su4yVifDP/A68s06ns+OzTsesFMw
- mgaV5o2qVOcLJCBT7MPhq0/0CN8cKkeOgkVc4spH54VrUI8zQujTeZ/kkkjAGNlFMDi1oaTet
- 0faIcTkvbzioBZukzMKqYLZNAQvMlVVrm7Nmuz17XWtsxWDl5wER74K0yRLBUF/kShUtDdCSL
- 04BnZkgcFCofqTwEIJnn4tWPAG6pyN5vcJEEQ8meivuv42zzGQgVQpWfr8vr2d59bwnml/LIR
- AB36+8ISDZxp4TH4hDDM1Z+iTlPA9UnFEUYsR2vYopRgDFgWn5XCbak/IGeM=
+X-Provags-ID: V03:K1:cl3hnurCDS8Um1oNZYIEd2gOJYJRGd1F019xMwreAp0J6i3V+Co
+ nCBlP0b/hvKk9EOmH6AUSjnM2awnxVLV0R2O3g8MnA1TyeKNtVBvXwBJbfTog5bdAFQa/Ou
+ zWsXCzJFX+jQ5jQe5esVjhQcEoNRde9GHucysQ6UFqlgbfqaI1pgyegWqF07f9jYizSriAF
+ XBAeIoVabB0L/dL2Hns/g==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:nHDuIekP1tA=:S/b+1iqcU3FP6FPR1xoaRV
+ MImz52vR4Jg9ppR+7jZyuoaC/xfcrrRQgDpyylDEKIzm5s83MFaFXbRFbLMx2cj4GgOI7EI3V
+ MGnQPPc9z1oyp/LECt1EAS8FYHAa3OpD2YVS7TUpcM0UXsnAf8W67xtb4Vcf1r9L1ZCz4nNlp
+ KrNB1sjbqECKa+DUGihCMgt/ABwzOqmegG6ngEtzFE8evwkH8YLPZp9iYmEAcDyP8SnaJYxdQ
+ fXu0siOD9fZQQJ/gUv7Ey4azKI2Ff1aTe3EPa1SbaZbLiFzqf86Z0thUV3JwqAgiXK8X7vyY+
+ vUXnJUkf1V35f5A+j93W8G7v2neMLLM+i2RYip6JtKGkXw/l0uhlPcbrqC7+83OkRuPVA8dHS
+ Sr4sr9PpfUr2pOLlFlKvGhwD7Ym6eChHgGuZ88ySyu5ASiGQzdrnmS2tS/pdFiR/six0gpYZU
+ xummSUewmB3E7k3B6VY3jutBgrzI0zSMw6nfRZR33F6I6JeYoxdsHLR12Rruo7bHjNtd+UjZ3
+ i343zUhpl3No8s/ChI91PLqH8AhaATGpu8yEJ+2lSOsriO6Uxz/8fiLCzqwahWHUsBcMdtONz
+ kXPP46Aa4b6CRdEktL9/ZbEmeRG20b0/qYjZOrC33/RiZKPPxeJIuI4CXBmjktnwUhgEsNdTU
+ 6Zwp1Hmx4p84nOgjHpLEHfqhZZJzbgsnT91pLTI7RZN9RZ9KlfkP8oHBpn2Chogspj+1l3ewU
+ S+p6S/PK4j4AWgiGfwvAdNepwjb3wk/2pZvffDlzClSCzccqxaxAXHz2dHr/XffStUlcMTcm6
+ 7LOo4PBal9H4NC8PoF+W5DZgeeN2jG37jfxM5xs/IEhYc+sInDQP1kVtzEmOdoujKz4pEIZbs
+ K61SK2Ioeke4n5qoP1NBFPi9U1FOP/HqeL6W+gFlYEK2bQdkDn+hdSK6yCPn0jAcQCKdVBOqM
+ 2BRApn4L7xymaMeu1mAw3nIW73aCbmKij1WA+/B/i5Ox9xE2piFlgpgzIxuzCb/O082SiIWm8
+ pT2sDddslOtTkNTD55eVDAuf20iKAob9l3v/m58kMAn/XXOB/QsgJ0Klf5jPRCMeMuRL+w95J
+ JE+t0zehx46JTIqZvEDwOxxLO438EscAwH1mD89kRGUfNamUkITycC3ppo22GM2SoOgZcgHoS
+ lylmIoQMwxgp5WuyFN/RaK2k0OWgfETd2wKsnCGd8HckKghsE1PgG7fWdvuT3txQ1Ehg74XWW
+ 9QrWxaE9fPnm3rC5A+PTLg+p6x5jcdPxzAWjihDT8e6MUvsHqFYjOpKYQ85Y=
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> In crypto_report, a new skb is created via nlmsg_new(). This skb should
-> be released if crypto_report_alg() fails.
+> In crypto_reportstat, a new skb is created by nlmsg_new(). This skb is
+> leaked if crypto_reportstat_alg() fails. Required release for skb is
+> added.
 
 Please improve this change description.
 
