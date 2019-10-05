@@ -1,250 +1,212 @@
-Return-Path: <SRS0=x16Q=X5=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=f3/+=X6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_2 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21E2FC4CED1
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 22:11:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99998C47404
+	for <linux-crypto@archiver.kernel.org>; Sat,  5 Oct 2019 07:24:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DEC6E21D81
-	for <linux-crypto@archiver.kernel.org>; Fri,  4 Oct 2019 22:11:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5AF2D2084D
+	for <linux-crypto@archiver.kernel.org>; Sat,  5 Oct 2019 07:24:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="Uwvx5G6d";
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="Uwvx5G6d"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JOgox7h0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731490AbfJDWLM (ORCPT
+        id S1725976AbfJEHYt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 4 Oct 2019 18:11:12 -0400
-Received: from bedivere.hansenpartnership.com ([66.63.167.143]:35852 "EHLO
-        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730814AbfJDWLL (ORCPT
+        Sat, 5 Oct 2019 03:24:49 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:34925 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725927AbfJEHYs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 4 Oct 2019 18:11:11 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id BF8928EE27D;
-        Fri,  4 Oct 2019 15:11:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1570227070;
-        bh=TFG7caQVqFJ3Q80Ho7+LboXA24+IoJDY4nVR3w9xVPA=;
-        h=Subject:From:To:Date:In-Reply-To:References:From;
-        b=Uwvx5G6diQgxoXrkYxzNofLkC7dZbBYJ7FY7Bl7X8TbM7S9Fw0AQyTuLann8WLD+f
-         4dwv/2uh7nVPESoJ6sFEX6rVIwdQTvRuJrgjubzytGhpktWOy0ywkuSGPpU0Qt0PEU
-         hJTTm/jA7pFdR4PqqjUrDU2WJo2Mc6hCsfKgOmnU=
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id Zsxd6MXkHfIz; Fri,  4 Oct 2019 15:11:10 -0700 (PDT)
-Received: from jarvis.lan (unknown [50.35.76.230])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id E4B318EE0EE;
-        Fri,  4 Oct 2019 15:11:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
-        s=20151216; t=1570227070;
-        bh=TFG7caQVqFJ3Q80Ho7+LboXA24+IoJDY4nVR3w9xVPA=;
-        h=Subject:From:To:Date:In-Reply-To:References:From;
-        b=Uwvx5G6diQgxoXrkYxzNofLkC7dZbBYJ7FY7Bl7X8TbM7S9Fw0AQyTuLann8WLD+f
-         4dwv/2uh7nVPESoJ6sFEX6rVIwdQTvRuJrgjubzytGhpktWOy0ywkuSGPpU0Qt0PEU
-         hJTTm/jA7pFdR4PqqjUrDU2WJo2Mc6hCsfKgOmnU=
-Message-ID: <1570227068.17537.4.camel@HansenPartnership.com>
-Subject: Re: [PATCH] KEYS: asym_tpm: Switch to get_random_bytes()
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     Jerry Snitselaar <jsnitsel@redhat.com>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        David Safford <david.safford@ge.com>,
-        linux-integrity@vger.kernel.org, stable@vger.kernel.org,
-        David Howells <dhowells@redhat.com>,
+        Sat, 5 Oct 2019 03:24:48 -0400
+Received: by mail-wr1-f67.google.com with SMTP id v8so9609695wrt.2
+        for <linux-crypto@vger.kernel.org>; Sat, 05 Oct 2019 00:24:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=oXumP7isg67q+b5DBmTeeHFwTKSHVytPFJVSkr9ZKk0=;
+        b=JOgox7h0oOMz7oKv3Y45i2QVRArBN8yYCfoZGBMIyUoN3NuMMT8TC2BLoSCAZjMTfY
+         PIwlM6PNLEmEvjTcx1Y76IAFAzNrAoH7cuT/ggasYvhFYqoJq9EPmzR49ohFFnSFRXoT
+         vV/AkISginXU/yBKeAYThKvYPPaykwrm3oeNVt129mcqsP4IR3+N9SNNR/PeMwknSXe5
+         xwNC1uArAn5vK9fhEDxrOCY62QGUPm99eXAF2pS1PZ4MEmHVG1FzxCwu0iy7JZZb6OQo
+         PtB3EXY2Akze6b6u4iARBu/2/hWncMbJGzGhem0oSwHZOiOXSbrkCp8BZtXwVBx1F2Fe
+         3rkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=oXumP7isg67q+b5DBmTeeHFwTKSHVytPFJVSkr9ZKk0=;
+        b=ZQ1Tf+WwYMLCu0PksVz+iFwlaneW2jISzV0+IMM409sSmCisjLK+k/pBFkXJbrX1hD
+         EQVMqW5AGEcv/9r4acp+Sz1Gv6FA0aGn7g6LV4UtL+s6VzXa4YDtkx+Gckj+akbiXGxr
+         /FqRFIEbP6hQRoWtdcWmtOr/wSY+1w8JnB+14hAi35lXS28JtXdz4pcT6QZ4vTMjh6PX
+         TdwuFB2ZK15LXuHtG5BBNaHXKaz+Yg2CYgKn06DDAWnR44QVjA/uhV3jXlA2HRM0gkDB
+         vZ5/ssvikwCPwm2o1BrzY3QbCVpsJFk9F+YZpD7SswI0NhZleCF6ITYRr54a8LNdm+yl
+         IDtw==
+X-Gm-Message-State: APjAAAVGMP24atUdRTyEKS3OropoRWUuqAbYCvLtjS5iI8I4lIZmcHgZ
+        y7fZ8WOHt+/A6Q+OefN9A5ICNAaavdc49bzU8f8K/Q==
+X-Google-Smtp-Source: APXvYqxWTbUljZ2Wv7s9oAU86Z4Klxhnv5w9UUlf9hJ5oxfy7or01JMFmjmf4GsTF1r8VozW2dB3utA7VyttWvqXNwg=
+X-Received: by 2002:adf:e5cb:: with SMTP id a11mr14254198wrn.200.1570260285679;
+ Sat, 05 Oct 2019 00:24:45 -0700 (PDT)
+MIME-Version: 1.0
+References: <CAKv+Gu-Xe-BfYzVDqDaZZ2wawYs8HHHc-CMYPPOU3E=6CPgccA@mail.gmail.com>
+ <BE18E4E0-D4CC-40B9-96E1-C44D25B879D9@amacapital.net> <CAKv+Gu87Co3BobUeC_x2TLE9vy-sDHzj3aiK=LFetwC2jz3aig@mail.gmail.com>
+In-Reply-To: <CAKv+Gu87Co3BobUeC_x2TLE9vy-sDHzj3aiK=LFetwC2jz3aig@mail.gmail.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Sat, 5 Oct 2019 09:24:33 +0200
+Message-ID: <CAKv+Gu-VqfFsW+nrG+-2g1-eu6S+ZuD7qaN9aTchwD=Bcj_giw@mail.gmail.com>
+Subject: Re: [PATCH v2 00/20] crypto: crypto API library interfaces for WireGuard
+To:     Andy Lutomirski <luto@amacapital.net>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "open list:ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Date:   Fri, 04 Oct 2019 15:11:08 -0700
-In-Reply-To: <20191004201134.nuesk6hxtxajnxh2@cantor>
-References: <1570128827.5046.19.camel@linux.ibm.com>
-         <20191003215125.GA30511@linux.intel.com>
-         <20191003215743.GB30511@linux.intel.com>
-         <1570140491.5046.33.camel@linux.ibm.com>
-         <1570147177.10818.11.camel@HansenPartnership.com>
-         <20191004182216.GB6945@linux.intel.com>
-         <1570213491.3563.27.camel@HansenPartnership.com>
-         <20191004183342.y63qdvspojyf3m55@cantor>
-         <1570214574.3563.32.camel@HansenPartnership.com>
-         <20191004200728.xoj6jlgbhv57gepc@cantor>
-         <20191004201134.nuesk6hxtxajnxh2@cantor>
+        David Miller <davem@davemloft.net>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Eric Biggers <ebiggers@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Martin Willi <martin@strongswan.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.26.6 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 2019-10-04 at 13:11 -0700, Jerry Snitselaar wrote:
-> On Fri Oct 04 19, Jerry Snitselaar wrote:
-> > On Fri Oct 04 19, James Bottomley wrote:
-> > > On Fri, 2019-10-04 at 11:33 -0700, Jerry Snitselaar wrote:
-> > > > On Fri Oct 04 19, James Bottomley wrote:
-> > > > > On Fri, 2019-10-04 at 21:22 +0300, Jarkko Sakkinen wrote:
-> > > > > > On Thu, Oct 03, 2019 at 04:59:37PM -0700, James Bottomley
-> > > > > > wrote:
-> > > > > > > I think the principle of using multiple RNG sources for
-> > > > > > > strong keys is a sound one, so could I propose a
-> > > > > > > compromise:  We have a tpm subsystem random number
-> > > > > > > generator that, when asked for <n> random bytes first
-> > > > > > > extracts <n> bytes from the TPM RNG and places it into
-> > > > > > > the kernel entropy pool and then asks for <n> random
-> > > > > > > bytes from the kernel RNG? That way, it will always have
-> > > > > > > the entropy to satisfy the request and in the worst case,
-> > > > > > > where the kernel has picked up no other entropy sources
-> > > > > > > at all it will be equivalent to what we have now (single
-> > > > > > > entropy source) but usually it will be a much better
-> > > > > > > mixed entropy source.
-> > > > > > 
-> > > > > > I think we should rely the existing architecture where TPM
-> > > > > > is contributing to the entropy pool as hwrng.
-> > > > > 
-> > > > > That doesn't seem to work: when I trace what happens I see us
-> > > > > inject 32 bytes of entropy at boot time, but never again.  I
-> > > > > think the problem is the kernel entropy pool is push not pull
-> > > > > and we have no triggering event in the TPM to get us to
-> > > > > push.  I suppose we could set a timer to do this or perhaps
-> > > > > there is a pull hook and we haven't wired it up correctly?
-> > > > > 
-> > > > > James
-> > > > > 
-> > > > 
-> > > > Shouldn't hwrng_fillfn be pulling from it?
-> > > 
-> > > It should, but the problem seems to be it only polls the
-> > > "current" hw rng ... it doesn't seem to have a concept that there
-> > > may be more than one.  What happens, according to a brief reading
-> > > of the code, is when multiple are registered, it determines what
-> > > the "best" one is and then only pulls from that.  What I think it
-> > > should be doing is filling from all of them using the entropy
-> > > quality to adjust how many bits we get.
-> > > 
-> > > James
-> > > 
-> > 
-> > Most of them don't even set quality, including the tpm, so they end
-> > up at the end of the list. For the ones that do I'm not sure how
-> > they determined the value. For example virtio-rng sets quality to
-> > 1000.
-> 
-> I should have added that I like that idea though.
+On Fri, 4 Oct 2019 at 16:56, Ard Biesheuvel <ard.biesheuvel@linaro.org> wro=
+te:
+>
+> On Fri, 4 Oct 2019 at 16:53, Andy Lutomirski <luto@amacapital.net> wrote:
+> >
+> >
+> >
+> > > On Oct 4, 2019, at 6:52 AM, Ard Biesheuvel <ard.biesheuvel@linaro.org=
+> wrote:
+> > >
+> > > =EF=BB=BFOn Fri, 4 Oct 2019 at 15:42, Jason A. Donenfeld <Jason@zx2c4=
+.com> wrote:
+> > >>
+> > >>> On Thu, Oct 03, 2019 at 10:43:29AM +0200, Ard Biesheuvel wrote:
+> > >>> On Wed, 2 Oct 2019 at 16:17, Ard Biesheuvel <ard.biesheuvel@linaro.=
+org> wrote:
+> > >>>>
+> > >>> ...
+> > >>>>
+> > >>>> In the future, I would like to extend these interfaces to use stat=
+ic calls,
+> > >>>> so that the accelerated implementations can be [un]plugged at runt=
+ime. For
+> > >>>> the time being, we rely on weak aliases and conditional exports so=
+ that the
+> > >>>> users of the library interfaces link directly to the accelerated v=
+ersions,
+> > >>>> but without the ability to unplug them.
+> > >>>>
+> > >>>
+> > >>> As it turns out, we don't actually need static calls for this.
+> > >>> Instead, we can simply permit weak symbol references to go unresolv=
+ed
+> > >>> between modules (as we already do in the kernel itself, due to the
+> > >>> fact that ELF permits it), and have the accelerated code live in
+> > >>> separate modules that may not be loadable on certain systems, or be
+> > >>> blacklisted by the user.
+> > >>
+> > >> You're saying that at module insertion time, the kernel will overrid=
+e
+> > >> weak symbols with those provided by the module itself? At runtime?
+> > >>
+> > >
+> > > Yes.
+> > >
+> > >> Do you know offhand how this patching works? Is there a PLT that get=
+s
+> > >> patched, and so the calls all go through a layer of function pointer
+> > >> indirection? Or are all call sites fixed up at insertion time and th=
+e
+> > >> call instructions rewritten with some runtime patching magic?
+> > >>
+> > >
+> > > No magic. Take curve25519 for example, when built for ARM:
+> > >
+> > > 00000000 <curve25519>:
+> > >   0:   f240 0300       movw    r3, #0
+> > >                        0: R_ARM_THM_MOVW_ABS_NC        curve25519_arc=
+h
+> > >   4:   f2c0 0300       movt    r3, #0
+> > >                        4: R_ARM_THM_MOVT_ABS   curve25519_arch
+> > >   8:   b570            push    {r4, r5, r6, lr}
+> > >   a:   4604            mov     r4, r0
+> > >   c:   460d            mov     r5, r1
+> > >   e:   4616            mov     r6, r2
+> > >  10:   b173            cbz     r3, 30 <curve25519+0x30>
+> > >  12:   f7ff fffe       bl      0 <curve25519_arch>
+> > >                        12: R_ARM_THM_CALL      curve25519_arch
+> > >  16:   b158            cbz     r0, 30 <curve25519+0x30>
+> > >  18:   4620            mov     r0, r4
+> > >  1a:   2220            movs    r2, #32
+> > >  1c:   f240 0100       movw    r1, #0
+> > >                        1c: R_ARM_THM_MOVW_ABS_NC       .LANCHOR0
+> > >  20:   f2c0 0100       movt    r1, #0
+> > >                        20: R_ARM_THM_MOVT_ABS  .LANCHOR0
+> > >  24:   f7ff fffe       bl      0 <__crypto_memneq>
+> > >                        24: R_ARM_THM_CALL      __crypto_memneq
+> > >  28:   3000            adds    r0, #0
+> > >  2a:   bf18            it      ne
+> > >  2c:   2001            movne   r0, #1
+> > >  2e:   bd70            pop     {r4, r5, r6, pc}
+> > >  30:   4632            mov     r2, r6
+> > >  32:   4629            mov     r1, r5
+> > >  34:   4620            mov     r0, r4
+> > >  36:   f7ff fffe       bl      0 <curve25519_generic>
+> > >                        36: R_ARM_THM_CALL      curve25519_generic
+> > >  3a:   e7ed            b.n     18 <curve25519+0x18>
+> > >
+> > > curve25519_arch is a weak reference. It either gets satisfied at
+> > > module load time, or it doesn't.
+> > >
+> > > If it does get satisfied, the relocations covering the movw/movt pair
+> > > and the one covering the bl instruction get updated so that they poin=
+t
+> > > to the arch routine.
+> > >
+> > > If it does not get satisfied, the relocations are disregarded, in
+> > > which case the cbz instruction at offset 0x10 jumps over the bl call.
+> > >
+> > > Note that this does not involve any memory accesses. It does involve
+> > > some code patching, but only of the kind the module loader already
+> > > does.
+> >
+> > Won=E2=80=99t this have the counterintuitive property that, if you load=
+ the modules in the opposite order, the reference won=E2=80=99t be re-resol=
+ved and performance will silently regress?
+> >
+>
+> Indeed, the arch module needs to be loaded first
+>
 
-OK, so I looked at how others implement this.  It turns out there's
-only one other: the atheros rng and this is what it does:
+Actually, this can be addressed by retaining the module dependencies
+as before, but permitting the arch module to be omitted at load time.
 
-drivers/net/wireless/ath/ath9k/rng.c
+> > I think it might be better to allow two different modules to export the=
+ same symbol but only allow one of them to be loaded.
+>
+> That is what I am doing for chacha and poly
+>
+> > Or use static calls.
 
-so rather than redoing the entirety of the TPM rng like this, I thought
-it's easier to keep what we have (direct hwrng device) and plug our
-tpm_get_random() function into the kernel rng like the below.  
-
-James
-
----
-
-diff --git a/drivers/char/tpm/tpm-chip.c b/drivers/char/tpm/tpm-chip.c
-index 3d6d394a8661..0794521c0784 100644
---- a/drivers/char/tpm/tpm-chip.c
-+++ b/drivers/char/tpm/tpm-chip.c
-@@ -536,7 +536,7 @@ static int tpm_hwrng_read(struct hwrng *rng, void *data, size_t max, bool wait)
- {
- 	struct tpm_chip *chip = container_of(rng, struct tpm_chip, hwrng);
- 
--	return tpm_get_random(chip, data, max);
-+	return __tpm_get_random(chip, data, max);
- }
- 
- static int tpm_add_hwrng(struct tpm_chip *chip)
-diff --git a/drivers/char/tpm/tpm-interface.c b/drivers/char/tpm/tpm-interface.c
-index d7a3888ad80f..14631cba000c 100644
---- a/drivers/char/tpm/tpm-interface.c
-+++ b/drivers/char/tpm/tpm-interface.c
-@@ -24,6 +24,7 @@
- #include <linux/mutex.h>
- #include <linux/spinlock.h>
- #include <linux/freezer.h>
-+#include <linux/random.h>
- #include <linux/tpm_eventlog.h>
- 
- #include "tpm.h"
-@@ -424,15 +425,11 @@ int tpm_pm_resume(struct device *dev)
- }
- EXPORT_SYMBOL_GPL(tpm_pm_resume);
- 
--/**
-- * tpm_get_random() - get random bytes from the TPM's RNG
-- * @chip:	a &struct tpm_chip instance, %NULL for the default chip
-- * @out:	destination buffer for the random bytes
-- * @max:	the max number of bytes to write to @out
-- *
-- * Return: number of random bytes read or a negative error value.
-+/*
-+ * Internal interface for tpm_get_random(): gets the random string
-+ * directly from the TPM without mixing into the linux rng.
-  */
--int tpm_get_random(struct tpm_chip *chip, u8 *out, size_t max)
-+int __tpm_get_random(struct tpm_chip *chip, u8 *out, size_t max)
- {
- 	int rc;
- 
-@@ -451,6 +448,38 @@ int tpm_get_random(struct tpm_chip *chip, u8 *out, size_t max)
- 	tpm_put_ops(chip);
- 	return rc;
- }
-+
-+/**
-+ * tpm_get_random() - get random bytes influenced by the TPM's RNG
-+ * @chip:	a &struct tpm_chip instance, %NULL for the default chip
-+ * @out:	destination buffer for the random bytes
-+ * @max:	the max number of bytes to write to @out
-+ *
-+ * Uses the TPM as a source of input to the kernel random number
-+ * generator and then takes @max bytes directly from the kernel.  In
-+ * the worst (no other entropy) case, this will return the pure TPM
-+ * random number, but if the kernel RNG has any entropy at all it will
-+ * return a mixed entropy output which doesn't rely on a single
-+ * source.
-+ *
-+ * Return: number of random bytes read or a negative error value.
-+ */
-+int tpm_get_random(struct tpm_chip *chip, u8 *out, size_t max)
-+{
-+	int rc;
-+
-+	rc = __tpm_get_random(chip, out, max);
-+	if (rc <= 0)
-+		return rc;
-+	/*
-+	 * assume the TPM produces pure randomness, so the amount of
-+	 * entropy is the number of bits returned
-+	 */
-+	add_hwgenerator_randomness(out, rc, rc * 8);
-+	get_random_bytes(out, rc);
-+
-+	return rc;
-+}
- EXPORT_SYMBOL_GPL(tpm_get_random);
- 
- /**
-diff --git a/drivers/char/tpm/tpm.h b/drivers/char/tpm/tpm.h
-index a7fea3e0ca86..25f6b347b194 100644
---- a/drivers/char/tpm/tpm.h
-+++ b/drivers/char/tpm/tpm.h
-@@ -398,6 +398,7 @@ int tpm1_get_pcr_allocation(struct tpm_chip *chip);
- unsigned long tpm_calc_ordinal_duration(struct tpm_chip *chip, u32 ordinal);
- int tpm_pm_suspend(struct device *dev);
- int tpm_pm_resume(struct device *dev);
-+int __tpm_get_random(struct tpm_chip *chip, u8 *data, size_t max);
- 
- static inline void tpm_msleep(unsigned int delay_msec)
- {
+Given that static calls don't actually exist yet, I propose to proceed
+with the approach above, and switch to static calls once all
+architectures where it matters have an implementation that does not
+use function pointers (which is how static calls will be implemented
+generically)
