@@ -2,146 +2,155 @@ Return-Path: <SRS0=TB/N=X7=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B41DC47404
-	for <linux-crypto@archiver.kernel.org>; Sun,  6 Oct 2019 00:39:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CE69C47404
+	for <linux-crypto@archiver.kernel.org>; Sun,  6 Oct 2019 01:13:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D91D9222BE
-	for <linux-crypto@archiver.kernel.org>; Sun,  6 Oct 2019 00:39:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3BAFD222C5
+	for <linux-crypto@archiver.kernel.org>; Sun,  6 Oct 2019 01:13:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726957AbfJFAjH (ORCPT
+        id S1726962AbfJFBNa (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 5 Oct 2019 20:39:07 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:7498 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726921AbfJFAjE (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 5 Oct 2019 20:39:04 -0400
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x960b387118139
-        for <linux-crypto@vger.kernel.org>; Sat, 5 Oct 2019 20:39:02 -0400
-Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2veqbxg86a-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Sat, 05 Oct 2019 20:39:02 -0400
-Received: from localhost
-        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <zohar@linux.ibm.com>;
-        Sun, 6 Oct 2019 01:39:00 +0100
-Received: from b06cxnps4075.portsmouth.uk.ibm.com (9.149.109.197)
-        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Sun, 6 Oct 2019 01:38:56 +0100
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps4075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x960ctYr57671800
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 6 Oct 2019 00:38:55 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 89019A4040;
-        Sun,  6 Oct 2019 00:38:55 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E4502A404D;
-        Sun,  6 Oct 2019 00:38:53 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.85.134.152])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Sun,  6 Oct 2019 00:38:53 +0000 (GMT)
-Subject: Re: [PATCH] KEYS: asym_tpm: Switch to get_random_bytes()
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>,
-        Jerry Snitselaar <jsnitsel@redhat.com>,
-        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        David Safford <david.safford@ge.com>,
-        linux-integrity@vger.kernel.org, stable@vger.kernel.org,
-        David Howells <dhowells@redhat.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "open list:ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Date:   Sat, 05 Oct 2019 20:38:53 -0400
-In-Reply-To: <1570227068.17537.4.camel@HansenPartnership.com>
-References: <1570128827.5046.19.camel@linux.ibm.com>
-         <20191003215125.GA30511@linux.intel.com>
-         <20191003215743.GB30511@linux.intel.com>
-         <1570140491.5046.33.camel@linux.ibm.com>
-         <1570147177.10818.11.camel@HansenPartnership.com>
-         <20191004182216.GB6945@linux.intel.com>
-         <1570213491.3563.27.camel@HansenPartnership.com>
-         <20191004183342.y63qdvspojyf3m55@cantor>
-         <1570214574.3563.32.camel@HansenPartnership.com>
-         <20191004200728.xoj6jlgbhv57gepc@cantor>
-         <20191004201134.nuesk6hxtxajnxh2@cantor>
-         <1570227068.17537.4.camel@HansenPartnership.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.20.5 (3.20.5-1.fc24) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 19100600-0012-0000-0000-0000035467BF
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19100600-0013-0000-0000-0000218F7549
-Message-Id: <1570322333.5046.145.camel@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-05_14:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910060003
+        Sat, 5 Oct 2019 21:13:30 -0400
+Received: from mga02.intel.com ([134.134.136.20]:59241 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726956AbfJFBNa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 5 Oct 2019 21:13:30 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Oct 2019 18:13:28 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,261,1566889200"; 
+   d="scan'208";a="217532765"
+Received: from lkp-server01.sh.intel.com (HELO lkp-server01) ([10.239.97.150])
+  by fmsmga004.fm.intel.com with ESMTP; 05 Oct 2019 18:13:27 -0700
+Received: from kbuild by lkp-server01 with local (Exim 4.89)
+        (envelope-from <lkp@intel.com>)
+        id 1iGv71-000CY6-1Y; Sun, 06 Oct 2019 09:13:27 +0800
+Date:   Sun, 6 Oct 2019 09:13:00 +0800
+From:   kbuild test robot <lkp@intel.com>
+To:     Pascal van Leeuwen <pascalvanl@gmail.com>
+Cc:     kbuild-all@01.org, linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [cryptodev:master 12/53]
+ drivers/crypto/inside-secure/safexcel_cipher.c:2476:26: sparse: sparse: cast
+ from restricted __le32
+Message-ID: <201910060958.AxYsmWpe%lkp@intel.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Patchwork-Hint: ignore
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 2019-10-04 at 15:11 -0700, James Bottomley wrote:
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+head:   4fd7d7befdb531920cae8f78afd4938e4a25e421
+commit: a60619211dd188a5dfa18761b82d096cda76fc9f [12/53] crypto: inside-secure - Add support for the Chacha20-Poly1305 AEAD
+reproduce:
+        # apt-get install sparse
+        # sparse version: v0.6.1-rc1-42-g38eda53-dirty
+        git checkout a60619211dd188a5dfa18761b82d096cda76fc9f
+        make ARCH=x86_64 allmodconfig
+        make C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__'
 
-> +
-> +/**
-> + * tpm_get_random() - get random bytes influenced by the TPM's RNG
-> + * @chip:	a &struct tpm_chip instance, %NULL for the default chip
-> + * @out:	destination buffer for the random bytes
-> + * @max:	the max number of bytes to write to @out
-> + *
-> + * Uses the TPM as a source of input to the kernel random number
-> + * generator and then takes @max bytes directly from the kernel.  In
-> + * the worst (no other entropy) case, this will return the pure TPM
-> + * random number, but if the kernel RNG has any entropy at all it will
-> + * return a mixed entropy output which doesn't rely on a single
-> + * source.
-> + *
-> + * Return: number of random bytes read or a negative error value.
-> + */
-> +int tpm_get_random(struct tpm_chip *chip, u8 *out, size_t max)
-> +{
-> +	int rc;
-> +
-> +	rc = __tpm_get_random(chip, out, max);
-> +	if (rc <= 0)
-> +		return rc;
-> +	/*
-> +	 * assume the TPM produces pure randomness, so the amount of
-> +	 * entropy is the number of bits returned
-> +	 */
-> +	add_hwgenerator_randomness(out, rc, rc * 8);
-> +	get_random_bytes(out, rc);
-
-Using the TPM as a source of input to the kernel random number
-generator is fine, but please don't change the meaning of trusted
-keys.  The trusted-encrypted keys documentation clearly states
-"Trusted Keys use a TPM both to generate and to seal the keys."
-
-If you really want to use a different random number source instead of
-the TPM, then define a new trusted key option (eg. rng=kernel), with
-the default being the TPM.
-
-Mimi
+If you fix the issue, kindly add following tag
+Reported-by: kbuild test robot <lkp@intel.com>
 
 
-> +
-> +	return rc;
-> +}
->  EXPORT_SYMBOL_GPL(tpm_get_random);
+sparse warnings: (new ones prefixed by >>)
 
+   drivers/crypto/inside-secure/safexcel_cipher.c:85:46: sparse: sparse: incorrect type in assignment (different base types) @@    expected unsigned int @@    got restricted __be32unsigned int @@
+   drivers/crypto/inside-secure/safexcel_cipher.c:85:46: sparse:    expected unsigned int
+   drivers/crypto/inside-secure/safexcel_cipher.c:85:46: sparse:    got restricted __be32 [usertype]
+   drivers/crypto/inside-secure/safexcel_cipher.c:117:46: sparse: sparse: incorrect type in assignment (different base types) @@    expected unsigned int @@    got restricted __be32unsigned int @@
+   drivers/crypto/inside-secure/safexcel_cipher.c:117:46: sparse:    expected unsigned int
+   drivers/crypto/inside-secure/safexcel_cipher.c:117:46: sparse:    got restricted __be32 [usertype]
+   drivers/crypto/inside-secure/safexcel_cipher.c:272:35: sparse: sparse: cast from restricted __be16
+   drivers/crypto/inside-secure/safexcel_cipher.c:272:33: sparse: sparse: incorrect type in assignment (different base types) @@    expected unsigned int [usertype] @@    got restrunsigned int [usertype] @@
+   drivers/crypto/inside-secure/safexcel_cipher.c:272:33: sparse:    expected unsigned int [usertype]
+   drivers/crypto/inside-secure/safexcel_cipher.c:272:33: sparse:    got restricted __le32 [usertype]
+   drivers/crypto/inside-secure/safexcel_cipher.c:2158:45: sparse: sparse: restricted __be32 degrades to integer
+   drivers/crypto/inside-secure/safexcel_cipher.c:2166:30: sparse: sparse: incorrect type in assignment (different base types) @@    expected unsigned int @@    got restricted __be32unsigned int @@
+   drivers/crypto/inside-secure/safexcel_cipher.c:2166:30: sparse:    expected unsigned int
+   drivers/crypto/inside-secure/safexcel_cipher.c:2166:30: sparse:    got restricted __be32 [usertype]
+   drivers/crypto/inside-secure/safexcel_cipher.c:2257:65: sparse: sparse: incorrect type in assignment (different base types) @@    expected unsigned int @@    got restricted __be32unsigned int @@
+   drivers/crypto/inside-secure/safexcel_cipher.c:2257:65: sparse:    expected unsigned int
+   drivers/crypto/inside-secure/safexcel_cipher.c:2257:65: sparse:    got restricted __be32 [usertype]
+   drivers/crypto/inside-secure/safexcel_cipher.c:2361:37: sparse: sparse: restricted __le32 degrades to integer
+   drivers/crypto/inside-secure/safexcel_cipher.c:2370:29: sparse: sparse: incorrect type in assignment (different base types) @@    expected restricted __le32 @@    got icted __le32 @@
+   drivers/crypto/inside-secure/safexcel_cipher.c:2370:29: sparse:    expected restricted __le32
+   drivers/crypto/inside-secure/safexcel_cipher.c:2370:29: sparse:    got unsigned int
+>> drivers/crypto/inside-secure/safexcel_cipher.c:2476:26: sparse: sparse: cast from restricted __le32
+>> drivers/crypto/inside-secure/safexcel_cipher.c:2476:24: sparse: sparse: incorrect type in assignment (different base types) @@    expected unsigned int @@    got restricted __le32unsigned int @@
+   drivers/crypto/inside-secure/safexcel_cipher.c:2476:24: sparse:    expected unsigned int
+   drivers/crypto/inside-secure/safexcel_cipher.c:2476:24: sparse:    got restricted __le32 [usertype]
+
+vim +2476 drivers/crypto/inside-secure/safexcel_cipher.c
+
+  2451	
+  2452	static int safexcel_aead_chachapoly_crypt(struct aead_request *req,
+  2453						  enum safexcel_cipher_direction dir)
+  2454	{
+  2455		struct safexcel_cipher_req *creq = aead_request_ctx(req);
+  2456		struct crypto_aead *aead = crypto_aead_reqtfm(req);
+  2457		struct crypto_tfm *tfm = crypto_aead_tfm(aead);
+  2458		struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
+  2459		struct aead_request *subreq = aead_request_ctx(req);
+  2460		u32 key[CHACHA_KEY_SIZE / sizeof(u32) + 1];
+  2461		int i, ret = 0;
+  2462	
+  2463		/*
+  2464		 * Instead of wasting time detecting umpteen silly corner cases,
+  2465		 * just dump all "small" requests to the fallback implementation.
+  2466		 * HW would not be faster on such small requests anyway.
+  2467		 */
+  2468		if (likely((ctx->aead != EIP197_AEAD_TYPE_IPSEC_ESP ||
+  2469			    req->assoclen >= EIP197_AEAD_IPSEC_IV_SIZE) &&
+  2470			   req->cryptlen > POLY1305_DIGEST_SIZE)) {
+  2471			return safexcel_queue_req(&req->base, creq, dir);
+  2472		}
+  2473	
+  2474		/* HW cannot do full (AAD+payload) zero length, use fallback */
+  2475		for (i = 0; i < CHACHA_KEY_SIZE / sizeof(u32); i++)
+> 2476			key[i] = cpu_to_le32(ctx->key[i]);
+  2477		if (ctx->aead == EIP197_AEAD_TYPE_IPSEC_ESP) {
+  2478			/* ESP variant has nonce appended to the key */
+  2479			key[CHACHA_KEY_SIZE / sizeof(u32)] = ctx->nonce;
+  2480			ret = crypto_aead_setkey(ctx->fback, (u8 *)key,
+  2481						 CHACHA_KEY_SIZE +
+  2482						 EIP197_AEAD_IPSEC_NONCE_SIZE);
+  2483		} else {
+  2484			ret = crypto_aead_setkey(ctx->fback, (u8 *)key,
+  2485						 CHACHA_KEY_SIZE);
+  2486		}
+  2487		if (ret) {
+  2488			crypto_aead_clear_flags(aead, CRYPTO_TFM_REQ_MASK);
+  2489			crypto_aead_set_flags(aead, crypto_aead_get_flags(ctx->fback) &
+  2490						    CRYPTO_TFM_REQ_MASK);
+  2491			return ret;
+  2492		}
+  2493	
+  2494		aead_request_set_tfm(subreq, ctx->fback);
+  2495		aead_request_set_callback(subreq, req->base.flags, req->base.complete,
+  2496					  req->base.data);
+  2497		aead_request_set_crypt(subreq, req->src, req->dst, req->cryptlen,
+  2498				       req->iv);
+  2499		aead_request_set_ad(subreq, req->assoclen);
+  2500	
+  2501		return (dir ==  SAFEXCEL_ENCRYPT) ?
+  2502			crypto_aead_encrypt(subreq) :
+  2503			crypto_aead_decrypt(subreq);
+  2504	}
+  2505	
+
+---
+0-DAY kernel test infrastructure                Open Source Technology Center
+https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
