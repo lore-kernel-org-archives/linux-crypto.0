@@ -2,155 +2,221 @@ Return-Path: <SRS0=TB/N=X7=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CE69C47404
-	for <linux-crypto@archiver.kernel.org>; Sun,  6 Oct 2019 01:13:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89A1CC4360C
+	for <linux-crypto@archiver.kernel.org>; Sun,  6 Oct 2019 19:12:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3BAFD222C5
-	for <linux-crypto@archiver.kernel.org>; Sun,  6 Oct 2019 01:13:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 559E12087E
+	for <linux-crypto@archiver.kernel.org>; Sun,  6 Oct 2019 19:12:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=vdorst.com header.i=@vdorst.com header.b="FESceyk6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726962AbfJFBNa (ORCPT
+        id S1726048AbfJFTMb (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 5 Oct 2019 21:13:30 -0400
-Received: from mga02.intel.com ([134.134.136.20]:59241 "EHLO mga02.intel.com"
+        Sun, 6 Oct 2019 15:12:31 -0400
+Received: from mx.0dd.nl ([5.2.79.48]:54026 "EHLO mx.0dd.nl"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726956AbfJFBNa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 5 Oct 2019 21:13:30 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 05 Oct 2019 18:13:28 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,261,1566889200"; 
-   d="scan'208";a="217532765"
-Received: from lkp-server01.sh.intel.com (HELO lkp-server01) ([10.239.97.150])
-  by fmsmga004.fm.intel.com with ESMTP; 05 Oct 2019 18:13:27 -0700
-Received: from kbuild by lkp-server01 with local (Exim 4.89)
-        (envelope-from <lkp@intel.com>)
-        id 1iGv71-000CY6-1Y; Sun, 06 Oct 2019 09:13:27 +0800
-Date:   Sun, 6 Oct 2019 09:13:00 +0800
-From:   kbuild test robot <lkp@intel.com>
-To:     Pascal van Leeuwen <pascalvanl@gmail.com>
-Cc:     kbuild-all@01.org, linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: [cryptodev:master 12/53]
- drivers/crypto/inside-secure/safexcel_cipher.c:2476:26: sparse: sparse: cast
- from restricted __le32
-Message-ID: <201910060958.AxYsmWpe%lkp@intel.com>
+        id S1726030AbfJFTMa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 6 Oct 2019 15:12:30 -0400
+Received: from mail.vdorst.com (mail.vdorst.com [IPv6:fd01::250])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx.0dd.nl (Postfix) with ESMTPS id 455095FBCA;
+        Sun,  6 Oct 2019 21:12:29 +0200 (CEST)
+Authentication-Results: mx.0dd.nl;
+        dkim=pass (2048-bit key; secure) header.d=vdorst.com header.i=@vdorst.com header.b="FESceyk6";
+        dkim-atps=neutral
+Received: from www (www.vdorst.com [192.168.2.222])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.vdorst.com (Postfix) with ESMTPSA id EDD593AD77;
+        Sun,  6 Oct 2019 21:12:28 +0200 (CEST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mail.vdorst.com EDD593AD77
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vdorst.com;
+        s=default; t=1570389149;
+        bh=pYYvIlINVMFr28wexA57nXUsHHmBbxLOveUHLaVgk6o=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=FESceyk6OONGviZ9JELPfVQ0D+8ypxw2m5AMDkQfXkKaqdofqU2PoqJ8Sah3p6G6L
+         NS+g4clG+7noRHd2eE1QxqCEkd2KQzmxlKI8iYEZbYd83oVfZoTBI50ijCf54oKMKJ
+         0SHaf5K0iopjnO3Oww6dJxHCxnBTrP4rAbV+i73jQIdt9vTodslblaACBDKzw4jIv+
+         Qn8BqVrhrxTaTn+Tzci/ssxo1gKElqYTy+E83CzpWXs/8lTuX4EOYehCjmSTp4vwtK
+         1W8a0gaRt2s5cT/kIyTu1JzlURVngldrSAzKfZ0qQZqvpAvFLjufAalzjBT8COgLmk
+         gnw6vw+/VoQ4Q==
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1]) by
+ www.vdorst.com (Horde Framework) with HTTPS; Sun, 06 Oct 2019 19:12:28 +0000
+Date:   Sun, 06 Oct 2019 19:12:28 +0000
+Message-ID: <20191006191228.Horde.E8aAava9O1UOhVnxdaZzfqw@www.vdorst.com>
+From:   =?utf-8?b?UmVuw6k=?= van Dorst <opensource@vdorst.com>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Eric Biggers <ebiggers@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Martin Willi <martin@strongswan.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>
+Subject: Re: [PATCH v2 05/20] crypto: mips/chacha - import accelerated 32r2
+ code from Zinc
+References: <20191002141713.31189-1-ard.biesheuvel@linaro.org>
+ <20191002141713.31189-6-ard.biesheuvel@linaro.org>
+ <20191004134644.GE112631@zx2c4.com>
+ <CAKv+Gu_X9DBgUiPqcyJ2hOQqi_FEBVpHOr9uG1ZAh-RWv6-z9Q@mail.gmail.com>
+ <CAHmME9ojUTysb2kHKbSWaR+2Qat3qF1cNrVtphu3V+C+P_g8yQ@mail.gmail.com>
+ <20191004151524.Horde.zXUzQP5eBQt7Ybx5I75Ig5X@www.vdorst.com>
+ <CAKv+Gu-84O9wo3-w7bYxW41g3gjwGk5tBJX54TGN53MUPNpdvQ@mail.gmail.com>
+In-Reply-To: <CAKv+Gu-84O9wo3-w7bYxW41g3gjwGk5tBJX54TGN53MUPNpdvQ@mail.gmail.com>
+User-Agent: Horde Application Framework 5
+Content-Type: text/plain; charset=utf-8; format=flowed; DelSp=Yes
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Patchwork-Hint: ignore
-User-Agent: NeoMutt/20170113 (1.7.2)
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-head:   4fd7d7befdb531920cae8f78afd4938e4a25e421
-commit: a60619211dd188a5dfa18761b82d096cda76fc9f [12/53] crypto: inside-secure - Add support for the Chacha20-Poly1305 AEAD
-reproduce:
-        # apt-get install sparse
-        # sparse version: v0.6.1-rc1-42-g38eda53-dirty
-        git checkout a60619211dd188a5dfa18761b82d096cda76fc9f
-        make ARCH=x86_64 allmodconfig
-        make C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__'
+Quoting Ard Biesheuvel <ard.biesheuvel@linaro.org>:
 
-If you fix the issue, kindly add following tag
-Reported-by: kbuild test robot <lkp@intel.com>
+<snip>
+
+Hi Ard,
+
+> Thanks a lot for taking the time to double check this. I think it
+> would be nice to be able to expose xchacha12 like we do on other
+> architectures.
+>
+> Note that for xchacha, I also added a hchacha_block() routine based on
+> your code (with the round count as the third argument) [0]. Please let
+> me know if you see anything wrong with that.
+>
+>
+> +.globl hchacha_block
+> +.ent hchacha_block
+> +hchacha_block:
+> + .frame $sp, STACK_SIZE, $ra
+> +
+> + addiu $sp, -STACK_SIZE
+> +
+> + /* Save s0-s7 */
+> + sw $s0, 0($sp)
+> + sw $s1, 4($sp)
+> + sw $s2, 8($sp)
+> + sw $s3, 12($sp)
+> + sw $s4, 16($sp)
+> + sw $s5, 20($sp)
+> + sw $s6, 24($sp)
+> + sw $s7, 28($sp)
+
+We only have to preserve the used s registers.
+Currently X11 to X15 are using the registers s6 down to s2.
+
+But by shuffling/redefine the needed registers, so that we use all the
+non-preserve registers, I can reduce the used s registers to one.
+
+Registers we don't use and don't have to preserve are a3, at and v0.
+Also STATE(a0) can be reused because we only need that pointer while  
+loading the
+values from memory.
+
+So:
+
+#undef X12
+#undef X13
+#undef X14
+#undef X15
+
+#define X12    $a3
+#define X13    $at
+#define X14    $v0
+#define X15    STATE
+
+And save X11(s6) on the stack.
+
+See the full code here [0].
+
+For the rest the code looks good!
+
+Greats,
+
+René
+
+[0]:  
+https://github.com/vDorst/wireguard/commit/562a516ae3b282b32f57d3239369360bc926df60
 
 
-sparse warnings: (new ones prefixed by >>)
+> +
+> + lw X0, 0(STATE)
+> + lw X1, 4(STATE)
+> + lw X2, 8(STATE)
+> + lw X3, 12(STATE)
+> + lw X4, 16(STATE)
+> + lw X5, 20(STATE)
+> + lw X6, 24(STATE)
+> + lw X7, 28(STATE)
+> + lw X8, 32(STATE)
+> + lw X9, 36(STATE)
+> + lw X10, 40(STATE)
+> + lw X11, 44(STATE)
+> + lw X12, 48(STATE)
+> + lw X13, 52(STATE)
+> + lw X14, 56(STATE)
+> + lw X15, 60(STATE)
+> +
+> +.Loop_hchacha_xor_rounds:
+> + addiu $a2, -2
+> + AXR( 0, 1, 2, 3, 4, 5, 6, 7, 12,13,14,15, 16);
+> + AXR( 8, 9,10,11, 12,13,14,15, 4, 5, 6, 7, 12);
+> + AXR( 0, 1, 2, 3, 4, 5, 6, 7, 12,13,14,15, 8);
+> + AXR( 8, 9,10,11, 12,13,14,15, 4, 5, 6, 7, 7);
+> + AXR( 0, 1, 2, 3, 5, 6, 7, 4, 15,12,13,14, 16);
+> + AXR(10,11, 8, 9, 15,12,13,14, 5, 6, 7, 4, 12);
+> + AXR( 0, 1, 2, 3, 5, 6, 7, 4, 15,12,13,14, 8);
+> + AXR(10,11, 8, 9, 15,12,13,14, 5, 6, 7, 4, 7);
+> + bnez $a2, .Loop_hchacha_xor_rounds
+> +
+> + sw X0, 0(OUT)
+> + sw X1, 4(OUT)
+> + sw X2, 8(OUT)
+> + sw X3, 12(OUT)
+> + sw X12, 16(OUT)
+> + sw X13, 20(OUT)
+> + sw X14, 24(OUT)
+> + sw X15, 28(OUT)
+> +
+> + /* Restore used registers */
+> + lw $s0, 0($sp)
+> + lw $s1, 4($sp)
+> + lw $s2, 8($sp)
+> + lw $s3, 12($sp)
+> + lw $s4, 16($sp)
+> + lw $s5, 20($sp)
+> + lw $s6, 24($sp)
+> + lw $s7, 28($sp)
+> +
+> + addiu $sp, STACK_SIZE
+> + jr $ra
+> +.end hchacha_block
+> +.set at
+>
+>
+> [0]  
+> https://git.kernel.org/pub/scm/linux/kernel/git/ardb/linux.git/commit/?h=wireguard-crypto-library-api-v3&id=cc74a037f8152d52bd17feaf8d9142b61761484f
 
-   drivers/crypto/inside-secure/safexcel_cipher.c:85:46: sparse: sparse: incorrect type in assignment (different base types) @@    expected unsigned int @@    got restricted __be32unsigned int @@
-   drivers/crypto/inside-secure/safexcel_cipher.c:85:46: sparse:    expected unsigned int
-   drivers/crypto/inside-secure/safexcel_cipher.c:85:46: sparse:    got restricted __be32 [usertype]
-   drivers/crypto/inside-secure/safexcel_cipher.c:117:46: sparse: sparse: incorrect type in assignment (different base types) @@    expected unsigned int @@    got restricted __be32unsigned int @@
-   drivers/crypto/inside-secure/safexcel_cipher.c:117:46: sparse:    expected unsigned int
-   drivers/crypto/inside-secure/safexcel_cipher.c:117:46: sparse:    got restricted __be32 [usertype]
-   drivers/crypto/inside-secure/safexcel_cipher.c:272:35: sparse: sparse: cast from restricted __be16
-   drivers/crypto/inside-secure/safexcel_cipher.c:272:33: sparse: sparse: incorrect type in assignment (different base types) @@    expected unsigned int [usertype] @@    got restrunsigned int [usertype] @@
-   drivers/crypto/inside-secure/safexcel_cipher.c:272:33: sparse:    expected unsigned int [usertype]
-   drivers/crypto/inside-secure/safexcel_cipher.c:272:33: sparse:    got restricted __le32 [usertype]
-   drivers/crypto/inside-secure/safexcel_cipher.c:2158:45: sparse: sparse: restricted __be32 degrades to integer
-   drivers/crypto/inside-secure/safexcel_cipher.c:2166:30: sparse: sparse: incorrect type in assignment (different base types) @@    expected unsigned int @@    got restricted __be32unsigned int @@
-   drivers/crypto/inside-secure/safexcel_cipher.c:2166:30: sparse:    expected unsigned int
-   drivers/crypto/inside-secure/safexcel_cipher.c:2166:30: sparse:    got restricted __be32 [usertype]
-   drivers/crypto/inside-secure/safexcel_cipher.c:2257:65: sparse: sparse: incorrect type in assignment (different base types) @@    expected unsigned int @@    got restricted __be32unsigned int @@
-   drivers/crypto/inside-secure/safexcel_cipher.c:2257:65: sparse:    expected unsigned int
-   drivers/crypto/inside-secure/safexcel_cipher.c:2257:65: sparse:    got restricted __be32 [usertype]
-   drivers/crypto/inside-secure/safexcel_cipher.c:2361:37: sparse: sparse: restricted __le32 degrades to integer
-   drivers/crypto/inside-secure/safexcel_cipher.c:2370:29: sparse: sparse: incorrect type in assignment (different base types) @@    expected restricted __le32 @@    got icted __le32 @@
-   drivers/crypto/inside-secure/safexcel_cipher.c:2370:29: sparse:    expected restricted __le32
-   drivers/crypto/inside-secure/safexcel_cipher.c:2370:29: sparse:    got unsigned int
->> drivers/crypto/inside-secure/safexcel_cipher.c:2476:26: sparse: sparse: cast from restricted __le32
->> drivers/crypto/inside-secure/safexcel_cipher.c:2476:24: sparse: sparse: incorrect type in assignment (different base types) @@    expected unsigned int @@    got restricted __le32unsigned int @@
-   drivers/crypto/inside-secure/safexcel_cipher.c:2476:24: sparse:    expected unsigned int
-   drivers/crypto/inside-secure/safexcel_cipher.c:2476:24: sparse:    got restricted __le32 [usertype]
 
-vim +2476 drivers/crypto/inside-secure/safexcel_cipher.c
 
-  2451	
-  2452	static int safexcel_aead_chachapoly_crypt(struct aead_request *req,
-  2453						  enum safexcel_cipher_direction dir)
-  2454	{
-  2455		struct safexcel_cipher_req *creq = aead_request_ctx(req);
-  2456		struct crypto_aead *aead = crypto_aead_reqtfm(req);
-  2457		struct crypto_tfm *tfm = crypto_aead_tfm(aead);
-  2458		struct safexcel_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
-  2459		struct aead_request *subreq = aead_request_ctx(req);
-  2460		u32 key[CHACHA_KEY_SIZE / sizeof(u32) + 1];
-  2461		int i, ret = 0;
-  2462	
-  2463		/*
-  2464		 * Instead of wasting time detecting umpteen silly corner cases,
-  2465		 * just dump all "small" requests to the fallback implementation.
-  2466		 * HW would not be faster on such small requests anyway.
-  2467		 */
-  2468		if (likely((ctx->aead != EIP197_AEAD_TYPE_IPSEC_ESP ||
-  2469			    req->assoclen >= EIP197_AEAD_IPSEC_IV_SIZE) &&
-  2470			   req->cryptlen > POLY1305_DIGEST_SIZE)) {
-  2471			return safexcel_queue_req(&req->base, creq, dir);
-  2472		}
-  2473	
-  2474		/* HW cannot do full (AAD+payload) zero length, use fallback */
-  2475		for (i = 0; i < CHACHA_KEY_SIZE / sizeof(u32); i++)
-> 2476			key[i] = cpu_to_le32(ctx->key[i]);
-  2477		if (ctx->aead == EIP197_AEAD_TYPE_IPSEC_ESP) {
-  2478			/* ESP variant has nonce appended to the key */
-  2479			key[CHACHA_KEY_SIZE / sizeof(u32)] = ctx->nonce;
-  2480			ret = crypto_aead_setkey(ctx->fback, (u8 *)key,
-  2481						 CHACHA_KEY_SIZE +
-  2482						 EIP197_AEAD_IPSEC_NONCE_SIZE);
-  2483		} else {
-  2484			ret = crypto_aead_setkey(ctx->fback, (u8 *)key,
-  2485						 CHACHA_KEY_SIZE);
-  2486		}
-  2487		if (ret) {
-  2488			crypto_aead_clear_flags(aead, CRYPTO_TFM_REQ_MASK);
-  2489			crypto_aead_set_flags(aead, crypto_aead_get_flags(ctx->fback) &
-  2490						    CRYPTO_TFM_REQ_MASK);
-  2491			return ret;
-  2492		}
-  2493	
-  2494		aead_request_set_tfm(subreq, ctx->fback);
-  2495		aead_request_set_callback(subreq, req->base.flags, req->base.complete,
-  2496					  req->base.data);
-  2497		aead_request_set_crypt(subreq, req->src, req->dst, req->cryptlen,
-  2498				       req->iv);
-  2499		aead_request_set_ad(subreq, req->assoclen);
-  2500	
-  2501		return (dir ==  SAFEXCEL_ENCRYPT) ?
-  2502			crypto_aead_encrypt(subreq) :
-  2503			crypto_aead_decrypt(subreq);
-  2504	}
-  2505	
 
----
-0-DAY kernel test infrastructure                Open Source Technology Center
-https://lists.01.org/pipermail/kbuild-all                   Intel Corporation
+
