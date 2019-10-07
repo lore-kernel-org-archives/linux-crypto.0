@@ -2,120 +2,125 @@ Return-Path: <SRS0=5F7Z=YA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9E67C47404
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Oct 2019 14:50:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41C16C47404
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Oct 2019 15:02:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9BD2D21479
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Oct 2019 14:50:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1385B21655
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Oct 2019 15:02:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=amacapital-net.20150623.gappssmtp.com header.i=@amacapital-net.20150623.gappssmtp.com header.b="y7/AMJp1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728724AbfJGOuZ (ORCPT
+        id S1727589AbfJGPCJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Oct 2019 10:50:25 -0400
-Received: from Galois.linutronix.de ([193.142.43.55]:44529 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728708AbfJGOtr (ORCPT
+        Mon, 7 Oct 2019 11:02:09 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:38224 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727490AbfJGPCI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Oct 2019 10:49:47 -0400
-Received: from [5.158.153.53] (helo=tip-bot2.lab.linutronix.de)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tip-bot2@linutronix.de>)
-        id 1iHUKI-00066Y-PO; Mon, 07 Oct 2019 16:49:30 +0200
-Received: from [127.0.1.1] (localhost [IPv6:::1])
-        by tip-bot2.lab.linutronix.de (Postfix) with ESMTP id 0FE711C032F;
-        Mon,  7 Oct 2019 16:49:26 +0200 (CEST)
-Date:   Mon, 07 Oct 2019 14:49:25 -0000
-From:   "tip-bot2 for Hans de Goede" <tip-bot2@linutronix.de>
-Reply-to: linux-kernel@vger.kernel.org
-To:     linux-tip-commits@vger.kernel.org
-Subject: [tip: x86/urgent] x86/boot: Provide memzero_explicit()
-Cc:     Arvind Sankar <nivedita@alum.mit.edu>,
-        Hans de Goede <hdegoede@redhat.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-crypto@vger.kernel.org, Ingo Molnar <mingo@kernel.org>,
-        linux-kernel@vger.kernel.org
-In-Reply-To: <20191007134724.4019-1-hdegoede@redhat.com>
-References: <20191007134724.4019-1-hdegoede@redhat.com>
+        Mon, 7 Oct 2019 11:02:08 -0400
+Received: by mail-wr1-f67.google.com with SMTP id w12so15746003wro.5
+        for <linux-crypto@vger.kernel.org>; Mon, 07 Oct 2019 08:02:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Gppf5ydLVlzLpYBKWg5uMeNal7mwzCjmiO49DJJEUFw=;
+        b=y7/AMJp1p4yc87RqT8N+6573FN4qZ/ygLP3mwmyKX+U98jrg6Vg0a1TSyKlfKKfD0t
+         9T5H/1tQPaASmsNS1G9v5aLVXpc4Zyd8nVcjywDIinzC7Y38lG1vi4d+paItNIgGu/+W
+         mHD82Xl/zbTbCKQzN3g11uHer/fiyRZmdJG+La4puEhpx0sMZ0Rv5wpGZizQ1w16hp4e
+         iwXvdz8Zl4kjRPMki7+MaR1XImco+vYdX09VAlSnHV5w8zlumedq+WWGroVqFQmR7YfN
+         /hDf1ioc5DUJkdp1nAMr9tt27hLfd8lMYaNKtwNyJwV7zUGpeLLUfu986Fm2Cs5gf818
+         Ikxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Gppf5ydLVlzLpYBKWg5uMeNal7mwzCjmiO49DJJEUFw=;
+        b=OaCYHtPDv1dSz6MNumHbtWCajwUIRc2tXKY8RuQRM4Quc6vuWPWWGkSmHzl4F+3L4X
+         tX9OPxAbFmrZYsWX25xmufopOI9j+9PDi8MWjBW3gEt9NFBV6M4v3KYm9bDg6w7b3eK5
+         h9efle8PmmACyg8BmEV/2OijPSDvBdBqSLQ4E6eqDOwIxT7eVRYzIGvUwGJhy0xyga36
+         cHT2RqmkbgrPspYRlDi+6O3O1UA7IZh1VKDzhC3XZg4x//bp47wi/BNv90iXrn6QKl6A
+         cNHgwXcUTS+2E9VyVZ6/7uXqL/rBOKDtRT8VqfB0GZINXDbvKzpMBssVN8pDiXPMUHEM
+         DwYg==
+X-Gm-Message-State: APjAAAWL+IZ+VAM6H9fSNOXC4wkXWFMX4UtypOfh8c9rmBzxwQHK9KmM
+        3OL04j3+b0tGc6XdmZm9LFc9Dq1OfXMES10BfzYkmQ==
+X-Google-Smtp-Source: APXvYqwpzNZt3H5NRm51SNYpFETcnDGrZgCg/r5gCkKNG3mQb/ZeNM7Lk8Bz2OyV2SCXW2vYjyzJJXGw/PmJu3kY6H4=
+X-Received: by 2002:adf:dbc6:: with SMTP id e6mr22426377wrj.149.1570460526477;
+ Mon, 07 Oct 2019 08:02:06 -0700 (PDT)
 MIME-Version: 1.0
-Message-ID: <157045976599.9978.16157507866106024022.tip-bot2@tip-bot2>
-X-Mailer: tip-git-log-daemon
-Robot-ID: <tip-bot2.linutronix.de>
-Robot-Unsubscribe: Contact <mailto:tglx@linutronix.de> to get blacklisted from these emails
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
+References: <CAKv+Gu-VqfFsW+nrG+-2g1-eu6S+ZuD7qaN9aTchwD=Bcj_giw@mail.gmail.com>
+ <04D32F59-34D4-4EBF-80E3-69088D14C5D8@amacapital.net> <CAKv+Gu8s6AuZfdVUSmpgi-eY_9oZr-j4sdFygUOR3uvQXji+rQ@mail.gmail.com>
+In-Reply-To: <CAKv+Gu8s6AuZfdVUSmpgi-eY_9oZr-j4sdFygUOR3uvQXji+rQ@mail.gmail.com>
+From:   Andy Lutomirski <luto@amacapital.net>
+Date:   Mon, 7 Oct 2019 08:01:55 -0700
+Message-ID: <CALCETrXWSu_fY5BetMah=iEOqSgkOphMOKcMrtiWyN0QqbZspw@mail.gmail.com>
+Subject: Re: [PATCH v2 00/20] crypto: crypto API library interfaces for WireGuard
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Eric Biggers <ebiggers@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Martin Willi <martin@strongswan.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The following commit has been merged into the x86/urgent branch of tip:
+On Sun, Oct 6, 2019 at 10:24 PM Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
+>
+> On Mon, 7 Oct 2019 at 06:44, Andy Lutomirski <luto@amacapital.net> wrote:
+> >
 
-Commit-ID:     ee008a19f1c72c37ffa54326a592035dddb66fd6
-Gitweb:        https://git.kernel.org/tip/ee008a19f1c72c37ffa54326a592035dddb66fd6
-Author:        Hans de Goede <hdegoede@redhat.com>
-AuthorDate:    Mon, 07 Oct 2019 15:47:24 +02:00
-Committer:     Ingo Molnar <mingo@kernel.org>
-CommitterDate: Mon, 07 Oct 2019 16:47:35 +02:00
+> > > Actually, this can be addressed by retaining the module dependencies
+> > > as before, but permitting the arch module to be omitted at load time.
+> >
+> > I think that, to avoid surprises, you should refuse to load the arch module if the generic module is loaded, too.
+> >
+>
+> Most arch code depends on CPU features that may not be available given
+> the context, either because they are SIMD or because they are optional
+> CPU instructions. So we need both modules at the same time anyway, so
+> that we can fall back to the generic code at runtime.
+>
+> So what I'd like is to have the generic module provide the library
+> interface, but rely on arch modules that are optional.
+>
+> We already have 95% of what we need with weak references. We have the
+> ability to test for presence of the arch code at runtime, and we even
+> have code patching for all architectures (through static relocations).
+>
+> However, one could argue that this is more a [space] optimization than
+> anything else, so I am willing to park this discussion until support
+> for static calls has been merged, and proceed with something simpler.
 
-x86/boot: Provide memzero_explicit()
+I'd suggest tabling it until static calls are merged.  PeterZ just
+sent a new patchbomb for it anyway.
 
-The purgatory code now uses the shared lib/crypto/sha256.c sha256
-implementation. This needs memzero_explicit(), implement this.
+What I'm trying to get at here and apparently saying badly is that I
+want to avoid a situation where lsmod shows the arch module loaded but
+the arch code isn't actually executing.  Regardless of how everything
+gets wired up (static calls, weak refs, etc), the system's behavior
+should match the system's configuration, which means that we should
+not allow any improper order of loading things so that everything
+*appears* to be loaded but does not actually function.
 
-We also have barrier_data() call after the memset, making sure
-neither the compiler nor the linker optimizes out this seemingly
-unused function.
-
-Reported-by: Arvind Sankar <nivedita@alum.mit.edu>
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
-Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: H . Peter Anvin <hpa@zytor.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Peter Zijlstra <peterz@infradead.org>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: linux-crypto@vger.kernel.org
-Fixes: 906a4bb97f5d ("crypto: sha256 - Use get/put_unaligned_be32 to get input, memzero_explicit")
-Link: https://lkml.kernel.org/r/20191007134724.4019-1-hdegoede@redhat.com
-[ Added comment. ]
-Signed-off-by: Ingo Molnar <mingo@kernel.org>
----
- arch/x86/boot/compressed/string.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
-
-diff --git a/arch/x86/boot/compressed/string.c b/arch/x86/boot/compressed/string.c
-index 81fc1ea..dd30e63 100644
---- a/arch/x86/boot/compressed/string.c
-+++ b/arch/x86/boot/compressed/string.c
-@@ -50,6 +50,16 @@ void *memset(void *s, int c, size_t n)
- 	return s;
- }
- 
-+void memzero_explicit(void *s, size_t count)
-+{
-+	memset(s, 0, count);
-+	/*
-+	 * Make sure this function never gets inlined and
-+	 * the memset() never gets optimized away:
-+	 */
-+	barrier_data(s);
-+}
-+
- void *memmove(void *dest, const void *src, size_t n)
- {
- 	unsigned char *d = dest;
+Saying "modprobe will do the right thing and let's not worry about
+silly admins using insmod directly" is not a good solution.
