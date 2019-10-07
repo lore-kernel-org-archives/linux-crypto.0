@@ -2,184 +2,120 @@ Return-Path: <SRS0=5F7Z=YA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A6D1ECE58C
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Oct 2019 14:46:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 846C7C47404
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Oct 2019 14:50:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 135EF21721
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Oct 2019 14:46:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1570459567;
-	bh=+WxnLtW0CM5zuNcVmAFSLRA1c01TWuxDEph+gcccG/A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=lP68WHyjVivDjglFxBUiltIQyMPEjpjNKZaCCUbgGyDUK4H/TIcalfe0p6CQoU+NW
-	 Dt1Z+4JS9hdu8WBoWuWTdIYos4TqhnCjROHJJrYMnnAxvplSgqkR74kCxdokX3ywgA
-	 gsjp1x/PW5OTg4Zg5b5qJAG5Bd1aZcZO7MZr+MoY=
+	by mail.kernel.org (Postfix) with ESMTP id 64C3E21721
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Oct 2019 14:50:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728059AbfJGOqG (ORCPT
+        id S1728774AbfJGOtt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Oct 2019 10:46:06 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:34296 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726334AbfJGOqF (ORCPT
+        Mon, 7 Oct 2019 10:49:49 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:44534 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728718AbfJGOts (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Oct 2019 10:46:05 -0400
-Received: by mail-wm1-f66.google.com with SMTP id y135so200863wmc.1;
-        Mon, 07 Oct 2019 07:46:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=7LKk/MQUH9PrRGrgWgJu6sQTRpVfMAcu12gSHONSwaQ=;
-        b=odUBTvBVB0ZmzaHCSWCJ6I1SZNze2wQrGoiGGMdma0cAgPHGgqm7Ii29Oo/bAVdf0D
-         HHoPB69lGGhTa7g5KGhZFZxZFuzxG68pW6BvZcoGrALrMcc5KkfIMcHOREPQoXU7kNPK
-         3+MI+D3fNoV2LbKW+iNbQF1lxkuGoZqdgeL2rj0ovZdwKEGYBOey1Bzj/xomXYpxgJRf
-         okvssGH6OEP5VKGx6VwK7V6FZVdOZNXbcmrujG7M0DYCGIZQGAYxtj4MoktfzMsMQLxW
-         LaBB4rJdO9CXTkL6DvtVn+mv7PrkUA7fr22A5lzX4bPQxw8c+zQ+R0ga1FEu5VOMZYjI
-         ZcMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=7LKk/MQUH9PrRGrgWgJu6sQTRpVfMAcu12gSHONSwaQ=;
-        b=acDqWpKP6on/hdJ5YzoFqn9oVEJvJn3w00Xv32O23vSCLUthYSqHlsqLUGfakXWWMa
-         YgysVSnfi4VBoB4yrmZQcnJZCVJBTM2xd5q+FK84w2tyXCnOdcYyigxccd9xcw8K0eFW
-         2xkbQZ0n1miETOEPafY3PkGPfoy4AWDd5cxe1OMCHjFTXxBxF/JkVEQQU8dWjPbbM3fQ
-         PF79x+1XGZVZqk8R8xC2alJLZij6j4UWba3o5fr6ByxLuSu8Us7FPyRYOY1c7BIwKW7M
-         uAf+FJPq7xwWs3B+3ZohtuPEur74NIhTa4J8GnjLldNWSlKy0n6w+meSVe2NA95kwJzI
-         X93Q==
-X-Gm-Message-State: APjAAAUa17YgjvBKaWlPmP34spAUjxu/htto3Pkh9u5tYkuNmWtsYME7
-        V2cl+qE56vkFmeHqp/w/6c0=
-X-Google-Smtp-Source: APXvYqy7eGqUJ6sI/nYfuvX1IX5cPiP8K+0tP/2XpBgkpGpDcxVFJurHv0UYmt4vIYyGTmceu58+pg==
-X-Received: by 2002:a1c:4c12:: with SMTP id z18mr20487068wmf.45.1570459563086;
-        Mon, 07 Oct 2019 07:46:03 -0700 (PDT)
-Received: from gmail.com (2E8B0CD5.catv.pool.telekom.hu. [46.139.12.213])
-        by smtp.gmail.com with ESMTPSA id o9sm36091179wrh.46.2019.10.07.07.46.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Oct 2019 07:46:02 -0700 (PDT)
-Date:   Mon, 7 Oct 2019 16:46:00 +0200
-From:   Ingo Molnar <mingo@kernel.org>
-To:     Hans de Goede <hdegoede@redhat.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Mon, 7 Oct 2019 10:49:48 -0400
+Received: from [5.158.153.53] (helo=tip-bot2.lab.linutronix.de)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tip-bot2@linutronix.de>)
+        id 1iHUKQ-0006Ep-Qt; Mon, 07 Oct 2019 16:49:38 +0200
+Received: from [127.0.1.1] (localhost [IPv6:::1])
+        by tip-bot2.lab.linutronix.de (Postfix) with ESMTP id 8B87E1C0895;
+        Mon,  7 Oct 2019 16:49:34 +0200 (CEST)
+Date:   Mon, 07 Oct 2019 14:49:34 -0000
+From:   "tip-bot2 for Hans de Goede" <tip-bot2@linutronix.de>
+Reply-to: linux-kernel@vger.kernel.org
+To:     linux-tip-commits@vger.kernel.org
+Subject: [tip: x86/urgent] x86/boot: Provide memzero_explicit()
+Cc:     Arvind Sankar <nivedita@alum.mit.edu>,
+        Hans de Goede <hdegoede@redhat.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Borislav Petkov <bp@alien8.de>,
         "H . Peter Anvin" <hpa@zytor.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org,
-        Arvind Sankar <nivedita@alum.mit.edu>,
-        Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v2 5.4 regression fix] x86/boot: Provide memzero_explicit
-Message-ID: <20191007144600.GB59713@gmail.com>
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-crypto@vger.kernel.org, Ingo Molnar <mingo@kernel.org>,
+        linux-kernel@vger.kernel.org
+In-Reply-To: <20191007134724.4019-1-hdegoede@redhat.com>
 References: <20191007134724.4019-1-hdegoede@redhat.com>
- <20191007140022.GA29008@gmail.com>
- <1dc3c53d-785e-f9a4-1b4c-3374c94ae0a7@redhat.com>
- <20191007142230.GA117630@gmail.com>
- <2982b666-e310-afb7-40eb-e536ce95e23d@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2982b666-e310-afb7-40eb-e536ce95e23d@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Message-ID: <157045977450.9978.18318761982949903126.tip-bot2@tip-bot2>
+X-Mailer: tip-git-log-daemon
+Robot-ID: <tip-bot2.linutronix.de>
+Robot-Unsubscribe: Contact <mailto:tglx@linutronix.de> to get blacklisted from these emails
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+The following commit has been merged into the x86/urgent branch of tip:
 
-* Hans de Goede <hdegoede@redhat.com> wrote:
+Commit-ID:     ee008a19f1c72c37ffa54326a592035dddb66fd6
+Gitweb:        https://git.kernel.org/tip/ee008a19f1c72c37ffa54326a592035dddb66fd6
+Author:        Hans de Goede <hdegoede@redhat.com>
+AuthorDate:    Mon, 07 Oct 2019 15:47:24 +02:00
+Committer:     Ingo Molnar <mingo@kernel.org>
+CommitterDate: Mon, 07 Oct 2019 16:47:35 +02:00
 
-> Hi,
-> 
-> On 07-10-2019 16:22, Ingo Molnar wrote:
-> > 
-> > * Hans de Goede <hdegoede@redhat.com> wrote:
-> > 
-> > > Hi,
-> > > 
-> > > On 07-10-2019 16:00, Ingo Molnar wrote:
-> > > > 
-> > > > * Hans de Goede <hdegoede@redhat.com> wrote:
-> > > > 
-> > > > > The purgatory code now uses the shared lib/crypto/sha256.c sha256
-> > > > > implementation. This needs memzero_explicit, implement this.
-> > > > > 
-> > > > > Reported-by: Arvind Sankar <nivedita@alum.mit.edu>
-> > > > > Fixes: 906a4bb97f5d ("crypto: sha256 - Use get/put_unaligned_be32 to get input, memzero_explicit")
-> > > > > Signed-off-by: Hans de Goede <hdegoede@redhat.com>
-> > > > > ---
-> > > > > Changes in v2:
-> > > > > - Add barrier_data() call after the memset, making the function really
-> > > > >     explicit. Using barrier_data() works fine in the purgatory (build)
-> > > > >     environment.
-> > > > > ---
-> > > > >    arch/x86/boot/compressed/string.c | 6 ++++++
-> > > > >    1 file changed, 6 insertions(+)
-> > > > > 
-> > > > > diff --git a/arch/x86/boot/compressed/string.c b/arch/x86/boot/compressed/string.c
-> > > > > index 81fc1eaa3229..654a7164a702 100644
-> > > > > --- a/arch/x86/boot/compressed/string.c
-> > > > > +++ b/arch/x86/boot/compressed/string.c
-> > > > > @@ -50,6 +50,12 @@ void *memset(void *s, int c, size_t n)
-> > > > >    	return s;
-> > > > >    }
-> > > > > +void memzero_explicit(void *s, size_t count)
-> > > > > +{
-> > > > > +	memset(s, 0, count);
-> > > > > +	barrier_data(s);
-> > > > > +}
-> > > > 
-> > > > So the barrier_data() is only there to keep LTO from optimizing out the
-> > > > seemingly unused function?
-> > > 
-> > > I believe that Stephan Mueller (who suggested adding the barrier)
-> > > was also worried about people using this as an example for other
-> > > "explicit" functions which actually might get inlined.
-> > > 
-> > > This is not so much about protecting against LTO as it is against
-> > > protecting against inlining, which in this case boils down to the
-> > > same thing. Also this change makes the arch/x86/boot/compressed/string.c
-> > > and lib/string.c versions identical which seems like a good thing to me
-> > > (except for the code duplication part of it).
-> > > 
-> > > But I agree a comment would be good, how about:
-> > > 
-> > > void memzero_explicit(void *s, size_t count)
-> > > {
-> > > 	memset(s, 0, count);
-> > > 	/* Avoid the memset getting optimized away if we ever get inlined */
-> > > 	barrier_data(s);
-> > > }
-> > 
-> > Well, the standard construct for preventing inlining would be 'noinline',
-> > right? Any reason that wouldn't work?
-> 
-> Good question. I guess the worry is that modern compilers are getting
-> more aggressive with optimizing and then even if not inlined if the
-> function gets compiled in the same scope, then the compiler might
-> still notice it is only every writing to the memory passed in; and
-> then optimize it away of the write happens to memory which lifetime
-> ends immediately afterwards. I mean removing the call is not inlining,
-> so compiler developers might decide that that is still fine to do.
-> 
-> IMHO with trickycode like this is is best to just use the proven
-> version from lib/string.c
-> 
-> I guess I made the comment to specific though, so how about:
-> 
-> void memzero_explicit(void *s, size_t count)
-> {
-> 	memset(s, 0, count);
-> 	/* Tell the compiler to never remove / optimize away the memset */
-> 	barrier_data(s);
-> }
+x86/boot: Provide memzero_explicit()
 
-Ok, I guess this will work.
+The purgatory code now uses the shared lib/crypto/sha256.c sha256
+implementation. This needs memzero_explicit(), implement this.
 
-Thanks,
+We also have barrier_data() call after the memset, making sure
+neither the compiler nor the linker optimizes out this seemingly
+unused function.
 
-	Ingo
+Reported-by: Arvind Sankar <nivedita@alum.mit.edu>
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: H . Peter Anvin <hpa@zytor.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: linux-crypto@vger.kernel.org
+Fixes: 906a4bb97f5d ("crypto: sha256 - Use get/put_unaligned_be32 to get input, memzero_explicit")
+Link: https://lkml.kernel.org/r/20191007134724.4019-1-hdegoede@redhat.com
+[ Added comment. ]
+Signed-off-by: Ingo Molnar <mingo@kernel.org>
+---
+ arch/x86/boot/compressed/string.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/arch/x86/boot/compressed/string.c b/arch/x86/boot/compressed/string.c
+index 81fc1ea..dd30e63 100644
+--- a/arch/x86/boot/compressed/string.c
++++ b/arch/x86/boot/compressed/string.c
+@@ -50,6 +50,16 @@ void *memset(void *s, int c, size_t n)
+ 	return s;
+ }
+ 
++void memzero_explicit(void *s, size_t count)
++{
++	memset(s, 0, count);
++	/*
++	 * Make sure this function never gets inlined and
++	 * the memset() never gets optimized away:
++	 */
++	barrier_data(s);
++}
++
+ void *memmove(void *dest, const void *src, size_t n)
+ {
+ 	unsigned char *d = dest;
