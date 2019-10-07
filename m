@@ -2,114 +2,175 @@ Return-Path: <SRS0=5F7Z=YA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63698ECE58C
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Oct 2019 15:40:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 043E5C47404
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Oct 2019 16:05:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 370EC218AC
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Oct 2019 15:40:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C193D205C9
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Oct 2019 16:05:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1570462817;
-	bh=0SqrmEI3jPveA0in6PcRhu6ezfY2kUTsmIlF2EiiGK0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=WQMMqCSpDDnMloCiM0lAesf44lwGH+EiUeZmFEklMMG7fosVuqtDUzAmJ1a2M4LHt
-	 UUfUO3WzuGlEDIPp+3YqeKNNr1zpZF5aXaGFQJjR6W75UsWrbY1pTa14IP+iGvmFR9
-	 lCKWZfFqEAwVBvSRHbSte3OZDwGYeU6IgG34eqf0=
+	s=default; t=1570464321;
+	bh=tZ52lW+2owZ6FS8euu9Nt3i0FCpurv5BeoGCv2dYG3s=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=tNlLRLH4DqHOZBVjNRQADsWROgW+I6tHSCAFTylQ9Qm42/WwMFAI/roEcYWMXEg/G
+	 EsnrW1qj4lcEPmXvhCNEQXS1PVJv51Em0nceXx/auyporIW15m4IYEIlp5GtORglPU
+	 erN8FBaTgwnh3l5k3z1t0jAXFCbpv1BZiJtyzBQs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729371AbfJGPkM (ORCPT
+        id S1727711AbfJGQFU (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Oct 2019 11:40:12 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:38223 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729169AbfJGPkL (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Oct 2019 11:40:11 -0400
-Received: by mail-wm1-f65.google.com with SMTP id 3so12870348wmi.3;
-        Mon, 07 Oct 2019 08:40:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=YvxpVFdJOEZrkQChM8Lq11d9YvLJbKpxKj8YQXF8h+c=;
-        b=b4aG6tjLd5D2QbgnsraRnITHGMxPIlNYBw3yvdWYP1HXbsqS/SraQh9s6vsAGE01d6
-         MQIslDbt1wE18zCEStz+X9q7Y+jV6jLPKAjDeWSBoivuHmzk3dLr7uDU52DvuXSd1BTw
-         ksD0DFhHtZ6gDqB3thMNT0kkZ388AIzXzMAVXxcOm6Weie/MQZPRYbHYdHbLwMvkG1hn
-         mjV1Am8WsTi4xlAwdj5P4xVuX+Nj+pqwa5aM3dlPsSATUFr3NrmlTOJkFh9pgTFrn1BQ
-         HpKoFh/IQSXAeHRrbbdvggubAAPtBj1XdU+YV1/fExBF7JZnI6PCKZ+M/CUlgGKP0Iag
-         D0jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to:user-agent;
-        bh=YvxpVFdJOEZrkQChM8Lq11d9YvLJbKpxKj8YQXF8h+c=;
-        b=iNuJLxNTvo7RGem/89WvjeG8DdkG5Q7hCpYpNpkWGGyw6ap19R+XErQBbT5zQuwIUU
-         WqetegjJ+EJa0Ta9eMhaWPfvGr+XlMpeng+jJVCVc2gHFguUBYPkOMX5avh1jrVVm4v4
-         6qg7Yux6934RBBInf9bq80FdpdWc8R4m1/4fqKEfAkIXDEdiDip8CnfbEyW14CPKFVTM
-         dB0BgvOFUReuAyKQhG7wYqNMGi1YUv/OcYH/mLXGTzHDCcEWX1BKyYwScM0HOwW7V+Vr
-         pR5V8EuvDtvlwosxYVZFkE+3xSATzM3z/NMWw9J8Hr+D0Y3eMKuxqwzxybHpQik3fRGd
-         86kg==
-X-Gm-Message-State: APjAAAX10vbkuKDJ62W8jsPPnpOnANCRqKsszQDRFGuJx7vdsYXhla3O
-        F+bbTQKf9Jm7MwAfj5lIpgo=
-X-Google-Smtp-Source: APXvYqw1sh7drpFUzZ8Rb52Hl6MrStf7eBimtSUGhMBrc0RLPFo88/Tu+eXgo9P3OGErTSCHgYbQDA==
-X-Received: by 2002:a1c:7ec4:: with SMTP id z187mr20333322wmc.94.1570462809964;
-        Mon, 07 Oct 2019 08:40:09 -0700 (PDT)
-Received: from gmail.com (2E8B0CD5.catv.pool.telekom.hu. [46.139.12.213])
-        by smtp.gmail.com with ESMTPSA id y5sm18605709wma.14.2019.10.07.08.40.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Oct 2019 08:40:09 -0700 (PDT)
-Date:   Mon, 7 Oct 2019 17:40:07 +0200
-From:   Ingo Molnar <mingo@kernel.org>
-To:     Arvind Sankar <nivedita@alum.mit.edu>
-Cc:     Hans de Goede <hdegoede@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        linux-crypto@vger.kernel.org, x86@kernel.org,
-        linux-kernel@vger.kernel.org, Stephan Mueller <smueller@chronox.de>
-Subject: Re: [PATCH v2 5.4 regression fix] x86/boot: Provide memzero_explicit
-Message-ID: <20191007154007.GA96929@gmail.com>
-References: <20191007134724.4019-1-hdegoede@redhat.com>
- <20191007140022.GA29008@gmail.com>
- <1dc3c53d-785e-f9a4-1b4c-3374c94ae0a7@redhat.com>
- <20191007142230.GA117630@gmail.com>
- <2982b666-e310-afb7-40eb-e536ce95e23d@redhat.com>
- <20191007144600.GB59713@gmail.com>
- <20191007152049.GA384920@rani.riverdale.lan>
+        Mon, 7 Oct 2019 12:05:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56032 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727801AbfJGQFU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 7 Oct 2019 12:05:20 -0400
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id D285C205C9
+        for <linux-crypto@vger.kernel.org>; Mon,  7 Oct 2019 16:05:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1570464319;
+        bh=tZ52lW+2owZ6FS8euu9Nt3i0FCpurv5BeoGCv2dYG3s=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=VkuU+YoIU5W6SZLGb2McUzcOZB3NJf2191T66r4PcBZsw0EosDDPIhFV5LrC0Da24
+         Hx8b52vSREg5zQK8UgMHkulwcy/yRJaP9vm6ks2f3JgbjaMYQ9uqY4NNSQV8rLdHcH
+         XYjOAiP5TQzXvPl0ZHm+mSUIFvXtDFfWXRePNuRI=
+Received: by mail-wr1-f43.google.com with SMTP id o18so15947113wrv.13
+        for <linux-crypto@vger.kernel.org>; Mon, 07 Oct 2019 09:05:18 -0700 (PDT)
+X-Gm-Message-State: APjAAAUqGLgyUB21OBVhoyaY2uY1JMO2wcZ9iDoTh7i5Ln7JxtY2rMrC
+        ZdBjJtcHfJHHLnKy9bHh41XYt6KlnPZBEV2uWr/0ig==
+X-Google-Smtp-Source: APXvYqxt2Ft7TRJQPkWnG0+SWoAhkDWxKaZZBY5ChQ4TEulQhELWUtfKz6md9frIu0mI7A5zNxJmsUicBtgvJ2HpGbg=
+X-Received: by 2002:a05:6000:1632:: with SMTP id v18mr24495521wrb.61.1570464317306;
+ Mon, 07 Oct 2019 09:05:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191007152049.GA384920@rani.riverdale.lan>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <CAKv+Gu-VqfFsW+nrG+-2g1-eu6S+ZuD7qaN9aTchwD=Bcj_giw@mail.gmail.com>
+ <04D32F59-34D4-4EBF-80E3-69088D14C5D8@amacapital.net> <CAKv+Gu8s6AuZfdVUSmpgi-eY_9oZr-j4sdFygUOR3uvQXji+rQ@mail.gmail.com>
+ <CALCETrXWSu_fY5BetMah=iEOqSgkOphMOKcMrtiWyN0QqbZspw@mail.gmail.com> <CAKv+Gu8u8Oco==YRPSa4mq_eZyUcB_Apj-k_vo=7WvTwCp8k+A@mail.gmail.com>
+In-Reply-To: <CAKv+Gu8u8Oco==YRPSa4mq_eZyUcB_Apj-k_vo=7WvTwCp8k+A@mail.gmail.com>
+From:   Andy Lutomirski <luto@kernel.org>
+Date:   Mon, 7 Oct 2019 09:05:05 -0700
+X-Gmail-Original-Message-ID: <CALCETrXes_vNPXurB91VH0nZYiZRYrDMDhOy6jrw=tMFiT_nGA@mail.gmail.com>
+Message-ID: <CALCETrXes_vNPXurB91VH0nZYiZRYrDMDhOy6jrw=tMFiT_nGA@mail.gmail.com>
+Subject: Re: [PATCH v2 00/20] crypto: crypto API library interfaces for WireGuard
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Eric Biggers <ebiggers@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Martin Willi <martin@strongswan.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Josh Poimboeuf <jpoimboe@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Mon, Oct 7, 2019 at 8:12 AM Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+>
+> On Mon, 7 Oct 2019 at 17:02, Andy Lutomirski <luto@amacapital.net> wrote:
+> >
+> > On Sun, Oct 6, 2019 at 10:24 PM Ard Biesheuvel
+> > <ard.biesheuvel@linaro.org> wrote:
+> > >
+> > > On Mon, 7 Oct 2019 at 06:44, Andy Lutomirski <luto@amacapital.net> wrote:
+> > > >
+> >
+> > > > > Actually, this can be addressed by retaining the module dependencies
+> > > > > as before, but permitting the arch module to be omitted at load time.
+> > > >
+> > > > I think that, to avoid surprises, you should refuse to load the arch module if the generic module is loaded, too.
+> > > >
+> > >
+> > > Most arch code depends on CPU features that may not be available given
+> > > the context, either because they are SIMD or because they are optional
+> > > CPU instructions. So we need both modules at the same time anyway, so
+> > > that we can fall back to the generic code at runtime.
+> > >
+> > > So what I'd like is to have the generic module provide the library
+> > > interface, but rely on arch modules that are optional.
+> > >
+> > > We already have 95% of what we need with weak references. We have the
+> > > ability to test for presence of the arch code at runtime, and we even
+> > > have code patching for all architectures (through static relocations).
+> > >
+> > > However, one could argue that this is more a [space] optimization than
+> > > anything else, so I am willing to park this discussion until support
+> > > for static calls has been merged, and proceed with something simpler.
+> >
+> > I'd suggest tabling it until static calls are merged.  PeterZ just
+> > sent a new patchbomb for it anyway.
+> >
+>
+> As it turns out, static calls are a poor fit for this. Imagine an interface like
+>
+> poly1305_init(state)
+> poly1305_update(state, input)
+> poly1305_fina(state, digest)
+>
+> which can be implemented by different libraries. The problem is that
+> state is opaque, and so it is generally not guaranteed that a sequence
+> that was started using one implementation can be completed using
+> another one.
+>
+> Since the whole point is having a simple library interface,
+> complicating this with RCU hooks or other crazy plumbing to ensure
+> that no calls are in progress when you switch one out for another one,
+> I don't think static calls are suitable for this use case.
+>
+> > What I'm trying to get at here and apparently saying badly is that I
+> > want to avoid a situation where lsmod shows the arch module loaded but
+> > the arch code isn't actually executing.
+>
+> My goal here is to allow the generic library to be loaded with or
+> without the arch code, with the arch code always being used when it is
+> loaded. This is what I implemented using weak references, but it
+> requires a tweak in the module loader (two lines but not pretty).
+> Using weak references preserves the dependency order, since the
+> generic module will depend on the arch module (and up the refcount) it
+> any of its weak references were fulfilled by the arch module in
+> question. Using static calls will invert the dependency relation,
+> since the arch code will need to perform a static_call_update() to
+> make [users of] the generic library point to its code. How this works
+> with managing the module refcounts and unload order is an open
+> question afaict.
 
-* Arvind Sankar <nivedita@alum.mit.edu> wrote:
+Indeed.  Dealing with unloading when static calls are in use may be messy.
 
-> With the barrier in there, is there any reason to *not* inline the
-> function? barrier_data() is an asm statement that tells the compiler
-> that the asm uses the memory that was set to zero, thus preventing it
-> from removing the memset even if nothing else uses that memory later. A
-> more detailed comment is there in compiler-gcc.h. I can't see why it
-> wouldn't work even if it were inlined.
-> 
-> If the function can indeed be inlined, we could just make the common
-> implementation a macro and avoid duplicating it? As mentioned in another
-> mail, we otherwise will likely need another duplicate implementation for
-> arch/s390/purgatory as well.
+>
+> > Regardless of how everything
+> > gets wired up (static calls, weak refs, etc), the system's behavior
+> > should match the system's configuration, which means that we should
+> > not allow any improper order of loading things so that everything
+> > *appears* to be loaded but does not actually function.
+> >
+>
+> Yes. that is the whole point.
+>
+> > Saying "modprobe will do the right thing and let's not worry about
+> > silly admins using insmod directly" is not a good solution.
+>
+> Agreed.
+>
+> I have disregarded static calls and weak references for the time
+> being, and I will proceed with an implementation that uses neither.
+> The downside of this is that, e.g., we are forced to load the NEON
+> module on non-NEON capable hardware without calling any of its code,
+> but this is basically the Zinc situation only with the NEON and the
+> generic code living in different modules.
 
-I suspect macro would be justified in this case. Mind sending a v3 patch 
-to demonstrate how it would all look like?
-
-I'll zap v2 if the macro solution looks better.
-
-Thanks,
-
-	Ingo
+Makes sense.  It can always be improved after the initial
+implementation is merged.
