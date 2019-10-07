@@ -2,172 +2,195 @@ Return-Path: <SRS0=5F7Z=YA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68FAEECE58C
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Oct 2019 15:12:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DD57C47404
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Oct 2019 15:20:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 30B2E21479
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Oct 2019 15:12:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 547972053B
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Oct 2019 15:20:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QTaJ84Wi"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c9r2HWfJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727490AbfJGPMZ (ORCPT
+        id S1727711AbfJGPUx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Oct 2019 11:12:25 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:40742 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726334AbfJGPMY (ORCPT
+        Mon, 7 Oct 2019 11:20:53 -0400
+Received: from mail-qk1-f193.google.com ([209.85.222.193]:38081 "EHLO
+        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727589AbfJGPUx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Oct 2019 11:12:24 -0400
-Received: by mail-wr1-f68.google.com with SMTP id h4so7043849wrv.7
-        for <linux-crypto@vger.kernel.org>; Mon, 07 Oct 2019 08:12:22 -0700 (PDT)
+        Mon, 7 Oct 2019 11:20:53 -0400
+Received: by mail-qk1-f193.google.com with SMTP id u186so12947159qkc.5;
+        Mon, 07 Oct 2019 08:20:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=X1p0OfMCa1ZqMu/HdbF1dLDmeHh9sQqaQGFSoVRKm5g=;
-        b=QTaJ84Wivj7ViFOasFVFZ2dj3Ot1OiE2g5DXLSCzVjsUMWFY2H0dAS45UW9hWWVwzL
-         Q0hHXHU/1YTE+ug+myO81k09ekHkqNCxxnTX32Z7qwMNT7OKBolffIXGjsBCZ5NFwUJj
-         igamA4/udJcnx3K8Ziup7t2I+Ro8dcH8goRio8o1oHq5h4csLYQi+SKLeb6dthcKdX5t
-         E8a5xomZja3uh8K4VQmQvTVrkVoB8MuRt1XRQKRVRLFYLKWYcVW34r5jPPZV9CXPfyic
-         mN48uxmspZIBO4U+XImplR64xRTIF66ofLHuTRF3rByJ5r/23qTyebnTrmYRp2HAPWAt
-         6ugQ==
+        d=gmail.com; s=20161025;
+        h=sender:from:date:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=2XCAaj09dK9PFMXyIfqQJxhCJ1/sGcx1oaMzSLYOyzU=;
+        b=c9r2HWfJ2JP2aHcQEm5jXuT3Y/mgUr2wKANfK1AyOhsDWEaenY1CnitFOjhsbcSRBT
+         S6daY+BV6iblJnHKW9ETaQhNNRSibq9hvg9sBIXOlyRo68iGG/wzvnxLQUvNxoZJN+2c
+         62TUOMfKrNR9eRF3j3ZCp5+7voKcqxCTwADOhOVMRMCCReNiSalKL0hSNx0UgN0JyuwF
+         ZnJAykWAVAgUtF3aWVjqMwWyaBFO+bHPw6OsuGFczZ2iYaffiL+70A4r4BRupDn3rv+w
+         Q0shGg8vIBIr6a2Ay3HDUrhUVC1y81p0n5frQ0bObbsXEXE9/C4sOFiRlhc/XeIzDtAw
+         g0hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=X1p0OfMCa1ZqMu/HdbF1dLDmeHh9sQqaQGFSoVRKm5g=;
-        b=h9bQir0HZyCtZMjNK66k9UOFVdAaD3hpudS118M/ngh50NWPUPox61gpRc41kL6r3Y
-         Alip6pwXWsMZ3vTWs/9wIlJYPjg5Sx85IruaQZwjGa37ABFDpDpzAiSyigZWmXWNnt80
-         XMUu1w4bAQjgxpinJ1+JBawRdy2yf6pKd09v9Wb1xPrjcFbYQeVV4fuIB0XS1zMFO4Zn
-         jF6piFvb7vbaet5m4rtDYZIRwqgl0Y8CET+1EoUTjK1GEDp6e3+IwkBUQNlXHczujIc0
-         92NJsHrf4ysoDlhZVH+WBi2dPe/TI8UN7beENP+8Vlmawv+u4lnS9NEwY0yNh/yQN8Wd
-         5ubg==
-X-Gm-Message-State: APjAAAUqyHe9t5iZu03UXyAHYy3XR9EkEPqsU/FbVdID8n8cghSHLZAS
-        7bg1zPCdLtbqI+gnm6voabkHCuilcZajdylsjc+zItCq6kkoaw==
-X-Google-Smtp-Source: APXvYqx1MqcW7TT6IaHEc4cib4f2mjj7xUdUToqMJEMDNT+kyY1mcNR+HdldSYOJDYqqccdkWdTcAkRaMRawj533188=
-X-Received: by 2002:adf:fb11:: with SMTP id c17mr24339838wrr.0.1570461141884;
- Mon, 07 Oct 2019 08:12:21 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAKv+Gu-VqfFsW+nrG+-2g1-eu6S+ZuD7qaN9aTchwD=Bcj_giw@mail.gmail.com>
- <04D32F59-34D4-4EBF-80E3-69088D14C5D8@amacapital.net> <CAKv+Gu8s6AuZfdVUSmpgi-eY_9oZr-j4sdFygUOR3uvQXji+rQ@mail.gmail.com>
- <CALCETrXWSu_fY5BetMah=iEOqSgkOphMOKcMrtiWyN0QqbZspw@mail.gmail.com>
-In-Reply-To: <CALCETrXWSu_fY5BetMah=iEOqSgkOphMOKcMrtiWyN0QqbZspw@mail.gmail.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Mon, 7 Oct 2019 17:12:10 +0200
-Message-ID: <CAKv+Gu8u8Oco==YRPSa4mq_eZyUcB_Apj-k_vo=7WvTwCp8k+A@mail.gmail.com>
-Subject: Re: [PATCH v2 00/20] crypto: crypto API library interfaces for WireGuard
-To:     Andy Lutomirski <luto@amacapital.net>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
+        h=x-gm-message-state:sender:from:date:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=2XCAaj09dK9PFMXyIfqQJxhCJ1/sGcx1oaMzSLYOyzU=;
+        b=HfmuubfpjXwPRg5mliFr3eaM6vfA0o5P3k9xSKuXbYYo2Q622/uFWsksAliU+Q1x/W
+         oz4+7CX9fN+eb4t2MzoV8dwSmcXt1InrvOayPnH0juX+Ryk6bhECe3ijQRmZ59GmsDD7
+         vOxusv7oOAUSzNdCS84l3ccNYKDzw6+0UTjZ1u3C8prcp0BH/fCw2w5d7tgnWdlqM+dh
+         8BGZZEpkPyICOiC4eQqUbmf58jax3xZ4uCAlHMesJ1FCc2F4V5a6ENLyEfScBf0fFBJj
+         IlTwldWymfRyn/Jkzgg7Uo0UrUfudj3omIY8gtdrLDrc4I6FrUqlH1+O+6Qfc+QdSk1O
+         66ig==
+X-Gm-Message-State: APjAAAUUiSzdBueZAIjPJS4X/eti9Yfum0tGGOGnDI1lU2BY/mnqb5qr
+        eWcAHDiiPxb4QSbJRpvUQHw=
+X-Google-Smtp-Source: APXvYqxjrrymmH4+uWeXv9AswdZK3ZCmEZ6MFpdaPlUexTXm1g46iohpHZkEynqVbiwm2FyGR2odCQ==
+X-Received: by 2002:a37:5cc1:: with SMTP id q184mr24265246qkb.212.1570461651900;
+        Mon, 07 Oct 2019 08:20:51 -0700 (PDT)
+Received: from rani.riverdale.lan ([2001:470:1f07:5f3::b55f])
+        by smtp.gmail.com with ESMTPSA id c185sm7602621qkf.122.2019.10.07.08.20.51
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 07 Oct 2019 08:20:51 -0700 (PDT)
+From:   Arvind Sankar <nivedita@alum.mit.edu>
+X-Google-Original-From: Arvind Sankar <arvind@rani.riverdale.lan>
+Date:   Mon, 7 Oct 2019 11:20:49 -0400
+To:     Ingo Molnar <mingo@kernel.org>
+Cc:     Hans de Goede <hdegoede@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Samuel Neves <sneves@dei.uc.pt>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Eric Biggers <ebiggers@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Martin Willi <martin@strongswan.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Josh Poimboeuf <jpoimboe@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        linux-crypto@vger.kernel.org, x86@kernel.org,
+        linux-kernel@vger.kernel.org,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        Stephan Mueller <smueller@chronox.de>
+Subject: Re: [PATCH v2 5.4 regression fix] x86/boot: Provide memzero_explicit
+Message-ID: <20191007152049.GA384920@rani.riverdale.lan>
+References: <20191007134724.4019-1-hdegoede@redhat.com>
+ <20191007140022.GA29008@gmail.com>
+ <1dc3c53d-785e-f9a4-1b4c-3374c94ae0a7@redhat.com>
+ <20191007142230.GA117630@gmail.com>
+ <2982b666-e310-afb7-40eb-e536ce95e23d@redhat.com>
+ <20191007144600.GB59713@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20191007144600.GB59713@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 7 Oct 2019 at 17:02, Andy Lutomirski <luto@amacapital.net> wrote:
->
-> On Sun, Oct 6, 2019 at 10:24 PM Ard Biesheuvel
-> <ard.biesheuvel@linaro.org> wrote:
-> >
-> > On Mon, 7 Oct 2019 at 06:44, Andy Lutomirski <luto@amacapital.net> wrote:
-> > >
->
-> > > > Actually, this can be addressed by retaining the module dependencies
-> > > > as before, but permitting the arch module to be omitted at load time.
-> > >
-> > > I think that, to avoid surprises, you should refuse to load the arch module if the generic module is loaded, too.
-> > >
-> >
-> > Most arch code depends on CPU features that may not be available given
-> > the context, either because they are SIMD or because they are optional
-> > CPU instructions. So we need both modules at the same time anyway, so
-> > that we can fall back to the generic code at runtime.
-> >
-> > So what I'd like is to have the generic module provide the library
-> > interface, but rely on arch modules that are optional.
-> >
-> > We already have 95% of what we need with weak references. We have the
-> > ability to test for presence of the arch code at runtime, and we even
-> > have code patching for all architectures (through static relocations).
-> >
-> > However, one could argue that this is more a [space] optimization than
-> > anything else, so I am willing to park this discussion until support
-> > for static calls has been merged, and proceed with something simpler.
->
-> I'd suggest tabling it until static calls are merged.  PeterZ just
-> sent a new patchbomb for it anyway.
->
+On Mon, Oct 07, 2019 at 04:46:00PM +0200, Ingo Molnar wrote:
+> 
+> * Hans de Goede <hdegoede@redhat.com> wrote:
+> 
+> > Hi,
+> > 
+> > On 07-10-2019 16:22, Ingo Molnar wrote:
+> > > 
+> > > * Hans de Goede <hdegoede@redhat.com> wrote:
+> > > 
+> > > > Hi,
+> > > > 
+> > > > On 07-10-2019 16:00, Ingo Molnar wrote:
+> > > > > 
+> > > > > * Hans de Goede <hdegoede@redhat.com> wrote:
+> > > > > 
+> > > > > > The purgatory code now uses the shared lib/crypto/sha256.c sha256
+> > > > > > implementation. This needs memzero_explicit, implement this.
+> > > > > > 
+> > > > > > Reported-by: Arvind Sankar <nivedita@alum.mit.edu>
+> > > > > > Fixes: 906a4bb97f5d ("crypto: sha256 - Use get/put_unaligned_be32 to get input, memzero_explicit")
+> > > > > > Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+> > > > > > ---
+> > > > > > Changes in v2:
+> > > > > > - Add barrier_data() call after the memset, making the function really
+> > > > > >     explicit. Using barrier_data() works fine in the purgatory (build)
+> > > > > >     environment.
+> > > > > > ---
+> > > > > >    arch/x86/boot/compressed/string.c | 6 ++++++
+> > > > > >    1 file changed, 6 insertions(+)
+> > > > > > 
+> > > > > > diff --git a/arch/x86/boot/compressed/string.c b/arch/x86/boot/compressed/string.c
+> > > > > > index 81fc1eaa3229..654a7164a702 100644
+> > > > > > --- a/arch/x86/boot/compressed/string.c
+> > > > > > +++ b/arch/x86/boot/compressed/string.c
+> > > > > > @@ -50,6 +50,12 @@ void *memset(void *s, int c, size_t n)
+> > > > > >    	return s;
+> > > > > >    }
+> > > > > > +void memzero_explicit(void *s, size_t count)
+> > > > > > +{
+> > > > > > +	memset(s, 0, count);
+> > > > > > +	barrier_data(s);
+> > > > > > +}
+> > > > > 
+> > > > > So the barrier_data() is only there to keep LTO from optimizing out the
+> > > > > seemingly unused function?
+> > > > 
+> > > > I believe that Stephan Mueller (who suggested adding the barrier)
+> > > > was also worried about people using this as an example for other
+> > > > "explicit" functions which actually might get inlined.
+> > > > 
+> > > > This is not so much about protecting against LTO as it is against
+> > > > protecting against inlining, which in this case boils down to the
+> > > > same thing. Also this change makes the arch/x86/boot/compressed/string.c
+> > > > and lib/string.c versions identical which seems like a good thing to me
+> > > > (except for the code duplication part of it).
+> > > > 
+> > > > But I agree a comment would be good, how about:
+> > > > 
+> > > > void memzero_explicit(void *s, size_t count)
+> > > > {
+> > > > 	memset(s, 0, count);
+> > > > 	/* Avoid the memset getting optimized away if we ever get inlined */
+> > > > 	barrier_data(s);
+> > > > }
+> > > 
+> > > Well, the standard construct for preventing inlining would be 'noinline',
+> > > right? Any reason that wouldn't work?
+> > 
+> > Good question. I guess the worry is that modern compilers are getting
+> > more aggressive with optimizing and then even if not inlined if the
+> > function gets compiled in the same scope, then the compiler might
+> > still notice it is only every writing to the memory passed in; and
+> > then optimize it away of the write happens to memory which lifetime
+> > ends immediately afterwards. I mean removing the call is not inlining,
+> > so compiler developers might decide that that is still fine to do.
+> > 
+> > IMHO with trickycode like this is is best to just use the proven
+> > version from lib/string.c
+> > 
+> > I guess I made the comment to specific though, so how about:
+> > 
+> > void memzero_explicit(void *s, size_t count)
+> > {
+> > 	memset(s, 0, count);
+> > 	/* Tell the compiler to never remove / optimize away the memset */
+> > 	barrier_data(s);
+> > }
+> 
+> Ok, I guess this will work.
+> 
+> Thanks,
+> 
+> 	Ingo
 
-As it turns out, static calls are a poor fit for this. Imagine an interface like
+With the barrier in there, is there any reason to *not* inline the
+function? barrier_data() is an asm statement that tells the compiler
+that the asm uses the memory that was set to zero, thus preventing it
+from removing the memset even if nothing else uses that memory later. A
+more detailed comment is there in compiler-gcc.h. I can't see why it
+wouldn't work even if it were inlined.
 
-poly1305_init(state)
-poly1305_update(state, input)
-poly1305_fina(state, digest)
-
-which can be implemented by different libraries. The problem is that
-state is opaque, and so it is generally not guaranteed that a sequence
-that was started using one implementation can be completed using
-another one.
-
-Since the whole point is having a simple library interface,
-complicating this with RCU hooks or other crazy plumbing to ensure
-that no calls are in progress when you switch one out for another one,
-I don't think static calls are suitable for this use case.
-
-> What I'm trying to get at here and apparently saying badly is that I
-> want to avoid a situation where lsmod shows the arch module loaded but
-> the arch code isn't actually executing.
-
-My goal here is to allow the generic library to be loaded with or
-without the arch code, with the arch code always being used when it is
-loaded. This is what I implemented using weak references, but it
-requires a tweak in the module loader (two lines but not pretty).
-Using weak references preserves the dependency order, since the
-generic module will depend on the arch module (and up the refcount) it
-any of its weak references were fulfilled by the arch module in
-question. Using static calls will invert the dependency relation,
-since the arch code will need to perform a static_call_update() to
-make [users of] the generic library point to its code. How this works
-with managing the module refcounts and unload order is an open
-question afaict.
-
-> Regardless of how everything
-> gets wired up (static calls, weak refs, etc), the system's behavior
-> should match the system's configuration, which means that we should
-> not allow any improper order of loading things so that everything
-> *appears* to be loaded but does not actually function.
->
-
-Yes. that is the whole point.
-
-> Saying "modprobe will do the right thing and let's not worry about
-> silly admins using insmod directly" is not a good solution.
-
-Agreed.
-
-I have disregarded static calls and weak references for the time
-being, and I will proceed with an implementation that uses neither.
-The downside of this is that, e.g., we are forced to load the NEON
-module on non-NEON capable hardware without calling any of its code,
-but this is basically the Zinc situation only with the NEON and the
-generic code living in different modules.
+If the function can indeed be inlined, we could just make the common
+implementation a macro and avoid duplicating it? As mentioned in another
+mail, we otherwise will likely need another duplicate implementation for
+arch/s390/purgatory as well.
