@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39BC3ECE596
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Oct 2019 16:46:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9CEEC47404
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Oct 2019 16:46:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0FE432070B
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Oct 2019 16:46:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 94CA220659
+	for <linux-crypto@archiver.kernel.org>; Mon,  7 Oct 2019 16:46:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OR7aBirK"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Rkssk7Z3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729122AbfJGQqd (ORCPT
+        id S1729123AbfJGQqg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Oct 2019 12:46:33 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:54494 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729003AbfJGQqd (ORCPT
+        Mon, 7 Oct 2019 12:46:36 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:41909 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728996AbfJGQqf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Oct 2019 12:46:33 -0400
-Received: by mail-wm1-f67.google.com with SMTP id p7so204582wmp.4
-        for <linux-crypto@vger.kernel.org>; Mon, 07 Oct 2019 09:46:31 -0700 (PDT)
+        Mon, 7 Oct 2019 12:46:35 -0400
+Received: by mail-wr1-f67.google.com with SMTP id q9so16157702wrm.8
+        for <linux-crypto@vger.kernel.org>; Mon, 07 Oct 2019 09:46:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=oruMzlzw7GcV2sRKVbWRaila+GettxXX0AhrwqUiGGI=;
-        b=OR7aBirKEAL8XGv75qPw86bCueah3VpvtuoUp3Oh0eYMqEjdbhXY9mmOtOLbYfzdI8
-         zsmzrspcZfamJ06K5ix1QnVlg2vumBRlfMC3UgZFIBf7jiNZJ4JJyfJ30pd015fWN7Ja
-         foScPDNypYFSR/GTPNs1hZSAGn/bCzNKF59EsCGxm+ckqLnh6XaAXz42IpTtT1Qetj8R
-         2CjcPG2dGxMs7VlimsdhGFcxx0TTiThyEdZ3zoIzGeBIkXNMPUpveX6ClqI4Upyv49Qq
-         E5zuzdKEFqTTw9k2JdR9PDDkuVeaCoS9f+wMHLyhJ4CRgbhG0isC3AXuI9Pv/wiUEMGe
-         i2dA==
+        bh=A2CZYX76kQFyJCwsCO5g5Sxb7Uo/6SjNNPF4/sPswNY=;
+        b=Rkssk7Z3+yeGC/sDAJHiuwldDLB3fFxxeEYfZfde49XXxkULh0LvvVLQAvnQGRXcgL
+         Q4NRliTy2fZKJHDd93fz+D6YLSgdaOik3vSXi27w8CiCNaKwWj1gcQjlWh8cTPULLKkr
+         KNyMqg3ggaFjenT/UMJzzgppUnQj6275j8HeXYmIkS50szD3m0RQsRsq4Eh+fSJaqx+a
+         pEvkuWygE9CBQb2wb1wiPt6bGmDvjq7DWClSxgkzWh+u7QqbaWbN773DROXQOFt+4vbr
+         8GMayItwCPhvl7XCHJag9pMg51e6WlxjrW+5ZsLRCfl5/ZGNfGt2y1bSydniZf1bagxC
+         hT7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=oruMzlzw7GcV2sRKVbWRaila+GettxXX0AhrwqUiGGI=;
-        b=Bzppd8JTIgzd337Z8YjlAOQrCBjObHqz2IVtu657N4ZtLdG6MFt4CY8Cnkw2DjZ9wS
-         NAmAsHmE6tA6T+6LSPFJ5DTifu67/eht/hKjpGbq5IEABFsaXWiJYYd+V/OKpJ4TJzY6
-         DSkOe03GeQjtJmn/GBw9QE463weNJ8XGc4KYUwWuyruc5QUOhT4wDI8x7IJ5gnNlokI9
-         zL96txJCHcdEX72LAWDmfJSt7Gm+m7pyvZ92LnUCX0hMe6Edmif3GPHxW4YKXqzLIgiY
-         yn56i4e+39vOJb5i21T4nfo07J6NW49lGITAbjpavWIogWKK9/ebWHuiBeso0WS6A34s
-         ZqhA==
-X-Gm-Message-State: APjAAAWDAiq3XpGBGA4BwcvpTVLMj/w3KcX1d3JbZQ+ThXdQBpyg//SH
-        HEQsQitjlp6qpuXY50yo/qpEhad/m1JSNg==
-X-Google-Smtp-Source: APXvYqwbNmTFFjI1dvhyQ0TMBA42Y0Mznp5yUBP+B7iz1deJSCrEUezP7rQRbORMxDKBvDRhyBLT4w==
-X-Received: by 2002:a7b:ce08:: with SMTP id m8mr172770wmc.106.1570466790311;
-        Mon, 07 Oct 2019 09:46:30 -0700 (PDT)
+        bh=A2CZYX76kQFyJCwsCO5g5Sxb7Uo/6SjNNPF4/sPswNY=;
+        b=WFCHIzbVEgQYxVdqBPvqNJ7Sn0sAbGcV759AbQ4L5ZdSO4UcP+MoJWZg6LO2xKhKSq
+         9R7GykTNCD1AzPjinyBQ/EM6K6NI0BRdTRkUDw8Kz/ExCpu+K31pYpickcFXWnlF7BOb
+         y6WAnY68ioqpcjZrBP50KGJoh0rvswUUx+joRtR0XJAiZO0GSJNADMG62rsvvnCXqpLq
+         a1Q6knCJf+PYvZpeUUTvJcjEciOlv57m0PwYSWutyMFKM9IsI8xNR/JKPo4TylkvSeFF
+         DavddTolY9WayFjNrOvA8jmvB1f60ALHHJZOvZaufz4oYjbSprc6n/yzRWPRQ5Sah0WH
+         NPsw==
+X-Gm-Message-State: APjAAAUCKQ953rZDgS/coYYTkB2zj+3CUrHC95Bb1VNJWfgGbYoaAskg
+        TSHAfhs3v/RgmkXiHk3BDZthmHjPp1cDcA==
+X-Google-Smtp-Source: APXvYqxNYryTbMSgMr9hGgdJ3COeotCk36qSfLGx72pLSGzcLmRgDqiORv29Y4C/+3labWsHobXzGw==
+X-Received: by 2002:adf:aa98:: with SMTP id h24mr18714070wrc.60.1570466791688;
+        Mon, 07 Oct 2019 09:46:31 -0700 (PDT)
 Received: from localhost.localdomain (laubervilliers-657-1-83-120.w92-154.abo.wanadoo.fr. [92.154.90.120])
-        by smtp.gmail.com with ESMTPSA id b22sm68507wmj.36.2019.10.07.09.46.28
+        by smtp.gmail.com with ESMTPSA id b22sm68507wmj.36.2019.10.07.09.46.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Oct 2019 09:46:29 -0700 (PDT)
+        Mon, 07 Oct 2019 09:46:30 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
@@ -67,137 +67,461 @@ Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Andy Lutomirski <luto@kernel.org>,
         Martin Willi <martin@strongswan.org>,
         Rene van Dorst <opensource@vdorst.com>
-Subject: [PATCH v3 08/29] crypto: arm/chacha - expose ARM ChaCha routine as library function
-Date:   Mon,  7 Oct 2019 18:45:49 +0200
-Message-Id: <20191007164610.6881-9-ard.biesheuvel@linaro.org>
+Subject: [PATCH v3 09/29] crypto: mips/chacha - import 32r2 ChaCha code from Zinc
+Date:   Mon,  7 Oct 2019 18:45:50 +0200
+Message-Id: <20191007164610.6881-10-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191007164610.6881-1-ard.biesheuvel@linaro.org>
 References: <20191007164610.6881-1-ard.biesheuvel@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Expose the accelerated NEON ChaCha routine directly as a symbol
-export so that users of the ChaCha library API can use it directly.
+This imports the accelerated MIPS 32r2 ChaCha20 implementation from the
+Zinc patch set.
 
-Given that calls into the library API will always go through the
-routines in this module if it is enabled, switch to static keys
-to select the optimal implementation available (which may be none
-at all, in which case we defer to the generic implementation for
-all invocations).
-
+Co-developed-by: René van Dorst <opensource@vdorst.com>
+Signed-off-by: René van Dorst <opensource@vdorst.com>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- arch/arm/crypto/Kconfig       |  1 +
- arch/arm/crypto/chacha-glue.c | 45 +++++++++++++++++++-
- 2 files changed, 44 insertions(+), 2 deletions(-)
+ arch/mips/crypto/chacha-core.S | 424 ++++++++++++++++++++
+ 1 file changed, 424 insertions(+)
 
-diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
-index a31b0b95548d..265da3801e4f 100644
---- a/arch/arm/crypto/Kconfig
-+++ b/arch/arm/crypto/Kconfig
-@@ -128,6 +128,7 @@ config CRYPTO_CRC32_ARM_CE
- config CRYPTO_CHACHA20_NEON
- 	tristate "NEON and scalar accelerated ChaCha stream cipher algorithms"
- 	select CRYPTO_BLKCIPHER
-+	select CRYPTO_ARCH_HAVE_LIB_CHACHA
- 
- config CRYPTO_NHPOLY1305_NEON
- 	tristate "NEON accelerated NHPoly1305 hash function (for Adiantum)"
-diff --git a/arch/arm/crypto/chacha-glue.c b/arch/arm/crypto/chacha-glue.c
-index 63168e905273..f797601a15a3 100644
---- a/arch/arm/crypto/chacha-glue.c
-+++ b/arch/arm/crypto/chacha-glue.c
-@@ -11,6 +11,7 @@
- #include <crypto/internal/chacha.h>
- #include <crypto/internal/simd.h>
- #include <crypto/internal/skcipher.h>
-+#include <linux/jump_label.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
- 
-@@ -29,6 +30,8 @@ asmlinkage void hchacha_block_neon(const u32 *state, u32 *out, int nrounds);
- asmlinkage void chacha_doarm(u8 *dst, const u8 *src, unsigned int bytes,
- 			     const u32 *state, int nrounds);
- 
-+static __ro_after_init DEFINE_STATIC_KEY_FALSE(use_neon);
+diff --git a/arch/mips/crypto/chacha-core.S b/arch/mips/crypto/chacha-core.S
+new file mode 100644
+index 000000000000..a81e02db95e7
+--- /dev/null
++++ b/arch/mips/crypto/chacha-core.S
+@@ -0,0 +1,424 @@
++/* SPDX-License-Identifier: GPL-2.0 OR MIT */
++/*
++ * Copyright (C) 2016-2018 René van Dorst <opensource@vdorst.com>. All Rights Reserved.
++ * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++ */
 +
- static void chacha_doneon(u32 *state, u8 *dst, const u8 *src,
- 			  unsigned int bytes, int nrounds)
- {
-@@ -55,6 +58,42 @@ static void chacha_doneon(u32 *state, u8 *dst, const u8 *src,
- 	}
- }
- 
-+void hchacha_block(const u32 *state, u32 *stream, int nrounds)
-+{
-+	if (!IS_ENABLED(CONFIG_KERNEL_MODE_NEON) ||
-+	    !static_branch_likely(&use_neon) || !crypto_simd_usable()) {
-+		hchacha_block_arm(state, stream, nrounds);
-+	} else {
-+		kernel_neon_begin();
-+		hchacha_block_neon(state, stream, nrounds);
-+		kernel_neon_end();
-+	}
-+}
-+EXPORT_SYMBOL(hchacha_block);
++#define MASK_U32		0x3c
++#define CHACHA20_BLOCK_SIZE	64
++#define STACK_SIZE		32
 +
-+void chacha_init(u32 *state, const u32 *key, const u8 *iv)
-+{
-+	chacha_init_generic(state, key, iv);
-+}
-+EXPORT_SYMBOL(chacha_init);
++#define X0	$t0
++#define X1	$t1
++#define X2	$t2
++#define X3	$t3
++#define X4	$t4
++#define X5	$t5
++#define X6	$t6
++#define X7	$t7
++#define X8	$t8
++#define X9	$t9
++#define X10	$v1
++#define X11	$s6
++#define X12	$s5
++#define X13	$s4
++#define X14	$s3
++#define X15	$s2
++/* Use regs which are overwritten on exit for Tx so we don't leak clear data. */
++#define T0	$s1
++#define T1	$s0
++#define T(n)	T ## n
++#define X(n)	X ## n
 +
-+void chacha_crypt(u32 *state, u8 *dst, const u8 *src, unsigned int bytes,
-+		  int nrounds)
-+{
-+	if (!IS_ENABLED(CONFIG_KERNEL_MODE_NEON) ||
-+	    !static_branch_likely(&use_neon) ||
-+	    bytes <= CHACHA_BLOCK_SIZE || !crypto_simd_usable()) {
-+		chacha_doarm(dst, src, bytes, state, nrounds);
-+		state[12] += DIV_ROUND_UP(bytes, CHACHA_BLOCK_SIZE);
-+		return;
-+	}
++/* Input arguments */
++#define STATE		$a0
++#define OUT		$a1
++#define IN		$a2
++#define BYTES		$a3
 +
-+	kernel_neon_begin();
-+	chacha_doneon(state, dst, src, bytes, nrounds);
-+	kernel_neon_end();
-+}
-+EXPORT_SYMBOL(chacha_crypt);
++/* Output argument */
++/* NONCE[0] is kept in a register and not in memory.
++ * We don't want to touch original value in memory.
++ * Must be incremented every loop iteration.
++ */
++#define NONCE_0		$v0
 +
- static int chacha_stream_xor(struct skcipher_request *req,
- 			     const struct chacha_ctx *ctx, const u8 *iv)
- {
-@@ -108,7 +147,7 @@ static int chacha_neon_stream_xor(struct skcipher_request *req,
- 		if (nbytes < walk.total)
- 			nbytes = round_down(nbytes, walk.stride);
- 
--		if (!do_neon) {
-+		if (!static_branch_likely(&use_neon) || !do_neon) {
- 			chacha_doarm(walk.dst.virt.addr, walk.src.virt.addr,
- 				     nbytes, state, ctx->nrounds);
- 			state[12] += DIV_ROUND_UP(nbytes, CHACHA_BLOCK_SIZE);
-@@ -160,7 +199,7 @@ static int xchacha_neon(struct skcipher_request *req)
- 
- 	chacha_init_generic(state, ctx->key, req->iv);
- 
--	if (!crypto_simd_usable()) {
-+	if (!static_branch_likely(&use_neon) || !crypto_simd_usable()) {
- 		hchacha_block_arm(state, subctx.key, ctx->nrounds);
- 	} else {
- 		kernel_neon_begin();
-@@ -309,6 +348,8 @@ static int __init chacha_simd_mod_init(void)
- 			for (i = 0; i < ARRAY_SIZE(neon_algs); i++)
- 				neon_algs[i].base.cra_priority = 0;
- 			break;
-+		default:
-+			static_branch_enable(&use_neon);
- 		}
- 
- 		err = crypto_register_skciphers(neon_algs, ARRAY_SIZE(neon_algs));
++/* SAVED_X and SAVED_CA are set in the jump table.
++ * Use regs which are overwritten on exit else we don't leak clear data.
++ * They are used to handling the last bytes which are not multiple of 4.
++ */
++#define SAVED_X		X15
++#define SAVED_CA	$s7
++
++#define IS_UNALIGNED	$s7
++
++#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
++#define MSB 0
++#define LSB 3
++#define ROTx rotl
++#define ROTR(n) rotr n, 24
++#define	CPU_TO_LE32(n) \
++	wsbh	n; \
++	rotr	n, 16;
++#else
++#define MSB 3
++#define LSB 0
++#define ROTx rotr
++#define CPU_TO_LE32(n)
++#define ROTR(n)
++#endif
++
++#define FOR_EACH_WORD(x) \
++	x( 0); \
++	x( 1); \
++	x( 2); \
++	x( 3); \
++	x( 4); \
++	x( 5); \
++	x( 6); \
++	x( 7); \
++	x( 8); \
++	x( 9); \
++	x(10); \
++	x(11); \
++	x(12); \
++	x(13); \
++	x(14); \
++	x(15);
++
++#define FOR_EACH_WORD_REV(x) \
++	x(15); \
++	x(14); \
++	x(13); \
++	x(12); \
++	x(11); \
++	x(10); \
++	x( 9); \
++	x( 8); \
++	x( 7); \
++	x( 6); \
++	x( 5); \
++	x( 4); \
++	x( 3); \
++	x( 2); \
++	x( 1); \
++	x( 0);
++
++#define PLUS_ONE_0	 1
++#define PLUS_ONE_1	 2
++#define PLUS_ONE_2	 3
++#define PLUS_ONE_3	 4
++#define PLUS_ONE_4	 5
++#define PLUS_ONE_5	 6
++#define PLUS_ONE_6	 7
++#define PLUS_ONE_7	 8
++#define PLUS_ONE_8	 9
++#define PLUS_ONE_9	10
++#define PLUS_ONE_10	11
++#define PLUS_ONE_11	12
++#define PLUS_ONE_12	13
++#define PLUS_ONE_13	14
++#define PLUS_ONE_14	15
++#define PLUS_ONE_15	16
++#define PLUS_ONE(x)	PLUS_ONE_ ## x
++#define _CONCAT3(a,b,c)	a ## b ## c
++#define CONCAT3(a,b,c)	_CONCAT3(a,b,c)
++
++#define STORE_UNALIGNED(x) \
++CONCAT3(.Lchacha20_mips_xor_unaligned_, PLUS_ONE(x), _b: ;) \
++	.if (x != 12); \
++		lw	T0, (x*4)(STATE); \
++	.endif; \
++	lwl	T1, (x*4)+MSB ## (IN); \
++	lwr	T1, (x*4)+LSB ## (IN); \
++	.if (x == 12); \
++		addu	X ## x, NONCE_0; \
++	.else; \
++		addu	X ## x, T0; \
++	.endif; \
++	CPU_TO_LE32(X ## x); \
++	xor	X ## x, T1; \
++	swl	X ## x, (x*4)+MSB ## (OUT); \
++	swr	X ## x, (x*4)+LSB ## (OUT);
++
++#define STORE_ALIGNED(x) \
++CONCAT3(.Lchacha20_mips_xor_aligned_, PLUS_ONE(x), _b: ;) \
++	.if (x != 12); \
++		lw	T0, (x*4)(STATE); \
++	.endif; \
++	lw	T1, (x*4) ## (IN); \
++	.if (x == 12); \
++		addu	X ## x, NONCE_0; \
++	.else; \
++		addu	X ## x, T0; \
++	.endif; \
++	CPU_TO_LE32(X ## x); \
++	xor	X ## x, T1; \
++	sw	X ## x, (x*4) ## (OUT);
++
++/* Jump table macro.
++ * Used for setup and handling the last bytes, which are not multiple of 4.
++ * X15 is free to store Xn
++ * Every jumptable entry must be equal in size.
++ */
++#define JMPTBL_ALIGNED(x) \
++.Lchacha20_mips_jmptbl_aligned_ ## x: ; \
++	.set	noreorder; \
++	b	.Lchacha20_mips_xor_aligned_ ## x ## _b; \
++	.if (x == 12); \
++		addu	SAVED_X, X ## x, NONCE_0; \
++	.else; \
++		addu	SAVED_X, X ## x, SAVED_CA; \
++	.endif; \
++	.set	reorder
++
++#define JMPTBL_UNALIGNED(x) \
++.Lchacha20_mips_jmptbl_unaligned_ ## x: ; \
++	.set	noreorder; \
++	b	.Lchacha20_mips_xor_unaligned_ ## x ## _b; \
++	.if (x == 12); \
++		addu	SAVED_X, X ## x, NONCE_0; \
++	.else; \
++		addu	SAVED_X, X ## x, SAVED_CA; \
++	.endif; \
++	.set	reorder
++
++#define AXR(A, B, C, D,  K, L, M, N,  V, W, Y, Z,  S) \
++	addu	X(A), X(K); \
++	addu	X(B), X(L); \
++	addu	X(C), X(M); \
++	addu	X(D), X(N); \
++	xor	X(V), X(A); \
++	xor	X(W), X(B); \
++	xor	X(Y), X(C); \
++	xor	X(Z), X(D); \
++	rotl	X(V), S;    \
++	rotl	X(W), S;    \
++	rotl	X(Y), S;    \
++	rotl	X(Z), S;
++
++.text
++.set	reorder
++.set	noat
++.globl	chacha20_mips
++.ent	chacha20_mips
++chacha20_mips:
++	.frame	$sp, STACK_SIZE, $ra
++
++	addiu	$sp, -STACK_SIZE
++
++	/* Return bytes = 0. */
++	beqz	BYTES, .Lchacha20_mips_end
++
++	lw	NONCE_0, 48(STATE)
++
++	/* Save s0-s7 */
++	sw	$s0,  0($sp)
++	sw	$s1,  4($sp)
++	sw	$s2,  8($sp)
++	sw	$s3, 12($sp)
++	sw	$s4, 16($sp)
++	sw	$s5, 20($sp)
++	sw	$s6, 24($sp)
++	sw	$s7, 28($sp)
++
++	/* Test IN or OUT is unaligned.
++	 * IS_UNALIGNED = ( IN | OUT ) & 0x00000003
++	 */
++	or	IS_UNALIGNED, IN, OUT
++	andi	IS_UNALIGNED, 0x3
++
++	/* Set number of rounds */
++	li	$at, 20
++
++	b	.Lchacha20_rounds_start
++
++.align 4
++.Loop_chacha20_rounds:
++	addiu	IN,  CHACHA20_BLOCK_SIZE
++	addiu	OUT, CHACHA20_BLOCK_SIZE
++	addiu	NONCE_0, 1
++
++.Lchacha20_rounds_start:
++	lw	X0,  0(STATE)
++	lw	X1,  4(STATE)
++	lw	X2,  8(STATE)
++	lw	X3,  12(STATE)
++
++	lw	X4,  16(STATE)
++	lw	X5,  20(STATE)
++	lw	X6,  24(STATE)
++	lw	X7,  28(STATE)
++	lw	X8,  32(STATE)
++	lw	X9,  36(STATE)
++	lw	X10, 40(STATE)
++	lw	X11, 44(STATE)
++
++	move	X12, NONCE_0
++	lw	X13, 52(STATE)
++	lw	X14, 56(STATE)
++	lw	X15, 60(STATE)
++
++.Loop_chacha20_xor_rounds:
++	addiu	$at, -2
++	AXR( 0, 1, 2, 3,  4, 5, 6, 7, 12,13,14,15, 16);
++	AXR( 8, 9,10,11, 12,13,14,15,  4, 5, 6, 7, 12);
++	AXR( 0, 1, 2, 3,  4, 5, 6, 7, 12,13,14,15,  8);
++	AXR( 8, 9,10,11, 12,13,14,15,  4, 5, 6, 7,  7);
++	AXR( 0, 1, 2, 3,  5, 6, 7, 4, 15,12,13,14, 16);
++	AXR(10,11, 8, 9, 15,12,13,14,  5, 6, 7, 4, 12);
++	AXR( 0, 1, 2, 3,  5, 6, 7, 4, 15,12,13,14,  8);
++	AXR(10,11, 8, 9, 15,12,13,14,  5, 6, 7, 4,  7);
++	bnez	$at, .Loop_chacha20_xor_rounds
++
++	addiu	BYTES, -(CHACHA20_BLOCK_SIZE)
++
++	/* Is data src/dst unaligned? Jump */
++	bnez	IS_UNALIGNED, .Loop_chacha20_unaligned
++
++	/* Set number rounds here to fill delayslot. */
++	li	$at, 20
++
++	/* BYTES < 0, it has no full block. */
++	bltz	BYTES, .Lchacha20_mips_no_full_block_aligned
++
++	FOR_EACH_WORD_REV(STORE_ALIGNED)
++
++	/* BYTES > 0? Loop again. */
++	bgtz	BYTES, .Loop_chacha20_rounds
++
++	/* Place this here to fill delay slot */
++	addiu	NONCE_0, 1
++
++	/* BYTES < 0? Handle last bytes */
++	bltz	BYTES, .Lchacha20_mips_xor_bytes
++
++.Lchacha20_mips_xor_done:
++	/* Restore used registers */
++	lw	$s0,  0($sp)
++	lw	$s1,  4($sp)
++	lw	$s2,  8($sp)
++	lw	$s3, 12($sp)
++	lw	$s4, 16($sp)
++	lw	$s5, 20($sp)
++	lw	$s6, 24($sp)
++	lw	$s7, 28($sp)
++
++	/* Write NONCE_0 back to right location in state */
++	sw	NONCE_0, 48(STATE)
++
++.Lchacha20_mips_end:
++	addiu	$sp, STACK_SIZE
++	jr	$ra
++
++.Lchacha20_mips_no_full_block_aligned:
++	/* Restore the offset on BYTES */
++	addiu	BYTES, CHACHA20_BLOCK_SIZE
++
++	/* Get number of full WORDS */
++	andi	$at, BYTES, MASK_U32
++
++	/* Load upper half of jump table addr */
++	lui	T0, %hi(.Lchacha20_mips_jmptbl_aligned_0)
++
++	/* Calculate lower half jump table offset */
++	ins	T0, $at, 1, 6
++
++	/* Add offset to STATE */
++	addu	T1, STATE, $at
++
++	/* Add lower half jump table addr */
++	addiu	T0, %lo(.Lchacha20_mips_jmptbl_aligned_0)
++
++	/* Read value from STATE */
++	lw	SAVED_CA, 0(T1)
++
++	/* Store remaining bytecounter as negative value */
++	subu	BYTES, $at, BYTES
++
++	jr	T0
++
++	/* Jump table */
++	FOR_EACH_WORD(JMPTBL_ALIGNED)
++
++
++.Loop_chacha20_unaligned:
++	/* Set number rounds here to fill delayslot. */
++	li	$at, 20
++
++	/* BYTES > 0, it has no full block. */
++	bltz	BYTES, .Lchacha20_mips_no_full_block_unaligned
++
++	FOR_EACH_WORD_REV(STORE_UNALIGNED)
++
++	/* BYTES > 0? Loop again. */
++	bgtz	BYTES, .Loop_chacha20_rounds
++
++	/* Write NONCE_0 back to right location in state */
++	sw	NONCE_0, 48(STATE)
++
++	.set noreorder
++	/* Fall through to byte handling */
++	bgez	BYTES, .Lchacha20_mips_xor_done
++.Lchacha20_mips_xor_unaligned_0_b:
++.Lchacha20_mips_xor_aligned_0_b:
++	/* Place this here to fill delay slot */
++	addiu	NONCE_0, 1
++	.set reorder
++
++.Lchacha20_mips_xor_bytes:
++	addu	IN, $at
++	addu	OUT, $at
++	/* First byte */
++	lbu	T1, 0(IN)
++	addiu	$at, BYTES, 1
++	CPU_TO_LE32(SAVED_X)
++	ROTR(SAVED_X)
++	xor	T1, SAVED_X
++	sb	T1, 0(OUT)
++	beqz	$at, .Lchacha20_mips_xor_done
++	/* Second byte */
++	lbu	T1, 1(IN)
++	addiu	$at, BYTES, 2
++	ROTx	SAVED_X, 8
++	xor	T1, SAVED_X
++	sb	T1, 1(OUT)
++	beqz	$at, .Lchacha20_mips_xor_done
++	/* Third byte */
++	lbu	T1, 2(IN)
++	ROTx	SAVED_X, 8
++	xor	T1, SAVED_X
++	sb	T1, 2(OUT)
++	b	.Lchacha20_mips_xor_done
++
++.Lchacha20_mips_no_full_block_unaligned:
++	/* Restore the offset on BYTES */
++	addiu	BYTES, CHACHA20_BLOCK_SIZE
++
++	/* Get number of full WORDS */
++	andi	$at, BYTES, MASK_U32
++
++	/* Load upper half of jump table addr */
++	lui	T0, %hi(.Lchacha20_mips_jmptbl_unaligned_0)
++
++	/* Calculate lower half jump table offset */
++	ins	T0, $at, 1, 6
++
++	/* Add offset to STATE */
++	addu	T1, STATE, $at
++
++	/* Add lower half jump table addr */
++	addiu	T0, %lo(.Lchacha20_mips_jmptbl_unaligned_0)
++
++	/* Read value from STATE */
++	lw	SAVED_CA, 0(T1)
++
++	/* Store remaining bytecounter as negative value */
++	subu	BYTES, $at, BYTES
++
++	jr	T0
++
++	/* Jump table */
++	FOR_EACH_WORD(JMPTBL_UNALIGNED)
++.end chacha20_mips
++.set at
 -- 
 2.20.1
 
