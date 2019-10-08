@@ -2,113 +2,166 @@ Return-Path: <SRS0=AFir=YB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F00F3C4360C
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Oct 2019 08:37:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5D6FC10F14
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Oct 2019 11:33:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CC02520673
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Oct 2019 08:37:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C8370217D7
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Oct 2019 11:33:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730006AbfJHIhL (ORCPT
+        id S1730779AbfJHLdf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Oct 2019 04:37:11 -0400
-Received: from smtprelay0017.hostedemail.com ([216.40.44.17]:58390 "EHLO
-        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730004AbfJHIhL (ORCPT
+        Tue, 8 Oct 2019 07:33:35 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:47840 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730710AbfJHLdf (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Oct 2019 04:37:11 -0400
-X-Greylist: delayed 502 seconds by postgrey-1.27 at vger.kernel.org; Tue, 08 Oct 2019 04:37:10 EDT
-Received: from smtprelay.hostedemail.com (10.5.19.251.rfc1918.com [10.5.19.251])
-        by smtpgrave03.hostedemail.com (Postfix) with ESMTP id B39C118021B8B;
-        Tue,  8 Oct 2019 08:28:49 +0000 (UTC)
-Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
-        by smtprelay05.hostedemail.com (Postfix) with ESMTP id 378B918028EB1;
-        Tue,  8 Oct 2019 08:28:48 +0000 (UTC)
-X-Session-Marker: 6A6F6540706572636865732E636F6D
-X-HE-Tag: cord46_2f84ddd429022
-X-Filterd-Recvd-Size: 3536
-Received: from XPS-9350.home (unknown [47.151.152.152])
-        (Authenticated sender: joe@perches.com)
-        by omf14.hostedemail.com (Postfix) with ESMTPA;
-        Tue,  8 Oct 2019 08:28:46 +0000 (UTC)
-Message-ID: <f7fada8a8afce542e5ac08f804df8d5c8d8a726b.camel@perches.com>
-Subject: Re: [PATCH][next] crypto: inside-secure: fix spelling mistake
- "algorithmn" -> "algorithm"
-From:   Joe Perches <joe@perches.com>
-To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>,
-        Colin King <colin.king@canonical.com>,
-        Antoine Tenart <antoine.tenart@bootlin.com>,
+        Tue, 8 Oct 2019 07:33:35 -0400
+Received: from [5.158.153.53] (helo=tip-bot2.lab.linutronix.de)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tip-bot2@linutronix.de>)
+        id 1iHnk3-0008DR-CC; Tue, 08 Oct 2019 13:33:23 +0200
+Received: from [127.0.1.1] (localhost [IPv6:::1])
+        by tip-bot2.lab.linutronix.de (Postfix) with ESMTP id E98E01C0325;
+        Tue,  8 Oct 2019 13:33:22 +0200 (CEST)
+Date:   Tue, 08 Oct 2019 11:33:22 -0000
+From:   "tip-bot2 for Arvind Sankar" <tip-bot2@linutronix.de>
+Reply-to: linux-kernel@vger.kernel.org
+To:     linux-tip-commits@vger.kernel.org
+Subject: [tip: x86/urgent] lib/string: Make memzero_explicit() inline instead
+ of external
+Cc:     Hans de Goede <hdegoede@redhat.com>,
+        Arvind Sankar <nivedita@alum.mit.edu>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Cc:     "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Date:   Tue, 08 Oct 2019 01:28:45 -0700
-In-Reply-To: <MN2PR20MB29735A64971670E9CE56821ECA9A0@MN2PR20MB2973.namprd20.prod.outlook.com>
-References: <20191008081410.18857-1-colin.king@canonical.com>
-         <MN2PR20MB29735A64971670E9CE56821ECA9A0@MN2PR20MB2973.namprd20.prod.outlook.com>
-Content-Type: text/plain; charset="ISO-8859-1"
-User-Agent: Evolution 3.32.1-2 
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Stephan Mueller <smueller@chronox.de>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
+        Ingo Molnar <mingo@kernel.org>, linux-kernel@vger.kernel.org
+In-Reply-To: <20191007220000.GA408752@rani.riverdale.lan>
+References: <20191007220000.GA408752@rani.riverdale.lan>
 MIME-Version: 1.0
+Message-ID: <157053440280.9978.14856787712173585355.tip-bot2@tip-bot2>
+X-Mailer: tip-git-log-daemon
+Robot-ID: <tip-bot2.linutronix.de>
+Robot-Unsubscribe: Contact <mailto:tglx@linutronix.de> to get blacklisted from these emails
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 2019-10-08 at 08:15 +0000, Pascal Van Leeuwen wrote:
-> > There is a spelling mistake in a dev_err message. Fix it.
-[]
-> > diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-
-[]
-> > @@ -437,7 +437,7 @@ static int safexcel_aead_setkey(struct crypto_aead *ctfm, const u8 *key,
-> >  			goto badkey;
-> >  		break;
-> >  	default:
-> > -		dev_err(priv->dev, "aead: unsupported hash algorithmn");
-> > +		dev_err(priv->dev, "aead: unsupported hash algorithm");
-> >  		goto badkey;
-> >  	}
-[]
-> Actually, the typing error is well spotted, but the fix is not correct.
-> What actually happened here is that a \ got accidentally deleted,
-> there should have been a "\n" at the end of the line ...
+The following commit has been merged into the x86/urgent branch of tip:
 
-Other missing newlines in the same file:
+Commit-ID:     bec500777089b3c96c53681fc0aa6fee59711d4a
+Gitweb:        https://git.kernel.org/tip/bec500777089b3c96c53681fc0aa6fee59711d4a
+Author:        Arvind Sankar <nivedita@alum.mit.edu>
+AuthorDate:    Mon, 07 Oct 2019 18:00:02 -04:00
+Committer:     Ingo Molnar <mingo@kernel.org>
+CommitterDate: Tue, 08 Oct 2019 13:27:05 +02:00
+
+lib/string: Make memzero_explicit() inline instead of external
+
+With the use of the barrier implied by barrier_data(), there is no need
+for memzero_explicit() to be extern. Making it inline saves the overhead
+of a function call, and allows the code to be reused in arch/*/purgatory
+without having to duplicate the implementation.
+
+Tested-by: Hans de Goede <hdegoede@redhat.com>
+Signed-off-by: Arvind Sankar <nivedita@alum.mit.edu>
+Reviewed-by: Hans de Goede <hdegoede@redhat.com>
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: H . Peter Anvin <hpa@zytor.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Stephan Mueller <smueller@chronox.de>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-s390@vger.kernel.org
+Fixes: 906a4bb97f5d ("crypto: sha256 - Use get/put_unaligned_be32 to get input, memzero_explicit")
+Link: https://lkml.kernel.org/r/20191007220000.GA408752@rani.riverdale.lan
+Signed-off-by: Ingo Molnar <mingo@kernel.org>
 ---
- drivers/crypto/inside-secure/safexcel_cipher.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ include/linux/string.h | 21 ++++++++++++++++++++-
+ lib/string.c           | 21 ---------------------
+ 2 files changed, 20 insertions(+), 22 deletions(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-index cecc56073337..47fec8a0a4e1 100644
---- a/drivers/crypto/inside-secure/safexcel_cipher.c
-+++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -695,21 +695,21 @@ static int safexcel_send_req(struct crypto_async_request *base, int ring,
- 		sreq->nr_dst = sreq->nr_src;
- 		if (unlikely((totlen_src || totlen_dst) &&
- 		    (sreq->nr_src <= 0))) {
--			dev_err(priv->dev, "In-place buffer not large enough (need %d bytes)!",
-+			dev_err(priv->dev, "In-place buffer not large enough (need %d bytes)!\n",
- 				max(totlen_src, totlen_dst));
- 			return -EINVAL;
- 		}
- 		dma_map_sg(priv->dev, src, sreq->nr_src, DMA_BIDIRECTIONAL);
- 	} else {
- 		if (unlikely(totlen_src && (sreq->nr_src <= 0))) {
--			dev_err(priv->dev, "Source buffer not large enough (need %d bytes)!",
-+			dev_err(priv->dev, "Source buffer not large enough (need %d bytes)!\n",
- 				totlen_src);
- 			return -EINVAL;
- 		}
- 		dma_map_sg(priv->dev, src, sreq->nr_src, DMA_TO_DEVICE);
+diff --git a/include/linux/string.h b/include/linux/string.h
+index b2f9df7..b6ccdc2 100644
+--- a/include/linux/string.h
++++ b/include/linux/string.h
+@@ -227,7 +227,26 @@ static inline bool strstarts(const char *str, const char *prefix)
+ }
  
- 		if (unlikely(totlen_dst && (sreq->nr_dst <= 0))) {
--			dev_err(priv->dev, "Dest buffer not large enough (need %d bytes)!",
-+			dev_err(priv->dev, "Dest buffer not large enough (need %d bytes)!\n",
- 				totlen_dst);
- 			dma_unmap_sg(priv->dev, src, sreq->nr_src,
- 				     DMA_TO_DEVICE);
-
+ size_t memweight(const void *ptr, size_t bytes);
+-void memzero_explicit(void *s, size_t count);
++
++/**
++ * memzero_explicit - Fill a region of memory (e.g. sensitive
++ *		      keying data) with 0s.
++ * @s: Pointer to the start of the area.
++ * @count: The size of the area.
++ *
++ * Note: usually using memset() is just fine (!), but in cases
++ * where clearing out _local_ data at the end of a scope is
++ * necessary, memzero_explicit() should be used instead in
++ * order to prevent the compiler from optimising away zeroing.
++ *
++ * memzero_explicit() doesn't need an arch-specific version as
++ * it just invokes the one of memset() implicitly.
++ */
++static inline void memzero_explicit(void *s, size_t count)
++{
++	memset(s, 0, count);
++	barrier_data(s);
++}
+ 
+ /**
+  * kbasename - return the last part of a pathname.
+diff --git a/lib/string.c b/lib/string.c
+index cd7a10c..08ec58c 100644
+--- a/lib/string.c
++++ b/lib/string.c
+@@ -748,27 +748,6 @@ void *memset(void *s, int c, size_t count)
+ EXPORT_SYMBOL(memset);
+ #endif
+ 
+-/**
+- * memzero_explicit - Fill a region of memory (e.g. sensitive
+- *		      keying data) with 0s.
+- * @s: Pointer to the start of the area.
+- * @count: The size of the area.
+- *
+- * Note: usually using memset() is just fine (!), but in cases
+- * where clearing out _local_ data at the end of a scope is
+- * necessary, memzero_explicit() should be used instead in
+- * order to prevent the compiler from optimising away zeroing.
+- *
+- * memzero_explicit() doesn't need an arch-specific version as
+- * it just invokes the one of memset() implicitly.
+- */
+-void memzero_explicit(void *s, size_t count)
+-{
+-	memset(s, 0, count);
+-	barrier_data(s);
+-}
+-EXPORT_SYMBOL(memzero_explicit);
+-
+ #ifndef __HAVE_ARCH_MEMSET16
+ /**
+  * memset16() - Fill a memory area with a uint16_t
