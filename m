@@ -1,111 +1,96 @@
-Return-Path: <SRS0=5F7Z=YA=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=AFir=YB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ACC1C47404
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Oct 2019 22:14:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 208A0ECE58C
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Oct 2019 01:00:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 353BF2133F
-	for <linux-crypto@archiver.kernel.org>; Mon,  7 Oct 2019 22:14:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F0192206BB
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Oct 2019 01:00:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729211AbfJGWOI (ORCPT
+        id S1729307AbfJHBAm (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 7 Oct 2019 18:14:08 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:37062 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728654AbfJGWOI (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 7 Oct 2019 18:14:08 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x97LwWjW140478;
-        Mon, 7 Oct 2019 18:13:05 -0400
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2vg9h81far-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Oct 2019 18:13:04 -0400
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id x97MAt9w016380;
-        Mon, 7 Oct 2019 22:13:03 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
-        by ppma03wdc.us.ibm.com with ESMTP id 2vejt6meww-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 07 Oct 2019 22:13:03 +0000
-Received: from b03ledav006.gho.boulder.ibm.com (b03ledav006.gho.boulder.ibm.com [9.17.130.237])
-        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x97MD2VT58065340
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 7 Oct 2019 22:13:02 GMT
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5A58AC60B2;
-        Mon,  7 Oct 2019 22:13:02 +0000 (GMT)
-Received: from b03ledav006.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DF4BFC60B7;
-        Mon,  7 Oct 2019 22:13:01 +0000 (GMT)
-Received: from [9.2.202.93] (unknown [9.2.202.93])
-        by b03ledav006.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Mon,  7 Oct 2019 22:13:01 +0000 (GMT)
-Subject: Re: [PATCH] KEYS: asym_tpm: Switch to get_random_bytes()
-To:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        "Safford, David (GE Global Research, US)" <david.safford@ge.com>
-Cc:     Mimi Zohar <zohar@linux.ibm.com>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>,
-        "open list:ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-References: <20190926171601.30404-1-jarkko.sakkinen@linux.intel.com>
- <1570024819.4999.119.camel@linux.ibm.com>
- <20191003114119.GF8933@linux.intel.com>
- <1570107752.4421.183.camel@linux.ibm.com>
- <20191003175854.GB19679@linux.intel.com>
- <1570128827.5046.19.camel@linux.ibm.com>
- <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2A22E@ALPMBAPA12.e2k.ad.ge.com>
- <20191004182711.GC6945@linux.intel.com>
- <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2A38B@ALPMBAPA12.e2k.ad.ge.com>
- <20191007000520.GA17116@linux.intel.com>
-From:   Ken Goldman <kgold@linux.ibm.com>
-Message-ID: <59b88042-9c56-c891-f75e-7c0719eb5ff9@linux.ibm.com>
-Date:   Mon, 7 Oct 2019 18:13:01 -0400
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        Mon, 7 Oct 2019 21:00:42 -0400
+Received: from szxga08-in.huawei.com ([45.249.212.255]:44720 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728983AbfJHBAm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 7 Oct 2019 21:00:42 -0400
+Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.56])
+        by Forcepoint Email with ESMTP id 3E7B1753A4C8525F0019;
+        Tue,  8 Oct 2019 09:00:22 +0800 (CST)
+Received: from dggeme711-chm.china.huawei.com (10.1.199.107) by
+ DGGEMM405-HUB.china.huawei.com (10.3.20.213) with Microsoft SMTP Server (TLS)
+ id 14.3.439.0; Tue, 8 Oct 2019 09:00:21 +0800
+Received: from dggeme759-chm.china.huawei.com (10.3.19.105) by
+ dggeme711-chm.china.huawei.com (10.1.199.107) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.1713.5; Tue, 8 Oct 2019 09:00:21 +0800
+Received: from dggeme759-chm.china.huawei.com ([10.7.64.73]) by
+ dggeme759-chm.china.huawei.com ([10.7.64.73]) with mapi id 15.01.1713.004;
+ Tue, 8 Oct 2019 09:00:21 +0800
+From:   "tiantao (H)" <tiantao6@huawei.com>
+To:     Gilad Ben-Yossef <gilad@benyossef.com>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linuxarm <linuxarm@huawei.com>
+Subject: =?utf-8?B?562U5aSNOiBbUEFUQ0hdIGNyeXB0bzogZml4IGNvbXBhcmlzb24gb2YgdW5z?=
+ =?utf-8?Q?igned_expression_warnings?=
+Thread-Topic: [PATCH] crypto: fix comparison of unsigned expression warnings
+Thread-Index: AQHVd2xXFUZ9TKOpNUGIIEmFgERbp6dGm3eAgAlc8LA=
+Date:   Tue, 8 Oct 2019 01:00:21 +0000
+Message-ID: <e5210fd7f4b4493593cbbb603d08d52c@huawei.com>
+References: <1569833361-47224-1-git-send-email-tiantao6@huawei.com>
+ <CAOtvUMeaRp08Go7BqdPzOaTFQKLOUTXMZfUE5pTpUNk3vM649A@mail.gmail.com>
+In-Reply-To: <CAOtvUMeaRp08Go7BqdPzOaTFQKLOUTXMZfUE5pTpUNk3vM649A@mail.gmail.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.57.60.129]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20191007000520.GA17116@linux.intel.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-07_04:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=882 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1908290000 definitions=main-1910070196
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The TPM library specification states that the TPM must comply with NIST 
-SP800-90 A.
-
-https://trustedcomputinggroup.org/membership/certification/tpm-certified-products/
-
-shows that the TPMs get third party certification, Common Criteria EAL 4+.
-
-While it's theoretically possible that an attacker could compromise
-both the TPM vendors and the evaluation agencies, we do have EAL 4+ 
-assurance against both 1 and 2.
-
-On 10/6/2019 8:05 PM, Jarkko Sakkinen wrote:
-> 
-> Kernel has the random number generator for two reasons:
-> 
-> 1. To protect against bugs in hwrng's.
-> 2. To protect against deliberate backdoors in hwrng's.
-> 
-> How TPM RNG is guaranteed to protect against both 1 and 2?
-
+SGksDQoNCkkgZm91bmQgdGhpcyB3YXJuaW5nIHVzaW5nIHRoZSBjb21tYW5kICJtYWtlIGNvY2Np
+Y2hlY2sgQ09DQ0k9c2NyaXB0cy9jb2NjaW5lbGxlL3Rlc3RzL3Vuc2lnbmVkX2xlc3Nlcl90aGFu
+X3plcm8uY29jY2kgTU9ERT1wYXRjaCIgDQoNCkJlc3QNCg0KLS0tLS3pgq7ku7bljp/ku7YtLS0t
+LQ0K5Y+R5Lu25Lq6OiBHaWxhZCBCZW4tWW9zc2VmIFttYWlsdG86Z2lsYWRAYmVueW9zc2VmLmNv
+bV0gDQrlj5HpgIHml7bpl7Q6IDIwMTnlubQxMOaciDLml6UgMTg6MDANCuaUtuS7tuS6ujogdGlh
+bnRhbyAoSCkgPHRpYW50YW82QGh1YXdlaS5jb20+DQrmioTpgIE6IEhlcmJlcnQgWHUgPGhlcmJl
+cnRAZ29uZG9yLmFwYW5hLm9yZy5hdT47IERhdmlkIE1pbGxlciA8ZGF2ZW1AZGF2ZW1sb2Z0Lm5l
+dD47IExpbnV4IENyeXB0byBNYWlsaW5nIExpc3QgPGxpbnV4LWNyeXB0b0B2Z2VyLmtlcm5lbC5v
+cmc+OyBMaW51eGFybSA8bGludXhhcm1AaHVhd2VpLmNvbT4NCuS4u+mimDogUmU6IFtQQVRDSF0g
+Y3J5cHRvOiBmaXggY29tcGFyaXNvbiBvZiB1bnNpZ25lZCBleHByZXNzaW9uIHdhcm5pbmdzDQoN
+CkhpLA0KDQoNCk9uIE1vbiwgU2VwIDMwLCAyMDE5IGF0IDExOjUyIEFNIFRpYW4gVGFvIDx0aWFu
+dGFvNkBodWF3ZWkuY29tPiB3cm90ZToNCj4NCj4gVGhpcyBwYXRjaCBmaXhlcyB0aGUgZm9sbG93
+aW5nIHdhcm5pbmdzOg0KPiBkcml2ZXJzL2NyeXB0by9jY3JlZS9jY19hZWFkLmM6NjMwOjUtMTI6
+IFdBUk5JTkc6IFVuc2lnbmVkIGV4cHJlc3Npb24gDQo+IGNvbXBhcmVkIHdpdGggemVybzogc2Vx
+X2xlbiA+IDANCj4NCg0KVGhhbmtzIGZvciB0aGUgcmVwb3J0IQ0KDQpDYW4geW91IHBsZWFzZSBz
+aGFyZSB3aGljaCBjb21waWxlci9hcmNoL2NvbmZpZyB5b3UgdXNlIHRoYXQgcHJvZHVjZXMgdGhp
+cyB3YXJuaW5nPw0KDQpJJ20gbm90IHNlZWluZyBpdCBvbiBteSBlbmQuDQoNCk1hbnkgdGhhbmtz
+LA0KR2lsYWQNCg0KPiBTaWduZWQtb2ZmLWJ5OiBUaWFuIFRhbyA8dGlhbnRhbzZAaHVhd2VpLmNv
+bT4NCj4gLS0tDQo+ICBkcml2ZXJzL2NyeXB0by9jY3JlZS9jY19hZWFkLmMgfCAyICstDQo+ICAx
+IGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKyksIDEgZGVsZXRpb24oLSkNCj4NCj4gZGlmZiAt
+LWdpdCBhL2RyaXZlcnMvY3J5cHRvL2NjcmVlL2NjX2FlYWQuYyANCj4gYi9kcml2ZXJzL2NyeXB0
+by9jY3JlZS9jY19hZWFkLmMgaW5kZXggZDNlOGZhYS4uYjE5MjkxZCAxMDA2NDQNCj4gLS0tIGEv
+ZHJpdmVycy9jcnlwdG8vY2NyZWUvY2NfYWVhZC5jDQo+ICsrKyBiL2RyaXZlcnMvY3J5cHRvL2Nj
+cmVlL2NjX2FlYWQuYw0KPiBAQCAtNTQ2LDcgKzU0Niw3IEBAIHN0YXRpYyBpbnQgY2NfYWVhZF9z
+ZXRrZXkoc3RydWN0IGNyeXB0b19hZWFkICp0Zm0sIGNvbnN0IHU4ICprZXksDQo+ICAgICAgICAg
+c3RydWN0IGNjX2FlYWRfY3R4ICpjdHggPSBjcnlwdG9fYWVhZF9jdHgodGZtKTsNCj4gICAgICAg
+ICBzdHJ1Y3QgY2NfY3J5cHRvX3JlcSBjY19yZXEgPSB7fTsNCj4gICAgICAgICBzdHJ1Y3QgY2Nf
+aHdfZGVzYyBkZXNjW01BWF9BRUFEX1NFVEtFWV9TRVFdOw0KPiAtICAgICAgIHVuc2lnbmVkIGlu
+dCBzZXFfbGVuID0gMDsNCj4gKyAgICAgICBpbnQgc2VxX2xlbiA9IDA7DQo+ICAgICAgICAgc3Ry
+dWN0IGRldmljZSAqZGV2ID0gZHJ2ZGF0YV90b19kZXYoY3R4LT5kcnZkYXRhKTsNCj4gICAgICAg
+ICBjb25zdCB1OCAqZW5ja2V5LCAqYXV0aGtleTsNCj4gICAgICAgICBpbnQgcmM7DQo+IC0tDQo+
+IDIuNy40DQo+DQoNCg0KLS0NCkdpbGFkIEJlbi1Zb3NzZWYNCkNoaWVmIENvZmZlZSBEcmlua2Vy
+DQoNCnZhbHVlcyBvZiDOsiB3aWxsIGdpdmUgcmlzZSB0byBkb20hDQo=
