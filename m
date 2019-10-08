@@ -2,256 +2,139 @@ Return-Path: <SRS0=AFir=YB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0342C4360C
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Oct 2019 11:37:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C54EC10F14
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Oct 2019 11:38:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 69D8420673
-	for <linux-crypto@archiver.kernel.org>; Tue,  8 Oct 2019 11:37:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0E7E820673
+	for <linux-crypto@archiver.kernel.org>; Tue,  8 Oct 2019 11:38:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XtoNKprI"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X9KLNDPr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730618AbfJHLhA (ORCPT
+        id S1730156AbfJHLi1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 8 Oct 2019 07:37:00 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:37523 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730561AbfJHLhA (ORCPT
+        Tue, 8 Oct 2019 07:38:27 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:54187 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729790AbfJHLi1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 8 Oct 2019 07:37:00 -0400
-Received: by mail-wr1-f67.google.com with SMTP id p14so18060478wro.4
-        for <linux-crypto@vger.kernel.org>; Tue, 08 Oct 2019 04:36:59 -0700 (PDT)
+        Tue, 8 Oct 2019 07:38:27 -0400
+Received: by mail-wm1-f65.google.com with SMTP id i16so2774991wmd.3
+        for <linux-crypto@vger.kernel.org>; Tue, 08 Oct 2019 04:38:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=USPgXhsJ5/qd/fTdRAnjSJ/p0FepKhUYaM+9o3VonSM=;
-        b=XtoNKprIfefX/QXPuKcp3SW62O9ICkKvBzU/5sBfgxj3xFO/pd/4ry88dWCQIHJ6QG
-         pl1K7QYkuT3/rd4FJyi45+S1noFPyMcGgaWc3+5aD62BKbnMBEO1gIeCbs1dMNtZkGQ/
-         VjOC1hs5VrkT5JuCSURxMUWX+FP8u6IgQ5TEOTaoUOW7UjTnSW6e/+i6j1IKGFgdp0ck
-         IcKwuAn8Uxki+E2elp1mL4pn979rHCcFhhDkNHYAlDlSfscXrTtgHip9Th6On+9yn2d2
-         NU+dsw7qTEtsaAhsMUgkzpAAhScCZjY7XF2UCwOUxqRYwWtbFO2xZzumj0s6OXAJqitt
-         659w==
+        bh=VH+0C0uR5m7C8bWg29oN3PksDQMhMsMgqlBp18FmE1w=;
+        b=X9KLNDPrZQbpAmY00fnhH3gUBt6So+TIaZQLwaiQIA/KlAgzLQHUIMJihzinKAJaiv
+         pcGxMPQZPBgvYSqCVRkiUxpDHLHD188BvJhOS9f/1cctx0r1APjJvRQGLoYaDv8xEv84
+         0Zz3TNl4qxcBCx00104lW2Z1BfLCeW66TPaVr26kfDiefOOMraeHKm1o0u0p9j2OY8/v
+         LHfWMpOzon1tOizzwxqsX1g7ffYqKUOXcAlq5PGSaY0R6DMQEE/js2Ha3/fKhOvSJ5qY
+         joCWdY7O8VmiSRwbax1qUPkLQigrdViqmyEcpPbecCl3j+4zWCLVQ4H1tN+Yd1DnjKQo
+         gZtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=USPgXhsJ5/qd/fTdRAnjSJ/p0FepKhUYaM+9o3VonSM=;
-        b=Sv97GaMBw63GigJ0GnSmldQY/TNXXyggiEbT6hR/0kQbjwh8YufI4034m0GBEkGa2I
-         0y5GWPCQTiExV9g1xJpj5LFWFlyL3d5bF9jHalP3l4bcOwWvUcUcxoGmERLtVjfBG64N
-         Guz4Ij8CaAiwAGq1fnmN3V05Y4U2k/Vsl6P5VZoPIcbB3xvn4Ua+GTmfJkRL8P1G3bLB
-         RZwD9skcQ7ybp7BZvk3A/p7heLLKxvTEsb6EobNhyPn5b+LU89i5ZtoWID9TRh/rT0CF
-         RLDr19yndgUelCgrn5rhmqzC66im+Y9l9UacPCyGxVCEXr8hUiGd41y41+TW9wS+Foeo
-         iqag==
-X-Gm-Message-State: APjAAAVOELZgJVHff4v7hBHTd1VdgxRttTH4mbL57xK2MX7xMYkKNmXD
-        eCK0dmUvSXwFDv3ftqJsBK36/5iA2KUcWuzhbmBmaMw3J8Q=
-X-Google-Smtp-Source: APXvYqzXIYVk/vwsA37Yy+kHV7fmb0TpWU3J5pX5ZHa6B/ph6sgktpjIqT1ltFOwCUMk1r4gXOFzRugDByPyx8jPLHY=
-X-Received: by 2002:a5d:61c8:: with SMTP id q8mr20362397wrv.325.1570534618232;
- Tue, 08 Oct 2019 04:36:58 -0700 (PDT)
+        bh=VH+0C0uR5m7C8bWg29oN3PksDQMhMsMgqlBp18FmE1w=;
+        b=NSvYobunResrGwGYue25KA6FDLM8QjHPWgyPoII83fawCy7MpiPtkAMVFiDF75q1uL
+         1tdFZFp/RPahsrp0eka6Q6YbrmLmHESnkM6DVqKKTO1E2EFz6C8keydkj5Bn/DQDrZ+5
+         86eUP6eR1XvVWT1rtbFNSPZzTnQt0OPQ+W8JoGmUp8cI1poIn6hQmjWqBuCDGJ88EFIL
+         7Hj97jKG30cTr+Hol8xocmHoeweXcq2XdntlV3XFqn77zZiuS/l/xW92Y7LWs//HJFYL
+         p4JSFt2edHzPzjuLG1Ao71GyGAUGP3cbwDFvNNnklOgpbaOix91YoIYejrx/l+DxgwPr
+         sT+w==
+X-Gm-Message-State: APjAAAWYMxG8Zf6qj+kJmXK5LLCZ9Xklfl2ZAP/jZpEQp61OhtQ1JJAd
+        ug0/+Mlxg/QmlN98OExbXvR5B2vxpNsxiHoRYVGfrQ==
+X-Google-Smtp-Source: APXvYqyWKJ6wzhbsq3wOqvUgPLA7CAZngPJ7cB4FCOkE5Ogat4YhGNuf406gPvwU/sSUXv13SMF+m4g9j2rxkz2NvNA=
+X-Received: by 2002:a1c:2546:: with SMTP id l67mr3589422wml.10.1570534704763;
+ Tue, 08 Oct 2019 04:38:24 -0700 (PDT)
 MIME-Version: 1.0
-References: <20191005091110.12556-1-ard.biesheuvel@linaro.org> <20191005122226.23552-1-florian@bezdeka.de>
-In-Reply-To: <20191005122226.23552-1-florian@bezdeka.de>
+References: <20191005091110.12556-1-ard.biesheuvel@linaro.org> <b18ff289-ceca-d934-6583-caf8d2916bcb@gert.gr>
+In-Reply-To: <b18ff289-ceca-d934-6583-caf8d2916bcb@gert.gr>
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Tue, 8 Oct 2019 13:36:47 +0200
-Message-ID: <CAKv+Gu8n0p7fab4Uosv09tDGvfmNbQY+2Sw=QrLB1=aJJmwCJg@mail.gmail.com>
+Date:   Tue, 8 Oct 2019 13:38:13 +0200
+Message-ID: <CAKv+Gu9yoROn8+vmE=_c-gTm2H1WGTJsPb+yj1YBv6+-P6ei_A@mail.gmail.com>
 Subject: Re: [PATCH v2] crypto: geode-aes - switch to skcipher for cbc(aes) fallback
-To:     Florian Bezdeka <florian@bezdeka.de>
+To:     Gert Robben <t2@gert.gr>
 Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>
+        <linux-crypto@vger.kernel.org>,
+        Jelle de Jong <jelledejong@powercraft.nl>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Florian Bezdeka <florian@bezdeka.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, 5 Oct 2019 at 14:22, Florian Bezdeka <florian@bezdeka.de> wrote:
+On Sat, 5 Oct 2019 at 18:15, Gert Robben <t2@gert.gr> wrote:
 >
-> Commit 79c65d179a40e145 ("crypto: cbc - Convert to skcipher") updated
-> the generic CBC template wrapper from a blkcipher to a skcipher algo,
-> to get away from the deprecated blkcipher interface. However, as a side
-> effect, drivers that instantiate CBC transforms using the blkcipher as
-> a fallback no longer work, since skciphers can wrap blkciphers but not
-> the other way around. This broke the geode-aes driver.
+> Op 05-10-2019 om 11:11 schreef Ard Biesheuvel:
+> > Commit 79c65d179a40e145 ("crypto: cbc - Convert to skcipher") updated
+> > the generic CBC template wrapper from a blkcipher to a skcipher algo,
+> > to get away from the deprecated blkcipher interface. However, as a side
+> > effect, drivers that instantiate CBC transforms using the blkcipher as
+> > a fallback no longer work, since skciphers can wrap blkciphers but not
+> > the other way around. This broke the geode-aes driver.
+> >
+> > So let's fix it by moving to the sync skcipher interface when allocating
+> > the fallback. At the same time, align with the generic API for ECB and
+> > CBC by rejecting inputs that are not a multiple of the AES block size.
+> >
+> > Fixes: 79c65d179a40e145 ("crypto: cbc - Convert to skcipher")
+> > Cc: <stable@vger.kernel.org> # v4.20+ ONLY
+> > Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> > ---
+> > v2: pass dst and src scatterlist in the right order
+> >      reject inputs that are not a multiple of the block size
 >
-> So let's fix it by moving to the sync skcipher interface when allocating
-> the fallback. At the same time, align with the generic API for ECB and
-> CBC by rejecting inputs that are not a multiple of the AES block size.
+> Yes, with this patch, the CRYPTO_MANAGER_EXTRA_TESTS output nothing
+> (apart from "extra crypto tests enabled").
+> All items in /proc/crypto have "selftest: passed" mentioned.
+> "openssl speed -evp aes-128-cbc -elapsed -engine afalg" reaches the
+> proper speed.
+> And nginx (correctly) transfers files about 40% faster than without
+> geode-aes.
 >
-> Fixes: 79c65d179a40e145 ("crypto: cbc - Convert to skcipher")
-> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> Signed-off-by: Florian Bezdeka <florian@bezdeka.de>
-> ---
+> I didn't think about testing ecb before, because I don't use it.
+> Now that I did, I tried the same openssl benchmark for ecb.
+> But that only reaches software AES speed, and "time" also shows the work
+> is being done in "user" instead of "sys" (see below).
+> Yet I see no errors.
+> (Maybe this is normal/expected, so I didn't look much further into it).
 >
-> Ard, I just followed your instructions and created this patch
-> for usage on an 4.19 kernel. The patch was successfully tested
-> on two different Geode systems.
+> Thank you,
+> Gert
 >
-> Can you please review again and forward to the stable tree if the patch
-> looks OK?
+> # time openssl speed -evp aes-128-cbc -elapsed -engine afalg
+> - - - 8< - - -
+> type             16 bytes     64 bytes    256 bytes   1024 bytes   8192
+> bytes  16384 bytes
+> aes-128-cbc        135.82k      539.29k     2087.90k     7491.16k
+> 29221.69k    34943.67k
+>
+> real    0m18.081s
+> user    0m0.516s
+> sys     0m17.541s
+>
+> # time openssl speed -evp aes-128-ecb -elapsed -engine afalg
+> - - - 8< - - -
+> type             16 bytes     64 bytes    256 bytes   1024 bytes   8192
+> bytes  16384 bytes
+> aes-128-ecb       4480.65k     5137.66k     5336.94k     5410.19k
+> 5409.91k     5409.91k
+>
+> real    0m18.084s
+> user    0m18.046s
+> sys     0m0.012s
 >
 
-The patch looks fine to me, but we cannot send it to -stable before
-the mainline version is merged.
-
->  drivers/crypto/geode-aes.c | 57 +++++++++++++++++++++++---------------
->  drivers/crypto/geode-aes.h |  2 +-
->  2 files changed, 35 insertions(+), 24 deletions(-)
->
-> diff --git a/drivers/crypto/geode-aes.c b/drivers/crypto/geode-aes.c
-> index eb2a0a73cbed..cc33354d13c1 100644
-> --- a/drivers/crypto/geode-aes.c
-> +++ b/drivers/crypto/geode-aes.c
-> @@ -14,6 +14,7 @@
->  #include <linux/spinlock.h>
->  #include <crypto/algapi.h>
->  #include <crypto/aes.h>
-> +#include <crypto/skcipher.h>
->
->  #include <linux/io.h>
->  #include <linux/delay.h>
-> @@ -170,13 +171,15 @@ static int geode_setkey_blk(struct crypto_tfm *tfm, const u8 *key,
->         /*
->          * The requested key size is not supported by HW, do a fallback
->          */
-> -       op->fallback.blk->base.crt_flags &= ~CRYPTO_TFM_REQ_MASK;
-> -       op->fallback.blk->base.crt_flags |= (tfm->crt_flags & CRYPTO_TFM_REQ_MASK);
-> +       crypto_skcipher_clear_flags(op->fallback.blk, CRYPTO_TFM_REQ_MASK);
-> +       crypto_skcipher_set_flags(op->fallback.blk,
-> +                                 tfm->crt_flags & CRYPTO_TFM_REQ_MASK);
->
-> -       ret = crypto_blkcipher_setkey(op->fallback.blk, key, len);
-> +       ret = crypto_skcipher_setkey(op->fallback.blk, key, len);
->         if (ret) {
->                 tfm->crt_flags &= ~CRYPTO_TFM_RES_MASK;
-> -               tfm->crt_flags |= (op->fallback.blk->base.crt_flags & CRYPTO_TFM_RES_MASK);
-> +               tfm->crt_flags |= crypto_skcipher_get_flags(op->fallback.blk) &
-> +                                 CRYPTO_TFM_RES_MASK;
->         }
->         return ret;
->  }
-> @@ -185,33 +188,28 @@ static int fallback_blk_dec(struct blkcipher_desc *desc,
->                 struct scatterlist *dst, struct scatterlist *src,
->                 unsigned int nbytes)
->  {
-> -       unsigned int ret;
-> -       struct crypto_blkcipher *tfm;
->         struct geode_aes_op *op = crypto_blkcipher_ctx(desc->tfm);
-> +       SKCIPHER_REQUEST_ON_STACK(req, op->fallback.blk);
->
-> -       tfm = desc->tfm;
-> -       desc->tfm = op->fallback.blk;
-> -
-> -       ret = crypto_blkcipher_decrypt_iv(desc, dst, src, nbytes);
-> +       skcipher_request_set_tfm(req, op->fallback.blk);
-> +       skcipher_request_set_callback(req, 0, NULL, NULL);
-> +       skcipher_request_set_crypt(req, src, dst, nbytes, desc->info);
->
-> -       desc->tfm = tfm;
-> -       return ret;
-> +       return crypto_skcipher_decrypt(req);
->  }
-> +
->  static int fallback_blk_enc(struct blkcipher_desc *desc,
->                 struct scatterlist *dst, struct scatterlist *src,
->                 unsigned int nbytes)
->  {
-> -       unsigned int ret;
-> -       struct crypto_blkcipher *tfm;
->         struct geode_aes_op *op = crypto_blkcipher_ctx(desc->tfm);
-> +       SKCIPHER_REQUEST_ON_STACK(req, op->fallback.blk);
->
-> -       tfm = desc->tfm;
-> -       desc->tfm = op->fallback.blk;
-> -
-> -       ret = crypto_blkcipher_encrypt_iv(desc, dst, src, nbytes);
-> +       skcipher_request_set_tfm(req, op->fallback.blk);
-> +       skcipher_request_set_callback(req, 0, NULL, NULL);
-> +       skcipher_request_set_crypt(req, src, dst, nbytes, desc->info);
->
-> -       desc->tfm = tfm;
-> -       return ret;
-> +       return crypto_skcipher_encrypt(req);
->  }
->
->  static void
-> @@ -311,6 +309,9 @@ geode_cbc_decrypt(struct blkcipher_desc *desc,
->         struct blkcipher_walk walk;
->         int err, ret;
->
-> +       if (nbytes % AES_BLOCK_SIZE)
-> +               return -EINVAL;
-> +
->         if (unlikely(op->keylen != AES_KEYSIZE_128))
->                 return fallback_blk_dec(desc, dst, src, nbytes);
->
-> @@ -343,6 +344,9 @@ geode_cbc_encrypt(struct blkcipher_desc *desc,
->         struct blkcipher_walk walk;
->         int err, ret;
->
-> +       if (nbytes % AES_BLOCK_SIZE)
-> +               return -EINVAL;
-> +
->         if (unlikely(op->keylen != AES_KEYSIZE_128))
->                 return fallback_blk_enc(desc, dst, src, nbytes);
->
-> @@ -370,8 +374,9 @@ static int fallback_init_blk(struct crypto_tfm *tfm)
->         const char *name = crypto_tfm_alg_name(tfm);
->         struct geode_aes_op *op = crypto_tfm_ctx(tfm);
->
-> -       op->fallback.blk = crypto_alloc_blkcipher(name, 0,
-> -                       CRYPTO_ALG_ASYNC | CRYPTO_ALG_NEED_FALLBACK);
-> +       op->fallback.blk = crypto_alloc_skcipher(name, 0,
-> +                                                CRYPTO_ALG_ASYNC |
-> +                                                CRYPTO_ALG_NEED_FALLBACK);
->
->         if (IS_ERR(op->fallback.blk)) {
->                 printk(KERN_ERR "Error allocating fallback algo %s\n", name);
-> @@ -385,7 +390,7 @@ static void fallback_exit_blk(struct crypto_tfm *tfm)
->  {
->         struct geode_aes_op *op = crypto_tfm_ctx(tfm);
->
-> -       crypto_free_blkcipher(op->fallback.blk);
-> +       crypto_free_skcipher(op->fallback.blk);
->         op->fallback.blk = NULL;
->  }
->
-> @@ -424,6 +429,9 @@ geode_ecb_decrypt(struct blkcipher_desc *desc,
->         struct blkcipher_walk walk;
->         int err, ret;
->
-> +       if (nbytes % AES_BLOCK_SIZE)
-> +               return -EINVAL;
-> +
->         if (unlikely(op->keylen != AES_KEYSIZE_128))
->                 return fallback_blk_dec(desc, dst, src, nbytes);
->
-> @@ -454,6 +462,9 @@ geode_ecb_encrypt(struct blkcipher_desc *desc,
->         struct blkcipher_walk walk;
->         int err, ret;
->
-> +       if (nbytes % AES_BLOCK_SIZE)
-> +               return -EINVAL;
-> +
->         if (unlikely(op->keylen != AES_KEYSIZE_128))
->                 return fallback_blk_enc(desc, dst, src, nbytes);
->
-> diff --git a/drivers/crypto/geode-aes.h b/drivers/crypto/geode-aes.h
-> index f442ca972e3c..c5763a041bb8 100644
-> --- a/drivers/crypto/geode-aes.h
-> +++ b/drivers/crypto/geode-aes.h
-> @@ -64,7 +64,7 @@ struct geode_aes_op {
->         u8 *iv;
->
->         union {
-> -               struct crypto_blkcipher *blk;
-> +               struct crypto_skcipher *blk;
->                 struct crypto_cipher *cip;
->         } fallback;
->         u32 keylen;
-> --
-> 2.21.0
->
+It seems likely that the ECB code in OpenSSL is not invoking the afalg
+code at all. Since ECB is just the bare block cipher applied to each
+block in the input, I wonder if it even uses a skcipher like interface
+internally.
