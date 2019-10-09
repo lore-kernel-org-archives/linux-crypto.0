@@ -2,145 +2,155 @@ Return-Path: <SRS0=7GLU=YC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE5A9ECE596
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Oct 2019 13:03:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0124ECE58D
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Oct 2019 13:28:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B9E8D218AC
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Oct 2019 13:03:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 649E421848
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Oct 2019 13:28:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="MEaCa84t"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731181AbfJINDG convert rfc822-to-8bit (ORCPT
+        id S1731178AbfJIN2x (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 9 Oct 2019 09:03:06 -0400
-Received: from mx0b-00176a03.pphosted.com ([67.231.157.48]:41762 "EHLO
-        mx0a-00176a03.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730901AbfJINDG (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Oct 2019 09:03:06 -0400
-X-Greylist: delayed 3109 seconds by postgrey-1.27 at vger.kernel.org; Wed, 09 Oct 2019 09:03:05 EDT
-Received: from pps.filterd (m0048205.ppops.net [127.0.0.1])
-        by m0048205.ppops.net-00176a03. (8.16.0.27/8.16.0.27) with SMTP id x99C9XgY029449;
-        Wed, 9 Oct 2019 08:11:15 -0400
-From:   "Safford, David (GE Global Research, US)" <david.safford@ge.com>
-To:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        Ken Goldman <kgold@linux.ibm.com>
-CC:     Mimi Zohar <zohar@linux.ibm.com>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>,
-        "open list:ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Thread-Topic: Re: [PATCH] KEYS: asym_tpm: Switch to get_random_bytes()
-Thread-Index: AQHVdI4g9L3xPAeMJki3mq4fpV79C6dHrWSAgAFrf4CAABaxAIAAUs4AgAAPVoCAAOxxAIAAnnWA///LRNCAA7fgAIABcvOAgAGtUICAAAEjgIAAiUkQ
-Date:   Wed, 9 Oct 2019 12:11:06 +0000
-Message-ID: <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2B995@ALPMBAPA12.e2k.ad.ge.com>
-References: <20191003114119.GF8933@linux.intel.com>
- <1570107752.4421.183.camel@linux.ibm.com>
- <20191003175854.GB19679@linux.intel.com>
- <1570128827.5046.19.camel@linux.ibm.com>
- <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2A22E@ALPMBAPA12.e2k.ad.ge.com>
- <20191004182711.GC6945@linux.intel.com>
- <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2A38B@ALPMBAPA12.e2k.ad.ge.com>
- <20191007000520.GA17116@linux.intel.com>
- <59b88042-9c56-c891-f75e-7c0719eb5ff9@linux.ibm.com>
- <20191008234935.GA13926@linux.intel.com>
- <20191008235339.GB13926@linux.intel.com>
-In-Reply-To: <20191008235339.GB13926@linux.intel.com>
+        Wed, 9 Oct 2019 09:28:53 -0400
+Received: from mail-eopbgr800049.outbound.protection.outlook.com ([40.107.80.49]:26720
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1731181AbfJIN2w (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 9 Oct 2019 09:28:52 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mlsdi+FEsN2MXsYxwPNF5NQmU1PaPwDPsSmPwoRFSnQib0QjFEdbRbFW/+rNOLlVHeb/OPrb0M7zUVJj1aatUKoTwBgZNP0DMUUYa2/qyEzy+jrLSN2giir15pvIeFlltxIhRtN8k8cuUVWVS3Vn4AqNeuu1XaRnCQ2aZsOpTgxFmJNQxTo4aHJUF+iibFrOZ593D7mmN0t5ct2H/UiTsIW6r4rEt690ZsBOz2fBo/IkkK41wrpxztNz4bJXvMXWg7YolW+dIJD5bfALGfo0a8VtpTQd3sqEqVZ3PQ5+R4Ff7fyHYlnj+wPxSqCq7bABt49G54eVjFGXxHfNkOnoPg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KufVDrgc3cSmHNaiLmnxc39UBT0aFIAmnFrAJm7jr6M=;
+ b=LrUHgMwYyK/UDYRD3SJNehFAtYgr0pOLo05rKFQUxZ6Xkgb5dTBcyzNr8nRUsHKCxJ1TpQNu8yeGyZiL4oAnHRjUnb7nbc6OufiTsGZhNT+MAzjOqzVRjvpgm8csteiFYuyXT/J2rzeCPWc8YFRDOZrH9yVgSHghJM5r1zpMP760cCRaNhjJe9he5epCjI1VC+hbbqWzeoTTVh+ohZVsrfqDTRtzdQGmPMgRL8cEbpLj9U3GRkTDCOavrE8eo2hBgHgRKziXoWFAxvt1RXUwC3ZG9ANP4/LihxHL1PyqfVyqMCPqC6RXnuKHwKao3qT552/I+FQPSqLaiKLJuMBP9g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=verimatrix.com; dmarc=pass action=none
+ header.from=verimatrix.com; dkim=pass header.d=verimatrix.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KufVDrgc3cSmHNaiLmnxc39UBT0aFIAmnFrAJm7jr6M=;
+ b=MEaCa84tzoBmT7z3hEx4aJ4TNZ4zHixn41eGiTfOPG4J4UCjKFcvExn1UPP0qKmHtUfeLcY2N6U+qKqpdMkVixgmT8cc0bf16uqsyofQgr+mjRMxnrHe/ATTMxLf8ZKjqAM3aoyY+JlA4z1RsNsD/hjsVGnGsmPWYSAwnPf7kBE=
+Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.86) by
+ MN2PR20MB3023.namprd20.prod.outlook.com (52.132.174.224) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2327.24; Wed, 9 Oct 2019 13:28:48 +0000
+Received: from MN2PR20MB2973.namprd20.prod.outlook.com
+ ([fe80::b986:4f02:3206:31e4]) by MN2PR20MB2973.namprd20.prod.outlook.com
+ ([fe80::b986:4f02:3206:31e4%7]) with mapi id 15.20.2347.016; Wed, 9 Oct 2019
+ 13:28:47 +0000
+From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+To:     YueHaibing <yuehaibing@huawei.com>,
+        Antoine Tenart <antoine.tenart@bootlin.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>
+Subject: RE: [PATCH -next] crypto: Use PTR_ERR_OR_ZERO in
+ safexcel_xcbcmac_cra_init()
+Thread-Topic: [PATCH -next] crypto: Use PTR_ERR_OR_ZERO in
+ safexcel_xcbcmac_cra_init()
+Thread-Index: AQHVfpoPpEbnac0BKUSyYpyAmlCIvadSTTXQ
+Date:   Wed, 9 Oct 2019 13:28:47 +0000
+Message-ID: <MN2PR20MB29737A41C34E055FB7FFD9FBCA950@MN2PR20MB2973.namprd20.prod.outlook.com>
+References: <20191009120621.45834-1-yuehaibing@huawei.com>
+In-Reply-To: <20191009120621.45834-1-yuehaibing@huawei.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-x-dg-ref: =?us-ascii?Q?PG1ldGE+PGF0IG5tPSJib2R5LnR4dCIgcD0iYzpcdXNlcnNcMjEyNDczOTUw?=
- =?us-ascii?Q?XGFwcGRhdGFccm9hbWluZ1wwOWQ4NDliNi0zMmQzLTRhNDAtODVlZS02Yjg0?=
- =?us-ascii?Q?YmEyOWUzNWJcbXNnc1xtc2ctZGRkMDhkMzItZWE4ZC0xMWU5LThlNjQtYTRj?=
- =?us-ascii?Q?M2YwYjU5OGE2XGFtZS10ZXN0XGRkZDA4ZDM0LWVhOGQtMTFlOS04ZTY0LWE0?=
- =?us-ascii?Q?YzNmMGI1OThhNmJvZHkudHh0IiBzej0iMjA5NSIgdD0iMTMyMTUwOTY2NjU0?=
- =?us-ascii?Q?NTEyMTE0IiBoPSJOeUxXaXhaaHFjUHNKaXhDWEppNWF4MkppRkE9IiBpZD0i?=
- =?us-ascii?Q?IiBibD0iMCIgYm89IjEiIGNpPSJjQUFBQUVSSFUxUlNSVUZOQ2dVQUFFb0NB?=
- =?us-ascii?Q?QUR5cXlxZ21uN1ZBZGZLMWFPdHBmaG4xOHJWbzYybCtHY0RBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBSEFBQUFEYUFRQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBRUFBUUFCQUFBQUZ0R2VRd0FBQUFBQUFBQUFBQUFBQUo0QUFBQm5BR1VB?=
- =?us-ascii?Q?WHdCakFHOEFiZ0JtQUdrQVpBQmxBRzRBZEFCcEFHRUFiQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFFQUFBQUFBQUFBQWdBQUFBQUFuZ0FBQUdjQVpRQmZBR2dBYVFCbkFHZ0Fi?=
- =?us-ascii?Q?QUI1QUdNQWJ3QnVBR1lBYVFCa0FHVUFiZ0IwQUdrQVlRQnNBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBUUFBQUFBQUFBQUNB?=
- =?us-ascii?Q?QUFBQUFDZUFBQUFad0JsQUY4QWJnQnZBRzRBY0FCMUFHSUFiQUJwQUdNQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFB?=
- =?us-ascii?Q?QUFBQUFBQUFBQUFBQUFBQUFBQkFBQUFBQUFBQUFJQUFBQUFBQT09Ii8+PC9t?=
- =?us-ascii?Q?ZXRhPg=3D=3D?=
-x-dg-rorf: 
-x-originating-ip: [3.159.16.111]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=pvanleeuwen@verimatrix.com; 
+x-originating-ip: [188.204.2.113]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: c3b5499b-20f3-49a2-73b0-08d74cbc9db5
+x-ms-traffictypediagnostic: MN2PR20MB3023:
+x-ms-exchange-purlcount: 1
+x-microsoft-antispam-prvs: <MN2PR20MB30230FA02D90B51FFD3BC3DACA950@MN2PR20MB3023.namprd20.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:525;
+x-forefront-prvs: 018577E36E
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(346002)(39850400004)(396003)(136003)(366004)(376002)(13464003)(199004)(189003)(8936002)(81166006)(6116002)(71190400001)(66446008)(110136005)(316002)(305945005)(66946007)(256004)(446003)(8676002)(54906003)(81156014)(7736002)(33656002)(66556008)(64756008)(14454004)(11346002)(66476007)(52536014)(5660300002)(76116006)(74316002)(3846002)(71200400001)(25786009)(26005)(53546011)(6506007)(102836004)(99286004)(4326008)(7696005)(55016002)(6246003)(15974865002)(9686003)(478600001)(76176011)(229853002)(476003)(2906002)(186003)(486006)(66066001)(86362001)(6436002)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB3023;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: verimatrix.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 9GSDfD+bcuy4NJNlTKcku2CQ8zzdlMC/HbnJ8bae1oc22ub/Ha70Q4Y7N0UGXqVySdlqHV3GIlc4jaPkPWxxrNYpcIINxutJb3c2JUmJEPKnuHHNqRorW4OoDXPGR2Stx0v8zR3aqeXaZlEiQJy6H//v85Q7GpAXmrc3sTCeChM3XemVoJgjmQE9G3Wx9fzu0l5sjvkJDeiofF9KVapZF6qtIebPlaTLDb0frGaoaD+ysHQ8nJ8Vfk6bLHGFQanUSI1koRzNhgT5WFexQnMoxJt+ooHRtx0k3wDk0RbOBs/Mgm1RCs1774LOAZw1GEGSn2IhNbd7zOdZ67AdOvHf/38o3m8z8zf0lUe28ykqT2l3AFfliJ2uflC/GPuiTpRKlc+eYIRsapzWcVS4XMbAf63v0N2/9Z7UTNrTtNX3ejM=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="Windows-1252"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Subject: [PATCH] KEYS: asym_tpm: Switch to get_random_bytes()
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-09_05:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1908290000
- definitions=main-1910090115
+X-OriginatorOrg: verimatrix.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c3b5499b-20f3-49a2-73b0-08d74cbc9db5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Oct 2019 13:28:47.5564
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: LStnmcMsMKS8S2g7fqCuR3tVHT7XK+h++Q9S7LEfZop+BYsnf2T8cd3iZija62VWf/KGYkP6hDVBB/dFcyPHyzLwtalKxQ988Fao4gy+q18=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB3023
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+> -----Original Message-----
+> From: linux-crypto-owner@vger.kernel.org <linux-crypto-owner@vger.kernel.=
+org> On Behalf Of
+> YueHaibing
+> Sent: Wednesday, October 9, 2019 2:06 PM
+> To: Antoine Tenart <antoine.tenart@bootlin.com>; Herbert Xu <herbert@gond=
+or.apana.org.au>
+> Cc: YueHaibing <yuehaibing@huawei.com>; linux-crypto@vger.kernel.org; ker=
+nel-
+> janitors@vger.kernel.org
+> Subject: [PATCH -next] crypto: Use PTR_ERR_OR_ZERO in safexcel_xcbcmac_cr=
+a_init()
+>=20
+> Use PTR_ERR_OR_ZERO rather than if(IS_ERR(...)) + PTR_ERR
+>=20
+> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+>
+Acked-by: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
 
-> From: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-> Sent: Tuesday, October 8, 2019 7:54 PM
-> To: Ken Goldman <kgold@linux.ibm.com>
-> Cc: Safford, David (GE Global Research, US) <david.safford@ge.com>; Mimi
-> Zohar <zohar@linux.ibm.com>; linux-integrity@vger.kernel.org;
-> stable@vger.kernel.org; open list:ASYMMETRIC KEYS
-> <keyrings@vger.kernel.org>; open list:CRYPTO API <linux-
-> crypto@vger.kernel.org>; open list <linux-kernel@vger.kernel.org>
-> Subject: EXT: Re: [PATCH] KEYS: asym_tpm: Switch to get_random_bytes()
-> 
-> On Wed, Oct 09, 2019 at 02:49:35AM +0300, Jarkko Sakkinen wrote:
-> > On Mon, Oct 07, 2019 at 06:13:01PM -0400, Ken Goldman wrote:
-> > > The TPM library specification states that the TPM must comply with
-> > > NIST
-> > > SP800-90 A.
-> > >
-> > > https://trustedcomputinggroup.org/membership/certification/tpm-certi
-> > > fied-products/
-> > >
-> > > shows that the TPMs get third party certification, Common Criteria EAL 4+.
-> > >
-> > > While it's theoretically possible that an attacker could compromise
-> > > both the TPM vendors and the evaluation agencies, we do have EAL 4+
-> > > assurance against both 1 and 2.
-> >
-> > Certifications do not equal to trust.
-> 
-> And for trusted keys the least trust solution is to do generation with the kernel
-> assets and sealing with TPM. With TEE the least trust solution is equivalent.
-> 
-> Are you proposing that the kernel random number generation should be
-> removed? That would be my conclusion of this discussion if I would agree any
-> of this (I don't).
-> 
-> /Jarkko
+> ---
+>  drivers/crypto/inside-secure/safexcel_hash.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
+>=20
+> diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypt=
+o/inside-
+> secure/safexcel_hash.c
+> index 85c3a075f283..a07a2915fab1 100644
+> --- a/drivers/crypto/inside-secure/safexcel_hash.c
+> +++ b/drivers/crypto/inside-secure/safexcel_hash.c
+> @@ -2109,10 +2109,7 @@ static int safexcel_xcbcmac_cra_init(struct crypto=
+_tfm *tfm)
+>=20
+>  	safexcel_ahash_cra_init(tfm);
+>  	ctx->kaes =3D crypto_alloc_cipher("aes", 0, 0);
+> -	if (IS_ERR(ctx->kaes))
+> -		return PTR_ERR(ctx->kaes);
+> -
+> -	return 0;
+> +	return PTR_ERR_OR_ZERO(ctx->kaes);
+>
+Ah cool, you can do that in one go, didn't know that yet :-) Thanks!
 
-No one is suggesting that.
+>  }
+>=20
+>  static void safexcel_xcbcmac_cra_exit(struct crypto_tfm *tfm)
+>=20
+>=20
+>=20
+>=20
 
-You are suggesting changing the documented behavior of trusted keys, and
-that would cause problems for some of our use cases. While certification
-may not in your mind be equal to trust, it is equal to compliance with 
-mandatory regulations.
+Regards,
+Pascal van Leeuwen
+Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
+www.insidesecure.com
 
-Perhaps rather than arguing past each other, we should look into 
-providing users the ability to choose, as an argument to keyctl?
-
-dave
