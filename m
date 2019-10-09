@@ -2,34 +2,34 @@ Return-Path: <SRS0=7GLU=YC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6AFFECE58E
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Oct 2019 07:33:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24642ECE58D
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Oct 2019 07:41:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BA46121920
-	for <linux-crypto@archiver.kernel.org>; Wed,  9 Oct 2019 07:33:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 06D3D21835
+	for <linux-crypto@archiver.kernel.org>; Wed,  9 Oct 2019 07:41:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726579AbfJIHdV (ORCPT
+        id S1730168AbfJIHlk (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 9 Oct 2019 03:33:21 -0400
-Received: from mga12.intel.com ([192.55.52.136]:34804 "EHLO mga12.intel.com"
+        Wed, 9 Oct 2019 03:41:40 -0400
+Received: from mga05.intel.com ([192.55.52.43]:10388 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725440AbfJIHdU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 9 Oct 2019 03:33:20 -0400
+        id S1729983AbfJIHlj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 9 Oct 2019 03:41:39 -0400
 X-Amp-Result: UNKNOWN
 X-Amp-Original-Verdict: FILE UNKNOWN
 X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Oct 2019 00:33:20 -0700
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 09 Oct 2019 00:41:38 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.67,273,1566889200"; 
-   d="scan'208";a="345280689"
+   d="scan'208";a="277350156"
 Received: from jsakkine-mobl1.tm.intel.com (HELO localhost) ([10.237.50.125])
-  by orsmga004.jf.intel.com with ESMTP; 09 Oct 2019 00:33:16 -0700
-Date:   Wed, 9 Oct 2019 10:33:15 +0300
+  by orsmga001.jf.intel.com with ESMTP; 09 Oct 2019 00:41:34 -0700
+Date:   Wed, 9 Oct 2019 10:41:33 +0300
 From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
 To:     Ken Goldman <kgold@linux.ibm.com>
 Cc:     "Safford, David (GE Global Research, US)" <david.safford@ge.com>,
@@ -40,9 +40,8 @@ Cc:     "Safford, David (GE Global Research, US)" <david.safford@ge.com>,
         "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
         open list <linux-kernel@vger.kernel.org>
 Subject: Re: [PATCH] KEYS: asym_tpm: Switch to get_random_bytes()
-Message-ID: <20191009073315.GA5884@linux.intel.com>
-References: <1570107752.4421.183.camel@linux.ibm.com>
- <20191003175854.GB19679@linux.intel.com>
+Message-ID: <20191009074133.GA6202@linux.intel.com>
+References: <20191003175854.GB19679@linux.intel.com>
  <1570128827.5046.19.camel@linux.ibm.com>
  <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2A22E@ALPMBAPA12.e2k.ad.ge.com>
  <20191004182711.GC6945@linux.intel.com>
@@ -51,10 +50,11 @@ References: <1570107752.4421.183.camel@linux.ibm.com>
  <59b88042-9c56-c891-f75e-7c0719eb5ff9@linux.ibm.com>
  <20191008234935.GA13926@linux.intel.com>
  <20191008235339.GB13926@linux.intel.com>
+ <20191009073315.GA5884@linux.intel.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191008235339.GB13926@linux.intel.com>
+In-Reply-To: <20191009073315.GA5884@linux.intel.com>
 Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
@@ -62,39 +62,44 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 09, 2019 at 02:53:39AM +0300, Jarkko Sakkinen wrote:
-> On Wed, Oct 09, 2019 at 02:49:35AM +0300, Jarkko Sakkinen wrote:
-> > On Mon, Oct 07, 2019 at 06:13:01PM -0400, Ken Goldman wrote:
-> > > The TPM library specification states that the TPM must comply with NIST
-> > > SP800-90 A.
+On Wed, Oct 09, 2019 at 10:33:15AM +0300, Jarkko Sakkinen wrote:
+> On Wed, Oct 09, 2019 at 02:53:39AM +0300, Jarkko Sakkinen wrote:
+> > On Wed, Oct 09, 2019 at 02:49:35AM +0300, Jarkko Sakkinen wrote:
+> > > On Mon, Oct 07, 2019 at 06:13:01PM -0400, Ken Goldman wrote:
+> > > > The TPM library specification states that the TPM must comply with NIST
+> > > > SP800-90 A.
+> > > > 
+> > > > https://trustedcomputinggroup.org/membership/certification/tpm-certified-products/
+> > > > 
+> > > > shows that the TPMs get third party certification, Common Criteria EAL 4+.
+> > > > 
+> > > > While it's theoretically possible that an attacker could compromise
+> > > > both the TPM vendors and the evaluation agencies, we do have EAL 4+
+> > > > assurance against both 1 and 2.
 > > > 
-> > > https://trustedcomputinggroup.org/membership/certification/tpm-certified-products/
-> > > 
-> > > shows that the TPMs get third party certification, Common Criteria EAL 4+.
-> > > 
-> > > While it's theoretically possible that an attacker could compromise
-> > > both the TPM vendors and the evaluation agencies, we do have EAL 4+
-> > > assurance against both 1 and 2.
+> > > Certifications do not equal to trust.
 > > 
-> > Certifications do not equal to trust.
+> > And for trusted keys the least trust solution is to do generation
+> > with the kernel assets and sealing with TPM. With TEE the least
+> > trust solution is equivalent.
+> > 
+> > Are you proposing that the kernel random number generation should
+> > be removed? That would be my conclusion of this discussion if I
+> > would agree any of this (I don't).
 > 
-> And for trusted keys the least trust solution is to do generation
-> with the kernel assets and sealing with TPM. With TEE the least
-> trust solution is equivalent.
+> The whole point of rng in kernel has been to use multiple entropy
+> sources in order to disclose the trust issue.
 > 
-> Are you proposing that the kernel random number generation should
-> be removed? That would be my conclusion of this discussion if I
-> would agree any of this (I don't).
+> Even with weaker entropy than TPM RNG it is still a better choice for
+> *non-TPM* keys because of better trustworthiness. Using only TPM RNG is
+> a design flaw that has existed probably because when trusted keys were
+> introduced TPM was more niche than it is today.
+> 
+> Please remember that a trusted key is not a TPM key. The reality
+> distortion field is strong here it seems.
 
-The whole point of rng in kernel has been to use multiple entropy
-sources in order to disclose the trust issue.
-
-Even with weaker entropy than TPM RNG it is still a better choice for
-*non-TPM* keys because of better trustworthiness. Using only TPM RNG is
-a design flaw that has existed probably because when trusted keys were
-introduced TPM was more niche than it is today.
-
-Please remember that a trusted key is not a TPM key. The reality
-distortion field is strong here it seems.
+And why not use RDRAND on x86 instead of TPM RNG here? It is also FIPS
+compliant and has less latency than TPM RNG. :-) If we go with this
+route, lets pick the HRNG that performs best.
 
 /Jarkko
