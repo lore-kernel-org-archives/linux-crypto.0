@@ -4,84 +4,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F072C4360C
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Oct 2019 12:55:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE6EAC10F14
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Oct 2019 12:55:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 109172067B
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Oct 2019 12:55:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8C85E2067B
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Oct 2019 12:55:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387852AbfJJMzS (ORCPT
+        id S1729045AbfJJMzi (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 10 Oct 2019 08:55:18 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:37638 "EHLO fornost.hmeau.com"
+        Thu, 10 Oct 2019 08:55:38 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:37644 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728274AbfJJMzS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Oct 2019 08:55:18 -0400
+        id S1728274AbfJJMzh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 10 Oct 2019 08:55:37 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1iIXy9-0001sw-7h; Thu, 10 Oct 2019 23:55:02 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 10 Oct 2019 23:55:00 +1100
-Date:   Thu, 10 Oct 2019 23:55:00 +1100
+        id 1iIXyg-0001tB-T6; Thu, 10 Oct 2019 23:55:36 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 10 Oct 2019 23:55:34 +1100
+Date:   Thu, 10 Oct 2019 23:55:34 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Antoine Tenart <antoine.tenart@bootlin.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Pascal van Leeuwen <pvanleeuwen@verimatrix.com>,
-        Pascal van Leeuwen <pascalvanl@gmail.com>,
-        Kelsey Skunberg <skunberg.kelsey@gmail.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-pci@vger.kernel.org
-Subject: Re: [PATCH 3/3] crypto: inside-secure - Remove #ifdef checks
-Message-ID: <20191010125500.GE31566@gondor.apana.org.au>
-References: <20190930121520.1388317-1-arnd@arndb.de>
- <20190930121520.1388317-3-arnd@arndb.de>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     linux-crypto@vger.kernel.org, arnd@arndb.de,
+        natechancellor@gmail.com, ndesaulniers@google.com
+Subject: Re: [PATCH] crypto: aegis128/simd - build 32-bit ARM for v8
+ architecture explicitly
+Message-ID: <20191010125534.GF31566@gondor.apana.org.au>
+References: <20191002075448.6453-1-ard.biesheuvel@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190930121520.1388317-3-arnd@arndb.de>
+In-Reply-To: <20191002075448.6453-1-ard.biesheuvel@linaro.org>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Sep 30, 2019 at 02:14:35PM +0200, Arnd Bergmann wrote:
-> When both PCI and OF are disabled, no drivers are registered, and
-> we get some unused-function warnings:
+On Wed, Oct 02, 2019 at 09:54:48AM +0200, Ard Biesheuvel wrote:
+> Now that the Clang compiler has taken it upon itself to police the
+> compiler command line, and reject combinations for arguments it views
+> as incompatible, the AEGIS128 no longer builds correctly, and errors
+> out like this:
 > 
-> drivers/crypto/inside-secure/safexcel.c:1221:13: error: unused function 'safexcel_unregister_algorithms' [-Werror,-Wunused-function]
-> static void safexcel_unregister_algorithms(struct safexcel_crypto_priv *priv)
-> drivers/crypto/inside-secure/safexcel.c:1307:12: error: unused function 'safexcel_probe_generic' [-Werror,-Wunused-function]
-> static int safexcel_probe_generic(void *pdev,
-> drivers/crypto/inside-secure/safexcel.c:1531:13: error: unused function 'safexcel_hw_reset_rings' [-Werror,-Wunused-function]
-> static void safexcel_hw_reset_rings(struct safexcel_crypto_priv *priv)
+>   clang-10: warning: ignoring extension 'crypto' because the 'armv7-a'
+>   architecture does not support it [-Winvalid-command-line-argument]
 > 
-> It's better to make the compiler see what is going on and remove
-> such ifdef checks completely. In case of PCI, this is trivial since
-> pci_register_driver() is defined to an empty function that makes the
-> compiler subsequently drop all unused code silently.
+> So let's switch to armv8-a instead, which matches the crypto-neon-fp-armv8
+> FPU profile we specify. Since neither were actually supported by GCC
+> versions before 4.8, let's tighten the Kconfig dependencies as well so
+> we won't run into errors when building with an ancient compiler.
 > 
-> The global pcireg_rc/ofreg_rc variables are not actually needed here
-> since the driver registration does not fail in ways that would make
-> it helpful.
-> 
-> For CONFIG_OF, an IS_ENABLED() check is still required, since platform
-> drivers can exist both with and without it.
-> 
-> A little change to linux/pci.h is needed to ensure that
-> pcim_enable_device() is visible to the driver. Moving the declaration
-> outside of ifdef would be sufficient here, but for consistency with the
-> rest of the file, adding an inline helper is probably best.
-> 
-> Fixes: 212ef6f29e5b ("crypto: inside-secure - Fix unused variable warning when CONFIG_PCI=n")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 > ---
->  drivers/crypto/inside-secure/safexcel.c | 49 ++++++-------------------
->  include/linux/pci.h                     |  1 +
->  2 files changed, 13 insertions(+), 37 deletions(-)
+>  crypto/Kconfig  | 1 +
+>  crypto/Makefile | 2 +-
+>  2 files changed, 2 insertions(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
