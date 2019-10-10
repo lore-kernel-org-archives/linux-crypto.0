@@ -2,62 +2,78 @@ Return-Path: <SRS0=yFEM=YD=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B094C10F14
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Oct 2019 12:54:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27EF7C4360C
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Oct 2019 12:54:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 39073206B6
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Oct 2019 12:54:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 04B2F208C3
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Oct 2019 12:54:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387435AbfJJMyB (ORCPT
+        id S1733300AbfJJMy0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 10 Oct 2019 08:54:01 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:37592 "EHLO fornost.hmeau.com"
+        Thu, 10 Oct 2019 08:54:26 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:37602 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1733300AbfJJMyB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Oct 2019 08:54:01 -0400
+        id S1728339AbfJJMy0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 10 Oct 2019 08:54:26 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1iIXx6-0001nl-6n; Thu, 10 Oct 2019 23:53:57 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 10 Oct 2019 23:53:53 +1100
-Date:   Thu, 10 Oct 2019 23:53:53 +1100
+        id 1iIXxT-0001oh-FL; Thu, 10 Oct 2019 23:54:20 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 10 Oct 2019 23:54:13 +1100
+Date:   Thu, 10 Oct 2019 23:54:13 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Laurent Vivier <lvivier@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Matt Mackall <mpm@selenic.com>
-Subject: Re: [PATCH] hw_random: move add_early_randomness() out of rng_mutex
-Message-ID: <20191010125353.GA31566@gondor.apana.org.au>
-References: <20190912133022.14870-1-lvivier@redhat.com>
+To:     Zhou Wang <wangzhou1@hisilicon.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linuxarm@huawei.com
+Subject: Re: [PATCH 0/4] crypto: hisilicon: misc sgl fixes
+Message-ID: <20191010125413.GB31566@gondor.apana.org.au>
+References: <1569827335-21822-1-git-send-email-wangzhou1@hisilicon.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190912133022.14870-1-lvivier@redhat.com>
+In-Reply-To: <1569827335-21822-1-git-send-email-wangzhou1@hisilicon.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Sep 12, 2019 at 03:30:22PM +0200, Laurent Vivier wrote:
-> add_early_randomness() is called every time a new rng backend is added
-> and every time it is set as the current rng provider.
+On Mon, Sep 30, 2019 at 03:08:51PM +0800, Zhou Wang wrote:
+> This series fixes some preblems in sgl code. The main change is merging sgl
+> code into hisi_qm module. 
 > 
-> add_early_randomness() is called from functions locking rng_mutex,
-> and if it hangs all the hw_random framework hangs: we can't read sysfs,
-> add or remove a backend.
+> These problem are also fixed:
+>  - Let user driver to pass the configure of sge number in one sgl when
+>    creating hardware sgl resources.
+>  - When disabling SMMU, it may fail to allocate large continuous memory. We
+>    fixes this by allocating memory by blocks.
 > 
-> This patch move add_early_randomness() out of the rng_mutex zone.
-> It only needs the reading_mutex.
+> This series is based on Arnd's patch: https://lkml.org/lkml/2019/9/19/455
 > 
-> Signed-off-by: Laurent Vivier <lvivier@redhat.com>
-> ---
->  drivers/char/hw_random/core.c | 60 +++++++++++++++++++++++++----------
->  1 file changed, 44 insertions(+), 16 deletions(-)
+> Shunkun Tan (1):
+>   crypto: hisilicon - add sgl_sge_nr module param for zip
+> 
+> Zhou Wang (3):
+>   crypto: hisilicon - merge sgl support to hisi_qm module
+>   crypto: hisilicon - fix large sgl memory allocation problem when
+>     disable smmu
+>   crypto: hisilicon - misc fix about sgl
+> 
+>  MAINTAINERS                               |   1 -
+>  drivers/crypto/hisilicon/Kconfig          |   9 --
+>  drivers/crypto/hisilicon/Makefile         |   4 +-
+>  drivers/crypto/hisilicon/qm.h             |  13 +++
+>  drivers/crypto/hisilicon/sgl.c            | 182 +++++++++++++++++++-----------
+>  drivers/crypto/hisilicon/sgl.h            |  24 ----
+>  drivers/crypto/hisilicon/zip/zip.h        |   1 -
+>  drivers/crypto/hisilicon/zip/zip_crypto.c |  44 ++++++--
+>  8 files changed, 167 insertions(+), 111 deletions(-)
+>  delete mode 100644 drivers/crypto/hisilicon/sgl.h
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
