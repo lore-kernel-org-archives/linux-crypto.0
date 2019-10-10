@@ -2,72 +2,77 @@ Return-Path: <SRS0=yFEM=YD=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50BA8C4360C
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Oct 2019 12:39:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F3F7C10F14
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Oct 2019 12:41:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2FAA5206B6
-	for <linux-crypto@archiver.kernel.org>; Thu, 10 Oct 2019 12:39:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 711B82064A
+	for <linux-crypto@archiver.kernel.org>; Thu, 10 Oct 2019 12:41:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387411AbfJJMjB (ORCPT
+        id S2387460AbfJJMlT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 10 Oct 2019 08:39:01 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:37568 "EHLO fornost.hmeau.com"
+        Thu, 10 Oct 2019 08:41:19 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:37584 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726923AbfJJMjB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 10 Oct 2019 08:39:01 -0400
+        id S1733191AbfJJMlS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 10 Oct 2019 08:41:18 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1iIXiX-0001FH-7c; Thu, 10 Oct 2019 23:38:54 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 10 Oct 2019 23:38:49 +1100
-Date:   Thu, 10 Oct 2019 23:38:49 +1100
+        id 1iIXkX-0001OD-Jc; Thu, 10 Oct 2019 23:40:58 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 10 Oct 2019 23:40:51 +1100
+Date:   Thu, 10 Oct 2019 23:40:51 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     Antoine Tenart <antoine.tenart@bootlin.com>,
         "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [GIT PULL] Crypto Fixes for 5.4
-Message-ID: <20191010123849.GA30001@gondor.apana.org.au>
-References: <20190916084901.GA20338@gondor.apana.org.au>
- <20190923050515.GA6980@gondor.apana.org.au>
+        Pascal van Leeuwen <pvanleeuwen@verimatrix.com>,
+        Pascal van Leeuwen <pascalvanl@gmail.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Eric Biggers <ebiggers@google.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/3] crypto: inside-secure - Reduce stack usage
+Message-ID: <20191010124051.GA30370@gondor.apana.org.au>
+References: <20190930121520.1388317-1-arnd@arndb.de>
+ <20190930121520.1388317-2-arnd@arndb.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20190923050515.GA6980@gondor.apana.org.au>
+In-Reply-To: <20190930121520.1388317-2-arnd@arndb.de>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Linus:
+On Mon, Sep 30, 2019 at 02:14:34PM +0200, Arnd Bergmann wrote:
+> safexcel_aead_setkey() contains three large stack variables, totalling
+> slightly more than the 1024 byte warning limit:
+> 
+> drivers/crypto/inside-secure/safexcel_cipher.c:303:12: error: stack frame size of 1032 bytes in function 'safexcel_aead_setkey' [-Werror,-Wframe-larger-than=]
+> 
+> The function already contains a couple of dynamic allocations, so it is
+> likely not performance critical and it can only be called in a context
+> that allows sleeping, so the easiest workaround is to add change it
+> to use dynamic allocations. Combining istate and ostate into a single
+> variable simplifies the allocation at the cost of making it slightly
+> less readable.
+> 
+> Alternatively, it should be possible to shrink these allocations
+> as the extra buffers appear to be largely unnecessary, but doing
+> this would be a much more invasive change.
+> 
+> Fixes: 0e17e3621a28 ("crypto: inside-secure - add support for authenc(hmac(sha*),rfc3686(ctr(aes))) suites")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  .../crypto/inside-secure/safexcel_cipher.c    | 53 ++++++++++++-------
+>  1 file changed, 35 insertions(+), 18 deletions(-)
 
-This push fixes build issues in arm/aes-ce.
+This patch doesn't apply against the current cryptodev tree.
 
-The following changes since commit bf6a7a5ad6fa69e48b735be75eeb90569d9584bb:
-
-  crypto: hisilicon - avoid unused function warning (2019-09-20 23:05:33 +1000)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-
-for you to fetch changes up to f703964fc66804e6049f2670fc11045aa8359b1a:
-
-  crypto: arm/aes-ce - add dependency on AES library (2019-10-01 23:06:43 +1000)
-
-----------------------------------------------------------------
-Ard Biesheuvel (2):
-      crypto: arm/aes-ce - build for v8 architecture explicitly
-      crypto: arm/aes-ce - add dependency on AES library
-
- arch/arm/crypto/Kconfig       | 1 +
- arch/arm/crypto/aes-ce-core.S | 1 +
- 2 files changed, 2 insertions(+)
+Please respin it.
 
 Thanks,
 -- 
