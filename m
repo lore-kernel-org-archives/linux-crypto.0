@@ -2,187 +2,287 @@ Return-Path: <SRS0=ziyG=YE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19B74ECE58E
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Oct 2019 11:54:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC7B3C47404
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Oct 2019 12:04:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F23E3206CD
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Oct 2019 11:54:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8285F2190F
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Oct 2019 12:04:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727198AbfJKLyF (ORCPT
+        id S1727750AbfJKMEY (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Oct 2019 07:54:05 -0400
-Received: from mx2.suse.de ([195.135.220.15]:33348 "EHLO mx1.suse.de"
+        Fri, 11 Oct 2019 08:04:24 -0400
+Received: from mx2.suse.de ([195.135.220.15]:42110 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727969AbfJKLvT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Oct 2019 07:51:19 -0400
+        id S1727198AbfJKMEY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Oct 2019 08:04:24 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 79C62B48C;
-        Fri, 11 Oct 2019 11:51:17 +0000 (UTC)
-From:   Jiri Slaby <jslaby@suse.cz>
-To:     bp@alien8.de
-Cc:     tglx@linutronix.de, mingo@redhat.com, hpa@zytor.com,
-        x86@kernel.org, linux-arch@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Jiri Slaby <jslaby@suse.cz>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Juergen Gross <jgross@suse.com>, linux-crypto@vger.kernel.org,
-        xen-devel@lists.xenproject.org
-Subject: [PATCH v9 09/28] x86/asm: Annotate aliases
-Date:   Fri, 11 Oct 2019 13:50:49 +0200
-Message-Id: <20191011115108.12392-10-jslaby@suse.cz>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20191011115108.12392-1-jslaby@suse.cz>
-References: <20191011115108.12392-1-jslaby@suse.cz>
+        by mx1.suse.de (Postfix) with ESMTP id 72C19AFA9;
+        Fri, 11 Oct 2019 12:04:21 +0000 (UTC)
+Received: by ds.suse.cz (Postfix, from userid 10065)
+        id 29BE2DA7FF; Fri, 11 Oct 2019 14:04:35 +0200 (CEST)
+Date:   Fri, 11 Oct 2019 14:04:35 +0200
+From:   David Sterba <dsterba@suse.cz>
+To:     David Sterba <dsterba@suse.com>, linux-crypto@vger.kernel.org,
+        ard.biesheuvel@linaro.org, ebiggers@google.com
+Subject: Re: [PATCH v3] crypto: add blake2b generic implementation
+Message-ID: <20191011120434.GC2751@suse.cz>
+Reply-To: dsterba@suse.cz
+Mail-Followup-To: dsterba@suse.cz, David Sterba <dsterba@suse.com>,
+        linux-crypto@vger.kernel.org, ard.biesheuvel@linaro.org,
+        ebiggers@google.com
+References: <e7f46def436c2c705c0b2cac3324f817efa4717d.1570715842.git.dsterba@suse.com>
+ <20191010221200.GB143518@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191010221200.GB143518@gmail.com>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-_key_expansion_128 is an alias to _key_expansion_256a, __memcpy to
-memcpy, xen_syscall32_target to xen_sysenter_target, and so on. Annotate
-them all using the new SYM_FUNC_START_ALIAS, SYM_FUNC_START_LOCAL_ALIAS,
-and SYM_FUNC_END_ALIAS. This will make the tools generating the
-debuginfo happy as it avoid nesting and double symbols.
+On Thu, Oct 10, 2019 at 03:12:02PM -0700, Eric Biggers wrote:
+> > I'm going to do the selftests next so the above can't happen again.
+> 
+> The test vectors should be included in this patch.
+> 
+> > +
+> > +	  - blake2b     - the default 512b digest
+> > +	  - blake2b-160
+> > +	  - blake2b-256
+> > +	  - blake2b-384
+> > +	  - blake2b-512
+> > +
+> 
+> Why have the "blake2b" algorithm at all, when it's already available under the
+> name "blake2b-512"?  It's confusing to have two different names for the same
+> algorithm because then people will need to decide which one to use, and both
+> will need to be tested.
 
-Signed-off-by: Jiri Slaby <jslaby@suse.cz>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@redhat.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: <x86@kernel.org>
-Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
-Reviewed-by: Juergen Gross <jgross@suse.com> [xen parts]
-Cc: <linux-crypto@vger.kernel.org>
-Cc: <xen-devel@lists.xenproject.org>
----
- arch/x86/crypto/aesni-intel_asm.S | 5 ++---
- arch/x86/lib/memcpy_64.S          | 4 ++--
- arch/x86/lib/memmove_64.S         | 4 ++--
- arch/x86/lib/memset_64.S          | 4 ++--
- arch/x86/xen/xen-asm_64.S         | 4 ++--
- 5 files changed, 10 insertions(+), 11 deletions(-)
+The idea is that 'blake2b' is a convenience alias for the default digest
+size, as it is commonly referred. But I agree it's can cause some
+confusion, so I'll remove it.
 
-diff --git a/arch/x86/crypto/aesni-intel_asm.S b/arch/x86/crypto/aesni-intel_asm.S
-index e0a5fb462a0a..9d8d5f2296e1 100644
---- a/arch/x86/crypto/aesni-intel_asm.S
-+++ b/arch/x86/crypto/aesni-intel_asm.S
-@@ -1757,8 +1757,7 @@ ENDPROC(aesni_gcm_finalize)
- #endif
- 
- 
--.align 4
--_key_expansion_128:
-+SYM_FUNC_START_LOCAL_ALIAS(_key_expansion_128)
- SYM_FUNC_START_LOCAL(_key_expansion_256a)
- 	pshufd $0b11111111, %xmm1, %xmm1
- 	shufps $0b00010000, %xmm0, %xmm4
-@@ -1769,8 +1768,8 @@ SYM_FUNC_START_LOCAL(_key_expansion_256a)
- 	movaps %xmm0, (TKEYP)
- 	add $0x10, TKEYP
- 	ret
--ENDPROC(_key_expansion_128)
- SYM_FUNC_END(_key_expansion_256a)
-+SYM_FUNC_END_ALIAS(_key_expansion_128)
- 
- SYM_FUNC_START_LOCAL(_key_expansion_192a)
- 	pshufd $0b01010101, %xmm1, %xmm1
-diff --git a/arch/x86/lib/memcpy_64.S b/arch/x86/lib/memcpy_64.S
-index 92748660ba51..57a64266ba69 100644
---- a/arch/x86/lib/memcpy_64.S
-+++ b/arch/x86/lib/memcpy_64.S
-@@ -28,7 +28,7 @@
-  * Output:
-  * rax original destination
-  */
--ENTRY(__memcpy)
-+SYM_FUNC_START_ALIAS(__memcpy)
- ENTRY(memcpy)
- 	ALTERNATIVE_2 "jmp memcpy_orig", "", X86_FEATURE_REP_GOOD, \
- 		      "jmp memcpy_erms", X86_FEATURE_ERMS
-@@ -42,7 +42,7 @@ ENTRY(memcpy)
- 	rep movsb
- 	ret
- ENDPROC(memcpy)
--ENDPROC(__memcpy)
-+SYM_FUNC_END_ALIAS(__memcpy)
- EXPORT_SYMBOL(memcpy)
- EXPORT_SYMBOL(__memcpy)
- 
-diff --git a/arch/x86/lib/memmove_64.S b/arch/x86/lib/memmove_64.S
-index bbec69d8223b..50c1648311b3 100644
---- a/arch/x86/lib/memmove_64.S
-+++ b/arch/x86/lib/memmove_64.S
-@@ -26,7 +26,7 @@
-  */
- .weak memmove
- 
--ENTRY(memmove)
-+SYM_FUNC_START_ALIAS(memmove)
- ENTRY(__memmove)
- 
- 	/* Handle more 32 bytes in loop */
-@@ -208,6 +208,6 @@ ENTRY(__memmove)
- 13:
- 	retq
- ENDPROC(__memmove)
--ENDPROC(memmove)
-+SYM_FUNC_END_ALIAS(memmove)
- EXPORT_SYMBOL(__memmove)
- EXPORT_SYMBOL(memmove)
-diff --git a/arch/x86/lib/memset_64.S b/arch/x86/lib/memset_64.S
-index 9bc861c71e75..927ac44d34aa 100644
---- a/arch/x86/lib/memset_64.S
-+++ b/arch/x86/lib/memset_64.S
-@@ -19,7 +19,7 @@
-  *
-  * rax   original destination
-  */
--ENTRY(memset)
-+SYM_FUNC_START_ALIAS(memset)
- ENTRY(__memset)
- 	/*
- 	 * Some CPUs support enhanced REP MOVSB/STOSB feature. It is recommended
-@@ -43,8 +43,8 @@ ENTRY(__memset)
- 	rep stosb
- 	movq %r9,%rax
- 	ret
--ENDPROC(memset)
- ENDPROC(__memset)
-+SYM_FUNC_END_ALIAS(memset)
- EXPORT_SYMBOL(memset)
- EXPORT_SYMBOL(__memset)
- 
-diff --git a/arch/x86/xen/xen-asm_64.S b/arch/x86/xen/xen-asm_64.S
-index ebf610b49c06..45c1249f370d 100644
---- a/arch/x86/xen/xen-asm_64.S
-+++ b/arch/x86/xen/xen-asm_64.S
-@@ -167,13 +167,13 @@ ENDPROC(xen_sysenter_target)
- 
- #else /* !CONFIG_IA32_EMULATION */
- 
--ENTRY(xen_syscall32_target)
-+SYM_FUNC_START_ALIAS(xen_syscall32_target)
- ENTRY(xen_sysenter_target)
- 	lea 16(%rsp), %rsp	/* strip %rcx, %r11 */
- 	mov $-ENOSYS, %rax
- 	pushq $0
- 	jmp hypercall_iret
--ENDPROC(xen_syscall32_target)
- ENDPROC(xen_sysenter_target)
-+SYM_FUNC_END_ALIAS(xen_syscall32_target)
- 
- #endif	/* CONFIG_IA32_EMULATION */
--- 
-2.23.0
+> > +struct blake2b_param
+> > +{
+> > +	u8  digest_length; /* 1 */
+> > +	u8  key_length;    /* 2 */
+> > +	u8  fanout;        /* 3 */
+> > +	u8  depth;         /* 4 */
+> > +	u32 leaf_length;   /* 8 */
+> > +	u32 node_offset;   /* 12 */
+> > +	u32 xof_length;    /* 16 */
+> 
+> The u32 fields need to be __le32, since this struct is interpreted as an array
+> of bytes.
 
+For this and several other comments: I tried to minimize changes to the
+the reference implementation, not to introduce bugs or remove code that
+should be there, unless requested by a reviewer. I hope you understand
+that and don't mind.
+
+> > +static int blake2b_init(struct blake2b_state *S, size_t outlen)
+> > +{
+> > +	struct blake2b_param P[1];
+> 
+> This shouldn't be an array.
+
+Copied from the original, will switch to simple variable.
+
+> > +	if ((!outlen) || (outlen > BLAKE2B_OUTBYTES))
+> > +		return -1;
+> 
+> No need for these checks, since this patch doesn't provide any way for the user
+> to set an arbitrary outlen.  They should either be removed, or replaced with a
+> WARN_ON().  As-is, it looks like a valid error, which is bad because some
+> callers of the crypto_shash API don't handle errors.
+
+I see and will remove it.
+
+> > +	P->digest_length = (u8)outlen;
+> > +	P->key_length    = 0;
+> > +	P->fanout        = 1;
+> > +	P->depth         = 1;
+> > +	put_unaligned_le32(0, &P->leaf_length);
+> > +	put_unaligned_le32(0, &P->node_offset);
+> > +	put_unaligned_le32(0, &P->xof_length);
+> 
+> struct blake2b_param is already a packed structure, so these should be direct
+> assignments.  No need for put_unaligned_le32().
+> 
+> > +	P->node_depth    = 0;
+> > +	P->inner_length  = 0;
+> > +	memset(P->reserved, 0, sizeof(P->reserved));
+> > +	memset(P->salt,     0, sizeof(P->salt));
+> > +	memset(P->personal, 0, sizeof(P->personal));
+> > +	return blake2b_init_param(S, P);
+> > +}
+> > +
+> > +static int blake2b_init_key(struct blake2b_state *S, size_t outlen,
+> > +			 const void *key, size_t keylen)
+> > +{
+> > +	struct blake2b_param P[1];
+> > +
+> > +	if ((!outlen) || (outlen > BLAKE2B_OUTBYTES))
+> > +		return -1;
+> > +
+> > +	if (!key || !keylen || keylen > BLAKE2B_KEYBYTES)
+> > +		return -1;
+> 
+> More unclear error checks here.  Which are actually valid reachable errors, and
+> which are assertions that should never trigger?  See comment above.
+> 
+> > +
+> > +	P->digest_length = (u8)outlen;
+> > +	P->key_length    = (u8)keylen;
+> > +	P->fanout        = 1;
+> > +	P->depth         = 1;
+> > +	put_unaligned_le32(0, &P->leaf_length);
+> > +	put_unaligned_le32(0, &P->node_offset);
+> > +	put_unaligned_le32(0, &P->xof_length);
+> 
+> Same problem with the unnecessary put_unaligned_le32().
+> 
+> > +static int blake2b_final(struct blake2b_state *S, void *out, size_t outlen)
+> > +{
+> > +	u8 buffer[BLAKE2B_OUTBYTES] = {0};
+> > +	size_t i;
+> > +
+> > +	if (out == NULL || outlen < S->outlen)
+> > +		return -1;
+> 
+> More unnecessary error checks.  None of the other hash algorithms check for a
+> NULL output buffer, and some users don't check for errors.  So returning -1
+> instead of just crashing could hide bugs.
+
+Yeah, removing the checks will allow to remove return values.
+
+> > +	if (blake2b_is_lastblock(S))
+> > +		return -1;
+> 
+> This can't be the case because lastblock is only set by final().
+> 
+> > +static int digest_setkey(struct crypto_shash *tfm, const u8 *key,
+> > +			 unsigned int keylen)
+> > +{
+> > +	struct digest_tfm_ctx *mctx = crypto_shash_ctx(tfm);
+> > +
+> > +	if (keylen == 0 || keylen > BLAKE2B_KEYBYTES) {
+> > +		crypto_shash_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
+> > +		return -EINVAL;
+> > +	}
+> > +
+> > +	memcpy(mctx->key, key, BLAKE2B_KEYBYTES);
+> > +	mctx->keylen = keylen;
+> > +
+> > +	return 0;
+> > +}
+> 
+> This reads past the end of the key buffer if keylen < BLAKE2B_KEYBYTES.
+> 
+> Please add tests and run with CONFIG_KASAN=y.
+
+Right, I'll fix it. The selftests did not catch this because all of them
+used the maximum key length.
+
+> > +static int digest_update(struct shash_desc *desc, const u8 *data,
+> > +			 unsigned int length)
+> > +{
+> > +	struct digest_desc_ctx *ctx = shash_desc_ctx(desc);
+> > +	int ret;
+> > +
+> > +	ret = blake2b_update(ctx->S, data, length);
+> > +	if (ret)
+> > +		return -EINVAL;
+> > +	return 0;
+> > +}
+> 
+> Why does update() need to fail?  Not all shash API users check for errors.
+> 
+> > +
+> > +static int digest_final(struct shash_desc *desc, u8 *out)
+> > +{
+> > +	struct digest_desc_ctx *ctx = shash_desc_ctx(desc);
+> > +	const int digestsize = crypto_shash_digestsize(desc->tfm);
+> > +	int ret;
+> > +
+> > +	ret = blake2b_final(ctx->S, out, digestsize);
+> > +	if (ret)
+> > +		return -EINVAL;
+> > +	return 0;
+> > +}
+> 
+> Likewise.  Why does final() need to fail?
+> 
+> > +
+> > +static int digest_finup(struct shash_desc *desc, const u8 *data,
+> > +			unsigned int len, u8 *out)
+> > +{
+> > +	struct digest_desc_ctx *ctx = shash_desc_ctx(desc);
+> > +	const int digestsize = crypto_shash_digestsize(desc->tfm);
+> > +	int ret;
+> > +
+> > +	ret = blake2b_update(ctx->S, data, len);
+> > +	if (ret)
+> > +		return -EINVAL;
+> > +	ret = blake2b_final(ctx->S, out, digestsize);
+> > +	if (ret)
+> > +		return -EINVAL;
+> > +	return 0;
+> > +}
+> 
+> finup() shouldn't be implemented if it can't be made more efficient than
+> update() and final() separately.
+
+Ok, will be removed.
+
+> > +static int blake2b_cra_init(struct crypto_tfm *tfm)
+> > +{
+> > +	struct digest_tfm_ctx *mctx = crypto_tfm_ctx(tfm);
+> > +
+> > +	/* Use the unkeyed version by default */
+> > +	memset(mctx->key, 0, BLAKE2B_KEYBYTES);
+> > +	mctx->keylen = 0;
+> > +
+> > +	return 0;
+> > +}
+> 
+> No need for this function, since the tfm_ctx starts out zeroed by default.
+
+Ok, will be removed.
+
+> > +static struct shash_alg blake2b_algs[] = {
+> > +	{
+> > +		.digestsize		= BLAKE2B_512_DIGEST_SIZE,
+> > +		.setkey			= digest_setkey,
+> > +		.init			= digest_init,
+> > +		.update			= digest_update,
+> > +		.final			= digest_final,
+> > +		.finup			= digest_finup,
+> > +		.descsize		= sizeof(struct digest_desc_ctx),
+> > +		.base.cra_name		= "blake2b",
+> > +		.base.cra_driver_name	= "blake2b-generic",
+> > +		.base.cra_priority	= 100,
+> > +		.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
+> > +		.base.cra_blocksize	= BLAKE2B_BLOCKBYTES,
+> > +		.base.cra_ctxsize	= 0,
+> 
+> Need to set cra_ctxsize to sizeof(struct digest_tfm_ctx), otherwise the code is
+> using an area beyond the end of the buffer for the tfm_ctx.  This would have
+> been caught if there were self tests and they were run with CONFIG_KASAN=y.
+
+I found it out the hard way, the sefltests caused memory overwrite,
+caught by SLUB_DEBUG, but I did the KASAN pass as well, no further
+problems found.
+
+I'll spin v4, adding the test vectors. It'll be probably a series
+because single patch I have now is over 400K in size, so we'd need one
+more feedback round to decide what test values to include.
+
+Thanks for the comments.
