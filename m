@@ -2,155 +2,119 @@ Return-Path: <SRS0=ziyG=YE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42196C47404
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Oct 2019 18:11:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25BBEC47404
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Oct 2019 18:49:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1429F206CD
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Oct 2019 18:11:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1570817475;
-	bh=Vy91gWb39GX55L6RG91h/D2B4BNBN3lQmgOpTzHBEOk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=deEbcixtyFTTfBhy+z5Hzyhou5xxc1+HvNR16F6AAk9csmYoj4Jn7IkTOLs7UyLTn
-	 saobX2g2DEevXzzZpNCiLhMAF6ljJqZhXV1L4Qb1y579wTbahAzYupDy1Cu1ZeowpZ
-	 7YH4Eb93zkxYHRr+DUREGhpzyq0O9OW5pMDaOAXk=
+	by mail.kernel.org (Postfix) with ESMTP id EE90C222D1
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Oct 2019 18:49:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=cryptogams.org header.i=@cryptogams.org header.b="FBpxSDHS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728472AbfJKSLO (ORCPT
+        id S1728978AbfJKStW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Oct 2019 14:11:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40302 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728374AbfJKSLN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Oct 2019 14:11:13 -0400
-Received: from gmail.com (unknown [104.132.1.77])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id F050220659;
-        Fri, 11 Oct 2019 18:11:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1570817473;
-        bh=Vy91gWb39GX55L6RG91h/D2B4BNBN3lQmgOpTzHBEOk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ConMc7KNj22I1kOLdEqcRxj6zXyAh4j8bNIRq/968WYO+LGTZ36qvQTyjvBizT2df
-         ZmIGrsZwWOxSGc9z8rf2+i8gjm+1f2HY0ZZU3v2cE05Ow+MMqYGqsv8KxOFGjN6GOq
-         4dOYKrnoPrdeceHNlcEsz/SEWPMDjo9yD6klrLgc=
-Date:   Fri, 11 Oct 2019 11:11:11 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     David Sterba <dsterba@suse.com>
-Cc:     linux-crypto@vger.kernel.org, ard.biesheuvel@linaro.org
-Subject: Re: [PATCH v4 1/5] crypto: add blake2b generic implementation
-Message-ID: <20191011181110.GC235973@gmail.com>
-Mail-Followup-To: David Sterba <dsterba@suse.com>,
-        linux-crypto@vger.kernel.org, ard.biesheuvel@linaro.org
-References: <cover.1570812094.git.dsterba@suse.com>
- <6494ffe9b7940efa4de569d9371da7b1623e726b.1570812094.git.dsterba@suse.com>
+        Fri, 11 Oct 2019 14:49:22 -0400
+Received: from mail-ed1-f68.google.com ([209.85.208.68]:37196 "EHLO
+        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728966AbfJKStW (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Oct 2019 14:49:22 -0400
+Received: by mail-ed1-f68.google.com with SMTP id r4so9557591edy.4
+        for <linux-crypto@vger.kernel.org>; Fri, 11 Oct 2019 11:49:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cryptogams.org; s=gmail;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=dLREoD8VZsbLG4RNnQzVU+lz0coRJeXKm7I6cQzHWCM=;
+        b=FBpxSDHSl5h0D0K0CUSQr+iDnLFNRCThN7zywYEYH0IR45Qbjk8tE6aAW3jKmkvILr
+         1ycQbgRiNyEej71ci6GO46wkxLg0Sqv0cJhgCRe8u8gho8NL9NXAqBVjYfEywpRYIeLE
+         f7i6kwJbP2dB/6ME1h7Tq2g49XPVe//Bojng+ID7FaFWcXmdJPRjFDOhtPMn8AwJ6nDj
+         EYLBOO6nFuMHlJPEgWkAwWp2pEgCEWlKeD80JSufywSeySKIuh+ni1AVHuIqUUnrcVwj
+         0N/F71gdmFtAmeiQmWig7qFsdwN00PJebdbbYb1u4GraTZ1vogWYBBpONd6eXZ9SZ4NI
+         6HmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=dLREoD8VZsbLG4RNnQzVU+lz0coRJeXKm7I6cQzHWCM=;
+        b=hgQ63wmwlBixpGA00D8MTc6umvgZEQQM0vwgBq7kPXByYx3qki6XtYh0cCbKOq6hrT
+         D+m3iqgWHOQrVMdieIqumocGfHQgznoPIY4g8MU8IsW72JSoR28rTsa4zk2zuhl365es
+         6/a3pCfblferRIoUWdnCTBAaJhUpIiHitBhMqkit6Gt0LdjmoDR4/XDAj9kT2M3cNerM
+         +p43u6VAlzDQJVMF2NUYx6T0tA66qTJpCHvYQRgAa5il/BMgqtUJ9+WzneC/YAKq4U3s
+         /vVq1GOMxw3dv060veJxUfdYcbIsKl8+ee3W7m1ZMvvBXd/AIAacTHhTaQeJ3cyb21bW
+         3FGw==
+X-Gm-Message-State: APjAAAXegEtERkhJPn+1GsBDn6jaxmBR74PK9e1rTAHBK5RRLpfU8Jfi
+        /OqSpMFlH8V+tVsZBi9ujHFFu17KZEimfTRSxjd2mQ==
+X-Google-Smtp-Source: APXvYqyjTgZ5NjVsILsULeLWY2Z8jzdOLbEi9VjspmJqkxC9KOyRuUm6s1GUQ/3n0nfZ8y16gnibrQzM48RJfy01WzM=
+X-Received: by 2002:a05:6402:21d6:: with SMTP id bi22mr14876917edb.19.1570819760376;
+ Fri, 11 Oct 2019 11:49:20 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6494ffe9b7940efa4de569d9371da7b1623e726b.1570812094.git.dsterba@suse.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20191007164610.6881-1-ard.biesheuvel@linaro.org>
+ <20191007164610.6881-20-ard.biesheuvel@linaro.org> <20191007210242.Horde.FiSEhRSAuhKHgFx9ROLFIco@www.vdorst.com>
+ <a1c1ade1-f62a-3422-c161-a1d62ea67203@cryptogams.org> <CABb3=+a5zegft0e8ixCVe0xc=FAV1W-bse3x5qhytQ8GKJTJPA@mail.gmail.com>
+ <20191011172133.Horde.sxiyClHzSJAUvHtYJdMQEbN@www.vdorst.com>
+In-Reply-To: <20191011172133.Horde.sxiyClHzSJAUvHtYJdMQEbN@www.vdorst.com>
+From:   Andy Polyakov <appro@cryptogams.org>
+Date:   Fri, 11 Oct 2019 20:49:08 +0200
+Message-ID: <CABb3=+a7qfin8QjaDgt9iU-ps05GYP+pA=fs2L1E9vgEBr7Egg@mail.gmail.com>
+Subject: Re: [PATCH v3 19/29] crypto: mips/poly1305 - incorporate
+ OpenSSL/CRYPTOGAMS optimized implementation
+To:     =?UTF-8?Q?Ren=C3=A9_van_Dorst?= <opensource@vdorst.com>
+Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Samuel Neves <sneves@dei.uc.pt>, Arnd Bergmann <arnd@arndb.de>,
+        Eric Biggers <ebiggers@google.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Martin Willi <martin@strongswan.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Oct 11, 2019 at 06:52:04PM +0200, David Sterba wrote:
-> The patch brings support of several BLAKE2 variants (2b with various
-> digest lengths).  The keyed digest is supported, using tfm->setkey call.
-> The in-tree user will be btrfs (for checksumming), we're going to use
-> the BLAKE2b-256 variant.
-> 
-> The code is reference implementation taken from the official sources and
-> modified in terms of kernel coding style (whitespace, comments, uintXX_t
-> -> uXX types, removed unused prototypes and #ifdefs, removed testing
-> code, changed secure_zero_memory -> memzero_explicit, used own helpers
-> for unaligned reads/writes and rotations).
-> 
-> Further changes removed sanity checks of key length or output size,
-> these values are verified in the crypto API callbacks or hardcoded in
-> shash_alg and not exposed to users.
-> 
-> Signed-off-by: David Sterba <dsterba@suse.com>
-> ---
->  crypto/Kconfig           |  17 ++
->  crypto/Makefile          |   1 +
->  crypto/blake2b_generic.c | 418 +++++++++++++++++++++++++++++++++++++++
->  include/crypto/blake2b.h |  48 +++++
->  4 files changed, 484 insertions(+)
->  create mode 100644 crypto/blake2b_generic.c
->  create mode 100644 include/crypto/blake2b.h
-> 
-> diff --git a/crypto/Kconfig b/crypto/Kconfig
-> index e801450bcb1c..192cbb824928 100644
-> --- a/crypto/Kconfig
-> +++ b/crypto/Kconfig
-> @@ -691,6 +691,23 @@ config CRYPTO_XXHASH
->  	  xxHash non-cryptographic hash algorithm. Extremely fast, working at
->  	  speeds close to RAM limits.
->  
-> +config CRYPTO_BLAKE2B
-> +	tristate "BLAKE2b digest algorithm"
-> +	select CRYPTO_HASH
-> +	help
-> +	  Implementation of cryptographic hash function BLAKE2b (or just BLAKE2),
-> +	  optimized for 64bit platforms and can produce digests of any size
-> +	  between 1 to 64.  The keyed hash is also implemented.
-> +
-> +	  This module provides the following algorithms:
-> +
-> +	  - blake2b-160
-> +	  - blake2b-256
-> +	  - blake2b-384
-> +	  - blake2b-512
-> +
-> +	  See https://blake2.net for further information.
-> +
->  config CRYPTO_CRCT10DIF
->  	tristate "CRCT10DIF algorithm"
->  	select CRYPTO_HASH
-> diff --git a/crypto/Makefile b/crypto/Makefile
-> index 9479e1a45d8c..2318420d3e71 100644
-> --- a/crypto/Makefile
-> +++ b/crypto/Makefile
-> @@ -74,6 +74,7 @@ obj-$(CONFIG_CRYPTO_STREEBOG) += streebog_generic.o
->  obj-$(CONFIG_CRYPTO_WP512) += wp512.o
->  CFLAGS_wp512.o := $(call cc-option,-fno-schedule-insns)  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79149
->  obj-$(CONFIG_CRYPTO_TGR192) += tgr192.o
-> +obj-$(CONFIG_CRYPTO_BLAKE2B) += blake2b_generic.o
->  obj-$(CONFIG_CRYPTO_GF128MUL) += gf128mul.o
->  obj-$(CONFIG_CRYPTO_ECB) += ecb.o
->  obj-$(CONFIG_CRYPTO_CBC) += cbc.o
-> diff --git a/crypto/blake2b_generic.c b/crypto/blake2b_generic.c
-> new file mode 100644
-> index 000000000000..e31fb669383b
-> --- /dev/null
-> +++ b/crypto/blake2b_generic.c
-> @@ -0,0 +1,418 @@
-> +// SPDX-License-Identifier: (GPL-2.0-only OR Apache-2.0)
-> +/*
-> + * BLAKE2b reference source code package - reference C implementations
-> + *
-> + * Copyright 2012, Samuel Neves <sneves@dei.uc.pt>.  You may use this under the
-> + * terms of the CC0, the OpenSSL Licence, or the Apache Public License 2.0, at
-> + * your option.  The terms of these licenses can be found at:
-> + *
-> + * - CC0 1.0 Universal : http://creativecommons.org/publicdomain/zero/1.0
-> + * - OpenSSL license   : https://www.openssl.org/source/license.html
-> + * - Apache 2.0        : http://www.apache.org/licenses/LICENSE-2.0
-> + *
-> + * More information about the BLAKE2 hash function can be found at
-> + * https://blake2.net.
-> + */
+Hi,
 
-Can you also adjust this comment to make it clear that this isn't the reference
-implementation verbatim, but rather it's been modified for inclusion in the
-kernel?
+On 10/11/2019 7:21 PM, Ren=C3=A9 van Dorst wrote:
+>
+> ...
+>
+> I also wonder if we can also replace the "li $x, -4" and "and $x" with
+> "sll $x"
+> combination on other places like [0], also on line 1169?
+>
+> Replace this on line 1169, works on my device.
+>
+> -       li      $in0,-4
+>         srl     $ctx,$tmp4,2
+> -       and     $in0,$in0,$tmp4
+>         andi    $tmp4,$tmp4,3
+> +       sll     $in0, $ctx, 2
+>         addu    $ctx,$ctx,$in0
 
-Thanks!
+The reason for why I chose to keep 'li $in0,-4' in poly1305_emit is
+because the original sequence has higher instruction-level parallelism.
+Yes, it's one extra instruction, but if all of them get paired, they
+will execute faster. Yes, it doesn't help single-issue processors such
+as yours, but thing is that next instruction depends on last, and then
+*formally* it's more appropriate to aim for higher ILP as general rule.
+Just in case, in poly1305_blocks is different, because dependent
+instruction does not immediately follow one that computes the residue.
 
-- Eric
+>> As for multiply-by-1-n-add.
+>>
+>
+> I wonder how many devices do exist with the "poor man" version.
+
+Well, it's not just how many devices, but more specifically how many of
+those will end up running the code in question. I would guess poor-man's
+unit would be found in ultra-low-power microcontroller, so... As
+implied, it's probably sufficient to keep this in mind just in case :-)
+
+Cheers.
