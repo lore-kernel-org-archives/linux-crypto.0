@@ -2,131 +2,87 @@ Return-Path: <SRS0=ziyG=YE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ACD3ECE58C
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Oct 2019 14:15:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97BB2ECE58C
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Oct 2019 14:26:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D7AC420679
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Oct 2019 14:15:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cryptogams.org header.i=@cryptogams.org header.b="Ii+sYIaC"
+	by mail.kernel.org (Postfix) with ESMTP id 72BBA206A1
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Oct 2019 14:26:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1570803984;
+	bh=SHvMCO37/GiqJDDWH3KVyMHOaT3c4+xepf3IfRJhWAI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=GLQLJ+6YUpfJ6nXZs1HQ2S2fxhRMSiJCOtRKKw+I2Zz4ZWGmZCceFt/QMV7r5VfT3
+	 21i0PFHCLzO04S2ihUgp+695YRBtiBKheY1ZcPB9MuSWck7xYui1ArJbvcz3/eGgeZ
+	 hnR6SkN7emLy7NNPqpISJ9Fjg69RXvK8j/u+SLKo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728348AbfJKOPM (ORCPT
+        id S1728232AbfJKO0X (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Oct 2019 10:15:12 -0400
-Received: from mail-ed1-f68.google.com ([209.85.208.68]:42162 "EHLO
-        mail-ed1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728149AbfJKOPL (ORCPT
+        Fri, 11 Oct 2019 10:26:23 -0400
+Received: from mail-ot1-f66.google.com ([209.85.210.66]:42080 "EHLO
+        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728068AbfJKO0X (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Oct 2019 10:15:11 -0400
-Received: by mail-ed1-f68.google.com with SMTP id y91so8805629ede.9
-        for <linux-crypto@vger.kernel.org>; Fri, 11 Oct 2019 07:15:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cryptogams.org; s=gmail;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=NxRqcpgft6HxNHQsFkXilvChGERevyF+onKOD4k/Nmw=;
-        b=Ii+sYIaCTwABlDBgKtdN2uAmj90iqH+Ih9wnTeORJWBU3Ag+VIsCGyJAyz1Ut8cy4k
-         Sz8vyeiwEZr0QyyTE9NZi+gASf3AJT5/8prfoG1Amd7NORV3k/p0Wn7SP+9sNlkXveSb
-         q8AP6lsFpDqY5vpURjwvTlXRPbeemVIct8Q8oh1Zv3BBwUV6TaJAUz64qZ5LgiGXbpC+
-         TIcAlgRWsfASh5ZVUZ/uUoidVp1CqwFy5qKVIDH/FhZpoJYrs6RRrqHa9GVWofkBJ3CZ
-         Yr/iKouYJYH/qf02/1ITnXMi0tjZ0XNJUA8VS4MS7+8TpiIhGKpqeDmDPi5p0tKGYBDP
-         Dxtw==
+        Fri, 11 Oct 2019 10:26:23 -0400
+Received: by mail-ot1-f66.google.com with SMTP id c10so8106237otd.9;
+        Fri, 11 Oct 2019 07:26:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=NxRqcpgft6HxNHQsFkXilvChGERevyF+onKOD4k/Nmw=;
-        b=dpbmd7+CWYSV0VIOn0Y4aNw/bAUK+fypxrl/bvnHIB3yxK8x0q6rRXz2y+U7axYFw0
-         azUqzALX89459sk5R7Qit5HVvRQWRmqFu2yzYOcrAHI7apgpCDU8zxjit/9caiZFm1fp
-         ndS4QXZgneGEgT883oUR6mhYRg3eppm3GFkOLq8GGgPLp0kVO/WTp3dYMucJjJOwINwY
-         tKBxfOwVFj4paVfycH1+5YCGQU0fgjz1kme4dwNlYtq6XF57qWCjvsfOqrHRCMtmPT8H
-         liYl0FMMTde8IpK6uMYwWmhuMN0XujsZ/4ENc3NGgiJYLvDFzUC4ZKEr0HpOfwoVyJA7
-         gbYg==
-X-Gm-Message-State: APjAAAXm1qfnkpec0LrHtoUHDki5uADIXfvsf05TMbdijQlI/g/0q6kL
-        1OYnfeK6lwAQUFD31CiB0QLOPkeKsxCdiHuoO8yErw==
-X-Google-Smtp-Source: APXvYqyzAIPiBPtaTpf3RayFDYs8p7WmKnL2oRc/lyNFCA6WLrR3AyFMjDN0VBfxz2/eApU2ZWsmekKOgJB1GXPm0DI=
-X-Received: by 2002:a17:906:1343:: with SMTP id x3mr14224938ejb.113.1570803309858;
- Fri, 11 Oct 2019 07:15:09 -0700 (PDT)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=0sXP7aU6qKZTyZKXCQXYeDcKFa2nychpYgtG2BtNMcE=;
+        b=f5FFESqzYTK8dFMwevcKKjdoiHYy2OuFCRSnXA/HIdv9XUtk179xuUeFxhQ/M6ikhr
+         VY/39XvZmibQAoXzmfrholvuKG4t95MRbISaDo+BxPGqj2mlF8RVrPM0TMUiQ/g5sB8t
+         TwnCR9hlUEI3PS0/6/sGEUGuRkUy5y/cbJmJlr3XnnRJQcJ4oTHFrufIauDFuxbikBsp
+         iYrRtlaJfCoD5RLuz7TqM2h6JeJr3LgxeHTZBxHwjwjoxQWXmWuy9UaPIWh03ohLTOWj
+         BtF46gDr65k5vBO+fb8zaMUIpMGg4/nG8w4nrtSZSdNxvrO3nVYHi3r0l/ea26rjmSEf
+         WTCQ==
+X-Gm-Message-State: APjAAAV0G4rbYtb7njsvFmStfEkK6PFDuePvATjfvT1VKqW8yDIFWfK6
+        9J8iLlUQYDh1L4WSy75G8Q==
+X-Google-Smtp-Source: APXvYqzgN/fv6O0f3DUaNGIVyCz4N6l22G8C1+jX2gKw2dQJ11I1w+uXFqvbkbZLVrJUjhEeDCwV5w==
+X-Received: by 2002:a05:6830:1619:: with SMTP id g25mr12671280otr.195.1570803982282;
+        Fri, 11 Oct 2019 07:26:22 -0700 (PDT)
+Received: from localhost (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
+        by smtp.gmail.com with ESMTPSA id y18sm2621979oto.2.2019.10.11.07.26.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Oct 2019 07:26:21 -0700 (PDT)
+Date:   Fri, 11 Oct 2019 09:26:20 -0500
+From:   Rob Herring <robh@kernel.org>
+To:     Corentin Labbe <clabbe.montjoie@gmail.com>
+Cc:     catalin.marinas@arm.com, davem@davemloft.net,
+        herbert@gondor.apana.org.au, linux@armlinux.org.uk,
+        mark.rutland@arm.com, mripard@kernel.org, robh+dt@kernel.org,
+        wens@csie.org, will@kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-sunxi@googlegroups.com,
+        Corentin Labbe <clabbe.montjoie@gmail.com>
+Subject: Re: [PATCH v3 03/11] dt-bindings: crypto: Add DT bindings
+ documentation for sun8i-ce Crypto Engine
+Message-ID: <20191011142620.GA11285@bogus>
+References: <20191010182328.15826-1-clabbe.montjoie@gmail.com>
+ <20191010182328.15826-4-clabbe.montjoie@gmail.com>
 MIME-Version: 1.0
-References: <20191007164610.6881-1-ard.biesheuvel@linaro.org>
- <20191007164610.6881-20-ard.biesheuvel@linaro.org> <20191007210242.Horde.FiSEhRSAuhKHgFx9ROLFIco@www.vdorst.com>
- <a1c1ade1-f62a-3422-c161-a1d62ea67203@cryptogams.org>
-In-Reply-To: <a1c1ade1-f62a-3422-c161-a1d62ea67203@cryptogams.org>
-From:   Andy Polyakov <appro@cryptogams.org>
-Date:   Fri, 11 Oct 2019 16:14:58 +0200
-Message-ID: <CABb3=+a5zegft0e8ixCVe0xc=FAV1W-bse3x5qhytQ8GKJTJPA@mail.gmail.com>
-Subject: Re: [PATCH v3 19/29] crypto: mips/poly1305 - incorporate
- OpenSSL/CRYPTOGAMS optimized implementation
-To:     =?UTF-8?Q?Ren=C3=A9_van_Dorst?= <opensource@vdorst.com>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Samuel Neves <sneves@dei.uc.pt>, Arnd Bergmann <arnd@arndb.de>,
-        Eric Biggers <ebiggers@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Martin Willi <martin@strongswan.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191010182328.15826-4-clabbe.montjoie@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+On Thu, 10 Oct 2019 20:23:20 +0200, Corentin Labbe wrote:
+> This patch adds documentation for Device-Tree bindings for the
+> Crypto Engine cryptographic accelerator driver.
+> 
+> Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+> ---
+>  .../bindings/crypto/allwinner,sun8i-ce.yaml   | 92 +++++++++++++++++++
+>  1 file changed, 92 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml
+> 
 
-On 10/8/19 1:38 PM, Andy Polyakov wrote:
->>> <snip>
->>
->> Hi Ard,
->>
->> Is it also an option to include my mip32r2 optimized poly1305 version?
->>
->> Below the results which shows a good improvement over the Andy Polyakov
->> version.
->> I swapped the poly1305 assembly file and rename the function to
->> <func_name>_mips
->> Full WireGuard source with the changes [0]
->>
->> bytes |  RvD | openssl | delta | delta / openssl
->>  ...
->>  4096 | 9160 | 11755   | -2595 | -22,08%
-
-Update is pushed to cryptogams. Thanks to Ren=C3=A9 for ideas, feedback and
-testing! There is even a question about supporting DSP ASE, let's
-discuss details off-list first.
-
-As for multiply-by-1-n-add.
-
-> I assume that the presented results depict regression after switch to
-> cryptogams module. Right? RvD implementation distinguishes itself in two
-> ways:
->
-> 1. some of additions in inner loop are replaced with multiply-by-1-n-add;
-> ...
->
-> I recall attempting 1. and chosen not to do it with following rationale.
-> On processor I have access to, Octeon II, it made no significant
-> difference. It was better, but only marginally. And it's understandable,
-> because Octeon II should have lesser difficulty pairing those additions
-> with multiply-n-add instructions. But since multiplication is an
-> expensive operation, it can be pretty slow, I reckoned that on processor
-> less potent than Octeon II it might be more appropriate to minimize
-> amount of multiplication-n-add instructions.
-
-As an example, MIPS 1004K manual discusses that that there are two
-options for multiplier for this core, proper and poor-man's. Proper
-multiplier unit can issue multiplication or multiplication-n-add each
-cycle, with multiplication latency apparently being 4. Poor-man's unit
-on the other hand can issue multiplication each 32nd[!] cycle with
-corresponding latency. This means that core with poor-man's unit would
-perform ~13% worse than it could have been. Updated module does use
-multiply-by-1-n-add, so this note is effectively for reference in case
-"poor man" wonders.
-
-Cheers.
+Reviewed-by: Rob Herring <robh@kernel.org>
