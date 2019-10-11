@@ -2,168 +2,138 @@ Return-Path: <SRS0=ziyG=YE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48149C47404
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Oct 2019 17:21:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DC74C47404
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Oct 2019 17:57:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 20790214E0
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Oct 2019 17:21:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=vdorst.com header.i=@vdorst.com header.b="V00Nwr6b"
+	by mail.kernel.org (Postfix) with ESMTP id E88F121835
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Oct 2019 17:57:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1570816664;
+	bh=YiI7zF8WltNUYYD6XmKfVSSX4StmUMBNXn8Ha54j4wE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=E3NwgaxOa412gLKGFPoUO/RkiWwRNRb+xbaQWRZwypJIdEDTa+qitZt29CEAY2+Qs
+	 yJOILfOh/OR5AuvBy76X9L2PnYUqlrlXDfLa/zMgETIP2EMOIxEzhMlFru5OZD/Lx3
+	 gQVfywqc7foz0DLRu9AKvYk+zyHLmOr+hOPQ9dEg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728449AbfJKRVf (ORCPT
+        id S1728474AbfJKR5n (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Oct 2019 13:21:35 -0400
-Received: from mx.0dd.nl ([5.2.79.48]:51016 "EHLO mx.0dd.nl"
+        Fri, 11 Oct 2019 13:57:43 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38410 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728086AbfJKRVf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Oct 2019 13:21:35 -0400
-Received: from mail.vdorst.com (mail.vdorst.com [IPv6:fd01::250])
+        id S1728374AbfJKR5m (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Oct 2019 13:57:42 -0400
+Received: from gmail.com (unknown [104.132.1.77])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mx.0dd.nl (Postfix) with ESMTPS id 68AB55FBD4;
-        Fri, 11 Oct 2019 19:21:33 +0200 (CEST)
-Authentication-Results: mx.0dd.nl;
-        dkim=pass (2048-bit key; secure) header.d=vdorst.com header.i=@vdorst.com header.b="V00Nwr6b";
-        dkim-atps=neutral
-Received: from www (www.vdorst.com [192.168.2.222])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.vdorst.com (Postfix) with ESMTPSA id 20AA24079D;
-        Fri, 11 Oct 2019 19:21:33 +0200 (CEST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.vdorst.com 20AA24079D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vdorst.com;
-        s=default; t=1570814493;
-        bh=VKBpyBcunIosn/sC6Z7RuILrN+OdZB/cUALWtgo/tQ0=;
+        by mail.kernel.org (Postfix) with ESMTPSA id DC971206A1;
+        Fri, 11 Oct 2019 17:57:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1570816662;
+        bh=YiI7zF8WltNUYYD6XmKfVSSX4StmUMBNXn8Ha54j4wE=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=V00Nwr6ba5hXAKpjMIg1vBWdiUuEw0xfxsNTNFfMsQCzBbOeB18mFKmnxTpgWdP1n
-         6quBG0JByxK2Zs39hDxvNgTg+AaIymZ9QLGx4ZqU9pMy7eWn1RgFndM5/UhRqKN9Oj
-         1UmKs1bSK/eevWBif8B1UzNQ7KLQKIFfreaUPYTR7x0lRJzKZiZlmq9kCa09sZKIYR
-         nw/41Ks5Mn48lYDwGYU/IZHuG7Pp4ClkadtT/ytnOtwxVlTwFQlBWR59T8FehQesOo
-         XNXhqIXdCsX8F9njztaNIiWewxxjBCq1EHy0r1o4OqSGkoIywGpeD2pN1ixJDkNu/R
-         rfshSdQOd0qlQ==
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1]) by
- www.vdorst.com (Horde Framework) with HTTPS; Fri, 11 Oct 2019 17:21:33 +0000
-Date:   Fri, 11 Oct 2019 17:21:33 +0000
-Message-ID: <20191011172133.Horde.sxiyClHzSJAUvHtYJdMQEbN@www.vdorst.com>
-From:   =?utf-8?b?UmVuw6k=?= van Dorst <opensource@vdorst.com>
-To:     Andy Polyakov <appro@cryptogams.org>
-Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Samuel Neves <sneves@dei.uc.pt>, Arnd Bergmann <arnd@arndb.de>,
-        Eric Biggers <ebiggers@google.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Martin Willi <martin@strongswan.org>
-Subject: Re: [PATCH v3 19/29] crypto: mips/poly1305 - incorporate
- OpenSSL/CRYPTOGAMS optimized implementation
-References: <20191007164610.6881-1-ard.biesheuvel@linaro.org>
- <20191007164610.6881-20-ard.biesheuvel@linaro.org>
- <20191007210242.Horde.FiSEhRSAuhKHgFx9ROLFIco@www.vdorst.com>
- <a1c1ade1-f62a-3422-c161-a1d62ea67203@cryptogams.org>
- <CABb3=+a5zegft0e8ixCVe0xc=FAV1W-bse3x5qhytQ8GKJTJPA@mail.gmail.com>
-In-Reply-To: <CABb3=+a5zegft0e8ixCVe0xc=FAV1W-bse3x5qhytQ8GKJTJPA@mail.gmail.com>
-User-Agent: Horde Application Framework 5
-Content-Type: text/plain; charset=utf-8; format=flowed; DelSp=Yes
+        b=arpX6MgIZZaBsDtWlD7eJ3YuDcPPaePYou4jkD0PQ9bTktRV1qK1QqvXfsu6vjFzL
+         231IQm7fNJt+/TMhJyN0pkZ4y/2TdTPQlGOCUbvslNB6QTmP5f7zzDITxJKZqlBcN7
+         RD5Vdwl6YNn68w3ocp7KzCXXSGWUafEy97ZsuruU=
+Date:   Fri, 11 Oct 2019 10:57:40 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     David Sterba <dsterba@suse.com>
+Cc:     linux-crypto@vger.kernel.org, ard.biesheuvel@linaro.org
+Subject: Re: [PATCH v4 0/5] BLAKE2b generic implementation
+Message-ID: <20191011175739.GA235973@gmail.com>
+Mail-Followup-To: David Sterba <dsterba@suse.com>,
+        linux-crypto@vger.kernel.org, ard.biesheuvel@linaro.org
+References: <cover.1570812094.git.dsterba@suse.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <cover.1570812094.git.dsterba@suse.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Andy,
+On Fri, Oct 11, 2019 at 06:52:03PM +0200, David Sterba wrote:
+> The patchset adds blake2b refrerence implementation and test vectors.
+> 
+> V4:
+> 
+> Code changes:
+> 
+> - removed .finup
+> - removed .cra_init
+> - dropped redundant sanity checks (key length, output size length)
+> - switch blake2b_param from a 1 element array to plain struct
+> - direct assignment in blake2b_init, instead of put_unaligned*
+> - removed blake2b_is_lastblock
+> - removed useless error cases in the blake * helpers
+> - replace digest_desc_ctx with blake2b_state
+> - use __le32 in blake2b_param
+> 
+> Added testmgr vectors:
+> 
+> - all digests covered: 160, 256, 384, 512
+> - 4 different keys:
+>   - empty
+>   - short (1 byte, 'B', 0x42)
+>   - half of the default key (32 bytes, sequence 00..1f)
+>   - default key (64 bytes, sequence 00..3f)
+> - plaintext values:
+>   - subsequences of 0..15 and 247..255
+>   - the full range 0..255 add up to 4MiB of .h, for all digests and key
+>     sizes, so this is not very practical for the in-kernel testsuite
+> - official blake2 provided test vectors are only for empty and default key for
+>   digest size 512
+> - the remaining combinations were obtained from b2sum utility (enhanced to
+>   accept a key)
 
-Quoting Andy Polyakov <appro@cryptogams.org>:
+The choice of data lengths seems a bit unusual, as they include every length in
+two ranges but nothing in between.  Also, none of the lengths except 0 is a
+multiple of the blake2b block size.  Instead, maybe use something like
+[0, 1, 7, 15, 64, 247, 256]?
 
-> Hi,
->
-> On 10/8/19 1:38 PM, Andy Polyakov wrote:
->>>> <snip>
->>>
->>> Hi Ard,
->>>
->>> Is it also an option to include my mip32r2 optimized poly1305 version?
->>>
->>> Below the results which shows a good improvement over the Andy Polyakov
->>> version.
->>> I swapped the poly1305 assembly file and rename the function to
->>> <func_name>_mips
->>> Full WireGuard source with the changes [0]
->>>
->>> bytes |  RvD | openssl | delta | delta / openssl
->>>  ...
->>>  4096 | 9160 | 11755   | -2595 | -22,08%
->
-> Update is pushed to cryptogams. Thanks to René for ideas, feedback and
-> testing! There is even a question about supporting DSP ASE, let's
-> discuss details off-list first.
->
+Also, since the 4 variants share nearly all their code, it seems the tests would
+be just as effective in practice if we cut the test vectors down by 4x by
+distributing the key lengths among each variant.  Like:
 
-Thanks!
-I see that you have found an other spot to save 1 cycle.
+          blake2b-160  blake2b-256  blake2b-384  blake2b-512
+         ---------------------------------------------------
+len=0   | klen=0       klen=1       klen=16      klen=32
+len=1   | klen=16      klen=32      klen=0       klen=1
+len=7   | klen=32      klen=0       klen=1       klen=16
+len=15  | klen=1       klen=16      klen=32      klen=0
+len=64  | klen=0       klen=1       klen=16      klen=32
+len=247 | klen=16      klen=32      klen=0       klen=1
+len=256 | klen=32      klen=0       klen=1       klen=16
 
-Last results: poly1305: 4096 bytes,     188.671 MB/sec,     9066 cycles
+> 
+> Testing performed:
+> 
+> - compiled with SLUB_DEBUG and KASAN, plus crypto selftests
+>   CONFIG_CRYPTO_MANAGER2=y
+>   CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=n
+>   CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
+> - module loaded, no errors reported from the tessuite
+> - (un)intentionally broken test values were detected
+> 
+> The test values were produced by b2sum, compiled from the reference
+> implementation. The generated values were cross-checked by pyblake2
+> based script (ie. not the same sources, built by distro).
+> 
+> The .h portion of testmgr is completely generated, so in case somebody feels
+> like reducing it in size, adding more keys, changing the formatting, it's easy
+> to do.
 
-I also wonder if we can also replace the "li $x, -4" and "and $x" with  
-"sll $x"
-combination on other places like [0], also on line 1169?
+> 
+> In case the patches don't make it to the mailinglist, it's in git
+> 
+>   git://git.kernel.org/pub/scm/linux/kernel/git/kdave/linux.git dev/blake2b-v4
 
-Replace this on line 1169, works on my device.
+Can you please rebase this onto cryptodev/master?
 
--       li      $in0,-4
-         srl     $ctx,$tmp4,2
--       and     $in0,$in0,$tmp4
-         andi    $tmp4,$tmp4,3
-+       sll     $in0, $ctx, 2
-         addu    $ctx,$ctx,$in0
-
-> As for multiply-by-1-n-add.
->
->> I assume that the presented results depict regression after switch to
->> cryptogams module. Right? RvD implementation distinguishes itself in two
->> ways:
->>
->> 1. some of additions in inner loop are replaced with multiply-by-1-n-add;
->> ...
->>
->> I recall attempting 1. and chosen not to do it with following rationale.
->> On processor I have access to, Octeon II, it made no significant
->> difference. It was better, but only marginally. And it's understandable,
->> because Octeon II should have lesser difficulty pairing those additions
->> with multiply-n-add instructions. But since multiplication is an
->> expensive operation, it can be pretty slow, I reckoned that on processor
->> less potent than Octeon II it might be more appropriate to minimize
->> amount of multiplication-n-add instructions.
->
-> As an example, MIPS 1004K manual discusses that that there are two
-> options for multiplier for this core, proper and poor-man's. Proper
-> multiplier unit can issue multiplication or multiplication-n-add each
-> cycle, with multiplication latency apparently being 4. Poor-man's unit
-> on the other hand can issue multiplication each 32nd[!] cycle with
-> corresponding latency. This means that core with poor-man's unit would
-> perform ~13% worse than it could have been. Updated module does use
-> multiply-by-1-n-add, so this note is effectively for reference in case
-> "poor man" wonders.
->
-> Cheers.
-
-Thanks for this information.
-I wonder how many devices do exist with the "poor man" version.
-
-Greats,
-
-René
-
-[0]:  
-https://github.com/dot-asm/cryptogams/blob/d22ade312a7af958ec955620b0d241cf42c37feb/mips/poly1305-mips.pl#L461
-
-
-
+- Eric
