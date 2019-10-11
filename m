@@ -2,49 +2,49 @@ Return-Path: <SRS0=ziyG=YE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FEC4C47404
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Oct 2019 18:04:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42196C47404
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Oct 2019 18:11:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 00C2F21835
-	for <linux-crypto@archiver.kernel.org>; Fri, 11 Oct 2019 18:04:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1429F206CD
+	for <linux-crypto@archiver.kernel.org>; Fri, 11 Oct 2019 18:11:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1570817084;
-	bh=N/VcmY3IQiznewIHsfVNXHOUII7hSi60s1YWdvm/NZA=;
+	s=default; t=1570817475;
+	bh=Vy91gWb39GX55L6RG91h/D2B4BNBN3lQmgOpTzHBEOk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=IpsWjFwUbyzMUx75K4hFA70b5VK3xofBZIi8DNUk2BWpU2j8FRQGFqIKJ4jgp8mhl
-	 XpGru8kfYhX9/uE6QAoA5m93dLMqgS1Qp3bam+6tI0VtO6q+nTuhHwHolalsguJRWG
-	 1GcNrcGddFPr9nxF8Feg0Rk58lsoTP7oDNB7SuMk=
+	b=deEbcixtyFTTfBhy+z5Hzyhou5xxc1+HvNR16F6AAk9csmYoj4Jn7IkTOLs7UyLTn
+	 saobX2g2DEevXzzZpNCiLhMAF6ljJqZhXV1L4Qb1y579wTbahAzYupDy1Cu1ZeowpZ
+	 7YH4Eb93zkxYHRr+DUREGhpzyq0O9OW5pMDaOAXk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728587AbfJKSEn (ORCPT
+        id S1728472AbfJKSLO (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 11 Oct 2019 14:04:43 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39374 "EHLO mail.kernel.org"
+        Fri, 11 Oct 2019 14:11:14 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40302 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728470AbfJKSEn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 11 Oct 2019 14:04:43 -0400
+        id S1728374AbfJKSLN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 11 Oct 2019 14:11:13 -0400
 Received: from gmail.com (unknown [104.132.1.77])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 068CC20659;
-        Fri, 11 Oct 2019 18:04:41 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id F050220659;
+        Fri, 11 Oct 2019 18:11:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1570817082;
-        bh=N/VcmY3IQiznewIHsfVNXHOUII7hSi60s1YWdvm/NZA=;
+        s=default; t=1570817473;
+        bh=Vy91gWb39GX55L6RG91h/D2B4BNBN3lQmgOpTzHBEOk=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=xaWUUYnEj7yTbr6H10WuTCzg0JGu73+KAOGVOH3q69bc+f3ZtPWQU4TtpeaITlYq9
-         PSqWc1TsjAEK3tc9ZrLovm0rRvJ9whZDCXqnhrLtwZ/bzQk328+sNmQUmdf70IVO0f
-         OIPaM34chq0kNc5uuxdnJqp3zs60hREQ9ps1cbQY=
-Date:   Fri, 11 Oct 2019 11:04:40 -0700
+        b=ConMc7KNj22I1kOLdEqcRxj6zXyAh4j8bNIRq/968WYO+LGTZ36qvQTyjvBizT2df
+         ZmIGrsZwWOxSGc9z8rf2+i8gjm+1f2HY0ZZU3v2cE05Ow+MMqYGqsv8KxOFGjN6GOq
+         4dOYKrnoPrdeceHNlcEsz/SEWPMDjo9yD6klrLgc=
+Date:   Fri, 11 Oct 2019 11:11:11 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     David Sterba <dsterba@suse.com>
 Cc:     linux-crypto@vger.kernel.org, ard.biesheuvel@linaro.org
 Subject: Re: [PATCH v4 1/5] crypto: add blake2b generic implementation
-Message-ID: <20191011180439.GB235973@gmail.com>
+Message-ID: <20191011181110.GC235973@gmail.com>
 Mail-Followup-To: David Sterba <dsterba@suse.com>,
         linux-crypto@vger.kernel.org, ard.biesheuvel@linaro.org
 References: <cover.1570812094.git.dsterba@suse.com>
@@ -60,6 +60,59 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 On Fri, Oct 11, 2019 at 06:52:04PM +0200, David Sterba wrote:
+> The patch brings support of several BLAKE2 variants (2b with various
+> digest lengths).  The keyed digest is supported, using tfm->setkey call.
+> The in-tree user will be btrfs (for checksumming), we're going to use
+> the BLAKE2b-256 variant.
+> 
+> The code is reference implementation taken from the official sources and
+> modified in terms of kernel coding style (whitespace, comments, uintXX_t
+> -> uXX types, removed unused prototypes and #ifdefs, removed testing
+> code, changed secure_zero_memory -> memzero_explicit, used own helpers
+> for unaligned reads/writes and rotations).
+> 
+> Further changes removed sanity checks of key length or output size,
+> these values are verified in the crypto API callbacks or hardcoded in
+> shash_alg and not exposed to users.
+> 
+> Signed-off-by: David Sterba <dsterba@suse.com>
+> ---
+>  crypto/Kconfig           |  17 ++
+>  crypto/Makefile          |   1 +
+>  crypto/blake2b_generic.c | 418 +++++++++++++++++++++++++++++++++++++++
+>  include/crypto/blake2b.h |  48 +++++
+>  4 files changed, 484 insertions(+)
+>  create mode 100644 crypto/blake2b_generic.c
+>  create mode 100644 include/crypto/blake2b.h
+> 
+> diff --git a/crypto/Kconfig b/crypto/Kconfig
+> index e801450bcb1c..192cbb824928 100644
+> --- a/crypto/Kconfig
+> +++ b/crypto/Kconfig
+> @@ -691,6 +691,23 @@ config CRYPTO_XXHASH
+>  	  xxHash non-cryptographic hash algorithm. Extremely fast, working at
+>  	  speeds close to RAM limits.
+>  
+> +config CRYPTO_BLAKE2B
+> +	tristate "BLAKE2b digest algorithm"
+> +	select CRYPTO_HASH
+> +	help
+> +	  Implementation of cryptographic hash function BLAKE2b (or just BLAKE2),
+> +	  optimized for 64bit platforms and can produce digests of any size
+> +	  between 1 to 64.  The keyed hash is also implemented.
+> +
+> +	  This module provides the following algorithms:
+> +
+> +	  - blake2b-160
+> +	  - blake2b-256
+> +	  - blake2b-384
+> +	  - blake2b-512
+> +
+> +	  See https://blake2.net for further information.
+> +
+>  config CRYPTO_CRCT10DIF
+>  	tristate "CRCT10DIF algorithm"
+>  	select CRYPTO_HASH
 > diff --git a/crypto/Makefile b/crypto/Makefile
 > index 9479e1a45d8c..2318420d3e71 100644
 > --- a/crypto/Makefile
@@ -93,60 +146,11 @@ On Fri, Oct 11, 2019 at 06:52:04PM +0200, David Sterba wrote:
 > + * More information about the BLAKE2 hash function can be found at
 > + * https://blake2.net.
 > + */
-> +
-> +#include <asm/unaligned.h>
-> +#include <linux/module.h>
-> +#include <linux/string.h>
-> +#include <linux/kernel.h>
-> +#include <linux/bitops.h>
-> +#include <crypto/internal/hash.h>
-> +#include <crypto/blake2b.h>
-> +
-> +struct blake2b_param
-> +{
 
-It should be 'struct blake2b_param {'
+Can you also adjust this comment to make it clear that this isn't the reference
+implementation verbatim, but rather it's been modified for inclusion in the
+kernel?
 
-checkpatch.pl should warn about this.  Can you fix the checkpatch warnings that
-make sense to fix?
-
-> +/* init xors IV with input parameter block */
-> +static int blake2b_init_param(struct blake2b_state *S,
-> +			      const struct blake2b_param *P)
-> +{
-> +	const u8 *p = (const u8 *)(P);
-> +	size_t i;
-> +
-> +	blake2b_init0(S);
-> +
-> +	/* IV XOR ParamBlock */
-> +	for (i = 0; i < 8; ++i)
-> +		S->h[i] ^= get_unaligned_le64(p + sizeof(S->h[i]) * i);
-> +
-> +	S->outlen = P->digest_length;
-> +	return 0;
-> +}
-
-No need for this to have a return value anymore.  Same with:
-
-	blake2b_init_param()
-	blake2b_update()
-	blake2b_init()
-	blake2b_init_key()
-	blake2b_final()
-
-The code would be more readable if they returned void, since otherwise it gives
-the impression that errors can occur.
-
-> +static int blake2b_update(struct blake2b_state *S, const void *pin, size_t inlen)
-> +{
-> +	const unsigned char *in = (const unsigned char *)pin;
-
-Convention is to use 'u8', not 'unsigned char'.
-
-> +MODULE_ALIAS_CRYPTO("blake2b");
-> +MODULE_ALIAS_CRYPTO("blake2b-generic");
-
-Should remove these module aliases now that the "blake2b" algorithm was removed.
+Thanks!
 
 - Eric
