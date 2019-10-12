@@ -2,61 +2,60 @@ Return-Path: <SRS0=sxdd=YF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88E55C10F14
-	for <linux-crypto@archiver.kernel.org>; Sat, 12 Oct 2019 18:49:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5AB4C10F14
+	for <linux-crypto@archiver.kernel.org>; Sat, 12 Oct 2019 18:49:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 67FC02087E
-	for <linux-crypto@archiver.kernel.org>; Sat, 12 Oct 2019 18:49:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B11721D56
+	for <linux-crypto@archiver.kernel.org>; Sat, 12 Oct 2019 18:49:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NPNVLmWA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="q+Ha2zc+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729586AbfJLStE (ORCPT
+        id S1729516AbfJLStC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 12 Oct 2019 14:49:04 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:40671 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729528AbfJLStE (ORCPT
+        Sat, 12 Oct 2019 14:49:02 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:41080 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729324AbfJLStB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 12 Oct 2019 14:49:04 -0400
-Received: by mail-wm1-f65.google.com with SMTP id b24so13036073wmj.5;
-        Sat, 12 Oct 2019 11:49:01 -0700 (PDT)
+        Sat, 12 Oct 2019 14:49:01 -0400
+Received: by mail-wr1-f66.google.com with SMTP id q9so15251534wrm.8;
+        Sat, 12 Oct 2019 11:48:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=XSMaBnNcLIC/2A/YQA0ncniU4wnlx2r73tbiVGv77iU=;
-        b=NPNVLmWAeFcXj3knWuqJnAxJ+1GylRrTwiTa77k1yTT3oxlyyyBt8UNmnledAaDpI1
-         u6djkoPktc+ZxrfozJgsNZTrWPituND1cSkVXNqka6R00deTXKitvsGSNk3+t0qPVyW8
-         yT7XSpCqhxzmpJpriicVF036kpd4rUTTMWSXi+T2cFU5hpL/5lUGiUOEJ/W6JBcGWYhl
-         3vAHmdsKXaouQWUf/de7nSu2uvT4Uo/S9AevCKik2kgA2uR+3SBp60kTeEnNnf1bRyYO
-         jOKz3Ex8yRvHwQI90qtb1BAs2iTY6ePGgL3ShQ+9AfQF5dXluk5hqD/AULQ4qleu/JmN
-         7h7w==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=mHmZ3uVIQl1nvwGBNhAHxx/afaDHfmZCLHq24Dj1FMI=;
+        b=q+Ha2zc+dWj+dyzbrh3ZNn1S+Bzn1xBq2dQzR3LCeh7MYXCZ4IFdppgnp6Wg/6w9Rg
+         Vmyv7xd7xbLmPYLCMpnBnsx2+UgB2fiZQxKDTpl9kuZcfOcxFt/lOm+4QGVn1zStLSJG
+         S/eoaVnaDDHrzYOIxStNfytJfsmztaB0vR9bWPPTo3jxct8fncUfaUpHnuaaDo7UZKle
+         +e+QnAcWbX8VtW0gg0Pdo14r1Un9fv+UnBwyx9Tl7cPfQO2/mG1+n6EBQmcnhjDXAm7a
+         Xu1KQKlZ51z0ncJI5QDaLmRs2/vlxJWPxmI5mL77uv6jjkyiC0k3bwlczGEX0kFW6OzI
+         Ujpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=XSMaBnNcLIC/2A/YQA0ncniU4wnlx2r73tbiVGv77iU=;
-        b=niml7z4aHa6AV4r9pDi+MCqURS/Wo8Rj06kgZgnr1pX+QwpVUYFYDIPybfj1t7d+8I
-         BuhX685PKFtb4sT5ExhtDajVRUZs2rwOmS71t3aRQFereUBMI5CfvYtsAIm/DfCrYejq
-         Hs9bRqiXoIJIeKmdv4JsSX4D74YjjIc3uPRECMgUqUNQnOVqoY3kWPaQNDaPgKV9P+76
-         +63pLPaVJdobze18B4dY75lhCoc3Y8lvqvljcK5524DYTQ035gH5ncfwsaVcAlLZNDbA
-         4s7D59U6RaG0BVyvBBg+NVZjK02ZxV++fdnlrClyeNrEcqqXbpJmziPJBP+JPhjz+NMm
-         GTWg==
-X-Gm-Message-State: APjAAAX0sHAcWXnTdG6auxX8nBwQ1h8PLwTiWF2WqGFdXMy+K0RKBYeW
-        a0UyZSl9sYSU3roBz+iNM0Q=
-X-Google-Smtp-Source: APXvYqxgq2hv3i+rHpHikEMKw1s6a8GqUoLKsHkTq1qlgD7lEHfX/LfAbBnGE7cDTzg8cuhDZLNTzg==
-X-Received: by 2002:a7b:cd04:: with SMTP id f4mr8103167wmj.91.1570906141381;
-        Sat, 12 Oct 2019 11:49:01 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=mHmZ3uVIQl1nvwGBNhAHxx/afaDHfmZCLHq24Dj1FMI=;
+        b=rc55dCWpXvj5aB0fZHDCdIfIBf8SleL/dYCOrc06yaGTAfZMzjapwVbx2y7KWOaYxp
+         j1OBMUNoXuVEgfncaKXC/PcH3MP58LKVd7/Cjqn9hEFgDYs7+8XMb1EKRrD3xcMQyCOl
+         p3QUpKto849h3uNgGvvrI1IN3HdrOGCIKnlV+JOAi9APy6b6lsw3IP19G8ZBq+HcSz3p
+         YIzWijRbJs5vYtX/1unXperixfmiXQcwIgESLUDZAVJNTF20wAnV+u2w3b7sw50x5KEF
+         tKE4EFiKvx7pyf7QwgAH325hPxrDZYrCoqhCGI/chCe21DTIkKnjWVTvFc8CtR364PU/
+         krMA==
+X-Gm-Message-State: APjAAAU8Yk8+yoWaYIxn1YMCRPXuYY8+v1eLAxJW+Q+dyvATFn0bKThM
+        5oAG1JCllCeP34j/81bxeoI=
+X-Google-Smtp-Source: APXvYqwnVp1c9C0rNWKN0cNV/Ida3rboGEScQOkBtQkk8V3Zds5+oSLMnivS1fle7h5/sTJfT3lBVg==
+X-Received: by 2002:adf:ff82:: with SMTP id j2mr19206357wrr.356.1570906136564;
+        Sat, 12 Oct 2019 11:48:56 -0700 (PDT)
 Received: from Red.localdomain ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id a13sm33670580wrf.73.2019.10.12.11.49.00
+        by smtp.googlemail.com with ESMTPSA id a13sm33670580wrf.73.2019.10.12.11.48.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 12 Oct 2019 11:49:00 -0700 (PDT)
+        Sat, 12 Oct 2019 11:48:55 -0700 (PDT)
 From:   Corentin Labbe <clabbe.montjoie@gmail.com>
 To:     catalin.marinas@arm.com, davem@davemloft.net,
         herbert@gondor.apana.org.au, linux@armlinux.org.uk,
@@ -65,14 +64,11 @@ To:     catalin.marinas@arm.com, davem@davemloft.net,
 Cc:     devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-sunxi@googlegroups.com,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Rob Herring <robh@kernel.org>
-Subject: [PATCH v4 03/11] dt-bindings: crypto: Add DT bindings documentation for sun8i-ce Crypto Engine
-Date:   Sat, 12 Oct 2019 20:48:44 +0200
-Message-Id: <20191012184852.28329-4-clabbe.montjoie@gmail.com>
+        Corentin Labbe <clabbe.montjoie@gmail.com>
+Subject: [PATCH v4 00/11] crypto: add sun8i-ce driver for Allwinner crypto engine
+Date:   Sat, 12 Oct 2019 20:48:41 +0200
+Message-Id: <20191012184852.28329-1-clabbe.montjoie@gmail.com>
 X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20191012184852.28329-1-clabbe.montjoie@gmail.com>
-References: <20191012184852.28329-1-clabbe.montjoie@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
@@ -80,110 +76,109 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch adds documentation for Device-Tree bindings for the
-Crypto Engine cryptographic accelerator driver.
+Hello
 
-Reviewed-by: Rob Herring <robh@kernel.org>
-Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
----
- .../bindings/crypto/allwinner,sun8i-ce.yaml   | 88 +++++++++++++++++++
- 1 file changed, 88 insertions(+)
+This patch serie adds support for the Allwinner crypto engine.
+The Crypto Engine is the third generation of Allwinner cryptogaphic offloader.
+The first generation is the Security System already handled by the
+sun4i-ss driver.
+The second is named also Security System and is present on A80 and A83T
+SoCs, originaly this driver supported it also, but supporting both IP bringing
+too much complexity and another driver (sun8i-ss) will came for it.
+
+For the moment, the driver support only DES3/AES in ECB/CBC mode.
+Patchs for CTR/CTS/XTS, RSA and RNGs will came later.
+
+This serie is tested with CRYPTO_MANAGER_EXTRA_TESTS
+and tested on:
+sun50i-a64-bananapi-m64
+sun50i-a64-pine64-plus
+sun50i-h5-libretech-all-h3-cc
+sun50i-h6-pine-h64
+sun8i-h2-plus-libretech-all-h3-cc
+sun8i-h2-plus-orangepi-r1
+sun8i-h2-plus-orangepi-zero
+sun8i-h3-libretech-all-h3-cc
+sun8i-h3-orangepi-pc
+sun8i-r40-bananapi-m2-ultra
+
+Regards
+
+Changes since v3:
+- removed need of reset-names
+- switched from optional reset to mandatory
+
+Changes since v2:
+- changed additionalproperties
+- splited fallbacks functions out of sun8i_ce_cipher()
+- changed variant "model" to "has_t_dlen_in_bytes"
+- splited sun8i_ce_register_algs/sun8i_ce_get_clks out of sun8i_ce_probe()
+
+Changes since v1:
+- Add sun4i-ss to allwinner directory
+- Cleaned variant structure
+- Renamed clock name from ahb to bus (and mbus to ram)
+- Fixed DT bindings problem reported by mripard
+- Cleaned unneeded status = ""  in R40 DT
+- Removed old unnecessary interrupt_names in A64 DT
+- Added arm64 defconfig
+- Added support for PM functions
+- Splitted probe functions
+- Reworked clock settings
+- made reset mandatory
+
+Corentin Labbe (11):
+  crypto: Add allwinner subdirectory
+  crypto: Add Allwinner sun8i-ce Crypto Engine
+  dt-bindings: crypto: Add DT bindings documentation for sun8i-ce Crypto
+    Engine
+  ARM: dts: sun8i: R40: add crypto engine node
+  ARM: dts: sun8i: H3: Add Crypto Engine node
+  ARM64: dts: allwinner: sun50i: Add Crypto Engine node on A64
+  ARM64: dts: allwinner: sun50i: Add crypto engine node on H5
+  ARM64: dts: allwinner: sun50i: Add Crypto Engine node on H6
+  sunxi_defconfig: add new Allwinner crypto options
+  arm64: defconfig: add new Allwinner crypto options
+  crypto: sun4i-ss: Move to Allwinner directory
+
+ .../bindings/crypto/allwinner,sun8i-ce.yaml   |  88 +++
+ MAINTAINERS                                   |   4 +-
+ arch/arm/boot/dts/sun8i-h3.dtsi               |   9 +
+ arch/arm/boot/dts/sun8i-r40.dtsi              |   9 +
+ arch/arm/configs/sunxi_defconfig              |   2 +
+ arch/arm64/boot/dts/allwinner/sun50i-a64.dtsi |   9 +
+ arch/arm64/boot/dts/allwinner/sun50i-h5.dtsi  |   9 +
+ arch/arm64/boot/dts/allwinner/sun50i-h6.dtsi  |   9 +
+ arch/arm64/configs/defconfig                  |   2 +
+ drivers/crypto/Kconfig                        |  28 +-
+ drivers/crypto/Makefile                       |   2 +-
+ drivers/crypto/allwinner/Kconfig              |  60 ++
+ drivers/crypto/allwinner/Makefile             |   2 +
+ .../{sunxi-ss => allwinner/sun4i-ss}/Makefile |   0
+ .../sun4i-ss}/sun4i-ss-cipher.c               |   0
+ .../sun4i-ss}/sun4i-ss-core.c                 |   0
+ .../sun4i-ss}/sun4i-ss-hash.c                 |   0
+ .../sun4i-ss}/sun4i-ss-prng.c                 |   0
+ .../sun4i-ss}/sun4i-ss.h                      |   0
+ drivers/crypto/allwinner/sun8i-ce/Makefile    |   2 +
+ .../allwinner/sun8i-ce/sun8i-ce-cipher.c      | 434 +++++++++++
+ .../crypto/allwinner/sun8i-ce/sun8i-ce-core.c | 677 ++++++++++++++++++
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h  | 254 +++++++
+ 23 files changed, 1571 insertions(+), 29 deletions(-)
  create mode 100644 Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml
+ create mode 100644 drivers/crypto/allwinner/Kconfig
+ create mode 100644 drivers/crypto/allwinner/Makefile
+ rename drivers/crypto/{sunxi-ss => allwinner/sun4i-ss}/Makefile (100%)
+ rename drivers/crypto/{sunxi-ss => allwinner/sun4i-ss}/sun4i-ss-cipher.c (100%)
+ rename drivers/crypto/{sunxi-ss => allwinner/sun4i-ss}/sun4i-ss-core.c (100%)
+ rename drivers/crypto/{sunxi-ss => allwinner/sun4i-ss}/sun4i-ss-hash.c (100%)
+ rename drivers/crypto/{sunxi-ss => allwinner/sun4i-ss}/sun4i-ss-prng.c (100%)
+ rename drivers/crypto/{sunxi-ss => allwinner/sun4i-ss}/sun4i-ss.h (100%)
+ create mode 100644 drivers/crypto/allwinner/sun8i-ce/Makefile
+ create mode 100644 drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+ create mode 100644 drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
+ create mode 100644 drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
 
-diff --git a/Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml b/Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml
-new file mode 100644
-index 000000000000..2c459b8c76ff
---- /dev/null
-+++ b/Documentation/devicetree/bindings/crypto/allwinner,sun8i-ce.yaml
-@@ -0,0 +1,88 @@
-+# SPDX-License-Identifier: GPL-2.0
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/crypto/allwinner,sun8i-ce.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Allwinner Crypto Engine driver
-+
-+maintainers:
-+  - Corentin Labbe <clabbe.montjoie@gmail.com>
-+
-+properties:
-+  compatible:
-+    enum:
-+      - allwinner,sun8i-h3-crypto
-+      - allwinner,sun8i-r40-crypto
-+      - allwinner,sun50i-a64-crypto
-+      - allwinner,sun50i-h5-crypto
-+      - allwinner,sun50i-h6-crypto
-+
-+  reg:
-+    maxItems: 1
-+
-+  interrupts:
-+    maxItems: 1
-+
-+  clocks:
-+    items:
-+      - description: Bus clock
-+      - description: Module clock
-+      - description: MBus clock
-+    minItems: 2
-+    maxItems: 3
-+
-+  clock-names:
-+    items:
-+      - const: bus
-+      - const: mod
-+      - const: ram
-+    minItems: 2
-+    maxItems: 3
-+
-+  resets:
-+    maxItems: 1
-+
-+if:
-+  properties:
-+    compatible:
-+      items:
-+        const: allwinner,sun50i-h6-crypto
-+then:
-+  properties:
-+      clocks:
-+        minItems: 3
-+      clock-names:
-+        minItems: 3
-+else:
-+  properties:
-+      clocks:
-+        maxItems: 2
-+      clock-names:
-+        maxItems: 2
-+
-+required:
-+  - compatible
-+  - reg
-+  - interrupts
-+  - clocks
-+  - clock-names
-+  - resets
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/interrupt-controller/arm-gic.h>
-+    #include <dt-bindings/clock/sun50i-a64-ccu.h>
-+    #include <dt-bindings/reset/sun50i-a64-ccu.h>
-+
-+    crypto: crypto@1c15000 {
-+      compatible = "allwinner,sun8i-h3-crypto";
-+      reg = <0x01c15000 0x1000>;
-+      interrupts = <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>;
-+      clocks = <&ccu CLK_BUS_CE>, <&ccu CLK_CE>;
-+      clock-names = "bus", "mod";
-+      resets = <&ccu RST_BUS_CE>;
-+    };
-+
 -- 
 2.21.0
 
