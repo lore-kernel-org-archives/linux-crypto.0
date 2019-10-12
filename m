@@ -7,46 +7,46 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C9CAECE58E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36349C4360C
 	for <linux-crypto@archiver.kernel.org>; Sat, 12 Oct 2019 04:41:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D2A3A2196E
-	for <linux-crypto@archiver.kernel.org>; Sat, 12 Oct 2019 04:41:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 10A0421929
+	for <linux-crypto@archiver.kernel.org>; Sat, 12 Oct 2019 04:41:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1570855271;
-	bh=y0235GUogeMoqZc3owSRi2xbCa6cwfIzCRjmHMUWYdw=;
+	s=default; t=1570855272;
+	bh=1hlzgq2LYH5GVOkMkyG2e2fWkA8zR4XPX+VOzIVFiO4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=wWrw70JKJ0jVb7nVuxUXpezbWdBk2ysjOMz9epRkgCMG2MZd9eL3HYg5D4z1UgB0F
-	 kKrDFUZoEzYE3afOWfdkW1JOHN9/1NC6PWSRGtcIG/afCE+n6Hj/spMm71AsgDSzCY
-	 UolPMH8JUaoej80ALm2FacNYr+gVugoFgd7si4sA=
+	b=19g6/ssdQ4em5y9naOU799EjwfVTMr1i4bCOBY/KDXIDdPsFQJ6hb2ZOVrvJtd73Y
+	 nzAkiB97PiwggKSHefysDUQVQpYlrUD4x1dU9PiytrqGFPeU34xhQaka7eq/04JjXA
+	 yFdJeSNh+FnkSW9llrtGSV3YNasjcDQZglJZ88Eo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727262AbfJLElJ (ORCPT
+        id S1726269AbfJLElJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Sat, 12 Oct 2019 00:41:09 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33092 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:33080 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727440AbfJLElI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1727262AbfJLElI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Sat, 12 Oct 2019 00:41:08 -0400
 Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 771762190F;
-        Sat, 12 Oct 2019 04:41:07 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id CBE4B2087E;
+        Sat, 12 Oct 2019 04:41:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=default; t=1570855267;
-        bh=y0235GUogeMoqZc3owSRi2xbCa6cwfIzCRjmHMUWYdw=;
+        bh=1hlzgq2LYH5GVOkMkyG2e2fWkA8zR4XPX+VOzIVFiO4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=2f8eKKNAQ3HbVhcVTRVwfKu2tYk7IaeuDpMzqmWlNlL3WG50HruMwWTdeRcNcwOsJ
-         nOECE8GaHoc9Q3LR8zHp9bd+TGx0WIf1PS+8Ib9pdlc2beqbaWv4prCNbsNicOQb9B
-         5jgRMoi6io6292nrAYIFnDeZHPuK3BwAUhaxeaJI=
+        b=ova5JKAYOTvzewHMSa9w6eT7NacOL8lF8orC02QjoOEPSKdYol8mA9jNPb1QwndEi
+         qkLzQcAqCsPMqLrVOmdaVDiccUWjs1pTdxqM85Zj1LTKvvFyiCCl7/GaLg4oC812NQ
+         76jyMud757NS3L4zsg7BKw1yRwEPGMSk+h6yTTo8=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         linux-crypto@vger.kernel.org
 Cc:     sparclinux@vger.kernel.org,
         "David S . Miller" <davem@davemloft.net>
-Subject: [RFT PATCH 3/3] crypto: sparc/des - convert to skcipher API
-Date:   Fri, 11 Oct 2019 21:38:50 -0700
-Message-Id: <20191012043850.340957-4-ebiggers@kernel.org>
+Subject: [RFT PATCH 1/3] crypto: sparc/aes - convert to skcipher API
+Date:   Fri, 11 Oct 2019 21:38:48 -0700
+Message-Id: <20191012043850.340957-2-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20191012043850.340957-1-ebiggers@kernel.org>
 References: <20191012043850.340957-1-ebiggers@kernel.org>
@@ -59,57 +59,57 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-Convert the glue code for the SPARC64 DES opcodes implementations of
-DES-ECB, DES-CBC, 3DES-ECB, and 3DES-CBC from the deprecated "blkcipher"
-API to the "skcipher" API.  This is needed in order for the blkcipher
-API to be removed.
+Convert the glue code for the SPARC64 AES opcodes implementations of
+AES-ECB, AES-CBC, and AES-CTR from the deprecated "blkcipher" API to the
+"skcipher" API.  This is needed in order for the blkcipher API to be
+removed.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/sparc/crypto/des_glue.c | 499 ++++++++++++++++-------------------
- crypto/Kconfig               |   1 +
- 2 files changed, 228 insertions(+), 272 deletions(-)
+ arch/sparc/crypto/aes_glue.c | 310 ++++++++++++++++-------------------
+ crypto/Kconfig               |   3 +-
+ 2 files changed, 144 insertions(+), 169 deletions(-)
 
-diff --git a/arch/sparc/crypto/des_glue.c b/arch/sparc/crypto/des_glue.c
-index db6010b4e52e..a499102bf706 100644
---- a/arch/sparc/crypto/des_glue.c
-+++ b/arch/sparc/crypto/des_glue.c
-@@ -13,6 +13,7 @@
+diff --git a/arch/sparc/crypto/aes_glue.c b/arch/sparc/crypto/aes_glue.c
+index 7b946b3dee9d..0f5a501c95a9 100644
+--- a/arch/sparc/crypto/aes_glue.c
++++ b/arch/sparc/crypto/aes_glue.c
+@@ -24,6 +24,7 @@
  #include <linux/types.h>
  #include <crypto/algapi.h>
- #include <crypto/internal/des.h>
+ #include <crypto/aes.h>
 +#include <crypto/internal/skcipher.h>
  
  #include <asm/fpumacro.h>
  #include <asm/pstate.h>
-@@ -61,6 +62,12 @@ static int des_set_key(struct crypto_tfm *tfm, const u8 *key,
+@@ -197,6 +198,12 @@ static int aes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
  	return 0;
  }
  
-+static int des_set_key_skcipher(struct crypto_skcipher *tfm, const u8 *key,
-+				unsigned int keylen)
++static int aes_set_key_skcipher(struct crypto_skcipher *tfm, const u8 *in_key,
++				unsigned int key_len)
 +{
-+	return des_set_key(crypto_skcipher_tfm(tfm), key, keylen);
++	return aes_set_key(crypto_skcipher_tfm(tfm), in_key, key_len);
 +}
 +
- extern void des_sparc64_crypt(const u64 *key, const u64 *input,
- 			      u64 *output);
- 
-@@ -85,113 +92,90 @@ extern void des_sparc64_load_keys(const u64 *key);
- extern void des_sparc64_ecb_crypt(const u64 *input, u64 *output,
- 				  unsigned int len);
- 
--#define DES_BLOCK_MASK	(~(DES_BLOCK_SIZE - 1))
--
--static int __ecb_crypt(struct blkcipher_desc *desc,
--		       struct scatterlist *dst, struct scatterlist *src,
--		       unsigned int nbytes, bool encrypt)
-+static int __ecb_crypt(struct skcipher_request *req, bool encrypt)
+ static void crypto_aes_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
  {
--	struct des_sparc64_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
+ 	struct crypto_sparc64_aes_ctx *ctx = crypto_tfm_ctx(tfm);
+@@ -211,131 +218,108 @@ static void crypto_aes_decrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
+ 	ctx->ops->decrypt(&ctx->key[0], (const u32 *) src, (u32 *) dst);
+ }
+ 
+-#define AES_BLOCK_MASK	(~(AES_BLOCK_SIZE-1))
+-
+-static int ecb_encrypt(struct blkcipher_desc *desc,
+-		       struct scatterlist *dst, struct scatterlist *src,
+-		       unsigned int nbytes)
++static int ecb_encrypt(struct skcipher_request *req)
+ {
+-	struct crypto_sparc64_aes_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
 -	struct blkcipher_walk walk;
 +	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	const struct des_sparc64_ctx *ctx = crypto_skcipher_ctx(tfm);
++	const struct crypto_sparc64_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
 +	struct skcipher_walk walk;
 +	unsigned int nbytes;
  	int err;
@@ -121,36 +121,26 @@ index db6010b4e52e..a499102bf706 100644
 +	if (err)
 +		return err;
  
- 	if (encrypt)
- 		des_sparc64_load_keys(&ctx->encrypt_expkey[0]);
- 	else
- 		des_sparc64_load_keys(&ctx->decrypt_expkey[0]);
+ 	ctx->ops->load_encrypt_keys(&ctx->key[0]);
 -	while ((nbytes = walk.nbytes)) {
--		unsigned int block_len = nbytes & DES_BLOCK_MASK;
+-		unsigned int block_len = nbytes & AES_BLOCK_MASK;
 -
 -		if (likely(block_len)) {
--			des_sparc64_ecb_crypt((const u64 *)walk.src.virt.addr,
+-			ctx->ops->ecb_encrypt(&ctx->key[0],
+-					      (const u64 *)walk.src.virt.addr,
 -					      (u64 *) walk.dst.virt.addr,
 -					      block_len);
 -		}
--		nbytes &= DES_BLOCK_SIZE - 1;
+-		nbytes &= AES_BLOCK_SIZE - 1;
 -		err = blkcipher_walk_done(desc, &walk, nbytes);
 +	while ((nbytes = walk.nbytes) != 0) {
-+		des_sparc64_ecb_crypt(walk.src.virt.addr, walk.dst.virt.addr,
-+				      round_down(nbytes, DES_BLOCK_SIZE));
-+		err = skcipher_walk_done(&walk, nbytes % DES_BLOCK_SIZE);
++		ctx->ops->ecb_encrypt(&ctx->key[0], walk.src.virt.addr,
++				      walk.dst.virt.addr,
++				      round_down(nbytes, AES_BLOCK_SIZE));
++		err = skcipher_walk_done(&walk, nbytes % AES_BLOCK_SIZE);
  	}
  	fprs_write(0);
  	return err;
- }
- 
--static int ecb_encrypt(struct blkcipher_desc *desc,
--		       struct scatterlist *dst, struct scatterlist *src,
--		       unsigned int nbytes)
-+static int ecb_encrypt(struct skcipher_request *req)
- {
--	return __ecb_crypt(desc, dst, src, nbytes, true);
-+	return __ecb_crypt(req, true);
  }
  
 -static int ecb_decrypt(struct blkcipher_desc *desc,
@@ -158,25 +148,55 @@ index db6010b4e52e..a499102bf706 100644
 -		       unsigned int nbytes)
 +static int ecb_decrypt(struct skcipher_request *req)
  {
--	return __ecb_crypt(desc, dst, src, nbytes, false);
-+	return __ecb_crypt(req, false);
- }
+-	struct crypto_sparc64_aes_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
+-	struct blkcipher_walk walk;
+-	u64 *key_end;
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	const struct crypto_sparc64_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
++	const u64 *key_end;
++	struct skcipher_walk walk;
++	unsigned int nbytes;
+ 	int err;
  
- extern void des_sparc64_cbc_encrypt(const u64 *input, u64 *output,
- 				    unsigned int len, u64 *iv);
+-	blkcipher_walk_init(&walk, dst, src, nbytes);
+-	err = blkcipher_walk_virt(desc, &walk);
+-	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
++	err = skcipher_walk_virt(&walk, req, true);
++	if (err)
++		return err;
+ 
+ 	ctx->ops->load_decrypt_keys(&ctx->key[0]);
+ 	key_end = &ctx->key[ctx->expanded_key_length / sizeof(u64)];
+-	while ((nbytes = walk.nbytes)) {
+-		unsigned int block_len = nbytes & AES_BLOCK_MASK;
+-
+-		if (likely(block_len)) {
+-			ctx->ops->ecb_decrypt(key_end,
+-					      (const u64 *) walk.src.virt.addr,
+-					      (u64 *) walk.dst.virt.addr, block_len);
+-		}
+-		nbytes &= AES_BLOCK_SIZE - 1;
+-		err = blkcipher_walk_done(desc, &walk, nbytes);
++	while ((nbytes = walk.nbytes) != 0) {
++		ctx->ops->ecb_decrypt(key_end, walk.src.virt.addr,
++				      walk.dst.virt.addr,
++				      round_down(nbytes, AES_BLOCK_SIZE));
++		err = skcipher_walk_done(&walk, nbytes % AES_BLOCK_SIZE);
+ 	}
+ 	fprs_write(0);
+ 
+ 	return err;
+ }
  
 -static int cbc_encrypt(struct blkcipher_desc *desc,
 -		       struct scatterlist *dst, struct scatterlist *src,
 -		       unsigned int nbytes)
-+extern void des_sparc64_cbc_decrypt(const u64 *input, u64 *output,
-+				    unsigned int len, u64 *iv);
-+
-+static int __cbc_crypt(struct skcipher_request *req, bool encrypt)
++static int cbc_encrypt(struct skcipher_request *req)
  {
--	struct des_sparc64_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
+-	struct crypto_sparc64_aes_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
 -	struct blkcipher_walk walk;
 +	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	const struct des_sparc64_ctx *ctx = crypto_skcipher_ctx(tfm);
++	const struct crypto_sparc64_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
 +	struct skcipher_walk walk;
 +	unsigned int nbytes;
  	int err;
@@ -184,110 +204,45 @@ index db6010b4e52e..a499102bf706 100644
 -	blkcipher_walk_init(&walk, dst, src, nbytes);
 -	err = blkcipher_walk_virt(desc, &walk);
 -	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
--
--	des_sparc64_load_keys(&ctx->encrypt_expkey[0]);
--	while ((nbytes = walk.nbytes)) {
--		unsigned int block_len = nbytes & DES_BLOCK_MASK;
 +	err = skcipher_walk_virt(&walk, req, true);
 +	if (err)
 +		return err;
  
+ 	ctx->ops->load_encrypt_keys(&ctx->key[0]);
+-	while ((nbytes = walk.nbytes)) {
+-		unsigned int block_len = nbytes & AES_BLOCK_MASK;
+-
 -		if (likely(block_len)) {
--			des_sparc64_cbc_encrypt((const u64 *)walk.src.virt.addr,
--						(u64 *) walk.dst.virt.addr,
--						block_len, (u64 *) walk.iv);
+-			ctx->ops->cbc_encrypt(&ctx->key[0],
+-					      (const u64 *)walk.src.virt.addr,
+-					      (u64 *) walk.dst.virt.addr,
+-					      block_len, (u64 *) walk.iv);
 -		}
--		nbytes &= DES_BLOCK_SIZE - 1;
+-		nbytes &= AES_BLOCK_SIZE - 1;
 -		err = blkcipher_walk_done(desc, &walk, nbytes);
-+	if (encrypt)
-+		des_sparc64_load_keys(&ctx->encrypt_expkey[0]);
-+	else
-+		des_sparc64_load_keys(&ctx->decrypt_expkey[0]);
 +	while ((nbytes = walk.nbytes) != 0) {
-+		if (encrypt)
-+			des_sparc64_cbc_encrypt(walk.src.virt.addr,
-+						walk.dst.virt.addr,
-+						round_down(nbytes,
-+							   DES_BLOCK_SIZE),
-+						walk.iv);
-+		else
-+			des_sparc64_cbc_decrypt(walk.src.virt.addr,
-+						walk.dst.virt.addr,
-+						round_down(nbytes,
-+							   DES_BLOCK_SIZE),
-+						walk.iv);
-+		err = skcipher_walk_done(&walk, nbytes % DES_BLOCK_SIZE);
++		ctx->ops->cbc_encrypt(&ctx->key[0], walk.src.virt.addr,
++				      walk.dst.virt.addr,
++				      round_down(nbytes, AES_BLOCK_SIZE),
++				      walk.iv);
++		err = skcipher_walk_done(&walk, nbytes % AES_BLOCK_SIZE);
  	}
  	fprs_write(0);
  	return err;
  }
  
--extern void des_sparc64_cbc_decrypt(const u64 *input, u64 *output,
--				    unsigned int len, u64 *iv);
--
 -static int cbc_decrypt(struct blkcipher_desc *desc,
 -		       struct scatterlist *dst, struct scatterlist *src,
 -		       unsigned int nbytes)
-+static int cbc_encrypt(struct skcipher_request *req)
- {
--	struct des_sparc64_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
--	struct blkcipher_walk walk;
--	int err;
--
--	blkcipher_walk_init(&walk, dst, src, nbytes);
--	err = blkcipher_walk_virt(desc, &walk);
--	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
--
--	des_sparc64_load_keys(&ctx->decrypt_expkey[0]);
--	while ((nbytes = walk.nbytes)) {
--		unsigned int block_len = nbytes & DES_BLOCK_MASK;
-+	return __cbc_crypt(req, true);
-+}
- 
--		if (likely(block_len)) {
--			des_sparc64_cbc_decrypt((const u64 *)walk.src.virt.addr,
--						(u64 *) walk.dst.virt.addr,
--						block_len, (u64 *) walk.iv);
--		}
--		nbytes &= DES_BLOCK_SIZE - 1;
--		err = blkcipher_walk_done(desc, &walk, nbytes);
--	}
--	fprs_write(0);
--	return err;
 +static int cbc_decrypt(struct skcipher_request *req)
-+{
-+	return __cbc_crypt(req, false);
- }
- 
- static int des3_ede_set_key(struct crypto_tfm *tfm, const u8 *key,
-@@ -227,6 +211,12 @@ static int des3_ede_set_key(struct crypto_tfm *tfm, const u8 *key,
- 	return 0;
- }
- 
-+static int des3_ede_set_key_skcipher(struct crypto_skcipher *tfm, const u8 *key,
-+				     unsigned int keylen)
-+{
-+	return des3_ede_set_key(crypto_skcipher_tfm(tfm), key, keylen);
-+}
-+
- extern void des3_ede_sparc64_crypt(const u64 *key, const u64 *input,
- 				   u64 *output);
- 
-@@ -251,241 +241,196 @@ extern void des3_ede_sparc64_load_keys(const u64 *key);
- extern void des3_ede_sparc64_ecb_crypt(const u64 *expkey, const u64 *input,
- 				       u64 *output, unsigned int len);
- 
--static int __ecb3_crypt(struct blkcipher_desc *desc,
--			struct scatterlist *dst, struct scatterlist *src,
--			unsigned int nbytes, bool encrypt)
-+static int __ecb3_crypt(struct skcipher_request *req, bool encrypt)
  {
--	struct des3_ede_sparc64_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
+-	struct crypto_sparc64_aes_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
 -	struct blkcipher_walk walk;
+-	u64 *key_end;
 +	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	const struct des3_ede_sparc64_ctx *ctx = crypto_skcipher_ctx(tfm);
++	const struct crypto_sparc64_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
++	const u64 *key_end;
 +	struct skcipher_walk walk;
- 	const u64 *K;
 +	unsigned int nbytes;
  	int err;
  
@@ -298,305 +253,155 @@ index db6010b4e52e..a499102bf706 100644
 +	if (err)
 +		return err;
  
- 	if (encrypt)
- 		K = &ctx->encrypt_expkey[0];
- 	else
- 		K = &ctx->decrypt_expkey[0];
- 	des3_ede_sparc64_load_keys(K);
+ 	ctx->ops->load_decrypt_keys(&ctx->key[0]);
+ 	key_end = &ctx->key[ctx->expanded_key_length / sizeof(u64)];
 -	while ((nbytes = walk.nbytes)) {
--		unsigned int block_len = nbytes & DES_BLOCK_MASK;
+-		unsigned int block_len = nbytes & AES_BLOCK_MASK;
 -
 -		if (likely(block_len)) {
--			const u64 *src64 = (const u64 *)walk.src.virt.addr;
--			des3_ede_sparc64_ecb_crypt(K, src64,
--						   (u64 *) walk.dst.virt.addr,
--						   block_len);
+-			ctx->ops->cbc_decrypt(key_end,
+-					      (const u64 *) walk.src.virt.addr,
+-					      (u64 *) walk.dst.virt.addr,
+-					      block_len, (u64 *) walk.iv);
 -		}
--		nbytes &= DES_BLOCK_SIZE - 1;
+-		nbytes &= AES_BLOCK_SIZE - 1;
 -		err = blkcipher_walk_done(desc, &walk, nbytes);
 +	while ((nbytes = walk.nbytes) != 0) {
-+		des3_ede_sparc64_ecb_crypt(K, walk.src.virt.addr,
-+					   walk.dst.virt.addr,
-+					   round_down(nbytes, DES_BLOCK_SIZE));
-+		err = skcipher_walk_done(&walk, nbytes % DES_BLOCK_SIZE);
++		ctx->ops->cbc_decrypt(key_end, walk.src.virt.addr,
++				      walk.dst.virt.addr,
++				      round_down(nbytes, AES_BLOCK_SIZE),
++				      walk.iv);
++		err = skcipher_walk_done(&walk, nbytes % AES_BLOCK_SIZE);
  	}
  	fprs_write(0);
+ 
  	return err;
  }
  
--static int ecb3_encrypt(struct blkcipher_desc *desc,
--		       struct scatterlist *dst, struct scatterlist *src,
--		       unsigned int nbytes)
-+static int ecb3_encrypt(struct skcipher_request *req)
+-static void ctr_crypt_final(struct crypto_sparc64_aes_ctx *ctx,
+-			    struct blkcipher_walk *walk)
++static void ctr_crypt_final(const struct crypto_sparc64_aes_ctx *ctx,
++			    struct skcipher_walk *walk)
  {
--	return __ecb3_crypt(desc, dst, src, nbytes, true);
-+	return __ecb3_crypt(req, true);
+ 	u8 *ctrblk = walk->iv;
+ 	u64 keystream[AES_BLOCK_SIZE / sizeof(u64)];
+@@ -349,40 +333,35 @@ static void ctr_crypt_final(struct crypto_sparc64_aes_ctx *ctx,
+ 	crypto_inc(ctrblk, AES_BLOCK_SIZE);
  }
  
--static int ecb3_decrypt(struct blkcipher_desc *desc,
--		       struct scatterlist *dst, struct scatterlist *src,
--		       unsigned int nbytes)
-+static int ecb3_decrypt(struct skcipher_request *req)
+-static int ctr_crypt(struct blkcipher_desc *desc,
+-		     struct scatterlist *dst, struct scatterlist *src,
+-		     unsigned int nbytes)
++static int ctr_crypt(struct skcipher_request *req)
  {
--	return __ecb3_crypt(desc, dst, src, nbytes, false);
-+	return __ecb3_crypt(req, false);
- }
- 
- extern void des3_ede_sparc64_cbc_encrypt(const u64 *expkey, const u64 *input,
- 					 u64 *output, unsigned int len,
- 					 u64 *iv);
- 
--static int cbc3_encrypt(struct blkcipher_desc *desc,
--			struct scatterlist *dst, struct scatterlist *src,
--			unsigned int nbytes)
--{
--	struct des3_ede_sparc64_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
--	struct blkcipher_walk walk;
--	const u64 *K;
--	int err;
--
--	blkcipher_walk_init(&walk, dst, src, nbytes);
--	err = blkcipher_walk_virt(desc, &walk);
--	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
--
--	K = &ctx->encrypt_expkey[0];
--	des3_ede_sparc64_load_keys(K);
--	while ((nbytes = walk.nbytes)) {
--		unsigned int block_len = nbytes & DES_BLOCK_MASK;
--
--		if (likely(block_len)) {
--			const u64 *src64 = (const u64 *)walk.src.virt.addr;
--			des3_ede_sparc64_cbc_encrypt(K, src64,
--						     (u64 *) walk.dst.virt.addr,
--						     block_len,
--						     (u64 *) walk.iv);
--		}
--		nbytes &= DES_BLOCK_SIZE - 1;
--		err = blkcipher_walk_done(desc, &walk, nbytes);
--	}
--	fprs_write(0);
--	return err;
--}
--
- extern void des3_ede_sparc64_cbc_decrypt(const u64 *expkey, const u64 *input,
- 					 u64 *output, unsigned int len,
- 					 u64 *iv);
- 
--static int cbc3_decrypt(struct blkcipher_desc *desc,
--			struct scatterlist *dst, struct scatterlist *src,
--			unsigned int nbytes)
-+static int __cbc3_crypt(struct skcipher_request *req, bool encrypt)
- {
--	struct des3_ede_sparc64_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
+-	struct crypto_sparc64_aes_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
 -	struct blkcipher_walk walk;
 +	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	const struct des3_ede_sparc64_ctx *ctx = crypto_skcipher_ctx(tfm);
++	const struct crypto_sparc64_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
 +	struct skcipher_walk walk;
- 	const u64 *K;
 +	unsigned int nbytes;
  	int err;
  
 -	blkcipher_walk_init(&walk, dst, src, nbytes);
--	err = blkcipher_walk_virt(desc, &walk);
+-	err = blkcipher_walk_virt_block(desc, &walk, AES_BLOCK_SIZE);
 -	desc->flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
 +	err = skcipher_walk_virt(&walk, req, true);
 +	if (err)
 +		return err;
  
--	K = &ctx->decrypt_expkey[0];
-+	if (encrypt)
-+		K = &ctx->encrypt_expkey[0];
-+	else
-+		K = &ctx->decrypt_expkey[0];
- 	des3_ede_sparc64_load_keys(K);
--	while ((nbytes = walk.nbytes)) {
--		unsigned int block_len = nbytes & DES_BLOCK_MASK;
+ 	ctx->ops->load_encrypt_keys(&ctx->key[0]);
+ 	while ((nbytes = walk.nbytes) >= AES_BLOCK_SIZE) {
+-		unsigned int block_len = nbytes & AES_BLOCK_MASK;
 -
 -		if (likely(block_len)) {
--			const u64 *src64 = (const u64 *)walk.src.virt.addr;
--			des3_ede_sparc64_cbc_decrypt(K, src64,
--						     (u64 *) walk.dst.virt.addr,
--						     block_len,
--						     (u64 *) walk.iv);
+-			ctx->ops->ctr_crypt(&ctx->key[0],
+-					    (const u64 *)walk.src.virt.addr,
+-					    (u64 *) walk.dst.virt.addr,
+-					    block_len, (u64 *) walk.iv);
 -		}
--		nbytes &= DES_BLOCK_SIZE - 1;
+-		nbytes &= AES_BLOCK_SIZE - 1;
 -		err = blkcipher_walk_done(desc, &walk, nbytes);
-+	while ((nbytes = walk.nbytes) != 0) {
-+		if (encrypt)
-+			des3_ede_sparc64_cbc_encrypt(K, walk.src.virt.addr,
-+						     walk.dst.virt.addr,
-+						     round_down(nbytes,
-+								DES_BLOCK_SIZE),
-+						     walk.iv);
-+		else
-+			des3_ede_sparc64_cbc_decrypt(K, walk.src.virt.addr,
-+						     walk.dst.virt.addr,
-+						     round_down(nbytes,
-+								DES_BLOCK_SIZE),
-+						     walk.iv);
-+		err = skcipher_walk_done(&walk, nbytes % DES_BLOCK_SIZE);
++		ctx->ops->ctr_crypt(&ctx->key[0], walk.src.virt.addr,
++				    walk.dst.virt.addr,
++				    round_down(nbytes, AES_BLOCK_SIZE),
++				    walk.iv);
++		err = skcipher_walk_done(&walk, nbytes % AES_BLOCK_SIZE);
+ 	}
+ 	if (walk.nbytes) {
+ 		ctr_crypt_final(ctx, &walk);
+-		err = blkcipher_walk_done(desc, &walk, 0);
++		err = skcipher_walk_done(&walk, 0);
  	}
  	fprs_write(0);
  	return err;
  }
  
 -static struct crypto_alg algs[] = { {
--	.cra_name		= "des",
--	.cra_driver_name	= "des-sparc64",
--	.cra_priority		= SPARC_CR_OPCODE_PRIORITY,
--	.cra_flags		= CRYPTO_ALG_TYPE_CIPHER,
--	.cra_blocksize		= DES_BLOCK_SIZE,
--	.cra_ctxsize		= sizeof(struct des_sparc64_ctx),
--	.cra_alignmask		= 7,
--	.cra_module		= THIS_MODULE,
--	.cra_u	= {
--		.cipher	= {
--			.cia_min_keysize	= DES_KEY_SIZE,
--			.cia_max_keysize	= DES_KEY_SIZE,
--			.cia_setkey		= des_set_key,
--			.cia_encrypt		= sparc_des_encrypt,
--			.cia_decrypt		= sparc_des_decrypt
-+static int cbc3_encrypt(struct skcipher_request *req)
-+{
-+	return __cbc3_crypt(req, true);
-+}
-+
-+static int cbc3_decrypt(struct skcipher_request *req)
-+{
-+	return __cbc3_crypt(req, false);
-+}
-+
-+static struct crypto_alg cipher_algs[] = {
-+	{
-+		.cra_name		= "des",
-+		.cra_driver_name	= "des-sparc64",
-+		.cra_priority		= SPARC_CR_OPCODE_PRIORITY,
-+		.cra_flags		= CRYPTO_ALG_TYPE_CIPHER,
-+		.cra_blocksize		= DES_BLOCK_SIZE,
-+		.cra_ctxsize		= sizeof(struct des_sparc64_ctx),
-+		.cra_alignmask		= 7,
-+		.cra_module		= THIS_MODULE,
-+		.cra_u	= {
-+			.cipher	= {
-+				.cia_min_keysize	= DES_KEY_SIZE,
-+				.cia_max_keysize	= DES_KEY_SIZE,
-+				.cia_setkey		= des_set_key,
-+				.cia_encrypt		= sparc_des_encrypt,
-+				.cia_decrypt		= sparc_des_decrypt
-+			}
++static struct crypto_alg cipher_alg = {
+ 	.cra_name		= "aes",
+ 	.cra_driver_name	= "aes-sparc64",
+ 	.cra_priority		= SPARC_CR_OPCODE_PRIORITY,
+@@ -400,66 +379,53 @@ static struct crypto_alg algs[] = { {
+ 			.cia_decrypt		= crypto_aes_decrypt
  		}
--	}
+ 	}
 -}, {
--	.cra_name		= "ecb(des)",
--	.cra_driver_name	= "ecb-des-sparc64",
+-	.cra_name		= "ecb(aes)",
+-	.cra_driver_name	= "ecb-aes-sparc64",
 -	.cra_priority		= SPARC_CR_OPCODE_PRIORITY,
 -	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
--	.cra_blocksize		= DES_BLOCK_SIZE,
--	.cra_ctxsize		= sizeof(struct des_sparc64_ctx),
+-	.cra_blocksize		= AES_BLOCK_SIZE,
+-	.cra_ctxsize		= sizeof(struct crypto_sparc64_aes_ctx),
 -	.cra_alignmask		= 7,
 -	.cra_type		= &crypto_blkcipher_type,
 -	.cra_module		= THIS_MODULE,
 -	.cra_u = {
 -		.blkcipher = {
--			.min_keysize	= DES_KEY_SIZE,
--			.max_keysize	= DES_KEY_SIZE,
--			.setkey		= des_set_key,
+-			.min_keysize	= AES_MIN_KEY_SIZE,
+-			.max_keysize	= AES_MAX_KEY_SIZE,
+-			.setkey		= aes_set_key,
 -			.encrypt	= ecb_encrypt,
 -			.decrypt	= ecb_decrypt,
 -		},
 -	},
 -}, {
--	.cra_name		= "cbc(des)",
--	.cra_driver_name	= "cbc-des-sparc64",
+-	.cra_name		= "cbc(aes)",
+-	.cra_driver_name	= "cbc-aes-sparc64",
 -	.cra_priority		= SPARC_CR_OPCODE_PRIORITY,
 -	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
--	.cra_blocksize		= DES_BLOCK_SIZE,
--	.cra_ctxsize		= sizeof(struct des_sparc64_ctx),
+-	.cra_blocksize		= AES_BLOCK_SIZE,
+-	.cra_ctxsize		= sizeof(struct crypto_sparc64_aes_ctx),
 -	.cra_alignmask		= 7,
 -	.cra_type		= &crypto_blkcipher_type,
 -	.cra_module		= THIS_MODULE,
 -	.cra_u = {
 -		.blkcipher = {
--			.min_keysize	= DES_KEY_SIZE,
--			.max_keysize	= DES_KEY_SIZE,
--			.ivsize		= DES_BLOCK_SIZE,
--			.setkey		= des_set_key,
+-			.min_keysize	= AES_MIN_KEY_SIZE,
+-			.max_keysize	= AES_MAX_KEY_SIZE,
+-			.ivsize		= AES_BLOCK_SIZE,
+-			.setkey		= aes_set_key,
 -			.encrypt	= cbc_encrypt,
 -			.decrypt	= cbc_decrypt,
 -		},
 -	},
 -}, {
--	.cra_name		= "des3_ede",
--	.cra_driver_name	= "des3_ede-sparc64",
--	.cra_priority		= SPARC_CR_OPCODE_PRIORITY,
--	.cra_flags		= CRYPTO_ALG_TYPE_CIPHER,
--	.cra_blocksize		= DES3_EDE_BLOCK_SIZE,
--	.cra_ctxsize		= sizeof(struct des3_ede_sparc64_ctx),
--	.cra_alignmask		= 7,
--	.cra_module		= THIS_MODULE,
--	.cra_u	= {
--		.cipher	= {
--			.cia_min_keysize	= DES3_EDE_KEY_SIZE,
--			.cia_max_keysize	= DES3_EDE_KEY_SIZE,
--			.cia_setkey		= des3_ede_set_key,
--			.cia_encrypt		= sparc_des3_ede_encrypt,
--			.cia_decrypt		= sparc_des3_ede_decrypt
-+	}, {
-+		.cra_name		= "des3_ede",
-+		.cra_driver_name	= "des3_ede-sparc64",
-+		.cra_priority		= SPARC_CR_OPCODE_PRIORITY,
-+		.cra_flags		= CRYPTO_ALG_TYPE_CIPHER,
-+		.cra_blocksize		= DES3_EDE_BLOCK_SIZE,
-+		.cra_ctxsize		= sizeof(struct des3_ede_sparc64_ctx),
-+		.cra_alignmask		= 7,
-+		.cra_module		= THIS_MODULE,
-+		.cra_u	= {
-+			.cipher	= {
-+				.cia_min_keysize	= DES3_EDE_KEY_SIZE,
-+				.cia_max_keysize	= DES3_EDE_KEY_SIZE,
-+				.cia_setkey		= des3_ede_set_key,
-+				.cia_encrypt		= sparc_des3_ede_encrypt,
-+				.cia_decrypt		= sparc_des3_ede_decrypt
-+			}
- 		}
- 	}
--}, {
--	.cra_name		= "ecb(des3_ede)",
--	.cra_driver_name	= "ecb-des3_ede-sparc64",
+-	.cra_name		= "ctr(aes)",
+-	.cra_driver_name	= "ctr-aes-sparc64",
 -	.cra_priority		= SPARC_CR_OPCODE_PRIORITY,
 -	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
--	.cra_blocksize		= DES3_EDE_BLOCK_SIZE,
--	.cra_ctxsize		= sizeof(struct des3_ede_sparc64_ctx),
+-	.cra_blocksize		= 1,
+-	.cra_ctxsize		= sizeof(struct crypto_sparc64_aes_ctx),
 -	.cra_alignmask		= 7,
 -	.cra_type		= &crypto_blkcipher_type,
 -	.cra_module		= THIS_MODULE,
 -	.cra_u = {
 -		.blkcipher = {
--			.min_keysize	= DES3_EDE_KEY_SIZE,
--			.max_keysize	= DES3_EDE_KEY_SIZE,
--			.setkey		= des3_ede_set_key,
--			.encrypt	= ecb3_encrypt,
--			.decrypt	= ecb3_decrypt,
--		},
--	},
--}, {
--	.cra_name		= "cbc(des3_ede)",
--	.cra_driver_name	= "cbc-des3_ede-sparc64",
--	.cra_priority		= SPARC_CR_OPCODE_PRIORITY,
--	.cra_flags		= CRYPTO_ALG_TYPE_BLKCIPHER,
--	.cra_blocksize		= DES3_EDE_BLOCK_SIZE,
--	.cra_ctxsize		= sizeof(struct des3_ede_sparc64_ctx),
--	.cra_alignmask		= 7,
--	.cra_type		= &crypto_blkcipher_type,
--	.cra_module		= THIS_MODULE,
--	.cra_u = {
--		.blkcipher = {
--			.min_keysize	= DES3_EDE_KEY_SIZE,
--			.max_keysize	= DES3_EDE_KEY_SIZE,
--			.ivsize		= DES3_EDE_BLOCK_SIZE,
--			.setkey		= des3_ede_set_key,
--			.encrypt	= cbc3_encrypt,
--			.decrypt	= cbc3_decrypt,
+-			.min_keysize	= AES_MIN_KEY_SIZE,
+-			.max_keysize	= AES_MAX_KEY_SIZE,
+-			.ivsize		= AES_BLOCK_SIZE,
+-			.setkey		= aes_set_key,
+-			.encrypt	= ctr_crypt,
+-			.decrypt	= ctr_crypt,
 -		},
 -	},
 -} };
@@ -604,110 +409,100 @@ index db6010b4e52e..a499102bf706 100644
 +
 +static struct skcipher_alg skcipher_algs[] = {
 +	{
-+		.base.cra_name		= "ecb(des)",
-+		.base.cra_driver_name	= "ecb-des-sparc64",
++		.base.cra_name		= "ecb(aes)",
++		.base.cra_driver_name	= "ecb-aes-sparc64",
 +		.base.cra_priority	= SPARC_CR_OPCODE_PRIORITY,
-+		.base.cra_blocksize	= DES_BLOCK_SIZE,
-+		.base.cra_ctxsize	= sizeof(struct des_sparc64_ctx),
++		.base.cra_blocksize	= AES_BLOCK_SIZE,
++		.base.cra_ctxsize	= sizeof(struct crypto_sparc64_aes_ctx),
 +		.base.cra_alignmask	= 7,
 +		.base.cra_module	= THIS_MODULE,
-+		.min_keysize		= DES_KEY_SIZE,
-+		.max_keysize		= DES_KEY_SIZE,
-+		.setkey			= des_set_key_skcipher,
++		.min_keysize		= AES_MIN_KEY_SIZE,
++		.max_keysize		= AES_MAX_KEY_SIZE,
++		.setkey			= aes_set_key_skcipher,
 +		.encrypt		= ecb_encrypt,
 +		.decrypt		= ecb_decrypt,
 +	}, {
-+		.base.cra_name		= "cbc(des)",
-+		.base.cra_driver_name	= "cbc-des-sparc64",
++		.base.cra_name		= "cbc(aes)",
++		.base.cra_driver_name	= "cbc-aes-sparc64",
 +		.base.cra_priority	= SPARC_CR_OPCODE_PRIORITY,
-+		.base.cra_blocksize	= DES_BLOCK_SIZE,
-+		.base.cra_ctxsize	= sizeof(struct des_sparc64_ctx),
++		.base.cra_blocksize	= AES_BLOCK_SIZE,
++		.base.cra_ctxsize	= sizeof(struct crypto_sparc64_aes_ctx),
 +		.base.cra_alignmask	= 7,
 +		.base.cra_module	= THIS_MODULE,
-+		.min_keysize		= DES_KEY_SIZE,
-+		.max_keysize		= DES_KEY_SIZE,
-+		.ivsize			= DES_BLOCK_SIZE,
-+		.setkey			= des_set_key_skcipher,
++		.min_keysize		= AES_MIN_KEY_SIZE,
++		.max_keysize		= AES_MAX_KEY_SIZE,
++		.ivsize			= AES_BLOCK_SIZE,
++		.setkey			= aes_set_key_skcipher,
 +		.encrypt		= cbc_encrypt,
 +		.decrypt		= cbc_decrypt,
 +	}, {
-+		.base.cra_name		= "ecb(des3_ede)",
-+		.base.cra_driver_name	= "ecb-des3_ede-sparc64",
++		.base.cra_name		= "ctr(aes)",
++		.base.cra_driver_name	= "ctr-aes-sparc64",
 +		.base.cra_priority	= SPARC_CR_OPCODE_PRIORITY,
-+		.base.cra_blocksize	= DES3_EDE_BLOCK_SIZE,
-+		.base.cra_ctxsize	= sizeof(struct des3_ede_sparc64_ctx),
++		.base.cra_blocksize	= 1,
++		.base.cra_ctxsize	= sizeof(struct crypto_sparc64_aes_ctx),
 +		.base.cra_alignmask	= 7,
 +		.base.cra_module	= THIS_MODULE,
-+		.min_keysize		= DES3_EDE_KEY_SIZE,
-+		.max_keysize		= DES3_EDE_KEY_SIZE,
-+		.setkey			= des3_ede_set_key_skcipher,
-+		.encrypt		= ecb3_encrypt,
-+		.decrypt		= ecb3_decrypt,
-+	}, {
-+		.base.cra_name		= "cbc(des3_ede)",
-+		.base.cra_driver_name	= "cbc-des3_ede-sparc64",
-+		.base.cra_priority	= SPARC_CR_OPCODE_PRIORITY,
-+		.base.cra_blocksize	= DES3_EDE_BLOCK_SIZE,
-+		.base.cra_ctxsize	= sizeof(struct des3_ede_sparc64_ctx),
-+		.base.cra_alignmask	= 7,
-+		.base.cra_module	= THIS_MODULE,
-+		.min_keysize		= DES3_EDE_KEY_SIZE,
-+		.max_keysize		= DES3_EDE_KEY_SIZE,
-+		.ivsize			= DES3_EDE_BLOCK_SIZE,
-+		.setkey			= des3_ede_set_key_skcipher,
-+		.encrypt		= cbc3_encrypt,
-+		.decrypt		= cbc3_decrypt,
++		.min_keysize		= AES_MIN_KEY_SIZE,
++		.max_keysize		= AES_MAX_KEY_SIZE,
++		.ivsize			= AES_BLOCK_SIZE,
++		.setkey			= aes_set_key_skcipher,
++		.encrypt		= ctr_crypt,
++		.decrypt		= ctr_crypt,
++		.chunksize		= AES_BLOCK_SIZE,
 +	}
 +};
  
- static bool __init sparc64_has_des_opcode(void)
+ static bool __init sparc64_has_aes_opcode(void)
  {
-@@ -503,17 +448,27 @@ static bool __init sparc64_has_des_opcode(void)
+@@ -477,17 +443,27 @@ static bool __init sparc64_has_aes_opcode(void)
  
- static int __init des_sparc64_mod_init(void)
+ static int __init aes_sparc64_mod_init(void)
  {
--	if (sparc64_has_des_opcode()) {
--		pr_info("Using sparc64 des opcodes optimized DES implementation\n");
+-	if (sparc64_has_aes_opcode()) {
+-		pr_info("Using sparc64 aes opcodes optimized AES implementation\n");
 -		return crypto_register_algs(algs, ARRAY_SIZE(algs));
 +	int err;
 +
-+	if (!sparc64_has_des_opcode()) {
-+		pr_info("sparc64 des opcodes not available.\n");
++	if (!sparc64_has_aes_opcode()) {
++		pr_info("sparc64 aes opcodes not available.\n");
 +		return -ENODEV;
  	}
--	pr_info("sparc64 des opcodes not available.\n");
+-	pr_info("sparc64 aes opcodes not available.\n");
 -	return -ENODEV;
-+	pr_info("Using sparc64 des opcodes optimized DES implementation\n");
-+	err = crypto_register_algs(cipher_algs, ARRAY_SIZE(cipher_algs));
++	pr_info("Using sparc64 aes opcodes optimized AES implementation\n");
++	err = crypto_register_alg(&cipher_alg);
 +	if (err)
 +		return err;
 +	err = crypto_register_skciphers(skcipher_algs,
 +					ARRAY_SIZE(skcipher_algs));
 +	if (err)
-+		crypto_unregister_algs(cipher_algs, ARRAY_SIZE(cipher_algs));
++		crypto_unregister_alg(&cipher_alg);
 +	return err;
  }
  
- static void __exit des_sparc64_mod_fini(void)
+ static void __exit aes_sparc64_mod_fini(void)
  {
 -	crypto_unregister_algs(algs, ARRAY_SIZE(algs));
-+	crypto_unregister_algs(cipher_algs, ARRAY_SIZE(cipher_algs));
++	crypto_unregister_alg(&cipher_alg);
 +	crypto_unregister_skciphers(skcipher_algs, ARRAY_SIZE(skcipher_algs));
  }
  
- module_init(des_sparc64_mod_init);
+ module_init(aes_sparc64_mod_init);
 diff --git a/crypto/Kconfig b/crypto/Kconfig
-index bc97543d1ec2..320548b4dfa9 100644
+index 03699657fb5d..7c54a5b9aa2b 100644
 --- a/crypto/Kconfig
 +++ b/crypto/Kconfig
-@@ -1355,6 +1355,7 @@ config CRYPTO_DES_SPARC64
+@@ -1098,8 +1098,7 @@ config CRYPTO_AES_NI_INTEL
+ config CRYPTO_AES_SPARC64
+ 	tristate "AES cipher algorithms (SPARC64)"
  	depends on SPARC64
- 	select CRYPTO_ALGAPI
- 	select CRYPTO_LIB_DES
+-	select CRYPTO_CRYPTD
+-	select CRYPTO_ALGAPI
 +	select CRYPTO_BLKCIPHER
  	help
- 	  DES cipher algorithm (FIPS 46-2), and Triple DES EDE (FIPS 46-3),
- 	  optimized using SPARC64 crypto opcodes.
+ 	  Use SPARC64 crypto opcodes for AES algorithm.
+ 
 -- 
 2.23.0
 
