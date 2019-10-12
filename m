@@ -8,55 +8,55 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D1BDC4CECE
-	for <linux-crypto@archiver.kernel.org>; Sat, 12 Oct 2019 18:49:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18C06C4360C
+	for <linux-crypto@archiver.kernel.org>; Sat, 12 Oct 2019 18:49:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4774A2087E
-	for <linux-crypto@archiver.kernel.org>; Sat, 12 Oct 2019 18:49:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E148C2190F
+	for <linux-crypto@archiver.kernel.org>; Sat, 12 Oct 2019 18:49:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SA7/NNFe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UJ8N1Yny"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729740AbfJLStd (ORCPT
+        id S1729755AbfJLStl (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 12 Oct 2019 14:49:33 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:35202 "EHLO
+        Sat, 12 Oct 2019 14:49:41 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:43563 "EHLO
         mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728688AbfJLStI (ORCPT
+        with ESMTP id S1729324AbfJLStE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 12 Oct 2019 14:49:08 -0400
-Received: by mail-wr1-f65.google.com with SMTP id v8so15257164wrt.2;
-        Sat, 12 Oct 2019 11:49:07 -0700 (PDT)
+        Sat, 12 Oct 2019 14:49:04 -0400
+Received: by mail-wr1-f65.google.com with SMTP id j18so15231416wrq.10;
+        Sat, 12 Oct 2019 11:49:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=BlSNEKakkPz3qSacpRbF5fymVNSJO3OQiWGq/ZKj+yQ=;
-        b=SA7/NNFeQ98FEGXx1+uVXTnACJz8MTst5089OK206YuwU6jlcpacc5B9z4UOuyyNGw
-         ke71/7POGluofgAfCHwJhIrCk3Nin4mRz+PEjsU+uTKiqE3vnMJT+CS7IiBrUrbxNcwJ
-         16wlIFHjEPuIKXMa6jct1K47TC+wUDgLzpZ2OxvpscHTmj4oJTPE0q7T4QlnfScmLrH/
-         RHuoyRksoDzbj6rhULw77apsYHcBmmm1cnnDIBpEoloI26ulj2PHZOqISdZbCQ8+cGV9
-         ViTaIJ9vRXkg/KxI6kNNebgSAmGrLYKBEdQtpWW7uqMar2Op/2p7YnN2AKKHkqOPnh64
-         MbiQ==
+        bh=GJDCD24q8FHHhxNDtUAkpzQYbJaDZYgAmYeaRlxpr/w=;
+        b=UJ8N1YnyS5qFw+3hQ3wHH5qfKH2llANndMmxVbmKPRFZFunXLbuK+yD9tw96qzf0PE
+         A/m0wISDjend/x20vATRDUG1JCXyrOYIj03D13PuaTDKLFnUuCPlSUhnsiC5zsNBsmjf
+         mo2GoPkv27PlCPvWHWteG887VCHCMoLUOwiBggLgZFTPbeSwNRSUOnd0MbXcZ0wLvT65
+         GJbc3aIp9DPxRCjJkTaweu1iaxBYYOjxlTAdT0ZMRdJ+c5eZZE0+4QsnFdMWvIcfgsWh
+         atTuxyBXM2Ox6d7wdji6LRj0u0GszAubZBddCT7m4iFvlEmU+ZxQZ7qilVuyQL+8t505
+         1wtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=BlSNEKakkPz3qSacpRbF5fymVNSJO3OQiWGq/ZKj+yQ=;
-        b=IWs533N4GCd2zebhA3jDa3t7OZRJxjB8HhjIU9kllsWNtdosbQknuxZDgSq0UtCOfO
-         uk2xhx0aXjNvtOSVP19REVNkmF+hXE6i4vZRBxXYzNnVaXXFkUW5/SzepklXfHwt7rde
-         i6btc7OaQ12mRchMK0NoYjrDInFQ12tpOQO/HWme9MWI6U5RU8zsWyvccmuGNSyn6bv/
-         TcPl5cCmlVC3s4EGCKjVp8B+xU0AfoKphJ89mKhYS72c8svtcs+/yCLsuTrYmz2dFpie
-         v6CCZxGjsY5/GM5muuJlE3PYMpYps4WoKLejdgjNn+wQvDMgu4a8Dlpktrw3Uxh0EK0J
-         MEpg==
-X-Gm-Message-State: APjAAAUhxzKKb5ySLdNc9sf5MINUW4g/eM/DIBeWUGDQhimQS412xB0F
-        RtlHPetPhF9pNYOwzFJScn8=
-X-Google-Smtp-Source: APXvYqxfCjt/RqeTgVtsWQpkZ0VRN2BvNX4AuzG6Hw4yEBb6II3Qtz4jIguKLO25SuRfFbZlsuxFZA==
-X-Received: by 2002:adf:ff82:: with SMTP id j2mr19206783wrr.356.1570906146460;
-        Sat, 12 Oct 2019 11:49:06 -0700 (PDT)
+        bh=GJDCD24q8FHHhxNDtUAkpzQYbJaDZYgAmYeaRlxpr/w=;
+        b=HK0rHGRtyEd+azZfApJSonON1sjzKUIYvOT6L4pg/sy0ZZdud/Gy0CGMy0tsLLE+qO
+         7u87V9opR58Rf/CCN0CiaIB0v12sDjGzopL2RziwuzT5HpbROSYRVyd51swb6nxMx/ek
+         f8rLD+MTENd4y8mskIFOIf1SNiIWF4gLdBw7IKFFy8QZyLcbyd4UQAJG+/hIRC0EwxyY
+         TOHdB/jWhSUazB4N8cDlKdK1yCAl+9cX7OhMWfF705A68n7fcOB1UilvDDPlK5Yu5Cry
+         xVho/XCtrhWR5sYMIuFMf11ulx0QKQ+Hqp8PAeTNSagxpHEoCtq1sJRu1A7wCF8BscIX
+         i/aQ==
+X-Gm-Message-State: APjAAAVYuh+7gd3VYUrWdYD5bAMaewr7wgVaPtiOz2+99CDwrx6VjGKo
+        pb15F0I/hpe5aal1GkElhcIBXLM0
+X-Google-Smtp-Source: APXvYqxnME26nF6TxFl78Rm1SskYXik1n78MVRjhh7ocTVWwXQmDS1/gxLMcjqW5qc6QHhau4k39EQ==
+X-Received: by 2002:a5d:6581:: with SMTP id q1mr17970758wru.393.1570906142613;
+        Sat, 12 Oct 2019 11:49:02 -0700 (PDT)
 Received: from Red.localdomain ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id a13sm33670580wrf.73.2019.10.12.11.49.05
+        by smtp.googlemail.com with ESMTPSA id a13sm33670580wrf.73.2019.10.12.11.49.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 12 Oct 2019 11:49:05 -0700 (PDT)
+        Sat, 12 Oct 2019 11:49:02 -0700 (PDT)
 From:   Corentin Labbe <clabbe.montjoie@gmail.com>
 To:     catalin.marinas@arm.com, davem@davemloft.net,
         herbert@gondor.apana.org.au, linux@armlinux.org.uk,
@@ -66,9 +66,9 @@ Cc:     devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-sunxi@googlegroups.com,
         Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH v4 07/11] ARM64: dts: allwinner: sun50i: Add crypto engine node on H5
-Date:   Sat, 12 Oct 2019 20:48:48 +0200
-Message-Id: <20191012184852.28329-8-clabbe.montjoie@gmail.com>
+Subject: [PATCH v4 04/11] ARM: dts: sun8i: R40: add crypto engine node
+Date:   Sat, 12 Oct 2019 20:48:45 +0200
+Message-Id: <20191012184852.28329-5-clabbe.montjoie@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191012184852.28329-1-clabbe.montjoie@gmail.com>
 References: <20191012184852.28329-1-clabbe.montjoie@gmail.com>
@@ -79,27 +79,27 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The Crypto Engine is a hardware cryptographic accelerator that supports
+The Crypto Engine is a hardware cryptographic offloader that supports
 many algorithms.
 It could be found on most Allwinner SoCs.
 
-This patch enables the Crypto Engine on the Allwinner H5 SoC Device-tree.
+This patch enables the Crypto Engine on the Allwinner R40 SoC Device-tree.
 
 Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 ---
- arch/arm64/boot/dts/allwinner/sun50i-h5.dtsi | 9 +++++++++
+ arch/arm/boot/dts/sun8i-r40.dtsi | 9 +++++++++
  1 file changed, 9 insertions(+)
 
-diff --git a/arch/arm64/boot/dts/allwinner/sun50i-h5.dtsi b/arch/arm64/boot/dts/allwinner/sun50i-h5.dtsi
-index f002a496d7cb..e92c4de5bf3b 100644
---- a/arch/arm64/boot/dts/allwinner/sun50i-h5.dtsi
-+++ b/arch/arm64/boot/dts/allwinner/sun50i-h5.dtsi
-@@ -127,6 +127,15 @@
- 			allwinner,sram = <&ve_sram 1>;
+diff --git a/arch/arm/boot/dts/sun8i-r40.dtsi b/arch/arm/boot/dts/sun8i-r40.dtsi
+index c9c2688db66d..421dfbbfd7ee 100644
+--- a/arch/arm/boot/dts/sun8i-r40.dtsi
++++ b/arch/arm/boot/dts/sun8i-r40.dtsi
+@@ -266,6 +266,15 @@
+ 			#phy-cells = <1>;
  		};
  
 +		crypto: crypto@1c15000 {
-+			compatible = "allwinner,sun50i-h5-crypto";
++			compatible = "allwinner,sun8i-r40-crypto";
 +			reg = <0x01c15000 0x1000>;
 +			interrupts = <GIC_SPI 94 IRQ_TYPE_LEVEL_HIGH>;
 +			clocks = <&ccu CLK_BUS_CE>, <&ccu CLK_CE>;
@@ -107,9 +107,9 @@ index f002a496d7cb..e92c4de5bf3b 100644
 +			resets = <&ccu RST_BUS_CE>;
 +		};
 +
- 		mali: gpu@1e80000 {
- 			compatible = "allwinner,sun50i-h5-mali", "arm,mali-450";
- 			reg = <0x01e80000 0x30000>;
+ 		ehci1: usb@1c19000 {
+ 			compatible = "allwinner,sun8i-r40-ehci", "generic-ehci";
+ 			reg = <0x01c19000 0x100>;
 -- 
 2.21.0
 
