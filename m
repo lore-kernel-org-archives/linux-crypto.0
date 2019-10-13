@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FD28C4CECE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43BA3C4360C
 	for <linux-crypto@archiver.kernel.org>; Sun, 13 Oct 2019 04:40:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E17F3206B7
-	for <linux-crypto@archiver.kernel.org>; Sun, 13 Oct 2019 04:40:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D382207FF
+	for <linux-crypto@archiver.kernel.org>; Sun, 13 Oct 2019 04:40:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=default; t=1570941635;
-	bh=W5Fp7YlbC0rhH0+OjHJyVT8XfABH4ToWxx4yYu1wDig=;
+	bh=iZG7Gnbw2qUdkWy1v/vH8dVeIQZnN6PwmAd99agXqxY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=fPIMzkoMjuMNPPtPMepQKxEVbD6mYIYJAlPrVykSqpbiNlnKe175oQThkeNAMNfQS
-	 tQQcBai8RDjTMuBSFuqjCznjqNv40PRC1+IgLD67gjN3qdS6fc+br9ooraEO9Sc1YT
-	 +Jo1wdV+sKSa/1DgFFm03FJHz3hHiQ1icW2K/tYQ=
+	b=lyGC76MppaF+Er7RSWcgPG/dzrBz1reppOpYwAtUiNuQd74UEdOddcaO9qIw9vWgu
+	 BjhqUoB/W3uxuEIxKRJku5epuwBvJn3HFa+2QmaAohX0q/UDN5uFGKUiyVtrj6C6fR
+	 BKlGByOQ7aWmgNBgs1PlCmNkidRw5MTtr+3GZNc8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726127AbfJMEke (ORCPT
+        id S1727141AbfJMEke (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Sun, 13 Oct 2019 00:40:34 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51726 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:51712 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727141AbfJMEkc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1726085AbfJMEkc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Sun, 13 Oct 2019 00:40:32 -0400
 Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id AEA572085B;
+        by mail.kernel.org (Postfix) with ESMTPSA id 5CDB52082F;
         Sun, 13 Oct 2019 04:40:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=default; t=1570941630;
-        bh=W5Fp7YlbC0rhH0+OjHJyVT8XfABH4ToWxx4yYu1wDig=;
+        bh=iZG7Gnbw2qUdkWy1v/vH8dVeIQZnN6PwmAd99agXqxY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=EvQnFSgmYkBCF8e8lDA49wOCVxHsF5/gEDrnAmx0CQdxMO8i9qIgaD7WRCKSqB3/x
-         W/W9VA95Z/jrzki6G0hLny5aspsL4aiHMmkDMhw+yGiQwFbxNKPKUO6vZkyMK9R6e5
-         zAnU9EC0lrdYrZECFFVUwncuHLpDi1Vhj149gIiA=
+        b=RGAZKRvme0NJbcNUejHTswqSwJonAUVvQkrCQ6l+S67QjYqqgh3tYzOwjm0uD+3/K
+         k4XlVR1D8iVngJXfFN/H8/sIw27cqo1gNt3G2tHN+2MLqNPwBx1BJ/v9WhXwe3zywG
+         oXlArqWTQcOxgeK5iVHhk5zoFzM4il0zPhquvwO4=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>
@@ -46,9 +46,9 @@ Cc:     linuxppc-dev@lists.ozlabs.org,
         =?UTF-8?q?Breno=20Leit=C3=A3o?= <leitao@debian.org>,
         Nayna Jain <nayna@linux.ibm.com>,
         Paulo Flabiano Smorigo <pfsmorigo@gmail.com>
-Subject: [PATCH 3/4] crypto: nx - convert AES-CBC to skcipher API
-Date:   Sat, 12 Oct 2019 21:39:17 -0700
-Message-Id: <20191013043918.337113-4-ebiggers@kernel.org>
+Subject: [PATCH 2/4] crypto: nx - convert AES-ECB to skcipher API
+Date:   Sat, 12 Oct 2019 21:39:16 -0700
+Message-Id: <20191013043918.337113-3-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20191013043918.337113-1-ebiggers@kernel.org>
 References: <20191013043918.337113-1-ebiggers@kernel.org>
@@ -61,47 +61,47 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-Convert the PowerPC Nest (NX) implementation of AES-CBC from the
+Convert the PowerPC Nest (NX) implementation of AES-ECB from the
 deprecated "blkcipher" API to the "skcipher" API.  This is needed in
 order for the blkcipher API to be removed.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- drivers/crypto/nx/nx-aes-cbc.c | 78 ++++++++++++++--------------------
- drivers/crypto/nx/nx.c         | 11 ++---
- drivers/crypto/nx/nx.h         |  4 +-
- 3 files changed, 41 insertions(+), 52 deletions(-)
+ drivers/crypto/nx/nx-aes-ecb.c | 76 ++++++++++++++--------------------
+ drivers/crypto/nx/nx.c         | 28 ++++++++++---
+ drivers/crypto/nx/nx.h         |  5 ++-
+ 3 files changed, 58 insertions(+), 51 deletions(-)
 
-diff --git a/drivers/crypto/nx/nx-aes-cbc.c b/drivers/crypto/nx/nx-aes-cbc.c
-index 482a203a9260..92e921eceed7 100644
---- a/drivers/crypto/nx/nx-aes-cbc.c
-+++ b/drivers/crypto/nx/nx-aes-cbc.c
+diff --git a/drivers/crypto/nx/nx-aes-ecb.c b/drivers/crypto/nx/nx-aes-ecb.c
+index 87183890d1ab..77e338dc33f1 100644
+--- a/drivers/crypto/nx/nx-aes-ecb.c
++++ b/drivers/crypto/nx/nx-aes-ecb.c
 @@ -18,11 +18,11 @@
  #include "nx.h"
  
  
--static int cbc_aes_nx_set_key(struct crypto_tfm *tfm,
+-static int ecb_aes_nx_set_key(struct crypto_tfm *tfm,
 -			      const u8          *in_key,
 -			      unsigned int       key_len)
-+static int cbc_aes_nx_set_key(struct crypto_skcipher *tfm,
++static int ecb_aes_nx_set_key(struct crypto_skcipher *tfm,
 +			      const u8               *in_key,
 +			      unsigned int            key_len)
  {
 -	struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(tfm);
 +	struct nx_crypto_ctx *nx_ctx = crypto_skcipher_ctx(tfm);
- 	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
+ 	struct nx_csbcpb *csbcpb = (struct nx_csbcpb *)nx_ctx->csbcpb;
  
  	nx_ctx_init(nx_ctx, HCOP_FC_AES);
-@@ -50,13 +50,11 @@ static int cbc_aes_nx_set_key(struct crypto_tfm *tfm,
+@@ -50,13 +50,11 @@ static int ecb_aes_nx_set_key(struct crypto_tfm *tfm,
  	return 0;
  }
  
--static int cbc_aes_nx_crypt(struct blkcipher_desc *desc,
+-static int ecb_aes_nx_crypt(struct blkcipher_desc *desc,
 -			    struct scatterlist    *dst,
 -			    struct scatterlist    *src,
 -			    unsigned int           nbytes,
 -			    int                    enc)
-+static int cbc_aes_nx_crypt(struct skcipher_request *req,
++static int ecb_aes_nx_crypt(struct skcipher_request *req,
 +			    int                      enc)
  {
 -	struct nx_crypto_ctx *nx_ctx = crypto_blkcipher_ctx(desc->tfm);
@@ -110,19 +110,21 @@ index 482a203a9260..92e921eceed7 100644
  	struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
  	unsigned long irq_flags;
  	unsigned int processed = 0, to_process;
-@@ -70,9 +68,9 @@ static int cbc_aes_nx_crypt(struct blkcipher_desc *desc,
+@@ -70,10 +68,10 @@ static int ecb_aes_nx_crypt(struct blkcipher_desc *desc,
  		NX_CPB_FDM(csbcpb) &= ~NX_FDM_ENDE_ENCRYPT;
  
  	do {
 -		to_process = nbytes - processed;
 +		to_process = req->cryptlen - processed;
  
--		rc = nx_build_sg_lists(nx_ctx, desc->info, dst, src,
-+		rc = nx_build_sg_lists(nx_ctx, req->iv, req->dst, req->src,
- 				       &to_process, processed,
- 				       csbcpb->cpb.aes_cbc.iv);
+-		rc = nx_build_sg_lists(nx_ctx, NULL, dst, src, &to_process,
+-				       processed, NULL);
++		rc = nx_build_sg_lists(nx_ctx, NULL, req->dst, req->src,
++				       &to_process, processed, NULL);
  		if (rc)
-@@ -84,56 +82,46 @@ static int cbc_aes_nx_crypt(struct blkcipher_desc *desc,
+ 			goto out;
+ 
+@@ -83,7 +81,7 @@ static int ecb_aes_nx_crypt(struct blkcipher_desc *desc,
  		}
  
  		rc = nx_hcall_sync(nx_ctx, &nx_ctx->op,
@@ -131,143 +133,180 @@ index 482a203a9260..92e921eceed7 100644
  		if (rc)
  			goto out;
  
--		memcpy(desc->info, csbcpb->cpb.aes_cbc.cv, AES_BLOCK_SIZE);
-+		memcpy(req->iv, csbcpb->cpb.aes_cbc.cv, AES_BLOCK_SIZE);
- 		atomic_inc(&(nx_ctx->stats->aes_ops));
- 		atomic64_add(csbcpb->csb.processed_byte_count,
+@@ -92,46 +90,36 @@ static int ecb_aes_nx_crypt(struct blkcipher_desc *desc,
  			     &(nx_ctx->stats->aes_bytes));
  
  		processed += to_process;
 -	} while (processed < nbytes);
 +	} while (processed < req->cryptlen);
+ 
  out:
  	spin_unlock_irqrestore(&nx_ctx->lock, irq_flags);
  	return rc;
  }
  
--static int cbc_aes_nx_encrypt(struct blkcipher_desc *desc,
+-static int ecb_aes_nx_encrypt(struct blkcipher_desc *desc,
 -			      struct scatterlist    *dst,
 -			      struct scatterlist    *src,
 -			      unsigned int           nbytes)
-+static int cbc_aes_nx_encrypt(struct skcipher_request *req)
++static int ecb_aes_nx_encrypt(struct skcipher_request *req)
  {
--	return cbc_aes_nx_crypt(desc, dst, src, nbytes, 1);
-+	return cbc_aes_nx_crypt(req, 1);
+-	return ecb_aes_nx_crypt(desc, dst, src, nbytes, 1);
++	return ecb_aes_nx_crypt(req, 1);
  }
  
--static int cbc_aes_nx_decrypt(struct blkcipher_desc *desc,
+-static int ecb_aes_nx_decrypt(struct blkcipher_desc *desc,
 -			      struct scatterlist    *dst,
 -			      struct scatterlist    *src,
 -			      unsigned int           nbytes)
-+static int cbc_aes_nx_decrypt(struct skcipher_request *req)
++static int ecb_aes_nx_decrypt(struct skcipher_request *req)
  {
--	return cbc_aes_nx_crypt(desc, dst, src, nbytes, 0);
-+	return cbc_aes_nx_crypt(req, 0);
+-	return ecb_aes_nx_crypt(desc, dst, src, nbytes, 0);
++	return ecb_aes_nx_crypt(req, 0);
  }
  
--struct crypto_alg nx_cbc_aes_alg = {
--	.cra_name        = "cbc(aes)",
--	.cra_driver_name = "cbc-aes-nx",
+-struct crypto_alg nx_ecb_aes_alg = {
+-	.cra_name        = "ecb(aes)",
+-	.cra_driver_name = "ecb-aes-nx",
 -	.cra_priority    = 300,
 -	.cra_flags       = CRYPTO_ALG_TYPE_BLKCIPHER,
 -	.cra_blocksize   = AES_BLOCK_SIZE,
+-	.cra_alignmask   = 0xf,
 -	.cra_ctxsize     = sizeof(struct nx_crypto_ctx),
 -	.cra_type        = &crypto_blkcipher_type,
--	.cra_alignmask   = 0xf,
 -	.cra_module      = THIS_MODULE,
--	.cra_init        = nx_crypto_ctx_aes_cbc_init,
+-	.cra_init        = nx_crypto_ctx_aes_ecb_init,
 -	.cra_exit        = nx_crypto_ctx_exit,
 -	.cra_blkcipher = {
 -		.min_keysize = AES_MIN_KEY_SIZE,
 -		.max_keysize = AES_MAX_KEY_SIZE,
--		.ivsize      = AES_BLOCK_SIZE,
--		.setkey      = cbc_aes_nx_set_key,
--		.encrypt     = cbc_aes_nx_encrypt,
--		.decrypt     = cbc_aes_nx_decrypt,
+-		.setkey      = ecb_aes_nx_set_key,
+-		.encrypt     = ecb_aes_nx_encrypt,
+-		.decrypt     = ecb_aes_nx_decrypt,
 -	}
-+struct skcipher_alg nx_cbc_aes_alg = {
-+	.base.cra_name		= "cbc(aes)",
-+	.base.cra_driver_name	= "cbc-aes-nx",
++struct skcipher_alg nx_ecb_aes_alg = {
++	.base.cra_name		= "ecb(aes)",
++	.base.cra_driver_name	= "ecb-aes-nx",
 +	.base.cra_priority	= 300,
 +	.base.cra_blocksize	= AES_BLOCK_SIZE,
-+	.base.cra_ctxsize	= sizeof(struct nx_crypto_ctx),
 +	.base.cra_alignmask	= 0xf,
++	.base.cra_ctxsize	= sizeof(struct nx_crypto_ctx),
 +	.base.cra_module	= THIS_MODULE,
-+	.init			= nx_crypto_ctx_aes_cbc_init,
++	.init			= nx_crypto_ctx_aes_ecb_init,
 +	.exit			= nx_crypto_ctx_skcipher_exit,
 +	.min_keysize		= AES_MIN_KEY_SIZE,
 +	.max_keysize		= AES_MAX_KEY_SIZE,
-+	.ivsize			= AES_BLOCK_SIZE,
-+	.setkey			= cbc_aes_nx_set_key,
-+	.encrypt		= cbc_aes_nx_encrypt,
-+	.decrypt		= cbc_aes_nx_decrypt,
++	.setkey			= ecb_aes_nx_set_key,
++	.encrypt		= ecb_aes_nx_encrypt,
++	.decrypt		= ecb_aes_nx_decrypt,
  };
 diff --git a/drivers/crypto/nx/nx.c b/drivers/crypto/nx/nx.c
-index 4b97081e7486..8e5367776ca0 100644
+index 1202a00715ac..4b97081e7486 100644
 --- a/drivers/crypto/nx/nx.c
 +++ b/drivers/crypto/nx/nx.c
-@@ -589,7 +589,7 @@ static int nx_register_algs(void)
+@@ -517,6 +517,12 @@ static int nx_register_alg(struct crypto_alg *alg, u32 fc, u32 mode)
+ 	       crypto_register_alg(alg) : 0;
+ }
+ 
++static int nx_register_skcipher(struct skcipher_alg *alg, u32 fc, u32 mode)
++{
++	return nx_check_props(&nx_driver.viodev->dev, fc, mode) ?
++	       crypto_register_skcipher(alg) : 0;
++}
++
+ static int nx_register_aead(struct aead_alg *alg, u32 fc, u32 mode)
+ {
+ 	return nx_check_props(&nx_driver.viodev->dev, fc, mode) ?
+@@ -537,6 +543,12 @@ static void nx_unregister_alg(struct crypto_alg *alg, u32 fc, u32 mode)
+ 		crypto_unregister_alg(alg);
+ }
+ 
++static void nx_unregister_skcipher(struct skcipher_alg *alg, u32 fc, u32 mode)
++{
++	if (nx_check_props(NULL, fc, mode))
++		crypto_unregister_skcipher(alg);
++}
++
+ static void nx_unregister_aead(struct aead_alg *alg, u32 fc, u32 mode)
+ {
+ 	if (nx_check_props(NULL, fc, mode))
+@@ -573,7 +585,7 @@ static int nx_register_algs(void)
+ 
+ 	nx_driver.of.status = NX_OKAY;
+ 
+-	rc = nx_register_alg(&nx_ecb_aes_alg, NX_FC_AES, NX_MODE_AES_ECB);
++	rc = nx_register_skcipher(&nx_ecb_aes_alg, NX_FC_AES, NX_MODE_AES_ECB);
  	if (rc)
  		goto out;
  
--	rc = nx_register_alg(&nx_cbc_aes_alg, NX_FC_AES, NX_MODE_AES_CBC);
-+	rc = nx_register_skcipher(&nx_cbc_aes_alg, NX_FC_AES, NX_MODE_AES_CBC);
- 	if (rc)
- 		goto out_unreg_ecb;
- 
-@@ -647,7 +647,7 @@ static int nx_register_algs(void)
- out_unreg_ctr3686:
- 	nx_unregister_alg(&nx_ctr3686_aes_alg, NX_FC_AES, NX_MODE_AES_CTR);
+@@ -637,7 +649,7 @@ static int nx_register_algs(void)
  out_unreg_cbc:
--	nx_unregister_alg(&nx_cbc_aes_alg, NX_FC_AES, NX_MODE_AES_CBC);
-+	nx_unregister_skcipher(&nx_cbc_aes_alg, NX_FC_AES, NX_MODE_AES_CBC);
+ 	nx_unregister_alg(&nx_cbc_aes_alg, NX_FC_AES, NX_MODE_AES_CBC);
  out_unreg_ecb:
- 	nx_unregister_skcipher(&nx_ecb_aes_alg, NX_FC_AES, NX_MODE_AES_ECB);
+-	nx_unregister_alg(&nx_ecb_aes_alg, NX_FC_AES, NX_MODE_AES_ECB);
++	nx_unregister_skcipher(&nx_ecb_aes_alg, NX_FC_AES, NX_MODE_AES_ECB);
  out:
-@@ -722,9 +722,9 @@ int nx_crypto_ctx_aes_ctr_init(struct crypto_tfm *tfm)
- 				  NX_MODE_AES_CTR);
+ 	return rc;
  }
- 
--int nx_crypto_ctx_aes_cbc_init(struct crypto_tfm *tfm)
-+int nx_crypto_ctx_aes_cbc_init(struct crypto_skcipher *tfm)
- {
--	return nx_crypto_ctx_init(crypto_tfm_ctx(tfm), NX_FC_AES,
-+	return nx_crypto_ctx_init(crypto_skcipher_ctx(tfm), NX_FC_AES,
+@@ -716,9 +728,9 @@ int nx_crypto_ctx_aes_cbc_init(struct crypto_tfm *tfm)
  				  NX_MODE_AES_CBC);
  }
  
-@@ -817,7 +817,8 @@ static int nx_remove(struct vio_dev *viodev)
- 				   NX_FC_AES, NX_MODE_AES_GCM);
+-int nx_crypto_ctx_aes_ecb_init(struct crypto_tfm *tfm)
++int nx_crypto_ctx_aes_ecb_init(struct crypto_skcipher *tfm)
+ {
+-	return nx_crypto_ctx_init(crypto_tfm_ctx(tfm), NX_FC_AES,
++	return nx_crypto_ctx_init(crypto_skcipher_ctx(tfm), NX_FC_AES,
+ 				  NX_MODE_AES_ECB);
+ }
+ 
+@@ -752,6 +764,11 @@ void nx_crypto_ctx_exit(struct crypto_tfm *tfm)
+ 	nx_ctx->out_sg = NULL;
+ }
+ 
++void nx_crypto_ctx_skcipher_exit(struct crypto_skcipher *tfm)
++{
++	nx_crypto_ctx_exit(crypto_skcipher_ctx(tfm));
++}
++
+ void nx_crypto_ctx_aead_exit(struct crypto_aead *tfm)
+ {
+ 	struct nx_crypto_ctx *nx_ctx = crypto_aead_ctx(tfm);
+@@ -801,7 +818,8 @@ static int nx_remove(struct vio_dev *viodev)
  		nx_unregister_alg(&nx_ctr3686_aes_alg,
  				  NX_FC_AES, NX_MODE_AES_CTR);
--		nx_unregister_alg(&nx_cbc_aes_alg, NX_FC_AES, NX_MODE_AES_CBC);
-+		nx_unregister_skcipher(&nx_cbc_aes_alg, NX_FC_AES,
-+				       NX_MODE_AES_CBC);
- 		nx_unregister_skcipher(&nx_ecb_aes_alg, NX_FC_AES,
- 				       NX_MODE_AES_ECB);
+ 		nx_unregister_alg(&nx_cbc_aes_alg, NX_FC_AES, NX_MODE_AES_CBC);
+-		nx_unregister_alg(&nx_ecb_aes_alg, NX_FC_AES, NX_MODE_AES_ECB);
++		nx_unregister_skcipher(&nx_ecb_aes_alg, NX_FC_AES,
++				       NX_MODE_AES_ECB);
  	}
+ 
+ 	return 0;
 diff --git a/drivers/crypto/nx/nx.h b/drivers/crypto/nx/nx.h
-index 1a839ef21c4f..2e1a3e5e65cb 100644
+index 768ebae9731e..1a839ef21c4f 100644
 --- a/drivers/crypto/nx/nx.h
 +++ b/drivers/crypto/nx/nx.h
-@@ -146,7 +146,7 @@ int nx_crypto_ctx_aes_ccm_init(struct crypto_aead *tfm);
- int nx_crypto_ctx_aes_gcm_init(struct crypto_aead *tfm);
+@@ -147,9 +147,10 @@ int nx_crypto_ctx_aes_gcm_init(struct crypto_aead *tfm);
  int nx_crypto_ctx_aes_xcbc_init(struct crypto_tfm *tfm);
  int nx_crypto_ctx_aes_ctr_init(struct crypto_tfm *tfm);
--int nx_crypto_ctx_aes_cbc_init(struct crypto_tfm *tfm);
-+int nx_crypto_ctx_aes_cbc_init(struct crypto_skcipher *tfm);
- int nx_crypto_ctx_aes_ecb_init(struct crypto_skcipher *tfm);
+ int nx_crypto_ctx_aes_cbc_init(struct crypto_tfm *tfm);
+-int nx_crypto_ctx_aes_ecb_init(struct crypto_tfm *tfm);
++int nx_crypto_ctx_aes_ecb_init(struct crypto_skcipher *tfm);
  int nx_crypto_ctx_sha_init(struct crypto_tfm *tfm);
  void nx_crypto_ctx_exit(struct crypto_tfm *tfm);
-@@ -176,7 +176,7 @@ void nx_debugfs_fini(struct nx_crypto_driver *);
- 
++void nx_crypto_ctx_skcipher_exit(struct crypto_skcipher *tfm);
+ void nx_crypto_ctx_aead_exit(struct crypto_aead *tfm);
+ void nx_ctx_init(struct nx_crypto_ctx *nx_ctx, unsigned int function);
+ int nx_hcall_sync(struct nx_crypto_ctx *ctx, struct vio_pfo_op *op,
+@@ -176,7 +177,7 @@ void nx_debugfs_fini(struct nx_crypto_driver *);
  #define NX_PAGE_NUM(x)		((u64)(x) & 0xfffffffffffff000ULL)
  
--extern struct crypto_alg nx_cbc_aes_alg;
-+extern struct skcipher_alg nx_cbc_aes_alg;
- extern struct skcipher_alg nx_ecb_aes_alg;
+ extern struct crypto_alg nx_cbc_aes_alg;
+-extern struct crypto_alg nx_ecb_aes_alg;
++extern struct skcipher_alg nx_ecb_aes_alg;
  extern struct aead_alg nx_gcm_aes_alg;
  extern struct aead_alg nx_gcm4106_aes_alg;
+ extern struct crypto_alg nx_ctr3686_aes_alg;
 -- 
 2.23.0
 
