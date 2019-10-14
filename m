@@ -2,79 +2,78 @@ Return-Path: <SRS0=VKJi=YH=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEBEEECE58D
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 08:58:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 453CFECE58D
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 09:17:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C6A5D206A3
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 08:58:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2816B20882
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 09:17:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730423AbfJNI6s (ORCPT
+        id S1730799AbfJNJRp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Oct 2019 04:58:48 -0400
-Received: from mga06.intel.com ([134.134.136.31]:43474 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730354AbfJNI6s (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Oct 2019 04:58:48 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Oct 2019 01:58:47 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,295,1566889200"; 
-   d="scan'208";a="207929957"
-Received: from vkuppusa-mobl2.ger.corp.intel.com (HELO localhost) ([10.249.39.77])
-  by fmsmga001.fm.intel.com with ESMTP; 14 Oct 2019 01:58:41 -0700
-From:   Jani Nikula <jani.nikula@linux.intel.com>
-To:     Changbin Du <changbin.du@gmail.com>,
-        Jonathan Corbet <corbet@lwn.net>
-Cc:     linux-pci@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linux-fpga@vger.kernel.org,
-        linux-usb@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        intel-gfx@lists.freedesktop.org,
-        Changbin Du <changbin.du@gmail.com>
-Subject: Re: [PATCH] kernel-doc: rename the kernel-doc directive 'functions' to 'specific'
-In-Reply-To: <20191013055359.23312-1-changbin.du@gmail.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-References: <20191013055359.23312-1-changbin.du@gmail.com>
-Date:   Mon, 14 Oct 2019 11:59:37 +0300
-Message-ID: <875zkrd7nq.fsf@intel.com>
+        Mon, 14 Oct 2019 05:17:45 -0400
+Received: from mx2.suse.de ([195.135.220.15]:41102 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1730797AbfJNJRo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 14 Oct 2019 05:17:44 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id B41D4B974;
+        Mon, 14 Oct 2019 09:17:42 +0000 (UTC)
+Received: by ds.suse.cz (Postfix, from userid 10065)
+        id CA99DDA7E3; Mon, 14 Oct 2019 11:16:48 +0200 (CEST)
+From:   David Sterba <dsterba@suse.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     ebiggers@google.com, ard.biesheuvel@linaro.org,
+        David Sterba <dsterba@suse.com>
+Subject: [PATCH v5 0/2]  BLAKE2b generic implementation
+Date:   Mon, 14 Oct 2019 11:16:42 +0200
+Message-Id: <cover.1571043883.git.dsterba@suse.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, 13 Oct 2019, Changbin Du <changbin.du@gmail.com> wrote:
-> The 'functions' directive is not only for functions, but also works for
-> structs/unions. So the name is misleading. This patch renames it to
-> 'specific', so now we have export/internal/specific directives to limit
-> the functions/types to be included in documentation. Meanwhile we improved
-> the warning message.
+The patchset adds blake2b refrerence implementation and test vectors.
 
-Agreed on "functions" being less than perfect. It directly exposes the
-idiosyncrasies of scripts/kernel-doc. I'm not sure "specific" is any
-better, though.
+V5:
 
-Perhaps "symbols" would be more self-explanatory. Or, actually make
-"functions" only work on functions, and add a separate keyword for other
-stuff. *shrug*
+- removed return 0 and switched to void in blake2 functions
+- reordered shash_alg definition so that .base.* are first (this seems
+  to be the preferred ordering from what I saw in recent patches in the
+  mailinglist)
+- added note to blake2b_generic.c about changes made for kernel
+  inclusion
+- test vectors reworked so that key length and input length are
+  distributed over all digest sizes
 
-Seems like the patch is way too big. I'd probably add "symbols" (or
-whatever) as a synonym for "functions" for starters, and convert
-documents piecemeal, and finally drop the old one.
+Tested on x86_64 with KASAN and SLUB_DEBUG.
 
-The scripts/kernel-doc change should be a patch of its own.
+V1: https://lore.kernel.org/linux-crypto/cover.1569849051.git.dsterba@suse.com/
+V2: https://lore.kernel.org/linux-crypto/e31c2030fcfa7f409b2c81adf8f179a8a55a584a.1570184333.git.dsterba@suse.com/
+V3: https://lore.kernel.org/linux-crypto/e7f46def436c2c705c0b2cac3324f817efa4717d.1570715842.git.dsterba@suse.com/
+V4: https://lore.kernel.org/linux-crypto/cover.1570812094.git.dsterba@suse.com/
 
-BR,
-Jani.
+David Sterba (2):
+  crypto: add blake2b generic implementation
+  crypto: add test vectors for blake2b
 
+ crypto/Kconfig           |  17 +
+ crypto/Makefile          |   1 +
+ crypto/blake2b_generic.c | 413 ++++++++++++++++++++++
+ crypto/testmgr.c         |  28 ++
+ crypto/testmgr.h         | 719 +++++++++++++++++++++++++++++++++++++++
+ include/crypto/blake2b.h |  46 +++
+ 6 files changed, 1224 insertions(+)
+ create mode 100644 crypto/blake2b_generic.c
+ create mode 100644 include/crypto/blake2b.h
 
 -- 
-Jani Nikula, Intel Open Source Graphics Center
+2.23.0
+
