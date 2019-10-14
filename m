@@ -2,337 +2,123 @@ Return-Path: <SRS0=VKJi=YH=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F2DAECE587
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 12:40:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4CF4C4CECE
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 12:47:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DFB582089C
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 12:40:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8ABA520673
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 12:47:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TNJAb3RI"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hEqY218f"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730800AbfJNMkF (ORCPT
+        id S1730386AbfJNMrK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Oct 2019 08:40:05 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:37230 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730733AbfJNMkF (ORCPT
+        Mon, 14 Oct 2019 08:47:10 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:55640 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730733AbfJNMrK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Oct 2019 08:40:05 -0400
-Received: by mail-wr1-f67.google.com with SMTP id p14so19551674wro.4
-        for <linux-crypto@vger.kernel.org>; Mon, 14 Oct 2019 05:40:02 -0700 (PDT)
+        Mon, 14 Oct 2019 08:47:10 -0400
+Received: by mail-wm1-f66.google.com with SMTP id a6so17113673wma.5
+        for <linux-crypto@vger.kernel.org>; Mon, 14 Oct 2019 05:47:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=qxqhJoxdjh4AjpluVAjMFm9F70n5PQ7T2iO5hHpE/DE=;
-        b=TNJAb3RID6birb4/E8PqVYHep/YLbHvjcZiS+7oHfW6VC5Q50CrFEFfA0Wt6JRa1T/
-         DNPV9fen98GNAbDsutGI+7AOEilah8rwOI5s8u53B6dUgK7O1bUMnUcNcboPZas/f58h
-         zHRZ+K6g8ZK9FFa62Lam+FM9Xtb4CInNT8KJSOU9JZ9JsvMkbaGLIm/zsjZQF9yc/rVn
-         POGt8psb5TweCS/YWGiZyLxXq3usd8EFZrvihr1NcbCX9i/kpMQ8JgQ1IEPV3qD8y8eU
-         U0h15962nMyHYL8ukiv5ebk3QdWexUGSzuIVuiXQbH0IcQYncLTvqYRol890/GTsqOT4
-         eHbw==
+        bh=TTkA/5vTH9Kh1+XMRC6xhgxSKGDJRglBVbRfMO0b/uY=;
+        b=hEqY218fHzvciuduGiB8zmFUf3M0b55irActkL0tbSl4V9ZW4yb2Gr8EbVZxRMUsak
+         2EEDG50n39iM1awJUJkvRG97oYZz4tX+EHLKLEWOvREf7Z+JrfkMUrZOYLfZRc00jEkg
+         nrVFXNnLewGGtjWGzUsToPdaKNUKUpRuEKib7gDmcS3p2OjkfxvwZJ7CXQm3Ih8mEHBm
+         GE6vtINAN+YDEePf/L+gWdG50qaKyATPJGNdeMnaVlUF12tOrKmIn987WhZLHvqp1FAU
+         g75RQPG+tf4W76LB+oak+hQgOfGxgfngYrv3QwPf32ZJjQA1ssRuMpJ0Z6fobZCq9RKG
+         rJSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=qxqhJoxdjh4AjpluVAjMFm9F70n5PQ7T2iO5hHpE/DE=;
-        b=K5xK0pYDfSxpfcof3hZnnaiFSJbH1388PglfcXzN8ekg98DSLPRbCjkJi4e/kyNff5
-         ykA/8ucpxFGsB/i2h1c/+128iG0EHWPKdtC/Qz/jEHyEXo4d53vhPcm/lnB06WZl663K
-         cJfnJsV83htMVxajAXDzriqp8YqMf46fnXzCCmoVK20/GCLA0XSZyxj/BXCvGho+1A1D
-         0hGGhFeVaR36UBqv0oVDaZsd35YsSmr5jQe0A+Xvy02Egn6E7ubSj4ucAc1Nbh4KMZTy
-         ZW6af93/yC+OiP5SMMcnCgkPs3Vcic4J+1WBoCtWOyH3Yq/R0dAuqJoL1QiidV6aavjF
-         +c4g==
-X-Gm-Message-State: APjAAAWfldrFiXswd3hr84Z8fPlgb/FFKiNxj93m9Yi2MDiDAZpGZwCy
-        1XT0QGpD/c+vHnh9urulPEdxcv2WdMP8oY34U5uaJA==
-X-Google-Smtp-Source: APXvYqz+/5TKtAubqflHrCtpjVt6Ttqec5j3CXxIXUn/20bViZw6XvcN1sHkcufMrUDHoO9UJvXZIa8GM5ilhKzm4MU=
-X-Received: by 2002:a5d:6b0a:: with SMTP id v10mr24158026wrw.32.1571056801154;
- Mon, 14 Oct 2019 05:40:01 -0700 (PDT)
+        bh=TTkA/5vTH9Kh1+XMRC6xhgxSKGDJRglBVbRfMO0b/uY=;
+        b=rXpek6rSIQzyuMVelxqf6kYutioFeRSf0uFbRyryXeGQQng7rre5bEp7u3mE9OBH8k
+         /h0xIlUO0Tt2pBjoygrj+JG5eIyp2IMBez1Ml3CWy59S+W66oVVxqEabDVOQDSXUNn7t
+         oPv5n1tf2mGb1Vb4nfqltFCQc1C5mAEM9EFrm2D+5Y1IUxyCMkIMZiuAHDEdlv+1JTeF
+         DF/RD67M6tW1oCJP3ngEdfF50/YrADW1Xw7lZtANZT4Y34QgHi/Js5jXzhUjRMpKgVQC
+         hdv7EFM47ijLZlYdbR7XuweGkn4WTR5S+G7tY3/nwldLUJ2WZmpi4iKnjrX1Sxz1HMUI
+         DElw==
+X-Gm-Message-State: APjAAAXS3hc8ckLuKKZvvGawNKT3pLhQzgfAaNXmEAcAkL0rIS/tS/Uq
+        KaYmStXq57R2IcOEIr3Mwiz5yUg23azCbu7O3GG9zw==
+X-Google-Smtp-Source: APXvYqyE7O3ty6hTTmcwGxRp3tsZOYJcvZhkhjALW6bQaoAI0SUEL4togKyAb9MuENgPYvjAUi4POYXXDr99Yki0TjM=
+X-Received: by 2002:a05:600c:2214:: with SMTP id z20mr15281643wml.10.1571057226626;
+ Mon, 14 Oct 2019 05:47:06 -0700 (PDT)
 MIME-Version: 1.0
-References: <20191013043918.337113-1-ebiggers@kernel.org> <20191013043918.337113-5-ebiggers@kernel.org>
-In-Reply-To: <20191013043918.337113-5-ebiggers@kernel.org>
+References: <20191012201809.160500-1-ebiggers@kernel.org>
+In-Reply-To: <20191012201809.160500-1-ebiggers@kernel.org>
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Mon, 14 Oct 2019 14:39:50 +0200
-Message-ID: <CAKv+Gu8AmyQHa=ficw3h1UWup2S3uU6G4=U8joD6nZF1fEoisw@mail.gmail.com>
-Subject: Re: [PATCH 4/4] crypto: nx - convert AES-CTR to skcipher API
+Date:   Mon, 14 Oct 2019 14:46:55 +0200
+Message-ID: <CAKv+Gu_HWop7ry=PKMjYrY8EcZN2dmJnqWRE=VPR2ep7OFEBVw@mail.gmail.com>
+Subject: Re: [RFT PATCH 0/3] crypto: s390 - convert to skcipher API
 To:     Eric Biggers <ebiggers@kernel.org>
 Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
         <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        =?UTF-8?Q?Breno_Leit=C3=A3o?= <leitao@debian.org>,
-        Nayna Jain <nayna@linux.ibm.com>,
-        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, 13 Oct 2019 at 06:40, Eric Biggers <ebiggers@kernel.org> wrote:
+On Sat, 12 Oct 2019 at 22:20, Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> From: Eric Biggers <ebiggers@google.com>
+> This series converts the glue code for the S390 CPACF implementations of
+> AES, DES, and 3DES modes from the deprecated "blkcipher" API to the
+> "skcipher" API.  This is needed in order for the blkcipher API to be
+> removed.
 >
-> Convert the PowerPC Nest (NX) implementation of AES-CTR from the
-> deprecated "blkcipher" API to the "skcipher" API.  This is needed in
-> order for the blkcipher API to be removed.
+> I've compiled this patchset, and the conversion is very similar to that
+> which has been done for many other crypto drivers.  But I don't have the
+> hardware to test it, nor is S390 CPACF supported by QEMU.  So I really
+> need someone with the hardware to test it.  You can do so by setting:
 >
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> CONFIG_CRYPTO_HW=y
+> CONFIG_ZCRYPT=y
+> CONFIG_PKEY=y
+> CONFIG_CRYPTO_AES_S390=y
+> CONFIG_CRYPTO_PAES_S390=y
+> CONFIG_CRYPTO_DES_S390=y
+> # CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
+> CONFIG_DEBUG_KERNEL=y
+> CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
+> CONFIG_CRYPTO_AES=y
+> CONFIG_CRYPTO_DES=y
+> CONFIG_CRYPTO_CBC=y
+> CONFIG_CRYPTO_CTR=y
+> CONFIG_CRYPTO_ECB=y
+> CONFIG_CRYPTO_XTS=y
+>
+> Then boot and check for crypto self-test failures by running
+> 'dmesg | grep alg'.
+>
+> If there are test failures, please also check whether they were already
+> failing prior to this patchset.
+>
+> This won't cover the "paes" ("protected key AES") algorithms, however,
+> since those don't have self-tests.  If anyone has any way to test those,
+> please do so.
+>
+> Eric Biggers (3):
+>   crypto: s390/aes - convert to skcipher API
+>   crypto: s390/paes - convert to skcipher API
+>   crypto: s390/des - convert to skcipher API
+>
+
+These look fine to me:
 
 Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-> ---
->  drivers/crypto/nx/nx-aes-ctr.c | 84 +++++++++++++++-------------------
->  drivers/crypto/nx/nx.c         | 25 +++-------
->  drivers/crypto/nx/nx.h         |  4 +-
->  3 files changed, 46 insertions(+), 67 deletions(-)
->
-> diff --git a/drivers/crypto/nx/nx-aes-ctr.c b/drivers/crypto/nx/nx-aes-ctr.c
-> index 05e558cefe94..6d5ce1a66f1e 100644
-> --- a/drivers/crypto/nx/nx-aes-ctr.c
-> +++ b/drivers/crypto/nx/nx-aes-ctr.c
-> @@ -19,11 +19,11 @@
->  #include "nx.h"
->
->
-> -static int ctr_aes_nx_set_key(struct crypto_tfm *tfm,
-> -                             const u8          *in_key,
-> -                             unsigned int       key_len)
-> +static int ctr_aes_nx_set_key(struct crypto_skcipher *tfm,
-> +                             const u8               *in_key,
-> +                             unsigned int            key_len)
->  {
-> -       struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(tfm);
-> +       struct nx_crypto_ctx *nx_ctx = crypto_skcipher_ctx(tfm);
->         struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
->
->         nx_ctx_init(nx_ctx, HCOP_FC_AES);
-> @@ -51,11 +51,11 @@ static int ctr_aes_nx_set_key(struct crypto_tfm *tfm,
->         return 0;
->  }
->
-> -static int ctr3686_aes_nx_set_key(struct crypto_tfm *tfm,
-> -                                 const u8          *in_key,
-> -                                 unsigned int       key_len)
-> +static int ctr3686_aes_nx_set_key(struct crypto_skcipher *tfm,
-> +                                 const u8               *in_key,
-> +                                 unsigned int            key_len)
->  {
-> -       struct nx_crypto_ctx *nx_ctx = crypto_tfm_ctx(tfm);
-> +       struct nx_crypto_ctx *nx_ctx = crypto_skcipher_ctx(tfm);
->
->         if (key_len < CTR_RFC3686_NONCE_SIZE)
->                 return -EINVAL;
-> @@ -69,12 +69,10 @@ static int ctr3686_aes_nx_set_key(struct crypto_tfm *tfm,
->         return ctr_aes_nx_set_key(tfm, in_key, key_len);
->  }
->
-> -static int ctr_aes_nx_crypt(struct blkcipher_desc *desc,
-> -                           struct scatterlist    *dst,
-> -                           struct scatterlist    *src,
-> -                           unsigned int           nbytes)
-> +static int ctr_aes_nx_crypt(struct skcipher_request *req, u8 *iv)
->  {
-> -       struct nx_crypto_ctx *nx_ctx = crypto_blkcipher_ctx(desc->tfm);
-> +       struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-> +       struct nx_crypto_ctx *nx_ctx = crypto_skcipher_ctx(tfm);
->         struct nx_csbcpb *csbcpb = nx_ctx->csbcpb;
->         unsigned long irq_flags;
->         unsigned int processed = 0, to_process;
-> @@ -83,9 +81,9 @@ static int ctr_aes_nx_crypt(struct blkcipher_desc *desc,
->         spin_lock_irqsave(&nx_ctx->lock, irq_flags);
->
->         do {
-> -               to_process = nbytes - processed;
-> +               to_process = req->cryptlen - processed;
->
-> -               rc = nx_build_sg_lists(nx_ctx, desc->info, dst, src,
-> +               rc = nx_build_sg_lists(nx_ctx, iv, req->dst, req->src,
->                                        &to_process, processed,
->                                        csbcpb->cpb.aes_ctr.iv);
->                 if (rc)
-> @@ -97,59 +95,51 @@ static int ctr_aes_nx_crypt(struct blkcipher_desc *desc,
->                 }
->
->                 rc = nx_hcall_sync(nx_ctx, &nx_ctx->op,
-> -                                  desc->flags & CRYPTO_TFM_REQ_MAY_SLEEP);
-> +                                  req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP);
->                 if (rc)
->                         goto out;
->
-> -               memcpy(desc->info, csbcpb->cpb.aes_cbc.cv, AES_BLOCK_SIZE);
-> +               memcpy(iv, csbcpb->cpb.aes_cbc.cv, AES_BLOCK_SIZE);
->
->                 atomic_inc(&(nx_ctx->stats->aes_ops));
->                 atomic64_add(csbcpb->csb.processed_byte_count,
->                              &(nx_ctx->stats->aes_bytes));
->
->                 processed += to_process;
-> -       } while (processed < nbytes);
-> +       } while (processed < req->cryptlen);
->  out:
->         spin_unlock_irqrestore(&nx_ctx->lock, irq_flags);
->         return rc;
->  }
->
-> -static int ctr3686_aes_nx_crypt(struct blkcipher_desc *desc,
-> -                               struct scatterlist    *dst,
-> -                               struct scatterlist    *src,
-> -                               unsigned int           nbytes)
-> +static int ctr3686_aes_nx_crypt(struct skcipher_request *req)
->  {
-> -       struct nx_crypto_ctx *nx_ctx = crypto_blkcipher_ctx(desc->tfm);
-> +       struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-> +       struct nx_crypto_ctx *nx_ctx = crypto_skcipher_ctx(tfm);
->         u8 iv[16];
->
->         memcpy(iv, nx_ctx->priv.ctr.nonce, CTR_RFC3686_IV_SIZE);
-> -       memcpy(iv + CTR_RFC3686_NONCE_SIZE,
-> -              desc->info, CTR_RFC3686_IV_SIZE);
-> +       memcpy(iv + CTR_RFC3686_NONCE_SIZE, req->iv, CTR_RFC3686_IV_SIZE);
->         iv[12] = iv[13] = iv[14] = 0;
->         iv[15] = 1;
->
-> -       desc->info = iv;
-> -
-> -       return ctr_aes_nx_crypt(desc, dst, src, nbytes);
-> +       return ctr_aes_nx_crypt(req, iv);
->  }
->
-> -struct crypto_alg nx_ctr3686_aes_alg = {
-> -       .cra_name        = "rfc3686(ctr(aes))",
-> -       .cra_driver_name = "rfc3686-ctr-aes-nx",
-> -       .cra_priority    = 300,
-> -       .cra_flags       = CRYPTO_ALG_TYPE_BLKCIPHER,
-> -       .cra_blocksize   = 1,
-> -       .cra_ctxsize     = sizeof(struct nx_crypto_ctx),
-> -       .cra_type        = &crypto_blkcipher_type,
-> -       .cra_module      = THIS_MODULE,
-> -       .cra_init        = nx_crypto_ctx_aes_ctr_init,
-> -       .cra_exit        = nx_crypto_ctx_exit,
-> -       .cra_blkcipher = {
-> -               .min_keysize = AES_MIN_KEY_SIZE + CTR_RFC3686_NONCE_SIZE,
-> -               .max_keysize = AES_MAX_KEY_SIZE + CTR_RFC3686_NONCE_SIZE,
-> -               .ivsize      = CTR_RFC3686_IV_SIZE,
-> -               .setkey      = ctr3686_aes_nx_set_key,
-> -               .encrypt     = ctr3686_aes_nx_crypt,
-> -               .decrypt     = ctr3686_aes_nx_crypt,
-> -       }
-> +struct skcipher_alg nx_ctr3686_aes_alg = {
-> +       .base.cra_name          = "rfc3686(ctr(aes))",
-> +       .base.cra_driver_name   = "rfc3686-ctr-aes-nx",
-> +       .base.cra_priority      = 300,
-> +       .base.cra_blocksize     = 1,
-> +       .base.cra_ctxsize       = sizeof(struct nx_crypto_ctx),
-> +       .base.cra_module        = THIS_MODULE,
-> +       .init                   = nx_crypto_ctx_aes_ctr_init,
-> +       .exit                   = nx_crypto_ctx_skcipher_exit,
-> +       .min_keysize            = AES_MIN_KEY_SIZE + CTR_RFC3686_NONCE_SIZE,
-> +       .max_keysize            = AES_MAX_KEY_SIZE + CTR_RFC3686_NONCE_SIZE,
-> +       .ivsize                 = CTR_RFC3686_IV_SIZE,
-> +       .setkey                 = ctr3686_aes_nx_set_key,
-> +       .encrypt                = ctr3686_aes_nx_crypt,
-> +       .decrypt                = ctr3686_aes_nx_crypt,
-> +       .chunksize              = AES_BLOCK_SIZE,
->  };
-> diff --git a/drivers/crypto/nx/nx.c b/drivers/crypto/nx/nx.c
-> index 8e5367776ca0..f03c238f5a31 100644
-> --- a/drivers/crypto/nx/nx.c
-> +++ b/drivers/crypto/nx/nx.c
-> @@ -511,12 +511,6 @@ static bool nx_check_props(struct device *dev, u32 fc, u32 mode)
->         return true;
->  }
->
-> -static int nx_register_alg(struct crypto_alg *alg, u32 fc, u32 mode)
-> -{
-> -       return nx_check_props(&nx_driver.viodev->dev, fc, mode) ?
-> -              crypto_register_alg(alg) : 0;
-> -}
-> -
->  static int nx_register_skcipher(struct skcipher_alg *alg, u32 fc, u32 mode)
->  {
->         return nx_check_props(&nx_driver.viodev->dev, fc, mode) ?
-> @@ -537,12 +531,6 @@ static int nx_register_shash(struct shash_alg *alg, u32 fc, u32 mode, int slot)
->                crypto_register_shash(alg) : 0;
->  }
->
-> -static void nx_unregister_alg(struct crypto_alg *alg, u32 fc, u32 mode)
-> -{
-> -       if (nx_check_props(NULL, fc, mode))
-> -               crypto_unregister_alg(alg);
-> -}
-> -
->  static void nx_unregister_skcipher(struct skcipher_alg *alg, u32 fc, u32 mode)
->  {
->         if (nx_check_props(NULL, fc, mode))
-> @@ -593,7 +581,8 @@ static int nx_register_algs(void)
->         if (rc)
->                 goto out_unreg_ecb;
->
-> -       rc = nx_register_alg(&nx_ctr3686_aes_alg, NX_FC_AES, NX_MODE_AES_CTR);
-> +       rc = nx_register_skcipher(&nx_ctr3686_aes_alg, NX_FC_AES,
-> +                                 NX_MODE_AES_CTR);
->         if (rc)
->                 goto out_unreg_cbc;
->
-> @@ -645,7 +634,7 @@ static int nx_register_algs(void)
->  out_unreg_gcm:
->         nx_unregister_aead(&nx_gcm_aes_alg, NX_FC_AES, NX_MODE_AES_GCM);
->  out_unreg_ctr3686:
-> -       nx_unregister_alg(&nx_ctr3686_aes_alg, NX_FC_AES, NX_MODE_AES_CTR);
-> +       nx_unregister_skcipher(&nx_ctr3686_aes_alg, NX_FC_AES, NX_MODE_AES_CTR);
->  out_unreg_cbc:
->         nx_unregister_skcipher(&nx_cbc_aes_alg, NX_FC_AES, NX_MODE_AES_CBC);
->  out_unreg_ecb:
-> @@ -716,9 +705,9 @@ int nx_crypto_ctx_aes_gcm_init(struct crypto_aead *tfm)
->                                   NX_MODE_AES_GCM);
->  }
->
-> -int nx_crypto_ctx_aes_ctr_init(struct crypto_tfm *tfm)
-> +int nx_crypto_ctx_aes_ctr_init(struct crypto_skcipher *tfm)
->  {
-> -       return nx_crypto_ctx_init(crypto_tfm_ctx(tfm), NX_FC_AES,
-> +       return nx_crypto_ctx_init(crypto_skcipher_ctx(tfm), NX_FC_AES,
->                                   NX_MODE_AES_CTR);
->  }
->
-> @@ -815,8 +804,8 @@ static int nx_remove(struct vio_dev *viodev)
->                                    NX_FC_AES, NX_MODE_AES_GCM);
->                 nx_unregister_aead(&nx_gcm_aes_alg,
->                                    NX_FC_AES, NX_MODE_AES_GCM);
-> -               nx_unregister_alg(&nx_ctr3686_aes_alg,
-> -                                 NX_FC_AES, NX_MODE_AES_CTR);
-> +               nx_unregister_skcipher(&nx_ctr3686_aes_alg,
-> +                                      NX_FC_AES, NX_MODE_AES_CTR);
->                 nx_unregister_skcipher(&nx_cbc_aes_alg, NX_FC_AES,
->                                        NX_MODE_AES_CBC);
->                 nx_unregister_skcipher(&nx_ecb_aes_alg, NX_FC_AES,
-> diff --git a/drivers/crypto/nx/nx.h b/drivers/crypto/nx/nx.h
-> index 2e1a3e5e65cb..91c54289124a 100644
-> --- a/drivers/crypto/nx/nx.h
-> +++ b/drivers/crypto/nx/nx.h
-> @@ -145,7 +145,7 @@ struct crypto_aead;
->  int nx_crypto_ctx_aes_ccm_init(struct crypto_aead *tfm);
->  int nx_crypto_ctx_aes_gcm_init(struct crypto_aead *tfm);
->  int nx_crypto_ctx_aes_xcbc_init(struct crypto_tfm *tfm);
-> -int nx_crypto_ctx_aes_ctr_init(struct crypto_tfm *tfm);
-> +int nx_crypto_ctx_aes_ctr_init(struct crypto_skcipher *tfm);
->  int nx_crypto_ctx_aes_cbc_init(struct crypto_skcipher *tfm);
->  int nx_crypto_ctx_aes_ecb_init(struct crypto_skcipher *tfm);
->  int nx_crypto_ctx_sha_init(struct crypto_tfm *tfm);
-> @@ -180,7 +180,7 @@ extern struct skcipher_alg nx_cbc_aes_alg;
->  extern struct skcipher_alg nx_ecb_aes_alg;
->  extern struct aead_alg nx_gcm_aes_alg;
->  extern struct aead_alg nx_gcm4106_aes_alg;
-> -extern struct crypto_alg nx_ctr3686_aes_alg;
-> +extern struct skcipher_alg nx_ctr3686_aes_alg;
->  extern struct aead_alg nx_ccm_aes_alg;
->  extern struct aead_alg nx_ccm4309_aes_alg;
->  extern struct shash_alg nx_shash_aes_xcbc_alg;
-> --
-> 2.23.0
->
+but i cannot test them either.
