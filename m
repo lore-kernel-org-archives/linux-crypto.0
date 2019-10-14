@@ -2,88 +2,118 @@ Return-Path: <SRS0=VKJi=YH=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AE03C47404
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 04:54:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F41DCC4CECE
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 05:18:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4FD8020882
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 04:54:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1571028881;
-	bh=jkAxrokFeGdmQ8630KmacbiObdol59kzXDARoI9ENkI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=qB6fFCrOCB0RkoaIwhTxiSGtUk5O9AZab4tA/IytfPdpv/o9MQsv8iyXy31k+HA70
-	 Pcr3Z14MQEJYmw9+12okFbL6WcArOZXnowiYMbEv5Jwft/ewALTMoSW/Tn1IxM3YPE
-	 jVxSsI/OXKoiScDP9ixcS+8MpRQ/fx1fKnIL0+MI=
+	by mail.kernel.org (Postfix) with ESMTP id CC6982168B
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 05:18:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GF/EoEen"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725877AbfJNEyk (ORCPT
+        id S1726528AbfJNFSr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Oct 2019 00:54:40 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42300 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725787AbfJNEyk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Oct 2019 00:54:40 -0400
-Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 32A5420873;
-        Mon, 14 Oct 2019 04:54:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1571028880;
-        bh=jkAxrokFeGdmQ8630KmacbiObdol59kzXDARoI9ENkI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=SSYlo4i3onZx9xYWD7TxBw9llKcqZLL/lTs9Y4K8FbUtgq/H/3YG0HfD41WG6E9Ov
-         uhe9SFrI+lLjzViZdAAd3/M8Ht0TYOL7QwdXCeyyX6VSh04mGmup/a8reSgzGPzwDH
-         wTOpGj5CANJBejn969bYXQWggXFIUOBSnTuesbqA=
-Date:   Sun, 13 Oct 2019 21:54:38 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Jamie Heilman <jamie@audible.transient.net>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] crypto: padlock-aes - convert to skcipher API
-Message-ID: <20191014045438.GE10007@sol.localdomain>
-Mail-Followup-To: Jamie Heilman <jamie@audible.transient.net>,
-        linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-References: <20191013041741.265150-1-ebiggers@kernel.org>
- <20191013232050.GA3266@audible.transient.net>
- <20191014031222.GC10007@sol.localdomain>
- <20191014044726.GB3266@audible.transient.net>
+        Mon, 14 Oct 2019 01:18:47 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:34596 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725869AbfJNFSq (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 14 Oct 2019 01:18:46 -0400
+Received: by mail-wr1-f68.google.com with SMTP id j11so18029762wrp.1;
+        Sun, 13 Oct 2019 22:18:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=VV3IaZnskbUr1GiFO2X9yDGhA134LORR3NXQx0QiOlA=;
+        b=GF/EoEenQBXCUWJ2k0tzuqQR085/nEg2EkMXurnyEdNA2zKX6mjtAE5DIkxdZ0UU5Q
+         wSofKEtnAsrgiJeTSdIjD03CU0AYKb/SncJB2yl5/6p80ZrpgWSQoPklhw3I461/0+89
+         zm7Sp2nZb/rLh1lZG8RLs1GXPEV8El4hcQ661jDremdTBE5H9wt8573KGsGOPmbhlZoC
+         1yHBDrCLpIEkaqxcvFLeaCQMEoWaNvrrRsqGeqp50z8CPYO7Fp7+cftycC7iLB4mmS0n
+         QQzIa0U6xir7ZDLNcQlPRwVrRP3iWp9AdJI6aK3c+j38tJ61NbCXeZrw7E3NjzG116Gb
+         keTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=VV3IaZnskbUr1GiFO2X9yDGhA134LORR3NXQx0QiOlA=;
+        b=dKrmCFsN2NRqEZjmFlD5wTc4JYhAkXf1jYR8L7eTE9PKNRKE8mHHuZobUdWgbqqfxG
+         tBen3FMdn2rWczzxA3xuos8RZEVDZis5aJnMUaG6v/dUeTstf4G5yAHnedDDjuviPSu0
+         CJcRMt/Pb0Obp3wF/eyKPv686oeoZGwZln9VtaznFLcLS03iY7oaoKL9tIWPdqtIrJwK
+         OF53PqAIS/9FwtPic88EpHNdJfbayoOAth8JcLigX568J0cghhKZPrL74nwfS0dJw1ui
+         lc4UTfQg5H3k1L8dsxJ3Zw6UHKi3y5EbE72EcjcwakNKqJORo5C9peDU/6ql5BG1oUfJ
+         pXQA==
+X-Gm-Message-State: APjAAAW7wuAiolgVdIEK6tvAceI+JIt+a7NpA2j89PzkSv7les8RtSj3
+        h5kxHiqtgCI9Lq1ldvYOu+RroB0P
+X-Google-Smtp-Source: APXvYqwSkfiMiVUM22hh3eH+vxUD6VrSroLzyJM2IkERg+/i7QXfkOq9fwEWbQq/e+W1/GbC3PcE0Q==
+X-Received: by 2002:a05:6000:18d:: with SMTP id p13mr1507726wrx.396.1571030324402;
+        Sun, 13 Oct 2019 22:18:44 -0700 (PDT)
+Received: from Red.localdomain ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
+        by smtp.googlemail.com with ESMTPSA id 5sm14660340wrk.86.2019.10.13.22.18.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 13 Oct 2019 22:18:43 -0700 (PDT)
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     davem@davemloft.net, herbert@gondor.apana.org.au,
+        khilman@baylibre.com, mark.rutland@arm.com, robh+dt@kernel.org,
+        martin.blumenstingl@googlemail.com
+Cc:     devicetree@vger.kernel.org, linux-amlogic@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Corentin Labbe <clabbe.montjoie@gmail.com>
+Subject: [PATCH v2 0/4] crypto: add amlogic crypto offloader driver
+Date:   Mon, 14 Oct 2019 07:18:35 +0200
+Message-Id: <20191014051839.32274-1-clabbe.montjoie@gmail.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191014044726.GB3266@audible.transient.net>
-User-Agent: Mutt/1.12.2 (2019-09-21)
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Oct 14, 2019 at 04:47:27AM +0000, Jamie Heilman wrote:
-> Eric Biggers wrote:
-> > > I built a patched 5.3.6 with none of the crypto bits modularized
-> > > and you can find that dmesg and config at:
-> > > 
-> > > http://audible.transient.net/~jamie/k/skcipher.config-5.3.6
-> > > http://audible.transient.net/~jamie/k/skcipher.dmesg
-> > > 
-> > 
-> > Great, I don't see any test failures in the log.  Just to double
-> > check, you had applied both Ard's patch and this one, right?:
-> > 
-> > 	crypto: geode-aes - switch to skcipher for cbc(aes) fallback
-> > 	crypto: geode-aes - convert to skcipher API and make thread-safe
-> 
-> Er, no?  Just the VIA padlock-aes.c change from you on top of a stock
-> 5.3.6 tree, nothing from Ard.  No geode here.
-> 
+Hello
 
-Oops, sorry, I confused this with a different driver.  Yes, if you just applied
-this padlock-aes patch it's good.
+This serie adds support for the crypto offloader present on amlogic GXL
+SoCs.
 
-Thanks for testing!
+Tested on meson-gxl-s905x-khadas-vim and meson-gxl-s905x-libretech-cc
 
-- Eric
+Regards
+
+Changes since v1:
+- renamed files and algo with gxl
+- removed unused reset handlings
+- splited the probe functions
+- splited meson_cipher fallback in need_fallback() and do_fallback()
+
+Corentin Labbe (4):
+  dt-bindings: crypto: Add DT bindings documentation for amlogic-crypto
+  MAINTAINERS: Add myself as maintainer of amlogic crypto
+  crypto: amlogic: Add crypto accelerator for amlogic GXL
+  ARM64: dts: amlogic: adds crypto hardware node
+
+ .../bindings/crypto/amlogic,gxl-crypto.yaml   |  52 +++
+ MAINTAINERS                                   |   7 +
+ arch/arm64/boot/dts/amlogic/meson-gxl.dtsi    |  10 +
+ drivers/crypto/Kconfig                        |   2 +
+ drivers/crypto/Makefile                       |   1 +
+ drivers/crypto/amlogic/Kconfig                |  24 ++
+ drivers/crypto/amlogic/Makefile               |   2 +
+ drivers/crypto/amlogic/amlogic-gxl-cipher.c   | 381 ++++++++++++++++++
+ drivers/crypto/amlogic/amlogic-gxl-core.c     | 333 +++++++++++++++
+ drivers/crypto/amlogic/amlogic-gxl.h          | 170 ++++++++
+ 10 files changed, 982 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
+ create mode 100644 drivers/crypto/amlogic/Kconfig
+ create mode 100644 drivers/crypto/amlogic/Makefile
+ create mode 100644 drivers/crypto/amlogic/amlogic-gxl-cipher.c
+ create mode 100644 drivers/crypto/amlogic/amlogic-gxl-core.c
+ create mode 100644 drivers/crypto/amlogic/amlogic-gxl.h
+
+-- 
+2.21.0
+
