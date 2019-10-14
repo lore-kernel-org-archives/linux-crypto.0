@@ -2,97 +2,383 @@ Return-Path: <SRS0=VKJi=YH=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0F0DC4CECE
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 12:53:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BAA1ECE587
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 13:01:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A564420673
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 12:53:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B9udUHxd"
+	by mail.kernel.org (Postfix) with ESMTP id 4E65C21882
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 13:01:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1571058116;
+	bh=NpehrkHyjb0psRZp/Hleb6tPGTn2vlQy2Pv8V0UUgIc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=Vc+mO9rdPiWchA4ZwuMJ7cMMaDmP57klWbNBzMKBNbKUppCoCWDY6bUFUt69hHOCt
+	 NqWGr4WJ7GVb5xfw7JZIsLa60IXjoUwOY2COy53S3035A7lFpO7Ad3nFnB+uGVuQtn
+	 mB2HbxMEi5HAaEhLP3h3NCtCATKPzBzuWA+wnYaA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731492AbfJNMxu (ORCPT
+        id S1730366AbfJNNBz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Oct 2019 08:53:50 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:45677 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731471AbfJNMxt (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Oct 2019 08:53:49 -0400
-Received: by mail-wr1-f67.google.com with SMTP id r5so19558938wrm.12
-        for <linux-crypto@vger.kernel.org>; Mon, 14 Oct 2019 05:53:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=O7K03ojuhZUEPufhw8dvRl32iX1dIUuNh6+Mii0jm8s=;
-        b=B9udUHxdqqZFbwa3QaYJihbJ92a/4zyCUfTCoMoH3snFDeKWCDFvz7+QYn4yc5sibq
-         8NHLm/7Ib6oboGCi7SSbOn0FdI1E+hm83mJVKzEt5zEFQ+4c+1gUeKNHNcLySy1VJipU
-         K0kosp9H7LRKqnzz/eWmCeMdsBAdVY0UMY70i4tbWD2mc1Rf2c9HfpPL+EUdxKTp1rJN
-         Gd7JmVON/TwIU7ECGnImQvkXS2hRg8mQs66EskEGgzU98bpTyg3Qq51hDevjg53U6PTz
-         kUDyYQW6re87E7vIDWbLXlpoHhkKqOS5AgPMrIyXDx+LQJcjseYoYwpVp8r/xSSKa5SB
-         Nv4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=O7K03ojuhZUEPufhw8dvRl32iX1dIUuNh6+Mii0jm8s=;
-        b=ktt10SLhrAe8y8DBxMLksJblDvfXslsZX51u6VN+R22IruDpUMLHk3jL3KzZMF8ITg
-         z6Uo4+UHNC/cvBfA3Urje+aQjelAIjxPbQ76KqAcRVSWDjWxQGUbFAPSZ3YZYDck4AQ7
-         aQatVl5GdLhXCLBSKhbppCYMcY7F8xbIyfZ1TAD61XqOZIypYtqxJhfaPLP4SrC78g9b
-         ZAlLs8c6Ec5wq9gLKP4s1delkh+ckDNdLyDJ9ah4WlcrDiGWGIkxeldbnEXMnEQ5lmOA
-         Oi1m3pg6JYC159qyS0TDF36RKnRFEE5Uy+dnZ7/a0PJxjRNPUnzBaRy7cXkFWsKlLF7L
-         J31Q==
-X-Gm-Message-State: APjAAAXGSW207RJbPfMmoLjBAEui8BhqAJpkNBejdi8AmKdfw9t81hwh
-        qQ7gPamCRFiXqz8aSHGdCDDgfMC+X4CgheE6snzgmA==
-X-Google-Smtp-Source: APXvYqz1g1K3bZw+Yaf4FiZgz4EcDEjg2qtRzDMh9qVgwR+/GOFLHIGXYIr3PKpRqDaZ1w6YrLqviMG8/pyFspJEeJg=
-X-Received: by 2002:adf:9f08:: with SMTP id l8mr24595014wrf.325.1571057626382;
- Mon, 14 Oct 2019 05:53:46 -0700 (PDT)
-MIME-Version: 1.0
-References: <20191007164610.6881-1-ard.biesheuvel@linaro.org>
- <20191007164610.6881-22-ard.biesheuvel@linaro.org> <20191011060232.GB23882@sol.localdomain>
- <20191011164550.GA203415@zx2c4.com>
-In-Reply-To: <20191011164550.GA203415@zx2c4.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Mon, 14 Oct 2019 14:53:35 +0200
-Message-ID: <CAKv+Gu9R25f+jxMLDPD2PTvrH5n9PPLx_Sb1foo4mUgm8A3D6Q@mail.gmail.com>
-Subject: Re: [PATCH v3 21/29] crypto: BLAKE2s - generic C library
- implementation and selftest
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
+        Mon, 14 Oct 2019 09:01:55 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58124 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726169AbfJNNBz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 14 Oct 2019 09:01:55 -0400
+Received: from dragon (li937-157.members.linode.com [45.56.119.157])
+        (using TLSv1.2 with cipher DHE-RSA-AES128-SHA (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 93733217D9;
+        Mon, 14 Oct 2019 13:01:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1571058114;
+        bh=NpehrkHyjb0psRZp/Hleb6tPGTn2vlQy2Pv8V0UUgIc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=1SuzeT8T1X07sLA2AodJqOIqxuFyQAXDKnF0NVeR/9VZCQezCUZ0x6GQVRHhIxTtx
+         E2akFGO3lShs8zz1ILXf2SwHGIJpi9GIC1g+WkjHh/yd1Dd5smXfLHajU+Y2cjRIWr
+         0GwY5BTrYA87nElB5mL1LXfU2W6C7mR3yDaDWcHE=
+Date:   Mon, 14 Oct 2019 21:01:28 +0800
+From:   Shawn Guo <shawnguo@kernel.org>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Marek Vasut <marex@denx.de>
+Cc:     linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        Samuel Neves <sneves@dei.uc.pt>, Arnd Bergmann <arnd@arndb.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Martin Willi <martin@strongswan.org>,
-        Rene van Dorst <opensource@vdorst.com>
-Content-Type: text/plain; charset="UTF-8"
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@google.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Fabio Estevam <festevam@gmail.com>,
+        NXP Linux Team <linux-imx@nxp.com>
+Subject: Re: [PATCH 16/25] crypto: mxs - switch to skcipher API
+Message-ID: <20191014130124.GT12262@dragon>
+References: <20191014121910.7264-1-ard.biesheuvel@linaro.org>
+ <20191014121910.7264-17-ard.biesheuvel@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191014121910.7264-17-ard.biesheuvel@linaro.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 11 Oct 2019 at 18:46, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> On Thu, Oct 10, 2019 at 11:02:32PM -0700, Eric Biggers wrote:
-> > FYI, I had left a few review comments on Jason's last version of this patch
-> > (https://lkml.kernel.org/linux-crypto/20190326173759.GA607@zzz.localdomain/),
-> > some of which Jason addressed in the Wireguard repository
-> > (https://git.zx2c4.com/WireGuard) but they didn't make it into this patch.
-> > I'd suggest taking a look at the version there.
->
-> Indeed I hadn't updated the Zinc patchset since then, but you can see
-> the changes since ~March here:
->
-> https://git.zx2c4.com/WireGuard/log/src/crypto
->
-> There are actually quite a few interesting Blake changes.
+Copy Marek who is the author of the driver.
 
-I've picked up a recent version of your Blake2s sources for my v4 series.
+Shawn
 
-Thanks,
-Ard.
+On Mon, Oct 14, 2019 at 02:19:01PM +0200, Ard Biesheuvel wrote:
+> Commit 7a7ffe65c8c5 ("crypto: skcipher - Add top-level skcipher interface")
+> dated 20 august 2015 introduced the new skcipher API which is supposed to
+> replace both blkcipher and ablkcipher. While all consumers of the API have
+> been converted long ago, some producers of the ablkcipher remain, forcing
+> us to keep the ablkcipher support routines alive, along with the matching
+> code to expose [a]blkciphers via the skcipher API.
+> 
+> So switch this driver to the skcipher API, allowing us to finally drop the
+> blkcipher code in the near future.
+> 
+> Cc: Shawn Guo <shawnguo@kernel.org>
+> Cc: Sascha Hauer <s.hauer@pengutronix.de>
+> Cc: Pengutronix Kernel Team <kernel@pengutronix.de>
+> Cc: Fabio Estevam <festevam@gmail.com>
+> Cc: NXP Linux Team <linux-imx@nxp.com>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
+>  drivers/crypto/mxs-dcp.c | 140 +++++++++-----------
+>  1 file changed, 65 insertions(+), 75 deletions(-)
+> 
+> diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
+> index bf8d2197bc11..f438b425c655 100644
+> --- a/drivers/crypto/mxs-dcp.c
+> +++ b/drivers/crypto/mxs-dcp.c
+> @@ -211,11 +211,11 @@ static int mxs_dcp_start_dma(struct dcp_async_ctx *actx)
+>   * Encryption (AES128)
+>   */
+>  static int mxs_dcp_run_aes(struct dcp_async_ctx *actx,
+> -			   struct ablkcipher_request *req, int init)
+> +			   struct skcipher_request *req, int init)
+>  {
+>  	struct dcp *sdcp = global_sdcp;
+>  	struct dcp_dma_desc *desc = &sdcp->coh->desc[actx->chan];
+> -	struct dcp_aes_req_ctx *rctx = ablkcipher_request_ctx(req);
+> +	struct dcp_aes_req_ctx *rctx = skcipher_request_ctx(req);
+>  	int ret;
+>  
+>  	dma_addr_t key_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_key,
+> @@ -274,9 +274,9 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
+>  {
+>  	struct dcp *sdcp = global_sdcp;
+>  
+> -	struct ablkcipher_request *req = ablkcipher_request_cast(arq);
+> +	struct skcipher_request *req = skcipher_request_cast(arq);
+>  	struct dcp_async_ctx *actx = crypto_tfm_ctx(arq->tfm);
+> -	struct dcp_aes_req_ctx *rctx = ablkcipher_request_ctx(req);
+> +	struct dcp_aes_req_ctx *rctx = skcipher_request_ctx(req);
+>  
+>  	struct scatterlist *dst = req->dst;
+>  	struct scatterlist *src = req->src;
+> @@ -305,7 +305,7 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
+>  
+>  	if (!rctx->ecb) {
+>  		/* Copy the CBC IV just past the key. */
+> -		memcpy(key + AES_KEYSIZE_128, req->info, AES_KEYSIZE_128);
+> +		memcpy(key + AES_KEYSIZE_128, req->iv, AES_KEYSIZE_128);
+>  		/* CBC needs the INIT set. */
+>  		init = 1;
+>  	} else {
+> @@ -316,10 +316,10 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
+>  		src_buf = sg_virt(src);
+>  		len = sg_dma_len(src);
+>  		tlen += len;
+> -		limit_hit = tlen > req->nbytes;
+> +		limit_hit = tlen > req->cryptlen;
+>  
+>  		if (limit_hit)
+> -			len = req->nbytes - (tlen - len);
+> +			len = req->cryptlen - (tlen - len);
+>  
+>  		do {
+>  			if (actx->fill + len > out_off)
+> @@ -375,10 +375,10 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
+>  	/* Copy the IV for CBC for chaining */
+>  	if (!rctx->ecb) {
+>  		if (rctx->enc)
+> -			memcpy(req->info, out_buf+(last_out_len-AES_BLOCK_SIZE),
+> +			memcpy(req->iv, out_buf+(last_out_len-AES_BLOCK_SIZE),
+>  				AES_BLOCK_SIZE);
+>  		else
+> -			memcpy(req->info, in_buf+(last_out_len-AES_BLOCK_SIZE),
+> +			memcpy(req->iv, in_buf+(last_out_len-AES_BLOCK_SIZE),
+>  				AES_BLOCK_SIZE);
+>  	}
+>  
+> @@ -422,17 +422,17 @@ static int dcp_chan_thread_aes(void *data)
+>  	return 0;
+>  }
+>  
+> -static int mxs_dcp_block_fallback(struct ablkcipher_request *req, int enc)
+> +static int mxs_dcp_block_fallback(struct skcipher_request *req, int enc)
+>  {
+> -	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
+> -	struct dcp_async_ctx *ctx = crypto_ablkcipher_ctx(tfm);
+> +	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+> +	struct dcp_async_ctx *ctx = crypto_skcipher_ctx(tfm);
+>  	SYNC_SKCIPHER_REQUEST_ON_STACK(subreq, ctx->fallback);
+>  	int ret;
+>  
+>  	skcipher_request_set_sync_tfm(subreq, ctx->fallback);
+>  	skcipher_request_set_callback(subreq, req->base.flags, NULL, NULL);
+>  	skcipher_request_set_crypt(subreq, req->src, req->dst,
+> -				   req->nbytes, req->info);
+> +				   req->cryptlen, req->iv);
+>  
+>  	if (enc)
+>  		ret = crypto_skcipher_encrypt(subreq);
+> @@ -444,12 +444,12 @@ static int mxs_dcp_block_fallback(struct ablkcipher_request *req, int enc)
+>  	return ret;
+>  }
+>  
+> -static int mxs_dcp_aes_enqueue(struct ablkcipher_request *req, int enc, int ecb)
+> +static int mxs_dcp_aes_enqueue(struct skcipher_request *req, int enc, int ecb)
+>  {
+>  	struct dcp *sdcp = global_sdcp;
+>  	struct crypto_async_request *arq = &req->base;
+>  	struct dcp_async_ctx *actx = crypto_tfm_ctx(arq->tfm);
+> -	struct dcp_aes_req_ctx *rctx = ablkcipher_request_ctx(req);
+> +	struct dcp_aes_req_ctx *rctx = skcipher_request_ctx(req);
+>  	int ret;
+>  
+>  	if (unlikely(actx->key_len != AES_KEYSIZE_128))
+> @@ -468,30 +468,30 @@ static int mxs_dcp_aes_enqueue(struct ablkcipher_request *req, int enc, int ecb)
+>  	return ret;
+>  }
+>  
+> -static int mxs_dcp_aes_ecb_decrypt(struct ablkcipher_request *req)
+> +static int mxs_dcp_aes_ecb_decrypt(struct skcipher_request *req)
+>  {
+>  	return mxs_dcp_aes_enqueue(req, 0, 1);
+>  }
+>  
+> -static int mxs_dcp_aes_ecb_encrypt(struct ablkcipher_request *req)
+> +static int mxs_dcp_aes_ecb_encrypt(struct skcipher_request *req)
+>  {
+>  	return mxs_dcp_aes_enqueue(req, 1, 1);
+>  }
+>  
+> -static int mxs_dcp_aes_cbc_decrypt(struct ablkcipher_request *req)
+> +static int mxs_dcp_aes_cbc_decrypt(struct skcipher_request *req)
+>  {
+>  	return mxs_dcp_aes_enqueue(req, 0, 0);
+>  }
+>  
+> -static int mxs_dcp_aes_cbc_encrypt(struct ablkcipher_request *req)
+> +static int mxs_dcp_aes_cbc_encrypt(struct skcipher_request *req)
+>  {
+>  	return mxs_dcp_aes_enqueue(req, 1, 0);
+>  }
+>  
+> -static int mxs_dcp_aes_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
+> +static int mxs_dcp_aes_setkey(struct crypto_skcipher *tfm, const u8 *key,
+>  			      unsigned int len)
+>  {
+> -	struct dcp_async_ctx *actx = crypto_ablkcipher_ctx(tfm);
+> +	struct dcp_async_ctx *actx = crypto_skcipher_ctx(tfm);
+>  	unsigned int ret;
+>  
+>  	/*
+> @@ -525,10 +525,10 @@ static int mxs_dcp_aes_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
+>  	return ret;
+>  }
+>  
+> -static int mxs_dcp_aes_fallback_init(struct crypto_tfm *tfm)
+> +static int mxs_dcp_aes_fallback_init_tfm(struct crypto_skcipher *tfm)
+>  {
+> -	const char *name = crypto_tfm_alg_name(tfm);
+> -	struct dcp_async_ctx *actx = crypto_tfm_ctx(tfm);
+> +	const char *name = crypto_tfm_alg_name(crypto_skcipher_tfm(tfm));
+> +	struct dcp_async_ctx *actx = crypto_skcipher_ctx(tfm);
+>  	struct crypto_sync_skcipher *blk;
+>  
+>  	blk = crypto_alloc_sync_skcipher(name, 0, CRYPTO_ALG_NEED_FALLBACK);
+> @@ -536,13 +536,13 @@ static int mxs_dcp_aes_fallback_init(struct crypto_tfm *tfm)
+>  		return PTR_ERR(blk);
+>  
+>  	actx->fallback = blk;
+> -	tfm->crt_ablkcipher.reqsize = sizeof(struct dcp_aes_req_ctx);
+> +	crypto_skcipher_set_reqsize(tfm, sizeof(struct dcp_aes_req_ctx));
+>  	return 0;
+>  }
+>  
+> -static void mxs_dcp_aes_fallback_exit(struct crypto_tfm *tfm)
+> +static void mxs_dcp_aes_fallback_exit_tfm(struct crypto_skcipher *tfm)
+>  {
+> -	struct dcp_async_ctx *actx = crypto_tfm_ctx(tfm);
+> +	struct dcp_async_ctx *actx = crypto_skcipher_ctx(tfm);
+>  
+>  	crypto_free_sync_skcipher(actx->fallback);
+>  }
+> @@ -854,54 +854,44 @@ static void dcp_sha_cra_exit(struct crypto_tfm *tfm)
+>  }
+>  
+>  /* AES 128 ECB and AES 128 CBC */
+> -static struct crypto_alg dcp_aes_algs[] = {
+> +static struct skcipher_alg dcp_aes_algs[] = {
+>  	{
+> -		.cra_name		= "ecb(aes)",
+> -		.cra_driver_name	= "ecb-aes-dcp",
+> -		.cra_priority		= 400,
+> -		.cra_alignmask		= 15,
+> -		.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER |
+> -					  CRYPTO_ALG_ASYNC |
+> +		.base.cra_name		= "ecb(aes)",
+> +		.base.cra_driver_name	= "ecb-aes-dcp",
+> +		.base.cra_priority	= 400,
+> +		.base.cra_alignmask	= 15,
+> +		.base.cra_flags		= CRYPTO_ALG_ASYNC |
+>  					  CRYPTO_ALG_NEED_FALLBACK,
+> -		.cra_init		= mxs_dcp_aes_fallback_init,
+> -		.cra_exit		= mxs_dcp_aes_fallback_exit,
+> -		.cra_blocksize		= AES_BLOCK_SIZE,
+> -		.cra_ctxsize		= sizeof(struct dcp_async_ctx),
+> -		.cra_type		= &crypto_ablkcipher_type,
+> -		.cra_module		= THIS_MODULE,
+> -		.cra_u	= {
+> -			.ablkcipher = {
+> -				.min_keysize	= AES_MIN_KEY_SIZE,
+> -				.max_keysize	= AES_MAX_KEY_SIZE,
+> -				.setkey		= mxs_dcp_aes_setkey,
+> -				.encrypt	= mxs_dcp_aes_ecb_encrypt,
+> -				.decrypt	= mxs_dcp_aes_ecb_decrypt
+> -			},
+> -		},
+> +		.base.cra_blocksize	= AES_BLOCK_SIZE,
+> +		.base.cra_ctxsize	= sizeof(struct dcp_async_ctx),
+> +		.base.cra_module	= THIS_MODULE,
+> +
+> +		.min_keysize		= AES_MIN_KEY_SIZE,
+> +		.max_keysize		= AES_MAX_KEY_SIZE,
+> +		.setkey			= mxs_dcp_aes_setkey,
+> +		.encrypt		= mxs_dcp_aes_ecb_encrypt,
+> +		.decrypt		= mxs_dcp_aes_ecb_decrypt,
+> +		.init			= mxs_dcp_aes_fallback_init_tfm,
+> +		.exit			= mxs_dcp_aes_fallback_exit_tfm,
+>  	}, {
+> -		.cra_name		= "cbc(aes)",
+> -		.cra_driver_name	= "cbc-aes-dcp",
+> -		.cra_priority		= 400,
+> -		.cra_alignmask		= 15,
+> -		.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER |
+> -					  CRYPTO_ALG_ASYNC |
+> +		.base.cra_name		= "cbc(aes)",
+> +		.base.cra_driver_name	= "cbc-aes-dcp",
+> +		.base.cra_priority	= 400,
+> +		.base.cra_alignmask	= 15,
+> +		.base.cra_flags		= CRYPTO_ALG_ASYNC |
+>  					  CRYPTO_ALG_NEED_FALLBACK,
+> -		.cra_init		= mxs_dcp_aes_fallback_init,
+> -		.cra_exit		= mxs_dcp_aes_fallback_exit,
+> -		.cra_blocksize		= AES_BLOCK_SIZE,
+> -		.cra_ctxsize		= sizeof(struct dcp_async_ctx),
+> -		.cra_type		= &crypto_ablkcipher_type,
+> -		.cra_module		= THIS_MODULE,
+> -		.cra_u = {
+> -			.ablkcipher = {
+> -				.min_keysize	= AES_MIN_KEY_SIZE,
+> -				.max_keysize	= AES_MAX_KEY_SIZE,
+> -				.setkey		= mxs_dcp_aes_setkey,
+> -				.encrypt	= mxs_dcp_aes_cbc_encrypt,
+> -				.decrypt	= mxs_dcp_aes_cbc_decrypt,
+> -				.ivsize		= AES_BLOCK_SIZE,
+> -			},
+> -		},
+> +		.base.cra_blocksize	= AES_BLOCK_SIZE,
+> +		.base.cra_ctxsize	= sizeof(struct dcp_async_ctx),
+> +		.base.cra_module	= THIS_MODULE,
+> +
+> +		.min_keysize		= AES_MIN_KEY_SIZE,
+> +		.max_keysize		= AES_MAX_KEY_SIZE,
+> +		.setkey			= mxs_dcp_aes_setkey,
+> +		.encrypt		= mxs_dcp_aes_cbc_encrypt,
+> +		.decrypt		= mxs_dcp_aes_cbc_decrypt,
+> +		.ivsize			= AES_BLOCK_SIZE,
+> +		.init			= mxs_dcp_aes_fallback_init_tfm,
+> +		.exit			= mxs_dcp_aes_fallback_exit_tfm,
+>  	},
+>  };
+>  
+> @@ -1104,8 +1094,8 @@ static int mxs_dcp_probe(struct platform_device *pdev)
+>  	sdcp->caps = readl(sdcp->base + MXS_DCP_CAPABILITY1);
+>  
+>  	if (sdcp->caps & MXS_DCP_CAPABILITY1_AES128) {
+> -		ret = crypto_register_algs(dcp_aes_algs,
+> -					   ARRAY_SIZE(dcp_aes_algs));
+> +		ret = crypto_register_skciphers(dcp_aes_algs,
+> +						ARRAY_SIZE(dcp_aes_algs));
+>  		if (ret) {
+>  			/* Failed to register algorithm. */
+>  			dev_err(dev, "Failed to register AES crypto!\n");
+> @@ -1139,7 +1129,7 @@ static int mxs_dcp_probe(struct platform_device *pdev)
+>  
+>  err_unregister_aes:
+>  	if (sdcp->caps & MXS_DCP_CAPABILITY1_AES128)
+> -		crypto_unregister_algs(dcp_aes_algs, ARRAY_SIZE(dcp_aes_algs));
+> +		crypto_unregister_skciphers(dcp_aes_algs, ARRAY_SIZE(dcp_aes_algs));
+>  
+>  err_destroy_aes_thread:
+>  	kthread_stop(sdcp->thread[DCP_CHAN_CRYPTO]);
+> @@ -1164,7 +1154,7 @@ static int mxs_dcp_remove(struct platform_device *pdev)
+>  		crypto_unregister_ahash(&dcp_sha1_alg);
+>  
+>  	if (sdcp->caps & MXS_DCP_CAPABILITY1_AES128)
+> -		crypto_unregister_algs(dcp_aes_algs, ARRAY_SIZE(dcp_aes_algs));
+> +		crypto_unregister_skciphers(dcp_aes_algs, ARRAY_SIZE(dcp_aes_algs));
+>  
+>  	kthread_stop(sdcp->thread[DCP_CHAN_HASH_SHA]);
+>  	kthread_stop(sdcp->thread[DCP_CHAN_CRYPTO]);
+> -- 
+> 2.20.1
+> 
