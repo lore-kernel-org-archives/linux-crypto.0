@@ -4,34 +4,34 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 904ECECE587
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 09:17:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6305BC4CECE
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 09:17:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 57BED20882
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 09:17:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 20DE020882
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 09:17:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730797AbfJNJRq (ORCPT
+        id S1730438AbfJNJRs (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Oct 2019 05:17:46 -0400
-Received: from mx2.suse.de ([195.135.220.15]:41098 "EHLO mx1.suse.de"
+        Mon, 14 Oct 2019 05:17:48 -0400
+Received: from mx2.suse.de ([195.135.220.15]:41116 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730438AbfJNJRq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Oct 2019 05:17:46 -0400
+        id S1730798AbfJNJRs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 14 Oct 2019 05:17:48 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id BAB37B977;
+        by mx1.suse.de (Postfix) with ESMTP id BDF18B978;
         Mon, 14 Oct 2019 09:17:42 +0000 (UTC)
 Received: by ds.suse.cz (Postfix, from userid 10065)
-        id 2B353DA7E3; Mon, 14 Oct 2019 11:16:50 +0200 (CEST)
+        id 8CB5EDA7E3; Mon, 14 Oct 2019 11:16:51 +0200 (CEST)
 From:   David Sterba <dsterba@suse.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     ebiggers@google.com, ard.biesheuvel@linaro.org,
         David Sterba <dsterba@suse.com>
-Subject: [PATCH v5 1/2] crypto: add blake2b generic implementation
-Date:   Mon, 14 Oct 2019 11:16:43 +0200
-Message-Id: <18eb153655a7501c8f0b3cc66d604d7c8fa6f7d9.1571043883.git.dsterba@suse.com>
+Subject: [PATCH v5 2/2] crypto: add test vectors for blake2b
+Date:   Mon, 14 Oct 2019 11:16:44 +0200
+Message-Id: <a4e3e9db53b01c4092309a75e5b5d703ed344c5a.1571043883.git.dsterba@suse.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <cover.1571043883.git.dsterba@suse.com>
 References: <cover.1571043883.git.dsterba@suse.com>
@@ -42,542 +42,809 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The patch brings support of several BLAKE2 variants (2b with various
-digest lengths).  The keyed digest is supported, using tfm->setkey call.
-The in-tree user will be btrfs (for checksumming), we're going to use
-the BLAKE2b-256 variant.
+Test vectors for blake2b with various digest sizes. As the algorithm is
+the same up to the digest calculation, the key and input data length is
+distributed in a way that tests all combinanions of the two over the
+digest sizes.
 
-The code is reference implementation taken from the official sources and
-modified in terms of kernel coding style (whitespace, comments, uintXX_t
--> uXX types, removed unused prototypes and #ifdefs, removed testing
-code, changed secure_zero_memory -> memzero_explicit, used own helpers
-for unaligned reads/writes and rotations).
+Based on the suggestion from Eric, the following input sizes are tested
+[0, 1, 7, 15, 64, 247, 256], where blake2b blocksize is 128, so the
+padded and the non-padded input buffers are tested.
 
-Further changes removed sanity checks of key length or output size,
-these values are verified in the crypto API callbacks or hardcoded in
-shash_alg and not exposed to users.
+          blake2b-160  blake2b-256  blake2b-384  blake2b-512
+         ---------------------------------------------------
+len=0   | klen=0       klen=1       klen=32      klen=64
+len=1   | klen=32      klen=64      klen=0       klen=1
+len=7   | klen=64      klen=0       klen=1       klen=32
+len=15  | klen=1       klen=32      klen=64      klen=0
+len=64  | klen=0       klen=1       klen=32      klen=64
+len=247 | klen=32      klen=64      klen=0       klen=1
+len=256 | klen=64      klen=0       klen=1       klen=32
 
+Where key:
+
+- klen=0: empty key
+- klen=1: 1 byte value 0x42, 'B'
+- klen=32: first 32 bytes of the default key, sequence 00..1f
+- klen=64: default key, sequence 00..3f
+
+The unkeyed vectors are ordered before keyed, as this is required by
+testmgr.
+
+CC: Eric Biggers <ebiggers@google.com>
 Signed-off-by: David Sterba <dsterba@suse.com>
 ---
- crypto/Kconfig           |  17 ++
- crypto/Makefile          |   1 +
- crypto/blake2b_generic.c | 413 +++++++++++++++++++++++++++++++++++++++
- include/crypto/blake2b.h |  46 +++++
- 4 files changed, 477 insertions(+)
- create mode 100644 crypto/blake2b_generic.c
- create mode 100644 include/crypto/blake2b.h
+ crypto/testmgr.c |  28 ++
+ crypto/testmgr.h | 719 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 747 insertions(+)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index ad86463de715..d37eba22f436 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -610,6 +610,23 @@ config CRYPTO_XXHASH
- 	  xxHash non-cryptographic hash algorithm. Extremely fast, working at
- 	  speeds close to RAM limits.
- 
-+config CRYPTO_BLAKE2B
-+	tristate "BLAKE2b digest algorithm"
-+	select CRYPTO_HASH
-+	help
-+	  Implementation of cryptographic hash function BLAKE2b (or just BLAKE2),
-+	  optimized for 64bit platforms and can produce digests of any size
-+	  between 1 to 64.  The keyed hash is also implemented.
-+
-+	  This module provides the following algorithms:
-+
-+	  - blake2b-160
-+	  - blake2b-256
-+	  - blake2b-384
-+	  - blake2b-512
-+
-+	  See https://blake2.net for further information.
-+
- config CRYPTO_CRCT10DIF
- 	tristate "CRCT10DIF algorithm"
- 	select CRYPTO_HASH
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 0d2cdd523fd9..dc010b1a8e41 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -74,6 +74,7 @@ obj-$(CONFIG_CRYPTO_STREEBOG) += streebog_generic.o
- obj-$(CONFIG_CRYPTO_WP512) += wp512.o
- CFLAGS_wp512.o := $(call cc-option,-fno-schedule-insns)  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79149
- obj-$(CONFIG_CRYPTO_TGR192) += tgr192.o
-+obj-$(CONFIG_CRYPTO_BLAKE2B) += blake2b_generic.o
- obj-$(CONFIG_CRYPTO_GF128MUL) += gf128mul.o
- obj-$(CONFIG_CRYPTO_ECB) += ecb.o
- obj-$(CONFIG_CRYPTO_CBC) += cbc.o
-diff --git a/crypto/blake2b_generic.c b/crypto/blake2b_generic.c
-new file mode 100644
-index 000000000000..63f5cab3761c
---- /dev/null
-+++ b/crypto/blake2b_generic.c
-@@ -0,0 +1,413 @@
-+// SPDX-License-Identifier: (GPL-2.0-only OR Apache-2.0)
-+/*
-+ * BLAKE2b reference source code package - reference C implementations
-+ *
-+ * Copyright 2012, Samuel Neves <sneves@dei.uc.pt>.  You may use this under the
-+ * terms of the CC0, the OpenSSL Licence, or the Apache Public License 2.0, at
-+ * your option.  The terms of these licenses can be found at:
-+ *
-+ * - CC0 1.0 Universal : http://creativecommons.org/publicdomain/zero/1.0
-+ * - OpenSSL license   : https://www.openssl.org/source/license.html
-+ * - Apache 2.0        : http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * More information about the BLAKE2 hash function can be found at
-+ * https://blake2.net.
-+ *
-+ * Note: the original sources have been modified for inclusion in linux kernel
-+ * in terms of coding style, using generic helpers and simplifications of error
-+ * handling.
-+ */
-+
-+#include <asm/unaligned.h>
-+#include <linux/module.h>
-+#include <linux/string.h>
-+#include <linux/kernel.h>
-+#include <linux/bitops.h>
-+#include <crypto/internal/hash.h>
-+#include <crypto/blake2b.h>
-+
-+struct blake2b_param {
-+	u8 digest_length;			/* 1 */
-+	u8 key_length;				/* 2 */
-+	u8 fanout;				/* 3 */
-+	u8 depth;				/* 4 */
-+	__le32 leaf_length;			/* 8 */
-+	__le32 node_offset;			/* 12 */
-+	__le32 xof_length;			/* 16 */
-+	u8 node_depth;				/* 17 */
-+	u8 inner_length;			/* 18 */
-+	u8 reserved[14];			/* 32 */
-+	u8 salt[BLAKE2B_SALTBYTES];		/* 48 */
-+	u8 personal[BLAKE2B_PERSONALBYTES];	/* 64 */
-+} __packed;
-+
-+static const u64 blake2b_IV[8] = {
-+	0x6a09e667f3bcc908ULL, 0xbb67ae8584caa73bULL,
-+	0x3c6ef372fe94f82bULL, 0xa54ff53a5f1d36f1ULL,
-+	0x510e527fade682d1ULL, 0x9b05688c2b3e6c1fULL,
-+	0x1f83d9abfb41bd6bULL, 0x5be0cd19137e2179ULL
-+};
-+
-+static const u8 blake2b_sigma[12][16] = {
-+	{  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15 },
-+	{ 14, 10,  4,  8,  9, 15, 13,  6,  1, 12,  0,  2, 11,  7,  5,  3 },
-+	{ 11,  8, 12,  0,  5,  2, 15, 13, 10, 14,  3,  6,  7,  1,  9,  4 },
-+	{  7,  9,  3,  1, 13, 12, 11, 14,  2,  6,  5, 10,  4,  0, 15,  8 },
-+	{  9,  0,  5,  7,  2,  4, 10, 15, 14,  1, 11, 12,  6,  8,  3, 13 },
-+	{  2, 12,  6, 10,  0, 11,  8,  3,  4, 13,  7,  5, 15, 14,  1,  9 },
-+	{ 12,  5,  1, 15, 14, 13,  4, 10,  0,  7,  6,  3,  9,  2,  8, 11 },
-+	{ 13, 11,  7, 14, 12,  1,  3,  9,  5,  0, 15,  4,  8,  6,  2, 10 },
-+	{  6, 15, 14,  9, 11,  3,  0,  8, 12,  2, 13,  7,  1,  4, 10,  5 },
-+	{ 10,  2,  8,  4,  7,  6,  1,  5, 15, 11,  9, 14,  3, 12, 13,  0 },
-+	{  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15 },
-+	{ 14, 10,  4,  8,  9, 15, 13,  6,  1, 12,  0,  2, 11,  7,  5,  3 }
-+};
-+
-+static void blake2b_update(struct blake2b_state *S, const void *pin, size_t inlen);
-+
-+static void blake2b_set_lastnode(struct blake2b_state *S)
-+{
-+	S->f[1] = (u64)-1;
-+}
-+
-+static void blake2b_set_lastblock(struct blake2b_state *S)
-+{
-+	if (S->last_node)
-+		blake2b_set_lastnode(S);
-+
-+	S->f[0] = (u64)-1;
-+}
-+
-+static void blake2b_increment_counter(struct blake2b_state *S, const u64 inc)
-+{
-+	S->t[0] += inc;
-+	S->t[1] += (S->t[0] < inc);
-+}
-+
-+static void blake2b_init0(struct blake2b_state *S)
-+{
-+	size_t i;
-+
-+	memset(S, 0, sizeof(struct blake2b_state));
-+
-+	for (i = 0; i < 8; ++i)
-+		S->h[i] = blake2b_IV[i];
-+}
-+
-+/* init xors IV with input parameter block */
-+static void blake2b_init_param(struct blake2b_state *S,
-+			       const struct blake2b_param *P)
-+{
-+	const u8 *p = (const u8 *)(P);
-+	size_t i;
-+
-+	blake2b_init0(S);
-+
-+	/* IV XOR ParamBlock */
-+	for (i = 0; i < 8; ++i)
-+		S->h[i] ^= get_unaligned_le64(p + sizeof(S->h[i]) * i);
-+
-+	S->outlen = P->digest_length;
-+}
-+
-+static void blake2b_init(struct blake2b_state *S, size_t outlen)
-+{
-+	struct blake2b_param P;
-+
-+	P.digest_length = (u8)outlen;
-+	P.key_length    = 0;
-+	P.fanout        = 1;
-+	P.depth         = 1;
-+	P.leaf_length   = 0;
-+	P.node_offset   = 0;
-+	P.xof_length    = 0;
-+	P.node_depth    = 0;
-+	P.inner_length  = 0;
-+	memset(P.reserved, 0, sizeof(P.reserved));
-+	memset(P.salt,     0, sizeof(P.salt));
-+	memset(P.personal, 0, sizeof(P.personal));
-+	blake2b_init_param(S, &P);
-+}
-+
-+static void blake2b_init_key(struct blake2b_state *S, size_t outlen,
-+			     const void *key, size_t keylen)
-+{
-+	struct blake2b_param P;
-+
-+	P.digest_length = (u8)outlen;
-+	P.key_length    = (u8)keylen;
-+	P.fanout        = 1;
-+	P.depth         = 1;
-+	P.leaf_length   = 0;
-+	P.node_offset   = 0;
-+	P.xof_length    = 0;
-+	P.node_depth    = 0;
-+	P.inner_length  = 0;
-+	memset(P.reserved, 0, sizeof(P.reserved));
-+	memset(P.salt,     0, sizeof(P.salt));
-+	memset(P.personal, 0, sizeof(P.personal));
-+
-+	blake2b_init_param(S, &P);
-+
-+	{
-+		u8 block[BLAKE2B_BLOCKBYTES];
-+
-+		memset(block, 0, BLAKE2B_BLOCKBYTES);
-+		memcpy(block, key, keylen);
-+		blake2b_update(S, block, BLAKE2B_BLOCKBYTES);
-+		memzero_explicit(block, BLAKE2B_BLOCKBYTES);
-+	}
-+}
-+
-+#define G(r,i,a,b,c,d)                                  \
-+	do {                                            \
-+		a = a + b + m[blake2b_sigma[r][2*i+0]]; \
-+		d = ror64(d ^ a, 32);                   \
-+		c = c + d;                              \
-+		b = ror64(b ^ c, 24);                   \
-+		a = a + b + m[blake2b_sigma[r][2*i+1]]; \
-+		d = ror64(d ^ a, 16);                   \
-+		c = c + d;                              \
-+		b = ror64(b ^ c, 63);                   \
-+	} while (0)
-+
-+#define ROUND(r)                                \
-+	do {                                    \
-+		G(r,0,v[ 0],v[ 4],v[ 8],v[12]); \
-+		G(r,1,v[ 1],v[ 5],v[ 9],v[13]); \
-+		G(r,2,v[ 2],v[ 6],v[10],v[14]); \
-+		G(r,3,v[ 3],v[ 7],v[11],v[15]); \
-+		G(r,4,v[ 0],v[ 5],v[10],v[15]); \
-+		G(r,5,v[ 1],v[ 6],v[11],v[12]); \
-+		G(r,6,v[ 2],v[ 7],v[ 8],v[13]); \
-+		G(r,7,v[ 3],v[ 4],v[ 9],v[14]); \
-+	} while (0)
-+
-+static void blake2b_compress(struct blake2b_state *S,
-+			     const u8 block[BLAKE2B_BLOCKBYTES])
-+{
-+	u64 m[16];
-+	u64 v[16];
-+	size_t i;
-+
-+	for (i = 0; i < 16; ++i)
-+		m[i] = get_unaligned_le64(block + i * sizeof(m[i]));
-+
-+	for (i = 0; i < 8; ++i)
-+		v[i] = S->h[i];
-+
-+	v[ 8] = blake2b_IV[0];
-+	v[ 9] = blake2b_IV[1];
-+	v[10] = blake2b_IV[2];
-+	v[11] = blake2b_IV[3];
-+	v[12] = blake2b_IV[4] ^ S->t[0];
-+	v[13] = blake2b_IV[5] ^ S->t[1];
-+	v[14] = blake2b_IV[6] ^ S->f[0];
-+	v[15] = blake2b_IV[7] ^ S->f[1];
-+
-+	ROUND(0);
-+	ROUND(1);
-+	ROUND(2);
-+	ROUND(3);
-+	ROUND(4);
-+	ROUND(5);
-+	ROUND(6);
-+	ROUND(7);
-+	ROUND(8);
-+	ROUND(9);
-+	ROUND(10);
-+	ROUND(11);
-+
-+	for (i = 0; i < 8; ++i)
-+		S->h[i] = S->h[i] ^ v[i] ^ v[i + 8];
-+}
-+
-+#undef G
-+#undef ROUND
-+
-+static void blake2b_update(struct blake2b_state *S, const void *pin, size_t inlen)
-+{
-+	const u8 *in = (const u8 *)pin;
-+
-+	if (inlen > 0) {
-+		size_t left = S->buflen;
-+		size_t fill = BLAKE2B_BLOCKBYTES - left;
-+
-+		if (inlen > fill) {
-+			S->buflen = 0;
-+			/* Fill buffer */
-+			memcpy(S->buf + left, in, fill);
-+			blake2b_increment_counter(S, BLAKE2B_BLOCKBYTES);
-+			/* Compress */
-+			blake2b_compress(S, S->buf);
-+			in += fill;
-+			inlen -= fill;
-+			while (inlen > BLAKE2B_BLOCKBYTES) {
-+				blake2b_increment_counter(S, BLAKE2B_BLOCKBYTES);
-+				blake2b_compress(S, in);
-+				in += BLAKE2B_BLOCKBYTES;
-+				inlen -= BLAKE2B_BLOCKBYTES;
-+			}
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index c39e39e55dc2..0f956780a673 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -4022,6 +4022,34 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		.alg = "authenc(hmac(sha512),rfc3686(ctr(aes)))",
+ 		.test = alg_test_null,
+ 		.fips_allowed = 1,
++	}, {
++		.alg = "blake2b-160",
++		.test = alg_test_hash,
++		.fips_allowed = 0,
++		.suite = {
++			.hash = __VECS(blake2b_160_tv_template)
 +		}
-+		memcpy(S->buf + S->buflen, in, inlen);
-+		S->buflen += inlen;
-+	}
-+}
-+
-+static void blake2b_final(struct blake2b_state *S, void *out, size_t outlen)
-+{
-+	u8 buffer[BLAKE2B_OUTBYTES] = {0};
-+	size_t i;
-+
-+	blake2b_increment_counter(S, S->buflen);
-+	blake2b_set_lastblock(S);
-+	/* Padding */
-+	memset(S->buf + S->buflen, 0, BLAKE2B_BLOCKBYTES - S->buflen);
-+	blake2b_compress(S, S->buf);
-+
-+	/* Output full hash to temp buffer */
-+	for (i = 0; i < 8; ++i)
-+		put_unaligned_le64(S->h[i], buffer + sizeof(S->h[i]) * i);
-+
-+	memcpy(out, buffer, S->outlen);
-+	memzero_explicit(buffer, sizeof(buffer));
-+}
-+
-+struct digest_tfm_ctx {
-+	u8 key[BLAKE2B_KEYBYTES];
-+	unsigned int keylen;
-+};
-+
-+static int digest_setkey(struct crypto_shash *tfm, const u8 *key,
-+			 unsigned int keylen)
-+{
-+	struct digest_tfm_ctx *mctx = crypto_shash_ctx(tfm);
-+
-+	if (keylen == 0 || keylen > BLAKE2B_KEYBYTES) {
-+		crypto_shash_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
-+		return -EINVAL;
-+	}
-+
-+	memcpy(mctx->key, key, keylen);
-+	mctx->keylen = keylen;
-+
-+	return 0;
-+}
-+
-+static int digest_init(struct shash_desc *desc)
-+{
-+	struct digest_tfm_ctx *mctx = crypto_shash_ctx(desc->tfm);
-+	struct blake2b_state *state = shash_desc_ctx(desc);
-+	const int digestsize = crypto_shash_digestsize(desc->tfm);
-+
-+	if (mctx->keylen == 0)
-+		blake2b_init(state, digestsize);
-+	else
-+		blake2b_init_key(state, digestsize, mctx->key, mctx->keylen);
-+	return 0;
-+}
-+
-+static int digest_update(struct shash_desc *desc, const u8 *data,
-+			 unsigned int length)
-+{
-+	struct blake2b_state *state = shash_desc_ctx(desc);
-+
-+	blake2b_update(state, data, length);
-+	return 0;
-+}
-+
-+static int digest_final(struct shash_desc *desc, u8 *out)
-+{
-+	struct blake2b_state *state = shash_desc_ctx(desc);
-+	const int digestsize = crypto_shash_digestsize(desc->tfm);
-+
-+	blake2b_final(state, out, digestsize);
-+	return 0;
-+}
-+
-+static struct shash_alg blake2b_algs[] = {
++	}, {
++		.alg = "blake2b-256",
++		.test = alg_test_hash,
++		.fips_allowed = 0,
++		.suite = {
++			.hash = __VECS(blake2b_256_tv_template)
++		}
++	}, {
++		.alg = "blake2b-384",
++		.test = alg_test_hash,
++		.fips_allowed = 0,
++		.suite = {
++			.hash = __VECS(blake2b_384_tv_template)
++		}
++	}, {
++		.alg = "blake2b-512",
++		.test = alg_test_hash,
++		.fips_allowed = 0,
++		.suite = {
++			.hash = __VECS(blake2b_512_tv_template)
++		}
+ 	}, {
+ 		.alg = "cbc(aes)",
+ 		.test = alg_test_skcipher,
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index ef7d21f39d4a..e6a4806f0ccd 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -31567,4 +31567,723 @@ static const struct aead_testvec essiv_hmac_sha256_aes_cbc_tv_temp[] = {
+ 	},
+ };
+ 
++static const struct hash_testvec blake2b_160_tv_template[] = {
 +	{
-+		.base.cra_name		= "blake2b-160",
-+		.base.cra_driver_name	= "blake2b-160-generic",
-+		.base.cra_priority	= 100,
-+		.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
-+		.base.cra_blocksize	= BLAKE2B_BLOCKBYTES,
-+		.base.cra_ctxsize	= sizeof(struct digest_tfm_ctx),
-+		.base.cra_module	= THIS_MODULE,
-+		.digestsize		= BLAKE2B_160_DIGEST_SIZE,
-+		.setkey			= digest_setkey,
-+		.init			= digest_init,
-+		.update			= digest_update,
-+		.final			= digest_final,
-+		.descsize		= sizeof(struct blake2b_state),
++		.plaintext =
++			"",
++		.psize     = 0,
++		.digest    =
++			"\x33\x45\x52\x4a\xbf\x6b\xbe\x18"
++			"\x09\x44\x92\x24\xb5\x97\x2c\x41"
++			"\x79\x0b\x6c\xf2",
 +	}, {
-+		.base.cra_name		= "blake2b-256",
-+		.base.cra_driver_name	= "blake2b-256-generic",
-+		.base.cra_priority	= 100,
-+		.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
-+		.base.cra_blocksize	= BLAKE2B_BLOCKBYTES,
-+		.base.cra_ctxsize	= sizeof(struct digest_tfm_ctx),
-+		.base.cra_module	= THIS_MODULE,
-+		.digestsize		= BLAKE2B_256_DIGEST_SIZE,
-+		.setkey			= digest_setkey,
-+		.init			= digest_init,
-+		.update			= digest_update,
-+		.final			= digest_final,
-+		.descsize		= sizeof(struct blake2b_state),
++		.plaintext =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
++			"\x20\x21\x22\x23\x24\x25\x26\x27"
++			"\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
++			"\x30\x31\x32\x33\x34\x35\x36\x37"
++			"\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f",
++		.psize     = 64,
++		.digest    =
++			"\x11\xcc\x66\x61\xe9\x22\xb0\xe4"
++			"\x07\xe0\xa5\x72\x49\xc3\x8d\x4f"
++			"\xf7\x6d\x8e\xc8",
 +	}, {
-+		.base.cra_name		= "blake2b-384",
-+		.base.cra_driver_name	= "blake2b-384-generic",
-+		.base.cra_priority	= 100,
-+		.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
-+		.base.cra_blocksize	= BLAKE2B_BLOCKBYTES,
-+		.base.cra_ctxsize	= sizeof(struct digest_tfm_ctx),
-+		.base.cra_module	= THIS_MODULE,
-+		.digestsize		= BLAKE2B_384_DIGEST_SIZE,
-+		.setkey			= digest_setkey,
-+		.init			= digest_init,
-+		.update			= digest_update,
-+		.final			= digest_final,
-+		.descsize		= sizeof(struct blake2b_state),
++		.ksize     = 32,
++		.key       =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
++		.plaintext =
++			"\x00",
++		.psize     = 1,
++		.digest    =
++			"\x31\xe3\xd9\xd5\x4e\x72\xd8\x0b"
++			"\x2b\x3b\xd7\x6b\x82\x7a\x1d\xfb"
++			"\x56\x2f\x79\x4c",
 +	}, {
-+		.base.cra_name		= "blake2b-512",
-+		.base.cra_driver_name	= "blake2b-512-generic",
-+		.base.cra_priority	= 100,
-+		.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
-+		.base.cra_blocksize	= BLAKE2B_BLOCKBYTES,
-+		.base.cra_ctxsize	= sizeof(struct digest_tfm_ctx),
-+		.base.cra_module	= THIS_MODULE,
-+		.digestsize		= BLAKE2B_512_DIGEST_SIZE,
-+		.setkey			= digest_setkey,
-+		.init			= digest_init,
-+		.update			= digest_update,
-+		.final			= digest_final,
-+		.descsize		= sizeof(struct blake2b_state),
++		.ksize     = 64,
++		.key       =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
++			"\x20\x21\x22\x23\x24\x25\x26\x27"
++			"\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
++			"\x30\x31\x32\x33\x34\x35\x36\x37"
++			"\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f",
++		.plaintext =
++			"\x00\x01\x02\x03\x04\x05\x06",
++		.psize     = 7,
++		.digest    =
++			"\x28\x20\xd1\xbe\x7f\xcc\xc1\x62"
++			"\xd9\x0d\x9a\x4b\x47\xd1\x5e\x04"
++			"\x74\x2a\x53\x17",
++	}, {
++		.ksize     = 1,
++		.key       =
++			"\x42",
++		.plaintext =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e",
++		.psize     = 15,
++		.digest    =
++			"\x45\xe9\x95\xb6\xc4\xe8\x22\xea"
++			"\xfe\xd2\x37\xdb\x46\xbf\xf1\x25"
++			"\xd5\x03\x1d\x81",
++	}, {
++		.ksize     = 32,
++		.key       =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
++		.plaintext =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
++			"\x20\x21\x22\x23\x24\x25\x26\x27"
++			"\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
++			"\x30\x31\x32\x33\x34\x35\x36\x37"
++			"\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f"
++			"\x40\x41\x42\x43\x44\x45\x46\x47"
++			"\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f"
++			"\x50\x51\x52\x53\x54\x55\x56\x57"
++			"\x58\x59\x5a\x5b\x5c\x5d\x5e\x5f"
++			"\x60\x61\x62\x63\x64\x65\x66\x67"
++			"\x68\x69\x6a\x6b\x6c\x6d\x6e\x6f"
++			"\x70\x71\x72\x73\x74\x75\x76\x77"
++			"\x78\x79\x7a\x7b\x7c\x7d\x7e\x7f"
++			"\x80\x81\x82\x83\x84\x85\x86\x87"
++			"\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f"
++			"\x90\x91\x92\x93\x94\x95\x96\x97"
++			"\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f"
++			"\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7"
++			"\xa8\xa9\xaa\xab\xac\xad\xae\xaf"
++			"\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7"
++			"\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf"
++			"\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7"
++			"\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf"
++			"\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7"
++			"\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf"
++			"\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7"
++			"\xe8\xe9\xea\xeb\xec\xed\xee\xef"
++			"\xf0\xf1\xf2\xf3\xf4\xf5\xf6",
++		.psize     = 247,
++		.digest    =
++			"\x7e\xb9\xf2\x9b\x2f\xc2\x01\xd4"
++			"\xb0\x4f\x08\x2b\x8e\xbd\x06\xef"
++			"\x1c\xc4\x25\x95",
++	}, {
++		.ksize     = 64,
++		.key       =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
++			"\x20\x21\x22\x23\x24\x25\x26\x27"
++			"\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
++			"\x30\x31\x32\x33\x34\x35\x36\x37"
++			"\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f",
++		.plaintext =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
++			"\x20\x21\x22\x23\x24\x25\x26\x27"
++			"\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
++			"\x30\x31\x32\x33\x34\x35\x36\x37"
++			"\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f"
++			"\x40\x41\x42\x43\x44\x45\x46\x47"
++			"\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f"
++			"\x50\x51\x52\x53\x54\x55\x56\x57"
++			"\x58\x59\x5a\x5b\x5c\x5d\x5e\x5f"
++			"\x60\x61\x62\x63\x64\x65\x66\x67"
++			"\x68\x69\x6a\x6b\x6c\x6d\x6e\x6f"
++			"\x70\x71\x72\x73\x74\x75\x76\x77"
++			"\x78\x79\x7a\x7b\x7c\x7d\x7e\x7f"
++			"\x80\x81\x82\x83\x84\x85\x86\x87"
++			"\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f"
++			"\x90\x91\x92\x93\x94\x95\x96\x97"
++			"\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f"
++			"\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7"
++			"\xa8\xa9\xaa\xab\xac\xad\xae\xaf"
++			"\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7"
++			"\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf"
++			"\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7"
++			"\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf"
++			"\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7"
++			"\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf"
++			"\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7"
++			"\xe8\xe9\xea\xeb\xec\xed\xee\xef"
++			"\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7"
++			"\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff",
++		.psize     = 256,
++		.digest    =
++			"\x6e\x35\x01\x70\xbf\xb6\xc4\xba"
++			"\x33\x1b\xa6\xd3\xc2\x5d\xb4\x03"
++			"\x95\xaf\x29\x16",
 +	}
 +};
 +
-+static int __init blake2b_mod_init(void)
-+{
-+	BUILD_BUG_ON(sizeof(struct blake2b_param) != BLAKE2B_OUTBYTES);
-+
-+	return crypto_register_shashes(blake2b_algs, ARRAY_SIZE(blake2b_algs));
-+}
-+
-+static void __exit blake2b_mod_fini(void)
-+{
-+	crypto_unregister_shashes(blake2b_algs, ARRAY_SIZE(blake2b_algs));
-+}
-+
-+subsys_initcall(blake2b_mod_init);
-+module_exit(blake2b_mod_fini);
-+
-+MODULE_AUTHOR("David Sterba <kdave@kernel.org>");
-+MODULE_DESCRIPTION("BLAKE2b generic implementation");
-+MODULE_LICENSE("GPL");
-+MODULE_ALIAS_CRYPTO("blake2b-160");
-+MODULE_ALIAS_CRYPTO("blake2b-160-generic");
-+MODULE_ALIAS_CRYPTO("blake2b-256");
-+MODULE_ALIAS_CRYPTO("blake2b-256-generic");
-+MODULE_ALIAS_CRYPTO("blake2b-384");
-+MODULE_ALIAS_CRYPTO("blake2b-384-generic");
-+MODULE_ALIAS_CRYPTO("blake2b-512");
-+MODULE_ALIAS_CRYPTO("blake2b-512-generic");
-diff --git a/include/crypto/blake2b.h b/include/crypto/blake2b.h
-new file mode 100644
-index 000000000000..5ec3d213f024
---- /dev/null
-+++ b/include/crypto/blake2b.h
-@@ -0,0 +1,46 @@
-+/* SPDX-License-Identifier: (GPL-2.0-only OR Apache-2.0) */
-+/*
-+ * BLAKE2 reference source code package - reference C implementations
-+ *
-+ * Copyright 2012, Samuel Neves <sneves@dei.uc.pt>.  You may use this under the
-+ * terms of the CC0, the OpenSSL Licence, or the Apache Public License 2.0, at
-+ * your option.  The terms of these licenses can be found at:
-+ *
-+ * - CC0 1.0 Universal : http://creativecommons.org/publicdomain/zero/1.0
-+ * - OpenSSL license   : https://www.openssl.org/source/license.html
-+ * - Apache 2.0        : http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * More information about the BLAKE2 hash function can be found at
-+ * https://blake2.net.
-+ */
-+
-+#ifndef _CRYPTO_BLAKE2B_H
-+#define _CRYPTO_BLAKE2B_H
-+
-+#include <linux/types.h>
-+#include <stddef.h>
-+
-+#define BLAKE2B_160_DIGEST_SIZE		(160 / 8)
-+#define BLAKE2B_256_DIGEST_SIZE		(256 / 8)
-+#define BLAKE2B_384_DIGEST_SIZE		(384 / 8)
-+#define BLAKE2B_512_DIGEST_SIZE		(512 / 8)
-+
-+enum blake2b_constant {
-+	BLAKE2B_BLOCKBYTES    = 128,
-+	BLAKE2B_OUTBYTES      = 64,
-+	BLAKE2B_KEYBYTES      = 64,
-+	BLAKE2B_SALTBYTES     = 16,
-+	BLAKE2B_PERSONALBYTES = 16
++static const struct hash_testvec blake2b_256_tv_template[] = {
++	{
++		.plaintext =
++			"",
++		.psize     = 0,
++		.digest    =
++			"\x0e\x57\x51\xc0\x26\xe5\x43\xb2"
++			"\xe8\xab\x2e\xb0\x60\x99\xda\xa1"
++			"\xd1\xe5\xdf\x47\x77\x8f\x77\x87"
++			"\xfa\xab\x45\xcd\xf1\x2f\xe3\xa8",
++	}, {
++		.plaintext =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
++			"\x20\x21\x22\x23\x24\x25\x26\x27"
++			"\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
++			"\x30\x31\x32\x33\x34\x35\x36\x37"
++			"\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f",
++		.psize     = 64,
++		.digest    =
++			"\x10\xd8\xe6\xd5\x34\xb0\x09\x39"
++			"\x84\x3f\xe9\xdc\xc4\xda\xe4\x8c"
++			"\xdf\x00\x8f\x6b\x8b\x2b\x82\xb1"
++			"\x56\xf5\x40\x4d\x87\x48\x87\xf5",
++	}, {
++		.ksize     = 32,
++		.key       =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
++		.plaintext =
++			"\x00",
++		.psize     = 1,
++		.digest    =
++			"\x41\xff\x93\xa4\xea\xee\xbd\x3b"
++			"\x78\xa9\x34\x38\xa6\xf6\x2a\x92"
++			"\xab\x59\x59\xc8\x59\xe6\x82\xb7"
++			"\x2c\x7d\xef\x40\x61\x97\xca\x4d",
++	}, {
++		.ksize     = 64,
++		.key       =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
++			"\x20\x21\x22\x23\x24\x25\x26\x27"
++			"\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
++			"\x30\x31\x32\x33\x34\x35\x36\x37"
++			"\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f",
++		.plaintext =
++			"\x00\x01\x02\x03\x04\x05\x06",
++		.psize     = 7,
++		.digest    =
++			"\x44\xae\x55\x0a\x1c\x3b\xd3\x81"
++			"\x7d\xc8\x43\x53\x05\xb6\xd1\xbb"
++			"\x5d\x7f\x64\x3e\xd5\x22\x49\x91"
++			"\xfb\x3e\x91\x7a\xae\x0b\x26\xdb",
++	}, {
++		.ksize     = 1,
++		.key       =
++			"\x42",
++		.plaintext =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e",
++		.psize     = 15,
++		.digest    =
++			"\x10\x03\x69\xe4\x5f\xc4\x20\x96"
++			"\x57\xa0\x01\x2d\x16\xed\xfa\xbe"
++			"\xd6\xe7\x1a\xe7\x1e\x61\x98\xc4"
++			"\x6e\x0e\x42\x8b\x21\x7f\x77\x27",
++	}, {
++		.ksize     = 32,
++		.key       =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
++		.plaintext =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
++			"\x20\x21\x22\x23\x24\x25\x26\x27"
++			"\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
++			"\x30\x31\x32\x33\x34\x35\x36\x37"
++			"\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f"
++			"\x40\x41\x42\x43\x44\x45\x46\x47"
++			"\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f"
++			"\x50\x51\x52\x53\x54\x55\x56\x57"
++			"\x58\x59\x5a\x5b\x5c\x5d\x5e\x5f"
++			"\x60\x61\x62\x63\x64\x65\x66\x67"
++			"\x68\x69\x6a\x6b\x6c\x6d\x6e\x6f"
++			"\x70\x71\x72\x73\x74\x75\x76\x77"
++			"\x78\x79\x7a\x7b\x7c\x7d\x7e\x7f"
++			"\x80\x81\x82\x83\x84\x85\x86\x87"
++			"\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f"
++			"\x90\x91\x92\x93\x94\x95\x96\x97"
++			"\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f"
++			"\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7"
++			"\xa8\xa9\xaa\xab\xac\xad\xae\xaf"
++			"\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7"
++			"\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf"
++			"\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7"
++			"\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf"
++			"\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7"
++			"\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf"
++			"\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7"
++			"\xe8\xe9\xea\xeb\xec\xed\xee\xef"
++			"\xf0\xf1\xf2\xf3\xf4\xf5\xf6",
++		.psize     = 247,
++		.digest    =
++			"\x40\x9f\xf7\x1a\xeb\x38\xb3\x58"
++			"\xd7\xc6\x0a\x3f\x6e\x9f\xe9\x13"
++			"\x14\x31\x49\x2a\x6e\xaa\x2b\xbd"
++			"\x2a\x88\xbf\x2a\x77\x83\x86\x3e",
++	}, {
++		.ksize     = 64,
++		.key       =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
++			"\x20\x21\x22\x23\x24\x25\x26\x27"
++			"\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
++			"\x30\x31\x32\x33\x34\x35\x36\x37"
++			"\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f",
++		.plaintext =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
++			"\x20\x21\x22\x23\x24\x25\x26\x27"
++			"\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
++			"\x30\x31\x32\x33\x34\x35\x36\x37"
++			"\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f"
++			"\x40\x41\x42\x43\x44\x45\x46\x47"
++			"\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f"
++			"\x50\x51\x52\x53\x54\x55\x56\x57"
++			"\x58\x59\x5a\x5b\x5c\x5d\x5e\x5f"
++			"\x60\x61\x62\x63\x64\x65\x66\x67"
++			"\x68\x69\x6a\x6b\x6c\x6d\x6e\x6f"
++			"\x70\x71\x72\x73\x74\x75\x76\x77"
++			"\x78\x79\x7a\x7b\x7c\x7d\x7e\x7f"
++			"\x80\x81\x82\x83\x84\x85\x86\x87"
++			"\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f"
++			"\x90\x91\x92\x93\x94\x95\x96\x97"
++			"\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f"
++			"\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7"
++			"\xa8\xa9\xaa\xab\xac\xad\xae\xaf"
++			"\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7"
++			"\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf"
++			"\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7"
++			"\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf"
++			"\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7"
++			"\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf"
++			"\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7"
++			"\xe8\xe9\xea\xeb\xec\xed\xee\xef"
++			"\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7"
++			"\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff",
++		.psize     = 256,
++		.digest    =
++			"\x1e\xe3\xb6\x31\x2b\x4e\x0f\x0b"
++			"\x96\x63\xb8\x12\xb8\xc1\x29\xe6"
++			"\xd4\x5c\x41\x0b\x1c\x9c\x5a\x16"
++			"\x67\xbf\xc6\xdd\x95\x1d\xb7\x9f",
++	}
 +};
 +
-+struct blake2b_state {
-+	u64      h[8];
-+	u64      t[2];
-+	u64      f[2];
-+	u8       buf[BLAKE2B_BLOCKBYTES];
-+	size_t   buflen;
-+	size_t   outlen;
-+	u8       last_node;
++static const struct hash_testvec blake2b_384_tv_template[] = {
++	{
++		.plaintext =
++			"",
++		.psize     = 0,
++		.digest    =
++			"\xb3\x28\x11\x42\x33\x77\xf5\x2d"
++			"\x78\x62\x28\x6e\xe1\xa7\x2e\xe5"
++			"\x40\x52\x43\x80\xfd\xa1\x72\x4a"
++			"\x6f\x25\xd7\x97\x8c\x6f\xd3\x24"
++			"\x4a\x6c\xaf\x04\x98\x81\x26\x73"
++			"\xc5\xe0\x5e\xf5\x83\x82\x51\x00",
++	}, {
++		.plaintext =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
++			"\x20\x21\x22\x23\x24\x25\x26\x27"
++			"\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
++			"\x30\x31\x32\x33\x34\x35\x36\x37"
++			"\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f",
++		.psize     = 64,
++		.digest    =
++			"\x11\xc8\xe1\xa6\xad\x99\xf7\x5b"
++			"\xd0\xb8\xdf\x15\x30\x54\x9c\x6b"
++			"\xf2\xe7\x2d\x64\xe6\x70\x35\x35"
++			"\xad\x06\x51\x24\x17\xb0\xf3\x35"
++			"\xdf\xe0\x7e\x63\xcc\xb8\xc5\xcf"
++			"\x99\xd7\x6e\xe1\xf6\x53\xf6\x09",
++	}, {
++		.ksize     = 32,
++		.key       =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
++		.plaintext =
++			"\x00",
++		.psize     = 1,
++		.digest    =
++			"\xf7\x5c\xa8\x93\x2f\x14\xb5\xf2"
++			"\x8e\x7b\xe1\xc2\x77\xa0\xec\x04"
++			"\x1d\x8e\x24\xd0\x4e\x11\xd4\x5b"
++			"\xe4\x95\x2a\x86\xdc\xce\x95\x99"
++			"\x32\xb2\x4d\x15\xd3\xd3\x36\xc2"
++			"\x70\x58\xc2\x19\xf5\x9f\xe8\xe1",
++	}, {
++		.ksize     = 64,
++		.key       =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
++			"\x20\x21\x22\x23\x24\x25\x26\x27"
++			"\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
++			"\x30\x31\x32\x33\x34\x35\x36\x37"
++			"\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f",
++		.plaintext =
++			"\x00\x01\x02\x03\x04\x05\x06",
++		.psize     = 7,
++		.digest    =
++			"\xa2\xc9\x4a\x59\xbc\x66\xbf\x9b"
++			"\x7f\x3f\xe2\x4a\xab\xfb\x80\x5a"
++			"\x0a\xbb\xb4\xf5\x86\x9a\x7e\x7b"
++			"\x47\x2f\x5e\x6b\x73\x6d\x34\x4d"
++			"\xf4\xc3\x9c\x63\xe7\x20\x6d\x07"
++			"\x53\x6b\xe6\x3d\x78\xb6\xf1\xb0",
++	}, {
++		.ksize     = 1,
++		.key       =
++			"\x42",
++		.plaintext =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e",
++		.psize     = 15,
++		.digest    =
++			"\xa5\x89\xf8\x8f\x49\x5f\xe0\x2d"
++			"\xee\x38\x98\xaa\xc0\x80\xfd\x7a"
++			"\x42\x28\xf5\x65\xb3\x3e\x92\xb7"
++			"\x08\x00\x84\x69\x65\x95\xf7\xb9"
++			"\xa9\x66\xb7\xb0\x69\xe8\xa8\x45"
++			"\x7e\xe0\xec\xd9\x35\x56\xc0\x63",
++	}, {
++		.ksize     = 32,
++		.key       =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
++		.plaintext =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
++			"\x20\x21\x22\x23\x24\x25\x26\x27"
++			"\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
++			"\x30\x31\x32\x33\x34\x35\x36\x37"
++			"\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f"
++			"\x40\x41\x42\x43\x44\x45\x46\x47"
++			"\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f"
++			"\x50\x51\x52\x53\x54\x55\x56\x57"
++			"\x58\x59\x5a\x5b\x5c\x5d\x5e\x5f"
++			"\x60\x61\x62\x63\x64\x65\x66\x67"
++			"\x68\x69\x6a\x6b\x6c\x6d\x6e\x6f"
++			"\x70\x71\x72\x73\x74\x75\x76\x77"
++			"\x78\x79\x7a\x7b\x7c\x7d\x7e\x7f"
++			"\x80\x81\x82\x83\x84\x85\x86\x87"
++			"\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f"
++			"\x90\x91\x92\x93\x94\x95\x96\x97"
++			"\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f"
++			"\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7"
++			"\xa8\xa9\xaa\xab\xac\xad\xae\xaf"
++			"\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7"
++			"\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf"
++			"\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7"
++			"\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf"
++			"\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7"
++			"\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf"
++			"\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7"
++			"\xe8\xe9\xea\xeb\xec\xed\xee\xef"
++			"\xf0\xf1\xf2\xf3\xf4\xf5\xf6",
++		.psize     = 247,
++		.digest    =
++			"\x14\x5d\x5a\xc5\x98\x3c\x04\x4b"
++			"\xe2\x51\x5f\x26\x6e\xd2\x01\x0a"
++			"\x8a\xcb\xa9\xc3\x7b\xd1\xea\x6f"
++			"\x94\xe9\x24\xcc\x10\x45\xb4\x26"
++			"\xb2\x55\x17\x3f\xfa\x28\x92\xab"
++			"\x61\x62\x97\x14\x7d\x17\x57\x3b",
++	}, {
++		.ksize     = 64,
++		.key       =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
++			"\x20\x21\x22\x23\x24\x25\x26\x27"
++			"\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
++			"\x30\x31\x32\x33\x34\x35\x36\x37"
++			"\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f",
++		.plaintext =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
++			"\x20\x21\x22\x23\x24\x25\x26\x27"
++			"\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
++			"\x30\x31\x32\x33\x34\x35\x36\x37"
++			"\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f"
++			"\x40\x41\x42\x43\x44\x45\x46\x47"
++			"\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f"
++			"\x50\x51\x52\x53\x54\x55\x56\x57"
++			"\x58\x59\x5a\x5b\x5c\x5d\x5e\x5f"
++			"\x60\x61\x62\x63\x64\x65\x66\x67"
++			"\x68\x69\x6a\x6b\x6c\x6d\x6e\x6f"
++			"\x70\x71\x72\x73\x74\x75\x76\x77"
++			"\x78\x79\x7a\x7b\x7c\x7d\x7e\x7f"
++			"\x80\x81\x82\x83\x84\x85\x86\x87"
++			"\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f"
++			"\x90\x91\x92\x93\x94\x95\x96\x97"
++			"\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f"
++			"\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7"
++			"\xa8\xa9\xaa\xab\xac\xad\xae\xaf"
++			"\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7"
++			"\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf"
++			"\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7"
++			"\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf"
++			"\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7"
++			"\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf"
++			"\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7"
++			"\xe8\xe9\xea\xeb\xec\xed\xee\xef"
++			"\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7"
++			"\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff",
++		.psize     = 256,
++		.digest    =
++			"\xdf\x0b\x34\x2a\xb6\x14\xf4\xca"
++			"\x66\x45\x83\x82\x97\x94\xed\x4b"
++			"\xe2\x11\x0b\x2b\x68\x20\x08\x7e"
++			"\xe9\xdd\xfc\x7c\x3d\xc2\x0d\x2f"
++			"\x66\x35\x62\x7a\x6e\x97\x7a\x00"
++			"\x3e\x3d\xd7\x78\x4c\x30\x20\x19",
++	}
 +};
 +
-+#endif
++static const struct hash_testvec blake2b_512_tv_template[] = {
++	{
++		.plaintext =
++			"",
++		.psize     = 0,
++		.digest    =
++			"\x78\x6a\x02\xf7\x42\x01\x59\x03"
++			"\xc6\xc6\xfd\x85\x25\x52\xd2\x72"
++			"\x91\x2f\x47\x40\xe1\x58\x47\x61"
++			"\x8a\x86\xe2\x17\xf7\x1f\x54\x19"
++			"\xd2\x5e\x10\x31\xaf\xee\x58\x53"
++			"\x13\x89\x64\x44\x93\x4e\xb0\x4b"
++			"\x90\x3a\x68\x5b\x14\x48\xb7\x55"
++			"\xd5\x6f\x70\x1a\xfe\x9b\xe2\xce",
++	}, {
++		.plaintext =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
++			"\x20\x21\x22\x23\x24\x25\x26\x27"
++			"\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
++			"\x30\x31\x32\x33\x34\x35\x36\x37"
++			"\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f",
++		.psize     = 64,
++		.digest    =
++			"\x2f\xc6\xe6\x9f\xa2\x6a\x89\xa5"
++			"\xed\x26\x90\x92\xcb\x9b\x2a\x44"
++			"\x9a\x44\x09\xa7\xa4\x40\x11\xee"
++			"\xca\xd1\x3d\x7c\x4b\x04\x56\x60"
++			"\x2d\x40\x2f\xa5\x84\x4f\x1a\x7a"
++			"\x75\x81\x36\xce\x3d\x5d\x8d\x0e"
++			"\x8b\x86\x92\x1f\xff\xf4\xf6\x92"
++			"\xdd\x95\xbd\xc8\xe5\xff\x00\x52",
++	}, {
++		.ksize     = 32,
++		.key       =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
++		.plaintext =
++			"\x00",
++		.psize     = 1,
++		.digest    =
++			"\xf4\xc3\x55\xc6\x1f\xb4\xa9\x61"
++			"\x1c\xf0\x8a\xe5\x3a\x06\xf5\x7e"
++			"\x25\xc6\xe9\xc3\xbb\x7a\x88\x18"
++			"\xb9\x53\x9d\xc4\xb4\xe6\xd7\x05"
++			"\x4b\x62\x99\x9b\xbe\xf5\x21\x2d"
++			"\xea\x91\x03\xa2\xc4\xe4\x4d\x65"
++			"\x04\x65\x9d\x60\xb5\x04\x55\x3a"
++			"\xd1\x17\x3c\x02\xc4\x55\x3a\xfd",
++	}, {
++		.ksize     = 64,
++		.key       =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
++			"\x20\x21\x22\x23\x24\x25\x26\x27"
++			"\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
++			"\x30\x31\x32\x33\x34\x35\x36\x37"
++			"\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f",
++		.plaintext =
++			"\x00\x01\x02\x03\x04\x05\x06",
++		.psize     = 7,
++		.digest    =
++			"\x7a\x8c\xfe\x9b\x90\xf7\x5f\x7e"
++			"\xcb\x3a\xcc\x05\x3a\xae\xd6\x19"
++			"\x31\x12\xb6\xf6\xa4\xae\xeb\x3f"
++			"\x65\xd3\xde\x54\x19\x42\xde\xb9"
++			"\xe2\x22\x81\x52\xa3\xc4\xbb\xbe"
++			"\x72\xfc\x3b\x12\x62\x95\x28\xcf"
++			"\xbb\x09\xfe\x63\x0f\x04\x74\x33"
++			"\x9f\x54\xab\xf4\x53\xe2\xed\x52",
++	}, {
++		.ksize     = 1,
++		.key       =
++			"\x42",
++		.plaintext =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e",
++		.psize     = 15,
++		.digest    =
++			"\xb3\xac\xd9\xa6\xbc\x00\x92\x43"
++			"\x12\x3e\xbe\xc8\xa2\x1a\x04\xd9"
++			"\x5a\xf2\x61\x4b\x2b\x60\xdc\x6f"
++			"\x23\xa1\x52\x1e\xf3\xa0\xc6\xf9"
++			"\xda\xb2\xdd\x47\x43\x12\x67\xe0"
++			"\x62\x0a\xba\xf1\x90\x67\xcc\x45"
++			"\x01\x9c\x06\x99\xc4\x45\x98\xf2"
++			"\x6a\xf0\x45\x99\x5b\xfb\x99\x10",
++	}, {
++		.ksize     = 32,
++		.key       =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f",
++		.plaintext =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
++			"\x20\x21\x22\x23\x24\x25\x26\x27"
++			"\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
++			"\x30\x31\x32\x33\x34\x35\x36\x37"
++			"\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f"
++			"\x40\x41\x42\x43\x44\x45\x46\x47"
++			"\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f"
++			"\x50\x51\x52\x53\x54\x55\x56\x57"
++			"\x58\x59\x5a\x5b\x5c\x5d\x5e\x5f"
++			"\x60\x61\x62\x63\x64\x65\x66\x67"
++			"\x68\x69\x6a\x6b\x6c\x6d\x6e\x6f"
++			"\x70\x71\x72\x73\x74\x75\x76\x77"
++			"\x78\x79\x7a\x7b\x7c\x7d\x7e\x7f"
++			"\x80\x81\x82\x83\x84\x85\x86\x87"
++			"\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f"
++			"\x90\x91\x92\x93\x94\x95\x96\x97"
++			"\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f"
++			"\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7"
++			"\xa8\xa9\xaa\xab\xac\xad\xae\xaf"
++			"\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7"
++			"\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf"
++			"\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7"
++			"\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf"
++			"\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7"
++			"\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf"
++			"\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7"
++			"\xe8\xe9\xea\xeb\xec\xed\xee\xef"
++			"\xf0\xf1\xf2\xf3\xf4\xf5\xf6",
++		.psize     = 247,
++		.digest    =
++			"\x4c\x13\x91\xb7\x59\x96\xd3\x28"
++			"\xd2\x63\xd1\x87\x1a\xbf\xe9\x36"
++			"\xe2\x49\x98\x66\xb6\x60\x9a\x07"
++			"\xa0\x4f\x78\x75\x57\x6d\x63\x0a"
++			"\xcf\xca\x48\x51\xfc\x3c\x79\x1e"
++			"\x1f\xf6\x3a\x73\x86\x64\x77\x15"
++			"\xd9\x7c\xf8\xd7\x0d\x13\x2e\x27"
++			"\x76\x9f\x3c\x10\x40\xdf\x66\x81",
++	}, {
++		.ksize     = 64,
++		.key       =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
++			"\x20\x21\x22\x23\x24\x25\x26\x27"
++			"\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
++			"\x30\x31\x32\x33\x34\x35\x36\x37"
++			"\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f",
++		.plaintext =
++			"\x00\x01\x02\x03\x04\x05\x06\x07"
++			"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++			"\x10\x11\x12\x13\x14\x15\x16\x17"
++			"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
++			"\x20\x21\x22\x23\x24\x25\x26\x27"
++			"\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
++			"\x30\x31\x32\x33\x34\x35\x36\x37"
++			"\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f"
++			"\x40\x41\x42\x43\x44\x45\x46\x47"
++			"\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f"
++			"\x50\x51\x52\x53\x54\x55\x56\x57"
++			"\x58\x59\x5a\x5b\x5c\x5d\x5e\x5f"
++			"\x60\x61\x62\x63\x64\x65\x66\x67"
++			"\x68\x69\x6a\x6b\x6c\x6d\x6e\x6f"
++			"\x70\x71\x72\x73\x74\x75\x76\x77"
++			"\x78\x79\x7a\x7b\x7c\x7d\x7e\x7f"
++			"\x80\x81\x82\x83\x84\x85\x86\x87"
++			"\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f"
++			"\x90\x91\x92\x93\x94\x95\x96\x97"
++			"\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f"
++			"\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7"
++			"\xa8\xa9\xaa\xab\xac\xad\xae\xaf"
++			"\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7"
++			"\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf"
++			"\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7"
++			"\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf"
++			"\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7"
++			"\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf"
++			"\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7"
++			"\xe8\xe9\xea\xeb\xec\xed\xee\xef"
++			"\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7"
++			"\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff",
++		.psize     = 256,
++		.digest    =
++			"\xb7\x20\x71\xe0\x96\x27\x7e\xde"
++			"\xbb\x8e\xe5\x13\x4d\xd3\x71\x49"
++			"\x96\x30\x7b\xa3\xa5\x5a\xa4\x73"
++			"\x3d\x41\x2a\xbb\xe2\x8e\x90\x9e"
++			"\x10\xe5\x7e\x6f\xbf\xb4\xef\x53"
++			"\xb3\xb9\x60\x51\x82\x94\xff\x88"
++			"\x9a\x90\x82\x92\x54\x41\x2e\x2a"
++			"\x60\xb8\x5a\xdd\x07\xa3\x67\x4f",
++	}
++};
++
+ #endif	/* _CRYPTO_TESTMGR_H */
 -- 
 2.23.0
 
