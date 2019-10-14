@@ -2,63 +2,86 @@ Return-Path: <SRS0=VKJi=YH=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 923B3C4CECE
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 18:08:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05253ECE587
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 18:17:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 775BF2067B
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 18:08:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA76A20854
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 18:17:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1571077026;
+	bh=LczrQTUyvT5jaLGgcpxF4f3vBKkBDCVyFILFIgjdkEg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=CQZv0WL+j6vrGKdd8GxU5Y/rM3QiWGXw09Z7HS2proK8t+l3G4wBL6m3GkR9R7KKf
+	 9VtvJ6shQNKCkNOLoiDl60GfnqMSwJQ9vfm2nVz22+XRsHRj6h4j3EVlj5mVe7gJ8e
+	 klKrNCiFTFle4VMMeWFK7lEQrtbZtLfvlpry6lF0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731921AbfJNSIX (ORCPT
+        id S2388763AbfJNSRG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Oct 2019 14:08:23 -0400
-Received: from shards.monkeyblade.net ([23.128.96.9]:52702 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730192AbfJNSIX (ORCPT
+        Mon, 14 Oct 2019 14:17:06 -0400
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:39920 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731926AbfJNSRG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Oct 2019 14:08:23 -0400
-Received: from localhost (unknown [IPv6:2603:3023:50c:85e1:b5c5:ae11:3e54:6a07])
-        (using TLSv1 with cipher AES256-SHA (256/256 bits))
-        (Client did not present a certificate)
-        (Authenticated sender: davem-davemloft)
-        by shards.monkeyblade.net (Postfix) with ESMTPSA id 8B9641429F7E8;
-        Mon, 14 Oct 2019 11:08:22 -0700 (PDT)
-Date:   Mon, 14 Oct 2019 14:08:19 -0400 (EDT)
-Message-Id: <20191014.140819.2180009161399855683.davem@davemloft.net>
-To:     ard.biesheuvel@linaro.org
-Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
-        ebiggers@google.com, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 23/25] crypto: niagara2 - switch to skcipher API
-From:   David Miller <davem@davemloft.net>
-In-Reply-To: <20191014121910.7264-24-ard.biesheuvel@linaro.org>
-References: <20191014121910.7264-1-ard.biesheuvel@linaro.org>
-        <20191014121910.7264-24-ard.biesheuvel@linaro.org>
-X-Mailer: Mew version 6.8 on Emacs 26.1
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.5.12 (shards.monkeyblade.net [149.20.54.216]); Mon, 14 Oct 2019 11:08:22 -0700 (PDT)
+        Mon, 14 Oct 2019 14:17:06 -0400
+Received: by mail-ot1-f65.google.com with SMTP id s22so14589521otr.6;
+        Mon, 14 Oct 2019 11:17:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=ckXq7H/VDyEuDBGMiSrOJq+fYS3KZI2dTxrNxPrWB1k=;
+        b=mV9KOS5bzFNCpLJWeZlhoj5fUuoEyVYCR4kPOoqcfkZfGyFnk0CYNFh6QLXz1JZk5G
+         Or6vPVZt8rcIxJtQgwbZD0Hsi4Kcd6QBoZopXkyZoGKdDeY3N2zA38aa69/fC/rU/ITi
+         /tbZr06y6nAvMXov3EffXQn4KnqtUT1cJBHfyNOtiixTM/bxpvPSaHqV85sK/e5edF0A
+         fFK5K3zkXE7CUXGvxDGDPqzuOFd/FuuT8QVXoTwLSFI5bKbaqNwYcImzcQtXN3YDtzmC
+         LT8jKm+UMa4EKz9Yj4NC7yU+Qj9adoXIDh6Mtq7ueDk3vg4JBSHbjDkmd31PnmywuJiP
+         uhEA==
+X-Gm-Message-State: APjAAAXSXGjW0E9BEB0p/XyOoqjfSh2EYfmtl0dJjWsNYn4c8RI++j9M
+        b4AQF06zqCsbwd6j+F44tg==
+X-Google-Smtp-Source: APXvYqykid9kSCG1CYJVW2KOEUFr4Yc+gJ5hvhWeq8D1eMHp1wcYxUdLkGAG0vEh1DCoe19itZwiaw==
+X-Received: by 2002:a9d:58cc:: with SMTP id s12mr12635611oth.291.1571077025089;
+        Mon, 14 Oct 2019 11:17:05 -0700 (PDT)
+Received: from localhost (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
+        by smtp.gmail.com with ESMTPSA id k24sm5352026oic.29.2019.10.14.11.17.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Oct 2019 11:17:04 -0700 (PDT)
+Date:   Mon, 14 Oct 2019 13:17:03 -0500
+From:   Rob Herring <robh@kernel.org>
+To:     Corentin Labbe <clabbe@baylibre.com>
+Cc:     davem@davemloft.net, herbert@gondor.apana.org.au,
+        khilman@baylibre.com, mark.rutland@arm.com, robh+dt@kernel.org,
+        martin.blumenstingl@googlemail.com, devicetree@vger.kernel.org,
+        linux-amlogic@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Corentin Labbe <clabbe@baylibre.com>
+Subject: Re: [PATCH v2 1/4] dt-bindings: crypto: Add DT bindings
+ documentation for amlogic-crypto
+Message-ID: <20191014181703.GA14399@bogus>
+References: <1571031104-6880-1-git-send-email-clabbe@baylibre.com>
+ <1571031104-6880-2-git-send-email-clabbe@baylibre.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1571031104-6880-2-git-send-email-clabbe@baylibre.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date: Mon, 14 Oct 2019 14:19:08 +0200
-
-> Commit 7a7ffe65c8c5 ("crypto: skcipher - Add top-level skcipher interface")
-> dated 20 august 2015 introduced the new skcipher API which is supposed to
-> replace both blkcipher and ablkcipher. While all consumers of the API have
-> been converted long ago, some producers of the ablkcipher remain, forcing
-> us to keep the ablkcipher support routines alive, along with the matching
-> code to expose [a]blkciphers via the skcipher API.
+On Mon, 14 Oct 2019 05:31:41 +0000, Corentin Labbe wrote:
+> This patch adds documentation for Device-Tree bindings for the
+> Amlogic GXL cryptographic offloader driver.
 > 
-> So switch this driver to the skcipher API, allowing us to finally drop the
-> blkcipher code in the near future.
+> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+> ---
+>  .../bindings/crypto/amlogic,gxl-crypto.yaml   | 52 +++++++++++++++++++
+>  1 file changed, 52 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
 > 
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-Acked-by: David S. Miller <davem@davemloft.net>
+Reviewed-by: Rob Herring <robh@kernel.org>
