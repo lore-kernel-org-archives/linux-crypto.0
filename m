@@ -6,119 +6,93 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4CF4C4CECE
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 12:47:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0F0DC4CECE
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 12:53:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8ABA520673
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 12:47:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A564420673
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 12:53:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hEqY218f"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="B9udUHxd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730386AbfJNMrK (ORCPT
+        id S1731492AbfJNMxu (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Oct 2019 08:47:10 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:55640 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730733AbfJNMrK (ORCPT
+        Mon, 14 Oct 2019 08:53:50 -0400
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:45677 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731471AbfJNMxt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Oct 2019 08:47:10 -0400
-Received: by mail-wm1-f66.google.com with SMTP id a6so17113673wma.5
-        for <linux-crypto@vger.kernel.org>; Mon, 14 Oct 2019 05:47:07 -0700 (PDT)
+        Mon, 14 Oct 2019 08:53:49 -0400
+Received: by mail-wr1-f67.google.com with SMTP id r5so19558938wrm.12
+        for <linux-crypto@vger.kernel.org>; Mon, 14 Oct 2019 05:53:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=TTkA/5vTH9Kh1+XMRC6xhgxSKGDJRglBVbRfMO0b/uY=;
-        b=hEqY218fHzvciuduGiB8zmFUf3M0b55irActkL0tbSl4V9ZW4yb2Gr8EbVZxRMUsak
-         2EEDG50n39iM1awJUJkvRG97oYZz4tX+EHLKLEWOvREf7Z+JrfkMUrZOYLfZRc00jEkg
-         nrVFXNnLewGGtjWGzUsToPdaKNUKUpRuEKib7gDmcS3p2OjkfxvwZJ7CXQm3Ih8mEHBm
-         GE6vtINAN+YDEePf/L+gWdG50qaKyATPJGNdeMnaVlUF12tOrKmIn987WhZLHvqp1FAU
-         g75RQPG+tf4W76LB+oak+hQgOfGxgfngYrv3QwPf32ZJjQA1ssRuMpJ0Z6fobZCq9RKG
-         rJSg==
+        bh=O7K03ojuhZUEPufhw8dvRl32iX1dIUuNh6+Mii0jm8s=;
+        b=B9udUHxdqqZFbwa3QaYJihbJ92a/4zyCUfTCoMoH3snFDeKWCDFvz7+QYn4yc5sibq
+         8NHLm/7Ib6oboGCi7SSbOn0FdI1E+hm83mJVKzEt5zEFQ+4c+1gUeKNHNcLySy1VJipU
+         K0kosp9H7LRKqnzz/eWmCeMdsBAdVY0UMY70i4tbWD2mc1Rf2c9HfpPL+EUdxKTp1rJN
+         Gd7JmVON/TwIU7ECGnImQvkXS2hRg8mQs66EskEGgzU98bpTyg3Qq51hDevjg53U6PTz
+         kUDyYQW6re87E7vIDWbLXlpoHhkKqOS5AgPMrIyXDx+LQJcjseYoYwpVp8r/xSSKa5SB
+         Nv4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=TTkA/5vTH9Kh1+XMRC6xhgxSKGDJRglBVbRfMO0b/uY=;
-        b=rXpek6rSIQzyuMVelxqf6kYutioFeRSf0uFbRyryXeGQQng7rre5bEp7u3mE9OBH8k
-         /h0xIlUO0Tt2pBjoygrj+JG5eIyp2IMBez1Ml3CWy59S+W66oVVxqEabDVOQDSXUNn7t
-         oPv5n1tf2mGb1Vb4nfqltFCQc1C5mAEM9EFrm2D+5Y1IUxyCMkIMZiuAHDEdlv+1JTeF
-         DF/RD67M6tW1oCJP3ngEdfF50/YrADW1Xw7lZtANZT4Y34QgHi/Js5jXzhUjRMpKgVQC
-         hdv7EFM47ijLZlYdbR7XuweGkn4WTR5S+G7tY3/nwldLUJ2WZmpi4iKnjrX1Sxz1HMUI
-         DElw==
-X-Gm-Message-State: APjAAAXS3hc8ckLuKKZvvGawNKT3pLhQzgfAaNXmEAcAkL0rIS/tS/Uq
-        KaYmStXq57R2IcOEIr3Mwiz5yUg23azCbu7O3GG9zw==
-X-Google-Smtp-Source: APXvYqyE7O3ty6hTTmcwGxRp3tsZOYJcvZhkhjALW6bQaoAI0SUEL4togKyAb9MuENgPYvjAUi4POYXXDr99Yki0TjM=
-X-Received: by 2002:a05:600c:2214:: with SMTP id z20mr15281643wml.10.1571057226626;
- Mon, 14 Oct 2019 05:47:06 -0700 (PDT)
+        bh=O7K03ojuhZUEPufhw8dvRl32iX1dIUuNh6+Mii0jm8s=;
+        b=ktt10SLhrAe8y8DBxMLksJblDvfXslsZX51u6VN+R22IruDpUMLHk3jL3KzZMF8ITg
+         z6Uo4+UHNC/cvBfA3Urje+aQjelAIjxPbQ76KqAcRVSWDjWxQGUbFAPSZ3YZYDck4AQ7
+         aQatVl5GdLhXCLBSKhbppCYMcY7F8xbIyfZ1TAD61XqOZIypYtqxJhfaPLP4SrC78g9b
+         ZAlLs8c6Ec5wq9gLKP4s1delkh+ckDNdLyDJ9ah4WlcrDiGWGIkxeldbnEXMnEQ5lmOA
+         Oi1m3pg6JYC159qyS0TDF36RKnRFEE5Uy+dnZ7/a0PJxjRNPUnzBaRy7cXkFWsKlLF7L
+         J31Q==
+X-Gm-Message-State: APjAAAXGSW207RJbPfMmoLjBAEui8BhqAJpkNBejdi8AmKdfw9t81hwh
+        qQ7gPamCRFiXqz8aSHGdCDDgfMC+X4CgheE6snzgmA==
+X-Google-Smtp-Source: APXvYqz1g1K3bZw+Yaf4FiZgz4EcDEjg2qtRzDMh9qVgwR+/GOFLHIGXYIr3PKpRqDaZ1w6YrLqviMG8/pyFspJEeJg=
+X-Received: by 2002:adf:9f08:: with SMTP id l8mr24595014wrf.325.1571057626382;
+ Mon, 14 Oct 2019 05:53:46 -0700 (PDT)
 MIME-Version: 1.0
-References: <20191012201809.160500-1-ebiggers@kernel.org>
-In-Reply-To: <20191012201809.160500-1-ebiggers@kernel.org>
+References: <20191007164610.6881-1-ard.biesheuvel@linaro.org>
+ <20191007164610.6881-22-ard.biesheuvel@linaro.org> <20191011060232.GB23882@sol.localdomain>
+ <20191011164550.GA203415@zx2c4.com>
+In-Reply-To: <20191011164550.GA203415@zx2c4.com>
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Mon, 14 Oct 2019 14:46:55 +0200
-Message-ID: <CAKv+Gu_HWop7ry=PKMjYrY8EcZN2dmJnqWRE=VPR2ep7OFEBVw@mail.gmail.com>
-Subject: Re: [RFT PATCH 0/3] crypto: s390 - convert to skcipher API
-To:     Eric Biggers <ebiggers@kernel.org>
+Date:   Mon, 14 Oct 2019 14:53:35 +0200
+Message-ID: <CAKv+Gu9R25f+jxMLDPD2PTvrH5n9PPLx_Sb1foo4mUgm8A3D6Q@mail.gmail.com>
+Subject: Re: [PATCH v3 21/29] crypto: BLAKE2s - generic C library
+ implementation and selftest
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
 Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
         <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>
+        David Miller <davem@davemloft.net>,
+        Samuel Neves <sneves@dei.uc.pt>, Arnd Bergmann <arnd@arndb.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        Martin Willi <martin@strongswan.org>,
+        Rene van Dorst <opensource@vdorst.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, 12 Oct 2019 at 22:20, Eric Biggers <ebiggers@kernel.org> wrote:
+On Fri, 11 Oct 2019 at 18:46, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
 >
-> This series converts the glue code for the S390 CPACF implementations of
-> AES, DES, and 3DES modes from the deprecated "blkcipher" API to the
-> "skcipher" API.  This is needed in order for the blkcipher API to be
-> removed.
+> On Thu, Oct 10, 2019 at 11:02:32PM -0700, Eric Biggers wrote:
+> > FYI, I had left a few review comments on Jason's last version of this patch
+> > (https://lkml.kernel.org/linux-crypto/20190326173759.GA607@zzz.localdomain/),
+> > some of which Jason addressed in the Wireguard repository
+> > (https://git.zx2c4.com/WireGuard) but they didn't make it into this patch.
+> > I'd suggest taking a look at the version there.
 >
-> I've compiled this patchset, and the conversion is very similar to that
-> which has been done for many other crypto drivers.  But I don't have the
-> hardware to test it, nor is S390 CPACF supported by QEMU.  So I really
-> need someone with the hardware to test it.  You can do so by setting:
+> Indeed I hadn't updated the Zinc patchset since then, but you can see
+> the changes since ~March here:
 >
-> CONFIG_CRYPTO_HW=y
-> CONFIG_ZCRYPT=y
-> CONFIG_PKEY=y
-> CONFIG_CRYPTO_AES_S390=y
-> CONFIG_CRYPTO_PAES_S390=y
-> CONFIG_CRYPTO_DES_S390=y
-> # CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
-> CONFIG_DEBUG_KERNEL=y
-> CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
-> CONFIG_CRYPTO_AES=y
-> CONFIG_CRYPTO_DES=y
-> CONFIG_CRYPTO_CBC=y
-> CONFIG_CRYPTO_CTR=y
-> CONFIG_CRYPTO_ECB=y
-> CONFIG_CRYPTO_XTS=y
+> https://git.zx2c4.com/WireGuard/log/src/crypto
 >
-> Then boot and check for crypto self-test failures by running
-> 'dmesg | grep alg'.
->
-> If there are test failures, please also check whether they were already
-> failing prior to this patchset.
->
-> This won't cover the "paes" ("protected key AES") algorithms, however,
-> since those don't have self-tests.  If anyone has any way to test those,
-> please do so.
->
-> Eric Biggers (3):
->   crypto: s390/aes - convert to skcipher API
->   crypto: s390/paes - convert to skcipher API
->   crypto: s390/des - convert to skcipher API
->
+> There are actually quite a few interesting Blake changes.
 
-These look fine to me:
+I've picked up a recent version of your Blake2s sources for my v4 series.
 
-Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-
-but i cannot test them either.
+Thanks,
+Ard.
