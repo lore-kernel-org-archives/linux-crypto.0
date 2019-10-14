@@ -2,160 +2,114 @@ Return-Path: <SRS0=VKJi=YH=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F6B3ECE587
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 11:46:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAE0BECE58E
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 12:03:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 029F32084B
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 11:46:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C48CB2084B
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 12:03:34 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gbq/HeQV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730472AbfJNLqh (ORCPT
+        id S1731261AbfJNMDd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Oct 2019 07:46:37 -0400
-Received: from mx1.redhat.com ([209.132.183.28]:54018 "EHLO mx1.redhat.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730593AbfJNLqh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Oct 2019 07:46:37 -0400
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mx1.redhat.com (Postfix) with ESMTPS id A35CC801673;
-        Mon, 14 Oct 2019 11:46:35 +0000 (UTC)
-Received: from thinkpad.redhat.com (ovpn-116-247.ams2.redhat.com [10.36.116.247])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5186619C6A;
-        Mon, 14 Oct 2019 11:46:33 +0000 (UTC)
-From:   Laurent Vivier <lvivier@redhat.com>
-To:     linux-kernel@vger.kernel.org
-Cc:     Matt Mackall <mpm@selenic.com>,
-        'Linux Samsung SOC' <linux-samsung-soc@vger.kernel.org>,
-        Marek Szyprowski <m.szyprowski@samsung.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, Laurent Vivier <lvivier@redhat.com>
-Subject: [PATCH] hwrng: core - Fix use-after-free warning in hwrng_register()
-Date:   Mon, 14 Oct 2019 13:46:32 +0200
-Message-Id: <20191014114632.10875-1-lvivier@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-X-Greylist: Sender IP whitelisted, not delayed by milter-greylist-4.6.2 (mx1.redhat.com [10.5.110.67]); Mon, 14 Oct 2019 11:46:36 +0000 (UTC)
+        Mon, 14 Oct 2019 08:03:33 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:33510 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731371AbfJNMDd (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 14 Oct 2019 08:03:33 -0400
+Received: by mail-pl1-f194.google.com with SMTP id d22so7948322pls.0
+        for <linux-crypto@vger.kernel.org>; Mon, 14 Oct 2019 05:03:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id;
+        bh=1Ew6nvp+lIVXOTGUH+6CvvZJUmcbSc2ZNxvYMIXew0A=;
+        b=gbq/HeQVGZN31YpkwxiGgPCoN0r2zdogqzMJXRrbQizFzp3Zvjk+eG3xHT2HVWlyy0
+         yKoQjLIHCe0qcE5FvLMZysmpRQsx69QVdXF/tddh5HohWl0Q9NIf38blfmC7Fq1sjSB4
+         Ak3m4KZd93vrdGL9HYEPKodz4Ztok0bUTTyZm+wZxQM50eY0SRrOTJ5y8sjU5rTa4x8b
+         qjI0w9oaCrHmxwIQkCSGQ6VHgMZD1WhwXAtIPeAJ2dgILuIA5LDlGwYbcYJvI4X1XSxW
+         Xja2s77OedE10WM4nb/YkRJYfY0zsnU21WFEINy2Vx9ymomKtOMPof4G46/fvr3Sr1tc
+         Hmrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=1Ew6nvp+lIVXOTGUH+6CvvZJUmcbSc2ZNxvYMIXew0A=;
+        b=GFXjmUujKxO8uNpHznN/al7FTKBSSkvCcAD0jBoYFsPt0wTTLGr7wxKjK8kRu09aot
+         wVUREN4dVsnQSdMAFuZ708+c5tvyHUefb9UNCJb1wx0ih9QRgMmuMK7SBet/T6FPWQNi
+         224Y3WVPpED2vmNkb9q3siqkDdMtTzIxOwtsgyYbRcQ+Q4DXDE8z6Bn0RIdHYBb2Kh/2
+         P6otx/7VNQUaCIKnt6+fQpotw8Zl6GEZoC3z+JjBB49A9NVubjycN3A5UjGlPjW1E0pA
+         CeNI4biUTT5jxhZiXoHS7/TZKQIJXJ7v7CtTrJWGCVXgotCv+xPvtx676gOK7RfOUegT
+         pmAg==
+X-Gm-Message-State: APjAAAUi3f5iZVJwlwLhjdAk27OVeLQ7CZascw6ZosYSt7nOoftAw5jp
+        Ot2b9prJEUwBMyyTPHlRsLxS34Tvaz8=
+X-Google-Smtp-Source: APXvYqwZdkrEAgTaWFnRP+/uhst6b4xYJs7GiVSruDMSpRCe0gbmmFgFtXUPYO/lBF0emiDvmKmAhA==
+X-Received: by 2002:a17:902:9306:: with SMTP id bc6mr30065583plb.133.1571054611544;
+        Mon, 14 Oct 2019 05:03:31 -0700 (PDT)
+Received: from localhost.localdomain ([117.252.65.194])
+        by smtp.gmail.com with ESMTPSA id q6sm25026813pgn.44.2019.10.14.05.03.24
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Mon, 14 Oct 2019 05:03:30 -0700 (PDT)
+From:   Sumit Garg <sumit.garg@linaro.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     dsaxena@plexity.net, herbert@gondor.apana.org.au, mpm@selenic.com,
+        romain.perier@free-electrons.com, arnd@arndb.de,
+        gregkh@linuxfoundation.org, daniel.thompson@linaro.org,
+        ralph.siemsen@linaro.org, milan.stevanovic@se.com,
+        ryan.harkin@linaro.org, linux-kernel@vger.kernel.org,
+        Sumit Garg <sumit.garg@linaro.org>, stable@vger.kernel.org
+Subject: [PATCH] hwrng: omap - Fix RNG wait loop timeout
+Date:   Mon, 14 Oct 2019 17:32:45 +0530
+Message-Id: <1571054565-6991-1-git-send-email-sumit.garg@linaro.org>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Commit daae28debcb0 has moved add_early_randomness() out of the
-rng_mutex and tries to protect the reference of the new rng device
-by incrementing the reference counter.
+Existing RNG data read timeout is 200us but it doesn't cover EIP76 RNG
+data rate which takes approx. 700us to produce 16 bytes of output data
+as per testing results. So configure the timeout as 1000us to also take
+account of lack of udelay()'s reliability.
 
-But in hwrng_register(), the function can be called with a new device
-that is not set as the current_rng device and the reference has not been
-initialized. This patch fixes the problem by not using the reference
-counter when the device is not the current one: the reference counter
-is only meaningful in the case of the current rng device and a device
-is not used if it is not the current one (except in hwrng_register())
-
-The problem has been reported by Marek Szyprowski on ARM 32bit
-Exynos5420-based Chromebook Peach-Pit board:
-
-WARNING: CPU: 3 PID: 1 at lib/refcount.c:156 hwrng_register+0x13c/0x1b4
-refcount_t: increment on 0; use-after-free.
-Modules linked in:
-CPU: 3 PID: 1 Comm: swapper/0 Not tainted 5.4.0-rc1-00061-gdaae28debcb0
-Hardware name: SAMSUNG EXYNOS (Flattened Device Tree)
-[<c01124c8>] (unwind_backtrace) from [<c010dfb8>] (show_stack+0x10/0x14)
-[<c010dfb8>] (show_stack) from [<c0ae86d8>] (dump_stack+0xa8/0xd4)
-[<c0ae86d8>] (dump_stack) from [<c0127428>] (__warn+0xf4/0x10c)
-[<c0127428>] (__warn) from [<c01274b4>] (warn_slowpath_fmt+0x74/0xb8)
-[<c01274b4>] (warn_slowpath_fmt) from [<c054729c>] (hwrng_register+0x13c/0x1b4)
-[<c054729c>] (hwrng_register) from [<c0547e54>] (tpm_chip_register+0xc4/0x274)
-...
-
-Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
-Fixes: daae28debcb0 ("hwrng: core - move add_early_randomness() out of rng_mutex")
-Tested-by: Marek Szyprowski <m.szyprowski@samsung.com>
-Signed-off-by: Laurent Vivier <lvivier@redhat.com>
+Fixes: 383212425c92 ("hwrng: omap - Add device variant for SafeXcel IP-76 found in Armada 8K")
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Sumit Garg <sumit.garg@linaro.org>
 ---
- drivers/char/hw_random/core.c | 33 ++++++++++++++++-----------------
- 1 file changed, 16 insertions(+), 17 deletions(-)
+ drivers/char/hw_random/omap-rng.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/char/hw_random/core.c b/drivers/char/hw_random/core.c
-index 29f50c045c92..d85c6e18a2d2 100644
---- a/drivers/char/hw_random/core.c
-+++ b/drivers/char/hw_random/core.c
-@@ -471,17 +471,15 @@ static void start_khwrngd(void)
- int hwrng_register(struct hwrng *rng)
- {
- 	int err = -EINVAL;
--	struct hwrng *old_rng, *new_rng, *tmp;
-+	struct hwrng *tmp;
- 	struct list_head *rng_list_ptr;
-+	bool is_new_current = false;
+diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/omap-rng.c
+index b27f396..e329f82 100644
+--- a/drivers/char/hw_random/omap-rng.c
++++ b/drivers/char/hw_random/omap-rng.c
+@@ -66,6 +66,13 @@
+ #define OMAP4_RNG_OUTPUT_SIZE			0x8
+ #define EIP76_RNG_OUTPUT_SIZE			0x10
  
- 	if (!rng->name || (!rng->data_read && !rng->read))
- 		goto out;
++/*
++ * EIP76 RNG takes approx. 700us to produce 16 bytes of output data
++ * as per testing results. And to account for the lack of udelay()'s
++ * reliability, we keep the timeout as 1000us.
++ */
++#define RNG_DATA_FILL_TIMEOUT			100
++
+ enum {
+ 	RNG_OUTPUT_0_REG = 0,
+ 	RNG_OUTPUT_1_REG,
+@@ -176,7 +183,7 @@ static int omap_rng_do_read(struct hwrng *rng, void *data, size_t max,
+ 	if (max < priv->pdata->data_size)
+ 		return 0;
  
- 	mutex_lock(&rng_mutex);
- 
--	old_rng = current_rng;
--	new_rng = NULL;
--
- 	/* Must not register two RNGs with the same name. */
- 	err = -EEXIST;
- 	list_for_each_entry(tmp, &rng_list, list) {
-@@ -500,9 +498,8 @@ int hwrng_register(struct hwrng *rng)
- 	}
- 	list_add_tail(&rng->list, rng_list_ptr);
- 
--	err = 0;
--	if (!old_rng ||
--	    (!cur_rng_set_by_user && rng->quality > old_rng->quality)) {
-+	if (!current_rng ||
-+	    (!cur_rng_set_by_user && rng->quality > current_rng->quality)) {
- 		/*
- 		 * Set new rng as current as the new rng source
- 		 * provides better entropy quality and was not
-@@ -511,15 +508,14 @@ int hwrng_register(struct hwrng *rng)
- 		err = set_current_rng(rng);
- 		if (err)
- 			goto out_unlock;
-+		/* to use current_rng in add_early_randomness() we need
-+		 * to take a ref
-+		 */
-+		is_new_current = true;
-+		kref_get(&rng->ref);
- 	}
--
--	new_rng = rng;
--	kref_get(&new_rng->ref);
--out_unlock:
- 	mutex_unlock(&rng_mutex);
--
--	if (new_rng) {
--		if (new_rng != old_rng || !rng->init) {
-+	if (is_new_current || !rng->init) {
- 		/*
- 		 * Use a new device's input to add some randomness to
- 		 * the system.  If this rng device isn't going to be
-@@ -527,10 +523,13 @@ int hwrng_register(struct hwrng *rng)
- 		 * called yet by set_current_rng(); so only use the
- 		 * randomness from devices that don't need an init callback
- 		 */
--			add_early_randomness(new_rng);
--		}
--		put_rng(new_rng);
-+		add_early_randomness(rng);
- 	}
-+	if (is_new_current)
-+		put_rng(rng);
-+	return 0;
-+out_unlock:
-+	mutex_unlock(&rng_mutex);
- out:
- 	return err;
- }
+-	for (i = 0; i < 20; i++) {
++	for (i = 0; i < RNG_DATA_FILL_TIMEOUT; i++) {
+ 		present = priv->pdata->data_present(priv);
+ 		if (present || !wait)
+ 			break;
 -- 
-2.21.0
+2.7.4
 
