@@ -6,52 +6,61 @@ X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DAE9C4CECE
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 14:33:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D581C4CECE
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 16:07:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E0B5220854
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 14:33:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5159920854
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 16:07:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="cR2r+p8R"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bjQDgqCO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731121AbfJNOdq (ORCPT
+        id S2387415AbfJNQHb (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Oct 2019 10:33:46 -0400
-Received: from frisell.zx2c4.com ([192.95.5.64]:37615 "EHLO frisell.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732589AbfJNOdq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Oct 2019 10:33:46 -0400
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id c1dca13a
-        for <linux-crypto@vger.kernel.org>;
-        Mon, 14 Oct 2019 13:45:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
-        :references:in-reply-to:from:date:message-id:subject:to:cc
-        :content-type; s=mail; bh=t1IWs8fn/n2sFghu1hnC9gTFAo4=; b=cR2r+p
-        8RIdfVDNoYNG+YIhO3y5nirqTA0mQKzJnKPjWBLzBmL8r/g1lqKYcJBz7ddCLG20
-        EzLFjLCK/REcv7WXqfF+AG8/XLQduPve9ehNL+tPA9dnwcLN+3VgqLXemUiB0vZx
-        GVPS+sWwUUwP9UwaYwe7S62QKbOEOr5ctxllx9SLEj0iXlIrqrR9LYQyGBzDUeSO
-        2zOSFClN4htegurcUeWGlUfSfvp2aOw9MIc5suONTB2NqE9v0k16XPUTcVdk6guJ
-        RvbMVqjA/KRxG9eF3kz/IL9Yg9rFY9lhia5N8/sGZ3UW0rBPAEklcDBviP+b/zIc
-        V9pco2wCx6q+5zJQ==
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id bfb78fd0 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO)
-        for <linux-crypto@vger.kernel.org>;
-        Mon, 14 Oct 2019 13:45:33 +0000 (UTC)
-Received: by mail-ot1-f52.google.com with SMTP id k32so13969413otc.4
-        for <linux-crypto@vger.kernel.org>; Mon, 14 Oct 2019 07:33:44 -0700 (PDT)
-X-Gm-Message-State: APjAAAV+aL3UVbENrDb5MlWqzJaTUbhX+N2oYOTYy1Esl3EYUe7zApOn
-        A/aEnk8cPTqNm8ZVsiFwlc57CmiGh99j7ORBoZE=
-X-Google-Smtp-Source: APXvYqxyDK8bluRYUcDPqtybNyOGRzZnOkRvV8BrzWIDPtNSUKbAmqxyCbMNQbqHITIh5iO7g3Uy7mXHZYV6azm3GcA=
-X-Received: by 2002:a9d:3664:: with SMTP id w91mr25008563otb.243.1571063623525;
- Mon, 14 Oct 2019 07:33:43 -0700 (PDT)
+        Mon, 14 Oct 2019 12:07:31 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:45901 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387778AbfJNQHb (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 14 Oct 2019 12:07:31 -0400
+Received: by mail-wr1-f68.google.com with SMTP id r5so20340905wrm.12
+        for <linux-crypto@vger.kernel.org>; Mon, 14 Oct 2019 09:07:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=OzyZEeUp7DwxKDZLdbXyF8LuMW9/BfvpmbsTiHDXZVs=;
+        b=bjQDgqCOYXjcC/4xlVUweIE1sLIVDDEvBbYuuGZ9F3ujf+bHlqPrEaTDgL2P7dKJ9e
+         hDneiw2Y0tZq8xartpAB8e5CSxdo+yj7OzkAOr3QJePBg0dMGjKVueGExXxQET7tSnZz
+         ELYg8xYtnDyz/DFuZpmYba34X1BUOsdlJN7uHc/yaEfuywvEh5pgH/W/XVFS64u2HuJ4
+         63sDu8f4ZMDoP18d3NRRReX/LfOCHM6ZWWhGBLm0h6Jty4ft7Ton6IE53yayR5yzSjM9
+         bJUXwNsl6DMacWff2T3DQBqImUa3Sg5nTOlT+rIjsMTu8xhabTvGDjfbGudLSDCdeg0g
+         CdWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=OzyZEeUp7DwxKDZLdbXyF8LuMW9/BfvpmbsTiHDXZVs=;
+        b=qGxDkQ01Ln2tT1MFbuAdAnZOowlSUxNu7/gJb18JoBgM/hu6xZ1RKBIJLF9sf4fskf
+         9iSacYCtlEstyFWe30HHRBNZ5N2YNp0TEungeh5NCo34yHpv94rLMz6CS67bIZW6jkWP
+         zx8NH5Bf8RRCcZ9JT91YzKHjIYbcu6hJY3CZUFRnAYW12KCf0+JCVe+i+JLHiW7zKTIS
+         FxYZ2RoGL8G0t/Kc85Ybm2TwDrgBN29Pw/J2MwRFvLX16KF8p7fT8V8GGbAbMiZ8nLgI
+         sHSTz3ncaQACkcpEO3nMia3s7ZYdEXmpOCHVs2gAgSznfzAD+pzV3O1+j/ndLjq4RNqe
+         2giQ==
+X-Gm-Message-State: APjAAAUkLoXChMutXqztLbi3aXmICkHhYT5qO9S3+89cBJGbx97ZUJwg
+        bLLznfHkk34osnPWcnEjfRCsfz6F1lFkwWYHj+4Nfg==
+X-Google-Smtp-Source: APXvYqx/1Pj+XHpEMnbZaCtZn6072TcFonfz6+uizN7MhjBBVFeAFqMLlbwx/cPRVQhpEEyeZOiVCeid6+4piuXaOWc=
+X-Received: by 2002:adf:9f08:: with SMTP id l8mr25375592wrf.325.1571069247407;
+ Mon, 14 Oct 2019 09:07:27 -0700 (PDT)
 MIME-Version: 1.0
 References: <20191007164610.6881-1-ard.biesheuvel@linaro.org>
-In-Reply-To: <20191007164610.6881-1-ard.biesheuvel@linaro.org>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Mon, 14 Oct 2019 16:33:31 +0200
-X-Gmail-Original-Message-ID: <CAHmME9r9o9EmDoYVV=bGs9Yici900aE2YLN8z-RahSvnP0+mRg@mail.gmail.com>
-Message-ID: <CAHmME9r9o9EmDoYVV=bGs9Yici900aE2YLN8z-RahSvnP0+mRg@mail.gmail.com>
-Subject: Re: [PATCH v3 00/29] crypto: crypto API library interfaces for WireGuard
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+ <20191007164610.6881-25-ard.biesheuvel@linaro.org> <CAHmME9o5hHERnrT_V2EmL9GYRNGpOyos1pmwUHN71vt8yPb+ow@mail.gmail.com>
+In-Reply-To: <CAHmME9o5hHERnrT_V2EmL9GYRNGpOyos1pmwUHN71vt8yPb+ow@mail.gmail.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Mon, 14 Oct 2019 18:07:15 +0200
+Message-ID: <CAKv+Gu-b1gSoG0kc=yzfUE-j7vjZOo=JpD64dF6Lm8+eZruFbw@mail.gmail.com>
+Subject: Re: [PATCH v3 24/29] crypto: lib/curve25519 - work around Clang stack
+ spilling issue
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
 Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         David Miller <davem@davemloft.net>,
@@ -66,25 +75,32 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Ard,
+On Mon, 14 Oct 2019 at 16:14, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+>
+> Hi Ard,
+>
+> On Mon, Oct 7, 2019 at 6:46 PM Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+> > Arnd reports that the 32-bit generic library code for Curve25119 ends
+> > up using an excessive amount of stack space when built with Clang:
+> >
+> >   lib/crypto/curve25519-fiat32.c:756:6: error: stack frame size
+> >       of 1384 bytes in function 'curve25519_generic'
+> >       [-Werror,-Wframe-larger-than=]
+> >
+> > Let's give some hints to the compiler regarding which routines should
+> > not be inlined, to prevent it from running out of registers and spilling
+> > to the stack. The resulting code performs identically under both GCC
+> > and Clang, and makes the warning go away.
+>
+> Are you *sure* about that? Couldn't we fix clang instead? I'd rather
+> fixes go there instead of gimping this. The reason is that I noticed
+> before that this code, performance-wise, was very inlining sensitive.
+> Can you benchmark this on ARM32-noneon and on MIPS32? If there's a
+> performance difference there, then maybe you can defer this part of
+> the series until after the rest lands, and then we'll discuss at
+> length various strategies? Alternatively, if you benchmark those and
+> it also makes no difference, then it indeed makes no difference.
+>
 
-Just to keep track of it in public, here are the things that we're
-deferring from my original series for after this one is (if it is)
-merged:
-
-- Zinc's generic C implementation of poly1305, which is faster and has
-separate implementations for u64 and u128. Should be uncontroversial,
-but it's a code replacement, so not appropriate for this series here.
-- x86_64 ChaCha20 from Zinc, which will spark interesting discussions
-with Martin and might prove to be a bit controversial.
-- x86_64 Poly1305 from Zinc, which I think Martin will be on board
-with, but is also a code replacement.
-- The big_keys patch, showing the simplification the function call
-interface offers.
-- WireGuard - things are quasi-ready, so when the time comes, I look
-forward to submitting that to Dave's net tree as a single boring
-[PATCH 1/1].
-
-Did I leave anything out?
-
-Jason
+I tested this using a 32-bit ARM VM running under an 64-bit KVM
+hypervisor, doing 100 iterations of the selftest.
