@@ -2,144 +2,127 @@ Return-Path: <SRS0=VKJi=YH=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 993EAECE58C
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 05:32:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B011C4CECE
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 05:41:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7381C20882
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 05:32:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1EA9120873
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 05:41:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="FQ5ORjgo"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LuK3iUxU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726646AbfJNFcH (ORCPT
+        id S1726260AbfJNFlK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Oct 2019 01:32:07 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:39534 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726260AbfJNFcH (ORCPT
+        Mon, 14 Oct 2019 01:41:10 -0400
+Received: from bombadil.infradead.org ([198.137.202.133]:37662 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725798AbfJNFlK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Oct 2019 01:32:07 -0400
-Received: by mail-wr1-f67.google.com with SMTP id r3so18047817wrj.6
-        for <linux-crypto@vger.kernel.org>; Sun, 13 Oct 2019 22:32:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=8ehlRfTi/fq+Oy1TzUxlpwPnlRkkcugNpCvrZknIDGg=;
-        b=FQ5ORjgovekCk7XGqhyn+ke278DVw0wPlJaaxeMo1a5O4thnBrnZ0ux4qmb22O+ztr
-         LI3Q5AyYGkd/u/6Fs5rfH7EUzCJeINMQpQ/2bREwujfr+jeoJMoo9uOLUytI3y0ox+Cw
-         uvTm2edHXCe+7eBdbWbBS324u0Vad8Fqlmuv80+RA+Gw2Kgn3TYKPaEhy9KjpqZL6MM/
-         0CYCelN+RFX8cJDSgVFnauAIpGNzozZ2XUgCFlOKxD2VYWBA6Z8O8XA+QL6Vyv4WEIbS
-         O1ixREOhLQqgVB4B91diAct1NeWoynDToZTqm7ZeDbNIhfsS7wiUbfslNWZ6EOiJ5iBI
-         H/tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=8ehlRfTi/fq+Oy1TzUxlpwPnlRkkcugNpCvrZknIDGg=;
-        b=FncPbrpzkaIhOzWyFNPd++Tkw3pZXpoVj+623h+uucH1zXereJVDVn0lxaTXkRRfXN
-         71C7lZ+c45j+GLSOdps8wESqUb9sWuAgXeNWAqACt19vqeT7VXSyi1CRqgFjeHSd+GC2
-         dx4ocpB7INacywlt2EjDJ6mF1vqBJwinVKilnUEWGFjn1/Tfcgh+XOhCObGFHa95yvsq
-         5qv/ND+Yy93Tx0ApY1QQi/W+8NmmGxzDgwD1nMWzlPLTplfw0MNJYhvL9pTS53rfySA/
-         EzObE4aCmRHxK9+wCxAXaCIjac2/tzOrU4K+dtoSwihi/wDlnB7MuGT6TBAaGOVyghU0
-         +o1g==
-X-Gm-Message-State: APjAAAVbEzTZi2/QlztNmu0LL5sDyi+2FutzZ2jzPd2ZQLa7bmTGwqvP
-        Aj9D3MRT2FHq3GyiXXiyhE3E9g==
-X-Google-Smtp-Source: APXvYqzASzbmQ23svVZMfVmaqECJFtThTvyq6i0XHeqaL0MjTozTSVrjTQXBUc9//FwizHoJb6IEdw==
-X-Received: by 2002:a5d:6581:: with SMTP id q1mr23513906wru.393.1571031124896;
-        Sun, 13 Oct 2019 22:32:04 -0700 (PDT)
-Received: from localhost.localdomain ([51.15.160.169])
-        by smtp.googlemail.com with ESMTPSA id o18sm44238772wrw.90.2019.10.13.22.32.04
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Sun, 13 Oct 2019 22:32:04 -0700 (PDT)
-From:   Corentin Labbe <clabbe@baylibre.com>
-To:     davem@davemloft.net, herbert@gondor.apana.org.au,
-        khilman@baylibre.com, mark.rutland@arm.com, robh+dt@kernel.org,
+        Mon, 14 Oct 2019 01:41:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
+        Subject:Sender:Reply-To:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=AI8EfTeODgLvLyZXkT+wBeWstD/BS6tQHgRMlH3pY2k=; b=LuK3iUxUmZAB6J9sYijmNHSU2
+        6Rrp6Rw+FIkUStG7/Lb8Jf13fRsZDSjH0PFVjTwxZpe7IaNvq6UXA/D2es8JQfrOGAW8WnYbDf/ZS
+        nI0ELJQbZkbvTeJZsVVHPaHeXKVANzJy+N+qHEXIMzS2c0SoZjBbstvo+oHxCc8szD+kVRKPTIRzk
+        XlQoIdGz3mERL7yP7ceE56QiLMG42TjQxZ+fbIhw0sjtzUlANxEq5yBGj4+8inMcjgeyfiiCCfYxw
+        7Jx7ldxiaK7Ke5ue4ZC+1z9n2lP7z1O7cBqwvhF/R9zbaE6eiIKQbhpy2YPmmQNEcu8OdcLbsYp9K
+        C6GZcYN/w==;
+Received: from [2601:1c0:6280:3f0::9ef4]
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1iJt6S-0001Ax-Ej; Mon, 14 Oct 2019 05:41:08 +0000
+Subject: Re: [PATCH v2 3/4] crypto: amlogic: Add crypto accelerator for
+ amlogic GXL
+To:     Corentin Labbe <clabbe@baylibre.com>, davem@davemloft.net,
+        herbert@gondor.apana.org.au, khilman@baylibre.com,
+        mark.rutland@arm.com, robh+dt@kernel.org,
         martin.blumenstingl@googlemail.com
 Cc:     devicetree@vger.kernel.org, linux-amlogic@lists.infradead.org,
         linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH v2 1/4] dt-bindings: crypto: Add DT bindings documentation for amlogic-crypto
-Date:   Mon, 14 Oct 2019 05:31:41 +0000
-Message-Id: <1571031104-6880-2-git-send-email-clabbe@baylibre.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1571031104-6880-1-git-send-email-clabbe@baylibre.com>
+        linux-kernel@vger.kernel.org
 References: <1571031104-6880-1-git-send-email-clabbe@baylibre.com>
+ <1571031104-6880-4-git-send-email-clabbe@baylibre.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <8f9be4a8-ed6c-a2bd-f3ba-df22752e7172@infradead.org>
+Date:   Sun, 13 Oct 2019 22:41:06 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
+MIME-Version: 1.0
+In-Reply-To: <1571031104-6880-4-git-send-email-clabbe@baylibre.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch adds documentation for Device-Tree bindings for the
-Amlogic GXL cryptographic offloader driver.
+Hi,
 
-Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
----
- .../bindings/crypto/amlogic,gxl-crypto.yaml   | 52 +++++++++++++++++++
- 1 file changed, 52 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
+On 10/13/19 10:31 PM, Corentin Labbe wrote:
+> diff --git a/drivers/crypto/amlogic/Kconfig b/drivers/crypto/amlogic/Kconfig
+> new file mode 100644
+> index 000000000000..9c4bf96afeb3
+> --- /dev/null
+> +++ b/drivers/crypto/amlogic/Kconfig
+> @@ -0,0 +1,24 @@
+> +config CRYPTO_DEV_AMLOGIC_GXL
+> +	tristate "Support for amlogic cryptographic offloader"
+> +	default y if ARCH_MESON
+> +	select CRYPTO_BLKCIPHER
+> +	select CRYPTO_ENGINE
+> +	select CRYPTO_ECB
+> +	select CRYPTO_CBC
+> +	select CRYPTO_AES
+> +	help
+> +	  Select y here for having support for the cryptographic offloader
 
-diff --git a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-new file mode 100644
-index 000000000000..5becc60a0e28
---- /dev/null
-+++ b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-@@ -0,0 +1,52 @@
-+# SPDX-License-Identifier: GPL-2.0
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/crypto/amlogic,gxl-crypto.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Amlogic GXL Cryptographic Offloader
-+
-+maintainers:
-+  - Corentin Labbe <clabbe@baylibre.com>
-+
-+properties:
-+  compatible:
-+    items:
-+    - const: amlogic,gxl-crypto
-+
-+  reg:
-+    maxItems: 1
-+
-+  interrupts:
-+    items:
-+      - description: "Interrupt for flow 0"
-+      - description: "Interrupt for flow 1"
-+
-+  clocks:
-+    maxItems: 1
-+
-+  clock-names:
-+    const: blkmv
-+
-+required:
-+  - compatible
-+  - reg
-+  - interrupts
-+  - clocks
-+  - clock-names
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/interrupt-controller/irq.h>
-+    #include <dt-bindings/interrupt-controller/arm-gic.h>
-+    #include <dt-bindings/clock/gxbb-clkc.h>
-+
-+    crypto: crypto@c883e000 {
-+        compatible = "amlogic,gxl-crypto";
-+        reg = <0x0 0xc883e000 0x0 0x36>;
-+        interrupts = <GIC_SPI 188 IRQ_TYPE_EDGE_RISING>, <GIC_SPI 189 IRQ_TYPE_EDGE_RISING>;
-+        clocks = <&clkc CLKID_BLKMV>;
-+        clock-names = "blkmv";
-+    };
+	                to have support for
+
+> +	  availlable on Amlogic GXL SoC.
+
+	  available
+
+> +	  This hardware handle AES ciphers in ECB/CBC mode.
+
+	                handles
+
+> +
+> +	  To compile this driver as a module, choose M here: the module
+> +	  will be called amlogic-crypto.
+
+That module name does not match the Makefile's name.
+
+> +
+> +config CRYPTO_DEV_AMLOGIC_GXL_DEBUG
+> +	bool "Enabled amlogic stats"
+
+	      Enable
+
+> +	depends on CRYPTO_DEV_AMLOGIC_GXL
+> +	depends on DEBUG_FS
+> +	help
+> +	  Say y to enabled amlogic-crypto debug stats.
+
+	           enable
+
+> +	  This will create /sys/kernel/debug/gxl-crypto/stats for displaying
+> +	  the number of requests per flow and per algorithm.
+> diff --git a/drivers/crypto/amlogic/Makefile b/drivers/crypto/amlogic/Makefile
+> new file mode 100644
+> index 000000000000..39057e62c13e
+> --- /dev/null
+> +++ b/drivers/crypto/amlogic/Makefile
+> @@ -0,0 +1,2 @@
+> +obj-$(CONFIG_CRYPTO_DEV_AMLOGIC_GXL) += amlogic-gxl-crypto.o
+> +amlogic-gxl-crypto-y := amlogic-gxl-core.o amlogic-gxl-cipher.o
+
+
 -- 
-2.21.0
-
+~Randy
