@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A865EC4CECE
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 12:19:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 483DEC4CECE
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 12:19:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 66C2B206A3
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 12:19:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 141AC206A3
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 12:19:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZLxGs65f"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JcSWlZho"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729942AbfJNMTo (ORCPT
+        id S1729900AbfJNMTs (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Oct 2019 08:19:44 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:44153 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729776AbfJNMTo (ORCPT
+        Mon, 14 Oct 2019 08:19:48 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:40139 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729776AbfJNMTs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Oct 2019 08:19:44 -0400
-Received: by mail-wr1-f68.google.com with SMTP id z9so19457906wrl.11
-        for <linux-crypto@vger.kernel.org>; Mon, 14 Oct 2019 05:19:41 -0700 (PDT)
+        Mon, 14 Oct 2019 08:19:48 -0400
+Received: by mail-wm1-f67.google.com with SMTP id b24so16528813wmj.5
+        for <linux-crypto@vger.kernel.org>; Mon, 14 Oct 2019 05:19:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=KkX6qzZaTwohXSXWCxEEDtNSmaYeUCGtH+INKRMHgMc=;
-        b=ZLxGs65fDVZHbaNTUFKioRHXR1DRVZQ4F9nqNKPTAqxhE1xEEe1SFrDP/Wy0n4AId+
-         If4OV0GsCcHaIhnDt6lCeLyrDcovVlap/G70Ln4g2eQqDbAdVJcKynKyw/tHmOfbnlpZ
-         awC7wRzDZU5O7ntttm77/ehMi6nNaQpn8BUgI8qcdO/ZnRi9CZAnNRYh6gLd+9a+U/Jj
-         Dn1+LAfDyfhfMVLE9GaxMTi8c8NPOu4GVOkwZrmRcEiulfu4N8VyoiZ9jaubtog1Up+z
-         H8C2HqHJsjCRJ9zFV5WjEjdEzO3JzZjn8bQd7Gpx28ueR+5RtYCmhTsFTEF+kjKlfq9X
-         CIoA==
+        bh=jwbuHn1/nhVbykFmuemQXuXRDIeeykNljoq67tVLxpM=;
+        b=JcSWlZhoRIJ9tK8Qo4Az4CDqXRAblOzaWgnOB8/tdU1ZLTnQ/yUhYUc5F/BddrWmJm
+         waoEhMh+Th4G1LfUJnW/yKdoz3cDbiZrcOZdOulms9Q9P+RM100ld7dZnFHZOHj/w1iT
+         MaFq/yx7fU5FmbtdOZAN89JZzdafpe41cEV1UYqogaNQNboXoSdM9k9tC+FR8A+s2tUj
+         f4AP4PX6ybPIQsz5m92axzNteyI8SAkviG8oCDR+FBhck4cH0pQdaFU2scfeibYrAt49
+         6I/4uKo7dIL8Vvcr9n5Ss14Rl3dC9ditba/3s3uWpfz/iIaZeWiw6T2LlcW5U5+B7zAN
+         RpbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=KkX6qzZaTwohXSXWCxEEDtNSmaYeUCGtH+INKRMHgMc=;
-        b=CrBLT8z+wpAFwB0KUmXhUAywbW37vbIy6fc7aEvCGNYJrrYx5lEnqiKU6oMiiPtzoH
-         aSbXdK87naOcu0ezc2YUtVIdtPgC8QTmfD70p6FE2UsLqAAS6voA73eTRUv777FoadGt
-         JPzfHsxZCLHC0h0AMAUQCcbGlLlOZXItHhOyOPKRmsyAgBPK4zOlO2SHrUZJHGyklMA8
-         S6ulRJoz0TsKXVL7nOa0hhhdXFeGm/0ZJc3ER4iJc2jQ9cbiF4pbUakhi3+giyL3lWTE
-         xLQQHcf/o/VkLQFn5WvayPV58djVU8asd9ufRpipFzZlsH3DCYqGb5Ea+4NEbMGrmF/E
-         lvYw==
-X-Gm-Message-State: APjAAAXVN0kaxgxTrcXIHXpnJBegBrcDAKc04z7uw0hP2l1IHLrlQJzv
-        Udkfq7cHG+8rKpk1Oyc/SMRs3jxOdM0x+Q==
-X-Google-Smtp-Source: APXvYqwdT7Fl5pMnQ+EI7+cROAD08GeUtOSv3X/d+r7DMLbS33R3MBFBqcdAe7N4gqmjKbKGVvj4ZA==
-X-Received: by 2002:adf:aacc:: with SMTP id i12mr25442854wrc.15.1571055580700;
-        Mon, 14 Oct 2019 05:19:40 -0700 (PDT)
+        bh=jwbuHn1/nhVbykFmuemQXuXRDIeeykNljoq67tVLxpM=;
+        b=tGa2j1o8clAXqkfynBDki+Pn9wg7keCmNCgpKoQBFwFTXoHLgYXo0RBuQVDCYXSSgk
+         lcnY5tCaGuupOga6jp+Gkvr6Y1A2bYXGFVPrOBm3ibk7gtAd0925EAfrDTzBT1y2Ee8R
+         xeG4YfSjLQKa34rzUU05r4KQJ3p9Q3NOATbbWEAdXnK9R/PG/35TNGGDG8VKZmKN/NeF
+         JcvfWEokeJt6eRAT8XTfQKhhaoAtJruM0tPff4vV9OZIz65SMG2OyRZFnCpduvtjvRMF
+         528NdS8sgRhE8ExokQXE09L8SHJ+8FrfPytBFaA9bUMr3g4vuhw9JohSBUf5LnMlhbO6
+         Qmjw==
+X-Gm-Message-State: APjAAAXQnwK5gh9GMWl6wLqL0RjXtcZtJfj67gcgKvCCAAN7VmF9cVv9
+        dN4QxEPqH0+k8c/GQ9AkVJG7ypf/f4xusg==
+X-Google-Smtp-Source: APXvYqzax3juYC22AlSRNQtWVfB+oTNB9iLfbn+BKPLsrNtsgUSMjvv3o0Zj7NufR1FPB289BTAIeA==
+X-Received: by 2002:a7b:ce06:: with SMTP id m6mr14234402wmc.156.1571055584025;
+        Mon, 14 Oct 2019 05:19:44 -0700 (PDT)
 Received: from localhost.localdomain (91-167-84-221.subs.proxad.net. [91.167.84.221])
-        by smtp.gmail.com with ESMTPSA id i1sm20222470wmb.19.2019.10.14.05.19.39
+        by smtp.gmail.com with ESMTPSA id i1sm20222470wmb.19.2019.10.14.05.19.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Oct 2019 05:19:40 -0700 (PDT)
+        Mon, 14 Oct 2019 05:19:43 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
@@ -63,13 +63,10 @@ Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Biggers <ebiggers@google.com>,
         linux-arm-kernel@lists.infradead.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Gonglei <arei.gonglei@huawei.com>,
-        virtualization@lists.linux-foundation.org
-Subject: [PATCH 03/25] crypto: virtio - switch to skcipher API
-Date:   Mon, 14 Oct 2019 14:18:48 +0200
-Message-Id: <20191014121910.7264-4-ard.biesheuvel@linaro.org>
+        Linus Walleij <linus.walleij@linaro.org>
+Subject: [PATCH 06/25] crypto: ux500 - switch to skcipher API
+Date:   Mon, 14 Oct 2019 14:18:51 +0200
+Message-Id: <20191014121910.7264-7-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191014121910.7264-1-ard.biesheuvel@linaro.org>
 References: <20191014121910.7264-1-ard.biesheuvel@linaro.org>
@@ -90,470 +87,563 @@ code to expose [a]blkciphers via the skcipher API.
 So switch this driver to the skcipher API, allowing us to finally drop the
 blkcipher code in the near future.
 
-Cc: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>
-Cc: Gonglei <arei.gonglei@huawei.com>
-Cc: virtualization@lists.linux-foundation.org
+Cc: Linus Walleij <linus.walleij@linaro.org>
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- drivers/crypto/virtio/virtio_crypto_algs.c   | 187 ++++++++++----------
- drivers/crypto/virtio/virtio_crypto_common.h |   2 +-
- 2 files changed, 92 insertions(+), 97 deletions(-)
+ drivers/crypto/ux500/cryp/cryp_core.c | 371 ++++++++------------
+ 1 file changed, 156 insertions(+), 215 deletions(-)
 
-diff --git a/drivers/crypto/virtio/virtio_crypto_algs.c b/drivers/crypto/virtio/virtio_crypto_algs.c
-index 82b316b2f537..4b71e80951b7 100644
---- a/drivers/crypto/virtio/virtio_crypto_algs.c
-+++ b/drivers/crypto/virtio/virtio_crypto_algs.c
-@@ -8,6 +8,7 @@
- 
- #include <linux/scatterlist.h>
+diff --git a/drivers/crypto/ux500/cryp/cryp_core.c b/drivers/crypto/ux500/cryp/cryp_core.c
+index 1628ae7a1467..95fb694a2667 100644
+--- a/drivers/crypto/ux500/cryp/cryp_core.c
++++ b/drivers/crypto/ux500/cryp/cryp_core.c
+@@ -30,6 +30,7 @@
  #include <crypto/algapi.h>
+ #include <crypto/ctr.h>
+ #include <crypto/internal/des.h>
 +#include <crypto/internal/skcipher.h>
- #include <linux/err.h>
  #include <crypto/scatterwalk.h>
- #include <linux/atomic.h>
-@@ -16,10 +17,10 @@
- #include "virtio_crypto_common.h"
  
+ #include <linux/platform_data/crypto-ux500.h>
+@@ -828,10 +829,10 @@ static int get_nents(struct scatterlist *sg, int nbytes)
+ 	return nents;
+ }
  
--struct virtio_crypto_ablkcipher_ctx {
-+struct virtio_crypto_skcipher_ctx {
- 	struct crypto_engine_ctx enginectx;
- 	struct virtio_crypto *vcrypto;
--	struct crypto_tfm *tfm;
-+	struct crypto_skcipher *tfm;
+-static int ablk_dma_crypt(struct ablkcipher_request *areq)
++static int ablk_dma_crypt(struct skcipher_request *areq)
+ {
+-	struct crypto_ablkcipher *cipher = crypto_ablkcipher_reqtfm(areq);
+-	struct cryp_ctx *ctx = crypto_ablkcipher_ctx(cipher);
++	struct crypto_skcipher *cipher = crypto_skcipher_reqtfm(areq);
++	struct cryp_ctx *ctx = crypto_skcipher_ctx(cipher);
+ 	struct cryp_device_data *device_data;
  
- 	struct virtio_crypto_sym_session_info enc_sess_info;
- 	struct virtio_crypto_sym_session_info dec_sess_info;
-@@ -30,8 +31,8 @@ struct virtio_crypto_sym_request {
+ 	int bytes_written = 0;
+@@ -840,8 +841,8 @@ static int ablk_dma_crypt(struct ablkcipher_request *areq)
  
- 	/* Cipher or aead */
- 	uint32_t type;
--	struct virtio_crypto_ablkcipher_ctx *ablkcipher_ctx;
--	struct ablkcipher_request *ablkcipher_req;
-+	struct virtio_crypto_skcipher_ctx *skcipher_ctx;
-+	struct skcipher_request *skcipher_req;
- 	uint8_t *iv;
- 	/* Encryption? */
- 	bool encrypt;
-@@ -41,7 +42,7 @@ struct virtio_crypto_algo {
- 	uint32_t algonum;
- 	uint32_t service;
- 	unsigned int active_devs;
--	struct crypto_alg algo;
-+	struct skcipher_alg algo;
+ 	pr_debug(DEV_DBG_NAME " [%s]", __func__);
+ 
+-	ctx->datalen = areq->nbytes;
+-	ctx->outlen = areq->nbytes;
++	ctx->datalen = areq->cryptlen;
++	ctx->outlen = areq->cryptlen;
+ 
+ 	ret = cryp_get_device_data(ctx, &device_data);
+ 	if (ret)
+@@ -885,11 +886,11 @@ static int ablk_dma_crypt(struct ablkcipher_request *areq)
+ 	return 0;
+ }
+ 
+-static int ablk_crypt(struct ablkcipher_request *areq)
++static int ablk_crypt(struct skcipher_request *areq)
+ {
+-	struct ablkcipher_walk walk;
+-	struct crypto_ablkcipher *cipher = crypto_ablkcipher_reqtfm(areq);
+-	struct cryp_ctx *ctx = crypto_ablkcipher_ctx(cipher);
++	struct skcipher_walk walk;
++	struct crypto_skcipher *cipher = crypto_skcipher_reqtfm(areq);
++	struct cryp_ctx *ctx = crypto_skcipher_ctx(cipher);
+ 	struct cryp_device_data *device_data;
+ 	unsigned long src_paddr;
+ 	unsigned long dst_paddr;
+@@ -902,21 +903,20 @@ static int ablk_crypt(struct ablkcipher_request *areq)
+ 	if (ret)
+ 		goto out;
+ 
+-	ablkcipher_walk_init(&walk, areq->dst, areq->src, areq->nbytes);
+-	ret = ablkcipher_walk_phys(areq, &walk);
++	ret = skcipher_walk_async(&walk, areq);
+ 
+ 	if (ret) {
+-		pr_err(DEV_DBG_NAME "[%s]: ablkcipher_walk_phys() failed!",
++		pr_err(DEV_DBG_NAME "[%s]: skcipher_walk_async() failed!",
+ 			__func__);
+ 		goto out;
+ 	}
+ 
+ 	while ((nbytes = walk.nbytes) > 0) {
+ 		ctx->iv = walk.iv;
+-		src_paddr = (page_to_phys(walk.src.page) + walk.src.offset);
++		src_paddr = (page_to_phys(walk.src.phys.page) + walk.src.phys.offset);
+ 		ctx->indata = phys_to_virt(src_paddr);
+ 
+-		dst_paddr = (page_to_phys(walk.dst.page) + walk.dst.offset);
++		dst_paddr = (page_to_phys(walk.dst.phys.page) + walk.dst.phys.offset);
+ 		ctx->outdata = phys_to_virt(dst_paddr);
+ 
+ 		ctx->datalen = nbytes - (nbytes % ctx->blocksize);
+@@ -926,11 +926,10 @@ static int ablk_crypt(struct ablkcipher_request *areq)
+ 			goto out;
+ 
+ 		nbytes -= ctx->datalen;
+-		ret = ablkcipher_walk_done(areq, &walk, nbytes);
++		ret = skcipher_walk_done(&walk, nbytes);
+ 		if (ret)
+ 			goto out;
+ 	}
+-	ablkcipher_walk_complete(&walk);
+ 
+ out:
+ 	/* Release the device */
+@@ -948,10 +947,10 @@ static int ablk_crypt(struct ablkcipher_request *areq)
+ 	return ret;
+ }
+ 
+-static int aes_ablkcipher_setkey(struct crypto_ablkcipher *cipher,
++static int aes_skcipher_setkey(struct crypto_skcipher *cipher,
+ 				 const u8 *key, unsigned int keylen)
+ {
+-	struct cryp_ctx *ctx = crypto_ablkcipher_ctx(cipher);
++	struct cryp_ctx *ctx = crypto_skcipher_ctx(cipher);
+ 	u32 *flags = &cipher->base.crt_flags;
+ 
+ 	pr_debug(DEV_DBG_NAME " [%s]", __func__);
+@@ -983,15 +982,15 @@ static int aes_ablkcipher_setkey(struct crypto_ablkcipher *cipher,
+ 	return 0;
+ }
+ 
+-static int des_ablkcipher_setkey(struct crypto_ablkcipher *cipher,
++static int des_skcipher_setkey(struct crypto_skcipher *cipher,
+ 				 const u8 *key, unsigned int keylen)
+ {
+-	struct cryp_ctx *ctx = crypto_ablkcipher_ctx(cipher);
++	struct cryp_ctx *ctx = crypto_skcipher_ctx(cipher);
+ 	int err;
+ 
+ 	pr_debug(DEV_DBG_NAME " [%s]", __func__);
+ 
+-	err = verify_ablkcipher_des_key(cipher, key);
++	err = verify_skcipher_des_key(cipher, key);
+ 	if (err)
+ 		return err;
+ 
+@@ -1002,15 +1001,15 @@ static int des_ablkcipher_setkey(struct crypto_ablkcipher *cipher,
+ 	return 0;
+ }
+ 
+-static int des3_ablkcipher_setkey(struct crypto_ablkcipher *cipher,
++static int des3_skcipher_setkey(struct crypto_skcipher *cipher,
+ 				  const u8 *key, unsigned int keylen)
+ {
+-	struct cryp_ctx *ctx = crypto_ablkcipher_ctx(cipher);
++	struct cryp_ctx *ctx = crypto_skcipher_ctx(cipher);
+ 	int err;
+ 
+ 	pr_debug(DEV_DBG_NAME " [%s]", __func__);
+ 
+-	err = verify_ablkcipher_des3_key(cipher, key);
++	err = verify_skcipher_des3_key(cipher, key);
+ 	if (err)
+ 		return err;
+ 
+@@ -1021,10 +1020,10 @@ static int des3_ablkcipher_setkey(struct crypto_ablkcipher *cipher,
+ 	return 0;
+ }
+ 
+-static int cryp_blk_encrypt(struct ablkcipher_request *areq)
++static int cryp_blk_encrypt(struct skcipher_request *areq)
+ {
+-	struct crypto_ablkcipher *cipher = crypto_ablkcipher_reqtfm(areq);
+-	struct cryp_ctx *ctx = crypto_ablkcipher_ctx(cipher);
++	struct crypto_skcipher *cipher = crypto_skcipher_reqtfm(areq);
++	struct cryp_ctx *ctx = crypto_skcipher_ctx(cipher);
+ 
+ 	pr_debug(DEV_DBG_NAME " [%s]", __func__);
+ 
+@@ -1039,10 +1038,10 @@ static int cryp_blk_encrypt(struct ablkcipher_request *areq)
+ 	return ablk_crypt(areq);
+ }
+ 
+-static int cryp_blk_decrypt(struct ablkcipher_request *areq)
++static int cryp_blk_decrypt(struct skcipher_request *areq)
+ {
+-	struct crypto_ablkcipher *cipher = crypto_ablkcipher_reqtfm(areq);
+-	struct cryp_ctx *ctx = crypto_ablkcipher_ctx(cipher);
++	struct crypto_skcipher *cipher = crypto_skcipher_reqtfm(areq);
++	struct cryp_ctx *ctx = crypto_skcipher_ctx(cipher);
+ 
+ 	pr_debug(DEV_DBG_NAME " [%s]", __func__);
+ 
+@@ -1058,19 +1057,19 @@ static int cryp_blk_decrypt(struct ablkcipher_request *areq)
+ 
+ struct cryp_algo_template {
+ 	enum cryp_algo_mode algomode;
+-	struct crypto_alg crypto;
++	struct skcipher_alg skcipher;
  };
  
- /*
-@@ -49,9 +50,9 @@ struct virtio_crypto_algo {
-  * and crypto algorithms registion.
-  */
- static DEFINE_MUTEX(algs_lock);
--static void virtio_crypto_ablkcipher_finalize_req(
-+static void virtio_crypto_skcipher_finalize_req(
- 	struct virtio_crypto_sym_request *vc_sym_req,
--	struct ablkcipher_request *req,
-+	struct skcipher_request *req,
- 	int err);
- 
- static void virtio_crypto_dataq_sym_callback
-@@ -59,7 +60,7 @@ static void virtio_crypto_dataq_sym_callback
+-static int cryp_cra_init(struct crypto_tfm *tfm)
++static int cryp_init_tfm(struct crypto_skcipher *tfm)
  {
- 	struct virtio_crypto_sym_request *vc_sym_req =
- 		container_of(vc_req, struct virtio_crypto_sym_request, base);
--	struct ablkcipher_request *ablk_req;
-+	struct skcipher_request *ablk_req;
- 	int error;
+-	struct cryp_ctx *ctx = crypto_tfm_ctx(tfm);
+-	struct crypto_alg *alg = tfm->__crt_alg;
++	struct cryp_ctx *ctx = crypto_skcipher_ctx(tfm);
++	struct skcipher_alg *alg = crypto_skcipher_alg(tfm);
+ 	struct cryp_algo_template *cryp_alg = container_of(alg,
+ 			struct cryp_algo_template,
+-			crypto);
++			skcipher);
  
- 	/* Finish the encrypt or decrypt process */
-@@ -79,8 +80,8 @@ static void virtio_crypto_dataq_sym_callback
- 			error = -EIO;
- 			break;
+ 	ctx->config.algomode = cryp_alg->algomode;
+-	ctx->blocksize = crypto_tfm_alg_blocksize(tfm);
++	ctx->blocksize = crypto_skcipher_blocksize(tfm);
+ 
+ 	return 0;
+ }
+@@ -1078,205 +1077,147 @@ static int cryp_cra_init(struct crypto_tfm *tfm)
+ static struct cryp_algo_template cryp_algs[] = {
+ 	{
+ 		.algomode = CRYP_ALGO_AES_ECB,
+-		.crypto = {
+-			.cra_name = "aes",
+-			.cra_driver_name = "aes-ux500",
+-			.cra_priority =	300,
+-			.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
+-					CRYPTO_ALG_ASYNC,
+-			.cra_blocksize = AES_BLOCK_SIZE,
+-			.cra_ctxsize = sizeof(struct cryp_ctx),
+-			.cra_alignmask = 3,
+-			.cra_type = &crypto_ablkcipher_type,
+-			.cra_init = cryp_cra_init,
+-			.cra_module = THIS_MODULE,
+-			.cra_u = {
+-				.ablkcipher = {
+-					.min_keysize = AES_MIN_KEY_SIZE,
+-					.max_keysize = AES_MAX_KEY_SIZE,
+-					.setkey = aes_ablkcipher_setkey,
+-					.encrypt = cryp_blk_encrypt,
+-					.decrypt = cryp_blk_decrypt
+-				}
+-			}
+-		}
+-	},
+-	{
+-		.algomode = CRYP_ALGO_AES_ECB,
+-		.crypto = {
+-			.cra_name = "ecb(aes)",
+-			.cra_driver_name = "ecb-aes-ux500",
+-			.cra_priority = 300,
+-			.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
+-					CRYPTO_ALG_ASYNC,
+-			.cra_blocksize = AES_BLOCK_SIZE,
+-			.cra_ctxsize = sizeof(struct cryp_ctx),
+-			.cra_alignmask = 3,
+-			.cra_type = &crypto_ablkcipher_type,
+-			.cra_init = cryp_cra_init,
+-			.cra_module = THIS_MODULE,
+-			.cra_u = {
+-				.ablkcipher = {
+-					.min_keysize = AES_MIN_KEY_SIZE,
+-					.max_keysize = AES_MAX_KEY_SIZE,
+-					.setkey = aes_ablkcipher_setkey,
+-					.encrypt = cryp_blk_encrypt,
+-					.decrypt = cryp_blk_decrypt,
+-				}
+-			}
++		.skcipher = {
++			.base.cra_name		= "ecb(aes)",
++			.base.cra_driver_name	= "ecb-aes-ux500",
++			.base.cra_priority	= 300,
++			.base.cra_flags		= CRYPTO_ALG_ASYNC,
++			.base.cra_blocksize	= AES_BLOCK_SIZE,
++			.base.cra_ctxsize	= sizeof(struct cryp_ctx),
++			.base.cra_alignmask	= 3,
++			.base.cra_module	= THIS_MODULE,
++
++			.min_keysize		= AES_MIN_KEY_SIZE,
++			.max_keysize		= AES_MAX_KEY_SIZE,
++			.setkey			= aes_skcipher_setkey,
++			.encrypt		= cryp_blk_encrypt,
++			.decrypt		= cryp_blk_decrypt,
++			.init			= cryp_init_tfm,
  		}
--		ablk_req = vc_sym_req->ablkcipher_req;
--		virtio_crypto_ablkcipher_finalize_req(vc_sym_req,
-+		ablk_req = vc_sym_req->skcipher_req;
-+		virtio_crypto_skcipher_finalize_req(vc_sym_req,
- 							ablk_req, error);
- 	}
- }
-@@ -110,8 +111,8 @@ virtio_crypto_alg_validate_key(int key_len, uint32_t *alg)
- 	return 0;
- }
- 
--static int virtio_crypto_alg_ablkcipher_init_session(
--		struct virtio_crypto_ablkcipher_ctx *ctx,
-+static int virtio_crypto_alg_skcipher_init_session(
-+		struct virtio_crypto_skcipher_ctx *ctx,
- 		uint32_t alg, const uint8_t *key,
- 		unsigned int keylen,
- 		int encrypt)
-@@ -200,8 +201,8 @@ static int virtio_crypto_alg_ablkcipher_init_session(
- 	return 0;
- }
- 
--static int virtio_crypto_alg_ablkcipher_close_session(
--		struct virtio_crypto_ablkcipher_ctx *ctx,
-+static int virtio_crypto_alg_skcipher_close_session(
-+		struct virtio_crypto_skcipher_ctx *ctx,
- 		int encrypt)
- {
- 	struct scatterlist outhdr, status_sg, *sgs[2];
-@@ -261,8 +262,8 @@ static int virtio_crypto_alg_ablkcipher_close_session(
- 	return 0;
- }
- 
--static int virtio_crypto_alg_ablkcipher_init_sessions(
--		struct virtio_crypto_ablkcipher_ctx *ctx,
-+static int virtio_crypto_alg_skcipher_init_sessions(
-+		struct virtio_crypto_skcipher_ctx *ctx,
- 		const uint8_t *key, unsigned int keylen)
- {
- 	uint32_t alg;
-@@ -278,30 +279,30 @@ static int virtio_crypto_alg_ablkcipher_init_sessions(
- 		goto bad_key;
- 
- 	/* Create encryption session */
--	ret = virtio_crypto_alg_ablkcipher_init_session(ctx,
-+	ret = virtio_crypto_alg_skcipher_init_session(ctx,
- 			alg, key, keylen, 1);
- 	if (ret)
- 		return ret;
- 	/* Create decryption session */
--	ret = virtio_crypto_alg_ablkcipher_init_session(ctx,
-+	ret = virtio_crypto_alg_skcipher_init_session(ctx,
- 			alg, key, keylen, 0);
- 	if (ret) {
--		virtio_crypto_alg_ablkcipher_close_session(ctx, 1);
-+		virtio_crypto_alg_skcipher_close_session(ctx, 1);
- 		return ret;
- 	}
- 	return 0;
- 
- bad_key:
--	crypto_tfm_set_flags(ctx->tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
-+	crypto_skcipher_set_flags(ctx->tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
- 	return -EINVAL;
- }
- 
- /* Note: kernel crypto API realization */
--static int virtio_crypto_ablkcipher_setkey(struct crypto_ablkcipher *tfm,
-+static int virtio_crypto_skcipher_setkey(struct crypto_skcipher *tfm,
- 					 const uint8_t *key,
- 					 unsigned int keylen)
- {
--	struct virtio_crypto_ablkcipher_ctx *ctx = crypto_ablkcipher_ctx(tfm);
-+	struct virtio_crypto_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	uint32_t alg;
- 	int ret;
- 
-@@ -323,11 +324,11 @@ static int virtio_crypto_ablkcipher_setkey(struct crypto_ablkcipher *tfm,
- 		ctx->vcrypto = vcrypto;
- 	} else {
- 		/* Rekeying, we should close the created sessions previously */
--		virtio_crypto_alg_ablkcipher_close_session(ctx, 1);
--		virtio_crypto_alg_ablkcipher_close_session(ctx, 0);
-+		virtio_crypto_alg_skcipher_close_session(ctx, 1);
-+		virtio_crypto_alg_skcipher_close_session(ctx, 0);
- 	}
- 
--	ret = virtio_crypto_alg_ablkcipher_init_sessions(ctx, key, keylen);
-+	ret = virtio_crypto_alg_skcipher_init_sessions(ctx, key, keylen);
- 	if (ret) {
- 		virtcrypto_dev_put(ctx->vcrypto);
- 		ctx->vcrypto = NULL;
-@@ -339,14 +340,14 @@ static int virtio_crypto_ablkcipher_setkey(struct crypto_ablkcipher *tfm,
- }
- 
- static int
--__virtio_crypto_ablkcipher_do_req(struct virtio_crypto_sym_request *vc_sym_req,
--		struct ablkcipher_request *req,
-+__virtio_crypto_skcipher_do_req(struct virtio_crypto_sym_request *vc_sym_req,
-+		struct skcipher_request *req,
- 		struct data_queue *data_vq)
- {
--	struct crypto_ablkcipher *tfm = crypto_ablkcipher_reqtfm(req);
--	struct virtio_crypto_ablkcipher_ctx *ctx = vc_sym_req->ablkcipher_ctx;
-+	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-+	struct virtio_crypto_skcipher_ctx *ctx = vc_sym_req->skcipher_ctx;
- 	struct virtio_crypto_request *vc_req = &vc_sym_req->base;
--	unsigned int ivsize = crypto_ablkcipher_ivsize(tfm);
-+	unsigned int ivsize = crypto_skcipher_ivsize(tfm);
- 	struct virtio_crypto *vcrypto = ctx->vcrypto;
- 	struct virtio_crypto_op_data_req *req_data;
- 	int src_nents, dst_nents;
-@@ -359,7 +360,7 @@ __virtio_crypto_ablkcipher_do_req(struct virtio_crypto_sym_request *vc_sym_req,
- 	int sg_total;
- 	uint8_t *iv;
- 
--	src_nents = sg_nents_for_len(req->src, req->nbytes);
-+	src_nents = sg_nents_for_len(req->src, req->cryptlen);
- 	dst_nents = sg_nents(req->dst);
- 
- 	pr_debug("virtio_crypto: Number of sgs (src_nents: %d, dst_nents: %d)\n",
-@@ -396,7 +397,7 @@ __virtio_crypto_ablkcipher_do_req(struct virtio_crypto_sym_request *vc_sym_req,
- 	req_data->u.sym_req.op_type = cpu_to_le32(VIRTIO_CRYPTO_SYM_OP_CIPHER);
- 	req_data->u.sym_req.u.cipher.para.iv_len = cpu_to_le32(ivsize);
- 	req_data->u.sym_req.u.cipher.para.src_data_len =
--			cpu_to_le32(req->nbytes);
-+			cpu_to_le32(req->cryptlen);
- 
- 	dst_len = virtio_crypto_alg_sg_nents_length(req->dst);
- 	if (unlikely(dst_len > U32_MAX)) {
-@@ -406,9 +407,9 @@ __virtio_crypto_ablkcipher_do_req(struct virtio_crypto_sym_request *vc_sym_req,
- 	}
- 
- 	pr_debug("virtio_crypto: src_len: %u, dst_len: %llu\n",
--			req->nbytes, dst_len);
-+			req->cryptlen, dst_len);
- 
--	if (unlikely(req->nbytes + dst_len + ivsize +
-+	if (unlikely(req->cryptlen + dst_len + ivsize +
- 		sizeof(vc_req->status) > vcrypto->max_size)) {
- 		pr_err("virtio_crypto: The length is too big\n");
- 		err = -EINVAL;
-@@ -434,10 +435,10 @@ __virtio_crypto_ablkcipher_do_req(struct virtio_crypto_sym_request *vc_sym_req,
- 		err = -ENOMEM;
- 		goto free;
- 	}
--	memcpy(iv, req->info, ivsize);
-+	memcpy(iv, req->iv, ivsize);
- 	if (!vc_sym_req->encrypt)
--		scatterwalk_map_and_copy(req->info, req->src,
--					 req->nbytes - AES_BLOCK_SIZE,
-+		scatterwalk_map_and_copy(req->iv, req->src,
-+					 req->cryptlen - AES_BLOCK_SIZE,
- 					 AES_BLOCK_SIZE, 0);
- 
- 	sg_init_one(&iv_sg, iv, ivsize);
-@@ -476,93 +477,93 @@ __virtio_crypto_ablkcipher_do_req(struct virtio_crypto_sym_request *vc_sym_req,
- 	return err;
- }
- 
--static int virtio_crypto_ablkcipher_encrypt(struct ablkcipher_request *req)
-+static int virtio_crypto_skcipher_encrypt(struct skcipher_request *req)
- {
--	struct crypto_ablkcipher *atfm = crypto_ablkcipher_reqtfm(req);
--	struct virtio_crypto_ablkcipher_ctx *ctx = crypto_ablkcipher_ctx(atfm);
-+	struct crypto_skcipher *atfm = crypto_skcipher_reqtfm(req);
-+	struct virtio_crypto_skcipher_ctx *ctx = crypto_skcipher_ctx(atfm);
- 	struct virtio_crypto_sym_request *vc_sym_req =
--				ablkcipher_request_ctx(req);
-+				skcipher_request_ctx(req);
- 	struct virtio_crypto_request *vc_req = &vc_sym_req->base;
- 	struct virtio_crypto *vcrypto = ctx->vcrypto;
- 	/* Use the first data virtqueue as default */
- 	struct data_queue *data_vq = &vcrypto->data_vq[0];
- 
--	if (!req->nbytes)
-+	if (!req->cryptlen)
- 		return 0;
--	if (req->nbytes % AES_BLOCK_SIZE)
-+	if (req->cryptlen % AES_BLOCK_SIZE)
- 		return -EINVAL;
- 
- 	vc_req->dataq = data_vq;
- 	vc_req->alg_cb = virtio_crypto_dataq_sym_callback;
--	vc_sym_req->ablkcipher_ctx = ctx;
--	vc_sym_req->ablkcipher_req = req;
-+	vc_sym_req->skcipher_ctx = ctx;
-+	vc_sym_req->skcipher_req = req;
- 	vc_sym_req->encrypt = true;
- 
--	return crypto_transfer_ablkcipher_request_to_engine(data_vq->engine, req);
-+	return crypto_transfer_skcipher_request_to_engine(data_vq->engine, req);
- }
- 
--static int virtio_crypto_ablkcipher_decrypt(struct ablkcipher_request *req)
-+static int virtio_crypto_skcipher_decrypt(struct skcipher_request *req)
- {
--	struct crypto_ablkcipher *atfm = crypto_ablkcipher_reqtfm(req);
--	struct virtio_crypto_ablkcipher_ctx *ctx = crypto_ablkcipher_ctx(atfm);
-+	struct crypto_skcipher *atfm = crypto_skcipher_reqtfm(req);
-+	struct virtio_crypto_skcipher_ctx *ctx = crypto_skcipher_ctx(atfm);
- 	struct virtio_crypto_sym_request *vc_sym_req =
--				ablkcipher_request_ctx(req);
-+				skcipher_request_ctx(req);
- 	struct virtio_crypto_request *vc_req = &vc_sym_req->base;
- 	struct virtio_crypto *vcrypto = ctx->vcrypto;
- 	/* Use the first data virtqueue as default */
- 	struct data_queue *data_vq = &vcrypto->data_vq[0];
- 
--	if (!req->nbytes)
-+	if (!req->cryptlen)
- 		return 0;
--	if (req->nbytes % AES_BLOCK_SIZE)
-+	if (req->cryptlen % AES_BLOCK_SIZE)
- 		return -EINVAL;
- 
- 	vc_req->dataq = data_vq;
- 	vc_req->alg_cb = virtio_crypto_dataq_sym_callback;
--	vc_sym_req->ablkcipher_ctx = ctx;
--	vc_sym_req->ablkcipher_req = req;
-+	vc_sym_req->skcipher_ctx = ctx;
-+	vc_sym_req->skcipher_req = req;
- 	vc_sym_req->encrypt = false;
- 
--	return crypto_transfer_ablkcipher_request_to_engine(data_vq->engine, req);
-+	return crypto_transfer_skcipher_request_to_engine(data_vq->engine, req);
- }
- 
--static int virtio_crypto_ablkcipher_init(struct crypto_tfm *tfm)
-+static int virtio_crypto_skcipher_init(struct crypto_skcipher *tfm)
- {
--	struct virtio_crypto_ablkcipher_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct virtio_crypto_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
- 
--	tfm->crt_ablkcipher.reqsize = sizeof(struct virtio_crypto_sym_request);
-+	crypto_skcipher_set_reqsize(tfm, sizeof(struct virtio_crypto_sym_request));
- 	ctx->tfm = tfm;
- 
--	ctx->enginectx.op.do_one_request = virtio_crypto_ablkcipher_crypt_req;
-+	ctx->enginectx.op.do_one_request = virtio_crypto_skcipher_crypt_req;
- 	ctx->enginectx.op.prepare_request = NULL;
- 	ctx->enginectx.op.unprepare_request = NULL;
- 	return 0;
- }
- 
--static void virtio_crypto_ablkcipher_exit(struct crypto_tfm *tfm)
-+static void virtio_crypto_skcipher_exit(struct crypto_skcipher *tfm)
- {
--	struct virtio_crypto_ablkcipher_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct virtio_crypto_skcipher_ctx *ctx = crypto_skcipher_ctx(tfm);
- 
- 	if (!ctx->vcrypto)
- 		return;
- 
--	virtio_crypto_alg_ablkcipher_close_session(ctx, 1);
--	virtio_crypto_alg_ablkcipher_close_session(ctx, 0);
-+	virtio_crypto_alg_skcipher_close_session(ctx, 1);
-+	virtio_crypto_alg_skcipher_close_session(ctx, 0);
- 	virtcrypto_dev_put(ctx->vcrypto);
- 	ctx->vcrypto = NULL;
- }
- 
--int virtio_crypto_ablkcipher_crypt_req(
-+int virtio_crypto_skcipher_crypt_req(
- 	struct crypto_engine *engine, void *vreq)
- {
--	struct ablkcipher_request *req = container_of(vreq, struct ablkcipher_request, base);
-+	struct skcipher_request *req = container_of(vreq, struct skcipher_request, base);
- 	struct virtio_crypto_sym_request *vc_sym_req =
--				ablkcipher_request_ctx(req);
-+				skcipher_request_ctx(req);
- 	struct virtio_crypto_request *vc_req = &vc_sym_req->base;
- 	struct data_queue *data_vq = vc_req->dataq;
- 	int ret;
- 
--	ret = __virtio_crypto_ablkcipher_do_req(vc_sym_req, req, data_vq);
-+	ret = __virtio_crypto_skcipher_do_req(vc_sym_req, req, data_vq);
- 	if (ret < 0)
- 		return ret;
- 
-@@ -571,16 +572,16 @@ int virtio_crypto_ablkcipher_crypt_req(
- 	return 0;
- }
- 
--static void virtio_crypto_ablkcipher_finalize_req(
-+static void virtio_crypto_skcipher_finalize_req(
- 	struct virtio_crypto_sym_request *vc_sym_req,
--	struct ablkcipher_request *req,
-+	struct skcipher_request *req,
- 	int err)
- {
- 	if (vc_sym_req->encrypt)
--		scatterwalk_map_and_copy(req->info, req->dst,
--					 req->nbytes - AES_BLOCK_SIZE,
-+		scatterwalk_map_and_copy(req->iv, req->dst,
-+					 req->cryptlen - AES_BLOCK_SIZE,
- 					 AES_BLOCK_SIZE, 0);
--	crypto_finalize_ablkcipher_request(vc_sym_req->base.dataq->engine,
-+	crypto_finalize_skcipher_request(vc_sym_req->base.dataq->engine,
- 					   req, err);
- 	kzfree(vc_sym_req->iv);
- 	virtcrypto_clear_request(&vc_sym_req->base);
-@@ -590,27 +591,21 @@ static struct virtio_crypto_algo virtio_crypto_algs[] = { {
- 	.algonum = VIRTIO_CRYPTO_CIPHER_AES_CBC,
- 	.service = VIRTIO_CRYPTO_SERVICE_CIPHER,
- 	.algo = {
--		.cra_name = "cbc(aes)",
--		.cra_driver_name = "virtio_crypto_aes_cbc",
--		.cra_priority = 150,
--		.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
--		.cra_blocksize = AES_BLOCK_SIZE,
--		.cra_ctxsize  = sizeof(struct virtio_crypto_ablkcipher_ctx),
--		.cra_alignmask = 0,
--		.cra_module = THIS_MODULE,
--		.cra_type = &crypto_ablkcipher_type,
--		.cra_init = virtio_crypto_ablkcipher_init,
--		.cra_exit = virtio_crypto_ablkcipher_exit,
--		.cra_u = {
--			.ablkcipher = {
--				.setkey = virtio_crypto_ablkcipher_setkey,
--				.decrypt = virtio_crypto_ablkcipher_decrypt,
--				.encrypt = virtio_crypto_ablkcipher_encrypt,
--				.min_keysize = AES_MIN_KEY_SIZE,
--				.max_keysize = AES_MAX_KEY_SIZE,
--				.ivsize = AES_BLOCK_SIZE,
--			},
--		},
-+		.base.cra_name		= "cbc(aes)",
-+		.base.cra_driver_name	= "virtio_crypto_aes_cbc",
-+		.base.cra_priority	= 150,
-+		.base.cra_flags		= CRYPTO_ALG_ASYNC,
-+		.base.cra_blocksize	= AES_BLOCK_SIZE,
-+		.base.cra_ctxsize	= sizeof(struct virtio_crypto_skcipher_ctx),
-+		.base.cra_module	= THIS_MODULE,
-+		.init			= virtio_crypto_skcipher_init,
-+		.exit			= virtio_crypto_skcipher_exit,
-+		.setkey			= virtio_crypto_skcipher_setkey,
-+		.decrypt		= virtio_crypto_skcipher_decrypt,
-+		.encrypt		= virtio_crypto_skcipher_encrypt,
-+		.min_keysize		= AES_MIN_KEY_SIZE,
-+		.max_keysize		= AES_MAX_KEY_SIZE,
-+		.ivsize			= AES_BLOCK_SIZE,
  	},
- } };
- 
-@@ -630,14 +625,14 @@ int virtio_crypto_algs_register(struct virtio_crypto *vcrypto)
- 			continue;
- 
- 		if (virtio_crypto_algs[i].active_devs == 0) {
--			ret = crypto_register_alg(&virtio_crypto_algs[i].algo);
-+			ret = crypto_register_skcipher(&virtio_crypto_algs[i].algo);
- 			if (ret)
- 				goto unlock;
+ 	{
+ 		.algomode = CRYP_ALGO_AES_CBC,
+-		.crypto = {
+-			.cra_name = "cbc(aes)",
+-			.cra_driver_name = "cbc-aes-ux500",
+-			.cra_priority = 300,
+-			.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
+-					CRYPTO_ALG_ASYNC,
+-			.cra_blocksize = AES_BLOCK_SIZE,
+-			.cra_ctxsize = sizeof(struct cryp_ctx),
+-			.cra_alignmask = 3,
+-			.cra_type = &crypto_ablkcipher_type,
+-			.cra_init = cryp_cra_init,
+-			.cra_module = THIS_MODULE,
+-			.cra_u = {
+-				.ablkcipher = {
+-					.min_keysize = AES_MIN_KEY_SIZE,
+-					.max_keysize = AES_MAX_KEY_SIZE,
+-					.setkey = aes_ablkcipher_setkey,
+-					.encrypt = cryp_blk_encrypt,
+-					.decrypt = cryp_blk_decrypt,
+-					.ivsize = AES_BLOCK_SIZE,
+-				}
+-			}
++		.skcipher = {
++			.base.cra_name		= "cbc(aes)",
++			.base.cra_driver_name	= "cbc-aes-ux500",
++			.base.cra_priority	= 300,
++			.base.cra_flags		= CRYPTO_ALG_ASYNC,
++			.base.cra_blocksize	= AES_BLOCK_SIZE,
++			.base.cra_ctxsize	= sizeof(struct cryp_ctx),
++			.base.cra_alignmask	= 3,
++			.base.cra_module	= THIS_MODULE,
++
++			.min_keysize		= AES_MIN_KEY_SIZE,
++			.max_keysize		= AES_MAX_KEY_SIZE,
++			.setkey			= aes_skcipher_setkey,
++			.encrypt		= cryp_blk_encrypt,
++			.decrypt		= cryp_blk_decrypt,
++			.init			= cryp_init_tfm,
++			.ivsize			= AES_BLOCK_SIZE,
  		}
- 
- 		virtio_crypto_algs[i].active_devs++;
- 		dev_info(&vcrypto->vdev->dev, "Registered algo %s\n",
--			 virtio_crypto_algs[i].algo.cra_name);
-+			 virtio_crypto_algs[i].algo.base.cra_name);
+ 	},
+ 	{
+ 		.algomode = CRYP_ALGO_AES_CTR,
+-		.crypto = {
+-			.cra_name = "ctr(aes)",
+-			.cra_driver_name = "ctr-aes-ux500",
+-			.cra_priority = 300,
+-			.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
+-						CRYPTO_ALG_ASYNC,
+-			.cra_blocksize = AES_BLOCK_SIZE,
+-			.cra_ctxsize = sizeof(struct cryp_ctx),
+-			.cra_alignmask = 3,
+-			.cra_type = &crypto_ablkcipher_type,
+-			.cra_init = cryp_cra_init,
+-			.cra_module = THIS_MODULE,
+-			.cra_u = {
+-				.ablkcipher = {
+-					.min_keysize = AES_MIN_KEY_SIZE,
+-					.max_keysize = AES_MAX_KEY_SIZE,
+-					.setkey = aes_ablkcipher_setkey,
+-					.encrypt = cryp_blk_encrypt,
+-					.decrypt = cryp_blk_decrypt,
+-					.ivsize = AES_BLOCK_SIZE,
+-				}
+-			}
++		.skcipher = {
++			.base.cra_name		= "ctr(aes)",
++			.base.cra_driver_name	= "ctr-aes-ux500",
++			.base.cra_priority	= 300,
++			.base.cra_flags		= CRYPTO_ALG_ASYNC,
++			.base.cra_blocksize	= 1,
++			.base.cra_ctxsize	= sizeof(struct cryp_ctx),
++			.base.cra_alignmask	= 3,
++			.base.cra_module	= THIS_MODULE,
++
++			.min_keysize		= AES_MIN_KEY_SIZE,
++			.max_keysize		= AES_MAX_KEY_SIZE,
++			.setkey			= aes_skcipher_setkey,
++			.encrypt		= cryp_blk_encrypt,
++			.decrypt		= cryp_blk_decrypt,
++			.init			= cryp_init_tfm,
++			.ivsize			= AES_BLOCK_SIZE,
++			.chunksize		= AES_BLOCK_SIZE,
+ 		}
+ 	},
+ 	{
+ 		.algomode = CRYP_ALGO_DES_ECB,
+-		.crypto = {
+-			.cra_name = "ecb(des)",
+-			.cra_driver_name = "ecb-des-ux500",
+-			.cra_priority = 300,
+-			.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
+-					CRYPTO_ALG_ASYNC,
+-			.cra_blocksize = DES_BLOCK_SIZE,
+-			.cra_ctxsize = sizeof(struct cryp_ctx),
+-			.cra_alignmask = 3,
+-			.cra_type = &crypto_ablkcipher_type,
+-			.cra_init = cryp_cra_init,
+-			.cra_module = THIS_MODULE,
+-			.cra_u = {
+-				.ablkcipher = {
+-					.min_keysize = DES_KEY_SIZE,
+-					.max_keysize = DES_KEY_SIZE,
+-					.setkey = des_ablkcipher_setkey,
+-					.encrypt = cryp_blk_encrypt,
+-					.decrypt = cryp_blk_decrypt,
+-				}
+-			}
++		.skcipher = {
++			.base.cra_name		= "ecb(des)",
++			.base.cra_driver_name	= "ecb-des-ux500",
++			.base.cra_priority	= 300,
++			.base.cra_flags		= CRYPTO_ALG_ASYNC,
++			.base.cra_blocksize	= DES_BLOCK_SIZE,
++			.base.cra_ctxsize	= sizeof(struct cryp_ctx),
++			.base.cra_alignmask	= 3,
++			.base.cra_module	= THIS_MODULE,
++
++			.min_keysize		= DES_KEY_SIZE,
++			.max_keysize		= DES_KEY_SIZE,
++			.setkey			= des_skcipher_setkey,
++			.encrypt		= cryp_blk_encrypt,
++			.decrypt		= cryp_blk_decrypt,
++			.init			= cryp_init_tfm,
+ 		}
+ 	},
+ 	{
+ 		.algomode = CRYP_ALGO_TDES_ECB,
+-		.crypto = {
+-			.cra_name = "ecb(des3_ede)",
+-			.cra_driver_name = "ecb-des3_ede-ux500",
+-			.cra_priority = 300,
+-			.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
+-					CRYPTO_ALG_ASYNC,
+-			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+-			.cra_ctxsize = sizeof(struct cryp_ctx),
+-			.cra_alignmask = 3,
+-			.cra_type = &crypto_ablkcipher_type,
+-			.cra_init = cryp_cra_init,
+-			.cra_module = THIS_MODULE,
+-			.cra_u = {
+-				.ablkcipher = {
+-					.min_keysize = DES3_EDE_KEY_SIZE,
+-					.max_keysize = DES3_EDE_KEY_SIZE,
+-					.setkey = des3_ablkcipher_setkey,
+-					.encrypt = cryp_blk_encrypt,
+-					.decrypt = cryp_blk_decrypt,
+-				}
+-			}
++		.skcipher = {
++			.base.cra_name		= "ecb(des3_ede)",
++			.base.cra_driver_name	= "ecb-des3_ede-ux500",
++			.base.cra_priority	= 300,
++			.base.cra_flags		= CRYPTO_ALG_ASYNC,
++			.base.cra_blocksize	= DES3_EDE_BLOCK_SIZE,
++			.base.cra_ctxsize	= sizeof(struct cryp_ctx),
++			.base.cra_alignmask	= 3,
++			.base.cra_module	= THIS_MODULE,
++
++			.min_keysize		= DES3_EDE_KEY_SIZE,
++			.max_keysize		= DES3_EDE_KEY_SIZE,
++			.setkey			= des3_skcipher_setkey,
++			.encrypt		= cryp_blk_encrypt,
++			.decrypt		= cryp_blk_decrypt,
++			.init			= cryp_init_tfm,
+ 		}
+ 	},
+ 	{
+ 		.algomode = CRYP_ALGO_DES_CBC,
+-		.crypto = {
+-			.cra_name = "cbc(des)",
+-			.cra_driver_name = "cbc-des-ux500",
+-			.cra_priority = 300,
+-			.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
+-					CRYPTO_ALG_ASYNC,
+-			.cra_blocksize = DES_BLOCK_SIZE,
+-			.cra_ctxsize = sizeof(struct cryp_ctx),
+-			.cra_alignmask = 3,
+-			.cra_type = &crypto_ablkcipher_type,
+-			.cra_init = cryp_cra_init,
+-			.cra_module = THIS_MODULE,
+-			.cra_u = {
+-				.ablkcipher = {
+-					.min_keysize = DES_KEY_SIZE,
+-					.max_keysize = DES_KEY_SIZE,
+-					.setkey = des_ablkcipher_setkey,
+-					.encrypt = cryp_blk_encrypt,
+-					.decrypt = cryp_blk_decrypt,
+-				}
+-			}
++		.skcipher = {
++			.base.cra_name		= "cbc(des)",
++			.base.cra_driver_name	= "cbc-des-ux500",
++			.base.cra_priority	= 300,
++			.base.cra_flags		= CRYPTO_ALG_ASYNC,
++			.base.cra_blocksize	= DES_BLOCK_SIZE,
++			.base.cra_ctxsize	= sizeof(struct cryp_ctx),
++			.base.cra_alignmask	= 3,
++			.base.cra_module	= THIS_MODULE,
++
++			.min_keysize		= DES_KEY_SIZE,
++			.max_keysize		= DES_KEY_SIZE,
++			.setkey			= des_skcipher_setkey,
++			.encrypt		= cryp_blk_encrypt,
++			.decrypt		= cryp_blk_decrypt,
++			.ivsize			= DES_BLOCK_SIZE,
++			.init			= cryp_init_tfm,
+ 		}
+ 	},
+ 	{
+ 		.algomode = CRYP_ALGO_TDES_CBC,
+-		.crypto = {
+-			.cra_name = "cbc(des3_ede)",
+-			.cra_driver_name = "cbc-des3_ede-ux500",
+-			.cra_priority = 300,
+-			.cra_flags = CRYPTO_ALG_TYPE_ABLKCIPHER |
+-					CRYPTO_ALG_ASYNC,
+-			.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+-			.cra_ctxsize = sizeof(struct cryp_ctx),
+-			.cra_alignmask = 3,
+-			.cra_type = &crypto_ablkcipher_type,
+-			.cra_init = cryp_cra_init,
+-			.cra_module = THIS_MODULE,
+-			.cra_u = {
+-				.ablkcipher = {
+-					.min_keysize = DES3_EDE_KEY_SIZE,
+-					.max_keysize = DES3_EDE_KEY_SIZE,
+-					.setkey = des3_ablkcipher_setkey,
+-					.encrypt = cryp_blk_encrypt,
+-					.decrypt = cryp_blk_decrypt,
+-					.ivsize = DES3_EDE_BLOCK_SIZE,
+-				}
+-			}
++		.skcipher = {
++			.base.cra_name		= "cbc(des3_ede)",
++			.base.cra_driver_name	= "cbc-des3_ede-ux500",
++			.base.cra_priority	= 300,
++			.base.cra_flags		= CRYPTO_ALG_ASYNC,
++			.base.cra_blocksize	= DES3_EDE_BLOCK_SIZE,
++			.base.cra_ctxsize	= sizeof(struct cryp_ctx),
++			.base.cra_alignmask	= 3,
++			.base.cra_module	= THIS_MODULE,
++
++			.min_keysize		= DES3_EDE_KEY_SIZE,
++			.max_keysize		= DES3_EDE_KEY_SIZE,
++			.setkey			= des3_skcipher_setkey,
++			.encrypt		= cryp_blk_encrypt,
++			.decrypt		= cryp_blk_decrypt,
++			.ivsize			= DES3_EDE_BLOCK_SIZE,
++			.init			= cryp_init_tfm,
+ 		}
  	}
+ };
+@@ -1293,18 +1234,18 @@ static int cryp_algs_register_all(void)
+ 	pr_debug("[%s]", __func__);
  
- unlock:
-@@ -661,7 +656,7 @@ void virtio_crypto_algs_unregister(struct virtio_crypto *vcrypto)
- 			continue;
- 
- 		if (virtio_crypto_algs[i].active_devs == 1)
--			crypto_unregister_alg(&virtio_crypto_algs[i].algo);
-+			crypto_unregister_skcipher(&virtio_crypto_algs[i].algo);
- 
- 		virtio_crypto_algs[i].active_devs--;
+ 	for (i = 0; i < ARRAY_SIZE(cryp_algs); i++) {
+-		ret = crypto_register_alg(&cryp_algs[i].crypto);
++		ret = crypto_register_skcipher(&cryp_algs[i].skcipher);
+ 		if (ret) {
+ 			count = i;
+ 			pr_err("[%s] alg registration failed",
+-					cryp_algs[i].crypto.cra_driver_name);
++					cryp_algs[i].skcipher.base.cra_driver_name);
+ 			goto unreg;
+ 		}
  	}
-diff --git a/drivers/crypto/virtio/virtio_crypto_common.h b/drivers/crypto/virtio/virtio_crypto_common.h
-index 1c6e00da5a29..a24f85c589e7 100644
---- a/drivers/crypto/virtio/virtio_crypto_common.h
-+++ b/drivers/crypto/virtio/virtio_crypto_common.h
-@@ -112,7 +112,7 @@ struct virtio_crypto *virtcrypto_get_dev_node(int node,
- 					      uint32_t algo);
- int virtcrypto_dev_start(struct virtio_crypto *vcrypto);
- void virtcrypto_dev_stop(struct virtio_crypto *vcrypto);
--int virtio_crypto_ablkcipher_crypt_req(
-+int virtio_crypto_skcipher_crypt_req(
- 	struct crypto_engine *engine, void *vreq);
+ 	return 0;
+ unreg:
+ 	for (i = 0; i < count; i++)
+-		crypto_unregister_alg(&cryp_algs[i].crypto);
++		crypto_unregister_skcipher(&cryp_algs[i].skcipher);
+ 	return ret;
+ }
  
- void
+@@ -1318,7 +1259,7 @@ static void cryp_algs_unregister_all(void)
+ 	pr_debug(DEV_DBG_NAME " [%s]", __func__);
+ 
+ 	for (i = 0; i < ARRAY_SIZE(cryp_algs); i++)
+-		crypto_unregister_alg(&cryp_algs[i].crypto);
++		crypto_unregister_skcipher(&cryp_algs[i].skcipher);
+ }
+ 
+ static int ux500_cryp_probe(struct platform_device *pdev)
 -- 
 2.20.1
 
