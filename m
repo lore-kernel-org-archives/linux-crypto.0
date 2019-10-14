@@ -2,86 +2,133 @@ Return-Path: <SRS0=VKJi=YH=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05253ECE587
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 18:17:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52B60C4CECE
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 19:00:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CA76A20854
-	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 18:17:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1571077026;
-	bh=LczrQTUyvT5jaLGgcpxF4f3vBKkBDCVyFILFIgjdkEg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=CQZv0WL+j6vrGKdd8GxU5Y/rM3QiWGXw09Z7HS2proK8t+l3G4wBL6m3GkR9R7KKf
-	 9VtvJ6shQNKCkNOLoiDl60GfnqMSwJQ9vfm2nVz22+XRsHRj6h4j3EVlj5mVe7gJ8e
-	 klKrNCiFTFle4VMMeWFK7lEQrtbZtLfvlpry6lF0=
+	by mail.kernel.org (Postfix) with ESMTP id 38E0B206A3
+	for <linux-crypto@archiver.kernel.org>; Mon, 14 Oct 2019 19:00:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388763AbfJNSRG (ORCPT
+        id S1726953AbfJNTAn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 14 Oct 2019 14:17:06 -0400
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:39920 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731926AbfJNSRG (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 14 Oct 2019 14:17:06 -0400
-Received: by mail-ot1-f65.google.com with SMTP id s22so14589521otr.6;
-        Mon, 14 Oct 2019 11:17:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=ckXq7H/VDyEuDBGMiSrOJq+fYS3KZI2dTxrNxPrWB1k=;
-        b=mV9KOS5bzFNCpLJWeZlhoj5fUuoEyVYCR4kPOoqcfkZfGyFnk0CYNFh6QLXz1JZk5G
-         Or6vPVZt8rcIxJtQgwbZD0Hsi4Kcd6QBoZopXkyZoGKdDeY3N2zA38aa69/fC/rU/ITi
-         /tbZr06y6nAvMXov3EffXQn4KnqtUT1cJBHfyNOtiixTM/bxpvPSaHqV85sK/e5edF0A
-         fFK5K3zkXE7CUXGvxDGDPqzuOFd/FuuT8QVXoTwLSFI5bKbaqNwYcImzcQtXN3YDtzmC
-         LT8jKm+UMa4EKz9Yj4NC7yU+Qj9adoXIDh6Mtq7ueDk3vg4JBSHbjDkmd31PnmywuJiP
-         uhEA==
-X-Gm-Message-State: APjAAAXSXGjW0E9BEB0p/XyOoqjfSh2EYfmtl0dJjWsNYn4c8RI++j9M
-        b4AQF06zqCsbwd6j+F44tg==
-X-Google-Smtp-Source: APXvYqykid9kSCG1CYJVW2KOEUFr4Yc+gJ5hvhWeq8D1eMHp1wcYxUdLkGAG0vEh1DCoe19itZwiaw==
-X-Received: by 2002:a9d:58cc:: with SMTP id s12mr12635611oth.291.1571077025089;
-        Mon, 14 Oct 2019 11:17:05 -0700 (PDT)
-Received: from localhost (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
-        by smtp.gmail.com with ESMTPSA id k24sm5352026oic.29.2019.10.14.11.17.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Oct 2019 11:17:04 -0700 (PDT)
-Date:   Mon, 14 Oct 2019 13:17:03 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Corentin Labbe <clabbe@baylibre.com>
-Cc:     davem@davemloft.net, herbert@gondor.apana.org.au,
-        khilman@baylibre.com, mark.rutland@arm.com, robh+dt@kernel.org,
-        martin.blumenstingl@googlemail.com, devicetree@vger.kernel.org,
-        linux-amlogic@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Corentin Labbe <clabbe@baylibre.com>
-Subject: Re: [PATCH v2 1/4] dt-bindings: crypto: Add DT bindings
- documentation for amlogic-crypto
-Message-ID: <20191014181703.GA14399@bogus>
-References: <1571031104-6880-1-git-send-email-clabbe@baylibre.com>
- <1571031104-6880-2-git-send-email-clabbe@baylibre.com>
+        Mon, 14 Oct 2019 15:00:43 -0400
+Received: from mga05.intel.com ([192.55.52.43]:45668 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728106AbfJNTAn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 14 Oct 2019 15:00:43 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 14 Oct 2019 12:00:41 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,296,1566889200"; 
+   d="scan'208";a="208023923"
+Received: from kridax-mobl1.ger.corp.intel.com (HELO localhost) ([10.252.7.178])
+  by fmsmga001.fm.intel.com with ESMTP; 14 Oct 2019 12:00:34 -0700
+Date:   Mon, 14 Oct 2019 22:00:33 +0300
+From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+To:     "Safford, David (GE Global Research, US)" <david.safford@ge.com>
+Cc:     Ken Goldman <kgold@linux.ibm.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>,
+        "open list:ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] KEYS: asym_tpm: Switch to get_random_bytes()
+Message-ID: <20191014190033.GA15552@linux.intel.com>
+References: <20191003175854.GB19679@linux.intel.com>
+ <1570128827.5046.19.camel@linux.ibm.com>
+ <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2A22E@ALPMBAPA12.e2k.ad.ge.com>
+ <20191004182711.GC6945@linux.intel.com>
+ <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2A38B@ALPMBAPA12.e2k.ad.ge.com>
+ <20191007000520.GA17116@linux.intel.com>
+ <59b88042-9c56-c891-f75e-7c0719eb5ff9@linux.ibm.com>
+ <20191008234935.GA13926@linux.intel.com>
+ <20191008235339.GB13926@linux.intel.com>
+ <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2B995@ALPMBAPA12.e2k.ad.ge.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1571031104-6880-2-git-send-email-clabbe@baylibre.com>
+In-Reply-To: <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2B995@ALPMBAPA12.e2k.ad.ge.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 14 Oct 2019 05:31:41 +0000, Corentin Labbe wrote:
-> This patch adds documentation for Device-Tree bindings for the
-> Amlogic GXL cryptographic offloader driver.
+On Wed, Oct 09, 2019 at 12:11:06PM +0000, Safford, David (GE Global Research, US) wrote:
 > 
-> Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> ---
->  .../bindings/crypto/amlogic,gxl-crypto.yaml   | 52 +++++++++++++++++++
->  1 file changed, 52 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
+> > From: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+> > Sent: Tuesday, October 8, 2019 7:54 PM
+> > To: Ken Goldman <kgold@linux.ibm.com>
+> > Cc: Safford, David (GE Global Research, US) <david.safford@ge.com>; Mimi
+> > Zohar <zohar@linux.ibm.com>; linux-integrity@vger.kernel.org;
+> > stable@vger.kernel.org; open list:ASYMMETRIC KEYS
+> > <keyrings@vger.kernel.org>; open list:CRYPTO API <linux-
+> > crypto@vger.kernel.org>; open list <linux-kernel@vger.kernel.org>
+> > Subject: EXT: Re: [PATCH] KEYS: asym_tpm: Switch to get_random_bytes()
+> > 
+> > On Wed, Oct 09, 2019 at 02:49:35AM +0300, Jarkko Sakkinen wrote:
+> > > On Mon, Oct 07, 2019 at 06:13:01PM -0400, Ken Goldman wrote:
+> > > > The TPM library specification states that the TPM must comply with
+> > > > NIST
+> > > > SP800-90 A.
+> > > >
+> > > > https://trustedcomputinggroup.org/membership/certification/tpm-certi
+> > > > fied-products/
+> > > >
+> > > > shows that the TPMs get third party certification, Common Criteria EAL 4+.
+> > > >
+> > > > While it's theoretically possible that an attacker could compromise
+> > > > both the TPM vendors and the evaluation agencies, we do have EAL 4+
+> > > > assurance against both 1 and 2.
+> > >
+> > > Certifications do not equal to trust.
+> > 
+> > And for trusted keys the least trust solution is to do generation with the kernel
+> > assets and sealing with TPM. With TEE the least trust solution is equivalent.
+> > 
+> > Are you proposing that the kernel random number generation should be
+> > removed? That would be my conclusion of this discussion if I would agree any
+> > of this (I don't).
+> > 
+> > /Jarkko
 > 
+> No one is suggesting that.
+> 
+> You are suggesting changing the documented behavior of trusted keys, and
+> that would cause problems for some of our use cases. While certification
+> may not in your mind be equal to trust, it is equal to compliance with 
+> mandatory regulations.
+> 
+> Perhaps rather than arguing past each other, we should look into 
+> providing users the ability to choose, as an argument to keyctl?
+> 
+> dave
 
-Reviewed-by: Rob Herring <robh@kernel.org>
+I'm taking my words back in the regression part as regression would need
+really a failing system. Definitely the fixes tag should be removed from
+my patch.
+
+What is anyway the role of the kernel rng? Why does it exist and when
+exactly it should be used? This exactly where the whole review process
+throughout the "chain of command" failed misserably with tpm_asym.c.
+
+The commit message for tpm_asym.c does not document the design choice in
+any possible way and still was merged to the mainline.
+
+Before knowning the answer to the "existential" question we are
+somewhat paralyzed on moving forward with trusted keys (e.g. paralyzed
+to merge TEE backend).
+
+Your proposal might make sense but I don't really want to say anything
+since I'm completely cluesless of the role of the kernel rng. Looks like
+everyone who participated to the review process of tpm_asym.c, is too.
+
+/Jarkko
