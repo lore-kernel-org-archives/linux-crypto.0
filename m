@@ -2,136 +2,90 @@ Return-Path: <SRS0=lMhp=YI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 676D7C10F14
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Oct 2019 10:33:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42861C10F14
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Oct 2019 10:40:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3A78C2067B
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Oct 2019 10:33:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TpsPmLAp"
+	by mail.kernel.org (Postfix) with ESMTP id 1FB6621835
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Oct 2019 10:40:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730714AbfJOKdj (ORCPT
+        id S1730942AbfJOKkp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Oct 2019 06:33:39 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:39723 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730348AbfJOKdj (ORCPT
+        Tue, 15 Oct 2019 06:40:45 -0400
+Received: from mail3-relais-sop.national.inria.fr ([192.134.164.104]:22950
+        "EHLO mail3-relais-sop.national.inria.fr" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730937AbfJOKko (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Oct 2019 06:33:39 -0400
-Received: by mail-wr1-f66.google.com with SMTP id r3so23200355wrj.6
-        for <linux-crypto@vger.kernel.org>; Tue, 15 Oct 2019 03:33:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=YSK25mgLP2qGujjcVZMaYH39R8jkExhb9pHpMqbi9GA=;
-        b=TpsPmLAphUhP91H2zfTGmqgMFc+tf3x2s40xaEMXb4jarRvDtFZ5Re7Oq97V+ovVBm
-         JJba+t1emP9U++I0ssZAbA1j2VgnXDVbnUzdzo75m8UWBXdGcQXSzI1NHBlood8xkfs9
-         LDNoJSG14R2jBhOuZwa4ijGXTSdXsAFyDC1ZdEH0/2Q9CSy4OG33qNfW67KQcDIfPemE
-         29VJuwe7H83hKYkJpz06O82aT12VYY+/RzuNmAYrqZMFZzB+/yngc9eeGfaZXMeCDQ4J
-         Y+zu9ZpcKV9zQODZ1SzuefzABwyShTteUlgYkDBVNjMeSzHywmaiNZ8OcFpWt31pIj5R
-         itrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=YSK25mgLP2qGujjcVZMaYH39R8jkExhb9pHpMqbi9GA=;
-        b=ZRb+q/hh3ErU8dFSm4aprxGFuphwUw6b70MWRXxYf2f38O+S9dVHVkxWNzn+1DPeNj
-         kWl08Xw/yZoDU0lH7YjzrJ2DwDdsk5UJs5PG4YZMfvnyMLvDiwPzXAokrz2ec5UT4km7
-         uApsjudx+FRD056r+fcWNjLZ9gHfljZxrfHAxtO+MT5eNH492sL0L/WslbDo5ljTrNHK
-         y9eenY9P3FA6drpCwFwAbwz8HaRlC/FnyfTUUmI8RSSD2vJTfVi6eTWMmZHZ+fuYSocn
-         x0cG1wQToDt9qlVkVdj/0VSRPVsDcS8SXMPsLvcXGk4pGOleXt57c5KwSPCVDRpFseeo
-         h7Xg==
-X-Gm-Message-State: APjAAAWhPKwsq/u6BpkjvDjmAp90kzXah7MxWd70XYvKsEiSWPILuTyA
-        fUFuZylmcXXtGGNDljxRs7cr//PIiuTGkb0uLQxlNd+07jMutAoF
-X-Google-Smtp-Source: APXvYqzAzVDkHsjTVyzfvOTUBgHd0YjSgoANEEfLP1CwlPZ8hBLoj9oAW8bPSfn3FKN8hHgs3zbYuM4bXtcIus5kXCg=
-X-Received: by 2002:adf:f5c2:: with SMTP id k2mr31748636wrp.0.1571135616941;
- Tue, 15 Oct 2019 03:33:36 -0700 (PDT)
+        Tue, 15 Oct 2019 06:40:44 -0400
+X-IronPort-AV: E=Sophos;i="5.67,299,1566856800"; 
+   d="scan'208";a="322757199"
+Received: from portablejulia.rsr.lip6.fr ([132.227.76.63])
+  by mail3-relais-sop.national.inria.fr with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Oct 2019 12:40:42 +0200
+Date:   Tue, 15 Oct 2019 12:40:42 +0200 (CEST)
+From:   Julia Lawall <julia.lawall@lip6.fr>
+X-X-Sender: julia@hadrien
+To:     Corentin Labbe <clabbe@baylibre.com>
+cc:     devicetree@vger.kernel.org, linux-amlogic@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, davem@davemloft.net,
+        herbert@gondor.apana.org.au, khilman@baylibre.com,
+        mark.rutland@arm.com, robh+dt@kernel.org,
+        martin.blumenstingl@googlemail.com
+Subject: [PATCH] crypto: amlogic: fix devm_platform_ioremap_resource.cocci
+ warnings
+Message-ID: <alpine.DEB.2.21.1910151239360.2818@hadrien>
+User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
 MIME-Version: 1.0
-References: <20191015024517.52790-1-ebiggers@kernel.org>
-In-Reply-To: <20191015024517.52790-1-ebiggers@kernel.org>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Tue, 15 Oct 2019 12:33:25 +0200
-Message-ID: <CAKv+Gu8V50wZyoP8gLAEL8W=w25Ra91E+KyH7-kD18qUyuEOmw@mail.gmail.com>
-Subject: Re: [PATCH v2 0/3] crypto: powerpc - convert SPE AES algorithms to
- skcipher API
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Markus Stockhausen <stockhausen@collogia.de>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 15 Oct 2019 at 04:45, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> This series converts the glue code for the PowerPC SPE implementations
-> of AES-ECB, AES-CBC, AES-CTR, and AES-XTS from the deprecated
-> "blkcipher" API to the "skcipher" API.  This is needed in order for the
-> blkcipher API to be removed.
->
-> Patch 1-2 are fixes.  Patch 3 is the actual conversion.
->
-> Tested with:
->
->         export ARCH=powerpc CROSS_COMPILE=powerpc-linux-gnu-
->         make mpc85xx_defconfig
->         cat >> .config << EOF
->         # CONFIG_MODULES is not set
->         # CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
->         CONFIG_DEBUG_KERNEL=y
->         CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
->         CONFIG_CRYPTO_AES=y
->         CONFIG_CRYPTO_CBC=y
->         CONFIG_CRYPTO_CTR=y
->         CONFIG_CRYPTO_ECB=y
->         CONFIG_CRYPTO_XTS=y
->         CONFIG_CRYPTO_AES_PPC_SPE=y
->         EOF
->         make olddefconfig
->         make -j32
->         qemu-system-ppc -M mpc8544ds -cpu e500 -nographic \
->                 -kernel arch/powerpc/boot/zImage \
->                 -append cryptomgr.fuzz_iterations=1000
->
-> Note that xts-ppc-spe still fails the comparison tests due to the lack
-> of ciphertext stealing support.  This is not addressed by this series.
->
-> Changed since v1:
->
-> - Split fixes into separate patches.
->
-> - Made ppc_aes_setkey_skcipher() call ppc_aes_setkey(), rather than
->   creating a separate expand_key() function.  This keeps the code
->   shorter.
->
-> Eric Biggers (3):
->   crypto: powerpc - don't unnecessarily use atomic scatterwalk
->   crypto: powerpc - don't set ivsize for AES-ECB
->   crypto: powerpc - convert SPE AES algorithms to skcipher API
->
+From: kbuild test robot <lkp@intel.com>
 
-For the series
+drivers/crypto/amlogic/amlogic-gxl-core.c:241:1-9: WARNING: Use devm_platform_ioremap_resource for mc -> base
 
-Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Tested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+ Use devm_platform_ioremap_resource helper which wraps
+ platform_get_resource() and devm_ioremap_resource() together.
 
+Generated by: scripts/coccinelle/api/devm_platform_ioremap_resource.cocci
 
->  arch/powerpc/crypto/aes-spe-glue.c | 389 ++++++++++++-----------------
->  crypto/Kconfig                     |   1 +
->  2 files changed, 166 insertions(+), 224 deletions(-)
->
-> --
-> 2.23.0
->
+Fixes: 28b8a60c6c83 ("crypto: amlogic: Add crypto accelerator for amlogic GXL")
+CC: Corentin Labbe <clabbe@baylibre.com>
+Signed-off-by: kbuild test robot <lkp@intel.com>
+Signed-off-by: Julia Lawall <julia.lawall@lip6.fr>
+---
+
+url:    https://github.com/0day-ci/linux/commits/Corentin-Labbe/crypto-add-amlogic-crypto-offloader-driver/20191014-133654
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+:::::: branch date: 7 hours ago
+:::::: commit date: 7 hours ago
+
+ amlogic-gxl-core.c |    4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+--- a/drivers/crypto/amlogic/amlogic-gxl-core.c
++++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
+@@ -223,7 +223,6 @@ static void meson_unregister_algs(struct
+
+ static int meson_crypto_probe(struct platform_device *pdev)
+ {
+-	struct resource *res;
+ 	struct meson_dev *mc;
+ 	int err, i;
+
+@@ -237,8 +236,7 @@ static int meson_crypto_probe(struct pla
+ 	mc->dev = &pdev->dev;
+ 	platform_set_drvdata(pdev, mc);
+
+-	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-	mc->base = devm_ioremap_resource(&pdev->dev, res);
++	mc->base = devm_platform_ioremap_resource(pdev, 0);
+ 	if (IS_ERR(mc->base)) {
+ 		err = PTR_ERR(mc->base);
+ 		dev_err(&pdev->dev, "Cannot request MMIO err=%d\n", err);
