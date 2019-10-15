@@ -2,77 +2,75 @@ Return-Path: <SRS0=lMhp=YI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1A97C10F14
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Oct 2019 13:18:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CC52ECE588
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Oct 2019 16:18:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A191E21848
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Oct 2019 13:18:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 79F3520872
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Oct 2019 16:18:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730441AbfJONSp (ORCPT
+        id S1728488AbfJOQSU (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Oct 2019 09:18:45 -0400
-Received: from mga18.intel.com ([134.134.136.126]:16623 "EHLO mga18.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729551AbfJONSp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Oct 2019 09:18:45 -0400
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga106.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 15 Oct 2019 06:18:44 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,300,1566889200"; 
-   d="scan'208";a="208181089"
-Received: from mcretu-mobl.ger.corp.intel.com (HELO localhost) ([10.252.56.150])
-  by fmsmga001.fm.intel.com with ESMTP; 15 Oct 2019 06:18:38 -0700
-From:   Jani Nikula <jani.nikula@linux.intel.com>
-To:     Matthew Wilcox <willy@infradead.org>,
-        Thomas Zimmermann <tzimmermann@suse.de>
-Cc:     Tim.Bird@sony.com, changbin.du@gmail.com, corbet@lwn.net,
-        linux-doc@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-fpga@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        intel-gfx@lists.freedesktop.org
-Subject: Re: [PATCH] kernel-doc: rename the kernel-doc directive 'functions' to 'specific'
-In-Reply-To: <20191015115439.GE32665@bombadil.infradead.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-References: <20191013055359.23312-1-changbin.du@gmail.com> <875zkrd7nq.fsf@intel.com> <ECADFF3FD767C149AD96A924E7EA6EAF977CAF09@USCULXMSG01.am.sony.com> <7e7557b5-469f-3e63-6254-53dab2d7234a@suse.de> <20191015115439.GE32665@bombadil.infradead.org>
-Date:   Tue, 15 Oct 2019 16:19:36 +0300
-Message-ID: <8736fub0yf.fsf@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        Tue, 15 Oct 2019 12:18:20 -0400
+Received: from mx2.suse.de ([195.135.220.15]:33016 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727809AbfJOQSU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 15 Oct 2019 12:18:20 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 670E5B4B0;
+        Tue, 15 Oct 2019 16:18:18 +0000 (UTC)
+From:   Davidlohr Bueso <dave@stgolabs.net>
+To:     herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        dave@stgolabs.net, Davidlohr Bueso <dbueso@suse.de>
+Subject: [PATCH] drivers,crypto/cavium: Fix barrier barrier usage after atomic_set()
+Date:   Tue, 15 Oct 2019 09:16:57 -0700
+Message-Id: <20191015161657.10760-1-dave@stgolabs.net>
+X-Mailer: git-send-email 2.16.4
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 15 Oct 2019, Matthew Wilcox <willy@infradead.org> wrote:
-> On Tue, Oct 15, 2019 at 11:25:53AM +0200, Thomas Zimmermann wrote:
->> > My preference would be to use 'symbols'.  I tried to come up with something
->> > but 'symbols' is better than anything I came up with.
->> 
->> Maybe 'interfaces' or 'artifacts'. The term 'symbols' is just as
->> imprecise as 'functions'.
->
-> I suggested 'identifier' because that's the term used in the C spec (6.2.1):
->
-> : An identifier can denote an object; a function; a tag or a member
-> : of a structure, union, or enumeration; a typedef name; a label name;
-> : a macro name; or a macro parameter.
->
-> We don't allow documenting all those things separately, but it does cover
-> all the things we do allow to be individually documented.
+Because it is not a Rmw operation, atomic_set() is not serialized,
+and therefore the 'upgradable' smp_mb__after_atomic() call after
+the atomic_set() is completely bogus (not to mention the comment
+could also use some love, but that's a different matter).
 
-Agreed.
+This patch replaces these with smp_mb(), which seems like the
+original intent of when the code was written.
 
-BR,
-Jani.
+Signed-off-by: Davidlohr Bueso <dbueso@suse.de>
+---
+ drivers/crypto/cavium/nitrox/nitrox_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-
+diff --git a/drivers/crypto/cavium/nitrox/nitrox_main.c b/drivers/crypto/cavium/nitrox/nitrox_main.c
+index bc924980e10c..da2e0edceb50 100644
+--- a/drivers/crypto/cavium/nitrox/nitrox_main.c
++++ b/drivers/crypto/cavium/nitrox/nitrox_main.c
+@@ -504,7 +504,7 @@ static int nitrox_probe(struct pci_dev *pdev,
+ 
+ 	atomic_set(&ndev->state, __NDEV_READY);
+ 	/* barrier to sync with other cpus */
+-	smp_mb__after_atomic();
++	smp_mb();
+ 
+ 	err = nitrox_crypto_register();
+ 	if (err)
+@@ -551,7 +551,7 @@ static void nitrox_remove(struct pci_dev *pdev)
+ 
+ 	atomic_set(&ndev->state, __NDEV_NOT_READY);
+ 	/* barrier to sync with other cpus */
+-	smp_mb__after_atomic();
++	smp_mb();
+ 
+ 	nitrox_remove_from_devlist(ndev);
+ 
 -- 
-Jani Nikula, Intel Open Source Graphics Center
+2.16.4
+
