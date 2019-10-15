@@ -2,138 +2,136 @@ Return-Path: <SRS0=lMhp=YI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 263D5C10F14
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Oct 2019 10:31:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 676D7C10F14
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Oct 2019 10:33:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EB7502067B
-	for <linux-crypto@archiver.kernel.org>; Tue, 15 Oct 2019 10:31:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3A78C2067B
+	for <linux-crypto@archiver.kernel.org>; Tue, 15 Oct 2019 10:33:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OhSbn61m"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TpsPmLAp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726296AbfJOKbo (ORCPT
+        id S1730714AbfJOKdj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Oct 2019 06:31:44 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:36666 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726208AbfJOKbn (ORCPT
+        Tue, 15 Oct 2019 06:33:39 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:39723 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730348AbfJOKdj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Oct 2019 06:31:43 -0400
-Received: by mail-wm1-f66.google.com with SMTP id m18so19711765wmc.1
-        for <linux-crypto@vger.kernel.org>; Tue, 15 Oct 2019 03:31:42 -0700 (PDT)
+        Tue, 15 Oct 2019 06:33:39 -0400
+Received: by mail-wr1-f66.google.com with SMTP id r3so23200355wrj.6
+        for <linux-crypto@vger.kernel.org>; Tue, 15 Oct 2019 03:33:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=NyesQWTuvXO6kEAohzVxND+5nW0ZsL+t3l5nme1Rsn0=;
-        b=OhSbn61m0jwUeoM2Gbtb8R350ZOWMXmrO8gesaATTj3rlHsl7HvG2SpwjW50lSEiBJ
-         zt7g5hu0MbBC9PEdNN90xjkKR5C3i1ggatfNeTzAAVjntlp5dSLpCkAUQMqg0Q+lA1ix
-         NrNbGvlFiTzv8S8RHToxrG/W/8mKaRdb6DHgQNNcorTlYIBQspVRq8QwiNYR93rsaqCT
-         S9o5aXMHvOL7eiOWNnL78IDx4CTMWTrAbk0x73A+90DHlJI2BKha/1U0eLo6WftgWS1C
-         Zvja1fgaH27eAByigY+5Xm71MFLBXwmk8I6VSmrXS8XpjeTFsErTqquR3YbubMh7tR5O
-         7RGw==
+         :cc;
+        bh=YSK25mgLP2qGujjcVZMaYH39R8jkExhb9pHpMqbi9GA=;
+        b=TpsPmLAphUhP91H2zfTGmqgMFc+tf3x2s40xaEMXb4jarRvDtFZ5Re7Oq97V+ovVBm
+         JJba+t1emP9U++I0ssZAbA1j2VgnXDVbnUzdzo75m8UWBXdGcQXSzI1NHBlood8xkfs9
+         LDNoJSG14R2jBhOuZwa4ijGXTSdXsAFyDC1ZdEH0/2Q9CSy4OG33qNfW67KQcDIfPemE
+         29VJuwe7H83hKYkJpz06O82aT12VYY+/RzuNmAYrqZMFZzB+/yngc9eeGfaZXMeCDQ4J
+         Y+zu9ZpcKV9zQODZ1SzuefzABwyShTteUlgYkDBVNjMeSzHywmaiNZ8OcFpWt31pIj5R
+         itrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=NyesQWTuvXO6kEAohzVxND+5nW0ZsL+t3l5nme1Rsn0=;
-        b=GM9gyKhTnKaSDQVECO8bOGh0GX0WDhM74sBkmVnv0aw5QZPhRiJtUdZA7A/dvUtcbF
-         hgEpgx3kqw/VJtjUmXPsy6ni36O8Y4OirgKOSE1VF+D1aynEX1Rs+rw189cU1Oom1YrL
-         oSpWcSOEjplnbDijGBGnGXAn9B61Cm7357X3j0sUCaWdVtAStmpbX8+A1LGbjapRgLFY
-         zAI+DSNeYh05fr1G9puUZONG+uxnkpBl95g1ydg5xD08TmqAN9KpklSkRbD8FvdaOaFf
-         oi/cAK5cUjIE1EDy7wJEa2wFD9XgTodxxFmMFLY/Pil0bdJMdG5/JixUBmjFSIb/4/oG
-         7vrQ==
-X-Gm-Message-State: APjAAAWM+HkAZ9yaOZPrEYY6hOJ8U9yXo5iiFOpgZkZIiG1h6AYiYvHK
-        eJxG/6Lzs6OxELeyjL3mUTXs0lEPckcAeGYhIqUouQ==
-X-Google-Smtp-Source: APXvYqwK8OH6ITdP8Q0rR5rvn0rGj0Xy6S+TZjr6jM71xBorVP8lcKUWlmOcxNuRU2ut7HUSNRPf7f05SmvXO5g7uEw=
-X-Received: by 2002:a1c:a9c5:: with SMTP id s188mr17099745wme.61.1571135502001;
- Tue, 15 Oct 2019 03:31:42 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=YSK25mgLP2qGujjcVZMaYH39R8jkExhb9pHpMqbi9GA=;
+        b=ZRb+q/hh3ErU8dFSm4aprxGFuphwUw6b70MWRXxYf2f38O+S9dVHVkxWNzn+1DPeNj
+         kWl08Xw/yZoDU0lH7YjzrJ2DwDdsk5UJs5PG4YZMfvnyMLvDiwPzXAokrz2ec5UT4km7
+         uApsjudx+FRD056r+fcWNjLZ9gHfljZxrfHAxtO+MT5eNH492sL0L/WslbDo5ljTrNHK
+         y9eenY9P3FA6drpCwFwAbwz8HaRlC/FnyfTUUmI8RSSD2vJTfVi6eTWMmZHZ+fuYSocn
+         x0cG1wQToDt9qlVkVdj/0VSRPVsDcS8SXMPsLvcXGk4pGOleXt57c5KwSPCVDRpFseeo
+         h7Xg==
+X-Gm-Message-State: APjAAAWhPKwsq/u6BpkjvDjmAp90kzXah7MxWd70XYvKsEiSWPILuTyA
+        fUFuZylmcXXtGGNDljxRs7cr//PIiuTGkb0uLQxlNd+07jMutAoF
+X-Google-Smtp-Source: APXvYqzAzVDkHsjTVyzfvOTUBgHd0YjSgoANEEfLP1CwlPZ8hBLoj9oAW8bPSfn3FKN8hHgs3zbYuM4bXtcIus5kXCg=
+X-Received: by 2002:adf:f5c2:: with SMTP id k2mr31748636wrp.0.1571135616941;
+ Tue, 15 Oct 2019 03:33:36 -0700 (PDT)
 MIME-Version: 1.0
-References: <20191014121910.7264-1-ard.biesheuvel@linaro.org>
- <20191014121910.7264-9-ard.biesheuvel@linaro.org> <2e544398-5407-430c-84b6-3f946f5dea0c@microchip.com>
-In-Reply-To: <2e544398-5407-430c-84b6-3f946f5dea0c@microchip.com>
+References: <20191015024517.52790-1-ebiggers@kernel.org>
+In-Reply-To: <20191015024517.52790-1-ebiggers@kernel.org>
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Tue, 15 Oct 2019 12:31:31 +0200
-Message-ID: <CAKv+Gu_OueNR9ecHrqx5ROG9Pvvci69myASAW6kmj=KNuK26hQ@mail.gmail.com>
-Subject: Re: [PATCH 08/25] crypto: atmel-aes - switch to skcipher API
-To:     Tudor-Dan Ambarus <Tudor.Ambarus@microchip.com>
+Date:   Tue, 15 Oct 2019 12:33:25 +0200
+Message-ID: <CAKv+Gu8V50wZyoP8gLAEL8W=w25Ra91E+KyH7-kD18qUyuEOmw@mail.gmail.com>
+Subject: Re: [PATCH v2 0/3] crypto: powerpc - convert SPE AES algorithms to
+ skcipher API
+To:     Eric Biggers <ebiggers@kernel.org>
 Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
         <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@google.com>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        Nicolas Ferre <Nicolas.Ferre@microchip.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Ludovic Desroches <Ludovic.Desroches@microchip.com>
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Markus Stockhausen <stockhausen@collogia.de>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 15 Oct 2019 at 12:17, <Tudor.Ambarus@microchip.com> wrote:
+On Tue, 15 Oct 2019 at 04:45, Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> Hi, Ard,
+> This series converts the glue code for the PowerPC SPE implementations
+> of AES-ECB, AES-CBC, AES-CTR, and AES-XTS from the deprecated
+> "blkcipher" API to the "skcipher" API.  This is needed in order for the
+> blkcipher API to be removed.
 >
-> Thanks for working on this.
+> Patch 1-2 are fixes.  Patch 3 is the actual conversion.
 >
-> On 10/14/2019 03:18 PM, Ard Biesheuvel wrote:
-> > Commit 7a7ffe65c8c5 ("crypto: skcipher - Add top-level skcipher interfa=
-ce")
-> > dated 20 august 2015 introduced the new skcipher API which is supposed =
-to
-> > replace both blkcipher and ablkcipher. While all consumers of the API h=
-ave
-> > been converted long ago, some producers of the ablkcipher remain, forci=
-ng
-> > us to keep the ablkcipher support routines alive, along with the matchi=
-ng
-> > code to expose [a]blkciphers via the skcipher API.
-> >
-> > So switch this driver to the skcipher API, allowing us to finally drop =
-the
-> > blkcipher code in the near future.
-> >
-> > Cc: Nicolas Ferre <nicolas.ferre@microchip.com>
-> > Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>
-> > Cc: Ludovic Desroches <ludovic.desroches@microchip.com>
-> > Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> > ---
-> >  drivers/crypto/atmel-aes.c | 507 ++++++++++----------
-> >  1 file changed, 244 insertions(+), 263 deletions(-)
+> Tested with:
 >
-> drivers/crypto/atmel-aes.c: In function =E2=80=98atmel_aes_register_algs=
-=E2=80=99:
-> drivers/crypto/atmel-aes.c:2515:24: error: passing argument 1 of =E2=80=
-=98crypto_unregister_alg=E2=80=99 from incompatible pointer type [-Werror=
-=3Dincompatible-pointer-types]
->   crypto_unregister_alg(&aes_xts_alg);
->                         ^
-> In file included from drivers/crypto/atmel-aes.c:32:0:
-> ./include/linux/crypto.h:703:5: note: expected =E2=80=98struct crypto_alg=
- *=E2=80=99 but argument is of type =E2=80=98struct skcipher_alg *=E2=80=99
->  int crypto_unregister_alg(struct crypto_alg *alg);
->      ^~~~~~~~~~~~~~~~~~~~~
+>         export ARCH=powerpc CROSS_COMPILE=powerpc-linux-gnu-
+>         make mpc85xx_defconfig
+>         cat >> .config << EOF
+>         # CONFIG_MODULES is not set
+>         # CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
+>         CONFIG_DEBUG_KERNEL=y
+>         CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
+>         CONFIG_CRYPTO_AES=y
+>         CONFIG_CRYPTO_CBC=y
+>         CONFIG_CRYPTO_CTR=y
+>         CONFIG_CRYPTO_ECB=y
+>         CONFIG_CRYPTO_XTS=y
+>         CONFIG_CRYPTO_AES_PPC_SPE=y
+>         EOF
+>         make olddefconfig
+>         make -j32
+>         qemu-system-ppc -M mpc8544ds -cpu e500 -nographic \
+>                 -kernel arch/powerpc/boot/zImage \
+>                 -append cryptomgr.fuzz_iterations=1000
+>
+> Note that xts-ppc-spe still fails the comparison tests due to the lack
+> of ciphertext stealing support.  This is not addressed by this series.
+>
+> Changed since v1:
+>
+> - Split fixes into separate patches.
+>
+> - Made ppc_aes_setkey_skcipher() call ppc_aes_setkey(), rather than
+>   creating a separate expand_key() function.  This keeps the code
+>   shorter.
+>
+> Eric Biggers (3):
+>   crypto: powerpc - don't unnecessarily use atomic scatterwalk
+>   crypto: powerpc - don't set ivsize for AES-ECB
+>   crypto: powerpc - convert SPE AES algorithms to skcipher API
 >
 
-Apologies for that. I was pretty sure I build tested all patches, so I
-should have spotted this myself.
+For the series
 
-> and when applying tdes:
-> Applying: crypto: atmel-tdes - switch to skcipher API
-> .git/rebase-apply/patch:637: trailing whitespace.
->
-> warning: 1 line adds whitespace errors.
->
-> I'll try to review the atmel part next week.
->
-> Cheers,
-> ta
+Reviewed-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Tested-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-Thanks,
+
+>  arch/powerpc/crypto/aes-spe-glue.c | 389 ++++++++++++-----------------
+>  crypto/Kconfig                     |   1 +
+>  2 files changed, 166 insertions(+), 224 deletions(-)
+>
+> --
+> 2.23.0
+>
