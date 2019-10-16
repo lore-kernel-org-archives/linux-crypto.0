@@ -2,79 +2,78 @@ Return-Path: <SRS0=0DWe=YJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 956C9FA372A
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 16:41:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D120FA3728
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 16:44:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6E2BD21A49
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 16:41:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 56A7D21928
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 16:44:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bZZ7F/7w"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sFLTSa9h"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404491AbfJPQlM (ORCPT
+        id S2391615AbfJPQof (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Oct 2019 12:41:12 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:45208 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389155AbfJPQlL (ORCPT
+        Wed, 16 Oct 2019 12:44:35 -0400
+Received: from mail-ed1-f44.google.com ([209.85.208.44]:45217 "EHLO
+        mail-ed1-f44.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389763AbfJPQof (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Oct 2019 12:41:11 -0400
-Received: by mail-ed1-f66.google.com with SMTP id h33so21812559edh.12;
-        Wed, 16 Oct 2019 09:41:09 -0700 (PDT)
+        Wed, 16 Oct 2019 12:44:35 -0400
+Received: by mail-ed1-f44.google.com with SMTP id h33so21820613edh.12;
+        Wed, 16 Oct 2019 09:44:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=v9nMjaMVU16eOG/GsmAlJCGLKImaqDAh6yeiRFaFUuM=;
-        b=bZZ7F/7whOXnXcFnUNNVLp7Dk/5cqCLzRiqsIWDfhFEfBXz0o2BOLeJKagMZtyexm2
-         79eYeUvw7CM9R/3P7I9zt7LPTXFznMViXDKveHYBSTG5t2b+72xhG4NZvLadz/Qw+nYv
-         GXPSDPrOF2gQOOQq6G2Y0i14hwHCxwhhYv//OYSMYymg1VSHepfVAAKrNnhG6HJypNsa
-         CX15LyTRFssaTmQeXRqyuiCYimgXdo8dChXffTP/ZPKX7MiaZ987Mof7gqiG5rd2mYbQ
-         AiCJet4jlyB6a0S5FhNGA60CjAViXuiHracD/A8ZPjjA6ozaz4hv90Lu/zmy1J4xUiaG
-         //dQ==
+        bh=ZjLuelx3S+vgGEqA0Wa177sYJKNlYV9yc/c2zDhGqzk=;
+        b=sFLTSa9hhwygpd1bl/N+6RbfhNg5GlETinvAuHy8UaAmNw/uEtQKh17fwDDVt/7XjU
+         YASM8CdrdHu5jck713OgMYVtoaiyODLeYM92R3a8VLjJ2DVFbz9h5tR9yP3fqx4UM2Sz
+         qGBXypuwhBKm/jetCiIgFMYdu1+erRSbZzMd6f9RshqmAx843SHbj/wle9H7rh7aNlBO
+         Pjm/5XNttCpD8Mv7aHWjZIXUQHPb0I+gDK8l8U3uKoOSbHOXueeJTxmhD3asqUmN6Pft
+         P8RQGb7En6PW9rtUyUQBR+lmpSEaBthsDZrwQEFQKJB4qk+eqX/73OlD/biO2UeORM41
+         wIJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=v9nMjaMVU16eOG/GsmAlJCGLKImaqDAh6yeiRFaFUuM=;
-        b=OVwtw9gzjXHteh83K4JEyp7y5comCfJ4mu1ECb0E7x+dy9L4cssmw8f9HTgDxlXaHD
-         ZWXMqwYlI1fqR8kcod5IrW6Lo8jGy7IJwJjBu0ieVka37/D3g/f0zwfyyvBkhAs/ICxb
-         h1ntjSUNcn23y80DPMY+L9D291zzmU54g7jMl138A8rfdAbfDfEb5wOLWt6lBbElr57U
-         Fetqc8/XYY4MxLQQcdIiVP2W4t8QoTkHM0HIrzhmNw6/b03vPcKkubR2pna0MMtzu4+x
-         8ZC2ydZnXOVabh99RXGAfKDByi3Wmm37yGOygEQvHyAgTD8k8MWQboP+zCR9bPBQYSaR
-         ZVGA==
-X-Gm-Message-State: APjAAAUMGPMvTk6mKSerJgC1wGOv3Bk5u02zGSr5rO6lYBCrMHikjdfi
-        g6hdDtRq7GSPi4EVadoFzrU=
-X-Google-Smtp-Source: APXvYqx3eLl5To4wenHDE9gsj3RkpGIJgKJh+8Y2Jzsnenh+i8KAX3dPjFLZbvxUZND7gvNmldPkLw==
-X-Received: by 2002:a17:906:5051:: with SMTP id e17mr6124293ejk.139.1571244068858;
-        Wed, 16 Oct 2019 09:41:08 -0700 (PDT)
+        bh=ZjLuelx3S+vgGEqA0Wa177sYJKNlYV9yc/c2zDhGqzk=;
+        b=ZYzFEUHbFwYRdOKqrzyJXeOzOzZXEO4Yf3cYZYHIVDFnNGEdVkWbKSkGBf8jt3d4tQ
+         pFc92XUPyP2fSikKGeCZjZgRUMc6CHp7ECdMgxQB/vkwUaVYffRsHkIwuTdJIVs5fqT7
+         Mmx2M4QVjcKTH/2cXOyKQilNHSGxA8b9gwqIH8vJTi+q0d1/OOEfx9Np+KLdT2XvxF7y
+         gh6MR3kbKxUACn//vSMEmN3kM0s/GTIM/xlhJfRrJSVJXlHBriXXV+RUOTt+TLfjgxMw
+         zGoIin7RiY8B/Z38bAX57mfluK6p0TPyHdTxhu4C93hmQj5tsN+3HkxMPa9bCA8hTziF
+         cGVw==
+X-Gm-Message-State: APjAAAWlgojPmYr9IVJ2cvBCtQ3MoSzU47gqQCaSN4b6agFe4sKbZmjY
+        vjQscM79JVVTKjkNdfjKjl8=
+X-Google-Smtp-Source: APXvYqxIERiZ5w64+xqs7jAq4hXeyVbjFAQKX837pLY6HTLxJZOWrfK9CNoOE8J3X4tpR4eT5bVQ2g==
+X-Received: by 2002:a17:907:20c8:: with SMTP id qq8mr40330276ejb.311.1571244271178;
+        Wed, 16 Oct 2019 09:44:31 -0700 (PDT)
 Received: from [10.67.50.53] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id h38sm4079231edh.13.2019.10.16.09.41.03
+        by smtp.googlemail.com with ESMTPSA id h38sm4079614edh.13.2019.10.16.09.44.22
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 16 Oct 2019 09:41:07 -0700 (PDT)
-Subject: Re: [PATCH -next 02/13] hwrng: bcm2835 - use
- devm_platform_ioremap_resource() to simplify code
+        Wed, 16 Oct 2019 09:44:30 -0700 (PDT)
+Subject: Re: [PATCH -next 00/13] hwrng: use devm_platform_ioremap_resource()
+ to simplify code
 To:     YueHaibing <yuehaibing@huawei.com>, herbert@gondor.apana.org.au,
         mpm@selenic.com, arnd@arndb.de, gregkh@linuxfoundation.org,
         nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
-        ludovic.desroches@microchip.com, rjui@broadcom.com,
-        sbranden@broadcom.com, bcm-kernel-feedback-list@broadcom.com,
-        eric@anholt.net, wahrenst@gmx.net, l.stelmach@samsung.com,
-        kgene@kernel.org, krzk@kernel.org, khilman@baylibre.com,
-        dsaxena@plexity.net, patrice.chotard@st.com
+        ludovic.desroches@microchip.com, f.fainelli@gmail.com,
+        rjui@broadcom.com, sbranden@broadcom.com,
+        bcm-kernel-feedback-list@broadcom.com, eric@anholt.net,
+        wahrenst@gmx.net, l.stelmach@samsung.com, kgene@kernel.org,
+        krzk@kernel.org, khilman@baylibre.com, dsaxena@plexity.net,
+        patrice.chotard@st.com
 Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-kernel@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
         linux-samsung-soc@vger.kernel.org,
         linux-amlogic@lists.infradead.org, linuxppc-dev@lists.ozlabs.org
 References: <20191016104621.26056-1-yuehaibing@huawei.com>
- <20191016104621.26056-3-yuehaibing@huawei.com>
 From:   Florian Fainelli <f.fainelli@gmail.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=f.fainelli@gmail.com; prefer-encrypt=mutual; keydata=
@@ -131,12 +130,12 @@ Autocrypt: addr=f.fainelli@gmail.com; prefer-encrypt=mutual; keydata=
  caxTGgc5zzQHeX67eMzrGomG3ZnIxmd1sAbgvJUDaD2GrYlulfwGWwWyTNbWRvMighVdPkSF
  6XFgQaosWxkV0OELLy2N485YrTr2Uq64VKyxpncLh50e2RnyAJ9Za0Dx0yyp44iD1OvHtkEI
  M5kY0ACeNhCZJvZ5g4C2Lc9fcTHu8jxmEkI=
-Message-ID: <e3c80376-396a-3444-9be5-e8e801f91112@gmail.com>
-Date:   Wed, 16 Oct 2019 09:41:01 -0700
+Message-ID: <2c60b926-1e98-cca0-ec17-6b45f9da404a@gmail.com>
+Date:   Wed, 16 Oct 2019 09:44:20 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191016104621.26056-3-yuehaibing@huawei.com>
+In-Reply-To: <20191016104621.26056-1-yuehaibing@huawei.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -146,11 +145,48 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 On 10/16/19 3:46 AM, YueHaibing wrote:
-> Use devm_platform_ioremap_resource() to simplify the code a bit.
-> This is detected by coccinelle.
-> 
-> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+> devm_platform_ioremap_resource() internally have platform_get_resource()
+> and devm_ioremap_resource() in it. So instead of calling them separately
+> use devm_platform_ioremap_resource() directly.
 
-Acked-by: Florian Fainelli <f.fainelli@gmail.com>
+Did your coccinelle script not cover
+drivers/char/hw_random/iproc-rng200.c somehow? Do you mind including it
+as a separate patch?
+
+Thanks
+
+> 
+> YueHaibing (13):
+>   hwrng: atmel - use devm_platform_ioremap_resource() to simplify code
+>   hwrng: bcm2835 - use devm_platform_ioremap_resource() to simplify code
+>   hwrng: exynos - use devm_platform_ioremap_resource() to simplify code
+>   hwrng: hisi - use devm_platform_ioremap_resource() to simplify code
+>   hwrng: ks-sa - use devm_platform_ioremap_resource() to simplify code
+>   hwrng: meson - use devm_platform_ioremap_resource() to simplify code
+>   hwrng: npcm - use devm_platform_ioremap_resource() to simplify code
+>   hwrng: omap - use devm_platform_ioremap_resource() to simplify code
+>   hwrng: pasemi - use devm_platform_ioremap_resource() to simplify code
+>   hwrng: pic32 - use devm_platform_ioremap_resource() to simplify code
+>   hwrng: st - use devm_platform_ioremap_resource() to simplify code
+>   hwrng: tx4939 - use devm_platform_ioremap_resource() to simplify code
+>   hwrng: xgene - use devm_platform_ioremap_resource() to simplify code
+> 
+>  drivers/char/hw_random/atmel-rng.c   | 4 +---
+>  drivers/char/hw_random/bcm2835-rng.c | 5 +----
+>  drivers/char/hw_random/exynos-trng.c | 4 +---
+>  drivers/char/hw_random/hisi-rng.c    | 4 +---
+>  drivers/char/hw_random/ks-sa-rng.c   | 4 +---
+>  drivers/char/hw_random/meson-rng.c   | 4 +---
+>  drivers/char/hw_random/npcm-rng.c    | 4 +---
+>  drivers/char/hw_random/omap-rng.c    | 4 +---
+>  drivers/char/hw_random/pasemi-rng.c  | 4 +---
+>  drivers/char/hw_random/pic32-rng.c   | 4 +---
+>  drivers/char/hw_random/st-rng.c      | 4 +---
+>  drivers/char/hw_random/tx4939-rng.c  | 4 +---
+>  drivers/char/hw_random/xgene-rng.c   | 4 +---
+>  13 files changed, 13 insertions(+), 40 deletions(-)
+> 
+
+
 -- 
 Florian
