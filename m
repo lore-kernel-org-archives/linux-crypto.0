@@ -7,25 +7,25 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EBF3FA372B
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 10:47:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71755FA372C
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 10:47:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3863A21A49
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 10:47:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4AC2321848
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 10:47:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404713AbfJPKrI (ORCPT
+        id S2404693AbfJPKrD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Oct 2019 06:47:08 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:3783 "EHLO huawei.com"
+        Wed, 16 Oct 2019 06:47:03 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:4186 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2404702AbfJPKrG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Oct 2019 06:47:06 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 97CE53AA7BC64B30075C;
-        Wed, 16 Oct 2019 18:47:04 +0800 (CST)
-Received: from localhost (10.133.213.239) by DGGEMS414-HUB.china.huawei.com
- (10.3.19.214) with Microsoft SMTP Server id 14.3.439.0; Wed, 16 Oct 2019
- 18:46:57 +0800
+        id S2404688AbfJPKrC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 16 Oct 2019 06:47:02 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 96F77AF0CE8A6DB49ED9;
+        Wed, 16 Oct 2019 18:47:00 +0800 (CST)
+Received: from localhost (10.133.213.239) by DGGEMS406-HUB.china.huawei.com
+ (10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Wed, 16 Oct 2019
+ 18:46:50 +0800
 From:   YueHaibing <yuehaibing@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <mpm@selenic.com>, <arnd@arndb.de>,
         <gregkh@linuxfoundation.org>, <nicolas.ferre@microchip.com>,
@@ -42,9 +42,9 @@ CC:     <linux-crypto@vger.kernel.org>,
         <linux-samsung-soc@vger.kernel.org>,
         <linux-amlogic@lists.infradead.org>,
         <linuxppc-dev@lists.ozlabs.org>, YueHaibing <yuehaibing@huawei.com>
-Subject: [PATCH -next 10/13] hwrng: pic32 - use devm_platform_ioremap_resource() to simplify code
-Date:   Wed, 16 Oct 2019 18:46:18 +0800
-Message-ID: <20191016104621.26056-11-yuehaibing@huawei.com>
+Subject: [PATCH -next 07/13] hwrng: npcm - use devm_platform_ioremap_resource() to simplify code
+Date:   Wed, 16 Oct 2019 18:46:15 +0800
+Message-ID: <20191016104621.26056-8-yuehaibing@huawei.com>
 X-Mailer: git-send-email 2.10.2.windows.1
 In-Reply-To: <20191016104621.26056-1-yuehaibing@huawei.com>
 References: <20191016104621.26056-1-yuehaibing@huawei.com>
@@ -62,22 +62,21 @@ This is detected by coccinelle.
 
 Signed-off-by: YueHaibing <yuehaibing@huawei.com>
 ---
- drivers/char/hw_random/pic32-rng.c | 4 +---
+ drivers/char/hw_random/npcm-rng.c | 4 +---
  1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/drivers/char/hw_random/pic32-rng.c b/drivers/char/hw_random/pic32-rng.c
-index 90f498c..81080cb 100644
---- a/drivers/char/hw_random/pic32-rng.c
-+++ b/drivers/char/hw_random/pic32-rng.c
-@@ -70,7 +70,6 @@ static int pic32_rng_read(struct hwrng *rng, void *buf, size_t max,
- static int pic32_rng_probe(struct platform_device *pdev)
+diff --git a/drivers/char/hw_random/npcm-rng.c b/drivers/char/hw_random/npcm-rng.c
+index b7c8c7e..01d0440 100644
+--- a/drivers/char/hw_random/npcm-rng.c
++++ b/drivers/char/hw_random/npcm-rng.c
+@@ -87,15 +87,13 @@ static int npcm_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
+ static int npcm_rng_probe(struct platform_device *pdev)
  {
- 	struct pic32_rng *priv;
+ 	struct npcm_rng *priv;
 -	struct resource *res;
- 	u32 v;
  	int ret;
  
-@@ -78,8 +77,7 @@ static int pic32_rng_probe(struct platform_device *pdev)
+ 	priv = devm_kzalloc(&pdev->dev, sizeof(*priv), GFP_KERNEL);
  	if (!priv)
  		return -ENOMEM;
  
