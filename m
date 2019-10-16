@@ -2,675 +2,620 @@ Return-Path: <SRS0=0DWe=YJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B55DFA372A
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 17:05:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA122FA3728
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 17:28:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E56A221835
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 17:05:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1571245518;
-	bh=l1gHZk3dTlTp3//+5EBzE+NiMhHGIx8FEjS9EK+DTOk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=Jv1ncrPzI8OZba7E4U6K43yaJAtwzFslQ4GcHLu7wYhUzEDueOhngOkHnn1LudGDf
-	 O9W48GWzW8F7iBH+kZacir8QX63CdQWCCRkMLrKltQHZw1dnxeGSpOj8N1rW7S5r7U
-	 5gQKtkehooxfo6Wk95Flw/A/BuERL6M7ub+PLq7A=
+	by mail.kernel.org (Postfix) with ESMTP id 85FB42082C
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 17:28:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="V4ottE6w"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387860AbfJPRFR (ORCPT
+        id S1730061AbfJPR2J (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Oct 2019 13:05:17 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46490 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726845AbfJPRFQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Oct 2019 13:05:16 -0400
-Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8B42E20663;
-        Wed, 16 Oct 2019 17:05:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1571245514;
-        bh=l1gHZk3dTlTp3//+5EBzE+NiMhHGIx8FEjS9EK+DTOk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=G5aWNRNHXLrkB2mVbhu2e/btNLW2S0J9ttHdmfqMWY7GBEzjaXNdGX9F3Sr6HN75s
-         ezHoASmlnTlRiDq/cMjRxg5vC6tk8YFzPR6lNTIASXRiSFkAYGej9TkCZIVPcnqy5U
-         86HpDbRwDqy0J0/ieEVQSQCdyAoZEf7sJ990s9aA=
-Date:   Wed, 16 Oct 2019 10:05:13 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Harald Freudenberger <freude@linux.ibm.com>
-Cc:     linux-crypto@vger.kernel.org,
+        Wed, 16 Oct 2019 13:28:09 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:35397 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728773AbfJPR2J (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 16 Oct 2019 13:28:09 -0400
+Received: by mail-wm1-f67.google.com with SMTP id y21so3671193wmi.0
+        for <linux-crypto@vger.kernel.org>; Wed, 16 Oct 2019 10:28:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=+xEFDfh2hL66ZXFwcJ6+Ej1LhU3aeAdnAEouDJebaJE=;
+        b=V4ottE6wcLTR+fRayJjG5ZFBdmVThyl79xP1O87h9e2UGhE2ummZPWPi6c3RcvHRIq
+         jliIoMGIc7AEwxkTMhlbaZloAickfU6lyxatgHHzwaEnJfQsAXKenGqIZaKtWA2QpzfZ
+         sjyVTtQYOTxZBhU7bQPZMAvBqWrxRESu6Ily6Jj1C7M/KLWjwiUe8z3WJIuUTtpd4zqP
+         fomjT9x5hNhx8m8lwb2c8KuYx1kz5D2A91IpS1aGH+zVlLcRmUahXxKjPTsOIkowUYmI
+         IAAge8a+VSG5tIWLjC03qOKZLiKH/YthgqWX5hYVnF+F3T/MwwXdcpFN1W+ifv92NV0t
+         BlZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=+xEFDfh2hL66ZXFwcJ6+Ej1LhU3aeAdnAEouDJebaJE=;
+        b=DOh19usri1uY39Dm8qsTXoI9EHUvFjiinG34DQy+Af0nTeQXV1STnlGyBeYmpk1/yn
+         rFSqhVe7xmiqaYkwXLkX5dDe/yah2bu4jwDiQBWfaGruEUzhKY6jEKFvfC0ZMLDRChsF
+         onTzxbcHMhRI7Ybfp4dXvwUaAlxu6qalmJxoXj46UjkehzIcV8XcqZsUg5v4jPn7EACO
+         uocmSLlU3RKflz3h5N+Uyy1tdh21HWQ3M3BryQVFj/HD+2vGY26OUJe3e2QobdJ9tsnI
+         Omi82R8o4Hh9ocYBur+Zz9egsAlVl7hNKx0qyj+ZPtBA5okmVxhaQllE3D4/4uN8coad
+         9oPQ==
+X-Gm-Message-State: APjAAAUvKjsmmIvd1LLYrPlyKOscc+qmFIV9nUC+0GyFJrRrvZY/zIP1
+        toP2yEOOkwLx71dI1sNHE+pZIw==
+X-Google-Smtp-Source: APXvYqz6gPi14XcbzWrKp2vXQpDRSLun+KWTYD45l4Ny++Oi68Jj1tYHYuh9VtvvkuLb5wbUGJJNEQ==
+X-Received: by 2002:a7b:c08e:: with SMTP id r14mr4230952wmh.118.1571246885411;
+        Wed, 16 Oct 2019 10:28:05 -0700 (PDT)
+Received: from lophozonia ([85.195.192.192])
+        by smtp.gmail.com with ESMTPSA id y11sm2354361wrp.44.2019.10.16.10.28.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Oct 2019 10:28:04 -0700 (PDT)
+Date:   Wed, 16 Oct 2019 19:28:02 +0200
+From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
+To:     Zhangfei Gao <zhangfei.gao@linaro.org>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-s390@vger.kernel.org,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-Subject: Re: [RFT PATCH 2/3] crypto: s390/paes - convert to skcipher API
-Message-ID: <20191016170513.GA720@sol.localdomain>
-Mail-Followup-To: Harald Freudenberger <freude@linux.ibm.com>,
-        linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-s390@vger.kernel.org,
-        Heiko Carstens <heiko.carstens@de.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>
-References: <20191012201809.160500-1-ebiggers@kernel.org>
- <20191012201809.160500-3-ebiggers@kernel.org>
- <77a7eb57-2a26-8d2f-1ada-800d925514a4@linux.ibm.com>
+        jonathan.cameron@huawei.com, grant.likely@arm.com,
+        ilias.apalodimas@linaro.org, francois.ozog@linaro.org,
+        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
+        "haojian . zhuang" <haojian.zhuang@linaro.org>,
+        linux-accelerators@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, Kenneth Lee <liguozhu@hisilicon.com>,
+        Zaibo Xu <xuzaibo@huawei.com>
+Subject: Re: [PATCH v6 2/3] uacce: add uacce driver
+Message-ID: <20191016172802.GA1533448@lophozonia>
+References: <1571214873-27359-1-git-send-email-zhangfei.gao@linaro.org>
+ <1571214873-27359-3-git-send-email-zhangfei.gao@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <77a7eb57-2a26-8d2f-1ada-800d925514a4@linux.ibm.com>
+In-Reply-To: <1571214873-27359-3-git-send-email-zhangfei.gao@linaro.org>
 User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Oct 15, 2019 at 01:31:39PM +0200, Harald Freudenberger wrote:
-> On 12.10.19 22:18, Eric Biggers wrote:
-> > From: Eric Biggers <ebiggers@google.com>
-> >
-> > Convert the glue code for the S390 CPACF protected key implementations
-> > of AES-ECB, AES-CBC, AES-XTS, and AES-CTR from the deprecated
-> > "blkcipher" API to the "skcipher" API.  This is needed in order for the
-> > blkcipher API to be removed.
-> >
-> > Note: I made CTR use the same function for encryption and decryption,
-> > since CTR encryption and decryption are identical.
-> >
-> > Signed-off-by: Eric Biggers <ebiggers@google.com>
-> > ---
-> >  arch/s390/crypto/paes_s390.c | 414 +++++++++++++++--------------------
-> >  1 file changed, 174 insertions(+), 240 deletions(-)
-> >
-> > diff --git a/arch/s390/crypto/paes_s390.c b/arch/s390/crypto/paes_s390.c
-> > index 6184dceed340..c7119c617b6e 100644
-> > --- a/arch/s390/crypto/paes_s390.c
-> > +++ b/arch/s390/crypto/paes_s390.c
-> > @@ -21,6 +21,7 @@
-> >  #include <linux/cpufeature.h>
-> >  #include <linux/init.h>
-> >  #include <linux/spinlock.h>
-> > +#include <crypto/internal/skcipher.h>
-> >  #include <crypto/xts.h>
-> >  #include <asm/cpacf.h>
-> >  #include <asm/pkey.h>
-> > @@ -123,27 +124,27 @@ static int __paes_set_key(struct s390_paes_ctx *ctx)
-> >  	return ctx->fc ? 0 : -EINVAL;
-> >  }
-> >  
-> > -static int ecb_paes_init(struct crypto_tfm *tfm)
-> > +static int ecb_paes_init(struct crypto_skcipher *tfm)
-> >  {
-> > -	struct s390_paes_ctx *ctx = crypto_tfm_ctx(tfm);
-> > +	struct s390_paes_ctx *ctx = crypto_skcipher_ctx(tfm);
-> >  
-> >  	ctx->kb.key = NULL;
-> >  
-> >  	return 0;
-> >  }
-> >  
-> > -static void ecb_paes_exit(struct crypto_tfm *tfm)
-> > +static void ecb_paes_exit(struct crypto_skcipher *tfm)
-> >  {
-> > -	struct s390_paes_ctx *ctx = crypto_tfm_ctx(tfm);
-> > +	struct s390_paes_ctx *ctx = crypto_skcipher_ctx(tfm);
-> >  
-> >  	_free_kb_keybuf(&ctx->kb);
-> >  }
-> >  
-> > -static int ecb_paes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
-> > +static int ecb_paes_set_key(struct crypto_skcipher *tfm, const u8 *in_key,
-> >  			    unsigned int key_len)
-> >  {
-> >  	int rc;
-> > -	struct s390_paes_ctx *ctx = crypto_tfm_ctx(tfm);
-> > +	struct s390_paes_ctx *ctx = crypto_skcipher_ctx(tfm);
-> >  
-> >  	_free_kb_keybuf(&ctx->kb);
-> >  	rc = _copy_key_to_kb(&ctx->kb, in_key, key_len);
-> > @@ -151,91 +152,75 @@ static int ecb_paes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
-> >  		return rc;
-> >  
-> >  	if (__paes_set_key(ctx)) {
-> > -		tfm->crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
-> > +		crypto_skcipher_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
-> >  		return -EINVAL;
-> >  	}
-> >  	return 0;
-> >  }
-> >  
-> > -static int ecb_paes_crypt(struct blkcipher_desc *desc,
-> > -			  unsigned long modifier,
-> > -			  struct blkcipher_walk *walk)
-> > +static int ecb_paes_crypt(struct skcipher_request *req, unsigned long modifier)
-> >  {
-> > -	struct s390_paes_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
-> > +	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-> > +	struct s390_paes_ctx *ctx = crypto_skcipher_ctx(tfm);
-> > +	struct skcipher_walk walk;
-> >  	unsigned int nbytes, n, k;
-> >  	int ret;
-> >  
-> > -	ret = blkcipher_walk_virt(desc, walk);
-> > -	while ((nbytes = walk->nbytes) >= AES_BLOCK_SIZE) {
-> > +	ret = skcipher_walk_virt(&walk, req, false);
-> > +	while ((nbytes = walk.nbytes) != 0) {
-> >  		/* only use complete blocks */
-> >  		n = nbytes & ~(AES_BLOCK_SIZE - 1);
-> >  		k = cpacf_km(ctx->fc | modifier, ctx->pk.protkey,
-> > -			     walk->dst.virt.addr, walk->src.virt.addr, n);
-> > +			     walk.dst.virt.addr, walk.src.virt.addr, n);
-> >  		if (k)
-> > -			ret = blkcipher_walk_done(desc, walk, nbytes - k);
-> > +			ret = skcipher_walk_done(&walk, nbytes - k);
-> >  		if (k < n) {
-> >  			if (__paes_set_key(ctx) != 0)
-> > -				return blkcipher_walk_done(desc, walk, -EIO);
-> > +				return skcipher_walk_done(&walk, -EIO);
-> >  		}
-> >  	}
-> >  	return ret;
-> >  }
-> >  
-> > -static int ecb_paes_encrypt(struct blkcipher_desc *desc,
-> > -			    struct scatterlist *dst, struct scatterlist *src,
-> > -			    unsigned int nbytes)
-> > +static int ecb_paes_encrypt(struct skcipher_request *req)
-> >  {
-> > -	struct blkcipher_walk walk;
-> > -
-> > -	blkcipher_walk_init(&walk, dst, src, nbytes);
-> > -	return ecb_paes_crypt(desc, CPACF_ENCRYPT, &walk);
-> > +	return ecb_paes_crypt(req, 0);
-> >  }
-> >  
-> > -static int ecb_paes_decrypt(struct blkcipher_desc *desc,
-> > -			    struct scatterlist *dst, struct scatterlist *src,
-> > -			    unsigned int nbytes)
-> > +static int ecb_paes_decrypt(struct skcipher_request *req)
-> >  {
-> > -	struct blkcipher_walk walk;
-> > -
-> > -	blkcipher_walk_init(&walk, dst, src, nbytes);
-> > -	return ecb_paes_crypt(desc, CPACF_DECRYPT, &walk);
-> > +	return ecb_paes_crypt(req, CPACF_DECRYPT);
-> >  }
-> >  
-> > -static struct crypto_alg ecb_paes_alg = {
-> > -	.cra_name		=	"ecb(paes)",
-> > -	.cra_driver_name	=	"ecb-paes-s390",
-> > -	.cra_priority		=	401,	/* combo: aes + ecb + 1 */
-> > -	.cra_flags		=	CRYPTO_ALG_TYPE_BLKCIPHER,
-> > -	.cra_blocksize		=	AES_BLOCK_SIZE,
-> > -	.cra_ctxsize		=	sizeof(struct s390_paes_ctx),
-> > -	.cra_type		=	&crypto_blkcipher_type,
-> > -	.cra_module		=	THIS_MODULE,
-> > -	.cra_list		=	LIST_HEAD_INIT(ecb_paes_alg.cra_list),
-> > -	.cra_init		=	ecb_paes_init,
-> > -	.cra_exit		=	ecb_paes_exit,
-> > -	.cra_u			=	{
-> > -		.blkcipher = {
-> > -			.min_keysize		=	PAES_MIN_KEYSIZE,
-> > -			.max_keysize		=	PAES_MAX_KEYSIZE,
-> > -			.setkey			=	ecb_paes_set_key,
-> > -			.encrypt		=	ecb_paes_encrypt,
-> > -			.decrypt		=	ecb_paes_decrypt,
-> > -		}
-> > -	}
-> > +static struct skcipher_alg ecb_paes_alg = {
-> > +	.base.cra_name		=	"ecb(paes)",
-> > +	.base.cra_driver_name	=	"ecb-paes-s390",
-> > +	.base.cra_priority	=	401,	/* combo: aes + ecb + 1 */
-> > +	.base.cra_blocksize	=	AES_BLOCK_SIZE,
-> > +	.base.cra_ctxsize	=	sizeof(struct s390_paes_ctx),
-> > +	.base.cra_module	=	THIS_MODULE,
-> > +	.base.cra_list		=	LIST_HEAD_INIT(ecb_paes_alg.base.cra_list),
-> > +	.init			=	ecb_paes_init,
-> > +	.exit			=	ecb_paes_exit,
-> > +	.min_keysize		=	PAES_MIN_KEYSIZE,
-> > +	.max_keysize		=	PAES_MAX_KEYSIZE,
-> > +	.setkey			=	ecb_paes_set_key,
-> > +	.encrypt		=	ecb_paes_encrypt,
-> > +	.decrypt		=	ecb_paes_decrypt,
-> >  };
-> >  
-> > -static int cbc_paes_init(struct crypto_tfm *tfm)
-> > +static int cbc_paes_init(struct crypto_skcipher *tfm)
-> >  {
-> > -	struct s390_paes_ctx *ctx = crypto_tfm_ctx(tfm);
-> > +	struct s390_paes_ctx *ctx = crypto_skcipher_ctx(tfm);
-> >  
-> >  	ctx->kb.key = NULL;
-> >  
-> >  	return 0;
-> >  }
-> >  
-> > -static void cbc_paes_exit(struct crypto_tfm *tfm)
-> > +static void cbc_paes_exit(struct crypto_skcipher *tfm)
-> >  {
-> > -	struct s390_paes_ctx *ctx = crypto_tfm_ctx(tfm);
-> > +	struct s390_paes_ctx *ctx = crypto_skcipher_ctx(tfm);
-> >  
-> >  	_free_kb_keybuf(&ctx->kb);
-> >  }
-> > @@ -258,11 +243,11 @@ static int __cbc_paes_set_key(struct s390_paes_ctx *ctx)
-> >  	return ctx->fc ? 0 : -EINVAL;
-> >  }
-> >  
-> > -static int cbc_paes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
-> > +static int cbc_paes_set_key(struct crypto_skcipher *tfm, const u8 *in_key,
-> >  			    unsigned int key_len)
-> >  {
-> >  	int rc;
-> > -	struct s390_paes_ctx *ctx = crypto_tfm_ctx(tfm);
-> > +	struct s390_paes_ctx *ctx = crypto_skcipher_ctx(tfm);
-> >  
-> >  	_free_kb_keybuf(&ctx->kb);
-> >  	rc = _copy_key_to_kb(&ctx->kb, in_key, key_len);
-> > @@ -270,16 +255,17 @@ static int cbc_paes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
-> >  		return rc;
-> >  
-> >  	if (__cbc_paes_set_key(ctx)) {
-> > -		tfm->crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
-> > +		crypto_skcipher_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
-> >  		return -EINVAL;
-> >  	}
-> >  	return 0;
-> >  }
-> >  
-> > -static int cbc_paes_crypt(struct blkcipher_desc *desc, unsigned long modifier,
-> > -			  struct blkcipher_walk *walk)
-> > +static int cbc_paes_crypt(struct skcipher_request *req, unsigned long modifier)
-> >  {
-> > -	struct s390_paes_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
-> > +	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-> > +	struct s390_paes_ctx *ctx = crypto_skcipher_ctx(tfm);
-> > +	struct skcipher_walk walk;
-> >  	unsigned int nbytes, n, k;
-> >  	int ret;
-> >  	struct {
-> > @@ -287,73 +273,60 @@ static int cbc_paes_crypt(struct blkcipher_desc *desc, unsigned long modifier,
-> >  		u8 key[MAXPROTKEYSIZE];
-> >  	} param;
-> >  
-> > -	ret = blkcipher_walk_virt(desc, walk);
-> > -	memcpy(param.iv, walk->iv, AES_BLOCK_SIZE);
-> > +	ret = skcipher_walk_virt(&walk, req, false);
-> > +	if (ret)
-> > +		return ret;
-> > +	memcpy(param.iv, walk.iv, AES_BLOCK_SIZE);
-> >  	memcpy(param.key, ctx->pk.protkey, MAXPROTKEYSIZE);
-> > -	while ((nbytes = walk->nbytes) >= AES_BLOCK_SIZE) {
-> > +	while ((nbytes = walk.nbytes) != 0) {
-> >  		/* only use complete blocks */
-> >  		n = nbytes & ~(AES_BLOCK_SIZE - 1);
-> >  		k = cpacf_kmc(ctx->fc | modifier, &param,
-> > -			      walk->dst.virt.addr, walk->src.virt.addr, n);
-> > -		if (k)
-> > -			ret = blkcipher_walk_done(desc, walk, nbytes - k);
-> > +			      walk.dst.virt.addr, walk.src.virt.addr, n);
-> > +		if (k) {
-> > +			memcpy(walk.iv, param.iv, AES_BLOCK_SIZE);
-> > +			ret = skcipher_walk_done(&walk, nbytes - k);
-> > +		}
-> >  		if (k < n) {
-> >  			if (__cbc_paes_set_key(ctx) != 0)
-> > -				return blkcipher_walk_done(desc, walk, -EIO);
-> > +				return skcipher_walk_done(&walk, -EIO);
-> >  			memcpy(param.key, ctx->pk.protkey, MAXPROTKEYSIZE);
-> >  		}
-> >  	}
-> > -	memcpy(walk->iv, param.iv, AES_BLOCK_SIZE);
-> >  	return ret;
-> >  }
-> >  
-> > -static int cbc_paes_encrypt(struct blkcipher_desc *desc,
-> > -			    struct scatterlist *dst, struct scatterlist *src,
-> > -			    unsigned int nbytes)
-> > +static int cbc_paes_encrypt(struct skcipher_request *req)
-> >  {
-> > -	struct blkcipher_walk walk;
-> > -
-> > -	blkcipher_walk_init(&walk, dst, src, nbytes);
-> > -	return cbc_paes_crypt(desc, 0, &walk);
-> > +	return cbc_paes_crypt(req, 0);
-> >  }
-> >  
-> > -static int cbc_paes_decrypt(struct blkcipher_desc *desc,
-> > -			    struct scatterlist *dst, struct scatterlist *src,
-> > -			    unsigned int nbytes)
-> > +static int cbc_paes_decrypt(struct skcipher_request *req)
-> >  {
-> > -	struct blkcipher_walk walk;
-> > -
-> > -	blkcipher_walk_init(&walk, dst, src, nbytes);
-> > -	return cbc_paes_crypt(desc, CPACF_DECRYPT, &walk);
-> > +	return cbc_paes_crypt(req, CPACF_DECRYPT);
-> >  }
-> >  
-> > -static struct crypto_alg cbc_paes_alg = {
-> > -	.cra_name		=	"cbc(paes)",
-> > -	.cra_driver_name	=	"cbc-paes-s390",
-> > -	.cra_priority		=	402,	/* ecb-paes-s390 + 1 */
-> > -	.cra_flags		=	CRYPTO_ALG_TYPE_BLKCIPHER,
-> > -	.cra_blocksize		=	AES_BLOCK_SIZE,
-> > -	.cra_ctxsize		=	sizeof(struct s390_paes_ctx),
-> > -	.cra_type		=	&crypto_blkcipher_type,
-> > -	.cra_module		=	THIS_MODULE,
-> > -	.cra_list		=	LIST_HEAD_INIT(cbc_paes_alg.cra_list),
-> > -	.cra_init		=	cbc_paes_init,
-> > -	.cra_exit		=	cbc_paes_exit,
-> > -	.cra_u			=	{
-> > -		.blkcipher = {
-> > -			.min_keysize		=	PAES_MIN_KEYSIZE,
-> > -			.max_keysize		=	PAES_MAX_KEYSIZE,
-> > -			.ivsize			=	AES_BLOCK_SIZE,
-> > -			.setkey			=	cbc_paes_set_key,
-> > -			.encrypt		=	cbc_paes_encrypt,
-> > -			.decrypt		=	cbc_paes_decrypt,
-> > -		}
-> > -	}
-> > +static struct skcipher_alg cbc_paes_alg = {
-> > +	.base.cra_name		=	"cbc(paes)",
-> > +	.base.cra_driver_name	=	"cbc-paes-s390",
-> > +	.base.cra_priority	=	402,	/* ecb-paes-s390 + 1 */
-> > +	.base.cra_blocksize	=	AES_BLOCK_SIZE,
-> > +	.base.cra_ctxsize	=	sizeof(struct s390_paes_ctx),
-> > +	.base.cra_module	=	THIS_MODULE,
-> > +	.base.cra_list		=	LIST_HEAD_INIT(cbc_paes_alg.base.cra_list),
-> > +	.init			=	cbc_paes_init,
-> > +	.exit			=	cbc_paes_exit,
-> > +	.min_keysize		=	PAES_MIN_KEYSIZE,
-> > +	.max_keysize		=	PAES_MAX_KEYSIZE,
-> > +	.ivsize			=	AES_BLOCK_SIZE,
-> > +	.setkey			=	cbc_paes_set_key,
-> > +	.encrypt		=	cbc_paes_encrypt,
-> > +	.decrypt		=	cbc_paes_decrypt,
-> >  };
-> >  
-> > -static int xts_paes_init(struct crypto_tfm *tfm)
-> > +static int xts_paes_init(struct crypto_skcipher *tfm)
-> >  {
-> > -	struct s390_pxts_ctx *ctx = crypto_tfm_ctx(tfm);
-> > +	struct s390_pxts_ctx *ctx = crypto_skcipher_ctx(tfm);
-> >  
-> >  	ctx->kb[0].key = NULL;
-> >  	ctx->kb[1].key = NULL;
-> > @@ -361,9 +334,9 @@ static int xts_paes_init(struct crypto_tfm *tfm)
-> >  	return 0;
-> >  }
-> >  
-> > -static void xts_paes_exit(struct crypto_tfm *tfm)
-> > +static void xts_paes_exit(struct crypto_skcipher *tfm)
-> >  {
-> > -	struct s390_pxts_ctx *ctx = crypto_tfm_ctx(tfm);
-> > +	struct s390_pxts_ctx *ctx = crypto_skcipher_ctx(tfm);
-> >  
-> >  	_free_kb_keybuf(&ctx->kb[0]);
-> >  	_free_kb_keybuf(&ctx->kb[1]);
-> > @@ -391,11 +364,11 @@ static int __xts_paes_set_key(struct s390_pxts_ctx *ctx)
-> >  	return ctx->fc ? 0 : -EINVAL;
-> >  }
-> >  
-> > -static int xts_paes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
-> > +static int xts_paes_set_key(struct crypto_skcipher *tfm, const u8 *in_key,
-> >  			    unsigned int xts_key_len)
-> >  {
-> >  	int rc;
-> > -	struct s390_pxts_ctx *ctx = crypto_tfm_ctx(tfm);
-> > +	struct s390_pxts_ctx *ctx = crypto_skcipher_ctx(tfm);
-> >  	u8 ckey[2 * AES_MAX_KEY_SIZE];
-> >  	unsigned int ckey_len, key_len;
-> >  
-> > @@ -414,7 +387,7 @@ static int xts_paes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
-> >  		return rc;
-> >  
-> >  	if (__xts_paes_set_key(ctx)) {
-> > -		tfm->crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
-> > +		crypto_skcipher_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
-> >  		return -EINVAL;
-> >  	}
-> >  
-> > @@ -427,13 +400,14 @@ static int xts_paes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
-> >  		AES_KEYSIZE_128 : AES_KEYSIZE_256;
-> >  	memcpy(ckey, ctx->pk[0].protkey, ckey_len);
-> >  	memcpy(ckey + ckey_len, ctx->pk[1].protkey, ckey_len);
-> > -	return xts_check_key(tfm, ckey, 2*ckey_len);
-> > +	return xts_verify_key(tfm, ckey, 2*ckey_len);
-> >  }
-> >  
-> > -static int xts_paes_crypt(struct blkcipher_desc *desc, unsigned long modifier,
-> > -			  struct blkcipher_walk *walk)
-> > +static int xts_paes_crypt(struct skcipher_request *req, unsigned long modifier)
-> >  {
-> > -	struct s390_pxts_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
-> > +	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-> > +	struct s390_pxts_ctx *ctx = crypto_skcipher_ctx(tfm);
-> > +	struct skcipher_walk walk;
-> >  	unsigned int keylen, offset, nbytes, n, k;
-> >  	int ret;
-> >  	struct {
-> > @@ -448,90 +422,76 @@ static int xts_paes_crypt(struct blkcipher_desc *desc, unsigned long modifier,
-> >  		u8 init[16];
-> >  	} xts_param;
-> >  
-> > -	ret = blkcipher_walk_virt(desc, walk);
-> > +	ret = skcipher_walk_virt(&walk, req, false);
-> > +	if (ret)
-> > +		return ret;
-> >  	keylen = (ctx->pk[0].type == PKEY_KEYTYPE_AES_128) ? 48 : 64;
-> >  	offset = (ctx->pk[0].type == PKEY_KEYTYPE_AES_128) ? 16 : 0;
-> >  retry:
-> >  	memset(&pcc_param, 0, sizeof(pcc_param));
-> > -	memcpy(pcc_param.tweak, walk->iv, sizeof(pcc_param.tweak));
-> > +	memcpy(pcc_param.tweak, walk.iv, sizeof(pcc_param.tweak));
-> >  	memcpy(pcc_param.key + offset, ctx->pk[1].protkey, keylen);
-> >  	cpacf_pcc(ctx->fc, pcc_param.key + offset);
-> >  
-> >  	memcpy(xts_param.key + offset, ctx->pk[0].protkey, keylen);
-> >  	memcpy(xts_param.init, pcc_param.xts, 16);
-> >  
-> > -	while ((nbytes = walk->nbytes) >= AES_BLOCK_SIZE) {
-> > +	while ((nbytes = walk.nbytes) != 0) {
-> >  		/* only use complete blocks */
-> >  		n = nbytes & ~(AES_BLOCK_SIZE - 1);
-> >  		k = cpacf_km(ctx->fc | modifier, xts_param.key + offset,
-> > -			     walk->dst.virt.addr, walk->src.virt.addr, n);
-> > +			     walk.dst.virt.addr, walk.src.virt.addr, n);
-> >  		if (k)
-> > -			ret = blkcipher_walk_done(desc, walk, nbytes - k);
-> > +			ret = skcipher_walk_done(&walk, nbytes - k);
-> >  		if (k < n) {
-> >  			if (__xts_paes_set_key(ctx) != 0)
-> > -				return blkcipher_walk_done(desc, walk, -EIO);
-> > +				return skcipher_walk_done(&walk, -EIO);
-> >  			goto retry;
-> >  		}
-> >  	}
-> >  	return ret;
-> >  }
-> >  
-> > -static int xts_paes_encrypt(struct blkcipher_desc *desc,
-> > -			    struct scatterlist *dst, struct scatterlist *src,
-> > -			    unsigned int nbytes)
-> > +static int xts_paes_encrypt(struct skcipher_request *req)
-> >  {
-> > -	struct blkcipher_walk walk;
-> > -
-> > -	blkcipher_walk_init(&walk, dst, src, nbytes);
-> > -	return xts_paes_crypt(desc, 0, &walk);
-> > +	return xts_paes_crypt(req, 0);
-> >  }
-> >  
-> > -static int xts_paes_decrypt(struct blkcipher_desc *desc,
-> > -			    struct scatterlist *dst, struct scatterlist *src,
-> > -			    unsigned int nbytes)
-> > +static int xts_paes_decrypt(struct skcipher_request *req)
-> >  {
-> > -	struct blkcipher_walk walk;
-> > -
-> > -	blkcipher_walk_init(&walk, dst, src, nbytes);
-> > -	return xts_paes_crypt(desc, CPACF_DECRYPT, &walk);
-> > +	return xts_paes_crypt(req, CPACF_DECRYPT);
-> >  }
-> >  
-> > -static struct crypto_alg xts_paes_alg = {
-> > -	.cra_name		=	"xts(paes)",
-> > -	.cra_driver_name	=	"xts-paes-s390",
-> > -	.cra_priority		=	402,	/* ecb-paes-s390 + 1 */
-> > -	.cra_flags		=	CRYPTO_ALG_TYPE_BLKCIPHER,
-> > -	.cra_blocksize		=	AES_BLOCK_SIZE,
-> > -	.cra_ctxsize		=	sizeof(struct s390_pxts_ctx),
-> > -	.cra_type		=	&crypto_blkcipher_type,
-> > -	.cra_module		=	THIS_MODULE,
-> > -	.cra_list		=	LIST_HEAD_INIT(xts_paes_alg.cra_list),
-> > -	.cra_init		=	xts_paes_init,
-> > -	.cra_exit		=	xts_paes_exit,
-> > -	.cra_u			=	{
-> > -		.blkcipher = {
-> > -			.min_keysize		=	2 * PAES_MIN_KEYSIZE,
-> > -			.max_keysize		=	2 * PAES_MAX_KEYSIZE,
-> > -			.ivsize			=	AES_BLOCK_SIZE,
-> > -			.setkey			=	xts_paes_set_key,
-> > -			.encrypt		=	xts_paes_encrypt,
-> > -			.decrypt		=	xts_paes_decrypt,
-> > -		}
-> > -	}
-> > +static struct skcipher_alg xts_paes_alg = {
-> > +	.base.cra_name		=	"xts(paes)",
-> > +	.base.cra_driver_name	=	"xts-paes-s390",
-> > +	.base.cra_priority	=	402,	/* ecb-paes-s390 + 1 */
-> > +	.base.cra_blocksize	=	AES_BLOCK_SIZE,
-> > +	.base.cra_ctxsize	=	sizeof(struct s390_pxts_ctx),
-> > +	.base.cra_module	=	THIS_MODULE,
-> > +	.base.cra_list		=	LIST_HEAD_INIT(xts_paes_alg.base.cra_list),
-> > +	.init			=	xts_paes_init,
-> > +	.exit			=	xts_paes_exit,
-> > +	.min_keysize		=	2 * PAES_MIN_KEYSIZE,
-> > +	.max_keysize		=	2 * PAES_MAX_KEYSIZE,
-> > +	.ivsize			=	AES_BLOCK_SIZE,
-> > +	.setkey			=	xts_paes_set_key,
-> > +	.encrypt		=	xts_paes_encrypt,
-> > +	.decrypt		=	xts_paes_decrypt,
-> >  };
-> >  
-> > -static int ctr_paes_init(struct crypto_tfm *tfm)
-> > +static int ctr_paes_init(struct crypto_skcipher *tfm)
-> >  {
-> > -	struct s390_paes_ctx *ctx = crypto_tfm_ctx(tfm);
-> > +	struct s390_paes_ctx *ctx = crypto_skcipher_ctx(tfm);
-> >  
-> >  	ctx->kb.key = NULL;
-> >  
-> >  	return 0;
-> >  }
-> >  
-> > -static void ctr_paes_exit(struct crypto_tfm *tfm)
-> > +static void ctr_paes_exit(struct crypto_skcipher *tfm)
-> >  {
-> > -	struct s390_paes_ctx *ctx = crypto_tfm_ctx(tfm);
-> > +	struct s390_paes_ctx *ctx = crypto_skcipher_ctx(tfm);
-> >  
-> >  	_free_kb_keybuf(&ctx->kb);
-> >  }
-> > @@ -555,11 +515,11 @@ static int __ctr_paes_set_key(struct s390_paes_ctx *ctx)
-> >  	return ctx->fc ? 0 : -EINVAL;
-> >  }
-> >  
-> > -static int ctr_paes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
-> > +static int ctr_paes_set_key(struct crypto_skcipher *tfm, const u8 *in_key,
-> >  			    unsigned int key_len)
-> >  {
-> >  	int rc;
-> > -	struct s390_paes_ctx *ctx = crypto_tfm_ctx(tfm);
-> > +	struct s390_paes_ctx *ctx = crypto_skcipher_ctx(tfm);
-> >  
-> >  	_free_kb_keybuf(&ctx->kb);
-> >  	rc = _copy_key_to_kb(&ctx->kb, in_key, key_len);
-> > @@ -567,7 +527,7 @@ static int ctr_paes_set_key(struct crypto_tfm *tfm, const u8 *in_key,
-> >  		return rc;
-> >  
-> >  	if (__ctr_paes_set_key(ctx)) {
-> > -		tfm->crt_flags |= CRYPTO_TFM_RES_BAD_KEY_LEN;
-> > +		crypto_skcipher_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
-> >  		return -EINVAL;
-> >  	}
-> >  	return 0;
-> > @@ -588,37 +548,37 @@ static unsigned int __ctrblk_init(u8 *ctrptr, u8 *iv, unsigned int nbytes)
-> >  	return n;
-> >  }
-> >  
-> > -static int ctr_paes_crypt(struct blkcipher_desc *desc, unsigned long modifier,
-> > -			  struct blkcipher_walk *walk)
-> > +static int ctr_paes_crypt(struct skcipher_request *req)
-> >  {
-> > -	struct s390_paes_ctx *ctx = crypto_blkcipher_ctx(desc->tfm);
-> > +	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
-> > +	struct s390_paes_ctx *ctx = crypto_skcipher_ctx(tfm);
-> >  	u8 buf[AES_BLOCK_SIZE], *ctrptr;
-> > +	struct skcipher_walk walk;
-> >  	unsigned int nbytes, n, k;
-> >  	int ret, locked;
-> >  
-> >  	locked = spin_trylock(&ctrblk_lock);
-> >  
-> > -	ret = blkcipher_walk_virt_block(desc, walk, AES_BLOCK_SIZE);
-> > -	while ((nbytes = walk->nbytes) >= AES_BLOCK_SIZE) {
-> > +	ret = skcipher_walk_virt(&walk, req, false);
-> > +	while ((nbytes = walk.nbytes) >= AES_BLOCK_SIZE) {
-> >  		n = AES_BLOCK_SIZE;
-> >  		if (nbytes >= 2*AES_BLOCK_SIZE && locked)
-> > -			n = __ctrblk_init(ctrblk, walk->iv, nbytes);
-> > -		ctrptr = (n > AES_BLOCK_SIZE) ? ctrblk : walk->iv;
-> > -		k = cpacf_kmctr(ctx->fc | modifier, ctx->pk.protkey,
-> > -				walk->dst.virt.addr, walk->src.virt.addr,
-> > -				n, ctrptr);
-> > +			n = __ctrblk_init(ctrblk, walk.iv, nbytes);
-> > +		ctrptr = (n > AES_BLOCK_SIZE) ? ctrblk : walk.iv;
-> > +		k = cpacf_kmctr(ctx->fc, ctx->pk.protkey, walk.dst.virt.addr,
-> > +				walk.src.virt.addr, n, ctrptr);
-> >  		if (k) {
-> >  			if (ctrptr == ctrblk)
-> > -				memcpy(walk->iv, ctrptr + k - AES_BLOCK_SIZE,
-> > +				memcpy(walk.iv, ctrptr + k - AES_BLOCK_SIZE,
-> >  				       AES_BLOCK_SIZE);
-> > -			crypto_inc(walk->iv, AES_BLOCK_SIZE);
-> > -			ret = blkcipher_walk_done(desc, walk, nbytes - n);
-> > +			crypto_inc(walk.iv, AES_BLOCK_SIZE);
-> > +			ret = skcipher_walk_done(&walk, nbytes - n);
-> 
-> Looks like a bug here. It should be
-> 
-> ret = skcipher_walk_done(&walk, nbytes - k);
-> 
-> similar to the other modes.
-> You can add this in your patch or leave it to me to provide a separate patch.
+Hi,
 
-I'm not planning to fix this since it's an existing bug, I can't test this code
-myself, and the paes code is different from the regular algorithms so it's hard
-to work with.  So I suggest you provide a patch later.
+I have a few comments on the overall design and some implementation
+details below.
 
-> 
-> >  		}
-> >  		if (k < n) {
-> >  			if (__ctr_paes_set_key(ctx) != 0) {
-> >  				if (locked)
-> >  					spin_unlock(&ctrblk_lock);
-> > -				return blkcipher_walk_done(desc, walk, -EIO);
-> > +				return skcipher_walk_done(&walk, -EIO);
-> >  			}
-> >  		}
-> >  	}
+Could you also Cc iommu@lists.linux-foundation.org on your next posting?
+I'm sure some subscribers would be interested and I don't think many
+people know about linux-accelerators yet.
 
-Note that __ctr_paes_set_key() is modifying the tfm_ctx which can be shared
-between multiple threads.  So this code seems broken in other ways too.
+On Wed, Oct 16, 2019 at 04:34:32PM +0800, Zhangfei Gao wrote:
+> diff --git a/Documentation/ABI/testing/sysfs-driver-uacce b/Documentation/ABI/testing/sysfs-driver-uacce
+> new file mode 100644
+> index 0000000..e48333c
+> --- /dev/null
+> +++ b/Documentation/ABI/testing/sysfs-driver-uacce
+> @@ -0,0 +1,65 @@
+> +What:           /sys/class/uacce/hisi_zip-<n>/id
 
-How is "paes" tested, given that it isn't covered by the crypto subsystem's
-self-tests?  How do you know it isn't completely broken?
+Should probably be /sys/class/uacce/<dev_name>/ if we want the API to be
+used by other drivers.
 
-- Eric
+[...]
+> +static int uacce_queue_map_qfr(struct uacce_queue *q,
+> +			       struct uacce_qfile_region *qfr)
+> +{
+> +	struct device *dev = q->uacce->pdev;
+> +	struct iommu_domain *domain = iommu_get_domain_for_dev(dev);
+> +	int i, j, ret;
+> +
+> +	if (!(qfr->flags & UACCE_QFRF_MAP) || (qfr->flags & UACCE_QFRF_DMA))
+> +		return 0;
+> +
+> +	if (!domain)
+> +		return -ENODEV;
+> +
+> +	for (i = 0; i < qfr->nr_pages; i++) {
+> +		ret = iommu_map(domain, qfr->iova + i * PAGE_SIZE,
+> +				page_to_phys(qfr->pages[i]),
+> +				PAGE_SIZE, qfr->prot | q->uacce->prot);
+> +		if (ret)
+> +			goto err_with_map_pages;
+> +
+> +		get_page(qfr->pages[i]);
+
+I guess we need this reference when coming from UACCE_CMD_SHARE_SVAS?
+Otherwise we should already get one from alloc_page().
+
+[...]
+> +static int uacce_qfr_alloc_pages(struct uacce_qfile_region *qfr)
+> +{
+> +	int i, j;
+> +
+> +	qfr->pages = kcalloc(qfr->nr_pages, sizeof(*qfr->pages), GFP_ATOMIC);
+
+Why GFP_ATOMIC and not GFP_KERNEL?  GFP_ATOMIC is used all over this file
+but there doesn't seem to be any non-sleepable context.
+
+> +	if (!qfr->pages)
+> +		return -ENOMEM;
+> +
+> +	for (i = 0; i < qfr->nr_pages; i++) {
+> +		qfr->pages[i] = alloc_page(GFP_ATOMIC | __GFP_ZERO);
+
+Is it worth copying __iommu_dma_alloc_pages() here - using
+alloc_pages_node() to allocate memory close to the device and to allocate
+compound pages if possible?
+
+Also, do we need GFP_USER here?
+
+
+More generally, it would be nice to use the DMA API when SVA isn't
+supported, instead of manually allocating and mapping memory with
+iommu_map(). Do we only handcraft these functions in order to have VA ==
+IOVA?  On its own it doesn't seem like a strong enough reason to avoid the
+DMA API.
+
+SVA simplifies DMA memory management and enables core mm features for DMA
+such as demand paging. VA == IOVA is just a natural consequence. But in
+the !SVA mode, the userspace library does need to create DMA mappings
+itself. So, since it has special cases for !SVA, it could easily get the
+IOVA of a DMA buffer from the kernel using another ioctl.
+
+[...]
+> +static struct uacce_qfile_region *
+> +uacce_create_region(struct uacce_queue *q, struct vm_area_struct *vma,
+> +		    enum uacce_qfrt type, unsigned int flags)
+> +{
+> +	struct uacce_qfile_region *qfr;
+> +	struct uacce_device *uacce = q->uacce;
+> +	unsigned long vm_pgoff;
+> +	int ret = -ENOMEM;
+> +
+> +	qfr = kzalloc(sizeof(*qfr), GFP_ATOMIC);
+> +	if (!qfr)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	qfr->type = type;
+> +	qfr->flags = flags;
+> +	qfr->iova = vma->vm_start;
+> +	qfr->nr_pages = vma_pages(vma);
+> +
+> +	if (vma->vm_flags & VM_READ)
+> +		qfr->prot |= IOMMU_READ;
+> +
+> +	if (vma->vm_flags & VM_WRITE)
+> +		qfr->prot |= IOMMU_WRITE;
+> +
+> +	if (flags & UACCE_QFRF_SELFMT) {
+> +		if (!uacce->ops->mmap) {
+> +			ret = -EINVAL;
+> +			goto err_with_qfr;
+> +		}
+> +
+> +		ret = uacce->ops->mmap(q, vma, qfr);
+> +		if (ret)
+> +			goto err_with_qfr;
+> +		return qfr;
+> +	}
+
+I wish the SVA and !SVA paths were less interleaved. Both models are
+fundamentally different:
+
+* Without SVA you cannot share the device between multiple processes. All
+  DMA mappings are in the "main", non-PASID address space of the device.
+
+  Note that process isolation without SVA could be achieved with the
+  auxiliary domains IOMMU API (introduced primarily for vfio-mdev) but
+  this is not the model chosen here.
+
+* With SVA you can share the device between multiple processes. But if the
+  process can somehow program its portion of the device to access the main
+  address space, you loose isolation. Only the kernel must be able to
+  program and access the main address space.
+
+When interleaving both code paths it's easy to make a mistake and loose
+this isolation. Although I think this code is correct, it took me some
+time to understand that we never end up calling dma_alloc or iommu_map
+when using SVA. Might be worth at least adding a check that if
+UACCE_DEV_SVA, then we never end up in the bottom part of this function.
+
+> +
+> +	/* allocate memory */
+> +	if (flags & UACCE_QFRF_DMA) {
+
+At the moment UACCE_QFRF_DMA is never set, so there is a lot of unused and
+possibly untested code in this file. I think it would be simpler to choose
+between either DMA API or unmanaged IOMMU domains and stick with it. As
+said before, I'd prefer DMA API.
+
+> +		qfr->kaddr = dma_alloc_coherent(uacce->pdev,
+> +						qfr->nr_pages << PAGE_SHIFT,
+> +						&qfr->dma, GFP_KERNEL);
+> +		if (!qfr->kaddr) {
+> +			ret = -ENOMEM;
+> +			goto err_with_qfr;
+> +		}
+> +	} else {
+> +		ret = uacce_qfr_alloc_pages(qfr);
+> +		if (ret)
+> +			goto err_with_qfr;
+> +	}
+> +
+> +	/* map to device */
+> +	ret = uacce_queue_map_qfr(q, qfr);
+
+Worth moving into the else above.
+
+[...]
+> +static long uacce_cmd_share_qfr(struct uacce_queue *tgt, int fd)
+> +{
+> +	struct file *filep;
+> +	struct uacce_queue *src;
+> +	int ret = -EINVAL;
+> +
+> +	mutex_lock(&uacce_mutex);
+> +
+> +	if (tgt->state != UACCE_Q_STARTED)
+> +		goto out_with_lock;
+> +
+> +	filep = fget(fd);
+> +	if (!filep)
+> +		goto out_with_lock;
+> +
+> +	if (filep->f_op != &uacce_fops)
+> +		goto out_with_fd;
+> +
+> +	src = filep->private_data;
+> +	if (!src)
+> +		goto out_with_fd;
+> +
+> +	if (tgt->uacce->flags & UACCE_DEV_SVA)
+> +		goto out_with_fd;
+> +
+> +	if (!src->qfrs[UACCE_QFRT_SS] || tgt->qfrs[UACCE_QFRT_SS])
+> +		goto out_with_fd;
+> +
+> +	ret = uacce_queue_map_qfr(tgt, src->qfrs[UACCE_QFRT_SS]);
+
+I don't understand what this ioctl does. The function duplicates the
+static mappings from one queue to another, right?  But static mappings are
+a !SVA thing and currently on !SVA a single queue can be opened at a time.
+In addition, unless the two queues belong to different devices, they would
+share the same IOMMU domain and the mappings would already exist, so you
+don't need to call uacce_queue_map_qfr() again.
+
+[...]
+> +static long uacce_put_queue(struct uacce_queue *q)
+> +{
+> +	struct uacce_device *uacce = q->uacce;
+> +
+> +	mutex_lock(&uacce_mutex);
+> +
+> +	if ((q->state == UACCE_Q_STARTED) && uacce->ops->stop_queue)
+> +		uacce->ops->stop_queue(q);
+> +
+> +	if ((q->state == UACCE_Q_INIT || q->state == UACCE_Q_STARTED) &&
+> +	     uacce->ops->put_queue)
+> +		uacce->ops->put_queue(q);
+> +
+> +	q->state = UACCE_Q_ZOMBIE;
+
+Since the PUT_Q ioctl makes the queue unrecoverable, why should userspace
+invoke it instead of immediately calling close()?
+
+[...]
+> +static int uacce_dev_open_check(struct uacce_device *uacce)
+> +{
+> +	if (uacce->flags & UACCE_DEV_SVA)
+> +		return 0;
+> +
+> +	/*
+> +	 * The device can be opened once if it does not support pasid
+> +	 */
+> +	if (kref_read(&uacce->cdev->kobj.kref) > 2)
+
+Why 2?  It doesn't feel right to access the cdev internals for this, could
+we just have a ref uacce->opened for this purpose?
+
+> +		return -EBUSY;
+> +
+> +	return 0;
+> +}
+> +
+> +static int uacce_fops_open(struct inode *inode, struct file *filep)
+> +{
+> +	struct uacce_queue *q;
+> +	struct iommu_sva *handle = NULL;
+> +	struct uacce_device *uacce;
+> +	int ret;
+> +	int pasid = 0;
+> +
+> +	uacce = idr_find(&uacce_idr, iminor(inode));
+> +	if (!uacce)
+> +		return -ENODEV;
+> +
+> +	if (!try_module_get(uacce->pdev->driver->owner))
+> +		return -ENODEV;
+> +
+> +	ret = uacce_dev_open_check(uacce);
+> +	if (ret)
+> +		goto out_with_module;
+> +
+> +	if (uacce->flags & UACCE_DEV_SVA) {
+> +		handle = iommu_sva_bind_device(uacce->pdev, current->mm, NULL);
+> +		if (IS_ERR(handle))
+> +			goto out_with_module;
+> +		pasid = iommu_sva_get_pasid(handle);
+
+We need to register an mm_exit callback. Once we return, userspace will
+start running jobs on the accelerator. If the process is killed while the
+accelerator is running, the mm_exit callback tells the device driver to
+stop using this PASID (stop_queue()), so that it can be reallocated for
+another process.
+
+Implementing this with the right locking and ordering can be tricky. I'll
+try to implement the callback and test it on the device this week.
+
+[...]
+> +static int uacce_fops_mmap(struct file *filep, struct vm_area_struct *vma)
+> +{
+> +	struct uacce_queue *q = filep->private_data;
+> +	struct uacce_device *uacce = q->uacce;
+> +	struct uacce_qfile_region *qfr;
+> +	enum uacce_qfrt type = 0;
+> +	unsigned int flags = 0;
+> +	int ret;
+> +
+> +	if (vma->vm_pgoff < UACCE_QFRT_MAX)
+> +		type = vma->vm_pgoff;
+> +
+> +	vma->vm_flags |= VM_DONTCOPY | VM_DONTEXPAND;
+> +
+> +	mutex_lock(&uacce_mutex);
+> +
+> +	/* fixme: if the region need no pages, we don't need to check it */
+> +	if (q->mm->data_vm + vma_pages(vma) >
+> +	    rlimit(RLIMIT_DATA) >> PAGE_SHIFT) {
+
+Doesn't may_expand_vm() do the job already?
+
+> +		ret = -ENOMEM;
+> +		goto out_with_lock;
+> +	}
+> +
+> +	if (q->qfrs[type]) {
+> +		ret = -EBUSY;
+> +		goto out_with_lock;
+> +	}
+> +
+> +	switch (type) {
+> +	case UACCE_QFRT_MMIO:
+> +		flags = UACCE_QFRF_SELFMT;
+> +		break;
+> +
+> +	case UACCE_QFRT_SS:
+> +		if (q->state != UACCE_Q_STARTED) {
+> +			ret = -EINVAL;
+> +			goto out_with_lock;
+> +		}
+> +
+> +		if (uacce->flags & UACCE_DEV_SVA) {
+> +			ret = -EINVAL;
+> +			goto out_with_lock;
+> +		}
+> +
+> +		flags = UACCE_QFRF_MAP | UACCE_QFRF_MMAP;
+> +
+> +		break;
+> +
+> +	case UACCE_QFRT_DKO:
+> +		if (uacce->flags & UACCE_DEV_SVA) {
+> +			ret = -EINVAL;
+> +			goto out_with_lock;
+> +		}
+> +
+> +		flags = UACCE_QFRF_MAP | UACCE_QFRF_KMAP;
+> +
+> +		break;
+> +
+> +	case UACCE_QFRT_DUS:
+> +		if (uacce->flags & UACCE_DEV_SVA) {
+> +			flags = UACCE_QFRF_SELFMT;
+> +			break;
+> +		}
+> +
+> +		flags = UACCE_QFRF_MAP | UACCE_QFRF_MMAP;
+> +		break;
+> +
+> +	default:
+> +		WARN_ON(&uacce->dev);
+> +		break;
+> +	}
+> +
+> +	qfr = uacce_create_region(q, vma, type, flags);
+
+Don't we need to setup a a vma->vm_ops->close callback, to remove this
+region on munmap()?
+
+> +	if (IS_ERR(qfr)) {
+> +		ret = PTR_ERR(qfr);
+> +		goto out_with_lock;
+> +	}
+> +	q->qfrs[type] = qfr;
+> +
+> +	if (type == UACCE_QFRT_SS) {
+> +		INIT_LIST_HEAD(&qfr->qs);
+> +		list_add(&q->list, &q->qfrs[type]->qs);
+> +	}
+> +
+> +	mutex_unlock(&uacce_mutex);
+> +
+> +	if (qfr->pages)
+> +		q->mm->data_vm += qfr->nr_pages;
+
+This too should be done by the core already.
+
+[...]
+> +/* Borrowed from VFIO to fix msi translation */
+> +static bool uacce_iommu_has_sw_msi(struct iommu_group *group,
+
+Sharing the same functions would be nicer.
+
+[...]
+> +struct uacce_device *uacce_register(struct device *parent,
+> +				    struct uacce_interface *interface)
+> +{
+> +	int ret;
+> +	struct uacce_device *uacce;
+> +	unsigned int flags = interface->flags;
+> +
+> +	uacce = kzalloc(sizeof(struct uacce_device), GFP_KERNEL);
+> +	if (!uacce)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	if (flags & UACCE_DEV_SVA) {
+> +		ret = iommu_dev_enable_feature(parent, IOMMU_DEV_FEAT_SVA);
+> +		if (ret)
+> +			flags &= ~UACCE_DEV_SVA;
+> +	}
+> +
+> +	uacce->pdev = parent;
+> +	uacce->flags = flags;
+> +	uacce->ops = interface->ops;
+> +
+> +	ret = uacce_set_iommu_domain(uacce);
+> +	if (ret)
+> +		goto err_free;
+> +
+> +	mutex_lock(&uacce_mutex);
+> +
+> +	ret = idr_alloc(&uacce_idr, uacce, 0, 0, GFP_KERNEL);
+> +	if (ret < 0)
+> +		goto err_with_lock;
+> +
+> +	uacce->cdev = cdev_alloc();
+
+Need to check the return value.
+
+> +	uacce->cdev->ops = &uacce_fops;
+> +	uacce->dev_id = ret;
+> +	uacce->cdev->owner = THIS_MODULE;
+> +	device_initialize(&uacce->dev);
+> +	uacce->dev.devt = MKDEV(MAJOR(uacce_devt), uacce->dev_id);
+> +	uacce->dev.class = uacce_class;
+> +	uacce->dev.groups = uacce_dev_groups;
+> +	uacce->dev.parent = uacce->pdev;
+> +	uacce->dev.release = uacce_release;
+> +	dev_set_name(&uacce->dev, "%s-%d", interface->name, uacce->dev_id);
+> +	ret = cdev_device_add(uacce->cdev, &uacce->dev);
+> +	if (ret)
+> +		goto err_with_idr;
+> +
+> +	mutex_unlock(&uacce_mutex);
+
+We published the new device into /dev/ and /sys/ even though the uacce
+structure has yet to be completed by the caller (for example qf_pg_size,
+api_ver, etc). Maybe we can add an initializer to uacce_ops so we can
+publish a complete structure?
+
+> +
+> +	return uacce;
+> +
+> +err_with_idr:
+> +	idr_remove(&uacce_idr, uacce->dev_id);
+> +err_with_lock:
+> +	mutex_unlock(&uacce_mutex);
+> +	uacce_unset_iommu_domain(uacce);
+> +err_free:
+> +	if (flags & UACCE_DEV_SVA)
+> +		iommu_dev_disable_feature(uacce->pdev, IOMMU_DEV_FEAT_SVA);
+> +	kfree(uacce);
+> +	return ERR_PTR(ret);
+> +}
+> +EXPORT_SYMBOL_GPL(uacce_register);
+> +
+> +/**
+> + * uacce_unregister - unregisters an accelerator
+> + * @uacce: the accelerator to unregister
+> + */
+> +void uacce_unregister(struct uacce_device *uacce)
+> +{
+> +	if (uacce == NULL)
+> +		return;
+> +
+> +	mutex_lock(&uacce_mutex);
+
+Are we certain that no open queue remains?
+
+> +
+> +	if (uacce->flags & UACCE_DEV_SVA)
+> +		iommu_dev_disable_feature(uacce->pdev, IOMMU_DEV_FEAT_SVA);
+> +
+> +	uacce_unset_iommu_domain(uacce);
+> +	cdev_device_del(uacce->cdev, &uacce->dev);
+> +	idr_remove(&uacce_idr, uacce->dev_id);
+> +	put_device(&uacce->dev);
+> +
+> +	mutex_unlock(&uacce_mutex);
+> +}
+> +EXPORT_SYMBOL_GPL(uacce_unregister);
+
+> diff --git a/include/uapi/misc/uacce/uacce.h b/include/uapi/misc/uacce/uacce.h
+> new file mode 100644
+> index 0000000..c859668
+> --- /dev/null
+> +++ b/include/uapi/misc/uacce/uacce.h
+> @@ -0,0 +1,41 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+
+Needs to be 
+/* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
+
+Otherwise headers_install.sh complains on v5.4 (same for the qm UAPI in
+patch 3)
+
+> +#ifndef _UAPIUUACCE_H
+> +#define _UAPIUUACCE_H
+> +
+> +#include <linux/types.h>
+> +#include <linux/ioctl.h>
+> +
+> +#define UACCE_CMD_SHARE_SVAS	_IO('W', 0)
+> +#define UACCE_CMD_START		_IO('W', 1)
+> +#define UACCE_CMD_PUT_Q		_IO('W', 2)
+
+These must be documented.
+
+> +
+> +/**
+> + * enum uacce_dev_flag: Device flags:
+> + * @UACCE_DEV_SHARE_DOMAIN: no PASID, can share sva for one process
+> + * @UACCE_DEV_SVA: Shared Virtual Addresses
+> + *		   Support PASID
+> + *		   Support device page fault (pcie device) or
+> + *		   smmu stall (platform device)
+
+Both stall and PRI are device page faults, so this could say "Support
+device page faults (PCI PRI or SMMU Stall)".
+
+> + */
+> +enum uacce_dev_flag {
+> +	UACCE_DEV_SHARE_DOMAIN = 0x0,
+> +	UACCE_DEV_SVA = 0x1,
+> +};
+
+This is a bitmap so UACCE_DEV_SHARE_DOMAIN will loose its meaning when
+adding a new flag. There will be:
+
+	UACCE_DEV_SVA		= 1 << 0,
+	UACCE_DEV_NEWFEATURE	= 1 << 1,
+
+Then a value of zero will simply mean "no special feature". I think we
+could simply remove UACCE_DEV_SHARE_DOMAIN now, it's not used.
+
+Thanks,
+Jean
