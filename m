@@ -2,91 +2,135 @@ Return-Path: <SRS0=0DWe=YJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5779FA372B
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 11:00:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A663AFA372A
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 11:31:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9FE1C2082C
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 11:00:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 77B2B2082C
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 11:31:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=st.com header.i=@st.com header.b="S1dIOLgH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388792AbfJPLAg (ORCPT
+        id S2404952AbfJPLbj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Oct 2019 07:00:36 -0400
-Received: from mga09.intel.com ([134.134.136.24]:3400 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726083AbfJPLAg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Oct 2019 07:00:36 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Oct 2019 04:00:35 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,303,1566889200"; 
-   d="scan'208";a="225749572"
-Received: from jsakkine-mobl1.tm.intel.com (HELO localhost) ([10.237.50.130])
-  by fmsmga002.fm.intel.com with ESMTP; 16 Oct 2019 04:00:32 -0700
-Date:   Wed, 16 Oct 2019 14:00:31 +0300
-From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc:     "Safford, David (GE Global Research, US)" <david.safford@ge.com>,
-        Ken Goldman <kgold@linux.ibm.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>,
-        "open list:ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] KEYS: asym_tpm: Switch to get_random_bytes()
-Message-ID: <20191016110031.GE10184@linux.intel.com>
-References: <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2A22E@ALPMBAPA12.e2k.ad.ge.com>
- <20191004182711.GC6945@linux.intel.com>
- <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2A38B@ALPMBAPA12.e2k.ad.ge.com>
- <20191007000520.GA17116@linux.intel.com>
- <59b88042-9c56-c891-f75e-7c0719eb5ff9@linux.ibm.com>
- <20191008234935.GA13926@linux.intel.com>
- <20191008235339.GB13926@linux.intel.com>
- <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2B995@ALPMBAPA12.e2k.ad.ge.com>
- <20191014190033.GA15552@linux.intel.com>
- <1571081397.3728.9.camel@HansenPartnership.com>
+        Wed, 16 Oct 2019 07:31:39 -0400
+Received: from mx08-00178001.pphosted.com ([91.207.212.93]:18868 "EHLO
+        mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2404936AbfJPLbj (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 16 Oct 2019 07:31:39 -0400
+Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
+        by mx08-00178001.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id x9GBQG43023848;
+        Wed, 16 Oct 2019 13:29:19 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=st.com; h=from : to : cc : subject
+ : date : message-id : references : in-reply-to : content-type : content-id
+ : content-transfer-encoding : mime-version; s=STMicroelectronics;
+ bh=LG7dUwNIu0+LFfdXsArrTdZw8lqv6tMm88WzwKR6KrA=;
+ b=S1dIOLgHhlnWOXh0gObHc7UsclwUejJlDnyrM1B+IDgosRXzZubyieCbZiLXGnEqlKYL
+ hpd61tPz7LkYexBy/HvcgZ45lzNg6K5RFrtQsR1/CsvmQpM0HL/LOKFVqbEJoCrjqRaJ
+ /E9EoqdTnfvZ+edK6JdPaQOvWKFGFEXldD9L/94lcNehviIcFV2PYLDKjiVqFaJ1Wjsg
+ dwmH1cOV1yvdz2fcgJRj41SW6+7vKlTL7PDE7rlsl1xD4adXDF9AaC3xXAi5DlfpperF
+ v7x4omaQWAxF3KYwgM0sjlCaITEkEpA4SQIgW0FP7lZAToaCZOv54Gin4gnBg888vRQx Zw== 
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+        by mx08-00178001.pphosted.com with ESMTP id 2vk3y9x8wr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 16 Oct 2019 13:29:19 +0200
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 7D01310002A;
+        Wed, 16 Oct 2019 13:29:16 +0200 (CEST)
+Received: from Webmail-eu.st.com (sfhdag6node2.st.com [10.75.127.17])
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 38E132074CE;
+        Wed, 16 Oct 2019 13:29:16 +0200 (CEST)
+Received: from SFHDAG6NODE3.st.com (10.75.127.18) by SFHDAG6NODE2.st.com
+ (10.75.127.17) with Microsoft SMTP Server (TLS) id 15.0.1347.2; Wed, 16 Oct
+ 2019 13:29:15 +0200
+Received: from SFHDAG6NODE3.st.com ([fe80::d04:5337:ab17:b6f6]) by
+ SFHDAG6NODE3.st.com ([fe80::d04:5337:ab17:b6f6%20]) with mapi id
+ 15.00.1473.003; Wed, 16 Oct 2019 13:29:15 +0200
+From:   Patrice CHOTARD <patrice.chotard@st.com>
+To:     YueHaibing <yuehaibing@huawei.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "mpm@selenic.com" <mpm@selenic.com>,
+        "arnd@arndb.de" <arnd@arndb.de>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "nicolas.ferre@microchip.com" <nicolas.ferre@microchip.com>,
+        "alexandre.belloni@bootlin.com" <alexandre.belloni@bootlin.com>,
+        "ludovic.desroches@microchip.com" <ludovic.desroches@microchip.com>,
+        "f.fainelli@gmail.com" <f.fainelli@gmail.com>,
+        "rjui@broadcom.com" <rjui@broadcom.com>,
+        "sbranden@broadcom.com" <sbranden@broadcom.com>,
+        "bcm-kernel-feedback-list@broadcom.com" 
+        <bcm-kernel-feedback-list@broadcom.com>,
+        "eric@anholt.net" <eric@anholt.net>,
+        "wahrenst@gmx.net" <wahrenst@gmx.net>,
+        "l.stelmach@samsung.com" <l.stelmach@samsung.com>,
+        "kgene@kernel.org" <kgene@kernel.org>,
+        "krzk@kernel.org" <krzk@kernel.org>,
+        "khilman@baylibre.com" <khilman@baylibre.com>,
+        "dsaxena@plexity.net" <dsaxena@plexity.net>
+CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-rpi-kernel@lists.infradead.org" 
+        <linux-rpi-kernel@lists.infradead.org>,
+        "linux-samsung-soc@vger.kernel.org" 
+        <linux-samsung-soc@vger.kernel.org>,
+        "linux-amlogic@lists.infradead.org" 
+        <linux-amlogic@lists.infradead.org>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
+Subject: Re: [PATCH -next 11/13] hwrng: st - use
+ devm_platform_ioremap_resource() to simplify code
+Thread-Topic: [PATCH -next 11/13] hwrng: st - use
+ devm_platform_ioremap_resource() to simplify code
+Thread-Index: AQHVhA8R7X2BGSeJiEmwGCSOAcwdJ6ddADyA
+Date:   Wed, 16 Oct 2019 11:29:15 +0000
+Message-ID: <d9fd5224-a858-e7ea-eb71-2ed6696a6ffd@st.com>
+References: <20191016104621.26056-1-yuehaibing@huawei.com>
+ <20191016104621.26056-12-yuehaibing@huawei.com>
+In-Reply-To: <20191016104621.26056-12-yuehaibing@huawei.com>
+Accept-Language: fr-FR, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.75.127.46]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <B3EF5CC03322D04D91346E3040ABD037@st.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1571081397.3728.9.camel@HansenPartnership.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,1.0.8
+ definitions=2019-10-16_04:2019-10-16,2019-10-16 signatures=0
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Oct 14, 2019 at 12:29:57PM -0700, James Bottomley wrote:
-> The job of the in-kernel rng is simply to produce a mixed entropy pool
-> from which we can draw random numbers.  The idea is that quite a few
-> attackers have identified the rng as being a weak point in the security
-> architecture of the kernel, so if we mix entropy from all the sources
-> we have, you have to compromise most of them to gain some predictive
-> power over the rng sequence.
-
-The documentation says that krng is suitable for key generation.
-Should the documentation changed to state that it is unsuitable?
-
-> The point is not how certified the TPM RNG is, the point is that it's a
-> single source and if we rely on it solely for some applications, like
-> trusted keys, then it gives the attackers a single known point to go
-> after.  This may be impossible for script kiddies, but it won't be for
-> nation states ... are you going to exclusively trust the random number
-> you got from your chinese certified TPM?
-
-I'd suggest approach where TPM RNG result is xored with krng result.
-
-> Remember also that the attack doesn't have to be to the TPM only, it
-> could be the pathway by which we get the random number, which involves
-> components outside of the TPM certification.
-
-Yeah, I do get this.
-
-/Jarkko
+SGkNCg0KT24gMTAvMTYvMTkgMTI6NDYgUE0sIFl1ZUhhaWJpbmcgd3JvdGU6DQo+IFVzZSBkZXZt
+X3BsYXRmb3JtX2lvcmVtYXBfcmVzb3VyY2UoKSB0byBzaW1wbGlmeSB0aGUgY29kZSBhIGJpdC4N
+Cj4gVGhpcyBpcyBkZXRlY3RlZCBieSBjb2NjaW5lbGxlLg0KPg0KPiBTaWduZWQtb2ZmLWJ5OiBZ
+dWVIYWliaW5nIDx5dWVoYWliaW5nQGh1YXdlaS5jb20+DQo+IC0tLQ0KPiAgZHJpdmVycy9jaGFy
+L2h3X3JhbmRvbS9zdC1ybmcuYyB8IDQgKy0tLQ0KPiAgMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0
+aW9uKCspLCAzIGRlbGV0aW9ucygtKQ0KPg0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9jaGFyL2h3
+X3JhbmRvbS9zdC1ybmcuYyBiL2RyaXZlcnMvY2hhci9od19yYW5kb20vc3Qtcm5nLmMNCj4gaW5k
+ZXggODYzNDQ4My4uNzgzYzI0ZSAxMDA2NDQNCj4gLS0tIGEvZHJpdmVycy9jaGFyL2h3X3JhbmRv
+bS9zdC1ybmcuYw0KPiArKysgYi9kcml2ZXJzL2NoYXIvaHdfcmFuZG9tL3N0LXJuZy5jDQo+IEBA
+IC03Miw3ICs3Miw2IEBAIHN0YXRpYyBpbnQgc3Rfcm5nX3JlYWQoc3RydWN0IGh3cm5nICpybmcs
+IHZvaWQgKmRhdGEsIHNpemVfdCBtYXgsIGJvb2wgd2FpdCkNCj4gIHN0YXRpYyBpbnQgc3Rfcm5n
+X3Byb2JlKHN0cnVjdCBwbGF0Zm9ybV9kZXZpY2UgKnBkZXYpDQo+ICB7DQo+ICAJc3RydWN0IHN0
+X3JuZ19kYXRhICpkZGF0YTsNCj4gLQlzdHJ1Y3QgcmVzb3VyY2UgKnJlczsNCj4gIAlzdHJ1Y3Qg
+Y2xrICpjbGs7DQo+ICAJdm9pZCBfX2lvbWVtICpiYXNlOw0KPiAgCWludCByZXQ7DQo+IEBAIC04
+MSw4ICs4MCw3IEBAIHN0YXRpYyBpbnQgc3Rfcm5nX3Byb2JlKHN0cnVjdCBwbGF0Zm9ybV9kZXZp
+Y2UgKnBkZXYpDQo+ICAJaWYgKCFkZGF0YSkNCj4gIAkJcmV0dXJuIC1FTk9NRU07DQo+ICANCj4g
+LQlyZXMgPSBwbGF0Zm9ybV9nZXRfcmVzb3VyY2UocGRldiwgSU9SRVNPVVJDRV9NRU0sIDApOw0K
+PiAtCWJhc2UgPSBkZXZtX2lvcmVtYXBfcmVzb3VyY2UoJnBkZXYtPmRldiwgcmVzKTsNCj4gKwli
+YXNlID0gZGV2bV9wbGF0Zm9ybV9pb3JlbWFwX3Jlc291cmNlKHBkZXYsIDApOw0KPiAgCWlmIChJ
+U19FUlIoYmFzZSkpDQo+ICAJCXJldHVybiBQVFJfRVJSKGJhc2UpOw0KPiAgDQoNClJldmlld2Vk
+LWJ5OiBQYXRyaWNlIENob3RhcmQgPHBhdHJpY2UuY2hvdGFyZEBzdC5jb20+DQoNClRoYW5rcw0K
