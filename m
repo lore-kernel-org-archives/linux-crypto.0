@@ -2,96 +2,110 @@ Return-Path: <SRS0=0DWe=YJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38ADDFA372A
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 13:02:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02335FA3728
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 13:34:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1182721848
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 13:02:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C6FF021928
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 13:34:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="k2uI+8mj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vfOKhkD/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393401AbfJPNCY (ORCPT
+        id S2405435AbfJPNeA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Oct 2019 09:02:24 -0400
-Received: from mail-qt1-f193.google.com ([209.85.160.193]:38321 "EHLO
-        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728878AbfJPNCY (ORCPT
+        Wed, 16 Oct 2019 09:34:00 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:38661 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2405422AbfJPNeA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Oct 2019 09:02:24 -0400
-Received: by mail-qt1-f193.google.com with SMTP id j31so35918463qta.5
-        for <linux-crypto@vger.kernel.org>; Wed, 16 Oct 2019 06:02:22 -0700 (PDT)
+        Wed, 16 Oct 2019 09:34:00 -0400
+Received: by mail-wr1-f65.google.com with SMTP id y18so18651958wrn.5;
+        Wed, 16 Oct 2019 06:33:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=nb+Zwv6A9Mb4GfSnlLYIs35QuTFmhM3ANMKIRmvC9YI=;
-        b=k2uI+8mjSnh09Xb8YO7vjSmrVkGwUmx1Mp2fIXodTr8e5zJG/RhUZ9a4R+Ze4LnTtK
-         23eqK1hAdLmvlmjfJOSbPS4YfGjjwoWeVeiQ+Xb31T7+BLKRnSsZTG8bubsr/JjuWR8/
-         4AoHL4EfhG2bs+gtfdfHzxYOGI6VlOer+aiNFAYVyl0lTx8F9Exqaf+DH5uL1DIBgUWq
-         az80mzMXkF5Qj+VH8cvhDzRyTKlq6rMPJ+BBA7Hc+HqVwGTu0TqjW645pYwiPf3AA+0a
-         +KCJvGnQa4kJUbsEam72ESp8wY9Nbn1BJVHcrIjHvnYP/AFdzm1XjUN1Ycnd6i+IGoll
-         aUyA==
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=dpe0zCbR3c1VkH/n1U/vOC6ekNORqcDkTSfYoQ4laf4=;
+        b=vfOKhkD/B4LEg6089Khw6AZt10guS5PRPkM3bMi0lgUqnTMUx0pI1R8LsienxZEMm2
+         E05kaPmoQtQvR2H7jKVnidLwW3Vejkt1ELE9yb6dTGA2vAXYEYNry0LWvHFcAA0NMpOv
+         k9G0Md+1zn8hR7VVE4Uz7lwin5Z9FyvKKqdFUOnLGNqjbls1aQdFZSeEunuMxh26BU81
+         QtFKBERwt2fYrJOFrRPVY3TP6wi6aJ4kvsqpXHpYY4+AV4mzKPJkNxdtZSnIoibCMRuB
+         E5ylZ26gQET4N1EgAmHkHImIdXAjm+dZYd0rRiSNOvxBD/pevTw0thJR010OqXlc0IAd
+         tDtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=nb+Zwv6A9Mb4GfSnlLYIs35QuTFmhM3ANMKIRmvC9YI=;
-        b=Pg+xjXm9wudIYzc1k916l9FXIaGPJ3BTHgekK+uf/88aNniKKgHnF4aYGyV7FaKPhN
-         bg40zLi+bDdE9oFbwvDhSgotWigyCwrZvKwlqHITq9jI02H5ZixMaoGuVpaCp+6Fefb0
-         wPRgFvi0hwuIRFxBwrMm660YKsggWpHjeCG53wHLpr5NfYSaSlRKrBsmVFx/10X628TV
-         Rw/nZOcb7hNyt5PCLkqftk6eAq4lizdHYRIRlO/Z6jHc6RcMWaIAbDYu7KGx8aSKoM0M
-         Qq9Gx3WekbxikgQ2AervlLIzX8CTB8cTso+TtZLB1aNK2ctuQVC3zOZMrD8qBdIfIq/Q
-         meBw==
-X-Gm-Message-State: APjAAAX4XakdImWKk/d1Hz9eQv/BnX97+YTssPlh3oRzruWEY3YfzKdl
-        u267qtlIpPxVJ488v/V7tMFMjiA+Q4C2JwFWWDdFKA==
-X-Google-Smtp-Source: APXvYqyW4cbiSWGzBxQIXio3vIu0cmY2K6dYV01TTkd8mDKAjaYz3de0ceDV/3tatxQgqUQRv2lL843vXSRKNrVKh8k=
-X-Received: by 2002:ac8:2f9b:: with SMTP id l27mr43816025qta.218.1571230942027;
- Wed, 16 Oct 2019 06:02:22 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=dpe0zCbR3c1VkH/n1U/vOC6ekNORqcDkTSfYoQ4laf4=;
+        b=Gs5rQOZNvDDaxWPHN1bf00MJnr/soXR0S6uvw7Ed5VjOUDB4ZXQKo4gb9nuc1YkWHZ
+         awZ1J9EaulnseL+ia7ePpLtWRqpHs3g3hI6ORLwr+zHZgR81m6FSmDILEtOug1Llqeec
+         k2nnnvQBZ+9mZd/N3O5phjYHvF30wiAVDHbSz7rQxyJlqcWlzHOR95nZzecZ+hYZ0VO+
+         JFlqloyw1wG7DVB/QHjqAGSMuZX9EOFwmSGRyK908BSbkYqmyJkgefhez+puq1PNqQ8V
+         ipUL9EReZuVJSV8BvG24QqVLGirTYDhgBPAY0yvvI9sjN3A25mfZwkWV8L3poAG7UBWH
+         yxEw==
+X-Gm-Message-State: APjAAAW/7DjDzuMnIJwGGARNdb+ogjdisiHu+erzA8jnUHA8omImknLu
+        6IVVoAIYe9mXBV7bhLisbC0=
+X-Google-Smtp-Source: APXvYqxz+OWi0tp3OSsbB23tWAXSlMcqgwlRvvpcPVUGZGYuP9JlM3ADHjooxy1QYXOvh/7QHnqaEQ==
+X-Received: by 2002:a5d:5011:: with SMTP id e17mr2790378wrt.160.1571232835526;
+        Wed, 16 Oct 2019 06:33:55 -0700 (PDT)
+Received: from Red.localdomain ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
+        by smtp.googlemail.com with ESMTPSA id h17sm3139998wme.6.2019.10.16.06.33.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Oct 2019 06:33:54 -0700 (PDT)
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     davem@davemloft.net, herbert@gondor.apana.org.au,
+        mark.rutland@arm.com, mripard@kernel.org, robh+dt@kernel.org,
+        wens@csie.org
+Cc:     devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-sunxi@googlegroups.com,
+        Corentin Labbe <clabbe.montjoie@gmail.com>
+Subject: [PATCH 4/4] ARM: dts: sun9i: a80: Add Security System node
+Date:   Wed, 16 Oct 2019 15:33:45 +0200
+Message-Id: <20191016133345.9076-5-clabbe.montjoie@gmail.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20191016133345.9076-1-clabbe.montjoie@gmail.com>
+References: <20191016133345.9076-1-clabbe.montjoie@gmail.com>
 MIME-Version: 1.0
-References: <20191014121910.7264-1-ard.biesheuvel@linaro.org> <20191014121910.7264-16-ard.biesheuvel@linaro.org>
-In-Reply-To: <20191014121910.7264-16-ard.biesheuvel@linaro.org>
-From:   Linus Walleij <linus.walleij@linaro.org>
-Date:   Wed, 16 Oct 2019 15:02:10 +0200
-Message-ID: <CACRpkdZLha2jExo2dzfxpCLw2SydWxkOw1FDLy+iwY9i7hADpg@mail.gmail.com>
-Subject: Re: [PATCH 15/25] crypto: ixp4xx - switch to skcipher API
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@google.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Linus Walleij <linusw@kernel.org>,
-        Imre Kaloz <kaloz@openwrt.org>,
-        Krzysztof Halasa <khalasa@piap.pl>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Oct 14, 2019 at 2:19 PM Ard Biesheuvel
-<ard.biesheuvel@linaro.org> wrote:
+This patchs the node for sun8i-ss which is availlable on the A80.
 
-> Commit 7a7ffe65c8c5 ("crypto: skcipher - Add top-level skcipher interface")
-> dated 20 august 2015 introduced the new skcipher API which is supposed to
-> replace both blkcipher and ablkcipher. While all consumers of the API have
-> been converted long ago, some producers of the ablkcipher remain, forcing
-> us to keep the ablkcipher support routines alive, along with the matching
-> code to expose [a]blkciphers via the skcipher API.
->
-> So switch this driver to the skcipher API, allowing us to finally drop the
-> blkcipher code in the near future.
->
-> Cc: Linus Walleij <linusw@kernel.org>
-> Cc: Imre Kaloz <kaloz@openwrt.org>
-> Cc: Krzysztof Halasa <khalasa@piap.pl>
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+---
+ arch/arm/boot/dts/sun9i-a80.dtsi | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+diff --git a/arch/arm/boot/dts/sun9i-a80.dtsi b/arch/arm/boot/dts/sun9i-a80.dtsi
+index b9b6fb00be28..d7498a1a158e 100644
+--- a/arch/arm/boot/dts/sun9i-a80.dtsi
++++ b/arch/arm/boot/dts/sun9i-a80.dtsi
+@@ -457,6 +457,16 @@
+ 			reg = <0x01700000 0x100>;
+ 		};
+ 
++		crypto: crypto@1c02000 {
++			compatible = "allwinner,sun9i-a80-crypto";
++			reg = <0x01c02000 0x1000>;
++			interrupts = <GIC_SPI 80 IRQ_TYPE_LEVEL_HIGH>;
++			resets = <&ccu RST_BUS_SS>;
++			reset-names = "bus";
++			clocks = <&ccu CLK_BUS_SS>, <&ccu CLK_SS>;
++			clock-names = "bus", "mod";
++		};
++
+ 		mmc0: mmc@1c0f000 {
+ 			compatible = "allwinner,sun9i-a80-mmc";
+ 			reg = <0x01c0f000 0x1000>;
+-- 
+2.21.0
 
-Yours,
-Linus Walleij
