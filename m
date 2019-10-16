@@ -2,257 +2,131 @@ Return-Path: <SRS0=0DWe=YJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A345FA372A
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 12:26:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2FA9FA372A
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 12:34:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 59334218DE
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 12:26:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D55B205F4
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 12:34:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="o14jG9dc";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="o14jG9dc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387685AbfJPM0y (ORCPT
+        id S2393111AbfJPMeQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Oct 2019 08:26:54 -0400
-Received: from imap1.codethink.co.uk ([176.9.8.82]:51121 "EHLO
-        imap1.codethink.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2390650AbfJPM0y (ORCPT
+        Wed, 16 Oct 2019 08:34:16 -0400
+Received: from bedivere.hansenpartnership.com ([66.63.167.143]:55966 "EHLO
+        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1733070AbfJPMeQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Oct 2019 08:26:54 -0400
-Received: from [167.98.27.226] (helo=rainbowdash.codethink.co.uk)
-        by imap1.codethink.co.uk with esmtpsa (Exim 4.84_2 #1 (Debian))
-        id 1iKiNu-0007GA-ME; Wed, 16 Oct 2019 13:26:34 +0100
-Received: from ben by rainbowdash.codethink.co.uk with local (Exim 4.92.2)
-        (envelope-from <ben@rainbowdash.codethink.co.uk>)
-        id 1iKiNu-0000aZ-6f; Wed, 16 Oct 2019 13:26:34 +0100
-From:   "Ben Dooks (Codethink)" <ben.dooks@codethink.co.uk>
-To:     linux-kernel@lists.codethink.co.uk
-Cc:     "Ben Dooks (Codethink)" <ben.dooks@codethink.co.uk>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Ludovic Desroches <ludovic.desroches@microchip.com>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: atmel - fix data types for __be{32,64}
-Date:   Wed, 16 Oct 2019 13:26:33 +0100
-Message-Id: <20191016122633.2220-1-ben.dooks@codethink.co.uk>
-X-Mailer: git-send-email 2.23.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Wed, 16 Oct 2019 08:34:16 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 95DF98EE0CC;
+        Wed, 16 Oct 2019 05:34:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
+        s=20151216; t=1571229255;
+        bh=DLovgWcYpoVQPuDx5Rz7kbFf0gXtdi0u6vI43N1Bp0g=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=o14jG9dc+ikKCo66qGBQlCFm7kBAJKESbhF9cGoKLps4Qdla9QfbpwQZTQdxwy4pr
+         Ie8/keP0YBtAJc2dqVABjG8Bk+7XZ8GO0TIJNzabgoJEmWxtYSrJ6FVvTTQf0x74lS
+         fmlDUGpZZHSpfBzrcxRH1i4cN9PklcmjSLJN2XEM=
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id MeFCJHFdFf8g; Wed, 16 Oct 2019 05:34:15 -0700 (PDT)
+Received: from [192.168.100.84] (unknown [24.246.103.29])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 61D5F8EE02B;
+        Wed, 16 Oct 2019 05:34:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
+        s=20151216; t=1571229255;
+        bh=DLovgWcYpoVQPuDx5Rz7kbFf0gXtdi0u6vI43N1Bp0g=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=o14jG9dc+ikKCo66qGBQlCFm7kBAJKESbhF9cGoKLps4Qdla9QfbpwQZTQdxwy4pr
+         Ie8/keP0YBtAJc2dqVABjG8Bk+7XZ8GO0TIJNzabgoJEmWxtYSrJ6FVvTTQf0x74lS
+         fmlDUGpZZHSpfBzrcxRH1i4cN9PklcmjSLJN2XEM=
+Message-ID: <1571229252.3477.7.camel@HansenPartnership.com>
+Subject: Re: [PATCH] KEYS: asym_tpm: Switch to get_random_bytes()
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+Cc:     "Safford, David (GE Global Research, US)" <david.safford@ge.com>,
+        Ken Goldman <kgold@linux.ibm.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>,
+        "open list:ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Date:   Wed, 16 Oct 2019 08:34:12 -0400
+In-Reply-To: <20191016110031.GE10184@linux.intel.com>
+References: <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2A22E@ALPMBAPA12.e2k.ad.ge.com>
+         <20191004182711.GC6945@linux.intel.com>
+         <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2A38B@ALPMBAPA12.e2k.ad.ge.com>
+         <20191007000520.GA17116@linux.intel.com>
+         <59b88042-9c56-c891-f75e-7c0719eb5ff9@linux.ibm.com>
+         <20191008234935.GA13926@linux.intel.com>
+         <20191008235339.GB13926@linux.intel.com>
+         <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2B995@ALPMBAPA12.e2k.ad.ge.com>
+         <20191014190033.GA15552@linux.intel.com>
+         <1571081397.3728.9.camel@HansenPartnership.com>
+         <20191016110031.GE10184@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.26.6 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The driver uses a couple of buffers that seem to
-be __be32 or __be64 fields, but declares them as
-u32. This means there are a number of warnings
-from sparse due to casting to/from __beXXX.
+On Wed, 2019-10-16 at 14:00 +0300, Jarkko Sakkinen wrote:
+> On Mon, Oct 14, 2019 at 12:29:57PM -0700, James Bottomley wrote:
+> > The job of the in-kernel rng is simply to produce a mixed entropy
+> > pool from which we can draw random numbers.  The idea is that quite
+> > a few attackers have identified the rng as being a weak point in
+> > the security architecture of the kernel, so if we mix entropy from
+> > all the sources we have, you have to compromise most of them to
+> > gain some predictive power over the rng sequence.
+> 
+> The documentation says that krng is suitable for key generation.
+> Should the documentation changed to state that it is unsuitable?
 
-Fix these by changing the types of the buffer
-and the associated variables.
+How do you get that from the argument above?  The krng is about the
+best we have in terms of unpredictable key generation, so of course it
+is suitable ... provided you give the entropy enough time to have
+sufficient entropy.  It's also not foolproof ... Bernstein did a
+speculation about how you could compromise all our input sources for
+entropy.  However the more sources we have the more difficult the
+compromise becomes.
 
-drivers/crypto/atmel-aes.c:1023:15: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1023:15: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1023:15: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1023:15: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1023:15: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1023:15: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1059:28: warning: incorrect type in assignment (different base types)
-drivers/crypto/atmel-aes.c:1059:28:    expected unsigned int
-drivers/crypto/atmel-aes.c:1059:28:    got restricted __be32 [usertype]
-drivers/crypto/atmel-aes.c:1550:28: warning: incorrect type in assignment (different base types)
-drivers/crypto/atmel-aes.c:1550:28:    expected unsigned int
-drivers/crypto/atmel-aes.c:1550:28:    got restricted __be32 [usertype]
-drivers/crypto/atmel-aes.c:1561:39: warning: incorrect type in assignment (different base types)
-drivers/crypto/atmel-aes.c:1561:39:    expected unsigned long long [usertype]
-drivers/crypto/atmel-aes.c:1561:39:    got restricted __be64 [usertype]
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:17: warning: cast to restricted __be32
-drivers/crypto/atmel-aes.c:1599:15: warning: incorrect type in assignment (different base types)
-drivers/crypto/atmel-aes.c:1599:15:    expected unsigned int [usertype]
-drivers/crypto/atmel-aes.c:1599:15:    got restricted __be32 [usertype]
-drivers/crypto/atmel-aes.c:1692:17: warning: incorrect type in assignment (different base types)
-drivers/crypto/atmel-aes.c:1692:17:    expected unsigned long long [usertype]
-drivers/crypto/atmel-aes.c:1692:17:    got restricted __be64 [usertype]
-drivers/crypto/atmel-aes.c:1693:17: warning: incorrect type in assignment (different base types)
-drivers/crypto/atmel-aes.c:1693:17:    expected unsigned long long [usertype]
-drivers/crypto/atmel-aes.c:1693:17:    got restricted __be64 [usertype]
-drivers/crypto/atmel-aes.c:1888:63: warning: incorrect type in initializer (different base types)
-drivers/crypto/atmel-aes.c:1888:63:    expected unsigned int
-drivers/crypto/atmel-aes.c:1888:63:    got restricted __le32 [usertype]
+> > The point is not how certified the TPM RNG is, the point is that
+> > it's a single source and if we rely on it solely for some
+> > applications, like trusted keys, then it gives the attackers a
+> > single known point to go after.  This may be impossible for script
+> > kiddies, but it won't be for nation states ... are you going to
+> > exclusively trust the random number you got from your chinese
+> > certified TPM?
+> 
+> I'd suggest approach where TPM RNG result is xored with krng result.
 
-Signed-off-by: Ben Dooks <ben.dooks@codethink.co.uk>
----
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Nicolas Ferre <nicolas.ferre@microchip.com>
-Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>
-Cc: Ludovic Desroches <ludovic.desroches@microchip.com>
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: linux-kernel@vger.kernel.org
-.. (open list)
----
- drivers/crypto/atmel-aes.c | 30 +++++++++++++++---------------
- 1 file changed, 15 insertions(+), 15 deletions(-)
+reversible ciphers are generally frowned upon in random number
+generation, that's why the krng uses chacha20.  In general I think we
+shouldn't try to code our own mixing and instead should get the krng to
+do it for us using whatever the algorithm du jour that the crypto guys
+have blessed is.  That's why I proposed adding the TPM output to the
+krng as entropy input and then taking the output of the krng.
 
-diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
-index 026f193556f9..6e658be32c2c 100644
---- a/drivers/crypto/atmel-aes.c
-+++ b/drivers/crypto/atmel-aes.c
-@@ -117,7 +117,7 @@ struct atmel_aes_ctx {
- struct atmel_aes_ctr_ctx {
- 	struct atmel_aes_base_ctx	base;
- 
--	u32			iv[AES_BLOCK_SIZE / sizeof(u32)];
-+	__be32			iv[AES_BLOCK_SIZE / sizeof(u32)];
- 	size_t			offset;
- 	struct scatterlist	src[2];
- 	struct scatterlist	dst[2];
-@@ -129,13 +129,13 @@ struct atmel_aes_gcm_ctx {
- 	struct scatterlist	src[2];
- 	struct scatterlist	dst[2];
- 
--	u32			j0[AES_BLOCK_SIZE / sizeof(u32)];
-+	__be32			j0[AES_BLOCK_SIZE / sizeof(u32)];
- 	u32			tag[AES_BLOCK_SIZE / sizeof(u32)];
--	u32			ghash[AES_BLOCK_SIZE / sizeof(u32)];
-+	__be32			ghash[AES_BLOCK_SIZE / sizeof(u32)];
- 	size_t			textlen;
- 
--	const u32		*ghash_in;
--	u32			*ghash_out;
-+	const __be32		*ghash_in;
-+	__be32			*ghash_out;
- 	atmel_aes_fn_t		ghash_resume;
- };
- 
-@@ -388,13 +388,13 @@ static void atmel_aes_write_n(struct atmel_aes_dev *dd, u32 offset,
- }
- 
- static inline void atmel_aes_read_block(struct atmel_aes_dev *dd, u32 offset,
--					u32 *value)
-+					void *value)
- {
- 	atmel_aes_read_n(dd, offset, value, SIZE_IN_WORDS(AES_BLOCK_SIZE));
- }
- 
- static inline void atmel_aes_write_block(struct atmel_aes_dev *dd, u32 offset,
--					 const u32 *value)
-+					 const void *value)
- {
- 	atmel_aes_write_n(dd, offset, value, SIZE_IN_WORDS(AES_BLOCK_SIZE));
- }
-@@ -530,7 +530,7 @@ static inline int atmel_aes_complete(struct atmel_aes_dev *dd, int err)
- }
- 
- static void atmel_aes_write_ctrl_key(struct atmel_aes_dev *dd, bool use_dma,
--				     const u32 *iv, const u32 *key, int keylen)
-+				     const __be32 *iv, const u32 *key, int keylen)
- {
- 	u32 valmr = 0;
- 
-@@ -561,7 +561,7 @@ static void atmel_aes_write_ctrl_key(struct atmel_aes_dev *dd, bool use_dma,
- }
- 
- static inline void atmel_aes_write_ctrl(struct atmel_aes_dev *dd, bool use_dma,
--					const u32 *iv)
-+					const __be32 *iv)
- 
- {
- 	atmel_aes_write_ctrl_key(dd, use_dma, iv,
-@@ -1450,7 +1450,7 @@ static struct crypto_alg aes_cfb64_alg = {
- 
- static int atmel_aes_gcm_ghash(struct atmel_aes_dev *dd,
- 			       const u32 *data, size_t datalen,
--			       const u32 *ghash_in, u32 *ghash_out,
-+			       const __be32 *ghash_in, __be32 *ghash_out,
- 			       atmel_aes_fn_t resume);
- static int atmel_aes_gcm_ghash_init(struct atmel_aes_dev *dd);
- static int atmel_aes_gcm_ghash_finalize(struct atmel_aes_dev *dd);
-@@ -1471,7 +1471,7 @@ atmel_aes_gcm_ctx_cast(struct atmel_aes_base_ctx *ctx)
- 
- static int atmel_aes_gcm_ghash(struct atmel_aes_dev *dd,
- 			       const u32 *data, size_t datalen,
--			       const u32 *ghash_in, u32 *ghash_out,
-+			       const __be32 *ghash_in, __be32 *ghash_out,
- 			       atmel_aes_fn_t resume)
- {
- 	struct atmel_aes_gcm_ctx *ctx = atmel_aes_gcm_ctx_cast(dd->ctx);
-@@ -1558,7 +1558,7 @@ static int atmel_aes_gcm_start(struct atmel_aes_dev *dd)
- 
- 	memcpy(data, iv, ivsize);
- 	memset(data + ivsize, 0, padlen + sizeof(u64));
--	((u64 *)(data + datalen))[-1] = cpu_to_be64(ivsize * 8);
-+	((__be64 *)(data + datalen))[-1] = cpu_to_be64(ivsize * 8);
- 
- 	return atmel_aes_gcm_ghash(dd, (const u32 *)data, datalen,
- 				   NULL, ctx->j0, atmel_aes_gcm_process);
-@@ -1591,7 +1591,7 @@ static int atmel_aes_gcm_length(struct atmel_aes_dev *dd)
- {
- 	struct atmel_aes_gcm_ctx *ctx = atmel_aes_gcm_ctx_cast(dd->ctx);
- 	struct aead_request *req = aead_request_cast(dd->areq);
--	u32 j0_lsw, *j0 = ctx->j0;
-+	__be32 j0_lsw, *j0 = ctx->j0;
- 	size_t padlen;
- 
- 	/* Write incr32(J0) into IV. */
-@@ -1674,7 +1674,7 @@ static int atmel_aes_gcm_tag_init(struct atmel_aes_dev *dd)
- {
- 	struct atmel_aes_gcm_ctx *ctx = atmel_aes_gcm_ctx_cast(dd->ctx);
- 	struct aead_request *req = aead_request_cast(dd->areq);
--	u64 *data = dd->buf;
-+	__be64 *data = dd->buf;
- 
- 	if (likely(dd->flags & AES_FLAGS_GTAGEN)) {
- 		if (!(atmel_aes_read(dd, AES_ISR) & AES_INT_TAGRDY)) {
-@@ -1885,7 +1885,7 @@ static int atmel_aes_xts_process_data(struct atmel_aes_dev *dd)
- 	struct ablkcipher_request *req = ablkcipher_request_cast(dd->areq);
- 	bool use_dma = (req->nbytes >= ATMEL_AES_DMA_THRESHOLD);
- 	u32 tweak[AES_BLOCK_SIZE / sizeof(u32)];
--	static const u32 one[AES_BLOCK_SIZE / sizeof(u32)] = {cpu_to_le32(1), };
-+	static const __le32 one[AES_BLOCK_SIZE / sizeof(u32)] = {cpu_to_le32(1), };
- 	u8 *tweak_bytes = (u8 *)tweak;
- 	int i;
- 
--- 
-2.23.0
+James
+
+> > Remember also that the attack doesn't have to be to the TPM only,
+> > it could be the pathway by which we get the random number, which
+> > involves components outside of the TPM certification.
+> 
+> Yeah, I do get this.
+> 
+> /Jarkko
+> 
 
