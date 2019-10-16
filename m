@@ -2,87 +2,88 @@ Return-Path: <SRS0=0DWe=YJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A30D5ECE58F
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 00:48:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EAC0ECE58F
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 01:34:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7818D20872
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 00:48:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qU7sjU5u"
+	by mail.kernel.org (Postfix) with ESMTP id D58C820873
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 01:34:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388624AbfJPAs2 (ORCPT
+        id S1726591AbfJPBep (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 15 Oct 2019 20:48:28 -0400
-Received: from bombadil.infradead.org ([198.137.202.133]:41042 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726362AbfJPAs2 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 15 Oct 2019 20:48:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=pf6bbQYx9hUE+6rFYONnUuY9TK+2idQNGK21XGkY2xo=; b=qU7sjU5uXXip0NogETsugUAi3
-        jtRE/3LcBLi9RdoLLx/XlPfCCqP/SEyUzVoQs8WqvIypx8a18jDctjkK4Re6BQG2NHTAYVe2clHx9
-        Fc3+P2BkHiuODGY67O+nE61aVcc/8GpDa/jzNwRrmBaE2id/NXw+dKOwpSr6xQnMsQ4fuePOFe+js
-        JIH8ZaatXc+A7TE44A1jvUJ6kUvX7Z+zadosMUcWzpR9cy44tC5hgJou/w2EXK7tpk4l7WdxUdnN+
-        jZ8v5qs2XXayMAz4jgQI/jbaEXemK0icN8biguipxmOtXSmNRCQ8+4zKpkdeeh7JWzTQO0Suarzpb
-        TMB4py35Q==;
-Received: from willy by bombadil.infradead.org with local (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1iKXUD-0005ri-Tc; Wed, 16 Oct 2019 00:48:21 +0000
-Date:   Tue, 15 Oct 2019 17:48:21 -0700
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Changbin Du <changbin.du@gmail.com>
-Cc:     Thomas Zimmermann <tzimmermann@suse.de>, Tim.Bird@sony.com,
-        jani.nikula@linux.intel.com, corbet@lwn.net,
-        linux-doc@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-fpga@vger.kernel.org, linux-usb@vger.kernel.org,
-        linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
-        dri-devel@lists.freedesktop.org, linux-mm@kvack.org,
-        linux-crypto@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        intel-gfx@lists.freedesktop.org
-Subject: Re: [PATCH] kernel-doc: rename the kernel-doc directive 'functions'
- to 'specific'
-Message-ID: <20191016004821.GI32665@bombadil.infradead.org>
-References: <20191013055359.23312-1-changbin.du@gmail.com>
- <875zkrd7nq.fsf@intel.com>
- <ECADFF3FD767C149AD96A924E7EA6EAF977CAF09@USCULXMSG01.am.sony.com>
- <7e7557b5-469f-3e63-6254-53dab2d7234a@suse.de>
- <20191015115439.GE32665@bombadil.infradead.org>
- <20191016000322.7dnuwvxqtdbg7clq@mail.google.com>
+        Tue, 15 Oct 2019 21:34:45 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:3775 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726083AbfJPBep (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 15 Oct 2019 21:34:45 -0400
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 94D242E291AD95F441B4;
+        Wed, 16 Oct 2019 09:34:43 +0800 (CST)
+Received: from [127.0.0.1] (10.57.77.109) by DGGEMS405-HUB.china.huawei.com
+ (10.3.19.205) with Microsoft SMTP Server id 14.3.439.0; Wed, 16 Oct 2019
+ 09:34:33 +0800
+Subject: Re: [PATCH] crypto: hisilicon: Fix misuse of GENMASK macro
+To:     Rikard Falkeborn <rikard.falkeborn@gmail.com>
+References: <1569835209-44326-2-git-send-email-xuzaibo@huawei.com>
+ <20191015201330.25973-1-rikard.falkeborn@gmail.com>
+CC:     <davem@davemloft.net>, <forest.zhouchang@huawei.com>,
+        <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linuxarm@huawei.com>,
+        <tanghui20@huawei.com>
+From:   Xu Zaibo <xuzaibo@huawei.com>
+Message-ID: <006a5fca-3493-9b35-7621-aa9b2a9290d7@huawei.com>
+Date:   Wed, 16 Oct 2019 09:34:33 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191016000322.7dnuwvxqtdbg7clq@mail.google.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+In-Reply-To: <20191015201330.25973-1-rikard.falkeborn@gmail.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.57.77.109]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 16, 2019 at 08:03:24AM +0800, Changbin Du wrote:
-> On Tue, Oct 15, 2019 at 04:54:39AM -0700, Matthew Wilcox wrote:
-> > On Tue, Oct 15, 2019 at 11:25:53AM +0200, Thomas Zimmermann wrote:
-> > > > My preference would be to use 'symbols'.  I tried to come up with something
-> > > > but 'symbols' is better than anything I came up with.
-> > > 
-> > > Maybe 'interfaces' or 'artifacts'. The term 'symbols' is just as
-> > > imprecise as 'functions'.
-> > 
-> > I suggested 'identifier' because that's the term used in the C spec (6.2.1):
-> > 
-> > : An identifier can denote an object; a function; a tag or a member
-> > : of a structure, union, or enumeration; a typedef name; a label name;
-> > : a macro name; or a macro parameter.
->
-> I also prefer this one now. I was looking for something like this. My original
-> idea is 'prototype', but that is only for function.
+Agree with you, thanks!
 
-We could also go with 'declaration' or 'definition'.  But I prefer
-'identifier'.
+Zaibo
+
+.
+
+On 2019/10/16 4:13, Rikard Falkeborn wrote:
+> Arguments are supposed to be ordered high then low.
+>
+> Fixes: c8b4b477079d ("crypto: hisilicon - add HiSilicon HPRE accelerator")
+> Signed-off-by: Rikard Falkeborn <rikard.falkeborn@gmail.com>
+> ---
+> Spotted when trying to introduce compile time checking that the order
+> of the arguments to GENMASK are correct [0]. I have only compile tested
+> the patch.
+>
+> [0]: https://lore.kernel.org/lkml/20191009214502.637875-1-rikard.falkeborn@gmail.com/
+>
+>   drivers/crypto/hisilicon/hpre/hpre_main.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+> index ca945b29632b..34e0424410bf 100644
+> --- a/drivers/crypto/hisilicon/hpre/hpre_main.c
+> +++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+> @@ -116,8 +116,8 @@ static const struct hpre_hw_error hpre_hw_errors[] = {
+>   	{ .int_msk = BIT(7), .msg = "hpre_cltr2_htbt_tm_out_err" },
+>   	{ .int_msk = BIT(8), .msg = "hpre_cltr3_htbt_tm_out_err" },
+>   	{ .int_msk = BIT(9), .msg = "hpre_cltr4_htbt_tm_out_err" },
+> -	{ .int_msk = GENMASK(10, 15), .msg = "hpre_ooo_rdrsp_err" },
+> -	{ .int_msk = GENMASK(16, 21), .msg = "hpre_ooo_wrrsp_err" },
+> +	{ .int_msk = GENMASK(15, 10), .msg = "hpre_ooo_rdrsp_err" },
+> +	{ .int_msk = GENMASK(21, 16), .msg = "hpre_ooo_wrrsp_err" },
+>   	{ /* sentinel */ }
+>   };
+>   
+
+
