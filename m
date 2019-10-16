@@ -2,93 +2,91 @@ Return-Path: <SRS0=0DWe=YJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FABCFA372A
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 10:47:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5779FA372B
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 11:00:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 32D7D2067D
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 10:47:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9FE1C2082C
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 11:00:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392525AbfJPKqr (ORCPT
+        id S2388792AbfJPLAg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Oct 2019 06:46:47 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:43510 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2392422AbfJPKqr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Oct 2019 06:46:47 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 58013CFF3E76FCB7C8C4;
-        Wed, 16 Oct 2019 18:46:44 +0800 (CST)
-Received: from localhost (10.133.213.239) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.439.0; Wed, 16 Oct 2019
- 18:46:34 +0800
-From:   YueHaibing <yuehaibing@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <mpm@selenic.com>, <arnd@arndb.de>,
-        <gregkh@linuxfoundation.org>, <nicolas.ferre@microchip.com>,
-        <alexandre.belloni@bootlin.com>, <ludovic.desroches@microchip.com>,
-        <f.fainelli@gmail.com>, <rjui@broadcom.com>,
-        <sbranden@broadcom.com>, <bcm-kernel-feedback-list@broadcom.com>,
-        <eric@anholt.net>, <wahrenst@gmx.net>, <l.stelmach@samsung.com>,
-        <kgene@kernel.org>, <krzk@kernel.org>, <khilman@baylibre.com>,
-        <dsaxena@plexity.net>, <patrice.chotard@st.com>
-CC:     <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>,
-        <linux-rpi-kernel@lists.infradead.org>,
-        <linux-samsung-soc@vger.kernel.org>,
-        <linux-amlogic@lists.infradead.org>,
-        <linuxppc-dev@lists.ozlabs.org>, YueHaibing <yuehaibing@huawei.com>
-Subject: [PATCH -next 00/13] hwrng: use devm_platform_ioremap_resource() to simplify code
-Date:   Wed, 16 Oct 2019 18:46:08 +0800
-Message-ID: <20191016104621.26056-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.10.2.windows.1
+        Wed, 16 Oct 2019 07:00:36 -0400
+Received: from mga09.intel.com ([134.134.136.24]:3400 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726083AbfJPLAg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 16 Oct 2019 07:00:36 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga102.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Oct 2019 04:00:35 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,303,1566889200"; 
+   d="scan'208";a="225749572"
+Received: from jsakkine-mobl1.tm.intel.com (HELO localhost) ([10.237.50.130])
+  by fmsmga002.fm.intel.com with ESMTP; 16 Oct 2019 04:00:32 -0700
+Date:   Wed, 16 Oct 2019 14:00:31 +0300
+From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+To:     James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc:     "Safford, David (GE Global Research, US)" <david.safford@ge.com>,
+        Ken Goldman <kgold@linux.ibm.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>,
+        "open list:ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] KEYS: asym_tpm: Switch to get_random_bytes()
+Message-ID: <20191016110031.GE10184@linux.intel.com>
+References: <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2A22E@ALPMBAPA12.e2k.ad.ge.com>
+ <20191004182711.GC6945@linux.intel.com>
+ <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2A38B@ALPMBAPA12.e2k.ad.ge.com>
+ <20191007000520.GA17116@linux.intel.com>
+ <59b88042-9c56-c891-f75e-7c0719eb5ff9@linux.ibm.com>
+ <20191008234935.GA13926@linux.intel.com>
+ <20191008235339.GB13926@linux.intel.com>
+ <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2B995@ALPMBAPA12.e2k.ad.ge.com>
+ <20191014190033.GA15552@linux.intel.com>
+ <1571081397.3728.9.camel@HansenPartnership.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.133.213.239]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1571081397.3728.9.camel@HansenPartnership.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-devm_platform_ioremap_resource() internally have platform_get_resource()
-and devm_ioremap_resource() in it. So instead of calling them separately
-use devm_platform_ioremap_resource() directly.
+On Mon, Oct 14, 2019 at 12:29:57PM -0700, James Bottomley wrote:
+> The job of the in-kernel rng is simply to produce a mixed entropy pool
+> from which we can draw random numbers.  The idea is that quite a few
+> attackers have identified the rng as being a weak point in the security
+> architecture of the kernel, so if we mix entropy from all the sources
+> we have, you have to compromise most of them to gain some predictive
+> power over the rng sequence.
 
-YueHaibing (13):
-  hwrng: atmel - use devm_platform_ioremap_resource() to simplify code
-  hwrng: bcm2835 - use devm_platform_ioremap_resource() to simplify code
-  hwrng: exynos - use devm_platform_ioremap_resource() to simplify code
-  hwrng: hisi - use devm_platform_ioremap_resource() to simplify code
-  hwrng: ks-sa - use devm_platform_ioremap_resource() to simplify code
-  hwrng: meson - use devm_platform_ioremap_resource() to simplify code
-  hwrng: npcm - use devm_platform_ioremap_resource() to simplify code
-  hwrng: omap - use devm_platform_ioremap_resource() to simplify code
-  hwrng: pasemi - use devm_platform_ioremap_resource() to simplify code
-  hwrng: pic32 - use devm_platform_ioremap_resource() to simplify code
-  hwrng: st - use devm_platform_ioremap_resource() to simplify code
-  hwrng: tx4939 - use devm_platform_ioremap_resource() to simplify code
-  hwrng: xgene - use devm_platform_ioremap_resource() to simplify code
+The documentation says that krng is suitable for key generation.
+Should the documentation changed to state that it is unsuitable?
 
- drivers/char/hw_random/atmel-rng.c   | 4 +---
- drivers/char/hw_random/bcm2835-rng.c | 5 +----
- drivers/char/hw_random/exynos-trng.c | 4 +---
- drivers/char/hw_random/hisi-rng.c    | 4 +---
- drivers/char/hw_random/ks-sa-rng.c   | 4 +---
- drivers/char/hw_random/meson-rng.c   | 4 +---
- drivers/char/hw_random/npcm-rng.c    | 4 +---
- drivers/char/hw_random/omap-rng.c    | 4 +---
- drivers/char/hw_random/pasemi-rng.c  | 4 +---
- drivers/char/hw_random/pic32-rng.c   | 4 +---
- drivers/char/hw_random/st-rng.c      | 4 +---
- drivers/char/hw_random/tx4939-rng.c  | 4 +---
- drivers/char/hw_random/xgene-rng.c   | 4 +---
- 13 files changed, 13 insertions(+), 40 deletions(-)
+> The point is not how certified the TPM RNG is, the point is that it's a
+> single source and if we rely on it solely for some applications, like
+> trusted keys, then it gives the attackers a single known point to go
+> after.  This may be impossible for script kiddies, but it won't be for
+> nation states ... are you going to exclusively trust the random number
+> you got from your chinese certified TPM?
 
--- 
-2.7.4
+I'd suggest approach where TPM RNG result is xored with krng result.
 
+> Remember also that the attack doesn't have to be to the TPM only, it
+> could be the pathway by which we get the random number, which involves
+> components outside of the TPM certification.
 
+Yeah, I do get this.
+
+/Jarkko
