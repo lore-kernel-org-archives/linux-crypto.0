@@ -7,25 +7,25 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F29DDFA372B
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 10:47:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03A7FFA372B
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 10:47:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D47252067D
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 10:47:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D027C2067D
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 10:47:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728892AbfJPKrn (ORCPT
+        id S2392551AbfJPKqy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Oct 2019 06:47:43 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:3782 "EHLO huawei.com"
+        Wed, 16 Oct 2019 06:46:54 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:44064 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2404658AbfJPKq5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Oct 2019 06:46:57 -0400
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 6FD86D69AC68E35F313E;
-        Wed, 16 Oct 2019 18:46:55 +0800 (CST)
-Received: from localhost (10.133.213.239) by DGGEMS410-HUB.china.huawei.com
- (10.3.19.210) with Microsoft SMTP Server id 14.3.439.0; Wed, 16 Oct 2019
- 18:46:48 +0800
+        id S1727291AbfJPKqx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 16 Oct 2019 06:46:53 -0400
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 86ECA4684DCFA3037407;
+        Wed, 16 Oct 2019 18:46:51 +0800 (CST)
+Received: from localhost (10.133.213.239) by DGGEMS407-HUB.china.huawei.com
+ (10.3.19.207) with Microsoft SMTP Server id 14.3.439.0; Wed, 16 Oct 2019
+ 18:46:45 +0800
 From:   YueHaibing <yuehaibing@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <mpm@selenic.com>, <arnd@arndb.de>,
         <gregkh@linuxfoundation.org>, <nicolas.ferre@microchip.com>,
@@ -42,9 +42,9 @@ CC:     <linux-crypto@vger.kernel.org>,
         <linux-samsung-soc@vger.kernel.org>,
         <linux-amlogic@lists.infradead.org>,
         <linuxppc-dev@lists.ozlabs.org>, YueHaibing <yuehaibing@huawei.com>
-Subject: [PATCH -next 06/13] hwrng: meson - use devm_platform_ioremap_resource() to simplify code
-Date:   Wed, 16 Oct 2019 18:46:14 +0800
-Message-ID: <20191016104621.26056-7-yuehaibing@huawei.com>
+Subject: [PATCH -next 05/13] hwrng: ks-sa - use devm_platform_ioremap_resource() to simplify code
+Date:   Wed, 16 Oct 2019 18:46:13 +0800
+Message-ID: <20191016104621.26056-6-yuehaibing@huawei.com>
 X-Mailer: git-send-email 2.10.2.windows.1
 In-Reply-To: <20191016104621.26056-1-yuehaibing@huawei.com>
 References: <20191016104621.26056-1-yuehaibing@huawei.com>
@@ -62,30 +62,30 @@ This is detected by coccinelle.
 
 Signed-off-by: YueHaibing <yuehaibing@huawei.com>
 ---
- drivers/char/hw_random/meson-rng.c | 4 +---
+ drivers/char/hw_random/ks-sa-rng.c | 4 +---
  1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/drivers/char/hw_random/meson-rng.c b/drivers/char/hw_random/meson-rng.c
-index 76e693d..e446236 100644
---- a/drivers/char/hw_random/meson-rng.c
-+++ b/drivers/char/hw_random/meson-rng.c
-@@ -42,7 +42,6 @@ static int meson_rng_probe(struct platform_device *pdev)
- {
- 	struct device *dev = &pdev->dev;
- 	struct meson_rng_data *data;
--	struct resource *res;
- 	int ret;
+diff --git a/drivers/char/hw_random/ks-sa-rng.c b/drivers/char/hw_random/ks-sa-rng.c
+index a674300..556400a 100644
+--- a/drivers/char/hw_random/ks-sa-rng.c
++++ b/drivers/char/hw_random/ks-sa-rng.c
+@@ -174,7 +174,6 @@ static int ks_sa_rng_probe(struct platform_device *pdev)
+ 	struct ks_sa_rng	*ks_sa_rng;
+ 	struct device		*dev = &pdev->dev;
+ 	int			ret;
+-	struct resource		*mem;
  
- 	data = devm_kzalloc(dev, sizeof(*data), GFP_KERNEL);
-@@ -51,8 +50,7 @@ static int meson_rng_probe(struct platform_device *pdev)
+ 	ks_sa_rng = devm_kzalloc(dev, sizeof(*ks_sa_rng), GFP_KERNEL);
+ 	if (!ks_sa_rng)
+@@ -190,8 +189,7 @@ static int ks_sa_rng_probe(struct platform_device *pdev)
+ 	};
+ 	ks_sa_rng->rng.priv = (unsigned long)dev;
  
- 	data->pdev = pdev;
- 
--	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
--	data->base = devm_ioremap_resource(dev, res);
-+	data->base = devm_platform_ioremap_resource(pdev, 0);
- 	if (IS_ERR(data->base))
- 		return PTR_ERR(data->base);
+-	mem = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-	ks_sa_rng->reg_rng = devm_ioremap_resource(dev, mem);
++	ks_sa_rng->reg_rng = devm_platform_ioremap_resource(pdev, 0);
+ 	if (IS_ERR(ks_sa_rng->reg_rng))
+ 		return PTR_ERR(ks_sa_rng->reg_rng);
  
 -- 
 2.7.4
