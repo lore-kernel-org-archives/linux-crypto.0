@@ -2,153 +2,105 @@ Return-Path: <SRS0=0DWe=YJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 535B9C4360C
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 07:12:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89003C4360C
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 08:01:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2C07D2082C
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 07:12:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=alien8.de header.i=@alien8.de header.b="jBjaAwnW"
+	by mail.kernel.org (Postfix) with ESMTP id 65FB22082C
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 08:01:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727365AbfJPHMk (ORCPT
+        id S2390578AbfJPIBN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Oct 2019 03:12:40 -0400
-Received: from mail.skyhub.de ([5.9.137.197]:34946 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726405AbfJPHMk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Oct 2019 03:12:40 -0400
-Received: from zn.tnic (p200300EC2F093900E460E23B12F7A6AE.dip0.t-ipconnect.de [IPv6:2003:ec:2f09:3900:e460:e23b:12f7:a6ae])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id A47CF1EC0CA8;
-        Wed, 16 Oct 2019 09:12:38 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1571209958;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=hCMIEpQo2zZVtw+c7T27PQGWxK9R4yH4oLgjyYmdmEs=;
-        b=jBjaAwnWbMtQO5KJkx8Ds4V597Vk3RcnpH9z7AXPZBtVtzOME4gu6KPFZ3LOB+4xl79+Lj
-        8kPodzuqb3NA7rSD0JFdUgz7ajO/9BH8XZe+Q1k900RYstacd4xK+1KOE2EULuWK9npP7U
-        hYwBeygUc058xRGplSLnZm1PpMuZkH8=
-Date:   Wed, 16 Oct 2019 09:12:30 +0200
-From:   Borislav Petkov <bp@alien8.de>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     Jiri Slaby <jslaby@suse.cz>, tglx@linutronix.de, mingo@redhat.com,
-        hpa@zytor.com, x86@kernel.org, linux-arch@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
-        Matt Fleming <matt@codeblueprint.co.uk>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Juergen Gross <jgross@suse.com>, linux-crypto@vger.kernel.org,
-        linux-pm@vger.kernel.org, linux-efi@vger.kernel.org,
-        xen-devel@lists.xenproject.org
-Subject: Re: [PATCH v9 24/28] x86_64/asm: Change all ENTRY+ENDPROC to
- SYM_FUNC_*
-Message-ID: <20191016071230.GD1138@zn.tnic>
-References: <20191011115108.12392-1-jslaby@suse.cz>
- <20191011115108.12392-25-jslaby@suse.cz>
+        Wed, 16 Oct 2019 04:01:13 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:14366 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1730874AbfJPIBN (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 16 Oct 2019 04:01:13 -0400
+Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id x9G7gMtl001121
+        for <linux-crypto@vger.kernel.org>; Wed, 16 Oct 2019 04:01:11 -0400
+Received: from e06smtp05.uk.ibm.com (e06smtp05.uk.ibm.com [195.75.94.101])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2vnvpy5a1q-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Wed, 16 Oct 2019 04:01:11 -0400
+Received: from localhost
+        by e06smtp05.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <heiko.carstens@de.ibm.com>;
+        Wed, 16 Oct 2019 09:01:09 +0100
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp05.uk.ibm.com (192.168.101.135) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Wed, 16 Oct 2019 09:01:06 +0100
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (b06wcsmtp001.portsmouth.uk.ibm.com [9.149.105.160])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id x9G814l543516312
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 16 Oct 2019 08:01:04 GMT
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BB37DA4064;
+        Wed, 16 Oct 2019 08:01:04 +0000 (GMT)
+Received: from b06wcsmtp001.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 82BA4A4065;
+        Wed, 16 Oct 2019 08:01:04 +0000 (GMT)
+Received: from osiris (unknown [9.152.212.85])
+        by b06wcsmtp001.portsmouth.uk.ibm.com (Postfix) with ESMTPS;
+        Wed, 16 Oct 2019 08:01:04 +0000 (GMT)
+Date:   Wed, 16 Oct 2019 10:01:03 +0200
+From:   Heiko Carstens <heiko.carstens@de.ibm.com>
+To:     Eric Biggers <ebiggers@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>,
+        Harald Freudenberger <freude@linux.ibm.com>
+Subject: Re: [RFT PATCH 0/3] crypto: s390 - convert to skcipher API
+References: <20191012201809.160500-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191011115108.12392-25-jslaby@suse.cz>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20191012201809.160500-1-ebiggers@kernel.org>
+X-TM-AS-GCONF: 00
+x-cbid: 19101608-0020-0000-0000-000003797DB9
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 19101608-0021-0000-0000-000021CF9FF0
+Message-Id: <20191016080103.GA4267@osiris>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-10-16_03:,,
+ signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ malwarescore=0 suspectscore=1 phishscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 lowpriorityscore=0 mlxscore=0 impostorscore=0
+ mlxlogscore=999 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.0.1-1908290000 definitions=main-1910160072
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
-
-On Fri, Oct 11, 2019 at 01:51:04PM +0200, Jiri Slaby wrote:
-> These are all functions which are invoked from elsewhere, so annotate
-> them as global using the new SYM_FUNC_START. And their ENDPROC's by
-> SYM_FUNC_END.
+On Sat, Oct 12, 2019 at 01:18:06PM -0700, Eric Biggers wrote:
+> This series converts the glue code for the S390 CPACF implementations of
+> AES, DES, and 3DES modes from the deprecated "blkcipher" API to the
+> "skcipher" API.  This is needed in order for the blkcipher API to be
+> removed.
 > 
-> And make sure ENTRY/ENDPROC is not defined on X86_64, given these were
-> the last users.
+> I've compiled this patchset, and the conversion is very similar to that
+> which has been done for many other crypto drivers.  But I don't have the
+> hardware to test it, nor is S390 CPACF supported by QEMU.  So I really
+> need someone with the hardware to test it.  You can do so by setting:
+
+...
+
+> Eric Biggers (3):
+>   crypto: s390/aes - convert to skcipher API
+>   crypto: s390/paes - convert to skcipher API
+>   crypto: s390/des - convert to skcipher API
 > 
-> Signed-off-by: Jiri Slaby <jslaby@suse.cz>
-> Reviewed-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com> [hibernate]
-> Reviewed-by: Boris Ostrovsky <boris.ostrovsky@oracle.com> [xen bits]
-> Cc: "H. Peter Anvin" <hpa@zytor.com>
-> Cc: Borislav Petkov <bp@alien8.de>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: Ingo Molnar <mingo@redhat.com>
-> Cc: x86@kernel.org
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>
-> Cc: Len Brown <len.brown@intel.com>
-> Cc: Pavel Machek <pavel@ucw.cz>
-> Cc: Matt Fleming <matt@codeblueprint.co.uk>
-> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
-> Cc: Juergen Gross <jgross@suse.com>
-> Cc: linux-crypto@vger.kernel.org
-> Cc: linux-pm@vger.kernel.org
-> Cc: linux-efi@vger.kernel.org
-> Cc: xen-devel@lists.xenproject.org
-> ---
->  arch/x86/boot/compressed/efi_thunk_64.S      |  4 +-
->  arch/x86/boot/compressed/head_64.S           | 16 +++---
->  arch/x86/boot/compressed/mem_encrypt.S       |  8 +--
->  arch/x86/crypto/aegis128-aesni-asm.S         | 28 ++++-----
->  arch/x86/crypto/aes_ctrby8_avx-x86_64.S      | 12 ++--
->  arch/x86/crypto/aesni-intel_asm.S            | 60 ++++++++++----------
->  arch/x86/crypto/aesni-intel_avx-x86_64.S     | 32 +++++------
->  arch/x86/crypto/blowfish-x86_64-asm_64.S     | 16 +++---
->  arch/x86/crypto/camellia-aesni-avx-asm_64.S  | 24 ++++----
->  arch/x86/crypto/camellia-aesni-avx2-asm_64.S | 24 ++++----
->  arch/x86/crypto/camellia-x86_64-asm_64.S     | 16 +++---
->  arch/x86/crypto/cast5-avx-x86_64-asm_64.S    | 16 +++---
->  arch/x86/crypto/cast6-avx-x86_64-asm_64.S    | 24 ++++----
->  arch/x86/crypto/chacha-avx2-x86_64.S         | 12 ++--
->  arch/x86/crypto/chacha-avx512vl-x86_64.S     | 12 ++--
->  arch/x86/crypto/chacha-ssse3-x86_64.S        | 12 ++--
->  arch/x86/crypto/crc32-pclmul_asm.S           |  4 +-
->  arch/x86/crypto/crc32c-pcl-intel-asm_64.S    |  4 +-
->  arch/x86/crypto/crct10dif-pcl-asm_64.S       |  4 +-
->  arch/x86/crypto/des3_ede-asm_64.S            |  8 +--
->  arch/x86/crypto/ghash-clmulni-intel_asm.S    |  8 +--
->  arch/x86/crypto/nh-avx2-x86_64.S             |  4 +-
->  arch/x86/crypto/nh-sse2-x86_64.S             |  4 +-
->  arch/x86/crypto/poly1305-avx2-x86_64.S       |  4 +-
->  arch/x86/crypto/poly1305-sse2-x86_64.S       |  8 +--
->  arch/x86/crypto/serpent-avx-x86_64-asm_64.S  | 24 ++++----
->  arch/x86/crypto/serpent-avx2-asm_64.S        | 24 ++++----
->  arch/x86/crypto/serpent-sse2-x86_64-asm_64.S |  8 +--
->  arch/x86/crypto/sha1_avx2_x86_64_asm.S       |  4 +-
->  arch/x86/crypto/sha1_ni_asm.S                |  4 +-
->  arch/x86/crypto/sha1_ssse3_asm.S             |  4 +-
->  arch/x86/crypto/sha256-avx-asm.S             |  4 +-
->  arch/x86/crypto/sha256-avx2-asm.S            |  4 +-
->  arch/x86/crypto/sha256-ssse3-asm.S           |  4 +-
->  arch/x86/crypto/sha256_ni_asm.S              |  4 +-
->  arch/x86/crypto/sha512-avx-asm.S             |  4 +-
->  arch/x86/crypto/sha512-avx2-asm.S            |  4 +-
->  arch/x86/crypto/sha512-ssse3-asm.S           |  4 +-
->  arch/x86/crypto/twofish-avx-x86_64-asm_64.S  | 24 ++++----
->  arch/x86/crypto/twofish-x86_64-asm_64-3way.S |  8 +--
->  arch/x86/crypto/twofish-x86_64-asm_64.S      |  8 +--
+>  arch/s390/crypto/aes_s390.c  | 609 ++++++++++++++---------------------
+>  arch/s390/crypto/des_s390.c  | 419 ++++++++++--------------
+>  arch/s390/crypto/paes_s390.c | 414 ++++++++++--------------
+>  3 files changed, 580 insertions(+), 862 deletions(-)
 
-I could use an ACK for the crypto bits...
+Herbert, should these go upstream via the s390 or crypto tree?
 
-Thx.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
