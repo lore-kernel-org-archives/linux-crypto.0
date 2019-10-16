@@ -2,79 +2,91 @@ Return-Path: <SRS0=0DWe=YJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8283DFA372A
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 12:35:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46CCDFA3728
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 13:01:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5776D20854
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 12:35:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1842720854
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 13:01:40 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BAyU5dpl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391272AbfJPMfL (ORCPT
+        id S2393402AbfJPNBj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Oct 2019 08:35:11 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:59950 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728490AbfJPMfL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Oct 2019 08:35:11 -0400
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
-        by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1iKiWC-0007NF-Gk; Wed, 16 Oct 2019 23:35:09 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 16 Oct 2019 23:35:07 +1100
-Date:   Wed, 16 Oct 2019 23:35:07 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Heiko Carstens <heiko.carstens@de.ibm.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-s390@vger.kernel.org, Vasily Gorbik <gor@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@de.ibm.com>,
-        Harald Freudenberger <freude@linux.ibm.com>
-Subject: Re: [RFT PATCH 0/3] crypto: s390 - convert to skcipher API
-Message-ID: <20191016123507.GA16265@gondor.apana.org.au>
-References: <20191012201809.160500-1-ebiggers@kernel.org>
- <20191016080103.GA4267@osiris>
+        Wed, 16 Oct 2019 09:01:39 -0400
+Received: from mail-qt1-f193.google.com ([209.85.160.193]:45729 "EHLO
+        mail-qt1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2393401AbfJPNBj (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 16 Oct 2019 09:01:39 -0400
+Received: by mail-qt1-f193.google.com with SMTP id c21so35867808qtj.12
+        for <linux-crypto@vger.kernel.org>; Wed, 16 Oct 2019 06:01:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=jnE8lBSLY3wNnqyY4G8WlYMgwsueTd/EoUksCVuD65E=;
+        b=BAyU5dplrFadafcQV8wzsDzA1AsMPOKwhq1dJebWhm730gL3t0WiDFQHtMnfwYBf5T
+         4Q3eSK6Qq4ex1FD2/Q5f/ZdJRQSYJ1upnqdfq3Y9yHAx9LPaJFHmMZqahRBIUgFvjzG7
+         kyskQIhOvG9uaorqTV6HcCGjVmLrbZ2w962+QDCXzJ0IcaDaXG4uCWBfNqNI7CzZMpMm
+         KfYK2f7WJ819fImO5EARWvL30f98knyldXDIOVxA13Gm0P7QnI/xQLDZmA5o0ZP+3CEZ
+         7FaSVGt6ptwWaA+rQepImmf1YT97mShCV2ZnEtliGHHwPrzqBbDrhpGaTFsBaPbXHvGt
+         4Rvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=jnE8lBSLY3wNnqyY4G8WlYMgwsueTd/EoUksCVuD65E=;
+        b=KFWq9kCwydpwpMaBjvSys3HTFhc6yfhaBDNJcXMokZUwoevAfZ58MkIGYldSH8SuFK
+         8I/Kzy+pQ30objq/XuAzbzOtMJ4PvumAxFDpzcTKKoa837UlUBMHicsVDXup5kLzb32s
+         vUgQHoap6CanijkHL2xG6x4x9IV039BGJzfugimQbkBfWXv/1ExDBgqLg8zqulcTwahz
+         5uSPizPqgnl99oyOha4oL0O9cA3irXgFtUjb1JfD1OK/y/L8pvs+tFOBZsxXwj+ZxnYx
+         vgfco6vAgXk8r9rmYce066HIc6m9VzIPv/nCCANYlkGzqPabf99Nt+zi+g/xYQSIdU7m
+         x0lw==
+X-Gm-Message-State: APjAAAWekt6kInn5ugXb2lToT+CdZ+5Y+URFUvG4hyAgpPdMIwregW0L
+        FaM6k0dRb82yt1Yy+sX/wEo3I32RDA5mq6mx4+52ho9E
+X-Google-Smtp-Source: APXvYqwW5pJtOTNrnLrO03T1G9+Fcg/NuG1gN7wmIq4pJ8cxsc7jBg6TJfq5ooHjs4qjHlf1A3fmee9vr4kyD9kiJvg=
+X-Received: by 2002:ac8:2a38:: with SMTP id k53mr13105733qtk.387.1571230897593;
+ Wed, 16 Oct 2019 06:01:37 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191016080103.GA4267@osiris>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <20191014121910.7264-1-ard.biesheuvel@linaro.org> <20191014121910.7264-7-ard.biesheuvel@linaro.org>
+In-Reply-To: <20191014121910.7264-7-ard.biesheuvel@linaro.org>
+From:   Linus Walleij <linus.walleij@linaro.org>
+Date:   Wed, 16 Oct 2019 15:01:26 +0200
+Message-ID: <CACRpkdZVTG-kKp0790uFU1-SRsq5tZ1ibPqm7hoCqXHJVYfuGw@mail.gmail.com>
+Subject: Re: [PATCH 06/25] crypto: ux500 - switch to skcipher API
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@google.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 16, 2019 at 10:01:03AM +0200, Heiko Carstens wrote:
-> On Sat, Oct 12, 2019 at 01:18:06PM -0700, Eric Biggers wrote:
-> > This series converts the glue code for the S390 CPACF implementations of
-> > AES, DES, and 3DES modes from the deprecated "blkcipher" API to the
-> > "skcipher" API.  This is needed in order for the blkcipher API to be
-> > removed.
-> > 
-> > I've compiled this patchset, and the conversion is very similar to that
-> > which has been done for many other crypto drivers.  But I don't have the
-> > hardware to test it, nor is S390 CPACF supported by QEMU.  So I really
-> > need someone with the hardware to test it.  You can do so by setting:
-> 
-> ...
-> 
-> > Eric Biggers (3):
-> >   crypto: s390/aes - convert to skcipher API
-> >   crypto: s390/paes - convert to skcipher API
-> >   crypto: s390/des - convert to skcipher API
-> > 
-> >  arch/s390/crypto/aes_s390.c  | 609 ++++++++++++++---------------------
-> >  arch/s390/crypto/des_s390.c  | 419 ++++++++++--------------
-> >  arch/s390/crypto/paes_s390.c | 414 ++++++++++--------------
-> >  3 files changed, 580 insertions(+), 862 deletions(-)
-> 
-> Herbert, should these go upstream via the s390 or crypto tree?
+On Mon, Oct 14, 2019 at 2:19 PM Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
 
-It would be best to go via the crypto tree since any future patches
-to remove blkcipher/ablkcipher would depend on these patches.
+> Commit 7a7ffe65c8c5 ("crypto: skcipher - Add top-level skcipher interface")
+> dated 20 august 2015 introduced the new skcipher API which is supposed to
+> replace both blkcipher and ablkcipher. While all consumers of the API have
+> been converted long ago, some producers of the ablkcipher remain, forcing
+> us to keep the ablkcipher support routines alive, along with the matching
+> code to expose [a]blkciphers via the skcipher API.
+>
+> So switch this driver to the skcipher API, allowing us to finally drop the
+> blkcipher code in the near future.
+>
+> Cc: Linus Walleij <linus.walleij@linaro.org>
+> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-Thanks,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+
+Yours,
+Linus Walleij
