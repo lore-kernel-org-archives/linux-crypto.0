@@ -2,77 +2,90 @@ Return-Path: <SRS0=0DWe=YJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BB36FA3728
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 16:25:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18E31FA372A
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 16:26:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6F2CD2168B
-	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 16:25:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E1B1821A49
+	for <linux-crypto@archiver.kernel.org>; Wed, 16 Oct 2019 16:26:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="LgzC5Cn/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390970AbfJPQZt (ORCPT
+        id S2393752AbfJPQ0r (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Oct 2019 12:25:49 -0400
-Received: from mga07.intel.com ([134.134.136.100]:12345 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1733056AbfJPQZt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Oct 2019 12:25:49 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga105.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 16 Oct 2019 09:25:48 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.67,304,1566889200"; 
-   d="scan'208";a="202116161"
-Received: from hagarwal-mobl1.gar.corp.intel.com (HELO localhost) ([10.252.5.165])
-  by FMSMGA003.fm.intel.com with ESMTP; 16 Oct 2019 09:25:44 -0700
-Date:   Wed, 16 Oct 2019 19:25:43 +0300
-From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc:     "Safford, David (GE Global Research, US)" <david.safford@ge.com>,
-        Ken Goldman <kgold@linux.ibm.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>,
-        "open list:ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] KEYS: asym_tpm: Switch to get_random_bytes()
-Message-ID: <20191016162543.GB6279@linux.intel.com>
-References: <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2A38B@ALPMBAPA12.e2k.ad.ge.com>
- <20191007000520.GA17116@linux.intel.com>
- <59b88042-9c56-c891-f75e-7c0719eb5ff9@linux.ibm.com>
- <20191008234935.GA13926@linux.intel.com>
- <20191008235339.GB13926@linux.intel.com>
- <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2B995@ALPMBAPA12.e2k.ad.ge.com>
- <20191014190033.GA15552@linux.intel.com>
- <1571081397.3728.9.camel@HansenPartnership.com>
- <20191016110031.GE10184@linux.intel.com>
- <1571229252.3477.7.camel@HansenPartnership.com>
+        Wed, 16 Oct 2019 12:26:47 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:34481 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729156AbfJPQ0r (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 16 Oct 2019 12:26:47 -0400
+Received: by mail-pg1-f194.google.com with SMTP id k20so7240827pgi.1
+        for <linux-crypto@vger.kernel.org>; Wed, 16 Oct 2019 09:26:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:in-reply-to:references:date:message-id
+         :mime-version;
+        bh=2XIK6irSOUYOqaT55Cb2rTG7oY2nstdNhyuJ62jJp1w=;
+        b=LgzC5Cn/xPt2olUE60N4pEOt4RSI2ZpcK9ac3jR5QUoHjfZ6KopcgFKySrAzfqZTLK
+         xw/GP4Ayp98mwvf5lXiBtokVwF22c/go7Jq2fmAHO3+z/dfZ4UGj2h2lSPA4WPi3wTu5
+         kx2xY3EISo3KDeawhuE8CoFt6RS3ckhddrTpZUBfj85vPWLuQ5gjqKgIodSgMg2Z8UOE
+         QLXiWAtlZnMJukqaX13llRVWRA5GhM1++i+VT2hv2z7Jz1d1zTL4o+yZm0aV0tI5Dor3
+         5/Lm+xvgudiyUXI4Q4b3d+P6YU/hlFTOozKWQPwvl5Qs3pkxxAMSoh8rHBJCZr+G0LNL
+         AJnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=2XIK6irSOUYOqaT55Cb2rTG7oY2nstdNhyuJ62jJp1w=;
+        b=JvqDCGZjpJX3T5UOAGj4jcIg5sHtEniq1d/FWrII25/jVnyFshQCaTNXv0bdnY8vIl
+         X8ORsB24VqpJgZaLATXyIp5gI5Aja7CJQBYVxfUxF5DedqKQe6qR88lP3GopUDEukak9
+         apqdtktIeLzaMxzg2s0N9wHWCmyIvQAVM5ZED5PbCFORr0LDXvF7FNXNV0NVY0ZbJrLH
+         /dPmjQ5br+tcKrD/T/rHJv2S0OghHtAQqsP8MkK+9a3HRI9aJHwpa4eHgHjJ1e20HRaG
+         vUF02d4eiJTQhRVw46CxE+qdkYbfw/9XXdF3capqW0biJj0TFPBdJ/ktqV0Sw2YX7exF
+         iRaw==
+X-Gm-Message-State: APjAAAUxS1zTzuCrjJXBUmGpGlsweMAcdF6YuMeHTd51ZpB23De3tzTL
+        xTRBWAdSPCOgAobrP0OHpzKFTQ==
+X-Google-Smtp-Source: APXvYqygm5XuOYj8EY825cN0gcWiXGpwZtxv9FetNVUXLKyxWccm3GGuLgq33/o/9nNMAg3YUL0DMw==
+X-Received: by 2002:a63:4705:: with SMTP id u5mr24757808pga.317.1571243205298;
+        Wed, 16 Oct 2019 09:26:45 -0700 (PDT)
+Received: from localhost (c-71-197-186-152.hsd1.wa.comcast.net. [71.197.186.152])
+        by smtp.gmail.com with ESMTPSA id c16sm3155360pja.2.2019.10.16.09.26.44
+        (version=TLS1_2 cipher=ECDHE-RSA-CHACHA20-POLY1305 bits=256/256);
+        Wed, 16 Oct 2019 09:26:44 -0700 (PDT)
+From:   Kevin Hilman <khilman@baylibre.com>
+To:     YueHaibing <yuehaibing@huawei.com>, herbert@gondor.apana.org.au,
+        mpm@selenic.com, arnd@arndb.de, gregkh@linuxfoundation.org,
+        nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
+        ludovic.desroches@microchip.com, f.fainelli@gmail.com,
+        rjui@broadcom.com, sbranden@broadcom.com,
+        bcm-kernel-feedback-list@broadcom.com, eric@anholt.net,
+        wahrenst@gmx.net, l.stelmach@samsung.com, kgene@kernel.org,
+        krzk@kernel.org, dsaxena@plexity.net, patrice.chotard@st.com
+Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org,
+        linux-amlogic@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
+        YueHaibing <yuehaibing@huawei.com>
+Subject: Re: [PATCH -next 06/13] hwrng: meson - use devm_platform_ioremap_resource() to simplify code
+In-Reply-To: <20191016104621.26056-7-yuehaibing@huawei.com>
+References: <20191016104621.26056-1-yuehaibing@huawei.com> <20191016104621.26056-7-yuehaibing@huawei.com>
+Date:   Wed, 16 Oct 2019 09:26:43 -0700
+Message-ID: <7h4l08hd18.fsf@baylibre.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1571229252.3477.7.camel@HansenPartnership.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 16, 2019 at 08:34:12AM -0400, James Bottomley wrote:
-> reversible ciphers are generally frowned upon in random number
-> generation, that's why the krng uses chacha20.  In general I think we
-> shouldn't try to code our own mixing and instead should get the krng to
-> do it for us using whatever the algorithm du jour that the crypto guys
-> have blessed is.  That's why I proposed adding the TPM output to the
-> krng as entropy input and then taking the output of the krng.
+YueHaibing <yuehaibing@huawei.com> writes:
 
-It is already registered as hwrng. What else? Was the issue that
-it is only used as seed when the rng is init'd first? I haven't
-at this point gone to the internals of krng.
+> Use devm_platform_ioremap_resource() to simplify the code a bit.
+> This is detected by coccinelle.
+>
+> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
 
-/Jarkko
+Reviewed-by: Kevin Hilman <khilman@baylibre.com>
