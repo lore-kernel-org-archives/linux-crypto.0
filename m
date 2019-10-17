@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 808EBFA373A
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Oct 2019 12:26:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93B8DFA372A
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Oct 2019 12:26:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 589C22064B
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Oct 2019 12:26:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6ABCB2064B
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Oct 2019 12:26:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="FSCP1gxG"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="EUEC5Yfn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2502305AbfJQM0Y (ORCPT
+        id S2409379AbfJQM02 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Oct 2019 08:26:24 -0400
-Received: from lelv0142.ext.ti.com ([198.47.23.249]:50398 "EHLO
-        lelv0142.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2409377AbfJQM0X (ORCPT
+        Thu, 17 Oct 2019 08:26:28 -0400
+Received: from lelv0143.ext.ti.com ([198.47.23.248]:54482 "EHLO
+        lelv0143.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2409377AbfJQM02 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Oct 2019 08:26:23 -0400
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-        by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id x9HCQE24084614;
-        Thu, 17 Oct 2019 07:26:14 -0500
+        Thu, 17 Oct 2019 08:26:28 -0400
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+        by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id x9HCQHmr086558;
+        Thu, 17 Oct 2019 07:26:17 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1571315174;
-        bh=/548IYlsZzVpGFlUyLpuldMg6WhApejqtJF4qdDLFY8=;
+        s=ti-com-17Q1; t=1571315177;
+        bh=Bb+NMsmU29SE+RzWfChJoj3IypYlnD56/0aZEsv24kI=;
         h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=FSCP1gxGgF0OIz9XnlIfJWQr2ZVvUsB50V54Y+CK+gsqhBp3UnfAl/fUICNx/x7fM
-         DFDLNW8+slMGMe3ZLaOaz62HUigsONZxBpH+ifQJCryxE5Qz1DWww6EOFotvaiCp6T
-         fm+KNqka2JkfjYqdtkDwy1A60Tpl6JI5uXeuyQQ4=
-Received: from DLEE114.ent.ti.com (dlee114.ent.ti.com [157.170.170.25])
-        by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id x9HCQEJp075376
+        b=EUEC5YfnjT7iTVhwzcFK6o9lvoalnQMQKcOei5FY7TvLm581iostC/cYgbLDFAjSf
+         l2TpaEQIRiwfvSxgL3id/s0/v4a4sAa6W/tuRy6tj5f6kWRlwKQrj4SIvaB3sZoF++
+         L4QwuhQn/ORr7LNOfWLj4pyBTTyZOE/sWofpVun4=
+Received: from DLEE110.ent.ti.com (dlee110.ent.ti.com [157.170.170.21])
+        by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id x9HCQHI5016697
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Thu, 17 Oct 2019 07:26:14 -0500
-Received: from DLEE100.ent.ti.com (157.170.170.30) by DLEE114.ent.ti.com
- (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
+        Thu, 17 Oct 2019 07:26:17 -0500
+Received: from DLEE105.ent.ti.com (157.170.170.35) by DLEE110.ent.ti.com
+ (157.170.170.21) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1713.5; Thu, 17
- Oct 2019 07:26:06 -0500
-Received: from lelv0326.itg.ti.com (10.180.67.84) by DLEE100.ent.ti.com
- (157.170.170.30) with Microsoft SMTP Server (version=TLS1_2,
+ Oct 2019 07:26:17 -0500
+Received: from lelv0326.itg.ti.com (10.180.67.84) by DLEE105.ent.ti.com
+ (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1713.5 via
- Frontend Transport; Thu, 17 Oct 2019 07:26:13 -0500
+ Frontend Transport; Thu, 17 Oct 2019 07:26:09 -0500
 Received: from sokoban.bb.dnainternet.fi (ileax41-snat.itg.ti.com [10.172.224.153])
-        by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id x9HCPxNc073246;
-        Thu, 17 Oct 2019 07:26:12 -0500
+        by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id x9HCPxNe073246;
+        Thu, 17 Oct 2019 07:26:16 -0500
 From:   Tero Kristo <t-kristo@ti.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
         <linux-crypto@vger.kernel.org>, <ard.biesheuvel@linaro.org>
 CC:     <linux-omap@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>
-Subject: [PATCH 07/10] crypto: omap-aes-gcm: fix corner case with only auth data
-Date:   Thu, 17 Oct 2019 15:25:46 +0300
-Message-ID: <20191017122549.4634-8-t-kristo@ti.com>
+Subject: [PATCH 09/10] crypto: add timeout to crypto_wait_req
+Date:   Thu, 17 Oct 2019 15:25:48 +0300
+Message-ID: <20191017122549.4634-10-t-kristo@ti.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191017122549.4634-1-t-kristo@ti.com>
 References: <20191017122549.4634-1-t-kristo@ti.com>
@@ -67,55 +67,38 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Fix a corner case where only authdata is generated, without any provided
-assocdata / cryptdata. Passing the empty scatterlists to OMAP AES core driver
-in this case would confuse it, failing to map DMAs.
+Currently crypto_wait_req waits indefinitely for an async crypto request
+to complete. This is bad as it can cause for example the crypto test
+manager to hang without any notification as to why it has happened.
+Instead of waiting indefinitely, add a 1 second timeout to the call,
+and provide a warning print if a timeout happens.
 
 Signed-off-by: Tero Kristo <t-kristo@ti.com>
 ---
- drivers/crypto/omap-aes-gcm.c | 22 ++++++++++++++--------
- 1 file changed, 14 insertions(+), 8 deletions(-)
+ include/linux/crypto.h | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/omap-aes-gcm.c b/drivers/crypto/omap-aes-gcm.c
-index 9bbedbccfadf..dfd4d1cac421 100644
---- a/drivers/crypto/omap-aes-gcm.c
-+++ b/drivers/crypto/omap-aes-gcm.c
-@@ -148,12 +148,14 @@ static int omap_aes_gcm_copy_buffers(struct omap_aes_dev *dd,
- 	if (req->src == req->dst || dd->out_sg == sg_arr)
- 		flags |= OMAP_CRYPTO_FORCE_COPY;
- 
--	ret = omap_crypto_align_sg(&dd->out_sg, cryptlen,
--				   AES_BLOCK_SIZE, &dd->out_sgl,
--				   flags,
--				   FLAGS_OUT_DATA_ST_SHIFT, &dd->flags);
--	if (ret)
--		return ret;
-+	if (cryptlen) {
-+		ret = omap_crypto_align_sg(&dd->out_sg, cryptlen,
-+					   AES_BLOCK_SIZE, &dd->out_sgl,
-+					   flags,
-+					   FLAGS_OUT_DATA_ST_SHIFT, &dd->flags);
-+		if (ret)
-+			return ret;
-+	}
- 
- 	dd->in_sg_len = sg_nents_for_len(dd->in_sg, alen + clen);
- 	dd->out_sg_len = sg_nents_for_len(dd->out_sg, clen);
-@@ -287,8 +289,12 @@ static int omap_aes_gcm_handle_queue(struct omap_aes_dev *dd,
- 		return err;
- 
- 	err = omap_aes_write_ctrl(dd);
--	if (!err)
--		err = omap_aes_crypt_dma_start(dd);
-+	if (!err) {
-+		if (dd->in_sg_len && dd->out_sg_len)
-+			err = omap_aes_crypt_dma_start(dd);
-+		else
-+			omap_aes_gcm_dma_out_callback(dd);
-+	}
- 
- 	if (err) {
- 		omap_aes_gcm_finish_req(dd, err);
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index 19ea3a371d7b..b8f0e5c3cc0c 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -682,8 +682,15 @@ static inline int crypto_wait_req(int err, struct crypto_wait *wait)
+ 	switch (err) {
+ 	case -EINPROGRESS:
+ 	case -EBUSY:
+-		wait_for_completion(&wait->completion);
++		err = wait_for_completion_timeout(&wait->completion,
++						  msecs_to_jiffies(1000));
+ 		reinit_completion(&wait->completion);
++		if (!err) {
++			pr_err("%s: timeout for %p\n", __func__, wait);
++			err = -ETIMEDOUT;
++			break;
++		}
++
+ 		err = wait->err;
+ 		break;
+ 	};
 -- 
 2.17.1
 
