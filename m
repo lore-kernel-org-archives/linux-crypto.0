@@ -2,132 +2,116 @@ Return-Path: <SRS0=Ic7o=YK=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62CF3ECE58E
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Oct 2019 13:45:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21D04FA372A
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Oct 2019 13:48:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2E67B2089C
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Oct 2019 13:45:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="1OfbHiT7"
+	by mail.kernel.org (Postfix) with ESMTP id 0288B2067B
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Oct 2019 13:48:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388251AbfJQNpT (ORCPT
+        id S2436806AbfJQNsF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Oct 2019 09:45:19 -0400
-Received: from mail-vk1-f193.google.com ([209.85.221.193]:37953 "EHLO
-        mail-vk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727368AbfJQNpT (ORCPT
+        Thu, 17 Oct 2019 09:48:05 -0400
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:40616 "EHLO
+        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2394727AbfJQNsE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 17 Oct 2019 09:45:19 -0400
-Received: by mail-vk1-f193.google.com with SMTP id s72so524463vkh.5
-        for <linux-crypto@vger.kernel.org>; Thu, 17 Oct 2019 06:45:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=E9JRpqDRkPMUC3+aonRkZFzyK81vqG5e+9EBDc49zoo=;
-        b=1OfbHiT7rFbrOfxLC/nWPhMZV0WyIHl8sY0pwDov5iRPW9VQJKmo7d1gO+/XuXO93F
-         sfkXTIt+TjUMghTZva2+Mb1fiaHFidiHAIb9x0dykURPXGqSXRFBjBbPGwG6Yizd9W4d
-         WdDZ/IsOuQcDe0Wh9hxujW0j1BR49lXSA/qhQljzdtX6lN2ST7iD5wIiL/0/HHRJB0On
-         6v2dC+uqsVdY6n698CPnfP05Jlpyk7Jaz1hUKWQUKGie0bbFckvTaAyrQp5moLVFJzTK
-         NxAD7N57GhCjUe/98PZWQNej4VA8DcfHWSzctlAIgr934vL+mWDd+2odA9OPK41RkfgL
-         nxwg==
+        Thu, 17 Oct 2019 09:48:04 -0400
+Received: by mail-qt1-f195.google.com with SMTP id m61so3629223qte.7;
+        Thu, 17 Oct 2019 06:48:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=E9JRpqDRkPMUC3+aonRkZFzyK81vqG5e+9EBDc49zoo=;
-        b=o+frJ3E3/kJSpi1aSxvE05aTnbcsl7nwlvi47QQfxx1bLjxDrskwUtSRx1HmaHysyG
-         hjbUaV/Kin2FZGaJ9BvFa+aWQfyvDNKfX3SFpAbLNAhqobdVx3iGMF4uFymwnN6iTkRZ
-         BsUMoN6jiA67RZhvt4tEOVmIn8vj3NPciBe4cGSMQW2P4SFnlxfAo6pxYxws1DOIgLIr
-         /hJnV4Q+4s+8ktLzwgJRb2GPqiaX5UY+6edbWiibOgkjUr6E6K1vLQKjqdy3szjuSuOr
-         miH9ocS3tYQ9MbM+py7qfGNCdYOoVfsqdCCG+JpVC3I/P04JvEZIi9Yv9LVlp2UWOIPv
-         eMIg==
-X-Gm-Message-State: APjAAAWR+Pz/wfpOsb2iUTEzPuofNvytX8VLRH/U0MWrFblfJlOa/WW9
-        3XmzlLk14Cgccw8EC1J57Gbi5IuASLjXNuZhSRV3Iw==
-X-Google-Smtp-Source: APXvYqya0eEZHB/do9ZUv3epLwOSxkimqKmRu/dMGl7ux5XwbxNK/SrTPyNprrsFp8UymnGJhbk5ZnOofhZ2ZVtknPY=
-X-Received: by 2002:a1f:9712:: with SMTP id z18mr1984419vkd.22.1571319918076;
- Thu, 17 Oct 2019 06:45:18 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=V9F1NynHBe9lfMAB/ZrN6cWXHTh5u4L4sRwtLfhngWc=;
+        b=G+facC80VhcAvLi/e6A7TrduLWn0vD2qJhwCrXCQM3M5ILpu7FXJbXruo/38blvJR5
+         Q9oLLeaCrnK44x/5Iju8xFk4HjeGNEu8EJAtJzKdeJlU40QpeDu7KikFtBXkeL0EpofJ
+         Wehvt2p6B7cM8Ub1BPoCUh1tIiWug2UFg00NAXwu2T5EdY7duo662MRQQA7vMfPtBnhr
+         mSqkgU+scwS6+zqRnMWS7LazQ3L7sA34yyI+rqDVn03k9VJD5ALQzh3dMciU948nlxoP
+         Ajitc4MmV6M46JL/91n4aTOi2mOmgoZmFwpYshjmkKfcEHKHbS4m3FA4/c2VYhRbCjXb
+         m+VQ==
+X-Gm-Message-State: APjAAAXSOsXBzY9+d6+zJ5ejcNPbiEEoJ/ZVzs78OY1c9awftUPobS52
+        m83lQK0zdCOJUPsfVDy9gK4P7r7Z5trw6EQGUrU=
+X-Google-Smtp-Source: APXvYqxrCvbM940pdLdmtVqE4d93GXlx6MUaBU251o7f5GEXzpxhDY9oTpugTTbJy9ZdJgE4C/nnBZc9xI85Q3+56Lw=
+X-Received: by 2002:a0c:c70a:: with SMTP id w10mr3972472qvi.222.1571320083293;
+ Thu, 17 Oct 2019 06:48:03 -0700 (PDT)
 MIME-Version: 1.0
-References: <1569833361-47224-1-git-send-email-tiantao6@huawei.com>
-In-Reply-To: <1569833361-47224-1-git-send-email-tiantao6@huawei.com>
-From:   Gilad Ben-Yossef <gilad@benyossef.com>
-Date:   Thu, 17 Oct 2019 16:45:06 +0300
-Message-ID: <CAOtvUMeX1F5+g-jg2vUWaTQX8KHdmtAcb2-r4oVaUwfFYJbmsg@mail.gmail.com>
-Subject: Re: [PATCH] crypto: fix comparison of unsigned expression warnings
-To:     Tian Tao <tiantao6@huawei.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linuxarm@huawei.com
+References: <20190930121520.1388317-1-arnd@arndb.de> <20190930121520.1388317-3-arnd@arndb.de>
+ <MN2PR20MB2973D14C38B7BC7E081A73A9CA6D0@MN2PR20MB2973.namprd20.prod.outlook.com>
+In-Reply-To: <MN2PR20MB2973D14C38B7BC7E081A73A9CA6D0@MN2PR20MB2973.namprd20.prod.outlook.com>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Thu, 17 Oct 2019 15:47:47 +0200
+Message-ID: <CAK8P3a3+UrqS0nQxcG7UuMt4s5FDnowFq-C5-K5XU-CKpciM8g@mail.gmail.com>
+Subject: Re: [PATCH 3/3] crypto: inside-secure - Remove #ifdef checks
+To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+Cc:     Antoine Tenart <antoine.tenart@bootlin.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Bjorn Helgaas <bhelgaas@google.com>,
+        Pascal van Leeuwen <pascalvanl@gmail.com>,
+        Kelsey Skunberg <skunberg.kelsey@gmail.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Sep 30, 2019 at 11:52 AM Tian Tao <tiantao6@huawei.com> wrote:
+On Thu, Oct 17, 2019 at 3:26 PM Pascal Van Leeuwen
+<pvanleeuwen@verimatrix.com> wrote:
+
+> >       /* Register PCI driver */
+> > -     pcireg_rc = pci_register_driver(&safexcel_pci_driver);
+> > -#endif
+> > +     ret = pci_register_driver(&safexcel_pci_driver);
+> >
+> > -#if IS_ENABLED(CONFIG_OF)
+> >       /* Register platform driver */
+> > -     ofreg_rc = platform_driver_register(&crypto_safexcel);
+> > - #if IS_ENABLED(CONFIG_PCI)
+> > -     /* Return success if either PCI or OF registered OK */
+> > -     return pcireg_rc ? ofreg_rc : 0;
+> > - #else
+> > -     return ofreg_rc;
+> > - #endif
+> > -#else
+> > - #if IS_ENABLED(CONFIG_PCI)
+> > -     return pcireg_rc;
+> > - #else
+> > -     return -EINVAL;
+> > - #endif
+> > -#endif
+> > +     if (IS_ENABLED(CONFIG_OF) && !ret) {
+> >
+> Hmm ... this would make it skip the OF registration if the PCIE
+> registration failed. Note that the typical embedded  system will
+> have a PCIE subsystem (e.g. Marvell A7K/A8K does) but will have
+> the EIP embedded on the SoC as an OF device.
 >
-> This patch fixes the following warnings:
-> drivers/crypto/ccree/cc_aead.c:630:5-12: WARNING: Unsigned expression
-> compared with zero: seq_len > 0
+> So the question is: is it possible somehow that PCIE registration
+> fails while OF registration does pass? Because in that case, this
+> code would be wrong ...
 
-Thank you very much for the patch. Please accept my apologies that it
-took me some time to respond.
+I don't see how it would fail. When CONFIG_PCI is disabled,
+pci_register_driver() does nothing, and the pci_driver as well
+as everything referenced from it will be silently dropped from
+the object file.
+If CONFIG_PCI is enabled, then the driver will be registered
+to the PCI subsystem, waiting for a device to show up, but
+the driver registration does not care about whether there is
+such a device.
 
-I'm sorry, but I don't think this is the right solution here:
+> Other than that, I don't care much how this code is implemented
+> as long as it works for both my use cases, being an OF embedded
+> device (on a SoC _with_ or _without_ PCIE support) and a device
+> on a PCIE board in a PCI (which has both PCIE and OF support).
 
-seq_len here can never get a negative value so the warning is a false one.
+Yes, that should be fine. There are a lot of drivers that support
+multiple bus interfaces, and this is the normal way to handle them.
 
-Having said that, I suspect it would be better code to:
-1. change hmac_setkey() return type to unsigned int as well, as it
-doesn't ever return a negative number.
-2. change the predicate in the if statement the warning mentions to
-seq_len !=3D 0.
-
-That would be a clearer code and possibly will also silence the false warni=
-ng
-
-So NACK for this one but I would accept a patch doing he above if you send =
-one.
-
-Thanks again for taking the time to do this.
-
-Gilad
-
->
-> Signed-off-by: Tian Tao <tiantao6@huawei.com>
-> ---
->  drivers/crypto/ccree/cc_aead.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/crypto/ccree/cc_aead.c b/drivers/crypto/ccree/cc_aea=
-d.c
-> index d3e8faa..b19291d 100644
-> --- a/drivers/crypto/ccree/cc_aead.c
-> +++ b/drivers/crypto/ccree/cc_aead.c
-> @@ -546,7 +546,7 @@ static int cc_aead_setkey(struct crypto_aead *tfm, co=
-nst u8 *key,
->         struct cc_aead_ctx *ctx =3D crypto_aead_ctx(tfm);
->         struct cc_crypto_req cc_req =3D {};
->         struct cc_hw_desc desc[MAX_AEAD_SETKEY_SEQ];
-> -       unsigned int seq_len =3D 0;
-> +       int seq_len =3D 0;
->         struct device *dev =3D drvdata_to_dev(ctx->drvdata);
->         const u8 *enckey, *authkey;
->         int rc;
-> --
-> 2.7.4
->
-
-
---=20
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-values of =CE=B2 will give rise to dom!
+    Arnd
