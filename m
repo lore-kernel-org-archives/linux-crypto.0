@@ -2,130 +2,116 @@ Return-Path: <SRS0=Ic7o=YK=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DF64FA3728
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Oct 2019 01:27:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F28DFA372B
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Oct 2019 05:06:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4C90F2082C
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Oct 2019 01:27:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D9A1A214E0
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Oct 2019 05:06:47 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="zh64szI5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388927AbfJQB1Y (ORCPT
+        id S2392175AbfJQFGq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 16 Oct 2019 21:27:24 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4194 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727916AbfJQB1Y (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 16 Oct 2019 21:27:24 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 735A76153B773426C5B9;
-        Thu, 17 Oct 2019 09:27:20 +0800 (CST)
-Received: from [127.0.0.1] (10.133.213.239) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.439.0; Thu, 17 Oct 2019
- 09:27:17 +0800
-Subject: Re: [PATCH -next 00/13] hwrng: use devm_platform_ioremap_resource()
- to simplify code
-To:     Florian Fainelli <f.fainelli@gmail.com>,
-        <herbert@gondor.apana.org.au>, <mpm@selenic.com>, <arnd@arndb.de>,
-        <gregkh@linuxfoundation.org>, <nicolas.ferre@microchip.com>,
-        <alexandre.belloni@bootlin.com>, <ludovic.desroches@microchip.com>,
-        <rjui@broadcom.com>, <sbranden@broadcom.com>,
-        <bcm-kernel-feedback-list@broadcom.com>, <eric@anholt.net>,
-        <wahrenst@gmx.net>, <l.stelmach@samsung.com>, <kgene@kernel.org>,
-        <krzk@kernel.org>, <khilman@baylibre.com>, <dsaxena@plexity.net>,
-        <patrice.chotard@st.com>
-References: <20191016104621.26056-1-yuehaibing@huawei.com>
- <2c60b926-1e98-cca0-ec17-6b45f9da404a@gmail.com>
-CC:     <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>,
-        <linux-rpi-kernel@lists.infradead.org>,
-        <linux-samsung-soc@vger.kernel.org>,
-        <linux-amlogic@lists.infradead.org>,
-        <linuxppc-dev@lists.ozlabs.org>
-From:   Yuehaibing <yuehaibing@huawei.com>
-Message-ID: <7c0269b6-cab3-bded-7f9d-76430be89f9c@huawei.com>
-Date:   Thu, 17 Oct 2019 09:27:13 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101
- Thunderbird/45.2.0
-MIME-Version: 1.0
-In-Reply-To: <2c60b926-1e98-cca0-ec17-6b45f9da404a@gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.133.213.239]
-X-CFilter-Loop: Reflected
+        Thu, 17 Oct 2019 01:06:46 -0400
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:53589 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728755AbfJQFGq (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 17 Oct 2019 01:06:46 -0400
+Received: by mail-wm1-f66.google.com with SMTP id i16so1032173wmd.3
+        for <linux-crypto@vger.kernel.org>; Wed, 16 Oct 2019 22:06:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id;
+        bh=vc5hMa73OPr/x/aEf805fVYp+2tYvgPjEPvMghKb2Zw=;
+        b=zh64szI5/P7kHr7xGyuurhRKHjg1Pn1Q28ubOkmOzG3Stwaf4WlQppsxqn+dNutVpv
+         Yp9ECpelYfZLjI25E2yFrf5j4gxK5YunYg3Br2IVSqkK/4jF77prXesnCIAaRvYrU06q
+         516AdjPwzMZ+S7nTMrdAZq6HlkPzGFMYWUmQhouxL0xUsRS+9Ct91pLNxgnjDTpcvU0+
+         Z60oaEnCXX2Aa9eKW0lvTSpWGEuZLmL31s+hPdJUAe0wFgCg+CbW3KqndIWiAaOKVKjD
+         3oFcBNzJVMivg8nPMQ95fwkpuydWpLCKG/B9xbbinhjU3YbV/0M3rzGTb3iA8yggNAYl
+         ZAmw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=vc5hMa73OPr/x/aEf805fVYp+2tYvgPjEPvMghKb2Zw=;
+        b=g044JxyAED+wsXoXd47Y/Jf9xlWM6pytF67O5xL0kvVb5IRCiPfqI9qwgfZJ3T7Amz
+         SRoDQlOqoMmnVtn17ghCODTu6Eb8iQK+K0LahXamptWvJei3nYr0/wJrI31TvhRQWiwt
+         x20h/+YLGsBhhXkKrfeAG4avGCdYEzHCTRc9mQLa7UThME/hnqeaIWmOHW2qQG9P6hyb
+         eYKhK8s7w/LaB+ZCiewcolvM8WgD+A/ccJDqBdpzYvHt6ZSh565cXvD5ncbiO9GqqbJS
+         zJpIvCxJEYmNdpBVQG9+tPdVAUM0JfJLhYO2uChIusO2uQIo0vhgnfeq+8UKQwQ2ILWk
+         b16g==
+X-Gm-Message-State: APjAAAWvqH7jh+/YQVkFLotPYxkPudzGM1tIuBv0pIulURmayhGl3A9u
+        8FgZCEly+Xxbfn8pTFbwqLMx+OpasW8=
+X-Google-Smtp-Source: APXvYqw07wwT75FOoNWJyD/an/XIle9yHvlb7113NxzJZiEpvXnUsfMUBXr2Xe/6iQ8HyyjCXNyUPQ==
+X-Received: by 2002:a05:600c:143:: with SMTP id w3mr1048902wmm.17.1571288802451;
+        Wed, 16 Oct 2019 22:06:42 -0700 (PDT)
+Received: from localhost.localdomain ([51.15.160.169])
+        by smtp.googlemail.com with ESMTPSA id b5sm1010762wmj.18.2019.10.16.22.06.41
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Wed, 16 Oct 2019 22:06:41 -0700 (PDT)
+From:   Corentin Labbe <clabbe@baylibre.com>
+To:     davem@davemloft.net, herbert@gondor.apana.org.au,
+        khilman@baylibre.com, mark.rutland@arm.com, robh+dt@kernel.org
+Cc:     devicetree@vger.kernel.org, linux-amlogic@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH v3 0/4] crypto: add amlogic crypto offloader driver
+Date:   Thu, 17 Oct 2019 05:06:22 +0000
+Message-Id: <1571288786-34601-1-git-send-email-clabbe@baylibre.com>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Hello
+
+This serie adds support for the crypto offloader present on amlogic GXL
+SoCs.
+
+Tested on meson-gxl-s905x-khadas-vim and meson-gxl-s905x-libretech-cc
+
+Regards
+
+Changes since v2:
+- fixed some spelling in kconfig
+- Use devm_platform_ioremap_resource
+
+Changes since v1:
+- renamed files and algo with gxl
+- removed unused reset handlings
+- splited the probe functions
+- splited meson_cipher fallback in need_fallback() and do_fallback()
 
 
-On 2019/10/17 0:44, Florian Fainelli wrote:
-> On 10/16/19 3:46 AM, YueHaibing wrote:
->> devm_platform_ioremap_resource() internally have platform_get_resource()
->> and devm_ioremap_resource() in it. So instead of calling them separately
->> use devm_platform_ioremap_resource() directly.
-> 
-> Did your coccinelle script not cover
-> drivers/char/hw_random/iproc-rng200.c somehow? Do you mind including it
-> as a separate patch?
+Corentin Labbe (4):
+  dt-bindings: crypto: Add DT bindings documentation for amlogic-crypto
+  MAINTAINERS: Add myself as maintainer of amlogic crypto
+  crypto: amlogic: Add crypto accelerator for amlogic GXL
+  ARM64: dts: amlogic: adds crypto hardware node
 
-A patch from Markus Elfring has be queued:
+ .../bindings/crypto/amlogic,gxl-crypto.yaml   |  52 +++
+ MAINTAINERS                                   |   7 +
+ arch/arm64/boot/dts/amlogic/meson-gxl.dtsi    |  10 +
+ drivers/crypto/Kconfig                        |   2 +
+ drivers/crypto/Makefile                       |   1 +
+ drivers/crypto/amlogic/Kconfig                |  24 ++
+ drivers/crypto/amlogic/Makefile               |   2 +
+ drivers/crypto/amlogic/amlogic-gxl-cipher.c   | 381 ++++++++++++++++++
+ drivers/crypto/amlogic/amlogic-gxl-core.c     | 331 +++++++++++++++
+ drivers/crypto/amlogic/amlogic-gxl.h          | 170 ++++++++
+ 10 files changed, 980 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
+ create mode 100644 drivers/crypto/amlogic/Kconfig
+ create mode 100644 drivers/crypto/amlogic/Makefile
+ create mode 100644 drivers/crypto/amlogic/amlogic-gxl-cipher.c
+ create mode 100644 drivers/crypto/amlogic/amlogic-gxl-core.c
+ create mode 100644 drivers/crypto/amlogic/amlogic-gxl.h
 
-commit a68b931932c5574aa5bd459529c766ba577c72b3
-Author: Markus Elfring <elfring@users.sourceforge.net>
-Date:   Wed Sep 18 09:09:22 2019 +0200
-
-    hwrng: iproc-rng200 - Use devm_platform_ioremap_resource() in iproc_rng200_probe()
-
-    Simplify this function implementation by using a known wrapper function.
-
-    This issue was detected by using the Coccinelle software.
-
-    Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-    Reviewed-by: Ray Jui <ray.jui@broadcom.com>
-    Reviewed-by: Florian Fainelli <f.fainelli@gmail.com>
-    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-
-
-
-> Thanks
-> 
->>
->> YueHaibing (13):
->>   hwrng: atmel - use devm_platform_ioremap_resource() to simplify code
->>   hwrng: bcm2835 - use devm_platform_ioremap_resource() to simplify code
->>   hwrng: exynos - use devm_platform_ioremap_resource() to simplify code
->>   hwrng: hisi - use devm_platform_ioremap_resource() to simplify code
->>   hwrng: ks-sa - use devm_platform_ioremap_resource() to simplify code
->>   hwrng: meson - use devm_platform_ioremap_resource() to simplify code
->>   hwrng: npcm - use devm_platform_ioremap_resource() to simplify code
->>   hwrng: omap - use devm_platform_ioremap_resource() to simplify code
->>   hwrng: pasemi - use devm_platform_ioremap_resource() to simplify code
->>   hwrng: pic32 - use devm_platform_ioremap_resource() to simplify code
->>   hwrng: st - use devm_platform_ioremap_resource() to simplify code
->>   hwrng: tx4939 - use devm_platform_ioremap_resource() to simplify code
->>   hwrng: xgene - use devm_platform_ioremap_resource() to simplify code
->>
->>  drivers/char/hw_random/atmel-rng.c   | 4 +---
->>  drivers/char/hw_random/bcm2835-rng.c | 5 +----
->>  drivers/char/hw_random/exynos-trng.c | 4 +---
->>  drivers/char/hw_random/hisi-rng.c    | 4 +---
->>  drivers/char/hw_random/ks-sa-rng.c   | 4 +---
->>  drivers/char/hw_random/meson-rng.c   | 4 +---
->>  drivers/char/hw_random/npcm-rng.c    | 4 +---
->>  drivers/char/hw_random/omap-rng.c    | 4 +---
->>  drivers/char/hw_random/pasemi-rng.c  | 4 +---
->>  drivers/char/hw_random/pic32-rng.c   | 4 +---
->>  drivers/char/hw_random/st-rng.c      | 4 +---
->>  drivers/char/hw_random/tx4939-rng.c  | 4 +---
->>  drivers/char/hw_random/xgene-rng.c   | 4 +---
->>  13 files changed, 13 insertions(+), 40 deletions(-)
->>
-> 
-> 
+-- 
+2.21.0
 
