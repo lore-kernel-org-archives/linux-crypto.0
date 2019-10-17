@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FF6CECE58D
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0AC2ECE58E
 	for <linux-crypto@archiver.kernel.org>; Thu, 17 Oct 2019 19:10:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D64BE21835
-	for <linux-crypto@archiver.kernel.org>; Thu, 17 Oct 2019 19:10:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8F52921835
+	for <linux-crypto@archiver.kernel.org>; Thu, 17 Oct 2019 19:10:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="LRMO86YY"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="JTrpH5vM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2503407AbfJQTKp (ORCPT
+        id S2503396AbfJQTKq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 17 Oct 2019 15:10:45 -0400
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:37798 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2503396AbfJQTKp (ORCPT
+        Thu, 17 Oct 2019 15:10:46 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:45928 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2503404AbfJQTKp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 17 Oct 2019 15:10:45 -0400
-Received: by mail-wm1-f66.google.com with SMTP id f22so3684473wmc.2
-        for <linux-crypto@vger.kernel.org>; Thu, 17 Oct 2019 12:10:43 -0700 (PDT)
+Received: by mail-wr1-f68.google.com with SMTP id r5so3568093wrm.12
+        for <linux-crypto@vger.kernel.org>; Thu, 17 Oct 2019 12:10:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=yKl79+kaP0xH/w2JKqyPRO+ZyNZ4Omsm0yfmDUcEZAU=;
-        b=LRMO86YY9JebVhHKaWJXLxasJczUY89pzRMJMlNFjEPds20yUbU8gNDzuHGSH1qKYr
-         epTcLg5UF3k1RlkgQn9iBxLZ040s9Cr7wey0gPRcbC2rHofoHzBzIQWOcv0kn6EvGBXK
-         aX/2phyKWlAv6g6sN0ZJZAGZ2p0hmPT/udRbgNSFRKDLMb+MNf355Dj64MT+Q4Z5Xb6T
-         YbFSI0J8vo40tTG9B7ir7XjBj3eC030CU+IOoaFMror1RqkOC/D9Ps9/aGEWHWTCLBvp
-         Z9P0Mqu0mSn3FgK1xvtqokYcpTDQOElQHQwaCQieRHpxdmJevt64zXRpipze9r6PvX/W
-         ib0w==
+        bh=l8cC6Plr9Pjy6A3czOGNz4y4TekSjUV9NitiUk1ehQ0=;
+        b=JTrpH5vMG4pRHdwhPUcRaOLrAQJrXB21I1UgYWDWYCbLl1o+OLRQ27LBhLTTSN5pDL
+         TuIOaPHu15kOTFszlcEZnGwqg7bGNJjgR44yLhOOzy6OkrPZb5WywEJMs2CHwKGifD+R
+         LMzIzUjn1F5sPeAgKB0qTm+5GdQzX1+kbD59QKr20FVi3W/C9ri/SqLf6vN9AlDbo/eT
+         bCP6oTTFGRgB6BtI47HrrksplqnHZPxVbqKLJXg0mKj2/KZCecWP80b1mebSlmRMhc0H
+         1bhuRCfDQ+4+e3aIfI5YYsTyascoMDkWJhK5uStZ1Lf14lMp+ltPMdfyykMbH/GzdDMk
+         v1Gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=yKl79+kaP0xH/w2JKqyPRO+ZyNZ4Omsm0yfmDUcEZAU=;
-        b=dwEMOvtXPaWx2oZaFP7ZMRLta8Tre/rMoXtljy+RA6rpGzUk7Gvwq77G+HOKs/EPXI
-         HHpTACxadubHts2wn1oLeAJHLEo8wHsml5UDnWXh5SbV6jGRc7jIawuUgS5tQUdkebHb
-         y7BPJIr8xTEp9QShPT43dUMeZWQ9l8X0Oy5gFzxVGHII67XlJ4OJqq8z4tdXdWcyjbq2
-         ilwXiq7ZK9fCUz+2aaL2R9IjyGEDM4PSP6C82TvkLxecfrma9OxUcA6abVh0YQxrVTFC
-         jQPf6AvGMfZtA/uZ3dBveWoqilz2FElqOJFFt5iB6sOnD2/lfCHr2xUBI+WRTe2jSpmf
-         4H6Q==
-X-Gm-Message-State: APjAAAX5llv8TjvIytqQXFXXy+qvpS0XVQGRIrNfd0069ldLmJHDwjUf
-        er5YlL1Smbh62lPrxmfp6XA7u6Bmzr/YNKc+
-X-Google-Smtp-Source: APXvYqxnXXNy3jEfnj+1Y2d/TbhrPOBGXrGFG/u0kJX0vgXYDjANNK6sxj0NVF2f5ilknrlLYRShhw==
-X-Received: by 2002:a1c:2d54:: with SMTP id t81mr4344803wmt.167.1571339442186;
-        Thu, 17 Oct 2019 12:10:42 -0700 (PDT)
+        bh=l8cC6Plr9Pjy6A3czOGNz4y4TekSjUV9NitiUk1ehQ0=;
+        b=EN1xGVLNGOFLFzTvtXPOwfOfXqsN/9NMQ3XQSHzpfuJZ7v0pYmrw4+9dtBdsFHzsIU
+         mxKiZwTLmJ6JGaBLTm4Ti118VZqWGIL3/Eny4mTjj/nlIcuPPiTgpmJoO2MSARq0nz1o
+         batDRYo0v3ZJSoTVMlyj9MtlLaUbG+FXaJP9iC60agwTIlWFGRr6Tc4oEtVZakFN3OTe
+         QrYldI6mekI++9Ql5nNUMMYgDGevrjsW34rEJQcHgWDI35xL3qb38umLgeQPiIbwX78Y
+         PQWniPoUSBLSWxsfhWrqGcYEPEe4n2nOIVxXJ/9Sc6rvMHg9kqcNCPYmUZi7jQhnd0K+
+         2Y/Q==
+X-Gm-Message-State: APjAAAXYcwnbmDSjmqP2fjFE3tANEzvFbzOFEfweY3ElrVIy303Nt7Xw
+        LGU9hCv6OAGJgyyPNLhxOZ/hb3H3pXFegXow
+X-Google-Smtp-Source: APXvYqzDXkvWOgnVcTuIGaJ4j5NePKT6AY2NOuZlVUh8fGerdyffG7pISgXs0Mo5m1T5djmOtAe3Jw==
+X-Received: by 2002:adf:fcd2:: with SMTP id f18mr1569432wrs.388.1571339443532;
+        Thu, 17 Oct 2019 12:10:43 -0700 (PDT)
 Received: from sudo.home ([2a01:cb1d:112:6f00:ccb6:e9d4:c1bc:d107])
-        by smtp.gmail.com with ESMTPSA id y3sm5124528wro.36.2019.10.17.12.10.41
+        by smtp.gmail.com with ESMTPSA id y3sm5124528wro.36.2019.10.17.12.10.42
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 17 Oct 2019 12:10:41 -0700 (PDT)
+        Thu, 17 Oct 2019 12:10:42 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
@@ -68,9 +68,9 @@ Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Martin Willi <martin@strongswan.org>,
         Rene van Dorst <opensource@vdorst.com>,
         David Sterba <dsterba@suse.com>
-Subject: [PATCH v4 29/35] crypto: curve25519 - implement generic KPP driver
-Date:   Thu, 17 Oct 2019 21:09:26 +0200
-Message-Id: <20191017190932.1947-30-ard.biesheuvel@linaro.org>
+Subject: [PATCH v4 30/35] crypto: lib/curve25519 - work around Clang stack spilling issue
+Date:   Thu, 17 Oct 2019 21:09:27 +0200
+Message-Id: <20191017190932.1947-31-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191017190932.1947-1-ard.biesheuvel@linaro.org>
 References: <20191017190932.1947-1-ard.biesheuvel@linaro.org>
@@ -81,142 +81,73 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Expose the generic Curve25519 library via the crypto API KPP interface.
+Arnd reports that the 32-bit generic library code for Curve25119 ends
+up using an excessive amount of stack space when built with Clang:
 
+  lib/crypto/curve25519-fiat32.c:756:6: error: stack frame size
+      of 1384 bytes in function 'curve25519_generic'
+      [-Werror,-Wframe-larger-than=]
+
+Let's give some hints to the compiler regarding which routines should
+not be inlined, to prevent it from running out of registers and spilling
+to the stack. The resulting code performs identically under both GCC
+and Clang, and makes the warning go away.
+
+Suggested-by: Arnd Bergmann <arnd@arndb.de>
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- crypto/Kconfig              |  5 ++
- crypto/Makefile             |  1 +
- crypto/curve25519-generic.c | 93 ++++++++++++++++++++
- 3 files changed, 99 insertions(+)
+ lib/crypto/curve25519-fiat32.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index ff077dd3a7b7..b83088e6a8e6 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -264,6 +264,11 @@ config CRYPTO_ECRDSA
- 	  standard algorithms (called GOST algorithms). Only signature verification
- 	  is implemented.
+diff --git a/lib/crypto/curve25519-fiat32.c b/lib/crypto/curve25519-fiat32.c
+index 1c455207341d..2fde0ec33dbd 100644
+--- a/lib/crypto/curve25519-fiat32.c
++++ b/lib/crypto/curve25519-fiat32.c
+@@ -223,7 +223,7 @@ static __always_inline void fe_1(fe *h)
+ 	h->v[0] = 1;
+ }
  
-+config CRYPTO_CURVE25519
-+	tristate "Curve25519 algorithm"
-+	select CRYPTO_KPP
-+	select CRYPTO_LIB_CURVE25519_GENERIC
-+
- comment "Authenticated Encryption with Associated Data"
+-static void fe_add_impl(u32 out[10], const u32 in1[10], const u32 in2[10])
++static noinline void fe_add_impl(u32 out[10], const u32 in1[10], const u32 in2[10])
+ {
+ 	{ const u32 x20 = in1[9];
+ 	{ const u32 x21 = in1[8];
+@@ -266,7 +266,7 @@ static __always_inline void fe_add(fe_loose *h, const fe *f, const fe *g)
+ 	fe_add_impl(h->v, f->v, g->v);
+ }
  
- config CRYPTO_CCM
-diff --git a/crypto/Makefile b/crypto/Makefile
-index ecc69a726460..1e6cea469a4a 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -167,6 +167,7 @@ obj-$(CONFIG_CRYPTO_ZSTD) += zstd.o
- obj-$(CONFIG_CRYPTO_OFB) += ofb.o
- obj-$(CONFIG_CRYPTO_ECC) += ecc.o
- obj-$(CONFIG_CRYPTO_ESSIV) += essiv.o
-+obj-$(CONFIG_CRYPTO_CURVE25519) += curve25519-generic.o
+-static void fe_sub_impl(u32 out[10], const u32 in1[10], const u32 in2[10])
++static noinline void fe_sub_impl(u32 out[10], const u32 in1[10], const u32 in2[10])
+ {
+ 	{ const u32 x20 = in1[9];
+ 	{ const u32 x21 = in1[8];
+@@ -309,7 +309,7 @@ static __always_inline void fe_sub(fe_loose *h, const fe *f, const fe *g)
+ 	fe_sub_impl(h->v, f->v, g->v);
+ }
  
- ecdh_generic-y += ecdh.o
- ecdh_generic-y += ecdh_helper.o
-diff --git a/crypto/curve25519-generic.c b/crypto/curve25519-generic.c
-new file mode 100644
-index 000000000000..0f4cd6347e3b
---- /dev/null
-+++ b/crypto/curve25519-generic.c
-@@ -0,0 +1,93 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+
-+#include <crypto/curve25519.h>
-+#include <crypto/internal/kpp.h>
-+#include <crypto/kpp.h>
-+#include <linux/module.h>
-+#include <linux/scatterlist.h>
-+
-+static int curve25519_set_secret(struct crypto_kpp *tfm, const void *buf,
-+				 unsigned int len)
-+{
-+	u8 *secret = kpp_tfm_ctx(tfm);
-+
-+	if (!len)
-+		curve25519_generate_secret(secret);
-+	else if (len == CURVE25519_KEY_SIZE &&
-+		 crypto_memneq(buf, curve25519_null_point, CURVE25519_KEY_SIZE))
-+		memcpy(secret, buf, CURVE25519_KEY_SIZE);
-+	else
-+		return -EINVAL;
-+	return 0;
-+}
-+
-+static int curve25519_compute_value(struct kpp_request *req)
-+{
-+	struct crypto_kpp *tfm = crypto_kpp_reqtfm(req);
-+	const u8 *secret = kpp_tfm_ctx(tfm);
-+	u8 public_key[CURVE25519_KEY_SIZE];
-+	u8 buf[CURVE25519_KEY_SIZE];
-+	int copied, nbytes;
-+	u8 const *bp;
-+
-+	if (req->src) {
-+		copied = sg_copy_to_buffer(req->src,
-+					   sg_nents_for_len(req->src,
-+							    CURVE25519_KEY_SIZE),
-+					   public_key, CURVE25519_KEY_SIZE);
-+		if (copied != CURVE25519_KEY_SIZE)
-+			return -EINVAL;
-+		bp = public_key;
-+	} else {
-+		bp = curve25519_base_point;
-+	}
-+
-+	curve25519_generic(buf, secret, bp);
-+
-+	if (!crypto_memneq(buf, curve25519_null_point, CURVE25519_KEY_SIZE))
-+		return -EKEYREJECTED;
-+
-+	/* might want less than we've got */
-+	nbytes = min_t(size_t, CURVE25519_KEY_SIZE, req->dst_len);
-+	copied = sg_copy_from_buffer(req->dst, sg_nents_for_len(req->dst,
-+								nbytes),
-+				     buf, nbytes);
-+	if (copied != nbytes)
-+		return -EINVAL;
-+	return 0;
-+}
-+
-+static unsigned int curve25519_max_size(struct crypto_kpp *tfm)
-+{
-+	return CURVE25519_KEY_SIZE;
-+}
-+
-+static struct kpp_alg curve25519_alg = {
-+	.base.cra_name		= "curve25519",
-+	.base.cra_driver_name	= "curve25519-generic",
-+	.base.cra_priority	= 100,
-+	.base.cra_module	= THIS_MODULE,
-+	.base.cra_ctxsize	= CURVE25519_KEY_SIZE,
-+
-+	.set_secret		= curve25519_set_secret,
-+	.generate_public_key	= curve25519_compute_value,
-+	.compute_shared_secret	= curve25519_compute_value,
-+	.max_size		= curve25519_max_size,
-+};
-+
-+static int curve25519_init(void)
-+{
-+	return crypto_register_kpp(&curve25519_alg);
-+}
-+
-+static void curve25519_exit(void)
-+{
-+	crypto_unregister_kpp(&curve25519_alg);
-+}
-+
-+subsys_initcall(curve25519_init);
-+module_exit(curve25519_exit);
-+
-+MODULE_ALIAS_CRYPTO("curve25519");
-+MODULE_ALIAS_CRYPTO("curve25519-generic");
-+MODULE_LICENSE("GPL");
+-static void fe_mul_impl(u32 out[10], const u32 in1[10], const u32 in2[10])
++static noinline void fe_mul_impl(u32 out[10], const u32 in1[10], const u32 in2[10])
+ {
+ 	{ const u32 x20 = in1[9];
+ 	{ const u32 x21 = in1[8];
+@@ -441,7 +441,7 @@ fe_mul_tll(fe *h, const fe_loose *f, const fe_loose *g)
+ 	fe_mul_impl(h->v, f->v, g->v);
+ }
+ 
+-static void fe_sqr_impl(u32 out[10], const u32 in1[10])
++static noinline void fe_sqr_impl(u32 out[10], const u32 in1[10])
+ {
+ 	{ const u32 x17 = in1[9];
+ 	{ const u32 x18 = in1[8];
+@@ -619,7 +619,7 @@ static __always_inline void fe_invert(fe *out, const fe *z)
+  *
+  * Preconditions: b in {0,1}
+  */
+-static __always_inline void fe_cswap(fe *f, fe *g, unsigned int b)
++static noinline void fe_cswap(fe *f, fe *g, unsigned int b)
+ {
+ 	unsigned i;
+ 	b = 0 - b;
 -- 
 2.20.1
 
