@@ -2,139 +2,70 @@ Return-Path: <SRS0=BhDJ=YL=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1CE8CA9EA3
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Oct 2019 07:37:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8872CA9EA1
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Oct 2019 08:02:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B5B1621925
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Oct 2019 07:37:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A6FC321D80
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Oct 2019 08:02:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389549AbfJRHhk (ORCPT
+        id S2388082AbfJRICb (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Oct 2019 03:37:40 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:37236 "EHLO fornost.hmeau.com"
+        Fri, 18 Oct 2019 04:02:31 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:37276 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728302AbfJRHhk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Oct 2019 03:37:40 -0400
+        id S1729376AbfJRICb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 18 Oct 2019 04:02:31 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1iLMoG-0004PG-JE; Fri, 18 Oct 2019 18:36:29 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Oct 2019 18:36:16 +1100
-Date:   Fri, 18 Oct 2019 17:56:23 +1100
+        id 1iLNDN-0001qE-70; Fri, 18 Oct 2019 19:02:26 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Oct 2019 19:02:25 +1100
+Date:   Fri, 18 Oct 2019 19:02:25 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jiri Slaby <jslaby@suse.cz>, tglx@linutronix.de,
-        mingo@redhat.com, hpa@zytor.com, x86@kernel.org,
-        linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
-        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
-        Matt Fleming <matt@codeblueprint.co.uk>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Juergen Gross <jgross@suse.com>, linux-crypto@vger.kernel.org,
-        linux-pm@vger.kernel.org, linux-efi@vger.kernel.org,
-        xen-devel@lists.xenproject.org
-Subject: Re: [PATCH v9 24/28] x86_64/asm: Change all ENTRY+ENDPROC to
- SYM_FUNC_*
-Message-ID: <20191018065623.GA15199@gondor.apana.org.au>
-References: <20191011115108.12392-1-jslaby@suse.cz>
- <20191011115108.12392-25-jslaby@suse.cz>
- <20191016071230.GD1138@zn.tnic>
+To:     Ben Dooks <ben.dooks@codethink.co.uk>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        davem@davemloft.net, linux-kernel@lists.codethink.co.uk
+Subject: Re: [PATCH] crypto: jitter - add header to fix buildwarnings
+Message-ID: <20191018080225.GB25128@gondor.apana.org.au>
+References: <20191009091256.12896-1-ben.dooks@codethink.co.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191016071230.GD1138@zn.tnic>
+In-Reply-To: <20191009091256.12896-1-ben.dooks@codethink.co.uk>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 16, 2019 at 09:12:30AM +0200, Borislav Petkov wrote:
-> Hi,
+On Wed, Oct 09, 2019 at 10:12:56AM +0100, Ben Dooks wrote:
+> Fix the following build warnings by adding a header for
+> the definitions shared between jitterentropy.c and
+> jitterentropy-kcapi.c. Fixes the following:
 > 
-> On Fri, Oct 11, 2019 at 01:51:04PM +0200, Jiri Slaby wrote:
-> > These are all functions which are invoked from elsewhere, so annotate
-> > them as global using the new SYM_FUNC_START. And their ENDPROC's by
-> > SYM_FUNC_END.
-> > 
-> > And make sure ENTRY/ENDPROC is not defined on X86_64, given these were
-> > the last users.
-> > 
-> > Signed-off-by: Jiri Slaby <jslaby@suse.cz>
-> > Reviewed-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com> [hibernate]
-> > Reviewed-by: Boris Ostrovsky <boris.ostrovsky@oracle.com> [xen bits]
-> > Cc: "H. Peter Anvin" <hpa@zytor.com>
-> > Cc: Borislav Petkov <bp@alien8.de>
-> > Cc: Thomas Gleixner <tglx@linutronix.de>
-> > Cc: Ingo Molnar <mingo@redhat.com>
-> > Cc: x86@kernel.org
-> > Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> > Cc: "David S. Miller" <davem@davemloft.net>
-> > Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>
-> > Cc: Len Brown <len.brown@intel.com>
-> > Cc: Pavel Machek <pavel@ucw.cz>
-> > Cc: Matt Fleming <matt@codeblueprint.co.uk>
-> > Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> > Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
-> > Cc: Juergen Gross <jgross@suse.com>
-> > Cc: linux-crypto@vger.kernel.org
-> > Cc: linux-pm@vger.kernel.org
-> > Cc: linux-efi@vger.kernel.org
-> > Cc: xen-devel@lists.xenproject.org
-> > ---
-> >  arch/x86/boot/compressed/efi_thunk_64.S      |  4 +-
-> >  arch/x86/boot/compressed/head_64.S           | 16 +++---
-> >  arch/x86/boot/compressed/mem_encrypt.S       |  8 +--
-> >  arch/x86/crypto/aegis128-aesni-asm.S         | 28 ++++-----
-> >  arch/x86/crypto/aes_ctrby8_avx-x86_64.S      | 12 ++--
-> >  arch/x86/crypto/aesni-intel_asm.S            | 60 ++++++++++----------
-> >  arch/x86/crypto/aesni-intel_avx-x86_64.S     | 32 +++++------
-> >  arch/x86/crypto/blowfish-x86_64-asm_64.S     | 16 +++---
-> >  arch/x86/crypto/camellia-aesni-avx-asm_64.S  | 24 ++++----
-> >  arch/x86/crypto/camellia-aesni-avx2-asm_64.S | 24 ++++----
-> >  arch/x86/crypto/camellia-x86_64-asm_64.S     | 16 +++---
-> >  arch/x86/crypto/cast5-avx-x86_64-asm_64.S    | 16 +++---
-> >  arch/x86/crypto/cast6-avx-x86_64-asm_64.S    | 24 ++++----
-> >  arch/x86/crypto/chacha-avx2-x86_64.S         | 12 ++--
-> >  arch/x86/crypto/chacha-avx512vl-x86_64.S     | 12 ++--
-> >  arch/x86/crypto/chacha-ssse3-x86_64.S        | 12 ++--
-> >  arch/x86/crypto/crc32-pclmul_asm.S           |  4 +-
-> >  arch/x86/crypto/crc32c-pcl-intel-asm_64.S    |  4 +-
-> >  arch/x86/crypto/crct10dif-pcl-asm_64.S       |  4 +-
-> >  arch/x86/crypto/des3_ede-asm_64.S            |  8 +--
-> >  arch/x86/crypto/ghash-clmulni-intel_asm.S    |  8 +--
-> >  arch/x86/crypto/nh-avx2-x86_64.S             |  4 +-
-> >  arch/x86/crypto/nh-sse2-x86_64.S             |  4 +-
-> >  arch/x86/crypto/poly1305-avx2-x86_64.S       |  4 +-
-> >  arch/x86/crypto/poly1305-sse2-x86_64.S       |  8 +--
-> >  arch/x86/crypto/serpent-avx-x86_64-asm_64.S  | 24 ++++----
-> >  arch/x86/crypto/serpent-avx2-asm_64.S        | 24 ++++----
-> >  arch/x86/crypto/serpent-sse2-x86_64-asm_64.S |  8 +--
-> >  arch/x86/crypto/sha1_avx2_x86_64_asm.S       |  4 +-
-> >  arch/x86/crypto/sha1_ni_asm.S                |  4 +-
-> >  arch/x86/crypto/sha1_ssse3_asm.S             |  4 +-
-> >  arch/x86/crypto/sha256-avx-asm.S             |  4 +-
-> >  arch/x86/crypto/sha256-avx2-asm.S            |  4 +-
-> >  arch/x86/crypto/sha256-ssse3-asm.S           |  4 +-
-> >  arch/x86/crypto/sha256_ni_asm.S              |  4 +-
-> >  arch/x86/crypto/sha512-avx-asm.S             |  4 +-
-> >  arch/x86/crypto/sha512-avx2-asm.S            |  4 +-
-> >  arch/x86/crypto/sha512-ssse3-asm.S           |  4 +-
-> >  arch/x86/crypto/twofish-avx-x86_64-asm_64.S  | 24 ++++----
-> >  arch/x86/crypto/twofish-x86_64-asm_64-3way.S |  8 +--
-> >  arch/x86/crypto/twofish-x86_64-asm_64.S      |  8 +--
+> crypto/jitterentropy.c:445:5: warning: symbol 'jent_read_entropy' was not declared. Should it be static?
+> crypto/jitterentropy.c:475:18: warning: symbol 'jent_entropy_collector_alloc' was not declared. Should it be static?
+> crypto/jitterentropy.c:509:6: warning: symbol 'jent_entropy_collector_free' was not declared. Should it be static?
+> crypto/jitterentropy.c:516:5: warning: symbol 'jent_entropy_init' was not declared. Should it be static?
+> crypto/jitterentropy-kcapi.c:59:6: warning: symbol 'jent_zalloc' was not declared. Should it be static?
+> crypto/jitterentropy-kcapi.c:64:6: warning: symbol 'jent_zfree' was not declared. Should it be static?
+> crypto/jitterentropy-kcapi.c:69:5: warning: symbol 'jent_fips_enabled' was not declared. Should it be static?
+> crypto/jitterentropy-kcapi.c:74:6: warning: symbol 'jent_panic' was not declared. Should it be static?
+> crypto/jitterentropy-kcapi.c:79:6: warning: symbol 'jent_memcpy' was not declared. Should it be static?
+> crypto/jitterentropy-kcapi.c:93:6: warning: symbol 'jent_get_nstime' was not declared. Should it be static?
 > 
-> I could use an ACK for the crypto bits...
+> Signed-off-by: Ben Dooks <ben.dooks@codethink.co.uk>
+> ---
+>  crypto/jitterentropy-kcapi.c |  8 +-------
+>  crypto/jitterentropy.c       |  7 +------
+>  crypto/jitterentropy.h       | 17 +++++++++++++++++
+>  3 files changed, 19 insertions(+), 13 deletions(-)
+>  create mode 100644 crypto/jitterentropy.h
 
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-Cheers,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
