@@ -2,101 +2,140 @@ Return-Path: <SRS0=BhDJ=YL=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DC57CA9EA3
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Oct 2019 07:32:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1CE8CA9EA3
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Oct 2019 07:37:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4440B21D80
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Oct 2019 07:32:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QDjSdwVh"
+	by mail.kernel.org (Postfix) with ESMTP id B5B1621925
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Oct 2019 07:37:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2504660AbfJRHci (ORCPT
+        id S2389549AbfJRHhk (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Oct 2019 03:32:38 -0400
-Received: from mail-lj1-f194.google.com ([209.85.208.194]:38598 "EHLO
-        mail-lj1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2504654AbfJRHci (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Oct 2019 03:32:38 -0400
-Received: by mail-lj1-f194.google.com with SMTP id b20so5155000ljj.5;
-        Fri, 18 Oct 2019 00:32:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=M59q7a9C0OgA4oCmsCvNmrsotdikD3/oQO5y00c53pE=;
-        b=QDjSdwVhwSC0JWfWLJhp/h9DdZY9n0KxIP8OCUJAgh30ovPE8RBv1vHr+hVbVE0tME
-         iJD/yM8B0njK1VSHughXZlw5SQkhpbffxcCOWITVKsRI0dqS8/ILGqUXSDE6L6GQObAB
-         8Spdl/ikovaOjEkQ7UyA0Glo6fnrOJKKEAP/gqHenduF5Lu0WFI9N0bTzyfpDg3zfBV2
-         IRnoDoHGZNoLlHtk2Azb1de+77SEAhw9DcNfUSfk+GVqyQLuuShl+xT1Ca29rp3J6LGC
-         y80VJ4sumAssPPDxX3/qBR8wbdfQ+PliuJhcYWI5xzyfTw1IL0YY22z+NQybKAWp1Wdy
-         emHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=M59q7a9C0OgA4oCmsCvNmrsotdikD3/oQO5y00c53pE=;
-        b=OqejqXKR2Btm1eTSswEz+ntVUVN002t/R6PIbFviDA8rDmBsMfnOqN1irwdOo3hjLk
-         YCQJmYJPPmSSliIOEzh3BExrQKzDWEeiUZ8AayTQPl8freFcAAWECvbqNSjxLkdTQxQH
-         4kBGov1jEAb74kfS/wwJFKQ6ZC0kK+QCpj9Tek0yKgWE5jmyg2HTCo2Z5ljF7rAOuRYV
-         CGtjMwbu5cewKg1OpkImqfETsVT4bRSnps0DURCtaijdt2vXKKxSPkUdDmLC/DiX+kCY
-         LzDHJlA+CWX3ZvLndruQAhUAB/FTET9F+bvfxQ79i8N6bJpAMb6VP2lEpy23OeWbbf4U
-         8qSQ==
-X-Gm-Message-State: APjAAAUKB0TO2VE+TYCtmu/wgTBKNDFG/DLwK/HVpgBXIRZMFh15wFHX
-        891On3Yw/5kr2uKORTWgdzQPvF5k2OXAXMhuJaY=
-X-Google-Smtp-Source: APXvYqxGOxFAMF/DGekSaTRLTT9JUI7FrVcOqmXscMrke5xrFR1FwSh6E7g1AZnXqZ7em90pHobqgkjM7M2X9uVhFI0=
-X-Received: by 2002:a2e:b4a8:: with SMTP id q8mr5095902ljm.106.1571383954846;
- Fri, 18 Oct 2019 00:32:34 -0700 (PDT)
+        Fri, 18 Oct 2019 03:37:40 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:37236 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728302AbfJRHhk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 18 Oct 2019 03:37:40 -0400
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
+        by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
+        id 1iLMoG-0004PG-JE; Fri, 18 Oct 2019 18:36:29 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Oct 2019 18:36:16 +1100
+Date:   Fri, 18 Oct 2019 17:56:23 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Borislav Petkov <bp@alien8.de>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Jiri Slaby <jslaby@suse.cz>, tglx@linutronix.de,
+        mingo@redhat.com, hpa@zytor.com, x86@kernel.org,
+        linux-arch@vger.kernel.org, linux-kernel@vger.kernel.org,
+        "Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
+        Matt Fleming <matt@codeblueprint.co.uk>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Juergen Gross <jgross@suse.com>, linux-crypto@vger.kernel.org,
+        linux-pm@vger.kernel.org, linux-efi@vger.kernel.org,
+        xen-devel@lists.xenproject.org
+Subject: Re: [PATCH v9 24/28] x86_64/asm: Change all ENTRY+ENDPROC to
+ SYM_FUNC_*
+Message-ID: <20191018065623.GA15199@gondor.apana.org.au>
+References: <20191011115108.12392-1-jslaby@suse.cz>
+ <20191011115108.12392-25-jslaby@suse.cz>
+ <20191016071230.GD1138@zn.tnic>
 MIME-Version: 1.0
-References: <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2A22E@ALPMBAPA12.e2k.ad.ge.com>
- <20191004182711.GC6945@linux.intel.com> <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2A38B@ALPMBAPA12.e2k.ad.ge.com>
- <20191007000520.GA17116@linux.intel.com> <59b88042-9c56-c891-f75e-7c0719eb5ff9@linux.ibm.com>
- <20191008234935.GA13926@linux.intel.com> <20191008235339.GB13926@linux.intel.com>
- <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2B995@ALPMBAPA12.e2k.ad.ge.com>
- <20191014190033.GA15552@linux.intel.com> <1571081397.3728.9.camel@HansenPartnership.com>
- <20191016110031.GE10184@linux.intel.com> <1571229252.3477.7.camel@HansenPartnership.com>
-In-Reply-To: <1571229252.3477.7.camel@HansenPartnership.com>
-From:   Janne Karhunen <janne.karhunen@gmail.com>
-Date:   Fri, 18 Oct 2019 10:32:23 +0300
-Message-ID: <CAE=NcrbSrqNUF_Jhe4cL=BSmY=p45nS8axkSJC6HWeGo2NnXDA@mail.gmail.com>
-Subject: Re: [PATCH] KEYS: asym_tpm: Switch to get_random_bytes()
-To:     James Bottomley <James.Bottomley@hansenpartnership.com>
-Cc:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
-        "Safford, David (GE Global Research, US)" <david.safford@ge.com>,
-        Ken Goldman <kgold@linux.ibm.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>,
-        "open list:ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191016071230.GD1138@zn.tnic>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 16, 2019 at 6:35 PM James Bottomley
-<James.Bottomley@hansenpartnership.com> wrote:
+On Wed, Oct 16, 2019 at 09:12:30AM +0200, Borislav Petkov wrote:
+> Hi,
+> 
+> On Fri, Oct 11, 2019 at 01:51:04PM +0200, Jiri Slaby wrote:
+> > These are all functions which are invoked from elsewhere, so annotate
+> > them as global using the new SYM_FUNC_START. And their ENDPROC's by
+> > SYM_FUNC_END.
+> > 
+> > And make sure ENTRY/ENDPROC is not defined on X86_64, given these were
+> > the last users.
+> > 
+> > Signed-off-by: Jiri Slaby <jslaby@suse.cz>
+> > Reviewed-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com> [hibernate]
+> > Reviewed-by: Boris Ostrovsky <boris.ostrovsky@oracle.com> [xen bits]
+> > Cc: "H. Peter Anvin" <hpa@zytor.com>
+> > Cc: Borislav Petkov <bp@alien8.de>
+> > Cc: Thomas Gleixner <tglx@linutronix.de>
+> > Cc: Ingo Molnar <mingo@redhat.com>
+> > Cc: x86@kernel.org
+> > Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> > Cc: "David S. Miller" <davem@davemloft.net>
+> > Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>
+> > Cc: Len Brown <len.brown@intel.com>
+> > Cc: Pavel Machek <pavel@ucw.cz>
+> > Cc: Matt Fleming <matt@codeblueprint.co.uk>
+> > Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> > Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+> > Cc: Juergen Gross <jgross@suse.com>
+> > Cc: linux-crypto@vger.kernel.org
+> > Cc: linux-pm@vger.kernel.org
+> > Cc: linux-efi@vger.kernel.org
+> > Cc: xen-devel@lists.xenproject.org
+> > ---
+> >  arch/x86/boot/compressed/efi_thunk_64.S      |  4 +-
+> >  arch/x86/boot/compressed/head_64.S           | 16 +++---
+> >  arch/x86/boot/compressed/mem_encrypt.S       |  8 +--
+> >  arch/x86/crypto/aegis128-aesni-asm.S         | 28 ++++-----
+> >  arch/x86/crypto/aes_ctrby8_avx-x86_64.S      | 12 ++--
+> >  arch/x86/crypto/aesni-intel_asm.S            | 60 ++++++++++----------
+> >  arch/x86/crypto/aesni-intel_avx-x86_64.S     | 32 +++++------
+> >  arch/x86/crypto/blowfish-x86_64-asm_64.S     | 16 +++---
+> >  arch/x86/crypto/camellia-aesni-avx-asm_64.S  | 24 ++++----
+> >  arch/x86/crypto/camellia-aesni-avx2-asm_64.S | 24 ++++----
+> >  arch/x86/crypto/camellia-x86_64-asm_64.S     | 16 +++---
+> >  arch/x86/crypto/cast5-avx-x86_64-asm_64.S    | 16 +++---
+> >  arch/x86/crypto/cast6-avx-x86_64-asm_64.S    | 24 ++++----
+> >  arch/x86/crypto/chacha-avx2-x86_64.S         | 12 ++--
+> >  arch/x86/crypto/chacha-avx512vl-x86_64.S     | 12 ++--
+> >  arch/x86/crypto/chacha-ssse3-x86_64.S        | 12 ++--
+> >  arch/x86/crypto/crc32-pclmul_asm.S           |  4 +-
+> >  arch/x86/crypto/crc32c-pcl-intel-asm_64.S    |  4 +-
+> >  arch/x86/crypto/crct10dif-pcl-asm_64.S       |  4 +-
+> >  arch/x86/crypto/des3_ede-asm_64.S            |  8 +--
+> >  arch/x86/crypto/ghash-clmulni-intel_asm.S    |  8 +--
+> >  arch/x86/crypto/nh-avx2-x86_64.S             |  4 +-
+> >  arch/x86/crypto/nh-sse2-x86_64.S             |  4 +-
+> >  arch/x86/crypto/poly1305-avx2-x86_64.S       |  4 +-
+> >  arch/x86/crypto/poly1305-sse2-x86_64.S       |  8 +--
+> >  arch/x86/crypto/serpent-avx-x86_64-asm_64.S  | 24 ++++----
+> >  arch/x86/crypto/serpent-avx2-asm_64.S        | 24 ++++----
+> >  arch/x86/crypto/serpent-sse2-x86_64-asm_64.S |  8 +--
+> >  arch/x86/crypto/sha1_avx2_x86_64_asm.S       |  4 +-
+> >  arch/x86/crypto/sha1_ni_asm.S                |  4 +-
+> >  arch/x86/crypto/sha1_ssse3_asm.S             |  4 +-
+> >  arch/x86/crypto/sha256-avx-asm.S             |  4 +-
+> >  arch/x86/crypto/sha256-avx2-asm.S            |  4 +-
+> >  arch/x86/crypto/sha256-ssse3-asm.S           |  4 +-
+> >  arch/x86/crypto/sha256_ni_asm.S              |  4 +-
+> >  arch/x86/crypto/sha512-avx-asm.S             |  4 +-
+> >  arch/x86/crypto/sha512-avx2-asm.S            |  4 +-
+> >  arch/x86/crypto/sha512-ssse3-asm.S           |  4 +-
+> >  arch/x86/crypto/twofish-avx-x86_64-asm_64.S  | 24 ++++----
+> >  arch/x86/crypto/twofish-x86_64-asm_64-3way.S |  8 +--
+> >  arch/x86/crypto/twofish-x86_64-asm_64.S      |  8 +--
+> 
+> I could use an ACK for the crypto bits...
 
-> > The documentation says that krng is suitable for key generation.
-> > Should the documentation changed to state that it is unsuitable?
->
-> How do you get that from the argument above?  The krng is about the
-> best we have in terms of unpredictable key generation, so of course it
-> is suitable ... provided you give the entropy enough time to have
-> sufficient entropy.
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Yes, so it can be both the safest and the least safe option available.
-By default it's the worst one, but use it wisely and it can be the
-best source. Hence I was proposing that kconfig option + boot time
-printout to make this clear for everyone..
-
-
---
-Janne
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
