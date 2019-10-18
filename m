@@ -2,68 +2,62 @@ Return-Path: <SRS0=BhDJ=YL=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8872CA9EA1
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Oct 2019 08:02:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C59CCCA9EA1
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Oct 2019 08:02:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A6FC321D80
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Oct 2019 08:02:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AA34D2089C
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Oct 2019 08:02:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388082AbfJRICb (ORCPT
+        id S2437733AbfJRICg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Oct 2019 04:02:31 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:37276 "EHLO fornost.hmeau.com"
+        Fri, 18 Oct 2019 04:02:36 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:37280 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729376AbfJRICb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Oct 2019 04:02:31 -0400
+        id S1729376AbfJRICg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 18 Oct 2019 04:02:36 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1iLNDN-0001qE-70; Fri, 18 Oct 2019 19:02:26 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Oct 2019 19:02:25 +1100
-Date:   Fri, 18 Oct 2019 19:02:25 +1100
+        id 1iLNDE-0001q5-IL; Fri, 18 Oct 2019 19:02:17 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Oct 2019 19:02:16 +1100
+Date:   Fri, 18 Oct 2019 19:02:16 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ben Dooks <ben.dooks@codethink.co.uk>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        davem@davemloft.net, linux-kernel@lists.codethink.co.uk
-Subject: Re: [PATCH] crypto: jitter - add header to fix buildwarnings
-Message-ID: <20191018080225.GB25128@gondor.apana.org.au>
-References: <20191009091256.12896-1-ben.dooks@codethink.co.uk>
+To:     Colin King <colin.king@canonical.com>
+Cc:     Antoine Tenart <antoine.tenart@bootlin.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH][V2][next] crypto: inside-secure: fix spelling mistake
+ "algorithmn" -> "algorithm"
+Message-ID: <20191018080216.GA25128@gondor.apana.org.au>
+References: <20191008082428.19839-1-colin.king@canonical.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191009091256.12896-1-ben.dooks@codethink.co.uk>
+In-Reply-To: <20191008082428.19839-1-colin.king@canonical.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 09, 2019 at 10:12:56AM +0100, Ben Dooks wrote:
-> Fix the following build warnings by adding a header for
-> the definitions shared between jitterentropy.c and
-> jitterentropy-kcapi.c. Fixes the following:
+On Tue, Oct 08, 2019 at 09:24:28AM +0100, Colin King wrote:
+> From: Colin Ian King <colin.king@canonical.com>
 > 
-> crypto/jitterentropy.c:445:5: warning: symbol 'jent_read_entropy' was not declared. Should it be static?
-> crypto/jitterentropy.c:475:18: warning: symbol 'jent_entropy_collector_alloc' was not declared. Should it be static?
-> crypto/jitterentropy.c:509:6: warning: symbol 'jent_entropy_collector_free' was not declared. Should it be static?
-> crypto/jitterentropy.c:516:5: warning: symbol 'jent_entropy_init' was not declared. Should it be static?
-> crypto/jitterentropy-kcapi.c:59:6: warning: symbol 'jent_zalloc' was not declared. Should it be static?
-> crypto/jitterentropy-kcapi.c:64:6: warning: symbol 'jent_zfree' was not declared. Should it be static?
-> crypto/jitterentropy-kcapi.c:69:5: warning: symbol 'jent_fips_enabled' was not declared. Should it be static?
-> crypto/jitterentropy-kcapi.c:74:6: warning: symbol 'jent_panic' was not declared. Should it be static?
-> crypto/jitterentropy-kcapi.c:79:6: warning: symbol 'jent_memcpy' was not declared. Should it be static?
-> crypto/jitterentropy-kcapi.c:93:6: warning: symbol 'jent_get_nstime' was not declared. Should it be static?
+> There is a spelling mistake in a dev_err message. Fix it. Add in missing
+> newline.
 > 
-> Signed-off-by: Ben Dooks <ben.dooks@codethink.co.uk>
+> Signed-off-by: Colin Ian King <colin.king@canonical.com>
 > ---
->  crypto/jitterentropy-kcapi.c |  8 +-------
->  crypto/jitterentropy.c       |  7 +------
->  crypto/jitterentropy.h       | 17 +++++++++++++++++
->  3 files changed, 19 insertions(+), 13 deletions(-)
->  create mode 100644 crypto/jitterentropy.h
+> 
+> V2: Add in newline \n
+> 
+> ---
+>  drivers/crypto/inside-secure/safexcel_cipher.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
