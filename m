@@ -6,64 +6,55 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD5ECCA9EA0
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Oct 2019 08:04:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1378CA9EA0
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Oct 2019 08:04:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AC97E2089C
-	for <linux-crypto@archiver.kernel.org>; Fri, 18 Oct 2019 08:04:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CCA4B2089C
+	for <linux-crypto@archiver.kernel.org>; Fri, 18 Oct 2019 08:04:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731017AbfJRIE1 (ORCPT
+        id S2394761AbfJRIEk (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 18 Oct 2019 04:04:27 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:37324 "EHLO fornost.hmeau.com"
+        Fri, 18 Oct 2019 04:04:40 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:37350 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727888AbfJRIE0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 18 Oct 2019 04:04:26 -0400
+        id S1727888AbfJRIEk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 18 Oct 2019 04:04:40 -0400
 Received: from gwarestrin.arnor.me.apana.org.au ([192.168.0.7])
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1iLNF9-0001v3-Bm; Fri, 18 Oct 2019 19:04:16 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Oct 2019 19:04:15 +1100
-Date:   Fri, 18 Oct 2019 19:04:15 +1100
+        id 1iLNFJ-0001vB-3p; Fri, 18 Oct 2019 19:04:26 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 18 Oct 2019 19:04:25 +1100
+Date:   Fri, 18 Oct 2019 19:04:25 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        arnd@arndb.de
-Subject: Re: [PATCH] crypto: arm - use Kconfig based compiler checks for
- crypto opcodes
-Message-ID: <20191018080415.GF25128@gondor.apana.org.au>
-References: <20191011090800.29386-1-ard.biesheuvel@linaro.org>
+To:     zhengbin <zhengbin13@huawei.com>
+Cc:     davem@davemloft.net, ndesaulniers@google.com,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] crypto: ux500: Remove set but not used variable 'cookie'
+Message-ID: <20191018080424.GG25128@gondor.apana.org.au>
+References: <1570788482-104009-1-git-send-email-zhengbin13@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191011090800.29386-1-ard.biesheuvel@linaro.org>
+In-Reply-To: <1570788482-104009-1-git-send-email-zhengbin13@huawei.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Oct 11, 2019 at 11:08:00AM +0200, Ard Biesheuvel wrote:
-> Instead of allowing the Crypto Extensions algorithms to be selected when
-> using a toolchain that does not support them, and complain about it at
-> build time, use the information we have about the compiler to prevent
-> them from being selected in the first place. Users that are stuck with
-> a GCC version <4.8 are unlikely to care about these routines anyway, and
-> it cleans up the Makefile considerably.
+On Fri, Oct 11, 2019 at 06:08:02PM +0800, zhengbin wrote:
+> Fixes gcc '-Wunused-but-set-variable' warning:
 > 
-> While at it, add explicit 'armv8-a' CPU specifiers to the code that uses
-> the 'crypto-neon-fp-armv8' FPU specifier so we don't regress Clang, which
-> will complain about this in version 10 and later.
+> drivers/crypto/ux500/hash/hash_core.c: In function hash_set_dma_transfer:
+> drivers/crypto/ux500/hash/hash_core.c:143:15: warning: variable cookie set but not used [-Wunused-but-set-variable]
 > 
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> It is not used since commit 8a63b1994c50 ("crypto:
+> ux500 - Add driver for HASH hardware")
+> 
+> Reported-by: Hulk Robot <hulkci@huawei.com>
+> Signed-off-by: zhengbin <zhengbin13@huawei.com>
 > ---
->  arch/arm/crypto/Kconfig             | 14 +++++++------
->  arch/arm/crypto/Makefile            | 32 ++++++-----------------------
->  arch/arm/crypto/aes-ce-core.S       |  1 +
->  arch/arm/crypto/crct10dif-ce-core.S |  2 +-
->  arch/arm/crypto/ghash-ce-core.S     |  1 +
->  arch/arm/crypto/sha1-ce-core.S      |  1 +
->  arch/arm/crypto/sha2-ce-core.S      |  1 +
->  7 files changed, 19 insertions(+), 33 deletions(-)
+>  drivers/crypto/ux500/hash/hash_core.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 
 Patch applied.  Thanks.
 -- 
