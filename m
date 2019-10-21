@@ -2,148 +2,102 @@ Return-Path: <SRS0=EZON=YO=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4308ECA9EAF
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 10:56:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF14CCA9EAF
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 11:39:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0B18620873
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 10:56:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="zaNXeyax"
+	by mail.kernel.org (Postfix) with ESMTP id B79A82084C
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 11:39:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727832AbfJUKz7 (ORCPT
+        id S1727725AbfJULjp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Oct 2019 06:55:59 -0400
-Received: from mail-eopbgr680060.outbound.protection.outlook.com ([40.107.68.60]:27876
-        "EHLO NAM04-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727831AbfJUKz6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Oct 2019 06:55:58 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZQ49BUyKdqPW61XTi64ufasFosGYdKgV2COutJaX3X/j6fzgdStn3Oqi/Vc7GCK9wmSxJwrfPzlexNZcaV9Wu8nbWHtqm5PXBrUwEcLct09ExXjwtlICd4Ko0DDf0yFK8p/C/zBkKJcBzEd27k/myqnrocDC3EBfmd4eyCrs67Io7ak5gCrE4pBpxfh5iRKNMAl9N+YgVu0Ra3nHmS/DWk+44mIFpBkD1EPqXgDR77VBy/aIvser2U+vskV4q91Qw6DRPY2tNao5dEBaMme8CfFlL/9bSf9vtu3HG9iLqvUlNq6rDNlYw0qaHabkGLueS8I8qENDv7gC4bYW76hhvQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vwYf75MjPx31xTKvR62HiLAJ8/501UAIekaKlGthX8g=;
- b=YsgpPUwW0vJnT4cU5Dv8xGIRyUABzJBullVt62MpgGyadQGOio25khLxGoEdFyhyUQB5QcjkEvKUqpQ4h+pDmbjSB++2QeUBGYeo1Yv77+CKkFWl+VT3cFp/Q5O+2rjjoaE/vOCDAJAxpjAOknkj0zAOcGl9cYoV15xzWd2kveUsEjZ9CGbn6jCMYZc1wDKiRb2EoAN/LbNRkHWAcVx4WEe1ttM7QI5crPaioEHpniE/LlbzFVrQeWDxMrGfmoM2Okpyma1Bcmsi7FZydmI8t+Ipq67nij+z3L70vbNsnQF5Aur62sA0yx8Ve5UrNu/gdmj+IwUM/YTntIYJdXzPTw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=verimatrix.com; dmarc=pass action=none
- header.from=verimatrix.com; dkim=pass header.d=verimatrix.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vwYf75MjPx31xTKvR62HiLAJ8/501UAIekaKlGthX8g=;
- b=zaNXeyaxpwQZPRfH9leTDGvMymrdwmhBWCxmGYtGXRPI4dPEZDX/ypKo2PBmvvS2Hag53GdIwjTea/b+d6wTbnTa3BGSWnYXDoTT1eeppFWfQVCQxIvchSjR37+RS+RL4nkHPqfL92n43wlwFOgb83YLNWiQuqhYgkzgzbMUstE=
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.86) by
- MN2PR20MB2656.namprd20.prod.outlook.com (20.178.251.207) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2347.21; Mon, 21 Oct 2019 10:55:56 +0000
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::b986:4f02:3206:31e4]) by MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::b986:4f02:3206:31e4%7]) with mapi id 15.20.2347.029; Mon, 21 Oct 2019
- 10:55:56 +0000
-From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
-Subject: RE: Key endianness?
-Thread-Topic: Key endianness?
-Thread-Index: AdWH7WiyGB6aVNy7SJOkTaAoiPGHOgADxdEg
-Date:   Mon, 21 Oct 2019 10:55:56 +0000
-Message-ID: <MN2PR20MB29734588383A8699E6B700F3CA690@MN2PR20MB2973.namprd20.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pvanleeuwen@verimatrix.com; 
-x-originating-ip: [188.204.2.113]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 5947232b-c8bc-4765-309b-08d756154020
-x-ms-traffictypediagnostic: MN2PR20MB2656:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <MN2PR20MB2656ACF323D7C42F70DF6544CA690@MN2PR20MB2656.namprd20.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-forefront-prvs: 0197AFBD92
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39850400004)(346002)(136003)(376002)(366004)(396003)(199004)(189003)(13464003)(7736002)(7696005)(316002)(86362001)(2906002)(71200400001)(71190400001)(478600001)(15974865002)(5660300002)(7116003)(8936002)(476003)(305945005)(74316002)(486006)(25786009)(14444005)(6116002)(256004)(3846002)(55016002)(6436002)(229853002)(9686003)(33656002)(99286004)(76116006)(66476007)(66556008)(64756008)(66446008)(8676002)(6506007)(110136005)(53546011)(52536014)(66946007)(66066001)(14454004)(26005)(81166006)(81156014)(186003)(102836004)(6246003)(3480700005)(2501003)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB2656;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: verimatrix.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 0J9HPgWR36fdTgjC26YjKzg0mT24Scml8QoqA/HcNNUBM/I5SNVr3Kmjr8OsaTLVzC6wbvJyOhE1Jpq8ml7ylzeQ23Hzfq+VoUvJBblkg/T1lDMI247IN5R0I3ZfLjpAkp7n8248udtsQF/xX02VjY3J8XeH4RFyZlKHfsFAqjuP3Cvx6zzE7B9XJ3Dv8n+xjrtxiwwdYa0wqEYmCammkmAfCNZzgYq/HcS9rmPbTAmv3bSyf5VafKRYEIaZjJA/B7VnNl5YiiP6mSkTHu026ZMFuTFSy/JUNZJb/YXXkrwUZYgQY228zu793CwPKRGhOEsHFDi9CrmTjswCuwbN12yzesS6lAh+Uh8J7xKG0cL8tjqGqGMWRz69yqfWrA5OUDZG/6/Ttf05YDE8f9/y26HjCS77O64J+6IoEPsOkuQ=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="Windows-1252"
-Content-Transfer-Encoding: quoted-printable
+        Mon, 21 Oct 2019 07:39:45 -0400
+Received: from mga05.intel.com ([192.55.52.43]:17908 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727685AbfJULjp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 21 Oct 2019 07:39:45 -0400
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 21 Oct 2019 04:39:44 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.67,323,1566889200"; 
+   d="scan'208";a="201346357"
+Received: from jsakkine-mobl1.tm.intel.com (HELO localhost) ([10.237.50.130])
+  by orsmga006.jf.intel.com with ESMTP; 21 Oct 2019 04:39:40 -0700
+Date:   Mon, 21 Oct 2019 14:39:39 +0300
+From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+To:     James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc:     "Safford, David (GE Global Research, US)" <david.safford@ge.com>,
+        Ken Goldman <kgold@linux.ibm.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>,
+        "open list:ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] KEYS: asym_tpm: Switch to get_random_bytes()
+Message-ID: <20191021113939.GA11649@linux.intel.com>
+References: <20191008234935.GA13926@linux.intel.com>
+ <20191008235339.GB13926@linux.intel.com>
+ <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2B995@ALPMBAPA12.e2k.ad.ge.com>
+ <20191014190033.GA15552@linux.intel.com>
+ <1571081397.3728.9.camel@HansenPartnership.com>
+ <20191016110031.GE10184@linux.intel.com>
+ <1571229252.3477.7.camel@HansenPartnership.com>
+ <20191016162543.GB6279@linux.intel.com>
+ <1571253029.17520.5.camel@HansenPartnership.com>
+ <20191017180440.GG6667@linux.intel.com>
 MIME-Version: 1.0
-X-OriginatorOrg: verimatrix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5947232b-c8bc-4765-309b-08d756154020
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Oct 2019 10:55:56.3919
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Qs0y8ze0Pxoh1eko244stbn0DlcAbf5g91jg9/aOWRglWQ4It9jSwiO1mxt1nZgMxrBWsnddif/jPZHxComyPt3qtykpjrpkkacxWvDaVac=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB2656
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191017180440.GG6667@linux.intel.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Another endianness question:
+On Thu, Oct 17, 2019 at 09:04:40PM +0300, Jarkko Sakkinen wrote:
+> On Wed, Oct 16, 2019 at 03:10:29PM -0400, James Bottomley wrote:
+> > On Wed, 2019-10-16 at 19:25 +0300, Jarkko Sakkinen wrote:
+> > > On Wed, Oct 16, 2019 at 08:34:12AM -0400, James Bottomley wrote:
+> > > > reversible ciphers are generally frowned upon in random number
+> > > > generation, that's why the krng uses chacha20.  In general I think
+> > > > we shouldn't try to code our own mixing and instead should get the
+> > > > krng to do it for us using whatever the algorithm du jour that the
+> > > > crypto guys have blessed is.  That's why I proposed adding the TPM
+> > > > output to the krng as entropy input and then taking the output of
+> > > > the krng.
+> > > 
+> > > It is already registered as hwrng. What else?
+> > 
+> > It only contributes entropy once at start of OS.
+> 
+> Ok.
+> 
+> > >  Was the issue that it is only used as seed when the rng is init'd
+> > > first? I haven't at this point gone to the internals of krng.
+> > 
+> > Basically it was similar to your xor patch except I got the kernel rng
+> > to do the mixing, so it would use the chacha20 cipher at the moment
+> > until they decide that's unsafe and change it to something else:
+> > 
+> > https://lore.kernel.org/linux-crypto/1570227068.17537.4.camel@HansenPartnership.com/
+> > 
+> > It uses add_hwgenerator_randomness() to do the mixing.  It also has an
+> > unmixed source so that read of the TPM hwrng device works as expected.
+> 
+> Thinking that could this potentially racy? I.e. between the calls
+> something else could eat the entropy added?
 
-I have some data structure that can be either little or big endian,
-depending on the exact use case. Currently, I have it defined as u32.
-This causes sparse errors when accessing it using cpu_to_Xe32() and
-Xe32_to_cpu().
+Also, what is wrong just taking one value from krng and mixing
+it with a value from TPM RNG where needed? That would be non-racy
+too.
 
-Now, for the big endian case, I could use htonl()/ntohl() instead,
-but this is inconsistent with all other endian conversions in the
-driver ... and there's no little endian alternative I'm aware of.
-So I don't really like that approach.
-
-Alternatively, I could define a union of both a big and little
-endian version of the data but that would require touching a lot
-of legacy code (unless I use a C11 anonymous union ... not sure
-if that would be allowed?) and IMHO is a bit silly.
-
-Is there some way of telling sparse to _not_ check for "correct"
-use of these functions for a certain variable?
-
-Regards,
-Pascal van Leeuwen
-Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
-www.insidesecure.com
-
-> -----Original Message-----
-> From: Pascal Van Leeuwen
-> Sent: Monday, October 21, 2019 11:04 AM
-> To: linux-crypto@vger.kernel.org; herbert@gondor.apana.org.au
-> Subject: Key endianness?
->=20
-> Herbert,
->=20
-> I'm currently busy fixing some endianness related sparse errors reported
-> by this kbuild test robot and this triggered my to rethink some endian
-> conversion being done in the inside-secure driver.
->=20
-> I actually wonder what the endianness is of the input key data, e.g. the
-> "u8 *key" parameter to the setkey function.
->=20
-> I also wonder what the endianness is of the key data in a structure
-> like "crypto_aes_ctx", as filled in by the aes_expandkey function.
->=20
-> Since I know my current endianness conversions work on a little endian
-> CPU, I guess the big question is whether the byte order of this key
-> data is _CPU byte order_ or always some _fixed byte order_ (e.g. as per
-> algorithm specification).
->=20
-> I know I have some customers using big-endian CPU's, so I do care, but
-> I unfortunately don't have any platform available to test this with.
->=20
-> Regards,
-> Pascal van Leeuwen
-> Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
-> www.insidesecure.com
-
+/Jarkko
