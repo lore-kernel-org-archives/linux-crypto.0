@@ -2,125 +2,66 @@ Return-Path: <SRS0=EZON=YO=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AE66CA9EA5
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 04:00:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36AB4CA9EB5
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 05:46:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 71E962089C
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 04:00:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0FF03205ED
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 05:46:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725372AbfJUEAK (ORCPT
+        id S1725900AbfJUFqJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Oct 2019 00:00:10 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:58718 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725290AbfJUEAK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Oct 2019 00:00:10 -0400
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id DBD4A99854E7AD08D5C5;
-        Mon, 21 Oct 2019 12:00:08 +0800 (CST)
-Received: from [127.0.0.1] (10.63.139.185) by DGGEMS410-HUB.china.huawei.com
- (10.3.19.210) with Microsoft SMTP Server id 14.3.439.0; Mon, 21 Oct 2019
- 12:00:01 +0800
+        Mon, 21 Oct 2019 01:46:09 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:55420 "EHLO fornost.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725843AbfJUFqJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 21 Oct 2019 01:46:09 -0400
+Received: from gwarestrin.me.apana.org.au ([192.168.0.7] helo=gwarestrin.arnor.me.apana.org.au)
+        by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
+        id 1iMQVz-0006Ej-AW; Mon, 21 Oct 2019 16:46:00 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Mon, 21 Oct 2019 16:45:59 +1100
+Date:   Mon, 21 Oct 2019 16:45:59 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Zhou Wang <wangzhou1@hisilicon.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linuxarm@huawei.com
 Subject: Re: [PATCH] crypto: zlib-deflate - add zlib-deflate test case in
  tcrypt
-To:     Herbert Xu <herbert@gondor.apana.org.au>
+Message-ID: <20191021054559.GA32542@gondor.apana.org.au>
 References: <1570695707-46528-1-git-send-email-wangzhou1@hisilicon.com>
  <20191018071424.GA16131@gondor.apana.org.au>
-CC:     "David S. Miller" <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>, <linuxarm@huawei.com>
-From:   Zhou Wang <wangzhou1@hisilicon.com>
-Message-ID: <5DAD2D40.6000901@hisilicon.com>
-Date:   Mon, 21 Oct 2019 12:00:00 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:38.0) Gecko/20100101
- Thunderbird/38.5.1
+ <5DAD2D40.6000901@hisilicon.com>
 MIME-Version: 1.0
-In-Reply-To: <20191018071424.GA16131@gondor.apana.org.au>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.63.139.185]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5DAD2D40.6000901@hisilicon.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2019/10/18 15:14, Herbert Xu wrote:
-> On Thu, Oct 10, 2019 at 04:21:47PM +0800, Zhou Wang wrote:
->> As a type CRYPTO_ALG_TYPE_ACOMPRESS is needed to trigger crypto acomp test,
->> we introduce a new help function tcrypto_test_extend to pass type and mask
->> to alg_test.
->>
->> Then tcrypto module can be used to do basic acomp test by:
->> insmod tcrypto.ko alg="zlib-deflate" mode=55 type=10
->>
->> Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
->> ---
->>  crypto/tcrypt.c | 19 ++++++++++++++++++-
->>  1 file changed, 18 insertions(+), 1 deletion(-)
->>
->> diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
->> index 83ad0b1..6ad821c 100644
->> --- a/crypto/tcrypt.c
->> +++ b/crypto/tcrypt.c
->> @@ -72,7 +72,7 @@ static char *check[] = {
->>  	"khazad", "wp512", "wp384", "wp256", "tnepres", "xeta",  "fcrypt",
->>  	"camellia", "seed", "salsa20", "rmd128", "rmd160", "rmd256", "rmd320",
->>  	"lzo", "lzo-rle", "cts", "sha3-224", "sha3-256", "sha3-384",
->> -	"sha3-512", "streebog256", "streebog512",
->> +	"sha3-512", "streebog256", "streebog512", "zlib-deflate",
->>  	NULL
->>  };
->>  
->> @@ -1657,6 +1657,19 @@ static inline int tcrypt_test(const char *alg)
->>  	return ret;
->>  }
->>  
->> +static inline int tcrypt_test_extend(const char *alg, u32 type, u32 mask)
->> +{
->> +	int ret;
->> +
->> +	pr_debug("testing %s\n", alg);
->> +
->> +	ret = alg_test(alg, alg, type, mask);
->> +	/* non-fips algs return -EINVAL in fips mode */
->> +	if (fips_enabled && ret == -EINVAL)
->> +		ret = 0;
->> +	return ret;
->> +}
->> +
->>  static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
->>  {
->>  	int i;
->> @@ -1919,6 +1932,10 @@ static int do_test(const char *alg, u32 type, u32 mask, int m, u32 num_mb)
->>  		ret += tcrypt_test("streebog512");
->>  		break;
->>  
->> +	case 55:
->> +		ret += tcrypt_test_extend("zlib-deflate", type, mask);
->> +		break;
->> +
-> 
-> Is this really needed? When you do
-> 
-> 	modprobe tcrypt alg="zlib-deflate" type=10 mask=15
-> 
-> It should cause zlib-defalte to be registered as acomp and therefore
-> tested automatically.
+On Mon, Oct 21, 2019 at 12:00:00PM +0800, Zhou Wang wrote:
+>
+> seems it can not work, when I run insmod tcrypt.ko alg="zlib-deflate" type=10 mask=15
+> I got: insmod: can't insert 'tcrypt.ko': Resource temporarily unavailable
 
-seems it can not work, when I run insmod tcrypt.ko alg="zlib-deflate" type=10 mask=15
-I got: insmod: can't insert 'tcrypt.ko': Resource temporarily unavailable
+This error is intentional.  This is so that you can test again
+without having to unload the module.
 
-crypto_has_alg in case 0 in do_test does find "zlib-deflate", however, it breaks and
-do nothing about test.
+> crypto_has_alg in case 0 in do_test does find "zlib-deflate", however, it breaks and
+> do nothing about test.
 
-Best,
-Zhou
+It doesn't have to do anything.  As long as it causes the algorithm
+to be registered the crypto API will test it automatically.  So
+after doing the modprobe, can you find the algorithm in /proc/crypto
+and if so what does its test status say?
 
-> 
-> Cheers,
-> 
-
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
