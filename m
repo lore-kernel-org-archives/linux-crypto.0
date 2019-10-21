@@ -7,30 +7,30 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0BCCCA9EAF
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 14:52:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A009ACA9EAF
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 14:52:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D03942053B
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 14:52:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 741DD2053B
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 14:52:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729403AbfJUOwa (ORCPT
+        id S1729265AbfJUOwM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Oct 2019 10:52:30 -0400
-Received: from baptiste.telenet-ops.be ([195.130.132.51]:58474 "EHLO
-        baptiste.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729203AbfJUOwN (ORCPT
+        Mon, 21 Oct 2019 10:52:12 -0400
+Received: from andre.telenet-ops.be ([195.130.132.53]:43170 "EHLO
+        andre.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728983AbfJUOwL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Oct 2019 10:52:13 -0400
+        Mon, 21 Oct 2019 10:52:11 -0400
 Received: from ramsan ([84.194.98.4])
-        by baptiste.telenet-ops.be with bizsmtp
-        id GErr2100905gfCL01Err8t; Mon, 21 Oct 2019 16:52:11 +0200
+        by andre.telenet-ops.be with bizsmtp
+        id GErr2100E05gfCL01Erri3; Mon, 21 Oct 2019 16:52:09 +0200
 Received: from rox.of.borg ([192.168.97.57])
         by ramsan with esmtp (Exim 4.90_1)
         (envelope-from <geert@linux-m68k.org>)
-        id 1iMZ2F-00075n-1J; Mon, 21 Oct 2019 16:51:51 +0200
+        id 1iMZ2F-000767-52; Mon, 21 Oct 2019 16:51:51 +0200
 Received: from geert by rox.of.borg with local (Exim 4.90_1)
         (envelope-from <geert@linux-m68k.org>)
-        id 1iMZ2E-0008FW-Vt; Mon, 21 Oct 2019 16:51:50 +0200
+        id 1iMZ2F-0008Fi-1d; Mon, 21 Oct 2019 16:51:51 +0200
 From:   Geert Uytterhoeven <geert+renesas@glider.be>
 To:     =?UTF-8?q?Breno=20Leit=C3=A3o?= <leitao@debian.org>,
         Nayna Jain <nayna@linux.ibm.com>,
@@ -54,9 +54,9 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         netdev@vger.kernel.org, linux-pm@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH 3/5] drm/amdgpu: Remove superfluous void * cast in debugfs_create_file() call
-Date:   Mon, 21 Oct 2019 16:51:47 +0200
-Message-Id: <20191021145149.31657-4-geert+renesas@glider.be>
+Subject: [PATCH 5/5] ionic: Use debugfs_create_bool() to export bool
+Date:   Mon, 21 Oct 2019 16:51:49 +0200
+Message-Id: <20191021145149.31657-6-geert+renesas@glider.be>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191021145149.31657-1-geert+renesas@glider.be>
 References: <20191021145149.31657-1-geert+renesas@glider.be>
@@ -65,30 +65,31 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-There is no need to cast a typed pointer to a void pointer when calling
-a function that accepts the latter.  Remove it, as the cast prevents
-further compiler checks.
+Currently bool ionic_cq.done_color is exported using
+debugfs_create_u8(), which requires a cast, preventing further compiler
+checks.
+
+Fix this by switching to debugfs_create_bool(), and dropping the cast.
 
 Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 ---
- drivers/gpu/drm/amd/amdgpu/amdgpu_debugfs.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/pensando/ionic/ionic_debugfs.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/gpu/drm/amd/amdgpu/amdgpu_debugfs.c b/drivers/gpu/drm/amd/amdgpu/amdgpu_debugfs.c
-index 5652cc72ed3a9b3a..b97a38b1e089b3d6 100644
---- a/drivers/gpu/drm/amd/amdgpu/amdgpu_debugfs.c
-+++ b/drivers/gpu/drm/amd/amdgpu/amdgpu_debugfs.c
-@@ -1090,8 +1090,8 @@ int amdgpu_debugfs_init(struct amdgpu_device *adev)
- {
- 	adev->debugfs_preempt =
- 		debugfs_create_file("amdgpu_preempt_ib", 0600,
--				    adev->ddev->primary->debugfs_root,
--				    (void *)adev, &fops_ib_preempt);
-+				    adev->ddev->primary->debugfs_root, adev,
-+				    &fops_ib_preempt);
- 	if (!(adev->debugfs_preempt)) {
- 		DRM_ERROR("unable to create amdgpu_preempt_ib debugsfs file\n");
- 		return -EIO;
+diff --git a/drivers/net/ethernet/pensando/ionic/ionic_debugfs.c b/drivers/net/ethernet/pensando/ionic/ionic_debugfs.c
+index bc03cecf80cc9eb4..5beba915f69d12dd 100644
+--- a/drivers/net/ethernet/pensando/ionic/ionic_debugfs.c
++++ b/drivers/net/ethernet/pensando/ionic/ionic_debugfs.c
+@@ -170,8 +170,7 @@ void ionic_debugfs_add_qcq(struct ionic_lif *lif, struct ionic_qcq *qcq)
+ 	debugfs_create_x64("base_pa", 0400, cq_dentry, &cq->base_pa);
+ 	debugfs_create_u32("num_descs", 0400, cq_dentry, &cq->num_descs);
+ 	debugfs_create_u32("desc_size", 0400, cq_dentry, &cq->desc_size);
+-	debugfs_create_u8("done_color", 0400, cq_dentry,
+-			  (u8 *)&cq->done_color);
++	debugfs_create_bool("done_color", 0400, cq_dentry, &cq->done_color);
+ 
+ 	debugfs_create_file("tail", 0400, cq_dentry, cq, &cq_tail_fops);
+ 
 -- 
 2.17.1
 
