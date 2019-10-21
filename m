@@ -2,127 +2,159 @@ Return-Path: <SRS0=EZON=YO=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDF8DCA9EAF
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 16:35:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E38A6CA9EAF
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 18:16:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A41642084B
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 16:35:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A23F820873
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 18:16:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=pensando.io header.i=@pensando.io header.b="ZvioHrwP"
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="ffLm16wM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729514AbfJUQfK (ORCPT
+        id S1728196AbfJUSQw (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Oct 2019 12:35:10 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:46593 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726289AbfJUQfH (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Oct 2019 12:35:07 -0400
-Received: by mail-pf1-f193.google.com with SMTP id q5so8737238pfg.13
-        for <linux-crypto@vger.kernel.org>; Mon, 21 Oct 2019 09:35:07 -0700 (PDT)
+        Mon, 21 Oct 2019 14:16:52 -0400
+Received: from mail-eopbgr810079.outbound.protection.outlook.com ([40.107.81.79]:34272
+        "EHLO NAM01-BY2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727767AbfJUSQw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 21 Oct 2019 14:16:52 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RhSanYzXvwg/DZmuVGwHoR79RJPM/B0JiDOhOAcZaodW/6PQd4NdxSqptvxiBE1QAxvq6QQNAywFx5ib7YuVF9KPEufmAK78aqZXTU6JFsmL+V0BM73VRpBU6va/ZsAGIPpg64djKaVXCu91TNZ+3sNARIp2R5izMQpXrYmL6i9dMVJay98J7A7mtL54/tS1QvdXKswir3mhm/Bo0Mar1X5BHsUqoj3VQ0HZXI0CLYEF6Fb6SA+rGE7o23UhWy3v8wHdMIpP182mDnmg/HDT5x5CWMlqm3A73ZgPmDWy/DBzVnL9zvgJt2H7AHsc2vXiTbgPpAwKrG6rb0g5j/hj0w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RRc1WrujN5kJ3TYU4P01saYk01F9Bw75zeFqiI4CDSU=;
+ b=NSHBkS14DSj/R+Z84MpoqzmOWNo+gEz7kA1L7jT1BHoxJJACsEeWO3WphKTLn+CuOA/R7rRMiOrcQP10W5MMvA0bkxJiEb0xLVtWYIBiV7CezQpvoXS+8SnA+IkRDgJir5a77bRk5eu3Ms1QPGRXCL4BZvitj7gtTHi5WkUMxLAjr5hXnzPfWxqchmb3dNERFZ3dzN4yw2+0drH4phJSMaRxE66C0g3OU7vYAi2MXd+Joo4cCOTgYVmh5ZiPnDAG3weLgj29wlAryaEJ2SAblF0On4LwvletIQy+8svMd+9C7/3/efvcBIUwPMcE+0t1xUcYg50tD/0XALGfNOzu8w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=pensando.io; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=YQ2SYzDjclp6+UMcXfMKe/dCfkknHxuiGOrHRSVn0cA=;
-        b=ZvioHrwPqgA32sqk/ZfXl+AIKFsddUO2tNAqbJtu4tCcRANhGvReU9J0qCrPtBX4dr
-         XyEFxDF3rI4Skd8uu+tW37bMnIbIfeVll6YP9QPsiv1m3u9UI7Hz50C/EOmQGDDvJxjt
-         MNnpf3ALOQX+wn100d4q49rWpqL/dLYkEvAbPydL+TGXqu4wUlet2YAblmsMtkne7qnv
-         mFnrVk537e3SRZLOSIfp5DZTMcRh1T3I7huUyEOh7iplVBe4IuwO1byLK+LTz8AIzALW
-         g8HnTvBYEWL7IAty6Tx+yooX0qDMEelsrde2cgdpkGApf9pCWxxWG6Loqrv6o3ZIrYoi
-         o0cQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=YQ2SYzDjclp6+UMcXfMKe/dCfkknHxuiGOrHRSVn0cA=;
-        b=PtK6YwyNHsU+N6MORNxI3I9lTaFu9ZINIBbNI6l0Ro7oUjpPjkNB88+WAHP+gyAPXH
-         gCTh7OgT6krhGDlU1PkPAZf0Fu+9VLQz+85AdgZYWq1nUM5BcftZbjAifZterSK/4e2r
-         MiwLUo/S2cAxXDdMm0d3dB59ZoxZX510pc/DJ9SyuJfNjFvOFKQS2fA8p5aLDCXCfJa8
-         N7uMSezqx6e78iaCrS4GceUdYpyGIya4ZngbiLah819wLZpGHfguIcAGhOb1VEeSAzBI
-         3Ty3HVQV20XFIckyCxy9A+TZKeXOqWHawXFj6Coo9gSGA//GmCSyBgeGTM0yQFt1qoSA
-         Zmvw==
-X-Gm-Message-State: APjAAAXZQZNO/SQkZ9JvWB3x8ss1m4Vh1jymZvug4VecQNrgL9uX8S2t
-        nQlJO1KQdTAgrBszcVYvPh//hQ==
-X-Google-Smtp-Source: APXvYqwmyNu50+FxrTO6V6IulFup1S67xnT8cj+dbepaT4niD1qSPIKhFvBy+c/p26nJk53uezcFig==
-X-Received: by 2002:a63:ad0d:: with SMTP id g13mr26250877pgf.407.1571675706632;
-        Mon, 21 Oct 2019 09:35:06 -0700 (PDT)
-Received: from Shannons-MacBook-Pro.local (static-50-53-47-17.bvtn.or.frontiernet.net. [50.53.47.17])
-        by smtp.gmail.com with ESMTPSA id e4sm16610297pff.22.2019.10.21.09.35.04
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 21 Oct 2019 09:35:05 -0700 (PDT)
-Subject: Re: [PATCH 5/5] ionic: Use debugfs_create_bool() to export bool
-To:     Geert Uytterhoeven <geert+renesas@glider.be>,
-        =?UTF-8?Q?Breno_Leit=c3=a3o?= <leitao@debian.org>,
-        Nayna Jain <nayna@linux.ibm.com>,
-        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        David@rox.of.borg, David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Casey Leedom <leedom@chelsio.com>,
-        Pensando Drivers <drivers@pensando.io>,
-        Kevin Hilman <khilman@kernel.org>, Nishanth Menon <nm@ti.com>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        netdev@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20191021145149.31657-1-geert+renesas@glider.be>
- <20191021145149.31657-6-geert+renesas@glider.be>
-From:   Shannon Nelson <snelson@pensando.io>
-Message-ID: <aeebbd5f-6100-2780-ef1c-6b1c261c9d23@pensando.io>
-Date:   Mon, 21 Oct 2019 09:35:03 -0700
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:60.0)
- Gecko/20100101 Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <20191021145149.31657-6-geert+renesas@glider.be>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RRc1WrujN5kJ3TYU4P01saYk01F9Bw75zeFqiI4CDSU=;
+ b=ffLm16wM58W6VJzAXlNSP4N15uLUGcEL+LHUkpS5PD9rieREGWA4rHztSObS3wJJVgxM8eLqARCJkafD4jygGAZb/3G2c0ZQ+hdI8e31NhwvxSPfacYPwBfPdBU3dNjErNkJuKP9hR+YanPsUL/0nmIRzD/6Yoso9bRVwJNuBSg=
+Received: from DM6PR12MB2682.namprd12.prod.outlook.com (20.176.118.13) by
+ DM6PR12MB3804.namprd12.prod.outlook.com (10.255.173.29) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2347.19; Mon, 21 Oct 2019 18:16:48 +0000
+Received: from DM6PR12MB2682.namprd12.prod.outlook.com
+ ([fe80::80:cb81:4a0e:a36]) by DM6PR12MB2682.namprd12.prod.outlook.com
+ ([fe80::80:cb81:4a0e:a36%3]) with mapi id 15.20.2367.022; Mon, 21 Oct 2019
+ 18:16:48 +0000
+From:   "Singh, Brijesh" <brijesh.singh@amd.com>
+To:     David Rientjes <rientjes@google.com>,
+        "Kalra, Ashish" <Ashish.Kalra@amd.com>
+CC:     "Singh, Brijesh" <brijesh.singh@amd.com>,
+        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "Hook, Gary" <Gary.Hook@amd.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "allison@lohutok.net" <allison@lohutok.net>,
+        "info@metux.net" <info@metux.net>,
+        "yamada.masahiro@socionext.com" <yamada.masahiro@socionext.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH] crypto: ccp - Retry SEV INIT command in case of integrity
+ check failure.
+Thread-Topic: [PATCH] crypto: ccp - Retry SEV INIT command in case of
+ integrity check failure.
+Thread-Index: AQHVhTsiVAXVZvJHqE+F84WTgpVS9KdhrHEAgAPAfIA=
+Date:   Mon, 21 Oct 2019 18:16:48 +0000
+Message-ID: <29887804-ecab-ae83-8d3f-52ea83e44b4e@amd.com>
+References: <20191017223459.64281-1-Ashish.Kalra@amd.com>
+ <alpine.DEB.2.21.1910190156210.140416@chino.kir.corp.google.com>
+In-Reply-To: <alpine.DEB.2.21.1910190156210.140416@chino.kir.corp.google.com>
+Accept-Language: en-US
 Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: SN6PR06CA0005.namprd06.prod.outlook.com
+ (2603:10b6:805:8e::18) To DM6PR12MB2682.namprd12.prod.outlook.com
+ (2603:10b6:5:42::13)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=brijesh.singh@amd.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [165.204.77.1]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 037887d9-b2f1-47aa-3a51-08d75652d682
+x-ms-office365-filtering-ht: Tenant
+x-ms-traffictypediagnostic: DM6PR12MB3804:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <DM6PR12MB38048E06148278D31C040F50E5690@DM6PR12MB3804.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6430;
+x-forefront-prvs: 0197AFBD92
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(346002)(376002)(396003)(136003)(39860400002)(199004)(189003)(8936002)(54906003)(478600001)(31696002)(71190400001)(71200400001)(8676002)(66556008)(66476007)(66446008)(64756008)(31686004)(316002)(86362001)(66066001)(66946007)(81156014)(81166006)(6636002)(14454004)(110136005)(25786009)(6512007)(7416002)(446003)(3846002)(2906002)(486006)(99286004)(36756003)(14444005)(256004)(5660300002)(11346002)(2616005)(6436002)(6486002)(229853002)(4326008)(476003)(26005)(76176011)(186003)(6246003)(7736002)(102836004)(53546011)(6506007)(386003)(52116002)(305945005)(6116002);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB3804;H:DM6PR12MB2682.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: vFeydfWMRRzbKTgZNGeNyNPfoh0zNstXqZwksGVNkozBtRgzeawR1hPAIIs5c85b19y7uIusONHhLHkrfSeheUxTxtT/YOMXe/mMFwzrtSAWj959SL84XVV9kb43HzDLz8r/oyA8fDYeffUj0AZKj7ZSE46TwpWVwVLrIyavqCLfIysTc48UcuGDhdyZG0SKhdFJoog85cd9HQF6hBx+P7FSiD7NP3ChpJuOcnFRUIOcUe1z5nJcKh6aZxG7WwQRH12T5ecHft0ksyv97sPmHtQNjtV5E0+rxIcaXOKaLsCuzqIHD8oS6Gdq/BRRMhb9BGTgsMVOGrZKSSdjzCpcoYvsdQxUcMP4wmE+hfXOAuBrmF1pAQ9LgNlLDLosY5X9dp4kH2Wl+mLS9Up6MFHk5Z+7mBtDoIv/fBy8mdX+T7c=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <777077A0761C7646BDBB320395BA0C30@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 037887d9-b2f1-47aa-3a51-08d75652d682
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Oct 2019 18:16:48.5628
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: XMk0pQOeAgLeyKYB2Awl3LX5Wb8CQwuzEZ7x9nHilUpdjwXk2/yTRyyVULrl5+KYo6KZaMqF/QTxFaOdxOOgnA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3804
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 10/21/19 7:51 AM, Geert Uytterhoeven wrote:
-> Currently bool ionic_cq.done_color is exported using
-> debugfs_create_u8(), which requires a cast, preventing further compiler
-> checks.
->
-> Fix this by switching to debugfs_create_bool(), and dropping the cast.
->
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-
-Acked-by: Shannon Nelson <snelson@pensando.io>
-
-> ---
->   drivers/net/ethernet/pensando/ionic/ionic_debugfs.c | 3 +--
->   1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_debugfs.c b/drivers/net/ethernet/pensando/ionic/ionic_debugfs.c
-> index bc03cecf80cc9eb4..5beba915f69d12dd 100644
-> --- a/drivers/net/ethernet/pensando/ionic/ionic_debugfs.c
-> +++ b/drivers/net/ethernet/pensando/ionic/ionic_debugfs.c
-> @@ -170,8 +170,7 @@ void ionic_debugfs_add_qcq(struct ionic_lif *lif, struct ionic_qcq *qcq)
->   	debugfs_create_x64("base_pa", 0400, cq_dentry, &cq->base_pa);
->   	debugfs_create_u32("num_descs", 0400, cq_dentry, &cq->num_descs);
->   	debugfs_create_u32("desc_size", 0400, cq_dentry, &cq->desc_size);
-> -	debugfs_create_u8("done_color", 0400, cq_dentry,
-> -			  (u8 *)&cq->done_color);
-> +	debugfs_create_bool("done_color", 0400, cq_dentry, &cq->done_color);
->   
->   	debugfs_create_file("tail", 0400, cq_dentry, cq, &cq_tail_fops);
->   
-
+DQoNCk9uIDEwLzE5LzE5IDM6NTkgQU0sIERhdmlkIFJpZW50amVzIHdyb3RlOg0KPiBPbiBUaHUs
+IDE3IE9jdCAyMDE5LCBLYWxyYSwgQXNoaXNoIHdyb3RlOg0KPiANCj4+IEZyb206IEFzaGlzaCBL
+YWxyYSA8YXNoaXNoLmthbHJhQGFtZC5jb20+DQo+Pg0KPj4gU0VWIElOSVQgY29tbWFuZCBsb2Fk
+cyB0aGUgU0VWIHJlbGF0ZWQgcGVyc2lzdGVudCBkYXRhIGZyb20gTlZTDQo+PiBhbmQgaW5pdGlh
+bGl6ZXMgdGhlIHBsYXRmb3JtIGNvbnRleHQuIFRoZSBmaXJtd2FyZSB2YWxpZGF0ZXMgdGhlDQo+
+PiBwZXJzaXN0ZW50IHN0YXRlLiBJZiB2YWxpZGF0aW9uIGZhaWxzLCB0aGUgZmlybXdhcmUgd2ls
+bCByZXNldA0KPj4gdGhlIHBlcnNpc2VudCBzdGF0ZSBhbmQgcmV0dXJuIGFuIGludGVncml0eSBj
+aGVjayBmYWlsdXJlIHN0YXR1cy4NCj4+DQo+PiBBdCB0aGlzIHBvaW50LCBhIHN1YnNlcXVlbnQg
+SU5JVCBjb21tYW5kIHNob3VsZCBzdWNjZWVkLCBzbyByZXRyeQ0KPj4gdGhlIGNvbW1hbmQuIFRo
+ZSBJTklUIGNvbW1hbmQgcmV0cnkgaXMgb25seSBkb25lIGR1cmluZyBkcml2ZXINCj4+IGluaXRp
+YWxpemF0aW9uLg0KPj4NCj4+IEFkZGl0aW9uYWwgZW51bXMgYWxvbmcgd2l0aCBTRVZfUkVUX1NF
+Q1VSRV9EQVRBX0lOVkFMSUQgYXJlIGFkZGVkDQo+PiB0byBzZXZfcmV0X2NvZGUgdG8gbWFpbnRh
+aW4gY29udGludWl0eSBhbmQgcmVsZXZhbmNlIG9mIGVudW0gdmFsdWVzLg0KPj4NCj4+IFNpZ25l
+ZC1vZmYtYnk6IEFzaGlzaCBLYWxyYSA8YXNoaXNoLmthbHJhQGFtZC5jb20+DQo+PiAtLS0NCj4+
+ICAgZHJpdmVycy9jcnlwdG8vY2NwL3BzcC1kZXYuYyB8IDEyICsrKysrKysrKysrKw0KPj4gICBp
+bmNsdWRlL3VhcGkvbGludXgvcHNwLXNldi5oIHwgIDMgKysrDQo+PiAgIDIgZmlsZXMgY2hhbmdl
+ZCwgMTUgaW5zZXJ0aW9ucygrKQ0KPj4NCj4+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2NyeXB0by9j
+Y3AvcHNwLWRldi5jIGIvZHJpdmVycy9jcnlwdG8vY2NwL3BzcC1kZXYuYw0KPj4gaW5kZXggNmIx
+N2QxNzllZjhhLi5mOTMxOGQ0NDgyZjIgMTAwNjQ0DQo+PiAtLS0gYS9kcml2ZXJzL2NyeXB0by9j
+Y3AvcHNwLWRldi5jDQo+PiArKysgYi9kcml2ZXJzL2NyeXB0by9jY3AvcHNwLWRldi5jDQo+PiBA
+QCAtMTA2NCw2ICsxMDY0LDE4IEBAIHZvaWQgcHNwX3BjaV9pbml0KHZvaWQpDQo+PiAgIA0KPj4g
+ICAJLyogSW5pdGlhbGl6ZSB0aGUgcGxhdGZvcm0gKi8NCj4+ICAgCXJjID0gc2V2X3BsYXRmb3Jt
+X2luaXQoJmVycm9yKTsNCj4+ICsJaWYgKHJjICYmIChlcnJvciA9PSBTRVZfUkVUX1NFQ1VSRV9E
+QVRBX0lOVkFMSUQpKSB7DQo+PiArCQkvKg0KPj4gKwkJICogSU5JVCBjb21tYW5kIHJldHVybmVk
+IGFuIGludGVncml0eSBjaGVjayBmYWlsdXJlDQo+PiArCQkgKiBzdGF0dXMgY29kZSwgbWVhbmlu
+ZyB0aGF0IGZpcm13YXJlIGxvYWQgYW5kDQo+PiArCQkgKiB2YWxpZGF0aW9uIG9mIFNFViByZWxh
+dGVkIHBlcnNpc3RlbnQgZGF0YSBoYXMNCj4+ICsJCSAqIGZhaWxlZCBhbmQgcGVyc2lzdGVudCBz
+dGF0ZSBoYXMgYmVlbiBlcmFzZWQuDQo+PiArCQkgKiBSZXRyeWluZyBJTklUIGNvbW1hbmQgaGVy
+ZSBzaG91bGQgc3VjY2VlZC4NCj4+ICsJCSAqLw0KPj4gKwkJZGV2X2RiZyhzcC0+ZGV2LCAiU0VW
+OiByZXRyeWluZyBJTklUIGNvbW1hbmQiKTsNCj4+ICsJCXJjID0gc2V2X3BsYXRmb3JtX2luaXQo
+JmVycm9yKTsNCj4+ICsJfQ0KPj4gKw0KPj4gICAJaWYgKHJjKSB7DQo+PiAgIAkJZGV2X2Vycihz
+cC0+ZGV2LCAiU0VWOiBmYWlsZWQgdG8gSU5JVCBlcnJvciAlI3hcbiIsIGVycm9yKTsNCj4+ICAg
+CQlyZXR1cm47DQo+IA0KPiBDdXJpb3VzIHdoeSB0aGlzIGlzbid0IGRvbmUgaW4gX19zZXZfcGxh
+dGZvcm1faW5pdF9sb2NrZWQoKSBzaW5jZQ0KPiBzZXZfcGxhdGZvcm1faW5pdCgpIGNhbiBiZSBj
+YWxsZWQgd2hlbiBsb2FkaW5nIHRoZSBrdm0gbW9kdWxlIGFuZCB0aGUgc2FtZQ0KPiBpbml0IGZh
+aWx1cmUgY2FuIGhhcHBlbiB0aGF0IHdheS4NCj4gDQoNClRoZSBGVyBpbml0aWFsaXphdGlvbiAo
+YWthIFBMQVRGT1JNX0lOSVQpIGlzIGNhbGxlZCBpbiB0aGUgZm9sbG93aW5nDQpjb2RlIHBhdGhz
+Og0KDQoxLiBEdXJpbmcgc3lzdGVtIGJvb3QgdXANCg0KYW5kDQoNCjIuIEFmdGVyIHRoZSBwbGF0
+Zm9ybSByZXNldCBjb21tYW5kIGlzIGlzc3VlZA0KDQpUaGUgcGF0Y2ggdGFrZXMgY2FyZSBvZiAj
+MS4gQmFzZWQgb24gdGhlIHNwZWMsIHBsYXRmb3JtIHJlc2V0IGNvbW1hbmQNCnNob3VsZCBlcmFz
+ZSB0aGUgcGVyc2lzdGVudCBkYXRhIGFuZCB0aGUgUExBVEZPUk1fSU5JVCBzaG91bGQgKm5vdCog
+ZmFpbA0Kd2l0aCBTRVZfUkVUX1NFQ1VSRV9EQVRBX0lOVkFMSUQgZXJyb3IgY29kZS4gU28sIEkg
+YW0gbm90IGFibGUgdG8gc2VlDQphbnkgIHN0cm9uZyByZWFzb24gdG8gbW92ZSB0aGUgcmV0cnkg
+Y29kZSBpbg0KX19zZXZfcGxhdGZvcm1faW5pdF9sb2NrZWQoKS4NCg0KdGhhbmtzDQo=
