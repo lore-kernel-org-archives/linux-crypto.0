@@ -6,284 +6,240 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43046CA9EAF
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 15:55:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 489E1CA9EAF
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 16:14:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EA7FE2084B
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 15:55:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0990121906
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 16:14:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="LesMudGj"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nvGHEccy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726847AbfJUPzX (ORCPT
+        id S1728408AbfJUQOy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Oct 2019 11:55:23 -0400
-Received: from mail-eopbgr780080.outbound.protection.outlook.com ([40.107.78.80]:60816
-        "EHLO NAM03-BY2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726332AbfJUPzX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Oct 2019 11:55:23 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OmzDXRxnBNyucxUeZDqCcWCdqw8kz89W6FBOEhAQ7FhO0JgG3ydalMhTJ+S4uR0tuPVQdUDW122ja3YEBub7F6pgtjkY/KvDkGE9X85PL9fHv3pJ0X9Y/HH/xOC06Ujm1+p9L2sbWrJ7rHfHIWwUbYimuJMIr4MvM2rW8iTzka7JLhyyj+aJuN5dgFqBwOzNaCaB1eV+eVTI+CqNZ1c3NnhhikSlE7QaWoiHYxh9c2AR95NVz9xJ1FPH+o1THDZXGaPoYxQYxBnut16B+whQV6b3h2RAaUdKpnvxdxA15zuR+jnVG6hbg7fgu/8Qhsy4OJolO+J9XKlIoSBsEX83ew==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TXXlpn0ZNfc0Q22PJGsmt2PO+H/H7zdD8oQ3rjINK0Y=;
- b=mMoJx0Z8wejmRnberssXrXFLFdNjxDs4ry5Qz5MEGx2qV/AHzAuLytreefsaWvhwqTKBje1weraImD8H9pszqPDxHCGJDpBw2QPcb/35nButu7/FifcCUcnIsZxfntX8ZUlZm2NtZL9EudhhCpM1PXn/GaYTv+zc7ZDdDT2HI3S03iPfj9S9pT2NBndIOiDMQBuGtoJrH1wvutzTv9C7OQocrtoyDCIL0AOcRlj/sC1TemItmTGflt5TDKzB4i7S5KXZm/cG70QTYbUvRs8xQivyCDndDj/oJbLA86yC9utfT0uxxIo9w/49iMBHBb0CYHY7SaMWCGyEqRhhxJbcdw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=verimatrix.com; dmarc=pass action=none
- header.from=verimatrix.com; dkim=pass header.d=verimatrix.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TXXlpn0ZNfc0Q22PJGsmt2PO+H/H7zdD8oQ3rjINK0Y=;
- b=LesMudGjNx9eH2ruR3VOXSV1bIEz+p9s1m+WVraa+tKfHgqF0kSpPhqxLcwULbTsy4xayFAP1woKM1xEoA4BsDGk4xbSUos2mlYug2rU7Wlhp8eyPX3KJNc1YJnRCv0Y5WB9cyehgNik3X9BEuLn1t7StJmAhXlvLXdY/ZNRHIY=
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.86) by
- MN2PR20MB2478.namprd20.prod.outlook.com (20.179.146.209) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2367.20; Mon, 21 Oct 2019 15:55:16 +0000
-Received: from MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::b986:4f02:3206:31e4]) by MN2PR20MB2973.namprd20.prod.outlook.com
- ([fe80::b986:4f02:3206:31e4%7]) with mapi id 15.20.2347.029; Mon, 21 Oct 2019
- 15:55:15 +0000
-From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
-Subject: RE: Key endianness?
-Thread-Topic: Key endianness?
-Thread-Index: AdWH7WiyGB6aVNy7SJOkTaAoiPGHOgADxdEgAAKexAAAAMmMEAABGwoAAAHCGpAAA8IUgAAAEpiw
-Date:   Mon, 21 Oct 2019 15:55:15 +0000
-Message-ID: <MN2PR20MB29735A4F3B31EEBDC179D110CA690@MN2PR20MB2973.namprd20.prod.outlook.com>
+        Mon, 21 Oct 2019 12:14:54 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:38420 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726289AbfJUQOx (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 21 Oct 2019 12:14:53 -0400
+Received: by mail-wm1-f67.google.com with SMTP id 3so13415372wmi.3
+        for <linux-crypto@vger.kernel.org>; Mon, 21 Oct 2019 09:14:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=aLijmoFtWrlwzjdRPcGBJYBpKEzzSKb+WfKp6Nlphco=;
+        b=nvGHEccyPKhVDa3BmPZ4oQs5v0mEqV7IEnO3KhFmUMoAl7eHOv10hQU9mcN9IiFEHT
+         dmCded44/XucWfgG0/M93WZ++aboGezsyW209OqdUplunwRhsyve2lQcEESRBJytTYBY
+         o5gSfImwzBnT2vfoZyFEo0cg71ZTbO8tcxm1vmyhypGoiFzmvIpaFvlzO5qA9dtJBH5Q
+         fNoGcp80tKZTnlUxN2Jc7isXl4YZBB6NL7FcM/W6LyBgQkK5lFexFtV1+ku+Hpcs3V18
+         UoLZGdByuOsyG4zoKVwbTSYZmgnA2GM495wc1gld16A3WX1Cv/+tnTTnfkf9d4hiPsHZ
+         odXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=aLijmoFtWrlwzjdRPcGBJYBpKEzzSKb+WfKp6Nlphco=;
+        b=aF30ND3y1ZDof7e/qX+4XonNYBifcxNXq548Jma7f6S9J+U8oHk/YGW/PS6LLyrDQj
+         TYO6sQhKNBtugd91UGPU2UoPoQSh+sDoi9/mevJU1717HdDNF/vwpUzqrkVfySNmYOMT
+         hqyJbsvI9lFE9HQcuw3tao+xmFn3ZiPU5U1zheE1WevZmzYyXNBc+oVF8RodLTUBVrvS
+         xO/ii9ID0JfXMl25qbDeFXwj7z9/9p4UJRHJcxaZCD4a1mnVIA5TgTnpkaSqNlP4j1Z1
+         T1XxBfXyM3BAaEvD0y4dqnKH2jsrdBodtPE3qPFQmbYHKFp18OzMF7r2WomUx9XflHDZ
+         PZVg==
+X-Gm-Message-State: APjAAAWKb8i3YLO+vBXbSaE2jCb8SX9g7qlx7/D2qqvNYL2y+okIQ2ro
+        DdMDK6jRi1Lvo7jOMbRMzDyno19sYli/ETF09cVeiNxg698=
+X-Google-Smtp-Source: APXvYqxDm0t/GKxevM/veLyah2G24/WYxx1dzp2ZHCyDlj2v3Jew7W6h2oaLfakeXl0ibCSbjbiicbOsq5xK63RWxZ8=
+X-Received: by 2002:a1c:9d07:: with SMTP id g7mr7203476wme.53.1571674490439;
+ Mon, 21 Oct 2019 09:14:50 -0700 (PDT)
+MIME-Version: 1.0
 References: <MN2PR20MB29734588383A8699E6B700F3CA690@MN2PR20MB2973.namprd20.prod.outlook.com>
  <CAKv+Gu8CvoaTCBxWjd9f=CtcK8GkgJkhRgYGjUHy3MqRKhezEg@mail.gmail.com>
  <MN2PR20MB2973E221217FBDA1252804E4CA690@MN2PR20MB2973.namprd20.prod.outlook.com>
  <CAKv+Gu_GnvoWd2OiY3C6enUMT4Vu5AyBaP8J3C4pVkK7yWeSng@mail.gmail.com>
  <MN2PR20MB2973876A85667AABE157A27ECA690@MN2PR20MB2973.namprd20.prod.outlook.com>
- <CAKv+Gu8oyZUL+i23j6r7xYsOeBEUDdZC2w4TKLVtVDfCB1LXYg@mail.gmail.com>
-In-Reply-To: <CAKv+Gu8oyZUL+i23j6r7xYsOeBEUDdZC2w4TKLVtVDfCB1LXYg@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=pvanleeuwen@verimatrix.com; 
-x-originating-ip: [188.204.2.113]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 46eeb921-d05e-47f8-286c-08d7563f10b5
-x-ms-traffictypediagnostic: MN2PR20MB2478:
-x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <MN2PR20MB2478A6335A5D4831DFD8D28ACA690@MN2PR20MB2478.namprd20.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:5516;
-x-forefront-prvs: 0197AFBD92
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(396003)(136003)(346002)(39840400004)(376002)(13464003)(43544003)(189003)(199004)(26005)(186003)(229853002)(446003)(14444005)(76176011)(7696005)(99286004)(6246003)(11346002)(256004)(476003)(25786009)(486006)(478600001)(6436002)(4326008)(6506007)(66066001)(53546011)(9686003)(102836004)(6916009)(7116003)(55016002)(76116006)(3480700005)(30864003)(8936002)(8676002)(71200400001)(74316002)(81156014)(81166006)(71190400001)(316002)(54906003)(14454004)(2906002)(86362001)(33656002)(52536014)(6116002)(5660300002)(7736002)(66556008)(66446008)(64756008)(66946007)(66476007)(15974865002)(305945005)(3846002)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB2478;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: verimatrix.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 0ISSHjZE+U2kK2VTgWw9Kc4IuBcE+nn3JA5GJWGBgggs+sX2z2YSc/+wY3DGJuGiQP71cr2hFfPXr+cO2K1MB1ZTAuj+3KRGSUvNPWtjwoQN/DmXr5olpnxGZhCQhBovzZ7YmZFHflwewUBsob8GVe5jOQMZ0JYaPpVAFFyY5RZFBla1RRG3iyMtRcLMT4BFq5GOaagAohW6SV0Cm/QlooqWkZ2z6Hkc2Me4kCoZFvlcOoNJfeZij9v0PvWS3oQCL5h697JAPMQjY0QOYGXbLoLfafuj8PZMOm172UpzTZvH+5/wLDCngU1RXP/j33QvnVw2oFhCgwVfCjQbK23fZZCR7uzZw5tvVZ3j6XPt8JCpnO4MK5WEsmcpMeiDoRrwUxoVcs7zQGRz1qjGUbzAmSDftdraE9pSqSXFx6a0datSLMgb5cQPAq6E5+2nStxJ
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: verimatrix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 46eeb921-d05e-47f8-286c-08d7563f10b5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Oct 2019 15:55:15.8131
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: IoyQANFxJftpOpVRaxmFuNKxyZM8TsI9ErF8ROqEHI33Y8YmGFOhQqUros4Kjkr/XyhhhPJt13ufnbgUTWNnanfOI2p1uuuZuSz1EXquNSE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB2478
+ <CAKv+Gu8oyZUL+i23j6r7xYsOeBEUDdZC2w4TKLVtVDfCB1LXYg@mail.gmail.com> <MN2PR20MB29735A4F3B31EEBDC179D110CA690@MN2PR20MB2973.namprd20.prod.outlook.com>
+In-Reply-To: <MN2PR20MB29735A4F3B31EEBDC179D110CA690@MN2PR20MB2973.namprd20.prod.outlook.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Mon, 21 Oct 2019 18:14:38 +0200
+Message-ID: <CAKv+Gu_yH=VwCSWsQ8Qqw6D1kDNpOH-TFMv9+tVg55rsz7qDRQ@mail.gmail.com>
+Subject: Re: Key endianness?
+To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBBcmQgQmllc2hldXZlbCA8YXJk
-LmJpZXNoZXV2ZWxAbGluYXJvLm9yZz4NCj4gU2VudDogTW9uZGF5LCBPY3RvYmVyIDIxLCAyMDE5
-IDU6MzIgUE0NCj4gVG86IFBhc2NhbCBWYW4gTGVldXdlbiA8cHZhbmxlZXV3ZW5AdmVyaW1hdHJp
-eC5jb20+DQo+IENjOiBsaW51eC1jcnlwdG9Admdlci5rZXJuZWwub3JnOyBoZXJiZXJ0QGdvbmRv
-ci5hcGFuYS5vcmcuYXUNCj4gU3ViamVjdDogUmU6IEtleSBlbmRpYW5uZXNzPw0KPiANCj4gcFsN
-Cj4gDQo+IE9uIE1vbiwgMjEgT2N0IDIwMTkgYXQgMTc6MjMsIFBhc2NhbCBWYW4gTGVldXdlbg0K
-PiA8cHZhbmxlZXV3ZW5AdmVyaW1hdHJpeC5jb20+IHdyb3RlOg0KPiA+DQo+ID4gPiAtLS0tLU9y
-aWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+ID4gRnJvbTogQXJkIEJpZXNoZXV2ZWwgPGFyZC5iaWVz
-aGV1dmVsQGxpbmFyby5vcmc+DQo+ID4gPiBTZW50OiBNb25kYXksIE9jdG9iZXIgMjEsIDIwMTkg
-Mjo1NCBQTQ0KPiA+ID4gVG86IFBhc2NhbCBWYW4gTGVldXdlbiA8cHZhbmxlZXV3ZW5AdmVyaW1h
-dHJpeC5jb20+DQo+ID4gPiBDYzogbGludXgtY3J5cHRvQHZnZXIua2VybmVsLm9yZzsgaGVyYmVy
-dEBnb25kb3IuYXBhbmEub3JnLmF1DQo+ID4gPiBTdWJqZWN0OiBSZTogS2V5IGVuZGlhbm5lc3M/
-DQo+ID4gPg0KPiA+ID4gT24gTW9uLCAyMSBPY3QgMjAxOSBhdCAxNDo0MCwgUGFzY2FsIFZhbiBM
-ZWV1d2VuDQo+ID4gPiA8cHZhbmxlZXV3ZW5AdmVyaW1hdHJpeC5jb20+IHdyb3RlOg0KPiA+ID4g
-Pg0KPiA+ID4gPiA+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4gPiA+ID4gRnJvbTog
-QXJkIEJpZXNoZXV2ZWwgPGFyZC5iaWVzaGV1dmVsQGxpbmFyby5vcmc+DQo+ID4gPiA+ID4gU2Vu
-dDogTW9uZGF5LCBPY3RvYmVyIDIxLCAyMDE5IDE6NTkgUE0NCj4gPiA+ID4gPiBUbzogUGFzY2Fs
-IFZhbiBMZWV1d2VuIDxwdmFubGVldXdlbkB2ZXJpbWF0cml4LmNvbT4NCj4gPiA+ID4gPiBDYzog
-bGludXgtY3J5cHRvQHZnZXIua2VybmVsLm9yZzsgaGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1
-DQo+ID4gPiA+ID4gU3ViamVjdDogUmU6IEtleSBlbmRpYW5uZXNzPw0KPiA+ID4gPiA+DQo+ID4g
-PiA+ID4gT24gTW9uLCAyMSBPY3QgMjAxOSBhdCAxMjo1NiwgUGFzY2FsIFZhbiBMZWV1d2VuDQo+
-ID4gPiA+ID4gPHB2YW5sZWV1d2VuQHZlcmltYXRyaXguY29tPiB3cm90ZToNCj4gPiA+ID4gPiA+
-DQo+ID4gPiA+ID4gPiBBbm90aGVyIGVuZGlhbm5lc3MgcXVlc3Rpb246DQo+ID4gPiA+ID4gPg0K
-PiA+ID4gPiA+ID4gSSBoYXZlIHNvbWUgZGF0YSBzdHJ1Y3R1cmUgdGhhdCBjYW4gYmUgZWl0aGVy
-IGxpdHRsZSBvciBiaWcgZW5kaWFuLA0KPiA+ID4gPiA+ID4gZGVwZW5kaW5nIG9uIHRoZSBleGFj
-dCB1c2UgY2FzZS4gQ3VycmVudGx5LCBJIGhhdmUgaXQgZGVmaW5lZCBhcyB1MzIuDQo+ID4gPiA+
-ID4gPiBUaGlzIGNhdXNlcyBzcGFyc2UgZXJyb3JzIHdoZW4gYWNjZXNzaW5nIGl0IHVzaW5nIGNw
-dV90b19YZTMyKCkgYW5kDQo+ID4gPiA+ID4gPiBYZTMyX3RvX2NwdSgpLg0KPiA+ID4gPiA+ID4N
-Cj4gPiA+ID4gPiA+IE5vdywgZm9yIHRoZSBiaWcgZW5kaWFuIGNhc2UsIEkgY291bGQgdXNlIGh0
-b25sKCkvbnRvaGwoKSBpbnN0ZWFkLA0KPiA+ID4gPiA+ID4gYnV0IHRoaXMgaXMgaW5jb25zaXN0
-ZW50IHdpdGggYWxsIG90aGVyIGVuZGlhbiBjb252ZXJzaW9ucyBpbiB0aGUNCj4gPiA+ID4gPiA+
-IGRyaXZlciAuLi4gYW5kIHRoZXJlJ3Mgbm8gbGl0dGxlIGVuZGlhbiBhbHRlcm5hdGl2ZSBJJ20g
-YXdhcmUgb2YuDQo+ID4gPiA+ID4gPiBTbyBJIGRvbid0IHJlYWxseSBsaWtlIHRoYXQgYXBwcm9h
-Y2guDQo+ID4gPiA+ID4gPg0KPiA+ID4gPiA+ID4gQWx0ZXJuYXRpdmVseSwgSSBjb3VsZCBkZWZp
-bmUgYSB1bmlvbiBvZiBib3RoIGEgYmlnIGFuZCBsaXR0bGUNCj4gPiA+ID4gPiA+IGVuZGlhbiB2
-ZXJzaW9uIG9mIHRoZSBkYXRhIGJ1dCB0aGF0IHdvdWxkIHJlcXVpcmUgdG91Y2hpbmcgYSBsb3QN
-Cj4gPiA+ID4gPiA+IG9mIGxlZ2FjeSBjb2RlICh1bmxlc3MgSSB1c2UgYSBDMTEgYW5vbnltb3Vz
-IHVuaW9uIC4uLiBub3Qgc3VyZQ0KPiA+ID4gPiA+ID4gaWYgdGhhdCB3b3VsZCBiZSBhbGxvd2Vk
-PykgYW5kIElNSE8gaXMgYSBiaXQgc2lsbHkuDQo+ID4gPiA+ID4gPg0KPiA+ID4gPiA+ID4gSXMg
-dGhlcmUgc29tZSB3YXkgb2YgdGVsbGluZyBzcGFyc2UgdG8gX25vdF8gY2hlY2sgZm9yICJjb3Jy
-ZWN0Ig0KPiA+ID4gPiA+ID4gdXNlIG9mIHRoZXNlIGZ1bmN0aW9ucyBmb3IgYSBjZXJ0YWluIHZh
-cmlhYmxlPw0KPiA+ID4gPiA+ID4NCj4gPiA+ID4gPg0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gSW4g
-dGhpcyBjYXNlLCBqdXN0IHVzZSAoX19mb3JjZSBfX1hlMzIqKSB0byBjYXN0IGl0IHRvIHRoZSBj
-b3JyZWN0DQo+ID4gPiA+ID4gdHlwZS4gVGhpcyBhbm5vdGF0ZXMgdGhlIGNhc3QgYXMgYmVpbmcg
-aW50ZW50aW9uYWxseSBlbmRpYW4tdW5jbGVhbiwNCj4gPiA+ID4gPiBhbmQgc2h1dHMgdXAgU3Bh
-cnNlLg0KPiA+ID4gPiA+DQo+ID4gPiA+IFRoYW5rcyBmb3IgdHJ5aW5nIHRvIGhlbHAgb3V0LCBi
-dXQgdGhhdCBqdXN0IGdpdmVzIG1lIGFuDQo+ID4gPiA+ICJlcnJvcjogbm90IGFuIGx2YWx1ZSIg
-ZnJvbSBib3RoIHNwYXJzZSBhbmQgR0NDLg0KPiA+ID4gPiBCdXQgSSdtIHByb2JhYmx5IGRvaW5n
-IGl0IHdyb25nIHNvbWVob3cgLi4uDQo+ID4gPiA+DQo+ID4gPg0KPiA+ID4gSXQgZGVwZW5kcyBv
-biB3aGF0IHlvdSBhcmUgY2FzdGluZy4gQnV0IGRvaW5nIHNvbWV0aGluZyBsaWtlDQo+ID4gPg0K
-PiA+ID4gdTMyIGwgPSAuLi4NCj4gPiA+IF9fbGUzMiBsbCA9IChfX2ZvcmNlIF9fbGUzMilsDQo+
-ID4gPg0KPiA+ID4gc2hvdWxkIG5vdCB0cmlnZ2VyIGEgc3BhcnNlIHdhcm5pbmcuDQo+ID4gPg0K
-PiA+IEkgd2FzIGFjdHVhbGx5IGNhc3RpbmcgdGhlIGxlZnQgc2lkZSwgbm90IHRoZSByaWdodCBz
-aWRlLA0KPiA+IGFzIHRoYXQncyB3aGVyZSBteSBzcGFyc2UgaXNzdWUgd2FzLiBNdXN0IGJlIG15
-IHBvb3IgZ3Jhc3ANCj4gPiBvZiB0aGUgQyBsYW5ndWFnZSBodXJ0aW5nIG1lIGhlcmUgYXMgSSBk
-b24ndCB1bmRlcnN0YW5kIHdoeQ0KPiA+IEknbSBub3QgYWxsb3dlZCB0byBjYXN0IGFuIGFycmF5
-IGVsZW1lbnQgdG8gYSBkaWZmZXJlbnQgdHlwZQ0KPiA+IG9mIHRoZSBfc2FtZSBzaXplXyAuLi4N
-Cj4gPg0KPiA+IGkuZS4gd2h5IGNhbid0IEkgZG8gKF9fYmUzMilzb21lX3UzMl9hcnJheVszXSA9
-IGNwdV90b19iZTMyKHNvbWVfdmFsdWUpPw0KPiA+DQo+IA0KPiBCZWNhdXNlIHlvdSBjYW4gb25s
-eSBjaGFuZ2UgdGhlIHR5cGUgb2YgYW4gZXhwcmVzc2lvbiBieSBjYXN0aW5nLCBhbmQNCj4gYW4g
-bHZhbHVlIGlzIG5vdCBhbiBleHByZXNzaW9uLiBBIHZhcmlhYmxlIGhhcyBhIHR5cGUgYWxyZWFk
-eSwgYW5kIHlvdQ0KPiBjYW5ub3QgY2FzdCB0aGF0IGF3YXkgLSB3aGF0IHdvdWxkIHRoYXQgbWVh
-biwgZXhhY3RseT8gV291bGQgYWxsDQo+IG9jY3VycmVuY2VzIG9mIHNvbWVfdTMyX2FycmF5W10g
-c3VkZGVubHkgaGF2ZSBhIGRpZmZlcmVudCB0eXBlPyBPcg0KPiBvbmx5IGVsZW1lbnQgWzNdPw0K
-PiANCkkgdGhpbmsgaXQgd291bGQgYmUgcGVyZmVjdGx5IGxvZ2ljYWwgdG8gZG8gc3VjaCBhIGNh
-c3QgYW5kIEknbSByZWFsbHkNCnN1cnByaXNlZCB0aGF0IGl0IGlzIG5vdCBsZWdhbC4gT2J2aW91
-c2x5LCBpdCB3b3VsZCBvbmx5IGFwcGx5IHRvIHRoZSANCmFjdHVhbCBhc3NpZ25tZW50IGl0IGlz
-IHVzZWQgd2l0aC4gSXQncyBhIGNhc3QsIG5vdCBhIHJlZGVmaW5pdGlvbi4NCkFmdGVyIGFsbCwg
-YSB2YXJpYWJsZSBvciBhbiBhcnJheSBpdGVtIGlzIGp1c3Qgc29tZSBzdG9yYWdlIGFyZWEgaW4N
-Cm1lbW9yeS4gV2h5IHNob3VsZG4ndCBJIGJlIGFibGUgdG8gd3JpdGUgdG8gaXQgX2FzIGlmXyBp
-dCBpcyBzb21lIA0KZGlmZmVyZW50IHR5cGUgKGlmIEkga25vdyB3aGF0IEknbSBkb2luZyBhbmQg
-ZXNwZWNpYWxseSBpZiBpdCBpcyB0aGUNCmV4YWN0IHNhbWUgc2l6ZSBpbiBtZW1vcnkpPyANCg0K
-PiANCj4gPiBJIG1hbmFnZWQgdG8gd29yayBhcm91bmQgaXQgYnkgZG9pbmcgKihfX2JlMzIgKikm
-c29tZV91MzJfYXJyYXlbM10gPQ0KPiA+IGJ1dCB0aGF0J3MgcHJldHR5IHVnbHkgLi4uIGEgYmV0
-dGVyIGFwcHJvYWNoIGlzIHN0aWxsIHdlbGNvbWUuDQo+ID4NCj4gDQo+IFlvdSBuZWVkIHRvIGNh
-c3QgdGhlIHJpZ2h0IGhhbmQgc2lkZSwgbm90IHRoZSBsZWZ0IGhhbmQgc2lkZS4gSWYNCj4gc29t
-ZV91MzJfYXJyYXkgaXMgdTMyW10sIGZvcmNlIGNhc3QgaXQgdG8gKF9fZm9yY2UgdTMyKQ0KPg0K
-DQpTdXJlLCB5b3UgY2FuIGRvIHRoZSBjYXN0aW5nIG9uIHRoZSByaWdodCBoYW5kIHNpZGUsIGJ1
-dCB0aGF0IG1heSBub3QNCmNvbnZleSB3aGF0IHlvdSBfcmVhbGx5XyB3YW50IHRvIGRvLCBwYXJ0
-aWN1bGFybHkgaW4gdGhpcyBjYXNlLg0KQXMgSSBfcmVhbGx5XyB3YW50IHRvIHdyaXRlIGEgYmln
-IGVuZGlhbiB3b3JkIHRoZXJlLiBJIGRvbid0IHdhbnQgdG8NCnByZXRlbmQgSSBsb29zZSB0aGUg
-ZW5kaWFubmVzcyBzb21ld2hlcmUgYWxvbmcgdGhlIHdheS4gVGhhdCB3cml0dGVuDQp3b3JkIGlz
-IHN0aWxsIHZlcnkgbXVjaCBiaWcgZW5kaWFuLg0KKEkga25vdyBwcmFjdGljYWxseSBpdCBtYWtl
-cyBubyBkaWZmZXJlbmNlLCBidXQgY2FzdGluZyB0aGUgbGVmdCBzaWRlDQp3b3VsZCBqdXN0IGJl
-IHNvIG11Y2ggY2xlYXJlciBJTUhPKQ0KDQo+ID4gPg0KPiA+ID4gPiA+ID4gUmVnYXJkcywNCj4g
-PiA+ID4gPiA+IFBhc2NhbCB2YW4gTGVldXdlbg0KPiA+ID4gPiA+ID4gU2lsaWNvbiBJUCBBcmNo
-aXRlY3QsIE11bHRpLVByb3RvY29sIEVuZ2luZXMgQCBWZXJpbWF0cml4DQo+ID4gPiA+ID4gPiB3
-d3cuaW5zaWRlc2VjdXJlLmNvbQ0KPiA+ID4gPiA+ID4NCj4gPiA+ID4gPiA+ID4gLS0tLS1Pcmln
-aW5hbCBNZXNzYWdlLS0tLS0NCj4gPiA+ID4gPiA+ID4gRnJvbTogUGFzY2FsIFZhbiBMZWV1d2Vu
-DQo+ID4gPiA+ID4gPiA+IFNlbnQ6IE1vbmRheSwgT2N0b2JlciAyMSwgMjAxOSAxMTowNCBBTQ0K
-PiA+ID4gPiA+ID4gPiBUbzogbGludXgtY3J5cHRvQHZnZXIua2VybmVsLm9yZzsgaGVyYmVydEBn
-b25kb3IuYXBhbmEub3JnLmF1DQo+ID4gPiA+ID4gPiA+IFN1YmplY3Q6IEtleSBlbmRpYW5uZXNz
-Pw0KPiA+ID4gPiA+ID4gPg0KPiA+ID4gPiA+ID4gPiBIZXJiZXJ0LA0KPiA+ID4gPiA+ID4gPg0K
-PiA+ID4gPiA+ID4gPiBJJ20gY3VycmVudGx5IGJ1c3kgZml4aW5nIHNvbWUgZW5kaWFubmVzcyBy
-ZWxhdGVkIHNwYXJzZSBlcnJvcnMgcmVwb3J0ZWQNCj4gPiA+ID4gPiA+ID4gYnkgdGhpcyBrYnVp
-bGQgdGVzdCByb2JvdCBhbmQgdGhpcyB0cmlnZ2VyZWQgbXkgdG8gcmV0aGluayBzb21lIGVuZGlh
-bg0KPiA+ID4gPiA+ID4gPiBjb252ZXJzaW9uIGJlaW5nIGRvbmUgaW4gdGhlIGluc2lkZS1zZWN1
-cmUgZHJpdmVyLg0KPiA+ID4gPiA+ID4gPg0KPiA+ID4gPiA+ID4gPiBJIGFjdHVhbGx5IHdvbmRl
-ciB3aGF0IHRoZSBlbmRpYW5uZXNzIGlzIG9mIHRoZSBpbnB1dCBrZXkgZGF0YSwgZS5nLiB0aGUN
-Cj4gPiA+ID4gPiA+ID4gInU4ICprZXkiIHBhcmFtZXRlciB0byB0aGUgc2V0a2V5IGZ1bmN0aW9u
-Lg0KPiA+ID4gPiA+ID4gPg0KPiA+ID4gPiA+ID4gPiBJIGFsc28gd29uZGVyIHdoYXQgdGhlIGVu
-ZGlhbm5lc3MgaXMgb2YgdGhlIGtleSBkYXRhIGluIGEgc3RydWN0dXJlDQo+ID4gPiA+ID4gPiA+
-IGxpa2UgImNyeXB0b19hZXNfY3R4IiwgYXMgZmlsbGVkIGluIGJ5IHRoZSBhZXNfZXhwYW5ka2V5
-IGZ1bmN0aW9uLg0KPiA+ID4gPiA+ID4gPg0KPiA+ID4gPiA+DQo+ID4gPiA+ID4gY3J5cHRvX2Fl
-c19jdHggdXNlcyBDUFUgZW5kaWFubmVzcyBmb3IgdGhlIHJvdW5kIGtleXMuDQo+ID4gPiA+ID4N
-Cj4gPiA+ID4gU28gdGhlc2Ugd2lsbCBuZWVkIHRvIGJlIGNvbnNpc3RlbnRseSBoYW5kbGVkIHVz
-aW5nIGNwdV90b19YZTMyLg0KPiA+ID4gPg0KPiA+ID4NCj4gPiA+IElmIHlvdSBhcmUgdXNpbmcg
-dGhlIGdlbmVyaWMgYWVzX2V4cGFuZGtleSBhbmQgd2FudCB0byByZXVzZSB0aGUga2V5DQo+ID4g
-PiBzY2hlZHVsZSwgaXQgaXMgaW5kZWVkIGdvb2QgdG8gYmUgYXdhcmUgdGhhdCBib3RoIHRoZSBy
-b3VuZCBrZXlzDQo+ID4gPiB0aGVtc2VsdmVzIGFzIHdlbGwgYXMgdGhlIGtleSBsZW5ndGggYXJl
-IHJlY29yZGVkIGluIENQVSBlbmRpYW5uZXNzLg0KPiA+ID4NCj4gPiBBY3R1YWxseSwgSSBoYXZl
-IGEgYmlnIHBhdGNoIHN0YW5kaW5nIGJ5IGdldHRpbmcgcmlkIG9mIGFlc19leHBhbmRrZXkoKQ0K
-PiA+IGFsdG9nZXRoZXIgYXMgSSBkb24ndCBuZWVkIF9hbnlfIG9mIHRob3NlIHJvdW5kIGtleXMg
-Z2VuZXJhdGVkLCBpaQ0KPiA+IHdhcyBqdXN0IHVzZWQgZm9yIEFFUyBrZXkgdmFsaWRpdHkgY2hl
-Y2tzIGFuZCBub3RoaW5nIGVsc2UuDQo+ID4NCj4gPiBCdXQgc2luY2UgdGhhdCBwYXRjaCBpcyBu
-b3QgcmVhZHkgZm9yIHByaW1lIHRpbWUgeWV0LCBJIGhhdmUgdG8gZml4DQo+ID4gdGhlc2Ugc3Bh
-cnNlIGVycm9ycyBmb3IgdGhlIHRpbWUgYmVpbmcuDQo+ID4NCj4gPiA+ID4gPiBJbiBnZW5lcmFs
-LCB0aG91Z2gsIHRoZXJlIGlzIG5vIHN1Y2ggdGhpbmcgYXMgZW5kaWFubmVzcyBmb3IgYSBrZXkN
-Cj4gPiA+ID4gPiB0aGF0IGlzIGRlY2xhcmVkIGFzIHU4W10sIGl0IGlzIHNpbXBseSBhIHNlcXVl
-bmNlIG9mIGJ5dGVzLg0KPiA+ID4gPiA+DQo+ID4gPiA+IERlcGVuZHMgYSBiaXQgb24gdGhlIGFs
-Z29yaXRobS4gU29tZSBrZXlzIGFyZSBpbmRlZWQgZGVmaW5lZCBhcyBieXRlDQo+ID4gPiA+IHN0
-cmVhbXMsIGluIHdoaWNoIGNhc2UgeW91IGhhdmUgYSBwb2ludC4gQXNzdW1pbmcgeW91IG1lYW4g
-dGhhdCB0aGUNCj4gPiA+ID4gY3J5cHRvIEFQSSBmb2xsb3dzIHRoZSBieXRlIG9yZGVyIGFzIGRl
-ZmluZWQgYnkgdGhlIGFsZ29yaXRobSBzcGVjLg0KPiA+ID4gPg0KPiA+ID4gPiBCdXQgc29tZXRp
-bWVzIHRoZSBrZXkgZGF0YSBpcyBhY3R1YWxseSBhIHN0cmVhbSBvZiBfd29yZHNfIChleGFtcGxl
-Og0KPiA+ID4gPiBDaGFjaGEyMCkgYW5kIHRoZW4gZW5kaWFubmVzcyBfZG9lc18gbWF0dGVyLiBT
-YW1lIHRoaW5nIGFwcGxpZXMgdG8NCj4gPiA+ID4gdGhpbmdzIGxpa2Ugbm9uY2VzIGFuZCBpbml0
-aWFsIGNvdW50ZXIgdmFsdWVzIEJUVy4NCj4gPiA+ID4NCj4gPiA+DQo+ID4gPiBFbmRpYW5uZXNz
-IGFsd2F5cyBtYXR0ZXJzLCBhbmQgYm90aCBBRVMgYW5kIENoYUNoYSBhcmUgcmF0aGVyIHNpbWls
-YXINCj4gPiA+IGluIHRoYXQgcmVzcGVjdCBpbiB0aGUgc2Vuc2UgdGhhdCBpdCBpcyB0aGUgYWxn
-b3JpdGhtIHRoYXQgZGVmaW5lcyBob3cNCj4gPiA+IGEgYnl0ZSBzdHJlYW0gaXMgbWFwcGVkIG9u
-dG8gMzItYml0IHdvcmRzLCBhbmQgaW4gYm90aCBjYXNlcywgdGhleSB1c2UNCj4gPiA+IGxpdHRs
-ZSBlbmRpYW5uZXNzLg0KPiA+ID4NCj4gPiBUaGFua3MsIHRoYXQncyBhY3R1YWxseSBzb21ldGhp
-bmcgSSBjYW4gX3VzZV8gOy0pDQo+ID4NCj4gPiA+DQo+ID4gPiA+ID4gSWYgdGhlDQo+ID4gPiA+
-ID4gaGFyZHdhcmUgY2hvb3NlcyB0byByZW9yZGVyIHRob3NlIGJ5dGVzIGZvciBzb21lIHJlYXNv
-biwgaXQgaXMgdGhlDQo+ID4gPiA+ID4gcmVzcG9uc2liaWxpdHkgb2YgdGhlIGRyaXZlciB0byB0
-YWtlIGNhcmUgb2YgdGhhdCBmcm9tIHRoZSBDUFUgc2lkZS4NCj4gPiA+ID4gPg0KPiA+ID4gPiBX
-aGljaCBzdGlsbCByZXF1aXJlcyB5b3UgdG8ga25vdyB0aGUgYnl0ZSBvcmRlciBhcyB1c2VkIGJ5
-IHRoZSBBUEkuDQo+ID4gPiA+DQo+ID4gPg0KPiA+ID4gT25seSBpZiBBUEkgbWVhbnMgdGhlIEFF
-UyBvciBDaGFDaGEgc3BlY2lmaWMgaGVscGVyIHJvdXRpbmVzIHRoYXQgd2UNCj4gPiA+IGhhdmUg
-aW4gdGhlIGtlcm5lbC4gSWYgeW91IGFyZSB1c2luZyB0aGUgQUVTIGhlbHBlcnMsIHRoZW4geWVz
-LCB5b3UNCj4gPiA+IG5lZWQgdG8gZW5zdXJlIHRoYXQgeW91IHVzZSB0aGUgc2FtZSBjb252ZW50
-aW9uLiBCdXQgdGhlIGFsZ29yaXRobXMNCj4gPiA+IHRoZW1zZWx2ZXMgYXJlIGZ1bGx5IGRlZmlu
-ZWQgYnkgdGhlaXIgc3BlY2lmaWNhdGlvbiwgYW5kIHNvIHdoYXQgb3RoZXINCj4gPiA+IGltcGxl
-bWVudGF0aW9ucyBpbiB0aGUga2VybmVsIGRvIGlzIG5vdCByZWFsbHkgcmVsZXZhbnQuDQo+ID4g
-Pg0KPiA+IFdoYXQgaXMgcmVsZXZhbnQgaXMgd2hhdCB0aGUgQVBJIGV4cGVjdHMNCj4gDQo+IEJ1
-dCAqd2hpY2gqIEFQST8gVGhlIHNrY2lwaGVyIEFQSSB1c2VzIHU4W10gZm9yIGluL291dHB1dCBh
-bmQga2V5cywNCj4gYW5kIGhvdyB0aGVzZSBieXRlIGFycmF5cyBhcmUgaW50ZXJwcmV0ZWQgaXMg
-bm90IChhbmQgY2Fubm90KSBiZQ0KPiBkZWZpbmVkIGF0IHRoaXMgbGV2ZWwgb2YgYWJzdHJhY3Rp
-b24uDQo+IA0KWWVzLCBza2NpcGhlciBBUEkuIE9idmlvdXNseS4gQXMgdGhhdCdzIHdoYXQgd2Un
-cmUgdGFsa2luZyBhYm91dC4NCkFuZCBfb2YgY291cnNlXyBpdCBoYXMgdG8gYmUgZGVmaW5lZCBh
-dCB0aGF0IGxldmVsIG9mIGFic3RyYWN0aW9uLg0KKHdoaWNoIGRvZXNuJ3QgcHJlY2x1ZGUgaW5o
-ZXJpdGluZyBpdCBmcm9tIHNvbWUgb3RoZXIgc3BlY2lmaWNhdGlvbikNCk90aGVyd2lzZSB5b3Ug
-d291bGQgbm90IGFibGUgdG8gZS5nLiBleGNoYW5nZSBrZXlzIGJldHdlZW4gZGlmZmVyZW50DQpw
-bGF0Zm9ybXMuDQoNCj4gDQo+ID4gLi4uIGFuZCBmcm9tIDIwIHllYXJzIG9mDQo+ID4gZXhwZXJp
-ZW5jZSBJIHdvdWxkIHNheSBtYW55IGFsZ29yaXRobSBzcGVjaWZpY2F0aW9ucyBhcmUgbm90IGV4
-YWN0bHkNCj4gPiB2ZXJ5IGNsZWFyIG9uIHRoZSBieXRlIG9yZGVyIGF0IGFsbCwgb2Z0ZW4gYXNz
-dW1pbmcgdGhpcyB0byBiZQ0KPiA+ICJvYnZpb3VzIi4gKGFuZCBpZiBpdCdzIG5vdCBsaXR0bGUt
-ZW5kaWFuLCBpdCdzIG5vdCBvYnZpb3VzIHRvIG1lIDstKQ0KPiA+DQo+IA0KPiBJIGFncmVlIHRo
-YXQgbm90IGFsbCBzcGVjcyBhcmUgY3J5c3RhbCBjbGVhciBvbiB0aGlzLiBCdXQgaXQgaXMgc3Rp
-bGwNCj4gdGhlIGFsZ29yaXRobSB0aGF0IG5lZWRzIHRvIGRlZmluZSB0aGlzLg0KPiANCkluIGFu
-IGlkZWFsIHdvcmxkLCBwcm9iYWJseS4gSW4gdGhlIHJlYWwgd29ybGQsIGl0IGlzIGVudGlyZWx5
-IHBvc3NpYmxlDQpmb3IgYW4gaW1wbGVtZW50YXRpb24gdG8gZXhwZWN0IHRoZSBrZXkgYnl0ZXMg
-aW4gYSBkaWZmZXJlbnQgb3JkZXIuDQpXb3VsZCBub3QgYmUgdGhlIGZpcnN0IHRpbWUgSSBydW4g
-aW50byB0aGF0Lg0KDQo+ID4gVmVyeSBvZnRlbiBnZXR0aW5nIHRoZSBieXRlIG9yZGVyIHJpZ2h0
-IHdhcyBqdXN0IHRyaWFsIGFuZCBlcnJvcg0KPiA+IHVzaW5nIGtub3duLWdvb2QgcmVmZXJlbmNl
-IHZlY3RvcnMgYW5kIGp1c3QgdHJ5aW5nIGV2ZXJ5IHBvc3NpYmxlDQo+ID4gYnl0ZS93b3JkL3do
-YXRldmVyIHN3YXAgeW91IGNvdWxkIHRoaW5rIG9mLiAoaGVuY2UgImVsbGVuZGlhbm5lc3MiKQ0K
-PiA+DQo+ID4gPg0KPiA+ID4NCj4gPiA+ID4gPg0KPiA+ID4gPiA+ID4gPiBTaW5jZSBJIGtub3cg
-bXkgY3VycmVudCBlbmRpYW5uZXNzIGNvbnZlcnNpb25zIHdvcmsgb24gYSBsaXR0bGUgZW5kaWFu
-DQo+ID4gPiA+ID4gPiA+IENQVSwgSSBndWVzcyB0aGUgYmlnIHF1ZXN0aW9uIGlzIHdoZXRoZXIg
-dGhlIGJ5dGUgb3JkZXIgb2YgdGhpcyBrZXkNCj4gPiA+ID4gPiA+ID4gZGF0YSBpcyBfQ1BVIGJ5
-dGUgb3JkZXJfIG9yIGFsd2F5cyBzb21lIF9maXhlZCBieXRlIG9yZGVyXyAoZS5nLiBhcyBwZXIN
-Cj4gPiA+ID4gPiA+ID4gYWxnb3JpdGhtIHNwZWNpZmljYXRpb24pLg0KPiA+ID4gPiA+ID4gPg0K
-PiA+ID4gPiA+ID4gPiBJIGtub3cgSSBoYXZlIHNvbWUgY3VzdG9tZXJzIHVzaW5nIGJpZy1lbmRp
-YW4gQ1BVJ3MsIHNvIEkgZG8gY2FyZSwgYnV0DQo+ID4gPiA+ID4gPiA+IEkgdW5mb3J0dW5hdGVs
-eSBkb24ndCBoYXZlIGFueSBwbGF0Zm9ybSBhdmFpbGFibGUgdG8gdGVzdCB0aGlzIHdpdGguDQo+
-ID4gPiA+ID4gPiA+DQo+ID4gPiA+ID4NCj4gPiA+ID4gPiBZb3UgY2FuIGJvb3QgYmlnIGVuZGlh
-biBrZXJuZWxzIG9uIE1hY2NoaWF0b0JpbiwgaW4gY2FzZSB0aGF0IGhlbHBzDQo+ID4gPiA+ID4g
-KHVzaW5nIHUtYm9vdCwgbm90IEVGSSkNCj4gPiA+ID4gPg0KPiA+ID4gPiBJJ20gc3VyZSBfc29t
-ZW9uZV8gY2FuLCBJJ20gbm90IHNvIHN1cmUgX0lfIGNhbiA7LSkNCj4gPiA+ID4NCj4gPiA+ID4g
-UmVnYXJkcywNCj4gPiA+ID4gUGFzY2FsIHZhbiBMZWV1d2VuDQo+ID4gPiA+IFNpbGljb24gSVAg
-QXJjaGl0ZWN0LCBNdWx0aS1Qcm90b2NvbCBFbmdpbmVzIEAgVmVyaW1hdHJpeA0KPiA+ID4gPiB3
-d3cuaW5zaWRlc2VjdXJlLmNvbQ0KPiA+DQo+ID4NCj4gPiBSZWdhcmRzLA0KPiA+IFBhc2NhbCB2
-YW4gTGVldXdlbg0KPiA+IFNpbGljb24gSVAgQXJjaGl0ZWN0LCBNdWx0aS1Qcm90b2NvbCBFbmdp
-bmVzIEAgVmVyaW1hdHJpeA0KPiA+IHd3dy5pbnNpZGVzZWN1cmUuY29tDQo+ID4NCg0KUmVnYXJk
-cywNClBhc2NhbCB2YW4gTGVldXdlbg0KU2lsaWNvbiBJUCBBcmNoaXRlY3QsIE11bHRpLVByb3Rv
-Y29sIEVuZ2luZXMgQCBWZXJpbWF0cml4DQp3d3cuaW5zaWRlc2VjdXJlLmNvbQ0KDQo=
+On Mon, 21 Oct 2019 at 17:55, Pascal Van Leeuwen
+<pvanleeuwen@verimatrix.com> wrote:
+>
+> > -----Original Message-----
+> > From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> > Sent: Monday, October 21, 2019 5:32 PM
+> > To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+> > Cc: linux-crypto@vger.kernel.org; herbert@gondor.apana.org.au
+> > Subject: Re: Key endianness?
+> >
+> > p[
+> >
+> > On Mon, 21 Oct 2019 at 17:23, Pascal Van Leeuwen
+> > <pvanleeuwen@verimatrix.com> wrote:
+> > >
+> > > > -----Original Message-----
+> > > > From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> > > > Sent: Monday, October 21, 2019 2:54 PM
+> > > > To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+> > > > Cc: linux-crypto@vger.kernel.org; herbert@gondor.apana.org.au
+> > > > Subject: Re: Key endianness?
+> > > >
+> > > > On Mon, 21 Oct 2019 at 14:40, Pascal Van Leeuwen
+> > > > <pvanleeuwen@verimatrix.com> wrote:
+> > > > >
+> > > > > > -----Original Message-----
+> > > > > > From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> > > > > > Sent: Monday, October 21, 2019 1:59 PM
+> > > > > > To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+> > > > > > Cc: linux-crypto@vger.kernel.org; herbert@gondor.apana.org.au
+> > > > > > Subject: Re: Key endianness?
+> > > > > >
+> > > > > > On Mon, 21 Oct 2019 at 12:56, Pascal Van Leeuwen
+> > > > > > <pvanleeuwen@verimatrix.com> wrote:
+> > > > > > >
+> > > > > > > Another endianness question:
+> > > > > > >
+> > > > > > > I have some data structure that can be either little or big endian,
+> > > > > > > depending on the exact use case. Currently, I have it defined as u32.
+> > > > > > > This causes sparse errors when accessing it using cpu_to_Xe32() and
+> > > > > > > Xe32_to_cpu().
+> > > > > > >
+> > > > > > > Now, for the big endian case, I could use htonl()/ntohl() instead,
+> > > > > > > but this is inconsistent with all other endian conversions in the
+> > > > > > > driver ... and there's no little endian alternative I'm aware of.
+> > > > > > > So I don't really like that approach.
+> > > > > > >
+> > > > > > > Alternatively, I could define a union of both a big and little
+> > > > > > > endian version of the data but that would require touching a lot
+> > > > > > > of legacy code (unless I use a C11 anonymous union ... not sure
+> > > > > > > if that would be allowed?) and IMHO is a bit silly.
+> > > > > > >
+> > > > > > > Is there some way of telling sparse to _not_ check for "correct"
+> > > > > > > use of these functions for a certain variable?
+> > > > > > >
+> > > > > >
+> > > > > >
+> > > > > > In this case, just use (__force __Xe32*) to cast it to the correct
+> > > > > > type. This annotates the cast as being intentionally endian-unclean,
+> > > > > > and shuts up Sparse.
+> > > > > >
+> > > > > Thanks for trying to help out, but that just gives me an
+> > > > > "error: not an lvalue" from both sparse and GCC.
+> > > > > But I'm probably doing it wrong somehow ...
+> > > > >
+> > > >
+> > > > It depends on what you are casting. But doing something like
+> > > >
+> > > > u32 l = ...
+> > > > __le32 ll = (__force __le32)l
+> > > >
+> > > > should not trigger a sparse warning.
+> > > >
+> > > I was actually casting the left side, not the right side,
+> > > as that's where my sparse issue was. Must be my poor grasp
+> > > of the C language hurting me here as I don't understand why
+> > > I'm not allowed to cast an array element to a different type
+> > > of the _same size_ ...
+> > >
+> > > i.e. why can't I do (__be32)some_u32_array[3] = cpu_to_be32(some_value)?
+> > >
+> >
+> > Because you can only change the type of an expression by casting, and
+> > an lvalue is not an expression. A variable has a type already, and you
+> > cannot cast that away - what would that mean, exactly? Would all
+> > occurrences of some_u32_array[] suddenly have a different type? Or
+> > only element [3]?
+> >
+> I think it would be perfectly logical to do such a cast and I'm really
+> surprised that it is not legal. Obviously, it would only apply to the
+> actual assignment it is used with. It's a cast, not a redefinition.
+> After all, a variable or an array item is just some storage area in
+> memory. Why shouldn't I be able to write to it _as if_ it is some
+> different type (if I know what I'm doing and especially if it is the
+> exact same size in memory)?
+>
+> >
+> > > I managed to work around it by doing *(__be32 *)&some_u32_array[3] =
+> > > but that's pretty ugly ... a better approach is still welcome.
+> > >
+> >
+> > You need to cast the right hand side, not the left hand side. If
+> > some_u32_array is u32[], force cast it to (__force u32)
+> >
+>
+> Sure, you can do the casting on the right hand side, but that may not
+> convey what you _really_ want to do, particularly in this case.
+> As I _really_ want to write a big endian word there. I don't want to
+> pretend I loose the endianness somewhere along the way. That written
+> word is still very much big endian.
+> (I know practically it makes no difference, but casting the left side
+> would just be so much clearer IMHO)
+>
+
+
+No, it really isn't, and I am tired of having another endless debate about this.
+
+C permits casting of expressions, not of lvalues.
+...
+> > > >
+> > > > > > If the
+> > > > > > hardware chooses to reorder those bytes for some reason, it is the
+> > > > > > responsibility of the driver to take care of that from the CPU side.
+> > > > > >
+> > > > > Which still requires you to know the byte order as used by the API.
+> > > > >
+> > > >
+> > > > Only if API means the AES or ChaCha specific helper routines that we
+> > > > have in the kernel. If you are using the AES helpers, then yes, you
+> > > > need to ensure that you use the same convention. But the algorithms
+> > > > themselves are fully defined by their specification, and so what other
+> > > > implementations in the kernel do is not really relevant.
+> > > >
+> > > What is relevant is what the API expects
+> >
+> > But *which* API? The skcipher API uses u8[] for in/output and keys,
+> > and how these byte arrays are interpreted is not (and cannot) be
+> > defined at this level of abstraction.
+> >
+> Yes, skcipher API. Obviously. As that's what we're talking about.
+> And _of course_ it has to be defined at that level of abstraction.
+> (which doesn't preclude inheriting it from some other specification)
+> Otherwise you would not able to e.g. exchange keys between different
+> platforms.
+>
+
+So what exactly are you suggesting? That the skcipher API should
+specify that the key is u8[], unless the algo in question operates on
+32-bit words, in which case it is le32[], unless the algo in question
+operates on 64-bit words, in which case it is le64[] etc etc? Do you
+seriously think that at the skcipher API level we should mandate all
+of that? That is insane.
+
+> >
+> > > ... and from 20 years of
+> > > experience I would say many algorithm specifications are not exactly
+> > > very clear on the byte order at all, often assuming this to be
+> > > "obvious". (and if it's not little-endian, it's not obvious to me ;-)
+> > >
+> >
+> > I agree that not all specs are crystal clear on this. But it is still
+> > the algorithm that needs to define this.
+> >
+> In an ideal world, probably. In the real world, it is entirely possible
+> for an implementation to expect the key bytes in a different order.
+> Would not be the first time I run into that.
+>
+
+Of course. But that is not the point. The skcipher API cannot possibly
+reason about byte orders of all current and future algorithms that it
+may ever encapsulate.
