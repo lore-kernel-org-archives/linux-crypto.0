@@ -2,67 +2,57 @@ Return-Path: <SRS0=EZON=YO=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36105CA9EAF
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 10:23:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4308ECA9EAF
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 10:56:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EA6312089C
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 10:23:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0B18620873
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 10:56:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="KtM/kEfh"
+	dkim=pass (1024-bit key) header.d=verimatrix.com header.i=@verimatrix.com header.b="zaNXeyax"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727517AbfJUKXi (ORCPT
+        id S1727832AbfJUKz7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Oct 2019 06:23:38 -0400
-Received: from mail-eopbgr770057.outbound.protection.outlook.com ([40.107.77.57]:46053
-        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        Mon, 21 Oct 2019 06:55:59 -0400
+Received: from mail-eopbgr680060.outbound.protection.outlook.com ([40.107.68.60]:27876
+        "EHLO NAM04-BN3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727328AbfJUKXh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Oct 2019 06:23:37 -0400
+        id S1727831AbfJUKz6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 21 Oct 2019 06:55:58 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EsJQpvtO4capHiUpytHatOj9pgBhM0wgb28DACRljX7U1C/E7eA4V+sDsXvYN9x7LoUsp/jGeExav5U6NE3SXm+RElKaAmPOyLz0NgIOlBF50MkIzC+BFamJG6WUCKslSEJC9fbX/QVcxXolCLGEacN1vDGPuxYquChQwiV31CYxeCC/nVvN9+Te0vfgZ9zJBZnRrRkHdOaZtuAZIDxCnqypxBVIXFJdv2c69Uq9N3gnrcxswdnj4DZIf6N+o6m1uUApTjN+7vP3mjG1jZcBrc8GyXgIIVtGil97GqPuxtuB5j+HDxGXwqwdZBmoJCk8VzSG4dqsInFv2r/qdNwpgg==
+ b=ZQ49BUyKdqPW61XTi64ufasFosGYdKgV2COutJaX3X/j6fzgdStn3Oqi/Vc7GCK9wmSxJwrfPzlexNZcaV9Wu8nbWHtqm5PXBrUwEcLct09ExXjwtlICd4Ko0DDf0yFK8p/C/zBkKJcBzEd27k/myqnrocDC3EBfmd4eyCrs67Io7ak5gCrE4pBpxfh5iRKNMAl9N+YgVu0Ra3nHmS/DWk+44mIFpBkD1EPqXgDR77VBy/aIvser2U+vskV4q91Qw6DRPY2tNao5dEBaMme8CfFlL/9bSf9vtu3HG9iLqvUlNq6rDNlYw0qaHabkGLueS8I8qENDv7gC4bYW76hhvQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/5eUZp6JzuHcHAyv5xCqnq5+JMeZGICotQn5K0+faAk=;
- b=KBxAliZM1rjcyAGbsVChNzxsZBwRNWzEWaJI//CgwNxCnVR9b3lAXg0IBo+Agy0IqXCCT1TfLU15FSo49ZYO5tzLonxDMo3+PxM/ELDiUTk+4AjwLokiArIJeJN3mQrAxLtn4b8gDbsLRDpG9TGCCBFUZDjHAXHLZOjpAET8ka7VcwK844G10jgjfJ4qSHFvCli7GPXPyTuALD4bfHM2MpXKyRK0bb351uGh3+iaSCYciLLqD/IU0dBC+2mObDU5ZBd5utZ26tb41oapHZ+HDmV4g32+zg84zEeQ5CijnlAoJWg7pZsm1jClAs29B+cYiizwwTbvYxX4bnOGOuhptQ==
+ bh=vwYf75MjPx31xTKvR62HiLAJ8/501UAIekaKlGthX8g=;
+ b=YsgpPUwW0vJnT4cU5Dv8xGIRyUABzJBullVt62MpgGyadQGOio25khLxGoEdFyhyUQB5QcjkEvKUqpQ4h+pDmbjSB++2QeUBGYeo1Yv77+CKkFWl+VT3cFp/Q5O+2rjjoaE/vOCDAJAxpjAOknkj0zAOcGl9cYoV15xzWd2kveUsEjZ9CGbn6jCMYZc1wDKiRb2EoAN/LbNRkHWAcVx4WEe1ttM7QI5crPaioEHpniE/LlbzFVrQeWDxMrGfmoM2Okpyma1Bcmsi7FZydmI8t+Ipq67nij+z3L70vbNsnQF5Aur62sA0yx8Ve5UrNu/gdmj+IwUM/YTntIYJdXzPTw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=verimatrix.com; dmarc=pass action=none
  header.from=verimatrix.com; dkim=pass header.d=verimatrix.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verimatrix.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/5eUZp6JzuHcHAyv5xCqnq5+JMeZGICotQn5K0+faAk=;
- b=KtM/kEfhEWB5yV5qONaS3tsPpozijphzKclD0JraGk7m2p8QqSvJuLt1lXGfhAIFLTn0l0r29uKJAqbeTLd5/eil/DK74awVMpmr0GeWitE94dkgxaAviaJN47s0tgX4IZCdCi7SfwkamdMEcee0q78jtM5VBUUqt4BdT0CgqJE=
+ bh=vwYf75MjPx31xTKvR62HiLAJ8/501UAIekaKlGthX8g=;
+ b=zaNXeyaxpwQZPRfH9leTDGvMymrdwmhBWCxmGYtGXRPI4dPEZDX/ypKo2PBmvvS2Hag53GdIwjTea/b+d6wTbnTa3BGSWnYXDoTT1eeppFWfQVCQxIvchSjR37+RS+RL4nkHPqfL92n43wlwFOgb83YLNWiQuqhYgkzgzbMUstE=
 Received: from MN2PR20MB2973.namprd20.prod.outlook.com (52.132.172.86) by
- MN2PR20MB3005.namprd20.prod.outlook.com (52.132.174.79) with Microsoft SMTP
+ MN2PR20MB2656.namprd20.prod.outlook.com (20.178.251.207) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2347.16; Mon, 21 Oct 2019 10:23:32 +0000
+ 15.20.2347.21; Mon, 21 Oct 2019 10:55:56 +0000
 Received: from MN2PR20MB2973.namprd20.prod.outlook.com
  ([fe80::b986:4f02:3206:31e4]) by MN2PR20MB2973.namprd20.prod.outlook.com
  ([fe80::b986:4f02:3206:31e4%7]) with mapi id 15.20.2347.029; Mon, 21 Oct 2019
- 10:23:32 +0000
+ 10:55:56 +0000
 From:   Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-To:     "Ben Dooks (Codethink)" <ben.dooks@codethink.co.uk>,
-        "linux-kernel@lists.codethink.co.uk" 
-        <linux-kernel@lists.codethink.co.uk>
-CC:     Antoine Tenart <antoine.tenart@bootlin.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH] crypto: inside-secure - fix type of buffer in
- eip197_write_firmware
-Thread-Topic: [PATCH] crypto: inside-secure - fix type of buffer in
- eip197_write_firmware
-Thread-Index: AQHVhBfWMp/OQ1W3YkiqzB+SEDRBb6dfDogAgAAvRhCABaqlQA==
-Date:   Mon, 21 Oct 2019 10:23:32 +0000
-Message-ID: <MN2PR20MB29732240A7D7ECE5BA80E474CA690@MN2PR20MB2973.namprd20.prod.outlook.com>
-References: <20191016114945.30451-1-ben.dooks@codethink.co.uk>  
+To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
+Subject: RE: Key endianness?
+Thread-Topic: Key endianness?
+Thread-Index: AdWH7WiyGB6aVNy7SJOkTaAoiPGHOgADxdEg
+Date:   Mon, 21 Oct 2019 10:55:56 +0000
+Message-ID: <MN2PR20MB29734588383A8699E6B700F3CA690@MN2PR20MB2973.namprd20.prod.outlook.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -71,192 +61,89 @@ authentication-results: spf=none (sender IP is )
  smtp.mailfrom=pvanleeuwen@verimatrix.com; 
 x-originating-ip: [188.204.2.113]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 05a5a4eb-f546-4d44-4ef0-08d75610b978
-x-ms-traffictypediagnostic: MN2PR20MB3005:
+x-ms-office365-filtering-correlation-id: 5947232b-c8bc-4765-309b-08d756154020
+x-ms-traffictypediagnostic: MN2PR20MB2656:
 x-ms-exchange-purlcount: 1
-x-microsoft-antispam-prvs: <MN2PR20MB3005F99D362BE0168205E5FBCA690@MN2PR20MB3005.namprd20.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:534;
+x-microsoft-antispam-prvs: <MN2PR20MB2656ACF323D7C42F70DF6544CA690@MN2PR20MB2656.namprd20.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
 x-forefront-prvs: 0197AFBD92
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(39850400004)(136003)(376002)(366004)(346002)(189003)(199004)(13464003)(64756008)(8676002)(2906002)(9686003)(66476007)(53546011)(8936002)(76116006)(66446008)(102836004)(66556008)(6506007)(26005)(74316002)(76176011)(99286004)(7696005)(186003)(81156014)(33656002)(81166006)(25786009)(486006)(476003)(478600001)(3846002)(6116002)(4326008)(305945005)(7736002)(6246003)(52536014)(5660300002)(66946007)(446003)(110136005)(6436002)(316002)(229853002)(14454004)(66066001)(71190400001)(86362001)(71200400001)(256004)(14444005)(2501003)(55016002)(54906003)(15974865002)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB3005;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39850400004)(346002)(136003)(376002)(366004)(396003)(199004)(189003)(13464003)(7736002)(7696005)(316002)(86362001)(2906002)(71200400001)(71190400001)(478600001)(15974865002)(5660300002)(7116003)(8936002)(476003)(305945005)(74316002)(486006)(25786009)(14444005)(6116002)(256004)(3846002)(55016002)(6436002)(229853002)(9686003)(33656002)(99286004)(76116006)(66476007)(66556008)(64756008)(66446008)(8676002)(6506007)(110136005)(53546011)(52536014)(66946007)(66066001)(14454004)(26005)(81166006)(81156014)(186003)(102836004)(6246003)(3480700005)(2501003)(18886075002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR20MB2656;H:MN2PR20MB2973.namprd20.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
 received-spf: None (protection.outlook.com: verimatrix.com does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 8cjbwv5ou0OA+0wb7jv+82Ntnd3DcpoN6hpbheqvgfjp546mQ4F9FcTnUDyBT2iZFhzw9Ld9xc7iM6lcqRCgCKuU7R4NXfyf6Yh19HQyvxED5BvcjbbvDKkcn7liXVqsNdUbUQttdO7APD+OL9xKz+AlSx/RoW+QlPUqLRCZ7wsD6xkzTDG55FiV6chrohN5Qv6lwBPIKTTOfRj2jJaXiXxCVZGrp4LFFBBRDSyQb73zP/Cj8BYxcNv1/Iekj4Sou1AOQJoHy3xLHZAus1n+h++O+GpL4VR1ecNSQvkE1blnW8/sWLSWPjoFiZ6ZEHW80d6S4plDQ524yKM/RDQ/9sk6v1GVUP3TXoY3XW40GFVwV9srcrKefZEl3Sz2BPWHXeGKW+D6ireefj9OYoKVaBjrv5NgBZ1DJK7S3IoJaAk=
+x-microsoft-antispam-message-info: 0J9HPgWR36fdTgjC26YjKzg0mT24Scml8QoqA/HcNNUBM/I5SNVr3Kmjr8OsaTLVzC6wbvJyOhE1Jpq8ml7ylzeQ23Hzfq+VoUvJBblkg/T1lDMI247IN5R0I3ZfLjpAkp7n8248udtsQF/xX02VjY3J8XeH4RFyZlKHfsFAqjuP3Cvx6zzE7B9XJ3Dv8n+xjrtxiwwdYa0wqEYmCammkmAfCNZzgYq/HcS9rmPbTAmv3bSyf5VafKRYEIaZjJA/B7VnNl5YiiP6mSkTHu026ZMFuTFSy/JUNZJb/YXXkrwUZYgQY228zu793CwPKRGhOEsHFDi9CrmTjswCuwbN12yzesS6lAh+Uh8J7xKG0cL8tjqGqGMWRz69yqfWrA5OUDZG/6/Ttf05YDE8f9/y26HjCS77O64J+6IoEPsOkuQ=
 x-ms-exchange-transport-forked: True
 Content-Type: text/plain; charset="Windows-1252"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: verimatrix.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 05a5a4eb-f546-4d44-4ef0-08d75610b978
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Oct 2019 10:23:32.6769
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5947232b-c8bc-4765-309b-08d756154020
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Oct 2019 10:55:56.3919
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: dcb260f9-022d-4495-8602-eae51035a0d0
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 28nOnlujFF92ppnlmfhpbTfqUi6+5jc9dlHgKl7pn2bUBjZrcWssQAN7xQG8EDD8Awz/wJfoWarC9H3VXKZbxKjSxnuGmwK8gGgzBVtyBLY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB3005
+X-MS-Exchange-CrossTenant-userprincipalname: Qs0y8ze0Pxoh1eko244stbn0DlcAbf5g91jg9/aOWRglWQ4It9jSwiO1mxt1nZgMxrBWsnddif/jPZHxComyPt3qtykpjrpkkacxWvDaVac=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR20MB2656
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Another endianness question:
+
+I have some data structure that can be either little or big endian,
+depending on the exact use case. Currently, I have it defined as u32.
+This causes sparse errors when accessing it using cpu_to_Xe32() and
+Xe32_to_cpu().
+
+Now, for the big endian case, I could use htonl()/ntohl() instead,
+but this is inconsistent with all other endian conversions in the
+driver ... and there's no little endian alternative I'm aware of.
+So I don't really like that approach.
+
+Alternatively, I could define a union of both a big and little
+endian version of the data but that would require touching a lot
+of legacy code (unless I use a C11 anonymous union ... not sure
+if that would be allowed?) and IMHO is a bit silly.
+
+Is there some way of telling sparse to _not_ check for "correct"
+use of these functions for a certain variable?
+
+Regards,
+Pascal van Leeuwen
+Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
+www.insidesecure.com
+
 > -----Original Message-----
 > From: Pascal Van Leeuwen
-> Sent: Thursday, October 17, 2019 9:46 PM
-> To: 'Ben Dooks (Codethink)' <ben.dooks@codethink.co.uk>; 'linux-kernel@li=
-sts.codethink.co.uk'
-> <linux-kernel@lists.codethink.co.uk>
-> Cc: 'Antoine Tenart' <antoine.tenart@bootlin.com>; 'Herbert Xu' <herbert@=
-gondor.apana.org.au>;
-> 'David S. Miller' <davem@davemloft.net>; 'linux-crypto@vger.kernel.org' <=
-linux-
-> crypto@vger.kernel.org>; 'linux-kernel@vger.kernel.org' <linux-kernel@vge=
-r.kernel.org>
-> Subject: RE: [PATCH] crypto: inside-secure - fix type of buffer in eip197=
-_write_firmware
+> Sent: Monday, October 21, 2019 11:04 AM
+> To: linux-crypto@vger.kernel.org; herbert@gondor.apana.org.au
+> Subject: Key endianness?
 >=20
-> > -----Original Message-----
-> > From: Pascal Van Leeuwen
-> > Sent: Thursday, October 17, 2019 7:14 PM
-> > To: 'Ben Dooks (Codethink)' <ben.dooks@codethink.co.uk>; linux-
-> > kernel@lists.codethink.co.uk
-> > Cc: Antoine Tenart <antoine.tenart@bootlin.com>; Herbert Xu
-> > <herbert@gondor.apana.org.au>; David S. Miller <davem@davemloft.net>; l=
-inux-
-> > crypto@vger.kernel.org; linux-kernel@vger.kernel.org
-> > Subject: RE: [PATCH] crypto: inside-secure - fix type of buffer in eip1=
-97_write_firmware
-> >
-> > > -----Original Message-----
-> > > From: linux-crypto-owner@vger.kernel.org <linux-crypto-owner@vger.ker=
-nel.org> On Behalf
-> > Of Ben
-> > > Dooks (Codethink)
-> > > Sent: Wednesday, October 16, 2019 1:50 PM
-> > > To: linux-kernel@lists.codethink.co.uk
-> > > Cc: Ben Dooks (Codethink) <ben.dooks@codethink.co.uk>; Antoine Tenart
-> > > <antoine.tenart@bootlin.com>; Herbert Xu <herbert@gondor.apana.org.au=
->; David S. Miller
-> > > <davem@davemloft.net>; linux-crypto@vger.kernel.org; linux-kernel@vge=
-r.kernel.org
-> > > Subject: [PATCH] crypto: inside-secure - fix type of buffer in eip197=
-_write_firmware
-> > >
-> > > In eip197_write_firmware() the firmware buffer is sent using
-> > > writel(be32_to_cpu(),,,) this produces a number of warnings.
-> > >
-> > > Note, should this really be cpu_to_be32()  ?
-> > >
-> > No, it should certainly not be cpu_to_be32() since the HW itself is mos=
-t
-> > definitely little endian, so that would not make sense to me.
->
-Never mind that. While looking into more endianness related sparse issues,
-I realised that the HW register access is actually configured to match the
-CPU endianness. So the CPU will not need to swap bytes when accessing the
-hardware registers.
-(Technically, the hardware _is_ little endian but our slave interface
-contains byte swapping logic that is enabled for big-endian CPU's ...)
-
-> >
-> > Actually, I don't think either solution would be correct on a big-endia=
-n
-> > CPU. But I don't have any big-endian CPU available to test that theory.
-> >
-> > What I believe must happen is that the bytes must *always* be swapped
-> > here, regardless of the endianness of the CPU. And with a little-endian
-> > CPU, be32_to_cpu() coincidentally always does that.
-> >
-> > Basically, what we need here is: read a dword (32 bits) from the memory
-> > subsystem and write it back to the memory subsystem with bytes reversed=
-.
-> >
-> > Does the kernel have any dedicated function for just always swapping?
-> >
+> Herbert,
 >=20
-> After some more thought on the train home:
+> I'm currently busy fixing some endianness related sparse errors reported
+> by this kbuild test robot and this triggered my to rethink some endian
+> conversion being done in the inside-secure driver.
 >=20
-> I think the correct construct would be cpu_to_le32(be32_to_cpu(data[i]))
-> This would correctly reflect that the data is read from big-endian
-> memory and subsequently written to little-endian "memory" (aka the EIP).
-> It also fits in nicely with your other changes. Could you work that into
-> a patch v2? Then I would ack it (after testing).
+> I actually wonder what the endianness is of the input key data, e.g. the
+> "u8 *key" parameter to the setkey function.
 >=20
-Since the HW slave ifc is configured to match the CPU endianness, the
-cpu_to_le32() I suggested should NOT be performed and the code is fine as
-it was.
-
-> > Anyway: NACK on this patch for now due to this.
-> >
-Apologies for the mistake and inconvenience. Correction:
-Acked-by: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
-
-
-> > > drivers/crypto/inside-secure/safexcel.c:306:17: warning: cast to rest=
-ricted __be32
-> > > drivers/crypto/inside-secure/safexcel.c:306:17: warning: cast to rest=
-ricted __be32
-> > > drivers/crypto/inside-secure/safexcel.c:306:17: warning: cast to rest=
-ricted __be32
-> > > drivers/crypto/inside-secure/safexcel.c:306:17: warning: cast to rest=
-ricted __be32
-> > > drivers/crypto/inside-secure/safexcel.c:306:17: warning: cast to rest=
-ricted __be32
-> > > drivers/crypto/inside-secure/safexcel.c:306:17: warning: cast to rest=
-ricted __be32
-> > >
-> > > Signed-off-by: Ben Dooks <ben.dooks@codethink.co.uk>
-> > > ---
-> > > Cc: Antoine Tenart <antoine.tenart@bootlin.com>
-> > > Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> > > Cc: "David S. Miller" <davem@davemloft.net>
-> > > Cc: linux-crypto@vger.kernel.org
-> > > Cc: linux-kernel@vger.kernel.org
-> > > ---
-> > >  drivers/crypto/inside-secure/safexcel.c | 6 +++---
-> > >  1 file changed, 3 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto=
-/inside-
-> > secure/safexcel.c
-> > > index 223d1bfdc7e6..dd33f6dda295 100644
-> > > --- a/drivers/crypto/inside-secure/safexcel.c
-> > > +++ b/drivers/crypto/inside-secure/safexcel.c
-> > > @@ -298,13 +298,13 @@ static void eip197_init_firmware(struct safexce=
-l_crypto_priv
-> > *priv)
-> > >  static int eip197_write_firmware(struct safexcel_crypto_priv *priv,
-> > >  				  const struct firmware *fw)
-> > >  {
-> > > -	const u32 *data =3D (const u32 *)fw->data;
-> > > +	const __be32 *data =3D (const __be32 *)fw->data;
-> > >  	int i;
-> > >
-> > >  	/* Write the firmware */
-> > > -	for (i =3D 0; i < fw->size / sizeof(u32); i++)
-> > > +	for (i =3D 0; i < fw->size / sizeof(__be32); i++)
-> > >  		writel(be32_to_cpu(data[i]),
-> > > -		       priv->base + EIP197_CLASSIFICATION_RAMS + i * sizeof(u32));
-> > > +		       priv->base + EIP197_CLASSIFICATION_RAMS + i * sizeof(__be32=
-));
-> > >
-> > >  	/* Exclude final 2 NOPs from size */
-> > >  	return i - EIP197_FW_TERMINAL_NOPS;
-> > > --
-> > > 2.23.0
-> >
-> > Regards,
-> > Pascal van Leeuwen
-> > Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
-> > www.insidesecure.com
+> I also wonder what the endianness is of the key data in a structure
+> like "crypto_aes_ctx", as filled in by the aes_expandkey function.
+>=20
+> Since I know my current endianness conversions work on a little endian
+> CPU, I guess the big question is whether the byte order of this key
+> data is _CPU byte order_ or always some _fixed byte order_ (e.g. as per
+> algorithm specification).
+>=20
+> I know I have some customers using big-endian CPU's, so I do care, but
+> I unfortunately don't have any platform available to test this with.
 >=20
 > Regards,
 > Pascal van Leeuwen
 > Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
 > www.insidesecure.com
 
-Regards,
-Pascal van Leeuwen
-Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
-www.insidesecure.com
