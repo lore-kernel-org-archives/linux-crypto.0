@@ -2,164 +2,122 @@ Return-Path: <SRS0=EZON=YO=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F407CA9EAF
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 13:35:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 305D0CA9EAF
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 13:44:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4BFB020873
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 13:35:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F3C89214AE
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 13:44:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AULSHFQ+"
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="RkHzTz5I"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728714AbfJUNfB (ORCPT
+        id S1728714AbfJUNod (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Oct 2019 09:35:01 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:54680 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728616AbfJUNfB (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Oct 2019 09:35:01 -0400
-Received: by mail-wm1-f65.google.com with SMTP id p7so13381357wmp.4
-        for <linux-crypto@vger.kernel.org>; Mon, 21 Oct 2019 06:34:59 -0700 (PDT)
+        Mon, 21 Oct 2019 09:44:33 -0400
+Received: from mail-eopbgr790054.outbound.protection.outlook.com ([40.107.79.54]:25248
+        "EHLO NAM03-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728479AbfJUNod (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 21 Oct 2019 09:44:33 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SEPZLggS84ZeSAm7Lc28QOYY0jly0iR40+U2mZs2Y4qXRvnAmxCUNCgaKetiqVA5V+qxzhzRSdLpFh2YYgV1YNIVvBvf5SzqJKCn9an2CncnyG4BQ9NmN7gNvzB7iLFneWQSSm7ISejSrKF4mG+xf8bgm/Duh+sKqN0nDwb5T3L0vihrMpUEEx2GpJtZPN/wuOySfMX0C3u236kFxFIy3/AjDD8linY9NUkaOMmUtZ5bU2uQYP1vT1QQ7zb9MKYH4Y3zZhT+TFBiMtxnTtGZxmlHR5bHPY0AkTf2PByM/CtH7S4Dyw4KSe9GXQJe7mOhDFQwIMNHQKrlinZuxlEJ+A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=apjZ2nAz6pU1SLya1E1RJBCHL5pryXplLcNLpoYNiqc=;
+ b=SsfUPln4BN0Yg3CgmV14NJDLD6A/hEMbTtAjRKkd1u248yYGRHZni+3bN0OkYBbJl1gUizzeWZgRFVfPzfoLEqdU8SbZ56GsxDn6YXmZ7cJjdvHwzUJAGea8Kzn2+bp8ER0VgOOMj7ed9tVLnWu5UzDF9QtAL+hBJWloZws2S/6kPSypyFs1kE8u85d1Nf0Zooi3h+pXUNHkiDEfvjia9L6tkOEufa+FP1eyn7Tla6my0bU+VCTynw18Bv7hDwziGa6N/RTjN9YCBa0dbMchW65tBoygeWS/ru8et1jVKlC6VU0nZAkGpBD05ffqdjTU3cvBdiKQZdwTrq1y8jTEug==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=PSOEOmMln8E+JJRVFy7GPNgUKtrrqbgaTaGl5CCcN0E=;
-        b=AULSHFQ+UDP3lc9ZV8CiTvloCNo2njKys1MLrEDDzwQE/3k6sYoehcCZn/FSp51MUz
-         BI6A/ODfsBUTYmAsiJwDi9WvQ2mr/gTK6PLDUSIyB0H/XjTNtfHC9sQFqdotNC+VtznU
-         EN5ZS7mM4+35l/YIr0T8SokVWFgmbcigY8c9PdWiwIOTRevJBi9AVdoYA8V72cz04xWy
-         0Wm8vWzI8wuGNQMssbTGn3g0F8S7NOkqFBALRypah58WwPXzn65E17tBWg31U7vFHdPL
-         5faOYT9ABjhsui8b2+Qu8z0ggiXLGBl3O9EUDct8rDz4kDKP127eYVnuO0vlxPErwyV5
-         UPyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=PSOEOmMln8E+JJRVFy7GPNgUKtrrqbgaTaGl5CCcN0E=;
-        b=US7eckSJWpaHe1bSlDXWIiYsG1HX9q0V3uyLsTTLCWYaq1sL1eNc5/l1lnWEWZ63Yj
-         Vpa2VLyS+FeFtCP4VMapaPKaSeDqbS6WF+kEQguo0iVYBI8Wx1jKxmezkRuDs8f8F1NE
-         ziP1qgRuuMZrBZP7ysb/pjSfTGzvRwA+2v2M9NpDCufG38dzyTcnCw9y6miOSUsHxz6l
-         tvFwnTyN3zwQYpo8eUShCU29wK4fTUnSfurLYrbNXPe+SAcvfbXU0MhPBJ1u0Qmar8/W
-         ykQSvGliJJYwDPDHiNQS30A9Ev/lWQ4WjwOHEOMPFqp64jnGoTj/YSxCyXajaN8tNo7M
-         CgqQ==
-X-Gm-Message-State: APjAAAXn7mPbba33XB5aIj6Y4E0+eW7xPtzW16K8kOYOA1RUjhsAcSy4
-        aUeU2gE0+jRvqokNiPDvKJ4rIg==
-X-Google-Smtp-Source: APXvYqyLilmBsuFakkLGBdUeLaUco79LtHGMIl+KiWY52hD/AAX8wFqqh5+QVIPOhsVpe3bHUSlKtQ==
-X-Received: by 2002:a1c:7d47:: with SMTP id y68mr13674573wmc.157.1571664898314;
-        Mon, 21 Oct 2019 06:34:58 -0700 (PDT)
-Received: from lophozonia ([85.195.192.192])
-        by smtp.gmail.com with ESMTPSA id f83sm14776425wmf.43.2019.10.21.06.34.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Oct 2019 06:34:57 -0700 (PDT)
-Date:   Mon, 21 Oct 2019 15:34:55 +0200
-From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
-To:     Kenneth Lee <Kenneth-Lee-2012@foxmail.com>
-Cc:     Zhangfei Gao <zhangfei.gao@linaro.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        jonathan.cameron@huawei.com, grant.likely@arm.com,
-        ilias.apalodimas@linaro.org, francois.ozog@linaro.org,
-        Wangzhou <wangzhou1@hisilicon.com>,
-        "haojian . zhuang" <haojian.zhuang@linaro.org>,
-        linux-accelerators@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, Kenneth Lee <liguozhu@hisilicon.com>,
-        Zaibo Xu <xuzaibo@huawei.com>
-Subject: Re: [PATCH v6 1/3] uacce: Add documents for uacce
-Message-ID: <20191021133455.GC117664@lophozonia>
-References: <1571214873-27359-1-git-send-email-zhangfei.gao@linaro.org>
- <1571214873-27359-2-git-send-email-zhangfei.gao@linaro.org>
- <20191016183638.GB1533448@lophozonia>
- <5da81d06.1c69fb81.395d6.c080SMTPIN_ADDED_BROKEN@mx.google.com>
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=apjZ2nAz6pU1SLya1E1RJBCHL5pryXplLcNLpoYNiqc=;
+ b=RkHzTz5ItN0DfOWovBT3LHyjTqbMd00FqYM8wgJa/nvJ++BqSxIHtQ0UpbWBbJcHVmIWrclOO42zJu5ZyLiLsyi4UXjo3pyfJK7A+9zfRAwyDC/O2rQsKaoxTPt0pBvniG1s97fuuSI9fqi1jIJBTDPYYuPKj+sOSd9XuXm2qOI=
+Received: from DM5PR12MB1449.namprd12.prod.outlook.com (10.172.40.14) by
+ DM5PR12MB2582.namprd12.prod.outlook.com (52.132.141.165) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2347.16; Mon, 21 Oct 2019 13:44:30 +0000
+Received: from DM5PR12MB1449.namprd12.prod.outlook.com
+ ([fe80::e0d2:a3e2:bf3d:a28f]) by DM5PR12MB1449.namprd12.prod.outlook.com
+ ([fe80::e0d2:a3e2:bf3d:a28f%6]) with mapi id 15.20.2347.029; Mon, 21 Oct 2019
+ 13:44:30 +0000
+From:   "Hook, Gary" <Gary.Hook@amd.com>
+To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC:     "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
+Subject: [PATCH v2 0/2] Improve CCP error handling messages
+Thread-Topic: [PATCH v2 0/2] Improve CCP error handling messages
+Thread-Index: AQHViBWqq9mvMBhS/Eacs79HREKsVQ==
+Date:   Mon, 21 Oct 2019 13:44:30 +0000
+Message-ID: <157166543871.28287.16899240336796713483.stgit@taos>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: SN4PR0401CA0023.namprd04.prod.outlook.com
+ (2603:10b6:803:21::33) To DM5PR12MB1449.namprd12.prod.outlook.com
+ (2603:10b6:4:10::14)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=Gary.Hook@amd.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [165.204.78.1]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 56516d6f-6a17-4c7f-9e47-08d7562ccc75
+x-ms-office365-filtering-ht: Tenant
+x-ms-traffictypediagnostic: DM5PR12MB2582:
+x-ld-processed: 3dd8961f-e488-4e60-8e11-a82d994e183d,ExtAddr
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <DM5PR12MB258264A688B675E4A7ACD506FD690@DM5PR12MB2582.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-forefront-prvs: 0197AFBD92
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(7916004)(4636009)(39860400002)(346002)(396003)(376002)(136003)(366004)(189003)(199004)(4744005)(25786009)(54906003)(6436002)(15650500001)(71200400001)(5660300002)(66946007)(64756008)(66446008)(66476007)(6916009)(86362001)(66556008)(71190400001)(52116002)(99286004)(186003)(2351001)(2501003)(103116003)(486006)(66066001)(386003)(6506007)(26005)(4326008)(8936002)(256004)(9686003)(14444005)(6512007)(8676002)(305945005)(14454004)(316002)(478600001)(7736002)(2906002)(81156014)(81166006)(102836004)(3846002)(476003)(6116002)(33716001)(6486002)(5640700003);DIR:OUT;SFP:1101;SCL:1;SRVR:DM5PR12MB2582;H:DM5PR12MB1449.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: O1/n5s31itDopLi8+zKZ6jGdM7hdOKNKTS+ialUg7sTNm4+QJ9bx89sEovuFubJq7XOHnySJtddAxFLi69oYwjcp4R9PANjX8PlXbniq63UuFkuR4puNKl3mXqpnjo5W+60wgxuOG3pilWNqy/U2BsVmcDJeyqikA4qfWD97/rQntLqg4TSpm/a3jm+Ijb2SRXe2k/QP2RBlRLzN9nGtVo4W2GLPDky4DbT2W3jhF5anOAdXSn2+uXfG13zWuROqN6Iuip6/lmMOz/2eL44j3baMlYkdgfb6MOhFhb7OwTbuD2lXu0ZaflIX+sge7f45oEJ9/1ugMAVB2UKu2Mwux/GDHm2/a5pyFo4D/JhPRX7Hq7gf84bl30qc+hTnKE0ClTLCb31YRFxw3HbJQC2uQ+a88ay9L5I5p0nKENwqfWj/fahGYUIo9D37AoQva9XP
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <4E421F129B795144A67B3630C1AA455C@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <5da81d06.1c69fb81.395d6.c080SMTPIN_ADDED_BROKEN@mx.google.com>
-User-Agent: Mutt/1.12.2 (2019-09-21)
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 56516d6f-6a17-4c7f-9e47-08d7562ccc75
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Oct 2019 13:44:30.6294
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: FpfIyq35vV/V3qWDAijvWFqs1+1wZ2k62ZAZ3M2P/jaiQRb455Bqkyt8eI31BVeF
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB2582
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Kenneth,
+This pair of patches is intended to clarify the messaging produced by
+the CCP driver when known, but non-critical, problems arise. The
+precipitating conditions can be determined based on simple, unalarming
+messages in the system log.
 
-On Thu, Oct 17, 2019 at 03:49:07PM +0800, Kenneth Lee wrote:
-> Dear Jean,
-> 
-> Please let me answer your question about why we build another subsystem
-> other than use vfio-mdev.
-> 
-> I think you might remember that we did build WarpDrive on top of
-> vfio-mdev from the very beginning.
 
-Right thanks for reminding me, I had forgotten about the first RFCs.
+Changes since V1:
+ - Change hex designation '0X' to '0x' in ccp-dev-v5.c
 
-> Both RFCv1, Share Parent IOMMU mdev, and the RFCv2, Share Domain mdev,
-> are based on mdev. We got many comments and we finally felt we could not
-> solve all of them if we continued the mdev directory.
-> 
-> I think the key problem here is that mdev is a virtual *device*. So, 
-> 
-> 1. As you have said, this creates more logic which is useless for
->    accelerator. For example, it gives the user the full control of DMA
->    and irq, it replays the dma mapping for new attach device and it
->    create VFIO IOMMU drivers... These are necessary to simulate a raw
->    device to a virtual machine. But it is not necessary to an
->    accelerator.
-> 
-> 2. You are forced to separate the resource to a device before use it.
->    And if the user process crash, we need extra facility to put it back
->    to the resource pool.
+---
 
-I don't understand the difference between vfio-mdev and uacce in this
-context. An example may help. If you want to give direct access of a bit
-of hardware to userspace, you necessarily need to isolate any resource
-associated to that partition from other processes and from the kernel.
-Namely create a DMA address space (SVA or AUXD), allocate an MMIO frame
-and an interrupt (although IRQs are still handled by the kernel and could
-be shared). And then you need to release those resources back into the
-pool when the process exits or crashes.
+Gary R Hook (2):
+      crypto: ccp - Change a message to reflect status instead of failure
+      crypto: ccp - Verify access to device registers before initializing
 
-> 3. Though Alex Williamson argues that vfio is not just used for
->    virtualisation. But it is indeed used only by virtualisation for the
->    time being.
 
-There is DPDK, that implements userspace drivers for net and crypto using
-vfio-pci, and will likely gain support for vfio-mdev soon. However
-similarly to Qemu they are self-contained and can easily deal with the
-fork problem, unlike a decompression library for example, that could be
-included by any application.
+ drivers/crypto/ccp/ccp-dev-v5.c |   14 +++++++++++++-
+ drivers/crypto/ccp/ccp-dev.c    |   15 ++++++++++++---
+ drivers/crypto/ccp/psp-dev.c    |   18 ++++++++++++++++--
+ 3 files changed, 41 insertions(+), 6 deletions(-)
 
-In any case I agree with your point 1. that a simpler user interface might
-be beneficial. Perhaps DPDK could support uacce as well later.
-
-Thanks,
-Jean
-
->    And Jerome Glisse （also from Redhat) said he could
->    accept some problem from a virtual machine because we can constrain
->    the behavior of virtual machine program (such as qemu) . But he could
->    not accept that happened in an general application. For example, if
->    you pin the memory in a process and then fork, you may lost the
->    physical page due to COW. We can solve the problem in uacce by
->    letting go the shared pages in the child.
-> 
-> So we think we should not continue the mdev direction for uacce. Even we
-> can merge the logic together. It we become a burden for both vfio and
-> uacce. Both of them make use of IOMMU, so of course they will have some
-> code similar. But they go to different direction. VFIO is trying to
-> export virtual DMA and irq to the user space. While uacce is trying to
-> let the accelerator share address with the process itself. Many tricks
-> can be made between the final user interface and the address translation
-> framework. Merge them together will not be good to both of them. 
-> 
-> Hope this answer some of your question.
-> 
-> Cheers:)
+--
