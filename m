@@ -7,30 +7,30 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B37FCCA9EB7
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 14:52:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF5D2CA9EAF
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 14:52:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8989B20B7C
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 14:52:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC97A2053B
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 14:52:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729233AbfJUOwh (ORCPT
+        id S1728289AbfJUOwt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Oct 2019 10:52:37 -0400
-Received: from andre.telenet-ops.be ([195.130.132.53]:43144 "EHLO
-        andre.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728881AbfJUOwM (ORCPT
+        Mon, 21 Oct 2019 10:52:49 -0400
+Received: from xavier.telenet-ops.be ([195.130.132.52]:35706 "EHLO
+        xavier.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726847AbfJUOwK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Oct 2019 10:52:12 -0400
+        Mon, 21 Oct 2019 10:52:10 -0400
 Received: from ramsan ([84.194.98.4])
-        by andre.telenet-ops.be with bizsmtp
-        id GErr2100C05gfCL01Erri2; Mon, 21 Oct 2019 16:52:09 +0200
+        by xavier.telenet-ops.be with bizsmtp
+        id GErr2100B05gfCL01ErrRZ; Mon, 21 Oct 2019 16:52:08 +0200
 Received: from rox.of.borg ([192.168.97.57])
         by ramsan with esmtp (Exim 4.90_1)
         (envelope-from <geert@linux-m68k.org>)
-        id 1iMZ2F-00075u-3G; Mon, 21 Oct 2019 16:51:51 +0200
+        id 1iMZ2E-00075h-Vs; Mon, 21 Oct 2019 16:51:50 +0200
 Received: from geert by rox.of.borg with local (Exim 4.90_1)
         (envelope-from <geert@linux-m68k.org>)
-        id 1iMZ2F-0008Fa-0U; Mon, 21 Oct 2019 16:51:51 +0200
+        id 1iMZ2E-0008FR-UG; Mon, 21 Oct 2019 16:51:50 +0200
 From:   Geert Uytterhoeven <geert+renesas@glider.be>
 To:     =?UTF-8?q?Breno=20Leit=C3=A3o?= <leitao@debian.org>,
         Nayna Jain <nayna@linux.ibm.com>,
@@ -54,9 +54,9 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         netdev@vger.kernel.org, linux-pm@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH 4/5] power: avs: smartreflex: Remove superfluous cast in debugfs_create_file() call
-Date:   Mon, 21 Oct 2019 16:51:48 +0200
-Message-Id: <20191021145149.31657-5-geert+renesas@glider.be>
+Subject: [PATCH 1/5] crypto: nx - Improve debugfs_create_u{32,64}() handling for atomics
+Date:   Mon, 21 Oct 2019 16:51:45 +0200
+Message-Id: <20191021145149.31657-2-geert+renesas@glider.be>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191021145149.31657-1-geert+renesas@glider.be>
 References: <20191021145149.31657-1-geert+renesas@glider.be>
@@ -65,28 +65,52 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-There is no need to cast a typed pointer to a void pointer when calling
-a function that accepts the latter.  Remove it, as the cast prevents
-further compiler checks.
+Variables of type atomic{,64}_t can be used fine with
+debugfs_create_u{32,64}, when passing a pointer to the embedded counter.
+This allows to get rid of the casts, which prevented compiler checks.
 
 Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 ---
- drivers/power/avs/smartreflex.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/nx/nx_debugfs.c | 18 +++++++++---------
+ 1 file changed, 9 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/power/avs/smartreflex.c b/drivers/power/avs/smartreflex.c
-index 4684e7df833a81e9..5376f3d22f31eade 100644
---- a/drivers/power/avs/smartreflex.c
-+++ b/drivers/power/avs/smartreflex.c
-@@ -905,7 +905,7 @@ static int omap_sr_probe(struct platform_device *pdev)
- 	sr_info->dbg_dir = debugfs_create_dir(sr_info->name, sr_dbg_dir);
+diff --git a/drivers/crypto/nx/nx_debugfs.c b/drivers/crypto/nx/nx_debugfs.c
+index e0d44a5512ab455b..1975bcbee997481e 100644
+--- a/drivers/crypto/nx/nx_debugfs.c
++++ b/drivers/crypto/nx/nx_debugfs.c
+@@ -38,23 +38,23 @@ void nx_debugfs_init(struct nx_crypto_driver *drv)
+ 	drv->dfs_root = root;
  
- 	debugfs_create_file("autocomp", S_IRUGO | S_IWUSR, sr_info->dbg_dir,
--			    (void *)sr_info, &pm_sr_fops);
-+			    sr_info, &pm_sr_fops);
- 	debugfs_create_x32("errweight", S_IRUGO, sr_info->dbg_dir,
- 			   &sr_info->err_weight);
- 	debugfs_create_x32("errmaxlimit", S_IRUGO, sr_info->dbg_dir,
+ 	debugfs_create_u32("aes_ops", S_IRUSR | S_IRGRP | S_IROTH,
+-			   root, (u32 *)&drv->stats.aes_ops);
++			   root, &drv->stats.aes_ops.counter);
+ 	debugfs_create_u32("sha256_ops", S_IRUSR | S_IRGRP | S_IROTH,
+-			   root, (u32 *)&drv->stats.sha256_ops);
++			   root, &drv->stats.sha256_ops.counter);
+ 	debugfs_create_u32("sha512_ops", S_IRUSR | S_IRGRP | S_IROTH,
+-			   root, (u32 *)&drv->stats.sha512_ops);
++			   root, &drv->stats.sha512_ops.counter);
+ 	debugfs_create_u64("aes_bytes", S_IRUSR | S_IRGRP | S_IROTH,
+-			   root, (u64 *)&drv->stats.aes_bytes);
++			   root, &drv->stats.aes_bytes.counter);
+ 	debugfs_create_u64("sha256_bytes", S_IRUSR | S_IRGRP | S_IROTH,
+-			   root, (u64 *)&drv->stats.sha256_bytes);
++			   root, &drv->stats.sha256_bytes.counter);
+ 	debugfs_create_u64("sha512_bytes", S_IRUSR | S_IRGRP | S_IROTH,
+-			   root, (u64 *)&drv->stats.sha512_bytes);
++			   root, &drv->stats.sha512_bytes.counter);
+ 	debugfs_create_u32("errors", S_IRUSR | S_IRGRP | S_IROTH,
+-			   root, (u32 *)&drv->stats.errors);
++			   root, &drv->stats.errors.counter);
+ 	debugfs_create_u32("last_error", S_IRUSR | S_IRGRP | S_IROTH,
+-			   root, (u32 *)&drv->stats.last_error);
++			   root, &drv->stats.last_error.counter);
+ 	debugfs_create_u32("last_error_pid", S_IRUSR | S_IRGRP | S_IROTH,
+-			   root, (u32 *)&drv->stats.last_error_pid);
++			   root, &drv->stats.last_error_pid.counter);
+ }
+ 
+ void
 -- 
 2.17.1
 
