@@ -2,148 +2,279 @@ Return-Path: <SRS0=EZON=YO=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E789CA9EAF
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 15:30:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30426CA9EAF
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 15:31:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F1FD7206C2
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 15:30:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EFF5720B7C
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 15:31:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V+qU0bqH"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NhPUd2hV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728025AbfJUPaS (ORCPT
+        id S1729339AbfJUPbt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Oct 2019 11:30:18 -0400
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:25419 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1727101AbfJUPaS (ORCPT
+        Mon, 21 Oct 2019 11:31:49 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:44918 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729431AbfJUPbt (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Oct 2019 11:30:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571671817;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=/5ELIDEIebRNcnRQXVHraCqPbkLQCcB1TSIjkZQvLZ8=;
-        b=V+qU0bqHnt7S91YXsCJfjvHN/WBOjXwwRR5SkK9RAWpduQiV50RXVI6rYxvw1u0ihdYn2t
-        mf//4QKSgsr/m9wuCWpPIRqgyMmcZ+oajk6hABgcCOvkA/+ohsREh32cnltELMVWp2q6g1
-        iQDB5Hqk4vNg1p3hDVIdwBuo6NO9Ylg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-264-oMNytNEGOv-stwXfhXkQgw-1; Mon, 21 Oct 2019 11:30:13 -0400
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A080B1005500;
-        Mon, 21 Oct 2019 15:30:12 +0000 (UTC)
-Received: from rhp50.localdomain (ovpn-120-56.rdu2.redhat.com [10.10.120.56])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B0CE360A9F;
-        Mon, 21 Oct 2019 15:30:11 +0000 (UTC)
-From:   Mark Salter <msalter@redhat.com>
-To:     Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>
-Subject: [PATCH] crypto: ccp - fix uninitialized list head
-Date:   Mon, 21 Oct 2019 11:29:49 -0400
-Message-Id: <20191021152949.17532-1-msalter@redhat.com>
+        Mon, 21 Oct 2019 11:31:49 -0400
+Received: by mail-wr1-f65.google.com with SMTP id z9so14501403wrl.11
+        for <linux-crypto@vger.kernel.org>; Mon, 21 Oct 2019 08:31:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=umwFzrfvCHqAWjqnbJ7c+GUihR3wgKbPKMdVvtxiwXA=;
+        b=NhPUd2hVd17j/YxoW6TTVx47yx7Kq194LvJlFQSWnitbMxi/J4z0+qE5NfX1V7XoFz
+         O1Gx83vASHPwTCnAKVqtF5EUIlVxOL4M1dD96PXr/UN17j8jKFrtSYbyjSQFG2X95hUr
+         PGXlOHoRm1AXiJzTe9S6rSHEsJbn3UfsvLUzGJeZG1xa8Os5dGKm6DbTCBj4HQDx8zQ/
+         QgztPLRZU78SQk2yrbZT6NwmUK9wgf6k7J7ma1QfcYPPVxTwuuHyB8BkU6UMlS1ZSM7i
+         AgbfSIzkPaFNRwjujcpyV9oeAbpfFfozCttnJ2jbS9vM3OxKHQMBveAWCW25dHsNz+s1
+         GNqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=umwFzrfvCHqAWjqnbJ7c+GUihR3wgKbPKMdVvtxiwXA=;
+        b=V9fRpsaa8yGxoQyMQzOVhNb2ICPfDrk0l7vHbdrjUrq9OqS+YwChRgczZEBtHVPA94
+         uHW1ZqrC8rw0bEf15JPwnx9kIqnNTDd5lBFPAoNbsWAc2cSE6JiLKLqrguM7D2mXff1s
+         zhSb4goRXd40WuYMr30RXS75VWTFegxzP7yltn49io9vNQwKtIRj38OPXERFtsH/YMLI
+         iM6D5dN3E+c+Z5t+KwyCPsK2dN6A47PlFqT5RoO07TybX6pMdahUrKkP82AKhhzYRZEh
+         I5pYYMBRIbLAMGfEm6dCgJo0I8nmoLwBd0WoFGSOPiZ0mJ5yATwQ4tjenPB87KSM8/pm
+         511w==
+X-Gm-Message-State: APjAAAU5pmsp2QDGBnHDqxNc9SNk1EofXnjIrhhKifyF8p6S0crX4n+u
+        ttypaB6E56VMITr8szP7yMyOL0pX3j804GvsZbAb9w==
+X-Google-Smtp-Source: APXvYqybqBLFgiG5vHWZjUVmX5NkApW26l+ElZe+oE+e2JFPpbFwgEtmE9md7WzESWfmJqdkXNDj0CIVHg7Qn58wjWE=
+X-Received: by 2002:a5d:6b0a:: with SMTP id v10mr19183431wrw.32.1571671905673;
+ Mon, 21 Oct 2019 08:31:45 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-X-MC-Unique: oMNytNEGOv-stwXfhXkQgw-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+References: <MN2PR20MB29734588383A8699E6B700F3CA690@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <CAKv+Gu8CvoaTCBxWjd9f=CtcK8GkgJkhRgYGjUHy3MqRKhezEg@mail.gmail.com>
+ <MN2PR20MB2973E221217FBDA1252804E4CA690@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <CAKv+Gu_GnvoWd2OiY3C6enUMT4Vu5AyBaP8J3C4pVkK7yWeSng@mail.gmail.com> <MN2PR20MB2973876A85667AABE157A27ECA690@MN2PR20MB2973.namprd20.prod.outlook.com>
+In-Reply-To: <MN2PR20MB2973876A85667AABE157A27ECA690@MN2PR20MB2973.namprd20.prod.outlook.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Mon, 21 Oct 2019 17:31:33 +0200
+Message-ID: <CAKv+Gu8oyZUL+i23j6r7xYsOeBEUDdZC2w4TKLVtVDfCB1LXYg@mail.gmail.com>
+Subject: Re: Key endianness?
+To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-A NULL-pointer dereference was reported in fedora bz#1762199 while
-reshaping a raid6 array after adding a fifth drive to an existing
-array.
+p[
 
-[   47.343549] md/raid:md0: raid level 6 active with 3 out of 5 devices, al=
-gorithm 2
-[   47.804017] md0: detected capacity change from 0 to 7885289422848
-[   47.822083] Unable to handle kernel read from unreadable memory at virtu=
-al address 0000000000000000
-...
-[   47.940477] CPU: 1 PID: 14210 Comm: md0_raid6 Tainted: G        W       =
-  5.2.18-200.fc30.aarch64 #1
-[   47.949594] Hardware name: AMD Overdrive/Supercharger/To be filled by O.=
-E.M., BIOS ROD1002C 04/08/2016
-[   47.958886] pstate: 00400085 (nzcv daIf +PAN -UAO)
-[   47.963668] pc : __list_del_entry_valid+0x2c/0xa8
-[   47.968366] lr : ccp_tx_submit+0x84/0x168 [ccp]
-[   47.972882] sp : ffff00001369b970
-[   47.976184] x29: ffff00001369b970 x28: ffff00001369bdb8
-[   47.981483] x27: 00000000ffffffff x26: ffff8003b758af70
-[   47.986782] x25: ffff8003b758b2d8 x24: ffff8003e6245818
-[   47.992080] x23: 0000000000000000 x22: ffff8003e62450c0
-[   47.997379] x21: ffff8003dfd6add8 x20: 0000000000000003
-[   48.002678] x19: ffff8003e6245100 x18: 0000000000000000
-[   48.007976] x17: 0000000000000000 x16: 0000000000000000
-[   48.013274] x15: 0000000000000000 x14: 0000000000000000
-[   48.018572] x13: ffff7e000ef83a00 x12: 0000000000000001
-[   48.023870] x11: ffff000010eff998 x10: 00000000000019a0
-[   48.029169] x9 : 0000000000000000 x8 : ffff8003e6245180
-[   48.034467] x7 : 0000000000000000 x6 : 000000000000003f
-[   48.039766] x5 : 0000000000000040 x4 : ffff8003e0145080
-[   48.045064] x3 : dead000000000200 x2 : 0000000000000000
-[   48.050362] x1 : 0000000000000000 x0 : ffff8003e62450c0
-[   48.055660] Call trace:
-[   48.058095]  __list_del_entry_valid+0x2c/0xa8
-[   48.062442]  ccp_tx_submit+0x84/0x168 [ccp]
-[   48.066615]  async_tx_submit+0x224/0x368 [async_tx]
-[   48.071480]  async_trigger_callback+0x68/0xfc [async_tx]
-[   48.076784]  ops_run_biofill+0x178/0x1e8 [raid456]
-[   48.081566]  raid_run_ops+0x248/0x818 [raid456]
-[   48.086086]  handle_stripe+0x864/0x1208 [raid456]
-[   48.090781]  handle_active_stripes.isra.0+0xb0/0x278 [raid456]
-[   48.096604]  raid5d+0x378/0x618 [raid456]
-[   48.100602]  md_thread+0xa0/0x150
-[   48.103905]  kthread+0x104/0x130
-[   48.107122]  ret_from_fork+0x10/0x18
-[   48.110686] Code: d2804003 f2fbd5a3 eb03003f 54000320 (f9400021)
-[   48.116766] ---[ end trace 23f390a527f7ad77 ]---
+On Mon, 21 Oct 2019 at 17:23, Pascal Van Leeuwen
+<pvanleeuwen@verimatrix.com> wrote:
+>
+> > -----Original Message-----
+> > From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> > Sent: Monday, October 21, 2019 2:54 PM
+> > To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+> > Cc: linux-crypto@vger.kernel.org; herbert@gondor.apana.org.au
+> > Subject: Re: Key endianness?
+> >
+> > On Mon, 21 Oct 2019 at 14:40, Pascal Van Leeuwen
+> > <pvanleeuwen@verimatrix.com> wrote:
+> > >
+> > > > -----Original Message-----
+> > > > From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> > > > Sent: Monday, October 21, 2019 1:59 PM
+> > > > To: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+> > > > Cc: linux-crypto@vger.kernel.org; herbert@gondor.apana.org.au
+> > > > Subject: Re: Key endianness?
+> > > >
+> > > > On Mon, 21 Oct 2019 at 12:56, Pascal Van Leeuwen
+> > > > <pvanleeuwen@verimatrix.com> wrote:
+> > > > >
+> > > > > Another endianness question:
+> > > > >
+> > > > > I have some data structure that can be either little or big endian,
+> > > > > depending on the exact use case. Currently, I have it defined as u32.
+> > > > > This causes sparse errors when accessing it using cpu_to_Xe32() and
+> > > > > Xe32_to_cpu().
+> > > > >
+> > > > > Now, for the big endian case, I could use htonl()/ntohl() instead,
+> > > > > but this is inconsistent with all other endian conversions in the
+> > > > > driver ... and there's no little endian alternative I'm aware of.
+> > > > > So I don't really like that approach.
+> > > > >
+> > > > > Alternatively, I could define a union of both a big and little
+> > > > > endian version of the data but that would require touching a lot
+> > > > > of legacy code (unless I use a C11 anonymous union ... not sure
+> > > > > if that would be allowed?) and IMHO is a bit silly.
+> > > > >
+> > > > > Is there some way of telling sparse to _not_ check for "correct"
+> > > > > use of these functions for a certain variable?
+> > > > >
+> > > >
+> > > >
+> > > > In this case, just use (__force __Xe32*) to cast it to the correct
+> > > > type. This annotates the cast as being intentionally endian-unclean,
+> > > > and shuts up Sparse.
+> > > >
+> > > Thanks for trying to help out, but that just gives me an
+> > > "error: not an lvalue" from both sparse and GCC.
+> > > But I'm probably doing it wrong somehow ...
+> > >
+> >
+> > It depends on what you are casting. But doing something like
+> >
+> > u32 l = ...
+> > __le32 ll = (__force __le32)l
+> >
+> > should not trigger a sparse warning.
+> >
+> I was actually casting the left side, not the right side,
+> as that's where my sparse issue was. Must be my poor grasp
+> of the C language hurting me here as I don't understand why
+> I'm not allowed to cast an array element to a different type
+> of the _same size_ ...
+>
+> i.e. why can't I do (__be32)some_u32_array[3] = cpu_to_be32(some_value)?
+>
 
-ccp_tx_submit is passed a dma_async_tx_descriptor which is contained in
-a ccp_dma_desc and adds it to a ccp channel's pending list:
+Because you can only change the type of an expression by casting, and
+an lvalue is not an expression. A variable has a type already, and you
+cannot cast that away - what would that mean, exactly? Would all
+occurrences of some_u32_array[] suddenly have a different type? Or
+only element [3]?
 
-=09list_del(&desc->entry);
-=09list_add_tail(&desc->entry, &chan->pending);
 
-The problem is that desc->entry may be uninitialized in the
-async_trigger_callback path where the descriptor was gotten
-from ccp_prep_dma_interrupt which got it from ccp_alloc_dma_desc
-which doesn't initialize the desc->entry list head. So, just
-initialize the list head to avoid the problem.
+> I managed to work around it by doing *(__be32 *)&some_u32_array[3] =
+> but that's pretty ugly ... a better approach is still welcome.
+>
 
-Reported-by: Sahaj Sarup <sahajsarup@gmail.com>
-Signed-off-by: Mark Salter <msalter@redhat.com>
----
- drivers/crypto/ccp/ccp-dmaengine.c | 1 +
- 1 file changed, 1 insertion(+)
+You need to cast the right hand side, not the left hand side. If
+some_u32_array is u32[], force cast it to (__force u32)
 
-diff --git a/drivers/crypto/ccp/ccp-dmaengine.c b/drivers/crypto/ccp/ccp-dm=
-aengine.c
-index a54f9367a580..0770a83bf1a5 100644
---- a/drivers/crypto/ccp/ccp-dmaengine.c
-+++ b/drivers/crypto/ccp/ccp-dmaengine.c
-@@ -342,6 +342,7 @@ static struct ccp_dma_desc *ccp_alloc_dma_desc(struct c=
-cp_dma_chan *chan,
- =09desc->tx_desc.flags =3D flags;
- =09desc->tx_desc.tx_submit =3D ccp_tx_submit;
- =09desc->ccp =3D chan->ccp;
-+=09INIT_LIST_HEAD(&desc->entry);
- =09INIT_LIST_HEAD(&desc->pending);
- =09INIT_LIST_HEAD(&desc->active);
- =09desc->status =3D DMA_IN_PROGRESS;
---=20
-2.21.0
+> >
+> > > > > Regards,
+> > > > > Pascal van Leeuwen
+> > > > > Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
+> > > > > www.insidesecure.com
+> > > > >
+> > > > > > -----Original Message-----
+> > > > > > From: Pascal Van Leeuwen
+> > > > > > Sent: Monday, October 21, 2019 11:04 AM
+> > > > > > To: linux-crypto@vger.kernel.org; herbert@gondor.apana.org.au
+> > > > > > Subject: Key endianness?
+> > > > > >
+> > > > > > Herbert,
+> > > > > >
+> > > > > > I'm currently busy fixing some endianness related sparse errors reported
+> > > > > > by this kbuild test robot and this triggered my to rethink some endian
+> > > > > > conversion being done in the inside-secure driver.
+> > > > > >
+> > > > > > I actually wonder what the endianness is of the input key data, e.g. the
+> > > > > > "u8 *key" parameter to the setkey function.
+> > > > > >
+> > > > > > I also wonder what the endianness is of the key data in a structure
+> > > > > > like "crypto_aes_ctx", as filled in by the aes_expandkey function.
+> > > > > >
+> > > >
+> > > > crypto_aes_ctx uses CPU endianness for the round keys.
+> > > >
+> > > So these will need to be consistently handled using cpu_to_Xe32.
+> > >
+> >
+> > If you are using the generic aes_expandkey and want to reuse the key
+> > schedule, it is indeed good to be aware that both the round keys
+> > themselves as well as the key length are recorded in CPU endianness.
+> >
+> Actually, I have a big patch standing by getting rid of aes_expandkey()
+> altogether as I don't need _any_ of those round keys generated, ii
+> was just used for AES key validity checks and nothing else.
+>
+> But since that patch is not ready for prime time yet, I have to fix
+> these sparse errors for the time being.
+>
+> > > > In general, though, there is no such thing as endianness for a key
+> > > > that is declared as u8[], it is simply a sequence of bytes.
+> > > >
+> > > Depends a bit on the algorithm. Some keys are indeed defined as byte
+> > > streams, in which case you have a point. Assuming you mean that the
+> > > crypto API follows the byte order as defined by the algorithm spec.
+> > >
+> > > But sometimes the key data is actually a stream of _words_ (example:
+> > > Chacha20) and then endianness _does_ matter. Same thing applies to
+> > > things like nonces and initial counter values BTW.
+> > >
+> >
+> > Endianness always matters, and both AES and ChaCha are rather similar
+> > in that respect in the sense that it is the algorithm that defines how
+> > a byte stream is mapped onto 32-bit words, and in both cases, they use
+> > little endianness.
+> >
+> Thanks, that's actually something I can _use_ ;-)
+>
+> >
+> > > > If the
+> > > > hardware chooses to reorder those bytes for some reason, it is the
+> > > > responsibility of the driver to take care of that from the CPU side.
+> > > >
+> > > Which still requires you to know the byte order as used by the API.
+> > >
+> >
+> > Only if API means the AES or ChaCha specific helper routines that we
+> > have in the kernel. If you are using the AES helpers, then yes, you
+> > need to ensure that you use the same convention. But the algorithms
+> > themselves are fully defined by their specification, and so what other
+> > implementations in the kernel do is not really relevant.
+> >
+> What is relevant is what the API expects
 
+But *which* API? The skcipher API uses u8[] for in/output and keys,
+and how these byte arrays are interpreted is not (and cannot) be
+defined at this level of abstraction.
+
+
+> ... and from 20 years of
+> experience I would say many algorithm specifications are not exactly
+> very clear on the byte order at all, often assuming this to be
+> "obvious". (and if it's not little-endian, it's not obvious to me ;-)
+>
+
+I agree that not all specs are crystal clear on this. But it is still
+the algorithm that needs to define this.
+
+> Very often getting the byte order right was just trial and error
+> using known-good reference vectors and just trying every possible
+> byte/word/whatever swap you could think of. (hence "ellendianness")
+>
+> >
+> >
+> > > >
+> > > > > > Since I know my current endianness conversions work on a little endian
+> > > > > > CPU, I guess the big question is whether the byte order of this key
+> > > > > > data is _CPU byte order_ or always some _fixed byte order_ (e.g. as per
+> > > > > > algorithm specification).
+> > > > > >
+> > > > > > I know I have some customers using big-endian CPU's, so I do care, but
+> > > > > > I unfortunately don't have any platform available to test this with.
+> > > > > >
+> > > >
+> > > > You can boot big endian kernels on MacchiatoBin, in case that helps
+> > > > (using u-boot, not EFI)
+> > > >
+> > > I'm sure _someone_ can, I'm not so sure _I_ can ;-)
+> > >
+> > > Regards,
+> > > Pascal van Leeuwen
+> > > Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
+> > > www.insidesecure.com
+>
+>
+> Regards,
+> Pascal van Leeuwen
+> Silicon IP Architect, Multi-Protocol Engines @ Verimatrix
+> www.insidesecure.com
+>
