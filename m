@@ -2,121 +2,132 @@ Return-Path: <SRS0=EZON=YO=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF2B0CA9EAF
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 12:01:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8251CA9EB7
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 12:04:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C24FF20700
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 12:01:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BDC5820B7C
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 12:04:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DZayBbwz"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GSW+qV15"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728327AbfJUMBI (ORCPT
+        id S1728076AbfJUMEn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Oct 2019 08:01:08 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:37394 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728323AbfJUMBH (ORCPT
+        Mon, 21 Oct 2019 08:04:43 -0400
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:50783 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727985AbfJUMEn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Oct 2019 08:01:07 -0400
-Received: by mail-wr1-f68.google.com with SMTP id e11so4939048wrv.4
-        for <linux-crypto@vger.kernel.org>; Mon, 21 Oct 2019 05:01:06 -0700 (PDT)
+        Mon, 21 Oct 2019 08:04:43 -0400
+Received: by mail-wm1-f68.google.com with SMTP id q13so2979596wmj.0
+        for <linux-crypto@vger.kernel.org>; Mon, 21 Oct 2019 05:04:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=mWEB9osAQee35AyhlgRxJbWS6irJ5cvGkHpX55XRn1E=;
-        b=DZayBbwzidagHXfjzo+vzE7AoicDQbfH28tq6Q3lvonVDXLWmKQFdudte2p5G1rCYp
-         RVCcVYLiRDHe1rxz+iGD1bJ19a2LoAC5z0miBg8I788Def1js93fq7drRVXZdNS26R13
-         UnnRmVsYQpkMOQqyFLSt6RoynkjorxsG76w0WY9nzHxR3eknHms4r6T1PRRybxDGFUz7
-         X6O82uWSVvSR5YTRhUvqJeUZihX/r7KOV478vNKXthZopVovLmhUu5PLjXBG8sTKgQ9m
-         amHtltZ0/s0L/DU1nqWZ3iNpJkbb7B6kjHoNQTSeFULE+WdU31YltZ0C/osAUTntiGEl
-         l4yg==
+        bh=EsyQ2kF/mtSmOiYow1hBVM0o2JCVCNC1wVtT4i3e0fY=;
+        b=GSW+qV15BGuUa1cfsLydezIkY+Lb/vWqLV90vOzXas25hDy+kIF+Ans2UAoCV6OYq6
+         K/toNM8GPvn/01PeQAYbMbHA+Fxymww1CRMHIz4S+3EnOShWNbLrZT2714U9NmyqakEz
+         lkt36cbm9MxX32+dGW51Utktt3AW1mU6mheveM0Soykj/joLfjKWigvSWJ1NsLPcsd0B
+         9OYtNeiL3+LfulnMLUPB7hAjpcdpwdBw9dOmEY3PdZez5JbpqcxT9eb96Uyr/67aU7jc
+         +90CkCdlZ1ANaDi1gyjPwVoqeULjedv3UfZ0NFdCIhuJEPP16XGpoE8gdnG7lSIjMxgI
+         L6QQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=mWEB9osAQee35AyhlgRxJbWS6irJ5cvGkHpX55XRn1E=;
-        b=RdYGH7a6726Lr7WZaaoBUJxbOmvLu841Gl9nj3ZOfkjvoh1Ma/wa/aGXlpadeiBH34
-         gYkfGFcIEg78M0/dctVTgtCXhwx4kxTpV70OM/f3RQpMu8wgPjYakEh/6o0hKjcKh6Mi
-         PYjYcnA9AZ/UkC+a3qu7eF+C160J6V5gV9eokimnNOcYyG1vPkdnQ1C67vDHhKmdaYew
-         vpkgBhDhXIUwVXCbpzqngdmw5iHumPfnpld6hun86KN89HIF8YFkVI/wCqMbYCzB1r6D
-         0TTxjfS9LESXyhwpiNgVTJLQvVBvFoefdp6gONRf2SDC/jhixTzOrke08JPFG2BEHKCN
-         by0w==
-X-Gm-Message-State: APjAAAWdYeXuMcI1dONc3WGvTS0OfcGC23OpqUAh1rrqFnIBF7aDOdQi
-        6lefIfaEnau9jqKrDdNCEQEC3SLmHVOmX9qBmYY4BA==
-X-Google-Smtp-Source: APXvYqyi04G4z3qmQczX0PrqdoD0ePmtzfbw4P+sB+JZvmXhdomvbxqXJ3pHKBiLdD/c9bC+H9OTsi2VKUlpDUvwjCE=
-X-Received: by 2002:adf:f685:: with SMTP id v5mr16542105wrp.246.1571659265641;
- Mon, 21 Oct 2019 05:01:05 -0700 (PDT)
+        bh=EsyQ2kF/mtSmOiYow1hBVM0o2JCVCNC1wVtT4i3e0fY=;
+        b=V/hHHEnSDYLWIO+SUzros7j5c5XOmBzss+EtSv5Q28Xdu51oJI1g5QZL+m09GyU141
+         KfUP82pFeZmGSMDkLV6QX128/Lavzw1ajJPAr67Nu2jVAarpfb2JOEIseIZa/EuZTuP6
+         B4Ixy4gX6EXhmdoK+Dl0rv3bajc84nN6cTkFF6F8ssSRkOJMH4sKddYKohmKpZr0Rh7M
+         0vetKX7lpmM9EFl9/TavbchJ9DykI/6rRh8efHB4o4QeoVALoqUwn2UMmvPlCSx52MiP
+         5hdKhHy6ZvuDd6C8Ru6JBPS+6JbdWer5HLRkzXP73/coIKj9ypJYdUbX8wUaDCC4IW0U
+         Zdog==
+X-Gm-Message-State: APjAAAV6cw/WR2xbvc1iXIvusJnqSz/CfraYwX17f6wLquxXAUjbFoki
+        HtR5pwgNW6SLWC1EQvXs8d0DvQw8w0C+aTuIyH8+2AbnFdE=
+X-Google-Smtp-Source: APXvYqxtzK5nSIkzx9itC5JD0mQqEEPKMa2VwaEF/qE7TkS5R8EI/021s5D+kHZuW4qrMsbxxIbFKVe0XKcPjoSxYBk=
+X-Received: by 2002:a1c:9d07:: with SMTP id g7mr6181114wme.53.1571659481322;
+ Mon, 21 Oct 2019 05:04:41 -0700 (PDT)
 MIME-Version: 1.0
-References: <20191014121910.7264-1-ard.biesheuvel@linaro.org>
- <20191014121910.7264-8-ard.biesheuvel@linaro.org> <20191021100517.GA1780@pi3>
-In-Reply-To: <20191021100517.GA1780@pi3>
+References: <cover.1571043883.git.dsterba@suse.com> <a4e3e9db53b01c4092309a75e5b5d703ed344c5a.1571043883.git.dsterba@suse.com>
+ <CAKv+Gu8m+CkrWj6fZi4XtEbpcDTM=d8HNS=9A5piJD8v41B-HQ@mail.gmail.com> <20191018130036.GC3001@twin.jikos.cz>
+In-Reply-To: <20191018130036.GC3001@twin.jikos.cz>
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Mon, 21 Oct 2019 14:00:59 +0200
-Message-ID: <CAKv+Gu8AK+oTRw5Q1NMWkxmycAD+tkqeiqBM-kV_oeebu2sYug@mail.gmail.com>
-Subject: Re: [PATCH 07/25] crypto: s5p - switch to skcipher API
-To:     Krzysztof Kozlowski <krzk@kernel.org>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Biggers <ebiggers@google.com>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        Kamil Konieczny <k.konieczny@partner.samsung.com>,
-        linux-samsung-soc@vger.kernel.org
+Date:   Mon, 21 Oct 2019 14:04:35 +0200
+Message-ID: <CAKv+Gu_-oYv9P-abTdtqWX6pR5SWm7mNsTw4WhP=OJDO+1FsQw@mail.gmail.com>
+Subject: Re: [PATCH v5 2/2] crypto: add test vectors for blake2b
+To:     David Sterba <dsterba@suse.cz>
+Cc:     David Sterba <dsterba@suse.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>, Eric Biggers <ebiggers@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 21 Oct 2019 at 12:05, Krzysztof Kozlowski <krzk@kernel.org> wrote:
+On Fri, 18 Oct 2019 at 15:00, David Sterba <dsterba@suse.cz> wrote:
 >
-> On Mon, Oct 14, 2019 at 02:18:52PM +0200, Ard Biesheuvel wrote:
-> > Commit 7a7ffe65c8c5 ("crypto: skcipher - Add top-level skcipher interface")
-> > dated 20 august 2015 introduced the new skcipher API which is supposed to
-> > replace both blkcipher and ablkcipher. While all consumers of the API have
-> > been converted long ago, some producers of the ablkcipher remain, forcing
-> > us to keep the ablkcipher support routines alive, along with the matching
-> > code to expose [a]blkciphers via the skcipher API.
+> On Thu, Oct 17, 2019 at 12:22:57PM +0200, Ard Biesheuvel wrote:
+> > On Mon, 14 Oct 2019 at 11:17, David Sterba <dsterba@suse.com> wrote:
+> > >
+> > > Test vectors for blake2b with various digest sizes. As the algorithm is
+> > > the same up to the digest calculation, the key and input data length is
+> > > distributed in a way that tests all combinanions of the two over the
+> > > digest sizes.
+> > >
+> > > Based on the suggestion from Eric, the following input sizes are tested
+> > > [0, 1, 7, 15, 64, 247, 256], where blake2b blocksize is 128, so the
+> > > padded and the non-padded input buffers are tested.
+> > >
+> > >           blake2b-160  blake2b-256  blake2b-384  blake2b-512
+> > >          ---------------------------------------------------
+> > > len=0   | klen=0       klen=1       klen=32      klen=64
+> > > len=1   | klen=32      klen=64      klen=0       klen=1
+> > > len=7   | klen=64      klen=0       klen=1       klen=32
+> > > len=15  | klen=1       klen=32      klen=64      klen=0
+> > > len=64  | klen=0       klen=1       klen=32      klen=64
+> > > len=247 | klen=32      klen=64      klen=0       klen=1
+> > > len=256 | klen=64      klen=0       klen=1       klen=32
+> > >
 > >
-> > So switch this driver to the skcipher API, allowing us to finally drop the
-> > blkcipher code in the near future.
-> >
-> > Cc: Krzysztof Kozlowski <krzk@kernel.org>
-> > Cc: Vladimir Zapolskiy <vz@mleia.com>
-> > Cc: Kamil Konieczny <k.konieczny@partner.samsung.com>
-> > Cc: linux-samsung-soc@vger.kernel.org
-> > Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> > ---
-> >  drivers/crypto/s5p-sss.c | 191 ++++++++++----------
-> >  1 file changed, 91 insertions(+), 100 deletions(-)
-> >
-> > diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
-> > index 010f1bb20dad..e6f1d4d5186c 100644
-> > --- a/drivers/crypto/s5p-sss.c
-> > +++ b/drivers/crypto/s5p-sss.c
-> > @@ -303,7 +303,7 @@ struct s5p_aes_dev {
-> >       void __iomem                    *aes_ioaddr;
-> >       int                             irq_fc;
-> >
-> > -     struct ablkcipher_request       *req;
-> > +     struct skcipher_request *req;
+> > I don't think your vectors match this table. It looks to me that you
+> > used the first column for all of them?
 >
-> You mix here indentation.
+> You're right, the script that generated each digest picked the key/len
+> sequence from the beginning and I did not catch that, sorry.
 >
+> > > +               .plaintext =
+> > > +                       "\x00\x01\x02\x03\x04\x05\x06\x07"
+> > > +                       "\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
+> > > +                       "\x10\x11\x12\x13\x14\x15\x16\x17"
+> > > +                       "\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
+> > > +                       "\x20\x21\x22\x23\x24\x25\x26\x27"
+> > > +                       "\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
+> > > +                       "\x30\x31\x32\x33\x34\x35\x36\x37"
+> > > +                       "\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f",
+> >
+> > Given the number of occurrences of this sequence, I suggest we break
+> > it out of this data structure, i.e.,
+> >
+> > static const char blake2s_ordered_sequence[256] = {
+> >   ...
+> > };
+> >
+> > and use
+> >
+> > .plaintext = blake2s_ordered_sequence
+> >
+> > here, and in all other places where the entire sequence or part of it
+> > is being used.
+> >
+> > I'm adopting this approach for my Blake2s tests as well - I'll cc you
+> > on those patches.
+>
+> That's a great simplification, I'll do the same then.
 
-Will fix
-
-> Beside that:
->
-> Acked-by: Krzysztof Kozlowski <krzk@kernel.org>
->
-
-Thanks!
+Excellent. If you cc me on the next revision, I'll do the big endian
+tests I promised you.
