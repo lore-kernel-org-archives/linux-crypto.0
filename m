@@ -2,107 +2,110 @@ Return-Path: <SRS0=EZON=YO=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AEEECA9EB5
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 06:08:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56280CA9EB5
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 07:40:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3EBB92084B
-	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 06:08:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oB1t6MTn"
+	by mail.kernel.org (Postfix) with ESMTP id 306352089C
+	for <linux-crypto@archiver.kernel.org>; Mon, 21 Oct 2019 07:40:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726702AbfJUGIS (ORCPT
+        id S1726480AbfJUHk3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 21 Oct 2019 02:08:18 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:37818 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726394AbfJUGIR (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 21 Oct 2019 02:08:17 -0400
-Received: by mail-wm1-f65.google.com with SMTP id f22so11407869wmc.2
-        for <linux-crypto@vger.kernel.org>; Sun, 20 Oct 2019 23:08:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=4/kY4Iuh46NZmdPYDysMt8pq2ZGIAr2/rIRYTWprc/0=;
-        b=oB1t6MTnzf47Ko9MJt4hXHXmaNHS2l9pnu0h4fYYHPxKIGDHcsgPdVyoo/NsSbv1O2
-         uCTLW6kDH+oaDa+OMJSo40Otaxe8aaCJyyKm9bN3s9j4EHVixD6E9soNlalXtzJTWADB
-         DJAKX4ZjYEgZQhvNbjmZOLQGmhA8Tfzz55vmJQ2/davbZjC6n55rh+rbvIs7L5/4FTeh
-         v8rUweDQ7PsWfJKC1LWaVdS5zxkjcbVH9fZsEzb+BaiK8YYGPR1pSrYpSBoj+M+uiEAl
-         Gg2xxpmKbyh4ZnDMCR1dI6pO2bfUnkE9t5szRJWG2hWKS4uYzRdfRc2y2t5fUGvCStDh
-         /nlQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=4/kY4Iuh46NZmdPYDysMt8pq2ZGIAr2/rIRYTWprc/0=;
-        b=O780Ay6mK5nBkKsPQU8a+EfxKNitQ1rZ0IoGbrW9rhPM5CMnAVE7W0GF78isQqqBhm
-         p/a2ZBsMLkgKptJQIwaJZkqq1fYrb/Cwl4EnEOvBI+Xsmlijhnh2N5jyknZqdkYx4AYl
-         WG3EHkAwnpm6Wr/NH07+H99zl+PwexL4e7I88UA2w+eY13dT1J1A2ut/aj7w18ULvVUq
-         GvNBSECNokGY61Tu8K4lwgWSapc1zZS9J5Yx7N7w3IqpNXsJ36Gk6pcI85ku4l9g/5mS
-         mwuJhN+IWYVWQZNGoqhJyK8wb9k2YAwJvqnpsFblLNPfo6krQfDAyofpf460tPKnOVWg
-         r3Cg==
-X-Gm-Message-State: APjAAAWoQwEYNws8EJc1/j6kHt13NyFtF1gPWV7apRicBCQHuo3Osu/p
-        HCJ+/I5m69zTqfAOKcAhB6E+LHviAdwQzoce8gmCGA==
-X-Google-Smtp-Source: APXvYqx7XQxrLMJoK6NNdCUXziFruma0esfovBxJGHOWgCA/3qMDBV1vUmG67RGywQZI7SPK2OszFu1whjLRm3Zdceg=
-X-Received: by 2002:a7b:cb54:: with SMTP id v20mr16697896wmj.119.1571638093988;
- Sun, 20 Oct 2019 23:08:13 -0700 (PDT)
+        Mon, 21 Oct 2019 03:40:29 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:57378 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727110AbfJUHk2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 21 Oct 2019 03:40:28 -0400
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id CEBF4521A6A4A6144FD;
+        Mon, 21 Oct 2019 15:40:26 +0800 (CST)
+Received: from localhost.localdomain (10.69.192.56) by
+ DGGEMS407-HUB.china.huawei.com (10.3.19.207) with Microsoft SMTP Server id
+ 14.3.439.0; Mon, 21 Oct 2019 15:40:18 +0800
+From:   Shukun Tan <tanshukun1@huawei.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     <wangzhou1@hisilicon.com>, <linux-crypto@vger.kernel.org>,
+        <linuxarm@huawei.com>
+Subject: [PATCH 1/4] crypto: hisilicon - tiny fix about QM/ZIP error callback print
+Date:   Mon, 21 Oct 2019 15:41:00 +0800
+Message-ID: <1571643663-29593-2-git-send-email-tanshukun1@huawei.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1571643663-29593-1-git-send-email-tanshukun1@huawei.com>
+References: <1571643663-29593-1-git-send-email-tanshukun1@huawei.com>
 MIME-Version: 1.0
-References: <20191018220525.9042-1-sashal@kernel.org> <20191018220525.9042-63-sashal@kernel.org>
-In-Reply-To: <20191018220525.9042-63-sashal@kernel.org>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Mon, 21 Oct 2019 08:08:02 +0200
-Message-ID: <CAKv+Gu_6vzE-Je4G-ZZ=jU1qAWnCcADr7cJ_MG8m+tPzcC0QBw@mail.gmail.com>
-Subject: Re: [PATCH AUTOSEL 4.19 063/100] crypto: arm/aes-ce - add dependency
- on AES library
-To:     Sasha Levin <sashal@kernel.org>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        stable <stable@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.56]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, 19 Oct 2019 at 00:07, Sasha Levin <sashal@kernel.org> wrote:
->
-> From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
->
-> [ Upstream commit f703964fc66804e6049f2670fc11045aa8359b1a ]
->
-> The ARM accelerated AES driver depends on the new AES library for
-> its non-SIMD fallback so express this in its Kconfig declaration.
->
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> Signed-off-by: Sasha Levin <sashal@kernel.org>
+From: Zhou Wang <wangzhou1@hisilicon.com>
 
-Please drop this, it doesn't belong in -stable.
+Tiny fix to make QM/ZIP error callback print clear and right. If one version
+hardware does not support error handling, we directly print this.
 
-> ---
->  arch/arm/crypto/Kconfig | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/arch/arm/crypto/Kconfig b/arch/arm/crypto/Kconfig
-> index b8e69fe282b8d..44278f375ae23 100644
-> --- a/arch/arm/crypto/Kconfig
-> +++ b/arch/arm/crypto/Kconfig
-> @@ -89,6 +89,7 @@ config CRYPTO_AES_ARM_CE
->         tristate "Accelerated AES using ARMv8 Crypto Extensions"
->         depends on KERNEL_MODE_NEON
->         select CRYPTO_BLKCIPHER
-> +       select CRYPTO_LIB_AES
->         select CRYPTO_SIMD
->         help
->           Use an implementation of AES in CBC, CTR and XTS modes that uses
-> --
-> 2.20.1
->
+And QM is embedded in ZIP, we can use ZIP print only, so remove unnecessary
+QM print.
+
+Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
+---
+ drivers/crypto/hisilicon/qm.c           | 9 ++-------
+ drivers/crypto/hisilicon/zip/zip_main.c | 3 +--
+ 2 files changed, 3 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index a8ed6990..2c17bf3 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -987,9 +987,6 @@ static int qm_create_debugfs_file(struct hisi_qm *qm, enum qm_debug_file index)
+ static void qm_hw_error_init_v1(struct hisi_qm *qm, u32 ce, u32 nfe, u32 fe,
+ 				u32 msi)
+ {
+-	dev_info(&qm->pdev->dev,
+-		 "QM v%d does not support hw error handle\n", qm->ver);
+-
+ 	writel(QM_ABNORMAL_INT_MASK_VALUE, qm->io_base + QM_ABNORMAL_INT_MASK);
+ }
+ 
+@@ -1868,8 +1865,7 @@ void hisi_qm_hw_error_init(struct hisi_qm *qm, u32 ce, u32 nfe, u32 fe,
+ 			   u32 msi)
+ {
+ 	if (!qm->ops->hw_error_init) {
+-		dev_err(&qm->pdev->dev, "QM version %d doesn't support hw error handling!\n",
+-			qm->ver);
++		dev_err(&qm->pdev->dev, "QM doesn't support hw error handling!\n");
+ 		return;
+ 	}
+ 
+@@ -1886,8 +1882,7 @@ EXPORT_SYMBOL_GPL(hisi_qm_hw_error_init);
+ int hisi_qm_hw_error_handle(struct hisi_qm *qm)
+ {
+ 	if (!qm->ops->hw_error_handle) {
+-		dev_err(&qm->pdev->dev, "QM version %d doesn't support hw error report!\n",
+-			qm->ver);
++		dev_err(&qm->pdev->dev, "QM doesn't support hw error report!\n");
+ 		return PCI_ERS_RESULT_NONE;
+ 	}
+ 
+diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+index 1b2ee96..5546edc 100644
+--- a/drivers/crypto/hisilicon/zip/zip_main.c
++++ b/drivers/crypto/hisilicon/zip/zip_main.c
+@@ -335,8 +335,7 @@ static void hisi_zip_hw_error_set_state(struct hisi_zip *hisi_zip, bool state)
+ 
+ 	if (qm->ver == QM_HW_V1) {
+ 		writel(HZIP_CORE_INT_DISABLE, qm->io_base + HZIP_CORE_INT_MASK);
+-		dev_info(&qm->pdev->dev, "ZIP v%d does not support hw error handle\n",
+-			 qm->ver);
++		dev_info(&qm->pdev->dev, "Does not support hw error handle\n");
+ 		return;
+ 	}
+ 
+-- 
+2.7.4
+
