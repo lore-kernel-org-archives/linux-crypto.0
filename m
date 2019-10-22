@@ -2,174 +2,105 @@ Return-Path: <SRS0=VsUo=YP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97A7ECA9EA0
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Oct 2019 13:38:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FE81CA9EA0
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Oct 2019 14:28:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6579A21783
-	for <linux-crypto@archiver.kernel.org>; Tue, 22 Oct 2019 13:38:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="TXTMKnPZ"
+	by mail.kernel.org (Postfix) with ESMTP id DDBFD218AE
+	for <linux-crypto@archiver.kernel.org>; Tue, 22 Oct 2019 14:28:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732086AbfJVNii (ORCPT
+        id S1727309AbfJVO2S (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Oct 2019 09:38:38 -0400
-Received: from mail-eopbgr800050.outbound.protection.outlook.com ([40.107.80.50]:35012
-        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1732064AbfJVNii (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Oct 2019 09:38:38 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jGdEoXEWiRcTtKNKwtmZnRhoe9sJk+Zk/822w5Y2HZYsdOQX/3d67xECVz3BWEl0SyxDutkILH2Fh7BXpEJvKgqN0EdERx/3IwK+50+aT9cJB2MWaWoENFF7qqgusgn24DH5R3VfVD43ok5Drs+k1Ef4tKvi1IT8/bStMVHtLgdElXNq5Wl/JEu2wQD5rTHY5+ftfnVhw7dc+LtWpfJeeVZPIWpYECx72jmIXSqg9hiUmjPIueIWu9Lj1Yip4woShs9s8AeiERg3bZ+65p9Q+hGCJaaGwXX0uOQRaFMi5EmIzxMkC1E/jrm+RMhnN3ZOvK6lX5Yq/Y1DUI1e3KFwAA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WUVx25eyEVhaMDYtSn6AQODsbMxEvTyjMFvV19ED3+k=;
- b=AAyNLa13W3iHF++EHjoIGu/E22woLZv9ooH3IhYXsmf+y47b4ZRZTfwb04f1Pj/nrd/uhbipjA2VwLP7VH91/CTdKi9k5kOUq+q7BvUsceRtCuPr8CbCx7pkOusC3EhPOz5KtzrNio/6s60UGkbknVHYNufhk184JHjYKi0bKy+i1wtXk7AzQ7e41u6KixptApAr5Vn1cUGnTC/Do1iHvSt0g4tgp+PICn+l+JUkX0sjm80FsBVyKLnP+uookQo2H03Zxbo0O0/5ARLqi4fc0oD4T2OveEu7XkZ8rZ+2NDgpdGAMlpnK4/7+OJL9K+i37j0lzrbdRm4nBFPCfgpGjg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WUVx25eyEVhaMDYtSn6AQODsbMxEvTyjMFvV19ED3+k=;
- b=TXTMKnPZg3AaLaijH1xbkHzkYoeY+sstO1GKCS3UEYFukqNGDOXypGk7yeqxQxlrAYpbOoIEaih/BtXGcNVmnZ/P1OHvfb25hfWrI5wzzQ1lMKTC41YnD7YUe53X9hS8FEC9SRRzu4n+WlYPF+Rvn4Igr14t7qSdVCDOV4Nxx9M=
-Received: from DM6PR12MB2682.namprd12.prod.outlook.com (20.176.118.13) by
- DM6PR12MB4218.namprd12.prod.outlook.com (10.141.186.208) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2367.24; Tue, 22 Oct 2019 13:38:33 +0000
-Received: from DM6PR12MB2682.namprd12.prod.outlook.com
- ([fe80::80:cb81:4a0e:a36]) by DM6PR12MB2682.namprd12.prod.outlook.com
- ([fe80::80:cb81:4a0e:a36%3]) with mapi id 15.20.2367.022; Tue, 22 Oct 2019
- 13:38:33 +0000
-From:   "Singh, Brijesh" <brijesh.singh@amd.com>
-To:     David Rientjes <rientjes@google.com>
-CC:     "Singh, Brijesh" <brijesh.singh@amd.com>,
-        "Kalra, Ashish" <Ashish.Kalra@amd.com>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "Hook, Gary" <Gary.Hook@amd.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "allison@lohutok.net" <allison@lohutok.net>,
-        "info@metux.net" <info@metux.net>,
-        "yamada.masahiro@socionext.com" <yamada.masahiro@socionext.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Subject: Re: [PATCH] crypto: ccp - Retry SEV INIT command in case of integrity
- check failure.
-Thread-Topic: [PATCH] crypto: ccp - Retry SEV INIT command in case of
- integrity check failure.
-Thread-Index: AQHVhTsiVAXVZvJHqE+F84WTgpVS9KdhrHEAgAPAfICAAG/6gIAA1J0A
-Date:   Tue, 22 Oct 2019 13:38:33 +0000
-Message-ID: <cfc975bb-d520-82a4-6fbe-40d78ce2e822@amd.com>
-References: <20191017223459.64281-1-Ashish.Kalra@amd.com>
- <alpine.DEB.2.21.1910190156210.140416@chino.kir.corp.google.com>
- <29887804-ecab-ae83-8d3f-52ea83e44b4e@amd.com>
- <alpine.DEB.2.21.1910211754550.152056@chino.kir.corp.google.com>
-In-Reply-To: <alpine.DEB.2.21.1910211754550.152056@chino.kir.corp.google.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: SN6PR01CA0018.prod.exchangelabs.com (2603:10b6:805:b6::31)
- To DM6PR12MB2682.namprd12.prod.outlook.com (2603:10b6:5:42::13)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=brijesh.singh@amd.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [165.204.77.1]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 9a0756d9-fc36-429f-d175-08d756f521b0
-x-ms-traffictypediagnostic: DM6PR12MB4218:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM6PR12MB4218E0A8C2D999E5E199E2A8E5680@DM6PR12MB4218.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-forefront-prvs: 01986AE76B
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(136003)(39860400002)(366004)(376002)(346002)(199004)(189003)(76176011)(8676002)(81166006)(81156014)(25786009)(66946007)(14454004)(64756008)(66446008)(66556008)(486006)(6916009)(8936002)(31686004)(71190400001)(71200400001)(99286004)(478600001)(53546011)(66066001)(6506007)(386003)(102836004)(186003)(26005)(52116002)(66476007)(256004)(14444005)(5660300002)(4326008)(6246003)(3846002)(6116002)(305945005)(7736002)(6486002)(6436002)(6512007)(7416002)(54906003)(316002)(11346002)(446003)(2906002)(229853002)(2616005)(476003)(36756003)(86362001)(31696002);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB4218;H:DM6PR12MB2682.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: jIygXWtAzOL+QTZm7367nSSrS1XuE+Vh7y6XhoFC5bO4YSGsFVLIuRCKiBjkIrylFZtB6EYAs/HQIojChBu5F51puUJ47OSiVO6arObG3nsJk7qMOEZZ0gxw0ydsekpcBcf1wTPvVLiW0fsnuawK6Dagmq+t6HK81VuS4BKb4VKpddzbeLP1/+8msuH0YccbW24zcYOAMPUWI7gzOdOmSUDYUT6wb/2DBen9FlEel9+6Sfjx9/H43x3HlKLqx3cecMERaeoF4wAqJGFMkbvuA8ryyNXxPzJIuN5C5T6DGcpFWoyUNFlVsCREsCAe/hXQ+e14qWxh2/w6m5ObSJ/4ag0wwVJphdZcB6nH2SBDxL9d+Nwjjr8L1mA0/4zsB5WEo/4E13xGQZscbk2m1TuVNFFEG809pQI/qaSWkfsvsw4xz+RQCbNl01Mku28xpDEI
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <468FC00634ABA3428AFE78F5CFD1C3F0@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Tue, 22 Oct 2019 10:28:18 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:45591 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727194AbfJVO2S (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 22 Oct 2019 10:28:18 -0400
+Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
+ (mreue108 [212.227.15.145]) with ESMTPA (Nemesis) id
+ 1MN5aF-1idDT43P41-00J6G4; Tue, 22 Oct 2019 16:27:47 +0200
+From:   Arnd Bergmann <arnd@arndb.de>
+To:     Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Aaro Koskinen <aaro.koskinen@iki.fi>,
+        Adam Ford <aford173@gmail.com>,
+        =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali.rohar@gmail.com>,
+        Sebastian Reichel <sre@kernel.org>,
+        Tero Kristo <t-kristo@ti.com>,
+        Tony Lindgren <tony@atomide.com>,
+        Rob Herring <robh@kernel.org>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] hwrng: omap3-rom - Fix unused function warnings
+Date:   Tue, 22 Oct 2019 16:27:31 +0200
+Message-Id: <20191022142741.1794378-1-arnd@arndb.de>
+X-Mailer: git-send-email 2.20.0
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9a0756d9-fc36-429f-d175-08d756f521b0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Oct 2019 13:38:33.7451
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: LjcnZOYSDvKXyKYQvJeOKxZIIw8J8/h5JHGNbzjDzOQS0uBFRUgA2vQTfPYoYQFdogz+b5XRiFvDVK9utyxoKg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4218
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:PBfTuEp8ZX4Ra2Ce3a9pZMSs9SwhMX1hftuoj/HSfQ/p0GlQWT4
+ wMj8mkLE7kG+8bdty5J1+ElmfuOTIR4PA6vdmHFsFLC0YXcpfucBrpTcccLMbR6YXng5JVu
+ zE7vpU4lQC0NFySxsgbnkX4cEG95HGNmQWpd8uRboG0BVC4+FQgUOv15lgD8qAWPhbEnYba
+ tNjqA/jWVavi2TrI1wYfg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:pKRLuV2+9dI=:6cTjtlK905RHJs9ndFcqmD
+ juozbcR0cdC4bMaUv2wwl6wuJrWELOB45PPT6II7Kef6Vub0TSU5FFQk/iKBYuLi88kUDPtK7
+ 7vaTpiHI3qkJQIUNBziBwkg8xIAeOlU/Ze7GkCT85tdTAF8Z2p+MQaV7Sc5Ie9PIYsMu8dOyP
+ /LqJU8oAIJ2h8wnKKVhpoJ20FFmQj2ETCkxFs4EvykGt93Lof1ORVpTH0jd5mrXT4qfoGszXI
+ xJk3RPilXcdGBszcps4Uc0xJu48ZgoybpIkvqQdgPAO+7PdhHL3pUkrgrTX5GiHWqfBGlGaAN
+ JoKezIHCF5sq/q2fZSLG0Cg/yC6pj/KdBZFl8ntnxBHG6OlZ/LtZjhnuO7wRxRT82rmEWOyWp
+ r9Iy+joHgPvnzw6HjnWfqPz0aGidOqjEA1EoDMeNsSgJUf/fMVnh7DxCyBDjdvtHCNezJXdwX
+ HyN1jg6bOGbxFbo93wMXApStWS/WTikWUdStKZS5UTgVSbSS2HwPIrK6h5t7KIEYKsY667iNK
+ +zKbvb6uc7JS6ZwcsNJhs5i8oyJ5Zbc3dL0yLOGbtfyDSfeGcGe6iavaFuo/kr3ZO4jF/EG2n
+ dN4AoZ3H175TBYbr9+YV8B0PCByqpNbVHMvG6XLnKY2kl8vnZnxgXu1zKZ3llRKe2EUY3jhnq
+ AMMOCTx04fbukNEpcKqVduYCJu0qXfDLeP24tQDFceNGbTmy7tD9twpmYJSe64+A6Iedtj91/
+ Y4DQrY0KpjrLYjZTBvnPBm5EflRX5Kki1hmyk5ScEZQ8hERqOmGEl3bY1jtfZaWL6Xzxjz1Be
+ kY25MZEJbHMalz08x1sntIC1dKasN2delAgrDfjKfL4q1mcQn5YT3bV0OOMyGq82+mIXSAWaq
+ TqWnK6DBylwqp8GwnGLg==
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-DQoNCk9uIDEwLzIxLzE5IDc6NTcgUE0sIERhdmlkIFJpZW50amVzIHdyb3RlOg0KPiBPbiBNb24s
-IDIxIE9jdCAyMDE5LCBTaW5naCwgQnJpamVzaCB3cm90ZToNCj4gDQo+Pj4+IEZyb206IEFzaGlz
-aCBLYWxyYSA8YXNoaXNoLmthbHJhQGFtZC5jb20+DQo+Pj4+DQo+Pj4+IFNFViBJTklUIGNvbW1h
-bmQgbG9hZHMgdGhlIFNFViByZWxhdGVkIHBlcnNpc3RlbnQgZGF0YSBmcm9tIE5WUw0KPj4+PiBh
-bmQgaW5pdGlhbGl6ZXMgdGhlIHBsYXRmb3JtIGNvbnRleHQuIFRoZSBmaXJtd2FyZSB2YWxpZGF0
-ZXMgdGhlDQo+Pj4+IHBlcnNpc3RlbnQgc3RhdGUuIElmIHZhbGlkYXRpb24gZmFpbHMsIHRoZSBm
-aXJtd2FyZSB3aWxsIHJlc2V0DQo+Pj4+IHRoZSBwZXJzaXNlbnQgc3RhdGUgYW5kIHJldHVybiBh
-biBpbnRlZ3JpdHkgY2hlY2sgZmFpbHVyZSBzdGF0dXMuDQo+Pj4+DQo+Pj4+IEF0IHRoaXMgcG9p
-bnQsIGEgc3Vic2VxdWVudCBJTklUIGNvbW1hbmQgc2hvdWxkIHN1Y2NlZWQsIHNvIHJldHJ5DQo+
-Pj4+IHRoZSBjb21tYW5kLiBUaGUgSU5JVCBjb21tYW5kIHJldHJ5IGlzIG9ubHkgZG9uZSBkdXJp
-bmcgZHJpdmVyDQo+Pj4+IGluaXRpYWxpemF0aW9uLg0KPj4+Pg0KPj4+PiBBZGRpdGlvbmFsIGVu
-dW1zIGFsb25nIHdpdGggU0VWX1JFVF9TRUNVUkVfREFUQV9JTlZBTElEIGFyZSBhZGRlZA0KPj4+
-PiB0byBzZXZfcmV0X2NvZGUgdG8gbWFpbnRhaW4gY29udGludWl0eSBhbmQgcmVsZXZhbmNlIG9m
-IGVudW0gdmFsdWVzLg0KPj4+Pg0KPj4+PiBTaWduZWQtb2ZmLWJ5OiBBc2hpc2ggS2FscmEgPGFz
-aGlzaC5rYWxyYUBhbWQuY29tPg0KPj4+PiAtLS0NCj4+Pj4gICAgZHJpdmVycy9jcnlwdG8vY2Nw
-L3BzcC1kZXYuYyB8IDEyICsrKysrKysrKysrKw0KPj4+PiAgICBpbmNsdWRlL3VhcGkvbGludXgv
-cHNwLXNldi5oIHwgIDMgKysrDQo+Pj4+ICAgIDIgZmlsZXMgY2hhbmdlZCwgMTUgaW5zZXJ0aW9u
-cygrKQ0KPj4+Pg0KPj4+PiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9jcnlwdG8vY2NwL3BzcC1kZXYu
-YyBiL2RyaXZlcnMvY3J5cHRvL2NjcC9wc3AtZGV2LmMNCj4+Pj4gaW5kZXggNmIxN2QxNzllZjhh
-Li5mOTMxOGQ0NDgyZjIgMTAwNjQ0DQo+Pj4+IC0tLSBhL2RyaXZlcnMvY3J5cHRvL2NjcC9wc3At
-ZGV2LmMNCj4+Pj4gKysrIGIvZHJpdmVycy9jcnlwdG8vY2NwL3BzcC1kZXYuYw0KPj4+PiBAQCAt
-MTA2NCw2ICsxMDY0LDE4IEBAIHZvaWQgcHNwX3BjaV9pbml0KHZvaWQpDQo+Pj4+ICAgIA0KPj4+
-PiAgICAJLyogSW5pdGlhbGl6ZSB0aGUgcGxhdGZvcm0gKi8NCj4+Pj4gICAgCXJjID0gc2V2X3Bs
-YXRmb3JtX2luaXQoJmVycm9yKTsNCj4+Pj4gKwlpZiAocmMgJiYgKGVycm9yID09IFNFVl9SRVRf
-U0VDVVJFX0RBVEFfSU5WQUxJRCkpIHsNCj4+Pj4gKwkJLyoNCj4+Pj4gKwkJICogSU5JVCBjb21t
-YW5kIHJldHVybmVkIGFuIGludGVncml0eSBjaGVjayBmYWlsdXJlDQo+Pj4+ICsJCSAqIHN0YXR1
-cyBjb2RlLCBtZWFuaW5nIHRoYXQgZmlybXdhcmUgbG9hZCBhbmQNCj4+Pj4gKwkJICogdmFsaWRh
-dGlvbiBvZiBTRVYgcmVsYXRlZCBwZXJzaXN0ZW50IGRhdGEgaGFzDQo+Pj4+ICsJCSAqIGZhaWxl
-ZCBhbmQgcGVyc2lzdGVudCBzdGF0ZSBoYXMgYmVlbiBlcmFzZWQuDQo+Pj4+ICsJCSAqIFJldHJ5
-aW5nIElOSVQgY29tbWFuZCBoZXJlIHNob3VsZCBzdWNjZWVkLg0KPj4+PiArCQkgKi8NCj4+Pj4g
-KwkJZGV2X2RiZyhzcC0+ZGV2LCAiU0VWOiByZXRyeWluZyBJTklUIGNvbW1hbmQiKTsNCj4+Pj4g
-KwkJcmMgPSBzZXZfcGxhdGZvcm1faW5pdCgmZXJyb3IpOw0KPj4+PiArCX0NCj4+Pj4gKw0KPj4+
-PiAgICAJaWYgKHJjKSB7DQo+Pj4+ICAgIAkJZGV2X2VycihzcC0+ZGV2LCAiU0VWOiBmYWlsZWQg
-dG8gSU5JVCBlcnJvciAlI3hcbiIsIGVycm9yKTsNCj4+Pj4gICAgCQlyZXR1cm47DQo+Pj4NCj4+
-PiBDdXJpb3VzIHdoeSB0aGlzIGlzbid0IGRvbmUgaW4gX19zZXZfcGxhdGZvcm1faW5pdF9sb2Nr
-ZWQoKSBzaW5jZQ0KPj4+IHNldl9wbGF0Zm9ybV9pbml0KCkgY2FuIGJlIGNhbGxlZCB3aGVuIGxv
-YWRpbmcgdGhlIGt2bSBtb2R1bGUgYW5kIHRoZSBzYW1lDQo+Pj4gaW5pdCBmYWlsdXJlIGNhbiBo
-YXBwZW4gdGhhdCB3YXkuDQo+Pj4NCj4+DQo+PiBUaGUgRlcgaW5pdGlhbGl6YXRpb24gKGFrYSBQ
-TEFURk9STV9JTklUKSBpcyBjYWxsZWQgaW4gdGhlIGZvbGxvd2luZw0KPj4gY29kZSBwYXRoczoN
-Cj4+DQo+PiAxLiBEdXJpbmcgc3lzdGVtIGJvb3QgdXANCj4+DQo+PiBhbmQNCj4+DQo+PiAyLiBB
-ZnRlciB0aGUgcGxhdGZvcm0gcmVzZXQgY29tbWFuZCBpcyBpc3N1ZWQNCj4+DQo+PiBUaGUgcGF0
-Y2ggdGFrZXMgY2FyZSBvZiAjMS4gQmFzZWQgb24gdGhlIHNwZWMsIHBsYXRmb3JtIHJlc2V0IGNv
-bW1hbmQNCj4+IHNob3VsZCBlcmFzZSB0aGUgcGVyc2lzdGVudCBkYXRhIGFuZCB0aGUgUExBVEZP
-Uk1fSU5JVCBzaG91bGQgKm5vdCogZmFpbA0KPj4gd2l0aCBTRVZfUkVUX1NFQ1VSRV9EQVRBX0lO
-VkFMSUQgZXJyb3IgY29kZS4gU28sIEkgYW0gbm90IGFibGUgdG8gc2VlDQo+PiBhbnkgIHN0cm9u
-ZyByZWFzb24gdG8gbW92ZSB0aGUgcmV0cnkgY29kZSBpbg0KPj4gX19zZXZfcGxhdGZvcm1faW5p
-dF9sb2NrZWQoKS4NCj4+DQo+IA0KPiBIbW0sIGlzIHRoZSBzZXZfcGxhdGZvcm1faW5pdCgpIGNh
-bGwgaW4gc2V2X2d1ZXN0X2luaXQoKSBpbnRlbmRlZCB0byBkbw0KPiBTRVZfQ01EX0lOSVQgb25s
-eSBhZnRlciBwbGF0Zm9ybSByZXNldD8gIEkgd2FzIHVuZGVyIHRoZSBpbXByZXNzaW9uIGl0IHdh
-cw0KPiBkb25lIGluIGNhc2UgYW55IHByZXZpb3VzIGluaXQgZmFpbGVkLg0KPiANCg0KDQpUaGUg
-UExBVEZPUk1fSU5JVCBjb21tYW5kIGlzIGFsbG93ZWQgb25seSB3aGVuIEZXIGlzIGluIFVJTklU
-IHN0YXRlLiBPbg0KYm9vdCwgdGhlIEZXIHdpbGwgYmUgaW4gVU5JTklUIHN0YXRlIGFuZCBzaW1p
-bGFybHkgYWZ0ZXIgdGhlIHBsYXRmb3JtIA0KcmVzZXQgY29tbWFuZCB0aGUgRlcgZ29lcyBiYWNr
-IHRvIFVOSU5JVCBzdGF0ZS4NCg0KVGhlIF9fc2V2X3BsYXRmb3JtX2luaXRfbG9ja2VkKCkgY2hl
-Y2tzIHRoZSBGVyBzdGF0ZSBiZWZvcmUgaXNzdWluZyB0aGUNCmNvbW1hbmQsIGlmIEZXIGlzIGFs
-cmVhZHkgaW4gSU5JVCBzdGF0ZSB0aGVuIGl0IHJldHVybnMgaW1tZWRpYXRlbHkuDQoNCnRoYW5r
-cw0K
+When runtime-pm is disabled, we get a few harmless warnings:
+
+drivers/char/hw_random/omap3-rom-rng.c:65:12: error: unused function 'omap_rom_rng_runtime_suspend' [-Werror,-Wunused-function]
+drivers/char/hw_random/omap3-rom-rng.c:81:12: error: unused function 'omap_rom_rng_runtime_resume' [-Werror,-Wunused-function]
+
+Mark these functions as __maybe_unused so gcc can drop them
+silently.
+
+Fixes: 8d9d4bdc495f ("hwrng: omap3-rom - Use runtime PM instead of custom functions")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/char/hw_random/omap3-rom-rng.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/char/hw_random/omap3-rom-rng.c b/drivers/char/hw_random/omap3-rom-rng.c
+index 0b90983c95c8..e08a8887e718 100644
+--- a/drivers/char/hw_random/omap3-rom-rng.c
++++ b/drivers/char/hw_random/omap3-rom-rng.c
+@@ -62,7 +62,7 @@ static int omap3_rom_rng_read(struct hwrng *rng, void *data, size_t max, bool w)
+ 	return r;
+ }
+ 
+-static int omap_rom_rng_runtime_suspend(struct device *dev)
++static int __maybe_unused omap_rom_rng_runtime_suspend(struct device *dev)
+ {
+ 	struct omap_rom_rng *ddata;
+ 	int r;
+@@ -78,7 +78,7 @@ static int omap_rom_rng_runtime_suspend(struct device *dev)
+ 	return 0;
+ }
+ 
+-static int omap_rom_rng_runtime_resume(struct device *dev)
++static int __maybe_unused omap_rom_rng_runtime_resume(struct device *dev)
+ {
+ 	struct omap_rom_rng *ddata;
+ 	int r;
+-- 
+2.20.0
+
