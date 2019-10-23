@@ -2,221 +2,245 @@ Return-Path: <SRS0=Ux5j=YQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B279CA9EAE
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 04:55:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E4FCCA9EB6
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 07:42:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 02A0721872
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 04:55:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1571806515;
-	bh=8NH05dDT3eYNBoIIpPGFvDsgZMQzmpKZtWtmh7MTmHU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=baT5uOHWX/s6Wrt1cN/I7Rj2FFbLxd6ksA8LjRTWcmoVmT9qlmxAl+4ju+4dgz62x
-	 hbPyaUWhhD2ROK9qPKIVxZR0PY5cu+85vz8Lgzmu77eD7MIVxjBCB42bU3ysHcx/84
-	 PqSwS9pzRrc9xfXSszBydJVJ4+lMG0Gdtk1QymK8=
+	by mail.kernel.org (Postfix) with ESMTP id DF189214B2
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 07:42:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u5jOUrPq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733186AbfJWEzO (ORCPT
+        id S1727574AbfJWHme (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Oct 2019 00:55:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59910 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732261AbfJWEzO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Oct 2019 00:55:14 -0400
-Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 917742173B;
-        Wed, 23 Oct 2019 04:55:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1571806512;
-        bh=8NH05dDT3eYNBoIIpPGFvDsgZMQzmpKZtWtmh7MTmHU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=UCyo+gUa2BBD7ABJxvnHqgclWwhlApBYITkBU3ezTydP9NkQ6D0lzSM0CLHk2RSd0
-         LK+TmOsPyu651fNV050istYfS+iHhlUeyelc2CczpeUlnLUpcMpK64D2Rb4Ss988Ci
-         GY2bTcHCfP8g4R4063qL7SiDhagtRdBTTiBwsQKM=
-Date:   Tue, 22 Oct 2019 21:55:11 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     linux-crypto@vger.kernel.org,
+        Wed, 23 Oct 2019 03:42:34 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:40333 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389999AbfJWHmd (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 23 Oct 2019 03:42:33 -0400
+Received: by mail-wr1-f66.google.com with SMTP id o28so20855001wro.7
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Oct 2019 00:42:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=KGid5vtQjFPMce0PdLU6XWEyY23AJL898C5Gv+DHVUY=;
+        b=u5jOUrPquPlfSoZAv/UUE6yYkNkhiDv3dsT8apJ5UIsZ8jjhkx/UhDNipKS015TQFl
+         GwkUjAB5oX90pqdwXguol0BUMURYcWtm+4SseYeytjNqZkPC1w9pOOeOlSz7gvwC1c3E
+         VE3HSNBo4xI6W6vkYKgNI2TRJ4H4pQiQ0uPkGujhtmGM11O3DVPKGejCiKgHiKiu7E1Y
+         P7yBNsZgKwTlJh4VMzs1k8lm3ulTp0PDH3wO522PmWQXxg46UTnBbjShODH2uUgfV3ti
+         HI98mq6yOT7+sfmeJ3v0sh/jBLc40+YJPY+gj6xxtRHXAquR7LgrISdmGnht7ctJgaPo
+         8itQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=KGid5vtQjFPMce0PdLU6XWEyY23AJL898C5Gv+DHVUY=;
+        b=bW28xgp5kAdVAVJlOl1U7L2Bmkd9/hWNa8NLG5zfNCMarKRZOreLUDSYapQGTbWF9R
+         roIX7Zaw7qV7ZFwFRE8VIo4i0tTazFrLXwg5pnfCrSAgOmRAHzqHMnZQ23eGGW16PGU0
+         XABF62/p3171ijZ+YlQtkQ/nN6SobDhcmmVImnOqQ9FocrPhN5u+CT0FXOqs/bqeFC+u
+         YIefG58KWRFOkwEgQyKWrObHBn1Ly32D2L5AKCz7Al3eZQa/Ilgqqr6wHHd75edNsy1r
+         kHAe4pf4iHZrnthmI0zyDJy/PG08Jfyvm5YLEuwBRTpFo9bftZRnZ/ilOAW/SGIGTRCu
+         SGrw==
+X-Gm-Message-State: APjAAAXtujFKY4gSuCQPwz1TT3Pt4d2ohSYdmnPeN/6vKP9Tvu0T/O0m
+        jUrV7c4Dtte6MWTf4lszehp1nw==
+X-Google-Smtp-Source: APXvYqzTwBoeZ6eycm/qh37tl4Rv2liCZqsEziDaSS5Io1XGjDnpXG1oLya1X7S2yUgcug9swTChbg==
+X-Received: by 2002:adf:fac2:: with SMTP id a2mr6635488wrs.290.1571816549918;
+        Wed, 23 Oct 2019 00:42:29 -0700 (PDT)
+Received: from lophozonia ([85.195.192.192])
+        by smtp.gmail.com with ESMTPSA id r1sm15185527wrw.60.2019.10.23.00.42.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Oct 2019 00:42:29 -0700 (PDT)
+Date:   Wed, 23 Oct 2019 09:42:27 +0200
+From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
+To:     "zhangfei.gao@foxmail.com" <zhangfei.gao@foxmail.com>
+Cc:     Zhangfei Gao <zhangfei.gao@linaro.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Samuel Neves <sneves@dei.uc.pt>, Arnd Bergmann <arnd@arndb.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Martin Willi <martin@strongswan.org>,
-        Rene van Dorst <opensource@vdorst.com>,
-        David Sterba <dsterba@suse.com>
-Subject: Re: [PATCH v4 25/35] crypto: BLAKE2s - x86_64 SIMD implementation
-Message-ID: <20191023045511.GC361298@sol.localdomain>
-Mail-Followup-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Samuel Neves <sneves@dei.uc.pt>, Arnd Bergmann <arnd@arndb.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Martin Willi <martin@strongswan.org>,
-        Rene van Dorst <opensource@vdorst.com>,
-        David Sterba <dsterba@suse.com>
-References: <20191017190932.1947-1-ard.biesheuvel@linaro.org>
- <20191017190932.1947-26-ard.biesheuvel@linaro.org>
+        jonathan.cameron@huawei.com, grant.likely@arm.com,
+        ilias.apalodimas@linaro.org, francois.ozog@linaro.org,
+        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
+        "haojian . zhuang" <haojian.zhuang@linaro.org>,
+        linux-accelerators@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, Kenneth Lee <liguozhu@hisilicon.com>,
+        Zaibo Xu <xuzaibo@huawei.com>
+Subject: Re: [PATCH v6 2/3] uacce: add uacce driver
+Message-ID: <20191023074227.GA264888@lophozonia>
+References: <1571214873-27359-1-git-send-email-zhangfei.gao@linaro.org>
+ <1571214873-27359-3-git-send-email-zhangfei.gao@linaro.org>
+ <20191016172802.GA1533448@lophozonia>
+ <5da9a9cd.1c69fb81.9f8e8.60faSMTPIN_ADDED_BROKEN@mx.google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191017190932.1947-26-ard.biesheuvel@linaro.org>
+In-Reply-To: <5da9a9cd.1c69fb81.9f8e8.60faSMTPIN_ADDED_BROKEN@mx.google.com>
 User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Oct 17, 2019 at 09:09:22PM +0200, Ard Biesheuvel wrote:
-> From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+On Fri, Oct 18, 2019 at 08:01:44PM +0800, zhangfei.gao@foxmail.com wrote:
+> > More generally, it would be nice to use the DMA API when SVA isn't
+> > supported, instead of manually allocating and mapping memory with
+> > iommu_map(). Do we only handcraft these functions in order to have VA ==
+> > IOVA?  On its own it doesn't seem like a strong enough reason to avoid the
+> > DMA API.
+> Here we use unmanaged domain to prevent va conflict with iova.
+> The target is still to build shared virtual address though SVA is not
+> supported.
+
+If SVA isn't supported, having VA == IOVA looks nice but isn't
+particularly useful. We could instead require that, if SVA isn't
+supported, userspace handles VA and IOVA separately for any DMA region.
+
+Enforcing VA == IOVA adds some unnecessary complexity to this module. In
+addition to the special case for software MSIs that is already there
+(uacce_iommu_has_sw_msi), it's also not guaranteed that the whole VA space
+is representable with IOVAs, you might need to poke holes in the IOVA
+space for reserved regions (See iommu.*resv). For example VFIO checks that
+the IOVA requested by userspace doesn't fall into a reserved range (see
+iova_list in vfio_iommu_type1.c). It also exports to userspace a list of
+possible IOVAs through VFIO_IOMMU_GET_INFO.
+
+Letting the DMA API allocate addresses would be simpler, since it already
+deals with resv regions and software MSI.
+
+> The iova from dma api can be same with va, and device can not distinguish
+> them.
+> So here we borrow va from user space and iommu_map to device, and the va
+> becomes iova.
+> Since this iova is from user space, so no conflict.
+> Then dma api can not be used in this case.
 > 
-> These implementations from Samuel Neves support AVX and AVX-512VL.
-> Originally this used AVX-512F, but Skylake thermal throttling made
-> AVX-512VL more attractive and possible to do with negligable difference.
-> 
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> Signed-off-by: Samuel Neves <sneves@dei.uc.pt>
-> Co-developed-by: Samuel Neves <sneves@dei.uc.pt>
-> [ardb: move to arch/x86/crypto, wire into lib/crypto framework]
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> ---
->  arch/x86/crypto/Makefile       |   2 +
->  arch/x86/crypto/blake2s-core.S | 685 ++++++++++++++++++++
->  arch/x86/crypto/blake2s-glue.c | 235 +++++++
->  crypto/Kconfig                 |   6 +
->  4 files changed, 928 insertions(+)
-> 
-> diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
-> index 759b1a927826..922c8ecfa00f 100644
-> --- a/arch/x86/crypto/Makefile
-> +++ b/arch/x86/crypto/Makefile
-> @@ -48,6 +48,7 @@ ifeq ($(avx_supported),yes)
->  	obj-$(CONFIG_CRYPTO_CAST6_AVX_X86_64) += cast6-avx-x86_64.o
->  	obj-$(CONFIG_CRYPTO_TWOFISH_AVX_X86_64) += twofish-avx-x86_64.o
->  	obj-$(CONFIG_CRYPTO_SERPENT_AVX_X86_64) += serpent-avx-x86_64.o
-> +	obj-$(CONFIG_CRYPTO_BLAKE2S_X86) += blake2s-x86_64.o
->  endif
->  
->  # These modules require assembler to support AVX2.
-> @@ -70,6 +71,7 @@ serpent-sse2-x86_64-y := serpent-sse2-x86_64-asm_64.o serpent_sse2_glue.o
->  aegis128-aesni-y := aegis128-aesni-asm.o aegis128-aesni-glue.o
->  
->  nhpoly1305-sse2-y := nh-sse2-x86_64.o nhpoly1305-sse2-glue.o
-> +blake2s-x86_64-y := blake2s-core.o blake2s-glue.o
->  
->  ifeq ($(avx_supported),yes)
->  	camellia-aesni-avx-x86_64-y := camellia-aesni-avx-asm_64.o \
-> diff --git a/arch/x86/crypto/blake2s-core.S b/arch/x86/crypto/blake2s-core.S
-> new file mode 100644
-> index 000000000000..675288fa4cca
-> --- /dev/null
-> +++ b/arch/x86/crypto/blake2s-core.S
-> @@ -0,0 +1,685 @@
-> +/* SPDX-License-Identifier: GPL-2.0 OR MIT */
-> +/*
-> + * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-> + * Copyright (C) 2017 Samuel Neves <sneves@dei.uc.pt>. All Rights Reserved.
-> + */
-> +
-> +#include <linux/linkage.h>
-> +
-> +.section .rodata.cst32.BLAKE2S_IV, "aM", @progbits, 32
-> +.align 32
-> +IV:	.octa 0xA54FF53A3C6EF372BB67AE856A09E667
-> +	.octa 0x5BE0CD191F83D9AB9B05688C510E527F
-> +.section .rodata.cst16.ROT16, "aM", @progbits, 16
-> +.align 16
-> +ROT16:	.octa 0x0D0C0F0E09080B0A0504070601000302
-> +.section .rodata.cst16.ROR328, "aM", @progbits, 16
-> +.align 16
-> +ROR328:	.octa 0x0C0F0E0D080B0A090407060500030201
-> +#ifdef CONFIG_AS_AVX512
-> +.section .rodata.cst64.BLAKE2S_SIGMA, "aM", @progbits, 640
-> +.align 64
-> +SIGMA:
-> +.long 0, 2, 4, 6, 1, 3, 5, 7, 8, 10, 12, 14, 9, 11, 13, 15
-> +.long 11, 2, 12, 14, 9, 8, 15, 3, 4, 0, 13, 6, 10, 1, 7, 5
-> +.long 10, 12, 11, 6, 5, 9, 13, 3, 4, 15, 14, 2, 0, 7, 8, 1
-> +.long 10, 9, 7, 0, 11, 14, 1, 12, 6, 2, 15, 3, 13, 8, 5, 4
-> +.long 4, 9, 8, 13, 14, 0, 10, 11, 7, 3, 12, 1, 5, 6, 15, 2
-> +.long 2, 10, 4, 14, 13, 3, 9, 11, 6, 5, 7, 12, 15, 1, 8, 0
-> +.long 4, 11, 14, 8, 13, 10, 12, 5, 2, 1, 15, 3, 9, 7, 0, 6
-> +.long 6, 12, 0, 13, 15, 2, 1, 10, 4, 5, 11, 14, 8, 3, 9, 7
-> +.long 14, 5, 4, 12, 9, 7, 3, 10, 2, 0, 6, 15, 11, 1, 13, 8
-> +.long 11, 7, 13, 10, 12, 14, 0, 15, 4, 5, 6, 9, 2, 1, 8, 3
-> +#endif /* CONFIG_AS_AVX512 */
-> +
-> +.text
-> +#ifdef CONFIG_AS_AVX
-> +ENTRY(blake2s_compress_avx)
-> +	movl		%ecx, %ecx
-> +	testq		%rdx, %rdx
-> +	je		.Lendofloop
-> +	.align 32
-> +.Lbeginofloop:
-> +	addq		%rcx, 32(%rdi)
-> +	vmovdqu		IV+16(%rip), %xmm1
-> +	vmovdqu		(%rsi), %xmm4
-> +	vpxor		32(%rdi), %xmm1, %xmm1
-> +	vmovdqu		16(%rsi), %xmm3
-> +	vshufps		$136, %xmm3, %xmm4, %xmm6
-> +	vmovdqa		ROT16(%rip), %xmm7
-> +	vpaddd		(%rdi), %xmm6, %xmm6
-> +	vpaddd		16(%rdi), %xmm6, %xmm6
-> +	vpxor		%xmm6, %xmm1, %xmm1
-> +	vmovdqu		IV(%rip), %xmm8
-> +	vpshufb		%xmm7, %xmm1, %xmm1
-> +	vmovdqu		48(%rsi), %xmm5
-> +	vpaddd		%xmm1, %xmm8, %xmm8
-> +	vpxor		16(%rdi), %xmm8, %xmm9
-> +	vmovdqu		32(%rsi), %xmm2
-> +	vpblendw	$12, %xmm3, %xmm5, %xmm13
-> +	vshufps		$221, %xmm5, %xmm2, %xmm12
-> +	vpunpckhqdq	%xmm2, %xmm4, %xmm14
-> +	vpslld		$20, %xmm9, %xmm0
-> +	vpsrld		$12, %xmm9, %xmm9
-> +	vpxor		%xmm0, %xmm9, %xmm0
-> +	vshufps		$221, %xmm3, %xmm4, %xmm9
-> +	vpaddd		%xmm9, %xmm6, %xmm9
-> +	vpaddd		%xmm0, %xmm9, %xmm9
-> +	vpxor		%xmm9, %xmm1, %xmm1
-> +	vmovdqa		ROR328(%rip), %xmm6
-> +	vpshufb		%xmm6, %xmm1, %xmm1
-> +	vpaddd		%xmm1, %xmm8, %xmm8
-> +	vpxor		%xmm8, %xmm0, %xmm0
-> +	vpshufd		$147, %xmm1, %xmm1
-> +	vpshufd		$78, %xmm8, %xmm8
-> +	vpslld		$25, %xmm0, %xmm10
-> +	vpsrld		$7, %xmm0, %xmm0
-> +	vpxor		%xmm10, %xmm0, %xmm0
-> +	vshufps		$136, %xmm5, %xmm2, %xmm10
-> +	vpshufd		$57, %xmm0, %xmm0
-> +	vpaddd		%xmm10, %xmm9, %xmm9
-> +	vpaddd		%xmm0, %xmm9, %xmm9
-> +	vpxor		%xmm9, %xmm1, %xmm1
-> +	vpaddd		%xmm12, %xmm9, %xmm9
-> +	vpblendw	$12, %xmm2, %xmm3, %xmm12
-> +	vpshufb		%xmm7, %xmm1, %xmm1
-> +	vpaddd		%xmm1, %xmm8, %xmm8
-> +	vpxor		%xmm8, %xmm0, %xmm10
-> +	vpslld		$20, %xmm10, %xmm0
-> +	vpsrld		$12, %xmm10, %xmm10
-> +	vpxor		%xmm0, %xmm10, %xmm0
-> +	vpaddd		%xmm0, %xmm9, %xmm9
-> +	vpxor		%xmm9, %xmm1, %xmm1
-> +	vpshufb		%xmm6, %xmm1, %xmm1
-> +	vpaddd		%xmm1, %xmm8, %xmm8
+> drivers/vfio/vfio_iommu_type1.c also use iommu_domain_alloc.
+
+VFIO needs to let userspace pick its IOVA, because the IOVA space is
+generally managed by a guest OS. In my opinion this is a baggage that
+uacce doesn't need.
+
+If we only supported the DMA API and not unmanaged IOMMU domains,
+userspace would need to do a little bit more work by differentiating
+between VA and DMA addresses, but that could be abstracted into the uacce
+library and it would make the kernel module a lot simpler.
+
 [...]
+> > I wish the SVA and !SVA paths were less interleaved. Both models are
+> > fundamentally different:
+> > 
+> > * Without SVA you cannot share the device between multiple processes. All
+> >    DMA mappings are in the "main", non-PASID address space of the device.
+> > 
+> >    Note that process isolation without SVA could be achieved with the
+> >    auxiliary domains IOMMU API (introduced primarily for vfio-mdev) but
+> >    this is not the model chosen here.
+> Does pasid has to be supported for this case?
 
-There are no comments in this 685-line assembly language file.
-Is this the original version, or is it a generated/stripped version?
+Yes, you do need PASID support for auxiliary domains, but not PRI/Stall.
 
-- Eric
+[...]
+> > > +	/* allocate memory */
+> > > +	if (flags & UACCE_QFRF_DMA) {
+> > At the moment UACCE_QFRF_DMA is never set, so there is a lot of unused and
+> > possibly untested code in this file. I think it would be simpler to choose
+> > between either DMA API or unmanaged IOMMU domains and stick with it. As
+> > said before, I'd prefer DMA API.
+> UACCE_QFRF_DMA is using dma api, it used this for quick method, though it
+> can not prevent va conflict.
+> We use an ioctl to get iova of the dma buffer.
+> Since the interface is not standard, we kept the interface and verified
+> internally.
+
+As above, it's probably worth exploring this method further for !SVA.
+
+> > > +		qfr->kaddr = dma_alloc_coherent(uacce->pdev,
+> > > +						qfr->nr_pages << PAGE_SHIFT,
+> > > +						&qfr->dma, GFP_KERNEL);
+> > > +		if (!qfr->kaddr) {
+> > > +			ret = -ENOMEM;
+> > > +			goto err_with_qfr;
+> > > +		}
+> > > +	} else {
+> > > +		ret = uacce_qfr_alloc_pages(qfr);
+> > > +		if (ret)
+> > > +			goto err_with_qfr;
+> > > +	}
+> > > +
+> > > +	/* map to device */
+> > > +	ret = uacce_queue_map_qfr(q, qfr);
+> > Worth moving into the else above.
+> The idea here is a, map to device, b, map to user space.
+
+Yes but dma_alloc_coherent() creates the IOMMU mapping, and
+uacce_queue_map_qfr()'s only task is to create the IOMMU mapping when the
+DMA API isn't in use, so you could move this call up, right after
+uacce_qfr_alloc_pages().
+
+[...]
+> > > +	q->state = UACCE_Q_ZOMBIE;
+> > Since the PUT_Q ioctl makes the queue unrecoverable, why should userspace
+> > invoke it instead of immediately calling close()?
+> We found close does not release resource immediately, which may cause issue
+> when re-open again
+> when all queues are used.
+
+I think the only way to fix that problem is to avoid reallocating the
+resources until they are released, because we can't count on userspace to
+always call the PUT_Q ioctl. Sometimes the program will crash before that.
+
+> > > +static int uacce_fops_mmap(struct file *filep, struct vm_area_struct *vma)
+> > > +{
+> > > +	struct uacce_queue *q = filep->private_data;
+> > > +	struct uacce_device *uacce = q->uacce;
+> > > +	struct uacce_qfile_region *qfr;
+> > > +	enum uacce_qfrt type = 0;
+> > > +	unsigned int flags = 0;
+> > > +	int ret;
+> > > +
+> > > +	if (vma->vm_pgoff < UACCE_QFRT_MAX)
+> > > +		type = vma->vm_pgoff;
+> > > +
+> > > +	vma->vm_flags |= VM_DONTCOPY | VM_DONTEXPAND;
+> > > +
+> > > +	mutex_lock(&uacce_mutex);
+
+By the way, lockdep detects a possible unsafe locking scenario here,
+because we're taking the uacce_mutex even though mmap called us with the
+mmap_sem held for writing. Conversely uacce_fops_release() takes the
+mmap_sem for writing while holding the uacce_mutex. I think it can be
+fixed easily, if we simply remove the use of mmap_sem in
+uacce_fops_release(), since it's only taken to do some accounting which
+doesn't look right.
+
+However, a similar but more complex locking issue comes from the current
+use of iommu_sva_bind/unbind_device():
+
+uacce_fops_open:
+ iommu_sva_unbind_device()
+  iommu_sva_bind_group()	[iommu_group->mutex]
+    mmu_notifier_get()		[mmap_sem]
+
+uacce_fops_mmap:		[mmap_sem]
+				[uacce_mutex]
+
+uacce_fops_release:
+				[uacce_mutex]
+  iommu_sva_unbind_device()	[iommu_group->mutex]
+
+This circular dependency can be broken by calling iommu_sva_unbind_device()
+outside of uacce_mutex, but I think it's worth reworking the queue locking
+scheme a little and use fine-grained locking for the queue state.
+
+Something else I noticed is uacce_idr isn't currently protected. The IDR
+API expected the caller to use its own locking scheme. You could replace
+it with an xarray, which I think is preferred to IDR now and provides a
+xa_lock.
+
+Thanks,
+Jean
