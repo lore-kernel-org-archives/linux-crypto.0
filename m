@@ -4,34 +4,34 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEEA4CA9EA0
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 00:12:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44B73CA9EA0
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 00:12:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9DE192064B
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 00:12:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0ECCA2064B
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 00:12:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732128AbfJWAMf (ORCPT
+        id S1732134AbfJWAMj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Oct 2019 20:12:35 -0400
-Received: from mx2.suse.de ([195.135.220.15]:44046 "EHLO mx1.suse.de"
+        Tue, 22 Oct 2019 20:12:39 -0400
+Received: from mx2.suse.de ([195.135.220.15]:44078 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1732131AbfJWAMf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Oct 2019 20:12:35 -0400
+        id S1732131AbfJWAMj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 22 Oct 2019 20:12:39 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 22EA1B2B4;
-        Wed, 23 Oct 2019 00:12:32 +0000 (UTC)
+        by mx1.suse.de (Postfix) with ESMTP id 5C67EB03D;
+        Wed, 23 Oct 2019 00:12:35 +0000 (UTC)
 Received: by ds.suse.cz (Postfix, from userid 10065)
-        id CDFDADA734; Wed, 23 Oct 2019 02:12:44 +0200 (CEST)
+        id 142FEDA734; Wed, 23 Oct 2019 02:12:48 +0200 (CEST)
 From:   David Sterba <dsterba@suse.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     ard.biesheuvel@linaro.org, ebiggers@kernel.org,
         David Sterba <dsterba@suse.com>
-Subject: [PATCH v6 1/2] crypto: add blake2b generic implementation
-Date:   Wed, 23 Oct 2019 02:12:39 +0200
-Message-Id: <18eb153655a7501c8f0b3cc66d604d7c8fa6f7d9.1571788861.git.dsterba@suse.com>
+Subject: [PATCH v6 2/2] crypto: add test vectors for blake2b
+Date:   Wed, 23 Oct 2019 02:12:40 +0200
+Message-Id: <774d1fd3336435d24c583c0abc38b6b2905628a6.1571788861.git.dsterba@suse.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <cover.1571788861.git.dsterba@suse.com>
 References: <cover.1571788861.git.dsterba@suse.com>
@@ -42,542 +42,397 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The patch brings support of several BLAKE2 variants (2b with various
-digest lengths).  The keyed digest is supported, using tfm->setkey call.
-The in-tree user will be btrfs (for checksumming), we're going to use
-the BLAKE2b-256 variant.
+Test vectors for blake2b with various digest sizes. As the algorithm is
+the same up to the digest calculation, the key and input data length is
+distributed in a way that tests all combinanions of the two over the
+digest sizes.
 
-The code is reference implementation taken from the official sources and
-modified in terms of kernel coding style (whitespace, comments, uintXX_t
--> uXX types, removed unused prototypes and #ifdefs, removed testing
-code, changed secure_zero_memory -> memzero_explicit, used own helpers
-for unaligned reads/writes and rotations).
+Based on the suggestion from Eric, the following input sizes are tested
+[0, 1, 7, 15, 64, 247, 256], where blake2b blocksize is 128, so the
+padded and the non-padded input buffers are tested.
 
-Further changes removed sanity checks of key length or output size,
-these values are verified in the crypto API callbacks or are hardcoded
-in shash_alg and not exposed to users.
+          blake2b-160  blake2b-256  blake2b-384  blake2b-512
+         ---------------------------------------------------
+len=0   | klen=0       klen=1       klen=32      klen=64
+len=1   | klen=32      klen=64      klen=0       klen=1
+len=7   | klen=64      klen=0       klen=1       klen=32
+len=15  | klen=1       klen=32      klen=64      klen=0
+len=64  | klen=0       klen=1       klen=32      klen=64
+len=247 | klen=32      klen=64      klen=0       klen=1
+len=256 | klen=64      klen=0       klen=1       klen=32
 
+Where key:
+
+- klen=0: empty key
+- klen=1: 1 byte value 0x42, 'B'
+- klen=32: first 32 bytes of the default key, sequence 00..1f
+- klen=64: default key, sequence 00..3f
+
+The unkeyed vectors are ordered before keyed, as this is required by
+testmgr.
+
+CC: Eric Biggers <ebiggers@kernel.org>
 Signed-off-by: David Sterba <dsterba@suse.com>
 ---
- crypto/Kconfig           |  17 ++
- crypto/Makefile          |   1 +
- crypto/blake2b_generic.c | 413 +++++++++++++++++++++++++++++++++++++++
- include/crypto/blake2b.h |  46 +++++
- 4 files changed, 477 insertions(+)
- create mode 100644 crypto/blake2b_generic.c
- create mode 100644 include/crypto/blake2b.h
+ crypto/testmgr.c |  28 +++++
+ crypto/testmgr.h | 307 +++++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 335 insertions(+)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index ad86463de715..d37eba22f436 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -610,6 +610,23 @@ config CRYPTO_XXHASH
- 	  xxHash non-cryptographic hash algorithm. Extremely fast, working at
- 	  speeds close to RAM limits.
- 
-+config CRYPTO_BLAKE2B
-+	tristate "BLAKE2b digest algorithm"
-+	select CRYPTO_HASH
-+	help
-+	  Implementation of cryptographic hash function BLAKE2b (or just BLAKE2),
-+	  optimized for 64bit platforms and can produce digests of any size
-+	  between 1 to 64.  The keyed hash is also implemented.
-+
-+	  This module provides the following algorithms:
-+
-+	  - blake2b-160
-+	  - blake2b-256
-+	  - blake2b-384
-+	  - blake2b-512
-+
-+	  See https://blake2.net for further information.
-+
- config CRYPTO_CRCT10DIF
- 	tristate "CRCT10DIF algorithm"
- 	select CRYPTO_HASH
-diff --git a/crypto/Makefile b/crypto/Makefile
-index 0d2cdd523fd9..dc010b1a8e41 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -74,6 +74,7 @@ obj-$(CONFIG_CRYPTO_STREEBOG) += streebog_generic.o
- obj-$(CONFIG_CRYPTO_WP512) += wp512.o
- CFLAGS_wp512.o := $(call cc-option,-fno-schedule-insns)  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79149
- obj-$(CONFIG_CRYPTO_TGR192) += tgr192.o
-+obj-$(CONFIG_CRYPTO_BLAKE2B) += blake2b_generic.o
- obj-$(CONFIG_CRYPTO_GF128MUL) += gf128mul.o
- obj-$(CONFIG_CRYPTO_ECB) += ecb.o
- obj-$(CONFIG_CRYPTO_CBC) += cbc.o
-diff --git a/crypto/blake2b_generic.c b/crypto/blake2b_generic.c
-new file mode 100644
-index 000000000000..63f5cab3761c
---- /dev/null
-+++ b/crypto/blake2b_generic.c
-@@ -0,0 +1,413 @@
-+// SPDX-License-Identifier: (GPL-2.0-only OR Apache-2.0)
-+/*
-+ * BLAKE2b reference source code package - reference C implementations
-+ *
-+ * Copyright 2012, Samuel Neves <sneves@dei.uc.pt>.  You may use this under the
-+ * terms of the CC0, the OpenSSL Licence, or the Apache Public License 2.0, at
-+ * your option.  The terms of these licenses can be found at:
-+ *
-+ * - CC0 1.0 Universal : http://creativecommons.org/publicdomain/zero/1.0
-+ * - OpenSSL license   : https://www.openssl.org/source/license.html
-+ * - Apache 2.0        : http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * More information about the BLAKE2 hash function can be found at
-+ * https://blake2.net.
-+ *
-+ * Note: the original sources have been modified for inclusion in linux kernel
-+ * in terms of coding style, using generic helpers and simplifications of error
-+ * handling.
-+ */
-+
-+#include <asm/unaligned.h>
-+#include <linux/module.h>
-+#include <linux/string.h>
-+#include <linux/kernel.h>
-+#include <linux/bitops.h>
-+#include <crypto/internal/hash.h>
-+#include <crypto/blake2b.h>
-+
-+struct blake2b_param {
-+	u8 digest_length;			/* 1 */
-+	u8 key_length;				/* 2 */
-+	u8 fanout;				/* 3 */
-+	u8 depth;				/* 4 */
-+	__le32 leaf_length;			/* 8 */
-+	__le32 node_offset;			/* 12 */
-+	__le32 xof_length;			/* 16 */
-+	u8 node_depth;				/* 17 */
-+	u8 inner_length;			/* 18 */
-+	u8 reserved[14];			/* 32 */
-+	u8 salt[BLAKE2B_SALTBYTES];		/* 48 */
-+	u8 personal[BLAKE2B_PERSONALBYTES];	/* 64 */
-+} __packed;
-+
-+static const u64 blake2b_IV[8] = {
-+	0x6a09e667f3bcc908ULL, 0xbb67ae8584caa73bULL,
-+	0x3c6ef372fe94f82bULL, 0xa54ff53a5f1d36f1ULL,
-+	0x510e527fade682d1ULL, 0x9b05688c2b3e6c1fULL,
-+	0x1f83d9abfb41bd6bULL, 0x5be0cd19137e2179ULL
-+};
-+
-+static const u8 blake2b_sigma[12][16] = {
-+	{  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15 },
-+	{ 14, 10,  4,  8,  9, 15, 13,  6,  1, 12,  0,  2, 11,  7,  5,  3 },
-+	{ 11,  8, 12,  0,  5,  2, 15, 13, 10, 14,  3,  6,  7,  1,  9,  4 },
-+	{  7,  9,  3,  1, 13, 12, 11, 14,  2,  6,  5, 10,  4,  0, 15,  8 },
-+	{  9,  0,  5,  7,  2,  4, 10, 15, 14,  1, 11, 12,  6,  8,  3, 13 },
-+	{  2, 12,  6, 10,  0, 11,  8,  3,  4, 13,  7,  5, 15, 14,  1,  9 },
-+	{ 12,  5,  1, 15, 14, 13,  4, 10,  0,  7,  6,  3,  9,  2,  8, 11 },
-+	{ 13, 11,  7, 14, 12,  1,  3,  9,  5,  0, 15,  4,  8,  6,  2, 10 },
-+	{  6, 15, 14,  9, 11,  3,  0,  8, 12,  2, 13,  7,  1,  4, 10,  5 },
-+	{ 10,  2,  8,  4,  7,  6,  1,  5, 15, 11,  9, 14,  3, 12, 13,  0 },
-+	{  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15 },
-+	{ 14, 10,  4,  8,  9, 15, 13,  6,  1, 12,  0,  2, 11,  7,  5,  3 }
-+};
-+
-+static void blake2b_update(struct blake2b_state *S, const void *pin, size_t inlen);
-+
-+static void blake2b_set_lastnode(struct blake2b_state *S)
-+{
-+	S->f[1] = (u64)-1;
-+}
-+
-+static void blake2b_set_lastblock(struct blake2b_state *S)
-+{
-+	if (S->last_node)
-+		blake2b_set_lastnode(S);
-+
-+	S->f[0] = (u64)-1;
-+}
-+
-+static void blake2b_increment_counter(struct blake2b_state *S, const u64 inc)
-+{
-+	S->t[0] += inc;
-+	S->t[1] += (S->t[0] < inc);
-+}
-+
-+static void blake2b_init0(struct blake2b_state *S)
-+{
-+	size_t i;
-+
-+	memset(S, 0, sizeof(struct blake2b_state));
-+
-+	for (i = 0; i < 8; ++i)
-+		S->h[i] = blake2b_IV[i];
-+}
-+
-+/* init xors IV with input parameter block */
-+static void blake2b_init_param(struct blake2b_state *S,
-+			       const struct blake2b_param *P)
-+{
-+	const u8 *p = (const u8 *)(P);
-+	size_t i;
-+
-+	blake2b_init0(S);
-+
-+	/* IV XOR ParamBlock */
-+	for (i = 0; i < 8; ++i)
-+		S->h[i] ^= get_unaligned_le64(p + sizeof(S->h[i]) * i);
-+
-+	S->outlen = P->digest_length;
-+}
-+
-+static void blake2b_init(struct blake2b_state *S, size_t outlen)
-+{
-+	struct blake2b_param P;
-+
-+	P.digest_length = (u8)outlen;
-+	P.key_length    = 0;
-+	P.fanout        = 1;
-+	P.depth         = 1;
-+	P.leaf_length   = 0;
-+	P.node_offset   = 0;
-+	P.xof_length    = 0;
-+	P.node_depth    = 0;
-+	P.inner_length  = 0;
-+	memset(P.reserved, 0, sizeof(P.reserved));
-+	memset(P.salt,     0, sizeof(P.salt));
-+	memset(P.personal, 0, sizeof(P.personal));
-+	blake2b_init_param(S, &P);
-+}
-+
-+static void blake2b_init_key(struct blake2b_state *S, size_t outlen,
-+			     const void *key, size_t keylen)
-+{
-+	struct blake2b_param P;
-+
-+	P.digest_length = (u8)outlen;
-+	P.key_length    = (u8)keylen;
-+	P.fanout        = 1;
-+	P.depth         = 1;
-+	P.leaf_length   = 0;
-+	P.node_offset   = 0;
-+	P.xof_length    = 0;
-+	P.node_depth    = 0;
-+	P.inner_length  = 0;
-+	memset(P.reserved, 0, sizeof(P.reserved));
-+	memset(P.salt,     0, sizeof(P.salt));
-+	memset(P.personal, 0, sizeof(P.personal));
-+
-+	blake2b_init_param(S, &P);
-+
-+	{
-+		u8 block[BLAKE2B_BLOCKBYTES];
-+
-+		memset(block, 0, BLAKE2B_BLOCKBYTES);
-+		memcpy(block, key, keylen);
-+		blake2b_update(S, block, BLAKE2B_BLOCKBYTES);
-+		memzero_explicit(block, BLAKE2B_BLOCKBYTES);
-+	}
-+}
-+
-+#define G(r,i,a,b,c,d)                                  \
-+	do {                                            \
-+		a = a + b + m[blake2b_sigma[r][2*i+0]]; \
-+		d = ror64(d ^ a, 32);                   \
-+		c = c + d;                              \
-+		b = ror64(b ^ c, 24);                   \
-+		a = a + b + m[blake2b_sigma[r][2*i+1]]; \
-+		d = ror64(d ^ a, 16);                   \
-+		c = c + d;                              \
-+		b = ror64(b ^ c, 63);                   \
-+	} while (0)
-+
-+#define ROUND(r)                                \
-+	do {                                    \
-+		G(r,0,v[ 0],v[ 4],v[ 8],v[12]); \
-+		G(r,1,v[ 1],v[ 5],v[ 9],v[13]); \
-+		G(r,2,v[ 2],v[ 6],v[10],v[14]); \
-+		G(r,3,v[ 3],v[ 7],v[11],v[15]); \
-+		G(r,4,v[ 0],v[ 5],v[10],v[15]); \
-+		G(r,5,v[ 1],v[ 6],v[11],v[12]); \
-+		G(r,6,v[ 2],v[ 7],v[ 8],v[13]); \
-+		G(r,7,v[ 3],v[ 4],v[ 9],v[14]); \
-+	} while (0)
-+
-+static void blake2b_compress(struct blake2b_state *S,
-+			     const u8 block[BLAKE2B_BLOCKBYTES])
-+{
-+	u64 m[16];
-+	u64 v[16];
-+	size_t i;
-+
-+	for (i = 0; i < 16; ++i)
-+		m[i] = get_unaligned_le64(block + i * sizeof(m[i]));
-+
-+	for (i = 0; i < 8; ++i)
-+		v[i] = S->h[i];
-+
-+	v[ 8] = blake2b_IV[0];
-+	v[ 9] = blake2b_IV[1];
-+	v[10] = blake2b_IV[2];
-+	v[11] = blake2b_IV[3];
-+	v[12] = blake2b_IV[4] ^ S->t[0];
-+	v[13] = blake2b_IV[5] ^ S->t[1];
-+	v[14] = blake2b_IV[6] ^ S->f[0];
-+	v[15] = blake2b_IV[7] ^ S->f[1];
-+
-+	ROUND(0);
-+	ROUND(1);
-+	ROUND(2);
-+	ROUND(3);
-+	ROUND(4);
-+	ROUND(5);
-+	ROUND(6);
-+	ROUND(7);
-+	ROUND(8);
-+	ROUND(9);
-+	ROUND(10);
-+	ROUND(11);
-+
-+	for (i = 0; i < 8; ++i)
-+		S->h[i] = S->h[i] ^ v[i] ^ v[i + 8];
-+}
-+
-+#undef G
-+#undef ROUND
-+
-+static void blake2b_update(struct blake2b_state *S, const void *pin, size_t inlen)
-+{
-+	const u8 *in = (const u8 *)pin;
-+
-+	if (inlen > 0) {
-+		size_t left = S->buflen;
-+		size_t fill = BLAKE2B_BLOCKBYTES - left;
-+
-+		if (inlen > fill) {
-+			S->buflen = 0;
-+			/* Fill buffer */
-+			memcpy(S->buf + left, in, fill);
-+			blake2b_increment_counter(S, BLAKE2B_BLOCKBYTES);
-+			/* Compress */
-+			blake2b_compress(S, S->buf);
-+			in += fill;
-+			inlen -= fill;
-+			while (inlen > BLAKE2B_BLOCKBYTES) {
-+				blake2b_increment_counter(S, BLAKE2B_BLOCKBYTES);
-+				blake2b_compress(S, in);
-+				in += BLAKE2B_BLOCKBYTES;
-+				inlen -= BLAKE2B_BLOCKBYTES;
-+			}
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index c39e39e55dc2..0f956780a673 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -4022,6 +4022,34 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 		.alg = "authenc(hmac(sha512),rfc3686(ctr(aes)))",
+ 		.test = alg_test_null,
+ 		.fips_allowed = 1,
++	}, {
++		.alg = "blake2b-160",
++		.test = alg_test_hash,
++		.fips_allowed = 0,
++		.suite = {
++			.hash = __VECS(blake2b_160_tv_template)
 +		}
-+		memcpy(S->buf + S->buflen, in, inlen);
-+		S->buflen += inlen;
-+	}
-+}
-+
-+static void blake2b_final(struct blake2b_state *S, void *out, size_t outlen)
-+{
-+	u8 buffer[BLAKE2B_OUTBYTES] = {0};
-+	size_t i;
-+
-+	blake2b_increment_counter(S, S->buflen);
-+	blake2b_set_lastblock(S);
-+	/* Padding */
-+	memset(S->buf + S->buflen, 0, BLAKE2B_BLOCKBYTES - S->buflen);
-+	blake2b_compress(S, S->buf);
-+
-+	/* Output full hash to temp buffer */
-+	for (i = 0; i < 8; ++i)
-+		put_unaligned_le64(S->h[i], buffer + sizeof(S->h[i]) * i);
-+
-+	memcpy(out, buffer, S->outlen);
-+	memzero_explicit(buffer, sizeof(buffer));
-+}
-+
-+struct digest_tfm_ctx {
-+	u8 key[BLAKE2B_KEYBYTES];
-+	unsigned int keylen;
-+};
-+
-+static int digest_setkey(struct crypto_shash *tfm, const u8 *key,
-+			 unsigned int keylen)
-+{
-+	struct digest_tfm_ctx *mctx = crypto_shash_ctx(tfm);
-+
-+	if (keylen == 0 || keylen > BLAKE2B_KEYBYTES) {
-+		crypto_shash_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
-+		return -EINVAL;
-+	}
-+
-+	memcpy(mctx->key, key, keylen);
-+	mctx->keylen = keylen;
-+
-+	return 0;
-+}
-+
-+static int digest_init(struct shash_desc *desc)
-+{
-+	struct digest_tfm_ctx *mctx = crypto_shash_ctx(desc->tfm);
-+	struct blake2b_state *state = shash_desc_ctx(desc);
-+	const int digestsize = crypto_shash_digestsize(desc->tfm);
-+
-+	if (mctx->keylen == 0)
-+		blake2b_init(state, digestsize);
-+	else
-+		blake2b_init_key(state, digestsize, mctx->key, mctx->keylen);
-+	return 0;
-+}
-+
-+static int digest_update(struct shash_desc *desc, const u8 *data,
-+			 unsigned int length)
-+{
-+	struct blake2b_state *state = shash_desc_ctx(desc);
-+
-+	blake2b_update(state, data, length);
-+	return 0;
-+}
-+
-+static int digest_final(struct shash_desc *desc, u8 *out)
-+{
-+	struct blake2b_state *state = shash_desc_ctx(desc);
-+	const int digestsize = crypto_shash_digestsize(desc->tfm);
-+
-+	blake2b_final(state, out, digestsize);
-+	return 0;
-+}
-+
-+static struct shash_alg blake2b_algs[] = {
-+	{
-+		.base.cra_name		= "blake2b-160",
-+		.base.cra_driver_name	= "blake2b-160-generic",
-+		.base.cra_priority	= 100,
-+		.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
-+		.base.cra_blocksize	= BLAKE2B_BLOCKBYTES,
-+		.base.cra_ctxsize	= sizeof(struct digest_tfm_ctx),
-+		.base.cra_module	= THIS_MODULE,
-+		.digestsize		= BLAKE2B_160_DIGEST_SIZE,
-+		.setkey			= digest_setkey,
-+		.init			= digest_init,
-+		.update			= digest_update,
-+		.final			= digest_final,
-+		.descsize		= sizeof(struct blake2b_state),
 +	}, {
-+		.base.cra_name		= "blake2b-256",
-+		.base.cra_driver_name	= "blake2b-256-generic",
-+		.base.cra_priority	= 100,
-+		.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
-+		.base.cra_blocksize	= BLAKE2B_BLOCKBYTES,
-+		.base.cra_ctxsize	= sizeof(struct digest_tfm_ctx),
-+		.base.cra_module	= THIS_MODULE,
-+		.digestsize		= BLAKE2B_256_DIGEST_SIZE,
-+		.setkey			= digest_setkey,
-+		.init			= digest_init,
-+		.update			= digest_update,
-+		.final			= digest_final,
-+		.descsize		= sizeof(struct blake2b_state),
++		.alg = "blake2b-256",
++		.test = alg_test_hash,
++		.fips_allowed = 0,
++		.suite = {
++			.hash = __VECS(blake2b_256_tv_template)
++		}
 +	}, {
-+		.base.cra_name		= "blake2b-384",
-+		.base.cra_driver_name	= "blake2b-384-generic",
-+		.base.cra_priority	= 100,
-+		.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
-+		.base.cra_blocksize	= BLAKE2B_BLOCKBYTES,
-+		.base.cra_ctxsize	= sizeof(struct digest_tfm_ctx),
-+		.base.cra_module	= THIS_MODULE,
-+		.digestsize		= BLAKE2B_384_DIGEST_SIZE,
-+		.setkey			= digest_setkey,
-+		.init			= digest_init,
-+		.update			= digest_update,
-+		.final			= digest_final,
-+		.descsize		= sizeof(struct blake2b_state),
++		.alg = "blake2b-384",
++		.test = alg_test_hash,
++		.fips_allowed = 0,
++		.suite = {
++			.hash = __VECS(blake2b_384_tv_template)
++		}
 +	}, {
-+		.base.cra_name		= "blake2b-512",
-+		.base.cra_driver_name	= "blake2b-512-generic",
-+		.base.cra_priority	= 100,
-+		.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
-+		.base.cra_blocksize	= BLAKE2B_BLOCKBYTES,
-+		.base.cra_ctxsize	= sizeof(struct digest_tfm_ctx),
-+		.base.cra_module	= THIS_MODULE,
-+		.digestsize		= BLAKE2B_512_DIGEST_SIZE,
-+		.setkey			= digest_setkey,
-+		.init			= digest_init,
-+		.update			= digest_update,
-+		.final			= digest_final,
-+		.descsize		= sizeof(struct blake2b_state),
-+	}
-+};
++		.alg = "blake2b-512",
++		.test = alg_test_hash,
++		.fips_allowed = 0,
++		.suite = {
++			.hash = __VECS(blake2b_512_tv_template)
++		}
+ 	}, {
+ 		.alg = "cbc(aes)",
+ 		.test = alg_test_skcipher,
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index ef7d21f39d4a..6e70dfefaebf 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -31567,4 +31567,311 @@ static const struct aead_testvec essiv_hmac_sha256_aes_cbc_tv_temp[] = {
+ 	},
+ };
+ 
++static const char blake2b_ordered_sequence[] =
++	"\x00\x01\x02\x03\x04\x05\x06\x07"
++	"\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f"
++	"\x10\x11\x12\x13\x14\x15\x16\x17"
++	"\x18\x19\x1a\x1b\x1c\x1d\x1e\x1f"
++	"\x20\x21\x22\x23\x24\x25\x26\x27"
++	"\x28\x29\x2a\x2b\x2c\x2d\x2e\x2f"
++	"\x30\x31\x32\x33\x34\x35\x36\x37"
++	"\x38\x39\x3a\x3b\x3c\x3d\x3e\x3f"
++	"\x40\x41\x42\x43\x44\x45\x46\x47"
++	"\x48\x49\x4a\x4b\x4c\x4d\x4e\x4f"
++	"\x50\x51\x52\x53\x54\x55\x56\x57"
++	"\x58\x59\x5a\x5b\x5c\x5d\x5e\x5f"
++	"\x60\x61\x62\x63\x64\x65\x66\x67"
++	"\x68\x69\x6a\x6b\x6c\x6d\x6e\x6f"
++	"\x70\x71\x72\x73\x74\x75\x76\x77"
++	"\x78\x79\x7a\x7b\x7c\x7d\x7e\x7f"
++	"\x80\x81\x82\x83\x84\x85\x86\x87"
++	"\x88\x89\x8a\x8b\x8c\x8d\x8e\x8f"
++	"\x90\x91\x92\x93\x94\x95\x96\x97"
++	"\x98\x99\x9a\x9b\x9c\x9d\x9e\x9f"
++	"\xa0\xa1\xa2\xa3\xa4\xa5\xa6\xa7"
++	"\xa8\xa9\xaa\xab\xac\xad\xae\xaf"
++	"\xb0\xb1\xb2\xb3\xb4\xb5\xb6\xb7"
++	"\xb8\xb9\xba\xbb\xbc\xbd\xbe\xbf"
++	"\xc0\xc1\xc2\xc3\xc4\xc5\xc6\xc7"
++	"\xc8\xc9\xca\xcb\xcc\xcd\xce\xcf"
++	"\xd0\xd1\xd2\xd3\xd4\xd5\xd6\xd7"
++	"\xd8\xd9\xda\xdb\xdc\xdd\xde\xdf"
++	"\xe0\xe1\xe2\xe3\xe4\xe5\xe6\xe7"
++	"\xe8\xe9\xea\xeb\xec\xed\xee\xef"
++	"\xf0\xf1\xf2\xf3\xf4\xf5\xf6\xf7"
++	"\xf8\xf9\xfa\xfb\xfc\xfd\xfe\xff";
 +
-+static int __init blake2b_mod_init(void)
-+{
-+	BUILD_BUG_ON(sizeof(struct blake2b_param) != BLAKE2B_OUTBYTES);
++static const struct hash_testvec blake2b_160_tv_template[] = {{
++	.digest = (u8[]){ 0x33, 0x45, 0x52, 0x4a, 0xbf, 0x6b, 0xbe, 0x18,
++			  0x09, 0x44, 0x92, 0x24, 0xb5, 0x97, 0x2c, 0x41,
++			  0x79, 0x0b, 0x6c, 0xf2, },
++}, {
++	.plaintext = blake2b_ordered_sequence,
++	.psize = 64,
++	.digest = (u8[]){ 0x11, 0xcc, 0x66, 0x61, 0xe9, 0x22, 0xb0, 0xe4,
++			  0x07, 0xe0, 0xa5, 0x72, 0x49, 0xc3, 0x8d, 0x4f,
++			  0xf7, 0x6d, 0x8e, 0xc8, },
++}, {
++	.ksize = 32,
++	.key = blake2b_ordered_sequence,
++	.plaintext = blake2b_ordered_sequence,
++	.psize = 1,
++	.digest = (u8[]){ 0x31, 0xe3, 0xd9, 0xd5, 0x4e, 0x72, 0xd8, 0x0b,
++			  0x2b, 0x3b, 0xd7, 0x6b, 0x82, 0x7a, 0x1d, 0xfb,
++			  0x56, 0x2f, 0x79, 0x4c, },
++}, {
++	.ksize = 64,
++	.key = blake2b_ordered_sequence,
++	.plaintext = blake2b_ordered_sequence,
++	.psize = 7,
++	.digest = (u8[]){ 0x28, 0x20, 0xd1, 0xbe, 0x7f, 0xcc, 0xc1, 0x62,
++			  0xd9, 0x0d, 0x9a, 0x4b, 0x47, 0xd1, 0x5e, 0x04,
++			  0x74, 0x2a, 0x53, 0x17, },
++}, {
++	.ksize = 1,
++	.key = "B",
++	.plaintext = blake2b_ordered_sequence,
++	.psize = 15,
++	.digest = (u8[]){ 0x45, 0xe9, 0x95, 0xb6, 0xc4, 0xe8, 0x22, 0xea,
++			  0xfe, 0xd2, 0x37, 0xdb, 0x46, 0xbf, 0xf1, 0x25,
++			  0xd5, 0x03, 0x1d, 0x81, },
++}, {
++	.ksize = 32,
++	.key = blake2b_ordered_sequence,
++	.plaintext = blake2b_ordered_sequence,
++	.psize = 247,
++	.digest = (u8[]){ 0x7e, 0xb9, 0xf2, 0x9b, 0x2f, 0xc2, 0x01, 0xd4,
++			  0xb0, 0x4f, 0x08, 0x2b, 0x8e, 0xbd, 0x06, 0xef,
++			  0x1c, 0xc4, 0x25, 0x95, },
++}, {
++	.ksize = 64,
++	.key = blake2b_ordered_sequence,
++	.plaintext = blake2b_ordered_sequence,
++	.psize = 256,
++	.digest = (u8[]){ 0x6e, 0x35, 0x01, 0x70, 0xbf, 0xb6, 0xc4, 0xba,
++			  0x33, 0x1b, 0xa6, 0xd3, 0xc2, 0x5d, 0xb4, 0x03,
++			  0x95, 0xaf, 0x29, 0x16, },
++}};
 +
-+	return crypto_register_shashes(blake2b_algs, ARRAY_SIZE(blake2b_algs));
-+}
++static const struct hash_testvec blake2b_256_tv_template[] = {{
++	.plaintext = blake2b_ordered_sequence,
++	.psize = 7,
++	.digest = (u8[]){ 0x9d, 0xf1, 0x4b, 0x72, 0x48, 0x76, 0x4a, 0x86,
++			  0x91, 0x97, 0xc3, 0x5e, 0x39, 0x2d, 0x2a, 0x6d,
++			  0x6f, 0xdc, 0x5b, 0x79, 0xd5, 0x97, 0x29, 0x79,
++			  0x20, 0xfd, 0x3f, 0x14, 0x91, 0xb4, 0x42, 0xd2, },
++}, {
++	.plaintext = blake2b_ordered_sequence,
++	.psize = 256,
++	.digest = (u8[]){ 0x39, 0xa7, 0xeb, 0x9f, 0xed, 0xc1, 0x9a, 0xab,
++			  0xc8, 0x34, 0x25, 0xc6, 0x75, 0x5d, 0xd9, 0x0e,
++			  0x6f, 0x9d, 0x0c, 0x80, 0x49, 0x64, 0xa1, 0xf4,
++			  0xaa, 0xee, 0xa3, 0xb9, 0xfb, 0x59, 0x98, 0x35, },
++}, {
++	.ksize = 1,
++	.key = "B",
++	.digest = (u8[]){ 0xc3, 0x08, 0xb1, 0xbf, 0xe4, 0xf9, 0xbc, 0xb4,
++			  0x75, 0xaf, 0x3f, 0x59, 0x6e, 0xae, 0xde, 0x6a,
++			  0xa3, 0x8e, 0xb5, 0x94, 0xad, 0x30, 0xf0, 0x17,
++			  0x1c, 0xfb, 0xd8, 0x3e, 0x8a, 0xbe, 0xed, 0x9c, },
++}, {
++	.ksize = 64,
++	.key = blake2b_ordered_sequence,
++	.plaintext = blake2b_ordered_sequence,
++	.psize = 1,
++	.digest = (u8[]){ 0x34, 0x75, 0x8b, 0x64, 0x71, 0x35, 0x62, 0x82,
++			  0x97, 0xfb, 0x09, 0xc7, 0x93, 0x0c, 0xd0, 0x4e,
++			  0x95, 0x28, 0xe5, 0x66, 0x91, 0x12, 0xf5, 0xb1,
++			  0x31, 0x84, 0x93, 0xe1, 0x4d, 0xe7, 0x7e, 0x55, },
++}, {
++	.ksize = 32,
++	.key = blake2b_ordered_sequence,
++	.plaintext = blake2b_ordered_sequence,
++	.psize = 15,
++	.digest = (u8[]){ 0xce, 0x74, 0xa9, 0x2e, 0xe9, 0x40, 0x3d, 0xa2,
++			  0x11, 0x4a, 0x99, 0x25, 0x7a, 0x34, 0x5d, 0x35,
++			  0xdf, 0x6a, 0x48, 0x79, 0x2a, 0x93, 0x93, 0xff,
++			  0x1f, 0x3c, 0x39, 0xd0, 0x71, 0x1f, 0x20, 0x7b, },
++}, {
++	.ksize = 1,
++	.key = "B",
++	.plaintext = blake2b_ordered_sequence,
++	.psize = 64,
++	.digest = (u8[]){ 0x2e, 0x84, 0xdb, 0xa2, 0x5f, 0x0e, 0xe9, 0x52,
++			  0x79, 0x50, 0x69, 0x9f, 0xf1, 0xfd, 0xfc, 0x9d,
++			  0x89, 0x83, 0xa9, 0xb6, 0xa4, 0xd5, 0xfa, 0xb5,
++			  0xbe, 0x35, 0x1a, 0x17, 0x8a, 0x2c, 0x7f, 0x7d, },
++}, {
++	.ksize = 64,
++	.key = blake2b_ordered_sequence,
++	.plaintext = blake2b_ordered_sequence,
++	.psize = 247,
++	.digest = (u8[]){ 0x2e, 0x26, 0xf0, 0x09, 0x02, 0x65, 0x90, 0x09,
++			  0xcc, 0xf5, 0x4c, 0x44, 0x74, 0x0e, 0xa0, 0xa8,
++			  0x25, 0x4a, 0xda, 0x61, 0x56, 0x95, 0x7d, 0x3f,
++			  0x6d, 0xc0, 0x43, 0x17, 0x95, 0x89, 0xcd, 0x9d, },
++}};
 +
-+static void __exit blake2b_mod_fini(void)
-+{
-+	crypto_unregister_shashes(blake2b_algs, ARRAY_SIZE(blake2b_algs));
-+}
++static const struct hash_testvec blake2b_384_tv_template[] = {{
++	.plaintext = blake2b_ordered_sequence,
++	.psize = 1,
++	.digest = (u8[]){ 0xcc, 0x01, 0x08, 0x85, 0x36, 0xf7, 0x84, 0xf0,
++			  0xbb, 0x76, 0x9e, 0x41, 0xc4, 0x95, 0x7b, 0x6d,
++			  0x0c, 0xde, 0x1f, 0xcc, 0x8c, 0xf1, 0xd9, 0x1f,
++			  0xc4, 0x77, 0xd4, 0xdd, 0x6e, 0x3f, 0xbf, 0xcd,
++			  0x43, 0xd1, 0x69, 0x8d, 0x14, 0x6f, 0x34, 0x8b,
++			  0x2c, 0x36, 0xa3, 0x39, 0x68, 0x2b, 0xec, 0x3f, },
++}, {
++	.plaintext = blake2b_ordered_sequence,
++	.psize = 247,
++	.digest = (u8[]){ 0xc8, 0xf8, 0xf0, 0xa2, 0x69, 0xfa, 0xcc, 0x4d,
++			  0x32, 0x5f, 0x13, 0x88, 0xca, 0x71, 0x99, 0x8f,
++			  0xf7, 0x30, 0x41, 0x5d, 0x6e, 0x34, 0xb7, 0x6e,
++			  0x3e, 0xd0, 0x46, 0xb6, 0xca, 0x30, 0x66, 0xb2,
++			  0x6f, 0x0c, 0x35, 0x54, 0x17, 0xcd, 0x26, 0x1b,
++			  0xef, 0x48, 0x98, 0xe0, 0x56, 0x7c, 0x05, 0xd2, },
++}, {
++	.ksize = 32,
++	.key = blake2b_ordered_sequence,
++	.digest = (u8[]){ 0x15, 0x09, 0x7a, 0x90, 0x13, 0x23, 0xab, 0x0c,
++			  0x0b, 0x43, 0x21, 0x9a, 0xb5, 0xc6, 0x0c, 0x2e,
++			  0x7c, 0x57, 0xfc, 0xcc, 0x4b, 0x0f, 0xf0, 0x57,
++			  0xb7, 0x9c, 0xe7, 0x0f, 0xe1, 0x57, 0xac, 0x37,
++			  0x77, 0xd4, 0xf4, 0x2f, 0x03, 0x3b, 0x64, 0x09,
++			  0x84, 0xa0, 0xb3, 0x24, 0xb7, 0xae, 0x47, 0x5e, },
++}, {
++	.ksize = 1,
++	.key = "B",
++	.plaintext = blake2b_ordered_sequence,
++	.psize = 7,
++	.digest = (u8[]){ 0x0b, 0x82, 0x88, 0xca, 0x05, 0x2f, 0x1b, 0x15,
++			  0xdc, 0xbb, 0x22, 0x27, 0x11, 0x6b, 0xf4, 0xd1,
++			  0xe9, 0x8f, 0x1b, 0x0b, 0x58, 0x3f, 0x5e, 0x86,
++			  0x80, 0x82, 0x6f, 0x8e, 0x54, 0xc1, 0x9f, 0x12,
++			  0xcf, 0xe9, 0x56, 0xc1, 0xfc, 0x1a, 0x08, 0xb9,
++			  0x4a, 0x57, 0x0a, 0x76, 0x3c, 0x15, 0x33, 0x18, },
++}, {
++	.ksize = 64,
++	.key = blake2b_ordered_sequence,
++	.plaintext = blake2b_ordered_sequence,
++	.psize = 15,
++	.digest = (u8[]){ 0x4a, 0x81, 0x55, 0xb9, 0x79, 0x42, 0x8c, 0xc6,
++			  0x4f, 0xfe, 0xca, 0x82, 0x3b, 0xb2, 0xf7, 0xbc,
++			  0x5e, 0xfc, 0xab, 0x09, 0x1c, 0xd6, 0x3b, 0xe1,
++			  0x50, 0x82, 0x3b, 0xde, 0xc7, 0x06, 0xee, 0x3b,
++			  0x29, 0xce, 0xe5, 0x68, 0xe0, 0xff, 0xfa, 0xe1,
++			  0x7a, 0xf1, 0xc0, 0xfe, 0x57, 0xf4, 0x60, 0x49, },
++}, {
++	.ksize = 32,
++	.key = blake2b_ordered_sequence,
++	.plaintext = blake2b_ordered_sequence,
++	.psize = 64,
++	.digest = (u8[]){ 0x34, 0xbd, 0xe1, 0x99, 0x43, 0x9f, 0x82, 0x72,
++			  0xe7, 0xed, 0x94, 0x9e, 0xe1, 0x84, 0xee, 0x82,
++			  0xfd, 0x26, 0x23, 0xc4, 0x17, 0x8d, 0xf5, 0x04,
++			  0xeb, 0xb7, 0xbc, 0xb8, 0xf3, 0x68, 0xb7, 0xad,
++			  0x94, 0x8e, 0x05, 0x3f, 0x8a, 0x5d, 0x8d, 0x81,
++			  0x3e, 0x88, 0xa7, 0x8c, 0xa2, 0xd5, 0xdc, 0x76, },
++}, {
++	.ksize = 1,
++	.key = "B",
++	.plaintext = blake2b_ordered_sequence,
++	.psize = 256,
++	.digest = (u8[]){ 0x22, 0x14, 0xf4, 0xb0, 0x4c, 0xa8, 0xb5, 0x7d,
++			  0xa7, 0x5c, 0x04, 0xeb, 0xd8, 0x8d, 0x04, 0x71,
++			  0xc7, 0x3c, 0xc7, 0x6e, 0x8b, 0x20, 0x36, 0x40,
++			  0x9d, 0xd0, 0x60, 0xc6, 0xe3, 0x0b, 0x6e, 0x50,
++			  0xf5, 0xaf, 0xf5, 0xc6, 0x3b, 0xe3, 0x84, 0x6a,
++			  0x93, 0x1b, 0x12, 0xd6, 0x18, 0x27, 0xba, 0x36, },
++}};
 +
-+subsys_initcall(blake2b_mod_init);
-+module_exit(blake2b_mod_fini);
++static const struct hash_testvec blake2b_512_tv_template[] = {{
++	.plaintext = blake2b_ordered_sequence,
++	.psize = 15,
++	.digest = (u8[]){ 0x44, 0x4b, 0x24, 0x0f, 0xe3, 0xed, 0x86, 0xd0,
++			  0xe2, 0xef, 0x4c, 0xe7, 0xd8, 0x51, 0xed, 0xde,
++			  0x22, 0x15, 0x55, 0x82, 0xaa, 0x09, 0x14, 0x79,
++			  0x7b, 0x72, 0x6c, 0xd0, 0x58, 0xb6, 0xf4, 0x59,
++			  0x32, 0xe0, 0xe1, 0x29, 0x51, 0x68, 0x76, 0x52,
++			  0x7b, 0x1d, 0xd8, 0x8f, 0xc6, 0x6d, 0x71, 0x19,
++			  0xf4, 0xab, 0x3b, 0xed, 0x93, 0xa6, 0x1a, 0x0e,
++			  0x2d, 0x2d, 0x2a, 0xea, 0xc3, 0x36, 0xd9, 0x58, },
++}, {
++	.ksize = 64,
++	.key = blake2b_ordered_sequence,
++	.digest = (u8[]){ 0x10, 0xeb, 0xb6, 0x77, 0x00, 0xb1, 0x86, 0x8e,
++			  0xfb, 0x44, 0x17, 0x98, 0x7a, 0xcf, 0x46, 0x90,
++			  0xae, 0x9d, 0x97, 0x2f, 0xb7, 0xa5, 0x90, 0xc2,
++			  0xf0, 0x28, 0x71, 0x79, 0x9a, 0xaa, 0x47, 0x86,
++			  0xb5, 0xe9, 0x96, 0xe8, 0xf0, 0xf4, 0xeb, 0x98,
++			  0x1f, 0xc2, 0x14, 0xb0, 0x05, 0xf4, 0x2d, 0x2f,
++			  0xf4, 0x23, 0x34, 0x99, 0x39, 0x16, 0x53, 0xdf,
++			  0x7a, 0xef, 0xcb, 0xc1, 0x3f, 0xc5, 0x15, 0x68, },
++}, {
++	.ksize = 1,
++	.key = "B",
++	.plaintext = blake2b_ordered_sequence,
++	.psize = 1,
++	.digest = (u8[]){ 0xd2, 0x11, 0x31, 0x29, 0x3f, 0xea, 0xca, 0x72,
++			  0x21, 0xe4, 0x06, 0x65, 0x05, 0x2a, 0xd1, 0x02,
++			  0xc0, 0x8d, 0x7b, 0xf1, 0x09, 0x3c, 0xef, 0x88,
++			  0xe1, 0x68, 0x0c, 0xf1, 0x3b, 0xa4, 0xe3, 0x03,
++			  0xed, 0xa0, 0xe3, 0x60, 0x58, 0xa0, 0xdb, 0x52,
++			  0x8a, 0x66, 0x43, 0x09, 0x60, 0x1a, 0xbb, 0x67,
++			  0xc5, 0x84, 0x31, 0x40, 0xfa, 0xde, 0xc1, 0xd0,
++			  0xff, 0x3f, 0x4a, 0x69, 0xd9, 0x92, 0x26, 0x86, },
++}, {
++	.ksize = 32,
++	.key = blake2b_ordered_sequence,
++	.plaintext = blake2b_ordered_sequence,
++	.psize = 7,
++	.digest = (u8[]){ 0xa3, 0x3e, 0x50, 0xbc, 0xfb, 0xd9, 0xf0, 0x82,
++			  0xa6, 0xd1, 0xdf, 0xaf, 0x82, 0xd0, 0xcf, 0x84,
++			  0x9a, 0x25, 0x3c, 0xae, 0x6d, 0xb5, 0xaf, 0x01,
++			  0xd7, 0xaf, 0xed, 0x50, 0xdc, 0xe2, 0xba, 0xcc,
++			  0x8c, 0x38, 0xf5, 0x16, 0x89, 0x38, 0x86, 0xce,
++			  0x68, 0x10, 0x63, 0x64, 0xa5, 0x79, 0x53, 0xb5,
++			  0x2e, 0x8e, 0xbc, 0x0a, 0xce, 0x95, 0xc0, 0x1e,
++			  0x69, 0x59, 0x1d, 0x3b, 0xd8, 0x19, 0x90, 0xd7, },
++}, {
++	.ksize = 64,
++	.key = blake2b_ordered_sequence,
++	.plaintext = blake2b_ordered_sequence,
++	.psize = 64,
++	.digest = (u8[]){ 0x65, 0x67, 0x6d, 0x80, 0x06, 0x17, 0x97, 0x2f,
++			  0xbd, 0x87, 0xe4, 0xb9, 0x51, 0x4e, 0x1c, 0x67,
++			  0x40, 0x2b, 0x7a, 0x33, 0x10, 0x96, 0xd3, 0xbf,
++			  0xac, 0x22, 0xf1, 0xab, 0xb9, 0x53, 0x74, 0xab,
++			  0xc9, 0x42, 0xf1, 0x6e, 0x9a, 0xb0, 0xea, 0xd3,
++			  0x3b, 0x87, 0xc9, 0x19, 0x68, 0xa6, 0xe5, 0x09,
++			  0xe1, 0x19, 0xff, 0x07, 0x78, 0x7b, 0x3e, 0xf4,
++			  0x83, 0xe1, 0xdc, 0xdc, 0xcf, 0x6e, 0x30, 0x22, },
++}, {
++	.ksize = 1,
++	.key = "B",
++	.plaintext = blake2b_ordered_sequence,
++	.psize = 247,
++	.digest = (u8[]){ 0xc2, 0x96, 0x2c, 0x6b, 0x84, 0xff, 0xee, 0xea,
++			  0x9b, 0xb8, 0x55, 0x2d, 0x6b, 0xa5, 0xd5, 0xe5,
++			  0xbd, 0xb1, 0x54, 0xb6, 0x1e, 0xfb, 0x63, 0x16,
++			  0x6e, 0x22, 0x04, 0xf0, 0x82, 0x7a, 0xc6, 0x99,
++			  0xf7, 0x4c, 0xff, 0x93, 0x71, 0x57, 0x64, 0xd0,
++			  0x08, 0x60, 0x39, 0x98, 0xb8, 0xd2, 0x2b, 0x4e,
++			  0x81, 0x8d, 0xe4, 0x8f, 0xb2, 0x1e, 0x8f, 0x99,
++			  0x98, 0xf1, 0x02, 0x9b, 0x4c, 0x7c, 0x97, 0x1a, },
++}, {
++	.ksize = 32,
++	.key = blake2b_ordered_sequence,
++	.plaintext = blake2b_ordered_sequence,
++	.psize = 256,
++	.digest = (u8[]){ 0x0f, 0x32, 0x05, 0x09, 0xad, 0x9f, 0x25, 0xf7,
++			  0xf2, 0x00, 0x71, 0xc9, 0x9f, 0x08, 0x58, 0xd1,
++			  0x67, 0xc3, 0xa6, 0x2c, 0x0d, 0xe5, 0x7c, 0x15,
++			  0x35, 0x18, 0x5a, 0x68, 0xc1, 0xca, 0x1c, 0x6e,
++			  0x0f, 0xc4, 0xf6, 0x0c, 0x43, 0xe1, 0xb4, 0x3d,
++			  0x28, 0xe4, 0xc7, 0xa1, 0xcf, 0x6b, 0x17, 0x4e,
++			  0xf1, 0x5b, 0xb5, 0x53, 0xd4, 0xa7, 0xd0, 0x5b,
++			  0xae, 0x15, 0x81, 0x15, 0xd0, 0x88, 0xa0, 0x3c, },
++}};
 +
-+MODULE_AUTHOR("David Sterba <kdave@kernel.org>");
-+MODULE_DESCRIPTION("BLAKE2b generic implementation");
-+MODULE_LICENSE("GPL");
-+MODULE_ALIAS_CRYPTO("blake2b-160");
-+MODULE_ALIAS_CRYPTO("blake2b-160-generic");
-+MODULE_ALIAS_CRYPTO("blake2b-256");
-+MODULE_ALIAS_CRYPTO("blake2b-256-generic");
-+MODULE_ALIAS_CRYPTO("blake2b-384");
-+MODULE_ALIAS_CRYPTO("blake2b-384-generic");
-+MODULE_ALIAS_CRYPTO("blake2b-512");
-+MODULE_ALIAS_CRYPTO("blake2b-512-generic");
-diff --git a/include/crypto/blake2b.h b/include/crypto/blake2b.h
-new file mode 100644
-index 000000000000..5ec3d213f024
---- /dev/null
-+++ b/include/crypto/blake2b.h
-@@ -0,0 +1,46 @@
-+/* SPDX-License-Identifier: (GPL-2.0-only OR Apache-2.0) */
-+/*
-+ * BLAKE2 reference source code package - reference C implementations
-+ *
-+ * Copyright 2012, Samuel Neves <sneves@dei.uc.pt>.  You may use this under the
-+ * terms of the CC0, the OpenSSL Licence, or the Apache Public License 2.0, at
-+ * your option.  The terms of these licenses can be found at:
-+ *
-+ * - CC0 1.0 Universal : http://creativecommons.org/publicdomain/zero/1.0
-+ * - OpenSSL license   : https://www.openssl.org/source/license.html
-+ * - Apache 2.0        : http://www.apache.org/licenses/LICENSE-2.0
-+ *
-+ * More information about the BLAKE2 hash function can be found at
-+ * https://blake2.net.
-+ */
-+
-+#ifndef _CRYPTO_BLAKE2B_H
-+#define _CRYPTO_BLAKE2B_H
-+
-+#include <linux/types.h>
-+#include <stddef.h>
-+
-+#define BLAKE2B_160_DIGEST_SIZE		(160 / 8)
-+#define BLAKE2B_256_DIGEST_SIZE		(256 / 8)
-+#define BLAKE2B_384_DIGEST_SIZE		(384 / 8)
-+#define BLAKE2B_512_DIGEST_SIZE		(512 / 8)
-+
-+enum blake2b_constant {
-+	BLAKE2B_BLOCKBYTES    = 128,
-+	BLAKE2B_OUTBYTES      = 64,
-+	BLAKE2B_KEYBYTES      = 64,
-+	BLAKE2B_SALTBYTES     = 16,
-+	BLAKE2B_PERSONALBYTES = 16
-+};
-+
-+struct blake2b_state {
-+	u64      h[8];
-+	u64      t[2];
-+	u64      f[2];
-+	u8       buf[BLAKE2B_BLOCKBYTES];
-+	size_t   buflen;
-+	size_t   outlen;
-+	u8       last_node;
-+};
-+
-+#endif
+ #endif	/* _CRYPTO_TESTMGR_H */
 -- 
 2.23.0
 
