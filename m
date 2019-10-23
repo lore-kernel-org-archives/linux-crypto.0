@@ -2,77 +2,69 @@ Return-Path: <SRS0=Ux5j=YQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76DE9CA9EB6
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 14:08:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53C8CCA9EB6
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 14:39:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4A86621920
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 14:08:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Es8gLIsC"
+	by mail.kernel.org (Postfix) with ESMTP id 33D3C2173B
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 14:39:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388504AbfJWOIz (ORCPT
+        id S2392216AbfJWOjl (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Oct 2019 10:08:55 -0400
-Received: from frisell.zx2c4.com ([192.95.5.64]:58269 "EHLO frisell.zx2c4.com"
+        Wed, 23 Oct 2019 10:39:41 -0400
+Received: from muru.com ([72.249.23.125]:39286 "EHLO muru.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730622AbfJWOIz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Oct 2019 10:08:55 -0400
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id d55c3c44
-        for <linux-crypto@vger.kernel.org>;
-        Wed, 23 Oct 2019 13:19:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
-        :references:in-reply-to:from:date:message-id:subject:to:cc
-        :content-type; s=mail; bh=gYi7JHyaBWH7zkBXmQlG2HyJa7E=; b=Es8gLI
-        sCJ26X8m8j2fuS6EM3nvDeI4qw3GJ4zxtyc4ZydFngHzgPDJUGwy3ng6ZJC+amSI
-        74ztB3X90BmXFFT7BdXCqpJISacch4/WePEtQfC/D09JCYpNth2UUdAt/YK4+/fy
-        OiGf897uhSz9wJipkNMGU6JKtAQZixYXoYA/UWkmm0yHVdYSc6Yo/Ng6HEVVHqPr
-        MvXnTpprfRLYHBiW5bPRNoDi67K94E89e3ff3aK1exx+r0Ce2lIwp/YTgx4A+8af
-        x9bYhao0XCWdhjNcEEoob2Re3/tUN3JdzULfLqXtXcwgFAxiufrL3y4LnciqBGd9
-        C68+/pEapyFcvnvw==
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id a43bfade (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO)
-        for <linux-crypto@vger.kernel.org>;
-        Wed, 23 Oct 2019 13:19:31 +0000 (UTC)
-Received: by mail-ot1-f49.google.com with SMTP id g13so17506570otp.8
-        for <linux-crypto@vger.kernel.org>; Wed, 23 Oct 2019 07:08:52 -0700 (PDT)
-X-Gm-Message-State: APjAAAW/rssdl5tpsj2xFR/QTA/y/e7sM1++x+X9Kl4ZrcArrndrnHPF
-        Uw9Sd3aWx7DeeoMiUIDsHn1qCqnAQ1Jxj1HxKJY=
-X-Google-Smtp-Source: APXvYqzR5dF/WkFdMG1GcLDtcgLofHVgT4peuofaEiO2g5xoLoDI++KyNLz8ESe2YcHm0oSyx0ANxeAxRGEzM+rEJWI=
-X-Received: by 2002:a9d:7f8d:: with SMTP id t13mr7632788otp.369.1571839730960;
- Wed, 23 Oct 2019 07:08:50 -0700 (PDT)
-MIME-Version: 1.0
-References: <20191017190932.1947-1-ard.biesheuvel@linaro.org>
- <20191017190932.1947-26-ard.biesheuvel@linaro.org> <20191023045511.GC361298@sol.localdomain>
-In-Reply-To: <20191023045511.GC361298@sol.localdomain>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 23 Oct 2019 16:08:39 +0200
-X-Gmail-Original-Message-ID: <CAHmME9oei5_9CpXoeMgD2MO5JWGc=Sm_pXJpmUfOuipbFRSTsg@mail.gmail.com>
-Message-ID: <CAHmME9oei5_9CpXoeMgD2MO5JWGc=Sm_pXJpmUfOuipbFRSTsg@mail.gmail.com>
-Subject: Re: [PATCH v4 25/35] crypto: BLAKE2s - x86_64 SIMD implementation
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        id S2389921AbfJWOjl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 23 Oct 2019 10:39:41 -0400
+Received: from atomide.com (localhost [127.0.0.1])
+        by muru.com (Postfix) with ESMTPS id B4C7480CF;
+        Wed, 23 Oct 2019 14:40:14 +0000 (UTC)
+Date:   Wed, 23 Oct 2019 07:39:36 -0700
+From:   Tony Lindgren <tony@atomide.com>
+To:     Sebastian Reichel <sre@kernel.org>
+Cc:     Arnd Bergmann <arnd@arndb.de>, Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        Samuel Neves <sneves@dei.uc.pt>, Arnd Bergmann <arnd@arndb.de>,
-        Andy Lutomirski <luto@kernel.org>,
-        Martin Willi <martin@strongswan.org>,
-        Rene van Dorst <opensource@vdorst.com>,
-        David Sterba <dsterba@suse.com>
-Content-Type: text/plain; charset="UTF-8"
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Aaro Koskinen <aaro.koskinen@iki.fi>,
+        Adam Ford <aford173@gmail.com>,
+        Pali =?utf-8?B?Um9ow6Fy?= <pali.rohar@gmail.com>,
+        Tero Kristo <t-kristo@ti.com>, Rob Herring <robh@kernel.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] hwrng: omap3-rom - Fix unused function warnings
+Message-ID: <20191023143936.GH5610@atomide.com>
+References: <20191022142741.1794378-1-arnd@arndb.de>
+ <20191023131452.2rilepif7x5lpfma@earth.universe>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191023131452.2rilepif7x5lpfma@earth.universe>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 23, 2019 at 6:55 AM Eric Biggers <ebiggers@kernel.org> wrote:
-> There are no comments in this 685-line assembly language file.
-> Is this the original version, or is it a generated/stripped version?
+* Sebastian Reichel <sre@kernel.org> [191023 13:15]:
+> Hi,
+> 
+> On Tue, Oct 22, 2019 at 04:27:31PM +0200, Arnd Bergmann wrote:
+> > When runtime-pm is disabled, we get a few harmless warnings:
+> > 
+> > drivers/char/hw_random/omap3-rom-rng.c:65:12: error: unused function 'omap_rom_rng_runtime_suspend' [-Werror,-Wunused-function]
+> > drivers/char/hw_random/omap3-rom-rng.c:81:12: error: unused function 'omap_rom_rng_runtime_resume' [-Werror,-Wunused-function]
+> > 
+> > Mark these functions as __maybe_unused so gcc can drop them
+> > silently.
+> > 
+> > Fixes: 8d9d4bdc495f ("hwrng: omap3-rom - Use runtime PM instead of custom functions")
+> > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> > ---
+> 
+> Reviewed-by: Sebastian Reichel <sebastian.reichel@collabora.com>
 
-It looks like Ard forgot to import the latest one from Zinc, which is
-significantly shorter and has other improvements too:
+Thanks for fixing these similar issues again:
 
-https://git.zx2c4.com/WireGuard/tree/src/crypto/zinc/blake2s/blake2s-x86_64.S
+Reviewwed-by: Tony Lindgren <tony@atomide.com>
