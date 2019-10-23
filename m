@@ -2,43 +2,44 @@ Return-Path: <SRS0=Ux5j=YQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 341F1CA9EAE
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 04:41:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DF3CCA9EAE
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 04:52:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0313221872
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 04:41:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 713AD21920
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 04:52:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1571805661;
-	bh=Gi+QwAYSnRq+qc3fWMJPJigkCQq5YPHxeww/sCsCE8Q=;
+	s=default; t=1571806321;
+	bh=47Z1H/p0N2jcwU/x4IbEzZERiJ51lQQcZJ0FyZl862Y=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=RuzF4/FYjMB1iy/mSzy74rij7tfCSu8+RxY2oVAU2Sb/l3EArnvME4ooAQpcuvTBl
-	 0dGgiS5ta2EM4JbWULn6Wt2SkWG7moLa3IeB6gqxCVMNq22e6TysfXa5E6CCcfZwYA
-	 2hWKFPUCFQmRN1MIGx2Hgo0jqxKqFVAM296WtYI8=
+	b=eKk7j55fA0wE9S0EF03Lej4KXQhWIWf3BeFAjdyRsGC5W8VmSed4SwP42bijT5GP/
+	 H9M/UBm369zFqT7iaYtwmwoFz2D4HRyg8Mm/rn4oAXoZ9R/wEfNfu3RXKRIGkIFrK1
+	 oH8/JgUy20Mw5BiGhfgVBqNRXa7nCDZzsMshbra8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731534AbfJWEk7 (ORCPT
+        id S1733169AbfJWEwA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Oct 2019 00:40:59 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57834 "EHLO mail.kernel.org"
+        Wed, 23 Oct 2019 00:52:00 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59562 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731487AbfJWEk7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Oct 2019 00:40:59 -0400
+        id S1733132AbfJWEwA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 23 Oct 2019 00:52:00 -0400
 Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7B9732086D;
-        Wed, 23 Oct 2019 04:40:58 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id D23B82173B;
+        Wed, 23 Oct 2019 04:51:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1571805658;
-        bh=Gi+QwAYSnRq+qc3fWMJPJigkCQq5YPHxeww/sCsCE8Q=;
+        s=default; t=1571806319;
+        bh=47Z1H/p0N2jcwU/x4IbEzZERiJ51lQQcZJ0FyZl862Y=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=2IJkMdhbHtZrT8kRTcM7QDaeofg+r3E7zSGeJQhA+yyv7HW1ZUfR/9b4AeURzUXID
-         IjtctC3h/i8KIf3bNsVR5PtwUqwt3pY+H9NzDttbR2efb2yi+0eio9QfhnJ0er4jbS
-         xlb5M8z3gF0/e6sPba+JdMFWsYaex2RcPmq91ZU4=
-Date:   Tue, 22 Oct 2019 21:40:57 -0700
+        b=DLTytyko2pm1pyusZU+r1+PMj9jpPQzR603MVJjmNAawSR+2RpQVRggV/Q+nxOUqZ
+         c/yJWfIVeZBtfRtegsyZh6fot3dR29pLnegCt0BTTU8Pz6ikk0xQzObwzvzpjQMVin
+         v4rXcdS+PcBTcIcENraXOa/9CIBTs6OeRa+4uu60=
+Date:   Tue, 22 Oct 2019 21:51:57 -0700
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Cc:     linux-crypto@vger.kernel.org,
@@ -50,9 +51,9 @@ Cc:     linux-crypto@vger.kernel.org,
         Martin Willi <martin@strongswan.org>,
         Rene van Dorst <opensource@vdorst.com>,
         David Sterba <dsterba@suse.com>
-Subject: Re: [PATCH v4 04/35] crypto: x86/chacha - expose SIMD ChaCha routine
- as library function
-Message-ID: <20191023044057.GA361298@sol.localdomain>
+Subject: Re: [PATCH v4 22/35] crypto: BLAKE2s - generic C library
+ implementation and selftest
+Message-ID: <20191023045157.GB361298@sol.localdomain>
 Mail-Followup-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -64,35 +65,73 @@ Mail-Followup-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Rene van Dorst <opensource@vdorst.com>,
         David Sterba <dsterba@suse.com>
 References: <20191017190932.1947-1-ard.biesheuvel@linaro.org>
- <20191017190932.1947-5-ard.biesheuvel@linaro.org>
+ <20191017190932.1947-23-ard.biesheuvel@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191017190932.1947-5-ard.biesheuvel@linaro.org>
+In-Reply-To: <20191017190932.1947-23-ard.biesheuvel@linaro.org>
 User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Oct 17, 2019 at 09:09:01PM +0200, Ard Biesheuvel wrote:
-> +void chacha_crypt_arch(u32 *state, u8 *dst, const u8 *src, unsigned int bytes,
-> +		       int nrounds)
+On Thu, Oct 17, 2019 at 09:09:19PM +0200, Ard Biesheuvel wrote:
+> diff --git a/lib/crypto/blake2s-selftest.c b/lib/crypto/blake2s-selftest.c
+> new file mode 100644
+> index 000000000000..7ba00fcc6b60
+> --- /dev/null
+> +++ b/lib/crypto/blake2s-selftest.c
+> @@ -0,0 +1,2093 @@
+> +// SPDX-License-Identifier: GPL-2.0 OR MIT
+> +/*
+> + * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
+> + */
+> +
+> +#include <crypto/blake2s.h>
+> +#include <linux/string.h>
+> +
+> +static const u8 blake2s_testvecs[][BLAKE2S_HASH_SIZE] __initconst = {
+[...]
+> +bool __init blake2s_selftest(void)
 > +{
-> +	state = PTR_ALIGN(state, CHACHA_STATE_ALIGN);
+> +	u8 key[BLAKE2S_KEY_SIZE];
+> +	u8 buf[ARRAY_SIZE(blake2s_testvecs)];
+> +	u8 hash[BLAKE2S_HASH_SIZE];
+> +	size_t i;
+> +	bool success = true;
 > +
-> +	if (!static_branch_likely(&chacha_use_simd) || !crypto_simd_usable() ||
-> +	    bytes <= CHACHA_BLOCK_SIZE)
-> +		return chacha_crypt_generic(state, dst, src, bytes, nrounds);
+> +	for (i = 0; i < BLAKE2S_KEY_SIZE; ++i)
+> +		key[i] = (u8)i;
 > +
-> +	kernel_fpu_begin();
-> +	chacha_dosimd(state, dst, src, bytes, nrounds);
-> +	kernel_fpu_end();
+> +	for (i = 0; i < ARRAY_SIZE(blake2s_testvecs); ++i)
+> +		buf[i] = (u8)i;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(blake2s_keyed_testvecs); ++i) {
+> +		blake2s(hash, buf, key, BLAKE2S_HASH_SIZE, i, BLAKE2S_KEY_SIZE);
+> +		if (memcmp(hash, blake2s_keyed_testvecs[i], BLAKE2S_HASH_SIZE)) {
+> +			pr_err("blake2s keyed self-test %zu: FAIL\n", i + 1);
+> +			success = false;
+> +		}
+> +	}
+> +
+> +	for (i = 0; i < ARRAY_SIZE(blake2s_testvecs); ++i) {
+> +		blake2s(hash, buf, NULL, BLAKE2S_HASH_SIZE, i, 0);
+> +		if (memcmp(hash, blake2s_testvecs[i], BLAKE2S_HASH_SIZE)) {
+> +			pr_err("blake2s unkeyed self-test %zu: FAIL\n", i + i);
+> +			success = false;
+> +		}
+> +	}
+> +	return success;
 > +}
-> +EXPORT_SYMBOL(chacha_crypt_arch);
 
-This can process an arbitrary amount of data with preemption disabled.
-Shouldn't the library functions limit the amount of data processed per
-fpu_begin/fpu_end region?  I see that some of them do...
+The only tests here are for blake2s(), with 0 and 32-byte keys.  There's no
+tests that incremental blake2s_update()s work correctly, nor any other key
+sizes.  And these don't get tested properly by the blake2s-generic shash tests
+either, because blake2s-generic has a separate implementation of the boilerplate
+and calls blake2s_compress_generic() directly.  Did you consider implementing
+blake2s-generic on top of blake2s_init/update/final instead?
+
+Also, blake2s_hmac() needs tests.
 
 - Eric
