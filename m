@@ -2,127 +2,125 @@ Return-Path: <SRS0=Ux5j=YQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 236B8CA9EA0
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 01:37:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62D45CA9EA0
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 03:05:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DBA6E214B2
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 01:36:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="VUzy3f++"
+	by mail.kernel.org (Postfix) with ESMTP id 2E492214B2
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 03:05:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1571799927;
+	bh=kkPkkVa8tSmBZrfUNuUqMVi0gdFyhC6khfCoDcn6A64=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=M/PE/a4lwbOOZcL1cjV1i1Xm0DdtXttjKAlfCywNIGWibqSYrmeVnHaF9h1rdFbAE
+	 dcqhjVh0Y1eii/1rdXEcQ66Xyk38fNx6nig0TnHcjJ8k4uN4KZeyHKVd7ICl7MmMfc
+	 lBRFTf7ZADNk1ER5U/e6XS00t4wBESqx5jiwFsQk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732625AbfJWBg6 (ORCPT
+        id S1727960AbfJWDF0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Oct 2019 21:36:58 -0400
-Received: from mail-eopbgr740042.outbound.protection.outlook.com ([40.107.74.42]:59852
-        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730047AbfJWBg6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Oct 2019 21:36:58 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JmrEnIyJs810ZC2tPtdrNkZbEBd+vGm1TKfqgda1kDwVevbpHAzmmO6cU91JdkoVfkGbZlD1Rxalfl7pgUHr+OZiCRZJ3J3AfeDlagEC6Jt1oGV/VfxxmMJKukxZxmNjfqNH6mJlNNHwZo3aaMs+Twn0HKABN2by4ufQJAxXVfSntmZrvpAiArJkFAkRd3qXHZa/e8elHXQWVHfBuny5x/lq6OrAsO7key6Z8QTX9cOVER+E7bLZTfqoRDH5J411YFDSdfjEFTKo//9xp8Q2gf1HPYSy3QPcLTS7Uhm8AyU+aCCgQ72Lfq5jrK+k8M3KAiOdpCqXMbVm+QhCJ7RlGA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6KrBQaOjc54qGjLl/SWFQzGe9wt3JyZff0O0hl60C6A=;
- b=H5Z7nzV72S6eHHsWeDWHcgM8bPBBEGtw1cURwvDyVVLleenylHczbqcIMn8m8dTJgjGzthFkvnQ5XlHJ53Kn9lN2lUtsYmvdmaog0Dyo9vtyTcGyqux6aoILK7r5mjG3kRGD0HqY5GviytXmi0DlJDoXhNDHwv5RcTfu3xA24R9jNKqHTNCibYvyXH37jkPCy6CnM8P+Epx4qduD90fIJBe/BF29OrATfomVOl+PLR0jIa21im8ZnKli8p31i/8U2x/VlmHY1dy5xZ0RmwLA+d0RyV4R5AyEtLwIbeIQqaELs3V9sRmE3dBWbpMmUIagYQxpFLpNOfHeaOFx2JClpw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6KrBQaOjc54qGjLl/SWFQzGe9wt3JyZff0O0hl60C6A=;
- b=VUzy3f++eFXBbw6E65d/Z+mHQZOz/NFCcc1QEzGu1e2mfG6ZsMvMsq2FHRVw+vn1XBG9lxepOSP0rJ5Rqno4COKLYQZB2nkjxiQGWZRjRVAU7U0J8GlvFTEHbF2UGdK71Wu2QB8Vo0cMqnkPsUa4gVdWlVaDJoLUDhz6jGRj9nU=
-Received: from DM6PR12MB2682.namprd12.prod.outlook.com (20.176.118.13) by
- DM6PR12MB3387.namprd12.prod.outlook.com (20.178.198.82) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2347.16; Wed, 23 Oct 2019 01:36:55 +0000
-Received: from DM6PR12MB2682.namprd12.prod.outlook.com
- ([fe80::80:cb81:4a0e:a36]) by DM6PR12MB2682.namprd12.prod.outlook.com
- ([fe80::80:cb81:4a0e:a36%3]) with mapi id 15.20.2367.022; Wed, 23 Oct 2019
- 01:36:55 +0000
-From:   "Singh, Brijesh" <brijesh.singh@amd.com>
-To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>,
-        "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
-        "Hook, Gary" <Gary.Hook@amd.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "allison@lohutok.net" <allison@lohutok.net>,
-        "info@metux.net" <info@metux.net>,
-        "yamada.masahiro@socionext.com" <yamada.masahiro@socionext.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-CC:     "Singh, Brijesh" <brijesh.singh@amd.com>
-Subject: Re: [PATCH] crypto: ccp - Retry SEV INIT command in case of integrity
- check failure.
-Thread-Topic: [PATCH] crypto: ccp - Retry SEV INIT command in case of
- integrity check failure.
-Thread-Index: AQHVhTsiVAXVZvJHqE+F84WTgpVS9KdnezQA
-Date:   Wed, 23 Oct 2019 01:36:55 +0000
-Message-ID: <14a4cb7c-5909-189a-c5ba-56df4e4fb65a@amd.com>
-References: <20191017223459.64281-1-Ashish.Kalra@amd.com>
-In-Reply-To: <20191017223459.64281-1-Ashish.Kalra@amd.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: SN4PR0201CA0069.namprd02.prod.outlook.com
- (2603:10b6:803:20::31) To DM6PR12MB2682.namprd12.prod.outlook.com
- (2603:10b6:5:42::13)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=brijesh.singh@amd.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [70.112.153.56]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: e1ed6df2-5d95-481f-eb6e-08d757597cad
-x-ms-traffictypediagnostic: DM6PR12MB3387:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM6PR12MB33873951F798C7F9E5F1725DE56B0@DM6PR12MB3387.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2887;
-x-forefront-prvs: 019919A9E4
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(39860400002)(346002)(376002)(396003)(366004)(199004)(189003)(8676002)(4326008)(316002)(6246003)(110136005)(2501003)(8936002)(36756003)(229853002)(478600001)(81156014)(81166006)(1250700005)(305945005)(2201001)(6436002)(6486002)(2616005)(256004)(11346002)(76176011)(99286004)(5660300002)(66066001)(52116002)(26005)(102836004)(31686004)(25786009)(7736002)(4744005)(476003)(186003)(31696002)(71200400001)(71190400001)(6512007)(66476007)(3846002)(86362001)(64756008)(66946007)(66446008)(66556008)(2906002)(7416002)(486006)(6116002)(14444005)(14454004)(53546011)(6506007)(386003)(446003)(921003)(1121003);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB3387;H:DM6PR12MB2682.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: a+CVSCfScJzn9V5PiJGAD48cUuGT01MH0sI9xzG9zSsJj7VkqtoHdsQbbCNxPqckziDXknmIXI5K6F29UnJgrgbHsAEJt1f+nPVmf9zaPWG2zuke1nO0PPgQnmDJYoKD6ctX5iswaBNIgX8qrsDAAAcki6NVE25bl3342alc5o2MLtqY9U1QHvsqrem6rwJS0xrIZqlRwGtvzRAHbq0vbK3ov7s9wKqRKgR35zmoZZVo4g3cawzoR+8zULkxYTs4tsZ+B93z0LRilhtrzzIgI4IeIqB2b1hBcurSoXS78+yqhHuWn56yKOkJ3VL3kFI3nG55xyd7fHph4LUi4dfnQHaJkHuZ272G1jGIly/9D2BIKt+C2ZTMqwLs2XZ9qySt5/u9p/zkLvgDNZsrweifrsTJS694bzdD9HOH98eTviEhuSCWUFEYhjuiMeGb5QXR
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6762AD8AC12D40478F6CD182032E0368@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Tue, 22 Oct 2019 23:05:26 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46714 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727831AbfJWDF0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 22 Oct 2019 23:05:26 -0400
+Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 31BAF207FC;
+        Wed, 23 Oct 2019 03:05:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1571799925;
+        bh=kkPkkVa8tSmBZrfUNuUqMVi0gdFyhC6khfCoDcn6A64=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=NGN+gKXch8HLob+NK8jg6R8JAt33cFKmddi/0mtNi5vBTxtl133qBxUaoHtztsaSi
+         OOqvD/5K3Z/PSyYH7ac0y7ka20btM2nmV1IywyNBrWt8+rXJ+jpRW/p8vBlhMUjggW
+         e76WrsCTM8xSyDlFlMTjq7PgW72v5YWTR8LBs+ek=
+Date:   Tue, 22 Oct 2019 20:05:23 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Samuel Neves <sneves@dei.uc.pt>, Arnd Bergmann <arnd@arndb.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        Martin Willi <martin@strongswan.org>,
+        Rene van Dorst <opensource@vdorst.com>,
+        David Sterba <dsterba@suse.com>
+Subject: Re: [PATCH v4 02/35] crypto: chacha - move existing library code
+ into lib/crypto
+Message-ID: <20191023030523.GB4278@sol.localdomain>
+Mail-Followup-To: Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Samuel Neves <sneves@dei.uc.pt>, Arnd Bergmann <arnd@arndb.de>,
+        Andy Lutomirski <luto@kernel.org>,
+        Martin Willi <martin@strongswan.org>,
+        Rene van Dorst <opensource@vdorst.com>,
+        David Sterba <dsterba@suse.com>
+References: <20191017190932.1947-1-ard.biesheuvel@linaro.org>
+ <20191017190932.1947-3-ard.biesheuvel@linaro.org>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e1ed6df2-5d95-481f-eb6e-08d757597cad
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Oct 2019 01:36:55.3791
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: zPB+p3cGL3DIppZK98hE9y1xb+2SNDPZHfFm68H76DOfpwHE3VogIxb3NbboCrxkpeEwV4AKfxUCNwhH+vm8Bg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3387
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191017190932.1947-3-ard.biesheuvel@linaro.org>
+User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-DQpPbiAxMC8xNy8xOSAzOjM1IFBNLCBLYWxyYSwgQXNoaXNoIHdyb3RlOg0KPiBGcm9tOiBBc2hp
-c2ggS2FscmEgPGFzaGlzaC5rYWxyYUBhbWQuY29tPg0KPg0KPiBTRVYgSU5JVCBjb21tYW5kIGxv
-YWRzIHRoZSBTRVYgcmVsYXRlZCBwZXJzaXN0ZW50IGRhdGEgZnJvbSBOVlMNCj4gYW5kIGluaXRp
-YWxpemVzIHRoZSBwbGF0Zm9ybSBjb250ZXh0LiBUaGUgZmlybXdhcmUgdmFsaWRhdGVzIHRoZQ0K
-PiBwZXJzaXN0ZW50IHN0YXRlLiBJZiB2YWxpZGF0aW9uIGZhaWxzLCB0aGUgZmlybXdhcmUgd2ls
-bCByZXNldA0KPiB0aGUgcGVyc2lzZW50IHN0YXRlIGFuZCByZXR1cm4gYW4gaW50ZWdyaXR5IGNo
-ZWNrIGZhaWx1cmUgc3RhdHVzLg0KPg0KPiBBdCB0aGlzIHBvaW50LCBhIHN1YnNlcXVlbnQgSU5J
-VCBjb21tYW5kIHNob3VsZCBzdWNjZWVkLCBzbyByZXRyeQ0KPiB0aGUgY29tbWFuZC4gVGhlIElO
-SVQgY29tbWFuZCByZXRyeSBpcyBvbmx5IGRvbmUgZHVyaW5nIGRyaXZlcg0KPiBpbml0aWFsaXph
-dGlvbi4NCj4NCj4gQWRkaXRpb25hbCBlbnVtcyBhbG9uZyB3aXRoIFNFVl9SRVRfU0VDVVJFX0RB
-VEFfSU5WQUxJRCBhcmUgYWRkZWQNCj4gdG8gc2V2X3JldF9jb2RlIHRvIG1haW50YWluIGNvbnRp
-bnVpdHkgYW5kIHJlbGV2YW5jZSBvZiBlbnVtIHZhbHVlcy4NCj4NCj4gU2lnbmVkLW9mZi1ieTog
-QXNoaXNoIEthbHJhIDxhc2hpc2gua2FscmFAYW1kLmNvbT4NCg0KDQpSZXZpZXdlZC1ieTogQnJp
-amVzaCBTaW5naCA8YnJpamVzaC5zaW5naEBhbWQuY29tPg0KDQp0aGFua3MNCg0K
+On Thu, Oct 17, 2019 at 09:08:59PM +0200, Ard Biesheuvel wrote:
+> +static inline void chacha_crypt(u32 *state, u8 *dst, const u8 *src,
+> +				unsigned int bytes, int nrounds)
+> +{
+> +	if (IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_CHACHA))
+> +		chacha_crypt_arch(state, dst, src, bytes, nrounds);
+> +	else
+> +		chacha_crypt_generic(state, dst, src, bytes, nrounds);
+> +}
+
+How about also providing chacha20_crypt() which calls chacha_crypt(..., 20)?
+The 'nrounds' parameter is really for implementations, rather than users of the
+library API.  Users don't really have any business specifying the number of
+rounds as an int.
+
+> +static inline int chacha_setkey(struct crypto_skcipher *tfm, const u8 *key,
+> +				unsigned int keysize, int nrounds)
+> +{
+> +	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
+> +	int i;
+> +
+> +	if (keysize != CHACHA_KEY_SIZE)
+> +		return -EINVAL;
+> +
+> +	for (i = 0; i < ARRAY_SIZE(ctx->key); i++)
+> +		ctx->key[i] = get_unaligned_le32(key + i * sizeof(u32));
+> +
+> +	ctx->nrounds = nrounds;
+> +	return 0;
+> +}
+
+At the end of this patch series there are 5 drivers which wrap chacha_setkey()
+with chacha20_setkey() and chacha12_setkey() -- all 5 pairs identical.  How
+about providing those as inline functions here?
+
+> +config CRYPTO_LIB_CHACHA
+> +	tristate "ChaCha library interface"
+> +	depends on CRYPTO_ARCH_HAVE_LIB_CHACHA || !CRYPTO_ARCH_HAVE_LIB_CHACHA
+> +	select CRYPTO_LIB_CHACHA_GENERIC if CRYPTO_ARCH_HAVE_LIB_CHACHA=n
+> +	help
+> +	  Enable the ChaCha library interface. This interface may be fulfilled
+> +	  by either the generic implementation or an arch-specific one, if one
+> +	  is available and enabled.
+
+Since this is a library for use within the kernel, and not a user-visible
+feature, I don't think it should be explicitly selectable.  I.e. it should just
+be "tristate", without the prompt string.
+
+- Eric
