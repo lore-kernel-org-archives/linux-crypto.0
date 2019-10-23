@@ -2,160 +2,187 @@ Return-Path: <SRS0=Ux5j=YQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ABC2CA9EB6
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 16:27:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2507ECA9EB6
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 16:58:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F34622084C
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 16:27:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DA92421925
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 16:58:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="xa1wrQAo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SVM4Xfdq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407281AbfJWQ1a (ORCPT
+        id S1726667AbfJWQ60 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Oct 2019 12:27:30 -0400
-Received: from mail-eopbgr690043.outbound.protection.outlook.com ([40.107.69.43]:22076
-        "EHLO NAM04-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2389149AbfJWQ13 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Oct 2019 12:27:29 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=CeTeYs2wQDeQtPjbGGP74M4UQgArbK8iDrJ5X0YEXUv4MNyVWUBzXFU0aY6vT9VAzXfhBkFZlxMuhjiAR+OR2cjctotX10T8taFrGOrVBs3XwoWRR8RpwlR3Bl52Nsxidst+MbQaQS+5bplD4orkmi+i9gBuJTFfLuFS6ZGBl5h54vUDBOX/MGEvJgmS37EdWa2dV9eKx8VOr8+t+hIbok3cuxSzh6qfCS6A9yRR8JlnMORiaEkVLZSBlNVwpW8JzXwbnSaXtdu2HcK+3fJV3m1b8LXCDDYCIX+arQBB20R9N4NlPx5QG1GTu8GdD8GlKawoqXlV7kkFBCN/spqTmA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=i/PyXqd81j2BZKCJs/WYGtoM+U9YO7GmEUiGcGF4m/4=;
- b=T4zIBQg7WZpW9o0jR2Um0QRW2YmFR4kQXkqPf9lqh2uRdCVpsW7I9mtaux4hah/bAGQ1auJzn34k1xE5bRFcoe1GYgEsG1inLAUa91MiA81ytkzTU1Cqk9xfrSbEqnCVk4Un0wnCso7P53pFx3n2v+alTPxQTt6sUM4NXxXph0F9LQ6eaMuK+bbURbmXNDJnopnBojBG/hgCQHh6lT763AIt93e3bG05/nnvEKKAHh1KuvyNsIpRZf+v1OSOj84gZ7Ng91eUneQa+qx0t1hU1b5vkDmSLK3TGsSLB0QUaSZQ7Y5z4DBDXYUiY4U6a7NdMTVrlVNSCAUNQsJlZzYDJg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=i/PyXqd81j2BZKCJs/WYGtoM+U9YO7GmEUiGcGF4m/4=;
- b=xa1wrQAoGZTv1FKK5oGDamAa+1ZptGm32uaW58hgvumek8mPapMy1dzNPShiFjMbVGxw+v15mJZ6Sswg7JQZ06RIxMqE/KsBaaDgR7eEmGiGtAZaZ1hQwtzDf6Y1slnY7w6prgd4yyoNhG0OXerPrH35eXRfF3EeQgABCn0EDm8=
-Received: from DM6PR12MB3163.namprd12.prod.outlook.com (20.179.104.150) by
- DM6PR12MB2908.namprd12.prod.outlook.com (20.179.71.214) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2387.22; Wed, 23 Oct 2019 16:27:26 +0000
-Received: from DM6PR12MB3163.namprd12.prod.outlook.com
- ([fe80::85b7:7456:1a67:78aa]) by DM6PR12MB3163.namprd12.prod.outlook.com
- ([fe80::85b7:7456:1a67:78aa%7]) with mapi id 15.20.2367.022; Wed, 23 Oct 2019
- 16:27:26 +0000
-From:   "Lendacky, Thomas" <Thomas.Lendacky@amd.com>
-To:     "Thomas, Rijo-john" <Rijo-john.Thomas@amd.com>,
-        "Hook, Gary" <Gary.Hook@amd.com>,
+        Wed, 23 Oct 2019 12:58:26 -0400
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:32842 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726664AbfJWQ60 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 23 Oct 2019 12:58:26 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1571849905;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qTTBTaOEjj6UwppDZDbr2espgMg/5p88pNBoo1l7DMI=;
+        b=SVM4XfdqAB1KKgHlaWTpcuX4VN3WOWZnrN809l7NFPS5ufHb5lUvSNqSv4QlB7AsWBlKWq
+        wQbD0YctYqW0HiTJ5x0tvplgvikqoN9wQT+5CDf/ky3tR+w87uHQmaPO7bhqPediVraNc/
+        PyNMqxSPIvfSwM6E2t69mUDA6YfgpbE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-285-2c7kOI1UPM2-cf5wB0RQTg-1; Wed, 23 Oct 2019 12:58:21 -0400
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 33D951005500;
+        Wed, 23 Oct 2019 16:58:19 +0000 (UTC)
+Received: from redhat.com (ovpn-124-105.rdu2.redhat.com [10.10.124.105])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id B6B6B1001B07;
+        Wed, 23 Oct 2019 16:58:16 +0000 (UTC)
+Date:   Wed, 23 Oct 2019 12:58:14 -0400
+From:   Jerome Glisse <jglisse@redhat.com>
+To:     Jean-Philippe Brucker <jean-philippe@linaro.org>
+Cc:     Zhangfei Gao <zhangfei.gao@linaro.org>, francois.ozog@linaro.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     "Singh, Brijesh" <brijesh.singh@amd.com>,
-        "Easow, Nimesh" <Nimesh.Easow@amd.com>,
-        "Rangasamy, Devaraj" <Devaraj.Rangasamy@amd.com>
-Subject: Re: [RFC PATCH 0/5] Add TEE interface support to AMD Secure Processor
- driver
-Thread-Topic: [RFC PATCH 0/5] Add TEE interface support to AMD Secure
- Processor driver
-Thread-Index: AQHViZTX3R3UO0PPhkOgyRS+vzwoTKdoalYA
-Date:   Wed, 23 Oct 2019 16:27:26 +0000
-Message-ID: <24a6506c-eb90-5a70-862f-95571e668a5d@amd.com>
-References: <cover.1571817675.git.Rijo-john.Thomas@amd.com>
-In-Reply-To: <cover.1571817675.git.Rijo-john.Thomas@amd.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: SN6PR06CA0021.namprd06.prod.outlook.com
- (2603:10b6:805:8e::34) To DM6PR12MB3163.namprd12.prod.outlook.com
- (2603:10b6:5:182::22)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=Thomas.Lendacky@amd.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [165.204.78.1]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: a7d4a3a9-0e67-4b24-af70-08d757d5e403
-x-ms-traffictypediagnostic: DM6PR12MB2908:
-x-ms-exchange-purlcount: 3
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM6PR12MB290804D38D1646403B4543AAEC6B0@DM6PR12MB2908.namprd12.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7219;
-x-forefront-prvs: 019919A9E4
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(136003)(346002)(396003)(376002)(366004)(199004)(189003)(486006)(256004)(31686004)(11346002)(2616005)(476003)(446003)(5660300002)(3846002)(6116002)(31696002)(66946007)(86362001)(2201001)(229853002)(14444005)(64756008)(66446008)(66556008)(386003)(6506007)(53546011)(102836004)(26005)(186003)(2906002)(66476007)(2501003)(71200400001)(71190400001)(110136005)(316002)(54906003)(76176011)(7736002)(305945005)(81156014)(4326008)(8676002)(99286004)(52116002)(6512007)(478600001)(14454004)(6306002)(966005)(6436002)(6246003)(6486002)(25786009)(8936002)(66066001)(81166006)(36756003);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB2908;H:DM6PR12MB3163.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: FkV4QEd2KSv+7oId3YHXbobOqOnofNVOr8RtnIirVy/v0qzRUtFRpA078361nIYoNrl+Ov+19UKnoxX5FIk2g4QkkToFAhTkPcmw2JMtpWl2d0V+4J/UlbS3A9QZBalSswEdaBaBfBitTrmJYOdaeiB3ZMQYPQ5ZqX1A6+nbgj7bnjugwOr+2DpwlUR7b7hPWBYx5E4DHKTUapn/449VIEmzFzRbNeVXANTvb5N5cRqBqXoB8CDzSs4JROTKut8QnJQEd1dMvGOpeg/01bdoBS2fTkmQb32IBDwzx2Y6oWKrIostUsFfA/QrUD0M8rgAuJrhju+EF1EjtajOIx156ZB5KIjwU/jQgmLP5iVZAqWGmI9YrAI4NUgHeqSFW0IsY+Mgtho6jQt1H6Es9PtFrhZ5iuSK9BcCMgFCu/SQSG2Ej5+bQbSnIZl/+xFsmI74s0JcBZf7fQh2TKFhWT1GJTBRccPFIlmW6LQidXEG0jw=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <D691747F92BFE8479A08C4267D272601@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Zaibo Xu <xuzaibo@huawei.com>, ilias.apalodimas@linaro.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Wangzhou <wangzhou1@hisilicon.com>, grant.likely@arm.com,
+        "haojian . zhuang" <haojian.zhuang@linaro.org>,
+        Kenneth Lee <liguozhu@hisilicon.com>,
+        linux-accelerators@lists.ozlabs.org, kenneth-lee-2012@foxmail.com
+Subject: Re: [PATCH v6 2/3] uacce: add uacce driver
+Message-ID: <20191023165814.GB4163@redhat.com>
+References: <1571214873-27359-1-git-send-email-zhangfei.gao@linaro.org>
+ <1571214873-27359-3-git-send-email-zhangfei.gao@linaro.org>
+ <20191016172802.GA1533448@lophozonia>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a7d4a3a9-0e67-4b24-af70-08d757d5e403
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Oct 2019 16:27:26.7228
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 8RG9uAy1LGVg6H/dlmzMfTbMmrP0Ay/pJBzfrOGFxNpb6uEaIkoYif/IGHKDi6qm3siy+7yxnKP853u8rX/XjA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB2908
+In-Reply-To: <20191016172802.GA1533448@lophozonia>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-MC-Unique: 2c7kOI1UPM2-cf5wB0RQTg-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-T24gMTAvMjMvMTkgNjoyNyBBTSwgVGhvbWFzLCBSaWpvLWpvaG4gd3JvdGU6DQo+IFRoZSBnb2Fs
-IG9mIHRoaXMgcGF0Y2ggc2VyaWVzIGlzIHRvIGludHJvZHVjZSBURUUgKFRydXN0ZWQgRXhlY3V0
-aW9uDQo+IEVudmlyb25tZW50KSBpbnRlcmZhY2Ugc3VwcG9ydCB0byBBTUQgU2VjdXJlIFByb2Nl
-c3NvciBkcml2ZXIuIFRoZQ0KPiBURUUgaXMgYSBzZWN1cmUgYXJlYSBvZiBhIHByb2Nlc3NvciB3
-aGljaCBlbnN1cmVzIHRoYXQgc2Vuc2l0aXZlIGRhdGENCj4gaXMgc3RvcmVkLCBwcm9jZXNzZWQg
-YW5kIHByb3RlY3RlZCBpbiBhbiBpc29sYXRlZCBhbmQgdHJ1c3RlZA0KPiBlbnZpcm9ubWVudC4g
-VGhlIFBsYXRmb3JtIFNlY3VyaXR5IFByb2Nlc3NvciAoUFNQKSBpcyBhIGRlZGljYXRlZA0KPiBw
-cm9jZXNzb3Igd2hpY2ggcHJvdmlkZXMgVEVFIHRvIGVuYWJsZSBIVyBwbGF0Zm9ybSBzZWN1cml0
-eS4gSXQgb2ZmZXJzDQo+IHByb3RlY3Rpb24gYWdhaW5zdCBzb2Z0d2FyZSBhdHRhY2tzIGdlbmVy
-YXRlZCBpbiBSaWNoIE9wZXJhdGluZyBTeXN0ZW0NCj4gKFJpY2ggT1MpIHN1Y2ggYXMgTGludXgg
-cnVubmluZyBvbiB4ODYuDQo+IA0KPiBCYXNlZCBvbiB0aGUgcGxhdGZvcm0gZmVhdHVyZSBzdXBw
-b3J0LCB0aGUgUFNQIGlzIGNhcGFibGUgb2Ygc3VwcG9ydGluZw0KPiBlaXRoZXIgU0VWIChTZWN1
-cmUgRW5jcnlwdGVkIFZpcnR1YWxpemF0aW9uKSBhbmQvb3IgVEVFLiBUaGUgZmlyc3QgdGhyZWUN
-Cj4gcGF0Y2hlcyBpbiB0aGlzIHNlcmllcyBpcyBhYm91dCBtb3ZpbmcgU0VWIHNwZWNpZmljIGZ1
-bmN0aW9ucyBhbmQgZGF0YQ0KPiBzdHJ1Y3R1cmVzIGZyb20gUFNQIGRldmljZSBkcml2ZXIgZmls
-ZSB0byBhIGRlZGljYXRlZCBTRVYgaW50ZXJmYWNlDQo+IGRyaXZlciBmaWxlLiBUaGUgbGFzdCB0
-d28gcGF0Y2hlcyBhZGQgVEVFIGludGVyZmFjZSBzdXBwb3J0IHRvIEFNRA0KPiBTZWN1cmUgUHJv
-Y2Vzc29yIGRyaXZlci4gVGhpcyBURUUgaW50ZXJmYWNlIHdpbGwgYmUgdXNlZCBieSBBTUQtVEVF
-DQo+IGRyaXZlciB0byBzdWJtaXQgY29tbWFuZCBidWZmZXJzIGZvciBwcm9jZXNzaW5nIGluIFBT
-UCBUcnVzdGVkIEV4ZWN1dGlvbg0KPiBFbnZpcm9ubWVudC4NCg0KVGhlcmUgYXJlIHNvbWUgb3V0
-c3RhbmRpbmcgcGF0Y2hlcyB0aGF0IGhhdmUgYmVlbiBzdWJtaXR0ZWQgdGhhdCBtb2RpZnkNCnNv
-bWUgb2YgdGhlIHNhbWUgZmlsZXMgeW91IGFyZSBtb2RpZnlpbmcsIHNvIHlvdSdsbCBuZWVkIHRv
-IHJlYmFzZSBhZnRlcg0KdGhvc2UgcGF0Y2hlcyBhcmUgYXBwbGllZC4gQWxzbywgb25lIHBhdGNo
-IHdhcyBhcHBsaWVkIHRocm91Z2ggdGhlIEtWTQ0KdHJlZSwgbm90IHN1cmUgaG93IHRvIGhhbmRs
-ZSB0aGF0Lg0KDQpGb3IgcmVmZXJlbmNlLCBoZXJlIGFyZSB0aGUgc3VibWl0dGVkIHBhdGNoZXM6
-DQoNCmh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2t2bS82MTA4NTYxZTM5MjQ2MGFkZTY3ZjdmNzBk
-OWJmYTlmNTZhOTI1ZDBhLjE1NzAxMzc0NDcuZ2l0LnRob21hcy5sZW5kYWNreUBhbWQuY29tLw0K
-aHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvbGludXgtY3J5cHRvLzIwMTkxMDE3MjIzNDU5LjY0Mjgx
-LTEtQXNoaXNoLkthbHJhQGFtZC5jb20vDQpodHRwczovL2xvcmUua2VybmVsLm9yZy9saW51eC1j
-cnlwdG8vMTU3MTY2NTQ4MjU5LjI4Mjg3LjE4MTE4ODAyOTA5ODAxNjgxNTQ2LnN0Z2l0QHRhb3Mv
-DQoNClRoYW5rcywNClRvbQ0KDQo+IA0KPiBSaWpvIFRob21hcyAoNSk6DQo+ICAgY3J5cHRvOiBj
-Y3AgLSByZW5hbWUgcHNwLWRldiBmaWxlcyB0byBzZXYtZGV2DQo+ICAgY3J5cHRvOiBjY3AgLSBj
-cmVhdGUgYSBnZW5lcmljIHBzcC1kZXYgZmlsZQ0KPiAgIGNyeXB0bzogY2NwIC0gbW92ZSBTRVYg
-dmRhdGEgdG8gYSBkZWRpY2F0ZWQgZGF0YSBzdHJ1Y3R1cmUNCj4gICBjcnlwdG86IGNjcCAtIGFk
-ZCBURUUgc3VwcG9ydCBmb3IgUmF2ZW4gUmlkZ2UNCj4gICBjcnlwdG86IGNjcCAtIHByb3ZpZGUg
-aW4ta2VybmVsIEFQSSB0byBzdWJtaXQgVEVFIGNvbW1hbmRzDQo+IA0KPiAgZHJpdmVycy9jcnlw
-dG8vY2NwL01ha2VmaWxlICB8ICAgIDQgKy0NCj4gIGRyaXZlcnMvY3J5cHRvL2NjcC9wc3AtZGV2
-LmMgfCAgOTgzICsrKy0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiAgZHJp
-dmVycy9jcnlwdG8vY2NwL3BzcC1kZXYuaCB8ICAgNTAgKy0NCj4gIGRyaXZlcnMvY3J5cHRvL2Nj
-cC9zZXYtZGV2LmMgfCAxMDQxICsrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysr
-KysrKw0KPiAgZHJpdmVycy9jcnlwdG8vY2NwL3Nldi1kZXYuaCB8ICAgNjIgKysrDQo+ICBkcml2
-ZXJzL2NyeXB0by9jY3Avc3AtZGV2LmggIHwgICAxNyArLQ0KPiAgZHJpdmVycy9jcnlwdG8vY2Nw
-L3NwLXBjaS5jICB8ICAgNDMgKy0NCj4gIGRyaXZlcnMvY3J5cHRvL2NjcC90ZWUtZGV2LmMgfCAg
-MzYzICsrKysrKysrKysrKysrKw0KPiAgZHJpdmVycy9jcnlwdG8vY2NwL3RlZS1kZXYuaCB8ICAx
-MDkgKysrKysNCj4gIGluY2x1ZGUvbGludXgvcHNwLXRlZS5oICAgICAgfCAgIDcyICsrKw0KPiAg
-MTAgZmlsZXMgY2hhbmdlZCwgMTc5NiBpbnNlcnRpb25zKCspLCA5NDggZGVsZXRpb25zKC0pDQo+
-ICBjcmVhdGUgbW9kZSAxMDA2NDQgZHJpdmVycy9jcnlwdG8vY2NwL3Nldi1kZXYuYw0KPiAgY3Jl
-YXRlIG1vZGUgMTAwNjQ0IGRyaXZlcnMvY3J5cHRvL2NjcC9zZXYtZGV2LmgNCj4gIGNyZWF0ZSBt
-b2RlIDEwMDY0NCBkcml2ZXJzL2NyeXB0by9jY3AvdGVlLWRldi5jDQo+ICBjcmVhdGUgbW9kZSAx
-MDA2NDQgZHJpdmVycy9jcnlwdG8vY2NwL3RlZS1kZXYuaA0KPiAgY3JlYXRlIG1vZGUgMTAwNjQ0
-IGluY2x1ZGUvbGludXgvcHNwLXRlZS5oDQo+IA0K
+On Wed, Oct 16, 2019 at 07:28:02PM +0200, Jean-Philippe Brucker wrote:
+[...]
+
+> > +static struct uacce_qfile_region *
+> > +uacce_create_region(struct uacce_queue *q, struct vm_area_struct *vma,
+> > +=09=09    enum uacce_qfrt type, unsigned int flags)
+> > +{
+> > +=09struct uacce_qfile_region *qfr;
+> > +=09struct uacce_device *uacce =3D q->uacce;
+> > +=09unsigned long vm_pgoff;
+> > +=09int ret =3D -ENOMEM;
+> > +
+> > +=09qfr =3D kzalloc(sizeof(*qfr), GFP_ATOMIC);
+> > +=09if (!qfr)
+> > +=09=09return ERR_PTR(-ENOMEM);
+> > +
+> > +=09qfr->type =3D type;
+> > +=09qfr->flags =3D flags;
+> > +=09qfr->iova =3D vma->vm_start;
+> > +=09qfr->nr_pages =3D vma_pages(vma);
+> > +
+> > +=09if (vma->vm_flags & VM_READ)
+> > +=09=09qfr->prot |=3D IOMMU_READ;
+> > +
+> > +=09if (vma->vm_flags & VM_WRITE)
+> > +=09=09qfr->prot |=3D IOMMU_WRITE;
+> > +
+> > +=09if (flags & UACCE_QFRF_SELFMT) {
+> > +=09=09if (!uacce->ops->mmap) {
+> > +=09=09=09ret =3D -EINVAL;
+> > +=09=09=09goto err_with_qfr;
+> > +=09=09}
+> > +
+> > +=09=09ret =3D uacce->ops->mmap(q, vma, qfr);
+> > +=09=09if (ret)
+> > +=09=09=09goto err_with_qfr;
+> > +=09=09return qfr;
+> > +=09}
+>=20
+> I wish the SVA and !SVA paths were less interleaved. Both models are
+> fundamentally different:
+>=20
+> * Without SVA you cannot share the device between multiple processes. All
+>   DMA mappings are in the "main", non-PASID address space of the device.
+>=20
+>   Note that process isolation without SVA could be achieved with the
+>   auxiliary domains IOMMU API (introduced primarily for vfio-mdev) but
+>   this is not the model chosen here.
+>=20
+> * With SVA you can share the device between multiple processes. But if th=
+e
+>   process can somehow program its portion of the device to access the mai=
+n
+>   address space, you loose isolation. Only the kernel must be able to
+>   program and access the main address space.
+>=20
+> When interleaving both code paths it's easy to make a mistake and loose
+> this isolation. Although I think this code is correct, it took me some
+> time to understand that we never end up calling dma_alloc or iommu_map
+> when using SVA. Might be worth at least adding a check that if
+> UACCE_DEV_SVA, then we never end up in the bottom part of this function.
+
+I would go even further, just remove the DMA path as it is not use.
+But yes at bare minimum it needs to be completely separate to avoid
+confusion.
+
+
+[...]
+
+
+> > +static int uacce_fops_open(struct inode *inode, struct file *filep)
+> > +{
+> > +=09struct uacce_queue *q;
+> > +=09struct iommu_sva *handle =3D NULL;
+> > +=09struct uacce_device *uacce;
+> > +=09int ret;
+> > +=09int pasid =3D 0;
+> > +
+> > +=09uacce =3D idr_find(&uacce_idr, iminor(inode));
+> > +=09if (!uacce)
+> > +=09=09return -ENODEV;
+> > +
+> > +=09if (!try_module_get(uacce->pdev->driver->owner))
+> > +=09=09return -ENODEV;
+> > +
+> > +=09ret =3D uacce_dev_open_check(uacce);
+> > +=09if (ret)
+> > +=09=09goto out_with_module;
+> > +
+> > +=09if (uacce->flags & UACCE_DEV_SVA) {
+> > +=09=09handle =3D iommu_sva_bind_device(uacce->pdev, current->mm, NULL)=
+;
+> > +=09=09if (IS_ERR(handle))
+> > +=09=09=09goto out_with_module;
+> > +=09=09pasid =3D iommu_sva_get_pasid(handle);
+>=20
+> We need to register an mm_exit callback. Once we return, userspace will
+> start running jobs on the accelerator. If the process is killed while the
+> accelerator is running, the mm_exit callback tells the device driver to
+> stop using this PASID (stop_queue()), so that it can be reallocated for
+> another process.
+>=20
+> Implementing this with the right locking and ordering can be tricky. I'll
+> try to implement the callback and test it on the device this week.
+
+It already exist it is call mmu notifier, you can register an mmu notifier
+and get callback once the mm exit.
+
+Cheers,
+J=E9r=F4me
+
