@@ -2,66 +2,51 @@ Return-Path: <SRS0=Ux5j=YQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.9 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1,USER_IN_DEF_DKIM_WL autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 521B5CA9EA0
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 00:23:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 236B8CA9EA0
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 01:37:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1ECD820650
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 00:23:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DBA6E214B2
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 01:36:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PWMr/nMY"
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="VUzy3f++"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732981AbfJWAXv (ORCPT
+        id S1732625AbfJWBg6 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 22 Oct 2019 20:23:51 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:44164 "EHLO
-        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728076AbfJWAXu (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 22 Oct 2019 20:23:50 -0400
-Received: by mail-pg1-f195.google.com with SMTP id e10so10983728pgd.11
-        for <linux-crypto@vger.kernel.org>; Tue, 22 Oct 2019 17:23:48 -0700 (PDT)
+        Tue, 22 Oct 2019 21:36:58 -0400
+Received: from mail-eopbgr740042.outbound.protection.outlook.com ([40.107.74.42]:59852
+        "EHLO NAM01-BN3-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1730047AbfJWBg6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 22 Oct 2019 21:36:58 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JmrEnIyJs810ZC2tPtdrNkZbEBd+vGm1TKfqgda1kDwVevbpHAzmmO6cU91JdkoVfkGbZlD1Rxalfl7pgUHr+OZiCRZJ3J3AfeDlagEC6Jt1oGV/VfxxmMJKukxZxmNjfqNH6mJlNNHwZo3aaMs+Twn0HKABN2by4ufQJAxXVfSntmZrvpAiArJkFAkRd3qXHZa/e8elHXQWVHfBuny5x/lq6OrAsO7key6Z8QTX9cOVER+E7bLZTfqoRDH5J411YFDSdfjEFTKo//9xp8Q2gf1HPYSy3QPcLTS7Uhm8AyU+aCCgQ72Lfq5jrK+k8M3KAiOdpCqXMbVm+QhCJ7RlGA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6KrBQaOjc54qGjLl/SWFQzGe9wt3JyZff0O0hl60C6A=;
+ b=H5Z7nzV72S6eHHsWeDWHcgM8bPBBEGtw1cURwvDyVVLleenylHczbqcIMn8m8dTJgjGzthFkvnQ5XlHJ53Kn9lN2lUtsYmvdmaog0Dyo9vtyTcGyqux6aoILK7r5mjG3kRGD0HqY5GviytXmi0DlJDoXhNDHwv5RcTfu3xA24R9jNKqHTNCibYvyXH37jkPCy6CnM8P+Epx4qduD90fIJBe/BF29OrATfomVOl+PLR0jIa21im8ZnKli8p31i/8U2x/VlmHY1dy5xZ0RmwLA+d0RyV4R5AyEtLwIbeIQqaELs3V9sRmE3dBWbpMmUIagYQxpFLpNOfHeaOFx2JClpw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:from:to:cc:subject:in-reply-to:message-id:references
-         :user-agent:mime-version;
-        bh=/rPZ4HhwO2Y5OxYPZvTpAmk/8khmnCdcuj1jKDBcIYI=;
-        b=PWMr/nMYg+m7WtNCPLVizhxiu8gyfLZI0qwKU6Yqp4oFhAsoLzwWin4tCq7I2oHIei
-         iAuxmHtpkNw44YwnJVo1QUoaReR9DmkDLXMTJedbn0+8dhb6RU6C+u9Ltmj4XbZ8fqWM
-         xP2Jj51dT1JuQLgl25G3zBtz6CXYBhEBscM0PODXuxtEddF9t/J3rU0w7Jp0y5yquS7/
-         5dX4qJZp8G15mW7nLthkGTyUcF3X+UYcgilTiWO9BvErNmqsj6sVk8JMFJL1eIPDd/f6
-         bIhlrg0o23AUNMSfTePJemTx+FFcPxq7SWdJIDlsC17QN2bhA1rtFuwcGr9ig5LnNbOf
-         o4dw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:in-reply-to:message-id
-         :references:user-agent:mime-version;
-        bh=/rPZ4HhwO2Y5OxYPZvTpAmk/8khmnCdcuj1jKDBcIYI=;
-        b=mCDM4/QHsZJwkTpINTBz82cVi4I/YcfxQUozAElw9QMBB9xTZE1VgMUohnLQ+S11SB
-         0qh2ZLgFYNKv/WpQ/zYLj877HcFzYJcO2d6BkhJOCmsErJvf639AyqKBZYGJmmGIVcVy
-         XwBMksjD9Z1HiKwHchjgdJ0PkRCivHF7z0km2YxpwEirG74Mbo4tnlB6AcY2VwZkXEHi
-         XzgJ3s+3lP2Ft2KI0HGHJXT8GP0ncsrn77LW/r88GzzYu6RDwl08Z829x/Vw7qWn1N0O
-         QVRm6/6ZoJqaf+IYB23H6t0h9RqTghl1xdXdarDGkmDqwxmZmcJQYhc31egrQI/tS5vN
-         7Ohg==
-X-Gm-Message-State: APjAAAVRQ7HOHFhMTpMcVeu9acygdwO3QjiWc0vHnHYlOvBcbuSI70qN
-        64QvIp4l4nKBX8C6joTm50Iatg==
-X-Google-Smtp-Source: APXvYqz+Z9nLdGje/5/GaGDSa9/q6bNKjeojhvbDbY03xj4oOhikScXlxlbbMaHu4V4ZTUwDYQLl8Q==
-X-Received: by 2002:a17:90a:eace:: with SMTP id ev14mr8128545pjb.57.1571790228097;
-        Tue, 22 Oct 2019 17:23:48 -0700 (PDT)
-Received: from [2620:15c:17:3:3a5:23a7:5e32:4598] ([2620:15c:17:3:3a5:23a7:5e32:4598])
-        by smtp.gmail.com with ESMTPSA id d7sm8201906pgv.6.2019.10.22.17.23.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Oct 2019 17:23:47 -0700 (PDT)
-Date:   Tue, 22 Oct 2019 17:23:46 -0700 (PDT)
-From:   David Rientjes <rientjes@google.com>
-X-X-Sender: rientjes@chino.kir.corp.google.com
-To:     "Singh, Brijesh" <brijesh.singh@amd.com>
-cc:     "Kalra, Ashish" <Ashish.Kalra@amd.com>,
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6KrBQaOjc54qGjLl/SWFQzGe9wt3JyZff0O0hl60C6A=;
+ b=VUzy3f++eFXBbw6E65d/Z+mHQZOz/NFCcc1QEzGu1e2mfG6ZsMvMsq2FHRVw+vn1XBG9lxepOSP0rJ5Rqno4COKLYQZB2nkjxiQGWZRjRVAU7U0J8GlvFTEHbF2UGdK71Wu2QB8Vo0cMqnkPsUa4gVdWlVaDJoLUDhz6jGRj9nU=
+Received: from DM6PR12MB2682.namprd12.prod.outlook.com (20.176.118.13) by
+ DM6PR12MB3387.namprd12.prod.outlook.com (20.178.198.82) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2347.16; Wed, 23 Oct 2019 01:36:55 +0000
+Received: from DM6PR12MB2682.namprd12.prod.outlook.com
+ ([fe80::80:cb81:4a0e:a36]) by DM6PR12MB2682.namprd12.prod.outlook.com
+ ([fe80::80:cb81:4a0e:a36%3]) with mapi id 15.20.2367.022; Wed, 23 Oct 2019
+ 01:36:55 +0000
+From:   "Singh, Brijesh" <brijesh.singh@amd.com>
+To:     "Kalra, Ashish" <Ashish.Kalra@amd.com>,
         "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
         "Hook, Gary" <Gary.Hook@amd.com>,
         "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
@@ -74,101 +59,70 @@ cc:     "Kalra, Ashish" <Ashish.Kalra@amd.com>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+CC:     "Singh, Brijesh" <brijesh.singh@amd.com>
 Subject: Re: [PATCH] crypto: ccp - Retry SEV INIT command in case of integrity
  check failure.
-In-Reply-To: <cfc975bb-d520-82a4-6fbe-40d78ce2e822@amd.com>
-Message-ID: <alpine.DEB.2.21.1910221723220.126424@chino.kir.corp.google.com>
-References: <20191017223459.64281-1-Ashish.Kalra@amd.com> <alpine.DEB.2.21.1910190156210.140416@chino.kir.corp.google.com> <29887804-ecab-ae83-8d3f-52ea83e44b4e@amd.com> <alpine.DEB.2.21.1910211754550.152056@chino.kir.corp.google.com>
- <cfc975bb-d520-82a4-6fbe-40d78ce2e822@amd.com>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+Thread-Topic: [PATCH] crypto: ccp - Retry SEV INIT command in case of
+ integrity check failure.
+Thread-Index: AQHVhTsiVAXVZvJHqE+F84WTgpVS9KdnezQA
+Date:   Wed, 23 Oct 2019 01:36:55 +0000
+Message-ID: <14a4cb7c-5909-189a-c5ba-56df4e4fb65a@amd.com>
+References: <20191017223459.64281-1-Ashish.Kalra@amd.com>
+In-Reply-To: <20191017223459.64281-1-Ashish.Kalra@amd.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: SN4PR0201CA0069.namprd02.prod.outlook.com
+ (2603:10b6:803:20::31) To DM6PR12MB2682.namprd12.prod.outlook.com
+ (2603:10b6:5:42::13)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=brijesh.singh@amd.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [70.112.153.56]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: e1ed6df2-5d95-481f-eb6e-08d757597cad
+x-ms-traffictypediagnostic: DM6PR12MB3387:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <DM6PR12MB33873951F798C7F9E5F1725DE56B0@DM6PR12MB3387.namprd12.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2887;
+x-forefront-prvs: 019919A9E4
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(39860400002)(346002)(376002)(396003)(366004)(199004)(189003)(8676002)(4326008)(316002)(6246003)(110136005)(2501003)(8936002)(36756003)(229853002)(478600001)(81156014)(81166006)(1250700005)(305945005)(2201001)(6436002)(6486002)(2616005)(256004)(11346002)(76176011)(99286004)(5660300002)(66066001)(52116002)(26005)(102836004)(31686004)(25786009)(7736002)(4744005)(476003)(186003)(31696002)(71200400001)(71190400001)(6512007)(66476007)(3846002)(86362001)(64756008)(66946007)(66446008)(66556008)(2906002)(7416002)(486006)(6116002)(14444005)(14454004)(53546011)(6506007)(386003)(446003)(921003)(1121003);DIR:OUT;SFP:1101;SCL:1;SRVR:DM6PR12MB3387;H:DM6PR12MB2682.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: a+CVSCfScJzn9V5PiJGAD48cUuGT01MH0sI9xzG9zSsJj7VkqtoHdsQbbCNxPqckziDXknmIXI5K6F29UnJgrgbHsAEJt1f+nPVmf9zaPWG2zuke1nO0PPgQnmDJYoKD6ctX5iswaBNIgX8qrsDAAAcki6NVE25bl3342alc5o2MLtqY9U1QHvsqrem6rwJS0xrIZqlRwGtvzRAHbq0vbK3ov7s9wKqRKgR35zmoZZVo4g3cawzoR+8zULkxYTs4tsZ+B93z0LRilhtrzzIgI4IeIqB2b1hBcurSoXS78+yqhHuWn56yKOkJ3VL3kFI3nG55xyd7fHph4LUi4dfnQHaJkHuZ272G1jGIly/9D2BIKt+C2ZTMqwLs2XZ9qySt5/u9p/zkLvgDNZsrweifrsTJS694bzdD9HOH98eTviEhuSCWUFEYhjuiMeGb5QXR
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <6762AD8AC12D40478F6CD182032E0368@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e1ed6df2-5d95-481f-eb6e-08d757597cad
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Oct 2019 01:36:55.3791
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: zPB+p3cGL3DIppZK98hE9y1xb+2SNDPZHfFm68H76DOfpwHE3VogIxb3NbboCrxkpeEwV4AKfxUCNwhH+vm8Bg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB3387
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 22 Oct 2019, Singh, Brijesh wrote:
-
-> >>>> From: Ashish Kalra <ashish.kalra@amd.com>
-> >>>>
-> >>>> SEV INIT command loads the SEV related persistent data from NVS
-> >>>> and initializes the platform context. The firmware validates the
-> >>>> persistent state. If validation fails, the firmware will reset
-> >>>> the persisent state and return an integrity check failure status.
-> >>>>
-> >>>> At this point, a subsequent INIT command should succeed, so retry
-> >>>> the command. The INIT command retry is only done during driver
-> >>>> initialization.
-> >>>>
-> >>>> Additional enums along with SEV_RET_SECURE_DATA_INVALID are added
-> >>>> to sev_ret_code to maintain continuity and relevance of enum values.
-> >>>>
-> >>>> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> >>>> ---
-> >>>>    drivers/crypto/ccp/psp-dev.c | 12 ++++++++++++
-> >>>>    include/uapi/linux/psp-sev.h |  3 +++
-> >>>>    2 files changed, 15 insertions(+)
-> >>>>
-> >>>> diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-> >>>> index 6b17d179ef8a..f9318d4482f2 100644
-> >>>> --- a/drivers/crypto/ccp/psp-dev.c
-> >>>> +++ b/drivers/crypto/ccp/psp-dev.c
-> >>>> @@ -1064,6 +1064,18 @@ void psp_pci_init(void)
-> >>>>    
-> >>>>    	/* Initialize the platform */
-> >>>>    	rc = sev_platform_init(&error);
-> >>>> +	if (rc && (error == SEV_RET_SECURE_DATA_INVALID)) {
-> >>>> +		/*
-> >>>> +		 * INIT command returned an integrity check failure
-> >>>> +		 * status code, meaning that firmware load and
-> >>>> +		 * validation of SEV related persistent data has
-> >>>> +		 * failed and persistent state has been erased.
-> >>>> +		 * Retrying INIT command here should succeed.
-> >>>> +		 */
-> >>>> +		dev_dbg(sp->dev, "SEV: retrying INIT command");
-> >>>> +		rc = sev_platform_init(&error);
-> >>>> +	}
-> >>>> +
-> >>>>    	if (rc) {
-> >>>>    		dev_err(sp->dev, "SEV: failed to INIT error %#x\n", error);
-> >>>>    		return;
-> >>>
-> >>> Curious why this isn't done in __sev_platform_init_locked() since
-> >>> sev_platform_init() can be called when loading the kvm module and the same
-> >>> init failure can happen that way.
-> >>>
-> >>
-> >> The FW initialization (aka PLATFORM_INIT) is called in the following
-> >> code paths:
-> >>
-> >> 1. During system boot up
-> >>
-> >> and
-> >>
-> >> 2. After the platform reset command is issued
-> >>
-> >> The patch takes care of #1. Based on the spec, platform reset command
-> >> should erase the persistent data and the PLATFORM_INIT should *not* fail
-> >> with SEV_RET_SECURE_DATA_INVALID error code. So, I am not able to see
-> >> any  strong reason to move the retry code in
-> >> __sev_platform_init_locked().
-> >>
-> > 
-> > Hmm, is the sev_platform_init() call in sev_guest_init() intended to do
-> > SEV_CMD_INIT only after platform reset?  I was under the impression it was
-> > done in case any previous init failed.
-> > 
-> 
-> 
-> The PLATFORM_INIT command is allowed only when FW is in UINIT state. On
-> boot, the FW will be in UNINIT state and similarly after the platform 
-> reset command the FW goes back to UNINIT state.
-> 
-> The __sev_platform_init_locked() checks the FW state before issuing the
-> command, if FW is already in INIT state then it returns immediately.
-> 
-
-Ah, got it, thanks.
-
-Acked-by: David Rientjes <rientjes@google.com>
+DQpPbiAxMC8xNy8xOSAzOjM1IFBNLCBLYWxyYSwgQXNoaXNoIHdyb3RlOg0KPiBGcm9tOiBBc2hp
+c2ggS2FscmEgPGFzaGlzaC5rYWxyYUBhbWQuY29tPg0KPg0KPiBTRVYgSU5JVCBjb21tYW5kIGxv
+YWRzIHRoZSBTRVYgcmVsYXRlZCBwZXJzaXN0ZW50IGRhdGEgZnJvbSBOVlMNCj4gYW5kIGluaXRp
+YWxpemVzIHRoZSBwbGF0Zm9ybSBjb250ZXh0LiBUaGUgZmlybXdhcmUgdmFsaWRhdGVzIHRoZQ0K
+PiBwZXJzaXN0ZW50IHN0YXRlLiBJZiB2YWxpZGF0aW9uIGZhaWxzLCB0aGUgZmlybXdhcmUgd2ls
+bCByZXNldA0KPiB0aGUgcGVyc2lzZW50IHN0YXRlIGFuZCByZXR1cm4gYW4gaW50ZWdyaXR5IGNo
+ZWNrIGZhaWx1cmUgc3RhdHVzLg0KPg0KPiBBdCB0aGlzIHBvaW50LCBhIHN1YnNlcXVlbnQgSU5J
+VCBjb21tYW5kIHNob3VsZCBzdWNjZWVkLCBzbyByZXRyeQ0KPiB0aGUgY29tbWFuZC4gVGhlIElO
+SVQgY29tbWFuZCByZXRyeSBpcyBvbmx5IGRvbmUgZHVyaW5nIGRyaXZlcg0KPiBpbml0aWFsaXph
+dGlvbi4NCj4NCj4gQWRkaXRpb25hbCBlbnVtcyBhbG9uZyB3aXRoIFNFVl9SRVRfU0VDVVJFX0RB
+VEFfSU5WQUxJRCBhcmUgYWRkZWQNCj4gdG8gc2V2X3JldF9jb2RlIHRvIG1haW50YWluIGNvbnRp
+bnVpdHkgYW5kIHJlbGV2YW5jZSBvZiBlbnVtIHZhbHVlcy4NCj4NCj4gU2lnbmVkLW9mZi1ieTog
+QXNoaXNoIEthbHJhIDxhc2hpc2gua2FscmFAYW1kLmNvbT4NCg0KDQpSZXZpZXdlZC1ieTogQnJp
+amVzaCBTaW5naCA8YnJpamVzaC5zaW5naEBhbWQuY29tPg0KDQp0aGFua3MNCg0K
