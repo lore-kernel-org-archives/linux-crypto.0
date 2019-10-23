@@ -2,127 +2,121 @@ Return-Path: <SRS0=Ux5j=YQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0421ACA9EB7
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 11:41:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F33DCA9EB6
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 11:48:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D783721872
-	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 11:41:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D34020650
+	for <linux-crypto@archiver.kernel.org>; Wed, 23 Oct 2019 11:48:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="oGAKSPe1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390721AbfJWLlj (ORCPT
+        id S2404850AbfJWLsa (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 23 Oct 2019 07:41:39 -0400
-Received: from mga02.intel.com ([134.134.136.20]:17445 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390623AbfJWLlj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 23 Oct 2019 07:41:39 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga101.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 23 Oct 2019 04:41:38 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,220,1569308400"; 
-   d="scan'208";a="399363728"
-Received: from jsakkine-mobl1.tm.intel.com (HELO localhost) ([10.237.50.121])
-  by fmsmga006.fm.intel.com with ESMTP; 23 Oct 2019 04:41:33 -0700
-Date:   Wed, 23 Oct 2019 14:41:33 +0300
-From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-To:     Sumit Garg <sumit.garg@linaro.org>
-Cc:     dhowells@redhat.com, peterhuewe@gmx.de, keyrings@vger.kernel.org,
-        linux-integrity@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-security-module@vger.kernel.org, herbert@gondor.apana.org.au,
-        davem@davemloft.net, jgg@ziepe.ca, arnd@arndb.de,
-        gregkh@linuxfoundation.org, jejb@linux.ibm.com,
-        zohar@linux.ibm.com, jmorris@namei.org, serge@hallyn.com,
-        jsnitsel@redhat.com, linux-kernel@vger.kernel.org,
-        daniel.thompson@linaro.org
-Subject: Re: [Patch v8 0/4] Create and consolidate trusted keys subsystem
-Message-ID: <20191023114133.GD21973@linux.intel.com>
-References: <1571202895-32651-1-git-send-email-sumit.garg@linaro.org>
+        Wed, 23 Oct 2019 07:48:30 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:37199 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2404768AbfJWLsa (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 23 Oct 2019 07:48:30 -0400
+Received: by mail-wr1-f66.google.com with SMTP id e11so13025840wrv.4
+        for <linux-crypto@vger.kernel.org>; Wed, 23 Oct 2019 04:48:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=yE4YnAn9SZKLzznNbPsY5PhammBc80afB9/X/EjOBf8=;
+        b=oGAKSPe1kQA6lMrI0brxudM7CZAJUzszAEPY5498i2LNSwlUw3nxfgK9uC/XJOPqfi
+         3NhhY4M0EgXLKuWwroXunwD9hBt7DCb41XaU0SJRTY/NOJK/vgJgv0ZJ7/qiQsc7+6tE
+         t9wWZgSOIzsl8b/571CCTDa7NcLIdcC6D+/+MdY5bnPWji+MSV9RNW9rYD37ZqoBvy2s
+         7IA2tr5BUs84kcrgvf6oIFtwuKf5JrdWrgsoFgSwTmGEunV2lAdPlANfSf2wIfTMmCp3
+         kWTRXBomIt5sGhGKvrpzYxoJYEDUNQ+gbagL5YDK0NYFxMNp79pZIBGsStlY28R44FT7
+         4jhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=yE4YnAn9SZKLzznNbPsY5PhammBc80afB9/X/EjOBf8=;
+        b=gz+7JCw/0YfV4PxwyCc/7oeXQuW7dP4/m4WLXsFgWDrrjXSIqCzY7UcOkj06Vp4z+8
+         6NAMvb7cVfENFiu1v7azST3c4FG0Q19p0+q8ekCOGDRq4jDsvE5mikQyETCWHu/exfD4
+         CjchrklQF8cz1wllxEUyrY8vVnXSj29h+/gMeWGtsSC4/a2bp+bJVPc1WLnOcKuSHBCC
+         zraP6V9wJyXh78BHakz/B1eX2OCNBD3/0uJKSM1N+RJCd0/aEPvH4eD7NJLgF6tmhJfY
+         DuqGskvtlf04/dGPxmBSmMcqQE0tGUvARKxob2BsG5mOxOUgIDoNoiYhE8qnIVeQxVH6
+         MbRw==
+X-Gm-Message-State: APjAAAWRlaONZhLL4Cf7Sv/n35CMEsbV8b21SByb1fpcP7/PlC7T+z4u
+        xiDEAeOzApHqs2jlUVxXb3AEWjiLDEIR/yhdT20hVQ==
+X-Google-Smtp-Source: APXvYqxYKzDUTh69mf5PJRYZh4SniTCSMTM3HAEA58AC6X94eunzW1bXxce0wVrabQNQ80Rx5QO2sYlmO9bdYVYdjVI=
+X-Received: by 2002:adf:9f08:: with SMTP id l8mr7660096wrf.325.1571831308148;
+ Wed, 23 Oct 2019 04:48:28 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1571202895-32651-1-git-send-email-sumit.garg@linaro.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <cover.1571817675.git.Rijo-john.Thomas@amd.com> <119557a5db5cc55c0e88f1543c0fabf0c820cb92.1571817675.git.Rijo-john.Thomas@amd.com>
+In-Reply-To: <119557a5db5cc55c0e88f1543c0fabf0c820cb92.1571817675.git.Rijo-john.Thomas@amd.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Wed, 23 Oct 2019 13:48:16 +0200
+Message-ID: <CAKv+Gu8Dtqr-=71e_P-h=+yBLxzyTcnp4EKsh8q_nGsXYvLL4A@mail.gmail.com>
+Subject: Re: [RFC PATCH 1/5] crypto: ccp - rename psp-dev files to sev-dev
+To:     "Thomas, Rijo-john" <Rijo-john.Thomas@amd.com>
+Cc:     "Lendacky, Thomas" <Thomas.Lendacky@amd.com>,
+        "Hook, Gary" <Gary.Hook@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "Singh, Brijesh" <brijesh.singh@amd.com>,
+        "Easow, Nimesh" <Nimesh.Easow@amd.com>,
+        "Rangasamy, Devaraj" <Devaraj.Rangasamy@amd.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Oct 16, 2019 at 10:44:51AM +0530, Sumit Garg wrote:
-> This patch-set does restructuring of trusted keys code to create and
-> consolidate trusted keys subsystem.
-> 
-> Also, patch #2 replaces tpm1_buf code used in security/keys/trusted.c and
-> crypto/asymmertic_keys/asym_tpm.c files to use the common tpm_buf code.
-> 
-> Changes in v8:
-> 1. Rebased to latest tpmdd/master.
-> 2. Added Reviewed-by tags.
-> 
-> Changes in v7:
-> 1. Rebased to top of tpmdd/master
-> 2. Patch #4: update tpm2 trusted keys code to use tpm_send() instead of
->    tpm_transmit_cmd() which is an internal function.
-> 
-> Changes in v6:
-> 1. Switch TPM asymmetric code also to use common tpm_buf code. These
->    changes required patches #1 and #2 update, so I have dropped review
->    tags from those patches.
-> 2. Incorporated miscellaneous comments from Jarkko.
-> 
-> Changes in v5:
-> 1. Drop 5/5 patch as its more relavant along with TEE patch-set.
-> 2. Add Reviewed-by tag for patch #2.
-> 3. Fix build failure when "CONFIG_HEADER_TEST" and
->    "CONFIG_KERNEL_HEADER_TEST" config options are enabled.
-> 4. Misc changes to rename files.
-> 
-> Changes in v4:
-> 1. Separate patch for export of tpm_buf code to include/linux/tpm.h
-> 2. Change TPM1.x trusted keys code to use common tpm_buf
-> 3. Keep module name as trusted.ko only
-> 
-> Changes in v3:
-> 
-> Move TPM2 trusted keys code to trusted keys subsystem.
-> 
-> Changes in v2:
-> 
-> Split trusted keys abstraction patch for ease of review.
-> 
-> Sumit Garg (4):
->   tpm: Move tpm_buf code to include/linux/
->   KEYS: Use common tpm_buf for trusted and asymmetric keys
->   KEYS: trusted: Create trusted keys subsystem
->   KEYS: trusted: Move TPM2 trusted keys code
-> 
->  crypto/asymmetric_keys/asym_tpm.c                  | 101 +++----
->  drivers/char/tpm/tpm-interface.c                   |  56 ----
->  drivers/char/tpm/tpm.h                             | 223 ---------------
->  drivers/char/tpm/tpm2-cmd.c                        | 307 --------------------
->  include/Kbuild                                     |   1 -
->  include/keys/{trusted.h => trusted_tpm.h}          |  49 +---
->  include/linux/tpm.h                                | 248 ++++++++++++++--
->  security/keys/Makefile                             |   2 +-
->  security/keys/trusted-keys/Makefile                |   8 +
->  .../{trusted.c => trusted-keys/trusted_tpm1.c}     |  96 +++----
->  security/keys/trusted-keys/trusted_tpm2.c          | 314 +++++++++++++++++++++
->  11 files changed, 649 insertions(+), 756 deletions(-)
->  rename include/keys/{trusted.h => trusted_tpm.h} (77%)
->  create mode 100644 security/keys/trusted-keys/Makefile
->  rename security/keys/{trusted.c => trusted-keys/trusted_tpm1.c} (94%)
->  create mode 100644 security/keys/trusted-keys/trusted_tpm2.c
-> 
-> -- 
-> 2.7.4
-> 
+Hello Thomas,
 
-Tested-by: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+On Wed, 23 Oct 2019 at 13:27, Thomas, Rijo-john
+<Rijo-john.Thomas@amd.com> wrote:
+>
+> This is a preliminary patch for creating a generic PSP device driver
+> file, which will have support for both SEV and TEE (Trusted Execution
+> Environment) interface.
+>
+> This patch does not introduce any new functionality, but simply renames
+> psp-dev.c and psp-dev.h files to sev-dev.c and sev-dev.h files
+> respectively.
+>
+> Signed-off-by: Rijo Thomas <Rijo-john.Thomas@amd.com>
+> Signed-off-by: Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>
 
-/Jarkko
+This is not the correct way to credit a co-author.
+
+You are sending the patch, so your signoff should come last.
+
+If Devaraj is a co-author of this work, you should add the following
+lines *before* your signoff
+
+Co-authored-by: Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>
+Signed-off-by: Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>
+
+If Devaraj is the sole author of this work, and you are just sending
+it out, you should set the authorship on the patch to Devaraj (so it
+will be From: Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>)
+
+> ---
+>  drivers/crypto/ccp/Makefile  |    2 +-
+>  drivers/crypto/ccp/psp-dev.c | 1087 ------------------------------------------
+>  drivers/crypto/ccp/psp-dev.h |   66 ---
+>  drivers/crypto/ccp/sev-dev.c | 1087 ++++++++++++++++++++++++++++++++++++++++++
+>  drivers/crypto/ccp/sev-dev.h |   66 +++
+>  drivers/crypto/ccp/sp-pci.c  |    2 +-
+>  6 files changed, 1155 insertions(+), 1155 deletions(-)
+>  delete mode 100644 drivers/crypto/ccp/psp-dev.c
+>  delete mode 100644 drivers/crypto/ccp/psp-dev.h
+>  create mode 100644 drivers/crypto/ccp/sev-dev.c
+>  create mode 100644 drivers/crypto/ccp/sev-dev.h
+>
+
+Please regenerate the patch so that the rename is reflected in the diffstat.
