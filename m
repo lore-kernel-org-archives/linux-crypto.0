@@ -2,120 +2,70 @@ Return-Path: <SRS0=tzqc=YR=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92988CA9EAF
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Oct 2019 13:42:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05E92CA9EAF
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Oct 2019 13:56:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6500720679
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Oct 2019 13:42:44 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="UxRR5VC2"
+	by mail.kernel.org (Postfix) with ESMTP id D51AF21655
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Oct 2019 13:56:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393694AbfJXNmo (ORCPT
+        id S2393829AbfJXN4l (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Oct 2019 09:42:44 -0400
-Received: from mail-vs1-f65.google.com ([209.85.217.65]:37591 "EHLO
-        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2393693AbfJXNmn (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Oct 2019 09:42:43 -0400
-Received: by mail-vs1-f65.google.com with SMTP id e12so4695438vsr.4
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Oct 2019 06:42:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=WeaV+gKFOMSix3DPscO9aSkp7iK/hD0Ls8seYHbmi40=;
-        b=UxRR5VC2FYc9UjBYOxrWsz5SOqrcLrvSutCl+ZqbiZfjtoEH0qYjKx5Q050ENwvK0V
-         ydPxywxMp0PVdb45MLPkN1uJjkcNL6OSenYYfxVSvxm+0GNIExUkaddXfv5n3bqRRzUX
-         5VtnXW/uJ3nH+yAbCfhcxBbCigp+5GsiXn8BPchQ/qeWTmDG/6aVAIDgPm6nz1+Kd+oK
-         C1E7jSQvGYQqrtH++bQE3X4/UwA8KrTznBTojS+NcI2W8+5AmFZ7+HAxl9972GrOAkit
-         b4gB2i76CmYZZfmUmxYV0XS0p8ZcgP12Ys9NnT9m8EvyAck4QhSsxU/dYuZHurmByWQa
-         JfPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=WeaV+gKFOMSix3DPscO9aSkp7iK/hD0Ls8seYHbmi40=;
-        b=hOAPiezrbBjmLVGogWYguvhWGPqpQRe1Hx9TV/YAp1zelcq/G6F58/TaG2sAdecYhw
-         OcdANG+fn8rYu0hHPclNHRuME0Fwl6ede80NHESG0R+hsv/yLE0MsBu8eee4t+3/x5Gx
-         /WkG+/oa3ZD0xRogWbTJ9rig15Yhhv7gw3CsY5Ju6uiqc5lXAfvSQGClLlKfm1/hMVuQ
-         M4VrxY+JRHgzurc4WhobwulItmU6Gv0cAoaLkiSMyNVhgfMgE3J2g92QUNHAAzXXdf+M
-         ooAyPz9+z4v3gk52vmBDnU89bxhb60wkSTgosqfuwtVTfIG13wqT8y5huQ46it2m+2v9
-         i79A==
-X-Gm-Message-State: APjAAAUBrHYbXkuoaQuvyY5LeUa585H6xSUD6r7X7WXPDYPZN7BP2FUk
-        l0N5LWyzlh7PqxoqRMkj3Vg2pAW4yqCxsL0SLkIUXg==
-X-Google-Smtp-Source: APXvYqxXcwF9zOJPpvwHAK7ZQwfzsKXchxjRTueoZZMdj58cC6SP+LXKc2OVDV37cV3DNOzyB1yZhp+k/bnRMZekj/8=
-X-Received: by 2002:a67:f744:: with SMTP id w4mr1733953vso.117.1571924562636;
- Thu, 24 Oct 2019 06:42:42 -0700 (PDT)
+        Thu, 24 Oct 2019 09:56:41 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:55966 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727811AbfJXN4l (ORCPT <rfc822;linux-crypto@vger.kernel.orG>);
+        Thu, 24 Oct 2019 09:56:41 -0400
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1iNdbO-0007K6-8b; Thu, 24 Oct 2019 21:56:34 +0800
+Received: from herbert by gondobar with local (Exim 4.89)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1iNdbJ-00063o-9V; Thu, 24 Oct 2019 21:56:29 +0800
+Date:   Thu, 24 Oct 2019 21:56:29 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     Zhou Wang <wangzhou1@hisilicon.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH 1/2] crypto: hisilicon - select NEED_SG_DMA_LENGTH in qm
+ Kconfig
+Message-ID: <20191024135629.vs43o3rz3xe2hg2c@gondor.apana.org.au>
+References: <1570792690-74597-1-git-send-email-wangzhou1@hisilicon.com>
+ <CAKv+Gu-6BBC4KQ6Ld+=8XBSdxmyJkBu-3ur_=XAkhSOJnhRcwQ@mail.gmail.com>
 MIME-Version: 1.0
-References: <1571445697-33824-1-git-send-email-tiantao6@huawei.com>
-In-Reply-To: <1571445697-33824-1-git-send-email-tiantao6@huawei.com>
-From:   Gilad Ben-Yossef <gilad@benyossef.com>
-Date:   Thu, 24 Oct 2019 16:42:26 +0300
-Message-ID: <CAOtvUMdw=N3ky-z2T4gJDM6YeGp2ir6d=ZtTrpLoK7g89-x+1g@mail.gmail.com>
-Subject: Re: [PATCH v2] crypto: fix comparison of unsigned expression warning
-To:     Tian Tao <tiantao6@huawei.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linuxarm@huawei.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu-6BBC4KQ6Ld+=8XBSdxmyJkBu-3ur_=XAkhSOJnhRcwQ@mail.gmail.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Oct 19, 2019 at 3:44 AM Tian Tao <tiantao6@huawei.com> wrote:
->
-> This patch fixes the following warnings:
-> drivers/crypto/ccree/cc_aead.c:630:5-12: WARNING: Unsigned expression
-> compared with zero: seq_len > 0
->
-> Signed-off-by: Tian Tao <tiantao6@huawei.com>
+On Thu, Oct 24, 2019 at 03:22:50PM +0200, Ard Biesheuvel wrote:
+> 
+> If you are fixing a COMPILE_TEST failure, just add NEED_SG_DMA_LENGTH
+> as a dependency, or drop the COMPILE_TEST altogether (why was that
+> added in the first place?)
 
+Because we want to maximise compiler coverage so that build failures
+can be caught at the earliest opportunity.
 
-Acked-by: Gilad Ben-Yossef <gilad@benyossef.com>
+But a better fix would be to use
 
-Thanks,
-Gilad
+	sg_dma_len(sg)
 
->
-> v2:
-> change hmac_setkey() return type to unsigned int to fix the warning.
-> ---
->  drivers/crypto/ccree/cc_aead.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/drivers/crypto/ccree/cc_aead.c b/drivers/crypto/ccree/cc_aea=
-d.c
-> index d3e8faa..64d318d 100644
-> --- a/drivers/crypto/ccree/cc_aead.c
-> +++ b/drivers/crypto/ccree/cc_aead.c
-> @@ -293,7 +293,8 @@ static unsigned int xcbc_setkey(struct cc_hw_desc *de=
-sc,
->         return 4;
->  }
->
-> -static int hmac_setkey(struct cc_hw_desc *desc, struct cc_aead_ctx *ctx)
-> +static unsigned int hmac_setkey(struct cc_hw_desc *desc,
-> +                               struct cc_aead_ctx *ctx)
->  {
->         unsigned int hmac_pad_const[2] =3D { HMAC_IPAD_CONST, HMAC_OPAD_C=
-ONST };
->         unsigned int digest_ofs =3D 0;
-> --
-> 2.7.4
->
+instead of
 
+	sg->dma_length
 
---=20
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-values of =CE=B2 will give rise to dom!
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
