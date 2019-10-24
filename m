@@ -2,194 +2,137 @@ Return-Path: <SRS0=tzqc=YR=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF9B6CA9EAF
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Oct 2019 13:23:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10090CA9EAF
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Oct 2019 13:24:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 75B682084C
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Oct 2019 13:23:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D77F32084C
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Oct 2019 13:24:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Nwg9+/Nh"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="a9bSL+5/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2502547AbfJXNX6 (ORCPT
+        id S2502548AbfJXNYA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Oct 2019 09:23:58 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:38679 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2502541AbfJXNX5 (ORCPT
+        Thu, 24 Oct 2019 09:24:00 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:53490 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2502541AbfJXNYA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Oct 2019 09:23:57 -0400
-Received: by mail-wm1-f68.google.com with SMTP id 3so2599818wmi.3
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Oct 2019 06:23:55 -0700 (PDT)
+        Thu, 24 Oct 2019 09:24:00 -0400
+Received: by mail-wm1-f67.google.com with SMTP id n7so2005778wmc.3
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Oct 2019 06:23:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=DoNY5nhcqsMX/VQdm/2dcVh9uYGHVkxgyi2II9TO5gA=;
-        b=Nwg9+/NhdSEA6IEeKNiYDBZDjsX3VE5Ct0kBDiFDIVw6kdN2IX29d3JRNVeH4liTbB
-         9Fp375ux6S8PS0l5OxAt4qY6kS9+p9PAuzeGdPN/1y3V+Uv/7MWVoR+lbLVX+u8BOl6x
-         Xv8QJrYzwGmb2ZjNuCPDWEiAA7IWrOAL1d0K0nsb9XYn/eVULEMWn+oPM91HlG0Dqvho
-         q+HG5yraQqN+hrPmdyzs1XknB4rM6z2Jfe7kcqJ4OR9rH76nMSzvznwcd/QVQW2QOxEZ
-         d4Y+OIRyNnsv3AIhhfRqUiWWtS0SalqsmpJC92Hb7a7k/byQMF23jNXFV3x7VleDOImm
-         Ay/g==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=n1CZfuSwOBWiTJLsXGGXKsTYggjtyZaieumQoTW6nsw=;
+        b=a9bSL+5/vXArpFGMdZBpm2T2ibvGHxT0RE4psOfP7d5NBAT+S87j+/oqiBatWysEkL
+         kn7q3XuaODmBXB+3LwnsntgHwm56Y1ztfBFP0yqKTcmfHlqkuDe8ovw1sA1hc5kd57JO
+         u8Ak//10fgCr6Mm3FaEZuBQdKM3COSEvlFdzm8IC1x/y3m9Ihrv/yxQgxutnY/g5jcOt
+         WHfH/KT8reM6VDTrsoDEvUnMxcTL43KH8aoYux8cYXKb0qOogFPlsZb/grPu9I3I2dRx
+         R+15WXBQxw9Y9PECCW+oCJlXTjFa3ScZneGVhbiSeQ3h1CYsluF43MWS6chfD96dWXBc
+         QQUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=DoNY5nhcqsMX/VQdm/2dcVh9uYGHVkxgyi2II9TO5gA=;
-        b=txOXXWTl6QtAXK9/VfY2oGd4E7DjKpnFXk3fajLddg5lwn4HTSrUBb8M282w87ZA7c
-         fu7IpW7WHb08EG4r9INIj2bLq8sWDT79jfiPz82CGhxkAR0hVRi7Sm4kj6mp39BHc18H
-         Srx0UzphQl5W1rhFsc+PTydVPjFsFHTtxKp0ONtXtklhQmMOj+YbdE95OYOdaqV+zQjP
-         z/Qll0tUGD7s6Vpnm2E4B18xXQL/wHS6SverqdNztgghAC90YK5Af/7iRM3rvj8vYf40
-         syUQo7CDjgStq10ebW6isviAqreFF0+3BpFDvj+gVXWgCUWlXhTh6Qq8C0X6QzNz9siB
-         Wr/Q==
-X-Gm-Message-State: APjAAAUUi4gEsd51f88nM4RpCahpWbEMsDG4f5V6Gfwe0NqirOv5J513
-        FOTkX2n8bOY0hOG7OXFk8GqZweN9AsK4oLun
-X-Google-Smtp-Source: APXvYqz6lRExPxrZzq/HzNoGfVZ8/pwXegBhHlmrc4aa8vUCi3bYeW4zFsBDvQowv77K8bpN8RpCGQ==
-X-Received: by 2002:a7b:c049:: with SMTP id u9mr4873589wmc.12.1571923434148;
-        Thu, 24 Oct 2019 06:23:54 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=n1CZfuSwOBWiTJLsXGGXKsTYggjtyZaieumQoTW6nsw=;
+        b=Pi7Lynn0OuIO1K0PePtpzz6MltyX5as/W3Me3Og5efUeDMtK51aIGtAm12R7WX2Z2x
+         PJ1LS9svNbenMTVl+Ryf/B8N+RADuUHkj6bzBlSKh0rfokqCG925q4y3wNpB/b/VYtm1
+         6I6ZC8fq5XxCvyGm5bkMUAQUzV0KEQ2RfN21fr3DcglEBms5FXdjk1Hs8SVBsYwAoEKt
+         E8yiAWZBOGWWM03jQ9t4oSHuKkUwe6VWHmHq4q8vXiq77Dhs5HjQieihTZ/Nv9Dcqa5Z
+         SCKyboQY/5xXd+htJnTnIJrJtIp9gVw8XPZ5GWUpwuUE4WTVMhi/c2zNfMZtcGvEfOQk
+         JsUA==
+X-Gm-Message-State: APjAAAW26rWUIjSeVkH2EPaFe7skz822SXk+JJKc9afCQSwcdjQmY+dn
+        s3Bug57zb28kqSk/TKagjN1ONYXQ3TMeflM8
+X-Google-Smtp-Source: APXvYqwHtc6EgZfQ0QDGwcZ2Q95eSng9l7ZYxmVHvCtz9rcd14RvSZ98geGqKgL1Tay0isfdqki/1A==
+X-Received: by 2002:a1c:4489:: with SMTP id r131mr4687908wma.132.1571923436836;
+        Thu, 24 Oct 2019 06:23:56 -0700 (PDT)
 Received: from localhost.localdomain (laubervilliers-657-1-83-120.w92-154.abo.wanadoo.fr. [92.154.90.120])
-        by smtp.gmail.com with ESMTPSA id e3sm2346310wme.36.2019.10.24.06.23.52
+        by smtp.gmail.com with ESMTPSA id e3sm2346310wme.36.2019.10.24.06.23.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Oct 2019 06:23:53 -0700 (PDT)
+        Thu, 24 Oct 2019 06:23:55 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Biggers <ebiggers@google.com>,
-        linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v2 00/27] crypto: convert h/w accelerator drivers to skcipher API
-Date:   Thu, 24 Oct 2019 15:23:18 +0200
-Message-Id: <20191024132345.5236-1-ard.biesheuvel@linaro.org>
+        linux-arm-kernel@lists.infradead.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Gonglei <arei.gonglei@huawei.com>,
+        virtualization@lists.linux-foundation.org
+Subject: [PATCH v2 02/27] crypto: virtio - deal with unsupported input sizes
+Date:   Thu, 24 Oct 2019 15:23:20 +0200
+Message-Id: <20191024132345.5236-3-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191024132345.5236-1-ard.biesheuvel@linaro.org>
+References: <20191024132345.5236-1-ard.biesheuvel@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This series converts all drivers for h/w accelerators that produce the
-ablkcipher API to the skcipher API, so that we can finally retire the
-long deprecated [a]blkcipher code.
+Return -EINVAL for input sizes that are not a multiple of the AES
+block size, since they are not supported by our CBC chaining mode.
 
-Changes since v1:
-- remove some more [cosmetic] references to [a]blkcipher (#26-#27)
-- add back missing IV for cbc(aes) in the omap driver, fixing a crash
-- add Gary's ack to #4
-- add Linus's ack to #6 and #15
-- add Kamil's and Krzysztof's acks to #7
-- fixed a bug in the Atmel patch (#8)
-- add Horia's tested-by to #16
-- add Dave's ack to #22
+While at it, remove the pr_err() that reports unsupported key sizes
+being used: we shouldn't spam the kernel log with that.
 
-Patches #1, #2 are fixes for the virtio driver, which need to be applied
-first so that they can be backported
+Fixes: dbaf0624ffa5 ("crypto: add virtio-crypto driver")
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: Gonglei <arei.gonglei@huawei.com>
+Cc: virtualization@lists.linux-foundation.org
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+---
+ drivers/crypto/virtio/virtio_crypto_algs.c | 12 ++++++++++--
+ 1 file changed, 10 insertions(+), 2 deletions(-)
 
-Patches #3 and #4 have been tested on actual 'hardware' (given the virtual
-nature of the virtio driver). Patch #7 was tested successfully in kernelci.
-Patch #16 was tested by Horia.
-
-All other patches have been build tested *only*, and should be tested on
-actual hardware before being merged. Note that patches can be merged
-piecemeal (with the exception of #1 .. #3) since there are no dependencies
-between them.
-
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Biggers <ebiggers@google.com>
-Cc: linux-arm-kernel@lists.infradead.org
-
-Ard Biesheuvel (27):
-  crypto: virtio - implement missing support for output IVs
-  crypto: virtio - deal with unsupported input sizes
-  crypto: virtio - switch to skcipher API
-  crypto: ccp - switch from ablkcipher to skcipher
-  crypto: omap - switch to skcipher API
-  crypto: ux500 - switch to skcipher API
-  crypto: s5p - switch to skcipher API
-  crypto: atmel-aes - switch to skcipher API
-  crypto: atmel-tdes - switch to skcipher API
-  crypto: bcm-spu - switch to skcipher API
-  crypto: nitrox - remove cra_type reference to ablkcipher
-  crypto: cavium/cpt - switch to skcipher API
-  crypto: chelsio - switch to skcipher API
-  crypto: hifn - switch to skcipher API
-  crypto: ixp4xx - switch to skcipher API
-  crypto: mxs - switch to skcipher API
-  crypto: mediatek - switch to skcipher API
-  crypto: sahara - switch to skcipher API
-  crypto: picoxcell - switch to skcipher API
-  crypto: qce - switch to skcipher API
-  crypto: stm32 - switch to skcipher API
-  crypto: niagara2 - switch to skcipher API
-  crypto: rockchip - switch to skcipher API
-  crypto: talitos - switch to skcipher API
-  crypto: qat - switch to skcipher API
-  crypto: marvell/cesa - rename blkcipher to skcipher
-  crypto: nx - remove stale comment referring to the blkcipher walk API
-
- drivers/crypto/Kconfig                             |   2 +-
- drivers/crypto/atmel-aes.c                         | 509 +++++++++---------
- drivers/crypto/atmel-tdes.c                        | 433 ++++++++-------
- drivers/crypto/bcm/cipher.c                        | 373 +++++++------
- drivers/crypto/bcm/cipher.h                        |  10 +-
- drivers/crypto/bcm/spu2.c                          |   6 +-
- drivers/crypto/cavium/cpt/cptvf_algs.c             | 292 +++++-----
- drivers/crypto/cavium/nitrox/nitrox_skcipher.c     |   1 -
- drivers/crypto/ccp/ccp-crypto-aes-galois.c         |   7 +-
- drivers/crypto/ccp/ccp-crypto-aes-xts.c            |  94 ++--
- drivers/crypto/ccp/ccp-crypto-aes.c                | 169 +++---
- drivers/crypto/ccp/ccp-crypto-des3.c               | 100 ++--
- drivers/crypto/ccp/ccp-crypto-main.c               |  14 +-
- drivers/crypto/ccp/ccp-crypto.h                    |  13 +-
- drivers/crypto/chelsio/chcr_algo.c                 | 334 ++++++------
- drivers/crypto/chelsio/chcr_algo.h                 |   2 +-
- drivers/crypto/chelsio/chcr_crypto.h               |  16 +-
- drivers/crypto/hifn_795x.c                         | 183 +++----
- drivers/crypto/ixp4xx_crypto.c                     | 228 ++++----
- drivers/crypto/marvell/cesa.h                      |   6 +-
- drivers/crypto/marvell/cipher.c                    |  14 +-
- drivers/crypto/mediatek/mtk-aes.c                  | 248 ++++-----
- drivers/crypto/mxs-dcp.c                           | 140 +++--
- drivers/crypto/n2_core.c                           | 194 ++++---
- drivers/crypto/nx/nx-aes-ccm.c                     |   5 -
- drivers/crypto/nx/nx-aes-gcm.c                     |   5 -
- drivers/crypto/omap-aes.c                          | 209 ++++----
- drivers/crypto/omap-aes.h                          |   4 +-
- drivers/crypto/omap-des.c                          | 232 ++++----
- drivers/crypto/picoxcell_crypto.c                  | 386 +++++++-------
- drivers/crypto/qat/qat_common/qat_algs.c           | 255 +++++----
- drivers/crypto/qat/qat_common/qat_crypto.h         |   4 +-
- drivers/crypto/qce/Makefile                        |   2 +-
- drivers/crypto/qce/cipher.h                        |   8 +-
- drivers/crypto/qce/common.c                        |  12 +-
- drivers/crypto/qce/common.h                        |   3 +-
- drivers/crypto/qce/core.c                          |   2 +-
- drivers/crypto/qce/{ablkcipher.c => skcipher.c}    | 172 +++---
- drivers/crypto/rockchip/Makefile                   |   2 +-
- drivers/crypto/rockchip/rk3288_crypto.c            |   8 +-
- drivers/crypto/rockchip/rk3288_crypto.h            |   3 +-
- drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c | 556 --------------------
- drivers/crypto/rockchip/rk3288_crypto_skcipher.c   | 538 +++++++++++++++++++
- drivers/crypto/s5p-sss.c                           | 187 ++++---
- drivers/crypto/sahara.c                            | 156 +++---
- drivers/crypto/stm32/stm32-cryp.c                  | 338 ++++++------
- drivers/crypto/talitos.c                           | 306 +++++------
- drivers/crypto/ux500/cryp/cryp_core.c              | 371 ++++++-------
- drivers/crypto/virtio/virtio_crypto_algs.c         | 192 +++----
- drivers/crypto/virtio/virtio_crypto_common.h       |   2 +-
- 50 files changed, 3499 insertions(+), 3847 deletions(-)
- rename drivers/crypto/qce/{ablkcipher.c => skcipher.c} (61%)
- delete mode 100644 drivers/crypto/rockchip/rk3288_crypto_ablkcipher.c
- create mode 100644 drivers/crypto/rockchip/rk3288_crypto_skcipher.c
-
+diff --git a/drivers/crypto/virtio/virtio_crypto_algs.c b/drivers/crypto/virtio/virtio_crypto_algs.c
+index 65ec10800137..82b316b2f537 100644
+--- a/drivers/crypto/virtio/virtio_crypto_algs.c
++++ b/drivers/crypto/virtio/virtio_crypto_algs.c
+@@ -105,8 +105,6 @@ virtio_crypto_alg_validate_key(int key_len, uint32_t *alg)
+ 		*alg = VIRTIO_CRYPTO_CIPHER_AES_CBC;
+ 		break;
+ 	default:
+-		pr_err("virtio_crypto: Unsupported key length: %d\n",
+-			key_len);
+ 		return -EINVAL;
+ 	}
+ 	return 0;
+@@ -489,6 +487,11 @@ static int virtio_crypto_ablkcipher_encrypt(struct ablkcipher_request *req)
+ 	/* Use the first data virtqueue as default */
+ 	struct data_queue *data_vq = &vcrypto->data_vq[0];
+ 
++	if (!req->nbytes)
++		return 0;
++	if (req->nbytes % AES_BLOCK_SIZE)
++		return -EINVAL;
++
+ 	vc_req->dataq = data_vq;
+ 	vc_req->alg_cb = virtio_crypto_dataq_sym_callback;
+ 	vc_sym_req->ablkcipher_ctx = ctx;
+@@ -509,6 +512,11 @@ static int virtio_crypto_ablkcipher_decrypt(struct ablkcipher_request *req)
+ 	/* Use the first data virtqueue as default */
+ 	struct data_queue *data_vq = &vcrypto->data_vq[0];
+ 
++	if (!req->nbytes)
++		return 0;
++	if (req->nbytes % AES_BLOCK_SIZE)
++		return -EINVAL;
++
+ 	vc_req->dataq = data_vq;
+ 	vc_req->alg_cb = virtio_crypto_dataq_sym_callback;
+ 	vc_sym_req->ablkcipher_ctx = ctx;
 -- 
 2.20.1
 
