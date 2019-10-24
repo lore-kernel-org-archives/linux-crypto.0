@@ -2,151 +2,70 @@ Return-Path: <SRS0=tzqc=YR=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50070CA9EAF
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Oct 2019 14:18:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD479CA9EAF
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Oct 2019 16:28:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 17CBB21906
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Oct 2019 14:18:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UbcY2S3M"
+	by mail.kernel.org (Postfix) with ESMTP id B44E320659
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Oct 2019 16:28:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2407368AbfJXOSM (ORCPT
+        id S2409799AbfJXQ2X (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Oct 2019 10:18:12 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:21722 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2405906AbfJXOSL (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Oct 2019 10:18:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1571926689;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=1702oBnAkkDkloBZidrcVo+vVTWenxIy5EZn+eImf0s=;
-        b=UbcY2S3M1qA1DmOZsBSKmhH4Rjk56eXwWX6dm8qvqZprOUjN5ZNoE03jr6EMQC6AbNCvFh
-        rcLtJRbZHYx/AqCCHVaA3DkxmviipwI0gz9UTGda9xKlnmGAgDu3znCKa47WU4T+G7gNgc
-        Ls55e8TgnKV3cmHkyaWqhgQdByIhfYc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-122-qxqBDIHWOzK-fIZtGMOReA-1; Thu, 24 Oct 2019 10:18:07 -0400
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BD33A47B;
-        Thu, 24 Oct 2019 14:18:04 +0000 (UTC)
-Received: from redhat.com (ovpn-125-229.rdu2.redhat.com [10.10.125.229])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5B5AC5D712;
-        Thu, 24 Oct 2019 14:18:01 +0000 (UTC)
-Date:   Thu, 24 Oct 2019 10:17:59 -0400
-From:   Jerome Glisse <jglisse@redhat.com>
-To:     Kenneth Lee <Kenneth-Lee-2012@foxmail.com>
-Cc:     Zhangfei Gao <zhangfei.gao@linaro.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        jonathan.cameron@huawei.com, grant.likely@arm.com,
-        jean-philippe <jean-philippe@linaro.org>,
-        ilias.apalodimas@linaro.org, francois.ozog@linaro.org,
-        Wangzhou <wangzhou1@hisilicon.com>,
-        "haojian . zhuang" <haojian.zhuang@linaro.org>,
-        Zaibo Xu <xuzaibo@huawei.com>, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, Kenneth Lee <liguozhu@hisilicon.com>,
-        linux-accelerators@lists.ozlabs.org
-Subject: Re: [PATCH v6 2/3] uacce: add uacce driver
-Message-ID: <20191024141759.GA4793@redhat.com>
-References: <1571214873-27359-1-git-send-email-zhangfei.gao@linaro.org>
- <1571214873-27359-3-git-send-email-zhangfei.gao@linaro.org>
- <20191022184929.GC5169@redhat.com>
- <20191024064129.GB17723@kllp10>
+        Thu, 24 Oct 2019 12:28:23 -0400
+Received: from mx2.suse.de ([195.135.220.15]:45494 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2405586AbfJXQ2X (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 24 Oct 2019 12:28:23 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id D553BAC0C;
+        Thu, 24 Oct 2019 16:28:21 +0000 (UTC)
+Received: by ds.suse.cz (Postfix, from userid 10065)
+        id AB83DDA733; Thu, 24 Oct 2019 18:28:33 +0200 (CEST)
+From:   David Sterba <dsterba@suse.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     ard.biesheuvel@linaro.org, ebiggers@kernel.org,
+        David Sterba <dsterba@suse.com>
+Subject: [PATCH v7 0/2]  BLAKE2b generic implementation
+Date:   Thu, 24 Oct 2019 18:28:30 +0200
+Message-Id: <cover.1571934170.git.dsterba@suse.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-In-Reply-To: <20191024064129.GB17723@kllp10>
-User-Agent: Mutt/1.12.1 (2019-06-15)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-X-MC-Unique: qxqBDIHWOzK-fIZtGMOReA-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Oct 24, 2019 at 02:41:29PM +0800, Kenneth Lee wrote:
-> On Tue, Oct 22, 2019 at 02:49:29PM -0400, Jerome Glisse wrote:
-> > Date: Tue, 22 Oct 2019 14:49:29 -0400
-> > From: Jerome Glisse <jglisse@redhat.com>
-> > To: Zhangfei Gao <zhangfei.gao@linaro.org>
-> > Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Arnd Bergmann
-> >  <arnd@arndb.de>, Herbert Xu <herbert@gondor.apana.org.au>,
-> >  jonathan.cameron@huawei.com, grant.likely@arm.com, jean-philippe
-> >  <jean-philippe@linaro.org>, ilias.apalodimas@linaro.org,
-> >  francois.ozog@linaro.org, kenneth-lee-2012@foxmail.com, Wangzhou
-> >  <wangzhou1@hisilicon.com>, "haojian . zhuang" <haojian.zhuang@linaro.o=
-rg>,
-> >  Zaibo Xu <xuzaibo@huawei.com>, linux-kernel@vger.kernel.org,
-> >  linux-crypto@vger.kernel.org, Kenneth Lee <liguozhu@hisilicon.com>,
-> >  linux-accelerators@lists.ozlabs.org
-> > Subject: Re: [PATCH v6 2/3] uacce: add uacce driver
-> > Message-ID: <20191022184929.GC5169@redhat.com>
-> >=20
-> > On Wed, Oct 16, 2019 at 04:34:32PM +0800, Zhangfei Gao wrote:
-> > > From: Kenneth Lee <liguozhu@hisilicon.com>
-> > >=20
-> > > Uacce (Unified/User-space-access-intended Accelerator Framework) targ=
-ets to
-> > > provide Shared Virtual Addressing (SVA) between accelerators and proc=
-esses.
-> > > So accelerator can access any data structure of the main cpu.
-> > > This differs from the data sharing between cpu and io device, which s=
-hare
-> > > data content rather than address.
-> > > Since unified address, hardware and user space of process can share t=
-he
-> > > same virtual address in the communication.
-> > >=20
-> > > Uacce create a chrdev for every registration, the queue is allocated =
-to
-> > > the process when the chrdev is opened. Then the process can access th=
-e
-> > > hardware resource by interact with the queue file. By mmap the queue
-> > > file space to user space, the process can directly put requests to th=
-e
-> > > hardware without syscall to the kernel space.
-> >=20
-> > You need to remove all API that is not use by your first driver as
-> > it will most likely bit rot without users. It is way better to add
-> > things when a driver start to make use of it.
->=20
-> Yes. Good point. Thank you:)
->=20
-> >=20
-> > I am still not convince of the value of adding a new framework here
-> > with only a single device as an example. It looks similar to some of
-> > the fpga devices. Saddly because framework layering is not something
-> > that exist i guess inventing a new framework is the only answer when
-> > you can not quite fit into an existing one.
-> >=20
-> > More fundamental question is why do you need to change the IOMMU
-> > domain of the device ? I do not see any reason for that unless the
-> > PASID has some restriction on ARM that i do not know of.
->=20
-> But I think this is the only way. As my understanding, by default, the
-> system creates a DMA IOMMU domain for each device behine an IOMMU. If
-> you want to call iommu interface directly, we have to rebind the device
-> to an unmanaged domain.
+The patchset adds blake2b reference implementation and test vectors.
 
-Why would you need to call iommu directly ? On some GPUs we do use
-PASID and we do not rebind to different domain, we just don't mess
-with that. So i do not see any reason to change the domain.
+V7:
 
-Cheers,
-J=E9r=F4me
+Contents of include/crypto/blake2b.h moved to blake2b_generic.c, as the
+exported constants or structures are not needed by anything as for now.
+
+V1: https://lore.kernel.org/linux-crypto/cover.1569849051.git.dsterba@suse.com/
+V2: https://lore.kernel.org/linux-crypto/e31c2030fcfa7f409b2c81adf8f179a8a55a584a.1570184333.git.dsterba@suse.com/
+V3: https://lore.kernel.org/linux-crypto/e7f46def436c2c705c0b2cac3324f817efa4717d.1570715842.git.dsterba@suse.com/
+V4: https://lore.kernel.org/linux-crypto/cover.1570812094.git.dsterba@suse.com/
+V5: https://lore.kernel.org/linux-crypto/cover.1571043883.git.dsterba@suse.com/
+V6: https://lore.kernel.org/linux-crypto/cover.1571788861.git.dsterba@suse.com/
+
+David Sterba (2):
+  crypto: add blake2b generic implementation
+  crypto: add test vectors for blake2b
+
+ crypto/Kconfig           |  17 ++
+ crypto/Makefile          |   1 +
+ crypto/blake2b_generic.c | 435 +++++++++++++++++++++++++++++++++++++++
+ crypto/testmgr.c         |  28 +++
+ crypto/testmgr.h         | 307 +++++++++++++++++++++++++++
+ 5 files changed, 788 insertions(+)
+ create mode 100644 crypto/blake2b_generic.c
+
+-- 
+2.23.0
 
