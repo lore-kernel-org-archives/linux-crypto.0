@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BFCECA9EAF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D683CA9EBE
 	for <linux-crypto@archiver.kernel.org>; Thu, 24 Oct 2019 13:24:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1F1B32166E
+	by mail.kernel.org (Postfix) with ESMTP id 51EA02166E
 	for <linux-crypto@archiver.kernel.org>; Thu, 24 Oct 2019 13:24:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CHB38qnm"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FhF56Pxn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732125AbfJXNYe (ORCPT
+        id S1731935AbfJXNYe (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Thu, 24 Oct 2019 09:24:34 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:54548 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731935AbfJXNYe (ORCPT
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:34395 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2502434AbfJXNYe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 24 Oct 2019 09:24:34 -0400
-Received: by mail-wm1-f65.google.com with SMTP id g7so2829956wmk.4
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Oct 2019 06:24:32 -0700 (PDT)
+Received: by mail-wm1-f67.google.com with SMTP id v3so2001226wmh.1
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Oct 2019 06:24:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=gafT1c0FgkNr2xD+zkDSgemAEsZK/gkAa/8lkYnPPKw=;
-        b=CHB38qnmiIoWY26c3wRxuzk+ZOSa7lwUYBKbyXFt+GT9s2qCB78UmvViVvoiQM7QTY
-         rW2Rcd6SGJIGgGVFNX0SJQXjO+WQVjD4QkIgV0+UI5iEFxbOyFlyTAx0uxmVAn/COzNa
-         ZzY0Bz17VitJ6ppDTaokb69HwslnO20Mo6PNP4LQbUHsHC/kX1f+Al6G3aWrHGy7jvdv
-         30OisuNk6PgBOI27Znki2YEYKb2BtGep5t8l/NUS1bxAoMb29C03ETB/wv32800J7BBz
-         KwB8Gti8rHMxcu+7DWapIuAph1mtDeASezoAay2t19YtwNGS+qginVZDnBYSm5G+v2XW
-         O0ew==
+        bh=pIvf3uaGexOd3cBtkCmgOi+/J9vxhbC8kqb/606IHXY=;
+        b=FhF56Pxn4X3XQVxawn/+Eu+hcpuuhw0C9uevsNl8pV9C/b0nSJu6BuMkHF23q4KPHP
+         oTVaS7ramu0vMoIUrzbPGj99cz/+em3Y8RUF0OJZbHaGBAfjMWUX+jy7li206eJNLk0G
+         l33a4FEzF1w6/MabcLmZJCRjvHdwKPtZPYwgNXB7fJ9JILxo9PdF8DgmmaSxRWnzeUIU
+         DDvwe1/4A4kzlNv/eL5Dxe+zp0FfhFV8tO3KDrngcRbD/B38M29QCnmQV+NvbuX5kyRZ
+         wV4saxxqa1dSh3MwQf7bUIMUcWYJyB8DTpnEotJajuraygBur7fdbEfCbL1L/MrqTWL3
+         r08w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=gafT1c0FgkNr2xD+zkDSgemAEsZK/gkAa/8lkYnPPKw=;
-        b=DJ2CmXCpJeRPmM8cRzQkY2H2CUQUOoGll5A/4jXJ0cxIPMSIPdKnnsaSXrJrPJcrVa
-         NVsrZhL/3FkRFFenHLLINUSTtC9QTw3p9Y6F6EpPwv1a98eXaga/alpDV6p8Tjz3lwG6
-         61RDSg2Q+9MVJ1/AKr58uRkLXFxRQYACGFar9tLq0+FxLHDURiGE660PHlUvAKQE5hM3
-         GjiPXDWWz7expvNR9+Mrg1Hco8Jj4zJHzoWobjQRd3rd+NL+rG3MKz4ChpT3IqzglTEj
-         Qawd/0xfVvzvgbdpuMGKoPqRVfOswNlg678MWQvfSBERMfhpHjB2hIQEeSVcFS6N/o5I
-         RtOw==
-X-Gm-Message-State: APjAAAXxan3IF8rIFVPqozu1O/Mn5MPushjY7o6UVLpz7aSjDFDwYPO5
-        a5J/H3ZrzmzOO0rIxK94Zkh22HTmLMzY86tU
-X-Google-Smtp-Source: APXvYqylavvVBkkME63FbqEWNpFeVOHYol92i8elmCht1vf/qMPHxvNflkj3oX9akZNufJ8WOdgm6A==
-X-Received: by 2002:a1c:49c2:: with SMTP id w185mr4782947wma.16.1571923471290;
-        Thu, 24 Oct 2019 06:24:31 -0700 (PDT)
-Received: from localhost.localdomain (laubervilliers-657-1-83-120.w92-154.abo.wanadoo.fr. [92.154.90.120])
-        by smtp.gmail.com with ESMTPSA id e3sm2346310wme.36.2019.10.24.06.24.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        bh=pIvf3uaGexOd3cBtkCmgOi+/J9vxhbC8kqb/606IHXY=;
+        b=AMIn8GRHT+vSK2XMBF6VriGs2PQMUhBim8Q2V4c43309ZAOQCJe6PDJgd1bednZhMo
+         W4kCmAG7j1CAUkIfw/FovQDCbR+1yGpMZ+OaDEPfRQxfdOUVNGKqDpHMH0kfpE5WVirT
+         ETTkdQ1S5SXoev9hbcbmRPb6HA/c/lFffDGxNZ5dugBcDcHcg0U49PXW30ZUbtjJG3iA
+         9+g8Hqx5XL03eG24VOVSvXlXOXENrG2WUhhvjr4yKBml5+62t9AelaCMpUYJrThhd8s/
+         1Q+ai5XN91lCFgYUx6xfWBCzAyukxTAiolRLruPVr43MxxJx2xyb91VNifgzPHObmPze
+         mhNQ==
+X-Gm-Message-State: APjAAAWXea4WqspTR4fm6rrDS/7g1LVaext5cXum6HSoEdSfWq6DE0Er
+        /Wq1CDajknzbx4K9iA3jojPewYHUJlSrf7WS
+X-Google-Smtp-Source: APXvYqzoCg2b5XHvYPu+5eB6aX89cQV4TlVbsQXRylMtCiOq+8zfsUcRYhaMc0a1t03d37CsAZTqXA==
+X-Received: by 2002:a7b:c94f:: with SMTP id i15mr5107043wml.8.1571923470209;
         Thu, 24 Oct 2019 06:24:30 -0700 (PDT)
+Received: from localhost.localdomain (laubervilliers-657-1-83-120.w92-154.abo.wanadoo.fr. [92.154.90.120])
+        by smtp.gmail.com with ESMTPSA id e3sm2346310wme.36.2019.10.24.06.24.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Oct 2019 06:24:29 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
@@ -63,9 +63,9 @@ Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         "David S. Miller" <davem@davemloft.net>,
         Eric Biggers <ebiggers@google.com>,
         linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v2 27/27] crypto: nx - remove stale comment referring to the blkcipher walk API
-Date:   Thu, 24 Oct 2019 15:23:45 +0200
-Message-Id: <20191024132345.5236-28-ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 26/27] crypto: marvell/cesa - rename blkcipher to skcipher
+Date:   Thu, 24 Oct 2019 15:23:44 +0200
+Message-Id: <20191024132345.5236-27-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191024132345.5236-1-ard.biesheuvel@linaro.org>
 References: <20191024132345.5236-1-ard.biesheuvel@linaro.org>
@@ -76,48 +76,113 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-These drivers do not use either the deprecated blkcipher or the current
-skcipher walk API, so this comment must refer to a previous state of the
-driver that no longer exists. So drop the comments.
+The driver specific types contain some rudimentary references to the
+blkcipher API, which is deprecated and will be removed. To avoid confusion,
+rename these to skcipher. This is a cosmetic change only, as the code does
+not actually use the blkcipher API.
 
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- drivers/crypto/nx/nx-aes-ccm.c | 5 -----
- drivers/crypto/nx/nx-aes-gcm.c | 5 -----
- 2 files changed, 10 deletions(-)
+ drivers/crypto/marvell/cesa.h   |  6 +++---
+ drivers/crypto/marvell/cipher.c | 14 +++++++-------
+ 2 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/crypto/nx/nx-aes-ccm.c b/drivers/crypto/nx/nx-aes-ccm.c
-index 84fed736ed2e..4c9362eebefd 100644
---- a/drivers/crypto/nx/nx-aes-ccm.c
-+++ b/drivers/crypto/nx/nx-aes-ccm.c
-@@ -525,11 +525,6 @@ static int ccm_aes_nx_decrypt(struct aead_request *req)
- 	return ccm_nx_decrypt(req, req->iv, req->assoclen);
- }
+diff --git a/drivers/crypto/marvell/cesa.h b/drivers/crypto/marvell/cesa.h
+index d63a6ee905c9..f1ed3b85c0d2 100644
+--- a/drivers/crypto/marvell/cesa.h
++++ b/drivers/crypto/marvell/cesa.h
+@@ -232,13 +232,13 @@ struct mv_cesa_sec_accel_desc {
+ };
  
--/* tell the block cipher walk routines that this is a stream cipher by
-- * setting cra_blocksize to 1. Even using blkcipher_walk_virt_block
-- * during encrypt/decrypt doesn't solve this problem, because it calls
-- * blkcipher_walk_done under the covers, which doesn't use walk->blocksize,
-- * but instead uses this tfm->blocksize. */
- struct aead_alg nx_ccm_aes_alg = {
- 	.base = {
- 		.cra_name        = "ccm(aes)",
-diff --git a/drivers/crypto/nx/nx-aes-gcm.c b/drivers/crypto/nx/nx-aes-gcm.c
-index 898220e159d3..19c6ed5baea4 100644
---- a/drivers/crypto/nx/nx-aes-gcm.c
-+++ b/drivers/crypto/nx/nx-aes-gcm.c
-@@ -467,11 +467,6 @@ static int gcm4106_aes_nx_decrypt(struct aead_request *req)
- 	return gcm_aes_nx_crypt(req, 0, req->assoclen - 8);
- }
+ /**
+- * struct mv_cesa_blkcipher_op_ctx - cipher operation context
++ * struct mv_cesa_skcipher_op_ctx - cipher operation context
+  * @key:	cipher key
+  * @iv:		cipher IV
+  *
+  * Context associated to a cipher operation.
+  */
+-struct mv_cesa_blkcipher_op_ctx {
++struct mv_cesa_skcipher_op_ctx {
+ 	u32 key[8];
+ 	u32 iv[4];
+ };
+@@ -265,7 +265,7 @@ struct mv_cesa_hash_op_ctx {
+ struct mv_cesa_op_ctx {
+ 	struct mv_cesa_sec_accel_desc desc;
+ 	union {
+-		struct mv_cesa_blkcipher_op_ctx blkcipher;
++		struct mv_cesa_skcipher_op_ctx skcipher;
+ 		struct mv_cesa_hash_op_ctx hash;
+ 	} ctx;
+ };
+diff --git a/drivers/crypto/marvell/cipher.c b/drivers/crypto/marvell/cipher.c
+index 84ceddfee76b..d8e8c857770c 100644
+--- a/drivers/crypto/marvell/cipher.c
++++ b/drivers/crypto/marvell/cipher.c
+@@ -209,7 +209,7 @@ mv_cesa_skcipher_complete(struct crypto_async_request *req)
+ 		struct mv_cesa_req *basereq;
  
--/* tell the block cipher walk routines that this is a stream cipher by
-- * setting cra_blocksize to 1. Even using blkcipher_walk_virt_block
-- * during encrypt/decrypt doesn't solve this problem, because it calls
-- * blkcipher_walk_done under the covers, which doesn't use walk->blocksize,
-- * but instead uses this tfm->blocksize. */
- struct aead_alg nx_gcm_aes_alg = {
- 	.base = {
- 		.cra_name        = "gcm(aes)",
+ 		basereq = &creq->base;
+-		memcpy(skreq->iv, basereq->chain.last->op->ctx.blkcipher.iv,
++		memcpy(skreq->iv, basereq->chain.last->op->ctx.skcipher.iv,
+ 		       ivsize);
+ 	} else {
+ 		memcpy_fromio(skreq->iv,
+@@ -470,7 +470,7 @@ static int mv_cesa_des_op(struct skcipher_request *req,
+ 	mv_cesa_update_op_cfg(tmpl, CESA_SA_DESC_CFG_CRYPTM_DES,
+ 			      CESA_SA_DESC_CFG_CRYPTM_MSK);
+ 
+-	memcpy(tmpl->ctx.blkcipher.key, ctx->key, DES_KEY_SIZE);
++	memcpy(tmpl->ctx.skcipher.key, ctx->key, DES_KEY_SIZE);
+ 
+ 	return mv_cesa_skcipher_queue_req(req, tmpl);
+ }
+@@ -523,7 +523,7 @@ static int mv_cesa_cbc_des_op(struct skcipher_request *req,
+ 	mv_cesa_update_op_cfg(tmpl, CESA_SA_DESC_CFG_CRYPTCM_CBC,
+ 			      CESA_SA_DESC_CFG_CRYPTCM_MSK);
+ 
+-	memcpy(tmpl->ctx.blkcipher.iv, req->iv, DES_BLOCK_SIZE);
++	memcpy(tmpl->ctx.skcipher.iv, req->iv, DES_BLOCK_SIZE);
+ 
+ 	return mv_cesa_des_op(req, tmpl);
+ }
+@@ -575,7 +575,7 @@ static int mv_cesa_des3_op(struct skcipher_request *req,
+ 	mv_cesa_update_op_cfg(tmpl, CESA_SA_DESC_CFG_CRYPTM_3DES,
+ 			      CESA_SA_DESC_CFG_CRYPTM_MSK);
+ 
+-	memcpy(tmpl->ctx.blkcipher.key, ctx->key, DES3_EDE_KEY_SIZE);
++	memcpy(tmpl->ctx.skcipher.key, ctx->key, DES3_EDE_KEY_SIZE);
+ 
+ 	return mv_cesa_skcipher_queue_req(req, tmpl);
+ }
+@@ -628,7 +628,7 @@ struct skcipher_alg mv_cesa_ecb_des3_ede_alg = {
+ static int mv_cesa_cbc_des3_op(struct skcipher_request *req,
+ 			       struct mv_cesa_op_ctx *tmpl)
+ {
+-	memcpy(tmpl->ctx.blkcipher.iv, req->iv, DES3_EDE_BLOCK_SIZE);
++	memcpy(tmpl->ctx.skcipher.iv, req->iv, DES3_EDE_BLOCK_SIZE);
+ 
+ 	return mv_cesa_des3_op(req, tmpl);
+ }
+@@ -694,7 +694,7 @@ static int mv_cesa_aes_op(struct skcipher_request *req,
+ 		key = ctx->aes.key_enc;
+ 
+ 	for (i = 0; i < ctx->aes.key_length / sizeof(u32); i++)
+-		tmpl->ctx.blkcipher.key[i] = cpu_to_le32(key[i]);
++		tmpl->ctx.skcipher.key[i] = cpu_to_le32(key[i]);
+ 
+ 	if (ctx->aes.key_length == 24)
+ 		cfg |= CESA_SA_DESC_CFG_AES_LEN_192;
+@@ -755,7 +755,7 @@ static int mv_cesa_cbc_aes_op(struct skcipher_request *req,
+ {
+ 	mv_cesa_update_op_cfg(tmpl, CESA_SA_DESC_CFG_CRYPTCM_CBC,
+ 			      CESA_SA_DESC_CFG_CRYPTCM_MSK);
+-	memcpy(tmpl->ctx.blkcipher.iv, req->iv, AES_BLOCK_SIZE);
++	memcpy(tmpl->ctx.skcipher.iv, req->iv, AES_BLOCK_SIZE);
+ 
+ 	return mv_cesa_aes_op(req, tmpl);
+ }
 -- 
 2.20.1
 
