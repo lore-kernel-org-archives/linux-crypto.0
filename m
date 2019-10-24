@@ -2,184 +2,174 @@ Return-Path: <SRS0=tzqc=YR=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBAA5CA9EAF
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Oct 2019 17:02:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A2ADCA9EAF
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Oct 2019 17:05:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C023920650
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Oct 2019 17:02:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 69C4A21929
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Oct 2019 17:05:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2410025AbfJXRCL (ORCPT
+        id S2410180AbfJXRFZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 24 Oct 2019 13:02:11 -0400
-Received: from mail-il1-f197.google.com ([209.85.166.197]:45857 "EHLO
-        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2410023AbfJXRCL (ORCPT
+        Thu, 24 Oct 2019 13:05:25 -0400
+Received: from esa5.microchip.iphmx.com ([216.71.150.166]:34300 "EHLO
+        esa5.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2410170AbfJXRFZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Oct 2019 13:02:11 -0400
-Received: by mail-il1-f197.google.com with SMTP id w9so16082767ilo.12
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Oct 2019 10:02:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=gnBVB/MCcAJVEx5kLX5YbPi7DcmZ/XW3gOmdfm/l+IA=;
-        b=GrYWX1XzPuswO2LJR0vYS4vpHwfc2uC/+n+bjgYT63g98vIT9y5WbGbkGJGfRg5/V0
-         78/0QOTJg5YmtoEHRJA/qu8OvJ+7pYWlN7Sqs5z5Dg1UUjN9gGtUJCf22r+5+SuACEE4
-         X3SMsRgdtPhj3YBa1llbOYysHjkBynUz+4tuvJQmKXVYNzG6HycuVnzI6wjZ4EfUoXt6
-         L9yJ9UjaI7jGg7vBE7K49jMgPzUJVIGj29/tRaD4/Qx4za4hfZ+ONYPKCc486XAwAzhJ
-         SCfb1/u95+I0wjVjDCzpQDNEAj+jEd41A1IYWI8HxXaJPlxh0/+G0bFIiFcplOQN4FLN
-         /ZCw==
-X-Gm-Message-State: APjAAAW/OLHIHn3UAu19/fyipmkrUYlDBxlkvk87T/vznRTMzvLVhgO1
-        d1vnhFz0ZCcaJ/SA/qI9Djxt2Umw3CQsBcN7yluyTIziIsIS
-X-Google-Smtp-Source: APXvYqwLrzXvLYspWxVGMVkDRKKtVf4XeXPJuGmcakuCAHepWXmGZfBZv+K8zdKynEexb7HeYziOoQZhYu/LXY4PeumEjm9NEvkP
+        Thu, 24 Oct 2019 13:05:25 -0400
+Received-SPF: Pass (esa5.microchip.iphmx.com: domain of
+  Codrin.Ciubotariu@microchip.com designates 198.175.253.82 as
+  permitted sender) identity=mailfrom;
+  client-ip=198.175.253.82; receiver=esa5.microchip.iphmx.com;
+  envelope-from="Codrin.Ciubotariu@microchip.com";
+  x-sender="Codrin.Ciubotariu@microchip.com";
+  x-conformance=spf_only; x-record-type="v=spf1";
+  x-record-text="v=spf1 mx a:ushub1.microchip.com
+  a:smtpout.microchip.com a:mx1.microchip.iphmx.com
+  a:mx2.microchip.iphmx.com include:servers.mcsv.net
+  include:mktomail.com include:spf.protection.outlook.com ~all"
+Received-SPF: None (esa5.microchip.iphmx.com: no sender
+  authenticity information available from domain of
+  postmaster@email.microchip.com) identity=helo;
+  client-ip=198.175.253.82; receiver=esa5.microchip.iphmx.com;
+  envelope-from="Codrin.Ciubotariu@microchip.com";
+  x-sender="postmaster@email.microchip.com";
+  x-conformance=spf_only
+Authentication-Results: esa5.microchip.iphmx.com; dkim=none (message not signed) header.i=none; spf=Pass smtp.mailfrom=Codrin.Ciubotariu@microchip.com; spf=None smtp.helo=postmaster@email.microchip.com; dmarc=pass (p=none dis=none) d=microchip.com
+IronPort-SDR: dTzbzup2PDTL1ft7e2VxNAcemzw2cAxVjj32wRrm9+7FzrcmgC6IggiOGjXpht6kLf8o8r+uBh
+ wb2H0ecdo1UisR+/q2pMKgKS86ZbuMT1zvNtej1xLG5f0Vp43hnrIZjtoescD/bIqhlI+wcCWv
+ YCNejmVQr6JaeO9DNCoqFWnV9AippM1dkIk0QbXIoG6aNkH1tqaxUXgo+3/UZcoQsmjT25bk2J
+ 2tC13Gc6O8etHnASx70oUdhx2Qoyo95kKvK6537HVy1GSHHvkQ/p1JYckbR5a3fTvmuIDJah6s
+ T3M=
+X-IronPort-AV: E=Sophos;i="5.68,225,1569308400"; 
+   d="scan'208";a="52806866"
+Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 24 Oct 2019 10:05:24 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Thu, 24 Oct 2019 10:05:23 -0700
+Received: from rob-ult-m19940.microchip.com (10.10.85.251) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
+ 15.1.1713.5 via Frontend Transport; Thu, 24 Oct 2019 10:05:20 -0700
+From:   Codrin Ciubotariu <codrin.ciubotariu@microchip.com>
+To:     <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>
+CC:     <mpm@selenic.com>, <herbert@gondor.apana.org.au>,
+        <robh+dt@kernel.org>, <mark.rutland@arm.com>,
+        <nicolas.ferre@microchip.com>, <alexandre.belloni@bootlin.com>,
+        <ludovic.desroches@microchip.com>, <arnd@arndb.de>,
+        <Tudor.Ambarus@microchip.com>,
+        Codrin Ciubotariu <codrin.ciubotariu@microchip.com>
+Subject: [PATCH 2/2] hwrng: atmel: add new platform support for sam9x60
+Date:   Thu, 24 Oct 2019 20:04:52 +0300
+Message-ID: <20191024170452.2145-2-codrin.ciubotariu@microchip.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191024170452.2145-1-codrin.ciubotariu@microchip.com>
+References: <20191024170452.2145-1-codrin.ciubotariu@microchip.com>
 MIME-Version: 1.0
-X-Received: by 2002:a92:9a54:: with SMTP id t81mr44665340ili.147.1571936528622;
- Thu, 24 Oct 2019 10:02:08 -0700 (PDT)
-Date:   Thu, 24 Oct 2019 10:02:08 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000065ef5f0595aafe71@google.com>
-Subject: KMSAN: uninit-value in aes_encrypt (2)
-From:   syzbot <syzbot+9e3b178624a8a2f8fa28@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, glider@google.com,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
+Add platform support for the new IP found on sam9x60 SoC. For this
+version, if the peripheral clk is above 100MHz, the HALFR bit must be
+set. This bit is available only if the IP can generate a random number
+every 168 cycles (instead of 84).
 
-syzbot found the following crash on:
-
-HEAD commit:    3c8ca708 test_kmsan.c: fix SPDX comment
-git tree:       https://github.com/google/kmsan.git master
-console output: https://syzkaller.appspot.com/x/log.txt?x=14129497600000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c07a3d4f8a59e198
-dashboard link: https://syzkaller.appspot.com/bug?extid=9e3b178624a8a2f8fa28
-compiler:       clang version 9.0.0 (/home/glider/llvm/clang  
-80fee25776c2fb61e74c1ecb1a523375c2500b69)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11331128e00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=140b47ef600000
-
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+9e3b178624a8a2f8fa28@syzkaller.appspotmail.com
-
-IPv6: ADDRCONF(NETDEV_CHANGE): hsr0: link becomes ready
-8021q: adding VLAN 0 to HW filter on device batadv0
-=====================================================
-BUG: KMSAN: uninit-value in subshift lib/crypto/aes.c:149 [inline]
-BUG: KMSAN: uninit-value in aes_encrypt+0x12d5/0x1bd0 lib/crypto/aes.c:282
-CPU: 0 PID: 12200 Comm: syz-executor134 Not tainted 5.4.0-rc3+ #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-Call Trace:
-  __dump_stack lib/dump_stack.c:77 [inline]
-  dump_stack+0x191/0x1f0 lib/dump_stack.c:113
-  kmsan_report+0x14a/0x2f0 mm/kmsan/kmsan_report.c:110
-  __msan_warning+0x73/0xf0 mm/kmsan/kmsan_instr.c:245
-  subshift lib/crypto/aes.c:149 [inline]
-  aes_encrypt+0x12d5/0x1bd0 lib/crypto/aes.c:282
-  aesti_encrypt+0xe8/0x130 crypto/aes_ti.c:31
-  crypto_cipher_encrypt_one include/linux/crypto.h:1763 [inline]
-  crypto_cbcmac_digest_update+0x3cf/0x550 crypto/ccm.c:871
-  crypto_shash_update crypto/shash.c:107 [inline]
-  shash_ahash_finup+0x659/0xb20 crypto/shash.c:276
-  shash_async_finup+0xbb/0x110 crypto/shash.c:291
-  crypto_ahash_op+0x1cd/0x6e0 crypto/ahash.c:368
-  crypto_ahash_finup+0x8c/0xb0 crypto/ahash.c:393
-  crypto_ccm_auth+0x14b2/0x1570 crypto/ccm.c:230
-  crypto_ccm_encrypt+0x283/0x840 crypto/ccm.c:309
-  crypto_aead_encrypt+0xf2/0x180 crypto/aead.c:99
-  tls_do_encryption net/tls/tls_sw.c:521 [inline]
-  tls_push_record+0x341e/0x4e50 net/tls/tls_sw.c:730
-  bpf_exec_tx_verdict+0x1454/0x1c80 net/tls/tls_sw.c:770
-  tls_sw_sendmsg+0x158d/0x2710 net/tls/tls_sw.c:1033
-  inet6_sendmsg+0x2d8/0x2e0 net/ipv6/af_inet6.c:576
-  sock_sendmsg_nosec net/socket.c:637 [inline]
-  sock_sendmsg net/socket.c:657 [inline]
-  __sys_sendto+0x8fc/0xc70 net/socket.c:1952
-  __do_sys_sendto net/socket.c:1964 [inline]
-  __se_sys_sendto+0x107/0x130 net/socket.c:1960
-  __x64_sys_sendto+0x6e/0x90 net/socket.c:1960
-  do_syscall_64+0xb6/0x160 arch/x86/entry/common.c:291
-  entry_SYSCALL_64_after_hwframe+0x63/0xe7
-RIP: 0033:0x441cf9
-Code: 43 02 00 85 c0 b8 00 00 00 00 48 0f 44 c3 5b c3 90 48 89 f8 48 89 f7  
-48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff  
-ff 0f 83 0b 13 fc ff c3 66 2e 0f 1f 84 00 00 00 00
-RSP: 002b:00000000007eff08 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 0000000000441cf9
-RDX: fffffffffffffee0 RSI: 00000000200005c0 RDI: 0000000000000003
-RBP: 00000000007eff30 R08: 0000000000000000 R09: 00000000000000b6
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000403490
-R13: 0000000000403520 R14: 0000000000000000 R15: 0000000000000000
-
-Uninit was stored to memory at:
-  kmsan_save_stack_with_flags mm/kmsan/kmsan.c:151 [inline]
-  kmsan_internal_chain_origin+0xbd/0x170 mm/kmsan/kmsan.c:319
-  __msan_chain_origin+0x6b/0xe0 mm/kmsan/kmsan_instr.c:179
-  __crypto_xor+0x1e8/0x1470 crypto/algapi.c:992
-  crypto_xor include/crypto/algapi.h:213 [inline]
-  crypto_cbcmac_digest_update+0x2ba/0x550 crypto/ccm.c:865
-  crypto_shash_update crypto/shash.c:107 [inline]
-  shash_ahash_finup+0x659/0xb20 crypto/shash.c:276
-  shash_async_finup+0xbb/0x110 crypto/shash.c:291
-  crypto_ahash_op+0x1cd/0x6e0 crypto/ahash.c:368
-  crypto_ahash_finup+0x8c/0xb0 crypto/ahash.c:393
-  crypto_ccm_auth+0x14b2/0x1570 crypto/ccm.c:230
-  crypto_ccm_encrypt+0x283/0x840 crypto/ccm.c:309
-  crypto_aead_encrypt+0xf2/0x180 crypto/aead.c:99
-  tls_do_encryption net/tls/tls_sw.c:521 [inline]
-  tls_push_record+0x341e/0x4e50 net/tls/tls_sw.c:730
-  bpf_exec_tx_verdict+0x1454/0x1c80 net/tls/tls_sw.c:770
-  tls_sw_sendmsg+0x158d/0x2710 net/tls/tls_sw.c:1033
-  inet6_sendmsg+0x2d8/0x2e0 net/ipv6/af_inet6.c:576
-  sock_sendmsg_nosec net/socket.c:637 [inline]
-  sock_sendmsg net/socket.c:657 [inline]
-  __sys_sendto+0x8fc/0xc70 net/socket.c:1952
-  __do_sys_sendto net/socket.c:1964 [inline]
-  __se_sys_sendto+0x107/0x130 net/socket.c:1960
-  __x64_sys_sendto+0x6e/0x90 net/socket.c:1960
-  do_syscall_64+0xb6/0x160 arch/x86/entry/common.c:291
-  entry_SYSCALL_64_after_hwframe+0x63/0xe7
-
-Uninit was created at:
-  kmsan_save_stack_with_flags+0x3f/0x90 mm/kmsan/kmsan.c:151
-  kmsan_internal_alloc_meta_for_pages mm/kmsan/kmsan_shadow.c:362 [inline]
-  kmsan_alloc_page+0x153/0x370 mm/kmsan/kmsan_shadow.c:391
-  __alloc_pages_nodemask+0x149d/0x60c0 mm/page_alloc.c:4794
-  alloc_pages_current+0x68d/0x9a0 mm/mempolicy.c:2188
-  alloc_pages include/linux/gfp.h:511 [inline]
-  skb_page_frag_refill+0x2b0/0x580 net/core/sock.c:2372
-  sk_page_frag_refill+0xa4/0x330 net/core/sock.c:2392
-  sk_msg_alloc+0x203/0x1050 net/core/skmsg.c:37
-  tls_alloc_encrypted_msg net/tls/tls_sw.c:284 [inline]
-  tls_sw_sendmsg+0xb56/0x2710 net/tls/tls_sw.c:953
-  inet6_sendmsg+0x2d8/0x2e0 net/ipv6/af_inet6.c:576
-  sock_sendmsg_nosec net/socket.c:637 [inline]
-  sock_sendmsg net/socket.c:657 [inline]
-  __sys_sendto+0x8fc/0xc70 net/socket.c:1952
-  __do_sys_sendto net/socket.c:1964 [inline]
-  __se_sys_sendto+0x107/0x130 net/socket.c:1960
-  __x64_sys_sendto+0x6e/0x90 net/socket.c:1960
-  do_syscall_64+0xb6/0x160 arch/x86/entry/common.c:291
-  entry_SYSCALL_64_after_hwframe+0x63/0xe7
-=====================================================
-
-
+Signed-off-by: Codrin Ciubotariu <codrin.ciubotariu@microchip.com>
 ---
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/char/hw_random/atmel-rng.c | 39 ++++++++++++++++++++++++++++--
+ 1 file changed, 37 insertions(+), 2 deletions(-)
 
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this bug, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+diff --git a/drivers/char/hw_random/atmel-rng.c b/drivers/char/hw_random/atmel-rng.c
+index e55705745d5e..0aa9425e6c3e 100644
+--- a/drivers/char/hw_random/atmel-rng.c
++++ b/drivers/char/hw_random/atmel-rng.c
+@@ -14,14 +14,22 @@
+ #include <linux/clk.h>
+ #include <linux/io.h>
+ #include <linux/hw_random.h>
++#include <linux/of_device.h>
+ #include <linux/platform_device.h>
+ 
+ #define TRNG_CR		0x00
++#define TRNG_MR		0x04
+ #define TRNG_ISR	0x1c
+ #define TRNG_ODATA	0x50
+ 
+ #define TRNG_KEY	0x524e4700 /* RNG */
+ 
++#define TRNG_HALFR	BIT(0) /* generate RN every 168 cycles */
++
++struct atmel_trng_pdata {
++	bool has_half_rate;
++};
++
+ struct atmel_trng {
+ 	struct clk *clk;
+ 	void __iomem *base;
+@@ -63,6 +71,7 @@ static int atmel_trng_probe(struct platform_device *pdev)
+ {
+ 	struct atmel_trng *trng;
+ 	struct resource *res;
++	const struct atmel_trng_pdata *pdata;
+ 	int ret;
+ 
+ 	trng = devm_kzalloc(&pdev->dev, sizeof(*trng), GFP_KERNEL);
+@@ -77,6 +86,17 @@ static int atmel_trng_probe(struct platform_device *pdev)
+ 	trng->clk = devm_clk_get(&pdev->dev, NULL);
+ 	if (IS_ERR(trng->clk))
+ 		return PTR_ERR(trng->clk);
++	pdata = of_device_get_match_data(&pdev->dev);
++	if (!pdata)
++		return -ENODEV;
++
++	if (pdata->has_half_rate) {
++		unsigned long rate = clk_get_rate(trng->clk);
++
++		/* if peripheral clk is above 100MHz, set HALFR */
++		if (rate > 100000000)
++			writel(TRNG_HALFR, trng->base + TRNG_MR);
++	}
+ 
+ 	ret = clk_prepare_enable(trng->clk);
+ 	if (ret)
+@@ -141,9 +161,24 @@ static const struct dev_pm_ops atmel_trng_pm_ops = {
+ };
+ #endif /* CONFIG_PM */
+ 
++static struct atmel_trng_pdata at91sam9g45_config = {
++	.has_half_rate = false,
++};
++
++static struct atmel_trng_pdata sam9x60_config = {
++	.has_half_rate = true,
++};
++
+ static const struct of_device_id atmel_trng_dt_ids[] = {
+-	{ .compatible = "atmel,at91sam9g45-trng" },
+-	{ /* sentinel */ }
++	{
++		.compatible = "atmel,at91sam9g45-trng",
++		.data = &at91sam9g45_config,
++	}, {
++		.compatible = "microchip,sam9x60-trng",
++		.data = &sam9x60_config,
++	}, {
++		/* sentinel */
++	}
+ };
+ MODULE_DEVICE_TABLE(of, atmel_trng_dt_ids);
+ 
+-- 
+2.20.1
+
