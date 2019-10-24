@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 056E8CA9EAF
-	for <linux-crypto@archiver.kernel.org>; Thu, 24 Oct 2019 13:24:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2C98CA9EBB
+	for <linux-crypto@archiver.kernel.org>; Thu, 24 Oct 2019 13:24:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C57B52166E
+	by mail.kernel.org (Postfix) with ESMTP id 7BDE62084C
 	for <linux-crypto@archiver.kernel.org>; Thu, 24 Oct 2019 13:24:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OCRvqMCb"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gwmxMfqO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732257AbfJXNYJ (ORCPT
+        id S1731940AbfJXNYJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Thu, 24 Oct 2019 09:24:09 -0400
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:55545 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2387516AbfJXNYJ (ORCPT
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:37870 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387593AbfJXNYI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 24 Oct 2019 09:24:09 -0400
-Received: by mail-wm1-f68.google.com with SMTP id g24so2826445wmh.5
-        for <linux-crypto@vger.kernel.org>; Thu, 24 Oct 2019 06:24:07 -0700 (PDT)
+        Thu, 24 Oct 2019 09:24:08 -0400
+Received: by mail-wm1-f67.google.com with SMTP id q130so2429185wme.2
+        for <linux-crypto@vger.kernel.org>; Thu, 24 Oct 2019 06:24:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=25UKh8EiGAnNUBZJQi258MHVfhFf66il5RFIQHhfILQ=;
-        b=OCRvqMCbtRfCSdlWR+suVuQAmrm02dyiXJ8vSJ8InhLFAefZIRGfzBUOtV8EKNrtrg
-         N90V4X8IWVAx+o7KDdDVNaBVssjUUT/2PyXJyr+gTqD/UfHTZNsNkNPiNAmyhxpL/QW1
-         UTyAGXEuhmsQ7QbQvfYZVQ6koa0yLqECx33/NtFft5lxQ9WUmlasFebnCrmZiry9IRqs
-         jIH9qsUhLJ0cixLmgeMGBfItFY4n3ycHFX/oVT7eFBS1GZ91cVKMsRxDRLnDqTdf4uLi
-         NJx4vBq2tKgMl37ucNVQtsXgUiCarDloBThquuWss+tJGoVxZPVH2y1WuIKH/33PJ4ji
-         y9yQ==
+        bh=mc2WnweIaRtDafmlV+b5kd5/545ymLu8iFRfFqG/ZGs=;
+        b=gwmxMfqOuK/AkoUT2NsJbgOEJ10J+0blvqaG8wdGFBWU7ThKf2TAegGuDFPnimRXEU
+         NlNfjYSUl1gb3ofZ0kySStBhkM070vr+ZtlGkAiUfqpjAGSjsK7av6WCNM5JOJnJrXXU
+         Va0mbJhP7wu/xExkmk8tdTkdkpfBh6rCcmzO7SIOGtk0xNiErDfjgJ3njVb2LkqQrc3r
+         VaxFQ0YM+Uyox5+uNduXv4p9mV46FPVBNb5Oi3yRqqvANCE+1nodCdaH309wl/5Vz/nk
+         eemWvNLdxV14zdfEcnL7+H7e+DLarq5cbFStaCMQ0pPvRZjc/SrLHjW57MD4Gpt2ZuHv
+         +aYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=25UKh8EiGAnNUBZJQi258MHVfhFf66il5RFIQHhfILQ=;
-        b=Z0KtxytmUDtcgoJ4BFf7YKdFMTI6jUPSCJRN72lI8G5QMVDluex9C4QkgX9TOallIc
-         VTMrsDA3epUkYP8t1XFbBEvtQLcVJz65p54Zo8SutNd4Osa+o1/JfN4RmelCoLmfDydz
-         CuUPGcJirPDwD2iqDziC6C2y2iIHdY69Vb026P2TkuyEb8cUVxHaxYXC2AIdv0oHZKK2
-         ATQy8fWOmQ4ysf/KytH5Dstvi9la55G/boy5Df37aT0EPrlMDCS3x0AIbk4kRDmESTAs
-         F2MfpA4gW4CdEOk0TMTmqwNYY+mkXL0yCUXkWzU5mJ7tQATZP5jtGdns9BeKn3pFrqQd
-         bp6g==
-X-Gm-Message-State: APjAAAXyJrEEDPgc8VEvbBFSXbosoVHb6bbuXwhMfTwVEJ9k0Ra3n2/S
-        unJd5CLwjGYvSDhQT4GhJWoloKZxBmNctk5Y
-X-Google-Smtp-Source: APXvYqylYWVZeqjzlsELP9hdN8kkD34WX4svIiCVf+pO66O+eQ5a8X64httVbxbfTAV0o7RnU5X9Ew==
-X-Received: by 2002:a1c:2884:: with SMTP id o126mr5321246wmo.153.1571923446080;
-        Thu, 24 Oct 2019 06:24:06 -0700 (PDT)
+        bh=mc2WnweIaRtDafmlV+b5kd5/545ymLu8iFRfFqG/ZGs=;
+        b=cEX0JJ2uMyHRfdm5Y5ls0qvKbQYcnuBTs20dSyFxijirU5+U7hOpxJ3TxA8dkSl+7P
+         gV6G3NFyxQo0uvcjBXHFAlhJaA2w88dN5z76FgkNK6truMjWfaBjljFz81F/Lwg3Pq5R
+         OyEcvDuJwrDP9h1MlfvBP5ImJNcl3r0wHQHaR8SGmEFzXBwyHAmnvBFQkOOA3L9SBxmz
+         9v6axkpQWhyxyDzO/JjpZmu2b/PV5cnEge8VbzmKXoPgQYzfllitCwHkZiFAVgnTFoz7
+         2V5uQGEZIpUY7K92Sc/+XeZDq7o8W5Rh4wGbR7nwXDJtE0RgAdAXZtlUTHaHr2O1Awt+
+         lJhg==
+X-Gm-Message-State: APjAAAW+pi013zv+X5fEe0Y13+oCY4a7yzDXIf2uxgmAmrsOuGddv0N7
+        u6d3LO5ryoEB0KpoT50A5NogOJhJ5rnoVU7Q
+X-Google-Smtp-Source: APXvYqx+U6iyGF4NuMqJjOPQBjBgswbNGE8WPgUedfhjqWwTNvaTOMUvhtKo6fQIS9H+FkWc+jpz+Q==
+X-Received: by 2002:a1c:67d7:: with SMTP id b206mr4803243wmc.68.1571923444629;
+        Thu, 24 Oct 2019 06:24:04 -0700 (PDT)
 Received: from localhost.localdomain (laubervilliers-657-1-83-120.w92-154.abo.wanadoo.fr. [92.154.90.120])
-        by smtp.gmail.com with ESMTPSA id e3sm2346310wme.36.2019.10.24.06.24.04
+        by smtp.gmail.com with ESMTPSA id e3sm2346310wme.36.2019.10.24.06.24.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Oct 2019 06:24:05 -0700 (PDT)
+        Thu, 24 Oct 2019 06:24:03 -0700 (PDT)
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
@@ -66,9 +66,9 @@ Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Nicolas Ferre <nicolas.ferre@microchip.com>,
         Alexandre Belloni <alexandre.belloni@bootlin.com>,
         Ludovic Desroches <ludovic.desroches@microchip.com>
-Subject: [PATCH v2 09/27] crypto: atmel-tdes - switch to skcipher API
-Date:   Thu, 24 Oct 2019 15:23:27 +0200
-Message-Id: <20191024132345.5236-10-ard.biesheuvel@linaro.org>
+Subject: [PATCH v2 08/27] crypto: atmel-aes - switch to skcipher API
+Date:   Thu, 24 Oct 2019 15:23:26 +0200
+Message-Id: <20191024132345.5236-9-ard.biesheuvel@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191024132345.5236-1-ard.biesheuvel@linaro.org>
 References: <20191024132345.5236-1-ard.biesheuvel@linaro.org>
@@ -94,676 +94,840 @@ Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>
 Cc: Ludovic Desroches <ludovic.desroches@microchip.com>
 Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 ---
- drivers/crypto/atmel-tdes.c | 433 ++++++++++----------
- 1 file changed, 207 insertions(+), 226 deletions(-)
+ drivers/crypto/atmel-aes.c | 509 ++++++++++----------
+ 1 file changed, 245 insertions(+), 264 deletions(-)
 
-diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
-index 1a6c86ae6148..bb7c0a387c04 100644
---- a/drivers/crypto/atmel-tdes.c
-+++ b/drivers/crypto/atmel-tdes.c
+diff --git a/drivers/crypto/atmel-aes.c b/drivers/crypto/atmel-aes.c
+index 00920a2b95ce..28e420ffd4f5 100644
+--- a/drivers/crypto/atmel-aes.c
++++ b/drivers/crypto/atmel-aes.c
 @@ -36,6 +36,7 @@
- #include <crypto/internal/des.h>
- #include <crypto/hash.h>
- #include <crypto/internal/hash.h>
+ #include <crypto/gcm.h>
+ #include <crypto/xts.h>
+ #include <crypto/internal/aead.h>
 +#include <crypto/internal/skcipher.h>
  #include <linux/platform_data/crypto-atmel.h>
- #include "atmel-tdes-regs.h"
+ #include <dt-bindings/dma/at91.h>
+ #include "atmel-aes-regs.h"
+@@ -492,23 +493,23 @@ static void atmel_aes_authenc_complete(struct atmel_aes_dev *dd, int err);
  
-@@ -72,7 +73,7 @@ struct atmel_tdes_ctx {
- 	struct atmel_tdes_dev *dd;
+ static void atmel_aes_set_iv_as_last_ciphertext_block(struct atmel_aes_dev *dd)
+ {
+-	struct ablkcipher_request *req = ablkcipher_request_cast(dd->areq);
+-	struct atmel_aes_reqctx *rctx = ablkcipher_request_ctx(req);
+-	struct crypto_ablkcipher *ablkcipher = crypto_ablkcipher_reqtfm(req);
+-	unsigned int ivsize = crypto_ablkcipher_ivsize(ablkcipher);
++	struct skcipher_request *req = skcipher_request_cast(dd->areq);
++	struct atmel_aes_reqctx *rctx = skcipher_request_ctx(req);
++	struct crypto_skcipher *skcipher = crypto_skcipher_reqtfm(req);
++	unsigned int ivsize = crypto_skcipher_ivsize(skcipher);
  
- 	int		keylen;
--	u32		key[3*DES_KEY_SIZE / sizeof(u32)];
-+	u32		key[DES3_EDE_KEY_SIZE / sizeof(u32)];
- 	unsigned long	flags;
+-	if (req->nbytes < ivsize)
++	if (req->cryptlen < ivsize)
+ 		return;
  
- 	u16		block_size;
-@@ -106,7 +107,7 @@ struct atmel_tdes_dev {
- 	struct tasklet_struct	done_task;
- 	struct tasklet_struct	queue_task;
- 
--	struct ablkcipher_request	*req;
-+	struct skcipher_request	*req;
- 	size_t				total;
- 
- 	struct scatterlist	*in_sg;
-@@ -307,8 +308,8 @@ static int atmel_tdes_write_ctrl(struct atmel_tdes_dev *dd)
- 						dd->ctx->keylen >> 2);
- 
- 	if (((dd->flags & TDES_FLAGS_CBC) || (dd->flags & TDES_FLAGS_CFB) ||
--		(dd->flags & TDES_FLAGS_OFB)) && dd->req->info) {
--		atmel_tdes_write_n(dd, TDES_IV1R, dd->req->info, 2);
-+		(dd->flags & TDES_FLAGS_OFB)) && dd->req->iv) {
-+		atmel_tdes_write_n(dd, TDES_IV1R, (void *)dd->req->iv, 2);
+ 	if (rctx->mode & AES_FLAGS_ENCRYPT) {
+-		scatterwalk_map_and_copy(req->info, req->dst,
+-					 req->nbytes - ivsize, ivsize, 0);
++		scatterwalk_map_and_copy(req->iv, req->dst,
++					 req->cryptlen - ivsize, ivsize, 0);
+ 	} else {
+ 		if (req->src == req->dst)
+-			memcpy(req->info, rctx->lastc, ivsize);
++			memcpy(req->iv, rctx->lastc, ivsize);
+ 		else
+-			scatterwalk_map_and_copy(req->info, req->src,
+-						 req->nbytes - ivsize,
++			scatterwalk_map_and_copy(req->iv, req->src,
++						 req->cryptlen - ivsize,
+ 						 ivsize, 0);
  	}
+ }
+@@ -981,9 +982,9 @@ static int atmel_aes_transfer_complete(struct atmel_aes_dev *dd)
  
- 	return 0;
-@@ -502,8 +503,8 @@ static int atmel_tdes_crypt_dma(struct crypto_tfm *tfm, dma_addr_t dma_addr_in,
- 
- static int atmel_tdes_crypt_start(struct atmel_tdes_dev *dd)
+ static int atmel_aes_start(struct atmel_aes_dev *dd)
  {
--	struct crypto_tfm *tfm = crypto_ablkcipher_tfm(
--					crypto_ablkcipher_reqtfm(dd->req));
-+	struct crypto_tfm *tfm = crypto_skcipher_tfm(
-+					crypto_skcipher_reqtfm(dd->req));
- 	int err, fast = 0, in, out;
- 	size_t count;
- 	dma_addr_t addr_in, addr_out;
-@@ -573,7 +574,7 @@ static int atmel_tdes_crypt_start(struct atmel_tdes_dev *dd)
+-	struct ablkcipher_request *req = ablkcipher_request_cast(dd->areq);
+-	struct atmel_aes_reqctx *rctx = ablkcipher_request_ctx(req);
+-	bool use_dma = (req->nbytes >= ATMEL_AES_DMA_THRESHOLD ||
++	struct skcipher_request *req = skcipher_request_cast(dd->areq);
++	struct atmel_aes_reqctx *rctx = skcipher_request_ctx(req);
++	bool use_dma = (req->cryptlen >= ATMEL_AES_DMA_THRESHOLD ||
+ 			dd->ctx->block_size != AES_BLOCK_SIZE);
+ 	int err;
  
- static void atmel_tdes_finish_req(struct atmel_tdes_dev *dd, int err)
- {
--	struct ablkcipher_request *req = dd->req;
-+	struct skcipher_request *req = dd->req;
+@@ -993,12 +994,12 @@ static int atmel_aes_start(struct atmel_aes_dev *dd)
+ 	if (err)
+ 		return atmel_aes_complete(dd, err);
  
- 	clk_disable_unprepare(dd->iclk);
+-	atmel_aes_write_ctrl(dd, use_dma, req->info);
++	atmel_aes_write_ctrl(dd, use_dma, (void *)req->iv);
+ 	if (use_dma)
+-		return atmel_aes_dma_start(dd, req->src, req->dst, req->nbytes,
++		return atmel_aes_dma_start(dd, req->src, req->dst, req->cryptlen,
+ 					   atmel_aes_transfer_complete);
  
-@@ -583,7 +584,7 @@ static void atmel_tdes_finish_req(struct atmel_tdes_dev *dd, int err)
+-	return atmel_aes_cpu_start(dd, req->src, req->dst, req->nbytes,
++	return atmel_aes_cpu_start(dd, req->src, req->dst, req->cryptlen,
+ 				   atmel_aes_transfer_complete);
  }
  
- static int atmel_tdes_handle_queue(struct atmel_tdes_dev *dd,
--			       struct ablkcipher_request *req)
-+			       struct skcipher_request *req)
+@@ -1011,7 +1012,7 @@ atmel_aes_ctr_ctx_cast(struct atmel_aes_base_ctx *ctx)
+ static int atmel_aes_ctr_transfer(struct atmel_aes_dev *dd)
  {
- 	struct crypto_async_request *async_req, *backlog;
- 	struct atmel_tdes_ctx *ctx;
-@@ -593,7 +594,7 @@ static int atmel_tdes_handle_queue(struct atmel_tdes_dev *dd,
+ 	struct atmel_aes_ctr_ctx *ctx = atmel_aes_ctr_ctx_cast(dd->ctx);
+-	struct ablkcipher_request *req = ablkcipher_request_cast(dd->areq);
++	struct skcipher_request *req = skcipher_request_cast(dd->areq);
+ 	struct scatterlist *src, *dst;
+ 	u32 ctr, blocks;
+ 	size_t datalen;
+@@ -1019,11 +1020,11 @@ static int atmel_aes_ctr_transfer(struct atmel_aes_dev *dd)
  
- 	spin_lock_irqsave(&dd->lock, flags);
- 	if (req)
--		ret = ablkcipher_enqueue_request(&dd->queue, req);
-+		ret = crypto_enqueue_request(&dd->queue, &req->base);
- 	if (dd->flags & TDES_FLAGS_BUSY) {
- 		spin_unlock_irqrestore(&dd->lock, flags);
- 		return ret;
-@@ -610,18 +611,18 @@ static int atmel_tdes_handle_queue(struct atmel_tdes_dev *dd,
- 	if (backlog)
- 		backlog->complete(backlog, -EINPROGRESS);
+ 	/* Check for transfer completion. */
+ 	ctx->offset += dd->total;
+-	if (ctx->offset >= req->nbytes)
++	if (ctx->offset >= req->cryptlen)
+ 		return atmel_aes_transfer_complete(dd);
  
--	req = ablkcipher_request_cast(async_req);
-+	req = skcipher_request_cast(async_req);
+ 	/* Compute data length. */
+-	datalen = req->nbytes - ctx->offset;
++	datalen = req->cryptlen - ctx->offset;
+ 	blocks = DIV_ROUND_UP(datalen, AES_BLOCK_SIZE);
+ 	ctr = be32_to_cpu(ctx->iv[3]);
+ 	if (dd->caps.has_ctr32) {
+@@ -1076,8 +1077,8 @@ static int atmel_aes_ctr_transfer(struct atmel_aes_dev *dd)
+ static int atmel_aes_ctr_start(struct atmel_aes_dev *dd)
+ {
+ 	struct atmel_aes_ctr_ctx *ctx = atmel_aes_ctr_ctx_cast(dd->ctx);
+-	struct ablkcipher_request *req = ablkcipher_request_cast(dd->areq);
+-	struct atmel_aes_reqctx *rctx = ablkcipher_request_ctx(req);
++	struct skcipher_request *req = skcipher_request_cast(dd->areq);
++	struct atmel_aes_reqctx *rctx = skcipher_request_ctx(req);
+ 	int err;
  
- 	/* assign new request to device */
- 	dd->req = req;
--	dd->total = req->nbytes;
-+	dd->total = req->cryptlen;
- 	dd->in_offset = 0;
- 	dd->in_sg = req->src;
- 	dd->out_offset = 0;
- 	dd->out_sg = req->dst;
+ 	atmel_aes_set_mode(dd, rctx);
+@@ -1086,16 +1087,16 @@ static int atmel_aes_ctr_start(struct atmel_aes_dev *dd)
+ 	if (err)
+ 		return atmel_aes_complete(dd, err);
+ 
+-	memcpy(ctx->iv, req->info, AES_BLOCK_SIZE);
++	memcpy(ctx->iv, req->iv, AES_BLOCK_SIZE);
+ 	ctx->offset = 0;
+ 	dd->total = 0;
+ 	return atmel_aes_ctr_transfer(dd);
+ }
+ 
+-static int atmel_aes_crypt(struct ablkcipher_request *req, unsigned long mode)
++static int atmel_aes_crypt(struct skcipher_request *req, unsigned long mode)
+ {
+-	struct crypto_ablkcipher *ablkcipher = crypto_ablkcipher_reqtfm(req);
+-	struct atmel_aes_base_ctx *ctx = crypto_ablkcipher_ctx(ablkcipher);
++	struct crypto_skcipher *skcipher = crypto_skcipher_reqtfm(req);
++	struct atmel_aes_base_ctx *ctx = crypto_skcipher_ctx(skcipher);
+ 	struct atmel_aes_reqctx *rctx;
+ 	struct atmel_aes_dev *dd;
+ 
+@@ -1126,30 +1127,30 @@ static int atmel_aes_crypt(struct ablkcipher_request *req, unsigned long mode)
+ 	if (!dd)
+ 		return -ENODEV;
  
 -	rctx = ablkcipher_request_ctx(req);
--	ctx = crypto_ablkcipher_ctx(crypto_ablkcipher_reqtfm(req));
 +	rctx = skcipher_request_ctx(req);
-+	ctx = crypto_skcipher_ctx(crypto_skcipher_reqtfm(req));
- 	rctx->mode &= TDES_FLAGS_MODE_MASK;
- 	dd->flags = (dd->flags & ~TDES_FLAGS_MODE_MASK) | rctx->mode;
- 	dd->ctx = ctx;
-@@ -665,32 +666,32 @@ static int atmel_tdes_crypt_dma_stop(struct atmel_tdes_dev *dd)
- 	return err;
+ 	rctx->mode = mode;
+ 
+ 	if (!(mode & AES_FLAGS_ENCRYPT) && (req->src == req->dst)) {
+-		unsigned int ivsize = crypto_ablkcipher_ivsize(ablkcipher);
++		unsigned int ivsize = crypto_skcipher_ivsize(skcipher);
+ 
+-		if (req->nbytes >= ivsize)
++		if (req->cryptlen >= ivsize)
+ 			scatterwalk_map_and_copy(rctx->lastc, req->src,
+-						 req->nbytes - ivsize,
++						 req->cryptlen - ivsize,
+ 						 ivsize, 0);
+ 	}
+ 
+ 	return atmel_aes_handle_queue(dd, &req->base);
  }
  
--static int atmel_tdes_crypt(struct ablkcipher_request *req, unsigned long mode)
-+static int atmel_tdes_crypt(struct skcipher_request *req, unsigned long mode)
- {
--	struct atmel_tdes_ctx *ctx = crypto_ablkcipher_ctx(
--			crypto_ablkcipher_reqtfm(req));
--	struct atmel_tdes_reqctx *rctx = ablkcipher_request_ctx(req);
-+	struct atmel_tdes_ctx *ctx = crypto_skcipher_ctx(
-+			crypto_skcipher_reqtfm(req));
-+	struct atmel_tdes_reqctx *rctx = skcipher_request_ctx(req);
- 
- 	if (mode & TDES_FLAGS_CFB8) {
--		if (!IS_ALIGNED(req->nbytes, CFB8_BLOCK_SIZE)) {
-+		if (!IS_ALIGNED(req->cryptlen, CFB8_BLOCK_SIZE)) {
- 			pr_err("request size is not exact amount of CFB8 blocks\n");
- 			return -EINVAL;
- 		}
- 		ctx->block_size = CFB8_BLOCK_SIZE;
- 	} else if (mode & TDES_FLAGS_CFB16) {
--		if (!IS_ALIGNED(req->nbytes, CFB16_BLOCK_SIZE)) {
-+		if (!IS_ALIGNED(req->cryptlen, CFB16_BLOCK_SIZE)) {
- 			pr_err("request size is not exact amount of CFB16 blocks\n");
- 			return -EINVAL;
- 		}
- 		ctx->block_size = CFB16_BLOCK_SIZE;
- 	} else if (mode & TDES_FLAGS_CFB32) {
--		if (!IS_ALIGNED(req->nbytes, CFB32_BLOCK_SIZE)) {
-+		if (!IS_ALIGNED(req->cryptlen, CFB32_BLOCK_SIZE)) {
- 			pr_err("request size is not exact amount of CFB32 blocks\n");
- 			return -EINVAL;
- 		}
- 		ctx->block_size = CFB32_BLOCK_SIZE;
- 	} else {
--		if (!IS_ALIGNED(req->nbytes, DES_BLOCK_SIZE)) {
-+		if (!IS_ALIGNED(req->cryptlen, DES_BLOCK_SIZE)) {
- 			pr_err("request size is not exact amount of DES blocks\n");
- 			return -EINVAL;
- 		}
-@@ -770,13 +771,13 @@ static void atmel_tdes_dma_cleanup(struct atmel_tdes_dev *dd)
- 	dma_release_channel(dd->dma_lch_out.chan);
- }
- 
--static int atmel_des_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
-+static int atmel_des_setkey(struct crypto_skcipher *tfm, const u8 *key,
+-static int atmel_aes_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
++static int atmel_aes_setkey(struct crypto_skcipher *tfm, const u8 *key,
  			   unsigned int keylen)
  {
--	struct atmel_tdes_ctx *ctx = crypto_ablkcipher_ctx(tfm);
-+	struct atmel_tdes_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	int err;
+-	struct atmel_aes_base_ctx *ctx = crypto_ablkcipher_ctx(tfm);
++	struct atmel_aes_base_ctx *ctx = crypto_skcipher_ctx(tfm);
  
--	err = verify_ablkcipher_des_key(tfm, key);
-+	err = verify_skcipher_des_key(tfm, key);
- 	if (err)
- 		return err;
+ 	if (keylen != AES_KEYSIZE_128 &&
+ 	    keylen != AES_KEYSIZE_192 &&
+ 	    keylen != AES_KEYSIZE_256) {
+-		crypto_ablkcipher_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
++		crypto_skcipher_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
+ 		return -EINVAL;
+ 	}
  
-@@ -786,13 +787,13 @@ static int atmel_des_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
+@@ -1159,297 +1160,279 @@ static int atmel_aes_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
  	return 0;
  }
  
--static int atmel_tdes_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
-+static int atmel_tdes_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 			   unsigned int keylen)
+-static int atmel_aes_ecb_encrypt(struct ablkcipher_request *req)
++static int atmel_aes_ecb_encrypt(struct skcipher_request *req)
  {
--	struct atmel_tdes_ctx *ctx = crypto_ablkcipher_ctx(tfm);
-+	struct atmel_tdes_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	int err;
+ 	return atmel_aes_crypt(req, AES_FLAGS_ECB | AES_FLAGS_ENCRYPT);
+ }
  
--	err = verify_ablkcipher_des3_key(tfm, key);
-+	err = verify_skcipher_des3_key(tfm, key);
- 	if (err)
- 		return err;
+-static int atmel_aes_ecb_decrypt(struct ablkcipher_request *req)
++static int atmel_aes_ecb_decrypt(struct skcipher_request *req)
+ {
+ 	return atmel_aes_crypt(req, AES_FLAGS_ECB);
+ }
  
-@@ -802,84 +803,84 @@ static int atmel_tdes_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
+-static int atmel_aes_cbc_encrypt(struct ablkcipher_request *req)
++static int atmel_aes_cbc_encrypt(struct skcipher_request *req)
+ {
+ 	return atmel_aes_crypt(req, AES_FLAGS_CBC | AES_FLAGS_ENCRYPT);
+ }
+ 
+-static int atmel_aes_cbc_decrypt(struct ablkcipher_request *req)
++static int atmel_aes_cbc_decrypt(struct skcipher_request *req)
+ {
+ 	return atmel_aes_crypt(req, AES_FLAGS_CBC);
+ }
+ 
+-static int atmel_aes_ofb_encrypt(struct ablkcipher_request *req)
++static int atmel_aes_ofb_encrypt(struct skcipher_request *req)
+ {
+ 	return atmel_aes_crypt(req, AES_FLAGS_OFB | AES_FLAGS_ENCRYPT);
+ }
+ 
+-static int atmel_aes_ofb_decrypt(struct ablkcipher_request *req)
++static int atmel_aes_ofb_decrypt(struct skcipher_request *req)
+ {
+ 	return atmel_aes_crypt(req, AES_FLAGS_OFB);
+ }
+ 
+-static int atmel_aes_cfb_encrypt(struct ablkcipher_request *req)
++static int atmel_aes_cfb_encrypt(struct skcipher_request *req)
+ {
+ 	return atmel_aes_crypt(req, AES_FLAGS_CFB128 | AES_FLAGS_ENCRYPT);
+ }
+ 
+-static int atmel_aes_cfb_decrypt(struct ablkcipher_request *req)
++static int atmel_aes_cfb_decrypt(struct skcipher_request *req)
+ {
+ 	return atmel_aes_crypt(req, AES_FLAGS_CFB128);
+ }
+ 
+-static int atmel_aes_cfb64_encrypt(struct ablkcipher_request *req)
++static int atmel_aes_cfb64_encrypt(struct skcipher_request *req)
+ {
+ 	return atmel_aes_crypt(req, AES_FLAGS_CFB64 | AES_FLAGS_ENCRYPT);
+ }
+ 
+-static int atmel_aes_cfb64_decrypt(struct ablkcipher_request *req)
++static int atmel_aes_cfb64_decrypt(struct skcipher_request *req)
+ {
+ 	return atmel_aes_crypt(req, AES_FLAGS_CFB64);
+ }
+ 
+-static int atmel_aes_cfb32_encrypt(struct ablkcipher_request *req)
++static int atmel_aes_cfb32_encrypt(struct skcipher_request *req)
+ {
+ 	return atmel_aes_crypt(req, AES_FLAGS_CFB32 | AES_FLAGS_ENCRYPT);
+ }
+ 
+-static int atmel_aes_cfb32_decrypt(struct ablkcipher_request *req)
++static int atmel_aes_cfb32_decrypt(struct skcipher_request *req)
+ {
+ 	return atmel_aes_crypt(req, AES_FLAGS_CFB32);
+ }
+ 
+-static int atmel_aes_cfb16_encrypt(struct ablkcipher_request *req)
++static int atmel_aes_cfb16_encrypt(struct skcipher_request *req)
+ {
+ 	return atmel_aes_crypt(req, AES_FLAGS_CFB16 | AES_FLAGS_ENCRYPT);
+ }
+ 
+-static int atmel_aes_cfb16_decrypt(struct ablkcipher_request *req)
++static int atmel_aes_cfb16_decrypt(struct skcipher_request *req)
+ {
+ 	return atmel_aes_crypt(req, AES_FLAGS_CFB16);
+ }
+ 
+-static int atmel_aes_cfb8_encrypt(struct ablkcipher_request *req)
++static int atmel_aes_cfb8_encrypt(struct skcipher_request *req)
+ {
+ 	return atmel_aes_crypt(req, AES_FLAGS_CFB8 | AES_FLAGS_ENCRYPT);
+ }
+ 
+-static int atmel_aes_cfb8_decrypt(struct ablkcipher_request *req)
++static int atmel_aes_cfb8_decrypt(struct skcipher_request *req)
+ {
+ 	return atmel_aes_crypt(req, AES_FLAGS_CFB8);
+ }
+ 
+-static int atmel_aes_ctr_encrypt(struct ablkcipher_request *req)
++static int atmel_aes_ctr_encrypt(struct skcipher_request *req)
+ {
+ 	return atmel_aes_crypt(req, AES_FLAGS_CTR | AES_FLAGS_ENCRYPT);
+ }
+ 
+-static int atmel_aes_ctr_decrypt(struct ablkcipher_request *req)
++static int atmel_aes_ctr_decrypt(struct skcipher_request *req)
+ {
+ 	return atmel_aes_crypt(req, AES_FLAGS_CTR);
+ }
+ 
+-static int atmel_aes_cra_init(struct crypto_tfm *tfm)
++static int atmel_aes_init_tfm(struct crypto_skcipher *tfm)
+ {
+-	struct atmel_aes_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct atmel_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
+ 
+-	tfm->crt_ablkcipher.reqsize = sizeof(struct atmel_aes_reqctx);
++	crypto_skcipher_set_reqsize(tfm, sizeof(struct atmel_aes_reqctx));
+ 	ctx->base.start = atmel_aes_start;
+ 
  	return 0;
  }
  
--static int atmel_tdes_ecb_encrypt(struct ablkcipher_request *req)
-+static int atmel_tdes_ecb_encrypt(struct skcipher_request *req)
+-static int atmel_aes_ctr_cra_init(struct crypto_tfm *tfm)
++static int atmel_aes_ctr_init_tfm(struct crypto_skcipher *tfm)
  {
- 	return atmel_tdes_crypt(req, TDES_FLAGS_ENCRYPT);
- }
+-	struct atmel_aes_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct atmel_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
  
--static int atmel_tdes_ecb_decrypt(struct ablkcipher_request *req)
-+static int atmel_tdes_ecb_decrypt(struct skcipher_request *req)
- {
- 	return atmel_tdes_crypt(req, 0);
- }
+-	tfm->crt_ablkcipher.reqsize = sizeof(struct atmel_aes_reqctx);
++	crypto_skcipher_set_reqsize(tfm, sizeof(struct atmel_aes_reqctx));
+ 	ctx->base.start = atmel_aes_ctr_start;
  
--static int atmel_tdes_cbc_encrypt(struct ablkcipher_request *req)
-+static int atmel_tdes_cbc_encrypt(struct skcipher_request *req)
- {
- 	return atmel_tdes_crypt(req, TDES_FLAGS_ENCRYPT | TDES_FLAGS_CBC);
- }
- 
--static int atmel_tdes_cbc_decrypt(struct ablkcipher_request *req)
-+static int atmel_tdes_cbc_decrypt(struct skcipher_request *req)
- {
- 	return atmel_tdes_crypt(req, TDES_FLAGS_CBC);
- }
--static int atmel_tdes_cfb_encrypt(struct ablkcipher_request *req)
-+static int atmel_tdes_cfb_encrypt(struct skcipher_request *req)
- {
- 	return atmel_tdes_crypt(req, TDES_FLAGS_ENCRYPT | TDES_FLAGS_CFB);
- }
- 
--static int atmel_tdes_cfb_decrypt(struct ablkcipher_request *req)
-+static int atmel_tdes_cfb_decrypt(struct skcipher_request *req)
- {
- 	return atmel_tdes_crypt(req, TDES_FLAGS_CFB);
- }
- 
--static int atmel_tdes_cfb8_encrypt(struct ablkcipher_request *req)
-+static int atmel_tdes_cfb8_encrypt(struct skcipher_request *req)
- {
- 	return atmel_tdes_crypt(req, TDES_FLAGS_ENCRYPT | TDES_FLAGS_CFB |
- 						TDES_FLAGS_CFB8);
- }
- 
--static int atmel_tdes_cfb8_decrypt(struct ablkcipher_request *req)
-+static int atmel_tdes_cfb8_decrypt(struct skcipher_request *req)
- {
- 	return atmel_tdes_crypt(req, TDES_FLAGS_CFB | TDES_FLAGS_CFB8);
- }
- 
--static int atmel_tdes_cfb16_encrypt(struct ablkcipher_request *req)
-+static int atmel_tdes_cfb16_encrypt(struct skcipher_request *req)
- {
- 	return atmel_tdes_crypt(req, TDES_FLAGS_ENCRYPT | TDES_FLAGS_CFB |
- 						TDES_FLAGS_CFB16);
- }
- 
--static int atmel_tdes_cfb16_decrypt(struct ablkcipher_request *req)
-+static int atmel_tdes_cfb16_decrypt(struct skcipher_request *req)
- {
- 	return atmel_tdes_crypt(req, TDES_FLAGS_CFB | TDES_FLAGS_CFB16);
- }
- 
--static int atmel_tdes_cfb32_encrypt(struct ablkcipher_request *req)
-+static int atmel_tdes_cfb32_encrypt(struct skcipher_request *req)
- {
- 	return atmel_tdes_crypt(req, TDES_FLAGS_ENCRYPT | TDES_FLAGS_CFB |
- 						TDES_FLAGS_CFB32);
- }
- 
--static int atmel_tdes_cfb32_decrypt(struct ablkcipher_request *req)
-+static int atmel_tdes_cfb32_decrypt(struct skcipher_request *req)
- {
- 	return atmel_tdes_crypt(req, TDES_FLAGS_CFB | TDES_FLAGS_CFB32);
- }
- 
--static int atmel_tdes_ofb_encrypt(struct ablkcipher_request *req)
-+static int atmel_tdes_ofb_encrypt(struct skcipher_request *req)
- {
- 	return atmel_tdes_crypt(req, TDES_FLAGS_ENCRYPT | TDES_FLAGS_OFB);
- }
- 
--static int atmel_tdes_ofb_decrypt(struct ablkcipher_request *req)
-+static int atmel_tdes_ofb_decrypt(struct skcipher_request *req)
- {
- 	return atmel_tdes_crypt(req, TDES_FLAGS_OFB);
- }
- 
--static int atmel_tdes_cra_init(struct crypto_tfm *tfm)
-+static int atmel_tdes_init_tfm(struct crypto_skcipher *tfm)
- {
--	struct atmel_tdes_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct atmel_tdes_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	struct atmel_tdes_dev *dd;
- 
--	tfm->crt_ablkcipher.reqsize = sizeof(struct atmel_tdes_reqctx);
-+	crypto_skcipher_set_reqsize(tfm, sizeof(struct atmel_tdes_reqctx));
- 
- 	dd = atmel_tdes_find_dev(ctx);
- 	if (!dd)
-@@ -888,204 +889,184 @@ static int atmel_tdes_cra_init(struct crypto_tfm *tfm)
  	return 0;
  }
  
--static struct crypto_alg tdes_algs[] = {
-+static struct skcipher_alg tdes_algs[] = {
- {
--	.cra_name		= "ecb(des)",
--	.cra_driver_name	= "atmel-ecb-des",
--	.cra_priority		= 100,
+-static struct crypto_alg aes_algs[] = {
+-{
+-	.cra_name		= "ecb(aes)",
+-	.cra_driver_name	= "atmel-ecb-aes",
+-	.cra_priority		= ATMEL_AES_PRIORITY,
 -	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
--	.cra_blocksize		= DES_BLOCK_SIZE,
--	.cra_ctxsize		= sizeof(struct atmel_tdes_ctx),
--	.cra_alignmask		= 0x7,
+-	.cra_blocksize		= AES_BLOCK_SIZE,
+-	.cra_ctxsize		= sizeof(struct atmel_aes_ctx),
+-	.cra_alignmask		= 0xf,
 -	.cra_type		= &crypto_ablkcipher_type,
 -	.cra_module		= THIS_MODULE,
--	.cra_init		= atmel_tdes_cra_init,
+-	.cra_init		= atmel_aes_cra_init,
 -	.cra_u.ablkcipher = {
--		.min_keysize	= DES_KEY_SIZE,
--		.max_keysize	= DES_KEY_SIZE,
--		.setkey		= atmel_des_setkey,
--		.encrypt	= atmel_tdes_ecb_encrypt,
--		.decrypt	= atmel_tdes_ecb_decrypt,
+-		.min_keysize	= AES_MIN_KEY_SIZE,
+-		.max_keysize	= AES_MAX_KEY_SIZE,
+-		.setkey		= atmel_aes_setkey,
+-		.encrypt	= atmel_aes_ecb_encrypt,
+-		.decrypt	= atmel_aes_ecb_decrypt,
 -	}
-+	.base.cra_name		= "ecb(des)",
-+	.base.cra_driver_name	= "atmel-ecb-des",
-+	.base.cra_priority	= 100,
++static struct skcipher_alg aes_algs[] = {
++{
++	.base.cra_name		= "ecb(aes)",
++	.base.cra_driver_name	= "atmel-ecb-aes",
++	.base.cra_priority	= ATMEL_AES_PRIORITY,
 +	.base.cra_flags		= CRYPTO_ALG_ASYNC,
-+	.base.cra_blocksize	= DES_BLOCK_SIZE,
-+	.base.cra_ctxsize	= sizeof(struct atmel_tdes_ctx),
-+	.base.cra_alignmask	= 0x7,
++	.base.cra_blocksize	= AES_BLOCK_SIZE,
++	.base.cra_ctxsize	= sizeof(struct atmel_aes_ctx),
++	.base.cra_alignmask	= 0xf,
 +	.base.cra_module	= THIS_MODULE,
 +
-+	.init			= atmel_tdes_init_tfm,
-+	.min_keysize		= DES_KEY_SIZE,
-+	.max_keysize		= DES_KEY_SIZE,
-+	.setkey			= atmel_des_setkey,
-+	.encrypt		= atmel_tdes_ecb_encrypt,
-+	.decrypt		= atmel_tdes_ecb_decrypt,
++	.init			= atmel_aes_init_tfm,
++	.min_keysize		= AES_MIN_KEY_SIZE,
++	.max_keysize		= AES_MAX_KEY_SIZE,
++	.setkey			= atmel_aes_setkey,
++	.encrypt		= atmel_aes_ecb_encrypt,
++	.decrypt		= atmel_aes_ecb_decrypt,
  },
  {
--	.cra_name		= "cbc(des)",
--	.cra_driver_name	= "atmel-cbc-des",
--	.cra_priority		= 100,
+-	.cra_name		= "cbc(aes)",
+-	.cra_driver_name	= "atmel-cbc-aes",
+-	.cra_priority		= ATMEL_AES_PRIORITY,
 -	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
--	.cra_blocksize		= DES_BLOCK_SIZE,
--	.cra_ctxsize		= sizeof(struct atmel_tdes_ctx),
--	.cra_alignmask		= 0x7,
+-	.cra_blocksize		= AES_BLOCK_SIZE,
+-	.cra_ctxsize		= sizeof(struct atmel_aes_ctx),
+-	.cra_alignmask		= 0xf,
 -	.cra_type		= &crypto_ablkcipher_type,
 -	.cra_module		= THIS_MODULE,
--	.cra_init		= atmel_tdes_cra_init,
+-	.cra_init		= atmel_aes_cra_init,
 -	.cra_u.ablkcipher = {
--		.min_keysize	= DES_KEY_SIZE,
--		.max_keysize	= DES_KEY_SIZE,
--		.ivsize		= DES_BLOCK_SIZE,
--		.setkey		= atmel_des_setkey,
--		.encrypt	= atmel_tdes_cbc_encrypt,
--		.decrypt	= atmel_tdes_cbc_decrypt,
+-		.min_keysize	= AES_MIN_KEY_SIZE,
+-		.max_keysize	= AES_MAX_KEY_SIZE,
+-		.ivsize		= AES_BLOCK_SIZE,
+-		.setkey		= atmel_aes_setkey,
+-		.encrypt	= atmel_aes_cbc_encrypt,
+-		.decrypt	= atmel_aes_cbc_decrypt,
 -	}
-+	.base.cra_name		= "cbc(des)",
-+	.base.cra_driver_name	= "atmel-cbc-des",
-+	.base.cra_priority	= 100,
++	.base.cra_name		= "cbc(aes)",
++	.base.cra_driver_name	= "atmel-cbc-aes",
++	.base.cra_priority	= ATMEL_AES_PRIORITY,
 +	.base.cra_flags		= CRYPTO_ALG_ASYNC,
-+	.base.cra_blocksize	= DES_BLOCK_SIZE,
-+	.base.cra_ctxsize	= sizeof(struct atmel_tdes_ctx),
-+	.base.cra_alignmask	= 0x7,
++	.base.cra_blocksize	= AES_BLOCK_SIZE,
++	.base.cra_ctxsize	= sizeof(struct atmel_aes_ctx),
++	.base.cra_alignmask	= 0xf,
 +	.base.cra_module	= THIS_MODULE,
 +
-+	.init			= atmel_tdes_init_tfm,
-+	.min_keysize		= DES_KEY_SIZE,
-+	.max_keysize		= DES_KEY_SIZE,
-+	.ivsize			= DES_BLOCK_SIZE,
-+	.setkey			= atmel_des_setkey,
-+	.encrypt		= atmel_tdes_cbc_encrypt,
-+	.decrypt		= atmel_tdes_cbc_decrypt,
++	.init			= atmel_aes_init_tfm,
++	.min_keysize		= AES_MIN_KEY_SIZE,
++	.max_keysize		= AES_MAX_KEY_SIZE,
++	.setkey			= atmel_aes_setkey,
++	.encrypt		= atmel_aes_cbc_encrypt,
++	.decrypt		= atmel_aes_cbc_decrypt,
++	.ivsize			= AES_BLOCK_SIZE,
  },
  {
--	.cra_name		= "cfb(des)",
--	.cra_driver_name	= "atmel-cfb-des",
--	.cra_priority		= 100,
+-	.cra_name		= "ofb(aes)",
+-	.cra_driver_name	= "atmel-ofb-aes",
+-	.cra_priority		= ATMEL_AES_PRIORITY,
 -	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
--	.cra_blocksize		= DES_BLOCK_SIZE,
--	.cra_ctxsize		= sizeof(struct atmel_tdes_ctx),
--	.cra_alignmask		= 0x7,
+-	.cra_blocksize		= AES_BLOCK_SIZE,
+-	.cra_ctxsize		= sizeof(struct atmel_aes_ctx),
+-	.cra_alignmask		= 0xf,
 -	.cra_type		= &crypto_ablkcipher_type,
 -	.cra_module		= THIS_MODULE,
--	.cra_init		= atmel_tdes_cra_init,
+-	.cra_init		= atmel_aes_cra_init,
 -	.cra_u.ablkcipher = {
--		.min_keysize	= DES_KEY_SIZE,
--		.max_keysize	= DES_KEY_SIZE,
--		.ivsize		= DES_BLOCK_SIZE,
--		.setkey		= atmel_des_setkey,
--		.encrypt	= atmel_tdes_cfb_encrypt,
--		.decrypt	= atmel_tdes_cfb_decrypt,
+-		.min_keysize	= AES_MIN_KEY_SIZE,
+-		.max_keysize	= AES_MAX_KEY_SIZE,
+-		.ivsize		= AES_BLOCK_SIZE,
+-		.setkey		= atmel_aes_setkey,
+-		.encrypt	= atmel_aes_ofb_encrypt,
+-		.decrypt	= atmel_aes_ofb_decrypt,
 -	}
-+	.base.cra_name		= "cfb(des)",
-+	.base.cra_driver_name	= "atmel-cfb-des",
-+	.base.cra_priority	= 100,
++	.base.cra_name		= "ofb(aes)",
++	.base.cra_driver_name	= "atmel-ofb-aes",
++	.base.cra_priority	= ATMEL_AES_PRIORITY,
 +	.base.cra_flags		= CRYPTO_ALG_ASYNC,
-+	.base.cra_blocksize	= DES_BLOCK_SIZE,
-+	.base.cra_ctxsize	= sizeof(struct atmel_tdes_ctx),
-+	.base.cra_alignmask	= 0x7,
++	.base.cra_blocksize	= AES_BLOCK_SIZE,
++	.base.cra_ctxsize	= sizeof(struct atmel_aes_ctx),
++	.base.cra_alignmask	= 0xf,
 +	.base.cra_module	= THIS_MODULE,
 +
-+	.init			= atmel_tdes_init_tfm,
-+	.min_keysize		= DES_KEY_SIZE,
-+	.max_keysize		= DES_KEY_SIZE,
-+	.ivsize			= DES_BLOCK_SIZE,
-+	.setkey			= atmel_des_setkey,
-+	.encrypt		= atmel_tdes_cfb_encrypt,
-+	.decrypt		= atmel_tdes_cfb_decrypt,
++	.init			= atmel_aes_init_tfm,
++	.min_keysize		= AES_MIN_KEY_SIZE,
++	.max_keysize		= AES_MAX_KEY_SIZE,
++	.setkey			= atmel_aes_setkey,
++	.encrypt		= atmel_aes_ofb_encrypt,
++	.decrypt		= atmel_aes_ofb_decrypt,
++	.ivsize			= AES_BLOCK_SIZE,
  },
  {
--	.cra_name		= "cfb8(des)",
--	.cra_driver_name	= "atmel-cfb8-des",
--	.cra_priority		= 100,
+-	.cra_name		= "cfb(aes)",
+-	.cra_driver_name	= "atmel-cfb-aes",
+-	.cra_priority		= ATMEL_AES_PRIORITY,
 -	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
--	.cra_blocksize		= CFB8_BLOCK_SIZE,
--	.cra_ctxsize		= sizeof(struct atmel_tdes_ctx),
--	.cra_alignmask		= 0,
+-	.cra_blocksize		= AES_BLOCK_SIZE,
+-	.cra_ctxsize		= sizeof(struct atmel_aes_ctx),
+-	.cra_alignmask		= 0xf,
 -	.cra_type		= &crypto_ablkcipher_type,
 -	.cra_module		= THIS_MODULE,
--	.cra_init		= atmel_tdes_cra_init,
+-	.cra_init		= atmel_aes_cra_init,
 -	.cra_u.ablkcipher = {
--		.min_keysize	= DES_KEY_SIZE,
--		.max_keysize	= DES_KEY_SIZE,
--		.ivsize		= DES_BLOCK_SIZE,
--		.setkey		= atmel_des_setkey,
--		.encrypt	= atmel_tdes_cfb8_encrypt,
--		.decrypt	= atmel_tdes_cfb8_decrypt,
+-		.min_keysize	= AES_MIN_KEY_SIZE,
+-		.max_keysize	= AES_MAX_KEY_SIZE,
+-		.ivsize		= AES_BLOCK_SIZE,
+-		.setkey		= atmel_aes_setkey,
+-		.encrypt	= atmel_aes_cfb_encrypt,
+-		.decrypt	= atmel_aes_cfb_decrypt,
 -	}
-+	.base.cra_name		= "cfb8(des)",
-+	.base.cra_driver_name	= "atmel-cfb8-des",
-+	.base.cra_priority	= 100,
++	.base.cra_name		= "cfb(aes)",
++	.base.cra_driver_name	= "atmel-cfb-aes",
++	.base.cra_priority	= ATMEL_AES_PRIORITY,
 +	.base.cra_flags		= CRYPTO_ALG_ASYNC,
-+	.base.cra_blocksize	= CFB8_BLOCK_SIZE,
-+	.base.cra_ctxsize	= sizeof(struct atmel_tdes_ctx),
-+	.base.cra_alignmask	= 0,
++	.base.cra_blocksize	= AES_BLOCK_SIZE,
++	.base.cra_ctxsize	= sizeof(struct atmel_aes_ctx),
++	.base.cra_alignmask	= 0xf,
 +	.base.cra_module	= THIS_MODULE,
 +
-+	.init			= atmel_tdes_init_tfm,
-+	.min_keysize		= DES_KEY_SIZE,
-+	.max_keysize		= DES_KEY_SIZE,
-+	.ivsize			= DES_BLOCK_SIZE,
-+	.setkey			= atmel_des_setkey,
-+	.encrypt		= atmel_tdes_cfb8_encrypt,
-+	.decrypt		= atmel_tdes_cfb8_decrypt,
++	.init			= atmel_aes_init_tfm,
++	.min_keysize		= AES_MIN_KEY_SIZE,
++	.max_keysize		= AES_MAX_KEY_SIZE,
++	.setkey			= atmel_aes_setkey,
++	.encrypt		= atmel_aes_cfb_encrypt,
++	.decrypt		= atmel_aes_cfb_decrypt,
++	.ivsize			= AES_BLOCK_SIZE,
  },
  {
--	.cra_name		= "cfb16(des)",
--	.cra_driver_name	= "atmel-cfb16-des",
--	.cra_priority		= 100,
--	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
--	.cra_blocksize		= CFB16_BLOCK_SIZE,
--	.cra_ctxsize		= sizeof(struct atmel_tdes_ctx),
--	.cra_alignmask		= 0x1,
--	.cra_type		= &crypto_ablkcipher_type,
--	.cra_module		= THIS_MODULE,
--	.cra_init		= atmel_tdes_cra_init,
--	.cra_u.ablkcipher = {
--		.min_keysize	= DES_KEY_SIZE,
--		.max_keysize	= DES_KEY_SIZE,
--		.ivsize		= DES_BLOCK_SIZE,
--		.setkey		= atmel_des_setkey,
--		.encrypt	= atmel_tdes_cfb16_encrypt,
--		.decrypt	= atmel_tdes_cfb16_decrypt,
--	}
-+	.base.cra_name		= "cfb16(des)",
-+	.base.cra_driver_name	= "atmel-cfb16-des",
-+	.base.cra_priority	= 100,
-+	.base.cra_flags		= CRYPTO_ALG_ASYNC,
-+	.base.cra_blocksize	= CFB16_BLOCK_SIZE,
-+	.base.cra_ctxsize	= sizeof(struct atmel_tdes_ctx),
-+	.base.cra_alignmask	= 0x1,
-+	.base.cra_module	= THIS_MODULE,
-+
-+	.init			= atmel_tdes_init_tfm,
-+	.min_keysize		= DES_KEY_SIZE,
-+	.max_keysize		= DES_KEY_SIZE,
-+	.ivsize			= DES_BLOCK_SIZE,
-+	.setkey			= atmel_des_setkey,
-+	.encrypt		= atmel_tdes_cfb16_encrypt,
-+	.decrypt		= atmel_tdes_cfb16_decrypt,
- },
- {
--	.cra_name		= "cfb32(des)",
--	.cra_driver_name	= "atmel-cfb32-des",
--	.cra_priority		= 100,
+-	.cra_name		= "cfb32(aes)",
+-	.cra_driver_name	= "atmel-cfb32-aes",
+-	.cra_priority		= ATMEL_AES_PRIORITY,
 -	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
 -	.cra_blocksize		= CFB32_BLOCK_SIZE,
--	.cra_ctxsize		= sizeof(struct atmel_tdes_ctx),
+-	.cra_ctxsize		= sizeof(struct atmel_aes_ctx),
 -	.cra_alignmask		= 0x3,
 -	.cra_type		= &crypto_ablkcipher_type,
 -	.cra_module		= THIS_MODULE,
--	.cra_init		= atmel_tdes_cra_init,
+-	.cra_init		= atmel_aes_cra_init,
 -	.cra_u.ablkcipher = {
--		.min_keysize	= DES_KEY_SIZE,
--		.max_keysize	= DES_KEY_SIZE,
--		.ivsize		= DES_BLOCK_SIZE,
--		.setkey		= atmel_des_setkey,
--		.encrypt	= atmel_tdes_cfb32_encrypt,
--		.decrypt	= atmel_tdes_cfb32_decrypt,
+-		.min_keysize	= AES_MIN_KEY_SIZE,
+-		.max_keysize	= AES_MAX_KEY_SIZE,
+-		.ivsize		= AES_BLOCK_SIZE,
+-		.setkey		= atmel_aes_setkey,
+-		.encrypt	= atmel_aes_cfb32_encrypt,
+-		.decrypt	= atmel_aes_cfb32_decrypt,
 -	}
-+	.base.cra_name		= "cfb32(des)",
-+	.base.cra_driver_name	= "atmel-cfb32-des",
-+	.base.cra_priority	= 100,
++	.base.cra_name		= "cfb32(aes)",
++	.base.cra_driver_name	= "atmel-cfb32-aes",
++	.base.cra_priority	= ATMEL_AES_PRIORITY,
 +	.base.cra_flags		= CRYPTO_ALG_ASYNC,
 +	.base.cra_blocksize	= CFB32_BLOCK_SIZE,
-+	.base.cra_ctxsize	= sizeof(struct atmel_tdes_ctx),
-+	.base.cra_alignmask	= 0x3,
++	.base.cra_ctxsize	= sizeof(struct atmel_aes_ctx),
++	.base.cra_alignmask	= 0xf,
 +	.base.cra_module	= THIS_MODULE,
 +
-+	.init			= atmel_tdes_init_tfm,
-+	.min_keysize		= DES_KEY_SIZE,
-+	.max_keysize		= DES_KEY_SIZE,
-+	.ivsize			= DES_BLOCK_SIZE,
-+	.setkey			= atmel_des_setkey,
-+	.encrypt		= atmel_tdes_cfb32_encrypt,
-+	.decrypt		= atmel_tdes_cfb32_decrypt,
++	.init			= atmel_aes_init_tfm,
++	.min_keysize		= AES_MIN_KEY_SIZE,
++	.max_keysize		= AES_MAX_KEY_SIZE,
++	.setkey			= atmel_aes_setkey,
++	.encrypt		= atmel_aes_cfb32_encrypt,
++	.decrypt		= atmel_aes_cfb32_decrypt,
++	.ivsize			= AES_BLOCK_SIZE,
  },
  {
--	.cra_name		= "ofb(des)",
--	.cra_driver_name	= "atmel-ofb-des",
--	.cra_priority		= 100,
+-	.cra_name		= "cfb16(aes)",
+-	.cra_driver_name	= "atmel-cfb16-aes",
+-	.cra_priority		= ATMEL_AES_PRIORITY,
 -	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
--	.cra_blocksize		= DES_BLOCK_SIZE,
--	.cra_ctxsize		= sizeof(struct atmel_tdes_ctx),
--	.cra_alignmask		= 0x7,
+-	.cra_blocksize		= CFB16_BLOCK_SIZE,
+-	.cra_ctxsize		= sizeof(struct atmel_aes_ctx),
+-	.cra_alignmask		= 0x1,
 -	.cra_type		= &crypto_ablkcipher_type,
 -	.cra_module		= THIS_MODULE,
--	.cra_init		= atmel_tdes_cra_init,
+-	.cra_init		= atmel_aes_cra_init,
 -	.cra_u.ablkcipher = {
--		.min_keysize	= DES_KEY_SIZE,
--		.max_keysize	= DES_KEY_SIZE,
--		.ivsize		= DES_BLOCK_SIZE,
--		.setkey		= atmel_des_setkey,
--		.encrypt	= atmel_tdes_ofb_encrypt,
--		.decrypt	= atmel_tdes_ofb_decrypt,
+-		.min_keysize	= AES_MIN_KEY_SIZE,
+-		.max_keysize	= AES_MAX_KEY_SIZE,
+-		.ivsize		= AES_BLOCK_SIZE,
+-		.setkey		= atmel_aes_setkey,
+-		.encrypt	= atmel_aes_cfb16_encrypt,
+-		.decrypt	= atmel_aes_cfb16_decrypt,
 -	}
-+	.base.cra_name		= "ofb(des)",
-+	.base.cra_driver_name	= "atmel-ofb-des",
-+	.base.cra_priority	= 100,
++	.base.cra_name		= "cfb16(aes)",
++	.base.cra_driver_name	= "atmel-cfb16-aes",
++	.base.cra_priority	= ATMEL_AES_PRIORITY,
 +	.base.cra_flags		= CRYPTO_ALG_ASYNC,
-+	.base.cra_blocksize	= DES_BLOCK_SIZE,
-+	.base.cra_ctxsize	= sizeof(struct atmel_tdes_ctx),
-+	.base.cra_alignmask	= 0x7,
++	.base.cra_blocksize	= CFB16_BLOCK_SIZE,
++	.base.cra_ctxsize	= sizeof(struct atmel_aes_ctx),
++	.base.cra_alignmask	= 0xf,
 +	.base.cra_module	= THIS_MODULE,
 +
-+	.init			= atmel_tdes_init_tfm,
-+	.min_keysize		= DES_KEY_SIZE,
-+	.max_keysize		= DES_KEY_SIZE,
-+	.ivsize			= DES_BLOCK_SIZE,
-+	.setkey			= atmel_des_setkey,
-+	.encrypt		= atmel_tdes_ofb_encrypt,
-+	.decrypt		= atmel_tdes_ofb_decrypt,
++	.init			= atmel_aes_init_tfm,
++	.min_keysize		= AES_MIN_KEY_SIZE,
++	.max_keysize		= AES_MAX_KEY_SIZE,
++	.setkey			= atmel_aes_setkey,
++	.encrypt		= atmel_aes_cfb16_encrypt,
++	.decrypt		= atmel_aes_cfb16_decrypt,
++	.ivsize			= AES_BLOCK_SIZE,
  },
  {
--	.cra_name		= "ecb(des3_ede)",
--	.cra_driver_name	= "atmel-ecb-tdes",
--	.cra_priority		= 100,
+-	.cra_name		= "cfb8(aes)",
+-	.cra_driver_name	= "atmel-cfb8-aes",
+-	.cra_priority		= ATMEL_AES_PRIORITY,
 -	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
--	.cra_blocksize		= DES_BLOCK_SIZE,
--	.cra_ctxsize		= sizeof(struct atmel_tdes_ctx),
--	.cra_alignmask		= 0x7,
+-	.cra_blocksize		= CFB8_BLOCK_SIZE,
+-	.cra_ctxsize		= sizeof(struct atmel_aes_ctx),
+-	.cra_alignmask		= 0x0,
 -	.cra_type		= &crypto_ablkcipher_type,
 -	.cra_module		= THIS_MODULE,
--	.cra_init		= atmel_tdes_cra_init,
+-	.cra_init		= atmel_aes_cra_init,
 -	.cra_u.ablkcipher = {
--		.min_keysize	= 3 * DES_KEY_SIZE,
--		.max_keysize	= 3 * DES_KEY_SIZE,
--		.setkey		= atmel_tdes_setkey,
--		.encrypt	= atmel_tdes_ecb_encrypt,
--		.decrypt	= atmel_tdes_ecb_decrypt,
+-		.min_keysize	= AES_MIN_KEY_SIZE,
+-		.max_keysize	= AES_MAX_KEY_SIZE,
+-		.ivsize		= AES_BLOCK_SIZE,
+-		.setkey		= atmel_aes_setkey,
+-		.encrypt	= atmel_aes_cfb8_encrypt,
+-		.decrypt	= atmel_aes_cfb8_decrypt,
 -	}
-+	.base.cra_name		= "ecb(des3_ede)",
-+	.base.cra_driver_name	= "atmel-ecb-tdes",
-+	.base.cra_priority	= 100,
++	.base.cra_name		= "cfb8(aes)",
++	.base.cra_driver_name	= "atmel-cfb8-aes",
++	.base.cra_priority	= ATMEL_AES_PRIORITY,
 +	.base.cra_flags		= CRYPTO_ALG_ASYNC,
-+	.base.cra_blocksize	= DES_BLOCK_SIZE,
-+	.base.cra_ctxsize	= sizeof(struct atmel_tdes_ctx),
-+	.base.cra_alignmask	= 0x7,
++	.base.cra_blocksize	= CFB8_BLOCK_SIZE,
++	.base.cra_ctxsize	= sizeof(struct atmel_aes_ctx),
++	.base.cra_alignmask	= 0xf,
 +	.base.cra_module	= THIS_MODULE,
 +
-+	.init			= atmel_tdes_init_tfm,
-+	.min_keysize		= DES3_EDE_KEY_SIZE,
-+	.max_keysize		= DES3_EDE_KEY_SIZE,
-+	.setkey			= atmel_tdes_setkey,
-+	.encrypt		= atmel_tdes_ecb_encrypt,
-+	.decrypt		= atmel_tdes_ecb_decrypt,
++	.init			= atmel_aes_init_tfm,
++	.min_keysize		= AES_MIN_KEY_SIZE,
++	.max_keysize		= AES_MAX_KEY_SIZE,
++	.setkey			= atmel_aes_setkey,
++	.encrypt		= atmel_aes_cfb8_encrypt,
++	.decrypt		= atmel_aes_cfb8_decrypt,
++	.ivsize			= AES_BLOCK_SIZE,
  },
  {
--	.cra_name		= "cbc(des3_ede)",
--	.cra_driver_name	= "atmel-cbc-tdes",
--	.cra_priority		= 100,
+-	.cra_name		= "ctr(aes)",
+-	.cra_driver_name	= "atmel-ctr-aes",
+-	.cra_priority		= ATMEL_AES_PRIORITY,
 -	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
--	.cra_blocksize		= DES_BLOCK_SIZE,
--	.cra_ctxsize		= sizeof(struct atmel_tdes_ctx),
--	.cra_alignmask		= 0x7,
+-	.cra_blocksize		= 1,
+-	.cra_ctxsize		= sizeof(struct atmel_aes_ctr_ctx),
+-	.cra_alignmask		= 0xf,
 -	.cra_type		= &crypto_ablkcipher_type,
 -	.cra_module		= THIS_MODULE,
--	.cra_init		= atmel_tdes_cra_init,
+-	.cra_init		= atmel_aes_ctr_cra_init,
 -	.cra_u.ablkcipher = {
--		.min_keysize	= 3*DES_KEY_SIZE,
--		.max_keysize	= 3*DES_KEY_SIZE,
--		.ivsize		= DES_BLOCK_SIZE,
--		.setkey		= atmel_tdes_setkey,
--		.encrypt	= atmel_tdes_cbc_encrypt,
--		.decrypt	= atmel_tdes_cbc_decrypt,
+-		.min_keysize	= AES_MIN_KEY_SIZE,
+-		.max_keysize	= AES_MAX_KEY_SIZE,
+-		.ivsize		= AES_BLOCK_SIZE,
+-		.setkey		= atmel_aes_setkey,
+-		.encrypt	= atmel_aes_ctr_encrypt,
+-		.decrypt	= atmel_aes_ctr_decrypt,
 -	}
-+	.base.cra_name		= "cbc(des3_ede)",
-+	.base.cra_driver_name	= "atmel-cbc-tdes",
-+	.base.cra_priority	= 100,
++	.base.cra_name		= "ctr(aes)",
++	.base.cra_driver_name	= "atmel-ctr-aes",
++	.base.cra_priority	= ATMEL_AES_PRIORITY,
 +	.base.cra_flags		= CRYPTO_ALG_ASYNC,
-+	.base.cra_blocksize	= DES_BLOCK_SIZE,
-+	.base.cra_ctxsize	= sizeof(struct atmel_tdes_ctx),
-+	.base.cra_alignmask	= 0x7,
++	.base.cra_blocksize	= 1,
++	.base.cra_ctxsize	= sizeof(struct atmel_aes_ctr_ctx),
++	.base.cra_alignmask	= 0xf,
 +	.base.cra_module	= THIS_MODULE,
 +
-+	.init			= atmel_tdes_init_tfm,
-+	.min_keysize		= DES3_EDE_KEY_SIZE,
-+	.max_keysize		= DES3_EDE_KEY_SIZE,
-+	.setkey			= atmel_tdes_setkey,
-+	.encrypt		= atmel_tdes_cbc_encrypt,
-+	.decrypt		= atmel_tdes_cbc_decrypt,
-+	.ivsize			= DES_BLOCK_SIZE,
- },
- {
--	.cra_name		= "ofb(des3_ede)",
--	.cra_driver_name	= "atmel-ofb-tdes",
--	.cra_priority		= 100,
--	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
--	.cra_blocksize		= DES_BLOCK_SIZE,
--	.cra_ctxsize		= sizeof(struct atmel_tdes_ctx),
--	.cra_alignmask		= 0x7,
--	.cra_type		= &crypto_ablkcipher_type,
--	.cra_module		= THIS_MODULE,
--	.cra_init		= atmel_tdes_cra_init,
--	.cra_u.ablkcipher = {
--		.min_keysize	= 3*DES_KEY_SIZE,
--		.max_keysize	= 3*DES_KEY_SIZE,
--		.ivsize		= DES_BLOCK_SIZE,
--		.setkey		= atmel_tdes_setkey,
--		.encrypt	= atmel_tdes_ofb_encrypt,
--		.decrypt	= atmel_tdes_ofb_decrypt,
--	}
-+	.base.cra_name		= "ofb(des3_ede)",
-+	.base.cra_driver_name	= "atmel-ofb-tdes",
-+	.base.cra_priority	= 100,
-+	.base.cra_flags		= CRYPTO_ALG_ASYNC,
-+	.base.cra_blocksize	= DES_BLOCK_SIZE,
-+	.base.cra_ctxsize	= sizeof(struct atmel_tdes_ctx),
-+	.base.cra_alignmask	= 0x7,
-+	.base.cra_module	= THIS_MODULE,
-+
-+	.init			= atmel_tdes_init_tfm,
-+	.min_keysize		= DES3_EDE_KEY_SIZE,
-+	.max_keysize		= DES3_EDE_KEY_SIZE,
-+	.setkey			= atmel_tdes_setkey,
-+	.encrypt		= atmel_tdes_ofb_encrypt,
-+	.decrypt		= atmel_tdes_ofb_decrypt,
-+	.ivsize			= DES_BLOCK_SIZE,
++	.init			= atmel_aes_ctr_init_tfm,
++	.min_keysize		= AES_MIN_KEY_SIZE,
++	.max_keysize		= AES_MAX_KEY_SIZE,
++	.setkey			= atmel_aes_setkey,
++	.encrypt		= atmel_aes_ctr_encrypt,
++	.decrypt		= atmel_aes_ctr_decrypt,
++	.ivsize			= AES_BLOCK_SIZE,
  },
  };
  
-@@ -1148,7 +1129,7 @@ static void atmel_tdes_unregister_algs(struct atmel_tdes_dev *dd)
- 	int i;
+-static struct crypto_alg aes_cfb64_alg = {
+-	.cra_name		= "cfb64(aes)",
+-	.cra_driver_name	= "atmel-cfb64-aes",
+-	.cra_priority		= ATMEL_AES_PRIORITY,
+-	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
+-	.cra_blocksize		= CFB64_BLOCK_SIZE,
+-	.cra_ctxsize		= sizeof(struct atmel_aes_ctx),
+-	.cra_alignmask		= 0x7,
+-	.cra_type		= &crypto_ablkcipher_type,
+-	.cra_module		= THIS_MODULE,
+-	.cra_init		= atmel_aes_cra_init,
+-	.cra_u.ablkcipher = {
+-		.min_keysize	= AES_MIN_KEY_SIZE,
+-		.max_keysize	= AES_MAX_KEY_SIZE,
+-		.ivsize		= AES_BLOCK_SIZE,
+-		.setkey		= atmel_aes_setkey,
+-		.encrypt	= atmel_aes_cfb64_encrypt,
+-		.decrypt	= atmel_aes_cfb64_decrypt,
+-	}
++static struct skcipher_alg aes_cfb64_alg = {
++	.base.cra_name		= "cfb64(aes)",
++	.base.cra_driver_name	= "atmel-cfb64-aes",
++	.base.cra_priority	= ATMEL_AES_PRIORITY,
++	.base.cra_flags		= CRYPTO_ALG_ASYNC,
++	.base.cra_blocksize	= CFB64_BLOCK_SIZE,
++	.base.cra_ctxsize	= sizeof(struct atmel_aes_ctx),
++	.base.cra_alignmask	= 0xf,
++	.base.cra_module	= THIS_MODULE,
++
++	.init			= atmel_aes_init_tfm,
++	.min_keysize		= AES_MIN_KEY_SIZE,
++	.max_keysize		= AES_MAX_KEY_SIZE,
++	.setkey			= atmel_aes_setkey,
++	.encrypt		= atmel_aes_cfb64_encrypt,
++	.decrypt		= atmel_aes_cfb64_decrypt,
++	.ivsize			= AES_BLOCK_SIZE,
+ };
  
- 	for (i = 0; i < ARRAY_SIZE(tdes_algs); i++)
--		crypto_unregister_alg(&tdes_algs[i]);
-+		crypto_unregister_skcipher(&tdes_algs[i]);
+ 
+@@ -1864,8 +1847,8 @@ static int atmel_aes_xts_process_data(struct atmel_aes_dev *dd);
+ static int atmel_aes_xts_start(struct atmel_aes_dev *dd)
+ {
+ 	struct atmel_aes_xts_ctx *ctx = atmel_aes_xts_ctx_cast(dd->ctx);
+-	struct ablkcipher_request *req = ablkcipher_request_cast(dd->areq);
+-	struct atmel_aes_reqctx *rctx = ablkcipher_request_ctx(req);
++	struct skcipher_request *req = skcipher_request_cast(dd->areq);
++	struct atmel_aes_reqctx *rctx = skcipher_request_ctx(req);
+ 	unsigned long flags;
+ 	int err;
+ 
+@@ -1875,7 +1858,7 @@ static int atmel_aes_xts_start(struct atmel_aes_dev *dd)
+ 	if (err)
+ 		return atmel_aes_complete(dd, err);
+ 
+-	/* Compute the tweak value from req->info with ecb(aes). */
++	/* Compute the tweak value from req->iv with ecb(aes). */
+ 	flags = dd->flags;
+ 	dd->flags &= ~AES_FLAGS_MODE_MASK;
+ 	dd->flags |= (AES_FLAGS_ECB | AES_FLAGS_ENCRYPT);
+@@ -1883,14 +1866,14 @@ static int atmel_aes_xts_start(struct atmel_aes_dev *dd)
+ 				 ctx->key2, ctx->base.keylen);
+ 	dd->flags = flags;
+ 
+-	atmel_aes_write_block(dd, AES_IDATAR(0), req->info);
++	atmel_aes_write_block(dd, AES_IDATAR(0), (void *)req->iv);
+ 	return atmel_aes_wait_for_data_ready(dd, atmel_aes_xts_process_data);
  }
  
- static int atmel_tdes_register_algs(struct atmel_tdes_dev *dd)
-@@ -1156,7 +1137,7 @@ static int atmel_tdes_register_algs(struct atmel_tdes_dev *dd)
+ static int atmel_aes_xts_process_data(struct atmel_aes_dev *dd)
+ {
+-	struct ablkcipher_request *req = ablkcipher_request_cast(dd->areq);
+-	bool use_dma = (req->nbytes >= ATMEL_AES_DMA_THRESHOLD);
++	struct skcipher_request *req = skcipher_request_cast(dd->areq);
++	bool use_dma = (req->cryptlen >= ATMEL_AES_DMA_THRESHOLD);
+ 	u32 tweak[AES_BLOCK_SIZE / sizeof(u32)];
+ 	static const u32 one[AES_BLOCK_SIZE / sizeof(u32)] = {cpu_to_le32(1), };
+ 	u8 *tweak_bytes = (u8 *)tweak;
+@@ -1915,20 +1898,20 @@ static int atmel_aes_xts_process_data(struct atmel_aes_dev *dd)
+ 	atmel_aes_write_block(dd, AES_TWR(0), tweak);
+ 	atmel_aes_write_block(dd, AES_ALPHAR(0), one);
+ 	if (use_dma)
+-		return atmel_aes_dma_start(dd, req->src, req->dst, req->nbytes,
++		return atmel_aes_dma_start(dd, req->src, req->dst, req->cryptlen,
+ 					   atmel_aes_transfer_complete);
+ 
+-	return atmel_aes_cpu_start(dd, req->src, req->dst, req->nbytes,
++	return atmel_aes_cpu_start(dd, req->src, req->dst, req->cryptlen,
+ 				   atmel_aes_transfer_complete);
+ }
+ 
+-static int atmel_aes_xts_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
++static int atmel_aes_xts_setkey(struct crypto_skcipher *tfm, const u8 *key,
+ 				unsigned int keylen)
+ {
+-	struct atmel_aes_xts_ctx *ctx = crypto_ablkcipher_ctx(tfm);
++	struct atmel_aes_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
+ 	int err;
+ 
+-	err = xts_check_key(crypto_ablkcipher_tfm(tfm), key, keylen);
++	err = xts_check_key(crypto_skcipher_tfm(tfm), key, keylen);
+ 	if (err)
+ 		return err;
+ 
+@@ -1939,45 +1922,43 @@ static int atmel_aes_xts_setkey(struct crypto_ablkcipher *tfm, const u8 *key,
+ 	return 0;
+ }
+ 
+-static int atmel_aes_xts_encrypt(struct ablkcipher_request *req)
++static int atmel_aes_xts_encrypt(struct skcipher_request *req)
+ {
+ 	return atmel_aes_crypt(req, AES_FLAGS_XTS | AES_FLAGS_ENCRYPT);
+ }
+ 
+-static int atmel_aes_xts_decrypt(struct ablkcipher_request *req)
++static int atmel_aes_xts_decrypt(struct skcipher_request *req)
+ {
+ 	return atmel_aes_crypt(req, AES_FLAGS_XTS);
+ }
+ 
+-static int atmel_aes_xts_cra_init(struct crypto_tfm *tfm)
++static int atmel_aes_xts_init_tfm(struct crypto_skcipher *tfm)
+ {
+-	struct atmel_aes_xts_ctx *ctx = crypto_tfm_ctx(tfm);
++	struct atmel_aes_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
+ 
+-	tfm->crt_ablkcipher.reqsize = sizeof(struct atmel_aes_reqctx);
++	crypto_skcipher_set_reqsize(tfm, sizeof(struct atmel_aes_reqctx));
+ 	ctx->base.start = atmel_aes_xts_start;
+ 
+ 	return 0;
+ }
+ 
+-static struct crypto_alg aes_xts_alg = {
+-	.cra_name		= "xts(aes)",
+-	.cra_driver_name	= "atmel-xts-aes",
+-	.cra_priority		= ATMEL_AES_PRIORITY,
+-	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER | CRYPTO_ALG_ASYNC,
+-	.cra_blocksize		= AES_BLOCK_SIZE,
+-	.cra_ctxsize		= sizeof(struct atmel_aes_xts_ctx),
+-	.cra_alignmask		= 0xf,
+-	.cra_type		= &crypto_ablkcipher_type,
+-	.cra_module		= THIS_MODULE,
+-	.cra_init		= atmel_aes_xts_cra_init,
+-	.cra_u.ablkcipher = {
+-		.min_keysize	= 2 * AES_MIN_KEY_SIZE,
+-		.max_keysize	= 2 * AES_MAX_KEY_SIZE,
+-		.ivsize		= AES_BLOCK_SIZE,
+-		.setkey		= atmel_aes_xts_setkey,
+-		.encrypt	= atmel_aes_xts_encrypt,
+-		.decrypt	= atmel_aes_xts_decrypt,
+-	}
++static struct skcipher_alg aes_xts_alg = {
++	.base.cra_name		= "xts(aes)",
++	.base.cra_driver_name	= "atmel-xts-aes",
++	.base.cra_priority	= ATMEL_AES_PRIORITY,
++	.base.cra_flags		= CRYPTO_ALG_ASYNC,
++	.base.cra_blocksize	= AES_BLOCK_SIZE,
++	.base.cra_ctxsize	= sizeof(struct atmel_aes_xts_ctx),
++	.base.cra_alignmask	= 0xf,
++	.base.cra_module	= THIS_MODULE,
++
++	.min_keysize		= 2 * AES_MIN_KEY_SIZE,
++	.max_keysize		= 2 * AES_MAX_KEY_SIZE,
++	.ivsize			= AES_BLOCK_SIZE,
++	.setkey			= atmel_aes_xts_setkey,
++	.encrypt		= atmel_aes_xts_encrypt,
++	.decrypt		= atmel_aes_xts_decrypt,
++	.init			= atmel_aes_xts_init_tfm,
+ };
+ 
+ #ifdef CONFIG_CRYPTO_DEV_ATMEL_AUTHENC
+@@ -2474,16 +2455,16 @@ static void atmel_aes_unregister_algs(struct atmel_aes_dev *dd)
+ #endif
+ 
+ 	if (dd->caps.has_xts)
+-		crypto_unregister_alg(&aes_xts_alg);
++		crypto_unregister_skcipher(&aes_xts_alg);
+ 
+ 	if (dd->caps.has_gcm)
+ 		crypto_unregister_aead(&aes_gcm_alg);
+ 
+ 	if (dd->caps.has_cfb64)
+-		crypto_unregister_alg(&aes_cfb64_alg);
++		crypto_unregister_skcipher(&aes_cfb64_alg);
+ 
+ 	for (i = 0; i < ARRAY_SIZE(aes_algs); i++)
+-		crypto_unregister_alg(&aes_algs[i]);
++		crypto_unregister_skcipher(&aes_algs[i]);
+ }
+ 
+ static int atmel_aes_register_algs(struct atmel_aes_dev *dd)
+@@ -2491,13 +2472,13 @@ static int atmel_aes_register_algs(struct atmel_aes_dev *dd)
  	int err, i, j;
  
- 	for (i = 0; i < ARRAY_SIZE(tdes_algs); i++) {
--		err = crypto_register_alg(&tdes_algs[i]);
-+		err = crypto_register_skcipher(&tdes_algs[i]);
+ 	for (i = 0; i < ARRAY_SIZE(aes_algs); i++) {
+-		err = crypto_register_alg(&aes_algs[i]);
++		err = crypto_register_skcipher(&aes_algs[i]);
  		if (err)
- 			goto err_tdes_algs;
+ 			goto err_aes_algs;
  	}
-@@ -1165,7 +1146,7 @@ static int atmel_tdes_register_algs(struct atmel_tdes_dev *dd)
  
- err_tdes_algs:
+ 	if (dd->caps.has_cfb64) {
+-		err = crypto_register_alg(&aes_cfb64_alg);
++		err = crypto_register_skcipher(&aes_cfb64_alg);
+ 		if (err)
+ 			goto err_aes_cfb64_alg;
+ 	}
+@@ -2509,7 +2490,7 @@ static int atmel_aes_register_algs(struct atmel_aes_dev *dd)
+ 	}
+ 
+ 	if (dd->caps.has_xts) {
+-		err = crypto_register_alg(&aes_xts_alg);
++		err = crypto_register_skcipher(&aes_xts_alg);
+ 		if (err)
+ 			goto err_aes_xts_alg;
+ 	}
+@@ -2531,17 +2512,17 @@ static int atmel_aes_register_algs(struct atmel_aes_dev *dd)
+ err_aes_authenc_alg:
  	for (j = 0; j < i; j++)
--		crypto_unregister_alg(&tdes_algs[j]);
-+		crypto_unregister_skcipher(&tdes_algs[j]);
+ 		crypto_unregister_aead(&aes_authenc_algs[j]);
+-	crypto_unregister_alg(&aes_xts_alg);
++	crypto_unregister_skcipher(&aes_xts_alg);
+ #endif
+ err_aes_xts_alg:
+ 	crypto_unregister_aead(&aes_gcm_alg);
+ err_aes_gcm_alg:
+-	crypto_unregister_alg(&aes_cfb64_alg);
++	crypto_unregister_skcipher(&aes_cfb64_alg);
+ err_aes_cfb64_alg:
+ 	i = ARRAY_SIZE(aes_algs);
+ err_aes_algs:
+ 	for (j = 0; j < i; j++)
+-		crypto_unregister_alg(&aes_algs[j]);
++		crypto_unregister_skcipher(&aes_algs[j]);
  
  	return err;
  }
