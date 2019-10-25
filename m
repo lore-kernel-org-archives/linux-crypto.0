@@ -4,77 +4,89 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E17CECA9EA0
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Oct 2019 15:28:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDC9FCA9EA0
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Oct 2019 15:56:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C2C1821D81
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Oct 2019 15:28:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C242C21E6F
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Oct 2019 15:56:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2440768AbfJYP2B (ORCPT
+        id S2395548AbfJYP42 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Oct 2019 11:28:01 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:36126 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2440753AbfJYP2A (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Oct 2019 11:28:00 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1iO1Un-0001vM-5Z; Fri, 25 Oct 2019 23:27:21 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1iO1Ue-0007uU-5p; Fri, 25 Oct 2019 23:27:12 +0800
-Date:   Fri, 25 Oct 2019 23:27:12 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Geert Uytterhoeven <geert+renesas@glider.be>
-Cc:     Breno =?iso-8859-1?Q?Leit=E3o?= <leitao@debian.org>,
-        Nayna Jain <nayna@linux.ibm.com>,
-        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-        David@rox.of.borg, David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Casey Leedom <leedom@chelsio.com>,
-        Shannon Nelson <snelson@pensando.io>,
-        Pensando Drivers <drivers@pensando.io>,
-        Kevin Hilman <khilman@kernel.org>, Nishanth Menon <nm@ti.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        netdev@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/5] crypto: nx - Improve debugfs_create_u{32,64}()
- handling for atomics
-Message-ID: <20191025152712.26q6s5gbygdxd33j@gondor.apana.org.au>
-References: <20191021145149.31657-1-geert+renesas@glider.be>
- <20191021145149.31657-2-geert+renesas@glider.be>
+        Fri, 25 Oct 2019 11:56:28 -0400
+Received: from mx2.suse.de ([195.135.220.15]:51488 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S2388136AbfJYP42 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 25 Oct 2019 11:56:28 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 0F529B54C;
+        Fri, 25 Oct 2019 15:56:27 +0000 (UTC)
+Received: by ds.suse.cz (Postfix, from userid 10065)
+        id 8756DDA785; Fri, 25 Oct 2019 17:56:38 +0200 (CEST)
+Date:   Fri, 25 Oct 2019 17:56:38 +0200
+From:   David Sterba <dsterba@suse.cz>
+To:     David Sterba <dsterba@suse.com>, linux-crypto@vger.kernel.org,
+        ard.biesheuvel@linaro.org
+Subject: Re: [PATCH v7 1/2] crypto: add blake2b generic implementation
+Message-ID: <20191025155638.GN3001@twin.jikos.cz>
+Reply-To: dsterba@suse.cz
+Mail-Followup-To: dsterba@suse.cz, David Sterba <dsterba@suse.com>,
+        linux-crypto@vger.kernel.org, ard.biesheuvel@linaro.org
+References: <cover.1571934170.git.dsterba@suse.com>
+ <79e47ab2c559c974d950a238e9db909795b4268d.1571934170.git.dsterba@suse.com>
+ <20191025051550.GA103313@sol.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191021145149.31657-2-geert+renesas@glider.be>
-User-Agent: NeoMutt/20170113 (1.7.2)
+In-Reply-To: <20191025051550.GA103313@sol.localdomain>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Oct 21, 2019 at 04:51:45PM +0200, Geert Uytterhoeven wrote:
-> Variables of type atomic{,64}_t can be used fine with
-> debugfs_create_u{32,64}, when passing a pointer to the embedded counter.
-> This allows to get rid of the casts, which prevented compiler checks.
+On Thu, Oct 24, 2019 at 10:15:50PM -0700, Eric Biggers wrote:
+> On Thu, Oct 24, 2019 at 06:28:31PM +0200, David Sterba wrote:
+> > The patch brings support of several BLAKE2 variants (2b with various
+> > digest lengths).  The keyed digest is supported, using tfm->setkey call.
+> > The in-tree user will be btrfs (for checksumming), we're going to use
+> > the BLAKE2b-256 variant.
+> > 
+> > The code is reference implementation taken from the official sources and
+> > modified in terms of kernel coding style (whitespace, comments, uintXX_t
+> > -> uXX types, removed unused prototypes and #ifdefs, removed testing
+> > code, changed secure_zero_memory -> memzero_explicit, used own helpers
+> > for unaligned reads/writes and rotations).
+> > 
+> > Further changes removed sanity checks of key length or output size,
+> > these values are verified in the crypto API callbacks or hardcoded in
+> > shash_alg and not exposed to users.
+> > 
+> > Signed-off-by: David Sterba <dsterba@suse.com>
+> > ---
+> >  crypto/Kconfig           |  17 ++
+> >  crypto/Makefile          |   1 +
+> >  crypto/blake2b_generic.c | 435 +++++++++++++++++++++++++++++++++++++++
+> >  3 files changed, 453 insertions(+)
+> >  create mode 100644 crypto/blake2b_generic.c
+> > 
 > 
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> ---
->  drivers/crypto/nx/nx_debugfs.c | 18 +++++++++---------
->  1 file changed, 9 insertions(+), 9 deletions(-)
+> This looks good enough now, though it would be nice to clean up some more of the
+> cruft that isn't actually needed and add a few of the optimizations from the
+> BLAKE2s code that is being proposed.  E.g. we could easily save 120 lines with
+> the following:
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+While I see your point, my intention is to avoid changes beyond
+formatting and interface adjustments so the kernel code would not
+diverge from the reference one. IMHO having this as a separate commit is
+a good thing.
+
+Further changes would need another round of review(s) and testing and
+then it should be called 'based on reference code and heavily modified',
+like the blake2s patch says.
+
+The proposed patch looks good, though I'd rather address that
+independently and perhaps also split it to individual changes so it's
+clear how the code is transformed.
