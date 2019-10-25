@@ -2,101 +2,94 @@ Return-Path: <SRS0=9dQ/=YS=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E61CA9EA0
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Oct 2019 15:20:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19491CA9EA0
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Oct 2019 15:21:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3530921D7B
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Oct 2019 15:20:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E80B921D7B
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Oct 2019 15:21:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2440614AbfJYPUR (ORCPT
+        id S2440642AbfJYPVC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Oct 2019 11:20:17 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:35772 "EHLO deadmen.hmeau.com"
+        Fri, 25 Oct 2019 11:21:02 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:35806 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2440610AbfJYPUR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Oct 2019 11:20:17 -0400
+        id S2440561AbfJYPVC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 25 Oct 2019 11:21:02 -0400
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1iO1Nn-0001gt-At; Fri, 25 Oct 2019 23:20:07 +0800
+        id 1iO1OE-0001hu-6D; Fri, 25 Oct 2019 23:20:34 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1iO1Nl-0007p5-6Z; Fri, 25 Oct 2019 23:20:05 +0800
-Date:   Fri, 25 Oct 2019 23:20:05 +0800
+        id 1iO1O5-0007pN-BO; Fri, 25 Oct 2019 23:20:25 +0800
+Date:   Fri, 25 Oct 2019 23:20:25 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ben Dooks <ben.dooks@codethink.co.uk>
-Cc:     linux-kernel@lists.codethink.co.uk, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] hwrng: ka-sa - fix __iomem on registers
-Message-ID: <20191025152005.3mesb4toi3na5f2q@gondor.apana.org.au>
-References: <20191015123604.28749-1-ben.dooks@codethink.co.uk>
+To:     YueHaibing <yuehaibing@huawei.com>
+Cc:     mpm@selenic.com, arnd@arndb.de, gregkh@linuxfoundation.org,
+        nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
+        ludovic.desroches@microchip.com, f.fainelli@gmail.com,
+        rjui@broadcom.com, sbranden@broadcom.com,
+        bcm-kernel-feedback-list@broadcom.com, eric@anholt.net,
+        wahrenst@gmx.net, l.stelmach@samsung.com, kgene@kernel.org,
+        krzk@kernel.org, khilman@baylibre.com, dsaxena@plexity.net,
+        patrice.chotard@st.com, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-rpi-kernel@lists.infradead.org,
+        linux-samsung-soc@vger.kernel.org,
+        linux-amlogic@lists.infradead.org, linuxppc-dev@lists.ozlabs.org
+Subject: Re: [PATCH -next 00/13] hwrng: use devm_platform_ioremap_resource()
+ to simplify code
+Message-ID: <20191025152025.qudqaupecsgwkn32@gondor.apana.org.au>
+References: <20191016104621.26056-1-yuehaibing@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191015123604.28749-1-ben.dooks@codethink.co.uk>
+In-Reply-To: <20191016104621.26056-1-yuehaibing@huawei.com>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Oct 15, 2019 at 01:36:04PM +0100, Ben Dooks wrote:
-> Add __ioemm attribute to reg_rng to fix the following
-> sparse warnings:
+On Wed, Oct 16, 2019 at 06:46:08PM +0800, YueHaibing wrote:
+> devm_platform_ioremap_resource() internally have platform_get_resource()
+> and devm_ioremap_resource() in it. So instead of calling them separately
+> use devm_platform_ioremap_resource() directly.
 > 
-> drivers/char/hw_random/ks-sa-rng.c:102:9: warning: incorrect type in argument 2 (different address spaces)
-> drivers/char/hw_random/ks-sa-rng.c:102:9:    expected void volatile [noderef] <asn:2> *addr
-> drivers/char/hw_random/ks-sa-rng.c:102:9:    got unsigned int *
-> drivers/char/hw_random/ks-sa-rng.c:104:9: warning: incorrect type in argument 2 (different address spaces)
-> drivers/char/hw_random/ks-sa-rng.c:104:9:    expected void volatile [noderef] <asn:2> *addr
-> drivers/char/hw_random/ks-sa-rng.c:104:9:    got unsigned int *
-> drivers/char/hw_random/ks-sa-rng.c:113:9: warning: incorrect type in argument 2 (different address spaces)
-> drivers/char/hw_random/ks-sa-rng.c:113:9:    expected void volatile [noderef] <asn:2> *addr
-> drivers/char/hw_random/ks-sa-rng.c:113:9:    got unsigned int *
-> drivers/char/hw_random/ks-sa-rng.c:116:9: warning: incorrect type in argument 2 (different address spaces)
-> drivers/char/hw_random/ks-sa-rng.c:116:9:    expected void volatile [noderef] <asn:2> *addr
-> drivers/char/hw_random/ks-sa-rng.c:116:9:    got unsigned int *
-> drivers/char/hw_random/ks-sa-rng.c:119:17: warning: incorrect type in argument 1 (different address spaces)
-> drivers/char/hw_random/ks-sa-rng.c:119:17:    expected void const volatile [noderef] <asn:2> *addr
-> drivers/char/hw_random/ks-sa-rng.c:119:17:    got unsigned int *
-> drivers/char/hw_random/ks-sa-rng.c:121:9: warning: incorrect type in argument 2 (different address spaces)
-> drivers/char/hw_random/ks-sa-rng.c:121:9:    expected void volatile [noderef] <asn:2> *addr
-> drivers/char/hw_random/ks-sa-rng.c:121:9:    got unsigned int *
-> drivers/char/hw_random/ks-sa-rng.c:132:9: warning: incorrect type in argument 2 (different address spaces)
-> drivers/char/hw_random/ks-sa-rng.c:132:9:    expected void volatile [noderef] <asn:2> *addr
-> drivers/char/hw_random/ks-sa-rng.c:132:9:    got unsigned int *
-> drivers/char/hw_random/ks-sa-rng.c:143:19: warning: incorrect type in argument 1 (different address spaces)
-> drivers/char/hw_random/ks-sa-rng.c:143:19:    expected void const volatile [noderef] <asn:2> *addr
-> drivers/char/hw_random/ks-sa-rng.c:143:19:    got unsigned int *
-> drivers/char/hw_random/ks-sa-rng.c:144:19: warning: incorrect type in argument 1 (different address spaces)
-> drivers/char/hw_random/ks-sa-rng.c:144:19:    expected void const volatile [noderef] <asn:2> *addr
-> drivers/char/hw_random/ks-sa-rng.c:144:19:    got unsigned int *
-> drivers/char/hw_random/ks-sa-rng.c:146:9: warning: incorrect type in argument 2 (different address spaces)
-> drivers/char/hw_random/ks-sa-rng.c:146:9:    expected void volatile [noderef] <asn:2> *addr
-> drivers/char/hw_random/ks-sa-rng.c:146:9:    got unsigned int *
-> drivers/char/hw_random/ks-sa-rng.c:160:25: warning: incorrect type in argument 1 (different address spaces)
-> drivers/char/hw_random/ks-sa-rng.c:160:25:    expected void const volatile [noderef] <asn:2> *addr
-> drivers/char/hw_random/ks-sa-rng.c:160:25:    got unsigned int *
-> drivers/char/hw_random/ks-sa-rng.c:194:28: warning: incorrect type in assignment (different address spaces)
-> drivers/char/hw_random/ks-sa-rng.c:194:28:    expected struct trng_regs *reg_rng
-> drivers/char/hw_random/ks-sa-rng.c:194:28:    got void [noderef] <asn:2> *
+> YueHaibing (13):
+>   hwrng: atmel - use devm_platform_ioremap_resource() to simplify code
+>   hwrng: bcm2835 - use devm_platform_ioremap_resource() to simplify code
+>   hwrng: exynos - use devm_platform_ioremap_resource() to simplify code
+>   hwrng: hisi - use devm_platform_ioremap_resource() to simplify code
+>   hwrng: ks-sa - use devm_platform_ioremap_resource() to simplify code
+>   hwrng: meson - use devm_platform_ioremap_resource() to simplify code
+>   hwrng: npcm - use devm_platform_ioremap_resource() to simplify code
+>   hwrng: omap - use devm_platform_ioremap_resource() to simplify code
+>   hwrng: pasemi - use devm_platform_ioremap_resource() to simplify code
+>   hwrng: pic32 - use devm_platform_ioremap_resource() to simplify code
+>   hwrng: st - use devm_platform_ioremap_resource() to simplify code
+>   hwrng: tx4939 - use devm_platform_ioremap_resource() to simplify code
+>   hwrng: xgene - use devm_platform_ioremap_resource() to simplify code
 > 
-> Signed-off-by: Ben Dooks <ben.dooks@codethink.co.uk>
-> Acked-by:  Arnd Bergmann <arnd@arndb.de>
-> ---
-> Cc: Arnd Bergmann <arnd@arndb.de>
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Cc: linux-crypto@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> ---
->  drivers/char/hw_random/ks-sa-rng.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  drivers/char/hw_random/atmel-rng.c   | 4 +---
+>  drivers/char/hw_random/bcm2835-rng.c | 5 +----
+>  drivers/char/hw_random/exynos-trng.c | 4 +---
+>  drivers/char/hw_random/hisi-rng.c    | 4 +---
+>  drivers/char/hw_random/ks-sa-rng.c   | 4 +---
+>  drivers/char/hw_random/meson-rng.c   | 4 +---
+>  drivers/char/hw_random/npcm-rng.c    | 4 +---
+>  drivers/char/hw_random/omap-rng.c    | 4 +---
+>  drivers/char/hw_random/pasemi-rng.c  | 4 +---
+>  drivers/char/hw_random/pic32-rng.c   | 4 +---
+>  drivers/char/hw_random/st-rng.c      | 4 +---
+>  drivers/char/hw_random/tx4939-rng.c  | 4 +---
+>  drivers/char/hw_random/xgene-rng.c   | 4 +---
+>  13 files changed, 13 insertions(+), 40 deletions(-)
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
