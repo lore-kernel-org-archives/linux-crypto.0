@@ -2,102 +2,174 @@ Return-Path: <SRS0=9dQ/=YS=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0892CA9EA0
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Oct 2019 16:37:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F327DCA9EBC
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Oct 2019 18:06:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C4C8F21D81
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Oct 2019 16:37:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=netronome-com.20150623.gappssmtp.com header.i=@netronome-com.20150623.gappssmtp.com header.b="gvoy3JML"
+	by mail.kernel.org (Postfix) with ESMTP id D11F9205F4
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Oct 2019 18:06:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2633108AbfJYQhu (ORCPT
+        id S1731518AbfJYSGu (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Oct 2019 12:37:50 -0400
-Received: from mail-pg1-f178.google.com ([209.85.215.178]:42521 "EHLO
-        mail-pg1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2393811AbfJYQht (ORCPT
+        Fri, 25 Oct 2019 14:06:50 -0400
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:47116 "EHLO
+        shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731506AbfJYSFy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Oct 2019 12:37:49 -0400
-Received: by mail-pg1-f178.google.com with SMTP id f14so1865416pgi.9
-        for <linux-crypto@vger.kernel.org>; Fri, 25 Oct 2019 09:37:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=netronome-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:in-reply-to:references
-         :organization:mime-version:content-transfer-encoding;
-        bh=UYQi1UzbB7iZ/+eKxNJToErjLhDOEYJn/+pcDU6Q51Y=;
-        b=gvoy3JML0FuZJ4rgTDUQ31bkdiDBxyr6ogVg5zGFYaYUCu1HuFEzXUHVndHUuSifpp
-         bucFPK1zq6qsuMyKSBtlartp7gP8Mb74kwH+2zajpKFAcL/RmkWlcgZqEK7PWy/6nlOU
-         8rFqVN0FryzoWjYhd7mkMUFViL4PWXe5arHB3nSzAV3PNy2ydkCf1qOicGro7L2j2C4n
-         fyeIUR2t3QevI+vePXPOXBbZoyPhFGXmYosEv4A9ebbmP2/EeC8bKTkGzvwhCy8PIVDu
-         ry2FNh1VPlo0lyr0nk73pb+AbDBtWr96Me3mkQN73Ckf+egJ6jMLPgTJjnvWiTq9YNJ/
-         PjsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=UYQi1UzbB7iZ/+eKxNJToErjLhDOEYJn/+pcDU6Q51Y=;
-        b=rGaHXzbM273tSXs0CxjQ/bsSnyBZYgm66jnwwfzMqSErdV8xqd8SlOInfQdqNMKxXg
-         wv70HqxhQ/9gjIOgKZFwqFX9jeIEjBWX1SIdcZytTaztLsMC48s+A0w9tDpkyFsaDNR0
-         chStVktHqPbxacwZzSHwqLvqo/YZYh6XwTybVEYNdppsNNk5Szu5M04HxQuvTzY1BQqu
-         jQvc0znucKIvOPYjhEZGNgzPMgSqDIqoAeVcJvqf9td8jrGPXitQAqXHxxJ1O4/fMo+Y
-         OVeELx9YWY3SmEM7LZjaRGDo8OU3WQ8x36ZmtwtlG3sQFirdF6omu0Ja7Vp4DA94RpJ/
-         NqTg==
-X-Gm-Message-State: APjAAAVKOdtSvXp0hZ7ILRUVmRRF9/l9y6iVNgskQXfrjQGT1F13pFdL
-        qw6HxnMzUue07C8JA86JJht2sQ==
-X-Google-Smtp-Source: APXvYqxakIs5zLyRaXbMPlWoXw1ffrHcyN8UtDf9R6ZXgLJ2TO3N4A4by4aXTKEvljfg/0VZVJvRtw==
-X-Received: by 2002:a62:30c5:: with SMTP id w188mr5478533pfw.105.1572021468983;
-        Fri, 25 Oct 2019 09:37:48 -0700 (PDT)
-Received: from cakuba.hsd1.ca.comcast.net (c-73-202-202-92.hsd1.ca.comcast.net. [73.202.202.92])
-        by smtp.gmail.com with ESMTPSA id b14sm2805214pfi.95.2019.10.25.09.37.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Oct 2019 09:37:48 -0700 (PDT)
-Date:   Fri, 25 Oct 2019 09:37:45 -0700
-From:   Jakub Kicinski <jakub.kicinski@netronome.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        Boris Pismenny <borisp@mellanox.com>,
-        Aviad Yehezkel <aviadye@mellanox.com>,
-        Dave Watson <davejwatson@fb.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Daniel Borkmann <daniel@iogearbox.net>, davem@davemloft.net,
-        glider@google.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        syzbot <syzbot+9e3b178624a8a2f8fa28@syzkaller.appspotmail.com>
-Subject: Re: [net/tls] Re: KMSAN: uninit-value in aes_encrypt (2)
-Message-ID: <20191025093745.29dcb185@cakuba.hsd1.ca.comcast.net>
-In-Reply-To: <20191025142924.7pgxabkbsbvpgygl@gondor.apana.org.au>
-References: <00000000000065ef5f0595aafe71@google.com>
-        <20191024172353.GA740@sol.localdomain>
-        <20191024104537.5a98f5b7@cakuba.hsd1.ca.comcast.net>
-        <20191025142924.7pgxabkbsbvpgygl@gondor.apana.org.au>
-Organization: Netronome Systems, Ltd.
+        Fri, 25 Oct 2019 14:05:54 -0400
+Received: from [167.98.27.226] (helo=deadeye)
+        by shadbolt.decadent.org.uk with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.89)
+        (envelope-from <ben@decadent.org.uk>)
+        id 1iO3xz-0008Ok-AV; Fri, 25 Oct 2019 19:05:39 +0100
+Received: from ben by deadeye with local (Exim 4.92.2)
+        (envelope-from <ben@decadent.org.uk>)
+        id 1iO3xw-0001l7-KJ; Fri, 25 Oct 2019 19:05:36 +0100
+Content-Type: text/plain; charset="UTF-8"
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+From:   Ben Hutchings <ben@decadent.org.uk>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+CC:     akpm@linux-foundation.org, Denis Kirjanov <kda@linux-powerpc.org>,
+        "Boqun Feng" <boqun.feng@gmail.com>, linux-crypto@vger.kernel.org,
+        "Daniel Jordan" <daniel.m.jordan@oracle.com>,
+        "Peter Zijlstra" <peterz@infradead.org>,
+        "Herbert Xu" <herbert@gondor.apana.org.au>,
+        "Paul E. McKenney" <paulmck@linux.ibm.com>,
+        "Steffen Klassert" <steffen.klassert@secunet.com>,
+        "Andrea Parri" <andrea.parri@amarulasolutions.com>,
+        linux-arch@vger.kernel.org
+Date:   Fri, 25 Oct 2019 19:03:46 +0100
+Message-ID: <lsq.1572026582.588282827@decadent.org.uk>
+X-Mailer: LinuxStableQueue (scripts by bwh)
+X-Patchwork-Hint: ignore
+Subject: [PATCH 3.16 45/47] padata: use smp_mb in padata_reorder to avoid
+ orphaned padata jobs
+In-Reply-To: <lsq.1572026581.992411028@decadent.org.uk>
+X-SA-Exim-Connect-IP: 167.98.27.226
+X-SA-Exim-Mail-From: ben@decadent.org.uk
+X-SA-Exim-Scanned: No (on shadbolt.decadent.org.uk); SAEximRunCond expanded to false
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 25 Oct 2019 22:29:25 +0800, Herbert Xu wrote:
-> On Thu, Oct 24, 2019 at 10:45:37AM -0700, Jakub Kicinski wrote:
-> >
-> > Oh, thanks for the CC, I don't see any of these in my inbox. We have 
-> > 6 TLS maintainers, the 3 that were CCed on the thread above don't
-> > participate much :(  
-> 
-> Can you please ensure that all the maintainers are listed in the
-> MAINTAINERS file so people can cc them when needed?
+3.16.76-rc1 review patch.  If anyone has any objections, please let me know.
 
-Yes, to be clear we are all listed. Coincidentally we're listed in
-order of addition, which turns out to be reverse to the amount of
-caring.. And in the threads above it seems someone decided to only 
-CC first few (i.e. the oldest, i.e. the least caring).
+------------------
 
-I'll send a patch to remove Dave Watson at least. He's FB email address
-is dead, I've been trying to get in touch with him for 2 months with no
-luck..
+From: Daniel Jordan <daniel.m.jordan@oracle.com>
+
+commit cf144f81a99d1a3928f90b0936accfd3f45c9a0a upstream.
+
+Testing padata with the tcrypt module on a 5.2 kernel...
+
+    # modprobe tcrypt alg="pcrypt(rfc4106(gcm(aes)))" type=3
+    # modprobe tcrypt mode=211 sec=1
+
+...produces this splat:
+
+    INFO: task modprobe:10075 blocked for more than 120 seconds.
+          Not tainted 5.2.0-base+ #16
+    modprobe        D    0 10075  10064 0x80004080
+    Call Trace:
+     ? __schedule+0x4dd/0x610
+     ? ring_buffer_unlock_commit+0x23/0x100
+     schedule+0x6c/0x90
+     schedule_timeout+0x3b/0x320
+     ? trace_buffer_unlock_commit_regs+0x4f/0x1f0
+     wait_for_common+0x160/0x1a0
+     ? wake_up_q+0x80/0x80
+     { crypto_wait_req }             # entries in braces added by hand
+     { do_one_aead_op }
+     { test_aead_jiffies }
+     test_aead_speed.constprop.17+0x681/0xf30 [tcrypt]
+     do_test+0x4053/0x6a2b [tcrypt]
+     ? 0xffffffffa00f4000
+     tcrypt_mod_init+0x50/0x1000 [tcrypt]
+     ...
+
+The second modprobe command never finishes because in padata_reorder,
+CPU0's load of reorder_objects is executed before the unlocking store in
+spin_unlock_bh(pd->lock), causing CPU0 to miss CPU1's increment:
+
+CPU0                                 CPU1
+
+padata_reorder                       padata_do_serial
+  LOAD reorder_objects  // 0
+                                       INC reorder_objects  // 1
+                                       padata_reorder
+                                         TRYLOCK pd->lock   // failed
+  UNLOCK pd->lock
+
+CPU0 deletes the timer before returning from padata_reorder and since no
+other job is submitted to padata, modprobe waits indefinitely.
+
+Add a pair of full barriers to guarantee proper ordering:
+
+CPU0                                 CPU1
+
+padata_reorder                       padata_do_serial
+  UNLOCK pd->lock
+  smp_mb()
+  LOAD reorder_objects
+                                       INC reorder_objects
+                                       smp_mb__after_atomic()
+                                       padata_reorder
+                                         TRYLOCK pd->lock
+
+smp_mb__after_atomic is needed so the read part of the trylock operation
+comes after the INC, as Andrea points out.   Thanks also to Andrea for
+help with writing a litmus test.
+
+Fixes: 16295bec6398 ("padata: Generic parallelization/serialization interface")
+Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc: Andrea Parri <andrea.parri@amarulasolutions.com>
+Cc: Boqun Feng <boqun.feng@gmail.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Paul E. McKenney <paulmck@linux.ibm.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: linux-arch@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Ben Hutchings <ben@decadent.org.uk>
+---
+ kernel/padata.c | 12 ++++++++++++
+ 1 file changed, 12 insertions(+)
+
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -272,7 +272,12 @@ static void padata_reorder(struct parall
+ 	 * The next object that needs serialization might have arrived to
+ 	 * the reorder queues in the meantime, we will be called again
+ 	 * from the timer function if no one else cares for it.
++	 *
++	 * Ensure reorder_objects is read after pd->lock is dropped so we see
++	 * an increment from another task in padata_do_serial.  Pairs with
++	 * smp_mb__after_atomic in padata_do_serial.
+ 	 */
++	smp_mb();
+ 	if (atomic_read(&pd->reorder_objects)
+ 			&& !(pinst->flags & PADATA_RESET))
+ 		mod_timer(&pd->timer, jiffies + HZ);
+@@ -341,6 +346,13 @@ void padata_do_serial(struct padata_priv
+ 	list_add_tail(&padata->list, &pqueue->reorder.list);
+ 	spin_unlock(&pqueue->reorder.lock);
+ 
++	/*
++	 * Ensure the atomic_inc of reorder_objects above is ordered correctly
++	 * with the trylock of pd->lock in padata_reorder.  Pairs with smp_mb
++	 * in padata_reorder.
++	 */
++	smp_mb__after_atomic();
++
+ 	put_cpu();
+ 
+ 	padata_reorder(pd);
+
