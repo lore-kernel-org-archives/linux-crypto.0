@@ -6,58 +6,95 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAD1CCA9EA0
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Oct 2019 15:19:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E61CA9EA0
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Oct 2019 15:20:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 86EFD21D7F
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Oct 2019 15:19:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3530921D7B
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Oct 2019 15:20:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2440631AbfJYPTe (ORCPT
+        id S2440614AbfJYPUR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Oct 2019 11:19:34 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:35742 "EHLO deadmen.hmeau.com"
+        Fri, 25 Oct 2019 11:20:17 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:35772 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2440617AbfJYPTd (ORCPT <rfc822;linux-crypto@vger.kernel.orG>);
-        Fri, 25 Oct 2019 11:19:33 -0400
+        id S2440610AbfJYPUR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 25 Oct 2019 11:20:17 -0400
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1iO1ND-0001gL-Ss; Fri, 25 Oct 2019 23:19:31 +0800
+        id 1iO1Nn-0001gt-At; Fri, 25 Oct 2019 23:20:07 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1iO1ND-0007oT-HU; Fri, 25 Oct 2019 23:19:31 +0800
-Date:   Fri, 25 Oct 2019 23:19:31 +0800
+        id 1iO1Nl-0007p5-6Z; Fri, 25 Oct 2019 23:20:05 +0800
+Date:   Fri, 25 Oct 2019 23:20:05 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     linux-crypto@vger.kernel.org, Eric Biggers <ebiggers@google.com>
-Subject: Re: [PATCH] crypto: powerpc/spe-xts - implement support for
- ciphertext stealing
-Message-ID: <20191025151931.m3tbnqdjp37dd4o6@gondor.apana.org.au>
-References: <20191015081412.5295-1-ard.biesheuvel@linaro.org>
+To:     Ben Dooks <ben.dooks@codethink.co.uk>
+Cc:     linux-kernel@lists.codethink.co.uk, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] hwrng: ka-sa - fix __iomem on registers
+Message-ID: <20191025152005.3mesb4toi3na5f2q@gondor.apana.org.au>
+References: <20191015123604.28749-1-ben.dooks@codethink.co.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191015081412.5295-1-ard.biesheuvel@linaro.org>
+In-Reply-To: <20191015123604.28749-1-ben.dooks@codethink.co.uk>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Oct 15, 2019 at 10:14:12AM +0200, Ard Biesheuvel wrote:
-> Add the logic to deal with input sizes that are not a round multiple
-> of the AES block size, as described by the XTS spec. This brings the
-> SPE implementation in line with other kernel drivers that have been
-> updated recently to take this into account.
+On Tue, Oct 15, 2019 at 01:36:04PM +0100, Ben Dooks wrote:
+> Add __ioemm attribute to reg_rng to fix the following
+> sparse warnings:
 > 
-> Cc: Eric Biggers <ebiggers@google.com>
-> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> drivers/char/hw_random/ks-sa-rng.c:102:9: warning: incorrect type in argument 2 (different address spaces)
+> drivers/char/hw_random/ks-sa-rng.c:102:9:    expected void volatile [noderef] <asn:2> *addr
+> drivers/char/hw_random/ks-sa-rng.c:102:9:    got unsigned int *
+> drivers/char/hw_random/ks-sa-rng.c:104:9: warning: incorrect type in argument 2 (different address spaces)
+> drivers/char/hw_random/ks-sa-rng.c:104:9:    expected void volatile [noderef] <asn:2> *addr
+> drivers/char/hw_random/ks-sa-rng.c:104:9:    got unsigned int *
+> drivers/char/hw_random/ks-sa-rng.c:113:9: warning: incorrect type in argument 2 (different address spaces)
+> drivers/char/hw_random/ks-sa-rng.c:113:9:    expected void volatile [noderef] <asn:2> *addr
+> drivers/char/hw_random/ks-sa-rng.c:113:9:    got unsigned int *
+> drivers/char/hw_random/ks-sa-rng.c:116:9: warning: incorrect type in argument 2 (different address spaces)
+> drivers/char/hw_random/ks-sa-rng.c:116:9:    expected void volatile [noderef] <asn:2> *addr
+> drivers/char/hw_random/ks-sa-rng.c:116:9:    got unsigned int *
+> drivers/char/hw_random/ks-sa-rng.c:119:17: warning: incorrect type in argument 1 (different address spaces)
+> drivers/char/hw_random/ks-sa-rng.c:119:17:    expected void const volatile [noderef] <asn:2> *addr
+> drivers/char/hw_random/ks-sa-rng.c:119:17:    got unsigned int *
+> drivers/char/hw_random/ks-sa-rng.c:121:9: warning: incorrect type in argument 2 (different address spaces)
+> drivers/char/hw_random/ks-sa-rng.c:121:9:    expected void volatile [noderef] <asn:2> *addr
+> drivers/char/hw_random/ks-sa-rng.c:121:9:    got unsigned int *
+> drivers/char/hw_random/ks-sa-rng.c:132:9: warning: incorrect type in argument 2 (different address spaces)
+> drivers/char/hw_random/ks-sa-rng.c:132:9:    expected void volatile [noderef] <asn:2> *addr
+> drivers/char/hw_random/ks-sa-rng.c:132:9:    got unsigned int *
+> drivers/char/hw_random/ks-sa-rng.c:143:19: warning: incorrect type in argument 1 (different address spaces)
+> drivers/char/hw_random/ks-sa-rng.c:143:19:    expected void const volatile [noderef] <asn:2> *addr
+> drivers/char/hw_random/ks-sa-rng.c:143:19:    got unsigned int *
+> drivers/char/hw_random/ks-sa-rng.c:144:19: warning: incorrect type in argument 1 (different address spaces)
+> drivers/char/hw_random/ks-sa-rng.c:144:19:    expected void const volatile [noderef] <asn:2> *addr
+> drivers/char/hw_random/ks-sa-rng.c:144:19:    got unsigned int *
+> drivers/char/hw_random/ks-sa-rng.c:146:9: warning: incorrect type in argument 2 (different address spaces)
+> drivers/char/hw_random/ks-sa-rng.c:146:9:    expected void volatile [noderef] <asn:2> *addr
+> drivers/char/hw_random/ks-sa-rng.c:146:9:    got unsigned int *
+> drivers/char/hw_random/ks-sa-rng.c:160:25: warning: incorrect type in argument 1 (different address spaces)
+> drivers/char/hw_random/ks-sa-rng.c:160:25:    expected void const volatile [noderef] <asn:2> *addr
+> drivers/char/hw_random/ks-sa-rng.c:160:25:    got unsigned int *
+> drivers/char/hw_random/ks-sa-rng.c:194:28: warning: incorrect type in assignment (different address spaces)
+> drivers/char/hw_random/ks-sa-rng.c:194:28:    expected struct trng_regs *reg_rng
+> drivers/char/hw_random/ks-sa-rng.c:194:28:    got void [noderef] <asn:2> *
+> 
+> Signed-off-by: Ben Dooks <ben.dooks@codethink.co.uk>
+> Acked-by:  Arnd Bergmann <arnd@arndb.de>
 > ---
-> This applies onto Eric's series 'crypto: powerpc - convert SPE AES algorithms
-> to skcipher API', which helpfully contained instructions how to run this code
-> under QEMU, allowing me to test the changes below.
-> 
->  arch/powerpc/crypto/aes-spe-glue.c | 81 +++++++++++++++++++-
->  1 file changed, 79 insertions(+), 2 deletions(-)
+> Cc: Arnd Bergmann <arnd@arndb.de>
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Cc: linux-crypto@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> ---
+>  drivers/char/hw_random/ks-sa-rng.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
