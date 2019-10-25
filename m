@@ -2,117 +2,154 @@ Return-Path: <SRS0=9dQ/=YS=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43403CA9EBD
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Oct 2019 07:35:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E5CCCA9EA0
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Oct 2019 08:01:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1C2F420867
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Oct 2019 07:35:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eMiPHVZU"
+	by mail.kernel.org (Postfix) with ESMTP id 2E3B021929
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Oct 2019 08:01:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2406923AbfJYHfo (ORCPT
+        id S2437561AbfJYIBr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Oct 2019 03:35:44 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:42169 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2407044AbfJYHfn (ORCPT
+        Fri, 25 Oct 2019 04:01:47 -0400
+Received: from relay9-d.mail.gandi.net ([217.70.183.199]:46021 "EHLO
+        relay9-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730337AbfJYIBr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Oct 2019 03:35:43 -0400
-Received: by mail-wr1-f65.google.com with SMTP id r1so1074132wrs.9
-        for <linux-crypto@vger.kernel.org>; Fri, 25 Oct 2019 00:35:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to
-         :user-agent;
-        bh=6A6igi+iIahcN2i7nqFwvDHaOIrrC7kc9SulvaWb1t0=;
-        b=eMiPHVZUMZHiiC3b4wO8fkj4sOT4J8cQT/B7pTI+nYvnYmtef30uo9xxiPHTDLQ5OH
-         p1K+uv8OkW0Z4+Kk0Tns6Ry1uk+qekivivWeZV5mil3cYc2J06xyu99Q13F36NeSDlFJ
-         rCwL2/2JJ/GHtnlog9n0EAP+hWde6vBnc1/wchD+xtgxxg/12KbLv8zkavTCEwK2iFsA
-         euMXFexUNw+UqcOh1hGHC/S+9XxBlELQihI0O1c3+IXjt7+5Y8y1iS2pCgejUvYGtOiv
-         tec/DUnVsEEciNCVkbSGwBxfjhhW+CVVJyU6ZIQEf0ECvNkxNj+Dx6J4dObCthj1q831
-         QgUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=6A6igi+iIahcN2i7nqFwvDHaOIrrC7kc9SulvaWb1t0=;
-        b=Opju+AvUBjpTI4SK0pCz3fz3cWsGA1+yRDqn+MzcbB/cbOdFS/5LR9FvY+bIQ1ln73
-         tX4hSfj7AJcouLEuRB12QPkFu+5tMhiIs2kc/oV0nM+pN5B5ygsC5mMh96NKtFeIuMjG
-         R1O8vzZj2DBvmoeNHYD5u19faA9UDbiminof6pxQ5V4OUR0bFUqoQmm+VWLZNkibkVZ4
-         Cxclx4n8ZLnBCneov+Ik9Y+dohQeGg2fKv2I0yWRZZz8z5z9oAk8NnlxiDJOPnRg+mnD
-         w8BE4NYyOB8wziV5FM2qBW5DpB73VEET2lp8IeEw4xdOEJc8CBsflJ3dOrLrpwnBRMru
-         puPQ==
-X-Gm-Message-State: APjAAAXNrBI9ffl2URRm5838em18Z+RbqaGhWlcygfGQCbKk/2A4+/XC
-        XNfg8/Lx1SoEXEZ57WyYCZNs/g==
-X-Google-Smtp-Source: APXvYqzgAol3HSs41oKRVvqmVFgjk39bV/r9jrrjPaqODAkY5xGnPUDMWeb/ek0hQto/lg9GZ4rVNg==
-X-Received: by 2002:adf:a50b:: with SMTP id i11mr1590050wrb.308.1571988941205;
-        Fri, 25 Oct 2019 00:35:41 -0700 (PDT)
-Received: from lophozonia ([85.195.192.192])
-        by smtp.gmail.com with ESMTPSA id l26sm592473wmg.3.2019.10.25.00.35.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 25 Oct 2019 00:35:40 -0700 (PDT)
-Date:   Fri, 25 Oct 2019 09:35:38 +0200
-From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
-To:     "zhangfei.gao@foxmail.com" <zhangfei.gao@foxmail.com>
-Cc:     Zhangfei Gao <zhangfei.gao@linaro.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        jonathan.cameron@huawei.com, grant.likely@arm.com,
-        ilias.apalodimas@linaro.org, francois.ozog@linaro.org,
-        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
-        "haojian . zhuang" <haojian.zhuang@linaro.org>,
-        linux-accelerators@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, Kenneth Lee <liguozhu@hisilicon.com>,
-        Zaibo Xu <xuzaibo@huawei.com>
-Subject: Re: [PATCH v6 2/3] uacce: add uacce driver
-Message-ID: <20191025073538.GC503659@lophozonia>
-References: <1571214873-27359-1-git-send-email-zhangfei.gao@linaro.org>
- <1571214873-27359-3-git-send-email-zhangfei.gao@linaro.org>
- <20191016172802.GA1533448@lophozonia>
- <5da9a9cd.1c69fb81.9f8e8.60faSMTPIN_ADDED_BROKEN@mx.google.com>
- <20191023074227.GA264888@lophozonia>
- <5db25e56.1c69fb81.4fe57.380cSMTPIN_ADDED_BROKEN@mx.google.com>
+        Fri, 25 Oct 2019 04:01:47 -0400
+X-Originating-IP: 86.202.229.42
+Received: from localhost (lfbn-lyo-1-146-42.w86-202.abo.wanadoo.fr [86.202.229.42])
+        (Authenticated sender: alexandre.belloni@bootlin.com)
+        by relay9-d.mail.gandi.net (Postfix) with ESMTPSA id 28521FF811;
+        Fri, 25 Oct 2019 08:01:41 +0000 (UTC)
+Date:   Fri, 25 Oct 2019 10:01:36 +0200
+From:   Alexandre Belloni <alexandre.belloni@bootlin.com>
+To:     Codrin Ciubotariu <codrin.ciubotariu@microchip.com>
+Cc:     linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        mpm@selenic.com, herbert@gondor.apana.org.au, robh+dt@kernel.org,
+        mark.rutland@arm.com, nicolas.ferre@microchip.com,
+        ludovic.desroches@microchip.com, arnd@arndb.de,
+        Tudor.Ambarus@microchip.com
+Subject: Re: [PATCH 2/2] hwrng: atmel: add new platform support for sam9x60
+Message-ID: <20191025080136.GA3125@piout.net>
+References: <20191024170452.2145-1-codrin.ciubotariu@microchip.com>
+ <20191024170452.2145-2-codrin.ciubotariu@microchip.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <5db25e56.1c69fb81.4fe57.380cSMTPIN_ADDED_BROKEN@mx.google.com>
-User-Agent: Mutt/1.12.2 (2019-09-21)
+In-Reply-To: <20191024170452.2145-2-codrin.ciubotariu@microchip.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Oct 25, 2019 at 10:28:30AM +0800, zhangfei.gao@foxmail.com wrote:
-> > Something else I noticed is uacce_idr isn't currently protected. The IDR
-> > API expected the caller to use its own locking scheme. You could replace
-> > it with an xarray, which I think is preferred to IDR now and provides a
-> > xa_lock.
-> Currently  idr_alloc and idr_remove are simply protected by uacce_mutex,
+On 24/10/2019 20:04:52+0300, Codrin Ciubotariu wrote:
+> Add platform support for the new IP found on sam9x60 SoC. For this
+> version, if the peripheral clk is above 100MHz, the HALFR bit must be
+> set. This bit is available only if the IP can generate a random number
+> every 168 cycles (instead of 84).
+> 
+> Signed-off-by: Codrin Ciubotariu <codrin.ciubotariu@microchip.com>
+> ---
+>  drivers/char/hw_random/atmel-rng.c | 39 ++++++++++++++++++++++++++++--
+>  1 file changed, 37 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/char/hw_random/atmel-rng.c b/drivers/char/hw_random/atmel-rng.c
+> index e55705745d5e..0aa9425e6c3e 100644
+> --- a/drivers/char/hw_random/atmel-rng.c
+> +++ b/drivers/char/hw_random/atmel-rng.c
+> @@ -14,14 +14,22 @@
+>  #include <linux/clk.h>
+>  #include <linux/io.h>
+>  #include <linux/hw_random.h>
+> +#include <linux/of_device.h>
+>  #include <linux/platform_device.h>
+>  
+>  #define TRNG_CR		0x00
+> +#define TRNG_MR		0x04
+>  #define TRNG_ISR	0x1c
+>  #define TRNG_ODATA	0x50
+>  
+>  #define TRNG_KEY	0x524e4700 /* RNG */
+>  
+> +#define TRNG_HALFR	BIT(0) /* generate RN every 168 cycles */
+> +
+> +struct atmel_trng_pdata {
 
-Ah right, but idr_find() also needs to be protected? 
+Could that be just atmel_trng_data?
 
-> Will check xarray, looks it is more complicated then idr.
+There is no platform data in this driver and it is DT only.
 
-Having tried both, it can easily replace idr. For uacce I think it could
-be something like (locking included):
+> +	bool has_half_rate;
+> +};
+> +
+>  struct atmel_trng {
+>  	struct clk *clk;
+>  	void __iomem *base;
+> @@ -63,6 +71,7 @@ static int atmel_trng_probe(struct platform_device *pdev)
+>  {
+>  	struct atmel_trng *trng;
+>  	struct resource *res;
+> +	const struct atmel_trng_pdata *pdata;
+>  	int ret;
+>  
+>  	trng = devm_kzalloc(&pdev->dev, sizeof(*trng), GFP_KERNEL);
+> @@ -77,6 +86,17 @@ static int atmel_trng_probe(struct platform_device *pdev)
+>  	trng->clk = devm_clk_get(&pdev->dev, NULL);
+>  	if (IS_ERR(trng->clk))
+>  		return PTR_ERR(trng->clk);
+> +	pdata = of_device_get_match_data(&pdev->dev);
+> +	if (!pdata)
+> +		return -ENODEV;
+> +
+> +	if (pdata->has_half_rate) {
+> +		unsigned long rate = clk_get_rate(trng->clk);
+> +
+> +		/* if peripheral clk is above 100MHz, set HALFR */
+> +		if (rate > 100000000)
+> +			writel(TRNG_HALFR, trng->base + TRNG_MR);
+> +	}
+>  
+>  	ret = clk_prepare_enable(trng->clk);
+>  	if (ret)
+> @@ -141,9 +161,24 @@ static const struct dev_pm_ops atmel_trng_pm_ops = {
+>  };
+>  #endif /* CONFIG_PM */
+>  
+> +static struct atmel_trng_pdata at91sam9g45_config = {
+> +	.has_half_rate = false,
+> +};
+> +
+> +static struct atmel_trng_pdata sam9x60_config = {
+> +	.has_half_rate = true,
+> +};
+> +
+>  static const struct of_device_id atmel_trng_dt_ids[] = {
+> -	{ .compatible = "atmel,at91sam9g45-trng" },
+> -	{ /* sentinel */ }
+> +	{
+> +		.compatible = "atmel,at91sam9g45-trng",
+> +		.data = &at91sam9g45_config,
+> +	}, {
+> +		.compatible = "microchip,sam9x60-trng",
+> +		.data = &sam9x60_config,
+> +	}, {
+> +		/* sentinel */
+> +	}
+>  };
+>  MODULE_DEVICE_TABLE(of, atmel_trng_dt_ids);
+>  
+> -- 
+> 2.20.1
+> 
 
-	static DEFINE_XARRAY_ALLOC(uacce_xa);
-
-	uacce = xa_load(&uacce_xa, iminor(inode));
-
-	ret = xa_alloc(&uacce_xa, &uacce->dev_id, uacce, xa_limit_32b,
-		       GFP_KERNEL);
-
-	xa_erase(&uacce_xa, uacce->dev_id);
-
-Thanks,
-Jean
+-- 
+Alexandre Belloni, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
