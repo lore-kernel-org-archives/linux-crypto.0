@@ -2,111 +2,109 @@ Return-Path: <SRS0=9dQ/=YS=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22724CA9EBC
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Oct 2019 09:50:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3CBACA9EA0
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Oct 2019 10:19:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F225E21929
-	for <linux-crypto@archiver.kernel.org>; Fri, 25 Oct 2019 09:50:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9715721D71
+	for <linux-crypto@archiver.kernel.org>; Fri, 25 Oct 2019 10:19:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UC5Pa7cS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2393434AbfJYJum (ORCPT
+        id S2409442AbfJYKTe (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 25 Oct 2019 05:50:42 -0400
-Received: from mga11.intel.com ([192.55.52.93]:40297 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390193AbfJYJum (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 25 Oct 2019 05:50:42 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 25 Oct 2019 02:50:41 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,228,1569308400"; 
-   d="scan'208";a="202566063"
-Received: from irvmail001.ir.intel.com ([163.33.26.43])
-  by orsmga006.jf.intel.com with ESMTP; 25 Oct 2019 02:50:39 -0700
-Received: from sivswdev08.ir.intel.com (sivswdev08.ir.intel.com [10.237.217.47])
-        by irvmail001.ir.intel.com (8.14.3/8.13.6/MailSET/Hub) with ESMTP id x9P9ocwp003574;
-        Fri, 25 Oct 2019 10:50:38 +0100
-Received: from sivswdev08.ir.intel.com (localhost [127.0.0.1])
-        by sivswdev08.ir.intel.com with ESMTP id x9P9ocxT020005;
-        Fri, 25 Oct 2019 10:50:38 +0100
-Received: (from gcabiddu@localhost)
-        by sivswdev08.ir.intel.com with LOCAL id x9P9obDT019995;
-        Fri, 25 Oct 2019 10:50:37 +0100
-Date:   Fri, 25 Oct 2019 10:50:37 +0100
-From:   Giovanni Cabiddu <giovanni.cabiddu@intel.com>
-To:     Yunfeng Ye <yeyunfeng@huawei.com>
-Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        qat-linux <qat-linux@intel.com>,
+        Fri, 25 Oct 2019 06:19:34 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:33340 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2409431AbfJYKTe (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 25 Oct 2019 06:19:34 -0400
+Received: by mail-wm1-f65.google.com with SMTP id 6so3949171wmf.0
+        for <linux-crypto@vger.kernel.org>; Fri, 25 Oct 2019 03:19:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Qc/ztTJAKK4J0aU63ev+egDW8U3y1aNoFPLB9AwTm3w=;
+        b=UC5Pa7cScT/WFAguuRUDz2M78p0dmWLmOfW1dC8/N7SIGs6qM3l5vSKSd/qfuJDCfm
+         DZwVsSY1fqEVzYQfsuc/06YzjJ6KBZXIEdBoijdF+h46xR42SxcAM4CcHb2rlrT7iB2N
+         /A1o81hFIu1nrqjC4OHrfKOeSB3dv/bPrsThXc9ohRHI9gxrySJGDUjvFEYD6dbxV7nl
+         rdogqwWXlJycW66GsbbwV946pLpHgK22+xzHaGaoslGwEuTUfu9dqmA+MLl0lwE/YJ7C
+         K87GxrrOU/3X1tV1P5zdwaz8cedB6jbV9Y0PvNqFdTYYEHSXrzI8UVB3bWSyf1i0iasq
+         hDIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Qc/ztTJAKK4J0aU63ev+egDW8U3y1aNoFPLB9AwTm3w=;
+        b=b+t3ibBL4K/URlMoskdHwVooy7qhcKaRP7HqFOqrmBxr7i16l4YJ9BUWXqkmJ/SgwV
+         JUMTDm4EUHOkRvwExY0Ky7B/Vqq7bBwWzirO98gSM5rYDqNYmf4VnW5ID3A/dqgyJTxR
+         FZ5Jyz3Fr/3ItJp5KOVojS7/y9NkmxBo0bnzgkPFxVQlA/M2W/+1EUcjwH9ir+VsFnft
+         t8o2JdsiLvF/RE1QH5/bzKIhJCBzkzLL/BDZCKNFGwmPzj2R8xe2chgcxGizZOvliaS9
+         FdA252JqA3EETJSHQznzZDse5MT7Ykm7Kk4GJ1Dwfksh6xOu2kRpqRy8FW0AC+hz2NPh
+         a+/g==
+X-Gm-Message-State: APjAAAUwSalTWVD/JLkeugINuN6cWojU6DSLk72f5Yf/CDmnw+V60Ezi
+        aFkrbvAlyiGEMKeKGpaGyIJi3dgNnDMJOEd5eNucvQ==
+X-Google-Smtp-Source: APXvYqyOvakmk18SJSBfU3bQ15rT25r/fiIWuvLvo3ZtqL2B40sMEKutw7b2eeoZZa603ekAwfCYdoOC7dYdRddhwNA=
+X-Received: by 2002:a05:600c:2214:: with SMTP id z20mr2880087wml.10.1571998772535;
+ Fri, 25 Oct 2019 03:19:32 -0700 (PDT)
+MIME-Version: 1.0
+References: <20191024132345.5236-1-ard.biesheuvel@linaro.org>
+ <20191024132345.5236-6-ard.biesheuvel@linaro.org> <20191024134123.GW5610@atomide.com>
+ <CAKv+Gu_xTe8qmPab=_UE_buxaSzj2Kxtq+CPrm-cawAyg8MUzg@mail.gmail.com> <2b461903-dbbc-1f1c-2359-6dae656d477c@ti.com>
+In-Reply-To: <2b461903-dbbc-1f1c-2359-6dae656d477c@ti.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Fri, 25 Oct 2019 12:19:29 +0200
+Message-ID: <CAKv+Gu_0HejeZLEft1VQpPruW+L8Ao1J2fFhp-io_sVZnUVxbg@mail.gmail.com>
+Subject: Re: [PATCH v2 05/27] crypto: omap - switch to skcipher API
+To:     Tero Kristo <t-kristo@ti.com>
+Cc:     Tony Lindgren <tony@atomide.com>,
         "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
         <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "hushiyuan@huawei.com" <hushiyuan@huawei.com>,
-        "linfeilong@huawei.com" <linfeilong@huawei.com>
-Subject: Re: [PATCH] crypto: qat - remove redundant condition
- accel_dev->is_vf
-Message-ID: <20191025095037.GA19336@sivswdev08.ir.intel.com>
-References: <78b1532c-f8bf-48e4-d0a7-30ea0137d408@huawei.com>
- <CAKv+Gu_MVe8mEeC-fVVbbLfUv-rEEk5_eoxfHjTCMgAFmSHrJw@mail.gmail.com>
- <77832b26242f4987877d6122ba14a0d0@irsmsx101.ger.corp.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <77832b26242f4987877d6122ba14a0d0@irsmsx101.ger.corp.intel.com>
-User-Agent: Mutt/1.5.20 (2009-06-14)
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@google.com>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        linux-omap@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Oct 25, 2019 at 10:45:31AM +0100, Yunfeng Ye wrote:
-> On 2019/10/25 17:33, Ard Biesheuvel wrote:
-> > On Fri, 25 Oct 2019 at 09:24, Yunfeng Ye <yeyunfeng@huawei.com> wrote:
+On Fri, 25 Oct 2019 at 09:32, Tero Kristo <t-kristo@ti.com> wrote:
+>
+> On 24/10/2019 16:42, Ard Biesheuvel wrote:
+> > On Thu, 24 Oct 2019 at 15:41, Tony Lindgren <tony@atomide.com> wrote:
 > >>
-> >> Warning is found by the code analysis tool:
-> >>   "Redundant condition: accel_dev->is_vf"
+> >> * Ard Biesheuvel <ard.biesheuvel@linaro.org> [191024 13:24]:
+> >>> Commit 7a7ffe65c8c5 ("crypto: skcipher - Add top-level skcipher interface")
+> >>> dated 20 august 2015 introduced the new skcipher API which is supposed to
+> >>> replace both blkcipher and ablkcipher. While all consumers of the API have
+> >>> been converted long ago, some producers of the ablkcipher remain, forcing
+> >>> us to keep the ablkcipher support routines alive, along with the matching
+> >>> code to expose [a]blkciphers via the skcipher API.
+> >>>
+> >>> So switch this driver to the skcipher API, allowing us to finally drop the
+> >>> blkcipher code in the near future.
 > >>
-> >> So remove the redundant condition accel_dev->is_vf.
+> >> Adding Tero to Cc on this one.
 > >>
-> >> Signed-off-by: Yunfeng Ye <yeyunfeng@huawei.com>
-> >> ---
-> >>  drivers/crypto/qat/qat_common/adf_dev_mgr.c | 4 ++--
-> >>  1 file changed, 2 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/drivers/crypto/qat/qat_common/adf_dev_mgr.c b/drivers/crypto/qat/qat_common/adf_dev_mgr.c
-> >> index 2d06409bd3c4..b54b8850fe20 100644
-> >> --- a/drivers/crypto/qat/qat_common/adf_dev_mgr.c
-> >> +++ b/drivers/crypto/qat/qat_common/adf_dev_mgr.c
-> >> @@ -196,7 +196,7 @@ int adf_devmgr_add_dev(struct adf_accel_dev *accel_dev,
-> >>         atomic_set(&accel_dev->ref_count, 0);
-> >>
-> >>         /* PF on host or VF on guest */
-> >> -       if (!accel_dev->is_vf || (accel_dev->is_vf && !pf)) {
-> >> +       if (!accel_dev->is_vf || !pf) {
-> > 
-> > I disagree with this change. There is no bug here, and the way the
-> > condition is formulated self-documents the code, i.e.,
-> > 
-> > IF NOT is_vf
-> > OR (is_vf BUT NOT pf)
-> > 
-> > Using an automated tool to reduce every boolean expression to its
-> > minimal representation doesn't seem that useful to me, since the
-> > compiler is perfectly capable of doing that when generating the object
-> > code.
-> > 
-> ok, thanks, this modify just fix warning, and make code simple.
-This change simplifies the code but it makes it less readable.
-I'd prefer to leave it as it was.
+> >
+> > Ah, of course - apologies for missing that.
+>
+> Works for me, also can't find any bugs in the code via inspection, so
+> feel free to add:
+>
+> Reviewed-by: Tero Kristo <t-kristo@ti.com>
+> Tested-by: Tero Kristo <t-kristo@ti.com>
+>
 
-Regards,
 
--- 
-Giovanni
+Thanks Tero
+
+I'll dig up my Beaglebone White today and test/review the patches you
+sent out last week.
