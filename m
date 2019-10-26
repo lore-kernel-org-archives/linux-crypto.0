@@ -4,176 +4,145 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93E3DCA9EB9
-	for <linux-crypto@archiver.kernel.org>; Sat, 26 Oct 2019 15:06:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF3DBCA9EB9
+	for <linux-crypto@archiver.kernel.org>; Sat, 26 Oct 2019 15:32:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 55866214DA
-	for <linux-crypto@archiver.kernel.org>; Sat, 26 Oct 2019 15:06:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B0F6020663
+	for <linux-crypto@archiver.kernel.org>; Sat, 26 Oct 2019 15:32:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rVmRABxh"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="i9YBDDSs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726202AbfJZPG3 (ORCPT
+        id S1726258AbfJZPcI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 26 Oct 2019 11:06:29 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:45630 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726189AbfJZPG3 (ORCPT
+        Sat, 26 Oct 2019 11:32:08 -0400
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:33171 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726189AbfJZPcI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 26 Oct 2019 11:06:29 -0400
-Received: by mail-wr1-f66.google.com with SMTP id q13so5421610wrs.12
-        for <linux-crypto@vger.kernel.org>; Sat, 26 Oct 2019 08:06:27 -0700 (PDT)
+        Sat, 26 Oct 2019 11:32:08 -0400
+Received: by mail-wm1-f65.google.com with SMTP id 6so6368088wmf.0
+        for <linux-crypto@vger.kernel.org>; Sat, 26 Oct 2019 08:32:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=QLAGBMMJrZggygVygRsryefuvxd8XaBmeOF2j1/ecNE=;
-        b=rVmRABxhe02YgSdyMdnuJuo7BC1VPq00UtE12fKace9MDodEtRUmLGayaFndOTO/Xc
-         LxQVjfNk1DO8VugPd8m2OvFXlRs7rdts936KkHd4Zy7EX7qPmd66ifrqRZQ7gIG5PyR+
-         kEY/RCCfuvyboqO51pyaBgbBJE90y2auSV+EMoNq8cKeZOApIl/DZwFrqikw0d8oQ+r5
-         m6QLFsiQYH/8TAwTprrT8+JYzG992Uw3N47xL+IEV4PH0Eexe464o36bxn1yJzo1Cqz6
-         La5BmtFmD//TuanHacSeWuFfcShr4bPsIzDf3A08t+Me4ZG84OJZkDR0aMuKTbBSeTxe
-         OcIA==
+        bh=7eL/Q6CJwzV4y80pnJNKU63D4qrd7HhYaSFbuj/Se+I=;
+        b=i9YBDDSssWCGgcPMoSckEmP3ZiSDG2DVk67NhNH2kjdMv0DL2tpHm0xivNsNTrNS7U
+         zWB1ImnpcDWm78HAeGbofscYcrp69bzyM/lo6DdrZI6xAQq+AqLzIRhyFGCuiPER6x/L
+         nOCaigVqJXXzR62yU7i9Wje77JyeHaJKQowDUmSBF/xRNVSjpzX6asjlqI5oixXzBxVg
+         NBeiMw9mSkh7QSyOEjhENNdJg9yfdzw/fR6jClXzIlJb6/LRTsNt5I3nl0hzNfi5GGQI
+         MMdK4sBbejr9d/sLuogOU868rywj1uvrOKxRssK8tZGReWUPR0jOniNJqnh8GijoNqW6
+         cOkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=QLAGBMMJrZggygVygRsryefuvxd8XaBmeOF2j1/ecNE=;
-        b=Gj8zuwsfG23/u++tkck/LuaJSQebPnD8RcGZOmnHREOfk29guOUf23stzhO+vChOJc
-         uFij6tSeZlCxavr3ztUURkgzy1jELWcCibEjdPL3XcB8kbm8hPieC3Ve36tB2dCMZkFg
-         /stVh5PhlrcUXmorkSrSDibYX7+ITFH7AdllpYLQDOnXPh8MaiERs5Oq1Lg+EJYcXxTm
-         YpUlKdpbO06vnrZPztZPHvIwSL2uloiiuyVGavmpjffj7bRmwpZyI4SsuxSwd1faeN1Z
-         nig/tSeBO9iV8eyabi4xrmO3fcv+xZ+gfxDo89se6Kf3p2+4jLfXhhPF9SHbeyime10T
-         n75A==
-X-Gm-Message-State: APjAAAVxnv7QTT/otxCKpn977+TLMUqLbcj4F3ftgwpa8q8tN0p0U9AO
-        CNGPWy+au4kzCNaK2JcsQvHNVl3Dha+Y3g2bWxqpBsbg5mk=
-X-Google-Smtp-Source: APXvYqxqv6iTS3d9ZL9lpYTs9m1CK0s8bMw9rNdx+7ex9vS7Pv7YSdyRAY1LkY2mf8u+utyAedZXk1aVjBATxptM6xM=
-X-Received: by 2002:adf:fd88:: with SMTP id d8mr1736438wrr.200.1572102386529;
- Sat, 26 Oct 2019 08:06:26 -0700 (PDT)
+        bh=7eL/Q6CJwzV4y80pnJNKU63D4qrd7HhYaSFbuj/Se+I=;
+        b=a7E+VTzGhoN2n0EefvBpL7PL150yuebrJqPsLVFs4ZR1Xwf09DolCsCuP3TqtFGEs5
+         wRL/7nE+nIZq2m1jR2AGGCGKdxFCGPPxuNSyIE9PoScdm8broD6NA/jZ6KZqzw9T2KWU
+         50bApAv7UaQpihWE2ge2EstrXwUOYi/3BdqRYfU0D4rbcoVPee66enWKq6kbCvqOfJ13
+         1nG6RrBY1ZB2jfYpuO/M2rgvdOMEdvNQ1MUPPH65yScOWoPufaCehhF0Rsfpvf4eq8z3
+         TnWwEM7jkxM5IoTVy5CjrYF7C1xV2UAW34rutf/YDz53QuB4M5IacbqKNhA+FyffpiJX
+         UEeg==
+X-Gm-Message-State: APjAAAVU5MSopqDFeAXrDigAJ+nzCzzO4KKjcnGQhwsGPjzrHoDf5d9w
+        XqLMP9oONCBA5b2MhZHSAEjEhBViYmtMTXBnHtwo4Q==
+X-Google-Smtp-Source: APXvYqyyucGawlh8ezUs5XthXW8fnGvDRmtPpdIpMT1S25GmkhznLllTEvPT7VB88bIhPtIvqKR1S4riyRJTPJY7BXs=
+X-Received: by 2002:a1c:64d6:: with SMTP id y205mr7672841wmb.136.1572103926694;
+ Sat, 26 Oct 2019 08:32:06 -0700 (PDT)
 MIME-Version: 1.0
-References: <20191017122549.4634-1-t-kristo@ti.com> <CAKv+Gu_HNOTSvWRTzLMeECaM8qCi5w806ht_e68e5vgcU9aQvQ@mail.gmail.com>
- <8f97d690-a88a-55cb-eb67-206e01873d94@ti.com> <bf22f7dd-5446-d736-611b-6465df45b74d@ti.com>
- <CAKv+Gu_ABcosRm30nrtCY429Xki8_b9GAzQ=hQ=Kiuo2o6Y2ng@mail.gmail.com> <359434e9-3289-2982-edc1-b93e76c28700@ti.com>
-In-Reply-To: <359434e9-3289-2982-edc1-b93e76c28700@ti.com>
+References: <20191025194113.217451-1-ebiggers@kernel.org>
+In-Reply-To: <20191025194113.217451-1-ebiggers@kernel.org>
 From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Sat, 26 Oct 2019 17:06:25 +0200
-Message-ID: <CAKv+Gu_TgqGzhzhojgBzuJ5r9pRusW3yC+Opqpr5ehdUaXX=UQ@mail.gmail.com>
-Subject: Re: [PATCH 00/10] crypto: omap fixes towards 5.5
-To:     Tero Kristo <t-kristo@ti.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>, linux-omap@vger.kernel.org,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+Date:   Sat, 26 Oct 2019 17:32:05 +0200
+Message-ID: <CAKv+Gu8Y2AnWfz8Up9V6YF9v7n-s_BYsMXbxMQ7s4tMNw5eusQ@mail.gmail.com>
+Subject: Re: [PATCH 0/5] crypto: remove blkcipher
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 25 Oct 2019 at 14:18, Tero Kristo <t-kristo@ti.com> wrote:
+On Fri, 25 Oct 2019 at 21:45, Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> On 25/10/2019 15:05, Ard Biesheuvel wrote:
-> > On Fri, 25 Oct 2019 at 13:56, Tero Kristo <t-kristo@ti.com> wrote:
-> >>
-> >> On 25/10/2019 14:55, Tero Kristo wrote:
-> >>> On 25/10/2019 14:33, Ard Biesheuvel wrote:
-> >>>> On Thu, 17 Oct 2019 at 14:26, Tero Kristo <t-kristo@ti.com> wrote:
-> >>>>>
-> >>>>> Hi,
-> >>>>>
-> >>>>> This series fixes a number of bugs with omap crypto implementation.
-> >>>>> These have become evident with the changes to the cryptomanager, where
-> >>>>> it adds some new test cases and modifies some existing, namely the split
-> >>>>> update tests. Also, while fixing the cryptomanager induced bugs, some
-> >>>>> other surfaced with tcrypt/IPSec tests, so fixed them aswell.
-> >>>>>
-> >>>>> Patch #9 is against crypto core modifying the crypto_wait_req
-> >>>>> common API to have a timeout for it also, currently it waits forever
-> >>>>> and it is kind of difficult to see what test fails with crypto manager.
-> >>>>> This is not really needed for anything, but it is kind of nice to have
-> >>>>> (makes debugging easier.)
-> >>>>>
-> >>>>> This series has been tested on top of 5.4-rc2, with following setups,
-> >>>>> on AM57xx-beagle-x15 board:
-> >>>>>
-> >>>>> - crypto manager self tests
-> >>>>> - tcrypt performance test
-> >>>>> - ipsec test with strongswan
-> >>>>>
-> >>>>> This series depends on the skcipher API switch patch from Ard Biesheuvel
-> >>>>> [1].
-> >>>>>
-> >>>>
-> >>>> Hi Tero,
-> >>>>
-> >>>> On my BeagleBone White, I am hitting the following issues after
-> >>>> applying these patches:
-> >>>>
-> >>>> [    7.493903] alg: skcipher: ecb-aes-omap encryption unexpectedly
-> >>>> succeeded on test vector "random: len=531 klen=32";
-> >>>> expected_error=-22, cfg="random: inplace may_sleep use_finup
-> >>>> src_divs=[44.72%@+4028, <flush>14.70%@alignmask+3, 19.45%@+4070,
-> >>>> 21.13%@+2728]"
-> >>>> [    7.651103] alg: skcipher: cbc-aes-omap encryption unexpectedly
-> >>>> succeeded on test vector "random: len=1118 klen=32";
-> >>>> expected_error=-22, cfg="random: may_sleep use_final
-> >>>> src_divs=[<reimport>41.87%@+31, <flush>58.13%@+2510]"
-> >>>>
-> >>>> These are simply a result of the ECB and CBC implementations not
-> >>>> returning -EINVAL when the input is not a multiple of the block size.
-> >>>>
-> >>>> [    7.845527] alg: skcipher: blocksize for ctr-aes-omap (16) doesn't
-> >>>> match generic impl (1)
-> >>>>
-> >>>> This means cra_blocksize is not set to 1 as it should. If your driver
-> >>>> uses the skcipher walk API, it should set the walksize to
-> >>>> AES_BLOCK_SIZE to ensure that the input is handled correctly. If you
-> >>>> don't, then you can disregard that part.
-> >>>>
-> >>>> [    8.306491] alg: aead: gcm-aes-omap setauthsize unexpectedly
-> >>>> succeeded on test vector "random: alen=3 plen=31 authsize=6 klen=9";
-> >>>> expected_error=-22
-> >>>>
-> >>>> Another missing sanity check. GCM only permits certain authsizes.
-> >>>>
-> >>>> [    9.074703] omap_crypto_copy_sgs: Couldn't allocate pages for
-> >>>> unaligned cases.
-> >>>>
-> >>>> This is not a bug, but I'm not sure if the below is related or not.
-> >>>>
-> >>>> I'll preserve the binaries, in case you need me to objdump anything.
-> >>>
-> >>> What are these tests you are executing? For me, the testmgr self test
-> >>> suite is passing just fine. Any extra tests you have enabled somehow?
-> >>>
-> >
-> > I enabled CONFIG_CRYPTO_MANAGER_EXTRA_TESTS, which enables a bunch of
-> > fuzz tests of the offloaded algorithms against the generic
-> > implementations.
+> Now that all "blkcipher" algorithms have been converted to "skcipher",
+> this series removes the blkcipher algorithm type.
 >
-> Ahha I see, let me give that a shot locally. I have so far only been
-> testing with the standard suite.
+> The skcipher (symmetric key cipher) algorithm type was introduced a few
+> years ago to replace both blkcipher and ablkcipher (synchronous and
+> asynchronous block cipher).  The advantages of skcipher include:
 >
-> >
-> >>> I am also running full test on different board though (am57xx), I
-> >>> haven't been explicitly running anything on am335x.
-> >>
-> >> Oh, and btw, did you try without my series? I think the selftests are
-> >> failing rather miserably without them...
-> >>
-> >
-> > No, I just tried a branch with mine and your patches applied.
+>   - A much less confusing name, since none of these algorithm types have
+>     ever actually been for raw block ciphers, but rather for all
+>     length-preserving encryption modes including block cipher modes of
+>     operation, stream ciphers, and other length-preserving modes.
 >
-> Could you give it a shot without the CRYPTO_MANAGER_EXTRA_TESTS, that
-> should pass with my series, and fail without?
+>   - It unified blkcipher and ablkcipher into a single algorithm type
+>     which supports both synchronous and asynchronous implementations.
+>     Note, blkcipher already operated only on scatterlists, so the fact
+>     that skcipher does too isn't a regression in functionality.
+>
+>   - Better type safety by using struct skcipher_alg, struct
+>     crypto_skcipher, etc. instead of crypto_alg, crypto_tfm, etc.
+>
+>   - It sometimes simplifies the implementations of algorithms.
+>
+> Also, the blkcipher API was no longer being tested.
+>
+> Eric Biggers (5):
+>   crypto: unify the crypto_has_skcipher*() functions
+>   crypto: remove crypto_has_ablkcipher()
+>   crypto: rename crypto_skcipher_type2 to crypto_skcipher_type
+>   crypto: remove the "blkcipher" algorithm type
+>   crypto: rename the crypto_blkcipher module and kconfig option
 >
 
-The missing output IVs are fixed by this series, but it seems we need
-some more work to get all the wrinkles ironed out. I sent some patches
-on top that address a couple of them, but we still need a proper fix
-for the situation where only assocdata is presented, and cryptlen == 0
 
-Feel free to merge my patches into your series, or take bits and
-pieces into your own patches where needed.
+For the series
+
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
+
+although obviously, this needs to wait until my albkcipher purge
+series is applied.
+
+>  Documentation/crypto/api-skcipher.rst |  13 +-
+>  Documentation/crypto/architecture.rst |   2 -
+>  Documentation/crypto/devel-algos.rst  |  27 +-
+>  arch/arm/crypto/Kconfig               |   6 +-
+>  arch/arm64/crypto/Kconfig             |   8 +-
+>  crypto/Kconfig                        |  84 ++--
+>  crypto/Makefile                       |   7 +-
+>  crypto/api.c                          |   2 +-
+>  crypto/blkcipher.c                    | 548 --------------------------
+>  crypto/cryptd.c                       |   2 +-
+>  crypto/crypto_user_stat.c             |   4 -
+>  crypto/essiv.c                        |   6 +-
+>  crypto/skcipher.c                     | 124 +-----
+>  drivers/crypto/Kconfig                |  52 +--
+>  drivers/crypto/amlogic/Kconfig        |   2 +-
+>  drivers/crypto/caam/Kconfig           |   6 +-
+>  drivers/crypto/cavium/nitrox/Kconfig  |   2 +-
+>  drivers/crypto/ccp/Kconfig            |   2 +-
+>  drivers/crypto/hisilicon/Kconfig      |   2 +-
+>  drivers/crypto/qat/Kconfig            |   2 +-
+>  drivers/crypto/ux500/Kconfig          |   2 +-
+>  drivers/crypto/virtio/Kconfig         |   2 +-
+>  drivers/net/wireless/cisco/Kconfig    |   2 +-
+>  include/crypto/algapi.h               |  74 ----
+>  include/crypto/internal/skcipher.h    |  12 -
+>  include/crypto/skcipher.h             |  27 +-
+>  include/linux/crypto.h                | 426 +-------------------
+>  net/bluetooth/Kconfig                 |   2 +-
+>  net/rxrpc/Kconfig                     |   2 +-
+>  net/xfrm/Kconfig                      |   2 +-
+>  net/xfrm/xfrm_algo.c                  |   4 +-
+>  31 files changed, 124 insertions(+), 1332 deletions(-)
+>  delete mode 100644 crypto/blkcipher.c
+>
+> --
+> 2.23.0
+>
