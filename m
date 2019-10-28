@@ -2,73 +2,158 @@ Return-Path: <SRS0=YLdW=YV=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97AD4CA9EA0
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Oct 2019 08:24:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FB79CA9EBD
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Oct 2019 09:24:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 753F8208C0
-	for <linux-crypto@archiver.kernel.org>; Mon, 28 Oct 2019 08:24:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0EC4E21850
+	for <linux-crypto@archiver.kernel.org>; Mon, 28 Oct 2019 09:24:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733275AbfJ1IYh (ORCPT
+        id S1728941AbfJ1JYc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Oct 2019 04:24:37 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:51094 "EHLO deadmen.hmeau.com"
+        Mon, 28 Oct 2019 05:24:32 -0400
+Received: from mga14.intel.com ([192.55.52.115]:42059 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729786AbfJ1IYh (ORCPT <rfc822;linux-crypto@vger.kernel.orG>);
-        Mon, 28 Oct 2019 04:24:37 -0400
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1iP0KK-0001Em-2p; Mon, 28 Oct 2019 16:24:36 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1iP0KH-0002w1-Ep; Mon, 28 Oct 2019 16:24:33 +0800
-Date:   Mon, 28 Oct 2019 16:24:33 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Harald Freudenberger <freude@linux.ibm.com>
-Cc:     linux390-list@tuxmaker.boeblingen.de.ibm.com,
-        linux-crypto@vger.kernel.org, ifranzki@linux.ibm.com,
-        ebiggers@kernel.org, freude@linux.ibm.com
-Subject: Re: [PATCH] s390/crypto: Rework on paes implementation
-Message-ID: <20191028082433.qdaabj2imf34ikam@gondor.apana.org.au>
+        id S1728194AbfJ1JYb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 28 Oct 2019 05:24:31 -0400
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Oct 2019 02:24:30 -0700
+X-IronPort-AV: E=Sophos;i="5.68,239,1569308400"; 
+   d="scan'208";a="193204146"
+Received: from jnikula-mobl3.fi.intel.com (HELO localhost) ([10.237.66.161])
+  by orsmga008-auth.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 28 Oct 2019 02:24:25 -0700
+From:   Jani Nikula <jani.nikula@linux.intel.com>
+To:     Changbin Du <changbin.du@gmail.com>
+Cc:     Jonathan Corbet <corbet@lwn.net>,
+        Changbin Du <changbin.du@gmail.com>, linux-pci@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-wireless@vger.kernel.org,
+        linux-fpga@vger.kernel.org, linux-usb@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        Matthew Wilcox <willy@infradead.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>
+Subject: Re: [PATCH v2] kernel-doc: rename the kernel-doc directive 'functions' to 'identifiers'
+In-Reply-To: <20191025144802.uixg2crhw6h7gghq@mail.google.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+References: <20191020131717.28990-1-changbin.du@gmail.com> <20191024121940.1d6a64df@lwn.net> <87woctb9cj.fsf@intel.com> <20191025144802.uixg2crhw6h7gghq@mail.google.com>
+Date:   Mon, 28 Oct 2019 11:24:22 +0200
+Message-ID: <87v9s99q9l.fsf@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191028073731.11778-1-freude@linux.ibm.com>
-X-Newsgroups: apana.lists.os.linux.cryptoapi
-Organization: Core
-User-Agent: NeoMutt/20170113 (1.7.2)
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Harald Freudenberger <freude@linux.ibm.com> wrote:
+On Fri, 25 Oct 2019, Changbin Du <changbin.du@gmail.com> wrote:
+> On Fri, Oct 25, 2019 at 09:57:48AM +0300, Jani Nikula wrote:
+>> On Thu, 24 Oct 2019, Jonathan Corbet <corbet@lwn.net> wrote:
+>> > On Sun, 20 Oct 2019 21:17:17 +0800
+>> > Changbin Du <changbin.du@gmail.com> wrote:
+>> >
+>> >> The 'functions' directive is not only for functions, but also works for
+>> >> structs/unions. So the name is misleading. This patch renames it to
+>> >> 'identifiers', which specific the functions/types to be included in
+>> >> documentation. We keep the old name as an alias of the new one before
+>> >> all documentation are updated.
+>> >> 
+>> >> Signed-off-by: Changbin Du <changbin.du@gmail.com>
+>> >
+>> > So I think this is basically OK, but I have one more request...
+>> >
+>> > [...]
+>> >
+>> >> diff --git a/Documentation/sphinx/kerneldoc.py b/Documentation/sphinx/kerneldoc.py
+>> >> index 1159405cb920..0689f9c37f1e 100644
+>> >> --- a/Documentation/sphinx/kerneldoc.py
+>> >> +++ b/Documentation/sphinx/kerneldoc.py
+>> >> @@ -59,9 +59,10 @@ class KernelDocDirective(Directive):
+>> >>      optional_arguments = 4
+>> >>      option_spec = {
+>> >>          'doc': directives.unchanged_required,
+>> >> -        'functions': directives.unchanged,
+>> >>          'export': directives.unchanged,
+>> >>          'internal': directives.unchanged,
+>> >> +        'identifiers': directives.unchanged,
+>> >> +        'functions': directives.unchanged,  # alias of 'identifiers'
+>> >>      }
+>> >>      has_content = False
+>> >>  
+>> >> @@ -71,6 +72,7 @@ class KernelDocDirective(Directive):
+>> >>  
+>> >>          filename = env.config.kerneldoc_srctree + '/' + self.arguments[0]
+>> >>          export_file_patterns = []
+>> >> +        identifiers = None
+>> >>  
+>> >>          # Tell sphinx of the dependency
+>> >>          env.note_dependency(os.path.abspath(filename))
+>> >> @@ -86,19 +88,22 @@ class KernelDocDirective(Directive):
+>> >>              export_file_patterns = str(self.options.get('internal')).split()
+>> >>          elif 'doc' in self.options:
+>> >>              cmd += ['-function', str(self.options.get('doc'))]
+>> >> +        elif 'identifiers' in self.options:
+>> >> +            identifiers = self.options.get('identifiers').split()
+>> >>          elif 'functions' in self.options:
+>> >> -            functions = self.options.get('functions').split()
+>> >> -            if functions:
+>> >> -                for f in functions:
+>> >> -                    cmd += ['-function', f]
+>> >> -            else:
+>> >> -                cmd += ['-no-doc-sections']
+>> >> +            identifiers = self.options.get('functions').split()
+>> >
+>> > Rather than do this, can you just change the elif line to read:
+>> >
+>> >     elif ('identifiers' in self.options) or ('functions' in self.options):
+>> >
+>> > ...then leave the rest of the code intact?  It keeps the logic together,
+>> > and avoids the confusing distinction between identifiers=='' and
+>> > identifiers==None .
+>> 
+>> I think the problem is you still need to distinguish between the two for
+>> the get('functions') part.
+>> 
+>> One option is to rename 'functions' to 'identifiers' in the above block,
+>> and put something like this above the whole if ladder (untested):
+>> 
+>>         # backward compat
+>>         if 'functions' in self.options:
+>>             if 'identifiers' in self.options:
+>>                 kernellog.warn(env.app, "fail")
+> This will miss the content of 'functions' directive if both exist in
+> same doc.
+
+Did you not notice your patch does the same, except silently, while this
+would produce a warning? Which one is less surprising?
+
 >
-> @@ -165,18 +183,31 @@ static int ecb_paes_crypt(struct skcipher_request *req, unsigned long modifier)
->        struct skcipher_walk walk;
->        unsigned int nbytes, n, k;
->        int ret;
-> +       struct {
-> +               u8 key[MAXPROTKEYSIZE];
-> +       } param;
-> 
->        ret = skcipher_walk_virt(&walk, req, false);
-> +       if (ret)
-> +               return ret;
-> +
-> +       spin_lock(&ctx->pk_lock);
-> +       memcpy(param.key, ctx->pk.protkey, MAXPROTKEYSIZE);
-> +       spin_unlock(&ctx->pk_lock);
+>>             else:
+>>                 self.options.set('identifiers', self.options.get('functions'))
+>> 
+>> BR,
+>> Jani.
+>>
+> After comparing, I still perfer my original code which is simpler. :)
 
-I think using a plain spin lock is unsafe as you may have callers
-from both kernel thread context and BH context.  So you need to
-have at least a spin_lock_bh here.
+But is it, really? I agree with Jon about the distinction between None
+and '' being confusing.
 
-Cheers,
+
+BR,
+Jani.
+
+
+
+>
+>> 
+>> -- 
+>> Jani Nikula, Intel Open Source Graphics Center
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Jani Nikula, Intel Open Source Graphics Center
