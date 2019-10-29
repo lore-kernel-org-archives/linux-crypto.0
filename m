@@ -2,107 +2,143 @@ Return-Path: <SRS0=WkI6=YW=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43999CA9EAE
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Oct 2019 12:42:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFC6ECA9EAE
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Oct 2019 14:58:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 169BF21721
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Oct 2019 12:42:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E98A2087E
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Oct 2019 14:58:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="oLxdOYd2"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="T7NX3+73";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="T7NX3+73"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729452AbfJ2MmX (ORCPT
+        id S2389546AbfJ2O6S (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 29 Oct 2019 08:42:23 -0400
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:44506 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728321AbfJ2MmW (ORCPT
+        Tue, 29 Oct 2019 10:58:18 -0400
+Received: from bedivere.hansenpartnership.com ([66.63.167.143]:38210 "EHLO
+        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S2389245AbfJ2O6S (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 29 Oct 2019 08:42:22 -0400
-Received: by mail-wr1-f68.google.com with SMTP id z11so13447859wro.11
-        for <linux-crypto@vger.kernel.org>; Tue, 29 Oct 2019 05:42:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=BPXp7xNo1ijPMANZMC0OJQTiJUBGfJGREatgOxfICDA=;
-        b=oLxdOYd2VPtLQZ8doEBWg3jJLtOOjZP0nu8AK0107eeu0xUi1HabO38UPUHtrxB2vJ
-         r2mpnITzdzYIIqJ/W3iu+aEU8bgU4W0LncSrHb+UQAu7yhrjvZI4vKFMOCu2U9pFXqvi
-         +5xbARGaMsnVr6r9l4LLzbw7OBSPNHSspPiIO0ZVlEYHkjpEBRj6pbDsjuIcyXnBmLTr
-         LladgHavdxtVP4r13zbSlUYLXfn2vMjbA7T9FSdKXeaQbQXd+XiBUhQOrQ9IEcwF2azi
-         q3OobcCUiDAGnX66Oc5MQpSpIzVfs2BYD9l8AoBtaj1Ri+QnV0jQr/Zi2OM9ICYyL8H5
-         mh2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=BPXp7xNo1ijPMANZMC0OJQTiJUBGfJGREatgOxfICDA=;
-        b=PG8vXLAvpN2D7ysaji4i/PEMjITpNIux5E9MD5Crh2HO15dW+hx4E3TD2ipzH3oNy8
-         gDadopr2mI09AvQ30CRABYLwT4s4SREhN0/CVV8D1RkylNKescWaUDbYozFrVhweXhqq
-         +q7b+gIkgKgZlNSNnP3G5/EBuKjzq5wuezngFnjiVNQKWzfqYtLpDzNVohsgXcLkwRQc
-         Ynz6+JTarLGK+0oQx4Az02qZhCrZuZC5amIRHqkE5UkQGn3imACKADoFUeeqF70M26KR
-         6BF4ZOITt1OBc2jgk1c1E/sskgkxY2YGcBnvtOHzR1gG7B6pnLnkm5FIEEk7pToWhWRR
-         uYhw==
-X-Gm-Message-State: APjAAAUrC/WKm76Sex5cZ6zQGzAVeYuTO+LWrcCWqSmRr5gdU7rTv9iO
-        aznjWyj7MfSYsEBk4NcPKGozpg==
-X-Google-Smtp-Source: APXvYqwqHf4wuK2I5AO9f/kEeooVPfRaL4aX5EEIOq9YjaTwHJCt7yKNkRGNPtbE0yZCGA/QU/7aIQ==
-X-Received: by 2002:adf:fbc4:: with SMTP id d4mr1318049wrs.265.1572352940992;
-        Tue, 29 Oct 2019 05:42:20 -0700 (PDT)
-Received: from Red ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id f143sm3375496wme.40.2019.10.29.05.42.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Oct 2019 05:42:20 -0700 (PDT)
-Date:   Tue, 29 Oct 2019 13:42:03 +0100
-From:   LABBE Corentin <clabbe@baylibre.com>
-To:     YueHaibing <yuehaibing@huawei.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH -next] crypto: amlogic - Use kmemdup in meson_aes_setkey()
-Message-ID: <20191029124203.GB18754@Red>
-References: <20191029015523.126987-1-yuehaibing@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191029015523.126987-1-yuehaibing@huawei.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        Tue, 29 Oct 2019 10:58:18 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id A5CCE8EE180;
+        Tue, 29 Oct 2019 07:58:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
+        s=20151216; t=1572361097;
+        bh=Km7xzhqJCON168lObmDAWI1ZFbTna56Ifa4zThcvXmI=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=T7NX3+73FsAuWkqUitVx2dlusGJI7PHBMrkLdJhs5zUKhsqIYRZxc/145jTq9hAq8
+         NIavX8VqU11G6odn3IbVJ563OSbkYJ6oDDeE4xjwau2ZlQzfgKwYTUEAPO7mY5YIy9
+         Ts4PAGWefolf/XFoWCxWmlkQGZONV8Z4eNIxQjuQ=
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id b3FM-ft7E3RJ; Tue, 29 Oct 2019 07:58:17 -0700 (PDT)
+Received: from jarvis.lan (unknown [50.35.76.230])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 173048EE15F;
+        Tue, 29 Oct 2019 07:58:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
+        s=20151216; t=1572361097;
+        bh=Km7xzhqJCON168lObmDAWI1ZFbTna56Ifa4zThcvXmI=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=T7NX3+73FsAuWkqUitVx2dlusGJI7PHBMrkLdJhs5zUKhsqIYRZxc/145jTq9hAq8
+         NIavX8VqU11G6odn3IbVJ563OSbkYJ6oDDeE4xjwau2ZlQzfgKwYTUEAPO7mY5YIy9
+         Ts4PAGWefolf/XFoWCxWmlkQGZONV8Z4eNIxQjuQ=
+Message-ID: <1572361096.4812.3.camel@HansenPartnership.com>
+Subject: Re: [PATCH] KEYS: asym_tpm: Switch to get_random_bytes()
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+Cc:     "Safford, David (GE Global Research, US)" <david.safford@ge.com>,
+        Ken Goldman <kgold@linux.ibm.com>,
+        Mimi Zohar <zohar@linux.ibm.com>,
+        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>,
+        "open list:ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
+        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Date:   Tue, 29 Oct 2019 07:58:16 -0700
+In-Reply-To: <20191029084258.GA5649@linux.intel.com>
+References: <20191008235339.GB13926@linux.intel.com>
+         <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2B995@ALPMBAPA12.e2k.ad.ge.com>
+         <20191014190033.GA15552@linux.intel.com>
+         <1571081397.3728.9.camel@HansenPartnership.com>
+         <20191016110031.GE10184@linux.intel.com>
+         <1571229252.3477.7.camel@HansenPartnership.com>
+         <20191016162543.GB6279@linux.intel.com>
+         <1571253029.17520.5.camel@HansenPartnership.com>
+         <20191017180440.GG6667@linux.intel.com>
+         <20191021113939.GA11649@linux.intel.com>
+         <20191029084258.GA5649@linux.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.26.6 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Oct 29, 2019 at 01:55:23AM +0000, YueHaibing wrote:
-> Use kmemdup rather than duplicating its implementation
+On Tue, 2019-10-29 at 10:42 +0200, Jarkko Sakkinen wrote:
+> On Mon, Oct 21, 2019 at 02:39:39PM +0300, Jarkko Sakkinen wrote:
+> > On Thu, Oct 17, 2019 at 09:04:40PM +0300, Jarkko Sakkinen wrote:
+> > > On Wed, Oct 16, 2019 at 03:10:29PM -0400, James Bottomley wrote:
+> > > > On Wed, 2019-10-16 at 19:25 +0300, Jarkko Sakkinen wrote:
+> > > > > On Wed, Oct 16, 2019 at 08:34:12AM -0400, James Bottomley
+> > > > > wrote:
+> > > > > > reversible ciphers are generally frowned upon in random
+> > > > > > number
+> > > > > > generation, that's why the krng uses chacha20.  In general
+> > > > > > I think
+> > > > > > we shouldn't try to code our own mixing and instead should
+> > > > > > get the
+> > > > > > krng to do it for us using whatever the algorithm du jour
+> > > > > > that the
+> > > > > > crypto guys have blessed is.  That's why I proposed adding
+> > > > > > the TPM
+> > > > > > output to the krng as entropy input and then taking the
+> > > > > > output of
+> > > > > > the krng.
+> > > > > 
+> > > > > It is already registered as hwrng. What else?
+> > > > 
+> > > > It only contributes entropy once at start of OS.
+> > > 
+> > > Ok.
+> > > 
+> > > > >  Was the issue that it is only used as seed when the rng is
+> > > > > init'd
+> > > > > first? I haven't at this point gone to the internals of krng.
+> > > > 
+> > > > Basically it was similar to your xor patch except I got the
+> > > > kernel rng
+> > > > to do the mixing, so it would use the chacha20 cipher at the
+> > > > moment
+> > > > until they decide that's unsafe and change it to something
+> > > > else:
+> > > > 
+> > > > https://lore.kernel.org/linux-crypto/1570227068.17537.4.camel@H
+> > > > ansenPartnership.com/
+> > > > 
+> > > > It uses add_hwgenerator_randomness() to do the mixing.  It also
+> > > > has an
+> > > > unmixed source so that read of the TPM hwrng device works as
+> > > > expected.
+> > > 
+> > > Thinking that could this potentially racy? I.e. between the calls
+> > > something else could eat the entropy added?
+> > 
+> > Also, what is wrong just taking one value from krng and mixing
+> > it with a value from TPM RNG where needed? That would be non-racy
+> > too.
 > 
-> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
-> ---
->  drivers/crypto/amlogic/amlogic-gxl-cipher.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/drivers/crypto/amlogic/amlogic-gxl-cipher.c b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
-> index e9283ffdbd23..78e776c58705 100644
-> --- a/drivers/crypto/amlogic/amlogic-gxl-cipher.c
-> +++ b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
-> @@ -372,10 +372,9 @@ int meson_aes_setkey(struct crypto_skcipher *tfm, const u8 *key,
->  		kfree(op->key);
->  	}
->  	op->keylen = keylen;
-> -	op->key = kmalloc(keylen, GFP_KERNEL | GFP_DMA);
-> +	op->key = kmemdup(key, keylen, GFP_KERNEL | GFP_DMA);
->  	if (!op->key)
->  		return -ENOMEM;
-> -	memcpy(op->key, key, keylen);
->  
->  	return crypto_sync_skcipher_setkey(op->fallback_tfm, key, keylen);
->  }
-> 
-> 
-> 
+> I guess we can move forward with this?
 
-Acked-by: Corentin Labbe <clabbe@baylibre.com>
+Sure I suppose; can we can figure out how to get the mixing function du
+jour exposed?
 
-Thanks
+James
+
