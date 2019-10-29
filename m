@@ -2,72 +2,91 @@ Return-Path: <SRS0=WkI6=YW=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02644CA9EC0
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Oct 2019 01:55:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D977DCA9EC1
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Oct 2019 05:53:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C611621721
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Oct 2019 01:55:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BA1C920659
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Oct 2019 05:53:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730027AbfJ2Bzy (ORCPT
+        id S1726634AbfJ2FxX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 28 Oct 2019 21:55:54 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:43598 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728432AbfJ2Bzy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 28 Oct 2019 21:55:54 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 5B94AC70F17D91E33609;
-        Tue, 29 Oct 2019 09:55:49 +0800 (CST)
-Received: from localhost.localdomain.localdomain (10.175.113.25) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.439.0; Tue, 29 Oct 2019 09:55:41 +0800
-From:   YueHaibing <yuehaibing@huawei.com>
-To:     Corentin Labbe <clabbe@baylibre.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-CC:     YueHaibing <yuehaibing@huawei.com>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <kernel-janitors@vger.kernel.org>
-Subject: [PATCH -next] crypto: amlogic - Use kmemdup in meson_aes_setkey()
-Date:   Tue, 29 Oct 2019 01:55:23 +0000
-Message-ID: <20191029015523.126987-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.20.1
+        Tue, 29 Oct 2019 01:53:23 -0400
+Received: from smtp3-1.goneo.de ([85.220.129.38]:49373 "EHLO smtp3-1.goneo.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726034AbfJ2FxX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 29 Oct 2019 01:53:23 -0400
+X-Greylist: delayed 629 seconds by postgrey-1.27 at vger.kernel.org; Tue, 29 Oct 2019 01:53:20 EDT
+Received: from localhost (localhost [127.0.0.1])
+        by smtp3.goneo.de (Postfix) with ESMTP id 1EC9B24007F;
+        Tue, 29 Oct 2019 06:42:49 +0100 (CET)
+X-Virus-Scanned: by goneo
+Received: from smtp3.goneo.de ([127.0.0.1])
+        by localhost (smtp3.goneo.de [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id qZjqyjNzm7GN; Tue, 29 Oct 2019 06:42:47 +0100 (CET)
+Received: from [192.168.1.103] (dyndsl-037-138-239-146.ewe-ip-backbone.de [37.138.239.146])
+        by smtp3.goneo.de (Postfix) with ESMTPSA id 024AA23F854;
+        Tue, 29 Oct 2019 06:42:46 +0100 (CET)
+Subject: Re: [PATCH v2] kernel-doc: rename the kernel-doc directive
+ 'functions' to 'identifiers'
+To:     Changbin Du <changbin.du@gmail.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>
+Cc:     Jonathan Corbet <corbet@lwn.net>, linux-pci@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mm@kvack.org, linux-crypto@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-wireless@vger.kernel.org,
+        linux-fpga@vger.kernel.org, linux-usb@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        Matthew Wilcox <willy@infradead.org>,
+        Thomas Zimmermann <tzimmermann@suse.de>
+References: <20191020131717.28990-1-changbin.du@gmail.com>
+ <20191024121940.1d6a64df@lwn.net> <87woctb9cj.fsf@intel.com>
+ <20191025144802.uixg2crhw6h7gghq@mail.google.com> <87v9s99q9l.fsf@intel.com>
+ <20191029003120.llve32crfw63ovpw@mail.google.com>
+From:   Markus Heiser <markus.heiser@darmarit.de>
+Message-ID: <36c4dcfb-5425-b4bc-a5e9-4fd1458c8385@darmarit.de>
+Date:   Tue, 29 Oct 2019 06:42:46 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type:   text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-X-Originating-IP: [10.175.113.25]
-X-CFilter-Loop: Reflected
+In-Reply-To: <20191029003120.llve32crfw63ovpw@mail.google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: de-DE
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use kmemdup rather than duplicating its implementation
+Am 29.10.19 um 01:31 schrieb Changbin Du:
+>> But is it, really? I agree with Jon about the distinction between None
+>> and '' being confusing.
+>>
+> Here python is different from C. Both empty string and None are False in python.
+> Note such condition is common in python.
 
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
----
- drivers/crypto/amlogic/amlogic-gxl-cipher.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+The one is a empty string str(''), its bool('') value is False.
 
-diff --git a/drivers/crypto/amlogic/amlogic-gxl-cipher.c b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
-index e9283ffdbd23..78e776c58705 100644
---- a/drivers/crypto/amlogic/amlogic-gxl-cipher.c
-+++ b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
-@@ -372,10 +372,9 @@ int meson_aes_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 		kfree(op->key);
- 	}
- 	op->keylen = keylen;
--	op->key = kmalloc(keylen, GFP_KERNEL | GFP_DMA);
-+	op->key = kmemdup(key, keylen, GFP_KERNEL | GFP_DMA);
- 	if (!op->key)
- 		return -ENOMEM;
--	memcpy(op->key, key, keylen);
- 
- 	return crypto_sync_skcipher_setkey(op->fallback_tfm, key, keylen);
- }
+| >>> type(''), bool('')
+| (<class 'str'>, False)
+
+The other is a NoneType, its bool(None) value is False.
+
+| >>> type(None), bool(None)
+| (<class 'NoneType'>, False)
+
+None often used like NULL (pointer). E.g if a function does not give an explicit 
+return value, the returned value is None.
+
+| >>> def foo():
+| ...     pass
+| ...
+| >>> print(foo())
+| None
 
 
+-- Markus --
 
