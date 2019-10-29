@@ -2,105 +2,85 @@ Return-Path: <SRS0=WkI6=YW=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDC84CA9EC3
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Oct 2019 08:43:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C8B1CA9EAE
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Oct 2019 09:19:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9D4792067D
-	for <linux-crypto@archiver.kernel.org>; Tue, 29 Oct 2019 08:43:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1920F20830
+	for <linux-crypto@archiver.kernel.org>; Tue, 29 Oct 2019 09:19:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1572340791;
+	bh=zl1P46j7VLTxaA1nHq9YSTjOkJ+meMpTFNCHAgimeyE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=AGwcRxPDTm7ATL1hqHKsrWhGH+6kxD5m5CA81ZKbK30u0Z9jAU8BVNwnuiR53wj74
+	 1Co31/L/q34XPMd62qooGXr95xPDNonCM/hIsZm8VCv4Gxdpd3zDd7W6ZXwDwLzFXw
+	 TK8kdFl/l2OdwHqoBPcfRV0BiKfkoN/CN2xueEDc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726642AbfJ2InD (ORCPT
+        id S1727455AbfJ2JTq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 29 Oct 2019 04:43:03 -0400
-Received: from mga06.intel.com ([134.134.136.31]:55781 "EHLO mga06.intel.com"
+        Tue, 29 Oct 2019 05:19:46 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60226 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725854AbfJ2InD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 29 Oct 2019 04:43:03 -0400
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga104.jf.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 29 Oct 2019 01:43:02 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.68,243,1569308400"; 
-   d="scan'208";a="224901941"
-Received: from jsakkine-mobl1.tm.intel.com (HELO localhost) ([10.237.50.122])
-  by fmsmga004.fm.intel.com with ESMTP; 29 Oct 2019 01:42:59 -0700
-Date:   Tue, 29 Oct 2019 10:42:58 +0200
-From:   Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-To:     James Bottomley <James.Bottomley@HansenPartnership.com>
-Cc:     "Safford, David (GE Global Research, US)" <david.safford@ge.com>,
-        Ken Goldman <kgold@linux.ibm.com>,
-        Mimi Zohar <zohar@linux.ibm.com>,
-        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>,
-        "open list:ASYMMETRIC KEYS" <keyrings@vger.kernel.org>,
-        "open list:CRYPTO API" <linux-crypto@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] KEYS: asym_tpm: Switch to get_random_bytes()
-Message-ID: <20191029084258.GA5649@linux.intel.com>
-References: <20191008235339.GB13926@linux.intel.com>
- <BCA04D5D9A3B764C9B7405BBA4D4A3C035F2B995@ALPMBAPA12.e2k.ad.ge.com>
- <20191014190033.GA15552@linux.intel.com>
- <1571081397.3728.9.camel@HansenPartnership.com>
- <20191016110031.GE10184@linux.intel.com>
- <1571229252.3477.7.camel@HansenPartnership.com>
- <20191016162543.GB6279@linux.intel.com>
- <1571253029.17520.5.camel@HansenPartnership.com>
- <20191017180440.GG6667@linux.intel.com>
- <20191021113939.GA11649@linux.intel.com>
+        id S1727228AbfJ2JTq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 29 Oct 2019 05:19:46 -0400
+Received: from localhost (100.50.158.77.rev.sfr.net [77.158.50.100])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6387520717;
+        Tue, 29 Oct 2019 09:19:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1572340785;
+        bh=zl1P46j7VLTxaA1nHq9YSTjOkJ+meMpTFNCHAgimeyE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=QpBq8nhFYVFXZia+EJOHKHZwqk5F5lGyWOQMZN/0CskDdcVjVp3wL0BF+lnuNq+b7
+         JSre38HMinoYbXjRE7SFTPyOHSB7j4M0VBKFsYdusSp/dVxBAzG6OuTALdOzAGpvhR
+         HTXpckj4aGFBTfMer/llZvSOC0M05zba47xLyl2Q=
+Date:   Tue, 29 Oct 2019 05:19:43 -0400
+From:   Sasha Levin <sashal@kernel.org>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        stable <stable@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH AUTOSEL 4.19 063/100] crypto: arm/aes-ce - add dependency
+ on AES library
+Message-ID: <20191029091943.GL1554@sasha-vm>
+References: <20191018220525.9042-1-sashal@kernel.org>
+ <20191018220525.9042-63-sashal@kernel.org>
+ <CAKv+Gu_6vzE-Je4G-ZZ=jU1qAWnCcADr7cJ_MG8m+tPzcC0QBw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20191021113939.GA11649@linux.intel.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+In-Reply-To: <CAKv+Gu_6vzE-Je4G-ZZ=jU1qAWnCcADr7cJ_MG8m+tPzcC0QBw@mail.gmail.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Oct 21, 2019 at 02:39:39PM +0300, Jarkko Sakkinen wrote:
-> On Thu, Oct 17, 2019 at 09:04:40PM +0300, Jarkko Sakkinen wrote:
-> > On Wed, Oct 16, 2019 at 03:10:29PM -0400, James Bottomley wrote:
-> > > On Wed, 2019-10-16 at 19:25 +0300, Jarkko Sakkinen wrote:
-> > > > On Wed, Oct 16, 2019 at 08:34:12AM -0400, James Bottomley wrote:
-> > > > > reversible ciphers are generally frowned upon in random number
-> > > > > generation, that's why the krng uses chacha20.  In general I think
-> > > > > we shouldn't try to code our own mixing and instead should get the
-> > > > > krng to do it for us using whatever the algorithm du jour that the
-> > > > > crypto guys have blessed is.  That's why I proposed adding the TPM
-> > > > > output to the krng as entropy input and then taking the output of
-> > > > > the krng.
-> > > > 
-> > > > It is already registered as hwrng. What else?
-> > > 
-> > > It only contributes entropy once at start of OS.
-> > 
-> > Ok.
-> > 
-> > > >  Was the issue that it is only used as seed when the rng is init'd
-> > > > first? I haven't at this point gone to the internals of krng.
-> > > 
-> > > Basically it was similar to your xor patch except I got the kernel rng
-> > > to do the mixing, so it would use the chacha20 cipher at the moment
-> > > until they decide that's unsafe and change it to something else:
-> > > 
-> > > https://lore.kernel.org/linux-crypto/1570227068.17537.4.camel@HansenPartnership.com/
-> > > 
-> > > It uses add_hwgenerator_randomness() to do the mixing.  It also has an
-> > > unmixed source so that read of the TPM hwrng device works as expected.
-> > 
-> > Thinking that could this potentially racy? I.e. between the calls
-> > something else could eat the entropy added?
-> 
-> Also, what is wrong just taking one value from krng and mixing
-> it with a value from TPM RNG where needed? That would be non-racy
-> too.
+On Mon, Oct 21, 2019 at 08:08:02AM +0200, Ard Biesheuvel wrote:
+>On Sat, 19 Oct 2019 at 00:07, Sasha Levin <sashal@kernel.org> wrote:
+>>
+>> From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+>>
+>> [ Upstream commit f703964fc66804e6049f2670fc11045aa8359b1a ]
+>>
+>> The ARM accelerated AES driver depends on the new AES library for
+>> its non-SIMD fallback so express this in its Kconfig declaration.
+>>
+>> Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+>> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+>> Signed-off-by: Sasha Levin <sashal@kernel.org>
+>
+>Please drop this, it doesn't belong in -stable.
 
-I guess we can move forward with this?
+I've dropped it, thank you.
 
-/Jarkko
+-- 
+Thanks,
+Sasha
