@@ -2,88 +2,111 @@ Return-Path: <SRS0=cgyY=YY=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74E1ECA9EC3
-	for <linux-crypto@archiver.kernel.org>; Thu, 31 Oct 2019 07:02:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F070CA9EC3
+	for <linux-crypto@archiver.kernel.org>; Thu, 31 Oct 2019 07:39:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 50F042083E
-	for <linux-crypto@archiver.kernel.org>; Thu, 31 Oct 2019 07:02:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2F6762087F
+	for <linux-crypto@archiver.kernel.org>; Thu, 31 Oct 2019 07:39:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726575AbfJaHCR (ORCPT
+        id S1726969AbfJaHjN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 31 Oct 2019 03:02:17 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:5658 "EHLO huawei.com"
+        Thu, 31 Oct 2019 03:39:13 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:52434 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726535AbfJaHCR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 31 Oct 2019 03:02:17 -0400
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 269BFEE5CC8800A2EB72;
-        Thu, 31 Oct 2019 15:02:15 +0800 (CST)
-Received: from [127.0.0.1] (10.177.251.225) by DGGEMS410-HUB.china.huawei.com
- (10.3.19.210) with Microsoft SMTP Server id 14.3.439.0; Thu, 31 Oct 2019
- 15:02:08 +0800
-Subject: [PATCH v3] crypto: arm64/aes-neonbs - add return value of
- skcipher_walk_done() in __xts_crypt()
-From:   Yunfeng Ye <yeyunfeng@huawei.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <catalin.marinas@arm.com>, <will@kernel.org>,
-        <ard.biesheuvel@linaro.org>, <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <hushiyuan@huawei.com>,
-        "linfeilong@huawei.com" <linfeilong@huawei.com>
-References: <aaf0f585-3a06-8af1-e2f1-ab301e560d49@huawei.com>
-Message-ID: <32b39396-d514-524f-a85c-3bc627454ba7@huawei.com>
-Date:   Thu, 31 Oct 2019 15:01:47 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.6.1
+        id S1726963AbfJaHjM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 31 Oct 2019 03:39:12 -0400
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 2E9C338070375DF20242;
+        Thu, 31 Oct 2019 15:39:10 +0800 (CST)
+Received: from localhost.localdomain (10.67.165.24) by
+ DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
+ 14.3.439.0; Thu, 31 Oct 2019 15:39:02 +0800
+From:   Zaibo Xu <xuzaibo@huawei.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     <linux-crypto@vger.kernel.org>, <jonathan.cameron@huawei.com>,
+        <liulongfang@huawei.com>, <wangzhou1@hisilicon.com>,
+        <linuxarm@huawei.com>, <zhangwei375@huawei.com>,
+        <yekai13@huawei.com>, <forest.zhouchang@huawei.com>
+Subject: [PATCH 3/5] Documentation: add DebugFS doc for HiSilicon SEC
+Date:   Thu, 31 Oct 2019 15:35:28 +0800
+Message-ID: <1572507330-34502-4-git-send-email-xuzaibo@huawei.com>
+X-Mailer: git-send-email 2.8.1
+In-Reply-To: <1572507330-34502-1-git-send-email-xuzaibo@huawei.com>
+References: <1572507330-34502-1-git-send-email-xuzaibo@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <aaf0f585-3a06-8af1-e2f1-ab301e560d49@huawei.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.177.251.225]
+Content-Type: text/plain
+X-Originating-IP: [10.67.165.24]
 X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-A warning is found by the static code analysis tool:
-  "Identical condition 'err', second condition is always false"
+From: Longfang Liu <liulongfang@huawei.com>
 
-Fix this by adding return value of skcipher_walk_done().
+This Documentation is for HiSilicon SEC DebugFS.
 
-Fixes: 67cfa5d3b721 ("crypto: arm64/aes-neonbs - implement ciphertext stealing for XTS")
-Signed-off-by: Yunfeng Ye <yeyunfeng@huawei.com>
-Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+Signed-off-by: Kai Ye <yekai13@huawei.com>
+Reviewed-by: Zaibo Xu <xuzaibo@huawei.com>
 ---
-v2 -> v3:
- - add "Acked-by:"
+ Documentation/ABI/testing/debugfs-hisi-sec | 43 ++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
+ create mode 100644 Documentation/ABI/testing/debugfs-hisi-sec
 
-v1 -> v2:
- - update the subject and comment
- - add return value of skcipher_walk_done()
-
- arch/arm64/crypto/aes-neonbs-glue.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/arch/arm64/crypto/aes-neonbs-glue.c b/arch/arm64/crypto/aes-neonbs-glue.c
-index ea873b8904c4..e3e27349a9fe 100644
---- a/arch/arm64/crypto/aes-neonbs-glue.c
-+++ b/arch/arm64/crypto/aes-neonbs-glue.c
-@@ -384,7 +384,7 @@ static int __xts_crypt(struct skcipher_request *req, bool encrypt,
- 			goto xts_tail;
-
- 		kernel_neon_end();
--		skcipher_walk_done(&walk, nbytes);
-+		err = skcipher_walk_done(&walk, nbytes);
- 	}
-
- 	if (err || likely(!tail))
+diff --git a/Documentation/ABI/testing/debugfs-hisi-sec b/Documentation/ABI/testing/debugfs-hisi-sec
+new file mode 100644
+index 0000000..06adb89
+--- /dev/null
++++ b/Documentation/ABI/testing/debugfs-hisi-sec
+@@ -0,0 +1,43 @@
++What:           /sys/kernel/debug/hisi_sec/<bdf>/sec_dfx
++Date:           Oct 2019
++Contact:        linux-crypto@vger.kernel.org
++Description:    Dump the debug registers of SEC cores.
++		Only available for PF.
++
++What:           /sys/kernel/debug/hisi_sec/<bdf>/clear_enable
++Date:           Oct 2019
++Contact:        linux-crypto@vger.kernel.org
++Description:    Enabling/disabling of clear action after reading
++		the SEC debug registers.
++		0: disable, 1: enable.
++		Only available for PF, and take no other effect on SEC.
++
++What:           /sys/kernel/debug/hisi_sec/<bdf>/current_qm
++Date:           Oct 2019
++Contact:        linux-crypto@vger.kernel.org
++Description:    One SEC controller has one PF and multiple VFs, each function
++		has a QM. This file can be used to select the QM which below
++		qm refers to.
++		Only available for PF.
++
++What:           /sys/kernel/debug/hisi_sec/<bdf>/qm/qm_regs
++Date:           Oct 2019
++Contact:        linux-crypto@vger.kernel.org
++Description:    Dump of QM related debug registers.
++		Available for PF and VF in host. VF in guest currently only
++		has one debug register.
++
++What:           /sys/kernel/debug/hisi_sec/<bdf>/qm/current_q
++Date:           Oct 2019
++Contact:        linux-crypto@vger.kernel.org
++Description:    One QM of SEC may contain multiple queues. Select specific
++		queue to show its debug registers in above 'qm_regs'.
++		Only available for PF.
++
++What:           /sys/kernel/debug/hisi_sec/<bdf>/qm/clear_enable
++Date:           Oct 2019
++Contact:        linux-crypto@vger.kernel.org
++Description:    Enabling/disabling of clear action after reading
++		the SEC's QM debug registers.
++		0: disable, 1: enable.
++		Only available for PF, and take no other effect on SEC.
 -- 
-2.7.4.3
-
+2.8.1
 
