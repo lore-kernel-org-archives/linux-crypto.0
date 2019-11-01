@@ -2,132 +2,95 @@ Return-Path: <SRS0=WdwO=YZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FA4ACA9ECF
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Nov 2019 12:25:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DAA7CA9ECF
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Nov 2019 12:50:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 51E8821835
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Nov 2019 12:25:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E83BE21835
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Nov 2019 12:50:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tByDGaaI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726622AbfKAMZY (ORCPT
+        id S1726771AbfKAMuw (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 1 Nov 2019 08:25:24 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:5685 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726229AbfKAMZY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 1 Nov 2019 08:25:24 -0400
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 9BC88EFD4F62366D4492;
-        Fri,  1 Nov 2019 20:25:15 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.58) by
- DGGEMS403-HUB.china.huawei.com (10.3.19.203) with Microsoft SMTP Server id
- 14.3.439.0; Fri, 1 Nov 2019 20:25:07 +0800
-From:   Zhou Wang <wangzhou1@hisilicon.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-CC:     <linux-crypto@vger.kernel.org>, Zhou Wang <wangzhou1@hisilicon.com>
-Subject: [PATCH] crypto: hisilicon - replace #ifdef with IS_ENABLED for CONFIG_NUMA
-Date:   Fri, 1 Nov 2019 20:21:49 +0800
-Message-ID: <1572610909-91857-1-git-send-email-wangzhou1@hisilicon.com>
-X-Mailer: git-send-email 2.8.1
+        Fri, 1 Nov 2019 08:50:52 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:53682 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726229AbfKAMuw (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 1 Nov 2019 08:50:52 -0400
+Received: by mail-wm1-f67.google.com with SMTP id n7so9231054wmc.3;
+        Fri, 01 Nov 2019 05:50:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=EKGzxWtR3fiXW/40+7aYocnd9u+gzpb6DDnHwR2mWX4=;
+        b=tByDGaaIgL/auVEam4y/Fevw0xCWCgTYgec2YLif4gCkcPDIt0cw9b0bad9AWAnatb
+         hcce1036cqyoQ1bYR5/ajs8L9rXCV+M3Qt/tjkljyE4vdI8V62U4TjTqsA9LWN95PtxQ
+         mjfnCHrrPRqW9zFaL2QCUROK+8RTwopcDe9mdNS9XjA+LKmd1Qn2R6IHoa7u/cHWy61W
+         2RYhuzi/Q0+ub/OgjYDjgSFa8rSTISy4D0Dc4t5tvqk2snTdSr/IaQ0BrsnHFiEdYaA9
+         wdPVFarPQxo341qV/HyqFKJYhcBbpfzRnRmqbZFTMlcAzM0M25ihJhBuzRsfXa9Yxg8E
+         4uvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=EKGzxWtR3fiXW/40+7aYocnd9u+gzpb6DDnHwR2mWX4=;
+        b=W+Pg3YR83W1EsIvNSEc3jSPjcj8HOtzQPyeZwoLCrojQn1FvcERq5mQDk0770f/ebJ
+         IxfBF/t+dD1g+k2DoHfU6Ht6Wj7GQM5DnnTHZ62qL5UEpI7l43ow2J9PVyqYTr9OMicD
+         VVOOFIU+j0C1w2LJihfTPz/mbz/sK6IW45nV2m9Ij8dmG0AG31n6K6HvtBriRB3Aj6gH
+         IYN6cw8DGg2gkZjFJ7OE5EHuwkWrIlCTh64w6dGYk9Cb4A8INJ7mixBrBXjkHXdXQe3N
+         BeqSfxJkEpRJ8YTW1w8NmhHp8LgqEC8rKGOkYZYGSs2huH7RUE/5WxUtDIGK9kQVxVjR
+         HH2g==
+X-Gm-Message-State: APjAAAWdPnuTl+xOO3ocSpBhmv8s3w6v/GEXUYdmZygc7F2XieWTHFNv
+        8yVb1QCqeQ7UBY+J7sbIZamEPUiF
+X-Google-Smtp-Source: APXvYqzuE2vAdMAq+9VOhAQXWfUPUsaGN/1iaSbTb8N8x4q2gMNbsC/YXDePLm9/FneMrqzdZGwEQw==
+X-Received: by 2002:a1c:f317:: with SMTP id q23mr9342526wmq.74.1572612650614;
+        Fri, 01 Nov 2019 05:50:50 -0700 (PDT)
+Received: from Red ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
+        by smtp.googlemail.com with ESMTPSA id a1sm5047692wmb.28.2019.11.01.05.50.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Nov 2019 05:50:49 -0700 (PDT)
+Date:   Fri, 1 Nov 2019 13:50:38 +0100
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     Julia Lawall <julia.lawall@lip6.fr>
+Cc:     kbuild-all@lists.01.org, linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Maxime Ripard <mripard@kernel.org>,
+        Chen-Yu Tsai <wens@csie.org>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: fix semicolon.cocci warnings
+Message-ID: <20191101125038.GA3904@Red>
+References: <alpine.DEB.2.21.1911010950330.2883@hadrien>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.58]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <alpine.DEB.2.21.1911010950330.2883@hadrien>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Replace #ifdef CONFIG_NUMA with IS_ENABLED(CONFIG_NUMA) to fix kbuild error.
+On Fri, Nov 01, 2019 at 09:52:06AM +0100, Julia Lawall wrote:
+> From: kbuild test robot <lkp@intel.com>
+> 
+>  Remove unneeded semicolon.
+> 
+> Generated by: scripts/coccinelle/misc/semicolon.cocci
+> 
+> Fixes: f08fcced6d00 ("crypto: allwinner - Add sun8i-ss cryptographic offloader")
+> CC: Corentin Labbe <clabbe.montjoie@gmail.com>
+> Signed-off-by: kbuild test robot <lkp@intel.com>
+> Signed-off-by: Julia Lawall <julia.lawall@lip6.fr>
+> ---
 
-Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
-Reported-by: kbuild test robot <lkp@intel.com>
----
- drivers/crypto/hisilicon/zip/zip_main.c | 51 ++++++++++++++++-----------------
- 1 file changed, 25 insertions(+), 26 deletions(-)
+Acked-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 
-diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index 255b63c..0605457 100644
---- a/drivers/crypto/hisilicon/zip/zip_main.c
-+++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -104,9 +104,8 @@ static void free_list(struct list_head *head)
- 
- struct hisi_zip *find_zip_device(int node)
- {
--	struct hisi_zip *ret = NULL;
--#ifdef CONFIG_NUMA
- 	struct hisi_zip_resource *res, *tmp;
-+	struct hisi_zip *ret = NULL;
- 	struct hisi_zip *hisi_zip;
- 	struct list_head *n;
- 	struct device *dev;
-@@ -114,38 +113,38 @@ struct hisi_zip *find_zip_device(int node)
- 
- 	mutex_lock(&hisi_zip_list_lock);
- 
--	list_for_each_entry(hisi_zip, &hisi_zip_list, list) {
--		res = kzalloc(sizeof(*res), GFP_KERNEL);
--		if (!res)
--			goto err;
--
--		dev = &hisi_zip->qm.pdev->dev;
--		res->hzip = hisi_zip;
--		res->distance = node_distance(dev->numa_node, node);
-+	if (IS_ENABLED(CONFIG_NUMA)) {
-+		list_for_each_entry(hisi_zip, &hisi_zip_list, list) {
-+			res = kzalloc(sizeof(*res), GFP_KERNEL);
-+			if (!res)
-+				goto err;
-+
-+			dev = &hisi_zip->qm.pdev->dev;
-+			res->hzip = hisi_zip;
-+			res->distance = node_distance(dev_to_node(dev), node);
-+
-+			n = &head;
-+			list_for_each_entry(tmp, &head, list) {
-+				if (res->distance < tmp->distance) {
-+					n = &tmp->list;
-+					break;
-+				}
-+			}
-+			list_add_tail(&res->list, n);
-+		}
- 
--		n = &head;
- 		list_for_each_entry(tmp, &head, list) {
--			if (res->distance < tmp->distance) {
--				n = &tmp->list;
-+			if (hisi_qm_get_free_qp_num(&tmp->hzip->qm)) {
-+				ret = tmp->hzip;
- 				break;
- 			}
- 		}
--		list_add_tail(&res->list, n);
--	}
- 
--	list_for_each_entry(tmp, &head, list) {
--		if (hisi_qm_get_free_qp_num(&tmp->hzip->qm)) {
--			ret = tmp->hzip;
--			break;
--		}
-+		free_list(&head);
-+	} else {
-+		ret = list_first_entry(&hisi_zip_list, struct hisi_zip, list);
- 	}
- 
--	free_list(&head);
--#else
--	mutex_lock(&hisi_zip_list_lock);
--
--	ret = list_first_entry(&hisi_zip_list, struct hisi_zip, list);
--#endif
- 	mutex_unlock(&hisi_zip_list_lock);
- 
- 	return ret;
--- 
-2.8.1
-
+Thanks
