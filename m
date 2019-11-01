@@ -2,95 +2,100 @@ Return-Path: <SRS0=WdwO=YZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 224D3CA9ECF
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Nov 2019 12:52:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B926CA9ECF
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Nov 2019 14:37:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E96BB208E3
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Nov 2019 12:52:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 134082085B
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Nov 2019 14:37:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ICZ8mx+U"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a0G3CKeV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726170AbfKAMwf (ORCPT
+        id S1726701AbfKAOhv (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 1 Nov 2019 08:52:35 -0400
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:50208 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725878AbfKAMwf (ORCPT
+        Fri, 1 Nov 2019 10:37:51 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:42051 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726658AbfKAOhv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 1 Nov 2019 08:52:35 -0400
-Received: by mail-wm1-f65.google.com with SMTP id 11so9262900wmk.0;
-        Fri, 01 Nov 2019 05:52:32 -0700 (PDT)
+        Fri, 1 Nov 2019 10:37:51 -0400
+Received: by mail-wr1-f66.google.com with SMTP id a15so9857738wrf.9;
+        Fri, 01 Nov 2019 07:37:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=5kDHdGaAqZVxVSO+DPwW99XZq8iYZVkob3e0AtdnlHc=;
-        b=ICZ8mx+Utk3tKzJbdssh1f2AJtQ+KDk1XnZX+N4wsPjRdi5IRTCH7IcVOIIRk4dk4h
-         J6Chf67SdhbX+qhKHNl1eB1HJfeCYlovuviQEwLTUXeO8Y3IZBKQilrL2Hmm+N0cUuCw
-         t4VDIFa13bjoPB3G33VJdZmhRpPootgEVPG99Wx9y6Y5RhgRRtyYkI+sNyRHgrHINM7x
-         Re2p2pPHaAfzt2uvFRpwEePm0oq0F14t/bjcBQhvzi3W6LksPuMU77u+lRVuGXhuXFyD
-         l2ZJ6GIwhXnqndT8X7hXN2YMpVfsgFwZuVSwJyu9f4gA5Sx8px8RMQtYzXrreuRcRX8q
-         85tg==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=iDATA8UWRvuERkVCUo3sHEhaiMy110+5RvXbe9baKYQ=;
+        b=a0G3CKeV4eMZvWvCK5eajXp9N4sKVrGEqIPZIYw5GZOswevSnjtindYVUVrXWrfMRI
+         JMacgwry7FiP4VCmUhiWGkaZ7f5bYkxpt6lmdx9etuDNCo+14TpcACqzVVa4/DNbA2Cc
+         u2HwS6yoKafmZPP1oXL3o/PX4qHIUjL7lD57BUhUCBW1+5XV7+xsRBMAWZxdRR0YRnlr
+         Ozd0YULIoCcc2kgF/ro8ZBKfFyYnMIVVPc1E2T9lHoD9OmA5SEpxixOZNTeZuE40uNmv
+         nSLJTGmRLeaDjfJKZsAtEiEQ3MwLZ5m5vD+RDVHJTHeHw3tQyaVNAma4+kpQ4ijcIdga
+         aCng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=5kDHdGaAqZVxVSO+DPwW99XZq8iYZVkob3e0AtdnlHc=;
-        b=SuozDL9hWAGah0qi/qjcUN9CMbwwFJg/Qi4P0YOw/4F0jQO7qD3nql+P49aQ/aOD99
-         zZyi4eDRzPZr5UK9XZYW5FhAsthQ71Xyw2SgMugiyJC07PiQ70HmgUchFsxAxfF1NPm/
-         46nQKTxEFI7h7nA96i2QPqgbVGI4OZ66+mGJUBleXQTXlw/zVXpQPC0b9KB8gvuxHD4w
-         OZvX2FCg5a6BCcOCDkQ3d6x+tbhk/RnryfE8zT9azGysFvvQmRx9vaC25UXBzSbqknYH
-         cL+ScN1z51izmmFNo87/WjLqR4ElWgWjZw01EXeERj+5U6DJl3Kbyp6e/vjNmpB8YjQG
-         Qy6A==
-X-Gm-Message-State: APjAAAUpkxCZJx7Bx6KuHWjUzCt7kXWDToYDBii4AySlTa1vhNTDwiRi
-        3qhs20XCbgCpwSc9PLcQr+c=
-X-Google-Smtp-Source: APXvYqyu7fVT4MGxfs1QnkZRpSmE0DSsyd+HoLtvpv2yrj8wf2G85zypZsTEptRDAJoMKjihJoqwvw==
-X-Received: by 2002:a1c:60d7:: with SMTP id u206mr10600674wmb.101.1572612751565;
-        Fri, 01 Nov 2019 05:52:31 -0700 (PDT)
-Received: from Red ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id p15sm7907642wrs.94.2019.11.01.05.52.25
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=iDATA8UWRvuERkVCUo3sHEhaiMy110+5RvXbe9baKYQ=;
+        b=QBumv39ek7fAScvDwQV2PSW1W7X9CEU3RXeKNSVaBDxeO0O/DK29rNPVbtZZsd0Agh
+         6t0hT4ORdP/HLm5ikCw1E7AAY3lFu1M35QwQzDrp+5/SWv/K/KU5MZwOFPc1/9PaLnGB
+         VGS/NGhnjUS5xbiQUG0eZAvtbr5vgqzkkI/+SydpXXmKjBPmMLlEV6VeEjDzeZYsojDq
+         TScZOHi7JXxQQK9SfpwpNBIkjSU6X17Rf1osi9Glq3KX8fkf7PgwQZ2W/Mo5APcx1A34
+         DJu0RXhqgLgtJYHVqF1rexy+JBC63sijK4GpQiXOWMugqVHx8ldV4fdMT52xGbfKnLlP
+         GNxQ==
+X-Gm-Message-State: APjAAAWjAI/rKW9lOWu42XKZFxEQL0Ke9JbI4CJouxrreKlUDnqhXk9I
+        kwLxIryKfI9n/fkIIABwR2o=
+X-Google-Smtp-Source: APXvYqxloXtQEEYKf1fFRXMPDxsO+UU37rFFsC09iEeQtHTMIAJRov+wc8xL1bAUgPxg3x3FNI77aA==
+X-Received: by 2002:a5d:4409:: with SMTP id z9mr6610626wrq.22.1572619069481;
+        Fri, 01 Nov 2019 07:37:49 -0700 (PDT)
+Received: from suzukaze.ipads-lab.se.sjtu.edu.cn ([202.120.40.82])
+        by smtp.gmail.com with ESMTPSA id q9sm1824816wru.83.2019.11.01.07.37.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Nov 2019 05:52:31 -0700 (PDT)
-Date:   Fri, 1 Nov 2019 13:52:21 +0100
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Julia Lawall <julia.lawall@lip6.fr>
-Cc:     kbuild-all@lists.01.org, linux-crypto@vger.kernel.org,
+        Fri, 01 Nov 2019 07:37:49 -0700 (PDT)
+From:   Chuhong Yuan <hslester96@gmail.com>
+Cc:     Antoine Tenart <antoine.tenart@bootlin.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Maxime Ripard <mripard@kernel.org>,
-        Chen-Yu Tsai <wens@csie.org>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: fix memdup.cocci warnings
-Message-ID: <20191101125221.GB3904@Red>
-References: <alpine.DEB.2.21.1911010953590.2883@hadrien>
+        "David S . Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Chuhong Yuan <hslester96@gmail.com>
+Subject: [PATCH] crypto: inside-secure - Add missed clk_disable_unprepare
+Date:   Fri,  1 Nov 2019 22:37:15 +0800
+Message-Id: <20191101143715.17708-1-hslester96@gmail.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <alpine.DEB.2.21.1911010953590.2883@hadrien>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
+To:     unlisted-recipients:; (no To-header on input)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Nov 01, 2019 at 09:55:34AM +0100, Julia Lawall wrote:
-> From: kbuild test robot <lkp@intel.com>
-> 
-> Use kmemdup rather than duplicating its implementation
-> 
-> Generated by: scripts/coccinelle/api/memdup.cocci
-> 
-> Fixes: f08fcced6d00 ("crypto: allwinner - Add sun8i-ss cryptographic offloader")
-> CC: Corentin Labbe <clabbe.montjoie@gmail.com>
-> Signed-off-by: kbuild test robot <lkp@intel.com>
-> Signed-off-by: Julia Lawall <julia.lawall@lip6.fr>
-> ---
+safexcel_remove misses disabling priv->reg_clk like what is done when
+probe fails.
+Add the missed call to fix it.
 
-Corentin Labbe <clabbe.montjoie@gmail.com>
+Signed-off-by: Chuhong Yuan <hslester96@gmail.com>
+---
+ drivers/crypto/inside-secure/safexcel.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Thanks
+diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
+index 4ab1bde8dd9b..24c0f2404ec6 100644
+--- a/drivers/crypto/inside-secure/safexcel.c
++++ b/drivers/crypto/inside-secure/safexcel.c
+@@ -1623,6 +1623,7 @@ static int safexcel_remove(struct platform_device *pdev)
+ 	safexcel_unregister_algorithms(priv);
+ 	safexcel_hw_reset_rings(priv);
+ 
++	clk_disable_unprepare(priv->reg_clk);
+ 	clk_disable_unprepare(priv->clk);
+ 
+ 	for (i = 0; i < priv->config.rings; i++)
+-- 
+2.23.0
+
