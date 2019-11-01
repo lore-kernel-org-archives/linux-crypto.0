@@ -2,71 +2,80 @@ Return-Path: <SRS0=WdwO=YZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51570CA9EC9
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Nov 2019 06:07:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D73E1CA9EC9
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Nov 2019 06:08:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2BCAD208E3
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Nov 2019 06:07:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AD4D520656
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Nov 2019 06:08:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727492AbfKAGHm (ORCPT
+        id S1725936AbfKAGIc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 1 Nov 2019 02:07:42 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:37530 "EHLO deadmen.hmeau.com"
+        Fri, 1 Nov 2019 02:08:32 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:37580 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725784AbfKAGHm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 1 Nov 2019 02:07:42 -0400
+        id S1725784AbfKAGIb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 1 Nov 2019 02:08:31 -0400
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1iQQ5n-0001sz-Vi; Fri, 01 Nov 2019 14:07:28 +0800
+        id 1iQQ6k-0001u5-7f; Fri, 01 Nov 2019 14:08:26 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1iQQ5i-0004pU-QY; Fri, 01 Nov 2019 14:07:22 +0800
-Date:   Fri, 1 Nov 2019 14:07:22 +0800
+        id 1iQQ6i-0004qj-5Y; Fri, 01 Nov 2019 14:08:24 +0800
+Date:   Fri, 1 Nov 2019 14:08:24 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Matt Mackall <mpm@selenic.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Aaro Koskinen <aaro.koskinen@iki.fi>,
-        Adam Ford <aford173@gmail.com>,
-        Pali =?iso-8859-1?Q?Roh=E1r?= <pali.rohar@gmail.com>,
-        Sebastian Reichel <sre@kernel.org>,
-        Tero Kristo <t-kristo@ti.com>,
-        Tony Lindgren <tony@atomide.com>,
-        Rob Herring <robh@kernel.org>, linux-crypto@vger.kernel.org,
+To:     Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc:     linux-crypto@vger.kernel.org, Chris Healy <cphealy@gmail.com>,
+        Lucas Stach <l.stach@pengutronix.de>,
+        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] hwrng: omap3-rom - Fix unused function warnings
-Message-ID: <20191101060722.56nbwi575qpzj65e@gondor.apana.org.au>
-References: <20191022142741.1794378-1-arnd@arndb.de>
+Subject: Re: [PATCH v2 0/6] CAAM bugfixes, small improvements
+Message-ID: <20191101060824.txnywabazrcna53q@gondor.apana.org.au>
+References: <20191022153013.3692-1-andrew.smirnov@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191022142741.1794378-1-arnd@arndb.de>
+In-Reply-To: <20191022153013.3692-1-andrew.smirnov@gmail.com>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Oct 22, 2019 at 04:27:31PM +0200, Arnd Bergmann wrote:
-> When runtime-pm is disabled, we get a few harmless warnings:
+On Tue, Oct 22, 2019 at 08:30:07AM -0700, Andrey Smirnov wrote:
+> Everyone:
 > 
-> drivers/char/hw_random/omap3-rom-rng.c:65:12: error: unused function 'omap_rom_rng_runtime_suspend' [-Werror,-Wunused-function]
-> drivers/char/hw_random/omap3-rom-rng.c:81:12: error: unused function 'omap_rom_rng_runtime_resume' [-Werror,-Wunused-function]
+> This series contains bugfixes and small improvement I made while doing
+> more testing of CAAM code.
 > 
-> Mark these functions as __maybe_unused so gcc can drop them
-> silently.
+> Changes since [v1]:
 > 
-> Fixes: 8d9d4bdc495f ("hwrng: omap3-rom - Use runtime PM instead of custom functions")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->  drivers/char/hw_random/omap3-rom-rng.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>     - Rebased on latest cryptodev/master, series limited to just
+>       devres changes
+> 
+>     - Minor code style changes as per feedback
+> 
+> [v1] lore.kernel.org/lkml/20190904023515.7107-1-andrew.smirnov@gmail.com
+> 
+> Andrey Smirnov (6):
+>   crypto: caam - use devres to unmap memory
+>   crypto: caam - use devres to remove debugfs
+>   crypto: caam - use devres to de-initialize the RNG
+>   crypto: caam - use devres to de-initialize QI
+>   crypto: caam - use devres to populate platform devices
+>   crypto: caam - populate platform devices last
+> 
+>  drivers/crypto/caam/ctrl.c   | 222 ++++++++++++++++-------------------
+>  drivers/crypto/caam/intern.h |   4 -
+>  drivers/crypto/caam/qi.c     |   8 +-
+>  drivers/crypto/caam/qi.h     |   1 -
+>  4 files changed, 104 insertions(+), 131 deletions(-)
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
