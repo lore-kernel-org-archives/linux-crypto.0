@@ -2,60 +2,60 @@ Return-Path: <SRS0=WdwO=YZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AECF6CA9ECF
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Nov 2019 17:22:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52126CA9ECF
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Nov 2019 19:51:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7ADC62085B
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Nov 2019 17:22:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1BA1621897
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Nov 2019 19:51:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=netronome-com.20150623.gappssmtp.com header.i=@netronome-com.20150623.gappssmtp.com header.b="OYhrNrhu"
+	dkim=pass (2048-bit key) header.d=netronome-com.20150623.gappssmtp.com header.i=@netronome-com.20150623.gappssmtp.com header.b="MsefNbDb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726866AbfKARWy (ORCPT
+        id S1727270AbfKATvy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 1 Nov 2019 13:22:54 -0400
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:38404 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727600AbfKARWy (ORCPT
+        Fri, 1 Nov 2019 15:51:54 -0400
+Received: from mail-lj1-f193.google.com ([209.85.208.193]:42756 "EHLO
+        mail-lj1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726709AbfKATvx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 1 Nov 2019 13:22:54 -0400
-Received: by mail-lf1-f66.google.com with SMTP id q28so7769486lfa.5
-        for <linux-crypto@vger.kernel.org>; Fri, 01 Nov 2019 10:22:50 -0700 (PDT)
+        Fri, 1 Nov 2019 15:51:53 -0400
+Received: by mail-lj1-f193.google.com with SMTP id n5so362282ljc.9
+        for <linux-crypto@vger.kernel.org>; Fri, 01 Nov 2019 12:51:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=netronome-com.20150623.gappssmtp.com; s=20150623;
         h=date:from:to:cc:subject:message-id:in-reply-to:references
-         :organization:mime-version:content-transfer-encoding;
-        bh=vdJS5wHCvpSQMFm2jdDQ61c5eY7rBNbjJW+8uyG0GRg=;
-        b=OYhrNrhuXsL/quLsVKXrps3cBpJHq+KilIJjfscIIvLeZFpDBdSoX5Q5sPW6eptPNi
-         i+9NTi0uzAsUEkZpX166hI0jqCIMfUC1/Dethrk7AQ4MffqSak83kdWTTcyrvjA23iLf
-         VHfL8XeJ2hsrhaKJfEQDlO5doohJw1DsFhJwSgSSs1/H3Mp7e0ORiq8fT8zQBT6jBvOL
-         ZLP2Rk3odmj1W6ChZQ8tPGvlT7D7ouKOMjBygRdn+r/7EJVGBofXm4i/np/bNknJA+Ph
-         nj4G7+4aUuYtW6CtSVVT/O2NcowP9Ar4uo8F24ar5BTxuWkeviBzEzcmiqXyUqZScnTl
-         tK2Q==
+         :organization:mime-version;
+        bh=5ha11ZVkcxZ26lpTg0eOSwyU3b6PXye9IzhfITxqsys=;
+        b=MsefNbDbNw/+ubsvVPmNC1TQJN5WyAjshdy8W5cUPMaHJmo/yFD55kxLnopLXRo8U7
+         pnkZ5EvEQsY7I9taHenM3OYadlDn6gT26H33wNf7+CgPJ9URtlwxfpimsDv2ez1KlQIw
+         zsQJdkdoakzmDoKqFcAAoDbLwnrOaEOtJ72ibB3Qlj5q0VrjzVeEsaaMuH8fBTAZiWHN
+         iorSgud3kpoOgzOAfhYABj69bF/N+2WiM6LRHK9Ver0P7s5+onLbYqkG3MupMOPR36Rj
+         Zr/f9y0QCrjnEpuBhGOTWVPzydPfigV/NY0dSm9SG31QuHx4qmGV/Q50PQuGtfTqZApD
+         22Cg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
-         :references:organization:mime-version:content-transfer-encoding;
-        bh=vdJS5wHCvpSQMFm2jdDQ61c5eY7rBNbjJW+8uyG0GRg=;
-        b=L4pAK6ck4AZSYWhjrVgKIo2Lf2uYExkvVXo2uX3x4xyVt6wTxH/pTp5Wj//ToFBq/+
-         oxCTYZu4joWJyiouHMmaLXt5MYgYxFCkLBCsDzg9McJQNMNVYwE4MOs49c3kiYdEJYGg
-         ha0VMErCsOck8sEJhQM+QUNSNt+R/V9LP8WVdf4uEBObtvUFfPaA4o8C2fQWira0SJ1t
-         yPnHCEvkZMBKzFF+3YE2+klxbRUf4mGixYLmKC169FP1q1UWjATbBEYPjzAomx9QVgKS
-         HYvW6eOUsje/HQDO3FQDEUS8QLLwyyggTfFPTbfAbSgr2SorKv2Qot7uCOkD/DscGH6w
-         olAA==
-X-Gm-Message-State: APjAAAXnwwEB4fEwap7l55FigIaGV0ZpUwk4uPfNxNjL+1rizznl2o1z
-        3lXvRGxt1I/JFi/x1vboRSBdVg==
-X-Google-Smtp-Source: APXvYqyPGR3nzGdy0gDqD745mihco1NVGyz6RWNzVa7kM90t6EZUC/folZiIrXBnSvpxYJBU95/uHQ==
-X-Received: by 2002:a19:5e53:: with SMTP id z19mr7553066lfi.111.1572628969408;
-        Fri, 01 Nov 2019 10:22:49 -0700 (PDT)
+         :references:organization:mime-version;
+        bh=5ha11ZVkcxZ26lpTg0eOSwyU3b6PXye9IzhfITxqsys=;
+        b=tXjXQCZG5erCrnmal5PFEZVEftApnQKV1O4T2ix8dfSTexC5399OyCuGrnYlstdY4E
+         kUgDNpG+Qb0KK8tnj4i1yt+9klHvbveH93vDRH/6sWr61rVf6cUsNPbQQm7dByi85Dv+
+         YXymadhYW20ozKGoOMBLeJEcHTRJacw5ee5smG3VST5NP1a2hEE2M0vYHt7L3pNyRBiy
+         a1qK4oISsl8Mkf2k1Gm74hcbbNZelhkZfW+hyxWOm3HqwIy/ubsx+n2v1YB4oIjTrmTc
+         8TsygvCnzJhJpGlWPYScFjq0tNNiM26G2hSWtzETk+KKcD/wNeticf1R5bNQi+tmqxB4
+         yALg==
+X-Gm-Message-State: APjAAAVfkYOSQYI47P7DLmVAV4BTTJv4Cb6ETjMDz/Out0VEvu00qrnu
+        rhUdAI4+SuFFGo5/7ManeIxaWw==
+X-Google-Smtp-Source: APXvYqwWyKrngAw3GUgVjrTW/vPRUzJgh6qNmbG8mvTpwFdL86YoU7neKf95TDIpirLajjt+fNX9rQ==
+X-Received: by 2002:a2e:a16d:: with SMTP id u13mr9747217ljl.214.1572637911013;
+        Fri, 01 Nov 2019 12:51:51 -0700 (PDT)
 Received: from cakuba.netronome.com ([66.60.152.14])
-        by smtp.gmail.com with ESMTPSA id q15sm2780830lfb.84.2019.11.01.10.22.46
+        by smtp.gmail.com with ESMTPSA id s26sm919319ljj.12.2019.11.01.12.51.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Nov 2019 10:22:49 -0700 (PDT)
-Date:   Fri, 1 Nov 2019 10:22:38 -0700
+        Fri, 01 Nov 2019 12:51:50 -0700 (PDT)
+Date:   Fri, 1 Nov 2019 12:51:39 -0700
 From:   Jakub Kicinski <jakub.kicinski@netronome.com>
 To:     John Fastabend <john.fastabend@gmail.com>
 Cc:     davem@davemloft.net, netdev@vger.kernel.org,
@@ -68,149 +68,412 @@ Cc:     davem@davemloft.net, netdev@vger.kernel.org,
         linux-crypto@vger.kernel.org
 Subject: Re: [oss-drivers] Re: [PATCH net] net/tls: fix sk_msg trim on
  fallback to copy mode
-Message-ID: <20191101102238.7f56cb84@cakuba.netronome.com>
-In-Reply-To: <5dbc48ac3a8cc_e4e2b12b10265b8a1@john-XPS-13-9370.notmuch>
+Message-ID: <20191101125139.77eb57aa@cakuba.netronome.com>
+In-Reply-To: <20191101102238.7f56cb84@cakuba.netronome.com>
 References: <20191030160542.30295-1-jakub.kicinski@netronome.com>
         <5dbb5ac1c208d_4c722b0ec06125c0cc@john-XPS-13-9370.notmuch>
         <20191031152444.773c183b@cakuba.netronome.com>
         <5dbbb83d61d0c_46342ae580f765bc78@john-XPS-13-9370.notmuch>
         <20191031215444.68a12dfe@cakuba.netronome.com>
         <5dbc48ac3a8cc_e4e2b12b10265b8a1@john-XPS-13-9370.notmuch>
+        <20191101102238.7f56cb84@cakuba.netronome.com>
 Organization: Netronome Systems, Ltd.
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="MP_/y928O4Z.I7HqST5oCUO3V22"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 01 Nov 2019 08:01:00 -0700, John Fastabend wrote:
-> Jakub Kicinski wrote:
-> > I will look in depth tomorrow as well, the full/empty cases are a
-> > little tricky to fold into general logic.
-> > 
-> > I came up with this before I got distracted Halloweening :)  
-> 
-> Same here. Looking at the two cases from above.
-> 
->    if (msg->sg.start < msg->sg.end &&
->        i < msg->sg.curr) {  // i <= msg->sg.curr
->       msg->sg.curr = i;
->       msg->sg.copybreak = msg->sg.data[i].length;
->    }
-> 
-> If we happen to trim the entire msg so size=0 then i==start
-> which should mean i < msg->sg.curr unless msg->sg.curr = msg->sg.start
-> so we should just use <=. In the second case.
-> 
->    else if (msg->sg.end < msg->sg.start &&
->            (i < msg->sg.curr || i > msg->sg.start)) { // i <= msg->sg.curr
->       msg->sg.curr = i;
->       msg->sg.copybreak = msg->sg.data[i].length;
->    }
->  
-> If we trim the entire message here i == sg.start again. And same
-> thing use <= and we should catch case sg.tart = sg.curr.
-> 
-> In the full case we didn't trim anything so we shouldn't do any
-> manipulating of curr or copybreak.
+--MP_/y928O4Z.I7HqST5oCUO3V22
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 
-Hm, don't we need to potentially move the copybreak back a little?
-That's why I added this:
+On Fri, 1 Nov 2019 10:22:38 -0700, Jakub Kicinski wrote:
+> > > +		msg->sg.copybreak =3D 0;
+> > > +	} else if (sk_msg_iter_dist(msg->sg.start, msg->sg.curr) >
+> > > +		   sk_msg_iter_dist(msg->sg.end, msg->sg.curr)) {
+> > > +		sk_msg_iter_var_prev(i);   =20
+> >=20
+> > I suspect with small update to dist logic the special case could also
+> > be dropped here. But I have a preference for my example above at the
+> > moment. Just getting coffee now so will think on it though. =20
+>=20
+> Oka, I like the dist thing, I thought that's where you were going in
+> your first email :)
+>=20
+> I need to do some more admin, and then I'll probably write a unit test
+> for this code (use space version).. So we can test either patch with it.
 
-if (msg->sg.curr == i && msg->sg.copybreak > msg->sg.data[i].length)
-	msg->sg.copybreak = msg->sg.data[i].length;
+Attaching my "unit test", you should be able to just replace
+sk_msg_trim() with yours and re-run. That said my understanding of the
+expected geometry of the buffer may not be correct :)
 
-To make sure that if we trimmed "a little bit" of the last SG but
-didn't actually consume it the copybreak doesn't point after the length.
-But perhaps that's not needed since sk_msg_memcopy_from_iter() special
-cases the copybreak > length, anyway?
+The patch I posted yesterday, with the small adjustment to set curr to
+start on empty message passes that test, here it is again:
 
-> > diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
-> > index e4b3fb4bb77c..ce7055259877 100644
-> > --- a/include/linux/skmsg.h
-> > +++ b/include/linux/skmsg.h
-> > @@ -139,6 +139,11 @@ static inline void sk_msg_apply_bytes(struct sk_psock *psock, u32 bytes)
-> >  	}
-> >  }
-> >  
-> > +static inline u32 sk_msg_iter_dist(u32 start, u32 end)
-> > +{
-> > +	return end >= start ? end - start : end + (MAX_MSG_FRAGS - start);
-> > +}
-> > +
-> >  #define sk_msg_iter_var_prev(var)			\
-> >  	do {						\
-> >  		if (var == 0)				\
-> > @@ -198,9 +203,7 @@ static inline u32 sk_msg_elem_used(const struct sk_msg *msg)
-> >  	if (sk_msg_full(msg))
-> >  		return MAX_MSG_FRAGS;
-> >  
-> > -	return msg->sg.end >= msg->sg.start ?
-> > -		msg->sg.end - msg->sg.start :
-> > -		msg->sg.end + (MAX_MSG_FRAGS - msg->sg.start);
-> > +	return sk_msg_iter_dist(msg->sg.start, msg->sg.end);
-> >  }
-> >  
-> >  static inline struct scatterlist *sk_msg_elem(struct sk_msg *msg, int which)
-> > diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-> > index cf390e0aa73d..f6b4a70bafa9 100644
-> > --- a/net/core/skmsg.c
-> > +++ b/net/core/skmsg.c
-> > @@ -270,18 +270,26 @@ void sk_msg_trim(struct sock *sk, struct sk_msg *msg, int len)
-> >  
-> >  	msg->sg.data[i].length -= trim;
-> >  	sk_mem_uncharge(sk, trim);
-> > +	if (msg->sg.curr == i && msg->sg.copybreak > msg->sg.data[i].length)
-> > +		msg->sg.copybreak = msg->sg.data[i].length;
-> >  out:
-> > +	sk_msg_iter_var_next(i);
-> > +	msg->sg.end = i;
-> > +
-> >  	/* If we trim data before curr pointer update copybreak and current
-> >  	 * so that any future copy operations start at new copy location.
-> >  	 * However trimed data that has not yet been used in a copy op
-> >  	 * does not require an update.
-> >  	 */
-> > -	if (msg->sg.curr >= i) {
-> > +	if (!msg->sg.size) {  
-> 
-> I do think its a bit nicer if we don't special case the size = 0 case. If
-> we get here and i != start then we would have extra bytes in the sg
-> items between the items (i, end) and nonzero size. If i == start then the
-> we sg.size = 0. I don't think there are any other cases.
+----->8-----
 
-On an empty message i ended up before start, so we'd have to take the
-wrapping into account, no? I couldn't come up with a way to handle
-that, and the full case cleanly :S Perhaps there are some constraints
-on the geometry that simplify it.
+=46rom 953df5bc0992e31a2c7863ea8b8e490ba7a07356 Mon Sep 17 00:00:00 2001
+From: Jakub Kicinski <jakub.kicinski@netronome.com>
+Date: Tue, 29 Oct 2019 20:20:49 -0700
+Subject: [PATCH net] net/tls: fix sk_msg trim on fallback to copy mode
 
-> > +		msg->sg.curr = 0;
+sk_msg_trim() tries to only update curr pointer if it falls into
+the trimmed region. The logic, however, does not take into the
+account pointer wrapping that sk_msg_iter_var_prev() does nor
+(as John points out) the fact that msg->sg is a ring buffer.
 
-Ugh, this should say msg->sg.start, not 0.
+This means that when the message was trimmed completely, the new
+curr pointer would have the value of MAX_MSG_FRAGS - 1, which is
+neither smaller than any other value, nor would it actually be
+correct.
 
-> > +		msg->sg.copybreak = 0;
-> > +	} else if (sk_msg_iter_dist(msg->sg.start, msg->sg.curr) >
-> > +		   sk_msg_iter_dist(msg->sg.end, msg->sg.curr)) {
-> > +		sk_msg_iter_var_prev(i);  
-> 
-> I suspect with small update to dist logic the special case could also
-> be dropped here. But I have a preference for my example above at the
-> moment. Just getting coffee now so will think on it though.
+Special case the trimming to 0 length a little bit and rework
+the comparison between curr and end to take into account wrapping.
 
-Oka, I like the dist thing, I thought that's where you were going in
-your first email :)
+This bug caused the TLS code to not copy all of the message, if
+zero copy filled in fewer sg entries than memcopy would need.
 
-I need to do some more admin, and then I'll probably write a unit test
-for this code (use space version).. So we can test either patch with it.
+Big thanks to Alexander Potapenko for the non-KMSAN reproducer.
 
-> FWIW I've not compiled my example.
-> 
-> >  		msg->sg.curr = i;
-> >  		msg->sg.copybreak = msg->sg.data[i].length;
-> >  	}
-> > -	sk_msg_iter_var_next(i);
-> > -	msg->sg.end = i;
-> >  }
-> >  EXPORT_SYMBOL_GPL(sk_msg_trim);
+v2:
+ - take into account that msg->sg is a ring buffer (John).
+
+Fixes: d829e9c4112b ("tls: convert to generic sk_msg interface")
+Suggested-by: John Fastabend <john.fastabend@gmail.com>
+Reported-by: syzbot+f8495bff23a879a6d0bd@syzkaller.appspotmail.com
+Reported-by: syzbot+6f50c99e8f6194bf363f@syzkaller.appspotmail.com
+Signed-off-by: Jakub Kicinski <jakub.kicinski@netronome.com>
+---
+ include/linux/skmsg.h |  9 ++++++---
+ net/core/skmsg.c      | 20 +++++++++++++++-----
+ 2 files changed, 21 insertions(+), 8 deletions(-)
+
+diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
+index e4b3fb4bb77c..ce7055259877 100644
+--- a/include/linux/skmsg.h
++++ b/include/linux/skmsg.h
+@@ -139,6 +139,11 @@ static inline void sk_msg_apply_bytes(struct sk_psock =
+*psock, u32 bytes)
+ 	}
+ }
+=20
++static inline u32 sk_msg_iter_dist(u32 start, u32 end)
++{
++	return end >=3D start ? end - start : end + (MAX_MSG_FRAGS - start);
++}
++
+ #define sk_msg_iter_var_prev(var)			\
+ 	do {						\
+ 		if (var =3D=3D 0)				\
+@@ -198,9 +203,7 @@ static inline u32 sk_msg_elem_used(const struct sk_msg =
+*msg)
+ 	if (sk_msg_full(msg))
+ 		return MAX_MSG_FRAGS;
+=20
+-	return msg->sg.end >=3D msg->sg.start ?
+-		msg->sg.end - msg->sg.start :
+-		msg->sg.end + (MAX_MSG_FRAGS - msg->sg.start);
++	return sk_msg_iter_dist(msg->sg.start, msg->sg.end);
+ }
+=20
+ static inline struct scatterlist *sk_msg_elem(struct sk_msg *msg, int whic=
+h)
+diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+index cf390e0aa73d..f87fde3a846c 100644
+--- a/net/core/skmsg.c
++++ b/net/core/skmsg.c
+@@ -270,18 +270,28 @@ void sk_msg_trim(struct sock *sk, struct sk_msg *msg,=
+ int len)
+=20
+ 	msg->sg.data[i].length -=3D trim;
+ 	sk_mem_uncharge(sk, trim);
++	/* Adjust copybreak if it falls into the trimmed part of last buf */
++	if (msg->sg.curr =3D=3D i && msg->sg.copybreak > msg->sg.data[i].length)
++		msg->sg.copybreak =3D msg->sg.data[i].length;
+ out:
+-	/* If we trim data before curr pointer update copybreak and current
+-	 * so that any future copy operations start at new copy location.
++	sk_msg_iter_var_next(i);
++	msg->sg.end =3D i;
++
++	/* If we trim data a full sg elem before curr pointer update
++	 * copybreak and current so that any future copy operations
++	 * start at new copy location.
+ 	 * However trimed data that has not yet been used in a copy op
+ 	 * does not require an update.
+ 	 */
+-	if (msg->sg.curr >=3D i) {
++	if (!msg->sg.size) {
++		msg->sg.curr =3D msg->sg.start;
++		msg->sg.copybreak =3D 0;
++	} else if (sk_msg_iter_dist(msg->sg.start, msg->sg.curr) >
++		   sk_msg_iter_dist(msg->sg.end, msg->sg.curr)) {
++		sk_msg_iter_var_prev(i);
+ 		msg->sg.curr =3D i;
+ 		msg->sg.copybreak =3D msg->sg.data[i].length;
+ 	}
+-	sk_msg_iter_var_next(i);
+-	msg->sg.end =3D i;
+ }
+ EXPORT_SYMBOL_GPL(sk_msg_trim);
+=20
+--=20
+2.23.0
+
+
+--MP_/y928O4Z.I7HqST5oCUO3V22
+Content-Type: text/x-c++src
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment; filename=ut.c
+
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+typedef unsigned int u32;
+
+struct sock;
+
+#define MAX_MSG_FRAGS 5
+
+#define WARN_ON(cond)	fprintf(stderr, "WARNING %s:%d\n", __func__, __LINE__)
+
+#define sk_msg_iter_var_prev(var)			\
+	do {						\
+		if (var == 0)				\
+			var = MAX_MSG_FRAGS - 1;	\
+		else					\
+			var--;				\
+	} while (0)
+
+#define sk_msg_iter_var_next(var)			\
+	do {						\
+		var++;					\
+		if (var == MAX_MSG_FRAGS)		\
+			var = 0;			\
+	} while (0)
+
+struct scatterlist {
+	u32				length;
+};
+
+struct sk_msg_sg {
+	u32				start;
+	u32				curr;
+	u32				end;
+	u32				size;
+	u32				copybreak;
+	/* The extra element is used for chaining the front and sections when
+	 * the list becomes partitioned (e.g. end < start). The crypto APIs
+	 * require the chaining.
+	 */
+	struct scatterlist		data[MAX_MSG_FRAGS + 1];
+};
+
+struct sk_msg {
+	struct sk_msg_sg		sg;
+};
+
+static void sk_msg_free_elem(struct sock *sk, struct sk_msg *msg, int i, bool a)
+{
+	msg->sg.data[i].length = 0;
+}
+
+static inline void sk_mem_uncharge() {}
+
+static inline u32 sk_msg_iter_dist(u32 start, u32 end)
+{
+	return end >= start ? end - start : end + (MAX_MSG_FRAGS - start);
+}
+
+void sk_msg_trim(struct sock *sk, struct sk_msg *msg, int len)
+{
+	int trim = msg->sg.size - len;
+	u32 i = msg->sg.end;
+
+	if (trim <= 0) {
+		WARN_ON(trim < 0);
+		return;
+	}
+
+	sk_msg_iter_var_prev(i);
+	msg->sg.size = len;
+	while (msg->sg.data[i].length &&
+	       trim >= msg->sg.data[i].length) {
+		trim -= msg->sg.data[i].length;
+		sk_msg_free_elem(sk, msg, i, true);
+		sk_msg_iter_var_prev(i);
+		if (!trim)
+			goto out;
+	}
+
+	msg->sg.data[i].length -= trim;
+	sk_mem_uncharge(sk, trim);
+	/* Adjust copy break if it falls into the trimmed part of last buf */
+	if (msg->sg.curr == i && msg->sg.copybreak > msg->sg.data[i].length)
+		msg->sg.copybreak = msg->sg.data[i].length;
+out:
+	sk_msg_iter_var_next(i);
+	msg->sg.end = i;
+
+	/* If we trim data a full sg elem before curr pointer update
+	 * copybreak and current so that any future copy operations
+	 * start at new copy location.
+	 * However trimed data that has not yet been used in a copy op
+	 * does not require an update.
+	 */
+	if (!msg->sg.size) {
+		msg->sg.curr = msg->sg.start;
+		msg->sg.copybreak = 0;
+	} else if (sk_msg_iter_dist(msg->sg.start, msg->sg.curr) >
+		   sk_msg_iter_dist(msg->sg.end, msg->sg.curr)) {
+		sk_msg_iter_var_prev(i);
+		msg->sg.curr = i;
+		msg->sg.copybreak = msg->sg.data[i].length;
+	}
+}
+
+#define NOPAREN(...) __VA_ARGS__
+
+static void dump_msg(const char *str, struct sk_msg *msg, const char *end)
+{
+	int i;
+
+	fprintf(stderr, "%s start:%u curr:%u end:%u cb:%3u size:%4u   ",
+		str, msg->sg.start, msg->sg.curr, msg->sg.end,
+		msg->sg.copybreak, msg->sg.size);
+	for (i = 0; i < MAX_MSG_FRAGS; i++)
+		fprintf(stderr, " %3u", msg->sg.data[i].length);
+	fprintf(stderr, "%s", end);
+}
+
+#define test_one(_as, _ac, _acb, _len, _bc, _bcb, _be, _ad...)		\
+	do {								\
+		struct sk_msg msg = {					\
+			.sg = {						\
+				.start		= (_as),		\
+				.curr		= (_ac),		\
+				.end		= 0,			\
+				.copybreak	= (_acb),		\
+			},						\
+		};							\
+		int in_lens[] = { _ad };				\
+		struct sk_msg omsg = {					\
+			.sg = {						\
+				.start		= (_as),		\
+				.curr		= (_bc),		\
+				.end		= (_be),		\
+				.copybreak	= (_bcb),		\
+			},						\
+		};							\
+		int i;							\
+									\
+		for (i = 0; i < sizeof(in_lens)/sizeof(in_lens[0]); i++) { \
+			int var = (i + msg.sg.start) % MAX_MSG_FRAGS;	\
+									\
+			msg.sg.data[var].length = in_lens[i];		\
+			msg.sg.size += in_lens[i];			\
+		}							\
+		msg.sg.end = (msg.sg.start + i) % MAX_MSG_FRAGS;	\
+									\
+		for (i = 0; i < sizeof(in_lens)/sizeof(in_lens[0]); i++) { \
+			int var = (i + msg.sg.start) % MAX_MSG_FRAGS;	\
+			int len = in_lens[i];				\
+									\
+			if ((_len) < omsg.sg.size + len)		\
+				len = (_len) - omsg.sg.size;		\
+			omsg.sg.data[var].length = len;			\
+			omsg.sg.size += len;				\
+		}							\
+									\
+		fprintf(stderr, "test #%2u ", test_ID);			\
+		dump_msg("", &msg, "");					\
+		sk_msg_trim(NULL, &msg, (_len));			\
+									\
+		if (memcmp(&msg, &omsg, sizeof(msg))) {			\
+			fprintf(stderr, "\tfailed\n");			\
+			dump_msg("  result", &msg, "\n");		\
+			dump_msg("  expect", &omsg, "\n");		\
+		} else {						\
+			fprintf(stderr, "\tOKAY\n");			\
+		}							\
+		test_ID++;						\
+} while (0)
+
+static unsigned int test_ID;
+
+int main()
+{
+	test_one(/* start */ 0, /* curr */ 0, /* copybreak */ 200,
+		 /* trim */ 100,
+		 /* curr */ 0, /* copybreak */ 100, /* end */ 1,
+		 /* data */ 200);
+
+	test_one(/* start */ 1, /* curr */ 1, /* copybreak */ 200,
+		 /* trim */ 100,
+		 /* curr */ 1, /* copybreak */ 100, /* end */ 2,
+		 /* data */ 200);
+
+	test_one(/* start */ 1, /* curr */ 1, /* copybreak */ 200,
+		 /* trim */ 300,
+		 /* curr */ 1, /* copybreak */ 200, /* end */ 3,
+		 /* data */ 200, 200);
+
+	test_one(/* start */ 1, /* curr */ 2, /* copybreak */ 200,
+		 /* trim */ 200,
+		 /* curr */ 1, /* copybreak */ 200, /* end */ 2,
+		 /* data */ 200, 200, 200);
+
+	test_one(/* start */ 1, /* curr */ 3, /* copybreak */ 200,
+		 /* trim */ 200,
+		 /* curr */ 1, /* copybreak */ 200, /* end */ 2,
+		 /* data */ 200, 200, 200);
+
+	test_one(/* start */ 1, /* curr */ 2, /* copybreak */ 200,
+		 /* trim */ 0,
+		 /* curr */ 1, /* copybreak */ 0, /* end */ 1,
+		 /* data */ 200, 200, 200);
+
+	test_one(/* start */ 1, /* curr */ 1, /* copybreak */ 200,
+		 /* trim */ 0,
+		 /* curr */ 1, /* copybreak */ 0, /* end */ 1,
+		 /* data */ 200, 200, 200, 200, 200);
+
+	test_one(/* start */ 1, /* curr */ 3, /* copybreak */ 100,
+		 /* trim */ 0,
+		 /* curr */ 1, /* copybreak */ 0, /* end */ 1,
+		 /* data */ 200, 200, 200, 200, 200);
+
+	test_one(/* start */ 1, /* curr */ 0, /* copybreak */ 200,
+		 /* trim */ 0,
+		 /* curr */ 1, /* copybreak */ 0, /* end */ 1,
+		 /* data */ 200, 200, 200, 200, 200);
+
+	test_one(/* start */ 1, /* curr */ 0, /* copybreak */ 200,
+		 /* trim */ 900,
+		 /* curr */ 0, /* copybreak */ 100, /* end */ 1,
+		 /* data */ 200, 200, 200, 200, 200);
+
+	test_one(/* start */ 1, /* curr */ 0, /* copybreak */ 200,
+		 /* trim */ 900,
+		 /* curr */ 0, /* copybreak */ 100, /* end */ 1,
+		 /* data */ 200, 200, 200, 200, 200);
+
+	test_one(/* start */ 0, /* curr */ 1, /* copybreak */ 0,
+		 /* trim */ 100,
+		 /* curr */ 0, /* copybreak */ 100, /* end */ 1,
+		 /* data */ 200);
+
+	test_one(/* start */ 1, /* curr */ 2, /* copybreak */ 0,
+		 /* trim */ 100,
+		 /* curr */ 1, /* copybreak */ 100, /* end */ 2,
+		 /* data */ 200);
+
+	return 0;
+}
+
+--MP_/y928O4Z.I7HqST5oCUO3V22--
