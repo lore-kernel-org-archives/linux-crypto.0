@@ -3,335 +3,211 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E64E5CA9ECF
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Nov 2019 15:01:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76E4ACA9ECF
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Nov 2019 16:43:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A436F217D9
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Nov 2019 15:01:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3303B21734
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Nov 2019 16:43:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CBAVAwRe"
+	dkim=pass (1024-bit key) header.d=microchiptechnology.onmicrosoft.com header.i=@microchiptechnology.onmicrosoft.com header.b="tDRyo8vH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727732AbfKAPBK (ORCPT
+        id S1727269AbfKAQnD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 1 Nov 2019 11:01:10 -0400
-Received: from mail-io1-f68.google.com ([209.85.166.68]:39043 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727465AbfKAPBK (ORCPT
+        Fri, 1 Nov 2019 12:43:03 -0400
+Received: from esa2.microchip.iphmx.com ([68.232.149.84]:9168 "EHLO
+        esa2.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727148AbfKAQnC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 1 Nov 2019 11:01:10 -0400
-Received: by mail-io1-f68.google.com with SMTP id 18so11198997ion.6;
-        Fri, 01 Nov 2019 08:01:09 -0700 (PDT)
+        Fri, 1 Nov 2019 12:43:02 -0400
+Received-SPF: Pass (esa2.microchip.iphmx.com: domain of
+  Tudor.Ambarus@microchip.com designates 198.175.253.82 as
+  permitted sender) identity=mailfrom;
+  client-ip=198.175.253.82; receiver=esa2.microchip.iphmx.com;
+  envelope-from="Tudor.Ambarus@microchip.com";
+  x-sender="Tudor.Ambarus@microchip.com";
+  x-conformance=spf_only; x-record-type="v=spf1";
+  x-record-text="v=spf1 mx a:ushub1.microchip.com
+  a:smtpout.microchip.com a:mx1.microchip.iphmx.com
+  a:mx2.microchip.iphmx.com include:servers.mcsv.net
+  include:mktomail.com include:spf.protection.outlook.com ~all"
+Received-SPF: None (esa2.microchip.iphmx.com: no sender
+  authenticity information available from domain of
+  postmaster@email.microchip.com) identity=helo;
+  client-ip=198.175.253.82; receiver=esa2.microchip.iphmx.com;
+  envelope-from="Tudor.Ambarus@microchip.com";
+  x-sender="postmaster@email.microchip.com";
+  x-conformance=spf_only
+Authentication-Results: esa2.microchip.iphmx.com; spf=Pass smtp.mailfrom=Tudor.Ambarus@microchip.com; spf=None smtp.helo=postmaster@email.microchip.com; dkim=pass (signature verified) header.i=@microchiptechnology.onmicrosoft.com; dmarc=pass (p=none dis=none) d=microchip.com
+IronPort-SDR: RULPMlJxXsQPFt0BWr8WzfA1jyw/6nrEHwi9xLbMa6lbfwXZ+Quxx7LV2O80SMxhnz1C7lwo8Y
+ k2yN0AbtIRsBEt8iYCCMfeC2hBu4qJslMG5K5XhzAZkNjXIjhoeAC1gjAuCm7cNKU/Nh1GjrAR
+ WQZ0keFRrqVUXgCZo88R2y2h13JQPjcN1ATKklGR3aM9YBT1iQwpxoEnc0CXvBG7BMYmJmqQ/d
+ rJS0aZXzLRw+2unIdZZNyf/e6gArE0+V14U6jUTlrPrZ/bjJeW+3eoZ7rkd1yLccY7cZwZ3QWm
+ G2M=
+X-IronPort-AV: E=Sophos;i="5.68,256,1569308400"; 
+   d="scan'208";a="54996722"
+Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 01 Nov 2019 09:43:01 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Fri, 1 Nov 2019 09:43:01 -0700
+Received: from NAM05-DM3-obe.outbound.protection.outlook.com (10.10.215.89) by
+ email.microchip.com (10.10.87.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5 via Frontend
+ Transport; Fri, 1 Nov 2019 09:43:00 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=n4m2YimchV5IS4Db93RmiY2g4uI7dLDnFEmMm0CnLuw0tKuNH9YQHGC4PetOeoCIinHMFCcwkEIl/BPfpf9qLOdhlSpW/d4CKN5I0UUuwEdQOi4in6FXMRr01e7zuCoGnptKf9Drsq7AIUadE9gnonHkHGcpjANv3AGzU+DBGGzYOeXu9Xu4Xz09thniHgWtesiQQ5A9Wcv46Guq5M+IOdT9NUTdQ9P//3AQco7ZjUlPpiHrkrckLFllgI2pPCJzko7hmWOe3tPBi0YAg2J45Xj5pS/I2QYoJgsCdwbVkGN4r+ZSpu/m+pZSw9utyenbiRmH/YJCZqNwGoYRlrHoMg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NmGw3iui+eeEfIXcZHEwkjZuLlF0h9vrwYMBfxxcQl0=;
+ b=JFcqklrsXz1doLw4LvLbmLiBaYFNE4cohRVfxU0N+7XqWgobYHm2MiEDvHFDtdLKRi2M7iYZpregoNZ/1RQ+jw5JEphRPZwZa1PbPTd/8eGPm7pC9xuWp1AYQ5s06QmeF4vBMx7PYVLg2xd7XjQDNmQE9y2z2S0Ojwi1U1gLBwGGy2KnnTnjthyNXxaIvlgC96uqKo5KgBF26jvr3FDroEGojPeBMQnThrD6PZ6qalOT/lg2fj9hmYvyvq/RNa8ap1ApjhyEawYg5wB49F3AUaD0QfZ3oa5WEXb9Jcm9Fzf2Hk4AEfWO0K0n80Y6yzlvAr8MAA3/larumEuJ1PkgJA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:message-id:in-reply-to:references:subject
-         :mime-version:content-transfer-encoding;
-        bh=TBAFKynpg7YBPsA6wf6JWHl/9/CPJW3b1igBgFWJV2E=;
-        b=CBAVAwRe+WlT8H2FMtR7fWk5vsApB4R4Fwt0pkWz3jVBgDoAf7xIc4hFgWE9co51D1
-         agHmBjbRRhQPERx3eNNhu8u7zrAfz93g8DrsNjDpY1GHf3Q9wX9b3iMRdA21d+/rjp46
-         ShqjSRP0m8Nzp+YWNSoIaUQY7lDLge+zEDTJGu7AEJlo6HDf9IvBowg3yTniJoAy9ue6
-         pAZUNfsVJzeCKVgKq73jsLXDDmWdN/3uM7IpSDC/Ip9lNuaAkhiilSzheW/js4+d7CGo
-         DviEnYL7gSsf8xHlCt1okZSOpRuoHaSkwGHH/w8i7n961lQL+jdO2z7MDru+NagL+zex
-         NxmQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:message-id:in-reply-to
-         :references:subject:mime-version:content-transfer-encoding;
-        bh=TBAFKynpg7YBPsA6wf6JWHl/9/CPJW3b1igBgFWJV2E=;
-        b=MmSvCcCimzVT3OgD8P8vE0HPVGWuXBelas9lhW4oDLdLEGAiMG20RcOFvCXeW2tHDI
-         vNtF/ZqONSvDzWId2AGM5yGn8xEiVyCSHKr2tK7wy7whEBTuRSUDfK+oZo6h2j2e1suO
-         7S8+hqfcfsy9nQpczzIfehZc4ZZH8qZgDaXNc09c7i4KS+xLC+7+Uyhhoa2HJPP/6BRH
-         0D3x3vt74Z8BjLfo473mh6upvF2vlfGBNj3m9Yq3qa07ntVCnDb+t80NT4va4wE648/H
-         eIwd0XTO6Rcow9xn6h8ze86donhLQokU3reGSrdrjqUrMiAbDV30/wAZX8AtrbjTO/SB
-         pT8g==
-X-Gm-Message-State: APjAAAVCjrOVxqQha5aNEpQGZq4FWhlEvhmQlH6ZTCxOcWQh+vpuyTMk
-        Sg+n6iMlyF/6LRcLGqQGc1k=
-X-Google-Smtp-Source: APXvYqw5b6n7kBK48avlOUPepxYum5V6LVTDvUo0W+/APYB9WcQFPgKaXXVEJB2yVmTNKJqUeTAhRQ==
-X-Received: by 2002:a5d:8598:: with SMTP id f24mr9994753ioj.60.1572620468986;
-        Fri, 01 Nov 2019 08:01:08 -0700 (PDT)
-Received: from localhost ([184.63.162.180])
-        by smtp.gmail.com with ESMTPSA id m18sm735605iol.49.2019.11.01.08.01.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Nov 2019 08:01:08 -0700 (PDT)
-Date:   Fri, 01 Nov 2019 08:01:00 -0700
-From:   John Fastabend <john.fastabend@gmail.com>
-To:     Jakub Kicinski <jakub.kicinski@netronome.com>,
-        John Fastabend <john.fastabend@gmail.com>
-Cc:     davem@davemloft.net, netdev@vger.kernel.org,
-        oss-drivers@netronome.com, borisp@mellanox.com,
-        aviadye@mellanox.com, daniel@iogearbox.net,
-        syzbot+f8495bff23a879a6d0bd@syzkaller.appspotmail.com,
-        syzbot+6f50c99e8f6194bf363f@syzkaller.appspotmail.com,
-        Eric Biggers <ebiggers@kernel.org>,
-        herbert@gondor.apana.org.au, glider@google.com,
-        linux-crypto@vger.kernel.org
-Message-ID: <5dbc48ac3a8cc_e4e2b12b10265b8a1@john-XPS-13-9370.notmuch>
-In-Reply-To: <20191031215444.68a12dfe@cakuba.netronome.com>
-References: <20191030160542.30295-1-jakub.kicinski@netronome.com>
- <5dbb5ac1c208d_4c722b0ec06125c0cc@john-XPS-13-9370.notmuch>
- <20191031152444.773c183b@cakuba.netronome.com>
- <5dbbb83d61d0c_46342ae580f765bc78@john-XPS-13-9370.notmuch>
- <20191031215444.68a12dfe@cakuba.netronome.com>
-Subject: Re: [PATCH net] net/tls: fix sk_msg trim on fallback to copy mode
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+ d=microchiptechnology.onmicrosoft.com;
+ s=selector2-microchiptechnology-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NmGw3iui+eeEfIXcZHEwkjZuLlF0h9vrwYMBfxxcQl0=;
+ b=tDRyo8vHGXqgwJKbGHcUJAjMEDuVGPSUKnZsqykUJwocDaxMsMlpbLIih8OVop+liTAsXRL7FJu8Q28BmSJghjqVwDtZVoDgrvQXpe0yNvBPkbsfLJg6HOFV3YB76sq9iYBhk5lJwXE6uWwGuB5f3Uf2F+H7l1UBC/q/pNQycoE=
+Received: from MN2PR11MB4448.namprd11.prod.outlook.com (52.135.39.157) by
+ MN2PR11MB3726.namprd11.prod.outlook.com (20.178.251.209) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2387.20; Fri, 1 Nov 2019 16:42:58 +0000
+Received: from MN2PR11MB4448.namprd11.prod.outlook.com
+ ([fe80::c09c:36c8:3301:4457]) by MN2PR11MB4448.namprd11.prod.outlook.com
+ ([fe80::c09c:36c8:3301:4457%5]) with mapi id 15.20.2408.018; Fri, 1 Nov 2019
+ 16:42:58 +0000
+From:   <Tudor.Ambarus@microchip.com>
+To:     <herbert@gondor.apana.org.au>, <linux-crypto@vger.kernel.org>,
+        <cyrille.pitchen@atmel.com>
+Subject: Re: crypto: atmel - Fix authenc support when it is set to m
+Thread-Topic: crypto: atmel - Fix authenc support when it is set to m
+Thread-Index: AQHVjWLV/yC0HfSHhU2H8roX+5OQuqd2i/UA
+Date:   Fri, 1 Nov 2019 16:42:57 +0000
+Message-ID: <7cc2ef12-0711-e72a-9bf8-27f5eb1f7827@microchip.com>
+References: <20191028073907.pbk6j5fvi7ludbvx@gondor.apana.org.au>
+In-Reply-To: <20191028073907.pbk6j5fvi7ludbvx@gondor.apana.org.au>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: VI1PR0801CA0085.eurprd08.prod.outlook.com
+ (2603:10a6:800:7d::29) To MN2PR11MB4448.namprd11.prod.outlook.com
+ (2603:10b6:208:193::29)
+x-ms-exchange-messagesentrepresentingtype: 1
+x-originating-ip: [86.120.239.29]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: c1a2cdbc-7e82-447b-a1a1-08d75eea8cf4
+x-ms-traffictypediagnostic: MN2PR11MB3726:
+x-microsoft-antispam-prvs: <MN2PR11MB372648C859AED6B952D74532F0620@MN2PR11MB3726.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2150;
+x-forefront-prvs: 020877E0CB
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(136003)(366004)(346002)(39860400002)(396003)(376002)(199004)(189003)(486006)(6246003)(76176011)(25786009)(186003)(386003)(2616005)(31696002)(66946007)(66556008)(64756008)(3846002)(478600001)(229853002)(476003)(71200400001)(11346002)(71190400001)(14454004)(6486002)(6506007)(52116002)(66476007)(6116002)(14444005)(53546011)(446003)(86362001)(256004)(26005)(6436002)(102836004)(316002)(31686004)(6512007)(2906002)(66446008)(8676002)(5660300002)(110136005)(81156014)(7736002)(305945005)(36756003)(66066001)(8936002)(99286004)(81166006)(129723003);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR11MB3726;H:MN2PR11MB4448.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: microchip.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: XzksDKeVmvX0Gs3Mzl1G3moMNGCxifV/L4TApVqt8j6OlEHLpahnx48v3YMeV05L021DnB622zxyqmrBxRRQbRmBSrebUIg+3/SB3nzAJUOK8VyWCr6Z9U9IzR5fuLXTKUN3jkYwxa/tyvx6XbggZDrt8G8v0cf+l//EEAUF6KNhRhJfnUgNw2IsjR+IOZ3xVKNWgNKmnzN/N7XW01Uyt5APJDxtINhqFdW0DwADCsXjb0is3J5sqooHxb3G9vvg50lKYtdZFXLgcruZLHBFTeUdVsJ+zVMKtIJuhM5UROa74hBH31dTR2CJs06SSy3SE7IIsfW/2JbOZ90mEBDZE/ObrEN7xbZlWy6w3hkhJEpqp6N6HcnhWpkP16NCc4C0IfCaGLj6/qsx2+w4C88GW3wQsCeS0VP5eCC78YQiKtOuipLO7yyfDzvaGn9IPCAk
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F708EBF1DD17CD44A68F97CE462099AB@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-Network-Message-Id: c1a2cdbc-7e82-447b-a1a1-08d75eea8cf4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Nov 2019 16:42:57.8573
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vYe2noIZcv+0KrbD5IYhWe1rhPy87oVC1tYTJhEqerqlW3f/3CqHbAzMIgN8y+J6HkeJsurTdsxB6I0rfY7sLOSr7uB9yragfe4hPQeDrps=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB3726
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Jakub Kicinski wrote:
-> On Thu, 31 Oct 2019 21:44:45 -0700, John Fastabend wrote:
-> > Jakub Kicinski wrote:
-> > > On Thu, 31 Oct 2019 15:05:53 -0700, John Fastabend wrote:  
-> > > > Jakub Kicinski wrote:  
-> > > > > sk_msg_trim() tries to only update curr pointer if it falls into
-> > > > > the trimmed region. The logic, however, does not take into the
-> > > > > account pointer wrapping that sk_msg_iter_var_prev() does.
-> > > > > This means that when the message was trimmed completely, the new
-> > > > > curr pointer would have the value of MAX_MSG_FRAGS - 1, which is
-> > > > > neither smaller than any other value, nor would it actually be
-> > > > > correct.
-> > > > > 
-> > > > > Special case the trimming to 0 length a little bit.
-> > > > > 
-> > > > > This bug caused the TLS code to not copy all of the message, if
-> > > > > zero copy filled in fewer sg entries than memcopy would need.
-> > > > > 
-> > > > > Big thanks to Alexander Potapenko for the non-KMSAN reproducer.
-> > > > > 
-> > > > > Fixes: d829e9c4112b ("tls: convert to generic sk_msg interface")
-> > > > > Reported-by: syzbot+f8495bff23a879a6d0bd@syzkaller.appspotmail.com
-> > > > > Reported-by: syzbot+6f50c99e8f6194bf363f@syzkaller.appspotmail.com
-> > > > > Signed-off-by: Jakub Kicinski <jakub.kicinski@netronome.com>
-> > > > > ---
-> > > > > Daniel, John, does this look okay?    
-> > > > 
-> > > > Thanks for the second ping!  
-> > > 
-> > > No problem, I was worried the patch got categorized as TLS and therefore
-> > > lower prio ;)  
-> > 
-> > Nope close to the top of the list here.
-> > 
-> > >   
-> >  [...]  
-> >  [...]  
-> > > 
-> > > I see, that makes sense and explains some of the complexity!
-> > > 
-> > > Perhaps the simplest way to go would be to adjust the curr as we go
-> > > then? The comparison logic could get a little hairy. So like this:  
-> > 
-> > I don't think the comparison is too bad. Working it out live here. First
-> > do a bit of case analysis, We have 3 pointers so there are 3!=6 possible
-> > arrangements (permutations),
-> > 
-> >  1. S,C,E  6. S,E,C
-> >  5. C,S,E  2. C,E,S
-> >  3. E,S,C  4. E,C,S
-> > 
-> > 
-> > Case 1: Normal case start < curr < end
-> >  
-> >     0 1 2                              N = MAX_MSG_FRAGS
-> >     |_|_|_|...|_|_|_|...|_|_|_|_|....|_|_|
-> >         ^       ^         ^
-> >         start   curr      end
-> > 
-> >   if (start < end && i < curr)
-> >      curr = i;
-> >         
-> >  
-> > Case 2: curr < end < start (in absolute index terms)
-> > 
-> >     0 1 2                              N = MAX_MSG_FRAGS
-> >     |_|_|_|...|_|_|_|...|_|_|_|_|....|_|_|
-> >         ^       ^         ^
-> >         curr    end       start
-> > 
-> >    if (end < start && (i < curr || i > start))
-> >         curr = i
-> > 
-> > 
-> > Case 3: end < start < curr
-> > 
-> >     0 1 2                              N = MAX_MSG_FRAGS
-> >     |_|_|_|...|_|_|_|...|_|_|_|_|....|_|_|
-> >                 ^         ^          ^
-> >                 end       start      curr
-> > 
-> > 
-> >    if (end < start && (i < curr)
-> >        curr = i;
-> > 
-> > 
-> > Case 4: end < curr < start
-> > 
-> >     0 1 2                              N = MAX_MSG_FRAGS
-> >     |_|_|_|...|_|_|_|...|_|_|_|_|....|_|_|
-> >                 ^         ^          ^
-> >                 end       curr       start 
-> > 
-> > (nonsense curr would be invalid here it must be between the start and end)
-> > 
-> > Case 5: curr < start < end
-> > 
-> >     0 1 2                              N = MAX_MSG_FRAGS
-> >     |_|_|_|...|_|_|_|...|_|_|_|_|....|_|_|
-> >                 ^         ^          ^
-> >                 curr      start      end 
-> > 
-> > (nonsense curr would be invalid here it must be between the start and end)
-> > 
-> > Case 6: start < end < curr 
-> > 
-> >     0 1 2                              N = MAX_MSG_FRAGS
-> >     |_|_|_|...|_|_|_|...|_|_|_|_|....|_|_|
-> >                 ^         ^          ^
-> >                 start     end        curr 
-> > 
-> > (nonsense curr would be invalid here it must be between the start and end)
-> > 
-> > So I think the following would suffice,
-> > 
-> > 
-> >   if (msg->sg.start < msg->sg.end && i < msg->sg.curr) {
-> >      msg->sg.curr = i;
-> >      msg->sg.copybreak = msg->sg.data[i].length;
-> >   } else if (msg->sg.end < msg->sg.start && (i < msg->sg.curr || i > msg->sg.start))
-> >      msg->sg.curr = i;
-> >      msg->sg.copybreak = msg->sg.data[i].length;
-> >   } else if (msg->sg.end < msg->sg.start && (i < msg->sg.curr) {
-> >      curr = i;
-> >      msg->sg.copybreak = msg->sg.data[i].length;
-> >   }
-> > 
-> > Finally fold the last two cases into one so we get
-> > 
-> >   if (msg->sg.start < msg->sg.end && i < msg->sg.curr) {
-> >      msg->sg.curr = i;
-> >      msg->sg.copybreak = msg->sg.data[i].length;
-> >   } else if (msg->sg.end < msg->sg.start && (i < msg->sg.curr || i > msg->sg.start))
-> >      msg->sg.curr = i;
-> >      msg->sg.copybreak = msg->sg.data[i].length;
-> > 
-> > So not so bad. Put that in a helper in sk_msg.h and use it in trim. I can check
-> > logic in the AM and draft a patch but I think that should be correct. Also will
-> > need to audit to see if there are other cases this happens. In general I tried
-> > to always use i == msg->sg.{start|end|curr} to avoid this.
-> 
-> I will look in depth tomorrow as well, the full/empty cases are a
-> little tricky to fold into general logic.
-> 
-> I came up with this before I got distracted Halloweening :)
-
-Same here. Looking at the two cases from above.
-
-   if (msg->sg.start < msg->sg.end &&
-       i < msg->sg.curr) {  // i <= msg->sg.curr
-      msg->sg.curr = i;
-      msg->sg.copybreak = msg->sg.data[i].length;
-   }
-
-If we happen to trim the entire msg so size=0 then i==start
-which should mean i < msg->sg.curr unless msg->sg.curr = msg->sg.start
-so we should just use <=. In the second case.
-
-   else if (msg->sg.end < msg->sg.start &&
-           (i < msg->sg.curr || i > msg->sg.start)) { // i <= msg->sg.curr
-      msg->sg.curr = i;
-      msg->sg.copybreak = msg->sg.data[i].length;
-   }
- 
-If we trim the entire message here i == sg.start again. And same
-thing use <= and we should catch case sg.tart = sg.curr.
-
-In the full case we didn't trim anything so we shouldn't do any
-manipulating of curr or copybreak.
-
-> 
-> diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
-> index e4b3fb4bb77c..ce7055259877 100644
-> --- a/include/linux/skmsg.h
-> +++ b/include/linux/skmsg.h
-> @@ -139,6 +139,11 @@ static inline void sk_msg_apply_bytes(struct sk_psock *psock, u32 bytes)
->  	}
->  }
->  
-> +static inline u32 sk_msg_iter_dist(u32 start, u32 end)
-> +{
-> +	return end >= start ? end - start : end + (MAX_MSG_FRAGS - start);
-> +}
-> +
->  #define sk_msg_iter_var_prev(var)			\
->  	do {						\
->  		if (var == 0)				\
-> @@ -198,9 +203,7 @@ static inline u32 sk_msg_elem_used(const struct sk_msg *msg)
->  	if (sk_msg_full(msg))
->  		return MAX_MSG_FRAGS;
->  
-> -	return msg->sg.end >= msg->sg.start ?
-> -		msg->sg.end - msg->sg.start :
-> -		msg->sg.end + (MAX_MSG_FRAGS - msg->sg.start);
-> +	return sk_msg_iter_dist(msg->sg.start, msg->sg.end);
->  }
->  
->  static inline struct scatterlist *sk_msg_elem(struct sk_msg *msg, int which)
-> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-> index cf390e0aa73d..f6b4a70bafa9 100644
-> --- a/net/core/skmsg.c
-> +++ b/net/core/skmsg.c
-> @@ -270,18 +270,26 @@ void sk_msg_trim(struct sock *sk, struct sk_msg *msg, int len)
->  
->  	msg->sg.data[i].length -= trim;
->  	sk_mem_uncharge(sk, trim);
-> +	if (msg->sg.curr == i && msg->sg.copybreak > msg->sg.data[i].length)
-> +		msg->sg.copybreak = msg->sg.data[i].length;
->  out:
-> +	sk_msg_iter_var_next(i);
-> +	msg->sg.end = i;
-> +
->  	/* If we trim data before curr pointer update copybreak and current
->  	 * so that any future copy operations start at new copy location.
->  	 * However trimed data that has not yet been used in a copy op
->  	 * does not require an update.
->  	 */
-> -	if (msg->sg.curr >= i) {
-> +	if (!msg->sg.size) {
-
-I do think its a bit nicer if we don't special case the size = 0 case. If
-we get here and i != start then we would have extra bytes in the sg
-items between the items (i, end) and nonzero size. If i == start then the
-we sg.size = 0. I don't think there are any other cases.
-
-> +		msg->sg.curr = 0;
-> +		msg->sg.copybreak = 0;
-> +	} else if (sk_msg_iter_dist(msg->sg.start, msg->sg.curr) >
-> +		   sk_msg_iter_dist(msg->sg.end, msg->sg.curr)) {
-> +		sk_msg_iter_var_prev(i);
-
-I suspect with small update to dist logic the special case could also
-be dropped here. But I have a preference for my example above at the
-moment. Just getting coffee now so will think on it though.
-
-FWIW I've not compiled my example.
-
->  		msg->sg.curr = i;
->  		msg->sg.copybreak = msg->sg.data[i].length;
->  	}
-> -	sk_msg_iter_var_next(i);
-> -	msg->sg.end = i;
->  }
->  EXPORT_SYMBOL_GPL(sk_msg_trim);
->  
-> -- 
-> 2.23.0
-
-
+DQoNCk9uIDEwLzI4LzIwMTkgMDk6MzkgQU0sIEhlcmJlcnQgWHUgd3JvdGU6DQo+IEV4dGVybmFs
+IEUtTWFpbA0KPiANCj4gDQo+IEFzIGl0IGlzIGlmIENPTkZJR19DUllQVE9fREVWX0FUTUVMX0FV
+VEhFTkMgaXMgc2V0IHRvIG0gaXQgaXMgaW4NCj4gZWZmZWN0IGRpc2FibGVkLiAgVGhpcyBwYXRj
+aCBmaXhlcyBpdCBieSB1c2luZyBJU19FTkFCTEVEIGluc3RlYWQNCj4gb2YgaWZkZWYuDQo+IA0K
+PiBGaXhlczogODlhODJlZjg3ZTAxICgiY3J5cHRvOiBhdG1lbC1hdXRoZW5jIC0gYWRkIHN1cHBv
+cnQgdG8uLi4iKQ0KPiBTaWduZWQtb2ZmLWJ5OiBIZXJiZXJ0IFh1IDxoZXJiZXJ0QGdvbmRvci5h
+cGFuYS5vcmcuYXU+DQo+IA0KDQpSZXZpZXdlZC1ieTogVHVkb3IgQW1iYXJ1cyA8dHVkb3IuYW1i
+YXJ1c0BtaWNyb2NoaXAuY29tPg0KDQo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL2NyeXB0by9hdG1l
+bC1hZXMuYyBiL2RyaXZlcnMvY3J5cHRvL2F0bWVsLWFlcy5jDQo+IGluZGV4IDMzYTc2ZDFmNGE2
+ZS4uYzVlYzc0MTcxZmJmIDEwMDY0NA0KPiAtLS0gYS9kcml2ZXJzL2NyeXB0by9hdG1lbC1hZXMu
+Yw0KPiArKysgYi9kcml2ZXJzL2NyeXB0by9hdG1lbC1hZXMuYw0KPiBAQCAtMTQ1LDcgKzE0NSw3
+IEBAIHN0cnVjdCBhdG1lbF9hZXNfeHRzX2N0eCB7DQo+ICAJdTMyCQkJa2V5MltBRVNfS0VZU0la
+RV8yNTYgLyBzaXplb2YodTMyKV07DQo+ICB9Ow0KPiAgDQo+IC0jaWZkZWYgQ09ORklHX0NSWVBU
+T19ERVZfQVRNRUxfQVVUSEVOQw0KPiArI2lmIElTX0VOQUJMRUQoQ09ORklHX0NSWVBUT19ERVZf
+QVRNRUxfQVVUSEVOQykNCj4gIHN0cnVjdCBhdG1lbF9hZXNfYXV0aGVuY19jdHggew0KPiAgCXN0
+cnVjdCBhdG1lbF9hZXNfYmFzZV9jdHgJYmFzZTsNCj4gIAlzdHJ1Y3QgYXRtZWxfc2hhX2F1dGhl
+bmNfY3R4CSphdXRoOw0KPiBAQCAtMTU3LDcgKzE1Nyw3IEBAIHN0cnVjdCBhdG1lbF9hZXNfcmVx
+Y3R4IHsNCj4gIAl1MzIJCQlsYXN0Y1tBRVNfQkxPQ0tfU0laRSAvIHNpemVvZih1MzIpXTsNCj4g
+IH07DQo+ICANCj4gLSNpZmRlZiBDT05GSUdfQ1JZUFRPX0RFVl9BVE1FTF9BVVRIRU5DDQo+ICsj
+aWYgSVNfRU5BQkxFRChDT05GSUdfQ1JZUFRPX0RFVl9BVE1FTF9BVVRIRU5DKQ0KPiAgc3RydWN0
+IGF0bWVsX2Flc19hdXRoZW5jX3JlcWN0eCB7DQo+ICAJc3RydWN0IGF0bWVsX2Flc19yZXFjdHgJ
+YmFzZTsNCj4gIA0KPiBAQCAtNDg2LDcgKzQ4Niw3IEBAIHN0YXRpYyBpbmxpbmUgYm9vbCBhdG1l
+bF9hZXNfaXNfZW5jcnlwdChjb25zdCBzdHJ1Y3QgYXRtZWxfYWVzX2RldiAqZGQpDQo+ICAJcmV0
+dXJuIChkZC0+ZmxhZ3MgJiBBRVNfRkxBR1NfRU5DUllQVCk7DQo+ICB9DQo+ICANCj4gLSNpZmRl
+ZiBDT05GSUdfQ1JZUFRPX0RFVl9BVE1FTF9BVVRIRU5DDQo+ICsjaWYgSVNfRU5BQkxFRChDT05G
+SUdfQ1JZUFRPX0RFVl9BVE1FTF9BVVRIRU5DKQ0KPiAgc3RhdGljIHZvaWQgYXRtZWxfYWVzX2F1
+dGhlbmNfY29tcGxldGUoc3RydWN0IGF0bWVsX2Flc19kZXYgKmRkLCBpbnQgZXJyKTsNCj4gICNl
+bmRpZg0KPiAgDQo+IEBAIC01MTUsNyArNTE1LDcgQEAgc3RhdGljIHZvaWQgYXRtZWxfYWVzX3Nl
+dF9pdl9hc19sYXN0X2NpcGhlcnRleHRfYmxvY2soc3RydWN0IGF0bWVsX2Flc19kZXYgKmRkKQ0K
+PiAgDQo+ICBzdGF0aWMgaW5saW5lIGludCBhdG1lbF9hZXNfY29tcGxldGUoc3RydWN0IGF0bWVs
+X2Flc19kZXYgKmRkLCBpbnQgZXJyKQ0KPiAgew0KPiAtI2lmZGVmIENPTkZJR19DUllQVE9fREVW
+X0FUTUVMX0FVVEhFTkMNCj4gKyNpZiBJU19FTkFCTEVEKENPTkZJR19DUllQVE9fREVWX0FUTUVM
+X0FVVEhFTkMpDQo+ICAJaWYgKGRkLT5jdHgtPmlzX2FlYWQpDQo+ICAJCWF0bWVsX2Flc19hdXRo
+ZW5jX2NvbXBsZXRlKGRkLCBlcnIpOw0KPiAgI2VuZGlmDQo+IEBAIC0xOTgwLDcgKzE5ODAsNyBA
+QCBzdGF0aWMgc3RydWN0IGNyeXB0b19hbGcgYWVzX3h0c19hbGcgPSB7DQo+ICAJfQ0KPiAgfTsN
+Cj4gIA0KPiAtI2lmZGVmIENPTkZJR19DUllQVE9fREVWX0FUTUVMX0FVVEhFTkMNCj4gKyNpZiBJ
+U19FTkFCTEVEKENPTkZJR19DUllQVE9fREVWX0FUTUVMX0FVVEhFTkMpDQo+ICAvKiBhdXRoZW5j
+IGFlYWQgZnVuY3Rpb25zICovDQo+ICANCj4gIHN0YXRpYyBpbnQgYXRtZWxfYWVzX2F1dGhlbmNf
+c3RhcnQoc3RydWN0IGF0bWVsX2Flc19kZXYgKmRkKTsNCj4gQEAgLTI0NjcsNyArMjQ2Nyw3IEBA
+IHN0YXRpYyB2b2lkIGF0bWVsX2Flc191bnJlZ2lzdGVyX2FsZ3Moc3RydWN0IGF0bWVsX2Flc19k
+ZXYgKmRkKQ0KPiAgew0KPiAgCWludCBpOw0KPiAgDQo+IC0jaWZkZWYgQ09ORklHX0NSWVBUT19E
+RVZfQVRNRUxfQVVUSEVOQw0KPiArI2lmIElTX0VOQUJMRUQoQ09ORklHX0NSWVBUT19ERVZfQVRN
+RUxfQVVUSEVOQykNCj4gIAlpZiAoZGQtPmNhcHMuaGFzX2F1dGhlbmMpDQo+ICAJCWZvciAoaSA9
+IDA7IGkgPCBBUlJBWV9TSVpFKGFlc19hdXRoZW5jX2FsZ3MpOyBpKyspDQo+ICAJCQljcnlwdG9f
+dW5yZWdpc3Rlcl9hZWFkKCZhZXNfYXV0aGVuY19hbGdzW2ldKTsNCj4gQEAgLTI1MTQsNyArMjUx
+NCw3IEBAIHN0YXRpYyBpbnQgYXRtZWxfYWVzX3JlZ2lzdGVyX2FsZ3Moc3RydWN0IGF0bWVsX2Fl
+c19kZXYgKmRkKQ0KPiAgCQkJZ290byBlcnJfYWVzX3h0c19hbGc7DQo+ICAJfQ0KPiAgDQo+IC0j
+aWZkZWYgQ09ORklHX0NSWVBUT19ERVZfQVRNRUxfQVVUSEVOQw0KPiArI2lmIElTX0VOQUJMRUQo
+Q09ORklHX0NSWVBUT19ERVZfQVRNRUxfQVVUSEVOQykNCj4gIAlpZiAoZGQtPmNhcHMuaGFzX2F1
+dGhlbmMpIHsNCj4gIAkJZm9yIChpID0gMDsgaSA8IEFSUkFZX1NJWkUoYWVzX2F1dGhlbmNfYWxn
+cyk7IGkrKykgew0KPiAgCQkJZXJyID0gY3J5cHRvX3JlZ2lzdGVyX2FlYWQoJmFlc19hdXRoZW5j
+X2FsZ3NbaV0pOw0KPiBAQCAtMjUyNiw3ICsyNTI2LDcgQEAgc3RhdGljIGludCBhdG1lbF9hZXNf
+cmVnaXN0ZXJfYWxncyhzdHJ1Y3QgYXRtZWxfYWVzX2RldiAqZGQpDQo+ICANCj4gIAlyZXR1cm4g
+MDsNCj4gIA0KPiAtI2lmZGVmIENPTkZJR19DUllQVE9fREVWX0FUTUVMX0FVVEhFTkMNCj4gKyNp
+ZiBJU19FTkFCTEVEKENPTkZJR19DUllQVE9fREVWX0FUTUVMX0FVVEhFTkMpDQo+ICAJLyogaSA9
+IEFSUkFZX1NJWkUoYWVzX2F1dGhlbmNfYWxncyk7ICovDQo+ICBlcnJfYWVzX2F1dGhlbmNfYWxn
+Og0KPiAgCWZvciAoaiA9IDA7IGogPCBpOyBqKyspDQo+IEBAIC0yNzE2LDcgKzI3MTYsNyBAQCBz
+dGF0aWMgaW50IGF0bWVsX2Flc19wcm9iZShzdHJ1Y3QgcGxhdGZvcm1fZGV2aWNlICpwZGV2KQ0K
+PiAgDQo+ICAJYXRtZWxfYWVzX2dldF9jYXAoYWVzX2RkKTsNCj4gIA0KPiAtI2lmZGVmIENPTkZJ
+R19DUllQVE9fREVWX0FUTUVMX0FVVEhFTkMNCj4gKyNpZiBJU19FTkFCTEVEKENPTkZJR19DUllQ
+VE9fREVWX0FUTUVMX0FVVEhFTkMpDQo+ICAJaWYgKGFlc19kZC0+Y2Fwcy5oYXNfYXV0aGVuYyAm
+JiAhYXRtZWxfc2hhX2F1dGhlbmNfaXNfcmVhZHkoKSkgew0KPiAgCQllcnIgPSAtRVBST0JFX0RF
+RkVSOw0KPiAgCQlnb3RvIGljbGtfdW5wcmVwYXJlOw0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9j
+cnlwdG8vYXRtZWwtYXV0aGVuYy5oIGIvZHJpdmVycy9jcnlwdG8vYXRtZWwtYXV0aGVuYy5oDQo+
+IGluZGV4IGNiZDM3YTJlZGFkYS4uZDZkZTgxMGRmNDRmIDEwMDY0NA0KPiAtLS0gYS9kcml2ZXJz
+L2NyeXB0by9hdG1lbC1hdXRoZW5jLmgNCj4gKysrIGIvZHJpdmVycy9jcnlwdG8vYXRtZWwtYXV0
+aGVuYy5oDQo+IEBAIC0xMiw3ICsxMiw3IEBADQo+ICAjaWZuZGVmIF9fQVRNRUxfQVVUSEVOQ19I
+X18NCj4gICNkZWZpbmUgX19BVE1FTF9BVVRIRU5DX0hfXw0KPiAgDQo+IC0jaWZkZWYgQ09ORklH
+X0NSWVBUT19ERVZfQVRNRUxfQVVUSEVOQw0KPiArI2lmIElTX0VOQUJMRUQoQ09ORklHX0NSWVBU
+T19ERVZfQVRNRUxfQVVUSEVOQykNCj4gIA0KPiAgI2luY2x1ZGUgPGNyeXB0by9hdXRoZW5jLmg+
+DQo+ICAjaW5jbHVkZSA8Y3J5cHRvL2hhc2guaD4NCj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMvY3J5
+cHRvL2F0bWVsLXNoYS5jIGIvZHJpdmVycy9jcnlwdG8vYXRtZWwtc2hhLmMNCj4gaW5kZXggODRj
+Yjg3NDhhNzk1Li5kMzI2MjY0NThlNjcgMTAwNjQ0DQo+IC0tLSBhL2RyaXZlcnMvY3J5cHRvL2F0
+bWVsLXNoYS5jDQo+ICsrKyBiL2RyaXZlcnMvY3J5cHRvL2F0bWVsLXNoYS5jDQo+IEBAIC0yMjEy
+LDcgKzIyMTIsNyBAQCBzdGF0aWMgc3RydWN0IGFoYXNoX2FsZyBzaGFfaG1hY19hbGdzW10gPSB7
+DQo+ICB9LA0KPiAgfTsNCj4gIA0KPiAtI2lmZGVmIENPTkZJR19DUllQVE9fREVWX0FUTUVMX0FV
+VEhFTkMNCj4gKyNpZiBJU19FTkFCTEVEKENPTkZJR19DUllQVE9fREVWX0FUTUVMX0FVVEhFTkMp
+DQo+ICAvKiBhdXRoZW5jIGZ1bmN0aW9ucyAqLw0KPiAgDQo+ICBzdGF0aWMgaW50IGF0bWVsX3No
+YV9hdXRoZW5jX2luaXQyKHN0cnVjdCBhdG1lbF9zaGFfZGV2ICpkZCk7DQo+IA0K
