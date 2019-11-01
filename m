@@ -2,100 +2,336 @@ Return-Path: <SRS0=WdwO=YZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B926CA9ECF
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Nov 2019 14:37:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E64E5CA9ECF
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Nov 2019 15:01:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 134082085B
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 Nov 2019 14:37:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A436F217D9
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 Nov 2019 15:01:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a0G3CKeV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CBAVAwRe"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726701AbfKAOhv (ORCPT
+        id S1727732AbfKAPBK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 1 Nov 2019 10:37:51 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:42051 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726658AbfKAOhv (ORCPT
+        Fri, 1 Nov 2019 11:01:10 -0400
+Received: from mail-io1-f68.google.com ([209.85.166.68]:39043 "EHLO
+        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727465AbfKAPBK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 1 Nov 2019 10:37:51 -0400
-Received: by mail-wr1-f66.google.com with SMTP id a15so9857738wrf.9;
-        Fri, 01 Nov 2019 07:37:50 -0700 (PDT)
+        Fri, 1 Nov 2019 11:01:10 -0400
+Received: by mail-io1-f68.google.com with SMTP id 18so11198997ion.6;
+        Fri, 01 Nov 2019 08:01:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=iDATA8UWRvuERkVCUo3sHEhaiMy110+5RvXbe9baKYQ=;
-        b=a0G3CKeV4eMZvWvCK5eajXp9N4sKVrGEqIPZIYw5GZOswevSnjtindYVUVrXWrfMRI
-         JMacgwry7FiP4VCmUhiWGkaZ7f5bYkxpt6lmdx9etuDNCo+14TpcACqzVVa4/DNbA2Cc
-         u2HwS6yoKafmZPP1oXL3o/PX4qHIUjL7lD57BUhUCBW1+5XV7+xsRBMAWZxdRR0YRnlr
-         Ozd0YULIoCcc2kgF/ro8ZBKfFyYnMIVVPc1E2T9lHoD9OmA5SEpxixOZNTeZuE40uNmv
-         nSLJTGmRLeaDjfJKZsAtEiEQ3MwLZ5m5vD+RDVHJTHeHw3tQyaVNAma4+kpQ4ijcIdga
-         aCng==
+        h=date:from:to:cc:message-id:in-reply-to:references:subject
+         :mime-version:content-transfer-encoding;
+        bh=TBAFKynpg7YBPsA6wf6JWHl/9/CPJW3b1igBgFWJV2E=;
+        b=CBAVAwRe+WlT8H2FMtR7fWk5vsApB4R4Fwt0pkWz3jVBgDoAf7xIc4hFgWE9co51D1
+         agHmBjbRRhQPERx3eNNhu8u7zrAfz93g8DrsNjDpY1GHf3Q9wX9b3iMRdA21d+/rjp46
+         ShqjSRP0m8Nzp+YWNSoIaUQY7lDLge+zEDTJGu7AEJlo6HDf9IvBowg3yTniJoAy9ue6
+         pAZUNfsVJzeCKVgKq73jsLXDDmWdN/3uM7IpSDC/Ip9lNuaAkhiilSzheW/js4+d7CGo
+         DviEnYL7gSsf8xHlCt1okZSOpRuoHaSkwGHH/w8i7n961lQL+jdO2z7MDru+NagL+zex
+         NxmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=iDATA8UWRvuERkVCUo3sHEhaiMy110+5RvXbe9baKYQ=;
-        b=QBumv39ek7fAScvDwQV2PSW1W7X9CEU3RXeKNSVaBDxeO0O/DK29rNPVbtZZsd0Agh
-         6t0hT4ORdP/HLm5ikCw1E7AAY3lFu1M35QwQzDrp+5/SWv/K/KU5MZwOFPc1/9PaLnGB
-         VGS/NGhnjUS5xbiQUG0eZAvtbr5vgqzkkI/+SydpXXmKjBPmMLlEV6VeEjDzeZYsojDq
-         TScZOHi7JXxQQK9SfpwpNBIkjSU6X17Rf1osi9Glq3KX8fkf7PgwQZ2W/Mo5APcx1A34
-         DJu0RXhqgLgtJYHVqF1rexy+JBC63sijK4GpQiXOWMugqVHx8ldV4fdMT52xGbfKnLlP
-         GNxQ==
-X-Gm-Message-State: APjAAAWjAI/rKW9lOWu42XKZFxEQL0Ke9JbI4CJouxrreKlUDnqhXk9I
-        kwLxIryKfI9n/fkIIABwR2o=
-X-Google-Smtp-Source: APXvYqxloXtQEEYKf1fFRXMPDxsO+UU37rFFsC09iEeQtHTMIAJRov+wc8xL1bAUgPxg3x3FNI77aA==
-X-Received: by 2002:a5d:4409:: with SMTP id z9mr6610626wrq.22.1572619069481;
-        Fri, 01 Nov 2019 07:37:49 -0700 (PDT)
-Received: from suzukaze.ipads-lab.se.sjtu.edu.cn ([202.120.40.82])
-        by smtp.gmail.com with ESMTPSA id q9sm1824816wru.83.2019.11.01.07.37.44
+        h=x-gm-message-state:date:from:to:cc:message-id:in-reply-to
+         :references:subject:mime-version:content-transfer-encoding;
+        bh=TBAFKynpg7YBPsA6wf6JWHl/9/CPJW3b1igBgFWJV2E=;
+        b=MmSvCcCimzVT3OgD8P8vE0HPVGWuXBelas9lhW4oDLdLEGAiMG20RcOFvCXeW2tHDI
+         vNtF/ZqONSvDzWId2AGM5yGn8xEiVyCSHKr2tK7wy7whEBTuRSUDfK+oZo6h2j2e1suO
+         7S8+hqfcfsy9nQpczzIfehZc4ZZH8qZgDaXNc09c7i4KS+xLC+7+Uyhhoa2HJPP/6BRH
+         0D3x3vt74Z8BjLfo473mh6upvF2vlfGBNj3m9Yq3qa07ntVCnDb+t80NT4va4wE648/H
+         eIwd0XTO6Rcow9xn6h8ze86donhLQokU3reGSrdrjqUrMiAbDV30/wAZX8AtrbjTO/SB
+         pT8g==
+X-Gm-Message-State: APjAAAVCjrOVxqQha5aNEpQGZq4FWhlEvhmQlH6ZTCxOcWQh+vpuyTMk
+        Sg+n6iMlyF/6LRcLGqQGc1k=
+X-Google-Smtp-Source: APXvYqw5b6n7kBK48avlOUPepxYum5V6LVTDvUo0W+/APYB9WcQFPgKaXXVEJB2yVmTNKJqUeTAhRQ==
+X-Received: by 2002:a5d:8598:: with SMTP id f24mr9994753ioj.60.1572620468986;
+        Fri, 01 Nov 2019 08:01:08 -0700 (PDT)
+Received: from localhost ([184.63.162.180])
+        by smtp.gmail.com with ESMTPSA id m18sm735605iol.49.2019.11.01.08.01.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Nov 2019 07:37:49 -0700 (PDT)
-From:   Chuhong Yuan <hslester96@gmail.com>
-Cc:     Antoine Tenart <antoine.tenart@bootlin.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Chuhong Yuan <hslester96@gmail.com>
-Subject: [PATCH] crypto: inside-secure - Add missed clk_disable_unprepare
-Date:   Fri,  1 Nov 2019 22:37:15 +0800
-Message-Id: <20191101143715.17708-1-hslester96@gmail.com>
-X-Mailer: git-send-email 2.23.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-To:     unlisted-recipients:; (no To-header on input)
+        Fri, 01 Nov 2019 08:01:08 -0700 (PDT)
+Date:   Fri, 01 Nov 2019 08:01:00 -0700
+From:   John Fastabend <john.fastabend@gmail.com>
+To:     Jakub Kicinski <jakub.kicinski@netronome.com>,
+        John Fastabend <john.fastabend@gmail.com>
+Cc:     davem@davemloft.net, netdev@vger.kernel.org,
+        oss-drivers@netronome.com, borisp@mellanox.com,
+        aviadye@mellanox.com, daniel@iogearbox.net,
+        syzbot+f8495bff23a879a6d0bd@syzkaller.appspotmail.com,
+        syzbot+6f50c99e8f6194bf363f@syzkaller.appspotmail.com,
+        Eric Biggers <ebiggers@kernel.org>,
+        herbert@gondor.apana.org.au, glider@google.com,
+        linux-crypto@vger.kernel.org
+Message-ID: <5dbc48ac3a8cc_e4e2b12b10265b8a1@john-XPS-13-9370.notmuch>
+In-Reply-To: <20191031215444.68a12dfe@cakuba.netronome.com>
+References: <20191030160542.30295-1-jakub.kicinski@netronome.com>
+ <5dbb5ac1c208d_4c722b0ec06125c0cc@john-XPS-13-9370.notmuch>
+ <20191031152444.773c183b@cakuba.netronome.com>
+ <5dbbb83d61d0c_46342ae580f765bc78@john-XPS-13-9370.notmuch>
+ <20191031215444.68a12dfe@cakuba.netronome.com>
+Subject: Re: [PATCH net] net/tls: fix sk_msg trim on fallback to copy mode
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-safexcel_remove misses disabling priv->reg_clk like what is done when
-probe fails.
-Add the missed call to fix it.
+Jakub Kicinski wrote:
+> On Thu, 31 Oct 2019 21:44:45 -0700, John Fastabend wrote:
+> > Jakub Kicinski wrote:
+> > > On Thu, 31 Oct 2019 15:05:53 -0700, John Fastabend wrote:  
+> > > > Jakub Kicinski wrote:  
+> > > > > sk_msg_trim() tries to only update curr pointer if it falls into
+> > > > > the trimmed region. The logic, however, does not take into the
+> > > > > account pointer wrapping that sk_msg_iter_var_prev() does.
+> > > > > This means that when the message was trimmed completely, the new
+> > > > > curr pointer would have the value of MAX_MSG_FRAGS - 1, which is
+> > > > > neither smaller than any other value, nor would it actually be
+> > > > > correct.
+> > > > > 
+> > > > > Special case the trimming to 0 length a little bit.
+> > > > > 
+> > > > > This bug caused the TLS code to not copy all of the message, if
+> > > > > zero copy filled in fewer sg entries than memcopy would need.
+> > > > > 
+> > > > > Big thanks to Alexander Potapenko for the non-KMSAN reproducer.
+> > > > > 
+> > > > > Fixes: d829e9c4112b ("tls: convert to generic sk_msg interface")
+> > > > > Reported-by: syzbot+f8495bff23a879a6d0bd@syzkaller.appspotmail.com
+> > > > > Reported-by: syzbot+6f50c99e8f6194bf363f@syzkaller.appspotmail.com
+> > > > > Signed-off-by: Jakub Kicinski <jakub.kicinski@netronome.com>
+> > > > > ---
+> > > > > Daniel, John, does this look okay?    
+> > > > 
+> > > > Thanks for the second ping!  
+> > > 
+> > > No problem, I was worried the patch got categorized as TLS and therefore
+> > > lower prio ;)  
+> > 
+> > Nope close to the top of the list here.
+> > 
+> > >   
+> >  [...]  
+> >  [...]  
+> > > 
+> > > I see, that makes sense and explains some of the complexity!
+> > > 
+> > > Perhaps the simplest way to go would be to adjust the curr as we go
+> > > then? The comparison logic could get a little hairy. So like this:  
+> > 
+> > I don't think the comparison is too bad. Working it out live here. First
+> > do a bit of case analysis, We have 3 pointers so there are 3!=6 possible
+> > arrangements (permutations),
+> > 
+> >  1. S,C,E  6. S,E,C
+> >  5. C,S,E  2. C,E,S
+> >  3. E,S,C  4. E,C,S
+> > 
+> > 
+> > Case 1: Normal case start < curr < end
+> >  
+> >     0 1 2                              N = MAX_MSG_FRAGS
+> >     |_|_|_|...|_|_|_|...|_|_|_|_|....|_|_|
+> >         ^       ^         ^
+> >         start   curr      end
+> > 
+> >   if (start < end && i < curr)
+> >      curr = i;
+> >         
+> >  
+> > Case 2: curr < end < start (in absolute index terms)
+> > 
+> >     0 1 2                              N = MAX_MSG_FRAGS
+> >     |_|_|_|...|_|_|_|...|_|_|_|_|....|_|_|
+> >         ^       ^         ^
+> >         curr    end       start
+> > 
+> >    if (end < start && (i < curr || i > start))
+> >         curr = i
+> > 
+> > 
+> > Case 3: end < start < curr
+> > 
+> >     0 1 2                              N = MAX_MSG_FRAGS
+> >     |_|_|_|...|_|_|_|...|_|_|_|_|....|_|_|
+> >                 ^         ^          ^
+> >                 end       start      curr
+> > 
+> > 
+> >    if (end < start && (i < curr)
+> >        curr = i;
+> > 
+> > 
+> > Case 4: end < curr < start
+> > 
+> >     0 1 2                              N = MAX_MSG_FRAGS
+> >     |_|_|_|...|_|_|_|...|_|_|_|_|....|_|_|
+> >                 ^         ^          ^
+> >                 end       curr       start 
+> > 
+> > (nonsense curr would be invalid here it must be between the start and end)
+> > 
+> > Case 5: curr < start < end
+> > 
+> >     0 1 2                              N = MAX_MSG_FRAGS
+> >     |_|_|_|...|_|_|_|...|_|_|_|_|....|_|_|
+> >                 ^         ^          ^
+> >                 curr      start      end 
+> > 
+> > (nonsense curr would be invalid here it must be between the start and end)
+> > 
+> > Case 6: start < end < curr 
+> > 
+> >     0 1 2                              N = MAX_MSG_FRAGS
+> >     |_|_|_|...|_|_|_|...|_|_|_|_|....|_|_|
+> >                 ^         ^          ^
+> >                 start     end        curr 
+> > 
+> > (nonsense curr would be invalid here it must be between the start and end)
+> > 
+> > So I think the following would suffice,
+> > 
+> > 
+> >   if (msg->sg.start < msg->sg.end && i < msg->sg.curr) {
+> >      msg->sg.curr = i;
+> >      msg->sg.copybreak = msg->sg.data[i].length;
+> >   } else if (msg->sg.end < msg->sg.start && (i < msg->sg.curr || i > msg->sg.start))
+> >      msg->sg.curr = i;
+> >      msg->sg.copybreak = msg->sg.data[i].length;
+> >   } else if (msg->sg.end < msg->sg.start && (i < msg->sg.curr) {
+> >      curr = i;
+> >      msg->sg.copybreak = msg->sg.data[i].length;
+> >   }
+> > 
+> > Finally fold the last two cases into one so we get
+> > 
+> >   if (msg->sg.start < msg->sg.end && i < msg->sg.curr) {
+> >      msg->sg.curr = i;
+> >      msg->sg.copybreak = msg->sg.data[i].length;
+> >   } else if (msg->sg.end < msg->sg.start && (i < msg->sg.curr || i > msg->sg.start))
+> >      msg->sg.curr = i;
+> >      msg->sg.copybreak = msg->sg.data[i].length;
+> > 
+> > So not so bad. Put that in a helper in sk_msg.h and use it in trim. I can check
+> > logic in the AM and draft a patch but I think that should be correct. Also will
+> > need to audit to see if there are other cases this happens. In general I tried
+> > to always use i == msg->sg.{start|end|curr} to avoid this.
+> 
+> I will look in depth tomorrow as well, the full/empty cases are a
+> little tricky to fold into general logic.
+> 
+> I came up with this before I got distracted Halloweening :)
 
-Signed-off-by: Chuhong Yuan <hslester96@gmail.com>
----
- drivers/crypto/inside-secure/safexcel.c | 1 +
- 1 file changed, 1 insertion(+)
+Same here. Looking at the two cases from above.
 
-diff --git a/drivers/crypto/inside-secure/safexcel.c b/drivers/crypto/inside-secure/safexcel.c
-index 4ab1bde8dd9b..24c0f2404ec6 100644
---- a/drivers/crypto/inside-secure/safexcel.c
-+++ b/drivers/crypto/inside-secure/safexcel.c
-@@ -1623,6 +1623,7 @@ static int safexcel_remove(struct platform_device *pdev)
- 	safexcel_unregister_algorithms(priv);
- 	safexcel_hw_reset_rings(priv);
+   if (msg->sg.start < msg->sg.end &&
+       i < msg->sg.curr) {  // i <= msg->sg.curr
+      msg->sg.curr = i;
+      msg->sg.copybreak = msg->sg.data[i].length;
+   }
+
+If we happen to trim the entire msg so size=0 then i==start
+which should mean i < msg->sg.curr unless msg->sg.curr = msg->sg.start
+so we should just use <=. In the second case.
+
+   else if (msg->sg.end < msg->sg.start &&
+           (i < msg->sg.curr || i > msg->sg.start)) { // i <= msg->sg.curr
+      msg->sg.curr = i;
+      msg->sg.copybreak = msg->sg.data[i].length;
+   }
  
-+	clk_disable_unprepare(priv->reg_clk);
- 	clk_disable_unprepare(priv->clk);
- 
- 	for (i = 0; i < priv->config.rings; i++)
--- 
-2.23.0
+If we trim the entire message here i == sg.start again. And same
+thing use <= and we should catch case sg.tart = sg.curr.
+
+In the full case we didn't trim anything so we shouldn't do any
+manipulating of curr or copybreak.
+
+> 
+> diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
+> index e4b3fb4bb77c..ce7055259877 100644
+> --- a/include/linux/skmsg.h
+> +++ b/include/linux/skmsg.h
+> @@ -139,6 +139,11 @@ static inline void sk_msg_apply_bytes(struct sk_psock *psock, u32 bytes)
+>  	}
+>  }
+>  
+> +static inline u32 sk_msg_iter_dist(u32 start, u32 end)
+> +{
+> +	return end >= start ? end - start : end + (MAX_MSG_FRAGS - start);
+> +}
+> +
+>  #define sk_msg_iter_var_prev(var)			\
+>  	do {						\
+>  		if (var == 0)				\
+> @@ -198,9 +203,7 @@ static inline u32 sk_msg_elem_used(const struct sk_msg *msg)
+>  	if (sk_msg_full(msg))
+>  		return MAX_MSG_FRAGS;
+>  
+> -	return msg->sg.end >= msg->sg.start ?
+> -		msg->sg.end - msg->sg.start :
+> -		msg->sg.end + (MAX_MSG_FRAGS - msg->sg.start);
+> +	return sk_msg_iter_dist(msg->sg.start, msg->sg.end);
+>  }
+>  
+>  static inline struct scatterlist *sk_msg_elem(struct sk_msg *msg, int which)
+> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+> index cf390e0aa73d..f6b4a70bafa9 100644
+> --- a/net/core/skmsg.c
+> +++ b/net/core/skmsg.c
+> @@ -270,18 +270,26 @@ void sk_msg_trim(struct sock *sk, struct sk_msg *msg, int len)
+>  
+>  	msg->sg.data[i].length -= trim;
+>  	sk_mem_uncharge(sk, trim);
+> +	if (msg->sg.curr == i && msg->sg.copybreak > msg->sg.data[i].length)
+> +		msg->sg.copybreak = msg->sg.data[i].length;
+>  out:
+> +	sk_msg_iter_var_next(i);
+> +	msg->sg.end = i;
+> +
+>  	/* If we trim data before curr pointer update copybreak and current
+>  	 * so that any future copy operations start at new copy location.
+>  	 * However trimed data that has not yet been used in a copy op
+>  	 * does not require an update.
+>  	 */
+> -	if (msg->sg.curr >= i) {
+> +	if (!msg->sg.size) {
+
+I do think its a bit nicer if we don't special case the size = 0 case. If
+we get here and i != start then we would have extra bytes in the sg
+items between the items (i, end) and nonzero size. If i == start then the
+we sg.size = 0. I don't think there are any other cases.
+
+> +		msg->sg.curr = 0;
+> +		msg->sg.copybreak = 0;
+> +	} else if (sk_msg_iter_dist(msg->sg.start, msg->sg.curr) >
+> +		   sk_msg_iter_dist(msg->sg.end, msg->sg.curr)) {
+> +		sk_msg_iter_var_prev(i);
+
+I suspect with small update to dist logic the special case could also
+be dropped here. But I have a preference for my example above at the
+moment. Just getting coffee now so will think on it though.
+
+FWIW I've not compiled my example.
+
+>  		msg->sg.curr = i;
+>  		msg->sg.copybreak = msg->sg.data[i].length;
+>  	}
+> -	sk_msg_iter_var_next(i);
+> -	msg->sg.end = i;
+>  }
+>  EXPORT_SYMBOL_GPL(sk_msg_trim);
+>  
+> -- 
+> 2.23.0
+
 
