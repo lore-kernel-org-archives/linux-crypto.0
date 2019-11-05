@@ -7,54 +7,54 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC3CCC17486
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 14:01:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E798CC17460
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 14:01:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9241F21882
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 14:01:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B4CB321D7D
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 14:01:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="yrgeKv7a"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="LCKWfEOD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389415AbfKEOBr (ORCPT
+        id S2389417AbfKEOBt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Nov 2019 09:01:47 -0500
-Received: from lelv0143.ext.ti.com ([198.47.23.248]:35154 "EHLO
-        lelv0143.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389377AbfKEOBr (ORCPT
+        Tue, 5 Nov 2019 09:01:49 -0500
+Received: from fllv0016.ext.ti.com ([198.47.19.142]:44744 "EHLO
+        fllv0016.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389377AbfKEOBs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Nov 2019 09:01:47 -0500
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-        by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id xA5E1f5R038178;
-        Tue, 5 Nov 2019 08:01:41 -0600
+        Tue, 5 Nov 2019 09:01:48 -0500
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id xA5E1htl043494;
+        Tue, 5 Nov 2019 08:01:43 -0600
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1572962501;
-        bh=DytK5ZfNQDTyFQ9kvyYcuDXQB7MIOphvtCQ9eA53fOk=;
+        s=ti-com-17Q1; t=1572962503;
+        bh=upit1y8CUJ/UG9U3l05ijSh8ThRDpMaSJFs1e/vfhUM=;
         h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=yrgeKv7aDdjQaAbIiyW8ZERkZDAo1pKPFIrMLGV92vBUrNiYOg6LCq3Amz7+UOUfJ
-         JNVGwegQfqS2J77wNpRalEJ2cSk7pzjyR0caFiESwx2BTAH66kry0ZUdckMM7MduGs
-         gT/okgs4mqXvWX2t7zEV3hirByAdVHbvtm5tEHa0=
-Received: from DFLE114.ent.ti.com (dfle114.ent.ti.com [10.64.6.35])
-        by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id xA5E1fpn008046
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 5 Nov 2019 08:01:41 -0600
-Received: from DFLE101.ent.ti.com (10.64.6.22) by DFLE114.ent.ti.com
- (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3; Tue, 5 Nov
- 2019 08:01:24 -0600
-Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE101.ent.ti.com
- (10.64.6.22) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3 via
- Frontend Transport; Tue, 5 Nov 2019 08:01:24 -0600
+        b=LCKWfEOD7NI4AuoaE3wiOaqgvKfsh23oVAerXggwu4NLxGozUWxcnJLTFd8EJNxtA
+         RHAPV4GdmAu/39DhhWGw4NU4kBTxL+UO9M+TBNhxQlOwQNjTr8UvB15LXZrQrxZJM/
+         bz5Hvo/dcK+RY4x8ASAC3XMQegIrw4Kscqf0eyjg=
+Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
+        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTP id xA5E1hMk084677;
+        Tue, 5 Nov 2019 08:01:43 -0600
+Received: from DLEE115.ent.ti.com (157.170.170.26) by DLEE107.ent.ti.com
+ (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1713.5; Tue, 5 Nov
+ 2019 08:01:43 -0600
+Received: from fllv0040.itg.ti.com (10.64.41.20) by DLEE115.ent.ti.com
+ (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1713.5 via
+ Frontend Transport; Tue, 5 Nov 2019 08:01:43 -0600
 Received: from sokoban.ti.com (ileax41-snat.itg.ti.com [10.172.224.153])
-        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id xA5E1FFm068289;
-        Tue, 5 Nov 2019 08:01:38 -0600
+        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id xA5E1FFo068289;
+        Tue, 5 Nov 2019 08:01:41 -0600
 From:   Tero Kristo <t-kristo@ti.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
         <linux-crypto@vger.kernel.org>
-CC:     <linux-omap@vger.kernel.org>, <ard.biesheuvel@kernel.org>
-Subject: [PATCHv2 09/22] crypto: add timeout to crypto_wait_req
-Date:   Tue, 5 Nov 2019 16:00:58 +0200
-Message-ID: <20191105140111.20285-10-t-kristo@ti.com>
+CC:     <linux-omap@vger.kernel.org>, <ard.biesheuvel@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCHv2 11/22] crypto: omap-aes - reject invalid input sizes for block modes
+Date:   Tue, 5 Nov 2019 16:01:00 +0200
+Message-ID: <20191105140111.20285-12-t-kristo@ti.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191105140111.20285-1-t-kristo@ti.com>
 References: <20191105140111.20285-1-t-kristo@ti.com>
@@ -66,38 +66,34 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Currently crypto_wait_req waits indefinitely for an async crypto request
-to complete. This is bad as it can cause for example the crypto test
-manager to hang without any notification as to why it has happened.
-Instead of waiting indefinitely, add a 1 second timeout to the call,
-and provide a warning print if a timeout happens.
+From: Ard Biesheuvel <ardb@kernel.org>
 
-Signed-off-by: Tero Kristo <t-kristo@ti.com>
+Block modes such as ECB and CBC only support input sizes that are
+a round multiple of the block size, so align with the generic code
+which returns -EINVAL when encountering inputs that violate this
+rule.
+
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+Reviewed-by: Tero Kristo <t-kristo@ti.com>
+Tested-by: Tero Kristo <t-kristo@ti.com>
 ---
- include/linux/crypto.h | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ drivers/crypto/omap-aes.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 19ea3a371d7b..41279eeecb21 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -682,8 +682,15 @@ static inline int crypto_wait_req(int err, struct crypto_wait *wait)
- 	switch (err) {
- 	case -EINPROGRESS:
- 	case -EBUSY:
--		wait_for_completion(&wait->completion);
-+		err = wait_for_completion_timeout(&wait->completion,
-+						  msecs_to_jiffies(1000));
- 		reinit_completion(&wait->completion);
-+		if (!err) {
-+			pr_err("%s: timeout for %p\n", __func__, wait);
-+			err = -ETIMEDOUT;
-+			break;
-+		}
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index de05b35283bf..067f4cd7c005 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -525,6 +525,9 @@ static int omap_aes_crypt(struct skcipher_request *req, unsigned long mode)
+ 	struct omap_aes_dev *dd;
+ 	int ret;
+ 
++	if ((req->cryptlen % AES_BLOCK_SIZE) && !(mode & FLAGS_CTR))
++		return -EINVAL;
 +
- 		err = wait->err;
- 		break;
- 	};
+ 	pr_debug("nbytes: %d, enc: %d, cbc: %d\n", req->cryptlen,
+ 		  !!(mode & FLAGS_ENCRYPT),
+ 		  !!(mode & FLAGS_CBC));
 -- 
 2.17.1
 
