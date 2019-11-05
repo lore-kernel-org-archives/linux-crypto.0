@@ -8,55 +8,55 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADCC0C5DF61
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 15:14:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ED4AC5DF60
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 15:14:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 85AC8214D8
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 15:14:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 67F04214D8
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 15:14:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XG/QQBNP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Du/Pkluu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389735AbfKEPOB (ORCPT
+        id S2389715AbfKEPOV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Nov 2019 10:14:01 -0500
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:34522 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389083AbfKEPOA (ORCPT
+        Tue, 5 Nov 2019 10:14:21 -0500
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:39369 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389766AbfKEPOD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Nov 2019 10:14:00 -0500
-Received: by mail-pg1-f196.google.com with SMTP id e4so14440142pgs.1;
-        Tue, 05 Nov 2019 07:14:00 -0800 (PST)
+        Tue, 5 Nov 2019 10:14:03 -0500
+Received: by mail-pl1-f194.google.com with SMTP id o9so2897524plk.6;
+        Tue, 05 Nov 2019 07:14:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=lnPUSmMzWebvtTdv486q9Snfl/2WFziST54BYduBh3o=;
-        b=XG/QQBNPKGJ6gv50UbSrqlzKdX2itOiPE7VJKl/R74saG/ERAsDfNQhdeffdo/6a4n
-         Xc02khRc7A/768W7qVD7LF1YOons3Z7g54+D0qBObKNGu1brcnmrhLZDSzGrgQScGXyR
-         r0m3VP0af4HIV9M+jZg+nrWcqKiQmnSrCMxrzATT5/quiKrTHoBSQjNth3mGHGAceWzF
-         RMA0EtztdrN2Q28Q8yBnTuXMNxO+AvsxkZVSHlDCPbjXsg2B7mx8eszlhylJddSXGLBJ
-         sL4om6upy5VtHL12p4wS4bpQ3Yz7V9vEyO+60/p1SdIhcQ1um9ZEpcbZx3nOqqZExm/9
-         c+VA==
+        bh=cD8QSUIgtSt3hWOH7J14z6PosOVnptVgj941oita3aA=;
+        b=Du/Pkluuj+rJHqc/Lc5etCEkuKR6HXKyZwudSyaULAYJP1G9X5EAPkKWh1SQnuGq7v
+         sLXX7xu+MuKhT/CP7B+vVHYVc9vs7Z7OTNSpx+4jmb0SeHXvm3CvZy0T8O4zgUrLR9oO
+         7QhK4XgldCyi/m+YK43uT2CqULE0FqpywJgL0/LAYg3tZ+hn6QQTANf+hfmaa4uSBIFY
+         qJSC7MaBK5nULS7wygyHnRJ5CnORJAUjhf9MQK+96J1WU6zJbfIahKLYqY0+cVqpWjDR
+         HeThp04ZzVoWAL2H0EJoKNsNL+V6TkChTIniVQwBumMRZCD7zt+GQdjfyzECP8xynijz
+         jQsw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=lnPUSmMzWebvtTdv486q9Snfl/2WFziST54BYduBh3o=;
-        b=KV1jzXhJQMclQJSwkmdcAKPj8x7H5MHRwGWZVGtCo2KtmLiIY3ln2HZmXAkRvdLgXY
-         uvJf60NabRnqP2/kG9tqjX9n9gIbXSNe//bKOS3/EjyB1SMUcdjP5nrWQU6Y15JqKY5D
-         Xdp5kOwiwpFx1YLwmB9T1kvvtHMffZmHgJNtGCEbLnKHFEWgHnreb+q6MV68pPxb62Wo
-         3s+aAj9t0kq65Ep6G8WYP+PUd1VecUTXcKpKwfnLG2zanmD2GzNLqbU0koMd5r51YuPR
-         wtUNXB0BlI9XRsl0iKW0vW5o9pAk0zeeHVKM4GUG/Ilhmtr4L+QnQkzn04wT+rGTskii
-         9yZQ==
-X-Gm-Message-State: APjAAAW79Ira/7vY+IUo/YJoG2cQF2rbRv0yp+pd7BmfQq2igDs0gZZf
-        GW25c/z/pj1tr/0O1fwIX6/GEdt7
-X-Google-Smtp-Source: APXvYqy3BgvociuYQXBbyQoeEhwiYaS8nl6e5wkwxc+83EmsEul+bIOl5i2BY1J5KudjTSNxY6bplg==
-X-Received: by 2002:a63:1c10:: with SMTP id c16mr36036600pgc.183.1572966839471;
-        Tue, 05 Nov 2019 07:13:59 -0800 (PST)
+        bh=cD8QSUIgtSt3hWOH7J14z6PosOVnptVgj941oita3aA=;
+        b=rR1bRSQiAxK4phJzIWbzNxh5veaS7mzzUt83ZpA18/SneaHPgl48rUxDxs9g3FbXWp
+         crXdzLZl9xKCXUQbOUoNELZILXf40LNIsZlkj4/WimSfEvKKg7TZzFHkIPzGJ0ty6Qav
+         J9MOluI5ECj/Y9yUZiMipl08lr9ygTniNkfzvc1Vu201YXU5Scc/zBy8cfrTwrOlUVf9
+         /MfOztCqIgt5kIhWF1NEd8jtO5dMyk5gRbmRz1XpLo9uKx8Q6D8v4zzyumErhRh5RlTJ
+         CtiR4QQY8y1LufYx7ga5vSd0GDguZqmCYXIZzmJVeMJKUexosFrEzg/X15cCbV5buhWp
+         BCvQ==
+X-Gm-Message-State: APjAAAU1Ym7ISG5eWw7EjC+oHnD638yGVzx7Jy5k8ViUNNY7GwO6PhpT
+        GhgY/gIWhA2vnCzv6qjWUcinZzB8
+X-Google-Smtp-Source: APXvYqy4OrftXbNogh5G8CwuTnDqLkLNCLEQqB3ycXFLBuN1wSMZFp4vnXTbz7B7iySJua0eWvZ3UQ==
+X-Received: by 2002:a17:902:aa8a:: with SMTP id d10mr12729955plr.273.1572966841264;
+        Tue, 05 Nov 2019 07:14:01 -0800 (PST)
 Received: from localhost.lan (c-67-185-54-80.hsd1.wa.comcast.net. [67.185.54.80])
-        by smtp.gmail.com with ESMTPSA id f7sm23120691pfa.150.2019.11.05.07.13.58
+        by smtp.gmail.com with ESMTPSA id f7sm23120691pfa.150.2019.11.05.07.13.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Nov 2019 07:13:58 -0800 (PST)
+        Tue, 05 Nov 2019 07:14:00 -0800 (PST)
 From:   Andrey Smirnov <andrew.smirnov@gmail.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
@@ -66,9 +66,9 @@ Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Iuliana Prodan <iuliana.prodan@nxp.com>, linux-imx@nxp.com,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 1/5] crypto: caam - use static initialization
-Date:   Tue,  5 Nov 2019 07:13:49 -0800
-Message-Id: <20191105151353.6522-2-andrew.smirnov@gmail.com>
+Subject: [PATCH 2/5] crypto: caam - introduce caam_jr_cbk
+Date:   Tue,  5 Nov 2019 07:13:50 -0800
+Message-Id: <20191105151353.6522-3-andrew.smirnov@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191105151353.6522-1-andrew.smirnov@gmail.com>
 References: <20191105151353.6522-1-andrew.smirnov@gmail.com>
@@ -80,7 +80,8 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use static initialization for global variables.
+Coalesce multiple ad-hoc definitions of the same function pointer into
+a dedicated type to avoid repetition.
 
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 Cc: Chris Healy <cphealy@gmail.com>
@@ -92,34 +93,86 @@ Cc: linux-imx@nxp.com
 Cc: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 ---
- drivers/crypto/caam/jr.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+ drivers/crypto/caam/intern.h | 3 ++-
+ drivers/crypto/caam/jr.c     | 9 +++------
+ drivers/crypto/caam/jr.h     | 7 ++++---
+ 3 files changed, 9 insertions(+), 10 deletions(-)
 
+diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
+index c7c10c90464b..fe2ca2ad6ff0 100644
+--- a/drivers/crypto/caam/intern.h
++++ b/drivers/crypto/caam/intern.h
+@@ -11,6 +11,7 @@
+ #define INTERN_H
+ 
+ #include "ctrl.h"
++#include "jr.h"
+ 
+ /* Currently comes from Kconfig param as a ^2 (driver-required) */
+ #define JOBR_DEPTH (1 << CONFIG_CRYPTO_DEV_FSL_CAAM_RINGSIZE)
+@@ -31,7 +32,7 @@
+  * Each entry on an output ring needs one of these
+  */
+ struct caam_jrentry_info {
+-	void (*callbk)(struct device *dev, u32 *desc, u32 status, void *arg);
++	caam_jr_cbk callbk;
+ 	void *cbkarg;	/* Argument per ring entry */
+ 	u32 *desc_addr_virt;	/* Stored virt addr for postprocessing */
+ 	dma_addr_t desc_addr_dma;	/* Stored bus addr for done matching */
 diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-index fc97cde27059..49c98a7f6723 100644
+index 49c98a7f6723..3e78fedeea30 100644
 --- a/drivers/crypto/caam/jr.c
 +++ b/drivers/crypto/caam/jr.c
-@@ -23,7 +23,10 @@ struct jr_driver_data {
- 	spinlock_t		jr_alloc_lock;	/* jr_list lock */
- } ____cacheline_aligned;
- 
--static struct jr_driver_data driver_data;
-+static struct jr_driver_data driver_data = {
-+	.jr_list = LIST_HEAD_INIT(driver_data.jr_list),
-+	.jr_alloc_lock = __SPIN_LOCK_UNLOCKED(driver_data.jr_alloc_lock),
-+};
- static DEFINE_MUTEX(algs_lock);
- static unsigned int active_devs;
- 
-@@ -589,8 +592,6 @@ static struct platform_driver caam_jr_driver = {
- 
- static int __init jr_driver_init(void)
+@@ -197,7 +197,7 @@ static void caam_jr_dequeue(unsigned long devarg)
+ 	int hw_idx, sw_idx, i, head, tail;
+ 	struct device *dev = (struct device *)devarg;
+ 	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
+-	void (*usercall)(struct device *dev, u32 *desc, u32 status, void *arg);
++	caam_jr_cbk usercall;
+ 	u32 *userdesc, userstatus;
+ 	void *userarg;
+ 	u32 outring_used = 0;
+@@ -354,10 +354,7 @@ EXPORT_SYMBOL(caam_jr_free);
+  * @areq: optional pointer to a user argument for use at callback
+  *        time.
+  **/
+-int caam_jr_enqueue(struct device *dev, u32 *desc,
+-		    void (*cbk)(struct device *dev, u32 *desc,
+-				u32 status, void *areq),
+-		    void *areq)
++int caam_jr_enqueue(struct device *dev, u32 *desc, caam_jr_cbk cbk, void *areq)
  {
--	spin_lock_init(&driver_data.jr_alloc_lock);
--	INIT_LIST_HEAD(&driver_data.jr_list);
- 	return platform_driver_register(&caam_jr_driver);
- }
+ 	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
+ 	struct caam_jrentry_info *head_entry;
+@@ -386,7 +383,7 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
+ 	head_entry = &jrp->entinfo[head];
+ 	head_entry->desc_addr_virt = desc;
+ 	head_entry->desc_size = desc_size;
+-	head_entry->callbk = (void *)cbk;
++	head_entry->callbk = cbk;
+ 	head_entry->cbkarg = areq;
+ 	head_entry->desc_addr_dma = desc_dma;
  
+diff --git a/drivers/crypto/caam/jr.h b/drivers/crypto/caam/jr.h
+index eab611530f36..81acc6a6909f 100644
+--- a/drivers/crypto/caam/jr.h
++++ b/drivers/crypto/caam/jr.h
+@@ -9,11 +9,12 @@
+ #define JR_H
+ 
+ /* Prototypes for backend-level services exposed to APIs */
++typedef void (*caam_jr_cbk)(struct device *dev, u32 *desc, u32 status,
++			    void *areq);
++
+ struct device *caam_jr_alloc(void);
+ void caam_jr_free(struct device *rdev);
+-int caam_jr_enqueue(struct device *dev, u32 *desc,
+-		    void (*cbk)(struct device *dev, u32 *desc, u32 status,
+-				void *areq),
++int caam_jr_enqueue(struct device *dev, u32 *desc, caam_jr_cbk cbk,
+ 		    void *areq);
+ 
+ #endif /* JR_H */
 -- 
 2.21.0
 
