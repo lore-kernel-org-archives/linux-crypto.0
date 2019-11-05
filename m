@@ -7,54 +7,54 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 395F9C010DF
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 12:38:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58B55C010CF
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 12:38:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0DF3321D81
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 12:38:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2DA2921D7F
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 12:38:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="g87CMXH9"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="G6R96ECl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388772AbfKEMiZ (ORCPT
+        id S2388810AbfKEMis (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Nov 2019 07:38:25 -0500
-Received: from lelv0142.ext.ti.com ([198.47.23.249]:34590 "EHLO
-        lelv0142.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388673AbfKEMiZ (ORCPT
+        Tue, 5 Nov 2019 07:38:48 -0500
+Received: from fllv0016.ext.ti.com ([198.47.19.142]:34446 "EHLO
+        fllv0016.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2388494AbfKEMis (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Nov 2019 07:38:25 -0500
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-        by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id xA5CcJEv078729;
-        Tue, 5 Nov 2019 06:38:19 -0600
+        Tue, 5 Nov 2019 07:38:48 -0500
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id xA5CchvY021814;
+        Tue, 5 Nov 2019 06:38:43 -0600
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1572957499;
-        bh=9fJAHIVAgIN3PPmEYUALLZCyp9Oxs8DgQg19svNGF8c=;
+        s=ti-com-17Q1; t=1572957523;
+        bh=CVS2IDzTtGCfSD9+s5z6NmfIUOK9IhJymoncHHPAjvY=;
         h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=g87CMXH98KfwAWINi6aRZrotSBkpUsPkUyBjRvB52obBmubAwDHe47a3rkgWT26Wy
-         bvaTEdVFDNXixWnE3Dj0Qpfvhltn0l8rHQxWBpC8+Hq1ZPFhy+vAwn1zCb4QksL3ID
-         cfcZ73APmynJhqoq70g85/1VYcXSp+mwn+YmvqmI=
-Received: from DLEE113.ent.ti.com (dlee113.ent.ti.com [157.170.170.24])
-        by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id xA5CcJTo023630
+        b=G6R96EClAt4JH+OFY4JQXbYgzUQWG4H6uGxbnQh64F89DMg8/2LFfAiJAG0WRmkbE
+         MOHG+6uLxOvN5hnNpUoCyEyMslsyQGyoHBnJw88sh59xdLZd4XLO43iX6Adph6AneB
+         YB/nVdK9g9tdL2mkBzdYB+N2qIykxD5autbYOj6g=
+Received: from DFLE113.ent.ti.com (dfle113.ent.ti.com [10.64.6.34])
+        by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id xA5Cchp9088156
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 5 Nov 2019 06:38:19 -0600
-Received: from DLEE113.ent.ti.com (157.170.170.24) by DLEE113.ent.ti.com
- (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1713.5; Tue, 5 Nov
- 2019 06:38:03 -0600
-Received: from fllv0039.itg.ti.com (10.64.41.19) by DLEE113.ent.ti.com
- (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1713.5 via
- Frontend Transport; Tue, 5 Nov 2019 06:38:03 -0600
+        Tue, 5 Nov 2019 06:38:43 -0600
+Received: from DFLE103.ent.ti.com (10.64.6.24) by DFLE113.ent.ti.com
+ (10.64.6.34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3; Tue, 5 Nov
+ 2019 06:38:00 -0600
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DFLE103.ent.ti.com
+ (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3 via
+ Frontend Transport; Tue, 5 Nov 2019 06:38:00 -0600
 Received: from sokoban.ti.com (ileax41-snat.itg.ti.com [10.172.224.153])
-        by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id xA5Cc6d3117093;
-        Tue, 5 Nov 2019 06:38:17 -0600
+        by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id xA5Cc6d1117093;
+        Tue, 5 Nov 2019 06:38:13 -0600
 From:   Tero Kristo <t-kristo@ti.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
         <linux-crypto@vger.kernel.org>
 CC:     <linux-omap@vger.kernel.org>, <ard.biesheuvel@kernel.org>
-Subject: [PATCH 6/6] crypto: omap-crypto: copy the temporary data to output buffer properly
-Date:   Tue, 5 Nov 2019 14:37:59 +0200
-Message-ID: <20191105123759.25053-7-t-kristo@ti.com>
+Subject: [PATCH 4/6] crypto: omap-des: avoid unnecessary spam with bad cryptlen
+Date:   Tue, 5 Nov 2019 14:37:57 +0200
+Message-ID: <20191105123759.25053-5-t-kristo@ti.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191105123759.25053-1-t-kristo@ti.com>
 References: <20191105123759.25053-1-t-kristo@ti.com>
@@ -66,73 +66,29 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Both source and destination are scatterlists that can contain multiple
-entries under the omap crypto cleanup handling. Current code only copies
-data from the first source scatterlist entry to the target scatterlist,
-potentially omitting any sg entries following the first one. Instead,
-implement a new routine that walks through both source and target and
-copies the data over once it goes.
+Remove the error print in this case, and just return the error.
 
 Signed-off-by: Tero Kristo <t-kristo@ti.com>
 ---
- drivers/crypto/omap-crypto.c | 37 +++++++++++++++++++++++++++++++++++-
- 1 file changed, 36 insertions(+), 1 deletion(-)
+ drivers/crypto/omap-des.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/omap-crypto.c b/drivers/crypto/omap-crypto.c
-index 7d592d93bb1c..cc88b7362bc2 100644
---- a/drivers/crypto/omap-crypto.c
-+++ b/drivers/crypto/omap-crypto.c
-@@ -154,6 +154,41 @@ int omap_crypto_align_sg(struct scatterlist **sg, int total, int bs,
- }
- EXPORT_SYMBOL_GPL(omap_crypto_align_sg);
+diff --git a/drivers/crypto/omap-des.c b/drivers/crypto/omap-des.c
+index ea82d55ea8c3..d1d839164048 100644
+--- a/drivers/crypto/omap-des.c
++++ b/drivers/crypto/omap-des.c
+@@ -637,10 +637,8 @@ static int omap_des_crypt(struct skcipher_request *req, unsigned long mode)
+ 		 !!(mode & FLAGS_ENCRYPT),
+ 		 !!(mode & FLAGS_CBC));
  
-+static void omap_crypto_copy_data(struct scatterlist *src,
-+				  struct scatterlist *dst,
-+				  int offset, int len)
-+{
-+	int amt;
-+	void *srcb, *dstb;
-+	int srco = 0, dsto = offset;
-+
-+	while (src && dst && len) {
-+		if (srco >= src->length) {
-+			srco -= src->length;
-+			src = sg_next(src);
-+			continue;
-+		}
-+
-+		if (dsto >= dst->length) {
-+			dsto -= dst->length;
-+			dst = sg_next(dst);
-+			continue;
-+		}
-+
-+		amt = min(src->length - srco, dst->length - dsto);
-+		amt = min(len, amt);
-+
-+		srcb = sg_virt(src) + srco;
-+		dstb = sg_virt(dst) + dsto;
-+
-+		memcpy(dstb, srcb, amt);
-+
-+		srco += amt;
-+		dsto += amt;
-+		len -= amt;
-+	}
-+}
-+
- void omap_crypto_cleanup(struct scatterlist *sg, struct scatterlist *orig,
- 			 int offset, int len, u8 flags_shift,
- 			 unsigned long flags)
-@@ -171,7 +206,7 @@ void omap_crypto_cleanup(struct scatterlist *sg, struct scatterlist *orig,
- 	pages = get_order(len);
+-	if (!IS_ALIGNED(req->cryptlen, DES_BLOCK_SIZE)) {
+-		pr_err("request size is not exact amount of DES blocks\n");
++	if (!IS_ALIGNED(req->cryptlen, DES_BLOCK_SIZE))
+ 		return -EINVAL;
+-	}
  
- 	if (orig && (flags & OMAP_CRYPTO_COPY_MASK))
--		scatterwalk_map_and_copy(buf, orig, offset, len, 1);
-+		omap_crypto_copy_data(sg, orig, offset, len);
- 
- 	if (flags & OMAP_CRYPTO_DATA_COPIED)
- 		free_pages((unsigned long)buf, pages);
+ 	dd = omap_des_find_dev(ctx);
+ 	if (!dd)
 -- 
 2.17.1
 
