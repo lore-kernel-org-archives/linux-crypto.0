@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0017C17460
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 14:02:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6139FC1747C
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 14:02:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 786E421D6C
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 14:02:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2DE3421D7C
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 14:02:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="UNqbLGfv"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="wB5X9yex"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389432AbfKEOB7 (ORCPT
+        id S2389429AbfKEOCA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Nov 2019 09:01:59 -0500
-Received: from lelv0143.ext.ti.com ([198.47.23.248]:35218 "EHLO
-        lelv0143.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389429AbfKEOB7 (ORCPT
+        Tue, 5 Nov 2019 09:02:00 -0500
+Received: from fllv0015.ext.ti.com ([198.47.19.141]:44044 "EHLO
+        fllv0015.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389421AbfKEOCA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Nov 2019 09:01:59 -0500
+        Tue, 5 Nov 2019 09:02:00 -0500
 Received: from lelv0266.itg.ti.com ([10.180.67.225])
-        by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id xA5E1p61038233;
-        Tue, 5 Nov 2019 08:01:51 -0600
+        by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id xA5E1rvY071630;
+        Tue, 5 Nov 2019 08:01:53 -0600
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1572962511;
-        bh=Fy9RhC6tUOYLCrTUDsYzuh5bXy3NK5kpC2mGjoRFUPE=;
+        s=ti-com-17Q1; t=1572962513;
+        bh=LmAyLnfz8YM25OuVd13njs2VbIXOcCSwKLiFJrFKgBI=;
         h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=UNqbLGfv9bGDddhm5a4GJv8q80u7GytwMr0iExRzM9KlBZo0iiVQFiHtRDHCrP4uH
-         Vv72P50cbKn6kgxj87MkEy3X3w19lQZRwSPW7uCJj5mpAsscKPtw+FlduXvhreXL82
-         mV1z4IAELVUNcguLboAslizdSvf/jZR594yyDY3k=
-Received: from DFLE115.ent.ti.com (dfle115.ent.ti.com [10.64.6.36])
-        by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id xA5E1pol059894
+        b=wB5X9yexbeeiGItPyVJeTOmWUa19DpRAkIvLYFqBxTMam50eeeb3StnQR5r9tZkfC
+         buwRcn1t1WHIXXeaZeZu+C1Y34wgRz4LT4fJ/7iDIAlgvFNE6qrWnc/NQTV6rmEaFC
+         IwDDglM+goq8FWz2bxSRNCmbsY+OToqyOUzFlAxI=
+Received: from DLEE113.ent.ti.com (dlee113.ent.ti.com [157.170.170.24])
+        by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id xA5E1rEs059930
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 5 Nov 2019 08:01:51 -0600
-Received: from DFLE115.ent.ti.com (10.64.6.36) by DFLE115.ent.ti.com
- (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3; Tue, 5 Nov
- 2019 08:01:34 -0600
-Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE115.ent.ti.com
- (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
+        Tue, 5 Nov 2019 08:01:53 -0600
+Received: from DLEE112.ent.ti.com (157.170.170.23) by DLEE113.ent.ti.com
+ (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1713.5; Tue, 5 Nov
+ 2019 08:01:38 -0600
+Received: from fllv0040.itg.ti.com (10.64.41.20) by DLEE112.ent.ti.com
+ (157.170.170.23) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3 via
- Frontend Transport; Tue, 5 Nov 2019 08:01:34 -0600
+ Frontend Transport; Tue, 5 Nov 2019 08:01:52 -0600
 Received: from sokoban.ti.com (ileax41-snat.itg.ti.com [10.172.224.153])
-        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id xA5E1FFr068289;
-        Tue, 5 Nov 2019 08:01:47 -0600
+        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id xA5E1FFt068289;
+        Tue, 5 Nov 2019 08:01:51 -0600
 From:   Tero Kristo <t-kristo@ti.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
         <linux-crypto@vger.kernel.org>
 CC:     <linux-omap@vger.kernel.org>, <ard.biesheuvel@kernel.org>,
         Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCHv2 14/22] crypto: omap-aes-gcm - add missing .setauthsize hooks
-Date:   Tue, 5 Nov 2019 16:01:03 +0200
-Message-ID: <20191105140111.20285-15-t-kristo@ti.com>
+Subject: [PATCHv2 16/22] crypto: omap-aes-gcm - use the AES library to encrypt the tag
+Date:   Tue, 5 Nov 2019 16:01:05 +0200
+Message-ID: <20191105140111.20285-17-t-kristo@ti.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191105140111.20285-1-t-kristo@ti.com>
 References: <20191105140111.20285-1-t-kristo@ti.com>
@@ -69,74 +69,283 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Ard Biesheuvel <ardb@kernel.org>
 
-GCM only permits certain tag lengths, so populate the .setauthsize
-hooks which ensure that only permitted sizes are accepted by the
-implementation.
+The OMAP AES-GCM implementation uses a fallback ecb(aes) skcipher to
+produce the keystream to encrypt the output tag. Let's use the new
+AES library instead - this is much simpler, and shouldn't affect
+performance given that it only involves a single block.
 
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 Reviewed-by: Tero Kristo <t-kristo@ti.com>
 Tested-by: Tero Kristo <t-kristo@ti.com>
 ---
- drivers/crypto/omap-aes-gcm.c | 11 +++++++++++
- drivers/crypto/omap-aes.c     |  2 ++
- drivers/crypto/omap-aes.h     |  3 +++
- 3 files changed, 16 insertions(+)
+ drivers/crypto/omap-aes-gcm.c | 98 +++++++++--------------------------
+ drivers/crypto/omap-aes.c     | 26 +---------
+ drivers/crypto/omap-aes.h     |  7 ++-
+ 3 files changed, 33 insertions(+), 98 deletions(-)
 
 diff --git a/drivers/crypto/omap-aes-gcm.c b/drivers/crypto/omap-aes-gcm.c
-index 05d2fe78b105..70398fbd669d 100644
+index 1aabf9a72066..6da05149b195 100644
 --- a/drivers/crypto/omap-aes-gcm.c
 +++ b/drivers/crypto/omap-aes-gcm.c
-@@ -413,3 +413,14 @@ int omap_aes_4106gcm_setkey(struct crypto_aead *tfm, const u8 *key,
+@@ -167,62 +167,12 @@ static int omap_aes_gcm_copy_buffers(struct omap_aes_dev *dd,
+ 	return 0;
+ }
+ 
+-static void omap_aes_gcm_complete(struct crypto_async_request *req, int err)
+-{
+-	struct omap_aes_gcm_result *res = req->data;
+-
+-	if (err == -EINPROGRESS)
+-		return;
+-
+-	res->err = err;
+-	complete(&res->completion);
+-}
+-
+ static int do_encrypt_iv(struct aead_request *req, u32 *tag, u32 *iv)
+ {
+-	struct scatterlist iv_sg, tag_sg;
+-	struct skcipher_request *sk_req;
+-	struct omap_aes_gcm_result result;
+-	struct omap_aes_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
+-	int ret = 0;
+-
+-	sk_req = skcipher_request_alloc(ctx->ctr, GFP_KERNEL);
+-	if (!sk_req) {
+-		pr_err("skcipher: Failed to allocate request\n");
+-		return -ENOMEM;
+-	}
+-
+-	init_completion(&result.completion);
+-
+-	sg_init_one(&iv_sg, iv, AES_BLOCK_SIZE);
+-	sg_init_one(&tag_sg, tag, AES_BLOCK_SIZE);
+-	skcipher_request_set_callback(sk_req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+-				      omap_aes_gcm_complete, &result);
+-	ret = crypto_skcipher_setkey(ctx->ctr, (u8 *)ctx->key, ctx->keylen);
+-	skcipher_request_set_crypt(sk_req, &iv_sg, &tag_sg, AES_BLOCK_SIZE,
+-				   NULL);
+-	ret = crypto_skcipher_encrypt(sk_req);
+-	switch (ret) {
+-	case 0:
+-		break;
+-	case -EINPROGRESS:
+-	case -EBUSY:
+-		ret = wait_for_completion_interruptible(&result.completion);
+-		if (!ret) {
+-			ret = result.err;
+-			if (!ret) {
+-				reinit_completion(&result.completion);
+-				break;
+-			}
+-		}
+-		/* fall through */
+-	default:
+-		pr_err("Encryption of IV failed for GCM mode\n");
+-		break;
+-	}
++	struct omap_aes_gcm_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
+ 
+-	skcipher_request_free(sk_req);
+-	return ret;
++	aes_encrypt(&ctx->actx, (u8 *)tag, (u8 *)iv);
++	return 0;
+ }
+ 
+ void omap_aes_gcm_dma_out_callback(void *data)
+@@ -252,7 +202,7 @@ void omap_aes_gcm_dma_out_callback(void *data)
+ static int omap_aes_gcm_handle_queue(struct omap_aes_dev *dd,
+ 				     struct aead_request *req)
+ {
+-	struct omap_aes_ctx *ctx;
++	struct omap_aes_gcm_ctx *ctx;
+ 	struct aead_request *backlog;
+ 	struct omap_aes_reqctx *rctx;
+ 	unsigned long flags;
+@@ -281,7 +231,7 @@ static int omap_aes_gcm_handle_queue(struct omap_aes_dev *dd,
+ 	ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
+ 	rctx = aead_request_ctx(req);
+ 
+-	dd->ctx = ctx;
++	dd->ctx = &ctx->octx;
+ 	rctx->dd = dd;
+ 	dd->aead_req = req;
+ 
+@@ -360,10 +310,10 @@ int omap_aes_gcm_decrypt(struct aead_request *req)
+ 
+ int omap_aes_4106gcm_encrypt(struct aead_request *req)
+ {
+-	struct omap_aes_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
++	struct omap_aes_gcm_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
+ 	struct omap_aes_reqctx *rctx = aead_request_ctx(req);
+ 
+-	memcpy(rctx->iv, ctx->nonce, 4);
++	memcpy(rctx->iv, ctx->octx.nonce, 4);
+ 	memcpy(rctx->iv + 4, req->iv, 8);
+ 	return crypto_ipsec_check_assoclen(req->assoclen) ?:
+ 	       omap_aes_gcm_crypt(req, FLAGS_ENCRYPT | FLAGS_GCM |
+@@ -372,10 +322,10 @@ int omap_aes_4106gcm_encrypt(struct aead_request *req)
+ 
+ int omap_aes_4106gcm_decrypt(struct aead_request *req)
+ {
+-	struct omap_aes_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
++	struct omap_aes_gcm_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
+ 	struct omap_aes_reqctx *rctx = aead_request_ctx(req);
+ 
+-	memcpy(rctx->iv, ctx->nonce, 4);
++	memcpy(rctx->iv, ctx->octx.nonce, 4);
+ 	memcpy(rctx->iv + 4, req->iv, 8);
+ 	return crypto_ipsec_check_assoclen(req->assoclen) ?:
+ 	       omap_aes_gcm_crypt(req, FLAGS_GCM | FLAGS_RFC4106_GCM);
+@@ -384,14 +334,15 @@ int omap_aes_4106gcm_decrypt(struct aead_request *req)
+ int omap_aes_gcm_setkey(struct crypto_aead *tfm, const u8 *key,
+ 			unsigned int keylen)
+ {
+-	struct omap_aes_ctx *ctx = crypto_aead_ctx(tfm);
++	struct omap_aes_gcm_ctx *ctx = crypto_aead_ctx(tfm);
++	int ret;
+ 
+-	if (keylen != AES_KEYSIZE_128 && keylen != AES_KEYSIZE_192 &&
+-	    keylen != AES_KEYSIZE_256)
+-		return -EINVAL;
++	ret = aes_expandkey(&ctx->actx, key, keylen);
++	if (ret)
++		return ret;
+ 
+-	memcpy(ctx->key, key, keylen);
+-	ctx->keylen = keylen;
++	memcpy(ctx->octx.key, key, keylen);
++	ctx->octx.keylen = keylen;
  
  	return 0;
  }
+@@ -399,19 +350,20 @@ int omap_aes_gcm_setkey(struct crypto_aead *tfm, const u8 *key,
+ int omap_aes_4106gcm_setkey(struct crypto_aead *tfm, const u8 *key,
+ 			    unsigned int keylen)
+ {
+-	struct omap_aes_ctx *ctx = crypto_aead_ctx(tfm);
++	struct omap_aes_gcm_ctx *ctx = crypto_aead_ctx(tfm);
++	int ret;
+ 
+ 	if (keylen < 4)
+ 		return -EINVAL;
+-
+ 	keylen -= 4;
+-	if (keylen != AES_KEYSIZE_128 && keylen != AES_KEYSIZE_192 &&
+-	    keylen != AES_KEYSIZE_256)
+-		return -EINVAL;
+ 
+-	memcpy(ctx->key, key, keylen);
+-	memcpy(ctx->nonce, key + keylen, 4);
+-	ctx->keylen = keylen;
++	ret = aes_expandkey(&ctx->actx, key, keylen);
++	if (ret)
++		return ret;
 +
-+int omap_aes_gcm_setauthsize(struct crypto_aead *tfm, unsigned int authsize)
-+{
-+	return crypto_gcm_check_authsize(authsize);
-+}
-+
-+int omap_aes_4106gcm_setauthsize(struct crypto_aead *parent,
-+				 unsigned int authsize)
-+{
-+	return crypto_rfc4106_check_authsize(authsize);
-+}
++	memcpy(ctx->octx.key, key, keylen);
++	memcpy(ctx->octx.nonce, key + keylen, 4);
++	ctx->octx.keylen = keylen;
+ 
+ 	return 0;
+ }
 diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index 33cba7a2d6df..161af3bf667c 100644
+index 161af3bf667c..d63ab370030e 100644
 --- a/drivers/crypto/omap-aes.c
 +++ b/drivers/crypto/omap-aes.c
-@@ -787,6 +787,7 @@ static struct aead_alg algs_aead_gcm[] = {
+@@ -645,7 +645,6 @@ static int omap_aes_init_tfm(struct crypto_skcipher *tfm)
+ static int omap_aes_gcm_cra_init(struct crypto_aead *tfm)
+ {
+ 	struct omap_aes_dev *dd = NULL;
+-	struct omap_aes_ctx *ctx = crypto_aead_ctx(tfm);
+ 	int err;
+ 
+ 	/* Find AES device, currently picks the first device */
+@@ -663,12 +662,6 @@ static int omap_aes_gcm_cra_init(struct crypto_aead *tfm)
+ 	}
+ 
+ 	tfm->reqsize = sizeof(struct omap_aes_reqctx);
+-	ctx->ctr = crypto_alloc_skcipher("ecb(aes)", 0, 0);
+-	if (IS_ERR(ctx->ctr)) {
+-		pr_warn("could not load aes driver for encrypting IV\n");
+-		return PTR_ERR(ctx->ctr);
+-	}
+-
+ 	return 0;
+ }
+ 
+@@ -682,19 +675,6 @@ static void omap_aes_exit_tfm(struct crypto_skcipher *tfm)
+ 	ctx->fallback = NULL;
+ }
+ 
+-static void omap_aes_gcm_cra_exit(struct crypto_aead *tfm)
+-{
+-	struct omap_aes_ctx *ctx = crypto_aead_ctx(tfm);
+-
+-	if (ctx->fallback)
+-		crypto_free_sync_skcipher(ctx->fallback);
+-
+-	ctx->fallback = NULL;
+-
+-	if (ctx->ctr)
+-		crypto_free_skcipher(ctx->ctr);
+-}
+-
+ /* ********************** ALGS ************************************ */
+ 
+ static struct skcipher_alg algs_ecb_cbc[] = {
+@@ -778,12 +758,11 @@ static struct aead_alg algs_aead_gcm[] = {
+ 		.cra_flags		= CRYPTO_ALG_ASYNC |
+ 					  CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 		.cra_blocksize		= 1,
+-		.cra_ctxsize		= sizeof(struct omap_aes_ctx),
++		.cra_ctxsize		= sizeof(struct omap_aes_gcm_ctx),
+ 		.cra_alignmask		= 0xf,
+ 		.cra_module		= THIS_MODULE,
+ 	},
+ 	.init		= omap_aes_gcm_cra_init,
+-	.exit		= omap_aes_gcm_cra_exit,
  	.ivsize		= GCM_AES_IV_SIZE,
  	.maxauthsize	= AES_BLOCK_SIZE,
  	.setkey		= omap_aes_gcm_setkey,
-+	.setauthsize	= omap_aes_gcm_setauthsize,
- 	.encrypt	= omap_aes_gcm_encrypt,
- 	.decrypt	= omap_aes_gcm_decrypt,
- },
-@@ -807,6 +808,7 @@ static struct aead_alg algs_aead_gcm[] = {
+@@ -799,12 +778,11 @@ static struct aead_alg algs_aead_gcm[] = {
+ 		.cra_flags		= CRYPTO_ALG_ASYNC |
+ 					  CRYPTO_ALG_KERN_DRIVER_ONLY,
+ 		.cra_blocksize		= 1,
+-		.cra_ctxsize		= sizeof(struct omap_aes_ctx),
++		.cra_ctxsize		= sizeof(struct omap_aes_gcm_ctx),
+ 		.cra_alignmask		= 0xf,
+ 		.cra_module		= THIS_MODULE,
+ 	},
+ 	.init		= omap_aes_gcm_cra_init,
+-	.exit		= omap_aes_gcm_cra_exit,
  	.maxauthsize	= AES_BLOCK_SIZE,
  	.ivsize		= GCM_RFC4106_IV_SIZE,
  	.setkey		= omap_aes_4106gcm_setkey,
-+	.setauthsize	= omap_aes_4106gcm_setauthsize,
- 	.encrypt	= omap_aes_4106gcm_encrypt,
- 	.decrypt	= omap_aes_4106gcm_decrypt,
- },
 diff --git a/drivers/crypto/omap-aes.h b/drivers/crypto/omap-aes.h
-index 2d3575231e31..1bcca7957e92 100644
+index 1bcca7957e92..b89d2e673699 100644
 --- a/drivers/crypto/omap-aes.h
 +++ b/drivers/crypto/omap-aes.h
-@@ -202,8 +202,11 @@ int omap_aes_4106gcm_setkey(struct crypto_aead *tfm, const u8 *key,
- 			    unsigned int keylen);
- int omap_aes_gcm_encrypt(struct aead_request *req);
- int omap_aes_gcm_decrypt(struct aead_request *req);
-+int omap_aes_gcm_setauthsize(struct crypto_aead *tfm, unsigned int authsize);
- int omap_aes_4106gcm_encrypt(struct aead_request *req);
- int omap_aes_4106gcm_decrypt(struct aead_request *req);
-+int omap_aes_4106gcm_setauthsize(struct crypto_aead *parent,
-+				 unsigned int authsize);
- int omap_aes_write_ctrl(struct omap_aes_dev *dd);
- int omap_aes_crypt_dma_start(struct omap_aes_dev *dd);
- int omap_aes_crypt_dma_stop(struct omap_aes_dev *dd);
+@@ -9,6 +9,7 @@
+ #ifndef __OMAP_AES_H__
+ #define __OMAP_AES_H__
+ 
++#include <crypto/aes.h>
+ #include <crypto/engine.h>
+ 
+ #define DST_MAXBURST			4
+@@ -98,7 +99,11 @@ struct omap_aes_ctx {
+ 	u32		key[AES_KEYSIZE_256 / sizeof(u32)];
+ 	u8		nonce[4];
+ 	struct crypto_sync_skcipher	*fallback;
+-	struct crypto_skcipher	*ctr;
++};
++
++struct omap_aes_gcm_ctx {
++	struct omap_aes_ctx	octx;
++	struct crypto_aes_ctx	actx;
+ };
+ 
+ struct omap_aes_reqctx {
 -- 
 2.17.1
 
