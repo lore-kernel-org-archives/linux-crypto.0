@@ -7,53 +7,54 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFBA4C010DF
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 12:38:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA009C010A2
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 12:38:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 84BA121D7F
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 12:38:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 96F5121D7F
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 12:38:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="hHwM9OoV"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="ZBgdl3Kw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388215AbfKEMiU (ORCPT
+        id S2388689AbfKEMiU (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Tue, 5 Nov 2019 07:38:20 -0500
-Received: from fllv0016.ext.ti.com ([198.47.19.142]:34364 "EHLO
+Received: from fllv0016.ext.ti.com ([198.47.19.142]:34362 "EHLO
         fllv0016.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388658AbfKEMiT (ORCPT
+        with ESMTP id S2388673AbfKEMiU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Nov 2019 07:38:19 -0500
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id xA5CcAL4021467;
-        Tue, 5 Nov 2019 06:38:10 -0600
+        Tue, 5 Nov 2019 07:38:20 -0500
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id xA5CcD0U021478;
+        Tue, 5 Nov 2019 06:38:13 -0600
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1572957490;
-        bh=0MpnH7eWm4FOfZl52m8GMcsRbvgeR59zMBRCUV6i9o8=;
+        s=ti-com-17Q1; t=1572957493;
+        bh=mUjNUnQ/VP5etN9fqL41+Jq7xqRS4LuXTifuuRCP97Q=;
         h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=hHwM9OoVHJBA1laAJayTjqPTFqJ6FrXtRcUcG1eO8edjganfguOG4J+9/xVyGkOjB
-         dWWf+EgbiWWx0h1/ZE+yT9HaKDggNQrQY7jzz5KqoyIsxptBd4OdadGcrTpKG5JZRj
-         XEsFpVdkU+ba94/3xhVtSUgI52AkYHM5Wd2apJi4=
-Received: from DLEE109.ent.ti.com (dlee109.ent.ti.com [157.170.170.41])
-        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTP id xA5CcAdL095773;
-        Tue, 5 Nov 2019 06:38:10 -0600
-Received: from DLEE100.ent.ti.com (157.170.170.30) by DLEE109.ent.ti.com
- (157.170.170.41) with Microsoft SMTP Server (version=TLS1_2,
+        b=ZBgdl3KwrkHfK2iGiHwU60wPSMwrchZCFZYBU3HXGjtyTerIpQfaifXGNgBD9Xr0U
+         QwCDRHLzv3e12GKd4czeDNNqvh0C3gY2hhLCaqVmPxaUFiBLx6WwjARKCPKSvVSFkh
+         Uh1C/8v0BPCb/C3TzgN3rafWgTw5GAA6Oc4Ri10c=
+Received: from DFLE101.ent.ti.com (dfle101.ent.ti.com [10.64.6.22])
+        by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id xA5CcD9N023444
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 5 Nov 2019 06:38:13 -0600
+Received: from DFLE101.ent.ti.com (10.64.6.22) by DFLE101.ent.ti.com
+ (10.64.6.22) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3; Tue, 5 Nov
- 2019 06:37:55 -0600
-Received: from fllv0039.itg.ti.com (10.64.41.19) by DLEE100.ent.ti.com
- (157.170.170.30) with Microsoft SMTP Server (version=TLS1_2,
+ 2019 06:37:58 -0600
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DFLE101.ent.ti.com
+ (10.64.6.22) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3 via
- Frontend Transport; Tue, 5 Nov 2019 06:37:55 -0600
+ Frontend Transport; Tue, 5 Nov 2019 06:37:58 -0600
 Received: from sokoban.ti.com (ileax41-snat.itg.ti.com [10.172.224.153])
-        by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id xA5Cc6cw117093;
-        Tue, 5 Nov 2019 06:38:08 -0600
+        by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id xA5Cc6d0117093;
+        Tue, 5 Nov 2019 06:38:12 -0600
 From:   Tero Kristo <t-kristo@ti.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
         <linux-crypto@vger.kernel.org>
 CC:     <linux-omap@vger.kernel.org>, <ard.biesheuvel@kernel.org>
-Subject: [PATCH 1/6] crypto: omap-aes-gcm: fix failure with assocdata only
-Date:   Tue, 5 Nov 2019 14:37:54 +0200
-Message-ID: <20191105123759.25053-2-t-kristo@ti.com>
+Subject: [PATCH 3/6] crypto: omap-aes-gcm: convert to use crypto engine
+Date:   Tue, 5 Nov 2019 14:37:56 +0200
+Message-ID: <20191105123759.25053-4-t-kristo@ti.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191105123759.25053-1-t-kristo@ti.com>
 References: <20191105123759.25053-1-t-kristo@ti.com>
@@ -65,150 +66,236 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-If we only have assocdata with an omap-aes-gcm, it currently just
-completes it directly without passing it over to the crypto HW. This
-produces wrong results.
-
-Fix by passing the request down to the crypto HW, and fix the DMA
-support code to accept a case where we don't expect any output data.
-In the case where only assocdata is provided, it just passes through
-the accelerator and provides authentication results, without any
-encrypted/decrypted buffer via DMA.
+Currently omap-aes-gcm algorithms are using local implementation for
+crypto request queuing logic. Instead, implement this via usage of
+crypto engine which is used already for rest of the omap aes algorithms.
+This avoids some random conflicts / crashes also which can happen if
+both aes and aes-gcm are attempted to be used simultaneously.
 
 Signed-off-by: Tero Kristo <t-kristo@ti.com>
 ---
- drivers/crypto/omap-aes-gcm.c |  2 +-
- drivers/crypto/omap-aes.c     | 67 +++++++++++++++++++++--------------
- 2 files changed, 42 insertions(+), 27 deletions(-)
+ drivers/crypto/omap-aes-gcm.c | 98 +++++++++++++++++++----------------
+ drivers/crypto/omap-aes.c     | 23 --------
+ drivers/crypto/omap-aes.h     |  2 +-
+ 3 files changed, 55 insertions(+), 68 deletions(-)
 
 diff --git a/drivers/crypto/omap-aes-gcm.c b/drivers/crypto/omap-aes-gcm.c
-index 6da05149b195..e92000846f16 100644
+index e92000846f16..32dc00dc570b 100644
 --- a/drivers/crypto/omap-aes-gcm.c
 +++ b/drivers/crypto/omap-aes-gcm.c
-@@ -244,7 +244,7 @@ static int omap_aes_gcm_handle_queue(struct omap_aes_dev *dd,
- 
- 	err = omap_aes_write_ctrl(dd);
- 	if (!err) {
--		if (dd->in_sg_len && dd->out_sg_len)
-+		if (dd->in_sg_len)
- 			err = omap_aes_crypt_dma_start(dd);
- 		else
- 			omap_aes_gcm_dma_out_callback(dd);
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index c43121ec8b0b..a63ff4738466 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -269,13 +269,14 @@ static int omap_aes_crypt_dma(struct omap_aes_dev *dd,
- 			      struct scatterlist *out_sg,
- 			      int in_sg_len, int out_sg_len)
+@@ -13,6 +13,7 @@
+ #include <linux/dmaengine.h>
+ #include <linux/omap-dma.h>
+ #include <linux/interrupt.h>
++#include <linux/pm_runtime.h>
+ #include <crypto/aes.h>
+ #include <crypto/gcm.h>
+ #include <crypto/scatterwalk.h>
+@@ -29,11 +30,13 @@ static void omap_aes_gcm_finish_req(struct omap_aes_dev *dd, int ret)
  {
--	struct dma_async_tx_descriptor *tx_in, *tx_out;
-+	struct dma_async_tx_descriptor *tx_in, *tx_out = NULL, *cb_desc;
- 	struct dma_slave_config cfg;
- 	int ret;
+ 	struct aead_request *req = dd->aead_req;
  
- 	if (dd->pio_only) {
- 		scatterwalk_start(&dd->in_walk, dd->in_sg);
--		scatterwalk_start(&dd->out_walk, dd->out_sg);
-+		if (out_sg_len)
-+			scatterwalk_start(&dd->out_walk, dd->out_sg);
+-	dd->flags &= ~FLAGS_BUSY;
+ 	dd->in_sg = NULL;
+ 	dd->out_sg = NULL;
  
- 		/* Enable DATAIN interrupt and let it take
- 		   care of the rest */
-@@ -312,34 +313,45 @@ static int omap_aes_crypt_dma(struct omap_aes_dev *dd,
+-	req->base.complete(&req->base, ret);
++	crypto_finalize_aead_request(dd->engine, req, ret);
++
++	pm_runtime_mark_last_busy(dd->dev);
++	pm_runtime_put_autosuspend(dd->dev);
+ }
  
- 	/* No callback necessary */
- 	tx_in->callback_param = dd;
-+	tx_in->callback = NULL;
+ static void omap_aes_gcm_done_task(struct omap_aes_dev *dd)
+@@ -81,7 +84,6 @@ static void omap_aes_gcm_done_task(struct omap_aes_dev *dd)
+ 	}
  
- 	/* OUT */
--	ret = dmaengine_slave_config(dd->dma_lch_out, &cfg);
--	if (ret) {
--		dev_err(dd->dev, "can't configure OUT dmaengine slave: %d\n",
--			ret);
+ 	omap_aes_gcm_finish_req(dd, ret);
+-	omap_aes_gcm_handle_queue(dd, NULL);
+ }
+ 
+ static int omap_aes_gcm_copy_buffers(struct omap_aes_dev *dd,
+@@ -127,6 +129,9 @@ static int omap_aes_gcm_copy_buffers(struct omap_aes_dev *dd,
+ 	if (cryptlen) {
+ 		tmp = scatterwalk_ffwd(sg_arr, req->src, req->assoclen);
+ 
++		if (nsg)
++			sg_unmark_end(dd->in_sgl);
++
+ 		ret = omap_crypto_align_sg(&tmp, cryptlen,
+ 					   AES_BLOCK_SIZE, &dd->in_sgl[nsg],
+ 					   OMAP_CRYPTO_COPY_DATA |
+@@ -146,7 +151,7 @@ static int omap_aes_gcm_copy_buffers(struct omap_aes_dev *dd,
+ 	dd->out_sg = req->dst;
+ 	dd->orig_out = req->dst;
+ 
+-	dd->out_sg = scatterwalk_ffwd(sg_arr, req->dst, assoclen);
++	dd->out_sg = scatterwalk_ffwd(sg_arr, req->dst, req->assoclen);
+ 
+ 	flags = 0;
+ 	if (req->src == req->dst || dd->out_sg == sg_arr)
+@@ -202,37 +207,21 @@ void omap_aes_gcm_dma_out_callback(void *data)
+ static int omap_aes_gcm_handle_queue(struct omap_aes_dev *dd,
+ 				     struct aead_request *req)
+ {
+-	struct omap_aes_gcm_ctx *ctx;
+-	struct aead_request *backlog;
+-	struct omap_aes_reqctx *rctx;
+-	unsigned long flags;
+-	int err, ret = 0;
+-
+-	spin_lock_irqsave(&dd->lock, flags);
+-	if (req)
+-		ret = aead_enqueue_request(&dd->aead_queue, req);
+-	if (dd->flags & FLAGS_BUSY) {
+-		spin_unlock_irqrestore(&dd->lock, flags);
 -		return ret;
 -	}
-+	if (out_sg_len) {
-+		ret = dmaengine_slave_config(dd->dma_lch_out, &cfg);
-+		if (ret) {
-+			dev_err(dd->dev, "can't configure OUT dmaengine slave: %d\n",
-+				ret);
-+			return ret;
-+		}
+-
+-	backlog = aead_get_backlog(&dd->aead_queue);
+-	req = aead_dequeue_request(&dd->aead_queue);
+ 	if (req)
+-		dd->flags |= FLAGS_BUSY;
+-	spin_unlock_irqrestore(&dd->lock, flags);
+-
+-	if (!req)
+-		return ret;
++		return crypto_transfer_aead_request_to_engine(dd->engine, req);
  
--	tx_out = dmaengine_prep_slave_sg(dd->dma_lch_out, out_sg, out_sg_len,
--					DMA_DEV_TO_MEM,
--					DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
--	if (!tx_out) {
--		dev_err(dd->dev, "OUT prep_slave_sg() failed\n");
--		return -EINVAL;
-+		tx_out = dmaengine_prep_slave_sg(dd->dma_lch_out, out_sg,
-+						 out_sg_len,
-+						 DMA_DEV_TO_MEM,
-+						 DMA_PREP_INTERRUPT | DMA_CTRL_ACK);
-+		if (!tx_out) {
-+			dev_err(dd->dev, "OUT prep_slave_sg() failed\n");
-+			return -EINVAL;
-+		}
+-	if (backlog)
+-		backlog->base.complete(&backlog->base, -EINPROGRESS);
++	return 0;
++}
+ 
+-	ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
+-	rctx = aead_request_ctx(req);
++static int omap_aes_gcm_prepare_req(struct crypto_engine *engine, void *areq)
++{
++	struct aead_request *req = container_of(areq, struct aead_request,
++						base);
++	struct omap_aes_reqctx *rctx = aead_request_ctx(req);
++	struct omap_aes_dev *dd = rctx->dd;
++	struct omap_aes_gcm_ctx *ctx = crypto_aead_ctx(crypto_aead_reqtfm(req));
++	int err;
+ 
+-	dd->ctx = &ctx->octx;
+-	rctx->dd = dd;
+ 	dd->aead_req = req;
+ 
+ 	rctx->mode &= FLAGS_MODE_MASK;
+@@ -242,20 +231,9 @@ static int omap_aes_gcm_handle_queue(struct omap_aes_dev *dd,
+ 	if (err)
+ 		return err;
+ 
+-	err = omap_aes_write_ctrl(dd);
+-	if (!err) {
+-		if (dd->in_sg_len)
+-			err = omap_aes_crypt_dma_start(dd);
+-		else
+-			omap_aes_gcm_dma_out_callback(dd);
+-	}
+-
+-	if (err) {
+-		omap_aes_gcm_finish_req(dd, err);
+-		omap_aes_gcm_handle_queue(dd, NULL);
+-	}
++	dd->ctx = &ctx->octx;
+ 
+-	return ret;
++	return omap_aes_write_ctrl(dd);
+ }
+ 
+ static int omap_aes_gcm_crypt(struct aead_request *req, unsigned long mode)
+@@ -378,3 +356,35 @@ int omap_aes_4106gcm_setauthsize(struct crypto_aead *parent,
+ {
+ 	return crypto_rfc4106_check_authsize(authsize);
+ }
 +
-+		cb_desc = tx_out;
-+	} else {
-+		cb_desc = tx_in;
- 	}
- 
- 	if (dd->flags & FLAGS_GCM)
--		tx_out->callback = omap_aes_gcm_dma_out_callback;
-+		cb_desc->callback = omap_aes_gcm_dma_out_callback;
- 	else
--		tx_out->callback = omap_aes_dma_out_callback;
--	tx_out->callback_param = dd;
-+		cb_desc->callback = omap_aes_dma_out_callback;
-+	cb_desc->callback_param = dd;
++static int omap_aes_gcm_crypt_req(struct crypto_engine *engine, void *areq)
++{
++	struct aead_request *req = container_of(areq, struct aead_request,
++						base);
++	struct omap_aes_reqctx *rctx = aead_request_ctx(req);
++	struct omap_aes_dev *dd = rctx->dd;
++	int ret = 0;
 +
++	if (!dd)
++		return -ENODEV;
++
++	if (dd->in_sg_len)
++		ret = omap_aes_crypt_dma_start(dd);
++	else
++		omap_aes_gcm_dma_out_callback(dd);
++
++	return ret;
++}
++
++int omap_aes_gcm_cra_init(struct crypto_aead *tfm)
++{
++	struct omap_aes_ctx *ctx = crypto_aead_ctx(tfm);
++
++	ctx->enginectx.op.prepare_request = omap_aes_gcm_prepare_req;
++	ctx->enginectx.op.unprepare_request = NULL;
++	ctx->enginectx.op.do_one_request = omap_aes_gcm_crypt_req;
++
++	crypto_aead_set_reqsize(tfm, sizeof(struct omap_aes_reqctx));
++
++	return 0;
++}
+diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
+index a63ff4738466..627254a872a9 100644
+--- a/drivers/crypto/omap-aes.c
++++ b/drivers/crypto/omap-aes.c
+@@ -657,29 +657,6 @@ static int omap_aes_init_tfm(struct crypto_skcipher *tfm)
+ 	return 0;
+ }
  
- 	dmaengine_submit(tx_in);
--	dmaengine_submit(tx_out);
-+	if (tx_out)
-+		dmaengine_submit(tx_out);
+-static int omap_aes_gcm_cra_init(struct crypto_aead *tfm)
+-{
+-	struct omap_aes_dev *dd = NULL;
+-	int err;
+-
+-	/* Find AES device, currently picks the first device */
+-	spin_lock_bh(&list_lock);
+-	list_for_each_entry(dd, &dev_list, list) {
+-		break;
+-	}
+-	spin_unlock_bh(&list_lock);
+-
+-	err = pm_runtime_get_sync(dd->dev);
+-	if (err < 0) {
+-		dev_err(dd->dev, "%s: failed to get_sync(%d)\n",
+-			__func__, err);
+-		return err;
+-	}
+-
+-	tfm->reqsize = sizeof(struct omap_aes_reqctx);
+-	return 0;
+-}
+-
+ static void omap_aes_exit_tfm(struct crypto_skcipher *tfm)
+ {
+ 	struct omap_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
+diff --git a/drivers/crypto/omap-aes.h b/drivers/crypto/omap-aes.h
+index b89d2e673699..2d111bf906e1 100644
+--- a/drivers/crypto/omap-aes.h
++++ b/drivers/crypto/omap-aes.h
+@@ -80,7 +80,6 @@
  
- 	dma_async_issue_pending(dd->dma_lch_in);
--	dma_async_issue_pending(dd->dma_lch_out);
-+	if (out_sg_len)
-+		dma_async_issue_pending(dd->dma_lch_out);
+ #define FLAGS_INIT		BIT(5)
+ #define FLAGS_FAST		BIT(6)
+-#define FLAGS_BUSY		BIT(7)
  
- 	/* start DMA */
- 	dd->pdata->trigger(dd, dd->total);
-@@ -361,11 +373,13 @@ int omap_aes_crypt_dma_start(struct omap_aes_dev *dd)
- 			return -EINVAL;
- 		}
- 
--		err = dma_map_sg(dd->dev, dd->out_sg, dd->out_sg_len,
--				 DMA_FROM_DEVICE);
--		if (!err) {
--			dev_err(dd->dev, "dma_map_sg() error\n");
--			return -EINVAL;
-+		if (dd->out_sg_len) {
-+			err = dma_map_sg(dd->dev, dd->out_sg, dd->out_sg_len,
-+					 DMA_FROM_DEVICE);
-+			if (!err) {
-+				dev_err(dd->dev, "dma_map_sg() error\n");
-+				return -EINVAL;
-+			}
- 		}
- 	}
- 
-@@ -373,8 +387,9 @@ int omap_aes_crypt_dma_start(struct omap_aes_dev *dd)
- 				 dd->out_sg_len);
- 	if (err && !dd->pio_only) {
- 		dma_unmap_sg(dd->dev, dd->in_sg, dd->in_sg_len, DMA_TO_DEVICE);
--		dma_unmap_sg(dd->dev, dd->out_sg, dd->out_sg_len,
--			     DMA_FROM_DEVICE);
-+		if (dd->out_sg_len)
-+			dma_unmap_sg(dd->dev, dd->out_sg, dd->out_sg_len,
-+				     DMA_FROM_DEVICE);
- 	}
- 
- 	return err;
+ #define FLAGS_IN_DATA_ST_SHIFT	8
+ #define FLAGS_OUT_DATA_ST_SHIFT	10
+@@ -212,6 +211,7 @@ int omap_aes_4106gcm_encrypt(struct aead_request *req);
+ int omap_aes_4106gcm_decrypt(struct aead_request *req);
+ int omap_aes_4106gcm_setauthsize(struct crypto_aead *parent,
+ 				 unsigned int authsize);
++int omap_aes_gcm_cra_init(struct crypto_aead *tfm);
+ int omap_aes_write_ctrl(struct omap_aes_dev *dd);
+ int omap_aes_crypt_dma_start(struct omap_aes_dev *dd);
+ int omap_aes_crypt_dma_stop(struct omap_aes_dev *dd);
 -- 
 2.17.1
 
