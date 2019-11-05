@@ -2,95 +2,93 @@ Return-Path: <SRS0=QWZk=Y5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58B55C010CF
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 12:38:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E416C17461
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 13:21:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2DA2921D7F
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 12:38:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="G6R96ECl"
+	by mail.kernel.org (Postfix) with ESMTP id 2D61C21D7C
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 13:21:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388810AbfKEMis (ORCPT
+        id S2388789AbfKENU7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Nov 2019 07:38:48 -0500
-Received: from fllv0016.ext.ti.com ([198.47.19.142]:34446 "EHLO
-        fllv0016.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2388494AbfKEMis (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Nov 2019 07:38:48 -0500
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id xA5CchvY021814;
-        Tue, 5 Nov 2019 06:38:43 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1572957523;
-        bh=CVS2IDzTtGCfSD9+s5z6NmfIUOK9IhJymoncHHPAjvY=;
-        h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=G6R96EClAt4JH+OFY4JQXbYgzUQWG4H6uGxbnQh64F89DMg8/2LFfAiJAG0WRmkbE
-         MOHG+6uLxOvN5hnNpUoCyEyMslsyQGyoHBnJw88sh59xdLZd4XLO43iX6Adph6AneB
-         YB/nVdK9g9tdL2mkBzdYB+N2qIykxD5autbYOj6g=
-Received: from DFLE113.ent.ti.com (dfle113.ent.ti.com [10.64.6.34])
-        by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id xA5Cchp9088156
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 5 Nov 2019 06:38:43 -0600
-Received: from DFLE103.ent.ti.com (10.64.6.24) by DFLE113.ent.ti.com
- (10.64.6.34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3; Tue, 5 Nov
- 2019 06:38:00 -0600
-Received: from fllv0039.itg.ti.com (10.64.41.19) by DFLE103.ent.ti.com
- (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3 via
- Frontend Transport; Tue, 5 Nov 2019 06:38:00 -0600
-Received: from sokoban.ti.com (ileax41-snat.itg.ti.com [10.172.224.153])
-        by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id xA5Cc6d1117093;
-        Tue, 5 Nov 2019 06:38:13 -0600
-From:   Tero Kristo <t-kristo@ti.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>
-CC:     <linux-omap@vger.kernel.org>, <ard.biesheuvel@kernel.org>
-Subject: [PATCH 4/6] crypto: omap-des: avoid unnecessary spam with bad cryptlen
-Date:   Tue, 5 Nov 2019 14:37:57 +0200
-Message-ID: <20191105123759.25053-5-t-kristo@ti.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191105123759.25053-1-t-kristo@ti.com>
-References: <20191105123759.25053-1-t-kristo@ti.com>
+        Tue, 5 Nov 2019 08:20:59 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:33330 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2388753AbfKENU7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 5 Nov 2019 08:20:59 -0500
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1iRylR-00062K-GN; Tue, 05 Nov 2019 21:20:53 +0800
+Received: from herbert by gondobar with local (Exim 4.89)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1iRylP-0000nY-Aq; Tue, 05 Nov 2019 21:20:51 +0800
+Date:   Tue, 5 Nov 2019 21:20:51 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Tero Kristo <t-kristo@ti.com>
+Cc:     Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+        linux-omap@vger.kernel.org
+Subject: Re: [PATCH 0/6] crypto: additional fixes for omap-aes
+Message-ID: <20191105132051.smkx32ix3465b5bq@gondor.apana.org.au>
+References: <20191026145259.16040-1-ardb@kernel.org>
+ <b8743ccb-2e3a-6d50-017c-48af6d3fa846@ti.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b8743ccb-2e3a-6d50-017c-48af6d3fa846@ti.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Remove the error print in this case, and just return the error.
+On Tue, Nov 05, 2019 at 02:19:54PM +0200, Tero Kristo wrote:
+> On 26/10/2019 17:52, Ard Biesheuvel wrote:
+> > This series applies onto Tero's series [0], and addresses a number of
+> > additional issues that exist in the omap-aes driver that aren't being
+> > addresses by Tero's fixes.
+> > 
+> > Note that the resulting code is still not 100% correct: an issue remains
+> > where inputs into GCM consisting solely of assocdata are not being processed
+> > correctly, e.g.,
+> > 
+> > alg: aead: gcm-aes-omap encryption test failed (wrong result) on test vector
+> >    "random: alen=38 plen=0 authsize=16 klen=32",
+> >     cfg="random: inplace may_sleep use_digest src_divs=[100.0%@+19] iv_offset=31"
+> > 
+> > I have no idea how to fix this, so I'll leave this to people that know this
+> > hardware and have access to the Sitara TRM.
+> > 
+> > Note that I also spotted some issues in the SHAM driver, i.e.,
+> > 
+> > alg: ahash: omap-sha1 test failed (wrong result) on test vector
+> >    "random: psize=7928 ksize=0", cfg="random: inplace use_final
+> >        src_divs=[5.64%@+13, 59.70%@+18, <flush>31.53%@+4072,
+> >        <flush,nosimd>3.13%@alignmask+263]"
+> > alg: ahash: omap-hmac-sha256 test failed (wrong result) on test vector
+> >    "random: psize=960 ksize=37", cfg="random: inplace use_final
+> >        src_divs=[32.54%@+2449, 17.18%@+4, <flush>50.28%@+1] iv_offset=31"
+> > 
+> > All of these failures are triggered by CONFIG_CRYPTO_MANAGER_EXTRA_TESTS,
+> > so they will not show up when using the standard set of test vectors.
+> > 
+> > [0] https://lore.kernel.org/linux-crypto/20191017122549.4634-1-t-kristo@ti.com/
+> > 
+> > Cc: linux-omap@vger.kernel.org
+> > Cc: Tero Kristo <t-kristo@ti.com>
+> 
+> For the whole series:
+> 
+> Reviewed-by: Tero Kristo <t-kristo@ti.com>
+> Tested-by: Tero Kristo <t-kristo@ti.com>
 
-Signed-off-by: Tero Kristo <t-kristo@ti.com>
----
- drivers/crypto/omap-des.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+Actually I've lost track of both of your patch series.  Please
+repost both in the correct order for merging.
 
-diff --git a/drivers/crypto/omap-des.c b/drivers/crypto/omap-des.c
-index ea82d55ea8c3..d1d839164048 100644
---- a/drivers/crypto/omap-des.c
-+++ b/drivers/crypto/omap-des.c
-@@ -637,10 +637,8 @@ static int omap_des_crypt(struct skcipher_request *req, unsigned long mode)
- 		 !!(mode & FLAGS_ENCRYPT),
- 		 !!(mode & FLAGS_CBC));
- 
--	if (!IS_ALIGNED(req->cryptlen, DES_BLOCK_SIZE)) {
--		pr_err("request size is not exact amount of DES blocks\n");
-+	if (!IS_ALIGNED(req->cryptlen, DES_BLOCK_SIZE))
- 		return -EINVAL;
--	}
- 
- 	dd = omap_des_find_dev(ctx);
- 	if (!dd)
+Thanks,
 -- 
-2.17.1
-
---
-Texas Instruments Finland Oy, Porkkalankatu 22, 00180 Helsinki. Y-tunnus/Business ID: 0615521-4. Kotipaikka/Domicile: Helsinki
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
