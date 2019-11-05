@@ -2,80 +2,103 @@ Return-Path: <SRS0=QWZk=Y5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44532C5DF60
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 17:32:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54A92C5DF60
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 17:42:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0FF44214D8
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 17:32:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2FBEC21A4A
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 17:42:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1572975163;
-	bh=uT3bEZMqcvE0LO6gjZrYNNNtYgoxVgzmdR0oJRRV3Q4=;
+	s=default; t=1572975723;
+	bh=wpN5dFK9y7CHh7qhkGjKOJbrRTRGtSpcxKUvYH3cpdM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=v3fMe1YFB9tul5trcdLxClDmX3R5E1V0P2vp8ib5mR8LBcSHBMPMBWeZu6ZrW/tRm
-	 ZWwGfMXK4U9EikmRyujx/s95BENBg9mvFfUrrcBN7T4VLGB5Li0ZOeZFvxJYOOpW+9
-	 OJXBXY8SU1msSYd0eX0W6cb7Ex8zF99oHc6ZLVAU=
+	b=kocAtVji4zwiCSAQ1GoCgFhbH2vN8LKImuzliDbFcJynXEdqe/qHQ8uUCt6e9y3zM
+	 JXHmS/2Is2j2I7CApPEeDXGDSR7Xq3n1zrnfS19X4oEiAKUynUJoSFAVY5I7VRwc0E
+	 4lybAtuMjy/wyCdPKb9BsvlRqSYabS5xoOp9iwmo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389523AbfKERcm (ORCPT
+        id S2390437AbfKERmC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Nov 2019 12:32:42 -0500
-Received: from mail.kernel.org ([198.145.29.99]:54302 "EHLO mail.kernel.org"
+        Tue, 5 Nov 2019 12:42:02 -0500
+Received: from mail.kernel.org ([198.145.29.99]:60916 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387776AbfKERcm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Nov 2019 12:32:42 -0500
+        id S2388969AbfKERmC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 5 Nov 2019 12:42:02 -0500
 Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 314BB2087E;
-        Tue,  5 Nov 2019 17:32:41 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 84CE9214D8;
+        Tue,  5 Nov 2019 17:42:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1572975161;
-        bh=uT3bEZMqcvE0LO6gjZrYNNNtYgoxVgzmdR0oJRRV3Q4=;
+        s=default; t=1572975721;
+        bh=wpN5dFK9y7CHh7qhkGjKOJbrRTRGtSpcxKUvYH3cpdM=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Q8ZNADz7U0snS9szacn2Cr5QJ/4QCcW1W0a+DJICsARMF1kCYi8Kr8vNKI9gh4JdG
-         9LRW/573QUVpGcLX98RCqH58tH6/xZX+BIQes9bGMgtwhJTJdm7SyvI+8DCgo3Lfh8
-         V4SAJ4hnBqXK34lpTuv0bjdCHmD9poqXaCmOHs64=
-Date:   Tue, 5 Nov 2019 09:32:39 -0800
+        b=UDKQjMTqFTL1AZCg5U4sHPerBG12YJ8qDC+VWkfCSUVMh2tGMk3XNEe7Z8hChxM1v
+         jzI7+CbehGyLJPsR1DnBj/2FohcSXmH9eu1gOIJ8k9oBYklbyn8RrpIuOwNy1uOZXW
+         JSwA0hdZJrEmrzKr7VVE7UEOTayZvfNe6B2Ejlw4=
+Date:   Tue, 5 Nov 2019 09:42:00 -0800
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-arm-kernel@lists.infradead.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Gonglei <arei.gonglei@huawei.com>,
-        virtualization@lists.linux-foundation.org
-Subject: Re: [PATCH v3 03/29] crypto: virtio - switch to skcipher API
-Message-ID: <20191105173239.GB757@sol.localdomain>
-Mail-Followup-To: Ard Biesheuvel <ardb@kernel.org>,
-        linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-arm-kernel@lists.infradead.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>, Gonglei <arei.gonglei@huawei.com>,
-        virtualization@lists.linux-foundation.org
-References: <20191105132826.1838-1-ardb@kernel.org>
- <20191105132826.1838-4-ardb@kernel.org>
+To:     Tero Kristo <t-kristo@ti.com>
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, ard.biesheuvel@linaro.org,
+        linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH 09/10] crypto: add timeout to crypto_wait_req
+Message-ID: <20191105174200.GC757@sol.localdomain>
+Mail-Followup-To: Tero Kristo <t-kristo@ti.com>,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, ard.biesheuvel@linaro.org,
+        linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+References: <20191017122549.4634-1-t-kristo@ti.com>
+ <20191017122549.4634-10-t-kristo@ti.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191105132826.1838-4-ardb@kernel.org>
+In-Reply-To: <20191017122549.4634-10-t-kristo@ti.com>
 User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Nov 05, 2019 at 02:28:00PM +0100, Ard Biesheuvel wrote:
-> So switch this driver to the skcipher API, allowing us to finally drop the
-> blkcipher code in the near future.
+On Thu, Oct 17, 2019 at 03:25:48PM +0300, Tero Kristo wrote:
+> Currently crypto_wait_req waits indefinitely for an async crypto request
+> to complete. This is bad as it can cause for example the crypto test
+> manager to hang without any notification as to why it has happened.
+> Instead of waiting indefinitely, add a 1 second timeout to the call,
+> and provide a warning print if a timeout happens.
+> 
+> Signed-off-by: Tero Kristo <t-kristo@ti.com>
+> ---
+>  include/linux/crypto.h | 9 ++++++++-
+>  1 file changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+> index 19ea3a371d7b..b8f0e5c3cc0c 100644
+> --- a/include/linux/crypto.h
+> +++ b/include/linux/crypto.h
+> @@ -682,8 +682,15 @@ static inline int crypto_wait_req(int err, struct crypto_wait *wait)
+>  	switch (err) {
+>  	case -EINPROGRESS:
+>  	case -EBUSY:
+> -		wait_for_completion(&wait->completion);
+> +		err = wait_for_completion_timeout(&wait->completion,
+> +						  msecs_to_jiffies(1000));
+>  		reinit_completion(&wait->completion);
+> +		if (!err) {
+> +			pr_err("%s: timeout for %p\n", __func__, wait);
+> +			err = -ETIMEDOUT;
+> +			break;
+> +		}
+> +
+>  		err = wait->err;
+>  		break;
+>  	};
 
-Strictly speaking this should say "ablkcipher", not "blkcipher".
-Same in the other commit messages.
+I'm not sure this is a good idea, because operations could legitimately take a
+long time, e.g. if someone passes in a huge data buffer.  How do you know that X
+amount of time is always going to be enough?
 
 - Eric
