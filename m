@@ -8,55 +8,55 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18341C5DF61
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 15:14:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47983C5DF60
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 15:14:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D6C10222C1
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 15:14:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F3A6D214D8
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 15:14:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cfxn590q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F3TqxC1r"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389850AbfKEPOJ (ORCPT
+        id S2389832AbfKEPOH (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Nov 2019 10:14:09 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:43421 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389837AbfKEPOI (ORCPT
+        Tue, 5 Nov 2019 10:14:07 -0500
+Received: from mail-pg1-f196.google.com ([209.85.215.196]:42822 "EHLO
+        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389083AbfKEPOG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Nov 2019 10:14:08 -0500
-Received: by mail-pf1-f194.google.com with SMTP id 3so15651412pfb.10;
-        Tue, 05 Nov 2019 07:14:07 -0800 (PST)
+        Tue, 5 Nov 2019 10:14:06 -0500
+Received: by mail-pg1-f196.google.com with SMTP id s23so11039564pgo.9;
+        Tue, 05 Nov 2019 07:14:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=+V9U/kgqliJ0JjR1q9YS5WvnKS2tKemStnCe92kSlvk=;
-        b=Cfxn590qqeWUo+j4bZrh9/whULdSKwb9U/vupga1h+vwWxsLJkDH27emfnI6gDNjv7
-         YjBA+xouJrES7HOOeSkl/54A/wXL8JdQjEcwBa9R6o9Hib3F0OrdEEdY070ReSX5kTz1
-         PTKl6xMJn2ro0FNWzulPYQMpX1MaKJ2W6S5emAPV/ICLVZUObPXSvlDZqvLrxjuZZbO/
-         EbjWeV6VqASPHHcO89QqpnyPklvGJ9sUxZMKx9kjit5X0x001mnEy8y/hn3HzKHvIYdq
-         H0D+xbX+wUnKRfhGJaCzBaA4BYvwOltURj+b7nOsGFPXgGceK0+iEZKdDzQ8XixojdAI
-         EC0A==
+        bh=1w3iW7NTvN7La5YhT9YPtWdscsba7Z3HfgTz1LRXGDw=;
+        b=F3TqxC1rAGQKctXjsHfSdIQbCR2wkSeUBb/oHkQrDwsEzsk4XA/WuxlVJVvqWQ45Rw
+         Csj2uvWnl035M9+SsTWJ7IkDYXwGYk/xwppR4HeIsHc6fRPC5Syg0nFAaWnUUUksLbbU
+         EB9kqhE7scirGIDIIx4aGk2noRio4bwANMzQotiU4S/nHSQX1249tTw79EXJHTZ8GPCk
+         zhZL5v5kzSp0eeTZ92n5fbZRED8Aqd5o+gSgJNYWF+i9pbqVnJZUnXZjLNrrdO6Wxc/q
+         LbYCZvi9JXc1P8cGINHLL9u4lbdMWTIKeLp/X6d2XOG9eZvJhJdgI44T4fZKJlx7kwPD
+         A3kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=+V9U/kgqliJ0JjR1q9YS5WvnKS2tKemStnCe92kSlvk=;
-        b=TI/zVR9d5hWCFQcijVmjOtKpJ1Vyv5FKABDx7yNQ33bUYZZQ4VUuPMi0ICVuZ/2XPf
-         mBFhf6JNex8+f+fonuXDVxcN8FrdkY7cWkgcGJB7SFP7TE01qpHK/z+68wUMOn+HM7NZ
-         B1M8jYk+uaK9s6vEjCyQH4rkh0/bhbN2ThP5sJJJB5HqspCmB1+Ho94RU5lYO6DHMAI8
-         ELKzEW3kcJnei/pa0ojqJD2nCG/ilNlNS/7kVHQAco5x9K6DXaVVBS0kg9R6h0qzzENS
-         S6Uzg2DsKhYPoJt8Dc9e0e/2UKiZ7DqHBA0ObQumNmksGDDONFF+dbniSYy9RU+5ateS
-         WKuQ==
-X-Gm-Message-State: APjAAAU8+m75mh3FxsN1Giu/80FownSVZ8zoV5pbgb4vrPHnEOLor5X2
-        xo0NSkvmonN2P100fG6+cvEkbb4b
-X-Google-Smtp-Source: APXvYqxXmJawm6N8va4MaMzR8P7XqNje/7s+J33Z9iWrsXZxI2CJmv2bnRLnDHUKgfuhO4OY/GwW5A==
-X-Received: by 2002:a63:d802:: with SMTP id b2mr37083755pgh.414.1572966846743;
-        Tue, 05 Nov 2019 07:14:06 -0800 (PST)
-Received: from localhost.lan (c-67-185-54-80.hsd1.wa.comcast.net. [67.185.54.80])
-        by smtp.gmail.com with ESMTPSA id f7sm23120691pfa.150.2019.11.05.07.14.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        bh=1w3iW7NTvN7La5YhT9YPtWdscsba7Z3HfgTz1LRXGDw=;
+        b=i0oWahxc2GmKZQh3J1TG2hQeNIqdEUe5cL3ZNyLswMMD+BqUbD2IonqC4RLTxOogBp
+         1RvCVzLAWHrRuE9xR3CNRIGrRay0PeAuPj+0PfJNerLfiyjlandtsthBx3YxuI42VytM
+         pDCG9K+TIui8YL9cGuI01+jR95YKJTJBdzAvUzD2NLxvH7tllQ0LrJvG9qlz6Vl+vPON
+         dRudsINKIh/lQWf9O+8nZHzs8PcOWRMz/Ajsn9OZX8VPn9zFa2ueJDseA6jTXH1hQlea
+         EqGu/cnKc/9Z2pBQ79SMsD35HtT/ARi2RiY8OvWUVlXL0sS9kyXN3cPgplyIQ3bHxnLj
+         m6uA==
+X-Gm-Message-State: APjAAAUKR/E6mR4z0bdwwF7471noUiNuKG9+NnAN/Q5WeN08yidiGGgm
+        RX+2ilU2+1q+BzUT+B0eXl9EZ3em
+X-Google-Smtp-Source: APXvYqx2xKUbqls/9/YgBoEYXCJJRh6/fOOjgxQbUr4rrJbFC/aRqLNcahk4/hSZ309+DnX0LsL7/w==
+X-Received: by 2002:a63:d50a:: with SMTP id c10mr4633482pgg.327.1572966845062;
         Tue, 05 Nov 2019 07:14:05 -0800 (PST)
+Received: from localhost.lan (c-67-185-54-80.hsd1.wa.comcast.net. [67.185.54.80])
+        by smtp.gmail.com with ESMTPSA id f7sm23120691pfa.150.2019.11.05.07.14.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Nov 2019 07:14:04 -0800 (PST)
 From:   Andrey Smirnov <andrew.smirnov@gmail.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
@@ -66,9 +66,9 @@ Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Iuliana Prodan <iuliana.prodan@nxp.com>, linux-imx@nxp.com,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 5/5] crypto: caam - disable CAAM's bind/unbind attributes
-Date:   Tue,  5 Nov 2019 07:13:53 -0800
-Message-Id: <20191105151353.6522-6-andrew.smirnov@gmail.com>
+Subject: [PATCH 4/5] crypto: caam - do not create a platform devices for JRs
+Date:   Tue,  5 Nov 2019 07:13:52 -0800
+Message-Id: <20191105151353.6522-5-andrew.smirnov@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191105151353.6522-1-andrew.smirnov@gmail.com>
 References: <20191105151353.6522-1-andrew.smirnov@gmail.com>
@@ -80,91 +80,24 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Exposing bind/unbind attributes for CAAM device allows user to
-circumvent module use counter and remove underlying device even while
-it is still in use by crypto API. The problem can be easily reproduce
-using the following sinppiet:
+Job rings are an integral part of underlying CAAM IP and treating them
+as independent devices means that we have to:
 
-$ openssl speed -evp aes-128-cbc -engine afalg &
-$ echo 30900000.crypto > /sys/bus/platform/drivers/caam/unbind
-[  164.797687] ------------[ cut here ]------------
-[  164.802320] kernel BUG at crypto/algapi.c:412!
-[  164.806771] Internal error: Oops - BUG: 0 [#1] PREEMPT SMP
-[  164.812260] Modules linked in: crct10dif_ce caam caamhash_desc caamalg_desc error btusb btbcm btintel
-[  164.821506] CPU: 1 PID: 2170 Comm: sh Not tainted 5.4.0-rc1 #30
-[  164.827428] Hardware name: ZII i.MX8MQ Ultra Zest Board (DT)
-[  164.833091] pstate: 20000005 (nzCv daif -PAN -UAO)
-[  164.837897] pc : crypto_unregister_alg+0xe4/0xf0
-[  164.842520] lr : crypto_unregister_alg+0x8c/0xf0
-[  164.847138] sp : ffff8000130f3b20
-[  164.850454] x29: ffff8000130f3b20 x28: ffff0000f1131a80
-[  164.855771] x27: 0000000000000000 x26: 0000000000000000
-[  164.861087] x25: ffff0000fa147ea0 x24: 0000000000000020
-[  164.866404] x23: ffff8000130f3c58 x22: ffff8000130f3b58
-[  164.871721] x21: ffff800012b787c8 x20: ffff800012be7ef0
-[  164.877037] x19: ffff800008ad7300 x18: 000000000000002b
-[  164.882353] x17: 0000000000000000 x16: 0000000000000000
-[  164.887670] x15: ffff800012b8f4d0 x14: 55980d468eb0c075
-[  164.892987] x13: 4375a0958c16498f x12: 27cb4484db878b3d
-[  164.898304] x11: c3bdc615f6902956 x10: e030849201295489
-[  164.903620] x9 : 00a97e1a31855afa x8 : 00000000000014a5
-[  164.908937] x7 : ffff800008ad7310 x6 : ffff8000130f3a60
-[  164.914253] x5 : ffff8000130f3af8 x4 : ffff800008ad7310
-[  164.919570] x3 : 0000000000000000 x2 : 0000000000000000
-[  164.924886] x1 : ffffffffffffffff x0 : 0000000000000002
-[  164.930202] Call trace:
-[  164.932656]  crypto_unregister_alg+0xe4/0xf0
-[  164.936932]  crypto_unregister_skcipher+0x20/0x30
-[  164.941662]  caam_algapi_exit+0x84/0xa0 [caam]
-[  164.946124]  caam_jr_remove+0x54/0xd0 [caam]
-[  164.950401]  devm_action_release+0x20/0x30
-[  164.954501]  release_nodes+0x1c8/0x240
-[  164.958255]  devres_release_all+0x3c/0x60
-[  164.962272]  device_release_driver_internal+0x10c/0x1c0
-[  164.967501]  device_driver_detach+0x28/0x40
-[  164.971689]  unbind_store+0x94/0x100
-[  164.975269]  drv_attr_store+0x40/0x60
-[  164.978938]  sysfs_kf_write+0x5c/0x70
-[  164.982605]  kernfs_fop_write+0xf4/0x1f0
-[  164.986534]  __vfs_write+0x48/0x90
-[  164.989941]  vfs_write+0xb8/0x1d0
-[  164.993261]  ksys_write+0x74/0x100
-[  164.996668]  __arm64_sys_write+0x24/0x30
-[  165.000598]  el0_svc_handler+0x94/0x100
-[  165.004439]  el0_svc+0x8/0xc
-[  165.007329] Code: aa1403e0 97f2d52e 12800020 17fffff5 (d4210000)
-[  165.013428] ---[ end trace 11587fd1ef597dd6 ]---
-[  165.018138] note: sh[2170] exited with preempt_count 1
-[  165.024146] ------------[ cut here ]------------
-[  165.028786] WARNING: CPU: 1 PID: 0 at kernel/rcu/tree.c:569 rcu_idle_enter+0x7c/0x90
-[  165.048977] Hardware name: ZII i.MX8MQ Ultra Zest Board (DT)
-[  165.054640] pstate: 200003c5 (nzCv DAIF -PAN -UAO)
-[  165.059435] pc : rcu_idle_enter+0x7c/0x90
-[  165.063450] lr : do_idle+0x218/0x2b0
-[  165.067027] sp : ffff800012e1bf20
-[  165.070343] x29: ffff800012e1bf20 x28: 0000000000000000
-[  165.075663] x27: 0000000000000000 x26: 0000000000000000
-[  165.080983] x25: 0000000000000000 x24: ffff800012b78884
-[  165.089045] x21: ffff800012b78860 x20: 0000000000000002
-[  165.094362] x19: ffff800012b787e8 x18: 0000000000000010
-[  165.099678] x17: 0000000000000000 x16: 0000000000000001
-[  165.104995] x15: ffff0000ff789170 x14: 0000000000000001
-[  165.110311] x13: ffff0000ff7a8170 x12: ffff0000fa996cd4
-[  165.115628] x11: ffff0000fa996cd4 x10: 0000000000000970
-[  165.120945] x9 : ffff800012e1bea0 x8 : ffff0000fa9aa450
-[  165.126261] x7 : 0000000000000001 x6 : ffff800012e1bee0
-[  165.131577] x5 : 0000000000000001 x4 : ffff800012cc61a8
-[  165.136894] x3 : 4000000000000002 x2 : 4000000000000000
-[  165.142210] x1 : ffff800012b6edc0 x0 : ffff0000ff789dc0
-[  165.147526] Call trace:
-[  165.149978]  rcu_idle_enter+0x7c/0x90
-[  165.153644]  do_idle+0x218/0x2b0
-[  165.156876]  cpu_startup_entry+0x2c/0x50
-[  165.160806]  secondary_start_kernel+0x164/0x180
-[  165.165339] ---[ end trace 11587fd1ef597dd7 ]---
+1. Properly maintain device reference counter
+   via (get_device/put_device). Currently not implemented
 
-Remove bind/unbind attributes of CAAM device, so that the only way to
-remove it during runtime would be to remove underlying kernel module.
+2. Properly coordinate lifecycle of the underlying platform
+   device (e.g. removal via 'unbind') with active users of that
+   JR. Not implemented currently as well.
+
+3. Have extra logic to initialize crypto algorithms after at least one
+   JR has been registered (see register_algs() and related code)
+
+Instead of adding extra code to deal with #1 and #2 above and open up
+the possibility of simpliying #3, convert the driver to not create
+platform devices for available JR and instead treat them as internal
+implementation detail while providing same API to all of the original
+users.
 
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 Cc: Chris Healy <cphealy@gmail.com>
@@ -176,21 +109,453 @@ Cc: linux-imx@nxp.com
 Cc: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 ---
- drivers/crypto/caam/ctrl.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/crypto/caam/Kconfig      |   5 +-
+ drivers/crypto/caam/Makefile     |  15 ++--
+ drivers/crypto/caam/caamalg.c    |  10 +--
+ drivers/crypto/caam/caamalg_qi.c |   4 +-
+ drivers/crypto/caam/caamhash.c   |   6 +-
+ drivers/crypto/caam/ctrl.c       |  15 +++-
+ drivers/crypto/caam/jr.c         | 136 +++++++------------------------
+ drivers/crypto/caam/jr.h         |   1 +
+ 8 files changed, 62 insertions(+), 130 deletions(-)
 
+diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
+index 137ed3df0c74..86ab869e4176 100644
+--- a/drivers/crypto/caam/Kconfig
++++ b/drivers/crypto/caam/Kconfig
+@@ -32,7 +32,7 @@ config CRYPTO_DEV_FSL_CAAM_DEBUG
+ 	  information in the CAAM driver.
+ 
+ menuconfig CRYPTO_DEV_FSL_CAAM_JR
+-	tristate "Freescale CAAM Job Ring driver backend"
++	bool "Freescale CAAM Job Ring driver backend"
+ 	default y
+ 	help
+ 	  Enables the driver module for Job Rings which are part of
+@@ -40,9 +40,6 @@ menuconfig CRYPTO_DEV_FSL_CAAM_JR
+ 	  and Assurance Module (CAAM). This module adds a job ring operation
+ 	  interface.
+ 
+-	  To compile this driver as a module, choose M here: the module
+-	  will be called caam_jr.
+-
+ if CRYPTO_DEV_FSL_CAAM_JR
+ 
+ config CRYPTO_DEV_FSL_CAAM_RINGSIZE
+diff --git a/drivers/crypto/caam/Makefile b/drivers/crypto/caam/Makefile
+index 68d5cc0f28e2..ab6c094f8bd8 100644
+--- a/drivers/crypto/caam/Makefile
++++ b/drivers/crypto/caam/Makefile
+@@ -10,17 +10,18 @@ ccflags-y += -DVERSION=\"\"
+ 
+ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_COMMON) += error.o
+ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM) += caam.o
+-obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_JR) += caam_jr.o
+ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_DESC) += caamalg_desc.o
+ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_AHASH_API_DESC) += caamhash_desc.o
+ 
+ caam-y := ctrl.o
+-caam_jr-y := jr.o key_gen.o
+-caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API) += caamalg.o
+-caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI) += caamalg_qi.o
+-caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_AHASH_API) += caamhash.o
+-caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_RNG_API) += caamrng.o
+-caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_PKC_API) += caampkc.o pkc_desc.o
++ifneq ($(CONFIG_CRYPTO_DEV_FSL_CAAM_JR),)
++caam-y += jr.o key_gen.o
++caam-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API) += caamalg.o
++caam-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI) += caamalg_qi.o
++caam-$(CONFIG_CRYPTO_DEV_FSL_CAAM_AHASH_API) += caamhash.o
++caam-$(CONFIG_CRYPTO_DEV_FSL_CAAM_RNG_API) += caamrng.o
++caam-$(CONFIG_CRYPTO_DEV_FSL_CAAM_PKC_API) += caampkc.o pkc_desc.o
++endif
+ 
+ caam-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI) += qi.o
+ ifneq ($(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI),)
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 4cb7d5b281cc..f2230256ef9f 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -118,7 +118,7 @@ static int aead_null_set_sh_desc(struct crypto_aead *aead)
+ {
+ 	struct caam_ctx *ctx = crypto_aead_ctx(aead);
+ 	struct device *jrdev = ctx->jr->dev;
+-	struct caam_drv_private *ctrlpriv = dev_get_drvdata(jrdev->parent);
++	struct caam_drv_private *ctrlpriv = dev_get_drvdata(jrdev);
+ 	u32 *desc;
+ 	int rem_bytes = CAAM_DESC_BYTES_MAX - AEAD_DESC_JOB_IO_LEN -
+ 			ctx->adata.keylen_pad;
+@@ -171,7 +171,7 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
+ 	unsigned int ivsize = crypto_aead_ivsize(aead);
+ 	struct caam_ctx *ctx = crypto_aead_ctx(aead);
+ 	struct device *jrdev = ctx->jr->dev;
+-	struct caam_drv_private *ctrlpriv = dev_get_drvdata(jrdev->parent);
++	struct caam_drv_private *ctrlpriv = dev_get_drvdata(jrdev);
+ 	u32 ctx1_iv_off = 0;
+ 	u32 *desc, *nonce = NULL;
+ 	u32 inl_mask;
+@@ -564,7 +564,7 @@ static int aead_setkey(struct crypto_aead *aead,
+ {
+ 	struct caam_ctx *ctx = crypto_aead_ctx(aead);
+ 	struct device *jrdev = ctx->jr->dev;
+-	struct caam_drv_private *ctrlpriv = dev_get_drvdata(jrdev->parent);
++	struct caam_drv_private *ctrlpriv = dev_get_drvdata(jrdev);
+ 	struct crypto_authenc_keys keys;
+ 	int ret = 0;
+ 
+@@ -1223,7 +1223,7 @@ static void init_authenc_job(struct aead_request *req,
+ 						 struct caam_aead_alg, aead);
+ 	unsigned int ivsize = crypto_aead_ivsize(aead);
+ 	struct caam_ctx *ctx = crypto_aead_ctx(aead);
+-	struct caam_drv_private *ctrlpriv = dev_get_drvdata(ctx->jr->dev->parent);
++	struct caam_drv_private *ctrlpriv = dev_get_drvdata(ctx->jr->dev);
+ 	const bool ctr_mode = ((ctx->cdata.algtype & OP_ALG_AAI_MASK) ==
+ 			       OP_ALG_AAI_CTR_MOD128);
+ 	const bool is_rfc3686 = alg->caam.rfc3686;
+@@ -3421,7 +3421,7 @@ static int caam_init_common(struct caam_ctx *ctx, struct caam_alg_entry *caam,
+ 		return PTR_ERR(ctx->jr);
+ 	}
+ 
+-	priv = dev_get_drvdata(ctx->jr->dev->parent);
++	priv = dev_get_drvdata(ctx->jr->dev);
+ 	if (priv->era >= 6 && uses_dkp)
+ 		ctx->dir = DMA_BIDIRECTIONAL;
+ 	else
+diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
+index 31bee401f9e5..b8905e3a9c80 100644
+--- a/drivers/crypto/caam/caamalg_qi.c
++++ b/drivers/crypto/caam/caamalg_qi.c
+@@ -82,7 +82,7 @@ static int aead_set_sh_desc(struct crypto_aead *aead)
+ 	const bool ctr_mode = ((ctx->cdata.algtype & OP_ALG_AAI_MASK) ==
+ 			       OP_ALG_AAI_CTR_MOD128);
+ 	const bool is_rfc3686 = alg->caam.rfc3686;
+-	struct caam_drv_private *ctrlpriv = dev_get_drvdata(ctx->jrdev->parent);
++	struct caam_drv_private *ctrlpriv = dev_get_drvdata(ctx->jrdev);
+ 
+ 	if (!ctx->cdata.keylen || !ctx->authsize)
+ 		return 0;
+@@ -189,7 +189,7 @@ static int aead_setkey(struct crypto_aead *aead, const u8 *key,
+ {
+ 	struct caam_ctx *ctx = crypto_aead_ctx(aead);
+ 	struct device *jrdev = ctx->jrdev;
+-	struct caam_drv_private *ctrlpriv = dev_get_drvdata(jrdev->parent);
++	struct caam_drv_private *ctrlpriv = dev_get_drvdata(jrdev);
+ 	struct crypto_authenc_keys keys;
+ 	int ret = 0;
+ 
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index 6e4fd5eb833a..94ecad06a120 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -224,7 +224,7 @@ static int ahash_set_sh_desc(struct crypto_ahash *ahash)
+ 	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
+ 	int digestsize = crypto_ahash_digestsize(ahash);
+ 	struct device *jrdev = ctx->jr->dev;
+-	struct caam_drv_private *ctrlpriv = dev_get_drvdata(jrdev->parent);
++	struct caam_drv_private *ctrlpriv = dev_get_drvdata(jrdev);
+ 	u32 *desc;
+ 
+ 	ctx->adata.key_virt = ctx->key;
+@@ -447,7 +447,7 @@ static int ahash_setkey(struct crypto_ahash *ahash,
+ 	struct device *jrdev = ctx->jr->dev;
+ 	int blocksize = crypto_tfm_alg_blocksize(&ahash->base);
+ 	int digestsize = crypto_ahash_digestsize(ahash);
+-	struct caam_drv_private *ctrlpriv = dev_get_drvdata(jrdev->parent);
++	struct caam_drv_private *ctrlpriv = dev_get_drvdata(jrdev);
+ 	int ret;
+ 	u8 *hashed_key = NULL;
+ 
+@@ -1839,7 +1839,7 @@ static int caam_hash_cra_init(struct crypto_tfm *tfm)
+ 		return PTR_ERR(ctx->jr);
+ 	}
+ 
+-	priv = dev_get_drvdata(ctx->jr->dev->parent);
++	priv = dev_get_drvdata(ctx->jr->dev);
+ 
+ 	if (is_xcbc_aes(caam_hash->alg_type)) {
+ 		ctx->dir = DMA_TO_DEVICE;
 diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index 0fb39bcf638a..e0c16cd2ce1a 100644
+index d7c3c3805693..0fb39bcf638a 100644
 --- a/drivers/crypto/caam/ctrl.c
 +++ b/drivers/crypto/caam/ctrl.c
-@@ -920,6 +920,7 @@ static struct platform_driver caam_driver = {
- 	.driver = {
- 		.name = "caam",
- 		.of_match_table = caam_match,
-+		.suppress_bind_attrs = true,
- 	},
- 	.probe       = caam_probe,
- };
+@@ -900,9 +900,18 @@ static int caam_probe(struct platform_device *pdev)
+ 			    &ctrlpriv->ctl_tdsk_wrap);
+ #endif
+ 
+-	ret = devm_of_platform_populate(dev);
+-	if (ret)
+-		dev_err(dev, "JR platform devices creation error\n");
++	for_each_available_child_of_node(nprop, np) {
++		if (of_device_is_compatible(np, "fsl,sec-v4.0-job-ring") ||
++		    of_device_is_compatible(np, "fsl,sec4.0-job-ring")) {
++			ret = caam_jr_probe(dev, np);
++			if (ret) {
++				dev_err(dev,
++				       "JR platform devices creation error\n");
++				of_node_put(np);
++				break;
++			}
++		}
++	}
+ 
+ 	return ret;
+ }
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index 1e2929b7c6b9..7f0d192b9276 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -65,9 +65,9 @@ static void unregister_algs(void)
+ 	mutex_unlock(&algs_lock);
+ }
+ 
+-static int caam_reset_hw_jr(struct device *dev)
++static int caam_reset_hw_jr(struct caam_drv_private_jr *jrp)
+ {
+-	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
++	struct device *dev = jrp->dev;
+ 	unsigned int timeout = 100000;
+ 
+ 	/*
+@@ -105,37 +105,11 @@ static int caam_reset_hw_jr(struct device *dev)
+ 	return 0;
+ }
+ 
+-/*
+- * Shutdown JobR independent of platform property code
+- */
+-static int caam_jr_shutdown(struct device *dev)
+-{
+-	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
+-	int ret;
+-
+-	ret = caam_reset_hw_jr(dev);
+-
+-	tasklet_kill(&jrp->irqtask);
+-
+-	return ret;
+-}
+-
+-static int caam_jr_remove(struct platform_device *pdev)
++static void caam_jr_remove(void *data)
+ {
+ 	int ret;
+-	struct device *jrdev;
+-	struct caam_drv_private_jr *jrpriv;
+-
+-	jrdev = &pdev->dev;
+-	jrpriv = dev_get_drvdata(jrdev);
+-
+-	/*
+-	 * Return EBUSY if job ring already allocated.
+-	 */
+-	if (atomic_read(&jrpriv->tfm_count)) {
+-		dev_err(jrdev, "Device is busy\n");
+-		return -EBUSY;
+-	}
++	struct caam_drv_private_jr *jrpriv = data;
++	struct device *jrdev = jrpriv->dev;
+ 
+ 	/* Unregister JR-based RNG & crypto algorithms */
+ 	unregister_algs();
+@@ -146,18 +120,18 @@ static int caam_jr_remove(struct platform_device *pdev)
+ 	spin_unlock(&driver_data.jr_alloc_lock);
+ 
+ 	/* Release ring */
+-	ret = caam_jr_shutdown(jrdev);
++	ret = caam_reset_hw_jr(jrpriv);
+ 	if (ret)
+ 		dev_err(jrdev, "Failed to shut down job ring\n");
+ 
+-	return ret;
++	tasklet_kill(&jrpriv->irqtask);
+ }
+ 
+ /* Main per-ring interrupt handler */
+ static irqreturn_t caam_jr_interrupt(int irq, void *st_dev)
+ {
+-	struct device *dev = st_dev;
+-	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
++	struct caam_drv_private_jr *jrp = st_dev;
++	struct device *dev = jrp->dev;
+ 	u32 irqstate;
+ 
+ 	/*
+@@ -195,8 +169,8 @@ static irqreturn_t caam_jr_interrupt(int irq, void *st_dev)
+ static void caam_jr_dequeue(unsigned long devarg)
+ {
+ 	int hw_idx, sw_idx, i, head, tail;
+-	struct device *dev = (struct device *)devarg;
+-	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
++	struct caam_drv_private_jr *jrp = (void *)devarg;
++	struct device *dev = jrp->dev;
+ 	caam_jr_cbk usercall;
+ 	u32 *userdesc, userstatus;
+ 	void *userarg;
+@@ -418,15 +392,13 @@ EXPORT_SYMBOL(caam_jr_enqueue);
+ /*
+  * Init JobR independent of platform property detection
+  */
+-static int caam_jr_init(struct device *dev)
++static int caam_jr_init(struct caam_drv_private_jr *jrp)
+ {
+-	struct caam_drv_private_jr *jrp;
++	struct device *dev = jrp->dev;
+ 	dma_addr_t inpbusaddr, outbusaddr;
+ 	int i, error;
+ 
+-	jrp = dev_get_drvdata(dev);
+-
+-	error = caam_reset_hw_jr(dev);
++	error = caam_reset_hw_jr(jrp);
+ 	if (error)
+ 		return error;
+ 
+@@ -469,11 +441,11 @@ static int caam_jr_init(struct device *dev)
+ 		      (JOBR_INTC_COUNT_THLD << JRCFG_ICDCT_SHIFT) |
+ 		      (JOBR_INTC_TIME_THLD << JRCFG_ICTT_SHIFT));
+ 
+-	tasklet_init(&jrp->irqtask, caam_jr_dequeue, (unsigned long)dev);
++	tasklet_init(&jrp->irqtask, caam_jr_dequeue, (unsigned long)jrp);
+ 
+ 	/* Connect job ring interrupt handler. */
+ 	error = devm_request_irq(dev, jrp->irq, caam_jr_interrupt, IRQF_SHARED,
+-				 dev_name(dev), dev);
++				 dev_name(dev), jrp);
+ 	if (error) {
+ 		dev_err(dev, "can't connect JobR %d interrupt (%d)\n",
+ 			jrp->ridx, jrp->irq);
+@@ -491,36 +463,29 @@ static void caam_jr_irq_dispose_mapping(void *data)
+ /*
+  * Probe routine for each detected JobR subsystem.
+  */
+-static int caam_jr_probe(struct platform_device *pdev)
++int caam_jr_probe(struct device *jrdev, struct device_node *nprop)
+ {
+-	struct device *jrdev;
+-	struct device_node *nprop;
+ 	struct caam_job_ring __iomem *ctrl;
+ 	struct caam_drv_private_jr *jrpriv;
+ 	static int total_jobrs;
+-	struct resource *r;
++	struct resource r;
+ 	int error;
+ 
+-	jrdev = &pdev->dev;
+ 	jrpriv = devm_kmalloc(jrdev, sizeof(*jrpriv), GFP_KERNEL);
+ 	if (!jrpriv)
+ 		return -ENOMEM;
+ 
+-	dev_set_drvdata(jrdev, jrpriv);
+-
+ 	/* save ring identity relative to detection */
+ 	jrpriv->ridx = total_jobrs++;
++	jrpriv->dev = jrdev;
+ 
+-	nprop = pdev->dev.of_node;
+-	/* Get configuration properties from device tree */
+-	/* First, get register page */
+-	r = platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-	if (!r) {
+-		dev_err(jrdev, "platform_get_resource() failed\n");
+-		return -ENOMEM;
++	error = of_address_to_resource(nprop, 0, &r);
++	if (error) {
++		dev_err(jrdev, "of_address_to_resource() failed\n");
++		return error;
+ 	}
+ 
+-	ctrl = devm_ioremap(jrdev, r->start, resource_size(r));
++	ctrl = devm_ioremap(jrdev, r.start, resource_size(&r));
+ 	if (!ctrl) {
+ 		dev_err(jrdev, "devm_ioremap() failed\n");
+ 		return -ENOMEM;
+@@ -528,13 +493,6 @@ static int caam_jr_probe(struct platform_device *pdev)
+ 
+ 	jrpriv->rregs = (struct caam_job_ring __iomem __force *)ctrl;
+ 
+-	error = dma_set_mask_and_coherent(jrdev, caam_get_dma_mask(jrdev));
+-	if (error) {
+-		dev_err(jrdev, "dma_set_mask_and_coherent failed (%d)\n",
+-			error);
+-		return error;
+-	}
+-
+ 	/* Identify the interrupt */
+ 	jrpriv->irq = irq_of_parse_and_map(nprop, 0);
+ 	if (!jrpriv->irq) {
+@@ -548,55 +506,21 @@ static int caam_jr_probe(struct platform_device *pdev)
+ 		return error;
+ 
+ 	/* Now do the platform independent part */
+-	error = caam_jr_init(jrdev); /* now turn on hardware */
++	error = caam_jr_init(jrpriv); /* now turn on hardware */
+ 	if (error)
+ 		return error;
+ 
+-	jrpriv->dev = jrdev;
+ 	spin_lock(&driver_data.jr_alloc_lock);
+ 	list_add_tail(&jrpriv->list_node, &driver_data.jr_list);
+ 	spin_unlock(&driver_data.jr_alloc_lock);
+ 
+ 	atomic_set(&jrpriv->tfm_count, 0);
+ 
+-	register_algs(jrdev->parent);
+-
+-	return 0;
+-}
+-
+-static const struct of_device_id caam_jr_match[] = {
+-	{
+-		.compatible = "fsl,sec-v4.0-job-ring",
+-	},
+-	{
+-		.compatible = "fsl,sec4.0-job-ring",
+-	},
+-	{},
+-};
+-MODULE_DEVICE_TABLE(of, caam_jr_match);
+-
+-static struct platform_driver caam_jr_driver = {
+-	.driver = {
+-		.name = "caam_jr",
+-		.of_match_table = caam_jr_match,
+-	},
+-	.probe       = caam_jr_probe,
+-	.remove      = caam_jr_remove,
+-};
++	error = devm_add_action_or_reset(jrdev, caam_jr_remove, jrpriv);
++	if (error)
++		return error;
+ 
+-static int __init jr_driver_init(void)
+-{
+-	return platform_driver_register(&caam_jr_driver);
+-}
++	register_algs(jrdev);
+ 
+-static void __exit jr_driver_exit(void)
+-{
+-	platform_driver_unregister(&caam_jr_driver);
++	return 0;
+ }
+-
+-module_init(jr_driver_init);
+-module_exit(jr_driver_exit);
+-
+-MODULE_LICENSE("GPL");
+-MODULE_DESCRIPTION("FSL CAAM JR request backend");
+-MODULE_AUTHOR("Freescale Semiconductor - NMG/STC");
+diff --git a/drivers/crypto/caam/jr.h b/drivers/crypto/caam/jr.h
+index f49caa0ac0ff..ee2aa1798605 100644
+--- a/drivers/crypto/caam/jr.h
++++ b/drivers/crypto/caam/jr.h
+@@ -18,5 +18,6 @@ struct caam_drv_private_jr *caam_jr_alloc(void);
+ void caam_jr_free(struct caam_drv_private_jr *jr);
+ int caam_jr_enqueue(struct caam_drv_private_jr *jr, u32 *desc, caam_jr_cbk cbk,
+ 		    void *areq);
++int caam_jr_probe(struct device *jrdev, struct device_node *nprop);
+ 
+ #endif /* JR_H */
 -- 
 2.21.0
 
