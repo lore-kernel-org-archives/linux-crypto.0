@@ -7,53 +7,54 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01E67C17486
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 14:01:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82E82C17460
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 14:01:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C44A121D71
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 14:01:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5744E21D71
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 14:01:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="IxpLht6V"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="xnNecQu0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389366AbfKEOBd (ORCPT
+        id S2389371AbfKEOBl (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Nov 2019 09:01:33 -0500
-Received: from fllv0016.ext.ti.com ([198.47.19.142]:44710 "EHLO
-        fllv0016.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2389290AbfKEOBd (ORCPT
+        Tue, 5 Nov 2019 09:01:41 -0500
+Received: from lelv0143.ext.ti.com ([198.47.23.248]:35128 "EHLO
+        lelv0143.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2389290AbfKEOBl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Nov 2019 09:01:33 -0500
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id xA5E1RNG043448;
-        Tue, 5 Nov 2019 08:01:27 -0600
+        Tue, 5 Nov 2019 09:01:41 -0500
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+        by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id xA5E1aPm038169;
+        Tue, 5 Nov 2019 08:01:36 -0600
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1572962488;
-        bh=1EkNmS89YfDgM2jgb2vd+QfDT3W+cE8tMZjNL9+5Avw=;
+        s=ti-com-17Q1; t=1572962496;
+        bh=/548IYlsZzVpGFlUyLpuldMg6WhApejqtJF4qdDLFY8=;
         h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=IxpLht6VPuPpoO77CL9p07NTcLbRMWWlTHB6DV1AiRO9lLtYPmZ6KVChC0Dlweg1c
-         Grw8n3qoI0+nzgOtzR3JxLLeFk3oECVMMCzHyjT8lLhggYLAuYZqTbz0euLvSXNO28
-         V291Q3H0eCPjdg2iFRQrh0UzjGA6ZuGZjLqSwCbc=
-Received: from DFLE102.ent.ti.com (dfle102.ent.ti.com [10.64.6.23])
-        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTP id xA5E1RLb084461;
-        Tue, 5 Nov 2019 08:01:27 -0600
-Received: from DFLE104.ent.ti.com (10.64.6.25) by DFLE102.ent.ti.com
- (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3; Tue, 5 Nov
- 2019 08:01:11 -0600
-Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE104.ent.ti.com
- (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3 via
- Frontend Transport; Tue, 5 Nov 2019 08:01:11 -0600
+        b=xnNecQu0ByEXRygUFD4eTHRu4VpwDaHeJSu2V1Cb3iI5G1S8tJeCIyF/Y/vPy0z8/
+         O9nJyYgVcxnBSOW2z3+EAG0edxyoegvy7P4E6cYt/awKIT1fQxX5f/weiOV5zM5AY2
+         ecP3Dt4H+BFUgPDDDCC5pVuN9zKFzwkRZBCXKNXI=
+Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
+        by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id xA5E1aEB087706
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 5 Nov 2019 08:01:36 -0600
+Received: from DLEE106.ent.ti.com (157.170.170.36) by DLEE107.ent.ti.com
+ (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1713.5; Tue, 5 Nov
+ 2019 08:01:36 -0600
+Received: from fllv0040.itg.ti.com (10.64.41.20) by DLEE106.ent.ti.com
+ (157.170.170.36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1713.5 via
+ Frontend Transport; Tue, 5 Nov 2019 08:01:36 -0600
 Received: from sokoban.ti.com (ileax41-snat.itg.ti.com [10.172.224.153])
-        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id xA5E1FFh068289;
-        Tue, 5 Nov 2019 08:01:23 -0600
+        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id xA5E1FFk068289;
+        Tue, 5 Nov 2019 08:01:34 -0600
 From:   Tero Kristo <t-kristo@ti.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
         <linux-crypto@vger.kernel.org>
 CC:     <linux-omap@vger.kernel.org>, <ard.biesheuvel@kernel.org>
-Subject: [PATCHv2 04/22] crypto: omap-des: add IV output handling
-Date:   Tue, 5 Nov 2019 16:00:53 +0200
-Message-ID: <20191105140111.20285-5-t-kristo@ti.com>
+Subject: [PATCHv2 07/22] crypto: omap-aes-gcm: fix corner case with only auth data
+Date:   Tue, 5 Nov 2019 16:00:56 +0200
+Message-ID: <20191105140111.20285-8-t-kristo@ti.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191105140111.20285-1-t-kristo@ti.com>
 References: <20191105140111.20285-1-t-kristo@ti.com>
@@ -65,39 +66,55 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Currently omap-des driver does not copy end result IV out at all. This
-is evident with the additional checks done at the crypto test manager.
-Fix by copying out the IV values from HW.
+Fix a corner case where only authdata is generated, without any provided
+assocdata / cryptdata. Passing the empty scatterlists to OMAP AES core driver
+in this case would confuse it, failing to map DMAs.
 
 Signed-off-by: Tero Kristo <t-kristo@ti.com>
 ---
- drivers/crypto/omap-des.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/crypto/omap-aes-gcm.c | 22 ++++++++++++++--------
+ 1 file changed, 14 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/crypto/omap-des.c b/drivers/crypto/omap-des.c
-index 4c4dbc2b377e..2e3ecb860e27 100644
---- a/drivers/crypto/omap-des.c
-+++ b/drivers/crypto/omap-des.c
-@@ -597,6 +597,7 @@ static int omap_des_crypt_req(struct crypto_engine *engine,
- static void omap_des_done_task(unsigned long data)
- {
- 	struct omap_des_dev *dd = (struct omap_des_dev *)data;
-+	int i;
+diff --git a/drivers/crypto/omap-aes-gcm.c b/drivers/crypto/omap-aes-gcm.c
+index 9bbedbccfadf..dfd4d1cac421 100644
+--- a/drivers/crypto/omap-aes-gcm.c
++++ b/drivers/crypto/omap-aes-gcm.c
+@@ -148,12 +148,14 @@ static int omap_aes_gcm_copy_buffers(struct omap_aes_dev *dd,
+ 	if (req->src == req->dst || dd->out_sg == sg_arr)
+ 		flags |= OMAP_CRYPTO_FORCE_COPY;
  
- 	pr_debug("enter done_task\n");
+-	ret = omap_crypto_align_sg(&dd->out_sg, cryptlen,
+-				   AES_BLOCK_SIZE, &dd->out_sgl,
+-				   flags,
+-				   FLAGS_OUT_DATA_ST_SHIFT, &dd->flags);
+-	if (ret)
+-		return ret;
++	if (cryptlen) {
++		ret = omap_crypto_align_sg(&dd->out_sg, cryptlen,
++					   AES_BLOCK_SIZE, &dd->out_sgl,
++					   flags,
++					   FLAGS_OUT_DATA_ST_SHIFT, &dd->flags);
++		if (ret)
++			return ret;
++	}
  
-@@ -615,6 +616,11 @@ static void omap_des_done_task(unsigned long data)
- 	omap_crypto_cleanup(&dd->out_sgl, dd->orig_out, 0, dd->total_save,
- 			    FLAGS_OUT_DATA_ST_SHIFT, dd->flags);
+ 	dd->in_sg_len = sg_nents_for_len(dd->in_sg, alen + clen);
+ 	dd->out_sg_len = sg_nents_for_len(dd->out_sg, clen);
+@@ -287,8 +289,12 @@ static int omap_aes_gcm_handle_queue(struct omap_aes_dev *dd,
+ 		return err;
  
-+	if ((dd->flags & FLAGS_CBC) && dd->req->iv)
-+		for (i = 0; i < 2; i++)
-+			((u32 *)dd->req->iv)[i] =
-+				omap_des_read(dd, DES_REG_IV(dd, i));
-+
- 	omap_des_finish_req(dd, 0);
+ 	err = omap_aes_write_ctrl(dd);
+-	if (!err)
+-		err = omap_aes_crypt_dma_start(dd);
++	if (!err) {
++		if (dd->in_sg_len && dd->out_sg_len)
++			err = omap_aes_crypt_dma_start(dd);
++		else
++			omap_aes_gcm_dma_out_callback(dd);
++	}
  
- 	pr_debug("exit\n");
+ 	if (err) {
+ 		omap_aes_gcm_finish_req(dd, err);
 -- 
 2.17.1
 
