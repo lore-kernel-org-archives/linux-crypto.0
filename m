@@ -1,186 +1,125 @@
-Return-Path: <SRS0=nD+4=Y4=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=QWZk=Y5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E41FCA9ED4
-	for <linux-crypto@archiver.kernel.org>; Mon,  4 Nov 2019 23:37:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DA1ACA9ED3
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 02:23:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D8BCD214E0
-	for <linux-crypto@archiver.kernel.org>; Mon,  4 Nov 2019 23:37:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1444C214E0
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 02:23:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=netronome-com.20150623.gappssmtp.com header.i=@netronome-com.20150623.gappssmtp.com header.b="u/t0bbe/"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="PCdW9n+y"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729720AbfKDXhU (ORCPT
+        id S2387504AbfKECXn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 4 Nov 2019 18:37:20 -0500
-Received: from mail-lf1-f68.google.com ([209.85.167.68]:38340 "EHLO
-        mail-lf1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729481AbfKDXhU (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 4 Nov 2019 18:37:20 -0500
-Received: by mail-lf1-f68.google.com with SMTP id q28so13629627lfa.5
-        for <linux-crypto@vger.kernel.org>; Mon, 04 Nov 2019 15:37:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=netronome-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=dDKnEK6D3MYm3xL73zW7rQdCF5qjKsfHm3AZtTTw4bg=;
-        b=u/t0bbe/skdemY0GbflsG9l4rwp0A9xX0DZ0L6E9EQF3yXXj1mG0NNKTvMUPAjxQZp
-         41NhrbtMMI9OXKIf3XyvapX9DrG142mP8lsw9ikxk9PhscZN6Qsr4ZEUHVTAz607rbAt
-         JMBWk9JJgW46XKbTXYdWYIb3m4QyEsTNbjv7tBljpzwH/Vno2sdbL9lqGOE3mDaeUu6M
-         eHn3O22JRtkmF+eCAqX/KmZmGJyeVvmRVWooj4i8gIcYTRITG9kv2f3fx3QBfGdb7sMq
-         LlxpSri94AIsvT4TPIsuODcQLVLsv6p8SpdJd2aodaYSTAnSyNz815v65R/f6McZCjhf
-         v5/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=dDKnEK6D3MYm3xL73zW7rQdCF5qjKsfHm3AZtTTw4bg=;
-        b=EWvLHDDW+RMSh7unIJsOlxNebclaOZiv4U6Lh4+b+RBorRze4S2bu+YJwhWUdTG8Q4
-         Pr3Sqfg22fONyvOGCwH73fqywgX7E0a82fTAwcDujFiQrb/Pf8KZ5LeagJX+4fiqxoI7
-         inqz8rEixQWeloRdJOuvxhgMRu0Z/ol8oHprAJJFOsr9hB1cEpvfhsQ/RRh+CLg8HKcX
-         XGIQE88QAjph/H8qwdcYM1P0e+pkPQbJ1CsLufPrx/ocy+D+ugeYZTFVN0hc1kSpI77R
-         bXGLkmuCLxrfS+AQ17grtUIte8JgDy22rr+/Ci45EC+0d64ZDccvAyKXpFhyfVR+CpF5
-         xgVg==
-X-Gm-Message-State: APjAAAUAVDdSyetjOMHVX1XqB43xZGDkX2DnUxTnHetVBaKKO6FpJYBU
-        BZU4FmTXDG1rDz/m3aBV3Rk1vg==
-X-Google-Smtp-Source: APXvYqxoTsiFWokDpZx+PktmMgqEh1BxGNLbbvr5aCEHz+pND5MXSkjVdKZTVL0t9neTPfhSqsvtOA==
-X-Received: by 2002:a19:c354:: with SMTP id t81mr4477022lff.179.1572910637599;
-        Mon, 04 Nov 2019 15:37:17 -0800 (PST)
-Received: from jkicinski-Precision-T1700.netronome.com ([66.60.152.14])
-        by smtp.gmail.com with ESMTPSA id g26sm7483132lfh.1.2019.11.04.15.37.13
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 04 Nov 2019 15:37:16 -0800 (PST)
-From:   Jakub Kicinski <jakub.kicinski@netronome.com>
-To:     davem@davemloft.net
-Cc:     netdev@vger.kernel.org, oss-drivers@netronome.com,
-        borisp@mellanox.com, aviadye@mellanox.com,
-        john.fastabend@gmail.com, daniel@iogearbox.net,
-        Jakub Kicinski <jakub.kicinski@netronome.com>,
-        syzbot+f8495bff23a879a6d0bd@syzkaller.appspotmail.com,
-        syzbot+6f50c99e8f6194bf363f@syzkaller.appspotmail.com,
-        Eric Biggers <ebiggers@kernel.org>,
-        herbert@gondor.apana.org.au, glider@google.com,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH net v2] net/tls: fix sk_msg trim on fallback to copy mode
-Date:   Mon,  4 Nov 2019 15:36:57 -0800
-Message-Id: <20191104233657.21054-1-jakub.kicinski@netronome.com>
-X-Mailer: git-send-email 2.23.0
+        Mon, 4 Nov 2019 21:23:43 -0500
+Received: from ozlabs.org ([203.11.71.1]:59633 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730245AbfKECXm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 4 Nov 2019 21:23:42 -0500
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 476YPR5LH8z9sPF;
+        Tue,  5 Nov 2019 13:23:39 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1572920619;
+        bh=l5dCxP2eylLUgWMrShKOATMKHD7bsW1qpxHjVZCdiy8=;
+        h=Date:From:To:Cc:Subject:From;
+        b=PCdW9n+ydCMcu6avVXOB7n08zf8Y3nQFeUO95M4nuFlU1qNu85RImUEplQb4zdRyX
+         uXOIdaAvr9sVWO4hmD4Nfcvhnapnf9LU5a7Ehl4gt7+SataZOTDIEAyb75Z68E58d4
+         yI+XiAakv2EM38xsayiyNqk5wEYTA3Ep0mMteugQE4VwMBtsrX+oogvK3JWa03erJx
+         f0aJGJTP2muIvehrohpVj8bFtWsL/iJfqkPduHlbhng5F+txusW0TyM6X7fcVUi876
+         nTfx4lTUkihs4Iw/rjewFmQ0JhGeuXqCxd5mcIHmENukoofm4gzPvmw61o8fcz0M66
+         itsAYTancgMGw==
+Date:   Tue, 5 Nov 2019 13:23:37 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>
+Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Eric Biggers <ebiggers@google.com>
+Subject: linux-next: manual merge of the crypto tree with Linus' tree
+Message-ID: <20191105132337.2d65cf0a@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; boundary="Sig_/eo3vTQNDaDmtEpv/KxN8=Qo";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-sk_msg_trim() tries to only update curr pointer if it falls into
-the trimmed region. The logic, however, does not take into the
-account pointer wrapping that sk_msg_iter_var_prev() does nor
-(as John points out) the fact that msg->sg is a ring buffer.
+--Sig_/eo3vTQNDaDmtEpv/KxN8=Qo
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-This means that when the message was trimmed completely, the new
-curr pointer would have the value of MAX_MSG_FRAGS - 1, which is
-neither smaller than any other value, nor would it actually be
-correct.
+Hi all,
 
-Special case the trimming to 0 length a little bit and rework
-the comparison between curr and end to take into account wrapping.
+Today's linux-next merge of the crypto tree got a conflict in:
 
-This bug caused the TLS code to not copy all of the message, if
-zero copy filled in fewer sg entries than memcopy would need.
+  arch/arm/crypto/Kconfig
 
-Big thanks to Alexander Potapenko for the non-KMSAN reproducer.
+between commit:
 
-v2:
- - take into account that msg->sg is a ring buffer (John).
+  f703964fc668 ("crypto: arm/aes-ce - add dependency on AES library")
 
-Link: https://lore.kernel.org/netdev/20191030160542.30295-1-jakub.kicinski@netronome.com/ (v1)
+from Linus' tree and commits:
 
-Fixes: d829e9c4112b ("tls: convert to generic sk_msg interface")
-Reported-by: syzbot+f8495bff23a879a6d0bd@syzkaller.appspotmail.com
-Reported-by: syzbot+6f50c99e8f6194bf363f@syzkaller.appspotmail.com
-Co-developed-by: John Fastabend <john.fastabend@gmail.com>
-Signed-off-by: Jakub Kicinski <jakub.kicinski@netronome.com>
----
-CC: Eric Biggers <ebiggers@kernel.org>
-CC: herbert@gondor.apana.org.au
-CC: glider@google.com
-CC: linux-crypto@vger.kernel.org
----
- include/linux/skmsg.h |  9 ++++++---
- net/core/skmsg.c      | 20 +++++++++++++++-----
- 2 files changed, 21 insertions(+), 8 deletions(-)
+  b4d0c0aad57a ("crypto: arm - use Kconfig based compiler checks for crypto=
+ opcodes")
+  b95bba5d0114 ("crypto: skcipher - rename the crypto_blkcipher module and =
+kconfig option")
 
-diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
-index e4b3fb4bb77c..ce7055259877 100644
---- a/include/linux/skmsg.h
-+++ b/include/linux/skmsg.h
-@@ -139,6 +139,11 @@ static inline void sk_msg_apply_bytes(struct sk_psock *psock, u32 bytes)
- 	}
- }
- 
-+static inline u32 sk_msg_iter_dist(u32 start, u32 end)
-+{
-+	return end >= start ? end - start : end + (MAX_MSG_FRAGS - start);
-+}
-+
- #define sk_msg_iter_var_prev(var)			\
- 	do {						\
- 		if (var == 0)				\
-@@ -198,9 +203,7 @@ static inline u32 sk_msg_elem_used(const struct sk_msg *msg)
- 	if (sk_msg_full(msg))
- 		return MAX_MSG_FRAGS;
- 
--	return msg->sg.end >= msg->sg.start ?
--		msg->sg.end - msg->sg.start :
--		msg->sg.end + (MAX_MSG_FRAGS - msg->sg.start);
-+	return sk_msg_iter_dist(msg->sg.start, msg->sg.end);
- }
- 
- static inline struct scatterlist *sk_msg_elem(struct sk_msg *msg, int which)
-diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-index cf390e0aa73d..ad31e4e53d0a 100644
---- a/net/core/skmsg.c
-+++ b/net/core/skmsg.c
-@@ -270,18 +270,28 @@ void sk_msg_trim(struct sock *sk, struct sk_msg *msg, int len)
- 
- 	msg->sg.data[i].length -= trim;
- 	sk_mem_uncharge(sk, trim);
-+	/* Adjust copybreak if it falls into the trimmed part of last buf */
-+	if (msg->sg.curr == i && msg->sg.copybreak > msg->sg.data[i].length)
-+		msg->sg.copybreak = msg->sg.data[i].length;
- out:
--	/* If we trim data before curr pointer update copybreak and current
--	 * so that any future copy operations start at new copy location.
-+	sk_msg_iter_var_next(i);
-+	msg->sg.end = i;
-+
-+	/* If we trim data a full sg elem before curr pointer update
-+	 * copybreak and current so that any future copy operations
-+	 * start at new copy location.
- 	 * However trimed data that has not yet been used in a copy op
- 	 * does not require an update.
- 	 */
--	if (msg->sg.curr >= i) {
-+	if (!msg->sg.size) {
-+		msg->sg.curr = msg->sg.start;
-+		msg->sg.copybreak = 0;
-+	} else if (sk_msg_iter_dist(msg->sg.start, msg->sg.curr) >=
-+		   sk_msg_iter_dist(msg->sg.start, msg->sg.end)) {
-+		sk_msg_iter_var_prev(i);
- 		msg->sg.curr = i;
- 		msg->sg.copybreak = msg->sg.data[i].length;
- 	}
--	sk_msg_iter_var_next(i);
--	msg->sg.end = i;
- }
- EXPORT_SYMBOL_GPL(sk_msg_trim);
- 
--- 
-2.23.0
+from the crypto tree.
 
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc arch/arm/crypto/Kconfig
+index 043b0b18bf7e,c618c379449f..000000000000
+--- a/arch/arm/crypto/Kconfig
++++ b/arch/arm/crypto/Kconfig
+@@@ -96,9 -96,8 +96,9 @@@ config CRYPTO_AES_ARM_B
+ =20
+  config CRYPTO_AES_ARM_CE
+  	tristate "Accelerated AES using ARMv8 Crypto Extensions"
+- 	depends on KERNEL_MODE_NEON
+- 	select CRYPTO_BLKCIPHER
++ 	depends on KERNEL_MODE_NEON && (CC_IS_CLANG || GCC_VERSION >=3D 40800)
++ 	select CRYPTO_SKCIPHER
+ +	select CRYPTO_LIB_AES
+  	select CRYPTO_SIMD
+  	help
+  	  Use an implementation of AES in CBC, CTR and XTS modes that uses
+
+--Sig_/eo3vTQNDaDmtEpv/KxN8=Qo
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl3A3SoACgkQAVBC80lX
+0GyepwgAkUyGhI24dDcq5CqWdl3Y9u7P+EzCRPulkBQMul4EKZ2Nx6vZcIHBq24D
+pi5L6Ciq4eAfiUU5gnO3AZhe+RGEiiEJ4QKBN5OQ5zewRoR+7vxF9S6zwgNC/MxM
+fo5CBjd/85tOzoVQAib6r4/qGgPQq7sgK0lFNdBU9ypUWSxiccm9lGIqwaTBfioY
+e+P7v8imZk1UKu9Jqmr/4mpmgkpDaDJqKh+/ND2OqJAXjI9YUhw1ry8UcixKqpnH
+yWyauNUrNHS5twEp+3r9ijvsmr3mhdRHgELRzqTpE8SWI3oEt8AJoPT7sPIxIC14
+AVuG/Mc7nH4Hl8HcGNs6leSBCNj6MA==
+=U0M+
+-----END PGP SIGNATURE-----
+
+--Sig_/eo3vTQNDaDmtEpv/KxN8=Qo--
