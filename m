@@ -2,81 +2,124 @@ Return-Path: <SRS0=QWZk=Y5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93C2FC1747C
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 14:35:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 979E4C17498
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 14:48:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 705FD21A4A
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 14:35:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E2CE21A4A
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 Nov 2019 14:48:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RFUp1sQZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389798AbfKEOep (ORCPT
+        id S1729070AbfKEOsQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Nov 2019 09:34:45 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:57634 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S2389763AbfKEOek (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Nov 2019 09:34:40 -0500
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 5685F8DD25CC4EF26B11;
-        Tue,  5 Nov 2019 22:34:38 +0800 (CST)
-Received: from localhost.localdomain.localdomain (10.175.113.25) by
- DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.439.0; Tue, 5 Nov 2019 22:34:28 +0800
-From:   Mao Wenan <maowenan@huawei.com>
-To:     <wangzhou1@hisilicon.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>, <tanshukun1@huawei.com>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel-janitors@vger.kernel.org>, Mao Wenan <maowenan@huawei.com>
-Subject: [PATCH -next] crypto: hisilicon: move label err to #ifdef CONFIG_NUMA
-Date:   Tue, 5 Nov 2019 22:33:40 +0800
-Message-ID: <20191105143340.32950-1-maowenan@huawei.com>
-X-Mailer: git-send-email 2.20.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.113.25]
-X-CFilter-Loop: Reflected
+        Tue, 5 Nov 2019 09:48:16 -0500
+Received: from mail-il1-f195.google.com ([209.85.166.195]:35686 "EHLO
+        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729092AbfKEOsQ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 5 Nov 2019 09:48:16 -0500
+Received: by mail-il1-f195.google.com with SMTP id z12so6466059ilp.2;
+        Tue, 05 Nov 2019 06:48:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:message-id:in-reply-to:references:subject
+         :mime-version:content-transfer-encoding;
+        bh=5Q1vt3almzqAzb5sEBadWFskQeA0wPngKWFtSxaTh1Q=;
+        b=RFUp1sQZPTnb8GxDXGbG7y/J83JmqMYQv1rnPHDSrMP7cGsQU4oITCooYtkVnc7T4P
+         y06lqFnM417K9levONy8Nyd3IoH/0sRSwwgZ3jIcVU4tEeEhsCpOt61E9nHBygab6k3/
+         8u8P/zPCCFoGbinBrSgCs9lG4V2F5ivVhBe/jD0ffpVDMuSJMj4dtl7Vca+OkvjxM5nv
+         8Yk/+brHRqCi3bytfPBugRCYL/vqCE3Zh+B8YJhlfj1X3lc1vjeFisb+ZERqSzdSkK47
+         dfN+ieN+txBe0NgrDGm1Q9LTZvCkK3HAtAspzeu1f6empoHvuo7WQ0cLVyy5mBeue2Gj
+         SmVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:message-id:in-reply-to
+         :references:subject:mime-version:content-transfer-encoding;
+        bh=5Q1vt3almzqAzb5sEBadWFskQeA0wPngKWFtSxaTh1Q=;
+        b=EuBuWSmJHhBm3KWAUBdhI9NCm+LUnF7ZQqEQwbpwkivizzLqxyWLUrLZT+GQHSsCo+
+         bqeYW7kbABuarDfsxzfZqAr3IwWVBZuoGI3RzCw9I5QkajERjto7UbsfTmUZzTFFb6NR
+         JOJCYqFC1Nx5IJDTcwEe/C+9z6q8oet1Ynnb6xheLJJ4gGY2+ZOPic6MGtIK4hJqcY4w
+         mOLhkCdoWCanQY8Q7X9yJyxfqk8J/LdzX7uR3lrIMEr++pJ2nicPCdv/jme+wZFpaCBn
+         9ZRBEM/VQqPUD8DU0OyoLhX42EdyRWpfnI+XToUc48zLf1HQCZM98WaEp2qR1Ko6i6Rj
+         ywKg==
+X-Gm-Message-State: APjAAAVvxtbirkD/0hO9eSogPyrtAQ8r2Sc1W171kK/veDcarYI3k0df
+        /VAks3kcISGfz4m3bQxXz24=
+X-Google-Smtp-Source: APXvYqwFwC45O+JY4lzd+zYWbG66p7c7n+9VpyFAqPAx48dHKQvjVbO3A9KPOIQ9oIM1qoeyZlSHvQ==
+X-Received: by 2002:a92:9198:: with SMTP id e24mr33866410ill.184.1572965293616;
+        Tue, 05 Nov 2019 06:48:13 -0800 (PST)
+Received: from localhost ([184.63.162.180])
+        by smtp.gmail.com with ESMTPSA id y1sm1126861iob.42.2019.11.05.06.48.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Nov 2019 06:48:12 -0800 (PST)
+Date:   Tue, 05 Nov 2019 06:48:05 -0800
+From:   John Fastabend <john.fastabend@gmail.com>
+To:     Jakub Kicinski <jakub.kicinski@netronome.com>, davem@davemloft.net
+Cc:     netdev@vger.kernel.org, oss-drivers@netronome.com,
+        borisp@mellanox.com, aviadye@mellanox.com,
+        john.fastabend@gmail.com, daniel@iogearbox.net,
+        Jakub Kicinski <jakub.kicinski@netronome.com>,
+        syzbot+f8495bff23a879a6d0bd@syzkaller.appspotmail.com,
+        syzbot+6f50c99e8f6194bf363f@syzkaller.appspotmail.com,
+        Eric Biggers <ebiggers@kernel.org>,
+        herbert@gondor.apana.org.au, glider@google.com,
+        linux-crypto@vger.kernel.org
+Message-ID: <5dc18ba56aec_48332abec96485b835@john-XPS-13-9370.notmuch>
+In-Reply-To: <20191104233657.21054-1-jakub.kicinski@netronome.com>
+References: <20191104233657.21054-1-jakub.kicinski@netronome.com>
+Subject: RE: [PATCH net v2] net/tls: fix sk_msg trim on fallback to copy mode
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-If CONFIG_NUMA is not set, there is error in function
-find_zip_device:
-drivers/crypto/hisilicon/zip/zip_main.c:154:13: error:
-head undeclared (first use in this function)
-  free_list(&head);
+Jakub Kicinski wrote:
+> sk_msg_trim() tries to only update curr pointer if it falls into
+> the trimmed region. The logic, however, does not take into the
+> account pointer wrapping that sk_msg_iter_var_prev() does nor
+> (as John points out) the fact that msg->sg is a ring buffer.
+> 
+> This means that when the message was trimmed completely, the new
+> curr pointer would have the value of MAX_MSG_FRAGS - 1, which is
+> neither smaller than any other value, nor would it actually be
+> correct.
+> 
+> Special case the trimming to 0 length a little bit and rework
+> the comparison between curr and end to take into account wrapping.
+> 
+> This bug caused the TLS code to not copy all of the message, if
+> zero copy filled in fewer sg entries than memcopy would need.
+> 
+> Big thanks to Alexander Potapenko for the non-KMSAN reproducer.
+> 
+> v2:
+>  - take into account that msg->sg is a ring buffer (John).
+> 
+> Link: https://lore.kernel.org/netdev/20191030160542.30295-1-jakub.kicinski@netronome.com/ (v1)
+> 
+> Fixes: d829e9c4112b ("tls: convert to generic sk_msg interface")
+> Reported-by: syzbot+f8495bff23a879a6d0bd@syzkaller.appspotmail.com
+> Reported-by: syzbot+6f50c99e8f6194bf363f@syzkaller.appspotmail.com
+> Co-developed-by: John Fastabend <john.fastabend@gmail.com>
+> Signed-off-by: Jakub Kicinski <jakub.kicinski@netronome.com>
+> ---
+> CC: Eric Biggers <ebiggers@kernel.org>
+> CC: herbert@gondor.apana.org.au
+> CC: glider@google.com
+> CC: linux-crypto@vger.kernel.org
+> ---
 
-This is because CONFIG_NUMA is not defined, it should move
-label err to #ifdef CONFIG_NUMA.
+I'll run it through our CI here when I get a chance but LGTM
+thanks for sending this and tracking it down. Per process.rst
+I guess we add Signed-off-by lines instead of acks from
+co-developers. News to me.
 
-Fixes: 700f7d0d29c7 ("crypto: hisilicon - fix to return sub-optimal device when best device has no qps")
-Signed-off-by: Mao Wenan <maowenan@huawei.com>
----
- drivers/crypto/hisilicon/zip/zip_main.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index 255b63c..0504fb2 100644
---- a/drivers/crypto/hisilicon/zip/zip_main.c
-+++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -150,10 +150,12 @@ struct hisi_zip *find_zip_device(int node)
- 
- 	return ret;
- 
-+#ifdef CONFIG_NUMA
- err:
- 	free_list(&head);
- 	mutex_unlock(&hisi_zip_list_lock);
- 	return NULL;
-+#endif
- }
- 
- struct hisi_zip_hw_error {
--- 
-2.7.4
-
+Signed-off-by: John Fastabend <john.fastabend@gmail.com>
