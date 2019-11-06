@@ -2,78 +2,85 @@ Return-Path: <SRS0=HcMk=Y6=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D40EC5DF60
-	for <linux-crypto@archiver.kernel.org>; Wed,  6 Nov 2019 00:53:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 869EBC5DF62
+	for <linux-crypto@archiver.kernel.org>; Wed,  6 Nov 2019 02:08:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F306621A49
-	for <linux-crypto@archiver.kernel.org>; Wed,  6 Nov 2019 00:53:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 40EE82178F
+	for <linux-crypto@archiver.kernel.org>; Wed,  6 Nov 2019 02:08:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727046AbfKFAxP (ORCPT
+        id S1730571AbfKFCIb (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 Nov 2019 19:53:15 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:45074 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727252AbfKFAxP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 Nov 2019 19:53:15 -0500
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id B6C8ADFC0E4BEAB798F2;
-        Wed,  6 Nov 2019 08:53:12 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
- 14.3.439.0; Wed, 6 Nov 2019 08:53:04 +0800
-From:   Tian Tao <tiantao6@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>, <linuxarm@huawei.com>
-Subject: [PATCH] crypto: tgr192 remove unneeded semicolon
-Date:   Wed, 6 Nov 2019 08:53:41 +0800
-Message-ID: <1573001621-58594-1-git-send-email-tiantao6@huawei.com>
-X-Mailer: git-send-email 2.7.4
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.56]
-X-CFilter-Loop: Reflected
+        Tue, 5 Nov 2019 21:08:31 -0500
+Received: from shards.monkeyblade.net ([23.128.96.9]:42068 "EHLO
+        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727252AbfKFCIb (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 5 Nov 2019 21:08:31 -0500
+Received: from localhost (unknown [IPv6:2601:601:9f00:1e2::d71])
+        (using TLSv1 with cipher AES256-SHA (256/256 bits))
+        (Client did not present a certificate)
+        (Authenticated sender: davem-davemloft)
+        by shards.monkeyblade.net (Postfix) with ESMTPSA id 419F81510370C;
+        Tue,  5 Nov 2019 18:08:30 -0800 (PST)
+Date:   Tue, 05 Nov 2019 18:08:29 -0800 (PST)
+Message-Id: <20191105.180829.228337395055155315.davem@davemloft.net>
+To:     jakub.kicinski@netronome.com
+Cc:     netdev@vger.kernel.org, oss-drivers@netronome.com,
+        borisp@mellanox.com, aviadye@mellanox.com,
+        john.fastabend@gmail.com, daniel@iogearbox.net,
+        syzbot+f8495bff23a879a6d0bd@syzkaller.appspotmail.com,
+        syzbot+6f50c99e8f6194bf363f@syzkaller.appspotmail.com,
+        ebiggers@kernel.org, herbert@gondor.apana.org.au,
+        glider@google.com, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH net v2] net/tls: fix sk_msg trim on fallback to copy
+ mode
+From:   David Miller <davem@davemloft.net>
+In-Reply-To: <20191104233657.21054-1-jakub.kicinski@netronome.com>
+References: <20191104233657.21054-1-jakub.kicinski@netronome.com>
+X-Mailer: Mew version 6.8 on Emacs 26.1
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.5.12 (shards.monkeyblade.net [149.20.54.216]); Tue, 05 Nov 2019 18:08:30 -0800 (PST)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Fix the warning below.
-./crypto/tgr192.c:558:43-44: Unneeded semicolon
-./crypto/tgr192.c:586:44-45: Unneeded semicolon
+From: Jakub Kicinski <jakub.kicinski@netronome.com>
+Date: Mon,  4 Nov 2019 15:36:57 -0800
 
-Fixes: f63fbd3d501b ("crypto: tgr192 - Switch to shash")
+> sk_msg_trim() tries to only update curr pointer if it falls into
+> the trimmed region. The logic, however, does not take into the
+> account pointer wrapping that sk_msg_iter_var_prev() does nor
+> (as John points out) the fact that msg->sg is a ring buffer.
+> 
+> This means that when the message was trimmed completely, the new
+> curr pointer would have the value of MAX_MSG_FRAGS - 1, which is
+> neither smaller than any other value, nor would it actually be
+> correct.
+> 
+> Special case the trimming to 0 length a little bit and rework
+> the comparison between curr and end to take into account wrapping.
+> 
+> This bug caused the TLS code to not copy all of the message, if
+> zero copy filled in fewer sg entries than memcopy would need.
+> 
+> Big thanks to Alexander Potapenko for the non-KMSAN reproducer.
+> 
+> v2:
+>  - take into account that msg->sg is a ring buffer (John).
+> 
+> Link: https://lore.kernel.org/netdev/20191030160542.30295-1-jakub.kicinski@netronome.com/ (v1)
+> 
+> Fixes: d829e9c4112b ("tls: convert to generic sk_msg interface")
+> Reported-by: syzbot+f8495bff23a879a6d0bd@syzkaller.appspotmail.com
+> Reported-by: syzbot+6f50c99e8f6194bf363f@syzkaller.appspotmail.com
+> Co-developed-by: John Fastabend <john.fastabend@gmail.com>
+> Signed-off-by: Jakub Kicinski <jakub.kicinski@netronome.com>
 
-Signed-off-by: Tian Tao <tiantao6@huawei.com>
----
- crypto/tgr192.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/crypto/tgr192.c b/crypto/tgr192.c
-index 052648e..aa29c52 100644
---- a/crypto/tgr192.c
-+++ b/crypto/tgr192.c
-@@ -555,7 +555,7 @@ static int tgr192_final(struct shash_desc *desc, u8 * out)
- 	__le32 *le32p;
- 	u32 t, msb, lsb;
- 
--	tgr192_update(desc, NULL, 0); /* flush */ ;
-+	tgr192_update(desc, NULL, 0); /* flush */
- 
- 	msb = 0;
- 	t = tctx->nblocks;
-@@ -583,7 +583,7 @@ static int tgr192_final(struct shash_desc *desc, u8 * out)
- 		while (tctx->count < 64) {
- 			tctx->hash[tctx->count++] = 0;
- 		}
--		tgr192_update(desc, NULL, 0); /* flush */ ;
-+		tgr192_update(desc, NULL, 0); /* flush */
- 		memset(tctx->hash, 0, 56);    /* fill next block with zeroes */
- 	}
- 	/* append the 64 bit count */
--- 
-2.7.4
-
+Applied and queued up for -stable, thanks Jakub.
