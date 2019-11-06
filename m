@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D29BFC5DF69
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C991C5DF68
 	for <linux-crypto@archiver.kernel.org>; Wed,  6 Nov 2019 14:14:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A5D4921D7E
+	by mail.kernel.org (Postfix) with ESMTP id 4C6B92173E
 	for <linux-crypto@archiver.kernel.org>; Wed,  6 Nov 2019 14:14:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="I2POX88Z"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="e5nNk39V"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731870AbfKFOOA (ORCPT
+        id S1731911AbfKFOOB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 6 Nov 2019 09:14:00 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:42090 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731910AbfKFONi (ORCPT
+        Wed, 6 Nov 2019 09:14:01 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:55491 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731922AbfKFONl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 6 Nov 2019 09:13:38 -0500
-Received: by mail-wr1-f68.google.com with SMTP id a15so25959550wrf.9
-        for <linux-crypto@vger.kernel.org>; Wed, 06 Nov 2019 06:13:36 -0800 (PST)
+        Wed, 6 Nov 2019 09:13:41 -0500
+Received: by mail-wm1-f68.google.com with SMTP id b11so678438wmb.5
+        for <linux-crypto@vger.kernel.org>; Wed, 06 Nov 2019 06:13:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=fqzAPQhanx5lXrgKjEv9uTOrlBIqmOP4j8raLoO2k80=;
-        b=I2POX88ZgDVEIXbxSVYMlxZS/dZ7L9KVhUwt+3VSv9oM/hQnoUVFd/6BdiDiRkN72e
-         mb3HIJ8zn335Mrlnm7+1kBy52YQr8iVQF2Ja5iGFzC2aYsdzlXapp9hOL4hr/d25WSIb
-         TLlS5LGfym6UNlJ25r+k4XhtiyR+AcOmsf8KxheDxTBSYyezHh6NYY+RQW8omSd+sxht
-         EExXnP+uHJklWzU8BZnUIUTZqb1eV8tqpuILEWnzNrXEiuexc65TTdG06IsXsKChYaG2
-         M8rk6v6P9kDamxYzI4+MMtDD4T8sy85hVCZM4ztqGTKQTpNvGNLVZNDmZx/i/SqHqgJj
-         0d0g==
+        bh=EtW7c5+Vxuw361NPgarxEa4pkxF91xrS2XEr4qnN4jI=;
+        b=e5nNk39VJ5IOgRqdcXf58JkLAmLsag2O4+U458JjYo5P0PSEMekSFRL7LZc2d3m3VJ
+         URQyFUvE8jMn4eVvMtPS4S4bwU+o51HOhtfgwYme4dhoLAOHd8OHl1q5buqF/oxhumhw
+         +z3jc1g7Ck1yBgoUiT30MrVfaQcI9SAZcV6//J2C/MjC41OM02IYNasElc3UDquPybqb
+         baWyh7WRSDEfEhipTjcqjxsGo/IM/qSUCmUCE5UrGsB4dj0txgaPvPHy4E6e/8b6xTks
+         +7wsbS1O4VTbwJoSISfsP2WPk3MvEuhRHnX4Tq6FkCgrC9KgWh7M7bDPmgQZAuRo+xGE
+         Q0vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=fqzAPQhanx5lXrgKjEv9uTOrlBIqmOP4j8raLoO2k80=;
-        b=bTMmTOqyR+dEmv+0UWQK8eriAu49n1fMvWXAfCzDAYxE1E7t6nmkHnNL/GwFb0f+xJ
-         8rwc2o+fPgF68hFIxZGvt0NUMAoTQHHkCDcL1VsGhcgbaT32ZXjV8RUUOWYmBDQzTFM0
-         c3KdJp4y//xoVrrbVR3n+HBvtnNE7E1SfylSHeb8UvsyWfnLYYc5VYC46APPww5fvzF2
-         lL89u6COmMafXmF0jG6+VknKV4TQccs8V0kbrF0TW0h1Jq940u0U/Wx40BvoAM2SgRGY
-         PLWm96ROkLxA2FNjLFjmPm9xqQskN49WaqGyrI8hA32cB5vGtBfhga8dzgVFukrcUS/2
-         8DkQ==
-X-Gm-Message-State: APjAAAU1L9U/XRWNZZQFfLxnbRKbwnorK4BDvA+2b41zv0iZrvgSm9Ja
-        O3tTgQDignAEK6LusuB7X8wAuRLRt9mwNA==
-X-Google-Smtp-Source: APXvYqx6m5i8d6WRVdHpkTE7+G9qJitHWAUl7IdCDvjMTeMctINMPoeFa1SZY80r+vkjd7EqisEAzw==
-X-Received: by 2002:a05:6000:128c:: with SMTP id f12mr3122000wrx.279.1573049615963;
-        Wed, 06 Nov 2019 06:13:35 -0800 (PST)
+        bh=EtW7c5+Vxuw361NPgarxEa4pkxF91xrS2XEr4qnN4jI=;
+        b=qQ/givsx4rWI/O/LzWuJMThUdRXVKIb3d0w92T9jOHmABoSwhjAeELejhmZSpLdBus
+         wA8ylk4B5Zd2Z/IwuwmSl3JgvpqTxzHjmgLiCLmKnWjHmNtKA0T+6kSwwbMO+syNnPRA
+         2fnh82stszzLR6Nnww4hlNCC09C6LNHmYjWQXZ2A1ySbr3zKC4onPxTNllBiIfvi8Wbf
+         sZB4FhPLSn3aY1mKmDmB1tK2UNHuu0QLk/6SmNMwTo6wRiNzmnwR2x6D075PNmH7Xxel
+         PUASLzVbE5oUtWB1r8b0aa6AlTxhSNX/4IjzFoW1/ZHQeKWInBqOoltFT4UN2GJLj2O0
+         qhUQ==
+X-Gm-Message-State: APjAAAXUCnBI9YJ/AXokXPE8h2Uf1ma2on1d4td4teRXwpXSZ/zkIvJx
+        CqFI3wpP8UzESrJpnGkJ7ObDp5FAUQD5Yw==
+X-Google-Smtp-Source: APXvYqwQkS3HkPb4xqO71j4GDBQsJDOPu6hiWKUGgF3l2gy8AO8EiMAAlXbkknCw6t0pwT+ISh1RMQ==
+X-Received: by 2002:a7b:c776:: with SMTP id x22mr2609658wmk.144.1573049619319;
+        Wed, 06 Nov 2019 06:13:39 -0800 (PST)
 Received: from localhost.localdomain (31.red-176-87-122.dynamicip.rima-tde.net. [176.87.122.31])
-        by smtp.gmail.com with ESMTPSA id b3sm2837556wma.13.2019.11.06.06.13.34
+        by smtp.gmail.com with ESMTPSA id b3sm2837556wma.13.2019.11.06.06.13.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Nov 2019 06:13:35 -0800 (PST)
+        Wed, 06 Nov 2019 06:13:38 -0800 (PST)
 From:   Richard Henderson <richard.henderson@linaro.org>
 X-Google-Original-From: Richard Henderson <rth@twiddle.net>
 To:     linux-crypto@vger.kernel.org
 Cc:     herbert@gondor.apana.org.au, linux-arch@vger.kernel.org,
         x86@kernel.org, linuxppc-dev@lists.ozlabs.org,
         linux-s390@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v2 08/10] powerpc: Use bool in archrandom.h
-Date:   Wed,  6 Nov 2019 15:13:06 +0100
-Message-Id: <20191106141308.30535-9-rth@twiddle.net>
+Subject: [PATCH v2 10/10] s390x: Mark archrandom.h functions __must_check
+Date:   Wed,  6 Nov 2019 15:13:08 +0100
+Message-Id: <20191106141308.30535-11-rth@twiddle.net>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191106141308.30535-1-rth@twiddle.net>
 References: <20191106141308.30535-1-rth@twiddle.net>
@@ -72,55 +72,50 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The generic interface uses bool not int; match that.
+We must not use the pointer output without validating the
+success of the random read.
 
+Reviewed-by: Harald Freudenberger <freude@linux.ibm.com>
 Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 ---
- arch/powerpc/include/asm/archrandom.h | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+ arch/s390/include/asm/archrandom.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/powerpc/include/asm/archrandom.h b/arch/powerpc/include/asm/archrandom.h
-index c2ed3b4681f5..7766812e2355 100644
---- a/arch/powerpc/include/asm/archrandom.h
-+++ b/arch/powerpc/include/asm/archrandom.h
-@@ -6,27 +6,28 @@
+diff --git a/arch/s390/include/asm/archrandom.h b/arch/s390/include/asm/archrandom.h
+index 9a6835137a16..de61ce562052 100644
+--- a/arch/s390/include/asm/archrandom.h
++++ b/arch/s390/include/asm/archrandom.h
+@@ -21,17 +21,17 @@ extern atomic64_t s390_arch_random_counter;
  
- #include <asm/machdep.h>
+ bool s390_arch_random_generate(u8 *buf, unsigned int nbytes);
  
--static inline int arch_get_random_long(unsigned long *v)
-+static inline bool arch_get_random_long(unsigned long *v)
+-static inline bool arch_get_random_long(unsigned long *v)
++static inline bool __must_check arch_get_random_long(unsigned long *v)
  {
--	return 0;
-+	return false;
+ 	return false;
  }
  
--static inline int arch_get_random_int(unsigned int *v)
-+static inline bool arch_get_random_int(unsigned int *v)
+-static inline bool arch_get_random_int(unsigned int *v)
++static inline bool __must_check arch_get_random_int(unsigned int *v)
  {
--	return 0;
-+	return false;
+ 	return false;
  }
  
--static inline int arch_get_random_seed_long(unsigned long *v)
-+static inline bool arch_get_random_seed_long(unsigned long *v)
+-static inline bool arch_get_random_seed_long(unsigned long *v)
++static inline bool __must_check arch_get_random_seed_long(unsigned long *v)
  {
- 	if (ppc_md.get_random_seed)
- 		return ppc_md.get_random_seed(v);
- 
--	return 0;
-+	return false;
+ 	if (static_branch_likely(&s390_arch_random_available)) {
+ 		return s390_arch_random_generate((u8 *)v, sizeof(*v));
+@@ -39,7 +39,7 @@ static inline bool arch_get_random_seed_long(unsigned long *v)
+ 	return false;
  }
--static inline int arch_get_random_seed_int(unsigned int *v)
-+
-+static inline bool arch_get_random_seed_int(unsigned int *v)
- {
- 	unsigned long val;
--	int rc;
-+	bool rc;
  
- 	rc = arch_get_random_long(&val);
- 	if (rc)
+-static inline bool arch_get_random_seed_int(unsigned int *v)
++static inline bool __must_check arch_get_random_seed_int(unsigned int *v)
+ {
+ 	if (static_branch_likely(&s390_arch_random_available)) {
+ 		return s390_arch_random_generate((u8 *)v, sizeof(*v));
 -- 
 2.17.1
 
