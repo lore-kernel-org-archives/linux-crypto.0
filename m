@@ -2,50 +2,112 @@ Return-Path: <SRS0=gVpy=Y7=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=FREEMAIL_REPLYTO_END_DIGIT,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41AACC5DF61
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 Nov 2019 15:08:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01212C5DF60
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 Nov 2019 20:05:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 21330207FA
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 Nov 2019 15:08:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CA4112166E
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 Nov 2019 20:05:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=netronome-com.20150623.gappssmtp.com header.i=@netronome-com.20150623.gappssmtp.com header.b="zrnACrcq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388689AbfKGPIv (ORCPT
+        id S1726118AbfKGUFl (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 7 Nov 2019 10:08:51 -0500
-Received: from [211.53.128.215] ([211.53.128.215]:49660 "EHLO MAIL.isd.co.kr"
-        rhost-flags-FAIL-FAIL-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729656AbfKGPIv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 7 Nov 2019 10:08:51 -0500
-Received: from 192.168.1.3 (217.217.179.17) by MAIL.isd.co.kr (10.10.10.22)
- with Microsoft SMTP Server id 14.3.123.3; Fri, 8 Nov 2019 00:08:07 +0900
-Date:   Thu, 7 Nov 2019 16:08:05 +0100
-From:   Peter Wong <choimj@isd.co.kr>
-Reply-To: Peter Wong <pw178483@protonmail.com>
-To:     <linux-crypto@vger.kernel.org>
-Message-ID: <32290093.22518.1573139287343.JavaMail.cash@211.53.128.215>
-Subject: Investment opportunity
+        Thu, 7 Nov 2019 15:05:41 -0500
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:44689 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725785AbfKGUFl (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 7 Nov 2019 15:05:41 -0500
+Received: by mail-pl1-f193.google.com with SMTP id az9so1465518plb.11
+        for <linux-crypto@vger.kernel.org>; Thu, 07 Nov 2019 12:05:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=netronome-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:in-reply-to:references
+         :organization:mime-version:content-transfer-encoding;
+        bh=Sn3H3USYo7BZToUu8oTrq01WdHO2mboQb5HVlpeRiKU=;
+        b=zrnACrcqsS2nzZa62EllyvKRCMH6Xpw6xK4qtFHcCoI6JgHhSQTKLdaelc5GJvsini
+         Oa3vn1I56tihebF1k6Eri2QUUD77LabYMtvF/m/EVozcVpT6Kf2JVDh7iqs5w3ExN4Z3
+         5zTpG7h+lKNQAoih+3IwDuoTlgPb8eeu9E3XKmtDCwciFe2BatUH2akmOR80S8+WxK5O
+         7nHwOOm0eq2IK3azfr3Hkr1I7mlLWqxEPPDzW7TA7PreJZDFe5666TD/NeujpVm4SmYO
+         LD5pytA58EY7pZ3yx3JBUFUAAPVX5H8Txi0hG6SHfUSBTOCJCVVbJCR6z9vvAnr6yYub
+         lIiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=Sn3H3USYo7BZToUu8oTrq01WdHO2mboQb5HVlpeRiKU=;
+        b=cY0bBkDF6oHvg+bL8qLCNM0cqLVCubfUcRn2cZvnmPojsfwgyzYCUTijspXID829Mj
+         McBjzl9rb/wBPTeRXoYkdslngq1AU+7l+IszOAhgrMabdUizom6v/u+EUHouB5zcJa8w
+         aJDLebVmiAFQbrd24w380h55Dlbk12g5KPqWjMGFFmt+xY0DBG0UB8Mb3AEdwVYCU90/
+         OYL9n1qJoqUvOILb1e9iM1qgzEPgXxhZdGeghUnDpsRZXtxkcA0n3VsUU+oVZmXR9cfy
+         03S8PFTJfUgrC+gwfFyXyP8gAvEgs+Bn/65WHoaWaG7uUFrpY59d/g1Jpp0v7ofcajbA
+         wFNQ==
+X-Gm-Message-State: APjAAAV9OMu8boMzRcC6MSdyF0HVLGnPi9hEq/t9rspNvSnHHvn/jDFS
+        hVU7RT97Np86dlP1gGMqaMB8UA==
+X-Google-Smtp-Source: APXvYqxWJNQvlbKIguc4Z/QM2uQTi9gQTGUknCkgIqxTfIQYWu4kMMdmOd+rr2Z9plzKxIsinf1bng==
+X-Received: by 2002:a17:902:161:: with SMTP id 88mr5368963plb.253.1573157139042;
+        Thu, 07 Nov 2019 12:05:39 -0800 (PST)
+Received: from cakuba.netronome.com ([65.196.126.174])
+        by smtp.gmail.com with ESMTPSA id s18sm4398210pfm.27.2019.11.07.12.05.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Nov 2019 12:05:38 -0800 (PST)
+Date:   Thu, 7 Nov 2019 15:05:18 -0500
+From:   Jakub Kicinski <jakub.kicinski@netronome.com>
+To:     syzbot <syzbot+e736399a2c4054612307@syzkaller.appspotmail.com>
+Cc:     Jason@zx2c4.com, ard.biesheuvel@linaro.org, aviadye@mellanox.com,
+        borisp@mellanox.com, daniel@iogearbox.net, davejwatson@fb.com,
+        davem@davemloft.net, dhowells@redhat.com,
+        dirk.vandermerwe@netronome.com, ebiggers3@gmail.com,
+        herbert@gondor.apana.org.au, john.fastabend@gmail.com,
+        k.marinushkin@gmail.com, keescook@chromium.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, security@kernel.org,
+        steffen.klassert@secunet.com, syzkaller-bugs@googlegroups.com
+Subject: Re: KASAN: use-after-free Read in crypto_gcm_init_common
+Message-ID: <20191107150518.36b4a872@cakuba.netronome.com>
+In-Reply-To: <000000000000dd9f160596c1d465@google.com>
+References: <00000000000060e0ae057a092be8@google.com>
+        <000000000000dd9f160596c1d465@google.com>
+Organization: Netronome Systems, Ltd.
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [217.217.179.17]
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Greetings,
+On Thu, 07 Nov 2019 05:42:07 -0800, syzbot wrote:
+> syzbot suspects this bug was fixed by commit:
+> 
+> commit 9354544cbccf68da1b047f8fb7b47630e3c8a59d
+> Author: Dirk van der Merwe <dirk.vandermerwe@netronome.com>
+> Date:   Mon Jun 24 04:26:58 2019 +0000
+> 
+>      net/tls: fix page double free on TX cleanup
+> 
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=168ad3c2600000
+> start commit:   4710e789 Merge tag 'nfs-for-4.20-2' of git://git.linux-nfs..
+> git tree:       upstream
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=9384ecb1c973baed
+> dashboard link: https://syzkaller.appspot.com/bug?extid=e736399a2c4054612307
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17902f5b400000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=111377e5400000
+> 
+> If the result looks correct, please mark the bug fixed by replying with:
+> 
+> #syz fix: net/tls: fix page double free on TX cleanup
+> 
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
-Find attached email very confidential. reply for more details
+The bug report looks fairly strange and could indicate a double free,
+but I don't see an entirely clear connection. We are double freeing a
+record and its pages while the splat is from a slab-32.. Given the
+bisection I think it's probably okay:
 
-Thanks.
-Peter Wong
-
-
-
-
-----------------------------------------------------
-This email was sent by the shareware version of Postman Professional.
-
+#syz fix: net/tls: fix page double free on TX cleanup
