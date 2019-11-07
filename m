@@ -2,265 +2,202 @@ Return-Path: <SRS0=gVpy=Y7=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64F72C5DF60
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 Nov 2019 03:51:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6A21C5DF60
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 Nov 2019 08:52:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3F7BE2166E
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 Nov 2019 03:51:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AD1AA2166E
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 Nov 2019 08:52:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1573116727;
+	bh=D7fJbf/YlbzggoeKvmikXB4Uhwz5VXlZUeKI6QZk1lk=;
+	h=Date:From:To:Cc:Subject:List-ID:From;
+	b=KsdcWeKMQ+EtfyHH9Hi+2VnIxZKg2xt6rnxjFmSsMD1pJ45R1rC12/BH7hcmSHFSH
+	 lu+bUrk+2AtiInrV8wpgccgzNflM2ScgMovaXEfOD6WYNkRHljcv/fj8cAR+r9++O8
+	 Ee+EWGq3zRHOFToOGp/buhs/NgLNJZAY445+TXbs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727751AbfKGDvj (ORCPT
+        id S1727563AbfKGIwG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 6 Nov 2019 22:51:39 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:47200 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727581AbfKGDvi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 6 Nov 2019 22:51:38 -0500
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 6A7B1546E722C0823F6E;
-        Thu,  7 Nov 2019 11:51:36 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.58) by
- DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
- 14.3.439.0; Thu, 7 Nov 2019 11:51:27 +0800
-From:   Hao Fang <fanghao11@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <linux-crypto@vger.kernel.org>, <linuxarm@huawei.com>
-Subject: [PATCH] crypto: hisilicon - add vfs_num module param for zip
-Date:   Thu, 7 Nov 2019 11:48:29 +0800
-Message-ID: <1573098509-72682-1-git-send-email-fanghao11@huawei.com>
-X-Mailer: git-send-email 2.8.1
+        Thu, 7 Nov 2019 03:52:06 -0500
+Received: from mail.kernel.org ([198.145.29.99]:49270 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727120AbfKGIwG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 7 Nov 2019 03:52:06 -0500
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8040A2077C;
+        Thu,  7 Nov 2019 08:52:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1573116723;
+        bh=D7fJbf/YlbzggoeKvmikXB4Uhwz5VXlZUeKI6QZk1lk=;
+        h=Date:From:To:Cc:Subject:From;
+        b=Y9fiUz/eZanesu7evppYHgZE6pgFy/JCCk1xE455FY3Bfbn+B60edBsfjWMuO1t1F
+         XaCIQLPBN53I4asESdV4mllWdjxye7FE4XM0oRT6Zy6uo/AEKP0avyVnUY6Gfxz1YH
+         qWRtAREp30iJG/4BYxDf5TX1igsjGny2W8Bk/JGE=
+Date:   Thu, 7 Nov 2019 09:52:00 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Zhou Wang <wangzhou1@hisilicon.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: hisilicon: no need to check return value of
+ debugfs_create functions
+Message-ID: <20191107085200.GB1274176@kroah.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.58]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Currently the VF can be enabled only through sysfs interface
-after module loaded, but this also needs to be done when the
-module loaded in some scenarios.
+When calling debugfs functions, there is no need to ever check the
+return value.  The function can work or not, but the code logic should
+never do something different based on this.
 
-This patch adds module param vfs_num, adds hisi_zip_sriov_enable()
-in probe, and also adjusts the position of probe.
-
-Signed-off-by: Hao Fang <fanghao11@huawei.com>
-Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
+Cc: Zhou Wang <wangzhou1@hisilicon.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 ---
- drivers/crypto/hisilicon/zip/zip_main.c | 182 +++++++++++++++++---------------
- 1 file changed, 98 insertions(+), 84 deletions(-)
+ drivers/crypto/hisilicon/qm.c           | 19 +++++--------------
+ drivers/crypto/hisilicon/zip/zip_main.c | 24 ++++++------------------
+ 2 files changed, 11 insertions(+), 32 deletions(-)
 
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index f975c393a603..ed6f4c70bc19 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -963,13 +963,11 @@ static const struct file_operations qm_regs_fops = {
+ 
+ static int qm_create_debugfs_file(struct hisi_qm *qm, enum qm_debug_file index)
+ {
+-	struct dentry *qm_d = qm->debug.qm_d, *tmp;
++	struct dentry *qm_d = qm->debug.qm_d;
+ 	struct debugfs_file *file = qm->debug.files + index;
+ 
+-	tmp = debugfs_create_file(qm_debug_file_name[index], 0600, qm_d, file,
+-				  &qm_debug_fops);
+-	if (IS_ERR(tmp))
+-		return -ENOENT;
++	debugfs_create_file(qm_debug_file_name[index], 0600, qm_d, file,
++			    &qm_debug_fops);
+ 
+ 	file->index = index;
+ 	mutex_init(&file->lock);
+@@ -1780,12 +1778,10 @@ EXPORT_SYMBOL_GPL(hisi_qm_stop);
+  */
+ int hisi_qm_debug_init(struct hisi_qm *qm)
+ {
+-	struct dentry *qm_d, *qm_regs;
++	struct dentry *qm_d;
+ 	int i, ret;
+ 
+ 	qm_d = debugfs_create_dir("qm", qm->debug.debug_root);
+-	if (IS_ERR(qm_d))
+-		return -ENOENT;
+ 	qm->debug.qm_d = qm_d;
+ 
+ 	/* only show this in PF */
+@@ -1796,12 +1792,7 @@ int hisi_qm_debug_init(struct hisi_qm *qm)
+ 				goto failed_to_create;
+ 			}
+ 
+-	qm_regs = debugfs_create_file("qm_regs", 0444, qm->debug.qm_d, qm,
+-				      &qm_regs_fops);
+-	if (IS_ERR(qm_regs)) {
+-		ret = -ENOENT;
+-		goto failed_to_create;
+-	}
++	debugfs_create_file("qm_regs", 0444, qm->debug.qm_d, qm, &qm_regs_fops);
+ 
+ 	return 0;
+ 
 diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index 255b63c..e42c3a84 100644
+index 1b2ee96c888d..f203fa824912 100644
 --- a/drivers/crypto/hisilicon/zip/zip_main.c
 +++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -301,6 +301,10 @@ MODULE_PARM_DESC(pf_q_num, "Number of queues in PF(v1 1-4096, v2 1-1024)");
- static int uacce_mode;
- module_param(uacce_mode, int, 0);
+@@ -511,7 +511,7 @@ static int hisi_zip_core_debug_init(struct hisi_zip_ctrl *ctrl)
+ 	struct hisi_qm *qm = &hisi_zip->qm;
+ 	struct device *dev = &qm->pdev->dev;
+ 	struct debugfs_regset32 *regset;
+-	struct dentry *tmp_d, *tmp;
++	struct dentry *tmp_d;
+ 	char buf[HZIP_BUF_SIZE];
+ 	int i;
  
-+static u32 vfs_num;
-+module_param(vfs_num, uint, 0444);
-+MODULE_PARM_DESC(vfs_num, "Number of VFs to enable(1-63)");
-+
- static const struct pci_device_id hisi_zip_dev_ids[] = {
- 	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_ZIP_PF) },
- 	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_ZIP_VF) },
-@@ -685,90 +689,6 @@ static int hisi_zip_pf_probe_init(struct hisi_zip *hisi_zip)
+@@ -521,10 +521,6 @@ static int hisi_zip_core_debug_init(struct hisi_zip_ctrl *ctrl)
+ 		else
+ 			sprintf(buf, "decomp_core%d", i - HZIP_COMP_CORE_NUM);
+ 
+-		tmp_d = debugfs_create_dir(buf, ctrl->debug_root);
+-		if (!tmp_d)
+-			return -ENOENT;
+-
+ 		regset = devm_kzalloc(dev, sizeof(*regset), GFP_KERNEL);
+ 		if (!regset)
+ 			return -ENOENT;
+@@ -533,9 +529,8 @@ static int hisi_zip_core_debug_init(struct hisi_zip_ctrl *ctrl)
+ 		regset->nregs = ARRAY_SIZE(hzip_dfx_regs);
+ 		regset->base = qm->io_base + core_offsets[i];
+ 
+-		tmp = debugfs_create_regset32("regs", 0444, tmp_d, regset);
+-		if (!tmp)
+-			return -ENOENT;
++		tmp_d = debugfs_create_dir(buf, ctrl->debug_root);
++		debugfs_create_regset32("regs", 0444, tmp_d, regset);
+ 	}
+ 
  	return 0;
+@@ -543,7 +538,6 @@ static int hisi_zip_core_debug_init(struct hisi_zip_ctrl *ctrl)
+ 
+ static int hisi_zip_ctrl_debug_init(struct hisi_zip_ctrl *ctrl)
+ {
+-	struct dentry *tmp;
+ 	int i;
+ 
+ 	for (i = HZIP_CURRENT_QM; i < HZIP_DEBUG_FILE_NUM; i++) {
+@@ -551,11 +545,9 @@ static int hisi_zip_ctrl_debug_init(struct hisi_zip_ctrl *ctrl)
+ 		ctrl->files[i].ctrl = ctrl;
+ 		ctrl->files[i].index = i;
+ 
+-		tmp = debugfs_create_file(ctrl_debug_file_name[i], 0600,
+-					  ctrl->debug_root, ctrl->files + i,
+-					  &ctrl_debug_fops);
+-		if (!tmp)
+-			return -ENOENT;
++		debugfs_create_file(ctrl_debug_file_name[i], 0600,
++				    ctrl->debug_root, ctrl->files + i,
++				    &ctrl_debug_fops);
+ 	}
+ 
+ 	return hisi_zip_core_debug_init(ctrl);
+@@ -569,8 +561,6 @@ static int hisi_zip_debugfs_init(struct hisi_zip *hisi_zip)
+ 	int ret;
+ 
+ 	dev_d = debugfs_create_dir(dev_name(dev), hzip_debugfs_root);
+-	if (!dev_d)
+-		return -ENOENT;
+ 
+ 	qm->debug.debug_root = dev_d;
+ 	ret = hisi_qm_debug_init(qm);
+@@ -955,8 +945,6 @@ static void hisi_zip_register_debugfs(void)
+ 		return;
+ 
+ 	hzip_debugfs_root = debugfs_create_dir("hisi_zip", NULL);
+-	if (IS_ERR_OR_NULL(hzip_debugfs_root))
+-		hzip_debugfs_root = NULL;
  }
  
--static int hisi_zip_probe(struct pci_dev *pdev, const struct pci_device_id *id)
--{
--	struct hisi_zip *hisi_zip;
--	enum qm_hw_ver rev_id;
--	struct hisi_qm *qm;
--	int ret;
--
--	rev_id = hisi_qm_get_hw_version(pdev);
--	if (rev_id == QM_HW_UNKNOWN)
--		return -EINVAL;
--
--	hisi_zip = devm_kzalloc(&pdev->dev, sizeof(*hisi_zip), GFP_KERNEL);
--	if (!hisi_zip)
--		return -ENOMEM;
--	pci_set_drvdata(pdev, hisi_zip);
--
--	qm = &hisi_zip->qm;
--	qm->pdev = pdev;
--	qm->ver = rev_id;
--
--	qm->sqe_size = HZIP_SQE_SIZE;
--	qm->dev_name = hisi_zip_name;
--	qm->fun_type = (pdev->device == PCI_DEVICE_ID_ZIP_PF) ? QM_HW_PF :
--								QM_HW_VF;
--	switch (uacce_mode) {
--	case 0:
--		qm->use_dma_api = true;
--		break;
--	case 1:
--		qm->use_dma_api = false;
--		break;
--	case 2:
--		qm->use_dma_api = true;
--		break;
--	default:
--		return -EINVAL;
--	}
--
--	ret = hisi_qm_init(qm);
--	if (ret) {
--		dev_err(&pdev->dev, "Failed to init qm!\n");
--		return ret;
--	}
--
--	if (qm->fun_type == QM_HW_PF) {
--		ret = hisi_zip_pf_probe_init(hisi_zip);
--		if (ret)
--			return ret;
--
--		qm->qp_base = HZIP_PF_DEF_Q_BASE;
--		qm->qp_num = pf_q_num;
--	} else if (qm->fun_type == QM_HW_VF) {
--		/*
--		 * have no way to get qm configure in VM in v1 hardware,
--		 * so currently force PF to uses HZIP_PF_DEF_Q_NUM, and force
--		 * to trigger only one VF in v1 hardware.
--		 *
--		 * v2 hardware has no such problem.
--		 */
--		if (qm->ver == QM_HW_V1) {
--			qm->qp_base = HZIP_PF_DEF_Q_NUM;
--			qm->qp_num = HZIP_QUEUE_NUM_V1 - HZIP_PF_DEF_Q_NUM;
--		} else if (qm->ver == QM_HW_V2)
--			/* v2 starts to support get vft by mailbox */
--			hisi_qm_get_vft(qm, &qm->qp_base, &qm->qp_num);
--	}
--
--	ret = hisi_qm_start(qm);
--	if (ret)
--		goto err_qm_uninit;
--
--	ret = hisi_zip_debugfs_init(hisi_zip);
--	if (ret)
--		dev_err(&pdev->dev, "Failed to init debugfs (%d)!\n", ret);
--
--	hisi_zip_add_to_list(hisi_zip);
--
--	return 0;
--
--err_qm_uninit:
--	hisi_qm_uninit(qm);
--	return ret;
--}
--
- /* Currently we only support equal assignment */
- static int hisi_zip_vf_q_assign(struct hisi_zip *hisi_zip, int num_vfs)
- {
-@@ -865,6 +785,100 @@ static int hisi_zip_sriov_disable(struct pci_dev *pdev)
- 	return hisi_zip_clear_vft_config(hisi_zip);
- }
- 
-+static int hisi_zip_probe(struct pci_dev *pdev, const struct pci_device_id *id)
-+{
-+	struct hisi_zip *hisi_zip;
-+	enum qm_hw_ver rev_id;
-+	struct hisi_qm *qm;
-+	int ret;
-+
-+	rev_id = hisi_qm_get_hw_version(pdev);
-+	if (rev_id == QM_HW_UNKNOWN)
-+		return -EINVAL;
-+
-+	hisi_zip = devm_kzalloc(&pdev->dev, sizeof(*hisi_zip), GFP_KERNEL);
-+	if (!hisi_zip)
-+		return -ENOMEM;
-+	pci_set_drvdata(pdev, hisi_zip);
-+
-+	qm = &hisi_zip->qm;
-+	qm->pdev = pdev;
-+	qm->ver = rev_id;
-+
-+	qm->sqe_size = HZIP_SQE_SIZE;
-+	qm->dev_name = hisi_zip_name;
-+	qm->fun_type = (pdev->device == PCI_DEVICE_ID_ZIP_PF) ? QM_HW_PF :
-+								QM_HW_VF;
-+	switch (uacce_mode) {
-+	case 0:
-+		qm->use_dma_api = true;
-+		break;
-+	case 1:
-+		qm->use_dma_api = false;
-+		break;
-+	case 2:
-+		qm->use_dma_api = true;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	ret = hisi_qm_init(qm);
-+	if (ret) {
-+		dev_err(&pdev->dev, "Failed to init qm!\n");
-+		return ret;
-+	}
-+
-+	if (qm->fun_type == QM_HW_PF) {
-+		ret = hisi_zip_pf_probe_init(hisi_zip);
-+		if (ret)
-+			return ret;
-+
-+		qm->qp_base = HZIP_PF_DEF_Q_BASE;
-+		qm->qp_num = pf_q_num;
-+	} else if (qm->fun_type == QM_HW_VF) {
-+		/*
-+		 * have no way to get qm configure in VM in v1 hardware,
-+		 * so currently force PF to uses HZIP_PF_DEF_Q_NUM, and force
-+		 * to trigger only one VF in v1 hardware.
-+		 *
-+		 * v2 hardware has no such problem.
-+		 */
-+		if (qm->ver == QM_HW_V1) {
-+			qm->qp_base = HZIP_PF_DEF_Q_NUM;
-+			qm->qp_num = HZIP_QUEUE_NUM_V1 - HZIP_PF_DEF_Q_NUM;
-+		} else if (qm->ver == QM_HW_V2)
-+			/* v2 starts to support get vft by mailbox */
-+			hisi_qm_get_vft(qm, &qm->qp_base, &qm->qp_num);
-+	}
-+
-+	ret = hisi_qm_start(qm);
-+	if (ret)
-+		goto err_qm_uninit;
-+
-+	ret = hisi_zip_debugfs_init(hisi_zip);
-+	if (ret)
-+		dev_err(&pdev->dev, "Failed to init debugfs (%d)!\n", ret);
-+
-+	hisi_zip_add_to_list(hisi_zip);
-+
-+	if (qm->fun_type == QM_HW_PF && vfs_num > 0) {
-+		ret = hisi_zip_sriov_enable(pdev, vfs_num);
-+		if (ret < 0)
-+			goto err_remove_from_list;
-+	}
-+
-+	return 0;
-+
-+err_remove_from_list:
-+	hisi_zip_remove_from_list(hisi_zip);
-+	hisi_zip_debugfs_exit(hisi_zip);
-+	hisi_qm_stop(qm);
-+err_qm_uninit:
-+	hisi_qm_uninit(qm);
-+	return ret;
-+}
-+
- static int hisi_zip_sriov_configure(struct pci_dev *pdev, int num_vfs)
- {
- 	if (num_vfs == 0)
+ static void hisi_zip_unregister_debugfs(void)
 -- 
-2.8.1
+2.23.0
 
