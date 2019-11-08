@@ -4,124 +4,89 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7D60FA372C
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 09:45:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5356FC6194
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 10:13:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 87DF3218AE
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 09:45:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BB4B6214DB
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 10:13:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="lbk0ljkn"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="PXCijcCc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731181AbfKHJpg (ORCPT
+        id S1728513AbfKHKNS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 8 Nov 2019 04:45:36 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:53609 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728513AbfKHJpg (ORCPT
+        Fri, 8 Nov 2019 05:13:18 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:42132 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729873AbfKHKNS (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 Nov 2019 04:45:36 -0500
-Received: by mail-wm1-f66.google.com with SMTP id x4so5450457wmi.3
-        for <linux-crypto@vger.kernel.org>; Fri, 08 Nov 2019 01:45:35 -0800 (PST)
+        Fri, 8 Nov 2019 05:13:18 -0500
+Received: by mail-wr1-f67.google.com with SMTP id a15so6328105wrf.9
+        for <linux-crypto@vger.kernel.org>; Fri, 08 Nov 2019 02:13:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=baylibre-com.20150623.gappssmtp.com; s=20150623;
         h=from:to:cc:subject:date:message-id;
-        bh=w0FiN6gyAyacF2gs8LToS4qHDjvvIl4Fdx7KgNHxcPA=;
-        b=lbk0ljknocwIdkmF9k7GAivkHRDTe/IAjZGyeQYpGPDyWtGzQmSXi4OPx48dAgQO0J
-         TMvYwp/agAMuRMGZj6lkbkJ+rTmtdHV52hEpEf1LJfXOcKs1uYdC7rSy+vs/M8ZR6SKx
-         NU+mmP3iv3Pl2/Y/LVuUzmpS/b3BpIIYVYuCK6Y9GnUbTs/slK8qwiPZzPfCj4GUDkhT
-         OGhdrWrwzuQfnXXtLYvvdNhAV+aANu6mo0CcXevdI5/q3duUfaB1RAoX2SEHj5YztOmt
-         rVtHFeQqKCG1RiVCj1gxnZmQy5THOMv3RalfhBY9RGDSGtgOm5d6M67bKxxnJLiIqyZ2
-         948g==
+        bh=cU3L2BBWe8lA2LWE7gRXOVYyqfxgb1FEIKhotYOu9Xk=;
+        b=PXCijcCcFDJnq59ddsvYjds27Zng22aFdWDWqJdpNGJIMHInEgrmbDnllDSDlpseVv
+         ndv7yrifX9deROcU0bVxOwT22xYXQu9hh3qu6HtK1LKytptdkfMwhiOLlxuozEs7fDX7
+         ekcbINwgFnIB1f3PYGXxtvrsVTGVqwc9fO4FE6rLLPlcMsXG0LdGB3K20jbqhsO8+Izr
+         ZO9nT9X73Ks4swESUuATZx0VOTBixpPG8QnDSKKc6TEjkDIxbZpUc9BWOEOymq2lQzur
+         n5SxVbKa15+zLCTN+BvD9PsOP91lfz5uW/edkJ5CODwQsSuAlsIX8dO85SkJcJC9o7z0
+         WKjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=w0FiN6gyAyacF2gs8LToS4qHDjvvIl4Fdx7KgNHxcPA=;
-        b=cuJMD3CO1JoBP1r2IVunxiTc2nqjMj1bn28GC3mK5R5KiGHyp0Ya/JnWcMH/GuFMwo
-         jTdw28zt0xGgOUhTMnLdN9Xlov8LU2M6lJDgejagl3wT1mzaPlWRDE3XyiuLx7uDAR9X
-         PHtNuHC7ygAVJmhZW/Jifih4LHhfGavG3uIVeQQeFZZ9NFfeFb77TCphonJZAD9qDnh8
-         a91SR1o+PFyKCb2bbHEHT4+3kf1Rh8HUsrh6kIAzeeB9ohDdVSyz5lAD8jONpmPve8L+
-         mc39us3wPlCfcHzYWtV7lYuVu0jx2+OKAkWEkbDpfDoeM53CE5jezjwrsqK3vj/7DkTe
-         N3/w==
-X-Gm-Message-State: APjAAAX+cKxXjzBXUUhDPdWG+0l+0oplvhgeq7V3y/8GcLr04R3/bdJO
-        Mf33TaB6OFRbeLGgHSlZ6Y1sMw==
-X-Google-Smtp-Source: APXvYqxyMB4JCp9NWE1ioQbruVXzPQumvhGWe31zInW2/Ji/Iz9hHST1fhd3vJd3yu3ksEJkV7WIVg==
-X-Received: by 2002:a7b:c08f:: with SMTP id r15mr7125636wmh.45.1573206334295;
-        Fri, 08 Nov 2019 01:45:34 -0800 (PST)
+        bh=cU3L2BBWe8lA2LWE7gRXOVYyqfxgb1FEIKhotYOu9Xk=;
+        b=sI0ybSX9MkGRxTZNrpnMYYncJesn3osjYK2GoMJIiYUg93veHPtaJT6PsBvgVTpwI6
+         4A9AGxjBfIELu03cL5IjfwRKcRfPGhNzeZfRDQDKf6QTxwUMz7hiGQEnbwml5srOXahL
+         lF6PWS+xo3BP7xrLJZpcWLMpGrA0OaqHS+x9xBY2AcjYmDt91FB0SUaBp12mQrae1i/Y
+         lkfHWujYeDbRTAZ6EFle5wBInKKKhkqCViOyP4C9Z97HkmrMUgjgBKDN9ksbljinSq1n
+         HAD9Ox+fWN+JBNKFfHBqCxiok4boN0J4BGkVGdZJrdV1mcRFC9btPKKGh/egkWXGLpXa
+         Z72g==
+X-Gm-Message-State: APjAAAXO0n6D9Qa0APEnx6/FiktjmvOoAYpjwmHWIIYgtzbOueaYKeQg
+        Gn9B6HyhVtMAIxRls/p2JoO0Ag==
+X-Google-Smtp-Source: APXvYqy54qoamMo6mHEiIaRis19DIgx8N4yy7Hc7RiXAPhgRu6JpxysgeEp8fI0vT1GFn/Qpj7mQfg==
+X-Received: by 2002:adf:f4c9:: with SMTP id h9mr7041901wrp.354.1573207995337;
+        Fri, 08 Nov 2019 02:13:15 -0800 (PST)
 Received: from localhost.localdomain ([51.15.160.169])
-        by smtp.googlemail.com with ESMTPSA id c24sm10601737wrb.27.2019.11.08.01.45.33
+        by smtp.googlemail.com with ESMTPSA id a11sm5762163wmh.40.2019.11.08.02.13.13
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Fri, 08 Nov 2019 01:45:33 -0800 (PST)
+        Fri, 08 Nov 2019 02:13:14 -0800 (PST)
 From:   Corentin Labbe <clabbe@baylibre.com>
-To:     davem@davemloft.net, herbert@gondor.apana.org.au,
-        keescook+coverity-bot@chromium.org, narmstrong@baylibre.com
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+To:     herbert@gondor.apana.org.au
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-amlogic@lists.infradead.org,
         Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH] crypto: amlogic - fix two resources leak
-Date:   Fri,  8 Nov 2019 09:45:17 +0000
-Message-Id: <1573206317-9926-1-git-send-email-clabbe@baylibre.com>
+Subject: [PATCH] MAINTAINERS: add linux-amlogic list for amlogic crypto
+Date:   Fri,  8 Nov 2019 10:13:06 +0000
+Message-Id: <1573207986-26787-1-git-send-email-clabbe@baylibre.com>
 X-Mailer: git-send-email 2.7.4
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch fixes two resources leak that occur on error path.
+The linux-amlogic mailing list need to be in copy of all patch for the amlogic crypto.
 
-Reported-by: coverity-bot <keescook+coverity-bot@chromium.org>
-Addresses-Coverity-ID: 1487403 ("RESOURCE_LEAK")
-Addresses-Coverity-ID: 1487401 ("Resource leaks")
-Fixes: 48fe583fe541 ("crypto: amlogic - Add crypto accelerator for amlogic GXL")
 Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 ---
- drivers/crypto/amlogic/amlogic-gxl-cipher.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ MAINTAINERS | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/crypto/amlogic/amlogic-gxl-cipher.c b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
-index e9283ffdbd23..58b717aab6e8 100644
---- a/drivers/crypto/amlogic/amlogic-gxl-cipher.c
-+++ b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
-@@ -131,7 +131,8 @@ static int meson_cipher(struct skcipher_request *areq)
- 	if (areq->iv && ivsize > 0) {
- 		if (ivsize > areq->cryptlen) {
- 			dev_err(mc->dev, "invalid ivsize=%d vs len=%d\n", ivsize, areq->cryptlen);
--			return -EINVAL;
-+			err = -EINVAL;
-+			goto theend;
- 		}
- 		memcpy(bkeyiv + 32, areq->iv, ivsize);
- 		keyivlen = 48;
-@@ -151,9 +152,10 @@ static int meson_cipher(struct skcipher_request *areq)
- 
- 	phykeyiv = dma_map_single(mc->dev, bkeyiv, keyivlen,
- 				  DMA_TO_DEVICE);
--	if (dma_mapping_error(mc->dev, phykeyiv)) {
-+	err = dma_mapping_error(mc->dev, phykeyiv);
-+	if (err) {
- 		dev_err(mc->dev, "Cannot DMA MAP KEY IV\n");
--		return -EFAULT;
-+		goto theend;
- 	}
- 
- 	tloffset = 0;
-@@ -245,7 +247,6 @@ static int meson_cipher(struct skcipher_request *areq)
- 	if (areq->iv && ivsize > 0) {
- 		if (rctx->op_dir == MESON_DECRYPT) {
- 			memcpy(areq->iv, backup_iv, ivsize);
--			kzfree(backup_iv);
- 		} else {
- 			scatterwalk_map_and_copy(areq->iv, areq->dst,
- 						 areq->cryptlen - ivsize,
-@@ -254,6 +255,7 @@ static int meson_cipher(struct skcipher_request *areq)
- 	}
- theend:
- 	kzfree(bkeyiv);
-+	kzfree(backup_iv);
- 
- 	return err;
- }
+diff --git a/MAINTAINERS b/MAINTAINERS
+index c4c532c70b86..ec1c71dba03d 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1488,6 +1488,7 @@ N:	meson
+ ARM/Amlogic Meson SoC Crypto Drivers
+ M:	Corentin Labbe <clabbe@baylibre.com>
+ L:	linux-crypto@vger.kernel.org
++L:	linux-amlogic@lists.infradead.org
+ S:	Maintained
+ F:	drivers/crypto/amlogic/
+ F:	Documentation/devicetree/bindings/crypto/amlogic*
 -- 
 2.23.0
 
