@@ -2,148 +2,101 @@ Return-Path: <SRS0=0i+u=ZA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18E86C5DF60
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 07:41:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BF4EFA372C
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 07:48:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D59222178F
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 07:41:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 127E121848
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 07:48:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="QLHM/T7Q"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OfXQxD87"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727016AbfKHHlQ (ORCPT
+        id S1726103AbfKHHso (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 8 Nov 2019 02:41:16 -0500
-Received: from lelv0142.ext.ti.com ([198.47.23.249]:50328 "EHLO
-        lelv0142.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726672AbfKHHlQ (ORCPT
+        Fri, 8 Nov 2019 02:48:44 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:39297 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726672AbfKHHsn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 Nov 2019 02:41:16 -0500
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-        by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id xA87f1JB064030;
-        Fri, 8 Nov 2019 01:41:01 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1573198862;
-        bh=8p57qwOk81qIZzYrBvDYBp3MiSplInyVjuIvJT9EzBE=;
-        h=Subject:To:References:From:Date:In-Reply-To;
-        b=QLHM/T7QV4DXcb4rvpTw7NQ42f4gHZ+sWcPZbWGEAJ36Yb9fE54BOkuE6OfZScEmG
-         qNbRELdBFtcas80D5rWZr5rsu3EIgTqGZU95YmeCU8aQ/CjxXaNSk0ZRi5MmKL2O+v
-         OeGPn2K+u5Bh/z4dI+oL2m5LQ7BTSeCWf4nfeSrc=
-Received: from DFLE103.ent.ti.com (dfle103.ent.ti.com [10.64.6.24])
-        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTP id xA87f1Cf001150;
-        Fri, 8 Nov 2019 01:41:01 -0600
-Received: from DFLE112.ent.ti.com (10.64.6.33) by DFLE103.ent.ti.com
- (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3; Fri, 8 Nov
- 2019 01:40:45 -0600
-Received: from lelv0326.itg.ti.com (10.180.67.84) by DFLE112.ent.ti.com
- (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3 via
- Frontend Transport; Fri, 8 Nov 2019 01:40:45 -0600
-Received: from [127.0.0.1] (ileax41-snat.itg.ti.com [10.172.224.153])
-        by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id xA87evV2090261;
-        Fri, 8 Nov 2019 01:40:58 -0600
-Subject: Re: [PATCH 09/10] crypto: add timeout to crypto_wait_req
-To:     Gilad Ben-Yossef <gilad@benyossef.com>,
+        Fri, 8 Nov 2019 02:48:43 -0500
+Received: by mail-wr1-f67.google.com with SMTP id a11so5875322wra.6
+        for <linux-crypto@vger.kernel.org>; Thu, 07 Nov 2019 23:48:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=ikAnX1n97pHrRs+oFI52Nu6jtvmhINRGHyMas+0u+t8=;
+        b=OfXQxD87fQ+CgLxFluj4dT5ELRfN4nI2r7b0b1MNUlEINLFKTDLC957GOrknJYpkZF
+         focCV4ugZH/9OhrBJZxmu8gQDqhUINoSlu3If/0kc6AyUQLKdRc/fluaWq0MlDTX1YR4
+         Hme5Q9MTXY2h7mT4EU2SCk2cP2SfHu74v56w1SrFYQzoW22HKcI9CUYza/GpDmmh35D3
+         Ver6+fPCj1oRvdPMiyhn9cPPWrUd/MWLTZpFfIVbs0gVM8K9SYuG7kpD5CZwxOdo2L/n
+         yh/1RM2LgLu1IwV8JNAjaZ6ZCEvOmz381KFeihnHJ5UsRJXVNr+gazfLqrOzsnNyuXEG
+         cAKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=ikAnX1n97pHrRs+oFI52Nu6jtvmhINRGHyMas+0u+t8=;
+        b=R94AuGH/TD7cvl+qAqu4ykbz/OZrzZAg+7HrIFT+Baz8evG21/DaQkbhNT4LXVIXVK
+         gDvWunysRCR6kv+EqZz7J6n9PL/kqjPYUYRSYr7RhZawvwHRL9+BMTSEvR10G78SGeiJ
+         nIFJ/aRP3UBgaP6i0O7bN+67MKAuUO3Y2ddgeQnmSDeUcJpYmLIJviTIPfMFLJ29isi/
+         hP7YnhA3LVfgb5gKmWXHlf6dEjH2/SFT2Umcltp++bhZ0bWHl43VQqJPd1e04Vf+AAlS
+         gXFVvua3P0n3i+GVFgVW4xlneNNwXmey15rSGiGIb9/NaOI+Fs3ySX3cVisVTaGRg+A8
+         tWWw==
+X-Gm-Message-State: APjAAAW2ICxYxWml4YEXeIx1po8iEQ9EN3nEaqe2KR3iM7wr01wi2H3Z
+        x3QjUQFknD6guABBP/awRJvNzmADB8NZjA==
+X-Google-Smtp-Source: APXvYqxo1T1YPUTzDNQ5bmIDkM48J8zFmYvTc8T96I3x8hptmRVD7jgMpYKmbuBIqHL6DaZ1BKcDDg==
+X-Received: by 2002:adf:dbc3:: with SMTP id e3mr4814087wrj.185.1573199319375;
+        Thu, 07 Nov 2019 23:48:39 -0800 (PST)
+Received: from lophozonia ([85.195.192.192])
+        by smtp.gmail.com with ESMTPSA id b1sm5302726wrw.77.2019.11.07.23.48.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Nov 2019 23:48:38 -0800 (PST)
+Date:   Fri, 8 Nov 2019 08:48:35 +0100
+From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
+To:     zhangfei <zhangfei.gao@linaro.org>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        <linux-omap@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>
-References: <20191017122549.4634-1-t-kristo@ti.com>
- <20191017122549.4634-10-t-kristo@ti.com>
- <CAOtvUMeBXjDBhSVgMOW=hshEx_AkNPg-Zk2c2jCDzY8vyXWW5g@mail.gmail.com>
- <076f0bc6-ad04-9543-db02-d7c7060db036@ti.com>
- <CAOtvUMc7pbtPAPUbEmz_MTHmB9LboQVdgG-t9tHCr=biEbFuUQ@mail.gmail.com>
- <20191108022759.GB1140@sol.localdomain>
-From:   Tero Kristo <t-kristo@ti.com>
-Message-ID: <d55c0182-5fb0-2ef9-f056-54b396fb0026@ti.com>
-Date:   Fri, 8 Nov 2019 09:40:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        jonathan.cameron@huawei.com, grant.likely@arm.com,
+        Jerome Glisse <jglisse@redhat.com>,
+        ilias.apalodimas@linaro.org, francois.ozog@linaro.org,
+        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
+        "haojian . zhuang" <haojian.zhuang@linaro.org>,
+        guodong.xu@linaro.org, linux-accelerators@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        iommu@lists.linux-foundation.org,
+        Kenneth Lee <liguozhu@hisilicon.com>,
+        Zaibo Xu <xuzaibo@huawei.com>
+Subject: Re: [PATCH v7 2/3] uacce: add uacce driver
+Message-ID: <20191108074835.GA3764149@lophozonia>
+References: <1572331216-9503-1-git-send-email-zhangfei.gao@linaro.org>
+ <1572331216-9503-3-git-send-email-zhangfei.gao@linaro.org>
+ <20191105114844.GA3648434@lophozonia>
+ <24cbcd55-56d0-83b9-6284-04c29da11306@linaro.org>
+ <20191106153246.GA3695715@lophozonia>
+ <0cad8084-8ba8-03bd-7d29-cc7ba22c29ab@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20191108022759.GB1140@sol.localdomain>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0cad8084-8ba8-03bd-7d29-cc7ba22c29ab@linaro.org>
+User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 08/11/2019 04:27, Eric Biggers wrote:
-> On Wed, Nov 06, 2019 at 09:33:20AM +0200, Gilad Ben-Yossef wrote:
->> On Wed, Nov 6, 2019 at 9:25 AM Tero Kristo <t-kristo@ti.com> wrote:
->>>
->>> On 06/11/2019 08:39, Gilad Ben-Yossef wrote:
->>>> Hi,
->>>>
->>>>
->>>> On Thu, Oct 17, 2019 at 3:26 PM Tero Kristo <t-kristo@ti.com> wrote:
->>>>>
->>>>> Currently crypto_wait_req waits indefinitely for an async crypto request
->>>>> to complete. This is bad as it can cause for example the crypto test
->>>>> manager to hang without any notification as to why it has happened.
->>>>> Instead of waiting indefinitely, add a 1 second timeout to the call,
->>>>> and provide a warning print if a timeout happens.
->>>>
->>>> While the incentive is clear and positive, this suggested solution
->>>> creates problems of its own.
->>>> In many (most?) cases where we are waiting here, we are waiting for a
->>>> DMA operation to finish from hardware.
->>>> Exiting while this pending DMA operation is not finished, even with a
->>>> proper error return value, is dangerous because
->>>> unless the calling code takes great care to not release the memory the
->>>> DMA is being done from/to, this can have disastrous effects.
->>>>
->>>> As Eric has already mentioned, one second might seem like a long time,
->>>> but we don't really know if it is enough.
->>>>
->>>> How about adding a second API (ig. crypto_wait_req_timeout) which
->>>> supports a calee specified timeout where
->>>> the calle knows how to correctly deal with timeout and port the
->>>> relevant call sites to use this?
->>>
->>> Yeah, that would work for me. I guess we could just swap the testmgr to
->>> use this timeout API, as it is quite clear it should timeout rather than
->>> wait indefinitely, and afaics, the data buffers it uses are limited
->>> size. It doesn't really matter for it whether the timeout is 1 second or
->>> 10 seconds, as long as it eventually times out.
->>
->>
->> As long as you avoid releasing the memory used on timeout, that should
->> work well, I think.
->>
-> 
-> The memory is always going to be freed eventually, though.  Although the crypto
-> tests currently reuse the input/output buffers and the request structure from
-> one test to the next, they're freed at the end of the tests.  Also, it's unsafe
-> for one request structure to be used for multiple requests concurrently anyway.
-> 
-> I think crypto_wait_req_timeout() would just be fundamentally unsafe.
-> 
-> Couldn't you just use CONFIG_DETECT_HUNG_TASK=y instead?  It should report if
-> any thread is blocked for too long.
+On Thu, Nov 07, 2019 at 09:23:50PM +0800, zhangfei wrote:
+> > What I had in mind is keep one uacce_mm per mm and per device, and we can
+> > pass that to iommu_sva_bind_device(). It requires some structure changes,
+> > see the attached patch.
+> Cool, thanks Jean
+> How about merge them together.
 
-The problem is not detecting a hung task, the problem is determining 
-what caused the hang. Personally I don't care if the system dies if a 
-crypto accelerator self test has failed, as long as I get reported about 
-the exact nature of the failure. The failures are expected to happen 
-only in development phase of a crypto driver.
+No problem, you can squash it into this patch
 
-With the timeout patch in place, I get reported what exact crypto test 
-case failed and I can focus my debug efforts on that one.
-
-Anyways, as said this is just a nice to have patch, and can be dropped 
-no issues there. I was just thinking some other people might find it 
-useful also.
-
--Tero
---
-Texas Instruments Finland Oy, Porkkalankatu 22, 00180 Helsinki. Y-tunnus/Business ID: 0615521-4. Kotipaikka/Domicile: Helsinki
+Thanks,
+Jean
