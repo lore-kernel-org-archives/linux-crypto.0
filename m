@@ -2,99 +2,126 @@ Return-Path: <SRS0=0i+u=ZA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0C42FA372C
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 09:23:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7D60FA372C
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 09:45:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A589D218AE
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 09:23:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 87DF3218AE
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 09:45:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="S2emD8s8"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="lbk0ljkn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730616AbfKHJXI (ORCPT
+        id S1731181AbfKHJpg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 8 Nov 2019 04:23:08 -0500
-Received: from fllv0016.ext.ti.com ([198.47.19.142]:52986 "EHLO
-        fllv0016.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727573AbfKHJXI (ORCPT
+        Fri, 8 Nov 2019 04:45:36 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:53609 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728513AbfKHJpg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 Nov 2019 04:23:08 -0500
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id xA89MrOZ028622;
-        Fri, 8 Nov 2019 03:22:53 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1573204973;
-        bh=zb4tt7HNgghJpj7aEIDr1k6z/Q2WE2sfSo6030XK974=;
-        h=Subject:To:CC:References:From:Date:In-Reply-To;
-        b=S2emD8s85c4YNwGFBERxXeJ+Dji/fOBWQDiySJ0RwDIY4dpaVqIWrxRdpV1k0G+6Y
-         k4rTTqmFd9ete1kHlAEDUlZeCI1zk57JHTlZ+QrmOUqgFhaPjo9etiLg8dYnP0sbKp
-         PqUdjYzjCg2zPfXMzzUMZ2S+E7YUmsbeZQqnD4Tk=
-Received: from DLEE108.ent.ti.com (dlee108.ent.ti.com [157.170.170.38])
-        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTP id xA89MrXS031001;
-        Fri, 8 Nov 2019 03:22:53 -0600
-Received: from DLEE115.ent.ti.com (157.170.170.26) by DLEE108.ent.ti.com
- (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3; Fri, 8 Nov
- 2019 03:22:53 -0600
-Received: from lelv0326.itg.ti.com (10.180.67.84) by DLEE115.ent.ti.com
- (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3 via
- Frontend Transport; Fri, 8 Nov 2019 03:22:52 -0600
-Received: from [127.0.0.1] (ileax41-snat.itg.ti.com [10.172.224.153])
-        by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id xA89MnJ5010398;
-        Fri, 8 Nov 2019 03:22:49 -0600
-Subject: Re: [PATCH 09/10] crypto: add timeout to crypto_wait_req
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-CC:     Gilad Ben-Yossef <gilad@benyossef.com>,
-        David Miller <davem@davemloft.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        <linux-omap@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>
-References: <20191017122549.4634-1-t-kristo@ti.com>
- <20191017122549.4634-10-t-kristo@ti.com>
- <CAOtvUMeBXjDBhSVgMOW=hshEx_AkNPg-Zk2c2jCDzY8vyXWW5g@mail.gmail.com>
- <076f0bc6-ad04-9543-db02-d7c7060db036@ti.com>
- <CAOtvUMc7pbtPAPUbEmz_MTHmB9LboQVdgG-t9tHCr=biEbFuUQ@mail.gmail.com>
- <20191108022759.GB1140@sol.localdomain>
- <d55c0182-5fb0-2ef9-f056-54b396fb0026@ti.com>
- <20191108091608.i5fxt2vu2nwrybgn@gondor.apana.org.au>
-From:   Tero Kristo <t-kristo@ti.com>
-Message-ID: <2ab94492-21e4-fbe0-41eb-e12b02511d7c@ti.com>
-Date:   Fri, 8 Nov 2019 11:22:48 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
-MIME-Version: 1.0
-In-Reply-To: <20191108091608.i5fxt2vu2nwrybgn@gondor.apana.org.au>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+        Fri, 8 Nov 2019 04:45:36 -0500
+Received: by mail-wm1-f66.google.com with SMTP id x4so5450457wmi.3
+        for <linux-crypto@vger.kernel.org>; Fri, 08 Nov 2019 01:45:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id;
+        bh=w0FiN6gyAyacF2gs8LToS4qHDjvvIl4Fdx7KgNHxcPA=;
+        b=lbk0ljknocwIdkmF9k7GAivkHRDTe/IAjZGyeQYpGPDyWtGzQmSXi4OPx48dAgQO0J
+         TMvYwp/agAMuRMGZj6lkbkJ+rTmtdHV52hEpEf1LJfXOcKs1uYdC7rSy+vs/M8ZR6SKx
+         NU+mmP3iv3Pl2/Y/LVuUzmpS/b3BpIIYVYuCK6Y9GnUbTs/slK8qwiPZzPfCj4GUDkhT
+         OGhdrWrwzuQfnXXtLYvvdNhAV+aANu6mo0CcXevdI5/q3duUfaB1RAoX2SEHj5YztOmt
+         rVtHFeQqKCG1RiVCj1gxnZmQy5THOMv3RalfhBY9RGDSGtgOm5d6M67bKxxnJLiIqyZ2
+         948g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=w0FiN6gyAyacF2gs8LToS4qHDjvvIl4Fdx7KgNHxcPA=;
+        b=cuJMD3CO1JoBP1r2IVunxiTc2nqjMj1bn28GC3mK5R5KiGHyp0Ya/JnWcMH/GuFMwo
+         jTdw28zt0xGgOUhTMnLdN9Xlov8LU2M6lJDgejagl3wT1mzaPlWRDE3XyiuLx7uDAR9X
+         PHtNuHC7ygAVJmhZW/Jifih4LHhfGavG3uIVeQQeFZZ9NFfeFb77TCphonJZAD9qDnh8
+         a91SR1o+PFyKCb2bbHEHT4+3kf1Rh8HUsrh6kIAzeeB9ohDdVSyz5lAD8jONpmPve8L+
+         mc39us3wPlCfcHzYWtV7lYuVu0jx2+OKAkWEkbDpfDoeM53CE5jezjwrsqK3vj/7DkTe
+         N3/w==
+X-Gm-Message-State: APjAAAX+cKxXjzBXUUhDPdWG+0l+0oplvhgeq7V3y/8GcLr04R3/bdJO
+        Mf33TaB6OFRbeLGgHSlZ6Y1sMw==
+X-Google-Smtp-Source: APXvYqxyMB4JCp9NWE1ioQbruVXzPQumvhGWe31zInW2/Ji/Iz9hHST1fhd3vJd3yu3ksEJkV7WIVg==
+X-Received: by 2002:a7b:c08f:: with SMTP id r15mr7125636wmh.45.1573206334295;
+        Fri, 08 Nov 2019 01:45:34 -0800 (PST)
+Received: from localhost.localdomain ([51.15.160.169])
+        by smtp.googlemail.com with ESMTPSA id c24sm10601737wrb.27.2019.11.08.01.45.33
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Fri, 08 Nov 2019 01:45:33 -0800 (PST)
+From:   Corentin Labbe <clabbe@baylibre.com>
+To:     davem@davemloft.net, herbert@gondor.apana.org.au,
+        keescook+coverity-bot@chromium.org, narmstrong@baylibre.com
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH] crypto: amlogic - fix two resources leak
+Date:   Fri,  8 Nov 2019 09:45:17 +0000
+Message-Id: <1573206317-9926-1-git-send-email-clabbe@baylibre.com>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 08/11/2019 11:16, Herbert Xu wrote:
-> On Fri, Nov 08, 2019 at 09:40:57AM +0200, Tero Kristo wrote:
->>
->> The problem is not detecting a hung task, the problem is determining what
->> caused the hang. Personally I don't care if the system dies if a crypto
->> accelerator self test has failed, as long as I get reported about the exact
->> nature of the failure. The failures are expected to happen only in
->> development phase of a crypto driver.
->>
->> With the timeout patch in place, I get reported what exact crypto test case
->> failed and I can focus my debug efforts on that one.
-> 
-> If that's all you need then how about just making the wait killable?
+This patch fixes two resources leak that occur on error path.
 
-Yeah, that would be an alternative.
+Reported-by: coverity-bot <keescook+coverity-bot@chromium.org>
+Addresses-Coverity-ID: 1487403 ("RESOURCE_LEAK")
+Addresses-Coverity-ID: 1487401 ("Resource leaks")
+Fixes: 48fe583fe541 ("crypto: amlogic - Add crypto accelerator for amlogic GXL")
+Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+---
+ drivers/crypto/amlogic/amlogic-gxl-cipher.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
--Tero
---
-Texas Instruments Finland Oy, Porkkalankatu 22, 00180 Helsinki. Y-tunnus/Business ID: 0615521-4. Kotipaikka/Domicile: Helsinki
+diff --git a/drivers/crypto/amlogic/amlogic-gxl-cipher.c b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
+index e9283ffdbd23..58b717aab6e8 100644
+--- a/drivers/crypto/amlogic/amlogic-gxl-cipher.c
++++ b/drivers/crypto/amlogic/amlogic-gxl-cipher.c
+@@ -131,7 +131,8 @@ static int meson_cipher(struct skcipher_request *areq)
+ 	if (areq->iv && ivsize > 0) {
+ 		if (ivsize > areq->cryptlen) {
+ 			dev_err(mc->dev, "invalid ivsize=%d vs len=%d\n", ivsize, areq->cryptlen);
+-			return -EINVAL;
++			err = -EINVAL;
++			goto theend;
+ 		}
+ 		memcpy(bkeyiv + 32, areq->iv, ivsize);
+ 		keyivlen = 48;
+@@ -151,9 +152,10 @@ static int meson_cipher(struct skcipher_request *areq)
+ 
+ 	phykeyiv = dma_map_single(mc->dev, bkeyiv, keyivlen,
+ 				  DMA_TO_DEVICE);
+-	if (dma_mapping_error(mc->dev, phykeyiv)) {
++	err = dma_mapping_error(mc->dev, phykeyiv);
++	if (err) {
+ 		dev_err(mc->dev, "Cannot DMA MAP KEY IV\n");
+-		return -EFAULT;
++		goto theend;
+ 	}
+ 
+ 	tloffset = 0;
+@@ -245,7 +247,6 @@ static int meson_cipher(struct skcipher_request *areq)
+ 	if (areq->iv && ivsize > 0) {
+ 		if (rctx->op_dir == MESON_DECRYPT) {
+ 			memcpy(areq->iv, backup_iv, ivsize);
+-			kzfree(backup_iv);
+ 		} else {
+ 			scatterwalk_map_and_copy(areq->iv, areq->dst,
+ 						 areq->cryptlen - ivsize,
+@@ -254,6 +255,7 @@ static int meson_cipher(struct skcipher_request *areq)
+ 	}
+ theend:
+ 	kzfree(bkeyiv);
++	kzfree(backup_iv);
+ 
+ 	return err;
+ }
+-- 
+2.23.0
+
