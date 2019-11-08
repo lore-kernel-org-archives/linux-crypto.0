@@ -1,86 +1,77 @@
-Return-Path: <SRS0=gVpy=Y7=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=0i+u=ZA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBE9EC5DF60
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 Nov 2019 20:53:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4909BC43331
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 02:13:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7FFB92166E
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 Nov 2019 20:53:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=lixom-net.20150623.gappssmtp.com header.i=@lixom-net.20150623.gappssmtp.com header.b="er3oh261"
+	by mail.kernel.org (Postfix) with ESMTP id 15B9A2087E
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 02:13:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1573179225;
+	bh=1KFbirskEXIU/c7xK5k4i25uPFEg3vr7Nv4LYuZca9A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=OliiqymwOzTKVNujORK5Xfg2Pv3XeXlVpGyL/j2hPP3rOuXMXHdVRJXWUZwNf5G/N
+	 b8V70pCjr1jeCIM8vB44N9iOcWGaMe3n0x5SnY0fJxNweeVBBzOGe9iPIZqwHCuvqN
+	 TZ3jDLNtyeIkM6k69/8JN18BgizCFnE9cv3+feOs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725906AbfKGUxN (ORCPT
+        id S1726504AbfKHCNn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 7 Nov 2019 15:53:13 -0500
-Received: from mail-io1-f68.google.com ([209.85.166.68]:40519 "EHLO
-        mail-io1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725893AbfKGUxN (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 7 Nov 2019 15:53:13 -0500
-Received: by mail-io1-f68.google.com with SMTP id p6so3847160iod.7
-        for <linux-crypto@vger.kernel.org>; Thu, 07 Nov 2019 12:53:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=lixom-net.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=rA5BF9v4ZThyajmII5ge2gdIpEkUZ9BxSgBgVhHF100=;
-        b=er3oh261iMbwiX8Afq6ri7awa7QMbDXPG9fBlGzXsBWHKWHgtz+Zom1Rr7CWfE//Ff
-         66rENayMZEEp6+YB8RexMR7pBaM5HXuYFoe54Dt36HIiov2r9j6ArjxMk6pOO5Or6WOk
-         ca7bzw+x++ysNpURufJxz3pZXV4/V/oPGhbLF5JoTss32pN4odeytidqmCj4jVB2CVMw
-         VXK9cc7AXBDiuXWI18/emxailuBRhh4aTtHClGY93LaEKsZf+lCRCkY7kv7Pewo27l9K
-         qyJihKp2OMDq4vULMcVUlFTPhaElR87LHj86iGEHBRquFTdr63S76WPCe4D596hQotjD
-         +xbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=rA5BF9v4ZThyajmII5ge2gdIpEkUZ9BxSgBgVhHF100=;
-        b=YhJuUHX1fgCnnSNNebPfHYYUi/hjdM0VsSKr1aFPNxj9OY6n5+hPBK7nbRe8uJ5rfT
-         XL/8Ep2Zr4PnWQ8UCUfGnN+SxGcb+NEYosuI5qLJOIeboU3WEfrLl0RV+xr63m6JqOfr
-         9LffwAINYYQJ3iaqboWvAIjw9OWtWQrCryqA9YooxGJ/LEQa6bYQYkcG8kPF+iM1Zm7A
-         z6Xd8G79mt8tVDWa2q0xcgfkkzuVLJZ86sUF+neBXrwn6kSTfPzQMM2eWwIeXB9ZFqbV
-         ocj6HytCNT3UjXPjflQOFO0zoTquqX+G2AruHIfQauNoPTKPLlUmrUwh6Gw6OqqZPanL
-         pnkg==
-X-Gm-Message-State: APjAAAW2nRruTnCUy1YTrRSpef3//3veljTKYUjxWybHPjEyq+ZfhmlU
-        OniTg8RP9VDfciGgqOp56aS3AC19q8X8sd15Li1GnHZnoN+J9qsp
-X-Google-Smtp-Source: APXvYqzJjKLaVnfZEqq+xqv7dZPLzZh6wegHzZyoQ0Tnotoa/bw4/+IV6FdVYkfIDnawx5ieS0+p1hvzR8BJ5xfwXXI=
-X-Received: by 2002:a6b:6509:: with SMTP id z9mr5494612iob.123.1573159992665;
- Thu, 07 Nov 2019 12:53:12 -0800 (PST)
-MIME-Version: 1.0
-References: <1572610909-91857-1-git-send-email-wangzhou1@hisilicon.com>
-In-Reply-To: <1572610909-91857-1-git-send-email-wangzhou1@hisilicon.com>
-From:   Olof Johansson <olof@lixom.net>
-Date:   Thu, 7 Nov 2019 12:53:01 -0800
-Message-ID: <CAOesGMiBK_Nc-hNDaomNWF7Ni0WZreLM1bgi5YsGihPVjk9RYw@mail.gmail.com>
-Subject: Re: [PATCH] crypto: hisilicon - replace #ifdef with IS_ENABLED for CONFIG_NUMA
-To:     Zhou Wang <wangzhou1@hisilicon.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
+        Thu, 7 Nov 2019 21:13:43 -0500
+Received: from mail.kernel.org ([198.145.29.99]:39412 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725940AbfKHCNn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 7 Nov 2019 21:13:43 -0500
+Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id F14CC2084C;
+        Fri,  8 Nov 2019 02:13:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1573179223;
+        bh=1KFbirskEXIU/c7xK5k4i25uPFEg3vr7Nv4LYuZca9A=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Y4DRw94wfgV1sEZaPNo3GxfntawACQM6fSfmIlK6cbWcChXhS6TnhaV4ttEwSfO24
+         il+c2/CNhYwIm8FC0NBfl0rcINoa0FPn/c/DJw8z1NNz13tfrJoaEQ8VVAZBAAWnpk
+         dLarO1SP1V0JKAjpBaAO8JcQW1PAINLffNmnMUsA=
+Date:   Thu, 7 Nov 2019 18:13:29 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     David Sterba <dsterba@suse.com>
+Cc:     linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 0/7] BLAKE2b cleanups
+Message-ID: <20191108021329.GA1140@sol.localdomain>
+Mail-Followup-To: David Sterba <dsterba@suse.com>,
         linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+References: <cover.1573047517.git.dsterba@suse.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1573047517.git.dsterba@suse.com>
+User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Nov 1, 2019 at 5:25 AM Zhou Wang <wangzhou1@hisilicon.com> wrote:
->
-> Replace #ifdef CONFIG_NUMA with IS_ENABLED(CONFIG_NUMA) to fix kbuild error.
->
-> Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
-> Reported-by: kbuild test robot <lkp@intel.com>
+On Wed, Nov 06, 2019 at 02:48:24PM +0100, David Sterba wrote:
+> Hi,
+> 
+> the patchset implements cleanups suggested by Eric in
+> https://lore.kernel.org/linux-crypto/20191025051550.GA103313@sol.localdomain/
+> 
+> The diff is the same, split into pieces with some additional comments
+> where it would help understand the simplifications. This is based on v7
+> of the BLAKE2b patchset.
+> 
 
-Acked-by: Olof Johansson <olof@lixom.net>
+Actually the diff isn't quite the same.  Your version looks fine though, except
+that I think digest_setkey() should be renamed to blake2b_setkey().  Otherwise
+it's inconsistent, since all the other digest_*() functions were renamed.
 
-Confirmed that this also fixes riscv allmodconfig build breakage on
-linux-next. Herbert, can you pick it up so we keep -next building?
 Thanks!
 
-
-
--Olof
+- Eric
