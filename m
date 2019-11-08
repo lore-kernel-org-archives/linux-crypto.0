@@ -2,43 +2,43 @@ Return-Path: <SRS0=0i+u=ZA=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2A94C5DF60
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 12:24:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7558FFA372C
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 12:24:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AEF2022499
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 12:24:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 34C0B21924
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 12:24:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1573215852;
-	bh=cV74xX0ftqZsH6EzildD6b19XNhPMTioWb6JBxE3NRA=;
+	s=default; t=1573215856;
+	bh=RO52y7aqFb3gYerkHhOcUh6X7y4cpdRTWofFltUKxOo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=P/KSytj4zq+TslK4MVo8tbiPNc2jqmMLxHfpsl2VNds9atINXzxYhkzS5f6N4MXyA
-	 X42n0aZFZnyBEY4bn4k2btm9igIGdS3Qxr3TRrUW5bu+ax1OWRNO9TYirWCH6OCf1P
-	 xb14/L0CBcoC+jrP89ULs1K4MpJNJnPquFXGq5co=
+	b=2wN5odLxBFmeW4AUcC8bjNt8Z/7GGs7s8k3N9+dkdJH+9XquKi2aFWtfP9493JsY2
+	 cAMD3b98Ieijn+MjSl8HSPdTqF6mCwnKZIFkoX8nW+D80nUfH3yp/TydfmrYl+W6YM
+	 xl2iBfkNLzyn4uqkPs6hOuD/1qH3qoyWUTb/lzXE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732516AbfKHMYM (ORCPT
+        id S1732532AbfKHMYP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 8 Nov 2019 07:24:12 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38532 "EHLO mail.kernel.org"
+        Fri, 8 Nov 2019 07:24:15 -0500
+Received: from mail.kernel.org ([198.145.29.99]:38570 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732457AbfKHMYM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 Nov 2019 07:24:12 -0500
+        id S1732457AbfKHMYP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 8 Nov 2019 07:24:15 -0500
 Received: from localhost.localdomain (laubervilliers-657-1-83-120.w92-154.abo.wanadoo.fr [92.154.90.120])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5A3F222490;
-        Fri,  8 Nov 2019 12:24:08 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 355EF2248F;
+        Fri,  8 Nov 2019 12:24:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573215850;
-        bh=cV74xX0ftqZsH6EzildD6b19XNhPMTioWb6JBxE3NRA=;
+        s=default; t=1573215853;
+        bh=RO52y7aqFb3gYerkHhOcUh6X7y4cpdRTWofFltUKxOo=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=wXdOU02jz4ejQ+1AQJm2ctXzkrsW7j5j3l4SgAXTwZeZSo3rz1hUagnrSTBjqrtnm
-         2VoaGYSh1VMvUb6tnxi6dnEzTzcwRiaNcXgiQbxRdV2hyEiOe+mBFWGIcOC7cwjIMO
-         2bX5aCo8OM8jrs8dMFkYvcaEKtM/gfHmUAR1Duqw=
+        b=JX/4xzyYVfdQg/DYm6bPbvEf0/4Mz/SJGPixBTV7paf6BXheOLMkwB7FR1188dVwX
+         voR+w8DMdszoul4bO5QWTK4iwe1rp2oCa6AIezWIxMFI1Nd0cB+9/h06Ue484BtBOU
+         Ze/77ht6rwitNIutlim7BX89n34319zcx2jcNMwc=
 From:   Ard Biesheuvel <ardb@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     Ard Biesheuvel <ardb@kernel.org>,
@@ -51,9 +51,9 @@ Cc:     Ard Biesheuvel <ardb@kernel.org>,
         Martin Willi <martin@strongswan.org>,
         Rene van Dorst <opensource@vdorst.com>,
         David Sterba <dsterba@suse.com>
-Subject: [PATCH v5 24/34] crypto: blake2s - implement generic shash driver
-Date:   Fri,  8 Nov 2019 13:22:30 +0100
-Message-Id: <20191108122240.28479-25-ardb@kernel.org>
+Subject: [PATCH v5 25/34] crypto: BLAKE2s - x86_64 SIMD implementation
+Date:   Fri,  8 Nov 2019 13:22:31 +0100
+Message-Id: <20191108122240.28479-26-ardb@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191108122240.28479-1-ardb@kernel.org>
 References: <20191108122240.28479-1-ardb@kernel.org>
@@ -64,63 +64,314 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Wire up our newly added Blake2s implementation via the shash API.
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
 
+These implementations from Samuel Neves support AVX and AVX-512VL.
+Originally this used AVX-512F, but Skylake thermal throttling made
+AVX-512VL more attractive and possible to do with negligable difference.
+
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Signed-off-by: Samuel Neves <sneves@dei.uc.pt>
+Co-developed-by: Samuel Neves <sneves@dei.uc.pt>
+[ardb: move to arch/x86/crypto, wire into lib/crypto framework]
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- crypto/Kconfig                    |  18 +++
- crypto/Makefile                   |   1 +
- crypto/blake2s_generic.c          | 171 ++++++++++++++++++++
- include/crypto/internal/blake2s.h |   5 +
- 4 files changed, 195 insertions(+)
+ arch/x86/crypto/Makefile       |   2 +
+ arch/x86/crypto/blake2s-core.S | 258 ++++++++++++++++++++
+ arch/x86/crypto/blake2s-glue.c | 233 ++++++++++++++++++
+ crypto/Kconfig                 |   6 +
+ 4 files changed, 499 insertions(+)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 2668eed03c5f..3c23187eeeb1 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -656,6 +656,24 @@ config CRYPTO_BLAKE2B
+diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+index 759b1a927826..922c8ecfa00f 100644
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -48,6 +48,7 @@ ifeq ($(avx_supported),yes)
+ 	obj-$(CONFIG_CRYPTO_CAST6_AVX_X86_64) += cast6-avx-x86_64.o
+ 	obj-$(CONFIG_CRYPTO_TWOFISH_AVX_X86_64) += twofish-avx-x86_64.o
+ 	obj-$(CONFIG_CRYPTO_SERPENT_AVX_X86_64) += serpent-avx-x86_64.o
++	obj-$(CONFIG_CRYPTO_BLAKE2S_X86) += blake2s-x86_64.o
+ endif
  
- 	  See https://blake2.net for further information.
+ # These modules require assembler to support AVX2.
+@@ -70,6 +71,7 @@ serpent-sse2-x86_64-y := serpent-sse2-x86_64-asm_64.o serpent_sse2_glue.o
+ aegis128-aesni-y := aegis128-aesni-asm.o aegis128-aesni-glue.o
  
-+config CRYPTO_BLAKE2S
-+	tristate "BLAKE2s digest algorithm"
-+	select CRYPTO_LIB_BLAKE2S_GENERIC
-+	select CRYPTO_HASH
-+	help
-+	  Implementation of cryptographic hash function BLAKE2s
-+	  optimized for 8-32bit platforms and can produce digests of any size
-+	  between 1 to 32.  The keyed hash is also implemented.
-+
-+	  This module provides the following algorithms:
-+
-+	  - blake2s-128
-+	  - blake2s-160
-+	  - blake2s-224
-+	  - blake2s-256
-+
-+	  See https://blake2.net for further information.
-+
- config CRYPTO_CRCT10DIF
- 	tristate "CRCT10DIF algorithm"
- 	select CRYPTO_HASH
-diff --git a/crypto/Makefile b/crypto/Makefile
-index efe63940b4e9..e30d6271e0f3 100644
---- a/crypto/Makefile
-+++ b/crypto/Makefile
-@@ -74,6 +74,7 @@ obj-$(CONFIG_CRYPTO_WP512) += wp512.o
- CFLAGS_wp512.o := $(call cc-option,-fno-schedule-insns)  # https://gcc.gnu.org/bugzilla/show_bug.cgi?id=79149
- obj-$(CONFIG_CRYPTO_TGR192) += tgr192.o
- obj-$(CONFIG_CRYPTO_BLAKE2B) += blake2b_generic.o
-+obj-$(CONFIG_CRYPTO_BLAKE2S) += blake2s_generic.o
- obj-$(CONFIG_CRYPTO_GF128MUL) += gf128mul.o
- obj-$(CONFIG_CRYPTO_ECB) += ecb.o
- obj-$(CONFIG_CRYPTO_CBC) += cbc.o
-diff --git a/crypto/blake2s_generic.c b/crypto/blake2s_generic.c
+ nhpoly1305-sse2-y := nh-sse2-x86_64.o nhpoly1305-sse2-glue.o
++blake2s-x86_64-y := blake2s-core.o blake2s-glue.o
+ 
+ ifeq ($(avx_supported),yes)
+ 	camellia-aesni-avx-x86_64-y := camellia-aesni-avx-asm_64.o \
+diff --git a/arch/x86/crypto/blake2s-core.S b/arch/x86/crypto/blake2s-core.S
 new file mode 100644
-index 000000000000..ed0c74640470
+index 000000000000..8591938eee26
 --- /dev/null
-+++ b/crypto/blake2s_generic.c
-@@ -0,0 +1,171 @@
++++ b/arch/x86/crypto/blake2s-core.S
+@@ -0,0 +1,258 @@
++/* SPDX-License-Identifier: GPL-2.0 OR MIT */
++/*
++ * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
++ * Copyright (C) 2017-2019 Samuel Neves <sneves@dei.uc.pt>. All Rights Reserved.
++ */
++
++#include <linux/linkage.h>
++
++.section .rodata.cst32.BLAKE2S_IV, "aM", @progbits, 32
++.align 32
++IV:	.octa 0xA54FF53A3C6EF372BB67AE856A09E667
++	.octa 0x5BE0CD191F83D9AB9B05688C510E527F
++.section .rodata.cst16.ROT16, "aM", @progbits, 16
++.align 16
++ROT16:	.octa 0x0D0C0F0E09080B0A0504070601000302
++.section .rodata.cst16.ROR328, "aM", @progbits, 16
++.align 16
++ROR328:	.octa 0x0C0F0E0D080B0A090407060500030201
++.section .rodata.cst64.BLAKE2S_SIGMA, "aM", @progbits, 160
++.align 64
++SIGMA:
++.byte  0,  2,  4,  6,  1,  3,  5,  7, 14,  8, 10, 12, 15,  9, 11, 13
++.byte 14,  4,  9, 13, 10,  8, 15,  6,  5,  1,  0, 11,  3, 12,  2,  7
++.byte 11, 12,  5, 15,  8,  0,  2, 13,  9, 10,  3,  7,  4, 14,  6,  1
++.byte  7,  3, 13, 11,  9,  1, 12, 14, 15,  2,  5,  4,  8,  6, 10,  0
++.byte  9,  5,  2, 10,  0,  7,  4, 15,  3, 14, 11,  6, 13,  1, 12,  8
++.byte  2,  6,  0,  8, 12, 10, 11,  3,  1,  4,  7, 15,  9, 13,  5, 14
++.byte 12,  1, 14,  4,  5, 15, 13, 10,  8,  0,  6,  9, 11,  7,  3,  2
++.byte 13,  7, 12,  3, 11, 14,  1,  9,  2,  5, 15,  8, 10,  0,  4,  6
++.byte  6, 14, 11,  0, 15,  9,  3,  8, 10, 12, 13,  1,  5,  2,  7,  4
++.byte 10,  8,  7,  1,  2,  4,  6,  5, 13, 15,  9,  3,  0, 11, 14, 12
++#ifdef CONFIG_AS_AVX512
++.section .rodata.cst64.BLAKE2S_SIGMA2, "aM", @progbits, 640
++.align 64
++SIGMA2:
++.long  0,  2,  4,  6,  1,  3,  5,  7, 14,  8, 10, 12, 15,  9, 11, 13
++.long  8,  2, 13, 15, 10,  9, 12,  3,  6,  4,  0, 14,  5, 11,  1,  7
++.long 11, 13,  8,  6,  5, 10, 14,  3,  2,  4, 12, 15,  1,  0,  7,  9
++.long 11, 10,  7,  0,  8, 15,  1, 13,  3,  6,  2, 12,  4, 14,  9,  5
++.long  4, 10,  9, 14, 15,  0, 11,  8,  1,  7,  3, 13,  2,  5,  6, 12
++.long  2, 11,  4, 15, 14,  3, 10,  8, 13,  6,  5,  7,  0, 12,  1,  9
++.long  4,  8, 15,  9, 14, 11, 13,  5,  3,  2,  1, 12,  6, 10,  7,  0
++.long  6, 13,  0, 14, 12,  2,  1, 11, 15,  4,  5,  8,  7,  9,  3, 10
++.long 15,  5,  4, 13, 10,  7,  3, 11, 12,  2,  0,  6,  9,  8,  1, 14
++.long  8,  7, 14, 11, 13, 15,  0, 12, 10,  4,  5,  6,  3,  2,  1,  9
++#endif /* CONFIG_AS_AVX512 */
++
++.text
++#ifdef CONFIG_AS_SSSE3
++ENTRY(blake2s_compress_ssse3)
++	testq		%rdx,%rdx
++	je		.Lendofloop
++	movdqu		(%rdi),%xmm0
++	movdqu		0x10(%rdi),%xmm1
++	movdqa		ROT16(%rip),%xmm12
++	movdqa		ROR328(%rip),%xmm13
++	movdqu		0x20(%rdi),%xmm14
++	movq		%rcx,%xmm15
++	leaq		SIGMA+0xa0(%rip),%r8
++	jmp		.Lbeginofloop
++	.align		32
++.Lbeginofloop:
++	movdqa		%xmm0,%xmm10
++	movdqa		%xmm1,%xmm11
++	paddq		%xmm15,%xmm14
++	movdqa		IV(%rip),%xmm2
++	movdqa		%xmm14,%xmm3
++	pxor		IV+0x10(%rip),%xmm3
++	leaq		SIGMA(%rip),%rcx
++.Lroundloop:
++	movzbl		(%rcx),%eax
++	movd		(%rsi,%rax,4),%xmm4
++	movzbl		0x1(%rcx),%eax
++	movd		(%rsi,%rax,4),%xmm5
++	movzbl		0x2(%rcx),%eax
++	movd		(%rsi,%rax,4),%xmm6
++	movzbl		0x3(%rcx),%eax
++	movd		(%rsi,%rax,4),%xmm7
++	punpckldq	%xmm5,%xmm4
++	punpckldq	%xmm7,%xmm6
++	punpcklqdq	%xmm6,%xmm4
++	paddd		%xmm4,%xmm0
++	paddd		%xmm1,%xmm0
++	pxor		%xmm0,%xmm3
++	pshufb		%xmm12,%xmm3
++	paddd		%xmm3,%xmm2
++	pxor		%xmm2,%xmm1
++	movdqa		%xmm1,%xmm8
++	psrld		$0xc,%xmm1
++	pslld		$0x14,%xmm8
++	por		%xmm8,%xmm1
++	movzbl		0x4(%rcx),%eax
++	movd		(%rsi,%rax,4),%xmm5
++	movzbl		0x5(%rcx),%eax
++	movd		(%rsi,%rax,4),%xmm6
++	movzbl		0x6(%rcx),%eax
++	movd		(%rsi,%rax,4),%xmm7
++	movzbl		0x7(%rcx),%eax
++	movd		(%rsi,%rax,4),%xmm4
++	punpckldq	%xmm6,%xmm5
++	punpckldq	%xmm4,%xmm7
++	punpcklqdq	%xmm7,%xmm5
++	paddd		%xmm5,%xmm0
++	paddd		%xmm1,%xmm0
++	pxor		%xmm0,%xmm3
++	pshufb		%xmm13,%xmm3
++	paddd		%xmm3,%xmm2
++	pxor		%xmm2,%xmm1
++	movdqa		%xmm1,%xmm8
++	psrld		$0x7,%xmm1
++	pslld		$0x19,%xmm8
++	por		%xmm8,%xmm1
++	pshufd		$0x93,%xmm0,%xmm0
++	pshufd		$0x4e,%xmm3,%xmm3
++	pshufd		$0x39,%xmm2,%xmm2
++	movzbl		0x8(%rcx),%eax
++	movd		(%rsi,%rax,4),%xmm6
++	movzbl		0x9(%rcx),%eax
++	movd		(%rsi,%rax,4),%xmm7
++	movzbl		0xa(%rcx),%eax
++	movd		(%rsi,%rax,4),%xmm4
++	movzbl		0xb(%rcx),%eax
++	movd		(%rsi,%rax,4),%xmm5
++	punpckldq	%xmm7,%xmm6
++	punpckldq	%xmm5,%xmm4
++	punpcklqdq	%xmm4,%xmm6
++	paddd		%xmm6,%xmm0
++	paddd		%xmm1,%xmm0
++	pxor		%xmm0,%xmm3
++	pshufb		%xmm12,%xmm3
++	paddd		%xmm3,%xmm2
++	pxor		%xmm2,%xmm1
++	movdqa		%xmm1,%xmm8
++	psrld		$0xc,%xmm1
++	pslld		$0x14,%xmm8
++	por		%xmm8,%xmm1
++	movzbl		0xc(%rcx),%eax
++	movd		(%rsi,%rax,4),%xmm7
++	movzbl		0xd(%rcx),%eax
++	movd		(%rsi,%rax,4),%xmm4
++	movzbl		0xe(%rcx),%eax
++	movd		(%rsi,%rax,4),%xmm5
++	movzbl		0xf(%rcx),%eax
++	movd		(%rsi,%rax,4),%xmm6
++	punpckldq	%xmm4,%xmm7
++	punpckldq	%xmm6,%xmm5
++	punpcklqdq	%xmm5,%xmm7
++	paddd		%xmm7,%xmm0
++	paddd		%xmm1,%xmm0
++	pxor		%xmm0,%xmm3
++	pshufb		%xmm13,%xmm3
++	paddd		%xmm3,%xmm2
++	pxor		%xmm2,%xmm1
++	movdqa		%xmm1,%xmm8
++	psrld		$0x7,%xmm1
++	pslld		$0x19,%xmm8
++	por		%xmm8,%xmm1
++	pshufd		$0x39,%xmm0,%xmm0
++	pshufd		$0x4e,%xmm3,%xmm3
++	pshufd		$0x93,%xmm2,%xmm2
++	addq		$0x10,%rcx
++	cmpq		%r8,%rcx
++	jnz		.Lroundloop
++	pxor		%xmm2,%xmm0
++	pxor		%xmm3,%xmm1
++	pxor		%xmm10,%xmm0
++	pxor		%xmm11,%xmm1
++	addq		$0x40,%rsi
++	decq		%rdx
++	jnz		.Lbeginofloop
++	movdqu		%xmm0,(%rdi)
++	movdqu		%xmm1,0x10(%rdi)
++	movdqu		%xmm14,0x20(%rdi)
++.Lendofloop:
++	ret
++ENDPROC(blake2s_compress_ssse3)
++#endif /* CONFIG_AS_SSSE3 */
++
++#ifdef CONFIG_AS_AVX512
++ENTRY(blake2s_compress_avx512)
++	vmovdqu		(%rdi),%xmm0
++	vmovdqu		0x10(%rdi),%xmm1
++	vmovdqu		0x20(%rdi),%xmm4
++	vmovq		%rcx,%xmm5
++	vmovdqa		IV(%rip),%xmm14
++	vmovdqa		IV+16(%rip),%xmm15
++	jmp		.Lblake2s_compress_avx512_mainloop
++.align 32
++.Lblake2s_compress_avx512_mainloop:
++	vmovdqa		%xmm0,%xmm10
++	vmovdqa		%xmm1,%xmm11
++	vpaddq		%xmm5,%xmm4,%xmm4
++	vmovdqa		%xmm14,%xmm2
++	vpxor		%xmm15,%xmm4,%xmm3
++	vmovdqu		(%rsi),%ymm6
++	vmovdqu		0x20(%rsi),%ymm7
++	addq		$0x40,%rsi
++	leaq		SIGMA2(%rip),%rax
++	movb		$0xa,%cl
++.Lblake2s_compress_avx512_roundloop:
++	addq		$0x40,%rax
++	vmovdqa		-0x40(%rax),%ymm8
++	vmovdqa		-0x20(%rax),%ymm9
++	vpermi2d	%ymm7,%ymm6,%ymm8
++	vpermi2d	%ymm7,%ymm6,%ymm9
++	vmovdqa		%ymm8,%ymm6
++	vmovdqa		%ymm9,%ymm7
++	vpaddd		%xmm8,%xmm0,%xmm0
++	vpaddd		%xmm1,%xmm0,%xmm0
++	vpxor		%xmm0,%xmm3,%xmm3
++	vprord		$0x10,%xmm3,%xmm3
++	vpaddd		%xmm3,%xmm2,%xmm2
++	vpxor		%xmm2,%xmm1,%xmm1
++	vprord		$0xc,%xmm1,%xmm1
++	vextracti128	$0x1,%ymm8,%xmm8
++	vpaddd		%xmm8,%xmm0,%xmm0
++	vpaddd		%xmm1,%xmm0,%xmm0
++	vpxor		%xmm0,%xmm3,%xmm3
++	vprord		$0x8,%xmm3,%xmm3
++	vpaddd		%xmm3,%xmm2,%xmm2
++	vpxor		%xmm2,%xmm1,%xmm1
++	vprord		$0x7,%xmm1,%xmm1
++	vpshufd		$0x93,%xmm0,%xmm0
++	vpshufd		$0x4e,%xmm3,%xmm3
++	vpshufd		$0x39,%xmm2,%xmm2
++	vpaddd		%xmm9,%xmm0,%xmm0
++	vpaddd		%xmm1,%xmm0,%xmm0
++	vpxor		%xmm0,%xmm3,%xmm3
++	vprord		$0x10,%xmm3,%xmm3
++	vpaddd		%xmm3,%xmm2,%xmm2
++	vpxor		%xmm2,%xmm1,%xmm1
++	vprord		$0xc,%xmm1,%xmm1
++	vextracti128	$0x1,%ymm9,%xmm9
++	vpaddd		%xmm9,%xmm0,%xmm0
++	vpaddd		%xmm1,%xmm0,%xmm0
++	vpxor		%xmm0,%xmm3,%xmm3
++	vprord		$0x8,%xmm3,%xmm3
++	vpaddd		%xmm3,%xmm2,%xmm2
++	vpxor		%xmm2,%xmm1,%xmm1
++	vprord		$0x7,%xmm1,%xmm1
++	vpshufd		$0x39,%xmm0,%xmm0
++	vpshufd		$0x4e,%xmm3,%xmm3
++	vpshufd		$0x93,%xmm2,%xmm2
++	decb		%cl
++	jne		.Lblake2s_compress_avx512_roundloop
++	vpxor		%xmm10,%xmm0,%xmm0
++	vpxor		%xmm11,%xmm1,%xmm1
++	vpxor		%xmm2,%xmm0,%xmm0
++	vpxor		%xmm3,%xmm1,%xmm1
++	decq		%rdx
++	jne		.Lblake2s_compress_avx512_mainloop
++	vmovdqu		%xmm0,(%rdi)
++	vmovdqu		%xmm1,0x10(%rdi)
++	vmovdqu		%xmm4,0x20(%rdi)
++	vzeroupper
++	retq
++ENDPROC(blake2s_compress_avx512)
++#endif /* CONFIG_AS_AVX512 */
+diff --git a/arch/x86/crypto/blake2s-glue.c b/arch/x86/crypto/blake2s-glue.c
+new file mode 100644
+index 000000000000..4a37ba7cdbe5
+--- /dev/null
++++ b/arch/x86/crypto/blake2s-glue.c
+@@ -0,0 +1,233 @@
 +// SPDX-License-Identifier: GPL-2.0 OR MIT
 +/*
 + * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
@@ -134,6 +385,53 @@ index 000000000000..ed0c74640470
 +#include <linux/jump_label.h>
 +#include <linux/kernel.h>
 +#include <linux/module.h>
++
++#include <asm/cpufeature.h>
++#include <asm/fpu/api.h>
++#include <asm/processor.h>
++#include <asm/simd.h>
++
++asmlinkage void blake2s_compress_ssse3(struct blake2s_state *state,
++				       const u8 *block, const size_t nblocks,
++				       const u32 inc);
++asmlinkage void blake2s_compress_avx512(struct blake2s_state *state,
++					const u8 *block, const size_t nblocks,
++					const u32 inc);
++
++static __ro_after_init DEFINE_STATIC_KEY_FALSE(blake2s_use_ssse3);
++static __ro_after_init DEFINE_STATIC_KEY_FALSE(blake2s_use_avx512);
++
++void blake2s_compress_arch(struct blake2s_state *state,
++			   const u8 *block, size_t nblocks,
++			   const u32 inc)
++{
++	/* SIMD disables preemption, so relax after processing each page. */
++	BUILD_BUG_ON(PAGE_SIZE / BLAKE2S_BLOCK_SIZE < 8);
++
++	if (!static_branch_likely(&blake2s_use_ssse3) || !crypto_simd_usable()) {
++		blake2s_compress_generic(state, block, nblocks, inc);
++		return;
++	}
++
++	for (;;) {
++		const size_t blocks = min_t(size_t, nblocks,
++					    PAGE_SIZE / BLAKE2S_BLOCK_SIZE);
++
++		kernel_fpu_begin();
++		if (IS_ENABLED(CONFIG_AS_AVX512) &&
++		    static_branch_likely(&blake2s_use_avx512))
++			blake2s_compress_avx512(state, block, blocks, inc);
++		else
++			blake2s_compress_ssse3(state, block, blocks, inc);
++		kernel_fpu_end();
++
++		nblocks -= blocks;
++		if (!nblocks)
++			break;
++		block += blocks * BLAKE2S_BLOCK_SIZE;
++	}
++}
++EXPORT_SYMBOL(blake2s_compress_arch);
 +
 +static int crypto_blake2s_setkey(struct crypto_shash *tfm, const u8 *key,
 +				 unsigned int keylen)
@@ -175,7 +473,7 @@ index 000000000000..ed0c74640470
 +		return 0;
 +	if (inlen > fill) {
 +		memcpy(state->buf + state->buflen, in, fill);
-+		blake2s_compress_generic(state, state->buf, 1, BLAKE2S_BLOCK_SIZE);
++		blake2s_compress_arch(state, state->buf, 1, BLAKE2S_BLOCK_SIZE);
 +		state->buflen = 0;
 +		in += fill;
 +		inlen -= fill;
@@ -183,7 +481,7 @@ index 000000000000..ed0c74640470
 +	if (inlen > BLAKE2S_BLOCK_SIZE) {
 +		const size_t nblocks = DIV_ROUND_UP(inlen, BLAKE2S_BLOCK_SIZE);
 +		/* Hash one less (full) block than strictly possible */
-+		blake2s_compress_generic(state, in, nblocks - 1, BLAKE2S_BLOCK_SIZE);
++		blake2s_compress_arch(state, in, nblocks - 1, BLAKE2S_BLOCK_SIZE);
 +		in += BLAKE2S_BLOCK_SIZE * (nblocks - 1);
 +		inlen -= BLAKE2S_BLOCK_SIZE * (nblocks - 1);
 +	}
@@ -200,7 +498,7 @@ index 000000000000..ed0c74640470
 +	blake2s_set_lastblock(state);
 +	memset(state->buf + state->buflen, 0,
 +	       BLAKE2S_BLOCK_SIZE - state->buflen); /* Padding */
-+	blake2s_compress_generic(state, state->buf, 1, state->buflen);
++	blake2s_compress_arch(state, state->buf, 1, state->buflen);
 +	cpu_to_le32_array(state->h, ARRAY_SIZE(state->h));
 +	memcpy(out, state->h, state->outlen);
 +	memzero_explicit(state, sizeof(*state));
@@ -210,7 +508,7 @@ index 000000000000..ed0c74640470
 +
 +static struct shash_alg blake2s_algs[] = {{
 +	.base.cra_name		= "blake2s-128",
-+	.base.cra_driver_name	= "blake2s-128-generic",
++	.base.cra_driver_name	= "blake2s-128-x86",
 +	.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
 +	.base.cra_ctxsize	= sizeof(struct blake2s_tfm_ctx),
 +	.base.cra_priority	= 200,
@@ -225,7 +523,7 @@ index 000000000000..ed0c74640470
 +	.descsize		= sizeof(struct blake2s_state),
 +}, {
 +	.base.cra_name		= "blake2s-160",
-+	.base.cra_driver_name	= "blake2s-160-generic",
++	.base.cra_driver_name	= "blake2s-160-x86",
 +	.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
 +	.base.cra_ctxsize	= sizeof(struct blake2s_tfm_ctx),
 +	.base.cra_priority	= 200,
@@ -240,7 +538,7 @@ index 000000000000..ed0c74640470
 +	.descsize		= sizeof(struct blake2s_state),
 +}, {
 +	.base.cra_name		= "blake2s-224",
-+	.base.cra_driver_name	= "blake2s-224-generic",
++	.base.cra_driver_name	= "blake2s-224-x86",
 +	.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
 +	.base.cra_ctxsize	= sizeof(struct blake2s_tfm_ctx),
 +	.base.cra_priority	= 200,
@@ -255,7 +553,7 @@ index 000000000000..ed0c74640470
 +	.descsize		= sizeof(struct blake2s_state),
 +}, {
 +	.base.cra_name		= "blake2s-256",
-+	.base.cra_driver_name	= "blake2s-256-generic",
++	.base.cra_driver_name	= "blake2s-256-x86",
 +	.base.cra_flags		= CRYPTO_ALG_OPTIONAL_KEY,
 +	.base.cra_ctxsize	= sizeof(struct blake2s_tfm_ctx),
 +	.base.cra_priority	= 200,
@@ -272,42 +570,58 @@ index 000000000000..ed0c74640470
 +
 +static int __init blake2s_mod_init(void)
 +{
++	if (!boot_cpu_has(X86_FEATURE_SSSE3))
++		return 0;
++
++	static_branch_enable(&blake2s_use_ssse3);
++
++	if (IS_ENABLED(CONFIG_AS_AVX512) &&
++	    boot_cpu_has(X86_FEATURE_AVX) &&
++	    boot_cpu_has(X86_FEATURE_AVX2) &&
++	    boot_cpu_has(X86_FEATURE_AVX512F) &&
++	    boot_cpu_has(X86_FEATURE_AVX512VL) &&
++	    cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM |
++			      XFEATURE_MASK_AVX512, NULL))
++		static_branch_enable(&blake2s_use_avx512);
++
 +	return crypto_register_shashes(blake2s_algs, ARRAY_SIZE(blake2s_algs));
 +}
 +
 +static void __exit blake2s_mod_exit(void)
 +{
-+	crypto_unregister_shashes(blake2s_algs, ARRAY_SIZE(blake2s_algs));
++	if (boot_cpu_has(X86_FEATURE_SSSE3))
++		crypto_unregister_shashes(blake2s_algs, ARRAY_SIZE(blake2s_algs));
 +}
 +
-+subsys_initcall(blake2s_mod_init);
++module_init(blake2s_mod_init);
 +module_exit(blake2s_mod_exit);
 +
 +MODULE_ALIAS_CRYPTO("blake2s-128");
-+MODULE_ALIAS_CRYPTO("blake2s-128-generic");
++MODULE_ALIAS_CRYPTO("blake2s-128-x86");
 +MODULE_ALIAS_CRYPTO("blake2s-160");
-+MODULE_ALIAS_CRYPTO("blake2s-160-generic");
++MODULE_ALIAS_CRYPTO("blake2s-160-x86");
 +MODULE_ALIAS_CRYPTO("blake2s-224");
-+MODULE_ALIAS_CRYPTO("blake2s-224-generic");
++MODULE_ALIAS_CRYPTO("blake2s-224-x86");
 +MODULE_ALIAS_CRYPTO("blake2s-256");
-+MODULE_ALIAS_CRYPTO("blake2s-256-generic");
++MODULE_ALIAS_CRYPTO("blake2s-256-x86");
 +MODULE_LICENSE("GPL v2");
-diff --git a/include/crypto/internal/blake2s.h b/include/crypto/internal/blake2s.h
-index 941693effc7d..74ff77032e52 100644
---- a/include/crypto/internal/blake2s.h
-+++ b/include/crypto/internal/blake2s.h
-@@ -5,6 +5,11 @@
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 3c23187eeeb1..64cc4a93b51c 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -674,6 +674,12 @@ config CRYPTO_BLAKE2S
  
- #include <crypto/blake2s.h>
+ 	  See https://blake2.net for further information.
  
-+struct blake2s_tfm_ctx {
-+	u8 key[BLAKE2S_KEY_SIZE];
-+	unsigned int keylen;
-+};
++config CRYPTO_BLAKE2S_X86
++	tristate "BLAKE2s digest algorithm (x86 accelerated version)"
++	depends on X86 && 64BIT
++	select CRYPTO_LIB_BLAKE2S_GENERIC
++	select CRYPTO_ARCH_HAVE_LIB_BLAKE2S
 +
- void blake2s_compress_generic(struct blake2s_state *state,const u8 *block,
- 			      size_t nblocks, const u32 inc);
- 
+ config CRYPTO_CRCT10DIF
+ 	tristate "CRCT10DIF algorithm"
+ 	select CRYPTO_HASH
 -- 
 2.20.1
 
