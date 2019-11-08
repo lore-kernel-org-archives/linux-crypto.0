@@ -7,561 +7,364 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AF01FA372C
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 13:33:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57CF9C5DF60
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 13:58:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 086AE215EA
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 13:33:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 073F021924
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 13:58:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="vaXWLcUC"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VApYMUem"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728633AbfKHNdf (ORCPT
+        id S1726307AbfKHN6I (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 8 Nov 2019 08:33:35 -0500
-Received: from mail-pf1-f196.google.com ([209.85.210.196]:35213 "EHLO
-        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727703AbfKHNdf (ORCPT
+        Fri, 8 Nov 2019 08:58:08 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:34920 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726281AbfKHN6H (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 Nov 2019 08:33:35 -0500
-Received: by mail-pf1-f196.google.com with SMTP id d13so4598377pfq.2
-        for <linux-crypto@vger.kernel.org>; Fri, 08 Nov 2019 05:33:34 -0800 (PST)
+        Fri, 8 Nov 2019 08:58:07 -0500
+Received: by mail-wm1-f66.google.com with SMTP id 8so6347883wmo.0
+        for <linux-crypto@vger.kernel.org>; Fri, 08 Nov 2019 05:58:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=ih0gjgftVSq40UymBQOagIAp1xQi1B6tEC0FaP+FShA=;
-        b=vaXWLcUCFjX5Aa5cPXCDhkqdMFY1j8eZF6Oa1immZ7KoCWLDdRX757hj7pT/Y+da8R
-         cUHZGwE9u+co/d7pFhNyWaPlM2amGt8jer5P85tRkFNQYMJIkBd6tRddNuIAgOkhnBZD
-         +WYZMHb6MfWYNaNsEu0fp1GjAi2pVV1dT/CbyhVrccCuyFlRuoUpEEWgUoJDu620N2Jy
-         IKlkMdQ+1/UZVIZtSdXY2QxhCQ0La8ilag0gEcHCibzIhaE39S1+e4JSN8zE36ogBNkv
-         rXakGjrGAh9x1YxFNP4EA0KOvGank8x72wYH9M5ZvRCsv6L0/Yy+jSDPdCe93P1bSDAF
-         +slQ==
+        h=from:to:cc:subject:date:message-id;
+        bh=JSAj4UNo0s82HmpusaFb1MeLYC6KSj4Gfcm2JWdZruY=;
+        b=VApYMUem9Xf0wySwNgd66vSAONXOk1yoCTbm8VDjS231bOPuhPmiURr/fJRfNHjvT6
+         +3eV2H5mfxKsOo6hz7+eWf0x1s8T5gbceca95xNCt7htp/H0biWFFMpypk5PnTih9nCq
+         UWXLt9GzG8zwnMP8Cf58wCZ49f39wXOfEVv7SqdtIW4RrmYrqrNJGstPL1St+QilG13R
+         umIFrjGjZH0ZjLny894A2ukD+r8hqm4yB81XKwoezGLgm20V+WoI1GuAZnK95QRh7EW8
+         ofdQKXKKepu0jGgHi3ybfpZ1EjPmBuNXBl/tK/W0vj5jQ8dkfL0Dmd8mEn2rQ0rDHU6r
+         +dKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=ih0gjgftVSq40UymBQOagIAp1xQi1B6tEC0FaP+FShA=;
-        b=iq2G32+lTR/wABpEPRfrKm8I1EPleon2fAVXfj82dsrvaKIsD3xFcw0otwflxvWX2k
-         ev899YDhPsbkvJoPhCWt6lOGgGjNE9Vl+wUoZyb4u5PyJIxDOyxI9IhN4dr1gIuzDhbr
-         n91/w9gssTPneW2ZBWC4erVsam3eCTUL31EO0eczmyQbDnI6hsfTAaAuoI63L1uTGcev
-         QDRa7Cpkd4fF8NXTQJP+gmGD+hASW34PcLCO4gETQpfpqMeWaHpbJINZY1z8CIZo2U7O
-         fpukfFc86Mef7OGsZyJDa33RRqi5QEM+o3/0mgcL164ve71stjGtuDKDsYb/BG4C0EGP
-         otcA==
-X-Gm-Message-State: APjAAAVwZwXfsAwYKTlcaiRRtiMF+TMxUUYThkQoSCDQW+WthKkYEe42
-        KWTy8v9MTtqwipVrlag5bU2oXQ==
-X-Google-Smtp-Source: APXvYqyZNTBG8iJbLnHZM7R0yS2RhR6VRFqIKdP22w6/RYCv90ajmPgx5nbICzcdEqam7VFZE5KPqQ==
-X-Received: by 2002:a63:f48:: with SMTP id 8mr12071411pgp.329.1573220013948;
-        Fri, 08 Nov 2019 05:33:33 -0800 (PST)
-Received: from localhost.localdomain ([240e:362:48f:8f00:79bd:a8a7:1834:2d1a])
-        by smtp.gmail.com with ESMTPSA id 12sm7626483pjm.11.2019.11.08.05.33.17
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Fri, 08 Nov 2019 05:33:33 -0800 (PST)
-From:   Zhangfei Gao <zhangfei.gao@linaro.org>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        jonathan.cameron@huawei.com, grant.likely@arm.com,
-        jean-philippe <jean-philippe@linaro.org>,
-        Jerome Glisse <jglisse@redhat.com>,
-        ilias.apalodimas@linaro.org, francois.ozog@linaro.org,
-        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
-        "haojian . zhuang" <haojian.zhuang@linaro.org>,
-        guodong.xu@linaro.org
-Cc:     linux-accelerators@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
-        Zhangfei Gao <zhangfei.gao@linaro.org>
-Subject: [RESEND PATCH v8 3/3] crypto: hisilicon - register zip engine to uacce
-Date:   Fri,  8 Nov 2019 21:31:44 +0800
-Message-Id: <1573219904-17594-4-git-send-email-zhangfei.gao@linaro.org>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1573219904-17594-1-git-send-email-zhangfei.gao@linaro.org>
-References: <1573219904-17594-1-git-send-email-zhangfei.gao@linaro.org>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=JSAj4UNo0s82HmpusaFb1MeLYC6KSj4Gfcm2JWdZruY=;
+        b=kFxaJM5VtZFsToLGM+kK1ROTSV/nC4nUFdQDI1MwZdOTxB7+1LJon//pi8baqJ7m3l
+         wlTsOiaDL9olncMuEnpTuHVkC9P6EdWQ+ckEN6jdpeuyAZW4DSXSEAP7E/u3VKRui96A
+         ujlX478OJi93dHvYl2we9TaQlG7GIAjtKUCP3gRLK3sX+Re8jbOhTuWxBxZyl5JvP8OD
+         d+D4XffFr2B1uaTA+BPohkdYVcUgXaQZlIOyHczfog/jgY5eJ2Zhjit2395fH4UutQMX
+         OFZWnFThetqTzoHklAKuMrGW8bZxPs4jSUUBYrkQ0kviiTGhhRW26hnwJoxiSWdGiTJg
+         KFiw==
+X-Gm-Message-State: APjAAAXlgleR7XwwOlOj34iCeK++ZwZ/MsLaurPuBdagcAPWFwpy7Vpa
+        N9IeahXvsM3I4vPVZvKjYcuNIQ==
+X-Google-Smtp-Source: APXvYqx6XBBxmte3zBY1ph01QlPtKhucaziETvnwxHuyUBTcyOPLP/tAEMJ84xYxZxJsVJ+105eyOA==
+X-Received: by 2002:a1c:9ccd:: with SMTP id f196mr8422699wme.152.1573221484456;
+        Fri, 08 Nov 2019 05:58:04 -0800 (PST)
+Received: from localhost.localdomain (212.red-213-99-162.dynamicip.rima-tde.net. [213.99.162.212])
+        by smtp.gmail.com with ESMTPSA id a16sm9022470wmd.11.2019.11.08.05.58.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Nov 2019 05:58:03 -0800 (PST)
+From:   Richard Henderson <richard.henderson@linaro.org>
+X-Google-Original-From: Richard Henderson <rth@twiddle.net>
+To:     linux-arm-kernel@lists.infradead.org
+Cc:     linux-crypto@vger.kernel.org, mark.rutland@arm.com,
+        ard.biesheuvel@linaro.org,
+        Richard Henderson <richard.henderson@linaro.org>
+Subject: [PATCH v5] arm64: Implement archrandom.h for ARMv8.5-RNG
+Date:   Fri,  8 Nov 2019 14:57:51 +0100
+Message-Id: <20191108135751.3218-1-rth@twiddle.net>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Register qm to uacce framework for user crypto driver
+From: Richard Henderson <richard.henderson@linaro.org>
 
-Signed-off-by: Zhangfei Gao <zhangfei.gao@linaro.org>
-Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
+Expose the ID_AA64ISAR0.RNDR field to userspace, as the
+RNG system registers are always available at EL0.
+
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- drivers/crypto/hisilicon/qm.c           | 256 ++++++++++++++++++++++++++++++--
- drivers/crypto/hisilicon/qm.h           |  11 ++
- drivers/crypto/hisilicon/zip/zip_main.c |  38 ++---
- include/uapi/misc/uacce/hisi_qm.h       |  23 +++
- 4 files changed, 289 insertions(+), 39 deletions(-)
- create mode 100644 include/uapi/misc/uacce/hisi_qm.h
+v2: Use __mrs_s and fix missing cc clobber (Mark),
+    Log rng failures with pr_warn (Mark),
+    Use __must_check; put RNDR in arch_get_random_long and RNDRRS
+    in arch_get_random_seed_long (Ard),
+    Use ARM64_CPUCAP_WEAK_LOCAL_CPU_FEATURE, and check this_cpu_has_cap
+    when reading random data.  Move everything out of line, now that
+    there are 5 other function calls involved, and to unify the rate
+    limiting on the pr_warn.
+v3: Keep arch_get_random{,_seed}_long in sync.
+v4: Use __cpus_have_const_cap before falling back to this_cpu_has_cap.
+v5: Improve commentary; fix some checkpatch warnings.
+---
+ Documentation/arm64/cpu-feature-registers.rst |  2 +
+ arch/arm64/include/asm/archrandom.h           | 35 ++++++++
+ arch/arm64/include/asm/cpucaps.h              |  3 +-
+ arch/arm64/include/asm/sysreg.h               |  4 +
+ arch/arm64/kernel/cpufeature.c                | 13 +++
+ arch/arm64/kernel/random.c                    | 82 +++++++++++++++++++
+ arch/arm64/Kconfig                            | 12 +++
+ arch/arm64/kernel/Makefile                    |  1 +
+ drivers/char/Kconfig                          |  4 +-
+ 9 files changed, 153 insertions(+), 3 deletions(-)
+ create mode 100644 arch/arm64/include/asm/archrandom.h
+ create mode 100644 arch/arm64/kernel/random.c
 
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index a8ed6990..bf8442d 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -9,6 +9,9 @@
- #include <linux/log2.h>
- #include <linux/seq_file.h>
- #include <linux/slab.h>
-+#include <linux/uacce.h>
-+#include <linux/uaccess.h>
-+#include <uapi/misc/uacce/hisi_qm.h>
- #include "qm.h"
- 
- /* eq/aeq irq enable */
-@@ -465,17 +468,22 @@ static void qm_cq_head_update(struct hisi_qp *qp)
- 
- static void qm_poll_qp(struct hisi_qp *qp, struct hisi_qm *qm)
- {
--	struct qm_cqe *cqe = qp->cqe + qp->qp_status.cq_head;
--
--	if (qp->req_cb) {
--		while (QM_CQE_PHASE(cqe) == qp->qp_status.cqc_phase) {
--			dma_rmb();
--			qp->req_cb(qp, qp->sqe + qm->sqe_size * cqe->sq_head);
--			qm_cq_head_update(qp);
--			cqe = qp->cqe + qp->qp_status.cq_head;
--			qm_db(qm, qp->qp_id, QM_DOORBELL_CMD_CQ,
--			      qp->qp_status.cq_head, 0);
--			atomic_dec(&qp->qp_status.used);
-+	struct qm_cqe *cqe;
-+
-+	if (qp->event_cb) {
-+		qp->event_cb(qp);
-+	} else {
-+		cqe = qp->cqe + qp->qp_status.cq_head;
-+
-+		if (qp->req_cb) {
-+			while (QM_CQE_PHASE(cqe) == qp->qp_status.cqc_phase) {
-+				dma_rmb();
-+				qp->req_cb(qp, qp->sqe + qm->sqe_size *
-+					   cqe->sq_head);
-+				qm_cq_head_update(qp);
-+				cqe = qp->cqe + qp->qp_status.cq_head;
-+				atomic_dec(&qp->qp_status.used);
-+			}
- 		}
- 
- 		/* set c_flag */
-@@ -1271,7 +1279,7 @@ static int qm_qp_ctx_cfg(struct hisi_qp *qp, int qp_id, int pasid)
-  * @qp: The qp we want to start to run.
-  * @arg: Accelerator specific argument.
-  *
-- * After this function, qp can receive request from user. Return qp_id if
-+ * After this function, qp can receive request from user. Return 0 if
-  * successful, Return -EBUSY if failed.
-  */
- int hisi_qm_start_qp(struct hisi_qp *qp, unsigned long arg)
-@@ -1316,7 +1324,7 @@ int hisi_qm_start_qp(struct hisi_qp *qp, unsigned long arg)
- 
- 	dev_dbg(dev, "queue %d started\n", qp_id);
- 
--	return qp_id;
-+	return 0;
- }
- EXPORT_SYMBOL_GPL(hisi_qm_start_qp);
- 
-@@ -1397,6 +1405,213 @@ static void hisi_qm_cache_wb(struct hisi_qm *qm)
- 	}
- }
- 
-+static void qm_qp_event_notifier(struct hisi_qp *qp)
-+{
-+	wake_up_interruptible(&qp->uacce_q->wait);
-+}
-+
-+static int hisi_qm_get_available_instances(struct uacce_device *uacce)
-+{
-+	int i, ret;
-+	struct hisi_qm *qm = uacce->priv;
-+
-+	read_lock(&qm->qps_lock);
-+	for (i = 0, ret = 0; i < qm->qp_num; i++)
-+		if (!qm->qp_array[i])
-+			ret++;
-+	read_unlock(&qm->qps_lock);
-+
-+	return ret;
-+}
-+
-+static int hisi_qm_uacce_get_queue(struct uacce_device *uacce,
-+				   unsigned long arg,
-+				   struct uacce_queue *q)
-+{
-+	struct hisi_qm *qm = uacce->priv;
-+	struct hisi_qp *qp;
-+	u8 alg_type = 0;
-+
-+	qp = hisi_qm_create_qp(qm, alg_type);
-+	if (IS_ERR(qp))
-+		return PTR_ERR(qp);
-+
-+	q->priv = qp;
-+	q->uacce = uacce;
-+	qp->uacce_q = q;
-+	qp->event_cb = qm_qp_event_notifier;
-+	qp->pasid = arg;
-+
-+	return 0;
-+}
-+
-+static void hisi_qm_uacce_put_queue(struct uacce_queue *q)
-+{
-+	struct hisi_qp *qp = q->priv;
-+
-+	hisi_qm_cache_wb(qp->qm);
-+	hisi_qm_release_qp(qp);
-+}
-+
-+/* map sq/cq/doorbell to user space */
-+static int hisi_qm_uacce_mmap(struct uacce_queue *q,
-+			      struct vm_area_struct *vma,
-+			      struct uacce_qfile_region *qfr)
-+{
-+	struct hisi_qp *qp = q->priv;
-+	struct hisi_qm *qm = qp->qm;
-+	size_t sz = vma->vm_end - vma->vm_start;
-+	struct pci_dev *pdev = qm->pdev;
-+	struct device *dev = &pdev->dev;
-+	unsigned long vm_pgoff;
-+	int ret;
-+
-+	switch (qfr->type) {
-+	case UACCE_QFRT_MMIO:
-+		if (qm->ver == QM_HW_V2) {
-+			if (sz > PAGE_SIZE * (QM_DOORBELL_PAGE_NR +
-+			    QM_DOORBELL_SQ_CQ_BASE_V2 / PAGE_SIZE))
-+				return -EINVAL;
-+		} else {
-+			if (sz > PAGE_SIZE * QM_DOORBELL_PAGE_NR)
-+				return -EINVAL;
-+		}
-+
-+		vma->vm_flags |= VM_IO;
-+
-+		return remap_pfn_range(vma, vma->vm_start,
-+				       qm->phys_base >> PAGE_SHIFT,
-+				       sz, pgprot_noncached(vma->vm_page_prot));
-+	case UACCE_QFRT_DUS:
-+		if (sz != qp->qdma.size)
-+			return -EINVAL;
-+
-+		/*
-+		 * dma_mmap_coherent() requires vm_pgoff as 0
-+		 * restore vm_pfoff to initial value for mmap()
-+		 */
-+		vm_pgoff = vma->vm_pgoff;
-+		vma->vm_pgoff = 0;
-+		ret = dma_mmap_coherent(dev, vma, qp->qdma.va,
-+					qp->qdma.dma, sz);
-+		vma->vm_pgoff = vm_pgoff;
-+		return ret;
-+
-+	default:
-+		return -EINVAL;
-+	}
-+}
-+
-+static int hisi_qm_uacce_start_queue(struct uacce_queue *q)
-+{
-+	struct hisi_qp *qp = q->priv;
-+
-+	return hisi_qm_start_qp(qp, qp->pasid);
-+}
-+
-+static void hisi_qm_uacce_stop_queue(struct uacce_queue *q)
-+{
-+	hisi_qm_stop_qp(q->priv);
-+}
-+
-+static int qm_set_sqctype(struct uacce_queue *q, u16 type)
-+{
-+	struct hisi_qm *qm = q->uacce->priv;
-+	struct hisi_qp *qp = q->priv;
-+
-+	write_lock(&qm->qps_lock);
-+	qp->alg_type = type;
-+	write_unlock(&qm->qps_lock);
-+
-+	return 0;
-+}
-+
-+static long hisi_qm_uacce_ioctl(struct uacce_queue *q, unsigned int cmd,
-+				unsigned long arg)
-+{
-+	struct hisi_qp *qp = q->priv;
-+	struct hisi_qp_ctx qp_ctx;
-+
-+	if (cmd == UACCE_CMD_QM_SET_QP_CTX) {
-+		if (copy_from_user(&qp_ctx, (void __user *)arg,
-+				   sizeof(struct hisi_qp_ctx)))
-+			return -EFAULT;
-+
-+		if (qp_ctx.qc_type != 0 && qp_ctx.qc_type != 1)
-+			return -EINVAL;
-+
-+		qm_set_sqctype(q, qp_ctx.qc_type);
-+		qp_ctx.id = qp->qp_id;
-+
-+		if (copy_to_user((void __user *)arg, &qp_ctx,
-+				 sizeof(struct hisi_qp_ctx)))
-+			return -EFAULT;
-+	} else {
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static const struct uacce_ops uacce_qm_ops = {
-+	.get_available_instances = hisi_qm_get_available_instances,
-+	.get_queue = hisi_qm_uacce_get_queue,
-+	.put_queue = hisi_qm_uacce_put_queue,
-+	.start_queue = hisi_qm_uacce_start_queue,
-+	.stop_queue = hisi_qm_uacce_stop_queue,
-+	.mmap = hisi_qm_uacce_mmap,
-+	.ioctl = hisi_qm_uacce_ioctl,
-+};
-+
-+static int qm_register_uacce(struct hisi_qm *qm)
-+{
-+	struct pci_dev *pdev = qm->pdev;
-+	struct uacce_device *uacce;
-+	unsigned long mmio_page_nr;
-+	unsigned long dus_page_nr;
-+	struct uacce_interface interface = {
-+		.flags = UACCE_DEV_SVA,
-+		.ops = &uacce_qm_ops,
-+	};
-+
-+	strncpy(interface.name, pdev->driver->name, sizeof(interface.name));
-+
-+	uacce = uacce_register(&pdev->dev, &interface);
-+	if (IS_ERR(uacce))
-+		return PTR_ERR(uacce);
-+
-+	if (uacce->flags & UACCE_DEV_SVA) {
-+		qm->use_sva = true;
-+	} else {
-+		/* only consider sva case */
-+		uacce_unregister(uacce);
-+		return -EINVAL;
-+	}
-+
-+	uacce->is_vf = pdev->is_virtfn;
-+	uacce->priv = qm;
-+	uacce->algs = qm->algs;
-+
-+	if (qm->ver == QM_HW_V1) {
-+		mmio_page_nr = QM_DOORBELL_PAGE_NR;
-+		uacce->api_ver = HISI_QM_API_VER_BASE;
-+	} else {
-+		mmio_page_nr = QM_DOORBELL_PAGE_NR +
-+			QM_DOORBELL_SQ_CQ_BASE_V2 / PAGE_SIZE;
-+		uacce->api_ver = HISI_QM_API_VER2_BASE;
-+	}
-+
-+	dus_page_nr = (PAGE_SIZE - 1 + qm->sqe_size * QM_Q_DEPTH +
-+		       sizeof(struct qm_cqe) * QM_Q_DEPTH) >> PAGE_SHIFT;
-+
-+	uacce->qf_pg_num[UACCE_QFRT_MMIO] = mmio_page_nr;
-+	uacce->qf_pg_num[UACCE_QFRT_DUS]  = dus_page_nr;
-+
-+	qm->uacce = uacce;
-+
-+	return 0;
-+}
-+
- /**
-  * hisi_qm_init() - Initialize configures about qm.
-  * @qm: The qm needing init.
-@@ -1421,10 +1636,14 @@ int hisi_qm_init(struct hisi_qm *qm)
- 		return -EINVAL;
- 	}
- 
-+	ret = qm_register_uacce(qm);
-+	if (ret < 0)
-+		dev_warn(&pdev->dev, "fail to register uacce (%d)\n", ret);
-+
- 	ret = pci_enable_device_mem(pdev);
- 	if (ret < 0) {
- 		dev_err(&pdev->dev, "Failed to enable device mem!\n");
--		return ret;
-+		goto err_unregister_uacce;
- 	}
- 
- 	ret = pci_request_mem_regions(pdev, qm->dev_name);
-@@ -1433,8 +1652,9 @@ int hisi_qm_init(struct hisi_qm *qm)
- 		goto err_disable_pcidev;
- 	}
- 
--	qm->io_base = ioremap(pci_resource_start(pdev, PCI_BAR_2),
--			      pci_resource_len(qm->pdev, PCI_BAR_2));
-+	qm->phys_base = pci_resource_start(pdev, PCI_BAR_2);
-+	qm->phys_size = pci_resource_len(qm->pdev, PCI_BAR_2);
-+	qm->io_base = ioremap(qm->phys_base, qm->phys_size);
- 	if (!qm->io_base) {
- 		ret = -EIO;
- 		goto err_release_mem_regions;
-@@ -1476,6 +1696,8 @@ int hisi_qm_init(struct hisi_qm *qm)
- 	pci_release_mem_regions(pdev);
- err_disable_pcidev:
- 	pci_disable_device(pdev);
-+err_unregister_uacce:
-+	uacce_unregister(qm->uacce);
- 
- 	return ret;
- }
-@@ -1504,6 +1726,8 @@ void hisi_qm_uninit(struct hisi_qm *qm)
- 	iounmap(qm->io_base);
- 	pci_release_mem_regions(pdev);
- 	pci_disable_device(pdev);
-+
-+	uacce_unregister(qm->uacce);
- }
- EXPORT_SYMBOL_GPL(hisi_qm_uninit);
- 
-diff --git a/drivers/crypto/hisilicon/qm.h b/drivers/crypto/hisilicon/qm.h
-index 103e2fd..16a176f 100644
---- a/drivers/crypto/hisilicon/qm.h
-+++ b/drivers/crypto/hisilicon/qm.h
-@@ -77,6 +77,9 @@
- 
- #define HISI_ACC_SGL_SGE_NR_MAX		255
- 
-+/* page number for queue file region */
-+#define QM_DOORBELL_PAGE_NR		1
-+
- enum qp_state {
- 	QP_STOP,
- };
-@@ -161,7 +164,12 @@ struct hisi_qm {
- 	u32 error_mask;
- 	u32 msi_mask;
- 
-+	const char *algs;
- 	bool use_dma_api;
-+	bool use_sva;
-+	resource_size_t phys_base;
-+	resource_size_t phys_size;
-+	struct uacce_device *uacce;
- };
- 
- struct hisi_qp_status {
-@@ -191,10 +199,13 @@ struct hisi_qp {
- 	struct hisi_qp_ops *hw_ops;
- 	void *qp_ctx;
- 	void (*req_cb)(struct hisi_qp *qp, void *data);
-+	void (*event_cb)(struct hisi_qp *qp);
- 	struct work_struct work;
- 	struct workqueue_struct *wq;
- 
- 	struct hisi_qm *qm;
-+	u16 pasid;
-+	struct uacce_queue *uacce_q;
- };
- 
- int hisi_qm_init(struct hisi_qm *qm);
-diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index 1b2ee96..1c91587 100644
---- a/drivers/crypto/hisilicon/zip/zip_main.c
-+++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -316,8 +316,14 @@ static void hisi_zip_set_user_domain_and_cache(struct hisi_zip *hisi_zip)
- 	writel(AXUSER_BASE, base + HZIP_BD_RUSER_32_63);
- 	writel(AXUSER_BASE, base + HZIP_SGL_RUSER_32_63);
- 	writel(AXUSER_BASE, base + HZIP_BD_WUSER_32_63);
--	writel(AXUSER_BASE, base + HZIP_DATA_RUSER_32_63);
--	writel(AXUSER_BASE, base + HZIP_DATA_WUSER_32_63);
-+
-+	if (hisi_zip->qm.use_sva) {
-+		writel(AXUSER_BASE | AXUSER_SSV, base + HZIP_DATA_RUSER_32_63);
-+		writel(AXUSER_BASE | AXUSER_SSV, base + HZIP_DATA_WUSER_32_63);
-+	} else {
-+		writel(AXUSER_BASE, base + HZIP_DATA_RUSER_32_63);
-+		writel(AXUSER_BASE, base + HZIP_DATA_WUSER_32_63);
-+	}
- 
- 	/* let's open all compression/decompression cores */
- 	writel(DECOMP_CHECK_ENABLE | ALL_COMP_DECOMP_EN,
-@@ -672,23 +678,12 @@ static int hisi_zip_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	qm->pdev = pdev;
- 	qm->ver = rev_id;
- 
-+	qm->use_dma_api = true;
-+	qm->algs = "zlib\ngzip\n";
- 	qm->sqe_size = HZIP_SQE_SIZE;
- 	qm->dev_name = hisi_zip_name;
- 	qm->fun_type = (pdev->device == PCI_DEVICE_ID_ZIP_PF) ? QM_HW_PF :
- 								QM_HW_VF;
--	switch (uacce_mode) {
--	case 0:
--		qm->use_dma_api = true;
--		break;
--	case 1:
--		qm->use_dma_api = false;
--		break;
--	case 2:
--		qm->use_dma_api = true;
--		break;
--	default:
--		return -EINVAL;
--	}
- 
- 	ret = hisi_qm_init(qm);
- 	if (ret) {
-@@ -976,12 +971,10 @@ static int __init hisi_zip_init(void)
- 		goto err_pci;
- 	}
- 
--	if (uacce_mode == 0 || uacce_mode == 2) {
--		ret = hisi_zip_register_to_crypto();
--		if (ret < 0) {
--			pr_err("Failed to register driver to crypto.\n");
--			goto err_crypto;
--		}
-+	ret = hisi_zip_register_to_crypto();
-+	if (ret < 0) {
-+		pr_err("Failed to register driver to crypto.\n");
-+		goto err_crypto;
- 	}
- 
- 	return 0;
-@@ -996,8 +989,7 @@ static int __init hisi_zip_init(void)
- 
- static void __exit hisi_zip_exit(void)
- {
--	if (uacce_mode == 0 || uacce_mode == 2)
--		hisi_zip_unregister_from_crypto();
-+	hisi_zip_unregister_from_crypto();
- 	pci_unregister_driver(&hisi_zip_pci_driver);
- 	hisi_zip_unregister_debugfs();
- }
-diff --git a/include/uapi/misc/uacce/hisi_qm.h b/include/uapi/misc/uacce/hisi_qm.h
+diff --git a/Documentation/arm64/cpu-feature-registers.rst b/Documentation/arm64/cpu-feature-registers.rst
+index 2955287e9acc..78d6f5c6e824 100644
+--- a/Documentation/arm64/cpu-feature-registers.rst
++++ b/Documentation/arm64/cpu-feature-registers.rst
+@@ -117,6 +117,8 @@ infrastructure:
+      +------------------------------+---------+---------+
+      | Name                         |  bits   | visible |
+      +------------------------------+---------+---------+
++     | RNDR                         | [63-60] |    y    |
++     +------------------------------+---------+---------+
+      | TS                           | [55-52] |    y    |
+      +------------------------------+---------+---------+
+      | FHM                          | [51-48] |    y    |
+diff --git a/arch/arm64/include/asm/archrandom.h b/arch/arm64/include/asm/archrandom.h
 new file mode 100644
-index 0000000..6435f0b
+index 000000000000..e796a6de7421
 --- /dev/null
-+++ b/include/uapi/misc/uacce/hisi_qm.h
-@@ -0,0 +1,23 @@
-+/* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
-+#ifndef _UAPI_HISI_QM_H
-+#define _UAPI_HISI_QM_H
++++ b/arch/arm64/include/asm/archrandom.h
+@@ -0,0 +1,35 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef _ASM_ARCHRANDOM_H
++#define _ASM_ARCHRANDOM_H
 +
-+#include <linux/types.h>
++#ifdef CONFIG_ARCH_RANDOM
 +
-+/**
-+ * struct hisi_qp_ctx - User data for hisi qp.
-+ * @id: qp_index return to user space
-+ * @qc_type: Accelerator algorithm type
-+ */
-+struct hisi_qp_ctx {
-+	__u16 id;
-+	__u16 qc_type;
-+};
++bool __must_check arch_get_random_long(unsigned long *v);
++bool __must_check arch_get_random_seed_long(unsigned long *v);
 +
-+#define HISI_QM_API_VER_BASE "hisi_qm_v1"
-+#define HISI_QM_API_VER2_BASE "hisi_qm_v2"
++static inline bool __must_check arch_get_random_int(unsigned int *v)
++{
++	unsigned long val;
 +
-+/* UACCE_CMD_QM_SET_QP_CTX: Set qp algorithm type */
-+#define UACCE_CMD_QM_SET_QP_CTX	_IOWR('H', 10, struct hisi_qp_ctx)
++	if (arch_get_random_long(&val)) {
++		*v = val;
++		return true;
++	}
 +
++	return false;
++}
++
++static inline bool __must_check arch_get_random_seed_int(unsigned int *v)
++{
++	unsigned long val;
++
++	if (arch_get_random_seed_long(&val)) {
++		*v = val;
++		return true;
++	}
++
++	return false;
++}
++
++#endif /* CONFIG_ARCH_RANDOM */
++#endif /* _ASM_ARCHRANDOM_H */
+diff --git a/arch/arm64/include/asm/cpucaps.h b/arch/arm64/include/asm/cpucaps.h
+index ac1dbca3d0cd..1dd7644bc59a 100644
+--- a/arch/arm64/include/asm/cpucaps.h
++++ b/arch/arm64/include/asm/cpucaps.h
+@@ -54,7 +54,8 @@
+ #define ARM64_WORKAROUND_1463225		44
+ #define ARM64_WORKAROUND_CAVIUM_TX2_219_TVM	45
+ #define ARM64_WORKAROUND_CAVIUM_TX2_219_PRFM	46
++#define ARM64_HAS_RNG				47
+ 
+-#define ARM64_NCAPS				47
++#define ARM64_NCAPS				48
+ 
+ #endif /* __ASM_CPUCAPS_H */
+diff --git a/arch/arm64/include/asm/sysreg.h b/arch/arm64/include/asm/sysreg.h
+index 6e919fafb43d..5e718f279469 100644
+--- a/arch/arm64/include/asm/sysreg.h
++++ b/arch/arm64/include/asm/sysreg.h
+@@ -365,6 +365,9 @@
+ #define SYS_CTR_EL0			sys_reg(3, 3, 0, 0, 1)
+ #define SYS_DCZID_EL0			sys_reg(3, 3, 0, 0, 7)
+ 
++#define SYS_RNDR_EL0			sys_reg(3, 3, 2, 4, 0)
++#define SYS_RNDRRS_EL0			sys_reg(3, 3, 2, 4, 1)
++
+ #define SYS_PMCR_EL0			sys_reg(3, 3, 9, 12, 0)
+ #define SYS_PMCNTENSET_EL0		sys_reg(3, 3, 9, 12, 1)
+ #define SYS_PMCNTENCLR_EL0		sys_reg(3, 3, 9, 12, 2)
+@@ -539,6 +542,7 @@
+ 			 ENDIAN_SET_EL1 | SCTLR_EL1_UCI  | SCTLR_EL1_RES1)
+ 
+ /* id_aa64isar0 */
++#define ID_AA64ISAR0_RNDR_SHIFT		60
+ #define ID_AA64ISAR0_TS_SHIFT		52
+ #define ID_AA64ISAR0_FHM_SHIFT		48
+ #define ID_AA64ISAR0_DP_SHIFT		44
+diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
+index 80f459ad0190..456d5c461cbf 100644
+--- a/arch/arm64/kernel/cpufeature.c
++++ b/arch/arm64/kernel/cpufeature.c
+@@ -119,6 +119,7 @@ static void cpu_enable_cnp(struct arm64_cpu_capabilities const *cap);
+  * sync with the documentation of the CPU feature register ABI.
+  */
+ static const struct arm64_ftr_bits ftr_id_aa64isar0[] = {
++	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR0_RNDR_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR0_TS_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR0_FHM_SHIFT, 4, 0),
+ 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR0_DP_SHIFT, 4, 0),
+@@ -1565,6 +1566,18 @@ static const struct arm64_cpu_capabilities arm64_features[] = {
+ 		.sign = FTR_UNSIGNED,
+ 		.min_field_value = 1,
+ 	},
 +#endif
++#ifdef CONFIG_ARCH_RANDOM
++	{
++		.desc = "Random Number Generator",
++		.capability = ARM64_HAS_RNG,
++		.type = ARM64_CPUCAP_WEAK_LOCAL_CPU_FEATURE,
++		.matches = has_cpuid_feature,
++		.sys_reg = SYS_ID_AA64ISAR0_EL1,
++		.field_pos = ID_AA64ISAR0_RNDR_SHIFT,
++		.sign = FTR_UNSIGNED,
++		.min_field_value = 1,
++	},
+ #endif
+ 	{},
+ };
+diff --git a/arch/arm64/kernel/random.c b/arch/arm64/kernel/random.c
+new file mode 100644
+index 000000000000..e7ff29dd637c
+--- /dev/null
++++ b/arch/arm64/kernel/random.c
+@@ -0,0 +1,82 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Random number generation using ARMv8.5-RNG.
++ */
++
++#include <linux/random.h>
++#include <linux/ratelimit.h>
++#include <linux/printk.h>
++#include <linux/preempt.h>
++#include <asm/cpufeature.h>
++
++static inline bool has_random(void)
++{
++	/*
++	 * We "have" RNG if either
++	 * (1) every cpu in the system has RNG, or
++	 * (2) in a non-preemptible context, current cpu has RNG.
++	 *
++	 * Case 1 is the expected case when RNG is deployed, but
++	 * case 2 is present as a backup.  Case 2 has two effects:
++	 * (A) rand_initialize() is able to use the instructions
++	 * when present in the boot cpu, which happens before
++	 * secondary cpus are enabled and before features are
++	 * resolved for the full system.
++	 * (B) add_interrupt_randomness() is able to use the
++	 * instructions when present on the current cpu, in case
++	 * some big/little system only has RNG on big cpus.
++	 *
++	 * We can use __cpus_have_const_cap because we then fall
++	 * back to checking the current cpu.
++	 */
++	return __cpus_have_const_cap(ARM64_HAS_RNG) ||
++	       (!preemptible() && this_cpu_has_cap(ARM64_HAS_RNG));
++}
++
++bool arch_get_random_long(unsigned long *v)
++{
++	bool ok;
++
++	if (!has_random())
++		return false;
++
++	/*
++	 * Reads of RNDR set PSTATE.NZCV to 0b0000 on success,
++	 * and set PSTATE.NZCV to 0b0100 otherwise.
++	 */
++	asm volatile(
++		__mrs_s("%0", SYS_RNDR_EL0) "\n"
++	"	cset %w1, ne\n"
++	: "=r"(*v), "=r"(ok)
++	:
++	: "cc");
++
++	if (unlikely(!ok))
++		pr_warn_ratelimited("cpu%d: sys_rndr failed\n",
++				    read_cpuid_id());
++	return ok;
++}
++
++bool arch_get_random_seed_long(unsigned long *v)
++{
++	bool ok;
++
++	if (!has_random())
++		return false;
++
++	/*
++	 * Reads of RNDRRS set PSTATE.NZCV to 0b0000 on success,
++	 * and set PSTATE.NZCV to 0b0100 otherwise.
++	 */
++	asm volatile(
++		__mrs_s("%0", SYS_RNDRRS_EL0) "\n"
++	"	cset %w1, ne\n"
++	: "=r"(*v), "=r"(ok)
++	:
++	: "cc");
++
++	if (unlikely(!ok))
++		pr_warn_ratelimited("cpu%d: sys_rndrrs failed\n",
++				    read_cpuid_id());
++	return ok;
++}
+diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+index 3f047afb982c..5bc88601f07b 100644
+--- a/arch/arm64/Kconfig
++++ b/arch/arm64/Kconfig
+@@ -1438,6 +1438,18 @@ config ARM64_PTR_AUTH
+ 
+ endmenu
+ 
++menu "ARMv8.5 architectural features"
++
++config ARCH_RANDOM
++	bool "Enable support for random number generation"
++	default y
++	help
++	  Random number generation (part of the ARMv8.5 Extensions)
++	  provides a high bandwidth, cryptographically secure
++	  hardware random number generator.
++
++endmenu
++
+ config ARM64_SVE
+ 	bool "ARM Scalable Vector Extension support"
+ 	default y
+diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
+index 478491f07b4f..a47c2b984da7 100644
+--- a/arch/arm64/kernel/Makefile
++++ b/arch/arm64/kernel/Makefile
+@@ -63,6 +63,7 @@ obj-$(CONFIG_CRASH_CORE)		+= crash_core.o
+ obj-$(CONFIG_ARM_SDE_INTERFACE)		+= sdei.o
+ obj-$(CONFIG_ARM64_SSBD)		+= ssbd.o
+ obj-$(CONFIG_ARM64_PTR_AUTH)		+= pointer_auth.o
++obj-$(CONFIG_ARCH_RANDOM)		+= random.o
+ 
+ obj-y					+= vdso/ probes/
+ obj-$(CONFIG_COMPAT_VDSO)		+= vdso32/
+diff --git a/drivers/char/Kconfig b/drivers/char/Kconfig
+index df0fc997dc3e..f26a0a8cc0d0 100644
+--- a/drivers/char/Kconfig
++++ b/drivers/char/Kconfig
+@@ -539,7 +539,7 @@ endmenu
+ 
+ config RANDOM_TRUST_CPU
+ 	bool "Trust the CPU manufacturer to initialize Linux's CRNG"
+-	depends on X86 || S390 || PPC
++	depends on X86 || S390 || PPC || ARM64
+ 	default n
+ 	help
+ 	Assume that CPU manufacturer (e.g., Intel or AMD for RDSEED or
+@@ -559,4 +559,4 @@ config RANDOM_TRUST_BOOTLOADER
+ 	device randomness. Say Y here to assume the entropy provided by the
+ 	booloader is trustworthy so it will be added to the kernel's entropy
+ 	pool. Otherwise, say N here so it will be regarded as device input that
+-	only mixes the entropy pool.
+\ No newline at end of file
++	only mixes the entropy pool.
 -- 
-2.7.4
+2.17.1
 
