@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87653FA372C
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 12:53:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8076C5DF60
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 12:53:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 52D52222C2
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 12:53:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ADC732245A
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 12:53:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=st.com header.i=@st.com header.b="mwDBKYuD"
+	dkim=pass (2048-bit key) header.d=st.com header.i=@st.com header.b="VaPfpgUz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726608AbfKHMxU (ORCPT
+        id S1726335AbfKHMxV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 8 Nov 2019 07:53:20 -0500
-Received: from mx08-00178001.pphosted.com ([91.207.212.93]:13472 "EHLO
-        mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726335AbfKHMxU (ORCPT
+        Fri, 8 Nov 2019 07:53:21 -0500
+Received: from mx07-00178001.pphosted.com ([62.209.51.94]:47391 "EHLO
+        mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726445AbfKHMxU (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Fri, 8 Nov 2019 07:53:20 -0500
-Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
-        by mx08-00178001.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xA8Cq5Kk024045;
-        Fri, 8 Nov 2019 13:52:50 +0100
+Received: from pps.filterd (m0046037.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xA8CqEI6015196;
+        Fri, 8 Nov 2019 13:52:49 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=st.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-type; s=STMicroelectronics;
- bh=U42CzDCTjvGgKHPDdujEizpP/MuGbL64x7aocKvP598=;
- b=mwDBKYuDjJj4/kG3Ia92rMuR1ojDDvT0Q/HagfYo0vu92FbgZpMc4b+0j9PnLlM4Dj2m
- ofeR0UXVkCROk2BB9ZcmcEqV2T68xXwo07mGPubntHwsAIsThWESPvKlVa8TrBmyF/Zr
- EYCLZHITplwcDmEzXNv1TJRMPezkHmJeDWkRCehV90C4we5ZAUhRWGX2ikyXgbvpsr9f
- blV2b7kOMbRfSOhkEDbHV4w0doWBPdyUmmVTaHUmLHXOtQMWfsOmDfUlkBtMQHx5SZgn
- /t4XjicIsnp7RXnz8Dz8AuaVrOt9RmBBIUXlXXL1ae7nVm2XUh/UV8aEcMmmuNSYTjUU qQ== 
+ bh=7H2L6p4aMQZbG5XB4uxu8UBuL7eVs48hwy7HAKSmpAI=;
+ b=VaPfpgUzleU4vIJLQLhDtt8Ru6nOJFUlWfMyb4whxfGjnJowJF9m5pcIE9wcTmdEgJu3
+ VQCrNFlcxjheF5fi1WPMzY9hYErFA8IGHVpVMYT0OYPLIw3bIMFHVm0blhgvhZpWj6Zs
+ fQ3io09Zee3s7wMCZub1Zdu8D2qSJekfkH9oOcI50VxPrnXSvZi/q4TNBuIIjmyeRSWW
+ tuwZ8b5RvYm9gdxKsOwWHpOxOFiUqqGw5XdF2KEE7m0jHnwbUfwJfYlo9N+2VmoRz4fm
+ aOm3cJEbLf92QCps+1peqCCSrTDS71nVWzgTW6Gt0edq0vOb1X9ofQlNxODIluzEegjD 4A== 
 Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx08-00178001.pphosted.com with ESMTP id 2w41vmuntd-1
+        by mx07-00178001.pphosted.com with ESMTP id 2w41ve3m4m-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 08 Nov 2019 13:52:50 +0100
+        Fri, 08 Nov 2019 13:52:49 +0100
 Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 50D1510002A;
-        Fri,  8 Nov 2019 13:52:50 +0100 (CET)
-Received: from Webmail-eu.st.com (Safex1hubcas22.st.com [10.75.90.92])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 442D42B6A0D;
-        Fri,  8 Nov 2019 13:52:50 +0100 (CET)
-Received: from SAFEX1HUBCAS24.st.com (10.75.90.95) by Safex1hubcas22.st.com
- (10.75.90.92) with Microsoft SMTP Server (TLS) id 14.3.439.0; Fri, 8 Nov 2019
- 13:52:50 +0100
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 3E89F100039;
+        Fri,  8 Nov 2019 13:52:49 +0100 (CET)
+Received: from Webmail-eu.st.com (Safex1hubcas21.st.com [10.75.90.44])
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 2EB8A2B6A0F;
+        Fri,  8 Nov 2019 13:52:49 +0100 (CET)
+Received: from SAFEX1HUBCAS24.st.com (10.75.90.95) by SAFEX1HUBCAS21.st.com
+ (10.75.90.44) with Microsoft SMTP Server (TLS) id 14.3.439.0; Fri, 8 Nov 2019
+ 13:52:49 +0100
 Received: from localhost (10.201.20.122) by webmail-ga.st.com (10.75.90.48)
- with Microsoft SMTP Server (TLS) id 14.3.439.0; Fri, 8 Nov 2019 13:52:49
+ with Microsoft SMTP Server (TLS) id 14.3.439.0; Fri, 8 Nov 2019 13:52:48
  +0100
 From:   Benjamin Gaignard <benjamin.gaignard@st.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
@@ -60,9 +60,9 @@ CC:     <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>,
         Benjamin Gaignard <benjamin.gaignard@st.com>
-Subject: [PATCH] dt-bindings: crypto: Convert stm32 HASH bindings to json-schema
-Date:   Fri, 8 Nov 2019 13:52:44 +0100
-Message-ID: <20191108125244.23001-3-benjamin.gaignard@st.com>
+Subject: [PATCH] dt-bindings: crypto: Convert stm32 CRYP bindings to json-schema
+Date:   Fri, 8 Nov 2019 13:52:43 +0100
+Message-ID: <20191108125244.23001-2-benjamin.gaignard@st.com>
 X-Mailer: git-send-email 2.15.0
 In-Reply-To: <20191108125244.23001-1-benjamin.gaignard@st.com>
 References: <20191108125244.23001-1-benjamin.gaignard@st.com>
@@ -76,65 +76,54 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Convert the STM32 HASH binding to DT schema format using json-schema
+Convert the STM32 CRYP binding to DT schema format using json-schema
 
 Signed-off-by: Benjamin Gaignard <benjamin.gaignard@st.com>
 ---
- .../devicetree/bindings/crypto/st,stm32-hash.txt   | 30 ----------
- .../devicetree/bindings/crypto/st,stm32-hash.yaml  | 64 ++++++++++++++++++++++
- 2 files changed, 64 insertions(+), 30 deletions(-)
- delete mode 100644 Documentation/devicetree/bindings/crypto/st,stm32-hash.txt
- create mode 100644 Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
+ .../devicetree/bindings/crypto/st,stm32-cryp.txt   | 19 --------
+ .../devicetree/bindings/crypto/st,stm32-cryp.yaml  | 51 ++++++++++++++++++++++
+ 2 files changed, 51 insertions(+), 19 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/crypto/st,stm32-cryp.txt
+ create mode 100644 Documentation/devicetree/bindings/crypto/st,stm32-cryp.yaml
 
-diff --git a/Documentation/devicetree/bindings/crypto/st,stm32-hash.txt b/Documentation/devicetree/bindings/crypto/st,stm32-hash.txt
+diff --git a/Documentation/devicetree/bindings/crypto/st,stm32-cryp.txt b/Documentation/devicetree/bindings/crypto/st,stm32-cryp.txt
 deleted file mode 100644
-index 04fc246f02f7..000000000000
---- a/Documentation/devicetree/bindings/crypto/st,stm32-hash.txt
+index 970487fa40b8..000000000000
+--- a/Documentation/devicetree/bindings/crypto/st,stm32-cryp.txt
 +++ /dev/null
-@@ -1,30 +0,0 @@
--* STMicroelectronics STM32 HASH
+@@ -1,19 +0,0 @@
+-* STMicroelectronics STM32 CRYP
 -
 -Required properties:
--- compatible: Should contain entries for this and backward compatible
--  HASH versions:
--  - "st,stm32f456-hash" for stm32 F456.
--  - "st,stm32f756-hash" for stm32 F756.
+-- compatible: Should be "st,stm32f756-cryp".
 -- reg: The address and length of the peripheral registers space
--- interrupts: the interrupt specifier for the HASH
--- clocks: The input clock of the HASH instance
+-- clocks: The input clock of the CRYP instance
+-- interrupts: The CRYP interrupt
 -
 -Optional properties:
--- resets: The input reset of the HASH instance
--- dmas: DMA specifiers for the HASH. See the DMA client binding,
--	 Documentation/devicetree/bindings/dma/dma.txt
--- dma-names: DMA request name. Should be "in" if a dma is present.
--- dma-maxburst: Set number of maximum dma burst supported
+-- resets: The input reset of the CRYP instance
 -
 -Example:
--
--hash1: hash@50060400 {
--	compatible = "st,stm32f756-hash";
--	reg = <0x50060400 0x400>;
--	interrupts = <80>;
--	clocks = <&rcc 0 STM32F7_AHB2_CLOCK(HASH)>;
--	resets = <&rcc STM32F7_AHB2_RESET(HASH)>;
--	dmas = <&dma2 7 2 0x400 0x0>;
--	dma-names = "in";
--	dma-maxburst = <0>;
+-crypto@50060000 {
+-	compatible = "st,stm32f756-cryp";
+-	reg = <0x50060000 0x400>;
+-	interrupts = <79>;
+-	clocks = <&rcc 0 STM32F7_AHB2_CLOCK(CRYP)>;
+-	resets = <&rcc STM32F7_AHB2_RESET(CRYP)>;
 -};
-diff --git a/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml b/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
+diff --git a/Documentation/devicetree/bindings/crypto/st,stm32-cryp.yaml b/Documentation/devicetree/bindings/crypto/st,stm32-cryp.yaml
 new file mode 100644
-index 000000000000..3c09c9899021
+index 000000000000..a4574552502a
 --- /dev/null
-+++ b/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
-@@ -0,0 +1,64 @@
++++ b/Documentation/devicetree/bindings/crypto/st,stm32-cryp.yaml
+@@ -0,0 +1,51 @@
 +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 +%YAML 1.2
 +---
-+$id: http://devicetree.org/schemas/crypto/st,stm32-hash.yaml#
++$id: http://devicetree.org/schemas/crypto/st,stm32-cryp.yaml#
 +$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
-+title: STMicroelectronics STM32 HASH bindings
++title: STMicroelectronics STM32 CRYP bindings
 +
 +maintainers:
 +  - Lionel Debieve <lionel.debieve@st.com>
@@ -142,8 +131,8 @@ index 000000000000..3c09c9899021
 +properties:
 +  compatible:
 +    enum:
-+      - st,stm32f456-hash
-+      - st,stm32f756-hash
++      - st,stm32f756-cryp
++      - st,stm32mp1-cryp
 +
 +  reg:
 +    maxItems: 1
@@ -156,16 +145,6 @@ index 000000000000..3c09c9899021
 +
 +  resets:
 +    maxItems: 1
-+
-+  dmas:
-+    maxItems: 1
-+
-+  dma-names:
-+    items:
-+      - const: in
-+
-+  dma-maxburst:
-+    description: Set number of maximum dma burst supported
 +
 +required:
 +  - compatible
@@ -180,15 +159,12 @@ index 000000000000..3c09c9899021
 +    #include <dt-bindings/interrupt-controller/arm-gic.h>
 +    #include <dt-bindings/clock/stm32mp1-clks.h>
 +    #include <dt-bindings/reset/stm32mp1-resets.h>
-+    hash@54002000 {
-+      compatible = "st,stm32f756-hash";
-+      reg = <0x54002000 0x400>;
-+      interrupts = <GIC_SPI 80 IRQ_TYPE_LEVEL_HIGH>;
-+      clocks = <&rcc HASH1>;
-+      resets = <&rcc HASH1_R>;
-+      dmas = <&mdma1 31 0x10 0x1000A02 0x0 0x0>;
-+      dma-names = "in";
-+      dma-maxburst = <2>;
++    cryp@54001000 {
++      compatible = "st,stm32mp1-cryp";
++      reg = <0x54001000 0x400>;
++      interrupts = <GIC_SPI 79 IRQ_TYPE_LEVEL_HIGH>;
++      clocks = <&rcc CRYP1>;
++      resets = <&rcc CRYP1_R>;
 +    };
 +
 +...
