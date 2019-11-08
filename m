@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D152FA372C
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 12:23:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63487C5DF60
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 12:23:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 10BD322473
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 12:23:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 25E2522473
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 Nov 2019 12:23:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1573215818;
-	bh=2a+PT+frzlqqB6N654vMHLV8wTuhXDw8QFGaYOxD5ZA=;
+	s=default; t=1573215821;
+	bh=2nuv9VXQtOzHeFCmAQiXqvGQoB1SvQPZxiEOErY3Lwk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=H/m0+rL3b2ms0dfAPGvdObE1+xRe87MLR1Aia6Ay7klXDr40uwSFMlhUHKwEZgyMR
-	 5i+GBAf8wFPIEPv6jdYLLPZQ4RsinyRihQyrhZ3/n5uaIO1eSji3HjJ/asC1oLbMyu
-	 h82C7V6Dfx84dxxW5zTIH4kp03QhY+w9YXqMPPeI=
+	b=Rr65YGomJm2tPD7Z6PXySVTvn+0w/s8hfJOKTTWrmLkQtH2d2NxzTI6DdS+ULzCcx
+	 bFGrpVZg6ydsun9u9OGrlOgmdDFAWAEaq92IhAVD8K1vRxnSOnPYG5hhjBsDQwks6U
+	 OIVATnTr3lO9HGM1Px/lHeLLnA9wZbiO1DvzHdQs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732314AbfKHMXh (ORCPT
+        id S1732340AbfKHMXk (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 8 Nov 2019 07:23:37 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38044 "EHLO mail.kernel.org"
+        Fri, 8 Nov 2019 07:23:40 -0500
+Received: from mail.kernel.org ([198.145.29.99]:38082 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727598AbfKHMXh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 Nov 2019 07:23:37 -0500
+        id S1727598AbfKHMXk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 8 Nov 2019 07:23:40 -0500
 Received: from localhost.localdomain (laubervilliers-657-1-83-120.w92-154.abo.wanadoo.fr [92.154.90.120])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7635222466;
-        Fri,  8 Nov 2019 12:23:33 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4F73B2246A;
+        Fri,  8 Nov 2019 12:23:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573215815;
-        bh=2a+PT+frzlqqB6N654vMHLV8wTuhXDw8QFGaYOxD5ZA=;
+        s=default; t=1573215818;
+        bh=2nuv9VXQtOzHeFCmAQiXqvGQoB1SvQPZxiEOErY3Lwk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=HjyIgiTAERRN0J1gJiAhtRapd547BF/reBqPrh0qnYgaRbN+OhlYI42HVMTICnHxu
-         ZHlGdsP8ksP7bPC2TtqBiSzaothuCa+p5Fy9aaFm+WW8BpZJ1NAaSgbLxpzygwufqk
-         kR3r0k1jRhyHs74/a2Y41y62w9LyvuzOYN35EnZw=
+        b=d1+l/DiFNMIuSANtPeYmu7O0avsh9wMxX7Clb3VyKI/kttomy/4fT+ML+JuYI24N2
+         P2ifsJp1RYsPaQixQ5/HDDRyyxRePLqnqJRlCkeDjUiVvdrY+zzoCeGnJvbnZPh5kI
+         zmh/iBM65hYuYTtzykeAQpze7MwS/euHcG3Lv9xs=
 From:   Ard Biesheuvel <ardb@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     Ard Biesheuvel <ardb@kernel.org>,
@@ -51,129 +51,680 @@ Cc:     Ard Biesheuvel <ardb@kernel.org>,
         Martin Willi <martin@strongswan.org>,
         Rene van Dorst <opensource@vdorst.com>,
         David Sterba <dsterba@suse.com>
-Subject: [PATCH v5 12/34] crypto: chacha - unexport chacha_generic routines
-Date:   Fri,  8 Nov 2019 13:22:18 +0100
-Message-Id: <20191108122240.28479-13-ardb@kernel.org>
+Subject: [PATCH v5 13/34] crypto: poly1305 - move core routines into a separate library
+Date:   Fri,  8 Nov 2019 13:22:19 +0100
+Message-Id: <20191108122240.28479-14-ardb@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191108122240.28479-1-ardb@kernel.org>
 References: <20191108122240.28479-1-ardb@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Now that all users of generic ChaCha code have moved to the core library,
-there is no longer a need for the generic ChaCha skcpiher driver to
-export parts of it implementation for reuse by other drivers. So drop
-the exports, and make the symbols static.
+Move the core Poly1305 routines shared between the generic Poly1305
+shash driver and the Adiantum and NHPoly1305 drivers into a separate
+library so that using just this pieces does not pull in the crypto
+API pieces of the generic Poly1305 routine.
+
+In a subsequent patch, we will augment this generic library with
+init/update/final routines so that Poyl1305 algorithm can be used
+directly without the need for using the crypto API's shash abstraction.
 
 Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- crypto/chacha_generic.c          | 26 ++++++--------------
- include/crypto/internal/chacha.h | 10 --------
- 2 files changed, 8 insertions(+), 28 deletions(-)
+ arch/x86/crypto/poly1305_glue.c    |   2 +-
+ crypto/Kconfig                     |   5 +-
+ crypto/adiantum.c                  |   5 +-
+ crypto/nhpoly1305.c                |   3 +-
+ crypto/poly1305_generic.c          | 195 +-------------------
+ include/crypto/internal/poly1305.h |  67 +++++++
+ include/crypto/poly1305.h          |  23 ---
+ lib/crypto/Kconfig                 |   3 +
+ lib/crypto/Makefile                |   3 +
+ lib/crypto/poly1305.c              | 158 ++++++++++++++++
+ 10 files changed, 248 insertions(+), 216 deletions(-)
 
-diff --git a/crypto/chacha_generic.c b/crypto/chacha_generic.c
-index ebae6d9d9b32..c1b147318393 100644
---- a/crypto/chacha_generic.c
-+++ b/crypto/chacha_generic.c
-@@ -21,7 +21,7 @@ static int chacha_stream_xor(struct skcipher_request *req,
+diff --git a/arch/x86/crypto/poly1305_glue.c b/arch/x86/crypto/poly1305_glue.c
+index 4a1c05dce950..6ccf8eb26324 100644
+--- a/arch/x86/crypto/poly1305_glue.c
++++ b/arch/x86/crypto/poly1305_glue.c
+@@ -7,8 +7,8 @@
  
- 	err = skcipher_walk_virt(&walk, req, false);
+ #include <crypto/algapi.h>
+ #include <crypto/internal/hash.h>
++#include <crypto/internal/poly1305.h>
+ #include <crypto/internal/simd.h>
+-#include <crypto/poly1305.h>
+ #include <linux/crypto.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 34c4938febeb..362dd6ae6aca 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -446,7 +446,7 @@ config CRYPTO_KEYWRAP
+ config CRYPTO_NHPOLY1305
+ 	tristate
+ 	select CRYPTO_HASH
+-	select CRYPTO_POLY1305
++	select CRYPTO_LIB_POLY1305_GENERIC
  
--	crypto_chacha_init(state, ctx, iv);
-+	chacha_init_generic(state, ctx->key, iv);
+ config CRYPTO_NHPOLY1305_SSE2
+ 	tristate "NHPoly1305 hash function (x86_64 SSE2 implementation)"
+@@ -467,7 +467,7 @@ config CRYPTO_NHPOLY1305_AVX2
+ config CRYPTO_ADIANTUM
+ 	tristate "Adiantum support"
+ 	select CRYPTO_CHACHA20
+-	select CRYPTO_POLY1305
++	select CRYPTO_LIB_POLY1305_GENERIC
+ 	select CRYPTO_NHPOLY1305
+ 	select CRYPTO_MANAGER
+ 	help
+@@ -703,6 +703,7 @@ config CRYPTO_GHASH
+ config CRYPTO_POLY1305
+ 	tristate "Poly1305 authenticator algorithm"
+ 	select CRYPTO_HASH
++	select CRYPTO_LIB_POLY1305_GENERIC
+ 	help
+ 	  Poly1305 authenticator algorithm, RFC7539.
  
- 	while (walk.nbytes > 0) {
- 		unsigned int nbytes = walk.nbytes;
-@@ -37,36 +37,27 @@ static int chacha_stream_xor(struct skcipher_request *req,
- 	return err;
+diff --git a/crypto/adiantum.c b/crypto/adiantum.c
+index 395a3ddd3707..aded26092268 100644
+--- a/crypto/adiantum.c
++++ b/crypto/adiantum.c
+@@ -33,6 +33,7 @@
+ #include <crypto/b128ops.h>
+ #include <crypto/chacha.h>
+ #include <crypto/internal/hash.h>
++#include <crypto/internal/poly1305.h>
+ #include <crypto/internal/skcipher.h>
+ #include <crypto/nhpoly1305.h>
+ #include <crypto/scatterwalk.h>
+@@ -242,11 +243,11 @@ static void adiantum_hash_header(struct skcipher_request *req)
+ 
+ 	BUILD_BUG_ON(sizeof(header) % POLY1305_BLOCK_SIZE != 0);
+ 	poly1305_core_blocks(&state, &tctx->header_hash_key,
+-			     &header, sizeof(header) / POLY1305_BLOCK_SIZE);
++			     &header, sizeof(header) / POLY1305_BLOCK_SIZE, 1);
+ 
+ 	BUILD_BUG_ON(TWEAK_SIZE % POLY1305_BLOCK_SIZE != 0);
+ 	poly1305_core_blocks(&state, &tctx->header_hash_key, req->iv,
+-			     TWEAK_SIZE / POLY1305_BLOCK_SIZE);
++			     TWEAK_SIZE / POLY1305_BLOCK_SIZE, 1);
+ 
+ 	poly1305_core_emit(&state, &rctx->header_hash);
+ }
+diff --git a/crypto/nhpoly1305.c b/crypto/nhpoly1305.c
+index 9ab4e07cde4d..f6b6a52092b4 100644
+--- a/crypto/nhpoly1305.c
++++ b/crypto/nhpoly1305.c
+@@ -33,6 +33,7 @@
+ #include <asm/unaligned.h>
+ #include <crypto/algapi.h>
+ #include <crypto/internal/hash.h>
++#include <crypto/internal/poly1305.h>
+ #include <crypto/nhpoly1305.h>
+ #include <linux/crypto.h>
+ #include <linux/kernel.h>
+@@ -78,7 +79,7 @@ static void process_nh_hash_value(struct nhpoly1305_state *state,
+ 	BUILD_BUG_ON(NH_HASH_BYTES % POLY1305_BLOCK_SIZE != 0);
+ 
+ 	poly1305_core_blocks(&state->poly_state, &key->poly_key, state->nh_hash,
+-			     NH_HASH_BYTES / POLY1305_BLOCK_SIZE);
++			     NH_HASH_BYTES / POLY1305_BLOCK_SIZE, 1);
  }
  
--void crypto_chacha_init(u32 *state, const struct chacha_ctx *ctx, const u8 *iv)
+ /*
+diff --git a/crypto/poly1305_generic.c b/crypto/poly1305_generic.c
+index adc40298c749..067f493c2504 100644
+--- a/crypto/poly1305_generic.c
++++ b/crypto/poly1305_generic.c
+@@ -13,27 +13,12 @@
+ 
+ #include <crypto/algapi.h>
+ #include <crypto/internal/hash.h>
+-#include <crypto/poly1305.h>
++#include <crypto/internal/poly1305.h>
+ #include <linux/crypto.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <asm/unaligned.h>
+ 
+-static inline u64 mlt(u64 a, u64 b)
 -{
--	chacha_init_generic(state, ctx->key, iv);
+-	return a * b;
 -}
--EXPORT_SYMBOL_GPL(crypto_chacha_init);
 -
--int crypto_chacha20_setkey(struct crypto_skcipher *tfm, const u8 *key,
--			   unsigned int keysize)
-+static int crypto_chacha20_setkey(struct crypto_skcipher *tfm, const u8 *key,
-+				  unsigned int keysize)
+-static inline u32 sr(u64 v, u_char n)
+-{
+-	return v >> n;
+-}
+-
+-static inline u32 and(u32 v, u32 mask)
+-{
+-	return v & mask;
+-}
+-
+ int crypto_poly1305_init(struct shash_desc *desc)
  {
- 	return chacha_setkey(tfm, key, keysize, 20);
+ 	struct poly1305_desc_ctx *dctx = shash_desc_ctx(desc);
+@@ -47,124 +32,8 @@ int crypto_poly1305_init(struct shash_desc *desc)
  }
--EXPORT_SYMBOL_GPL(crypto_chacha20_setkey);
+ EXPORT_SYMBOL_GPL(crypto_poly1305_init);
  
--int crypto_chacha12_setkey(struct crypto_skcipher *tfm, const u8 *key,
--			   unsigned int keysize)
-+static int crypto_chacha12_setkey(struct crypto_skcipher *tfm, const u8 *key,
-+				 unsigned int keysize)
+-void poly1305_core_setkey(struct poly1305_key *key, const u8 *raw_key)
+-{
+-	/* r &= 0xffffffc0ffffffc0ffffffc0fffffff */
+-	key->r[0] = (get_unaligned_le32(raw_key +  0) >> 0) & 0x3ffffff;
+-	key->r[1] = (get_unaligned_le32(raw_key +  3) >> 2) & 0x3ffff03;
+-	key->r[2] = (get_unaligned_le32(raw_key +  6) >> 4) & 0x3ffc0ff;
+-	key->r[3] = (get_unaligned_le32(raw_key +  9) >> 6) & 0x3f03fff;
+-	key->r[4] = (get_unaligned_le32(raw_key + 12) >> 8) & 0x00fffff;
+-}
+-EXPORT_SYMBOL_GPL(poly1305_core_setkey);
+-
+-/*
+- * Poly1305 requires a unique key for each tag, which implies that we can't set
+- * it on the tfm that gets accessed by multiple users simultaneously. Instead we
+- * expect the key as the first 32 bytes in the update() call.
+- */
+-unsigned int crypto_poly1305_setdesckey(struct poly1305_desc_ctx *dctx,
+-					const u8 *src, unsigned int srclen)
+-{
+-	if (!dctx->sset) {
+-		if (!dctx->rset && srclen >= POLY1305_BLOCK_SIZE) {
+-			poly1305_core_setkey(&dctx->r, src);
+-			src += POLY1305_BLOCK_SIZE;
+-			srclen -= POLY1305_BLOCK_SIZE;
+-			dctx->rset = true;
+-		}
+-		if (srclen >= POLY1305_BLOCK_SIZE) {
+-			dctx->s[0] = get_unaligned_le32(src +  0);
+-			dctx->s[1] = get_unaligned_le32(src +  4);
+-			dctx->s[2] = get_unaligned_le32(src +  8);
+-			dctx->s[3] = get_unaligned_le32(src + 12);
+-			src += POLY1305_BLOCK_SIZE;
+-			srclen -= POLY1305_BLOCK_SIZE;
+-			dctx->sset = true;
+-		}
+-	}
+-	return srclen;
+-}
+-EXPORT_SYMBOL_GPL(crypto_poly1305_setdesckey);
+-
+-static void poly1305_blocks_internal(struct poly1305_state *state,
+-				     const struct poly1305_key *key,
+-				     const void *src, unsigned int nblocks,
+-				     u32 hibit)
+-{
+-	u32 r0, r1, r2, r3, r4;
+-	u32 s1, s2, s3, s4;
+-	u32 h0, h1, h2, h3, h4;
+-	u64 d0, d1, d2, d3, d4;
+-
+-	if (!nblocks)
+-		return;
+-
+-	r0 = key->r[0];
+-	r1 = key->r[1];
+-	r2 = key->r[2];
+-	r3 = key->r[3];
+-	r4 = key->r[4];
+-
+-	s1 = r1 * 5;
+-	s2 = r2 * 5;
+-	s3 = r3 * 5;
+-	s4 = r4 * 5;
+-
+-	h0 = state->h[0];
+-	h1 = state->h[1];
+-	h2 = state->h[2];
+-	h3 = state->h[3];
+-	h4 = state->h[4];
+-
+-	do {
+-		/* h += m[i] */
+-		h0 += (get_unaligned_le32(src +  0) >> 0) & 0x3ffffff;
+-		h1 += (get_unaligned_le32(src +  3) >> 2) & 0x3ffffff;
+-		h2 += (get_unaligned_le32(src +  6) >> 4) & 0x3ffffff;
+-		h3 += (get_unaligned_le32(src +  9) >> 6) & 0x3ffffff;
+-		h4 += (get_unaligned_le32(src + 12) >> 8) | hibit;
+-
+-		/* h *= r */
+-		d0 = mlt(h0, r0) + mlt(h1, s4) + mlt(h2, s3) +
+-		     mlt(h3, s2) + mlt(h4, s1);
+-		d1 = mlt(h0, r1) + mlt(h1, r0) + mlt(h2, s4) +
+-		     mlt(h3, s3) + mlt(h4, s2);
+-		d2 = mlt(h0, r2) + mlt(h1, r1) + mlt(h2, r0) +
+-		     mlt(h3, s4) + mlt(h4, s3);
+-		d3 = mlt(h0, r3) + mlt(h1, r2) + mlt(h2, r1) +
+-		     mlt(h3, r0) + mlt(h4, s4);
+-		d4 = mlt(h0, r4) + mlt(h1, r3) + mlt(h2, r2) +
+-		     mlt(h3, r1) + mlt(h4, r0);
+-
+-		/* (partial) h %= p */
+-		d1 += sr(d0, 26);     h0 = and(d0, 0x3ffffff);
+-		d2 += sr(d1, 26);     h1 = and(d1, 0x3ffffff);
+-		d3 += sr(d2, 26);     h2 = and(d2, 0x3ffffff);
+-		d4 += sr(d3, 26);     h3 = and(d3, 0x3ffffff);
+-		h0 += sr(d4, 26) * 5; h4 = and(d4, 0x3ffffff);
+-		h1 += h0 >> 26;       h0 = h0 & 0x3ffffff;
+-
+-		src += POLY1305_BLOCK_SIZE;
+-	} while (--nblocks);
+-
+-	state->h[0] = h0;
+-	state->h[1] = h1;
+-	state->h[2] = h2;
+-	state->h[3] = h3;
+-	state->h[4] = h4;
+-}
+-
+-void poly1305_core_blocks(struct poly1305_state *state,
+-			  const struct poly1305_key *key,
+-			  const void *src, unsigned int nblocks)
+-{
+-	poly1305_blocks_internal(state, key, src, nblocks, 1 << 24);
+-}
+-EXPORT_SYMBOL_GPL(poly1305_core_blocks);
+-
+-static void poly1305_blocks(struct poly1305_desc_ctx *dctx,
+-			    const u8 *src, unsigned int srclen, u32 hibit)
++static void poly1305_blocks(struct poly1305_desc_ctx *dctx, const u8 *src,
++			    unsigned int srclen)
  {
- 	return chacha_setkey(tfm, key, keysize, 12);
- }
--EXPORT_SYMBOL_GPL(crypto_chacha12_setkey);
+ 	unsigned int datalen;
  
--int crypto_chacha_crypt(struct skcipher_request *req)
-+static int crypto_chacha_crypt(struct skcipher_request *req)
+@@ -174,8 +43,8 @@ static void poly1305_blocks(struct poly1305_desc_ctx *dctx,
+ 		srclen = datalen;
+ 	}
+ 
+-	poly1305_blocks_internal(&dctx->h, &dctx->r,
+-				 src, srclen / POLY1305_BLOCK_SIZE, hibit);
++	poly1305_core_blocks(&dctx->h, &dctx->r, src,
++			     srclen / POLY1305_BLOCK_SIZE, 1);
+ }
+ 
+ int crypto_poly1305_update(struct shash_desc *desc,
+@@ -193,13 +62,13 @@ int crypto_poly1305_update(struct shash_desc *desc,
+ 
+ 		if (dctx->buflen == POLY1305_BLOCK_SIZE) {
+ 			poly1305_blocks(dctx, dctx->buf,
+-					POLY1305_BLOCK_SIZE, 1 << 24);
++					POLY1305_BLOCK_SIZE);
+ 			dctx->buflen = 0;
+ 		}
+ 	}
+ 
+ 	if (likely(srclen >= POLY1305_BLOCK_SIZE)) {
+-		poly1305_blocks(dctx, src, srclen, 1 << 24);
++		poly1305_blocks(dctx, src, srclen);
+ 		src += srclen - (srclen % POLY1305_BLOCK_SIZE);
+ 		srclen %= POLY1305_BLOCK_SIZE;
+ 	}
+@@ -213,54 +82,6 @@ int crypto_poly1305_update(struct shash_desc *desc,
+ }
+ EXPORT_SYMBOL_GPL(crypto_poly1305_update);
+ 
+-void poly1305_core_emit(const struct poly1305_state *state, void *dst)
+-{
+-	u32 h0, h1, h2, h3, h4;
+-	u32 g0, g1, g2, g3, g4;
+-	u32 mask;
+-
+-	/* fully carry h */
+-	h0 = state->h[0];
+-	h1 = state->h[1];
+-	h2 = state->h[2];
+-	h3 = state->h[3];
+-	h4 = state->h[4];
+-
+-	h2 += (h1 >> 26);     h1 = h1 & 0x3ffffff;
+-	h3 += (h2 >> 26);     h2 = h2 & 0x3ffffff;
+-	h4 += (h3 >> 26);     h3 = h3 & 0x3ffffff;
+-	h0 += (h4 >> 26) * 5; h4 = h4 & 0x3ffffff;
+-	h1 += (h0 >> 26);     h0 = h0 & 0x3ffffff;
+-
+-	/* compute h + -p */
+-	g0 = h0 + 5;
+-	g1 = h1 + (g0 >> 26);             g0 &= 0x3ffffff;
+-	g2 = h2 + (g1 >> 26);             g1 &= 0x3ffffff;
+-	g3 = h3 + (g2 >> 26);             g2 &= 0x3ffffff;
+-	g4 = h4 + (g3 >> 26) - (1 << 26); g3 &= 0x3ffffff;
+-
+-	/* select h if h < p, or h + -p if h >= p */
+-	mask = (g4 >> ((sizeof(u32) * 8) - 1)) - 1;
+-	g0 &= mask;
+-	g1 &= mask;
+-	g2 &= mask;
+-	g3 &= mask;
+-	g4 &= mask;
+-	mask = ~mask;
+-	h0 = (h0 & mask) | g0;
+-	h1 = (h1 & mask) | g1;
+-	h2 = (h2 & mask) | g2;
+-	h3 = (h3 & mask) | g3;
+-	h4 = (h4 & mask) | g4;
+-
+-	/* h = h % (2^128) */
+-	put_unaligned_le32((h0 >>  0) | (h1 << 26), dst +  0);
+-	put_unaligned_le32((h1 >>  6) | (h2 << 20), dst +  4);
+-	put_unaligned_le32((h2 >> 12) | (h3 << 14), dst +  8);
+-	put_unaligned_le32((h3 >> 18) | (h4 <<  8), dst + 12);
+-}
+-EXPORT_SYMBOL_GPL(poly1305_core_emit);
+-
+ int crypto_poly1305_final(struct shash_desc *desc, u8 *dst)
  {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
+ 	struct poly1305_desc_ctx *dctx = shash_desc_ctx(desc);
+@@ -274,7 +95,7 @@ int crypto_poly1305_final(struct shash_desc *desc, u8 *dst)
+ 		dctx->buf[dctx->buflen++] = 1;
+ 		memset(dctx->buf + dctx->buflen, 0,
+ 		       POLY1305_BLOCK_SIZE - dctx->buflen);
+-		poly1305_blocks(dctx, dctx->buf, POLY1305_BLOCK_SIZE, 0);
++		poly1305_core_blocks(&dctx->h, &dctx->r, dctx->buf, 1, 0);
+ 	}
  
- 	return chacha_stream_xor(req, ctx, req->iv);
- }
--EXPORT_SYMBOL_GPL(crypto_chacha_crypt);
- 
--int crypto_xchacha_crypt(struct skcipher_request *req)
-+static int crypto_xchacha_crypt(struct skcipher_request *req)
- {
- 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
- 	struct chacha_ctx *ctx = crypto_skcipher_ctx(tfm);
-@@ -75,7 +66,7 @@ int crypto_xchacha_crypt(struct skcipher_request *req)
- 	u8 real_iv[16];
- 
- 	/* Compute the subkey given the original key and first 128 nonce bits */
--	crypto_chacha_init(state, ctx, req->iv);
-+	chacha_init_generic(state, ctx->key, req->iv);
- 	hchacha_block_generic(state, subctx.key, ctx->nrounds);
- 	subctx.nrounds = ctx->nrounds;
- 
-@@ -86,7 +77,6 @@ int crypto_xchacha_crypt(struct skcipher_request *req)
- 	/* Generate the stream and XOR it with the data */
- 	return chacha_stream_xor(req, &subctx, real_iv);
- }
--EXPORT_SYMBOL_GPL(crypto_xchacha_crypt);
- 
- static struct skcipher_alg algs[] = {
- 	{
-diff --git a/include/crypto/internal/chacha.h b/include/crypto/internal/chacha.h
-index c0e40b245431..aa5d4a16aac5 100644
---- a/include/crypto/internal/chacha.h
-+++ b/include/crypto/internal/chacha.h
-@@ -12,8 +12,6 @@ struct chacha_ctx {
- 	int nrounds;
+ 	poly1305_core_emit(&dctx->h, digest);
+diff --git a/include/crypto/internal/poly1305.h b/include/crypto/internal/poly1305.h
+new file mode 100644
+index 000000000000..cb58e61f73a7
+--- /dev/null
++++ b/include/crypto/internal/poly1305.h
+@@ -0,0 +1,67 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Common values for the Poly1305 algorithm
++ */
++
++#ifndef _CRYPTO_INTERNAL_POLY1305_H
++#define _CRYPTO_INTERNAL_POLY1305_H
++
++#include <asm/unaligned.h>
++#include <linux/types.h>
++#include <crypto/poly1305.h>
++
++struct shash_desc;
++
++/*
++ * Poly1305 core functions.  These implement the ε-almost-∆-universal hash
++ * function underlying the Poly1305 MAC, i.e. they don't add an encrypted nonce
++ * ("s key") at the end.  They also only support block-aligned inputs.
++ */
++void poly1305_core_setkey(struct poly1305_key *key, const u8 *raw_key);
++static inline void poly1305_core_init(struct poly1305_state *state)
++{
++	*state = (struct poly1305_state){};
++}
++
++void poly1305_core_blocks(struct poly1305_state *state,
++			  const struct poly1305_key *key, const void *src,
++			  unsigned int nblocks, u32 hibit);
++void poly1305_core_emit(const struct poly1305_state *state, void *dst);
++
++/* Crypto API helper functions for the Poly1305 MAC */
++int crypto_poly1305_init(struct shash_desc *desc);
++
++int crypto_poly1305_update(struct shash_desc *desc,
++			   const u8 *src, unsigned int srclen);
++int crypto_poly1305_final(struct shash_desc *desc, u8 *dst);
++
++/*
++ * Poly1305 requires a unique key for each tag, which implies that we can't set
++ * it on the tfm that gets accessed by multiple users simultaneously. Instead we
++ * expect the key as the first 32 bytes in the update() call.
++ */
++static inline
++unsigned int crypto_poly1305_setdesckey(struct poly1305_desc_ctx *dctx,
++					const u8 *src, unsigned int srclen)
++{
++	if (!dctx->sset) {
++		if (!dctx->rset && srclen >= POLY1305_BLOCK_SIZE) {
++			poly1305_core_setkey(&dctx->r, src);
++			src += POLY1305_BLOCK_SIZE;
++			srclen -= POLY1305_BLOCK_SIZE;
++			dctx->rset = true;
++		}
++		if (srclen >= POLY1305_BLOCK_SIZE) {
++			dctx->s[0] = get_unaligned_le32(src +  0);
++			dctx->s[1] = get_unaligned_le32(src +  4);
++			dctx->s[2] = get_unaligned_le32(src +  8);
++			dctx->s[3] = get_unaligned_le32(src + 12);
++			src += POLY1305_BLOCK_SIZE;
++			srclen -= POLY1305_BLOCK_SIZE;
++			dctx->sset = true;
++		}
++	}
++	return srclen;
++}
++
++#endif
+diff --git a/include/crypto/poly1305.h b/include/crypto/poly1305.h
+index 34317ed2071e..f5a4319c2a1f 100644
+--- a/include/crypto/poly1305.h
++++ b/include/crypto/poly1305.h
+@@ -38,27 +38,4 @@ struct poly1305_desc_ctx {
+ 	bool sset;
  };
  
--void crypto_chacha_init(u32 *state, const struct chacha_ctx *ctx, const u8 *iv);
+-/*
+- * Poly1305 core functions.  These implement the ε-almost-∆-universal hash
+- * function underlying the Poly1305 MAC, i.e. they don't add an encrypted nonce
+- * ("s key") at the end.  They also only support block-aligned inputs.
+- */
+-void poly1305_core_setkey(struct poly1305_key *key, const u8 *raw_key);
+-static inline void poly1305_core_init(struct poly1305_state *state)
+-{
+-	memset(state->h, 0, sizeof(state->h));
+-}
+-void poly1305_core_blocks(struct poly1305_state *state,
+-			  const struct poly1305_key *key,
+-			  const void *src, unsigned int nblocks);
+-void poly1305_core_emit(const struct poly1305_state *state, void *dst);
 -
- static inline int chacha_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 				unsigned int keysize, int nrounds)
- {
-@@ -42,12 +40,4 @@ static int inline chacha12_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 	return chacha_setkey(tfm, key, keysize, 12);
- }
+-/* Crypto API helper functions for the Poly1305 MAC */
+-int crypto_poly1305_init(struct shash_desc *desc);
+-unsigned int crypto_poly1305_setdesckey(struct poly1305_desc_ctx *dctx,
+-					const u8 *src, unsigned int srclen);
+-int crypto_poly1305_update(struct shash_desc *desc,
+-			   const u8 *src, unsigned int srclen);
+-int crypto_poly1305_final(struct shash_desc *desc, u8 *dst);
+-
+ #endif
+diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
+index 6a11931ae105..c4882d29879e 100644
+--- a/lib/crypto/Kconfig
++++ b/lib/crypto/Kconfig
+@@ -37,5 +37,8 @@ config CRYPTO_LIB_CHACHA
+ config CRYPTO_LIB_DES
+ 	tristate
  
--int crypto_chacha20_setkey(struct crypto_skcipher *tfm, const u8 *key,
--			   unsigned int keysize);
--int crypto_chacha12_setkey(struct crypto_skcipher *tfm, const u8 *key,
--			   unsigned int keysize);
--
--int crypto_chacha_crypt(struct skcipher_request *req);
--int crypto_xchacha_crypt(struct skcipher_request *req);
--
- #endif /* _CRYPTO_CHACHA_H */
++config CRYPTO_LIB_POLY1305_GENERIC
++	tristate
++
+ config CRYPTO_LIB_SHA256
+ 	tristate
+diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
+index 0ce40604e104..b58ab6843a9d 100644
+--- a/lib/crypto/Makefile
++++ b/lib/crypto/Makefile
+@@ -13,5 +13,8 @@ libarc4-y					:= arc4.o
+ obj-$(CONFIG_CRYPTO_LIB_DES)			+= libdes.o
+ libdes-y					:= des.o
+ 
++obj-$(CONFIG_CRYPTO_LIB_POLY1305_GENERIC)	+= libpoly1305.o
++libpoly1305-y					:= poly1305.o
++
+ obj-$(CONFIG_CRYPTO_LIB_SHA256)			+= libsha256.o
+ libsha256-y					:= sha256.o
+diff --git a/lib/crypto/poly1305.c b/lib/crypto/poly1305.c
+new file mode 100644
+index 000000000000..f019a57dbc1b
+--- /dev/null
++++ b/lib/crypto/poly1305.c
+@@ -0,0 +1,158 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ * Poly1305 authenticator algorithm, RFC7539
++ *
++ * Copyright (C) 2015 Martin Willi
++ *
++ * Based on public domain code by Andrew Moon and Daniel J. Bernstein.
++ */
++
++#include <crypto/internal/poly1305.h>
++#include <linux/kernel.h>
++#include <linux/module.h>
++#include <asm/unaligned.h>
++
++static inline u64 mlt(u64 a, u64 b)
++{
++	return a * b;
++}
++
++static inline u32 sr(u64 v, u_char n)
++{
++	return v >> n;
++}
++
++static inline u32 and(u32 v, u32 mask)
++{
++	return v & mask;
++}
++
++void poly1305_core_setkey(struct poly1305_key *key, const u8 *raw_key)
++{
++	/* r &= 0xffffffc0ffffffc0ffffffc0fffffff */
++	key->r[0] = (get_unaligned_le32(raw_key +  0) >> 0) & 0x3ffffff;
++	key->r[1] = (get_unaligned_le32(raw_key +  3) >> 2) & 0x3ffff03;
++	key->r[2] = (get_unaligned_le32(raw_key +  6) >> 4) & 0x3ffc0ff;
++	key->r[3] = (get_unaligned_le32(raw_key +  9) >> 6) & 0x3f03fff;
++	key->r[4] = (get_unaligned_le32(raw_key + 12) >> 8) & 0x00fffff;
++}
++EXPORT_SYMBOL_GPL(poly1305_core_setkey);
++
++void poly1305_core_blocks(struct poly1305_state *state,
++			  const struct poly1305_key *key, const void *src,
++			  unsigned int nblocks, u32 hibit)
++{
++	u32 r0, r1, r2, r3, r4;
++	u32 s1, s2, s3, s4;
++	u32 h0, h1, h2, h3, h4;
++	u64 d0, d1, d2, d3, d4;
++
++	if (!nblocks)
++		return;
++
++	r0 = key->r[0];
++	r1 = key->r[1];
++	r2 = key->r[2];
++	r3 = key->r[3];
++	r4 = key->r[4];
++
++	s1 = r1 * 5;
++	s2 = r2 * 5;
++	s3 = r3 * 5;
++	s4 = r4 * 5;
++
++	h0 = state->h[0];
++	h1 = state->h[1];
++	h2 = state->h[2];
++	h3 = state->h[3];
++	h4 = state->h[4];
++
++	do {
++		/* h += m[i] */
++		h0 += (get_unaligned_le32(src +  0) >> 0) & 0x3ffffff;
++		h1 += (get_unaligned_le32(src +  3) >> 2) & 0x3ffffff;
++		h2 += (get_unaligned_le32(src +  6) >> 4) & 0x3ffffff;
++		h3 += (get_unaligned_le32(src +  9) >> 6) & 0x3ffffff;
++		h4 += (get_unaligned_le32(src + 12) >> 8) | (hibit << 24);
++
++		/* h *= r */
++		d0 = mlt(h0, r0) + mlt(h1, s4) + mlt(h2, s3) +
++		     mlt(h3, s2) + mlt(h4, s1);
++		d1 = mlt(h0, r1) + mlt(h1, r0) + mlt(h2, s4) +
++		     mlt(h3, s3) + mlt(h4, s2);
++		d2 = mlt(h0, r2) + mlt(h1, r1) + mlt(h2, r0) +
++		     mlt(h3, s4) + mlt(h4, s3);
++		d3 = mlt(h0, r3) + mlt(h1, r2) + mlt(h2, r1) +
++		     mlt(h3, r0) + mlt(h4, s4);
++		d4 = mlt(h0, r4) + mlt(h1, r3) + mlt(h2, r2) +
++		     mlt(h3, r1) + mlt(h4, r0);
++
++		/* (partial) h %= p */
++		d1 += sr(d0, 26);     h0 = and(d0, 0x3ffffff);
++		d2 += sr(d1, 26);     h1 = and(d1, 0x3ffffff);
++		d3 += sr(d2, 26);     h2 = and(d2, 0x3ffffff);
++		d4 += sr(d3, 26);     h3 = and(d3, 0x3ffffff);
++		h0 += sr(d4, 26) * 5; h4 = and(d4, 0x3ffffff);
++		h1 += h0 >> 26;       h0 = h0 & 0x3ffffff;
++
++		src += POLY1305_BLOCK_SIZE;
++	} while (--nblocks);
++
++	state->h[0] = h0;
++	state->h[1] = h1;
++	state->h[2] = h2;
++	state->h[3] = h3;
++	state->h[4] = h4;
++}
++EXPORT_SYMBOL_GPL(poly1305_core_blocks);
++
++void poly1305_core_emit(const struct poly1305_state *state, void *dst)
++{
++	u32 h0, h1, h2, h3, h4;
++	u32 g0, g1, g2, g3, g4;
++	u32 mask;
++
++	/* fully carry h */
++	h0 = state->h[0];
++	h1 = state->h[1];
++	h2 = state->h[2];
++	h3 = state->h[3];
++	h4 = state->h[4];
++
++	h2 += (h1 >> 26);     h1 = h1 & 0x3ffffff;
++	h3 += (h2 >> 26);     h2 = h2 & 0x3ffffff;
++	h4 += (h3 >> 26);     h3 = h3 & 0x3ffffff;
++	h0 += (h4 >> 26) * 5; h4 = h4 & 0x3ffffff;
++	h1 += (h0 >> 26);     h0 = h0 & 0x3ffffff;
++
++	/* compute h + -p */
++	g0 = h0 + 5;
++	g1 = h1 + (g0 >> 26);             g0 &= 0x3ffffff;
++	g2 = h2 + (g1 >> 26);             g1 &= 0x3ffffff;
++	g3 = h3 + (g2 >> 26);             g2 &= 0x3ffffff;
++	g4 = h4 + (g3 >> 26) - (1 << 26); g3 &= 0x3ffffff;
++
++	/* select h if h < p, or h + -p if h >= p */
++	mask = (g4 >> ((sizeof(u32) * 8) - 1)) - 1;
++	g0 &= mask;
++	g1 &= mask;
++	g2 &= mask;
++	g3 &= mask;
++	g4 &= mask;
++	mask = ~mask;
++	h0 = (h0 & mask) | g0;
++	h1 = (h1 & mask) | g1;
++	h2 = (h2 & mask) | g2;
++	h3 = (h3 & mask) | g3;
++	h4 = (h4 & mask) | g4;
++
++	/* h = h % (2^128) */
++	put_unaligned_le32((h0 >>  0) | (h1 << 26), dst +  0);
++	put_unaligned_le32((h1 >>  6) | (h2 << 20), dst +  4);
++	put_unaligned_le32((h2 >> 12) | (h3 << 14), dst +  8);
++	put_unaligned_le32((h3 >> 18) | (h4 <<  8), dst + 12);
++}
++EXPORT_SYMBOL_GPL(poly1305_core_emit);
++
++MODULE_LICENSE("GPL");
++MODULE_AUTHOR("Martin Willi <martin@strongswan.org>");
 -- 
 2.20.1
 
