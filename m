@@ -2,152 +2,152 @@ Return-Path: <SRS0=z9QW=ZB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 713D2C43331
-	for <linux-crypto@archiver.kernel.org>; Sat,  9 Nov 2019 06:23:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92B76C17440
+	for <linux-crypto@archiver.kernel.org>; Sat,  9 Nov 2019 06:36:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3297121848
-	for <linux-crypto@archiver.kernel.org>; Sat,  9 Nov 2019 06:23:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 611E321882
+	for <linux-crypto@archiver.kernel.org>; Sat,  9 Nov 2019 06:36:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=microchiptechnology.onmicrosoft.com header.i=@microchiptechnology.onmicrosoft.com header.b="cLL+mO8f"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qzu+cLoM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726092AbfKIGXd (ORCPT
+        id S1726111AbfKIGgc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 9 Nov 2019 01:23:33 -0500
-Received: from esa5.microchip.iphmx.com ([216.71.150.166]:52974 "EHLO
-        esa5.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725861AbfKIGXd (ORCPT
+        Sat, 9 Nov 2019 01:36:32 -0500
+Received: from mail-wr1-f49.google.com ([209.85.221.49]:42555 "EHLO
+        mail-wr1-f49.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725861AbfKIGgb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 9 Nov 2019 01:23:33 -0500
-Received-SPF: Pass (esa5.microchip.iphmx.com: domain of
-  Tudor.Ambarus@microchip.com designates 198.175.253.82 as
-  permitted sender) identity=mailfrom;
-  client-ip=198.175.253.82; receiver=esa5.microchip.iphmx.com;
-  envelope-from="Tudor.Ambarus@microchip.com";
-  x-sender="Tudor.Ambarus@microchip.com";
-  x-conformance=spf_only; x-record-type="v=spf1";
-  x-record-text="v=spf1 mx a:ushub1.microchip.com
-  a:smtpout.microchip.com a:mx1.microchip.iphmx.com
-  a:mx2.microchip.iphmx.com include:servers.mcsv.net
-  include:mktomail.com include:spf.protection.outlook.com ~all"
-Received-SPF: None (esa5.microchip.iphmx.com: no sender
-  authenticity information available from domain of
-  postmaster@email.microchip.com) identity=helo;
-  client-ip=198.175.253.82; receiver=esa5.microchip.iphmx.com;
-  envelope-from="Tudor.Ambarus@microchip.com";
-  x-sender="postmaster@email.microchip.com";
-  x-conformance=spf_only
-Authentication-Results: esa5.microchip.iphmx.com; spf=Pass smtp.mailfrom=Tudor.Ambarus@microchip.com; spf=None smtp.helo=postmaster@email.microchip.com; dkim=pass (signature verified) header.i=@microchiptechnology.onmicrosoft.com; dmarc=pass (p=none dis=none) d=microchip.com
-IronPort-SDR: 7P1/hi4SilswJRNBQ86Y1VW8zjgvKQFi9McEEFFWKJRZTm41OfY1R3UMPl8mzF1N85U4kHZOIJ
- uWBIipppkIEArQ+rys2Ax5bBARvXdTIEIMBX910JdEs1HHuGM/8xUm8NLdit1zYCMlG4XIl+O6
- WKm23w5ULFaNyl5PxbSp/EuVYOhfR5G0AkO62wws/4IOW04nwGtaxe9gYcTvBVZTERDrSnA+Xv
- euvuI/QGb4H1RlWReOm0ODCJ/nIGpWQWM756HFuYhBL4nw6vcWeq+DHFdB+Z1ZDBgq5jQxIDqB
- EO4=
-X-IronPort-AV: E=Sophos;i="5.68,283,1569308400"; 
-   d="scan'208";a="54800979"
-Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 08 Nov 2019 23:23:33 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Fri, 8 Nov 2019 23:23:09 -0700
-Received: from NAM04-BN3-obe.outbound.protection.outlook.com (10.10.215.89) by
- email.microchip.com (10.10.87.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5
- via Frontend Transport; Fri, 8 Nov 2019 23:23:08 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=S/W2bsQtGD507YM4AFWMhBzLZlrGeldlzJtZC4elmQg5XI00BMSLn3Le3LABifPcLPCUlHftSgNSEFjhbsIbifxBny4Be376zU9mK4muaCHUy8l+EDe3z9X9pUCFimxIBSYbga+JfxTxZZMku+uZ4jzoJLSY10BhQTP7amfm7AyDbWQi/YznfRBB8q5FWOXD2EJMagYgVvnUfpGKk1LL8jGkpVnLVy1GBGV8cVazH8IcKTKh8aeNqEg/shsmS+O4v8o7U/iNNAiK/PDTUE662MsHGlhLHvM/DnIbOm2AiEt2wjv1xMo77/vg/cq5cg2jxqCbmKkJ6n9n01EWgG+gzQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5Kmagvn7nV6sSDSgnw4oXYs1P7kYkfwJkcJhLJyvKQc=;
- b=JWOSCgT15yZhENwsSk5c44Vd4UB7SC5hFnHHm5PRNED3S9AYepu7u91gz4GVvf5TrHrUafoWDrEbvzKUSi2PmKqiWYC64S73u1a60WcFwdX3PfGCrZqw50/tIUS4UDa258e8wISRh9DwiCnbRNYbJNyLKLMMhMv8zNbZzY4SV/mNx5mc8Qawpnhr/RCIo0F4lms/o6SqbqsnrpGiN8cF8rXJptLy/BIlpRdABfbwaQWN4i8tthAt7lJfNmOqBqW822OaxXGO/YtuxCqcGwiy8A+DxyxgOZR1zuYqfZu2ikYL/VyCC8IQweJ+8+Prr64V94u/kwfFdiGJfMshkaPetQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+        Sat, 9 Nov 2019 01:36:31 -0500
+Received: by mail-wr1-f49.google.com with SMTP id a15so9314959wrf.9
+        for <linux-crypto@vger.kernel.org>; Fri, 08 Nov 2019 22:36:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=microchiptechnology.onmicrosoft.com;
- s=selector2-microchiptechnology-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5Kmagvn7nV6sSDSgnw4oXYs1P7kYkfwJkcJhLJyvKQc=;
- b=cLL+mO8fpJxjVO5kV7SJuhTbobKlDf4QC4G44LUBHbYzBo7sVAgAL8X93V+JxfV/1IdC174qOeR1BOSYisctIZr166TFTW1dS6CwYbHwYJVQb0y5slo1jWmtxo3qsRM89M778snPEl5AIwHh74MlJkZEbsq0TYZbeI7TPthaqg8=
-Received: from MN2PR11MB4448.namprd11.prod.outlook.com (52.135.39.157) by
- MN2PR11MB4287.namprd11.prod.outlook.com (52.135.37.17) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2430.20; Sat, 9 Nov 2019 06:23:06 +0000
-Received: from MN2PR11MB4448.namprd11.prod.outlook.com
- ([fe80::c09c:36c8:3301:4457]) by MN2PR11MB4448.namprd11.prod.outlook.com
- ([fe80::c09c:36c8:3301:4457%5]) with mapi id 15.20.2430.023; Sat, 9 Nov 2019
- 06:23:06 +0000
-From:   <Tudor.Ambarus@microchip.com>
-To:     <ardb@kernel.org>, <linux-crypto@vger.kernel.org>
-CC:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <ebiggers@google.com>, <linux-arm-kernel@lists.infradead.org>,
-        <Nicolas.Ferre@microchip.com>, <alexandre.belloni@bootlin.com>,
-        <Ludovic.Desroches@microchip.com>
-Subject: Re: [PATCH v3 08/29] crypto: atmel-aes - switch to skcipher API
-Thread-Topic: [PATCH v3 08/29] crypto: atmel-aes - switch to skcipher API
-Thread-Index: AQHVk90MoVdSv33QXUOLAx243AJe1aeCZIaA
-Date:   Sat, 9 Nov 2019 06:23:06 +0000
-Message-ID: <fe064b41-94b8-1695-dc43-da8e151c77a8@microchip.com>
-References: <20191105132826.1838-1-ardb@kernel.org>
- <20191105132826.1838-9-ardb@kernel.org>
-In-Reply-To: <20191105132826.1838-9-ardb@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-clientproxiedby: VI1P193CA0020.EURP193.PROD.OUTLOOK.COM
- (2603:10a6:800:bd::30) To MN2PR11MB4448.namprd11.prod.outlook.com
- (2603:10b6:208:193::29)
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [5.12.60.46]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 12942c85-b92f-463e-31f1-08d764dd484e
-x-ms-traffictypediagnostic: MN2PR11MB4287:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MN2PR11MB4287484895CDD852CC7C67DDF07A0@MN2PR11MB4287.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:5797;
-x-forefront-prvs: 021670B4D2
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(396003)(346002)(136003)(39860400002)(376002)(366004)(189003)(199004)(31696002)(71190400001)(6506007)(107886003)(71200400001)(486006)(76176011)(102836004)(2906002)(53546011)(99286004)(386003)(31686004)(11346002)(7736002)(2501003)(446003)(476003)(26005)(25786009)(36756003)(2616005)(66066001)(305945005)(4326008)(86362001)(6436002)(6116002)(3846002)(66476007)(66556008)(64756008)(14454004)(478600001)(186003)(6512007)(8936002)(66446008)(316002)(8676002)(81156014)(81166006)(256004)(229853002)(5660300002)(66946007)(6486002)(110136005)(4744005)(54906003)(6246003)(52116002);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR11MB4287;H:MN2PR11MB4448.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: microchip.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: MVvZoBTFKoULtxgHlz1q0yxbO4CjxYR67tbHxgqCgzFWL0J2F93vb5B3Oz7EVuBR/WtwQLt633qSybqvXDoaZfAE5IepO1aLl5w+6FV+55LcuXw3VqM3JccEtZYBsWQxX4hF+BrywE/LpC3PCQJCkpLpjGBdF+u+H5OKLWc4QymWIgzzD/rgeZSXXOm0NQiaar/C+hGbgG/wgYt1FXptAttv1KgDi53DQbqngH73elaazJwRH880TruPYfZLf2Y/hgC6ml3YUvVCrOK1VqFcm54l3WJOGN6G0ClA7nYuPjz45QOGiq3nx3zyd62ITrK6GayDKc64Sz/1HplnAj/0LWWx8PyWldAFkaMV99og89LGzwazFKv1sZEyh1qmNOYYLBP/3q3TpmbYDPI63OvPvP/TqgYdvWZylApA/U5PO2Aj9eVCMZVGt3KlZskCzXdH
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <693EBB30A4E23D42BF49A30252435200@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=bRbMBT5BGFdZ7hjiEjksJO2VlNdac8E3y7B9gDKQGiA=;
+        b=Qzu+cLoMCEoaiH/wuRIoRdKso65PS5Ou76cODP0bFSdGr6WdoW+qR4s0GwOuMzwOAw
+         6zPHXmbhnyQlXbAVbylI1PpLhI2l0bx8bCo2n4CSW56VsEVW4RU/hQajhvOk3M8Vk78D
+         9lveO47Ph5iUiG5PKagCMjGD2b1j0NW3t0+n36qG2gSE6mTFatuOtceaxlOpo9L+gH7y
+         GZ25VexgavIcj/4r21NsI0ebUr9lRenNYIIIxvcyJtouAEIsBuUDID6QygmMHz8y0jyG
+         cuWRTZWl7OXDeHY9HJSNJIo9lqYppZw5w4FnEB+LVXIzNSKSSzpdGodYpMApE+qayjDE
+         5+Hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=bRbMBT5BGFdZ7hjiEjksJO2VlNdac8E3y7B9gDKQGiA=;
+        b=fZkZvcxQy3aB4tnPeBXpWbeswNK1+S/LO1h7/+pOsyI8v2IAzwTum/tklCGMn8lnXb
+         C7WQNZbaXrJ5h2PywolfJDsnBmx9xjXy1dQlCm0q+X2etZhr8BRbGo8MT6ZWPfxUfa1e
+         pS6V/Lo0hp2va6zI/cG3/p28lBtRsIr+no7FZSQIBbEgoxyh8FShQz7qIggqClvU5V/P
+         s2YOyh4OndOazGF1/+PfTAIiOUN4ghtnki7Kr+yKr2h2HGZYYOsFKb1I2ZqFwaZKASC7
+         HJWSCpw/aN6AId/ldT61htNESglgGZQWJheTLtQayD7H6NVuNDbyG5aZhsGQKmCnvIJ0
+         lYkA==
+X-Gm-Message-State: APjAAAVgbX12FbB314omNaLkYdsSwtyimJ1DtF017dEoKevSBAGMFQsn
+        pF7AZyGKSb5xnqRZ/+P5PIEn+yt49YvVi9BaFHQ=
+X-Google-Smtp-Source: APXvYqx38PFiauwAnXlk/XAaoHI8lkz+ln3UnDLwuCaxkR6YvyjpwDnJBBSrO9e26oJzA6lIj1+o8+V7UyAIub6s5MY=
+X-Received: by 2002:a5d:4803:: with SMTP id l3mr11870708wrq.381.1573281388025;
+ Fri, 08 Nov 2019 22:36:28 -0800 (PST)
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: 12942c85-b92f-463e-31f1-08d764dd484e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Nov 2019 06:23:06.1897
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: VBR2COXkn4mw7mac076AiDmjxb/HCPvLLPAZVsqIWNZ7XUUKiQNCzFXXXiK0BSrsjS6YOwoe72Fw+BI7kaZGVFEw3oPchVvCcTliopN08Rc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4287
+References: <XnsAB01A0BBA9FB8fgotham@195.159.176.226> <20191109050353.GD23325@mit.edu>
+In-Reply-To: <20191109050353.GD23325@mit.edu>
+From:   Sandy Harris <sandyinchina@gmail.com>
+Date:   Sat, 9 Nov 2019 14:36:14 +0800
+Message-ID: <CACXcFmmFH0Bg3O98XOt-vaS4=fwDQxfnuUtgHZxp7hDswAdfTQ@mail.gmail.com>
+Subject: Re: Remove PRNG from Linux Kernel
+To:     "Theodore Y. Ts'o" <tytso@mit.edu>
+Cc:     Frederick Gotham <cauldwell.thomas@gmail.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-DQoNCk9uIDExLzA1LzIwMTkgMDM6MjggUE0sIEFyZCBCaWVzaGV1dmVsIHdyb3RlOg0KPiBDb21t
-aXQgN2E3ZmZlNjVjOGM1ICgiY3J5cHRvOiBza2NpcGhlciAtIEFkZCB0b3AtbGV2ZWwgc2tjaXBo
-ZXIgaW50ZXJmYWNlIikNCj4gZGF0ZWQgMjAgYXVndXN0IDIwMTUgaW50cm9kdWNlZCB0aGUgbmV3
-IHNrY2lwaGVyIEFQSSB3aGljaCBpcyBzdXBwb3NlZCB0bw0KPiByZXBsYWNlIGJvdGggYmxrY2lw
-aGVyIGFuZCBhYmxrY2lwaGVyLiBXaGlsZSBhbGwgY29uc3VtZXJzIG9mIHRoZSBBUEkgaGF2ZQ0K
-PiBiZWVuIGNvbnZlcnRlZCBsb25nIGFnbywgc29tZSBwcm9kdWNlcnMgb2YgdGhlIGFibGtjaXBo
-ZXIgcmVtYWluLCBmb3JjaW5nDQo+IHVzIHRvIGtlZXAgdGhlIGFibGtjaXBoZXIgc3VwcG9ydCBy
-b3V0aW5lcyBhbGl2ZSwgYWxvbmcgd2l0aCB0aGUgbWF0Y2hpbmcNCj4gY29kZSB0byBleHBvc2Ug
-W2FdYmxrY2lwaGVycyB2aWEgdGhlIHNrY2lwaGVyIEFQSS4NCj4gDQo+IFNvIHN3aXRjaCB0aGlz
-IGRyaXZlciB0byB0aGUgc2tjaXBoZXIgQVBJLCBhbGxvd2luZyB1cyB0byBmaW5hbGx5IGRyb3Ag
-dGhlDQo+IGJsa2NpcGhlciBjb2RlIGluIHRoZSBuZWFyIGZ1dHVyZS4NCj4gDQo+IENjOiBOaWNv
-bGFzIEZlcnJlIDxuaWNvbGFzLmZlcnJlQG1pY3JvY2hpcC5jb20+DQo+IENjOiBBbGV4YW5kcmUg
-QmVsbG9uaSA8YWxleGFuZHJlLmJlbGxvbmlAYm9vdGxpbi5jb20+DQo+IENjOiBMdWRvdmljIERl
-c3JvY2hlcyA8bHVkb3ZpYy5kZXNyb2NoZXNAbWljcm9jaGlwLmNvbT4NCj4gU2lnbmVkLW9mZi1i
-eTogQXJkIEJpZXNoZXV2ZWwgPGFyZGJAa2VybmVsLm9yZz4NCg0KVGVzdGVkLWJ5OiBUdWRvciBB
-bWJhcnVzIDx0dWRvci5hbWJhcnVzQG1pY3JvY2hpcC5jb20+DQo=
+Theodore Y. Ts'o <tytso@mit.edu> wrote:
+
+> On Fri, Nov 08, 2019 at 03:48:02PM -0000, Frederick Gotham wrote:
+> >
+> > There cannot be any software-based psuedo-random number generators on my
+> > device, and so far I've removed three of them:
+> >
+> > (1) The built-in PRNG inside OpenSSL
+> > (2) The Intel RDRAND engine inside OpenSSL
+> > (3) The simulator library that goes with the tpm2tss engine for OpenSSL
+> > (tcti-mssim)
+>
+> Why must there not be a "pseudo-random number generator"?  Who made
+> that rule?  What is the goal of not allowing such a thing?
+
+I assume the reason is that you have very high security requirements.
+
+If so, replacing PRNGs with something hardware-based may be a
+reasonable idea. However, that does not seem entirely clear, given
+that well-implemented & well-seeded PRNGs have been shown to
+be adequate for crypto purposes, e.g. in Schneier et al's Yarrow
+paper.
+
+> Note that in general, most people would not refer to such things as a
+> "PRNG", but a Cryptographic Random Number Generator (CRNG).  And in
+> general, it's considered a very good thing put a CRNG in front of a
+> hardware random number generator for several reasons:
+>
+>   (1) Hardware random number generators, including TPM-based RNG's are
+>       slow, and
+>
+>   (2) using a hardware RNG directly means you are investing all of
+>       your trust in the hardware RNG --- and hardware RNG have been known to
+>       have their share of insecurities.
+
+Yes, putting a mixer in front of an HRNG is almost always a good idea.
+Since Linux has a built-in mixer, you might as well use that.
+
+> What makes you so sure that the you can trust the implementation of
+> the TPM's random number generator?
+>
+> Far better is to mix multiple entropy sources together, so that if one
+> happens to be insecure, or has failed in some way, you still will have
+> protection from the other entropy sources.
+>
+> > I need to remove the PRNG from the Linux kernel and replace it with something
+> > that interfaces directly with the TPM2 chip.
+
+Far better, I'd say to arrange for the chip to reseed the random(4) driver.
+
+If you really don't want to ever use any CRNG, then either remove the
+/dev/urandom interface or make it a link to /dev/random. I do not
+think that is either necessary or a good idea, but it is possible & does
+not require messing with the kernel.
+
+> > Has this been done before?
+>
+> As far as I know, no, because most people would consider this a
+> Really, REALLY, **REALLY** bad idea.  Note that the TPM2 chip has a
+> very slow connection to the main CPU, and there are many applications
+> which will need session keys at a high rate (for example, opening
+> multiple https connections when browsing a web page), for which the
+> TPM2 would be totally unsuited.
+>
+> If you really want to use the TPM2 chip, there are userspace libraries
+> which will access it directly, and you can see how slow and painful
+> using the TPM chip really would be....
+
+I'd say using almost anything as your sole entropy source would be
+a serious error if security requirements are high. You want at least
+two sources both because that leaves you safe if one fails and
+because, even if someone discovers some flaw that makes it easy
+to attack one source, the presence of the other makes the attack
+extremely difficult.
+
+The random(4) driver does collect entropy from interrupts etc.
+and, depending on what your machine will be doing, that may
+well be all the second source you need.
+
+If you have RDRAND, that would be a fine second source. If
+your board has an unused sound card equivalent, then
+Denker's Turbid would be another. I'd use either or both if
+available.
