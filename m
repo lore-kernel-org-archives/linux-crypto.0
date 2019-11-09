@@ -2,86 +2,78 @@ Return-Path: <SRS0=z9QW=ZB=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49896C17441
-	for <linux-crypto@archiver.kernel.org>; Sat,  9 Nov 2019 02:45:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C53AEC43331
+	for <linux-crypto@archiver.kernel.org>; Sat,  9 Nov 2019 05:01:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2947F20865
-	for <linux-crypto@archiver.kernel.org>; Sat,  9 Nov 2019 02:45:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A0DCE214E0
+	for <linux-crypto@archiver.kernel.org>; Sat,  9 Nov 2019 05:01:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726125AbfKICpG (ORCPT
+        id S1725827AbfKIFBY (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 8 Nov 2019 21:45:06 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:5749 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726061AbfKICpG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 Nov 2019 21:45:06 -0500
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 07A4A3D3DC3141E17821;
-        Sat,  9 Nov 2019 10:45:04 +0800 (CST)
-Received: from localhost.localdomain.localdomain (10.175.113.25) by
- DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
- 14.3.439.0; Sat, 9 Nov 2019 10:44:58 +0800
-From:   YueHaibing <yuehaibing@huawei.com>
-To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Maxime Ripard <mripard@kernel.org>,
-        "Chen-Yu Tsai" <wens@csie.org>
-CC:     YueHaibing <yuehaibing@huawei.com>, <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, <kernel-janitors@vger.kernel.org>
-Subject: [PATCH -next] crypto: sun8i-ss - Fix memdup.cocci warnings
-Date:   Sat, 9 Nov 2019 02:44:03 +0000
-Message-ID: <20191109024403.47106-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.20.1
+        Sat, 9 Nov 2019 00:01:24 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:33704 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725788AbfKIFBY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 9 Nov 2019 00:01:24 -0500
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1iTIs5-0006nb-Un; Sat, 09 Nov 2019 13:01:14 +0800
+Received: from herbert by gondobar with local (Exim 4.89)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1iTIs0-00083U-GN; Sat, 09 Nov 2019 13:01:08 +0800
+Date:   Sat, 9 Nov 2019 13:01:08 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Tero Kristo <t-kristo@ti.com>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        David Miller <davem@davemloft.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        linux-omap@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH 09/10] crypto: add timeout to crypto_wait_req
+Message-ID: <20191109050108.mcykgg2izb7htrek@gondor.apana.org.au>
+References: <20191017122549.4634-1-t-kristo@ti.com>
+ <20191017122549.4634-10-t-kristo@ti.com>
+ <CAOtvUMeBXjDBhSVgMOW=hshEx_AkNPg-Zk2c2jCDzY8vyXWW5g@mail.gmail.com>
+ <076f0bc6-ad04-9543-db02-d7c7060db036@ti.com>
+ <CAOtvUMc7pbtPAPUbEmz_MTHmB9LboQVdgG-t9tHCr=biEbFuUQ@mail.gmail.com>
+ <20191108022759.GB1140@sol.localdomain>
+ <d55c0182-5fb0-2ef9-f056-54b396fb0026@ti.com>
+ <20191108091608.i5fxt2vu2nwrybgn@gondor.apana.org.au>
+ <2ab94492-21e4-fbe0-41eb-e12b02511d7c@ti.com>
+ <20191109022749.GB9739@sol.localdomain>
 MIME-Version: 1.0
-Content-Type:   text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7BIT
-X-Originating-IP: [10.175.113.25]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191109022749.GB9739@sol.localdomain>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Use kmemdup rather than duplicating its implementation
+On Fri, Nov 08, 2019 at 06:27:49PM -0800, Eric Biggers wrote:
+> 
+> I don't see how making crypto_wait_req killable would be any better than adding
+> a timeout, since in both cases the crypto operation would still be proceeding in
+> the background while things are being freed.
 
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
----
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+Right, you would need to modify the caller to actually distinguish
+between the killed case vs. actual completion.
 
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-index f0e7c1e12da6..b6e7c346c3ae 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-@@ -396,10 +396,9 @@ int sun8i_ce_aes_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 		kfree(op->key);
- 	}
- 	op->keylen = keylen;
--	op->key = kmalloc(keylen, GFP_KERNEL | GFP_DMA);
-+	op->key = kmemdup(key, keylen, GFP_KERNEL | GFP_DMA);
- 	if (!op->key)
- 		return -ENOMEM;
--	memcpy(op->key, key, keylen);
- 
- 	crypto_sync_skcipher_clear_flags(op->fallback_tfm, CRYPTO_TFM_REQ_MASK);
- 	crypto_sync_skcipher_set_flags(op->fallback_tfm, tfm->base.crt_flags & CRYPTO_TFM_REQ_MASK);
-@@ -422,10 +421,9 @@ int sun8i_ce_des3_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 		kfree(op->key);
- 	}
- 	op->keylen = keylen;
--	op->key = kmalloc(keylen, GFP_KERNEL | GFP_DMA);
-+	op->key = kmemdup(key, keylen, GFP_KERNEL | GFP_DMA);
- 	if (!op->key)
- 		return -ENOMEM;
--	memcpy(op->key, key, keylen);
- 
- 	crypto_sync_skcipher_clear_flags(op->fallback_tfm, CRYPTO_TFM_REQ_MASK);
- 	crypto_sync_skcipher_set_flags(op->fallback_tfm, tfm->base.crt_flags & CRYPTO_TFM_REQ_MASK);
+> Would it help if the crypto self-tests printed a pr_debug() message when
+> starting each test vector?  These wouldn't be shown by default, but it would be
+> possible to enable them using dynamic-debug or by adding '#define DEBUG' to the
+> top of the source file.
 
+This should be simpler to implement.
 
-
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
