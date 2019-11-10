@@ -7,52 +7,51 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54986C43331
-	for <linux-crypto@archiver.kernel.org>; Sun, 10 Nov 2019 02:44:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5B01C17443
+	for <linux-crypto@archiver.kernel.org>; Sun, 10 Nov 2019 02:46:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2760D21848
-	for <linux-crypto@archiver.kernel.org>; Sun, 10 Nov 2019 02:44:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7F88421848
+	for <linux-crypto@archiver.kernel.org>; Sun, 10 Nov 2019 02:46:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1573353887;
-	bh=irSFSlP4lDy18Th9gU+TMXSW4JZxVtRA522JoQhDzh0=;
+	s=default; t=1573354014;
+	bh=UI1J+tDPK+dDqNQkuwW+1DwMI88CGJiKXEB/ID8jN98=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=hlOWi1vn/nj5s3UqpSGEDnQW5YkKW8hIolhg9XeGw50c7+aH9dAoCe7kly0wLQTdf
-	 Go/MTvBRXHlrqHdlxEHkVHT4YNkOVJMa52TqMEhVD9nPGwcmKTC/fM8Tc+bBnq0viY
-	 UkBPfAO54k0ec9bsqHYAqiBTr2AfVuL+MH1r43ew=
+	b=bdw9ORFHI4Z65lsQvaKIvzCXNJ5oFyxHZCUmdMbn5BekjzkWVzyGG7G0PaDKNzgwb
+	 RKilN56h8L+Bb2hJvjo7YqEEgo2a/ful2jwAkBD6SX43v22wJHLSJIa5jxTvi7IrZe
+	 dfLOGnnkujQQWXzw7yet3EhwJqf0on0/tCRelgCc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728644AbfKJCop (ORCPT
+        id S1729185AbfKJCqx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 9 Nov 2019 21:44:45 -0500
-Received: from mail.kernel.org ([198.145.29.99]:44370 "EHLO mail.kernel.org"
+        Sat, 9 Nov 2019 21:46:53 -0500
+Received: from mail.kernel.org ([198.145.29.99]:51376 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728632AbfKJCom (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 9 Nov 2019 21:44:42 -0500
+        id S1729151AbfKJCqx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 9 Nov 2019 21:46:53 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id CE4F221D7B;
-        Sun, 10 Nov 2019 02:44:40 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id A25EE21D82;
+        Sun, 10 Nov 2019 02:46:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573353881;
-        bh=irSFSlP4lDy18Th9gU+TMXSW4JZxVtRA522JoQhDzh0=;
+        s=default; t=1573354012;
+        bh=UI1J+tDPK+dDqNQkuwW+1DwMI88CGJiKXEB/ID8jN98=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=epz5I0ydhLZtxw06ZtIgQPeG4w7P4pXiLG9Xe/b428NihDvKEt8CFbJndK71DlONm
-         oSdA58LsGx0NKbG+Nzd40kPzW/2cA8S+3HOAGLOnIolTec+u5rPC9BCw5Wn6yXubOk
-         zJ5vk+Lbd/5dz7yGfJ0JaPtN04STiYi+xpf82gjM=
+        b=jz+NMqZSaLR5hrem+7Ms85c46pi4jMQiP5BRidGDR2FGu9RXiYVLQ6pHDKYWCErSn
+         F++khQuZc7v/NmE/4kEeNbx0N3HPdd4OgEZje2sKrSf8oDSjJ5dqO0qjGWW6jAlq0X
+         YosFLqKfGW4jstg0BngLmxcVUwWo+poWaFI52psE=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Christoph Manszewski <c.manszewski@samsung.com>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Kamil Konieczny <k.konieczny@partner.samsung.com>,
+Cc:     Stefan Agner <stefan@agner.ch>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-samsung-soc@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 158/191] crypto: s5p-sss: Fix Fix argument list alignment
-Date:   Sat,  9 Nov 2019 21:39:40 -0500
-Message-Id: <20191110024013.29782-158-sashal@kernel.org>
+        clang-built-linux@googlegroups.com
+Subject: [PATCH AUTOSEL 4.14 037/109] crypto: arm/crc32 - avoid warning when compiling with Clang
+Date:   Sat,  9 Nov 2019 21:44:29 -0500
+Message-Id: <20191110024541.31567-37-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191110024013.29782-1-sashal@kernel.org>
-References: <20191110024013.29782-1-sashal@kernel.org>
+In-Reply-To: <20191110024541.31567-1-sashal@kernel.org>
+References: <20191110024541.31567-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -62,43 +61,44 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Christoph Manszewski <c.manszewski@samsung.com>
+From: Stefan Agner <stefan@agner.ch>
 
-[ Upstream commit 6c12b6ba45490eeb820fdceccf5a53f42a26799c ]
+[ Upstream commit cd560235d8f9ddd94aa51e1c4dabdf3212b9b241 ]
 
-Fix misalignment of continued argument list.
+The table id (second) argument to MODULE_DEVICE_TABLE is often
+referenced otherwise. This is not the case for CPU features. This
+leads to a warning when building the kernel with Clang:
+  arch/arm/crypto/crc32-ce-glue.c:239:33: warning: variable
+    'crc32_cpu_feature' is not needed and will not be emitted
+    [-Wunneeded-internal-declaration]
+  static const struct cpu_feature crc32_cpu_feature[] = {
+                                  ^
 
-Signed-off-by: Christoph Manszewski <c.manszewski@samsung.com>
-Reviewed-by: Krzysztof Kozlowski <krzk@kernel.org>
-Acked-by: Kamil Konieczny <k.konieczny@partner.samsung.com>
+Avoid warnings by using __maybe_unused, similar to commit 1f318a8bafcf
+("modules: mark __inittest/__exittest as __maybe_unused").
+
+Fixes: 2a9faf8b7e43 ("crypto: arm/crc32 - enable module autoloading based on CPU feature bits")
+Signed-off-by: Stefan Agner <stefan@agner.ch>
+Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/s5p-sss.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/arm/crypto/crc32-ce-glue.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
-index 9021ad9df0c45..b7216935236f0 100644
---- a/drivers/crypto/s5p-sss.c
-+++ b/drivers/crypto/s5p-sss.c
-@@ -491,7 +491,7 @@ static void s5p_unset_indata(struct s5p_aes_dev *dev)
+diff --git a/arch/arm/crypto/crc32-ce-glue.c b/arch/arm/crypto/crc32-ce-glue.c
+index 96e62ec105d06..cd9e93b46c2dd 100644
+--- a/arch/arm/crypto/crc32-ce-glue.c
++++ b/arch/arm/crypto/crc32-ce-glue.c
+@@ -236,7 +236,7 @@ static void __exit crc32_pmull_mod_exit(void)
+ 				  ARRAY_SIZE(crc32_pmull_algs));
  }
  
- static int s5p_make_sg_cpy(struct s5p_aes_dev *dev, struct scatterlist *src,
--			    struct scatterlist **dst)
-+			   struct scatterlist **dst)
- {
- 	void *pages;
- 	int len;
-@@ -1889,7 +1889,7 @@ static int s5p_set_indata_start(struct s5p_aes_dev *dev,
- }
- 
- static int s5p_set_outdata_start(struct s5p_aes_dev *dev,
--				struct ablkcipher_request *req)
-+				 struct ablkcipher_request *req)
- {
- 	struct scatterlist *sg;
- 	int err;
+-static const struct cpu_feature crc32_cpu_feature[] = {
++static const struct cpu_feature __maybe_unused crc32_cpu_feature[] = {
+ 	{ cpu_feature(CRC32) }, { cpu_feature(PMULL) }, { }
+ };
+ MODULE_DEVICE_TABLE(cpu, crc32_cpu_feature);
 -- 
 2.20.1
 
