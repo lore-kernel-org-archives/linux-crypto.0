@@ -2,97 +2,610 @@ Return-Path: <SRS0=RIhc=ZC=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF9A4C43331
-	for <linux-crypto@archiver.kernel.org>; Sun, 10 Nov 2019 13:56:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F099FC43331
+	for <linux-crypto@archiver.kernel.org>; Sun, 10 Nov 2019 18:31:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BFA412085B
-	for <linux-crypto@archiver.kernel.org>; Sun, 10 Nov 2019 13:56:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A4DAD2085B
+	for <linux-crypto@archiver.kernel.org>; Sun, 10 Nov 2019 18:31:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sb7RRn85"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726402AbfKJN4D (ORCPT
+        id S1726935AbfKJSb4 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 10 Nov 2019 08:56:03 -0500
-Received: from vps-vb.mhejs.net ([37.28.154.113]:51690 "EHLO vps-vb.mhejs.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726390AbfKJN4D (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 10 Nov 2019 08:56:03 -0500
-Received: from MUA
-        by vps-vb.mhejs.net with esmtps (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256)
-        (Exim 4.92.3)
-        (envelope-from <mail@maciej.szmigiero.name>)
-        id 1iTngz-0000Y5-23; Sun, 10 Nov 2019 14:55:49 +0100
-From:   "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-To:     "Theodore Ts'o" <tytso@mit.edu>
+        Sun, 10 Nov 2019 13:31:56 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:45129 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726900AbfKJSb4 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 10 Nov 2019 13:31:56 -0500
+Received: by mail-wr1-f66.google.com with SMTP id z10so6942083wrs.12
+        for <linux-crypto@vger.kernel.org>; Sun, 10 Nov 2019 10:31:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=219Psk+NMwviPy5jzF7BTHjk8aNJx0YEeA+z73oVWI0=;
+        b=Sb7RRn851g0MQSH4r9iCtwNet76gP8rw+UU0ZbHAFgSqSmnwtD8PhZL6+4fBgxZhIv
+         856F98g7CDzEC1HSMu3DtzXxYr+rBKLz2FALzvnq4M9RoOJ3XgW4VEqwBo9KreWjlZAV
+         rJw4lXX8pC/4eEEn7AOV8tEvnqmt8oRwb/FdSHjGvvnmlAlwSpUZ17KG1A1Idl48vFcH
+         h32f1OWQ1aqKNNNr1HM/n3YFJGLRFdm3oNccdcOfw6C4897pjsfJpvWKdX8l06dtz17B
+         TGpQTuR0wxtn750DOWZYeYdZg5lBkBYsn23oI+SVsOWuR/vIQ2U6HD7w7SW9IwPWDvxW
+         cxIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=219Psk+NMwviPy5jzF7BTHjk8aNJx0YEeA+z73oVWI0=;
+        b=nV744a/X8hdY5UXW9XCAOJL+J7C7zF601azmudaad1Hn9ZhaalSwOPVRvk0I/55Sa3
+         q30fzBDZjwhcjJCJBw1zC4l7jnTv8Yye/oNh+8W3IBBlrwz8SPNSdV2ahHEUNXPhj9tO
+         RmjVpiImVyTygq5niHind5tif0PKS8UqNFEImSNJxECOmBReAI4CTEjQvVNV0V0UF00g
+         QfXHXGRdUECYrkECVgc/EaiwSpJ7NKfICZ1MpuzxlYd3NVcjpXjTy5eYaglsPEWp5WrI
+         2Uqpob4AOkrboMAdVDn+ImCxRjMwfuY4BfVRfX/Xo9K2QixncjbzGYvk+XzCc7TC4zU9
+         I/yA==
+X-Gm-Message-State: APjAAAVEGCjm04FxfExVYvmpiMj80aZUL6u/2Qmfi5wpsrgayJKxvMqG
+        PqwC9iQoCtv5ZJnRTcz1BPJ3/3PkAlw=
+X-Google-Smtp-Source: APXvYqwanGzcCWhs+dMTtMw/pi6L+S9uOblOnL83zhuvuynoKW/lF6e3nV4V2adyarIHB4Er3O6RjQ==
+X-Received: by 2002:adf:f650:: with SMTP id x16mr3570483wrp.223.1573410711080;
+        Sun, 10 Nov 2019 10:31:51 -0800 (PST)
+Received: from ziggy.stardust ([95.169.226.39])
+        by smtp.gmail.com with ESMTPSA id q124sm11860372wme.13.2019.11.10.10.31.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 10 Nov 2019 10:31:50 -0800 (PST)
+Subject: Re: [PATCH v3 17/29] crypto: mediatek - switch to skcipher API
+To:     Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org
 Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Keerthy <j-keerthy@ti.com>, Stephen Boyd <swboyd@chromium.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] random: Don't freeze in add_hwgenerator_randomness() if stopping kthread
-Date:   Sun, 10 Nov 2019 14:55:42 +0100
-Message-Id: <20191110135543.3476097-1-mail@maciej.szmigiero.name>
-X-Mailer: git-send-email 2.23.0
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Biggers <ebiggers@google.com>,
+        linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org
+References: <20191105132826.1838-1-ardb@kernel.org>
+ <20191105132826.1838-18-ardb@kernel.org>
+From:   Matthias Brugger <matthias.bgg@gmail.com>
+Autocrypt: addr=matthias.bgg@gmail.com; prefer-encrypt=mutual; keydata=
+ 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
+ r2JwH1CJjrHWeQEI2ucSKsNa8FllDmG/fQ==
+Message-ID: <fdba315c-a1db-4038-0775-e8016cab4045@gmail.com>
+Date:   Sun, 10 Nov 2019 19:31:48 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191105132826.1838-18-ardb@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Since commit 59b569480dc8
-("random: Use wait_event_freezable() in add_hwgenerator_randomness()")
-there is a race in add_hwgenerator_randomness() between freezing and
-stopping the calling kthread.
 
-This commit changed wait_event_interruptible() call with
-kthread_freezable_should_stop() as a condition into wait_event_freezable()
-with just kthread_should_stop() as a condition to fix a warning that
-kthread_freezable_should_stop() might sleep inside the wait.
 
-wait_event_freezable() ultimately calls __refrigerator() with its
-check_kthr_stop argument set to false, which causes it to keep the kthread
-frozen even if somebody calls kthread_stop() on it.
+On 05/11/2019 14:28, Ard Biesheuvel wrote:
+> Commit 7a7ffe65c8c5 ("crypto: skcipher - Add top-level skcipher interface")
+> dated 20 august 2015 introduced the new skcipher API which is supposed to
+> replace both blkcipher and ablkcipher. While all consumers of the API have
+> been converted long ago, some producers of the ablkcipher remain, forcing
+> us to keep the ablkcipher support routines alive, along with the matching
+> code to expose [a]blkciphers via the skcipher API.
+> 
+> So switch this driver to the skcipher API, allowing us to finally drop the
+> blkcipher code in the near future.
+> 
+> Cc: Matthias Brugger <matthias.bgg@gmail.com>
+> Cc: linux-mediatek@lists.infradead.org
+> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 
-Calling wait_event_freezable() with kthread_should_stop() as a condition
-is racy because it doesn't take into account the situation where this
-condition becomes true on a kthread marked for freezing only after this
-condition has already been checked.
+Reviewed-by: Matthias Brugger <matthias.bgg@gmail.com>
 
-Calling freezing() should avoid the issue that the commit 59b569480dc8 has
-fixed, as it is only a checking function, it doesn't actually do the
-freezing.
-
-add_hwgenerator_randomness() has two post-boot users: in khwrng the
-kthread will be frozen anyway by call to kthread_freezable_should_stop()
-in its main loop, while its second user (ath9k-hwrng) is not freezable at
-all.
-
-This change allows a VM with virtio-rng loaded to write s2disk image
-successfully.
-
-Fixes: 59b569480dc8 ("random: Use wait_event_freezable() in add_hwgenerator_randomness()")
-Signed-off-by: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
----
- drivers/char/random.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/char/random.c b/drivers/char/random.c
-index de434feb873a..2f87910dd498 100644
---- a/drivers/char/random.c
-+++ b/drivers/char/random.c
-@@ -2500,8 +2500,8 @@ void add_hwgenerator_randomness(const char *buffer, size_t count,
- 	 * We'll be woken up again once below random_write_wakeup_thresh,
- 	 * or when the calling thread is about to terminate.
- 	 */
--	wait_event_freezable(random_write_wait,
--			kthread_should_stop() ||
-+	wait_event_interruptible(random_write_wait,
-+			kthread_should_stop() || freezing(current) ||
- 			ENTROPY_BITS(&input_pool) <= random_write_wakeup_bits);
- 	mix_pool_bytes(poolp, buffer, count);
- 	credit_entropy_bits(poolp, entropy);
+> ---
+>  drivers/crypto/mediatek/mtk-aes.c | 248 +++++++++-----------
+>  1 file changed, 116 insertions(+), 132 deletions(-)
+> 
+> diff --git a/drivers/crypto/mediatek/mtk-aes.c b/drivers/crypto/mediatek/mtk-aes.c
+> index d43410259113..90880a81c534 100644
+> --- a/drivers/crypto/mediatek/mtk-aes.c
+> +++ b/drivers/crypto/mediatek/mtk-aes.c
+> @@ -11,6 +11,7 @@
+>  
+>  #include <crypto/aes.h>
+>  #include <crypto/gcm.h>
+> +#include <crypto/internal/skcipher.h>
+>  #include "mtk-platform.h"
+>  
+>  #define AES_QUEUE_SIZE		512
+> @@ -414,7 +415,7 @@ static int mtk_aes_map(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
+>  static void mtk_aes_info_init(struct mtk_cryp *cryp, struct mtk_aes_rec *aes,
+>  			      size_t len)
+>  {
+> -	struct ablkcipher_request *req = ablkcipher_request_cast(aes->areq);
+> +	struct skcipher_request *req = skcipher_request_cast(aes->areq);
+>  	struct mtk_aes_base_ctx *ctx = aes->ctx;
+>  	struct mtk_aes_info *info = &ctx->info;
+>  	u32 cnt = 0;
+> @@ -450,7 +451,7 @@ static void mtk_aes_info_init(struct mtk_cryp *cryp, struct mtk_aes_rec *aes,
+>  		return;
+>  	}
+>  
+> -	mtk_aes_write_state_le(info->state + ctx->keylen, req->info,
+> +	mtk_aes_write_state_le(info->state + ctx->keylen, (void *)req->iv,
+>  			       AES_BLOCK_SIZE);
+>  ctr:
+>  	info->tfm[0] += AES_TFM_SIZE(SIZE_IN_WORDS(AES_BLOCK_SIZE));
+> @@ -552,13 +553,13 @@ static int mtk_aes_transfer_complete(struct mtk_cryp *cryp,
+>  
+>  static int mtk_aes_start(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
+>  {
+> -	struct ablkcipher_request *req = ablkcipher_request_cast(aes->areq);
+> -	struct mtk_aes_reqctx *rctx = ablkcipher_request_ctx(req);
+> +	struct skcipher_request *req = skcipher_request_cast(aes->areq);
+> +	struct mtk_aes_reqctx *rctx = skcipher_request_ctx(req);
+>  
+>  	mtk_aes_set_mode(aes, rctx);
+>  	aes->resume = mtk_aes_transfer_complete;
+>  
+> -	return mtk_aes_dma(cryp, aes, req->src, req->dst, req->nbytes);
+> +	return mtk_aes_dma(cryp, aes, req->src, req->dst, req->cryptlen);
+>  }
+>  
+>  static inline struct mtk_aes_ctr_ctx *
+> @@ -571,7 +572,7 @@ static int mtk_aes_ctr_transfer(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
+>  {
+>  	struct mtk_aes_base_ctx *ctx = aes->ctx;
+>  	struct mtk_aes_ctr_ctx *cctx = mtk_aes_ctr_ctx_cast(ctx);
+> -	struct ablkcipher_request *req = ablkcipher_request_cast(aes->areq);
+> +	struct skcipher_request *req = skcipher_request_cast(aes->areq);
+>  	struct scatterlist *src, *dst;
+>  	u32 start, end, ctr, blocks;
+>  	size_t datalen;
+> @@ -579,11 +580,11 @@ static int mtk_aes_ctr_transfer(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
+>  
+>  	/* Check for transfer completion. */
+>  	cctx->offset += aes->total;
+> -	if (cctx->offset >= req->nbytes)
+> +	if (cctx->offset >= req->cryptlen)
+>  		return mtk_aes_transfer_complete(cryp, aes);
+>  
+>  	/* Compute data length. */
+> -	datalen = req->nbytes - cctx->offset;
+> +	datalen = req->cryptlen - cctx->offset;
+>  	blocks = DIV_ROUND_UP(datalen, AES_BLOCK_SIZE);
+>  	ctr = be32_to_cpu(cctx->iv[3]);
+>  
+> @@ -620,12 +621,12 @@ static int mtk_aes_ctr_transfer(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
+>  static int mtk_aes_ctr_start(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
+>  {
+>  	struct mtk_aes_ctr_ctx *cctx = mtk_aes_ctr_ctx_cast(aes->ctx);
+> -	struct ablkcipher_request *req = ablkcipher_request_cast(aes->areq);
+> -	struct mtk_aes_reqctx *rctx = ablkcipher_request_ctx(req);
+> +	struct skcipher_request *req = skcipher_request_cast(aes->areq);
+> +	struct mtk_aes_reqctx *rctx = skcipher_request_ctx(req);
+>  
+>  	mtk_aes_set_mode(aes, rctx);
+>  
+> -	memcpy(cctx->iv, req->info, AES_BLOCK_SIZE);
+> +	memcpy(cctx->iv, req->iv, AES_BLOCK_SIZE);
+>  	cctx->offset = 0;
+>  	aes->total = 0;
+>  	aes->resume = mtk_aes_ctr_transfer;
+> @@ -634,10 +635,10 @@ static int mtk_aes_ctr_start(struct mtk_cryp *cryp, struct mtk_aes_rec *aes)
+>  }
+>  
+>  /* Check and set the AES key to transform state buffer */
+> -static int mtk_aes_setkey(struct crypto_ablkcipher *tfm,
+> +static int mtk_aes_setkey(struct crypto_skcipher *tfm,
+>  			  const u8 *key, u32 keylen)
+>  {
+> -	struct mtk_aes_base_ctx *ctx = crypto_ablkcipher_ctx(tfm);
+> +	struct mtk_aes_base_ctx *ctx = crypto_skcipher_ctx(tfm);
+>  
+>  	switch (keylen) {
+>  	case AES_KEYSIZE_128:
+> @@ -651,7 +652,7 @@ static int mtk_aes_setkey(struct crypto_ablkcipher *tfm,
+>  		break;
+>  
+>  	default:
+> -		crypto_ablkcipher_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
+> +		crypto_skcipher_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
+>  		return -EINVAL;
+>  	}
+>  
+> @@ -661,10 +662,10 @@ static int mtk_aes_setkey(struct crypto_ablkcipher *tfm,
+>  	return 0;
+>  }
+>  
+> -static int mtk_aes_crypt(struct ablkcipher_request *req, u64 mode)
+> +static int mtk_aes_crypt(struct skcipher_request *req, u64 mode)
+>  {
+> -	struct crypto_ablkcipher *ablkcipher = crypto_ablkcipher_reqtfm(req);
+> -	struct mtk_aes_base_ctx *ctx = crypto_ablkcipher_ctx(ablkcipher);
+> +	struct crypto_skcipher *skcipher = crypto_skcipher_reqtfm(req);
+> +	struct mtk_aes_base_ctx *ctx = crypto_skcipher_ctx(skcipher);
+>  	struct mtk_aes_reqctx *rctx;
+>  	struct mtk_cryp *cryp;
+>  
+> @@ -672,185 +673,168 @@ static int mtk_aes_crypt(struct ablkcipher_request *req, u64 mode)
+>  	if (!cryp)
+>  		return -ENODEV;
+>  
+> -	rctx = ablkcipher_request_ctx(req);
+> +	rctx = skcipher_request_ctx(req);
+>  	rctx->mode = mode;
+>  
+>  	return mtk_aes_handle_queue(cryp, !(mode & AES_FLAGS_ENCRYPT),
+>  				    &req->base);
+>  }
+>  
+> -static int mtk_aes_ecb_encrypt(struct ablkcipher_request *req)
+> +static int mtk_aes_ecb_encrypt(struct skcipher_request *req)
+>  {
+>  	return mtk_aes_crypt(req, AES_FLAGS_ENCRYPT | AES_FLAGS_ECB);
+>  }
+>  
+> -static int mtk_aes_ecb_decrypt(struct ablkcipher_request *req)
+> +static int mtk_aes_ecb_decrypt(struct skcipher_request *req)
+>  {
+>  	return mtk_aes_crypt(req, AES_FLAGS_ECB);
+>  }
+>  
+> -static int mtk_aes_cbc_encrypt(struct ablkcipher_request *req)
+> +static int mtk_aes_cbc_encrypt(struct skcipher_request *req)
+>  {
+>  	return mtk_aes_crypt(req, AES_FLAGS_ENCRYPT | AES_FLAGS_CBC);
+>  }
+>  
+> -static int mtk_aes_cbc_decrypt(struct ablkcipher_request *req)
+> +static int mtk_aes_cbc_decrypt(struct skcipher_request *req)
+>  {
+>  	return mtk_aes_crypt(req, AES_FLAGS_CBC);
+>  }
+>  
+> -static int mtk_aes_ctr_encrypt(struct ablkcipher_request *req)
+> +static int mtk_aes_ctr_encrypt(struct skcipher_request *req)
+>  {
+>  	return mtk_aes_crypt(req, AES_FLAGS_ENCRYPT | AES_FLAGS_CTR);
+>  }
+>  
+> -static int mtk_aes_ctr_decrypt(struct ablkcipher_request *req)
+> +static int mtk_aes_ctr_decrypt(struct skcipher_request *req)
+>  {
+>  	return mtk_aes_crypt(req, AES_FLAGS_CTR);
+>  }
+>  
+> -static int mtk_aes_ofb_encrypt(struct ablkcipher_request *req)
+> +static int mtk_aes_ofb_encrypt(struct skcipher_request *req)
+>  {
+>  	return mtk_aes_crypt(req, AES_FLAGS_ENCRYPT | AES_FLAGS_OFB);
+>  }
+>  
+> -static int mtk_aes_ofb_decrypt(struct ablkcipher_request *req)
+> +static int mtk_aes_ofb_decrypt(struct skcipher_request *req)
+>  {
+>  	return mtk_aes_crypt(req, AES_FLAGS_OFB);
+>  }
+>  
+> -static int mtk_aes_cfb_encrypt(struct ablkcipher_request *req)
+> +static int mtk_aes_cfb_encrypt(struct skcipher_request *req)
+>  {
+>  	return mtk_aes_crypt(req, AES_FLAGS_ENCRYPT | AES_FLAGS_CFB128);
+>  }
+>  
+> -static int mtk_aes_cfb_decrypt(struct ablkcipher_request *req)
+> +static int mtk_aes_cfb_decrypt(struct skcipher_request *req)
+>  {
+>  	return mtk_aes_crypt(req, AES_FLAGS_CFB128);
+>  }
+>  
+> -static int mtk_aes_cra_init(struct crypto_tfm *tfm)
+> +static int mtk_aes_init_tfm(struct crypto_skcipher *tfm)
+>  {
+> -	struct mtk_aes_ctx *ctx = crypto_tfm_ctx(tfm);
+> +	struct mtk_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
+>  
+> -	tfm->crt_ablkcipher.reqsize = sizeof(struct mtk_aes_reqctx);
+> +	crypto_skcipher_set_reqsize(tfm, sizeof(struct mtk_aes_reqctx));
+>  	ctx->base.start = mtk_aes_start;
+>  	return 0;
+>  }
+>  
+> -static int mtk_aes_ctr_cra_init(struct crypto_tfm *tfm)
+> +static int mtk_aes_ctr_init_tfm(struct crypto_skcipher *tfm)
+>  {
+> -	struct mtk_aes_ctx *ctx = crypto_tfm_ctx(tfm);
+> +	struct mtk_aes_ctx *ctx = crypto_skcipher_ctx(tfm);
+>  
+> -	tfm->crt_ablkcipher.reqsize = sizeof(struct mtk_aes_reqctx);
+> +	crypto_skcipher_set_reqsize(tfm, sizeof(struct mtk_aes_reqctx));
+>  	ctx->base.start = mtk_aes_ctr_start;
+>  	return 0;
+>  }
+>  
+> -static struct crypto_alg aes_algs[] = {
+> +static struct skcipher_alg aes_algs[] = {
+>  {
+> -	.cra_name		= "cbc(aes)",
+> -	.cra_driver_name	= "cbc-aes-mtk",
+> -	.cra_priority		= 400,
+> -	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER |
+> -				  CRYPTO_ALG_ASYNC,
+> -	.cra_init		= mtk_aes_cra_init,
+> -	.cra_blocksize		= AES_BLOCK_SIZE,
+> -	.cra_ctxsize		= sizeof(struct mtk_aes_ctx),
+> -	.cra_alignmask		= 0xf,
+> -	.cra_type		= &crypto_ablkcipher_type,
+> -	.cra_module		= THIS_MODULE,
+> -	.cra_u.ablkcipher = {
+> -		.min_keysize	= AES_MIN_KEY_SIZE,
+> -		.max_keysize	= AES_MAX_KEY_SIZE,
+> -		.setkey		= mtk_aes_setkey,
+> -		.encrypt	= mtk_aes_cbc_encrypt,
+> -		.decrypt	= mtk_aes_cbc_decrypt,
+> -		.ivsize		= AES_BLOCK_SIZE,
+> -	}
+> +	.base.cra_name		= "cbc(aes)",
+> +	.base.cra_driver_name	= "cbc-aes-mtk",
+> +	.base.cra_priority	= 400,
+> +	.base.cra_flags		= CRYPTO_ALG_ASYNC,
+> +	.base.cra_blocksize	= AES_BLOCK_SIZE,
+> +	.base.cra_ctxsize	= sizeof(struct mtk_aes_ctx),
+> +	.base.cra_alignmask	= 0xf,
+> +	.base.cra_module	= THIS_MODULE,
+> +
+> +	.min_keysize		= AES_MIN_KEY_SIZE,
+> +	.max_keysize		= AES_MAX_KEY_SIZE,
+> +	.setkey			= mtk_aes_setkey,
+> +	.encrypt		= mtk_aes_cbc_encrypt,
+> +	.decrypt		= mtk_aes_cbc_decrypt,
+> +	.ivsize			= AES_BLOCK_SIZE,
+> +	.init			= mtk_aes_init_tfm,
+>  },
+>  {
+> -	.cra_name		= "ecb(aes)",
+> -	.cra_driver_name	= "ecb-aes-mtk",
+> -	.cra_priority		= 400,
+> -	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER |
+> -				  CRYPTO_ALG_ASYNC,
+> -	.cra_init		= mtk_aes_cra_init,
+> -	.cra_blocksize		= AES_BLOCK_SIZE,
+> -	.cra_ctxsize		= sizeof(struct mtk_aes_ctx),
+> -	.cra_alignmask		= 0xf,
+> -	.cra_type		= &crypto_ablkcipher_type,
+> -	.cra_module		= THIS_MODULE,
+> -	.cra_u.ablkcipher = {
+> -		.min_keysize	= AES_MIN_KEY_SIZE,
+> -		.max_keysize	= AES_MAX_KEY_SIZE,
+> -		.setkey		= mtk_aes_setkey,
+> -		.encrypt	= mtk_aes_ecb_encrypt,
+> -		.decrypt	= mtk_aes_ecb_decrypt,
+> -	}
+> +	.base.cra_name		= "ecb(aes)",
+> +	.base.cra_driver_name	= "ecb-aes-mtk",
+> +	.base.cra_priority	= 400,
+> +	.base.cra_flags		= CRYPTO_ALG_ASYNC,
+> +	.base.cra_blocksize	= AES_BLOCK_SIZE,
+> +	.base.cra_ctxsize	= sizeof(struct mtk_aes_ctx),
+> +	.base.cra_alignmask	= 0xf,
+> +	.base.cra_module	= THIS_MODULE,
+> +
+> +	.min_keysize		= AES_MIN_KEY_SIZE,
+> +	.max_keysize		= AES_MAX_KEY_SIZE,
+> +	.setkey			= mtk_aes_setkey,
+> +	.encrypt		= mtk_aes_ecb_encrypt,
+> +	.decrypt		= mtk_aes_ecb_decrypt,
+> +	.init			= mtk_aes_init_tfm,
+>  },
+>  {
+> -	.cra_name		= "ctr(aes)",
+> -	.cra_driver_name	= "ctr-aes-mtk",
+> -	.cra_priority		= 400,
+> -	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER |
+> -				  CRYPTO_ALG_ASYNC,
+> -	.cra_init		= mtk_aes_ctr_cra_init,
+> -	.cra_blocksize		= 1,
+> -	.cra_ctxsize		= sizeof(struct mtk_aes_ctr_ctx),
+> -	.cra_alignmask		= 0xf,
+> -	.cra_type		= &crypto_ablkcipher_type,
+> -	.cra_module		= THIS_MODULE,
+> -	.cra_u.ablkcipher = {
+> -		.min_keysize	= AES_MIN_KEY_SIZE,
+> -		.max_keysize	= AES_MAX_KEY_SIZE,
+> -		.ivsize		= AES_BLOCK_SIZE,
+> -		.setkey		= mtk_aes_setkey,
+> -		.encrypt	= mtk_aes_ctr_encrypt,
+> -		.decrypt	= mtk_aes_ctr_decrypt,
+> -	}
+> +	.base.cra_name		= "ctr(aes)",
+> +	.base.cra_driver_name	= "ctr-aes-mtk",
+> +	.base.cra_priority	= 400,
+> +	.base.cra_flags		= CRYPTO_ALG_ASYNC,
+> +	.base.cra_blocksize	= 1,
+> +	.base.cra_ctxsize	= sizeof(struct mtk_aes_ctx),
+> +	.base.cra_alignmask	= 0xf,
+> +	.base.cra_module	= THIS_MODULE,
+> +
+> +	.min_keysize		= AES_MIN_KEY_SIZE,
+> +	.max_keysize		= AES_MAX_KEY_SIZE,
+> +	.ivsize			= AES_BLOCK_SIZE,
+> +	.setkey			= mtk_aes_setkey,
+> +	.encrypt		= mtk_aes_ctr_encrypt,
+> +	.decrypt		= mtk_aes_ctr_decrypt,
+> +	.init			= mtk_aes_ctr_init_tfm,
+>  },
+>  {
+> -	.cra_name		= "ofb(aes)",
+> -	.cra_driver_name	= "ofb-aes-mtk",
+> -	.cra_priority		= 400,
+> -	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER |
+> -				  CRYPTO_ALG_ASYNC,
+> -	.cra_init		= mtk_aes_cra_init,
+> -	.cra_blocksize		= 1,
+> -	.cra_ctxsize		= sizeof(struct mtk_aes_ctx),
+> -	.cra_alignmask		= 0xf,
+> -	.cra_type		= &crypto_ablkcipher_type,
+> -	.cra_module		= THIS_MODULE,
+> -	.cra_u.ablkcipher = {
+> -		.min_keysize	= AES_MIN_KEY_SIZE,
+> -		.max_keysize	= AES_MAX_KEY_SIZE,
+> -		.ivsize		= AES_BLOCK_SIZE,
+> -		.setkey		= mtk_aes_setkey,
+> -		.encrypt	= mtk_aes_ofb_encrypt,
+> -		.decrypt	= mtk_aes_ofb_decrypt,
+> -	}
+> +	.base.cra_name		= "ofb(aes)",
+> +	.base.cra_driver_name	= "ofb-aes-mtk",
+> +	.base.cra_priority	= 400,
+> +	.base.cra_flags		= CRYPTO_ALG_ASYNC,
+> +	.base.cra_blocksize	= AES_BLOCK_SIZE,
+> +	.base.cra_ctxsize	= sizeof(struct mtk_aes_ctx),
+> +	.base.cra_alignmask	= 0xf,
+> +	.base.cra_module	= THIS_MODULE,
+> +
+> +	.min_keysize		= AES_MIN_KEY_SIZE,
+> +	.max_keysize		= AES_MAX_KEY_SIZE,
+> +	.ivsize			= AES_BLOCK_SIZE,
+> +	.setkey			= mtk_aes_setkey,
+> +	.encrypt		= mtk_aes_ofb_encrypt,
+> +	.decrypt		= mtk_aes_ofb_decrypt,
+>  },
+>  {
+> -	.cra_name		= "cfb(aes)",
+> -	.cra_driver_name	= "cfb-aes-mtk",
+> -	.cra_priority		= 400,
+> -	.cra_flags		= CRYPTO_ALG_TYPE_ABLKCIPHER |
+> -				  CRYPTO_ALG_ASYNC,
+> -	.cra_init		= mtk_aes_cra_init,
+> -	.cra_blocksize		= 1,
+> -	.cra_ctxsize		= sizeof(struct mtk_aes_ctx),
+> -	.cra_alignmask		= 0xf,
+> -	.cra_type		= &crypto_ablkcipher_type,
+> -	.cra_module		= THIS_MODULE,
+> -	.cra_u.ablkcipher = {
+> -		.min_keysize	= AES_MIN_KEY_SIZE,
+> -		.max_keysize	= AES_MAX_KEY_SIZE,
+> -		.ivsize		= AES_BLOCK_SIZE,
+> -		.setkey		= mtk_aes_setkey,
+> -		.encrypt	= mtk_aes_cfb_encrypt,
+> -		.decrypt	= mtk_aes_cfb_decrypt,
+> -	}
+> +	.base.cra_name		= "cfb(aes)",
+> +	.base.cra_driver_name	= "cfb-aes-mtk",
+> +	.base.cra_priority	= 400,
+> +	.base.cra_flags		= CRYPTO_ALG_ASYNC,
+> +	.base.cra_blocksize	= 1,
+> +	.base.cra_ctxsize	= sizeof(struct mtk_aes_ctx),
+> +	.base.cra_alignmask	= 0xf,
+> +	.base.cra_module	= THIS_MODULE,
+> +
+> +	.min_keysize		= AES_MIN_KEY_SIZE,
+> +	.max_keysize		= AES_MAX_KEY_SIZE,
+> +	.ivsize			= AES_BLOCK_SIZE,
+> +	.setkey			= mtk_aes_setkey,
+> +	.encrypt		= mtk_aes_cfb_encrypt,
+> +	.decrypt		= mtk_aes_cfb_decrypt,
+>  },
+>  };
+>  
+> @@ -1259,7 +1243,7 @@ static void mtk_aes_unregister_algs(void)
+>  	crypto_unregister_aead(&aes_gcm_alg);
+>  
+>  	for (i = 0; i < ARRAY_SIZE(aes_algs); i++)
+> -		crypto_unregister_alg(&aes_algs[i]);
+> +		crypto_unregister_skcipher(&aes_algs[i]);
+>  }
+>  
+>  static int mtk_aes_register_algs(void)
+> @@ -1267,7 +1251,7 @@ static int mtk_aes_register_algs(void)
+>  	int err, i;
+>  
+>  	for (i = 0; i < ARRAY_SIZE(aes_algs); i++) {
+> -		err = crypto_register_alg(&aes_algs[i]);
+> +		err = crypto_register_skcipher(&aes_algs[i]);
+>  		if (err)
+>  			goto err_aes_algs;
+>  	}
+> @@ -1280,7 +1264,7 @@ static int mtk_aes_register_algs(void)
+>  
+>  err_aes_algs:
+>  	for (; i--; )
+> -		crypto_unregister_alg(&aes_algs[i]);
+> +		crypto_unregister_skcipher(&aes_algs[i]);
+>  
+>  	return err;
+>  }
+> 
