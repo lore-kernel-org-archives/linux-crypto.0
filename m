@@ -2,49 +2,49 @@ Return-Path: <SRS0=rtXS=ZD=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C46A2C43331
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 Nov 2019 19:14:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6D75C43331
+	for <linux-crypto@archiver.kernel.org>; Mon, 11 Nov 2019 19:14:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8EB4A206BA
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 Nov 2019 19:14:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 96CFB21655
+	for <linux-crypto@archiver.kernel.org>; Mon, 11 Nov 2019 19:14:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="qQkTGOJc"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="HRfuUZRN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727211AbfKKTOZ (ORCPT
+        id S1727200AbfKKTOn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 11 Nov 2019 14:14:25 -0500
-Received: from mo4-p04-ob.smtp.rzone.de ([85.215.255.124]:30821 "EHLO
+        Mon, 11 Nov 2019 14:14:43 -0500
+Received: from mo4-p04-ob.smtp.rzone.de ([85.215.255.124]:35230 "EHLO
         mo4-p04-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727112AbfKKTOY (ORCPT
+        with ESMTP id S1726985AbfKKTOm (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 Nov 2019 14:14:24 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1573499660;
+        Mon, 11 Nov 2019 14:14:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1573499677;
         s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=hzT2sQmGMWFbo8zas0c/uXFDbupufRKgC7qKAjtgBIA=;
-        b=qQkTGOJcrr4JVLrAdvxVG/sSObdyGFzr6+u1NhF1A/WMBGY9sxW9VhbiOfqQNo+rGv
-        Cv17/BSS2xCWyXH1i+RZ4rfYj2wA/ldLzdxp7ZTgHbDNMR6My+x/9anyQaxHg3c7v1ek
-        y5fBUsbwCh0Ajr/zbKF30vM46VOz1KqkUeSRq/OT6cP1+QgA0xDc+D6W2kOTmw4JAFp9
-        t0lZ8p3D7ZXwwMXDiAsHyJq2+YuHFfVYgs73mASx20OowdEvrue+2XOx3BTcLFJUnYts
-        AELqKOeQCCv7C5M9aOTjDSOkkS0bliEs1kX+kZu9hZt7aaBiCY5UY+WH9WAwRYk539Vc
-        fW6Q==
+        h=Message-ID:Date:Subject:Cc:To:From:X-RZG-CLASS-ID:X-RZG-AUTH:From:
+        Subject:Sender;
+        bh=7vwgCAEN7oJOVzriDotgWu4mTpr4jmrm5MfR+TKI5A8=;
+        b=HRfuUZRNHuMYpNLJJLUkmbTyb7w1EIWAYaYeD+azOn9gWZa2FiKT7MZQ/+Rh0gA2Zr
+        /jFW3pfL/iRFN2xd8P+q7lTwSRthKrnuaWSlSHxdZ/vM+XmGujSu7u4J2+XLWXzu1TbA
+        QlfAccVHtqhExnD19mraCdNhUJWrYL6eWdf3RdpwM1ytPdawt+GDOiYhyXaOVImIQOZP
+        TUClAkeCK9Zalqpyvs9Zn+x2wDLOc6hQGAEhz0WDO4ktn2T1I/iYMCf9HHo4LG3NBJQ4
+        vWj/Bwemy4iADf0jnrP1VoPiX4WcyKxCy/ZXuGZJxGfJELdmwjwYC1kcgOndWMcngOmm
+        8sPw==
 X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9zmgLKehaO2hZDSTWbgzIOA=="
 X-RZG-CLASS-ID: mo00
 Received: from positron.chronox.de
         by smtp.strato.de (RZmta 44.29.0 AUTH)
-        with ESMTPSA id N09a57vABJDD3Xb
+        with ESMTPSA id N09a57vABJDU3Xe
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
         (Client did not present a certificate);
-        Mon, 11 Nov 2019 20:13:13 +0100 (CET)
+        Mon, 11 Nov 2019 20:13:30 +0100 (CET)
 From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+To:     Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
         linux-api@vger.kernel.org,
         "Eric W. Biederman" <ebiederm@xmission.com>,
         "Alexander E. Patrakov" <patrakov@gmail.com>,
@@ -64,11 +64,9 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
         Roman Drahtmueller <draht@schaltsekun.de>,
         Neil Horman <nhorman@redhat.com>
-Subject: [PATCH v24 02/12] LRNG - allocate one SDRNG instance per NUMA node
-Date:   Mon, 11 Nov 2019 19:19:20 +0100
-Message-ID: <5150773.fIWb0X7rEq@positron.chronox.de>
-In-Reply-To: <6157374.ptSnyUpaCn@positron.chronox.de>
-References: <6157374.ptSnyUpaCn@positron.chronox.de>
+Subject: [PATCH v24 00/12] /dev/random - a new approach with full SP800-90B compliance
+Date:   Mon, 11 Nov 2019 19:17:30 +0100
+Message-ID: <6157374.ptSnyUpaCn@positron.chronox.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset="iso-8859-1"
@@ -77,21 +75,196 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In order to improve NUMA-locality when serving getrandom(2) requests,
-allocate one DRNG instance per node.
+Hi,
 
-The SDRNG instance that is present right from the start of the kernel is
-reused as the first per-NUMA-node SDRNG. For all remaining online NUMA
-nodes a new SDRNG instance is allocated.
+The following patch set provides a different approach to /dev/random which =
+is
+called Linux Random Number Generator (LRNG) to collect entropy within the L=
+inux
+kernel. The main improvements compared to the existing /dev/random is to pr=
+ovide
+sufficient entropy during boot time as well as in virtual environments and =
+when
+using SSDs. A secondary design goal is to limit the impact of the entropy
+collection on massive parallel systems and also allow the use accelerated
+cryptographic primitives. Also, all steps of the entropic data processing a=
+re
+testable.
 
-During boot time, the multiple SDRNG instances are seeded sequentially.
-With this, the first SDRNG instance (referenced as the initial SDRNG
-in the code) is completely seeded with 256 bits of entropy before the
-next SDRNG instance is completely seeded.
+The LRNG patch set allows a user to select use of the existing /dev/random =
+or
+the LRNG during compile time. As the LRNG provides API and ABI compatible
+interfaces to the existing /dev/random implementation, the user can freely =
+chose
+the RNG implementation without affecting kernel or user space operations.
 
-When random numbers are requested, the NUMA-node-local SDRNG is checked
-whether it has been already fully seeded. If this is not the case, the
-initial SDRNG is used to serve the request.
+This patch set provides early boot-time entropy which implies that no
+additional flags to the getrandom(2) system call discussed recently on
+the LKML is considered to be necessary.
+
+The LRNG is fully compliant to SP800-90B requirements and is shipped with a
+full SP800-90B assessment and all required test tools. The existing /dev/ra=
+ndom
+implementation on the other hand has architectural limitations which
+does not easily allow to bring the implementation in compliance with
+SP800-90B. The key statement that causes concern is SP800-90B section
+3.1.6. This section denies crediting entropy to multiple similar noise
+sources. This section explicitly references different noise sources resting
+on the timing of events and their derivatives (i.e. it is a direct complaint
+to the existing existing /dev/random implementation). Therefore, SP800-90B
+now denies the very issue mentioned in [1] with the existing /dev/random
+implementation for a long time: crediting entropy to interrupts as well as
+crediting entropy to derivatives of interrupts (HID and disk events). This =
+is
+not permissible with SP800-90B.
+
+SP800-90B specifies various requirements for the noise source(s) that seed =
+any
+DRNG including SP800-90A DRBGs. In about a year from now, SP800-90B will be
+mandated for all noise sources that provide entropy to DRBGs as part of a F=
+IPS
+140-[2|3] validation or other evaluation types. That means, if we there are=
+ no
+solutions to comply with the requirements of SP800-90B found till one year
+from now, any random number generation and ciphers based on random numbers
+on Linux will be considered and treated as not applicable and delivering
+no entropy! As /dev/urandom, getrandom(2) and /dev/random are the most
+common and prevalent noise sources for DRNGs, all these DRNGs are affected.
+This applies across the board for all validations of cryptography executing=
+ on
+Linux (kernel and user space modules).
+
+=46or users that are not interested in SP800-90B, the entire code for the
+compliance as well as test interfaces can be deselected at compile time.
+
+The design and implementation is driven by a set of goals described in [1]
+that the LRNG completely implements. Furthermore, [1] includes the full
+assessment of the SP800-90B compliance as well as a comparison with RNG
+design suggestions of SP800-90C, and AIS20/31.
+
+The LRNG provides a complete separation of the noise source maintenance
+and the collection of entropy into an entropy pool from the post-processing
+using a pseudo-random number generator. Different DRNGs are supported,
+including:
+
+* The LRNG can be compile-time enabled to replace the existing /dev/random
+  implementation. When not selecting the LRNG at compile time (default), the
+  existing /dev/random implementation is built.
+
+* Built-in ChaCha20 DRNG which has no dependency to other kernel
+  frameworks.
+
+* SP800-90A DRBG using the kernel crypto API including its accelerated
+  raw cipher implementations. This implies that the output of /dev/random,
+  getrandom(2), /dev/urandom or get_random_bytes is fully compliant to
+  SP800-90A.
+
+* Arbitrary DRNGs registered with the kernel crypto API
+
+* Full compliance with SP800-90B which covers the startup and runtime health
+  tests mandated by SP800-90B as well as providing the test tools and test
+  interfaces to obtain raw noise data securely. The test tools are provided=
+ at
+  [1].
+
+Booting the patch with the kernel command line option
+"dyndbg=3Dfile drivers/char/lrng* +p" generates logs indicating the operati=
+on
+of the LRNG. Each log is pre-pended with "lrng".
+
+The LRNG has a flexible design by allowing an easy replacement of the
+deterministic random number generator component.
+
+Compared to the existing /dev/random implementation, the compiled binary
+is smaller when the LRNG is compiled with all options equal to the
+existing /dev/random (i.e. only CONFIG_LRNG and
+CONFIG_LRNG_TRNG_SUPPORT are set): random.o is 52.5 kBytes whereas
+all LRNG object files are in 49 kBytes in size. The fully
+SP800-90A/SP800-90B compliant binary code (CONFIG_LRNG,
+CONFIG_LRNG_DRNG_SWITCH, CONFIG_LRNG_DRBG, CONFIG_LRNG_HEALTH_TESTS)
+uses some 61 kBytes.
+
+[1] http://www.chronox.de/lrng.html - If the patch is accepted, I would
+be volunteering to convert the documentation into RST format and
+contribute it to the Linux kernel documentation directory.
+
+Changes (compared to the previous patch set for 5.2):
+
+* breakup of the monolithic code base into several logically isolated
+  files and move all files into drivers/char/lrng/ - this also reduces
+  the number of ifdefs in the code significantly as the make system is
+  used to select the enabled code
+
+* Add Tested-by and Reviewed-by lines
+
+* Significant speedup of code executing in interrupt handler: the LRNG
+  is now almost 50% faster as the existing /dev/random. On one example
+  system, the LRNG interrupt handling code executes within an average of
+  65 cycles whereas the existing /dev/random on the same device takes
+  about 97 cycles.
+
+* SP800-90B compliance
+	- use hash_df function defined in SP800-90A section 10.3.1 to read
+	  entropy pool
+	- add compile time configurable SP800-90B health tests and eliminate
+	  any FIPS 140-2 code from the base code
+	- consider entropy reduction of conditioning operation compliant
+	  to SP800-90B
+	- complete entropy assessment and entropy assessment tests available
+	at [1]
+
+* prune base LRNG code of any FIPS-related code - all FIPS-related code is
+  in the SP800-90B compliance code that can be deactivated at compile time
+
+* testing performed with all tests offered at [1] including all required
+  SP800-90B tests, as well as KASAN, UBSAN, and lockdep while executing
+  stress tests. Tests were performed on: x86, S390
+
+* make DRNG switching support compile-time configurable
+
+* selection of entropy pool size is now a configure option
+
+* support deactivation of TRNG (i.e. blocking behavior of /dev/random)
+  at compile time. If deactivated, /dev/random behaves like
+  getrandom(2).
+
+* conditionally compile NUMA support
+
+* eliminate in_atomic() invocation: In-kernel consumers always use
+  the ChaCha20 DRNG unless the new API call get_random_bytes_full
+  is invoked which may sleep but offer access to the full functionality
+  of the LRNG including all types of DRNG.
+
+* use debugfs file for obtaining raw entropy test data required to fulfill
+  SP800-90B requirements
+
+* fix: ensure that gathering raw entropy does not affect runtime of the ker=
+nel
+
+* fix: import upstream patch b7d5dc21072cda7124d13eae2aefb7343ef94197
+
+* fix: import upstream patch 428826f5358c922dc378830a1717b682c0823160
+
+* fix: integrate patch "random: Don't freeze in add_hwgenerator_randomness()
+  if stopping kthread"
+
+* documentation enhancement: import upstream patch
+  92e507d216139b356a375afbda2824e85235e748 into documentation to cover all
+  interfaces of the LRNG
+
+* speedup of injection of non-aligned data into entropy pool
+
+As a side node: With the switchable DRNG support offered in this patch set,
+the following areas could be removed. As the existing /dev/random has no su=
+pport
+for switchable DRNGs, however, this is not yet feasible though.
+
+* remove lrng_ready_list and all code around it in lrng_interfaces.c
+
+* remove the kernel crypto API RNG API to avoid having two random number
+  providing APIs - this would imply that all RNGs developed for this API wo=
+uld
+  be converted to the LRNG interface
 
 CC: "Eric W. Biederman" <ebiederm@xmission.com>
 CC: "Alexander E. Patrakov" <patrakov@gmail.com>
@@ -109,170 +282,72 @@ CC: Andy Lutomirski <luto@kernel.org>
 CC: Florian Weimer <fweimer@redhat.com>
 CC: Lennart Poettering <mzxreary@0pointer.de>
 CC: Nicolai Stange <nstange@suse.de>
-Reviewed-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
-Reviewed-by: Roman Drahtmueller <draht@schaltsekun.de>
 Tested-by: Roman Drahtm=FCller <draht@schaltsekun.de>
 Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
 Tested-by: Neil Horman <nhorman@redhat.com>
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
-=2D--
- drivers/char/lrng/Makefile        |   2 +
- drivers/char/lrng/lrng_internal.h |   5 ++
- drivers/char/lrng/lrng_numa.c     | 114 ++++++++++++++++++++++++++++++
- 3 files changed, 121 insertions(+)
- create mode 100644 drivers/char/lrng/lrng_numa.c
 
-diff --git a/drivers/char/lrng/Makefile b/drivers/char/lrng/Makefile
-index 2761623715d2..a00cddb45773 100644
-=2D-- a/drivers/char/lrng/Makefile
-+++ b/drivers/char/lrng/Makefile
-@@ -7,3 +7,5 @@ obj-y				+=3D lrng_pool.o lrng_aux.o \
- 				   lrng_sw_noise.o lrng_archrandom.o \
- 				   lrng_sdrng.o lrng_chacha20.o \
- 				   lrng_interfaces.o \
-+
-+obj-$(CONFIG_NUMA)		+=3D lrng_numa.o
-diff --git a/drivers/char/lrng/lrng_internal.h b/drivers/char/lrng/lrng_int=
-ernal.h
-index 242f9b5b4f3d..e6ac2c527378 100644
-=2D-- a/drivers/char/lrng/lrng_internal.h
-+++ b/drivers/char/lrng/lrng_internal.h
-@@ -263,8 +263,13 @@ int lrng_sdrng_get_sleep(u8 *outbuf, u32 outbuflen);
- void lrng_sdrng_force_reseed(void);
- void lrng_sdrng_seed_work(struct work_struct *dummy);
-=20
-+#ifdef CONFIG_NUMA
-+struct lrng_sdrng **lrng_sdrng_instances(void);
-+void lrng_drngs_numa_alloc(void);
-+#else	/* CONFIG_NUMA */
- static inline struct lrng_sdrng **lrng_sdrng_instances(void) { return NULL=
-; }
- static inline void lrng_drngs_numa_alloc(void) { return; }
-+#endif /* CONFIG_NUMA */
-=20
- /************************** Health Test linking code *********************=
-*****/
-=20
-diff --git a/drivers/char/lrng/lrng_numa.c b/drivers/char/lrng/lrng_numa.c
-new file mode 100644
-index 000000000000..e88de91cb0aa
-=2D-- /dev/null
-+++ b/drivers/char/lrng/lrng_numa.c
-@@ -0,0 +1,114 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
-+/*
-+ * LRNG NUMA support
-+ *
-+ * Copyright (C) 2016 - 2019, Stephan Mueller <smueller@chronox.de>
-+ *
-+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
-+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ALL OF
-+ * WHICH ARE HEREBY DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE
-+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
-+ * OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
-+ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
-+ * USE OF THIS SOFTWARE, EVEN IF NOT ADVISED OF THE POSSIBILITY OF SUCH
-+ * DAMAGE.
-+ */
-+
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
-+#include <linux/lrng.h>
-+#include <linux/slab.h>
-+
-+#include "lrng_internal.h"
-+
-+static struct lrng_sdrng **lrng_sdrng __read_mostly =3D NULL;
-+
-+struct lrng_sdrng **lrng_sdrng_instances(void)
-+{
-+	return lrng_sdrng;
-+}
-+
-+/* Allocate the data structures for the per-NUMA node DRNGs */
-+static void _lrng_drngs_numa_alloc(struct work_struct *work)
-+{
-+	struct lrng_sdrng **sdrngs;
-+	struct lrng_sdrng *lrng_sdrng_init =3D lrng_sdrng_init_instance();
-+	u32 node;
-+	bool init_sdrng_used =3D false;
-+
-+	mutex_lock(&lrng_crypto_cb_update);
-+
-+	/* per-NUMA-node DRNGs are already present */
-+	if (lrng_sdrng)
-+		goto unlock;
-+
-+	sdrngs =3D kcalloc(nr_node_ids, sizeof(void *), GFP_KERNEL|__GFP_NOFAIL);
-+	for_each_online_node(node) {
-+		struct lrng_sdrng *sdrng;
-+
-+		if (!init_sdrng_used) {
-+			sdrngs[node] =3D lrng_sdrng_init;
-+			init_sdrng_used =3D true;
-+			continue;
-+		}
-+
-+		sdrng =3D kmalloc_node(sizeof(struct lrng_sdrng),
-+				     GFP_KERNEL|__GFP_NOFAIL, node);
-+		memset(sdrng, 0, sizeof(lrng_sdrng));
-+
-+		sdrng->crypto_cb =3D lrng_sdrng_init->crypto_cb;
-+		sdrng->sdrng =3D sdrng->crypto_cb->lrng_drng_alloc(
-+					LRNG_DRNG_SECURITY_STRENGTH_BYTES);
-+		if (IS_ERR(sdrng->sdrng)) {
-+			kfree(sdrng);
-+			goto err;
-+		}
-+
-+		mutex_init(&sdrng->lock);
-+		spin_lock_init(&sdrng->spin_lock);
-+
-+		/*
-+		 * No reseeding of NUMA DRNGs from previous DRNGs as this
-+		 * would complicate the code. Let it simply reseed.
-+		 */
-+		lrng_sdrng_reset(sdrng);
-+		sdrngs[node] =3D sdrng;
-+
-+		lrng_pool_inc_numa_node();
-+		pr_info("secondary DRNG for NUMA node %d allocated\n", node);
-+	}
-+
-+	/* Ensure that all NUMA nodes receive changed memory here. */
-+	mb();
-+
-+	if (!cmpxchg(&lrng_sdrng, NULL, sdrngs))
-+		goto unlock;
-+
-+err:
-+	for_each_online_node(node) {
-+		struct lrng_sdrng *sdrng =3D sdrngs[node];
-+
-+		if (sdrng =3D=3D lrng_sdrng_init)
-+			continue;
-+
-+		if (sdrng) {
-+			sdrng->crypto_cb->lrng_drng_dealloc(sdrng->sdrng);
-+			kfree(sdrng);
-+		}
-+	}
-+	kfree(sdrngs);
-+
-+unlock:
-+	mutex_unlock(&lrng_crypto_cb_update);
-+}
-+
-+static DECLARE_WORK(lrng_drngs_numa_alloc_work, _lrng_drngs_numa_alloc);
-+
-+void lrng_drngs_numa_alloc(void)
-+{
-+	schedule_work(&lrng_drngs_numa_alloc_work);
-+}
+Stephan Mueller (12):
+  Linux Random Number Generator
+  LRNG - allocate one SDRNG instance per NUMA node
+  LRNG - /proc interface
+  LRNG - add switchable DRNG support
+  crypto: DRBG - externalize DRBG functions for LRNG
+  LRNG - add SP800-90A DRBG extension
+  LRNG - add kernel crypto API PRNG extension
+  crypto: provide access to a static Jitter RNG state
+  LRNG - add Jitter RNG fast noise source
+  LRNG - add TRNG support
+  LRNG - add SP800-90B compliance
+  LRNG - add interface for gathering of raw entropy
+
+ MAINTAINERS                         |   7 +
+ crypto/drbg.c                       |  16 +-
+ crypto/jitterentropy.c              |  23 +
+ drivers/char/Kconfig                |   2 +
+ drivers/char/Makefile               |   9 +-
+ drivers/char/lrng/Kconfig           | 145 ++++++
+ drivers/char/lrng/Makefile          |  19 +
+ drivers/char/lrng/lrng_archrandom.c | 105 +++++
+ drivers/char/lrng/lrng_aux.c        | 161 +++++++
+ drivers/char/lrng/lrng_chacha20.c   | 341 ++++++++++++++
+ drivers/char/lrng/lrng_drbg.c       | 274 +++++++++++
+ drivers/char/lrng/lrng_health.c     | 424 ++++++++++++++++++
+ drivers/char/lrng/lrng_interfaces.c | 648 ++++++++++++++++++++++++++
+ drivers/char/lrng/lrng_internal.h   | 322 +++++++++++++
+ drivers/char/lrng/lrng_jent.c       | 101 +++++
+ drivers/char/lrng/lrng_kcapi.c      | 341 ++++++++++++++
+ drivers/char/lrng/lrng_numa.c       | 114 +++++
+ drivers/char/lrng/lrng_pool.c       | 673 ++++++++++++++++++++++++++++
+ drivers/char/lrng/lrng_proc.c       | 192 ++++++++
+ drivers/char/lrng/lrng_sdrng.c      | 458 +++++++++++++++++++
+ drivers/char/lrng/lrng_sw_noise.c   | 156 +++++++
+ drivers/char/lrng/lrng_switch.c     | 198 ++++++++
+ drivers/char/lrng/lrng_testing.c    | 324 +++++++++++++
+ drivers/char/lrng/lrng_trng.c       | 301 +++++++++++++
+ include/crypto/drbg.h               |   7 +
+ include/linux/lrng.h                |  83 ++++
+ 26 files changed, 5437 insertions(+), 7 deletions(-)
+ create mode 100644 drivers/char/lrng/Kconfig
+ create mode 100644 drivers/char/lrng/Makefile
+ create mode 100644 drivers/char/lrng/lrng_archrandom.c
+ create mode 100644 drivers/char/lrng/lrng_aux.c
+ create mode 100644 drivers/char/lrng/lrng_chacha20.c
+ create mode 100644 drivers/char/lrng/lrng_drbg.c
+ create mode 100644 drivers/char/lrng/lrng_health.c
+ create mode 100644 drivers/char/lrng/lrng_interfaces.c
+ create mode 100644 drivers/char/lrng/lrng_internal.h
+ create mode 100644 drivers/char/lrng/lrng_jent.c
+ create mode 100644 drivers/char/lrng/lrng_kcapi.c
+ create mode 100644 drivers/char/lrng/lrng_numa.c
+ create mode 100644 drivers/char/lrng/lrng_pool.c
+ create mode 100644 drivers/char/lrng/lrng_proc.c
+ create mode 100644 drivers/char/lrng/lrng_sdrng.c
+ create mode 100644 drivers/char/lrng/lrng_sw_noise.c
+ create mode 100644 drivers/char/lrng/lrng_switch.c
+ create mode 100644 drivers/char/lrng/lrng_testing.c
+ create mode 100644 drivers/char/lrng/lrng_trng.c
+ create mode 100644 include/linux/lrng.h
+
 =2D-=20
 2.23.0
 
