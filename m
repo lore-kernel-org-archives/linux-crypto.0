@@ -2,110 +2,108 @@ Return-Path: <SRS0=rtXS=ZD=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A158DC43331
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 Nov 2019 17:18:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A507C43331
+	for <linux-crypto@archiver.kernel.org>; Mon, 11 Nov 2019 17:20:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 739142190F
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 Nov 2019 17:18:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1573492701;
-	bh=f9l2HbZ3OcGFP12zNrw5cfXRvIpUn8xJk4t/VMJUFJo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=RrxuFJiGXKODWIwyDPl3fkHqVJ6P6Le1fleFPIeGOtJWXEwSVlk2wcpBqkB/e/r79
-	 4CKLctznTMVLzpEoEneKOAwlqb8ya4vtEGUEO64B9iBtfmU+xgjtnpCNGkyQI8gEvY
-	 4Rsghp2JDoILkrqGghIecch1ZojQ/cbg1s85jSco=
+	by mail.kernel.org (Postfix) with ESMTP id 84D7A2190F
+	for <linux-crypto@archiver.kernel.org>; Mon, 11 Nov 2019 17:20:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=alien8.de header.i=@alien8.de header.b="qyuqe1jF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726958AbfKKRSU (ORCPT
+        id S1726878AbfKKRUK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 11 Nov 2019 12:18:20 -0500
-Received: from mail.kernel.org ([198.145.29.99]:59900 "EHLO mail.kernel.org"
+        Mon, 11 Nov 2019 12:20:10 -0500
+Received: from mail.skyhub.de ([5.9.137.197]:52422 "EHLO mail.skyhub.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726871AbfKKRSU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 Nov 2019 12:18:20 -0500
-Received: from gmail.com (unknown [104.132.1.77])
+        id S1726845AbfKKRUK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 11 Nov 2019 12:20:10 -0500
+Received: from zn.tnic (p200300EC2F26BB00D592BD3399DA4BDA.dip0.t-ipconnect.de [IPv6:2003:ec:2f26:bb00:d592:bd33:99da:4bda])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 542A320656;
-        Mon, 11 Nov 2019 17:18:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573492699;
-        bh=f9l2HbZ3OcGFP12zNrw5cfXRvIpUn8xJk4t/VMJUFJo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=zqyyiPmeXMg5GzJrLPu9gN8t1fmN8YKFX+2XQ+ILpO5Pfmhf298tGW0j7OUPWVPk4
-         2o/qyfXVYdJOm84b8MP3cQaSz/Cz0j6Wx13/F9YI6vR1YqowgxQf8+4BdGflawKxmq
-         l2GN5IT6c8GX7DEKTcRH7GmPK70f/CQqSRDHUDIA=
-Date:   Mon, 11 Nov 2019 09:18:17 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Xu Zaibo <xuzaibo@huawei.com>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, jonathan.cameron@huawei.com,
-        wangzhou1@hisilicon.com, linuxarm@huawei.com, fanghao11@huawei.com,
-        yekai13@huawei.com, zhangwei375@huawei.com,
-        forest.zhouchang@huawei.com
-Subject: Re: [PATCH v2 0/5] crypto: hisilicon - add HiSilicon SEC V2 support
-Message-ID: <20191111171816.GA56300@gmail.com>
-Mail-Followup-To: Xu Zaibo <xuzaibo@huawei.com>,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, jonathan.cameron@huawei.com,
-        wangzhou1@hisilicon.com, linuxarm@huawei.com, fanghao11@huawei.com,
-        yekai13@huawei.com, zhangwei375@huawei.com,
-        forest.zhouchang@huawei.com
-References: <1573264917-14588-1-git-send-email-xuzaibo@huawei.com>
- <20191109021650.GA9739@sol.localdomain>
- <d75fc607-524c-a68a-bafe-28e793bced93@huawei.com>
- <20191111053720.GA18665@sol.localdomain>
- <5f822228-0323-928a-30f9-dea4af210a4c@huawei.com>
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 1FA4E1EC0C25;
+        Mon, 11 Nov 2019 18:20:09 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1573492809;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=3tu/7JPN4tV5i1X8iQrVSJW+CCc7eYR1Dlq3I5+LVX8=;
+        b=qyuqe1jFxo+K8LpqQlIAKT4knwZJson6Dvyz8Q1EbH8WUy/pnEULfJDRJhknMQgBSqHA7b
+        0jAl0vdQ6vQKlNAxpErBdf/04xKzI48cJfK3z2WqrCdCYctQTdfSo3SRTzXCzYebnJ3rlb
+        lWXbQPBg6M9I7MtRDGog4//j2Gp6meQ=
+Date:   Mon, 11 Nov 2019 18:20:06 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Richard Henderson <richard.henderson@linaro.org>
+Cc:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au,
+        linux-arch@vger.kernel.org, x86@kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-s390@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 00/10] Improvements for random.h/archrandom.h
+Message-ID: <20191111172006.GC2799@zn.tnic>
+References: <20191106141308.30535-1-rth@twiddle.net>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <5f822228-0323-928a-30f9-dea4af210a4c@huawei.com>
+In-Reply-To: <20191106141308.30535-1-rth@twiddle.net>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Nov 11, 2019 at 08:26:20PM +0800, Xu Zaibo wrote:
-> Hi,
+On Wed, Nov 06, 2019 at 03:12:58PM +0100, Richard Henderson wrote:
+> During patch review for an addition of archrandom.h for arm64, it was
+> suggeted that the arch_random_get_* functions should be marked __must_check.
+> Which does sound like a good idea, since the by-reference integer output
+> may be uninitialized when the boolean result is false.
 > 
-> On 2019/11/11 13:37, Eric Biggers wrote:
-> > On Mon, Nov 11, 2019 at 10:21:39AM +0800, Xu Zaibo wrote:
-> > > Hi,
-> > > 
-> > > On 2019/11/9 10:16, Eric Biggers wrote:
-> > > > On Sat, Nov 09, 2019 at 10:01:52AM +0800, Zaibo Xu wrote:
-> > > > > This series adds HiSilicon Security Engine (SEC) version 2 controller
-> > > > > driver in Crypto subsystem. It includes PCIe enabling, Skcipher, DebugFS
-> > > > > and SRIOV support of SEC.
-> > > > > 
-> > > > > This patchset rebases on:
-> > > > > git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
-> > > > > 
-> > > > > This patchset is based on:
-> > > > > https://www.spinics.net/lists/linux-crypto/msg43520.html
-> > > > > 
-> > > > > Changes:
-> > > > >    - delete checking return value of debugfs_create_xxx functions.
-> > > > > 
-> > > > > Change log:
-> > > > > v2:    - remove checking return value of debugfs_create_xxx functions.
-> > > > > 
-> > > > Does this driver pass all the crypto self-tests, including with
-> > > > CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y?
-> > > > 
-> > > Not including extra testing now, only CONFIG_CRYPTO_TEST is passed.
-> > > 
-> > Can you please ensure that all the extra tests are passing too?  I.e., boot a
-> > kernel with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y and check dmesg for failures.
-> > 
-> Ok, I will try to do this. BTW, why we need this test? Thanks.
+> In addition, it turns out that arch_has_random() and arch_has_random_seed()
+> are not used, and not easy to support for arm64.  Rather than cobble
+> something together that would not be testable, remove the interfaces
+> against some future accidental use.
 > 
+> In addition, I noticed a few other minor inconsistencies between the
+> different architectures, e.g. powerpc isn't using bool.
+> 
+> Change since v1:
+>   * Remove arch_has_random, arch_has_random_seed.
+> 
+> 
+> r~
+> 
+> 
+> Richard Henderson (10):
+>   x86: Remove arch_has_random, arch_has_random_seed
+>   powerpc: Remove arch_has_random, arch_has_random_seed
+>   s390: Remove arch_has_random, arch_has_random_seed
+>   linux/random.h: Remove arch_has_random, arch_has_random_seed
+>   linux/random.h: Use false with bool
+>   linux/random.h: Mark CONFIG_ARCH_RANDOM functions __must_check
+>   x86: Mark archrandom.h functions __must_check
+>   powerpc: Use bool in archrandom.h
+>   powerpc: Mark archrandom.h functions __must_check
+>   s390x: Mark archrandom.h functions __must_check
+> 
+>  arch/powerpc/include/asm/archrandom.h | 27 +++++++++-----------------
+>  arch/s390/include/asm/archrandom.h    | 20 ++++---------------
+>  arch/x86/include/asm/archrandom.h     | 28 ++++++++++++---------------
+>  include/linux/random.h                | 24 ++++++++---------------
+>  4 files changed, 33 insertions(+), 66 deletions(-)
+> 
+> -- 
 
-It will test the correctness of your driver.
+They look good to me.
 
-- Eric
+Is anyone going to take them or should I though the tip tree?
+
+Thx.
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
