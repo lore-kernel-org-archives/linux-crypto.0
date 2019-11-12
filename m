@@ -2,125 +2,245 @@ Return-Path: <SRS0=Y60y=ZE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E23BAC43331
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Nov 2019 22:56:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C685C43331
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Nov 2019 23:05:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BB04321D7F
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Nov 2019 22:56:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E92E021A49
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Nov 2019 23:05:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="IsPQL/hU"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="d/osedc7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726995AbfKLW4t (ORCPT
+        id S1727036AbfKLXFC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Nov 2019 17:56:49 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:38748 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726910AbfKLW4s (ORCPT
+        Tue, 12 Nov 2019 18:05:02 -0500
+Received: from mo4-p02-ob.smtp.rzone.de ([85.215.255.83]:13892 "EHLO
+        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726910AbfKLXFC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Nov 2019 17:56:48 -0500
-Received: by mail-pf1-f194.google.com with SMTP id c13so152242pfp.5
-        for <linux-crypto@vger.kernel.org>; Tue, 12 Nov 2019 14:56:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=zpJ/TMpVSKZy+JXxk/4c68rZdEAtB+OaqfRaFt77y6Y=;
-        b=IsPQL/hU3IhF+qfkUCRWUrXYZheaE/5EOnSVDyJp/WnzWjkB3a7igBYUvpzviMn6L3
-         EWwKMMcbTBSkE9j6+lM7cjybdedxFAxjw34SjY8xUmExgVx9vkxyfsA7HCeOc5ODgssQ
-         WFs7WhwKK8SIMbSuP6MoGhI6aOCwmBoWjhHQo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=zpJ/TMpVSKZy+JXxk/4c68rZdEAtB+OaqfRaFt77y6Y=;
-        b=TfGfuodjZzMIb2fWce5JJSEDW55sXzP+lz3DXxKcGjI3jsytT7E7/ndJ/LjNV50cWT
-         Or0DiLDLq6HsIoS3PohxJHk7hcbKqxTRVT6XSF78UuM9PdBZszeQN5//07fve9kBxXNK
-         HBdguiQrJT7GKqAeuF1HuCyAbYDHK7L15Sw7fpafkfmBPZNZyHqI3857HZMSK6WPXYgm
-         7uXxhBp60AuIbpZSTjGtEGMZffT/Z+utNH0UBQ+SIXf8Sl8ly48RUvyMmIh78qnTuF+Q
-         Jy4PoTZOnGuhjha8cplOTLAhL41U8nBNfa7FZW7GQ6Qxn4/JwOVC4F5qvkrnzz+tDb9l
-         tlqw==
-X-Gm-Message-State: APjAAAWY0psn6q3pEb1Y0hj0SSq7HVJBfuXrTpUlTksktzrs+gUJK1aJ
-        GaLyFaBC4VCcdjvjXsF7mdNouA==
-X-Google-Smtp-Source: APXvYqwVpIPBQ69m+AEur+RE+tA3ua9JIQo1zSDy5Qc9XKebf2oGEun7RjUMRnM+saiWqFyl65X22A==
-X-Received: by 2002:a17:90a:d102:: with SMTP id l2mr363545pju.132.1573599406393;
-        Tue, 12 Nov 2019 14:56:46 -0800 (PST)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id e198sm18553pfh.83.2019.11.12.14.56.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Nov 2019 14:56:45 -0800 (PST)
-Date:   Tue, 12 Nov 2019 14:56:44 -0800
-From:   Kees Cook <keescook@chromium.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>,
-        =?iso-8859-1?Q?Jo=E3o?= Moreira <joao.moreira@lsc.ic.unicamp.br>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>, x86@kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-hardening@lists.openwall.com
-Subject: Re: [PATCH v4 3/8] crypto: x86/camellia: Use new glue function macros
-Message-ID: <201911121452.AE2672AECB@keescook>
-References: <20191111214552.36717-1-keescook@chromium.org>
- <20191111214552.36717-4-keescook@chromium.org>
- <3059417.7DhL3USBNQ@positron.chronox.de>
- <20191112031417.GB1433@sol.localdomain>
- <20191112031635.jm32vne33qxh7ojh@gondor.apana.org.au>
+        Tue, 12 Nov 2019 18:05:02 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1573599897;
+        s=strato-dkim-0002; d=chronox.de;
+        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=Q3yI8KuXkhoIXdHnKwMf4rsXPTkqQCXkxTeNhzhUzL8=;
+        b=d/osedc7zO6w5kTZLkQzsbavacu4UNEpFgARxwhUlwj+0kkhQNH0l7jKwZ03heFgYG
+        pLgZb/JY08dkLtda8w2ZlJOmVN8HCjSTv5YlvUvVQVCLDW6ULlljGPgLOsc3YKSDqtrF
+        mC78ubdnllk6wxycpOwZD3LYDwY/64EMmOj++cCalIis1qLjgctSn858HXFCL/x3D0Af
+        ho1HuDVCwIY5RLN/CESWhnerrldYMoVIBwm6aYhh4TqIa5hdJmUB5GJ3zKRcrHyjdbO9
+        2v48z1X5vnJYRQe53AtHiswBSV2Irab8olJxUninqaZQem+hh76ivHSYptZlxppuiKRK
+        pe5w==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9zmwdNLqV/Nz7PsNPEA=="
+X-RZG-CLASS-ID: mo00
+Received: from positron.chronox.de
+        by smtp.strato.de (RZmta 44.29.0 SBL|AUTH)
+        with ESMTPSA id N09a57vACN3nA2B
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
+        (Client did not present a certificate);
+        Wed, 13 Nov 2019 00:03:49 +0100 (CET)
+From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To:     Andy Lutomirski <luto@kernel.org>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Nicolai Stange <nstange@suse.de>,
+        "Peter, Matthias" <matthias.peter@bsi.bund.de>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Roman Drahtmueller <draht@schaltsekun.de>,
+        Neil Horman <nhorman@redhat.com>
+Subject: Re: [PATCH v24 00/12] /dev/random - a new approach with full SP800-90B compliance
+Date:   Wed, 13 Nov 2019 00:03:47 +0100
+Message-ID: <3282061.iY3hP4IT6m@positron.chronox.de>
+In-Reply-To: <CALCETrVBzuOsDfaz5y3V4v+6xmeWufOYsOGnpZrRju6Pfsi6gg@mail.gmail.com>
+References: <6157374.ptSnyUpaCn@positron.chronox.de> <CALCETrVBzuOsDfaz5y3V4v+6xmeWufOYsOGnpZrRju6Pfsi6gg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191112031635.jm32vne33qxh7ojh@gondor.apana.org.au>
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Nov 12, 2019 at 11:16:35AM +0800, Herbert Xu wrote:
-> On Mon, Nov 11, 2019 at 07:14:17PM -0800, Eric Biggers wrote:
-> >
-> > Also, I don't see the point of the macros, other than to obfuscate things.  To
-> > keep things straightforward, I think we should keep the explicit function
-> > prototypes for each algorithm.
-> 
-> I agree.  Kees, please get rid of the macros.
+Am Dienstag, 12. November 2019, 16:33:59 CET schrieb Andy Lutomirski:
 
-Okay, if we do that, then we'll likely be dropping a lot of union logic
-(since ecb and cbc end up with identical params and ctr and xts do too):
+Hi Andy,
 
-typedef void (*common_glue_func_t)(void *ctx, u8 *dst, const u8 *src);
-typedef void (*common_glue_cbc_func_t)(void *ctx, u128 *dst, const u128 *src);
-typedef void (*common_glue_ctr_func_t)(void *ctx, u128 *dst, const u128 *src,
-                                       le128 *iv);
-typedef void (*common_glue_xts_func_t)(void *ctx, u128 *dst, const u128 *src,
-                                       le128 *iv);
-...
-struct common_glue_func_entry {
-        unsigned int num_blocks; /* number of blocks that @fn will process */
-        union { 
-                common_glue_func_t ecb;
-                common_glue_cbc_func_t cbc;
-                common_glue_ctr_func_t ctr;
-                common_glue_xts_func_t xts;
-        } fn_u;
-};
+> On Mon, Nov 11, 2019 at 11:13 AM Stephan M=FCller <smueller@chronox.de> w=
+rote:
+> > The following patch set provides a different approach to /dev/random wh=
+ich
+> > is called Linux Random Number Generator (LRNG) to collect entropy within
+> > the Linux kernel. The main improvements compared to the existing
+> > /dev/random is to provide sufficient entropy during boot time as well as
+> > in virtual environments and when using SSDs. A secondary design goal is
+> > to limit the impact of the entropy collection on massive parallel syste=
+ms
+> > and also allow the use accelerated cryptographic primitives. Also, all
+> > steps of the entropic data processing are testable.
+>=20
+> This is very nice!
+>=20
+> > The LRNG patch set allows a user to select use of the existing /dev/ran=
+dom
+> > or the LRNG during compile time. As the LRNG provides API and ABI
+> > compatible interfaces to the existing /dev/random implementation, the
+> > user can freely chose the RNG implementation without affecting kernel or
+> > user space operations.
+> >=20
+> > This patch set provides early boot-time entropy which implies that no
+> > additional flags to the getrandom(2) system call discussed recently on
+> > the LKML is considered to be necessary.
+>=20
+> I'm uneasy about this.  I fully believe that, *on x86*, this works.
+> But on embedded systems with in-order CPUs, a single clock, and very
+> lightweight boot processes, most or all of boot might be too
+> deterministic for this to work.
 
-These would end up being just:
+I agree that in such cases, my LRNG getrandom(2) would also block until the=
+=20
+LRNG thinks it collected 256 bits of entropy. However, I am under the=20
+impression that the LRNG collects that entropy faster that the existing /de=
+v/
+random implementation, even in this case.
 
-typedef void (*common_glue_func_t)(void *ctx, u8 *dst, const u8 *src);
-typedef void (*common_glue_iv_func_t)(void *ctx, u8 *dst, const u8 *src,
-                                       le128 *iv);
-...
-struct common_glue_func_entry {
-        unsigned int num_blocks; /* number of blocks that @fn will process */
-        union { 
-                common_glue_func_t func;
-                common_glue_iv_func_t iv_func;
-        } fn_u;
+Nicolai is copied on this thread. He promised to have the LRNG tested on su=
+ch=20
+a minimalistic system that you describe. I hope he could contribute some=20
+numbers from that test helping us to understand how much of a problem we fa=
+ce.
+>=20
+> I have a somewhat competing patch set here:
+>=20
+> https://git.kernel.org/pub/scm/linux/kernel/git/luto/linux.git/log/?h=3Dr=
+andom
+> /kill-it
+>=20
+> (Ignore the "horrible test hack" and the debugfs part.)
+>=20
+> The basic summary is that I change /dev/random so that it becomes
+> functionally identical to getrandom(..., 0) -- in other words, it
+> blocks until the CRNG is initialized but is then identical to
+> /dev/urandom.
 
-Is that reasonable?
+This would be equal to the LRNG code without compiling the TRNG.
 
--- 
-Kees Cook
+> And I add getrandom(...., GRND_INSECURE) that is
+> functionally identical to the existing /dev/urandom: it always returns
+> *something* immediately, but it may or may not actually be
+> cryptographically random or even random at all depending on system
+> details.
+
+Ok, if it is suggested that getrandom(2) should also have a mode to behave=
+=20
+exactly like /dev/urandom by not waiting until it is fully seeded, I am hap=
+py=20
+to add that.
+>=20
+> In other words, my series simplifies the ABI that we support.  Right
+> now, we have three ways to ask for random numbers with different
+> semantics and we need to have to RNGs in the kernel at all time.  With
+> my changes, we have only two ways to ask for random numbers, and the
+> /dev/random pool is entirely gone.
+
+Again, I do not want to stand in the way of changing the ABI if this is the=
+=20
+agreed way. All I want to say is that the LRNG seemingly is initialized muc=
+h=20
+faster than the existing /dev/random. If this is not fast enough for some=20
+embedded environments, I would not want to stand in the way to make their l=
+ife=20
+easier.
+>=20
+> Would you be amenable to merging this into your series (i.e. either
+> merging the code or just the ideas)?=20
+
+Absolutely. I would be happy to do that.
+
+Allow me to pull your code (I am currently behind a slow line) and review i=
+t=20
+to see how best to integrate it.
+
+> This would let you get rid of
+> things like the compile-time selection of the blocking TRNG, since the
+> blocking TRNG would be entirely gone.
+
+Hm, I am not so sure we should do that.
+
+Allow me to explain: I am also collaborating on the European side with the=
+=20
+German BSI. They love /dev/random as it is a "NTG.1" RNG based on their AIS=
+ 31=20
+standard.
+
+In order to seed a deterministic RNG (like OpenSSL, GnuTLS, etc. which are =
+all=20
+defined to be "DRG.3" or "DRG.2"), BSI mandates that the seed source is an=
+=20
+NTG.1.
+
+By getting rid of the TRNG entirely and having /dev/random entirely behavin=
+g=20
+like /dev/urandom or getrandom(2) without the GRND_RANDOM flag, the kernel=
+=20
+would "only" provide a "DRG.3" type RNG. This type of RNG would be disallow=
+ed=20
+to seed another "DRG.3" or "DRG.2".
+
+In plain English that means that for BSI's requirements, if the TRNG is gon=
+e=20
+there would be no native seed source on Linux any more that can satisfy the=
+=20
+requirement. This is the ultimate reason why I made the TRNG compile-time=20
+selectable: to support embedded systems but also support use cases like the=
+=20
+BSI case.
+
+Please consider that I maintain a study over the last years for BSI trying =
+to=20
+ensure that the NTG.1 property is always met [1] [2]. The sole purpose of t=
+hat=20
+study is around this NTG.1.
+>=20
+> Or do you think that a kernel-provided blocking TRNG is a genuinely
+> useful thing to keep around?
+
+Yes, as I hope I explained it appropriately above, there are standardizatio=
+n=20
+requirements that need the TRNG.
+
+PS: When I was forwarding Linus' email on eliminating the blocking_pool to=
+=20
+BSI, I saw unhappy faces. :-)
+
+I would like to help both sides here.
+
+[1] https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Publications/Studie=
+s/
+LinuxRNG/NTG1_Kerneltabelle_EN.pdf?__blob=3DpublicationFile&v=3D3
+
+[2] https://www.bsi.bund.de/SharedDocs/Downloads/EN/BSI/Publications/Studie=
+s/
+LinuxRNG/NTG1_Kerneltabelle_EN.pdf?__blob=3DpublicationFile&v=3D3
+
+Ciao
+Stephan
+
+
