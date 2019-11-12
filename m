@@ -1,120 +1,102 @@
-Return-Path: <SRS0=rtXS=ZD=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=Y60y=ZE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A70BDC17441
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 Nov 2019 23:54:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ED1DC43331
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Nov 2019 01:05:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 810CA2184C
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 Nov 2019 23:54:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 48A68206C3
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Nov 2019 01:05:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726994AbfKKXyf (ORCPT
+        id S1726915AbfKLBFI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 11 Nov 2019 18:54:35 -0500
-Received: from Galois.linutronix.de ([193.142.43.55]:60267 "EHLO
-        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726877AbfKKXyf (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 Nov 2019 18:54:35 -0500
-Received: from p5b06da22.dip0.t-ipconnect.de ([91.6.218.34] helo=nanos)
-        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
-        (Exim 4.80)
-        (envelope-from <tglx@linutronix.de>)
-        id 1iUJVh-0001np-JL; Tue, 12 Nov 2019 00:54:19 +0100
-Date:   Tue, 12 Nov 2019 00:54:16 +0100 (CET)
-From:   Thomas Gleixner <tglx@linutronix.de>
-To:     =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
-cc:     Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        linux-api@vger.kernel.org,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        "Alexander E. Patrakov" <patrakov@gmail.com>,
-        "Ahmed S. Darwish" <darwish.07@gmail.com>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
-        Matthew Garrett <mjg59@srcf.ucam.org>,
-        Vito Caputo <vcaputo@pengaru.com>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
-        William Jon McCann <mccann@jhu.edu>,
-        zhangjs <zachary@baishancloud.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Florian Weimer <fweimer@redhat.com>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Nicolai Stange <nstange@suse.de>,
-        "Peter, Matthias" <matthias.peter@bsi.bund.de>,
-        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
-        Roman Drahtmueller <draht@schaltsekun.de>,
-        Neil Horman <nhorman@redhat.com>
-Subject: Re: [PATCH v24 01/12] Linux Random Number Generator
-In-Reply-To: <2369119.jSEA3qhmGI@positron.chronox.de>
-Message-ID: <alpine.DEB.2.21.1911120041060.1833@nanos.tec.linutronix.de>
-References: <6157374.ptSnyUpaCn@positron.chronox.de> <2369119.jSEA3qhmGI@positron.chronox.de>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+        Mon, 11 Nov 2019 20:05:08 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:6195 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726877AbfKLBFI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 11 Nov 2019 20:05:08 -0500
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 8238C632D2E65DEEF238;
+        Tue, 12 Nov 2019 09:05:03 +0800 (CST)
+Received: from [127.0.0.1] (10.57.77.109) by DGGEMS409-HUB.china.huawei.com
+ (10.3.19.209) with Microsoft SMTP Server id 14.3.439.0; Tue, 12 Nov 2019
+ 09:04:33 +0800
+Subject: Re: [PATCH v2 0/5] crypto: hisilicon - add HiSilicon SEC V2 support
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <linux-crypto@vger.kernel.org>, <jonathan.cameron@huawei.com>,
+        <wangzhou1@hisilicon.com>, <linuxarm@huawei.com>,
+        <fanghao11@huawei.com>, <yekai13@huawei.com>,
+        <zhangwei375@huawei.com>, <forest.zhouchang@huawei.com>
+References: <1573264917-14588-1-git-send-email-xuzaibo@huawei.com>
+ <20191109021650.GA9739@sol.localdomain>
+ <d75fc607-524c-a68a-bafe-28e793bced93@huawei.com>
+ <20191111053720.GA18665@sol.localdomain>
+ <5f822228-0323-928a-30f9-dea4af210a4c@huawei.com>
+ <20191111171816.GA56300@gmail.com>
+From:   Xu Zaibo <xuzaibo@huawei.com>
+Message-ID: <6cecf2de-9aa0-f6ea-0c2d-8e974a1a820b@huawei.com>
+Date:   Tue, 12 Nov 2019 09:04:33 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="8323329-1567238779-1573516457=:1833"
-X-Linutronix-Spam-Score: -1.0
-X-Linutronix-Spam-Level: -
-X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
+In-Reply-To: <20191111171816.GA56300@gmail.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.57.77.109]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+On 2019/11/12 1:18, Eric Biggers wrote:
+> On Mon, Nov 11, 2019 at 08:26:20PM +0800, Xu Zaibo wrote:
+>> Hi,
+>>
+>> On 2019/11/11 13:37, Eric Biggers wrote:
+>>> On Mon, Nov 11, 2019 at 10:21:39AM +0800, Xu Zaibo wrote:
+>>>> Hi,
+>>>>
+>>>> On 2019/11/9 10:16, Eric Biggers wrote:
+>>>>> On Sat, Nov 09, 2019 at 10:01:52AM +0800, Zaibo Xu wrote:
+>>>>>> This series adds HiSilicon Security Engine (SEC) version 2 controller
+>>>>>> driver in Crypto subsystem. It includes PCIe enabling, Skcipher, DebugFS
+>>>>>> and SRIOV support of SEC.
+>>>>>>
+>>>>>> This patchset rebases on:
+>>>>>> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
+>>>>>>
+>>>>>> This patchset is based on:
+>>>>>> https://www.spinics.net/lists/linux-crypto/msg43520.html
+>>>>>>
+>>>>>> Changes:
+>>>>>>     - delete checking return value of debugfs_create_xxx functions.
+>>>>>>
+>>>>>> Change log:
+>>>>>> v2:    - remove checking return value of debugfs_create_xxx functions.
+>>>>>>
+>>>>> Does this driver pass all the crypto self-tests, including with
+>>>>> CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y?
+>>>>>
+>>>> Not including extra testing now, only CONFIG_CRYPTO_TEST is passed.
+>>>>
+>>> Can you please ensure that all the extra tests are passing too?  I.e., boot a
+>>> kernel with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y and check dmesg for failures.
+>>>
+>> Ok, I will try to do this. BTW, why we need this test? Thanks.
+>>
+> It will test the correctness of your driver.
+>
+So, it is a basic test not an extra test ? :)
 
---8323329-1567238779-1573516457=:1833
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Cheers,
+Zaibo
 
-Stephan,
-
-On Mon, 11 Nov 2019, Stephan Müller wrote:
-
-thanks for Cc'ing me. I'll have a look at the technical details at later
-point in time. While skimming through the patches I noticed, that you
-thankfully added the SPDX license identifiers, but
-
-> @@ -0,0 +1,105 @@
-> +// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
-> +/*
-> + * LRNG Fast Noise Source: CPU-based noise source
-> + *
-> + * Copyright (C) 2016 - 2019, Stephan Mueller <smueller@chronox.de>
-> + *
-> + * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
-> + * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
-> + * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE, ALL OF
-> + * WHICH ARE HEREBY DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR BE
-> + * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-> + * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT
-> + * OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
-> + * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-> + * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-> + * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
-> + * USE OF THIS SOFTWARE, EVEN IF NOT ADVISED OF THE POSSIBILITY OF SUCH
-> + * DAMAGE.
-
-we really want to get rid of these boiler plate disclaimers as they are
-already implicit by the SPDX license identifier and provide no real
-value.
-
-Aside of that, the above disclaimer has even a slightly different wording
-than the standard BSD-2-Clause disclaimer which is going to cause even more
-headaches as automated scanner tools will detect that and someone has to go
-through that unreadable uppercase yelling mess and figure out whether it's
-a legaly substantial difference.
-
-Can you please get rid of those?
-
-Thanks,
-
-	tglx
+.
+>
 
 
---8323329-1567238779-1573516457=:1833--
