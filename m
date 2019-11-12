@@ -2,116 +2,125 @@ Return-Path: <SRS0=Y60y=ZE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D22D4C17441
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Nov 2019 22:45:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E23BAC43331
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Nov 2019 22:56:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AAA5421872
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Nov 2019 22:45:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BB04321D7F
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Nov 2019 22:56:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="PhH8e4EB"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="IsPQL/hU"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726953AbfKLWpI (ORCPT
+        id S1726995AbfKLW4t (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Nov 2019 17:45:08 -0500
-Received: from mo4-p02-ob.smtp.rzone.de ([85.215.255.80]:12229 "EHLO
-        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726923AbfKLWpI (ORCPT
+        Tue, 12 Nov 2019 17:56:49 -0500
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:38748 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726910AbfKLW4s (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Nov 2019 17:45:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1573598704;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=DImeky0BTUCha4r7Uhw0UC1AKgaF3x/DYPNkEbHElSo=;
-        b=PhH8e4EBsOgwYqrm0QN6vPaXiYgGDtYXNWWIuKOGWldojLsfmAFpEDtMTZpWag7RQO
-        62d0kxK0xXzPTS49QO6U9gZQX9AzdAGIekX80XXXTrD2w5YPBgJfoXa+sVT5xUwGhvzh
-        +hJKxQqnT1le8vLAVKtH0gVLUed9Ah5uxMJkCQ9RiLXkNeWa4mSozpsLRbJi47zpWS/S
-        mNrGQkDtpYzz6p8TSl3K4IZNShOP2VQOI6N9IqnVez3Cp5sNpgbqkBR8OpELOPL0bvkP
-        bFb4gsccXhZ5XDiSp/7Y86Vep03P8nAtNluMc4ESGE3IhHZvh9fD0oXYSrOV+LFNkSK+
-        nNZw==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9zmwdNLqV/Nz7PsNPEA=="
-X-RZG-CLASS-ID: mo00
-Received: from positron.chronox.de
-        by smtp.strato.de (RZmta 44.29.0 SBL|AUTH)
-        with ESMTPSA id N09a57vACMhj9yq
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
-        (Client did not present a certificate);
-        Tue, 12 Nov 2019 23:43:45 +0100 (CET)
-From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-To:     Florian Weimer <fw@deneb.enyo.de>
-Cc:     Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        linux-api@vger.kernel.org,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        "Alexander E. Patrakov" <patrakov@gmail.com>,
-        "Ahmed S. Darwish" <darwish.07@gmail.com>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
-        Matthew Garrett <mjg59@srcf.ucam.org>,
-        Vito Caputo <vcaputo@pengaru.com>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
-        William Jon McCann <mccann@jhu.edu>,
-        zhangjs <zachary@baishancloud.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Florian Weimer <fweimer@redhat.com>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Nicolai Stange <nstange@suse.de>,
-        "Peter, Matthias" <matthias.peter@bsi.bund.de>,
-        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
-        Roman Drahtmueller <draht@schaltsekun.de>,
-        Neil Horman <nhorman@redhat.com>
-Subject: Re: [PATCH v24 00/12] /dev/random - a new approach with full SP800-90B compliance
-Date:   Tue, 12 Nov 2019 23:43:42 +0100
-Message-ID: <5603724.uI2RiKDNrm@positron.chronox.de>
-In-Reply-To: <875zjpfcu9.fsf@mid.deneb.enyo.de>
-References: <6157374.ptSnyUpaCn@positron.chronox.de> <875zjpfcu9.fsf@mid.deneb.enyo.de>
+        Tue, 12 Nov 2019 17:56:48 -0500
+Received: by mail-pf1-f194.google.com with SMTP id c13so152242pfp.5
+        for <linux-crypto@vger.kernel.org>; Tue, 12 Nov 2019 14:56:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=zpJ/TMpVSKZy+JXxk/4c68rZdEAtB+OaqfRaFt77y6Y=;
+        b=IsPQL/hU3IhF+qfkUCRWUrXYZheaE/5EOnSVDyJp/WnzWjkB3a7igBYUvpzviMn6L3
+         EWwKMMcbTBSkE9j6+lM7cjybdedxFAxjw34SjY8xUmExgVx9vkxyfsA7HCeOc5ODgssQ
+         WFs7WhwKK8SIMbSuP6MoGhI6aOCwmBoWjhHQo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=zpJ/TMpVSKZy+JXxk/4c68rZdEAtB+OaqfRaFt77y6Y=;
+        b=TfGfuodjZzMIb2fWce5JJSEDW55sXzP+lz3DXxKcGjI3jsytT7E7/ndJ/LjNV50cWT
+         Or0DiLDLq6HsIoS3PohxJHk7hcbKqxTRVT6XSF78UuM9PdBZszeQN5//07fve9kBxXNK
+         HBdguiQrJT7GKqAeuF1HuCyAbYDHK7L15Sw7fpafkfmBPZNZyHqI3857HZMSK6WPXYgm
+         7uXxhBp60AuIbpZSTjGtEGMZffT/Z+utNH0UBQ+SIXf8Sl8ly48RUvyMmIh78qnTuF+Q
+         Jy4PoTZOnGuhjha8cplOTLAhL41U8nBNfa7FZW7GQ6Qxn4/JwOVC4F5qvkrnzz+tDb9l
+         tlqw==
+X-Gm-Message-State: APjAAAWY0psn6q3pEb1Y0hj0SSq7HVJBfuXrTpUlTksktzrs+gUJK1aJ
+        GaLyFaBC4VCcdjvjXsF7mdNouA==
+X-Google-Smtp-Source: APXvYqwVpIPBQ69m+AEur+RE+tA3ua9JIQo1zSDy5Qc9XKebf2oGEun7RjUMRnM+saiWqFyl65X22A==
+X-Received: by 2002:a17:90a:d102:: with SMTP id l2mr363545pju.132.1573599406393;
+        Tue, 12 Nov 2019 14:56:46 -0800 (PST)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id e198sm18553pfh.83.2019.11.12.14.56.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Nov 2019 14:56:45 -0800 (PST)
+Date:   Tue, 12 Nov 2019 14:56:44 -0800
+From:   Kees Cook <keescook@chromium.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>,
+        =?iso-8859-1?Q?Jo=E3o?= Moreira <joao.moreira@lsc.ic.unicamp.br>,
+        Sami Tolvanen <samitolvanen@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>, x86@kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-hardening@lists.openwall.com
+Subject: Re: [PATCH v4 3/8] crypto: x86/camellia: Use new glue function macros
+Message-ID: <201911121452.AE2672AECB@keescook>
+References: <20191111214552.36717-1-keescook@chromium.org>
+ <20191111214552.36717-4-keescook@chromium.org>
+ <3059417.7DhL3USBNQ@positron.chronox.de>
+ <20191112031417.GB1433@sol.localdomain>
+ <20191112031635.jm32vne33qxh7ojh@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191112031635.jm32vne33qxh7ojh@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Dienstag, 12. November 2019, 14:23:10 CET schrieb Florian Weimer:
+On Tue, Nov 12, 2019 at 11:16:35AM +0800, Herbert Xu wrote:
+> On Mon, Nov 11, 2019 at 07:14:17PM -0800, Eric Biggers wrote:
+> >
+> > Also, I don't see the point of the macros, other than to obfuscate things.  To
+> > keep things straightforward, I think we should keep the explicit function
+> > prototypes for each algorithm.
+> 
+> I agree.  Kees, please get rid of the macros.
 
-Hi Florian,
+Okay, if we do that, then we'll likely be dropping a lot of union logic
+(since ecb and cbc end up with identical params and ctr and xts do too):
 
-> * Stephan M=FCller:
-> > * support deactivation of TRNG (i.e. blocking behavior of /dev/random)
-> >=20
-> >   at compile time. If deactivated, /dev/random behaves like
-> >   getrandom(2).
->=20
-> I don't quite understand this comment.  Doesn't getrandom with the
-> GRND_RANDOM always behave like /dev/random?  Presumably, without the
-> TRNG tap, the GRND_RANDOM flag for getrandom is ignored, and reading
-> from /dev/random behaves like reading from /dev/urandom.
+typedef void (*common_glue_func_t)(void *ctx, u8 *dst, const u8 *src);
+typedef void (*common_glue_cbc_func_t)(void *ctx, u128 *dst, const u128 *src);
+typedef void (*common_glue_ctr_func_t)(void *ctx, u128 *dst, const u128 *src,
+                                       le128 *iv);
+typedef void (*common_glue_xts_func_t)(void *ctx, u128 *dst, const u128 *src,
+                                       le128 *iv);
+...
+struct common_glue_func_entry {
+        unsigned int num_blocks; /* number of blocks that @fn will process */
+        union { 
+                common_glue_func_t ecb;
+                common_glue_cbc_func_t cbc;
+                common_glue_ctr_func_t ctr;
+                common_glue_xts_func_t xts;
+        } fn_u;
+};
 
-Absolutely. Apologies for the imprecision here. I will correct that.
+These would end up being just:
 
-The idea is that the constant blocking behavior of /dev/random and GRND_RAN=
-DOM=20
-is replaced with the blocking behavior of getrandom(2) without the GRND_RAN=
-DOM=20
-flag (i.e. the interface waits until the LRNG thinks it is completely seede=
-d=20
-before it provides ulimited data).
->=20
-> Anyway, reading the accompanying PDF, this looks rather impressive:
-> the userspace bootstrapping problem is gone (the issue where waiting
-> for more entropy prevents the collection of more entropy), *and* we
-> can still make the standards people happy.
->=20
-> (Replying from my other account due to mail issues, sorry.)
+typedef void (*common_glue_func_t)(void *ctx, u8 *dst, const u8 *src);
+typedef void (*common_glue_iv_func_t)(void *ctx, u8 *dst, const u8 *src,
+                                       le128 *iv);
+...
+struct common_glue_func_entry {
+        unsigned int num_blocks; /* number of blocks that @fn will process */
+        union { 
+                common_glue_func_t func;
+                common_glue_iv_func_t iv_func;
+        } fn_u;
 
+Is that reasonable?
 
-Ciao
-Stephan
-
-
+-- 
+Kees Cook
