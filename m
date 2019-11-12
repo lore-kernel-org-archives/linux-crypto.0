@@ -2,100 +2,95 @@ Return-Path: <SRS0=Y60y=ZE=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EC74C43331
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Nov 2019 07:27:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40BDAC43331
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Nov 2019 09:35:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 56B05206A3
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 Nov 2019 07:27:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1264F20650
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 Nov 2019 09:35:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rXxBW2sQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725781AbfKLH1f (ORCPT
+        id S1727104AbfKLJfc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Nov 2019 02:27:35 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:55022 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725283AbfKLH1f (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Nov 2019 02:27:35 -0500
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 04C2C77090FD33FDC1D0;
-        Tue, 12 Nov 2019 15:27:33 +0800 (CST)
-Received: from localhost (10.133.213.239) by DGGEMS401-HUB.china.huawei.com
- (10.3.19.201) with Microsoft SMTP Server id 14.3.439.0; Tue, 12 Nov 2019
- 15:27:27 +0800
-From:   YueHaibing <yuehaibing@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <cyrille.pitchen@atmel.com>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        YueHaibing <yuehaibing@huawei.com>
-Subject: [PATCH v2 -next] crypto: atmel - Fix build error of CRYPTO_AUTHENC
-Date:   Tue, 12 Nov 2019 15:24:05 +0800
-Message-ID: <20191112072405.40268-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.10.2.windows.1
-In-Reply-To: <20191111133901.19164-1-yuehaibing@huawei.com>
-References: <20191111133901.19164-1-yuehaibing@huawei.com>
+        Tue, 12 Nov 2019 04:35:32 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:42932 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726008AbfKLJfc (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 12 Nov 2019 04:35:32 -0500
+Received: by mail-wr1-f66.google.com with SMTP id a15so17655103wrf.9
+        for <linux-crypto@vger.kernel.org>; Tue, 12 Nov 2019 01:35:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=oaj1E/kv5TLb76cZYS6U6PoCB07whC/O3d8mIn1w4YM=;
+        b=rXxBW2sQnIxizld2YMECZrm2rE70o/bvTIHFjYU75H1Tf3xMwvv5w0HkpEfNcSW32a
+         /kngm3doeVG7wlCsenPhbJ7VzKjXkypsxJ/M5Bg8zYbcgMvpt0/o+m0sNfxkoRJh5zUO
+         AGoA/nmBNaKx0iXXpTFFEMCY+2/nzkMgACWLk7y9lBXNjqrpNaXXPZSFsi8ZodZm6Wk4
+         r1rVzzfESgLtXUGoySVnXt/fnZ1bc9sdZ6pm5Z/lfvzhQolKVqsSx/+VaG5SbSxgq898
+         RDbb6wjCg4PDyDPul0XU7syFSLM8PvzrjMZ1kSvJPEHaPxS8FdNFMvi9b2L91jpyoKP9
+         WFJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=oaj1E/kv5TLb76cZYS6U6PoCB07whC/O3d8mIn1w4YM=;
+        b=ILxWmeTv87QstWN90kJn1KNj1ZACL6FAVVNO7wejgEQh/xLTTsccX24O9NiMitd48j
+         L2tr6RP33eQCwKVwqeROnjnr0CGA8vb+45dKFuNcUKCi+yt6hDMrT6HwNWbfFWVCHEad
+         4XjHwHbY8z42O6/EMxuyCKM7J2TTW361L54R0vUKAOxpLCOkyMHRJFvHWU3TDGYGDMVz
+         q9OIfmdFlx5T7xbirl698+6HgAO7MGovFsadNOU5aTQae+S0JAnJrolQDMBpxMjtJMpe
+         nS3kRZSUWB/AtBW4XJwGr2ykBNjmTm8lN/7QNPMhsDz19jeYoEywuDCUkwJL3asXWWFr
+         mYTw==
+X-Gm-Message-State: APjAAAWguPlWvM1li+mtxkY+5ArP788uyZeKdTItvqwFU/av0BSFMcxU
+        82iuThbWcmI7c0U1QMIwd8jDb5iV
+X-Google-Smtp-Source: APXvYqyZnGyXGi7XWpW5elk2WbW/BxrbjoB5cyIhArY3V8BC6SR0DlFIx4MS1SQ8Yf3gVLzgFQRlng==
+X-Received: by 2002:adf:9323:: with SMTP id 32mr24361690wro.15.1573551329995;
+        Tue, 12 Nov 2019 01:35:29 -0800 (PST)
+Received: from Red ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
+        by smtp.googlemail.com with ESMTPSA id u16sm19626625wrr.65.2019.11.12.01.35.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Nov 2019 01:35:29 -0800 (PST)
+Date:   Tue, 12 Nov 2019 10:35:27 +0100
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH] crypto: sun4i-ss - Fix 64-bit size_t warnings
+Message-ID: <20191112093527.GB18647@Red>
+References: <20191112023834.l7mbyrlhhaxgpbdp@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.133.213.239]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191112023834.l7mbyrlhhaxgpbdp@gondor.apana.org.au>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-If CRYPTO_DEV_ATMEL_AUTHENC is m, CRYPTO_DEV_ATMEL_SHA is m,
-but CRYPTO_DEV_ATMEL_AES is y, building will fails:
+On Tue, Nov 12, 2019 at 10:38:34AM +0800, Herbert Xu wrote:
+> If you try to compile this driver on a 64-bit platform then you
+> will get warnings because it mixes size_t with unsigned int which
+> only works on 32-bit.
+> 
+> This patch fixes all of the warnings.
+> 
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> 
 
-drivers/crypto/atmel-aes.o: In function `atmel_aes_authenc_init_tfm':
-atmel-aes.c:(.text+0x670): undefined reference to `atmel_sha_authenc_get_reqsize'
-atmel-aes.c:(.text+0x67a): undefined reference to `atmel_sha_authenc_spawn'
-drivers/crypto/atmel-aes.o: In function `atmel_aes_authenc_setkey':
-atmel-aes.c:(.text+0x7e5): undefined reference to `atmel_sha_authenc_setkey'
+Hello
 
-Make CRYPTO_DEV_ATMEL_AUTHENC depends on CRYPTO_DEV_ATMEL_AES,
-and select CRYPTO_DEV_ATMEL_SHA and CRYPTO_AUTHENC for it under there.
+Note that the driver is within !64BIT, so that compiling on 64-bit should not be doable/an issue, but removing this conditionnal could be a good point.
+Furthermore, I just tested compiling on 64BIT and there are the same warnings on sun4i-ss-hash.c.
+I will send a subsequent patch for it.
 
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
-Fixes: 89a82ef87e01 ("crypto: atmel-authenc - add support to...")
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
----
-v2: make CRYPTO_DEV_ATMEL_AUTHENC depends on DEV_ATMEL_AES
----
- drivers/crypto/Kconfig | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index c5cc04d..296e829 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -492,10 +492,9 @@ if CRYPTO_DEV_UX500
- endif # if CRYPTO_DEV_UX500
- 
- config CRYPTO_DEV_ATMEL_AUTHENC
--	tristate "Support for Atmel IPSEC/SSL hw accelerator"
-+	bool "Support for Atmel IPSEC/SSL hw accelerator"
- 	depends on ARCH_AT91 || COMPILE_TEST
--	select CRYPTO_DEV_ATMEL_AES
--	select CRYPTO_DEV_ATMEL_SHA
-+	depends on CRYPTO_DEV_ATMEL_AES
- 	help
- 	  Some Atmel processors can combine the AES and SHA hw accelerators
- 	  to enhance support of IPSEC/SSL.
-@@ -507,8 +506,9 @@ config CRYPTO_DEV_ATMEL_AES
- 	depends on ARCH_AT91 || COMPILE_TEST
- 	select CRYPTO_AES
- 	select CRYPTO_AEAD
--	select CRYPTO_AUTHENC
- 	select CRYPTO_SKCIPHER
-+	select CRYPTO_AUTHENC if CRYPTO_DEV_ATMEL_AUTHENC
-+	select CRYPTO_DEV_ATMEL_SHA if CRYPTO_DEV_ATMEL_AUTHENC
- 	help
- 	  Some Atmel processors have AES hw accelerator.
- 	  Select this if you want to use the Atmel module for
--- 
-2.7.4
-
-
+Acked-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+Tested-by: Corentin Labbe <clabbe.montjoie@gmail.com>
+Tested-on: sun7i-a20-cubieboard2
+Tested-on: sun8i-a33-olinuxino
