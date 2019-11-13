@@ -2,189 +2,247 @@ Return-Path: <SRS0=5LAy=ZF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4D5FC43331
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 02:21:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 204D2C43331
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 04:25:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9A48E222C9
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 02:21:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1573611689;
-	bh=s5iwcHxkRt8+t8tvmr6U2LXDWYdG4gCtv2HSTwEukQc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=LYTcxfw2XIWIkYTGQ4q6hlZNflbnbsRIRcF3p+YV0uzpWsFVS+a4ne+1VDCYWu7v3
-	 uH9GLo2yCkcyu3o4M5EjgIzH25ooF9vmv5uyOVkZDgdRlTtP4/97ArAINOgFN0e0He
-	 ySb/d5H/7LfhjJPemrzq7xgM6IhOZTTh0mHdNVhA=
+	by mail.kernel.org (Postfix) with ESMTP id 9B62C222D0
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 04:25:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="EvkwOakq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728729AbfKMByB (ORCPT
+        id S1727069AbfKMEZ4 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Nov 2019 20:54:01 -0500
-Received: from mail.kernel.org ([198.145.29.99]:44252 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728728AbfKMByA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Nov 2019 20:54:00 -0500
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1727A2245A;
-        Wed, 13 Nov 2019 01:53:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573610039;
-        bh=s5iwcHxkRt8+t8tvmr6U2LXDWYdG4gCtv2HSTwEukQc=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=JH3Pv+uBJZmLursdzQ03gQkN2M9WCSnAwna39NlHQHvjmNeztQE44aZASAXakNm/t
-         Li8jhNR2y06jUYJBzOk0o7vi7aYSL19k2Zbe0eGdqkRwGhoWvBsEZQ4lQhRUKOX8gs
-         QmslyK7jqo/5XI2wp9nMKMOuhhwOnX22tq4Bdua0=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Radu Solea <radu.solea@nxp.com>,
-        Leonard Crestez <leonard.crestez@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 130/209] crypto: mxs-dcp - Fix SHA null hashes and output length
-Date:   Tue, 12 Nov 2019 20:49:06 -0500
-Message-Id: <20191113015025.9685-130-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191113015025.9685-1-sashal@kernel.org>
-References: <20191113015025.9685-1-sashal@kernel.org>
+        Tue, 12 Nov 2019 23:25:56 -0500
+Received: from mo4-p02-ob.smtp.rzone.de ([85.215.255.84]:32324 "EHLO
+        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726995AbfKMEZ4 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 12 Nov 2019 23:25:56 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1573619151;
+        s=strato-dkim-0002; d=chronox.de;
+        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=fweAIs1NsQUyJq3CnTKSiNwVcFJ1aHqrYO1LnCTNAwI=;
+        b=EvkwOakq9oY4TsH9JsiTYOV5dmhFZcry0bk7sn8zFXuNz7rlEBPXOLXzLqIrUvtPMi
+        eF5dSgN3sTKFKXVcEL4jvNtRP6wegxFcg5bEppoQwoGip0saOukCXzzPqmWH0CsrWacL
+        oAbjRFFyu5BYELXTMlPmzw/nmqAY5fKPfhGlbLOriH/kbacN7mqN3W6io4DH3Llsltav
+        fET0OiWgHAosPhrWSu1qrfEoDicR7LZ6EU/KeBZmvyYNE0/3Rkthof3b2maxHbnJI8h0
+        mT7egWnZy1z/ViLjGpRzlm482o1/WjLbUDWXYWtPnYkG/EHgOv/0hZRVZUwPgTtJrgUu
+        BOiA==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9zmwdNLqV/Nz7PsNPEA=="
+X-RZG-CLASS-ID: mo00
+Received: from positron.chronox.de
+        by smtp.strato.de (RZmta 44.29.0 SBL|AUTH)
+        with ESMTPSA id N09a57vAD4OTATE
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
+        (Client did not present a certificate);
+        Wed, 13 Nov 2019 05:24:29 +0100 (CET)
+From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To:     Andy Lutomirski <luto@kernel.org>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Nicolai Stange <nstange@suse.de>,
+        "Peter, Matthias" <matthias.peter@bsi.bund.de>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Roman Drahtmueller <draht@schaltsekun.de>,
+        Neil Horman <nhorman@redhat.com>
+Subject: Re: [PATCH v24 00/12] /dev/random - a new approach with full SP800-90B compliance
+Date:   Wed, 13 Nov 2019 05:24:26 +0100
+Message-ID: <3208655.cZiRAY37Id@positron.chronox.de>
+In-Reply-To: <CALCETrVBzuOsDfaz5y3V4v+6xmeWufOYsOGnpZrRju6Pfsi6gg@mail.gmail.com>
+References: <6157374.ptSnyUpaCn@positron.chronox.de> <CALCETrVBzuOsDfaz5y3V4v+6xmeWufOYsOGnpZrRju6Pfsi6gg@mail.gmail.com>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Radu Solea <radu.solea@nxp.com>
+Am Dienstag, 12. November 2019, 16:33:59 CET schrieb Andy Lutomirski:
 
-[ Upstream commit c709eebaf5c5faa8a0f140355f9cfe67e8f7afb1 ]
+Hi Andy,
 
-DCP writes at least 32 bytes in the output buffer instead of hash length
-as documented. Add intermediate buffer to prevent write out of bounds.
+> On Mon, Nov 11, 2019 at 11:13 AM Stephan M=FCller <smueller@chronox.de> w=
+rote:
+> > The following patch set provides a different approach to /dev/random wh=
+ich
+> > is called Linux Random Number Generator (LRNG) to collect entropy within
+> > the Linux kernel. The main improvements compared to the existing
+> > /dev/random is to provide sufficient entropy during boot time as well as
+> > in virtual environments and when using SSDs. A secondary design goal is
+> > to limit the impact of the entropy collection on massive parallel syste=
+ms
+> > and also allow the use accelerated cryptographic primitives. Also, all
+> > steps of the entropic data processing are testable.
+>=20
+> This is very nice!
+>=20
+> > The LRNG patch set allows a user to select use of the existing /dev/ran=
+dom
+> > or the LRNG during compile time. As the LRNG provides API and ABI
+> > compatible interfaces to the existing /dev/random implementation, the
+> > user can freely chose the RNG implementation without affecting kernel or
+> > user space operations.
+> >=20
+> > This patch set provides early boot-time entropy which implies that no
+> > additional flags to the getrandom(2) system call discussed recently on
+> > the LKML is considered to be necessary.
+>=20
+> I'm uneasy about this.  I fully believe that, *on x86*, this works.
+> But on embedded systems with in-order CPUs, a single clock, and very
+> lightweight boot processes, most or all of boot might be too
+> deterministic for this to work.
+>=20
+> I have a somewhat competing patch set here:
+>=20
+> https://git.kernel.org/pub/scm/linux/kernel/git/luto/linux.git/log/?h=3Dr=
+andom
+> /kill-it
+>=20
+> (Ignore the "horrible test hack" and the debugfs part.)
+>=20
+> The basic summary is that I change /dev/random so that it becomes
+> functionally identical to getrandom(..., 0) -- in other words, it
+> blocks until the CRNG is initialized but is then identical to
+> /dev/urandom.  And I add getrandom(...., GRND_INSECURE) that is
+> functionally identical to the existing /dev/urandom: it always returns
+> *something* immediately, but it may or may not actually be
+> cryptographically random or even random at all depending on system
+> details.
+>=20
+> In other words, my series simplifies the ABI that we support.  Right
+> now, we have three ways to ask for random numbers with different
+> semantics and we need to have to RNGs in the kernel at all time.  With
+> my changes, we have only two ways to ask for random numbers, and the
+> /dev/random pool is entirely gone.
+>=20
+> Would you be amenable to merging this into your series (i.e. either
+> merging the code or just the ideas)?  This would let you get rid of
+> things like the compile-time selection of the blocking TRNG, since the
+> blocking TRNG would be entirely gone.
 
-When requested to produce null hashes DCP fails to produce valid output.
-Add software workaround to bypass hardware and return valid output.
+I pulled your code and found the following based on my explanation that I=20
+would suggest to keep the TRNG at least as an option.
 
-Signed-off-by: Radu Solea <radu.solea@nxp.com>
-Signed-off-by: Leonard Crestez <leonard.crestez@nxp.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/crypto/mxs-dcp.c | 47 +++++++++++++++++++++++++++++++---------
- 1 file changed, 37 insertions(+), 10 deletions(-)
+=2D 7d54ef8512b06baf396f12584f7f48a9558ecd0f does not seem applicable: I al=
+so do=20
+have an equivalent "lrng_init_wait" wait queue. This wait queue is used to =
+let=20
+in-kernel users wait until the LRNG obtained 128 bits of entropy. In additi=
+on,=20
+this wait queue is used to let user space is invoked after the LRNG has=20
+received 256 bits of entropy (which implies that the kernel waiters are=20
+invoked earlier). In kernel waiters are all that call wait_for_random_bytes=
+=20
+and its derivatives. User space callers have to call getrandom(..., 0); to =
+be=20
+registered in this wait queue. So, I think the wakeup calls I have in the L=
+RNG=20
+for lrng_init_wait should remain.
 
-diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
-index 56bd28174f525..3425ccc012168 100644
---- a/drivers/crypto/mxs-dcp.c
-+++ b/drivers/crypto/mxs-dcp.c
-@@ -28,9 +28,24 @@
- 
- #define DCP_MAX_CHANS	4
- #define DCP_BUF_SZ	PAGE_SIZE
-+#define DCP_SHA_PAY_SZ  64
- 
- #define DCP_ALIGNMENT	64
- 
-+/*
-+ * Null hashes to align with hw behavior on imx6sl and ull
-+ * these are flipped for consistency with hw output
-+ */
-+const uint8_t sha1_null_hash[] =
-+	"\x09\x07\xd8\xaf\x90\x18\x60\x95\xef\xbf"
-+	"\x55\x32\x0d\x4b\x6b\x5e\xee\xa3\x39\xda";
-+
-+const uint8_t sha256_null_hash[] =
-+	"\x55\xb8\x52\x78\x1b\x99\x95\xa4"
-+	"\x4c\x93\x9b\x64\xe4\x41\xae\x27"
-+	"\x24\xb9\x6f\x99\xc8\xf4\xfb\x9a"
-+	"\x14\x1c\xfc\x98\x42\xc4\xb0\xe3";
-+
- /* DCP DMA descriptor. */
- struct dcp_dma_desc {
- 	uint32_t	next_cmd_addr;
-@@ -48,6 +63,7 @@ struct dcp_coherent_block {
- 	uint8_t			aes_in_buf[DCP_BUF_SZ];
- 	uint8_t			aes_out_buf[DCP_BUF_SZ];
- 	uint8_t			sha_in_buf[DCP_BUF_SZ];
-+	uint8_t			sha_out_buf[DCP_SHA_PAY_SZ];
- 
- 	uint8_t			aes_key[2 * AES_KEYSIZE_128];
- 
-@@ -513,8 +529,6 @@ static int mxs_dcp_run_sha(struct ahash_request *req)
- 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
- 	struct dcp_async_ctx *actx = crypto_ahash_ctx(tfm);
- 	struct dcp_sha_req_ctx *rctx = ahash_request_ctx(req);
--	struct hash_alg_common *halg = crypto_hash_alg_common(tfm);
--
- 	struct dcp_dma_desc *desc = &sdcp->coh->desc[actx->chan];
- 
- 	dma_addr_t digest_phys = 0;
-@@ -536,10 +550,23 @@ static int mxs_dcp_run_sha(struct ahash_request *req)
- 	desc->payload = 0;
- 	desc->status = 0;
- 
-+	/*
-+	 * Align driver with hw behavior when generating null hashes
-+	 */
-+	if (rctx->init && rctx->fini && desc->size == 0) {
-+		struct hash_alg_common *halg = crypto_hash_alg_common(tfm);
-+		const uint8_t *sha_buf =
-+			(actx->alg == MXS_DCP_CONTROL1_HASH_SELECT_SHA1) ?
-+			sha1_null_hash : sha256_null_hash;
-+		memcpy(sdcp->coh->sha_out_buf, sha_buf, halg->digestsize);
-+		ret = 0;
-+		goto done_run;
-+	}
-+
- 	/* Set HASH_TERM bit for last transfer block. */
- 	if (rctx->fini) {
--		digest_phys = dma_map_single(sdcp->dev, req->result,
--					     halg->digestsize, DMA_FROM_DEVICE);
-+		digest_phys = dma_map_single(sdcp->dev, sdcp->coh->sha_out_buf,
-+					     DCP_SHA_PAY_SZ, DMA_FROM_DEVICE);
- 		desc->control0 |= MXS_DCP_CONTROL0_HASH_TERM;
- 		desc->payload = digest_phys;
- 	}
-@@ -547,9 +574,10 @@ static int mxs_dcp_run_sha(struct ahash_request *req)
- 	ret = mxs_dcp_start_dma(actx);
- 
- 	if (rctx->fini)
--		dma_unmap_single(sdcp->dev, digest_phys, halg->digestsize,
-+		dma_unmap_single(sdcp->dev, digest_phys, DCP_SHA_PAY_SZ,
- 				 DMA_FROM_DEVICE);
- 
-+done_run:
- 	dma_unmap_single(sdcp->dev, buf_phys, DCP_BUF_SZ, DMA_TO_DEVICE);
- 
- 	return ret;
-@@ -567,6 +595,7 @@ static int dcp_sha_req_to_buf(struct crypto_async_request *arq)
- 	const int nents = sg_nents(req->src);
- 
- 	uint8_t *in_buf = sdcp->coh->sha_in_buf;
-+	uint8_t *out_buf = sdcp->coh->sha_out_buf;
- 
- 	uint8_t *src_buf;
- 
-@@ -621,11 +650,9 @@ static int dcp_sha_req_to_buf(struct crypto_async_request *arq)
- 
- 		actx->fill = 0;
- 
--		/* For some reason, the result is flipped. */
--		for (i = 0; i < halg->digestsize / 2; i++) {
--			swap(req->result[i],
--			     req->result[halg->digestsize - i - 1]);
--		}
-+		/* For some reason the result is flipped */
-+		for (i = 0; i < halg->digestsize; i++)
-+			req->result[i] = out_buf[halg->digestsize - i - 1];
- 	}
- 
- 	return 0;
--- 
-2.20.1
+=2D 6a26a3146e5fb90878dca9fde8caa1ca4233156a: My handler for /dev/urandom a=
+nd=20
+getrandom(..., 0) are using one callback which issues a warning in both use=
+=20
+cases (see lrng_sdrng_read). So I think this patch may not be applicable as=
+=20
+the LRNG code implements warning about being unseeded.
+
+=2D 3e8e159da49b44ae0bb08e68fa2be760722fa033: I am happy to take that code =
+which=20
+would almost directly apply. The last hunk however would be:
+
+if (!(flags & GRND_INSECURE) && unlikely(!lrng_state_operational())) {
+
+=3D=3D> Shall I apply it to my code base? If yes, how shall the changes to=
+=20
+random.h be handled?
+
+
+=2D 920e97e7fc508e6f0da9c7dec94c8073fd63ab4d: I would pass on this patch du=
+e to=20
+the following: it unconditionally starts removing the access to the TRNG (t=
+he=20
+LRNG's logical equivalent to the blocking_pool). As patch 10/12 of the LRNG=
+=20
+patch series provides the TRNG that is a compile time option, your patch wo=
+uld=20
+logically and functionally be equivalent when deselecting=20
+CONFIG_LRNG_TRNG_SUPPORT in the LRNG without any further changes to the LRN=
+G=20
+code.
+
+=2D 693b9ffdf0fdc93456b5ad293ac05edf240a531b: This patch is applicable to t=
+he=20
+LRNG. In case CONFIG_LRNG_TRNG_SUPPORT is not set, the TRNG is not present.=
+=20
+Yet, the /dev/random and getrandom(GRND_RANDOM) would behave blocked until=
+=20
+fully initialized. I have now added the general blocking until the LRNG is=
+=20
+fully initialized to the common /dev/random and getrandom(GRND_RANDOM)=20
+interface function of lrng_trng_read_common. With that, the LRNG would be=20
+fully equivalent to this patch if CONFIG_LRNG_TRNG_SUPPORT is not set.
+
+=2D 66f660842ec6d34134b9c3c1c9c65972834797f6: This patch is implicit with=20
+CONFIG_LRNG_TRNG_SUPPORT being not set.
+
+=2D d8f59b5c25af22fb9d85b7fa96de601ea03f2eac: This patch is not applicable =
+to=20
+the LRNG as the deactivation of CONFIG_LRNG_TRNG_SUPPORT implies that there=
+=20
+should be no unused code left in the LRNG.
+
+=2D 4046ac638761821aef67af10537ebcbc80715785: In theory that patch is appli=
+cable=20
+to the LRNG as well. The LRNG has the lrng_read_wait queue. If=20
+CONFIG_LRNG_TRNG_SUPPORT is not set, there will never be the code triggered=
+ to=20
+add a caller to this wait queue. To avoid cluttering the LRNG code with=20
+ifdefs, may I suggest to leave these several lines even though it is dead=20
+code?
+
+
+
+Bottom line: the only patch that I seems to be relevant and that I would be=
+=20
+happy to apply is the one adding GRND_INSECURE. All other patches are=20
+implicitly covered by deselecting CONFIG_LRNG_TRNG_SUPPORT.
+
+By making the TRNG compile-time selectable, I was hoping to serve all users=
+: I=20
+wanted to cover the conclusions of the discussion to remove the blocking_po=
+ol.=20
+On the other hand, however, I want to support requirements that need the=20
+blocking behavior.
+
+The current LRNG patch set, however, defaults to Y for=20
+CONFIG_LRNG_TRNG_SUPPORT. I would see no issue if it defaults to N.
+
+
+Thank you very much.
+
+Ciao
+Stephan
+
 
