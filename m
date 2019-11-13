@@ -2,67 +2,70 @@ Return-Path: <SRS0=5LAy=ZF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84410C17442
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 04:48:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F928C43331
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 06:02:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 539D62246A
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 04:48:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1573620527;
-	bh=JekA7T9hI81Ns3VAxm1JGt/jGYHRceTz9qVWnShkahI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=uTHlgEhvR1zl5++eXYOo6CH9fve0u0sAiMZ3c+OwemWJ/CMO8c7ztMaq78gBwC+Ru
-	 SNU+Yj6pLlWT+MBR3JX1TYGdWaHBeHLJWWJQBTgNJW+yNgoMZY1VmmD7FnEZh2XRFF
-	 9iqqtR9f04KUDF44QU3Ph0BWuZPIikucY3eXwZhs=
+	by mail.kernel.org (Postfix) with ESMTP id 055D7222C9
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 06:02:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mXfCrazN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727388AbfKMEsp (ORCPT
+        id S1725908AbfKMGCx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Nov 2019 23:48:45 -0500
-Received: from mail.kernel.org ([198.145.29.99]:39030 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727470AbfKMEsp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Nov 2019 23:48:45 -0500
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 34D4022478
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Nov 2019 04:48:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573620523;
-        bh=JekA7T9hI81Ns3VAxm1JGt/jGYHRceTz9qVWnShkahI=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=Q6e6dqau9j98a1EJ39WHqDrzePZYLryhqHq5//h1qY76V083EtVU9mJSptdPXpe3x
-         jPocFR0TknPA+PiYmMDCNPVwt18KrPpjgg5E20bi0MbDLFPCxXDm3BSsbQhkpm/O66
-         JWRu5b5dyhiWgVND6CqvQpo+JqRYFgPFWkCmXJ0Y=
-Received: by mail-wm1-f49.google.com with SMTP id q70so488984wme.1
-        for <linux-crypto@vger.kernel.org>; Tue, 12 Nov 2019 20:48:43 -0800 (PST)
-X-Gm-Message-State: APjAAAXac08hyKEcSQEZulAvO+i322GhbrSPYS1vXBBsdmfyv9IsP2Y9
-        W/Qr+US5C4V9O9jDCT/PbyM+AV56zPYEH1XBaNmCwg==
-X-Google-Smtp-Source: APXvYqzHZAN8kHsTOGKXhrhA+lp57rKvesbhM9l64m01LPZyOzPCuYxVyYoQbLnO6Mm1Cg9oVrUR29QTzEdhyTF94Do=
-X-Received: by 2002:a05:600c:3cf:: with SMTP id z15mr844908wmd.76.1573620521471;
- Tue, 12 Nov 2019 20:48:41 -0800 (PST)
+        Wed, 13 Nov 2019 01:02:53 -0500
+Received: from mail-qk1-f196.google.com ([209.85.222.196]:39760 "EHLO
+        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725866AbfKMGCw (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 13 Nov 2019 01:02:52 -0500
+Received: by mail-qk1-f196.google.com with SMTP id 15so754521qkh.6;
+        Tue, 12 Nov 2019 22:02:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=phY5nYA9dHfZmr9N/f2WhSW/Yk2EVx6rjISS971Sg2o=;
+        b=mXfCrazN9OmG7u9ZHylHgcIWpfHsn9ZPDWi5eVrh3USyFDSrlAIqK3YbWi5Gt1I5G3
+         gjKQVXWCRSAx1O8yY+IaIoaHEwVKKfiKPxQbxhF6W9APf5JXQD/PPVvO57Q5YPNnK8vp
+         94vMbmLlH2ISX9divPjKRhO1JH2Sh1xrervXN7P0Y1rmfBx+hiYXYFyaJ4cZz7KDmVAo
+         e7sKwwxFqGRq7fTU4aVaQoSGDyDXYi1ohraFQUADPpcyaDhkyyHf/cIejD4m0zEUzQyc
+         JnO4hfzmk6S4bDUKGe34KJ5IfGeoDOSOEgGIpXL0d3lKy7faUbJBJVXRvDzZLkQCzfW+
+         AvZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=phY5nYA9dHfZmr9N/f2WhSW/Yk2EVx6rjISS971Sg2o=;
+        b=ge6GjaogSgKb2Uo8ePd2rF3WIjpMuFcCcKrMM3i/2uZV2inC2edbYiV4MEZ8JfUiRw
+         rqtdtRdWSanNfdohy6W+Qggf35xc86ExFdCBlxxcoIwOdF/G1SjOLnV9/Li4OFi0f50G
+         x85CYrav6cIqMyfF11x4s76Xcfd4BUqrTnNHnsQOcQf3Kg3uypicqqEZpZrKtWrRvzHf
+         8Fs8gmWhBqQ12j3NTwdvFGgibUQ+WVGhmKXHcw1TVxxkvIGoJLwzfg0isbg3NdZhUS+U
+         GN8QVa3/B2AGSPDE4TOFuRdFk9ZmOJygqL2a8nmmTAw1rlIa1dpWjtZB2NMAYcJoWMGg
+         S1TA==
+X-Gm-Message-State: APjAAAUUPn7nj9WIbQA2ezSkuRy4whu9zUkG1BhzoJv8hUQyId12lzeZ
+        fqd42KoJxL6MXQGVy6wAgYtQa3U0e6YFBxpRxmM=
+X-Google-Smtp-Source: APXvYqwpTO3SSm8dLQNU/ZVFUrLYX4ux5vxjme0dp8ULBuaBBoEv6u2hZ10eTvWolnIf5b5PhbUqSsH2wC5NXzEq7Po=
+X-Received: by 2002:a37:7c81:: with SMTP id x123mr1137940qkc.212.1573624971655;
+ Tue, 12 Nov 2019 22:02:51 -0800 (PST)
 MIME-Version: 1.0
-References: <6157374.ptSnyUpaCn@positron.chronox.de> <CALCETrVBzuOsDfaz5y3V4v+6xmeWufOYsOGnpZrRju6Pfsi6gg@mail.gmail.com>
- <3208655.cZiRAY37Id@positron.chronox.de>
-In-Reply-To: <3208655.cZiRAY37Id@positron.chronox.de>
-From:   Andy Lutomirski <luto@kernel.org>
-Date:   Tue, 12 Nov 2019 20:48:30 -0800
-X-Gmail-Original-Message-ID: <CALCETrVHdauN2ptZLSYAUDm=S3OGkxq=iH4qGxCuH0XCMKjGkQ@mail.gmail.com>
-Message-ID: <CALCETrVHdauN2ptZLSYAUDm=S3OGkxq=iH4qGxCuH0XCMKjGkQ@mail.gmail.com>
-Subject: Re: [PATCH v24 00/12] /dev/random - a new approach with full
- SP800-90B compliance
+References: <6157374.ptSnyUpaCn@positron.chronox.de> <3385183.Cb3iLDTLdO@positron.chronox.de>
+ <556c89ae-4272-970d-1644-cb77dc3c7946@gmail.com> <9152597.fJySsU3eCD@positron.chronox.de>
+In-Reply-To: <9152597.fJySsU3eCD@positron.chronox.de>
+From:   "Alexander E. Patrakov" <patrakov@gmail.com>
+Date:   Wed, 13 Nov 2019 11:02:40 +0500
+Message-ID: <CAN_LGv3LUjJ=8ZZxaJ=c7uDPb=ayvCNPE-UshxgBUK-Jf7qNmQ@mail.gmail.com>
+Subject: Re: [PATCH v24 11/12] LRNG - add SP800-90B compliant health tests
 To:     =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
-Cc:     Andy Lutomirski <luto@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+Cc:     Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
         Linux API <linux-api@vger.kernel.org>,
         "Eric W. Biederman" <ebiederm@xmission.com>,
-        "Alexander E. Patrakov" <patrakov@gmail.com>,
         "Ahmed S. Darwish" <darwish.07@gmail.com>,
         "Theodore Y. Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
         Matthew Garrett <mjg59@srcf.ucam.org>,
@@ -71,6 +74,7 @@ Cc:     Andy Lutomirski <luto@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
         Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
         William Jon McCann <mccann@jhu.edu>,
         zhangjs <zachary@baishancloud.com>,
+        Andy Lutomirski <luto@kernel.org>,
         Florian Weimer <fweimer@redhat.com>,
         Lennart Poettering <mzxreary@0pointer.de>,
         Nicolai Stange <nstange@suse.de>,
@@ -85,170 +89,48 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Nov 12, 2019 at 8:25 PM Stephan M=C3=BCller <smueller@chronox.de> w=
-rote:
+=D1=81=D1=80, 13 =D0=BD=D0=BE=D1=8F=D0=B1. 2019 =D0=B3. =D0=B2 05:38, Steph=
+an M=C3=BCller <smueller@chronox.de>:
 >
-> Am Dienstag, 12. November 2019, 16:33:59 CET schrieb Andy Lutomirski:
+> Am Dienstag, 12. November 2019, 20:58:32 CET schrieb Alexander E. Patrako=
+v:
 >
-> Hi Andy,
+> Hi Alexander,
 >
-> > On Mon, Nov 11, 2019 at 11:13 AM Stephan M=C3=BCller <smueller@chronox.=
-de> wrote:
-> > > The following patch set provides a different approach to /dev/random =
-which
-> > > is called Linux Random Number Generator (LRNG) to collect entropy wit=
-hin
-> > > the Linux kernel. The main improvements compared to the existing
-> > > /dev/random is to provide sufficient entropy during boot time as well=
- as
-> > > in virtual environments and when using SSDs. A secondary design goal =
-is
-> > > to limit the impact of the entropy collection on massive parallel sys=
-tems
-> > > and also allow the use accelerated cryptographic primitives. Also, al=
-l
-> > > steps of the entropic data processing are testable.
+> > > +config LRNG_HEALTH_TESTS
+> > > +   bool "Enable noise source online health tests"
+> > > +   help
+> > > +     The online health tests validate the noise source at
+> > > +     runtime for fatal errors. These tests include SP800-90B
+> > > +     compliant tests which are invoked if the system is booted
+> > > +     with fips=3D1. In case of fatal errors during active
+> > > +     SP800-90B tests, the issue is logged and the noise
+> > > +     data is discarded. These tests are required for full
+> > > +     compliance with SP800-90B.
 > >
-> > This is very nice!
-> >
-> > > The LRNG patch set allows a user to select use of the existing /dev/r=
-andom
-> > > or the LRNG during compile time. As the LRNG provides API and ABI
-> > > compatible interfaces to the existing /dev/random implementation, the
-> > > user can freely chose the RNG implementation without affecting kernel=
- or
-> > > user space operations.
-> > >
-> > > This patch set provides early boot-time entropy which implies that no
-> > > additional flags to the getrandom(2) system call discussed recently o=
-n
-> > > the LKML is considered to be necessary.
-> >
-> > I'm uneasy about this.  I fully believe that, *on x86*, this works.
-> > But on embedded systems with in-order CPUs, a single clock, and very
-> > lightweight boot processes, most or all of boot might be too
-> > deterministic for this to work.
-> >
-> > I have a somewhat competing patch set here:
-> >
-> > https://git.kernel.org/pub/scm/linux/kernel/git/luto/linux.git/log/?h=
-=3Drandom
-> > /kill-it
-> >
-> > (Ignore the "horrible test hack" and the debugfs part.)
-> >
-> > The basic summary is that I change /dev/random so that it becomes
-> > functionally identical to getrandom(..., 0) -- in other words, it
-> > blocks until the CRNG is initialized but is then identical to
-> > /dev/urandom.  And I add getrandom(...., GRND_INSECURE) that is
-> > functionally identical to the existing /dev/urandom: it always returns
-> > *something* immediately, but it may or may not actually be
-> > cryptographically random or even random at all depending on system
-> > details.
-> >
-> > In other words, my series simplifies the ABI that we support.  Right
-> > now, we have three ways to ask for random numbers with different
-> > semantics and we need to have to RNGs in the kernel at all time.  With
-> > my changes, we have only two ways to ask for random numbers, and the
-> > /dev/random pool is entirely gone.
-> >
-> > Would you be amenable to merging this into your series (i.e. either
-> > merging the code or just the ideas)?  This would let you get rid of
-> > things like the compile-time selection of the blocking TRNG, since the
-> > blocking TRNG would be entirely gone.
+> > How have you tested that these tests work at runtime? Maybe add some
+> > code under a new CONFIG item that depends on CONFIG_BROKEN that
+> > deliberately botches the RNG and triggers failures?
 >
-> I pulled your code and found the following based on my explanation that I
-> would suggest to keep the TRNG at least as an option.
 >
-> - 7d54ef8512b06baf396f12584f7f48a9558ecd0f does not seem applicable:
-
-Not surprising.  It's just a cleanup to the existing code, and I doubt
-you inherited the oddity I'm fixing.
-
-> - 6a26a3146e5fb90878dca9fde8caa1ca4233156a: My handler for /dev/urandom a=
-nd
-> getrandom(..., 0) are using one callback which issues a warning in both u=
-se
-> cases (see lrng_sdrng_read). So I think this patch may not be applicable =
-as
-> the LRNG code implements warning about being unseeded.
-
-Probably true.
-
-What is the actual semantics of /dev/urandom with your series applied?
- Is there any situation in which it will block?
-
+> I am unable to find sensible information about CONFIG_BROKEN in the recen=
+t
+> kernel tree.
 >
-> - 3e8e159da49b44ae0bb08e68fa2be760722fa033: I am happy to take that code =
-which
-> would almost directly apply. The last hunk however would be:
->
-> if (!(flags & GRND_INSECURE) && unlikely(!lrng_state_operational())) {
->
-> =3D=3D> Shall I apply it to my code base? If yes, how shall the changes t=
-o
-> random.h be handled?
->
+> Do you happen to have a pointer on how that option is to be used?
 
-This might be a question for Ted.  Once the merge window opens, I'll
-resubmit it.
+This option is not used on its own. You create a new option,
+CONFIG_TEST_LRNG_FAILURE_MODE or something like that, and put your
+code under the ifdef guarded by that option. And then, to prevent
+ordinary users and allyesconfig from selecting it, in Kconfig you say:
+"depends on BROKEN". This way, the option becomes unselectable in
+menuconfig but still works as intended when added manually to .config
+(obviously, with the BROKEN dependency removed locally).
 
->
-> - 920e97e7fc508e6f0da9c7dec94c8073fd63ab4d: I would pass on this patch du=
-e to
-> the following: it unconditionally starts removing the access to the TRNG =
-(the
-> LRNG's logical equivalent to the blocking_pool). As patch 10/12 of the LR=
-NG
-> patch series provides the TRNG that is a compile time option, your patch =
-would
-> logically and functionally be equivalent when deselecting
-> CONFIG_LRNG_TRNG_SUPPORT in the LRNG without any further changes to the L=
-RNG
-> code.
+Definition: https://github.com/torvalds/linux/blob/9c7db5004280767566e91a33=
+445bf93aa479ef02/init/Kconfig#L68
+Example usage: https://github.com/torvalds/linux/blob/c87237110f2553b4200a8=
+b3401a01198edfcf0d9/drivers/gpu/drm/i915/Kconfig.debug#L166
 
-Given your previous email about the TRNG, I'm wondering what the API
-for the TRNG should be.  I am willing to grant that there are users
-who need a TRNG for various reasons, and that not all of them can use
-hwrng.  (And the current hwrng API is pretty bad.)  But I'm not
-convinced that /dev/random or getrandom(..., GRND_RANDOM) is a
-reasonable way to access it.  A blocking_pool-style TRNG is a very
-limited resource, and I think it could make sense to require some sort
-of actual permission to use it.  GRND_RANDOM has no access control at
-all, and everyone expects /dev/random to be world-readable.  The most
-widespread user of /dev/random that I know of is gnupg, and gnupg
-really should not be using it.
-
-Would it make sense to have a /dev/true_random that is 0400 by default
-for users who actually need it?  Then /dev/random and GRND_RANDOM
-could work as they do with my patch, and maybe it does the right thing
-for everyone.
-
->
-> - 693b9ffdf0fdc93456b5ad293ac05edf240a531b: This patch is applicable to t=
-he
-> LRNG. In case CONFIG_LRNG_TRNG_SUPPORT is not set, the TRNG is not presen=
-t.
-> Yet, the /dev/random and getrandom(GRND_RANDOM) would behave blocked unti=
-l
-> fully initialized. I have now added the general blocking until the LRNG i=
-s
-> fully initialized to the common /dev/random and getrandom(GRND_RANDOM)
-> interface function of lrng_trng_read_common. With that, the LRNG would be
-> fully equivalent to this patch if CONFIG_LRNG_TRNG_SUPPORT is not set.
-
-Sounds reasonable.
-
-> By making the TRNG compile-time selectable, I was hoping to serve all use=
-rs: I
-> wanted to cover the conclusions of the discussion to remove the blocking_=
-pool.
-> On the other hand, however, I want to support requirements that need the
-> blocking behavior.
-
-I find it odd that /dev/random would be either a TRNG or not a TRNG
-depending on kernel configuration.  For the small fraction of users
-that actually want a TRNG, wouldn't it be better to have an interface
-that fails outright if the TRNG is not enabled?
-
---Andy
+--
+Alexander E. Patrakov
