@@ -4,53 +4,54 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8CA5C17441
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 02:04:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6DA7C17441
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 02:07:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 92700222CA
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 02:04:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7FE2E21783
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 02:07:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1573610649;
-	bh=Hu7H6Gd7xqdBLTMuYsjBXuc2ZJmlAFn0a4M6+861rQY=;
+	s=default; t=1573610838;
+	bh=zzrMT65p4aIG+QXYsqjFqm0EsZZulY+2S2RkW/+FWLs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=e7B48FgkplXzWoP3DKtEJYxtEaUTFPmd3i1cSrYXYVpMuxS5dKsauOcTgZER+Jx1q
-	 vNpDeU9mOAFnJ0qDfH4jGekpyjqH+FZpC0NMDNYWAGC87fySxKXj9aqQ1onYnTbJ2t
-	 JZOrEONtSyGO18q5RsL2b4k1g9jRzT8dgPk469eU=
+	b=aWzZJs8nLj16a++XlPFJosTR2/S2rHLS6cZt5uyyaLDUW8F6cCmQsnGToIVo3VI8P
+	 Y/zJOpwwyLwdBIj4j+LA75cN9otC3iUj2G8BfSJ1a2LrP4b19PU7ffOVhrKkeh0N4c
+	 kwL84Qw+1uRsjOcAror3ne2LlJdhSeMdC0F5GPQU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729018AbfKMCEA (ORCPT
+        id S1728872AbfKMCHR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Nov 2019 21:04:00 -0500
-Received: from mail.kernel.org ([198.145.29.99]:58836 "EHLO mail.kernel.org"
+        Tue, 12 Nov 2019 21:07:17 -0500
+Received: from mail.kernel.org ([198.145.29.99]:56244 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730998AbfKMCCV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Nov 2019 21:02:21 -0500
+        id S1729697AbfKMCAs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 12 Nov 2019 21:00:48 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C8D7E22468;
-        Wed, 13 Nov 2019 02:02:19 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1ACC622469;
+        Wed, 13 Nov 2019 02:00:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573610540;
-        bh=Hu7H6Gd7xqdBLTMuYsjBXuc2ZJmlAFn0a4M6+861rQY=;
+        s=default; t=1573610446;
+        bh=zzrMT65p4aIG+QXYsqjFqm0EsZZulY+2S2RkW/+FWLs=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=2eYylClYK4ags/xoTuzu6SubqXE4munokX1Mdikb7N66ifgc1qp2pQcfNaB7dhDFX
-         rfP4DPNwG1OA2mxtRPZXn8VMJwD9Cwzrs17yC+RshcxtAsVH909gOsDIIGVqgXNZKx
-         GO09/FL/9ZkNbVVSwqonnEnWXhbS8xFpnHxKlb30=
+        b=cGgJJdvQwRMOv0FUHNIlOPm4Oo/7pcfiu5MwNHyXLoFYfWEI2t4YGGN3sJ2B4S8H0
+         IqZIpT6PXUiY0MMTV0s53uoglx99QxkDzLhXycd1DPMk/xIlGWi4mXSr9DcsXXbnkQ
+         QgH8/XTg1fD88FU2bg4YhFHDDVBP2OSjjS7rbX0I=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Radu Solea <radu.solea@nxp.com>,
+        Franck LENORMAND <franck.lenormand@nxp.com>,
         Leonard Crestez <leonard.crestez@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 29/48] crypto: mxs-dcp - Fix SHA null hashes and output length
-Date:   Tue, 12 Nov 2019 21:01:12 -0500
-Message-Id: <20191113020131.13356-29-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 43/68] crypto: mxs-dcp - Fix AES issues
+Date:   Tue, 12 Nov 2019 20:59:07 -0500
+Message-Id: <20191113015932.12655-43-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191113020131.13356-1-sashal@kernel.org>
-References: <20191113020131.13356-1-sashal@kernel.org>
+In-Reply-To: <20191113015932.12655-1-sashal@kernel.org>
+References: <20191113015932.12655-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -62,129 +63,117 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Radu Solea <radu.solea@nxp.com>
 
-[ Upstream commit c709eebaf5c5faa8a0f140355f9cfe67e8f7afb1 ]
+[ Upstream commit fadd7a6e616b89c7f4f7bfa7b824f290bab32c3c ]
 
-DCP writes at least 32 bytes in the output buffer instead of hash length
-as documented. Add intermediate buffer to prevent write out of bounds.
+The DCP driver does not obey cryptlen, when doing android CTS this
+results in passing to hardware input stream lengths which are not
+multiple of block size.
 
-When requested to produce null hashes DCP fails to produce valid output.
-Add software workaround to bypass hardware and return valid output.
+Add a check to prevent future erroneous stream lengths from reaching the
+hardware and adjust the scatterlist walking code to obey cryptlen.
+
+Also properly copy-out the IV for chaining.
 
 Signed-off-by: Radu Solea <radu.solea@nxp.com>
+Signed-off-by: Franck LENORMAND <franck.lenormand@nxp.com>
 Signed-off-by: Leonard Crestez <leonard.crestez@nxp.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/mxs-dcp.c | 47 +++++++++++++++++++++++++++++++---------
- 1 file changed, 37 insertions(+), 10 deletions(-)
+ drivers/crypto/mxs-dcp.c | 33 +++++++++++++++++++++++++++++++--
+ 1 file changed, 31 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
-index fe8cfe24c518f..38c5dd8891138 100644
+index 7483adf120084..b4bd34429cc14 100644
 --- a/drivers/crypto/mxs-dcp.c
 +++ b/drivers/crypto/mxs-dcp.c
-@@ -28,9 +28,24 @@
+@@ -225,6 +225,12 @@ static int mxs_dcp_run_aes(struct dcp_async_ctx *actx,
+ 	dma_addr_t dst_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_out_buf,
+ 					     DCP_BUF_SZ, DMA_FROM_DEVICE);
  
- #define DCP_MAX_CHANS	4
- #define DCP_BUF_SZ	PAGE_SIZE
-+#define DCP_SHA_PAY_SZ  64
- 
- #define DCP_ALIGNMENT	64
- 
-+/*
-+ * Null hashes to align with hw behavior on imx6sl and ull
-+ * these are flipped for consistency with hw output
-+ */
-+const uint8_t sha1_null_hash[] =
-+	"\x09\x07\xd8\xaf\x90\x18\x60\x95\xef\xbf"
-+	"\x55\x32\x0d\x4b\x6b\x5e\xee\xa3\x39\xda";
-+
-+const uint8_t sha256_null_hash[] =
-+	"\x55\xb8\x52\x78\x1b\x99\x95\xa4"
-+	"\x4c\x93\x9b\x64\xe4\x41\xae\x27"
-+	"\x24\xb9\x6f\x99\xc8\xf4\xfb\x9a"
-+	"\x14\x1c\xfc\x98\x42\xc4\xb0\xe3";
-+
- /* DCP DMA descriptor. */
- struct dcp_dma_desc {
- 	uint32_t	next_cmd_addr;
-@@ -48,6 +63,7 @@ struct dcp_coherent_block {
- 	uint8_t			aes_in_buf[DCP_BUF_SZ];
- 	uint8_t			aes_out_buf[DCP_BUF_SZ];
- 	uint8_t			sha_in_buf[DCP_BUF_SZ];
-+	uint8_t			sha_out_buf[DCP_SHA_PAY_SZ];
- 
- 	uint8_t			aes_key[2 * AES_KEYSIZE_128];
- 
-@@ -518,8 +534,6 @@ static int mxs_dcp_run_sha(struct ahash_request *req)
- 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
- 	struct dcp_async_ctx *actx = crypto_ahash_ctx(tfm);
- 	struct dcp_sha_req_ctx *rctx = ahash_request_ctx(req);
--	struct hash_alg_common *halg = crypto_hash_alg_common(tfm);
--
- 	struct dcp_dma_desc *desc = &sdcp->coh->desc[actx->chan];
- 
- 	dma_addr_t digest_phys = 0;
-@@ -541,10 +555,23 @@ static int mxs_dcp_run_sha(struct ahash_request *req)
- 	desc->payload = 0;
- 	desc->status = 0;
- 
-+	/*
-+	 * Align driver with hw behavior when generating null hashes
-+	 */
-+	if (rctx->init && rctx->fini && desc->size == 0) {
-+		struct hash_alg_common *halg = crypto_hash_alg_common(tfm);
-+		const uint8_t *sha_buf =
-+			(actx->alg == MXS_DCP_CONTROL1_HASH_SELECT_SHA1) ?
-+			sha1_null_hash : sha256_null_hash;
-+		memcpy(sdcp->coh->sha_out_buf, sha_buf, halg->digestsize);
-+		ret = 0;
-+		goto done_run;
++	if (actx->fill % AES_BLOCK_SIZE) {
++		dev_err(sdcp->dev, "Invalid block size!\n");
++		ret = -EINVAL;
++		goto aes_done_run;
 +	}
 +
- 	/* Set HASH_TERM bit for last transfer block. */
- 	if (rctx->fini) {
--		digest_phys = dma_map_single(sdcp->dev, req->result,
--					     halg->digestsize, DMA_FROM_DEVICE);
-+		digest_phys = dma_map_single(sdcp->dev, sdcp->coh->sha_out_buf,
-+					     DCP_SHA_PAY_SZ, DMA_FROM_DEVICE);
- 		desc->control0 |= MXS_DCP_CONTROL0_HASH_TERM;
- 		desc->payload = digest_phys;
- 	}
-@@ -552,9 +579,10 @@ static int mxs_dcp_run_sha(struct ahash_request *req)
+ 	/* Fill in the DMA descriptor. */
+ 	desc->control0 = MXS_DCP_CONTROL0_DECR_SEMAPHORE |
+ 		    MXS_DCP_CONTROL0_INTERRUPT |
+@@ -254,6 +260,7 @@ static int mxs_dcp_run_aes(struct dcp_async_ctx *actx,
+ 
  	ret = mxs_dcp_start_dma(actx);
  
- 	if (rctx->fini)
--		dma_unmap_single(sdcp->dev, digest_phys, halg->digestsize,
-+		dma_unmap_single(sdcp->dev, digest_phys, DCP_SHA_PAY_SZ,
- 				 DMA_FROM_DEVICE);
++aes_done_run:
+ 	dma_unmap_single(sdcp->dev, key_phys, 2 * AES_KEYSIZE_128,
+ 			 DMA_TO_DEVICE);
+ 	dma_unmap_single(sdcp->dev, src_phys, DCP_BUF_SZ, DMA_TO_DEVICE);
+@@ -280,13 +287,15 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
  
-+done_run:
- 	dma_unmap_single(sdcp->dev, buf_phys, DCP_BUF_SZ, DMA_TO_DEVICE);
+ 	uint8_t *out_tmp, *src_buf, *dst_buf = NULL;
+ 	uint32_t dst_off = 0;
++	uint32_t last_out_len = 0;
  
- 	return ret;
-@@ -572,6 +600,7 @@ static int dcp_sha_req_to_buf(struct crypto_async_request *arq)
- 	const int nents = sg_nents(req->src);
+ 	uint8_t *key = sdcp->coh->aes_key;
  
- 	uint8_t *in_buf = sdcp->coh->sha_in_buf;
-+	uint8_t *out_buf = sdcp->coh->sha_out_buf;
+ 	int ret = 0;
+ 	int split = 0;
+-	unsigned int i, len, clen, rem = 0;
++	unsigned int i, len, clen, rem = 0, tlen = 0;
+ 	int init = 0;
++	bool limit_hit = false;
  
- 	uint8_t *src_buf;
+ 	actx->fill = 0;
  
-@@ -626,11 +655,9 @@ static int dcp_sha_req_to_buf(struct crypto_async_request *arq)
+@@ -305,6 +314,11 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
+ 	for_each_sg(req->src, src, nents, i) {
+ 		src_buf = sg_virt(src);
+ 		len = sg_dma_len(src);
++		tlen += len;
++		limit_hit = tlen > req->nbytes;
++
++		if (limit_hit)
++			len = req->nbytes - (tlen - len);
  
- 		actx->fill = 0;
+ 		do {
+ 			if (actx->fill + len > out_off)
+@@ -321,13 +335,15 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
+ 			 * If we filled the buffer or this is the last SG,
+ 			 * submit the buffer.
+ 			 */
+-			if (actx->fill == out_off || sg_is_last(src)) {
++			if (actx->fill == out_off || sg_is_last(src) ||
++				limit_hit) {
+ 				ret = mxs_dcp_run_aes(actx, req, init);
+ 				if (ret)
+ 					return ret;
+ 				init = 0;
  
--		/* For some reason, the result is flipped. */
--		for (i = 0; i < halg->digestsize / 2; i++) {
--			swap(req->result[i],
--			     req->result[halg->digestsize - i - 1]);
--		}
-+		/* For some reason the result is flipped */
-+		for (i = 0; i < halg->digestsize; i++)
-+			req->result[i] = out_buf[halg->digestsize - i - 1];
+ 				out_tmp = out_buf;
++				last_out_len = actx->fill;
+ 				while (dst && actx->fill) {
+ 					if (!split) {
+ 						dst_buf = sg_virt(dst);
+@@ -350,6 +366,19 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
+ 				}
+ 			}
+ 		} while (len);
++
++		if (limit_hit)
++			break;
++	}
++
++	/* Copy the IV for CBC for chaining */
++	if (!rctx->ecb) {
++		if (rctx->enc)
++			memcpy(req->info, out_buf+(last_out_len-AES_BLOCK_SIZE),
++				AES_BLOCK_SIZE);
++		else
++			memcpy(req->info, in_buf+(last_out_len-AES_BLOCK_SIZE),
++				AES_BLOCK_SIZE);
  	}
  
- 	return 0;
+ 	return ret;
 -- 
 2.20.1
 
