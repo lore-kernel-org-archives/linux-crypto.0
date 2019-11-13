@@ -4,137 +4,102 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27B0BC432C3
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 19:55:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A39E3C432C3
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 20:04:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A25D6206ED
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 19:55:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 379F7206ED
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 20:04:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1573674934;
-	bh=+xX4T292kmZPyjMt+ZzYlLxnM6bEpvKK3p+NvavvN0k=;
+	s=default; t=1573675464;
+	bh=LZIwwPqo6cGSYYo3omBkRDVFip05Z5LaeW4j2tDTV2g=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=lKk+Yji/YQYT+toAvCQdwoqa7b2TOBbzR4ZKonzexlLe/Hu3uRRVCv3Ml2Dxs5bTL
-	 ms1yAsimGwAy0aQ3Gy5HejhDlL0Fhice314pOu8yj/xiGnRIzKtVB3z6P4L519DLuP
-	 iHHGmErtKOux4+sdQLPw1m5SqD09chzJQHW4QqV0=
+	b=tR+WFRh2eCTa9t7Hd0TXHvEV2ateZQ56HNF93eNBp2sH1FO+im3YrR6WvH9keVl6Z
+	 LRUMvwbpdzdefCf4e5anUIUb/eupkhKpjc6U94kYU8BD2iRRbKBZUGUaMB1Kthjm2r
+	 EotDrPOkSq/VHPfY1YUzX3YOgMm9+tlhUXCfg7sk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726422AbfKMTzd (ORCPT
+        id S1726155AbfKMUEW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Nov 2019 14:55:33 -0500
-Received: from mail.kernel.org ([198.145.29.99]:46084 "EHLO mail.kernel.org"
+        Wed, 13 Nov 2019 15:04:22 -0500
+Received: from mail.kernel.org ([198.145.29.99]:46934 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726066AbfKMTzc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Nov 2019 14:55:32 -0500
+        id S1726066AbfKMUEW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 13 Nov 2019 15:04:22 -0500
 Received: from gmail.com (unknown [104.132.1.77])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5D989206E1;
-        Wed, 13 Nov 2019 19:55:32 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 64D7B206E5;
+        Wed, 13 Nov 2019 20:04:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573674932;
-        bh=+xX4T292kmZPyjMt+ZzYlLxnM6bEpvKK3p+NvavvN0k=;
+        s=default; t=1573675462;
+        bh=LZIwwPqo6cGSYYo3omBkRDVFip05Z5LaeW4j2tDTV2g=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Azpy8mErVREYVRWovo3eozNIltWgJcIC5YxDopltuq44onMyzJgGEadjNQI9KHmPy
-         2pRznMLAHamRApspgu6qWIJ7V4jLJBQbBid+7FNy/F366JeIIwev2krbtIGRpmPkAb
-         uY7Vpnwoq/i1hPDUky3WFScLdvA0Wrui55BNOPdM=
-Date:   Wed, 13 Nov 2019 11:55:30 -0800
+        b=lhnZFjvlbtfVvcPSF1Xz2bXxwpvSyQKGXcs/DZmH2Yq6Qo5X6zS2xMotyjpkxZx6x
+         CBBLyub/I93WCDLJkqQlz+qJKMDdR92ckWE9aeoZS0KU0JuiLO68+Z8tcNS1zd10Pw
+         SXhtQGMI7Ad6ZHKdgaQ60mOoZNuf6k6cAqaMMnN4=
+Date:   Wed, 13 Nov 2019 12:04:20 -0800
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Kees Cook <keescook@chromium.org>
+To:     Sami Tolvanen <samitolvanen@google.com>
 Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        =?iso-8859-1?Q?Jo=E3o?= Moreira <joao.moreira@intel.com>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Stephan Mueller <smueller@chronox.de>, x86@kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-hardening@lists.openwall.com
-Subject: Re: [PATCH v5 8/8] crypto, x86/sha: Eliminate casts on asm
- implementations
-Message-ID: <20191113195529.GD221701@gmail.com>
-Mail-Followup-To: Kees Cook <keescook@chromium.org>,
+        Kees Cook <keescook@chromium.org>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: arm64/sha: fix function types
+Message-ID: <20191113200419.GE221701@gmail.com>
+Mail-Followup-To: Sami Tolvanen <samitolvanen@google.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        =?iso-8859-1?Q?Jo=E3o?= Moreira <joao.moreira@intel.com>,
-        Sami Tolvanen <samitolvanen@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Stephan Mueller <smueller@chronox.de>, x86@kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-hardening@lists.openwall.com
-References: <20191113182516.13545-1-keescook@chromium.org>
- <20191113182516.13545-9-keescook@chromium.org>
+        Kees Cook <keescook@chromium.org>, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20191112223046.176097-1-samitolvanen@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191113182516.13545-9-keescook@chromium.org>
+In-Reply-To: <20191112223046.176097-1-samitolvanen@google.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Nov 13, 2019 at 10:25:16AM -0800, Kees Cook wrote:
-> In order to avoid CFI function prototype mismatches, this removes the
-> casts on assembly implementations of sha1/256/512 accelerators. The
-> safety checks from BUILD_BUG_ON() remain.
+On Tue, Nov 12, 2019 at 02:30:46PM -0800, Sami Tolvanen wrote:
+> Declare assembly functions with the expected function type
+> instead of casting pointers in C to avoid type mismatch failures
+> with Control-Flow Integrity (CFI) checking.
 > 
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+> Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
 > ---
->  arch/x86/crypto/sha1_ssse3_glue.c   | 61 ++++++++++++-----------------
->  arch/x86/crypto/sha256_ssse3_glue.c | 31 +++++++--------
->  arch/x86/crypto/sha512_ssse3_glue.c | 28 ++++++-------
->  3 files changed, 50 insertions(+), 70 deletions(-)
+>  arch/arm64/crypto/sha1-ce-glue.c   | 12 +++++-------
+>  arch/arm64/crypto/sha2-ce-glue.c   | 26 +++++++++++---------------
+>  arch/arm64/crypto/sha256-glue.c    | 30 ++++++++++++------------------
+>  arch/arm64/crypto/sha512-ce-glue.c | 23 ++++++++++-------------
+>  arch/arm64/crypto/sha512-glue.c    | 13 +++++--------
+>  5 files changed, 43 insertions(+), 61 deletions(-)
 > 
-> diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
-> index 639d4c2fd6a8..a151d899f37a 100644
-> --- a/arch/x86/crypto/sha1_ssse3_glue.c
-> +++ b/arch/x86/crypto/sha1_ssse3_glue.c
-> @@ -27,11 +27,8 @@
->  #include <crypto/sha1_base.h>
->  #include <asm/simd.h>
+> diff --git a/arch/arm64/crypto/sha1-ce-glue.c b/arch/arm64/crypto/sha1-ce-glue.c
+> index bdc1b6d7aff7..3153a9bbb683 100644
+> --- a/arch/arm64/crypto/sha1-ce-glue.c
+> +++ b/arch/arm64/crypto/sha1-ce-glue.c
+> @@ -25,7 +25,7 @@ struct sha1_ce_state {
+>  	u32			finalize;
+>  };
 >  
-> -typedef void (sha1_transform_fn)(u32 *digest, const char *data,
-> -				unsigned int rounds);
-> -
->  static int sha1_update(struct shash_desc *desc, const u8 *data,
-> -			     unsigned int len, sha1_transform_fn *sha1_xform)
-> +			     unsigned int len, sha1_block_fn *sha1_xform)
->  {
->  	struct sha1_state *sctx = shash_desc_ctx(desc);
->  
-> @@ -39,48 +36,44 @@ static int sha1_update(struct shash_desc *desc, const u8 *data,
->  	    (sctx->count % SHA1_BLOCK_SIZE) + len < SHA1_BLOCK_SIZE)
->  		return crypto_sha1_update(desc, data, len);
->  
-> -	/* make sure casting to sha1_block_fn() is safe */
-> +	/* make sure sha1_block_fn() use in generic routines is safe */
->  	BUILD_BUG_ON(offsetof(struct sha1_state, state) != 0);
+> -asmlinkage void sha1_ce_transform(struct sha1_ce_state *sst, u8 const *src,
+> +asmlinkage void sha1_ce_transform(struct sha1_state *sst, u8 const *src,
+>  				  int blocks);
 
-This update to the comment makes no sense, since sha1_block_fn() is obviously
-safe in the helpers, and this says nothing about the assembly functions.
-Instead this should say something like:
+Please update the comments in the corresponding assembly files too.
 
-	/*
-	 * Make sure that struct sha1_state begins directly with the 160-bit
-	 * SHA1 internal state, as this is what the assembly functions expect.
-	 */
+Also, this change doesn't really make sense because the assembly functions still
+expect struct sha1_ce_state, and they access sha1_ce_state::finalize which is
+not present in struct sha1_state.  There should either be wrapper functions that
+explicitly do the cast from sha1_state to sha1_ce_state, or there should be
+comments in the assembly files that very clearly explain that although the
+function prototype takes sha1_state, it's really assumed to be a sha1_ce_state.
 
-Likewise for SHA-256 and SHA-512, except for those it would be a 256-bit and
-512-bit internal state respectively.
-
-> -asmlinkage void sha1_transform_ssse3(u32 *digest, const char *data,
-> -				     unsigned int rounds);
-> +asmlinkage void sha1_transform_ssse3(struct sha1_state *digest,
-> +				     u8 const *data, int rounds);
-
-'u8 const' is unconventional.  Please use 'const u8' instead.
-
-Also, this function prototype is also given in a comment in the corresponding
-assembly file.  Can you please update that too, and also leave a comment in the
-assembly file like "struct sha1_state is assumed to begin with u32 state[5]."?
-
-Likewise for all the other SHA-1, and SHA-256, and SHA-512 assembly functions,
-except it would be u32 state[8] for SHA-256 and u64 state[8] for SHA-512.
+Likewise for SHA-256 and SHA-512.
 
 - Eric
