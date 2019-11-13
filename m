@@ -2,511 +2,90 @@ Return-Path: <SRS0=5LAy=ZF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE975C17442
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 10:55:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACA97C43331
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 11:03:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AEC52222BD
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 10:55:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 81BCF222C1
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 11:03:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726138AbfKMKzv (ORCPT
+        id S1727142AbfKMLCz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Nov 2019 05:55:51 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:31636 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727211AbfKMKzu (ORCPT
+        Wed, 13 Nov 2019 06:02:55 -0500
+Received: from cloudserver094114.home.pl ([79.96.170.134]:45734 "EHLO
+        cloudserver094114.home.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726165AbfKMLCz (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Nov 2019 05:55:50 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.27/8.16.0.27) with SMTP id xADAnTcA134420
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Nov 2019 05:55:48 -0500
-Received: from e06smtp01.uk.ibm.com (e06smtp01.uk.ibm.com [195.75.94.97])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2w8e1sd2kh-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Nov 2019 05:55:48 -0500
-Received: from localhost
-        by e06smtp01.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <freude@linux.ibm.com>;
-        Wed, 13 Nov 2019 10:55:44 -0000
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
-        by e06smtp01.uk.ibm.com (192.168.101.131) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Wed, 13 Nov 2019 10:55:41 -0000
-Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xADAtdC349479694
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 13 Nov 2019 10:55:39 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9F20442047;
-        Wed, 13 Nov 2019 10:55:39 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 56E6D42049;
-        Wed, 13 Nov 2019 10:55:39 +0000 (GMT)
-Received: from funtu.com (unknown [9.152.224.114])
-        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Wed, 13 Nov 2019 10:55:39 +0000 (GMT)
-From:   Harald Freudenberger <freude@linux.ibm.com>
-To:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
-Cc:     ebiggers@kernel.org, heiko.carstens@de.ibm.com, gor@linux.ibm.com,
-        Harald Freudenberger <freude@linux.ibm.com>
-Subject: [PATCH 3/3] crypto/testmgr: add selftests for paes-s390
-Date:   Wed, 13 Nov 2019 11:55:23 +0100
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20191113105523.8007-1-freude@linux.ibm.com>
-References: <20191113105523.8007-1-freude@linux.ibm.com>
-X-TM-AS-GCONF: 00
-x-cbid: 19111310-4275-0000-0000-0000037D5A0F
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 19111310-4276-0000-0000-00003890BB1B
-Message-Id: <20191113105523.8007-4-freude@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:,, definitions=2019-11-13_02:,,
- signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- malwarescore=0 suspectscore=0 phishscore=0 bulkscore=0 spamscore=0
- clxscore=1015 lowpriorityscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=779 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.0.1-1910280000 definitions=main-1911130102
+        Wed, 13 Nov 2019 06:02:55 -0500
+Received: from 79.184.253.153.ipv4.supernova.orange.pl (79.184.253.153) (HELO kreacher.localnet)
+ by serwer1319399.home.pl (79.96.170.134) with SMTP (IdeaSmtpServer 0.83.292)
+ id f9c9ec80f02b64f5; Wed, 13 Nov 2019 12:02:52 +0100
+From:   "Rafael J. Wysocki" <rjw@rjwysocki.net>
+To:     Geert Uytterhoeven <geert+renesas@glider.be>
+Cc:     Breno =?ISO-8859-1?Q?Leit=E3o?= <leitao@debian.org>,
+        Nayna Jain <nayna@linux.ibm.com>,
+        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Alex Deucher <alexander.deucher@amd.com>,
+        Christian =?ISO-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+        David@rox.of.borg, David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Casey Leedom <leedom@chelsio.com>,
+        Shannon Nelson <snelson@pensando.io>,
+        Pensando Drivers <drivers@pensando.io>,
+        Kevin Hilman <khilman@kernel.org>, Nishanth Menon <nm@ti.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        netdev@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 4/5] power: avs: smartreflex: Remove superfluous cast in debugfs_create_file() call
+Date:   Wed, 13 Nov 2019 12:02:51 +0100
+Message-ID: <2168390.66xqsT3ub9@kreacher>
+In-Reply-To: <20191021145149.31657-5-geert+renesas@glider.be>
+References: <20191021145149.31657-1-geert+renesas@glider.be> <20191021145149.31657-5-geert+renesas@glider.be>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch adds selftests for the s390 specific protected key
-AES (PAES) cipher implementations:
-  * cbc-paes-s390
-  * ctr-paes-s390
-  * ecb-paes-s390
-  * xts-paes-s390
-PAES is an AES cipher but with encrypted ('protected') key
-material. So here come ordinary AES enciphered data values
-but with a special key format understood by the PAES
-implementation.
+On Monday, October 21, 2019 4:51:48 PM CET Geert Uytterhoeven wrote:
+> There is no need to cast a typed pointer to a void pointer when calling
+> a function that accepts the latter.  Remove it, as the cast prevents
+> further compiler checks.
+> 
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> ---
+>  drivers/power/avs/smartreflex.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/power/avs/smartreflex.c b/drivers/power/avs/smartreflex.c
+> index 4684e7df833a81e9..5376f3d22f31eade 100644
+> --- a/drivers/power/avs/smartreflex.c
+> +++ b/drivers/power/avs/smartreflex.c
+> @@ -905,7 +905,7 @@ static int omap_sr_probe(struct platform_device *pdev)
+>  	sr_info->dbg_dir = debugfs_create_dir(sr_info->name, sr_dbg_dir);
+>  
+>  	debugfs_create_file("autocomp", S_IRUGO | S_IWUSR, sr_info->dbg_dir,
+> -			    (void *)sr_info, &pm_sr_fops);
+> +			    sr_info, &pm_sr_fops);
+>  	debugfs_create_x32("errweight", S_IRUGO, sr_info->dbg_dir,
+>  			   &sr_info->err_weight);
+>  	debugfs_create_x32("errmaxlimit", S_IRUGO, sr_info->dbg_dir,
+> 
 
-The testdata definitons and testlist entries are surrounded
-by #if IS_ENABLED(CONFIG_CRYPTO_PAES_S390) because they don't
-make any sense on non s390 platforms or without the PAES
-cipher implementation.
+Applying as 5.5 material, thanks!
 
-Signed-off-by: Harald Freudenberger <freude@linux.ibm.com>
----
- crypto/testmgr.c |  36 +++++
- crypto/testmgr.h | 334 +++++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 370 insertions(+)
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 82084f6d84b6..6bda67bdc662 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -4104,6 +4104,15 @@ static const struct alg_test_desc alg_test_descs[] = {
- 			.cipher = __VECS(tf_cbc_tv_template)
- 		},
- 	}, {
-+#if IS_ENABLED(CONFIG_CRYPTO_PAES_S390)
-+		.alg = "cbc-paes-s390",
-+		.fips_allowed = 1,
-+		.test = alg_test_skcipher,
-+		.suite = {
-+			.cipher = __VECS(paes_cbc_tv_template)
-+		}
-+	}, {
-+#endif
- 		.alg = "cbcmac(aes)",
- 		.fips_allowed = 1,
- 		.test = alg_test_hash,
-@@ -4252,6 +4261,15 @@ static const struct alg_test_desc alg_test_descs[] = {
- 			.cipher = __VECS(tf_ctr_tv_template)
- 		}
- 	}, {
-+#if IS_ENABLED(CONFIG_CRYPTO_PAES_S390)
-+		.alg = "ctr-paes-s390",
-+		.fips_allowed = 1,
-+		.test = alg_test_skcipher,
-+		.suite = {
-+			.cipher = __VECS(paes_ctr_tv_template)
-+		}
-+	}, {
-+#endif
- 		.alg = "cts(cbc(aes))",
- 		.test = alg_test_skcipher,
- 		.fips_allowed = 1,
-@@ -4538,6 +4556,15 @@ static const struct alg_test_desc alg_test_descs[] = {
- 			.cipher = __VECS(xtea_tv_template)
- 		}
- 	}, {
-+#if IS_ENABLED(CONFIG_CRYPTO_PAES_S390)
-+		.alg = "ecb-paes-s390",
-+		.fips_allowed = 1,
-+		.test = alg_test_skcipher,
-+		.suite = {
-+			.cipher = __VECS(paes_ecb_tv_template)
-+		}
-+	}, {
-+#endif
- 		.alg = "ecdh",
- 		.test = alg_test_kpp,
- 		.fips_allowed = 1,
-@@ -5109,6 +5136,15 @@ static const struct alg_test_desc alg_test_descs[] = {
- 			.cipher = __VECS(tf_xts_tv_template)
- 		}
- 	}, {
-+#if IS_ENABLED(CONFIG_CRYPTO_PAES_S390)
-+		.alg = "xts-paes-s390",
-+		.fips_allowed = 1,
-+		.test = alg_test_skcipher,
-+		.suite = {
-+			.cipher = __VECS(paes_xts_tv_template)
-+		}
-+	}, {
-+#endif
- 		.alg = "xts4096(paes)",
- 		.test = alg_test_null,
- 		.fips_allowed = 1,
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index d1d89101f1b5..14c594e8fbed 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -31942,4 +31942,338 @@ static const struct aead_testvec essiv_hmac_sha256_aes_cbc_tv_temp[] = {
- 	},
- };
- 
-+#if IS_ENABLED(CONFIG_CRYPTO_PAES_S390)
-+static const struct cipher_testvec paes_cbc_tv_template[] = {
-+	{
-+		.key	= "\x00\x00\x00\x00\x02\x00\x00\x00"
-+			  "\x00\x00\x00\x01\x00\x00\x00\x10"
-+			  "\x4a\x6f\x68\x61\x6e\x6e\x20\x57"
-+			  "\x6f\x6c\x66\x67\x61\x6e\x67\x20",
-+		.klen	= 16 + 16,
-+		.iv	= "\x5a\x61\x75\x62\x65\x72\x6c\x65"
-+			  "\x68\x72\x6c\x69\x6e\x67\x00\x00",
-+		.iv_out	= "\x29\x4a\x3a\x21\x51\xbf\x9e\x57"
-+			  "\xd2\x79\x5b\xb1\x91\x4f\x54\x59",
-+		.ptext	= "\x48\x61\x74\x20\x64\x65\x72\x20"
-+			  "\x61\x6c\x74\x65\x20\x48\x65\x78",
-+		.ctext	= "\x29\x4a\x3a\x21\x51\xbf\x9e\x57"
-+			  "\xd2\x79\x5b\xb1\x91\x4f\x54\x59",
-+		.len	= 16,
-+	}, {
-+		.key	= "\x00\x00\x00\x00\x02\x00\x00\x00"
-+			  "\x00\x00\x00\x01\x00\x00\x00\x10"
-+			  "\x4a\x6f\x68\x61\x6e\x6e\x20\x57"
-+			  "\x6f\x6c\x66\x67\x61\x6e\x67\x20",
-+		.klen	= 16 + 16,
-+		.iv	= "\x5a\x61\x75\x62\x65\x72\x6c\x65"
-+			  "\x68\x72\x6c\x69\x6e\x67\x00\x00",
-+		.iv_out	= "\x6c\xfd\xd0\xce\x12\x53\xf5\x01"
-+			  "\x9d\x87\xe6\xb1\x32\x72\xfd\x31",
-+		.ptext	= "\x65\x6e\x6d\x65\x69\x73\x74\x65"
-+			  "\x72\x0a\x53\x69\x63\x68\x20\x64"
-+			  "\x6f\x63\x68\x20\x65\x69\x6e\x6d"
-+			  "\x61\x6c\x20\x77\x65\x67\x62\x65",
-+		.ctext	= "\x58\xd0\x61\x98\x33\xf5\xee\x3e"
-+			  "\xcd\xe8\x2f\x8b\x05\x30\x3d\xf0"
-+			  "\x6c\xfd\xd0\xce\x12\x53\xf5\x01"
-+			  "\x9d\x87\xe6\xb1\x32\x72\xfd\x31",
-+		.len	= 32,
-+	}, {
-+		.key	= "\x00\x00\x00\x00\x02\x00\x00\x00"
-+			  "\x00\x00\x00\x02\x00\x00\x00\x18"
-+			  "\x4a\x6f\x68\x61\x6e\x6e\x20\x57"
-+			  "\x6f\x6c\x66\x67\x61\x6e\x67\x20"
-+			  "\x76\x6f\x6e\x20\x47\x6f\x65\x74",
-+		.klen	= 16 + 24,
-+		.iv	= "\x5a\x61\x75\x62\x65\x72\x6c\x65"
-+			  "\x68\x72\x6c\x69\x6e\x67\x00\x00",
-+		.iv_out	= "\xfa\xce\xf8\x56\x00\x06\x07\xd0"
-+			  "\x80\xca\xd1\x92\x8b\x72\x3a\x37",
-+		.ptext	= "\x67\x65\x62\x65\x6e\x21\x0a\x55"
-+			  "\x6e\x64\x20\x6e\x75\x6e\x20\x73"
-+			  "\x6f\x6c\x6c\x65\x6e\x20\x73\x65"
-+			  "\x69\x6e\x65\x20\x47\x65\x69\x73"
-+			  "\x74\x65\x72\x0a\x41\x75\x63\x68"
-+			  "\x20\x6e\x61\x63\x68\x20\x6d\x65",
-+		.ctext	= "\xf9\x64\x0b\x55\x99\x95\xbb\x84"
-+			  "\xd2\x4e\x12\x63\xff\xde\x1d\x34"
-+			  "\x39\xdd\x05\x33\x70\x8d\x43\x3f"
-+			  "\xf8\xf2\x52\x00\xbd\xce\x35\x73"
-+			  "\xfa\xce\xf8\x56\x00\x06\x07\xd0"
-+			  "\x80\xca\xd1\x92\x8b\x72\x3a\x37",
-+		.len	= 48,
-+	}, {
-+		.key	= "\x00\x00\x00\x00\x02\x00\x00\x00"
-+			  "\x00\x00\x00\x03\x00\x00\x00\x20"
-+			  "\x4a\x6f\x68\x61\x6e\x6e\x20\x57"
-+			  "\x6f\x6c\x66\x67\x61\x6e\x67\x20"
-+			  "\x76\x6f\x6e\x20\x47\x6f\x65\x74"
-+			  "\x68\x65\x0a\x00\x00\x00\x00\x00",
-+		.klen	= 16 + 32,
-+		.iv	= "\x5a\x61\x75\x62\x65\x72\x6c\x65"
-+			  "\x68\x72\x6c\x69\x6e\x67\x00\x00",
-+		.iv_out	= "\x2b\xea\x25\x71\x32\x2b\xe7\x5b"
-+			  "\xdd\x59\xb9\xfc\x3b\x34\x50\x62",
-+		.ptext	= "\x69\x6e\x65\x6d\x20\x57\x69\x6c"
-+			  "\x6c\x65\x6e\x20\x6c\x65\x62\x65"
-+			  "\x6e\x2e\x0a\x53\x65\x69\x6e\x65"
-+			  "\x20\x57\x6f\x72\x74\x20\x75\x6e"
-+			  "\x64\x20\x57\x65\x72\x6b\x65\x0a"
-+			  "\x4d\x65\x72\x6b\x74\x20\x69\x63"
-+			  "\x68\x20\x75\x6e\x64\x20\x64\x65"
-+			  "\x6e\x20\x42\x72\x61\x75\x63\x68",
-+		.ctext	= "\x04\x5b\x92\x57\xe4\xec\x01\xb8"
-+			  "\x92\xd9\xba\x28\x1e\xe9\xc0\xbd"
-+			  "\x9b\xa2\x08\xc2\xe1\x59\x34\xd9"
-+			  "\xc8\x30\x66\xfb\x28\x06\xb0\xac"
-+			  "\x37\x18\x1d\x82\xb5\xd4\x0c\xa0"
-+			  "\x80\x40\x2c\x51\x5d\x07\xc6\xe9"
-+			  "\x2b\xea\x25\x71\x32\x2b\xe7\x5b"
-+			  "\xdd\x59\xb9\xfc\x3b\x34\x50\x62",
-+		.len	= 64,
-+	},
-+};
-+
-+static const struct cipher_testvec paes_ctr_tv_template[] = {
-+	{
-+		.key	= "\x00\x00\x00\x00\x02\x00\x00\x00"
-+			  "\x00\x00\x00\x01\x00\x00\x00\x10"
-+			  "\x4a\x6f\x68\x61\x6e\x6e\x20\x57"
-+			  "\x6f\x6c\x66\x67\x61\x6e\x67\x20",
-+		.klen	= 16 + 16,
-+		.iv	= "\x5a\x61\x75\x62\x65\x72\x6c\x65"
-+			  "\x68\x72\x6c\x69\x6e\x67\x00\x00",
-+		.iv_out	= "\x5a\x61\x75\x62\x65\x72\x6c\x65"
-+			  "\x68\x72\x6c\x69\x6e\x67\x00\x01",
-+		.ptext	= "\x2c\x0a\x55\x6e\x64\x20\x6d\x69"
-+			  "\x74\x20\x47\x65\x69\x73\x74\x65",
-+		.ctext	= "\x10\xfd\x9c\x75\x74\x7d\xa1\x49"
-+			  "\xef\xc9\x90\xa8\x24\x43\x8d\xee",
-+		.len	= 16,
-+	}, {
-+		.key	= "\x00\x00\x00\x00\x02\x00\x00\x00"
-+			  "\x00\x00\x00\x01\x00\x00\x00\x10"
-+			  "\x4a\x6f\x68\x61\x6e\x6e\x20\x57"
-+			  "\x6f\x6c\x66\x67\x61\x6e\x67\x20",
-+		.klen	= 16 + 16,
-+		.iv	= "\x5a\x61\x75\x62\x65\x72\x6c\x65"
-+			  "\x68\x72\x6c\x69\x6e\x67\x00\x00",
-+		.iv_out	= "\x5a\x61\x75\x62\x65\x72\x6c\x65"
-+			  "\x68\x72\x6c\x69\x6e\x67\x00\x02",
-+		.ptext	= "\x73\x73\x74\xc3\xa4\x72\x6b\x65"
-+			  "\x0a\x54\x75\x20\x69\x63\x68\x20"
-+			  "\x57\x75\x6e\x64\x65\x72\x20\x61"
-+			  "\x75\x63\x68\x2e\x0a\x57\x61\x6c",
-+		.ctext	= "\x4f\x84\xbd\xd8\xb4\x2f\xa7\x45"
-+			  "\x91\xbd\xa2\xed\x24\x53\x91\xab"
-+			  "\x93\xbf\xe3\xce\xca\x97\x10\xaf"
-+			  "\x01\x50\x8a\xf8\x9f\x6c\x9c\x6c",
-+		.len	= 32,
-+	}, {
-+		.key	= "\x00\x00\x00\x00\x02\x00\x00\x00"
-+			  "\x00\x00\x00\x02\x00\x00\x00\x18"
-+			  "\x4a\x6f\x68\x61\x6e\x6e\x20\x57"
-+			  "\x6f\x6c\x66\x67\x61\x6e\x67\x20"
-+			  "\x76\x6f\x6e\x20\x47\x6f\x65\x74",
-+		.klen	= 16 + 24,
-+		.iv	= "\x5a\x61\x75\x62\x65\x72\x6c\x65"
-+			  "\x68\x72\x6c\x69\x6e\x67\x00\x00",
-+		.iv_out	= "\x5a\x61\x75\x62\x65\x72\x6c\x65"
-+			  "\x68\x72\x6c\x69\x6e\x67\x00\x03",
-+		.ptext	= "\x6c\x65\x21\x20\x77\x61\x6c\x6c"
-+			  "\x65\x0a\x4d\x61\x6e\x63\x68\x65"
-+			  "\x20\x53\x74\x72\x65\x63\x6b\x65"
-+			  "\x2c\x0a\x44\x61\xc3\x9f\x2c\x20"
-+			  "\x7a\x75\x6d\x20\x5a\x77\x65\x63"
-+			  "\x6b\x65\x2c\x0a\x57\x61\x73\x73",
-+		.ctext	= "\xfa\x8a\x69\xe9\xb6\x0e\x33\x38"
-+			  "\x7a\x9b\x3a\x1d\x0e\xad\xb9\xc5"
-+			  "\x17\xc2\x8c\x5c\x0a\xa7\x6f\xf2"
-+			  "\x22\x81\xdd\x72\xf0\x69\x4a\xea"
-+			  "\x20\xb8\x8d\x3f\x4a\xf1\x96\xd9"
-+			  "\x45\x96\x87\x64\xae\xa4\x1c\xe0",
-+		.len	= 48,
-+	}, {
-+		.key	= "\x00\x00\x00\x00\x02\x00\x00\x00"
-+			  "\x00\x00\x00\x03\x00\x00\x00\x20"
-+			  "\x4a\x6f\x68\x61\x6e\x6e\x20\x57"
-+			  "\x6f\x6c\x66\x67\x61\x6e\x67\x20"
-+			  "\x76\x6f\x6e\x20\x47\x6f\x65\x74"
-+			  "\x68\x65\x0a\x00\x00\x00\x00\x00",
-+		.klen	= 16 + 32,
-+		.iv	= "\x5a\x61\x75\x62\x65\x72\x6c\x65"
-+			  "\x68\x72\x6c\x69\x6e\x67\x00\x00",
-+		.iv_out	= "\x5a\x61\x75\x62\x65\x72\x6c\x65"
-+			  "\x68\x72\x6c\x69\x6e\x67\x00\x04",
-+		.ptext	= "\x65\x72\x20\x66\x6c\x69\x65\xc3"
-+			  "\x9f\x65\x0a\x55\x6e\x64\x20\x6d"
-+			  "\x69\x74\x20\x72\x65\x69\x63\x68"
-+			  "\x65\x6d\x2c\x20\x76\x6f\x6c\x6c"
-+			  "\x65\x6d\x20\x53\x63\x68\x77\x61"
-+			  "\x6c\x6c\x65\x0a\x5a\x75\x20\x64"
-+			  "\x65\x6d\x20\x42\x61\x64\x65\x20"
-+			  "\x73\x69\x63\x68\x20\x65\x72\x67",
-+		.ctext	= "\x7d\x37\x30\x05\x86\x89\x6c\x68"
-+			  "\xb9\xb1\xda\x71\xc7\x4d\x8e\x64"
-+			  "\x0b\x46\xdf\x0c\xd2\x25\x1f\x8f"
-+			  "\xd6\xc2\xd7\x35\x98\x6b\x31\x67"
-+			  "\xc0\x46\x69\x34\xc2\x3f\x2a\x13"
-+			  "\xc2\x4a\xbf\x5c\xe0\x6f\x92\x38"
-+			  "\x7b\xa5\x46\xc0\x70\x96\xa9\x09"
-+			  "\xe4\x03\x10\xbc\x28\xe7\xe9\xf8",
-+		.len	= 64,
-+	},
-+};
-+
-+static const struct cipher_testvec paes_ecb_tv_template[] = {
-+	{
-+		.key	= "\x00\x00\x00\x00\x02\x00\x00\x00"
-+			  "\x00\x00\x00\x01\x00\x00\x00\x10"
-+			  "\x4a\x6f\x68\x61\x6e\x6e\x20\x57"
-+			  "\x6f\x6c\x66\x67\x61\x6e\x67\x20",
-+		.klen	= 16 + 16,
-+		.ptext	= "\x69\x65\xc3\x9f\x65\x2e\x0a\x55"
-+			  "\x6e\x64\x20\x6e\x75\x6e\x20\x6b",
-+		.ctext	= "\x22\xb1\xc6\x20\x52\x27\x69\xbc"
-+			  "\xac\x96\x6b\x39\xe7\x5f\x3c\x5e",
-+		.len	= 16,
-+	}, {
-+		.key	= "\x00\x00\x00\x00\x02\x00\x00\x00"
-+			  "\x00\x00\x00\x01\x00\x00\x00\x10"
-+			  "\x4a\x6f\x68\x61\x6e\x6e\x20\x57"
-+			  "\x6f\x6c\x66\x67\x61\x6e\x67\x20",
-+		.klen	= 16 + 16,
-+		.ptext	= "\x6f\x6d\x6d\x2c\x20\x64\x75\x20"
-+			  "\x61\x6c\x74\x65\x72\x20\x42\x65"
-+			  "\x73\x65\x6e\x2c\x0a\x4e\x69\x6d"
-+			  "\x6d\x20\x64\x69\x65\x20\x73\x63",
-+		.ctext	= "\x74\x37\x97\x02\x47\xe8\x3f\xfd"
-+			  "\x06\xd4\x7f\x92\xe6\x86\xd5\xdd"
-+			  "\x20\x05\x7b\xa8\x5a\xe4\x55\x68"
-+			  "\xfe\x4e\x7e\x01\x47\x92\xc5\x9c",
-+		.len	= 32,
-+	}, {
-+		.key	= "\x00\x00\x00\x00\x02\x00\x00\x00"
-+			  "\x00\x00\x00\x02\x00\x00\x00\x18"
-+			  "\x4a\x6f\x68\x61\x6e\x6e\x20\x57"
-+			  "\x6f\x6c\x66\x67\x61\x6e\x67\x20"
-+			  "\x76\x6f\x6e\x20\x47\x6f\x65\x74",
-+		.klen	= 16 + 24,
-+		.ptext	= "\x68\x6c\x65\x63\x68\x74\x65\x6e"
-+			  "\x20\x4c\x75\x6d\x70\x65\x6e\x68"
-+			  "\xc3\xbc\x6c\x6c\x65\x6e\x21\x0a"
-+			  "\x42\x69\x73\x74\x20\x73\x63\x68"
-+			  "\x6f\x6e\x20\x6c\x61\x6e\x67\x65"
-+			  "\x20\x4b\x6e\x65\x63\x68\x74\x20",
-+		.ctext	= "\x2c\xd6\xa7\x25\x94\x16\x47\xb0"
-+			  "\xad\x9f\x05\x17\x72\xa5\x5a\x82"
-+			  "\xcd\x0f\x01\xaa\x39\xd6\x52\x1e"
-+			  "\x8d\x3d\x87\x0e\xdd\x67\xa0\xb7"
-+			  "\xbc\x9e\xd6\xf4\x11\xad\x94\x21"
-+			  "\xd2\x95\x44\xca\x76\xfd\x75\xc2",
-+		.len	= 48,
-+	}, {
-+		.key	= "\x00\x00\x00\x00\x02\x00\x00\x00"
-+			  "\x00\x00\x00\x03\x00\x00\x00\x20"
-+			  "\x4a\x6f\x68\x61\x6e\x6e\x20\x57"
-+			  "\x6f\x6c\x66\x67\x61\x6e\x67\x20"
-+			  "\x76\x6f\x6e\x20\x47\x6f\x65\x74"
-+			  "\x68\x65\x0a\x00\x00\x00\x00\x00",
-+		.klen	= 16 + 32,
-+		.ptext	= "\x67\x65\x77\x65\x73\x65\x6e\x3a"
-+			  "\x0a\x4e\x75\x6e\x20\x65\x72\x66"
-+			  "\xc3\xbc\x6c\x6c\x65\x20\x6d\x65"
-+			  "\x69\x6e\x65\x6e\x20\x57\x69\x6c"
-+			  "\x6c\x65\x6e\x21\x0a\x41\x75\x66"
-+			  "\x20\x7a\x77\x65\x69\x20\x42\x65"
-+			  "\x69\x6e\x65\x6e\x20\x73\x74\x65"
-+			  "\x68\x65\x2c\x0a\x4f\x62\x65\x6e",
-+		.ctext	= "\x93\x33\xa3\xb0\xa5\xda\x3d\x2b"
-+			  "\xf1\xde\x19\xb4\xe5\xa6\x89\xa9"
-+			  "\x3f\xaa\x25\x69\x2c\x54\xd1\x0d"
-+			  "\xaa\x6b\xd2\x91\xfb\x6d\xb7\x6c"
-+			  "\xad\xa6\xf5\x0a\x20\x24\x5a\x1e"
-+			  "\x41\x01\xc4\x45\x4a\x4b\xf9\x26"
-+			  "\xf0\xb3\x42\xfb\x5a\xe4\x55\x4c"
-+			  "\xea\x2b\xd8\x31\x60\x6e\xef\xe9",
-+		.len	= 64,
-+	},
-+};
-+
-+static const struct cipher_testvec paes_xts_tv_template[] = {
-+	{
-+		.key	= "\x00\x00\x00\x00\x02\x00\x00\x00"
-+			  "\x00\x00\x00\x01\x00\x00\x00\x10"
-+			  "\x4a\x6f\x68\x61\x6e\x6e\x20\x57"
-+			  "\x6f\x6c\x66\x67\x61\x6e\x67\x20"
-+			  "\x00\x00\x00\x00\x02\x00\x00\x00"
-+			  "\x00\x00\x00\x01\x00\x00\x00\x10"
-+			  "\x44\x65\x72\x20\x5a\x61\x75\x62"
-+			  "\x65\x72\x6c\x65\x68\x72\x6c\x69",
-+		.klen	= 2 * (16 + 16),
-+		.iv	= "\x31\x37\x34\x39\x2d\x31\x38\x33"
-+			  "\x32\x00\x00\x00\x00\x00\x00\x00",
-+		.ptext	= "\x20\x73\x65\x69\x20\x65\x69\x6e"
-+			  "\x20\x4b\x6f\x70\x66\x2c\x0a\x45",
-+		.ctext	= "\x53\xc8\x2f\x3f\x95\x06\x19\x08"
-+			  "\xc5\xe0\xf4\x4a\xeb\x00\x50\xd9",
-+		.len	= 16,
-+	}, {
-+		.key	= "\x00\x00\x00\x00\x02\x00\x00\x00"
-+			  "\x00\x00\x00\x01\x00\x00\x00\x10"
-+			  "\x4a\x6f\x68\x61\x6e\x6e\x20\x57"
-+			  "\x6f\x6c\x66\x67\x61\x6e\x67\x20"
-+			  "\x00\x00\x00\x00\x02\x00\x00\x00"
-+			  "\x00\x00\x00\x01\x00\x00\x00\x10"
-+			  "\x44\x65\x72\x20\x5a\x61\x75\x62"
-+			  "\x65\x72\x6c\x65\x68\x72\x6c\x69",
-+		.klen	= 2 * (16 + 16),
-+		.iv	= "\x31\x37\x34\x39\x2d\x31\x38\x33"
-+			  "\x32\x00\x00\x00\x00\x00\x00\x00",
-+		.ptext	= "\x69\x6c\x65\x20\x6e\x75\x6e\x20"
-+			  "\x75\x6e\x64\x20\x67\x65\x68\x65"
-+			  "\x0a\x4d\x69\x74\x20\x64\x65\x6d"
-+			  "\x20\x57\x61\x73\x73\x65\x72\x74",
-+		.ctext	= "\xe4\x08\xdc\x74\xba\xa2\xb2\x09"
-+			  "\xe4\x1a\x34\x81\xb6\x65\xe7\x7a"
-+			  "\x51\xe3\x88\x36\xb8\xb1\x23\xfe"
-+			  "\x83\x21\xd8\x2e\x9d\x78\xfb\x06",
-+		.len	= 32,
-+	}, {
-+		.key	= "\x00\x00\x00\x00\x02\x00\x00\x00"
-+			  "\x00\x00\x00\x03\x00\x00\x00\x20"
-+			  "\x4a\x6f\x68\x61\x6e\x6e\x20\x57"
-+			  "\x6f\x6c\x66\x67\x61\x6e\x67\x20"
-+			  "\x76\x6f\x6e\x20\x47\x6f\x65\x74"
-+			  "\x68\x65\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x02\x00\x00\x00"
-+			  "\x00\x00\x00\x03\x00\x00\x00\x20"
-+			  "\x44\x65\x72\x20\x5a\x61\x75\x62"
-+			  "\x65\x72\x6c\x65\x68\x72\x6c\x69"
-+			  "\x6e\x67\x00\x00\x00\x00\x00\x00"
-+			  "\x00\x00\x00\x00\x00\x00\x00\x00",
-+		.klen	= 2 * (16 + 32),
-+		.iv	= "\x31\x37\x34\x39\x2d\x31\x38\x33"
-+			  "\x32\x00\x00\x00\x00\x00\x00\x00",
-+		.ptext	= "\x6f\x70\x66\x21\x0a\x57\x61\x6c"
-+			  "\x6c\x65\x21\x20\x77\x61\x6c\x6c"
-+			  "\x65\x0a\x4d\x61\x6e\x63\x68\x65"
-+			  "\x20\x53\x74\x72\x65\x63\x6b\x65"
-+			  "\x2c\x0a\x44\x61\xc3\x9f\x2c\x20"
-+			  "\x7a\x75\x6d\x20\x5a\x77\x65\x63"
-+			  "\x6b\x65\x2c\x0a\x57\x61\x73\x73"
-+			  "\x65\x72\x20\x66\x6c\x69\x65\xc3",
-+		.ctext	= "\x04\x02\x88\xed\xe0\xce\x13\xad"
-+			  "\x9b\x9d\x7f\x10\xdf\x7d\x7b\xc5"
-+			  "\xf0\xab\x35\x07\x1a\xfa\xdd\x33"
-+			  "\xf1\x10\x52\x1e\x1f\x6b\x41\x3a"
-+			  "\xef\xae\xbb\xd9\xf0\x1d\x1b\x7b"
-+			  "\x2c\x77\xee\x18\xe4\x51\x18\xc5"
-+			  "\x99\xb6\x83\x3b\x5f\xae\x14\x6e"
-+			  "\xc9\x22\x9c\x0a\xaa\x2f\x0a\xe1",
-+		.len	= 64,
-+	},
-+};
-+#endif /* CONFIG_CRYPTO_PAES_S390 */
-+
- #endif	/* _CRYPTO_TESTMGR_H */
--- 
-2.17.1
+
 
