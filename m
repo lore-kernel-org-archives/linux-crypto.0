@@ -2,90 +2,94 @@ Return-Path: <SRS0=5LAy=ZF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACA97C43331
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 11:03:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE401C43331
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 11:14:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 81BCF222C1
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 11:03:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BD430222D0
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 11:14:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727142AbfKMLCz (ORCPT
+        id S1727832AbfKMLOf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Nov 2019 06:02:55 -0500
-Received: from cloudserver094114.home.pl ([79.96.170.134]:45734 "EHLO
-        cloudserver094114.home.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726165AbfKMLCz (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Nov 2019 06:02:55 -0500
-Received: from 79.184.253.153.ipv4.supernova.orange.pl (79.184.253.153) (HELO kreacher.localnet)
- by serwer1319399.home.pl (79.96.170.134) with SMTP (IdeaSmtpServer 0.83.292)
- id f9c9ec80f02b64f5; Wed, 13 Nov 2019 12:02:52 +0100
-From:   "Rafael J. Wysocki" <rjw@rjwysocki.net>
-To:     Geert Uytterhoeven <geert+renesas@glider.be>
-Cc:     Breno =?ISO-8859-1?Q?Leit=E3o?= <leitao@debian.org>,
-        Nayna Jain <nayna@linux.ibm.com>,
-        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Alex Deucher <alexander.deucher@amd.com>,
-        Christian =?ISO-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-        David@rox.of.borg, David Airlie <airlied@linux.ie>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        Casey Leedom <leedom@chelsio.com>,
-        Shannon Nelson <snelson@pensando.io>,
-        Pensando Drivers <drivers@pensando.io>,
-        Kevin Hilman <khilman@kernel.org>, Nishanth Menon <nm@ti.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
-        netdev@vger.kernel.org, linux-pm@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 4/5] power: avs: smartreflex: Remove superfluous cast in debugfs_create_file() call
-Date:   Wed, 13 Nov 2019 12:02:51 +0100
-Message-ID: <2168390.66xqsT3ub9@kreacher>
-In-Reply-To: <20191021145149.31657-5-geert+renesas@glider.be>
-References: <20191021145149.31657-1-geert+renesas@glider.be> <20191021145149.31657-5-geert+renesas@glider.be>
+        Wed, 13 Nov 2019 06:14:35 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:57100 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727641AbfKMLOf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 13 Nov 2019 06:14:35 -0500
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 2555CCE592811F388CA6;
+        Wed, 13 Nov 2019 19:14:34 +0800 (CST)
+Received: from localhost.localdomain (10.67.165.24) by
+ DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
+ 14.3.439.0; Wed, 13 Nov 2019 19:14:26 +0800
+From:   Zaibo Xu <xuzaibo@huawei.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     <linux-crypto@vger.kernel.org>, <jonathan.cameron@huawei.com>,
+        <wangzhou1@hisilicon.com>, <linuxarm@huawei.com>,
+        <fanghao11@huawei.com>, <yekai13@huawei.com>,
+        <zhangwei375@huawei.com>, <forest.zhouchang@huawei.com>
+Subject: [PATCH v3 0/5] crypto: hisilicon - add HiSilicon SEC V2 support
+Date:   Wed, 13 Nov 2019 19:11:03 +0800
+Message-ID: <1573643468-1812-1-git-send-email-xuzaibo@huawei.com>
+X-Mailer: git-send-email 2.8.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain
+X-Originating-IP: [10.67.165.24]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Monday, October 21, 2019 4:51:48 PM CET Geert Uytterhoeven wrote:
-> There is no need to cast a typed pointer to a void pointer when calling
-> a function that accepts the latter.  Remove it, as the cast prevents
-> further compiler checks.
-> 
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> ---
->  drivers/power/avs/smartreflex.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/power/avs/smartreflex.c b/drivers/power/avs/smartreflex.c
-> index 4684e7df833a81e9..5376f3d22f31eade 100644
-> --- a/drivers/power/avs/smartreflex.c
-> +++ b/drivers/power/avs/smartreflex.c
-> @@ -905,7 +905,7 @@ static int omap_sr_probe(struct platform_device *pdev)
->  	sr_info->dbg_dir = debugfs_create_dir(sr_info->name, sr_dbg_dir);
->  
->  	debugfs_create_file("autocomp", S_IRUGO | S_IWUSR, sr_info->dbg_dir,
-> -			    (void *)sr_info, &pm_sr_fops);
-> +			    sr_info, &pm_sr_fops);
->  	debugfs_create_x32("errweight", S_IRUGO, sr_info->dbg_dir,
->  			   &sr_info->err_weight);
->  	debugfs_create_x32("errmaxlimit", S_IRUGO, sr_info->dbg_dir,
-> 
+This series adds HiSilicon Security Engine (SEC) version 2 controller
+driver in Crypto subsystem. It includes PCIe enabling, Skcipher, DebugFS
+and SRIOV support of SEC.
 
-Applying as 5.5 material, thanks!
+This patchset rebases on:
+git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
 
+This patchset is based on:
+https://www.spinics.net/lists/linux-crypto/msg43520.html
 
+Changes on v3:
+ - bugfixed as running CRYPTO extra tests.
 
+Changes on v2:
+ - delete checking return value of debugfs_create_xxx functions.
+
+Change log:
+v3:    - bugfixed as running CRTPTO extra tests.
+v2:    - remove checking return value of debugfs_create_xxx functions.
+
+Longfang Liu (1):
+  Documentation: add DebugFS doc for HiSilicon SEC
+
+Zaibo Xu (4):
+  crypto: hisilicon - add HiSilicon SEC V2 driver
+  crypto: hisilicon - add SRIOV for HiSilicon SEC
+  crypto: hisilicon - add DebugFS for HiSilicon SEC
+  MAINTAINERS: Add maintainer for HiSilicon SEC V2 driver
+
+ Documentation/ABI/testing/debugfs-hisi-sec |   43 ++
+ MAINTAINERS                                |   10 +
+ drivers/crypto/hisilicon/Kconfig           |   16 +
+ drivers/crypto/hisilicon/Makefile          |    1 +
+ drivers/crypto/hisilicon/sec2/Makefile     |    2 +
+ drivers/crypto/hisilicon/sec2/sec.h        |  156 ++++
+ drivers/crypto/hisilicon/sec2/sec_crypto.c |  889 ++++++++++++++++++++++
+ drivers/crypto/hisilicon/sec2/sec_crypto.h |  198 +++++
+ drivers/crypto/hisilicon/sec2/sec_main.c   | 1095 ++++++++++++++++++++++++++++
+ 9 files changed, 2410 insertions(+)
+ create mode 100644 Documentation/ABI/testing/debugfs-hisi-sec
+ create mode 100644 drivers/crypto/hisilicon/sec2/Makefile
+ create mode 100644 drivers/crypto/hisilicon/sec2/sec.h
+ create mode 100644 drivers/crypto/hisilicon/sec2/sec_crypto.c
+ create mode 100644 drivers/crypto/hisilicon/sec2/sec_crypto.h
+ create mode 100644 drivers/crypto/hisilicon/sec2/sec_main.c
+
+-- 
+2.8.1
 
