@@ -2,109 +2,178 @@ Return-Path: <SRS0=5LAy=ZF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3658C17440
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 00:38:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14932C43331
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 01:58:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CBB1921872
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 00:38:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="JzkEBA51"
+	by mail.kernel.org (Postfix) with ESMTP id E35AE222D3
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 01:58:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1573610311;
+	bh=3JxE7MxnwJWUazFf1/4aL5Jz2vKF4IYWKmV9aRGK8Zw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=uYEfLIIZFuVF6d2b3Ic4fyNS/CclFBGEQDqlNQbZ/05qIA75IA3+LMwEhkcq8X4IO
+	 nsFe+x+L/uDG95faKKLf3dzzxwiPojvoza2wBd/pdZcxWSg3+jQ+cMId0GeLr4E2+N
+	 EehyJV/6h9Ss1VoNftBXQ7thgO/ro6bkCYJwxTxE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726969AbfKMAiD (ORCPT
+        id S1728959AbfKMB63 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Nov 2019 19:38:03 -0500
-Received: from mo4-p02-ob.smtp.rzone.de ([85.215.255.81]:9568 "EHLO
-        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726960AbfKMAiD (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Nov 2019 19:38:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1573605481;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=odJ7n5ZEnkLtRoB5zC5Ulu/wysvbhjc5UXNa+NovNYM=;
-        b=JzkEBA51bxZIc034cc9Ag0QRwE4/0IKyT6/CRkoM3TDJ78KPpafdrmeRp3h5374LLp
-        Lhlc4fL2W5Onv+8TAlcUsdpqCqtQzNPZctxxt14m1OZQrt/JJjbFgWK2gnKOjNWS1g+c
-        JzZKT+I4AV0tqoOsVAFYlpIPiLG01r0iMqc3FkZQtr5umE6sEtZii0IkJ4mNALE2KWJ2
-        7LGnhuKICUh1B/bb/cYzUL0O7wAf0eTBYs/qiYs5nqCKQOIzyffLaRh8NRSzrlMYSfO1
-        XC1XEdCSO4o2HyEqC4Pw86NJJW+4MvDHEXVwIuc5B9vDP3FksahJotVZ28ELQjJWNgl1
-        +PIA==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9zmwdNLqV/Nz7PsNPEA=="
-X-RZG-CLASS-ID: mo00
-Received: from positron.chronox.de
-        by smtp.strato.de (RZmta 44.29.0 SBL|AUTH)
-        with ESMTPSA id N09a57vAD0aOACK
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
-        (Client did not present a certificate);
-        Wed, 13 Nov 2019 01:36:24 +0100 (CET)
-From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-To:     "Alexander E. Patrakov" <patrakov@gmail.com>
-Cc:     Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        linux-api@vger.kernel.org,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        "Ahmed S. Darwish" <darwish.07@gmail.com>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
-        Matthew Garrett <mjg59@srcf.ucam.org>,
-        Vito Caputo <vcaputo@pengaru.com>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
-        William Jon McCann <mccann@jhu.edu>,
-        zhangjs <zachary@baishancloud.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Florian Weimer <fweimer@redhat.com>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Nicolai Stange <nstange@suse.de>,
-        "Peter, Matthias" <matthias.peter@bsi.bund.de>,
-        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
-        Roman Drahtmueller <draht@schaltsekun.de>,
-        Neil Horman <nhorman@redhat.com>
-Subject: Re: [PATCH v24 11/12] LRNG - add SP800-90B compliant health tests
-Date:   Wed, 13 Nov 2019 01:36:22 +0100
-Message-ID: <9152597.fJySsU3eCD@positron.chronox.de>
-In-Reply-To: <556c89ae-4272-970d-1644-cb77dc3c7946@gmail.com>
-References: <6157374.ptSnyUpaCn@positron.chronox.de> <3385183.Cb3iLDTLdO@positron.chronox.de> <556c89ae-4272-970d-1644-cb77dc3c7946@gmail.com>
+        Tue, 12 Nov 2019 20:58:29 -0500
+Received: from mail.kernel.org ([198.145.29.99]:52244 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730023AbfKMB62 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 12 Nov 2019 20:58:28 -0500
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id B52742246A;
+        Wed, 13 Nov 2019 01:58:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1573610307;
+        bh=3JxE7MxnwJWUazFf1/4aL5Jz2vKF4IYWKmV9aRGK8Zw=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=DlSkgjxM/8t0/r3DNrJOVwfSZVWmwM/EEKZIPKyETUvQE7SZgRQ6Hm5MdgAQoC/u7
+         oQ2heRW2+BrNKKNdRF3bQW1t7cK9TYkPdrX4qj1lSrRKo69M/+z408M+ICbKLu3TAf
+         ntHarC/jXY+K4uPm1mriOEzRoRoFJ72uI656DrH4=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Radu Solea <radu.solea@nxp.com>,
+        Franck LENORMAND <franck.lenormand@nxp.com>,
+        Leonard Crestez <leonard.crestez@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.14 076/115] crypto: mxs-dcp - Fix AES issues
+Date:   Tue, 12 Nov 2019 20:55:43 -0500
+Message-Id: <20191113015622.11592-76-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191113015622.11592-1-sashal@kernel.org>
+References: <20191113015622.11592-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Dienstag, 12. November 2019, 20:58:32 CET schrieb Alexander E. Patrakov:
+From: Radu Solea <radu.solea@nxp.com>
 
-Hi Alexander,
+[ Upstream commit fadd7a6e616b89c7f4f7bfa7b824f290bab32c3c ]
+
+The DCP driver does not obey cryptlen, when doing android CTS this
+results in passing to hardware input stream lengths which are not
+multiple of block size.
+
+Add a check to prevent future erroneous stream lengths from reaching the
+hardware and adjust the scatterlist walking code to obey cryptlen.
+
+Also properly copy-out the IV for chaining.
+
+Signed-off-by: Radu Solea <radu.solea@nxp.com>
+Signed-off-by: Franck LENORMAND <franck.lenormand@nxp.com>
+Signed-off-by: Leonard Crestez <leonard.crestez@nxp.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/crypto/mxs-dcp.c | 33 +++++++++++++++++++++++++++++++--
+ 1 file changed, 31 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
+index 4615dbee22d0a..e1e1e81107904 100644
+--- a/drivers/crypto/mxs-dcp.c
++++ b/drivers/crypto/mxs-dcp.c
+@@ -225,6 +225,12 @@ static int mxs_dcp_run_aes(struct dcp_async_ctx *actx,
+ 	dma_addr_t dst_phys = dma_map_single(sdcp->dev, sdcp->coh->aes_out_buf,
+ 					     DCP_BUF_SZ, DMA_FROM_DEVICE);
  
-> > +config LRNG_HEALTH_TESTS
-> > +	bool "Enable noise source online health tests"
-> > +	help
-> > +	  The online health tests validate the noise source at
-> > +	  runtime for fatal errors. These tests include SP800-90B
-> > +	  compliant tests which are invoked if the system is booted
-> > +	  with fips=1. In case of fatal errors during active
-> > +	  SP800-90B tests, the issue is logged and the noise
-> > +	  data is discarded. These tests are required for full
-> > +	  compliance with SP800-90B.
-> 
-> How have you tested that these tests work at runtime? Maybe add some
-> code under a new CONFIG item that depends on CONFIG_BROKEN that
-> deliberately botches the RNG and triggers failures?
-
-
-I am unable to find sensible information about CONFIG_BROKEN in the recent 
-kernel tree. 
-
-Do you happen to have a pointer on how that option is to be used?
-
-Thanks a lot
-
-Ciao
-Stephan
-
++	if (actx->fill % AES_BLOCK_SIZE) {
++		dev_err(sdcp->dev, "Invalid block size!\n");
++		ret = -EINVAL;
++		goto aes_done_run;
++	}
++
+ 	/* Fill in the DMA descriptor. */
+ 	desc->control0 = MXS_DCP_CONTROL0_DECR_SEMAPHORE |
+ 		    MXS_DCP_CONTROL0_INTERRUPT |
+@@ -254,6 +260,7 @@ static int mxs_dcp_run_aes(struct dcp_async_ctx *actx,
+ 
+ 	ret = mxs_dcp_start_dma(actx);
+ 
++aes_done_run:
+ 	dma_unmap_single(sdcp->dev, key_phys, 2 * AES_KEYSIZE_128,
+ 			 DMA_TO_DEVICE);
+ 	dma_unmap_single(sdcp->dev, src_phys, DCP_BUF_SZ, DMA_TO_DEVICE);
+@@ -280,13 +287,15 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
+ 
+ 	uint8_t *out_tmp, *src_buf, *dst_buf = NULL;
+ 	uint32_t dst_off = 0;
++	uint32_t last_out_len = 0;
+ 
+ 	uint8_t *key = sdcp->coh->aes_key;
+ 
+ 	int ret = 0;
+ 	int split = 0;
+-	unsigned int i, len, clen, rem = 0;
++	unsigned int i, len, clen, rem = 0, tlen = 0;
+ 	int init = 0;
++	bool limit_hit = false;
+ 
+ 	actx->fill = 0;
+ 
+@@ -305,6 +314,11 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
+ 	for_each_sg(req->src, src, nents, i) {
+ 		src_buf = sg_virt(src);
+ 		len = sg_dma_len(src);
++		tlen += len;
++		limit_hit = tlen > req->nbytes;
++
++		if (limit_hit)
++			len = req->nbytes - (tlen - len);
+ 
+ 		do {
+ 			if (actx->fill + len > out_off)
+@@ -321,13 +335,15 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
+ 			 * If we filled the buffer or this is the last SG,
+ 			 * submit the buffer.
+ 			 */
+-			if (actx->fill == out_off || sg_is_last(src)) {
++			if (actx->fill == out_off || sg_is_last(src) ||
++				limit_hit) {
+ 				ret = mxs_dcp_run_aes(actx, req, init);
+ 				if (ret)
+ 					return ret;
+ 				init = 0;
+ 
+ 				out_tmp = out_buf;
++				last_out_len = actx->fill;
+ 				while (dst && actx->fill) {
+ 					if (!split) {
+ 						dst_buf = sg_virt(dst);
+@@ -350,6 +366,19 @@ static int mxs_dcp_aes_block_crypt(struct crypto_async_request *arq)
+ 				}
+ 			}
+ 		} while (len);
++
++		if (limit_hit)
++			break;
++	}
++
++	/* Copy the IV for CBC for chaining */
++	if (!rctx->ecb) {
++		if (rctx->enc)
++			memcpy(req->info, out_buf+(last_out_len-AES_BLOCK_SIZE),
++				AES_BLOCK_SIZE);
++		else
++			memcpy(req->info, in_buf+(last_out_len-AES_BLOCK_SIZE),
++				AES_BLOCK_SIZE);
+ 	}
+ 
+ 	return ret;
+-- 
+2.20.1
 
