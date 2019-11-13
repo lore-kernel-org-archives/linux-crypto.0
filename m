@@ -2,135 +2,98 @@ Return-Path: <SRS0=5LAy=ZF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F928C43331
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 06:02:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A8C8C43331
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 09:08:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 055D7222C9
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 06:02:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EDB87222C1
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 09:08:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mXfCrazN"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="GhR8/TA8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725908AbfKMGCx (ORCPT
+        id S1726155AbfKMJIo (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Nov 2019 01:02:53 -0500
-Received: from mail-qk1-f196.google.com ([209.85.222.196]:39760 "EHLO
-        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725866AbfKMGCw (ORCPT
+        Wed, 13 Nov 2019 04:08:44 -0500
+Received: from fllv0016.ext.ti.com ([198.47.19.142]:43178 "EHLO
+        fllv0016.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726086AbfKMJIo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Nov 2019 01:02:52 -0500
-Received: by mail-qk1-f196.google.com with SMTP id 15so754521qkh.6;
-        Tue, 12 Nov 2019 22:02:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=phY5nYA9dHfZmr9N/f2WhSW/Yk2EVx6rjISS971Sg2o=;
-        b=mXfCrazN9OmG7u9ZHylHgcIWpfHsn9ZPDWi5eVrh3USyFDSrlAIqK3YbWi5Gt1I5G3
-         gjKQVXWCRSAx1O8yY+IaIoaHEwVKKfiKPxQbxhF6W9APf5JXQD/PPVvO57Q5YPNnK8vp
-         94vMbmLlH2ISX9divPjKRhO1JH2Sh1xrervXN7P0Y1rmfBx+hiYXYFyaJ4cZz7KDmVAo
-         e7sKwwxFqGRq7fTU4aVaQoSGDyDXYi1ohraFQUADPpcyaDhkyyHf/cIejD4m0zEUzQyc
-         JnO4hfzmk6S4bDUKGe34KJ5IfGeoDOSOEgGIpXL0d3lKy7faUbJBJVXRvDzZLkQCzfW+
-         AvZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=phY5nYA9dHfZmr9N/f2WhSW/Yk2EVx6rjISS971Sg2o=;
-        b=ge6GjaogSgKb2Uo8ePd2rF3WIjpMuFcCcKrMM3i/2uZV2inC2edbYiV4MEZ8JfUiRw
-         rqtdtRdWSanNfdohy6W+Qggf35xc86ExFdCBlxxcoIwOdF/G1SjOLnV9/Li4OFi0f50G
-         x85CYrav6cIqMyfF11x4s76Xcfd4BUqrTnNHnsQOcQf3Kg3uypicqqEZpZrKtWrRvzHf
-         8Fs8gmWhBqQ12j3NTwdvFGgibUQ+WVGhmKXHcw1TVxxkvIGoJLwzfg0isbg3NdZhUS+U
-         GN8QVa3/B2AGSPDE4TOFuRdFk9ZmOJygqL2a8nmmTAw1rlIa1dpWjtZB2NMAYcJoWMGg
-         S1TA==
-X-Gm-Message-State: APjAAAUUPn7nj9WIbQA2ezSkuRy4whu9zUkG1BhzoJv8hUQyId12lzeZ
-        fqd42KoJxL6MXQGVy6wAgYtQa3U0e6YFBxpRxmM=
-X-Google-Smtp-Source: APXvYqwpTO3SSm8dLQNU/ZVFUrLYX4ux5vxjme0dp8ULBuaBBoEv6u2hZ10eTvWolnIf5b5PhbUqSsH2wC5NXzEq7Po=
-X-Received: by 2002:a37:7c81:: with SMTP id x123mr1137940qkc.212.1573624971655;
- Tue, 12 Nov 2019 22:02:51 -0800 (PST)
+        Wed, 13 Nov 2019 04:08:44 -0500
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id xAD98YBY110423;
+        Wed, 13 Nov 2019 03:08:34 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+        s=ti-com-17Q1; t=1573636114;
+        bh=L5yB4sXWEphH1kS7OcR6nTpRGX5u3VDhE7QxjQRUxHE=;
+        h=From:To:CC:Subject:Date;
+        b=GhR8/TA859CcTnzUuhfN9dTXPmy3KXv1W/ZOobZE5qndfQgLlqh+E0IvcwnFwy2Me
+         4bQ5Qag9PEda47sL1JDzukOdiic8zchmkLBtablkO5ahaeKeFl96giy6VV0ilQNUS6
+         zFDsmDqN+m6tHqlR6l4I47MmvkiTyBWDkbEkv4zw=
+Received: from DFLE100.ent.ti.com (dfle100.ent.ti.com [10.64.6.21])
+        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTP id xAD98Ykh006184;
+        Wed, 13 Nov 2019 03:08:34 -0600
+Received: from DFLE115.ent.ti.com (10.64.6.36) by DFLE100.ent.ti.com
+ (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3; Wed, 13
+ Nov 2019 03:08:16 -0600
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DFLE115.ent.ti.com
+ (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3 via
+ Frontend Transport; Wed, 13 Nov 2019 03:08:15 -0600
+Received: from feketebors.ti.com (ileax41-snat.itg.ti.com [10.172.224.153])
+        by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id xAD98V6k008708;
+        Wed, 13 Nov 2019 03:08:32 -0600
+From:   Peter Ujfalusi <peter.ujfalusi@ti.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     <vkoul@kernel.org>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH] crypto: qce/dma - Use dma_request_chan() directly for channel request
+Date:   Wed, 13 Nov 2019 11:09:47 +0200
+Message-ID: <20191113090947.28499-1-peter.ujfalusi@ti.com>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-References: <6157374.ptSnyUpaCn@positron.chronox.de> <3385183.Cb3iLDTLdO@positron.chronox.de>
- <556c89ae-4272-970d-1644-cb77dc3c7946@gmail.com> <9152597.fJySsU3eCD@positron.chronox.de>
-In-Reply-To: <9152597.fJySsU3eCD@positron.chronox.de>
-From:   "Alexander E. Patrakov" <patrakov@gmail.com>
-Date:   Wed, 13 Nov 2019 11:02:40 +0500
-Message-ID: <CAN_LGv3LUjJ=8ZZxaJ=c7uDPb=ayvCNPE-UshxgBUK-Jf7qNmQ@mail.gmail.com>
-Subject: Re: [PATCH v24 11/12] LRNG - add SP800-90B compliant health tests
-To:     =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
-Cc:     Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        Linux API <linux-api@vger.kernel.org>,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        "Ahmed S. Darwish" <darwish.07@gmail.com>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
-        Matthew Garrett <mjg59@srcf.ucam.org>,
-        Vito Caputo <vcaputo@pengaru.com>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
-        William Jon McCann <mccann@jhu.edu>,
-        zhangjs <zachary@baishancloud.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Florian Weimer <fweimer@redhat.com>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Nicolai Stange <nstange@suse.de>,
-        "Peter, Matthias" <matthias.peter@bsi.bund.de>,
-        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
-        Roman Drahtmueller <draht@schaltsekun.de>,
-        Neil Horman <nhorman@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-=D1=81=D1=80, 13 =D0=BD=D0=BE=D1=8F=D0=B1. 2019 =D0=B3. =D0=B2 05:38, Steph=
-an M=C3=BCller <smueller@chronox.de>:
->
-> Am Dienstag, 12. November 2019, 20:58:32 CET schrieb Alexander E. Patrako=
-v:
->
-> Hi Alexander,
->
-> > > +config LRNG_HEALTH_TESTS
-> > > +   bool "Enable noise source online health tests"
-> > > +   help
-> > > +     The online health tests validate the noise source at
-> > > +     runtime for fatal errors. These tests include SP800-90B
-> > > +     compliant tests which are invoked if the system is booted
-> > > +     with fips=3D1. In case of fatal errors during active
-> > > +     SP800-90B tests, the issue is logged and the noise
-> > > +     data is discarded. These tests are required for full
-> > > +     compliance with SP800-90B.
-> >
-> > How have you tested that these tests work at runtime? Maybe add some
-> > code under a new CONFIG item that depends on CONFIG_BROKEN that
-> > deliberately botches the RNG and triggers failures?
->
->
-> I am unable to find sensible information about CONFIG_BROKEN in the recen=
-t
-> kernel tree.
->
-> Do you happen to have a pointer on how that option is to be used?
+dma_request_slave_channel_reason() is:
+#define dma_request_slave_channel_reason(dev, name) \
+	dma_request_chan(dev, name)
 
-This option is not used on its own. You create a new option,
-CONFIG_TEST_LRNG_FAILURE_MODE or something like that, and put your
-code under the ifdef guarded by that option. And then, to prevent
-ordinary users and allyesconfig from selecting it, in Kconfig you say:
-"depends on BROKEN". This way, the option becomes unselectable in
-menuconfig but still works as intended when added manually to .config
-(obviously, with the BROKEN dependency removed locally).
+Signed-off-by: Peter Ujfalusi <peter.ujfalusi@ti.com>
+---
+ drivers/crypto/qce/dma.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Definition: https://github.com/torvalds/linux/blob/9c7db5004280767566e91a33=
-445bf93aa479ef02/init/Kconfig#L68
-Example usage: https://github.com/torvalds/linux/blob/c87237110f2553b4200a8=
-b3401a01198edfcf0d9/drivers/gpu/drm/i915/Kconfig.debug#L166
+diff --git a/drivers/crypto/qce/dma.c b/drivers/crypto/qce/dma.c
+index 0984a719144d..40a59214d2e1 100644
+--- a/drivers/crypto/qce/dma.c
++++ b/drivers/crypto/qce/dma.c
+@@ -12,11 +12,11 @@ int qce_dma_request(struct device *dev, struct qce_dma_data *dma)
+ {
+ 	int ret;
+ 
+-	dma->txchan = dma_request_slave_channel_reason(dev, "tx");
++	dma->txchan = dma_request_chan(dev, "tx");
+ 	if (IS_ERR(dma->txchan))
+ 		return PTR_ERR(dma->txchan);
+ 
+-	dma->rxchan = dma_request_slave_channel_reason(dev, "rx");
++	dma->rxchan = dma_request_chan(dev, "rx");
+ 	if (IS_ERR(dma->rxchan)) {
+ 		ret = PTR_ERR(dma->rxchan);
+ 		goto error_rx;
+-- 
+Peter
 
---
-Alexander E. Patrakov
+Texas Instruments Finland Oy, Porkkalankatu 22, 00180 Helsinki.
+Y-tunnus/Business ID: 0615521-4. Kotipaikka/Domicile: Helsinki
+
