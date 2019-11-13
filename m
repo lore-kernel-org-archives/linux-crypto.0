@@ -2,536 +2,184 @@ Return-Path: <SRS0=5LAy=ZF=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0329C17449
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 11:14:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92869C43331
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 12:18:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7DDF7222D0
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 11:14:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BB353222D0
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 12:18:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="tlSCc4P9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727476AbfKMLOm (ORCPT
+        id S1727078AbfKMMSF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Nov 2019 06:14:42 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:6219 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727811AbfKMLOl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Nov 2019 06:14:41 -0500
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 0758B90966C7A5126DDA;
-        Wed, 13 Nov 2019 19:14:39 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.24) by
- DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
- 14.3.439.0; Wed, 13 Nov 2019 19:14:27 +0800
-From:   Zaibo Xu <xuzaibo@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <linux-crypto@vger.kernel.org>, <jonathan.cameron@huawei.com>,
-        <wangzhou1@hisilicon.com>, <linuxarm@huawei.com>,
-        <fanghao11@huawei.com>, <yekai13@huawei.com>,
-        <zhangwei375@huawei.com>, <forest.zhouchang@huawei.com>
-Subject: [PATCH v3 4/5] crypto: hisilicon - add DebugFS for HiSilicon SEC
-Date:   Wed, 13 Nov 2019 19:11:07 +0800
-Message-ID: <1573643468-1812-5-git-send-email-xuzaibo@huawei.com>
-X-Mailer: git-send-email 2.8.1
-In-Reply-To: <1573643468-1812-1-git-send-email-xuzaibo@huawei.com>
-References: <1573643468-1812-1-git-send-email-xuzaibo@huawei.com>
+        Wed, 13 Nov 2019 07:18:05 -0500
+Received: from mo4-p02-ob.smtp.rzone.de ([85.215.255.81]:35936 "EHLO
+        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726543AbfKMMSF (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 13 Nov 2019 07:18:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1573647481;
+        s=strato-dkim-0002; d=chronox.de;
+        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=hvJX/vKCMUAqZWIt1j09OeWmeNt8cPCg4BZjI3Cb3Zg=;
+        b=tlSCc4P9ZO0cJNG9iiDN3gh4mAjPZYVVmxms6uX2A1cmPQhSH3Vx6jZ7Z+zvBoIYN1
+        D82Jrf/tATxhZfx2ZOILcnwcd57G19Fcx+9q1yIj1pcP9D6dqP2/QyYxGwSi38yr40Db
+        oKIg5KSpLWP0n6IaH9/sWrEWV0pCVkyeBGJ7O26PQqyDTvUgG//KJN+rYQl88ONPY0V1
+        Is3WkoNO+hG+G8iSBiNdJMOOzt7MxBG1tvenmP2somhyo640l7diPEgCshA8AUsv92jp
+        fGFegbrcct52OtESMjt+zH4gcDTyO8Y+R2CoImWc93qqdfqMZc0TZnV+op098gyVPC4h
+        HD7w==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9zmwdNLqV/Nz7PsNPEA=="
+X-RZG-CLASS-ID: mo00
+Received: from positron.chronox.de
+        by smtp.strato.de (RZmta 44.29.0 SBL|AUTH)
+        with ESMTPSA id N09a57vADCGeD4S
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
+        (Client did not present a certificate);
+        Wed, 13 Nov 2019 13:16:40 +0100 (CET)
+From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To:     Andy Lutomirski <luto@kernel.org>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Nicolai Stange <nstange@suse.de>,
+        "Peter, Matthias" <matthias.peter@bsi.bund.de>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Roman Drahtmueller <draht@schaltsekun.de>,
+        Neil Horman <nhorman@redhat.com>
+Subject: Re: [PATCH v24 00/12] /dev/random - a new approach with full SP800-90B compliance
+Date:   Wed, 13 Nov 2019 13:16:36 +0100
+Message-ID: <4999435.M7Dy0bkext@positron.chronox.de>
+In-Reply-To: <CALCETrVHdauN2ptZLSYAUDm=S3OGkxq=iH4qGxCuH0XCMKjGkQ@mail.gmail.com>
+References: <6157374.ptSnyUpaCn@positron.chronox.de> <3208655.cZiRAY37Id@positron.chronox.de> <CALCETrVHdauN2ptZLSYAUDm=S3OGkxq=iH4qGxCuH0XCMKjGkQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.67.165.24]
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The HiSilicon SEC engine driver uses DebugFS
-to provide main debug information for user space.
+Am Mittwoch, 13. November 2019, 05:48:30 CET schrieb Andy Lutomirski:
 
-Signed-off-by: Zaibo Xu <xuzaibo@huawei.com>
-Signed-off-by: Longfang Liu <liulongfang@huawei.com>
----
- drivers/crypto/hisilicon/sec2/sec.h        |  23 +++
- drivers/crypto/hisilicon/sec2/sec_crypto.c |   3 +
- drivers/crypto/hisilicon/sec2/sec_main.c   | 306 +++++++++++++++++++++++++++++
- 3 files changed, 332 insertions(+)
+Hi Andy,
 
-diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
-index 69b37f2..26754d0 100644
---- a/drivers/crypto/hisilicon/sec2/sec.h
-+++ b/drivers/crypto/hisilicon/sec2/sec.h
-@@ -119,9 +119,32 @@ enum sec_endian {
- 	SEC_64BE
- };
- 
-+enum sec_debug_file_index {
-+	SEC_CURRENT_QM,
-+	SEC_CLEAR_ENABLE,
-+	SEC_DEBUG_FILE_NUM,
-+};
-+
-+struct sec_debug_file {
-+	enum sec_debug_file_index index;
-+	spinlock_t lock;
-+	struct hisi_qm *qm;
-+};
-+
-+struct sec_dfx {
-+	u64 send_cnt;
-+	u64 recv_cnt;
-+};
-+
-+struct sec_debug {
-+	struct sec_dfx dfx;
-+	struct sec_debug_file files[SEC_DEBUG_FILE_NUM];
-+};
-+
- struct sec_dev {
- 	struct hisi_qm qm;
- 	struct list_head list;
-+	struct sec_debug debug;
- 	u32 ctx_q_num;
- 	u32 num_vfs;
- 	unsigned long status;
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-index 23092a9..dc1eb97 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-@@ -120,6 +120,8 @@ static void sec_req_cb(struct hisi_qp *qp, void *resp)
- 		return;
- 	}
- 
-+	__sync_add_and_fetch(&req->ctx->sec->debug.dfx.recv_cnt, 1);
-+
- 	req->ctx->req_op->buf_unmap(req->ctx, req);
- 
- 	req->ctx->req_op->callback(req->ctx, req);
-@@ -133,6 +135,7 @@ static int sec_bd_send(struct sec_ctx *ctx, struct sec_req *req)
- 	mutex_lock(&qp_ctx->req_lock);
- 	ret = hisi_qp_send(qp_ctx->qp, &req->sec_sqe);
- 	mutex_unlock(&qp_ctx->req_lock);
-+	__sync_add_and_fetch(&ctx->sec->debug.dfx.send_cnt, 1);
- 
- 	if (ret == -EBUSY)
- 		return -ENOBUFS;
-diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-index 00dd4c3..74f0654 100644
---- a/drivers/crypto/hisilicon/sec2/sec_main.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-@@ -4,6 +4,7 @@
- #include <linux/acpi.h>
- #include <linux/aer.h>
- #include <linux/bitops.h>
-+#include <linux/debugfs.h>
- #include <linux/init.h>
- #include <linux/io.h>
- #include <linux/kernel.h>
-@@ -32,6 +33,8 @@
- #define SEC_PF_DEF_Q_BASE		0
- #define SEC_CTX_Q_NUM_DEF		24
- 
-+#define SEC_CTRL_CNT_CLR_CE		0x301120
-+#define SEC_CTRL_CNT_CLR_CE_BIT		BIT(0)
- #define SEC_ENGINE_PF_CFG_OFF		0x300000
- #define SEC_ACC_COMMON_REG_OFF		0x1000
- #define SEC_CORE_INT_SOURCE		0x301010
-@@ -72,6 +75,8 @@
- 
- #define SEC_DELAY_10_US			10
- #define SEC_POLL_TIMEOUT_US		1000
-+#define SEC_VF_CNT_MASK			0xffffffc0
-+#define SEC_DBGFS_VAL_MAX_LEN		20
- 
- #define SEC_ADDR(qm, offset) ((qm)->io_base + (offset) + \
- 			     SEC_ENGINE_PF_CFG_OFF + SEC_ACC_COMMON_REG_OFF)
-@@ -82,6 +87,7 @@ struct sec_hw_error {
- };
- 
- static const char sec_name[] = "hisi_sec2";
-+static struct dentry *sec_debugfs_root;
- static LIST_HEAD(sec_list);
- static DEFINE_MUTEX(sec_list_lock);
- 
-@@ -129,6 +135,35 @@ struct sec_dev *sec_find_device(int node)
- 	return ret;
- }
- 
-+static const char * const sec_dbg_file_name[] = {
-+	[SEC_CURRENT_QM] = "current_qm",
-+	[SEC_CLEAR_ENABLE] = "clear_enable",
-+};
-+
-+static struct debugfs_reg32 sec_dfx_regs[] = {
-+	{"SEC_PF_ABNORMAL_INT_SOURCE    ",  0x301010},
-+	{"SEC_SAA_EN                    ",  0x301270},
-+	{"SEC_BD_LATENCY_MIN            ",  0x301600},
-+	{"SEC_BD_LATENCY_MAX            ",  0x301608},
-+	{"SEC_BD_LATENCY_AVG            ",  0x30160C},
-+	{"SEC_BD_NUM_IN_SAA0            ",  0x301670},
-+	{"SEC_BD_NUM_IN_SAA1            ",  0x301674},
-+	{"SEC_BD_NUM_IN_SEC             ",  0x301680},
-+	{"SEC_ECC_1BIT_CNT              ",  0x301C00},
-+	{"SEC_ECC_1BIT_INFO             ",  0x301C04},
-+	{"SEC_ECC_2BIT_CNT              ",  0x301C10},
-+	{"SEC_ECC_2BIT_INFO             ",  0x301C14},
-+	{"SEC_BD_SAA0                   ",  0x301C20},
-+	{"SEC_BD_SAA1                   ",  0x301C24},
-+	{"SEC_BD_SAA2                   ",  0x301C28},
-+	{"SEC_BD_SAA3                   ",  0x301C2C},
-+	{"SEC_BD_SAA4                   ",  0x301C30},
-+	{"SEC_BD_SAA5                   ",  0x301C34},
-+	{"SEC_BD_SAA6                   ",  0x301C38},
-+	{"SEC_BD_SAA7                   ",  0x301C3C},
-+	{"SEC_BD_SAA8                   ",  0x301C40},
-+};
-+
- static int sec_pf_q_num_set(const char *val, const struct kernel_param *kp)
- {
- 	struct pci_dev *pdev;
-@@ -335,6 +370,19 @@ static int sec_set_user_domain_and_cache(struct sec_dev *sec)
- 	return sec_engine_init(sec);
- }
- 
-+/* sec_debug_regs_clear() - clear the sec debug regs */
-+static void sec_debug_regs_clear(struct hisi_qm *qm)
-+{
-+	/* clear current_qm */
-+	writel(0x0, qm->io_base + QM_DFX_MB_CNT_VF);
-+	writel(0x0, qm->io_base + QM_DFX_DB_CNT_VF);
-+
-+	/* clear rdclr_en */
-+	writel(0x0, qm->io_base + SEC_CTRL_CNT_CLR_CE);
-+
-+	hisi_qm_debug_regs_clear(qm);
-+}
-+
- static void sec_hw_error_enable(struct sec_dev *sec)
- {
- 	struct hisi_qm *qm = &sec->qm;
-@@ -407,6 +455,235 @@ static void sec_hw_error_uninit(struct sec_dev *sec)
- 	writel(GENMASK(12, 0), sec->qm.io_base + SEC_QM_ABNORMAL_INT_MASK);
- }
- 
-+static u32 sec_current_qm_read(struct sec_debug_file *file)
-+{
-+	struct hisi_qm *qm = file->qm;
-+
-+	return readl(qm->io_base + QM_DFX_MB_CNT_VF);
-+}
-+
-+static int sec_current_qm_write(struct sec_debug_file *file, u32 val)
-+{
-+	struct hisi_qm *qm = file->qm;
-+	struct sec_dev *sec = container_of(qm, struct sec_dev, qm);
-+	u32 vfq_num;
-+	u32 tmp;
-+
-+	if (val > sec->num_vfs)
-+		return -EINVAL;
-+
-+	/* According PF or VF Dev ID to calculation curr_qm_qp_num and store */
-+	if (!val) {
-+		qm->debug.curr_qm_qp_num = qm->qp_num;
-+	} else {
-+		vfq_num = (qm->ctrl_qp_num - qm->qp_num) / sec->num_vfs;
-+
-+		if (val == sec->num_vfs)
-+			qm->debug.curr_qm_qp_num =
-+				qm->ctrl_qp_num - qm->qp_num -
-+				(sec->num_vfs - 1) * vfq_num;
-+		else
-+			qm->debug.curr_qm_qp_num = vfq_num;
-+	}
-+
-+	writel(val, qm->io_base + QM_DFX_MB_CNT_VF);
-+	writel(val, qm->io_base + QM_DFX_DB_CNT_VF);
-+
-+	tmp = val |
-+	      (readl(qm->io_base + QM_DFX_SQE_CNT_VF_SQN) & CURRENT_Q_MASK);
-+	writel(tmp, qm->io_base + QM_DFX_SQE_CNT_VF_SQN);
-+
-+	tmp = val |
-+	      (readl(qm->io_base + QM_DFX_CQE_CNT_VF_CQN) & CURRENT_Q_MASK);
-+	writel(tmp, qm->io_base + QM_DFX_CQE_CNT_VF_CQN);
-+
-+	return 0;
-+}
-+
-+static u32 sec_clear_enable_read(struct sec_debug_file *file)
-+{
-+	struct hisi_qm *qm = file->qm;
-+
-+	return readl(qm->io_base + SEC_CTRL_CNT_CLR_CE) &
-+			SEC_CTRL_CNT_CLR_CE_BIT;
-+}
-+
-+static int sec_clear_enable_write(struct sec_debug_file *file, u32 val)
-+{
-+	struct hisi_qm *qm = file->qm;
-+	u32 tmp;
-+
-+	if (val != 1 && val)
-+		return -EINVAL;
-+
-+	tmp = (readl(qm->io_base + SEC_CTRL_CNT_CLR_CE) &
-+	       ~SEC_CTRL_CNT_CLR_CE_BIT) | val;
-+	writel(tmp, qm->io_base + SEC_CTRL_CNT_CLR_CE);
-+
-+	return 0;
-+}
-+
-+static ssize_t sec_debug_read(struct file *filp, char __user *buf,
-+			       size_t count, loff_t *pos)
-+{
-+	struct sec_debug_file *file = filp->private_data;
-+	char tbuf[SEC_DBGFS_VAL_MAX_LEN];
-+	u32 val;
-+	int ret;
-+
-+	spin_lock_irq(&file->lock);
-+
-+	switch (file->index) {
-+	case SEC_CURRENT_QM:
-+		val = sec_current_qm_read(file);
-+		break;
-+	case SEC_CLEAR_ENABLE:
-+		val = sec_clear_enable_read(file);
-+		break;
-+	default:
-+		spin_unlock_irq(&file->lock);
-+		return -EINVAL;
-+	}
-+
-+	spin_unlock_irq(&file->lock);
-+	ret = snprintf(tbuf, SEC_DBGFS_VAL_MAX_LEN, "%u\n", val);
-+
-+	return simple_read_from_buffer(buf, count, pos, tbuf, ret);
-+}
-+
-+static ssize_t sec_debug_write(struct file *filp, const char __user *buf,
-+			       size_t count, loff_t *pos)
-+{
-+	struct sec_debug_file *file = filp->private_data;
-+	char tbuf[SEC_DBGFS_VAL_MAX_LEN];
-+	unsigned long val;
-+	int len, ret;
-+
-+	if (*pos != 0)
-+		return 0;
-+
-+	if (count >= SEC_DBGFS_VAL_MAX_LEN)
-+		return -ENOSPC;
-+
-+	len = simple_write_to_buffer(tbuf, SEC_DBGFS_VAL_MAX_LEN - 1,
-+				     pos, buf, count);
-+	if (len < 0)
-+		return len;
-+
-+	tbuf[len] = '\0';
-+	if (kstrtoul(tbuf, 0, &val))
-+		return -EFAULT;
-+
-+	spin_lock_irq(&file->lock);
-+
-+	switch (file->index) {
-+	case SEC_CURRENT_QM:
-+		ret = sec_current_qm_write(file, val);
-+		if (ret)
-+			goto err_input;
-+		break;
-+	case SEC_CLEAR_ENABLE:
-+		ret = sec_clear_enable_write(file, val);
-+		if (ret)
-+			goto err_input;
-+		break;
-+	default:
-+		ret = -EINVAL;
-+		goto err_input;
-+	}
-+
-+	spin_unlock_irq(&file->lock);
-+
-+	return count;
-+
-+ err_input:
-+	spin_unlock_irq(&file->lock);
-+	return ret;
-+}
-+
-+static const struct file_operations sec_dbg_fops = {
-+	.owner = THIS_MODULE,
-+	.open = simple_open,
-+	.read = sec_debug_read,
-+	.write = sec_debug_write,
-+};
-+
-+static int sec_core_debug_init(struct sec_dev *sec)
-+{
-+	struct hisi_qm *qm = &sec->qm;
-+	struct device *dev = &qm->pdev->dev;
-+	struct sec_dfx *dfx = &sec->debug.dfx;
-+	struct debugfs_regset32 *regset;
-+	struct dentry *tmp_d;
-+
-+	tmp_d = debugfs_create_dir("sec_dfx", sec->qm.debug.debug_root);
-+
-+	regset = devm_kzalloc(dev, sizeof(*regset), GFP_KERNEL);
-+	if (!regset)
-+		return -ENOENT;
-+
-+	regset->regs = sec_dfx_regs;
-+	regset->nregs = ARRAY_SIZE(sec_dfx_regs);
-+	regset->base = qm->io_base;
-+
-+	debugfs_create_regset32("regs", 0444, tmp_d, regset);
-+
-+	debugfs_create_u64("send_cnt", 0444, tmp_d, &dfx->send_cnt);
-+
-+	debugfs_create_u64("recv_cnt", 0444, tmp_d, &dfx->recv_cnt);
-+
-+	return 0;
-+}
-+
-+static int sec_debug_init(struct sec_dev *sec)
-+{
-+	int i;
-+
-+	for (i = SEC_CURRENT_QM; i < SEC_DEBUG_FILE_NUM; i++) {
-+		spin_lock_init(&sec->debug.files[i].lock);
-+		sec->debug.files[i].index = i;
-+		sec->debug.files[i].qm = &sec->qm;
-+
-+		debugfs_create_file(sec_dbg_file_name[i], 0600,
-+				    sec->qm.debug.debug_root,
-+				    sec->debug.files + i,
-+				    &sec_dbg_fops);
-+	}
-+
-+	return sec_core_debug_init(sec);
-+}
-+
-+static int sec_debugfs_init(struct sec_dev *sec)
-+{
-+	struct hisi_qm *qm = &sec->qm;
-+	struct device *dev = &qm->pdev->dev;
-+	int ret;
-+
-+	qm->debug.debug_root = debugfs_create_dir(dev_name(dev),
-+						  sec_debugfs_root);
-+	ret = hisi_qm_debug_init(qm);
-+	if (ret)
-+		goto failed_to_create;
-+
-+	if (qm->pdev->device == SEC_PF_PCI_DEVICE_ID) {
-+		ret = sec_debug_init(sec);
-+		if (ret)
-+			goto failed_to_create;
-+	}
-+
-+	return 0;
-+
-+failed_to_create:
-+	debugfs_remove_recursive(sec_debugfs_root);
-+
-+	return ret;
-+}
-+
-+static void sec_debugfs_exit(struct sec_dev *sec)
-+{
-+	debugfs_remove_recursive(sec->qm.debug.debug_root);
-+}
-+
- static int sec_pf_probe_init(struct sec_dev *sec)
- {
- 	struct hisi_qm *qm = &sec->qm;
-@@ -430,6 +707,7 @@ static int sec_pf_probe_init(struct sec_dev *sec)
- 		return ret;
- 
- 	sec_hw_error_init(sec);
-+	sec_debug_regs_clear(qm);
- 
- 	return 0;
- }
-@@ -464,6 +742,7 @@ static int sec_probe_init(struct hisi_qm *qm, struct sec_dev *sec)
- 	if (qm->fun_type == QM_HW_PF) {
- 		qm->qp_base = SEC_PF_DEF_Q_BASE;
- 		qm->qp_num = pf_q_num;
-+		qm->debug.curr_qm_qp_num = pf_q_num;
- 
- 		return sec_pf_probe_init(sec);
- 	} else if (qm->fun_type == QM_HW_VF) {
-@@ -526,6 +805,10 @@ static int sec_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 		goto err_probe_uninit;
- 	}
- 
-+	ret = sec_debugfs_init(sec);
-+	if (ret)
-+		pci_warn(pdev, "Failed to init debugfs!\n");
-+
- 	sec_add_to_list(sec);
- 
- 	ret = sec_register_to_crypto();
-@@ -538,6 +821,7 @@ static int sec_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 
- err_remove_from_list:
- 	sec_remove_from_list(sec);
-+	sec_debugfs_exit(sec);
- 	hisi_qm_stop(qm);
- 
- err_probe_uninit:
-@@ -665,8 +949,13 @@ static void sec_remove(struct pci_dev *pdev)
- 	if (qm->fun_type == QM_HW_PF && sec->num_vfs)
- 		(void)sec_sriov_disable(pdev);
- 
-+	sec_debugfs_exit(sec);
-+
- 	(void)hisi_qm_stop(qm);
- 
-+	if (qm->fun_type == QM_HW_PF)
-+		sec_debug_regs_clear(qm);
-+
- 	sec_probe_uninit(sec);
- 
- 	sec_qm_uninit(qm);
-@@ -761,12 +1050,28 @@ static struct pci_driver sec_pci_driver = {
- 	.sriov_configure = sec_sriov_configure,
- };
- 
-+static void sec_register_debugfs(void)
-+{
-+	if (!debugfs_initialized())
-+		return;
-+
-+	sec_debugfs_root = debugfs_create_dir("hisi_sec2", NULL);
-+}
-+
-+static void sec_unregister_debugfs(void)
-+{
-+	debugfs_remove_recursive(sec_debugfs_root);
-+}
-+
- static int __init sec_init(void)
- {
- 	int ret;
- 
-+	sec_register_debugfs();
-+
- 	ret = pci_register_driver(&sec_pci_driver);
- 	if (ret < 0) {
-+		sec_unregister_debugfs();
- 		pr_err("Failed to register pci driver.\n");
- 		return ret;
- 	}
-@@ -777,6 +1082,7 @@ static int __init sec_init(void)
- static void __exit sec_exit(void)
- {
- 	pci_unregister_driver(&sec_pci_driver);
-+	sec_unregister_debugfs();
- }
- 
- module_init(sec_init);
--- 
-2.8.1
+> 
+> > - 6a26a3146e5fb90878dca9fde8caa1ca4233156a: My handler for /dev/urandom
+> > and
+> > getrandom(..., 0) are using one callback which issues a warning in both
+> > use
+> > cases (see lrng_sdrng_read). So I think this patch may not be applicable
+> > as
+> > the LRNG code implements warning about being unseeded.
+> 
+> Probably true.
+> 
+> What is the actual semantics of /dev/urandom with your series applied?
+>  Is there any situation in which it will block?
+
+The LRNG tries to provide a 100% identical user interface to the existing /
+dev/random:
+
+- /dev/urandom never blocks
+
+- getrandom(..., 0) blocks until the LRNG has received 256 bits of entropy 
+(i.e. the LRNG is fully seeded)
+
+Yet, both may issue a warning if CONFIG_WARN_ALL_UNSEEDED_RANDOM is set.
+> 
+> > - 3e8e159da49b44ae0bb08e68fa2be760722fa033: I am happy to take that code
+> > which would almost directly apply. The last hunk however would be:
+> > 
+> > if (!(flags & GRND_INSECURE) && unlikely(!lrng_state_operational())) {
+> > 
+> > ==> Shall I apply it to my code base? If yes, how shall the changes to
+> > random.h be handled?
+> 
+> This might be a question for Ted.  Once the merge window opens, I'll
+> resubmit it.
+
+Ok, I will keep it out of the LRNG for now, but once your patch is merged, I 
+would integrate it.
+> 
+> > - 920e97e7fc508e6f0da9c7dec94c8073fd63ab4d: I would pass on this patch due
+> > to the following: it unconditionally starts removing the access to the
+> > TRNG (the LRNG's logical equivalent to the blocking_pool). As patch 10/12
+> > of the LRNG patch series provides the TRNG that is a compile time option,
+> > your patch would logically and functionally be equivalent when
+> > deselecting
+> > CONFIG_LRNG_TRNG_SUPPORT in the LRNG without any further changes to the
+> > LRNG code.
+> 
+> Given your previous email about the TRNG, I'm wondering what the API
+> for the TRNG should be.  I am willing to grant that there are users
+> who need a TRNG for various reasons, and that not all of them can use
+> hwrng.  (And the current hwrng API is pretty bad.)  But I'm not
+> convinced that /dev/random or getrandom(..., GRND_RANDOM) is a
+> reasonable way to access it.  A blocking_pool-style TRNG is a very
+> limited resource, and I think it could make sense to require some sort
+> of actual permission to use it.  GRND_RANDOM has no access control at
+> all, and everyone expects /dev/random to be world-readable.  The most
+> widespread user of /dev/random that I know of is gnupg, and gnupg
+> really should not be using it.
+> 
+> Would it make sense to have a /dev/true_random that is 0400 by default
+> for users who actually need it?  Then /dev/random and GRND_RANDOM
+> could work as they do with my patch, and maybe it does the right thing
+> for everyone.
+
+That is surely a reasonable way to do it. But I am not sure 0400 should be 
+applied, but rather 0440. This should allow introducing a group in user space 
+that processes who need the TRNG are not required to have root privilege, but 
+rather need to be a member of some otherwise unprivileged group.
+> 
+> > - 693b9ffdf0fdc93456b5ad293ac05edf240a531b: This patch is applicable to
+> > the
+> > LRNG. In case CONFIG_LRNG_TRNG_SUPPORT is not set, the TRNG is not
+> > present.
+> > Yet, the /dev/random and getrandom(GRND_RANDOM) would behave blocked until
+> > fully initialized. I have now added the general blocking until the LRNG is
+> > fully initialized to the common /dev/random and getrandom(GRND_RANDOM)
+> > interface function of lrng_trng_read_common. With that, the LRNG would be
+> > fully equivalent to this patch if CONFIG_LRNG_TRNG_SUPPORT is not set.
+> 
+> Sounds reasonable.
+> 
+> > By making the TRNG compile-time selectable, I was hoping to serve all
+> > users: I wanted to cover the conclusions of the discussion to remove the
+> > blocking_pool. On the other hand, however, I want to support requirements
+> > that need the blocking behavior.
+> 
+> I find it odd that /dev/random would be either a TRNG or not a TRNG
+> depending on kernel configuration.  For the small fraction of users
+> that actually want a TRNG, wouldn't it be better to have an interface
+> that fails outright if the TRNG is not enabled?
+
+Sure, I would have no concerns here.
+
+> 
+> --Andy
+
+
+Ciao
+Stephan
+
 
