@@ -4,41 +4,41 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14932C43331
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 01:58:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5817C17441
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 02:04:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E35AE222D3
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 01:58:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE9CF206B6
+	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 02:04:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1573610311;
-	bh=3JxE7MxnwJWUazFf1/4aL5Jz2vKF4IYWKmV9aRGK8Zw=;
+	s=default; t=1573610641;
+	bh=VG3DgUL0//crMwuAkysXJ4eawFrx3m9fdLNPZBJZAF0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=uYEfLIIZFuVF6d2b3Ic4fyNS/CclFBGEQDqlNQbZ/05qIA75IA3+LMwEhkcq8X4IO
-	 nsFe+x+L/uDG95faKKLf3dzzxwiPojvoza2wBd/pdZcxWSg3+jQ+cMId0GeLr4E2+N
-	 EehyJV/6h9Ss1VoNftBXQ7thgO/ro6bkCYJwxTxE=
+	b=tECsqiGyzqsNPfbw8Qp7cUvgnFnSiprF7NbpR9zXn/WpZqYwLImRUtvQPD5WJ3tzx
+	 ANaDLqbWWS1d7g3WLy+OhrGbEaLgvbzIAgoxvdwvVWFgW5IWkQPQt2czyvLWwLkWYj
+	 CBI24QIkDJCLjq+GhFJRTfLmuklRVZ+hSLWYwv9A=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728959AbfKMB63 (ORCPT
+        id S1728311AbfKMCEA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 Nov 2019 20:58:29 -0500
-Received: from mail.kernel.org ([198.145.29.99]:52244 "EHLO mail.kernel.org"
+        Tue, 12 Nov 2019 21:04:00 -0500
+Received: from mail.kernel.org ([198.145.29.99]:58880 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730023AbfKMB62 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 Nov 2019 20:58:28 -0500
+        id S1729839AbfKMCCW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 12 Nov 2019 21:02:22 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B52742246A;
-        Wed, 13 Nov 2019 01:58:26 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id E8756204EC;
+        Wed, 13 Nov 2019 02:02:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573610307;
-        bh=3JxE7MxnwJWUazFf1/4aL5Jz2vKF4IYWKmV9aRGK8Zw=;
+        s=default; t=1573610541;
+        bh=VG3DgUL0//crMwuAkysXJ4eawFrx3m9fdLNPZBJZAF0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=DlSkgjxM/8t0/r3DNrJOVwfSZVWmwM/EEKZIPKyETUvQE7SZgRQ6Hm5MdgAQoC/u7
-         oQ2heRW2+BrNKKNdRF3bQW1t7cK9TYkPdrX4qj1lSrRKo69M/+z408M+ICbKLu3TAf
-         ntHarC/jXY+K4uPm1mriOEzRoRoFJ72uI656DrH4=
+        b=N91UGOFD7VTdHYL8nqbdjQWzKDJ/2fWqg8egCfjs/Bp36W7PTixnnNxF11M+8ba91
+         pUEC7b4wEyr4LVPuEIYsiW6gC1xOkBSuJKTMltvrdFxTAx6lWWzH6j0EYxCup08xRe
+         BQHJSbDw7D9UmkQOEGZBL3xtUJXA6xdyvNPGicFA=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Radu Solea <radu.solea@nxp.com>,
@@ -46,12 +46,12 @@ Cc:     Radu Solea <radu.solea@nxp.com>,
         Leonard Crestez <leonard.crestez@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 076/115] crypto: mxs-dcp - Fix AES issues
-Date:   Tue, 12 Nov 2019 20:55:43 -0500
-Message-Id: <20191113015622.11592-76-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 30/48] crypto: mxs-dcp - Fix AES issues
+Date:   Tue, 12 Nov 2019 21:01:13 -0500
+Message-Id: <20191113020131.13356-30-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191113015622.11592-1-sashal@kernel.org>
-References: <20191113015622.11592-1-sashal@kernel.org>
+In-Reply-To: <20191113020131.13356-1-sashal@kernel.org>
+References: <20191113020131.13356-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -84,7 +84,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 31 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
-index 4615dbee22d0a..e1e1e81107904 100644
+index 38c5dd8891138..4b82cf9da0ba7 100644
 --- a/drivers/crypto/mxs-dcp.c
 +++ b/drivers/crypto/mxs-dcp.c
 @@ -225,6 +225,12 @@ static int mxs_dcp_run_aes(struct dcp_async_ctx *actx,
