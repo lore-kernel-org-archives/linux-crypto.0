@@ -1,116 +1,140 @@
-Return-Path: <SRS0=5LAy=ZF=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=sx3D=ZG=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E13ACC432C3
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 22:28:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E73ABC43141
+	for <linux-crypto@archiver.kernel.org>; Thu, 14 Nov 2019 01:48:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D6B12206EE
-	for <linux-crypto@archiver.kernel.org>; Wed, 13 Nov 2019 22:28:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D399206DA
+	for <linux-crypto@archiver.kernel.org>; Thu, 14 Nov 2019 01:48:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dZb5uR28"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="hZQdzgZw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726428AbfKMW2d (ORCPT
+        id S1726139AbfKNBsb (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 13 Nov 2019 17:28:33 -0500
-Received: from mail-vs1-f65.google.com ([209.85.217.65]:46282 "EHLO
-        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726251AbfKMW2d (ORCPT
+        Wed, 13 Nov 2019 20:48:31 -0500
+Received: from mo4-p02-ob.smtp.rzone.de ([85.215.255.82]:10612 "EHLO
+        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726120AbfKNBsb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 13 Nov 2019 17:28:33 -0500
-Received: by mail-vs1-f65.google.com with SMTP id m6so2475067vsn.13
-        for <linux-crypto@vger.kernel.org>; Wed, 13 Nov 2019 14:28:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=df+DaKSym2F9N38LbwQBau3uyVIjwZlwEI4gpy1fPE4=;
-        b=dZb5uR28WtYmsIGQUl7x9pIgxS9KCCtdlUs9VoItFY5+c1+CApd8HbmkRUyerPpjHO
-         gv+ogesx6Ikklix2lZMfqiwnJqGFYKybH2NcArccBFnXRMyJtTBobVjX2j3X3AvJhFlN
-         9AcGprpxGi6mMOsBsVvcl0XYhdP5V2Ruf+wPdwgRvEtHXksnGjqVuioxHg6oX0MAgyGS
-         O6e9uN/vo4c/x2u7XiDMhCWfzS4QslstYQYB4fu76AkptLbmn2qqu57heYwEhbMgtPH9
-         MQaDP5Jy6GFzLHQIK1QKUN8YLZvx/m59XTd6leHo14UcJ4n880Yi2KQwPbPEAmJFIJfs
-         +i5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=df+DaKSym2F9N38LbwQBau3uyVIjwZlwEI4gpy1fPE4=;
-        b=n3sG3Rg5MTV2eP5LKXpYHGqqM0MWHnFBfiZmYsGQM8rRiiFeXmYBMDfmo0/bbOEcLy
-         iqvtxpajeYxaEBUDhXFzxx9fuC1uaR4JVn1Sc78cgBDwkf1dSvyL97cq/wVkMQdHLoNn
-         7QQTtl+rv/B89AqozBX2DKlm45KBDHOvy7jbRRN7rRt9O9D0A91ihRo63Q1MF4I0OxRj
-         WB8HCxrybkqpE6AlSZu7zJrPsGFAMff6Os41aaQDEFCnBh78dlCHg9k9ROy8Hm4WbloO
-         JBFvUPC9DEmN2Fh0fmUyFU0AlomKapsTBIuQ86NrzKXjUIrXcOLynXSjrjlozKgNCkbx
-         HETg==
-X-Gm-Message-State: APjAAAUwmMEF7UubtMNI2gUCuLtrrO+ZRvWTDeKH106qrjnXyvcFi3XW
-        2rGs6xDro0sYKhun+/ZMYwtEzhiasczlivKufwZalQ==
-X-Google-Smtp-Source: APXvYqxfpgw1bAj534p0frCXIEt+l0yG7RkVd1Sj5Hvf+PUYmwQzQTLAWLYEMRDZVRNouwEoi67rVA5OIosex2sZLnI=
-X-Received: by 2002:a67:c58e:: with SMTP id h14mr3590395vsk.104.1573684112019;
- Wed, 13 Nov 2019 14:28:32 -0800 (PST)
+        Wed, 13 Nov 2019 20:48:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1573696107;
+        s=strato-dkim-0002; d=chronox.de;
+        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=4ffHBB9/52/MY1Qf33VviaYK3WPUsckkWp5OkQvLBKk=;
+        b=hZQdzgZwHaGgItIc9B9grvhZCeZhYRZgT6opVmlgknaj6J5zNebynbpQOOKDWwQcF/
+        sLkq2R+NtiS3ZpnT3+JX6Y25kS43R3NcXYTpv0nZWqMRQoXkZuDxyxfp5CER4qMG8imx
+        KiXuyQYJdoWkgFOsogSnsyXnd4A3tqGm1eqhvdZ5Z6ujrdtSziESK1vwff+RH1PGYgFD
+        31pJTZJ2Kaenekgq6KTNE6qIFhs1d6VM66JWoK51qUZ8Y7pkQL/MUmhbSrUQwZEF+AkZ
+        9uihgNOCSjjM8ovrSJKINlUEnYmbZzpI8dlTOE8Q9PxdTd35i/t9VLf9NOzoBeJ7L50u
+        Unfg==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9zmwdNLqV/Nz7PsNPEA=="
+X-RZG-CLASS-ID: mo00
+Received: from positron.chronox.de
+        by smtp.strato.de (RZmta 44.29.0 SBL|AUTH)
+        with ESMTPSA id N09a57vAE1kfGBt
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
+        (Client did not present a certificate);
+        Thu, 14 Nov 2019 02:46:41 +0100 (CET)
+From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To:     "Alexander E. Patrakov" <patrakov@gmail.com>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Nicolai Stange <nstange@suse.de>,
+        "Peter, Matthias" <matthias.peter@bsi.bund.de>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Roman Drahtmueller <draht@schaltsekun.de>,
+        Neil Horman <nhorman@redhat.com>
+Subject: Re: [PATCH v24 11/12] LRNG - add SP800-90B compliant health tests
+Date:   Thu, 14 Nov 2019 02:46:38 +0100
+Message-ID: <7132090.9rmkJY1zsi@positron.chronox.de>
+In-Reply-To: <CAN_LGv3LUjJ=8ZZxaJ=c7uDPb=ayvCNPE-UshxgBUK-Jf7qNmQ@mail.gmail.com>
+References: <6157374.ptSnyUpaCn@positron.chronox.de> <9152597.fJySsU3eCD@positron.chronox.de> <CAN_LGv3LUjJ=8ZZxaJ=c7uDPb=ayvCNPE-UshxgBUK-Jf7qNmQ@mail.gmail.com>
 MIME-Version: 1.0
-References: <20191112223046.176097-1-samitolvanen@google.com> <20191113200419.GE221701@gmail.com>
-In-Reply-To: <20191113200419.GE221701@gmail.com>
-From:   Sami Tolvanen <samitolvanen@google.com>
-Date:   Wed, 13 Nov 2019 14:28:20 -0800
-Message-ID: <CABCJKudoBHo6rZoGMFproXjmexu16gonVKDPdnq9XDCmO2J2cw@mail.gmail.com>
-Subject: Re: [PATCH] crypto: arm64/sha: fix function types
-To:     Sami Tolvanen <samitolvanen@google.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Kees Cook <keescook@chromium.org>,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>
+Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Nov 13, 2019 at 12:04 PM Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Tue, Nov 12, 2019 at 02:30:46PM -0800, Sami Tolvanen wrote:
-> > Declare assembly functions with the expected function type
-> > instead of casting pointers in C to avoid type mismatch failures
-> > with Control-Flow Integrity (CFI) checking.
-> >
-> > Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
-> > ---
-> >  arch/arm64/crypto/sha1-ce-glue.c   | 12 +++++-------
-> >  arch/arm64/crypto/sha2-ce-glue.c   | 26 +++++++++++---------------
-> >  arch/arm64/crypto/sha256-glue.c    | 30 ++++++++++++------------------
-> >  arch/arm64/crypto/sha512-ce-glue.c | 23 ++++++++++-------------
-> >  arch/arm64/crypto/sha512-glue.c    | 13 +++++--------
-> >  5 files changed, 43 insertions(+), 61 deletions(-)
-> >
-> > diff --git a/arch/arm64/crypto/sha1-ce-glue.c b/arch/arm64/crypto/sha1-ce-glue.c
-> > index bdc1b6d7aff7..3153a9bbb683 100644
-> > --- a/arch/arm64/crypto/sha1-ce-glue.c
-> > +++ b/arch/arm64/crypto/sha1-ce-glue.c
-> > @@ -25,7 +25,7 @@ struct sha1_ce_state {
-> >       u32                     finalize;
-> >  };
-> >
-> > -asmlinkage void sha1_ce_transform(struct sha1_ce_state *sst, u8 const *src,
-> > +asmlinkage void sha1_ce_transform(struct sha1_state *sst, u8 const *src,
-> >                                 int blocks);
->
-> Please update the comments in the corresponding assembly files too.
->
-> Also, this change doesn't really make sense because the assembly functions still
-> expect struct sha1_ce_state, and they access sha1_ce_state::finalize which is
-> not present in struct sha1_state.  There should either be wrapper functions that
-> explicitly do the cast from sha1_state to sha1_ce_state, or there should be
-> comments in the assembly files that very clearly explain that although the
-> function prototype takes sha1_state, it's really assumed to be a sha1_ce_state.
+Am Mittwoch, 13. November 2019, 07:02:40 CET schrieb Alexander E. Patrakov:
 
-Agreed, this needs a comment explaining the type mismatch. I'm also
-fine with using wrapper functions and explicitly casting the
-parameters instead of changing function declarations. Herbert, Ard,
-any preferences?
+Hi Alexander,
 
-Sami
+> =D1=81=D1=80, 13 =D0=BD=D0=BE=D1=8F=D0=B1. 2019 =D0=B3. =D0=B2 05:38, Ste=
+phan M=C3=BCller <smueller@chronox.de>:
+> > Am Dienstag, 12. November 2019, 20:58:32 CET schrieb Alexander E.
+> > Patrakov:
+> >=20
+> > Hi Alexander,
+> >=20
+> > > > +config LRNG_HEALTH_TESTS
+> > > > +   bool "Enable noise source online health tests"
+> > > > +   help
+> > > > +     The online health tests validate the noise source at
+> > > > +     runtime for fatal errors. These tests include SP800-90B
+> > > > +     compliant tests which are invoked if the system is booted
+> > > > +     with fips=3D1. In case of fatal errors during active
+> > > > +     SP800-90B tests, the issue is logged and the noise
+> > > > +     data is discarded. These tests are required for full
+> > > > +     compliance with SP800-90B.
+> > >=20
+> > > How have you tested that these tests work at runtime? Maybe add some
+> > > code under a new CONFIG item that depends on CONFIG_BROKEN that
+> > > deliberately botches the RNG and triggers failures?
+> >=20
+> > I am unable to find sensible information about CONFIG_BROKEN in the rec=
+ent
+> > kernel tree.
+> >=20
+> > Do you happen to have a pointer on how that option is to be used?
+>=20
+> This option is not used on its own. You create a new option,
+> CONFIG_TEST_LRNG_FAILURE_MODE or something like that, and put your
+> code under the ifdef guarded by that option. And then, to prevent
+> ordinary users and allyesconfig from selecting it, in Kconfig you say:
+> "depends on BROKEN". This way, the option becomes unselectable in
+> menuconfig but still works as intended when added manually to .config
+> (obviously, with the BROKEN dependency removed locally).
+>=20
+> Definition:
+> https://github.com/torvalds/linux/blob/9c7db5004280767566e91a33445bf93aa4=
+79
+> ef02/init/Kconfig#L68 Example usage:
+> https://github.com/torvalds/linux/blob/c87237110f2553b4200a8b3401a01198ed=
+fc
+> f0d9/drivers/gpu/drm/i915/Kconfig.debug#L166
+
+I added such support to the LRNG.
+
+Thank you for your suggestion.
+>=20
+> --
+> Alexander E. Patrakov
+
+
+Ciao
+Stephan
+
+
