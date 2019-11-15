@@ -2,210 +2,241 @@ Return-Path: <SRS0=SVjD=ZH=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35813C43215
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Nov 2019 12:45:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8CF7C432C3
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Nov 2019 13:49:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0DD5D2082E
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Nov 2019 12:45:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B530720728
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Nov 2019 13:49:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oaB9WzyC"
+	dkim=pass (1024-bit key) header.d=microchiptechnology.onmicrosoft.com header.i=@microchiptechnology.onmicrosoft.com header.b="alzfldcH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727476AbfKOMpW (ORCPT
+        id S1727508AbfKONtN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 Nov 2019 07:45:22 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:34310 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727272AbfKOMpW (ORCPT
+        Fri, 15 Nov 2019 08:49:13 -0500
+Received: from esa6.microchip.iphmx.com ([216.71.154.253]:58818 "EHLO
+        esa6.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727417AbfKONtN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 Nov 2019 07:45:22 -0500
-Received: by mail-wm1-f66.google.com with SMTP id j18so9996846wmk.1;
-        Fri, 15 Nov 2019 04:45:20 -0800 (PST)
+        Fri, 15 Nov 2019 08:49:13 -0500
+Received-SPF: Pass (esa6.microchip.iphmx.com: domain of
+  Tudor.Ambarus@microchip.com designates 198.175.253.82 as
+  permitted sender) identity=mailfrom;
+  client-ip=198.175.253.82; receiver=esa6.microchip.iphmx.com;
+  envelope-from="Tudor.Ambarus@microchip.com";
+  x-sender="Tudor.Ambarus@microchip.com";
+  x-conformance=spf_only; x-record-type="v=spf1";
+  x-record-text="v=spf1 mx a:ushub1.microchip.com
+  a:smtpout.microchip.com a:mx1.microchip.iphmx.com
+  a:mx2.microchip.iphmx.com include:servers.mcsv.net
+  include:mktomail.com include:spf.protection.outlook.com ~all"
+Received-SPF: None (esa6.microchip.iphmx.com: no sender
+  authenticity information available from domain of
+  postmaster@email.microchip.com) identity=helo;
+  client-ip=198.175.253.82; receiver=esa6.microchip.iphmx.com;
+  envelope-from="Tudor.Ambarus@microchip.com";
+  x-sender="postmaster@email.microchip.com";
+  x-conformance=spf_only
+Authentication-Results: esa6.microchip.iphmx.com; spf=Pass smtp.mailfrom=Tudor.Ambarus@microchip.com; spf=None smtp.helo=postmaster@email.microchip.com; dkim=pass (signature verified) header.i=@microchiptechnology.onmicrosoft.com; dmarc=pass (p=none dis=none) d=microchip.com
+IronPort-SDR: e+2vHAhIJMkphrue75duHRHCBu17/jRxoORFcGMyjdyP9Gy8Z0NiUXGS6WZ3txLZD4h8GfF6Z4
+ S9Gz7v/3YlBavM9PBnbOKgJYhvFJzPYJNbX84cRNyzl8I+iLRhs7l1pqnFZlphCQraa4J0vphJ
+ SFyv9VMdSfHTxRz/p7zy+HI0aI/yjS44KX7nV+xumiw4zZYOrKBpOBFaG/0RGwkTTAw9WUr9ow
+ UmiLZ+ZLUdUcOG4v29ZHZknL6PWaW3WXKxU4G+WFvrv/GUyKw5ByGk0DRh6SpSctgZvYZPROv9
+ E3E=
+X-IronPort-AV: E=Sophos;i="5.68,308,1569308400"; 
+   d="scan'208";a="54484154"
+Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 15 Nov 2019 06:49:12 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1713.5; Fri, 15 Nov 2019 06:49:11 -0700
+Received: from NAM05-DM3-obe.outbound.protection.outlook.com (10.10.215.89) by
+ email.microchip.com (10.10.87.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5 via Frontend
+ Transport; Fri, 15 Nov 2019 06:49:12 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WF4vBgJKNh3gy/Zfe6zgTmjrJsqA/NbXLFtj8GSuX6f53I7bIvs4QpN6FxsyF3Ra686iBdVLXHB5KwLk3DQkwxfQ5ZwWip7Zt2LpnFfIC3MUCVq0uxwm7116eTVMJWw1DbmM3qpsXluwGz08xr5xx/ol/vyB0x7DxQEcKaYbG34tdF2F5tw5rveRW4Ue4DkCwRq1uQQGGfdSxKJg6M5eVACbY8sOQvMUV6bfPXUXRuA5w4SS+NmYpyhkjoDi0+TWok4ex3pFZXf5kWqQbjvTcGbNg4RJJZ+KER33x3+sPyQIOzrRc5YeBbeAnfdm204u3Pd3fsE+ge9m9RfdKV5+cg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fmL+hqdqyAzXAq27hJ5vER4se5l/r6bFxzNtVY4+5sY=;
+ b=fgq5boECKGRWFip8trsFn1/Tx8OCkeCuW9Kr491tlog4Kk1MN+dlYMQkJ9MEMr/M5cAJMx8Z7LqDZyyTP33eQy5sa69oP8UxUMGcoVb99vVFHF46gdjkqz3W4AIq9U/JAnP3hu6WMcV23DFRi9s46FbxTNg/9CY8RB1DOUv/NoOR9lWTepwABbfN00QVDI9oQF89vaII9jqQneCnELI42ejc3c1qUEJTEMIomzCrf022MBDm0P7DauS6dmILX4xPpjOlwphlPsGjEskJ73fX5mUHzxohDcehlOQDalwsqTAs9IINTY+JCFYOh3V4QgHN6W53kMJULx1QFf0sxP+K7g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=IuuUvPE4LPSeug9SWAuaNF/jmrQAGOGNZ9g9Ry7ToRE=;
-        b=oaB9WzyCidhcS7WmkncUNaw1+Twilec9DoSikauUrM+ipjGDX+MGw5sngCARMYsyUG
-         FDjdg1s6MggFK0o6tG2aIk9AxDRek/q/Xir3pylOrt0ROE2OlWtRjNnKxYPK8GFj38tG
-         nJ6RzF5UOJpw29uZJ4Eb6b1ZfWBzDwVOtUtzegOIXrGi0s2xR1VRNBalxOWQM14tIi5a
-         fGGJmnJjyzjTKkOCW/+fI88pX4+7i1q4OkAuiptd32uA3cYWut56MJifbsvPduwymGj9
-         hjpmVYBSKlQDAdSEs4+CJVMb/0C9m8BQJtFH5E/+r4oIJ4GzJCc9GWEYw+Q35TLypjqj
-         UnBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=IuuUvPE4LPSeug9SWAuaNF/jmrQAGOGNZ9g9Ry7ToRE=;
-        b=YkO+A4eZCMp8spfAqMB+8Q9EJcTdUqCM8YCf8IXitn8WJnO9GZxp+0h0Wo3tUUK+NC
-         uQZVPFqMNlnxbRPiBIf7ppkAJMhbImQxvzsCpIYieAXbCnTEMzvMACiE6YiPdfGYns0Z
-         +7m0VTh/kY/qU0qSWrowMldUFDgyZ5Ne10G6J3icDleAByK6EGoBoGdLy4XiLWmzVKWG
-         xEnAswsHaOF7ERPyWzNnJIpsVBzR6OaN0K9O9OsvIbuNyDlJ46F2Ws4T499eGXXKMOZP
-         OT3jBEUWoF/yKH2QqgxZYlgR9U+sePVkyqOZWd2XcqbUES2l15kPNG3WVpvF+j/bg0Iq
-         3yZQ==
-X-Gm-Message-State: APjAAAU1pLC2VKSjQqb8YqifP5NGWMOG/kDgYVdc72cDbqV2tCAfolcx
-        m+GaWvRzMHX23RCfGweHiCEWaGmm
-X-Google-Smtp-Source: APXvYqwPO6UCR4wROZX9g244JGWsZTNfxtKqaYGdx1ZDLz2uk+hjVaSf3qXxka4ZxCB8+l/WHnMuEQ==
-X-Received: by 2002:a7b:c08c:: with SMTP id r12mr14067285wmh.67.1573821919961;
-        Fri, 15 Nov 2019 04:45:19 -0800 (PST)
-Received: from Red ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id y6sm11149915wrr.19.2019.11.15.04.45.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Nov 2019 04:45:19 -0800 (PST)
-Date:   Fri, 15 Nov 2019 13:45:17 +0100
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Kalyani Akula <kalyani.akula@xilinx.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Kalyani Akula <kalyania@xilinx.com>,
-        Harsh Jain <harshj@xilinx.com>,
-        Sarat Chand Savitala <saratcha@xilinx.com>,
-        Mohan Marutirao Dhanawade <mohan.dhanawade@xilinx.com>
-Subject: Re: [PATCH V3 4/4] crypto: Add Xilinx AES driver
-Message-ID: <20191115124517.GA31038@Red>
-References: <1573040435-6932-1-git-send-email-kalyani.akula@xilinx.com>
- <1573040435-6932-5-git-send-email-kalyani.akula@xilinx.com>
+ d=microchiptechnology.onmicrosoft.com;
+ s=selector2-microchiptechnology-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fmL+hqdqyAzXAq27hJ5vER4se5l/r6bFxzNtVY4+5sY=;
+ b=alzfldcHoRrM8b8UZvW9jwW+LyI5MnTgXWo+b4qh60YYP6l6D8NAudiTmiG4WvY8IgES7Itv907yU+AQwrvDE4FrSlu4o+HH7SXgzBxOP+cR4X4nGCIiSDZc/sVvdHPobtXxvBuplZS8wwd7k4HPmd02ySwRucSoNculGqv052c=
+Received: from MN2PR11MB4448.namprd11.prod.outlook.com (52.135.39.157) by
+ MN2PR11MB4159.namprd11.prod.outlook.com (20.179.150.225) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2451.27; Fri, 15 Nov 2019 13:49:07 +0000
+Received: from MN2PR11MB4448.namprd11.prod.outlook.com
+ ([fe80::84c:6e75:22df:cbc9]) by MN2PR11MB4448.namprd11.prod.outlook.com
+ ([fe80::84c:6e75:22df:cbc9%5]) with mapi id 15.20.2451.027; Fri, 15 Nov 2019
+ 13:49:07 +0000
+From:   <Tudor.Ambarus@microchip.com>
+To:     <herbert@gondor.apana.org.au>
+CC:     <Nicolas.Ferre@microchip.com>, <alexandre.belloni@bootlin.com>,
+        <Ludovic.Desroches@microchip.com>, <linux-crypto@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <Tudor.Ambarus@microchip.com>
+Subject: [PATCH 1/2] crypto: atmel-tdes - Set the IV after {en,de}crypt
+Thread-Topic: [PATCH 1/2] crypto: atmel-tdes - Set the IV after {en,de}crypt
+Thread-Index: AQHVm7tzmqQuq6l82kiSJWdwlyo4Og==
+Date:   Fri, 15 Nov 2019 13:49:06 +0000
+Message-ID: <20191115134854.30190-1-tudor.ambarus@microchip.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-clientproxiedby: BE0P281CA0017.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:a::27) To MN2PR11MB4448.namprd11.prod.outlook.com
+ (2603:10b6:208:193::29)
+x-ms-exchange-messagesentrepresentingtype: 1
+x-mailer: git-send-email 2.9.5
+x-originating-ip: [94.177.32.156]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 382fa047-a7e5-42b0-9982-08d769d2955e
+x-ms-traffictypediagnostic: MN2PR11MB4159:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <MN2PR11MB41596BFADE4A41763BADE92AF0700@MN2PR11MB4159.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:4941;
+x-forefront-prvs: 02229A4115
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(136003)(346002)(366004)(39860400002)(396003)(376002)(199004)(189003)(14444005)(102836004)(66446008)(6916009)(14454004)(2351001)(26005)(50226002)(6116002)(36756003)(71200400001)(3846002)(52116002)(99286004)(25786009)(8936002)(5660300002)(71190400001)(6506007)(6436002)(386003)(8676002)(6486002)(107886003)(2501003)(66476007)(66946007)(66556008)(6512007)(478600001)(64756008)(5640700003)(1730700003)(81156014)(81166006)(186003)(1076003)(7736002)(305945005)(316002)(2616005)(4326008)(54906003)(486006)(476003)(256004)(66066001)(2906002)(86362001)(142933001);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR11MB4159;H:MN2PR11MB4448.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: microchip.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: oNRhIqAUr/BSV2O47QOoqqe+ReFfeMeWrW2JpHy59iWdLxuSJoeMAKFqSCAcCwAX1qxQVrwq2iAh9gPmriFU9cLbcWcH7kvD6X0vmqEkESM0oWoGy7eO47gF6nvD2sk274zVfFkSxyIQzjmWNj5xUTWzui2og1EAOEKaCIcTPNrph+w9YDYOzNl/9R0a0f5nGXwZVBQn3nvfUI2diSne5M/L+JB2htYHD4lhzKfZX7xG8G4bwaeBq1dwL0t7PwNRrmrOr8lTIbrFzu0FBC6L1SykmHGs4y3UCNhfIo8hFUozEekV4hWcdzvcgyrjSF5zpMiyWfcjCrB5B02+lbPnbQDZZ/3tm/Iht6yssW2NBRAhGh4BP4a2KgYGYSuQMwtY/y+4FGomFyZgkxHM9e0fch2hb3yBdxO/m1UoXopIt1dyxraLWT6HNVL5ih/JKkZA
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1573040435-6932-5-git-send-email-kalyani.akula@xilinx.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 382fa047-a7e5-42b0-9982-08d769d2955e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Nov 2019 13:49:06.9376
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: VqZRjXC334x6dOT7iMU2/yhmiDi+ttf8Nh4Ix5PRlgmVeSiSOv/SERsAlaBrr1iHtNBDUePXu3yDQNGHFa48XI5K7e0zuKlT58UGP55hbps=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4159
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Nov 06, 2019 at 05:10:35PM +0530, Kalyani Akula wrote:
-> This patch adds AES driver support for the Xilinx ZynqMP SoC.
-> 
-> Signed-off-by: Kalyani Akula <kalyani.akula@xilinx.com>
-> ---
->  drivers/crypto/Kconfig                 |  11 +
->  drivers/crypto/Makefile                |   2 +
->  drivers/crypto/xilinx/Makefile         |   3 +
->  drivers/crypto/xilinx/zynqmp-aes-gcm.c | 457 +++++++++++++++++++++++++++++++++
->  4 files changed, 473 insertions(+)
->  create mode 100644 drivers/crypto/xilinx/Makefile
->  create mode 100644 drivers/crypto/xilinx/zynqmp-aes-gcm.c
-> 
-> diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-> index 1fb622f..8e7d3a9 100644
-> --- a/drivers/crypto/Kconfig
-> +++ b/drivers/crypto/Kconfig
-> @@ -696,6 +696,17 @@ config CRYPTO_DEV_ROCKCHIP
->  	help
->  	  This driver interfaces with the hardware crypto accelerator.
->  	  Supporting cbc/ecb chainmode, and aes/des/des3_ede cipher mode.
-> +config CRYPTO_DEV_ZYNQMP_AES
-> +	tristate "Support for Xilinx ZynqMP AES hw accelerator"
-> +	depends on ARCH_ZYNQMP || COMPILE_TEST
-> +	select CRYPTO_AES
-> +	select CRYPTO_ENGINE
-> +	select CRYPTO_AEAD
-> +	help
-> +	  Xilinx ZynqMP has AES-GCM engine used for symmetric key
-> +	  encryption and decryption. This driver interfaces with AES hw
-> +	  accelerator. Select this if you want to use the ZynqMP module
-> +	  for AES algorithms.
->  
->  config CRYPTO_DEV_MEDIATEK
->  	tristate "MediaTek's EIP97 Cryptographic Engine driver"
-> diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
-> index afc4753..b6124b8 100644
-> --- a/drivers/crypto/Makefile
-> +++ b/drivers/crypto/Makefile
-> @@ -47,4 +47,6 @@ obj-$(CONFIG_CRYPTO_DEV_VMX) += vmx/
->  obj-$(CONFIG_CRYPTO_DEV_BCM_SPU) += bcm/
->  obj-$(CONFIG_CRYPTO_DEV_SAFEXCEL) += inside-secure/
->  obj-$(CONFIG_CRYPTO_DEV_ARTPEC6) += axis/
-> +obj-$(CONFIG_CRYPTO_DEV_ZYNQMP_AES) += xilinx/
-> +
+From: Tudor Ambarus <tudor.ambarus@microchip.com>
 
-Hello
+The req->iv of the skcipher_request is expected to contain the
+last ciphertext block when the {en,de}crypt operation is done.
+In case of in-place decryption, copy the ciphertext in an
+intermediate buffer before decryption.
 
-you insert a useless newline
+This fixes the following tcrypt tests:
+alg: skcipher: atmel-cbc-des encryption test failed (wrong output IV) on te=
+st vector 0, cfg=3D"in-place"
+00000000: fe dc ba 98 76 54 32 10
+alg: skcipher: atmel-cbc-tdes encryption test failed (wrong output IV) on t=
+est vector 0, cfg=3D"in-place"
+00000000: 7d 33 88 93 0f 93 b2 42
 
-[...]
-> +static int zynqmp_handle_aes_req(struct crypto_engine *engine,
-> +				 void *req)
-> +{
-> +	struct aead_request *areq =
-> +				container_of(req, struct aead_request, base);
-> +	struct crypto_aead *aead = crypto_aead_reqtfm(req);
-> +	struct zynqmp_aead_tfm_ctx *tfm_ctx = crypto_aead_ctx(aead);
-> +	struct zynqmp_aead_req_ctx *rq_ctx = aead_request_ctx(areq);
-> +	struct aead_request *subreq;
-> +	int need_fallback;
-> +	int err;
-> +
-> +	need_fallback = zynqmp_fallback_check(tfm_ctx, areq);
-> +
-> +	if (need_fallback) {
-> +		subreq = aead_request_alloc(tfm_ctx->fbk_cipher, GFP_KERNEL);
-> +		if (!subreq)
-> +			return -ENOMEM;
-> +
-> +		aead_request_set_callback(subreq, areq->base.flags,
-> +					  NULL, NULL);
-> +		aead_request_set_crypt(subreq, areq->src, areq->dst,
-> +				       areq->cryptlen, areq->iv);
-> +		aead_request_set_ad(subreq, areq->assoclen);
-> +		if (rq_ctx->op == ZYNQMP_AES_ENCRYPT)
-> +			err = crypto_aead_encrypt(subreq);
-> +		else
-> +			err = crypto_aead_decrypt(subreq);
-> +		aead_request_free(subreq);
+Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
+---
+ drivers/crypto/atmel-tdes.c | 40 ++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 38 insertions(+), 2 deletions(-)
 
-Every other crypto driver which use async fallback does not use aead_request_free() (and do not allocate a new request).
-I am puzzled that you can free an async request without waiting for its completion.
-Perhaps I am wrong, but since no other driver do like that...
+diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
+index bb7c0a387c04..0c1f79b30fc1 100644
+--- a/drivers/crypto/atmel-tdes.c
++++ b/drivers/crypto/atmel-tdes.c
+@@ -81,6 +81,7 @@ struct atmel_tdes_ctx {
+=20
+ struct atmel_tdes_reqctx {
+ 	unsigned long mode;
++	u8 lastc[DES_BLOCK_SIZE];
+ };
+=20
+ struct atmel_tdes_dma {
+@@ -572,6 +573,30 @@ static int atmel_tdes_crypt_start(struct atmel_tdes_de=
+v *dd)
+ 	return err;
+ }
+=20
++static void
++atmel_tdes_set_iv_as_last_ciphertext_block(struct atmel_tdes_dev *dd)
++{
++	struct skcipher_request *req =3D dd->req;
++	struct atmel_tdes_reqctx *rctx =3D skcipher_request_ctx(req);
++	struct crypto_skcipher *skcipher =3D crypto_skcipher_reqtfm(req);
++	unsigned int ivsize =3D crypto_skcipher_ivsize(skcipher);
++
++	if (req->cryptlen < ivsize)
++		return;
++
++	if (rctx->mode & TDES_FLAGS_ENCRYPT) {
++		scatterwalk_map_and_copy(req->iv, req->dst,
++					 req->cryptlen - ivsize, ivsize, 0);
++	} else {
++		if (req->src =3D=3D req->dst)
++			memcpy(req->iv, rctx->lastc, ivsize);
++		else
++			scatterwalk_map_and_copy(req->iv, req->src,
++						 req->cryptlen - ivsize,
++						 ivsize, 0);
++	}
++}
++
+ static void atmel_tdes_finish_req(struct atmel_tdes_dev *dd, int err)
+ {
+ 	struct skcipher_request *req =3D dd->req;
+@@ -580,6 +605,8 @@ static void atmel_tdes_finish_req(struct atmel_tdes_dev=
+ *dd, int err)
+=20
+ 	dd->flags &=3D ~TDES_FLAGS_BUSY;
+=20
++	atmel_tdes_set_iv_as_last_ciphertext_block(dd);
++
+ 	req->base.complete(&req->base, err);
+ }
+=20
+@@ -668,8 +695,8 @@ static int atmel_tdes_crypt_dma_stop(struct atmel_tdes_=
+dev *dd)
+=20
+ static int atmel_tdes_crypt(struct skcipher_request *req, unsigned long mo=
+de)
+ {
+-	struct atmel_tdes_ctx *ctx =3D crypto_skcipher_ctx(
+-			crypto_skcipher_reqtfm(req));
++	struct crypto_skcipher *skcipher =3D crypto_skcipher_reqtfm(req);
++	struct atmel_tdes_ctx *ctx =3D crypto_skcipher_ctx(skcipher);
+ 	struct atmel_tdes_reqctx *rctx =3D skcipher_request_ctx(req);
+=20
+ 	if (mode & TDES_FLAGS_CFB8) {
+@@ -700,6 +727,15 @@ static int atmel_tdes_crypt(struct skcipher_request *r=
+eq, unsigned long mode)
+=20
+ 	rctx->mode =3D mode;
+=20
++	if (!(mode & TDES_FLAGS_ENCRYPT) && req->src =3D=3D req->dst) {
++		unsigned int ivsize =3D crypto_skcipher_ivsize(skcipher);
++
++		if (req->cryptlen >=3D ivsize)
++			scatterwalk_map_and_copy(rctx->lastc, req->src,
++						 req->cryptlen - ivsize,
++						 ivsize, 0);
++	}
++
+ 	return atmel_tdes_handle_queue(ctx->dd, req);
+ }
+=20
+--=20
+2.9.5
 
-[...]
-> +static int zynqmp_aes_aead_probe(struct platform_device *pdev)
-> +{
-> +	struct device *dev = &pdev->dev;
-> +	int err = -1;
-> +
-> +	if (!pdev->dev.of_node)
-> +		return -ENODEV;
-> +
-> +	aes_drv_ctx.dev = dev;
-
-You should test if dev is not already set.
-And add a comment like "this driver support only one instance".
-
-> +	aes_drv_ctx.eemi_ops = zynqmp_pm_get_eemi_ops();
-> +	if (IS_ERR(aes_drv_ctx.eemi_ops)) {
-> +		dev_err(dev, "Failed to get ZynqMP EEMI interface\n");
-> +		return PTR_ERR(aes_drv_ctx.eemi_ops);
-> +	}
-> +
-> +	err = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(ZYNQMP_DMA_BIT_MASK));
-> +	if (err < 0) {
-> +		dev_err(dev, "No usable DMA configuration\n");
-> +		return err;
-> +	}
-> +
-> +	aes_drv_ctx.engine = crypto_engine_alloc_init(dev, 1);
-> +	if (!aes_drv_ctx.engine) {
-> +		dev_err(dev, "Cannot alloc AES engine\n");
-> +		return err;
-> +	}
-> +
-> +	err = crypto_engine_start(aes_drv_ctx.engine);
-> +	if (err) {
-> +		dev_err(dev, "Cannot start AES engine\n");
-> +		return err;
-> +	}
-> +
-> +	err = crypto_register_aead(&aes_drv_ctx.alg.aead);
-> +	if (err < 0)
-> +		dev_err(dev, "Failed to register AEAD alg.\n");
-
-In case of error you didnt crypto_engine_exit()
-
-Regards
