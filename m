@@ -5,101 +5,102 @@ X-Spam-Level:
 X-Spam-Status: No, score=-8.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55171C432C3
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Nov 2019 18:20:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEAAFC432C3
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Nov 2019 18:47:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2F3C52073A
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Nov 2019 18:20:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B49462072D
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Nov 2019 18:47:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="EaoAKkm4"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="EQLOVGqY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727015AbfKOSTZ (ORCPT
+        id S1726323AbfKOSrq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 Nov 2019 13:19:25 -0500
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:34500 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727001AbfKOSTY (ORCPT
+        Fri, 15 Nov 2019 13:47:46 -0500
+Received: from mail-pj1-f66.google.com ([209.85.216.66]:44951 "EHLO
+        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726075AbfKOSrq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 Nov 2019 13:19:24 -0500
-Received: by mail-pg1-f193.google.com with SMTP id z188so6390653pgb.1
-        for <linux-crypto@vger.kernel.org>; Fri, 15 Nov 2019 10:19:22 -0800 (PST)
+        Fri, 15 Nov 2019 13:47:46 -0500
+Received: by mail-pj1-f66.google.com with SMTP id w8so121682pjh.11
+        for <linux-crypto@vger.kernel.org>; Fri, 15 Nov 2019 10:47:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=message-id:mime-version:content-transfer-encoding:in-reply-to
          :references:to:subject:from:user-agent:date;
-        bh=/nPbsdCJvwt5lKKSjGD3DLzTdGucI41FrjpblwIsypo=;
-        b=EaoAKkm4BqcYz0t8roJcx9ZGH2ZwnA35uEWBR9b+b+UfNnEGGPfkn2GMxv+SW2BrwE
-         kT/LksAzxIDphLmWMWfjlHn57yIe0BUhKtAumfwEy+E0QujKRxuLjqrx5sDVKcQEBB22
-         lSgKZXpa6E+Cz/zv/IT9DVHmE/Ol4XZE15gGk=
+        bh=iS/Fqu32CYRsyYqI3nNewHGyeeTZ7Vyn3l2lS2Wx+I4=;
+        b=EQLOVGqYrkyo+x9eBqaR38FivLhZb82i4BXqpCkgEtQbc5eP5cdH3D9uM6kDxJ5NSS
+         0faGbqmYkX5A7cAuuymXwjY/NdAY3n+5XO9WW1BVZUMC9xvtcxX01fFTCwhzHLJrvmY6
+         Xgfx56P0+DbzPUA4veZCjkLneUfU7DTBumXTY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:mime-version
          :content-transfer-encoding:in-reply-to:references:to:subject:from
          :user-agent:date;
-        bh=/nPbsdCJvwt5lKKSjGD3DLzTdGucI41FrjpblwIsypo=;
-        b=QvmJZl+47wUfnBnwiKYVTKWdAnJNgOHgbvKYrk5ye3dJo8hjsmSfUiUqTb+YK6pnFN
-         WUcWCH88SETdDKPVrWEwqzneP12Xc2qNH41+SFuP+FNjOi52GDjzCqHnpYpEVeWtEEpG
-         YxYKGrlF1KcNO7XEnoTSLZV4/fuLbz87Ymxv//njfUVpSQsqG3aD3wf6vbQO0qrLlpAG
-         VCU0Zvw3MkEpQ6XsJhnV8yjV7a+d7rtKCB4tiaCPItsz9IKjey+FF7I+2UL6qYC9oR4/
-         X5VtAy8UpuD3W0CcEcs9CB4iruxUiFqdTtQiMKUuy+UodHHFq3EqZuLFVegUjX3htUL5
-         SnJA==
-X-Gm-Message-State: APjAAAVDpB1nnBqzsg7eSMR+LQOwEfV/MB3ZcU7fuiIIwlyw4POOsjf0
-        23LnOixsgWvtWrU+mZxegsfErA==
-X-Google-Smtp-Source: APXvYqw4aSsYPurq2VMWDwYSwROjnsjmTt0F1DX8PauKVTqLhoSLVwwxc6wZfCS/R0GLPZtK1TVkQA==
-X-Received: by 2002:a62:ea0b:: with SMTP id t11mr19675909pfh.182.1573841961943;
-        Fri, 15 Nov 2019 10:19:21 -0800 (PST)
+        bh=iS/Fqu32CYRsyYqI3nNewHGyeeTZ7Vyn3l2lS2Wx+I4=;
+        b=ikF1PZQnTq5iqWjU+MK0N6cjJKbzOqCA75kds//Rp48ddbcE3LOrhhMs3zBNkleGac
+         kXImQCf/+QLYIaFXS1hqJnappS1IA5JME+iG+SYQzftHD0SA67Eh8s7SlAIpEsjfVN3e
+         tX4P7821ARo9IyEHXT4G3uZ92v6DvGhltvVp/56EHJ9qocQ9YlFvRP7EBTezRmf6n1fF
+         vDAZPFbcTitMgVK0hU0tXxXS48h9bWEHMM+CAndEwkF3rd06Jen00kIfEvUXc/QOuX6r
+         3uno9zHvO1++eUaAtEl/JLUYtyNu4CbT4TxMZNeZfmpyvBmic7JqXPtY4SCFZkHJStGo
+         pR1w==
+X-Gm-Message-State: APjAAAV97UyzquALCVbhqwFnXlUAHANMESEvwLSIeXwmtLdyUuzy29Gu
+        RWi9EvjGVe4Zhpu2hgKIzEIZ6g==
+X-Google-Smtp-Source: APXvYqzo8ZTaeQMvkZzw76l4dUblfI2O5tBibpRcgatRhGZq8Uo9e3xMTJCYC85y6OhrsNVmUd0svw==
+X-Received: by 2002:a17:902:7e4c:: with SMTP id a12mr16275022pln.219.1573843665716;
+        Fri, 15 Nov 2019 10:47:45 -0800 (PST)
 Received: from chromium.org ([2620:15c:202:1:fa53:7765:582b:82b9])
-        by smtp.gmail.com with ESMTPSA id k13sm10639792pgl.69.2019.11.15.10.19.21
+        by smtp.gmail.com with ESMTPSA id x12sm11001564pfm.130.2019.11.15.10.47.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Nov 2019 10:19:21 -0800 (PST)
-Message-ID: <5dceec29.1c69fb81.4c2d0.e24d@mx.google.com>
+        Fri, 15 Nov 2019 10:47:45 -0800 (PST)
+Message-ID: <5dcef2d1.1c69fb81.803c0.0872@mx.google.com>
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <0000000000006062280596203360@google.com>
-References: <0000000000006062280596203360@google.com>
+In-Reply-To: <000000000000cdaa560596acbc4e@google.com>
+References: <000000000000cdaa560596acbc4e@google.com>
 To:     alexandre.belloni@bootlin.com, andreyknvl@google.com,
-        arnd@arndb.de, gregkh@linuxfoundation.org,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-        lvivier@redhat.com, mchehab+samsung@kernel.org, mpm@selenic.com,
-        syzbot <syzbot+6d8505fcdf25f00ac276@syzkaller.appspotmail.com>,
-        syzkaller-bugs@googlegroups.com, tytso@mit.edu
-Subject: Re: KASAN: use-after-free Read in chaoskey_disconnect
+        arnd@arndb.de, b.zolnierkie@samsung.com,
+        gregkh@linuxfoundation.org, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-usb@vger.kernel.org, lvivier@redhat.com,
+        mchehab+samsung@kernel.org, mpm@selenic.com,
+        syzbot <syzbot+f41c4f7c6d8b0b778780@syzkaller.appspotmail.com>,
+        syzkaller-bugs@googlegroups.com
+Subject: Re: INFO: task hung in chaoskey_disconnect
 From:   Stephen Boyd <swboyd@chromium.org>
 User-Agent: alot/0.8.1
-Date:   Fri, 15 Nov 2019 10:19:20 -0800
+Date:   Fri, 15 Nov 2019 10:47:44 -0800
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Quoting syzbot (2019-10-30 05:52:08)
+Quoting syzbot (2019-11-06 04:32:09)
 > Hello,
 >=20
 > syzbot found the following crash on:
 >=20
-> HEAD commit:    ff6409a6 usb-fuzzer: main usb gadget fuzzer driver
+> HEAD commit:    b1aa9d83 usb: raw: add raw-gadget interface
 > git tree:       https://github.com/google/kasan.git usb-fuzzer
-> console output: https://syzkaller.appspot.com/x/log.txt?x=3D15e1ba24e00000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=3D3230c37d44289=
-5b7
-> dashboard link: https://syzkaller.appspot.com/bug?extid=3D6d8505fcdf25f00=
-ac276
+> console output: https://syzkaller.appspot.com/x/log.txt?x=3D16ae2adce00000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=3D79de80330003b=
+5f7
+> dashboard link: https://syzkaller.appspot.com/bug?extid=3Df41c4f7c6d8b0b7=
+78780
 > compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D169b8904e00=
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D10248158e00=
 000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D166f3104e00000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D16afbf7ce00000
 >=20
 > IMPORTANT: if you fix the bug, please add the following tag to the commit:
-> Reported-by: syzbot+6d8505fcdf25f00ac276@syzkaller.appspotmail.com
+> Reported-by: syzbot+f41c4f7c6d8b0b778780@syzkaller.appspotmail.com
 >=20
 
-Ok, let's try that again
+There are two reports. Let's test this one too.
 
-#syz test: https://github.com/google/kasan.git ff6409a6
+#syz test: https://github.com/google/kasan.git b1aa9d83
 
 diff --git a/drivers/char/random.c b/drivers/char/random.c
 index 5b799aa973a3..c487709499fc 100644
