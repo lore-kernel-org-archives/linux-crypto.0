@@ -6,54 +6,56 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 241ADC432C3
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Nov 2019 06:06:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 507F0C432C3
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Nov 2019 06:06:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 02B9C20718
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Nov 2019 06:06:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3117C20718
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Nov 2019 06:06:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726196AbfKOGGV (ORCPT
+        id S1726986AbfKOGG2 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 Nov 2019 01:06:21 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:57866 "EHLO deadmen.hmeau.com"
+        Fri, 15 Nov 2019 01:06:28 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:57874 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725848AbfKOGGV (ORCPT <rfc822;linux-crypto@vger.kernel.orG>);
-        Fri, 15 Nov 2019 01:06:21 -0500
+        id S1725848AbfKOGG2 (ORCPT <rfc822;linux-crypto@vger.kernel.orG>);
+        Fri, 15 Nov 2019 01:06:28 -0500
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1iVUkO-0004iq-5M; Fri, 15 Nov 2019 14:06:20 +0800
+        id 1iVUkV-0004jM-Kq; Fri, 15 Nov 2019 14:06:27 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1iVUkM-000663-ET; Fri, 15 Nov 2019 14:06:18 +0800
-Date:   Fri, 15 Nov 2019 14:06:18 +0800
+        id 1iVUkV-00066H-HA; Fri, 15 Nov 2019 14:06:27 +0800
+Date:   Fri, 15 Nov 2019 14:06:27 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Pascal van Leeuwen <pascalvanl@gmail.com>
-Cc:     linux-crypto@vger.kernel.org, antoine.tenart@bootlin.com,
-        davem@davemloft.net,
-        Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
-Subject: Re: [PATCH] crypto: inside-secure - Fix hangup during probing for
- EIP97 engine
-Message-ID: <20191115060618.ircolgczknt25lzy@gondor.apana.org.au>
-References: <1573053187-8342-1-git-send-email-pvanleeuwen@verimatrix.com>
+To:     Hao Fang <fanghao11@huawei.com>
+Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linuxarm@huawei.com
+Subject: Re: [PATCH] crypto: hisilicon - add vfs_num module param for zip
+Message-ID: <20191115060627.mvbxgil3py3p3ls5@gondor.apana.org.au>
+References: <1573098509-72682-1-git-send-email-fanghao11@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1573053187-8342-1-git-send-email-pvanleeuwen@verimatrix.com>
+In-Reply-To: <1573098509-72682-1-git-send-email-fanghao11@huawei.com>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Nov 06, 2019 at 04:13:07PM +0100, Pascal van Leeuwen wrote:
-> Fixed mask used for CFSIZE and RFSIZE fields of HIA_OPTIONS register,
-> these were all 1 bit too wide. Which caused the probing of a standard
-> EIP97 to actually hang due to assume way too large descriptor FIFO's.
+On Thu, Nov 07, 2019 at 11:48:29AM +0800, Hao Fang wrote:
+> Currently the VF can be enabled only through sysfs interface
+> after module loaded, but this also needs to be done when the
+> module loaded in some scenarios.
 > 
-> Signed-off-by: Pascal van Leeuwen <pvanleeuwen@verimatrix.com>
+> This patch adds module param vfs_num, adds hisi_zip_sriov_enable()
+> in probe, and also adjusts the position of probe.
+> 
+> Signed-off-by: Hao Fang <fanghao11@huawei.com>
+> Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
 > ---
->  drivers/crypto/inside-secure/safexcel.h | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+>  drivers/crypto/hisilicon/zip/zip_main.c | 182 +++++++++++++++++---------------
+>  1 file changed, 98 insertions(+), 84 deletions(-)
 
 Patch applied.  Thanks.
 -- 
