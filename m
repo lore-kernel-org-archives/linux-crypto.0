@@ -5,50 +5,50 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E4D6C43141
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Nov 2019 10:09:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDCAFC432C3
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Nov 2019 10:24:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 48D112073A
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Nov 2019 10:09:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 922302073C
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Nov 2019 10:24:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=st.com header.i=@st.com header.b="eExy1s42"
+	dkim=pass (2048-bit key) header.d=st.com header.i=@st.com header.b="GKqHP3GV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727142AbfKOKJ2 (ORCPT
+        id S1727220AbfKOKYw (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 Nov 2019 05:09:28 -0500
-Received: from mx08-00178001.pphosted.com ([91.207.212.93]:3826 "EHLO
+        Fri, 15 Nov 2019 05:24:52 -0500
+Received: from mx08-00178001.pphosted.com ([91.207.212.93]:9318 "EHLO
         mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727004AbfKOKJ2 (ORCPT
+        by vger.kernel.org with ESMTP id S1727036AbfKOKYw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 Nov 2019 05:09:28 -0500
+        Fri, 15 Nov 2019 05:24:52 -0500
 Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
-        by mx08-00178001.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xAFA71fq002107;
-        Fri, 15 Nov 2019 11:09:05 +0100
+        by mx08-00178001.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xAFAMjp8021368;
+        Fri, 15 Nov 2019 11:24:30 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=st.com; h=from : to : cc : subject
  : date : message-id : mime-version : content-type; s=STMicroelectronics;
- bh=lAUGW0y2CHBDpVTA3h5ClqMlUAZUqXjeRxzgtQy+rpU=;
- b=eExy1s42e1KDNtXfaE58U+ydiOXEL0+L9ooNaeQ5q1pmb8eWTclk/YHwAbi7HNB3Wlhw
- gJZToY++Da9GOsq6Sfv66K6GYlNhyDtZFrDmtYqx4yZra330admzcM6xSAONAfSugBN0
- SBTaiRQDJNJeZHliLORIbL0p04KliNeqk6Ep7cGguXyNXngvFgwP3k16WzixLOWYTTKg
- +doo/WdM0EAay0pCGaUQvWKbeSy1z7+bcMzKXnJWhMw7dumRWuKOnm6UxpT3tLOUwu1H
- av3EUzSBxXjvZl+ByeDbvk4qaroputh+rfBtp4oM6O3KOTHuOiXznw9R4b9iw+Y8zMqg Vw== 
+ bh=G7/vNr2mUj/ypwdiuuuBONQIOgMUSkIYzFbYwlty4cU=;
+ b=GKqHP3GVDgRYkuv35dVhv4BNGRDvGWOmYbXWI2H3I323pftfCkIoJVDlZiEvbJlI4ReG
+ C1q4xiLL6PgT/CA4ZjB193k2Qi8q6DyGw1taDBjMf+1QY80dtKUl8LeT+6gS/f2yo2at
+ Od2cZ2fk+VHrjIHpkCgtHeoQM2gGRJp3SqEPfmrCq6HDKftO6AXzCuapbU/wlZjRYkp7
+ IfozdDyaXaGpSKoStDjuAja5CwCeHpkhugQZRxQWHRvbIKOdUHNZSq7jrZ1+voChFejF
+ a5g0ZcI7ST5eLcn+E7AlGpiksNjhMHzhY3DvVL6U5ZcM3yXW6w8SKBqA4TinqABaTS1g qQ== 
 Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx08-00178001.pphosted.com with ESMTP id 2w7psfkfqc-1
+        by mx08-00178001.pphosted.com with ESMTP id 2w7psfkjbx-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 15 Nov 2019 11:09:05 +0100
+        Fri, 15 Nov 2019 11:24:30 +0100
 Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id D27AC10003A;
-        Fri, 15 Nov 2019 11:09:03 +0100 (CET)
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 7829A10002A;
+        Fri, 15 Nov 2019 11:24:29 +0100 (CET)
 Received: from Webmail-eu.st.com (sfhdag3node3.st.com [10.75.127.9])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id BC76B2B2520;
-        Fri, 15 Nov 2019 11:09:03 +0100 (CET)
-Received: from localhost (10.75.127.49) by SFHDAG3NODE3.st.com (10.75.127.9)
- with Microsoft SMTP Server (TLS) id 15.0.1347.2; Fri, 15 Nov 2019 11:09:03
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 5FF582B2558;
+        Fri, 15 Nov 2019 11:24:29 +0100 (CET)
+Received: from localhost (10.75.127.50) by SFHDAG3NODE3.st.com (10.75.127.9)
+ with Microsoft SMTP Server (TLS) id 15.0.1347.2; Fri, 15 Nov 2019 11:24:28
  +0100
 From:   Benjamin Gaignard <benjamin.gaignard@st.com>
-To:     <mpm@selenic.com>, <herbert@gondor.apana.org.au>,
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
         <robh+dt@kernel.org>, <mark.rutland@arm.com>,
         <alexandre.torgue@st.com>, <lionel.debieve@st.com>
 CC:     <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
@@ -56,14 +56,14 @@ CC:     <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>,
         Benjamin Gaignard <benjamin.gaignard@st.com>
-Subject: [PATCH] dt-bindings: rng: Convert stm32 RNG bindings to json-schema
-Date:   Fri, 15 Nov 2019 11:08:54 +0100
-Message-ID: <20191115100854.17938-1-benjamin.gaignard@st.com>
+Subject: [PATCH v2] dt-bindings: crypto: Convert stm32 HASH bindings to json-schema
+Date:   Fri, 15 Nov 2019 11:24:27 +0100
+Message-ID: <20191115102427.31224-1-benjamin.gaignard@st.com>
 X-Mailer: git-send-email 2.15.0
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Originating-IP: [10.75.127.49]
-X-ClientProxiedBy: SFHDAG2NODE1.st.com (10.75.127.4) To SFHDAG3NODE3.st.com
+X-Originating-IP: [10.75.127.50]
+X-ClientProxiedBy: SFHDAG7NODE2.st.com (10.75.127.20) To SFHDAG3NODE3.st.com
  (10.75.127.9)
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
  definitions=2019-11-15_02:2019-11-15,2019-11-15 signatures=0
@@ -72,72 +72,77 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Convert the STM32 RNG binding to DT schema format using json-schema
-Remove interrupt from the json-schema because it is not used by the driver.
+Convert the STM32 HASH binding to DT schema format using json-schema
 
 Signed-off-by: Benjamin Gaignard <benjamin.gaignard@st.com>
 ---
- .../devicetree/bindings/rng/st,stm32-rng.txt       | 25 -----------
- .../devicetree/bindings/rng/st,stm32-rng.yaml      | 48 ++++++++++++++++++++++
- 2 files changed, 48 insertions(+), 25 deletions(-)
- delete mode 100644 Documentation/devicetree/bindings/rng/st,stm32-rng.txt
- create mode 100644 Documentation/devicetree/bindings/rng/st,stm32-rng.yaml
+version 2:
+- add type ref, min, max and default values for dma-maxburst property
 
-diff --git a/Documentation/devicetree/bindings/rng/st,stm32-rng.txt b/Documentation/devicetree/bindings/rng/st,stm32-rng.txt
+ .../devicetree/bindings/crypto/st,stm32-hash.txt   | 30 ----------
+ .../devicetree/bindings/crypto/st,stm32-hash.yaml  | 69 ++++++++++++++++++++++
+ 2 files changed, 69 insertions(+), 30 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/crypto/st,stm32-hash.txt
+ create mode 100644 Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
+
+diff --git a/Documentation/devicetree/bindings/crypto/st,stm32-hash.txt b/Documentation/devicetree/bindings/crypto/st,stm32-hash.txt
 deleted file mode 100644
-index 1dfa7d51e006..000000000000
---- a/Documentation/devicetree/bindings/rng/st,stm32-rng.txt
+index 04fc246f02f7..000000000000
+--- a/Documentation/devicetree/bindings/crypto/st,stm32-hash.txt
 +++ /dev/null
-@@ -1,25 +0,0 @@
--STMicroelectronics STM32 HW RNG
--===============================
--
--The STM32 hardware random number generator is a simple fixed purpose IP and
--is fully separated from other crypto functions.
+@@ -1,30 +0,0 @@
+-* STMicroelectronics STM32 HASH
 -
 -Required properties:
--
--- compatible : Should be "st,stm32-rng"
--- reg : Should be register base and length as documented in the datasheet
--- interrupts : The designated IRQ line for the RNG
--- clocks : The clock needed to enable the RNG
+-- compatible: Should contain entries for this and backward compatible
+-  HASH versions:
+-  - "st,stm32f456-hash" for stm32 F456.
+-  - "st,stm32f756-hash" for stm32 F756.
+-- reg: The address and length of the peripheral registers space
+-- interrupts: the interrupt specifier for the HASH
+-- clocks: The input clock of the HASH instance
 -
 -Optional properties:
--- resets : The reset to properly start RNG
--- clock-error-detect : Enable the clock detection management
+-- resets: The input reset of the HASH instance
+-- dmas: DMA specifiers for the HASH. See the DMA client binding,
+-	 Documentation/devicetree/bindings/dma/dma.txt
+-- dma-names: DMA request name. Should be "in" if a dma is present.
+-- dma-maxburst: Set number of maximum dma burst supported
 -
 -Example:
 -
--	rng: rng@50060800 {
--		compatible = "st,stm32-rng";
--		reg = <0x50060800 0x400>;
--		interrupts = <80>;
--		clocks = <&rcc 0 38>;
--	};
-diff --git a/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml b/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml
+-hash1: hash@50060400 {
+-	compatible = "st,stm32f756-hash";
+-	reg = <0x50060400 0x400>;
+-	interrupts = <80>;
+-	clocks = <&rcc 0 STM32F7_AHB2_CLOCK(HASH)>;
+-	resets = <&rcc STM32F7_AHB2_RESET(HASH)>;
+-	dmas = <&dma2 7 2 0x400 0x0>;
+-	dma-names = "in";
+-	dma-maxburst = <0>;
+-};
+diff --git a/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml b/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
 new file mode 100644
-index 000000000000..82bb2e97e889
+index 000000000000..57ae1c0b6d18
 --- /dev/null
-+++ b/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml
-@@ -0,0 +1,48 @@
++++ b/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
+@@ -0,0 +1,69 @@
 +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 +%YAML 1.2
 +---
-+$id: http://devicetree.org/schemas/rng/st,stm32-rng.yaml#
++$id: http://devicetree.org/schemas/crypto/st,stm32-hash.yaml#
 +$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
-+title: STMicroelectronics STM32 RNG bindings
-+
-+description: |
-+  The STM32 hardware random number generator is a simple fixed purpose
-+  IP and is fully separated from other crypto functions.
++title: STMicroelectronics STM32 HASH bindings
 +
 +maintainers:
 +  - Lionel Debieve <lionel.debieve@st.com>
 +
 +properties:
 +  compatible:
-+    const: st,stm32-rng
++    enum:
++      - st,stm32f456-hash
++      - st,stm32f756-hash
 +
 +  reg:
 +    maxItems: 1
@@ -145,26 +150,49 @@ index 000000000000..82bb2e97e889
 +  clocks:
 +    maxItems: 1
 +
++  interrupts:
++    maxItems: 1
++
 +  resets:
 +    maxItems: 1
 +
-+  clock-error-detect:
-+    description: If set enable the clock detection management
++  dmas:
++    maxItems: 1
++
++  dma-names:
++    items:
++      - const: in
++
++  dma-maxburst:
++    description: Set number of maximum dma burst supported
++    allOf:
++      - $ref: /schemas/types.yaml#/definitions/uint32
++      - minimum: 0
++      - maximum: 2
++      - default: 0
 +
 +required:
 +  - compatible
 +  - reg
 +  - clocks
++  - interrupts
 +
 +additionalProperties: false
 +
 +examples:
 +  - |
++    #include <dt-bindings/interrupt-controller/arm-gic.h>
 +    #include <dt-bindings/clock/stm32mp1-clks.h>
-+    rng@54003000 {
-+      compatible = "st,stm32-rng";
-+      reg = <0x54003000 0x400>;
-+      clocks = <&rcc RNG1_K>;
++    #include <dt-bindings/reset/stm32mp1-resets.h>
++    hash@54002000 {
++      compatible = "st,stm32f756-hash";
++      reg = <0x54002000 0x400>;
++      interrupts = <GIC_SPI 80 IRQ_TYPE_LEVEL_HIGH>;
++      clocks = <&rcc HASH1>;
++      resets = <&rcc HASH1_R>;
++      dmas = <&mdma1 31 0x10 0x1000A02 0x0 0x0>;
++      dma-names = "in";
++      dma-maxburst = <2>;
 +    };
 +
 +...
