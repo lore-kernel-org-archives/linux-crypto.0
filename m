@@ -2,91 +2,95 @@ Return-Path: <SRS0=SVjD=ZH=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E021BC432C3
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Nov 2019 06:09:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0363C432C3
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Nov 2019 07:45:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B51EE2072B
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 Nov 2019 06:09:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A71892073C
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 Nov 2019 07:45:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="tUToV5Cj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726182AbfKOGJJ (ORCPT
+        id S1726323AbfKOHpF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 Nov 2019 01:09:09 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:58092 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725848AbfKOGJJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 Nov 2019 01:09:09 -0500
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1iVUmb-0004sE-0W; Fri, 15 Nov 2019 14:08:37 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1iVUmX-000693-CF; Fri, 15 Nov 2019 14:08:33 +0800
-Date:   Fri, 15 Nov 2019 14:08:33 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
-Cc:     Theodore Ts'o <tytso@mit.edu>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Keerthy <j-keerthy@ti.com>, Stephen Boyd <swboyd@chromium.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] random: Don't freeze in add_hwgenerator_randomness() if
- stopping kthread
-Message-ID: <20191115060833.xze5kkq64pxci2la@gondor.apana.org.au>
-References: <20191110135543.3476097-1-mail@maciej.szmigiero.name>
+        Fri, 15 Nov 2019 02:45:05 -0500
+Received: from lelv0143.ext.ti.com ([198.47.23.248]:49766 "EHLO
+        lelv0143.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726308AbfKOHpF (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 15 Nov 2019 02:45:05 -0500
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+        by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id xAF7iuit025070;
+        Fri, 15 Nov 2019 01:44:56 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+        s=ti-com-17Q1; t=1573803896;
+        bh=Xs1on+SjeBN8n1kpYUhiw2Uk25z/evS/GUTsBoExlSw=;
+        h=Subject:To:CC:References:From:Date:In-Reply-To;
+        b=tUToV5CjxEooDYWgx5o5oBFnIEDe4UJlnwTFpFZ0l+/yRxG2odQxCq9YH7MJ9VJJg
+         DoXRburAUpfDPJ2Y7Wjd/JaBJwWBChj5YVpJkap0uoAyimlGvy4HFmtuc0XJrnsJyQ
+         0h/Yuttu0iL9kYbhIl1/ZuO5WnVPUvQrcJ2ZPRKw=
+Received: from DFLE102.ent.ti.com (dfle102.ent.ti.com [10.64.6.23])
+        by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id xAF7iu4h094894
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Fri, 15 Nov 2019 01:44:56 -0600
+Received: from DFLE100.ent.ti.com (10.64.6.21) by DFLE102.ent.ti.com
+ (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3; Fri, 15
+ Nov 2019 01:44:54 -0600
+Received: from fllv0040.itg.ti.com (10.64.41.20) by DFLE100.ent.ti.com
+ (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3 via
+ Frontend Transport; Fri, 15 Nov 2019 01:44:54 -0600
+Received: from [127.0.0.1] (ileax41-snat.itg.ti.com [10.172.224.153])
+        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id xAF7iq2T021849;
+        Fri, 15 Nov 2019 01:44:52 -0600
+Subject: Re: [PATCHv2 09/22] crypto: add timeout to crypto_wait_req
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+CC:     <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
+        <linux-omap@vger.kernel.org>, <ard.biesheuvel@kernel.org>,
+        Eric Biggers <ebiggers@kernel.org>
+References: <20191105140111.20285-1-t-kristo@ti.com>
+ <20191105140111.20285-10-t-kristo@ti.com>
+ <20191115052918.htafn2sch3a6aizv@gondor.apana.org.au>
+From:   Tero Kristo <t-kristo@ti.com>
+Message-ID: <28db6fc9-fa0d-0914-f0e9-9cba53ac16ad@ti.com>
+Date:   Fri, 15 Nov 2019 09:44:51 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191110135543.3476097-1-mail@maciej.szmigiero.name>
-User-Agent: NeoMutt/20170113 (1.7.2)
+In-Reply-To: <20191115052918.htafn2sch3a6aizv@gondor.apana.org.au>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Nov 10, 2019 at 02:55:42PM +0100, Maciej S. Szmigiero wrote:
-> Since commit 59b569480dc8
-> ("random: Use wait_event_freezable() in add_hwgenerator_randomness()")
-> there is a race in add_hwgenerator_randomness() between freezing and
-> stopping the calling kthread.
+On 15/11/2019 07:29, Herbert Xu wrote:
+> On Tue, Nov 05, 2019 at 04:00:58PM +0200, Tero Kristo wrote:
+>> Currently crypto_wait_req waits indefinitely for an async crypto request
+>> to complete. This is bad as it can cause for example the crypto test
+>> manager to hang without any notification as to why it has happened.
+>> Instead of waiting indefinitely, add a 1 second timeout to the call,
+>> and provide a warning print if a timeout happens.
+>>
+>> Signed-off-by: Tero Kristo <t-kristo@ti.com>
+>> ---
+>>   include/linux/crypto.h | 9 ++++++++-
+>>   1 file changed, 8 insertions(+), 1 deletion(-)
 > 
-> This commit changed wait_event_interruptible() call with
-> kthread_freezable_should_stop() as a condition into wait_event_freezable()
-> with just kthread_should_stop() as a condition to fix a warning that
-> kthread_freezable_should_stop() might sleep inside the wait.
-> 
-> wait_event_freezable() ultimately calls __refrigerator() with its
-> check_kthr_stop argument set to false, which causes it to keep the kthread
-> frozen even if somebody calls kthread_stop() on it.
-> 
-> Calling wait_event_freezable() with kthread_should_stop() as a condition
-> is racy because it doesn't take into account the situation where this
-> condition becomes true on a kthread marked for freezing only after this
-> condition has already been checked.
-> 
-> Calling freezing() should avoid the issue that the commit 59b569480dc8 has
-> fixed, as it is only a checking function, it doesn't actually do the
-> freezing.
-> 
-> add_hwgenerator_randomness() has two post-boot users: in khwrng the
-> kthread will be frozen anyway by call to kthread_freezable_should_stop()
-> in its main loop, while its second user (ath9k-hwrng) is not freezable at
-> all.
-> 
-> This change allows a VM with virtio-rng loaded to write s2disk image
-> successfully.
-> 
-> Fixes: 59b569480dc8 ("random: Use wait_event_freezable() in add_hwgenerator_randomness()")
-> Signed-off-by: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
-> ---
->  drivers/char/random.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> As we discussed before this patch is not acceptable because it
+> would cause a use-after-free.
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Yep, its fine to ditch this one as it was provided as just a nice to 
+have initially anyway. Any comments for the rest of the series?
+
+-Tero
+--
+Texas Instruments Finland Oy, Porkkalankatu 22, 00180 Helsinki. Y-tunnus/Business ID: 0615521-4. Kotipaikka/Domicile: Helsinki
