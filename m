@@ -2,122 +2,129 @@ Return-Path: <SRS0=zerQ=ZI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E5F3C43215
-	for <linux-crypto@archiver.kernel.org>; Sat, 16 Nov 2019 16:09:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9119C43141
+	for <linux-crypto@archiver.kernel.org>; Sat, 16 Nov 2019 16:25:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 228C120874
-	for <linux-crypto@archiver.kernel.org>; Sat, 16 Nov 2019 16:09:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=amacapital-net.20150623.gappssmtp.com header.i=@amacapital-net.20150623.gappssmtp.com header.b="bS92H15s"
+	by mail.kernel.org (Postfix) with ESMTP id B0FF12184B
+	for <linux-crypto@archiver.kernel.org>; Sat, 16 Nov 2019 16:25:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1573921511;
+	bh=OKqeG2P+tPeyHFAyZKVWcBe8xkMu2lCZ2qbbeu6ZUeo=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=KVw276scldHQ2epQ/bSV9NMXNBQhONZAM2fddKfKF0zbKI9P4N4nvtNZ56YKnMaqW
+	 zu67h+aR9lsYdfqSUTNTPbAwdIMnqB083AovVD4eNhmxPFAnp1WGeoERwKofKk4KrG
+	 D/KhFC7ayoVoBYmY4EqLDw6ThFvnXjJqopG1pPnU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730390AbfKPQJO (ORCPT
+        id S1728203AbfKPPmL (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 16 Nov 2019 11:09:14 -0500
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:34925 "EHLO
-        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731008AbfKPQJM (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 16 Nov 2019 11:09:12 -0500
-Received: by mail-pl1-f193.google.com with SMTP id s10so6857780plp.2
-        for <linux-crypto@vger.kernel.org>; Sat, 16 Nov 2019 08:09:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amacapital-net.20150623.gappssmtp.com; s=20150623;
-        h=content-transfer-encoding:from:mime-version:subject:date:message-id
-         :references:cc:in-reply-to:to;
-        bh=rbbVOSmMuRnIGDknBjXXfC0fBPASDKYoYUrmo5eNFgM=;
-        b=bS92H15s+5qWORaPy/KpGyd9SsgC655KqQYuSsU9pKNGfk9SJTLqRih+4XIq+ZkOS2
-         +/poIX3KAggHJsmIL0jJM+EurfmUKZRoJ9Bb5rc9SAaN4mUnuVL0u4psU6cMne+FN7vp
-         37n6UpKt+0TZ3XSqaIb7jbEgq6pL0UEzQ6MkRCpb5Id5hwADu+fONtfsT2zYci08+irc
-         miWPM6cogv/xFmoqjRR41ZkQlbnm7Oql0Oxp4oS3u9d+DJyiLsEyCDgbacdlxGsCwHWr
-         ZGwZtccBiL2U/y9DsrLyrdaGrRPsceSG8ipedytZVQBCAmEN0NK/dNnPTzzBSvM1VLxH
-         9XgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:content-transfer-encoding:from:mime-version
-         :subject:date:message-id:references:cc:in-reply-to:to;
-        bh=rbbVOSmMuRnIGDknBjXXfC0fBPASDKYoYUrmo5eNFgM=;
-        b=Do44xrM8ciDOr/T3trL6Sks76Mt0ef6rbVJne1PefmG5MVl4kOv89Ovse+08jBlTGS
-         rZy7GohVHtFO93kJQNU+u5Fd5kKm217YUwy4QO3mgUk794ADuKw+kJEtJB2KfYDyzfRq
-         hWP0IDK0S+7YTHcEyvBfjBufEs7BhzAzeksIoSGvV3p2FJliRbmM+dvZEcC8IlKDe2Ez
-         D85vYUe76Fekd1GTfXPP+AnZui9RF7WbhjuZVGFItCd1ssWebMBjO8o/S8Hnns6L82tX
-         dNYcEYj0l/ah43OFjsNoW6luFzoG/NdM2x1d23PFEyyWnBlbX1IG67677fpseWla+ijr
-         Ez/Q==
-X-Gm-Message-State: APjAAAWB4v5br1JfFf37zheKKGjDKkOiABaNRbwSl8blekYz50WzztiV
-        qf9vFAcn0FWQk7EV/dI9V4oTSw==
-X-Google-Smtp-Source: APXvYqzE6Pi8rl2FiPhLgHMfAfWxumnilALnvG8Q4I2VlRDOhJtY5abcO5MMFPuq46JoQGSuS01GjA==
-X-Received: by 2002:a17:90b:3015:: with SMTP id hg21mr27434228pjb.96.1573920552189;
-        Sat, 16 Nov 2019 08:09:12 -0800 (PST)
-Received: from ?IPv6:2601:646:c200:1ef2:28e6:fc7a:c382:8b6f? ([2601:646:c200:1ef2:28e6:fc7a:c382:8b6f])
-        by smtp.gmail.com with ESMTPSA id r33sm13936396pjb.5.2019.11.16.08.09.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 16 Nov 2019 08:09:11 -0800 (PST)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From:   Andy Lutomirski <luto@amacapital.net>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH v25 10/12] LRNG - add TRNG support
-Date:   Sat, 16 Nov 2019 08:09:09 -0800
-Message-Id: <DDB907EA-3FCC-40C7-B55B-A84BC77FD7A1@amacapital.net>
-References: <5390778.VeFRgus4bQ@positron.chronox.de>
-Cc:     Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        linux-api@vger.kernel.org,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        "Alexander E. Patrakov" <patrakov@gmail.com>,
-        "Ahmed S. Darwish" <darwish.07@gmail.com>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
-        Matthew Garrett <mjg59@srcf.ucam.org>,
-        Vito Caputo <vcaputo@pengaru.com>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
-        William Jon McCann <mccann@jhu.edu>,
-        zhangjs <zachary@baishancloud.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Florian Weimer <fweimer@redhat.com>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Nicolai Stange <nstange@suse.de>,
-        "Peter, Matthias" <matthias.peter@bsi.bund.de>,
-        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
-        Roman Drahtmueller <draht@schaltsekun.de>,
-        Neil Horman <nhorman@redhat.com>
-In-Reply-To: <5390778.VeFRgus4bQ@positron.chronox.de>
-To:     =?utf-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
-X-Mailer: iPhone Mail (17A878)
+        Sat, 16 Nov 2019 10:42:11 -0500
+Received: from mail.kernel.org ([198.145.29.99]:45650 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728191AbfKPPmJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 16 Nov 2019 10:42:09 -0500
+Received: from sasha-vm.mshome.net (unknown [50.234.116.4])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 13F362075B;
+        Sat, 16 Nov 2019 15:42:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1573918928;
+        bh=OKqeG2P+tPeyHFAyZKVWcBe8xkMu2lCZ2qbbeu6ZUeo=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=qt/cUn+ClZmPMPrzTlTuQcXjh847Zqv5VWk+meyQ82KW9GgAwzr7v/cQlLIE1V2Cn
+         kN8kOKEuz+qZ270ZGqeEY0T8Pl/35filyFx/BDjxSWtU0lLEYf8zxmq1I/SxvJ9CfV
+         JZfA58Z/TMCDUizFFH0xSfhDUFTNoji+GQy+6lIw=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Nathan Chancellor <natechancellor@gmail.com>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
+        clang-built-linux@googlegroups.com
+Subject: [PATCH AUTOSEL 4.19 055/237] crypto: ccree - avoid implicit enum conversion
+Date:   Sat, 16 Nov 2019 10:38:10 -0500
+Message-Id: <20191116154113.7417-55-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191116154113.7417-1-sashal@kernel.org>
+References: <20191116154113.7417-1-sashal@kernel.org>
+MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+From: Nathan Chancellor <natechancellor@gmail.com>
 
+[ Upstream commit 18e732b8035d175181aae2ded127994cb01694f7 ]
 
-> On Nov 16, 2019, at 1:40 AM, Stephan M=C3=BCller <smueller@chronox.de> wro=
-te:
->=20
-> =EF=BB=BFThe True Random Number Generator (TRNG) provides a random number
-> generator with prediction resistance (SP800-90A terminology) or an NTG.1
-> (AIS 31 terminology).
->=20
+Clang warns when one enumerated type is implicitly converted to another
+and this happens in several locations in this driver, ultimately related
+to the set_cipher_{mode,config0} functions. set_cipher_mode expects a mode
+of type drv_cipher_mode and set_cipher_config0 expects a mode of type
+drv_crypto_direction.
 
-...
+drivers/crypto/ccree/cc_ivgen.c:58:35: warning: implicit conversion from
+enumeration type 'enum cc_desc_direction' to different enumeration type
+'enum drv_crypto_direction' [-Wenum-conversion]
+        set_cipher_config0(&iv_seq[idx], DESC_DIRECTION_ENCRYPT_ENCRYPT);
 
-> The secondary DRNGs seed from the TRNG if it is present. In addition,
-> the /dev/random device accesses the TRNG.
->=20
-> If the TRNG is disabled, the secondary DRNGs seed from the entropy pool
-> and /dev/random behaves like getrandom(2).
+drivers/crypto/ccree/cc_hash.c:99:28: warning: implicit conversion from
+enumeration type 'enum cc_hash_conf_pad' to different enumeration type
+'enum drv_crypto_direction' [-Wenum-conversion]
+                set_cipher_config0(desc, HASH_DIGEST_RESULT_LITTLE_ENDIAN);
 
-As mentioned before, I don=E2=80=99t like this API.  An application that, fo=
-r some reason, needs a TRNG, should have an API by which it either gets a TR=
-NG or an error. Similarly, an application that wants cryptographically secur=
-e random numbers efficiently should have an API that does that.  With your d=
-esign, /dev/random tries to cater to both use cases, but one of the use case=
-s fails depending on kernel config.
+drivers/crypto/ccree/cc_aead.c:1643:30: warning: implicit conversion
+from enumeration type 'enum drv_hash_hw_mode' to different enumeration
+type 'enum drv_cipher_mode' [-Wenum-conversion]
+        set_cipher_mode(&desc[idx], DRV_HASH_HW_GHASH);
 
-I think /dev/random should wait for enough entropy to initialize the system b=
-ut should not block after that. A TRNG should have an entirely new API that i=
-s better than /dev/random.
+Since this fundamentally isn't a problem because these values just
+represent simple integers for a shift operation, make it clear to Clang
+that this is okay by making the mode parameter in both functions an int.
+
+Link: https://github.com/ClangBuiltLinux/linux/issues/46
+Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
+Acked-by: Gilad Ben-Yossef <gilad@benyossef.com>
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/crypto/ccree/cc_hw_queue_defs.h | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/crypto/ccree/cc_hw_queue_defs.h b/drivers/crypto/ccree/cc_hw_queue_defs.h
+index a091ae57f9024..45985b955d2c8 100644
+--- a/drivers/crypto/ccree/cc_hw_queue_defs.h
++++ b/drivers/crypto/ccree/cc_hw_queue_defs.h
+@@ -449,8 +449,7 @@ static inline void set_flow_mode(struct cc_hw_desc *pdesc,
+  * @pdesc: pointer HW descriptor struct
+  * @mode:  Any one of the modes defined in [CC7x-DESC]
+  */
+-static inline void set_cipher_mode(struct cc_hw_desc *pdesc,
+-				   enum drv_cipher_mode mode)
++static inline void set_cipher_mode(struct cc_hw_desc *pdesc, int mode)
+ {
+ 	pdesc->word[4] |= FIELD_PREP(WORD4_CIPHER_MODE, mode);
+ }
+@@ -461,8 +460,7 @@ static inline void set_cipher_mode(struct cc_hw_desc *pdesc,
+  * @pdesc: pointer HW descriptor struct
+  * @mode: Any one of the modes defined in [CC7x-DESC]
+  */
+-static inline void set_cipher_config0(struct cc_hw_desc *pdesc,
+-				      enum drv_crypto_direction mode)
++static inline void set_cipher_config0(struct cc_hw_desc *pdesc, int mode)
+ {
+ 	pdesc->word[4] |= FIELD_PREP(WORD4_CIPHER_CONF0, mode);
+ }
+-- 
+2.20.1
+
