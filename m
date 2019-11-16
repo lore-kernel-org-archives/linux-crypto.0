@@ -4,55 +4,56 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_LOCAL_HEX,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9105C33C8C
-	for <linux-crypto@archiver.kernel.org>; Sat, 16 Nov 2019 05:55:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60FE7C43215
+	for <linux-crypto@archiver.kernel.org>; Sat, 16 Nov 2019 06:11:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8D33820830
-	for <linux-crypto@archiver.kernel.org>; Sat, 16 Nov 2019 05:55:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 41C0E2073B
+	for <linux-crypto@archiver.kernel.org>; Sat, 16 Nov 2019 06:11:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727577AbfKPFzD (ORCPT
+        id S1725958AbfKPGLB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 16 Nov 2019 00:55:03 -0500
-Received: from mail-il1-f197.google.com ([209.85.166.197]:55609 "EHLO
-        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725830AbfKPFzB (ORCPT
+        Sat, 16 Nov 2019 01:11:01 -0500
+Received: from mail-io1-f72.google.com ([209.85.166.72]:39158 "EHLO
+        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725830AbfKPGLB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 16 Nov 2019 00:55:01 -0500
-Received: by mail-il1-f197.google.com with SMTP id n81so10837781ili.22
-        for <linux-crypto@vger.kernel.org>; Fri, 15 Nov 2019 21:55:00 -0800 (PST)
+        Sat, 16 Nov 2019 01:11:01 -0500
+Received: by mail-io1-f72.google.com with SMTP id e17so8924841ioc.6
+        for <linux-crypto@vger.kernel.org>; Fri, 15 Nov 2019 22:11:00 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
          :from:to;
-        bh=dXuE6yVQzJvOqytcSaHG0bqqilbG2j3QAqOwagl/p+c=;
-        b=iXzQxGgNbP43rXWSOO36QbKK0WaSJcuplj2cnUmQKEe9vhMpyFLGfEDyvm8NAAeuHi
-         XmoTMVAJThuHJWPsSN6nsQuHRMvJNc8VU0ohCaJ0MgLIazIlWlC6AykiAPAusikCkE70
-         ohhpbVqszflOaPrUX5m9W9CzNRcMLWCnCk/QxSPz75gedYwq426eks2yBUgxQaDTa3pi
-         SahCVCCUrVVe8L4I3YTLZP0OYu25N1r75EaL94NIWc0pY21AZxO6EnaMHcMcchP3EDSg
-         dWvFyItWL94cX53G43qx8Ls7/7NvlNEVHzh0MULFMA/0qsQrK8V0RnTmrBPep8BiEuAq
-         VAXg==
-X-Gm-Message-State: APjAAAVvzPbWvCkbv1VokxWbNqtzol6FKL+UVj1JdJSVyN3Mf0k7iql7
-        7WQYA+s1tNakowyDJwH+aI2yk2Dc7V7cJM/c1E0r85h5xVvw
-X-Google-Smtp-Source: APXvYqyEqTcdjT71yvmPMzko+ZqzB53EgTrIeU1q8kq16pRC0ZofyGrbd4WMDNRIJgW0Mfr4/fwmwWXBIy5e1AfxMGO9tgXhfdme
+        bh=vNPB7awq6ab0Up/MfCLVQK9zRNR3FRtQ5ICJDKhkv64=;
+        b=MPOy4YwX/+0AOOAta5CaleK5XckqQiCxeyeGgVhK9WoPXvEvoyGciMPevsUY5W5SRe
+         tjrkZ5uqBZTvJ2OBkhtWyqSbruQ5w5wpwnGLzRVjwMb0TiPqHfSEKcoGJbA55muR2ygk
+         kVTfhB7e13A3XtIaYWCv83dEH9Y8vqVCn34qntmCSDydfoTD3WjEqm/ghjduXu93CJbn
+         h3cEsoGhjNutd0xy2daEVvYqu7fvJDIVLXmjxS8SJHHjlGbly/3mPIxVJzxx6rNiMeGW
+         gQFAsCrpDpxZF8Err+2kRhKrKvP4efBSrNzPQtp3pE9M1QXfcFgZL8vBO5vxYKSCKyP6
+         QmGQ==
+X-Gm-Message-State: APjAAAUSHTOxM/Tz1LowE2BSEmUcmksbOyfMjlcl7OiJIUy/Kqm372yD
+        kxc+Yhnkb6oY6zB5kx42lbCX8BMcBOpeA0vCP+X64R06JnaC
+X-Google-Smtp-Source: APXvYqx8A2MWVMDBL74b9BMW4xCZu2wmDEJD7i4EdqQpKtpfGxhX0ZlXbM1mSOVsehp8Ffr4iaQwKxmXhHX2Bs3zN3rXzZupwcFu
 MIME-Version: 1.0
-X-Received: by 2002:a92:c6d0:: with SMTP id v16mr4756379ilm.274.1573883700380;
- Fri, 15 Nov 2019 21:55:00 -0800 (PST)
-Date:   Fri, 15 Nov 2019 21:55:00 -0800
-In-Reply-To: <5dceec29.1c69fb81.4c2d0.e24d@mx.google.com>
+X-Received: by 2002:a5e:c241:: with SMTP id w1mr4140885iop.274.1573884660392;
+ Fri, 15 Nov 2019 22:11:00 -0800 (PST)
+Date:   Fri, 15 Nov 2019 22:11:00 -0800
+In-Reply-To: <5dcef2d1.1c69fb81.803c0.0872@mx.google.com>
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000e10d500597705abf@google.com>
-Subject: Re: KASAN: use-after-free Read in chaoskey_disconnect
-From:   syzbot <syzbot+6d8505fcdf25f00ac276@syzkaller.appspotmail.com>
+Message-ID: <00000000000019acd8059770942b@google.com>
+Subject: Re: INFO: task hung in chaoskey_disconnect
+From:   syzbot <syzbot+f41c4f7c6d8b0b778780@syzkaller.appspotmail.com>
 To:     alexandre.belloni@bootlin.com, andreyknvl@google.com,
-        arnd@arndb.de, gregkh@linuxfoundation.org,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-        lvivier@redhat.com, mchehab@kernel.org, mpm@selenic.com,
-        swboyd@chromium.org, syzkaller-bugs@googlegroups.com, tytso@mit.edu
+        arnd@arndb.de, b.zolnierkie@samsung.com,
+        gregkh@linuxfoundation.org, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-usb@vger.kernel.org, lvivier@redhat.com, mchehab@kernel.org,
+        mpm@selenic.com, swboyd@chromium.org,
+        syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
@@ -65,15 +66,20 @@ syzbot has tested the proposed patch but the reproducer still triggered
 crash:
 KASAN: use-after-free Read in chaoskey_disconnect
 
-usb 5-1: USB disconnect, device number 2
+usb 3-1: New USB device found, idVendor=1d50, idProduct=60c6,  
+bcdDevice=1a.d7
+usb 3-1: New USB device strings: Mfr=0, Product=0, SerialNumber=0
+usb 3-1: config 0 descriptor??
+usb 3-1: string descriptor 0 read error: -71
+usb 3-1: USB disconnect, device number 14
 ==================================================================
 BUG: KASAN: use-after-free in atomic_read  
 include/asm-generic/atomic-instrumented.h:26 [inline]
 BUG: KASAN: use-after-free in refcount_inc_not_zero_checked+0x72/0x1e0  
 lib/refcount.c:123
-Read of size 4 at addr ffff8881d3106020 by task kworker/0:1/12
+Read of size 4 at addr ffff8881d91ec820 by task kworker/1:2/100
 
-CPU: 0 PID: 12 Comm: kworker/0:1 Not tainted 5.4.0-rc5+ #0
+CPU: 1 PID: 100 Comm: kworker/1:2 Not tainted 5.4.0-rc6+ #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
 Google 01/01/2011
 Workqueue: usb_hub_wq hub_event
@@ -126,7 +132,7 @@ Allocated by task 2:
   kthreadd+0x4a2/0x680 kernel/kthread.c:596
   ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
 
-Freed by task 9:
+Freed by task 0:
   save_stack+0x1b/0x80 mm/kasan/common.c:69
   set_track mm/kasan/common.c:77 [inline]
   kasan_set_free_info mm/kasan/common.c:332 [inline]
@@ -143,35 +149,35 @@ Freed by task 9:
   rcu_core+0x630/0x1ca0 kernel/rcu/tree.c:2377
   __do_softirq+0x221/0x912 kernel/softirq.c:292
 
-The buggy address belongs to the object at ffff8881d3106000
+The buggy address belongs to the object at ffff8881d91ec800
   which belongs to the cache task_struct of size 5888
 The buggy address is located 32 bytes inside of
-  5888-byte region [ffff8881d3106000, ffff8881d3107700)
+  5888-byte region [ffff8881d91ec800, ffff8881d91edf00)
 The buggy address belongs to the page:
-page:ffffea00074c4000 refcount:1 mapcount:0 mapping:ffff8881da116000  
-index:0xffff8881d3101800 compound_mapcount: 0
+page:ffffea0007647a00 refcount:1 mapcount:0 mapping:ffff8881da116000  
+index:0xffff8881d91e9800 compound_mapcount: 0
 flags: 0x200000000010200(slab|head)
-raw: 0200000000010200 dead000000000100 dead000000000122 ffff8881da116000
-raw: ffff8881d3101800 0000000080050004 00000001ffffffff 0000000000000000
+raw: 0200000000010200 0000000000000000 0000000100000001 ffff8881da116000
+raw: ffff8881d91e9800 0000000080050003 00000001ffffffff 0000000000000000
 page dumped because: kasan: bad access detected
 
 Memory state around the buggy address:
-  ffff8881d3105f00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-  ffff8881d3105f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-> ffff8881d3106000: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+  ffff8881d91ec700: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+  ffff8881d91ec780: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+> ffff8881d91ec800: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
                                 ^
-  ffff8881d3106080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-  ffff8881d3106100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+  ffff8881d91ec880: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+  ffff8881d91ec900: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
 ==================================================================
 
 
 Tested on:
 
-commit:         ff6409a6 usb-fuzzer: main usb gadget fuzzer driver
+commit:         b1aa9d83 usb: raw: add raw-gadget interface
 git tree:       https://github.com/google/kasan.git
-console output: https://syzkaller.appspot.com/x/log.txt?x=16dd8772e00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3230c37d442895b7
-dashboard link: https://syzkaller.appspot.com/bug?extid=6d8505fcdf25f00ac276
+console output: https://syzkaller.appspot.com/x/log.txt?x=1498da1ce00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=79de80330003b5f7
+dashboard link: https://syzkaller.appspot.com/bug?extid=f41c4f7c6d8b0b778780
 compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=14236abae00000
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=114dbc8ce00000
 
