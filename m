@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1078C43215
-	for <linux-crypto@archiver.kernel.org>; Sat, 16 Nov 2019 09:41:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E5D3C432C3
+	for <linux-crypto@archiver.kernel.org>; Sat, 16 Nov 2019 09:41:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7958920723
-	for <linux-crypto@archiver.kernel.org>; Sat, 16 Nov 2019 09:41:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 39B4820723
+	for <linux-crypto@archiver.kernel.org>; Sat, 16 Nov 2019 09:41:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="NahxZ3RQ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="iECfLH/1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727512AbfKPJlt (ORCPT
+        id S1727549AbfKPJlw (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 16 Nov 2019 04:41:49 -0500
-Received: from mo4-p04-ob.smtp.rzone.de ([81.169.146.177]:25157 "EHLO
-        mo4-p04-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727242AbfKPJlt (ORCPT
+        Sat, 16 Nov 2019 04:41:52 -0500
+Received: from mo4-p02-ob.smtp.rzone.de ([85.215.255.82]:20986 "EHLO
+        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727431AbfKPJlw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 16 Nov 2019 04:41:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1573897306;
+        Sat, 16 Nov 2019 04:41:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1573897304;
         s=strato-dkim-0002; d=chronox.de;
         h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
         X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=YGPwswFOZRdTyBbzwjBjxcOFP1gds3j+n+lujL6lBlY=;
-        b=NahxZ3RQQhLhQFsZ/qv4jQvfZStiU93VdFj/ul1ZB2OyyRw2y+e4xN41qbqQaIIZP5
-        3hn+zpvMS3h8UsECUv6nhcGRmq71h+m2vqZNg3YOMy6N4Erxz31mQ+vM7RfvU21P/7N5
-        qwrVOoRBjEm/O3E2vLnaVFnW1czSOTsn99faLku0zjFZfDY+DErBP8ddNvEOCCCDqcEk
-        jMP/ZPCJFJlP23Jnvts+s2oM83z2NzwqT1Z7I9/zFXJ204s8V1cRm1Pd9wNwtU5Fh9IX
-        xYH4Q73CHWzWfyWLRbd80e6/cv4Wm22bH0rqhT06u0+5OFPsimd4e+9M3bFiR5rlJeCd
-        0AWQ==
+        bh=nrHgYrY5S5vy1f2QIho5ZBdGlsDnQP66HSM1YfNZId0=;
+        b=iECfLH/1BxHnjzDtEMugQWxw4FeAFz8bpmqvZdPC3J5OCCcowm9MOdyuwNxrGCTrMI
+        Zy4TRnrnMVVq4EheaYYxWlxZxHijemulXJL5jtm9geHbeMPWeqB7EDxbw/hvgXO4XvZO
+        t7+7ehDLbYFlGVeuFg+ytMzYE8rALeSiX7Ci9B8VFRCzwEJgt2JSZ/7yrjIzUXwZdwKA
+        CrKa0h3KakgECTgHgJBgKm7nvt5wb+SmWVdeNWfjUz5W6IOIIjWXvKsNPejO5b/6gpIw
+        h4VpMriKfdPMntBhIfCzBBm6D/G/dGKfWDxTh/p7LdM0z1NU/cQKU5NOLqxt8tlH1lek
+        Wqaw==
 X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9x2YdNp5OujZ6kplo"
 X-RZG-CLASS-ID: mo00
 Received: from positron.chronox.de
         by smtp.strato.de (RZmta 44.29.0 SBL|AUTH)
-        with ESMTPSA id N09a57vAG9eXRID
+        with ESMTPSA id N09a57vAG9eTRI8
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
         (Client did not present a certificate);
-        Sat, 16 Nov 2019 10:40:33 +0100 (CET)
+        Sat, 16 Nov 2019 10:40:29 +0100 (CET)
 From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 To:     Arnd Bergmann <arnd@arndb.de>
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -65,35 +65,120 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
         Roman Drahtmueller <draht@schaltsekun.de>,
         Neil Horman <nhorman@redhat.com>
-Subject: [PATCH v25 06/12] LRNG - add SP800-90A DRBG extension
-Date:   Sat, 16 Nov 2019 10:35:31 +0100
-Message-ID: <2014245.ZDxk4MLLqQ@positron.chronox.de>
+Subject: [PATCH v25 11/12] LRNG - add SP800-90B compliant health tests
+Date:   Sat, 16 Nov 2019 10:37:48 +0100
+Message-ID: <10636626.bcqxjRBM9v@positron.chronox.de>
 In-Reply-To: <2787174.DQlWHN5GGo@positron.chronox.de>
 References: <6157374.ptSnyUpaCn@positron.chronox.de> <2787174.DQlWHN5GGo@positron.chronox.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Using the LRNG switchable DRNG support, the SP800-90A DRBG extension is
-implemented.
+Implement health tests for LRNG's slow noise sources as mandated by
+SP-800-90B The file contains the following health tests:
 
-The DRBG uses the kernel crypto API DRBG implementation. In addition, it
-uses the kernel crypto API SHASH support to provide the hashing
-operation.
+=2D stuck test: The stuck test calculates the first, second and third
+  discrete derivative of the time stamp to be processed by the LFSR.
+  Only if all three values are non-zero, the received time delta is
+  considered to be non-stuck.
 
-The DRBG supports the choice of either a CTR DRBG using AES-256, HMAC
-DRBG with SHA-512 core or Hash DRBG with SHA-512 core. The used core can
-be selected with the module parameter lrng_drbg_type. The default is the
-CTR DRBG.
+=2D SP800-90B Repetition Count Test (RCT): The LRNG uses an enhanced
+  version of the RCT specified in SP800-90B section 4.4.1. Instead of
+  counting identical back-to-back values, the input to the RCT is the
+  counting of the stuck values during the processing of received
+  interrupt events. The RCT is applied with alpha=3D2^-30 compliant to
+  the recommendation of FIPS 140-2 IG 9.8. During the counting operation,
+  the LRNG always calculates the RCT cut-off value of C. If that value
+  exceeds the allowed cut-off value, the LRNG will trigger the health
+  test failure discussed below. An error is logged to the kernel log
+  that such RCT failure occurred. This test is only applied and
+  enforced in FIPS mode, i.e. when the kernel compiled with
+  CONFIG_CONFIG_FIPS is started with fips=3D1.
 
-When compiling the DRBG extension statically, the DRBG is loaded at
-late_initcall stage which implies that with the start of user space, the
-user space interfaces of getrandom(2), /dev/random and /dev/urandom
-provide random data produced by an SP800-90A DRBG.
+=2D SP800-90B Adaptive Proportion Test (APT): The LRNG implements the
+  APT as defined in SP800-90B section 4.4.2. The applied significance
+  level again is alpha=3D2^-30 compliant to the recommendation of FIPS
+  140-2 IG 9.8.
+
+The aforementioned health tests are applied to the first 1,024 time stamps
+obtained from interrupt events. In case one error is identified for either
+the RCT, or the APT, the collected entropy is invalidated and the
+SP800-90B startup health test is restarted.
+
+As long as the SP800-90B startup health test is not completed, all LRNG
+random number output interfaces that may block will block and not generate
+any data. This implies that only those potentially blocking interfaces are
+defined to provide random numbers that are seeded with the interrupt noise
+source being SP800-90B compliant. All other output interfaces will not be
+affected by the SP800-90B startup test and thus are not considered
+SP800-90B compliant.
+
+At runtime, the SP800-90B APT and RCT are applied to each time stamp
+generated for a received interrupt. When either the APT and RCT indicates
+a noise source failure, the LRNG is reset to a state it has immediately
+after boot:
+
+=2D all entropy counters are set to zero
+
+=2D the SP800-90B startup tests are re-performed which implies that
+getrandom(2) would block again until new entropy was collected
+
+To summarize, the following rules apply:
+
+=E2=80=A2 SP800-90B compliant output interfaces
+
+  - /dev/random
+
+  - getrandom(2) system call
+
+  -  get_random_bytes kernel-internal interface when being triggered by
+     the callback registered with add_random_ready_callback
+
+=E2=80=A2 SP800-90B non-compliant output interfaces
+
+  - /dev/urandom
+
+  - get_random_bytes kernel-internal interface called directly
+
+  - randomize_page kernel-internal interface
+
+  - get_random_u32 and get_random_u64 kernel-internal interfaces
+
+  - get_random_u32_wait, get_random_u64_wait, get_random_int_wait, and
+    get_random_long_wait kernel-internal interfaces
+
+If either the RCT, or the APT health test fails irrespective whether
+during initialization or runtime, the following actions occur:
+
+  1. The entropy of the entire entropy pool is invalidated.
+
+  2. The primary and all secondary DRNGs are reset which imply that they
+     are treated as being not seeded and require a reseed during next
+     invocation.
+
+  3. The SP800-90B startup health test are initiated with all
+     implications of the startup tests. That implies that from that point
+     on, new events must be observed and its entropy must be inserted into
+     the entropy pool before random numbers are calculated from the
+     entropy pool.
+
+=46urther details on the SP800-90B compliance and the availability of all
+test tools required to perform all tests mandated by SP800-90B are
+provided at [1].
+
+The entire health testing code is compile-time configurable.
+
+The patch provides a CONFIG_BROKEN configuration of the APT / RCT cutoff
+values which have a high likelihood to trigger the health test failure.
+The BROKEN APT cutoff is set to the exact mean of the expected value if
+the time stamps are equally distributed (512 time stamps divided by 16
+possible values due to using the 4 LSB of the time stamp). The BROKEN
+RCT cutoff value is set to 1 which is likely to be triggered during
+regular operation.
 
 CC: "Eric W. Biederman" <ebiederm@xmission.com>
 CC: "Alexander E. Patrakov" <patrakov@gmail.com>
@@ -112,322 +197,525 @@ CC: Florian Weimer <fweimer@redhat.com>
 CC: Lennart Poettering <mzxreary@0pointer.de>
 CC: Nicolai Stange <nstange@suse.de>
 Reviewed-by: Roman Drahtmueller <draht@schaltsekun.de>
-Tested-by: Roman Drahtm=FCller <draht@schaltsekun.de>
+Tested-by: Roman Drahtm=C3=BCller <draht@schaltsekun.de>
 Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
 Tested-by: Neil Horman <nhorman@redhat.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 =2D--
- drivers/char/lrng/Kconfig     |  11 ++
- drivers/char/lrng/Makefile    |   1 +
- drivers/char/lrng/lrng_drbg.c | 261 ++++++++++++++++++++++++++++++++++
- 3 files changed, 273 insertions(+)
- create mode 100644 drivers/char/lrng/lrng_drbg.c
+ drivers/char/lrng/Kconfig       |  56 +++++
+ drivers/char/lrng/Makefile      |   1 +
+ drivers/char/lrng/lrng_health.c | 409 ++++++++++++++++++++++++++++++++
+ 3 files changed, 466 insertions(+)
+ create mode 100644 drivers/char/lrng/lrng_health.c
 
 diff --git a/drivers/char/lrng/Kconfig b/drivers/char/lrng/Kconfig
-index c6e8eafd836c..dcdf4ef83da5 100644
+index 122d67ee110e..e6ca3acc1e48 100644
 =2D-- a/drivers/char/lrng/Kconfig
 +++ b/drivers/char/lrng/Kconfig
-@@ -59,4 +59,15 @@ menuconfig LRNG_DRNG_SWITCH
- 	  accessible via the external interfaces. With this configuration
- 	  option other DRNGs can be selected and loaded at runtime.
+@@ -113,4 +113,60 @@ config LRNG_TRNG_SUPPORT
+ 	  With the TRNG support the /dev/random device will block
+ 	  if insufficient entropy is available.
 =20
-+if LRNG_DRNG_SWITCH
-+config LRNG_DRBG
-+	tristate "SP800-90A support for the LRNG"
-+	select CRYPTO_DRBG_MENU
-+	select CRYPTO_CMAC if CRYPTO_DRBG_CTR
++config LRNG_HEALTH_TESTS
++	bool "Enable noise source online health tests"
 +	help
-+	  Enable the SP800-90A DRBG support for the LRNG. Once the
-+	  module is loaded, output from /dev/random, /dev/urandom,
-+	  getrandom(2), or get_random_bytes is provided by a DRBG.
-+endif # LRNG_DRNG_SWITCH
++	  The online health tests validate the noise source at
++	  runtime for fatal errors. These tests include SP800-90B
++	  compliant tests which are invoked if the system is booted
++	  with fips=3D1. In case of fatal errors during active
++	  SP800-90B tests, the issue is logged and the noise
++	  data is discarded. These tests are required for full
++	  compliance with SP800-90B.
++
++	  If unsure, say Y.
++
++config LRNG_RCT_BROKEN
++	bool "SP800-90B RCT with dangerous low cutoff value"
++	depends on LRNG_HEALTH_TESTS
++	depends on BROKEN
++	default n
++	help
++	  This option enables a dangerously low SP800-90B repetitive
++	  count test (RCT) cutoff value which makes it very likely
++	  that the RCT is triggered to raise a self test failure.
++
++	  This option is ONLY intended for developers wanting to
++	  test the effectiveness of the SP800-90B RCT health test.
++
++	  If unsure, say N.
++
++config LRNG_APT_BROKEN
++	bool "SP800-90B APT with dangerous low cutoff value"
++	depends on LRNG_HEALTH_TESTS
++	depends on BROKEN
++	default n
++	help
++	  This option enables a dangerously low SP800-90B adaptive
++	  proportion test (APT) cutoff value which makes it very
++	  likely that the RCT is triggered to raise a self test
++	  failure.
++
++	  This option is ONLY intended for developers wanting to
++	  test the effectiveness of the SP800-90B APT health test.
++
++	  If unsure, say N.
++
++# Default taken from SP800-90B sec 4.4.1 - significance level 2^-30
++config LRNG_RCT_CUTOFF
++	int
++	default 30 if !LRNG_RCT_BROKEN
++	default 1 if LRNG_RCT_BROKEN
++
++# Default taken from SP800-90B sec 4.4.2 - significance level 2^-30
++config LRNG_APT_CUTOFF
++	int
++	default 325 if !LRNG_APT_BROKEN
++	default 32 if LRNG_APT_BROKEN
 +
  endif # LRNG
 diff --git a/drivers/char/lrng/Makefile b/drivers/char/lrng/Makefile
-index 6bac97638767..e3a704b3466c 100644
+index 1c72bc060bce..0713e9c0aa6e 100644
 =2D-- a/drivers/char/lrng/Makefile
 +++ b/drivers/char/lrng/Makefile
-@@ -11,3 +11,4 @@ obj-y				+=3D lrng_pool.o lrng_aux.o \
- obj-$(CONFIG_NUMA)		+=3D lrng_numa.o
- obj-$(CONFIG_SYSCTL)		+=3D lrng_proc.o
- obj-$(CONFIG_LRNG_DRNG_SWITCH)	+=3D lrng_switch.o
-+obj-$(CONFIG_LRNG_DRBG)		+=3D lrng_drbg.o
-diff --git a/drivers/char/lrng/lrng_drbg.c b/drivers/char/lrng/lrng_drbg.c
+@@ -15,3 +15,4 @@ obj-$(CONFIG_LRNG_DRBG)		+=3D lrng_drbg.o
+ obj-$(CONFIG_LRNG_KCAPI)	+=3D lrng_kcapi.o
+ obj-$(CONFIG_LRNG_JENT)		+=3D lrng_jent.o
+ obj-$(CONFIG_LRNG_TRNG_SUPPORT)	+=3D lrng_trng.o
++obj-$(CONFIG_LRNG_HEALTH_TESTS)	+=3D lrng_health.o
+diff --git a/drivers/char/lrng/lrng_health.c b/drivers/char/lrng/lrng_healt=
+h.c
 new file mode 100644
-index 000000000000..3b5314f399a2
+index 000000000000..9ea34322e0ae
 =2D-- /dev/null
-+++ b/drivers/char/lrng/lrng_drbg.c
-@@ -0,0 +1,261 @@
++++ b/drivers/char/lrng/lrng_health.c
+@@ -0,0 +1,409 @@
 +// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
 +/*
-+ * Backend for the LRNG providing the cryptographic primitives using the
-+ * kernel crypto API and its DRBG.
++ * Linux Random Number Generator (LRNG) Health Testing
 + *
-+ * Copyright (C) 2016 - 2019, Stephan Mueller <smueller@chronox.de>
++ * Copyright (C) 2019, Stephan Mueller <smueller@chronox.de>
 + */
 +
 +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 +
-+#include <crypto/drbg.h>
-+#include <linux/init.h>
++#include <linux/fips.h>
 +#include <linux/module.h>
-+#include <linux/lrng.h>
 +
-+/*
-+ * Define a DRBG plus a hash / MAC used to extract data from the entropy p=
-ool.
-+ * For LRNG_HASH_NAME you can use a hash or a MAC (HMAC or CMAC) of your c=
-hoice
-+ * (Note, you should use the suggested selections below -- using SHA-1 or =
-MD5
-+ * is not wise). The idea is that the used cipher primitive can be selecte=
-d to
-+ * be the same as used for the DRBG. I.e. the LRNG only uses one cipher
-+ * primitive using the same cipher implementation with the options offered=
- in
-+ * the following. This means, if the CTR DRBG is selected and AES-NI is pr=
-esent,
-+ * both the CTR DRBG and the selected cmac(aes) use AES-NI.
++#include "lrng_internal.h"
++
++/* Stuck Test */
++struct lrng_stuck_test {
++	u32 last_time;		/* Stuck test: time of previous IRQ */
++	u32 last_delta;		/* Stuck test: delta of previous IRQ */
++	u32 last_delta2;	/* Stuck test: 2. time derivation of prev IRQ */
++};
++
++/* Repetition Count Test */
++struct lrng_rct {
++	atomic_t rct_count;	/* Number of stuck values */
++};
++
++/* Adaptive Proportion Test */
++struct lrng_apt {
++	/* Data window size */
++#define LRNG_APT_WINDOW_SIZE	512
++	/* LSB of time stamp to process */
++#define LRNG_APT_LSB		16
++#define LRNG_APT_WORD_MASK	(LRNG_APT_LSB - 1)
++	atomic_t apt_count;		/* APT counter */
++	atomic_t apt_base;		/* APT base reference */
++
++	atomic_t apt_trigger;
++	bool apt_base_set;	/* Is APT base set? */
++};
++
++/* The health test code must operate lock-less */
++struct lrng_health {
++	struct lrng_rct rct;
++	struct lrng_apt apt;
++
++	bool health_test_enabled;
++
++	/* SP800-90B startup health tests */
++#define LRNG_SP80090B_STARTUP_SAMPLES  1024
++#define LRNG_SP80090B_STARTUP_BLOCKS   ((LRNG_SP80090B_STARTUP_SAMPLES + \
++					 LRNG_APT_WINDOW_SIZE - 1) /    \
++					LRNG_APT_WINDOW_SIZE)
++	bool sp80090b_startup_done;
++	atomic_t sp80090b_startup_blocks;
++};
++
++static struct lrng_health lrng_health =3D {
++	.rct.rct_count =3D ATOMIC_INIT(0),
++
++	.apt.apt_count =3D ATOMIC_INIT(0),
++	.apt.apt_base =3D ATOMIC_INIT(-1),
++	.apt.apt_trigger =3D ATOMIC_INIT(LRNG_APT_WINDOW_SIZE),
++	.apt.apt_base_set =3D false,
++
++	.health_test_enabled =3D true,
++
++	.sp80090b_startup_blocks =3D ATOMIC_INIT(LRNG_SP80090B_STARTUP_BLOCKS),
++	.sp80090b_startup_done =3D false,
++};
++
++static DEFINE_PER_CPU(struct lrng_stuck_test, lrng_stuck_test);
++
++static inline bool lrng_sp80090b_health_requested(void)
++{
++	/* Health tests are only requested in FIPS mode */
++	return fips_enabled;
++}
++
++static inline bool lrng_sp80090b_health_enabled(void)
++{
++	struct lrng_health *health =3D &lrng_health;
++
++	return lrng_sp80090b_health_requested() && health->health_test_enabled;
++}
++
++/*************************************************************************=
+**
++ * SP800-90B Compliance
 + *
-+ * The security strengths of the DRBGs are all 256 bits according to
-+ * SP800-57 section 5.6.1.
++ * If the Linux-RNG is booted into FIPS mode, the following interfaces
++ * provide an SP800-90B compliant noise source:
 + *
-+ * This definition is allowed to be changed.
++ * * /dev/random
++ * * getrandom(2)
++ * * get_random_bytes when using it in conjunction with
++ *   add_random_ready_callback
++ *
++ * All other interfaces, including /dev/urandom or get_random_bytes without
++ * the add_random_ready_callback cannot claim to use an SP800-90B compliant
++ * noise source.
++ *************************************************************************=
+**/
++
++/**
++ * Perform SP800-90B startup testing
 + */
-+#ifdef CONFIG_CRYPTO_DRBG_CTR
-+static unsigned int lrng_drbg_type =3D 0;
-+#elif defined CONFIG_CRYPTO_DRBG_HMAC
-+static unsigned int lrng_drbg_type =3D 1;
-+#elif defined CONFIG_CRYPTO_DRBG_HASH
-+static unsigned int lrng_drbg_type =3D 2;
-+#else
-+#error "Unknown DRBG in use"
-+#endif
-+
-+/* The parameter must be r/o in sysfs as otherwise races appear. */
-+module_param(lrng_drbg_type, uint, 0444);
-+MODULE_PARM_DESC(lrng_drbg_type, "DRBG type used for LRNG (0->CTR_DRBG, "
-+				 "1->HMAC_DRBG, 2->Hash_DRBG)");
-+
-+struct lrng_drbg {
-+	const char *hash_name;
-+	const char *drbg_core;
-+};
-+
-+static const struct lrng_drbg lrng_drbg_types[] =3D {
-+	{	/* CTR_DRBG with AES-256 using derivation function */
-+		.hash_name =3D "cmac(aes)",
-+		.drbg_core =3D "drbg_nopr_ctr_aes256",
-+	}, {	/* HMAC_DRBG with SHA-512 */
-+		.hash_name =3D "sha512",
-+		.drbg_core =3D "drbg_nopr_hmac_sha512",
-+	}, {	/* Hash_DRBG with SHA-512 using derivation function */
-+		.hash_name =3D "sha512",
-+		.drbg_core =3D "drbg_nopr_sha512"
-+	}
-+};
-+
-+struct lrng_hash_info {
-+	struct shash_desc shash;
-+	char ctx[];
-+};
-+
-+static int lrng_drbg_drng_seed_helper(void *drng, const u8 *inbuf, u32 inb=
-uflen)
++static inline void lrng_sp80090b_startup(struct lrng_health *health)
 +{
-+	struct drbg_state *drbg =3D (struct drbg_state *)drng;
-+	LIST_HEAD(seedlist);
-+	struct drbg_string data;
-+	int ret;
++	if (!health->sp80090b_startup_done &&
++	    atomic_dec_and_test(&health->sp80090b_startup_blocks)) {
++		health->sp80090b_startup_done =3D true;
++		pr_info("SP800-90B startup health tests completed\n");
++		lrng_init_ops(0);
 +
-+	drbg_string_fill(&data, inbuf, inbuflen);
-+	list_add_tail(&data.list, &seedlist);
-+	ret =3D drbg->d_ops->update(drbg, &seedlist, drbg->seeded);
-+
-+	if (ret >=3D 0)
-+		drbg->seeded =3D true;
-+
-+	return ret;
++		/*
++		 * Force a reseed of secondary DRNGs to ensure they are
++		 * seeded with entropy that passed the SP800-90B health tests.
++		 * As the primary DRNG always will reseed before generating
++		 * random numbers, it does not need a reseed trigger.
++		 */
++		lrng_sdrng_force_reseed();
++	}
 +}
 +
-+static int lrng_drbg_drng_generate_helper(void *drng, u8 *outbuf, u32 outb=
-uflen)
++/**
++ * Handle failure of SP800-90B startup testing
++ */
++static inline void lrng_sp80090b_startup_failure(struct lrng_health *healt=
+h)
 +{
-+	struct drbg_state *drbg =3D (struct drbg_state *)drng;
++	/* Reset of LRNG and its entropy - NOTE: we are in atomic context */
++	lrng_reset();
 +
-+	return drbg->d_ops->generate(drbg, outbuf, outbuflen, NULL);
++	/*
++	 * Reset the SP800-90B startup test.
++	 *
++	 * NOTE SP800-90B section 4.3 bullet 4 does not specify what
++	 * exactly is to be done in case of failure! Thus, we do what
++	 * makes sense, i.e. restarting the health test and thus gating
++	 * the output function of /dev/random and getrandom(2).
++	 */
++	atomic_set(&health->sp80090b_startup_blocks,
++		   LRNG_SP80090B_STARTUP_BLOCKS);
 +}
 +
-+static void *lrng_drbg_drng_alloc(u32 sec_strength)
++/**
++ * Handle failure of SP800-90B runtime testing
++ */
++static inline void lrng_sp80090b_runtime_failure(struct lrng_health *healt=
+h)
 +{
-+	struct drbg_state *drbg;
-+	int coreref =3D -1;
-+	bool pr =3D false;
-+	int ret;
-+
-+	drbg_convert_tfm_core(lrng_drbg_types[lrng_drbg_type].drbg_core,
-+			      &coreref, &pr);
-+	if (coreref < 0)
-+		return ERR_PTR(-EFAULT);
-+
-+	drbg =3D kzalloc(sizeof(struct drbg_state), GFP_KERNEL);
-+	if (!drbg)
-+		return ERR_PTR(-ENOMEM);
-+
-+	drbg->core =3D &drbg_cores[coreref];
-+	drbg->seeded =3D false;
-+	ret =3D drbg_alloc_state(drbg);
-+	if (ret)
-+		goto err;
-+
-+	if (sec_strength > drbg_sec_strength(drbg->core->flags)) {
-+		pr_err("Security strength of DRBG (%u bits) lower than "
-+		       "requested by LRNG (%u bits)\n",
-+			drbg_sec_strength(drbg->core->flags) * 8,
-+			sec_strength * 8);
-+		goto dealloc;
-+	}
-+
-+	if (sec_strength < drbg_sec_strength(drbg->core->flags))
-+		pr_warn("Security strength of DRBG (%u bits) higher than "
-+			"requested by LRNG (%u bits)\n",
-+			drbg_sec_strength(drbg->core->flags) * 8,
-+			sec_strength * 8);
-+
-+	pr_info("DRBG with %s core allocated\n", drbg->core->backend_cra_name);
-+
-+	return drbg;
-+
-+dealloc:
-+	if (drbg->d_ops)
-+		drbg->d_ops->crypto_fini(drbg);
-+	drbg_dealloc_state(drbg);
-+err:
-+	kfree(drbg);
-+	return ERR_PTR(-EINVAL);
++	lrng_sp80090b_startup_failure(health);
++	health->sp80090b_startup_done =3D false;
 +}
 +
-+static void lrng_drbg_drng_dealloc(void *drng)
++static inline void lrng_sp80090b_failure(struct lrng_health *health)
 +{
-+	struct drbg_state *drbg =3D (struct drbg_state *)drng;
-+
-+	drbg_dealloc_state(drbg);
-+	kzfree(drbg);
-+	pr_info("DRBG deallocated\n");
++	if (health->sp80090b_startup_done) {
++		pr_err("SP800-90B runtime health test failure - invalidating "
++		       "all existing entropy and initiate SP800-90B startup\n");
++		lrng_sp80090b_runtime_failure(health);
++	} else {
++		pr_err("SP800-90B startup test failure - resetting\n");
++		lrng_sp80090b_startup_failure(health);
++	}
 +}
 +
-+static void *lrng_drbg_hash_alloc(const u8 *key, u32 keylen)
++/**
++ * Is the SP800-90B startup testing complete?
++ *
++ * This function is called by the LRNG to determine whether to unblock
++ * a certain user interface. Therefore, only the potentially blocking
++ * user interfaces are considered SP800-90B compliant.
++ */
++bool lrng_sp80090b_startup_complete(void)
 +{
-+	struct lrng_hash_info *lrng_hash;
-+	struct crypto_shash *tfm;
-+	int size, ret;
++	struct lrng_health *health =3D &lrng_health;
 +
-+	tfm =3D crypto_alloc_shash(lrng_drbg_types[lrng_drbg_type].hash_name,
-+				 0, 0);
-+	if (IS_ERR(tfm)) {
-+		pr_err("could not allocate hash %s\n",
-+		       lrng_drbg_types[lrng_drbg_type].hash_name);
-+		return ERR_CAST(tfm);
-+	}
++	return (lrng_sp80090b_health_enabled()) ? health->sp80090b_startup_done:
++						  true;
++}
 +
-+	size =3D sizeof(struct lrng_hash_info) + crypto_shash_descsize(tfm);
-+	lrng_hash =3D kmalloc(size, GFP_KERNEL);
-+	if (!lrng_hash) {
-+		crypto_free_shash(tfm);
-+		return ERR_PTR(-ENOMEM);
-+	}
++bool lrng_sp80090b_compliant(void)
++{
++	struct lrng_health *health =3D &lrng_health;
 +
-+	lrng_hash->shash.tfm =3D tfm;
++	return lrng_sp80090b_health_enabled() && health->sp80090b_startup_done;
++}
 +
-+	/* If the used hash is no MAC, ignore the ENOSYS return code */
-+	ret =3D crypto_shash_setkey(tfm, key, keylen);
-+	if (ret && ret !=3D -ENOSYS) {
-+		pr_err("could not set the key for MAC\n");
-+		crypto_free_shash(tfm);
-+		kfree(lrng_hash);
-+		return ERR_PTR(ret);
++/*************************************************************************=
+**
++ * Adaptive Proportion Test
++ *
++ * This test complies with SP800-90B section 4.4.2.
++ *************************************************************************=
+**/
++
++/**
++ * Reset the APT counter
++ *
++ * @health [in] Reference to health state
++ */
++static inline void lrng_apt_reset(struct lrng_health *health,
++				  unsigned int time_masked)
++{
++	struct lrng_apt *apt =3D &health->apt;
++
++	pr_debug("APT value %d for base %d\n",
++		 atomic_read(&apt->apt_count), atomic_read(&apt->apt_base));
++
++	/* Reset APT */
++	atomic_set(&apt->apt_count, 0);
++	atomic_set(&apt->apt_base, time_masked);
++}
++
++static inline void lrng_apt_restart(struct lrng_health *health)
++{
++	struct lrng_apt *apt =3D &health->apt;
++
++	atomic_set(&apt->apt_trigger, LRNG_APT_WINDOW_SIZE);
++}
++
++/**
++ * Insert a new entropy event into APT
++ *
++ * This function does is void as it does not decide about the fate of a ti=
+me
++ * stamp. An APT failure can only happen at the same time of a stuck test
++ * failure. Thus, the stuck failure will already decide how the time stamp
++ * is handled.
++ *
++ * @health [in] Reference to health state
++ * @now_time [in] Time stamp to process
++ */
++static inline void lrng_apt_insert(struct lrng_health *health,
++				   unsigned int now_time)
++{
++	struct lrng_apt *apt =3D &health->apt;
++
++	if (!lrng_sp80090b_health_requested())
++		return;
++
++	now_time &=3D LRNG_APT_WORD_MASK;
++
++	/* Initialization of APT */
++	if (!apt->apt_base_set) {
++		atomic_set(&apt->apt_base, now_time);
++		apt->apt_base_set =3D true;
++		return;
 +	}
 +
-+	pr_info("Hash %s allocated\n",
-+		lrng_drbg_types[lrng_drbg_type].hash_name);
++	if (now_time =3D=3D (unsigned int)atomic_read(&apt->apt_base)) {
++		u32 apt_val =3D (u32)atomic_inc_return_relaxed(&apt->apt_count);
 +
-+	return lrng_hash;
-+}
-+
-+static void lrng_drbg_hash_dealloc(void *hash)
-+{
-+	struct lrng_hash_info *lrng_hash =3D (struct lrng_hash_info *)hash;
-+	struct shash_desc *shash =3D &lrng_hash->shash;
-+	struct crypto_shash *tfm =3D shash->tfm;
-+
-+	crypto_free_shash(tfm);
-+	kfree(lrng_hash);
-+	pr_info("Hash deallocated\n");
-+}
-+
-+static u32 lrng_drbg_hash_digestsize(void *hash)
-+{
-+	struct lrng_hash_info *lrng_hash =3D (struct lrng_hash_info *)hash;
-+	struct shash_desc *shash =3D &lrng_hash->shash;
-+
-+	return crypto_shash_digestsize(shash->tfm);
-+}
-+
-+static int lrng_drbg_hash_buffer(void *hash, const u8 *inbuf, u32 inbuflen,
-+				 u8 *digest)
-+{
-+	struct lrng_hash_info *lrng_hash =3D (struct lrng_hash_info *)hash;
-+	struct shash_desc *shash =3D &lrng_hash->shash;
-+
-+	return crypto_shash_digest(shash, inbuf, inbuflen, digest);
-+}
-+
-+static const char *lrng_drbg_name(void)
-+{
-+	return lrng_drbg_types[lrng_drbg_type].drbg_core;
-+}
-+
-+static const char *lrng_hash_name(void)
-+{
-+	return lrng_drbg_types[lrng_drbg_type].hash_name;
-+}
-+
-+const static struct lrng_crypto_cb lrng_drbg_crypto_cb =3D {
-+	.lrng_drng_name			=3D lrng_drbg_name,
-+	.lrng_hash_name			=3D lrng_hash_name,
-+	.lrng_drng_alloc		=3D lrng_drbg_drng_alloc,
-+	.lrng_drng_dealloc		=3D lrng_drbg_drng_dealloc,
-+	.lrng_drng_seed_helper		=3D lrng_drbg_drng_seed_helper,
-+	.lrng_drng_generate_helper	=3D lrng_drbg_drng_generate_helper,
-+	.lrng_drng_generate_helper_full	=3D lrng_drbg_drng_generate_helper,
-+	.lrng_hash_alloc		=3D lrng_drbg_hash_alloc,
-+	.lrng_hash_dealloc		=3D lrng_drbg_hash_dealloc,
-+	.lrng_hash_digestsize		=3D lrng_drbg_hash_digestsize,
-+	.lrng_hash_buffer		=3D lrng_drbg_hash_buffer,
-+};
-+
-+static int __init lrng_drbg_init(void)
-+{
-+	if (lrng_drbg_type >=3D ARRAY_SIZE(lrng_drbg_types)) {
-+		pr_err("lrng_drbg_type parameter too large (given %u - max: %lu)",
-+		       lrng_drbg_type,
-+		       (unsigned long)ARRAY_SIZE(lrng_drbg_types) - 1);
-+		return -EAGAIN;
++		if (apt_val >=3D CONFIG_LRNG_APT_CUTOFF)
++			lrng_sp80090b_failure(health);
 +	}
-+	return lrng_set_drng_cb(&lrng_drbg_crypto_cb);
++
++	if (atomic_dec_and_test(&apt->apt_trigger)) {
++		lrng_apt_restart(health);
++		lrng_apt_reset(health, now_time);
++		lrng_sp80090b_startup(health);
++	}
 +}
 +
-+static void __exit lrng_drbg_exit(void)
++/*************************************************************************=
+**
++ * Repetition Count Test
++ *
++ * The LRNG uses an enhanced version of the Repetition Count Test
++ * (RCT) specified in SP800-90B section 4.4.1. Instead of counting identic=
+al
++ * back-to-back values, the input to the RCT is the counting of the stuck
++ * values while filling the entropy pool.
++ *
++ * The RCT is applied with an alpha of 2^-30 compliant to FIPS 140-2 IG 9.=
+8.
++ *
++ * During the counting operation, the LRNG always calculates the RCT
++ * cut-off value of C. If that value exceeds the allowed cut-off value,
++ * the LRNG will invalidate all entropy for the entropy pool which implies
++ * that no data can be extracted from the entropy pool unless new entropy
++ * is received.
++ *************************************************************************=
+**/
++
++/**
++ * Hot code path - Insert data for Repetition Count Test
++ *
++ * @health: Reference to health information
++ * @stuck: Decision of stuck test
++ */
++static inline void lrng_rct(struct lrng_health *health, int stuck)
 +{
-+	lrng_set_drng_cb(NULL);
++	struct lrng_rct *rct =3D &health->rct;
++
++	if (!lrng_sp80090b_health_requested())
++		return;
++
++	if (stuck) {
++		u32 rct_count =3D atomic_add_return_relaxed(1, &rct->rct_count);
++
++		pr_debug("RCT count: %u\n", rct_count);
++
++		/*
++		 * The cutoff value is based on the following consideration:
++		 * alpha =3D 2^-30 as recommended in FIPS 140-2 IG 9.8.
++		 * In addition, we imply an entropy value H of 1 bit as this
++		 * is the minimum entropy required to provide full entropy.
++		 *
++		 * Note, rct_count (which equals to value B in the
++		 * pseudo code of SP800-90B section 4.4.1) starts with zero.
++		 * Hence we need to subtract one from the cutoff value as
++		 * calculated following SP800-90B.
++		 */
++		if (rct_count >=3D CONFIG_LRNG_RCT_CUTOFF) {
++			atomic_set(&rct->rct_count, 0);
++
++			/*
++			 * APT must start anew as we consider all previously
++			 * recorded data to contain no entropy.
++			 */
++			lrng_apt_restart(health);
++
++			lrng_sp80090b_failure(health);
++		}
++	} else {
++		atomic_set(&rct->rct_count, 0);
++	}
 +}
 +
-+late_initcall(lrng_drbg_init);
-+module_exit(lrng_drbg_exit);
-+MODULE_LICENSE("Dual BSD/GPL");
-+MODULE_AUTHOR("Stephan Mueller <smueller@chronox.de>");
-+MODULE_DESCRIPTION("Linux Random Number Generator - SP800-90A DRBG backend=
-");
++/*************************************************************************=
+**
++ * Stuck Test
++ *
++ * Checking the:
++ *      1st derivative of the event occurrence (time delta)
++ *      2nd derivative of the event occurrence (delta of time deltas)
++ *      3rd derivative of the event occurrence (delta of delta of time del=
+tas)
++ *
++ * All values must always be non-zero. The stuck test is only valid disabl=
+ed if
++ * high-resolution time stamps are identified after initialization.
++ *************************************************************************=
+**/
++
++static inline u32 lrng_delta(u32 prev, u32 next)
++{
++	/*
++	 * Note that this (unsigned) subtraction does yield the correct value
++	 * in the wraparound-case, i.e. when next < prev.
++	 */
++	return (next - prev);
++}
++
++/**
++ * Hot code path
++ *
++ * @health: Reference to health information
++ * @now: Event time
++ * @return: 0 event occurrence not stuck (good time stamp)
++ *	    !=3D 0 event occurrence stuck (reject time stamp)
++ */
++static inline int lrng_irq_stuck(struct lrng_stuck_test *stuck, u32 now_ti=
+me)
++{
++	u32 delta =3D lrng_delta(stuck->last_time, now_time);
++	u32 delta2 =3D lrng_delta(stuck->last_delta, delta);
++	u32 delta3 =3D lrng_delta(stuck->last_delta2, delta2);
++
++	stuck->last_time =3D now_time;
++	stuck->last_delta =3D delta;
++	stuck->last_delta2 =3D delta2;
++
++	if (!delta || !delta2 || !delta3)
++		return 1;
++
++	return 0;
++}
++
++/*************************************************************************=
+**
++ * Health test interfaces
++ *************************************************************************=
+**/
++
++/**
++ * Disable all health tests
++ */
++void lrng_health_disable(void)
++{
++	struct lrng_health *health =3D &lrng_health;
++
++	health->health_test_enabled =3D false;
++
++	if (lrng_sp80090b_health_requested())
++		pr_warn("SP800-90B compliance requested but the Linux RNG is "
++			"NOT SP800-90B compliant\n");
++}
++
++/**
++ * Hot code path - Perform health test on time stamp received from an event
++ *
++ * @now_time Time stap
++ */
++enum lrng_health_res lrng_health_test(u32 now_time)
++{
++	struct lrng_health *health =3D &lrng_health;
++	struct lrng_stuck_test *stuck_test =3D this_cpu_ptr(&lrng_stuck_test);
++	int stuck;
++
++	if (!health->health_test_enabled)
++		return lrng_health_pass;
++
++	lrng_apt_insert(health, now_time);
++
++	stuck =3D lrng_irq_stuck(stuck_test, now_time);
++	lrng_rct(health, stuck);
++	if (stuck) {
++		/* SP800-90B disallows using a failing health test time stamp */
++		return lrng_sp80090b_health_requested() ?
++			lrng_health_fail_drop : lrng_health_fail_use;
++	}
++
++	return lrng_health_pass;
++}
 =2D-=20
 2.23.0
 
