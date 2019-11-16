@@ -2,178 +2,94 @@ Return-Path: <SRS0=zerQ=ZI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9E0BC43215
-	for <linux-crypto@archiver.kernel.org>; Sat, 16 Nov 2019 18:13:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5728C43141
+	for <linux-crypto@archiver.kernel.org>; Sat, 16 Nov 2019 19:47:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BC88A21882
-	for <linux-crypto@archiver.kernel.org>; Sat, 16 Nov 2019 18:13:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 905A920740
+	for <linux-crypto@archiver.kernel.org>; Sat, 16 Nov 2019 19:47:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eG8Ac8nL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726913AbfKPSN2 convert rfc822-to-8bit (ORCPT
+        id S1727591AbfKPTry (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 16 Nov 2019 13:13:28 -0500
-Received: from mx2.suse.de ([195.135.220.15]:50332 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726009AbfKPSN2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 16 Nov 2019 13:13:28 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id AB08FB15A;
-        Sat, 16 Nov 2019 18:13:25 +0000 (UTC)
-From:   Nicolai Stange <nstange@suse.de>
-To:     Stephan =?utf-8?Q?M=C3=BCller?= <smueller@chronox.de>
-Cc:     Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        linux-api@vger.kernel.org,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        "Alexander E. Patrakov" <patrakov@gmail.com>,
-        "Ahmed S. Darwish" <darwish.07@gmail.com>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
-        Matthew Garrett <mjg59@srcf.ucam.org>,
-        Vito Caputo <vcaputo@pengaru.com>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
-        William Jon McCann <mccann@jhu.edu>,
-        zhangjs <zachary@baishancloud.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Florian Weimer <fweimer@redhat.com>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Nicolai Stange <nstange@suse.de>,
-        "Peter\, Matthias" <matthias.peter@bsi.bund.de>,
-        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
-        Roman Drahtmueller <draht@schaltsekun.de>,
-        Neil Horman <nhorman@redhat.com>
-Subject: Re: [PATCH v25 01/12] Linux Random Number Generator
-References: <6157374.ptSnyUpaCn@positron.chronox.de>
-        <2787174.DQlWHN5GGo@positron.chronox.de>
-        <2645285.kI0haNqfm4@positron.chronox.de>
-Date:   Sat, 16 Nov 2019 19:13:23 +0100
-In-Reply-To: <2645285.kI0haNqfm4@positron.chronox.de> ("Stephan
- \=\?utf-8\?Q\?M\=C3\=BCller\=22's\?\=
-        message of "Sat, 16 Nov 2019 10:33:20 +0100")
-Message-ID: <87mucvadvg.fsf@suse.de>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/25.3 (gnu/linux)
+        Sat, 16 Nov 2019 14:47:54 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:36006 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727473AbfKPTrx (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 16 Nov 2019 14:47:53 -0500
+Received: by mail-wr1-f65.google.com with SMTP id r10so14956323wrx.3;
+        Sat, 16 Nov 2019 11:47:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=kF8bADSuYOyZZ04T0VZZ38WxPOWk9q6i2kAOnZ54aEI=;
+        b=eG8Ac8nL9fJJ4dAxSlZ5w1mlOPQ/aZ44+2vKtS/iCw26fv8FTKt6AqpoUMiPu3pOBr
+         Wm46KJ9wUiA9nhrMoDOjF80R3DNyRC8bbZ/wono9/fKwCBzuAqiDb20MjxrXNtAsY6De
+         xhEIgdFubj2LpSMBCDZZAdpMbZAbYZhggITGNS/o+rMfp0jaNipFl4Hq+nFiJVhl+1Uh
+         0JpZbxWG3JUXhbZZ4U7Huzleg/97V3LYFyoVYvXQYTG120n8YyULMVrGXOmtuuBGJeoT
+         qlr2Fgp4DE3rpVMiXtX2fj8CKHK2833jMMxeacBhAk5/2WzPrTakAsOuIGzxz3DJPKcy
+         1KuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=kF8bADSuYOyZZ04T0VZZ38WxPOWk9q6i2kAOnZ54aEI=;
+        b=BHMW4R5RfhWANla4+AW2CN3TKIbko+oBe+Vpfc7jk0Jbhlj0pIA178x8Aisuwc74XN
+         I3HpXaaKZ2wD0WgZg4vP5hTwqPeb0IGdG49zqaBGxJZlcdiMdlfRtlIn8A2DcsUo9zQm
+         KtsRMqWQ1AQm//bmdcpPvsJG/bL9sBHfVzMGopwViEYhLFABGtaQK11zawbTFk703gk5
+         DrNh/mYxiFG5s6kDJh/KUEgfryAG2odr2TKS+EmD1g/+i6mQocwgVHQWduY/7ggGMwOr
+         IMQQuW0HETh+/NtOPC0kaPp1XL/MVb3ELyH7vAmV5E+2kbSXLLv9VjEFpzkLcPabPOt5
+         laOg==
+X-Gm-Message-State: APjAAAWqnyutIzTALx0eKB45Lg6EP5KygeLTV5GaoAvf/DntzU/S0vd0
+        O3ZxzkOOWproGaA7Mg4B5oc=
+X-Google-Smtp-Source: APXvYqx1+kz8MC/TEjt8V8DXDIvq8MBgjf1a9D6+6mE2GxlbPdRhZqxKarPwAbTsKLoRZIFBdux2BA==
+X-Received: by 2002:adf:8543:: with SMTP id 61mr13202158wrh.171.1573933671822;
+        Sat, 16 Nov 2019 11:47:51 -0800 (PST)
+Received: from Red ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
+        by smtp.googlemail.com with ESMTPSA id 76sm15319821wma.0.2019.11.16.11.47.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 16 Nov 2019 11:47:51 -0800 (PST)
+Date:   Sat, 16 Nov 2019 20:47:48 +0100
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     YueHaibing <yuehaibing@huawei.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Maxime Ripard <mripard@kernel.org>,
+        Chen-Yu Tsai <wens@csie.org>, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH v2 -next] crypto: sun8i-ce - Fix memdup.cocci warnings
+Message-ID: <20191116194748.GA23118@Red>
+References: <20191109024403.47106-1-yuehaibing@huawei.com>
+ <20191112072314.145064-1-yuehaibing@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191112072314.145064-1-yuehaibing@huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Stephan,
+On Tue, Nov 12, 2019 at 07:23:14AM +0000, YueHaibing wrote:
+> Use kmemdup rather than duplicating its implementation
+> 
+> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+> ---
+> v2: fix patch title 'sun8i-ss' -> 'sun8i-ce'
+> ---
+>  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+> 
 
-Stephan Müller <smueller@chronox.de> writes:
+Acked-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 
-> +/* Initialize the default DRNG during boot */
-
-I think that this can get called a bit too early through the
-get_random_bytes() invoked from e.g. boot_init_stack_canary(): in
-start_kernel(), there is
-
-	boot_init_stack_canary();
-
-	time_init();
-
-On ARM (at least with arm_arch_timer.c), get_cycles() would return 0
-until
-
-  time_init() => timer_probe() => arch_timer_of_init() =>
-  arch_timer_common_init() => arch_timer_arch_init() =>
-  arch_timer_delay_timer_register() => register_current_timer_delay()
-
-has executed and thus, ...
-
-> +void lrng_drngs_init_cc20(void)
-> +{
-> +	unsigned long flags = 0;
-> +
-> +	if (lrng_get_available())
-> +		return;
-> +
-> +	lrng_sdrng_lock(&lrng_sdrng_init, &flags);
-> +	if (lrng_get_available()) {
-> +		lrng_sdrng_unlock(&lrng_sdrng_init, &flags);
-> +		return;
-> +	}
-> +
-> +	if (random_get_entropy() || random_get_entropy()) {
-> +		/*
-> +		 * As the highres timer is identified here, previous interrupts
-> +		 * obtained during boot time are treated like a lowres-timer
-> +		 * would have been present.
-> +		 */
-> +		lrng_pool_configure(true, LRNG_IRQ_ENTROPY_BITS);
-> +	} else {
-> +		lrng_health_disable();
-> +		lrng_pool_configure(false, LRNG_IRQ_ENTROPY_BITS *
-> +					   LRNG_IRQ_OVERSAMPLING_FACTOR);
-> +		pr_warn("operating without high-resolution timer and applying "
-> +			"IRQ oversampling factor %u\n",
-> +			LRNG_IRQ_OVERSAMPLING_FACTOR);
-
-
-... LRNG thinks that no high-res timer is available even though there
-is:
-
-[    0.000000] lrng_sdrng: operating without high-resolution timer and applying IRQ oversampling factor 10
-[    0.000000] lrng_chacha20: ChaCha20 core initialized
-[    0.000000] lrng_chacha20: ChaCha20 core initialized
-[    0.000014] sched_clock: 32 bits at 1000kHz, resolution 1000ns, wraps every 2147483647500ns
-[    0.000036] clocksource: timer: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1911260446275 ns
-[    0.000114] bcm2835: system timer (irq = 27)
-[    0.000594] arch_timer: cp15 timer(s) running at 19.20MHz (phys).
-[    0.000613] clocksource: arch_sys_counter: mask: 0xffffffffffffff max_cycles: 0x46d987e47, max_idle_ns: 440795202767 ns
-[    0.000631] sched_clock: 56 bits at 19MHz, resolution 52ns, wraps every 4398046511078ns
-[    0.000645] Switching to timer-based delay loop, resolution 52ns
-
-Note that this last line comes from aforementioned
-register_current_timer_delay().
-
-Similarly, get_random_bytes() can get called quite early through
-WARN() => warn_slowpath_fmt() => __warn() => print_oops_end_marker() =>
-init_oops_id().
-
-Perhaps it would make sense not to do the (pool + health test)
-initalization "on-demand", but rather make sure it happens at some
-well-defined point after time_init()? Or at least that the pool +
-the health tests get reconfigured eventually?
-
-
-Thanks,
-
-Nicolai
-
-P.S: include/linux/lrng.h needs an #include <linux/errno.h> for
-     CONFIG_LRNG_DRNG_SWITCH=n
-
-
-> +	}
-> +
-> +	lrng_sdrng_reset(&lrng_sdrng_init);
-> +	lrng_cc20_init_state(&secondary_chacha20);
-> +	lrng_state_init_seed_work();
-> +	lrng_sdrng_unlock(&lrng_sdrng_init, &flags);
-> +
-> +	lrng_sdrng_lock(&lrng_sdrng_atomic, &flags);
-> +	lrng_sdrng_reset(&lrng_sdrng_atomic);
-> +	/*
-> +	 * We do not initialize the state of the atomic DRNG as it is identical
-> +	 * to the secondary DRNG at this point.
-> +	 */
-> +	lrng_sdrng_unlock(&lrng_sdrng_atomic, &flags);
-> +
-> +	lrng_trng_init();
-> +
-> +	lrng_set_available();
-> +}
-> +
-> +/* Reset LRNG such that all existing entropy is gone */
-
--- 
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg, Germany
-(HRB 36809, AG Nürnberg), GF: Felix Imendörffer
+Thanks
