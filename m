@@ -2,107 +2,148 @@ Return-Path: <SRS0=zerQ=ZI=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACC86C432C3
-	for <linux-crypto@archiver.kernel.org>; Sat, 16 Nov 2019 07:32:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB175C432C3
+	for <linux-crypto@archiver.kernel.org>; Sat, 16 Nov 2019 09:41:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7CBA120728
-	for <linux-crypto@archiver.kernel.org>; Sat, 16 Nov 2019 07:32:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1573889553;
-	bh=zvglgSWJ6QjYIekZR+EO9aF2ale+AA8m4tPCy7g+h3g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=cz9cECXL3B8wmYIxpANaEBDCZpjAMdRi8XfZg3xPIQF+EnyV7ircv4wOf3Jnd52tX
-	 9LqhYkufkESxk8vf0o3/jpmwc2WVB023cqhIwbZcgb+pcEEwD8GAaHq3+UaOhZ37Wo
-	 ZXpPi+UDi5ISKX4TqBIVGEwuuzgnSUL4Kq1uRLFo=
+	by mail.kernel.org (Postfix) with ESMTP id 8B7DB20723
+	for <linux-crypto@archiver.kernel.org>; Sat, 16 Nov 2019 09:41:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="C981fbOJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726174AbfKPHcc (ORCPT
+        id S1727273AbfKPJlq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 16 Nov 2019 02:32:32 -0500
-Received: from mail.kernel.org ([198.145.29.99]:41242 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726156AbfKPHcc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 16 Nov 2019 02:32:32 -0500
-Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 50C5B206D6;
-        Sat, 16 Nov 2019 07:32:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573889551;
-        bh=zvglgSWJ6QjYIekZR+EO9aF2ale+AA8m4tPCy7g+h3g=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Ur+Usnw3CiHyZNjJgShg8J2UL/SY1m5HSqHhHC7GIOcUSF14nqYEAziVq6ciMunLI
-         Y++NsJEqc7p5b3AWLjw5B7lQZRum/YjM8pCE/0uteVGYM2KiVUXCB6xG8afeKPHmFp
-         Ls4y5LNtOcaLbiBlddsyOR4aWgp4KSRlHp/OzBbk=
-Date:   Fri, 15 Nov 2019 23:32:29 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     "Sverdlin, Alexander (Nokia - DE/Ulm)" <alexander.sverdlin@nokia.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Vitaly Andrianov <vitalya@ti.com>
-Subject: Re: [PATCH] hwrng: ks-sa: Add minimum sleep time before ready-polling
-Message-ID: <20191116073229.GA161720@sol.localdomain>
-References: <20191106093019.117233-1-alexander.sverdlin@nokia.com>
- <20191115060610.2sjw7stopxr73jhn@gondor.apana.org.au>
+        Sat, 16 Nov 2019 04:41:46 -0500
+Received: from mo4-p03-ob.smtp.rzone.de ([81.169.146.172]:22280 "EHLO
+        mo4-p03-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727242AbfKPJlq (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 16 Nov 2019 04:41:46 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1573897303;
+        s=strato-dkim-0002; d=chronox.de;
+        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=aPZ/5dq1Q5Q0xxxZcch63UgLnu9JOzeEUdd+tUFCBSE=;
+        b=C981fbOJiDHf4bG3taTRbVrVJshMnolYxUlWabcOZ340MP5M+IBbKZNNlY16bNwtvB
+        odbRjEVVs6cQSxXW/5xwvSsKsJ2B6Ajf8s63hIExwRBs3rIV2fd5fBtvMV5sKT8CaGes
+        i/Ys6tdu4V0f48AiQiXEGdDbtdmpObjPLMZbUdM+D4aHD4MyiMLmPhzQOxRSGFqbVpwj
+        CZ6vaVMiXGBSpy7hi/drBEb1nQNLTa6z/HHaxjv8WuMTN7RcrBt5RtmbRNsuWer9IcDN
+        xzM25Ju/R6odDRpGHs/YSmlEiuRidOAjU/Iap2ga3EiiqpzOCPMNlYSubHXWiXco84qZ
+        8UhQ==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9x2YdNp5OujZ6kplo"
+X-RZG-CLASS-ID: mo00
+Received: from positron.chronox.de
+        by smtp.strato.de (RZmta 44.29.0 SBL|AUTH)
+        with ESMTPSA id N09a57vAG9eWRIB
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
+        (Client did not present a certificate);
+        Sat, 16 Nov 2019 10:40:32 +0100 (CET)
+From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        linux-api@vger.kernel.org,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Nicolai Stange <nstange@suse.de>,
+        "Peter, Matthias" <matthias.peter@bsi.bund.de>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Roman Drahtmueller <draht@schaltsekun.de>,
+        Neil Horman <nhorman@redhat.com>
+Subject: [PATCH v25 08/12] crypto: provide access to a static Jitter RNG state
+Date:   Sat, 16 Nov 2019 10:36:25 +0100
+Message-ID: <4886699.5igGNpkUo8@positron.chronox.de>
+In-Reply-To: <2787174.DQlWHN5GGo@positron.chronox.de>
+References: <6157374.ptSnyUpaCn@positron.chronox.de> <2787174.DQlWHN5GGo@positron.chronox.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191115060610.2sjw7stopxr73jhn@gondor.apana.org.au>
-User-Agent: Mutt/1.12.2 (2019-09-21)
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Nov 15, 2019 at 02:06:10PM +0800, Herbert Xu wrote:
-> On Wed, Nov 06, 2019 at 09:30:49AM +0000, Sverdlin, Alexander (Nokia - DE/Ulm) wrote:
-> > From: Alexander Sverdlin <alexander.sverdlin@nokia.com>
-> > 
-> > Current polling timeout is 25 us. The hardware is currently configured to
-> > harvest the entropy for 81920 us. This leads to timeouts even during
-> > blocking read (wait=1).
-> > 
-> > Log snippet:
-> > [    5.727589] [<c040ffcc>] (ks_sa_rng_probe) from [<c04181e8>] (platform_drv_probe+0x58/0xb4)
-> > ...
-> > [    5.727805] hwrng: no data available
-> > ...
-> > [   13.157016] random: systemd: uninitialized urandom read (16 bytes read)
-> > [   13.157033] systemd[1]: Initializing machine ID from random generator.
-> > ...
-> > [   15.848770] random: fast init done
-> > ...
-> > [   15.848807] random: crng init done
-> > 
-> > After the patch:
-> > [    6.223534] random: systemd: uninitialized urandom read (16 bytes read)
-> > [    6.223551] systemd[1]: Initializing machine ID from random generator.
-> > ...
-> > [    6.876075] random: fast init done
-> > ...
-> > [    6.954200] random: systemd: uninitialized urandom read (16 bytes read)
-> > [    6.955244] random: systemd: uninitialized urandom read (16 bytes read)
-> > ...
-> > [    7.121948] random: crng init done
-> > 
-> > Signed-off-by: Alexander Sverdlin <alexander.sverdlin@nokia.com>
-> > ---
-> >  drivers/char/hw_random/ks-sa-rng.c | 38 ++++++++++++++++++++++++++++++++++++++
-> >  1 file changed, 38 insertions(+)
-> 
-> Patch applied.  Thanks.
+To support the LRNG operation which uses the Jitter RNG separately
+from the kernel crypto API, at a time where potentially the regular
+memory management is not yet initialized, the Jitter RNG needs to
+provide a state whose memory is defined at compile time. As only once
+instance will ever be needed by the LRNG, define once static memory
+block which is solely to be used by the LRNG.
 
-This is causing a build error.  Seems that a line of the patch in
-ks_sa_rng_init() went missing when it was applied...?
+CC: "Eric W. Biederman" <ebiederm@xmission.com>
+CC: "Alexander E. Patrakov" <patrakov@gmail.com>
+CC: "Ahmed S. Darwish" <darwish.07@gmail.com>
+CC: "Theodore Y. Ts'o" <tytso@mit.edu>
+CC: Willy Tarreau <w@1wt.eu>
+CC: Matthew Garrett <mjg59@srcf.ucam.org>
+CC: Vito Caputo <vcaputo@pengaru.com>
+CC: Andreas Dilger <adilger.kernel@dilger.ca>
+CC: Jan Kara <jack@suse.cz>
+CC: Ray Strode <rstrode@redhat.com>
+CC: William Jon McCann <mccann@jhu.edu>
+CC: zhangjs <zachary@baishancloud.com>
+CC: Andy Lutomirski <luto@kernel.org>
+CC: Florian Weimer <fweimer@redhat.com>
+CC: Lennart Poettering <mzxreary@0pointer.de>
+CC: Nicolai Stange <nstange@suse.de>
+Reviewed-by: Roman Drahtmueller <draht@schaltsekun.de>
+Tested-by: Roman Drahtm=FCller <draht@schaltsekun.de>
+Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
+Tested-by: Neil Horman <nhorman@redhat.com>
+Signed-off-by: Stephan Mueller <smueller@chronox.de>
+=2D--
+ crypto/jitterentropy.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-drivers/char/hw_random/ks-sa-rng.c: In function 'ks_sa_rng_init':
-drivers/char/hw_random/ks-sa-rng.c:146:47: error: 'clk_rate' undeclared (first use in this function)
-  146 |  ks_sa_rng->refill_delay_ns = refill_delay_ns(clk_rate);
-      |                                               ^~~~~~~~
-drivers/char/hw_random/ks-sa-rng.c:146:47: note: each undeclared identifier is reported only once for each function it appears in
+diff --git a/crypto/jitterentropy.c b/crypto/jitterentropy.c
+index 77fa2120fe0c..3a815495f778 100644
+=2D-- a/crypto/jitterentropy.c
++++ b/crypto/jitterentropy.c
+@@ -644,3 +644,26 @@ int jent_entropy_init(void)
+=20
+ 	return 0;
+ }
++
++struct rand_data *jent_lrng_entropy_collector(void)
++{
++	static unsigned char lrng_jent_mem[JENT_MEMORY_SIZE];
++	static struct rand_data lrng_jent_state =3D {
++		.data		=3D 0,
++		.old_data	=3D 0,
++		.prev_time	=3D 0,
++		.last_delta	=3D 0,
++		.last_delta2	=3D 0,
++		.osr		=3D 1,
++		.mem		=3D lrng_jent_mem,
++		.memlocation	=3D 0,
++		.memblocks	=3D JENT_MEMORY_BLOCKSIZE,
++		.memblocksize	=3D JENT_MEMORY_BLOCKS,
++		.memaccessloops	=3D JENT_MEMORY_ACCESSLOOPS,
++	};
++
++	if (jent_entropy_init())
++		return NULL;
++
++	return &lrng_jent_state;
++}
+=2D-=20
+2.23.0
+
+
+
+
