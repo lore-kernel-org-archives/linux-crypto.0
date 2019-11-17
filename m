@@ -2,146 +2,104 @@ Return-Path: <SRS0=TGTC=ZJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48077C432C3
-	for <linux-crypto@archiver.kernel.org>; Sun, 17 Nov 2019 06:15:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCC18C432C0
+	for <linux-crypto@archiver.kernel.org>; Sun, 17 Nov 2019 07:59:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 17DF520730
-	for <linux-crypto@archiver.kernel.org>; Sun, 17 Nov 2019 06:15:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8476120730
+	for <linux-crypto@archiver.kernel.org>; Sun, 17 Nov 2019 07:59:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cgOwvPAx"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Vz+ZsF8u"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725978AbfKQGPw (ORCPT
+        id S1725942AbfKQH72 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 17 Nov 2019 01:15:52 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:55736 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725867AbfKQGPv (ORCPT
+        Sun, 17 Nov 2019 02:59:28 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:33785 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725927AbfKQH72 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 17 Nov 2019 01:15:51 -0500
-Received: by mail-wm1-f65.google.com with SMTP id b11so13997058wmb.5;
-        Sat, 16 Nov 2019 22:15:50 -0800 (PST)
+        Sun, 17 Nov 2019 02:59:28 -0500
+Received: by mail-wr1-f66.google.com with SMTP id w9so15861010wrr.0
+        for <linux-crypto@vger.kernel.org>; Sat, 16 Nov 2019 23:59:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=linaro.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=EyNqLWyu6a7Cs2JPGUTSzAWG/6GCveav2mKSjBErowo=;
-        b=cgOwvPAxaH/n63Wg25tXMcm2kFvQNkQ6C3fJxB75FISbd+/+3ZKYYQDA/WdV+ErTMW
-         M+wkpYzIImb61DSmNWELZCAEWsgl6a78nnMyjddYQ7FKpQ/jFh3KK49qbmlNP7oBYvWh
-         z0mYXOrDmM4n+Uq51brbWpFBr52bPV7shjiyJ4iQ0aeHhXphBe3P62AsVcLWmw/HfX0G
-         4lyjpCC7hEdBW4cwdVe/1AAL/Hl9hFFJpzu8DFSCeclPBX3jR1JXTtrq/GH6QdwNs3+9
-         tH7UqbWzA/qR4Pw7mwhIS2w+tY6KOe6Wy2QHhQG/iw//8Tz/nup9KrpKKRc++R1TMVLA
-         TICg==
+        bh=EHzTmPabHB3f7pFdeyNG36fmhjbQWjLIfGD4KILGES0=;
+        b=Vz+ZsF8uCMRFETY+lah2vd36ZQgcXMWlMmzSLkvkjbXdt7c5PeJvgtK+6p6PykHJx3
+         BSNVodjLK9HUpLRud5B3oClqy3O0sHF7WN+xFvr7lp+04q7F4gP0nDZWqnNibcHeJfrF
+         ZciqtYLY18VOAG+2O9K21b3QX+8mtVBAsl0+bEwIcDcsGGZ6L4l4ZXpBBSCCe1ynEb6K
+         +c3X3dzoRy2aBkhfclMjigKKca/9WxP/rA5zwLMrX7S3fyO5C7otuyE22HP3zo7zJ9Xi
+         q4rNgqeBpIi+TB4EtW9hRGFwdBq5EfKqrktNivomg9r7qyHBry+0HK3sRfNhrELzesIi
+         p/aQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=EyNqLWyu6a7Cs2JPGUTSzAWG/6GCveav2mKSjBErowo=;
-        b=L/IjnV4E7EiwSbkbtyC2u0x+Z5g1FAKUcbZ2L5mv2odAih69h+9+WjqyQuokCDqHEK
-         /vbde3CkqzGwsPlTzSBTdXpFPit19+Tbt3Rc6SofYSPIqxT+Y9Rb6RRaia5qZHw5A9Ek
-         MKPuHd5+PTccM48x76H9IffWIt/aam+oz8aAx/ioU4uwMbpk10Mr2hpmQZK2SHKbl08G
-         VwXtGyJryVkJeTNCkCzX/fLYndBLraHaf/GTcQ0LfLecxJxan1mb99h/IS54hs37GFFU
-         9FBCzS/gcECXYGW0ExA1VMtkaHc5uaDhsAN8olz8NvytoS4yD8vggzKszJ2qet387DWp
-         UIvg==
-X-Gm-Message-State: APjAAAX4vbxmE9a3xOovYTUfV8NtJmE+YPnoiDWLXubjjKOlNz7LZmif
-        0H0hb0NQMZPSN4T/Km0Wi/NObKeQ4DKLmWNBvkQ=
-X-Google-Smtp-Source: APXvYqx57AovMcTShdige/GJB4acv8FfpRlEPpn6owfAYHaZ8lJYhiSzJ1E4FBLOQr3BcxVRNA37QNEcUFK2aWHRSqI=
-X-Received: by 2002:a7b:ce11:: with SMTP id m17mr24822936wmc.113.1573971349494;
- Sat, 16 Nov 2019 22:15:49 -0800 (PST)
+        bh=EHzTmPabHB3f7pFdeyNG36fmhjbQWjLIfGD4KILGES0=;
+        b=pQTQZcOmiPjbdwGPK3cR6f+GIDQO5BbjfkrANLqeQbNHJdoXN9MWkLHKJuW+yf1o1v
+         4lRrr3oBk/ELV9NWUtENoGoP7tpSoJ+fJNWfdP1ojw60u691d9imqCx8b3eU3RPzwBkB
+         EJDH9pLhTx6xCFC7pVgqo9zj76slYKPyS5BVCy6giLUwEG77Wv4Xsm14K04Mps2fJuWt
+         N5aDcCTloWl32kRxwp8IjcEe6nPrzsuml12jnCchlZi+8GGmdOC9G1BDng6aADupCP0e
+         ommKuO+8Nt7/TO9zEHXNL7ztgpXalJ4at7NGVgcoIN6vhFdOTtU0sRRQwk2pxV3gKxQs
+         J18w==
+X-Gm-Message-State: APjAAAWCccGd2FZ2XrmoUimw+XXpDl2CsjiRHGCGcfXfwGanIXVBN6sz
+        05APOL38i8UqsvGzRRbbv/X4Ixsl8WwCs3yb5t5m3a59fdG5AQ==
+X-Google-Smtp-Source: APXvYqxY8TGxCLqmFVj1TCsYszRfg+rpwuwDw8LYKGyOy7Or3RdvX6onrk76DvutkWIMh3DW9x13GfBC2MVBsuSOTJo=
+X-Received: by 2002:a5d:6508:: with SMTP id x8mr9793489wru.0.1573977565979;
+ Sat, 16 Nov 2019 23:59:25 -0800 (PST)
 MIME-Version: 1.0
-References: <20191105151353.6522-1-andrew.smirnov@gmail.com>
- <DB7PR04MB4620E3087C59A26B865DEE988B790@DB7PR04MB4620.eurprd04.prod.outlook.com>
- <CAHQ1cqH5hstMwbO1vqOkZ3GVe-j5a+c3TX-yosq-TvuFFxPkHQ@mail.gmail.com>
- <VI1PR0402MB34851C1681F8A18341A8971098760@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <CAHQ1cqFPmJ7AR3ftTyCy4DiE0YQgspPBnp+EQLPOwxXo6tTcYg@mail.gmail.com>
-In-Reply-To: <CAHQ1cqFPmJ7AR3ftTyCy4DiE0YQgspPBnp+EQLPOwxXo6tTcYg@mail.gmail.com>
-From:   Andrey Smirnov <andrew.smirnov@gmail.com>
-Date:   Sat, 16 Nov 2019 22:15:36 -0800
-Message-ID: <CAHQ1cqE2PGKUPfc8SUAw2TkuDXRbFtnyux=bWyOny21KK8dhjA@mail.gmail.com>
-Subject: Re: [PATCH 0/5] CAAM JR lifecycle
-To:     Horia Geanta <horia.geanta@nxp.com>
-Cc:     Vakul Garg <vakul.garg@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Chris Healy <cphealy@gmail.com>,
-        Lucas Stach <l.stach@pengutronix.de>,
+References: <20191117025324.22929-1-ebiggers@kernel.org>
+In-Reply-To: <20191117025324.22929-1-ebiggers@kernel.org>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Sun, 17 Nov 2019 08:59:14 +0100
+Message-ID: <CAKv+Gu9h8TBgKo9ujZ0i+Nr1PRD2Wou-XXj1z=q1xxzRCMO8FA@mail.gmail.com>
+Subject: Re: [PATCH] crypto: mips/chacha - select CRYPTO_SKCIPHER, not CRYPTO_BLKCIPHER
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>,
-        dl-linux-imx <linux-imx@nxp.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+        Ard Biesheuvel <ardb@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Nov 13, 2019 at 11:25 AM Andrey Smirnov
-<andrew.smirnov@gmail.com> wrote:
+On Sun, 17 Nov 2019 at 03:54, Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> On Wed, Nov 13, 2019 at 10:57 AM Horia Geanta <horia.geanta@nxp.com> wrote:
-> >
-> > On 11/6/2019 5:19 PM, Andrey Smirnov wrote:
-> > > On Tue, Nov 5, 2019 at 11:27 PM Vakul Garg <vakul.garg@nxp.com> wrote:
-> > >>
-> > >>
-> > >>
-> > >>> -----Original Message-----
-> > >>> From: linux-crypto-owner@vger.kernel.org <linux-crypto-
-> > >>> owner@vger.kernel.org> On Behalf Of Andrey Smirnov
-> > >>> Sent: Tuesday, November 5, 2019 8:44 PM
-> > >>> To: linux-crypto@vger.kernel.org
-> > >>> Cc: Andrey Smirnov <andrew.smirnov@gmail.com>; Chris Healy
-> > >>> <cphealy@gmail.com>; Lucas Stach <l.stach@pengutronix.de>; Horia Geanta
-> > >>> <horia.geanta@nxp.com>; Herbert Xu <herbert@gondor.apana.org.au>;
-> > >>> Iuliana Prodan <iuliana.prodan@nxp.com>; dl-linux-imx <linux-
-> > >>> imx@nxp.com>; linux-kernel@vger.kernel.org
-> > >>> Subject: [PATCH 0/5] CAAM JR lifecycle
-> > >>>
-> > >>> Everyone:
-> > >>>
-> > >>> This series is a different approach to addressing the issues brought up in
-> > >>> [discussion]. This time the proposition is to get away from creating per-JR
-> > >>> platfrom device, move all of the underlying code into caam.ko and disable
-> > >>> manual binding/unbinding of the CAAM device via sysfs. Note that this series
-> > >>> is a rough cut intented to gauge if this approach could be acceptable for
-> > >>> upstreaming.
-> > >>>
-> > >>> Thanks,
-> > >>> Andrey Smirnov
-> > >>>
-> > >>> [discussion] lore.kernel.org/lkml/20190904023515.7107-13-
-> > >>> andrew.smirnov@gmail.com
-> > >>>
-> > >>> Andrey Smirnov (5):
-> > >>>   crypto: caam - use static initialization
-> > >>>   crypto: caam - introduce caam_jr_cbk
-> > >>>   crypto: caam - convert JR API to use struct caam_drv_private_jr
-> > >>>   crypto: caam - do not create a platform devices for JRs
-> > >>>   crypto: caam - disable CAAM's bind/unbind attributes
-> > >>>
-> > >>
-> > >> To access caam jobrings from DPDK (user space drivers), we unbind job-ring's platform device from the kernel.
-> > >> What would be the alternate way to enable job ring drivers in user space?
-> > >>
-> > >
-> > > Wouldn't either building your kernel with
-> > > CONFIG_CRYPTO_DEV_FSL_CAAM_JR=n (this series doesn't handle that right
-> > > currently due to being a rough cut) or disabling specific/all JRs via
-> > > DT accomplish the same goal?
-> > >
-> > It's not a 1:1 match, the ability to move a ring to user space / VM etc.
-> > *dynamically* goes away.
-> >
+> From: Eric Biggers <ebiggers@google.com>
 >
-> Wouldn't it be possible to do that dynamically using DT overlays? That
-> is "modprobe -r caam; <apply overlay>; modprobe caam"?
+> Another instance of CRYPTO_BLKCIPHER made it in just after it was
+> renamed to CRYPTO_SKCIPHER.  Fix it.
 >
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-Or, alternatively, could adding a module parameter, say "jr_mask", to
-limit JRs controlled by the driver cover dynamic use case?
+Thanks Eric
 
-Thanks,
-Andrey Smirnov
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
+
+> ---
+>  crypto/Kconfig | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/crypto/Kconfig b/crypto/Kconfig
+> index 472c2ad36063..5575d48473bd 100644
+> --- a/crypto/Kconfig
+> +++ b/crypto/Kconfig
+> @@ -1487,7 +1487,7 @@ config CRYPTO_CHACHA20_X86_64
+>  config CRYPTO_CHACHA_MIPS
+>         tristate "ChaCha stream cipher algorithms (MIPS 32r2 optimized)"
+>         depends on CPU_MIPS32_R2
+> -       select CRYPTO_BLKCIPHER
+> +       select CRYPTO_SKCIPHER
+>         select CRYPTO_ARCH_HAVE_LIB_CHACHA
+>
+>  config CRYPTO_SEED
+> --
+> 2.24.0
+>
