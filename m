@@ -2,72 +2,81 @@ Return-Path: <SRS0=TGTC=ZJ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30F50C432C0
-	for <linux-crypto@archiver.kernel.org>; Sun, 17 Nov 2019 02:35:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64E69C432C0
+	for <linux-crypto@archiver.kernel.org>; Sun, 17 Nov 2019 02:54:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F168120730
-	for <linux-crypto@archiver.kernel.org>; Sun, 17 Nov 2019 02:35:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C8B8207DD
+	for <linux-crypto@archiver.kernel.org>; Sun, 17 Nov 2019 02:54:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1573958111;
-	bh=LNFsYyHzWydQXy/hj8/dS4SZ/uOhWm03xbFzignN6Q4=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
-	b=Xl8DGcB47pHqE51pGid/cVoq7igMX4FFCSFout1jjCW1g+Z+8zaKuS3dyScDdC3au
-	 uo51e5PFIK/0PWS3JF0lDrcNCv3N49SxypbYXbOEc/iyp+x4Cw/SUTWgKsj9bCXdXS
-	 CGw4T3j10Q3it9LDWu+wbjNILL1g114cHd1J8tms=
+	s=default; t=1573959279;
+	bh=PaRIDoe+WalcGjTj41xoWyjoqJ7HCGiAD/E0e3C9vVU=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=oxtiTAnxHEzqO3WroLxehA+dc2ZRU+igjLIEAK6dOoOC+5FPNP+Z2vmrmXq6VjsHL
+	 f9mejLIPvJ7K6J1KWNWr0LysZhL8kOnXJy5xOZvTXwyf27vd2m6vie2ChzdE509UKn
+	 zYl1pUw/DybzY6uWBMQHjuyD1TUTqqQN+9t7RNjY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725880AbfKQCfH (ORCPT
+        id S1725880AbfKQCyh (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 16 Nov 2019 21:35:07 -0500
-Received: from mail.kernel.org ([198.145.29.99]:36216 "EHLO mail.kernel.org"
+        Sat, 16 Nov 2019 21:54:37 -0500
+Received: from mail.kernel.org ([198.145.29.99]:43200 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725839AbfKQCfH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 16 Nov 2019 21:35:07 -0500
-Subject: Re: [GIT PULL] Crypto Fixes for 5.4
+        id S1725839AbfKQCyh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 16 Nov 2019 21:54:37 -0500
+Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1EAEC207DD;
+        Sun, 17 Nov 2019 02:54:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1573958107;
-        bh=LNFsYyHzWydQXy/hj8/dS4SZ/uOhWm03xbFzignN6Q4=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=usyXxb2mi+c+hSxpbTIDfXSqf6qsc9CNnOophWj4Yh8/7obRDuVGulwdOe+it6iXd
-         5XdM50voZLE5WiqJcKNSPcqN8ezhvlWXLx9NFRKJub8S3QQStlCnPS5VizAkufzopb
-         ZOQybPAlsRKxNyHr7c/c03eUlWUZKG/dGv1UsZts=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20191117010036.7vww6vqrakv3avkw@gondor.apana.org.au>
-References: <20190916084901.GA20338@gondor.apana.org.au>
- <20190923050515.GA6980@gondor.apana.org.au>
- <20191010123849.GA30001@gondor.apana.org.au>
- <20191117010036.7vww6vqrakv3avkw@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20191117010036.7vww6vqrakv3avkw@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-X-PR-Tracked-Commit-Id: 08e97aec700aeff54c4847f170e566cbd7e14e81
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 1d4c79ed324ad780cfc3ad38364ba1fd585dd2a8
-Message-Id: <157395810692.19691.18012672586585444784.pr-tracker-bot@kernel.org>
-Date:   Sun, 17 Nov 2019 02:35:06 +0000
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        s=default; t=1573959277;
+        bh=PaRIDoe+WalcGjTj41xoWyjoqJ7HCGiAD/E0e3C9vVU=;
+        h=From:To:Cc:Subject:Date:From;
+        b=TsL0IEHiCEF0xACNH3rkfHob2O6wUsbhaqixpo4z9f34XmwEyX2eNN7RZcJauPs2C
+         W2vLULiGvv88PLaWXhw5+1ZnrD4GXCdvghWoiVNVYq/mcKGxCd1a6aH0ClyBkfDjsH
+         riHAeOSVLuRypuZdNT6rKfU2f4QYguOXx3XjbEEo=
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-crypto@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH] crypto: mips/chacha - select CRYPTO_SKCIPHER, not CRYPTO_BLKCIPHER
+Date:   Sat, 16 Nov 2019 18:53:24 -0800
+Message-Id: <20191117025324.22929-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.24.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pull request you sent on Sun, 17 Nov 2019 09:00:36 +0800:
+From: Eric Biggers <ebiggers@google.com>
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+Another instance of CRYPTO_BLKCIPHER made it in just after it was
+renamed to CRYPTO_SKCIPHER.  Fix it.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/1d4c79ed324ad780cfc3ad38364ba1fd585dd2a8
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thank you!
-
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 472c2ad36063..5575d48473bd 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -1487,7 +1487,7 @@ config CRYPTO_CHACHA20_X86_64
+ config CRYPTO_CHACHA_MIPS
+ 	tristate "ChaCha stream cipher algorithms (MIPS 32r2 optimized)"
+ 	depends on CPU_MIPS32_R2
+-	select CRYPTO_BLKCIPHER
++	select CRYPTO_SKCIPHER
+ 	select CRYPTO_ARCH_HAVE_LIB_CHACHA
+ 
+ config CRYPTO_SEED
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+2.24.0
+
