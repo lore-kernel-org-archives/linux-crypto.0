@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C39DC432C0
-	for <linux-crypto@archiver.kernel.org>; Mon, 18 Nov 2019 07:59:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B200C432C0
+	for <linux-crypto@archiver.kernel.org>; Mon, 18 Nov 2019 07:59:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 24DB720692
-	for <linux-crypto@archiver.kernel.org>; Mon, 18 Nov 2019 07:59:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DCAC92073A
+	for <linux-crypto@archiver.kernel.org>; Mon, 18 Nov 2019 07:59:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=brennan.io header.i=stephen@brennan.io header.b="a33RF1a+"
+	dkim=pass (1024-bit key) header.d=brennan.io header.i=stephen@brennan.io header.b="cpe26Rcf"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726314AbfKRH7V (ORCPT
+        id S1726475AbfKRH7n (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 18 Nov 2019 02:59:21 -0500
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21401 "EHLO
+        Mon, 18 Nov 2019 02:59:43 -0500
+Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21455 "EHLO
         sender4-of-o54.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726283AbfKRH7V (ORCPT
+        with ESMTP id S1726332AbfKRH7n (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 18 Nov 2019 02:59:21 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1574063909; cv=none; 
+        Mon, 18 Nov 2019 02:59:43 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1574063913; cv=none; 
         d=zohomail.com; s=zohoarc; 
-        b=Rc/20lkRyjUTL1pXtxaJuUuGL6Qy5iJf9domOrYQzp0dV7kTzUIId9MgtxymtHz8eW9RxfivYILm4WAx5Jvckm1YzecjcOeIHzE6SdnH6/okt9b/VJImBA0kry/OiihPLM1rSa6P8/slgkqAQkAO9rQmx2/fjQEeMmkoysH9gQ4=
+        b=Xk3i65B4Fu5x4VFH4ySsKzvsxbJO8zq+L05B611f30tGjhtITbjeA83awA2Q672Biu6cpGKIsn8umUiousOZLwOEsQxmSX/Wa7929nUDz75yPVUKGBC2cOQtsXcak6injbiGnpTpkh1N6wbfjIn4mNKkbKHrNpIqs/0AxRdHuns=
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-        t=1574063909; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To; 
-        bh=cfu4tgSh/ZEFa8HY5V7AvfFEMPP8yuNAhIRi2KmoYKY=; 
-        b=BATyhYXAZYAvgFtIi7Dds4pzApisEa2g0tbZSqJYoVJ9brOEazPmFpws7HMzPPzMZbDN2I/HSjycg1Uhv3rTVIoE64o9Cnr/qb946pR80D8WUsSEjaXNu3ir98oDNqNoruFkZfetGNHNMO0o0qOQUF05shLaPF9sFv5EOkuQb5o=
+        t=1574063913; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To; 
+        bh=rnDOXSZ5PSkKW71tjFE4P0SpeDfoougigqcTZkEQtXI=; 
+        b=RnIQVKi4hXA2dQ8ac8gNEsOOTJowF+cpfvkILkMsbyZTXdaVtYolqbrMbp8UwF+mYQiJf7lRhLalRBpzau1Spb0J0ACztNqyiEhuwb1vYKqLgDVPIq93u8ITwBDigz0iKyrmfazFQbPPzPPWPciHxpUzHvBHBFRoiX6cHj+jxDg=
 ARC-Authentication-Results: i=1; mx.zohomail.com;
         dkim=pass  header.i=brennan.io;
         spf=pass  smtp.mailfrom=stephen@brennan.io;
         dmarc=pass header.from=<stephen@brennan.io> header.from=<stephen@brennan.io>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1574063909;
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1574063913;
         s=selector01; d=brennan.io; i=stephen@brennan.io;
         h=From:To:Cc:Message-ID:Subject:Date:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Content-Type;
-        l=881; bh=cfu4tgSh/ZEFa8HY5V7AvfFEMPP8yuNAhIRi2KmoYKY=;
-        b=a33RF1a+B9CYq7VVkL5/b8DhfRPEp5pkdGOtbev4kuka5D2uuM2xocwxcS961KUD
-        SO3U4qTgJ3+23IuCXVYkAgSx2xpVaMwiF0QYGMXPGNRVC5wqg1rg9xzDJGod4d7T8E8
-        B+AoMbzrEPmEHnJk17ZEa3ioxzfoLDe74N8WQfHo=
+        l=1520; bh=rnDOXSZ5PSkKW71tjFE4P0SpeDfoougigqcTZkEQtXI=;
+        b=cpe26RcfhGlm7P/YpwYbB0VyjPEXbGW/F2PpjV214dtdUTxLjbWG/Ui6hXz/9dLk
+        wosu0VD+cIhsMExFhUtJoQZDvbWr2Tjjfp8PoE7MuyJnWnoVgfVgL29lTentLPPnXP3
+        SSGn7jYKIV+yoj0o1D1/IjaGGV0sgtedLIQF9XOI=
 Received: from localhost (195.173.24.136.in-addr.arpa [136.24.173.195]) by mx.zohomail.com
-        with SMTPS id 1574063908686965.880928958745; Sun, 17 Nov 2019 23:58:28 -0800 (PST)
+        with SMTPS id 1574063912030754.6313842017521; Sun, 17 Nov 2019 23:58:32 -0800 (PST)
 From:   Stephen Brennan <stephen@brennan.io>
 To:     stephen@brennan.io
 Cc:     Matt Mackall <mpm@selenic.com>,
@@ -60,9 +60,9 @@ Cc:     Matt Mackall <mpm@selenic.com>,
         linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
         linux-rpi-kernel@lists.infradead.org
-Message-ID: <20191118075807.165126-2-stephen@brennan.io>
-Subject: [PATCH 1/3] dt-bindings: rng: add BCM2711 RNG compatible
-Date:   Sun, 17 Nov 2019 23:58:05 -0800
+Message-ID: <20191118075807.165126-3-stephen@brennan.io>
+Subject: [PATCH 2/3] hwrng: iproc-rng200: Add support for BCM2711
+Date:   Sun, 17 Nov 2019 23:58:06 -0800
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20191118075807.165126-1-stephen@brennan.io>
 References: <20191118075807.165126-1-stephen@brennan.io>
@@ -77,27 +77,44 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Stefan Wahren <wahrenst@gmx.net>
 
-The BCM2711 has a RNG200 block, so document its compatible string.
+BCM2711 features a RNG200 hardware random number generator block.
+So make the driver available.
 
 Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
 Signed-off-by: Stephen Brennan <stephen@brennan.io>
 ---
- Documentation/devicetree/bindings/rng/brcm,iproc-rng200.txt | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/char/hw_random/Kconfig        | 2 +-
+ drivers/char/hw_random/iproc-rng200.c | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/devicetree/bindings/rng/brcm,iproc-rng200.txt b/=
-Documentation/devicetree/bindings/rng/brcm,iproc-rng200.txt
-index c223e54452da..802523196ee5 100644
---- a/Documentation/devicetree/bindings/rng/brcm,iproc-rng200.txt
-+++ b/Documentation/devicetree/bindings/rng/brcm,iproc-rng200.txt
-@@ -2,6 +2,7 @@ HWRNG support for the iproc-rng200 driver
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfi=
+g
+index 7c7fecfa2fb2..77e848fca531 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -90,7 +90,7 @@ config HW_RANDOM_BCM2835
 =20
- Required properties:
- - compatible : Must be one of:
-+=09       "brcm,bcm2711-rng200"
- =09       "brcm,bcm7211-rng200"
- =09       "brcm,bcm7278-rng200"
- =09       "brcm,iproc-rng200"
+ config HW_RANDOM_IPROC_RNG200
+ =09tristate "Broadcom iProc/STB RNG200 support"
+-=09depends on ARCH_BCM_IPROC || ARCH_BRCMSTB
++=09depends on ARCH_BCM_IPROC || ARCH_BCM2835 || ARCH_BRCMSTB
+ =09default HW_RANDOM
+ =09---help---
+ =09  This driver provides kernel-side support for the RNG200
+diff --git a/drivers/char/hw_random/iproc-rng200.c b/drivers/char/hw_random=
+/iproc-rng200.c
+index 899ff25f4f28..32d9fe61a225 100644
+--- a/drivers/char/hw_random/iproc-rng200.c
++++ b/drivers/char/hw_random/iproc-rng200.c
+@@ -213,6 +213,7 @@ static int iproc_rng200_probe(struct platform_device *p=
+dev)
+ }
+=20
+ static const struct of_device_id iproc_rng200_of_match[] =3D {
++=09{ .compatible =3D "brcm,bcm2711-rng200", },
+ =09{ .compatible =3D "brcm,bcm7211-rng200", },
+ =09{ .compatible =3D "brcm,bcm7278-rng200", },
+ =09{ .compatible =3D "brcm,iproc-rng200", },
 --=20
 2.24.0
 
