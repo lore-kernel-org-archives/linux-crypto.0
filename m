@@ -2,110 +2,100 @@ Return-Path: <SRS0=iOo2=ZK=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F330BC432C0
-	for <linux-crypto@archiver.kernel.org>; Mon, 18 Nov 2019 08:00:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1258C432C0
+	for <linux-crypto@archiver.kernel.org>; Mon, 18 Nov 2019 08:12:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CC32C20740
-	for <linux-crypto@archiver.kernel.org>; Mon, 18 Nov 2019 08:00:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7BB622084C
+	for <linux-crypto@archiver.kernel.org>; Mon, 18 Nov 2019 08:12:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=brennan.io header.i=stephen@brennan.io header.b="anV7HRl7"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="DHIf2G7Z"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726744AbfKRIAG (ORCPT
+        id S1726698AbfKRIMd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 18 Nov 2019 03:00:06 -0500
-Received: from sender4-of-o54.zoho.com ([136.143.188.54]:21416 "EHLO
-        sender4-of-o54.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726332AbfKRIAG (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 18 Nov 2019 03:00:06 -0500
-ARC-Seal: i=1; a=rsa-sha256; t=1574063917; cv=none; 
-        d=zohomail.com; s=zohoarc; 
-        b=YE3ZdikWrz4vU1wnKMshg3aH2E9+RlQgSCVV+br1F91F1PuwLieEtIvZvoKrgjOwY04gbq6CseB7hmzWfRWHRw7w+XXHWD74F4gYyBf1qGBToBah6MhfA9nYZ7uZBml+5d6589ujXt5UPlJWxuIBND3tX5RAkSLVkeuoI6mevfM=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-        t=1574063917; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:To; 
-        bh=SqUaBIpR2mccPD6jr20GE5M0X9vjxDDNdgLp2NxZva8=; 
-        b=VbjBKVhlbPDXrHTk9ZxSJ/Mbtm6iuhEV80+RtOhFRgX6rOH8Uh3qhgcWlh9Nvob6E/XVwozQHv0aXQPaL8pZqYz+3Xm0ccbemPFpvRrtMLEx13KyloMw5Kt8NI3NvfjgV2MANyy1Gc/+u0c4BM75lrwXbNcSFRndAnQR6Pt+Rzw=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-        dkim=pass  header.i=brennan.io;
-        spf=pass  smtp.mailfrom=stephen@brennan.io;
-        dmarc=pass header.from=<stephen@brennan.io> header.from=<stephen@brennan.io>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1574063917;
-        s=selector01; d=brennan.io; i=stephen@brennan.io;
-        h=From:To:Cc:Message-ID:Subject:Date:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Content-Type;
-        l=928; bh=SqUaBIpR2mccPD6jr20GE5M0X9vjxDDNdgLp2NxZva8=;
-        b=anV7HRl7bKqk4mHo2jeLLWqW3ZBdNO6/iS8FDjt7rIsjIXtvSDQHIA07RUh0kNm/
-        ynOfFc0UVtWYGRrWy6/YaGFfPU5v/P2jpMLVN5DYd5zYfV+Gmbbqos0UQrF4uQfHbM+
-        YoXP6BNOK8ivrGQ3+nUcWLaQOmJ98s3VCV5PZkqg=
-Received: from localhost (195.173.24.136.in-addr.arpa [136.24.173.195]) by mx.zohomail.com
-        with SMTPS id 1574063915435914.3658986565996; Sun, 17 Nov 2019 23:58:35 -0800 (PST)
-From:   Stephen Brennan <stephen@brennan.io>
-To:     stephen@brennan.io
-Cc:     Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        bcm-kernel-feedback-list@broadcom.com,
-        Eric Anholt <eric@anholt.net>,
-        Stefan Wahren <wahrenst@gmx.net>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-rpi-kernel@lists.infradead.org
-Message-ID: <20191118075807.165126-4-stephen@brennan.io>
-Subject: [PATCH 3/3] ARM: dts: bcm2711: Enable HWRNG support
-Date:   Sun, 17 Nov 2019 23:58:07 -0800
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20191118075807.165126-1-stephen@brennan.io>
-References: <20191118075807.165126-1-stephen@brennan.io>
+        Mon, 18 Nov 2019 03:12:33 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:52035 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726875AbfKRIMa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 18 Nov 2019 03:12:30 -0500
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 47GhWt6MCHz9sR8;
+        Mon, 18 Nov 2019 19:12:26 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1574064747;
+        bh=Ylcv/kAcskiEgYIYi4TminUt71+ufYVaNqcwaor7E8c=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=DHIf2G7ZB+cL+eBkxIPvCu1EjLMZWxzzns94iTyTeLzbfBPA61/Tqsnu+09y7azC0
+         T1XAp2boKqnROXrHLsvArwOxw9RH3/DCdHXd+MpENTLVppLBb+bqHZEeYjowBiCHz6
+         5dWvkduh+e1HkqImBBas7dBU5lpnjxEafRvswr7BY4FIjNmRBF0RwLvCVpz/Xi9SOL
+         RhIuKlWpXGYF601KiV3jhvogxKQei9mq2GVcYr/cin3ujGqoNbBLOBTzsDtoVLhpJ2
+         AtafywVaatEd8+uhHZwOqgtozNlOfRFaLCtDRg4DKKazzUZ9wV7E9PZ3IQD9zkboQR
+         Qlg67yn9dUqpg==
+Date:   Mon, 18 Nov 2019 19:12:23 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: linux-next: Fixes tag needs some work in the crypto tree
+Message-ID: <20191118191223.1b7c11a9@canb.auug.org.au>
+In-Reply-To: <MN2PR20MB2973E1EAD50B58826FCEC763CA4D0@MN2PR20MB2973.namprd20.prod.outlook.com>
+References: <20191116101954.33672f2d@canb.auug.org.au>
+        <MN2PR20MB2973E1EAD50B58826FCEC763CA4D0@MN2PR20MB2973.namprd20.prod.outlook.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-ZohoMailClient: External
-Content-Type: text/plain; charset=utf8
+Content-Type: multipart/signed; boundary="Sig_/t+UzsCG2yRIu++9O0gVcY2h";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Stefan Wahren <wahrenst@gmx.net>
+--Sig_/t+UzsCG2yRIu++9O0gVcY2h
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-This enables hardware random number generator support for the BCM2711
-on the Raspberry Pi 4 board.
+Hi Pascal,
 
-Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
-Signed-off-by: Stephen Brennan <stephen@brennan.io>
----
- arch/arm/boot/dts/bcm2711.dtsi | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+On Mon, 18 Nov 2019 07:58:42 +0000 Pascal Van Leeuwen <pvanleeuwen@verimatr=
+ix.com> wrote:
+>
+> My bad, I didn't know the Fixes tag should not be broken over
+> lines (and that rather conflicted with the 75 characters per
+> line rule here, which is why I did break it up).
+>=20
+> I'm willing to fix that - except that I don't know how to create
+> a patch that _only_ fixes the commit description of something=20
+> already pulled into the cryptodev tree?
 
-diff --git a/arch/arm/boot/dts/bcm2711.dtsi b/arch/arm/boot/dts/bcm2711.dts=
-i
-index ac83dac2e6ba..2c19e5de284a 100644
---- a/arch/arm/boot/dts/bcm2711.dtsi
-+++ b/arch/arm/boot/dts/bcm2711.dtsi
-@@ -92,10 +92,9 @@ pm: watchdog@7e100000 {
- =09=09};
-=20
- =09=09rng@7e104000 {
-+=09=09=09compatible =3D "brcm,bcm2711-rng200";
- =09=09=09interrupts =3D <GIC_SPI 125 IRQ_TYPE_LEVEL_HIGH>;
--
--=09=09=09/* RNG is incompatible with brcm,bcm2835-rng */
--=09=09=09status =3D "disabled";
-+=09=09=09status =3D "okay";
- =09=09};
-=20
- =09=09uart2: serial@7e201400 {
+Unless Herbert wants to rebase the crypto tree (and I think this is not
+a good reason to do that), you should just consider this a learning
+experience. :-)
+
 --=20
-2.24.0
+Cheers,
+Stephen Rothwell
 
+--Sig_/t+UzsCG2yRIu++9O0gVcY2h
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
+-----BEGIN PGP SIGNATURE-----
 
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl3SUmcACgkQAVBC80lX
+0GwDlAf8ClZ7n/HmuTyieT433MqwtF26pB9zw9iswQ709v1gNpWzMT5xdfba2JKr
+Vnvci9i0a02Op4c5gX0rQiB3a2k0FFb+jNA+Y68qk5iRvGE1EjD9u4V38xsErH9s
+v0penDIX9T8t83KRpdSNQHWbL2ZU0VOoKz5kRYBWe/XU2aW0DdMk74XrBeVIVhLD
+BwAK8LHOTdgQwlZoRIfGAjMeTJuagvUUC5RGPX72WXxn3WzUcJIH3IK0Y5/IaHqH
+pbAdAEYyEk1RYr4FveBhnDT0CcFkXTMlbU0LsXAD9dY1eaZ3efK7o2ZSPxpWKo8e
+iIRE73ISn4nGzBdtnlyQBttgX6Fxrg==
+=gpYR
+-----END PGP SIGNATURE-----
+
+--Sig_/t+UzsCG2yRIu++9O0gVcY2h--
