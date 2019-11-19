@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B46AC432C0
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Nov 2019 15:05:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE7C0C432C0
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Nov 2019 15:06:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E57B5222CD
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Nov 2019 15:05:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9BB1F222B0
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Nov 2019 15:06:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="Pc+UREXu"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="fPYbFEu9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728060AbfKSPFQ (ORCPT
+        id S1728197AbfKSPGw (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 Nov 2019 10:05:16 -0500
-Received: from mail-eopbgr20055.outbound.protection.outlook.com ([40.107.2.55]:57060
-        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
+        Tue, 19 Nov 2019 10:06:52 -0500
+Received: from mail-eopbgr70058.outbound.protection.outlook.com ([40.107.7.58]:6069
+        "EHLO EUR04-HE1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727066AbfKSPFQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 Nov 2019 10:05:16 -0500
+        id S1728183AbfKSPGv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 19 Nov 2019 10:06:51 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Y3J7sl6K6BbWEBa0jVfc+TRXZ9cO0NVO9RP6hcsyN/yi239OxqVlRu3tNcB2Z4PvKo1exIrxiqiFeRlwugxwCvSDHHyV38AtzLyUyH+/TLkK4Hqd5HCHTvw9JqbY9K7VONkTR3NOO9SeS3OS6JyeOqBQhAdjUOvIACx4YWDoN1vz6+d+P3ayeMtAPn5L03ScXzB02Wdyy4EEW/jbLzUypXOfDfSI5HZFnf925VeroL1RgnEyFdDfgyd9IpU7L2ytWcccyPS8/E0ZvyfEZ+Ks0X9ivwSBpROCgzM0YJFMX2/Q07dCBOLfifFoyREY6kkxQAHNmCn/yAgwT4l89585mQ==
+ b=nHCOGUGQ3Jrm6MjpwTHDr8turWDsxAKlPKp0aZT5Fc3nUfjGriSvnFK12LLroLLg0IApefTl30jz27PMyHJIqiYGig5aiAY5+rYg4J2HibGdsrFdUFhG1BBZ9hvKSJqiiUgwtLIFab7I8TTLjO1JA+5pZDBod6VmOJN05LcqzE0EZECEj63O8JE9IRjcRLKjQfLKXnQeFOii8ZjrzPg/R3p4tUA+vp/urRZsqGaT/47KS2ff++L6B2HhYtVkm8FOW12XOM3taGsR2oXn3e+cvalV3VaDcTcvL+A5RHxPblKj9FAKccX85jc7GEuJy0ZmcJ/i+GSMTccUIG4h/MiQ2g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=X/k4jdrsDHtc82q20JIAXTpNLKbFGNMFBc3vbvMQueM=;
- b=Mt04W/NMoWeRpq3/7Snt+b/IOEEpaDiqnyCTOW7IETGPqvqjD08qBySsRcq/t7vKRAq84DhA30y4a+AJh3OdXIkyn/8qWworm+syR5IBxp1LdnGCDP/mEr/Beu8rWzzXH0gwe6un7/Qv/0Ly/7rpCHgvHhZ/ZVz/hQuLlrqWSjQb+JshvQyhrIGIfkrYNO2KUlDbu1Z9o9atTZTCsJflYdST7V/GcFmw9U/NF+9lSuVN7axPZxYfMpnOrZ4M/J/Ij6zd3yoVOhaCfD+aF2fLZAHLpND4wndzwy1NSxZNomB7guehQ9wtwELU+9lyaSq7YIJRLVLWzZjr5mtMj9H49Q==
+ bh=Idkh/xqgBlrEs054AVuq2VLyBHuLFRPtOBflyt4hIL0=;
+ b=EmosnYE93ZLTvy4vDJcTVOB45keRU0w4FJ5c49j7NPipSZF2Nf7JuHXpomqLI0c+W3kooGVB/VNdBDZAoh5Jcj+HnG9Hq0+CtwCI/PM6ywtl83SVGtMoPFH02jVagFT+VNQrYUIdMr/NBKGl4b/NrfSm4ODCoN0jfyh5mYZlA6e6Ltef2GmlTLuvX5Q2eCcXQtXIDiOtnryY20YTD5/NCNFdnT214JIfX/uNorKu2yiVQ9KcpzS3JMpwKfFstAmJuXKKqRvdvej6KHofzTxWrkFOXeFntB4dyIBtBrw1l9mVVLWE28s8pl14N1hPpKWfdATZeaPA6nT8mAYcC+stPQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=X/k4jdrsDHtc82q20JIAXTpNLKbFGNMFBc3vbvMQueM=;
- b=Pc+UREXu8lqQCsXzNWSxR7ohpM5dU2daF/96S3b7RdqqTH4B3R01doXIiBit3ckBV0x8ruReQ8TDGqlhUeKXBpR/+U2MGxDaUtEavFu/iollH8d8u7wLBEa3SaK2GBFDMEJZKhX7PUjPaEZ/oJUZpJ9ql6uy3QSOVQLzw7YIJIQ=
+ bh=Idkh/xqgBlrEs054AVuq2VLyBHuLFRPtOBflyt4hIL0=;
+ b=fPYbFEu9f43ITgeBGC90eYHBFwKJowdaSZpbYDN51H0/bdd+nvQbMu3xSg3NP13fegaG2HgA/swXqjeR6j9rbCjJj+QTD4+TkUvHS01pkJ43AwFFVnV3m88HUtbpfEU7t1fyMKnffDzSihGnyxMzeMPxmw5w3kZJ52BIM50t6AA=
 Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB3920.eurprd04.prod.outlook.com (52.134.17.140) with Microsoft SMTP
+ VI1PR0402MB2927.eurprd04.prod.outlook.com (10.175.23.145) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2451.27; Tue, 19 Nov 2019 15:05:12 +0000
+ 15.20.2451.23; Tue, 19 Nov 2019 15:06:48 +0000
 Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
  ([fe80::89e1:552e:a24d:e72]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
  ([fe80::89e1:552e:a24d:e72%3]) with mapi id 15.20.2474.015; Tue, 19 Nov 2019
- 15:05:12 +0000
+ 15:06:48 +0000
 From:   Horia Geanta <horia.geanta@nxp.com>
 To:     Iuliana Prodan <iuliana.prodan@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -55,13 +55,15 @@ CC:     "David S. Miller" <davem@davemloft.net>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         dl-linux-imx <linux-imx@nxp.com>
-Subject: Re: [PATCH 04/12] crypto: caam - refactor ahash_edesc_alloc
-Thread-Topic: [PATCH 04/12] crypto: caam - refactor ahash_edesc_alloc
-Thread-Index: AQHVnZazrPktEYxsFUGlA3OloV904g==
-Date:   Tue, 19 Nov 2019 15:05:12 +0000
-Message-ID: <VI1PR0402MB3485A8C1320F32659B95776B984C0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+Subject: Re: [PATCH 05/12] crypto: caam - refactor RSA private key _done
+ callbacks
+Thread-Topic: [PATCH 05/12] crypto: caam - refactor RSA private key _done
+ callbacks
+Thread-Index: AQHVnZazsI3fpRN49USmTfGT8iFAAw==
+Date:   Tue, 19 Nov 2019 15:06:48 +0000
+Message-ID: <VI1PR0402MB34857BE41F9A3571F0D2C0BF984C0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
 References: <1574029845-22796-1-git-send-email-iuliana.prodan@nxp.com>
- <1574029845-22796-5-git-send-email-iuliana.prodan@nxp.com>
+ <1574029845-22796-6-git-send-email-iuliana.prodan@nxp.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -71,46 +73,39 @@ authentication-results: spf=none (sender IP is )
 x-originating-ip: [212.146.100.6]
 x-ms-publictraffictype: Email
 x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 0da5732f-9645-4150-9d36-08d76d01e06e
-x-ms-traffictypediagnostic: VI1PR0402MB3920:|VI1PR0402MB3920:
+x-ms-office365-filtering-correlation-id: 5f6ad517-f679-4556-1f3b-08d76d0219e3
+x-ms-traffictypediagnostic: VI1PR0402MB2927:|VI1PR0402MB2927:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <VI1PR0402MB39203C03D04FA7A8DD458102984C0@VI1PR0402MB3920.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4502;
+x-microsoft-antispam-prvs: <VI1PR0402MB2927F14316A051159A1FDE2C984C0@VI1PR0402MB2927.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:425;
 x-forefront-prvs: 022649CC2C
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(136003)(376002)(346002)(39860400002)(396003)(189003)(199004)(33656002)(4744005)(102836004)(25786009)(229853002)(7696005)(66446008)(26005)(81166006)(8676002)(52536014)(64756008)(4326008)(86362001)(81156014)(91956017)(14444005)(256004)(76116006)(76176011)(14454004)(8936002)(99286004)(44832011)(486006)(476003)(5660300002)(3846002)(446003)(66556008)(66476007)(71190400001)(71200400001)(6246003)(66946007)(6636002)(6116002)(186003)(2906002)(478600001)(66066001)(6436002)(55016002)(54906003)(110136005)(316002)(74316002)(305945005)(53546011)(6506007)(7736002)(9686003);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3920;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(346002)(396003)(366004)(39860400002)(376002)(189003)(199004)(558084003)(52536014)(186003)(74316002)(5660300002)(256004)(26005)(476003)(91956017)(102836004)(446003)(6506007)(66556008)(66066001)(486006)(64756008)(66446008)(44832011)(66476007)(53546011)(76176011)(76116006)(33656002)(7696005)(3846002)(6116002)(6246003)(55016002)(229853002)(6636002)(71190400001)(25786009)(66946007)(71200400001)(86362001)(478600001)(14454004)(54906003)(2906002)(8676002)(305945005)(8936002)(7736002)(4326008)(99286004)(316002)(6436002)(110136005)(81156014)(81166006)(9686003);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB2927;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
 received-spf: None (protection.outlook.com: nxp.com does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: zXJ+sCIvzUUmYbl30N97QBu6xZZGT/vjXT+Uer9pa8PyOpMJEmdxzzTErUNg9Jd4qftjKjBM2SRwgCqJ0F8hi7Pve/Wg+qC21lFUf+ndOXpjJ7xGmhZ8AD232tjDnEndlAjKPT67z25SyuIDkMyf6Qtr5JP/vbU++dpFntkskUfng+j+RJhLKB8oez2gqV3moh7B4dOdcwKgslYAaKhv0ek/ol1Teh7bveP7lY5TnCboCsuWgewUUgTkpD8SOiz8aFmE7bG/BeRA4+NsAAXYiO9Ts8QHFtCliWZISNJzMSYyTP8yCbBFJTRa7S1dUAW72VGaq4oPInQ+mqI/g5Td5YnLISZDCfqyiycF3kdHV8mj0AVKuGOmtTFmBb7vHhKuhlEvlcI1YJpyEBbi+nWA+0TmrGHU6po7/nQ6rp780W+Xb69hvrCzxwwNLiLkdOil
+x-microsoft-antispam-message-info: c+FQ5g0JnGwf3mxvA2uFCO9P47Y+ln/zEclTjBf/waLgW1n24pX50XSt5QtLgpwzQVv1udbnSU8EFpPqN34YwIiRWnisEsWbSyKrH1aPPLgvBn9SmahlJIq+crurDL6bwF8P+8X2h419/ZlM+w6IA9GwwfDv6D9VZ/fL8lbXexLoLPNwtSbHrrfqJEJmlQLTOEmLxA8UBKJcGMzm9dIQbIpiCzr2EYNgZkc5WLTwrqHXjv0mTTRVW7RjzzZV4V6x4WJUruDPBIMsrTpgYWmHyjhTXO2LtvYnijeTijL2ZnDGp/dR4LI1o/QSB5/b+WYt6kl6KBQccvJnH4HC01wRAWlkHFm08iKB1673g54N2lJamVASz32Nsu0H5w/k/qTqsSs400PCQL9StkCdKFitCyBxwJJSR478eJT1TF1HlcOmKjCvZDcDAUlnKPYsKv99
 Content-Type: text/plain; charset="iso-8859-2"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0da5732f-9645-4150-9d36-08d76d01e06e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Nov 2019 15:05:12.2735
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5f6ad517-f679-4556-1f3b-08d76d0219e3
+X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Nov 2019 15:06:48.6952
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: rpIhjleBcQUpDeUdbqJjUsuheuWUbCDqVwnc//am5/GbKLwzcwGPxY9eXyS/9YfSIfbJHh/ZJZ8d42RmCWZT4w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3920
+X-MS-Exchange-CrossTenant-userprincipalname: 2j0/KO1hTRn4J1kfX5VWYwPfn7upBuRnOuCJUcATPx+G3eyiJf1IR2TsU1+Rl5jG+vTIrRT+pMOuK155+Nv1wg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB2927
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 On 11/18/2019 12:31 AM, Iuliana Prodan wrote:=0A=
-> Changed parameters for ahash_edesc_alloc function:=0A=
-> - remove flags since they can be computed in=0A=
-> ahash_edesc_alloc, the only place they are needed;=0A=
-> - use ahash_request instead of caam_hash_ctx, which=0A=
-> can be obtained from request.=0A=
+> Create a common rsa_priv_f_done function, which based=0A=
+> on private key form calls the specific unmap function.=0A=
 > =0A=
-Technically, the use of ahash_request is to allow for access to=0A=
-request flags. The change is needed only to be able to refactor=0A=
-the computation of gfp flags.=0A=
-=0A=
 > Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>=0A=
 Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
 =0A=
