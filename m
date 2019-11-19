@@ -2,105 +2,112 @@ Return-Path: <SRS0=Veu2=ZL=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80BC3C432C3
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Nov 2019 06:02:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27FEBC43141
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Nov 2019 06:14:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4B5A9206DA
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Nov 2019 06:02:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1574143360;
-	bh=lA9ReJAonRl749F32IGcIapOZ9Sgo4WuiE5TEmF+pk0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=U12MGZrlDh9a7SD3gVZfPli7xdowkZ+yabJDAeqgQk39/jssjlC+7A6ak1poeRwjF
-	 +j29kk7jcRiZzWZs2c/OWukUGWuNbf6f/z/qtkLaY6oYTKbZym1N06vwScHiTr2wpa
-	 f1osKMc8wiZvyuzPX00iK8z9v3PB5+iddD7K6aMI=
+	by mail.kernel.org (Postfix) with ESMTP id EE0FB21850
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Nov 2019 06:14:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=brennan.io header.i=stephen@brennan.io header.b="cwmy2wB5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727774AbfKSFlv (ORCPT
+        id S1727117AbfKSGOp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 Nov 2019 00:41:51 -0500
-Received: from mail.kernel.org ([198.145.29.99]:36390 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728636AbfKSFlu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 Nov 2019 00:41:50 -0500
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0E77C21939;
-        Tue, 19 Nov 2019 05:41:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1574142109;
-        bh=lA9ReJAonRl749F32IGcIapOZ9Sgo4WuiE5TEmF+pk0=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ei2weQGZ1nM5lMssZPuEfY5wX02PjGL1B9ObXrRNhpDrSMLBOLwS5Uc5jmuM3ogXH
-         d/wqgzqTtyzbjJ8DZtndhK52PhF850xQ5LLPpjmk132A1niSHb01M0DNccFOoIZaMY
-         ckDWgxaFkAqKp3uZJHeIFBrpFg/2NWo6s4wTCxn8=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Dan Aloni <dan@kernelim.com>, Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 4.19 390/422] crypto: fix a memory leak in rsa-kcs1pads encryption mode
-Date:   Tue, 19 Nov 2019 06:19:47 +0100
-Message-Id: <20191119051424.384280022@linuxfoundation.org>
+        Tue, 19 Nov 2019 01:14:45 -0500
+Received: from sender4-of-o58.zoho.com ([136.143.188.58]:21825 "EHLO
+        sender4-of-o58.zoho.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727014AbfKSGOp (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 19 Nov 2019 01:14:45 -0500
+ARC-Seal: i=1; a=rsa-sha256; t=1574144058; cv=none; 
+        d=zohomail.com; s=zohoarc; 
+        b=FDZb191bVzzsmEhPHuSDRaaVt7KFIt6KQmswEHW57HA+Cvb8V+jTzRidED3Tjz7Xm96HWmBJ7KUDXQFl/wjoCpoaPSqhcNZQRr+QI1U97jojCKx5XpR+c1FKu2C/BpuLbqkIk0+59jlaUXPiT8tqqwLVOT0XK8sQTd8miJsEwcc=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+        t=1574144058; h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:MIME-Version:Message-ID:Subject:To; 
+        bh=c7L5ybwI41MQuUShcRtA57Ge+Ip1hk0Hb3ub23HMqaQ=; 
+        b=EVXnrACu/oK4Kz7ddwHdXs5N6VnpFcWRdQG9wf0BHjbCuxoDJM7S4BjU6QO8iYXtX681eQb1ErHkAvTEanYfEATZCIxq1Wkgi6i04HB+ajTd5RHK+VyHNi62Sfs6BEwZqyDs6yUQcFAUFTfV0iDJqtna60s3e/2DS9IpQH8AMpo=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+        dkim=pass  header.i=brennan.io;
+        spf=pass  smtp.mailfrom=stephen@brennan.io;
+        dmarc=pass header.from=<stephen@brennan.io> header.from=<stephen@brennan.io>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1574144058;
+        s=selector01; d=brennan.io; i=stephen@brennan.io;
+        h=From:To:Cc:Message-ID:Subject:Date:MIME-Version:Content-Transfer-Encoding:Content-Type;
+        l=1186; bh=c7L5ybwI41MQuUShcRtA57Ge+Ip1hk0Hb3ub23HMqaQ=;
+        b=cwmy2wB55tgQXK/vQOWlD0swe4jSvp7d9+e6rK8Bvpfqq1lWyISr2Q+caX1K0uKJ
+        iN4iRAVa+khnM2t8o0YWkT58iS9CLOjGLSYm89a2+NqqcvA+if0BGcX+3P3U22kjJqV
+        gaYUl4LZ9JiVjTQYu9Gxf29gt7KjG/K0mdCxuxT0=
+Received: from localhost (195.173.24.136.in-addr.arpa [136.24.173.195]) by mx.zohomail.com
+        with SMTPS id 1574144058311185.86846931854632; Mon, 18 Nov 2019 22:14:18 -0800 (PST)
+From:   Stephen Brennan <stephen@brennan.io>
+To:     stephen@brennan.io
+Cc:     Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        bcm-kernel-feedback-list@broadcom.com,
+        Eric Anholt <eric@anholt.net>,
+        Stefan Wahren <wahrenst@gmx.net>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-rpi-kernel@lists.infradead.org
+Message-ID: <20191119061407.69911-1-stephen@brennan.io>
+Subject: [PATCH v2 0/3] Raspberry Pi 4 HWRNG Support
+Date:   Mon, 18 Nov 2019 22:14:04 -0800
 X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20191119051400.261610025@linuxfoundation.org>
-References: <20191119051400.261610025@linuxfoundation.org>
-User-Agent: quilt/0.66
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+X-ZohoMailClient: External
+Content-Type: text/plain; charset=utf8
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Dan Aloni <dan@kernelim.com>
+This patch series enables support for the HWRNG included on the Raspberry
+Pi 4.  It is simply a rebase of Stefan's branch [1]. I went ahead and
+tested this out on a Pi 4.  Prior to this patch series, attempting to use
+the hwrng gives:
 
-[ Upstream commit 3944f139d5592790b70bc64f197162e643a8512b ]
+    $ head -c 2 /dev/hwrng
+    head: /dev/hwrng: Input/output error
 
-The encryption mode of pkcs1pad never uses out_sg and out_buf, so
-there's no need to allocate the buffer, which presently is not even
-being freed.
+After this series, the same command gives two random bytes.
 
-CC: Herbert Xu <herbert@gondor.apana.org.au>
-CC: linux-crypto@vger.kernel.org
-CC: "David S. Miller" <davem@davemloft.net>
-Signed-off-by: Dan Aloni <dan@kernelim.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Changes in v2:
+- specify the correct size for the region in the dts, refactor bcm283x rng
+
 ---
- crypto/rsa-pkcs1pad.c | 9 ---------
- 1 file changed, 9 deletions(-)
 
-diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
-index 9893dbfc1af45..812476e468213 100644
---- a/crypto/rsa-pkcs1pad.c
-+++ b/crypto/rsa-pkcs1pad.c
-@@ -261,15 +261,6 @@ static int pkcs1pad_encrypt(struct akcipher_request *req)
- 	pkcs1pad_sg_set_buf(req_ctx->in_sg, req_ctx->in_buf,
- 			ctx->key_size - 1 - req->src_len, req->src);
- 
--	req_ctx->out_buf = kmalloc(ctx->key_size, GFP_KERNEL);
--	if (!req_ctx->out_buf) {
--		kfree(req_ctx->in_buf);
--		return -ENOMEM;
--	}
--
--	pkcs1pad_sg_set_buf(req_ctx->out_sg, req_ctx->out_buf,
--			ctx->key_size, NULL);
--
- 	akcipher_request_set_tfm(&req_ctx->child_req, ctx->child);
- 	akcipher_request_set_callback(&req_ctx->child_req, req->base.flags,
- 			pkcs1pad_encrypt_sign_complete_cb, req);
--- 
-2.20.1
+Stefan Wahren (2):
+  dt-bindings: rng: add BCM2711 RNG compatible
+  hwrng: iproc-rng200: Add support for BCM2711
+
+Stephen Brennan (1):
+  ARM: dts: bcm2711: Enable HWRNG support
+
+ .../devicetree/bindings/rng/brcm,iproc-rng200.txt     |  1 +
+ arch/arm/boot/dts/bcm2711.dtsi                        |  6 +++---
+ arch/arm/boot/dts/bcm2835.dtsi                        |  1 +
+ arch/arm/boot/dts/bcm2836.dtsi                        |  1 +
+ arch/arm/boot/dts/bcm2837.dtsi                        |  1 +
+ arch/arm/boot/dts/bcm283x-common.dtsi                 | 11 +++++++++++
+ arch/arm/boot/dts/bcm283x.dtsi                        |  6 ------
+ drivers/char/hw_random/Kconfig                        |  2 +-
+ drivers/char/hw_random/iproc-rng200.c                 |  1 +
+ 9 files changed, 20 insertions(+), 10 deletions(-)
+ create mode 100644 arch/arm/boot/dts/bcm283x-common.dtsi
+
+--=20
+2.24.0
 
 
 
