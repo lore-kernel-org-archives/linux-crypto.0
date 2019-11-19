@@ -1,151 +1,171 @@
-Return-Path: <SRS0=iOo2=ZK=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=Veu2=ZL=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16AEBC432C3
-	for <linux-crypto@archiver.kernel.org>; Mon, 18 Nov 2019 19:45:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94268C432C0
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Nov 2019 05:17:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D511C22319
-	for <linux-crypto@archiver.kernel.org>; Mon, 18 Nov 2019 19:45:26 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="Kob6o5l5"
+	by mail.kernel.org (Postfix) with ESMTP id 74EA822317
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Nov 2019 05:17:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726705AbfKRTpZ (ORCPT
+        id S1726836AbfKSFRj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 18 Nov 2019 14:45:25 -0500
-Received: from mout.gmx.net ([212.227.17.20]:46283 "EHLO mout.gmx.net"
+        Tue, 19 Nov 2019 00:17:39 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:43000 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726435AbfKRTpZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 18 Nov 2019 14:45:25 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1574106298;
-        bh=XSpYzjhcgiHHrYhcZHLykdCAj0e3wpqTkNXlUfzkU4o=;
-        h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
-        b=Kob6o5l5jdcqPStOSOAJau0p9oouSqofToVYgzuAbv8dHGLXf3UOzpelxCJoeeZdQ
-         PlvPIgb+WEHwGwDKPU4e6rANIbrfeiWZFB+aLYApWxlwId/7mos3Jj5Vx6WztjEYP6
-         o4HL5jyK4tEnrL5LVdUpJu2W+3V8hai9kcJorfyc=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [192.168.1.176] ([37.4.249.101]) by mail.gmx.com (mrgmx105
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1MKbkC-1iIQQo2sto-00Kxvf; Mon, 18
- Nov 2019 20:44:58 +0100
-Subject: Re: [PATCH 3/3] ARM: dts: bcm2711: Enable HWRNG support
-To:     Nicolas Saenz Julienne <nsaenzjulienne@suse.de>,
-        Stephen Brennan <stephen@brennan.io>
-Cc:     Mark Rutland <mark.rutland@arm.com>, devicetree@vger.kernel.org,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Scott Branden <sbranden@broadcom.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Matt Mackall <mpm@selenic.com>, linux-kernel@vger.kernel.org,
-        Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
-        Eric Anholt <eric@anholt.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        bcm-kernel-feedback-list@broadcom.com,
-        linux-rpi-kernel@lists.infradead.org, Ray Jui <rjui@broadcom.com>,
-        linux-arm-kernel@lists.infradead.org
-References: <20191118075807.165126-1-stephen@brennan.io>
- <20191118075807.165126-4-stephen@brennan.io>
- <3209f601ad0537a7ef01e2a752f022ccf8816210.camel@suse.de>
-From:   Stefan Wahren <wahrenst@gmx.net>
-Message-ID: <5cc711fd-4d47-5369-c424-363677334b9f@gmx.net>
-Date:   Mon, 18 Nov 2019 20:44:54 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        id S1725280AbfKSFRj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 19 Nov 2019 00:17:39 -0500
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1iWvtO-0001DZ-0X; Tue, 19 Nov 2019 13:17:34 +0800
+Received: from herbert by gondobar with local (Exim 4.89)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1iWvtL-0007MY-A3; Tue, 19 Nov 2019 13:17:31 +0800
+Date:   Tue, 19 Nov 2019 13:17:31 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] padata: Remove broken queue flushing
+Message-ID: <20191119051731.yev6dcsp2znjaagz@gondor.apana.org.au>
 MIME-Version: 1.0
-In-Reply-To: <3209f601ad0537a7ef01e2a752f022ccf8816210.camel@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Content-Language: en-US
-X-Provags-ID: V03:K1:hOwNU8cCHONZ9O486Jwq2iYZo79fAwXMhOiTJGOJ2PlKe+8gm6Q
- UGZOE/CTkcMnh13XIW02vvGVxZLDBTfhtyX/V+eFjeKG0rSDSrVsYC2qS+YNqdTpolkbIr1
- 67O8WyoHcMO0Pt+KOgbWoq45imjgCX1ZRtzKZ6z8dTO+YJtfGNVKw91mLvvOE+StvshZzFX
- 9hmwXJS0vB8xxwCdtGr6A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:IR+/bxyYH8U=:KGTLKGtCmOSFtC86RHUyRn
- 6tBB+OxxEMNzyMCEHd3PLrD51+ULa0dMFC6VFO6GSgSf8Qbc9YmGewKKfnFZSPJj1CQ63o0Eu
- YIvVXMzkYxK1Ym4dJQXgJ6xYwO9xn2Vz5AV5eeo9A/Xudzp3vtsx0Uh7cGUm8xtHOzAVZiKFM
- gP18EqKGWZLG9h5wuEm9R5TFO19ROMpvSP9kA8tQBedg8pwejpEjtPVgOpZaGHF2Vq4mo3f33
- ixgrEi9tK7b/L1P0OyDXmWFnQSh4zxDPrsrEwdnzedQfzUAaImRjZjUOwxVv3e+KLgBYcA1Dn
- lCHD2oeAh/MRII5QCGIm00VxQcG5dIquSyWB62p1R+GPvbsI5rlCNV7zvICgNdsUwQlWGmIjs
- 5MVqLbWloeovB1G6M0NX8Uf5XwGLbe6aeDUPy7bX5WCwbTOHxhc11IpozjrONNJQji7PbGUFe
- bGjK49FUrzNQFkeYReJVw0ioZS0HhDh3OzzcjBlF4YJ8UT8hoLqRFFcxFWDZM1cPKLu6nwJj/
- 5ZUUasjCFowFJ0d8Pa5CS3PRtiRWkddic2hR/t3dok7S93xnqbpqx04uNbhjnKek9lQME8rWV
- GzQn/Gx1tgACdbcIyaMWvTaf/n1Ugkk1UldXuWDICh6qBAquh1nWGU5lBNlKty9nqcf7eiuUL
- 5OXXIKImipmMor65OEVHn38eGHqCCprKlwywlR1oqU4gzbw7yxZGh15okVFVZLdbyUgE+Oz5W
- J7nFv6u2bRj4CCBAn/skhbeWQGoJA9PQFrhEpKEi3oL/nyRnelSyp0TXVOVyfNDXzix8EskVJ
- V3EjiGpPqMs12Q4yiV3kKPbbLAnffb/OdtqMKXsMFuLs1SS/Ek+u+17CNr7NfqpYnMaLCFF8r
- LnTzE5w4FDLEQ890vHGFah/jCdH0hEJCDUNvIyYes+whaFKen2q9wa69F+F8h06TBE7Pr/qjL
- 3dX1Frn9NBqOb7E36gRbhFYQK1Kxg/I/8g+qkNDwR0MWP0l9nSFSiO8WjHZ2K8Y5xTMP05kat
- DhlYiF7sJ79RkVOHApJaRlaPUfJwVjQww/0HuiOr1edGc6StO69beT+0R2WNTk83Buu1zcG2v
- EzQuqvmvvXH8ufwxcYV8YsMAbpnZQrbsfS3rCH0tnYHyfHZ3a9vUPHLBI58Py0+aAPRwTozp0
- eQ1npU3/B3X/xQTedc7ruIIhRdCvBZnj+VtLFiBzRoLIFO40y9i9q3EI2udLHptGcRmb6cHV1
- u3VU1rHYZgDFYg229qicqHv6Bn+KBoUXrpPN5NKwgRWjL02CtdXcA6ihZWfU=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+The function padata_flush_queues is fundamentally broken because
+it cannot force padata users to complete the request that is
+underway.  IOW padata has to passively wait for the completion
+of any outstanding work.
 
-Am 18.11.19 um 12:44 schrieb Nicolas Saenz Julienne:
-> Hi Stephen,
->
-> On Sun, 2019-11-17 at 23:58 -0800, Stephen Brennan wrote:
->> From: Stefan Wahren <wahrenst@gmx.net>
->>
->> This enables hardware random number generator support for the BCM2711
->> on the Raspberry Pi 4 board.
->>
->> Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
->> Signed-off-by: Stephen Brennan <stephen@brennan.io>
->> ---
->>  arch/arm/boot/dts/bcm2711.dtsi | 5 ++---
->>  1 file changed, 2 insertions(+), 3 deletions(-)
->>
->> diff --git a/arch/arm/boot/dts/bcm2711.dtsi b/arch/arm/boot/dts/bcm2711=
-.dtsi
->> index ac83dac2e6ba..2c19e5de284a 100644
->> --- a/arch/arm/boot/dts/bcm2711.dtsi
->> +++ b/arch/arm/boot/dts/bcm2711.dtsi
->> @@ -92,10 +92,9 @@ pm: watchdog@7e100000 {
->>  		};
->>
->>  		rng@7e104000 {
->> +			compatible =3D "brcm,bcm2711-rng200";
->>  			interrupts =3D <GIC_SPI 125 IRQ_TYPE_LEVEL_HIGH>;
->> -
->> -			/* RNG is incompatible with brcm,bcm2835-rng */
->> -			status =3D "disabled";
->> +			status =3D "okay";
->>  		};
->>
->>  		uart2: serial@7e201400 {
-> We inherit the reg property from bcm283x.dtsi, on which we only define a=
- size
-> of 0x10 bytes. I gather from the driver that iproc-rng200's register spa=
-ce is
-> at least 0x28 bytes big. We should also update the 'reg' property to:
->
-> 	reg =3D <0x7e104000 0x28>;
+As it stands flushing is used in two places.  Its use in padata_stop
+is simply unnecessary because nothing depends on the queues to
+be flushed afterwards.
 
-Thanks for sending and noticing. A proper solution would be to move the
-whole rng node from bcm283x.dtsi to bcm283x-common.dtsi and define a
-completely new rng node in bcm2711.dtsi.
+The other use in padata_replace is more substantial as we depend
+on it to free the old pd structure.  This patch instead uses the
+pd->refcnt to dynamically free the pd structure once all requests
+are complete.
 
-Regards
-Stefan
+Fixes: 2b73b07ab8a4 ("padata: Flush the padata queues actively")
+Cc: <stable@vger.kernel.org>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
->
-> Regards,
-> Nicolas
->
->
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+diff --git a/kernel/padata.c b/kernel/padata.c
+index c3fec1413295..da56a235a255 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -35,6 +35,8 @@
+ 
+ #define MAX_OBJ_NUM 1000
+ 
++static void padata_free_pd(struct parallel_data *pd);
++
+ static int padata_index_to_cpu(struct parallel_data *pd, int cpu_index)
+ {
+ 	int cpu, target_cpu;
+@@ -283,6 +285,7 @@ static void padata_serial_worker(struct work_struct *serial_work)
+ 	struct padata_serial_queue *squeue;
+ 	struct parallel_data *pd;
+ 	LIST_HEAD(local_list);
++	int cnt;
+ 
+ 	local_bh_disable();
+ 	squeue = container_of(serial_work, struct padata_serial_queue, work);
+@@ -292,6 +295,8 @@ static void padata_serial_worker(struct work_struct *serial_work)
+ 	list_replace_init(&squeue->serial.list, &local_list);
+ 	spin_unlock(&squeue->serial.lock);
+ 
++	cnt = 0;
++
+ 	while (!list_empty(&local_list)) {
+ 		struct padata_priv *padata;
+ 
+@@ -301,9 +306,12 @@ static void padata_serial_worker(struct work_struct *serial_work)
+ 		list_del_init(&padata->list);
+ 
+ 		padata->serial(padata);
+-		atomic_dec(&pd->refcnt);
++		cnt++;
+ 	}
+ 	local_bh_enable();
++
++	if (atomic_sub_and_test(cnt, &pd->refcnt))
++		padata_free_pd(pd);
+ }
+ 
+ /**
+@@ -440,7 +448,7 @@ static struct parallel_data *padata_alloc_pd(struct padata_instance *pinst,
+ 	padata_init_squeues(pd);
+ 	atomic_set(&pd->seq_nr, -1);
+ 	atomic_set(&pd->reorder_objects, 0);
+-	atomic_set(&pd->refcnt, 0);
++	atomic_set(&pd->refcnt, 1);
+ 	spin_lock_init(&pd->lock);
+ 	pd->cpu = cpumask_first(pd->cpumask.pcpu);
+ 	INIT_WORK(&pd->reorder_work, invoke_padata_reorder);
+@@ -466,29 +474,6 @@ static void padata_free_pd(struct parallel_data *pd)
+ 	kfree(pd);
+ }
+ 
+-/* Flush all objects out of the padata queues. */
+-static void padata_flush_queues(struct parallel_data *pd)
+-{
+-	int cpu;
+-	struct padata_parallel_queue *pqueue;
+-	struct padata_serial_queue *squeue;
+-
+-	for_each_cpu(cpu, pd->cpumask.pcpu) {
+-		pqueue = per_cpu_ptr(pd->pqueue, cpu);
+-		flush_work(&pqueue->work);
+-	}
+-
+-	if (atomic_read(&pd->reorder_objects))
+-		padata_reorder(pd);
+-
+-	for_each_cpu(cpu, pd->cpumask.cbcpu) {
+-		squeue = per_cpu_ptr(pd->squeue, cpu);
+-		flush_work(&squeue->work);
+-	}
+-
+-	BUG_ON(atomic_read(&pd->refcnt) != 0);
+-}
+-
+ static void __padata_start(struct padata_instance *pinst)
+ {
+ 	pinst->flags |= PADATA_INIT;
+@@ -502,10 +487,6 @@ static void __padata_stop(struct padata_instance *pinst)
+ 	pinst->flags &= ~PADATA_INIT;
+ 
+ 	synchronize_rcu();
+-
+-	get_online_cpus();
+-	padata_flush_queues(pinst->pd);
+-	put_online_cpus();
+ }
+ 
+ /* Replace the internal control structure with a new one. */
+@@ -526,8 +507,8 @@ static void padata_replace(struct padata_instance *pinst,
+ 	if (!cpumask_equal(pd_old->cpumask.cbcpu, pd_new->cpumask.cbcpu))
+ 		notification_mask |= PADATA_CPU_SERIAL;
+ 
+-	padata_flush_queues(pd_old);
+-	padata_free_pd(pd_old);
++	if (atomic_dec_and_test(&pd_old->refcnt))
++		padata_free_pd(pd_old);
+ 
+ 	if (notification_mask)
+ 		blocking_notifier_call_chain(&pinst->cpumask_change_notifier,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
