@@ -5,76 +5,78 @@ X-Spam-Level:
 X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 181EDC43215
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Nov 2019 11:15:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE541C43215
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Nov 2019 11:16:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CDDF82230B
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Nov 2019 11:15:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89C5722304
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Nov 2019 11:16:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oz5Mo2oQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nwiafkFN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726165AbfKSLPH (ORCPT
+        id S1725798AbfKSLQI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 Nov 2019 06:15:07 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:52702 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725904AbfKSLPH (ORCPT
+        Tue, 19 Nov 2019 06:16:08 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:53749 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726555AbfKSLQI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 Nov 2019 06:15:07 -0500
-Received: by mail-wm1-f65.google.com with SMTP id l1so2727920wme.2;
-        Tue, 19 Nov 2019 03:15:03 -0800 (PST)
+        Tue, 19 Nov 2019 06:16:08 -0500
+Received: by mail-wm1-f68.google.com with SMTP id u18so2744842wmc.3;
+        Tue, 19 Nov 2019 03:16:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=W+Ceih9zdG62UJqcaWlnYe1SFIFfD3EBEBYUF7H1joU=;
-        b=oz5Mo2oQW59ihVfsRmEEoSO34ClHkaVHdbkmCP8IU/P8T+d1Y6tdjm8UHHrGs2pPD6
-         qfK94gdZvHD/RU2Zuodr3iqx1tVHGlqe6OJUG4BFcjCGCE7qyH7rk0sf/cpy5MfU13pA
-         lJ7uOX5xBRYlRatqKIt2MUN1yNjZ82/16oe3N+G8o383jnEaFRPLm9hQx1ZAbg4/z2NJ
-         qctAf6RT0djb0mLOKd0dqqNIGm0Y9Uy0TkZn1MvfhZzl5nKQ6WD3g/sP0zkeUEDmRhWl
-         /6eFugpL4A6WT/y+Bd+kAtEd8WvkTtA1LkaA9H8x+lKpAPcsRQ10sBQ+ivYQsm4oobIC
-         23/A==
+        bh=WSYGbqNbci1f2vNf24fXooIQD/06dOY7UKmcaqXzg8w=;
+        b=nwiafkFNXgpoTHElJ5jedbcT6/z48qKUE7H4VtHVSfsB12Iby4RaxqCO3FG963khUE
+         mQcerDz5W+DVIDBlamT8/15nfQKCjk3pxN1LOdUMzLXmjvMzVAMsg89zXABdl+xLIRAa
+         oaM3f8lp2g6pz+95xd0ajE+U1Y6bBKaB0U1G1dhPEnKLhOVLk6MO1IEmVSzC3e6XNVPf
+         ZKeur5lmzsHnEKCg69uHw9IRQB+hB4m2ChmVgtwzMtTwZ/7OwoSwA1z1FgHElIDMTOtm
+         15ph7kr/+6f3/ygQUo6sO7VgCLhk9OCu0Wy/Pvd48HCZ/w7A7tLzmOlwhm4pHMS/nI2o
+         XGUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=W+Ceih9zdG62UJqcaWlnYe1SFIFfD3EBEBYUF7H1joU=;
-        b=k+8EAaflC75IOLGUO1qr6VA6D+NSXiJM5L1d5uj3ZGzzJVCGoD31FF5SrlKI/hFdLB
-         T5oX+BKveyjOBuZTHene72TPnomPxyA7vTGs6SbGudb9AEvsxv/25kwy0I53+50d1JvA
-         f6QASC068OjjQqLcA4gwIKqfdx1Y/mfbuIcXDjasz2O/Glcg3Uobszh4sgMbHbuGOeqs
-         l5uhQdYS7Ng4JZWSc7NT9LxgUQ4d9ocGvwvkLOg2MCItZP7fB6l6JXmHrvm5YvC2nt5E
-         Ow8Vk2F5LQ2oNTO+p3QSIFTy1VK5Y2Mn+88owWxLY17jL9lZsjQjCPcn/QC8oXpn2miE
-         4wng==
-X-Gm-Message-State: APjAAAW18rp2fResCMokbATvWmvx+i35KVhQopfPa3xwOS71ohG6gf0Z
-        MAkpMvQuB7hO5BHvJN9vy381ElY881g=
-X-Google-Smtp-Source: APXvYqz4caGH442wAsbLN8kKx6Mll8oxdjFVSjPob4+QH1hW7D/tYvGLVjYNkh8N7gwaNxIMp3rMBg==
-X-Received: by 2002:a05:600c:23ce:: with SMTP id p14mr4854229wmb.176.1574162102073;
-        Tue, 19 Nov 2019 03:15:02 -0800 (PST)
+        bh=WSYGbqNbci1f2vNf24fXooIQD/06dOY7UKmcaqXzg8w=;
+        b=spkvH5kch9qBvgd6QUMrD62B1IDHAsI005u7/SGNlS8iiGfoERjdY6tNTnc/bbAlhl
+         tmxpshSSKJ4MbBJAO5Xz9EhS/DDUY5/9zp2yYJd0LpXPTeKWtog0nSevVPlSk0jZXHpY
+         evOVKgl0kdIDRWao++p4LSWOWbp7PWllbcgwNnsRpwtSzj6gAbsMCoOaw8juta1SuefD
+         Admm1XGOgX9jGFH7d26cnDAHdBilZ42gb8bkuAN2hvo7t90vtT6Z/HWa2Scn/syzoWV7
+         qcOmPZnAbhwKl1Engv79CuBfTO0gEn6jH9GXLQObF38AWPY1PId6RiZ7M3uOK0Jc3WGw
+         68vA==
+X-Gm-Message-State: APjAAAVDSP1fS2H8EpsztQY3ZiYunzrkRtUa73zC7dbbk8UE/NJpEEvj
+        2Ouf1mr3lUzSVsHJumuzKrQ=
+X-Google-Smtp-Source: APXvYqzJWB5Rf2ro+wbSGqakm6T8baD+43sGJon6MX7ANi30SIiqzSW5F7If7bLF3tRGfSmkskm9lw==
+X-Received: by 2002:a1c:7e82:: with SMTP id z124mr4494450wmc.136.1574162162288;
+        Tue, 19 Nov 2019 03:16:02 -0800 (PST)
 Received: from ziggy.stardust ([37.223.144.104])
-        by smtp.gmail.com with ESMTPSA id x8sm26484280wrm.7.2019.11.19.03.14.59
+        by smtp.gmail.com with ESMTPSA id u13sm2611214wmm.45.2019.11.19.03.16.00
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Nov 2019 03:15:00 -0800 (PST)
+        Tue, 19 Nov 2019 03:16:01 -0800 (PST)
 Subject: Re: [PATCH v2 3/3] ARM: dts: bcm2711: Enable HWRNG support
-To:     Stephen Brennan <stephen@brennan.io>
+To:     Nicolas Saenz Julienne <nsaenzjulienne@suse.de>,
+        Stephen Brennan <stephen@brennan.io>
 Cc:     Mark Rutland <mark.rutland@arm.com>, devicetree@vger.kernel.org,
-        linux-rpi-kernel@lists.infradead.org,
         Florian Fainelli <f.fainelli@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Scott Branden <sbranden@broadcom.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-arm-kernel@lists.infradead.org, Ray Jui <rjui@broadcom.com>,
-        linux-kernel@vger.kernel.org, Eric Anholt <eric@anholt.net>,
+        Matt Mackall <mpm@selenic.com>, linux-kernel@vger.kernel.org,
+        Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
+        Eric Anholt <eric@anholt.net>,
         Rob Herring <robh+dt@kernel.org>,
         bcm-kernel-feedback-list@broadcom.com,
-        Stefan Wahren <wahrenst@gmx.net>,
-        Matt Mackall <mpm@selenic.com>, Arnd Bergmann <arnd@arndb.de>,
-        linux-crypto@vger.kernel.org
+        linux-rpi-kernel@lists.infradead.org, Ray Jui <rjui@broadcom.com>,
+        linux-arm-kernel@lists.infradead.org,
+        Stefan Wahren <wahrenst@gmx.net>
 References: <20191119061407.69911-1-stephen@brennan.io>
  <20191119061407.69911-4-stephen@brennan.io>
+ <e38de8daad5a2c9b03bda1aa2632844e3ed3d11e.camel@suse.de>
 From:   Matthias Brugger <matthias.bgg@gmail.com>
 Autocrypt: addr=matthias.bgg@gmail.com; prefer-encrypt=mutual; keydata=
  mQINBFP1zgUBEAC21D6hk7//0kOmsUrE3eZ55kjc9DmFPKIz6l4NggqwQjBNRHIMh04BbCMY
@@ -149,12 +151,12 @@ Autocrypt: addr=matthias.bgg@gmail.com; prefer-encrypt=mutual; keydata=
  Y1aFdU79pac005PuhxCWkKTJz3gCmznnoat4GCnL5gy/m0Qk45l4PFqwWXVLo9AQg2Kp3mlI
  FZ6fsEKIAN5hxlbNvNb9V2Zo5bFZjPWPFTxOteM0omUAS+QopwU0yPLLGJVf2iCmItHcUXI+
  r2JwH1CJjrHWeQEI2ucSKsNa8FllDmG/fQ==
-Message-ID: <ab52b007-b6d7-4e97-9436-eb78365e6e99@gmail.com>
-Date:   Tue, 19 Nov 2019 12:14:58 +0100
+Message-ID: <4ae008c8-6e41-01f8-10a6-7b6ea72f96c4@gmail.com>
+Date:   Tue, 19 Nov 2019 12:15:58 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.2.1
 MIME-Version: 1.0
-In-Reply-To: <20191119061407.69911-4-stephen@brennan.io>
+In-Reply-To: <e38de8daad5a2c9b03bda1aa2632844e3ed3d11e.camel@suse.de>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -165,112 +167,119 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 
 
-On 19/11/2019 07:14, Stephen Brennan wrote:
-> BCM2711 features a RNG200 hardware random number generator block, which is
-> different from the BCM283x from which it inherits. Move the rng block from
-> BCM283x into a separate common file, and update the rng declaration of
-> BCM2711.
+On 19/11/2019 11:07, Nicolas Saenz Julienne wrote:
+> Hi Stephen, thanks for the follow-up.
+> 
+> On Mon, 2019-11-18 at 22:14 -0800, Stephen Brennan wrote:
+>> BCM2711 features a RNG200 hardware random number generator block, which is
+>> different from the BCM283x from which it inherits. Move the rng block from
+>> BCM283x into a separate common file, and update the rng declaration of
+>> BCM2711.
+>>
+>> Signed-off-by: Stephen Brennan <stephen@brennan.io>
+>> ---
+> 
+> It's petty in this case but you should add a list of changes here too.
+> 
+>>  arch/arm/boot/dts/bcm2711.dtsi        |  6 +++---
+>>  arch/arm/boot/dts/bcm2835.dtsi        |  1 +
+>>  arch/arm/boot/dts/bcm2836.dtsi        |  1 +
+>>  arch/arm/boot/dts/bcm2837.dtsi        |  1 +
+>>  arch/arm/boot/dts/bcm283x-common.dtsi | 11 +++++++++++
+>>  arch/arm/boot/dts/bcm283x.dtsi        |  6 ------
+>>  6 files changed, 17 insertions(+), 9 deletions(-)
+>>  create mode 100644 arch/arm/boot/dts/bcm283x-common.dtsi
+>>
+>> diff --git a/arch/arm/boot/dts/bcm2711.dtsi b/arch/arm/boot/dts/bcm2711.dtsi
+>> index ac83dac2e6ba..4975567e948e 100644
+>> --- a/arch/arm/boot/dts/bcm2711.dtsi
+>> +++ b/arch/arm/boot/dts/bcm2711.dtsi
+>> @@ -92,10 +92,10 @@ pm: watchdog@7e100000 {
+>>  		};
+>>  
+>>  		rng@7e104000 {
+>> +			compatible = "brcm,bcm2711-rng200";
+>> +			reg = <0x7e104000 0x28>;
+>>  			interrupts = <GIC_SPI 125 IRQ_TYPE_LEVEL_HIGH>;
+>> -
+>> -			/* RNG is incompatible with brcm,bcm2835-rng */
+>> -			status = "disabled";
+>> +			status = "okay";
+>>  		};
+>>  
+>>  		uart2: serial@7e201400 {
+>> diff --git a/arch/arm/boot/dts/bcm2835.dtsi b/arch/arm/boot/dts/bcm2835.dtsi
+>> index 53bf4579cc22..f7b2f46e307d 100644
+>> --- a/arch/arm/boot/dts/bcm2835.dtsi
+>> +++ b/arch/arm/boot/dts/bcm2835.dtsi
+>> @@ -1,5 +1,6 @@
+>>  // SPDX-License-Identifier: GPL-2.0
+>>  #include "bcm283x.dtsi"
+>> +#include "bcm283x-common.dtsi"
+>>  #include "bcm2835-common.dtsi"
+>>  
+>>  / {
+>> diff --git a/arch/arm/boot/dts/bcm2836.dtsi b/arch/arm/boot/dts/bcm2836.dtsi
+>> index 82d6c4662ae4..a85374195796 100644
+>> --- a/arch/arm/boot/dts/bcm2836.dtsi
+>> +++ b/arch/arm/boot/dts/bcm2836.dtsi
+>> @@ -1,5 +1,6 @@
+>>  // SPDX-License-Identifier: GPL-2.0
+>>  #include "bcm283x.dtsi"
+>> +#include "bcm283x-common.dtsi"
+>>  #include "bcm2835-common.dtsi"
+>>  
+>>  / {
+>> diff --git a/arch/arm/boot/dts/bcm2837.dtsi b/arch/arm/boot/dts/bcm2837.dtsi
+>> index 9e95fee78e19..045d78ffea08 100644
+>> --- a/arch/arm/boot/dts/bcm2837.dtsi
+>> +++ b/arch/arm/boot/dts/bcm2837.dtsi
+>> @@ -1,4 +1,5 @@
+>>  #include "bcm283x.dtsi"
+>> +#include "bcm283x-common.dtsi"
+>>  #include "bcm2835-common.dtsi"
+>>  
+>>  / {
+>> diff --git a/arch/arm/boot/dts/bcm283x-common.dtsi
+>> b/arch/arm/boot/dts/bcm283x-common.dtsi
+>> new file mode 100644
+>> index 000000000000..3c8834bee390
+>> --- /dev/null
+>> +++ b/arch/arm/boot/dts/bcm283x-common.dtsi
+>> @@ -0,0 +1,11 @@
+>> +// SPDX-License-Identifier: GPL-2.0
+>> +
+>> +/ {
+>> +	soc {
+>> +		rng@7e104000 {
+>> +			compatible = "brcm,bcm2835-rng";
+>> +			reg = <0x7e104000 0x10>;
+>> +			interrupts = <2 29>;
+>> +		};
+>> +	};
+>> +};
+> 
+> I think Stefan wrote bcm283x-common.dtsi by mistake, he really meant
+> bcm2835-common.dtsi.
 > 
 
-I'd prefer to split this in two patches. One moving the node and another one
-adding the new node for bcm2711.
+Thanks I was just wondering on which tree/patch-set this was based.
 
 Regards,
 Matthias
 
-> Signed-off-by: Stephen Brennan <stephen@brennan.io>
-> ---
->  arch/arm/boot/dts/bcm2711.dtsi        |  6 +++---
->  arch/arm/boot/dts/bcm2835.dtsi        |  1 +
->  arch/arm/boot/dts/bcm2836.dtsi        |  1 +
->  arch/arm/boot/dts/bcm2837.dtsi        |  1 +
->  arch/arm/boot/dts/bcm283x-common.dtsi | 11 +++++++++++
->  arch/arm/boot/dts/bcm283x.dtsi        |  6 ------
->  6 files changed, 17 insertions(+), 9 deletions(-)
->  create mode 100644 arch/arm/boot/dts/bcm283x-common.dtsi
+> See bcm2835-common.dtsi's header comment:
 > 
-> diff --git a/arch/arm/boot/dts/bcm2711.dtsi b/arch/arm/boot/dts/bcm2711.dtsi
-> index ac83dac2e6ba..4975567e948e 100644
-> --- a/arch/arm/boot/dts/bcm2711.dtsi
-> +++ b/arch/arm/boot/dts/bcm2711.dtsi
-> @@ -92,10 +92,10 @@ pm: watchdog@7e100000 {
->  		};
->  
->  		rng@7e104000 {
-> +			compatible = "brcm,bcm2711-rng200";
-> +			reg = <0x7e104000 0x28>;
->  			interrupts = <GIC_SPI 125 IRQ_TYPE_LEVEL_HIGH>;
-> -
-> -			/* RNG is incompatible with brcm,bcm2835-rng */
-> -			status = "disabled";
-> +			status = "okay";
->  		};
->  
->  		uart2: serial@7e201400 {
-> diff --git a/arch/arm/boot/dts/bcm2835.dtsi b/arch/arm/boot/dts/bcm2835.dtsi
-> index 53bf4579cc22..f7b2f46e307d 100644
-> --- a/arch/arm/boot/dts/bcm2835.dtsi
-> +++ b/arch/arm/boot/dts/bcm2835.dtsi
-> @@ -1,5 +1,6 @@
->  // SPDX-License-Identifier: GPL-2.0
->  #include "bcm283x.dtsi"
-> +#include "bcm283x-common.dtsi"
->  #include "bcm2835-common.dtsi"
->  
->  / {
-> diff --git a/arch/arm/boot/dts/bcm2836.dtsi b/arch/arm/boot/dts/bcm2836.dtsi
-> index 82d6c4662ae4..a85374195796 100644
-> --- a/arch/arm/boot/dts/bcm2836.dtsi
-> +++ b/arch/arm/boot/dts/bcm2836.dtsi
-> @@ -1,5 +1,6 @@
->  // SPDX-License-Identifier: GPL-2.0
->  #include "bcm283x.dtsi"
-> +#include "bcm283x-common.dtsi"
->  #include "bcm2835-common.dtsi"
->  
->  / {
-> diff --git a/arch/arm/boot/dts/bcm2837.dtsi b/arch/arm/boot/dts/bcm2837.dtsi
-> index 9e95fee78e19..045d78ffea08 100644
-> --- a/arch/arm/boot/dts/bcm2837.dtsi
-> +++ b/arch/arm/boot/dts/bcm2837.dtsi
-> @@ -1,4 +1,5 @@
->  #include "bcm283x.dtsi"
-> +#include "bcm283x-common.dtsi"
->  #include "bcm2835-common.dtsi"
->  
->  / {
-> diff --git a/arch/arm/boot/dts/bcm283x-common.dtsi b/arch/arm/boot/dts/bcm283x-common.dtsi
-> new file mode 100644
-> index 000000000000..3c8834bee390
-> --- /dev/null
-> +++ b/arch/arm/boot/dts/bcm283x-common.dtsi
-> @@ -0,0 +1,11 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +/ {
-> +	soc {
-> +		rng@7e104000 {
-> +			compatible = "brcm,bcm2835-rng";
-> +			reg = <0x7e104000 0x10>;
-> +			interrupts = <2 29>;
-> +		};
-> +	};
-> +};
-> diff --git a/arch/arm/boot/dts/bcm283x.dtsi b/arch/arm/boot/dts/bcm283x.dtsi
-> index 3caaa57eb6c8..5219339fc27c 100644
-> --- a/arch/arm/boot/dts/bcm283x.dtsi
-> +++ b/arch/arm/boot/dts/bcm283x.dtsi
-> @@ -84,12 +84,6 @@ clocks: cprman@7e101000 {
->  				<&dsi1 0>, <&dsi1 1>, <&dsi1 2>;
->  		};
->  
-> -		rng@7e104000 {
-> -			compatible = "brcm,bcm2835-rng";
-> -			reg = <0x7e104000 0x10>;
-> -			interrupts = <2 29>;
-> -		};
-> -
->  		mailbox: mailbox@7e00b880 {
->  			compatible = "brcm,bcm2835-mbox";
->  			reg = <0x7e00b880 0x40>;
+> /* This include file covers the common peripherals and configuration between
+>  * bcm2835, bcm2836 and bcm2837 implementations.
+>  */
+> 
+> Regards,
+> Nicolas
+> 
+> 
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
 > 
