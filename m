@@ -2,111 +2,116 @@ Return-Path: <SRS0=Veu2=ZL=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5E30C432C0
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Nov 2019 19:24:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13E02C432C0
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Nov 2019 20:02:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8D89A2245D
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Nov 2019 19:24:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC76A2240E
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Nov 2019 20:02:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="LO2dRHCy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LAYqXYJm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726874AbfKSTYP (ORCPT
+        id S1727217AbfKSUCG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 Nov 2019 14:24:15 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:44236 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726555AbfKSTYP (ORCPT
+        Tue, 19 Nov 2019 15:02:06 -0500
+Received: from mail-vs1-f66.google.com ([209.85.217.66]:35763 "EHLO
+        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727114AbfKSUCF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 Nov 2019 14:24:15 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAJJJBoP072724;
-        Tue, 19 Nov 2019 19:24:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2019-08-05;
- bh=QxgcqLxoGjB8tiiHLUzk3bvI2hEG7GG+c6sd93JVxAE=;
- b=LO2dRHCyRmYOfZlnkSFpTudygOdKoIXFYUlzaOU+k/zAwyqxK9wZ0FqSjLQfvpa+2b4u
- VQc6RDJdqRZaJMX1Si5+Xs6oiVCw/JmUuVRDedNlVVlrZ6LOYxFYR73HTPTlqyVgLdGN
- o8x6kxeowdy1Cvxbh8sluYiMj9/fb6bSSZl26s1sRjXf4UBBDkqQNyxYpict6sjr32Fn
- Q2Gc+hE4vm6RGNEyPeUipHatR0onaYfKsUyy566GsWfU4vv6TU4Bs2jUgUMPfj8uAzyd
- p1AoUS3IITiP58zJ3HQMjL4YzfkuUpTuo8Byn4s2UCEXUOH2IuajUluzzkbHnRYHFXAx aw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2130.oracle.com with ESMTP id 2wa8hts5u4-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 19 Nov 2019 19:24:05 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAJJN8uh170689;
-        Tue, 19 Nov 2019 19:24:05 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3030.oracle.com with ESMTP id 2wbxm4s9c3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 19 Nov 2019 19:24:04 +0000
-Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xAJJO3Qu019812;
-        Tue, 19 Nov 2019 19:24:03 GMT
-Received: from ca-dmjordan1.us.oracle.com (/10.211.9.48)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 19 Nov 2019 11:24:03 -0800
-Date:   Tue, 19 Nov 2019 14:24:05 -0500
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] padata: Remove broken queue flushing
-Message-ID: <20191119192405.imfi6q4u3g2zgstc@ca-dmjordan1.us.oracle.com>
-References: <20191119051731.yev6dcsp2znjaagz@gondor.apana.org.au>
+        Tue, 19 Nov 2019 15:02:05 -0500
+Received: by mail-vs1-f66.google.com with SMTP id k15so15171743vsp.2
+        for <linux-crypto@vger.kernel.org>; Tue, 19 Nov 2019 12:02:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=q+kgeC423PEmiXE54P456kmvClusHVqDZZQMf6Wfq8g=;
+        b=LAYqXYJmg3/nUPp2KkicyNn045+DSy+qXZ69cpU3O7SoqBK7jbFkPKBinM1rx16+R4
+         91xiJTO1WqhfYnv5n6OUtt1t2cg9YZP+j/dt2z8V+cOsGkYFGKFW4Cs2k66ETJ8Sw6vK
+         h2mYSM+2qxLS4HeVa5Hl6UooSCyvJm2WLZ9NhMrotAQSOsLE8Arx339mnaJ+EdbOX5PT
+         mOGLU9xKkjpQamXuUFolfgvZ9Oc1Ok80gB1T0nWbbJjHNdCxPMgf/KGWgblI4kc4AOlJ
+         UpLffBeGi/UAB2yJHAQnvh2Gp8Mb8vto1564i8T1PczukVwHCjZ7xiCJ3xS0NkPY3K2r
+         9WmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=q+kgeC423PEmiXE54P456kmvClusHVqDZZQMf6Wfq8g=;
+        b=B9BSH53svbE0ct0I7C7A7wudJuRqGh478pItOLv7WrWhTNtZOGtbNEgsInCT0Xtqh2
+         4bpoPoiTvRFMFyh6ECrsAn/yujjiHG+ytkVH2EKz8OW/9oi+zO+euEgBPGYO9LOS6hY1
+         CuX7TGLyDr6kcUM8XKlABR5a5ne+dHk2GvPgNBpTeHF8whQlEnAZY7A3YG4ku14V9XmE
+         XmstnVdWdw/4mVG6tmdx0YIgKpcWl3haiPrjORImSe+/Kc/u7quNj5LPYMSYwxoLcXVJ
+         EW8zPmI6LokQosZh++sLtWCmvKO4ZGWFfTIhxf1jTe7/rjblGaZ9LOtmVjs43bGvhWld
+         ItDg==
+X-Gm-Message-State: APjAAAUeSj6HkdJUpa48vEtBR6q3hfjLGMXwIrz6S6DM6htK050IORSO
+        Hh1G09FxNrsdOgmbNViUzgidIhZcqC5bj2kpJL6dkA==
+X-Google-Smtp-Source: APXvYqzcRdtEp6THc7+OIwZlRAkM2IozUimYlwR67GM90nMnCXw4ij3J6M+8GvqPD08ArQNVwEdRuTBT0xp6TrRbhp0=
+X-Received: by 2002:a67:e951:: with SMTP id p17mr18570219vso.112.1574193724307;
+ Tue, 19 Nov 2019 12:02:04 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191119051731.yev6dcsp2znjaagz@gondor.apana.org.au>
-User-Agent: NeoMutt/20180716
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9446 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1911190160
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9446 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1911190160
+References: <20191112223046.176097-1-samitolvanen@google.com>
+ <20191114225113.155143-1-samitolvanen@google.com> <CAKv+Gu98uOZz7ZrG66gQerBq+hmwHmL4ebz5oDL16hxg=Y_YvA@mail.gmail.com>
+In-Reply-To: <CAKv+Gu98uOZz7ZrG66gQerBq+hmwHmL4ebz5oDL16hxg=Y_YvA@mail.gmail.com>
+From:   Sami Tolvanen <samitolvanen@google.com>
+Date:   Tue, 19 Nov 2019 12:01:52 -0800
+Message-ID: <CABCJKufNpaYEFC0dNVFMd+4puPn9EW4r=UNW-gzn1y0yxYzY-w@mail.gmail.com>
+Subject: Re: [PATCH v2] crypto: arm64/sha: fix function types
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Eric Biggers <ebiggers@google.com>,
+        Kees Cook <keescook@chromium.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Nov 19, 2019 at 01:17:31PM +0800, Herbert Xu wrote:
-> The function padata_flush_queues is fundamentally broken because
-> it cannot force padata users to complete the request that is
-> underway.  IOW padata has to passively wait for the completion
-> of any outstanding work.
-> 
-> As it stands flushing is used in two places.  Its use in padata_stop
-> is simply unnecessary because nothing depends on the queues to
-> be flushed afterwards.
-> 
-> The other use in padata_replace is more substantial as we depend
-> on it to free the old pd structure.  This patch instead uses the
-> pd->refcnt to dynamically free the pd structure once all requests
-> are complete.
+On Fri, Nov 15, 2019 at 3:32 AM Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
+>
+> On Thu, 14 Nov 2019 at 22:51, Sami Tolvanen <samitolvanen@google.com> wrote:
+> >
+> > Instead of casting pointers to callback functions, add C wrappers
+> > to avoid type mismatch failures with Control-Flow Integrity (CFI)
+> > checking.
+> >
+> > Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
+> > ---
+> >  arch/arm64/crypto/sha1-ce-glue.c   | 17 +++++++++------
+> >  arch/arm64/crypto/sha2-ce-glue.c   | 34 ++++++++++++++++++------------
+> >  arch/arm64/crypto/sha256-glue.c    | 32 +++++++++++++++++-----------
+> >  arch/arm64/crypto/sha512-ce-glue.c | 26 ++++++++++++-----------
+> >  arch/arm64/crypto/sha512-glue.c    | 15 ++++++++-----
+> >  5 files changed, 76 insertions(+), 48 deletions(-)
+> >
+> > diff --git a/arch/arm64/crypto/sha1-ce-glue.c b/arch/arm64/crypto/sha1-ce-glue.c
+> > index bdc1b6d7aff7..76a951ce2a7b 100644
+> > --- a/arch/arm64/crypto/sha1-ce-glue.c
+> > +++ b/arch/arm64/crypto/sha1-ce-glue.c
+> > @@ -28,6 +28,13 @@ struct sha1_ce_state {
+> >  asmlinkage void sha1_ce_transform(struct sha1_ce_state *sst, u8 const *src,
+> >                                   int blocks);
+> >
+> > +static inline void __sha1_ce_transform(struct sha1_state *sst, u8 const *src,
+> > +                                      int blocks)
+>
+> Nit: making a function inline when all we ever do is take its address
+> is rather pointless, so please drop that (below as well)
 
-__padata_free unconditionally frees pd, so a padata job might choke on it
-later.  padata_do_parallel calls seem safe because they use RCU, but it seems
-possible that a job could call padata_do_serial after the instance is gone.
+Ack, I'll send v3 that removes the extra inlines shortly.
 
-Best idea I can think of now is to indicate the instance has been freed in the
-pd before dropping the initial pd ref in __padata_free, and use that to bail
-out early from places that touch the instance or its data (workqueues say).
-Will think more on this.
+> With that fixed (and assuming that the crypto selftests still pass -
+> please confirm that you've tried that)
 
+I don't have a test device that supports sha512-ce, but self-tests for
+everything else pass with these changes.
 
-(By the way, I was on leave longer than anticipated, so thanks for picking up
-my slack on this patch.  I plan to repost my other padata fixes soon.)
+Sami
