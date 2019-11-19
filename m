@@ -2,282 +2,585 @@ Return-Path: <SRS0=Veu2=ZL=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AC50C43215
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Nov 2019 17:56:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC381C432C0
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Nov 2019 18:58:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2272E21823
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 Nov 2019 17:56:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="P77v8NRb"
+	by mail.kernel.org (Postfix) with ESMTP id 8D06A2243B
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 Nov 2019 18:58:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726555AbfKSR4p (ORCPT
+        id S1727014AbfKSS6e (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 Nov 2019 12:56:45 -0500
-Received: from mail-eopbgr60083.outbound.protection.outlook.com ([40.107.6.83]:42661
-        "EHLO EUR04-DB3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726792AbfKSR4o (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 Nov 2019 12:56:44 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OD+mIQWS7i/Y98y4BtHG5Kt5B1Ngq6UzHXGXyD79Ld7z+Fwvovko+gQYloojMpF+7I77Hsy6cIp9g4ID8cumeYlb4M1miPUzPsYWwCzQYOeJa/9nP3nrzT2NmDC+p7aLC2EU3EIbhUish1unHdTTeVghLvzqIiIf8oy0Ko0rVHfnr/ZwZ12qtwRprng+CvU+SVaSVGqtw8hVdVtFHTHQb71l2nyoG/4RAhPa2Gg1W5dch8cgoCNyKHU42VZcF9YiuuV5LEhw2fQ+NxCKBPUrahsrpvKz8RyFv+y82ojE2WbbRMrNieQ7da1k8R1ndxvU0T+BfWrgiOADGvagX9TMlQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ug9a2kxCguORGCNNldpnPaK2L8TRYIjJLtVAz51utHI=;
- b=lL0tdeARMxArjByJh/a6zecEP0qQQww+odg2e4rTPhTWw5ANUWF6HMhf0XRi2P1onHwBLCdW3bwBWlU41IsKdK2fVrDy6aEkr/YUvoNrypohPXpsd5yXRmzl5I2/8ID+p6CAZU2TFyevQFfZ4i+owhaiqTbW/K3qO36ogVe0GbOpIiV8VQahCNi8NmeNVrBHfgu+vhvCEohVEuZbDahkUESzGpQIpSdDUOizbyehrIL4N3XrGEItRRcnGIE12eiTBGCBfkiU/B/YlsaCn8FH+zV1AY+6sijHuYYYvToesfnntadaO8M5d2AGpuj7vbwbXj3vhgDFcfJj8wTs0eBxAA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ug9a2kxCguORGCNNldpnPaK2L8TRYIjJLtVAz51utHI=;
- b=P77v8NRbHlfJEI5YGYDr0g05lBId3WnwNvvFzYmKdKqNmSEYikFlrPLLvyYDf6qkzh+cwI80qywxW7q42cubw6GGZUcNHLDDwBkTCm/oiPG9DzGx4qsX61Jxq7cAZJsso1GbKsjHqtV4mOJWQsjZbuqT3fHskHdPQ+Vz/jpW3fQ=
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB2925.eurprd04.prod.outlook.com (10.175.24.15) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2451.23; Tue, 19 Nov 2019 17:55:00 +0000
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::89e1:552e:a24d:e72]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::89e1:552e:a24d:e72%3]) with mapi id 15.20.2474.015; Tue, 19 Nov 2019
- 17:55:00 +0000
-From:   Horia Geanta <horia.geanta@nxp.com>
-To:     Iuliana Prodan <iuliana.prodan@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>
-CC:     "David S. Miller" <davem@davemloft.net>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>
-Subject: Re: [PATCH 07/12] crypto: caam - refactor caam_jr_enqueue
-Thread-Topic: [PATCH 07/12] crypto: caam - refactor caam_jr_enqueue
-Thread-Index: AQHVnZa0sS6CFfezokOAnr5a2apfuA==
-Date:   Tue, 19 Nov 2019 17:55:00 +0000
-Message-ID: <VI1PR0402MB34853893505F95195F4C125B984C0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <1574029845-22796-1-git-send-email-iuliana.prodan@nxp.com>
- <1574029845-22796-8-git-send-email-iuliana.prodan@nxp.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=horia.geanta@nxp.com; 
-x-originating-ip: [212.146.100.6]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 651a818c-7e77-4e68-dbac-08d76d1998f0
-x-ms-traffictypediagnostic: VI1PR0402MB2925:|VI1PR0402MB2925:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <VI1PR0402MB2925E93065410A6F7310E225984C0@VI1PR0402MB2925.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:3826;
-x-forefront-prvs: 022649CC2C
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(346002)(136003)(39860400002)(396003)(376002)(199004)(189003)(54906003)(9686003)(8676002)(76116006)(8936002)(33656002)(81166006)(81156014)(52536014)(5660300002)(71190400001)(316002)(71200400001)(86362001)(478600001)(110136005)(99286004)(14454004)(44832011)(76176011)(6246003)(7696005)(305945005)(4326008)(91956017)(476003)(486006)(66066001)(74316002)(446003)(6636002)(26005)(186003)(14444005)(6436002)(6506007)(66476007)(2906002)(3846002)(102836004)(6116002)(53546011)(229853002)(66946007)(55016002)(7736002)(64756008)(66556008)(25786009)(66446008)(256004);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB2925;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: CQE7RUpaYkzKm3yo4XemFaJCjIAOTWUEsHG4af6jQtjMy/3g8iv7tAc1ZCtRivqVF5OVQEu7VZAhNhFHGWE/kmupm/tn6p5qv/NIOauO1SK8XY9hhIMHpra2K8UswW44rd7CJSaFQo8sDGofWCQraHS4C7s/Lkukwspwib6Xk15vwBXsXTxLCbZUYEyC01F/pW13W8od+bfY7bWXs7kmDyBfT5yIlbgwuUNnaQ2deTUbws5y4yR9vvVkelsthI56IyPP15n6VDmebj45+PjGBgKV2zcb9biy9PYX/+arXDAZLjQi8y/3JAU7uUU7uJHQnY511GcpebxAj9TaiqDHjvl3Q+AX7xq54zSmXdJ2vWYIz/3/Qz5xz90MvCo7ortjdn6EMy92DopCQbRwrWGEriCvqbeYdOZP4Y57JbGJfUcXnSA4QV5oj7KyjetRaziy
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Tue, 19 Nov 2019 13:58:34 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:43068 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726948AbfKSS6d (ORCPT <rfc822;linux-crypto@vger.kernel.orG>);
+        Tue, 19 Nov 2019 13:58:33 -0500
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1iX8hs-0004tE-CG; Wed, 20 Nov 2019 02:58:32 +0800
+Received: from herbert by gondobar with local (Exim 4.89)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1iX8hn-0007KJ-Ra; Wed, 20 Nov 2019 02:58:27 +0800
+Date:   Wed, 20 Nov 2019 02:58:27 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>
+Subject: [v2 PATCH] crypto: pcrypt - Avoid deadlock by using per-instance
+ padata queues
+Message-ID: <20191119185827.nerskpvddkcsih25@gondor.apana.org.au>
+References: <20191119130556.dso2ni6qlks3lr23@gondor.apana.org.au>
+ <20191119173732.GB819@sol.localdomain>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 651a818c-7e77-4e68-dbac-08d76d1998f0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Nov 2019 17:55:00.2726
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: o4ETwvyDzHLQIKf4eNxOIVcrcp0av6K3PmPpfhAEVSGI3bbCGOhsJB3DCYReEkPK8vLPrvIl5DcxynpI7Vr7BA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB2925
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191119173732.GB819@sol.localdomain>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 11/18/2019 12:31 AM, Iuliana Prodan wrote:=0A=
-> Added a new struct - caam_jr_request_entry, to keep each request=0A=
-> information. This has a crypto_async_request, used to determine=0A=
-> the request type, and a bool to check if the request has backlog=0A=
-> flag or not.=0A=
-> This struct is passed to CAAM, via enqueue function - caam_jr_enqueue.=0A=
-> =0A=
-> The new added caam_jr_enqueue_no_bklog function is used to enqueue a job=
-=0A=
-> descriptor head for cases like caamrng, key_gen, digest_key, where we=0A=
-Enqueuing terminology: either generic "job" or more HW-specific=0A=
-"job descriptor".=0A=
-Job descriptor *head* has no meaning.=0A=
-=0A=
-> don't have backlogged requests.=0A=
-> =0A=
-...because the "requests" are not crypto requests - they are either coming=
-=0A=
-from hwrng (caamrng's case) or are driver-internal (key_gen, digest_key -=
-=0A=
-used for key hashing / derivation during .setkey callback).=0A=
-=0A=
-> diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.=
-c=0A=
-> index 21b6172..abebcfc 100644=0A=
-> --- a/drivers/crypto/caam/caamalg.c=0A=
-> +++ b/drivers/crypto/caam/caamalg.c=0A=
-[...]=0A=
-> @@ -1416,7 +1424,7 @@ static inline int chachapoly_crypt(struct aead_requ=
-est *req, bool encrypt)=0A=
->  			     DUMP_PREFIX_ADDRESS, 16, 4, desc, desc_bytes(desc),=0A=
->  			     1);=0A=
->  =0A=
-> -	ret =3D caam_jr_enqueue(jrdev, desc, aead_crypt_done, req);=0A=
-> +	ret =3D caam_jr_enqueue(jrdev, desc, aead_crypt_done, &edesc->jrentry);=
-=0A=
->  	if (ret !=3D -EINPROGRESS) {=0A=
->  		aead_unmap(jrdev, edesc, req);=0A=
->  		kfree(edesc);=0A=
-> @@ -1440,6 +1448,7 @@ static inline int aead_crypt(struct aead_request *r=
-eq, bool encrypt)=0A=
->  	struct aead_edesc *edesc;=0A=
->  	struct crypto_aead *aead =3D crypto_aead_reqtfm(req);=0A=
->  	struct caam_ctx *ctx =3D crypto_aead_ctx(aead);=0A=
-> +	struct caam_jr_request_entry *jrentry;=0A=
->  	struct device *jrdev =3D ctx->jrdev;=0A=
->  	bool all_contig;=0A=
->  	u32 *desc;=0A=
-> @@ -1459,7 +1468,9 @@ static inline int aead_crypt(struct aead_request *r=
-eq, bool encrypt)=0A=
->  			     desc_bytes(edesc->hw_desc), 1);=0A=
->  =0A=
->  	desc =3D edesc->hw_desc;=0A=
-> -	ret =3D caam_jr_enqueue(jrdev, desc, aead_crypt_done, req);=0A=
-> +	jrentry =3D &edesc->jrentry;=0A=
-> +=0A=
-> +	ret =3D caam_jr_enqueue(jrdev, desc, aead_crypt_done, jrentry);=0A=
-Let's avoid adding a new local variable by using &edesc->jrentry directly,=
-=0A=
-like in chachapoly_crypt().=0A=
-Similar for the other places.=0A=
-=0A=
-> diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhas=
-h.c=0A=
-> index baf4ab1..d9de3dc 100644=0A=
-> --- a/drivers/crypto/caam/caamhash.c=0A=
-> +++ b/drivers/crypto/caam/caamhash.c=0A=
-[...]=0A=
-> @@ -933,11 +943,13 @@ static int ahash_final_ctx(struct ahash_request *re=
-q)=0A=
->  			     DUMP_PREFIX_ADDRESS, 16, 4, desc, desc_bytes(desc),=0A=
->  			     1);=0A=
->  =0A=
-> -	ret =3D caam_jr_enqueue(jrdev, desc, ahash_done_ctx_src, req);=0A=
-> +	jrentry =3D &edesc->jrentry;=0A=
-> +=0A=
-> +	ret =3D caam_jr_enqueue(jrdev, desc, ahash_done_ctx_src, jrentry);=0A=
->  	if (ret =3D=3D -EINPROGRESS)=0A=
->  		return ret;=0A=
->  =0A=
-> - unmap_ctx:=0A=
-> +unmap_ctx:=0A=
-That's correct, however whitespace fixing should be done separately.=0A=
-=0A=
-> @@ -1009,11 +1022,13 @@ static int ahash_finup_ctx(struct ahash_request *=
-req)=0A=
->  			     DUMP_PREFIX_ADDRESS, 16, 4, desc, desc_bytes(desc),=0A=
->  			     1);=0A=
->  =0A=
-> -	ret =3D caam_jr_enqueue(jrdev, desc, ahash_done_ctx_src, req);=0A=
-> +	jrentry =3D &edesc->jrentry;=0A=
-> +=0A=
-> +	ret =3D caam_jr_enqueue(jrdev, desc, ahash_done_ctx_src, jrentry);=0A=
->  	if (ret =3D=3D -EINPROGRESS)=0A=
->  		return ret;=0A=
->  =0A=
-> - unmap_ctx:=0A=
-> +unmap_ctx:=0A=
-Again, unrelated whitespace fix.=0A=
-=0A=
-> diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.=
-c=0A=
-> index 7f7ea32..bb0e4b9 100644=0A=
-> --- a/drivers/crypto/caam/caampkc.c=0A=
-> +++ b/drivers/crypto/caam/caampkc.c=0A=
-[...]=0A=
-> @@ -315,6 +317,8 @@ static struct rsa_edesc *rsa_edesc_alloc(struct akcip=
-her_request *req,=0A=
->  	edesc->mapped_src_nents =3D mapped_src_nents;=0A=
->  	edesc->mapped_dst_nents =3D mapped_dst_nents;=0A=
->  =0A=
-> +	edesc->jrentry.base =3D &req->base;=0A=
-> +=0A=
->  	edesc->sec4_sg_dma =3D dma_map_single(dev, edesc->sec4_sg,=0A=
->  					    sec4_sg_bytes, DMA_TO_DEVICE);=0A=
->  	if (dma_mapping_error(dev, edesc->sec4_sg_dma)) {=0A=
-[...]=0A=
-> @@ -633,7 +638,10 @@ static int caam_rsa_enc(struct akcipher_request *req=
-)=0A=
->  	/* Initialize Job Descriptor */=0A=
->  	init_rsa_pub_desc(edesc->hw_desc, &edesc->pdb.pub);=0A=
->  =0A=
-> -	ret =3D caam_jr_enqueue(jrdev, edesc->hw_desc, rsa_pub_done, req);=0A=
-> +	jrentry =3D &edesc->jrentry;=0A=
-> +	jrentry->base =3D &req->base;=0A=
-This field is already set in rsa_edesc_alloc().=0A=
-=0A=
-> @@ -666,7 +675,10 @@ static int caam_rsa_dec_priv_f1(struct akcipher_requ=
-est *req)=0A=
->  	/* Initialize Job Descriptor */=0A=
->  	init_rsa_priv_f1_desc(edesc->hw_desc, &edesc->pdb.priv_f1);=0A=
->  =0A=
-> -	ret =3D caam_jr_enqueue(jrdev, edesc->hw_desc, rsa_priv_f_done, req);=
-=0A=
-> +	jrentry =3D &edesc->jrentry;=0A=
-> +	jrentry->base =3D &req->base;=0A=
-The same here.=0A=
-=0A=
-> @@ -699,7 +712,10 @@ static int caam_rsa_dec_priv_f2(struct akcipher_requ=
-est *req)=0A=
->  	/* Initialize Job Descriptor */=0A=
->  	init_rsa_priv_f2_desc(edesc->hw_desc, &edesc->pdb.priv_f2);=0A=
->  =0A=
-> -	ret =3D caam_jr_enqueue(jrdev, edesc->hw_desc, rsa_priv_f_done, req);=
-=0A=
-> +	jrentry =3D &edesc->jrentry;=0A=
-> +	jrentry->base =3D &req->base;=0A=
-And here.=0A=
-=0A=
-> @@ -732,7 +749,10 @@ static int caam_rsa_dec_priv_f3(struct akcipher_requ=
-est *req)=0A=
->  	/* Initialize Job Descriptor */=0A=
->  	init_rsa_priv_f3_desc(edesc->hw_desc, &edesc->pdb.priv_f3);=0A=
->  =0A=
-> -	ret =3D caam_jr_enqueue(jrdev, edesc->hw_desc, rsa_priv_f_done, req);=
-=0A=
-> +	jrentry =3D &edesc->jrentry;=0A=
-> +	jrentry->base =3D &req->base;=0A=
-Also here.=0A=
-=0A=
-> diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h=
-=0A=
-> index c7c10c9..58be66c 100644=0A=
-> --- a/drivers/crypto/caam/intern.h=0A=
-> +++ b/drivers/crypto/caam/intern.h=0A=
-[...]=0A=
-> @@ -104,6 +105,15 @@ struct caam_drv_private {=0A=
->  #endif=0A=
->  };=0A=
->  =0A=
-> +/*=0A=
-> + * Storage for tracking each request that is processed by a ring=0A=
-> + */=0A=
-> +struct caam_jr_request_entry {=0A=
-> +	/* Common attributes for async crypto requests */=0A=
-> +	struct crypto_async_request *base;=0A=
-> +	bool bklog;	/* Stored to determine if the request needs backlog */=0A=
-> +};=0A=
-> +=0A=
-Could we use kernel-doc here?=0A=
-=0A=
-Horia=0A=
+On Tue, Nov 19, 2019 at 09:37:32AM -0800, Eric Biggers wrote:
+> 
+> FYI, with your 3 pcrypt patches applied, I tried enabling CONFIG_CRYPTO_PCRYPT=y
+> again and running syzkaller targetting AF_ALG, and I quickly got the following
+> warning:
+
+Thanks, I forgot to take the CPU lock in padata_alloc_shell.
+
+---8<---
+If the pcrypt template is used multiple times in an algorithm, then a
+deadlock occurs because all pcrypt instances share the same
+padata_instance, which completes requests in the order submitted.  That
+is, the inner pcrypt request waits for the outer pcrypt request while
+the outer request is already waiting for the inner.
+
+This patch fixes this by allocating a set of queues for each pcrypt
+instance instead of using two global queues.  In order to maintain
+the existing user-space interface, the pinst structure remains global
+so any sysfs modifications will apply to every instance.
+
+The new per-instance data structure is called padata_shell and is
+essentially a wrapper around parallel_data.
+
+Reproducer:
+
+	#include <linux/if_alg.h>
+	#include <sys/socket.h>
+	#include <unistd.h>
+
+	int main()
+	{
+		struct sockaddr_alg addr = {
+			.salg_type = "aead",
+			.salg_name = "pcrypt(pcrypt(rfc4106-gcm-aesni))"
+		};
+		int algfd, reqfd;
+		char buf[32] = { 0 };
+
+		algfd = socket(AF_ALG, SOCK_SEQPACKET, 0);
+		bind(algfd, (void *)&addr, sizeof(addr));
+		setsockopt(algfd, SOL_ALG, ALG_SET_KEY, buf, 20);
+		reqfd = accept(algfd, 0, 0);
+		write(reqfd, buf, 32);
+		read(reqfd, buf, 16);
+	}
+
+Reported-by: syzbot+56c7151cad94eec37c521f0e47d2eee53f9361c4@syzkaller.appspotmail.com
+Fixes: 5068c7a883d1 ("crypto: pcrypt - Add pcrypt crypto parallelization wrapper")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
+index 81bbea7f2ba6..3e026e7a7e75 100644
+--- a/crypto/pcrypt.c
++++ b/crypto/pcrypt.c
+@@ -24,6 +24,8 @@ static struct kset           *pcrypt_kset;
+ 
+ struct pcrypt_instance_ctx {
+ 	struct crypto_aead_spawn spawn;
++	struct padata_shell *psenc;
++	struct padata_shell *psdec;
+ 	atomic_t tfm_count;
+ };
+ 
+@@ -32,6 +34,12 @@ struct pcrypt_aead_ctx {
+ 	unsigned int cb_cpu;
+ };
+ 
++static inline struct pcrypt_instance_ctx *pcrypt_tfm_ictx(
++	struct crypto_aead *tfm)
++{
++	return aead_instance_ctx(aead_alg_instance(tfm));
++}
++
+ static int pcrypt_aead_setkey(struct crypto_aead *parent,
+ 			      const u8 *key, unsigned int keylen)
+ {
+@@ -90,6 +98,9 @@ static int pcrypt_aead_encrypt(struct aead_request *req)
+ 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+ 	struct pcrypt_aead_ctx *ctx = crypto_aead_ctx(aead);
+ 	u32 flags = aead_request_flags(req);
++	struct pcrypt_instance_ctx *ictx;
++
++	ictx = pcrypt_tfm_ictx(aead);
+ 
+ 	memset(padata, 0, sizeof(struct padata_priv));
+ 
+@@ -103,7 +114,7 @@ static int pcrypt_aead_encrypt(struct aead_request *req)
+ 			       req->cryptlen, req->iv);
+ 	aead_request_set_ad(creq, req->assoclen);
+ 
+-	err = padata_do_parallel(pencrypt, padata, &ctx->cb_cpu);
++	err = padata_do_parallel(ictx->psenc, padata, &ctx->cb_cpu);
+ 	if (!err)
+ 		return -EINPROGRESS;
+ 
+@@ -132,6 +143,9 @@ static int pcrypt_aead_decrypt(struct aead_request *req)
+ 	struct crypto_aead *aead = crypto_aead_reqtfm(req);
+ 	struct pcrypt_aead_ctx *ctx = crypto_aead_ctx(aead);
+ 	u32 flags = aead_request_flags(req);
++	struct pcrypt_instance_ctx *ictx;
++
++	ictx = pcrypt_tfm_ictx(aead);
+ 
+ 	memset(padata, 0, sizeof(struct padata_priv));
+ 
+@@ -145,7 +159,7 @@ static int pcrypt_aead_decrypt(struct aead_request *req)
+ 			       req->cryptlen, req->iv);
+ 	aead_request_set_ad(creq, req->assoclen);
+ 
+-	err = padata_do_parallel(pdecrypt, padata, &ctx->cb_cpu);
++	err = padata_do_parallel(ictx->psdec, padata, &ctx->cb_cpu);
+ 	if (!err)
+ 		return -EINPROGRESS;
+ 
+@@ -192,6 +206,8 @@ static void pcrypt_free(struct aead_instance *inst)
+ 	struct pcrypt_instance_ctx *ctx = aead_instance_ctx(inst);
+ 
+ 	crypto_drop_aead(&ctx->spawn);
++	padata_free_shell(ctx->psdec);
++	padata_free_shell(ctx->psenc);
+ 	kfree(inst);
+ }
+ 
+@@ -233,12 +249,22 @@ static int pcrypt_create_aead(struct crypto_template *tmpl, struct rtattr **tb,
+ 	if (!inst)
+ 		return -ENOMEM;
+ 
++	err = -ENOMEM;
++
+ 	ctx = aead_instance_ctx(inst);
++	ctx->psenc = padata_alloc_shell(pencrypt);
++	if (!ctx->psenc)
++		goto out_free_inst;
++
++	ctx->psdec = padata_alloc_shell(pdecrypt);
++	if (!ctx->psdec)
++		goto out_free_psenc;
++
+ 	crypto_set_aead_spawn(&ctx->spawn, aead_crypto_instance(inst));
+ 
+ 	err = crypto_grab_aead(&ctx->spawn, name, 0, 0);
+ 	if (err)
+-		goto out_free_inst;
++		goto out_free_psdec;
+ 
+ 	alg = crypto_spawn_aead_alg(&ctx->spawn);
+ 	err = pcrypt_init_instance(aead_crypto_instance(inst), &alg->base);
+@@ -271,6 +297,10 @@ static int pcrypt_create_aead(struct crypto_template *tmpl, struct rtattr **tb,
+ 
+ out_drop_aead:
+ 	crypto_drop_aead(&ctx->spawn);
++out_free_psdec:
++	padata_free_shell(ctx->psdec);
++out_free_psenc:
++	padata_free_shell(ctx->psenc);
+ out_free_inst:
+ 	kfree(inst);
+ 	goto out;
+diff --git a/include/linux/padata.h b/include/linux/padata.h
+index 23717eeaad23..fd38897e1b91 100644
+--- a/include/linux/padata.h
++++ b/include/linux/padata.h
+@@ -9,6 +9,7 @@
+ #ifndef PADATA_H
+ #define PADATA_H
+ 
++#include <linux/compiler_types.h>
+ #include <linux/workqueue.h>
+ #include <linux/spinlock.h>
+ #include <linux/list.h>
+@@ -98,7 +99,7 @@ struct padata_cpumask {
+  * struct parallel_data - Internal control structure, covers everything
+  * that depends on the cpumask in use.
+  *
+- * @pinst: padata instance.
++ * @sh: padata_shell object.
+  * @pqueue: percpu padata queues used for parallelization.
+  * @squeue: percpu padata queues used for serialuzation.
+  * @reorder_objects: Number of objects waiting in the reorder queues.
+@@ -111,7 +112,7 @@ struct padata_cpumask {
+  * @lock: Reorder lock.
+  */
+ struct parallel_data {
+-	struct padata_instance		*pinst;
++	struct padata_shell		*ps;
+ 	struct padata_parallel_queue	__percpu *pqueue;
+ 	struct padata_serial_queue	__percpu *squeue;
+ 	atomic_t			reorder_objects;
+@@ -125,12 +126,27 @@ struct parallel_data {
+ };
+ 
+ /**
++ * struct padata_shell - Wrapper around struct parallel_data, its
++ * purpose is to allow the underlying control structure to be replaced
++ * on the fly using RCU.
++ *
++ * @pinst: padat instance.
++ * @pd: Actual parallel_data structure which may be substituted on the fly.
++ * @list: List entry in padata_instance list.
++ */
++struct padata_shell {
++	struct padata_instance		*pinst;
++	struct parallel_data __rcu	*pd;
++	struct list_head		list;
++};
++
++/**
+  * struct padata_instance - The overall control structure.
+  *
+  * @cpu_notifier: cpu hotplug notifier.
+  * @parallel_wq: The workqueue used for parallel work.
+  * @serial_wq: The workqueue used for serial work.
+- * @pd: The internal control structure.
++ * @pslist: List of padata_shell objects attached to this instance.
+  * @cpumask: User supplied cpumasks for parallel and serial works.
+  * @cpumask_change_notifier: Notifiers chain for user-defined notify
+  *            callbacks that will be called when either @pcpu or @cbcpu
+@@ -143,7 +159,7 @@ struct padata_instance {
+ 	struct hlist_node		 node;
+ 	struct workqueue_struct		*parallel_wq;
+ 	struct workqueue_struct		*serial_wq;
+-	struct parallel_data		*pd;
++	struct list_head		pslist;
+ 	struct padata_cpumask		cpumask;
+ 	struct blocking_notifier_head	 cpumask_change_notifier;
+ 	struct kobject                   kobj;
+@@ -156,7 +172,9 @@ struct padata_instance {
+ 
+ extern struct padata_instance *padata_alloc_possible(const char *name);
+ extern void padata_free(struct padata_instance *pinst);
+-extern int padata_do_parallel(struct padata_instance *pinst,
++extern struct padata_shell *padata_alloc_shell(struct padata_instance *pinst);
++extern void padata_free_shell(struct padata_shell *ps);
++extern int padata_do_parallel(struct padata_shell *ps,
+ 			      struct padata_priv *padata, int *cb_cpu);
+ extern void padata_do_serial(struct padata_priv *padata);
+ extern int padata_set_cpumask(struct padata_instance *pinst, int cpumask_type,
+diff --git a/kernel/padata.c b/kernel/padata.c
+index da56a235a255..b2f21074a276 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -89,7 +89,7 @@ static void padata_parallel_worker(struct work_struct *parallel_work)
+ /**
+  * padata_do_parallel - padata parallelization function
+  *
+- * @pinst: padata instance
++ * @ps: padatashell 
+  * @padata: object to be parallelized
+  * @cb_cpu: pointer to the CPU that the serialization callback function should
+  *          run on.  If it's not in the serial cpumask of @pinst
+@@ -100,16 +100,17 @@ static void padata_parallel_worker(struct work_struct *parallel_work)
+  * Note: Every object which is parallelized by padata_do_parallel
+  * must be seen by padata_do_serial.
+  */
+-int padata_do_parallel(struct padata_instance *pinst,
++int padata_do_parallel(struct padata_shell *ps,
+ 		       struct padata_priv *padata, int *cb_cpu)
+ {
++	struct padata_instance *pinst = ps->pinst;
+ 	int i, cpu, cpu_index, target_cpu, err;
+ 	struct padata_parallel_queue *queue;
+ 	struct parallel_data *pd;
+ 
+ 	rcu_read_lock_bh();
+ 
+-	pd = rcu_dereference_bh(pinst->pd);
++	pd = rcu_dereference_bh(ps->pd);
+ 
+ 	err = -EINVAL;
+ 	if (!(pinst->flags & PADATA_INIT) || pinst->flags & PADATA_INVALID)
+@@ -212,10 +213,10 @@ static struct padata_priv *padata_find_next(struct parallel_data *pd,
+ 
+ static void padata_reorder(struct parallel_data *pd)
+ {
++	struct padata_instance *pinst = pd->ps->pinst;
+ 	int cb_cpu;
+ 	struct padata_priv *padata;
+ 	struct padata_serial_queue *squeue;
+-	struct padata_instance *pinst = pd->pinst;
+ 	struct padata_parallel_queue *next_queue;
+ 
+ 	/*
+@@ -370,7 +371,7 @@ static int padata_setup_cpumasks(struct parallel_data *pd,
+ 
+ 	/* Restrict parallel_wq workers to pd->cpumask.pcpu. */
+ 	cpumask_copy(attrs->cpumask, pd->cpumask.pcpu);
+-	err = apply_workqueue_attrs(pd->pinst->parallel_wq, attrs);
++	err = apply_workqueue_attrs(pd->ps->pinst->parallel_wq, attrs);
+ 	free_workqueue_attrs(attrs);
+ 	if (err < 0)
+ 		goto free_cbcpu_mask;
+@@ -422,12 +423,16 @@ static void padata_init_pqueues(struct parallel_data *pd)
+ }
+ 
+ /* Allocate and initialize the internal cpumask dependend resources. */
+-static struct parallel_data *padata_alloc_pd(struct padata_instance *pinst,
+-					     const struct cpumask *pcpumask,
+-					     const struct cpumask *cbcpumask)
++static struct parallel_data *padata_alloc_pd(struct padata_shell *ps)
+ {
++	struct padata_instance *pinst = ps->pinst;
++	const struct cpumask *cbcpumask;
++	const struct cpumask *pcpumask;
+ 	struct parallel_data *pd;
+ 
++	cbcpumask = pinst->cpumask.cbcpu;
++	pcpumask = pinst->cpumask.pcpu;
++
+ 	pd = kzalloc(sizeof(struct parallel_data), GFP_KERNEL);
+ 	if (!pd)
+ 		goto err;
+@@ -440,7 +445,7 @@ static struct parallel_data *padata_alloc_pd(struct padata_instance *pinst,
+ 	if (!pd->squeue)
+ 		goto err_free_pqueue;
+ 
+-	pd->pinst = pinst;
++	pd->ps = ps;
+ 	if (padata_setup_cpumasks(pd, pcpumask, cbcpumask) < 0)
+ 		goto err_free_squeue;
+ 
+@@ -490,17 +495,17 @@ static void __padata_stop(struct padata_instance *pinst)
+ }
+ 
+ /* Replace the internal control structure with a new one. */
+-static void padata_replace(struct padata_instance *pinst,
+-			   struct parallel_data *pd_new)
++static int padata_replace_one(struct padata_shell *ps)
+ {
+-	struct parallel_data *pd_old = pinst->pd;
++	struct parallel_data *pd_old = rcu_dereference_protected(ps->pd, 1);
++	struct parallel_data *pd_new;
+ 	int notification_mask = 0;
+ 
+-	pinst->flags |= PADATA_RESET;
+-
+-	rcu_assign_pointer(pinst->pd, pd_new);
++	pd_new = padata_alloc_pd(ps);
++	if (!pd_new)
++		return -ENOMEM;
+ 
+-	synchronize_rcu();
++	rcu_assign_pointer(ps->pd, pd_new);
+ 
+ 	if (!cpumask_equal(pd_old->cpumask.pcpu, pd_new->cpumask.pcpu))
+ 		notification_mask |= PADATA_CPU_PARALLEL;
+@@ -510,10 +515,25 @@ static void padata_replace(struct padata_instance *pinst,
+ 	if (atomic_dec_and_test(&pd_old->refcnt))
+ 		padata_free_pd(pd_old);
+ 
++	return notification_mask;
++}
++
++static void padata_replace(struct padata_instance *pinst)
++{
++	int notification_mask = 0;
++	struct padata_shell *ps;
++
++	pinst->flags |= PADATA_RESET;
++
++	list_for_each_entry(ps, &pinst->pslist, list)
++		notification_mask |= padata_replace_one(ps);
++
++	synchronize_rcu();
++
+ 	if (notification_mask)
+ 		blocking_notifier_call_chain(&pinst->cpumask_change_notifier,
+ 					     notification_mask,
+-					     &pd_new->cpumask);
++					     &pinst->cpumask);
+ 
+ 	pinst->flags &= ~PADATA_RESET;
+ }
+@@ -568,7 +588,6 @@ static int __padata_set_cpumasks(struct padata_instance *pinst,
+ 				 cpumask_var_t cbcpumask)
+ {
+ 	int valid;
+-	struct parallel_data *pd;
+ 
+ 	valid = padata_validate_cpumask(pinst, pcpumask);
+ 	if (!valid) {
+@@ -581,14 +600,10 @@ static int __padata_set_cpumasks(struct padata_instance *pinst,
+ 		__padata_stop(pinst);
+ 
+ out_replace:
+-	pd = padata_alloc_pd(pinst, pcpumask, cbcpumask);
+-	if (!pd)
+-		return -ENOMEM;
+-
+ 	cpumask_copy(pinst->cpumask.pcpu, pcpumask);
+ 	cpumask_copy(pinst->cpumask.cbcpu, cbcpumask);
+ 
+-	padata_replace(pinst, pd);
++	padata_replace(pinst);
+ 
+ 	if (valid)
+ 		__padata_start(pinst);
+@@ -676,15 +691,8 @@ EXPORT_SYMBOL(padata_stop);
+ 
+ static int __padata_add_cpu(struct padata_instance *pinst, int cpu)
+ {
+-	struct parallel_data *pd;
+-
+ 	if (cpumask_test_cpu(cpu, cpu_online_mask)) {
+-		pd = padata_alloc_pd(pinst, pinst->cpumask.pcpu,
+-				     pinst->cpumask.cbcpu);
+-		if (!pd)
+-			return -ENOMEM;
+-
+-		padata_replace(pinst, pd);
++		padata_replace(pinst);
+ 
+ 		if (padata_validate_cpumask(pinst, pinst->cpumask.pcpu) &&
+ 		    padata_validate_cpumask(pinst, pinst->cpumask.cbcpu))
+@@ -696,23 +704,15 @@ static int __padata_add_cpu(struct padata_instance *pinst, int cpu)
+ 
+ static int __padata_remove_cpu(struct padata_instance *pinst, int cpu)
+ {
+-	struct parallel_data *pd = NULL;
+-
+ 	if (cpumask_test_cpu(cpu, cpu_online_mask)) {
++		cpumask_clear_cpu(cpu, pinst->cpumask.pcpu);
++		cpumask_clear_cpu(cpu, pinst->cpumask.cbcpu);
+ 
+ 		if (!padata_validate_cpumask(pinst, pinst->cpumask.pcpu) ||
+ 		    !padata_validate_cpumask(pinst, pinst->cpumask.cbcpu))
+ 			__padata_stop(pinst);
+ 
+-		pd = padata_alloc_pd(pinst, pinst->cpumask.pcpu,
+-				     pinst->cpumask.cbcpu);
+-		if (!pd)
+-			return -ENOMEM;
+-
+-		padata_replace(pinst, pd);
+-
+-		cpumask_clear_cpu(cpu, pd->cpumask.cbcpu);
+-		cpumask_clear_cpu(cpu, pd->cpumask.pcpu);
++		padata_replace(pinst);
+ 	}
+ 
+ 	return 0;
+@@ -798,8 +798,9 @@ static void __padata_free(struct padata_instance *pinst)
+ 	cpuhp_state_remove_instance_nocalls(hp_online, &pinst->node);
+ #endif
+ 
++	WARN_ON(!list_empty(&pinst->pslist));
++
+ 	padata_stop(pinst);
+-	padata_free_pd(pinst->pd);
+ 	free_cpumask_var(pinst->cpumask.pcpu);
+ 	free_cpumask_var(pinst->cpumask.cbcpu);
+ 	destroy_workqueue(pinst->serial_wq);
+@@ -946,7 +947,6 @@ static struct padata_instance *padata_alloc(const char *name,
+ 					    const struct cpumask *cbcpumask)
+ {
+ 	struct padata_instance *pinst;
+-	struct parallel_data *pd = NULL;
+ 
+ 	pinst = kzalloc(sizeof(struct padata_instance), GFP_KERNEL);
+ 	if (!pinst)
+@@ -974,11 +974,8 @@ static struct padata_instance *padata_alloc(const char *name,
+ 	    !padata_validate_cpumask(pinst, cbcpumask))
+ 		goto err_free_masks;
+ 
+-	pd = padata_alloc_pd(pinst, pcpumask, cbcpumask);
+-	if (!pd)
+-		goto err_free_masks;
+ 
+-	rcu_assign_pointer(pinst->pd, pd);
++	INIT_LIST_HEAD(&pinst->pslist);
+ 
+ 	cpumask_copy(pinst->cpumask.pcpu, pcpumask);
+ 	cpumask_copy(pinst->cpumask.cbcpu, cbcpumask);
+@@ -1035,6 +1032,61 @@ void padata_free(struct padata_instance *pinst)
+ }
+ EXPORT_SYMBOL(padata_free);
+ 
++/**
++ * padata_alloc_shell - Allocate and initialize padata shell.
++ *
++ * @pinst: Parent padata_instance object.
++ */
++struct padata_shell *padata_alloc_shell(struct padata_instance *pinst)
++{
++	struct parallel_data *pd;
++	struct padata_shell *ps;
++
++	ps = kzalloc(sizeof(*ps), GFP_KERNEL);
++	if (!ps)
++		goto out;
++
++	ps->pinst = pinst;
++
++	get_online_cpus();
++	pd = padata_alloc_pd(ps);
++	put_online_cpus();
++
++	if (!pd)
++		goto out_free_ps;
++
++	mutex_lock(&pinst->lock);
++	RCU_INIT_POINTER(ps->pd, pd);
++	list_add(&ps->list, &pinst->pslist);
++	mutex_unlock(&pinst->lock);
++
++	return ps;
++
++out_free_ps:
++	kfree(ps);
++out:
++	return NULL;
++}
++EXPORT_SYMBOL(padata_alloc_shell);
++
++/**
++ * padata_free_shell - free a padata shell
++ *
++ * @ps: padata shell to free
++ */
++void padata_free_shell(struct padata_shell *ps)
++{
++	struct padata_instance *pinst = ps->pinst;
++
++	mutex_lock(&pinst->lock);
++	list_del(&ps->list);
++	padata_free_pd(rcu_dereference_protected(ps->pd, 1));
++	mutex_unlock(&pinst->lock);
++
++	kfree(ps);
++}
++EXPORT_SYMBOL(padata_free_shell);
++
+ #ifdef CONFIG_HOTPLUG_CPU
+ 
+ static __init int padata_driver_init(void)
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
