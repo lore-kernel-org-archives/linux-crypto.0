@@ -2,100 +2,136 @@ Return-Path: <SRS0=IkvS=ZM=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D88F7C432C0
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 16:21:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9DA4C43215
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 16:54:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AADA62075E
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 16:21:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A0C2B20895
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 16:54:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="MngS67pw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A7dwQMCy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732772AbfKTQVz (ORCPT
+        id S1732904AbfKTQyy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Nov 2019 11:21:55 -0500
-Received: from mout.gmx.net ([212.227.15.19]:53483 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727885AbfKTQVy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Nov 2019 11:21:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1574266897;
-        bh=xu4ircm6Mkplv/efNNMwLAlVPDoRiD2XqhLUOoHy2/A=;
-        h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
-        b=MngS67pwPM63jyQtp4EXMbU12otqe7fvi924Kf0nZAoy+CvgGUNlS1Ggb82QN6PmD
-         oKEoHJ2y9av+yPClYwKaF+tJTSUUPkzCj/xyzmUtn7sh0vfIfLBPxaABUzqtaH+LlU
-         UfCnUTc9BbR4pjHGEzHEEpAElR7QjtDb6/9yUYso=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [192.168.1.176] ([37.4.249.139]) by mail.gmx.com (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1M8hZD-1iSo1w0NiD-004nuI; Wed, 20
- Nov 2019 17:21:37 +0100
-Subject: Re: [PATCH v3 4/4] ARM: dts: bcm2711: Enable HWRNG support
-To:     Stephen Brennan <stephen@brennan.io>
-Cc:     Matt Mackall <mpm@selenic.com>,
+        Wed, 20 Nov 2019 11:54:54 -0500
+Received: from mail-pj1-f66.google.com ([209.85.216.66]:34084 "EHLO
+        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731995AbfKTQyy (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 Nov 2019 11:54:54 -0500
+Received: by mail-pj1-f66.google.com with SMTP id bo14so103413pjb.1;
+        Wed, 20 Nov 2019 08:54:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=SmmkPL/s8+dLRBd7moGUYjQr50TV9dprre5biO+pWFE=;
+        b=A7dwQMCypoe6p4h96B9/TxzQRMiJlE0NJWcizqdgGJzf68jKTqmp/hiT1TDSHLZXrh
+         5kgOcBhMI8xn1SXXboQ9V9VYjO3AxVGb4KLqx54jO7MkmPWCMufJXhUt+X66KDVYUCP8
+         cncdn/Jn9FtaTEaR/+RzABGlvyUO3zB1ZntakO/rmj6DCX/fylGLUjMImcHC4fVQY2OF
+         XpagH4PoIhpP77h+oK1LEEKrfQSyEVjJ9zCupA7UANk1KQOzlfaB71z+ml/oa9zJj0RJ
+         kQs6/V5pX+kroPd4aas5FHTLEoOopF62oBTFGGNMhBCNfeiralaf1hDzd4pV7mGPxJYk
+         8ztw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=SmmkPL/s8+dLRBd7moGUYjQr50TV9dprre5biO+pWFE=;
+        b=I6IG9Icz0Uwb/RMfhwftlBjyx2Frw3suwb9xyx8Vwqtzip7WWwmBhJra4fWR6w71Cx
+         bTqeMkgpr/MAe8nugHInlCRj09Ei71HgipqZwyWxk7Kzk2HtjqbT+dE9rva4wGdLdBYI
+         SUwGSlnZ3uO9GYojytGA3WNfsbvvVw7SlgvMkgqSn4xdpK+xUOymDBaNhkH+dAYCMq4r
+         MCJmC+ka9Ved4dlTJGYnqN6UDGOipM5eMLa/Nj/rCcn4w40yLS6TUEv9trvnxYGXwryK
+         T08CiVMng7mlqk9PJGRYvAEL7PvuVkqKu2NewUdNRwkKBL8PYO9rDeTsrYftU0lV1ceD
+         5ZQA==
+X-Gm-Message-State: APjAAAXx5YK5SIbBwZP9eAplmyOQFT8I0j/B05xRENpiVn5NcZFZAv4S
+        NF6qCz9uCmpbdJ0mGkqyETOTwOPO
+X-Google-Smtp-Source: APXvYqxfRw7lBAZELqyM7BpttNf4yc/FBABSygrhE2LduXO/T+ZEuxM63jk69xNqzsFIHhaqjRGejQ==
+X-Received: by 2002:a17:902:6b47:: with SMTP id g7mr3949682plt.87.1574268892235;
+        Wed, 20 Nov 2019 08:54:52 -0800 (PST)
+Received: from localhost.hsd1.wa.comcast.net ([2601:602:847f:811f:babe:8e8d:b27e:e6d7])
+        by smtp.gmail.com with ESMTPSA id e11sm29841483pff.104.2019.11.20.08.54.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Nov 2019 08:54:49 -0800 (PST)
+From:   Andrey Smirnov <andrew.smirnov@gmail.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
+        Chris Healy <cphealy@gmail.com>,
+        Lucas Stach <l.stach@pengutronix.de>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        bcm-kernel-feedback-list@broadcom.com,
-        Eric Anholt <eric@anholt.net>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-rpi-kernel@lists.infradead.org
-References: <20191120031622.88949-1-stephen@brennan.io>
- <20191120031622.88949-5-stephen@brennan.io>
-From:   Stefan Wahren <wahrenst@gmx.net>
-Message-ID: <e4ad673b-873b-9bef-1f09-3bdeda892780@gmx.net>
-Date:   Wed, 20 Nov 2019 17:21:36 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
+        linux-kernel@vger.kernel.org, linux-imx@nxp.com
+Subject: [PATCH v3 0/6] enable CAAM's HWRNG as default
+Date:   Wed, 20 Nov 2019 08:53:35 -0800
+Message-Id: <20191120165341.32669-1-andrew.smirnov@gmail.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-In-Reply-To: <20191120031622.88949-5-stephen@brennan.io>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-Provags-ID: V03:K1:VzjpvITXKrHb4Xmn1iglZyLcPqx/MkTFcBBCSz7GFHyv2VbGGFg
- JO87hRDAEPzECYOWEtjxqyp0XX6hovTWp9pF6RODgKLjej6yQ3y2MrEqwTTxqLqFpi8L6Wa
- j9Rhd+IT2ZgfYYRGXr3eSUZ5Ovh6YTkI0Orh5hAE8ypHqDBuT8e6OJpNfMs1aI2OOA/nvTj
- 7MeLzBQFAjSmYqgXaL2XA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:hSVLPUrApkI=:cN5zB46U6clgcMSpU3dFrQ
- Xj/szHK7Kf6lkFgKxdlyXpMfbRogwFXsRwTyMhprZmF2XBvJ/PfTko6/wA1UZRPTN2KKvX4qJ
- rdlxP7WXHFgW0fHVLRYacQDFSFRse3P1wjPHmKseXzI0slW6F0b5/fMslyOzm6kE6Gvy+36F/
- 2395wk3w/18ftw3/UVkXT1nOvYMtGjnLJUlx0+Go8HC+Vg13dqUkOFKNO9+zUPxXQOu2qYYTq
- enSENd/plVgrj/V6ZfI2ZUrI719zL2evSQ7FEOPDS2eHyEOGLgrZfWXpvnuQ5r9AAKntjhihK
- gq/Ht4KtClB8tGWHmTb8kRXzHUiQPZuwqVHKpb6qptAq9j7HYYgpvXyQoPvF2jRXPwNlEa5qk
- bEPPM6BlAqcRP5fBx9TJZz5TGgaygfgHdXgSWV5IKbR4+SkivVtdlhGS8TLgh7/Kyg0u/oZxw
- mQCdOCr0aZ0vUB2mJoacFJLJ2XjFNSBriuOqhi/UgxoCuYAiiP7I3Cklul5/wtqZQiwB2yBfs
- KdmHYYL++b55a6zU6oDeW7dN7V0ygckf78g5UfXu9F4OUbvMoYNr0C6BXHr4WTPYP0N1SQ4Aw
- RpF+WjM9d1LUfZRQ0OhDovrVYjqM7WBNk2gB1fCjMcLV+N3Kj4zI9VM+KcVteyUKJb6jNQY/E
- ozUb/nG17mFf97nxk42KZQfYYN7YmOepHB06RLGPkRVePXAARmwLqQ8rdKimAwj7GnzZtVGbn
- YWdpAQ7f5ks1C4dE2ftaV/tKkS0gUPO+xFWPomP6DzZ88mt68P4LCCAkIy++g7INx7kurefP9
- +gZ01g6QCGXgumbBJ2pyUBJieBNkqqJMuxniHcpn3Y5BGNMSyF04Y3GJNOlfBq3yHqsohMM4w
- KctOzMuOfSp5VPDdje1ayhIQIZhTcpJs/8z4G3WFe9pi3d0UORlJx+AYW5mKCkhqPo1V8u+5/
- n+xq3DkqSzC1iUDspJOEDyXczFyUCVHLzhAbLd+God/mIupt/oZax6Qeln1yTL/cNq1wq9q3u
- 6LCznRCAygp6IhLLbAyXL7jimCRpbkk2Ay7DRD1UUKj/xa+FU+IN4KqEsPt0X9fYS64NvsPqB
- U0g4oxcaz8Fxqd1FPE5kvqnjxlSGVfcUoMzFijc1/oFuTje8FLXGC4Hmo48r8NIRwYdM1G7lR
- FA5sjsqhnwChE4DpzbBxGzo0lPagUMbdhCoPg+Zp7RTj7iKVMIBPg7CbQE470v3tsmo7yOlmF
- ox83VLw4DLZN4gwZp0lW6wyMtNq8DE/NmODRme0+rIso0iD305nS2aCn8vVc=
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am 20.11.19 um 04:16 schrieb Stephen Brennan:
-> This enables hardware random number generator support for the BCM2711
-> on the Raspberry Pi 4 board.
->
-> Signed-off-by: Stephen Brennan <stephen@brennan.io>
+Everyone:
 
-Acked-by: Stefan Wahren <wahrenst@gmx.net>
+This series is a continuation of original [discussion]. I don't know
+if what's in the series is enough to use CAAMs HWRNG system wide, but
+I am hoping that with enough iterations and feedback it will be.
 
-Thanks
+
+Changes since [v1]:
+
+    - Original hw_random replaced with the one using output of TRNG directly
+
+    - SEC4 DRNG IP block exposed via crypto API
+
+    - Small fix regarding use of GFP_DMA added to the series
+
+Chagnes since [v2]:
+
+    - msleep in polling loop to avoid wasting CPU cycles
+
+    - caam_trng_read() bails out early if 'wait' is set to 'false'
+
+    - fixed typo in ZII's name
+
+Feedback is welcome!
+
+Thanks,
+Andrey Smirnov
+
+[discussion] https://patchwork.kernel.org/patch/9850669/
+[v1] lore.kernel.org/lkml/20191029162916.26579-1-andrew.smirnov@gmail.com
+[v2] lore.kernel.org/lkml/20191118153843.28136-1-andrew.smirnov@gmail.com
+
+Andrey Smirnov (6):
+  crypto: caam - RNG4 TRNG errata
+  crypto: caam - enable prediction resistance in HRWNG
+  crypto: caam - allocate RNG instantiation descriptor with GFP_DMA
+  crypto: caam - move RNG presense check into a shared function
+  crypto: caam - replace DRNG with TRNG for use with hw_random
+  crypto: caam - expose SEC4 DRNG via crypto RNG API
+
+ drivers/crypto/caam/Kconfig   |  15 +-
+ drivers/crypto/caam/Makefile  |   3 +-
+ drivers/crypto/caam/caamrng.c | 358 ----------------------------------
+ drivers/crypto/caam/ctrl.c    |  29 ++-
+ drivers/crypto/caam/desc.h    |   2 +
+ drivers/crypto/caam/drng.c    | 175 +++++++++++++++++
+ drivers/crypto/caam/intern.h  |  32 ++-
+ drivers/crypto/caam/jr.c      |   3 +-
+ drivers/crypto/caam/regs.h    |  14 +-
+ drivers/crypto/caam/trng.c    |  89 +++++++++
+ 10 files changed, 338 insertions(+), 382 deletions(-)
+ delete mode 100644 drivers/crypto/caam/caamrng.c
+ create mode 100644 drivers/crypto/caam/drng.c
+ create mode 100644 drivers/crypto/caam/trng.c
+
+-- 
+2.21.0
 
