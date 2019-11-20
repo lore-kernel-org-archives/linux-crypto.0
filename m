@@ -7,54 +7,51 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1609C432C0
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 13:42:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68EB3C432C3
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 13:42:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7205D22506
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 13:42:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 373BC22528
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 13:42:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1574257349;
-	bh=4eCLfgC28qakH7dppaeyPKULnqHRTTytQprs89UT4h0=;
+	s=default; t=1574257374;
+	bh=90dtLk+IqP0UprqMWrNqJocmKABR/HpuO8r3OlLHJ+8=;
 	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=Wv2y0bAa5ZYkBW/DWe1Dp3pyYp5KWlnZlUWuz7yAbPHqhJBq85YeyklO0dONHP0fO
-	 Qw0TAuBRzvmYCtRpJqpOcbL9+FyNtLUcKrxVDNmvzzuemSfXs6ps6dGP1MPbHN8wYG
-	 40AIjPocHm+YGhDUQdatbOmOMKuk6m9VrtpdIWJM=
+	b=qISseiTUR0zE8+C2avitxSvmwDIc4y7ohm/9idK6afkRen5jkpHJaA0uFRryf3rrj
+	 SDzhWIE/JyRgGHvxN+PdmKPejincmDaJGwmWyoD3H72yXcIS0/Y6T1wBCOM6xIPuTy
+	 5hygS8FJOlmZ29sVvDMDBAJFAosz74nVIxhvrMkQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729331AbfKTNm2 (ORCPT
+        id S1728965AbfKTNmx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Nov 2019 08:42:28 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50228 "EHLO mail.kernel.org"
+        Wed, 20 Nov 2019 08:42:53 -0500
+Received: from mail.kernel.org ([198.145.29.99]:50714 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728149AbfKTNm2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Nov 2019 08:42:28 -0500
+        id S1731440AbfKTNmx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 Nov 2019 08:42:53 -0500
 Received: from localhost.localdomain (unknown [118.189.143.39])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 50670224FA;
-        Wed, 20 Nov 2019 13:42:24 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 93C63224FA;
+        Wed, 20 Nov 2019 13:42:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1574257347;
-        bh=4eCLfgC28qakH7dppaeyPKULnqHRTTytQprs89UT4h0=;
+        s=default; t=1574257371;
+        bh=90dtLk+IqP0UprqMWrNqJocmKABR/HpuO8r3OlLHJ+8=;
         h=From:To:Cc:Subject:Date:From;
-        b=KsiQcMPeCMJBqrz39phld9DGOKriGjNxugptomUEeuNvnK9yqJHb4thPICgnZEPGx
-         Srv4EjljAt5ran4rAWCg982THMZtLtVeTH7o5g3tRgS9RFTBwsqe9ZZ6u5qLWWMklA
-         DBdo9C5icjrQdbNhQg7TdoDz+msSeazcJAodc/ec=
+        b=qhaa0iik09JF5p1wuJcv4Twb6bl2bQHRtpsmvXYnAqmjGPIGTkvTXvQ+5EzLYQK7p
+         jx16uJ1dMOXtAtu5tXUsPq1QEaLd+bOHfZzGg+jbPPgIR4gtRmw4ZkXiYA/NQhjcRJ
+         mdt/CQWzVSWjuuLbieVPQjN/ozEqmCkP8KU5dw6Q=
 From:   Krzysztof Kozlowski <krzk@kernel.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Krzysztof Kozlowski <krzk@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        David Airlie <airlied@linux.ie>,
+        Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Atul Gupta <atul.gupta@chelsio.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        linux-crypto@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org
-Subject: [PATCH] crypto: Fix Kconfig indentation
-Date:   Wed, 20 Nov 2019 21:42:21 +0800
-Message-Id: <20191120134221.15774-1-krzk@kernel.org>
+        Corey Minyard <minyard@acm.org>, linux-crypto@vger.kernel.org,
+        openipmi-developer@lists.sourceforge.net
+Subject: [PATCH] char: Fix Kconfig indentation
+Date:   Wed, 20 Nov 2019 21:42:47 +0800
+Message-Id: <20191120134247.16073-1-krzk@kernel.org>
 X-Mailer: git-send-email 2.17.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
@@ -67,162 +64,139 @@ coding style with command like:
 
 Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
 ---
- drivers/crypto/Kconfig         |  4 ++--
- drivers/crypto/caam/Kconfig    | 14 +++++++-------
- drivers/crypto/chelsio/Kconfig | 30 +++++++++++++++---------------
- drivers/crypto/stm32/Kconfig   |  6 +++---
- drivers/crypto/ux500/Kconfig   | 16 ++++++++--------
- 5 files changed, 35 insertions(+), 35 deletions(-)
+ drivers/char/Kconfig           |  6 +++---
+ drivers/char/agp/Kconfig       |  2 +-
+ drivers/char/hw_random/Kconfig | 10 +++++-----
+ drivers/char/ipmi/Kconfig      | 20 ++++++++++----------
+ 4 files changed, 19 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 581021fab462..a60f1c5a702b 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -356,7 +356,7 @@ config CRYPTO_DEV_OMAP
- 	depends on ARCH_OMAP2PLUS
- 	help
- 	  OMAP processors have various crypto HW accelerators. Select this if
--          you want to use the OMAP modules for any of the crypto algorithms.
-+	  you want to use the OMAP modules for any of the crypto algorithms.
+diff --git a/drivers/char/Kconfig b/drivers/char/Kconfig
+index df0fc997dc3e..26956c006987 100644
+--- a/drivers/char/Kconfig
++++ b/drivers/char/Kconfig
+@@ -439,8 +439,8 @@ config RAW_DRIVER
+ 	  Once bound, I/O against /dev/raw/rawN uses efficient zero-copy I/O.
+ 	  See the raw(8) manpage for more details.
  
- if CRYPTO_DEV_OMAP
+-          Applications should preferably open the device (eg /dev/hda1)
+-          with the O_DIRECT flag.
++	  Applications should preferably open the device (eg /dev/hda1)
++	  with the O_DIRECT flag.
  
-@@ -638,7 +638,7 @@ config CRYPTO_DEV_QCOM_RNG
- 	  Generator hardware found on Qualcomm SoCs.
+ config MAX_RAW_DEVS
+ 	int "Maximum number of RAW devices to support (1-65536)"
+@@ -559,4 +559,4 @@ config RANDOM_TRUST_BOOTLOADER
+ 	device randomness. Say Y here to assume the entropy provided by the
+ 	booloader is trustworthy so it will be added to the kernel's entropy
+ 	pool. Otherwise, say N here so it will be regarded as device input that
+-	only mixes the entropy pool.
+\ No newline at end of file
++	only mixes the entropy pool.
+diff --git a/drivers/char/agp/Kconfig b/drivers/char/agp/Kconfig
+index 812d6aa6e013..bc54235a7022 100644
+--- a/drivers/char/agp/Kconfig
++++ b/drivers/char/agp/Kconfig
+@@ -63,7 +63,7 @@ config AGP_AMD64
+ 	  This option gives you AGP support for the GLX component of
+ 	  X using the on-CPU northbridge of the AMD Athlon64/Opteron CPUs.
+ 	  You still need an external AGP bridge like the AMD 8151, VIA
+-          K8T400M, SiS755. It may also support other AGP bridges when loaded
++	  K8T400M, SiS755. It may also support other AGP bridges when loaded
+ 	  with agp_try_unsupported=1.
  
- 	  To compile this driver as a module, choose M here. The
--          module will be called qcom-rng. If unsure, say N.
-+	  module will be called qcom-rng. If unsure, say N.
+ config AGP_INTEL
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index 7c7fecfa2fb2..91db933ed85a 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -390,13 +390,13 @@ config HW_RANDOM_CAVIUM
+        depends on HW_RANDOM && PCI && (ARM64 || (COMPILE_TEST && 64BIT))
+        default HW_RANDOM
+        ---help---
+-         This driver provides kernel-side support for the Random Number
+-         Generator hardware found on Cavium SoCs.
++	 This driver provides kernel-side support for the Random Number
++	 Generator hardware found on Cavium SoCs.
  
- config CRYPTO_DEV_VMX
- 	bool "Support for VMX cryptographic acceleration instructions"
-diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
-index 87053e46c788..fac5b2e26610 100644
---- a/drivers/crypto/caam/Kconfig
-+++ b/drivers/crypto/caam/Kconfig
-@@ -130,13 +130,13 @@ config CRYPTO_DEV_FSL_CAAM_AHASH_API
- 	  scatterlist crypto API to the SEC4 via job ring.
+-         To compile this driver as a module, choose M here: the
+-         module will be called cavium_rng.
++	 To compile this driver as a module, choose M here: the
++	 module will be called cavium_rng.
  
- config CRYPTO_DEV_FSL_CAAM_PKC_API
--        bool "Register public key cryptography implementations with Crypto API"
--        default y
--        select CRYPTO_RSA
--        help
--          Selecting this will allow SEC Public key support for RSA.
--          Supported cryptographic primitives: encryption, decryption,
--          signature and verification.
-+	bool "Register public key cryptography implementations with Crypto API"
-+	default y
-+	select CRYPTO_RSA
-+	help
-+	  Selecting this will allow SEC Public key support for RSA.
-+	  Supported cryptographic primitives: encryption, decryption,
-+	  signature and verification.
+-         If unsure, say Y.
++	 If unsure, say Y.
  
- config CRYPTO_DEV_FSL_CAAM_RNG_API
- 	bool "Register caam device for hwrng API"
-diff --git a/drivers/crypto/chelsio/Kconfig b/drivers/crypto/chelsio/Kconfig
-index 91e424378217..f078b2686418 100644
---- a/drivers/crypto/chelsio/Kconfig
-+++ b/drivers/crypto/chelsio/Kconfig
-@@ -23,22 +23,22 @@ config CRYPTO_DEV_CHELSIO
- 	  will be called chcr.
+ config HW_RANDOM_MTK
+ 	tristate "Mediatek Random Number Generator support"
+diff --git a/drivers/char/ipmi/Kconfig b/drivers/char/ipmi/Kconfig
+index 4bad0614109b..cc4bea773ded 100644
+--- a/drivers/char/ipmi/Kconfig
++++ b/drivers/char/ipmi/Kconfig
+@@ -8,13 +8,13 @@ menuconfig IPMI_HANDLER
+        depends on HAS_IOMEM
+        select IPMI_DMI_DECODE if DMI
+        help
+-         This enables the central IPMI message handler, required for IPMI
++	 This enables the central IPMI message handler, required for IPMI
+ 	 to work.
  
- config CHELSIO_IPSEC_INLINE
--        bool "Chelsio IPSec XFRM Tx crypto offload"
--        depends on CHELSIO_T4
-+	bool "Chelsio IPSec XFRM Tx crypto offload"
-+	depends on CHELSIO_T4
- 	depends on CRYPTO_DEV_CHELSIO
--        depends on XFRM_OFFLOAD
--        depends on INET_ESP_OFFLOAD || INET6_ESP_OFFLOAD
--        default n
--        ---help---
--          Enable support for IPSec Tx Inline.
-+	depends on XFRM_OFFLOAD
-+	depends on INET_ESP_OFFLOAD || INET6_ESP_OFFLOAD
-+	default n
-+	---help---
-+	  Enable support for IPSec Tx Inline.
+-         IPMI is a standard for managing sensors (temperature,
+-         voltage, etc.) in a system.
++	 IPMI is a standard for managing sensors (temperature,
++	 voltage, etc.) in a system.
  
- config CRYPTO_DEV_CHELSIO_TLS
--        tristate "Chelsio Crypto Inline TLS Driver"
--        depends on CHELSIO_T4
--        depends on TLS_TOE
--        select CRYPTO_DEV_CHELSIO
--        ---help---
--          Support Chelsio Inline TLS with Chelsio crypto accelerator.
-+	tristate "Chelsio Crypto Inline TLS Driver"
-+	depends on CHELSIO_T4
-+	depends on TLS_TOE
-+	select CRYPTO_DEV_CHELSIO
-+	---help---
-+	  Support Chelsio Inline TLS with Chelsio crypto accelerator.
+-         See <file:Documentation/IPMI.txt> for more details on the driver.
++	 See <file:Documentation/IPMI.txt> for more details on the driver.
  
--          To compile this driver as a module, choose M here: the module
--          will be called chtls.
-+	  To compile this driver as a module, choose M here: the module
-+	  will be called chtls.
-diff --git a/drivers/crypto/stm32/Kconfig b/drivers/crypto/stm32/Kconfig
-index 1aba9372cd23..4ef3eb11361c 100644
---- a/drivers/crypto/stm32/Kconfig
-+++ b/drivers/crypto/stm32/Kconfig
-@@ -4,7 +4,7 @@ config CRYPTO_DEV_STM32_CRC
- 	depends on ARCH_STM32
- 	select CRYPTO_HASH
- 	help
--          This enables support for the CRC32 hw accelerator which can be found
-+	  This enables support for the CRC32 hw accelerator which can be found
- 	  on STMicroelectronics STM32 SOC.
+ 	 If unsure, say N.
  
- config CRYPTO_DEV_STM32_HASH
-@@ -17,7 +17,7 @@ config CRYPTO_DEV_STM32_HASH
- 	select CRYPTO_SHA256
- 	select CRYPTO_ENGINE
- 	help
--          This enables support for the HASH hw accelerator which can be found
-+	  This enables support for the HASH hw accelerator which can be found
- 	  on STMicroelectronics STM32 SOC.
+@@ -56,14 +56,14 @@ config IPMI_PANIC_STRING
+ config IPMI_DEVICE_INTERFACE
+        tristate 'Device interface for IPMI'
+        help
+-         This provides an IOCTL interface to the IPMI message handler so
++	 This provides an IOCTL interface to the IPMI message handler so
+ 	 userland processes may use IPMI.  It supports poll() and select().
  
- config CRYPTO_DEV_STM32_CRYP
-@@ -27,5 +27,5 @@ config CRYPTO_DEV_STM32_CRYP
- 	select CRYPTO_ENGINE
- 	select CRYPTO_LIB_DES
- 	help
--          This enables support for the CRYP (AES/DES/TDES) hw accelerator which
-+	  This enables support for the CRYP (AES/DES/TDES) hw accelerator which
- 	  can be found on STMicroelectronics STM32 SOC.
-diff --git a/drivers/crypto/ux500/Kconfig b/drivers/crypto/ux500/Kconfig
-index b731895aa241..f56d65c56ccf 100644
---- a/drivers/crypto/ux500/Kconfig
-+++ b/drivers/crypto/ux500/Kconfig
-@@ -11,18 +11,18 @@ config CRYPTO_DEV_UX500_CRYP
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_LIB_DES
- 	help
--        This selects the crypto driver for the UX500_CRYP hardware. It supports
--        AES-ECB, CBC and CTR with keys sizes of 128, 192 and 256 bit sizes.
-+	This selects the crypto driver for the UX500_CRYP hardware. It supports
-+	AES-ECB, CBC and CTR with keys sizes of 128, 192 and 256 bit sizes.
+ config IPMI_SI
+        tristate 'IPMI System Interface handler'
+        select IPMI_PLAT_DATA
+        help
+-         Provides a driver for System Interfaces (KCS, SMIC, BT).
++	 Provides a driver for System Interfaces (KCS, SMIC, BT).
+ 	 Currently, only KCS and SMIC are supported.  If
+ 	 you are using IPMI, you should probably say "y" here.
  
- config CRYPTO_DEV_UX500_HASH
--        tristate "UX500 crypto driver for HASH block"
--        depends on CRYPTO_DEV_UX500
--        select CRYPTO_HASH
-+	tristate "UX500 crypto driver for HASH block"
-+	depends on CRYPTO_DEV_UX500
-+	select CRYPTO_HASH
- 	select CRYPTO_SHA1
- 	select CRYPTO_SHA256
--        help
--          This selects the hash driver for the UX500_HASH hardware.
--          Depends on UX500/STM DMA if running in DMA mode.
-+	help
-+	  This selects the hash driver for the UX500_HASH hardware.
-+	  Depends on UX500/STM DMA if running in DMA mode.
+@@ -71,7 +71,7 @@ config IPMI_SSIF
+        tristate 'IPMI SMBus handler (SSIF)'
+        select I2C
+        help
+-         Provides a driver for a SMBus interface to a BMC, meaning that you
++	 Provides a driver for a SMBus interface to a BMC, meaning that you
+ 	 have a driver that must be accessed over an I2C bus instead of a
+ 	 standard interface.  This module requires I2C support.
  
- config CRYPTO_DEV_UX500_DEBUG
- 	bool "Activate ux500 platform debug-mode for crypto and hash block"
+@@ -79,17 +79,17 @@ config IPMI_POWERNV
+        depends on PPC_POWERNV
+        tristate 'POWERNV (OPAL firmware) IPMI interface'
+        help
+-         Provides a driver for OPAL firmware-based IPMI interfaces.
++	 Provides a driver for OPAL firmware-based IPMI interfaces.
+ 
+ config IPMI_WATCHDOG
+        tristate 'IPMI Watchdog Timer'
+        help
+-         This enables the IPMI watchdog timer.
++	 This enables the IPMI watchdog timer.
+ 
+ config IPMI_POWEROFF
+        tristate 'IPMI Poweroff'
+        help
+-         This enables a function to power off the system with IPMI if
++	 This enables a function to power off the system with IPMI if
+ 	 the IPMI management controller is capable of this.
+ 
+ endif # IPMI_HANDLER
 -- 
 2.17.1
 
