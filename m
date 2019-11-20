@@ -8,67 +8,69 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 039CEC432C0
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 16:55:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CBB7C432C3
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 16:55:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CC7EE2071F
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 16:55:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 138212071F
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 16:55:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a3FkiYCW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="poqcC4J/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731995AbfKTQy7 (ORCPT
+        id S1732921AbfKTQy4 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Nov 2019 11:54:59 -0500
-Received: from mail-pj1-f67.google.com ([209.85.216.67]:40599 "EHLO
-        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732932AbfKTQy6 (ORCPT
+        Wed, 20 Nov 2019 11:54:56 -0500
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:34555 "EHLO
+        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731995AbfKTQy4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Nov 2019 11:54:58 -0500
-Received: by mail-pj1-f67.google.com with SMTP id ep1so90687pjb.7;
-        Wed, 20 Nov 2019 08:54:58 -0800 (PST)
+        Wed, 20 Nov 2019 11:54:56 -0500
+Received: by mail-pl1-f195.google.com with SMTP id h13so49026plr.1;
+        Wed, 20 Nov 2019 08:54:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=1DtsNhw9v1gDBQhovceUYU94x/2uJ8teNAnS6FI6Te8=;
-        b=a3FkiYCW6DBeKzfiRotDLAhEy4bHGAdzhJs2OvYhN/vpeN1mLnZ8xYXtqVrdaI4480
-         +Aih7x09GQnb7KAEzkQPkBJfN7CLWngL9WmI5kdDwcw9zFaor8D19sSdcfhPk78Gc3UL
-         TvzyWZzL2D9HolqyFKiqKY9FrEnXlnihGb5qI7itBBdMrQ6EWRS08mgRVar5PtDvJNub
-         Wjq0yPRDU/t9bAvfyZgBBiE9DT1kZVWbrsPowCm6dNxXqsEQ3VDlCFn1X0iEKZ9WlzNZ
-         33mJwpDl0eFVPGDDg+BxW/5XPcWVrcOS+fhykgkl9FGyDCWIlsBjITW0jY4DURgEbeE9
-         B6Qg==
+        bh=5auEHawVnFdIZOUx2eKKQZZ0ecTFrj9LceutMYE+Ee4=;
+        b=poqcC4J/rpivSH3vU30rSgLqMY7OWmyeO12g96GrL3ytw35YI7Zj8V+m7s9on+seQx
+         tEWhr8HjXrYaCFMJyiKLz8TAxfNBceFm3isAkU7P+OeZDuTgNm6F8puVpleB3qGXKks9
+         0DAvLIKZEWglZbU8Mn0X6wuBBy87AbxXaosM85Z0mB24sB943bLT/yX7JmIc9uroUmXZ
+         EqUCiOGbi1MT73qjInbHWlGfdljiKVbqQDcwmaDqzI6uKMGURxq5N/7q7M0zFzv+LhGV
+         yhOx/U0ho6c5wMN9tUkJ592XPOczG9y3aGcmpCcdW2V5I0/Sp+CUilvV44X6u2GdSh8p
+         8jEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=1DtsNhw9v1gDBQhovceUYU94x/2uJ8teNAnS6FI6Te8=;
-        b=tPM/+XA1B7HjkG9gqXblRfSX2d6uUPCp17sZDKR8B8+dnQU52OTXCpnqy036WhCVvZ
-         khGKZ9VJ7wvWORWC90Fyl/GpdUWsJvBVFfitDZuQ+q3iMDDV1XJ9rANgPGZRhEyq0MHZ
-         54zIOnS4ZLZfEtH+nD2lO+1ICYY9MCapjKQRJHTh6LVHpHPNRgEyRUoWdI7t3WTUzmm8
-         UtewWRPwdy7tiOtajFZsiA4vsaA4EzXG93veVbAiLKz0l4cNK7ilqFpHPS4LjJUiaJrk
-         MbZ5mfm/mXHNeWNYQYmgLUT2lzw2QWUDE5wzU2x6GIGetcbc9zweH+h7C+3jFi5qJQ3U
-         xAsQ==
-X-Gm-Message-State: APjAAAXbZ5SkKeJ7iU9eHpP6a2uUE7L1RO2bKqva4WYZt1udKEuqzOGd
-        NRitbH5ubOQTh4YuZT0vU3LXm7um
-X-Google-Smtp-Source: APXvYqx+TkVLOrzoGSzX5bRIAd/sOSJ9Qy74u8zdKIx6k/P6WCmVNCSwjuZdBnY+ONhcWhr3K+l0Hw==
-X-Received: by 2002:a17:90a:9286:: with SMTP id n6mr5170984pjo.84.1574268897255;
-        Wed, 20 Nov 2019 08:54:57 -0800 (PST)
-Received: from localhost.hsd1.wa.comcast.net ([2601:602:847f:811f:babe:8e8d:b27e:e6d7])
-        by smtp.gmail.com with ESMTPSA id e11sm29841483pff.104.2019.11.20.08.54.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        bh=5auEHawVnFdIZOUx2eKKQZZ0ecTFrj9LceutMYE+Ee4=;
+        b=FRaXP2mh/0HaX21ZgaJ609w0s7y6Fdm73WKK2LWB9t8Pvl+fSjXT/VjZwwl+AQhNDc
+         M1LoWMtlDX5hrpk9s/Jt0Yuq0n9+jQDbJZncUfKPJTfv2OUIgwjrA4BntG/HqTWi9SWe
+         qmKPAEQDTQiK4R8X9ulTndhIHMqo5wYoLKLz97EaFUQrAHnxFC3nIP0xyTGK6MtLzJow
+         SKARcavtG67+9yPwuAepdwZvMwV4ESsx0x1Cgl7DGAu4RR0IYfuI0MaxOvjKB+mdhkC0
+         iMz8flA+QCmnMMwjjUK8lk5aMwFghHylQNXDjTjSWKQrJw/PXEc6LoxQg0o5p88Oklc4
+         qdYw==
+X-Gm-Message-State: APjAAAW0wWGhAbavEzG7WOByfaJ4Z7kTXHIxQsfH3ToLQd8oL6oUkaQ7
+        k80IEei4jqJK3CI88WySRjtmYGmL
+X-Google-Smtp-Source: APXvYqzFo53W/cng2MNrmm0ns7AwFrB8539jAQNUjJmdgLAj+ByDTJl2GTXAsfrHL7MeCCV+HV33qg==
+X-Received: by 2002:a17:902:bf0c:: with SMTP id bi12mr3696587plb.98.1574268895035;
         Wed, 20 Nov 2019 08:54:55 -0800 (PST)
+Received: from localhost.hsd1.wa.comcast.net ([2601:602:847f:811f:babe:8e8d:b27e:e6d7])
+        by smtp.gmail.com with ESMTPSA id e11sm29841483pff.104.2019.11.20.08.54.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Nov 2019 08:54:53 -0800 (PST)
 From:   Andrey Smirnov <andrew.smirnov@gmail.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Vipul Kumar <vipul_kumar@mentor.com>,
         Chris Healy <cphealy@gmail.com>,
         Lucas Stach <l.stach@pengutronix.de>,
         =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Iuliana Prodan <iuliana.prodan@nxp.com>,
         linux-kernel@vger.kernel.org, linux-imx@nxp.com
-Subject: [PATCH v3 2/6] crypto: caam - enable prediction resistance in HRWNG
-Date:   Wed, 20 Nov 2019 08:53:37 -0800
-Message-Id: <20191120165341.32669-3-andrew.smirnov@gmail.com>
+Subject: [PATCH v3 1/6] crypto: caam - RNG4 TRNG errata
+Date:   Wed, 20 Nov 2019 08:53:36 -0800
+Message-Id: <20191120165341.32669-2-andrew.smirnov@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191120165341.32669-1-andrew.smirnov@gmail.com>
 References: <20191120165341.32669-1-andrew.smirnov@gmail.com>
@@ -80,9 +82,14 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Instantiate CAAM RNG with prediction resistance enabled to improve its
-quality.
+The TRNG as used in RNG4, used in CAAM has a documentation issue. The
+effect is that it is possible that the entropy used to instantiate the
+DRBG may be old entropy, rather than newly generated entropy. There is
+proper programming guidance, but it is not in the documentation.
 
+Signed-off-by: Aymen Sghaier <aymen.sghaier@nxp.com>
+Signed-off-by: Vipul Kumar <vipul_kumar@mentor.com>
+[andrew.smirnov@gmail.com ported to upstream kernel]
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 Cc: Chris Healy <cphealy@gmail.com>
 Cc: Lucas Stach <l.stach@pengutronix.de>
@@ -93,93 +100,53 @@ Cc: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 Cc: linux-imx@nxp.com
 ---
- drivers/crypto/caam/caamrng.c | 3 ++-
- drivers/crypto/caam/ctrl.c    | 8 +++++---
- drivers/crypto/caam/desc.h    | 2 ++
- drivers/crypto/caam/regs.h    | 4 +++-
- 4 files changed, 12 insertions(+), 5 deletions(-)
+ drivers/crypto/caam/ctrl.c | 11 ++++++++---
+ drivers/crypto/caam/regs.h |  3 ++-
+ 2 files changed, 10 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
-index e8baacaabe07..6dde8ae3cd9b 100644
---- a/drivers/crypto/caam/caamrng.c
-+++ b/drivers/crypto/caam/caamrng.c
-@@ -202,7 +202,8 @@ static inline int rng_create_sh_desc(struct caam_rng_ctx *ctx)
- 	init_sh_desc(desc, HDR_SHARE_SERIAL);
- 
- 	/* Generate random bytes */
--	append_operation(desc, OP_ALG_ALGSEL_RNG | OP_TYPE_CLASS1_ALG);
-+	append_operation(desc, OP_ALG_ALGSEL_RNG | OP_TYPE_CLASS1_ALG |
-+			 OP_ALG_PR_ON);
- 
- 	/* Store bytes */
- 	append_seq_fifo_store(desc, RN_BUF_SIZE, FIFOST_TYPE_RNGSTORE);
 diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index df4db10e9fca..a1c879820286 100644
+index d7c3c3805693..df4db10e9fca 100644
 --- a/drivers/crypto/caam/ctrl.c
 +++ b/drivers/crypto/caam/ctrl.c
-@@ -36,7 +36,8 @@ static void build_instantiation_desc(u32 *desc, int handle, int do_sk)
- 	init_job_desc(desc, 0);
+@@ -338,8 +338,12 @@ static void kick_trng(struct platform_device *pdev, int ent_delay)
+ 	ctrl = (struct caam_ctrl __iomem *)ctrlpriv->ctrl;
+ 	r4tst = &ctrl->r4tst[0];
  
- 	op_flags = OP_TYPE_CLASS1_ALG | OP_ALG_ALGSEL_RNG |
--			(handle << OP_ALG_AAI_SHIFT) | OP_ALG_AS_INIT;
-+			(handle << OP_ALG_AAI_SHIFT) | OP_ALG_AS_INIT |
-+			OP_ALG_PR_ON;
+-	/* put RNG4 into program mode */
+-	clrsetbits_32(&r4tst->rtmctl, 0, RTMCTL_PRGM);
++	/*
++	 * Setting both RTMCTL:PRGM and RTMCTL:TRNG_ACC causes TRNG to
++	 * properly invalidate the entropy in the entropy register and
++	 * force re-generation.
++	 */
++	clrsetbits_32(&r4tst->rtmctl, 0, RTMCTL_PRGM | RTMCTL_ACC);
  
- 	/* INIT RNG in non-test mode */
- 	append_operation(desc, op_flags);
-@@ -275,11 +276,12 @@ static int instantiate_rng(struct device *ctrldev, int state_handle_mask,
- 		return -ENOMEM;
+ 	/*
+ 	 * Performance-wise, it does not make sense to
+@@ -369,7 +373,8 @@ static void kick_trng(struct platform_device *pdev, int ent_delay)
+ 	 * select raw sampling in both entropy shifter
+ 	 * and statistical checker; ; put RNG4 into run mode
+ 	 */
+-	clrsetbits_32(&r4tst->rtmctl, RTMCTL_PRGM, RTMCTL_SAMP_MODE_RAW_ES_SC);
++	clrsetbits_32(&r4tst->rtmctl, RTMCTL_PRGM | RTMCTL_ACC,
++		      RTMCTL_SAMP_MODE_RAW_ES_SC);
+ }
  
- 	for (sh_idx = 0; sh_idx < RNG4_MAX_HANDLES; sh_idx++) {
-+		const u32 rdsta_mask = (RDSTA_PR0 | RDSTA_IF0) << sh_idx;
- 		/*
- 		 * If the corresponding bit is set, this state handle
- 		 * was initialized by somebody else, so it's left alone.
- 		 */
--		if ((1 << sh_idx) & state_handle_mask)
-+		if (rdsta_mask & state_handle_mask)
- 			continue;
- 
- 		/* Create the descriptor for instantiating RNG State Handle */
-@@ -302,7 +304,7 @@ static int instantiate_rng(struct device *ctrldev, int state_handle_mask,
- 
- 		rdsta_val = rd_reg32(&ctrl->r4tst[0].rdsta) & RDSTA_IFMASK;
- 		if ((status && status != JRSTA_SSRC_JUMP_HALT_CC) ||
--		    !(rdsta_val & (1 << sh_idx))) {
-+		    (rdsta_val & rdsta_mask) != rdsta_mask) {
- 			ret = -EAGAIN;
- 			break;
- 		}
-diff --git a/drivers/crypto/caam/desc.h b/drivers/crypto/caam/desc.h
-index 4b6854bf896a..e796d3cb9be8 100644
---- a/drivers/crypto/caam/desc.h
-+++ b/drivers/crypto/caam/desc.h
-@@ -1254,6 +1254,8 @@
- #define OP_ALG_ICV_OFF		(0 << OP_ALG_ICV_SHIFT)
- #define OP_ALG_ICV_ON		(1 << OP_ALG_ICV_SHIFT)
- 
-+#define OP_ALG_PR_ON		BIT(1)
-+
- #define OP_ALG_DIR_SHIFT	0
- #define OP_ALG_DIR_MASK		1
- #define OP_ALG_DECRYPT		0
+ static int caam_get_era_from_hw(struct caam_ctrl __iomem *ctrl)
 diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
-index c191e8fd0fa7..fe1f8c1409fd 100644
+index 05127b70527d..c191e8fd0fa7 100644
 --- a/drivers/crypto/caam/regs.h
 +++ b/drivers/crypto/caam/regs.h
-@@ -524,9 +524,11 @@ struct rng4tst {
- 	u32 rsvd1[40];
- #define RDSTA_SKVT 0x80000000
- #define RDSTA_SKVN 0x40000000
-+#define RDSTA_PR0 BIT(4)
-+#define RDSTA_PR1 BIT(5)
- #define RDSTA_IF0 0x00000001
- #define RDSTA_IF1 0x00000002
--#define RDSTA_IFMASK (RDSTA_IF1 | RDSTA_IF0)
-+#define RDSTA_IFMASK (RDSTA_PR1 | RDSTA_PR0 | RDSTA_IF1 | RDSTA_IF0)
- 	u32 rdsta;
- 	u32 rsvd2[15];
- };
+@@ -487,7 +487,8 @@ struct rngtst {
+ 
+ /* RNG4 TRNG test registers */
+ struct rng4tst {
+-#define RTMCTL_PRGM	0x00010000	/* 1 -> program mode, 0 -> run mode */
++#define RTMCTL_ACC  BIT(5)  /* TRNG access mode */
++#define RTMCTL_PRGM BIT(16) /* 1 -> program mode, 0 -> run mode */
+ #define RTMCTL_SAMP_MODE_VON_NEUMANN_ES_SC	0 /* use von Neumann data in
+ 						     both entropy shifter and
+ 						     statistical checker */
 -- 
 2.21.0
 
