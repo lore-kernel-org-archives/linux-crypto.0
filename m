@@ -2,50 +2,50 @@ Return-Path: <SRS0=IkvS=ZM=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F7A1C432C0
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 19:45:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 691B7C432C3
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 19:50:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 43B6F20715
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 19:45:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 441AF2071F
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 19:50:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727378AbfKTTpR (ORCPT
+        id S1727566AbfKTTuT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Nov 2019 14:45:17 -0500
-Received: from mx2.suse.de ([195.135.220.15]:60970 "EHLO mx1.suse.de"
+        Wed, 20 Nov 2019 14:50:19 -0500
+Received: from mx2.suse.de ([195.135.220.15]:33916 "EHLO mx1.suse.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726440AbfKTTpR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Nov 2019 14:45:17 -0500
+        id S1727374AbfKTTuT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 Nov 2019 14:50:19 -0500
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 63673AFCB;
-        Wed, 20 Nov 2019 19:45:15 +0000 (UTC)
-Message-ID: <073219d4e46bab9fb6ba972ebc2ee2f3b55abf55.camel@suse.de>
-Subject: Re: [PATCH v3 4/4] ARM: dts: bcm2711: Enable HWRNG support
+        by mx1.suse.de (Postfix) with ESMTP id 29ACDB14A;
+        Wed, 20 Nov 2019 19:50:16 +0000 (UTC)
+Message-ID: <6aaa37d2cbe91c177b7be2d7f8aa3846efe3dc34.camel@suse.de>
+Subject: Re: [PATCH v3 0/4] Raspberry Pi 4 HWRNG Support
 From:   Nicolas Saenz Julienne <nsaenzjulienne@suse.de>
-To:     Stephen Brennan <stephen@brennan.io>
+To:     Stefan Wahren <wahrenst@gmx.net>,
+        Stephen Brennan <stephen@brennan.io>
 Cc:     Mark Rutland <mark.rutland@arm.com>, devicetree@vger.kernel.org,
-        linux-rpi-kernel@lists.infradead.org,
         Florian Fainelli <f.fainelli@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Scott Branden <sbranden@broadcom.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-arm-kernel@lists.infradead.org, Ray Jui <rjui@broadcom.com>,
-        linux-kernel@vger.kernel.org, Eric Anholt <eric@anholt.net>,
+        Matt Mackall <mpm@selenic.com>, linux-kernel@vger.kernel.org,
+        Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
+        Eric Anholt <eric@anholt.net>,
         Rob Herring <robh+dt@kernel.org>,
         bcm-kernel-feedback-list@broadcom.com,
-        Stefan Wahren <wahrenst@gmx.net>,
-        Matt Mackall <mpm@selenic.com>, Arnd Bergmann <arnd@arndb.de>,
-        linux-crypto@vger.kernel.org
-Date:   Wed, 20 Nov 2019 20:45:12 +0100
-In-Reply-To: <20191120031622.88949-5-stephen@brennan.io>
+        linux-rpi-kernel@lists.infradead.org, Ray Jui <rjui@broadcom.com>,
+        linux-arm-kernel@lists.infradead.org
+Date:   Wed, 20 Nov 2019 20:50:14 +0100
+In-Reply-To: <99554159-6abb-6ea5-aebb-57a148a59b78@gmx.net>
 References: <20191120031622.88949-1-stephen@brennan.io>
-         <20191120031622.88949-5-stephen@brennan.io>
+         <99554159-6abb-6ea5-aebb-57a148a59b78@gmx.net>
 Content-Type: multipart/signed; micalg="pgp-sha256";
-        protocol="application/pgp-signature"; boundary="=-EQFLnI4F4oDM522MqmL9"
+        protocol="application/pgp-signature"; boundary="=-iQqSDeLkAUWuKqj/9yXJ"
 User-Agent: Evolution 3.34.1 
 MIME-Version: 1.0
 Sender: linux-crypto-owner@vger.kernel.org
@@ -54,60 +54,74 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
---=-EQFLnI4F4oDM522MqmL9
+--=-iQqSDeLkAUWuKqj/9yXJ
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2019-11-19 at 19:16 -0800, Stephen Brennan wrote:
-> This enables hardware random number generator support for the BCM2711
-> on the Raspberry Pi 4 board.
+On Wed, 2019-11-20 at 17:16 +0100, Stefan Wahren wrote:
+> Hi Stephen,
 >=20
-> Signed-off-by: Stephen Brennan <stephen@brennan.io>
-> ---
->  arch/arm/boot/dts/bcm2711.dtsi | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
+> Am 20.11.19 um 04:16 schrieb Stephen Brennan:
+> > This patch series enables support for the HWRNG included on the Raspber=
+ry
+> > Pi 4.  It is simply a rebase of Stefan's branch [1]. I went ahead and
+> > tested this out on a Pi 4.  Prior to this patch series, attempting to u=
+se
+> > the hwrng gives:
+> >=20
+> >     $ head -c 2 /dev/hwrng
+> >     head: /dev/hwrng: Input/output error
+> >=20
+> > After this series, the same command gives two random bytes.
 >=20
-> diff --git a/arch/arm/boot/dts/bcm2711.dtsi b/arch/arm/boot/dts/bcm2711.d=
-tsi
-> index ac83dac2e6ba..ed0877d5a1e9 100644
-> --- a/arch/arm/boot/dts/bcm2711.dtsi
-> +++ b/arch/arm/boot/dts/bcm2711.dtsi
-> @@ -92,10 +92,9 @@ pm: watchdog@7e100000 {
->  		};
-> =20
->  		rng@7e104000 {
-> -			interrupts =3D <GIC_SPI 125 IRQ_TYPE_LEVEL_HIGH>;
-> -
-> -			/* RNG is incompatible with brcm,bcm2835-rng */
-> -			status =3D "disabled";
-> +			compatible =3D "brcm,bcm2711-rng200";
-> +			reg =3D <0x7e104000 0x28>;
-> +			status =3D "okay";
+> just a note: a more expressive test would be running rngtest (package
+> rng-tools) on this device.
 
-Small nitpick, the 'okay' status is set by default, so no need for this. Bu=
-t
-it's something we can edit out once we pick the patch.
+Just had a go at it,
+
+root@rpi4:~# rngtest -c 1000 < /dev/hwrng
+rngtest 2-unofficial-mt.14
+Copyright (c) 2004 by Henrique de Moraes Holschuh
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+rngtest: starting FIPS tests...
+rngtest: bits received from input: 20000032
+rngtest: FIPS 140-2 successes: 998
+rngtest: FIPS 140-2 failures: 2
+rngtest: FIPS 140-2(2001-10-10) Monobit: 0
+rngtest: FIPS 140-2(2001-10-10) Poker: 1
+rngtest: FIPS 140-2(2001-10-10) Runs: 0
+rngtest: FIPS 140-2(2001-10-10) Long run: 1
+rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+rngtest: input channel speed: (min=3D1.284; avg=3D113.786; max=3D126.213)Ki=
+bits/s
+rngtest: FIPS tests speed: (min=3D17.122; avg=3D28.268; max=3D28.812)Mibits=
+/s
+rngtest: Program run time: 172323761 microseconds
+
+AFAIR (Arch wiki) some small failures are acceptable.
 
 Regards,
 Nicolas
 
 
---=-EQFLnI4F4oDM522MqmL9
+--=-iQqSDeLkAUWuKqj/9yXJ
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: This is a digitally signed message part
 Content-Transfer-Encoding: 7bit
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAABCAAdFiEErOkkGDHCg2EbPcGjlfZmHno8x/4FAl3Vl8gACgkQlfZmHno8
-x/49PQf/Tah+83leeq/AYVqsmeAlWU9tVFZ6DV4o9XFtXocYffZlQtscjV5mLpXU
-4CfcjTwUdIn/Cfk70ZXXqD7EsQ9XUGN6pfNiP/rPffSSTKAUd7wektykwl9YQaAN
-DcJBMRbPy+TPZDYaLu7DtGMpLe9HYj1p1onNEoKfW8XBqOPRirBQv1KfYTFMQyq4
-ZCXnvMz6F4PxpUf/Ybgv3KB3twfd8c1vF9arPEh06PKfTozUbnUu0gEqjgLvwi6a
-NP+K9oMo/5HMnOARh9znTaRJu/jKSjoiyCM0Jsisd6z6TDEe8PezgkxpdjIm6k79
-p6f8JA13izZl3k2g8I5ZBnG+xuWyBQ==
-=gzPL
+iQEzBAABCAAdFiEErOkkGDHCg2EbPcGjlfZmHno8x/4FAl3VmPYACgkQlfZmHno8
+x/747ggAscLDM0fF7tOoTWdcO+lp+zKBM4o38uVkOwes/laW6msQMiAvB0qW7j4V
+8FRmDLDFt34e1Ta9NKZW3GloAUkVkrS/iPX9msSCy7qlodRjRYdkgF5rbSH4YSIK
+K/9p8MXknOsXsJ9kQCiexooNiiKspt2XLl1lwtLuhHVdtNEVVw1phdlPhfU37BAW
+tV1n45JjdagGkNS8JrjvXNPbCRkSk8SStb/IjldltTO1Rvp//I5Whj0CWXnNzM0t
+HDhXrZiO7+5NB30WU9gP+o3NU8b0KiyAdoe5RgRzTCqlnZsK2rdhJ4eDQKzVpvWR
+/Ra8OIJmgCp4aezFVms92D0KO2dB6w==
+=VuSq
 -----END PGP SIGNATURE-----
 
---=-EQFLnI4F4oDM522MqmL9--
+--=-iQqSDeLkAUWuKqj/9yXJ--
 
