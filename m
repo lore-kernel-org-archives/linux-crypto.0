@@ -8,58 +8,58 @@ X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABE59C43215
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 19:55:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F9D4C43215
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 19:55:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7EF6121826
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 19:55:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 45D7221847
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 19:55:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cvvVjnVl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tXomjkHP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727240AbfKTTzI (ORCPT
+        id S1727179AbfKTTz0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Nov 2019 14:55:08 -0500
-Received: from mail-pf1-f195.google.com ([209.85.210.195]:38677 "EHLO
-        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726440AbfKTTzI (ORCPT
+        Wed, 20 Nov 2019 14:55:26 -0500
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:35107 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726529AbfKTTz0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Nov 2019 14:55:08 -0500
-Received: by mail-pf1-f195.google.com with SMTP id c13so272058pfp.5;
-        Wed, 20 Nov 2019 11:55:07 -0800 (PST)
+        Wed, 20 Nov 2019 14:55:26 -0500
+Received: by mail-pf1-f193.google.com with SMTP id q13so280624pff.2;
+        Wed, 20 Nov 2019 11:55:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=subject:to:cc:references:from:openpgp:autocrypt:message-id:date
          :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=XRAh0eVBvQPrUJMHT3f4p6gHZBhzuR8AG99LKVkyqEY=;
-        b=cvvVjnVl/zIIWnVgzZDTe19BvJFCmR/TFMIm5/2g9CSkiSrP3gOTAV7yM7WTl82GsP
-         RrbAC9aryXJShgaDbDP6YYJU4DlcIAiQBFuEaSFsEYGaYpVG0kTVlyJa2i3XNOS6Po9Y
-         rOFTO69Pc5aj9HeTxxDFgOk9YrjMcmn7fblsWggeMdsWieZbvsFHZ9u/o+ET6XZUZljQ
-         7Pr3w89Md5fCqqMfIwZLily0r7LIQ12UWaPZL17o67nh1A8sNHPcDRWwCBA0k8bS292m
-         /mzHtpinZighsrxP9RY2CK+/ZStpNBMIsjF/aRvHphIwVtx5/QbPwDuetO6sPk0+PjKU
-         dIjQ==
+        bh=YQQoya+v/8diolbV2XZpiWrP4ZJQzk4Uym+pkCI0Efc=;
+        b=tXomjkHPTSq6u+7DfpTyx8PCl+eGxaFI15lEMHfZbSkSVpEcB6Rd+o/Tb24IdBkC9K
+         Q3zzriPMFcAvCqJkccqClJ75RXqhgHgTEfN21dNGDuGv72nMH6YFEQrkw3qKUfaQYNPj
+         6VgrzVPC9scQebvIGzfWBEWrfKOKbIk0l90HVfUxD4H1scOdUxbI9sIXxXySFNXcWHv8
+         Dilq8VtzgPslmUsJiIJ/BmicLuOg34LbvTD2zGbSQyrKyCrzXI0SyfWxdm3SXxiHpbyT
+         AwI4LKVkkb2/G2jhRY6EIDhjZvKTw0vd4TA6+al9M2tOe24mTWVB/KUIuORPNhbzJbkc
+         BgeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:openpgp:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
-        bh=XRAh0eVBvQPrUJMHT3f4p6gHZBhzuR8AG99LKVkyqEY=;
-        b=lk93MI/dUN3Wviuul/QKxqvVMekFB9ofW9YD6h4gPafULByHkeUJYYmFG4h8wqbYR2
-         vbZv1aJuJkxcyA1q9TWCXmJrS9T9je9nskJKofHfmZPKn402qCwZKPnxe+65eZHEOPCM
-         hHRj2PV9zD4fS8WBYvoqBxivK0nn4hnVTjpqYNRhCoIPvfCdhpO+DY2qZaTNKuHUUmnN
-         RjpY1Hr5Ve6FAyRqm4O/QnzpbpDl/LJS66Jjpedfx/FwBshbw0ERh/7cFZALE9MRHxiK
-         yghIEiuV3kQd0RhWc7X8r7tO1dDsEC6woT+lIyw7WwyZI06QyVhN2GHMeQx8YOY5ycSO
-         WnJQ==
-X-Gm-Message-State: APjAAAX/gYuE2fpQlnZytIY9HrdEeA6BGa9gWmscSmoxTEdk48eLr+dN
-        dFCldoGR+iDOJzm9TBGFSBQ=
-X-Google-Smtp-Source: APXvYqwmO2n6SEXGlwjFrG14g/Bm2pL2DisLjvoTgQqI9bb4mE1zoxG5dJKu9wHgZM5Q+ap6EJQDuQ==
-X-Received: by 2002:a63:d047:: with SMTP id s7mr5211535pgi.355.1574279707402;
-        Wed, 20 Nov 2019 11:55:07 -0800 (PST)
+        bh=YQQoya+v/8diolbV2XZpiWrP4ZJQzk4Uym+pkCI0Efc=;
+        b=hdXEQDS32wqqf2OL/tU8k6gdFTPAJkpZ2Gn6winzDdXeNkomfX2LdbplZSr9CVGtI6
+         omKq/nfSGlzcPLjj9ogalO5kDuvh3jT4WvJjb36pz4JeLKGfo1iYuY+iWgcjRRVdjsT2
+         iaC9EiGhZxq3E5+JsdFVXr5mrLqDgW85ToagfbhtvNnnZeSU20pd1RPlu0ZyUyj1LgCK
+         iM/xbevkVpE4b5HkHQYsWX0U8W+uip8KC8mDRjrr2R81LeXRWVk4zV2mL37VhvbO2kMa
+         9YbvGXOjjyH54E6prVTpfXIoP4b9herfK8gwpmMTxP4mEmTh/QXzEimIGADZzTXh54UE
+         LHbw==
+X-Gm-Message-State: APjAAAWBy9PJsa4MyTc+lozapXUVGVWu+jP+k33mQl/SX1gXdoH54NDr
+        xJDUbwZuDIg/bTkFKSB9AXsZ9gxN
+X-Google-Smtp-Source: APXvYqxHrXlW3mJlCrAg01l4E+1CN3kpv1SDXjzuAE6KGPbVfDb7PxOr6ldsKjydlfyd0uEj/DWeSw==
+X-Received: by 2002:a62:1693:: with SMTP id 141mr6176107pfw.146.1574279724925;
+        Wed, 20 Nov 2019 11:55:24 -0800 (PST)
 Received: from [10.67.50.53] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id o15sm81598pjs.24.2019.11.20.11.55.05
+        by smtp.googlemail.com with ESMTPSA id x203sm45545pgx.61.2019.11.20.11.55.23
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 20 Nov 2019 11:55:06 -0800 (PST)
-Subject: Re: [PATCH v3 1/4] dt-bindings: rng: add BCM2711 RNG compatible
+        Wed, 20 Nov 2019 11:55:24 -0800 (PST)
+Subject: Re: [PATCH v3 2/4] hwrng: iproc-rng200: Add support for BCM2711
 To:     Stephen Brennan <stephen@brennan.io>
 Cc:     Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -75,9 +75,10 @@ Cc:     Matt Mackall <mpm@selenic.com>,
         Florian Fainelli <f.fainelli@gmail.com>,
         linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
         linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-rpi-kernel@lists.infradead.org
+        linux-rpi-kernel@lists.infradead.org,
+        Matthias Brugger <mbrugger@suse.com>
 References: <20191120031622.88949-1-stephen@brennan.io>
- <20191120031622.88949-2-stephen@brennan.io>
+ <20191120031622.88949-3-stephen@brennan.io>
 From:   Florian Fainelli <f.fainelli@gmail.com>
 Openpgp: preference=signencrypt
 Autocrypt: addr=f.fainelli@gmail.com; prefer-encrypt=mutual; keydata=
@@ -134,12 +135,12 @@ Autocrypt: addr=f.fainelli@gmail.com; prefer-encrypt=mutual; keydata=
  caxTGgc5zzQHeX67eMzrGomG3ZnIxmd1sAbgvJUDaD2GrYlulfwGWwWyTNbWRvMighVdPkSF
  6XFgQaosWxkV0OELLy2N485YrTr2Uq64VKyxpncLh50e2RnyAJ9Za0Dx0yyp44iD1OvHtkEI
  M5kY0ACeNhCZJvZ5g4C2Lc9fcTHu8jxmEkI=
-Message-ID: <8d1dc843-fb70-cf42-eaca-27766d478762@gmail.com>
-Date:   Wed, 20 Nov 2019 11:55:03 -0800
+Message-ID: <6b4ba90a-9698-5ff5-22b8-b42937c3a8e8@gmail.com>
+Date:   Wed, 20 Nov 2019 11:55:22 -0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191120031622.88949-2-stephen@brennan.io>
+In-Reply-To: <20191120031622.88949-3-stephen@brennan.io>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -151,10 +152,12 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 On 11/19/19 7:16 PM, Stephen Brennan wrote:
 > From: Stefan Wahren <wahrenst@gmx.net>
 > 
-> The BCM2711 has a RNG200 block, so document its compatible string.
+> BCM2711 features a RNG200 hardware random number generator block.
+> So make the driver available.
 > 
 > Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
 > Signed-off-by: Stephen Brennan <stephen@brennan.io>
+> Reviewed-by: Matthias Brugger <mbrugger@suse.com>
 
 Reviewed-by: Florian Fainelli <f.fainelli@gmail.com>
 -- 
