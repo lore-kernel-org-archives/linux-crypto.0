@@ -2,105 +2,102 @@ Return-Path: <SRS0=IkvS=ZM=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 755DDC432C3
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 11:27:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5B66C432C0
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 12:19:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4B1382243F
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 11:27:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="bW6nm99p"
+	by mail.kernel.org (Postfix) with ESMTP id C52FA224F6
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 12:19:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728431AbfKTL1t (ORCPT
+        id S1729474AbfKTMT1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Nov 2019 06:27:49 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:37915 "EHLO ozlabs.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728376AbfKTL1t (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Nov 2019 06:27:49 -0500
-Received: by ozlabs.org (Postfix, from userid 1034)
-        id 47J0mL5x9bz9sPf; Wed, 20 Nov 2019 22:27:46 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ellerman.id.au;
-        s=201909; t=1574249266;
-        bh=Jduwe2SsdV67P5EeS5nGje6t3g/X5IPOQjA2coFz4+k=;
-        h=From:To:Cc:Subject:Date:From;
-        b=bW6nm99pIXRpwMDjMFq17gWi5zmu6Zwvz91wjIUjb63592//GMMaCZWsipe1xu1y6
-         1lgtRyEPDCmoSsyDB/SGlAlV90jzaO2fBrokmEZHNSOxemoSyGVldvLvJXz6t7Bl+G
-         qJqXwdm/IrdDvjyAsUFsUpbx/gvYkhIe6hi//HDHX/+UknJEs9p3kHLDxEoCdqoXQU
-         tOhM9gWgwiw5xNjov9Yxe9eWQLu2+PX514DYqDGlx+4N1bAx+t/eRa9Bu/xT7eEx1e
-         ZDN32qYHi2TszuyXhyj65YgZAgMyrHnnI1HsNn4gZf63TguP1pm+1r1Nj5ODE0QIEx
-         QUa44QqHSJVBA==
-From:   Michael Ellerman <mpe@ellerman.id.au>
-To:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-Cc:     linuxppc-dev@ozlabs.org, yamada.masahiro@socionext.com
-Subject: [PATCH] crypto: vmx - Avoid weird build failures
-Date:   Wed, 20 Nov 2019 22:27:38 +1100
-Message-Id: <20191120112738.7031-1-mpe@ellerman.id.au>
-X-Mailer: git-send-email 2.21.0
+        Wed, 20 Nov 2019 07:19:27 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:6253 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728943AbfKTMT1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 Nov 2019 07:19:27 -0500
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id CCA281A39208A5582348;
+        Wed, 20 Nov 2019 20:19:25 +0800 (CST)
+Received: from [127.0.0.1] (10.57.77.109) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.439.0; Wed, 20 Nov 2019
+ 20:19:19 +0800
+Subject: Re: [PATCH v3 0/5] crypto: hisilicon - add HiSilicon SEC V2 support
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+References: <1573643468-1812-1-git-send-email-xuzaibo@huawei.com>
+CC:     <forest.zhouchang@huawei.com>, <linuxarm@huawei.com>,
+        <zhangwei375@huawei.com>, <yekai13@huawei.com>,
+        <linux-crypto@vger.kernel.org>
+From:   Xu Zaibo <xuzaibo@huawei.com>
+Message-ID: <038b55c4-afc7-f69b-add8-fc94d5148630@huawei.com>
+Date:   Wed, 20 Nov 2019 20:19:19 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <1573643468-1812-1-git-send-email-xuzaibo@huawei.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.57.77.109]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In the vmx crypto Makefile we assign to a variable called TARGET and
-pass that to the aesp8-ppc.pl and ghashp8-ppc.pl scripts.
+Hi,
 
-The variable is meant to describe what flavour of powerpc we're
-building for, eg. either 32 or 64-bit, and big or little endian.
+On 2019/11/13 19:11, Zaibo Xu wrote:
+> This series adds HiSilicon Security Engine (SEC) version 2 controller
+> driver in Crypto subsystem. It includes PCIe enabling, Skcipher, DebugFS
+> and SRIOV support of SEC.
+>
+> This patchset rebases on:
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git
+>
+> This patchset is based on:
+> https://www.spinics.net/lists/linux-crypto/msg43520.html
+>
+> Changes on v3:
+>   - bugfixed as running CRYPTO extra tests.
+>
+> Changes on v2:
+>   - delete checking return value of debugfs_create_xxx functions.
+>
+> Change log:
+> v3:    - bugfixed as running CRTPTO extra tests.
+> v2:    - remove checking return value of debugfs_create_xxx functions.
+>
+> Longfang Liu (1):
+>    Documentation: add DebugFS doc for HiSilicon SEC
+>
+> Zaibo Xu (4):
+>    crypto: hisilicon - add HiSilicon SEC V2 driver
+>    crypto: hisilicon - add SRIOV for HiSilicon SEC
+>    crypto: hisilicon - add DebugFS for HiSilicon SEC
+>    MAINTAINERS: Add maintainer for HiSilicon SEC V2 driver
+>
+>   Documentation/ABI/testing/debugfs-hisi-sec |   43 ++
+>   MAINTAINERS                                |   10 +
+>   drivers/crypto/hisilicon/Kconfig           |   16 +
+>   drivers/crypto/hisilicon/Makefile          |    1 +
+>   drivers/crypto/hisilicon/sec2/Makefile     |    2 +
+>   drivers/crypto/hisilicon/sec2/sec.h        |  156 ++++
+>   drivers/crypto/hisilicon/sec2/sec_crypto.c |  889 ++++++++++++++++++++++
+>   drivers/crypto/hisilicon/sec2/sec_crypto.h |  198 +++++
+>   drivers/crypto/hisilicon/sec2/sec_main.c   | 1095 ++++++++++++++++++++++++++++
+>   9 files changed, 2410 insertions(+)
+>   create mode 100644 Documentation/ABI/testing/debugfs-hisi-sec
+>   create mode 100644 drivers/crypto/hisilicon/sec2/Makefile
+>   create mode 100644 drivers/crypto/hisilicon/sec2/sec.h
+>   create mode 100644 drivers/crypto/hisilicon/sec2/sec_crypto.c
+>   create mode 100644 drivers/crypto/hisilicon/sec2/sec_crypto.h
+>   create mode 100644 drivers/crypto/hisilicon/sec2/sec_main.c
+Any comments for this version?
 
-Unfortunately TARGET is a fairly common name for a make variable, and
-if it happens that TARGET is specified as a command line parameter to
-make, the value specified on the command line will override our value.
+Cheers,
+Zaibo
 
-In particular this can happen if the kernel Makefile is driven by an
-external Makefile that uses TARGET for something.
-
-This leads to weird build failures, eg:
-  nonsense  at /build/linux/drivers/crypto/vmx/ghashp8-ppc.pl line 45.
-  /linux/drivers/crypto/vmx/Makefile:20: recipe for target 'drivers/crypto/vmx/ghashp8-ppc.S' failed
-
-Which shows that we passed an empty value for $(TARGET) to the perl
-script, confirmed with make V=1:
-
-  perl /linux/drivers/crypto/vmx/ghashp8-ppc.pl  > drivers/crypto/vmx/ghashp8-ppc.S
-
-We can avoid this confusion by using override, to tell make that we
-don't want anything to override our variable, even a value specified
-on the command line. We can also use a less common name, given the
-script calls it "flavour", let's use that.
-
-Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
----
- drivers/crypto/vmx/Makefile | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/crypto/vmx/Makefile b/drivers/crypto/vmx/Makefile
-index cab32cfec9c4..709670d2b553 100644
---- a/drivers/crypto/vmx/Makefile
-+++ b/drivers/crypto/vmx/Makefile
-@@ -3,13 +3,13 @@ obj-$(CONFIG_CRYPTO_DEV_VMX_ENCRYPT) += vmx-crypto.o
- vmx-crypto-objs := vmx.o aesp8-ppc.o ghashp8-ppc.o aes.o aes_cbc.o aes_ctr.o aes_xts.o ghash.o
- 
- ifeq ($(CONFIG_CPU_LITTLE_ENDIAN),y)
--TARGET := linux-ppc64le
-+override flavour := linux-ppc64le
- else
--TARGET := linux-ppc64
-+override flavour := linux-ppc64
- endif
- 
- quiet_cmd_perl = PERL $@
--      cmd_perl = $(PERL) $(<) $(TARGET) > $(@)
-+      cmd_perl = $(PERL) $(<) $(flavour) > $(@)
- 
- targets += aesp8-ppc.S ghashp8-ppc.S
- 
--- 
-2.21.0
 
