@@ -2,126 +2,155 @@ Return-Path: <SRS0=IkvS=ZM=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 691B7C432C3
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 19:50:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B1B7C432C3
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 19:52:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 441AF2071F
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 19:50:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 238E72071F
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 19:52:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="ruprINJH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727566AbfKTTuT (ORCPT
+        id S1727684AbfKTTwX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Nov 2019 14:50:19 -0500
-Received: from mx2.suse.de ([195.135.220.15]:33916 "EHLO mx1.suse.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727374AbfKTTuT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Nov 2019 14:50:19 -0500
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.220.254])
-        by mx1.suse.de (Postfix) with ESMTP id 29ACDB14A;
-        Wed, 20 Nov 2019 19:50:16 +0000 (UTC)
-Message-ID: <6aaa37d2cbe91c177b7be2d7f8aa3846efe3dc34.camel@suse.de>
-Subject: Re: [PATCH v3 0/4] Raspberry Pi 4 HWRNG Support
-From:   Nicolas Saenz Julienne <nsaenzjulienne@suse.de>
-To:     Stefan Wahren <wahrenst@gmx.net>,
-        Stephen Brennan <stephen@brennan.io>
-Cc:     Mark Rutland <mark.rutland@arm.com>, devicetree@vger.kernel.org,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Scott Branden <sbranden@broadcom.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Matt Mackall <mpm@selenic.com>, linux-kernel@vger.kernel.org,
-        Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
-        Eric Anholt <eric@anholt.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        bcm-kernel-feedback-list@broadcom.com,
-        linux-rpi-kernel@lists.infradead.org, Ray Jui <rjui@broadcom.com>,
-        linux-arm-kernel@lists.infradead.org
-Date:   Wed, 20 Nov 2019 20:50:14 +0100
-In-Reply-To: <99554159-6abb-6ea5-aebb-57a148a59b78@gmx.net>
-References: <20191120031622.88949-1-stephen@brennan.io>
-         <99554159-6abb-6ea5-aebb-57a148a59b78@gmx.net>
-Content-Type: multipart/signed; micalg="pgp-sha256";
-        protocol="application/pgp-signature"; boundary="=-iQqSDeLkAUWuKqj/9yXJ"
-User-Agent: Evolution 3.34.1 
+        Wed, 20 Nov 2019 14:52:23 -0500
+Received: from mo4-p02-ob.smtp.rzone.de ([85.215.255.81]:29107 "EHLO
+        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726440AbfKTTwW (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 Nov 2019 14:52:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1574279540;
+        s=strato-dkim-0002; d=chronox.de;
+        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=LeodlJc2E0O1WN5oYZY2L3ih1kyEFugDWGrCoq/S39M=;
+        b=ruprINJH9bhaV2VGvM41XuV/8huZ76KYqhD2WHYIyFx+E9yqRcQ7eOK7AnMgrMQsx5
+        e9qpTE3GHrhs/g4wbHFV5NdpcoBBuyzqRa56Q8EfJUXN2Ywff2Z5J+8wgnwx398AK8xg
+        hav/iGWI6MyayuOet6rCfbZhMAe7VicD+du4i3hKBHt8wL+aiN1NBzSgis0YUE+fMA+6
+        QrzEGLh4YRGJKuCqvufjPvsOWvRj1bbUpXQ4WTpTQFgzVcv1gRr9KMgs+BJ8h5lSY8Sk
+        6uNTnXJEC7DMSpyVoYJs+ciXsmOuMwTE/7FRZWFLEXcDFyC2xglZPF0UidMwrUQ4E3hF
+        g2ow==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzHHXDbL/ScbtM="
+X-RZG-CLASS-ID: mo00
+Received: from positron.chronox.de
+        by smtp.strato.de (RZmta 44.29.0 DYNA|AUTH)
+        with ESMTPSA id N09a57vAKJpBmvw
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
+        (Client did not present a certificate);
+        Wed, 20 Nov 2019 20:51:11 +0100 (CET)
+From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Andy Lutomirski <luto@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Nicolai Stange <nstange@suse.de>,
+        "Peter, Matthias" <matthias.peter@bsi.bund.de>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Roman Drahtmueller <draht@schaltsekun.de>,
+        Neil Horman <nhorman@redhat.com>
+Subject: Re: [PATCH v25 10/12] LRNG - add TRNG support
+Date:   Wed, 20 Nov 2019 20:51:11 +0100
+Message-ID: <1695782.oZ5Vf4nH9s@positron.chronox.de>
+In-Reply-To: <20191120132918.GA2892197@kroah.com>
+References: <5390778.VeFRgus4bQ@positron.chronox.de> <19681012.svDddlc5pN@positron.chronox.de> <20191120132918.GA2892197@kroah.com>
 MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Am Mittwoch, 20. November 2019, 14:29:18 CET schrieb Greg Kroah-Hartman:
 
---=-iQqSDeLkAUWuKqj/9yXJ
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Hi Greg,
 
-On Wed, 2019-11-20 at 17:16 +0100, Stefan Wahren wrote:
-> Hi Stephen,
->=20
-> Am 20.11.19 um 04:16 schrieb Stephen Brennan:
-> > This patch series enables support for the HWRNG included on the Raspber=
-ry
-> > Pi 4.  It is simply a rebase of Stefan's branch [1]. I went ahead and
-> > tested this out on a Pi 4.  Prior to this patch series, attempting to u=
-se
-> > the hwrng gives:
+> On Wed, Nov 20, 2019 at 09:58:35AM +0100, Stephan M=FCller wrote:
+> > Am Dienstag, 19. November 2019, 13:41:50 CET schrieb Greg Kroah-Hartman:
 > >=20
-> >     $ head -c 2 /dev/hwrng
-> >     head: /dev/hwrng: Input/output error
+> > Hi Greg,
 > >=20
-> > After this series, the same command gives two random bytes.
+> > > On Tue, Nov 19, 2019 at 02:07:40AM -0800, Andy Lutomirski wrote:
+> > > > > As this would introduce a new device file now, is there a special
+> > > > > process that I need to follow or do I need to copy? Which
+> > > > > major/minor
+> > > > > number should I use?
+> > > > >=20
+> > > > > Looking into static const struct memdev devlist[] I see
+> > > > >=20
+> > > > >          [8] =3D { "random", 0666, &random_fops, 0 },
+> > > > >          [9] =3D { "urandom", 0666, &urandom_fops, 0 },
+> > > > >=20
+> > > > > Shall a true_random be added here with [10]?
+> > > >=20
+> > > > I am not at all an expert on chardevs, but this sounds generally
+> > > > reasonable.  gregkh is probably the real authority here.
+> > >=20
+> > > [10] is the aio char device node, so you better not try to overlap it=
+ or
+> > > bad things will happen :(
+> >=20
+> > Thanks for your insights.
+> >=20
+> > Which device minor number could we use?
 >=20
-> just a note: a more expressive test would be running rngtest (package
-> rng-tools) on this device.
+> Get your own dynamic one by using a misc device if you _REALLY_ want to
+> add yet-another-char-node-for-random-data.
+>=20
+> But I would have thought that we all realize that this is not the way to
+> do things.  Let's not have "random", "urandom", and "true_random" be
+> something we want to totally confuse userspace with, that way is insane.
+>=20
+> Please just make the existing userspace api "just work", don't add to
+> the mess.
 
-Just had a go at it,
+Thank you, I think we should follow that advise.
 
-root@rpi4:~# rngtest -c 1000 < /dev/hwrng
-rngtest 2-unofficial-mt.14
-Copyright (c) 2004 by Henrique de Moraes Holschuh
-This is free software; see the source for copying conditions.  There is NO
-warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+With that and considering Alexander's rightful remark we have a challenge. =
+So,=20
+changing the syscall may not be the right way unless we find a way to restr=
+ict=20
+the permissions somehow (capability? LSM? None of that seems to be a good=20
+fit).
 
-rngtest: starting FIPS tests...
-rngtest: bits received from input: 20000032
-rngtest: FIPS 140-2 successes: 998
-rngtest: FIPS 140-2 failures: 2
-rngtest: FIPS 140-2(2001-10-10) Monobit: 0
-rngtest: FIPS 140-2(2001-10-10) Poker: 1
-rngtest: FIPS 140-2(2001-10-10) Runs: 0
-rngtest: FIPS 140-2(2001-10-10) Long run: 1
-rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
-rngtest: input channel speed: (min=3D1.284; avg=3D113.786; max=3D126.213)Ki=
-bits/s
-rngtest: FIPS tests speed: (min=3D17.122; avg=3D28.268; max=3D28.812)Mibits=
-/s
-rngtest: Program run time: 172323761 microseconds
+What about providing a /sys file? I.e. adding a file that:
 
-AFAIR (Arch wiki) some small failures are acceptable.
+a) has permissions 440 per default and maybe the ownership of root:root
 
-Regards,
-Nicolas
+b) allow user space to perform a chown/chgrp
 
+c) only supports reading of data from user space
 
---=-iQqSDeLkAUWuKqj/9yXJ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
+But then, how could we provide a common interface for the existing random.c=
+=20
+and the LRNG?
 
------BEGIN PGP SIGNATURE-----
+Or should we use a proc file for that? If yes, I guess it should not be a=20
+sysctl, but a "regular" proc file that should allow a chown(2) operation. O=
+n=20
+the other hand, is proc the right place to provide a user space interface f=
+or=20
+exporting data to user?
 
-iQEzBAABCAAdFiEErOkkGDHCg2EbPcGjlfZmHno8x/4FAl3VmPYACgkQlfZmHno8
-x/747ggAscLDM0fF7tOoTWdcO+lp+zKBM4o38uVkOwes/laW6msQMiAvB0qW7j4V
-8FRmDLDFt34e1Ta9NKZW3GloAUkVkrS/iPX9msSCy7qlodRjRYdkgF5rbSH4YSIK
-K/9p8MXknOsXsJ9kQCiexooNiiKspt2XLl1lwtLuhHVdtNEVVw1phdlPhfU37BAW
-tV1n45JjdagGkNS8JrjvXNPbCRkSk8SStb/IjldltTO1Rvp//I5Whj0CWXnNzM0t
-HDhXrZiO7+5NB30WU9gP+o3NU8b0KiyAdoe5RgRzTCqlnZsK2rdhJ4eDQKzVpvWR
-/Ra8OIJmgCp4aezFVms92D0KO2dB6w==
-=VuSq
------END PGP SIGNATURE-----
+Thanks a lot.
 
---=-iQqSDeLkAUWuKqj/9yXJ--
+Ciao
+Stephan
+
 
