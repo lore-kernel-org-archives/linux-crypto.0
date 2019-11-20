@@ -5,53 +5,53 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B964C432C0
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 18:58:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9263FC432C3
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 18:58:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 31C962068E
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 18:58:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6BBB82068E
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 18:58:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="EOsTY1N2"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="YuMXm3au"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726523AbfKTS6r (ORCPT
+        id S1727450AbfKTS6x (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Nov 2019 13:58:47 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:53736 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726440AbfKTS6r (ORCPT
+        Wed, 20 Nov 2019 13:58:53 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:55926 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726440AbfKTS6x (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Nov 2019 13:58:47 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAKIs5vi002497;
-        Wed, 20 Nov 2019 18:58:37 GMT
+        Wed, 20 Nov 2019 13:58:53 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAKIs6Y5015731;
+        Wed, 20 Nov 2019 18:58:38 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=corp-2019-08-05;
- bh=sSgfjfplpILRyqeLBHWbrZ2grVum8h5c4h94UoKEwFo=;
- b=EOsTY1N2Mf/iC+R4Ui/Xjy4pL0EJBYibNyK4H0R9oVFwrtOLjnGuQyrXWkNTNJt+Uv/5
- Tlvvf8w/88wtnUGL+WcKXBJfYjyIrhOYgQtpyRSi3MGZCt0wDlhniuVc2eNp1Pv7Z0d4
- JK3R8PBMFlczx2/wp9FL8dBzaJbFeKzdIeXOE7bdXGZI8eUm/fV744WKEkSLR9dXu3To
- HqHVArw41BOkkAIWhJcp0HfA9x7j0BpxauGRfABMhfmZLWyaNfJ1GnEPQwBjjojkkPZj
- gEqXolLmvByLu3QCFU51nMzCFG05jCNghQw8lwtF0/cwRDib/GI+HtKO01GeLdI5pw76 OA== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2120.oracle.com with ESMTP id 2wa9rqqfdh-1
+ bh=Mh9tB57Nnn4lghxLTxDkHxWWjco2T6GOaUVCFch00nk=;
+ b=YuMXm3auSfkO2dwqcc4qon9Ubxx75dOaDdyiKUpbXZJSia0tJz3f28Eh7RPs1M8o5zDG
+ vsx69TEh0PC/a5KaP3y+xgpLcp4KawZNTrtA0M5zZp3Azsgcr9ssMNnvJoGLflKX8Yjz
+ Z3aKie4n6vKFsBSyK5C1FJqcXAHwVpuA+/cRs47TFWxxf1M7rYAQwHgtZ2zYNz16Dk2o
+ JUePqI91Kjc+qe8Ji1tbQsT2CiiPHpWjNxEj9MUvFxBJHkhs2T4rwyHuYcd67eVEG8Zd
+ OGhgyeVs+zESedX66feGrWkTHQNlMzUijcYq0YBQjiJrLcXZ+Nb7m7srd48HG6+r1a50 TA== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by aserp2120.oracle.com with ESMTP id 2wa92pyhbk-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 20 Nov 2019 18:58:37 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAKIrikU139562;
-        Wed, 20 Nov 2019 18:56:36 GMT
+        Wed, 20 Nov 2019 18:58:38 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAKIs4Tf165866;
+        Wed, 20 Nov 2019 18:56:37 GMT
 Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3030.oracle.com with ESMTP id 2wd47vmgte-1
+        by userp3030.oracle.com with ESMTP id 2wda04knm6-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 20 Nov 2019 18:56:36 +0000
+        Wed, 20 Nov 2019 18:56:37 +0000
 Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xAKIuZu9014903;
-        Wed, 20 Nov 2019 18:56:35 GMT
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xAKIuad3014913;
+        Wed, 20 Nov 2019 18:56:36 GMT
 Received: from zissou.us.oracle.com (/10.152.34.58)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Wed, 20 Nov 2019 10:56:34 -0800
+        with ESMTP ; Wed, 20 Nov 2019 10:56:36 -0800
 From:   Daniel Jordan <daniel.m.jordan@oracle.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         Steffen Klassert <steffen.klassert@secunet.com>
@@ -59,9 +59,9 @@ Cc:     Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         Daniel Jordan <daniel.m.jordan@oracle.com>,
         Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org
-Subject: [PATCH 1/4] padata: update documentation
-Date:   Wed, 20 Nov 2019 13:54:09 -0500
-Message-Id: <20191120185412.302-2-daniel.m.jordan@oracle.com>
+Subject: [PATCH 4/4] padata: remove cpumask change notifier
+Date:   Wed, 20 Nov 2019 13:54:12 -0500
+Message-Id: <20191120185412.302-5-daniel.m.jordan@oracle.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20191120185412.302-1-daniel.m.jordan@oracle.com>
 References: <20191120185412.302-1-daniel.m.jordan@oracle.com>
@@ -83,10 +83,11 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Remove references to unused functions and update to reflect the new
-struct padata_shell.
+Since commit 63d3578892dc ("crypto: pcrypt - remove padata cpumask
+notifier") this feature is unused and may deliver unexpected data with
+the introduction of struct padata_shell (a notification mask that
+includes -ENOMEM), so get rid of it.
 
-Fixes: 815613da6a67 ("kernel/padata.c: removed unused code")
 Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
 Cc: Eric Biggers <ebiggers@kernel.org>
 Cc: Herbert Xu <herbert@gondor.apana.org.au>
@@ -96,99 +97,200 @@ Cc: linux-crypto@vger.kernel.org
 Cc: linux-doc@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 ---
- Documentation/padata.txt | 50 +++++++++++++++++++++-------------------
- 1 file changed, 26 insertions(+), 24 deletions(-)
+ Documentation/padata.txt | 24 ------------------
+ crypto/pcrypt.c          |  1 -
+ include/linux/padata.h   | 10 --------
+ kernel/padata.c          | 53 +++-------------------------------------
+ 4 files changed, 3 insertions(+), 85 deletions(-)
 
 diff --git a/Documentation/padata.txt b/Documentation/padata.txt
-index b37ba1eaace3..a03afb1588f9 100644
+index a03afb1588f9..82e42dbaab65 100644
 --- a/Documentation/padata.txt
 +++ b/Documentation/padata.txt
-@@ -2,7 +2,7 @@
- The padata parallel execution mechanism
- =======================================
+@@ -74,30 +74,6 @@ padata_set_cpumask is used to change just one of the cpumasks. Here cpumask_type
+ is one of PADATA_CPU_SERIAL or PADATA_CPU_PARALLEL, and cpumask specifies the
+ new cpumask to use.
  
--:Last updated: for 2.6.36
-+:Last updated: for 5.4
+-If a user is interested in padata cpumask changes, he can register to
+-the padata cpumask change notifier::
+-
+-    int padata_register_cpumask_notifier(struct padata_instance *pinst,
+-					 struct notifier_block *nblock);
+-
+-To unregister from that notifier::
+-
+-    int padata_unregister_cpumask_notifier(struct padata_instance *pinst,
+-					   struct notifier_block *nblock);
+-
+-The padata cpumask change notifier notifies about changes of the usable
+-cpumasks, i.e. the subset of active CPUs in the user supplied cpumask.
+-
+-Padata calls the notifier chain with::
+-
+-    blocking_notifier_call_chain(&pinst->cpumask_change_notifier,
+-				 notification_mask,
+-				 &pd_new->cpumask);
+-
+-Here cpumask_change_notifier is registered notifier, notification_mask
+-is one of PADATA_CPU_SERIAL, PADATA_CPU_PARALLEL and cpumask is a pointer
+-to a struct padata_cpumask that contains the new cpumask information.
+-
+ Actually submitting work to the padata instance requires the creation of a
+ padata_priv structure::
  
- Padata is a mechanism by which the kernel can farm work out to be done in
- parallel on multiple CPUs while retaining the ordering of tasks.  It was
-@@ -53,27 +53,26 @@ padata cpumask contains no active CPU (flag not set).
- padata_stop clears the flag and blocks until the padata instance
- is unused.
+diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
+index 3e026e7a7e75..af60016d25c4 100644
+--- a/crypto/pcrypt.c
++++ b/crypto/pcrypt.c
+@@ -13,7 +13,6 @@
+ #include <linux/init.h>
+ #include <linux/module.h>
+ #include <linux/slab.h>
+-#include <linux/notifier.h>
+ #include <linux/kobject.h>
+ #include <linux/cpu.h>
+ #include <crypto/pcrypt.h>
+diff --git a/include/linux/padata.h b/include/linux/padata.h
+index 9e0be23bd9ff..efdd0b129c53 100644
+--- a/include/linux/padata.h
++++ b/include/linux/padata.h
+@@ -13,7 +13,6 @@
+ #include <linux/workqueue.h>
+ #include <linux/spinlock.h>
+ #include <linux/list.h>
+-#include <linux/notifier.h>
+ #include <linux/kobject.h>
  
--The list of CPUs to be used can be adjusted with these functions::
-+Finally, complete padata initialization by allocating a padata_shell object::
-+
-+   struct padata_shell *padata_alloc_shell(struct padata_instance *pinst);
-+
-+A padata_shell is used to submit a job to padata and allows a series of such
-+jobs to be serialized independently.  A padata_instance may have one or more
-+padata_shell objects associated with it, each allowing a separate series of
-+jobs.
-+
-+The list of CPUs to be used can be adjusted with this function::
+ #define PADATA_CPU_SERIAL   0x01
+@@ -141,14 +140,10 @@ struct padata_shell {
+ /**
+  * struct padata_instance - The overall control structure.
+  *
+- * @cpu_notifier: cpu hotplug notifier.
+  * @parallel_wq: The workqueue used for parallel work.
+  * @serial_wq: The workqueue used for serial work.
+  * @pslist: List of padata_shell objects attached to this instance.
+  * @cpumask: User supplied cpumasks for parallel and serial works.
+- * @cpumask_change_notifier: Notifiers chain for user-defined notify
+- *            callbacks that will be called when either @pcpu or @cbcpu
+- *            or both cpumasks change.
+  * @kobj: padata instance kernel object.
+  * @lock: padata instance lock.
+  * @flags: padata flags.
+@@ -159,7 +154,6 @@ struct padata_instance {
+ 	struct workqueue_struct		*serial_wq;
+ 	struct list_head		pslist;
+ 	struct padata_cpumask		cpumask;
+-	struct blocking_notifier_head	 cpumask_change_notifier;
+ 	struct kobject                   kobj;
+ 	struct mutex			 lock;
+ 	u8				 flags;
+@@ -179,8 +173,4 @@ extern int padata_set_cpumask(struct padata_instance *pinst, int cpumask_type,
+ 			      cpumask_var_t cpumask);
+ extern int padata_start(struct padata_instance *pinst);
+ extern void padata_stop(struct padata_instance *pinst);
+-extern int padata_register_cpumask_notifier(struct padata_instance *pinst,
+-					    struct notifier_block *nblock);
+-extern int padata_unregister_cpumask_notifier(struct padata_instance *pinst,
+-					      struct notifier_block *nblock);
+ #endif
+diff --git a/kernel/padata.c b/kernel/padata.c
+index cd9ae6822460..7305e81b9bee 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -492,81 +492,35 @@ static void __padata_stop(struct padata_instance *pinst)
+ }
  
--    int padata_set_cpumasks(struct padata_instance *pinst,
--			    cpumask_var_t pcpumask,
--			    cpumask_var_t cbcpumask);
-     int padata_set_cpumask(struct padata_instance *pinst, int cpumask_type,
- 			   cpumask_var_t cpumask);
--    int padata_add_cpu(struct padata_instance *pinst, int cpu, int mask);
--    int padata_remove_cpu(struct padata_instance *pinst, int cpu, int mask);
+ /* Replace the internal control structure with a new one. */
+-static int padata_replace_one(struct padata_shell *ps)
++static void padata_replace_one(struct padata_shell *ps)
+ {
+ 	struct parallel_data *pd_old = rcu_dereference_protected(ps->pd, 1);
+ 	struct parallel_data *pd_new;
+-	int notification_mask = 0;
  
- Changing the CPU masks are expensive operations, though, so it should not be
- done with great frequency.
+ 	pd_new = padata_alloc_pd(ps);
+ 	if (!pd_new)
+-		return -ENOMEM;
++		return;
  
--It's possible to change both cpumasks of a padata instance with
--padata_set_cpumasks by specifying the cpumasks for parallel execution (pcpumask)
--and for the serial callback function (cbcpumask). padata_set_cpumask is used to
--change just one of the cpumasks. Here cpumask_type is one of PADATA_CPU_SERIAL,
--PADATA_CPU_PARALLEL and cpumask specifies the new cpumask to use.
--To simply add or remove one CPU from a certain cpumask the functions
--padata_add_cpu/padata_remove_cpu are used. cpu specifies the CPU to add or
--remove and mask is one of PADATA_CPU_SERIAL, PADATA_CPU_PARALLEL.
-+padata_set_cpumask is used to change just one of the cpumasks. Here cpumask_type
-+is one of PADATA_CPU_SERIAL or PADATA_CPU_PARALLEL, and cpumask specifies the
-+new cpumask to use.
+ 	rcu_assign_pointer(ps->pd, pd_new);
  
- If a user is interested in padata cpumask changes, he can register to
- the padata cpumask change notifier::
-@@ -117,12 +116,13 @@ momentarily.
+-	if (!cpumask_equal(pd_old->cpumask.pcpu, pd_new->cpumask.pcpu))
+-		notification_mask |= PADATA_CPU_PARALLEL;
+-	if (!cpumask_equal(pd_old->cpumask.cbcpu, pd_new->cpumask.cbcpu))
+-		notification_mask |= PADATA_CPU_SERIAL;
+-
+ 	if (atomic_dec_and_test(&pd_old->refcnt))
+ 		padata_free_pd(pd_old);
+-
+-	return notification_mask;
+ }
  
- The submission of work is done with::
+ static void padata_replace(struct padata_instance *pinst)
+ {
+-	int notification_mask = 0;
+ 	struct padata_shell *ps;
  
--    int padata_do_parallel(struct padata_instance *pinst,
--		           struct padata_priv *padata, int cb_cpu);
-+    int padata_do_parallel(struct padata_shell *ps,
-+		           struct padata_priv *padata, int *cb_cpu);
+ 	pinst->flags |= PADATA_RESET;
  
--The pinst and padata structures must be set up as described above; cb_cpu
--specifies which CPU will be used for the final callback when the work is
--done; it must be in the current instance's CPU mask.  The return value from
-+The ps and padata structures must be set up as described above; cb_cpu
-+points to the preferred CPU to be used for the final callback when the work is
-+done; it must be in the current instance's CPU mask (if not the cb_cpu pointer
-+is updated to point to the CPU actually chosen).  The return value from
- padata_do_parallel() is zero on success, indicating that the work is in
- progress. -EBUSY means that somebody, somewhere else is messing with the
- instance's CPU mask, while -EINVAL is a complaint about cb_cpu not being
-@@ -154,10 +154,12 @@ Note that this call may be deferred for a while since the padata code takes
- pains to ensure that tasks are completed in the order in which they were
- submitted.
+ 	list_for_each_entry(ps, &pinst->pslist, list)
+-		notification_mask |= padata_replace_one(ps);
++		padata_replace_one(ps);
  
--The one remaining function in the padata API should be called to clean up
--when a padata instance is no longer needed::
-+Cleaning up a padata instance predictably involves calling the three free
-+functions that correspond to the allocation in reverse:
+ 	synchronize_rcu();
  
-+    void padata_free_shell(struct padata_shell *ps);
-+    void padata_stop(struct padata_instance *pinst);
-     void padata_free(struct padata_instance *pinst);
+-	if (notification_mask)
+-		blocking_notifier_call_chain(&pinst->cpumask_change_notifier,
+-					     notification_mask,
+-					     &pinst->cpumask);
+-
+ 	pinst->flags &= ~PADATA_RESET;
+ }
  
--This function will busy-wait while any remaining tasks are completed, so it
--might be best not to call it while there is work outstanding.
-+It is the user's responsibility to ensure all outstanding jobs are complete
-+before any of the above are called.
+-/**
+- * padata_register_cpumask_notifier - Registers a notifier that will be called
+- *                             if either pcpu or cbcpu or both cpumasks change.
+- *
+- * @pinst: A poineter to padata instance
+- * @nblock: A pointer to notifier block.
+- */
+-int padata_register_cpumask_notifier(struct padata_instance *pinst,
+-				     struct notifier_block *nblock)
+-{
+-	return blocking_notifier_chain_register(&pinst->cpumask_change_notifier,
+-						nblock);
+-}
+-EXPORT_SYMBOL(padata_register_cpumask_notifier);
+-
+-/**
+- * padata_unregister_cpumask_notifier - Unregisters cpumask notifier
+- *        registered earlier  using padata_register_cpumask_notifier
+- *
+- * @pinst: A pointer to data instance.
+- * @nlock: A pointer to notifier block.
+- */
+-int padata_unregister_cpumask_notifier(struct padata_instance *pinst,
+-				       struct notifier_block *nblock)
+-{
+-	return blocking_notifier_chain_unregister(
+-		&pinst->cpumask_change_notifier,
+-		nblock);
+-}
+-EXPORT_SYMBOL(padata_unregister_cpumask_notifier);
+-
+-
+ /* If cpumask contains no active cpu, we mark the instance as invalid. */
+ static bool padata_validate_cpumask(struct padata_instance *pinst,
+ 				    const struct cpumask *cpumask)
+@@ -944,7 +898,6 @@ static struct padata_instance *padata_alloc(const char *name,
+ 
+ 	pinst->flags = 0;
+ 
+-	BLOCKING_INIT_NOTIFIER_HEAD(&pinst->cpumask_change_notifier);
+ 	kobject_init(&pinst->kobj, &padata_attr_type);
+ 	mutex_init(&pinst->lock);
+ 
 -- 
 2.23.0
 
