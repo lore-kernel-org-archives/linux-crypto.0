@@ -2,114 +2,150 @@ Return-Path: <SRS0=IkvS=ZM=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C82DC432C0
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 20:17:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A83EEC432C0
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 20:32:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 41DAD20895
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 20:17:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="EQ65JBR8"
+	by mail.kernel.org (Postfix) with ESMTP id 7CABC20895
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 20:32:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1574281957;
+	bh=rgz7tSc56R6AlFhUwHCm3gukAfl1sHXelnLXuoyn9n8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=Wv1rYXMzBRUTjrmvvHG8MX4NHjAm7NDGH/ZRaqQbnlkaAHp/fCq3pnoFSk2FKvn5g
+	 qD6n4CZvkJUSC207m/ahzL5E0Gw2ylNrgvNxSCioa/lNAXAsd1BXm924RULT3DkzYc
+	 nLZQghyoVEDNJ0oPHUmqcbhq9RpdvwMMj5I7F+CE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726979AbfKTURV (ORCPT
+        id S1726351AbfKTUcg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Nov 2019 15:17:21 -0500
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:34032 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726722AbfKTURV (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Nov 2019 15:17:21 -0500
-Received: by mail-pl1-f196.google.com with SMTP id h13so321132plr.1
-        for <linux-crypto@vger.kernel.org>; Wed, 20 Nov 2019 12:17:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=message-id:mime-version:content-transfer-encoding:in-reply-to
-         :references:subject:from:to:user-agent:date;
-        bh=pEcboEGWgRcR/lCzkZsNrTAeSBzrBEcSRW5Q19SXbMI=;
-        b=EQ65JBR8bkeY9w4g/Uc09Y4QqY5RWsrMSpC5TXkqOYfEwzwY+zBJfbxvIxys0nqjFy
-         02qA8zcrbdxss7Z6s0fO8IYZ5yywKee2UPfYlgGwEbt1owwZNYuTR8739myDYq87p60K
-         ThgCbPjw2lXpTi7Q3s24f+XS315ywP8gZaqHM=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:mime-version
-         :content-transfer-encoding:in-reply-to:references:subject:from:to
-         :user-agent:date;
-        bh=pEcboEGWgRcR/lCzkZsNrTAeSBzrBEcSRW5Q19SXbMI=;
-        b=Etf9pLaZ22jXXnSDtXdSpyOtKhMCTjxdeGHMS8bUAkzypJhQolM9xwrNPq7dikgust
-         lE02M6wc6Ks/2+6FXqOC4ZK1D5FArLZB2Ar38nyNExbOaNeZH6yFlllpHyXAcjcldcSn
-         mTDkRc2ASPR3jvjWcopdkFYgaQ664IVpuUOxpilO/XdbNYog0w2McC6+dqTsx4c59rwY
-         lJQa+3L9Ced0Z6hFe6Qgax2hyQYa+2KjwF3CEO1nqUf2CbXCn2C0i7n4echrgKYf5k/3
-         e2HDsI1vssV7w2Q64IlXulIL+e6Gqx+i8OHYdfyupr4csalST+0J3RxpIOxYMJ7w6ST6
-         SHdg==
-X-Gm-Message-State: APjAAAWsQO6h/Swff6aZUjmwAAhEdPJcxEgXBhUDTmkUcEeP0DIeK9+d
-        aMMEmrpUrOjmvxm73+OwrBQckg==
-X-Google-Smtp-Source: APXvYqzpSqQYefyJ3ZiEe7Zp8CiqqyaHPThJUtrwF7mFi9vdQx6QxD53EHr8zOke3ntXqED5vcNQhw==
-X-Received: by 2002:a17:902:b481:: with SMTP id y1mr4627808plr.76.1574281040440;
-        Wed, 20 Nov 2019 12:17:20 -0800 (PST)
-Received: from chromium.org ([2620:15c:202:1:fa53:7765:582b:82b9])
-        by smtp.gmail.com with ESMTPSA id s15sm89632pgc.3.2019.11.20.12.17.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Nov 2019 12:17:19 -0800 (PST)
-Message-ID: <5dd59f4f.1c69fb81.17c48.0540@mx.google.com>
-Content-Type: text/plain; charset="utf-8"
+        Wed, 20 Nov 2019 15:32:36 -0500
+Received: from mail.kernel.org ([198.145.29.99]:53430 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726038AbfKTUcg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 Nov 2019 15:32:36 -0500
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id E33AC20872;
+        Wed, 20 Nov 2019 20:32:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1574281955;
+        bh=rgz7tSc56R6AlFhUwHCm3gukAfl1sHXelnLXuoyn9n8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=YxytrLSujkMi+YhB60vQ4R5qA6bi7jIjXFJCPx0aj6ZCR2dKlKjWHI649X9tToNSd
+         5u+a+9w4YBtS9AcvywmrIMwG5XV6XwGzKwtDkp4YuWzFG2LES9dsOJYsGMthUe/NhI
+         a2QS8rjcGaeNUNn8GJwOHx5qfXXsS8WeLJrXdWKE=
+Date:   Wed, 20 Nov 2019 21:32:32 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Cc:     Andy Lutomirski <luto@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux API <linux-api@vger.kernel.org>,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Nicolai Stange <nstange@suse.de>,
+        "Peter, Matthias" <matthias.peter@bsi.bund.de>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Roman Drahtmueller <draht@schaltsekun.de>,
+        Neil Horman <nhorman@redhat.com>
+Subject: Re: [PATCH v25 10/12] LRNG - add TRNG support
+Message-ID: <20191120203232.GB3109949@kroah.com>
+References: <5390778.VeFRgus4bQ@positron.chronox.de>
+ <19681012.svDddlc5pN@positron.chronox.de>
+ <20191120132918.GA2892197@kroah.com>
+ <1695782.oZ5Vf4nH9s@positron.chronox.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <1574247349.14298.30.camel@suse.com>
-References: <000000000000cdaa560596acbc4e@google.com> <5dcee59a.1c69fb81.188d.e4b9@mx.google.com> <1574247349.14298.30.camel@suse.com>
-Subject: Re: INFO: task hung in chaoskey_disconnect
-From:   Stephen Boyd <swboyd@chromium.org>
-To:     Oliver Neukum <oneukum@suse.com>, alexandre.belloni@bootlin.com,
-        andreyknvl@google.com, arnd@arndb.de, b.zolnierkie@samsung.com,
-        gregkh@linuxfoundation.org, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-usb@vger.kernel.org, lvivier@redhat.com,
-        mchehab+samsung@kernel.org, mpm@selenic.com,
-        syzbot <syzbot+f41c4f7c6d8b0b778780@syzkaller.appspotmail.com>,
-        syzkaller-bugs@googlegroups.com
-User-Agent: alot/0.8.1
-Date:   Wed, 20 Nov 2019 12:17:18 -0800
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1695782.oZ5Vf4nH9s@positron.chronox.de>
+User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Quoting Oliver Neukum (2019-11-20 02:55:49)
-> Am Freitag, den 15.11.2019, 09:51 -0800 schrieb Stephen Boyd:
-> > Quoting syzbot (2019-11-06 04:32:09)
-> > > Hello,
-> > >=20
-> > > syzbot found the following crash on:
-> > >=20
-> > > HEAD commit:    b1aa9d83 usb: raw: add raw-gadget interface
-> > > git tree:       https://github.com/google/kasan.git usb-fuzzer
-> > > console output: https://syzkaller.appspot.com/x/log.txt?x=3D16ae2adce=
-00000
-> > > kernel config:  https://syzkaller.appspot.com/x/.config?x=3D79de80330=
-003b5f7
-> > > dashboard link: https://syzkaller.appspot.com/bug?extid=3Df41c4f7c6d8=
-b0b778780
-> > > compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-> > > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D1024815=
-8e00000
-> > > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D16afbf7ce=
-00000
-> > >=20
-> > > IMPORTANT: if you fix the bug, please add the following tag to the co=
-mmit:
-> > > Reported-by: syzbot+f41c4f7c6d8b0b778780@syzkaller.appspotmail.com
-> >=20
-> > I suspect this is because of the kthread getting stuck problem reported
-> > by Maciej. Maybe try the commit that Herbert picked up.
->=20
-> Do you have a commit ID so we can test an exported patch?
->=20
+On Wed, Nov 20, 2019 at 08:51:11PM +0100, Stephan Müller wrote:
+> Am Mittwoch, 20. November 2019, 14:29:18 CET schrieb Greg Kroah-Hartman:
+> 
+> Hi Greg,
+> 
+> > On Wed, Nov 20, 2019 at 09:58:35AM +0100, Stephan Müller wrote:
+> > > Am Dienstag, 19. November 2019, 13:41:50 CET schrieb Greg Kroah-Hartman:
+> > > 
+> > > Hi Greg,
+> > > 
+> > > > On Tue, Nov 19, 2019 at 02:07:40AM -0800, Andy Lutomirski wrote:
+> > > > > > As this would introduce a new device file now, is there a special
+> > > > > > process that I need to follow or do I need to copy? Which
+> > > > > > major/minor
+> > > > > > number should I use?
+> > > > > > 
+> > > > > > Looking into static const struct memdev devlist[] I see
+> > > > > > 
+> > > > > >          [8] = { "random", 0666, &random_fops, 0 },
+> > > > > >          [9] = { "urandom", 0666, &urandom_fops, 0 },
+> > > > > > 
+> > > > > > Shall a true_random be added here with [10]?
+> > > > > 
+> > > > > I am not at all an expert on chardevs, but this sounds generally
+> > > > > reasonable.  gregkh is probably the real authority here.
+> > > > 
+> > > > [10] is the aio char device node, so you better not try to overlap it or
+> > > > bad things will happen :(
+> > > 
+> > > Thanks for your insights.
+> > > 
+> > > Which device minor number could we use?
+> > 
+> > Get your own dynamic one by using a misc device if you _REALLY_ want to
+> > add yet-another-char-node-for-random-data.
+> > 
+> > But I would have thought that we all realize that this is not the way to
+> > do things.  Let's not have "random", "urandom", and "true_random" be
+> > something we want to totally confuse userspace with, that way is insane.
+> > 
+> > Please just make the existing userspace api "just work", don't add to
+> > the mess.
+> 
+> Thank you, I think we should follow that advise.
+> 
+> With that and considering Alexander's rightful remark we have a challenge. So, 
+> changing the syscall may not be the right way unless we find a way to restrict 
+> the permissions somehow (capability? LSM? None of that seems to be a good 
+> fit).
+> 
+> What about providing a /sys file? I.e. adding a file that:
+> 
+> a) has permissions 440 per default and maybe the ownership of root:root
+> 
+> b) allow user space to perform a chown/chgrp
+> 
+> c) only supports reading of data from user space
+> 
+> But then, how could we provide a common interface for the existing random.c 
+> and the LRNG?
+> 
+> Or should we use a proc file for that? If yes, I guess it should not be a 
+> sysctl, but a "regular" proc file that should allow a chown(2) operation. On 
+> the other hand, is proc the right place to provide a user space interface for 
+> exporting data to user?
 
-I sent the patch in. See https://lkml.kernel.org/r/00000000000019acd8059770=
-942b@google.com
-for what happened. It didn't make a difference. I'll have to stare at it
-a little more to figure out what's going on.
+No, do not abuse sysfs or procfs for something like this.  Use a real
+syscall please if you really need it.
 
+greg k-h
