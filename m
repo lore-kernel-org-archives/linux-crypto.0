@@ -5,92 +5,97 @@ X-Spam-Level:
 X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3EE9C432C0
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 16:20:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D88F7C432C0
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 16:21:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7B6DE2071F
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 16:20:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AADA62075E
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 Nov 2019 16:21:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="Qn5sDZkr"
+	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="MngS67pw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729306AbfKTQUo (ORCPT
+        id S1732772AbfKTQVz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Nov 2019 11:20:44 -0500
-Received: from mout.gmx.net ([212.227.15.18]:53321 "EHLO mout.gmx.net"
+        Wed, 20 Nov 2019 11:21:55 -0500
+Received: from mout.gmx.net ([212.227.15.19]:53483 "EHLO mout.gmx.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727885AbfKTQUo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Nov 2019 11:20:44 -0500
+        id S1727885AbfKTQVy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 Nov 2019 11:21:54 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1574266825;
-        bh=bxZXK4jBYOL5HZciNl+I4AQKYqmjhu0pYOZ1i9Z/OoM=;
+        s=badeba3b8450; t=1574266897;
+        bh=xu4ircm6Mkplv/efNNMwLAlVPDoRiD2XqhLUOoHy2/A=;
         h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
-        b=Qn5sDZkrEU+j1jcx+kYmtk0WukmyVj9yeK5sBRxSqWQY8wwuSmM0c6UBXqkxip2oG
-         FI9YvdS4O2dAkn/BSORui0RLFirwfDBPl8i/pYb03/g2Fu8GNEVij/BtLmjnm/8CoW
-         /MG1cvs49rxyIe/XyeAYNFeuM/8JWfnTak/0yAeQ=
+        b=MngS67pwPM63jyQtp4EXMbU12otqe7fvi924Kf0nZAoy+CvgGUNlS1Ggb82QN6PmD
+         oKEoHJ2y9av+yPClYwKaF+tJTSUUPkzCj/xyzmUtn7sh0vfIfLBPxaABUzqtaH+LlU
+         UfCnUTc9BbR4pjHGEzHEEpAElR7QjtDb6/9yUYso=
 X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
 Received: from [192.168.1.176] ([37.4.249.139]) by mail.gmx.com (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MiacH-1htBcc20uN-00fnOV; Wed, 20
- Nov 2019 17:20:25 +0100
-Subject: Re: [PATCH v3 3/4] ARM: dts: bcm2835: Move rng definition to common
- location
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1M8hZD-1iSo1w0NiD-004nuI; Wed, 20
+ Nov 2019 17:21:37 +0100
+Subject: Re: [PATCH v3 4/4] ARM: dts: bcm2711: Enable HWRNG support
 To:     Stephen Brennan <stephen@brennan.io>
-Cc:     Mark Rutland <mark.rutland@arm.com>, devicetree@vger.kernel.org,
-        linux-rpi-kernel@lists.infradead.org,
-        Florian Fainelli <f.fainelli@gmail.com>,
+Cc:     Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Scott Branden <sbranden@broadcom.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-arm-kernel@lists.infradead.org, Ray Jui <rjui@broadcom.com>,
-        linux-kernel@vger.kernel.org, Eric Anholt <eric@anholt.net>,
         Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
         bcm-kernel-feedback-list@broadcom.com,
-        Matt Mackall <mpm@selenic.com>, Arnd Bergmann <arnd@arndb.de>,
-        linux-crypto@vger.kernel.org
+        Eric Anholt <eric@anholt.net>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-rpi-kernel@lists.infradead.org
 References: <20191120031622.88949-1-stephen@brennan.io>
- <20191120031622.88949-4-stephen@brennan.io>
+ <20191120031622.88949-5-stephen@brennan.io>
 From:   Stefan Wahren <wahrenst@gmx.net>
-Message-ID: <307960ba-0c01-1590-551b-2190a54ea350@gmx.net>
-Date:   Wed, 20 Nov 2019 17:20:23 +0100
+Message-ID: <e4ad673b-873b-9bef-1f09-3bdeda892780@gmx.net>
+Date:   Wed, 20 Nov 2019 17:21:36 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
  Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <20191120031622.88949-4-stephen@brennan.io>
+In-Reply-To: <20191120031622.88949-5-stephen@brennan.io>
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
 Content-Language: en-US
-X-Provags-ID: V03:K1:x3VLRf8GmImn+EPZjvIVhfId/7IfKu1RrJ9BQzHaYGGKSw0bb09
- d6oSlm3vQNJT3WAIyZSlUBY9hD0zaZduPoXWLqWpZXQWvST1PYzXg/aUy6yCmPoCKA9VgXG
- NqDmrZcbwY3KMnkvLeS2+3sstYZy1wQFzLKc9zuF1/7/UCvoxx86aY3pR8QtQscgpty+UTl
- topjqXqUmwp8/M+h70sKA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:6fbkE9d3JpA=:/2o0C5CqgIV8IPoFApQNss
- +eRU0v2zdC1o4JjackG/gOZQu+89WNB+/LrNarG1RKNqSYRDn477tVpP9sn5jLa3v/u3/owHQ
- Aaid1dlCvEJs44TIo3rVPukrkVfqHReVfjhuIXDe/vG3H6a6Y5WWCMxMRYMRVe5BWqdS60LGl
- GHPd2+OXfQ8wEDQDLRyQD1XywhNTlprizyRA7ZyVSl5A0Gdk5kqzJsjfZWCPHwHYd3j0yDZYe
- +hFxHphf31HAtbvxRcQm7r7WxHGUoCvm4syBtC3vjWDZSfjmK3mqn7ngQxlyxyw6ncUUi02Sg
- LRptIgViLiuEaOOj91aoVA2wnaR4XT1L0aCsaiYIvWzKe0PuU2+GhEzVAgp796yH92aOEmUUf
- MnvmoWXDB+5XyUg9y69k3HehBOgXsAkcLFO5Lhk0apUv273xI95xufVXhJzhHCXbhLsYT2pWO
- fBniw+o36eN1Eknph3GO3SkxoDgicaSgSF7PGRzedpN7LjzwbPPsJQLbb3tkmdotVMGzcC3Qr
- MSu/0KCzoiw14gFvI5CorhR08yEQTk1qPG9yJLIkzHHyz7wGF3Ru18LBljidiLWYnLd5iNwju
- J/+Q9YR1r3njNlIvyvLAspmRsA2Wll99kVkH6XhdrZxxdwMIDSP7eLTdZHIfoss1V+uOePeJl
- SYcPPwlNm7YQqjK5WuztQdJYkcv1sOWOTPPt9lgxbj4KUVeXSi3z6dT6pW1mvzFXtceNrTDGr
- MlQeosWhXFb0jdpxvgnPq0kAxGuTotcZlb8pTE5LnsA9ha1iL+vuNmSMDhCMoVBoMfVgpwvJE
- 74VAxdXFi3iNflUKdnvMYItMR+na8exnfjsxKTn5sPpSL6G7cIXtACZeCxTIwl8BjptmwDVUA
- GMdRVIVkHjDlLwvS2GDKMT/36l/L4SzmlG4XhaIHhwltXdfnXqheHJ1B6XgvFRlv/WnG4Xqes
- BV6SbjGeDw3oyOEle4DR3eIM4nno3Zf/M5JFZ7RoNbV9cECd+HvFN4xB1mLWpIrfTwUcXBv9z
- r9A7XvwDoIJkVEU6q1RxRAQ56/dah+itmG8FjEIp7yVmvsbb3RS9CxwUDEh+WnPSJfohp3Kw8
- Bls5AGlHLIF3OFS6vSzD1cUx8rGjnl1aoyyLAoe7M3Th7rtTVBFDsfkHTwPpK0faLtmMU8rvD
- YL9+5yNmppQDOpt2jga6v6+xEx/mj3BfVtVwnzynu8otKEjDVYYtNIHc3Pj5C7HiGNuss7Gaq
- 4JGPpBsDaCrmRXiwIcu1j3VrdyNvKonVP3t7Ez4FVCA6vs/xtXq/0U8mUusQ=
+X-Provags-ID: V03:K1:VzjpvITXKrHb4Xmn1iglZyLcPqx/MkTFcBBCSz7GFHyv2VbGGFg
+ JO87hRDAEPzECYOWEtjxqyp0XX6hovTWp9pF6RODgKLjej6yQ3y2MrEqwTTxqLqFpi8L6Wa
+ j9Rhd+IT2ZgfYYRGXr3eSUZ5Ovh6YTkI0Orh5hAE8ypHqDBuT8e6OJpNfMs1aI2OOA/nvTj
+ 7MeLzBQFAjSmYqgXaL2XA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:hSVLPUrApkI=:cN5zB46U6clgcMSpU3dFrQ
+ Xj/szHK7Kf6lkFgKxdlyXpMfbRogwFXsRwTyMhprZmF2XBvJ/PfTko6/wA1UZRPTN2KKvX4qJ
+ rdlxP7WXHFgW0fHVLRYacQDFSFRse3P1wjPHmKseXzI0slW6F0b5/fMslyOzm6kE6Gvy+36F/
+ 2395wk3w/18ftw3/UVkXT1nOvYMtGjnLJUlx0+Go8HC+Vg13dqUkOFKNO9+zUPxXQOu2qYYTq
+ enSENd/plVgrj/V6ZfI2ZUrI719zL2evSQ7FEOPDS2eHyEOGLgrZfWXpvnuQ5r9AAKntjhihK
+ gq/Ht4KtClB8tGWHmTb8kRXzHUiQPZuwqVHKpb6qptAq9j7HYYgpvXyQoPvF2jRXPwNlEa5qk
+ bEPPM6BlAqcRP5fBx9TJZz5TGgaygfgHdXgSWV5IKbR4+SkivVtdlhGS8TLgh7/Kyg0u/oZxw
+ mQCdOCr0aZ0vUB2mJoacFJLJ2XjFNSBriuOqhi/UgxoCuYAiiP7I3Cklul5/wtqZQiwB2yBfs
+ KdmHYYL++b55a6zU6oDeW7dN7V0ygckf78g5UfXu9F4OUbvMoYNr0C6BXHr4WTPYP0N1SQ4Aw
+ RpF+WjM9d1LUfZRQ0OhDovrVYjqM7WBNk2gB1fCjMcLV+N3Kj4zI9VM+KcVteyUKJb6jNQY/E
+ ozUb/nG17mFf97nxk42KZQfYYN7YmOepHB06RLGPkRVePXAARmwLqQ8rdKimAwj7GnzZtVGbn
+ YWdpAQ7f5ks1C4dE2ftaV/tKkS0gUPO+xFWPomP6DzZ88mt68P4LCCAkIy++g7INx7kurefP9
+ +gZ01g6QCGXgumbBJ2pyUBJieBNkqqJMuxniHcpn3Y5BGNMSyF04Y3GJNOlfBq3yHqsohMM4w
+ KctOzMuOfSp5VPDdje1ayhIQIZhTcpJs/8z4G3WFe9pi3d0UORlJx+AYW5mKCkhqPo1V8u+5/
+ n+xq3DkqSzC1iUDspJOEDyXczFyUCVHLzhAbLd+God/mIupt/oZax6Qeln1yTL/cNq1wq9q3u
+ 6LCznRCAygp6IhLLbAyXL7jimCRpbkk2Ay7DRD1UUKj/xa+FU+IN4KqEsPt0X9fYS64NvsPqB
+ U0g4oxcaz8Fxqd1FPE5kvqnjxlSGVfcUoMzFijc1/oFuTje8FLXGC4Hmo48r8NIRwYdM1G7lR
+ FA5sjsqhnwChE4DpzbBxGzo0lPagUMbdhCoPg+Zp7RTj7iKVMIBPg7CbQE470v3tsmo7yOlmF
+ ox83VLw4DLZN4gwZp0lW6wyMtNq8DE/NmODRme0+rIso0iD305nS2aCn8vVc=
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 Am 20.11.19 um 04:16 schrieb Stephen Brennan:
-> BCM2711 inherits from BCM283X, but has an incompatible HWRNG. Move this
-> node to bcm2835-common.dtsi, so that BCM2711 can define its own.
+> This enables hardware random number generator support for the BCM2711
+> on the Raspberry Pi 4 board.
 >
 > Signed-off-by: Stephen Brennan <stephen@brennan.io>
+
 Acked-by: Stefan Wahren <wahrenst@gmx.net>
+
+Thanks
+
