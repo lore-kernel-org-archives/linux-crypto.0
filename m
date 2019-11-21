@@ -2,86 +2,230 @@ Return-Path: <SRS0=AlHk=ZN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7ED9C432C0
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 14:44:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91C3FC432C0
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 15:19:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AB4F1206B6
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 14:44:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 66A5A20674
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 15:19:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TGuAsPNx"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="Nvqxc6vJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726396AbfKUOor (ORCPT
+        id S1726573AbfKUPT3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Nov 2019 09:44:47 -0500
-Received: from mail-lf1-f66.google.com ([209.85.167.66]:43875 "EHLO
-        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726293AbfKUOor (ORCPT
+        Thu, 21 Nov 2019 10:19:29 -0500
+Received: from mo4-p02-ob.smtp.rzone.de ([85.215.255.84]:25890 "EHLO
+        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726546AbfKUPT3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Nov 2019 09:44:47 -0500
-Received: by mail-lf1-f66.google.com with SMTP id l14so2838348lfh.10;
-        Thu, 21 Nov 2019 06:44:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=VXzx9aTYeMQl18LE4uxvxrgXEVm/FTvT7LouxOHpbMQ=;
-        b=TGuAsPNxZIOi0BiAVSPyzbWWKoSZoS1L8Cz+haDYOSMklBR+DWYI4RKgqpsqbcye04
-         R3hqlOwHQVqKs2yc/wp9LpHYlmz66NiVPyblTYlWal10g1In1XNsHIO0n+iL8GZWia+z
-         Y6O5mE/7aW6j5nbU5/C8KfEi6CBcIwfppx6j9X1xKLpLKH4lQqhi1+G/OiJuFl/klz+Q
-         OyInQQNir6trcmP1uiaQOqMGd5BDEPPcdOlEQDFHS5FCm2GNyAkdtScTFymV0pQU+bMx
-         idmQVKhthdewPpu5lWoTzDVEtkM2Q1Z4kuQMmfI9yLl58hs0lemvP4AfKccUoBGPd69z
-         C8EA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=VXzx9aTYeMQl18LE4uxvxrgXEVm/FTvT7LouxOHpbMQ=;
-        b=Bxe2tOe13ROAIsC0F3HyX+PyVK45+HB9jM4f5KEIziDe6I8Xyl21JHivPnvnmQsCLD
-         /MCvJsEGS6ndLXgt+/8ZuM7+G5DXYhdLBYTThh/PfCAiCB3ekIhbVoW7iNpd4bHJ0nAI
-         BCGWEkmu+a6JIy9hY7noQuZAB9HqvQcjT+RU/S3l5SkxbF0yTRRrwjC3a4+RCgc8pWYp
-         KfGvh8r9f79CUCYjMNXhtjCUtPncqzvuA7cK9XDBAhxoHfzXV8e4D4TMIIK1xcQmMkPt
-         YR/AZvB5s22kuHvso71rQvv6EB8uvB451vMM3TMlRcYsoV4U28YjvLl3wPRk9u7ipioS
-         0baQ==
-X-Gm-Message-State: APjAAAXO5fmzpF0hvYYvbX6Ah8SukhaqFbPqG3EhBsw0RAtO3NcQ92uk
-        MTfTZ1hzqU+MaOoBKSu2Llom0TddZdnwLMTCYMs=
-X-Google-Smtp-Source: APXvYqzD4PNqVRcS5zHB0VNgXjeposUpPgmg7qw+BbT+QY3NiPTZ5wQKYTBMR5cEMS0bjInbclgss5aB67f/Zy3yE2k=
-X-Received: by 2002:a19:f701:: with SMTP id z1mr2971084lfe.133.1574347485888;
- Thu, 21 Nov 2019 06:44:45 -0800 (PST)
+        Thu, 21 Nov 2019 10:19:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1574349566;
+        s=strato-dkim-0002; d=chronox.de;
+        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=2RiF8MQSa3XBV1fR1xKat6hykVT+ebuvV4G+mKmn2PA=;
+        b=Nvqxc6vJkD4JxsRYaRyKivNQMKYiFdkybhgiuRLsD0kz8LBhAqZQ9WXx6yFkVUhn2K
+        zm1gJqAbgNyUfx12CRiDw+eMFLMX8A2W0+80vxa20P1FUpC1LPOb2ce65Q/M6JaFB8ai
+        sTXHzS8wGsgfZZNnhgD55FDi7EwZSfy0Zw6lOFtAVQu6+LRM5d+oUyi3Y+s2QDqsoO/S
+        L+LQjv8fi7L9n61oVHnOJb/VPn443u2Vwom8IFgOqFolT3q8cbIeA/tkIRkrkSjIF68S
+        7rHqn+Dw6rR+9T7IFqKssn7VlE316gxGUx5rPyT3s+HCxGg+Zl9aspIFGwcbxp6v8iU8
+        N1Dg==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzHHXPSIvSWlTs="
+X-RZG-CLASS-ID: mo00
+Received: from positron.chronox.de
+        by smtp.strato.de (RZmta 44.29.0 DYNA|AUTH)
+        with ESMTPSA id N09a57vALFIJsIY
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
+        (Client did not present a certificate);
+        Thu, 21 Nov 2019 16:18:19 +0100 (CET)
+From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To:     Nicolai Stange <nstange@suse.de>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        linux-api@vger.kernel.org,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        "Peter, Matthias" <matthias.peter@bsi.bund.de>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Roman Drahtmueller <draht@schaltsekun.de>,
+        Neil Horman <nhorman@redhat.com>
+Subject: Re: [PATCH v25 12/12] LRNG - add interface for gathering of raw entropy
+Date:   Thu, 21 Nov 2019 16:18:18 +0100
+Message-ID: <23500762.5LfuSYdpsK@positron.chronox.de>
+In-Reply-To: <87a78pl8xp.fsf@suse.de>
+References: <6157374.ptSnyUpaCn@positron.chronox.de> <3610406.x8mDjznOIz@positron.chronox.de> <87a78pl8xp.fsf@suse.de>
 MIME-Version: 1.0
-References: <20191120203538.199367-1-Jason@zx2c4.com> <877e3t8qv7.fsf@toke.dk> <CAHmME9rmFw7xGKNMURBUSiezbsBEikOPiJxtEu=i2Quzf+JNDg@mail.gmail.com>
-In-Reply-To: <CAHmME9rmFw7xGKNMURBUSiezbsBEikOPiJxtEu=i2Quzf+JNDg@mail.gmail.com>
-From:   Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date:   Thu, 21 Nov 2019 15:44:34 +0100
-Message-ID: <CANiq72mGPmMVBCmOMc_xJbKuOvbmmPAotGx67nSVQrYmXd2x3A@mail.gmail.com>
-Subject: Re: [PATCH RFC net-next] net: WireGuard secure network tunnel
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <thoiland@redhat.com>,
-        Netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        David Miller <davem@davemloft.net>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Jason,
+Am Donnerstag, 21. November 2019, 13:18:10 CET schrieb Nicolai Stange:
 
-On Thu, Nov 21, 2019 at 12:09 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> [...]
+Hi Nicolai,
 
-Any reason for the .clang-format in drivers/? If yes, it would be nice
-to state it in the comment of the file.
+> Hi Stephan,
+>=20
+> two general remarks on debugfs usage below
+>=20
+> Stephan M=FCller <smueller@chronox.de> writes:
+> > diff --git a/drivers/char/lrng/lrng_testing.c
+> > b/drivers/char/lrng/lrng_testing.c new file mode 100644
+> > index 000000000000..5c33d3bd2172
+> > --- /dev/null
+> > +++ b/drivers/char/lrng/lrng_testing.c
+>=20
+> <snip>
+>=20
+> > +/*
+> > + * This data structure holds the dentry's of the debugfs files
+> > establishing + * the interface to user space.
+> > + */
+> > +struct lrng_raw_debugfs {
+> > +	struct dentry *lrng_raw_debugfs_root; /* root dentry */
+> > +	struct dentry *lrng_raw_debugfs_lrng_raw; /* .../lrng_raw */
+> > +};
+> > +
+> > +static struct lrng_raw_debugfs lrng_raw_debugfs;
+> > +
+> > +/* DebugFS operations and definition of the debugfs files */
+> > +static ssize_t lrng_raw_read(struct file *file, char __user *to,
+> > +			     size_t count, loff_t *ppos)
+> > +{
+> > +	loff_t pos =3D *ppos;
+> > +	int ret;
+> > +
+> > +	if (!count)
+> > +		return 0;
+> > +	lrng_raw_entropy_init();
+> > +	ret =3D lrng_raw_extract_user(to, count);
+> > +	lrng_raw_entropy_fini();
+> > +	if (ret < 0)
+> > +		return ret;
+> > +	count -=3D ret;
+> > +	*ppos =3D pos + count;
+> > +	return ret;
+> > +}
+> > +
+> > +/* Module init: allocate memory, register the debugfs files */
+> > +static int lrng_raw_debugfs_init(void)
+> > +{
+> > +	lrng_raw_debugfs.lrng_raw_debugfs_root =3D
+> > +		debugfs_create_dir(KBUILD_MODNAME, NULL);
+> > +	if (IS_ERR(lrng_raw_debugfs.lrng_raw_debugfs_root)) {
+> > +		lrng_raw_debugfs.lrng_raw_debugfs_root =3D NULL;
+> > +		return PTR_ERR(lrng_raw_debugfs.lrng_raw_debugfs_root);
+> > +	}
+>=20
+> I think pointers returned by the debugfs API are not supposed to get
+> checked for NULL/IS_ERR(), c.f commit ff9fb72bc077 ("debugfs: return
+> error values, not NULL") or the the output from
+>=20
+>   git log --pretty=3Doneline | grep 'no need to check return value of
+> debugfs_create'
+>=20
+> (Also the above code is dubious: you're effectively returning
+>  PTR_ERR(NULL)).
 
-Cheers,
-Miguel
+Removed the check compliant to the mentioned patches.
+>=20
+> > +	return 0;
+> > +}
+> > +
+> > +static struct file_operations lrng_raw_name_fops =3D {
+> > +	.owner =3D THIS_MODULE,
+> > +	.read =3D lrng_raw_read,
+> > +};
+> > +
+> > +static int lrng_raw_debugfs_init_name(void)
+> > +{
+> > +	lrng_raw_debugfs.lrng_raw_debugfs_lrng_raw =3D
+> > +		debugfs_create_file("lrng_raw", 0400,
+> > +				    lrng_raw_debugfs.lrng_raw_debugfs_root,
+> > +				    NULL, &lrng_raw_name_fops);q
+>=20
+> CONFIG_LRNG_TESTING is a bool and thus, this debugfs file can't ever get
+> removed. Even if it could, this inode hasn't got any data associated
+> with it and so file removal would not be a problem for lrng_raw_read().
+
+Correct.
+>=20
+> Please consider using debugfs_create_file_unsafe() instead to save
+> debugfs from kmalloc()ing a proxy file_operations protecting your fops
+> against concurrent file removal.
+
+Yes, you are correct. Changed.
+>=20
+> > +	if (IS_ERR(lrng_raw_debugfs.lrng_raw_debugfs_lrng_raw)) {
+> > +		lrng_raw_debugfs.lrng_raw_debugfs_lrng_raw =3D NULL;
+> > +		return PTR_ERR(lrng_raw_debugfs.lrng_raw_debugfs_lrng_raw);
+> > +	}
+>=20
+> Same comment regarding return value checking applies here.
+
+Same here: I removed the check.
+
+With that, I also removed the static variable to maintain the two dentries=
+=20
+following the examples seen in other kernel code. Also, the __exit function=
+ is=20
+removed as we do not need it as you pointed out.
+
+Thanks a lot.
+>=20
+> Thanks,
+>=20
+> Nicolai
+>=20
+> > +	return 0;
+> > +}
+> > +
+> > +static int __init lrng_raw_init(void)
+> > +{
+> > +	int ret =3D lrng_raw_debugfs_init();
+> > +
+> > +	if (ret < 0)
+> > +		return ret;
+> > +
+> > +	ret =3D lrng_raw_debugfs_init_name();
+> > +	if (ret < 0)
+> > +		debugfs_remove_recursive(
+> > +					lrng_raw_debugfs.lrng_raw_debugfs_root);
+> > +
+> > +	return ret;
+> > +}
+> > +
+> > +static void __exit lrng_raw_exit(void)
+> > +{
+> > +	debugfs_remove_recursive(lrng_raw_debugfs.lrng_raw_debugfs_root);
+> > +}
+> > +
+> > +module_init(lrng_raw_init);
+> > +module_exit(lrng_raw_exit);
+> > +
+> > +MODULE_LICENSE("Dual BSD/GPL");
+> > +MODULE_AUTHOR("Stephan Mueller <smueller@chronox.de>");
+> > +MODULE_DESCRIPTION("Kernel module for gathering raw entropy");
+
+
+Ciao
+Stephan
+
+
