@@ -2,246 +2,294 @@ Return-Path: <SRS0=AlHk=ZN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5927EC432C0
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 13:28:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA79AC432C0
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 14:19:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2A0C42070B
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 13:28:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1574342932;
-	bh=0HkgFJdDQHE3by3aLKwO6EefVYZW/Zdkx6yOx0RE9LI=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=JJZVhCQhkz0qWbBAyUU/qOuML5WRALyZRvNlrzoSVbr8/6mnG3OKoBGQqgKK3MvtZ
-	 nEtQRMYbxgPfTuUnljKyX2vivulSbDTPxjTjYs0E3QiWSxx4BMT71yBug80cHAKpVl
-	 iMjR17G53MXDlLgbtzo5d79xhD4mMSUD0IoF2OWg=
+	by mail.kernel.org (Postfix) with ESMTP id 96EF82068E
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 14:19:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OG4/ddKE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727059AbfKUN2s (ORCPT
+        id S1726593AbfKUOTr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Nov 2019 08:28:48 -0500
-Received: from mail.kernel.org ([198.145.29.99]:48454 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726293AbfKUN2r (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Nov 2019 08:28:47 -0500
-Received: from localhost.localdomain (unknown [118.189.143.39])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        Thu, 21 Nov 2019 09:19:47 -0500
+Received: from us-smtp-2.mimecast.com ([205.139.110.61]:44569 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726574AbfKUOTr (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 21 Nov 2019 09:19:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574345986;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Mw+cO9LOWM9AAalb2mQwDjkTO4iW67Tkd/Br4OFvMps=;
+        b=OG4/ddKEgSlh/bHe8GpONrZzmf+BnBvo+mSVaIRBpFfYQ5r3RkMA2rhiXykbgO8TtLN/6J
+        wVb0BTefSMay9ZOBhQwqPreLVstTjhdIGn1hCo9AYdMk9xQ2sQHP2j8KZD81GalXB+8KLt
+        5Fv8cu6DAN2Cl+3X1Y/Q9wVLquLATfE=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-58-lh5z5WgaP-Sb5bTx0nn0-w-1; Thu, 21 Nov 2019 09:19:41 -0500
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6C7A12067D;
-        Thu, 21 Nov 2019 13:28:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1574342926;
-        bh=0HkgFJdDQHE3by3aLKwO6EefVYZW/Zdkx6yOx0RE9LI=;
-        h=From:To:Cc:Subject:Date:From;
-        b=Z9ekmTt1Z/DFRkageVjT8bvI5YeOAb0650f720wGoJOjpENnmqgtgoVs8qj1apxlI
-         JU8Pzf3vWKI4K0uWlNg5O/unzs4VSsN2fxFI7zO+sjLOVxr5juiP1fsfweYqTYc/L8
-         PTU3wFvvCKJnnvg6VNmwV7qVjP9wttOPfkJMkx+U=
-From:   Krzysztof Kozlowski <krzk@kernel.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Krzysztof Kozlowski <krzk@kernel.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 662B3107ACC4;
+        Thu, 21 Nov 2019 14:19:36 +0000 (UTC)
+Received: from hmswarspite.think-freely.org (ovpn-120-15.rdu2.redhat.com [10.10.120.15])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CA09E6FF12;
+        Thu, 21 Nov 2019 14:19:32 +0000 (UTC)
+Date:   Thu, 21 Nov 2019 09:19:30 -0500
+From:   Neil Horman <nhorman@redhat.com>
+To:     Stephan =?iso-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Corey Minyard <minyard@acm.org>, linux-crypto@vger.kernel.org,
-        openipmi-developer@lists.sourceforge.net
-Subject: [PATCH] char: Fix Kconfig indentation, continued
-Date:   Thu, 21 Nov 2019 21:28:41 +0800
-Message-Id: <20191121132842.28942-1-krzk@kernel.org>
-X-Mailer: git-send-email 2.17.1
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        linux-api@vger.kernel.org,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Nicolai Stange <nstange@suse.de>,
+        "Peter, Matthias" <matthias.peter@bsi.bund.de>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Roman Drahtmueller <draht@schaltsekun.de>
+Subject: Re: [PATCH v25 09/12] LRNG - add Jitter RNG fast noise source
+Message-ID: <20191121141930.GB27405@hmswarspite.think-freely.org>
+References: <6157374.ptSnyUpaCn@positron.chronox.de>
+ <2377947.mlgTlHak1g@positron.chronox.de>
+ <20191120133303.GA28341@hmswarspite.think-freely.org>
+ <1844272.AK0ElEJLVa@positron.chronox.de>
+MIME-Version: 1.0
+In-Reply-To: <1844272.AK0ElEJLVa@positron.chronox.de>
+User-Agent: Mutt/1.12.1 (2019-06-15)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-MC-Unique: lh5z5WgaP-Sb5bTx0nn0-w-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Adjust indentation from seven spaces to tab (+optional two spaces) as in
-coding style with command like:
-	$ sed -e 's/^        /\t/' -i */Kconfig
+On Wed, Nov 20, 2019 at 09:07:13PM +0100, Stephan M=FCller wrote:
+> Am Mittwoch, 20. November 2019, 14:33:03 CET schrieb Neil Horman:
+>=20
+> Hi Neil,
+>=20
+> > On Sat, Nov 16, 2019 at 10:36:52AM +0100, Stephan M=FCller wrote:
+> > > The Jitter RNG fast noise source implemented as part of the kernel
+> > > crypto API is queried for 256 bits of entropy at the time the seed
+> > > buffer managed by the LRNG is about to be filled.
+> > >=20
+> > > CC: "Eric W. Biederman" <ebiederm@xmission.com>
+> > > CC: "Alexander E. Patrakov" <patrakov@gmail.com>
+> > > CC: "Ahmed S. Darwish" <darwish.07@gmail.com>
+> > > CC: "Theodore Y. Ts'o" <tytso@mit.edu>
+> > > CC: Willy Tarreau <w@1wt.eu>
+> > > CC: Matthew Garrett <mjg59@srcf.ucam.org>
+> > > CC: Vito Caputo <vcaputo@pengaru.com>
+> > > CC: Andreas Dilger <adilger.kernel@dilger.ca>
+> > > CC: Jan Kara <jack@suse.cz>
+> > > CC: Ray Strode <rstrode@redhat.com>
+> > > CC: William Jon McCann <mccann@jhu.edu>
+> > > CC: zhangjs <zachary@baishancloud.com>
+> > > CC: Andy Lutomirski <luto@kernel.org>
+> > > CC: Florian Weimer <fweimer@redhat.com>
+> > > CC: Lennart Poettering <mzxreary@0pointer.de>
+> > > CC: Nicolai Stange <nstange@suse.de>
+> > > Reviewed-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
+> > > Reviewed-by: Roman Drahtmueller <draht@schaltsekun.de>
+> > > Tested-by: Roman Drahtm=FCller <draht@schaltsekun.de>
+> > > Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
+> > > Tested-by: Neil Horman <nhorman@redhat.com>
+> > > Signed-off-by: Stephan Mueller <smueller@chronox.de>
+> > > ---
+> > >=20
+> > >  drivers/char/lrng/Kconfig     | 11 +++++
+> > >  drivers/char/lrng/Makefile    |  1 +
+> > >  drivers/char/lrng/lrng_jent.c | 88 +++++++++++++++++++++++++++++++++=
+++
+> > >  3 files changed, 100 insertions(+)
+> > >  create mode 100644 drivers/char/lrng/lrng_jent.c
+> > >=20
+> > > diff --git a/drivers/char/lrng/Kconfig b/drivers/char/lrng/Kconfig
+> > > index 03e6e2ec356b..80fc723c67d2 100644
+> > > --- a/drivers/char/lrng/Kconfig
+> > > +++ b/drivers/char/lrng/Kconfig
+> > > @@ -80,4 +80,15 @@ config LRNG_KCAPI
+> > >=20
+> > >  =09  provided by the selected kernel crypto API RNG.
+> > > =20
+> > >  endif # LRNG_DRNG_SWITCH
+> > >=20
+> > > +config LRNG_JENT
+> > > +=09bool "Enable Jitter RNG as LRNG Seed Source"
+> > > +=09select CRYPTO_JITTERENTROPY
+> > > +=09help
+> > > +=09  The Linux RNG may use the Jitter RNG as noise source. Enabling
+> > > +=09  this option enables the use of the Jitter RNG. Its default
+> > > +=09  entropy level is 16 bits of entropy per 256 data bits delivered
+> > > +=09  by the Jitter RNG. This entropy level can be changed at boot
+> > > +=09  time or at runtime with the lrng_base.jitterrng configuration
+> > > +=09  variable.
+> > > +
+> > >=20
+> > >  endif # LRNG
+> > >=20
+> > > diff --git a/drivers/char/lrng/Makefile b/drivers/char/lrng/Makefile
+> > > index 027b6ea51c20..a87d800c9aae 100644
+> > > --- a/drivers/char/lrng/Makefile
+> > > +++ b/drivers/char/lrng/Makefile
+> > > @@ -13,3 +13,4 @@ obj-$(CONFIG_SYSCTL)=09=09+=3D lrng_proc.o
+> > >=20
+> > >  obj-$(CONFIG_LRNG_DRNG_SWITCH)=09+=3D lrng_switch.o
+> > >  obj-$(CONFIG_LRNG_DRBG)=09=09+=3D lrng_drbg.o
+> > >  obj-$(CONFIG_LRNG_KCAPI)=09+=3D lrng_kcapi.o
+> > >=20
+> > > +obj-$(CONFIG_LRNG_JENT)=09=09+=3D lrng_jent.o
+> > > diff --git a/drivers/char/lrng/lrng_jent.c b/drivers/char/lrng/lrng_j=
+ent.c
+> > > new file mode 100644
+> > > index 000000000000..43114a44b8f5
+> > > --- /dev/null
+> > > +++ b/drivers/char/lrng/lrng_jent.c
+> > > @@ -0,0 +1,88 @@
+> > > +// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
+> > > +/*
+> > > + * LRNG Fast Noise Source: Jitter RNG
+> > > + *
+> > > + * Copyright (C) 2016 - 2019, Stephan Mueller <smueller@chronox.de>
+> > > + */
+> > > +
+> > > +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+> > > +
+> > > +#include "lrng_internal.h"
+> > > +
+> > > +/*
+> > > + * Estimated entropy of data is a 16th of
+> > > LRNG_DRNG_SECURITY_STRENGTH_BITS. + * Albeit a full entropy assessmen=
+t is
+> > > provided for the noise source indicating + * that it provides high
+> > > entropy rates and considering that it deactivates + * when it detects
+> > > insufficient hardware, the chosen under estimation of + * entropy is
+> > > considered to be acceptable to all reviewers.
+> > > + */
+> > > +static u32 jitterrng =3D LRNG_DRNG_SECURITY_STRENGTH_BITS>>4;
+> > > +module_param(jitterrng, uint, 0644);
+> > > +MODULE_PARM_DESC(jitterrng, "Entropy in bits of 256 data bits from J=
+itter
+> > > " +=09=09=09    "RNG noise source");
+> > > +
+> > > +/**
+> > > + * Get Jitter RNG entropy
+> > > + *
+> > > + * @outbuf buffer to store entropy
+> > > + * @outbuflen length of buffer
+> > > + * @return > 0 on success where value provides the added entropy in =
+bits
+> > > + *=09   0 if no fast source was available
+> > > + */
+> > > +struct rand_data;
+> > > +struct rand_data *jent_lrng_entropy_collector(void);
+> > > +int jent_read_entropy(struct rand_data *ec, unsigned char *data,
+> > > +=09=09      unsigned int len);
+> > > +static struct rand_data *lrng_jent_state;
+> > > +
+> > > +u32 lrng_get_jent(u8 *outbuf, unsigned int outbuflen)
+> > > +{
+> > > +=09int ret;
+> > > +=09u32 ent_bits =3D jitterrng;
+> > > +=09unsigned long flags;
+> > > +=09static DEFINE_SPINLOCK(lrng_jent_lock);
+> > > +=09static int lrng_jent_initialized =3D 0;
+> > > +
+> > > +=09spin_lock_irqsave(&lrng_jent_lock, flags);
+> > > +
+> > > +=09if (!ent_bits || (lrng_jent_initialized =3D=3D -1)) {
+> > > +=09=09spin_unlock_irqrestore(&lrng_jent_lock, flags);
+> > > +=09=09return 0;
+> > > +=09}
+> > > +
+> >=20
+> > this works, but I think you can avoid the use of the spin lock on the r=
+ead
+> > calls here.  If you assign a global pointer to the value of
+> > &lrng_jent_state on init, you can just take the spinlock on assignment,=
+ and
+> > assume its stable after that (which it should be given that its only ev=
+er
+> > going to point to a static data structure).
+>=20
+> It is correct that the lock protects the assignment of the data structure=
+.
+>=20
+> But the Jitter RNG itself is not multi-threaded. So, a form of serializat=
+ion=20
+> is needed to also "read" data from the Jitter RNG using one and the same=
+=20
+> state.
+>=20
+> Granted, there is a serialization in the current code as the=20
+> lrng_pool_trylock() is taken before the Jitter RNG is called by=20
+> lrng_fill_seed_buffer which effectively serializes all requests to also t=
+he=20
+> Jitter RNG. But this is coincidence in this case. I would think, however,=
+ that=20
+> this coincidence could easily lead to programming errors further down the=
+ road=20
+> when the spinlock is not present and that trylock() is moved to some plac=
+e=20
+> else considering that this trylock() is meant to protect reading the entr=
+opy=20
+> pool and not the Jitter RNG.
+>=20
+> As the reading of the Jitter RNG is always performed in process context, =
+I=20
+> think having this additional spin lock against possible programming error=
+s=20
+> should not lead to performance regressions.
+>=20
+> What do you think?
+>=20
+I take your meaning that each random device needs protection, and yes, each=
+ of
+the random devices (trng and sdrng) have their own locking.  But it also ap=
+pears
+to me that each of those random devices contains its own private copy of th=
+e
+entropy_buf (they're statically declared on the stack in lrng_trng_seed and
+_lrng_sdrng_seed), so while the additional locking doesn't necessecarily hu=
+rt,
+I'm struggling to see why the additional work is needed.  If ever you have =
+a
+situation in which multiple rngs want want to share an entropy buffer, yes,=
+ you
+would need that lock, or some other protection, but I don't see the need
+immediately.
 
-Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
----
- drivers/char/hw_random/Kconfig | 18 +++----
- drivers/char/ipmi/Kconfig      | 98 +++++++++++++++++-----------------
- 2 files changed, 58 insertions(+), 58 deletions(-)
+Neil
 
-diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-index 91db933ed85a..f898df4c1412 100644
---- a/drivers/char/hw_random/Kconfig
-+++ b/drivers/char/hw_random/Kconfig
-@@ -386,17 +386,17 @@ config HW_RANDOM_MESON
- 	  If unsure, say Y.
- 
- config HW_RANDOM_CAVIUM
--       tristate "Cavium ThunderX Random Number Generator support"
--       depends on HW_RANDOM && PCI && (ARM64 || (COMPILE_TEST && 64BIT))
--       default HW_RANDOM
--       ---help---
--	 This driver provides kernel-side support for the Random Number
--	 Generator hardware found on Cavium SoCs.
-+	tristate "Cavium ThunderX Random Number Generator support"
-+	depends on HW_RANDOM && PCI && (ARM64 || (COMPILE_TEST && 64BIT))
-+	default HW_RANDOM
-+	---help---
-+	  This driver provides kernel-side support for the Random Number
-+	  Generator hardware found on Cavium SoCs.
- 
--	 To compile this driver as a module, choose M here: the
--	 module will be called cavium_rng.
-+	  To compile this driver as a module, choose M here: the
-+	  module will be called cavium_rng.
- 
--	 If unsure, say Y.
-+	  If unsure, say Y.
- 
- config HW_RANDOM_MTK
- 	tristate "Mediatek Random Number Generator support"
-diff --git a/drivers/char/ipmi/Kconfig b/drivers/char/ipmi/Kconfig
-index cc4bea773ded..7dc2c3ec4051 100644
---- a/drivers/char/ipmi/Kconfig
-+++ b/drivers/char/ipmi/Kconfig
-@@ -4,38 +4,38 @@
- #
- 
- menuconfig IPMI_HANDLER
--       tristate 'IPMI top-level message handler'
--       depends on HAS_IOMEM
--       select IPMI_DMI_DECODE if DMI
--       help
--	 This enables the central IPMI message handler, required for IPMI
--	 to work.
-+	tristate 'IPMI top-level message handler'
-+	depends on HAS_IOMEM
-+	select IPMI_DMI_DECODE if DMI
-+	help
-+	  This enables the central IPMI message handler, required for IPMI
-+	  to work.
- 
--	 IPMI is a standard for managing sensors (temperature,
--	 voltage, etc.) in a system.
-+	  IPMI is a standard for managing sensors (temperature,
-+	  voltage, etc.) in a system.
- 
--	 See <file:Documentation/IPMI.txt> for more details on the driver.
-+	  See <file:Documentation/IPMI.txt> for more details on the driver.
- 
--	 If unsure, say N.
-+	  If unsure, say N.
- 
- config IPMI_DMI_DECODE
--       select IPMI_PLAT_DATA
--       bool
-+	select IPMI_PLAT_DATA
-+	bool
- 
- config IPMI_PLAT_DATA
--       bool
-+	bool
- 
- if IPMI_HANDLER
- 
- config IPMI_PANIC_EVENT
--       bool 'Generate a panic event to all BMCs on a panic'
--       help
--	 When a panic occurs, this will cause the IPMI message handler to,
--	 by default, generate an IPMI event describing the panic to each
--	 interface registered with the message handler.  This is always
--	 available, the module parameter for ipmi_msghandler named
--	 panic_op can be set to "event" to chose this value, this config
--	 simply causes the default value to be set to "event".
-+	bool 'Generate a panic event to all BMCs on a panic'
-+	help
-+	  When a panic occurs, this will cause the IPMI message handler to,
-+	  by default, generate an IPMI event describing the panic to each
-+	  interface registered with the message handler.  This is always
-+	  available, the module parameter for ipmi_msghandler named
-+	  panic_op can be set to "event" to chose this value, this config
-+	  simply causes the default value to be set to "event".
- 
- config IPMI_PANIC_STRING
- 	bool 'Generate OEM events containing the panic string'
-@@ -54,43 +54,43 @@ config IPMI_PANIC_STRING
- 	  causes the default value to be set to "string".
- 
- config IPMI_DEVICE_INTERFACE
--       tristate 'Device interface for IPMI'
--       help
--	 This provides an IOCTL interface to the IPMI message handler so
--	 userland processes may use IPMI.  It supports poll() and select().
-+	tristate 'Device interface for IPMI'
-+	help
-+	  This provides an IOCTL interface to the IPMI message handler so
-+	  userland processes may use IPMI.  It supports poll() and select().
- 
- config IPMI_SI
--       tristate 'IPMI System Interface handler'
--       select IPMI_PLAT_DATA
--       help
--	 Provides a driver for System Interfaces (KCS, SMIC, BT).
--	 Currently, only KCS and SMIC are supported.  If
--	 you are using IPMI, you should probably say "y" here.
-+	tristate 'IPMI System Interface handler'
-+	select IPMI_PLAT_DATA
-+	help
-+	  Provides a driver for System Interfaces (KCS, SMIC, BT).
-+	  Currently, only KCS and SMIC are supported.  If
-+	  you are using IPMI, you should probably say "y" here.
- 
- config IPMI_SSIF
--       tristate 'IPMI SMBus handler (SSIF)'
--       select I2C
--       help
--	 Provides a driver for a SMBus interface to a BMC, meaning that you
--	 have a driver that must be accessed over an I2C bus instead of a
--	 standard interface.  This module requires I2C support.
-+	tristate 'IPMI SMBus handler (SSIF)'
-+	select I2C
-+	help
-+	  Provides a driver for a SMBus interface to a BMC, meaning that you
-+	  have a driver that must be accessed over an I2C bus instead of a
-+	  standard interface.  This module requires I2C support.
- 
- config IPMI_POWERNV
--       depends on PPC_POWERNV
--       tristate 'POWERNV (OPAL firmware) IPMI interface'
--       help
--	 Provides a driver for OPAL firmware-based IPMI interfaces.
-+	depends on PPC_POWERNV
-+	tristate 'POWERNV (OPAL firmware) IPMI interface'
-+	help
-+	  Provides a driver for OPAL firmware-based IPMI interfaces.
- 
- config IPMI_WATCHDOG
--       tristate 'IPMI Watchdog Timer'
--       help
--	 This enables the IPMI watchdog timer.
-+	tristate 'IPMI Watchdog Timer'
-+	help
-+	  This enables the IPMI watchdog timer.
- 
- config IPMI_POWEROFF
--       tristate 'IPMI Poweroff'
--       help
--	 This enables a function to power off the system with IPMI if
--	 the IPMI management controller is capable of this.
-+	tristate 'IPMI Poweroff'
-+	help
-+	  This enables a function to power off the system with IPMI if
-+	  the IPMI management controller is capable of this.
- 
- endif # IPMI_HANDLER
- 
-@@ -126,7 +126,7 @@ config NPCM7XX_KCS_IPMI_BMC
- 
- config ASPEED_BT_IPMI_BMC
- 	depends on ARCH_ASPEED || COMPILE_TEST
--       depends on REGMAP && REGMAP_MMIO && MFD_SYSCON
-+	depends on REGMAP && REGMAP_MMIO && MFD_SYSCON
- 	tristate "BT IPMI bmc driver"
- 	help
- 	  Provides a driver for the BT (Block Transfer) IPMI interface
--- 
-2.17.1
+> Thank you for your review!
+>=20
+> Ciao
+> Stephan
+>=20
+>=20
 
