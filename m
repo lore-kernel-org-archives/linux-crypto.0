@@ -2,110 +2,86 @@ Return-Path: <SRS0=AlHk=ZN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 550A0C432C3
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 14:36:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7ED9C432C0
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 14:44:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2BCCF206D7
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 14:36:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AB4F1206B6
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 14:44:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Nw5dU8mL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TGuAsPNx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726613AbfKUOgV (ORCPT
+        id S1726396AbfKUOor (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Nov 2019 09:36:21 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:35586 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726396AbfKUOgV (ORCPT
+        Thu, 21 Nov 2019 09:44:47 -0500
+Received: from mail-lf1-f66.google.com ([209.85.167.66]:43875 "EHLO
+        mail-lf1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726293AbfKUOor (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Nov 2019 09:36:21 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xALEXxbg176360;
-        Thu, 21 Nov 2019 14:36:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2019-08-05;
- bh=M2ZTh/ffoJTAXhTWkUwqBgK4JVTx0Aie1A5Hh2zrp78=;
- b=Nw5dU8mLhMqxRSNdgBbulrptxP5HHvrlO+8tlOEr9Oho9bPZ17gTaLcYlnXYWNM0sd9S
- TmlbtL0vz3o3aNAtf3H4cEG8Jw9cgWNNOrYpWkNy2W5oZWlwERgy5GxSpgybzSiieVQ2
- vyyxDcd9dpnIWWycfLY2Wotq9FL4vpwMduvlqtF/LiXKNRAyQhQmXjc00kK6ewKZgsuE
- sdpKYPr/mofMLC55Q4wnU+d8K5ikPNNkO3Eqdvpba49j57TBFc6YOJlSIpCXCHC9FPJM
- 8huAbbZjxJjUj281dU+dSfc5brdbgPBkaNC0kAZiAfSM/jX+UlQ4WKJDELccXfEOEjtl 9w== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 2wa8hu4qjd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 21 Nov 2019 14:36:10 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xALEYZH6166676;
-        Thu, 21 Nov 2019 14:36:09 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3030.oracle.com with ESMTP id 2wda0643ft-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 21 Nov 2019 14:36:09 +0000
-Received: from abhmp0020.oracle.com (abhmp0020.oracle.com [141.146.116.26])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xALEa7Gm016867;
-        Thu, 21 Nov 2019 14:36:07 GMT
-Received: from ca-dmjordan1.us.oracle.com (/10.211.9.48)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 21 Nov 2019 06:36:06 -0800
-Date:   Thu, 21 Nov 2019 09:36:13 -0500
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Jonathan Corbet <corbet@lwn.net>
-Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-doc@vger.kernel.org
-Subject: Re: [PATCH 1/4] padata: update documentation
-Message-ID: <20191121143613.xofz7dkpy7e5wtqe@ca-dmjordan1.us.oracle.com>
-References: <20191120185412.302-1-daniel.m.jordan@oracle.com>
- <20191120185412.302-2-daniel.m.jordan@oracle.com>
- <20191120121634.6d989088@lwn.net>
+        Thu, 21 Nov 2019 09:44:47 -0500
+Received: by mail-lf1-f66.google.com with SMTP id l14so2838348lfh.10;
+        Thu, 21 Nov 2019 06:44:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=VXzx9aTYeMQl18LE4uxvxrgXEVm/FTvT7LouxOHpbMQ=;
+        b=TGuAsPNxZIOi0BiAVSPyzbWWKoSZoS1L8Cz+haDYOSMklBR+DWYI4RKgqpsqbcye04
+         R3hqlOwHQVqKs2yc/wp9LpHYlmz66NiVPyblTYlWal10g1In1XNsHIO0n+iL8GZWia+z
+         Y6O5mE/7aW6j5nbU5/C8KfEi6CBcIwfppx6j9X1xKLpLKH4lQqhi1+G/OiJuFl/klz+Q
+         OyInQQNir6trcmP1uiaQOqMGd5BDEPPcdOlEQDFHS5FCm2GNyAkdtScTFymV0pQU+bMx
+         idmQVKhthdewPpu5lWoTzDVEtkM2Q1Z4kuQMmfI9yLl58hs0lemvP4AfKccUoBGPd69z
+         C8EA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=VXzx9aTYeMQl18LE4uxvxrgXEVm/FTvT7LouxOHpbMQ=;
+        b=Bxe2tOe13ROAIsC0F3HyX+PyVK45+HB9jM4f5KEIziDe6I8Xyl21JHivPnvnmQsCLD
+         /MCvJsEGS6ndLXgt+/8ZuM7+G5DXYhdLBYTThh/PfCAiCB3ekIhbVoW7iNpd4bHJ0nAI
+         BCGWEkmu+a6JIy9hY7noQuZAB9HqvQcjT+RU/S3l5SkxbF0yTRRrwjC3a4+RCgc8pWYp
+         KfGvh8r9f79CUCYjMNXhtjCUtPncqzvuA7cK9XDBAhxoHfzXV8e4D4TMIIK1xcQmMkPt
+         YR/AZvB5s22kuHvso71rQvv6EB8uvB451vMM3TMlRcYsoV4U28YjvLl3wPRk9u7ipioS
+         0baQ==
+X-Gm-Message-State: APjAAAXO5fmzpF0hvYYvbX6Ah8SukhaqFbPqG3EhBsw0RAtO3NcQ92uk
+        MTfTZ1hzqU+MaOoBKSu2Llom0TddZdnwLMTCYMs=
+X-Google-Smtp-Source: APXvYqzD4PNqVRcS5zHB0VNgXjeposUpPgmg7qw+BbT+QY3NiPTZ5wQKYTBMR5cEMS0bjInbclgss5aB67f/Zy3yE2k=
+X-Received: by 2002:a19:f701:: with SMTP id z1mr2971084lfe.133.1574347485888;
+ Thu, 21 Nov 2019 06:44:45 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191120121634.6d989088@lwn.net>
-User-Agent: NeoMutt/20180716
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9447 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1911210133
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9447 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1911210133
+References: <20191120203538.199367-1-Jason@zx2c4.com> <877e3t8qv7.fsf@toke.dk> <CAHmME9rmFw7xGKNMURBUSiezbsBEikOPiJxtEu=i2Quzf+JNDg@mail.gmail.com>
+In-Reply-To: <CAHmME9rmFw7xGKNMURBUSiezbsBEikOPiJxtEu=i2Quzf+JNDg@mail.gmail.com>
+From:   Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date:   Thu, 21 Nov 2019 15:44:34 +0100
+Message-ID: <CANiq72mGPmMVBCmOMc_xJbKuOvbmmPAotGx67nSVQrYmXd2x3A@mail.gmail.com>
+Subject: Re: [PATCH RFC net-next] net: WireGuard secure network tunnel
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <thoiland@redhat.com>,
+        Netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        David Miller <davem@davemloft.net>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Nov 20, 2019 at 12:16:34PM -0700, Jonathan Corbet wrote:
-> This all seems fine - it's better than not doing it - but can I put in a
-> request or two?
-> 
->  - This document is already formatted as RST, and your changes continue
->    that.  Can we please move it to Documentation/core-api/padata.rst and
->    add it to the TOC tree there?  Then it can become part of our formatted
->    docs.
-> 
->  - The padata code seems to be nicely equipped with kerneldoc comments; it
->    would be awfully nice to pull them into the document directly rather
->    than replicating the API there.  (Why does the document do that now?
->    Blame the bozo who originally wrote it :)  That would make the document
->    more complete and easier to maintain going forward.
+Hi Jason,
 
-Ok.  It would be nice to preserve the how-to aspect of the original doc as
-well, in other words, the order the interfaces should be called in.  Will do
-both.
+On Thu, Nov 21, 2019 at 12:09 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+>
+> [...]
 
-> For added goodness we could stick in an SPDX tag while we're at it.
+Any reason for the .clang-format in drivers/? If yes, it would be nice
+to state it in the comment of the file.
 
-I'll use the license from padata.c/h.
+Cheers,
+Miguel
