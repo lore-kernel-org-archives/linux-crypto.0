@@ -5,49 +5,49 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7F7BC43215
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 10:16:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84FF7C432C0
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 10:16:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AA1F320714
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 10:16:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 593362073F
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 10:16:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="dC8bPDfi"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="AqW9t2yj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727107AbfKUKQY (ORCPT
+        id S1727142AbfKUKQ2 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Nov 2019 05:16:24 -0500
-Received: from lelv0143.ext.ti.com ([198.47.23.248]:39820 "EHLO
-        lelv0143.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726132AbfKUKQY (ORCPT
+        Thu, 21 Nov 2019 05:16:28 -0500
+Received: from fllv0015.ext.ti.com ([198.47.19.141]:33384 "EHLO
+        fllv0015.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727125AbfKUKQ1 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Nov 2019 05:16:24 -0500
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-        by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id xALAGBHU088328;
-        Thu, 21 Nov 2019 04:16:11 -0600
+        Thu, 21 Nov 2019 05:16:27 -0500
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+        by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id xALAGEIi026633;
+        Thu, 21 Nov 2019 04:16:14 -0600
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1574331371;
-        bh=pE69mjXGRtzpdlcRpFWBhAVSwz09Tx2CA10ZtUiAstA=;
+        s=ti-com-17Q1; t=1574331374;
+        bh=EeSIzZP6KADvh/f9LO5V0lquKd/w+xeZwK/dgc5hXNE=;
         h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=dC8bPDfivf29O7SsbE4rlzJ8f8NmeIoZyHFEAwo4HGczorlkOqgL/9WNfv2mI5sd/
-         iMxiOJUXALnn47ag+moCGsqcWOiY6qcmLoAzd3CmqXNb5TxuQb36vaSWoLyy8yu2nb
-         0zZCDo2+JFkCkpGzwD4SKkKKRX8XDVKISWA8MqN4=
-Received: from DFLE103.ent.ti.com (dfle103.ent.ti.com [10.64.6.24])
-        by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id xALAGB99010833
+        b=AqW9t2yjijXuUy2mcWi28Ldp2oswwej1CG0cB5ACOJngz+xK07GTKQT2NEdAIqral
+         PDdOh3Y+wn03XMf1tDuDpnN9/vl2Jb+els2MJOi2qVb3IjQUbJeFPw1MMowVFOgi8p
+         1k5p7fs1byhnPBUCuTPYtIBuKmssMDp8r7Lj44e0=
+Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
+        by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id xALAGExM019076
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Thu, 21 Nov 2019 04:16:11 -0600
-Received: from DFLE115.ent.ti.com (10.64.6.36) by DFLE103.ent.ti.com
- (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
+        Thu, 21 Nov 2019 04:16:14 -0600
+Received: from DLEE115.ent.ti.com (157.170.170.26) by DLEE107.ent.ti.com
+ (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3; Thu, 21
- Nov 2019 04:16:11 -0600
-Received: from lelv0326.itg.ti.com (10.180.67.84) by DFLE115.ent.ti.com
- (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
+ Nov 2019 04:16:14 -0600
+Received: from lelv0326.itg.ti.com (10.180.67.84) by DLEE115.ent.ti.com
+ (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3 via
- Frontend Transport; Thu, 21 Nov 2019 04:16:11 -0600
+ Frontend Transport; Thu, 21 Nov 2019 04:16:13 -0600
 Received: from feketebors.ti.com (ileax41-snat.itg.ti.com [10.172.224.153])
-        by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id xALAG3b6105173;
-        Thu, 21 Nov 2019 04:16:09 -0600
+        by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id xALAG3b7105173;
+        Thu, 21 Nov 2019 04:16:11 -0600
 From:   Peter Ujfalusi <peter.ujfalusi@ti.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
         <nicolas.ferre@microchip.com>, <alexandre.belloni@bootlin.com>,
@@ -55,9 +55,9 @@ To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
 CC:     <vkoul@kernel.org>, <linux-crypto@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>
-Subject: [PATCH v2 2/3] crypto: atmel-sha - Retire dma_request_slave_channel_compat()
-Date:   Thu, 21 Nov 2019 12:16:01 +0200
-Message-ID: <20191121101602.21941-3-peter.ujfalusi@ti.com>
+Subject: [PATCH v2 3/3] crypto: atmel-tdes - Retire dma_request_slave_channel_compat()
+Date:   Thu, 21 Nov 2019 12:16:02 +0200
+Message-ID: <20191121101602.21941-4-peter.ujfalusi@ti.com>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20191121101602.21941-1-peter.ujfalusi@ti.com>
 References: <20191121101602.21941-1-peter.ujfalusi@ti.com>
@@ -83,18 +83,18 @@ anymore.
 
 Signed-off-by: Peter Ujfalusi <peter.ujfalusi@ti.com>
 ---
- drivers/crypto/atmel-sha.c | 39 +++++++-------------------------------
- 1 file changed, 7 insertions(+), 32 deletions(-)
+ drivers/crypto/atmel-tdes.c | 47 ++++++++++---------------------------
+ 1 file changed, 13 insertions(+), 34 deletions(-)
 
-diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index 8ea0e4bcde0d..9d392c5ff06b 100644
---- a/drivers/crypto/atmel-sha.c
-+++ b/drivers/crypto/atmel-sha.c
-@@ -2608,32 +2608,16 @@ static int atmel_sha_register_algs(struct atmel_sha_dev *dd)
- 	return err;
+diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
+index bb7c0a387c04..fbc76edaef3e 100644
+--- a/drivers/crypto/atmel-tdes.c
++++ b/drivers/crypto/atmel-tdes.c
+@@ -703,31 +703,17 @@ static int atmel_tdes_crypt(struct skcipher_request *req, unsigned long mode)
+ 	return atmel_tdes_handle_queue(ctx->dd, req);
  }
  
--static bool atmel_sha_filter(struct dma_chan *chan, void *slave)
+-static bool atmel_tdes_filter(struct dma_chan *chan, void *slave)
 -{
 -	struct at_dma_slave	*sl = slave;
 -
@@ -106,30 +106,55 @@ index 8ea0e4bcde0d..9d392c5ff06b 100644
 -	}
 -}
 -
- static int atmel_sha_dma_init(struct atmel_sha_dev *dd,
- 				struct crypto_platform_data *pdata)
+ static int atmel_tdes_dma_init(struct atmel_tdes_dev *dd,
+ 			struct crypto_platform_data *pdata)
  {
--	dma_cap_mask_t mask_in;
+-	dma_cap_mask_t mask;
+-
+-	dma_cap_zero(mask);
+-	dma_cap_set(DMA_SLAVE, mask);
++	int ret;
+ 
+ 	/* Try to grab 2 DMA channels */
+-	dd->dma_lch_in.chan = dma_request_slave_channel_compat(mask,
+-			atmel_tdes_filter, &pdata->dma_slave->rxdata, dd->dev, "tx");
+-	if (!dd->dma_lch_in.chan)
 +	dd->dma_lch_in.chan = dma_request_chan(dd->dev, "tx");
 +	if (IS_ERR(dd->dma_lch_in.chan)) {
-+		int ret = PTR_ERR(dd->dma_lch_in.chan);
- 
--	/* Try to grab DMA channel */
--	dma_cap_zero(mask_in);
--	dma_cap_set(DMA_SLAVE, mask_in);
--
--	dd->dma_lch_in.chan = dma_request_slave_channel_compat(mask_in,
--			atmel_sha_filter, &pdata->dma_slave->rxdata, dd->dev, "tx");
--	if (!dd->dma_lch_in.chan) {
--		dev_warn(dd->dev, "no DMA channel available\n");
--		return -ENODEV;
-+		if (ret != -EPROBE_DEFER)
-+			dev_warn(dd->dev, "no DMA channel available\n");
-+		return ret;
- 	}
++		ret = PTR_ERR(dd->dma_lch_in.chan);
+ 		goto err_dma_in;
++	}
  
  	dd->dma_lch_in.dma_conf.direction = DMA_MEM_TO_DEV;
-@@ -2724,12 +2708,6 @@ static struct crypto_platform_data *atmel_sha_of_init(struct platform_device *pd
+ 	dd->dma_lch_in.dma_conf.dst_addr = dd->phys_base +
+@@ -740,10 +726,11 @@ static int atmel_tdes_dma_init(struct atmel_tdes_dev *dd,
+ 		DMA_SLAVE_BUSWIDTH_4_BYTES;
+ 	dd->dma_lch_in.dma_conf.device_fc = false;
+ 
+-	dd->dma_lch_out.chan = dma_request_slave_channel_compat(mask,
+-			atmel_tdes_filter, &pdata->dma_slave->txdata, dd->dev, "rx");
+-	if (!dd->dma_lch_out.chan)
++	dd->dma_lch_out.chan = dma_request_chan(dd->dev, "rx");
++	if (IS_ERR(dd->dma_lch_out.chan)) {
++		ret = PTR_ERR(dd->dma_lch_out.chan);
+ 		goto err_dma_out;
++	}
+ 
+ 	dd->dma_lch_out.dma_conf.direction = DMA_DEV_TO_MEM;
+ 	dd->dma_lch_out.dma_conf.src_addr = dd->phys_base +
+@@ -761,8 +748,9 @@ static int atmel_tdes_dma_init(struct atmel_tdes_dev *dd,
+ err_dma_out:
+ 	dma_release_channel(dd->dma_lch_in.chan);
+ err_dma_in:
+-	dev_warn(dd->dev, "no DMA channel available\n");
+-	return -ENODEV;
++	if (ret != -EPROBE_DEFER)
++		dev_warn(dd->dev, "no DMA channel available\n");
++	return ret;
+ }
+ 
+ static void atmel_tdes_dma_cleanup(struct atmel_tdes_dev *dd)
+@@ -1193,12 +1181,6 @@ static struct crypto_platform_data *atmel_tdes_of_init(struct platform_device *p
  	if (!pdata)
  		return ERR_PTR(-ENOMEM);
  
@@ -142,18 +167,18 @@ index 8ea0e4bcde0d..9d392c5ff06b 100644
  	return pdata;
  }
  #else /* CONFIG_OF */
-@@ -2823,10 +2801,7 @@ static int atmel_sha_probe(struct platform_device *pdev)
- 				goto iclk_unprepare;
+@@ -1292,10 +1274,7 @@ static int atmel_tdes_probe(struct platform_device *pdev)
+ 				goto err_pdata;
  			}
  		}
 -		if (!pdata->dma_slave) {
 -			err = -ENXIO;
--			goto iclk_unprepare;
+-			goto err_pdata;
 -		}
 +
- 		err = atmel_sha_dma_init(sha_dd, pdata);
+ 		err = atmel_tdes_dma_init(tdes_dd, pdata);
  		if (err)
- 			goto err_sha_dma;
+ 			goto err_tdes_dma;
 -- 
 Peter
 
