@@ -2,117 +2,202 @@ Return-Path: <SRS0=AlHk=ZN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11521C432C3
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 12:00:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5155FC43141
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 12:18:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D201120872
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 12:00:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VAxXx/g6"
+	by mail.kernel.org (Postfix) with ESMTP id 332C920C01
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 12:18:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726620AbfKUMAd (ORCPT
+        id S1726775AbfKUMSQ convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Nov 2019 07:00:33 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:30958 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726342AbfKUMAd (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Nov 2019 07:00:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1574337632;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Q5rBJ14foXXsUIH3cvZz1qwUhkNTdgEVQ2KMu92pgrc=;
-        b=VAxXx/g6G2/5yob3nkKbfgY7nzXpsbdXNHpGn4p+AtNgJogRAk7l49720zcXPhmGblHnyx
-        a0R6mwgEjPhvPOvmWNoiTRuEVFHSPoHPLu0xZ+knzIa0X6Ca56dw+qZ8vxURic9+AR+Ola
-        cdQO6bDWi/Ai6AAMRG6NGv7tmMkW+rI=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-85-7sTIQrgiPp6y8xFm0Wu0Mg-1; Thu, 21 Nov 2019 07:00:30 -0500
-Received: by mail-lf1-f71.google.com with SMTP id j16so860414lfk.2
-        for <linux-crypto@vger.kernel.org>; Thu, 21 Nov 2019 04:00:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=x7Br6MUt5GIrekmwoW3W/dVDofzaSmCZ4ehtQgntfJg=;
-        b=Cjvw/Ip2tr+15bHFu7kHZg86IFmmKp+PFfVbGXXqlAyBE9dhSc8jTnNpx5munHM4vQ
-         AhVjx+LtnEKjNB8itW9fAllAe5mK/jv7wKGfGcK/UmBqCibBLwIIOH+SAeRyeUXrnt23
-         sksEZOuDcTp5Os+obkPiezpZ0iddnR8PYdS04aQ6tMt1TPiRkiUd38gA33Xnq4IzYh5l
-         R10ZZF6fVsrSxmZBTH8HBrg/mOcf5WlCIvlkWhX8ZKz7VwpJtHFOLOZ0DwxbBmB9tchT
-         w0w2Cfrs3PRqp+5HrBGGxObch2LPOPoJbZKtB544DbAg6eLHC6SJ2bArOOC7uCNLD7gG
-         iNiA==
-X-Gm-Message-State: APjAAAV0n+Phftoh21Q8kmffRQA87ykbW/GDarVygD5qhRgdeWjLrAOX
-        oKuqmF1zJbNx0qwGoY358bf4oZfgQMcqPm3z1o1OzEhJCP+pGmbQ4Ry6PkCYKIL/cWYq84hn1KU
-        n/7L5/mEuxGFrmKvYCm6CX6ym
-X-Received: by 2002:ac2:4a71:: with SMTP id q17mr7003190lfp.179.1574337629216;
-        Thu, 21 Nov 2019 04:00:29 -0800 (PST)
-X-Google-Smtp-Source: APXvYqwoeKMb/g8JM/lXuuI1qNoHv9YuoiOe6iH1WkPLFXbg9oIhgY0S6Dx/PfPzgSPCEeKonyhh5w==
-X-Received: by 2002:ac2:4a71:: with SMTP id q17mr7003168lfp.179.1574337628964;
-        Thu, 21 Nov 2019 04:00:28 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([2a00:7660:6da:443::2])
-        by smtp.gmail.com with ESMTPSA id k25sm1144384ljg.22.2019.11.21.04.00.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Nov 2019 04:00:27 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-        id C838A1818BA; Thu, 21 Nov 2019 13:00:26 +0100 (CET)
-From:   Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        David Miller <davem@davemloft.net>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH RFC net-next] net: WireGuard secure network tunnel
-In-Reply-To: <CAHmME9rmFw7xGKNMURBUSiezbsBEikOPiJxtEu=i2Quzf+JNDg@mail.gmail.com>
-References: <20191120203538.199367-1-Jason@zx2c4.com> <877e3t8qv7.fsf@toke.dk> <CAHmME9rmFw7xGKNMURBUSiezbsBEikOPiJxtEu=i2Quzf+JNDg@mail.gmail.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date:   Thu, 21 Nov 2019 13:00:26 +0100
-Message-ID: <87lfs9782t.fsf@toke.dk>
+        Thu, 21 Nov 2019 07:18:16 -0500
+Received: from mx2.suse.de ([195.135.220.15]:32998 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726197AbfKUMSP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 21 Nov 2019 07:18:15 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 2C9E2B033;
+        Thu, 21 Nov 2019 12:18:13 +0000 (UTC)
+From:   Nicolai Stange <nstange@suse.de>
+To:     Stephan =?utf-8?Q?M=C3=BCller?= <smueller@chronox.de>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        linux-api@vger.kernel.org,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Nicolai Stange <nstange@suse.de>,
+        "Peter\, Matthias" <matthias.peter@bsi.bund.de>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Roman Drahtmueller <draht@schaltsekun.de>,
+        Neil Horman <nhorman@redhat.com>
+Subject: Re: [PATCH v25 12/12] LRNG - add interface for gathering of raw entropy
+References: <6157374.ptSnyUpaCn@positron.chronox.de>
+        <2787174.DQlWHN5GGo@positron.chronox.de>
+        <3610406.x8mDjznOIz@positron.chronox.de>
+Date:   Thu, 21 Nov 2019 13:18:10 +0100
+In-Reply-To: <3610406.x8mDjznOIz@positron.chronox.de> ("Stephan
+ \=\?utf-8\?Q\?M\=C3\=BCller\=22's\?\=
+        message of "Sat, 16 Nov 2019 10:38:12 +0100")
+Message-ID: <87a78pl8xp.fsf@suse.de>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/25.3 (gnu/linux)
 MIME-Version: 1.0
-X-MC-Unique: 7sTIQrgiPp6y8xFm0Wu0Mg-1
-X-Mimecast-Spam-Score: 0
-Content-Type: text/plain; charset=WINDOWS-1252
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-"Jason A. Donenfeld" <Jason@zx2c4.com> writes:
+Hi Stephan,
 
->> > +     MAX_QUEUED_INCOMING_HANDSHAKES =3D 4096, /* TODO: replace this w=
-ith DQL */
->> > +     MAX_STAGED_PACKETS =3D 128,
->> > +     MAX_QUEUED_PACKETS =3D 1024 /* TODO: replace this with DQL */
->>
->> Yes, please (on the TODO) :)
->>
->> FWIW, since you're using pointer rings I think the way to do this is
->> probably to just keep the limits in place as a maximum size, and then
->> use DQL (or CoDel) to throttle enqueue to those pointer rings instead of
->> just letting them fill.
->>
->> Happy to work with you on this (as I believe I've already promised), but
->> we might as well do that after the initial version is merged...
->
-> I've actually implemented this a few times, but DQL always seems too
-> slow to react properly, and I haven't yet been able to figure out
-> what's happening. Let's indeed work on this after the initial version
-> is merged. I think this change, and several more like it, will be the
-> topic of some interesting discussions. But that doesn't need to happen
-> /now/ I don't think.
+two general remarks on debugfs usage below
 
-Agreed. Let's wait until the initial version is merged and use that as a
-base to benchmark against... :)
+Stephan Müller <smueller@chronox.de> writes:
 
--Toke
+> diff --git a/drivers/char/lrng/lrng_testing.c b/drivers/char/lrng/lrng_testing.c
+> new file mode 100644
+> index 000000000000..5c33d3bd2172
+> --- /dev/null
+> +++ b/drivers/char/lrng/lrng_testing.c
 
+<snip>
+
+
+> +/*
+> + * This data structure holds the dentry's of the debugfs files establishing
+> + * the interface to user space.
+> + */
+> +struct lrng_raw_debugfs {
+> +	struct dentry *lrng_raw_debugfs_root; /* root dentry */
+> +	struct dentry *lrng_raw_debugfs_lrng_raw; /* .../lrng_raw */
+> +};
+> +
+> +static struct lrng_raw_debugfs lrng_raw_debugfs;
+> +
+> +/* DebugFS operations and definition of the debugfs files */
+> +static ssize_t lrng_raw_read(struct file *file, char __user *to,
+> +			     size_t count, loff_t *ppos)
+> +{
+> +	loff_t pos = *ppos;
+> +	int ret;
+> +
+> +	if (!count)
+> +		return 0;
+> +	lrng_raw_entropy_init();
+> +	ret = lrng_raw_extract_user(to, count);
+> +	lrng_raw_entropy_fini();
+> +	if (ret < 0)
+> +		return ret;
+> +	count -= ret;
+> +	*ppos = pos + count;
+> +	return ret;
+> +}
+> +
+> +/* Module init: allocate memory, register the debugfs files */
+> +static int lrng_raw_debugfs_init(void)
+> +{
+> +	lrng_raw_debugfs.lrng_raw_debugfs_root =
+> +		debugfs_create_dir(KBUILD_MODNAME, NULL);
+> +	if (IS_ERR(lrng_raw_debugfs.lrng_raw_debugfs_root)) {
+> +		lrng_raw_debugfs.lrng_raw_debugfs_root = NULL;
+> +		return PTR_ERR(lrng_raw_debugfs.lrng_raw_debugfs_root);
+> +	}
+
+I think pointers returned by the debugfs API are not supposed to get
+checked for NULL/IS_ERR(), c.f commit ff9fb72bc077 ("debugfs: return
+error values, not NULL") or the the output from
+
+  git log --pretty=oneline | grep 'no need to check return value of debugfs_create'
+
+(Also the above code is dubious: you're effectively returning
+ PTR_ERR(NULL)).
+
+
+
+> +	return 0;
+> +}
+> +
+> +static struct file_operations lrng_raw_name_fops = {
+> +	.owner = THIS_MODULE,
+> +	.read = lrng_raw_read,
+> +};
+> +
+> +static int lrng_raw_debugfs_init_name(void)
+> +{
+> +	lrng_raw_debugfs.lrng_raw_debugfs_lrng_raw =
+> +		debugfs_create_file("lrng_raw", 0400,
+> +				    lrng_raw_debugfs.lrng_raw_debugfs_root,
+> +				    NULL, &lrng_raw_name_fops);q
+
+CONFIG_LRNG_TESTING is a bool and thus, this debugfs file can't ever get
+removed. Even if it could, this inode hasn't got any data associated
+with it and so file removal would not be a problem for lrng_raw_read().
+
+Please consider using debugfs_create_file_unsafe() instead to save
+debugfs from kmalloc()ing a proxy file_operations protecting your fops
+against concurrent file removal.
+
+
+
+> +	if (IS_ERR(lrng_raw_debugfs.lrng_raw_debugfs_lrng_raw)) {
+> +		lrng_raw_debugfs.lrng_raw_debugfs_lrng_raw = NULL;
+> +		return PTR_ERR(lrng_raw_debugfs.lrng_raw_debugfs_lrng_raw);
+> +	}
+
+Same comment regarding return value checking applies here.
+
+Thanks,
+
+Nicolai
+
+
+> +	return 0;
+> +}
+> +
+> +static int __init lrng_raw_init(void)
+> +{
+> +	int ret = lrng_raw_debugfs_init();
+> +
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	ret = lrng_raw_debugfs_init_name();
+> +	if (ret < 0)
+> +		debugfs_remove_recursive(
+> +					lrng_raw_debugfs.lrng_raw_debugfs_root);
+> +
+> +	return ret;
+> +}
+> +
+> +static void __exit lrng_raw_exit(void)
+> +{
+> +	debugfs_remove_recursive(lrng_raw_debugfs.lrng_raw_debugfs_root);
+> +}
+> +
+> +module_init(lrng_raw_init);
+> +module_exit(lrng_raw_exit);
+> +
+> +MODULE_LICENSE("Dual BSD/GPL");
+> +MODULE_AUTHOR("Stephan Mueller <smueller@chronox.de>");
+> +MODULE_DESCRIPTION("Kernel module for gathering raw entropy");
+
+-- 
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg, Germany
+(HRB 36809, AG Nürnberg), GF: Felix Imendörffer
