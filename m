@@ -2,186 +2,132 @@ Return-Path: <SRS0=AlHk=ZN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84FF7C432C0
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 10:16:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2046BC43215
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 10:29:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 593362073F
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 10:16:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB1D72089F
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 10:29:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="AqW9t2yj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G0lDyO0P"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727142AbfKUKQ2 (ORCPT
+        id S1726230AbfKUK3W (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Nov 2019 05:16:28 -0500
-Received: from fllv0015.ext.ti.com ([198.47.19.141]:33384 "EHLO
-        fllv0015.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727125AbfKUKQ1 (ORCPT
+        Thu, 21 Nov 2019 05:29:22 -0500
+Received: from us-smtp-1.mimecast.com ([207.211.31.81]:41332 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726197AbfKUK3W (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Nov 2019 05:16:27 -0500
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-        by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id xALAGEIi026633;
-        Thu, 21 Nov 2019 04:16:14 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1574331374;
-        bh=EeSIzZP6KADvh/f9LO5V0lquKd/w+xeZwK/dgc5hXNE=;
-        h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=AqW9t2yjijXuUy2mcWi28Ldp2oswwej1CG0cB5ACOJngz+xK07GTKQT2NEdAIqral
-         PDdOh3Y+wn03XMf1tDuDpnN9/vl2Jb+els2MJOi2qVb3IjQUbJeFPw1MMowVFOgi8p
-         1k5p7fs1byhnPBUCuTPYtIBuKmssMDp8r7Lj44e0=
-Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
-        by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id xALAGExM019076
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Thu, 21 Nov 2019 04:16:14 -0600
-Received: from DLEE115.ent.ti.com (157.170.170.26) by DLEE107.ent.ti.com
- (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3; Thu, 21
- Nov 2019 04:16:14 -0600
-Received: from lelv0326.itg.ti.com (10.180.67.84) by DLEE115.ent.ti.com
- (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3 via
- Frontend Transport; Thu, 21 Nov 2019 04:16:13 -0600
-Received: from feketebors.ti.com (ileax41-snat.itg.ti.com [10.172.224.153])
-        by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id xALAG3b7105173;
-        Thu, 21 Nov 2019 04:16:11 -0600
-From:   Peter Ujfalusi <peter.ujfalusi@ti.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <nicolas.ferre@microchip.com>, <alexandre.belloni@bootlin.com>,
-        <ludovic.desroches@microchip.com>
-CC:     <vkoul@kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH v2 3/3] crypto: atmel-tdes - Retire dma_request_slave_channel_compat()
-Date:   Thu, 21 Nov 2019 12:16:02 +0200
-Message-ID: <20191121101602.21941-4-peter.ujfalusi@ti.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20191121101602.21941-1-peter.ujfalusi@ti.com>
-References: <20191121101602.21941-1-peter.ujfalusi@ti.com>
+        Thu, 21 Nov 2019 05:29:22 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1574332162;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=t9X1E0mPwcgFWQfrAV192xVl6AHfJK9mk2N8XSWyhdc=;
+        b=G0lDyO0PmhCDN8jRJJyn911GzV0W9GZvwWoShmF7/ZpzLzLucvQVSIgGNFeO3ftF9rNacU
+        uSigUA0hEZcA5QP+LRNF1QUCdDpJ19JG9QctDsFZHgPPNZQUqt6GavChaBZUMKTBw03Gk5
+        /qTwV0Jyn+Psk6gzxij4qltYAFIyJcM=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-103-d2UgjTnFN9-xBOesawV21A-1; Thu, 21 Nov 2019 05:29:20 -0500
+Received: by mail-lj1-f198.google.com with SMTP id y17so464549ljm.16
+        for <linux-crypto@vger.kernel.org>; Thu, 21 Nov 2019 02:29:20 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=ucqBuN/GyC2pdnb4QcrvifWl2PtH/4rDjAh47h8mEbo=;
+        b=Zet7jHH9qvM59VB+BmoCBtlbyURn95L3HxDfWdj5dhzwKgTLPDW3Fko38rQwiOP6ur
+         L4e7mV8+D3kPT8poHFJERaGOUsvljmDRzTqw+JZ6A1AKG5/EA2ks0sGRue7ivEorDl3v
+         50KOQAcMhff9Jdie/Lq+9MvekO4W0pgZWdx+iyEZe8GKuU8b4CfbcdWaG9G6ITJHXmrh
+         FOz5G3dv0qYL6MoJds2ZxdQNzSCaM1aeZQOanieImKEo09E9iaXSfRyagxCz9T9SMDTQ
+         sn/BjyE7B8W47OEk5fS6IGQ5azosoUNS1SmdaF9eWYzoRnHt0Rheb81+Ddot8Day59hH
+         owkQ==
+X-Gm-Message-State: APjAAAXgRny56LFBu+Y2neUwk0f7J5Gezxx4+WxrgdwcOEyuEfTC6vPY
+        WGQKjw2Vt0ojjnefGs4WPmxqDrvYOKPfi9NjPBAWsDswwVV6ZgztQe+MRZHmSjxrSmgBb2nqlQf
+        ijLSRvlJ1tbZsKqEGZTSX/dwY
+X-Received: by 2002:a05:651c:390:: with SMTP id e16mr6751318ljp.196.1574332158700;
+        Thu, 21 Nov 2019 02:29:18 -0800 (PST)
+X-Google-Smtp-Source: APXvYqwad1vM01fCMQKOMxvi3SDsPF4W318bJWsoMeOqcAfg1It54CDiNRVixFQOF/1CZYdfjRHvyw==
+X-Received: by 2002:a05:651c:390:: with SMTP id e16mr6751297ljp.196.1574332158521;
+        Thu, 21 Nov 2019 02:29:18 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([2a00:7660:6da:443::2])
+        by smtp.gmail.com with ESMTPSA id 141sm1013079ljj.37.2019.11.21.02.29.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Nov 2019 02:29:17 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+        id CE1A11818B9; Thu, 21 Nov 2019 11:29:16 +0100 (CET)
+From:   Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <thoiland@redhat.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        David Miller <davem@davemloft.net>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH RFC net-next] net: WireGuard secure network tunnel
+In-Reply-To: <20191120203538.199367-1-Jason@zx2c4.com>
+References: <20191120203538.199367-1-Jason@zx2c4.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date:   Thu, 21 Nov 2019 11:29:16 +0100
+Message-ID: <877e3t8qv7.fsf@toke.dk>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+X-MC-Unique: d2UgjTnFN9-xBOesawV21A-1
+X-Mimecast-Spam-Score: 0
+Content-Type: text/plain; charset=WINDOWS-1252
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The driver no longer boots in legacy mode, only via DT. This makes the
-dma_request_slave_channel_compat() redundant.
-If ever the filter function would be executed it will return false as the
-dma_slave is not really initialized.
+"Jason A. Donenfeld" <Jason@zx2c4.com> writes:
 
-Switch to use dma_request_chan() which would allow legacy boot if ever
-needed again by configuring dma_slave_map for the DMA driver.
+> RFC Note:
+>   This is a RFC for folks who want to play with this early, because
+>   Herbert's cryptodev-2.6 tree hasn't yet made it into net-next. I'll
+>   repost this as a v1 (possibly with feedback incorporated) once the
+>   various trees are in the right place. This compiles on top of the
+>   Frankenzinc patchset from Ard, though it hasn't yet received suitable
+>   testing there for me to call it v1 just yet. Preliminary testing with
+>   the usual netns.sh test suite on x86 indicates it's at least mostly
+>   functional, but I'll be giving things further scrutiny in the days to
+>   come.
 
-At the same time skip allocating memory for dma_slave as it is not used
-anymore.
+Hi Jason
 
-Signed-off-by: Peter Ujfalusi <peter.ujfalusi@ti.com>
----
- drivers/crypto/atmel-tdes.c | 47 ++++++++++---------------------------
- 1 file changed, 13 insertions(+), 34 deletions(-)
+Great to see this! Just a few small comments for now:
 
-diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
-index bb7c0a387c04..fbc76edaef3e 100644
---- a/drivers/crypto/atmel-tdes.c
-+++ b/drivers/crypto/atmel-tdes.c
-@@ -703,31 +703,17 @@ static int atmel_tdes_crypt(struct skcipher_request *req, unsigned long mode)
- 	return atmel_tdes_handle_queue(ctx->dd, req);
- }
- 
--static bool atmel_tdes_filter(struct dma_chan *chan, void *slave)
--{
--	struct at_dma_slave	*sl = slave;
--
--	if (sl && sl->dma_dev == chan->device->dev) {
--		chan->private = sl;
--		return true;
--	} else {
--		return false;
--	}
--}
--
- static int atmel_tdes_dma_init(struct atmel_tdes_dev *dd,
- 			struct crypto_platform_data *pdata)
- {
--	dma_cap_mask_t mask;
--
--	dma_cap_zero(mask);
--	dma_cap_set(DMA_SLAVE, mask);
-+	int ret;
- 
- 	/* Try to grab 2 DMA channels */
--	dd->dma_lch_in.chan = dma_request_slave_channel_compat(mask,
--			atmel_tdes_filter, &pdata->dma_slave->rxdata, dd->dev, "tx");
--	if (!dd->dma_lch_in.chan)
-+	dd->dma_lch_in.chan = dma_request_chan(dd->dev, "tx");
-+	if (IS_ERR(dd->dma_lch_in.chan)) {
-+		ret = PTR_ERR(dd->dma_lch_in.chan);
- 		goto err_dma_in;
-+	}
- 
- 	dd->dma_lch_in.dma_conf.direction = DMA_MEM_TO_DEV;
- 	dd->dma_lch_in.dma_conf.dst_addr = dd->phys_base +
-@@ -740,10 +726,11 @@ static int atmel_tdes_dma_init(struct atmel_tdes_dev *dd,
- 		DMA_SLAVE_BUSWIDTH_4_BYTES;
- 	dd->dma_lch_in.dma_conf.device_fc = false;
- 
--	dd->dma_lch_out.chan = dma_request_slave_channel_compat(mask,
--			atmel_tdes_filter, &pdata->dma_slave->txdata, dd->dev, "rx");
--	if (!dd->dma_lch_out.chan)
-+	dd->dma_lch_out.chan = dma_request_chan(dd->dev, "rx");
-+	if (IS_ERR(dd->dma_lch_out.chan)) {
-+		ret = PTR_ERR(dd->dma_lch_out.chan);
- 		goto err_dma_out;
-+	}
- 
- 	dd->dma_lch_out.dma_conf.direction = DMA_DEV_TO_MEM;
- 	dd->dma_lch_out.dma_conf.src_addr = dd->phys_base +
-@@ -761,8 +748,9 @@ static int atmel_tdes_dma_init(struct atmel_tdes_dev *dd,
- err_dma_out:
- 	dma_release_channel(dd->dma_lch_in.chan);
- err_dma_in:
--	dev_warn(dd->dev, "no DMA channel available\n");
--	return -ENODEV;
-+	if (ret != -EPROBE_DEFER)
-+		dev_warn(dd->dev, "no DMA channel available\n");
-+	return ret;
- }
- 
- static void atmel_tdes_dma_cleanup(struct atmel_tdes_dev *dd)
-@@ -1193,12 +1181,6 @@ static struct crypto_platform_data *atmel_tdes_of_init(struct platform_device *p
- 	if (!pdata)
- 		return ERR_PTR(-ENOMEM);
- 
--	pdata->dma_slave = devm_kzalloc(&pdev->dev,
--					sizeof(*(pdata->dma_slave)),
--					GFP_KERNEL);
--	if (!pdata->dma_slave)
--		return ERR_PTR(-ENOMEM);
--
- 	return pdata;
- }
- #else /* CONFIG_OF */
-@@ -1292,10 +1274,7 @@ static int atmel_tdes_probe(struct platform_device *pdev)
- 				goto err_pdata;
- 			}
- 		}
--		if (!pdata->dma_slave) {
--			err = -ENXIO;
--			goto err_pdata;
--		}
-+
- 		err = atmel_tdes_dma_init(tdes_dd, pdata);
- 		if (err)
- 			goto err_tdes_dma;
--- 
-Peter
+> +/*
+> + * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rig=
+hts Reserved.
+> + */
 
-Texas Instruments Finland Oy, Porkkalankatu 22, 00180 Helsinki.
-Y-tunnus/Business ID: 0615521-4. Kotipaikka/Domicile: Helsinki
+Could you please get rid of the "All Rights Reserved" (here, and
+everywhere else)? All rights are *not* reserved: this is licensed under
+the GPL. Besides, that phrase is in general dubious at best:
+https://en.wikipedia.org/wiki/All_rights_reserved
+
+> +=09MAX_QUEUED_INCOMING_HANDSHAKES =3D 4096, /* TODO: replace this with D=
+QL */
+> +=09MAX_STAGED_PACKETS =3D 128,
+> +=09MAX_QUEUED_PACKETS =3D 1024 /* TODO: replace this with DQL */
+
+Yes, please (on the TODO) :)
+
+FWIW, since you're using pointer rings I think the way to do this is
+probably to just keep the limits in place as a maximum size, and then
+use DQL (or CoDel) to throttle enqueue to those pointer rings instead of
+just letting them fill.
+
+Happy to work with you on this (as I believe I've already promised), but
+we might as well do that after the initial version is merged...
+
+-Toke
 
