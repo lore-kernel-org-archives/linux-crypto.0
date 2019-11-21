@@ -2,261 +2,191 @@ Return-Path: <SRS0=AlHk=ZN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92A6FC432C0
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 03:21:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEB19C43215
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 04:10:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5B06120B7C
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 03:21:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1574306460;
-	bh=zUywFnJCQodUArh350d7rTnxwf/fRS9fF+rpssAclRs=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=Yb0JcqqvVD9teRCKP3a+7jI8umYGGeTQP3moYKYI20oOPUNebE0fVd+Lc5q9NmpOb
-	 Qidt83ADc5ZXtG0lZq0ryxcoycXpVrLaPzCj5CBQUk2YDD75qL065dUev8w7kKEdyk
-	 witFhQ51YIAFiFCT4kHEXcgJPjS7U7il33mA6Zb0=
+	by mail.kernel.org (Postfix) with ESMTP id A7999208D4
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 04:10:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X1dFxFN0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727608AbfKUDUy (ORCPT
+        id S1726265AbfKUEKG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 Nov 2019 22:20:54 -0500
-Received: from mail.kernel.org ([198.145.29.99]:34764 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727509AbfKUDUy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 Nov 2019 22:20:54 -0500
-Received: from PC-kkoz.proceq.com (unknown [213.160.61.66])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B7E56208A3;
-        Thu, 21 Nov 2019 03:20:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1574306453;
-        bh=zUywFnJCQodUArh350d7rTnxwf/fRS9fF+rpssAclRs=;
-        h=From:To:Cc:Subject:Date:From;
-        b=hffyNBXZEouEob19K6kTnV6YzQmnyEFBGSAOx3uxZ87bjhYFTt7MY69yOiamNZVCH
-         2Cmbr5PezJJ+cqxxItpjJbQEIjeV+ccG2O331ApyrQ3g2/4UjnlWq8cp8+2RYR8+Ve
-         LIAN3EtsjUSp/muyGHo/spzGMo7nE/KNnb8rHTU4=
-From:   Krzysztof Kozlowski <krzk@kernel.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Krzysztof Kozlowski <krzk@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Atul Gupta <atul.gupta@chelsio.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        linux-crypto@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org
-Subject: [PATCH v2] crypto: Fix Kconfig indentation
-Date:   Thu, 21 Nov 2019 04:20:48 +0100
-Message-Id: <1574306448-31868-1-git-send-email-krzk@kernel.org>
-X-Mailer: git-send-email 2.7.4
+        Wed, 20 Nov 2019 23:10:06 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:33376 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725819AbfKUEKG (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 Nov 2019 23:10:06 -0500
+Received: by mail-wm1-f68.google.com with SMTP id t26so2736374wmi.0;
+        Wed, 20 Nov 2019 20:10:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=KyVV9OtMYzuxUfKjDOoN9OjB6k595IRNlTVuhDMhC10=;
+        b=X1dFxFN0j+/WiJCSTbji/fhE29CoKE7C5ViqxKT72cn/BLDypzsr8dFyhngRM6K6FH
+         L+ucvR8AIEv6ZUn0Q6Pws2Tmng01E0mgpiPiZtiuEqRasL+mtVpMnkEc8Tm3lVZ2xD48
+         xoa7Ej1fqE8VEBTE7MtbHsZt3AqpEguD43PyZxdNPI41dLr/AQ3/COqOh0hEDBM9mfeL
+         8cnM6Gyj98xChINmfmVj88Zz3Gs1vAF21A8y1Ond9H2ubmPAN3xUadY0fztz2BmcYGHW
+         qX88ltZFAPlHLeMNnx+FEAvUI00aPKGWRDduQDvRGLl3m5h014R7CUqFJCn2N4C5XgAy
+         RFjg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:autocrypt
+         :message-id:date:user-agent:mime-version:in-reply-to
+         :content-language:content-transfer-encoding;
+        bh=KyVV9OtMYzuxUfKjDOoN9OjB6k595IRNlTVuhDMhC10=;
+        b=nwiLve64Q4CVnOazyOVaLqe+KZ7os+DJHzzhNj9FENp5jxIBkZ0VoYhCWlRmMGU6cJ
+         yeHqmtKnsYayDBIG83baNgX3sYAqvRT4SmquVMY7JTQvrz7YG6/YM9oVyNZeAf9bHg8e
+         EkpgDEmlqzQqu7/bCmzH56WyGA+jhx2/jFSuIkUDo07PB/D5cjCYNgCSxn4asqwlQMzt
+         VEfZtPbdj8LJ9at096yVHLeRIsiyZ5g8we6Jww4QwixFSLDXpgi/Is07FjGDetSd/cGc
+         5nZVALyXqMyYlRcYogAiKUAnrZCIyvXS5CdRUgemNk/T/bWeMBlB837u193gjrS4bioG
+         GLkg==
+X-Gm-Message-State: APjAAAVAPaQITUmvIBewL1rut0FRSUVT+AdIKL6qytmH9VC9QBY+VdyS
+        n9ljgx2uplRU6AIlHly9HuU=
+X-Google-Smtp-Source: APXvYqyxVfla0wEQcFAjsBVcwLaLBok/WxoGLngc9EgAWr+J6QCHtUciwq03DPeRHwz1Cj9mOyAeBQ==
+X-Received: by 2002:a1c:7fd8:: with SMTP id a207mr7399474wmd.10.1574309403248;
+        Wed, 20 Nov 2019 20:10:03 -0800 (PST)
+Received: from [10.230.29.119] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id m16sm1460809wml.47.2019.11.20.20.09.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Nov 2019 20:10:02 -0800 (PST)
+Subject: Re: [PATCH v3 0/4] Raspberry Pi 4 HWRNG Support
+To:     Stephen Brennan <stephen@brennan.io>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Matt Mackall <mpm@selenic.com>, Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        bcm-kernel-feedback-list@broadcom.com,
+        Eric Anholt <eric@anholt.net>,
+        Stefan Wahren <wahrenst@gmx.net>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-rpi-kernel@lists.infradead.org
+References: <20191120031622.88949-1-stephen@brennan.io>
+From:   Florian Fainelli <f.fainelli@gmail.com>
+Autocrypt: addr=f.fainelli@gmail.com; keydata=
+ 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
+ a9BQwACgnzGuH1BVeT2J0Ra+ZYgkx7DaPR0=
+Message-ID: <3e78d01f-f7a4-b3c4-4d23-7be7d6ad764d@gmail.com>
+Date:   Wed, 20 Nov 2019 20:09:57 -0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191120031622.88949-1-stephen@brennan.io>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Adjust indentation from spaces to tab (+optional two spaces) as in
-coding style with command like:
-	$ sed -e 's/^        /\t/' -i */Kconfig
+Hi Herbert,
 
-Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
-Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
+On 11/19/2019 7:16 PM, Stephen Brennan wrote:
+> This patch series enables support for the HWRNG included on the Raspberry
+> Pi 4.  It is simply a rebase of Stefan's branch [1]. I went ahead and
+> tested this out on a Pi 4.  Prior to this patch series, attempting to use
+> the hwrng gives:
+> 
+>     $ head -c 2 /dev/hwrng
+>     head: /dev/hwrng: Input/output error
+> 
+> After this series, the same command gives two random bytes.
 
----
+When we get a review from Rob, you can take patches 1-2 through your
+tree and Stefan/Nicholas can queue patches 3-4 through the BCM2835 tree
+where the DTS files already exist. Does that work for you?
 
-Changes since v1:
-1. Fix also 7-space and tab+1 space indentation issues.
----
- drivers/crypto/Kconfig         | 22 +++++++++++-----------
- drivers/crypto/caam/Kconfig    | 14 +++++++-------
- drivers/crypto/chelsio/Kconfig | 30 +++++++++++++++---------------
- drivers/crypto/stm32/Kconfig   |  6 +++---
- drivers/crypto/ux500/Kconfig   | 16 ++++++++--------
- 5 files changed, 44 insertions(+), 44 deletions(-)
+> 
+> Changes in v3:
+> - drop interrupts from bcm2711 rng node
+> - move bcm283x rng into bcm2835-common.dtsi
+> - add reviewed-by tag
+> - separated out patch 3 into two parts
+> 
+> Changes in v2:
+> - specify the correct size for the region in the dts, refactor bcm283x rng
+> 
+> ---
+> 
+> Stefan Wahren (2):
+>   dt-bindings: rng: add BCM2711 RNG compatible
+>   hwrng: iproc-rng200: Add support for BCM2711
+> 
+> Stephen Brennan (2):
+>   ARM: dts: bcm2835: Move rng definition to common location
+>   ARM: dts: bcm2711: Enable HWRNG support
+> 
+>  .../devicetree/bindings/rng/brcm,iproc-rng200.txt          | 1 +
+>  arch/arm/boot/dts/bcm2711.dtsi                             | 7 +++----
+>  arch/arm/boot/dts/bcm2835-common.dtsi                      | 6 ++++++
+>  arch/arm/boot/dts/bcm283x.dtsi                             | 6 ------
+>  drivers/char/hw_random/Kconfig                             | 2 +-
+>  drivers/char/hw_random/iproc-rng200.c                      | 1 +
+>  6 files changed, 12 insertions(+), 11 deletions(-)
+> 
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index 581021fab462..1a3f0779862c 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -248,15 +248,15 @@ config CRYPTO_DEV_MARVELL_CESA
- 	  This driver supports CPU offload through DMA transfers.
- 
- config CRYPTO_DEV_NIAGARA2
--       tristate "Niagara2 Stream Processing Unit driver"
--       select CRYPTO_LIB_DES
--       select CRYPTO_SKCIPHER
--       select CRYPTO_HASH
--       select CRYPTO_MD5
--       select CRYPTO_SHA1
--       select CRYPTO_SHA256
--       depends on SPARC64
--       help
-+	tristate "Niagara2 Stream Processing Unit driver"
-+	select CRYPTO_LIB_DES
-+	select CRYPTO_SKCIPHER
-+	select CRYPTO_HASH
-+	select CRYPTO_MD5
-+	select CRYPTO_SHA1
-+	select CRYPTO_SHA256
-+	depends on SPARC64
-+	help
- 	  Each core of a Niagara2 processor contains a Stream
- 	  Processing Unit, which itself contains several cryptographic
- 	  sub-units.  One set provides the Modular Arithmetic Unit,
-@@ -356,7 +356,7 @@ config CRYPTO_DEV_OMAP
- 	depends on ARCH_OMAP2PLUS
- 	help
- 	  OMAP processors have various crypto HW accelerators. Select this if
--          you want to use the OMAP modules for any of the crypto algorithms.
-+	  you want to use the OMAP modules for any of the crypto algorithms.
- 
- if CRYPTO_DEV_OMAP
- 
-@@ -638,7 +638,7 @@ config CRYPTO_DEV_QCOM_RNG
- 	  Generator hardware found on Qualcomm SoCs.
- 
- 	  To compile this driver as a module, choose M here. The
--          module will be called qcom-rng. If unsure, say N.
-+	  module will be called qcom-rng. If unsure, say N.
- 
- config CRYPTO_DEV_VMX
- 	bool "Support for VMX cryptographic acceleration instructions"
-diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
-index 87053e46c788..fac5b2e26610 100644
---- a/drivers/crypto/caam/Kconfig
-+++ b/drivers/crypto/caam/Kconfig
-@@ -130,13 +130,13 @@ config CRYPTO_DEV_FSL_CAAM_AHASH_API
- 	  scatterlist crypto API to the SEC4 via job ring.
- 
- config CRYPTO_DEV_FSL_CAAM_PKC_API
--        bool "Register public key cryptography implementations with Crypto API"
--        default y
--        select CRYPTO_RSA
--        help
--          Selecting this will allow SEC Public key support for RSA.
--          Supported cryptographic primitives: encryption, decryption,
--          signature and verification.
-+	bool "Register public key cryptography implementations with Crypto API"
-+	default y
-+	select CRYPTO_RSA
-+	help
-+	  Selecting this will allow SEC Public key support for RSA.
-+	  Supported cryptographic primitives: encryption, decryption,
-+	  signature and verification.
- 
- config CRYPTO_DEV_FSL_CAAM_RNG_API
- 	bool "Register caam device for hwrng API"
-diff --git a/drivers/crypto/chelsio/Kconfig b/drivers/crypto/chelsio/Kconfig
-index 91e424378217..f078b2686418 100644
---- a/drivers/crypto/chelsio/Kconfig
-+++ b/drivers/crypto/chelsio/Kconfig
-@@ -23,22 +23,22 @@ config CRYPTO_DEV_CHELSIO
- 	  will be called chcr.
- 
- config CHELSIO_IPSEC_INLINE
--        bool "Chelsio IPSec XFRM Tx crypto offload"
--        depends on CHELSIO_T4
-+	bool "Chelsio IPSec XFRM Tx crypto offload"
-+	depends on CHELSIO_T4
- 	depends on CRYPTO_DEV_CHELSIO
--        depends on XFRM_OFFLOAD
--        depends on INET_ESP_OFFLOAD || INET6_ESP_OFFLOAD
--        default n
--        ---help---
--          Enable support for IPSec Tx Inline.
-+	depends on XFRM_OFFLOAD
-+	depends on INET_ESP_OFFLOAD || INET6_ESP_OFFLOAD
-+	default n
-+	---help---
-+	  Enable support for IPSec Tx Inline.
- 
- config CRYPTO_DEV_CHELSIO_TLS
--        tristate "Chelsio Crypto Inline TLS Driver"
--        depends on CHELSIO_T4
--        depends on TLS_TOE
--        select CRYPTO_DEV_CHELSIO
--        ---help---
--          Support Chelsio Inline TLS with Chelsio crypto accelerator.
-+	tristate "Chelsio Crypto Inline TLS Driver"
-+	depends on CHELSIO_T4
-+	depends on TLS_TOE
-+	select CRYPTO_DEV_CHELSIO
-+	---help---
-+	  Support Chelsio Inline TLS with Chelsio crypto accelerator.
- 
--          To compile this driver as a module, choose M here: the module
--          will be called chtls.
-+	  To compile this driver as a module, choose M here: the module
-+	  will be called chtls.
-diff --git a/drivers/crypto/stm32/Kconfig b/drivers/crypto/stm32/Kconfig
-index 1aba9372cd23..4ef3eb11361c 100644
---- a/drivers/crypto/stm32/Kconfig
-+++ b/drivers/crypto/stm32/Kconfig
-@@ -4,7 +4,7 @@ config CRYPTO_DEV_STM32_CRC
- 	depends on ARCH_STM32
- 	select CRYPTO_HASH
- 	help
--          This enables support for the CRC32 hw accelerator which can be found
-+	  This enables support for the CRC32 hw accelerator which can be found
- 	  on STMicroelectronics STM32 SOC.
- 
- config CRYPTO_DEV_STM32_HASH
-@@ -17,7 +17,7 @@ config CRYPTO_DEV_STM32_HASH
- 	select CRYPTO_SHA256
- 	select CRYPTO_ENGINE
- 	help
--          This enables support for the HASH hw accelerator which can be found
-+	  This enables support for the HASH hw accelerator which can be found
- 	  on STMicroelectronics STM32 SOC.
- 
- config CRYPTO_DEV_STM32_CRYP
-@@ -27,5 +27,5 @@ config CRYPTO_DEV_STM32_CRYP
- 	select CRYPTO_ENGINE
- 	select CRYPTO_LIB_DES
- 	help
--          This enables support for the CRYP (AES/DES/TDES) hw accelerator which
-+	  This enables support for the CRYP (AES/DES/TDES) hw accelerator which
- 	  can be found on STMicroelectronics STM32 SOC.
-diff --git a/drivers/crypto/ux500/Kconfig b/drivers/crypto/ux500/Kconfig
-index b731895aa241..f56d65c56ccf 100644
---- a/drivers/crypto/ux500/Kconfig
-+++ b/drivers/crypto/ux500/Kconfig
-@@ -11,18 +11,18 @@ config CRYPTO_DEV_UX500_CRYP
- 	select CRYPTO_SKCIPHER
- 	select CRYPTO_LIB_DES
- 	help
--        This selects the crypto driver for the UX500_CRYP hardware. It supports
--        AES-ECB, CBC and CTR with keys sizes of 128, 192 and 256 bit sizes.
-+	This selects the crypto driver for the UX500_CRYP hardware. It supports
-+	AES-ECB, CBC and CTR with keys sizes of 128, 192 and 256 bit sizes.
- 
- config CRYPTO_DEV_UX500_HASH
--        tristate "UX500 crypto driver for HASH block"
--        depends on CRYPTO_DEV_UX500
--        select CRYPTO_HASH
-+	tristate "UX500 crypto driver for HASH block"
-+	depends on CRYPTO_DEV_UX500
-+	select CRYPTO_HASH
- 	select CRYPTO_SHA1
- 	select CRYPTO_SHA256
--        help
--          This selects the hash driver for the UX500_HASH hardware.
--          Depends on UX500/STM DMA if running in DMA mode.
-+	help
-+	  This selects the hash driver for the UX500_HASH hardware.
-+	  Depends on UX500/STM DMA if running in DMA mode.
- 
- config CRYPTO_DEV_UX500_DEBUG
- 	bool "Activate ux500 platform debug-mode for crypto and hash block"
 -- 
-2.7.4
-
+Florian
