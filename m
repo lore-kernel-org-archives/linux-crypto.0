@@ -2,161 +2,146 @@ Return-Path: <SRS0=AlHk=ZN=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3F64C432C0
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 07:28:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE80EC43215
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 10:14:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 72B6E208C0
-	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 07:28:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B5938206CB
+	for <linux-crypto@archiver.kernel.org>; Thu, 21 Nov 2019 10:14:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="IB/u1Mki"
+	dkim=pass (1024-bit key) header.d=gmx.net header.i=@gmx.net header.b="CWKQRgVh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727110AbfKUH1s (ORCPT
+        id S1726957AbfKUKOx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Nov 2019 02:27:48 -0500
-Received: from fllv0016.ext.ti.com ([198.47.19.142]:50828 "EHLO
-        fllv0016.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726962AbfKUH1s (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Nov 2019 02:27:48 -0500
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id xAL7RYFr081645;
-        Thu, 21 Nov 2019 01:27:34 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1574321254;
-        bh=pE69mjXGRtzpdlcRpFWBhAVSwz09Tx2CA10ZtUiAstA=;
-        h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=IB/u1MkiR06t8hyB7ae/x/pZ3PFrFA5LRBna9BHimQORrxNZVqwo3h7h6JBj+F/SB
-         Eexs8ceoCxQ0iycEGVCJmyzT5ohJNw0MjylUFZesEoSx95A7D6B6udnQIZ2LXVVv6c
-         Oxk0ynuzDakj1kBf9Vw/dYtjbXLMw4DpK1fcwOHo=
-Received: from DLEE100.ent.ti.com (dlee100.ent.ti.com [157.170.170.30])
-        by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id xAL7RY84100906
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Thu, 21 Nov 2019 01:27:34 -0600
-Received: from DLEE112.ent.ti.com (157.170.170.23) by DLEE100.ent.ti.com
- (157.170.170.30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3; Thu, 21
- Nov 2019 01:27:31 -0600
-Received: from fllv0040.itg.ti.com (10.64.41.20) by DLEE112.ent.ti.com
- (157.170.170.23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3 via
- Frontend Transport; Thu, 21 Nov 2019 01:27:31 -0600
-Received: from feketebors.ti.com (ileax41-snat.itg.ti.com [10.172.224.153])
-        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id xAL7RNTs079857;
-        Thu, 21 Nov 2019 01:27:29 -0600
-From:   Peter Ujfalusi <peter.ujfalusi@ti.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <nicolas.ferre@microchip.com>, <alexandre.belloni@bootlin.com>,
-        <ludovic.desroches@microchip.com>
-CC:     <vkoul@kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH 2/3] crypto: atmel-sha - Retire dma_request_slave_channel_compat()
-Date:   Thu, 21 Nov 2019 09:27:22 +0200
-Message-ID: <20191121072723.28479-3-peter.ujfalusi@ti.com>
-X-Mailer: git-send-email 2.24.0
-In-Reply-To: <20191121072723.28479-1-peter.ujfalusi@ti.com>
-References: <20191121072723.28479-1-peter.ujfalusi@ti.com>
+        Thu, 21 Nov 2019 05:14:53 -0500
+Received: from mout.gmx.net ([212.227.15.18]:49805 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726948AbfKUKOx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 21 Nov 2019 05:14:53 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+        s=badeba3b8450; t=1574331269;
+        bh=ZWabn5cPEZdM/dU9k7wTedMC47TS5i2tDFXWn60+DOs=;
+        h=X-UI-Sender-Class:Subject:To:Cc:References:From:Date:In-Reply-To;
+        b=CWKQRgVhuOIUhCNpJUY3dP41+GKdPHtHldjxJ1DvtdOEyZjH1/Mi+/G76Hfrijjb7
+         zoHRD4yikNARTFY+9FAqGXjCYHcw8zbzQxPKcZSH/0GcZ+it0ZmyH4MDrutWuTu4kB
+         zye1MDAFNaLL11W8qpIY35e8yhEkSMw3Pt+c9eb8=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from [192.168.1.176] ([37.4.249.139]) by mail.gmx.com (mrgmx004
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1N5VDE-1hn2lC4AWo-016tzL; Thu, 21
+ Nov 2019 11:14:29 +0100
+Subject: Re: [PATCH v3 0/4] Raspberry Pi 4 HWRNG Support
+To:     Nicolas Saenz Julienne <nsaenzjulienne@suse.de>,
+        Stephen Brennan <stephen@brennan.io>
+Cc:     Mark Rutland <mark.rutland@arm.com>, devicetree@vger.kernel.org,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Scott Branden <sbranden@broadcom.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-kernel@vger.kernel.org, Ray Jui <rjui@broadcom.com>,
+        Eric Anholt <eric@anholt.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>, linux-crypto@vger.kernel.org,
+        Matt Mackall <mpm@selenic.com>,
+        bcm-kernel-feedback-list@broadcom.com,
+        linux-arm-kernel@lists.infradead.org,
+        linux-rpi-kernel@lists.infradead.org
+References: <20191120031622.88949-1-stephen@brennan.io>
+ <99554159-6abb-6ea5-aebb-57a148a59b78@gmx.net>
+ <6aaa37d2cbe91c177b7be2d7f8aa3846efe3dc34.camel@suse.de>
+From:   Stefan Wahren <wahrenst@gmx.net>
+Message-ID: <79995d88-ad9c-e2cc-3f79-0fc9cf8352d2@gmx.net>
+Date:   Thu, 21 Nov 2019 11:14:25 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+In-Reply-To: <6aaa37d2cbe91c177b7be2d7f8aa3846efe3dc34.camel@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Provags-ID: V03:K1:oeIJr8IJyuJ/vS51pMEcSu7Yj39vWst+y+r9CPsXWP7HunwteIc
+ egP5Y8cxeEiRXU4LvKDlX/9esGv2STZa/M/Q7404ZUthVaybzTLQLFi4tnQ2/AMGHQinzFa
+ A/kE0mGrtwiBGKZE+/3ZxYjKn2NR/+cwIWadtynSh2CnxuCjSn8cAqQNx2HX4OVjiTZL34z
+ OcWQPE/GGnLpp3QxQzdgQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:vn0z0Y9b/OQ=:KFcXAJndPuH1F9vw1xhnWE
+ ogT6+YtFfNMMJex53vqOrvjeTkqxvqEDCOmjmXuA7x9HdvyH+R3dkVxeA/h6cGVSgb+YESv0U
+ Jh+ZgANrfvCs4asrWXujNysoqmXEwi1cFg+o/q5G0ZKJ7DeaBL3qSHnrBFzXeiDHcTT7UKfu/
+ uoubAdDAWJ4M9YT2qQh1su1VBSa/HziBvFvRRVtTdeyNh3m5zKm3pZLbTkHXIJ1mow6vadeuV
+ 4zz2v5XZTav0n28BJqwW6lM7rLQFr/9bkTPEPhIsjF8rmlxRNk4UEZ7FbPMlJpz9+WSI6cn+9
+ jbScYxCFRoYRJ/GEbpd+f5rP1T+nuXIR5CpMg7lMqRoampgdzjBbzK7/ub897h3XIsSlc/VBZ
+ lm99I/aIlsNsnCE/XnrKoo4VIhYousiwvT5G/ZrVefLRvgouaDr98O+pBMJGYRN5Zmzlvicfd
+ co7/1M5WXwKqE4GU0A9P7GuPuDTKFPeSRjQdOkRBFGltfm4B0yG1qsoYjBR/V+kumCKAkTwi2
+ GH8D+EaxdiF5ubLN+WR+Njn1C7Z+xIAeglgfq6BuONF3HxSuOaY/lHGkpJNLLx41w3WfCA59T
+ qdEsLMONJ4qxFHXWH+xABpNqgu725FfOlAdm9Ovu4b5IkduS5ahvYRcY34ouhsYSe8N99ndYx
+ hJmNFpGhIYvLRz+k5r6smWWGht8TIRaCD3Tl1WbImosaYdj6jAQjhuCIc/Nv4uKWRb1O48D+C
+ oYQSj0fTUTRy9692QDfxV8qbbHpRqdovHkWax5mGZ6tSIymGVSdemAZQJLeweMg0yaKR9fyo1
+ dBOcMFzVnzEYy36vyqJsXTyhsaa91Jn8pNf8X055SXruU8eANLqzTMW2DFPrc2IEcgUmoqsFg
+ mEvo/1IU0lP98GfQ5grsqEHoVXuFVAgOTExTCd40jTsUfn0x8WTPJjCq7nvYodn01xOonsauY
+ LpQ2v0+1oCu5AhgxHn2SjTyc+9w3siFlsV373D3BKgeJ32hD6HnXdy2BjfLvbG2P8sb8CXbTC
+ Q57gqNwV6a8cMX3NrdcppqCZ1PE+qXvd8Qladi6rKLM0rGrFnToukkd3qOPoqhsWMBhlu/wom
+ gRwajYI98pxl019XccgxkJ7xPk+uYMgrIc4cMFkHq5k49w6eph1jepbNOd8IYmCL1i4SHgb3R
+ WMEORmGvMXxlEkf0whZ7EdHCa4zrZeLQ+FixyOH7g6uw1eud0quCTufLmPLpmk/63AbrKxuXc
+ VqqDW2HlvkjOw/jLJcYYiGGMCnPBiP2NcQp+B6C9/cdOzZVcCggaokriGAKw=
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The driver no longer boots in legacy mode, only via DT. This makes the
-dma_request_slave_channel_compat() redundant.
-If ever the filter function would be executed it will return false as the
-dma_slave is not really initialized.
+Hi,
 
-Switch to use dma_request_chan() which would allow legacy boot if ever
-needed again by configuring dma_slave_map for the DMA driver.
+Am 20.11.19 um 20:50 schrieb Nicolas Saenz Julienne:
+> On Wed, 2019-11-20 at 17:16 +0100, Stefan Wahren wrote:
+>> Hi Stephen,
+>>
+>> Am 20.11.19 um 04:16 schrieb Stephen Brennan:
+>>> This patch series enables support for the HWRNG included on the Raspberry
+>>> Pi 4.  It is simply a rebase of Stefan's branch [1]. I went ahead and
+>>> tested this out on a Pi 4.  Prior to this patch series, attempting to use
+>>> the hwrng gives:
+>>>
+>>>     $ head -c 2 /dev/hwrng
+>>>     head: /dev/hwrng: Input/output error
+>>>
+>>> After this series, the same command gives two random bytes.
+>> just a note: a more expressive test would be running rngtest (package
+>> rng-tools) on this device.
+> Just had a go at it,
+>
+> root@rpi4:~# rngtest -c 1000 < /dev/hwrng
+> rngtest 2-unofficial-mt.14
+> Copyright (c) 2004 by Henrique de Moraes Holschuh
+> This is free software; see the source for copying conditions.  There is NO
+> warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+>
+> rngtest: starting FIPS tests...
+> rngtest: bits received from input: 20000032
+> rngtest: FIPS 140-2 successes: 998
+> rngtest: FIPS 140-2 failures: 2
+> rngtest: FIPS 140-2(2001-10-10) Monobit: 0
+> rngtest: FIPS 140-2(2001-10-10) Poker: 1
+> rngtest: FIPS 140-2(2001-10-10) Runs: 0
+> rngtest: FIPS 140-2(2001-10-10) Long run: 1
+> rngtest: FIPS 140-2(2001-10-10) Continuous run: 0
+> rngtest: input channel speed: (min=1.284; avg=113.786; max=126.213)Kibits/s
+> rngtest: FIPS tests speed: (min=17.122; avg=28.268; max=28.812)Mibits/s
+> rngtest: Program run time: 172323761 microseconds
+>
+> AFAIR (Arch wiki) some small failures are acceptable.
+>
+> Regards,
+> Nicolas
+>
+thanks for the results. AFAIR the downstream implementation [1] has a
+significant higher input speed. So there is possibly some room for
+optimizations later.
 
-At the same time skip allocating memory for dma_slave as it is not used
-anymore.
+Regards
+Stefan
 
-Signed-off-by: Peter Ujfalusi <peter.ujfalusi@ti.com>
----
- drivers/crypto/atmel-sha.c | 39 +++++++-------------------------------
- 1 file changed, 7 insertions(+), 32 deletions(-)
-
-diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index 8ea0e4bcde0d..9d392c5ff06b 100644
---- a/drivers/crypto/atmel-sha.c
-+++ b/drivers/crypto/atmel-sha.c
-@@ -2608,32 +2608,16 @@ static int atmel_sha_register_algs(struct atmel_sha_dev *dd)
- 	return err;
- }
- 
--static bool atmel_sha_filter(struct dma_chan *chan, void *slave)
--{
--	struct at_dma_slave	*sl = slave;
--
--	if (sl && sl->dma_dev == chan->device->dev) {
--		chan->private = sl;
--		return true;
--	} else {
--		return false;
--	}
--}
--
- static int atmel_sha_dma_init(struct atmel_sha_dev *dd,
- 				struct crypto_platform_data *pdata)
- {
--	dma_cap_mask_t mask_in;
-+	dd->dma_lch_in.chan = dma_request_chan(dd->dev, "tx");
-+	if (IS_ERR(dd->dma_lch_in.chan)) {
-+		int ret = PTR_ERR(dd->dma_lch_in.chan);
- 
--	/* Try to grab DMA channel */
--	dma_cap_zero(mask_in);
--	dma_cap_set(DMA_SLAVE, mask_in);
--
--	dd->dma_lch_in.chan = dma_request_slave_channel_compat(mask_in,
--			atmel_sha_filter, &pdata->dma_slave->rxdata, dd->dev, "tx");
--	if (!dd->dma_lch_in.chan) {
--		dev_warn(dd->dev, "no DMA channel available\n");
--		return -ENODEV;
-+		if (ret != -EPROBE_DEFER)
-+			dev_warn(dd->dev, "no DMA channel available\n");
-+		return ret;
- 	}
- 
- 	dd->dma_lch_in.dma_conf.direction = DMA_MEM_TO_DEV;
-@@ -2724,12 +2708,6 @@ static struct crypto_platform_data *atmel_sha_of_init(struct platform_device *pd
- 	if (!pdata)
- 		return ERR_PTR(-ENOMEM);
- 
--	pdata->dma_slave = devm_kzalloc(&pdev->dev,
--					sizeof(*(pdata->dma_slave)),
--					GFP_KERNEL);
--	if (!pdata->dma_slave)
--		return ERR_PTR(-ENOMEM);
--
- 	return pdata;
- }
- #else /* CONFIG_OF */
-@@ -2823,10 +2801,7 @@ static int atmel_sha_probe(struct platform_device *pdev)
- 				goto iclk_unprepare;
- 			}
- 		}
--		if (!pdata->dma_slave) {
--			err = -ENXIO;
--			goto iclk_unprepare;
--		}
-+
- 		err = atmel_sha_dma_init(sha_dd, pdata);
- 		if (err)
- 			goto err_sha_dma;
--- 
-Peter
-
-Texas Instruments Finland Oy, Porkkalankatu 22, 00180 Helsinki.
-Y-tunnus/Business ID: 0615521-4. Kotipaikka/Domicile: Helsinki
+[1] -
+https://github.com/raspberrypi/linux/commit/5e74aadfd1e0e6c00994521863ba044ce25b40de
 
