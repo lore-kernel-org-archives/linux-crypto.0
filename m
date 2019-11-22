@@ -7,52 +7,51 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30222C432C0
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Nov 2019 01:03:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DEB4C432C3
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Nov 2019 01:03:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DCBCF206D8
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Nov 2019 01:03:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 59D4120709
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Nov 2019 01:03:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="nicNbVp6"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="gv0IHxYg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726408AbfKVBDm (ORCPT
+        id S1726666AbfKVBDs (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Nov 2019 20:03:42 -0500
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:34707 "EHLO
+        Thu, 21 Nov 2019 20:03:48 -0500
+Received: from mail-pl1-f195.google.com ([209.85.214.195]:45847 "EHLO
         mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726038AbfKVBDm (ORCPT
+        with ESMTP id S1726747AbfKVBDs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Nov 2019 20:03:42 -0500
-Received: by mail-pl1-f195.google.com with SMTP id h13so2388465plr.1
-        for <linux-crypto@vger.kernel.org>; Thu, 21 Nov 2019 17:03:41 -0800 (PST)
+        Thu, 21 Nov 2019 20:03:48 -0500
+Received: by mail-pl1-f195.google.com with SMTP id w7so2356367plz.12
+        for <linux-crypto@vger.kernel.org>; Thu, 21 Nov 2019 17:03:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=kdYC0pBu/EAPqdjWM3ua8RUDru/SEmXyg/S4R+FESwM=;
-        b=nicNbVp62wAtdYARJt++xYlup8n5EhnPi39LYb8wMo3l2gPaYTCRhoIMIsO3vnM/mx
-         3f5/fPE3Se032ravZJ9AcBoU9x/QESjozIxY8sW8vzQ8petWr8It4JYfpBB9ZWfrEoTf
-         zEpLE9xftJO+0PzMaQ3WCytzlEBDoQ0ANr6mk=
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=qTi7QKHxCikdI0tmHa1luqmE/dJyaW51e2pyeW/8+4I=;
+        b=gv0IHxYgfU3jIYGq3xFvZ8xp9OxfrBp4+7jfUKcfcrhhbJdlyYjWolIzF4epOQpN4X
+         fNg94wGa+gSO9dMc6atDoouxqS4j6oAdZY8lr0qRdfOhlwwPFlkIViW+ItPVahztTGHj
+         5AUzDDT48TWvJnBVN7t2fyZGN0AXrNZvdtnNY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=kdYC0pBu/EAPqdjWM3ua8RUDru/SEmXyg/S4R+FESwM=;
-        b=U+vqFofK64g/SleCw7Uu1T3BX71pbb8FAC+CeAD411i8VcG5O0O7Mgz3ZVXRz2ogxu
-         4G2m9BOOECtwil9bvXBJZ7C4aJ7+Yo7nKZFe6PnmY0W1m68MqPEIhoPC39OpHA1egnn2
-         NpA+pvgtKawIaUtMz0JEa1xMyH/9tF581m4EnhhhwRb/legqZj4bAp5vZBOxAfZLUy7E
-         Q91rRuuqkcn0cHlVUbHvrUAkKFn7Iqd5+rzEU4vl/FFtknmnv6u2RZSYSdAPTG+wjEL2
-         7Z7WXRAOOP7XJEio8AKq6fd4ciiXygM7c3j8TToe/wUz+yoMHfPVIv0QsSisHe64P8bR
-         yq3w==
-X-Gm-Message-State: APjAAAUxNMnKUvAmzwm0worblUozYrdFK5mne2HapZeVU3ibsDqO3kkT
-        ZAGG1NjCGDOjZ65XFeVcfsfCMQ==
-X-Google-Smtp-Source: APXvYqzRFo5rwpGeKqSpqoGlGVb2LHplZ+rjO5pY+6ou5TwPTpDAQ+1+3HxYcIPCtKPXAsyoRZwKdQ==
-X-Received: by 2002:a17:90a:c004:: with SMTP id p4mr15478535pjt.104.1574384620604;
-        Thu, 21 Nov 2019 17:03:40 -0800 (PST)
+         :references;
+        bh=qTi7QKHxCikdI0tmHa1luqmE/dJyaW51e2pyeW/8+4I=;
+        b=Cx6TOO8WYw0CbPTcGB472QSaCvLKXebAnRRwOYsDGFB83an+3dgaRcUADc3kbGtE8d
+         OMbXa+tS/76BTh8UxRbfna6lt/usDmVWDWVd1oPDOwvfoIc96DiAegr+U25yySyMeugH
+         k1K7rXQB0e/o2/f0+zU9ulvvmOOVyBCI2flPRq4gQcN6fwB6Xj5oMKVPjfmVXtEFRABX
+         TVq6eiOM31vDpnlwT0+k8M6++LaiR74erSMBKPjZUJZ4laEWHtk7ptjYkXkQ3h/mFFFO
+         vD2TTlPpxktpVbH1MCWT62g+Us3ZyVWD1ZzKoSpQUSjMUBXgJ6LoAZhwI7MzPAeW84+V
+         UjsA==
+X-Gm-Message-State: APjAAAXjpK4WLeUxB0H9kGtpoaZWst69oJNjAEknIjZJ6p+iB3G5+gUP
+        o44eCJTI+vOfk3P8uHJhsmreuw==
+X-Google-Smtp-Source: APXvYqxnkbBh37NiGw48teVpABuD2V3PAJNIx1cE2AHYBTVQLvihkQjsd06KPVNFwVc2VbIUPh8w2g==
+X-Received: by 2002:a17:90a:db43:: with SMTP id u3mr15428691pjx.56.1574384626103;
+        Thu, 21 Nov 2019 17:03:46 -0800 (PST)
 Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id a26sm4684668pff.155.2019.11.21.17.03.38
+        by smtp.gmail.com with ESMTPSA id b1sm686220pjw.19.2019.11.21.17.03.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Nov 2019 17:03:38 -0800 (PST)
+        Thu, 21 Nov 2019 17:03:43 -0800 (PST)
 From:   Kees Cook <keescook@chromium.org>
 To:     Herbert Xu <herbert@gondor.apana.org.au>
 Cc:     Kees Cook <keescook@chromium.org>,
@@ -63,636 +62,423 @@ Cc:     Kees Cook <keescook@chromium.org>,
         Stephan Mueller <smueller@chronox.de>, x86@kernel.org,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         kernel-hardening@lists.openwall.com
-Subject: [PATCH v6 2/8] crypto: x86/serpent: Remove glue function macros usage
-Date:   Thu, 21 Nov 2019 17:03:28 -0800
-Message-Id: <20191122010334.12081-3-keescook@chromium.org>
+Subject: [PATCH v6 8/8] crypto, x86/sha: Eliminate casts on asm implementations
+Date:   Thu, 21 Nov 2019 17:03:34 -0800
+Message-Id: <20191122010334.12081-9-keescook@chromium.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20191122010334.12081-1-keescook@chromium.org>
 References: <20191122010334.12081-1-keescook@chromium.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In order to remove the callsite function casts, regularize the function
-prototypes for helpers to avoid triggering Control-Flow Integrity checks
-during indirect function calls. Where needed, to avoid changes to
-pointer math, u8 pointers are internally cast back to u128 pointers.
+In order to avoid CFI function prototype mismatches, this removes the
+casts on assembly implementations of sha1/256/512 accelerators. The
+safety checks from BUILD_BUG_ON() remain.
 
-Co-developed-by: João Moreira <joao.moreira@intel.com>
 Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
- arch/x86/crypto/serpent_avx2_glue.c        | 65 +++++++++++-----------
- arch/x86/crypto/serpent_avx_glue.c         | 63 +++++++++++----------
- arch/x86/crypto/serpent_sse2_glue.c        | 30 ++++++----
- arch/x86/include/asm/crypto/serpent-avx.h  | 20 +++----
- arch/x86/include/asm/crypto/serpent-sse2.h | 28 ++++------
- crypto/serpent_generic.c                   |  6 +-
- include/crypto/serpent.h                   |  4 +-
- 7 files changed, 108 insertions(+), 108 deletions(-)
+ arch/x86/crypto/sha1_ssse3_asm.S    | 10 +++--
+ arch/x86/crypto/sha1_ssse3_glue.c   | 64 ++++++++++++-----------------
+ arch/x86/crypto/sha256-ssse3-asm.S  |  4 +-
+ arch/x86/crypto/sha256_ssse3_glue.c | 34 +++++++--------
+ arch/x86/crypto/sha512-ssse3-asm.S  |  4 +-
+ arch/x86/crypto/sha512_ssse3_glue.c | 31 +++++++-------
+ 6 files changed, 72 insertions(+), 75 deletions(-)
 
-diff --git a/arch/x86/crypto/serpent_avx2_glue.c b/arch/x86/crypto/serpent_avx2_glue.c
-index 13fd8d3d2da0..f973ace44ad3 100644
---- a/arch/x86/crypto/serpent_avx2_glue.c
-+++ b/arch/x86/crypto/serpent_avx2_glue.c
-@@ -19,18 +19,16 @@
- #define SERPENT_AVX2_PARALLEL_BLOCKS 16
+diff --git a/arch/x86/crypto/sha1_ssse3_asm.S b/arch/x86/crypto/sha1_ssse3_asm.S
+index 99c5b8c4dc38..b6443979a60b 100644
+--- a/arch/x86/crypto/sha1_ssse3_asm.S
++++ b/arch/x86/crypto/sha1_ssse3_asm.S
+@@ -457,9 +457,13 @@ W_PRECALC_SSSE3
+ 	movdqu	\a,\b
+ .endm
  
- /* 16-way AVX2 parallel cipher functions */
--asmlinkage void serpent_ecb_enc_16way(struct serpent_ctx *ctx, u8 *dst,
--				      const u8 *src);
--asmlinkage void serpent_ecb_dec_16way(struct serpent_ctx *ctx, u8 *dst,
--				      const u8 *src);
--asmlinkage void serpent_cbc_dec_16way(void *ctx, u128 *dst, const u128 *src);
-+asmlinkage void serpent_ecb_enc_16way(const void *ctx, u8 *dst, const u8 *src);
-+asmlinkage void serpent_ecb_dec_16way(const void *ctx, u8 *dst, const u8 *src);
-+asmlinkage void serpent_cbc_dec_16way(const void *ctx, u8 *dst, const u8 *src);
+-/* SSSE3 optimized implementation:
+- *  extern "C" void sha1_transform_ssse3(u32 *digest, const char *data, u32 *ws,
+- *                                       unsigned int rounds);
++/*
++ * SSSE3 optimized implementation:
++ *
++ * extern "C" void sha1_transform_ssse3(struct sha1_state *digest,
++ *					const u8 *data, int rounds);
++ *
++ * Note that struct sha1_state is assumed to begin with u32 state[5].
+  */
+ SHA1_VECTOR_ASM     sha1_transform_ssse3
  
--asmlinkage void serpent_ctr_16way(void *ctx, u128 *dst, const u128 *src,
-+asmlinkage void serpent_ctr_16way(const void *ctx, u8 *dst, const u8 *src,
- 				  le128 *iv);
--asmlinkage void serpent_xts_enc_16way(struct serpent_ctx *ctx, u8 *dst,
--				      const u8 *src, le128 *iv);
--asmlinkage void serpent_xts_dec_16way(struct serpent_ctx *ctx, u8 *dst,
--				      const u8 *src, le128 *iv);
-+asmlinkage void serpent_xts_enc_16way(const void *ctx, u8 *dst, const u8 *src,
-+				      le128 *iv);
-+asmlinkage void serpent_xts_dec_16way(const void *ctx, u8 *dst, const u8 *src,
-+				      le128 *iv);
+diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
+index 639d4c2fd6a8..f2864a15a203 100644
+--- a/arch/x86/crypto/sha1_ssse3_glue.c
++++ b/arch/x86/crypto/sha1_ssse3_glue.c
+@@ -27,11 +27,8 @@
+ #include <crypto/sha1_base.h>
+ #include <asm/simd.h>
  
- static int serpent_setkey_skcipher(struct crypto_skcipher *tfm,
- 				   const u8 *key, unsigned int keylen)
-@@ -44,13 +42,13 @@ static const struct common_glue_ctx serpent_enc = {
- 
- 	.funcs = { {
- 		.num_blocks = 16,
--		.fn_u = { .ecb = GLUE_FUNC_CAST(serpent_ecb_enc_16way) }
-+		.fn_u = { .ecb = serpent_ecb_enc_16way }
- 	}, {
- 		.num_blocks = 8,
--		.fn_u = { .ecb = GLUE_FUNC_CAST(serpent_ecb_enc_8way_avx) }
-+		.fn_u = { .ecb = serpent_ecb_enc_8way_avx }
- 	}, {
- 		.num_blocks = 1,
--		.fn_u = { .ecb = GLUE_FUNC_CAST(__serpent_encrypt) }
-+		.fn_u = { .ecb = __serpent_encrypt }
- 	} }
- };
- 
-@@ -60,13 +58,13 @@ static const struct common_glue_ctx serpent_ctr = {
- 
- 	.funcs = { {
- 		.num_blocks = 16,
--		.fn_u = { .ctr = GLUE_CTR_FUNC_CAST(serpent_ctr_16way) }
-+		.fn_u = { .ctr = serpent_ctr_16way }
- 	},  {
- 		.num_blocks = 8,
--		.fn_u = { .ctr = GLUE_CTR_FUNC_CAST(serpent_ctr_8way_avx) }
-+		.fn_u = { .ctr = serpent_ctr_8way_avx }
- 	}, {
- 		.num_blocks = 1,
--		.fn_u = { .ctr = GLUE_CTR_FUNC_CAST(__serpent_crypt_ctr) }
-+		.fn_u = { .ctr = __serpent_crypt_ctr }
- 	} }
- };
- 
-@@ -76,13 +74,13 @@ static const struct common_glue_ctx serpent_enc_xts = {
- 
- 	.funcs = { {
- 		.num_blocks = 16,
--		.fn_u = { .xts = GLUE_XTS_FUNC_CAST(serpent_xts_enc_16way) }
-+		.fn_u = { .xts = serpent_xts_enc_16way }
- 	}, {
- 		.num_blocks = 8,
--		.fn_u = { .xts = GLUE_XTS_FUNC_CAST(serpent_xts_enc_8way_avx) }
-+		.fn_u = { .xts = serpent_xts_enc_8way_avx }
- 	}, {
- 		.num_blocks = 1,
--		.fn_u = { .xts = GLUE_XTS_FUNC_CAST(serpent_xts_enc) }
-+		.fn_u = { .xts = serpent_xts_enc }
- 	} }
- };
- 
-@@ -92,13 +90,13 @@ static const struct common_glue_ctx serpent_dec = {
- 
- 	.funcs = { {
- 		.num_blocks = 16,
--		.fn_u = { .ecb = GLUE_FUNC_CAST(serpent_ecb_dec_16way) }
-+		.fn_u = { .ecb = serpent_ecb_dec_16way }
- 	}, {
- 		.num_blocks = 8,
--		.fn_u = { .ecb = GLUE_FUNC_CAST(serpent_ecb_dec_8way_avx) }
-+		.fn_u = { .ecb = serpent_ecb_dec_8way_avx }
- 	}, {
- 		.num_blocks = 1,
--		.fn_u = { .ecb = GLUE_FUNC_CAST(__serpent_decrypt) }
-+		.fn_u = { .ecb = __serpent_decrypt }
- 	} }
- };
- 
-@@ -108,13 +106,13 @@ static const struct common_glue_ctx serpent_dec_cbc = {
- 
- 	.funcs = { {
- 		.num_blocks = 16,
--		.fn_u = { .cbc = GLUE_CBC_FUNC_CAST(serpent_cbc_dec_16way) }
-+		.fn_u = { .cbc = serpent_cbc_dec_16way }
- 	}, {
- 		.num_blocks = 8,
--		.fn_u = { .cbc = GLUE_CBC_FUNC_CAST(serpent_cbc_dec_8way_avx) }
-+		.fn_u = { .cbc = serpent_cbc_dec_8way_avx }
- 	}, {
- 		.num_blocks = 1,
--		.fn_u = { .cbc = GLUE_CBC_FUNC_CAST(__serpent_decrypt) }
-+		.fn_u = { .cbc = __serpent_decrypt }
- 	} }
- };
- 
-@@ -124,13 +122,13 @@ static const struct common_glue_ctx serpent_dec_xts = {
- 
- 	.funcs = { {
- 		.num_blocks = 16,
--		.fn_u = { .xts = GLUE_XTS_FUNC_CAST(serpent_xts_dec_16way) }
-+		.fn_u = { .xts = serpent_xts_dec_16way }
- 	}, {
- 		.num_blocks = 8,
--		.fn_u = { .xts = GLUE_XTS_FUNC_CAST(serpent_xts_dec_8way_avx) }
-+		.fn_u = { .xts = serpent_xts_dec_8way_avx }
- 	}, {
- 		.num_blocks = 1,
--		.fn_u = { .xts = GLUE_XTS_FUNC_CAST(serpent_xts_dec) }
-+		.fn_u = { .xts = serpent_xts_dec }
- 	} }
- };
- 
-@@ -146,8 +144,7 @@ static int ecb_decrypt(struct skcipher_request *req)
- 
- static int cbc_encrypt(struct skcipher_request *req)
+-typedef void (sha1_transform_fn)(u32 *digest, const char *data,
+-				unsigned int rounds);
+-
+ static int sha1_update(struct shash_desc *desc, const u8 *data,
+-			     unsigned int len, sha1_transform_fn *sha1_xform)
++			     unsigned int len, sha1_block_fn *sha1_xform)
  {
--	return glue_cbc_encrypt_req_128bit(GLUE_FUNC_CAST(__serpent_encrypt),
--					   req);
-+	return glue_cbc_encrypt_req_128bit(__serpent_encrypt, req);
+ 	struct sha1_state *sctx = shash_desc_ctx(desc);
+ 
+@@ -39,48 +36,47 @@ static int sha1_update(struct shash_desc *desc, const u8 *data,
+ 	    (sctx->count % SHA1_BLOCK_SIZE) + len < SHA1_BLOCK_SIZE)
+ 		return crypto_sha1_update(desc, data, len);
+ 
+-	/* make sure casting to sha1_block_fn() is safe */
++	/*
++	 * Make sure struct sha1_state begins directly with the SHA1
++	 * 160-bit internal state, as this is what the asm functions expect.
++	 */
+ 	BUILD_BUG_ON(offsetof(struct sha1_state, state) != 0);
+ 
+ 	kernel_fpu_begin();
+-	sha1_base_do_update(desc, data, len,
+-			    (sha1_block_fn *)sha1_xform);
++	sha1_base_do_update(desc, data, len, sha1_xform);
+ 	kernel_fpu_end();
+ 
+ 	return 0;
  }
  
- static int cbc_decrypt(struct skcipher_request *req)
-@@ -166,8 +163,8 @@ static int xts_encrypt(struct skcipher_request *req)
- 	struct serpent_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
- 
- 	return glue_xts_req_128bit(&serpent_enc_xts, req,
--				   XTS_TWEAK_CAST(__serpent_encrypt),
--				   &ctx->tweak_ctx, &ctx->crypt_ctx, false);
-+				   __serpent_encrypt, &ctx->tweak_ctx,
-+				   &ctx->crypt_ctx, false);
- }
- 
- static int xts_decrypt(struct skcipher_request *req)
-@@ -176,8 +173,8 @@ static int xts_decrypt(struct skcipher_request *req)
- 	struct serpent_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
- 
- 	return glue_xts_req_128bit(&serpent_dec_xts, req,
--				   XTS_TWEAK_CAST(__serpent_encrypt),
--				   &ctx->tweak_ctx, &ctx->crypt_ctx, true);
-+				   __serpent_encrypt, &ctx->tweak_ctx,
-+				   &ctx->crypt_ctx, true);
- }
- 
- static struct skcipher_alg serpent_algs[] = {
-diff --git a/arch/x86/crypto/serpent_avx_glue.c b/arch/x86/crypto/serpent_avx_glue.c
-index 7d3dca38a5a2..7806d1cbe854 100644
---- a/arch/x86/crypto/serpent_avx_glue.c
-+++ b/arch/x86/crypto/serpent_avx_glue.c
-@@ -20,33 +20,35 @@
- #include <asm/crypto/serpent-avx.h>
- 
- /* 8-way parallel cipher functions */
--asmlinkage void serpent_ecb_enc_8way_avx(struct serpent_ctx *ctx, u8 *dst,
-+asmlinkage void serpent_ecb_enc_8way_avx(const void *ctx, u8 *dst,
- 					 const u8 *src);
- EXPORT_SYMBOL_GPL(serpent_ecb_enc_8way_avx);
- 
--asmlinkage void serpent_ecb_dec_8way_avx(struct serpent_ctx *ctx, u8 *dst,
-+asmlinkage void serpent_ecb_dec_8way_avx(const void *ctx, u8 *dst,
- 					 const u8 *src);
- EXPORT_SYMBOL_GPL(serpent_ecb_dec_8way_avx);
- 
--asmlinkage void serpent_cbc_dec_8way_avx(struct serpent_ctx *ctx, u8 *dst,
-+asmlinkage void serpent_cbc_dec_8way_avx(const void *ctx, u8 *dst,
- 					 const u8 *src);
- EXPORT_SYMBOL_GPL(serpent_cbc_dec_8way_avx);
- 
--asmlinkage void serpent_ctr_8way_avx(struct serpent_ctx *ctx, u8 *dst,
--				     const u8 *src, le128 *iv);
-+asmlinkage void serpent_ctr_8way_avx(const void *ctx, u8 *dst, const u8 *src,
-+				     le128 *iv);
- EXPORT_SYMBOL_GPL(serpent_ctr_8way_avx);
- 
--asmlinkage void serpent_xts_enc_8way_avx(struct serpent_ctx *ctx, u8 *dst,
-+asmlinkage void serpent_xts_enc_8way_avx(const void *ctx, u8 *dst,
- 					 const u8 *src, le128 *iv);
- EXPORT_SYMBOL_GPL(serpent_xts_enc_8way_avx);
- 
--asmlinkage void serpent_xts_dec_8way_avx(struct serpent_ctx *ctx, u8 *dst,
-+asmlinkage void serpent_xts_dec_8way_avx(const void *ctx, u8 *dst,
- 					 const u8 *src, le128 *iv);
- EXPORT_SYMBOL_GPL(serpent_xts_dec_8way_avx);
- 
--void __serpent_crypt_ctr(void *ctx, u128 *dst, const u128 *src, le128 *iv)
-+void __serpent_crypt_ctr(const void *ctx, u8 *d, const u8 *s, le128 *iv)
+ static int sha1_finup(struct shash_desc *desc, const u8 *data,
+-		      unsigned int len, u8 *out, sha1_transform_fn *sha1_xform)
++		      unsigned int len, u8 *out, sha1_block_fn *sha1_xform)
  {
- 	be128 ctrblk;
-+	u128 *dst = (u128 *)d;
-+	const u128 *src = (const u128 *)s;
+ 	if (!crypto_simd_usable())
+ 		return crypto_sha1_finup(desc, data, len, out);
  
- 	le128_to_be128(&ctrblk, iv);
- 	le128_inc(iv);
-@@ -56,17 +58,15 @@ void __serpent_crypt_ctr(void *ctx, u128 *dst, const u128 *src, le128 *iv)
+ 	kernel_fpu_begin();
+ 	if (len)
+-		sha1_base_do_update(desc, data, len,
+-				    (sha1_block_fn *)sha1_xform);
+-	sha1_base_do_finalize(desc, (sha1_block_fn *)sha1_xform);
++		sha1_base_do_update(desc, data, len, sha1_xform);
++	sha1_base_do_finalize(desc, sha1_xform);
+ 	kernel_fpu_end();
+ 
+ 	return sha1_base_finish(desc, out);
  }
- EXPORT_SYMBOL_GPL(__serpent_crypt_ctr);
  
--void serpent_xts_enc(void *ctx, u128 *dst, const u128 *src, le128 *iv)
-+void serpent_xts_enc(const void *ctx, u8 *dst, const u8 *src, le128 *iv)
+-asmlinkage void sha1_transform_ssse3(u32 *digest, const char *data,
+-				     unsigned int rounds);
++asmlinkage void sha1_transform_ssse3(struct sha1_state *digest,
++				     const u8 *data, int rounds);
+ 
+ static int sha1_ssse3_update(struct shash_desc *desc, const u8 *data,
+ 			     unsigned int len)
  {
--	glue_xts_crypt_128bit_one(ctx, dst, src, iv,
--				  GLUE_FUNC_CAST(__serpent_encrypt));
-+	glue_xts_crypt_128bit_one(ctx, dst, src, iv, __serpent_encrypt);
+-	return sha1_update(desc, data, len,
+-			(sha1_transform_fn *) sha1_transform_ssse3);
++	return sha1_update(desc, data, len, sha1_transform_ssse3);
  }
- EXPORT_SYMBOL_GPL(serpent_xts_enc);
  
--void serpent_xts_dec(void *ctx, u128 *dst, const u128 *src, le128 *iv)
-+void serpent_xts_dec(const void *ctx, u8 *dst, const u8 *src, le128 *iv)
+ static int sha1_ssse3_finup(struct shash_desc *desc, const u8 *data,
+ 			      unsigned int len, u8 *out)
  {
--	glue_xts_crypt_128bit_one(ctx, dst, src, iv,
--				  GLUE_FUNC_CAST(__serpent_decrypt));
-+	glue_xts_crypt_128bit_one(ctx, dst, src, iv, __serpent_decrypt);
+-	return sha1_finup(desc, data, len, out,
+-			(sha1_transform_fn *) sha1_transform_ssse3);
++	return sha1_finup(desc, data, len, out, sha1_transform_ssse3);
  }
- EXPORT_SYMBOL_GPL(serpent_xts_dec);
  
-@@ -102,10 +102,10 @@ static const struct common_glue_ctx serpent_enc = {
+ /* Add padding and return the message digest. */
+@@ -119,21 +115,19 @@ static void unregister_sha1_ssse3(void)
+ }
  
- 	.funcs = { {
- 		.num_blocks = SERPENT_PARALLEL_BLOCKS,
--		.fn_u = { .ecb = GLUE_FUNC_CAST(serpent_ecb_enc_8way_avx) }
-+		.fn_u = { .ecb = serpent_ecb_enc_8way_avx }
- 	}, {
- 		.num_blocks = 1,
--		.fn_u = { .ecb = GLUE_FUNC_CAST(__serpent_encrypt) }
-+		.fn_u = { .ecb = __serpent_encrypt }
- 	} }
- };
+ #ifdef CONFIG_AS_AVX
+-asmlinkage void sha1_transform_avx(u32 *digest, const char *data,
+-				   unsigned int rounds);
++asmlinkage void sha1_transform_avx(struct sha1_state *digest,
++				   const u8 *data, int rounds);
  
-@@ -115,10 +115,10 @@ static const struct common_glue_ctx serpent_ctr = {
- 
- 	.funcs = { {
- 		.num_blocks = SERPENT_PARALLEL_BLOCKS,
--		.fn_u = { .ctr = GLUE_CTR_FUNC_CAST(serpent_ctr_8way_avx) }
-+		.fn_u = { .ctr = serpent_ctr_8way_avx }
- 	}, {
- 		.num_blocks = 1,
--		.fn_u = { .ctr = GLUE_CTR_FUNC_CAST(__serpent_crypt_ctr) }
-+		.fn_u = { .ctr = __serpent_crypt_ctr }
- 	} }
- };
- 
-@@ -128,10 +128,10 @@ static const struct common_glue_ctx serpent_enc_xts = {
- 
- 	.funcs = { {
- 		.num_blocks = SERPENT_PARALLEL_BLOCKS,
--		.fn_u = { .xts = GLUE_XTS_FUNC_CAST(serpent_xts_enc_8way_avx) }
-+		.fn_u = { .xts = serpent_xts_enc_8way_avx }
- 	}, {
- 		.num_blocks = 1,
--		.fn_u = { .xts = GLUE_XTS_FUNC_CAST(serpent_xts_enc) }
-+		.fn_u = { .xts = serpent_xts_enc }
- 	} }
- };
- 
-@@ -141,10 +141,10 @@ static const struct common_glue_ctx serpent_dec = {
- 
- 	.funcs = { {
- 		.num_blocks = SERPENT_PARALLEL_BLOCKS,
--		.fn_u = { .ecb = GLUE_FUNC_CAST(serpent_ecb_dec_8way_avx) }
-+		.fn_u = { .ecb = serpent_ecb_dec_8way_avx }
- 	}, {
- 		.num_blocks = 1,
--		.fn_u = { .ecb = GLUE_FUNC_CAST(__serpent_decrypt) }
-+		.fn_u = { .ecb = __serpent_decrypt }
- 	} }
- };
- 
-@@ -154,10 +154,10 @@ static const struct common_glue_ctx serpent_dec_cbc = {
- 
- 	.funcs = { {
- 		.num_blocks = SERPENT_PARALLEL_BLOCKS,
--		.fn_u = { .cbc = GLUE_CBC_FUNC_CAST(serpent_cbc_dec_8way_avx) }
-+		.fn_u = { .cbc = serpent_cbc_dec_8way_avx }
- 	}, {
- 		.num_blocks = 1,
--		.fn_u = { .cbc = GLUE_CBC_FUNC_CAST(__serpent_decrypt) }
-+		.fn_u = { .cbc = __serpent_decrypt }
- 	} }
- };
- 
-@@ -167,10 +167,10 @@ static const struct common_glue_ctx serpent_dec_xts = {
- 
- 	.funcs = { {
- 		.num_blocks = SERPENT_PARALLEL_BLOCKS,
--		.fn_u = { .xts = GLUE_XTS_FUNC_CAST(serpent_xts_dec_8way_avx) }
-+		.fn_u = { .xts = serpent_xts_dec_8way_avx }
- 	}, {
- 		.num_blocks = 1,
--		.fn_u = { .xts = GLUE_XTS_FUNC_CAST(serpent_xts_dec) }
-+		.fn_u = { .xts = serpent_xts_dec }
- 	} }
- };
- 
-@@ -186,8 +186,7 @@ static int ecb_decrypt(struct skcipher_request *req)
- 
- static int cbc_encrypt(struct skcipher_request *req)
+ static int sha1_avx_update(struct shash_desc *desc, const u8 *data,
+ 			     unsigned int len)
  {
--	return glue_cbc_encrypt_req_128bit(GLUE_FUNC_CAST(__serpent_encrypt),
--					   req);
-+	return glue_cbc_encrypt_req_128bit(__serpent_encrypt, req);
+-	return sha1_update(desc, data, len,
+-			(sha1_transform_fn *) sha1_transform_avx);
++	return sha1_update(desc, data, len, sha1_transform_avx);
  }
  
- static int cbc_decrypt(struct skcipher_request *req)
-@@ -206,8 +205,8 @@ static int xts_encrypt(struct skcipher_request *req)
- 	struct serpent_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
- 
- 	return glue_xts_req_128bit(&serpent_enc_xts, req,
--				   XTS_TWEAK_CAST(__serpent_encrypt),
--				   &ctx->tweak_ctx, &ctx->crypt_ctx, false);
-+				   __serpent_encrypt, &ctx->tweak_ctx,
-+				   &ctx->crypt_ctx, false);
- }
- 
- static int xts_decrypt(struct skcipher_request *req)
-@@ -216,8 +215,8 @@ static int xts_decrypt(struct skcipher_request *req)
- 	struct serpent_xts_ctx *ctx = crypto_skcipher_ctx(tfm);
- 
- 	return glue_xts_req_128bit(&serpent_dec_xts, req,
--				   XTS_TWEAK_CAST(__serpent_encrypt),
--				   &ctx->tweak_ctx, &ctx->crypt_ctx, true);
-+				   __serpent_encrypt, &ctx->tweak_ctx,
-+				   &ctx->crypt_ctx, true);
- }
- 
- static struct skcipher_alg serpent_algs[] = {
-diff --git a/arch/x86/crypto/serpent_sse2_glue.c b/arch/x86/crypto/serpent_sse2_glue.c
-index 5fdf1931d069..4fed8d26b91a 100644
---- a/arch/x86/crypto/serpent_sse2_glue.c
-+++ b/arch/x86/crypto/serpent_sse2_glue.c
-@@ -31,9 +31,11 @@ static int serpent_setkey_skcipher(struct crypto_skcipher *tfm,
- 	return __serpent_setkey(crypto_skcipher_ctx(tfm), key, keylen);
- }
- 
--static void serpent_decrypt_cbc_xway(void *ctx, u128 *dst, const u128 *src)
-+static void serpent_decrypt_cbc_xway(const void *ctx, u8 *d, const u8 *s)
+ static int sha1_avx_finup(struct shash_desc *desc, const u8 *data,
+ 			      unsigned int len, u8 *out)
  {
- 	u128 ivs[SERPENT_PARALLEL_BLOCKS - 1];
-+	u128 *dst = (u128 *)d;
-+	const u128 *src = (const u128 *)s;
- 	unsigned int j;
- 
- 	for (j = 0; j < SERPENT_PARALLEL_BLOCKS - 1; j++)
-@@ -45,9 +47,11 @@ static void serpent_decrypt_cbc_xway(void *ctx, u128 *dst, const u128 *src)
- 		u128_xor(dst + (j + 1), dst + (j + 1), ivs + j);
+-	return sha1_finup(desc, data, len, out,
+-			(sha1_transform_fn *) sha1_transform_avx);
++	return sha1_finup(desc, data, len, out, sha1_transform_avx);
  }
  
--static void serpent_crypt_ctr(void *ctx, u128 *dst, const u128 *src, le128 *iv)
-+static void serpent_crypt_ctr(const void *ctx, u8 *d, const u8 *s, le128 *iv)
- {
- 	be128 ctrblk;
-+	u128 *dst = (u128 *)d;
-+	const u128 *src = (const u128 *)s;
+ static int sha1_avx_final(struct shash_desc *desc, u8 *out)
+@@ -190,8 +184,8 @@ static inline void unregister_sha1_avx(void) { }
+ #if defined(CONFIG_AS_AVX2) && (CONFIG_AS_AVX)
+ #define SHA1_AVX2_BLOCK_OPTSIZE	4	/* optimal 4*64 bytes of SHA1 blocks */
  
- 	le128_to_be128(&ctrblk, iv);
- 	le128_inc(iv);
-@@ -56,10 +60,12 @@ static void serpent_crypt_ctr(void *ctx, u128 *dst, const u128 *src, le128 *iv)
- 	u128_xor(dst, src, (u128 *)&ctrblk);
+-asmlinkage void sha1_transform_avx2(u32 *digest, const char *data,
+-				    unsigned int rounds);
++asmlinkage void sha1_transform_avx2(struct sha1_state *digest,
++				    const u8 *data, int rounds);
+ 
+ static bool avx2_usable(void)
+ {
+@@ -203,8 +197,8 @@ static bool avx2_usable(void)
+ 	return false;
  }
  
--static void serpent_crypt_ctr_xway(void *ctx, u128 *dst, const u128 *src,
-+static void serpent_crypt_ctr_xway(const void *ctx, u8 *d, const u8 *s,
- 				   le128 *iv)
+-static void sha1_apply_transform_avx2(u32 *digest, const char *data,
+-				unsigned int rounds)
++static void sha1_apply_transform_avx2(struct sha1_state *digest,
++				      const u8 *data, int rounds)
  {
- 	be128 ctrblks[SERPENT_PARALLEL_BLOCKS];
-+	u128 *dst = (u128 *)d;
-+	const u128 *src = (const u128 *)s;
- 	unsigned int i;
- 
- 	for (i = 0; i < SERPENT_PARALLEL_BLOCKS; i++) {
-@@ -79,10 +85,10 @@ static const struct common_glue_ctx serpent_enc = {
- 
- 	.funcs = { {
- 		.num_blocks = SERPENT_PARALLEL_BLOCKS,
--		.fn_u = { .ecb = GLUE_FUNC_CAST(serpent_enc_blk_xway) }
-+		.fn_u = { .ecb = serpent_enc_blk_xway }
- 	}, {
- 		.num_blocks = 1,
--		.fn_u = { .ecb = GLUE_FUNC_CAST(__serpent_encrypt) }
-+		.fn_u = { .ecb = __serpent_encrypt }
- 	} }
- };
- 
-@@ -92,10 +98,10 @@ static const struct common_glue_ctx serpent_ctr = {
- 
- 	.funcs = { {
- 		.num_blocks = SERPENT_PARALLEL_BLOCKS,
--		.fn_u = { .ctr = GLUE_CTR_FUNC_CAST(serpent_crypt_ctr_xway) }
-+		.fn_u = { .ctr = serpent_crypt_ctr_xway }
- 	}, {
- 		.num_blocks = 1,
--		.fn_u = { .ctr = GLUE_CTR_FUNC_CAST(serpent_crypt_ctr) }
-+		.fn_u = { .ctr = serpent_crypt_ctr }
- 	} }
- };
- 
-@@ -105,10 +111,10 @@ static const struct common_glue_ctx serpent_dec = {
- 
- 	.funcs = { {
- 		.num_blocks = SERPENT_PARALLEL_BLOCKS,
--		.fn_u = { .ecb = GLUE_FUNC_CAST(serpent_dec_blk_xway) }
-+		.fn_u = { .ecb = serpent_dec_blk_xway }
- 	}, {
- 		.num_blocks = 1,
--		.fn_u = { .ecb = GLUE_FUNC_CAST(__serpent_decrypt) }
-+		.fn_u = { .ecb = __serpent_decrypt }
- 	} }
- };
- 
-@@ -118,10 +124,10 @@ static const struct common_glue_ctx serpent_dec_cbc = {
- 
- 	.funcs = { {
- 		.num_blocks = SERPENT_PARALLEL_BLOCKS,
--		.fn_u = { .cbc = GLUE_CBC_FUNC_CAST(serpent_decrypt_cbc_xway) }
-+		.fn_u = { .cbc = serpent_decrypt_cbc_xway }
- 	}, {
- 		.num_blocks = 1,
--		.fn_u = { .cbc = GLUE_CBC_FUNC_CAST(__serpent_decrypt) }
-+		.fn_u = { .cbc = __serpent_decrypt }
- 	} }
- };
- 
-@@ -137,7 +143,7 @@ static int ecb_decrypt(struct skcipher_request *req)
- 
- static int cbc_encrypt(struct skcipher_request *req)
+ 	/* Select the optimal transform based on data block size */
+ 	if (rounds >= SHA1_AVX2_BLOCK_OPTSIZE)
+@@ -216,15 +210,13 @@ static void sha1_apply_transform_avx2(u32 *digest, const char *data,
+ static int sha1_avx2_update(struct shash_desc *desc, const u8 *data,
+ 			     unsigned int len)
  {
--	return glue_cbc_encrypt_req_128bit(GLUE_FUNC_CAST(__serpent_encrypt),
-+	return glue_cbc_encrypt_req_128bit(__serpent_encrypt,
- 					   req);
+-	return sha1_update(desc, data, len,
+-		(sha1_transform_fn *) sha1_apply_transform_avx2);
++	return sha1_update(desc, data, len, sha1_apply_transform_avx2);
  }
  
-diff --git a/arch/x86/include/asm/crypto/serpent-avx.h b/arch/x86/include/asm/crypto/serpent-avx.h
-index db7c9cc32234..251c2c89d7cf 100644
---- a/arch/x86/include/asm/crypto/serpent-avx.h
-+++ b/arch/x86/include/asm/crypto/serpent-avx.h
-@@ -15,26 +15,26 @@ struct serpent_xts_ctx {
- 	struct serpent_ctx crypt_ctx;
- };
- 
--asmlinkage void serpent_ecb_enc_8way_avx(struct serpent_ctx *ctx, u8 *dst,
-+asmlinkage void serpent_ecb_enc_8way_avx(const void *ctx, u8 *dst,
- 					 const u8 *src);
--asmlinkage void serpent_ecb_dec_8way_avx(struct serpent_ctx *ctx, u8 *dst,
-+asmlinkage void serpent_ecb_dec_8way_avx(const void *ctx, u8 *dst,
- 					 const u8 *src);
- 
--asmlinkage void serpent_cbc_dec_8way_avx(struct serpent_ctx *ctx, u8 *dst,
-+asmlinkage void serpent_cbc_dec_8way_avx(const void *ctx, u8 *dst,
- 					 const u8 *src);
--asmlinkage void serpent_ctr_8way_avx(struct serpent_ctx *ctx, u8 *dst,
--				     const u8 *src, le128 *iv);
-+asmlinkage void serpent_ctr_8way_avx(const void *ctx, u8 *dst, const u8 *src,
-+				     le128 *iv);
- 
--asmlinkage void serpent_xts_enc_8way_avx(struct serpent_ctx *ctx, u8 *dst,
-+asmlinkage void serpent_xts_enc_8way_avx(const void *ctx, u8 *dst,
- 					 const u8 *src, le128 *iv);
--asmlinkage void serpent_xts_dec_8way_avx(struct serpent_ctx *ctx, u8 *dst,
-+asmlinkage void serpent_xts_dec_8way_avx(const void *ctx, u8 *dst,
- 					 const u8 *src, le128 *iv);
- 
--extern void __serpent_crypt_ctr(void *ctx, u128 *dst, const u128 *src,
-+extern void __serpent_crypt_ctr(const void *ctx, u8 *dst, const u8 *src,
- 				le128 *iv);
- 
--extern void serpent_xts_enc(void *ctx, u128 *dst, const u128 *src, le128 *iv);
--extern void serpent_xts_dec(void *ctx, u128 *dst, const u128 *src, le128 *iv);
-+extern void serpent_xts_enc(const void *ctx, u8 *dst, const u8 *src, le128 *iv);
-+extern void serpent_xts_dec(const void *ctx, u8 *dst, const u8 *src, le128 *iv);
- 
- extern int xts_serpent_setkey(struct crypto_skcipher *tfm, const u8 *key,
- 			      unsigned int keylen);
-diff --git a/arch/x86/include/asm/crypto/serpent-sse2.h b/arch/x86/include/asm/crypto/serpent-sse2.h
-index 1a345e8a7496..860ca248914b 100644
---- a/arch/x86/include/asm/crypto/serpent-sse2.h
-+++ b/arch/x86/include/asm/crypto/serpent-sse2.h
-@@ -9,25 +9,23 @@
- 
- #define SERPENT_PARALLEL_BLOCKS 4
- 
--asmlinkage void __serpent_enc_blk_4way(struct serpent_ctx *ctx, u8 *dst,
-+asmlinkage void __serpent_enc_blk_4way(const struct serpent_ctx *ctx, u8 *dst,
- 				       const u8 *src, bool xor);
--asmlinkage void serpent_dec_blk_4way(struct serpent_ctx *ctx, u8 *dst,
-+asmlinkage void serpent_dec_blk_4way(const struct serpent_ctx *ctx, u8 *dst,
- 				     const u8 *src);
- 
--static inline void serpent_enc_blk_xway(struct serpent_ctx *ctx, u8 *dst,
--					const u8 *src)
-+static inline void serpent_enc_blk_xway(const void *ctx, u8 *dst, const u8 *src)
+ static int sha1_avx2_finup(struct shash_desc *desc, const u8 *data,
+ 			      unsigned int len, u8 *out)
  {
- 	__serpent_enc_blk_4way(ctx, dst, src, false);
+-	return sha1_finup(desc, data, len, out,
+-		(sha1_transform_fn *) sha1_apply_transform_avx2);
++	return sha1_finup(desc, data, len, out, sha1_apply_transform_avx2);
  }
  
--static inline void serpent_enc_blk_xway_xor(struct serpent_ctx *ctx, u8 *dst,
--					    const u8 *src)
-+static inline void serpent_enc_blk_xway_xor(const struct serpent_ctx *ctx,
-+					    u8 *dst, const u8 *src)
- {
- 	__serpent_enc_blk_4way(ctx, dst, src, true);
- }
- 
--static inline void serpent_dec_blk_xway(struct serpent_ctx *ctx, u8 *dst,
--					const u8 *src)
-+static inline void serpent_dec_blk_xway(const void *ctx, u8 *dst, const u8 *src)
- {
- 	serpent_dec_blk_4way(ctx, dst, src);
- }
-@@ -36,25 +34,23 @@ static inline void serpent_dec_blk_xway(struct serpent_ctx *ctx, u8 *dst,
- 
- #define SERPENT_PARALLEL_BLOCKS 8
- 
--asmlinkage void __serpent_enc_blk_8way(struct serpent_ctx *ctx, u8 *dst,
-+asmlinkage void __serpent_enc_blk_8way(const struct serpent_ctx *ctx, u8 *dst,
- 				       const u8 *src, bool xor);
--asmlinkage void serpent_dec_blk_8way(struct serpent_ctx *ctx, u8 *dst,
-+asmlinkage void serpent_dec_blk_8way(const struct serpent_ctx *ctx, u8 *dst,
- 				     const u8 *src);
- 
--static inline void serpent_enc_blk_xway(struct serpent_ctx *ctx, u8 *dst,
--				   const u8 *src)
-+static inline void serpent_enc_blk_xway(const void *ctx, u8 *dst, const u8 *src)
- {
- 	__serpent_enc_blk_8way(ctx, dst, src, false);
- }
- 
--static inline void serpent_enc_blk_xway_xor(struct serpent_ctx *ctx, u8 *dst,
--				       const u8 *src)
-+static inline void serpent_enc_blk_xway_xor(const struct serpent_ctx *ctx,
-+					    u8 *dst, const u8 *src)
- {
- 	__serpent_enc_blk_8way(ctx, dst, src, true);
- }
- 
--static inline void serpent_dec_blk_xway(struct serpent_ctx *ctx, u8 *dst,
--				   const u8 *src)
-+static inline void serpent_dec_blk_xway(const void *ctx, u8 *dst, const u8 *src)
- {
- 	serpent_dec_blk_8way(ctx, dst, src);
- }
-diff --git a/crypto/serpent_generic.c b/crypto/serpent_generic.c
-index 56fa665a4f01..492c1d0bfe06 100644
---- a/crypto/serpent_generic.c
-+++ b/crypto/serpent_generic.c
-@@ -449,8 +449,9 @@ int serpent_setkey(struct crypto_tfm *tfm, const u8 *key, unsigned int keylen)
- }
- EXPORT_SYMBOL_GPL(serpent_setkey);
- 
--void __serpent_encrypt(struct serpent_ctx *ctx, u8 *dst, const u8 *src)
-+void __serpent_encrypt(const void *c, u8 *dst, const u8 *src)
- {
-+	const struct serpent_ctx *ctx = c;
- 	const u32 *k = ctx->expkey;
- 	const __le32 *s = (const __le32 *)src;
- 	__le32	*d = (__le32 *)dst;
-@@ -514,8 +515,9 @@ static void serpent_encrypt(struct crypto_tfm *tfm, u8 *dst, const u8 *src)
- 	__serpent_encrypt(ctx, dst, src);
- }
- 
--void __serpent_decrypt(struct serpent_ctx *ctx, u8 *dst, const u8 *src)
-+void __serpent_decrypt(const void *c, u8 *dst, const u8 *src)
- {
-+	const struct serpent_ctx *ctx = c;
- 	const u32 *k = ctx->expkey;
- 	const __le32 *s = (const __le32 *)src;
- 	__le32	*d = (__le32 *)dst;
-diff --git a/include/crypto/serpent.h b/include/crypto/serpent.h
-index 7dd780c5d058..75c7eaa20853 100644
---- a/include/crypto/serpent.h
-+++ b/include/crypto/serpent.h
-@@ -22,7 +22,7 @@ int __serpent_setkey(struct serpent_ctx *ctx, const u8 *key,
- 		     unsigned int keylen);
- int serpent_setkey(struct crypto_tfm *tfm, const u8 *key, unsigned int keylen);
- 
--void __serpent_encrypt(struct serpent_ctx *ctx, u8 *dst, const u8 *src);
--void __serpent_decrypt(struct serpent_ctx *ctx, u8 *dst, const u8 *src);
-+void __serpent_encrypt(const void *ctx, u8 *dst, const u8 *src);
-+void __serpent_decrypt(const void *ctx, u8 *dst, const u8 *src);
- 
+ static int sha1_avx2_final(struct shash_desc *desc, u8 *out)
+@@ -267,21 +259,19 @@ static inline void unregister_sha1_avx2(void) { }
  #endif
+ 
+ #ifdef CONFIG_AS_SHA1_NI
+-asmlinkage void sha1_ni_transform(u32 *digest, const char *data,
+-				   unsigned int rounds);
++asmlinkage void sha1_ni_transform(struct sha1_state *digest, const u8 *data,
++				  int rounds);
+ 
+ static int sha1_ni_update(struct shash_desc *desc, const u8 *data,
+ 			     unsigned int len)
+ {
+-	return sha1_update(desc, data, len,
+-		(sha1_transform_fn *) sha1_ni_transform);
++	return sha1_update(desc, data, len, sha1_ni_transform);
+ }
+ 
+ static int sha1_ni_finup(struct shash_desc *desc, const u8 *data,
+ 			      unsigned int len, u8 *out)
+ {
+-	return sha1_finup(desc, data, len, out,
+-		(sha1_transform_fn *) sha1_ni_transform);
++	return sha1_finup(desc, data, len, out, sha1_ni_transform);
+ }
+ 
+ static int sha1_ni_final(struct shash_desc *desc, u8 *out)
+diff --git a/arch/x86/crypto/sha256-ssse3-asm.S b/arch/x86/crypto/sha256-ssse3-asm.S
+index c6c05ed2c16a..a3ea5f9b0522 100644
+--- a/arch/x86/crypto/sha256-ssse3-asm.S
++++ b/arch/x86/crypto/sha256-ssse3-asm.S
+@@ -347,8 +347,10 @@ a = TMP_
+ .endm
+ 
+ ########################################################################
+-## void sha256_transform_ssse3(void *input_data, UINT32 digest[8], UINT64 num_blks)
++## void sha256_transform_ssse3(struct sha1_state *digest, const u8 *data,
++##			       int rounds);
+ ## arg 1 : pointer to digest
++##	   (struct sha256_state is assumed to begin with u32 state[8])
+ ## arg 2 : pointer to input data
+ ## arg 3 : Num blocks
+ ########################################################################
+diff --git a/arch/x86/crypto/sha256_ssse3_glue.c b/arch/x86/crypto/sha256_ssse3_glue.c
+index f9aff31fe59e..08ec76ae4de7 100644
+--- a/arch/x86/crypto/sha256_ssse3_glue.c
++++ b/arch/x86/crypto/sha256_ssse3_glue.c
+@@ -41,12 +41,11 @@
+ #include <linux/string.h>
+ #include <asm/simd.h>
+ 
+-asmlinkage void sha256_transform_ssse3(u32 *digest, const char *data,
+-				       u64 rounds);
+-typedef void (sha256_transform_fn)(u32 *digest, const char *data, u64 rounds);
++asmlinkage void sha256_transform_ssse3(struct sha256_state *digest,
++				       const u8 *data, int rounds);
+ 
+ static int _sha256_update(struct shash_desc *desc, const u8 *data,
+-			  unsigned int len, sha256_transform_fn *sha256_xform)
++			  unsigned int len, sha256_block_fn *sha256_xform)
+ {
+ 	struct sha256_state *sctx = shash_desc_ctx(desc);
+ 
+@@ -54,28 +53,29 @@ static int _sha256_update(struct shash_desc *desc, const u8 *data,
+ 	    (sctx->count % SHA256_BLOCK_SIZE) + len < SHA256_BLOCK_SIZE)
+ 		return crypto_sha256_update(desc, data, len);
+ 
+-	/* make sure casting to sha256_block_fn() is safe */
++	/*
++	 * Make sure struct sha256_state begins directly with the SHA256
++	 * 256-bit internal state, as this is what the asm functions expect.
++	 */
+ 	BUILD_BUG_ON(offsetof(struct sha256_state, state) != 0);
+ 
+ 	kernel_fpu_begin();
+-	sha256_base_do_update(desc, data, len,
+-			      (sha256_block_fn *)sha256_xform);
++	sha256_base_do_update(desc, data, len, sha256_xform);
+ 	kernel_fpu_end();
+ 
+ 	return 0;
+ }
+ 
+ static int sha256_finup(struct shash_desc *desc, const u8 *data,
+-	      unsigned int len, u8 *out, sha256_transform_fn *sha256_xform)
++	      unsigned int len, u8 *out, sha256_block_fn *sha256_xform)
+ {
+ 	if (!crypto_simd_usable())
+ 		return crypto_sha256_finup(desc, data, len, out);
+ 
+ 	kernel_fpu_begin();
+ 	if (len)
+-		sha256_base_do_update(desc, data, len,
+-				      (sha256_block_fn *)sha256_xform);
+-	sha256_base_do_finalize(desc, (sha256_block_fn *)sha256_xform);
++		sha256_base_do_update(desc, data, len, sha256_xform);
++	sha256_base_do_finalize(desc, sha256_xform);
+ 	kernel_fpu_end();
+ 
+ 	return sha256_base_finish(desc, out);
+@@ -145,8 +145,8 @@ static void unregister_sha256_ssse3(void)
+ }
+ 
+ #ifdef CONFIG_AS_AVX
+-asmlinkage void sha256_transform_avx(u32 *digest, const char *data,
+-				     u64 rounds);
++asmlinkage void sha256_transform_avx(struct sha256_state *digest,
++				     const u8 *data, int blocks);
+ 
+ static int sha256_avx_update(struct shash_desc *desc, const u8 *data,
+ 			 unsigned int len)
+@@ -227,8 +227,8 @@ static inline void unregister_sha256_avx(void) { }
+ #endif
+ 
+ #if defined(CONFIG_AS_AVX2) && defined(CONFIG_AS_AVX)
+-asmlinkage void sha256_transform_rorx(u32 *digest, const char *data,
+-				      u64 rounds);
++asmlinkage void sha256_transform_rorx(struct sha256_state *digest,
++				      const u8 *data, int rounds);
+ 
+ static int sha256_avx2_update(struct shash_desc *desc, const u8 *data,
+ 			 unsigned int len)
+@@ -307,8 +307,8 @@ static inline void unregister_sha256_avx2(void) { }
+ #endif
+ 
+ #ifdef CONFIG_AS_SHA256_NI
+-asmlinkage void sha256_ni_transform(u32 *digest, const char *data,
+-				   u64 rounds); /*unsigned int rounds);*/
++asmlinkage void sha256_ni_transform(struct sha256_state *digest,
++				    const u8 *data, int rounds);
+ 
+ static int sha256_ni_update(struct shash_desc *desc, const u8 *data,
+ 			 unsigned int len)
+diff --git a/arch/x86/crypto/sha512-ssse3-asm.S b/arch/x86/crypto/sha512-ssse3-asm.S
+index 66bbd9058a90..840c749051ee 100644
+--- a/arch/x86/crypto/sha512-ssse3-asm.S
++++ b/arch/x86/crypto/sha512-ssse3-asm.S
+@@ -269,7 +269,9 @@ frame_size = frame_GPRSAVE + GPRSAVE_SIZE
+ .endm
+ 
+ ########################################################################
+-# void sha512_transform_ssse3(void* D, const void* M, u64 L)#
++## void sha512_transform_ssse3(struct sha1_state *digest, const u8 *data,
++##			       int rounds);
++# (struct sha512_state is assumed to begin with u64 state[8])
+ # Purpose: Updates the SHA512 digest stored at D with the message stored in M.
+ # The size of the message pointed to by M must be an integer multiple of SHA512
+ #   message blocks.
+diff --git a/arch/x86/crypto/sha512_ssse3_glue.c b/arch/x86/crypto/sha512_ssse3_glue.c
+index 458356a3f124..19c9596534aa 100644
+--- a/arch/x86/crypto/sha512_ssse3_glue.c
++++ b/arch/x86/crypto/sha512_ssse3_glue.c
+@@ -39,13 +39,11 @@
+ #include <crypto/sha512_base.h>
+ #include <asm/simd.h>
+ 
+-asmlinkage void sha512_transform_ssse3(u64 *digest, const char *data,
+-				       u64 rounds);
+-
+-typedef void (sha512_transform_fn)(u64 *digest, const char *data, u64 rounds);
++asmlinkage void sha512_transform_ssse3(struct sha512_state *digest,
++				       const u8 *data, int rounds);
+ 
+ static int sha512_update(struct shash_desc *desc, const u8 *data,
+-		       unsigned int len, sha512_transform_fn *sha512_xform)
++		       unsigned int len, sha512_block_fn *sha512_xform)
+ {
+ 	struct sha512_state *sctx = shash_desc_ctx(desc);
+ 
+@@ -53,28 +51,29 @@ static int sha512_update(struct shash_desc *desc, const u8 *data,
+ 	    (sctx->count[0] % SHA512_BLOCK_SIZE) + len < SHA512_BLOCK_SIZE)
+ 		return crypto_sha512_update(desc, data, len);
+ 
+-	/* make sure casting to sha512_block_fn() is safe */
++	/*
++	 * Make sure struct sha512_state begins directly with the SHA512
++	 * 512-bit internal state, as this is what the asm functions expect.
++	 */
+ 	BUILD_BUG_ON(offsetof(struct sha512_state, state) != 0);
+ 
+ 	kernel_fpu_begin();
+-	sha512_base_do_update(desc, data, len,
+-			      (sha512_block_fn *)sha512_xform);
++	sha512_base_do_update(desc, data, len, sha512_xform);
+ 	kernel_fpu_end();
+ 
+ 	return 0;
+ }
+ 
+ static int sha512_finup(struct shash_desc *desc, const u8 *data,
+-	      unsigned int len, u8 *out, sha512_transform_fn *sha512_xform)
++	      unsigned int len, u8 *out, sha512_block_fn *sha512_xform)
+ {
+ 	if (!crypto_simd_usable())
+ 		return crypto_sha512_finup(desc, data, len, out);
+ 
+ 	kernel_fpu_begin();
+ 	if (len)
+-		sha512_base_do_update(desc, data, len,
+-				      (sha512_block_fn *)sha512_xform);
+-	sha512_base_do_finalize(desc, (sha512_block_fn *)sha512_xform);
++		sha512_base_do_update(desc, data, len, sha512_xform);
++	sha512_base_do_finalize(desc, sha512_xform);
+ 	kernel_fpu_end();
+ 
+ 	return sha512_base_finish(desc, out);
+@@ -144,8 +143,8 @@ static void unregister_sha512_ssse3(void)
+ }
+ 
+ #ifdef CONFIG_AS_AVX
+-asmlinkage void sha512_transform_avx(u64 *digest, const char *data,
+-				     u64 rounds);
++asmlinkage void sha512_transform_avx(struct sha512_state *digest,
++				     const u8 *data, int rounds);
+ static bool avx_usable(void)
+ {
+ 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL)) {
+@@ -225,8 +224,8 @@ static inline void unregister_sha512_avx(void) { }
+ #endif
+ 
+ #if defined(CONFIG_AS_AVX2) && defined(CONFIG_AS_AVX)
+-asmlinkage void sha512_transform_rorx(u64 *digest, const char *data,
+-				      u64 rounds);
++asmlinkage void sha512_transform_rorx(struct sha512_state *digest,
++				      const u8 *data, int rounds);
+ 
+ static int sha512_avx2_update(struct shash_desc *desc, const u8 *data,
+ 		       unsigned int len)
 -- 
 2.17.1
 
