@@ -2,77 +2,171 @@ Return-Path: <SRS0=W3IF=ZO=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1039FC432C0
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Nov 2019 04:37:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEE38C432C3
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Nov 2019 05:49:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D240620707
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Nov 2019 04:37:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8697D20718
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Nov 2019 05:49:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1574397472;
-	bh=SUQ9OFAb62GXoX/MtVCEnH4ZzSHKhWxeJQUcD9rTFj8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=idxRlh7fK/SHuIiNcJJlgSCL4ku1QKA9nuuOuGUFoRbkQBcGnQmIy5erH+CUaPLL3
-	 84aWnYDD7uaBlkZeo8i62s7uWw78nKjuIj6LrTKWwBN3iVc+3klbyCDsrmvePxfEDo
-	 ZcG8bc6mND+4F/YUnCE2YR4NEyNBzWOBblhh3+tM=
+	s=default; t=1574401797;
+	bh=Zim3oUanFEmUHT0Cy6nsnBShFv0GEZ4ifLMG6yApetk=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=u9euwQPX474U7pdAUdK2aEBbTWq4WydnBZ3LdNIMd9VKURImCqLapmIKX7J4/+prM
+	 loVpll51qmPXkt18F0/ExkGZBrHRRi5D5suQHwLl0CaUgU6Cb4EYbRmIOSqBLq6V3Q
+	 LFeKydpQMeCV+gkySBnumWzz5fzHeKXfT/D7OWaE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726546AbfKVEhv (ORCPT
+        id S1727385AbfKVFt4 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 21 Nov 2019 23:37:51 -0500
-Received: from mail.kernel.org ([198.145.29.99]:57820 "EHLO mail.kernel.org"
+        Fri, 22 Nov 2019 00:49:56 -0500
+Received: from mail.kernel.org ([198.145.29.99]:54262 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726529AbfKVEhv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 21 Nov 2019 23:37:51 -0500
-Received: from localhost (unknown [171.61.94.63])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1727372AbfKVFt4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 22 Nov 2019 00:49:56 -0500
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 573AB2068D;
-        Fri, 22 Nov 2019 04:37:50 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7DC1E2070A;
+        Fri, 22 Nov 2019 05:49:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1574397471;
-        bh=SUQ9OFAb62GXoX/MtVCEnH4ZzSHKhWxeJQUcD9rTFj8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Rz++MFrfWK+An4b+AwBuTYhLWNDxawnfeV1XKGoY1BJL4CBdVW757Al5r599uC2cX
-         Mi5eym5FF1c8+yTGXVDulsls3nfj+r5n3ZDH/oMtPD79UJXqhYzemEX1TbpDztsmKO
-         Rm2C57tdhmZ5HLT4ZgLTiZcnxlIMKWXcpydxWV78=
-Date:   Fri, 22 Nov 2019 10:07:45 +0530
-From:   Vinod Koul <vkoul@kernel.org>
-To:     Peter Ujfalusi <peter.ujfalusi@ti.com>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
-        ludovic.desroches@microchip.com, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 0/3] crypto: atmel - Retire
- dma_request_slave_channel_compat()
-Message-ID: <20191122043745.GK82508@vkoul-mobl>
-References: <20191121101602.21941-1-peter.ujfalusi@ti.com>
+        s=default; t=1574401795;
+        bh=Zim3oUanFEmUHT0Cy6nsnBShFv0GEZ4ifLMG6yApetk=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=dUQbUgtyhTjP+XUZBsrsbF1gNJE/oFRsvIBojYWQKqu27lwq8itYt6c5yWtIlKY6O
+         2i55w5/hpjgvXooDHyNXKILE7eNgxVHHnj553Ww8fXPcujQMLbtmxj5wjoV2v8w3zm
+         VWmuWgXgrbBs3YVmfPzvJHqAIRDCAZ2O43+p+LfE=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Eric Biggers <ebiggers@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 042/219] crypto: user - support incremental algorithm dumps
+Date:   Fri, 22 Nov 2019 00:46:14 -0500
+Message-Id: <20191122054911.1750-35-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191122054911.1750-1-sashal@kernel.org>
+References: <20191122054911.1750-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191121101602.21941-1-peter.ujfalusi@ti.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 21-11-19, 12:15, Peter Ujfalusi wrote:
-> Hi,
-> 
-> Changes since v1:
-> - Rebased on next-20191121 to avoid conflict for atmel-aes
-> 
-> I'm going through the kernel to crack down on dma_request_slave_channel_compat()
-> users.
-> 
-> These drivers no longer needs it as they are only probed via DT and even if they
-> would probe in legacy mode, the dma_request_chan() + dma_slave_map must be used
-> for supporting non DT boots.
+From: Eric Biggers <ebiggers@google.com>
 
-Reviewed-by: Vinod Koul <vkoul@kernel.org>
+[ Upstream commit 0ac6b8fb23c724b015d9ca70a89126e8d1563166 ]
 
+CRYPTO_MSG_GETALG in NLM_F_DUMP mode sometimes doesn't return all
+registered crypto algorithms, because it doesn't support incremental
+dumps.  crypto_dump_report() only permits itself to be called once, yet
+the netlink subsystem allocates at most ~64 KiB for the skb being dumped
+to.  Thus only the first recvmsg() returns data, and it may only include
+a subset of the crypto algorithms even if the user buffer passed to
+recvmsg() is large enough to hold all of them.
+
+Fix this by using one of the arguments in the netlink_callback structure
+to keep track of the current position in the algorithm list.  Then
+userspace can do multiple recvmsg() on the socket after sending the dump
+request.  This is the way netlink dumps work elsewhere in the kernel;
+it's unclear why this was different (probably just an oversight).
+
+Also fix an integer overflow when calculating the dump buffer size hint.
+
+Fixes: a38f7907b926 ("crypto: Add userspace configuration API")
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ crypto/crypto_user.c | 37 ++++++++++++++++++++-----------------
+ 1 file changed, 20 insertions(+), 17 deletions(-)
+
+diff --git a/crypto/crypto_user.c b/crypto/crypto_user.c
+index 3cca814348a26..74cb166097cd2 100644
+--- a/crypto/crypto_user.c
++++ b/crypto/crypto_user.c
+@@ -296,30 +296,33 @@ static int crypto_report(struct sk_buff *in_skb, struct nlmsghdr *in_nlh,
+ 
+ static int crypto_dump_report(struct sk_buff *skb, struct netlink_callback *cb)
+ {
+-	struct crypto_alg *alg;
++	const size_t start_pos = cb->args[0];
++	size_t pos = 0;
+ 	struct crypto_dump_info info;
+-	int err;
+-
+-	if (cb->args[0])
+-		goto out;
+-
+-	cb->args[0] = 1;
++	struct crypto_alg *alg;
++	int res;
+ 
+ 	info.in_skb = cb->skb;
+ 	info.out_skb = skb;
+ 	info.nlmsg_seq = cb->nlh->nlmsg_seq;
+ 	info.nlmsg_flags = NLM_F_MULTI;
+ 
++	down_read(&crypto_alg_sem);
+ 	list_for_each_entry(alg, &crypto_alg_list, cra_list) {
+-		err = crypto_report_alg(alg, &info);
+-		if (err)
+-			goto out_err;
++		if (pos >= start_pos) {
++			res = crypto_report_alg(alg, &info);
++			if (res == -EMSGSIZE)
++				break;
++			if (res)
++				goto out;
++		}
++		pos++;
+ 	}
+-
++	cb->args[0] = pos;
++	res = skb->len;
+ out:
+-	return skb->len;
+-out_err:
+-	return err;
++	up_read(&crypto_alg_sem);
++	return res;
+ }
+ 
+ static int crypto_dump_report_done(struct netlink_callback *cb)
+@@ -503,7 +506,7 @@ static int crypto_user_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 	if ((type == (CRYPTO_MSG_GETALG - CRYPTO_MSG_BASE) &&
+ 	    (nlh->nlmsg_flags & NLM_F_DUMP))) {
+ 		struct crypto_alg *alg;
+-		u16 dump_alloc = 0;
++		unsigned long dump_alloc = 0;
+ 
+ 		if (link->dump == NULL)
+ 			return -EINVAL;
+@@ -511,16 +514,16 @@ static int crypto_user_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 		down_read(&crypto_alg_sem);
+ 		list_for_each_entry(alg, &crypto_alg_list, cra_list)
+ 			dump_alloc += CRYPTO_REPORT_MAXSIZE;
++		up_read(&crypto_alg_sem);
+ 
+ 		{
+ 			struct netlink_dump_control c = {
+ 				.dump = link->dump,
+ 				.done = link->done,
+-				.min_dump_alloc = dump_alloc,
++				.min_dump_alloc = min(dump_alloc, 65535UL),
+ 			};
+ 			err = netlink_dump_start(crypto_nlsk, skb, nlh, &c);
+ 		}
+-		up_read(&crypto_alg_sem);
+ 
+ 		return err;
+ 	}
 -- 
-~Vinod
+2.20.1
+
