@@ -4,52 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA2EFC432C0
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Nov 2019 06:02:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2D6FC43215
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Nov 2019 06:09:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 829872071B
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Nov 2019 06:02:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CB6FB2068F
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Nov 2019 06:09:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1574402558;
-	bh=ItxSqDFiFPe32iS6WA6fvIXptjkKIjmv+gsp8JwxaaY=;
+	s=default; t=1574402957;
+	bh=pd3AeSBtOZjnIaMKLxGwzgSveNiz/pmLImr/pfQFtRo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=f7R2cNtB3THmHOcpqsmnKZksHf+J6Y9x7PRvLP2lUqksZpvV9GDSmRMC7ObfJrPMn
-	 GvxCPg5R1C8TAOkSebIZnuPi/vjV+09swyu+d4YH6bsniw675K+j56Fdy2zePiq1Iz
-	 f1T8UTpN7Or49PTWuNKNV7m4CKhm17Ovstg8XuWM=
+	b=ChA6e4mK6p3ktF3jU9+x3lGKw6sNvG7uAFpQjauXhv9jNFFFwx1sWSSdyGlyjYik8
+	 rvGButsKe9ORVl3HFNIoJzNVrK2HndJr/F55qXfjujtTKx8gVEBn0JnFojUyhOqart
+	 TcDHVIMSw1VKuVj+RgkjfYMHYi2Z5tWjdimh8XLw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729755AbfKVGCg (ORCPT
+        id S1729345AbfKVF5O (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 22 Nov 2019 01:02:36 -0500
-Received: from mail.kernel.org ([198.145.29.99]:41312 "EHLO mail.kernel.org"
+        Fri, 22 Nov 2019 00:57:14 -0500
+Received: from mail.kernel.org ([198.145.29.99]:35432 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727969AbfKVGCf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Nov 2019 01:02:35 -0500
+        id S1728844AbfKVF5N (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 22 Nov 2019 00:57:13 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4C39820714;
-        Fri, 22 Nov 2019 06:02:33 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 08FEE207FA;
+        Fri, 22 Nov 2019 05:57:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1574402554;
-        bh=ItxSqDFiFPe32iS6WA6fvIXptjkKIjmv+gsp8JwxaaY=;
+        s=default; t=1574402232;
+        bh=pd3AeSBtOZjnIaMKLxGwzgSveNiz/pmLImr/pfQFtRo=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=l7GSjh5dWdjHX15kn3aGQJZXHK50WPZKo1/wXoSPUNYC6z8OJ5vrf9OJLGwf5jbgh
-         jImrjZQQ6yEC+lSn0w1iMTPzQR1ryToepCuFRKopWbNuqRDWid30RBVH5R8QNzVd0S
-         B72y5vJqji1+OIk+nYT0e0Qe8JC9aPULgGDZomWc=
+        b=uUZoahNdjvpT63daiShDAH2ARNexWNgkX7fhhRUd2vXQSDxfZwqphRxMdXumKeEOX
+         KWGGb4A3J6PXv9YilJow8wFzgJLdUbisVjOv9po7Hwa0jpVNPLjaZJ6gIes51v36Tz
+         TUX/gERm4MdrJPjkymLR+qDIdsFmonxubQHvwBLc=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Fabio Estevam <festevam@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 59/91] crypto: mxc-scc - fix build warnings on ARM64
-Date:   Fri, 22 Nov 2019 01:00:57 -0500
-Message-Id: <20191122060129.4239-58-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 078/127] crypto: mxc-scc - fix build warnings on ARM64
+Date:   Fri, 22 Nov 2019 00:54:56 -0500
+Message-Id: <20191122055544.3299-77-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191122060129.4239-1-sashal@kernel.org>
-References: <20191122060129.4239-1-sashal@kernel.org>
+In-Reply-To: <20191122055544.3299-1-sashal@kernel.org>
+References: <20191122055544.3299-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -82,7 +82,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 6 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/crypto/mxc-scc.c b/drivers/crypto/mxc-scc.c
-index ee4be1b0d30ba..0a57b3db2d67e 100644
+index e01c46387df8d..519086730791b 100644
 --- a/drivers/crypto/mxc-scc.c
 +++ b/drivers/crypto/mxc-scc.c
 @@ -178,12 +178,12 @@ static int mxc_scc_get_data(struct mxc_scc_ctx *ctx,
