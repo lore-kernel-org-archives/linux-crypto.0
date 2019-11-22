@@ -2,82 +2,105 @@ Return-Path: <SRS0=W3IF=ZO=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0715C432C0
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Nov 2019 11:11:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD6F7C432C0
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Nov 2019 11:21:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9880F20718
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Nov 2019 11:11:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A67720708
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Nov 2019 11:21:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1574421699;
+	bh=SbUN0yYZmzZAvFPcXi0mVND1v/e7vZHcGEaSQBWDqX8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=iutqPP/qVM+e96vUcwEudEqP9Ras5YU3t2qkRvCp9VmVJwW+03IT8wzcgTyOKNyh0
+	 jl8PTRE50oQA5aiwJOE7SCcV8VBnnrXuU2G8wc2eiceF3qsUwmrg9Ol1IwwMyDLmg5
+	 oezmWqPsLecdtdjmh/R4Mz6QkqegtngZ0wjCxqf4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729169AbfKVLLe (ORCPT
+        id S1729402AbfKVKpB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 22 Nov 2019 06:11:34 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:54084 "EHLO deadmen.hmeau.com"
+        Fri, 22 Nov 2019 05:45:01 -0500
+Received: from mail.kernel.org ([198.145.29.99]:51126 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729410AbfKVLLc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Nov 2019 06:11:32 -0500
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1iY6qZ-0005XE-QA; Fri, 22 Nov 2019 19:11:31 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1iY6qY-0002m8-1L; Fri, 22 Nov 2019 19:11:30 +0800
-Date:   Fri, 22 Nov 2019 19:11:30 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Michael Ellerman <mpe@ellerman.id.au>
-Cc:     linux-crypto@vger.kernel.org, linuxppc-dev@ozlabs.org,
-        yamada.masahiro@socionext.com
-Subject: Re: [PATCH] crypto: vmx - Avoid weird build failures
-Message-ID: <20191122111129.nu5lr5nfxilsjsy5@gondor.apana.org.au>
-References: <20191120112738.7031-1-mpe@ellerman.id.au>
+        id S1728502AbfKVKpA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 22 Nov 2019 05:45:00 -0500
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 976EE20717;
+        Fri, 22 Nov 2019 10:44:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1574419500;
+        bh=SbUN0yYZmzZAvFPcXi0mVND1v/e7vZHcGEaSQBWDqX8=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=WKjJSAd48nX/bgfbgk+cWIq0unBGnlOy6djpGYpMEE9m7ozRo/fiFz407F93hixoz
+         GZQWLm6SlagSdbHD9b9j7Z3Ll4OzeNd3aaz5pN7gr4wkwcfMoED1Ssve8dJ0Tzyit5
+         056QQAAhkuQNQ3cVhhta0iOjBA05KtaGuBhz7JHY=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Dan Aloni <dan@kernelim.com>, Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 4.9 133/222] crypto: fix a memory leak in rsa-kcs1pads encryption mode
+Date:   Fri, 22 Nov 2019 11:27:53 +0100
+Message-Id: <20191122100912.541742992@linuxfoundation.org>
+X-Mailer: git-send-email 2.24.0
+In-Reply-To: <20191122100830.874290814@linuxfoundation.org>
+References: <20191122100830.874290814@linuxfoundation.org>
+User-Agent: quilt/0.66
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191120112738.7031-1-mpe@ellerman.id.au>
-User-Agent: NeoMutt/20170113 (1.7.2)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Nov 20, 2019 at 10:27:38PM +1100, Michael Ellerman wrote:
-> In the vmx crypto Makefile we assign to a variable called TARGET and
-> pass that to the aesp8-ppc.pl and ghashp8-ppc.pl scripts.
-> 
-> The variable is meant to describe what flavour of powerpc we're
-> building for, eg. either 32 or 64-bit, and big or little endian.
-> 
-> Unfortunately TARGET is a fairly common name for a make variable, and
-> if it happens that TARGET is specified as a command line parameter to
-> make, the value specified on the command line will override our value.
-> 
-> In particular this can happen if the kernel Makefile is driven by an
-> external Makefile that uses TARGET for something.
-> 
-> This leads to weird build failures, eg:
->   nonsense  at /build/linux/drivers/crypto/vmx/ghashp8-ppc.pl line 45.
->   /linux/drivers/crypto/vmx/Makefile:20: recipe for target 'drivers/crypto/vmx/ghashp8-ppc.S' failed
-> 
-> Which shows that we passed an empty value for $(TARGET) to the perl
-> script, confirmed with make V=1:
-> 
->   perl /linux/drivers/crypto/vmx/ghashp8-ppc.pl  > drivers/crypto/vmx/ghashp8-ppc.S
-> 
-> We can avoid this confusion by using override, to tell make that we
-> don't want anything to override our variable, even a value specified
-> on the command line. We can also use a less common name, given the
-> script calls it "flavour", let's use that.
-> 
-> Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
-> ---
->  drivers/crypto/vmx/Makefile | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+From: Dan Aloni <dan@kernelim.com>
 
-Patch applied.  Thanks.
+[ Upstream commit 3944f139d5592790b70bc64f197162e643a8512b ]
+
+The encryption mode of pkcs1pad never uses out_sg and out_buf, so
+there's no need to allocate the buffer, which presently is not even
+being freed.
+
+CC: Herbert Xu <herbert@gondor.apana.org.au>
+CC: linux-crypto@vger.kernel.org
+CC: "David S. Miller" <davem@davemloft.net>
+Signed-off-by: Dan Aloni <dan@kernelim.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ crypto/rsa-pkcs1pad.c | 9 ---------
+ 1 file changed, 9 deletions(-)
+
+diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
+index 7830d304dff6f..d58224d808675 100644
+--- a/crypto/rsa-pkcs1pad.c
++++ b/crypto/rsa-pkcs1pad.c
+@@ -267,15 +267,6 @@ static int pkcs1pad_encrypt(struct akcipher_request *req)
+ 	pkcs1pad_sg_set_buf(req_ctx->in_sg, req_ctx->in_buf,
+ 			ctx->key_size - 1 - req->src_len, req->src);
+ 
+-	req_ctx->out_buf = kmalloc(ctx->key_size, GFP_KERNEL);
+-	if (!req_ctx->out_buf) {
+-		kfree(req_ctx->in_buf);
+-		return -ENOMEM;
+-	}
+-
+-	pkcs1pad_sg_set_buf(req_ctx->out_sg, req_ctx->out_buf,
+-			ctx->key_size, NULL);
+-
+ 	akcipher_request_set_tfm(&req_ctx->child_req, ctx->child);
+ 	akcipher_request_set_callback(&req_ctx->child_req, req->base.flags,
+ 			pkcs1pad_encrypt_sign_complete_cb, req);
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.20.1
+
+
+
