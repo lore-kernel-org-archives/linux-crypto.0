@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAD25C432C3
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Nov 2019 09:42:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38807C432C0
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Nov 2019 09:46:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8CBB820708
-	for <linux-crypto@archiver.kernel.org>; Fri, 22 Nov 2019 09:42:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE6852070E
+	for <linux-crypto@archiver.kernel.org>; Fri, 22 Nov 2019 09:46:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="IrTMeWPd"
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="SslhPqXF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726568AbfKVJmA (ORCPT
+        id S1726747AbfKVJqk (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 22 Nov 2019 04:42:00 -0500
-Received: from frisell.zx2c4.com ([192.95.5.64]:43053 "EHLO frisell.zx2c4.com"
+        Fri, 22 Nov 2019 04:46:40 -0500
+Received: from frisell.zx2c4.com ([192.95.5.64]:38441 "EHLO frisell.zx2c4.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726100AbfKVJmA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Nov 2019 04:42:00 -0500
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 9b90f797;
-        Fri, 22 Nov 2019 08:48:47 +0000 (UTC)
+        id S1726767AbfKVJqj (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 22 Nov 2019 04:46:39 -0500
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 34bfece9;
+        Fri, 22 Nov 2019 08:53:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=from:to:cc
         :subject:date:message-id:in-reply-to:references:mime-version
-        :content-transfer-encoding; s=mail; bh=Z1HPxkbuQm4r8kxMGmBLXOQLK
-        1s=; b=IrTMeWPdnT1xgHrHjo0M5ojuhGJjGrU8naQAwAIltZnzoDVJcSdoIgxtK
-        M2qeNE15vIFAIJ1x0MvmkQ30p9T6sUKw/qNSYgrlI5o2bMF1/cP3jOHWhe6pqLlr
-        8pf7Mm0IXo4iWFbRUFkFhsfeE+dO4wGn7RnxJk5mouCCQtnamChp0cDiKKvEbmFF
-        gxcdygCYFVmAdxPd7f6K/+XtJW4/9P/9W2FP8Y1F0Qrtxmwpu/eFVb6BFrLIFzDl
-        KLgGnq3K49fmK8UAC4I2JdLW+lWlZMKarAtuo1iztej1Nn7+dlkzimWjI4glcwUA
-        64cttv6WPOsWnS0Mb6tGEC3hIMI1w==
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id e8af0153 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
-        Fri, 22 Nov 2019 08:48:47 +0000 (UTC)
+        :content-transfer-encoding; s=mail; bh=A6j0paaQTTGqArOIJ3Pe8B0Rg
+        lA=; b=SslhPqXFI99hJfXYu0MQr/ESy9X5kiKv3IOcoeVKNaDd3NGl2as4R9I/W
+        4IAHchgg1sMeoOCbnkHI/n3cKqho4ejcduJMcH/a8lKfBp5vX2zsZdyfuv3Y/Pka
+        KS1GoYgdHKOtJpzBMU6IUX4AbR+EUsXpfWt0otQ9nevBaYiYj3Kt4tCKtnVXnSej
+        Zt2bNR7fXThfWrV/Cxn+gZRc/LvpQGfD/RWla2Jeqi59DKrcrRnQ7sSQYDcldFyG
+        c/1Zh+HPCZuuMWGVKnDsvOjqSXSBtJr6RDtY85nu9B5FhkygWiSjaQogPvz5gY62
+        Ptsc+iuBq5+Oi1Ugh2XDOohmXF1Pw==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id de93179f (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
+        Fri, 22 Nov 2019 08:53:26 +0000 (UTC)
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
 To:     linux-crypto@vger.kernel.org, ardb@kernel.org
 Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH v2] crypto: conditionalize crypto api in arch glue for lib code
-Date:   Fri, 22 Nov 2019 10:41:56 +0100
-Message-Id: <20191122094156.169526-1-Jason@zx2c4.com>
-In-Reply-To: <20191122092547.115401-1-Jason@zx2c4.com>
-References: <20191122092547.115401-1-Jason@zx2c4.com>
+Subject: [PATCH v3] crypto: conditionalize crypto api in arch glue for lib code
+Date:   Fri, 22 Nov 2019 10:46:35 +0100
+Message-Id: <20191122094635.172168-1-Jason@zx2c4.com>
+In-Reply-To: <20191122094156.169526-1-Jason@zx2c4.com>
+References: <20191122094156.169526-1-Jason@zx2c4.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
@@ -58,46 +58,31 @@ of the proper config entry.
 
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
+Changes v2->v3:
+  - v2 was a dud, with a find and replace operation gone wild. v3 is
+    what v2 should have been.
 Changes v1->v2:
   - Discussing with Ard on IRC, we concluded that IS_REACHABLE makes
     more sense than IS_ENABLED.
 
- arch/arm/crypto/chacha-glue.c        | 32 +++++++++++++++++-----------
+ arch/arm/crypto/chacha-glue.c        | 26 ++++++++++++++++----------
  arch/arm/crypto/curve25519-glue.c    |  5 +++--
- arch/arm/crypto/poly1305-glue.c      | 13 ++++++-----
+ arch/arm/crypto/poly1305-glue.c      |  9 ++++++---
  arch/arm64/crypto/chacha-neon-glue.c |  5 +++--
  arch/arm64/crypto/poly1305-glue.c    |  5 +++--
  arch/mips/crypto/chacha-glue.c       |  6 ++++--
  arch/mips/crypto/poly1305-glue.c     |  6 ++++--
- arch/x86/crypto/blake2s-glue.c       | 10 +++++----
- arch/x86/crypto/chacha_glue.c        | 14 ++++++------
- arch/x86/crypto/curve25519-x86_64.c  |  7 +++---
- arch/x86/crypto/poly1305_glue.c      |  9 ++++----
- 11 files changed, 67 insertions(+), 45 deletions(-)
+ arch/x86/crypto/blake2s-glue.c       |  6 ++++--
+ arch/x86/crypto/chacha_glue.c        |  6 ++++--
+ arch/x86/crypto/curve25519-x86_64.c  |  7 ++++---
+ arch/x86/crypto/poly1305_glue.c      |  5 +++--
+ 11 files changed, 54 insertions(+), 32 deletions(-)
 
 diff --git a/arch/arm/crypto/chacha-glue.c b/arch/arm/crypto/chacha-glue.c
-index 3f0c057aa050..dfb673e076bb 100644
+index 3f0c057aa050..6ebbb2b241d2 100644
 --- a/arch/arm/crypto/chacha-glue.c
 +++ b/arch/arm/crypto/chacha-glue.c
-@@ -65,7 +65,7 @@ static void chacha_doneon(u32 *state, u8 *dst, const u8 *src,
- 
- void hchacha_block_arch(const u32 *state, u32 *stream, int nrounds)
- {
--	if (!IS_ENABLED(CONFIG_KERNEL_MODE_NEON) || !neon_usable()) {
-+	if (!IS_REACHABLE(CONFIG_KERNEL_MODE_NEON) || !neon_usable()) {
- 		hchacha_block_arm(state, stream, nrounds);
- 	} else {
- 		kernel_neon_begin();
-@@ -84,7 +84,7 @@ EXPORT_SYMBOL(chacha_init_arch);
- void chacha_crypt_arch(u32 *state, u8 *dst, const u8 *src, unsigned int bytes,
- 		       int nrounds)
- {
--	if (!IS_ENABLED(CONFIG_KERNEL_MODE_NEON) || !neon_usable() ||
-+	if (!IS_REACHABLE(CONFIG_KERNEL_MODE_NEON) || !neon_usable() ||
- 	    bytes <= CHACHA_BLOCK_SIZE) {
- 		chacha_doarm(dst, src, bytes, state, nrounds);
- 		state[12] += DIV_ROUND_UP(bytes, CHACHA_BLOCK_SIZE);
-@@ -286,13 +286,15 @@ static struct skcipher_alg neon_algs[] = {
+@@ -286,11 +286,13 @@ static struct skcipher_alg neon_algs[] = {
  
  static int __init chacha_simd_mod_init(void)
  {
@@ -113,11 +98,8 @@ index 3f0c057aa050..dfb673e076bb 100644
 +			return err;
 +	}
  
--	if (IS_ENABLED(CONFIG_KERNEL_MODE_NEON) && (elf_hwcap & HWCAP_NEON)) {
-+	if (IS_REACHABLE(CONFIG_KERNEL_MODE_NEON) && (elf_hwcap & HWCAP_NEON)) {
+ 	if (IS_ENABLED(CONFIG_KERNEL_MODE_NEON) && (elf_hwcap & HWCAP_NEON)) {
  		int i;
- 
- 		switch (read_cpuid_part()) {
 @@ -310,18 +312,22 @@ static int __init chacha_simd_mod_init(void)
  			static_branch_enable(&use_neon);
  		}
@@ -141,7 +123,7 @@ index 3f0c057aa050..dfb673e076bb 100644
 -		crypto_unregister_skciphers(neon_algs, ARRAY_SIZE(neon_algs));
 +	if (IS_REACHABLE(CONFIG_CRYPTO_SKCIPHER)) {
 +		crypto_unregister_skciphers(arm_algs, ARRAY_SIZE(arm_algs));
-+		if (IS_REACHABLE(CONFIG_KERNEL_MODE_NEON) && (elf_hwcap & HWCAP_NEON))
++		if (IS_ENABLED(CONFIG_KERNEL_MODE_NEON) && (elf_hwcap & HWCAP_NEON))
 +			crypto_unregister_skciphers(neon_algs, ARRAY_SIZE(neon_algs));
 +	}
  }
@@ -170,24 +152,11 @@ index 2e9e12d2f642..f3f42cf3b893 100644
  }
  
 diff --git a/arch/arm/crypto/poly1305-glue.c b/arch/arm/crypto/poly1305-glue.c
-index 74a725ac89c9..f73cf1d03a3f 100644
+index 74a725ac89c9..abe3f2d587dc 100644
 --- a/arch/arm/crypto/poly1305-glue.c
 +++ b/arch/arm/crypto/poly1305-glue.c
-@@ -138,7 +138,7 @@ static int __maybe_unused arm_poly1305_update_neon(struct shash_desc *desc,
- void poly1305_update_arch(struct poly1305_desc_ctx *dctx, const u8 *src,
- 			  unsigned int nbytes)
- {
--	bool do_neon = IS_ENABLED(CONFIG_KERNEL_MODE_NEON) &&
-+	bool do_neon = IS_REACHABLE(CONFIG_KERNEL_MODE_NEON) &&
- 		       crypto_simd_usable();
- 
- 	if (unlikely(dctx->buflen)) {
-@@ -246,19 +246,22 @@ static struct shash_alg arm_poly1305_algs[] = {{
- 
- static int __init arm_poly1305_mod_init(void)
- {
--	if (IS_ENABLED(CONFIG_KERNEL_MODE_NEON) &&
-+	if (IS_REACHABLE(CONFIG_KERNEL_MODE_NEON) &&
+@@ -249,16 +249,19 @@ static int __init arm_poly1305_mod_init(void)
+ 	if (IS_ENABLED(CONFIG_KERNEL_MODE_NEON) &&
  	    (elf_hwcap & HWCAP_NEON))
  		static_branch_enable(&have_neon);
 -	else
@@ -292,27 +261,9 @@ index b759b6ccc361..b37d29cf5d0a 100644
  
  module_init(mips_poly1305_mod_init);
 diff --git a/arch/x86/crypto/blake2s-glue.c b/arch/x86/crypto/blake2s-glue.c
-index 4a37ba7cdbe5..1382a0d15496 100644
+index 4a37ba7cdbe5..1d9ff8a45e1f 100644
 --- a/arch/x86/crypto/blake2s-glue.c
 +++ b/arch/x86/crypto/blake2s-glue.c
-@@ -44,7 +44,7 @@ void blake2s_compress_arch(struct blake2s_state *state,
- 					    PAGE_SIZE / BLAKE2S_BLOCK_SIZE);
- 
- 		kernel_fpu_begin();
--		if (IS_ENABLED(CONFIG_AS_AVX512) &&
-+		if (IS_REACHABLE(CONFIG_AS_AVX512) &&
- 		    static_branch_likely(&blake2s_use_avx512))
- 			blake2s_compress_avx512(state, block, blocks, inc);
- 		else
-@@ -201,7 +201,7 @@ static int __init blake2s_mod_init(void)
- 
- 	static_branch_enable(&blake2s_use_ssse3);
- 
--	if (IS_ENABLED(CONFIG_AS_AVX512) &&
-+	if (IS_REACHABLE(CONFIG_AS_AVX512) &&
- 	    boot_cpu_has(X86_FEATURE_AVX) &&
- 	    boot_cpu_has(X86_FEATURE_AVX2) &&
- 	    boot_cpu_has(X86_FEATURE_AVX512F) &&
 @@ -210,12 +210,14 @@ static int __init blake2s_mod_init(void)
  			      XFEATURE_MASK_AVX512, NULL))
  		static_branch_enable(&blake2s_use_avx512);
@@ -331,41 +282,10 @@ index 4a37ba7cdbe5..1382a0d15496 100644
  }
  
 diff --git a/arch/x86/crypto/chacha_glue.c b/arch/x86/crypto/chacha_glue.c
-index b391e13a9e41..fd59ee556c67 100644
+index b391e13a9e41..ce67bc8a9f4e 100644
 --- a/arch/x86/crypto/chacha_glue.c
 +++ b/arch/x86/crypto/chacha_glue.c
-@@ -49,7 +49,7 @@ static unsigned int chacha_advance(unsigned int len, unsigned int maxblocks)
- static void chacha_dosimd(u32 *state, u8 *dst, const u8 *src,
- 			  unsigned int bytes, int nrounds)
- {
--	if (IS_ENABLED(CONFIG_AS_AVX512) &&
-+	if (IS_REACHABLE(CONFIG_AS_AVX512) &&
- 	    static_branch_likely(&chacha_use_avx512vl)) {
- 		while (bytes >= CHACHA_BLOCK_SIZE * 8) {
- 			chacha_8block_xor_avx512vl(state, dst, src, bytes,
-@@ -79,7 +79,7 @@ static void chacha_dosimd(u32 *state, u8 *dst, const u8 *src,
- 		}
- 	}
- 
--	if (IS_ENABLED(CONFIG_AS_AVX2) &&
-+	if (IS_REACHABLE(CONFIG_AS_AVX2) &&
- 	    static_branch_likely(&chacha_use_avx2)) {
- 		while (bytes >= CHACHA_BLOCK_SIZE * 8) {
- 			chacha_8block_xor_avx2(state, dst, src, bytes, nrounds);
-@@ -288,23 +288,25 @@ static int __init chacha_simd_mod_init(void)
- 
- 	static_branch_enable(&chacha_use_simd);
- 
--	if (IS_ENABLED(CONFIG_AS_AVX2) &&
-+	if (IS_REACHABLE(CONFIG_AS_AVX2) &&
- 	    boot_cpu_has(X86_FEATURE_AVX) &&
- 	    boot_cpu_has(X86_FEATURE_AVX2) &&
- 	    cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL)) {
- 		static_branch_enable(&chacha_use_avx2);
- 
--		if (IS_ENABLED(CONFIG_AS_AVX512) &&
-+		if (IS_REACHABLE(CONFIG_AS_AVX512) &&
- 		    boot_cpu_has(X86_FEATURE_AVX512VL) &&
+@@ -299,12 +299,14 @@ static int __init chacha_simd_mod_init(void)
  		    boot_cpu_has(X86_FEATURE_AVX512BW)) /* kmovq */
  			static_branch_enable(&chacha_use_avx512vl);
  	}
@@ -405,26 +325,10 @@ index a52a3fb15727..eec7d2d24239 100644
  }
  
 diff --git a/arch/x86/crypto/poly1305_glue.c b/arch/x86/crypto/poly1305_glue.c
-index 370cd88068ec..02c14e27bfb8 100644
+index 370cd88068ec..0cc4537e6617 100644
 --- a/arch/x86/crypto/poly1305_glue.c
 +++ b/arch/x86/crypto/poly1305_glue.c
-@@ -65,7 +65,7 @@ static unsigned int poly1305_simd_blocks(struct poly1305_desc_ctx *dctx,
- 		srclen = datalen;
- 	}
- 
--	if (IS_ENABLED(CONFIG_AS_AVX2) &&
-+	if (IS_REACHABLE(CONFIG_AS_AVX2) &&
- 	    static_branch_likely(&poly1305_use_avx2) &&
- 	    srclen >= POLY1305_BLOCK_SIZE * 4) {
- 		if (unlikely(dctx->rset < 4)) {
-@@ -218,18 +218,19 @@ static int __init poly1305_simd_mod_init(void)
- 
- 	static_branch_enable(&poly1305_use_simd);
- 
--	if (IS_ENABLED(CONFIG_AS_AVX2) &&
-+	if (IS_REACHABLE(CONFIG_AS_AVX2) &&
- 	    boot_cpu_has(X86_FEATURE_AVX) &&
- 	    boot_cpu_has(X86_FEATURE_AVX2) &&
+@@ -224,12 +224,13 @@ static int __init poly1305_simd_mod_init(void)
  	    cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL))
  		static_branch_enable(&poly1305_use_avx2);
  
