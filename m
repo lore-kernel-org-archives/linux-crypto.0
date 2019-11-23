@@ -2,93 +2,96 @@ Return-Path: <SRS0=AJZI=ZP=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97F17C432C0
-	for <linux-crypto@archiver.kernel.org>; Sat, 23 Nov 2019 00:39:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BF4FC432C0
+	for <linux-crypto@archiver.kernel.org>; Sat, 23 Nov 2019 00:48:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 629C320731
-	for <linux-crypto@archiver.kernel.org>; Sat, 23 Nov 2019 00:39:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1574469593;
-	bh=gv9pxvgutuySJOL4jAp7Sn50N2BeMDsbJvO3Q8sIxxk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=RIRdSh87ps4yXWXxS7Rj22W2OXgSrPvaHHWMAmEUBGFdLJP8AR9+rK7WE+C6L7tzL
-	 nvbZADG/04WdHYDd8uVrMvWS6FaNPdqqLZhYh4De2P3Vkx9ayTMN/bOlKU0msDrTTX
-	 FlIK0JI6JfUwviSICL0PklF4IaMbDsO3kqYfMKsE=
+	by mail.kernel.org (Postfix) with ESMTP id 6E87A2070E
+	for <linux-crypto@archiver.kernel.org>; Sat, 23 Nov 2019 00:48:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=netronome-com.20150623.gappssmtp.com header.i=@netronome-com.20150623.gappssmtp.com header.b="b9dT9QGu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726666AbfKWAjw (ORCPT
+        id S1726736AbfKWAsw (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 22 Nov 2019 19:39:52 -0500
-Received: from mail-ot1-f66.google.com ([209.85.210.66]:37214 "EHLO
-        mail-ot1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726089AbfKWAjw (ORCPT
+        Fri, 22 Nov 2019 19:48:52 -0500
+Received: from mail-lj1-f196.google.com ([209.85.208.196]:44010 "EHLO
+        mail-lj1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726721AbfKWAsv (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 22 Nov 2019 19:39:52 -0500
-Received: by mail-ot1-f66.google.com with SMTP id d5so7797925otp.4;
-        Fri, 22 Nov 2019 16:39:50 -0800 (PST)
+        Fri, 22 Nov 2019 19:48:51 -0500
+Received: by mail-lj1-f196.google.com with SMTP id y23so9305523ljh.10
+        for <linux-crypto@vger.kernel.org>; Fri, 22 Nov 2019 16:48:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=netronome-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:in-reply-to:references
+         :organization:mime-version:content-transfer-encoding;
+        bh=CO1PvkNBKC29DHOlapGJKqbdGQIw7CGnLoX3d7miUss=;
+        b=b9dT9QGuKRAdsXfYMKphv0AIll/WvgeSmmKC+Bf6Ve9YF4POy2ijzM7FolFQQH28jR
+         4BvrmLKml4dTaKl2qonDiVEcEGXkCgo5ET3NsZtKVo47RcDisp5UsN/hlaIS7lvaFYUp
+         jbz7YNdzZJDRJWJQ4WWOu7t9zK/wtaNB2aI2buc7Nr18D/q63jWc3Z7mYUO089n4q563
+         e4S2RN45QhhQLsuMok34eWMRFAH8kCUAvKXyKrNN6QB8HZHwKmlN9Yd/fYQAOqk/Y/Qc
+         nVY1oYp4ojjPT9X/fPUq861WQKuzAGnHsn6b0C3fTo+/wLPOCfR7K9fHGRIXByTOnYHN
+         93yg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=tEgHxCiyiX1vvVmymHFYVTUbODIbpTwPwyJWeOdOzsw=;
-        b=qb5tY8LSdp1kdAtsevy+g4bauZLPdinL756/2GiLNpXLZETJYA83hlhms2DY1froNX
-         5OlnvVVKn+hli0yPq52cWpGdv/Dm+x7WTB58g5qYHW3L3UNMPWDMpE4/IJMmADNeNBli
-         cbbiIWiYGcnWPf2iwFMViWvP2UTgYg5YTxM7J2h5fPxMx6Z90hfz15nSnHT7lHZ49SFm
-         gATydOT5isq0f7mYsW22zUacoUjPF8pMZYv+bY9HNpnMPiqxaMpvGu3RJmP/kbUsqk0A
-         XzNePINk0pibQxidy1jt7cr9aWD5l/2hou70Q4qshFcbgM3XiLfdA+JECDBveuvAaawa
-         8sig==
-X-Gm-Message-State: APjAAAUCJfOieUHOWltiNgo0tUpL7AqH35lN5S+TmUPvgAhrcXfpV2CA
-        swAEf6kfrrP/C5olUdC79g==
-X-Google-Smtp-Source: APXvYqxyABAixVX6UI5qvZ5b6JowXXc/TuRvG5WegziVxYCjLu6SH7n/ghlJ1SoD2w77Id8T2Mgupg==
-X-Received: by 2002:a05:6830:2006:: with SMTP id e6mr13247748otp.260.1574469590171;
-        Fri, 22 Nov 2019 16:39:50 -0800 (PST)
-Received: from localhost (ip-70-5-93-147.ftwttx.spcsdns.net. [70.5.93.147])
-        by smtp.gmail.com with ESMTPSA id u143sm2632482oia.14.2019.11.22.16.39.48
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+         :references:organization:mime-version:content-transfer-encoding;
+        bh=CO1PvkNBKC29DHOlapGJKqbdGQIw7CGnLoX3d7miUss=;
+        b=SmZTI86Ft/pO87m4SB1Mo1F9Uo6Uf1uSlt/Ah6rRERGMptPjObQeIRgqkrg7V7Squi
+         vd532ezC6E4Sjaue8vDq/ptBcG9XVqOcyy6hLWeI9M5icgJaNdhffVapab79mDZxzHWf
+         lJs8iSsnzhL8miG1D4K2Bivgv+CiU+soO6ZGdwyNMhtWDXPUqP2okBgjZtwhLJ8u78Oq
+         9ZYwxqqQN+oKjCt5f4q6xzurXy9V9VRhCYAZr3t4QD2zxjqPEWkXRH6bPC76aIiG2mCP
+         TTlnWocRpkd+T/QaORZJkP4d7O0PXP4/Zjunz2YE6gjpuYsDgufT7FODA0JFOrRz8uoD
+         +buw==
+X-Gm-Message-State: APjAAAUBfILlGCLAll2gU5WDdYIVWPJtpa63xfVwGChHCyDs0e+zyY21
+        hV5S4v/uFVh7fv0Y+4sG4CvpIA==
+X-Google-Smtp-Source: APXvYqzrhPo6DSbsP2edvEoJaffajmaT8DOabrty6HjlIS7HrmOkDHtSYMhG+4Bp+cvrQ18E9F69DQ==
+X-Received: by 2002:a2e:c42:: with SMTP id o2mr113538ljd.222.1574470129738;
+        Fri, 22 Nov 2019 16:48:49 -0800 (PST)
+Received: from cakuba.netronome.com ([66.60.152.14])
+        by smtp.gmail.com with ESMTPSA id w11sm3786846lfe.56.2019.11.22.16.48.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Nov 2019 16:39:49 -0800 (PST)
-Date:   Fri, 22 Nov 2019 18:39:48 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     Stephen Brennan <stephen@brennan.io>
-Cc:     stephen@brennan.io, Mark Rutland <mark.rutland@arm.com>,
-        devicetree@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Scott Branden <sbranden@broadcom.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-arm-kernel@lists.infradead.org, Ray Jui <rjui@broadcom.com>,
-        linux-kernel@vger.kernel.org, Eric Anholt <eric@anholt.net>,
-        bcm-kernel-feedback-list@broadcom.com,
-        Stefan Wahren <wahrenst@gmx.net>,
-        Matt Mackall <mpm@selenic.com>, Arnd Bergmann <arnd@arndb.de>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v3 1/4] dt-bindings: rng: add BCM2711 RNG compatible
-Message-ID: <20191123003948.GA13973@bogus>
-References: <20191120031622.88949-1-stephen@brennan.io>
- <20191120031622.88949-2-stephen@brennan.io>
+        Fri, 22 Nov 2019 16:48:49 -0800 (PST)
+Date:   Fri, 22 Nov 2019 16:48:42 -0800
+From:   Jakub Kicinski <jakub.kicinski@netronome.com>
+To:     Rahul Lakkireddy <rahul.lakkireddy@chelsio.com>
+Cc:     netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+        davem@davemloft.net, herbert@gondor.apana.org.au,
+        nirranjan@chelsio.com, atul.gupta@chelsio.com, vishal@chelsio.com,
+        dt@chelsio.com
+Subject: Re: [PATCH net-next v2 0/3] cxgb4: add UDP Segmentation Offload
+ support
+Message-ID: <20191122164842.1d040c81@cakuba.netronome.com>
+In-Reply-To: <cover.1574383652.git.rahul.lakkireddy@chelsio.com>
+References: <cover.1574383652.git.rahul.lakkireddy@chelsio.com>
+Organization: Netronome Systems, Ltd.
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191120031622.88949-2-stephen@brennan.io>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 19 Nov 2019 19:16:19 -0800, Stephen Brennan wrote:
-> From: Stefan Wahren <wahrenst@gmx.net>
+On Fri, 22 Nov 2019 06:30:00 +0530, Rahul Lakkireddy wrote:
+> This series of patches add UDP Segmentation Offload (USO) supported
+> by Chelsio T5/T6 NICs.
 > 
-> The BCM2711 has a RNG200 block, so document its compatible string.
+> Patch 1 updates the current Scatter Gather List (SGL) DMA unmap logic
+> for USO requests.
 > 
-> Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
-> Signed-off-by: Stephen Brennan <stephen@brennan.io>
-> ---
->  Documentation/devicetree/bindings/rng/brcm,iproc-rng200.txt | 1 +
->  1 file changed, 1 insertion(+)
+> Patch 2 adds USO support for NIC and MQPRIO QoS offload Tx path.
 > 
+> Patch 3 adds missing stats for MQPRIO QoS offload Tx path.
+> 
+> Thanks,
+> Rahul
+> 
+> v2:
+> - Remove inline keyword from write_eo_udp_wr() in sge.c in patch 2.
+>   Let the compiler decide.
 
-Acked-by: Rob Herring <robh@kernel.org>
+Okay, these are good enough, so applied to net-next. Thanks!
