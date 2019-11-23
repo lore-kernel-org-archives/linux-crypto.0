@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C968AC432C0
-	for <linux-crypto@archiver.kernel.org>; Sat, 23 Nov 2019 20:40:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB07FC432C3
+	for <linux-crypto@archiver.kernel.org>; Sat, 23 Nov 2019 20:40:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8F34A2071B
-	for <linux-crypto@archiver.kernel.org>; Sat, 23 Nov 2019 20:40:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C9EE20706
+	for <linux-crypto@archiver.kernel.org>; Sat, 23 Nov 2019 20:40:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="JCp+przu"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="SIWzsxcy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727370AbfKWUk3 (ORCPT
+        id S1727166AbfKWUjv (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 23 Nov 2019 15:40:29 -0500
-Received: from mo4-p02-ob.smtp.rzone.de ([85.215.255.80]:28284 "EHLO
-        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727149AbfKWUjx (ORCPT
+        Sat, 23 Nov 2019 15:39:51 -0500
+Received: from mo4-p04-ob.smtp.rzone.de ([81.169.146.177]:20781 "EHLO
+        mo4-p04-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726638AbfKWUju (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 23 Nov 2019 15:39:53 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1574541587;
+        Sat, 23 Nov 2019 15:39:50 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1574541588;
         s=strato-dkim-0002; d=chronox.de;
         h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
         X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=hNEjiDimYRZ64sBt17mfpqbaaOALcpilHA9DMXjGvYQ=;
-        b=JCp+przupe+8EEfBgqrELNij72Y2RGpKaZg2ztg3P/hoNvCnptvtiKgr7cNkAx3lyN
-        7VzsFCI6WWeK7G0XjeuL4U1P4GEpoxg/xbO825Fi/mSvP4YLUYxUTN0E7f8Q/z3s5Jkl
-        sPa8EsUPFQhUhVQ+Bp++Ri0qnEkPYzEgkcD3RA4Ymqnqm6zdG1n8OxintyDt/eff39fa
-        K5xN464KWdToDBwaYXQbgjaVwIqJPlBnSKpaKzBwxWftBAogJO9g7VhvRYgsV7qhqolN
-        h2wd0w3janyngeNnJMxRlOKEsOnL4alhzR5jifK+NhThxcZxy1uAwI8x8c+/YtYzbPcQ
-        KhSg==
+        bh=+9pvk9ZDlZUHmWQLjDe5Bin9DRZFPCDlC4EvIJp/HGw=;
+        b=SIWzsxcygV7ty8LH2l4ID9/U79I5yHDTGaWTE5lZX1VjiX8VEbdpnZ7BaNcuKpBHxt
+        Fj861xOvPvoxJgpIQkGgDP/41PhJZ9ZV9iUdKKVMBs+767Xn+7WXEKJ02BPGfKS8VTVl
+        n1tW1lfbb2G1KR6pLmJWSpZqvRkQ2tNS96Uax9zW0N+icri6kwNNE7Pp4qzxobX6kE4Y
+        oxM2ZO8TTP01qx2Z5rNcEf/kuYRB8DWSZkNgSUy/VvNEGAbaPr5LH2knCu4dPem1ETKt
+        WY9KOPdx6W8ABFLQPfjtNrXNC7zJwxJBz3CEsFU10GJVSBecUnpll4DIKgLOl1pgvOHx
+        JdDA==
 X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzHHXDaJfSfWrhX"
 X-RZG-CLASS-ID: mo00
 Received: from positron.chronox.de
         by smtp.strato.de (RZmta 44.29.0 DYNA|AUTH)
-        with ESMTPSA id N09a57vANKcR3yP
+        with ESMTPSA id N09a57vANKca3yX
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
         (Client did not present a certificate);
-        Sat, 23 Nov 2019 21:38:27 +0100 (CET)
+        Sat, 23 Nov 2019 21:38:36 +0100 (CET)
 From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 To:     Arnd Bergmann <arnd@arndb.de>
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -66,9 +66,9 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Roman Drahtmueller <draht@schaltsekun.de>,
         Neil Horman <nhorman@redhat.com>,
         Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH v26 12/12] LRNG - add interface for gathering of raw entropy
-Date:   Sat, 23 Nov 2019 21:35:23 +0100
-Message-ID: <3742813.K7GG538zxB@positron.chronox.de>
+Subject: [PATCH v26 05/12] crypto: DRBG - externalize DRBG functions for LRNG
+Date:   Sat, 23 Nov 2019 21:31:51 +0100
+Message-ID: <5451049.LYQJoY4i8T@positron.chronox.de>
 In-Reply-To: <2722222.P16TYeLAVu@positron.chronox.de>
 References: <6157374.ptSnyUpaCn@positron.chronox.de> <2787174.DQlWHN5GGo@positron.chronox.de> <2722222.P16TYeLAVu@positron.chronox.de>
 MIME-Version: 1.0
@@ -79,23 +79,8 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The test interface allows a privileged process to capture the raw
-unconditioned noise that is collected by the LRNG for statistical
-analysis. Such testing allows the analysis how much entropy
-the interrupt noise source provides on a given platform.
-Extracted noise data is not used to seed the LRNG. This
-is a test interface and not appropriate for production systems.
-Yet, the interface is considered to be sufficiently secured for
-production systems.
-
-Access to the data is given through the lrng_raw debugfs file. The
-data buffer should be multiples of sizeof(u32) to fill the entire
-buffer. Using the option lrng_testing.boot_test=3D1 the raw noise of
-the first 1000 entropy events since boot can be sampled.
-
-This test interface allows generating the data required for
-analysis whether the LRNG is in compliance with SP800-90B
-sections 3.1.3 and 3.1.4.
+This patch allows several DRBG functions to be called by the LRNG kernel
+code paths outside the drbg.c file.
 
 CC: "Eric W. Biederman" <ebiederm@xmission.com>
 CC: "Alexander E. Patrakov" <patrakov@gmail.com>
@@ -119,325 +104,122 @@ Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
 Tested-by: Neil Horman <nhorman@redhat.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 =2D--
- drivers/char/lrng/Kconfig        |  16 ++
- drivers/char/lrng/Makefile       |   1 +
- drivers/char/lrng/lrng_testing.c | 269 +++++++++++++++++++++++++++++++
- 3 files changed, 286 insertions(+)
- create mode 100644 drivers/char/lrng/lrng_testing.c
+ crypto/drbg.c         | 16 ++++++++++------
+ include/crypto/drbg.h |  7 +++++++
+ 2 files changed, 17 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/char/lrng/Kconfig b/drivers/char/lrng/Kconfig
-index e6ca3acc1e48..9335761cb2ba 100644
-=2D-- a/drivers/char/lrng/Kconfig
-+++ b/drivers/char/lrng/Kconfig
-@@ -169,4 +169,20 @@ config LRNG_APT_CUTOFF
- 	default 325 if !LRNG_APT_BROKEN
- 	default 32 if LRNG_APT_BROKEN
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index b6929eb5f565..5561dd0f09e1 100644
+=2D-- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -113,7 +113,7 @@
+  * the SHA256 / AES 256 over other ciphers. Thus, the favored
+  * DRBGs are the latest entries in this array.
+  */
+=2Dstatic const struct drbg_core drbg_cores[] =3D {
++const struct drbg_core drbg_cores[] =3D {
+ #ifdef CONFIG_CRYPTO_DRBG_CTR
+ 	{
+ 		.flags =3D DRBG_CTR | DRBG_STRENGTH128,
+@@ -190,6 +190,7 @@ static const struct drbg_core drbg_cores[] =3D {
+ 	},
+ #endif /* CONFIG_CRYPTO_DRBG_HMAC */
+ };
++EXPORT_SYMBOL(drbg_cores);
 =20
-+config LRNG_TESTING
-+	bool "Enable entropy test interface to LRNG noise source"
-+	depends on DEBUG_FS
-+	help
-+	  The test interface allows a privileged process to capture
-+	  the raw unconditioned noise that is collected by the LRNG
-+	  for statistical analysis. Extracted noise data is not used
-+	  to seed the LRNG.
+ static int drbg_uninstantiate(struct drbg_state *drbg);
+=20
+@@ -205,7 +206,7 @@ static int drbg_uninstantiate(struct drbg_state *drbg);
+  * Return: normalized strength in *bytes* value or 32 as default
+  *	   to counter programming errors
+  */
+=2Dstatic inline unsigned short drbg_sec_strength(drbg_flag_t flags)
++unsigned short drbg_sec_strength(drbg_flag_t flags)
+ {
+ 	switch (flags & DRBG_STRENGTH_MASK) {
+ 	case DRBG_STRENGTH128:
+@@ -218,6 +219,7 @@ static inline unsigned short drbg_sec_strength(drbg_fla=
+g_t flags)
+ 		return 32;
+ 	}
+ }
++EXPORT_SYMBOL(drbg_sec_strength);
+=20
+ /*
+  * FIPS 140-2 continuous self test for the noise source
+@@ -1202,7 +1204,7 @@ static int drbg_seed(struct drbg_state *drbg, struct =
+drbg_string *pers,
+ }
+=20
+ /* Free all substructures in a DRBG state without the DRBG state structure=
+ */
+=2Dstatic inline void drbg_dealloc_state(struct drbg_state *drbg)
++void drbg_dealloc_state(struct drbg_state *drbg)
+ {
+ 	if (!drbg)
+ 		return;
+@@ -1223,12 +1225,13 @@ static inline void drbg_dealloc_state(struct drbg_s=
+tate *drbg)
+ 		drbg->fips_primed =3D false;
+ 	}
+ }
++EXPORT_SYMBOL(drbg_dealloc_state);
+=20
+ /*
+  * Allocate all sub-structures for a DRBG state.
+  * The DRBG state structure must already be allocated.
+  */
+=2Dstatic inline int drbg_alloc_state(struct drbg_state *drbg)
++int drbg_alloc_state(struct drbg_state *drbg)
+ {
+ 	int ret =3D -ENOMEM;
+ 	unsigned int sb_size =3D 0;
+@@ -1307,6 +1310,7 @@ static inline int drbg_alloc_state(struct drbg_state =
+*drbg)
+ 	drbg_dealloc_state(drbg);
+ 	return ret;
+ }
++EXPORT_SYMBOL(drbg_alloc_state);
+=20
+ /*************************************************************************
+  * DRBG interface functions
+@@ -1874,8 +1878,7 @@ static int drbg_kcapi_sym_ctr(struct drbg_state *drbg,
+  *
+  * return: flags
+  */
+=2Dstatic inline void drbg_convert_tfm_core(const char *cra_driver_name,
+=2D					 int *coreref, bool *pr)
++void drbg_convert_tfm_core(const char *cra_driver_name, int *coreref, bool=
+ *pr)
+ {
+ 	int i =3D 0;
+ 	size_t start =3D 0;
+@@ -1902,6 +1905,7 @@ static inline void drbg_convert_tfm_core(const char *=
+cra_driver_name,
+ 		}
+ 	}
+ }
++EXPORT_SYMBOL(drbg_convert_tfm_core);
+=20
+ static int drbg_kcapi_init(struct crypto_tfm *tfm)
+ {
+diff --git a/include/crypto/drbg.h b/include/crypto/drbg.h
+index 8c9af21efce1..c63b20375235 100644
+=2D-- a/include/crypto/drbg.h
++++ b/include/crypto/drbg.h
+@@ -282,4 +282,11 @@ enum drbg_prefixes {
+ 	DRBG_PREFIX3
+ };
+=20
++extern int drbg_alloc_state(struct drbg_state *drbg);
++extern void drbg_dealloc_state(struct drbg_state *drbg);
++extern void drbg_convert_tfm_core(const char *cra_driver_name, int *corere=
+f,
++				  bool *pr);
++extern const struct drbg_core drbg_cores[];
++extern unsigned short drbg_sec_strength(drbg_flag_t flags);
 +
-+	  The raw noise data can be obtained using the lrng_raw
-+	  debugfs file. Using the option lrng_testing.boot_test=3D1
-+	  the raw noise of the first 1000 entropy events since boot
-+	  can be sampled.
-+
-+	  If unsure, say N.
-+
- endif # LRNG
-diff --git a/drivers/char/lrng/Makefile b/drivers/char/lrng/Makefile
-index 0713e9c0aa6e..c0b6cc4301fe 100644
-=2D-- a/drivers/char/lrng/Makefile
-+++ b/drivers/char/lrng/Makefile
-@@ -16,3 +16,4 @@ obj-$(CONFIG_LRNG_KCAPI)	+=3D lrng_kcapi.o
- obj-$(CONFIG_LRNG_JENT)		+=3D lrng_jent.o
- obj-$(CONFIG_LRNG_TRNG_SUPPORT)	+=3D lrng_trng.o
- obj-$(CONFIG_LRNG_HEALTH_TESTS)	+=3D lrng_health.o
-+obj-$(CONFIG_LRNG_TESTING)	+=3D lrng_testing.o
-diff --git a/drivers/char/lrng/lrng_testing.c b/drivers/char/lrng/lrng_test=
-ing.c
-new file mode 100644
-index 000000000000..718a24660773
-=2D-- /dev/null
-+++ b/drivers/char/lrng/lrng_testing.c
-@@ -0,0 +1,269 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
-+/*
-+ * Linux Random Number Generator (LRNG) Raw entropy collection tool
-+ *
-+ * Copyright (C) 2019, Stephan Mueller <smueller@chronox.de>
-+ */
-+
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
-+#include <linux/atomic.h>
-+#include <linux/bug.h>
-+#include <linux/debugfs.h>
-+#include <linux/module.h>
-+#include <linux/sched.h>
-+#include <linux/sched/signal.h>
-+#include <linux/slab.h>
-+#include <linux/string.h>
-+#include <linux/types.h>
-+#include <linux/uaccess.h>
-+#include <linux/workqueue.h>
-+#include <asm/errno.h>
-+
-+#include "lrng_internal.h"
-+
-+#define LRNG_TESTING_RINGBUFFER_SIZE	1024
-+#define LRNG_TESTING_RINGBUFFER_MASK	(LRNG_TESTING_RINGBUFFER_SIZE - 1)
-+
-+static u32 lrng_testing_rb[LRNG_TESTING_RINGBUFFER_SIZE];
-+static u32 lrng_rb_reader =3D 0;
-+static u32 lrng_rb_writer =3D 0;
-+static atomic_t lrng_testing_enabled =3D ATOMIC_INIT(0);
-+
-+static DECLARE_WAIT_QUEUE_HEAD(lrng_raw_read_wait);
-+static DEFINE_SPINLOCK(lrng_raw_lock);
-+
-+/*
-+ * 0 =3D=3D> No boot test, gathering of runtime data allowed
-+ * 1 =3D=3D> Boot test enabled and ready for collecting data, gathering ru=
-ntime
-+ *	 data is disabled
-+ * 2 =3D=3D> Boot test completed and disabled, gathering of runtime data is
-+ *	 disabled
-+ */
-+static u32 boot_test =3D 0;
-+module_param(boot_test, uint, 0644);
-+MODULE_PARM_DESC(boot_test, "Enable gathering boot time entropy of the fir=
-st"
-+			    " entropy events");
-+
-+static inline void lrng_raw_entropy_reset(void)
-+{
-+	unsigned long flags;
-+
-+	spin_lock_irqsave(&lrng_raw_lock, flags);
-+	lrng_rb_reader =3D 0;
-+	lrng_rb_writer =3D 0;
-+	spin_unlock_irqrestore(&lrng_raw_lock, flags);
-+}
-+
-+static void lrng_raw_entropy_init(void)
-+{
-+	/*
-+	 * The boot time testing implies we have a running test. If the
-+	 * caller wants to clear it, he has to unset the boot_test flag
-+	 * at runtime via sysfs to enable regular runtime testing
-+	 */
-+	if (boot_test)
-+		return;
-+
-+	lrng_raw_entropy_reset();
-+	atomic_set(&lrng_testing_enabled, 1);
-+	pr_warn("Enabling raw entropy collection\n");
-+}
-+
-+static void lrng_raw_entropy_fini(void)
-+{
-+	if (boot_test)
-+		return;
-+
-+	atomic_set(&lrng_testing_enabled, 0);
-+	lrng_raw_entropy_reset();
-+	pr_warn("Disabling raw entropy collection\n");
-+}
-+
-+bool lrng_raw_entropy_store(u32 value)
-+{
-+	unsigned long flags;
-+
-+	if (!atomic_read(&lrng_testing_enabled) && (boot_test !=3D 1))
-+		return false;
-+
-+	spin_lock_irqsave(&lrng_raw_lock, flags);
-+
-+	/*
-+	 * Disable entropy testing for boot time testing after ring buffer
-+	 * is filled.
-+	 */
-+	if (boot_test) {
-+		if (lrng_rb_writer > LRNG_TESTING_RINGBUFFER_SIZE) {
-+			boot_test =3D 2;
-+			pr_warn_once("Boot time entropy collection test "
-+				     "disabled\n");
-+			spin_unlock_irqrestore(&lrng_raw_lock, flags);
-+			return false;
-+		}
-+
-+		if (lrng_rb_writer =3D=3D 1)
-+			pr_warn("Boot time entropy collection test enabled\n");
-+	}
-+
-+	lrng_testing_rb[lrng_rb_writer & LRNG_TESTING_RINGBUFFER_MASK] =3D value;
-+	lrng_rb_writer++;
-+
-+	spin_unlock_irqrestore(&lrng_raw_lock, flags);
-+
-+	if (wq_has_sleeper(&lrng_raw_read_wait))
-+		wake_up_interruptible(&lrng_raw_read_wait);
-+
-+	return true;
-+}
-+
-+static inline bool lrng_raw_have_data(void)
-+{
-+	return ((lrng_rb_writer & LRNG_TESTING_RINGBUFFER_MASK) !=3D
-+		 (lrng_rb_reader & LRNG_TESTING_RINGBUFFER_MASK));
-+}
-+
-+static int lrng_raw_entropy_reader(u8 *outbuf, u32 outbuflen)
-+{
-+	unsigned long flags;
-+	int collected_data =3D 0;
-+
-+	lrng_raw_entropy_init();
-+
-+	while (outbuflen) {
-+		spin_lock_irqsave(&lrng_raw_lock, flags);
-+
-+		/* We have no data or reached the writer. */
-+		if (!lrng_rb_writer || (lrng_rb_writer =3D=3D lrng_rb_reader)) {
-+
-+			spin_unlock_irqrestore(&lrng_raw_lock, flags);
-+
-+			/*
-+			 * Now we gathered all boot data, enable regular data
-+			 * collection.
-+			 */
-+			if (boot_test) {
-+				boot_test =3D 0;
-+				goto out;
-+			}
-+
-+			wait_event_interruptible(lrng_raw_read_wait,
-+						 lrng_raw_have_data());
-+			if (signal_pending(current)) {
-+				collected_data =3D -ERESTARTSYS;
-+				goto out;
-+			}
-+
-+			continue;
-+		}
-+
-+		/* We copy out word-wise */
-+		if (outbuflen < sizeof(u32))
-+			goto out;
-+
-+		memcpy(outbuf, &lrng_testing_rb[lrng_rb_reader], sizeof(u32));
-+		lrng_rb_reader++;
-+
-+		spin_unlock_irqrestore(&lrng_raw_lock, flags);
-+
-+		outbuf +=3D sizeof(u32);
-+		outbuflen -=3D sizeof(u32);
-+		collected_data +=3D sizeof(u32);
-+	}
-+
-+out:
-+	lrng_raw_entropy_fini();
-+	return collected_data;
-+}
-+
-+/**************************************************************************
-+ * Debugfs interface
-+ *************************************************************************=
-*/
-+static int lrng_raw_extract_user(char __user *buf, size_t nbytes)
-+{
-+	u8 *tmp, *tmp_aligned;
-+	int ret =3D 0, large_request =3D (nbytes > 256);
-+
-+	/*
-+	 * The intention of this interface is for collecting at least
-+	 * 1000 samples due to the SP800-90B requirements. So, we make no
-+	 * effort in avoiding allocating more memory that actually needed
-+	 * by the user. Hence, we allocate sufficient memory to always hold
-+	 * that amount of data.
-+	 */
-+	tmp =3D kmalloc(LRNG_TESTING_RINGBUFFER_SIZE + sizeof(u32), GFP_KERNEL);
-+	if (!tmp)
-+		return -ENOMEM;
-+
-+	tmp_aligned =3D PTR_ALIGN(tmp, sizeof(u32));
-+
-+	while (nbytes) {
-+		int i;
-+
-+		if (large_request && need_resched()) {
-+			if (signal_pending(current)) {
-+				if (ret =3D=3D 0)
-+					ret =3D -ERESTARTSYS;
-+				break;
-+			}
-+			schedule();
-+		}
-+
-+		i =3D min_t(int, nbytes, LRNG_TESTING_RINGBUFFER_SIZE);
-+		i =3D lrng_raw_entropy_reader(tmp_aligned, i);
-+		if (i <=3D 0) {
-+			if (i < 0)
-+				ret =3D i;
-+			break;
-+		}
-+		if (copy_to_user(buf, tmp_aligned, i)) {
-+			ret =3D -EFAULT;
-+			break;
-+		}
-+
-+		nbytes -=3D i;
-+		buf +=3D i;
-+		ret +=3D i;
-+	}
-+
-+	kzfree(tmp);
-+	return ret;
-+}
-+
-+/* DebugFS operations and definition of the debugfs files */
-+static ssize_t lrng_raw_read(struct file *file, char __user *to,
-+			     size_t count, loff_t *ppos)
-+{
-+	loff_t pos =3D *ppos;
-+	int ret;
-+
-+	if (!count)
-+		return 0;
-+
-+	ret =3D lrng_raw_extract_user(to, count);
-+	if (ret < 0)
-+		return ret;
-+
-+	count -=3D ret;
-+	*ppos =3D pos + count;
-+
-+	return ret;
-+}
-+
-+static struct file_operations lrng_raw_name_fops =3D {
-+	.owner =3D THIS_MODULE,
-+	.read =3D lrng_raw_read,
-+};
-+
-+static int __init lrng_raw_init(void)
-+{
-+	struct dentry *lrng_raw_debugfs_root;
-+
-+	lrng_raw_debugfs_root =3D debugfs_create_dir(KBUILD_MODNAME, NULL);
-+	debugfs_create_file_unsafe("lrng_raw", 0400, lrng_raw_debugfs_root,
-+				   NULL, &lrng_raw_name_fops);
-+
-+	return 0;
-+}
-+
-+module_init(lrng_raw_init);
+ #endif /* _DRBG_H */
 =2D-=20
 2.23.0
 
