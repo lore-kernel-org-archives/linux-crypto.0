@@ -1,52 +1,69 @@
-Return-Path: <SRS0=AJZI=ZP=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=C2vA=ZQ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 877A2C43215
-	for <linux-crypto@archiver.kernel.org>; Sat, 23 Nov 2019 20:40:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE8ABC432C0
+	for <linux-crypto@archiver.kernel.org>; Sun, 24 Nov 2019 04:51:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 577AE204FD
-	for <linux-crypto@archiver.kernel.org>; Sat, 23 Nov 2019 20:40:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B4FFA20830
+	for <linux-crypto@archiver.kernel.org>; Sun, 24 Nov 2019 04:51:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="dixvTwZc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cqqaBO8r"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727121AbfKWUjp (ORCPT
+        id S1726803AbfKXEvg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 23 Nov 2019 15:39:45 -0500
-Received: from mo4-p04-ob.smtp.rzone.de ([85.215.255.124]:8933 "EHLO
-        mo4-p04-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726638AbfKWUjo (ORCPT
+        Sat, 23 Nov 2019 23:51:36 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:33820 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726705AbfKXEvg (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 23 Nov 2019 15:39:44 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1574541578;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=p+/Xlqo7If7tuaOyfbuWJk4O4l5TUpTRKUwTp4QXRWc=;
-        b=dixvTwZcrp6YEZDBouKrzhyE/9++I3kVpX4ye77PmBGwDYvrP+rvBPPjfqF/UcLmm0
-        R4HqcMpxWwszzpgYoTsjioT+Tt1HyEXnbftv0OFuYLJmHE5ruppBf7PqnGjA8+L8BrDK
-        WWBLt8DBKisDyWyyMWdp+W/l1t30MF5/Ppgb+Ct1q08DDpMH5l9BLZYvzuP59iiYq+9+
-        DLVvue7C3lJQl9CG12xjs1hTvjdmYs3v/RYQUAL82xnCjjFaw2grusxTxzHATQXPibgX
-        D+Xrz/TYuiqwViKGLlG0MXHq8uP2r26hC/wmslAwYDHAZN94AnW1hP+6PwQJ3/uacpK1
-        QRTQ==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzHHXDaJfSfWrhX"
-X-RZG-CLASS-ID: mo00
-Received: from positron.chronox.de
-        by smtp.strato.de (RZmta 44.29.0 DYNA|AUTH)
-        with ESMTPSA id N09a57vANKcd3ya
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (curve secp521r1 with 521 ECDH bits, eq. 15360 bits RSA))
-        (Client did not present a certificate);
-        Sat, 23 Nov 2019 21:38:39 +0100 (CET)
-From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        linux-api@vger.kernel.org,
+        Sat, 23 Nov 2019 23:51:36 -0500
+Received: by mail-wr1-f67.google.com with SMTP id t2so13415832wrr.1;
+        Sat, 23 Nov 2019 20:51:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=UMNvMZ2fiueHFeBLtH1yqoxzy6gBcmr82O5GZYCic0I=;
+        b=cqqaBO8rwLZCQAQHTXvCo2RUBKkg8tdFoISyP22RXsT8TTixtNpakZvXcy6Yd/mQIX
+         sSt4Wd4DXjh34IK6EX00eNiCIJhjF4YyFXVyOMgNzWIRzt4rIUqz0ibinZKsOOU2Bd+k
+         MqZ8DJcC7B2lXlns95IdHGkfWSuBxOzflkmFJziQvDK0lwAHvJmnWrp1lLnFzogIQmUf
+         P83uCcRySIPT4G9dAx3Xs9RzwvIUC/QOfgczueCPmJmjkMTTOMaXckNXxRjF+Gp2tVjh
+         fNPFNNp+vUugcdWyBf/a9ZZur8HzS5F44nlHVKsxTq+lo+gLLQr3EkumPuLgTtt2JTmv
+         ffKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=UMNvMZ2fiueHFeBLtH1yqoxzy6gBcmr82O5GZYCic0I=;
+        b=m8w8bieCVaPa2snwVztCmToLo9S7mK3mCXywWBtlpIU//INUSVcawK/Scp3G+fzQOJ
+         MDB9Z2rzHTxz2qRMtakzDC0SF/nMnYmlbNVxNXj2H+ZVMVx/jckhIbIG4FeS63yUP3Ty
+         aOcbSEeilsuYcZeMBordWb4HrveBaoRt5xDhPi+aWUaiOBObM+eifYbHSQRjfozuAE3d
+         86gTm1q9GaD/QnWnxwKx2Wo8Jn5YWCLq6GaPld1xCa4R5AAs9yyDAMDNm6H++VC4mLh1
+         nJ4Jdeth6iNHGhWc0CnnkhetBVJ7S6vYA+v47YLP+7ELJIVIY/5zTlxojc3PFtJtwz4z
+         cWLw==
+X-Gm-Message-State: APjAAAWZ7CCbdmvcYnpR0kAZ2gXa1R9FmuEVnOaLmxN9RavepJDGfBar
+        sWXE7LjHXhlVfErlykRM9Vl950KnFOfN1acVuBQ=
+X-Google-Smtp-Source: APXvYqzbmBMaUZ7OFJ0tend1/u7Cs6qVFDD/rGCvqIMqwRuT0rDHfIou/pqOPQldrOCGd5rCi9+hdcY/eGpacKVnWhE=
+X-Received: by 2002:adf:ea8d:: with SMTP id s13mr24873434wrm.366.1574571093582;
+ Sat, 23 Nov 2019 20:51:33 -0800 (PST)
+MIME-Version: 1.0
+References: <6157374.ptSnyUpaCn@positron.chronox.de> <2369119.jSEA3qhmGI@positron.chronox.de>
+In-Reply-To: <2369119.jSEA3qhmGI@positron.chronox.de>
+From:   Sandy Harris <sandyinchina@gmail.com>
+Date:   Sun, 24 Nov 2019 12:51:19 +0800
+Message-ID: <CACXcFmkBQAZd4bSfQvqeCsoTjMr0-uSjKciD6y9EkMN3c9ppJw@mail.gmail.com>
+Subject: Re: [PATCH v24 01/12] Linux Random Number Generator
+To:     =?UTF-8?Q?Stephan_M=C3=BCller?= <smueller@chronox.de>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, linux-api@vger.kernel.org,
         "Eric W. Biederman" <ebiederm@xmission.com>,
         "Alexander E. Patrakov" <patrakov@gmail.com>,
         "Ahmed S. Darwish" <darwish.07@gmail.com>,
@@ -64,207 +81,51 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         "Peter, Matthias" <matthias.peter@bsi.bund.de>,
         Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
         Roman Drahtmueller <draht@schaltsekun.de>,
-        Neil Horman <nhorman@redhat.com>,
-        Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH v26 02/12] LRNG - allocate one SDRNG instance per NUMA node
-Date:   Sat, 23 Nov 2019 21:10:41 +0100
-Message-ID: <56236375.DK8cemDQLA@positron.chronox.de>
-In-Reply-To: <2722222.P16TYeLAVu@positron.chronox.de>
-References: <6157374.ptSnyUpaCn@positron.chronox.de> <2787174.DQlWHN5GGo@positron.chronox.de> <2722222.P16TYeLAVu@positron.chronox.de>
-MIME-Version: 1.0
+        Neil Horman <nhorman@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In order to improve NUMA-locality when serving getrandom(2) requests,
-allocate one DRNG instance per node.
+Stephan M=C3=BCller <smueller@chronox.de> wrote:
 
-The SDRNG instance that is present right from the start of the kernel is
-reused as the first per-NUMA-node SDRNG. For all remaining online NUMA
-nodes a new SDRNG instance is allocated.
+> In an effort to provide a flexible implementation for a random number
+> generator that also ...
 
-During boot time, the multiple SDRNG instances are seeded sequentially.
-With this, the first SDRNG instance (referenced as the initial SDRNG
-in the code) is completely seeded with 256 bits of entropy before the
-next SDRNG instance is completely seeded.
+As usual, some of your proposals make considerable sense to me &
+others do not, at least on first reading. I may have more comments
+after reflecting some.
 
-When random numbers are requested, the NUMA-node-local SDRNG is checked
-whether it has been already fully seeded. If this is not the case, the
-initial SDRNG is used to serve the request.
+Meanwhile, a couple of things jump out at me:
 
-CC: "Eric W. Biederman" <ebiederm@xmission.com>
-CC: "Alexander E. Patrakov" <patrakov@gmail.com>
-CC: "Ahmed S. Darwish" <darwish.07@gmail.com>
-CC: "Theodore Y. Ts'o" <tytso@mit.edu>
-CC: Willy Tarreau <w@1wt.eu>
-CC: Matthew Garrett <mjg59@srcf.ucam.org>
-CC: Vito Caputo <vcaputo@pengaru.com>
-CC: Andreas Dilger <adilger.kernel@dilger.ca>
-CC: Jan Kara <jack@suse.cz>
-CC: Ray Strode <rstrode@redhat.com>
-CC: William Jon McCann <mccann@jhu.edu>
-CC: zhangjs <zachary@baishancloud.com>
-CC: Andy Lutomirski <luto@kernel.org>
-CC: Florian Weimer <fweimer@redhat.com>
-CC: Lennart Poettering <mzxreary@0pointer.de>
-CC: Nicolai Stange <nstange@suse.de>
-Reviewed-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
-Reviewed-by: Roman Drahtmueller <draht@schaltsekun.de>
-Tested-by: Roman Drahtm=FCller <draht@schaltsekun.de>
-Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
-Tested-by: Neil Horman <nhorman@redhat.com>
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
-=2D--
- drivers/char/lrng/Makefile        |   2 +
- drivers/char/lrng/lrng_internal.h |   5 ++
- drivers/char/lrng/lrng_numa.c     | 101 ++++++++++++++++++++++++++++++
- 3 files changed, 108 insertions(+)
- create mode 100644 drivers/char/lrng/lrng_numa.c
+>  (a) When an interrupt occurs, the high-resolution time stamp is mixed
+> into the LFSR. ...
+>
+>  (b) HID event data like the key stroke or the mouse coordinates are
+> mixed into the LFSR. ...
+>
+>  (c) Device drivers may provide data that is mixed into the LFSR. ...
 
-diff --git a/drivers/char/lrng/Makefile b/drivers/char/lrng/Makefile
-index 2761623715d2..a00cddb45773 100644
-=2D-- a/drivers/char/lrng/Makefile
-+++ b/drivers/char/lrng/Makefile
-@@ -7,3 +7,5 @@ obj-y				+=3D lrng_pool.o lrng_aux.o \
- 				   lrng_sw_noise.o lrng_archrandom.o \
- 				   lrng_sdrng.o lrng_chacha20.o \
- 				   lrng_interfaces.o \
-+
-+obj-$(CONFIG_NUMA)		+=3D lrng_numa.o
-diff --git a/drivers/char/lrng/lrng_internal.h b/drivers/char/lrng/lrng_int=
-ernal.h
-index 675ba28bd2e6..fb7890939089 100644
-=2D-- a/drivers/char/lrng/lrng_internal.h
-+++ b/drivers/char/lrng/lrng_internal.h
-@@ -261,8 +261,13 @@ int lrng_sdrng_get_sleep(u8 *outbuf, u32 outbuflen);
- void lrng_sdrng_force_reseed(void);
- void lrng_sdrng_seed_work(struct work_struct *dummy);
-=20
-+#ifdef CONFIG_NUMA
-+struct lrng_sdrng **lrng_sdrng_instances(void);
-+void lrng_drngs_numa_alloc(void);
-+#else	/* CONFIG_NUMA */
- static inline struct lrng_sdrng **lrng_sdrng_instances(void) { return NULL=
-; }
- static inline void lrng_drngs_numa_alloc(void) { return; }
-+#endif /* CONFIG_NUMA */
-=20
- /************************** Health Test linking code *********************=
-*****/
-=20
-diff --git a/drivers/char/lrng/lrng_numa.c b/drivers/char/lrng/lrng_numa.c
-new file mode 100644
-index 000000000000..5401f927919a
-=2D-- /dev/null
-+++ b/drivers/char/lrng/lrng_numa.c
-@@ -0,0 +1,101 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
-+/*
-+ * LRNG NUMA support
-+ *
-+ * Copyright (C) 2016 - 2019, Stephan Mueller <smueller@chronox.de>
-+ */
-+
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
-+#include <linux/lrng.h>
-+#include <linux/slab.h>
-+
-+#include "lrng_internal.h"
-+
-+static struct lrng_sdrng **lrng_sdrng __read_mostly =3D NULL;
-+
-+struct lrng_sdrng **lrng_sdrng_instances(void)
-+{
-+	return lrng_sdrng;
-+}
-+
-+/* Allocate the data structures for the per-NUMA node DRNGs */
-+static void _lrng_drngs_numa_alloc(struct work_struct *work)
-+{
-+	struct lrng_sdrng **sdrngs;
-+	struct lrng_sdrng *lrng_sdrng_init =3D lrng_sdrng_init_instance();
-+	u32 node;
-+	bool init_sdrng_used =3D false;
-+
-+	mutex_lock(&lrng_crypto_cb_update);
-+
-+	/* per-NUMA-node DRNGs are already present */
-+	if (lrng_sdrng)
-+		goto unlock;
-+
-+	sdrngs =3D kcalloc(nr_node_ids, sizeof(void *), GFP_KERNEL|__GFP_NOFAIL);
-+	for_each_online_node(node) {
-+		struct lrng_sdrng *sdrng;
-+
-+		if (!init_sdrng_used) {
-+			sdrngs[node] =3D lrng_sdrng_init;
-+			init_sdrng_used =3D true;
-+			continue;
-+		}
-+
-+		sdrng =3D kmalloc_node(sizeof(struct lrng_sdrng),
-+				     GFP_KERNEL|__GFP_NOFAIL, node);
-+		memset(sdrng, 0, sizeof(lrng_sdrng));
-+
-+		sdrng->crypto_cb =3D lrng_sdrng_init->crypto_cb;
-+		sdrng->sdrng =3D sdrng->crypto_cb->lrng_drng_alloc(
-+					LRNG_DRNG_SECURITY_STRENGTH_BYTES);
-+		if (IS_ERR(sdrng->sdrng)) {
-+			kfree(sdrng);
-+			goto err;
-+		}
-+
-+		mutex_init(&sdrng->lock);
-+		spin_lock_init(&sdrng->spin_lock);
-+
-+		/*
-+		 * No reseeding of NUMA DRNGs from previous DRNGs as this
-+		 * would complicate the code. Let it simply reseed.
-+		 */
-+		lrng_sdrng_reset(sdrng);
-+		sdrngs[node] =3D sdrng;
-+
-+		lrng_pool_inc_numa_node();
-+		pr_info("secondary DRNG for NUMA node %d allocated\n", node);
-+	}
-+
-+	/* Ensure that all NUMA nodes receive changed memory here. */
-+	mb();
-+
-+	if (!cmpxchg(&lrng_sdrng, NULL, sdrngs))
-+		goto unlock;
-+
-+err:
-+	for_each_online_node(node) {
-+		struct lrng_sdrng *sdrng =3D sdrngs[node];
-+
-+		if (sdrng =3D=3D lrng_sdrng_init)
-+			continue;
-+
-+		if (sdrng) {
-+			sdrng->crypto_cb->lrng_drng_dealloc(sdrng->sdrng);
-+			kfree(sdrng);
-+		}
-+	}
-+	kfree(sdrngs);
-+
-+unlock:
-+	mutex_unlock(&lrng_crypto_cb_update);
-+}
-+
-+static DECLARE_WORK(lrng_drngs_numa_alloc_work, _lrng_drngs_numa_alloc);
-+
-+void lrng_drngs_numa_alloc(void)
-+{
-+	schedule_work(&lrng_drngs_numa_alloc_work);
-+}
-=2D-=20
-2.23.0
+Why into the LFSR instead of into the entropy pool?
 
+> The LRNG allows the TRNG and secondary DRNG mechanism to be changed
+> at runtime.
 
+Why? This strikes me as pointless complication.
 
+> * high performance of interrupt handling code: The LRNG impact on the
+> interrupt handling has been reduced to a minimum. On one example
+> system, the LRNG interrupt handling code executes within an average
+> of 65 cycles whereas the existing /dev/random on the same device
+> takes about 97 cycles when measuring the execution time of
+> add_interrupt_randomness().
 
+Assuming you do this without sacrificing the input mixing, this
+would be worth submitting as a separate patch. Saving cycles
+on every interrupt definitely looks worth doing.
+
+> * lockless LFSR to collect raw entropy
+
+This too.
