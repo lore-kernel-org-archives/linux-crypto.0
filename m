@@ -2,117 +2,351 @@ Return-Path: <SRS0=1Cfx=ZR=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56480C43215
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Nov 2019 08:02:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CE19C432C0
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Nov 2019 10:31:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 25D262082F
-	for <linux-crypto@archiver.kernel.org>; Mon, 25 Nov 2019 08:02:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 04D922075C
+	for <linux-crypto@archiver.kernel.org>; Mon, 25 Nov 2019 10:31:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="FlCxswqj"
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="1nZhOsPy"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727148AbfKYICt (ORCPT
+        id S1727470AbfKYKb3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 25 Nov 2019 03:02:49 -0500
-Received: from mail-eopbgr70059.outbound.protection.outlook.com ([40.107.7.59]:57861
-        "EHLO EUR04-HE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727142AbfKYICt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 25 Nov 2019 03:02:49 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JewMVeP001r9e2jRlPUescjiAEcQB8p5lhd0GQcKHgjAT+Tg91cyIrQkhX9H2qSE05B+j3pE0ys5Qo5pWFOsUCCw6rFP3/6e/Nh4xvDJouXGD1eDF4UCvLEcRBf9+nra6QWvnW2GpPh+uUlgaSb3peAUhxAb9gmRJwZ9OY2/ORCe2+Xx+Jh6Ob7d64MA5jzTNFW4oizcFLdOQcF0WKLI4D0otBq0VuwLgLT+b8+p8sR9y7HVjSAcDxARCOF9GmJ9rhoCvY19w/vnAeauJogrRCorMmWhVfQzTbGiFBkX2sFfeIV462WhlGCpGmh1RElHcT606oGdcsk1mUi6qK/Q0g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+uhYEdZCoec9WSffkdF4Oe5jZgL043atWeWMmdXkSzU=;
- b=mGXou2oWH4LAfaZOIo03UWdy+5BsjvCMTYBNSHcPkeIOLMxHhdHnpc/o0WM7S+63TSn8F7GDYjjDR7mimcOUOXq0+HStfRKyy9lPzTm5uYH2NkX/VwlBOns9QicU963mUEc+Kb1v4gS6yyVEWzvfzrzMNh+zOMBoLlAdKxwPwp179+zlVeRoWCm0rqgUR9OW9Tw4gXHaXIDzdv31CEiCiZUWL5e8cEpCvQJfW5YXH4m5HDzbfZ0ErtQd7tih8HRARf3ELW2pMP/dh/Z88sGwmsHgR5wcbUR4uJYI+j9bppjurj0lBrxS98CqBXuWRA/joKCrKlFrEHztyjc4hLWn6g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+uhYEdZCoec9WSffkdF4Oe5jZgL043atWeWMmdXkSzU=;
- b=FlCxswqj1yEI2WFC+LbZFsxAOfotSsEhi05IIUUWxOQDpXDv/ZE+HHIXUD+KHtnpNSja3qB1Jcsthy/0cBkNj7/liE9b1452shw5sHdDC8Dhne5xAVk68Xwrjv2/WDU8EGAhJpBx2zsfnKJ/1LOqitcDBDcGPmD4R+03qsVr7lw=
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB2848.eurprd04.prod.outlook.com (10.175.23.18) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2474.21; Mon, 25 Nov 2019 08:02:45 +0000
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::89e1:552e:a24d:e72]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::89e1:552e:a24d:e72%3]) with mapi id 15.20.2474.023; Mon, 25 Nov 2019
- 08:02:45 +0000
-From:   Horia Geanta <horia.geanta@nxp.com>
-To:     Andrey Smirnov <andrew.smirnov@gmail.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Vipul Kumar <vipul_kumar@mentor.com>,
-        Chris Healy <cphealy@gmail.com>,
-        Lucas Stach <l.stach@pengutronix.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>
-Subject: Re: [PATCH v4 1/6] crypto: caam - RNG4 TRNG errata
-Thread-Topic: [PATCH v4 1/6] crypto: caam - RNG4 TRNG errata
-Thread-Index: AQHVoIQxRNGIQZ6nZ0+/zH6oZ3HYNQ==
-Date:   Mon, 25 Nov 2019 08:02:45 +0000
-Message-ID: <VI1PR0402MB348579B485FC139EDA222B0C984A0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <20191121155554.1227-1-andrew.smirnov@gmail.com>
- <20191121155554.1227-2-andrew.smirnov@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=horia.geanta@nxp.com; 
-x-originating-ip: [212.146.100.6]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 3d9e3258-d989-4886-d161-08d7717ddb05
-x-ms-traffictypediagnostic: VI1PR0402MB2848:|VI1PR0402MB2848:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <VI1PR0402MB2848A6D2D210AEFF6A581500984A0@VI1PR0402MB2848.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 0232B30BBC
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(376002)(346002)(136003)(39860400002)(396003)(189003)(199004)(2501003)(76116006)(91956017)(5660300002)(6506007)(53546011)(71200400001)(71190400001)(54906003)(44832011)(478600001)(14454004)(26005)(102836004)(25786009)(316002)(110136005)(76176011)(7696005)(52536014)(6116002)(3846002)(99286004)(6246003)(256004)(4744005)(4326008)(66066001)(229853002)(33656002)(86362001)(9686003)(81166006)(81156014)(55016002)(186003)(305945005)(7736002)(8676002)(8936002)(74316002)(6436002)(66946007)(2906002)(66446008)(446003)(66476007)(66556008)(64756008);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB2848;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: E7et/QmkoETc6r14/w2mSJll/o83MwgDLGM608Cs3hKGKr/We98ZVj34qqnSFQqm+Od4OFgAWmFLLPhpad2jaXpSDucPEK1ma6DFQCDM+n53M4VFH6kA795kYk3VVLaMwn4Mz4zJNkgExAytTkLNUv+cYTov4P0E2XiQder1ZRcuiagxhZrGj4/MvyZhW+jC1Ojz8fKezlQY7qfdXQDWE0lO66FaewKE+H59rcRFNYcJL7DgKcpmzoxcs1QYirogXbKcFm52Fc+yrTA+kkJez7bQCZAkWUpX6MPByNld+hlQtgXUupUSEs04sCdRtcQc4k8vgzXBjmZiHQh3Os9gLMJ2yog9oammFK/2Zc3jd9H74Jga6bqgAXBR2r3BKX24TgSANcb1rqQm1mLBqNt0x6/jHT0uY1aQELsmNYbgIpOc0XcrFyUCCQLVEUIdoLP7
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Mon, 25 Nov 2019 05:31:29 -0500
+Received: from frisell.zx2c4.com ([192.95.5.64]:42469 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725828AbfKYKb3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 25 Nov 2019 05:31:29 -0500
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id b5d15032;
+        Mon, 25 Nov 2019 09:37:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=from:to:cc
+        :subject:date:message-id:in-reply-to:references:mime-version
+        :content-transfer-encoding; s=mail; bh=8UEI0Fb0d4nrsmNpwrp3HgJja
+        fc=; b=1nZhOsPypXXGxhb84XbAkO40mihovFxaonEZamhjT7rGfEauO3lM9N2Y8
+        JCWTKLOqZ41iXk+4RU02/bCTnV7OV53bLnGGMuvw2krNsO8dPYtA9XHRWGkwdqRZ
+        Tld+9f8Oh3Mj/ouoe7HHX1qZEvptFkGQCYhOSL0TsLgxTVInDDvvhhAeZHPbI6of
+        iIg9qrp3jVO5m2KHZ0HF4EAjudDIwGhGnYdgQ1O9zIY6f5PoLl52BEWq/Xjc7ze4
+        el2Vd2tqCYuM9e6LJhZmN68lszW6UcNj0lLQbEVJM2XU1ZiHR7sCAXvUJfGUzEbX
+        4Zx3/S86Mhh7VA2fkZDPDJIDHrCrQ==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 3ba1a84a (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
+        Mon, 25 Nov 2019 09:37:52 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH v4] crypto: conditionalize crypto api in arch glue for lib code
+Date:   Mon, 25 Nov 2019 11:31:12 +0100
+Message-Id: <20191125103112.71638-1-Jason@zx2c4.com>
+In-Reply-To: <CAKv+Gu8C77SavEUfTbwVzSsCqn63k=wxUVoDUyrz0uJH62h3oQ@mail.gmail.com>
+References: <CAKv+Gu8C77SavEUfTbwVzSsCqn63k=wxUVoDUyrz0uJH62h3oQ@mail.gmail.com>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3d9e3258-d989-4886-d161-08d7717ddb05
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Nov 2019 08:02:45.4327
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: q55ko4pWw+PFfuxqvqv1/aLgZ6ycqTCy0m3/Wj1o3NwBZ8YCk4RZjwfhgNKACRuUtBi1i0hTO0cnfrg+ys9d1w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB2848
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 11/21/2019 5:56 PM, Andrey Smirnov wrote:=0A=
-> The TRNG as used in RNG4, used in CAAM has a documentation issue. The=0A=
-I assume the "erratum" consists in RTMCTL[TRNG_ACC] bit=0A=
-not being documented, correct?=0A=
-=0A=
-Is there an ID of the erratum?=0A=
-Or at least do you know what parts / SoCs have incorrect documentation?=0A=
-=0A=
-> effect is that it is possible that the entropy used to instantiate the=0A=
-> DRBG may be old entropy, rather than newly generated entropy. There is=0A=
-> proper programming guidance, but it is not in the documentation.=0A=
-> =0A=
-Is the "programming guidance" public?=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
+For glue code that's used by Zinc, the actual Crypto API functions might
+not necessarily exist, and don't need to exist either. Before this
+patch, there are valid build configurations that lead to a unbuildable
+kernel. This fixes it to conditionalize those symbols on the existence
+of the proper config entry.
+
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
+---
+Changes v3->v4:
+  - Rebased on cryptodev-2.6.git to make merging smoother.
+Changes v2->v3:
+  - v2 was a dud, with a find and replace operation gone wild. v3 is
+    what v2 should have been.
+Changes v1->v2:
+  - Discussing with Ard on IRC, we concluded that IS_REACHABLE makes
+    more sense than IS_ENABLED.
+
+ arch/arm/crypto/chacha-glue.c        | 26 ++++++++++++++++----------
+ arch/arm/crypto/curve25519-glue.c    |  5 +++--
+ arch/arm/crypto/poly1305-glue.c      |  9 ++++++---
+ arch/arm64/crypto/chacha-neon-glue.c |  5 +++--
+ arch/arm64/crypto/poly1305-glue.c    |  5 +++--
+ arch/mips/crypto/chacha-glue.c       |  6 ++++--
+ arch/mips/crypto/poly1305-glue.c     |  6 ++++--
+ arch/x86/crypto/blake2s-glue.c       |  6 ++++--
+ arch/x86/crypto/chacha_glue.c        |  5 +++--
+ arch/x86/crypto/curve25519-x86_64.c  |  7 ++++---
+ arch/x86/crypto/poly1305_glue.c      |  5 +++--
+ 11 files changed, 53 insertions(+), 32 deletions(-)
+
+diff --git a/arch/arm/crypto/chacha-glue.c b/arch/arm/crypto/chacha-glue.c
+index 3f0c057aa050..6ebbb2b241d2 100644
+--- a/arch/arm/crypto/chacha-glue.c
++++ b/arch/arm/crypto/chacha-glue.c
+@@ -286,11 +286,13 @@ static struct skcipher_alg neon_algs[] = {
+ 
+ static int __init chacha_simd_mod_init(void)
+ {
+-	int err;
++	int err = 0;
+ 
+-	err = crypto_register_skciphers(arm_algs, ARRAY_SIZE(arm_algs));
+-	if (err)
+-		return err;
++	if (IS_REACHABLE(CONFIG_CRYPTO_SKCIPHER)) {
++		err = crypto_register_skciphers(arm_algs, ARRAY_SIZE(arm_algs));
++		if (err)
++			return err;
++	}
+ 
+ 	if (IS_ENABLED(CONFIG_KERNEL_MODE_NEON) && (elf_hwcap & HWCAP_NEON)) {
+ 		int i;
+@@ -310,18 +312,22 @@ static int __init chacha_simd_mod_init(void)
+ 			static_branch_enable(&use_neon);
+ 		}
+ 
+-		err = crypto_register_skciphers(neon_algs, ARRAY_SIZE(neon_algs));
+-		if (err)
+-			crypto_unregister_skciphers(arm_algs, ARRAY_SIZE(arm_algs));
++		if (IS_REACHABLE(CONFIG_CRYPTO_SKCIPHER)) {
++			err = crypto_register_skciphers(neon_algs, ARRAY_SIZE(neon_algs));
++			if (err)
++				crypto_unregister_skciphers(arm_algs, ARRAY_SIZE(arm_algs));
++		}
+ 	}
+ 	return err;
+ }
+ 
+ static void __exit chacha_simd_mod_fini(void)
+ {
+-	crypto_unregister_skciphers(arm_algs, ARRAY_SIZE(arm_algs));
+-	if (IS_ENABLED(CONFIG_KERNEL_MODE_NEON) && (elf_hwcap & HWCAP_NEON))
+-		crypto_unregister_skciphers(neon_algs, ARRAY_SIZE(neon_algs));
++	if (IS_REACHABLE(CONFIG_CRYPTO_SKCIPHER)) {
++		crypto_unregister_skciphers(arm_algs, ARRAY_SIZE(arm_algs));
++		if (IS_ENABLED(CONFIG_KERNEL_MODE_NEON) && (elf_hwcap & HWCAP_NEON))
++			crypto_unregister_skciphers(neon_algs, ARRAY_SIZE(neon_algs));
++	}
+ }
+ 
+ module_init(chacha_simd_mod_init);
+diff --git a/arch/arm/crypto/curve25519-glue.c b/arch/arm/crypto/curve25519-glue.c
+index 2e9e12d2f642..f3f42cf3b893 100644
+--- a/arch/arm/crypto/curve25519-glue.c
++++ b/arch/arm/crypto/curve25519-glue.c
+@@ -108,14 +108,15 @@ static int __init mod_init(void)
+ {
+ 	if (elf_hwcap & HWCAP_NEON) {
+ 		static_branch_enable(&have_neon);
+-		return crypto_register_kpp(&curve25519_alg);
++		return IS_REACHABLE(CONFIG_CRYPTO_KPP) ?
++			crypto_register_kpp(&curve25519_alg) : 0;
+ 	}
+ 	return 0;
+ }
+ 
+ static void __exit mod_exit(void)
+ {
+-	if (elf_hwcap & HWCAP_NEON)
++	if (IS_REACHABLE(CONFIG_CRYPTO_KPP) && elf_hwcap & HWCAP_NEON)
+ 		crypto_unregister_kpp(&curve25519_alg);
+ }
+ 
+diff --git a/arch/arm/crypto/poly1305-glue.c b/arch/arm/crypto/poly1305-glue.c
+index 74a725ac89c9..abe3f2d587dc 100644
+--- a/arch/arm/crypto/poly1305-glue.c
++++ b/arch/arm/crypto/poly1305-glue.c
+@@ -249,16 +249,19 @@ static int __init arm_poly1305_mod_init(void)
+ 	if (IS_ENABLED(CONFIG_KERNEL_MODE_NEON) &&
+ 	    (elf_hwcap & HWCAP_NEON))
+ 		static_branch_enable(&have_neon);
+-	else
++	else if (IS_REACHABLE(CONFIG_CRYPTO_HASH))
+ 		/* register only the first entry */
+ 		return crypto_register_shash(&arm_poly1305_algs[0]);
+ 
+-	return crypto_register_shashes(arm_poly1305_algs,
+-				       ARRAY_SIZE(arm_poly1305_algs));
++	return IS_REACHABLE(CONFIG_CRYPTO_HASH) ?
++		crypto_register_shashes(arm_poly1305_algs,
++					ARRAY_SIZE(arm_poly1305_algs)) : 0;
+ }
+ 
+ static void __exit arm_poly1305_mod_exit(void)
+ {
++	if (!IS_REACHABLE(CONFIG_CRYPTO_HASH))
++		return;
+ 	if (!static_branch_likely(&have_neon)) {
+ 		crypto_unregister_shash(&arm_poly1305_algs[0]);
+ 		return;
+diff --git a/arch/arm64/crypto/chacha-neon-glue.c b/arch/arm64/crypto/chacha-neon-glue.c
+index b08029d7bde6..c1f9660d104c 100644
+--- a/arch/arm64/crypto/chacha-neon-glue.c
++++ b/arch/arm64/crypto/chacha-neon-glue.c
+@@ -211,12 +211,13 @@ static int __init chacha_simd_mod_init(void)
+ 
+ 	static_branch_enable(&have_neon);
+ 
+-	return crypto_register_skciphers(algs, ARRAY_SIZE(algs));
++	return IS_REACHABLE(CONFIG_CRYPTO_SKCIPHER) ?
++		crypto_register_skciphers(algs, ARRAY_SIZE(algs)) : 0;
+ }
+ 
+ static void __exit chacha_simd_mod_fini(void)
+ {
+-	if (cpu_have_named_feature(ASIMD))
++	if (IS_REACHABLE(CONFIG_CRYPTO_SKCIPHER) && cpu_have_named_feature(ASIMD))
+ 		crypto_unregister_skciphers(algs, ARRAY_SIZE(algs));
+ }
+ 
+diff --git a/arch/arm64/crypto/poly1305-glue.c b/arch/arm64/crypto/poly1305-glue.c
+index dd843d0ee83a..83a2338a8826 100644
+--- a/arch/arm64/crypto/poly1305-glue.c
++++ b/arch/arm64/crypto/poly1305-glue.c
+@@ -220,12 +220,13 @@ static int __init neon_poly1305_mod_init(void)
+ 
+ 	static_branch_enable(&have_neon);
+ 
+-	return crypto_register_shash(&neon_poly1305_alg);
++	return IS_REACHABLE(CONFIG_CRYPTO_HASH) ?
++		crypto_register_shash(&neon_poly1305_alg) : 0;
+ }
+ 
+ static void __exit neon_poly1305_mod_exit(void)
+ {
+-	if (cpu_have_named_feature(ASIMD))
++	if (IS_REACHABLE(CONFIG_CRYPTO_HASH) && cpu_have_named_feature(ASIMD))
+ 		crypto_unregister_shash(&neon_poly1305_alg);
+ }
+ 
+diff --git a/arch/mips/crypto/chacha-glue.c b/arch/mips/crypto/chacha-glue.c
+index 779e399c9bef..d1fd23e6ef84 100644
+--- a/arch/mips/crypto/chacha-glue.c
++++ b/arch/mips/crypto/chacha-glue.c
+@@ -128,12 +128,14 @@ static struct skcipher_alg algs[] = {
+ 
+ static int __init chacha_simd_mod_init(void)
+ {
+-	return crypto_register_skciphers(algs, ARRAY_SIZE(algs));
++	return IS_REACHABLE(CONFIG_CRYPTO_SKCIPHER) ?
++		crypto_register_skciphers(algs, ARRAY_SIZE(algs)) : 0;
+ }
+ 
+ static void __exit chacha_simd_mod_fini(void)
+ {
+-	crypto_unregister_skciphers(algs, ARRAY_SIZE(algs));
++	if (IS_REACHABLE(CONFIG_CRYPTO_SKCIPHER))
++		crypto_unregister_skciphers(algs, ARRAY_SIZE(algs));
+ }
+ 
+ module_init(chacha_simd_mod_init);
+diff --git a/arch/mips/crypto/poly1305-glue.c b/arch/mips/crypto/poly1305-glue.c
+index b759b6ccc361..b37d29cf5d0a 100644
+--- a/arch/mips/crypto/poly1305-glue.c
++++ b/arch/mips/crypto/poly1305-glue.c
+@@ -187,12 +187,14 @@ static struct shash_alg mips_poly1305_alg = {
+ 
+ static int __init mips_poly1305_mod_init(void)
+ {
+-	return crypto_register_shash(&mips_poly1305_alg);
++	return IS_REACHABLE(CONFIG_CRYPTO_HASH) ?
++		crypto_register_shash(&mips_poly1305_alg) : 0;
+ }
+ 
+ static void __exit mips_poly1305_mod_exit(void)
+ {
+-	crypto_unregister_shash(&mips_poly1305_alg);
++	if (IS_REACHABLE(CONFIG_CRYPTO_HASH))
++		crypto_unregister_shash(&mips_poly1305_alg);
+ }
+ 
+ module_init(mips_poly1305_mod_init);
+diff --git a/arch/x86/crypto/blake2s-glue.c b/arch/x86/crypto/blake2s-glue.c
+index 4a37ba7cdbe5..1d9ff8a45e1f 100644
+--- a/arch/x86/crypto/blake2s-glue.c
++++ b/arch/x86/crypto/blake2s-glue.c
+@@ -210,12 +210,14 @@ static int __init blake2s_mod_init(void)
+ 			      XFEATURE_MASK_AVX512, NULL))
+ 		static_branch_enable(&blake2s_use_avx512);
+ 
+-	return crypto_register_shashes(blake2s_algs, ARRAY_SIZE(blake2s_algs));
++	return IS_REACHABLE(CONFIG_CRYPTO_HASH) ?
++		crypto_register_shashes(blake2s_algs,
++					ARRAY_SIZE(blake2s_algs)) : 0;
+ }
+ 
+ static void __exit blake2s_mod_exit(void)
+ {
+-	if (boot_cpu_has(X86_FEATURE_SSSE3))
++	if (IS_REACHABLE(CONFIG_CRYPTO_HASH) && boot_cpu_has(X86_FEATURE_SSSE3))
+ 		crypto_unregister_shashes(blake2s_algs, ARRAY_SIZE(blake2s_algs));
+ }
+ 
+diff --git a/arch/x86/crypto/chacha_glue.c b/arch/x86/crypto/chacha_glue.c
+index a94e30b6f941..68a74953efaf 100644
+--- a/arch/x86/crypto/chacha_glue.c
++++ b/arch/x86/crypto/chacha_glue.c
+@@ -299,12 +299,13 @@ static int __init chacha_simd_mod_init(void)
+ 		    boot_cpu_has(X86_FEATURE_AVX512BW)) /* kmovq */
+ 			static_branch_enable(&chacha_use_avx512vl);
+ 	}
+-	return crypto_register_skciphers(algs, ARRAY_SIZE(algs));
++	return IS_REACHABLE(CONFIG_CRYPTO_SKCIPHER) ?
++		crypto_register_skciphers(algs, ARRAY_SIZE(algs)) : 0;
+ }
+ 
+ static void __exit chacha_simd_mod_fini(void)
+ {
+-	if (boot_cpu_has(X86_FEATURE_SSSE3))
++	if (IS_REACHABLE(CONFIG_CRYPTO_SKCIPHER) && boot_cpu_has(X86_FEATURE_SSSE3))
+ 		crypto_unregister_skciphers(algs, ARRAY_SIZE(algs));
+ }
+ 
+diff --git a/arch/x86/crypto/curve25519-x86_64.c b/arch/x86/crypto/curve25519-x86_64.c
+index a52a3fb15727..eec7d2d24239 100644
+--- a/arch/x86/crypto/curve25519-x86_64.c
++++ b/arch/x86/crypto/curve25519-x86_64.c
+@@ -2457,13 +2457,14 @@ static int __init curve25519_mod_init(void)
+ 		static_branch_enable(&curve25519_use_adx);
+ 	else
+ 		return 0;
+-	return crypto_register_kpp(&curve25519_alg);
++	return IS_REACHABLE(CONFIG_CRYPTO_KPP) ?
++		crypto_register_kpp(&curve25519_alg) : 0;
+ }
+ 
+ static void __exit curve25519_mod_exit(void)
+ {
+-	if (boot_cpu_has(X86_FEATURE_BMI2) ||
+-	    boot_cpu_has(X86_FEATURE_ADX))
++	if (IS_REACHABLE(CONFIG_CRYPTO_KPP) &&
++	    (boot_cpu_has(X86_FEATURE_BMI2) || boot_cpu_has(X86_FEATURE_ADX)))
+ 		crypto_unregister_kpp(&curve25519_alg);
+ }
+ 
+diff --git a/arch/x86/crypto/poly1305_glue.c b/arch/x86/crypto/poly1305_glue.c
+index 370cd88068ec..0cc4537e6617 100644
+--- a/arch/x86/crypto/poly1305_glue.c
++++ b/arch/x86/crypto/poly1305_glue.c
+@@ -224,12 +224,13 @@ static int __init poly1305_simd_mod_init(void)
+ 	    cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL))
+ 		static_branch_enable(&poly1305_use_avx2);
+ 
+-	return crypto_register_shash(&alg);
++	return IS_REACHABLE(CONFIG_CRYPTO_HASH) ? crypto_register_shash(&alg) : 0;
+ }
+ 
+ static void __exit poly1305_simd_mod_exit(void)
+ {
+-	crypto_unregister_shash(&alg);
++	if (IS_REACHABLE(CONFIG_CRYPTO_HASH))
++		crypto_unregister_shash(&alg);
+ }
+ 
+ module_init(poly1305_simd_mod_init);
+-- 
+2.24.0
+
