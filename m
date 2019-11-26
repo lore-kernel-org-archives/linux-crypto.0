@@ -2,116 +2,89 @@ Return-Path: <SRS0=6oT7=ZS=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A357C432C0
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Nov 2019 12:21:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26D40C432C0
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Nov 2019 12:23:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D11F420722
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Nov 2019 12:21:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="nS9IB1Su"
+	by mail.kernel.org (Postfix) with ESMTP id E682320722
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Nov 2019 12:23:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727827AbfKZMVn (ORCPT
+        id S1728300AbfKZMXh (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Nov 2019 07:21:43 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:59772 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727733AbfKZMVn (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Nov 2019 07:21:43 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAQCIur5124856;
-        Tue, 26 Nov 2019 12:21:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : mime-version : content-type; s=corp-2019-08-05;
- bh=yHWs0d6oK6yP4BkI2TKi1Xcr0/D0UZ96ZCkXeVdaLPE=;
- b=nS9IB1SuLUn7B9LfrFFRxQHsIIrBvyx1OMeyfUg5Ju4IC60w9Gmt5z1dwMm8VEjwUFky
- AZB1oH5n3z+BCvLZPcyQnJk6fUHFYHTxML65OjLOhgYKY9CINhcNL2be8UJg/AbM4Smm
- htv4qzYUDAH90WBr+VPBrv0uOKhCj3r1we3vSyaTTgKddp/SAobJVBPRzOkJWHIrLKh4
- e/IzQsFHKFO539ZXOHHQ1csG0CW429ls4NXT3vHZIVIXdi+hkyngmn0XX7oQhoK+Cqr/
- UKWC5jPZ2/0D5b+YAyMaWysxMsMsXTWNhgY0mwPUPeAUMP/2IdnF+/UiOw+G/OJtHjRH cw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2130.oracle.com with ESMTP id 2wev6u6er5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 26 Nov 2019 12:21:29 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAQC8Wo1050153;
-        Tue, 26 Nov 2019 12:21:28 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3030.oracle.com with ESMTP id 2wgwush3b5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 26 Nov 2019 12:21:28 +0000
-Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xAQCLRfe022357;
-        Tue, 26 Nov 2019 12:21:28 GMT
-Received: from kili.mountain (/129.205.23.165)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 26 Nov 2019 04:21:27 -0800
-Date:   Tue, 26 Nov 2019 15:21:20 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Zaibo Xu <xuzaibo@huawei.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Longfang Liu <liulongfang@huawei.com>,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] crypto: hisilicon - fix a NULL vs IS_ERR() bug in
- sec_create_qp_ctx()
-Message-ID: <20191126122120.vnf6mxmvf25ppyeo@kili.mountain>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
-User-Agent: NeoMutt/20170113 (1.7.2)
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9452 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=907
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1911260110
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9452 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=969 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1911260110
+        Tue, 26 Nov 2019 07:23:37 -0500
+Received: from inva021.nxp.com ([92.121.34.21]:37578 "EHLO inva021.nxp.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728290AbfKZMXh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 26 Nov 2019 07:23:37 -0500
+Received: from inva021.nxp.com (localhost [127.0.0.1])
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 9049A2005D0;
+        Tue, 26 Nov 2019 13:23:35 +0100 (CET)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 8088B2000C7;
+        Tue, 26 Nov 2019 13:23:35 +0100 (CET)
+Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 1B18E20506;
+        Tue, 26 Nov 2019 13:23:35 +0100 (CET)
+From:   Iuliana Prodan <iuliana.prodan@nxp.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Andrey Smirnov <andrew.smirnov@gmail.com>,
+        Alison Wang <alison.wang@nxp.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-imx <linux-imx@nxp.com>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>
+Subject: [PATCH v2] crypto: caam - do not reset pointer size from MCFGR register
+Date:   Tue, 26 Nov 2019 14:23:23 +0200
+Message-Id: <1574771003-17208-1-git-send-email-iuliana.prodan@nxp.com>
+X-Mailer: git-send-email 2.1.0
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The hisi_acc_create_sgl_pool() function returns error pointers, it never
-returns NULL pointers.
+In commit 'a1cf573ee95 ("crypto: caam - select DMA address
+size at runtime")' CAAM pointer size (caam_ptr_size) is changed
+from sizeof(dma_addr_t) to runtime value computed from MCFGR register.
+Therefore, do not reset MCFGR[PS].
 
-Fixes: 416d82204df4 ("crypto: hisilicon - add HiSilicon SEC V2 driver")
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+Fixes: a1cf573ee95 ("crypto: caam - select DMA address size at runtime")
+Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
+Cc: <stable@vger.kernel.org>
+Cc: Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc: Alison Wang <alison.wang@nxp.com>
 ---
- drivers/crypto/hisilicon/sec2/sec_crypto.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Changes since v1:
+- do not reset MCFGR[PS];
+- update description;
+- cc-ed authors for Fixes tag.
 
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-index dc1eb97d57f7..62b04e19067c 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-@@ -179,14 +179,14 @@ static int sec_create_qp_ctx(struct hisi_qm *qm, struct sec_ctx *ctx,
+ drivers/crypto/caam/ctrl.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index d7c3c3805693..3e811fcc6b83 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -671,11 +671,9 @@ static int caam_probe(struct platform_device *pdev)
+ 	of_node_put(np);
  
- 	qp_ctx->c_in_pool = hisi_acc_create_sgl_pool(dev, QM_Q_DEPTH,
- 						     SEC_SGL_SGE_NR);
--	if (!qp_ctx->c_in_pool) {
-+	if (IS_ERR(qp_ctx->c_in_pool)) {
- 		dev_err(dev, "fail to create sgl pool for input!\n");
- 		goto err_free_req_list;
- 	}
+ 	if (!ctrlpriv->mc_en)
+-		clrsetbits_32(&ctrl->mcr, MCFGR_AWCACHE_MASK | MCFGR_LONG_PTR,
++		clrsetbits_32(&ctrl->mcr, MCFGR_AWCACHE_MASK,
+ 			      MCFGR_AWCACHE_CACH | MCFGR_AWCACHE_BUFF |
+-			      MCFGR_WDENABLE | MCFGR_LARGE_BURST |
+-			      (sizeof(dma_addr_t) == sizeof(u64) ?
+-			       MCFGR_LONG_PTR : 0));
++			      MCFGR_WDENABLE | MCFGR_LARGE_BURST);
  
- 	qp_ctx->c_out_pool = hisi_acc_create_sgl_pool(dev, QM_Q_DEPTH,
- 						      SEC_SGL_SGE_NR);
--	if (!qp_ctx->c_out_pool) {
-+	if (IS_ERR(qp_ctx->c_out_pool)) {
- 		dev_err(dev, "fail to create sgl pool for output!\n");
- 		goto err_free_c_in_pool;
- 	}
+ 	handle_imx6_err005766(&ctrl->mcr);
+ 
 -- 
-2.11.0
+2.17.1
 
