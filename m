@@ -2,162 +2,140 @@ Return-Path: <SRS0=6oT7=ZS=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A8FDC432C0
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Nov 2019 05:32:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5C33C432C0
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Nov 2019 07:44:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EA1E720637
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Nov 2019 05:32:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5C88720748
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Nov 2019 07:44:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="gT8QA1LE"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="qP52E2V3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726103AbfKZFcv (ORCPT
+        id S1727073AbfKZHoT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Nov 2019 00:32:51 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:44820 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726101AbfKZFcv (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Nov 2019 00:32:51 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAQ5THpq163100;
-        Tue, 26 Nov 2019 05:32:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2019-08-05;
- bh=8zB3TsTytegvoCe09ZHtPxhgC3JiQuIcJm0pmU68R4Q=;
- b=gT8QA1LE74UdB2V1SxIShb6wQHb0dQaKBsLiVSL/HrjxPK7T09O80xUX3b7DaJLIFcqI
- MUDOlqN4+szwAEJ7eyfOoZ/dkeOUHc2qEmehFMSy+QThz4NLSP37DiHdXE5QZHKEnM78
- Op/uJP3Ni8bvg1hPSnaw2GGuDUoiT+zQCWJZMv5Vt9xnhjEJjsxo5iRD5B6U2kr+U4Wg
- okUcjSGQJymhQqdwDdMa6B9dE3xPElfZd/TU9getOzgXgwHGtn3XUVDd/SVKlSQrvESO
- OnREel2EYXa/jTyN4BEvtKo6iK1w5Uzo4Bm2GacNhjBbdaZ4S5z+F0cKiioKhJX5K4Ld hA== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
-        by aserp2120.oracle.com with ESMTP id 2wevqq49xp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 26 Nov 2019 05:32:35 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
-        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xAQ5T9NZ106090;
-        Tue, 26 Nov 2019 05:32:34 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
-        by userp3020.oracle.com with ESMTP id 2wgvfhujmq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 26 Nov 2019 05:32:33 +0000
-Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
-        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xAQ5WVqE027572;
-        Tue, 26 Nov 2019 05:32:31 GMT
-Received: from ca-dmjordan1.us.oracle.com (/10.211.9.48)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 25 Nov 2019 21:32:30 -0800
-Date:   Tue, 26 Nov 2019 00:32:38 -0500
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Daniel Jordan <daniel.m.jordan@oracle.com>
-Subject: Re: [v2 PATCH] crypto: pcrypt - Avoid deadlock by using per-instance
- padata queues
-Message-ID: <20191126053238.yxhtfbt5okcjycuy@ca-dmjordan1.us.oracle.com>
-References: <20191119130556.dso2ni6qlks3lr23@gondor.apana.org.au>
- <20191119173732.GB819@sol.localdomain>
- <20191119185827.nerskpvddkcsih25@gondor.apana.org.au>
+        Tue, 26 Nov 2019 02:44:19 -0500
+Received: from mail-eopbgr40089.outbound.protection.outlook.com ([40.107.4.89]:37078
+        "EHLO EUR03-DB5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725972AbfKZHoT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 26 Nov 2019 02:44:19 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=F2PiuZRigbmHaEXpYA/BxI9CkqGH38qHblajwEi3TsNIf6HCfvfSBOjh9FJV9thmHDwawJzlUmNGjzRwM/0X43ImiNwN4LAfMJoV1pDw/LNt53wU4M1IOE2ZFpRpdf3TO/eNdyakbRmf6fvOL5QEdmBj4bQSwG4oCc1i30EYP/gRVfriuJUI2ba+5oKJjNL7xhUzVH2fepciIpBLIdNtF9qsMZp3mlq5fECWrYqblBuADqjwgTH+Tn/SkRWoFv0V/cWroHCIHzZ7a95WGGGybzYBrKmqQpxN24F+yN+BdyjmtaineUQia3GhfO7nb94s0APWuZdgK9PfD81Q1rcFoA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AznrVe91wsESl/9cuugSqejB9ELrkC3qsGlKaaOVd2s=;
+ b=NrwrMhNgEYVrJVs3iSZCZuwE6RzxhjL2PNl2teq+vIPbEENA5YMqGv5EQ7JlT1dCRSTre+8h+yodkIuWAW4FqOh6WCnV1JbD9Gr9sMdvw7XWd4Mok/m5Tr6hbNfCIbHBsQVitBjojYnpgWyRA+yrqoBMMrH/Tmm+CqxfCEIIV22IanhGZNNEhcNrFuTnjH3jwj9ZxfTpxVGfj4FmJhDz4yBafYBrBTNclvjc0ADa5gi7wniCw/3vP0F70MLIivDqeWdA/0feqMMZkLIRHNH7TPeSYguUaLiAOTPGFsOi4ZS+ZNOq1RVaZU2wUDQzaKRDoYkzUKFrr1TzDFUn+2yuXg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=AznrVe91wsESl/9cuugSqejB9ELrkC3qsGlKaaOVd2s=;
+ b=qP52E2V388dE2jJ86aA95KDE0OgsbLQIMdDRcwytpXCPQFQnmjHHJe6X5MNRTC8t6tFdl89YwGMwLhywszP7PJ/QQBPs6Ux0QBH0ekRgNLXGYE0nR15pCqAktu7L1qSIEL+fXbhlsNXRiBzM5uKMNgCBwoQhGP0Jy2oN0ShRxMI=
+Received: from AM0PR0402MB3476.eurprd04.prod.outlook.com (52.133.50.141) by
+ AM0PR0402MB3601.eurprd04.prod.outlook.com (52.133.49.146) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2474.19; Tue, 26 Nov 2019 07:44:15 +0000
+Received: from AM0PR0402MB3476.eurprd04.prod.outlook.com
+ ([fe80::ac4f:f733:bc41:1e84]) by AM0PR0402MB3476.eurprd04.prod.outlook.com
+ ([fe80::ac4f:f733:bc41:1e84%7]) with mapi id 15.20.2474.023; Tue, 26 Nov 2019
+ 07:44:15 +0000
+From:   Horia Geanta <horia.geanta@nxp.com>
+To:     Andrey Smirnov <andrew.smirnov@gmail.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>
+CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Vipul Kumar <vipul_kumar@mentor.com>,
+        Chris Healy <cphealy@gmail.com>,
+        Lucas Stach <l.stach@pengutronix.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        dl-linux-imx <linux-imx@nxp.com>
+Subject: Re: [PATCH v4 1/6] crypto: caam - RNG4 TRNG errata
+Thread-Topic: [PATCH v4 1/6] crypto: caam - RNG4 TRNG errata
+Thread-Index: AQHVoIQxRNGIQZ6nZ0+/zH6oZ3HYNQ==
+Date:   Tue, 26 Nov 2019 07:44:15 +0000
+Message-ID: <AM0PR0402MB3476636E6BF1CAE4B80435F198450@AM0PR0402MB3476.eurprd04.prod.outlook.com>
+References: <20191121155554.1227-1-andrew.smirnov@gmail.com>
+ <20191121155554.1227-2-andrew.smirnov@gmail.com>
+ <VI1PR0402MB348579B485FC139EDA222B0C984A0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <CAHQ1cqF_SW16_cvxpDmn6kYoLQDy7CBRfkftUs=u7gR8SQ=MTw@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=horia.geanta@nxp.com; 
+x-originating-ip: [212.146.100.6]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 17ebacb2-1c3a-4f41-dd1b-08d772446fc5
+x-ms-traffictypediagnostic: AM0PR0402MB3601:|AM0PR0402MB3601:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM0PR0402MB3601A0C4BDD9BD55BE93676B98450@AM0PR0402MB3601.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:3631;
+x-forefront-prvs: 0233768B38
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(376002)(366004)(346002)(136003)(39860400002)(199004)(189003)(52536014)(86362001)(53546011)(6506007)(71200400001)(102836004)(26005)(6436002)(186003)(7696005)(76116006)(8936002)(54906003)(9686003)(25786009)(55016002)(110136005)(66446008)(2906002)(71190400001)(66476007)(66556008)(64756008)(66946007)(6116002)(3846002)(99286004)(446003)(5660300002)(66066001)(14454004)(44832011)(6246003)(33656002)(14444005)(256004)(74316002)(305945005)(7736002)(6636002)(316002)(81166006)(81156014)(229853002)(8676002)(478600001)(4326008)(76176011);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR0402MB3601;H:AM0PR0402MB3476.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: +G7ZmmRzjp0lsNiiuN3M5cjnbx71c0by6s5HUsHbzOUCaYgcOKLZaDBTO845CbdoxlYeWBIFwBfUrAnA961MVwVP4u5Du1id+3RtWUOfxXCzCZMnZuw6kWY6c/+aVJehJ+w+K0ZEnAk4vWKecNqLwCzTrpMNyT2JbdyScjxksWLR7A1obvD2ePfw+ZJ5EcXZ9XoPAgUn+4YEBzMP4ocQf4wWEBymbLC2XDVTaX1urKDS3pjiBWCjVCaejBSlxv4Av1+Hz3pxzqghva4Rzj1XnlqwrzTft9VrKxXsknCpVIUfNqUTcMraiHmHspx/EH/Yn/g7ZuWrTqhkNR58qFi2+jAJfojRjznvMXwSrImhPLIYsREWet4ku6qHSZzK/PivtTfbt0yvGbAtaTM8n0b/rAtUylWv8dx7jz0NDmfp9UVIk3HG0LYXzJwM273r3/15
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191119185827.nerskpvddkcsih25@gondor.apana.org.au>
-User-Agent: NeoMutt/20180716
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9452 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=860
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1911260046
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9452 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=926 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1911260046
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 17ebacb2-1c3a-4f41-dd1b-08d772446fc5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Nov 2019 07:44:15.3945
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: XiPHinMicC/7JpS2jUCQebg/Un8pn4FvHy7rkeQvPKOfwL6J/tjDD9FP3oxB9LDhXhhX2X5xzRY1HuwGl9W9Wg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR0402MB3601
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Nov 20, 2019 at 02:58:27AM +0800, Herbert Xu wrote:
->  /* Replace the internal control structure with a new one. */
-> -static void padata_replace(struct padata_instance *pinst,
-> -			   struct parallel_data *pd_new)
-> +static int padata_replace_one(struct padata_shell *ps)
->  {
-> -	struct parallel_data *pd_old = pinst->pd;
-> +	struct parallel_data *pd_old = rcu_dereference_protected(ps->pd, 1);
-> +	struct parallel_data *pd_new;
->  	int notification_mask = 0;
->  
-> -	pinst->flags |= PADATA_RESET;
-> -
-> -	rcu_assign_pointer(pinst->pd, pd_new);
-> +	pd_new = padata_alloc_pd(ps);
-> +	if (!pd_new)
-> +		return -ENOMEM;
->  
-> -	synchronize_rcu();
-> +	rcu_assign_pointer(ps->pd, pd_new);
->  
->  	if (!cpumask_equal(pd_old->cpumask.pcpu, pd_new->cpumask.pcpu))
->  		notification_mask |= PADATA_CPU_PARALLEL;
-> @@ -510,10 +515,25 @@ static void padata_replace(struct padata_instance *pinst,
->  	if (atomic_dec_and_test(&pd_old->refcnt))
->  		padata_free_pd(pd_old);
->  
-> +	return notification_mask;
-> +}
-> +
-> +static void padata_replace(struct padata_instance *pinst)
-> +{
-> +	int notification_mask = 0;
-> +	struct padata_shell *ps;
-> +
-> +	pinst->flags |= PADATA_RESET;
-> +
-> +	list_for_each_entry(ps, &pinst->pslist, list)
-> +		notification_mask |= padata_replace_one(ps);
-> +
-> +	synchronize_rcu();
-> +
->  	if (notification_mask)
->  		blocking_notifier_call_chain(&pinst->cpumask_change_notifier,
->  					     notification_mask,
-> -					     &pd_new->cpumask);
-> +					     &pinst->cpumask);
->  
->  	pinst->flags &= ~PADATA_RESET;
->  }
-
-I think it's possible for a task in padata_do_parallel() racing with another in
-padata_replace() to use a pd after free.  The synchronize_rcu() comes after the
-pd_old->refcnt's are dec'd.
-
-                                          padata_do_parallel()
-                                            rcu_dereference_bh(ps->pd)
-                                            // doesn't see PADATA_RESET set
-padata_replace()
-  pinst->flags |= PADATA_RESET
-  padata_replace_one()
-    rcu_assign_pointer(ps->pd, pd_new)
-    atomic_dec_and_test(&pd_old->refcnt)
-      padata_free_pd()
-                                            atomic_inc(&pd->refcnt) // too late
-
-If I'm not missing something, one way out is adding a list_head to
-parallel_data for remembering the old pd's on a local list in padata_replace()
-so that this function can loop over it and drop the refs after
-synchronize_rcu().  A padata_do_parallel() call will have then had a chance to
-take a ref on the pd it's using.
-
-
-And, not this patch, but with the removal of flushing it seems there's no need
-for PADATA_RESET, so it and its EBUSY error can go away.
+On 11/25/2019 3:22 PM, Andrey Smirnov wrote:=0A=
+> On Mon, Nov 25, 2019 at 12:02 AM Horia Geanta <horia.geanta@nxp.com> wrot=
+e:=0A=
+>>=0A=
+>> On 11/21/2019 5:56 PM, Andrey Smirnov wrote:=0A=
+>>> The TRNG as used in RNG4, used in CAAM has a documentation issue. The=
+=0A=
+>> I assume the "erratum" consists in RTMCTL[TRNG_ACC] bit=0A=
+>> not being documented, correct?=0A=
+>>=0A=
+>> Is there an ID of the erratum?=0A=
+>> Or at least do you know what parts / SoCs have incorrect documentation?=
+=0A=
+>>=0A=
+>>> effect is that it is possible that the entropy used to instantiate the=
+=0A=
+>>> DRBG may be old entropy, rather than newly generated entropy. There is=
+=0A=
+>>> proper programming guidance, but it is not in the documentation.=0A=
+>>>=0A=
+>> Is the "programming guidance" public?=0A=
+>>=0A=
+> =0A=
+> I don't know the answers to any of those questions. I am not the=0A=
+> original author of this change, just ported if from NXP tree because=0A=
+> it seemed important. More than happy to drop this if you think it's=0A=
+> bogus.=0A=
+> =0A=
+The implementation is fine.=0A=
+I am just trying to understand the commit message.=0A=
+=0A=
+Maybe Aymen, as author, could help.=0A=
+Otherwise I suggest rewriting it, i.e. drop the mention of an erratum=0A=
+and just say what's the problem in the RNG initialization code.=0A=
+=0A=
+Thanks,=0A=
+Horia=0A=
