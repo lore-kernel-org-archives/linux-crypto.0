@@ -2,33 +2,48 @@ Return-Path: <SRS0=6oT7=ZS=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6282C432C3
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Nov 2019 18:04:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0135C432C0
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Nov 2019 19:31:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A2F682071A
-	for <linux-crypto@archiver.kernel.org>; Tue, 26 Nov 2019 18:04:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B6FA20866
+	for <linux-crypto@archiver.kernel.org>; Tue, 26 Nov 2019 19:31:07 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="XfUYt5Ax"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726231AbfKZSE0 (ORCPT
+        id S1726576AbfKZTbG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 26 Nov 2019 13:04:26 -0500
-Received: from mail2-relais-roc.national.inria.fr ([192.134.164.83]:7740 "EHLO
-        mail2-relais-roc.national.inria.fr" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725870AbfKZSEZ (ORCPT
+        Tue, 26 Nov 2019 14:31:06 -0500
+Received: from mo4-p02-ob.smtp.rzone.de ([81.169.146.168]:28268 "EHLO
+        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726299AbfKZTbG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 26 Nov 2019 13:04:25 -0500
-X-IronPort-AV: E=Sophos;i="5.69,246,1571695200"; 
-   d="scan'208";a="413630304"
-Received: from abo-228-123-68.mrs.modulonet.fr (HELO hadrien) ([85.68.123.228])
-  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 26 Nov 2019 19:04:10 +0100
-Date:   Tue, 26 Nov 2019 19:04:10 +0100 (CET)
-From:   Julia Lawall <julia.lawall@inria.fr>
-X-X-Sender: jll@hadrien
-To:     =?ISO-8859-15?Q?Stephan_M=FCller?= <smueller@chronox.de>
-cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Tue, 26 Nov 2019 14:31:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1574796664;
+        s=strato-dkim-0002; d=chronox.de;
+        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=ZFKAqYpbbjnGol8k3VcaYvgyvKkNLTdKc+1X7uXlroE=;
+        b=XfUYt5AxuLESQ5gMBtfHO18ZAOWzUflCUigM7aHSjLFM4nL6uhZUsgWMsL6apnH+ri
+        zyIJMXBnmWdFZxWTWCLEvDCvcytbZXSLqzQ5GWClhG5K4kh8/aicXLHQNEv0W9oK6x20
+        wpDn2IThg6OguDbQB18zUoS9L6WPWbl1oJUZeMBCCYj9gORJlsWSJQUbR8nSNdzre2CR
+        NRWrvS192g8wdW6UA39DlcdHFDPGykSPxKWf1BSTkOkponaELxg805e7Kl34wWT0RgoS
+        B81ca9c7PQxXDFY9Xi5Ko766TnUVWNOcVGUiYaU5cKBdevmQiybqbQ2sRcIja4ukuvzO
+        odSA==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaJvScdGvN"
+X-RZG-CLASS-ID: mo00
+Received: from tauon.chronox.de
+        by smtp.strato.de (RZmta 45.0.2 DYNA|AUTH)
+        with ESMTPSA id m074f2vAQJRY80E
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+        Tue, 26 Nov 2019 20:27:34 +0100 (CET)
+From:   Stephan Mueller <smueller@chronox.de>
+To:     Julia Lawall <julia.lawall@inria.fr>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
         linux-api@vger.kernel.org,
         "Eric W. Biederman" <ebiederm@xmission.com>,
@@ -51,123 +66,30 @@ cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Neil Horman <nhorman@redhat.com>,
         Randy Dunlap <rdunlap@infradead.org>,
         Arnd Bergmann <arnd@arndb.de>, kbuild-all@lists.01.org
-Subject: Re: [PATCH v26 12/12] LRNG - add interface for gathering of raw
- entropy (fwd)
-Message-ID: <alpine.DEB.2.21.1911261903060.2605@hadrien>
-User-Agent: Alpine 2.21 (DEB 202 2017-01-01)
+Subject: Re: [PATCH v26 12/12] LRNG - add interface for gathering of raw entropy (fwd)
+Date:   Tue, 26 Nov 2019 20:27:33 +0100
+Message-ID: <3845228.ihUtNFa0QL@tauon.chronox.de>
+In-Reply-To: <alpine.DEB.2.21.1911261903060.2605@hadrien>
+References: <alpine.DEB.2.21.1911261903060.2605@hadrien>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="8323329-739979723-1574791451=:2605"
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+Am Dienstag, 26. November 2019, 19:04:10 CET schrieb Julia Lawall:
 
---8323329-739979723-1574791451=:2605
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: 8BIT
+Hi Julia,
 
-Hello,
+> Hello,
+> 
+> Should something be done about the lock on line 162?
 
-Should something be done about the lock on line 162?
+Yes, thank you for the report. There should be an unlock, naturally.
 
-julia
+Ciao
+Stephan
 
----------- Forwarded message ----------
-Date: Tue, 26 Nov 2019 01:12:49 +0800
-From: kbuild test robot <lkp@intel.com>
-To: kbuild@lists.01.org
-Cc: Julia Lawall <julia.lawall@lip6.fr>
-Subject: Re: [PATCH v26 12/12] LRNG - add interface for gathering of raw entropy
 
-In-Reply-To: <3742813.K7GG538zxB@positron.chronox.de>
-References: <3742813.K7GG538zxB@positron.chronox.de>
-
-Hi "Stephan,
-
-Thank you for the patch! Perhaps something to improve:
-
-[auto build test WARNING on char-misc/char-misc-testing]
-[also build test WARNING on v5.4 next-20191125]
-[if your patch is applied to the wrong git tree, please drop us a note to help
-improve the system. BTW, we also suggest to use '--base' option to specify the
-base tree in git format-patch, please see https://stackoverflow.com/a/37406982]
-
-url:    https://github.com/0day-ci/linux/commits/Stephan-M-ller/dev-random-a-new-approach-with-full-SP800-90B/20191125-042152
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/char-misc.git b78cda795ac83333293f1bfa3165572a47e550c2
-:::::: branch date: 21 hours ago
-:::::: commit date: 21 hours ago
-
-If you fix the issue, kindly add following tag
-Reported-by: kbuild test robot <lkp@intel.com>
-Reported-by: Julia Lawall <julia.lawall@lip6.fr>
-
->> drivers/char/lrng/lrng_testing.c:176:1-7: preceding lock on line 134
-
-# https://github.com/0day-ci/linux/commit/d69edb724ef2677392bfcbaf4fb6750306f8a1f1
-git remote add linux-review https://github.com/0day-ci/linux
-git remote update linux-review
-git checkout d69edb724ef2677392bfcbaf4fb6750306f8a1f1
-vim +176 drivers/char/lrng/lrng_testing.c
-
-d69edb724ef267 Stephan Müller 2019-11-23  125
-d69edb724ef267 Stephan Müller 2019-11-23  126  static int lrng_raw_entropy_reader(u8 *outbuf, u32 outbuflen)
-d69edb724ef267 Stephan Müller 2019-11-23  127  {
-d69edb724ef267 Stephan Müller 2019-11-23  128  	unsigned long flags;
-d69edb724ef267 Stephan Müller 2019-11-23  129  	int collected_data = 0;
-d69edb724ef267 Stephan Müller 2019-11-23  130
-d69edb724ef267 Stephan Müller 2019-11-23  131  	lrng_raw_entropy_init();
-d69edb724ef267 Stephan Müller 2019-11-23  132
-d69edb724ef267 Stephan Müller 2019-11-23  133  	while (outbuflen) {
-d69edb724ef267 Stephan Müller 2019-11-23 @134  		spin_lock_irqsave(&lrng_raw_lock, flags);
-d69edb724ef267 Stephan Müller 2019-11-23  135
-d69edb724ef267 Stephan Müller 2019-11-23  136  		/* We have no data or reached the writer. */
-d69edb724ef267 Stephan Müller 2019-11-23  137  		if (!lrng_rb_writer || (lrng_rb_writer == lrng_rb_reader)) {
-d69edb724ef267 Stephan Müller 2019-11-23  138
-d69edb724ef267 Stephan Müller 2019-11-23  139  			spin_unlock_irqrestore(&lrng_raw_lock, flags);
-d69edb724ef267 Stephan Müller 2019-11-23  140
-d69edb724ef267 Stephan Müller 2019-11-23  141  			/*
-d69edb724ef267 Stephan Müller 2019-11-23  142  			 * Now we gathered all boot data, enable regular data
-d69edb724ef267 Stephan Müller 2019-11-23  143  			 * collection.
-d69edb724ef267 Stephan Müller 2019-11-23  144  			 */
-d69edb724ef267 Stephan Müller 2019-11-23  145  			if (boot_test) {
-d69edb724ef267 Stephan Müller 2019-11-23  146  				boot_test = 0;
-d69edb724ef267 Stephan Müller 2019-11-23  147  				goto out;
-d69edb724ef267 Stephan Müller 2019-11-23  148  			}
-d69edb724ef267 Stephan Müller 2019-11-23  149
-d69edb724ef267 Stephan Müller 2019-11-23  150  			wait_event_interruptible(lrng_raw_read_wait,
-d69edb724ef267 Stephan Müller 2019-11-23  151  						 lrng_raw_have_data());
-d69edb724ef267 Stephan Müller 2019-11-23  152  			if (signal_pending(current)) {
-d69edb724ef267 Stephan Müller 2019-11-23  153  				collected_data = -ERESTARTSYS;
-d69edb724ef267 Stephan Müller 2019-11-23  154  				goto out;
-d69edb724ef267 Stephan Müller 2019-11-23  155  			}
-d69edb724ef267 Stephan Müller 2019-11-23  156
-d69edb724ef267 Stephan Müller 2019-11-23  157  			continue;
-d69edb724ef267 Stephan Müller 2019-11-23  158  		}
-d69edb724ef267 Stephan Müller 2019-11-23  159
-d69edb724ef267 Stephan Müller 2019-11-23  160  		/* We copy out word-wise */
-d69edb724ef267 Stephan Müller 2019-11-23  161  		if (outbuflen < sizeof(u32))
-d69edb724ef267 Stephan Müller 2019-11-23  162  			goto out;
-d69edb724ef267 Stephan Müller 2019-11-23  163
-d69edb724ef267 Stephan Müller 2019-11-23  164  		memcpy(outbuf, &lrng_testing_rb[lrng_rb_reader], sizeof(u32));
-d69edb724ef267 Stephan Müller 2019-11-23  165  		lrng_rb_reader++;
-d69edb724ef267 Stephan Müller 2019-11-23  166
-d69edb724ef267 Stephan Müller 2019-11-23  167  		spin_unlock_irqrestore(&lrng_raw_lock, flags);
-d69edb724ef267 Stephan Müller 2019-11-23  168
-d69edb724ef267 Stephan Müller 2019-11-23  169  		outbuf += sizeof(u32);
-d69edb724ef267 Stephan Müller 2019-11-23  170  		outbuflen -= sizeof(u32);
-d69edb724ef267 Stephan Müller 2019-11-23  171  		collected_data += sizeof(u32);
-d69edb724ef267 Stephan Müller 2019-11-23  172  	}
-d69edb724ef267 Stephan Müller 2019-11-23  173
-d69edb724ef267 Stephan Müller 2019-11-23  174  out:
-d69edb724ef267 Stephan Müller 2019-11-23  175  	lrng_raw_entropy_fini();
-d69edb724ef267 Stephan Müller 2019-11-23 @176  	return collected_data;
-d69edb724ef267 Stephan Müller 2019-11-23  177  }
-d69edb724ef267 Stephan Müller 2019-11-23  178
-
----
-0-DAY kernel test infrastructure                 Open Source Technology Center
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org Intel Corporation
---8323329-739979723-1574791451=:2605--
