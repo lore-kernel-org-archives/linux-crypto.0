@@ -2,139 +2,127 @@ Return-Path: <SRS0=XAm+=ZT=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 841C9C432C0
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Nov 2019 19:14:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71E5AC432C0
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Nov 2019 21:23:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5A41620862
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Nov 2019 19:14:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1574882096;
-	bh=E7omxeKWYSr7QnIWsWGPKCPFf7LQirXNe6LTBrwkKOQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=Fa4JreJMLzlX6+dbAmj+ekivQJlg6pgkQL5/o6yK1egNgy0ZwIMmlpL5d4dWUq7RF
-	 WE+vJ0KUpEuxkHAIr1wu+LJNUDKvKcxqMS7wmAioiXqKbZ2TDWaee0q2vJ5uk1kyMI
-	 A/CKLcGZs6m0L5BUfhmRf9tIxxmLd6v7RdzGc5Dc=
+	by mail.kernel.org (Postfix) with ESMTP id 3F7B921556
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Nov 2019 21:23:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="u7cKuegC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726633AbfK0TOz (ORCPT
+        id S1727468AbfK0VXG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Nov 2019 14:14:55 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38750 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726593AbfK0TOz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Nov 2019 14:14:55 -0500
-Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3E54420835;
-        Wed, 27 Nov 2019 19:14:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1574882094;
-        bh=E7omxeKWYSr7QnIWsWGPKCPFf7LQirXNe6LTBrwkKOQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=dXS/nard+ukkXkaKPweeqgr8f4UE1PhOlNsuRlS89qxM/AoskdsGYVfjO1WesllNi
-         D1h0kvZp0N8P4wA/eq8H0TDikwEA+zwQHCeNtqrwe/8Ym1qVuFltyfUj/9tWPaK40+
-         uURN4NFNDC3gDDRiEx5B952oKrfpugZJoFVxxhTs=
-Date:   Wed, 27 Nov 2019 11:14:52 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [v3 PATCH] crypto: pcrypt - Avoid deadlock by using per-instance
- padata queues
-Message-ID: <20191127191452.GC49214@sol.localdomain>
-References: <20191119130556.dso2ni6qlks3lr23@gondor.apana.org.au>
- <20191119173732.GB819@sol.localdomain>
- <20191119185827.nerskpvddkcsih25@gondor.apana.org.au>
- <20191126053238.yxhtfbt5okcjycuy@ca-dmjordan1.us.oracle.com>
- <20191126075845.2v3woc3xqx2fxzqh@gondor.apana.org.au>
+        Wed, 27 Nov 2019 16:23:06 -0500
+Received: from mail-eopbgr700057.outbound.protection.outlook.com ([40.107.70.57]:60448
+        "EHLO NAM04-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1732224AbfK0VFD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 27 Nov 2019 16:05:03 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YRBuhA3kpJQ8Uvh7akR35QXQ9qmXBC9+qB7Nq160MQKtiLW/1wd9JIMRkthukThIVHy/Gsz/EM7eQxizrOjv9x8FA/CKKJQbJPiwbii9S9Mzl5KWbbnZKilqgAQW7ZIsU7X128UDZppT/c1kWXdzCbo41eZSbyrqxtdRxwFMgSzy0l9jJDUTxsS2/ZioIv8bmlIbCzZAlJptEa/NjrGLVM/yn6ZzWyUqwVI8ijq3eyb7Yr6LdSQbSbQAIpnQekr/dc9V/NhnYEkoyrQr87y9M7VEJQ8cM3xII7fFfooWPzPKIJrq8Nu/ZezPVZuHDhYpYGXWUNRzQtPQRAs53KllNA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=d3aU/F1QGA4pBRP5oE82ZdOXdxzxLJH3b/TeTpBfeYo=;
+ b=JVz6f39CRPpas5xx0M7WTyOO6lMlHbOSeQmoebmb2oFob4zKyQRj2C9fNWpDmm0w5w5gMmrJhmNs5W/poPNdTY5CaIY/CI5Ygh0kckNOWUrJJ996cePzDkg3AjCAfDbgBz4eQ+vRlv8f7JY4xluYfb/SKTRbT+exC7Cpe0XjJUWr4WTFhpCB3Zwpvo4ZWYvmYC0k5YFftteaBMIMs5F0VnlenIb3Euob0HMPrIiyby1xfsKcs+J2drL1zrZ8C3Qk8Ama+4FMRHXQupc7i0rLga+gNAa/aos7uexe8Orrc06Xp3HwKnwV3N1gLaJ2MGnNB+ljIESdpLPOh7eJZQTDcg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=d3aU/F1QGA4pBRP5oE82ZdOXdxzxLJH3b/TeTpBfeYo=;
+ b=u7cKuegCIQgTOUJtOJRckzhNV4AJUfkQtvOYVCIEaUT76d6tlvVCCRTgGh9NZJG11jh6wyYFMd9tUMntViUTkI0RDdjABKk+DXj0QYKxDeUgUx8jHRodo+G0EsUkyh0gTpVKxzBdXUWnEaiOW+ugNQLTtbEFcCAeO59ytg52Qyc=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Gary.Hook@amd.com; 
+Received: from DM5PR12MB1449.namprd12.prod.outlook.com (10.172.40.14) by
+ DM5PR12MB2390.namprd12.prod.outlook.com (52.132.141.161) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2474.17; Wed, 27 Nov 2019 21:04:59 +0000
+Received: from DM5PR12MB1449.namprd12.prod.outlook.com
+ ([fe80::1c56:6282:aee4:89]) by DM5PR12MB1449.namprd12.prod.outlook.com
+ ([fe80::1c56:6282:aee4:89%3]) with mapi id 15.20.2474.023; Wed, 27 Nov 2019
+ 21:04:59 +0000
+Subject: Re: [PATCH] crypto: ccp: set max RSA modulus size for v3 platform
+ devices as well
+To:     Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au
+References: <20191127120136.105325-1-ardb@kernel.org>
+From:   "Hook, Gary" <gary.hook@amd.com>
+Message-ID: <dcb66129-1cb7-cc67-acf6-07abb4047794@amd.com>
+Date:   Wed, 27 Nov 2019 15:04:56 -0600
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
+In-Reply-To: <20191127120136.105325-1-ardb@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-ClientProxiedBy: SN6PR08CA0009.namprd08.prod.outlook.com
+ (2603:10b6:805:66::22) To DM5PR12MB1449.namprd12.prod.outlook.com
+ (2603:10b6:4:10::14)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191126075845.2v3woc3xqx2fxzqh@gondor.apana.org.au>
-User-Agent: Mutt/1.12.2 (2019-09-21)
+X-Originating-IP: [165.204.77.11]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 41a174d3-2add-4aeb-6c22-08d7737d766d
+X-MS-TrafficTypeDiagnostic: DM5PR12MB2390:
+X-Microsoft-Antispam-PRVS: <DM5PR12MB2390742A71E1C95254FA1057FD440@DM5PR12MB2390.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4303;
+X-Forefront-PRVS: 023495660C
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(396003)(39860400002)(366004)(376002)(346002)(189003)(199004)(2616005)(81166006)(6512007)(81156014)(6486002)(66946007)(2906002)(230700001)(66476007)(66556008)(229853002)(31686004)(7736002)(305945005)(8676002)(6436002)(47776003)(58126008)(6116002)(31696002)(316002)(86362001)(65806001)(50466002)(66066001)(65956001)(26005)(11346002)(3846002)(76176011)(52116002)(23676004)(2486003)(4326008)(478600001)(14444005)(5660300002)(186003)(446003)(36756003)(6506007)(6246003)(25786009)(386003)(99286004)(8936002)(14454004)(53546011)(6666004);DIR:OUT;SFP:1101;SCL:1;SRVR:DM5PR12MB2390;H:DM5PR12MB1449.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: BVAB9CdCXwg1mL3D2ERkDgD+1+VXW0SzVMuJz6P4FTkTwNs7db+UG+Ry99KWH14prigAyGzaS2Ve5HjsxcTsluC6nBzx4gOjmRvSeMbgMHqUZSLua7zBKqR2cUNLySdByYUkM1UtN/8Gk1dobS0+EHbZ15RDFkOJd8AnJXVig4RFvP+WJ5Nhs6vxbfTclgGMsu1HnruF3cDOWXjUhr6ktUg+chtVpnfRoSxPUsAqgI1ocvTYO7cdbMoTPgsnNyjTeA8yvy2SHdIDoLGCeCxOLVeL8xopFsLhHS01RsVzPsceoImankBoUephsSUo5kqsx3E8UR05N2UPUdpQ+UTWnSXjsWW2ghRDm8bmERBZxgFSV5ELjQCNinrVwF8CyjbtaXeOTlj1gMaEcK0qGuCulYv5xRlEKXLGXVC96RNr/8CHTa/qneE8R5CxCddrSq4D
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 41a174d3-2add-4aeb-6c22-08d7737d766d
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Nov 2019 21:04:59.4611
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: e1+zozXzy6n1GyIkXYZvMr2fEwI3kzBOUb/IshNG2Gadp6QrX7hbQp58jv+WRNrc
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB2390
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Herbert,
+On 11/27/2019 6:01 AM, Ard Biesheuvel wrote:
+> AMD Seattle incorporates a non-PCI version of the v3 CCP crypto
+> accelerator, and this version was left behind when the maximum
+> RSA modulus size was parameterized in order to support v5 hardware
+> which supports larger moduli than v3 hardware does. Due to this
+> oversight, RSA acceleration no longer works at all on these systems.
+>
+> Fix this by setting the .rsamax property to the appropriate value
+> for v3 platform hardware.
+>
+> Fixes: e28c190db66830c0 ("csrypto: ccp - Expand RSA support for a v5 ccp")
+> Cc: Gary R Hook <gary.hook@amd.com>
+> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 
-On Tue, Nov 26, 2019 at 03:58:45PM +0800, Herbert Xu wrote:
-> On Tue, Nov 26, 2019 at 12:32:38AM -0500, Daniel Jordan wrote:
-> > 
-> > I think it's possible for a task in padata_do_parallel() racing with another in
-> > padata_replace() to use a pd after free.  The synchronize_rcu() comes after the
-> > pd_old->refcnt's are dec'd.
-> 
-> Thanks.  I've fixed this as well as the CPU mask issue you identified
-> earlier.
-> 
-> ---8<---
-> If the pcrypt template is used multiple times in an algorithm, then a
-> deadlock occurs because all pcrypt instances share the same
-> padata_instance, which completes requests in the order submitted.  That
-> is, the inner pcrypt request waits for the outer pcrypt request while
-> the outer request is already waiting for the inner.
-> 
-> This patch fixes this by allocating a set of queues for each pcrypt
-> instance instead of using two global queues.  In order to maintain
-> the existing user-space interface, the pinst structure remains global
-> so any sysfs modifications will apply to every pcrypt instance.
-> 
-> Note that when an update occurs we have to allocate memory for
-> every pcrypt instance.  Should one of the allocations fail we
-> will abort the update without rolling back changes already made.
-> 
-> The new per-instance data structure is called padata_shell and is
-> essentially a wrapper around parallel_data.
-> 
-> Reproducer:
-> 
-> 	#include <linux/if_alg.h>
-> 	#include <sys/socket.h>
-> 	#include <unistd.h>
-> 
-> 	int main()
-> 	{
-> 		struct sockaddr_alg addr = {
-> 			.salg_type = "aead",
-> 			.salg_name = "pcrypt(pcrypt(rfc4106-gcm-aesni))"
-> 		};
-> 		int algfd, reqfd;
-> 		char buf[32] = { 0 };
-> 
-> 		algfd = socket(AF_ALG, SOCK_SEQPACKET, 0);
-> 		bind(algfd, (void *)&addr, sizeof(addr));
-> 		setsockopt(algfd, SOL_ALG, ALG_SET_KEY, buf, 20);
-> 		reqfd = accept(algfd, 0, 0);
-> 		write(reqfd, buf, 32);
-> 		read(reqfd, buf, 16);
-> 	}
-> 
-> Reported-by: syzbot+56c7151cad94eec37c521f0e47d2eee53f9361c4@syzkaller.appspotmail.com
-> Fixes: 5068c7a883d1 ("crypto: pcrypt - Add pcrypt crypto parallelization wrapper")
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Acked-by: Gary R Hook <gary.hook@amd.com>
 
-I tried applying the following patches and running syzkaller again:
-
-	padata: Remove unused padata_remove_cpu
-	padata: Remove broken queue flushing
-	crypto: pcrypt - Fix user-after-free on module unload
-	[v3] crypto: pcrypt - Avoid deadlock by using per-instance padata queues
-
-This time I got a crypto self-test failure when
-"pcrypt(pcrypt(rfc4106-gcm-aesni))" was instantiated:
-
-[ 2220.165113] alg: aead: pcrypt(pcrypt(rfc4106-gcm-aesni)) encryption corrupted request struct on test vector 0, cfg="uneven misaligned splits, may sleep"
-[ 2220.170295] alg: aead: changed 'req->base.flags'
-[ 2220.171799] Kernel panic - not syncing: alg: self-tests for pcrypt(pcrypt(rfc4106-gcm-aesni)) (rfc4106(gcm(aes))) failed in panic_on_fail mode!
-
-So the algorithm is not preserving aead_request::base.flags.
-
-- Eric
+> ---
+>   drivers/crypto/ccp/ccp-dev-v3.c | 1 +
+>   1 file changed, 1 insertion(+)
+>
+> diff --git a/drivers/crypto/ccp/ccp-dev-v3.c b/drivers/crypto/ccp/ccp-dev-v3.c
+> index 0186b3df4c87..0d5576f6ad21 100644
+> --- a/drivers/crypto/ccp/ccp-dev-v3.c
+> +++ b/drivers/crypto/ccp/ccp-dev-v3.c
+> @@ -586,6 +586,7 @@ const struct ccp_vdata ccpv3_platform = {
+>   	.setup = NULL,
+>   	.perform = &ccp3_actions,
+>   	.offset = 0,
+> +	.rsamax = CCP_RSA_MAX_WIDTH,
+>   };
+>   
+>   const struct ccp_vdata ccpv3 = {
