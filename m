@@ -2,143 +2,89 @@ Return-Path: <SRS0=XAm+=ZT=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DE97C432C0
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Nov 2019 13:22:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0060C432C0
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Nov 2019 14:23:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5D3802068E
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Nov 2019 13:22:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A78A4206F0
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Nov 2019 14:23:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JBaM3J5s"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="uRMQFQup"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726591AbfK0NWv (ORCPT
+        id S1727107AbfK0OXP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Nov 2019 08:22:51 -0500
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:32974 "EHLO
-        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726530AbfK0NWv (ORCPT
+        Wed, 27 Nov 2019 09:23:15 -0500
+Received: from mailgw02.mediatek.com ([210.61.82.184]:1717 "EHLO
+        mailgw02.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726673AbfK0OXP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Nov 2019 08:22:51 -0500
-Received: by mail-qk1-f194.google.com with SMTP id c124so15021671qkg.0;
-        Wed, 27 Nov 2019 05:22:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=bT7huAeaJrxOt/OOAz/dFRoPCvzkLXC6+YmTWjfXTjU=;
-        b=JBaM3J5ssSF+BZ6b+O3zzUEQftJP89cPjMRg84yki/9rIK6RQXOEDffPsp+VMJc0zl
-         X97czddDf5v7dvcBxglRyZ4HZxPvbjBr397v8zfV/00XIhSFwyqM0u1DqNknVfRom+SZ
-         Aae4ZX8aVKZWg9JaaBMWAstrhjIpexBMJAqtrzKzNmH1AVbp3UHv6yEEo7qC1chn28km
-         dzuHhXlQS7xsl0ec4FzfPWV1CuTXPzYIti7+PNz7isfQUqY8Shcp0llWDrWMY0YQN3ev
-         HdstfSmZvAP3W8qBZPs+mblWJRpde7rGkmU4o/7VSEdrSL9e+V6qajS6Vm8IZghXEmQw
-         y1mw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=bT7huAeaJrxOt/OOAz/dFRoPCvzkLXC6+YmTWjfXTjU=;
-        b=EE12TAWmQ+8LkY0LWe6hvuYo4KJL+vGKoEqvgUNeKwAUXqeqeIEoWmDpaBWoooyndt
-         kjAQyyafHnfROBSEyDtk9M4Lz6wyJHTvoLiSfwiodohD0WK38Jmo6edYxhsv2AXE45wr
-         e9N425fIov/VcsL5hcmOD8A8cIwxOw9oUh/iUiVi+ST0+nJcd0bxGiCnyS1d9CUMVkNd
-         URPaUefBmoU1iJTmD38kZhGeV2xo433GqNPckr6vPmwnUhudoUJxKD4l7kCK21poXl0K
-         QufSjyHViSc/v5KEfonxyGCTVNOEADEHW5doflZOBvVWIP1/aWpbbSyl0E3BdC4xnOrw
-         +sTw==
-X-Gm-Message-State: APjAAAXCZ2E94KCD7p/hk5aMSFda7/YZ2NAJs7ctqleuh24JZcSJPeh2
-        +J/KXG5baTk1sjUFSirgeDHpGii+SD9Lww==
-X-Google-Smtp-Source: APXvYqxRxWHwQcE23vnQEloXZ4T2uJ+AnMKnvlWVgfZJXrna+veWEeRcoNzcofK0h6mJIZn2XO20Pg==
-X-Received: by 2002:a05:620a:15f8:: with SMTP id p24mr4298620qkm.438.1574860970402;
-        Wed, 27 Nov 2019 05:22:50 -0800 (PST)
-Received: from localhost.localdomain ([2001:1284:f013:3bac:6dc2:4a4b:b6a6:4365])
-        by smtp.gmail.com with ESMTPSA id y131sm2314498qkb.29.2019.11.27.05.22.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Nov 2019 05:22:49 -0800 (PST)
-Received: by localhost.localdomain (Postfix, from userid 1000)
-        id C9D88C510E; Wed, 27 Nov 2019 10:22:46 -0300 (-03)
-Date:   Wed, 27 Nov 2019 10:22:46 -0300
-From:   Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-To:     Xin Long <lucien.xin@gmail.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        Vlad Yasevich <vyasevich@gmail.com>,
-        Neil Horman <nhorman@tuxdriver.com>,
-        linux-sctp@vger.kernel.org,
-        syzbot <syzbot+6dcbfea81cd3d4dd0b02@syzkaller.appspotmail.com>,
-        davem <davem@davemloft.net>,
-        Alexander Potapenko <glider@google.com>,
+        Wed, 27 Nov 2019 09:23:15 -0500
+X-UUID: dea260d0f5c7453a82d2c8ba4cb62079-20191127
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+        h=Content-Transfer-Encoding:Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=cF2Om7X85XQimoGPg+VUY4Aqoy6qnXHiU7JTF0y3r6E=;
+        b=uRMQFQupvqFkrThMzspsv6IPiZ3M81H8L2EF9Xd9zrcWL2OgcFJOI0Rs5SUYEyO4u5mQmxYO/hbNqmcEBbFPuAZO1e8uRIBppL+vVHi6Ah0QxqwhdcxUO++yxn2PEYEKLMaUqcaI0xy16LJ/NGUv/7rPJOh5sjtu4GYhvt7BTXw=;
+X-UUID: dea260d0f5c7453a82d2c8ba4cb62079-20191127
+Received: from mtkcas06.mediatek.inc [(172.21.101.30)] by mailgw02.mediatek.com
+        (envelope-from <neal.liu@mediatek.com>)
+        (Cellopoint E-mail Firewall v4.1.10 Build 0809 with TLS)
+        with ESMTP id 1900528197; Wed, 27 Nov 2019 22:23:10 +0800
+Received: from MTKCAS06.mediatek.inc (172.21.101.30) by
+ mtkmbs02n1.mediatek.inc (172.21.101.77) with Microsoft SMTP Server (TLS) id
+ 15.0.1395.4; Wed, 27 Nov 2019 22:23:00 +0800
+Received: from mtkswgap22.mediatek.inc (172.21.77.33) by MTKCAS06.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1395.4 via Frontend
+ Transport; Wed, 27 Nov 2019 22:23:03 +0800
+From:   Neal Liu <neal.liu@mediatek.com>
+To:     Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>
-Subject: Re: KMSAN: uninit-value in __crc32c_le_base
-Message-ID: <20191127132246.GN388551@localhost.localdomain>
-References: <00000000000004b2df0598075fc8@google.com>
- <20191127060138.GB227319@sol.localdomain>
- <CADvbK_fOZ+kLiOOOXN-qUzDC2376-UxHmg1L6xiAFRR6=+re3w@mail.gmail.com>
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Sean Wang <sean.wang@kernel.org>
+CC:     Neal Liu <neal.liu@mediatek.com>,
+        Crystal Guo <Crystal.Guo@mediatek.com>,
+        <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-mediatek@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <wsd_upstream@mediatek.com>
+Subject: [PATCH v5 2/3] dt-bindings: rng: add bindings for MediaTek ARMv8 SoCs
+Date:   Wed, 27 Nov 2019 22:22:57 +0800
+Message-ID: <1574864578-467-3-git-send-email-neal.liu@mediatek.com>
+X-Mailer: git-send-email 1.7.9.5
+In-Reply-To: <1574864578-467-1-git-send-email-neal.liu@mediatek.com>
+References: <1574864578-467-1-git-send-email-neal.liu@mediatek.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CADvbK_fOZ+kLiOOOXN-qUzDC2376-UxHmg1L6xiAFRR6=+re3w@mail.gmail.com>
-User-Agent: Mutt/1.12.1 (2019-06-15)
+Content-Type: text/plain
+X-MTK:  N
+Content-Transfer-Encoding: base64
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Nov 27, 2019 at 04:49:46PM +0800, Xin Long wrote:
-> On Wed, Nov 27, 2019 at 2:02 PM Eric Biggers <ebiggers@kernel.org> wrote:
-> >
-> > Looks like a bug in net/sctp/ where it's passing uninitialized memory into the
-> > crc32c() function.  SCTP maintainers, can you please take a look?
-> Thanks.
-> 
-> The issue was caused by:
-> transport->ipaddr set with uninit addr param, which was passed by:
-> 
->   sctp_transport_init net/sctp/transport.c:47 [inline]
->   sctp_transport_new+0x248/0xa00 net/sctp/transport.c:100
->   sctp_assoc_add_peer+0x5ba/0x2030 net/sctp/associola.c:611
->   sctp_process_param net/sctp/sm_make_chunk.c:2524 [inline]
-> 
-> where 'addr' is set by sctp_v4_from_addr_param(), which doesn't initialize the
-> padding of addr->v4.
-> 
-> later when calling sctp_make_heartbeat(), hbinfo.daddr(=transport->ipaddr)
-> will become the part of skb, and the issue occurs.
+RG9jdW1lbnQgdGhlIGJpbmRpbmcgdXNlZCBieSB0aGUgTWVkaWFUZWsgQVJNdjggU29DcyByYW5k
+b20NCm51bWJlciBnZW5lcmF0b3Igd2l0aCBUcnVzdFpvbmUgZW5hYmxlZC4NCg0KU2lnbmVkLW9m
+Zi1ieTogTmVhbCBMaXUgPG5lYWwubGl1QG1lZGlhdGVrLmNvbT4NCi0tLQ0KIC4uLi9iaW5kaW5n
+cy9hcm0vZmlybXdhcmUvbWVkaWF0ZWssbXRrLXNlYy1ybmcudHh0IHwgICAxOCArKysrKysrKysr
+KysrKysrKysNCiAxIGZpbGUgY2hhbmdlZCwgMTggaW5zZXJ0aW9ucygrKQ0KIGNyZWF0ZSBtb2Rl
+IDEwMDY0NCBEb2N1bWVudGF0aW9uL2RldmljZXRyZWUvYmluZGluZ3MvYXJtL2Zpcm13YXJlL21l
+ZGlhdGVrLG10ay1zZWMtcm5nLnR4dA0KDQpkaWZmIC0tZ2l0IGEvRG9jdW1lbnRhdGlvbi9kZXZp
+Y2V0cmVlL2JpbmRpbmdzL2FybS9maXJtd2FyZS9tZWRpYXRlayxtdGstc2VjLXJuZy50eHQgYi9E
+b2N1bWVudGF0aW9uL2RldmljZXRyZWUvYmluZGluZ3MvYXJtL2Zpcm13YXJlL21lZGlhdGVrLG10
+ay1zZWMtcm5nLnR4dA0KbmV3IGZpbGUgbW9kZSAxMDA2NDQNCmluZGV4IDAwMDAwMDAuLjc0MWZj
+ZGMNCi0tLSAvZGV2L251bGwNCisrKyBiL0RvY3VtZW50YXRpb24vZGV2aWNldHJlZS9iaW5kaW5n
+cy9hcm0vZmlybXdhcmUvbWVkaWF0ZWssbXRrLXNlYy1ybmcudHh0DQpAQCAtMCwwICsxLDE4IEBA
+DQorTWVkaWFUZWsgcmFuZG9tIG51bWJlciBnZW5lcmF0b3Igd2l0aCBUcnVzdFpvbmUgZW5hYmxl
+ZA0KKw0KK1JlcXVpcmVkIHByb3BlcnRpZXM6DQorLSBjb21wYXRpYmxlICAgICAgIDogU2hvdWxk
+IGNvbnRhaW4gIm1lZGlhdGVrLG10ay1zZWMtcm5nIg0KKw0KKy0gbWV0aG9kICAgICAgICAgICA6
+IFRoZSBtZXRob2Qgb2YgY2FsbGluZyBBcm0gVHJ1c3RlZCBGaXJtd2FyZS4gUGVybWl0dGVkDQor
+CQkgICAgIHZhbHVlcyBhcmU6DQorDQorCQkgICAgICJzbWMiIDogU01DICMwLCB3aXRoIHRoZSBy
+ZWdpc3RlciBhc3NpZ25tZW50cyBzcGVjaWZpZWQNCisJCSAgICAgaW4gdGhpcyBiaW5kaW5nLg0K
+Kw0KK0V4YW1wbGU6DQorCWZpcm13YXJlIHsNCisJCWh3cm5nIHsNCisJCQljb21wYXRpYmxlID0g
+Im1lZGlhdGVrLG10ay1zZWMtcm5nIjsNCisJCQltZXRob2RzID0gInNtYyI7DQorCQl9Ow0KKwl9
+Ow0KLS0gDQoxLjcuOS41DQo=
 
-Sweet.
-
-> 
-> The fix should be:
-> 
-> diff --git a/net/sctp/sm_make_chunk.c b/net/sctp/sm_make_chunk.c
-> index 09050c1d5517..0e73405eba4f 100644
-> --- a/net/sctp/sm_make_chunk.c
-> +++ b/net/sctp/sm_make_chunk.c
-> @@ -2516,6 +2516,7 @@ static int sctp_process_param(struct
-> sctp_association *asoc,
->   if (ipv6_only_sock(asoc->base.sk))
->   break;
->  do_addr_param:
-> + memset(&addr, 0, sizeof(addr));
->   af = sctp_get_af_specific(param_type2af(param.p->type));
->   af->from_addr_param(&addr, param.addr, htons(asoc->peer.port), 0);
->   scope = sctp_scope(peer_addr);
-> @@ -3040,6 +3041,7 @@ static __be16 sctp_process_asconf_param(struct
-> sctp_association *asoc,
->   if (unlikely(!af))
->   return SCTP_ERROR_DNS_FAILED;
-> 
-> + memset(&addr, 0, sizeof(addr));
->   af->from_addr_param(&addr, addr_param, htons(asoc->peer.port), 0);
-
-In sctp_v4_from_addr_param() itself seems cleaner.
-(Ditto for sctp_v4_to_addr_param() and related ones, like
-sctp_v4_dst_saddr())
-
-These functions shouldn't trust that the caller initializes the
-memory. They are dealing with ipv4 but they know that the buffer
-they are writting into is larger and the size of it.
-
-  Marcelo
