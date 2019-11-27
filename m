@@ -2,86 +2,143 @@ Return-Path: <SRS0=XAm+=ZT=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77085C432C0
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Nov 2019 12:01:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DE97C432C0
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Nov 2019 13:22:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4C9632073F
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Nov 2019 12:01:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1574856105;
-	bh=TziSEip9ZikWXUb6vddqqT1XCVIbwlGlZtN3ZQciJFQ=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=2GWA4pis9L13ptFRgFlPoq8JjsebVyT3q8B26o4ERTX4QI9Eobh7vqH5CLlXOunRe
-	 hkq5xcTOd3Bt6pGl0U0GBwb4nliTZxdJZWWxeeNzGuYkSpvztIQHBShGwa8OziCWMl
-	 NuYCEvnhs4VK8q1No1GZlF6WxWvnhw335gBYPhV0=
+	by mail.kernel.org (Postfix) with ESMTP id 5D3802068E
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Nov 2019 13:22:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JBaM3J5s"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726655AbfK0MBo (ORCPT
+        id S1726591AbfK0NWv (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Nov 2019 07:01:44 -0500
-Received: from mail.kernel.org ([198.145.29.99]:41914 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726320AbfK0MBo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Nov 2019 07:01:44 -0500
-Received: from localhost.localdomain (laubervilliers-657-1-83-120.w92-154.abo.wanadoo.fr [92.154.90.120])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 5097E206F0;
-        Wed, 27 Nov 2019 12:01:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1574856104;
-        bh=TziSEip9ZikWXUb6vddqqT1XCVIbwlGlZtN3ZQciJFQ=;
-        h=From:To:Cc:Subject:Date:From;
-        b=adGbilzhpKiK4sfwGDqft1IqGvpY+Lm1ThaHm1tI2LsI032dTR38upyYl2yCA70sd
-         QWa1dTxHjkjM690IY2v1OnA1QSFdTFwFzp2FN805hDT8hsRm7Jnlsud26abhcwy6Xq
-         Z0nYd25ROG8G7/YdUiZcmRunCSuLnolKOheXl4Hc=
-From:   Ard Biesheuvel <ardb@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, Ard Biesheuvel <ardb@kernel.org>,
-        Gary R Hook <gary.hook@amd.com>
-Subject: [PATCH] crypto: ccp: set max RSA modulus size for v3 platform devices as well
-Date:   Wed, 27 Nov 2019 13:01:36 +0100
-Message-Id: <20191127120136.105325-1-ardb@kernel.org>
-X-Mailer: git-send-email 2.20.1
+        Wed, 27 Nov 2019 08:22:51 -0500
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:32974 "EHLO
+        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726530AbfK0NWv (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 27 Nov 2019 08:22:51 -0500
+Received: by mail-qk1-f194.google.com with SMTP id c124so15021671qkg.0;
+        Wed, 27 Nov 2019 05:22:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=bT7huAeaJrxOt/OOAz/dFRoPCvzkLXC6+YmTWjfXTjU=;
+        b=JBaM3J5ssSF+BZ6b+O3zzUEQftJP89cPjMRg84yki/9rIK6RQXOEDffPsp+VMJc0zl
+         X97czddDf5v7dvcBxglRyZ4HZxPvbjBr397v8zfV/00XIhSFwyqM0u1DqNknVfRom+SZ
+         Aae4ZX8aVKZWg9JaaBMWAstrhjIpexBMJAqtrzKzNmH1AVbp3UHv6yEEo7qC1chn28km
+         dzuHhXlQS7xsl0ec4FzfPWV1CuTXPzYIti7+PNz7isfQUqY8Shcp0llWDrWMY0YQN3ev
+         HdstfSmZvAP3W8qBZPs+mblWJRpde7rGkmU4o/7VSEdrSL9e+V6qajS6Vm8IZghXEmQw
+         y1mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=bT7huAeaJrxOt/OOAz/dFRoPCvzkLXC6+YmTWjfXTjU=;
+        b=EE12TAWmQ+8LkY0LWe6hvuYo4KJL+vGKoEqvgUNeKwAUXqeqeIEoWmDpaBWoooyndt
+         kjAQyyafHnfROBSEyDtk9M4Lz6wyJHTvoLiSfwiodohD0WK38Jmo6edYxhsv2AXE45wr
+         e9N425fIov/VcsL5hcmOD8A8cIwxOw9oUh/iUiVi+ST0+nJcd0bxGiCnyS1d9CUMVkNd
+         URPaUefBmoU1iJTmD38kZhGeV2xo433GqNPckr6vPmwnUhudoUJxKD4l7kCK21poXl0K
+         QufSjyHViSc/v5KEfonxyGCTVNOEADEHW5doflZOBvVWIP1/aWpbbSyl0E3BdC4xnOrw
+         +sTw==
+X-Gm-Message-State: APjAAAXCZ2E94KCD7p/hk5aMSFda7/YZ2NAJs7ctqleuh24JZcSJPeh2
+        +J/KXG5baTk1sjUFSirgeDHpGii+SD9Lww==
+X-Google-Smtp-Source: APXvYqxRxWHwQcE23vnQEloXZ4T2uJ+AnMKnvlWVgfZJXrna+veWEeRcoNzcofK0h6mJIZn2XO20Pg==
+X-Received: by 2002:a05:620a:15f8:: with SMTP id p24mr4298620qkm.438.1574860970402;
+        Wed, 27 Nov 2019 05:22:50 -0800 (PST)
+Received: from localhost.localdomain ([2001:1284:f013:3bac:6dc2:4a4b:b6a6:4365])
+        by smtp.gmail.com with ESMTPSA id y131sm2314498qkb.29.2019.11.27.05.22.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Nov 2019 05:22:49 -0800 (PST)
+Received: by localhost.localdomain (Postfix, from userid 1000)
+        id C9D88C510E; Wed, 27 Nov 2019 10:22:46 -0300 (-03)
+Date:   Wed, 27 Nov 2019 10:22:46 -0300
+From:   Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+To:     Xin Long <lucien.xin@gmail.com>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        Vlad Yasevich <vyasevich@gmail.com>,
+        Neil Horman <nhorman@tuxdriver.com>,
+        linux-sctp@vger.kernel.org,
+        syzbot <syzbot+6dcbfea81cd3d4dd0b02@syzkaller.appspotmail.com>,
+        davem <davem@davemloft.net>,
+        Alexander Potapenko <glider@google.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>
+Subject: Re: KMSAN: uninit-value in __crc32c_le_base
+Message-ID: <20191127132246.GN388551@localhost.localdomain>
+References: <00000000000004b2df0598075fc8@google.com>
+ <20191127060138.GB227319@sol.localdomain>
+ <CADvbK_fOZ+kLiOOOXN-qUzDC2376-UxHmg1L6xiAFRR6=+re3w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CADvbK_fOZ+kLiOOOXN-qUzDC2376-UxHmg1L6xiAFRR6=+re3w@mail.gmail.com>
+User-Agent: Mutt/1.12.1 (2019-06-15)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-AMD Seattle incorporates a non-PCI version of the v3 CCP crypto
-accelerator, and this version was left behind when the maximum
-RSA modulus size was parameterized in order to support v5 hardware
-which supports larger moduli than v3 hardware does. Due to this
-oversight, RSA acceleration no longer works at all on these systems.
+On Wed, Nov 27, 2019 at 04:49:46PM +0800, Xin Long wrote:
+> On Wed, Nov 27, 2019 at 2:02 PM Eric Biggers <ebiggers@kernel.org> wrote:
+> >
+> > Looks like a bug in net/sctp/ where it's passing uninitialized memory into the
+> > crc32c() function.  SCTP maintainers, can you please take a look?
+> Thanks.
+> 
+> The issue was caused by:
+> transport->ipaddr set with uninit addr param, which was passed by:
+> 
+>   sctp_transport_init net/sctp/transport.c:47 [inline]
+>   sctp_transport_new+0x248/0xa00 net/sctp/transport.c:100
+>   sctp_assoc_add_peer+0x5ba/0x2030 net/sctp/associola.c:611
+>   sctp_process_param net/sctp/sm_make_chunk.c:2524 [inline]
+> 
+> where 'addr' is set by sctp_v4_from_addr_param(), which doesn't initialize the
+> padding of addr->v4.
+> 
+> later when calling sctp_make_heartbeat(), hbinfo.daddr(=transport->ipaddr)
+> will become the part of skb, and the issue occurs.
 
-Fix this by setting the .rsamax property to the appropriate value
-for v3 platform hardware.
+Sweet.
 
-Fixes: e28c190db66830c0 ("csrypto: ccp - Expand RSA support for a v5 ccp")
-Cc: Gary R Hook <gary.hook@amd.com>
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
----
- drivers/crypto/ccp/ccp-dev-v3.c | 1 +
- 1 file changed, 1 insertion(+)
+> 
+> The fix should be:
+> 
+> diff --git a/net/sctp/sm_make_chunk.c b/net/sctp/sm_make_chunk.c
+> index 09050c1d5517..0e73405eba4f 100644
+> --- a/net/sctp/sm_make_chunk.c
+> +++ b/net/sctp/sm_make_chunk.c
+> @@ -2516,6 +2516,7 @@ static int sctp_process_param(struct
+> sctp_association *asoc,
+>   if (ipv6_only_sock(asoc->base.sk))
+>   break;
+>  do_addr_param:
+> + memset(&addr, 0, sizeof(addr));
+>   af = sctp_get_af_specific(param_type2af(param.p->type));
+>   af->from_addr_param(&addr, param.addr, htons(asoc->peer.port), 0);
+>   scope = sctp_scope(peer_addr);
+> @@ -3040,6 +3041,7 @@ static __be16 sctp_process_asconf_param(struct
+> sctp_association *asoc,
+>   if (unlikely(!af))
+>   return SCTP_ERROR_DNS_FAILED;
+> 
+> + memset(&addr, 0, sizeof(addr));
+>   af->from_addr_param(&addr, addr_param, htons(asoc->peer.port), 0);
 
-diff --git a/drivers/crypto/ccp/ccp-dev-v3.c b/drivers/crypto/ccp/ccp-dev-v3.c
-index 0186b3df4c87..0d5576f6ad21 100644
---- a/drivers/crypto/ccp/ccp-dev-v3.c
-+++ b/drivers/crypto/ccp/ccp-dev-v3.c
-@@ -586,6 +586,7 @@ const struct ccp_vdata ccpv3_platform = {
- 	.setup = NULL,
- 	.perform = &ccp3_actions,
- 	.offset = 0,
-+	.rsamax = CCP_RSA_MAX_WIDTH,
- };
- 
- const struct ccp_vdata ccpv3 = {
--- 
-2.20.1
+In sctp_v4_from_addr_param() itself seems cleaner.
+(Ditto for sctp_v4_to_addr_param() and related ones, like
+sctp_v4_dst_saddr())
 
+These functions shouldn't trust that the caller initializes the
+memory. They are dealing with ipv4 but they know that the buffer
+they are writting into is larger and the size of it.
+
+  Marcelo
