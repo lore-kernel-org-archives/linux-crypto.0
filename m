@@ -2,147 +2,76 @@ Return-Path: <SRS0=XAm+=ZT=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37787C432C0
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Nov 2019 09:16:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61671C432C3
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Nov 2019 10:49:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0A5DD2070A
-	for <linux-crypto@archiver.kernel.org>; Wed, 27 Nov 2019 09:16:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2E8912070A
+	for <linux-crypto@archiver.kernel.org>; Wed, 27 Nov 2019 10:49:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nSZ3oe7r"
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="apEnIqch"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726133AbfK0JQM (ORCPT
+        id S1726383AbfK0Kte (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 27 Nov 2019 04:16:12 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:40452 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726130AbfK0JQM (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 27 Nov 2019 04:16:12 -0500
-Received: by mail-wm1-f65.google.com with SMTP id y5so6517236wmi.5;
-        Wed, 27 Nov 2019 01:16:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:mime-version:subject:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=0BJv2rQbPmyg5RLJ0rIFY2UVBNyGhHyWWhsLwcSjmkw=;
-        b=nSZ3oe7rGfunTsIADaXep5nf0AVArP4+QUSLzHg3Zxhg3saLVVO1ePhbPEGks6WEZs
-         9dqD9tfG+yzDGeBsdmXG8LXSIWpPIYdGo7QTQw8mkEaTcy6mWmL9BVHwhwEr7dYhcKZ2
-         vSTILlHO48dT1dcLT/JhexUE8jbP0NEn0LNP74+Mnz9KVclEWSD1OAv3i9CpgZpYs4hX
-         J9Qpyub5aKpfTIJX+lhTWjkX+E3U081ZOQe8Tl+I+xC5+DdBbFuwB8HFAJshTfw8sJLw
-         5BUjHMr+PL28OiryIOVxiiXCLYbOSkOW/lfnLuTvTadHdHFgNnbT14f5/olxfaOH0mOr
-         MENA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:mime-version:subject:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=0BJv2rQbPmyg5RLJ0rIFY2UVBNyGhHyWWhsLwcSjmkw=;
-        b=df1XXr4TTOK1SPUv0mZQyG5SxWRVh0jYA5GLquSN6QwKJEul9cFnMTrkyTrIYcdhqG
-         W8GSd/Tmzhe1oGfQGWfJFp2kMRUO9DOFkYzDkyZnyE2jx8GnXtTCSdos7OkJujt8EWF0
-         MebspGADE45bwlaxqD824fqzILxwwCl/IwwYtDy9i4T6n8uPOvbWfeVY3tZjDaGqYzlK
-         JKdG9n0uQsP/vYA5qwef3uY+tDiX2M2rZOcsp8ejm9w3xzLmYQ8zST+1orJY4jSKe1bl
-         JpJ1nDriCwmhcFWMHSfDTFj9HTDkEPEG978IYB/XuQLlX613MeYqLVRL2G9/nNVa3+UY
-         dfOw==
-X-Gm-Message-State: APjAAAW3739nuLxOK5ZnZNMwxQmlHde2+lYdVMt2V+woYIC7DZKDJs5P
-        JQzwTlA8Cv6qT8sSK9J3RYo=
-X-Google-Smtp-Source: APXvYqz025JqnWIO/Ncq+bSOi5sEijFLwElB0JpU6k1dNwDRd2yHM90gSYSczd60PcPiIw01pcQnew==
-X-Received: by 2002:a1c:5603:: with SMTP id k3mr3512995wmb.150.1574846169501;
-        Wed, 27 Nov 2019 01:16:09 -0800 (PST)
-Received: from ?IPv6:2a01:e0a:466:71c0:9917:620f:cb41:ebf9? ([2a01:e0a:466:71c0:9917:620f:cb41:ebf9])
-        by smtp.gmail.com with ESMTPSA id g21sm19975431wrb.48.2019.11.27.01.16.06
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 27 Nov 2019 01:16:08 -0800 (PST)
-From:   Christophe de Dinechin <christophe.de.dinechin@gmail.com>
-X-Google-Original-From: Christophe de Dinechin <christophe@dinechin.org>
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH v2] KVM: SVM: Fix "error" isn't initialized
-In-Reply-To: <2967bd12-21bf-3223-e90b-96b4eaa8c4c2@gmail.com>
-Date:   Wed, 27 Nov 2019 10:16:02 +0100
-Cc:     "x86@kernel.org" <x86@kernel.org>, KVM list <kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        linux-crypto@vger.kernel.org,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        "rkrcmar@redhat.com" <rkrcmar@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        "vkuznets@redhat.com" <vkuznets@redhat.com>,
-        "wanpengli@tencent.com" <wanpengli@tencent.com>,
-        "jmattson@google.com" <jmattson@google.com>,
-        "joro@8bytes.org" <joro@8bytes.org>,
-        "tglx@linutronix.de" <tglx@linutronix.de>,
-        "mingo@redhat.com" <mingo@redhat.com>,
-        "bp@alien8.de" <bp@alien8.de>, "hpa@zytor.com" <hpa@zytor.com>,
-        thomas.lendacky@amd.com, gary.hook@amd.com,
-        herbert@gondor.apana.org.au, davem@davemloft.net
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <592F6B37-93C9-4184-BCFF-3B25AF4F7562@dinechin.org>
-References: <2967bd12-21bf-3223-e90b-96b4eaa8c4c2@gmail.com>
-To:     Haiwei Li <lihaiwei.kernel@gmail.com>
-X-Mailer: Apple Mail (2.3445.104.11)
+        Wed, 27 Nov 2019 05:49:34 -0500
+Received: from frisell.zx2c4.com ([192.95.5.64]:41637 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726149AbfK0Kte (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 27 Nov 2019 05:49:34 -0500
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id f4a941b4;
+        Wed, 27 Nov 2019 09:55:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=date:from:to
+        :cc:subject:message-id:references:mime-version:content-type
+        :in-reply-to; s=mail; bh=eRC4IefZaq2pDwmil7AkwYOB+x4=; b=apEnIqc
+        hNhcp7PJoYCnlztSmO7hU35bnQku8sxzwt1fW8+esarEmV01sBUE2BQEGhNWxXE8
+        I2q2j1gBzd0sjNNA9TGQddNz6gFlSozY/c4Gj3iymlk6n+wQuhsrqW8KN/ivJI5v
+        BNCCm+d4ePkfYGyaMxzmLeYm7/SK8RkTljIhUtAElmPpeaFoIB2n+3ughhPsQbq2
+        VDDxiHP+jZ0P77Fiym39B4h+Lh2SVAtU8ipMse5WxWj4lTB4vjO2STnTP3BUobxn
+        oIqk3/PV8ttdTa1XejhNrrmvfApxp3fSNEolkmv0UXwr2RhbvKShz43T9HyGelkf
+        vF0EwPKqVdHxSTA==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 96238084 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
+        Wed, 27 Nov 2019 09:55:42 +0000 (UTC)
+Date:   Wed, 27 Nov 2019 11:49:30 +0100
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc:     David Miller <davem@davemloft.net>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH RFC net-next] net: WireGuard secure network tunnel
+Message-ID: <20191127104930.GA367657@zx2c4.com>
+References: <20191120203538.199367-1-Jason@zx2c4.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20191120203538.199367-1-Jason@zx2c4.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Wed, Nov 20, 2019 at 09:35:38PM +0100, Jason A. Donenfeld wrote:
+> RFC Note:
+>   This is a RFC for folks who want to play with this early, because
+>   Herbert's cryptodev-2.6 tree hasn't yet made it into net-next. I'll
+>   repost this as a v1 (possibly with feedback incorporated) once the
+>   various trees are in the right place. This compiles on top of the
+>   Frankenzinc patchset from Ard, though it hasn't yet received suitable
+>   testing there for me to call it v1 just yet. Preliminary testing with
+>   the usual netns.sh test suite on x86 indicates it's at least mostly
+>   functional, but I'll be giving things further scrutiny in the days to
+>   come.
+> 
+> WireGuard is a layer 3 secure networking tunnel made specifically for
+> [...]
 
+FYI, as the various merges happen between crypto-2.6.git and net*.git,
+I'll be keeping this tag up to date with the latest WireGuard patch:
 
-> On 27 Nov 2019, at 08:23, Haiwei Li <lihaiwei.kernel@gmail.com> wrote:
->=20
-> =46rom e7f9c786e43ef4f890b8a01f15f8f00786f4b14a Mon Sep 17 00:00:00 =
-2001
-> From: Haiwei Li <lihaiwei@tencent.com>
-> Date: Wed, 27 Nov 2019 15:00:49 +0800
-> Subject: [PATCH v2] fix: 'error' is not initialized
->=20
-> There are a bunch of error paths were "error" isn't initialized.
->=20
-> Signed-off-by: Haiwei Li <lihaiwei@tencent.com>
-> Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-> ---
-> arch/x86/kvm/svm.c           | 3 ++-
-> drivers/crypto/ccp/psp-dev.c | 2 ++
-> 2 files changed, 4 insertions(+), 1 deletion(-)
->=20
-> diff --git a/arch/x86/kvm/svm.c b/arch/x86/kvm/svm.c
-> index 362e874..9eef6fc 100644
-> --- a/arch/x86/kvm/svm.c
-> +++ b/arch/x86/kvm/svm.c
-> @@ -6308,7 +6308,8 @@ static int sev_flush_asids(void)
-> 	up_write(&sev_deactivate_lock);
->=20
-> 	if (ret)
-> -		pr_err("SEV: DF_FLUSH failed, ret=3D%d, error=3D%#x\n", =
-ret, error);
-> +		pr_err("SEV: DF_FLUSH failed, ret=3D%d. PSP returned =
-error=3D%#x\n",
-> +		       ret, error);
-
-This specific text change does not seem to match the patch description.
-
->=20
-> 	return ret;
-> }
-> diff --git a/drivers/crypto/ccp/psp-dev.c =
-b/drivers/crypto/ccp/psp-dev.c
-> index 39fdd06..c486c24 100644
-> --- a/drivers/crypto/ccp/psp-dev.c
-> +++ b/drivers/crypto/ccp/psp-dev.c
-> @@ -155,6 +155,8 @@ static int __sev_do_cmd_locked(int cmd, void =
-*data, int *psp_ret)
-> 	unsigned int phys_lsb, phys_msb;
-> 	unsigned int reg, ret =3D 0;
->=20
-> +	*psp_ret =3D -1;
-> +
-> 	if (!psp)
-> 		return -ENODEV;
->=20
-> --
-> 1.8.3.1
-
+https://git.kernel.org/pub/scm/linux/kernel/git/zx2c4/linux.git/patch/?id=734bd9ed21b0b0057bd2a131c9129a50cd910f6c
+https://git.kernel.org/pub/scm/linux/kernel/git/zx2c4/linux.git/commit/?h=wireguard
