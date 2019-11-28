@@ -2,78 +2,95 @@ Return-Path: <SRS0=AT0s=ZU=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CA81C432C3
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Nov 2019 12:55:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13FE0C432C0
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 Nov 2019 12:56:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E4CB321774
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Nov 2019 12:55:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1574945725;
-	bh=8bxLnSoz8rBfOPLDuSDuh1pX0IuRo0h0J6S+OsbXTls=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=FGaWcRzAboyXHecxttQqdz65Zk8GkZwaxa9go6eRMLwg2XGys+lKjUyXabwUG7E99
-	 7tSqp3DK2fYrKwExTzkdhRtPBCn0WGF2G0ZJKwv5AvBWKE2isXhgIpW4EVOVrD8cZx
-	 GdhM1nzWwDN7X5ZAorf01tkJyrOUfYVfjvJGHOeg=
+	by mail.kernel.org (Postfix) with ESMTP id E86572176D
+	for <linux-crypto@archiver.kernel.org>; Thu, 28 Nov 2019 12:56:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726448AbfK1MzY (ORCPT
+        id S1726608AbfK1M4t (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 28 Nov 2019 07:55:24 -0500
-Received: from mail.kernel.org ([198.145.29.99]:47800 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726281AbfK1MzY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 28 Nov 2019 07:55:24 -0500
-Received: from e123331-lin.home (amontpellier-657-1-18-247.w109-210.abo.wanadoo.fr [109.210.65.247])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1714B2176D;
-        Thu, 28 Nov 2019 12:55:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1574945723;
-        bh=8bxLnSoz8rBfOPLDuSDuh1pX0IuRo0h0J6S+OsbXTls=;
-        h=From:To:Cc:Subject:Date:From;
-        b=WHN6gSqz6zJuaqYeR2otaVjeZ3BNzzSBiiwxt6NmKAYBa7n3WXbhMqNVHoKGWysyz
-         wPwPa6XNmm2651cTEuMK3HfsDTcmfeiKdOcp7GnB+nxIKUdFaREArS1nA4Xim3vVP1
-         H0M5Wt/dcpEWtIBHwW7QtXcfjcM0lT1aNbmhJ29g=
-From:   Ard Biesheuvel <ardb@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH] crypto: arm64/ghash-neon - bump priority to 150
-Date:   Thu, 28 Nov 2019 13:55:31 +0100
-Message-Id: <20191128125531.5165-1-ardb@kernel.org>
-X-Mailer: git-send-email 2.17.1
+        Thu, 28 Nov 2019 07:56:49 -0500
+Received: from mout.kundenserver.de ([212.227.126.131]:47357 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726320AbfK1M4t (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 28 Nov 2019 07:56:49 -0500
+Received: from orion.localdomain ([95.117.37.214]) by mrelayeu.kundenserver.de
+ (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis) id
+ 1Mj8Vx-1hvDjy246X-00fC0B; Thu, 28 Nov 2019 13:54:35 +0100
+From:   "Enrico Weigelt, metux IT consult" <info@metux.net>
+To:     linux-kernel@vger.kernel.org
+Cc:     tim@buttersideup.com, james.morse@arm.com, rrichter@marvell.com,
+        jdelvare@suse.com, linux@roeck-us.net, miquel.raynal@bootlin.com,
+        richard@nod.at, vigneshr@ti.com, linux-crypto@vger.kernel.org,
+        linux-edac@vger.kernel.org, linux-hwmon@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-pci@vger.kernel.org
+Subject: [PATCH 4/6] edac: i82443bxgx_edac: use pci_get_device_by_id()
+Date:   Thu, 28 Nov 2019 13:54:04 +0100
+Message-Id: <20191128125406.10417-4-info@metux.net>
+X-Mailer: git-send-email 2.11.0
+In-Reply-To: <20191128125406.10417-1-info@metux.net>
+References: <20191128125406.10417-1-info@metux.net>
+X-Provags-ID: V03:K1:9EUuGTPFx9yVqpEoKdlnLYODqk9fzt9TtUcFLxUJNQuCt8Dur2J
+ ACsPPHh76A4wFy8Z88Uwcih8Gh0dLZpBgM8CFlKvY0QA8CbpcQLiyPn2pyQvfVC0LvrKJga
+ Cc1aJBxlcwchVkCPVIP3TXc8IMtS9wGQaNQjzGegaEmSeVHuId1bQ7trzN6njcAQpcGXqw0
+ CyUuKxSGvW13czLk3/woA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:/fn+U6evcp8=:mG00zLE+KR2h6oHqb9009C
+ L0fikJ9nBQgS+pmDUpSajRT4HUgHowXnOvY7nwciAUil9VzSSq5nS6YUn9wUiEJbCmBNMLBBi
+ 9GNdhWPS1tyZZwSwlZKHW8wKz+wikAN8xUu6xrk4YFNN23kXZplI4zmNLc+Lm5NyhRAcNdTIn
+ zy59HI05sybYGVBCSLYg7ZHBT8R1zeYbZwKMqGNW4KS58cEhkWwLinI5jCexhRJ84HZZ+BoN1
+ G3gCzTOfZgWRYOZCs88AkG/lhETTv0KlMQYhKgL7ekvBt7psZVSXZ/8i3OBWs8nO/GhCTTNyJ
+ zoZAY24hx+Pi36uQKrn26DyHbKnFkAWh/JhYMI+8XYHj3RMrXDJmLGAADEQ8R7udrni5VDqRQ
+ lIUeB02b37i4SJS82xbox6wwsVxwI4Y0yKU7hg41FJkk0yO59QBugIBSQMqoMuC8LwGZhF5Tt
+ ChOYleEqTKERFMWYdnAQpTtmOUQYPTKU/6K02ai1cOGFMYV2JbZk1eMDM/7homG2m5rb9bIIl
+ FtwTTsakh/VyDO4Xv+1wDFd/Ikjme1b8mbIQclCY8siGvzx4CZh0wrQpHYOLhR6tJC17XL3mK
+ IaVxXZbWmn5zjH4JoffpYxppi9setLwa8TImMh23Np222al9COuJD16fmAPMYIbRxoHwrk4HP
+ 8Sd3yluxx5TCu/GorU/8vmVsRwGuRqEDm9KjAC2Cnn94lyTRGo1dVG/xfH+/xJGUfQgeab/lE
+ IAshHFivK66H3YugaZnI3Fi5fIl4E0cFBdikOvm05PGkuNcE6Jv9wBeexKJo7o3NB+eECt7hu
+ 99QB4XBE7inceZX+WISbvRB+ohIstws4Entssak1jqg2wR4RN1TBTWYp/wY0m2rLoAKQCa+x/
+ B6FZ1HHlOMjNBYVsVT/A==
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The SIMD based GHASH implementation for arm64 is typically much faster
-than the generic one, and doesn't use any lookup tables, so it is
-clearly preferred when available. So bump the priority to reflect that.
+Use the new pci_get_device_by_id() helper in order to reduce
+a bit of boilerplate.
 
-Fixes: 5a22b198cd527447 ("crypto: arm64/ghash - register PMULL variants ...")
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+Signed-off-by: Enrico Weigelt, metux IT consult <info@metux.net>
 ---
- arch/arm64/crypto/ghash-ce-glue.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/edac/i82443bxgx_edac.c | 8 +++-----
+ 1 file changed, 3 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/crypto/ghash-ce-glue.c b/arch/arm64/crypto/ghash-ce-glue.c
-index 522cf004ce65..196aedd0c20c 100644
---- a/arch/arm64/crypto/ghash-ce-glue.c
-+++ b/arch/arm64/crypto/ghash-ce-glue.c
-@@ -259,7 +259,7 @@ static int ghash_setkey(struct crypto_shash *tfm,
- static struct shash_alg ghash_alg[] = {{
- 	.base.cra_name		= "ghash",
- 	.base.cra_driver_name	= "ghash-neon",
--	.base.cra_priority	= 100,
-+	.base.cra_priority	= 150,
- 	.base.cra_blocksize	= GHASH_BLOCK_SIZE,
- 	.base.cra_ctxsize	= sizeof(struct ghash_key),
- 	.base.cra_module	= THIS_MODULE,
+diff --git a/drivers/edac/i82443bxgx_edac.c b/drivers/edac/i82443bxgx_edac.c
+index a2ca929e2168..c01f51a4848c 100644
+--- a/drivers/edac/i82443bxgx_edac.c
++++ b/drivers/edac/i82443bxgx_edac.c
+@@ -407,15 +407,13 @@ static int __init i82443bxgx_edacmc_init(void)
+ 		goto fail0;
+ 
+ 	if (mci_pdev == NULL) {
+-		const struct pci_device_id *id = &i82443bxgx_pci_tbl[0];
+ 		int i = 0;
+ 		i82443bxgx_registered = 0;
+ 
+-		while (mci_pdev == NULL && id->vendor != 0) {
+-			mci_pdev = pci_get_device(id->vendor,
+-					id->device, NULL);
++		while (mci_pdev == NULL && i82443bxgx_pci_tbl[i].vendor) {
++			mci_pdev = pci_get_device_by_id(
++				&i82443bxgx_pci_tbl[i]);
+ 			i++;
+-			id = &i82443bxgx_pci_tbl[i];
+ 		}
+ 		if (!mci_pdev) {
+ 			edac_dbg(0, "i82443bxgx pci_get_device fail\n");
 -- 
-2.17.1
+2.11.0
 
