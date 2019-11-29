@@ -1,59 +1,116 @@
-Return-Path: <SRS0=AT0s=ZU=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=xIDj=ZV=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A76B0C432C0
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Nov 2019 21:30:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62F3FC432C0
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 Nov 2019 03:32:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8419721781
-	for <linux-crypto@archiver.kernel.org>; Thu, 28 Nov 2019 21:30:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0DB8F206F0
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 Nov 2019 03:32:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="XWR//nIp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726655AbfK1VaY (ORCPT
+        id S1726773AbfK2DcK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 28 Nov 2019 16:30:24 -0500
-Received: from shards.monkeyblade.net ([23.128.96.9]:49334 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726558AbfK1VaY (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 28 Nov 2019 16:30:24 -0500
-Received: from localhost (c-73-35-209-67.hsd1.wa.comcast.net [73.35.209.67])
-        (using TLSv1 with cipher AES256-SHA (256/256 bits))
-        (Client did not present a certificate)
-        (Authenticated sender: davem-davemloft)
-        by shards.monkeyblade.net (Postfix) with ESMTPSA id C8843145487A4;
-        Thu, 28 Nov 2019 13:30:23 -0800 (PST)
-Date:   Thu, 28 Nov 2019 13:30:23 -0800 (PST)
-Message-Id: <20191128.133023.1503723038764717212.davem@davemloft.net>
-To:     Jason@zx2c4.com
+        Thu, 28 Nov 2019 22:32:10 -0500
+Received: from frisell.zx2c4.com ([192.95.5.64]:50913 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726764AbfK2DcK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 28 Nov 2019 22:32:10 -0500
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 261fdee4;
+        Fri, 29 Nov 2019 02:38:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=date:from:to
+        :cc:subject:message-id:references:mime-version:content-type
+        :in-reply-to; s=mail; bh=QnhIEK3n2PL2veutrTDB1byHOuI=; b=XWR//nI
+        pUhfZoUNt+GgvwJFxvAY0gNHPOXOUsdaCoQPsZX7gInLGeIkZDSlga06X6SnEFWp
+        GYJxTuWwbiLsN8bMhbiftR3C+4WDJUebO2e33TpH/7fKUmAS1K57ulmd5k/GWaHh
+        zA2rAcofYYiaSSgGdlGpaUV01mZQtEZhyiv7xhvMfsXqrtRd14FaIllBmyyGzYTq
+        eWcuIGkWvO1laLhLfNoB2KDaA+nKokoyl4MdkccjUnP4Vqe9wmwC3J7ANaLRZinn
+        7jbxT8/M318CcQq6g5/VV328oJac7dNU0RAwO71ghpCdfvHw15StHblWVRWQiwn4
+        gxUMZKPbxvkHpSA==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 44972ea7 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
+        Fri, 29 Nov 2019 02:38:04 +0000 (UTC)
+Date:   Fri, 29 Nov 2019 04:32:05 +0100
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     David Miller <davem@davemloft.net>
 Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
         gregkh@linuxfoundation.org, torvalds@linux-foundation.org,
         herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
 Subject: Re: [PATCH v1] net: WireGuard secure network tunnel
-From:   David Miller <davem@davemloft.net>
-In-Reply-To: <20191127112643.441509-1-Jason@zx2c4.com>
+Message-ID: <20191129033205.GA67257@zx2c4.com>
 References: <20191127112643.441509-1-Jason@zx2c4.com>
-X-Mailer: Mew version 6.8 on Emacs 26.1
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.5.12 (shards.monkeyblade.net [149.20.54.216]); Thu, 28 Nov 2019 13:30:24 -0800 (PST)
+ <20191128.133023.1503723038764717212.davem@davemloft.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20191128.133023.1503723038764717212.davem@davemloft.net>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Wed, 27 Nov 2019 12:26:43 +0100
+Hey Dave,
 
-> +	do {
-> +		next = skb->next;
+On Thu, Nov 28, 2019 at 01:30:23PM -0800, David Miller wrote:
+> From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+> Date: Wed, 27 Nov 2019 12:26:43 +0100
+> 
+> > +	do {
+> > +		next = skb->next;
+> 
+> I've been trying desperately to remove all direct references to the SKB list
+> implementation details so that we can convert it over to list_head.  This
+> means no direct references to skb->next nor skb->prev.
+> 
+> Please rearrange this using appropriate helpers and abstractions from skbuff.h
 
-I've been trying desperately to remove all direct references to the SKB list
-implementation details so that we can convert it over to list_head.  This
-means no direct references to skb->next nor skb->prev.
+I'm not a huge fan of doing manual skb surgery either. The annoying
+thing here is that skb_gso_segment returns a list of skbs that's
+terminated by the last one's next pointer being NULL. I assume it's this
+way so that the GSO code doesn't have to pass a head around. I went to
+see what other drivers are doing to deal with the return value of
+skb_gso_segment, and found that every place without fail does pretty
+much the same thing as me, whether it's wifi drivers, ethernet drivers,
+qdiscs, ipsec, etc. Here's (one of) IPsec's usage, for example:
 
-Please rearrange this using appropriate helpers and abstractions from skbuff.h
+	segs = skb_gso_segment(skb, 0);
+	kfree_skb(skb);
+	if (IS_ERR(segs))
+		return PTR_ERR(segs);
+	if (segs == NULL)
+		return -EINVAL;
+
+	do {
+		struct sk_buff *nskb = segs->next;
+		int err;
+
+		skb_mark_not_on_list(segs);
+		err = xfrm_output2(net, sk, segs);
+
+		if (unlikely(err)) {
+			kfree_skb_list(nskb);
+			return err;
+		}
+
+		segs = nskb;
+	} while (segs);
+
+Given that so much code does the same skb surgery, this seems like it
+would be a good opportunity for actually adding the right helper /
+abstraction around this. If that sounds good to you, I'll send a commit
+adding something like the below, along with fixing up a couple of the
+more straight-forward existing places to use the new helper:
+
+#define skb_walk_null_list_safe(first, skb, next)                          \
+        for (skb = first, next = skb->next; skb;                           \
+             skb = next, next = skb ? skb->next : NULL)
+
+Does this sound good to you? If so, would you like this as lead-up
+commits to WireGuard, or just a new independent series all together?
+
+Regards,
+Jason
