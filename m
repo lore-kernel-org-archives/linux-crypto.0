@@ -2,121 +2,138 @@ Return-Path: <SRS0=xIDj=ZV=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64B42C432C0
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 Nov 2019 19:25:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0786C432C0
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 Nov 2019 19:36:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3380E21736
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 Nov 2019 19:25:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 889A620869
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 Nov 2019 19:36:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1575055559;
-	bh=kiF5SC2T+/XUiJjLkI//5lLepZeOcjPHT+qR5HYKPJ8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=f3pNt2RtM7yugXwdxbKGA+oQeZa0LpXBmzXcbxE0yrsEtmhhOJfDEvj8qHBtwP5+D
-	 tXqDfT2ALXdJSGHL028KTSZjuYeXX5un8LF/5ay6INIBRVz2QxjG/aUVj0dHFQtU36
-	 ViT11hjuujh27jcSapKmsImLZE29qWqjih6sQLeQ=
+	s=default; t=1575056189;
+	bh=23wt+adORmu1LXGWTyNdKLjs1groVQ/QeqHaiN2TPvU=;
+	h=From:To:Subject:Date:List-ID:From;
+	b=QpI4EjL1ON/lJ/DVgaAlqvlkcFVR3dEcGyyx5RoBn3JrWdWdvOw6HERunporbNBJf
+	 DcimEVpl7nF2h3/4OXzG4MMFLWTTq0+A5mMRinQaHUWfBLzYwx6P+AeGRkWOnN5ATX
+	 jVYq2VdvNAr9i5VbKu+CEGh5cqS6J/IiO3lQGoD8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726970AbfK2TZ6 (ORCPT
+        id S1726980AbfK2Tg2 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 29 Nov 2019 14:25:58 -0500
-Received: from mail.kernel.org ([198.145.29.99]:40558 "EHLO mail.kernel.org"
+        Fri, 29 Nov 2019 14:36:28 -0500
+Received: from mail.kernel.org ([198.145.29.99]:41656 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726926AbfK2TZ6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 29 Nov 2019 14:25:58 -0500
+        id S1726926AbfK2Tg2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 29 Nov 2019 14:36:28 -0500
 Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7AC66207FA;
-        Fri, 29 Nov 2019 19:25:57 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id CA93D20869
+        for <linux-crypto@vger.kernel.org>; Fri, 29 Nov 2019 19:36:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1575055557;
-        bh=kiF5SC2T+/XUiJjLkI//5lLepZeOcjPHT+qR5HYKPJ8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=eMh3KJQfRuKoSwE0phtng6SiN0ioGaHPOxGVUcSbjFHarP9NysiG0yuQMsYtR1Ksf
-         F0SBljE8jYC/Dfhlp1cQsxjv5U90XlhSUN9cIZ+RpO0Pv9orgf8panCH9nBhiKAIhk
-         GZTD9bDKTA/oSu6vkaxyH0MQfysrwxw86MXwtIDM=
-Date:   Fri, 29 Nov 2019 11:25:56 -0800
+        s=default; t=1575056187;
+        bh=23wt+adORmu1LXGWTyNdKLjs1groVQ/QeqHaiN2TPvU=;
+        h=From:To:Subject:Date:From;
+        b=bqNRivGyqu16ikt7gb2zEBmVsQQx2w/YN4sxlpJeXNbjVmnSc+lOTnzR05oozYJ7k
+         iprbp/D7biHF0tFDzMIivyRVkTi3pZm6P4DCJyaGZ/W4wEQveyjbObWoAFfVX06bkh
+         Kgu5VdKXgQpPvb1NWIl9CNiLeSxRAjjrg/jkGyrs=
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Steffen Klassert <steffen.klassert@secunet.com>
-Subject: Re: [v3 PATCH] crypto: pcrypt - Avoid deadlock by using per-instance
- padata queues
-Message-ID: <20191129192556.GB706@sol.localdomain>
-References: <20191119130556.dso2ni6qlks3lr23@gondor.apana.org.au>
- <20191119173732.GB819@sol.localdomain>
- <20191119185827.nerskpvddkcsih25@gondor.apana.org.au>
- <20191126053238.yxhtfbt5okcjycuy@ca-dmjordan1.us.oracle.com>
- <20191126075845.2v3woc3xqx2fxzqh@gondor.apana.org.au>
+To:     linux-crypto@vger.kernel.org
+Subject: [PATCH] crypto: shash - allow essiv and hmac to use OPTIONAL_KEY algorithms
+Date:   Fri, 29 Nov 2019 11:35:22 -0800
+Message-Id: <20191129193522.52513-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191126075845.2v3woc3xqx2fxzqh@gondor.apana.org.au>
-User-Agent: Mutt/1.12.2 (2019-09-21)
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Nov 26, 2019 at 03:58:45PM +0800, Herbert Xu wrote:
-> On Tue, Nov 26, 2019 at 12:32:38AM -0500, Daniel Jordan wrote:
-> > 
-> > I think it's possible for a task in padata_do_parallel() racing with another in
-> > padata_replace() to use a pd after free.  The synchronize_rcu() comes after the
-> > pd_old->refcnt's are dec'd.
-> 
-> Thanks.  I've fixed this as well as the CPU mask issue you identified
-> earlier.
-> 
-> ---8<---
-> If the pcrypt template is used multiple times in an algorithm, then a
-> deadlock occurs because all pcrypt instances share the same
-> padata_instance, which completes requests in the order submitted.  That
-> is, the inner pcrypt request waits for the outer pcrypt request while
-> the outer request is already waiting for the inner.
-> 
-> This patch fixes this by allocating a set of queues for each pcrypt
-> instance instead of using two global queues.  In order to maintain
-> the existing user-space interface, the pinst structure remains global
-> so any sysfs modifications will apply to every pcrypt instance.
-> 
-> Note that when an update occurs we have to allocate memory for
-> every pcrypt instance.  Should one of the allocations fail we
-> will abort the update without rolling back changes already made.
-> 
-> The new per-instance data structure is called padata_shell and is
-> essentially a wrapper around parallel_data.
-> 
-> Reproducer:
-> 
-> 	#include <linux/if_alg.h>
-> 	#include <sys/socket.h>
-> 	#include <unistd.h>
-> 
-> 	int main()
-> 	{
-> 		struct sockaddr_alg addr = {
-> 			.salg_type = "aead",
-> 			.salg_name = "pcrypt(pcrypt(rfc4106-gcm-aesni))"
-> 		};
-> 		int algfd, reqfd;
-> 		char buf[32] = { 0 };
-> 
-> 		algfd = socket(AF_ALG, SOCK_SEQPACKET, 0);
-> 		bind(algfd, (void *)&addr, sizeof(addr));
-> 		setsockopt(algfd, SOL_ALG, ALG_SET_KEY, buf, 20);
-> 		reqfd = accept(algfd, 0, 0);
-> 		write(reqfd, buf, 32);
-> 		read(reqfd, buf, 16);
-> 	}
-> 
-> Reported-by: syzbot+56c7151cad94eec37c521f0e47d2eee53f9361c4@syzkaller.appspotmail.com
-> Fixes: 5068c7a883d1 ("crypto: pcrypt - Add pcrypt crypto parallelization wrapper")
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> 
+From: Eric Biggers <ebiggers@google.com>
 
-Tested-by: Eric Biggers <ebiggers@kernel.org>
+The essiv and hmac templates refuse to use any hash algorithm that has a
+->setkey() function, which includes not just algorithms that always need
+a key, but also algorithms that optionally take a key.
+
+Previously the only optionally-keyed hash algorithms in the crypto API
+were non-cryptographic algorithms like crc32, so this didn't really
+matter.  But that's changed with BLAKE2 support being added.  BLAKE2
+should work with essiv and hmac, just like any other cryptographic hash.
+
+Fix this by allowing the use of both algorithms without a ->setkey()
+function and algorithms that have the OPTIONAL_KEY flag set.
+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/essiv.c                 | 2 +-
+ crypto/hmac.c                  | 4 ++--
+ crypto/shash.c                 | 3 +--
+ include/crypto/internal/hash.h | 6 ++++++
+ 4 files changed, 10 insertions(+), 5 deletions(-)
+
+diff --git a/crypto/essiv.c b/crypto/essiv.c
+index 808f2b362106..e4b32c2ea7ec 100644
+--- a/crypto/essiv.c
++++ b/crypto/essiv.c
+@@ -442,7 +442,7 @@ static bool essiv_supported_algorithms(const char *essiv_cipher_name,
+ 	if (ivsize != alg->cra_blocksize)
+ 		goto out;
+ 
+-	if (crypto_shash_alg_has_setkey(hash_alg))
++	if (crypto_shash_alg_needs_key(hash_alg))
+ 		goto out;
+ 
+ 	ret = true;
+diff --git a/crypto/hmac.c b/crypto/hmac.c
+index 8b2a212eb0ad..377f07733e2f 100644
+--- a/crypto/hmac.c
++++ b/crypto/hmac.c
+@@ -185,9 +185,9 @@ static int hmac_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 		return PTR_ERR(salg);
+ 	alg = &salg->base;
+ 
+-	/* The underlying hash algorithm must be unkeyed */
++	/* The underlying hash algorithm must not require a key */
+ 	err = -EINVAL;
+-	if (crypto_shash_alg_has_setkey(salg))
++	if (crypto_shash_alg_needs_key(salg))
+ 		goto out_put_alg;
+ 
+ 	ds = salg->digestsize;
+diff --git a/crypto/shash.c b/crypto/shash.c
+index e83c5124f6eb..7989258a46b4 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -50,8 +50,7 @@ static int shash_setkey_unaligned(struct crypto_shash *tfm, const u8 *key,
+ 
+ static void shash_set_needkey(struct crypto_shash *tfm, struct shash_alg *alg)
+ {
+-	if (crypto_shash_alg_has_setkey(alg) &&
+-	    !(alg->base.cra_flags & CRYPTO_ALG_OPTIONAL_KEY))
++	if (crypto_shash_alg_needs_key(alg))
+ 		crypto_shash_set_flags(tfm, CRYPTO_TFM_NEED_KEY);
+ }
+ 
+diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
+index bfc9db7b100d..f68dab38f160 100644
+--- a/include/crypto/internal/hash.h
++++ b/include/crypto/internal/hash.h
+@@ -85,6 +85,12 @@ static inline bool crypto_shash_alg_has_setkey(struct shash_alg *alg)
+ 	return alg->setkey != shash_no_setkey;
+ }
+ 
++static inline bool crypto_shash_alg_needs_key(struct shash_alg *alg)
++{
++	return crypto_shash_alg_has_setkey(alg) &&
++		!(alg->base.cra_flags & CRYPTO_ALG_OPTIONAL_KEY);
++}
++
+ bool crypto_hash_alg_has_setkey(struct hash_alg_common *halg);
+ 
+ int crypto_init_ahash_spawn(struct crypto_ahash_spawn *spawn,
+-- 
+2.24.0
+
