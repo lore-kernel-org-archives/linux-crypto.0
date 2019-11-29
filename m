@@ -2,96 +2,97 @@ Return-Path: <SRS0=xIDj=ZV=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5223C432C0
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 Nov 2019 08:40:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 752A0C432C0
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 Nov 2019 10:02:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 96E8921781
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 Nov 2019 08:40:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 43700217BC
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 Nov 2019 10:02:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=bofh-nu.20150623.gappssmtp.com header.i=@bofh-nu.20150623.gappssmtp.com header.b="jJ1yhaLn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726360AbfK2Ikd (ORCPT
+        id S1726824AbfK2KC6 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 29 Nov 2019 03:40:33 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:59734 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725886AbfK2Ikd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 29 Nov 2019 03:40:33 -0500
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1iabpE-00011i-Sn; Fri, 29 Nov 2019 16:40:28 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1iabpA-00060T-N4; Fri, 29 Nov 2019 16:40:24 +0800
-Date:   Fri, 29 Nov 2019 16:40:24 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Steffen Klassert <steffen.klassert@secunet.com>
-Subject: [PATCH] crypto: pcrypt - Do not clear MAY_SLEEP flag in original
- request
-Message-ID: <20191129084024.arwefx7bpvvxpyjk@gondor.apana.org.au>
-References: <20191119130556.dso2ni6qlks3lr23@gondor.apana.org.au>
- <20191119173732.GB819@sol.localdomain>
- <20191119185827.nerskpvddkcsih25@gondor.apana.org.au>
- <20191126053238.yxhtfbt5okcjycuy@ca-dmjordan1.us.oracle.com>
- <20191126075845.2v3woc3xqx2fxzqh@gondor.apana.org.au>
- <20191127191452.GC49214@sol.localdomain>
+        Fri, 29 Nov 2019 05:02:58 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:40777 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726822AbfK2KC6 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 29 Nov 2019 05:02:58 -0500
+Received: by mail-wm1-f66.google.com with SMTP id y5so14324063wmi.5
+        for <linux-crypto@vger.kernel.org>; Fri, 29 Nov 2019 02:02:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bofh-nu.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=5UrKqSRJKoGBPMgO2/jdCKMQcuQ7A1Ss66dwsiix9b0=;
+        b=jJ1yhaLnNR0CYGklrHbhvyokqlCl72QlSTMfSa4E21afa0fYB8h7HwmCoSh8aVQe6U
+         iu5bAl6x2CbffFH/bawfVtQgwanXgHO+iS1Gb+OOA06PXIu/PIpL/HJn6LjoQyAkRO70
+         fxLYUtGpmfos2QR3CnLxgKJc59EDfltbblF2X6VKh+1o5HkGi+iyOiEa1L1YEFNfaPVi
+         Ni5VDKVwx/4bFy8RwrxZNNrw86cFlsDODmaLZv0yCr5qRZSmRt10SSWPFopZ4auPDcDq
+         dY3UsZ//d3BFZG6YSXWhh0M8Id1A0ugvSDqZdrW2smTbAWpG+H1lgDdlT80mzZ4SNjNj
+         /cPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=5UrKqSRJKoGBPMgO2/jdCKMQcuQ7A1Ss66dwsiix9b0=;
+        b=JMQ+jwxh6EI31PUPp25+d5y5TD3kxzU+6Tn6mMPubt9Ti4sz7aWCPBMbVc68Uy3h5m
+         BKfJffofX2PX++9YPRdQDheGCHgLW7j8LSGO4ijz+OPCJtBhJD6gATH3BmVkpYrBhohw
+         54aQ+NMbdmKHX/IKhvvY+DPhx0pfTuASyJ3lSga6kk4PNkMkXwZYf7FpoNLE4ocf7pde
+         ibxhsli4PbdXFqrsWfmo5GVYNXjao2ZP15nTTZeRDut5HV32FFlhdmIy4dzvAqt2p42B
+         TdoM0ergIZksKnrf3IOJ7pu/R99XP0PTjjX+ZNsc9ByW2umffhEq/w+5VSliomgEbBnj
+         /fEA==
+X-Gm-Message-State: APjAAAVOkns2myeZIhJ8CmUdOVYo6kXByVqV9wWA1jj7IzoHDc4OF2RK
+        Bw2E+WUEsfXLAMPUT5z5elhrq5qGq8aFN4GHrjIul2tGw0Q=
+X-Google-Smtp-Source: APXvYqzTAFXNZGcwafQIeJec73W3RgozsYABeK30eaJTije1g+7R6/B3hF2p2eSWHt317C9cAPOBhlSgllb4GK9GIO4=
+X-Received: by 2002:a1c:7708:: with SMTP id t8mr13713623wmi.29.1575021776664;
+ Fri, 29 Nov 2019 02:02:56 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191127191452.GC49214@sol.localdomain>
-User-Agent: NeoMutt/20170113 (1.7.2)
+References: <1574864578-467-1-git-send-email-neal.liu@mediatek.com> <1574864578-467-4-git-send-email-neal.liu@mediatek.com>
+In-Reply-To: <1574864578-467-4-git-send-email-neal.liu@mediatek.com>
+From:   Lars Persson <lists@bofh.nu>
+Date:   Fri, 29 Nov 2019 11:02:45 +0100
+Message-ID: <CADnJP=uhD=J2NrpSwiX8oCTd-u_q05=HhsAV-ErCsXNDwVS0rA@mail.gmail.com>
+Subject: Re: [PATCH v5 3/3] hwrng: add mtk-sec-rng driver
+To:     Neal Liu <neal.liu@mediatek.com>
+Cc:     Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Sean Wang <sean.wang@kernel.org>,
+        Crystal Guo <Crystal.Guo@mediatek.com>,
+        linux-crypto@vger.kernel.org, DTML <devicetree@vger.kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        wsd_upstream@mediatek.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Nov 27, 2019 at 11:14:52AM -0800, Eric Biggers wrote:
+Hi Neal,
+
+On Wed, Nov 27, 2019 at 3:23 PM Neal Liu <neal.liu@mediatek.com> wrote:
 >
-> I tried applying the following patches and running syzkaller again:
-> 
-> 	padata: Remove unused padata_remove_cpu
-> 	padata: Remove broken queue flushing
-> 	crypto: pcrypt - Fix user-after-free on module unload
-> 	[v3] crypto: pcrypt - Avoid deadlock by using per-instance padata queues
-> 
-> This time I got a crypto self-test failure when
-> "pcrypt(pcrypt(rfc4106-gcm-aesni))" was instantiated:
-> 
-> [ 2220.165113] alg: aead: pcrypt(pcrypt(rfc4106-gcm-aesni)) encryption corrupted request struct on test vector 0, cfg="uneven misaligned splits, may sleep"
-> [ 2220.170295] alg: aead: changed 'req->base.flags'
-> [ 2220.171799] Kernel panic - not syncing: alg: self-tests for pcrypt(pcrypt(rfc4106-gcm-aesni)) (rfc4106(gcm(aes))) failed in panic_on_fail mode!
-> 
-> So the algorithm is not preserving aead_request::base.flags.
+> For MediaTek SoCs on ARMv8 with TrustZone enabled, peripherals like
+> entropy sources is not accessible from normal world (linux) and
+> rather accessible from secure world (ATF/TEE) only. This driver aims
+> to provide a generic interface to ATF rng service.
+>
 
-Thanks for the report.  This is a preexisting bug in pcrypt.  Here
-is a patch for it.
+I am working on several SoCs that also will need this kind of driver
+to get entropy from Arm trusted firmware.
+If you intend to make this a generic interface, please clean up the
+references to MediaTek and give it a more generic name. For example
+"Arm Trusted Firmware random number driver".
 
----8<---
-We should not be modifying the original request's MAY_SLEEP flag
-upon completion.  It makes no sense to do so anyway.
+It will also be helpful if the SMC call number is configurable.
 
-Reported-by: Eric Biggers <ebiggers@kernel.org>
-Fixes: 5068c7a883d1 ("crypto: pcrypt - Add pcrypt crypto...")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
-index 543792e0ebf0..2f6f81183e45 100644
---- a/crypto/pcrypt.c
-+++ b/crypto/pcrypt.c
-@@ -63,7 +63,6 @@ static void pcrypt_aead_done(struct crypto_async_request *areq, int err)
- 	struct padata_priv *padata = pcrypt_request_padata(preq);
- 
- 	padata->info = err;
--	req->base.flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
- 
- 	padata_do_serial(padata);
- }
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+- Lars
