@@ -2,96 +2,82 @@ Return-Path: <SRS0=xIDj=ZV=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_2 autolearn=no autolearn_force=no
-	version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73B7FC432C3
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 Nov 2019 11:30:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F6D9C432C0
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 Nov 2019 11:47:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 475A9217F5
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 Nov 2019 11:30:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 26BE1208E4
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 Nov 2019 11:47:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="B0kGmm32"
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="mrf//5+H"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726763AbfK2Laz (ORCPT
+        id S1726608AbfK2Lrx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 29 Nov 2019 06:30:55 -0500
-Received: from mailgw01.mediatek.com ([210.61.82.183]:21979 "EHLO
-        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726215AbfK2Laz (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 29 Nov 2019 06:30:55 -0500
-X-UUID: 0463d9a3274143959e604d33b956bd31-20191129
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-        h=Content-Transfer-Encoding:MIME-Version:Content-Type:References:In-Reply-To:Date:CC:To:From:Subject:Message-ID; bh=PwCHJ/ylLxsFTolp1LFDT4a1s0102DjGPATz1zjtxA0=;
-        b=B0kGmm32hS6rMrCce03DSS9/I49LmnvX9Of9xHT/lE4Yysz5JkdCowVMOt2ZRII8RGPauflXRDTpVRv0T0+7II32lMHsf/zwEReNp4o9aO9ByBej+e2FzRcMbHI3TUv3pbabwCw7WTWibWCP3OwLzmF3DzwlF5paVrx67Xv1ZMU=;
-X-UUID: 0463d9a3274143959e604d33b956bd31-20191129
-Received: from mtkcas09.mediatek.inc [(172.21.101.178)] by mailgw01.mediatek.com
-        (envelope-from <neal.liu@mediatek.com>)
-        (Cellopoint E-mail Firewall v4.1.10 Build 0809 with TLS)
-        with ESMTP id 1743712512; Fri, 29 Nov 2019 19:30:48 +0800
-Received: from mtkcas07.mediatek.inc (172.21.101.84) by
- mtkmbs07n1.mediatek.inc (172.21.101.16) with Microsoft SMTP Server (TLS) id
- 15.0.1395.4; Fri, 29 Nov 2019 19:30:42 +0800
-Received: from [172.21.77.33] (172.21.77.33) by mtkcas07.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1395.4 via Frontend
- Transport; Fri, 29 Nov 2019 19:30:44 +0800
-Message-ID: <1575027046.24848.4.camel@mtkswgap22>
-Subject: Re: [PATCH v5 3/3] hwrng: add mtk-sec-rng driver
-From:   Neal Liu <neal.liu@mediatek.com>
-To:     Lars Persson <lists@bofh.nu>
-CC:     Mark Rutland <mark.rutland@arm.com>,
-        DTML <devicetree@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        wsd_upstream <wsd_upstream@mediatek.com>,
-        Sean Wang <sean.wang@kernel.org>,
-        "Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Crystal Guo =?UTF-8?Q?=28=E9=83=AD=E6=99=B6=29?= 
-        <Crystal.Guo@mediatek.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Matt Mackall <mpm@selenic.com>,
-        "Matthias Brugger" <matthias.bgg@gmail.com>,
-        "linux-mediatek@lists.infradead.org" 
-        <linux-mediatek@lists.infradead.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>
-Date:   Fri, 29 Nov 2019 19:30:46 +0800
-In-Reply-To: <CADnJP=uhD=J2NrpSwiX8oCTd-u_q05=HhsAV-ErCsXNDwVS0rA@mail.gmail.com>
-References: <1574864578-467-1-git-send-email-neal.liu@mediatek.com>
-         <1574864578-467-4-git-send-email-neal.liu@mediatek.com>
-         <CADnJP=uhD=J2NrpSwiX8oCTd-u_q05=HhsAV-ErCsXNDwVS0rA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.2.3-0ubuntu6 
+        Fri, 29 Nov 2019 06:47:53 -0500
+Received: from frisell.zx2c4.com ([192.95.5.64]:32947 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725892AbfK2Lrx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 29 Nov 2019 06:47:53 -0500
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id c22c92ed;
+        Fri, 29 Nov 2019 10:53:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
+        :references:in-reply-to:from:date:message-id:subject:to:cc
+        :content-type; s=mail; bh=lEpJtkHaOd7GowBKrJ3B/YN/11g=; b=mrf//5
+        +HFMqsM3JXCbIOHBw3KhhWGga9oJMyfgfI+imBai1aZ7nYIthunm8IpU25u+xF7g
+        iYWs0/dgPCpUvQMjrfpTa/fOOZRbnvd4isoem3nfDvQQSCa2V8L/p2aAle61ckeG
+        hZ97l78wfyjw7ZbYEYpQlz7ZvagvKj41VO6sC+ateR7cI52s/2mNDun2dpHLZd8J
+        L9zY5otkIEQkk2Zt0NhaRwM5WPIBNyrwxA5/oqDEj2OrzDrQppWJAOoYMPd+Y3q/
+        ayDgc9QNk5Lhfv60tpheEccWFaqF4qFGNHo50OA1h2qnZ8unAymixrUjpfTq6TZF
+        FWNurdHM1n71U4Kg==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id b4d24bf9 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
+        Fri, 29 Nov 2019 10:53:43 +0000 (UTC)
+Received: by mail-ot1-f50.google.com with SMTP id m15so24667103otq.7;
+        Fri, 29 Nov 2019 03:47:49 -0800 (PST)
+X-Gm-Message-State: APjAAAXMsQoKmPI+ngWxStbSI6PgjhaGbMLNKy1q7p3usHjaZ3RfJCt2
+        +KIotTigQPcr7fvdIuUMA7I/n2SMlQ4oN4vvTXE=
+X-Google-Smtp-Source: APXvYqx3Q7DMiecStDC9+rNFKGUSNsMhh7Ix+sa+yiMKb6vcL+XWPNQk0WiF1NbH1qs0r+XJ8CX2Ds+lWDWNbQvpsSQ=
+X-Received: by 2002:a9d:1e88:: with SMTP id n8mr3305587otn.369.1575028069075;
+ Fri, 29 Nov 2019 03:47:49 -0800 (PST)
 MIME-Version: 1.0
-X-MTK:  N
-Content-Transfer-Encoding: base64
+References: <20191127112643.441509-1-Jason@zx2c4.com> <20191128.133023.1503723038764717212.davem@davemloft.net>
+ <20191129033205.GA67257@zx2c4.com> <20191128.222735.1430087391284485253.davem@davemloft.net>
+In-Reply-To: <20191128.222735.1430087391284485253.davem@davemloft.net>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Fri, 29 Nov 2019 12:47:37 +0100
+X-Gmail-Original-Message-ID: <CAHmME9p8cxUtZhegkNrCF+GgREKQA=5LQ_km35qopC-2SKtJaw@mail.gmail.com>
+Message-ID: <CAHmME9p8cxUtZhegkNrCF+GgREKQA=5LQ_km35qopC-2SKtJaw@mail.gmail.com>
+Subject: Re: [PATCH v1] net: WireGuard secure network tunnel
+To:     David Miller <davem@davemloft.net>
+Cc:     Netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-T24gRnJpLCAyMDE5LTExLTI5IGF0IDE4OjAyICswODAwLCBMYXJzIFBlcnNzb24gd3JvdGU6DQo+
-IEhpIE5lYWwsDQo+IA0KPiBPbiBXZWQsIE5vdiAyNywgMjAxOSBhdCAzOjIzIFBNIE5lYWwgTGl1
-IDxuZWFsLmxpdUBtZWRpYXRlay5jb20+IHdyb3RlOg0KPiA+DQo+ID4gRm9yIE1lZGlhVGVrIFNv
-Q3Mgb24gQVJNdjggd2l0aCBUcnVzdFpvbmUgZW5hYmxlZCwgcGVyaXBoZXJhbHMgbGlrZQ0KPiA+
-IGVudHJvcHkgc291cmNlcyBpcyBub3QgYWNjZXNzaWJsZSBmcm9tIG5vcm1hbCB3b3JsZCAobGlu
-dXgpIGFuZA0KPiA+IHJhdGhlciBhY2Nlc3NpYmxlIGZyb20gc2VjdXJlIHdvcmxkIChBVEYvVEVF
-KSBvbmx5LiBUaGlzIGRyaXZlciBhaW1zDQo+ID4gdG8gcHJvdmlkZSBhIGdlbmVyaWMgaW50ZXJm
-YWNlIHRvIEFURiBybmcgc2VydmljZS4NCj4gPg0KPiANCj4gSSBhbSB3b3JraW5nIG9uIHNldmVy
-YWwgU29DcyB0aGF0IGFsc28gd2lsbCBuZWVkIHRoaXMga2luZCBvZiBkcml2ZXINCj4gdG8gZ2V0
-IGVudHJvcHkgZnJvbSBBcm0gdHJ1c3RlZCBmaXJtd2FyZS4NCj4gSWYgeW91IGludGVuZCB0byBt
-YWtlIHRoaXMgYSBnZW5lcmljIGludGVyZmFjZSwgcGxlYXNlIGNsZWFuIHVwIHRoZQ0KPiByZWZl
-cmVuY2VzIHRvIE1lZGlhVGVrIGFuZCBnaXZlIGl0IGEgbW9yZSBnZW5lcmljIG5hbWUuIEZvciBl
-eGFtcGxlDQo+ICJBcm0gVHJ1c3RlZCBGaXJtd2FyZSByYW5kb20gbnVtYmVyIGRyaXZlciIuDQo+
-IA0KPiBJdCB3aWxsIGFsc28gYmUgaGVscGZ1bCBpZiB0aGUgU01DIGNhbGwgbnVtYmVyIGlzIGNv
-bmZpZ3VyYWJsZS4NCj4gDQo+IC0gTGFycw0KDQpZZXMsIEknbSB0cnlpbmcgdG8gbWFrZSB0aGlz
-IHRvIGEgZ2VuZXJpYyBpbnRlcmZhY2UuIEknbGwgdHJ5IHRvIG1ha2UNCkhXL3BsYXRmb3JtIHJl
-bGF0ZWQgZGVwZW5kZW5jeSB0byBiZSBjb25maWd1cmFibGUgYW5kIGxldCBpdCBtb3JlDQpnZW5l
-cmljLg0KVGhhbmtzIGZvciB5b3VyIHN1Z2dlc3Rpb24uDQoNCj4gDQo+IF9fX19fX19fX19fX19f
-X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fDQo+IExpbnV4LW1lZGlhdGVrIG1haWxp
-bmcgbGlzdA0KPiBMaW51eC1tZWRpYXRla0BsaXN0cy5pbmZyYWRlYWQub3JnDQo+IGh0dHA6Ly9s
-aXN0cy5pbmZyYWRlYWQub3JnL21haWxtYW4vbGlzdGluZm8vbGludXgtbWVkaWF0ZWsNCg0K
+On Fri, Nov 29, 2019 at 7:27 AM David Miller <davem@davemloft.net> wrote:
+>
+> From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+> Date: Fri, 29 Nov 2019 04:32:05 +0100
+>
+> > I'm not a huge fan of doing manual skb surgery either. The annoying
+> > thing here is that skb_gso_segment returns a list of skbs that's
+> > terminated by the last one's next pointer being NULL. I assume it's this
+> > way so that the GSO code doesn't have to pass a head around.
+>
+> Sorry, I missed that this was processing a GSO list which doesn't use
+> double linked list semantics.
+>
+> So ignore my feedback on this one :-)
 
+Okay, no problem. I'll submit some global tree-wide cleanup patches in
+the way of a helper macro sometime after all the wireguard dust
+settles, then, and we can assess that separately.
