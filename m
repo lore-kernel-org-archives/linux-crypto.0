@@ -2,140 +2,81 @@ Return-Path: <SRS0=ZwPv=5N=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.7 required=3.0 tests=DATE_IN_PAST_96_XX,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02394C43331
-	for <linux-crypto@archiver.kernel.org>; Sat, 28 Mar 2020 03:43:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8717C2D0E5
+	for <linux-crypto@archiver.kernel.org>; Sat, 28 Mar 2020 16:43:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BDF88206CC
-	for <linux-crypto@archiver.kernel.org>; Sat, 28 Mar 2020 03:43:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YK5ZxzEo"
+	by mail.kernel.org (Postfix) with ESMTP id 98E48206F6
+	for <linux-crypto@archiver.kernel.org>; Sat, 28 Mar 2020 16:43:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726781AbgC1Dnh (ORCPT
+        id S1727549AbgC1QnX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 27 Mar 2020 23:43:37 -0400
-Received: from mail-il1-f195.google.com ([209.85.166.195]:46937 "EHLO
-        mail-il1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726225AbgC1Dnh (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 27 Mar 2020 23:43:37 -0400
-Received: by mail-il1-f195.google.com with SMTP id i75so3469647ild.13;
-        Fri, 27 Mar 2020 20:43:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=UVK15i028mkx0jMpDy93kqL7jNl1F+KutZZLwGaGO80=;
-        b=YK5ZxzEo6HEEiK1jDNDS80yDjdrmaTfHno66iowxJhYWqC0NRswO5iVrywDnKCJsh6
-         KeuIkxgEW5X8Ct/nVCwy2pEdUvyrlVNk8o0cid9q4ON1b6sNEAl3ixsrPyWa9CLfcbmM
-         t80TVvuLimGb794UdrWiOy7mzoYijdA1/RV5uVItkeGDa7TKUAhP1ZPsBYu0dE6Uc5RI
-         wloO5fqvW1+8lx8050cqx/gpJuURq2W49w04ra0Nbc9SLaAlYsgU66vEdUlyzn3kvrDl
-         Eh9Fcj60DWW3b9jI3Y1qSdt2lb0zggNPaeH+koVPY8C/PVaKx6AIOu4u8Ve6g40Pp1+U
-         5OTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=UVK15i028mkx0jMpDy93kqL7jNl1F+KutZZLwGaGO80=;
-        b=fkoltFwCVx+dw+nJFEcejCdKLfZ9lSZyMmdRfIJfmjiKUOoLFiJmplFQv4K5jalZ9M
-         XKkeLyzSVLFLlju6dwkKL3mYXahomXMQsGyhoKl2RP6s6Ev8WPhyjK4CvLggGjeVzIFd
-         OaZZSOwbp3UGT9zKKPNfHgQHNtj6QvprtSXobEs+VjVUiZ2hQIEcQrhckgfY3gSJrKH8
-         WNjq5Xaqwoye7F+2g7jHH5+rfLuwHb+2NJxmEvhuc0HcOOu0ldT+bpehKA7hEhCSvrLc
-         iiYrhVK9L4zvqnsrJUI8G1w5x1cT6kDF4HNYoVx/5qwoTLhFTMrvDYP70Vxbh19oQbQr
-         qzCQ==
-X-Gm-Message-State: ANhLgQ2fDDMauAhePvoncmdy+tK7oQrVPSrGS2Kn2fTC+BmKEs0I+RaP
-        aBsDqFSo2FECy9LJiTQhYwqJ8zB1Md48ISGnvFez41Ju
-X-Google-Smtp-Source: ADFU+vvrTjRJAhD7aKWKIBES9XdTRJeSXRCB+0DdH2aQVrMCxPqgOw/bsGRDKE8GVKnrhAQIwquJP/XPFaeajb5G488=
-X-Received: by 2002:a92:96c6:: with SMTP id g189mr2199320ilh.276.1585367015881;
- Fri, 27 Mar 2020 20:43:35 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200225161201.1975-1-git@andred.net> <20200225161201.1975-6-git@andred.net>
- <VI1PR0402MB3485A743C94442533B6840F298E70@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-In-Reply-To: <VI1PR0402MB3485A743C94442533B6840F298E70@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-From:   Adam Ford <aford173@gmail.com>
-Date:   Fri, 27 Mar 2020 22:43:24 -0500
-Message-ID: <CAHCN7x+NJLaKF9SfHw9sDpw6zDUGs_TuD_co7USjQ5hgFDeaHg@mail.gmail.com>
-Subject: Re: [PATCH v2 6/6] Input: snvs_pwrkey - only IRQ_HANDLED for our own events
-To:     Horia Geanta <horia.geanta@nxp.com>
-Cc:     =?UTF-8?Q?Andr=C3=A9_Draszik?= <git@andred.net>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Anson Huang <anson.huang@nxp.com>,
-        Fabio Estevam <festevam@gmail.com>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Rob Herring <robh+dt@kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        "linux-input@vger.kernel.org" <linux-input@vger.kernel.org>,
-        Robin Gong <yibin.gong@nxp.com>,
-        Shawn Guo <shawnguo@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Sat, 28 Mar 2020 12:43:23 -0400
+Received: from mx.sdf.org ([205.166.94.20]:50208 "EHLO mx.sdf.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727401AbgC1QnU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 28 Mar 2020 12:43:20 -0400
+Received: from sdf.org (IDENT:lkml@sdf.lonestar.org [205.166.94.16])
+        by mx.sdf.org (8.15.2/8.14.5) with ESMTPS id 02SGhC9q026662
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits) verified NO);
+        Sat, 28 Mar 2020 16:43:12 GMT
+Received: (from lkml@localhost)
+        by sdf.org (8.15.2/8.12.8/Submit) id 02SGhCt7025631;
+        Sat, 28 Mar 2020 16:43:12 GMT
+Message-Id: <202003281643.02SGhCt7025631@sdf.org>
+From:   George Spelvin <lkml@sdf.org>
+Date:   Fri, 29 Nov 2019 15:24:22 -0500
+Subject: [RFC PATCH v1 14/50] crypto/testmgr.c: use prandom_u32_max() &
+ prandom_bytes()
+To:     linux-kernel@vger.kernel.org, lkml@sdf.org
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Mar 2, 2020 at 3:22 AM Horia Geanta <horia.geanta@nxp.com> wrote:
->
-> On 2/25/2020 6:12 PM, Andr=C3=A9 Draszik wrote:
-> > The snvs_pwrkey shares the SNVS LPSR status register with the snvs_rtc.
-> >
-> > This driver here should only return IRQ_HANDLED if the status register
-> > indicates that the event we're handling in the irq handler was genuinel=
-y
-> > intended for this driver. Otheriwse the interrupt subsystem will
-> > assume the interrupt was handled successfully even though it wasn't
-> > at all.
-> >
-> > Signed-off-by: Andr=C3=A9 Draszik <git@andred.net>
-> > Cc: "Horia Geant=C4=83" <horia.geanta@nxp.com>
-> > Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
-> > Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> > Cc: "David S. Miller" <davem@davemloft.net>
-> > Cc: Rob Herring <robh+dt@kernel.org>
-> > Cc: Mark Rutland <mark.rutland@arm.com>
-> > Cc: Shawn Guo <shawnguo@kernel.org>
-> > Cc: Sascha Hauer <s.hauer@pengutronix.de>
-> > Cc: Pengutronix Kernel Team <kernel@pengutronix.de>
-> > Cc: Fabio Estevam <festevam@gmail.com>
-> > Cc: NXP Linux Team <linux-imx@nxp.com>
-> > Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-> > Cc: Anson Huang <Anson.Huang@nxp.com>
-> > Cc: Robin Gong <yibin.gong@nxp.com>
-> > Cc: linux-crypto@vger.kernel.org
-> > Cc: devicetree@vger.kernel.org
-> > Cc: linux-arm-kernel@lists.infradead.org
-> > Cc: linux-input@vger.kernel.org
-> For patches 2-6:
-> Reviewed-by: Horia Geant=C4=83 <horia.geanta@nxp.com>
->
-> Also imx8mn.dtsi and imx8mp.dtsi will have to be updated.
+...in a couple of places where they're appropriate.
 
-Is there an update coming for the 8mn family?  I am seeing it not wake
-from the power key, and I was hoping to resolve that before i make a
-push to submit a new 8MN board for review.
+There are many other places where successive code blocks make calls
+like prandom_u32() % 2 followed immediately by prandom_u32() % 4.
+This could be easily written to use three bits of one call, but
+at some cost in clarity and obvious-correctness, which is more
+important that efficiency in self-test code.
 
-thanks
+Signed-off-by: George Spelvin <lkml@sdf.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: linux-crypto@vger.kernel.org
+---
+ crypto/testmgr.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-adam
->
-> Thanks,
-> Horia
->
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index e8f21f7348a48..bc9252768bdba 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -770,7 +770,7 @@ static void mutate_buffer(u8 *buf, size_t count)
+ 	if (prandom_u32() % 4 == 0) {
+ 		num_flips = min_t(size_t, 1 << (prandom_u32() % 8), count * 8);
+ 		for (i = 0; i < num_flips; i++) {
+-			pos = prandom_u32() % (count * 8);
++			pos = prandom_u32_max(count * 8);
+ 			buf[pos / 8] ^= 1 << (pos % 8);
+ 		}
+ 	}
+@@ -821,8 +821,7 @@ static void generate_random_bytes(u8 *buf, size_t count)
+ 		break;
+ 	default:
+ 		/* Fully random bytes */
+-		for (i = 0; i < count; i++)
+-			buf[i] = (u8)prandom_u32();
++		prandom_bytes(buf, count);
+ 	}
+ }
+ 
+-- 
+2.26.0
+
