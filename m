@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB1C7C432C0
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 Nov 2019 18:24:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 341CAC43215
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 Nov 2019 18:24:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B53AB21736
+	by mail.kernel.org (Postfix) with ESMTP id F2F4C21736
 	for <linux-crypto@archiver.kernel.org>; Fri, 29 Nov 2019 18:24:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1575051859;
-	bh=hRREJsy40CatH0AaogDQyxLMyyXcdvCKth2Ur8Mmybo=;
+	s=default; t=1575051860;
+	bh=oPjhjdDqYKLeD2sVzw6rzRl6CgtNz0m1bOH25zmgxOs=;
 	h=From:To:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=hyxZFsBM49D53LbAAAaiN4m3hBfnmDex4eU0O+qRFBEvU19eqh7AADabe18pCxtYn
-	 uMKxHkBMd6UwmkHPwLNw0oiv1mc7TFjlQ0DceIB4gSXE6Hy/soaWguWTxM9RvnSsyQ
-	 rr4qcFCf1xj+v5dToZE8iw34tJfyZNSCYy5Atiwc=
+	b=plcJBf9KLEDWoy6u6gMHL4OjwsRJGWEkr/4fBuqs9y9cCF6SKIE/0D6FCiR7tCyZ1
+	 E3gFXxcjL944XDlC8YGyiS8ri5ijq3Bkhrl/ECSfuAJerLxRYEpVQbuXopALI4JboH
+	 hNliaFUUOCRQmbl3afZkSijT5DlH/e1sH8diwCoc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727073AbfK2SYT (ORCPT
+        id S1727005AbfK2SYT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Fri, 29 Nov 2019 13:24:19 -0500
-Received: from mail.kernel.org ([198.145.29.99]:57250 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:57252 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727005AbfK2SYS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1727022AbfK2SYS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Fri, 29 Nov 2019 13:24:18 -0500
 Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id CBF84217AB
+        by mail.kernel.org (Postfix) with ESMTPSA id 6C49821736
         for <linux-crypto@vger.kernel.org>; Fri, 29 Nov 2019 18:24:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=default; t=1575051857;
-        bh=hRREJsy40CatH0AaogDQyxLMyyXcdvCKth2Ur8Mmybo=;
+        bh=oPjhjdDqYKLeD2sVzw6rzRl6CgtNz0m1bOH25zmgxOs=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=oYRs39XGZ8OlgyRK4R9OxnsXMdePiX/z41trHpALdDvqfTSx+mBVfRhaMe+1YQ1n4
-         VSohQYQfWEWzKxWJi0JDuc0Zw6CS0Pik3HBkdSsILgfbfS9FKtvWttD2rmCODyx10a
-         OXClkzsnHiP+5CDe9EBpwTWwB/sLCZo/3aFujN2E=
+        b=Dm90DGDbCG2eL4b8I6zkQsZMGoXzt5vw3F2Q/bmt2043/MzAb15Qcz1KyQ/9Yzp0t
+         E3ElhheffqtWpPtr9T5BrdNRjnEprjsiJoKPC0hSi2j3qf04ULGyvrRoX7hsp45F/E
+         bz/f6v3Or17/qozC4pBPLUqJ/bq8isON+ApBj36A=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Subject: [PATCH 6/6] crypto: skcipher - remove crypto_skcipher_extsize()
-Date:   Fri, 29 Nov 2019 10:23:08 -0800
-Message-Id: <20191129182308.53961-7-ebiggers@kernel.org>
+Subject: [PATCH 4/6] crypto: skcipher - remove crypto_skcipher::encrypt
+Date:   Fri, 29 Nov 2019 10:23:06 -0800
+Message-Id: <20191129182308.53961-5-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20191129182308.53961-1-ebiggers@kernel.org>
 References: <20191129182308.53961-1-ebiggers@kernel.org>
@@ -57,39 +57,50 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 From: Eric Biggers <ebiggers@google.com>
 
 Due to the removal of the blkcipher and ablkcipher algorithm types,
-crypto_skcipher_extsize() now simply calls crypto_alg_extsize().  So
-remove it and just use crypto_alg_extsize().
+crypto_skcipher::encrypt is now redundant since it always equals
+crypto_skcipher_alg(tfm)->encrypt.
+
+Remove it and update crypto_skcipher_encrypt() accordingly.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/skcipher.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+ crypto/skcipher.c         | 3 +--
+ include/crypto/skcipher.h | 1 -
+ 2 files changed, 1 insertion(+), 3 deletions(-)
 
 diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index e4e4a445dc66..39a718d99220 100644
+index 4197b5ed57c4..926295ce1b07 100644
 --- a/crypto/skcipher.c
 +++ b/crypto/skcipher.c
-@@ -578,11 +578,6 @@ int skcipher_walk_aead_decrypt(struct skcipher_walk *walk,
+@@ -648,7 +648,7 @@ int crypto_skcipher_encrypt(struct skcipher_request *req)
+ 	if (crypto_skcipher_get_flags(tfm) & CRYPTO_TFM_NEED_KEY)
+ 		ret = -ENOKEY;
+ 	else
+-		ret = tfm->encrypt(req);
++		ret = crypto_skcipher_alg(tfm)->encrypt(req);
+ 	crypto_stats_skcipher_encrypt(cryptlen, ret, alg);
+ 	return ret;
  }
- EXPORT_SYMBOL_GPL(skcipher_walk_aead_decrypt);
+@@ -684,7 +684,6 @@ static int crypto_skcipher_init_tfm(struct crypto_tfm *tfm)
+ 	struct crypto_skcipher *skcipher = __crypto_skcipher_cast(tfm);
+ 	struct skcipher_alg *alg = crypto_skcipher_alg(skcipher);
  
--static unsigned int crypto_skcipher_extsize(struct crypto_alg *alg)
--{
--	return crypto_alg_extsize(alg);
--}
--
- static void skcipher_set_needkey(struct crypto_skcipher *tfm)
- {
- 	if (crypto_skcipher_max_keysize(tfm) != 0)
-@@ -749,7 +744,7 @@ static int crypto_skcipher_report(struct sk_buff *skb, struct crypto_alg *alg)
- #endif
+-	skcipher->encrypt = alg->encrypt;
+ 	skcipher->decrypt = alg->decrypt;
  
- static const struct crypto_type crypto_skcipher_type = {
--	.extsize = crypto_skcipher_extsize,
-+	.extsize = crypto_alg_extsize,
- 	.init_tfm = crypto_skcipher_init_tfm,
- 	.free = crypto_skcipher_free_instance,
- #ifdef CONFIG_PROC_FS
+ 	skcipher_set_needkey(skcipher);
+diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
+index ea94cc422b94..694215a59719 100644
+--- a/include/crypto/skcipher.h
++++ b/include/crypto/skcipher.h
+@@ -35,7 +35,6 @@ struct skcipher_request {
+ };
+ 
+ struct crypto_skcipher {
+-	int (*encrypt)(struct skcipher_request *req);
+ 	int (*decrypt)(struct skcipher_request *req);
+ 
+ 	unsigned int reqsize;
 -- 
 2.24.0
 
