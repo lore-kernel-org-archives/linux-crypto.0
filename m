@@ -2,82 +2,82 @@ Return-Path: <SRS0=xIDj=ZV=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F6D9C432C0
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 Nov 2019 11:47:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 054BDC432C0
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 Nov 2019 18:16:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 26BE1208E4
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 Nov 2019 11:47:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="mrf//5+H"
+	by mail.kernel.org (Postfix) with ESMTP id C9E7B21721
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 Nov 2019 18:16:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1575051394;
+	bh=qH8chtq21VTUC09zCa9EbHhgJqTk8Du5bgarliTIMh8=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=Gk+eeRua7ukZYjM+c4q5b87vR+QEOfKsYY8iHKUsBFLvHXG9cHB0QbtCL9WVA3TJD
+	 eSWp5UHadVRio/0S7EhOA23BIP0nbgZ7ueNW2My+Em2BeWbhVIDVwrKrYhCYGaDD1o
+	 wgutttcr0ZOrBCC5J2koVUa2oiyUsv9SdeAVV4uE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726608AbfK2Lrx (ORCPT
+        id S1727004AbfK2SQe (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 29 Nov 2019 06:47:53 -0500
-Received: from frisell.zx2c4.com ([192.95.5.64]:32947 "EHLO frisell.zx2c4.com"
+        Fri, 29 Nov 2019 13:16:34 -0500
+Received: from mail.kernel.org ([198.145.29.99]:56104 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725892AbfK2Lrx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 29 Nov 2019 06:47:53 -0500
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id c22c92ed;
-        Fri, 29 Nov 2019 10:53:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
-        :references:in-reply-to:from:date:message-id:subject:to:cc
-        :content-type; s=mail; bh=lEpJtkHaOd7GowBKrJ3B/YN/11g=; b=mrf//5
-        +HFMqsM3JXCbIOHBw3KhhWGga9oJMyfgfI+imBai1aZ7nYIthunm8IpU25u+xF7g
-        iYWs0/dgPCpUvQMjrfpTa/fOOZRbnvd4isoem3nfDvQQSCa2V8L/p2aAle61ckeG
-        hZ97l78wfyjw7ZbYEYpQlz7ZvagvKj41VO6sC+ateR7cI52s/2mNDun2dpHLZd8J
-        L9zY5otkIEQkk2Zt0NhaRwM5WPIBNyrwxA5/oqDEj2OrzDrQppWJAOoYMPd+Y3q/
-        ayDgc9QNk5Lhfv60tpheEccWFaqF4qFGNHo50OA1h2qnZ8unAymixrUjpfTq6TZF
-        FWNurdHM1n71U4Kg==
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id b4d24bf9 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
-        Fri, 29 Nov 2019 10:53:43 +0000 (UTC)
-Received: by mail-ot1-f50.google.com with SMTP id m15so24667103otq.7;
-        Fri, 29 Nov 2019 03:47:49 -0800 (PST)
-X-Gm-Message-State: APjAAAXMsQoKmPI+ngWxStbSI6PgjhaGbMLNKy1q7p3usHjaZ3RfJCt2
-        +KIotTigQPcr7fvdIuUMA7I/n2SMlQ4oN4vvTXE=
-X-Google-Smtp-Source: APXvYqx3Q7DMiecStDC9+rNFKGUSNsMhh7Ix+sa+yiMKb6vcL+XWPNQk0WiF1NbH1qs0r+XJ8CX2Ds+lWDWNbQvpsSQ=
-X-Received: by 2002:a9d:1e88:: with SMTP id n8mr3305587otn.369.1575028069075;
- Fri, 29 Nov 2019 03:47:49 -0800 (PST)
+        id S1726985AbfK2SQe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 29 Nov 2019 13:16:34 -0500
+Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5D52C2158A;
+        Fri, 29 Nov 2019 18:16:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1575051393;
+        bh=qH8chtq21VTUC09zCa9EbHhgJqTk8Du5bgarliTIMh8=;
+        h=From:To:Cc:Subject:Date:From;
+        b=FpfvZ7z8fwSrhDjEYaWNp5ETrtbSAldZFrTv8Vji7we/fKHoz0o9iVmOAtm/WyW3l
+         7jNqWQok6l2D19vRq9H2fvBLaaahisERWSdCTg0uaclb+De6Qw3qGlgCPI6ty5C+GR
+         /Df/pWWuvdgqiTFzOB4KULiEH1HsdMrUOYSvskbY=
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     Zaibo Xu <xuzaibo@huawei.com>,
+        Longfang Liu <liulongfang@huawei.com>
+Subject: [PATCH] crypto: hisilicon - select CRYPTO_SKCIPHER, not CRYPTO_BLKCIPHER
+Date:   Fri, 29 Nov 2019 10:15:56 -0800
+Message-Id: <20191129181556.45422-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-References: <20191127112643.441509-1-Jason@zx2c4.com> <20191128.133023.1503723038764717212.davem@davemloft.net>
- <20191129033205.GA67257@zx2c4.com> <20191128.222735.1430087391284485253.davem@davemloft.net>
-In-Reply-To: <20191128.222735.1430087391284485253.davem@davemloft.net>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Fri, 29 Nov 2019 12:47:37 +0100
-X-Gmail-Original-Message-ID: <CAHmME9p8cxUtZhegkNrCF+GgREKQA=5LQ_km35qopC-2SKtJaw@mail.gmail.com>
-Message-ID: <CAHmME9p8cxUtZhegkNrCF+GgREKQA=5LQ_km35qopC-2SKtJaw@mail.gmail.com>
-Subject: Re: [PATCH v1] net: WireGuard secure network tunnel
-To:     David Miller <davem@davemloft.net>
-Cc:     Netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Nov 29, 2019 at 7:27 AM David Miller <davem@davemloft.net> wrote:
->
-> From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-> Date: Fri, 29 Nov 2019 04:32:05 +0100
->
-> > I'm not a huge fan of doing manual skb surgery either. The annoying
-> > thing here is that skb_gso_segment returns a list of skbs that's
-> > terminated by the last one's next pointer being NULL. I assume it's this
-> > way so that the GSO code doesn't have to pass a head around.
->
-> Sorry, I missed that this was processing a GSO list which doesn't use
-> double linked list semantics.
->
-> So ignore my feedback on this one :-)
+From: Eric Biggers <ebiggers@google.com>
 
-Okay, no problem. I'll submit some global tree-wide cleanup patches in
-the way of a helper macro sometime after all the wireguard dust
-settles, then, and we can assess that separately.
+Another instance of CRYPTO_BLKCIPHER made it in just after it was
+renamed to CRYPTO_SKCIPHER.  Fix it.
+
+Fixes: 416d82204df4 ("crypto: hisilicon - add HiSilicon SEC V2 driver")
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ drivers/crypto/hisilicon/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
+index c0e7a85fe129..da749f6ecbea 100644
+--- a/drivers/crypto/hisilicon/Kconfig
++++ b/drivers/crypto/hisilicon/Kconfig
+@@ -16,7 +16,7 @@ config CRYPTO_DEV_HISI_SEC
+ 
+ config CRYPTO_DEV_HISI_SEC2
+ 	tristate "Support for HiSilicon SEC2 crypto block cipher accelerator"
+-	select CRYPTO_BLKCIPHER
++	select CRYPTO_SKCIPHER
+ 	select CRYPTO_ALGAPI
+ 	select CRYPTO_LIB_DES
+ 	select CRYPTO_DEV_HISI_QM
+-- 
+2.24.0
+
