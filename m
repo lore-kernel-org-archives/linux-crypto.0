@@ -2,61 +2,96 @@ Return-Path: <SRS0=xIDj=ZV=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D574EC432C0
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 Nov 2019 06:27:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5223C432C0
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 Nov 2019 08:40:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A06C921721
-	for <linux-crypto@archiver.kernel.org>; Fri, 29 Nov 2019 06:27:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 96E8921781
+	for <linux-crypto@archiver.kernel.org>; Fri, 29 Nov 2019 08:40:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726785AbfK2G1i (ORCPT
+        id S1726360AbfK2Ikd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 29 Nov 2019 01:27:38 -0500
-Received: from shards.monkeyblade.net ([23.128.96.9]:53400 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726167AbfK2G1i (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 29 Nov 2019 01:27:38 -0500
-Received: from localhost (c-73-35-209-67.hsd1.wa.comcast.net [73.35.209.67])
-        (using TLSv1 with cipher AES256-SHA (256/256 bits))
-        (Client did not present a certificate)
-        (Authenticated sender: davem-davemloft)
-        by shards.monkeyblade.net (Postfix) with ESMTPSA id D7574142D4214;
-        Thu, 28 Nov 2019 22:27:37 -0800 (PST)
-Date:   Thu, 28 Nov 2019 22:27:35 -0800 (PST)
-Message-Id: <20191128.222735.1430087391284485253.davem@davemloft.net>
-To:     Jason@zx2c4.com
-Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        gregkh@linuxfoundation.org, torvalds@linux-foundation.org,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v1] net: WireGuard secure network tunnel
-From:   David Miller <davem@davemloft.net>
-In-Reply-To: <20191129033205.GA67257@zx2c4.com>
-References: <20191127112643.441509-1-Jason@zx2c4.com>
-        <20191128.133023.1503723038764717212.davem@davemloft.net>
-        <20191129033205.GA67257@zx2c4.com>
-X-Mailer: Mew version 6.8 on Emacs 26.1
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.5.12 (shards.monkeyblade.net [149.20.54.216]); Thu, 28 Nov 2019 22:27:38 -0800 (PST)
+        Fri, 29 Nov 2019 03:40:33 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:59734 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725886AbfK2Ikd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 29 Nov 2019 03:40:33 -0500
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1iabpE-00011i-Sn; Fri, 29 Nov 2019 16:40:28 +0800
+Received: from herbert by gondobar with local (Exim 4.89)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1iabpA-00060T-N4; Fri, 29 Nov 2019 16:40:24 +0800
+Date:   Fri, 29 Nov 2019 16:40:24 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Steffen Klassert <steffen.klassert@secunet.com>
+Subject: [PATCH] crypto: pcrypt - Do not clear MAY_SLEEP flag in original
+ request
+Message-ID: <20191129084024.arwefx7bpvvxpyjk@gondor.apana.org.au>
+References: <20191119130556.dso2ni6qlks3lr23@gondor.apana.org.au>
+ <20191119173732.GB819@sol.localdomain>
+ <20191119185827.nerskpvddkcsih25@gondor.apana.org.au>
+ <20191126053238.yxhtfbt5okcjycuy@ca-dmjordan1.us.oracle.com>
+ <20191126075845.2v3woc3xqx2fxzqh@gondor.apana.org.au>
+ <20191127191452.GC49214@sol.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191127191452.GC49214@sol.localdomain>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Fri, 29 Nov 2019 04:32:05 +0100
+On Wed, Nov 27, 2019 at 11:14:52AM -0800, Eric Biggers wrote:
+>
+> I tried applying the following patches and running syzkaller again:
+> 
+> 	padata: Remove unused padata_remove_cpu
+> 	padata: Remove broken queue flushing
+> 	crypto: pcrypt - Fix user-after-free on module unload
+> 	[v3] crypto: pcrypt - Avoid deadlock by using per-instance padata queues
+> 
+> This time I got a crypto self-test failure when
+> "pcrypt(pcrypt(rfc4106-gcm-aesni))" was instantiated:
+> 
+> [ 2220.165113] alg: aead: pcrypt(pcrypt(rfc4106-gcm-aesni)) encryption corrupted request struct on test vector 0, cfg="uneven misaligned splits, may sleep"
+> [ 2220.170295] alg: aead: changed 'req->base.flags'
+> [ 2220.171799] Kernel panic - not syncing: alg: self-tests for pcrypt(pcrypt(rfc4106-gcm-aesni)) (rfc4106(gcm(aes))) failed in panic_on_fail mode!
+> 
+> So the algorithm is not preserving aead_request::base.flags.
 
-> I'm not a huge fan of doing manual skb surgery either. The annoying
-> thing here is that skb_gso_segment returns a list of skbs that's
-> terminated by the last one's next pointer being NULL. I assume it's this
-> way so that the GSO code doesn't have to pass a head around.
+Thanks for the report.  This is a preexisting bug in pcrypt.  Here
+is a patch for it.
 
-Sorry, I missed that this was processing a GSO list which doesn't use
-double linked list semantics.
+---8<---
+We should not be modifying the original request's MAY_SLEEP flag
+upon completion.  It makes no sense to do so anyway.
 
-So ignore my feedback on this one :-)
+Reported-by: Eric Biggers <ebiggers@kernel.org>
+Fixes: 5068c7a883d1 ("crypto: pcrypt - Add pcrypt crypto...")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
+index 543792e0ebf0..2f6f81183e45 100644
+--- a/crypto/pcrypt.c
++++ b/crypto/pcrypt.c
+@@ -63,7 +63,6 @@ static void pcrypt_aead_done(struct crypto_async_request *areq, int err)
+ 	struct padata_priv *padata = pcrypt_request_padata(preq);
+ 
+ 	padata->info = err;
+-	req->base.flags &= ~CRYPTO_TFM_REQ_MAY_SLEEP;
+ 
+ 	padata_do_serial(padata);
+ }
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
