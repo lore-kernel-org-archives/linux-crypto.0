@@ -7,43 +7,44 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C4D6C43215
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E11A7C33CB8
 	for <linux-crypto@archiver.kernel.org>; Sun,  1 Dec 2019 21:54:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 178E720865
+	by mail.kernel.org (Postfix) with ESMTP id B619E215F1
 	for <linux-crypto@archiver.kernel.org>; Sun,  1 Dec 2019 21:54:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=default; t=1575237262;
-	bh=VSQfZ9WnmSpg9pL0yDSuqYs8FkDuRuK6VaZ+NTs01g8=;
-	h=From:To:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=wJAolSbK5RxrddDw328wc/K2d+yjoIgDbLQYl3TGuw7E0FRTr1tl6WTrQiZxXx7u+
-	 AKgfnmNvwcMJrN+OKQg+XcCChdyV+N6tL302yG4x6W3Sm4Hk6hpHrVX55a0/gZFTsa
-	 K/7iqj/OR1amvXiR7uSs7OEBeqz76nBHeutRFfKY=
+	bh=EuAafZaO9ltKvvDUJZdS4MB+SmmRnUWxVmGC4e8CdPA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=sCpIkuivKZh8RJ3fCQdOGWXd8utSzKINSm7nu+ggZBXhhKxJ3o4Id+K72VlpwgUAl
+	 wcXKFld5iYszlPsc68Mc7XQhwWyCU+Qf3MrNw7SFzQEwdmTjyH8qqcqUUSZ3khtQvw
+	 AZf+uicSsNzc+tWpGYWcPSJOhQYYCMdJxZttHMEk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727280AbfLAVyU (ORCPT
+        id S1727301AbfLAVyV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 1 Dec 2019 16:54:20 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33396 "EHLO mail.kernel.org"
+        Sun, 1 Dec 2019 16:54:21 -0500
+Received: from mail.kernel.org ([198.145.29.99]:33400 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727266AbfLAVyU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 1 Dec 2019 16:54:20 -0500
+        id S1727266AbfLAVyV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 1 Dec 2019 16:54:21 -0500
 Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E1A88215F1
-        for <linux-crypto@vger.kernel.org>; Sun,  1 Dec 2019 21:54:19 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4C14A217AB;
+        Sun,  1 Dec 2019 21:54:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=default; t=1575237260;
-        bh=VSQfZ9WnmSpg9pL0yDSuqYs8FkDuRuK6VaZ+NTs01g8=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=pQhMY7AvC040nOYDEP0pRItsS0N89BcbJERBnEPw582rxbBnYo7CnMAQWnO7B4lXF
-         N8CZHi34nORHc3zku5+SmvTNf4TMbFAHYR6Up/EzHUqPomO9+AHt3tPe+A/GuffjNQ
-         +7XoXoxuu3hhGAG2DqQBYBscn0WuddjOxWPYZNuY=
+        bh=EuAafZaO9ltKvvDUJZdS4MB+SmmRnUWxVmGC4e8CdPA=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=VyOCPAmai6+wc99y0aDPYdWyYXPWmjb0dQzI1LbI3943XFE7PqFC7wtqNNhBQA8xC
+         hgh97sgNHM16z7NSieRXprzfHp50/LakNtOZVAHS1B2yzjZmGofdMFgW0SUBm8L578
+         9C5NSXvmd7Am8neFVgARg1rX7BkfORt+PmTGOPs4=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Subject: [PATCH 1/7] crypto: aead - move crypto_aead_maxauthsize() to <crypto/aead.h>
-Date:   Sun,  1 Dec 2019 13:53:24 -0800
-Message-Id: <20191201215330.171990-2-ebiggers@kernel.org>
+Cc:     Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+Subject: [PATCH 3/7] crypto: testmgr - don't try to decrypt uninitialized buffers
+Date:   Sun,  1 Dec 2019 13:53:26 -0800
+Message-Id: <20191201215330.171990-4-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20191201215330.171990-1-ebiggers@kernel.org>
 References: <20191201215330.171990-1-ebiggers@kernel.org>
@@ -56,59 +57,72 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-Move crypto_aead_maxauthsize() to <crypto/aead.h> so that it's available
-to users of the API, not just AEAD implementations.
+Currently if the comparison fuzz tests encounter an encryption error
+when generating an skcipher or AEAD test vector, they will still test
+the decryption side (passing it the uninitialized ciphertext buffer)
+and expect it to fail with the same error.
 
-This will be used by the self-tests.
+This is sort of broken because it's not well-defined usage of the API to
+pass an uninitialized buffer, and furthermore in the AEAD case it's
+acceptable for the decryption error to be EBADMSG (meaning "inauthentic
+input") even if the encryption error was something else like EINVAL.
 
+Fix this for skcipher by explicitly initializing the ciphertext buffer
+on error, and for AEAD by skipping the decryption test on error.
+
+Reported-by: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
+Fixes: d435e10e67be ("crypto: testmgr - fuzz skciphers against their generic implementation")
+Fixes: 40153b10d91c ("crypto: testmgr - fuzz AEADs against their generic implementation")
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- include/crypto/aead.h          | 10 ++++++++++
- include/crypto/internal/aead.h | 10 ----------
- 2 files changed, 10 insertions(+), 10 deletions(-)
+ crypto/testmgr.c | 20 ++++++++++++++++----
+ 1 file changed, 16 insertions(+), 4 deletions(-)
 
-diff --git a/include/crypto/aead.h b/include/crypto/aead.h
-index a3bdadf6221e..1b3ebe8593c0 100644
---- a/include/crypto/aead.h
-+++ b/include/crypto/aead.h
-@@ -227,6 +227,16 @@ static inline unsigned int crypto_aead_authsize(struct crypto_aead *tfm)
- 	return tfm->authsize;
- }
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 85d720a57bb0..a8940415512f 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -2102,6 +2102,7 @@ static void generate_random_aead_testvec(struct aead_request *req,
+ 	 * If the key or authentication tag size couldn't be set, no need to
+ 	 * continue to encrypt.
+ 	 */
++	vec->crypt_error = 0;
+ 	if (vec->setkey_error || vec->setauthsize_error)
+ 		goto done;
  
-+static inline unsigned int crypto_aead_alg_maxauthsize(struct aead_alg *alg)
-+{
-+	return alg->maxauthsize;
-+}
-+
-+static inline unsigned int crypto_aead_maxauthsize(struct crypto_aead *aead)
-+{
-+	return crypto_aead_alg_maxauthsize(crypto_aead_alg(aead));
-+}
-+
- /**
-  * crypto_aead_blocksize() - obtain block size of cipher
-  * @tfm: cipher handle
-diff --git a/include/crypto/internal/aead.h b/include/crypto/internal/aead.h
-index c509ec30fc65..374185a7567f 100644
---- a/include/crypto/internal/aead.h
-+++ b/include/crypto/internal/aead.h
-@@ -113,16 +113,6 @@ static inline void crypto_aead_set_reqsize(struct crypto_aead *aead,
- 	aead->reqsize = reqsize;
- }
- 
--static inline unsigned int crypto_aead_alg_maxauthsize(struct aead_alg *alg)
--{
--	return alg->maxauthsize;
--}
--
--static inline unsigned int crypto_aead_maxauthsize(struct crypto_aead *aead)
--{
--	return crypto_aead_alg_maxauthsize(crypto_aead_alg(aead));
--}
--
- static inline void aead_init_queue(struct aead_queue *queue,
- 				   unsigned int max_qlen)
- {
+@@ -2245,10 +2246,12 @@ static int test_aead_vs_generic_impl(const char *driver,
+ 					req, tsgls);
+ 		if (err)
+ 			goto out;
+-		err = test_aead_vec_cfg(driver, DECRYPT, &vec, vec_name, cfg,
+-					req, tsgls);
+-		if (err)
+-			goto out;
++		if (vec.crypt_error == 0) {
++			err = test_aead_vec_cfg(driver, DECRYPT, &vec, vec_name,
++						cfg, req, tsgls);
++			if (err)
++				goto out;
++		}
+ 		cond_resched();
+ 	}
+ 	err = 0;
+@@ -2678,6 +2681,15 @@ static void generate_random_cipher_testvec(struct skcipher_request *req,
+ 	skcipher_request_set_callback(req, 0, crypto_req_done, &wait);
+ 	skcipher_request_set_crypt(req, &src, &dst, vec->len, iv);
+ 	vec->crypt_error = crypto_wait_req(crypto_skcipher_encrypt(req), &wait);
++	if (vec->crypt_error != 0) {
++		/*
++		 * The only acceptable error here is for an invalid length, so
++		 * skcipher decryption should fail with the same error too.
++		 * We'll test for this.  But to keep the API usage well-defined,
++		 * explicitly initialize the ciphertext buffer too.
++		 */
++		memset((u8 *)vec->ctext, 0, vec->len);
++	}
+ done:
+ 	snprintf(name, max_namelen, "\"random: len=%u klen=%u\"",
+ 		 vec->len, vec->klen);
 -- 
 2.24.0
 
