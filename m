@@ -8,67 +8,67 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D779C432C3
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Dec 2019 16:24:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DACBC432C0
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Dec 2019 16:24:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 54D1D206EC
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Dec 2019 16:24:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1BA49206EC
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Dec 2019 16:24:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tfHrWx0E"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p3/1HbZ0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726991AbfLCQYX (ORCPT
+        id S1727044AbfLCQYT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Dec 2019 11:24:23 -0500
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:43698 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727060AbfLCQYU (ORCPT
+        Tue, 3 Dec 2019 11:24:19 -0500
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:38106 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726991AbfLCQYT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Dec 2019 11:24:20 -0500
-Received: by mail-pg1-f193.google.com with SMTP id b1so1875452pgq.10;
-        Tue, 03 Dec 2019 08:24:20 -0800 (PST)
+        Tue, 3 Dec 2019 11:24:19 -0500
+Received: by mail-pf1-f196.google.com with SMTP id x185so2097501pfc.5;
+        Tue, 03 Dec 2019 08:24:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=csJknXoAEAep/w6gJ0VcZdy3jBlPD/zGz+DMoQC1qmc=;
-        b=tfHrWx0EEMC12Q+upcbJ8j8p6BUgA8DlNk9q4TxqDTDOG1qE5ucC6crb+mV63Mo+dE
-         2XG0sXsHLwDCJhYKowU6D3OjRV9ULkiJ6mtFYQhHqaIsCjh4iJByv2tyQX57+BTyUC2G
-         csBmJCemsNfyYn0A+j82xSrfN2qMXHo4D34TxxAhRvDgVUgGO482ecud6dso36DPqwLm
-         M9sHW0V5abbrj9h6YJyqCG/O+6n4dM60ZBzYt1op7ZlS2gGrh2P+WisvW32Fq6AO7YnZ
-         U9vMxkQl0dmlxvcR8DUykLhk+U1jWPTUsXebEhuh72ZExRfbbOTOSJBbX1zwSQdwTdKF
-         PHPQ==
+        bh=wZD4t0a3XXAgXV6gWa/5oe3utraxKSTOn74WWRhUtU4=;
+        b=p3/1HbZ0khvy8EzdjCYugCj5mO9dBDgaQm7mlFQjN+QebHjjyXDSYv+2pHka1zdDea
+         zr2jeySmm2JxZ4aU+A9V7+hcpWJiGHM4Qu2VnjTO5BDqsKvF4p8MRlmIGDoGy7DCUK8Y
+         Tf1Lqd9xv/ZWBh45Bmi66EigbCJT4+6l71695mt2kmO3Rdk5TZr4ADS883HH2KkA5nxc
+         ptLddadOPlZFYjBsR1SNVjj2gcG09JkTZbhgZMrZEN7Py6On8/iFeOSEhydPjAgVW9eC
+         zxHJPbpDfpdOY4R1qe+/JeMKcvmYPTwlyP1XGaOuVihVNFSdYlaE/JyurhIMu4xOBWwr
+         zQYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=csJknXoAEAep/w6gJ0VcZdy3jBlPD/zGz+DMoQC1qmc=;
-        b=IP3i2Xr/ibw7I0zajefyIzF+kpf9nRayd2LogKTAAkU8lB/ETjrri/4BPdinjuJk/Y
-         iuF3UPnvUCcWeHoyEZaKDcQFulCUXNLvjTSPLe7wh/YVCzD2Z6SXMIrYoJ8Nltx1CD0V
-         oFgmDMWS2jdSMjth4a3qxR6m94YB981joTRAN/En1qZ0QHrOin1xijJDbpGbEY0a9DdT
-         /43Z2u8KgWWkBjQ7KlqEeEB10raz/5v7QkmRQ2LPo/f+ZEXfo48zr36PXmYgonziwORF
-         K4T6Y46QZEhaskv7D8mIV5QXpyKcgD0dOl5f5ARsCsrskVCX/nz+KvLye0xArmESqIza
-         an4Q==
-X-Gm-Message-State: APjAAAUkXF4g7wrG28DXSOLJlW13H5mquu0pTpcesN4kV5ejgvqhR+hG
-        tZmqy4okRAGN8hEQD7bslluXx/rPD0Q=
-X-Google-Smtp-Source: APXvYqxwtIphqp9JNec8mvInyqwbrXKalS/a+XiFGTj0wT65SWmKvpgrlPtWsd4BUZnVLOTUB7QUig==
-X-Received: by 2002:a65:56c9:: with SMTP id w9mr6027699pgs.296.1575390259304;
-        Tue, 03 Dec 2019 08:24:19 -0800 (PST)
+        bh=wZD4t0a3XXAgXV6gWa/5oe3utraxKSTOn74WWRhUtU4=;
+        b=HNGnufD3U2gJb6zf8SuKTYffv1F9nWQZtq6YoKVLRkCym8kkp+poZm4/To9Nysu75o
+         xVPiumxuONmje0u1Q67hf4ooPBzG+xfIvCCOC+VFc0sqK4pfIbKyTa0Uylk0dSSpBF5A
+         HsWOCpIYOqrbIhJGlPg+/c9SMt24i3ea4nzdin5AT4L+eHVH123kGWApr/8fZX0sM29N
+         86ak1TclUx1FCo/nZYSofqjmuiWLEyOrtp/yxRKJYik1DEnuLtXn6JMBXxGm+05oZ9Ff
+         y2EIGHggLNUIq/V26J2i653Ii1IwVUG/Q7T3t3UpiuiFiRwH6K2dq7Nk6W2pQUX8bWmK
+         wjqw==
+X-Gm-Message-State: APjAAAUE9YHIGHeypdO3CiIke0UM84nSwiXijFqrJkSP6t1IOjYmni0j
+        AORtBpCNPlySDap1fU00jZcOAMYvSRk=
+X-Google-Smtp-Source: APXvYqykWaNDw/sJQs5kCpAOJiO7sFabUN6yTDV6VZyYX73zXQqVCs8nsusrKG/KwQELSydFb19mVg==
+X-Received: by 2002:a63:510e:: with SMTP id f14mr6278740pgb.35.1575390257660;
+        Tue, 03 Dec 2019 08:24:17 -0800 (PST)
 Received: from localhost.hsd1.wa.comcast.net ([2601:602:847f:811f:babe:8e8d:b27e:e6d7])
-        by smtp.gmail.com with ESMTPSA id g10sm4052093pgh.35.2019.12.03.08.24.17
+        by smtp.gmail.com with ESMTPSA id g10sm4052093pgh.35.2019.12.03.08.24.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Dec 2019 08:24:18 -0800 (PST)
+        Tue, 03 Dec 2019 08:24:16 -0800 (PST)
 From:   Andrey Smirnov <andrew.smirnov@gmail.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
-        Chris Healy <cphealy@gmail.com>,
         Lucas Stach <l.stach@pengutronix.de>,
+        Chris Healy <cphealy@gmail.com>,
         =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Iuliana Prodan <iuliana.prodan@nxp.com>, linux-imx@nxp.com,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v5 4/4] crypto: caam - expose SEC4 DRNG via crypto RNG API
-Date:   Tue,  3 Dec 2019 08:23:57 -0800
-Message-Id: <20191203162357.21942-5-andrew.smirnov@gmail.com>
+Subject: [PATCH v5 3/4] crypto: caam - replace DRNG with TRNG for use with hw_random
+Date:   Tue,  3 Dec 2019 08:23:56 -0800
+Message-Id: <20191203162357.21942-4-andrew.smirnov@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20191203162357.21942-1-andrew.smirnov@gmail.com>
 References: <20191203162357.21942-1-andrew.smirnov@gmail.com>
@@ -80,10 +80,12 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Expose SEC4 DRNG IP block using crypto RNG API so it could be used
-both by kernel and userspace code.
+In order to give CAAM-generated random data highest quality
+rating (999), replace current code that uses DRNG with code that
+fetches data straight out of TRNG used to seed aforementioned DRNG.
 
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+Reviewed-by: Lucas Stach <l.stach@pengutronix.de>
 Tested-by: Chris Healy <cphealy@gmail.com>
 Cc: Chris Healy <cphealy@gmail.com>
 Cc: Lucas Stach <l.stach@pengutronix.de>
@@ -94,261 +96,620 @@ Cc: linux-imx@nxp.com
 Cc: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 ---
- drivers/crypto/caam/Kconfig  |   8 ++
- drivers/crypto/caam/Makefile |   1 +
- drivers/crypto/caam/drng.c   | 174 +++++++++++++++++++++++++++++++++++
- drivers/crypto/caam/intern.h |  13 +++
- drivers/crypto/caam/jr.c     |   1 +
- 5 files changed, 197 insertions(+)
- create mode 100644 drivers/crypto/caam/drng.c
+ drivers/crypto/caam/Kconfig   |  17 +-
+ drivers/crypto/caam/Makefile  |   2 +-
+ drivers/crypto/caam/caamrng.c | 350 ----------------------------------
+ drivers/crypto/caam/ctrl.c    |   6 +
+ drivers/crypto/caam/intern.h  |   9 +-
+ drivers/crypto/caam/jr.c      |   2 -
+ drivers/crypto/caam/regs.h    |  11 +-
+ drivers/crypto/caam/trng.c    |  89 +++++++++
+ 8 files changed, 114 insertions(+), 372 deletions(-)
+ delete mode 100644 drivers/crypto/caam/caamrng.c
+ create mode 100644 drivers/crypto/caam/trng.c
 
 diff --git a/drivers/crypto/caam/Kconfig b/drivers/crypto/caam/Kconfig
-index 31ecf165bc03..b6d9f3caa9ba 100644
+index 87053e46c788..31ecf165bc03 100644
 --- a/drivers/crypto/caam/Kconfig
 +++ b/drivers/crypto/caam/Kconfig
-@@ -146,6 +146,14 @@ config CRYPTO_DEV_FSL_CAAM_PKC_API
+@@ -31,6 +31,14 @@ config CRYPTO_DEV_FSL_CAAM_DEBUG
+ 	  Selecting this will enable printing of various debug
+ 	  information in the CAAM driver.
+ 
++config CRYPTO_DEV_FSL_CAAM_RNG_API
++	bool "Register caam device for hwrng API"
++	default y
++	select HW_RANDOM
++	help
++	  Selecting this will register the hardware TRNG to
++	  the hw_random API for suppying the kernel entropy pool.
++
+ menuconfig CRYPTO_DEV_FSL_CAAM_JR
+ 	tristate "Freescale CAAM Job Ring driver backend"
+ 	default y
+@@ -138,15 +146,6 @@ config CRYPTO_DEV_FSL_CAAM_PKC_API
            Supported cryptographic primitives: encryption, decryption,
            signature and verification.
  
-+config CRYPTO_DEV_FSL_CAAM_DRNG_API
-+	bool "Register caam device for hwrng API"
-+	default y
-+	select CRYPTO_RNG
-+	help
-+	  Selecting this will register the SEC4 DRNG to
-+	  the crypto RNG API.
-+
+-config CRYPTO_DEV_FSL_CAAM_RNG_API
+-	bool "Register caam device for hwrng API"
+-	default y
+-	select CRYPTO_RNG
+-	select HW_RANDOM
+-	help
+-	  Selecting this will register the SEC4 hardware rng to
+-	  the hw_random API for suppying the kernel entropy pool.
+-
  endif # CRYPTO_DEV_FSL_CAAM_JR
  
  endif # CRYPTO_DEV_FSL_CAAM
 diff --git a/drivers/crypto/caam/Makefile b/drivers/crypto/caam/Makefile
-index 04884fc087f9..02b7ed8823ce 100644
+index 68d5cc0f28e2..04884fc087f9 100644
 --- a/drivers/crypto/caam/Makefile
 +++ b/drivers/crypto/caam/Makefile
-@@ -20,6 +20,7 @@ caam_jr-y := jr.o key_gen.o
+@@ -15,11 +15,11 @@ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_DESC) += caamalg_desc.o
+ obj-$(CONFIG_CRYPTO_DEV_FSL_CAAM_AHASH_API_DESC) += caamhash_desc.o
+ 
+ caam-y := ctrl.o
++caam-$(CONFIG_CRYPTO_DEV_FSL_CAAM_RNG_API) += trng.o
+ caam_jr-y := jr.o key_gen.o
  caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API) += caamalg.o
  caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI) += caamalg_qi.o
  caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_AHASH_API) += caamhash.o
-+caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_DRNG_API) += drng.o
+-caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_RNG_API) += caamrng.o
  caam_jr-$(CONFIG_CRYPTO_DEV_FSL_CAAM_PKC_API) += caampkc.o pkc_desc.o
  
  caam-$(CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI) += qi.o
-diff --git a/drivers/crypto/caam/drng.c b/drivers/crypto/caam/drng.c
-new file mode 100644
-index 000000000000..88b13a54e90f
---- /dev/null
-+++ b/drivers/crypto/caam/drng.c
-@@ -0,0 +1,174 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+/*
-+ * Driver to expose SEC4 DRNG via crypto RNG API
-+ *
-+ * Copyright 2019 Zodiac Inflight Innovations
-+ *
-+ * Based on CAAM SEC4 hw_random driver
-+ *
-+ * Copyright 2011 Freescale Semiconductor, Inc.
-+ * Copyright 2018-2019 NXP
-+ *
-+ * Based on caamalg.c crypto API driver.
-+ *
-+ */
-+
-+#include <linux/completion.h>
-+#include <linux/atomic.h>
-+
-+#include <crypto/internal/rng.h>
-+
-+#include "compat.h"
-+
-+#include "regs.h"
-+#include "intern.h"
-+#include "desc_constr.h"
-+#include "jr.h"
-+#include "error.h"
-+
-+#define CAAM_DRNG_MAX_FIFO_STORE_SIZE	((unsigned int)U16_MAX)
-+
-+/* rng per-device context */
-+struct caam_drng_ctx {
-+	struct device *jrdev;
-+	struct completion done;
-+};
-+
-+static void rng_done(struct device *jrdev, u32 *desc, u32 err, void *context)
-+{
-+	struct caam_drng_ctx *ctx = context;
-+
-+	if (err)
-+		caam_jr_strstatus(jrdev, err);
-+
-+	complete(&ctx->done);
-+}
-+
-+static int caam_drng_generate(struct crypto_rng *tfm,
-+			     const u8 *src, unsigned int slen,
-+			     u8 *dst, unsigned int dlen)
-+{
-+	struct caam_drng_ctx *ctx = crypto_rng_ctx(tfm);
-+	struct device *jrdev = ctx->jrdev;
-+	unsigned int residue = dlen;
-+	dma_addr_t dst_dma, cur_dma;
-+	u32 *desc;
-+	int ret;
-+
-+	desc = kzalloc(5 * CAAM_CMD_SZ + CAAM_PTR_SZ_MAX,
-+		       GFP_KERNEL | GFP_DMA);
-+	if (!desc)
-+		return -ENOMEM;
-+
-+	cur_dma = dst_dma = dma_map_single(jrdev, dst, dlen, DMA_FROM_DEVICE);
-+	if (dma_mapping_error(jrdev, dst_dma)) {
-+		dev_err(jrdev, "unable to map destination memory\n");
-+		ret = -ENOMEM;
-+		goto free_mem;
-+	}
-+
-+	do {
-+		const unsigned int chunk = min(residue,
-+					       CAAM_DRNG_MAX_FIFO_STORE_SIZE);
-+
-+		init_job_desc(desc, 0);
-+		/* Generate random bytes */
-+		append_operation(desc, OP_ALG_ALGSEL_RNG | OP_TYPE_CLASS1_ALG);
-+		/* Store bytes */
-+		append_seq_out_ptr_intlen(desc, cur_dma, chunk, 0);
-+		append_seq_fifo_store(desc, chunk, FIFOST_TYPE_RNGSTORE);
-+
-+		print_hex_dump_debug("rng job desc@: ", DUMP_PREFIX_ADDRESS,
-+				     16, 4, desc, desc_bytes(desc), 1);
-+
-+		init_completion(&ctx->done);
-+		ret = caam_jr_enqueue(jrdev, desc, rng_done, ctx);
-+		if (ret)
-+			break;
-+
-+		wait_for_completion(&ctx->done);
-+
-+		cur_dma += chunk;
-+		residue -= chunk;
-+	} while (residue);
-+
-+	dma_unmap_single(jrdev, dst_dma, dlen, DMA_FROM_DEVICE);
-+free_mem:
-+	kfree(desc);
-+	return ret;
-+}
-+
-+static int caam_drng_init(struct crypto_tfm *tfm)
-+{
-+	struct caam_drng_ctx *ctx = crypto_tfm_ctx(tfm);
-+	int ret;
-+
-+	ctx->jrdev = caam_jr_alloc();
-+	ret = PTR_ERR_OR_ZERO(ctx->jrdev);
+diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
+deleted file mode 100644
+index 041fbd015691..000000000000
+--- a/drivers/crypto/caam/caamrng.c
++++ /dev/null
+@@ -1,350 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0+
+-/*
+- * caam - Freescale FSL CAAM support for hw_random
+- *
+- * Copyright 2011 Freescale Semiconductor, Inc.
+- * Copyright 2018-2019 NXP
+- *
+- * Based on caamalg.c crypto API driver.
+- *
+- * relationship between job descriptors to shared descriptors:
+- *
+- * ---------------                     --------------
+- * | JobDesc #0  |-------------------->| ShareDesc  |
+- * | *(buffer 0) |      |------------->| (generate) |
+- * ---------------      |              | (move)     |
+- *                      |              | (store)    |
+- * ---------------      |              --------------
+- * | JobDesc #1  |------|
+- * | *(buffer 1) |
+- * ---------------
+- *
+- * A job desc looks like this:
+- *
+- * ---------------------
+- * | Header            |
+- * | ShareDesc Pointer |
+- * | SEQ_OUT_PTR       |
+- * | (output buffer)   |
+- * ---------------------
+- *
+- * The SharedDesc never changes, and each job descriptor points to one of two
+- * buffers for each device, from which the data will be copied into the
+- * requested destination
+- */
+-
+-#include <linux/hw_random.h>
+-#include <linux/completion.h>
+-#include <linux/atomic.h>
+-
+-#include "compat.h"
+-
+-#include "regs.h"
+-#include "intern.h"
+-#include "desc_constr.h"
+-#include "jr.h"
+-#include "error.h"
+-
+-/*
+- * Maximum buffer size: maximum number of random, cache-aligned bytes that
+- * will be generated and moved to seq out ptr (extlen not allowed)
+- */
+-#define RN_BUF_SIZE			(0xffff / L1_CACHE_BYTES * \
+-					 L1_CACHE_BYTES)
+-
+-/* length of descriptors */
+-#define DESC_JOB_O_LEN			(CAAM_CMD_SZ * 2 + CAAM_PTR_SZ_MAX * 2)
+-#define DESC_RNG_LEN			(3 * CAAM_CMD_SZ)
+-
+-/* Buffer, its dma address and lock */
+-struct buf_data {
+-	u8 buf[RN_BUF_SIZE] ____cacheline_aligned;
+-	dma_addr_t addr;
+-	struct completion filled;
+-	u32 hw_desc[DESC_JOB_O_LEN];
+-#define BUF_NOT_EMPTY 0
+-#define BUF_EMPTY 1
+-#define BUF_PENDING 2  /* Empty, but with job pending --don't submit another */
+-	atomic_t empty;
+-};
+-
+-/* rng per-device context */
+-struct caam_rng_ctx {
+-	struct device *jrdev;
+-	dma_addr_t sh_desc_dma;
+-	u32 sh_desc[DESC_RNG_LEN];
+-	unsigned int cur_buf_idx;
+-	int current_buf;
+-	struct buf_data bufs[2];
+-};
+-
+-static struct caam_rng_ctx *rng_ctx;
+-
+-/*
+- * Variable used to avoid double free of resources in case
+- * algorithm registration was unsuccessful
+- */
+-static bool init_done;
+-
+-static inline void rng_unmap_buf(struct device *jrdev, struct buf_data *bd)
+-{
+-	if (bd->addr)
+-		dma_unmap_single(jrdev, bd->addr, RN_BUF_SIZE,
+-				 DMA_FROM_DEVICE);
+-}
+-
+-static inline void rng_unmap_ctx(struct caam_rng_ctx *ctx)
+-{
+-	struct device *jrdev = ctx->jrdev;
+-
+-	if (ctx->sh_desc_dma)
+-		dma_unmap_single(jrdev, ctx->sh_desc_dma,
+-				 desc_bytes(ctx->sh_desc), DMA_TO_DEVICE);
+-	rng_unmap_buf(jrdev, &ctx->bufs[0]);
+-	rng_unmap_buf(jrdev, &ctx->bufs[1]);
+-}
+-
+-static void rng_done(struct device *jrdev, u32 *desc, u32 err, void *context)
+-{
+-	struct buf_data *bd;
+-
+-	bd = container_of(desc, struct buf_data, hw_desc[0]);
+-
+-	if (err)
+-		caam_jr_strstatus(jrdev, err);
+-
+-	atomic_set(&bd->empty, BUF_NOT_EMPTY);
+-	complete(&bd->filled);
+-
+-	/* Buffer refilled, invalidate cache */
+-	dma_sync_single_for_cpu(jrdev, bd->addr, RN_BUF_SIZE, DMA_FROM_DEVICE);
+-
+-	print_hex_dump_debug("rng refreshed buf@: ", DUMP_PREFIX_ADDRESS, 16, 4,
+-			     bd->buf, RN_BUF_SIZE, 1);
+-}
+-
+-static inline int submit_job(struct caam_rng_ctx *ctx, int to_current)
+-{
+-	struct buf_data *bd = &ctx->bufs[!(to_current ^ ctx->current_buf)];
+-	struct device *jrdev = ctx->jrdev;
+-	u32 *desc = bd->hw_desc;
+-	int err;
+-
+-	dev_dbg(jrdev, "submitting job %d\n", !(to_current ^ ctx->current_buf));
+-	init_completion(&bd->filled);
+-	err = caam_jr_enqueue(jrdev, desc, rng_done, ctx);
+-	if (err)
+-		complete(&bd->filled); /* don't wait on failed job*/
+-	else
+-		atomic_inc(&bd->empty); /* note if pending */
+-
+-	return err;
+-}
+-
+-static int caam_read(struct hwrng *rng, void *data, size_t max, bool wait)
+-{
+-	struct caam_rng_ctx *ctx = rng_ctx;
+-	struct buf_data *bd = &ctx->bufs[ctx->current_buf];
+-	int next_buf_idx, copied_idx;
+-	int err;
+-
+-	if (atomic_read(&bd->empty)) {
+-		/* try to submit job if there wasn't one */
+-		if (atomic_read(&bd->empty) == BUF_EMPTY) {
+-			err = submit_job(ctx, 1);
+-			/* if can't submit job, can't even wait */
+-			if (err)
+-				return 0;
+-		}
+-		/* no immediate data, so exit if not waiting */
+-		if (!wait)
+-			return 0;
+-
+-		/* waiting for pending job */
+-		if (atomic_read(&bd->empty))
+-			wait_for_completion(&bd->filled);
+-	}
+-
+-	next_buf_idx = ctx->cur_buf_idx + max;
+-	dev_dbg(ctx->jrdev, "%s: start reading at buffer %d, idx %d\n",
+-		 __func__, ctx->current_buf, ctx->cur_buf_idx);
+-
+-	/* if enough data in current buffer */
+-	if (next_buf_idx < RN_BUF_SIZE) {
+-		memcpy(data, bd->buf + ctx->cur_buf_idx, max);
+-		ctx->cur_buf_idx = next_buf_idx;
+-		return max;
+-	}
+-
+-	/* else, copy what's left... */
+-	copied_idx = RN_BUF_SIZE - ctx->cur_buf_idx;
+-	memcpy(data, bd->buf + ctx->cur_buf_idx, copied_idx);
+-	ctx->cur_buf_idx = 0;
+-	atomic_set(&bd->empty, BUF_EMPTY);
+-
+-	/* ...refill... */
+-	submit_job(ctx, 1);
+-
+-	/* and use next buffer */
+-	ctx->current_buf = !ctx->current_buf;
+-	dev_dbg(ctx->jrdev, "switched to buffer %d\n", ctx->current_buf);
+-
+-	/* since there already is some data read, don't wait */
+-	return copied_idx + caam_read(rng, data + copied_idx,
+-				      max - copied_idx, false);
+-}
+-
+-static inline int rng_create_sh_desc(struct caam_rng_ctx *ctx)
+-{
+-	struct device *jrdev = ctx->jrdev;
+-	u32 *desc = ctx->sh_desc;
+-
+-	init_sh_desc(desc, HDR_SHARE_SERIAL);
+-
+-	/* Generate random bytes */
+-	append_operation(desc, OP_ALG_ALGSEL_RNG | OP_TYPE_CLASS1_ALG);
+-
+-	/* Store bytes */
+-	append_seq_fifo_store(desc, RN_BUF_SIZE, FIFOST_TYPE_RNGSTORE);
+-
+-	ctx->sh_desc_dma = dma_map_single(jrdev, desc, desc_bytes(desc),
+-					  DMA_TO_DEVICE);
+-	if (dma_mapping_error(jrdev, ctx->sh_desc_dma)) {
+-		dev_err(jrdev, "unable to map shared descriptor\n");
+-		return -ENOMEM;
+-	}
+-
+-	print_hex_dump_debug("rng shdesc@: ", DUMP_PREFIX_ADDRESS, 16, 4,
+-			     desc, desc_bytes(desc), 1);
+-
+-	return 0;
+-}
+-
+-static inline int rng_create_job_desc(struct caam_rng_ctx *ctx, int buf_id)
+-{
+-	struct device *jrdev = ctx->jrdev;
+-	struct buf_data *bd = &ctx->bufs[buf_id];
+-	u32 *desc = bd->hw_desc;
+-	int sh_len = desc_len(ctx->sh_desc);
+-
+-	init_job_desc_shared(desc, ctx->sh_desc_dma, sh_len, HDR_SHARE_DEFER |
+-			     HDR_REVERSE);
+-
+-	bd->addr = dma_map_single(jrdev, bd->buf, RN_BUF_SIZE, DMA_FROM_DEVICE);
+-	if (dma_mapping_error(jrdev, bd->addr)) {
+-		dev_err(jrdev, "unable to map dst\n");
+-		return -ENOMEM;
+-	}
+-
+-	append_seq_out_ptr_intlen(desc, bd->addr, RN_BUF_SIZE, 0);
+-
+-	print_hex_dump_debug("rng job desc@: ", DUMP_PREFIX_ADDRESS, 16, 4,
+-			     desc, desc_bytes(desc), 1);
+-
+-	return 0;
+-}
+-
+-static void caam_cleanup(struct hwrng *rng)
+-{
+-	int i;
+-	struct buf_data *bd;
+-
+-	for (i = 0; i < 2; i++) {
+-		bd = &rng_ctx->bufs[i];
+-		if (atomic_read(&bd->empty) == BUF_PENDING)
+-			wait_for_completion(&bd->filled);
+-	}
+-
+-	rng_unmap_ctx(rng_ctx);
+-}
+-
+-static int caam_init_buf(struct caam_rng_ctx *ctx, int buf_id)
+-{
+-	struct buf_data *bd = &ctx->bufs[buf_id];
+-	int err;
+-
+-	err = rng_create_job_desc(ctx, buf_id);
+-	if (err)
+-		return err;
+-
+-	atomic_set(&bd->empty, BUF_EMPTY);
+-	submit_job(ctx, buf_id == ctx->current_buf);
+-	wait_for_completion(&bd->filled);
+-
+-	return 0;
+-}
+-
+-static int caam_init_rng(struct caam_rng_ctx *ctx, struct device *jrdev)
+-{
+-	int err;
+-
+-	ctx->jrdev = jrdev;
+-
+-	err = rng_create_sh_desc(ctx);
+-	if (err)
+-		return err;
+-
+-	ctx->current_buf = 0;
+-	ctx->cur_buf_idx = 0;
+-
+-	err = caam_init_buf(ctx, 0);
+-	if (err)
+-		return err;
+-
+-	return caam_init_buf(ctx, 1);
+-}
+-
+-static struct hwrng caam_rng = {
+-	.name		= "rng-caam",
+-	.cleanup	= caam_cleanup,
+-	.read		= caam_read,
+-};
+-
+-void caam_rng_exit(void)
+-{
+-	if (!init_done)
+-		return;
+-
+-	caam_jr_free(rng_ctx->jrdev);
+-	hwrng_unregister(&caam_rng);
+-	kfree(rng_ctx);
+-}
+-
+-int caam_rng_init(struct device *ctrldev)
+-{
+-	struct device *dev;
+-	struct caam_drv_private *priv = dev_get_drvdata(ctrldev);
+-	int err;
+-	init_done = false;
+-
+-	if (!caam_has_rng(priv))
+-		return 0;
+-
+-	dev = caam_jr_alloc();
+-	if (IS_ERR(dev)) {
+-		pr_err("Job Ring Device allocation for transform failed\n");
+-		return PTR_ERR(dev);
+-	}
+-	rng_ctx = kmalloc(sizeof(*rng_ctx), GFP_DMA | GFP_KERNEL);
+-	if (!rng_ctx) {
+-		err = -ENOMEM;
+-		goto free_caam_alloc;
+-	}
+-	err = caam_init_rng(rng_ctx, dev);
+-	if (err)
+-		goto free_rng_ctx;
+-
+-	dev_info(dev, "registering rng-caam\n");
+-
+-	err = hwrng_register(&caam_rng);
+-	if (!err) {
+-		init_done = true;
+-		return err;
+-	}
+-
+-free_rng_ctx:
+-	kfree(rng_ctx);
+-free_caam_alloc:
+-	caam_jr_free(dev);
+-	return err;
+-}
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index c99a6a3b22de..bcfda03d19ef 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -900,6 +900,12 @@ static int caam_probe(struct platform_device *pdev)
+ 			    &ctrlpriv->ctl_tdsk_wrap);
+ #endif
+ 
++	ret = caam_trng_register(dev);
 +	if (ret) {
-+		pr_err("Job Ring Device allocation for transform failed\n");
++		dev_err(dev, "Failed to register HWRNG interface\n");
 +		return ret;
 +	}
 +
-+	return 0;
-+}
+ 	ret = devm_of_platform_populate(dev);
+ 	if (ret)
+ 		dev_err(dev, "JR platform devices creation error\n");
+diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
+index f815e1ad4608..54bb04aa86bd 100644
+--- a/drivers/crypto/caam/intern.h
++++ b/drivers/crypto/caam/intern.h
+@@ -174,20 +174,15 @@ static inline void caam_pkc_exit(void)
+ 
+ #ifdef CONFIG_CRYPTO_DEV_FSL_CAAM_RNG_API
+ 
+-int caam_rng_init(struct device *dev);
+-void caam_rng_exit(void);
++int caam_trng_register(struct device *dev);
+ 
+ #else
+ 
+-static inline int caam_rng_init(struct device *dev)
++static inline int caam_trng_register(struct device *dev)
+ {
+ 	return 0;
+ }
+ 
+-static inline void caam_rng_exit(void)
+-{
+-}
+-
+ #endif /* CONFIG_CRYPTO_DEV_FSL_CAAM_RNG_API */
+ 
+ #ifdef CONFIG_CAAM_QI
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index fc97cde27059..c745b7044fe6 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -37,7 +37,6 @@ static void register_algs(struct device *dev)
+ 	caam_algapi_init(dev);
+ 	caam_algapi_hash_init(dev);
+ 	caam_pkc_init(dev);
+-	caam_rng_init(dev);
+ 	caam_qi_algapi_init(dev);
+ 
+ algs_unlock:
+@@ -53,7 +52,6 @@ static void unregister_algs(void)
+ 
+ 	caam_qi_algapi_exit();
+ 
+-	caam_rng_exit();
+ 	caam_pkc_exit();
+ 	caam_algapi_hash_exit();
+ 	caam_algapi_exit();
+diff --git a/drivers/crypto/caam/regs.h b/drivers/crypto/caam/regs.h
+index 05127b70527d..f065c5d56e01 100644
+--- a/drivers/crypto/caam/regs.h
++++ b/drivers/crypto/caam/regs.h
+@@ -487,7 +487,10 @@ struct rngtst {
+ 
+ /* RNG4 TRNG test registers */
+ struct rng4tst {
+-#define RTMCTL_PRGM	0x00010000	/* 1 -> program mode, 0 -> run mode */
++#define RTMCTL_ACC	BIT(5)  /* TRNG access mode */
++#define RTMCTL_ENT_VAL	BIT(10)
++#define RTMCTL_PRGM	BIT(16) /* 1 -> program mode, 0 -> run mode */
 +
-+static void caam_drng_exit(struct crypto_tfm *tfm)
-+{
-+	struct caam_drng_ctx *ctx = crypto_tfm_ctx(tfm);
+ #define RTMCTL_SAMP_MODE_VON_NEUMANN_ES_SC	0 /* use von Neumann data in
+ 						     both entropy shifter and
+ 						     statistical checker */
+@@ -520,14 +523,16 @@ struct rng4tst {
+ 		u32 rtfrqmax;	/* PRGM=1: freq. count max. limit register */
+ 		u32 rtfrqcnt;	/* PRGM=0: freq. count register */
+ 	};
+-	u32 rsvd1[40];
++	u32 rsvd1[8];
++	u32 rtent[16];		/* RTENT0 - RTENT15 */
++	u32 rsvd2[16];		/* RTPKRCNTn */
+ #define RDSTA_SKVT 0x80000000
+ #define RDSTA_SKVN 0x40000000
+ #define RDSTA_IF0 0x00000001
+ #define RDSTA_IF1 0x00000002
+ #define RDSTA_IFMASK (RDSTA_IF1 | RDSTA_IF0)
+ 	u32 rdsta;
+-	u32 rsvd2[15];
++	u32 rsvd3[15];
+ };
+ 
+ /*
+diff --git a/drivers/crypto/caam/trng.c b/drivers/crypto/caam/trng.c
+new file mode 100644
+index 000000000000..881fe588a229
+--- /dev/null
++++ b/drivers/crypto/caam/trng.c
+@@ -0,0 +1,89 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * hw_random interface for TRNG generator in CAAM RNG block
++ *
++ * Copyright 2019 Zodiac Inflight Innovations
++ *
++ */
 +
-+	caam_jr_free(ctx->jrdev);
-+}
++#include <linux/hw_random.h>
 +
-+static int caam_drng_seed(struct crypto_rng *tfm,
-+			 const u8 *seed, unsigned int slen)
-+{
-+	return 0;
-+}
++#include "compat.h"
++#include "regs.h"
++#include "intern.h"
 +
-+static struct rng_alg caam_drng_alg = {
-+	.generate = caam_drng_generate,
-+	.seed = caam_drng_seed,
-+	.seedsize = 0,
-+	.base = {
-+		.cra_name = "stdrng",
-+		.cra_driver_name = "drng-caam",
-+		.cra_priority = 300,
-+		.cra_ctxsize = sizeof(struct caam_drng_ctx),
-+		.cra_module = THIS_MODULE,
-+		.cra_init = caam_drng_init,
-+		.cra_exit = caam_drng_exit,
-+	},
++struct caam_trng_ctx {
++	struct rng4tst __iomem *r4tst;
++	struct hwrng rng;
 +};
 +
-+static void caam_drng_unregister(void *data)
++static bool caam_trng_busy(struct caam_trng_ctx *ctx)
 +{
-+	crypto_unregister_rng(&caam_drng_alg);
++	return !(rd_reg32(&ctx->r4tst->rtmctl) & RTMCTL_ENT_VAL);
 +}
 +
-+int caam_drng_register(struct device *ctrldev)
++static int caam_trng_read(struct hwrng *rng, void *data, size_t max, bool wait)
++{
++	struct caam_trng_ctx *ctx = (void *)rng->priv;
++	u32 rtent[ARRAY_SIZE(ctx->r4tst->rtent)];
++	size_t residue = max;
++
++	if (!wait)
++		return 0;
++
++	clrsetbits_32(&ctx->r4tst->rtmctl, 0, RTMCTL_ACC);
++
++	do {
++		const size_t chunk = min(residue, sizeof(rtent));
++		unsigned int i;
++
++		do {
++			/*
++			 * It takes about 70 ms to finish on i.MX6 and
++			 * i.MX8MQ
++			 */
++			msleep(70);
++		} while (caam_trng_busy(ctx));
++
++		for (i = 0; i < DIV_ROUND_UP(chunk, sizeof(u32)); i++)
++			rtent[i] = rd_reg32(&ctx->r4tst->rtent[i]);
++
++		memcpy(data, rtent, chunk);
++
++		residue -= chunk;
++		data    += chunk;
++	} while (residue);
++
++	clrsetbits_32(&ctx->r4tst->rtmctl, RTMCTL_ACC, 0);
++
++	return max;
++}
++
++int caam_trng_register(struct device *ctrldev)
 +{
 +	struct caam_drv_private *priv = dev_get_drvdata(ctrldev);
 +
 +	if (caam_has_rng(priv)) {
-+		int ret;
++		struct caam_trng_ctx *ctx;
++		int err;
 +
-+		ret = crypto_register_rng(&caam_drng_alg);
-+		if (ret) {
-+			dev_err(ctrldev,
-+				"couldn't register rng crypto alg: %d\n",
-+				ret);
-+			return ret;
-+		}
++		ctx = devm_kzalloc(ctrldev, sizeof(*ctx), GFP_KERNEL);
++		if (!ctx)
++			return -ENOMEM;
 +
-+		ret = devm_add_action_or_reset(ctrldev, caam_drng_unregister,
-+					       NULL);
-+		if (ret)
-+			return ret;
++		ctx->r4tst = &priv->ctrl->r4tst[0];
 +
-+		dev_info(ctrldev,
-+			 "registering %s\n", caam_drng_alg.base.cra_name);
++		ctx->rng.name = "trng-caam";
++		ctx->rng.read = caam_trng_read;
++		ctx->rng.priv = (unsigned long)ctx;
++		ctx->rng.quality = 999;
++
++		dev_info(ctrldev, "registering %s\n", ctx->rng.name);
++
++		err = devm_hwrng_register(ctrldev, &ctx->rng);
++		if (err)
++			return err;
 +	}
 +
 +	return 0;
 +}
-diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
-index 54bb04aa86bd..0c81eefd13a9 100644
---- a/drivers/crypto/caam/intern.h
-+++ b/drivers/crypto/caam/intern.h
-@@ -185,6 +185,19 @@ static inline int caam_trng_register(struct device *dev)
- 
- #endif /* CONFIG_CRYPTO_DEV_FSL_CAAM_RNG_API */
- 
-+#ifdef CONFIG_CRYPTO_DEV_FSL_CAAM_DRNG_API
-+
-+int caam_drng_register(struct device *dev);
-+
-+#else
-+
-+static inline int caam_drng_register(struct device *dev)
-+{
-+	return 0;
-+}
-+
-+#endif /* CONFIG_CRYPTO_DEV_FSL_CAAM_DRNG_API */
-+
- #ifdef CONFIG_CAAM_QI
- 
- int caam_qi_algapi_init(struct device *dev);
-diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-index c745b7044fe6..e68ba0606e3f 100644
---- a/drivers/crypto/caam/jr.c
-+++ b/drivers/crypto/caam/jr.c
-@@ -38,6 +38,7 @@ static void register_algs(struct device *dev)
- 	caam_algapi_hash_init(dev);
- 	caam_pkc_init(dev);
- 	caam_qi_algapi_init(dev);
-+	caam_drng_register(dev);
- 
- algs_unlock:
- 	mutex_unlock(&algs_lock);
 -- 
 2.21.0
 
