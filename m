@@ -2,118 +2,155 @@ Return-Path: <SRS0=f4rb=ZZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6A7EC432C0
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Dec 2019 12:39:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD194C432C0
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Dec 2019 13:16:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7A91D2068E
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Dec 2019 12:39:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Il9yVdFZ"
+	by mail.kernel.org (Postfix) with ESMTP id ADF5D205F4
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Dec 2019 13:16:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726057AbfLCMjd (ORCPT
+        id S1726214AbfLCNQp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Dec 2019 07:39:33 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:37479 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725957AbfLCMjc (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Dec 2019 07:39:32 -0500
-Received: by mail-wm1-f67.google.com with SMTP id f129so3294672wmf.2
-        for <linux-crypto@vger.kernel.org>; Tue, 03 Dec 2019 04:39:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=MyMcdHp2K0H8Xf4kwbcIc/jJgvEd2T5X4YN8iU45gmA=;
-        b=Il9yVdFZzbZaPUj1ohbbehmm9zRyot/JUqKTlcpSKSCspMmzjGZxIfFTZgQXrozzHa
-         FD+l8AZZBZGnOE17aI88s3cZ8SGiMkoQc9jMNPg3yXUxrmYq7twGOMV5bOERLIQgm9f9
-         LuYqu0ikgz6AoXLfkv/WdGBU3p5cuyB3neCeG+aU48EOAOePXUxkCJoFhzJs9oit5R/d
-         oJiCQqmnjVtWBoEnPihnXREUvQsGkgDtEI2c2lk+kQp4e276le/jBoP+Bj5SwjaOgeCc
-         5F5DDhxmuGiYDWi4iX2RdRRANKqsP2V0U6qFBQpMx7KuKdQTOneq/ZKJS5IA/G5NPHDq
-         yugQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=MyMcdHp2K0H8Xf4kwbcIc/jJgvEd2T5X4YN8iU45gmA=;
-        b=kNtJSn4hHnd7JOCBItAYFToF9cC1rlRb36YRKZ5Xz24KviKHQkGbdra3zHJIOuXoH6
-         oe41IzG8p57Q+8hcVsmRIz2Lcs9OM+YXBpdGjVfPaNVvFmeyAW/FwKKbS1SZzFcnB6pT
-         prdLR84zlOsaxu5EXcXXDOILRy5lz57Z2fh/AkX2CArFyBfcEhsh2+M/Bzh083mv0SZ6
-         dID+g2S18OD0W4HRK9hVO80m4dob+pwDyoFsoOKF750ph+gjs1NJHZd6E7SPN8J1TxPx
-         d5u583m0t4KjeY6UjSSm4D7pIa7IdySnkzq369YSp86yvJbvBUzhVE2UvGUGn2iiXFlP
-         CJhg==
-X-Gm-Message-State: APjAAAUpJZAyauC321wXCHUWxYgEWc/u7u1j6qsnTqtjwQJb2ARQYT6L
-        UaQizmsbMWv/CISZR+Othu0Sux8T8ZQNcktb6GGr1Q==
-X-Google-Smtp-Source: APXvYqyUqfjZ4/YpIPYAOpn0Bs0d8xQOBDYqDS5qXtol4klWnmapYeMk+XHbTblTFbpC4KPmir0iIVWWWBegOOigomk=
-X-Received: by 2002:a1c:4c10:: with SMTP id z16mr32330206wmf.136.1575376770518;
- Tue, 03 Dec 2019 04:39:30 -0800 (PST)
+        Tue, 3 Dec 2019 08:16:45 -0500
+Received: from mx2.suse.de ([195.135.220.15]:40720 "EHLO mx1.suse.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726224AbfLCNQp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 3 Dec 2019 08:16:45 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx1.suse.de (Postfix) with ESMTP id 3567AB162;
+        Tue,  3 Dec 2019 13:16:43 +0000 (UTC)
+Received: by ds.suse.cz (Postfix, from userid 10065)
+        id 303B0DA7D9; Tue,  3 Dec 2019 14:16:38 +0100 (CET)
+Date:   Tue, 3 Dec 2019 14:16:38 +0100
+From:   David Sterba <dsterba@suse.cz>
+To:     kbuild test robot <lkp@intel.com>
+Cc:     David Sterba <dsterba@suse.com>, kbuild-all@lists.01.org,
+        linux-kernel@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
+Subject: Re: crypto/blake2b_generic.c:245:1: warning: the frame size of 1220
+ bytes is larger than 1024 bytes
+Message-ID: <20191203131638.GO2734@suse.cz>
+Reply-To: dsterba@suse.cz
+Mail-Followup-To: dsterba@suse.cz, kbuild test robot <lkp@intel.com>,
+        David Sterba <dsterba@suse.com>, kbuild-all@lists.01.org,
+        linux-kernel@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
+References: <201912010551.6rUbsvGE%lkp@intel.com>
 MIME-Version: 1.0
-References: <20191201215330.171990-1-ebiggers@kernel.org>
-In-Reply-To: <20191201215330.171990-1-ebiggers@kernel.org>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Tue, 3 Dec 2019 12:39:26 +0000
-Message-ID: <CAKv+Gu_5pcDeXxLnG_5_jMPc0VDBT3CFr5Hnpb-e4irPLu8JDg@mail.gmail.com>
-Subject: Re: [PATCH 0/7] crypto: more self-test improvements
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <201912010551.6rUbsvGE%lkp@intel.com>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, 1 Dec 2019 at 21:54, Eric Biggers <ebiggers@kernel.org> wrote:
->
-> This series makes some more improvements to the crypto self-tests, the
-> largest of which is making the AEAD fuzz tests test inauthentic inputs,
-> i.e. cases where decryption is expected to fail due to the (ciphertext,
-> AAD) pair not being the correct result of an encryption with the key.
->
-> It also updates the self-tests to test passing misaligned buffers to the
-> various setkey() functions, and to check that skciphers have the same
-> min_keysize as the corresponding generic implementation.
->
-> I haven't seen any test failures from this on x86_64, arm64, or arm32.
-> But as usual I haven't tested drivers for crypto accelerators.
->
-> For this series to apply this cleanly, my other series
-> "crypto: skcipher - simplifications due to {,a}blkcipher removal"
-> needs to be applied first, due to a conflict in skcipher.h.
->
-> This can also be retrieved from git at
-> https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git
-> tag "crypto-self-tests_2019-12-01".
->
-> Eric Biggers (7):
->   crypto: aead - move crypto_aead_maxauthsize() to <crypto/aead.h>
->   crypto: skcipher - add crypto_skcipher_min_keysize()
->   crypto: testmgr - don't try to decrypt uninitialized buffers
->   crypto: testmgr - check skcipher min_keysize
->   crypto: testmgr - test setting misaligned keys
->   crypto: testmgr - create struct aead_extra_tests_ctx
->   crypto: testmgr - generate inauthentic AEAD test vectors
->
+On Sun, Dec 01, 2019 at 05:54:53AM +0800, kbuild test robot wrote:
+> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
+> head:   32ef9553635ab1236c33951a8bd9b5af1c3b1646
+> commit: 91d689337fe8b7703608a2ec39aae700b99f3933 crypto: blake2b - add blake2b generic implementation
+> date:   4 weeks ago
+> config: arc-randconfig-a0031-20191201 (attached as .config)
+> compiler: arc-elf-gcc (GCC) 7.4.0
+> reproduce:
+>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         git checkout 91d689337fe8b7703608a2ec39aae700b99f3933
+>         # save the attached .config to linux build tree
+>         GCC_VERSION=7.4.0 make.cross ARCH=arc 
 
-I've dropped this into kernelci again, let's see if anything turns out
-to be broken.
+So this is for ARC.
 
-For this series,
+> If you fix the issue, kindly add following tag
+> Reported-by: kbuild test robot <lkp@intel.com>
+> 
+> All warnings (new ones prefixed by >>):
+> 
+>    crypto/blake2b_generic.c: In function 'blake2b_compress':
+> >> crypto/blake2b_generic.c:245:1: warning: the frame size of 1220 bytes is larger than 1024 bytes [-Wframe-larger-than=]
 
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
+1220 looks like a lot, the x86_64 asks for 288 bytes for
+blake2b_compress, this roughly matches the declarations and effects of
+inlining (2 x 16 x sizeof(u64) is 256).
 
->  crypto/testmgr.c               | 574 +++++++++++++++++++++++++--------
->  crypto/testmgr.h               |  14 +-
->  include/crypto/aead.h          |  10 +
->  include/crypto/internal/aead.h |  10 -
->  include/crypto/skcipher.h      |   6 +
->  5 files changed, 461 insertions(+), 153 deletions(-)
->
-> --
-> 2.24.0
->
+I'm not familiar with ARC limitations regarding eg. 64 bit types so this
+would be my first guess that this requires more temporary stack space
+than other arches that can handle u64 just fine.
+
+>     }
+>     ^
+> 
+> vim +245 crypto/blake2b_generic.c
+> 
+>    183	
+>    184	#define G(r,i,a,b,c,d)                                  \
+>    185		do {                                            \
+>    186			a = a + b + m[blake2b_sigma[r][2*i+0]]; \
+>    187			d = ror64(d ^ a, 32);                   \
+>    188			c = c + d;                              \
+>    189			b = ror64(b ^ c, 24);                   \
+>    190			a = a + b + m[blake2b_sigma[r][2*i+1]]; \
+>    191			d = ror64(d ^ a, 16);                   \
+>    192			c = c + d;                              \
+>    193			b = ror64(b ^ c, 63);                   \
+>    194		} while (0)
+>    195	
+>    196	#define ROUND(r)                                \
+>    197		do {                                    \
+>    198			G(r,0,v[ 0],v[ 4],v[ 8],v[12]); \
+>    199			G(r,1,v[ 1],v[ 5],v[ 9],v[13]); \
+>    200			G(r,2,v[ 2],v[ 6],v[10],v[14]); \
+>    201			G(r,3,v[ 3],v[ 7],v[11],v[15]); \
+>    202			G(r,4,v[ 0],v[ 5],v[10],v[15]); \
+>    203			G(r,5,v[ 1],v[ 6],v[11],v[12]); \
+>    204			G(r,6,v[ 2],v[ 7],v[ 8],v[13]); \
+>    205			G(r,7,v[ 3],v[ 4],v[ 9],v[14]); \
+>    206		} while (0)
+>    207	
+>    208	static void blake2b_compress(struct blake2b_state *S,
+>    209				     const u8 block[BLAKE2B_BLOCKBYTES])
+>    210	{
+>    211		u64 m[16];
+>    212		u64 v[16];
+>    213		size_t i;
+>    214	
+>    215		for (i = 0; i < 16; ++i)
+>    216			m[i] = get_unaligned_le64(block + i * sizeof(m[i]));
+>    217	
+>    218		for (i = 0; i < 8; ++i)
+>    219			v[i] = S->h[i];
+>    220	
+>    221		v[ 8] = blake2b_IV[0];
+>    222		v[ 9] = blake2b_IV[1];
+>    223		v[10] = blake2b_IV[2];
+>    224		v[11] = blake2b_IV[3];
+>    225		v[12] = blake2b_IV[4] ^ S->t[0];
+>    226		v[13] = blake2b_IV[5] ^ S->t[1];
+>    227		v[14] = blake2b_IV[6] ^ S->f[0];
+>    228		v[15] = blake2b_IV[7] ^ S->f[1];
+>    229	
+>    230		ROUND(0);
+>    231		ROUND(1);
+>    232		ROUND(2);
+>    233		ROUND(3);
+>    234		ROUND(4);
+>    235		ROUND(5);
+>    236		ROUND(6);
+>    237		ROUND(7);
+>    238		ROUND(8);
+>    239		ROUND(9);
+>    240		ROUND(10);
+>    241		ROUND(11);
+>    242	
+>    243		for (i = 0; i < 8; ++i)
+>    244			S->h[i] = S->h[i] ^ v[i] ^ v[i + 8];
+>  > 245	}
+
+(rest of mail kept for reference)
