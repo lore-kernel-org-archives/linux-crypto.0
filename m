@@ -2,184 +2,149 @@ Return-Path: <SRS0=f4rb=ZZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D4BEC432C0
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Dec 2019 18:29:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 875F7C432C0
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Dec 2019 19:31:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0E0342073B
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Dec 2019 18:29:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 53A4D20661
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Dec 2019 19:31:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernelci-org.20150623.gappssmtp.com header.i=@kernelci-org.20150623.gappssmtp.com header.b="zvi8re4d"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="qHouwnCQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726564AbfLCS3V (ORCPT
+        id S1727482AbfLCTbp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Dec 2019 13:29:21 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:38031 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726486AbfLCS3V (ORCPT
+        Tue, 3 Dec 2019 14:31:45 -0500
+Received: from aserp2120.oracle.com ([141.146.126.78]:35984 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727385AbfLCTbp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Dec 2019 13:29:21 -0500
-Received: by mail-wr1-f68.google.com with SMTP id y17so4978819wrh.5
-        for <linux-crypto@vger.kernel.org>; Tue, 03 Dec 2019 10:29:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernelci-org.20150623.gappssmtp.com; s=20150623;
-        h=message-id:date:mime-version:content-transfer-encoding:subject:to
-         :from:cc;
-        bh=izaN34JmJS+n1M1NHqECtRm+b+Hrz3/REW2P27r0Cl8=;
-        b=zvi8re4d8FbzaLTO3YznPaNKAX/6rORnmDge6mrSzuGlcTIeyU1K/wythjB00aUxhw
-         U+KVimceYJk0k9SjhJBkGvkqqhxgWOA8vZzsRVG9vKrqNBJdbnEoNKu0R3washCACfdp
-         LZ8FfmKzwo5/feZJxIxJyualgj9mNQb+cdrEk33NH+5jl63yFcbmmEcq2MqBnYfI0Dmq
-         buE8+n1H+mAWw210NwrOj2hjBYOWw3ywS4TlRRy3b3dL6kXg1Ivv+A6FwR+tn0y37n5q
-         NMr0uzpNl5dXtHLMYey6unlLwsLTA9dlt6pgraAed2Bsj9swoyoHBsfSFbbD1V3HXQMm
-         GM7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version
-         :content-transfer-encoding:subject:to:from:cc;
-        bh=izaN34JmJS+n1M1NHqECtRm+b+Hrz3/REW2P27r0Cl8=;
-        b=alNq3VKL6yiaUT4ehwH6QEXA6fjYwKozQ+dir0HuA0/DhnaIDiFfiEeXymoEJqAU+P
-         FhDw4sHBl9PFIwdpxXuSZyCkNKOaeomJCVFjdKtZbSSe2gwGbZDB6FyeL0upPzCXmkcI
-         EnXOY+jJcN17VSHO2Qqlr1/ZWvuhd0ihWc7zoS65+idnJCTHyf6LdBK5Eo1EVGxxh8SO
-         Vq8E8gDjAC+pPlboHhP1jMMpYPiP/IQOsd4PmEbUJ9FROmw7xEwFUKIcA/44npKfG7C7
-         f4osiHWYY4LrRLaHEQlbTIoaSnzu8M1YwUvqFw4wyfYLCUuBdM/Yzir6AwtxwgN9NlIU
-         ocTg==
-X-Gm-Message-State: APjAAAXocaHt2B/9lGhEdA/GHFTZegKQ6jvNSp4O/6nXryPP7Ba2uRpm
-        qpm1BmwS8Hm11p9ROMEFkFFo2A==
-X-Google-Smtp-Source: APXvYqzBc3aTfWdtvsffqAHGFcl8oQT1EAbnBqIfbH6wvtlUeG3D5PvilkdWueBAbSdKRoHh+JKvtA==
-X-Received: by 2002:a5d:6901:: with SMTP id t1mr6351011wru.94.1575397758768;
-        Tue, 03 Dec 2019 10:29:18 -0800 (PST)
-Received: from [148.251.42.114] ([2a01:4f8:201:9271::2])
-        by smtp.gmail.com with ESMTPSA id z7sm3711973wma.46.2019.12.03.10.29.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Dec 2019 10:29:18 -0800 (PST)
-Message-ID: <5de6a97e.1c69fb81.21c1a.34e9@mx.google.com>
-Date:   Tue, 03 Dec 2019 10:29:18 -0800 (PST)
-Content-Type: text/plain; charset="utf-8"
+        Tue, 3 Dec 2019 14:31:45 -0500
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xB3JO6e5164854;
+        Tue, 3 Dec 2019 19:31:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=corp-2019-08-05;
+ bh=TpsYB1kPeZxPfSWEVgHYYY463BWwsahPEe4Ls8xV8pE=;
+ b=qHouwnCQ/0pWc8RCWiAqRYRTy4SpX+R1r/nT8XpvUU/jYVhFBRGoJVHRNRrv3754D/2U
+ lri2625EyTZFRnGymGHeMMtqsmSlTvqcuB22yc3OIqQ5XS2UFB3SZHb96PUwUjYPNmky
+ fkDk0w2wkiCHEfPIahKyydxeTC3pS8Ax8PNXrsB44yt/NASTgvvSJojZuJnI4fkeOVhP
+ 4sUy9MlhJNkFNZgHf9qSdVi5c+5PBHljxZVGLAQEXmBxllUhU/au4Y1jf1bY4pZh084R
+ dPw1C8qeGuKmLbnwUTVF9VV46e40VzjYmdyFU2XLZMiMYG11v10YS/kIJolThDbGL1wP UA== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by aserp2120.oracle.com with ESMTP id 2wkgcq9x9h-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 03 Dec 2019 19:31:36 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xB3JEjBa116728;
+        Tue, 3 Dec 2019 19:31:36 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3020.oracle.com with ESMTP id 2wnb8102jn-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 03 Dec 2019 19:31:35 +0000
+Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xB3JVYOo025480;
+        Tue, 3 Dec 2019 19:31:34 GMT
+Received: from localhost.localdomain (/98.229.125.203)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 03 Dec 2019 11:31:34 -0800
+From:   Daniel Jordan <daniel.m.jordan@oracle.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Steffen Klassert <steffen.klassert@secunet.com>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>, linux-crypto@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Daniel Jordan <daniel.m.jordan@oracle.com>
+Subject: [PATCH v2 4/5] padata: remove reorder_objects
+Date:   Tue,  3 Dec 2019 14:31:13 -0500
+Message-Id: <20191203193114.238912-5-daniel.m.jordan@oracle.com>
+X-Mailer: git-send-email 2.24.0
+In-Reply-To: <20191203193114.238912-1-daniel.m.jordan@oracle.com>
+References: <20191203193114.238912-1-daniel.m.jordan@oracle.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Kernelci-Report-Type: bisect
-X-Kernelci-Kernel: v5.4-9340-g0fbf7aea0d8b
-X-Kernelci-Tree: ardb
-X-Kernelci-Branch: for-kernelci
-X-Kernelci-Lab-Name: lab-collabora
-Subject: ardb/for-kernelci bisection: boot on bcm2836-rpi-2-b
-To:     broonie@kernel.org, khilman@baylibre.com,
-        guillaume.tucker@collabora.com, tomeu.vizoso@collabora.com,
-        mgalka@collabora.com, enric.balletbo@collabora.com,
-        Ard Biesheuvel <ardb@kernel.org>
-From:   "kernelci.org bot" <bot@kernelci.org>
-Cc:     linux-kernel@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9460 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-1912030143
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9460 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-1912030143
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-* This automated bisection report was sent to you on the basis  *
-* that you may be involved with the breaking commit it has      *
-* found.  No manual investigation has been done to verify it,   *
-* and the root cause of the problem may be somewhere else.      *
-*                                                               *
-* If you do send a fix, please include this trailer:            *
-*   Reported-by: "kernelci.org bot" <bot@kernelci.org>          *
-*                                                               *
-* Hope this helps!                                              *
-* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+reorder_objects is unused since the rework of padata's flushing, so
+remove it.
 
-ardb/for-kernelci bisection: boot on bcm2836-rpi-2-b
+Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc: Eric Biggers <ebiggers@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+---
+ include/linux/padata.h | 2 --
+ kernel/padata.c        | 3 ---
+ 2 files changed, 5 deletions(-)
 
-Summary:
-  Start:      0fbf7aea0d8b enable extra tests by default
-  Details:    https://kernelci.org/boot/id/5de6679c1d38df5638960f64
-  Plain log:  https://storage.kernelci.org//ardb/for-kernelci/v5.4-9340-g0f=
-bf7aea0d8b/arm/bcm2835_defconfig/gcc-8/lab-collabora/boot-bcm2836-rpi-2-b.t=
-xt
-  HTML log:   https://storage.kernelci.org//ardb/for-kernelci/v5.4-9340-g0f=
-bf7aea0d8b/arm/bcm2835_defconfig/gcc-8/lab-collabora/boot-bcm2836-rpi-2-b.h=
-tml
-  Result:     0fbf7aea0d8b enable extra tests by default
+diff --git a/include/linux/padata.h b/include/linux/padata.h
+index 178d5cc6b494..faa2e36832f8 100644
+--- a/include/linux/padata.h
++++ b/include/linux/padata.h
+@@ -101,7 +101,6 @@ struct padata_cpumask {
+  * @sh: padata_shell object.
+  * @pqueue: percpu padata queues used for parallelization.
+  * @squeue: percpu padata queues used for serialuzation.
+- * @reorder_objects: Number of objects waiting in the reorder queues.
+  * @refcnt: Number of objects holding a reference on this parallel_data.
+  * @max_seq_nr:  Maximal used sequence number.
+  * @processed: Number of already processed objects.
+@@ -114,7 +113,6 @@ struct parallel_data {
+ 	struct padata_shell		*ps;
+ 	struct padata_parallel_queue	__percpu *pqueue;
+ 	struct padata_serial_queue	__percpu *squeue;
+-	atomic_t			reorder_objects;
+ 	atomic_t			refcnt;
+ 	atomic_t			seq_nr;
+ 	unsigned int			processed;
+diff --git a/kernel/padata.c b/kernel/padata.c
+index c7edc6bf2bdc..2aaf677db85c 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -202,7 +202,6 @@ static struct padata_priv *padata_find_next(struct parallel_data *pd,
+ 
+ 	if (remove_object) {
+ 		list_del_init(&padata->list);
+-		atomic_dec(&pd->reorder_objects);
+ 		++pd->processed;
+ 		pd->cpu = cpumask_next_wrap(cpu, pd->cpumask.pcpu, -1, false);
+ 	}
+@@ -336,7 +335,6 @@ void padata_do_serial(struct padata_priv *padata)
+ 		if (cur->seq_nr < padata->seq_nr)
+ 			break;
+ 	list_add(&padata->list, &cur->list);
+-	atomic_inc(&pd->reorder_objects);
+ 	spin_unlock(&pqueue->reorder.lock);
+ 
+ 	/*
+@@ -455,7 +453,6 @@ static struct parallel_data *padata_alloc_pd(struct padata_shell *ps)
+ 	padata_init_pqueues(pd);
+ 	padata_init_squeues(pd);
+ 	atomic_set(&pd->seq_nr, -1);
+-	atomic_set(&pd->reorder_objects, 0);
+ 	atomic_set(&pd->refcnt, 1);
+ 	spin_lock_init(&pd->lock);
+ 	pd->cpu = cpumask_first(pd->cpumask.pcpu);
+-- 
+2.24.0
 
-Checks:
-  revert:     PASS
-  verify:     PASS
-
-Parameters:
-  Tree:       ardb
-  URL:        git://git.kernel.org/pub/scm/linux/kernel/git/ardb/linux.git
-  Branch:     for-kernelci
-  Target:     bcm2836-rpi-2-b
-  CPU arch:   arm
-  Lab:        lab-collabora
-  Compiler:   gcc-8
-  Config:     bcm2835_defconfig
-  Test suite: boot
-
-Breaking commit found:
-
----------------------------------------------------------------------------=
-----
-commit 0fbf7aea0d8bccba3d00706f46c89716fa982f9c
-Author: Ard Biesheuvel <ardb@kernel.org>
-Date:   Tue Dec 3 12:29:31 2019 +0000
-
-    enable extra tests by default
-
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 5575d48473bd..36af840aa820 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -140,7 +140,6 @@ if CRYPTO_MANAGER2
- =
-
- config CRYPTO_MANAGER_DISABLE_TESTS
- 	bool "Disable run-time self tests"
--	default y
- 	help
- 	  Disable run-time self tests that normally take place at
- 	  algorithm registration.
-@@ -148,6 +147,7 @@ config CRYPTO_MANAGER_DISABLE_TESTS
- config CRYPTO_MANAGER_EXTRA_TESTS
- 	bool "Enable extra run-time crypto self tests"
- 	depends on DEBUG_KERNEL && !CRYPTO_MANAGER_DISABLE_TESTS
-+	default y
- 	help
- 	  Enable extra run-time self tests of registered crypto algorithms,
- 	  including randomized fuzz tests.
----------------------------------------------------------------------------=
-----
-
-
-Git bisection log:
-
----------------------------------------------------------------------------=
-----
-git bisect start
-# good: [b94ae8ad9fe79da61231999f347f79645b909bda] Merge tag 'seccomp-v5.5-=
-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/kees/linux
-git bisect good b94ae8ad9fe79da61231999f347f79645b909bda
-# bad: [0fbf7aea0d8bccba3d00706f46c89716fa982f9c] enable extra tests by def=
-ault
-git bisect bad 0fbf7aea0d8bccba3d00706f46c89716fa982f9c
-# good: [25cbf24a7eec7c3dee4113b2e98b572e128009b7] crypto: aead - move cryp=
-to_aead_maxauthsize() to <crypto/aead.h>
-git bisect good 25cbf24a7eec7c3dee4113b2e98b572e128009b7
-# good: [7b19c7a82950ed034645fa92adce29cd6163ed3e] crypto: testmgr - check =
-skcipher min_keysize
-git bisect good 7b19c7a82950ed034645fa92adce29cd6163ed3e
-# good: [062752a354aaf03b46b86cba5fdaa2fd5c932860] crypto: testmgr - create=
- struct aead_extra_tests_ctx
-git bisect good 062752a354aaf03b46b86cba5fdaa2fd5c932860
-# good: [2cd56a00fff8584e342164c65e6b55da61f79c4a] crypto: testmgr - genera=
-te inauthentic AEAD test vectors
-git bisect good 2cd56a00fff8584e342164c65e6b55da61f79c4a
-# first bad commit: [0fbf7aea0d8bccba3d00706f46c89716fa982f9c] enable extra=
- tests by default
----------------------------------------------------------------------------=
-----
