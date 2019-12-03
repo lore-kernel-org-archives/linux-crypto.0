@@ -2,51 +2,52 @@ Return-Path: <SRS0=f4rb=ZZ=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C472C432C0
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Dec 2019 05:32:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 464A5C432C0
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Dec 2019 05:32:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5656F206E0
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Dec 2019 05:32:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1090B2068E
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Dec 2019 05:32:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="IKss/fU+"
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="bnQXTTm6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726598AbfLCFcN (ORCPT
+        id S1726661AbfLCFcg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Dec 2019 00:32:13 -0500
-Received: from mail-eopbgr690089.outbound.protection.outlook.com ([40.107.69.89]:35200
-        "EHLO NAM04-CO1-obe.outbound.protection.outlook.com"
+        Tue, 3 Dec 2019 00:32:36 -0500
+Received: from mail-eopbgr800057.outbound.protection.outlook.com ([40.107.80.57]:10304
+        "EHLO NAM03-DM3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725907AbfLCFcN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Dec 2019 00:32:13 -0500
+        id S1725907AbfLCFcg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 3 Dec 2019 00:32:36 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JeQ6z8QD+pZNXk3ONfS/zPksgi6bYODld2V06G7iCr8b/Vkx4MotoAmAFgr+LsWKU9ebaYhjW5Apz77rsCTX6Zp55MuDWOi+Y9sQRTP9+gODQb8C6RJxErKTu7hjsfb9toIS5030X+xyokMHhp3mqWoLNfacStv2cYfOwbFCoHztkNa0d/o5wxF0w5hsYF4gfBRv33jRDtp4HSWjJoFhYahHGtkeCgIw6j+2BQ5VWoSggEAiYYRWy3yXm3I1ZAGZLtDZrq7E6GnGWBw6+u0JELo4J6jtQSx9Vg3Ujq6DFR36zq2KtFS9p69ohSq8jBHAvkWjW3baPTpQr0ohUgwAVg==
+ b=e0K+6aAYFdQqYBsBfl1fTKy8BsbIgI0VdxCSUSYkjggXsHONhkYPEUyZpgknkU0YzwU2zGZ1OiCG0+3peIP2JLqtgTs9l5urqm0b0o+dU1ZJC+fwfytLcdrvd1VKMKcfqI33gSbeyK8jmNXSkuiguSWH++hoccb+vb9NoL9vaahj2gFB+mC8raEayAL9ZdK/ywbuO574/Er9+33pPfuZ0qpegRBczz2ld3wFszi2/VLMK6j8L1OYNx5dDrg8y1kbyEaIfW7GdtAYP//x6+o8ACyilrPaxp00mEG1ggbiEvwaY0EPQtEXPbdS5y0WUbI7bUjnLR19fX0J/xRaTNnCww==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gTEEFD06D0EkWGzivoVVxvmD+yuMFI4cJFO52RLEY7M=;
- b=jtTg+eCPs00MBHYxmKZlhaG/ahK8iK2DGyPd8SNv10UNEMDezpKDgnaKLOCXOKV3EOd30XgkS3s6AUMGn1AmFj9uu/x/wNpZtn9uLJY//7To08MouxtakLOqPxYwnbUI7GMdCbUu1kW+AL8DXfBlOLyAiOELK4MoVOdUhMlzXgR1FO251zTCZDzaHm8iBeRJbD3rLfWZ55VBO+1cknVDkgOoCVercvwPzyz+orZeEsqYGK0hyNMeb3LU4G5gre52uNQS4MvMEGFIkc4QMlwUi/2cMDYdgPMZesZsEOSFYx4SMOJfq1Z2NyZPnYCKihHEvfRv5GItNoyWca1Sxyr5Og==
+ bh=s3bvgiX4yhYoUqxDqwuCBTGLvlVb6Pp09Y1xTZ1aFcg=;
+ b=ZKUZcveg18Eyd5w89QnqA9Nz0v3wcYNxPyXyL2R9J03FAxinW/XM4NhFBbn0S/3d0EgVcf2IGq9MUM9wpMJirr95mij5rH13z9ZKVcYpLp/c1wI3dmbnI3utqn0P5tdh+ILxXdjyNaji6flufbq4xWLTqwAuzvmDqocfKGhjfCFDD08Er2L9yvtvVol1FB27Z7e0YtcxQbKJddcs6fuUvtqlpxCwdzsZy1kb3CueOiXVw9hNL+ATYxumJadqpYl/DwkwUUVzdXsm7bb6MxE7l2aSKYc8D1V6bmVOVfHUwERDy/E6Cq39fKc5L1gtK7+jmEew0PCvLATGxxrAoXMlJQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gTEEFD06D0EkWGzivoVVxvmD+yuMFI4cJFO52RLEY7M=;
- b=IKss/fU+myvqyB9HSdQJGQ9ICEE7HwS0RbeT29jChV+ePgKd3zyeAbE9TnEfaDy6Ftibw4CSKq7jTFklmLSxCsbZlrSE2HUtzl35uGhE5pEVuW+o2PxJMJ4/0Q8hgkC1+85jyq090nUyI8mJqHR79qgqiWFC7dALEAkeRxjbShk=
+ bh=s3bvgiX4yhYoUqxDqwuCBTGLvlVb6Pp09Y1xTZ1aFcg=;
+ b=bnQXTTm6bG8eLqhUZLxTruuxyN1FWr7imhmNZ+K1t1LLzhUDoOfkSus88pS5BczEtK4JRZrNMhCQTmyLYiZBAL8WBo28nUjJvumv2PDjKuzcEwQJlQDR+fe58Hw3CWjX0y+WL5UnvjKFT+InAv1vkpg4/K2Ik9KHu1qmIgeifOw=
 Authentication-Results: spf=none (sender IP is )
  smtp.mailfrom=Rijo-john.Thomas@amd.com; 
 Received: from CY4PR12MB1925.namprd12.prod.outlook.com (10.175.62.7) by
  CY4PR12MB1430.namprd12.prod.outlook.com (10.168.167.139) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2495.22; Tue, 3 Dec 2019 05:32:10 +0000
+ 15.20.2495.22; Tue, 3 Dec 2019 05:32:21 +0000
 Received: from CY4PR12MB1925.namprd12.prod.outlook.com
  ([fe80::cd8b:1d7e:31c2:e8b4]) by CY4PR12MB1925.namprd12.prod.outlook.com
  ([fe80::cd8b:1d7e:31c2:e8b4%7]) with mapi id 15.20.2495.014; Tue, 3 Dec 2019
- 05:32:09 +0000
+ 05:32:21 +0000
 From:   Rijo Thomas <Rijo-john.Thomas@amd.com>
 To:     Tom Lendacky <thomas.lendacky@amd.com>,
         Gary Hook <gary.hook@amd.com>,
@@ -58,10 +59,12 @@ Cc:     Rijo Thomas <Rijo-john.Thomas@amd.com>,
         Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>,
         Jens Wiklander <jens.wiklander@linaro.org>,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [RFC PATCH v2 0/6] Add TEE interface support to AMD Secure Processor driver
-Date:   Tue,  3 Dec 2019 10:09:15 +0530
-Message-Id: <cover.1575282249.git.Rijo-john.Thomas@amd.com>
+Subject: [RFC PATCH v2 1/6] crypto: ccp - rename psp-dev files to sev-dev
+Date:   Tue,  3 Dec 2019 10:09:16 +0530
+Message-Id: <072bd042e28d2a0a4e76154e3da02f9a69fb423e.1575282249.git.Rijo-john.Thomas@amd.com>
 X-Mailer: git-send-email 1.9.1
+In-Reply-To: <cover.1575282249.git.Rijo-john.Thomas@amd.com>
+References: <cover.1575282249.git.Rijo-john.Thomas@amd.com>
 Content-Type: text/plain
 X-ClientProxiedBy: MA1PR0101CA0006.INDPRD01.PROD.OUTLOOK.COM
  (2603:1096:a00:21::16) To CY4PR12MB1925.namprd12.prod.outlook.com
@@ -71,82 +74,138 @@ X-Mailer: git-send-email 1.9.1
 X-Originating-IP: [165.204.156.251]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 98ff1c47-f031-4742-257f-08d777b22434
+X-MS-Office365-Filtering-Correlation-Id: 710baa9b-96dc-4f27-5102-08d777b22b09
 X-MS-TrafficTypeDiagnostic: CY4PR12MB1430:|CY4PR12MB1430:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <CY4PR12MB1430D2530248DC59B0097E97CF420@CY4PR12MB1430.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2150;
+X-Microsoft-Antispam-PRVS: <CY4PR12MB1430875A5E631CE72FC0C1D9CF420@CY4PR12MB1430.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
 X-Forefront-PRVS: 02408926C4
-X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(136003)(39860400002)(366004)(376002)(346002)(199004)(189003)(81156014)(3846002)(50226002)(52116002)(305945005)(2616005)(186003)(316002)(110136005)(6486002)(16586007)(26005)(48376002)(66556008)(66476007)(66946007)(54906003)(14444005)(5660300002)(6666004)(478600001)(14454004)(36756003)(51416003)(8676002)(8936002)(50466002)(99286004)(386003)(6436002)(25786009)(6506007)(7736002)(47776003)(6116002)(86362001)(6512007)(2906002)(66066001)(4326008)(81166006);DIR:OUT;SFP:1101;SCL:1;SRVR:CY4PR12MB1430;H:CY4PR12MB1925.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(136003)(39860400002)(366004)(376002)(346002)(199004)(189003)(81156014)(3846002)(50226002)(52116002)(305945005)(11346002)(2616005)(186003)(316002)(110136005)(6486002)(16586007)(26005)(48376002)(66556008)(66476007)(66946007)(54906003)(14444005)(5660300002)(6666004)(478600001)(14454004)(36756003)(51416003)(8676002)(8936002)(50466002)(99286004)(386003)(6436002)(446003)(25786009)(6506007)(76176011)(7736002)(118296001)(47776003)(6116002)(86362001)(6512007)(2906002)(66066001)(4326008)(81166006);DIR:OUT;SFP:1101;SCL:1;SRVR:CY4PR12MB1430;H:CY4PR12MB1925.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
 Received-SPF: None (protection.outlook.com: amd.com does not designate
  permitted sender hosts)
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: rsWiK3Whcu/mMXkR/TLDdyNdhblj8xEuy8i4Pj96CSTT2tNJO8Hma4utVLWQjxOehGsxxF+9I+zL1gPClczB5pI1drpUuuzlwrnSpIfkAns3faHKRsAjbeG9hNu1nyETCEIOlJ84Kn+QQrnYgxbPlB4qCDphLEmNxJjXiCLaXCQXZilS5sThnIrK4EOUD6Hxji0czR6SDpbnfRswnK2QCS/H85plLpn1JVtZU7/XfaIYa8oO4Gbqza82rCsO46G/YYNd/v/6yWDGJTgbAjHu9N+A5Vs8wQYoDsIWwKDYRhwb6A9/eCZM/7SDrVt+VKTLObyNSYyBGH5RLjRgywdpXt/NjOzF8jtctprWaWvGKMf8o8e6yr0KVR7M3RItuCkXGQJPMngiyj1HACP4vM/DhHYAHsfM+Lx0SF5njgK6paSTpVfRxY5GAwfINfnDqXDa
+X-Microsoft-Antispam-Message-Info: OICEdaAxzWowyUU+YEF80464hGDazvfJwMpkF7Cc9ZvQvLT2UMRXLf2yblmghsC/8oDmf9e60/Ik9RF6hqG6tD/+w5BF+Zj6lJSHJkdsF4GkpBpd0Rp8k0DqYpxUcoEQ9OWvfiy/Z3JhjmQhC/0YZOZdkJyzwA+ubRFrIPk9A1UwniUP+CMuwRSmMF9gxonSnBiMkV64yKRlQ5VRTJ/UGJElM2T9GcrHxgpHBgrnwP0JvNfXblbvsOVpDBSjUwDoe2P7aF7nj/ggcB62z+VCqsKdLUHLOyl8HatGYDaBrTysDFy42aUkeyXKm7vhAZBdYJ6f/euPknU0BO72cr7xiAxUyH15gedpxLjBJrk3o48rTeNNVRQ1d2doG8CGn+4WCKkAegU0ZGAcknzmUhuKLRUJIPQVjimqe15WZLcgg3LnfbJhWi91/PySbl9ARHep
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 98ff1c47-f031-4742-257f-08d777b22434
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Dec 2019 05:32:09.7273
+X-MS-Exchange-CrossTenant-Network-Message-Id: 710baa9b-96dc-4f27-5102-08d777b22b09
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Dec 2019 05:32:21.1427
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +zeAkGPnKd7c1SqTE3+trEovj7Dszdd4QeJOZK6enT5fB+csNBp3zkdViuBAA8g+QlxNwySq+TiqONfi3N7B5w==
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZaIsmK7F803O9ZleDQZNMIgZh7wsK1L0Uo0OtDCFLpxPAEvD/lB4KFs1wNRv8CcwxyRV7uHgJ7HDyhjaw/6dHw==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1430
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The goal of this patch series is to introduce TEE (Trusted Execution
-Environment) interface support to AMD Secure Processor driver. The
-TEE is a secure area of a processor which ensures that sensitive data
-is stored, processed and protected in an isolated and trusted
-environment. The Platform Security Processor (PSP) is a dedicated
-processor which provides TEE to enable HW platform security. It offers
-protection against software attacks generated in Rich Operating System
-(Rich OS) such as Linux running on x86.
+This is a preliminary patch for creating a generic PSP device driver
+file, which will have support for both SEV and TEE (Trusted Execution
+Environment) interface.
 
-Based on the platform feature support, the PSP is capable of supporting
-either SEV (Secure Encrypted Virtualization) and/or TEE. The first three
-patches in this series is about moving SEV specific functions and data
-structures from PSP device driver file to a dedicated SEV interface
-driver file. The last two patches add TEE interface support to AMD
-Secure Processor driver. This TEE interface will be used by AMD-TEE
-driver to submit command buffers for processing in PSP Trusted Execution
-Environment.
+This patch does not introduce any new functionality, but simply renames
+psp-dev.c and psp-dev.h files to sev-dev.c and sev-dev.h files
+respectively.
 
-v2:
-* Rebased the patches on cryptodev-2.6 tree with base commit
-  d158367682cd (crypto: atmel - Fix selection of CRYPTO_AUTHENC)
-* Regenerated patch with correct diff-stat to show file rename
-* Used Co-developed-by: tag to give proper credit to co-author
+Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Jens Wiklander <jens.wiklander@linaro.org>
+Co-developed-by: Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>
+Signed-off-by: Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>
+Signed-off-by: Rijo Thomas <Rijo-john.Thomas@amd.com>
+---
+ drivers/crypto/ccp/Makefile                 | 2 +-
+ drivers/crypto/ccp/{psp-dev.c => sev-dev.c} | 6 +++---
+ drivers/crypto/ccp/{psp-dev.h => sev-dev.h} | 8 ++++----
+ drivers/crypto/ccp/sp-pci.c                 | 2 +-
+ 4 files changed, 9 insertions(+), 9 deletions(-)
+ rename drivers/crypto/ccp/{psp-dev.c => sev-dev.c} (99%)
+ rename drivers/crypto/ccp/{psp-dev.h => sev-dev.h} (90%)
 
-Rijo Thomas (6):
-  crypto: ccp - rename psp-dev files to sev-dev
-  crypto: ccp - create a generic psp-dev file
-  crypto: ccp - move SEV vdata to a dedicated data structure
-  crypto: ccp - check whether PSP supports SEV or TEE before
-    initialization
-  crypto: ccp - add TEE support for Raven Ridge
-  crypto: ccp - provide in-kernel API to submit TEE commands
-
- drivers/crypto/ccp/Makefile  |    4 +-
- drivers/crypto/ccp/psp-dev.c | 1020 ++++------------------------------------
- drivers/crypto/ccp/psp-dev.h |   50 +-
- drivers/crypto/ccp/sev-dev.c | 1053 ++++++++++++++++++++++++++++++++++++++++++
- drivers/crypto/ccp/sev-dev.h |   62 +++
- drivers/crypto/ccp/sp-dev.h  |   17 +-
- drivers/crypto/ccp/sp-pci.c  |   43 +-
- drivers/crypto/ccp/tee-dev.c |  364 +++++++++++++++
- drivers/crypto/ccp/tee-dev.h |  110 +++++
- include/linux/psp-tee.h      |   73 +++
- 10 files changed, 1827 insertions(+), 969 deletions(-)
- create mode 100644 drivers/crypto/ccp/sev-dev.c
- create mode 100644 drivers/crypto/ccp/sev-dev.h
- create mode 100644 drivers/crypto/ccp/tee-dev.c
- create mode 100644 drivers/crypto/ccp/tee-dev.h
- create mode 100644 include/linux/psp-tee.h
-
---
+diff --git a/drivers/crypto/ccp/Makefile b/drivers/crypto/ccp/Makefile
+index 6b86f1e..9dafcf2 100644
+--- a/drivers/crypto/ccp/Makefile
++++ b/drivers/crypto/ccp/Makefile
+@@ -8,7 +8,7 @@ ccp-$(CONFIG_CRYPTO_DEV_SP_CCP) += ccp-dev.o \
+ 	    ccp-dmaengine.o
+ ccp-$(CONFIG_CRYPTO_DEV_CCP_DEBUGFS) += ccp-debugfs.o
+ ccp-$(CONFIG_PCI) += sp-pci.o
+-ccp-$(CONFIG_CRYPTO_DEV_SP_PSP) += psp-dev.o
++ccp-$(CONFIG_CRYPTO_DEV_SP_PSP) += sev-dev.o
+ 
+ obj-$(CONFIG_CRYPTO_DEV_CCP_CRYPTO) += ccp-crypto.o
+ ccp-crypto-objs := ccp-crypto-main.o \
+diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/sev-dev.c
+similarity index 99%
+rename from drivers/crypto/ccp/psp-dev.c
+rename to drivers/crypto/ccp/sev-dev.c
+index c4da8d1..ba9f555 100644
+--- a/drivers/crypto/ccp/psp-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -1,8 +1,8 @@
+ // SPDX-License-Identifier: GPL-2.0-only
+ /*
+- * AMD Platform Security Processor (PSP) interface
++ * AMD Secure Encrypted Virtualization (SEV) interface
+  *
+- * Copyright (C) 2016,2018 Advanced Micro Devices, Inc.
++ * Copyright (C) 2016,2019 Advanced Micro Devices, Inc.
+  *
+  * Author: Brijesh Singh <brijesh.singh@amd.com>
+  */
+@@ -22,7 +22,7 @@
+ #include <linux/firmware.h>
+ 
+ #include "sp-dev.h"
+-#include "psp-dev.h"
++#include "sev-dev.h"
+ 
+ #define DEVICE_NAME		"sev"
+ #define SEV_FW_FILE		"amd/sev.fw"
+diff --git a/drivers/crypto/ccp/psp-dev.h b/drivers/crypto/ccp/sev-dev.h
+similarity index 90%
+rename from drivers/crypto/ccp/psp-dev.h
+rename to drivers/crypto/ccp/sev-dev.h
+index 82a084f..c178d9f 100644
+--- a/drivers/crypto/ccp/psp-dev.h
++++ b/drivers/crypto/ccp/sev-dev.h
+@@ -2,13 +2,13 @@
+ /*
+  * AMD Platform Security Processor (PSP) interface driver
+  *
+- * Copyright (C) 2017-2018 Advanced Micro Devices, Inc.
++ * Copyright (C) 2017-2019 Advanced Micro Devices, Inc.
+  *
+  * Author: Brijesh Singh <brijesh.singh@amd.com>
+  */
+ 
+-#ifndef __PSP_DEV_H__
+-#define __PSP_DEV_H__
++#ifndef __SEV_DEV_H__
++#define __SEV_DEV_H__
+ 
+ #include <linux/device.h>
+ #include <linux/spinlock.h>
+@@ -63,4 +63,4 @@ struct psp_device {
+ 	u8 build;
+ };
+ 
+-#endif /* __PSP_DEV_H */
++#endif /* __SEV_DEV_H */
+diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
+index b29d2e6..473cf14 100644
+--- a/drivers/crypto/ccp/sp-pci.c
++++ b/drivers/crypto/ccp/sp-pci.c
+@@ -22,7 +22,7 @@
+ #include <linux/ccp.h>
+ 
+ #include "ccp-dev.h"
+-#include "psp-dev.h"
++#include "sev-dev.h"
+ 
+ #define MSIX_VECTORS			2
+ 
+-- 
 1.9.1
 
