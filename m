@@ -2,114 +2,127 @@ Return-Path: <SRS0=RobT=Z2=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00B44C2BD09
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Dec 2019 11:38:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C788C43603
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Dec 2019 14:43:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D4BD72081B
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Dec 2019 11:38:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E45AF2073C
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Dec 2019 14:43:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xfGLXTgY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727703AbfLDLiu (ORCPT
+        id S1727880AbfLDOnE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 Dec 2019 06:38:50 -0500
-Received: from skedge03.snt-world.com ([91.208.41.68]:34632 "EHLO
-        skedge03.snt-world.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727268AbfLDLiu (ORCPT
+        Wed, 4 Dec 2019 09:43:04 -0500
+Received: from mail-wm1-f65.google.com ([209.85.128.65]:56249 "EHLO
+        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727850AbfLDOnE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 Dec 2019 06:38:50 -0500
-Received: from sntmail14r.snt-is.com (unknown [10.203.32.184])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by skedge03.snt-world.com (Postfix) with ESMTPS id A91FB67B181;
-        Wed,  4 Dec 2019 12:38:46 +0100 (CET)
-Received: from sntmail12r.snt-is.com (10.203.32.182) by sntmail14r.snt-is.com
- (10.203.32.184) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Wed, 4 Dec 2019
- 12:38:46 +0100
-Received: from sntmail12r.snt-is.com ([fe80::e551:8750:7bba:3305]) by
- sntmail12r.snt-is.com ([fe80::e551:8750:7bba:3305%3]) with mapi id
- 15.01.1713.004; Wed, 4 Dec 2019 12:38:46 +0100
-From:   Schrempf Frieder <frieder.schrempf@kontron.de>
-To:     Adam Ford <aford173@gmail.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     Mark Rutland <mark.rutland@arm.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Fabio Estevam <festevam@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        =?utf-8?B?SG9yaWEgR2VhbnTEgw==?= <horia.geanta@nxp.com>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        NXP Linux Team <linux-imx@nxp.com>,
-        "Pengutronix Kernel Team" <kernel@pengutronix.de>,
-        Shawn Guo <shawnguo@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH 1/2] crypto: caam: Change the i.MX8MQ check support all
- i.MX8M variants
-Thread-Topic: [PATCH 1/2] crypto: caam: Change the i.MX8MQ check support all
- i.MX8M variants
-Thread-Index: AQHVp9kQe4CI+Rf8yUmun0IOEuspVqepzk4A
-Date:   Wed, 4 Dec 2019 11:38:46 +0000
-Message-ID: <e8e429dd-4508-9835-fd01-825d2de8871e@kontron.de>
-References: <20191130225153.30111-1-aford173@gmail.com>
-In-Reply-To: <20191130225153.30111-1-aford173@gmail.com>
-Accept-Language: de-DE, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.25.9.193]
-x-c2processedorg: 51b406b7-48a2-4d03-b652-521f56ac89f3
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E8132CB5151D4E48A2A1202728C1E995@snt-world.com>
-Content-Transfer-Encoding: base64
+        Wed, 4 Dec 2019 09:43:04 -0500
+Received: by mail-wm1-f65.google.com with SMTP id q9so6186528wmj.5
+        for <linux-crypto@vger.kernel.org>; Wed, 04 Dec 2019 06:43:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=71DDqTK7SGG12Z0MAUYKioVk43X0P548ZzvubPDcpes=;
+        b=xfGLXTgYxFM84Pj6WXIKpkTBhgV8oH+4gBdq1RyvnYhawSBF8J2cwk5zOUkm2AkwBB
+         UXLF/UO/MgqC6imITb42Yz650P37738iiPggY/7Tp9sGnRo0mx1LhxkuZcWsaiQtr3Yi
+         FkP6cGyRHUH8nI8pLz4H6U0yOjZr1l/4yAUdSdFuoQ7OpX3R+glAHgOtA2W1zIjlhoCT
+         WztW2OPjojfkR3LiY03h5r9yKgoOER6NRh/swNhwjJKKOb6pY1/tF/QM0rG1OBONBiCC
+         b0xlMYBLBHrOvUh/6gDA5zhdfxwQ86cniJAOZtvVIEgww/uAIJVkOWV3wouQNDgaTQDW
+         DH0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=71DDqTK7SGG12Z0MAUYKioVk43X0P548ZzvubPDcpes=;
+        b=TgfZt9jSJ8c6w6mh6B6aCCpu5r40IuJfvMWHFy3ohjPM/Vzeql8rMqLpAMcjokpYKb
+         vdZ7x1/66WVCqGLY4Dz26BVWtQEsKeL2BS8zfvQVZDm+7g6KOYItDYPRL3UeUtwbBiXJ
+         g3Rlczqh+rMnL/0gT+F0arPLrpI0Uxyk0hJrRe97PMIQJbpL6icZvwBXv4upDufSaDxY
+         lgTvI3E022ndb0vHw6m+ZR02ndDygEPbUo6BiN9mdybJiQ0m1HDugT4+EjVclEeDHCR3
+         PgOKbrbf+0ibzI7kq7OFNYyXtTjdJOJgP4rBwKT7zoFJ34CTfNZ79TSTgwJjYiyfO5xf
+         NGeQ==
+X-Gm-Message-State: APjAAAWFt7yuzZJNsLEJdrAy7vtRDGnWCLqQsMN/cZMAyWlB4LdDerMS
+        0fLIyLBb7MzVYlDzPnR8YwKpWq6e33/3ljGd6sCGOmoWVHE9s/wu
+X-Google-Smtp-Source: APXvYqzBzPANQwZqpR4nb5lE+2+ez0DhI/ckjjRRwPhzDCwyB7+Q2eUdDSUNtFtrfiTPS2+MHgWhzJemLpmKh64hA2I=
+X-Received: by 2002:a7b:c778:: with SMTP id x24mr25114169wmk.119.1575470581747;
+ Wed, 04 Dec 2019 06:43:01 -0800 (PST)
 MIME-Version: 1.0
-X-SnT-MailScanner-Information: Please contact the ISP for more information
-X-SnT-MailScanner-ID: A91FB67B181.A1F6F
-X-SnT-MailScanner: Not scanned: please contact your Internet E-Mail Service Provider for details
-X-SnT-MailScanner-SpamCheck: 
-X-SnT-MailScanner-From: frieder.schrempf@kontron.de
-X-SnT-MailScanner-To: aford173@gmail.com, aymen.sghaier@nxp.com,
-        davem@davemloft.net, devicetree@vger.kernel.org, festevam@gmail.com,
-        herbert@gondor.apana.org.au, horia.geanta@nxp.com,
-        kernel@pengutronix.de, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-imx@nxp.com,
-        linux-kernel@vger.kernel.org, mark.rutland@arm.com,
-        robh+dt@kernel.org, s.hauer@pengutronix.de, shawnguo@kernel.org
+References: <20191201215330.171990-1-ebiggers@kernel.org> <CAKv+Gu_5pcDeXxLnG_5_jMPc0VDBT3CFr5Hnpb-e4irPLu8JDg@mail.gmail.com>
+In-Reply-To: <CAKv+Gu_5pcDeXxLnG_5_jMPc0VDBT3CFr5Hnpb-e4irPLu8JDg@mail.gmail.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Wed, 4 Dec 2019 14:42:58 +0000
+Message-ID: <CAKv+Gu9fQV4-KFz=wnBkNEHa3F8cWMuX9CG=a67qhVgFkZ=cPw@mail.gmail.com>
+Subject: Re: [PATCH 0/7] crypto: more self-test improvements
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-SGkgQWRhbSwNCg0KT24gMzAuMTEuMTkgMjM6NTEsIEFkYW0gRm9yZCB3cm90ZToNCj4gVGhlIGku
-TVg4TSBNaW5pIHVzZXMgdGhlIHNhbWUgY3J5cHRvIGVuZ2luZSBhcyB0aGUgaS5NWDhNUSwgYnV0
-DQo+IHRoZSBkcml2ZXIgaXMgcmVzdHJpY3RpbmcgdGhlIGNoZWNrIHRvIGp1c3QgdGhlIGkuTVg4
-TVEuDQo+IA0KPiBUaGlzIHBhdGNoIGxldHMgdGhlIGRyaXZlciBzdXBwb3J0IGFsbCBpLk1YOE0g
-VmFyaWFudHMgaWYgZW5hYmxlZC4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IEFkYW0gRm9yZCA8YWZv
-cmQxNzNAZ21haWwuY29tPg0KDQpXaGF0IGFib3V0IHRoZSBmb2xsb3dpbmcgbGluZXMgaW4gcnVu
-X2Rlc2NyaXB0b3JfZGVjbzAoKT8gRG9lcyB0aGlzIA0KY29uZGl0aW9uIGFsc28gYXBwbHkgdG8g
-aS5NWDhNTT8NCg0KZHJpdmVycy9jcnlwdG8vY2FhbS9jdHJsLmM6DQoNCglpZiAoY3RybHByaXYt
-PnZpcnRfZW4gPT0gMSB8fA0KCSAgICAvKg0KCSAgICAgKiBBcHBhcmVudGx5IG9uIGkuTVg4TVEg
-aXQgZG9lc24ndCBtYXR0ZXIgaWYgdmlydF9lbiA9PSAxDQoJICAgICAqIGFuZCB0aGUgZm9sbG93
-aW5nIHN0ZXBzIHNob3VsZCBiZSBwZXJmb3JtZWQgcmVnYXJkbGVzcw0KCSAgICAgKi8NCgkgICAg
-b2ZfbWFjaGluZV9pc19jb21wYXRpYmxlKCJmc2wsaW14OG1xIikpIHsNCgkJY2xyc2V0Yml0c18z
-MigmY3RybC0+ZGVjb19yc3IsIDAsIERFQ09SU1JfSlIwKTsNCg0KCQl3aGlsZSAoIShyZF9yZWcz
-MigmY3RybC0+ZGVjb19yc3IpICYgREVDT1JTUl9WQUxJRCkgJiYNCgkJICAgICAgIC0tdGltZW91
-dCkNCgkJCWNwdV9yZWxheCgpOw0KDQoJCXRpbWVvdXQgPSAxMDAwMDA7DQoJfQ0KDQpSZWdhcmRz
-LA0KRnJpZWRlcg0KDQo+IA0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9jcnlwdG8vY2FhbS9jdHJs
-LmMgYi9kcml2ZXJzL2NyeXB0by9jYWFtL2N0cmwuYw0KPiBpbmRleCBkYjIyNzc3ZDU5YjQuLjFj
-ZTAzZjg5NjFiNiAxMDA2NDQNCj4gLS0tIGEvZHJpdmVycy9jcnlwdG8vY2FhbS9jdHJsLmMNCj4g
-KysrIGIvZHJpdmVycy9jcnlwdG8vY2FhbS9jdHJsLmMNCj4gQEAgLTUyNyw3ICs1MjcsNyBAQCBz
-dGF0aWMgY29uc3Qgc3RydWN0IHNvY19kZXZpY2VfYXR0cmlidXRlIGNhYW1faW14X3NvY190YWJs
-ZVtdID0gew0KPiAgIAl7IC5zb2NfaWQgPSAiaS5NWDZVTCIsIC5kYXRhID0gJmNhYW1faW14NnVs
-X2RhdGEgfSwNCj4gICAJeyAuc29jX2lkID0gImkuTVg2KiIsICAuZGF0YSA9ICZjYWFtX2lteDZf
-ZGF0YSB9LA0KPiAgIAl7IC5zb2NfaWQgPSAiaS5NWDcqIiwgIC5kYXRhID0gJmNhYW1faW14N19k
-YXRhIH0sDQo+IC0JeyAuc29jX2lkID0gImkuTVg4TVEiLCAuZGF0YSA9ICZjYWFtX2lteDdfZGF0
-YSB9LA0KPiArCXsgLnNvY19pZCA9ICJpLk1YOE0qIiwgLmRhdGEgPSAmY2FhbV9pbXg3X2RhdGEg
-fSwNCj4gICAJeyAuZmFtaWx5ID0gIkZyZWVzY2FsZSBpLk1YIiB9LA0KPiAgIAl7IC8qIHNlbnRp
-bmVsICovIH0NCj4gICB9Ow0KPiA=
+On Tue, 3 Dec 2019 at 12:39, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+>
+> On Sun, 1 Dec 2019 at 21:54, Eric Biggers <ebiggers@kernel.org> wrote:
+> >
+> > This series makes some more improvements to the crypto self-tests, the
+> > largest of which is making the AEAD fuzz tests test inauthentic inputs,
+> > i.e. cases where decryption is expected to fail due to the (ciphertext,
+> > AAD) pair not being the correct result of an encryption with the key.
+> >
+> > It also updates the self-tests to test passing misaligned buffers to the
+> > various setkey() functions, and to check that skciphers have the same
+> > min_keysize as the corresponding generic implementation.
+> >
+> > I haven't seen any test failures from this on x86_64, arm64, or arm32.
+> > But as usual I haven't tested drivers for crypto accelerators.
+> >
+> > For this series to apply this cleanly, my other series
+> > "crypto: skcipher - simplifications due to {,a}blkcipher removal"
+> > needs to be applied first, due to a conflict in skcipher.h.
+> >
+> > This can also be retrieved from git at
+> > https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git
+> > tag "crypto-self-tests_2019-12-01".
+> >
+> > Eric Biggers (7):
+> >   crypto: aead - move crypto_aead_maxauthsize() to <crypto/aead.h>
+> >   crypto: skcipher - add crypto_skcipher_min_keysize()
+> >   crypto: testmgr - don't try to decrypt uninitialized buffers
+> >   crypto: testmgr - check skcipher min_keysize
+> >   crypto: testmgr - test setting misaligned keys
+> >   crypto: testmgr - create struct aead_extra_tests_ctx
+> >   crypto: testmgr - generate inauthentic AEAD test vectors
+> >
+>
+> I've dropped this into kernelci again, let's see if anything turns out
+> to be broken.
+>
+> For this series,
+>
+> Acked-by: Ard Biesheuvel <ardb@kernel.org>
+>
+
+Results here:
+https://kernelci.org/boot/all/job/ardb/branch/for-kernelci/kernel/v5.4-9340-g16839329da69/
+
+Only the usual suspects failed (rk3288)
+
+
+> >  crypto/testmgr.c               | 574 +++++++++++++++++++++++++--------
+> >  crypto/testmgr.h               |  14 +-
+> >  include/crypto/aead.h          |  10 +
+> >  include/crypto/internal/aead.h |  10 -
+> >  include/crypto/skcipher.h      |   6 +
+> >  5 files changed, 461 insertions(+), 153 deletions(-)
+> >
+> > --
+> > 2.24.0
+> >
