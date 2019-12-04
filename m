@@ -4,60 +4,60 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91DA7C43603
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Dec 2019 15:28:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8B41C2BC73
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Dec 2019 15:31:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5A974207DD
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Dec 2019 15:28:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A4179207DD
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Dec 2019 15:31:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernelci-org.20150623.gappssmtp.com header.i=@kernelci-org.20150623.gappssmtp.com header.b="cPNuQoPs"
+	dkim=pass (2048-bit key) header.d=kernelci-org.20150623.gappssmtp.com header.i=@kernelci-org.20150623.gappssmtp.com header.b="E3DsFqNY"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728293AbfLDP2G (ORCPT
+        id S1728484AbfLDPbh (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 Dec 2019 10:28:06 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:34817 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728274AbfLDP2G (ORCPT
+        Wed, 4 Dec 2019 10:31:37 -0500
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:54153 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728331AbfLDPbh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 Dec 2019 10:28:06 -0500
-Received: by mail-wr1-f67.google.com with SMTP id g17so9145095wro.2
-        for <linux-crypto@vger.kernel.org>; Wed, 04 Dec 2019 07:28:05 -0800 (PST)
+        Wed, 4 Dec 2019 10:31:37 -0500
+Received: by mail-wm1-f67.google.com with SMTP id u18so145331wmc.3
+        for <linux-crypto@vger.kernel.org>; Wed, 04 Dec 2019 07:31:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernelci-org.20150623.gappssmtp.com; s=20150623;
         h=message-id:date:mime-version:content-transfer-encoding:subject:to
          :from:cc;
-        bh=n0PMYgXBxpTJTwUFndMR8j8g1X+3mghMk/wqd/jqgb4=;
-        b=cPNuQoPsK/IaM6bjnT9f9fznnLZV6W3amrqNwE5KT0g0fAzb0IB/r7CZzMMmqG5ooF
-         bH1J5zqnHViwUlMvEZUMnhKSdwt5CVERjPLQwXJJ59xzXl4TkPThLLFguRiCuTZqZLgh
-         p8o9z51+Io63YGZ1D9Y3mBoy3VbQcM+CbjGLvPNMOhaoW6Hz6VFWLzT4xI3Xe6Ft6jSG
-         SWNl6f5cKTA5UVJI9eL/iWIM3Xqav0Ge9KFr1dzDqT+TaR4jNStC23Z+6MfNvMlDZFg5
-         vHOUT9n0pWZu63JbNZUgt5Wr8SRaNB8EYuYCYVvGYsz6+agsYFdQQOU/RNfLOp2vMOnS
-         7XbQ==
+        bh=ijoLCBnJ3pPexA/GR1FIE4d3lIT82dN/vPnRiftiEjE=;
+        b=E3DsFqNYYoNk3wJ8krQcMebT9+rMBTieirdWX7fi/YE5D0FA1P8YnZ4k8ZZNAJObnb
+         fwLjJ+H6rCS2tv9FYx6CjYeL8ThmCGHLTgz1oQ2HYmorHjwTAm/xeNKu04RpHTjQgQSG
+         AGMUyh6S3BMEQ2BLImO5bJKMED3wiqljPM4VykXcD+mEnl571jShECGkL0tKNNGvDoji
+         nfb8k2Z2q5tf+39Edjv03J1+IuyiwI+cL3VIBnhH/7Rb68MAKPpO7r9CJBczn9CI13DP
+         V6MxlO0bM2m5y3GEm0o639CBJoTN6oHCbL6mrpT1tHVhxqbw3lA4dmRFoeoT9dGPwlCV
+         RyAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:date:mime-version
          :content-transfer-encoding:subject:to:from:cc;
-        bh=n0PMYgXBxpTJTwUFndMR8j8g1X+3mghMk/wqd/jqgb4=;
-        b=kB+Ip5ZP9DpvmXsHXvEkhcgRUqH+DP2UoLfHToYQ0affnBleshiHD9Irax7dBWYO4z
-         Gye3/dHw+h1yVK4WvL1o8FT7ilRsJDMAsyT1ZCu8RclrmTx+3Uj0Ir0xuSHX0Qz00/d+
-         BE5npmhDEY0ZinNO4aAPxr8r4jimkqL8WAxiLIBUnc5sLEoRfVpC2h1I5LpCpPOOt5gI
-         Ul2vwwnuJ8m0YELBkJjd5cqino+OxzvI3SJWpSZ1NcLdl0Ar9sVN7FfwzRHepCmQ0rPF
-         JA7+ZzweO8jao8wkmfUZUFaM7z64LzIR/rfg+rsraj151sklpmPP0+pT5thLn0xKQFTK
-         ViMQ==
-X-Gm-Message-State: APjAAAUbX09xMm1X5pVdNFA2ygE9R83Ts+rLqKEHmgbrn7A/IAGeNWfo
-        5Rsq2amiM2/Y/xAXhjnO+VDf+Q==
-X-Google-Smtp-Source: APXvYqzg1TyHqcrLbHlAbi08TX3/2GpmskSRV7ZVEsEDmRuvJ1eZlWpKFOWi870svMg0kU8UUNR6OA==
-X-Received: by 2002:adf:eb46:: with SMTP id u6mr4788809wrn.239.1575473284403;
-        Wed, 04 Dec 2019 07:28:04 -0800 (PST)
+        bh=ijoLCBnJ3pPexA/GR1FIE4d3lIT82dN/vPnRiftiEjE=;
+        b=fuzJT58uCKnQPvr7YXxU26o9JmFjPvJiBb5HBrsS2NjU0z7b05QXHnAmvKoiUxTANc
+         pWEIw265x+kwtW3DqUfTUeXrAkGxmh5YVr1VUKDAK9Mo1QhcaSxHpr7vKuY4/1Z98QMD
+         C+aBO0I5zUfsRLrhv9viCe2dSWY/OUIy+p/39SL54rJkjYgttRZz3+5ZG+qUcIm5j7XN
+         1QB2Y7dVVr2Aew80ISIyjNW7XgKA+gmlUArKB+RuUEBUabfLuiDh6SwJD4v9jwMja7Dz
+         pscFgLfdInjfNRLcN8k1ncpHbL4Kq7SFoV2Bng1b+RriTA8+98RDDa6E/kdD75p94MEU
+         sAhg==
+X-Gm-Message-State: APjAAAVa/mz3k9QXAL7PriYEEcB9Pvlgv+eI1+8/NT9JSQ6CIW0kpoDN
+        091PgAyFFU+3l+o30w/+7jK1DQ==
+X-Google-Smtp-Source: APXvYqxbr+RDuWTYR72YaOoOSelg81h69keK+nXeReh9jM343ocfrIvOsVlWJnN/+vq+YcyK7XaPRw==
+X-Received: by 2002:a1c:a906:: with SMTP id s6mr133439wme.125.1575473494478;
+        Wed, 04 Dec 2019 07:31:34 -0800 (PST)
 Received: from [148.251.42.114] ([2a01:4f8:201:9271::2])
-        by smtp.gmail.com with ESMTPSA id b2sm8607869wrr.76.2019.12.04.07.28.03
+        by smtp.gmail.com with ESMTPSA id u10sm6971432wmd.1.2019.12.04.07.31.33
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 04 Dec 2019 07:28:03 -0800 (PST)
-Message-ID: <5de7d083.1c69fb81.82fe2.b0da@mx.google.com>
-Date:   Wed, 04 Dec 2019 07:28:03 -0800 (PST)
+        Wed, 04 Dec 2019 07:31:33 -0800 (PST)
+Message-ID: <5de7d155.1c69fb81.c06f8.3583@mx.google.com>
+Date:   Wed, 04 Dec 2019 07:31:33 -0800 (PST)
 Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
@@ -67,18 +67,18 @@ X-Kernelci-Tree: ardb
 X-Kernelci-Branch: for-kernelci
 X-Kernelci-Lab-Name: lab-collabora
 Subject: ardb/for-kernelci bisection: boot on rk3288-rock2-square
-To:     tomeu.vizoso@collabora.com, guillaume.tucker@collabora.com,
-        enric.balletbo@collabora.com, khilman@baylibre.com,
-        mgalka@collabora.com, Ard Biesheuvel <ardb@kernel.org>,
-        broonie@kernel.org
+To:     Ard Biesheuvel <ardb@kernel.org>, mgalka@collabora.com,
+        guillaume.tucker@collabora.com, broonie@kernel.org,
+        enric.balletbo@collabora.com, tomeu.vizoso@collabora.com,
+        khilman@baylibre.com
 From:   "kernelci.org bot" <bot@kernelci.org>
-Cc:     Alexandre Torgue <alexandre.torgue@st.com>,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        "David S. Miller" <davem@davemloft.net>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
@@ -100,13 +100,13 @@ ardb/for-kernelci bisection: boot on rk3288-rock2-square
 
 Summary:
   Start:      16839329da69 enable extra tests by default
-  Details:    https://kernelci.org/boot/id/5de791acd6451dc5be960f08
+  Details:    https://kernelci.org/boot/id/5de79104990bc03e5a960f0b
   Plain log:  https://storage.kernelci.org//ardb/for-kernelci/v5.4-9340-g16=
-839329da69/arm/multi_v7_defconfig+CONFIG_SMP=3Dn/gcc-8/lab-collabora/boot-r=
-k3288-rock2-square.txt
+839329da69/arm/multi_v7_defconfig+CONFIG_EFI=3Dy+CONFIG_ARM_LPAE=3Dy/gcc-8/=
+lab-collabora/boot-rk3288-rock2-square.txt
   HTML log:   https://storage.kernelci.org//ardb/for-kernelci/v5.4-9340-g16=
-839329da69/arm/multi_v7_defconfig+CONFIG_SMP=3Dn/gcc-8/lab-collabora/boot-r=
-k3288-rock2-square.html
+839329da69/arm/multi_v7_defconfig+CONFIG_EFI=3Dy+CONFIG_ARM_LPAE=3Dy/gcc-8/=
+lab-collabora/boot-rk3288-rock2-square.html
   Result:     16839329da69 enable extra tests by default
 
 Checks:
@@ -121,7 +121,7 @@ Parameters:
   CPU arch:   arm
   Lab:        lab-collabora
   Compiler:   gcc-8
-  Config:     multi_v7_defconfig+CONFIG_SMP=3Dn
+  Config:     multi_v7_defconfig+CONFIG_EFI=3Dy+CONFIG_ARM_LPAE=3Dy
   Test suite: boot
 
 Breaking commit found:
