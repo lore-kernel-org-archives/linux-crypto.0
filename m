@@ -4,50 +4,50 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19038C43603
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Dec 2019 07:12:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97B0FC43603
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Dec 2019 07:13:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C8C8B20863
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Dec 2019 07:12:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 41039206DB
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Dec 2019 07:12:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="xIZ14m5g"
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="rJYJravg"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725958AbfLDHMT (ORCPT
+        id S1726679AbfLDHMG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 Dec 2019 02:12:19 -0500
+        Wed, 4 Dec 2019 02:12:06 -0500
 Received: from mail-eopbgr680043.outbound.protection.outlook.com ([40.107.68.43]:59426
         "EHLO NAM04-BN3-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727322AbfLDHMS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 Dec 2019 02:12:18 -0500
+        id S1725958AbfLDHMG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 4 Dec 2019 02:12:06 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jW5uoA+03Hm3yoC9j1cA5Zb1oMIsJc40kxuMGM0aXTTMFTxLt3qmv0T/e0EdtyQKGt7h4J6Z+62Tu8TKXEHfq6xDCMjbFSpvHdl5TFX5oIN0wLhQELGk0RR7Xfby4817AkNA4bRmL/2j1k9W8Mkh9/bp+cnPtgy0V/23CE1ZpIoZxKB0A/wthPLNH3xPQYAUewXOLCVnb7dfuHsUrG4VB/qB10pzVuL0nJrn3GA2zdgv+PzCjie5B83cwWLGequhV9KW3coxPUu6FcjGdFDj4VBzdX9fTRY3pab89gBJE2J0mhWYKl9z/JNx6cYC6yWpRqpM1MfpMt/T1xVl5XlpxQ==
+ b=BOSzo9VpZU20Oo9U6TWVQG5cJ29VLXi/aXPOV4wVV7OVgFZAPcUgs+TGtL1y70FQxBKjW4tgJTnpaJYZ1Zd/qkxp1xqYWm+ruQxXNfVAhI3ChH86RM9jHuhAQWdnSq6o4UxyEmIgEiQUbiHPmIKTWZ/WYOV4rxLFYrPJMNm+oxKtDhkq9qHidWsPi1EWzTgKVzqUhAhzN0ZpWJeu6v+mWTl+SYZZzlU83u+jDYw/iVnPQJewViTULcGBVtpLpy3eLbckzGZrC6Dd8rb7mblbXC6CuxYZKfeX0Bgie7jmDZrCkLJ7gPFyj4r/zLVl4cKzuRZklLTaIcqNlus+IkZgtw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=B4XD5hAhqMgNiPoU6VxiBcvHcktkCvxlrCVD7SgPmow=;
- b=WyJserXtn+habpRdPKs8c2VBUE4K0zkvJXOuIVBzt8CA9xesqP6vYMdPgOx3LYW3UPOxRjCfDXoY7fpowboqRMTHYb3kjhK6kUzzPPMlc18ApXRf8put5mi3ybleVEtts3mKXfJByNsarks5urEifXRkXXl/I9Th/vuER1oUyXdYHqQ0BdaYcCjW5JAGhgIIEyey+ulfw3kY4wBHCIZlBORtC8s7/qNkG9pcsl40E0IDLF6BUDF79yc/WyUj6fZy+HBQU5eJ6kJe84h6vBe3O/ugVUyg4C0QESnQdZNK8ar52vEJuIL8WzJ4UhI4PuNqXvoWlog+oudzgopdbBp3xw==
+ bh=7sulpD1PqXhIRK1MxNzZPELPGfNqUUv00msMXh5JkZY=;
+ b=cz7QSE+8jV+dyNjl7KDqtNvaW25oksy1oqt3UZ/bCR+kM5mUXO9sYU7zLls9/7hp6PmvDa2scTOJEWe72bvxWp8zi+r4mCwAla2dRJijWLuhjl8Nhz95XiHt7QMBbv7GQG2YsmMxgdTRNmjIopk6Xu9BVe86561RbUZCrq4ceRbPWyIW127lgbBMYw52AFkYb+Hw6bMKfQVleRE+848qrUq0c19mBMhomxsF9Uy9Cs1fwiZ5buKnLAJKT2N19NMAAsAG9s7hGub14YVDCu4Z0fAReO+5BSiBIUJO+iw0139bV4Yo2zA3XJyNvu0aUpnzC2tzurMu8YtkQzQfhtPayA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=B4XD5hAhqMgNiPoU6VxiBcvHcktkCvxlrCVD7SgPmow=;
- b=xIZ14m5gKaUQAF/oAQCpkBZucL5WuXM24zSSrJVSMFQeDjs+tfGMJI1x6T1ga2hGWMXB39pWy389M8B04HEFedcNb48M5lluPQgDTdd1PURXh5rqHyNZNJs6wzyN/Boo6aSsSyYxoRpRIXNAhPuC5UIXcJ3W+NZXDZM8Vf0RDVI=
+ bh=7sulpD1PqXhIRK1MxNzZPELPGfNqUUv00msMXh5JkZY=;
+ b=rJYJravgkYWs4MyiR3KxTtjjXKEWDN2a3gV+TGDaaWdevViALUaesd7nzBduTYU+VIv+maEX+GE8Va2Zr6U3kz/GqmOb5g2vP6LymmoPbh162UIcW90uXri3qssxCh90XPsu0t9gHh3xPoRVRZgpDGsotEyN2Fxnz+weU7Z7pBA=
 Authentication-Results: spf=none (sender IP is )
  smtp.mailfrom=Rijo-john.Thomas@amd.com; 
 Received: from CY4PR12MB1925.namprd12.prod.outlook.com (10.175.62.7) by
  CY4PR12MB1400.namprd12.prod.outlook.com (10.168.165.138) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2516.12; Wed, 4 Dec 2019 07:11:56 +0000
+ 15.20.2516.12; Wed, 4 Dec 2019 07:11:41 +0000
 Received: from CY4PR12MB1925.namprd12.prod.outlook.com
  ([fe80::cd8b:1d7e:31c2:e8b4]) by CY4PR12MB1925.namprd12.prod.outlook.com
  ([fe80::cd8b:1d7e:31c2:e8b4%7]) with mapi id 15.20.2495.014; Wed, 4 Dec 2019
- 07:11:56 +0000
+ 07:11:41 +0000
 From:   Rijo Thomas <Rijo-john.Thomas@amd.com>
 To:     Tom Lendacky <thomas.lendacky@amd.com>,
         Gary Hook <gary.hook@amd.com>,
@@ -59,9 +59,9 @@ Cc:     Rijo Thomas <Rijo-john.Thomas@amd.com>,
         Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>,
         Jens Wiklander <jens.wiklander@linaro.org>,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: [RFC PATCH v3 6/6] crypto: ccp - provide in-kernel API to submit TEE commands
-Date:   Wed,  4 Dec 2019 11:49:03 +0530
-Message-Id: <8bde26314458954e1f229f5c737063692744a6cc.1575438845.git.Rijo-john.Thomas@amd.com>
+Subject: [RFC PATCH v3 2/6] crypto: ccp - create a generic psp-dev file
+Date:   Wed,  4 Dec 2019 11:48:59 +0530
+Message-Id: <d090f123722d4392c5a36c66e510e1728eb2d4c4.1575438845.git.Rijo-john.Thomas@amd.com>
 X-Mailer: git-send-email 1.9.1
 In-Reply-To: <cover.1575438845.git.Rijo-john.Thomas@amd.com>
 References: <cover.1575438845.git.Rijo-john.Thomas@amd.com>
@@ -74,310 +74,985 @@ X-Mailer: git-send-email 1.9.1
 X-Originating-IP: [165.204.156.251]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 375a00a7-99ba-4dbe-13f7-08d778893ee2
+X-MS-Office365-Filtering-Correlation-Id: c6fe810e-9556-4672-73a1-08d77889361b
 X-MS-TrafficTypeDiagnostic: CY4PR12MB1400:|CY4PR12MB1400:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <CY4PR12MB1400AE98FF28BCADC3D342D4CF5D0@CY4PR12MB1400.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3968;
+X-Microsoft-Antispam-PRVS: <CY4PR12MB14001F09D5A537FE26FDBABCCF5D0@CY4PR12MB1400.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:597;
 X-Forefront-PRVS: 0241D5F98C
-X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(376002)(366004)(39860400002)(396003)(346002)(199004)(189003)(2616005)(66556008)(2906002)(66476007)(50466002)(48376002)(478600001)(14454004)(50226002)(11346002)(36756003)(81156014)(26005)(54906003)(110136005)(81166006)(3846002)(66946007)(8936002)(446003)(8676002)(5660300002)(6486002)(6116002)(386003)(186003)(6436002)(4326008)(99286004)(25786009)(6506007)(14444005)(118296001)(76176011)(16586007)(316002)(86362001)(52116002)(7736002)(51416003)(6666004)(6512007)(305945005)(134885004);DIR:OUT;SFP:1101;SCL:1;SRVR:CY4PR12MB1400;H:CY4PR12MB1925.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(376002)(366004)(39860400002)(396003)(346002)(199004)(189003)(2616005)(66556008)(2906002)(66476007)(50466002)(48376002)(478600001)(14454004)(50226002)(11346002)(36756003)(81156014)(26005)(54906003)(110136005)(81166006)(3846002)(66946007)(8936002)(446003)(8676002)(5660300002)(6486002)(6116002)(386003)(186003)(6436002)(4326008)(99286004)(25786009)(6506007)(14444005)(118296001)(76176011)(16586007)(316002)(86362001)(52116002)(7736002)(51416003)(30864003)(6666004)(6512007)(305945005)(41533002);DIR:OUT;SFP:1101;SCL:1;SRVR:CY4PR12MB1400;H:CY4PR12MB1925.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
 Received-SPF: None (protection.outlook.com: amd.com does not designate
  permitted sender hosts)
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8Gl3Zm7d7GxtLbjg9K6HJhmgD+S6Ui8PFPCATlesuLOlPDB52oeZsw8eAeyVeKQe597nD1BKgzL/7KRmBVfcT8w9+CmdIpZOZetwP1j45iqiW7yRE7cUp2Qc6kO2UI9QKt4Q+d1UBgLACf1kZBVahqKfxF0sOW8+APKElDSOuyZzJLOvJgDNeV2u/3mVXcFqVpTufuy0KPHPgbQN8W34UAjbSfLc0CRj6Xf8U7YTgKtFd8ZTqRr/KgfjAr4+RUAuTTN5lQKNpGJsvu2XLHTCHvt5LBcEesUTtRE4o1JvTBVsY9DZpcyySeUWsBvPfLd9ydYnZ5/Vw9wmcaMkbn6xeE6dPkQeWmsBcXur/yTEuNw06U/7G3JsS2hBykpsTvTW9QxjJQzihIZDfn2P68e00xdjxoq5NmNPcN0Hn5eIveX9hf5dF1CZ8JTN8J6mllIxikYEKYPm46QrcrCaaA0RI8eZuvCW3OuoLAcsglwQy836eU7QDjXamfq59WiKalbF
+X-Microsoft-Antispam-Message-Info: G8YhaVNmgdywe3ipqBAJVgJJDFf5ZZAFfH/6OcLTMF+kFxmzsj6Q1EKDnKUE69U56nGMV3YPuBWzNyexAC63Z+WF5D+xpMTQ9uZHA2XBuRUyN6ZeFMSKkYSqbgIouj9mjHorRlRIqCh9Q1pwZvlOQf00WqJGOqAjBsykLldNO7GpyDZvSjaAZDkAo+62RNxOvpb35DjB6tsInmiSwx2WfxD6VclVF5skWNhqF3knEJq0HjGOdW3Nul7eMtY92SaYP44Zpxqo+x5ziXQE29dls9o1tA/dcWw2VDrrPm4xrkbjIZVyqVLUG6V3oANOw+c40LGKPXQQGqnSezURqoQSAIFKmCNIIjQi6bPLnywye/FG8jzShu8iKPu5kqAaUB3R/kOdCdr6BkJ8CbA4QNJ/bvGZekkF7CujKburXR4maRGBKw9JaQEx3waXTVvUBqvHf+36BcDMdrmq+0sm4p6ItlC323UYtuHqFv05FA+w1u+F4ukicxXN5VXeMlzvxT9Z
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 375a00a7-99ba-4dbe-13f7-08d778893ee2
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2019 07:11:56.2898
+X-MS-Exchange-CrossTenant-Network-Message-Id: c6fe810e-9556-4672-73a1-08d77889361b
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Dec 2019 07:11:41.1885
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xdbMivMscJoJkI+OeRNNRPPeXbBwVYB0nT7WJGGTlcuT9gtMkCeuDeJ1EEjqggwVoQlR5wIvo2Fz7zpjvNlE6A==
+X-MS-Exchange-CrossTenant-UserPrincipalName: GgXoTkpaB1U92n2E/S5Bt8l7NI1Zq3hsZrDxneYltXfCXBWWVMHVWvk+774u+CfODJh7/VUcJN+MHZIad5Bk9g==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR12MB1400
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Extend the functionality of AMD Secure Processor (SP) driver by
-providing an in-kernel API to submit commands to TEE ring buffer for
-processing by Trusted OS running on AMD Secure Processor.
+The PSP (Platform Security Processor) provides support for key management
+commands in Secure Encrypted Virtualization (SEV) mode, along with
+software-based Trusted Execution Environment (TEE) to enable third-party
+Trusted Applications.
 
-Following TEE commands are supported by Trusted OS:
+Therefore, introduce psp-dev.c and psp-dev.h files, which can invoke
+SEV (or TEE) initialization based on platform feature support.
 
-* TEE_CMD_ID_LOAD_TA : Load Trusted Application (TA) binary into
-  TEE environment
-* TEE_CMD_ID_UNLOAD_TA : Unload TA binary from TEE environment
-* TEE_CMD_ID_OPEN_SESSION : Open session with loaded TA
-* TEE_CMD_ID_CLOSE_SESSION : Close session with loaded TA
-* TEE_CMD_ID_INVOKE_CMD : Invoke a command with loaded TA
-* TEE_CMD_ID_MAP_SHARED_MEM : Map shared memory
-* TEE_CMD_ID_UNMAP_SHARED_MEM : Unmap shared memory
+TEE interface support will be introduced in a later patch.
 
-Linux AMD-TEE driver will use this API to submit command buffers
-for processing in Trusted Execution Environment. The AMD-TEE driver
-shall be introduced in a separate patch.
-
-Cc: Jens Wiklander <jens.wiklander@linaro.org>
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
 Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Jens Wiklander <jens.wiklander@linaro.org>
 Co-developed-by: Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>
 Signed-off-by: Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>
 Signed-off-by: Rijo Thomas <Rijo-john.Thomas@amd.com>
 ---
- drivers/crypto/ccp/tee-dev.c | 126 +++++++++++++++++++++++++++++++++++++++++++
- drivers/crypto/ccp/tee-dev.h |   1 +
- include/linux/psp-tee.h      |  73 +++++++++++++++++++++++++
- 3 files changed, 200 insertions(+)
- create mode 100644 include/linux/psp-tee.h
+ drivers/crypto/ccp/Makefile  |   3 +-
+ drivers/crypto/ccp/psp-dev.c | 194 ++++++++++++++++++++++++++++++
+ drivers/crypto/ccp/psp-dev.h |  52 +++++++++
+ drivers/crypto/ccp/sev-dev.c | 273 ++++++++++++++++---------------------------
+ drivers/crypto/ccp/sev-dev.h |  36 +++---
+ drivers/crypto/ccp/sp-pci.c  |   2 +-
+ 6 files changed, 367 insertions(+), 193 deletions(-)
+ create mode 100644 drivers/crypto/ccp/psp-dev.c
+ create mode 100644 drivers/crypto/ccp/psp-dev.h
 
-diff --git a/drivers/crypto/ccp/tee-dev.c b/drivers/crypto/ccp/tee-dev.c
-index ccbc2ce..555c8a7 100644
---- a/drivers/crypto/ccp/tee-dev.c
-+++ b/drivers/crypto/ccp/tee-dev.c
-@@ -14,6 +14,7 @@
- #include <linux/slab.h>
- #include <linux/gfp.h>
- #include <linux/psp-sev.h>
-+#include <linux/psp-tee.h>
+diff --git a/drivers/crypto/ccp/Makefile b/drivers/crypto/ccp/Makefile
+index 9dafcf2..3b29ea4 100644
+--- a/drivers/crypto/ccp/Makefile
++++ b/drivers/crypto/ccp/Makefile
+@@ -8,7 +8,8 @@ ccp-$(CONFIG_CRYPTO_DEV_SP_CCP) += ccp-dev.o \
+ 	    ccp-dmaengine.o
+ ccp-$(CONFIG_CRYPTO_DEV_CCP_DEBUGFS) += ccp-debugfs.o
+ ccp-$(CONFIG_PCI) += sp-pci.o
+-ccp-$(CONFIG_CRYPTO_DEV_SP_PSP) += sev-dev.o
++ccp-$(CONFIG_CRYPTO_DEV_SP_PSP) += psp-dev.o \
++                                   sev-dev.o
  
- #include "psp-dev.h"
- #include "tee-dev.h"
-@@ -38,6 +39,7 @@ static int tee_alloc_ring(struct psp_tee_device *tee, int ring_size)
- 	rb_mgr->ring_start = start_addr;
- 	rb_mgr->ring_size = ring_size;
- 	rb_mgr->ring_pa = __psp_pa(start_addr);
-+	mutex_init(&rb_mgr->mutex);
- 
- 	return 0;
- }
-@@ -55,6 +57,7 @@ static void tee_free_ring(struct psp_tee_device *tee)
- 	rb_mgr->ring_start = NULL;
- 	rb_mgr->ring_size = 0;
- 	rb_mgr->ring_pa = 0;
-+	mutex_destroy(&rb_mgr->mutex);
- }
- 
- static int tee_wait_cmd_poll(struct psp_tee_device *tee, unsigned int timeout,
-@@ -236,3 +239,126 @@ void tee_dev_destroy(struct psp_device *psp)
- 
- 	tee_destroy_ring(tee);
- }
+ obj-$(CONFIG_CRYPTO_DEV_CCP_CRYPTO) += ccp-crypto.o
+ ccp-crypto-objs := ccp-crypto-main.o \
+diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
+new file mode 100644
+index 0000000..2cd7a5e
+--- /dev/null
++++ b/drivers/crypto/ccp/psp-dev.c
+@@ -0,0 +1,194 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * AMD Platform Security Processor (PSP) interface
++ *
++ * Copyright (C) 2016,2019 Advanced Micro Devices, Inc.
++ *
++ * Author: Brijesh Singh <brijesh.singh@amd.com>
++ */
 +
-+static int tee_submit_cmd(struct psp_tee_device *tee, enum tee_cmd_id cmd_id,
-+			  void *buf, size_t len, struct tee_ring_cmd **resp)
++#include <linux/kernel.h>
++#include <linux/irqreturn.h>
++
++#include "sp-dev.h"
++#include "psp-dev.h"
++#include "sev-dev.h"
++
++struct psp_device *psp_master;
++
++static struct psp_device *psp_alloc_struct(struct sp_device *sp)
 +{
-+	struct tee_ring_cmd *cmd;
-+	u32 rptr, wptr;
-+	int nloop = 1000, ret = 0;
++	struct device *dev = sp->dev;
++	struct psp_device *psp;
 +
-+	*resp = NULL;
++	psp = devm_kzalloc(dev, sizeof(*psp), GFP_KERNEL);
++	if (!psp)
++		return NULL;
 +
-+	mutex_lock(&tee->rb_mgr.mutex);
++	psp->dev = dev;
++	psp->sp = sp;
 +
-+	wptr = tee->rb_mgr.wptr;
++	snprintf(psp->name, sizeof(psp->name), "psp-%u", sp->ord);
 +
-+	/* Check if ring buffer is full */
-+	do {
-+		rptr = ioread32(tee->io_regs + tee->vdata->ring_rptr_reg);
++	return psp;
++}
 +
-+		if (!(wptr + sizeof(struct tee_ring_cmd) == rptr))
-+			break;
++static irqreturn_t psp_irq_handler(int irq, void *data)
++{
++	struct psp_device *psp = data;
++	unsigned int status;
 +
-+		dev_info(tee->dev, "tee: ring buffer full. rptr = %u wptr = %u\n",
-+			 rptr, wptr);
++	/* Read the interrupt status: */
++	status = ioread32(psp->io_regs + psp->vdata->intsts_reg);
 +
-+		/* Wait if ring buffer is full */
-+		mutex_unlock(&tee->rb_mgr.mutex);
-+		schedule_timeout_interruptible(msecs_to_jiffies(10));
-+		mutex_lock(&tee->rb_mgr.mutex);
-+
-+	} while (--nloop);
-+
-+	if (!nloop && (wptr + sizeof(struct tee_ring_cmd) == rptr)) {
-+		dev_err(tee->dev, "tee: ring buffer full. rptr = %u wptr = %u\n",
-+			rptr, wptr);
-+		ret = -EBUSY;
-+		goto unlock;
++	/* invoke subdevice interrupt handlers */
++	if (status) {
++		if (psp->sev_irq_handler)
++			psp->sev_irq_handler(irq, psp->sev_irq_data, status);
 +	}
 +
-+	/* Pointer to empty data entry in ring buffer */
-+	cmd = (struct tee_ring_cmd *)(tee->rb_mgr.ring_start + wptr);
++	/* Clear the interrupt status by writing the same value we read. */
++	iowrite32(status, psp->io_regs + psp->vdata->intsts_reg);
 +
-+	/* Write command data into ring buffer */
-+	cmd->cmd_id = cmd_id;
-+	cmd->cmd_state = TEE_CMD_STATE_INIT;
-+	memset(&cmd->buf[0], 0, sizeof(cmd->buf));
-+	memcpy(&cmd->buf[0], buf, len);
++	return IRQ_HANDLED;
++}
 +
-+	/* Update local copy of write pointer */
-+	tee->rb_mgr.wptr += sizeof(struct tee_ring_cmd);
-+	if (tee->rb_mgr.wptr >= tee->rb_mgr.ring_size)
-+		tee->rb_mgr.wptr = 0;
++static int psp_check_sev_support(struct psp_device *psp)
++{
++	unsigned int val = ioread32(psp->io_regs + psp->vdata->feature_reg);
 +
-+	/* Trigger interrupt to Trusted OS */
-+	iowrite32(tee->rb_mgr.wptr, tee->io_regs + tee->vdata->ring_wptr_reg);
-+
-+	/* The response is provided by Trusted OS in same
-+	 * location as submitted data entry within ring buffer.
++	/*
++	 * Check for a access to the registers.  If this read returns
++	 * 0xffffffff, it's likely that the system is running a broken
++	 * BIOS which disallows access to the device. Stop here and
++	 * fail the PSP initialization (but not the load, as the CCP
++	 * could get properly initialized).
 +	 */
-+	*resp = cmd;
++	if (val == 0xffffffff) {
++		dev_notice(psp->dev, "psp: unable to access the device: you might be running a broken BIOS.\n");
++		return -ENODEV;
++	}
 +
-+unlock:
-+	mutex_unlock(&tee->rb_mgr.mutex);
++	if (!(val & 1)) {
++		/* Device does not support the SEV feature */
++		dev_dbg(psp->dev, "psp does not support SEV\n");
++		return -ENODEV;
++	}
++
++	return 0;
++}
++
++int psp_dev_init(struct sp_device *sp)
++{
++	struct device *dev = sp->dev;
++	struct psp_device *psp;
++	int ret;
++
++	ret = -ENOMEM;
++	psp = psp_alloc_struct(sp);
++	if (!psp)
++		goto e_err;
++
++	sp->psp_data = psp;
++
++	psp->vdata = (struct psp_vdata *)sp->dev_vdata->psp_vdata;
++	if (!psp->vdata) {
++		ret = -ENODEV;
++		dev_err(dev, "missing driver data\n");
++		goto e_err;
++	}
++
++	psp->io_regs = sp->io_map;
++
++	ret = psp_check_sev_support(psp);
++	if (ret)
++		goto e_disable;
++
++	/* Disable and clear interrupts until ready */
++	iowrite32(0, psp->io_regs + psp->vdata->inten_reg);
++	iowrite32(-1, psp->io_regs + psp->vdata->intsts_reg);
++
++	/* Request an irq */
++	ret = sp_request_psp_irq(psp->sp, psp_irq_handler, psp->name, psp);
++	if (ret) {
++		dev_err(dev, "psp: unable to allocate an IRQ\n");
++		goto e_err;
++	}
++
++	ret = sev_dev_init(psp);
++	if (ret)
++		goto e_irq;
++
++	if (sp->set_psp_master_device)
++		sp->set_psp_master_device(sp);
++
++	/* Enable interrupt */
++	iowrite32(-1, psp->io_regs + psp->vdata->inten_reg);
++
++	dev_notice(dev, "psp enabled\n");
++
++	return 0;
++
++e_irq:
++	sp_free_psp_irq(psp->sp, psp);
++e_err:
++	sp->psp_data = NULL;
++
++	dev_notice(dev, "psp initialization failed\n");
++
++	return ret;
++
++e_disable:
++	sp->psp_data = NULL;
 +
 +	return ret;
 +}
 +
-+static int tee_wait_cmd_completion(struct psp_tee_device *tee,
-+				   struct tee_ring_cmd *resp,
-+				   unsigned int timeout)
++void psp_dev_destroy(struct sp_device *sp)
 +{
-+	/* ~5ms sleep per loop => nloop = timeout * 200 */
-+	int nloop = timeout * 200;
++	struct psp_device *psp = sp->psp_data;
 +
-+	while (--nloop) {
-+		if (resp->cmd_state == TEE_CMD_STATE_COMPLETED)
-+			return 0;
++	if (!psp)
++		return;
 +
-+		usleep_range(5000, 5100);
-+	}
++	sev_dev_destroy(psp);
 +
-+	dev_err(tee->dev, "tee: command 0x%x timed out, disabling PSP\n",
-+		resp->cmd_id);
-+
-+	psp_dead = true;
-+
-+	return -ETIMEDOUT;
++	sp_free_psp_irq(sp, psp);
 +}
 +
-+int psp_tee_process_cmd(enum tee_cmd_id cmd_id, void *buf, size_t len,
-+			u32 *status)
++void psp_set_sev_irq_handler(struct psp_device *psp, psp_irq_handler_t handler,
++			     void *data)
 +{
-+	struct psp_device *psp = psp_get_master_device();
-+	struct psp_tee_device *tee;
-+	struct tee_ring_cmd *resp;
-+	int ret;
-+
-+	if (!buf || !status || !len || len > sizeof(resp->buf))
-+		return -EINVAL;
-+
-+	*status = 0;
-+
-+	if (!psp || !psp->tee_data)
-+		return -ENODEV;
-+
-+	if (psp_dead)
-+		return -EBUSY;
-+
-+	tee = psp->tee_data;
-+
-+	ret = tee_submit_cmd(tee, cmd_id, buf, len, &resp);
-+	if (ret)
-+		return ret;
-+
-+	ret = tee_wait_cmd_completion(tee, resp, TEE_DEFAULT_TIMEOUT);
-+	if (ret)
-+		return ret;
-+
-+	memcpy(buf, &resp->buf[0], len);
-+	*status = resp->status;
-+
-+	return 0;
++	psp->sev_irq_data = data;
++	psp->sev_irq_handler = handler;
 +}
-+EXPORT_SYMBOL(psp_tee_process_cmd);
-diff --git a/drivers/crypto/ccp/tee-dev.h b/drivers/crypto/ccp/tee-dev.h
-index b3db0fc..f099601 100644
---- a/drivers/crypto/ccp/tee-dev.h
-+++ b/drivers/crypto/ccp/tee-dev.h
-@@ -54,6 +54,7 @@ struct tee_init_ring_cmd {
-  * @wptr:        index to the last written entry in ring buffer
-  */
- struct ring_buf_manager {
-+	struct mutex mutex;	/* synchronizes access to ring buffer */
- 	void *ring_start;
- 	u32 ring_size;
- 	phys_addr_t ring_pa;
-diff --git a/include/linux/psp-tee.h b/include/linux/psp-tee.h
++
++void psp_clear_sev_irq_handler(struct psp_device *psp)
++{
++	psp_set_sev_irq_handler(psp, NULL, NULL);
++}
++
++struct psp_device *psp_get_master_device(void)
++{
++	struct sp_device *sp = sp_get_psp_master_device();
++
++	return sp ? sp->psp_data : NULL;
++}
++
++void psp_pci_init(void)
++{
++	psp_master = psp_get_master_device();
++
++	if (!psp_master)
++		return;
++
++	sev_pci_init();
++}
++
++void psp_pci_exit(void)
++{
++	if (!psp_master)
++		return;
++
++	sev_pci_exit();
++}
+diff --git a/drivers/crypto/ccp/psp-dev.h b/drivers/crypto/ccp/psp-dev.h
 new file mode 100644
-index 0000000..63bb221
+index 0000000..7c014ac
 --- /dev/null
-+++ b/include/linux/psp-tee.h
-@@ -0,0 +1,73 @@
-+/* SPDX-License-Identifier: MIT */
++++ b/drivers/crypto/ccp/psp-dev.h
+@@ -0,0 +1,52 @@
++/* SPDX-License-Identifier: GPL-2.0-only */
 +/*
-+ * AMD Trusted Execution Environment (TEE) interface
++ * AMD Platform Security Processor (PSP) interface driver
 + *
-+ * Author: Rijo Thomas <Rijo-john.Thomas@amd.com>
++ * Copyright (C) 2017-2019 Advanced Micro Devices, Inc.
 + *
-+ * Copyright 2019 Advanced Micro Devices, Inc.
-+ *
++ * Author: Brijesh Singh <brijesh.singh@amd.com>
 + */
 +
-+#ifndef __PSP_TEE_H_
-+#define __PSP_TEE_H_
++#ifndef __PSP_DEV_H__
++#define __PSP_DEV_H__
 +
-+#include <linux/types.h>
-+#include <linux/errno.h>
++#include <linux/device.h>
++#include <linux/list.h>
++#include <linux/bits.h>
++#include <linux/interrupt.h>
 +
-+/* This file defines the Trusted Execution Environment (TEE) interface commands
-+ * and the API exported by AMD Secure Processor driver to communicate with
-+ * AMD-TEE Trusted OS.
-+ */
++#include "sp-dev.h"
 +
-+/**
-+ * enum tee_cmd_id - TEE Interface Command IDs
-+ * @TEE_CMD_ID_LOAD_TA:          Load Trusted Application (TA) binary into
-+ *                               TEE environment
-+ * @TEE_CMD_ID_UNLOAD_TA:        Unload TA binary from TEE environment
-+ * @TEE_CMD_ID_OPEN_SESSION:     Open session with loaded TA
-+ * @TEE_CMD_ID_CLOSE_SESSION:    Close session with loaded TA
-+ * @TEE_CMD_ID_INVOKE_CMD:       Invoke a command with loaded TA
-+ * @TEE_CMD_ID_MAP_SHARED_MEM:   Map shared memory
-+ * @TEE_CMD_ID_UNMAP_SHARED_MEM: Unmap shared memory
-+ */
-+enum tee_cmd_id {
-+	TEE_CMD_ID_LOAD_TA = 1,
-+	TEE_CMD_ID_UNLOAD_TA,
-+	TEE_CMD_ID_OPEN_SESSION,
-+	TEE_CMD_ID_CLOSE_SESSION,
-+	TEE_CMD_ID_INVOKE_CMD,
-+	TEE_CMD_ID_MAP_SHARED_MEM,
-+	TEE_CMD_ID_UNMAP_SHARED_MEM,
++#define PSP_CMDRESP_RESP		BIT(31)
++#define PSP_CMDRESP_ERR_MASK		0xffff
++
++#define MAX_PSP_NAME_LEN		16
++
++extern struct psp_device *psp_master;
++
++typedef void (*psp_irq_handler_t)(int, void *, unsigned int);
++
++struct psp_device {
++	struct list_head entry;
++
++	struct psp_vdata *vdata;
++	char name[MAX_PSP_NAME_LEN];
++
++	struct device *dev;
++	struct sp_device *sp;
++
++	void __iomem *io_regs;
++
++	psp_irq_handler_t sev_irq_handler;
++	void *sev_irq_data;
++
++	void *sev_data;
 +};
 +
-+#ifdef CONFIG_CRYPTO_DEV_SP_PSP
-+/**
-+ * psp_tee_process_cmd() - Process command in Trusted Execution Environment
-+ * @cmd_id:     TEE command ID (&enum tee_cmd_id)
-+ * @buf:        Command buffer for TEE processing. On success, is updated
-+ *              with the response
-+ * @len:        Length of command buffer in bytes
-+ * @status:     On success, holds the TEE command execution status
-+ *
-+ * This function submits a command to the Trusted OS for processing in the
-+ * TEE environment and waits for a response or until the command times out.
-+ *
-+ * Returns:
-+ * 0 if TEE successfully processed the command
-+ * -%ENODEV    if PSP device not available
-+ * -%EINVAL    if invalid input
-+ * -%ETIMEDOUT if TEE command timed out
-+ * -%EBUSY     if PSP device is not responsive
-+ */
-+int psp_tee_process_cmd(enum tee_cmd_id cmd_id, void *buf, size_t len,
-+			u32 *status);
++void psp_set_sev_irq_handler(struct psp_device *psp, psp_irq_handler_t handler,
++			     void *data);
++void psp_clear_sev_irq_handler(struct psp_device *psp);
 +
-+#else /* !CONFIG_CRYPTO_DEV_SP_PSP */
++struct psp_device *psp_get_master_device(void);
 +
-+static inline int psp_tee_process_cmd(enum tee_cmd_id cmd_id, void *buf,
-+				      size_t len, u32 *status)
-+{
-+	return -ENODEV;
-+}
-+#endif /* CONFIG_CRYPTO_DEV_SP_PSP */
-+#endif /* __PSP_TEE_H_ */
++#endif /* __PSP_DEV_H */
+diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+index 9a8c523..a608b52 100644
+--- a/drivers/crypto/ccp/sev-dev.c
++++ b/drivers/crypto/ccp/sev-dev.c
+@@ -21,7 +21,7 @@
+ #include <linux/ccp.h>
+ #include <linux/firmware.h>
+ 
+-#include "sp-dev.h"
++#include "psp-dev.h"
+ #include "sev-dev.h"
+ 
+ #define DEVICE_NAME		"sev"
+@@ -30,7 +30,6 @@
+ 
+ static DEFINE_MUTEX(sev_cmd_mutex);
+ static struct sev_misc_dev *misc_dev;
+-static struct psp_device *psp_master;
+ 
+ static int psp_cmd_timeout = 100;
+ module_param(psp_cmd_timeout, int, 0644);
+@@ -45,68 +44,45 @@
+ 
+ static inline bool sev_version_greater_or_equal(u8 maj, u8 min)
+ {
+-	if (psp_master->api_major > maj)
+-		return true;
+-	if (psp_master->api_major == maj && psp_master->api_minor >= min)
+-		return true;
+-	return false;
+-}
+-
+-static struct psp_device *psp_alloc_struct(struct sp_device *sp)
+-{
+-	struct device *dev = sp->dev;
+-	struct psp_device *psp;
++	struct sev_device *sev = psp_master->sev_data;
+ 
+-	psp = devm_kzalloc(dev, sizeof(*psp), GFP_KERNEL);
+-	if (!psp)
+-		return NULL;
+-
+-	psp->dev = dev;
+-	psp->sp = sp;
++	if (sev->api_major > maj)
++		return true;
+ 
+-	snprintf(psp->name, sizeof(psp->name), "psp-%u", sp->ord);
++	if (sev->api_major == maj && sev->api_minor >= min)
++		return true;
+ 
+-	return psp;
++	return false;
+ }
+ 
+-static irqreturn_t psp_irq_handler(int irq, void *data)
++static void sev_irq_handler(int irq, void *data, unsigned int status)
+ {
+-	struct psp_device *psp = data;
+-	unsigned int status;
++	struct sev_device *sev = data;
+ 	int reg;
+ 
+-	/* Read the interrupt status: */
+-	status = ioread32(psp->io_regs + psp->vdata->intsts_reg);
+-
+ 	/* Check if it is command completion: */
+-	if (!(status & PSP_CMD_COMPLETE))
+-		goto done;
++	if (!(status & SEV_CMD_COMPLETE))
++		return;
+ 
+ 	/* Check if it is SEV command completion: */
+-	reg = ioread32(psp->io_regs + psp->vdata->cmdresp_reg);
++	reg = ioread32(sev->io_regs + sev->psp->vdata->cmdresp_reg);
+ 	if (reg & PSP_CMDRESP_RESP) {
+-		psp->sev_int_rcvd = 1;
+-		wake_up(&psp->sev_int_queue);
++		sev->int_rcvd = 1;
++		wake_up(&sev->int_queue);
+ 	}
+-
+-done:
+-	/* Clear the interrupt status by writing the same value we read. */
+-	iowrite32(status, psp->io_regs + psp->vdata->intsts_reg);
+-
+-	return IRQ_HANDLED;
+ }
+ 
+-static int sev_wait_cmd_ioc(struct psp_device *psp,
++static int sev_wait_cmd_ioc(struct sev_device *sev,
+ 			    unsigned int *reg, unsigned int timeout)
+ {
+ 	int ret;
+ 
+-	ret = wait_event_timeout(psp->sev_int_queue,
+-			psp->sev_int_rcvd, timeout * HZ);
++	ret = wait_event_timeout(sev->int_queue,
++			sev->int_rcvd, timeout * HZ);
+ 	if (!ret)
+ 		return -ETIMEDOUT;
+ 
+-	*reg = ioread32(psp->io_regs + psp->vdata->cmdresp_reg);
++	*reg = ioread32(sev->io_regs + sev->psp->vdata->cmdresp_reg);
+ 
+ 	return 0;
+ }
+@@ -150,42 +126,45 @@ static int sev_cmd_buffer_len(int cmd)
+ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+ {
+ 	struct psp_device *psp = psp_master;
++	struct sev_device *sev;
+ 	unsigned int phys_lsb, phys_msb;
+ 	unsigned int reg, ret = 0;
+ 
+-	if (!psp)
++	if (!psp || !psp->sev_data)
+ 		return -ENODEV;
+ 
+ 	if (psp_dead)
+ 		return -EBUSY;
+ 
++	sev = psp->sev_data;
++
+ 	/* Get the physical address of the command buffer */
+ 	phys_lsb = data ? lower_32_bits(__psp_pa(data)) : 0;
+ 	phys_msb = data ? upper_32_bits(__psp_pa(data)) : 0;
+ 
+-	dev_dbg(psp->dev, "sev command id %#x buffer 0x%08x%08x timeout %us\n",
++	dev_dbg(sev->dev, "sev command id %#x buffer 0x%08x%08x timeout %us\n",
+ 		cmd, phys_msb, phys_lsb, psp_timeout);
+ 
+ 	print_hex_dump_debug("(in):  ", DUMP_PREFIX_OFFSET, 16, 2, data,
+ 			     sev_cmd_buffer_len(cmd), false);
+ 
+-	iowrite32(phys_lsb, psp->io_regs + psp->vdata->cmdbuff_addr_lo_reg);
+-	iowrite32(phys_msb, psp->io_regs + psp->vdata->cmdbuff_addr_hi_reg);
++	iowrite32(phys_lsb, sev->io_regs + psp->vdata->cmdbuff_addr_lo_reg);
++	iowrite32(phys_msb, sev->io_regs + psp->vdata->cmdbuff_addr_hi_reg);
+ 
+-	psp->sev_int_rcvd = 0;
++	sev->int_rcvd = 0;
+ 
+ 	reg = cmd;
+-	reg <<= PSP_CMDRESP_CMD_SHIFT;
+-	reg |= PSP_CMDRESP_IOC;
+-	iowrite32(reg, psp->io_regs + psp->vdata->cmdresp_reg);
++	reg <<= SEV_CMDRESP_CMD_SHIFT;
++	reg |= SEV_CMDRESP_IOC;
++	iowrite32(reg, sev->io_regs + psp->vdata->cmdresp_reg);
+ 
+ 	/* wait for command completion */
+-	ret = sev_wait_cmd_ioc(psp, &reg, psp_timeout);
++	ret = sev_wait_cmd_ioc(sev, &reg, psp_timeout);
+ 	if (ret) {
+ 		if (psp_ret)
+ 			*psp_ret = 0;
+ 
+-		dev_err(psp->dev, "sev command %#x timed out, disabling PSP \n", cmd);
++		dev_err(sev->dev, "sev command %#x timed out, disabling PSP\n", cmd);
+ 		psp_dead = true;
+ 
+ 		return ret;
+@@ -197,7 +176,7 @@ static int __sev_do_cmd_locked(int cmd, void *data, int *psp_ret)
+ 		*psp_ret = reg & PSP_CMDRESP_ERR_MASK;
+ 
+ 	if (reg & PSP_CMDRESP_ERR_MASK) {
+-		dev_dbg(psp->dev, "sev command %#x failed (%#010x)\n",
++		dev_dbg(sev->dev, "sev command %#x failed (%#010x)\n",
+ 			cmd, reg & PSP_CMDRESP_ERR_MASK);
+ 		ret = -EIO;
+ 	}
+@@ -222,20 +201,23 @@ static int sev_do_cmd(int cmd, void *data, int *psp_ret)
+ static int __sev_platform_init_locked(int *error)
+ {
+ 	struct psp_device *psp = psp_master;
++	struct sev_device *sev;
+ 	int rc = 0;
+ 
+-	if (!psp)
++	if (!psp || !psp->sev_data)
+ 		return -ENODEV;
+ 
+-	if (psp->sev_state == SEV_STATE_INIT)
++	sev = psp->sev_data;
++
++	if (sev->state == SEV_STATE_INIT)
+ 		return 0;
+ 
+-	rc = __sev_do_cmd_locked(SEV_CMD_INIT, &psp->init_cmd_buf, error);
++	rc = __sev_do_cmd_locked(SEV_CMD_INIT, &sev->init_cmd_buf, error);
+ 	if (rc)
+ 		return rc;
+ 
+-	psp->sev_state = SEV_STATE_INIT;
+-	dev_dbg(psp->dev, "SEV firmware initialized\n");
++	sev->state = SEV_STATE_INIT;
++	dev_dbg(sev->dev, "SEV firmware initialized\n");
+ 
+ 	return rc;
+ }
+@@ -254,14 +236,15 @@ int sev_platform_init(int *error)
+ 
+ static int __sev_platform_shutdown_locked(int *error)
+ {
++	struct sev_device *sev = psp_master->sev_data;
+ 	int ret;
+ 
+ 	ret = __sev_do_cmd_locked(SEV_CMD_SHUTDOWN, NULL, error);
+ 	if (ret)
+ 		return ret;
+ 
+-	psp_master->sev_state = SEV_STATE_UNINIT;
+-	dev_dbg(psp_master->dev, "SEV firmware shutdown\n");
++	sev->state = SEV_STATE_UNINIT;
++	dev_dbg(sev->dev, "SEV firmware shutdown\n");
+ 
+ 	return ret;
+ }
+@@ -279,14 +262,15 @@ static int sev_platform_shutdown(int *error)
+ 
+ static int sev_get_platform_state(int *state, int *error)
+ {
++	struct sev_device *sev = psp_master->sev_data;
+ 	int rc;
+ 
+ 	rc = __sev_do_cmd_locked(SEV_CMD_PLATFORM_STATUS,
+-				 &psp_master->status_cmd_buf, error);
++				 &sev->status_cmd_buf, error);
+ 	if (rc)
+ 		return rc;
+ 
+-	*state = psp_master->status_cmd_buf.state;
++	*state = sev->status_cmd_buf.state;
+ 	return rc;
+ }
+ 
+@@ -324,7 +308,8 @@ static int sev_ioctl_do_reset(struct sev_issue_cmd *argp)
+ 
+ static int sev_ioctl_do_platform_status(struct sev_issue_cmd *argp)
+ {
+-	struct sev_user_data_status *data = &psp_master->status_cmd_buf;
++	struct sev_device *sev = psp_master->sev_data;
++	struct sev_user_data_status *data = &sev->status_cmd_buf;
+ 	int ret;
+ 
+ 	ret = __sev_do_cmd_locked(SEV_CMD_PLATFORM_STATUS, data, &argp->error);
+@@ -339,12 +324,13 @@ static int sev_ioctl_do_platform_status(struct sev_issue_cmd *argp)
+ 
+ static int sev_ioctl_do_pek_pdh_gen(int cmd, struct sev_issue_cmd *argp)
+ {
++	struct sev_device *sev = psp_master->sev_data;
+ 	int rc;
+ 
+ 	if (!capable(CAP_SYS_ADMIN))
+ 		return -EPERM;
+ 
+-	if (psp_master->sev_state == SEV_STATE_UNINIT) {
++	if (sev->state == SEV_STATE_UNINIT) {
+ 		rc = __sev_platform_init_locked(&argp->error);
+ 		if (rc)
+ 			return rc;
+@@ -355,6 +341,7 @@ static int sev_ioctl_do_pek_pdh_gen(int cmd, struct sev_issue_cmd *argp)
+ 
+ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp)
+ {
++	struct sev_device *sev = psp_master->sev_data;
+ 	struct sev_user_data_pek_csr input;
+ 	struct sev_data_pek_csr *data;
+ 	void *blob = NULL;
+@@ -391,7 +378,7 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp)
+ 	data->len = input.length;
+ 
+ cmd:
+-	if (psp_master->sev_state == SEV_STATE_UNINIT) {
++	if (sev->state == SEV_STATE_UNINIT) {
+ 		ret = __sev_platform_init_locked(&argp->error);
+ 		if (ret)
+ 			goto e_free_blob;
+@@ -434,21 +421,22 @@ void *psp_copy_user_blob(u64 __user uaddr, u32 len)
+ 
+ static int sev_get_api_version(void)
+ {
++	struct sev_device *sev = psp_master->sev_data;
+ 	struct sev_user_data_status *status;
+ 	int error = 0, ret;
+ 
+-	status = &psp_master->status_cmd_buf;
++	status = &sev->status_cmd_buf;
+ 	ret = sev_platform_status(status, &error);
+ 	if (ret) {
+-		dev_err(psp_master->dev,
++		dev_err(sev->dev,
+ 			"SEV: failed to get status. Error: %#x\n", error);
+ 		return 1;
+ 	}
+ 
+-	psp_master->api_major = status->api_major;
+-	psp_master->api_minor = status->api_minor;
+-	psp_master->build = status->build;
+-	psp_master->sev_state = status->state;
++	sev->api_major = status->api_major;
++	sev->api_minor = status->api_minor;
++	sev->build = status->build;
++	sev->state = status->state;
+ 
+ 	return 0;
+ }
+@@ -544,6 +532,7 @@ static int sev_update_firmware(struct device *dev)
+ 
+ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp)
+ {
++	struct sev_device *sev = psp_master->sev_data;
+ 	struct sev_user_data_pek_cert_import input;
+ 	struct sev_data_pek_cert_import *data;
+ 	void *pek_blob, *oca_blob;
+@@ -580,7 +569,7 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp)
+ 	data->oca_cert_len = input.oca_cert_len;
+ 
+ 	/* If platform is not in INIT state then transition it to INIT */
+-	if (psp_master->sev_state != SEV_STATE_INIT) {
++	if (sev->state != SEV_STATE_INIT) {
+ 		ret = __sev_platform_init_locked(&argp->error);
+ 		if (ret)
+ 			goto e_free_oca;
+@@ -702,13 +691,14 @@ static int sev_ioctl_do_get_id(struct sev_issue_cmd *argp)
+ 
+ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp)
+ {
++	struct sev_device *sev = psp_master->sev_data;
+ 	struct sev_user_data_pdh_cert_export input;
+ 	void *pdh_blob = NULL, *cert_blob = NULL;
+ 	struct sev_data_pdh_cert_export *data;
+ 	int ret;
+ 
+ 	/* If platform is not in INIT state then transition it to INIT. */
+-	if (psp_master->sev_state != SEV_STATE_INIT) {
++	if (sev->state != SEV_STATE_INIT) {
+ 		if (!capable(CAP_SYS_ADMIN))
+ 			return -EPERM;
+ 
+@@ -803,7 +793,7 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
+ 	struct sev_issue_cmd input;
+ 	int ret = -EFAULT;
+ 
+-	if (!psp_master)
++	if (!psp_master || !psp_master->sev_data)
+ 		return -ENODEV;
+ 
+ 	if (ioctl != SEV_ISSUE_CMD)
+@@ -902,9 +892,9 @@ static void sev_exit(struct kref *ref)
+ 	misc_deregister(&misc_dev->misc);
+ }
+ 
+-static int sev_misc_init(struct psp_device *psp)
++static int sev_misc_init(struct sev_device *sev)
+ {
+-	struct device *dev = psp->dev;
++	struct device *dev = sev->dev;
+ 	int ret;
+ 
+ 	/*
+@@ -935,115 +925,61 @@ static int sev_misc_init(struct psp_device *psp)
+ 		kref_get(&misc_dev->refcount);
+ 	}
+ 
+-	init_waitqueue_head(&psp->sev_int_queue);
+-	psp->sev_misc = misc_dev;
++	init_waitqueue_head(&sev->int_queue);
++	sev->misc = misc_dev;
+ 	dev_dbg(dev, "registered SEV device\n");
+ 
+ 	return 0;
+ }
+ 
+-static int psp_check_sev_support(struct psp_device *psp)
+-{
+-	unsigned int val = ioread32(psp->io_regs + psp->vdata->feature_reg);
+-
+-	/*
+-	 * Check for a access to the registers.  If this read returns
+-	 * 0xffffffff, it's likely that the system is running a broken
+-	 * BIOS which disallows access to the device. Stop here and
+-	 * fail the PSP initialization (but not the load, as the CCP
+-	 * could get properly initialized).
+-	 */
+-	if (val == 0xffffffff) {
+-		dev_notice(psp->dev, "psp: unable to access the device: you might be running a broken BIOS.\n");
+-		return -ENODEV;
+-	}
+-
+-	if (!(val & 1)) {
+-		/* Device does not support the SEV feature */
+-		dev_dbg(psp->dev, "psp does not support SEV\n");
+-		return -ENODEV;
+-	}
+-
+-	return 0;
+-}
+-
+-int psp_dev_init(struct sp_device *sp)
++int sev_dev_init(struct psp_device *psp)
+ {
+-	struct device *dev = sp->dev;
+-	struct psp_device *psp;
+-	int ret;
++	struct device *dev = psp->dev;
++	struct sev_device *sev;
++	int ret = -ENOMEM;
+ 
+-	ret = -ENOMEM;
+-	psp = psp_alloc_struct(sp);
+-	if (!psp)
++	sev = devm_kzalloc(dev, sizeof(*sev), GFP_KERNEL);
++	if (!sev)
+ 		goto e_err;
+ 
+-	sp->psp_data = psp;
++	psp->sev_data = sev;
+ 
+-	psp->vdata = (struct psp_vdata *)sp->dev_vdata->psp_vdata;
+-	if (!psp->vdata) {
+-		ret = -ENODEV;
+-		dev_err(dev, "missing driver data\n");
+-		goto e_err;
+-	}
++	sev->dev = dev;
++	sev->psp = psp;
+ 
+-	psp->io_regs = sp->io_map;
++	sev->io_regs = psp->io_regs;
+ 
+-	ret = psp_check_sev_support(psp);
+-	if (ret)
+-		goto e_disable;
++	psp_set_sev_irq_handler(psp, sev_irq_handler, sev);
+ 
+-	/* Disable and clear interrupts until ready */
+-	iowrite32(0, psp->io_regs + psp->vdata->inten_reg);
+-	iowrite32(-1, psp->io_regs + psp->vdata->intsts_reg);
+-
+-	/* Request an irq */
+-	ret = sp_request_psp_irq(psp->sp, psp_irq_handler, psp->name, psp);
+-	if (ret) {
+-		dev_err(dev, "psp: unable to allocate an IRQ\n");
+-		goto e_err;
+-	}
+-
+-	ret = sev_misc_init(psp);
++	ret = sev_misc_init(sev);
+ 	if (ret)
+ 		goto e_irq;
+ 
+-	if (sp->set_psp_master_device)
+-		sp->set_psp_master_device(sp);
+-
+-	/* Enable interrupt */
+-	iowrite32(-1, psp->io_regs + psp->vdata->inten_reg);
+-
+-	dev_notice(dev, "psp enabled\n");
++	dev_notice(dev, "sev enabled\n");
+ 
+ 	return 0;
+ 
+ e_irq:
+-	sp_free_psp_irq(psp->sp, psp);
++	psp_clear_sev_irq_handler(psp);
+ e_err:
+-	sp->psp_data = NULL;
++	psp->sev_data = NULL;
+ 
+-	dev_notice(dev, "psp initialization failed\n");
+-
+-	return ret;
+-
+-e_disable:
+-	sp->psp_data = NULL;
++	dev_notice(dev, "sev initialization failed\n");
+ 
+ 	return ret;
+ }
+ 
+-void psp_dev_destroy(struct sp_device *sp)
++void sev_dev_destroy(struct psp_device *psp)
+ {
+-	struct psp_device *psp = sp->psp_data;
++	struct sev_device *sev = psp->sev_data;
+ 
+-	if (!psp)
++	if (!sev)
+ 		return;
+ 
+-	if (psp->sev_misc)
++	if (sev->misc)
+ 		kref_put(&misc_dev->refcount, sev_exit);
+ 
+-	sp_free_psp_irq(sp, psp);
++	psp_clear_sev_irq_handler(psp);
+ }
+ 
+ int sev_issue_cmd_external_user(struct file *filep, unsigned int cmd,
+@@ -1052,21 +988,18 @@ int sev_issue_cmd_external_user(struct file *filep, unsigned int cmd,
+ 	if (!filep || filep->f_op != &sev_fops)
+ 		return -EBADF;
+ 
+-	return  sev_do_cmd(cmd, data, error);
++	return sev_do_cmd(cmd, data, error);
+ }
+ EXPORT_SYMBOL_GPL(sev_issue_cmd_external_user);
+ 
+-void psp_pci_init(void)
++void sev_pci_init(void)
+ {
+-	struct sp_device *sp;
++	struct sev_device *sev = psp_master->sev_data;
+ 	int error, rc;
+ 
+-	sp = sp_get_psp_master_device();
+-	if (!sp)
++	if (!sev)
+ 		return;
+ 
+-	psp_master = sp->psp_data;
+-
+ 	psp_timeout = psp_probe_timeout;
+ 
+ 	if (sev_get_api_version())
+@@ -1082,13 +1015,13 @@ void psp_pci_init(void)
+ 	 * firmware in INIT or WORKING state.
+ 	 */
+ 
+-	if (psp_master->sev_state != SEV_STATE_UNINIT) {
++	if (sev->state != SEV_STATE_UNINIT) {
+ 		sev_platform_shutdown(NULL);
+-		psp_master->sev_state = SEV_STATE_UNINIT;
++		sev->state = SEV_STATE_UNINIT;
+ 	}
+ 
+ 	if (sev_version_greater_or_equal(0, 15) &&
+-	    sev_update_firmware(psp_master->dev) == 0)
++	    sev_update_firmware(sev->dev) == 0)
+ 		sev_get_api_version();
+ 
+ 	/* Initialize the platform */
+@@ -1101,27 +1034,27 @@ void psp_pci_init(void)
+ 		 * failed and persistent state has been erased.
+ 		 * Retrying INIT command here should succeed.
+ 		 */
+-		dev_dbg(sp->dev, "SEV: retrying INIT command");
++		dev_dbg(sev->dev, "SEV: retrying INIT command");
+ 		rc = sev_platform_init(&error);
+ 	}
+ 
+ 	if (rc) {
+-		dev_err(sp->dev, "SEV: failed to INIT error %#x\n", error);
++		dev_err(sev->dev, "SEV: failed to INIT error %#x\n", error);
+ 		return;
+ 	}
+ 
+-	dev_info(sp->dev, "SEV API:%d.%d build:%d\n", psp_master->api_major,
+-		 psp_master->api_minor, psp_master->build);
++	dev_info(sev->dev, "SEV API:%d.%d build:%d\n", sev->api_major,
++		 sev->api_minor, sev->build);
+ 
+ 	return;
+ 
+ err:
+-	psp_master = NULL;
++	psp_master->sev_data = NULL;
+ }
+ 
+-void psp_pci_exit(void)
++void sev_pci_exit(void)
+ {
+-	if (!psp_master)
++	if (!psp_master->sev_data)
+ 		return;
+ 
+ 	sev_platform_shutdown(NULL);
+diff --git a/drivers/crypto/ccp/sev-dev.h b/drivers/crypto/ccp/sev-dev.h
+index e861647..3d84ac3 100644
+--- a/drivers/crypto/ccp/sev-dev.h
++++ b/drivers/crypto/ccp/sev-dev.h
+@@ -25,37 +25,25 @@
+ #include <linux/miscdevice.h>
+ #include <linux/capability.h>
+ 
+-#include "sp-dev.h"
+-
+-#define PSP_CMD_COMPLETE		BIT(1)
+-
+-#define PSP_CMDRESP_CMD_SHIFT		16
+-#define PSP_CMDRESP_IOC			BIT(0)
+-#define PSP_CMDRESP_RESP		BIT(31)
+-#define PSP_CMDRESP_ERR_MASK		0xffff
+-
+-#define MAX_PSP_NAME_LEN		16
++#define SEV_CMD_COMPLETE		BIT(1)
++#define SEV_CMDRESP_CMD_SHIFT		16
++#define SEV_CMDRESP_IOC			BIT(0)
+ 
+ struct sev_misc_dev {
+ 	struct kref refcount;
+ 	struct miscdevice misc;
+ };
+ 
+-struct psp_device {
+-	struct list_head entry;
+-
+-	struct psp_vdata *vdata;
+-	char name[MAX_PSP_NAME_LEN];
+-
++struct sev_device {
+ 	struct device *dev;
+-	struct sp_device *sp;
++	struct psp_device *psp;
+ 
+ 	void __iomem *io_regs;
+ 
+-	int sev_state;
+-	unsigned int sev_int_rcvd;
+-	wait_queue_head_t sev_int_queue;
+-	struct sev_misc_dev *sev_misc;
++	int state;
++	unsigned int int_rcvd;
++	wait_queue_head_t int_queue;
++	struct sev_misc_dev *misc;
+ 	struct sev_user_data_status status_cmd_buf;
+ 	struct sev_data_init init_cmd_buf;
+ 
+@@ -64,4 +52,10 @@ struct psp_device {
+ 	u8 build;
+ };
+ 
++int sev_dev_init(struct psp_device *psp);
++void sev_dev_destroy(struct psp_device *psp);
++
++void sev_pci_init(void);
++void sev_pci_exit(void);
++
+ #endif /* __SEV_DEV_H */
+diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
+index 473cf14..b29d2e6 100644
+--- a/drivers/crypto/ccp/sp-pci.c
++++ b/drivers/crypto/ccp/sp-pci.c
+@@ -22,7 +22,7 @@
+ #include <linux/ccp.h>
+ 
+ #include "ccp-dev.h"
+-#include "sev-dev.h"
++#include "psp-dev.h"
+ 
+ #define MSIX_VECTORS			2
+ 
 -- 
 1.9.1
 
