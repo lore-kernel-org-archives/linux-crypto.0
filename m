@@ -2,127 +2,202 @@ Return-Path: <SRS0=RobT=Z2=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C788C43603
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Dec 2019 14:43:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91DA7C43603
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Dec 2019 15:28:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E45AF2073C
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Dec 2019 14:43:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A974207DD
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Dec 2019 15:28:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xfGLXTgY"
+	dkim=pass (2048-bit key) header.d=kernelci-org.20150623.gappssmtp.com header.i=@kernelci-org.20150623.gappssmtp.com header.b="cPNuQoPs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727880AbfLDOnE (ORCPT
+        id S1728293AbfLDP2G (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 Dec 2019 09:43:04 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:56249 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727850AbfLDOnE (ORCPT
+        Wed, 4 Dec 2019 10:28:06 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:34817 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728274AbfLDP2G (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 Dec 2019 09:43:04 -0500
-Received: by mail-wm1-f65.google.com with SMTP id q9so6186528wmj.5
-        for <linux-crypto@vger.kernel.org>; Wed, 04 Dec 2019 06:43:02 -0800 (PST)
+        Wed, 4 Dec 2019 10:28:06 -0500
+Received: by mail-wr1-f67.google.com with SMTP id g17so9145095wro.2
+        for <linux-crypto@vger.kernel.org>; Wed, 04 Dec 2019 07:28:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=71DDqTK7SGG12Z0MAUYKioVk43X0P548ZzvubPDcpes=;
-        b=xfGLXTgYxFM84Pj6WXIKpkTBhgV8oH+4gBdq1RyvnYhawSBF8J2cwk5zOUkm2AkwBB
-         UXLF/UO/MgqC6imITb42Yz650P37738iiPggY/7Tp9sGnRo0mx1LhxkuZcWsaiQtr3Yi
-         FkP6cGyRHUH8nI8pLz4H6U0yOjZr1l/4yAUdSdFuoQ7OpX3R+glAHgOtA2W1zIjlhoCT
-         WztW2OPjojfkR3LiY03h5r9yKgoOER6NRh/swNhwjJKKOb6pY1/tF/QM0rG1OBONBiCC
-         b0xlMYBLBHrOvUh/6gDA5zhdfxwQ86cniJAOZtvVIEgww/uAIJVkOWV3wouQNDgaTQDW
-         DH0Q==
+        d=kernelci-org.20150623.gappssmtp.com; s=20150623;
+        h=message-id:date:mime-version:content-transfer-encoding:subject:to
+         :from:cc;
+        bh=n0PMYgXBxpTJTwUFndMR8j8g1X+3mghMk/wqd/jqgb4=;
+        b=cPNuQoPsK/IaM6bjnT9f9fznnLZV6W3amrqNwE5KT0g0fAzb0IB/r7CZzMMmqG5ooF
+         bH1J5zqnHViwUlMvEZUMnhKSdwt5CVERjPLQwXJJ59xzXl4TkPThLLFguRiCuTZqZLgh
+         p8o9z51+Io63YGZ1D9Y3mBoy3VbQcM+CbjGLvPNMOhaoW6Hz6VFWLzT4xI3Xe6Ft6jSG
+         SWNl6f5cKTA5UVJI9eL/iWIM3Xqav0Ge9KFr1dzDqT+TaR4jNStC23Z+6MfNvMlDZFg5
+         vHOUT9n0pWZu63JbNZUgt5Wr8SRaNB8EYuYCYVvGYsz6+agsYFdQQOU/RNfLOp2vMOnS
+         7XbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=71DDqTK7SGG12Z0MAUYKioVk43X0P548ZzvubPDcpes=;
-        b=TgfZt9jSJ8c6w6mh6B6aCCpu5r40IuJfvMWHFy3ohjPM/Vzeql8rMqLpAMcjokpYKb
-         vdZ7x1/66WVCqGLY4Dz26BVWtQEsKeL2BS8zfvQVZDm+7g6KOYItDYPRL3UeUtwbBiXJ
-         g3Rlczqh+rMnL/0gT+F0arPLrpI0Uxyk0hJrRe97PMIQJbpL6icZvwBXv4upDufSaDxY
-         lgTvI3E022ndb0vHw6m+ZR02ndDygEPbUo6BiN9mdybJiQ0m1HDugT4+EjVclEeDHCR3
-         PgOKbrbf+0ibzI7kq7OFNYyXtTjdJOJgP4rBwKT7zoFJ34CTfNZ79TSTgwJjYiyfO5xf
-         NGeQ==
-X-Gm-Message-State: APjAAAWFt7yuzZJNsLEJdrAy7vtRDGnWCLqQsMN/cZMAyWlB4LdDerMS
-        0fLIyLBb7MzVYlDzPnR8YwKpWq6e33/3ljGd6sCGOmoWVHE9s/wu
-X-Google-Smtp-Source: APXvYqzBzPANQwZqpR4nb5lE+2+ez0DhI/ckjjRRwPhzDCwyB7+Q2eUdDSUNtFtrfiTPS2+MHgWhzJemLpmKh64hA2I=
-X-Received: by 2002:a7b:c778:: with SMTP id x24mr25114169wmk.119.1575470581747;
- Wed, 04 Dec 2019 06:43:01 -0800 (PST)
+        h=x-gm-message-state:message-id:date:mime-version
+         :content-transfer-encoding:subject:to:from:cc;
+        bh=n0PMYgXBxpTJTwUFndMR8j8g1X+3mghMk/wqd/jqgb4=;
+        b=kB+Ip5ZP9DpvmXsHXvEkhcgRUqH+DP2UoLfHToYQ0affnBleshiHD9Irax7dBWYO4z
+         Gye3/dHw+h1yVK4WvL1o8FT7ilRsJDMAsyT1ZCu8RclrmTx+3Uj0Ir0xuSHX0Qz00/d+
+         BE5npmhDEY0ZinNO4aAPxr8r4jimkqL8WAxiLIBUnc5sLEoRfVpC2h1I5LpCpPOOt5gI
+         Ul2vwwnuJ8m0YELBkJjd5cqino+OxzvI3SJWpSZ1NcLdl0Ar9sVN7FfwzRHepCmQ0rPF
+         JA7+ZzweO8jao8wkmfUZUFaM7z64LzIR/rfg+rsraj151sklpmPP0+pT5thLn0xKQFTK
+         ViMQ==
+X-Gm-Message-State: APjAAAUbX09xMm1X5pVdNFA2ygE9R83Ts+rLqKEHmgbrn7A/IAGeNWfo
+        5Rsq2amiM2/Y/xAXhjnO+VDf+Q==
+X-Google-Smtp-Source: APXvYqzg1TyHqcrLbHlAbi08TX3/2GpmskSRV7ZVEsEDmRuvJ1eZlWpKFOWi870svMg0kU8UUNR6OA==
+X-Received: by 2002:adf:eb46:: with SMTP id u6mr4788809wrn.239.1575473284403;
+        Wed, 04 Dec 2019 07:28:04 -0800 (PST)
+Received: from [148.251.42.114] ([2a01:4f8:201:9271::2])
+        by smtp.gmail.com with ESMTPSA id b2sm8607869wrr.76.2019.12.04.07.28.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Dec 2019 07:28:03 -0800 (PST)
+Message-ID: <5de7d083.1c69fb81.82fe2.b0da@mx.google.com>
+Date:   Wed, 04 Dec 2019 07:28:03 -0800 (PST)
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-References: <20191201215330.171990-1-ebiggers@kernel.org> <CAKv+Gu_5pcDeXxLnG_5_jMPc0VDBT3CFr5Hnpb-e4irPLu8JDg@mail.gmail.com>
-In-Reply-To: <CAKv+Gu_5pcDeXxLnG_5_jMPc0VDBT3CFr5Hnpb-e4irPLu8JDg@mail.gmail.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Wed, 4 Dec 2019 14:42:58 +0000
-Message-ID: <CAKv+Gu9fQV4-KFz=wnBkNEHa3F8cWMuX9CG=a67qhVgFkZ=cPw@mail.gmail.com>
-Subject: Re: [PATCH 0/7] crypto: more self-test improvements
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Kernelci-Report-Type: bisect
+X-Kernelci-Kernel: v5.4-9340-g16839329da69
+X-Kernelci-Tree: ardb
+X-Kernelci-Branch: for-kernelci
+X-Kernelci-Lab-Name: lab-collabora
+Subject: ardb/for-kernelci bisection: boot on rk3288-rock2-square
+To:     tomeu.vizoso@collabora.com, guillaume.tucker@collabora.com,
+        enric.balletbo@collabora.com, khilman@baylibre.com,
+        mgalka@collabora.com, Ard Biesheuvel <ardb@kernel.org>,
+        broonie@kernel.org
+From:   "kernelci.org bot" <bot@kernelci.org>
+Cc:     Alexandre Torgue <alexandre.torgue@st.com>,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 3 Dec 2019 at 12:39, Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
->
-> On Sun, 1 Dec 2019 at 21:54, Eric Biggers <ebiggers@kernel.org> wrote:
-> >
-> > This series makes some more improvements to the crypto self-tests, the
-> > largest of which is making the AEAD fuzz tests test inauthentic inputs,
-> > i.e. cases where decryption is expected to fail due to the (ciphertext,
-> > AAD) pair not being the correct result of an encryption with the key.
-> >
-> > It also updates the self-tests to test passing misaligned buffers to the
-> > various setkey() functions, and to check that skciphers have the same
-> > min_keysize as the corresponding generic implementation.
-> >
-> > I haven't seen any test failures from this on x86_64, arm64, or arm32.
-> > But as usual I haven't tested drivers for crypto accelerators.
-> >
-> > For this series to apply this cleanly, my other series
-> > "crypto: skcipher - simplifications due to {,a}blkcipher removal"
-> > needs to be applied first, due to a conflict in skcipher.h.
-> >
-> > This can also be retrieved from git at
-> > https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/linux.git
-> > tag "crypto-self-tests_2019-12-01".
-> >
-> > Eric Biggers (7):
-> >   crypto: aead - move crypto_aead_maxauthsize() to <crypto/aead.h>
-> >   crypto: skcipher - add crypto_skcipher_min_keysize()
-> >   crypto: testmgr - don't try to decrypt uninitialized buffers
-> >   crypto: testmgr - check skcipher min_keysize
-> >   crypto: testmgr - test setting misaligned keys
-> >   crypto: testmgr - create struct aead_extra_tests_ctx
-> >   crypto: testmgr - generate inauthentic AEAD test vectors
-> >
->
-> I've dropped this into kernelci again, let's see if anything turns out
-> to be broken.
->
-> For this series,
->
-> Acked-by: Ard Biesheuvel <ardb@kernel.org>
->
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+* This automated bisection report was sent to you on the basis  *
+* that you may be involved with the breaking commit it has      *
+* found.  No manual investigation has been done to verify it,   *
+* and the root cause of the problem may be somewhere else.      *
+*                                                               *
+* If you do send a fix, please include this trailer:            *
+*   Reported-by: "kernelci.org bot" <bot@kernelci.org>          *
+*                                                               *
+* Hope this helps!                                              *
+* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 
-Results here:
-https://kernelci.org/boot/all/job/ardb/branch/for-kernelci/kernel/v5.4-9340-g16839329da69/
+ardb/for-kernelci bisection: boot on rk3288-rock2-square
 
-Only the usual suspects failed (rk3288)
+Summary:
+  Start:      16839329da69 enable extra tests by default
+  Details:    https://kernelci.org/boot/id/5de791acd6451dc5be960f08
+  Plain log:  https://storage.kernelci.org//ardb/for-kernelci/v5.4-9340-g16=
+839329da69/arm/multi_v7_defconfig+CONFIG_SMP=3Dn/gcc-8/lab-collabora/boot-r=
+k3288-rock2-square.txt
+  HTML log:   https://storage.kernelci.org//ardb/for-kernelci/v5.4-9340-g16=
+839329da69/arm/multi_v7_defconfig+CONFIG_SMP=3Dn/gcc-8/lab-collabora/boot-r=
+k3288-rock2-square.html
+  Result:     16839329da69 enable extra tests by default
+
+Checks:
+  revert:     PASS
+  verify:     PASS
+
+Parameters:
+  Tree:       ardb
+  URL:        git://git.kernel.org/pub/scm/linux/kernel/git/ardb/linux.git
+  Branch:     for-kernelci
+  Target:     rk3288-rock2-square
+  CPU arch:   arm
+  Lab:        lab-collabora
+  Compiler:   gcc-8
+  Config:     multi_v7_defconfig+CONFIG_SMP=3Dn
+  Test suite: boot
+
+Breaking commit found:
+
+---------------------------------------------------------------------------=
+----
+commit 16839329da69263e7360f3819bae01bcf4b220ec
+Author: Ard Biesheuvel <ardb@kernel.org>
+Date:   Tue Dec 3 12:29:31 2019 +0000
+
+    enable extra tests by default
+
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 5575d48473bd..36af840aa820 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -140,7 +140,6 @@ if CRYPTO_MANAGER2
+ =
+
+ config CRYPTO_MANAGER_DISABLE_TESTS
+ 	bool "Disable run-time self tests"
+-	default y
+ 	help
+ 	  Disable run-time self tests that normally take place at
+ 	  algorithm registration.
+@@ -148,6 +147,7 @@ config CRYPTO_MANAGER_DISABLE_TESTS
+ config CRYPTO_MANAGER_EXTRA_TESTS
+ 	bool "Enable extra run-time crypto self tests"
+ 	depends on DEBUG_KERNEL && !CRYPTO_MANAGER_DISABLE_TESTS
++	default y
+ 	help
+ 	  Enable extra run-time self tests of registered crypto algorithms,
+ 	  including randomized fuzz tests.
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 88f33c0efb23..5df87bcf6c4d 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -40,7 +40,7 @@ static bool notests;
+ module_param(notests, bool, 0644);
+ MODULE_PARM_DESC(notests, "disable crypto self-tests");
+ =
+
+-static bool panic_on_fail;
++static bool panic_on_fail =3D true;
+ module_param(panic_on_fail, bool, 0444);
+ =
+
+ #ifdef CONFIG_CRYPTO_MANAGER_EXTRA_TESTS
+---------------------------------------------------------------------------=
+----
 
 
-> >  crypto/testmgr.c               | 574 +++++++++++++++++++++++++--------
-> >  crypto/testmgr.h               |  14 +-
-> >  include/crypto/aead.h          |  10 +
-> >  include/crypto/internal/aead.h |  10 -
-> >  include/crypto/skcipher.h      |   6 +
-> >  5 files changed, 461 insertions(+), 153 deletions(-)
-> >
-> > --
-> > 2.24.0
-> >
+Git bisection log:
+
+---------------------------------------------------------------------------=
+----
+git bisect start
+# good: [b94ae8ad9fe79da61231999f347f79645b909bda] Merge tag 'seccomp-v5.5-=
+rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/kees/linux
+git bisect good b94ae8ad9fe79da61231999f347f79645b909bda
+# bad: [16839329da69263e7360f3819bae01bcf4b220ec] enable extra tests by def=
+ault
+git bisect bad 16839329da69263e7360f3819bae01bcf4b220ec
+# good: [25cbf24a7eec7c3dee4113b2e98b572e128009b7] crypto: aead - move cryp=
+to_aead_maxauthsize() to <crypto/aead.h>
+git bisect good 25cbf24a7eec7c3dee4113b2e98b572e128009b7
+# good: [7b19c7a82950ed034645fa92adce29cd6163ed3e] crypto: testmgr - check =
+skcipher min_keysize
+git bisect good 7b19c7a82950ed034645fa92adce29cd6163ed3e
+# good: [062752a354aaf03b46b86cba5fdaa2fd5c932860] crypto: testmgr - create=
+ struct aead_extra_tests_ctx
+git bisect good 062752a354aaf03b46b86cba5fdaa2fd5c932860
+# good: [2cd56a00fff8584e342164c65e6b55da61f79c4a] crypto: testmgr - genera=
+te inauthentic AEAD test vectors
+git bisect good 2cd56a00fff8584e342164c65e6b55da61f79c4a
+# first bad commit: [16839329da69263e7360f3819bae01bcf4b220ec] enable extra=
+ tests by default
+---------------------------------------------------------------------------=
+----
