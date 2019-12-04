@@ -1,129 +1,223 @@
-Return-Path: <SRS0=f4rb=ZZ=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=RobT=Z2=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80C90C432C0
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Dec 2019 19:32:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5DBFC432C0
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Dec 2019 01:10:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 444492080F
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Dec 2019 19:32:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="TyhNG6ph"
+	by mail.kernel.org (Postfix) with ESMTP id 85E8A2073B
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Dec 2019 01:10:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727487AbfLCTbq (ORCPT
+        id S1726060AbfLDBKn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Dec 2019 14:31:46 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:35986 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727433AbfLCTbp (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Dec 2019 14:31:45 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xB3JOcB9165372;
-        Tue, 3 Dec 2019 19:31:36 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding;
- s=corp-2019-08-05; bh=qEl+pOhRr3g+RbA74TF3EJsh7AdX920CBSilgxsTtEA=;
- b=TyhNG6phCS4TQJ7F8PPU0jytfzaRchoWR6IbfN7EznnBQ/F0L+jvwdG88mZ1u5+kgpLZ
- 6BEjm/u8DxAD7qZI9poq6jroazrTa9BNAxhYM69DmOYZUbgPdQmY/v181yS9PZ6BRHAe
- dVgcPbpj1uBaxy1L8FZEJX2WJ1QZcyt5mwJH/+AeDtnFjhhnLpifjoic1/NHm8BF1BzP
- n2A3L5DnkRiFSDZ/18BPHf0h9mIJXhhup5SwnS/RqYcjjGY+YpewUOJACi52ZrSpIfS2
- rEBf2OHZwpAj/ui+N+1Bzw+xcxwwOnOvBPuVku/rNgOToZFrLVf5oW0Bl+e82BcctOSd Sg== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by aserp2120.oracle.com with ESMTP id 2wkgcq9x9c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 03 Dec 2019 19:31:35 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xB3JEcmg133392;
-        Tue, 3 Dec 2019 19:31:35 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3030.oracle.com with ESMTP id 2wn7pqmm1x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 03 Dec 2019 19:31:34 +0000
-Received: from abhmp0008.oracle.com (abhmp0008.oracle.com [141.146.116.14])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xB3JVT6O009168;
-        Tue, 3 Dec 2019 19:31:30 GMT
-Received: from localhost.localdomain (/98.229.125.203)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 03 Dec 2019 11:31:29 -0800
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Steffen Klassert <steffen.klassert@secunet.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>, linux-crypto@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Daniel Jordan <daniel.m.jordan@oracle.com>
-Subject: [PATCH v2 0/5] padata lockdep, cpumask, and doc fixes
-Date:   Tue,  3 Dec 2019 14:31:09 -0500
-Message-Id: <20191203193114.238912-1-daniel.m.jordan@oracle.com>
-X-Mailer: git-send-email 2.24.0
+        Tue, 3 Dec 2019 20:10:43 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:6743 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726008AbfLDBKn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 3 Dec 2019 20:10:43 -0500
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id BF9586C4C0B7FB096718;
+        Wed,  4 Dec 2019 09:10:36 +0800 (CST)
+Received: from [127.0.0.1] (10.67.101.242) by DGGEMS414-HUB.china.huawei.com
+ (10.3.19.214) with Microsoft SMTP Server id 14.3.439.0; Wed, 4 Dec 2019
+ 09:10:24 +0800
+Subject: Re: [PATCH v3 1/5] crypto: hisilicon - add HiSilicon SEC V2 driver
+To:     Marco Elver <elver@google.com>
+References: <1573643468-1812-1-git-send-email-xuzaibo@huawei.com>
+ <1573643468-1812-2-git-send-email-xuzaibo@huawei.com>
+ <20191203120148.GA68157@google.com>
+CC:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <linux-crypto@vger.kernel.org>, <jonathan.cameron@huawei.com>,
+        <wangzhou1@hisilicon.com>, <linuxarm@huawei.com>,
+        <fanghao11@huawei.com>, <yekai13@huawei.com>,
+        <zhangwei375@huawei.com>, <forest.zhouchang@huawei.com>
+From:   Xu Zaibo <xuzaibo@huawei.com>
+Message-ID: <4c45461f-7c72-8f3c-4785-3a119383df0b@huawei.com>
+Date:   Wed, 4 Dec 2019 09:10:24 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9460 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=984
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1912030143
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9460 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=2 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1912030143
+In-Reply-To: <20191203120148.GA68157@google.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.101.242]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This series depends on all of Herbert's recent padata fixes to reduce
-merge conflicts on his end:
+Hi,
 
-  crypto: pcrypt - Do not clear MAY_SLEEP flag in original request
-  padata: Remove unused padata_remove_cpu
-  [v3] crypto: pcrypt - Avoid deadlock by using per-instance padata queues
-  crypto: pcrypt - Fix user-after-free on module unload
-  padata: Remove broken queue flushing 
+On 2019/12/3 20:01, Marco Elver wrote:
+> Avoid using __sync builtins and instead prefer the kernel's own
+> facilities:
+>
+> See comments below for suggestions, preserving the assumed memory
+> ordering requirements (but please double-check). By using atomic_t
+> instead of __sync, you'd also avoid any data races due to plain
+> concurrent accesses.
+>
+> Reported in: https://lore.kernel.org/linux-crypto/CANpmjNM2b26Oo6k-4EqfrJf1sBj3WoFf-NQnwsLr3EW9B=G8kw@mail.gmail.com/
+Okay, I will check, and send out a patch to fixed them, thanks.
 
-If this should be based on something else, please let me know.
+>
+> On Wed, 13 Nov 2019, Zaibo Xu wrote:
+>
+>> SEC driver provides PCIe hardware device initiation with
+>> AES, SM4, and 3DES skcipher algorithms registered to Crypto.
+>> It uses Hisilicon QM as interface to CPU.
+>>
+>> Signed-off-by: Zaibo Xu <xuzaibo@huawei.com>
+>> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+>> ---
+>>   drivers/crypto/hisilicon/Kconfig           |  16 +
+>>   drivers/crypto/hisilicon/Makefile          |   1 +
+>>   drivers/crypto/hisilicon/sec2/Makefile     |   2 +
+>>   drivers/crypto/hisilicon/sec2/sec.h        | 132 +++++
+>>   drivers/crypto/hisilicon/sec2/sec_crypto.c | 886 +++++++++++++++++++++++++++++
+>>   drivers/crypto/hisilicon/sec2/sec_crypto.h | 198 +++++++
+>>   drivers/crypto/hisilicon/sec2/sec_main.c   | 640 +++++++++++++++++++++
+>>   7 files changed, 1875 insertions(+)
+>>   create mode 100644 drivers/crypto/hisilicon/sec2/Makefile
+>>   create mode 100644 drivers/crypto/hisilicon/sec2/sec.h
+>>   create mode 100644 drivers/crypto/hisilicon/sec2/sec_crypto.c
+>>   create mode 100644 drivers/crypto/hisilicon/sec2/sec_crypto.h
+>>   create mode 100644 drivers/crypto/hisilicon/sec2/sec_main.c
+> [...]
+>> diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
+>> new file mode 100644
+>> index 0000000..443b6c5
+>> --- /dev/null
+>> +++ b/drivers/crypto/hisilicon/sec2/sec.h
+>> @@ -0,0 +1,132 @@
+> [...]
+>> +
+>> +/* SEC request of Crypto */
+>> +struct sec_req {
+>> +	struct sec_sqe sec_sqe;
+>> +	struct sec_ctx *ctx;
+>> +	struct sec_qp_ctx *qp_ctx;
+>> +
+>> +	/* Cipher supported only at present */
+>> +	struct sec_cipher_req c_req;
+>> +	int err_type;
+>> +	int req_id;
+>> +
+>> +	/* Status of the SEC request */
+>> +	int fake_busy;
+> This could be
+>
+> 	atomic_t fake_busy;
+Yes, atomic_t is better.
+>
+>> +};
+>> +
+> [...]
+>> diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+>> new file mode 100644
+>> index 0000000..23092a9
+>> --- /dev/null
+>> +++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+>> @@ -0,0 +1,886 @@
+> Add
+>
+> 	#include <linux/atomic.h>
+Okay.
+>
+> [...]
+>> +static int sec_bd_send(struct sec_ctx *ctx, struct sec_req *req)
+>> +{
+>> +	struct sec_qp_ctx *qp_ctx = req->qp_ctx;
+>> +	int ret;
+>> +
+>> +	mutex_lock(&qp_ctx->req_lock);
+>> +	ret = hisi_qp_send(qp_ctx->qp, &req->sec_sqe);
+>> +	mutex_unlock(&qp_ctx->req_lock);
+>> +
+>> +	if (ret == -EBUSY)
+>> +		return -ENOBUFS;
+>> +
+>> +	if (!ret) {
+>> +		if (req->fake_busy)
+> This could be:
+>
+> 	atomic_read(&req->fake_busy)
+yes.
+>
+>> +			ret = -EBUSY;
+>> +		else
+>> +			ret = -EINPROGRESS;
+>> +	}
+>> +
+>> +	return ret;
+>> +}
+> [...]
+>> +static void sec_skcipher_callback(struct sec_ctx *ctx, struct sec_req *req)
+>> +{
+>> +	struct skcipher_request *sk_req = req->c_req.sk_req;
+>> +	struct sec_qp_ctx *qp_ctx = req->qp_ctx;
+>> +
+>> +	atomic_dec(&qp_ctx->pending_reqs);
+>> +	sec_free_req_id(req);
+>> +
+>> +	/* IV output at encrypto of CBC mode */
+>> +	if (ctx->c_ctx.c_mode == SEC_CMODE_CBC && req->c_req.encrypt)
+>> +		sec_update_iv(req);
+>> +
+>> +	if (__sync_bool_compare_and_swap(&req->fake_busy, 1, 0))
+> This could be:
+>
+> 	int expect_val = 1;
+> 	...
+> 	if (atomic_try_cmpxchg_relaxed(&req->fake_busy, &expect_val, 0))
+okay
+>
+>> +		sk_req->base.complete(&sk_req->base, -EINPROGRESS);
+>> +
+>> +	sk_req->base.complete(&sk_req->base, req->err_type);
+>> +}
+>> +
+>> +static void sec_request_uninit(struct sec_ctx *ctx, struct sec_req *req)
+>> +{
+>> +	struct sec_qp_ctx *qp_ctx = req->qp_ctx;
+>> +
+>> +	atomic_dec(&qp_ctx->pending_reqs);
+>> +	sec_free_req_id(req);
+>> +	sec_put_queue_id(ctx, req);
+>> +}
+>> +
+>> +static int sec_request_init(struct sec_ctx *ctx, struct sec_req *req)
+>> +{
+>> +	struct sec_qp_ctx *qp_ctx;
+>> +	int issue_id, ret;
+>> +
+>> +	/* To load balance */
+>> +	issue_id = sec_get_queue_id(ctx, req);
+>> +	qp_ctx = &ctx->qp_ctx[issue_id];
+>> +
+>> +	req->req_id = sec_alloc_req_id(req, qp_ctx);
+>> +	if (req->req_id < 0) {
+>> +		sec_put_queue_id(ctx, req);
+>> +		return req->req_id;
+>> +	}
+>> +
+>> +	if (ctx->fake_req_limit <= atomic_inc_return(&qp_ctx->pending_reqs))
+>> +		req->fake_busy = 1;
+>> +	else
+>> +		req->fake_busy = 0;
+> These could be:
+>
+> 	atomic_set(&req->fake_busy, ...)
+Yes, thanks.
 
-Thanks,
-Daniel
+cheers,
+Zaibo
+.
+>
 
-v2:
- - documentation patch RST-ized according to Jon's comments
- - "validate cpumask" patch added
- - rebased onto v5.4 and updated since Herbert's fixes have changed
-
-Daniel Jordan (5):
-  padata: validate cpumask without removed CPU during offline
-  padata: always acquire cpu_hotplug_lock before pinst->lock
-  padata: remove cpumask change notifier
-  padata: remove reorder_objects
-  padata: update documentation
-
- Documentation/core-api/index.rst  |   1 +
- Documentation/core-api/padata.rst | 169 ++++++++++++++++++++++++++++++
- Documentation/padata.txt          | 163 ----------------------------
- crypto/pcrypt.c                   |   1 -
- include/linux/cpuhotplug.h        |   1 +
- include/linux/padata.h            |  28 ++---
- kernel/padata.c                   | 124 ++++++++--------------
- 7 files changed, 220 insertions(+), 267 deletions(-)
- create mode 100644 Documentation/core-api/padata.rst
- delete mode 100644 Documentation/padata.txt
-
-
-base-commit: 219d54332a09e8d8741c1e1982f5eae56099de85
-prerequisite-patch-id: e31e7b28eb12a2c7e1e04261f4e890f83a57bd19
-prerequisite-patch-id: 00f7ca687bd9df6281e9ced0925a865b2fa7b297
-prerequisite-patch-id: 9f3bb985b34d29ff30e44b8829545736de02186f
-prerequisite-patch-id: fe09ee84131ee649b90ee291fbbeda32e90c42fe
-prerequisite-patch-id: f2e5a29f78e2403677ad50d870d90022932bc2b6
--- 
-2.24.0
 
