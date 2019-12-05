@@ -7,26 +7,26 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47323C2BD09
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Dec 2019 09:54:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB677C2BD09
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Dec 2019 09:55:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 02CFA224F8
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Dec 2019 09:54:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 954D524654
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Dec 2019 09:55:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=microchiptechnology.onmicrosoft.com header.i=@microchiptechnology.onmicrosoft.com header.b="hBYRSmua"
+	dkim=pass (1024-bit key) header.d=microchiptechnology.onmicrosoft.com header.i=@microchiptechnology.onmicrosoft.com header.b="uW4XbtAv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729380AbfLEJyB (ORCPT
+        id S1729356AbfLEJx6 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 Dec 2019 04:54:01 -0500
-Received: from esa2.microchip.iphmx.com ([68.232.149.84]:11822 "EHLO
-        esa2.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729362AbfLEJx7 (ORCPT
+        Thu, 5 Dec 2019 04:53:58 -0500
+Received: from esa4.microchip.iphmx.com ([68.232.154.123]:51688 "EHLO
+        esa4.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729339AbfLEJx6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 Dec 2019 04:53:59 -0500
-Received-SPF: Pass (esa2.microchip.iphmx.com: domain of
+        Thu, 5 Dec 2019 04:53:58 -0500
+Received-SPF: Pass (esa4.microchip.iphmx.com: domain of
   Tudor.Ambarus@microchip.com designates 198.175.253.82 as
   permitted sender) identity=mailfrom;
-  client-ip=198.175.253.82; receiver=esa2.microchip.iphmx.com;
+  client-ip=198.175.253.82; receiver=esa4.microchip.iphmx.com;
   envelope-from="Tudor.Ambarus@microchip.com";
   x-sender="Tudor.Ambarus@microchip.com";
   x-conformance=spf_only; x-record-type="v=spf1";
@@ -34,38 +34,38 @@ Received-SPF: Pass (esa2.microchip.iphmx.com: domain of
   a:smtpout.microchip.com -exists:%{i}.spf.microchip.iphmx.com
   include:servers.mcsv.net include:mktomail.com
   include:spf.protection.outlook.com ~all"
-Received-SPF: None (esa2.microchip.iphmx.com: no sender
+Received-SPF: None (esa4.microchip.iphmx.com: no sender
   authenticity information available from domain of
   postmaster@email.microchip.com) identity=helo;
-  client-ip=198.175.253.82; receiver=esa2.microchip.iphmx.com;
+  client-ip=198.175.253.82; receiver=esa4.microchip.iphmx.com;
   envelope-from="Tudor.Ambarus@microchip.com";
   x-sender="postmaster@email.microchip.com";
   x-conformance=spf_only
-Authentication-Results: esa2.microchip.iphmx.com; spf=Pass smtp.mailfrom=Tudor.Ambarus@microchip.com; spf=None smtp.helo=postmaster@email.microchip.com; dkim=pass (signature verified) header.i=@microchiptechnology.onmicrosoft.com; dmarc=pass (p=none dis=none) d=microchip.com
-IronPort-SDR: H9DBKcHPm/6UITtM+xTSNud3tqn877qOJJzq9SvvG9UlJWq/b5fQBm/pmMgSVX0Wd/1/WOqNfH
- KfJOTK4uzMBYfEfY2rmIUXWUmUf+28Kb5BngNru1AIxTUWkdMKY+GQTP2LLgDXvYZMzbKuv662
- elJsfqGTmuE6r8q0EHdc+BLsw+upflSU4rtn5ITXMUeOcN0HAm6Tp+25sT7Sj2BlscwMLIpN2l
- XJqUkuNZS9ni806jCgF096PuCWDLfdumcoWIAg27t5ljAEKvHIwP1l/Ys55Kq2q6GySvrlW0ST
- QNQ=
+Authentication-Results: esa4.microchip.iphmx.com; spf=Pass smtp.mailfrom=Tudor.Ambarus@microchip.com; spf=None smtp.helo=postmaster@email.microchip.com; dkim=pass (signature verified) header.i=@microchiptechnology.onmicrosoft.com; dmarc=pass (p=none dis=none) d=microchip.com
+IronPort-SDR: mvrC3xOwnAcgryn910WMshypjFqmoH6Pr7vQ6aek52q2oO+RvzByEDKljyFxtDKYP95Plkdkg9
+ kN62HxHZ1LwrpGSLJmnOLDGmYb5FSuAj+AePUNbBYrT/yNcBrIbYKg+3jLFsySw0sRAoYDrh1R
+ V+Wtpkg4RasHgV3BO4q0hlj9hV1bruf0J/UvP5SAK4WS6nZ9qazx7siftWbERRyuWJLpISja+Q
+ IG7P6NvWdEFWraKrjIOnMYByeB/eFuwY3KGWrt6IzHLGQfQZnTKhksZYMr695Qnh3LTDRv22NM
+ X6w=
 X-IronPort-AV: E=Sophos;i="5.69,281,1571727600"; 
-   d="scan'208";a="58828896"
+   d="scan'208";a="57544835"
 Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 05 Dec 2019 02:53:58 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+  by esa4.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 05 Dec 2019 02:53:56 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Thu, 5 Dec 2019 02:54:01 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (10.10.215.89) by
- email.microchip.com (10.10.87.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5 via Frontend
- Transport; Thu, 5 Dec 2019 02:53:59 -0700
+ 15.1.1713.5; Thu, 5 Dec 2019 02:53:52 -0700
+Received: from NAM04-CO1-obe.outbound.protection.outlook.com (10.10.215.89) by
+ email.microchip.com (10.10.87.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5
+ via Frontend Transport; Thu, 5 Dec 2019 02:53:51 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HRBfOM4R8o019KChFp2fX79LxD4Gah4tOwSyJXD59v8S1syXWI1kM9aWPUjZM/kzMkYR66HZylzSVQP1xJ0Xy50hzwAtXM/9Gb80vlXs1ZUptHiTk+sMM2E/jiRbgOoJcs9iuVyVYa8UqQc22on5v9VJREEgrLvx/H3GCXm+gZxnetKvsD/mGT6Xfj3uTbm79fsqwz+FBTQ1J5F/3uTSJTSBllZhN7y+YOJOCKB+Bsl+V2nK8fuMYaTwhpDFdjfGu1q0hxEDSbTFCwAapO619WzCqNV78prwaA9iGBMG5SXMfLkLheJLFyTVeGwpuYUS9uPgK2MtCoW5z5MFuulo3Q==
+ b=ayJZbXF59jqlORHEK7GxEeRbV8EitzLEATdd0zkDAFVd9YCakEQlkTlELLcioQIe+8BIs7RwmpS7ACo9FSbR5WMVdISSVey2slf/D/UKzk9UU2bYJZFv+UqQj8atJB0xoBtIDM5/qIYUjopRgs7SKkZg782CqNusppOVcjiKsTpq0uSswbvCF+7Q/95AlBk5JKARWEuGHqiwUWradwzV76njbLR8eD7vHGGDMVGOeSRslUbx/QrMJbhprAACQ3R/X49Kr3u+BP0H4YeMPjS2f0wEJr+/iZdOtZXPR+f8yZUHEtDAoNprbiSMewikIzbtAuPeKv4Bjg9owD7Tmbrf9A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=C2yI5B4TbJuXvq8eZV2Ob4tKcjcAD4x0kTko29XWxAM=;
- b=G6O3P0lemTiQ435lIjqaN7Zjuelm4SgMFHx8lstblC9of6XedkeMiTY6KUUGxG8aiTySRmKuVtALweODvOBYGjLcRTYBQjISH3L+oRfqqfIvlaXVbgQrEmZPl0/zI43NvHh0mP1tOwbAgoV9dTBeRbA84fEN/RQct3PMqEy05hJH0iQTd2ZktcTUZ6b2ZZ6+b5VkObmvfY7R8qeoWFnt/0juI3wmr3yNzYYoK8c/CDnAkkIyiRpVY8YwuZz5ceLk8joZ3qoHLiiaAWvwcz9qSL/YO+j1gfDMcjIjDkDNa60WFV0rD3UEo/zb7dIOys03IJpptECXTOhzpLVjp6rcIw==
+ bh=mvSrvoS5dVkNU+oGN2yTf3DQHoV59G2i2Qo6vcY+f9M=;
+ b=TgpmPneSWdIUhwWnLA2VJj4KQDWefGnr06A5GSxmBfGBYfbZagdYADmN5SSFzZ5icWURLMp9VPbwCqJSMmp4AYUzAOs6X/P4pYRAA1bWAGDwErgnGzrH37mGeTvYmDVv+fKVmbxbAQoGm8mmDs9Xt/G4Zn8sbMfyvl+4xsebjoJ9rRgmPTnJIl54Xn8Dpw5dg81Wfr9F25Gid6AWv9vigEdubfZ10p6MmWOQZU0BxJvZcwIm3KvPpubAiiu9KH+sqA5sGs0lBJ25Fx9us6xphxUzhPbNQLCvYVRju2abftzPZAOlQ3fslTJiRz4iPoq8eWnu4btfGgx/e4GqogdQjQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=microchip.com; dmarc=pass action=none
  header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
@@ -73,29 +73,29 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=microchiptechnology.onmicrosoft.com;
  s=selector2-microchiptechnology-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=C2yI5B4TbJuXvq8eZV2Ob4tKcjcAD4x0kTko29XWxAM=;
- b=hBYRSmuaq1Wamsh5Hxg1AKjIy0Y/kZsOqkGDFXBHGbB/UaSDyko7/8o17zGLe6Wr2K9vnQH+ayfMgsjFE0iYEhY2dkjCne+El8Jg5h4aBqV6JXz/FRYdV1qRF2rrxIOudaeAlkQCNU1SzCchPssjr2WTLmZXgnpZWGMruvFiOKY=
+ bh=mvSrvoS5dVkNU+oGN2yTf3DQHoV59G2i2Qo6vcY+f9M=;
+ b=uW4XbtAvZ6utytbEWvjWxKLgJmZurVwG6d07FSN+rjPGVYu78BTCfb9BViFtq5EF8o3y3N6jnIBN0AljPKSvfn488wzVjPgqDVSk+MrhW0MKqGQSxqhzykVy+zb4p/dVdtK9PjUo2q2e0ULfua7TKN84UkUlwZ3A0BxYkH6accA=
 Received: from MN2PR11MB4448.namprd11.prod.outlook.com (52.135.39.157) by
- MN2PR11MB3677.namprd11.prod.outlook.com (20.178.253.145) with Microsoft SMTP
+ MN2PR11MB4288.namprd11.prod.outlook.com (52.135.37.206) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2516.13; Thu, 5 Dec 2019 09:53:57 +0000
+ 15.20.2495.20; Thu, 5 Dec 2019 09:53:50 +0000
 Received: from MN2PR11MB4448.namprd11.prod.outlook.com
  ([fe80::84c:6e75:22df:cbc9]) by MN2PR11MB4448.namprd11.prod.outlook.com
  ([fe80::84c:6e75:22df:cbc9%5]) with mapi id 15.20.2495.026; Thu, 5 Dec 2019
- 09:53:57 +0000
+ 09:53:50 +0000
 From:   <Tudor.Ambarus@microchip.com>
 To:     <herbert@gondor.apana.org.au>
 CC:     <Nicolas.Ferre@microchip.com>, <alexandre.belloni@bootlin.com>,
         <Ludovic.Desroches@microchip.com>, <linux-crypto@vger.kernel.org>,
         <linux-arm-kernel@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>, <Tudor.Ambarus@microchip.com>
-Subject: [PATCH 08/16] crypto: atmel-tdes - Map driver data flags to Mode
- Register
-Thread-Topic: [PATCH 08/16] crypto: atmel-tdes - Map driver data flags to Mode
- Register
-Thread-Index: AQHVq1Hp7la3PCOa8E+6QB5Iy+b5zg==
-Date:   Thu, 5 Dec 2019 09:53:56 +0000
-Message-ID: <20191205095326.5094-9-tudor.ambarus@microchip.com>
+Subject: [PATCH 04/16] crypto: atmel-{sha,tdes} - Propagate error from
+ _hw_version_init()
+Thread-Topic: [PATCH 04/16] crypto: atmel-{sha,tdes} - Propagate error from
+ _hw_version_init()
+Thread-Index: AQHVq1HlIYTa3qx/o0e+5eYjgTGE8g==
+Date:   Thu, 5 Dec 2019 09:53:50 +0000
+Message-ID: <20191205095326.5094-5-tudor.ambarus@microchip.com>
 References: <20191205095326.5094-1-tudor.ambarus@microchip.com>
 In-Reply-To: <20191205095326.5094-1-tudor.ambarus@microchip.com>
 Accept-Language: en-US
@@ -109,29 +109,29 @@ x-ms-exchange-messagesentrepresentingtype: 1
 x-mailer: git-send-email 2.14.5
 x-originating-ip: [94.177.32.156]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 221e222c-ee38-417f-cb3f-08d779690b71
-x-ms-traffictypediagnostic: MN2PR11MB3677:
+x-ms-office365-filtering-correlation-id: 949bd7b1-98eb-4ce4-2129-08d77969076a
+x-ms-traffictypediagnostic: MN2PR11MB4288:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MN2PR11MB367770609B3AD01ED84D58F1F05C0@MN2PR11MB3677.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:121;
+x-microsoft-antispam-prvs: <MN2PR11MB4288113427DE25F7EABD9800F05C0@MN2PR11MB4288.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:1169;
 x-forefront-prvs: 02426D11FE
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(366004)(136003)(39860400002)(376002)(346002)(396003)(189003)(199004)(2616005)(66556008)(305945005)(66476007)(66446008)(102836004)(64756008)(11346002)(5660300002)(52116002)(76176011)(99286004)(36756003)(66946007)(2906002)(54906003)(26005)(6916009)(6506007)(1076003)(8676002)(6486002)(4326008)(50226002)(1730700003)(8936002)(14454004)(81156014)(186003)(86362001)(81166006)(5640700003)(478600001)(6512007)(71200400001)(25786009)(316002)(71190400001)(14444005)(107886003);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR11MB3677;H:MN2PR11MB4448.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(346002)(376002)(136003)(39860400002)(396003)(366004)(189003)(199004)(6506007)(1076003)(305945005)(4326008)(2616005)(86362001)(478600001)(11346002)(102836004)(107886003)(2906002)(50226002)(5660300002)(66446008)(66946007)(66476007)(66556008)(14454004)(1730700003)(64756008)(76176011)(8936002)(52116002)(81166006)(186003)(5640700003)(81156014)(36756003)(71200400001)(71190400001)(54906003)(6512007)(316002)(6486002)(25786009)(8676002)(26005)(6916009)(99286004)(142933001);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR11MB4288;H:MN2PR11MB4448.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
 received-spf: None (protection.outlook.com: microchip.com does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 8C4tysKQFVrgOOyR6gJ1bm989u1Ab2p2IyNZTwHJfsvYD3uhL2B7Ys723T9mxsQI7EtJOKkcBXC6HSsyuDekIG0kVH3wGCzSX+ATP8kNsdSzHOvJvZyCfaRtP4YtoyVMcOjNWFIGGoyVzRKIEQwzkRJ4GRqDqhm9ttZWbHcLbpz1dfGJQrrdoZzlVq31nayuYFaii97RF7gQSUckiTH15w6t6Po6IowgHeDLxlCvJYCkvgKkSrvqmjN5l3LtiS68yPOupVsXaYQLVnv6sKkE+o+elKpqjWJN138ZiABjOY4g8KtvLnbO1D42G5mVck34aDot/P+CblGh1VF4CTWW/GYIIF+lkx5u5zOfUOiZleZJiqzy3/5afsHHrUTwVG9GJIp5imGkJ8itddOta3FoBgdLqOGv/RXresMm3BEdt2IFW33yd94soPcdOKhHLAlc
+x-microsoft-antispam-message-info: ZJOB9lrb2Iv2qFCBxPkbf61byBKWRIeHHEo96dc9cNt1aCbMmzimWswZD81VJkDenLYJLnz4TQFH9R64zewZ6Nm/jUdce3qOheHxyJvzJJKElqbDvkcGgMTj0fN1v6c1e7UBFc+A5qNbIHuq6WFC+4SQaSELaflSDuNbmt3W1XpAkJdnAPHil8vNS6XBDJDTdO0eZVu4EI0ESeDWOcUMHEwO6MjOW50uBUDujWSiD0Eqd5aM1tNFbhIw8fNe1KbgzPXO2cmu/3m2uYnEghKRSPBGMnXuoULZTN7bHKYxA9YESikMULs1wppvEYqWpP6VLPLPSr266iaav7MzHPNjlhfZUZay3T79OwbNy0uMl6aNRzQNbZzbhMwDO/DxxLww6Lk6sOE8G7ZbgN8Eq82TPjXVXFpZN7lOgnr713FHvGJxmiAP1UXjEgjsumAse+8CfDboQ4j6KaiLosp2dC5U+VkwR5fJw1DX6bfmuIqDre7OKUQvoOc0wMzGcmKDUg/x
 Content-Type: text/plain; charset="iso-8859-1"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: 221e222c-ee38-417f-cb3f-08d779690b71
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Dec 2019 09:53:56.8377
+X-MS-Exchange-CrossTenant-Network-Message-Id: 949bd7b1-98eb-4ce4-2129-08d77969076a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Dec 2019 09:53:50.0956
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: v2XlPvL2HApJksX/78QTzxfobO6Z8ysmu8bqUBgdwcUXSClnIeVK9JKJjV0Tobic9Cn4fyI2cVjw9FA/71UyHi4WLIq73Ygqu0wYJ68dHeE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB3677
+X-MS-Exchange-CrossTenant-userprincipalname: 6/PXqWM6g911pFXIwoyebhNfmJris6bkwgJWOLJyXxgZx9DqI9miDuTN2NAAeVEPNnjmXurbD0gMnBivfrLWyvr69z6Lno8MYgo5KUHOyxc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4288
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
@@ -139,307 +139,102 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Tudor Ambarus <tudor.ambarus@microchip.com>
 
-Simplifies the configuration of the TDES IP.
+atmel_{sha,tdes}_hw_version_init() calls atmel_{sha,tdes}_hw_init(),
+which may fail. Check the return code of atmel_{sha,tdes}_hw_init()
+and propagate the error if needed.
 
 Signed-off-by: Tudor Ambarus <tudor.ambarus@microchip.com>
 ---
- drivers/crypto/atmel-tdes.c | 144 ++++++++++++++++++++++------------------=
-----
- 1 file changed, 71 insertions(+), 73 deletions(-)
+ drivers/crypto/atmel-sha.c  | 14 +++++++++++---
+ drivers/crypto/atmel-tdes.c | 14 +++++++++++---
+ 2 files changed, 22 insertions(+), 6 deletions(-)
 
+diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
+index 3bbec58bf2cd..bf53b8aa8bfc 100644
+--- a/drivers/crypto/atmel-sha.c
++++ b/drivers/crypto/atmel-sha.c
+@@ -1038,9 +1038,13 @@ static inline unsigned int atmel_sha_get_version(str=
+uct atmel_sha_dev *dd)
+ 	return atmel_sha_read(dd, SHA_HW_VERSION) & 0x00000fff;
+ }
+=20
+-static void atmel_sha_hw_version_init(struct atmel_sha_dev *dd)
++static int atmel_sha_hw_version_init(struct atmel_sha_dev *dd)
+ {
+-	atmel_sha_hw_init(dd);
++	int err;
++
++	err =3D atmel_sha_hw_init(dd);
++	if (err)
++		return err;
+=20
+ 	dd->hw_version =3D atmel_sha_get_version(dd);
+=20
+@@ -1048,6 +1052,8 @@ static void atmel_sha_hw_version_init(struct atmel_sh=
+a_dev *dd)
+ 			"version: 0x%x\n", dd->hw_version);
+=20
+ 	clk_disable(dd->iclk);
++
++	return 0;
+ }
+=20
+ static int atmel_sha_handle_queue(struct atmel_sha_dev *dd,
+@@ -2811,7 +2817,9 @@ static int atmel_sha_probe(struct platform_device *pd=
+ev)
+ 	if (err)
+ 		goto res_err;
+=20
+-	atmel_sha_hw_version_init(sha_dd);
++	err =3D atmel_sha_hw_version_init(sha_dd);
++	if (err)
++		goto iclk_unprepare;
+=20
+ 	atmel_sha_get_cap(sha_dd);
+=20
 diff --git a/drivers/crypto/atmel-tdes.c b/drivers/crypto/atmel-tdes.c
-index 0b9badbd232d..ddb211706cba 100644
+index 1b1767ca9444..c47ceb593fa4 100644
 --- a/drivers/crypto/atmel-tdes.c
 +++ b/drivers/crypto/atmel-tdes.c
-@@ -40,20 +40,23 @@
- #define ATMEL_TDES_PRIORITY	300
+@@ -236,9 +236,13 @@ static inline unsigned int atmel_tdes_get_version(stru=
+ct atmel_tdes_dev *dd)
+ 	return atmel_tdes_read(dd, TDES_HW_VERSION) & 0x00000fff;
+ }
 =20
- /* TDES flags  */
--#define TDES_FLAGS_MODE_MASK		0x00ff
--#define TDES_FLAGS_ENCRYPT	BIT(0)
--#define TDES_FLAGS_CBC		BIT(1)
--#define TDES_FLAGS_CFB		BIT(2)
--#define TDES_FLAGS_CFB8		BIT(3)
--#define TDES_FLAGS_CFB16	BIT(4)
--#define TDES_FLAGS_CFB32	BIT(5)
--#define TDES_FLAGS_CFB64	BIT(6)
--#define TDES_FLAGS_OFB		BIT(7)
--
--#define TDES_FLAGS_INIT		BIT(16)
--#define TDES_FLAGS_FAST		BIT(17)
--#define TDES_FLAGS_BUSY		BIT(18)
--#define TDES_FLAGS_DMA		BIT(19)
-+/* Reserve bits [17:16], [13:12], [2:0] for AES Mode Register */
-+#define TDES_FLAGS_ENCRYPT	TDES_MR_CYPHER_ENC
-+#define TDES_FLAGS_OPMODE_MASK	(TDES_MR_OPMOD_MASK | TDES_MR_CFBS_MASK)
-+#define TDES_FLAGS_ECB		TDES_MR_OPMOD_ECB
-+#define TDES_FLAGS_CBC		TDES_MR_OPMOD_CBC
-+#define TDES_FLAGS_OFB		TDES_MR_OPMOD_OFB
-+#define TDES_FLAGS_CFB64	(TDES_MR_OPMOD_CFB | TDES_MR_CFBS_64b)
-+#define TDES_FLAGS_CFB32	(TDES_MR_OPMOD_CFB | TDES_MR_CFBS_32b)
-+#define TDES_FLAGS_CFB16	(TDES_MR_OPMOD_CFB | TDES_MR_CFBS_16b)
-+#define TDES_FLAGS_CFB8		(TDES_MR_OPMOD_CFB | TDES_MR_CFBS_8b)
+-static void atmel_tdes_hw_version_init(struct atmel_tdes_dev *dd)
++static int atmel_tdes_hw_version_init(struct atmel_tdes_dev *dd)
+ {
+-	atmel_tdes_hw_init(dd);
++	int err;
 +
-+#define TDES_FLAGS_MODE_MASK	(TDES_FLAGS_OPMODE_MASK | TDES_FLAGS_ENCRYPT)
++	err =3D atmel_tdes_hw_init(dd);
++	if (err)
++		return err;
+=20
+ 	dd->hw_version =3D atmel_tdes_get_version(dd);
+=20
+@@ -246,6 +250,8 @@ static void atmel_tdes_hw_version_init(struct atmel_tde=
+s_dev *dd)
+ 			"version: 0x%x\n", dd->hw_version);
+=20
+ 	clk_disable_unprepare(dd->iclk);
 +
-+#define TDES_FLAGS_INIT		BIT(3)
-+#define TDES_FLAGS_FAST		BIT(4)
-+#define TDES_FLAGS_BUSY		BIT(5)
-+#define TDES_FLAGS_DMA		BIT(6)
++	return 0;
+ }
 =20
- #define ATMEL_TDES_QUEUE_LENGTH	50
-=20
-@@ -287,35 +290,15 @@ static int atmel_tdes_write_ctrl(struct atmel_tdes_de=
-v *dd)
- 		valmr |=3D TDES_MR_TDESMOD_DES;
+ static void atmel_tdes_dma_callback(void *data)
+@@ -1309,7 +1315,9 @@ static int atmel_tdes_probe(struct platform_device *p=
+dev)
+ 		goto res_err;
  	}
 =20
--	if (dd->flags & TDES_FLAGS_CBC) {
--		valmr |=3D TDES_MR_OPMOD_CBC;
--	} else if (dd->flags & TDES_FLAGS_CFB) {
--		valmr |=3D TDES_MR_OPMOD_CFB;
--
--		if (dd->flags & TDES_FLAGS_CFB8)
--			valmr |=3D TDES_MR_CFBS_8b;
--		else if (dd->flags & TDES_FLAGS_CFB16)
--			valmr |=3D TDES_MR_CFBS_16b;
--		else if (dd->flags & TDES_FLAGS_CFB32)
--			valmr |=3D TDES_MR_CFBS_32b;
--		else if (dd->flags & TDES_FLAGS_CFB64)
--			valmr |=3D TDES_MR_CFBS_64b;
--	} else if (dd->flags & TDES_FLAGS_OFB) {
--		valmr |=3D TDES_MR_OPMOD_OFB;
--	}
--
--	if ((dd->flags & TDES_FLAGS_ENCRYPT) || (dd->flags & TDES_FLAGS_OFB))
--		valmr |=3D TDES_MR_CYPHER_ENC;
-+	valmr |=3D dd->flags & TDES_FLAGS_MODE_MASK;
+-	atmel_tdes_hw_version_init(tdes_dd);
++	err =3D atmel_tdes_hw_version_init(tdes_dd);
++	if (err)
++		goto res_err;
 =20
- 	atmel_tdes_write(dd, TDES_MR, valmr);
+ 	atmel_tdes_get_cap(tdes_dd);
 =20
- 	atmel_tdes_write_n(dd, TDES_KEY1W1R, dd->ctx->key,
- 						dd->ctx->keylen >> 2);
-=20
--	if (((dd->flags & TDES_FLAGS_CBC) || (dd->flags & TDES_FLAGS_CFB) ||
--		(dd->flags & TDES_FLAGS_OFB)) && dd->req->iv) {
-+	if (dd->req->iv && (valmr & TDES_MR_OPMOD_MASK) !=3D TDES_MR_OPMOD_ECB)
- 		atmel_tdes_write_n(dd, TDES_IV1R, (void *)dd->req->iv, 2);
--	}
-=20
- 	return 0;
- }
-@@ -406,6 +389,7 @@ static int atmel_tdes_crypt_pdc(struct crypto_tfm *tfm,=
- dma_addr_t dma_addr_in,
- {
- 	struct atmel_tdes_ctx *ctx =3D crypto_tfm_ctx(tfm);
- 	struct atmel_tdes_dev *dd =3D ctx->dd;
-+	struct atmel_tdes_reqctx *rctx =3D skcipher_request_ctx(dd->req);
- 	int len32;
-=20
- 	dd->dma_size =3D length;
-@@ -415,12 +399,19 @@ static int atmel_tdes_crypt_pdc(struct crypto_tfm *tf=
-m, dma_addr_t dma_addr_in,
- 					   DMA_TO_DEVICE);
- 	}
-=20
--	if ((dd->flags & TDES_FLAGS_CFB) && (dd->flags & TDES_FLAGS_CFB8))
-+	switch (rctx->mode & TDES_FLAGS_OPMODE_MASK) {
-+	case TDES_FLAGS_CFB8:
- 		len32 =3D DIV_ROUND_UP(length, sizeof(u8));
--	else if ((dd->flags & TDES_FLAGS_CFB) && (dd->flags & TDES_FLAGS_CFB16))
-+		break;
-+
-+	case TDES_FLAGS_CFB16:
- 		len32 =3D DIV_ROUND_UP(length, sizeof(u16));
--	else
-+		break;
-+
-+	default:
- 		len32 =3D DIV_ROUND_UP(length, sizeof(u32));
-+		break;
-+	}
-=20
- 	atmel_tdes_write(dd, TDES_PTCR, TDES_PTCR_TXTDIS|TDES_PTCR_RXTDIS);
- 	atmel_tdes_write(dd, TDES_TPR, dma_addr_in);
-@@ -442,8 +433,10 @@ static int atmel_tdes_crypt_dma(struct crypto_tfm *tfm=
-, dma_addr_t dma_addr_in,
- {
- 	struct atmel_tdes_ctx *ctx =3D crypto_tfm_ctx(tfm);
- 	struct atmel_tdes_dev *dd =3D ctx->dd;
-+	struct atmel_tdes_reqctx *rctx =3D skcipher_request_ctx(dd->req);
- 	struct scatterlist sg[2];
- 	struct dma_async_tx_descriptor	*in_desc, *out_desc;
-+	enum dma_slave_buswidth addr_width;
-=20
- 	dd->dma_size =3D length;
-=20
-@@ -452,23 +445,23 @@ static int atmel_tdes_crypt_dma(struct crypto_tfm *tf=
-m, dma_addr_t dma_addr_in,
- 					   DMA_TO_DEVICE);
- 	}
-=20
--	if (dd->flags & TDES_FLAGS_CFB8) {
--		dd->dma_lch_in.dma_conf.dst_addr_width =3D
--			DMA_SLAVE_BUSWIDTH_1_BYTE;
--		dd->dma_lch_out.dma_conf.src_addr_width =3D
--			DMA_SLAVE_BUSWIDTH_1_BYTE;
--	} else if (dd->flags & TDES_FLAGS_CFB16) {
--		dd->dma_lch_in.dma_conf.dst_addr_width =3D
--			DMA_SLAVE_BUSWIDTH_2_BYTES;
--		dd->dma_lch_out.dma_conf.src_addr_width =3D
--			DMA_SLAVE_BUSWIDTH_2_BYTES;
--	} else {
--		dd->dma_lch_in.dma_conf.dst_addr_width =3D
--			DMA_SLAVE_BUSWIDTH_4_BYTES;
--		dd->dma_lch_out.dma_conf.src_addr_width =3D
--			DMA_SLAVE_BUSWIDTH_4_BYTES;
-+	switch (rctx->mode & TDES_FLAGS_OPMODE_MASK) {
-+	case TDES_FLAGS_CFB8:
-+		addr_width =3D DMA_SLAVE_BUSWIDTH_1_BYTE;
-+		break;
-+
-+	case TDES_FLAGS_CFB16:
-+		addr_width =3D DMA_SLAVE_BUSWIDTH_2_BYTES;
-+		break;
-+
-+	default:
-+		addr_width =3D DMA_SLAVE_BUSWIDTH_4_BYTES;
-+		break;
- 	}
-=20
-+	dd->dma_lch_in.dma_conf.dst_addr_width =3D addr_width;
-+	dd->dma_lch_out.dma_conf.src_addr_width =3D addr_width;
-+
- 	dmaengine_slave_config(dd->dma_lch_in.chan, &dd->dma_lch_in.dma_conf);
- 	dmaengine_slave_config(dd->dma_lch_out.chan, &dd->dma_lch_out.dma_conf);
-=20
-@@ -703,30 +696,38 @@ static int atmel_tdes_crypt(struct skcipher_request *=
-req, unsigned long mode)
- 	struct atmel_tdes_ctx *ctx =3D crypto_skcipher_ctx(skcipher);
- 	struct atmel_tdes_reqctx *rctx =3D skcipher_request_ctx(req);
-=20
--	if (mode & TDES_FLAGS_CFB8) {
-+	switch (mode & TDES_FLAGS_OPMODE_MASK) {
-+	case TDES_FLAGS_CFB8:
- 		if (!IS_ALIGNED(req->cryptlen, CFB8_BLOCK_SIZE)) {
- 			pr_err("request size is not exact amount of CFB8 blocks\n");
- 			return -EINVAL;
- 		}
- 		ctx->block_size =3D CFB8_BLOCK_SIZE;
--	} else if (mode & TDES_FLAGS_CFB16) {
-+		break;
-+
-+	case TDES_FLAGS_CFB16:
- 		if (!IS_ALIGNED(req->cryptlen, CFB16_BLOCK_SIZE)) {
- 			pr_err("request size is not exact amount of CFB16 blocks\n");
- 			return -EINVAL;
- 		}
- 		ctx->block_size =3D CFB16_BLOCK_SIZE;
--	} else if (mode & TDES_FLAGS_CFB32) {
-+		break;
-+
-+	case TDES_FLAGS_CFB32:
- 		if (!IS_ALIGNED(req->cryptlen, CFB32_BLOCK_SIZE)) {
- 			pr_err("request size is not exact amount of CFB32 blocks\n");
- 			return -EINVAL;
- 		}
- 		ctx->block_size =3D CFB32_BLOCK_SIZE;
--	} else {
-+		break;
-+
-+	default:
- 		if (!IS_ALIGNED(req->cryptlen, DES_BLOCK_SIZE)) {
- 			pr_err("request size is not exact amount of DES blocks\n");
- 			return -EINVAL;
- 		}
- 		ctx->block_size =3D DES_BLOCK_SIZE;
-+		break;
- 	}
-=20
- 	rctx->mode =3D mode;
-@@ -845,17 +846,17 @@ static int atmel_tdes_setkey(struct crypto_skcipher *=
-tfm, const u8 *key,
-=20
- static int atmel_tdes_ecb_encrypt(struct skcipher_request *req)
- {
--	return atmel_tdes_crypt(req, TDES_FLAGS_ENCRYPT);
-+	return atmel_tdes_crypt(req, TDES_FLAGS_ECB | TDES_FLAGS_ENCRYPT);
- }
-=20
- static int atmel_tdes_ecb_decrypt(struct skcipher_request *req)
- {
--	return atmel_tdes_crypt(req, 0);
-+	return atmel_tdes_crypt(req, TDES_FLAGS_ECB);
- }
-=20
- static int atmel_tdes_cbc_encrypt(struct skcipher_request *req)
- {
--	return atmel_tdes_crypt(req, TDES_FLAGS_ENCRYPT | TDES_FLAGS_CBC);
-+	return atmel_tdes_crypt(req, TDES_FLAGS_CBC | TDES_FLAGS_ENCRYPT);
- }
-=20
- static int atmel_tdes_cbc_decrypt(struct skcipher_request *req)
-@@ -864,50 +865,47 @@ static int atmel_tdes_cbc_decrypt(struct skcipher_req=
-uest *req)
- }
- static int atmel_tdes_cfb_encrypt(struct skcipher_request *req)
- {
--	return atmel_tdes_crypt(req, TDES_FLAGS_ENCRYPT | TDES_FLAGS_CFB);
-+	return atmel_tdes_crypt(req, TDES_FLAGS_CFB64 | TDES_FLAGS_ENCRYPT);
- }
-=20
- static int atmel_tdes_cfb_decrypt(struct skcipher_request *req)
- {
--	return atmel_tdes_crypt(req, TDES_FLAGS_CFB);
-+	return atmel_tdes_crypt(req, TDES_FLAGS_CFB64);
- }
-=20
- static int atmel_tdes_cfb8_encrypt(struct skcipher_request *req)
- {
--	return atmel_tdes_crypt(req, TDES_FLAGS_ENCRYPT | TDES_FLAGS_CFB |
--						TDES_FLAGS_CFB8);
-+	return atmel_tdes_crypt(req, TDES_FLAGS_CFB8 | TDES_FLAGS_ENCRYPT);
- }
-=20
- static int atmel_tdes_cfb8_decrypt(struct skcipher_request *req)
- {
--	return atmel_tdes_crypt(req, TDES_FLAGS_CFB | TDES_FLAGS_CFB8);
-+	return atmel_tdes_crypt(req, TDES_FLAGS_CFB8);
- }
-=20
- static int atmel_tdes_cfb16_encrypt(struct skcipher_request *req)
- {
--	return atmel_tdes_crypt(req, TDES_FLAGS_ENCRYPT | TDES_FLAGS_CFB |
--						TDES_FLAGS_CFB16);
-+	return atmel_tdes_crypt(req, TDES_FLAGS_CFB16 | TDES_FLAGS_ENCRYPT);
- }
-=20
- static int atmel_tdes_cfb16_decrypt(struct skcipher_request *req)
- {
--	return atmel_tdes_crypt(req, TDES_FLAGS_CFB | TDES_FLAGS_CFB16);
-+	return atmel_tdes_crypt(req, TDES_FLAGS_CFB16);
- }
-=20
- static int atmel_tdes_cfb32_encrypt(struct skcipher_request *req)
- {
--	return atmel_tdes_crypt(req, TDES_FLAGS_ENCRYPT | TDES_FLAGS_CFB |
--						TDES_FLAGS_CFB32);
-+	return atmel_tdes_crypt(req, TDES_FLAGS_CFB32 | TDES_FLAGS_ENCRYPT);
- }
-=20
- static int atmel_tdes_cfb32_decrypt(struct skcipher_request *req)
- {
--	return atmel_tdes_crypt(req, TDES_FLAGS_CFB | TDES_FLAGS_CFB32);
-+	return atmel_tdes_crypt(req, TDES_FLAGS_CFB32);
- }
-=20
- static int atmel_tdes_ofb_encrypt(struct skcipher_request *req)
- {
--	return atmel_tdes_crypt(req, TDES_FLAGS_ENCRYPT | TDES_FLAGS_OFB);
-+	return atmel_tdes_crypt(req, TDES_FLAGS_OFB | TDES_FLAGS_ENCRYPT);
- }
-=20
- static int atmel_tdes_ofb_decrypt(struct skcipher_request *req)
 --=20
 2.14.5
 
