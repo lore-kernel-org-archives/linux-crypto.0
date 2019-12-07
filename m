@@ -2,82 +2,88 @@ Return-Path: <SRS0=Odag=Z5=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B732C43603
-	for <linux-crypto@archiver.kernel.org>; Sat,  7 Dec 2019 03:40:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12162C43603
+	for <linux-crypto@archiver.kernel.org>; Sat,  7 Dec 2019 04:20:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 58E1E21835
-	for <linux-crypto@archiver.kernel.org>; Sat,  7 Dec 2019 03:40:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D4FC321835
+	for <linux-crypto@archiver.kernel.org>; Sat,  7 Dec 2019 04:20:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1575692426;
+	bh=jOD1SgWgrPuh75IdvZWWJnof8kREDWVW1hG/2kt0McI=;
+	h=From:To:Subject:Date:List-ID:From;
+	b=Uwdw13WV39pFl043zhnB5fe1Yr13yXOXGcuKMKVLBMySFWZe1XKvqz7Wu6m1wke5H
+	 D89e2L2ogst4hJWw8895JiiNqjpMSS5EscjX/XKRjkQ+tz2BX8mDUd80EKJdW23weD
+	 sh4MVzT+zqIJp7IkV+9amUp9eusUqrT77MwKnMvg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726388AbfLGDkU (ORCPT
+        id S1726484AbfLGEU0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 Dec 2019 22:40:20 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:44538 "EHLO deadmen.hmeau.com"
+        Fri, 6 Dec 2019 23:20:26 -0500
+Received: from mail.kernel.org ([198.145.29.99]:41284 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726371AbfLGDkU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 Dec 2019 22:40:20 -0500
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1idQx8-0002N4-V3; Sat, 07 Dec 2019 11:40:19 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1idQx7-00049e-PY; Sat, 07 Dec 2019 11:40:17 +0800
-Date:   Sat, 7 Dec 2019 11:40:17 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH 2/2] crypto: api - Do not zap spawn->alg
-Message-ID: <20191207034017.6hy4wuua6f4ekmdr@gondor.apana.org.au>
-References: <20191206143914.hfggirmmnjk27kx4@gondor.apana.org.au>
- <E1idElt-0001VY-O3@gondobar>
- <20191206225021.GF246840@gmail.com>
+        id S1726400AbfLGEU0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 6 Dec 2019 23:20:26 -0500
+Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 827CA21835
+        for <linux-crypto@vger.kernel.org>; Sat,  7 Dec 2019 04:20:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1575692425;
+        bh=jOD1SgWgrPuh75IdvZWWJnof8kREDWVW1hG/2kt0McI=;
+        h=From:To:Subject:Date:From;
+        b=eKXHWYyGfqd11xKKFcvhcaDS5jRz5Vz+DbED3vkjgNY2iwRHFBDtH043SyWtUyF0Z
+         ZdOkBysMqqfXk8fNxxaazBPDaKIWkMLDQMTFUsPjyQmlFKtN0A99+rNORyfrEbOiLc
+         eppx89uORayLcfCZvvvU8jmgWiQQE03T7jEm079k=
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Subject: [PATCH] crypto: doc - remove references to ARC4
+Date:   Fri,  6 Dec 2019 20:19:37 -0800
+Message-Id: <20191207041937.97925-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191206225021.GF246840@gmail.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Dec 06, 2019 at 02:50:21PM -0800, Eric Biggers wrote:
->
-> This patch causes the below crash.
+From: Eric Biggers <ebiggers@google.com>
 
-Yes I got carried away with rearranging the code in the function
-crypto_more_spawns.  I shouldn't be using spawn as a list node
-after doing the list_move call.  The code now looks like:
+arc4 is no longer considered secure, so it shouldn't be used, even as
+just an example.  Mention serpent and chacha20 instead.
 
-	n = list_prev_entry(spawn, list);
-	list_move(&spawn->list, secondary_spawns);
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ Documentation/crypto/devel-algos.rst | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-	if (list_is_last(&n->list, stack))
-		return top;
-
-	n = list_next_entry(n, list);
-	if (!spawn->dead)
-		n->dead = false;
-
-	return &n->inst->alg.cra_users;
-
-> Also, some comments (e.g. for struct crypto_spawn and crypto_remove_spawns())
-> would be really helpful to understand what's going on here.
-
-crypto_remove_spawns is performing a depth-first walk on cra_users
-without recursion.  In the specific case of a spawn removal triggered
-by a new registration, we will halt the walk when we hit the
-newly registered algorithm, and undo any actions that we did
-on the path leading to that object.  The function crypto_more_spawns
-performs the undo action.
-
-I'll add this to crypto_remove_spawns.
-
-Thanks,
+diff --git a/Documentation/crypto/devel-algos.rst b/Documentation/crypto/devel-algos.rst
+index f9d288015acc..fb6b7979a1de 100644
+--- a/Documentation/crypto/devel-algos.rst
++++ b/Documentation/crypto/devel-algos.rst
+@@ -57,7 +57,7 @@ follows:
+ Single-Block Symmetric Ciphers [CIPHER]
+ ---------------------------------------
+ 
+-Example of transformations: aes, arc4, ...
++Example of transformations: aes, serpent, ...
+ 
+ This section describes the simplest of all transformation
+ implementations, that being the CIPHER type used for symmetric ciphers.
+@@ -108,7 +108,7 @@ is also valid:
+ Multi-Block Ciphers
+ -------------------
+ 
+-Example of transformations: cbc(aes), ecb(arc4), ...
++Example of transformations: cbc(aes), chacha20, ...
+ 
+ This section describes the multi-block cipher transformation
+ implementations. The multi-block ciphers are used for transformations
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.24.0
+
