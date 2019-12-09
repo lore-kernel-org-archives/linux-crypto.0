@@ -2,195 +2,176 @@ Return-Path: <SRS0=S8oY=Z7=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC163C43603
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Dec 2019 15:41:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A26CC43603
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Dec 2019 15:45:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A4FE62073D
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Dec 2019 15:41:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DD356207FF
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Dec 2019 15:45:01 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="fM13N4iC"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726197AbfLIPl6 (ORCPT
+        id S1726354AbfLIPpB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 Dec 2019 10:41:58 -0500
-Received: from mail1.bemta25.messagelabs.com ([195.245.230.3]:63259 "EHLO
-        mail1.bemta25.messagelabs.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726080AbfLIPl6 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 Dec 2019 10:41:58 -0500
-Received: from [46.226.52.100] (using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256 bits))
-        by server-3.bemta.az-a.eu-west-1.aws.symcld.net id 36/7A-12117-04B6EED5; Mon, 09 Dec 2019 15:41:52 +0000
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrBKsWRWlGSWpSXmKPExsVyU+ECq65D9rt
-  Yg3+f1C3u3/vJ5MDo8XmTXABjFGtmXlJ+RQJrxppLh5kKHjpXnJk8jbWB8YNTFyMnh5DAXkaJ
-  Ww02XYxcQPYZRonzbesYQRJsAloSM7ZOBbNFBGwlJi7rZgYpYhZYwihx9OpqJpCEsICXxJoZJ
-  5ggirwlNuz4xdrFyAFkW0n8u6UOEmYRUJF42nGcFcTmFdCVuH33DTPE4iCJE1eugLVyChhKXL
-  r/nR3EZhSQlXi08heYzSwgLnHryXywGgkBAYkle84zQ9iiEi8f/2OFsA0kti7dxwJhK0pcm3+
-  CEeQECQFriRsP+EFMZgFNifW79CEmKkpM6X7IDnGNoMTJmU9YJjCKzUKybBZCxywkHbOQdCxg
-  ZFnFaJ5UlJmeUZKbmJmja2hgoGtoaKRraGmsa2Sul1ilm6iXWqpbnlpcomuol1herFdcmZuck
-  6KXl1qyiREYXSkFB6V3MPZ/e6t3iFGSg0lJlHfSqVexQnxJ+SmVGYnFGfFFpTmpxYcYZTg4lC
-  R4z2W+ixUSLEpNT61Iy8wBRjpMWoKDR0mEd08WUJq3uCAxtzgzHSJ1itGYY8LLuYuYOY7MXbq
-  IWYglLz8vVUqcdz5IqQBIaUZpHtwgWAK6xCgrJczLyMDAIMRTkFqUm1mCKv+KUZyDUUmYdwrI
-  PTyZeSVw+14BncIEdEpnCtgpJYkIKakGpoQq5oeLe5fmtD2dq3R3b6eLBY/JB0G9Ka4f1q6e2
-  Gelt/BHtsv9J+0HXy28yZpwfu3P70vE2h5/e9i46HftvCkzq194VzVPt2+c7iLEMPnubQ3N8N
-  9+hzjWa5zpPftam2PFo38mTKfLvjVybVFdEOj1VdHqSuafs3aL3WoOl//7YLQt635T48bHR4U
-  rZOY57/hpfbR/9pQ5LYs51t6bVDfnvcnil338j1ecSHUJXSnoaG3VJfZOr+bj2axAjyDuWlHj
-  1C+7cr0EXNezGOztezzZLEB0yf5Xf+9J/XAzuDz71sPXZ4/ndp26WpRk/sy8U8xvhviKOKstL
-  dPjt4ubP7715YDGm2vZS+b4CPSZXLuuxFKckWioxVxUnAgAvGEpsrsDAAA=
-X-Env-Sender: david.kim@ncipher.com
-X-Msg-Ref: server-29.tower-264.messagelabs.com!1575906112!603882!2
-X-Originating-IP: [217.32.208.5]
-X-SYMC-ESS-Client-Auth: outbound-route-from=pass
-X-StarScan-Received: 
-X-StarScan-Version: 9.44.22; banners=-,-,-
-X-VirusChecked: Checked
-Received: (qmail 4657 invoked from network); 9 Dec 2019 15:41:52 -0000
-Received: from unknown (HELO exukdagfar02.INTERNAL.ROOT.TES) (217.32.208.5)
-  by server-29.tower-264.messagelabs.com with ECDHE-RSA-AES256-SHA384 encrypted SMTP; 9 Dec 2019 15:41:52 -0000
-Received: from exukdagfar01.INTERNAL.ROOT.TES (10.194.2.70) by
- exukdagfar02.INTERNAL.ROOT.TES (10.194.2.71) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Mon, 9 Dec 2019 15:41:51 +0000
-Received: from exukdagfar01.INTERNAL.ROOT.TES ([fe80::48de:aa33:fc4c:d1f5]) by
- exukdagfar01.INTERNAL.ROOT.TES ([fe80::48de:aa33:fc4c:d1f5%14]) with mapi id
- 15.00.1497.000; Mon, 9 Dec 2019 15:41:51 +0000
-From:   "Kim, David" <david.kim@ncipher.com>
-To:     "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
-CC:     "devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "Magee, Tim" <tim.magee@ncipher.com>
-Subject: Re: [PATCH] drivers: staging: Add support for nCipher HSM devices
-Thread-Topic: [PATCH] drivers: staging: Add support for nCipher HSM devices
-Thread-Index: AQHVrpiE4uqHhgJk30y3nRGskfuqA6ex7rsAgAAAzyA=
-Date:   Mon, 9 Dec 2019 15:41:51 +0000
-Message-ID: <1575906111248.24322@ncipher.com>
-References: <1575899815003.20486@ncipher.com>,<20191209153310.GD1280846@kroah.com>
-In-Reply-To: <20191209153310.GD1280846@kroah.com>
-Accept-Language: en-US, en-GB
+        Mon, 9 Dec 2019 10:45:01 -0500
+Received: from mail-eopbgr20054.outbound.protection.outlook.com ([40.107.2.54]:3202
+        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726197AbfLIPpB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 9 Dec 2019 10:45:01 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=c+2dC/iK/Lh4tuc6qY1H4VmssIrYCtHFSxteEIrWRZts4CwCfBW9C8ee/depAyBHQbUyq/slQgjHuisUgwvsbImpBRj9MUOeNdZ/2ecUgio+BY6O3bNrtMlRMCGyvPtpEY4/dA6Rg6zn4f6kLazsQ3Q7B5ZDsegqHd0jYC62dlHgCXV4pzFGWNQipkru1LmDMX0dm4kO1vMumH5nptT94WMLd4A621WNx0AjIqLKJ39vRwPk7kXCNVtgBoSnzTBFVXmyKAPG87s3prwqR8EfJCmglPPSV7ncp8IuBq80JTBpUwbmEc2P+u/sLXp7WWurQtM3Dqk3jWfx4LjkNXE1/w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5HgjuyrInZPIt6JgNSyYk+NBewPTa5N3Du30ED4X27c=;
+ b=NaCFxTXGp9TR1fHPoS1I9/qRYD2q+EWTwyegF7KAlttqdh4HPxnd6t0yhGUKEL5Vr5soADoGPNoOKif7oMe6detqTDP8j6J0ZEtzHU39HXilYy48WYeM11c72B2HVEmWnVyfFteJdn2TcLWV6UyDwpw847FXAOQrMsjuabYff1jswNKOPTus8nd/1oU7qgDW7Via8PH42s8Zo4P66Z9zgW6umHgCLWjJn9MuIfXRQcEgpTlIop0rvyd8pgXqczSWLcXXTTMDyucF1R4MdHUdmBQ4NOZ12ZXHLJDzkRVuwZwO0W/law51r30HAbQapcuE2Dx62lySW6w1szYYjV0EOQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5HgjuyrInZPIt6JgNSyYk+NBewPTa5N3Du30ED4X27c=;
+ b=fM13N4iCHgioD3kw9CN0RzQ7KurQO7HoPD/QWfZnQEWa+MwMHrUVqYs9nlREStrelZy5kSIkWqJz7nTYDfi8DZANyyx21JoHbwInj3+FSJ7V1smZCwIyfXHkey0RO2UvFMSYSeQ5V/JezAkBN7uBLPGGm2DbVfotPTTUCp7NvV0=
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
+ VI1PR0402MB3806.eurprd04.prod.outlook.com (52.134.11.18) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2516.18; Mon, 9 Dec 2019 15:44:15 +0000
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::64c8:fba:99e8:5ec4]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::64c8:fba:99e8:5ec4%6]) with mapi id 15.20.2516.018; Mon, 9 Dec 2019
+ 15:44:15 +0000
+From:   Horia Geanta <horia.geanta@nxp.com>
+To:     Andrey Smirnov <andrew.smirnov@gmail.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC:     Chris Healy <cphealy@gmail.com>,
+        Lucas Stach <l.stach@pengutronix.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        dl-linux-imx <linux-imx@nxp.com>
+Subject: Re: [PATCH v5 0/4] enable CAAM's HWRNG as default
+Thread-Topic: [PATCH v5 0/4] enable CAAM's HWRNG as default
+Thread-Index: AQHVqfYbrp2ap031c0mfNElXDRWd5w==
+Date:   Mon, 9 Dec 2019 15:44:15 +0000
+Message-ID: <VI1PR0402MB3485EF10976A4A69F90E5B0F98580@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+References: <20191203162357.21942-1-andrew.smirnov@gmail.com>
+Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [172.23.136.54]
-x-exclaimer-md-config: 7ae4f661-56ee-4cc7-9363-621ce9eeb65f
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=horia.geanta@nxp.com; 
+x-originating-ip: [212.146.100.6]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 1948729b-3fae-4a70-249a-08d77cbea52e
+x-ms-traffictypediagnostic: VI1PR0402MB3806:|VI1PR0402MB3806:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <VI1PR0402MB3806A0B258E6F8FD3796086198580@VI1PR0402MB3806.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:366;
+x-forefront-prvs: 02462830BE
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(376002)(136003)(346002)(366004)(39860400002)(189003)(199004)(8676002)(305945005)(6506007)(66446008)(71190400001)(64756008)(66556008)(53546011)(5660300002)(81156014)(81166006)(8936002)(26005)(229853002)(86362001)(7696005)(186003)(4326008)(33656002)(44832011)(316002)(478600001)(966005)(55016002)(91956017)(76116006)(66476007)(71200400001)(110136005)(9686003)(2906002)(54906003)(52536014)(66946007);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3806;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: YJ0bUCnQfRa4zYEexjXZjEPu0wRIjat/buM9FRFdtQ+lWV+jjlsIppNCchtD/yuaOGcpPfh2fa3UOvmWRuVU+HNbVWS6OiQu+1lV7eOIQ3G+YP5Y6xkMVtL9DHOTJ8PZG1Q3x8/rIvc9X2xDTZwNdfQrvJ6iSXr8C0EY6UuFGeUCFAKwvt5N4vOMH068YPurh5qUcd7WwUqvMG6ahyhXRoarwzE/QNwTzzFTxb+CJAx6fui//o5oJLAgW2XWfNUWUp0yKpMxyKa5lUGPlYBY12IlMD/3Ei2Kizwnt5jkEqtGJsjnvg6fS0CQiQU9OKZgZP1iqtyFIsJgJbHwGZ0awX1aEWD8Bd944q7tKeewhlR0zW7xZjcAclU3Xkp0+RgMAJIFgYAnyBCFOL/jaQ3qP0Vh1QbqyHn65/LhA1vpcl7r1oLR1ic8S9nYVm1KQg4CUtgUTSUb/om8J//ZBtJfzG+BzUhVyUp361zvTsi2PaM=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1948729b-3fae-4a70-249a-08d77cbea52e
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Dec 2019 15:44:15.1750
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: kKIWjN16MLB2dSHt97tVuHTynvw4Byo7TYZmUrTMeMdrYC85Pv1wUMt8JjXi7P6HzTe1ft8YtvC/Yx/tcecXKA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3806
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-SGkgR3JlZywNCg0KVGhhbmtzIGZvciB0aGUgc3BlZWR5IHJlcGx5LiBJIHdhcyBob3BpbmcgdGhh
-dCBzZXR0aW5nIG15IGNsaWVudCB0byBwbGFpbiB0ZXh0IG9ubHkgd291bGQgYWN0dWFsbHkgZG8g
-cGxhaW4gdGV4dCBvbmx5IGJ1dCBJIHdpbGwgdHJ5IGFnYWluIHdpdGggZ2l0IHNlbmQtZW1haWwu
-DQoNClRoaXMgaXMgb3VyIGZpcnN0IGRyaXZlciB1cHN0cmVhbWluZyBhbmQgd2UgdGFyZ2V0ZWQg
-c3RhZ2luZyBhcyBhIGZpcnN0IGVudHJ5IHBvaW50LiBJZiB5b3UgZmVlbCBpdCdzIG1vcmUgYXBw
-cm9wcmlhdGUgd2hlbiBJIHJlLXN1Ym1pdCBJIGNhbiBnbyBkaXJlY3RseSB0byBkcml2ZXJzL2Ny
-eXB0byBpbnN0ZWFkLg0KDQpUaGFua3MsDQpEYXZlDQoNCg0KDQpEYXZpZCBLaW0NClNlbmlvciBT
-b2Z0d2FyZSBFbmdpbmVlcg0KVGVsOiArNDQgMTIyMyA3MDM0NDkNCg0KbkNpcGhlciBTZWN1cml0
-eQ0KT25lIFN0YXRpb24gU3F1YXJlDQpDYW1icmlkZ2UgQ0IxIDJHQQ0KVW5pdGVkIEtpbmdkb20N
-Cg0KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXw0KRnJvbTogbGludXgt
-Y3J5cHRvLW93bmVyQHZnZXIua2VybmVsLm9yZyA8bGludXgtY3J5cHRvLW93bmVyQHZnZXIua2Vy
-bmVsLm9yZz4gb24gYmVoYWxmIG9mIGdyZWdraEBsaW51eGZvdW5kYXRpb24ub3JnIDxncmVna2hA
-bGludXhmb3VuZGF0aW9uLm9yZz4NClNlbnQ6IE1vbmRheSwgRGVjZW1iZXIgOSwgMjAxOSAzOjMz
-IFBNDQpUbzogS2ltLCBEYXZpZA0KQ2M6IGRldmVsQGRyaXZlcmRldi5vc3Vvc2wub3JnOyBsaW51
-eC1jcnlwdG9Admdlci5rZXJuZWwub3JnOyBNYWdlZSwgVGltDQpTdWJqZWN0OiBSZTogW1BBVENI
-XSBkcml2ZXJzOiBzdGFnaW5nOiBBZGQgc3VwcG9ydCBmb3IgbkNpcGhlciBIU00gZGV2aWNlcw0K
-DQpPbiBNb24sIERlYyAwOSwgMjAxOSBhdCAwMTo1Njo1NVBNICswMDAwLCBLaW0sIERhdmlkIHdy
-b3RlOg0KPg0KPiBIaSBldmVyeWJvZHksDQo+IOKAiw0KPiBUaGlzIHBhdGNoIGludHJvZHVjZXMg
-YSBkcml2ZXIgZm9yIG5DaXBoZXIncyBTb2xvIGFuZCBTb2xvIFhDIHJhbmdlIG9mIFBDSWUNCj4g
-aGFyZHdhcmUgc2VjdXJpdHkgbW9kdWxlcyAoSFNNKSwgd2hpY2ggcHJvdmlkZSBrZXkgY3JlYXRp
-b24vbWFuYWdlbWVudA0KPiBhbmQgY3J5cHRvZ3JhcGh5IHNlcnZpY2VzLg0KPg0KPiBVcHN0cmVh
-bWluZyB0aGUgbkNpcGhlciBkcml2ZXIgaW50byB0aGUga2VybmVsIHdpbGwgYWxsb3cgZWFybHkg
-YWRvcHRlcnMNCj4gb2YgdGhlIGxhdGVzdCBrZXJuZWwgdG8gdXBncmFkZSBhbmQgbWFpbnRhaW4g
-dGhlaXIgd29ya2luZyBzeXN0ZW1zIHdoZW4NCj4gdXNpbmcgYW4gbkNpcGhlciBQQ0llIEhTTS4g
-RnVydGhlciwgaGF2aW5nIHRoaXMgZHJpdmVyIGluIHRoZSBrZXJuZWwgd2lsbCBiZQ0KPiBtb3Jl
-IGNvbnZlbmllbnQgdG8gb3VyIHVzZXJzIGFuZCBtYWtlIGEgTGludXggYmFzZWQgc29sdXRpb24g
-YSBtb3JlDQo+IGF0dHJhY3RpdmUgb3B0aW9uIGZvciBvdGhlcnMu4oCLDQoNCk9kZCBjaGFyYWN0
-ZXJzIGF0IHlvdXIgbGluZS1lbmQgaGVyZSA6KA0KDQo+DQo+IFJlZ2FyZHMsDQo+IERhdmUgS2lt
-DQoNCg0KTm8gbmVlZCBmb3IgdGhlICJIaSIgYW5kICJyZWdhcmRzIiBpbiBhIGNoYW5nZWxvZyB0
-ZXh0IDopDQoNCk1vc3QgaW1wb3J0YW50bHksIHdoeSBpcyB0aGlzIGJlaW5nIHN1Ym1pdHRlZCBm
-b3IgdGhlIHN0YWdpbmcgZGlyZWN0b3J5Pw0KV2hhdCBpcyBrZWVwaW5nIGl0IGZyb20gYmVpbmcg
-YWRkZWQgdG8gdGhlICJyZWFsIiBwYXJ0IG9mIHRoZSBrZXJuZWwNCm5vdz8NCg0KSWYgeW91IG5l
-ZWQvd2FudCBpdCBpbiBkcml2ZXJzL3N0YWdpbmcvIHRoZW4geW91IG5lZWQgYSBUT0RPIGZpbGUg
-dGhhdA0KbGlzdHMgd2hhdCBuZWVkcyB0byBiZSBkb25lIHRvIGl0IGluIG9yZGVyIHRvIGdldCBv
-dXQgb2YNCmRyaXZlcnMvc3RhZ2luZy8NCg0KdGhhbmtzLA0KDQpncmVnIGstaA0KDQo+DQo+IENv
-LWRldmVsb3BlZC1ieTogVGltIE1hZ2VlIDx0aW0ubWFnZWVAbmNpcGhlci5jb20+DQo+IFNpZ25l
-ZC1vZmYtYnk6IFRpbSBNYWdlZSA8dGltLm1hZ2VlQG5jaXBoZXIuY29tPg0KPiBTaWduZWQtb2Zm
-LWJ5OiBEYXZpZCBLaW0gPGRhdmlkLmtpbUBuY2lwaGVyLmNvbT7igIsNCg0KT2RkIGxpbmUtZW5k
-IGhlcmUgOigNCg0KDQo+DQo+DQo+ICBNQUlOVEFJTkVSUyAgICAgICAgICAgICAgICAgICAgICAg
-fCAgICA4ICsNCj4gIGRyaXZlcnMvc3RhZ2luZy9LY29uZmlnICAgICAgICAgICB8ICAgIDEgKw0K
-PiAgZHJpdmVycy9zdGFnaW5nL01ha2VmaWxlICAgICAgICAgIHwgICAgMSArDQo+ICBkcml2ZXJz
-L3N0YWdpbmcvbmNpcGhlci9LY29uZmlnICAgfCAgICA4ICsNCj4gIGRyaXZlcnMvc3RhZ2luZy9u
-Y2lwaGVyL01ha2VmaWxlICB8ICAgIDcgKw0KPiAgZHJpdmVycy9zdGFnaW5nL25jaXBoZXIvZnNs
-LmMgICAgIHwgIDkxMSArKysrKysrKysrKysrKysrKysrKysrDQo+ICBkcml2ZXJzL3N0YWdpbmcv
-bmNpcGhlci9mc2wuaCAgICAgfCAgMTE3ICsrKw0KPiAgZHJpdmVycy9zdGFnaW5nL25jaXBoZXIv
-aG9zdGlmLmMgIHwgMTUyMSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+
-ICBkcml2ZXJzL3N0YWdpbmcvbmNpcGhlci9pMjE1NTUuYyAgfCAgNTUzICsrKysrKysrKysrKysr
-DQo+ICBkcml2ZXJzL3N0YWdpbmcvbmNpcGhlci9pMjE1NTUuaCAgfCAgIDY4ICsrDQo+ICBkcml2
-ZXJzL3N0YWdpbmcvbmNpcGhlci9zb2xvLmggICAgfCAgMzE2ICsrKysrKysrDQo+ICBpbmNsdWRl
-L3VhcGkvbGludXgvbnNoaWVsZF9zb2xvLmggfCAgMTgxICsrKysrDQo+ICAxMiBmaWxlcyBjaGFu
-Z2VkLCAzNjkyIGluc2VydGlvbnMoKykNCj4NCj4NCj4NCj4gZGlmZiAtLWdpdCBhL01BSU5UQUlO
-RVJTIGIvTUFJTlRBSU5FUlMNCj4gaW5kZXggMDYxZDU5YTRhODBiLi5jMTEyNWM5OTliOTUgMTAw
-NjQ0DQo+IC0tLSBhL01BSU5UQUlORVJTDQo+ICsrKyBiL01BSU5UQUlORVJTDQo+IEBAIC0xMjYw
-NSw2ICsxMjYwNSwxNCBAQCBMOiBsaW51eC1wY2lAdmdlci5rZXJuZWwub3JnDQo+ICBTOiBTdXBw
-b3J0ZWQNCj4gIEY6IGRyaXZlcnMvcGNpL2NvbnRyb2xsZXIvdm1kLmMNCj4NCj4gK1BDSSBEUklW
-RVIgRk9SIE5TSElFTEQgU09MTyBBTkQgU09MTyBYQyBIQVJEV0FSRSBTRUNVUklUWSBNT0RVTEVT
-IChIU00pDQo+ICtNOiBUaW0gTWFnZWUgPHRpbS5tYWdlZUBuY2lwaGVyLmNvbT4NCj4gK006IERh
-dmlkIEtpbSA8ZGF2aWQua2ltQG5jaXBoZXIuY29tPg0KPiArTTogSGFtaXNoIENhbWVyb24gPGhh
-bWlzaC5jYW1lcm9uQG5jaXBoZXIuY29tPg0KPiArTDogbGludXgtY3J5cHRvQHZnZXIua2VybmVs
-Lm9yZw0KPiArUzogU3VwcG9ydGVkDQo+ICtGOiBkcml2ZXJzL3N0YWdpbmcvbmNpcGhlci8NCj4g
-Kw0KPiAgUENJIERSSVZFUiBGT1IgTUlDUk9TRU1JIFNXSVRDSFRFQw0KPiAgTTogS3VydCBTY2h3
-ZW1tZXIgPGt1cnQuc2Nod2VtbWVyQG1pY3Jvc2VtaS5jb20+DQo+ICBNOiBMb2dhbiBHdW50aG9y
-cGUgPGxvZ2FuZ0BkZWx0YXRlZS5jb20+DQo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL3N0YWdpbmcv
-S2NvbmZpZyBiL2RyaXZlcnMvc3RhZ2luZy9LY29uZmlnDQo+IGluZGV4IGVhZjc1M2I3MGVjNS4u
-MGI1NDk4ZDI0MTVjIDEwMDY0NA0KPiAtLS0gYS9kcml2ZXJzL3N0YWdpbmcvS2NvbmZpZw0KPiAr
-KysgYi9kcml2ZXJzL3N0YWdpbmcvS2NvbmZpZw0KPiBAQCAtMTI0LDYgKzEyNCw3IEBAIHNvdXJj
-ZSAiZHJpdmVycy9zdGFnaW5nL3V3Yi9LY29uZmlnIg0KPiAgc291cmNlICJkcml2ZXJzL3N0YWdp
-bmcvZXhmYXQvS2NvbmZpZyINCj4NCj4gIHNvdXJjZSAiZHJpdmVycy9zdGFnaW5nL3FsZ2UvS2Nv
-bmZpZyINCj4gK3NvdXJjZSAiZHJpdmVycy9zdGFnaW5nL25jaXBoZXIvS2NvbmZpZyINCj4NCj4g
-IHNvdXJjZSAiZHJpdmVycy9zdGFnaW5nL2hwL0tjb25maWciDQo+DQo+IGRpZmYgLS1naXQgYS9k
-cml2ZXJzL3N0YWdpbmcvTWFrZWZpbGUgYi9kcml2ZXJzL3N0YWdpbmcvTWFrZWZpbGUNCj4gaW5k
-ZXggMGE0Mzk2YzkwNjdiLi5iZTlmMmU4MTE1MjggMTAwNjQ0DQo+IC0tLSBhL2RyaXZlcnMvc3Rh
-Z2luZy9NYWtlZmlsZQ0KPiArKysgYi9kcml2ZXJzL3N0YWdpbmcvTWFrZWZpbGUNCj4gQEAgLTU1
-LDMgKzU1LDQgQEAgb2JqLSQoQ09ORklHX0VYRkFUX0ZTKSArPSBleGZhdC8NCj4gIG9iai0kKENP
-TkZJR19RTEdFKSArPSBxbGdlLw0KPiAgb2JqLSQoQ09ORklHX05FVF9WRU5ET1JfSFApICs9IGhw
-Lw0KPiAgb2JqLSQoQ09ORklHX1dGWCkgKz0gd2Z4Lw0KPiArb2JqLSQoQ09ORklHX05DSVBIRVIp
-ICs9IG5jaXBoZXIvDQo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL3N0YWdpbmcvbmNpcGhlci9LY29u
-ZmlnIGIvZHJpdmVycy9zdGFnaW5nL25jaXBoZXIvS2NvbmZpZw0KPiBuZXcgZmlsZSBtb2RlIDEw
-MDY0NA0KPiBpbmRleCAwMDAwMDAwMDAwMDAuLjViNDY2Y2QxODk2YQ0KPiAtLS0gL2Rldi9udWxs
-DQo+ICsrKyBiL2RyaXZlcnMvc3RhZ2luZy9uY2lwaGVyL0tjb25maWcNCj4gQEAgLTAsMCArMSw4
-IEBADQo+ICsjIFNQRFgtTGljZW5zZS1JZGVudGlmaWVyOiBHUEwtMi4wDQo+ICsjIEVuYWJsZSBz
-dXBwb3J0IGZvciBuQ2lwaGVyJ3MgblNoaWVsZCBTb2xvIGFuZCBTb2xvIFhDDQo+ICtjb25maWcg
-SFNNX05DSVBIRVJfTlNISUVMRF9TT0xPDQo+ICsgdHJpc3RhdGUgIm5DaXBoZXIgU29sbyBhbmQg
-U29sbyBYQyBmYW1pbHkgb2YgUENJZSBIU01zIg0KPiArIGRlcGVuZHMgb24gUENJDQo+ICsgaGVs
-cA0KPiArICAgU2VsZWN0IHRoaXMgYXMgYnVpbHQtaW4gb3IgbW9kdWxlIGlmIHlvdSBleHBlY3Qg
-dG8gdXNlDQo+ICsgICBhIEhhcmR3YXJlIFNlY3VyaXR5IE1vZHVsZSBmcm9tIG5DaXBoZXIncyBT
-b2xvIG9yIFNvbG8gWEMgcmFuZ2UuDQo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL3N0YWdpbmcvbmNp
-cGhlci9NYWtlZmlsZSBiL2RyaXZlcnMvc3RhZ2luZy9uY2lwaGVyL01ha2VmaWxlDQo+IG5ldyBm
-aWxlIG1vZGUgMTAwNjQ0DQo+IGluZGV4IDAwMDAwMDAwMDAwMC4uYjRkNWY5MmFkZGVlDQo+IC0t
-LSAvZGV2L251bGwNCj4gKysrIGIvZHJpdmVycy9zdGFnaW5nL25jaXBoZXIvTWFrZWZpbGUNCj4g
-QEAgLTAsMCArMSw3IEBADQo+ICsjIFNQRFgtTGljZW5zZS1JZGVudGlmaWVyOiBHUEwtMi4wDQo+
-ICsjDQo+ICsjIE1ha2VmaWxlIGZvciBuQ2lwaGVyIG5TaGllbGQgSFNNIGRyaXZlcnMNCj4gKyMN
-Cj4gKw0KPiArb2JqLSQoQ09ORklHX0hTTV9OQ0lQSEVSX05TSElFTERfU09MTykgOj0gbnNoaWVs
-ZF9zb2xvLm8NCj4gK25zaGllbGRfc29sby15IDo9IGhvc3RpZi5vIGZzbC5vIGkyMTU1NS5vDQo+
-IGRpZmYgLS1naXQgYS9kcml2ZXJzL3N0YWdpbmcvbmNpcGhlci9mc2wuYyBiL2RyaXZlcnMvc3Rh
-Z2luZy9uY2lwaGVyL2ZzbC5jDQo+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0DQo+IGluZGV4IDAwMDAw
-MDAwMDAwMC4uNWM0ZWRlZWY2NGMwDQo+IC0tLSAvZGV2L251bGwNCj4gKysrIGIvZHJpdmVycy9z
-dGFnaW5nL25jaXBoZXIvZnNsLmMNCj4gQEAgLTAsMCArMSw5MTEgQEANCj4gKy8vIFNQRFgtTGlj
-ZW5zZS1JZGVudGlmaWVyOiBHUEwtMi4wKw0KPiArLyoNCj4gKyAqDQo+ICsgKiBmc2wuYzogbkNp
-cGhlciBQQ0kgSFNNIEZTTCBjb21tYW5kIGRyaXZlcg0KPiArICogQ29weXJpZ2h0IDIwMTkgbkNp
-cGhlciBTZWN1cml0eSBMdGQNCj4gKyAqDQo+ICsgKi8NCj4gKw0KPiArI2luY2x1ZGUgInNvbG8u
-aCINCj4gKyNpbmNsdWRlICJmc2wuaCINCj4gKw0KPiArLyoqDQo+ICsgKiBSZXNldHMgRlNMIGRl
-dmljZS4NCj4gKyAqDQo+ICsgKiBFeHRyYSBkZXZpY2UgaW5mbyBpcyBpbml0aWFsaXplZCB0aGUg
-Zmlyc3QgdGltZSBjcmVhdGVkLg0KPiArICoNCj4gKyAqIEBwYXJhbSBuZGV2IGNvbW1vbiBkZXZp
-Y2UuDQo+ICsgKiBAcmV0dXJucyAwIGlmIHN1Y2Nlc3NmdWwsIG90aGVyIHZhbHVlIGlmIGVycm9y
-Lg0KPiArICovDQo+ICtzdGF0aWMgaW50IGZzbF9jcmVhdGUoc3RydWN0IG5mcF9kZXYgKm5kZXYp
-DQo+ICt7DQo+ICsgLyogY2hlY2sgZm9yIGRldmljZSAqLw0KPiArIGlmICghbmRldikgew0KPiAr
-IHByX2VycigiJXM6IGVycm9yOiBubyBkZXZpY2UiLCBfX2Z1bmNfXyk7DQo+ICsgcmV0dXJuIC1F
-Tk9ERVY7DQo+ICsgfQ0KDQpQYXRjaCBpcyB0b3RhbGx5IGNvcnJ1cHRlZCBhbmQgY291bGQgbm90
-IGJlIGFwcGxpZWQgZXZlbiBpZiBJIHdhbnRlZCB0bw0KOigNCg0KQ2FuIHlvdSBqdXN0IHVzZSAn
-Z2l0IHNlbmQtZW1haWwnIHRvIHNlbmQgcGF0Y2hlcyBvdXQ/ICB3ZWIgY2xpZW50cyBkbw0Kbm90
-IHdvcmsgYXQgYWxsIChhcyB5b3Ugc2F3IHdpdGggeW91ciBmaXJzdCBhdHRlbXB0IGluIGh0bWwg
-Zm9ybWF0Li4uKQ0KDQp0aGFua3MsDQoNCmdyZWcgay1oDQo=
+On 12/3/2019 6:24 PM, Andrey Smirnov wrote:=0A=
+> Everyone:=0A=
+> =0A=
+> This series is a continuation of original [discussion]. I don't know=0A=
+> if what's in the series is enough to use CAAMs HWRNG system wide, but=0A=
+> I am hoping that with enough iterations and feedback it will be.=0A=
+> =0A=
+> Changes since [v1]:=0A=
+> =0A=
+>     - Original hw_random replaced with the one using output of TRNG direc=
+tly=0A=
+> =0A=
+>     - SEC4 DRNG IP block exposed via crypto API=0A=
+> =0A=
+>     - Small fix regarding use of GFP_DMA added to the series=0A=
+> =0A=
+> Chagnes since [v2]:=0A=
+> =0A=
+>     - msleep in polling loop to avoid wasting CPU cycles=0A=
+> =0A=
+>     - caam_trng_read() bails out early if 'wait' is set to 'false'=0A=
+> =0A=
+>     - fixed typo in ZII's name=0A=
+> =0A=
+> Changes since [v3]:=0A=
+> =0A=
+>     - DRNG's .cra_name is now "stdrng"=0A=
+> =0A=
+>     - collected Reviewd-by tag from Lucas=0A=
+> =0A=
+>     - typo fixes in commit messages of the series=0A=
+> =0A=
+> Changes since [v4]:=0A=
+> =0A=
+>     - Dropped "crypto: caam - RNG4 TRNG errata" and "crypto: caam -=0A=
+>       enable prediction resistance in HRWNG" to limit the scope of the=0A=
+>       series. Those two patches are not yet ready and can be submitted=0A=
+>       separately later.=0A=
+> =0A=
+I don't agree with dropping the Job Ring Interface (JRI) in favor of=0A=
+using TRNG registers directly - for the purpose of extracting entropy.=0A=
+=0A=
+One of the reasons is that TRNG registers are part of page 0,=0A=
+which is not accessible in the Linux kernel in some cases.=0A=
+=0A=
+It's possible to use JRI for extracting entropy following these steps:=0A=
+=0A=
+1. Instantiate RNG state handle with Prediction Resistance (PR) support=0A=
+This is optional in cases when page 0 is not under kernel's control.=0A=
+We'll separately modify SW controlling page 0 to offer PR support.=0A=
+=0A=
+2. For each hwrng read(), enqueue via JRI one or more job descriptors (JD)=
+=0A=
+having the PR bit set in the ALGORITHM OPERATION command.=0A=
+=0A=
+Note that according to hwrng API, it's ok to *partially* fulfill the reques=
+t:=0A=
+ * @read:		New API. drivers can fill up to max bytes of data=0A=
+ *			into the buffer. The buffer is aligned for any type=0A=
+ *			and max is a multiple of 4 and >=3D 32 bytes.=0A=
+=0A=
+It's important to limit the output of each JD, such that the recommendation=
+=0A=
+in SP800-90C (section "9.4 The Oversampling-NRBG Construction") is followed=
+:=0A=
+https://csrc.nist.gov/CSRC/media/Publications/sp/800-90c/draft/documents/sp=
+800_90c_second_draft.pdf=0A=
+=0A=
+For CAAM RNG4, the DRBG security strength is s =3D 256 bits (32 bytes),=0A=
+thus each JD must extract at most s/2 - 128 bits (16 bytes).=0A=
+=0A=
+Similar to what's being done for TRNG registers-based implementation,=0A=
+some back-off mechanism is needed, such that DECO won't stall=0A=
+waiting for the TRNG.=0A=
+This is important on i.MX platforms where there's a single DECO=0A=
+(on PPC & Layerscape platforms there are multiple DECOs).=0A=
+=0A=
+Horia=0A=
