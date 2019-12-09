@@ -2,61 +2,81 @@ Return-Path: <SRS0=S8oY=Z7=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34718C43603
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Dec 2019 01:52:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 870B9C43603
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Dec 2019 10:07:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 060802053B
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Dec 2019 01:52:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4846820828
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Dec 2019 10:07:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="D4yQpPTo"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726841AbfLIBwX (ORCPT
+        id S1727311AbfLIKHf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 8 Dec 2019 20:52:23 -0500
-Received: from shards.monkeyblade.net ([23.128.96.9]:54048 "EHLO
-        shards.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726659AbfLIBwX (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 8 Dec 2019 20:52:23 -0500
-Received: from localhost (unknown [IPv6:2601:601:9f00:1c3::3d5])
-        (using TLSv1 with cipher AES256-SHA (256/256 bits))
-        (Client did not present a certificate)
-        (Authenticated sender: davem-davemloft)
-        by shards.monkeyblade.net (Postfix) with ESMTPSA id 76293153AF38E;
-        Sun,  8 Dec 2019 17:52:22 -0800 (PST)
-Date:   Sun, 08 Dec 2019 17:52:09 -0800 (PST)
-Message-Id: <20191208.175209.1415607162791536317.davem@davemloft.net>
-To:     Jason@zx2c4.com
-Cc:     netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        gregkh@linuxfoundation.org, torvalds@linux-foundation.org,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
+        Mon, 9 Dec 2019 05:07:35 -0500
+Received: from frisell.zx2c4.com ([192.95.5.64]:46477 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726801AbfLIKHc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 9 Dec 2019 05:07:32 -0500
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 5f4a0ed7;
+        Mon, 9 Dec 2019 09:12:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
+        :references:in-reply-to:from:date:message-id:subject:to:cc
+        :content-type; s=mail; bh=MzJW81Y2l9liUBJB6xdygpI6H4o=; b=D4yQpP
+        ToqTcWOuLNSvqv42XXZtLwM+wq3bvnpgw1X35Cy+9SS81MrB+T7tfkr7dbH1zupx
+        BhaVPA2zv1haRFCrxM2kkPYWczlodGtEPhAyB8sUyxbPKKQIwPgM6Q1KNlG5AHHB
+        Ako9WX2xHOGqBvNl5AgGI4nAdKPk4+Lmcx8ZFeycBBU0dNGtbTp/HIkoK/mKg3zu
+        r/fhV7E3LgzbAl/5gUOhu7VvrlycyLO+z1wOGm/ATOVrnLsH7b3N1N9itxrWqQ4z
+        wVXks3r7VL31hC+IEOoFnku7LYXbWPKHL0iGCcHRd8OPVIxYv5zjgu9he0XCimnO
+        aYC977hzI39h3+WA==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id c73e30a7 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
+        Mon, 9 Dec 2019 09:12:06 +0000 (UTC)
+Received: by mail-oi1-f175.google.com with SMTP id l136so5835068oig.1;
+        Mon, 09 Dec 2019 02:07:29 -0800 (PST)
+X-Gm-Message-State: APjAAAUHBkT009BfylPoZuddSE5vWCKwH+kZuUBbbcBzoPVjfv24wJNy
+        dxM+hFe5eL7LS2pIXTJTlXD74PdcqKWRFKC+YYk=
+X-Google-Smtp-Source: APXvYqzrtpXcTBYUHQPnLatbUuyLsHiq7IJk7Mrmbl3KgZotcTSAlcByvlElSfsmxye6pDFpFYSdAb3f/wV2X2FykNI=
+X-Received: by 2002:aca:cf58:: with SMTP id f85mr23924143oig.6.1575886048379;
+ Mon, 09 Dec 2019 02:07:28 -0800 (PST)
+MIME-Version: 1.0
+References: <20191208232734.225161-1-Jason@zx2c4.com> <20191208.175209.1415607162791536317.davem@davemloft.net>
+In-Reply-To: <20191208.175209.1415607162791536317.davem@davemloft.net>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Mon, 9 Dec 2019 11:07:16 +0100
+X-Gmail-Original-Message-ID: <CAHmME9pXLEhe1gJm84EzXCRONMH-VfBh6UsKQ_DLq1NyOSS+_Q@mail.gmail.com>
+Message-ID: <CAHmME9pXLEhe1gJm84EzXCRONMH-VfBh6UsKQ_DLq1NyOSS+_Q@mail.gmail.com>
 Subject: Re: [PATCH net-next v2] net: WireGuard secure network tunnel
-From:   David Miller <davem@davemloft.net>
-In-Reply-To: <20191208232734.225161-1-Jason@zx2c4.com>
-References: <20191208232734.225161-1-Jason@zx2c4.com>
-X-Mailer: Mew version 6.8 on Emacs 26.1
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.5.12 (shards.monkeyblade.net [149.20.54.216]); Sun, 08 Dec 2019 17:52:22 -0800 (PST)
+To:     David Miller <davem@davemloft.net>
+Cc:     Netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Mon,  9 Dec 2019 00:27:34 +0100
+On Mon, Dec 9, 2019 at 2:52 AM David Miller <davem@davemloft.net> wrote:
+>
+> From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+> Date: Mon,  9 Dec 2019 00:27:34 +0100
+>
+> > WireGuard is a layer 3 secure networking tunnel made specifically for
+> > the kernel, that aims to be much simpler and easier to audit than IPsec.
+> > Extensive documentation and description of the protocol and
+> > considerations, along with formal proofs of the cryptography, are
+> > available at:
+> >
+> >   * https://www.wireguard.com/
+> >   * https://www.wireguard.com/papers/wireguard.pdf
+>  ...
+>
+> Applied, thanks Jason.
 
-> WireGuard is a layer 3 secure networking tunnel made specifically for
-> the kernel, that aims to be much simpler and easier to audit than IPsec.
-> Extensive documentation and description of the protocol and
-> considerations, along with formal proofs of the cryptography, are
-> available at:
-> 
->   * https://www.wireguard.com/
->   * https://www.wireguard.com/papers/wireguard.pdf
- ...
-
-Applied, thanks Jason.
+Thank you, Dave!
