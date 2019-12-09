@@ -2,52 +2,67 @@ Return-Path: <SRS0=S8oY=Z7=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43BDDC43603
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Dec 2019 16:23:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60E0EC04E30
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Dec 2019 16:47:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1A8E220692
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Dec 2019 16:23:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 375D9207FD
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Dec 2019 16:47:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="SuSZ1JmG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="udziYz2d"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726509AbfLIQXu (ORCPT
+        id S1726379AbfLIQr1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 Dec 2019 11:23:50 -0500
-Received: from mail-eopbgr50069.outbound.protection.outlook.com ([40.107.5.69]:13223
-        "EHLO EUR03-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726230AbfLIQXt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 Dec 2019 11:23:49 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mjgzkqI21y6+YMtqta7/qsyX1kRLS8wWOt6P3DkuGiSx7ZF/UOnqlo2mU5nxl6UqmNiZuqc8p0x8/LIPTL5fr9fhJHIiEqWw4ZkJ3NPTFQOr0rUo+cQqX/8ovX2FPwwnQ1SZsqe0dGwJFCulAN2cCe9rIkHHvR2RKyjNNXQV2qO4oXp523wf8RDQqUPiKiqxHTfB7idiOsV722uhxyCf1TSQ/QN+Agr0dvIYsMOgvtXqOxLkYyvXYPNamf8d42uCOMq6nfojckIMONa3XBU7SOD9u2HIq/hNmjXr+VflW+Op0nrbNFeqLJ831pPHI1Nejx6plAboEpMhKAJ8LimR1g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ARkJL02bUXCsuU3ALtKlXcZrlZw2MlKqgqxzAK+beJM=;
- b=LqtNB2WGAiNBwRTNk5zeK+X8utNZbGNboYXQ+XiwWp9SlNeUxfx95FBLToKq+LpEF4i//yOpRkyNysDKUC83hT6NJMCamZ+SuFaKdQYR+zP1hakHnBngwWSQF6MHsQqDa6ATQ6NwSUTE4iPtdOxKfZZZVvaLLwG/NVA82V5FmQ5C9w2Gbiw1gXGHgHtCH7eR3JeP07w5ycG37Kuv2q10qHicJi7Rz+bk7GKlhsNgjhicXpqJ/fPr5vSmR7YcdrmccC/5V9vHkai7oAXS/vqpETbVwIAjMkM6aT5wzr+zKuOHBnfQKGzrU3j41jn02MECvnaQ9uMNj9+tyFR5eaxoIg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ARkJL02bUXCsuU3ALtKlXcZrlZw2MlKqgqxzAK+beJM=;
- b=SuSZ1JmGjmBJVw5YbEHKyZ+HVtTka1HtbyfpjpKEWuFITqWeGEBnRPoHxkvMNGsnRn+sKyDtcyolQakhj1xPRftXEzzY3FytoRhHBqsvSTma1d6cH1R+y6iE7/ukxMCeLE79Qzcx5VqWsbLU2nvKDF/sR07kFO1Nr/ojUKJowVI=
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- DB7SPR01MB0012.eurprd04.prod.outlook.com (52.135.141.161) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2516.12; Mon, 9 Dec 2019 16:23:45 +0000
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::64c8:fba:99e8:5ec4]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::64c8:fba:99e8:5ec4%6]) with mapi id 15.20.2516.018; Mon, 9 Dec 2019
- 16:23:45 +0000
-From:   Horia Geanta <horia.geanta@nxp.com>
-To:     Adam Ford <aford173@gmail.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     Rob Herring <robh+dt@kernel.org>,
+        Mon, 9 Dec 2019 11:47:27 -0500
+Received: from mail-io1-f65.google.com ([209.85.166.65]:39636 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726230AbfLIQr0 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 9 Dec 2019 11:47:26 -0500
+Received: by mail-io1-f65.google.com with SMTP id c16so15468735ioh.6;
+        Mon, 09 Dec 2019 08:47:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=XHum4FDJDIcgTeOwvhbTJMdsl7kGHy76x1fPGptU0Ec=;
+        b=udziYz2dZA3xvFqA3QmslCERX0mkXTBQnwhiY585MQJ/oxeg4n8eBFiLdH/jTCa9VF
+         QMeKhP4j8Whn63LiUzZk2afaYl18gR8ZiV/okxSNcgW4FTki5hTkdPIVMkHS5g9eH9M4
+         zHhZs425J0FiJkW884QLhuPZrgc67h4LbuvWSNeMWR5+AZ7dlAVzXsZOQaLMbTbiIlKy
+         iXX64YMFlMeM4nFli7q6FzA+0hH75n4/Fj2xusjLxbAVzrwTbNGX4punKE1HosatLHxd
+         wngfe/KRWwgURMfP+qbt0/t/FaozZl/F9FCgTNtMcxictPVnzFGKaa2DngeaYwBGqcdT
+         04dA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=XHum4FDJDIcgTeOwvhbTJMdsl7kGHy76x1fPGptU0Ec=;
+        b=GWwUmQ3r6Uiza/CHpGybLGQz1Zv18i+Jy45kn+KnQhE2Q8J3mts1T8EYxrnsdHhLpS
+         51SUpcETvq+p2fYxfbJ4JeYWbvLqBoHQO5U64+qKFerFi+xqvotyCQAYVYEuWKPVu38M
+         vOQGu6TO/PFrZm4GPICdXtMQs7shtw3RjBjAkry//Zj1FgMCcdb9cibX9XmG/0PVBnKn
+         IDUBJSX1lILT5TQ6gChVzxQEfR/WyBvsMNvRqoSgoKRCcXsh71HptMGoPxXM+kiwNqJA
+         JfLGXBk91C5WyhJlH9i+queLP7sHP3yVREjbMMhT8Aer3C8UjtB70dP/FV+jZOhnc1gd
+         P7QA==
+X-Gm-Message-State: APjAAAWvAJrh0IVpZrOyufEEgnWWMaWl5YTDC8KoNXADwB9s3QNXdB03
+        4hLOxMo+B+KiIm0dZW+UUa6BECiwDOBIYDvj+hE=
+X-Google-Smtp-Source: APXvYqyRfLHLHr8UPDK5Qg/R0LOdnqfw2mns2KoezyJYWV0kZLZ9FzWmbX14ZpFaRwTi7GmfNPgc2uuS2/cMCzOhYbc=
+X-Received: by 2002:a02:13c2:: with SMTP id 185mr21935228jaz.0.1575910045615;
+ Mon, 09 Dec 2019 08:47:25 -0800 (PST)
+MIME-Version: 1.0
+References: <20191130225153.30111-1-aford173@gmail.com> <20191130225153.30111-2-aford173@gmail.com>
+ <VI1PR0402MB348586BEDA9BE13CEB10C75698580@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+In-Reply-To: <VI1PR0402MB348586BEDA9BE13CEB10C75698580@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+From:   Adam Ford <aford173@gmail.com>
+Date:   Mon, 9 Dec 2019 10:47:14 -0600
+Message-ID: <CAHCN7x+roEAmteNLT9KkLxPvL6AFFHMUW=J_cLcSdE50kODZQQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] arm64: dts: imx8mm: Add Crypto CAAM support
+To:     Horia Geanta <horia.geanta@nxp.com>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Rob Herring <robh+dt@kernel.org>,
         Mark Rutland <mark.rutland@arm.com>,
         Shawn Guo <shawnguo@kernel.org>,
         Sascha Hauer <s.hauer@pengutronix.de>,
@@ -61,66 +76,45 @@ CC:     Rob Herring <robh+dt@kernel.org>,
         "linux-arm-kernel@lists.infradead.org" 
         <linux-arm-kernel@lists.infradead.org>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 2/2] arm64: dts: imx8mm: Add Crypto CAAM support
-Thread-Topic: [PATCH 2/2] arm64: dts: imx8mm: Add Crypto CAAM support
-Thread-Index: AQHVp9DMEHInO4wSqU+tSt6Rx6I4SQ==
-Date:   Mon, 9 Dec 2019 16:23:45 +0000
-Message-ID: <VI1PR0402MB348586BEDA9BE13CEB10C75698580@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <20191130225153.30111-1-aford173@gmail.com>
- <20191130225153.30111-2-aford173@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=horia.geanta@nxp.com; 
-x-originating-ip: [212.146.100.6]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 6346c512-2a42-49ca-46eb-08d77cc429be
-x-ms-traffictypediagnostic: DB7SPR01MB0012:|DB7SPR01MB0012:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DB7SPR01MB00128994075675E07E14ACC898580@DB7SPR01MB0012.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:5797;
-x-forefront-prvs: 02462830BE
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(136003)(396003)(346002)(366004)(376002)(189003)(199004)(9686003)(7416002)(55016002)(52536014)(71190400001)(64756008)(54906003)(110136005)(66556008)(71200400001)(229853002)(66446008)(305945005)(33656002)(76116006)(91956017)(66946007)(66476007)(478600001)(316002)(5660300002)(6506007)(7696005)(86362001)(8936002)(44832011)(186003)(4326008)(4744005)(26005)(8676002)(53546011)(2906002)(81166006)(81156014)(32563001);DIR:OUT;SFP:1101;SCL:1;SRVR:DB7SPR01MB0012;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 3v7Mg2eBxrwqFCr8SLr6v+kro3ylsTGTgAYquN58+Up88RowdPvyCQWCRlHaeWO1FXtCay78bpvUOfPn2dBF/12vr1y1aIhp5HkAA+8BmQKJ0Ylizy8QxafbxPsDbr7lkK1UnO6uBNacdAVMR0qUH6nJArRZRYcjGI0i9YbJ1JzscomZf56u2AorRuLiYYeg3FqAo+cmKJeRtszmkXSlj7IoFjt70+JgJiMhrgKer2n/kPwo3UKWsEutniYMqcW/jMBqqRkOMmfXGokrKfeVezfizK3OVRyn4vENE+dpeuWcgWYAE2EaZYCiASr7GrayPgx6zoB447s9BVXT0KVSuIsg3C6auXG2XXJ5vbYULOEOxurIENCU8GeZ8ja+p6VzADmOVukDR6OlRYyuR8JNMK7q/MySiMBvzApGnRzxTEnJD/zwjmsQ6TMqDF147pndnoTETaKN+8PUHUsmK2hTltp6qGiRh75Bc4dFunTTY5I=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6346c512-2a42-49ca-46eb-08d77cc429be
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Dec 2019 16:23:45.0475
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: +XW79rgrmm0mt1k7JDXpoBMn5wE9bz37Vp7XmRv7vRBV44UXnXANL+BZPeyPskOmbm0d4H67w6okZ8Y7WzKK/w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB7SPR01MB0012
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 12/1/2019 12:52 AM, Adam Ford wrote:=0A=
-> The i.MX8M Mini supports the same crypto engine as what is in=0A=
-> the i.MX8MQ, but it is not currently present in the device tree,=0A=
-> because it may be resricted by security features.=0A=
-> =0A=
-What exactly are you referring to?=0A=
-=0A=
-> This patch places in into the device tree and marks it as disabled,=0A=
-> but anyone not restricting the CAAM with secure mode functions=0A=
-> can mark it as enabled.=0A=
-> =0A=
-Even if - due to export control regulations - CAAM is "trimmed down",=0A=
-it loses only the encryption capabilities (hashing etc. still working).=0A=
-=0A=
-Again, please clarify what you mean by "secure mode functions",=0A=
-"security features" etc.=0A=
-=0A=
-Horia=0A=
+On Mon, Dec 9, 2019 at 10:23 AM Horia Geanta <horia.geanta@nxp.com> wrote:
+>
+> On 12/1/2019 12:52 AM, Adam Ford wrote:
+> > The i.MX8M Mini supports the same crypto engine as what is in
+> > the i.MX8MQ, but it is not currently present in the device tree,
+> > because it may be resricted by security features.
+> >
+> What exactly are you referring to?
+
+I don't know this hardware very well, but on a different platform, we
+needed to make the crypto engines as disabled if they were being
+accessed through secure operations which made it unavailable to Linux
+without using some special barriers. I didn't have the special
+hardware on the other platform that required it that way, so I can't
+really explain it well.  I know on those special cases, because some
+people were accessing these registers through other means, the devices
+had to be marked as 'disabled' so to avoid breaking something.  Since
+I wasn't sure if this was left out of the i.MX8M Mini on purpose, I
+let this disabled just in case this hardware platform was also
+affected in a similar and people wanting to use it could mark it as
+'okay'
+
+adam
+
+>
+> > This patch places in into the device tree and marks it as disabled,
+> > but anyone not restricting the CAAM with secure mode functions
+> > can mark it as enabled.
+> >
+> Even if - due to export control regulations - CAAM is "trimmed down",
+> it loses only the encryption capabilities (hashing etc. still working).
+>
+> Again, please clarify what you mean by "secure mode functions",
+> "security features" etc.
+>
+> Horia
