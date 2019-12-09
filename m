@@ -7,163 +7,224 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 018EBC43603
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Dec 2019 15:21:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E663EC43603
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Dec 2019 15:33:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C95E52077B
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Dec 2019 15:21:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B4F132077B
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Dec 2019 15:33:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1575904916;
-	bh=XU+EqYv6IRJZKcvr2xpcoM6aIIGJNwdJYny7W0MFY0c=;
-	h=Date:From:To:Cc:Subject:List-ID:From;
-	b=UfLStQ34jnb6qfNoYWRRUpCJgqxNV6vc1PgwtkSJ2tY1FruP06LMZiC0nWVEw0Xmi
-	 9CWsT/GiGTKWsnppX3rZhmkuOzfk71/fz5taiYKKI8Ux4LLljKCcJiTliE55vyiGP5
-	 iAD3rFcFV8YK3rX5DpVUddw/kgeK5rKEBuaTVRj4=
+	s=default; t=1575905596;
+	bh=xv8UuW5kDA/p9HUZoET8W9XCTuTQpr0pivWsPRLO79w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=DY8t/k5u0hBi2C1F1y2G8QhsMk0KZQ0/SSnI9KHs6aq91J8Mz0XyKD4Y4DQ6di8um
+	 w0RWYQm0ezpr2T+V3WYypnYE3IqXDlJogwrgHQvX3+FTQpw1wdULrIMUHO6AxpFWrI
+	 zdpBPVhQumoT6b1gaJKejwCV8sMrmVlBpB6Yo7xA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726527AbfLIPV4 (ORCPT
+        id S1726483AbfLIPdQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 Dec 2019 10:21:56 -0500
-Received: from mail.kernel.org ([198.145.29.99]:60496 "EHLO mail.kernel.org"
+        Mon, 9 Dec 2019 10:33:16 -0500
+Received: from mail.kernel.org ([198.145.29.99]:39318 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726197AbfLIPV4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 Dec 2019 10:21:56 -0500
+        id S1726379AbfLIPdQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 9 Dec 2019 10:33:16 -0500
 Received: from localhost (unknown [89.205.132.23])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6B3212068E;
-        Mon,  9 Dec 2019 15:21:54 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7268920692;
+        Mon,  9 Dec 2019 15:33:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1575904915;
-        bh=XU+EqYv6IRJZKcvr2xpcoM6aIIGJNwdJYny7W0MFY0c=;
-        h=Date:From:To:Cc:Subject:From;
-        b=TUegjVkm/gKG+NeiexIYp/CkYJ9GXYs92RwO+vXYqqYb1o1gqf1sLrQRFoIcmcXP9
-         6NfYEk31/ZUnky4LvPiOQYTNaV4Eo9TUxHjZf8jhAWEgk+b6FpsAG/N8fiGJmIPbV5
-         urapI+iA8dSLJFRGJUbngYwTGlSrv7An5QjXb91o=
-Date:   Mon, 9 Dec 2019 16:21:51 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Zhou Wang <wangzhou1@hisilicon.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: hisilicon - still no need to check return value of
- debugfs_create functions
-Message-ID: <20191209152151.GA1282293@kroah.com>
+        s=default; t=1575905595;
+        bh=xv8UuW5kDA/p9HUZoET8W9XCTuTQpr0pivWsPRLO79w=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=xXFiZwDUwjN540ONucZ4zM78TX6Ztxvpi+8utG5Ckm7577MrtEAwRzmU1n4YxJ3+s
+         8petGSWeSlrgrDkgL+TIPZtoB2eypNsJbPZRcffsuGD92tETDzCLlYkJCAwNhnIU/O
+         YjQ0ZzBKF4m7fYXdDsiJpFI8hqIQQsKqHWLbG0Zw=
+Date:   Mon, 9 Dec 2019 16:33:10 +0100
+From:   "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
+To:     "Kim, David" <david.kim@ncipher.com>
+Cc:     "devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "Magee, Tim" <tim.magee@ncipher.com>
+Subject: Re: [PATCH] drivers: staging: Add support for nCipher HSM devices
+Message-ID: <20191209153310.GD1280846@kroah.com>
+References: <1575899815003.20486@ncipher.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1575899815003.20486@ncipher.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Just like in 4a97bfc79619 ("crypto: hisilicon - no need to check return
-value of debugfs_create functions"), there still is no need to ever
-check the return value.  The function can work or not, but the code
-logic should never do something different based on this.
+On Mon, Dec 09, 2019 at 01:56:55PM +0000, Kim, David wrote:
+> 
+> Hi everybody,
+> ​
+> This patch introduces a driver for nCipher's Solo and Solo XC range of PCIe
+> hardware security modules (HSM), which provide key creation/management
+> and cryptography services.
+> 
+> Upstreaming the nCipher driver into the kernel will allow early adopters
+> of the latest kernel to upgrade and maintain their working systems when
+> using an nCipher PCIe HSM. Further, having this driver in the kernel will be
+> more convenient to our users and make a Linux based solution a more
+> attractive option for others.​
 
-Cc: Zhou Wang <wangzhou1@hisilicon.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- drivers/crypto/hisilicon/hpre/hpre_main.c | 28 +++++------------------
- 1 file changed, 6 insertions(+), 22 deletions(-)
+Odd characters at your line-end here :(
 
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-index 34e0424410bf..711f5d18b641 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-@@ -557,7 +557,7 @@ static const struct file_operations hpre_ctrl_debug_fops = {
- static int hpre_create_debugfs_file(struct hpre_debug *dbg, struct dentry *dir,
- 				    enum hpre_ctrl_dbgfs_file type, int indx)
- {
--	struct dentry *tmp, *file_dir;
-+	struct dentry *file_dir;
- 
- 	if (dir)
- 		file_dir = dir;
-@@ -571,10 +571,8 @@ static int hpre_create_debugfs_file(struct hpre_debug *dbg, struct dentry *dir,
- 	dbg->files[indx].debug = dbg;
- 	dbg->files[indx].type = type;
- 	dbg->files[indx].index = indx;
--	tmp = debugfs_create_file(hpre_debug_file_name[type], 0600, file_dir,
--				  dbg->files + indx, &hpre_ctrl_debug_fops);
--	if (!tmp)
--		return -ENOENT;
-+	debugfs_create_file(hpre_debug_file_name[type], 0600, file_dir,
-+			    dbg->files + indx, &hpre_ctrl_debug_fops);
- 
- 	return 0;
- }
-@@ -585,7 +583,6 @@ static int hpre_pf_comm_regs_debugfs_init(struct hpre_debug *debug)
- 	struct hisi_qm *qm = &hpre->qm;
- 	struct device *dev = &qm->pdev->dev;
- 	struct debugfs_regset32 *regset;
--	struct dentry *tmp;
- 
- 	regset = devm_kzalloc(dev, sizeof(*regset), GFP_KERNEL);
- 	if (!regset)
-@@ -595,10 +592,7 @@ static int hpre_pf_comm_regs_debugfs_init(struct hpre_debug *debug)
- 	regset->nregs = ARRAY_SIZE(hpre_com_dfx_regs);
- 	regset->base = qm->io_base;
- 
--	tmp = debugfs_create_regset32("regs", 0444,  debug->debug_root, regset);
--	if (!tmp)
--		return -ENOENT;
--
-+	debugfs_create_regset32("regs", 0444,  debug->debug_root, regset);
- 	return 0;
- }
- 
-@@ -609,15 +603,12 @@ static int hpre_cluster_debugfs_init(struct hpre_debug *debug)
- 	struct device *dev = &qm->pdev->dev;
- 	char buf[HPRE_DBGFS_VAL_MAX_LEN];
- 	struct debugfs_regset32 *regset;
--	struct dentry *tmp_d, *tmp;
-+	struct dentry *tmp_d;
- 	int i, ret;
- 
- 	for (i = 0; i < HPRE_CLUSTERS_NUM; i++) {
- 		sprintf(buf, "cluster%d", i);
--
- 		tmp_d = debugfs_create_dir(buf, debug->debug_root);
--		if (!tmp_d)
--			return -ENOENT;
- 
- 		regset = devm_kzalloc(dev, sizeof(*regset), GFP_KERNEL);
- 		if (!regset)
-@@ -627,9 +618,7 @@ static int hpre_cluster_debugfs_init(struct hpre_debug *debug)
- 		regset->nregs = ARRAY_SIZE(hpre_cluster_dfx_regs);
- 		regset->base = qm->io_base + hpre_cluster_offsets[i];
- 
--		tmp = debugfs_create_regset32("regs", 0444, tmp_d, regset);
--		if (!tmp)
--			return -ENOENT;
-+		debugfs_create_regset32("regs", 0444, tmp_d, regset);
- 		ret = hpre_create_debugfs_file(debug, tmp_d, HPRE_CLUSTER_CTRL,
- 					       i + HPRE_CLUSTER_CTRL);
- 		if (ret)
-@@ -668,9 +657,6 @@ static int hpre_debugfs_init(struct hpre *hpre)
- 	int ret;
- 
- 	dir = debugfs_create_dir(dev_name(dev), hpre_debugfs_root);
--	if (!dir)
--		return -ENOENT;
--
- 	qm->debug.debug_root = dir;
- 
- 	ret = hisi_qm_debug_init(qm);
-@@ -1014,8 +1000,6 @@ static void hpre_register_debugfs(void)
- 		return;
- 
- 	hpre_debugfs_root = debugfs_create_dir(hpre_name, NULL);
--	if (IS_ERR_OR_NULL(hpre_debugfs_root))
--		hpre_debugfs_root = NULL;
- }
- 
- static void hpre_unregister_debugfs(void)
--- 
-2.24.0
+> 
+> Regards,
+> Dave Kim
 
+
+No need for the "Hi" and "regards" in a changelog text :)
+
+Most importantly, why is this being submitted for the staging directory?
+What is keeping it from being added to the "real" part of the kernel
+now?
+
+If you need/want it in drivers/staging/ then you need a TODO file that
+lists what needs to be done to it in order to get out of
+drivers/staging/
+
+thanks,
+
+greg k-h
+
+> 
+> Co-developed-by: Tim Magee <tim.magee@ncipher.com>
+> Signed-off-by: Tim Magee <tim.magee@ncipher.com>
+> Signed-off-by: David Kim <david.kim@ncipher.com>​
+
+Odd line-end here :(
+
+
+> 
+> 
+>  MAINTAINERS                       |    8 +
+>  drivers/staging/Kconfig           |    1 +
+>  drivers/staging/Makefile          |    1 +
+>  drivers/staging/ncipher/Kconfig   |    8 +
+>  drivers/staging/ncipher/Makefile  |    7 +
+>  drivers/staging/ncipher/fsl.c     |  911 ++++++++++++++++++++++
+>  drivers/staging/ncipher/fsl.h     |  117 +++
+>  drivers/staging/ncipher/hostif.c  | 1521 +++++++++++++++++++++++++++++++++++++
+>  drivers/staging/ncipher/i21555.c  |  553 ++++++++++++++
+>  drivers/staging/ncipher/i21555.h  |   68 ++
+>  drivers/staging/ncipher/solo.h    |  316 ++++++++
+>  include/uapi/linux/nshield_solo.h |  181 +++++
+>  12 files changed, 3692 insertions(+)
+> 
+> 
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 061d59a4a80b..c1125c999b95 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -12605,6 +12605,14 @@ L: linux-pci@vger.kernel.org
+>  S: Supported
+>  F: drivers/pci/controller/vmd.c
+> 
+> +PCI DRIVER FOR NSHIELD SOLO AND SOLO XC HARDWARE SECURITY MODULES (HSM)
+> +M: Tim Magee <tim.magee@ncipher.com>
+> +M: David Kim <david.kim@ncipher.com>
+> +M: Hamish Cameron <hamish.cameron@ncipher.com>
+> +L: linux-crypto@vger.kernel.org
+> +S: Supported
+> +F: drivers/staging/ncipher/
+> +
+>  PCI DRIVER FOR MICROSEMI SWITCHTEC
+>  M: Kurt Schwemmer <kurt.schwemmer@microsemi.com>
+>  M: Logan Gunthorpe <logang@deltatee.com>
+> diff --git a/drivers/staging/Kconfig b/drivers/staging/Kconfig
+> index eaf753b70ec5..0b5498d2415c 100644
+> --- a/drivers/staging/Kconfig
+> +++ b/drivers/staging/Kconfig
+> @@ -124,6 +124,7 @@ source "drivers/staging/uwb/Kconfig"
+>  source "drivers/staging/exfat/Kconfig"
+> 
+>  source "drivers/staging/qlge/Kconfig"
+> +source "drivers/staging/ncipher/Kconfig"
+> 
+>  source "drivers/staging/hp/Kconfig"
+> 
+> diff --git a/drivers/staging/Makefile b/drivers/staging/Makefile
+> index 0a4396c9067b..be9f2e811528 100644
+> --- a/drivers/staging/Makefile
+> +++ b/drivers/staging/Makefile
+> @@ -55,3 +55,4 @@ obj-$(CONFIG_EXFAT_FS) += exfat/
+>  obj-$(CONFIG_QLGE) += qlge/
+>  obj-$(CONFIG_NET_VENDOR_HP) += hp/
+>  obj-$(CONFIG_WFX) += wfx/
+> +obj-$(CONFIG_NCIPHER) += ncipher/
+> diff --git a/drivers/staging/ncipher/Kconfig b/drivers/staging/ncipher/Kconfig
+> new file mode 100644
+> index 000000000000..5b466cd1896a
+> --- /dev/null
+> +++ b/drivers/staging/ncipher/Kconfig
+> @@ -0,0 +1,8 @@
+> +# SPDX-License-Identifier: GPL-2.0
+> +# Enable support for nCipher's nShield Solo and Solo XC
+> +config HSM_NCIPHER_NSHIELD_SOLO
+> + tristate "nCipher Solo and Solo XC family of PCIe HSMs"
+> + depends on PCI
+> + help
+> +   Select this as built-in or module if you expect to use
+> +   a Hardware Security Module from nCipher's Solo or Solo XC range.
+> diff --git a/drivers/staging/ncipher/Makefile b/drivers/staging/ncipher/Makefile
+> new file mode 100644
+> index 000000000000..b4d5f92addee
+> --- /dev/null
+> +++ b/drivers/staging/ncipher/Makefile
+> @@ -0,0 +1,7 @@
+> +# SPDX-License-Identifier: GPL-2.0
+> +#
+> +# Makefile for nCipher nShield HSM drivers
+> +#
+> +
+> +obj-$(CONFIG_HSM_NCIPHER_NSHIELD_SOLO) := nshield_solo.o
+> +nshield_solo-y := hostif.o fsl.o i21555.o
+> diff --git a/drivers/staging/ncipher/fsl.c b/drivers/staging/ncipher/fsl.c
+> new file mode 100644
+> index 000000000000..5c4edeef64c0
+> --- /dev/null
+> +++ b/drivers/staging/ncipher/fsl.c
+> @@ -0,0 +1,911 @@
+> +// SPDX-License-Identifier: GPL-2.0+
+> +/*
+> + *
+> + * fsl.c: nCipher PCI HSM FSL command driver
+> + * Copyright 2019 nCipher Security Ltd
+> + *
+> + */
+> +
+> +#include "solo.h"
+> +#include "fsl.h"
+> +
+> +/**
+> + * Resets FSL device.
+> + *
+> + * Extra device info is initialized the first time created.
+> + *
+> + * @param ndev common device.
+> + * @returns 0 if successful, other value if error.
+> + */
+> +static int fsl_create(struct nfp_dev *ndev)
+> +{
+> + /* check for device */
+> + if (!ndev) {
+> + pr_err("%s: error: no device", __func__);
+> + return -ENODEV;
+> + }
+
+Patch is totally corrupted and could not be applied even if I wanted to
+:(
+
+Can you just use 'git send-email' to send patches out?  web clients do
+not work at all (as you saw with your first attempt in html format...)
+
+thanks,
+
+greg k-h
