@@ -2,396 +2,98 @@ Return-Path: <SRS0=S8oY=Z7=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 789AAC00454
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Dec 2019 17:00:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3350C04E30
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Dec 2019 20:39:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 41AE02077B
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Dec 2019 17:00:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B58AD20637
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Dec 2019 20:39:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="si5mTl2q"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725904AbfLIRAL (ORCPT
+        id S1726608AbfLIUjx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 Dec 2019 12:00:11 -0500
-Received: from inva020.nxp.com ([92.121.34.13]:57198 "EHLO inva020.nxp.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726335AbfLIRAJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 Dec 2019 12:00:09 -0500
-Received: from inva020.nxp.com (localhost [127.0.0.1])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 7DA7F1A1608;
-        Mon,  9 Dec 2019 18:00:06 +0100 (CET)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 66D2C1A15E5;
-        Mon,  9 Dec 2019 18:00:06 +0100 (CET)
-Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 29A6320564;
-        Mon,  9 Dec 2019 18:00:06 +0100 (CET)
-From:   Andrei Botila <andrei.botila@nxp.com>
-To:     Horia Geanta <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] crypto: caam/qi2 - remove double buffering for ahash
-Date:   Mon,  9 Dec 2019 18:59:56 +0200
-Message-Id: <1575910796-13897-2-git-send-email-andrei.botila@nxp.com>
-X-Mailer: git-send-email 2.1.0
-In-Reply-To: <1575910796-13897-1-git-send-email-andrei.botila@nxp.com>
-References: <1575910796-13897-1-git-send-email-andrei.botila@nxp.com>
-X-Virus-Scanned: ClamAV using ClamSMTP
+        Mon, 9 Dec 2019 15:39:53 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:33546 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726354AbfLIUjx (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 9 Dec 2019 15:39:53 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xB9Kdar4083867;
+        Mon, 9 Dec 2019 20:39:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2019-08-05;
+ bh=pgrzkgIvorMYsWDVNvkZGEiwd4r9QTH0sc9WP6gd/fA=;
+ b=si5mTl2qpZ2XIuHA+nlWUePoRIhka1QKKCCWNVtyx6rhpIw55EVZH81no/g7mZJn+yKO
+ d/VaSMECkMGHzgLZnTPozIoYWj/R7kia8MqyOkB1Sx2ek4PymbM3C6f2gpwjcSVr6pWH
+ 5k+CNxQY6kAMN9eZ6HZkz0dkt7UnT+p64XIokHHMXZvu347ER8d0B+JK4KmXU4j279/X
+ wEVTOvNueze5qiRGYgOktwxUq1cY8IAnuFWqVT3eruAtC1Fd3iIxeVjzv/HaOVSsiW2B
+ g82odMAk+8qeSfmqk+WURms/llfiXuMkgN7Ioc7++U9c66IM6Ijv9E2txpdDQjSaf3O7 Og== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 2wrw4mxw4y-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 09 Dec 2019 20:39:43 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xB9KdU5J015463;
+        Mon, 9 Dec 2019 20:39:42 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3020.oracle.com with ESMTP id 2wsw6frn7p-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 09 Dec 2019 20:39:42 +0000
+Received: from abhmp0016.oracle.com (abhmp0016.oracle.com [141.146.116.22])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id xB9KdeNX015737;
+        Mon, 9 Dec 2019 20:39:40 GMT
+Received: from ca-dmjordan1.us.oracle.com (/10.211.9.48)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 09 Dec 2019 12:39:40 -0800
+Date:   Mon, 9 Dec 2019 15:39:46 -0500
+From:   Daniel Jordan <daniel.m.jordan@oracle.com>
+To:     Steffen Klassert <steffen.klassert@secunet.com>
+Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Eric Biggers <ebiggers@kernel.org>
+Subject: Re: RFD: multithreading in padata
+Message-ID: <20191209200348.av6b4g6euqmoxvvo@ca-dmjordan1.us.oracle.com>
+References: <20191203155841.56egvxekxgf5xctw@ca-dmjordan1.us.oracle.com>
+ <20191209123929.GQ8621@gauss3.secunet.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191209123929.GQ8621@gauss3.secunet.de>
+User-Agent: NeoMutt/20180716
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9466 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
+ phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=764
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.0.1-1911140001 definitions=main-1912090162
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9466 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
+ lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=846 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
+ definitions=main-1912090162
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Previously double buffering was used for storing previous and next
-"less-than-block-size" bytes. Double buffering can be removed by moving
-the copy of next "less-than-block-size" bytes after current request is
-executed by HW.
+On Mon, Dec 09, 2019 at 01:39:29PM +0100, Steffen Klassert wrote:
+> On Tue, Dec 03, 2019 at 10:58:41AM -0500, Daniel Jordan wrote:
+> > Thoughts?  Questions?
+> 
+> I'm ok with this.
 
-Signed-off-by: Andrei Botila <andrei.botila@nxp.com>
----
- drivers/crypto/caam/caamalg_qi2.c | 157 +++++++++++-------------------
- 1 file changed, 58 insertions(+), 99 deletions(-)
+Glad to hear it, will continue in this direction.
 
-diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamalg_qi2.c
-index 3443f6d6dd83..3aeacc36ce23 100644
---- a/drivers/crypto/caam/caamalg_qi2.c
-+++ b/drivers/crypto/caam/caamalg_qi2.c
-@@ -2998,15 +2998,13 @@ struct caam_hash_state {
- 	dma_addr_t buf_dma;
- 	dma_addr_t ctx_dma;
- 	int ctx_dma_len;
--	u8 buf_0[CAAM_MAX_HASH_BLOCK_SIZE] ____cacheline_aligned;
--	int buflen_0;
--	u8 buf_1[CAAM_MAX_HASH_BLOCK_SIZE] ____cacheline_aligned;
--	int buflen_1;
-+	u8 buf[CAAM_MAX_HASH_BLOCK_SIZE] ____cacheline_aligned;
-+	int buflen;
-+	int next_buflen;
- 	u8 caam_ctx[MAX_CTX_LEN] ____cacheline_aligned;
- 	int (*update)(struct ahash_request *req);
- 	int (*final)(struct ahash_request *req);
- 	int (*finup)(struct ahash_request *req);
--	int current_buf;
- };
- 
- struct caam_export_state {
-@@ -3018,42 +3016,17 @@ struct caam_export_state {
- 	int (*finup)(struct ahash_request *req);
- };
- 
--static inline void switch_buf(struct caam_hash_state *state)
--{
--	state->current_buf ^= 1;
--}
--
--static inline u8 *current_buf(struct caam_hash_state *state)
--{
--	return state->current_buf ? state->buf_1 : state->buf_0;
--}
--
--static inline u8 *alt_buf(struct caam_hash_state *state)
--{
--	return state->current_buf ? state->buf_0 : state->buf_1;
--}
--
--static inline int *current_buflen(struct caam_hash_state *state)
--{
--	return state->current_buf ? &state->buflen_1 : &state->buflen_0;
--}
--
--static inline int *alt_buflen(struct caam_hash_state *state)
--{
--	return state->current_buf ? &state->buflen_0 : &state->buflen_1;
--}
--
- /* Map current buffer in state (if length > 0) and put it in link table */
- static inline int buf_map_to_qm_sg(struct device *dev,
- 				   struct dpaa2_sg_entry *qm_sg,
- 				   struct caam_hash_state *state)
- {
--	int buflen = *current_buflen(state);
-+	int buflen = state->buflen;
- 
- 	if (!buflen)
- 		return 0;
- 
--	state->buf_dma = dma_map_single(dev, current_buf(state), buflen,
-+	state->buf_dma = dma_map_single(dev, state->buf, buflen,
- 					DMA_TO_DEVICE);
- 	if (dma_mapping_error(dev, state->buf_dma)) {
- 		dev_err(dev, "unable to map buf\n");
-@@ -3321,7 +3294,7 @@ static inline void ahash_unmap(struct device *dev, struct ahash_edesc *edesc,
- 				 DMA_TO_DEVICE);
- 
- 	if (state->buf_dma) {
--		dma_unmap_single(dev, state->buf_dma, *current_buflen(state),
-+		dma_unmap_single(dev, state->buf_dma, state->buflen,
- 				 DMA_TO_DEVICE);
- 		state->buf_dma = 0;
- 	}
-@@ -3383,9 +3356,17 @@ static void ahash_done_bi(void *cbk_ctx, u32 status)
- 		ecode = caam_qi2_strstatus(ctx->dev, status);
- 
- 	ahash_unmap_ctx(ctx->dev, edesc, req, DMA_BIDIRECTIONAL);
--	switch_buf(state);
- 	qi_cache_free(edesc);
- 
-+	scatterwalk_map_and_copy(state->buf, req->src,
-+				 req->nbytes - state->next_buflen,
-+				 state->next_buflen, 0);
-+	state->buflen = state->next_buflen;
-+
-+	print_hex_dump_debug("buf@" __stringify(__LINE__)": ",
-+			     DUMP_PREFIX_ADDRESS, 16, 4, state->buf,
-+			     state->buflen, 1);
-+
- 	print_hex_dump_debug("ctx@" __stringify(__LINE__)": ",
- 			     DUMP_PREFIX_ADDRESS, 16, 4, state->caam_ctx,
- 			     ctx->ctx_len, 1);
-@@ -3440,9 +3421,17 @@ static void ahash_done_ctx_dst(void *cbk_ctx, u32 status)
- 		ecode = caam_qi2_strstatus(ctx->dev, status);
- 
- 	ahash_unmap_ctx(ctx->dev, edesc, req, DMA_FROM_DEVICE);
--	switch_buf(state);
- 	qi_cache_free(edesc);
- 
-+	scatterwalk_map_and_copy(state->buf, req->src,
-+				 req->nbytes - state->next_buflen,
-+				 state->next_buflen, 0);
-+	state->buflen = state->next_buflen;
-+
-+	print_hex_dump_debug("buf@" __stringify(__LINE__)": ",
-+			     DUMP_PREFIX_ADDRESS, 16, 4, state->buf,
-+			     state->buflen, 1);
-+
- 	print_hex_dump_debug("ctx@" __stringify(__LINE__)": ",
- 			     DUMP_PREFIX_ADDRESS, 16, 4, state->caam_ctx,
- 			     ctx->ctx_len, 1);
-@@ -3464,16 +3453,14 @@ static int ahash_update_ctx(struct ahash_request *req)
- 	struct dpaa2_fl_entry *out_fle = &req_ctx->fd_flt[0];
- 	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
- 		      GFP_KERNEL : GFP_ATOMIC;
--	u8 *buf = current_buf(state);
--	int *buflen = current_buflen(state);
--	u8 *next_buf = alt_buf(state);
--	int *next_buflen = alt_buflen(state), last_buflen;
-+	u8 *buf = state->buf;
-+	int *buflen = &state->buflen;
-+	int *next_buflen = &state->next_buflen;
- 	int in_len = *buflen + req->nbytes, to_hash;
- 	int src_nents, mapped_nents, qm_sg_bytes, qm_sg_src_index;
- 	struct ahash_edesc *edesc;
- 	int ret = 0;
- 
--	last_buflen = *next_buflen;
- 	*next_buflen = in_len & (crypto_tfm_alg_blocksize(&ahash->base) - 1);
- 	to_hash = in_len - *next_buflen;
- 
-@@ -3524,10 +3511,6 @@ static int ahash_update_ctx(struct ahash_request *req)
- 		if (mapped_nents) {
- 			sg_to_qm_sg_last(req->src, src_len,
- 					 sg_table + qm_sg_src_index, 0);
--			if (*next_buflen)
--				scatterwalk_map_and_copy(next_buf, req->src,
--							 to_hash - *buflen,
--							 *next_buflen, 0);
- 		} else {
- 			dpaa2_sg_set_final(sg_table + qm_sg_src_index - 1,
- 					   true);
-@@ -3566,14 +3549,11 @@ static int ahash_update_ctx(struct ahash_request *req)
- 		scatterwalk_map_and_copy(buf + *buflen, req->src, 0,
- 					 req->nbytes, 0);
- 		*buflen = *next_buflen;
--		*next_buflen = last_buflen;
--	}
- 
--	print_hex_dump_debug("buf@" __stringify(__LINE__)": ",
--			     DUMP_PREFIX_ADDRESS, 16, 4, buf, *buflen, 1);
--	print_hex_dump_debug("next buf@" __stringify(__LINE__)": ",
--			     DUMP_PREFIX_ADDRESS, 16, 4, next_buf, *next_buflen,
--			     1);
-+		print_hex_dump_debug("buf@" __stringify(__LINE__)": ",
-+				     DUMP_PREFIX_ADDRESS, 16, 4, buf,
-+				     *buflen, 1);
-+	}
- 
- 	return ret;
- unmap_ctx:
-@@ -3592,7 +3572,7 @@ static int ahash_final_ctx(struct ahash_request *req)
- 	struct dpaa2_fl_entry *out_fle = &req_ctx->fd_flt[0];
- 	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
- 		      GFP_KERNEL : GFP_ATOMIC;
--	int buflen = *current_buflen(state);
-+	int buflen = state->buflen;
- 	int qm_sg_bytes;
- 	int digestsize = crypto_ahash_digestsize(ahash);
- 	struct ahash_edesc *edesc;
-@@ -3663,7 +3643,7 @@ static int ahash_finup_ctx(struct ahash_request *req)
- 	struct dpaa2_fl_entry *out_fle = &req_ctx->fd_flt[0];
- 	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
- 		      GFP_KERNEL : GFP_ATOMIC;
--	int buflen = *current_buflen(state);
-+	int buflen = state->buflen;
- 	int qm_sg_bytes, qm_sg_src_index;
- 	int src_nents, mapped_nents;
- 	int digestsize = crypto_ahash_digestsize(ahash);
-@@ -3852,8 +3832,8 @@ static int ahash_final_no_ctx(struct ahash_request *req)
- 	struct dpaa2_fl_entry *out_fle = &req_ctx->fd_flt[0];
- 	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
- 		      GFP_KERNEL : GFP_ATOMIC;
--	u8 *buf = current_buf(state);
--	int buflen = *current_buflen(state);
-+	u8 *buf = state->buf;
-+	int buflen = state->buflen;
- 	int digestsize = crypto_ahash_digestsize(ahash);
- 	struct ahash_edesc *edesc;
- 	int ret = -ENOMEM;
-@@ -3925,10 +3905,9 @@ static int ahash_update_no_ctx(struct ahash_request *req)
- 	struct dpaa2_fl_entry *out_fle = &req_ctx->fd_flt[0];
- 	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
- 		      GFP_KERNEL : GFP_ATOMIC;
--	u8 *buf = current_buf(state);
--	int *buflen = current_buflen(state);
--	u8 *next_buf = alt_buf(state);
--	int *next_buflen = alt_buflen(state);
-+	u8 *buf = state->buf;
-+	int *buflen = &state->buflen;
-+	int *next_buflen = &state->next_buflen;
- 	int in_len = *buflen + req->nbytes, to_hash;
- 	int qm_sg_bytes, src_nents, mapped_nents;
- 	struct ahash_edesc *edesc;
-@@ -3977,11 +3956,6 @@ static int ahash_update_no_ctx(struct ahash_request *req)
- 
- 		sg_to_qm_sg_last(req->src, src_len, sg_table + 1, 0);
- 
--		if (*next_buflen)
--			scatterwalk_map_and_copy(next_buf, req->src,
--						 to_hash - *buflen,
--						 *next_buflen, 0);
--
- 		edesc->qm_sg_dma = dma_map_single(ctx->dev, sg_table,
- 						  qm_sg_bytes, DMA_TO_DEVICE);
- 		if (dma_mapping_error(ctx->dev, edesc->qm_sg_dma)) {
-@@ -4029,14 +4003,11 @@ static int ahash_update_no_ctx(struct ahash_request *req)
- 		scatterwalk_map_and_copy(buf + *buflen, req->src, 0,
- 					 req->nbytes, 0);
- 		*buflen = *next_buflen;
--		*next_buflen = 0;
--	}
- 
--	print_hex_dump_debug("buf@" __stringify(__LINE__)": ",
--			     DUMP_PREFIX_ADDRESS, 16, 4, buf, *buflen, 1);
--	print_hex_dump_debug("next buf@" __stringify(__LINE__)": ",
--			     DUMP_PREFIX_ADDRESS, 16, 4, next_buf, *next_buflen,
--			     1);
-+		print_hex_dump_debug("buf@" __stringify(__LINE__)": ",
-+				     DUMP_PREFIX_ADDRESS, 16, 4, buf,
-+				     *buflen, 1);
-+	}
- 
- 	return ret;
- unmap_ctx:
-@@ -4055,7 +4026,7 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
- 	struct dpaa2_fl_entry *out_fle = &req_ctx->fd_flt[0];
- 	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
- 		      GFP_KERNEL : GFP_ATOMIC;
--	int buflen = *current_buflen(state);
-+	int buflen = state->buflen;
- 	int qm_sg_bytes, src_nents, mapped_nents;
- 	int digestsize = crypto_ahash_digestsize(ahash);
- 	struct ahash_edesc *edesc;
-@@ -4151,8 +4122,9 @@ static int ahash_update_first(struct ahash_request *req)
- 	struct dpaa2_fl_entry *out_fle = &req_ctx->fd_flt[0];
- 	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
- 		      GFP_KERNEL : GFP_ATOMIC;
--	u8 *next_buf = alt_buf(state);
--	int *next_buflen = alt_buflen(state);
-+	u8 *buf = state->buf;
-+	int *buflen = &state->buflen;
-+	int *next_buflen = &state->next_buflen;
- 	int to_hash;
- 	int src_nents, mapped_nents;
- 	struct ahash_edesc *edesc;
-@@ -4220,10 +4192,6 @@ static int ahash_update_first(struct ahash_request *req)
- 			dpaa2_fl_set_addr(in_fle, sg_dma_address(req->src));
- 		}
- 
--		if (*next_buflen)
--			scatterwalk_map_and_copy(next_buf, req->src, to_hash,
--						 *next_buflen, 0);
--
- 		state->ctx_dma_len = ctx->ctx_len;
- 		state->ctx_dma = dma_map_single(ctx->dev, state->caam_ctx,
- 						ctx->ctx_len, DMA_FROM_DEVICE);
-@@ -4257,14 +4225,14 @@ static int ahash_update_first(struct ahash_request *req)
- 		state->update = ahash_update_no_ctx;
- 		state->finup = ahash_finup_no_ctx;
- 		state->final = ahash_final_no_ctx;
--		scatterwalk_map_and_copy(next_buf, req->src, 0,
-+		scatterwalk_map_and_copy(buf, req->src, 0,
- 					 req->nbytes, 0);
--		switch_buf(state);
--	}
-+		*buflen = *next_buflen;
- 
--	print_hex_dump_debug("next buf@" __stringify(__LINE__)": ",
--			     DUMP_PREFIX_ADDRESS, 16, 4, next_buf, *next_buflen,
--			     1);
-+		print_hex_dump_debug("buf@" __stringify(__LINE__)": ",
-+				     DUMP_PREFIX_ADDRESS, 16, 4, buf,
-+				     *buflen, 1);
-+	}
- 
- 	return ret;
- unmap_ctx:
-@@ -4288,10 +4256,9 @@ static int ahash_init(struct ahash_request *req)
- 
- 	state->ctx_dma = 0;
- 	state->ctx_dma_len = 0;
--	state->current_buf = 0;
- 	state->buf_dma = 0;
--	state->buflen_0 = 0;
--	state->buflen_1 = 0;
-+	state->buflen = 0;
-+	state->next_buflen = 0;
- 
- 	return 0;
- }
-@@ -4321,16 +4288,8 @@ static int ahash_export(struct ahash_request *req, void *out)
- {
- 	struct caam_hash_state *state = ahash_request_ctx(req);
- 	struct caam_export_state *export = out;
--	int len;
--	u8 *buf;
--
--	if (state->current_buf) {
--		buf = state->buf_1;
--		len = state->buflen_1;
--	} else {
--		buf = state->buf_0;
--		len = state->buflen_0;
--	}
-+	u8 *buf = state->buf;
-+	int len = state->buflen;
- 
- 	memcpy(export->buf, buf, len);
- 	memcpy(export->caam_ctx, state->caam_ctx, sizeof(export->caam_ctx));
-@@ -4348,9 +4307,9 @@ static int ahash_import(struct ahash_request *req, const void *in)
- 	const struct caam_export_state *export = in;
- 
- 	memset(state, 0, sizeof(*state));
--	memcpy(state->buf_0, export->buf, export->buflen);
-+	memcpy(state->buf, export->buf, export->buflen);
- 	memcpy(state->caam_ctx, export->caam_ctx, sizeof(state->caam_ctx));
--	state->buflen_0 = export->buflen;
-+	state->buflen = export->buflen;
- 	state->update = export->update;
- 	state->final = export->final;
- 	state->finup = export->finup;
--- 
-2.17.1
+> Please consider to add yourself as
+> a Co-Maintainer, I guess you know the code in between
+> much better than I do :)
 
+Sure, I'll consider that :)  Thanks for looking, Steffen.
