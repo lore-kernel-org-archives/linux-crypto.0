@@ -2,229 +2,195 @@ Return-Path: <SRS0=S8oY=Z7=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E663EC43603
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Dec 2019 15:33:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC163C43603
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Dec 2019 15:41:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B4F132077B
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Dec 2019 15:33:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1575905596;
-	bh=xv8UuW5kDA/p9HUZoET8W9XCTuTQpr0pivWsPRLO79w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=DY8t/k5u0hBi2C1F1y2G8QhsMk0KZQ0/SSnI9KHs6aq91J8Mz0XyKD4Y4DQ6di8um
-	 w0RWYQm0ezpr2T+V3WYypnYE3IqXDlJogwrgHQvX3+FTQpw1wdULrIMUHO6AxpFWrI
-	 zdpBPVhQumoT6b1gaJKejwCV8sMrmVlBpB6Yo7xA=
+	by mail.kernel.org (Postfix) with ESMTP id A4FE62073D
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Dec 2019 15:41:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726483AbfLIPdQ (ORCPT
+        id S1726197AbfLIPl6 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 Dec 2019 10:33:16 -0500
-Received: from mail.kernel.org ([198.145.29.99]:39318 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726379AbfLIPdQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 Dec 2019 10:33:16 -0500
-Received: from localhost (unknown [89.205.132.23])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7268920692;
-        Mon,  9 Dec 2019 15:33:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1575905595;
-        bh=xv8UuW5kDA/p9HUZoET8W9XCTuTQpr0pivWsPRLO79w=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=xXFiZwDUwjN540ONucZ4zM78TX6Ztxvpi+8utG5Ckm7577MrtEAwRzmU1n4YxJ3+s
-         8petGSWeSlrgrDkgL+TIPZtoB2eypNsJbPZRcffsuGD92tETDzCLlYkJCAwNhnIU/O
-         YjQ0ZzBKF4m7fYXdDsiJpFI8hqIQQsKqHWLbG0Zw=
-Date:   Mon, 9 Dec 2019 16:33:10 +0100
-From:   "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
-To:     "Kim, David" <david.kim@ncipher.com>
-Cc:     "devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
+        Mon, 9 Dec 2019 10:41:58 -0500
+Received: from mail1.bemta25.messagelabs.com ([195.245.230.3]:63259 "EHLO
+        mail1.bemta25.messagelabs.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726080AbfLIPl6 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 9 Dec 2019 10:41:58 -0500
+Received: from [46.226.52.100] (using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256 bits))
+        by server-3.bemta.az-a.eu-west-1.aws.symcld.net id 36/7A-12117-04B6EED5; Mon, 09 Dec 2019 15:41:52 +0000
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrBKsWRWlGSWpSXmKPExsVyU+ECq65D9rt
+  Yg3+f1C3u3/vJ5MDo8XmTXABjFGtmXlJ+RQJrxppLh5kKHjpXnJk8jbWB8YNTFyMnh5DAXkaJ
+  Ww02XYxcQPYZRonzbesYQRJsAloSM7ZOBbNFBGwlJi7rZgYpYhZYwihx9OpqJpCEsICXxJoZJ
+  5ggirwlNuz4xdrFyAFkW0n8u6UOEmYRUJF42nGcFcTmFdCVuH33DTPE4iCJE1eugLVyChhKXL
+  r/nR3EZhSQlXi08heYzSwgLnHryXywGgkBAYkle84zQ9iiEi8f/2OFsA0kti7dxwJhK0pcm3+
+  CEeQECQFriRsP+EFMZgFNifW79CEmKkpM6X7IDnGNoMTJmU9YJjCKzUKybBZCxywkHbOQdCxg
+  ZFnFaJ5UlJmeUZKbmJmja2hgoGtoaKRraGmsa2Sul1ilm6iXWqpbnlpcomuol1herFdcmZuck
+  6KXl1qyiREYXSkFB6V3MPZ/e6t3iFGSg0lJlHfSqVexQnxJ+SmVGYnFGfFFpTmpxYcYZTg4lC
+  R4z2W+ixUSLEpNT61Iy8wBRjpMWoKDR0mEd08WUJq3uCAxtzgzHSJ1itGYY8LLuYuYOY7MXbq
+  IWYglLz8vVUqcdz5IqQBIaUZpHtwgWAK6xCgrJczLyMDAIMRTkFqUm1mCKv+KUZyDUUmYdwrI
+  PTyZeSVw+14BncIEdEpnCtgpJYkIKakGpoQq5oeLe5fmtD2dq3R3b6eLBY/JB0G9Ka4f1q6e2
+  Gelt/BHtsv9J+0HXy28yZpwfu3P70vE2h5/e9i46HftvCkzq194VzVPt2+c7iLEMPnubQ3N8N
+  9+hzjWa5zpPftam2PFo38mTKfLvjVybVFdEOj1VdHqSuafs3aL3WoOl//7YLQt635T48bHR4U
+  rZOY57/hpfbR/9pQ5LYs51t6bVDfnvcnil338j1ecSHUJXSnoaG3VJfZOr+bj2axAjyDuWlHj
+  1C+7cr0EXNezGOztezzZLEB0yf5Xf+9J/XAzuDz71sPXZ4/ndp26WpRk/sy8U8xvhviKOKstL
+  dPjt4ubP7715YDGm2vZS+b4CPSZXLuuxFKckWioxVxUnAgAvGEpsrsDAAA=
+X-Env-Sender: david.kim@ncipher.com
+X-Msg-Ref: server-29.tower-264.messagelabs.com!1575906112!603882!2
+X-Originating-IP: [217.32.208.5]
+X-SYMC-ESS-Client-Auth: outbound-route-from=pass
+X-StarScan-Received: 
+X-StarScan-Version: 9.44.22; banners=-,-,-
+X-VirusChecked: Checked
+Received: (qmail 4657 invoked from network); 9 Dec 2019 15:41:52 -0000
+Received: from unknown (HELO exukdagfar02.INTERNAL.ROOT.TES) (217.32.208.5)
+  by server-29.tower-264.messagelabs.com with ECDHE-RSA-AES256-SHA384 encrypted SMTP; 9 Dec 2019 15:41:52 -0000
+Received: from exukdagfar01.INTERNAL.ROOT.TES (10.194.2.70) by
+ exukdagfar02.INTERNAL.ROOT.TES (10.194.2.71) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Mon, 9 Dec 2019 15:41:51 +0000
+Received: from exukdagfar01.INTERNAL.ROOT.TES ([fe80::48de:aa33:fc4c:d1f5]) by
+ exukdagfar01.INTERNAL.ROOT.TES ([fe80::48de:aa33:fc4c:d1f5%14]) with mapi id
+ 15.00.1497.000; Mon, 9 Dec 2019 15:41:51 +0000
+From:   "Kim, David" <david.kim@ncipher.com>
+To:     "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
+CC:     "devel@driverdev.osuosl.org" <devel@driverdev.osuosl.org>,
         "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "Magee, Tim" <tim.magee@ncipher.com>
 Subject: Re: [PATCH] drivers: staging: Add support for nCipher HSM devices
-Message-ID: <20191209153310.GD1280846@kroah.com>
-References: <1575899815003.20486@ncipher.com>
+Thread-Topic: [PATCH] drivers: staging: Add support for nCipher HSM devices
+Thread-Index: AQHVrpiE4uqHhgJk30y3nRGskfuqA6ex7rsAgAAAzyA=
+Date:   Mon, 9 Dec 2019 15:41:51 +0000
+Message-ID: <1575906111248.24322@ncipher.com>
+References: <1575899815003.20486@ncipher.com>,<20191209153310.GD1280846@kroah.com>
+In-Reply-To: <20191209153310.GD1280846@kroah.com>
+Accept-Language: en-US, en-GB
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [172.23.136.54]
+x-exclaimer-md-config: 7ae4f661-56ee-4cc7-9363-621ce9eeb65f
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1575899815003.20486@ncipher.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Dec 09, 2019 at 01:56:55PM +0000, Kim, David wrote:
-> 
-> Hi everybody,
-> ​
-> This patch introduces a driver for nCipher's Solo and Solo XC range of PCIe
-> hardware security modules (HSM), which provide key creation/management
-> and cryptography services.
-> 
-> Upstreaming the nCipher driver into the kernel will allow early adopters
-> of the latest kernel to upgrade and maintain their working systems when
-> using an nCipher PCIe HSM. Further, having this driver in the kernel will be
-> more convenient to our users and make a Linux based solution a more
-> attractive option for others.​
-
-Odd characters at your line-end here :(
-
-> 
-> Regards,
-> Dave Kim
-
-
-No need for the "Hi" and "regards" in a changelog text :)
-
-Most importantly, why is this being submitted for the staging directory?
-What is keeping it from being added to the "real" part of the kernel
-now?
-
-If you need/want it in drivers/staging/ then you need a TODO file that
-lists what needs to be done to it in order to get out of
-drivers/staging/
-
-thanks,
-
-greg k-h
-
-> 
-> Co-developed-by: Tim Magee <tim.magee@ncipher.com>
-> Signed-off-by: Tim Magee <tim.magee@ncipher.com>
-> Signed-off-by: David Kim <david.kim@ncipher.com>​
-
-Odd line-end here :(
-
-
-> 
-> 
->  MAINTAINERS                       |    8 +
->  drivers/staging/Kconfig           |    1 +
->  drivers/staging/Makefile          |    1 +
->  drivers/staging/ncipher/Kconfig   |    8 +
->  drivers/staging/ncipher/Makefile  |    7 +
->  drivers/staging/ncipher/fsl.c     |  911 ++++++++++++++++++++++
->  drivers/staging/ncipher/fsl.h     |  117 +++
->  drivers/staging/ncipher/hostif.c  | 1521 +++++++++++++++++++++++++++++++++++++
->  drivers/staging/ncipher/i21555.c  |  553 ++++++++++++++
->  drivers/staging/ncipher/i21555.h  |   68 ++
->  drivers/staging/ncipher/solo.h    |  316 ++++++++
->  include/uapi/linux/nshield_solo.h |  181 +++++
->  12 files changed, 3692 insertions(+)
-> 
-> 
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 061d59a4a80b..c1125c999b95 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -12605,6 +12605,14 @@ L: linux-pci@vger.kernel.org
->  S: Supported
->  F: drivers/pci/controller/vmd.c
-> 
-> +PCI DRIVER FOR NSHIELD SOLO AND SOLO XC HARDWARE SECURITY MODULES (HSM)
-> +M: Tim Magee <tim.magee@ncipher.com>
-> +M: David Kim <david.kim@ncipher.com>
-> +M: Hamish Cameron <hamish.cameron@ncipher.com>
-> +L: linux-crypto@vger.kernel.org
-> +S: Supported
-> +F: drivers/staging/ncipher/
-> +
->  PCI DRIVER FOR MICROSEMI SWITCHTEC
->  M: Kurt Schwemmer <kurt.schwemmer@microsemi.com>
->  M: Logan Gunthorpe <logang@deltatee.com>
-> diff --git a/drivers/staging/Kconfig b/drivers/staging/Kconfig
-> index eaf753b70ec5..0b5498d2415c 100644
-> --- a/drivers/staging/Kconfig
-> +++ b/drivers/staging/Kconfig
-> @@ -124,6 +124,7 @@ source "drivers/staging/uwb/Kconfig"
->  source "drivers/staging/exfat/Kconfig"
-> 
->  source "drivers/staging/qlge/Kconfig"
-> +source "drivers/staging/ncipher/Kconfig"
-> 
->  source "drivers/staging/hp/Kconfig"
-> 
-> diff --git a/drivers/staging/Makefile b/drivers/staging/Makefile
-> index 0a4396c9067b..be9f2e811528 100644
-> --- a/drivers/staging/Makefile
-> +++ b/drivers/staging/Makefile
-> @@ -55,3 +55,4 @@ obj-$(CONFIG_EXFAT_FS) += exfat/
->  obj-$(CONFIG_QLGE) += qlge/
->  obj-$(CONFIG_NET_VENDOR_HP) += hp/
->  obj-$(CONFIG_WFX) += wfx/
-> +obj-$(CONFIG_NCIPHER) += ncipher/
-> diff --git a/drivers/staging/ncipher/Kconfig b/drivers/staging/ncipher/Kconfig
-> new file mode 100644
-> index 000000000000..5b466cd1896a
-> --- /dev/null
-> +++ b/drivers/staging/ncipher/Kconfig
-> @@ -0,0 +1,8 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +# Enable support for nCipher's nShield Solo and Solo XC
-> +config HSM_NCIPHER_NSHIELD_SOLO
-> + tristate "nCipher Solo and Solo XC family of PCIe HSMs"
-> + depends on PCI
-> + help
-> +   Select this as built-in or module if you expect to use
-> +   a Hardware Security Module from nCipher's Solo or Solo XC range.
-> diff --git a/drivers/staging/ncipher/Makefile b/drivers/staging/ncipher/Makefile
-> new file mode 100644
-> index 000000000000..b4d5f92addee
-> --- /dev/null
-> +++ b/drivers/staging/ncipher/Makefile
-> @@ -0,0 +1,7 @@
-> +# SPDX-License-Identifier: GPL-2.0
-> +#
-> +# Makefile for nCipher nShield HSM drivers
-> +#
-> +
-> +obj-$(CONFIG_HSM_NCIPHER_NSHIELD_SOLO) := nshield_solo.o
-> +nshield_solo-y := hostif.o fsl.o i21555.o
-> diff --git a/drivers/staging/ncipher/fsl.c b/drivers/staging/ncipher/fsl.c
-> new file mode 100644
-> index 000000000000..5c4edeef64c0
-> --- /dev/null
-> +++ b/drivers/staging/ncipher/fsl.c
-> @@ -0,0 +1,911 @@
-> +// SPDX-License-Identifier: GPL-2.0+
-> +/*
-> + *
-> + * fsl.c: nCipher PCI HSM FSL command driver
-> + * Copyright 2019 nCipher Security Ltd
-> + *
-> + */
-> +
-> +#include "solo.h"
-> +#include "fsl.h"
-> +
-> +/**
-> + * Resets FSL device.
-> + *
-> + * Extra device info is initialized the first time created.
-> + *
-> + * @param ndev common device.
-> + * @returns 0 if successful, other value if error.
-> + */
-> +static int fsl_create(struct nfp_dev *ndev)
-> +{
-> + /* check for device */
-> + if (!ndev) {
-> + pr_err("%s: error: no device", __func__);
-> + return -ENODEV;
-> + }
-
-Patch is totally corrupted and could not be applied even if I wanted to
-:(
-
-Can you just use 'git send-email' to send patches out?  web clients do
-not work at all (as you saw with your first attempt in html format...)
-
-thanks,
-
-greg k-h
+SGkgR3JlZywNCg0KVGhhbmtzIGZvciB0aGUgc3BlZWR5IHJlcGx5LiBJIHdhcyBob3BpbmcgdGhh
+dCBzZXR0aW5nIG15IGNsaWVudCB0byBwbGFpbiB0ZXh0IG9ubHkgd291bGQgYWN0dWFsbHkgZG8g
+cGxhaW4gdGV4dCBvbmx5IGJ1dCBJIHdpbGwgdHJ5IGFnYWluIHdpdGggZ2l0IHNlbmQtZW1haWwu
+DQoNClRoaXMgaXMgb3VyIGZpcnN0IGRyaXZlciB1cHN0cmVhbWluZyBhbmQgd2UgdGFyZ2V0ZWQg
+c3RhZ2luZyBhcyBhIGZpcnN0IGVudHJ5IHBvaW50LiBJZiB5b3UgZmVlbCBpdCdzIG1vcmUgYXBw
+cm9wcmlhdGUgd2hlbiBJIHJlLXN1Ym1pdCBJIGNhbiBnbyBkaXJlY3RseSB0byBkcml2ZXJzL2Ny
+eXB0byBpbnN0ZWFkLg0KDQpUaGFua3MsDQpEYXZlDQoNCg0KDQpEYXZpZCBLaW0NClNlbmlvciBT
+b2Z0d2FyZSBFbmdpbmVlcg0KVGVsOiArNDQgMTIyMyA3MDM0NDkNCg0KbkNpcGhlciBTZWN1cml0
+eQ0KT25lIFN0YXRpb24gU3F1YXJlDQpDYW1icmlkZ2UgQ0IxIDJHQQ0KVW5pdGVkIEtpbmdkb20N
+Cg0KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fXw0KRnJvbTogbGludXgt
+Y3J5cHRvLW93bmVyQHZnZXIua2VybmVsLm9yZyA8bGludXgtY3J5cHRvLW93bmVyQHZnZXIua2Vy
+bmVsLm9yZz4gb24gYmVoYWxmIG9mIGdyZWdraEBsaW51eGZvdW5kYXRpb24ub3JnIDxncmVna2hA
+bGludXhmb3VuZGF0aW9uLm9yZz4NClNlbnQ6IE1vbmRheSwgRGVjZW1iZXIgOSwgMjAxOSAzOjMz
+IFBNDQpUbzogS2ltLCBEYXZpZA0KQ2M6IGRldmVsQGRyaXZlcmRldi5vc3Vvc2wub3JnOyBsaW51
+eC1jcnlwdG9Admdlci5rZXJuZWwub3JnOyBNYWdlZSwgVGltDQpTdWJqZWN0OiBSZTogW1BBVENI
+XSBkcml2ZXJzOiBzdGFnaW5nOiBBZGQgc3VwcG9ydCBmb3IgbkNpcGhlciBIU00gZGV2aWNlcw0K
+DQpPbiBNb24sIERlYyAwOSwgMjAxOSBhdCAwMTo1Njo1NVBNICswMDAwLCBLaW0sIERhdmlkIHdy
+b3RlOg0KPg0KPiBIaSBldmVyeWJvZHksDQo+IOKAiw0KPiBUaGlzIHBhdGNoIGludHJvZHVjZXMg
+YSBkcml2ZXIgZm9yIG5DaXBoZXIncyBTb2xvIGFuZCBTb2xvIFhDIHJhbmdlIG9mIFBDSWUNCj4g
+aGFyZHdhcmUgc2VjdXJpdHkgbW9kdWxlcyAoSFNNKSwgd2hpY2ggcHJvdmlkZSBrZXkgY3JlYXRp
+b24vbWFuYWdlbWVudA0KPiBhbmQgY3J5cHRvZ3JhcGh5IHNlcnZpY2VzLg0KPg0KPiBVcHN0cmVh
+bWluZyB0aGUgbkNpcGhlciBkcml2ZXIgaW50byB0aGUga2VybmVsIHdpbGwgYWxsb3cgZWFybHkg
+YWRvcHRlcnMNCj4gb2YgdGhlIGxhdGVzdCBrZXJuZWwgdG8gdXBncmFkZSBhbmQgbWFpbnRhaW4g
+dGhlaXIgd29ya2luZyBzeXN0ZW1zIHdoZW4NCj4gdXNpbmcgYW4gbkNpcGhlciBQQ0llIEhTTS4g
+RnVydGhlciwgaGF2aW5nIHRoaXMgZHJpdmVyIGluIHRoZSBrZXJuZWwgd2lsbCBiZQ0KPiBtb3Jl
+IGNvbnZlbmllbnQgdG8gb3VyIHVzZXJzIGFuZCBtYWtlIGEgTGludXggYmFzZWQgc29sdXRpb24g
+YSBtb3JlDQo+IGF0dHJhY3RpdmUgb3B0aW9uIGZvciBvdGhlcnMu4oCLDQoNCk9kZCBjaGFyYWN0
+ZXJzIGF0IHlvdXIgbGluZS1lbmQgaGVyZSA6KA0KDQo+DQo+IFJlZ2FyZHMsDQo+IERhdmUgS2lt
+DQoNCg0KTm8gbmVlZCBmb3IgdGhlICJIaSIgYW5kICJyZWdhcmRzIiBpbiBhIGNoYW5nZWxvZyB0
+ZXh0IDopDQoNCk1vc3QgaW1wb3J0YW50bHksIHdoeSBpcyB0aGlzIGJlaW5nIHN1Ym1pdHRlZCBm
+b3IgdGhlIHN0YWdpbmcgZGlyZWN0b3J5Pw0KV2hhdCBpcyBrZWVwaW5nIGl0IGZyb20gYmVpbmcg
+YWRkZWQgdG8gdGhlICJyZWFsIiBwYXJ0IG9mIHRoZSBrZXJuZWwNCm5vdz8NCg0KSWYgeW91IG5l
+ZWQvd2FudCBpdCBpbiBkcml2ZXJzL3N0YWdpbmcvIHRoZW4geW91IG5lZWQgYSBUT0RPIGZpbGUg
+dGhhdA0KbGlzdHMgd2hhdCBuZWVkcyB0byBiZSBkb25lIHRvIGl0IGluIG9yZGVyIHRvIGdldCBv
+dXQgb2YNCmRyaXZlcnMvc3RhZ2luZy8NCg0KdGhhbmtzLA0KDQpncmVnIGstaA0KDQo+DQo+IENv
+LWRldmVsb3BlZC1ieTogVGltIE1hZ2VlIDx0aW0ubWFnZWVAbmNpcGhlci5jb20+DQo+IFNpZ25l
+ZC1vZmYtYnk6IFRpbSBNYWdlZSA8dGltLm1hZ2VlQG5jaXBoZXIuY29tPg0KPiBTaWduZWQtb2Zm
+LWJ5OiBEYXZpZCBLaW0gPGRhdmlkLmtpbUBuY2lwaGVyLmNvbT7igIsNCg0KT2RkIGxpbmUtZW5k
+IGhlcmUgOigNCg0KDQo+DQo+DQo+ICBNQUlOVEFJTkVSUyAgICAgICAgICAgICAgICAgICAgICAg
+fCAgICA4ICsNCj4gIGRyaXZlcnMvc3RhZ2luZy9LY29uZmlnICAgICAgICAgICB8ICAgIDEgKw0K
+PiAgZHJpdmVycy9zdGFnaW5nL01ha2VmaWxlICAgICAgICAgIHwgICAgMSArDQo+ICBkcml2ZXJz
+L3N0YWdpbmcvbmNpcGhlci9LY29uZmlnICAgfCAgICA4ICsNCj4gIGRyaXZlcnMvc3RhZ2luZy9u
+Y2lwaGVyL01ha2VmaWxlICB8ICAgIDcgKw0KPiAgZHJpdmVycy9zdGFnaW5nL25jaXBoZXIvZnNs
+LmMgICAgIHwgIDkxMSArKysrKysrKysrKysrKysrKysrKysrDQo+ICBkcml2ZXJzL3N0YWdpbmcv
+bmNpcGhlci9mc2wuaCAgICAgfCAgMTE3ICsrKw0KPiAgZHJpdmVycy9zdGFnaW5nL25jaXBoZXIv
+aG9zdGlmLmMgIHwgMTUyMSArKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrKysrDQo+
+ICBkcml2ZXJzL3N0YWdpbmcvbmNpcGhlci9pMjE1NTUuYyAgfCAgNTUzICsrKysrKysrKysrKysr
+DQo+ICBkcml2ZXJzL3N0YWdpbmcvbmNpcGhlci9pMjE1NTUuaCAgfCAgIDY4ICsrDQo+ICBkcml2
+ZXJzL3N0YWdpbmcvbmNpcGhlci9zb2xvLmggICAgfCAgMzE2ICsrKysrKysrDQo+ICBpbmNsdWRl
+L3VhcGkvbGludXgvbnNoaWVsZF9zb2xvLmggfCAgMTgxICsrKysrDQo+ICAxMiBmaWxlcyBjaGFu
+Z2VkLCAzNjkyIGluc2VydGlvbnMoKykNCj4NCj4NCj4NCj4gZGlmZiAtLWdpdCBhL01BSU5UQUlO
+RVJTIGIvTUFJTlRBSU5FUlMNCj4gaW5kZXggMDYxZDU5YTRhODBiLi5jMTEyNWM5OTliOTUgMTAw
+NjQ0DQo+IC0tLSBhL01BSU5UQUlORVJTDQo+ICsrKyBiL01BSU5UQUlORVJTDQo+IEBAIC0xMjYw
+NSw2ICsxMjYwNSwxNCBAQCBMOiBsaW51eC1wY2lAdmdlci5rZXJuZWwub3JnDQo+ICBTOiBTdXBw
+b3J0ZWQNCj4gIEY6IGRyaXZlcnMvcGNpL2NvbnRyb2xsZXIvdm1kLmMNCj4NCj4gK1BDSSBEUklW
+RVIgRk9SIE5TSElFTEQgU09MTyBBTkQgU09MTyBYQyBIQVJEV0FSRSBTRUNVUklUWSBNT0RVTEVT
+IChIU00pDQo+ICtNOiBUaW0gTWFnZWUgPHRpbS5tYWdlZUBuY2lwaGVyLmNvbT4NCj4gK006IERh
+dmlkIEtpbSA8ZGF2aWQua2ltQG5jaXBoZXIuY29tPg0KPiArTTogSGFtaXNoIENhbWVyb24gPGhh
+bWlzaC5jYW1lcm9uQG5jaXBoZXIuY29tPg0KPiArTDogbGludXgtY3J5cHRvQHZnZXIua2VybmVs
+Lm9yZw0KPiArUzogU3VwcG9ydGVkDQo+ICtGOiBkcml2ZXJzL3N0YWdpbmcvbmNpcGhlci8NCj4g
+Kw0KPiAgUENJIERSSVZFUiBGT1IgTUlDUk9TRU1JIFNXSVRDSFRFQw0KPiAgTTogS3VydCBTY2h3
+ZW1tZXIgPGt1cnQuc2Nod2VtbWVyQG1pY3Jvc2VtaS5jb20+DQo+ICBNOiBMb2dhbiBHdW50aG9y
+cGUgPGxvZ2FuZ0BkZWx0YXRlZS5jb20+DQo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL3N0YWdpbmcv
+S2NvbmZpZyBiL2RyaXZlcnMvc3RhZ2luZy9LY29uZmlnDQo+IGluZGV4IGVhZjc1M2I3MGVjNS4u
+MGI1NDk4ZDI0MTVjIDEwMDY0NA0KPiAtLS0gYS9kcml2ZXJzL3N0YWdpbmcvS2NvbmZpZw0KPiAr
+KysgYi9kcml2ZXJzL3N0YWdpbmcvS2NvbmZpZw0KPiBAQCAtMTI0LDYgKzEyNCw3IEBAIHNvdXJj
+ZSAiZHJpdmVycy9zdGFnaW5nL3V3Yi9LY29uZmlnIg0KPiAgc291cmNlICJkcml2ZXJzL3N0YWdp
+bmcvZXhmYXQvS2NvbmZpZyINCj4NCj4gIHNvdXJjZSAiZHJpdmVycy9zdGFnaW5nL3FsZ2UvS2Nv
+bmZpZyINCj4gK3NvdXJjZSAiZHJpdmVycy9zdGFnaW5nL25jaXBoZXIvS2NvbmZpZyINCj4NCj4g
+IHNvdXJjZSAiZHJpdmVycy9zdGFnaW5nL2hwL0tjb25maWciDQo+DQo+IGRpZmYgLS1naXQgYS9k
+cml2ZXJzL3N0YWdpbmcvTWFrZWZpbGUgYi9kcml2ZXJzL3N0YWdpbmcvTWFrZWZpbGUNCj4gaW5k
+ZXggMGE0Mzk2YzkwNjdiLi5iZTlmMmU4MTE1MjggMTAwNjQ0DQo+IC0tLSBhL2RyaXZlcnMvc3Rh
+Z2luZy9NYWtlZmlsZQ0KPiArKysgYi9kcml2ZXJzL3N0YWdpbmcvTWFrZWZpbGUNCj4gQEAgLTU1
+LDMgKzU1LDQgQEAgb2JqLSQoQ09ORklHX0VYRkFUX0ZTKSArPSBleGZhdC8NCj4gIG9iai0kKENP
+TkZJR19RTEdFKSArPSBxbGdlLw0KPiAgb2JqLSQoQ09ORklHX05FVF9WRU5ET1JfSFApICs9IGhw
+Lw0KPiAgb2JqLSQoQ09ORklHX1dGWCkgKz0gd2Z4Lw0KPiArb2JqLSQoQ09ORklHX05DSVBIRVIp
+ICs9IG5jaXBoZXIvDQo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL3N0YWdpbmcvbmNpcGhlci9LY29u
+ZmlnIGIvZHJpdmVycy9zdGFnaW5nL25jaXBoZXIvS2NvbmZpZw0KPiBuZXcgZmlsZSBtb2RlIDEw
+MDY0NA0KPiBpbmRleCAwMDAwMDAwMDAwMDAuLjViNDY2Y2QxODk2YQ0KPiAtLS0gL2Rldi9udWxs
+DQo+ICsrKyBiL2RyaXZlcnMvc3RhZ2luZy9uY2lwaGVyL0tjb25maWcNCj4gQEAgLTAsMCArMSw4
+IEBADQo+ICsjIFNQRFgtTGljZW5zZS1JZGVudGlmaWVyOiBHUEwtMi4wDQo+ICsjIEVuYWJsZSBz
+dXBwb3J0IGZvciBuQ2lwaGVyJ3MgblNoaWVsZCBTb2xvIGFuZCBTb2xvIFhDDQo+ICtjb25maWcg
+SFNNX05DSVBIRVJfTlNISUVMRF9TT0xPDQo+ICsgdHJpc3RhdGUgIm5DaXBoZXIgU29sbyBhbmQg
+U29sbyBYQyBmYW1pbHkgb2YgUENJZSBIU01zIg0KPiArIGRlcGVuZHMgb24gUENJDQo+ICsgaGVs
+cA0KPiArICAgU2VsZWN0IHRoaXMgYXMgYnVpbHQtaW4gb3IgbW9kdWxlIGlmIHlvdSBleHBlY3Qg
+dG8gdXNlDQo+ICsgICBhIEhhcmR3YXJlIFNlY3VyaXR5IE1vZHVsZSBmcm9tIG5DaXBoZXIncyBT
+b2xvIG9yIFNvbG8gWEMgcmFuZ2UuDQo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL3N0YWdpbmcvbmNp
+cGhlci9NYWtlZmlsZSBiL2RyaXZlcnMvc3RhZ2luZy9uY2lwaGVyL01ha2VmaWxlDQo+IG5ldyBm
+aWxlIG1vZGUgMTAwNjQ0DQo+IGluZGV4IDAwMDAwMDAwMDAwMC4uYjRkNWY5MmFkZGVlDQo+IC0t
+LSAvZGV2L251bGwNCj4gKysrIGIvZHJpdmVycy9zdGFnaW5nL25jaXBoZXIvTWFrZWZpbGUNCj4g
+QEAgLTAsMCArMSw3IEBADQo+ICsjIFNQRFgtTGljZW5zZS1JZGVudGlmaWVyOiBHUEwtMi4wDQo+
+ICsjDQo+ICsjIE1ha2VmaWxlIGZvciBuQ2lwaGVyIG5TaGllbGQgSFNNIGRyaXZlcnMNCj4gKyMN
+Cj4gKw0KPiArb2JqLSQoQ09ORklHX0hTTV9OQ0lQSEVSX05TSElFTERfU09MTykgOj0gbnNoaWVs
+ZF9zb2xvLm8NCj4gK25zaGllbGRfc29sby15IDo9IGhvc3RpZi5vIGZzbC5vIGkyMTU1NS5vDQo+
+IGRpZmYgLS1naXQgYS9kcml2ZXJzL3N0YWdpbmcvbmNpcGhlci9mc2wuYyBiL2RyaXZlcnMvc3Rh
+Z2luZy9uY2lwaGVyL2ZzbC5jDQo+IG5ldyBmaWxlIG1vZGUgMTAwNjQ0DQo+IGluZGV4IDAwMDAw
+MDAwMDAwMC4uNWM0ZWRlZWY2NGMwDQo+IC0tLSAvZGV2L251bGwNCj4gKysrIGIvZHJpdmVycy9z
+dGFnaW5nL25jaXBoZXIvZnNsLmMNCj4gQEAgLTAsMCArMSw5MTEgQEANCj4gKy8vIFNQRFgtTGlj
+ZW5zZS1JZGVudGlmaWVyOiBHUEwtMi4wKw0KPiArLyoNCj4gKyAqDQo+ICsgKiBmc2wuYzogbkNp
+cGhlciBQQ0kgSFNNIEZTTCBjb21tYW5kIGRyaXZlcg0KPiArICogQ29weXJpZ2h0IDIwMTkgbkNp
+cGhlciBTZWN1cml0eSBMdGQNCj4gKyAqDQo+ICsgKi8NCj4gKw0KPiArI2luY2x1ZGUgInNvbG8u
+aCINCj4gKyNpbmNsdWRlICJmc2wuaCINCj4gKw0KPiArLyoqDQo+ICsgKiBSZXNldHMgRlNMIGRl
+dmljZS4NCj4gKyAqDQo+ICsgKiBFeHRyYSBkZXZpY2UgaW5mbyBpcyBpbml0aWFsaXplZCB0aGUg
+Zmlyc3QgdGltZSBjcmVhdGVkLg0KPiArICoNCj4gKyAqIEBwYXJhbSBuZGV2IGNvbW1vbiBkZXZp
+Y2UuDQo+ICsgKiBAcmV0dXJucyAwIGlmIHN1Y2Nlc3NmdWwsIG90aGVyIHZhbHVlIGlmIGVycm9y
+Lg0KPiArICovDQo+ICtzdGF0aWMgaW50IGZzbF9jcmVhdGUoc3RydWN0IG5mcF9kZXYgKm5kZXYp
+DQo+ICt7DQo+ICsgLyogY2hlY2sgZm9yIGRldmljZSAqLw0KPiArIGlmICghbmRldikgew0KPiAr
+IHByX2VycigiJXM6IGVycm9yOiBubyBkZXZpY2UiLCBfX2Z1bmNfXyk7DQo+ICsgcmV0dXJuIC1F
+Tk9ERVY7DQo+ICsgfQ0KDQpQYXRjaCBpcyB0b3RhbGx5IGNvcnJ1cHRlZCBhbmQgY291bGQgbm90
+IGJlIGFwcGxpZWQgZXZlbiBpZiBJIHdhbnRlZCB0bw0KOigNCg0KQ2FuIHlvdSBqdXN0IHVzZSAn
+Z2l0IHNlbmQtZW1haWwnIHRvIHNlbmQgcGF0Y2hlcyBvdXQ/ICB3ZWIgY2xpZW50cyBkbw0Kbm90
+IHdvcmsgYXQgYWxsIChhcyB5b3Ugc2F3IHdpdGggeW91ciBmaXJzdCBhdHRlbXB0IGluIGh0bWwg
+Zm9ybWF0Li4uKQ0KDQp0aGFua3MsDQoNCmdyZWcgay1oDQo=
