@@ -2,109 +2,107 @@ Return-Path: <SRS0=Ct60=2A=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4400BC2D0BF
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Dec 2019 16:45:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96B2CC43603
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Dec 2019 21:08:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1891C2073D
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Dec 2019 16:45:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="hgTjGNuJ"
+	by mail.kernel.org (Postfix) with ESMTP id 6363524684
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Dec 2019 21:08:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1576012118;
+	bh=z88IOY+YMC7QchWuaCMq11vzPMHWIBYHvXtSH+ltZno=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=RZI6DOMIF8gVxmmdsM91rd/1QgjRd9Xa/agb3bOhU8lHqcBguSJ4dqrgzlllJNqm0
+	 DX86BGnw3VWhr3/FmYo8xvrLs0guNjh9cWJIOKsC2btJY3Fs1sWzDJkuztAO+BgwWF
+	 snkDKypfwGhF+rKQnruhgRafLw6GDyfiLpT17tUk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727693AbfLJQoy (ORCPT
+        id S1727113AbfLJVIf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 Dec 2019 11:44:54 -0500
-Received: from userp2120.oracle.com ([156.151.31.85]:35162 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727603AbfLJQox (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Dec 2019 11:44:53 -0500
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBAGboui035560;
-        Tue, 10 Dec 2019 16:44:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2019-08-05;
- bh=DvRWT6CyyrCzRdhYiXvqt+Gm4VF8bj63CS4+c8VSgaM=;
- b=hgTjGNuJT9MEJ69ULPu8bGkLQFLcjAcl4cOkzbMEvyW0My104Br80ZyQAIMd83A6conH
- L7KVIo5eR7BeKAuOL1pN0n5vXUGXMMZNu5eFMYJaNWZfmZJZ+xTrSJ+xdHSZIcE3SMnd
- TPWWzdHN3H9MKopJLpVmA3Y4/y/O0z7IRfKFHf6lj7FiWzb0QH3nRMtZKfEW2qALY0Qt
- dPuJJyR6u3co72kOGXqrz87HGKFUPQIdsGWrEy3hkAiLXTvL2Wsy+KHTCbb6T/EAN/i3
- Kxh9gIaUOB10E2HoeTmwxO19G4zFHZol2oPs6YEgGesDiX3oCXI0DxEaQ6ZDSWVODfsW 8Q== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2120.oracle.com with ESMTP id 2wr4qrfadv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 10 Dec 2019 16:44:37 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.27/8.16.0.27) with SMTP id xBAGP27w005185;
-        Tue, 10 Dec 2019 16:44:36 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3020.oracle.com with ESMTP id 2wt6bckhc2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 10 Dec 2019 16:44:36 +0000
-Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id xBAGiWlJ007455;
-        Tue, 10 Dec 2019 16:44:32 GMT
-Received: from ca-dmjordan1.us.oracle.com (/10.211.9.48)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 10 Dec 2019 08:44:31 -0800
-Date:   Tue, 10 Dec 2019 11:44:41 -0500
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Steffen Klassert <steffen.klassert@secunet.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>, linux-crypto@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Daniel Jordan <daniel.m.jordan@oracle.com>
-Subject: Re: [PATCH v2 5/5] padata: update documentation
-Message-ID: <20191210164441.gikjbbusik4fan5y@ca-dmjordan1.us.oracle.com>
-References: <20191203193114.238912-1-daniel.m.jordan@oracle.com>
- <20191203193114.238912-6-daniel.m.jordan@oracle.com>
+        Tue, 10 Dec 2019 16:08:35 -0500
+Received: from mail.kernel.org ([198.145.29.99]:56022 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727893AbfLJVIe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 10 Dec 2019 16:08:34 -0500
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 218A024698;
+        Tue, 10 Dec 2019 21:08:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1576012114;
+        bh=z88IOY+YMC7QchWuaCMq11vzPMHWIBYHvXtSH+ltZno=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=Lgs/TjuJkw6n0n0QB9Vc0UakrsCZ0SF2PrXqV1YygnPg3ngDNUTlCw93rdCp2JWHO
+         +VuSmyLTQHuV3b/07gjeE3pSyXaYvisEbgpRYR3S2X2cu7H1vP+DMSZYFGSQBTym36
+         SjT7hOeYJ3rFdvuiZjeeyQvn6K9HfMNugC63AGFs=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Nathan Chancellor <natechancellor@gmail.com>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        ci_notify@linaro.org, Herbert Xu <herbert@gondor.apana.org.au>,
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
+        clang-built-linux@googlegroups.com
+Subject: [PATCH AUTOSEL 5.4 086/350] crypto: aegis128/simd - build 32-bit ARM for v8 architecture explicitly
+Date:   Tue, 10 Dec 2019 16:03:11 -0500
+Message-Id: <20191210210735.9077-47-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20191210210735.9077-1-sashal@kernel.org>
+References: <20191210210735.9077-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191203193114.238912-6-daniel.m.jordan@oracle.com>
-User-Agent: NeoMutt/20180716
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9467 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-1912100141
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9467 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=999 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-1912100142
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Small fixup for this patch.
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+[ Upstream commit 830536770f968ab33ece123b317e252c269098db ]
+
+Now that the Clang compiler has taken it upon itself to police the
+compiler command line, and reject combinations for arguments it views
+as incompatible, the AEGIS128 no longer builds correctly, and errors
+out like this:
+
+  clang-10: warning: ignoring extension 'crypto' because the 'armv7-a'
+  architecture does not support it [-Winvalid-command-line-argument]
+
+So let's switch to armv8-a instead, which matches the crypto-neon-fp-armv8
+FPU profile we specify. Since neither were actually supported by GCC
+versions before 4.8, let's tighten the Kconfig dependencies as well so
+we won't run into errors when building with an ancient compiler.
+
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Reviewed-by: Nathan Chancellor <natechancellor@gmail.com>
+Tested-by: Nathan Chancellor <natechancellor@gmail.com>
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+Tested-by: Nick Desaulniers <ndesaulniers@google.com>
+Reported-by: <ci_notify@linaro.org>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ crypto/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 9d3a5c54a41d..eefd665d41a1 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -12253,7 +12253,7 @@ L:	linux-crypto@vger.kernel.org
- S:	Maintained
- F:	kernel/padata.c
- F:	include/linux/padata.h
--F:	Documentation/padata.txt
-+F:	Documentation/core-api/padata.rst
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 9e524044d3128..29472fb795f34 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -309,6 +309,7 @@ config CRYPTO_AEGIS128
+ config CRYPTO_AEGIS128_SIMD
+ 	bool "Support SIMD acceleration for AEGIS-128"
+ 	depends on CRYPTO_AEGIS128 && ((ARM || ARM64) && KERNEL_MODE_NEON)
++	depends on !ARM || CC_IS_CLANG || GCC_VERSION >= 40800
+ 	default y
  
- PAGE POOL
- M:	Jesper Dangaard Brouer <hawk@kernel.org>
+ config CRYPTO_AEGIS128_AESNI_SSE2
 -- 
-2.24.0
+2.20.1
 
