@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 892C6C43603
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Dec 2019 21:15:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEDC9C2D0C4
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Dec 2019 21:15:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5DC0E205C9
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Dec 2019 21:15:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B3D5B205C9
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Dec 2019 21:15:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576012526;
-	bh=pEEjz3Ac7oHki0v/6nYWxfjSb4k9VlXfoHypBWSLk2w=;
+	s=default; t=1576012541;
+	bh=eIQ0z7KFrVi9cIMOCkXs+VUcprEsuWDL5eY/GTbXQ8g=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=G5AnfdCNPWCPZNLQPpaHJ8em4aC5/imSSwTgBITgy5mLp4jWk1sTN5w9v0BDiGlhC
-	 sSFB1bbFowWaJSTYJTMtSPdKMlrN+TTbiTpBhbH1Kfbll/VWhNNy7PuyNaeL961T7D
-	 3rn+XVDHYaJftkcNfwtnAL3yod6P+0F/j043ywFE=
+	b=pDDoMl66KRcSbl4NWcx5P8gGefB/i8i9aKX9nEeisBhWK+vv0N4PwXmrr8Ss0eDgb
+	 mWKh9s4MaFwEaJSKePKwmYKD9b72lwUh30EkrMgYgkuXCV4w+xhQQ9+ir93ZftpyZ4
+	 kAElbEKTUdkfCIo7ecuf8x4//dwmpQimX4SuQV3k=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728909AbfLJVPV (ORCPT
+        id S1727286AbfLJVPc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 Dec 2019 16:15:21 -0500
-Received: from mail.kernel.org ([198.145.29.99]:40168 "EHLO mail.kernel.org"
+        Tue, 10 Dec 2019 16:15:32 -0500
+Received: from mail.kernel.org ([198.145.29.99]:40070 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729307AbfLJVNh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Dec 2019 16:13:37 -0500
+        id S1729370AbfLJVNf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 10 Dec 2019 16:13:35 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 812B222464;
-        Tue, 10 Dec 2019 21:13:36 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2BCDF214D8;
+        Tue, 10 Dec 2019 21:13:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1576012417;
-        bh=pEEjz3Ac7oHki0v/6nYWxfjSb4k9VlXfoHypBWSLk2w=;
+        s=default; t=1576012414;
+        bh=eIQ0z7KFrVi9cIMOCkXs+VUcprEsuWDL5eY/GTbXQ8g=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=yUJXmGHq2Ue/EwC8f+oDfg9JckVdrDUJDOGeGQKtMufjCXS4qktCofR04MBmHXwHd
-         s6KAm1VZ+YztltygrMrE6Af1VeczM7euMehXPTA7V1HgejYvrrpZqtsz+bXW34h5zW
-         lCpdkyRkIoQdcrgTv9Q6W1pY/GYSJOqVP4WiZXNM=
+        b=PUU5xt0KPUN49hcxkZ9nFzwPHkG/+H4xqiY78qECKhehP4COzer7TC4v4R/UP2fbG
+         QyHRlsvReY7qJgJpVls2nYzxpPCmN4zIuQz79gvmebEstmXzk6r6k6aPHAjvRS1PqI
+         SM7cUuQBB3C6VLVSqvgZkxWr8L2zDLLZqoEtztyM=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Michael Ellerman <mpe@ellerman.id.au>,
+Cc:     Corentin Labbe <clabbe.montjoie@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH AUTOSEL 5.4 333/350] crypto: vmx - Avoid weird build failures
-Date:   Tue, 10 Dec 2019 16:07:18 -0500
-Message-Id: <20191210210735.9077-294-sashal@kernel.org>
+        linux-arm-kernel@lists.infradead.org
+Subject: [PATCH AUTOSEL 5.4 331/350] crypto: sun4i-ss - Fix 64-bit size_t warnings on sun4i-ss-hash.c
+Date:   Tue, 10 Dec 2019 16:07:16 -0500
+Message-Id: <20191210210735.9077-292-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191210210735.9077-1-sashal@kernel.org>
 References: <20191210210735.9077-1-sashal@kernel.org>
@@ -60,65 +60,59 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Michael Ellerman <mpe@ellerman.id.au>
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
 
-[ Upstream commit 4ee812f6143d78d8ba1399671d78c8d78bf2817c ]
+[ Upstream commit a7126603d46fe8f01aeedf589e071c6aaa6c6c39 ]
 
-In the vmx crypto Makefile we assign to a variable called TARGET and
-pass that to the aesp8-ppc.pl and ghashp8-ppc.pl scripts.
+If you try to compile this driver on a 64-bit platform then you
+will get warnings because it mixes size_t with unsigned int which
+only works on 32-bit.
 
-The variable is meant to describe what flavour of powerpc we're
-building for, eg. either 32 or 64-bit, and big or little endian.
-
-Unfortunately TARGET is a fairly common name for a make variable, and
-if it happens that TARGET is specified as a command line parameter to
-make, the value specified on the command line will override our value.
-
-In particular this can happen if the kernel Makefile is driven by an
-external Makefile that uses TARGET for something.
-
-This leads to weird build failures, eg:
-  nonsense  at /build/linux/drivers/crypto/vmx/ghashp8-ppc.pl line 45.
-  /linux/drivers/crypto/vmx/Makefile:20: recipe for target 'drivers/crypto/vmx/ghashp8-ppc.S' failed
-
-Which shows that we passed an empty value for $(TARGET) to the perl
-script, confirmed with make V=1:
-
-  perl /linux/drivers/crypto/vmx/ghashp8-ppc.pl  > drivers/crypto/vmx/ghashp8-ppc.S
-
-We can avoid this confusion by using override, to tell make that we
-don't want anything to override our variable, even a value specified
-on the command line. We can also use a less common name, given the
-script calls it "flavour", let's use that.
-
-Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+This patch fixes all of the warnings on sun4i-ss-hash.c.
+Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/vmx/Makefile | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ drivers/crypto/sunxi-ss/sun4i-ss-hash.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/crypto/vmx/Makefile b/drivers/crypto/vmx/Makefile
-index cab32cfec9c45..709670d2b553a 100644
---- a/drivers/crypto/vmx/Makefile
-+++ b/drivers/crypto/vmx/Makefile
-@@ -3,13 +3,13 @@ obj-$(CONFIG_CRYPTO_DEV_VMX_ENCRYPT) += vmx-crypto.o
- vmx-crypto-objs := vmx.o aesp8-ppc.o ghashp8-ppc.o aes.o aes_cbc.o aes_ctr.o aes_xts.o ghash.o
- 
- ifeq ($(CONFIG_CPU_LITTLE_ENDIAN),y)
--TARGET := linux-ppc64le
-+override flavour := linux-ppc64le
- else
--TARGET := linux-ppc64
-+override flavour := linux-ppc64
- endif
- 
- quiet_cmd_perl = PERL $@
--      cmd_perl = $(PERL) $(<) $(TARGET) > $(@)
-+      cmd_perl = $(PERL) $(<) $(flavour) > $(@)
- 
- targets += aesp8-ppc.S ghashp8-ppc.S
- 
+diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
+index fcffba5ef9276..1369c5fa30871 100644
+--- a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
++++ b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
+@@ -272,8 +272,8 @@ static int sun4i_hash(struct ahash_request *areq)
+ 			 */
+ 			while (op->len < 64 && i < end) {
+ 				/* how many bytes we can read from current SG */
+-				in_r = min3(mi.length - in_i, end - i,
+-					    64 - op->len);
++				in_r = min(end - i, 64 - op->len);
++				in_r = min_t(size_t, mi.length - in_i, in_r);
+ 				memcpy(op->buf + op->len, mi.addr + in_i, in_r);
+ 				op->len += in_r;
+ 				i += in_r;
+@@ -293,8 +293,8 @@ static int sun4i_hash(struct ahash_request *areq)
+ 		}
+ 		if (mi.length - in_i > 3 && i < end) {
+ 			/* how many bytes we can read from current SG */
+-			in_r = min3(mi.length - in_i, areq->nbytes - i,
+-				    ((mi.length - in_i) / 4) * 4);
++			in_r = min_t(size_t, mi.length - in_i, areq->nbytes - i);
++			in_r = min_t(size_t, ((mi.length - in_i) / 4) * 4, in_r);
+ 			/* how many bytes we can write in the device*/
+ 			todo = min3((u32)(end - i) / 4, rx_cnt, (u32)in_r / 4);
+ 			writesl(ss->base + SS_RXFIFO, mi.addr + in_i, todo);
+@@ -320,8 +320,8 @@ static int sun4i_hash(struct ahash_request *areq)
+ 	if ((areq->nbytes - i) < 64) {
+ 		while (i < areq->nbytes && in_i < mi.length && op->len < 64) {
+ 			/* how many bytes we can read from current SG */
+-			in_r = min3(mi.length - in_i, areq->nbytes - i,
+-				    64 - op->len);
++			in_r = min(areq->nbytes - i, 64 - op->len);
++			in_r = min_t(size_t, mi.length - in_i, in_r);
+ 			memcpy(op->buf + op->len, mi.addr + in_i, in_r);
+ 			op->len += in_r;
+ 			i += in_r;
 -- 
 2.20.1
 
