@@ -7,47 +7,48 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D6E4C00454
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Dec 2019 21:15:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B881BC00454
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Dec 2019 21:16:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 21647205C9
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Dec 2019 21:15:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 834B1206EC
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Dec 2019 21:16:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576012548;
-	bh=nb5yFAF53BWgm75qXbUF4VqZi6/1osmYFffo1aDSVAI=;
+	s=default; t=1576012583;
+	bh=vGhZFSEsZqCy533g7WLZ+OnLZ3qZFRbE9KzvE/bFCEw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=FYU257Sc2i8w5rwC2s+UrER6FgnnckRQssQ0AnAiLwAbWvVTfjNIie9H5uyEWrPGV
-	 BTTXHTl+1lWGfO4q/x1GEuYOw1F/UalFJwA2uZt3RWReRe9Rvz6Q12JgbyxrYYF6jW
-	 6FDrxTjgQMcp2Iw00QM2QFpIMxzlNHe88xt7WMNQ=
+	b=QIFd6xAHi/RQyXErQKe16m2WpAdJix9psIXGWBat3dD5fJq18INhrd0MJcZZ42e0t
+	 vGQ2k0NffvHbE8fXSB30JZXBJeoalZ4ZdIn8Mf5ocfu8P4WM86CrWZi3FB6ICJjvZW
+	 sIO6fX+IeMjZ2g7b+09O08U1YsTOvLK0HrCo326Y=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727674AbfLJVPm (ORCPT
+        id S1729271AbfLJVNT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 Dec 2019 16:15:42 -0500
-Received: from mail.kernel.org ([198.145.29.99]:39932 "EHLO mail.kernel.org"
+        Tue, 10 Dec 2019 16:13:19 -0500
+Received: from mail.kernel.org ([198.145.29.99]:39364 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729361AbfLJVNc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Dec 2019 16:13:32 -0500
+        id S1728733AbfLJVNS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 10 Dec 2019 16:13:18 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 43A4B2467F;
-        Tue, 10 Dec 2019 21:13:31 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id C50B6205C9;
+        Tue, 10 Dec 2019 21:13:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1576012412;
-        bh=nb5yFAF53BWgm75qXbUF4VqZi6/1osmYFffo1aDSVAI=;
+        s=default; t=1576012397;
+        bh=vGhZFSEsZqCy533g7WLZ+OnLZ3qZFRbE9KzvE/bFCEw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=W80mPfBXffffsDyZom/UOQkWaAqVJIEgKRSzKo1FnPWnrwHZPJPIO4KRS7HLe0AL2
-         0/MEbnJIw7eXOe9syJ/hZdD8yVoXa6N+8lAl7uASMlm10FdY+Q+tQ2RDTsiu5YkjB+
-         S+SeLd1c9reT+M5VOT1vhkoRbx47VvNQf1IkYMzk=
+        b=w+w9wvtpHcl65h2iIDupZ0ngXqmN38V2BgXrrR0B9azZFYDCbLxkla+KDkxIUEZBX
+         PjIKAFMXZQkEdo+zkVOUHM9DkXBa+/q3k29/fVLT1r7MV5a2e1gzF3dKX1MukAkkhu
+         RnXiEHZ9bFxtZhx5sQqnWom8HcMtscz7ZmI7s9LQ=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
+Cc:     YueHaibing <yuehaibing@huawei.com>, Hulk Robot <hulkci@huawei.com>,
+        Joerg Schmidbauer <jschmidb@linux.vnet.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Subject: [PATCH AUTOSEL 5.4 329/350] crypto: sun4i-ss - Fix 64-bit size_t warnings
-Date:   Tue, 10 Dec 2019 16:07:14 -0500
-Message-Id: <20191210210735.9077-290-sashal@kernel.org>
+        linux-s390@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.4 317/350] s390/crypto: Fix unsigned variable compared with zero
+Date:   Tue, 10 Dec 2019 16:07:02 -0500
+Message-Id: <20191210210735.9077-278-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191210210735.9077-1-sashal@kernel.org>
 References: <20191210210735.9077-1-sashal@kernel.org>
@@ -60,100 +61,48 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Herbert Xu <herbert@gondor.apana.org.au>
+From: YueHaibing <yuehaibing@huawei.com>
 
-[ Upstream commit d6e9da21ee8246b5e556b3b153401ab045adb986 ]
+[ Upstream commit 0398d4ab1677f7d8cd43aac2aa29a93dfcf9e2e3 ]
 
-If you try to compile this driver on a 64-bit platform then you
-will get warnings because it mixes size_t with unsigned int which
-only works on 32-bit.
+s390_crypto_shash_parmsize() return type is int, it
+should not be stored in a unsigned variable, which
+compared with zero.
 
-This patch fixes all of the warnings.
-
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Acked-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-Tested-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Fixes: 3c2eb6b76cab ("s390/crypto: Support for SHA3 via CPACF (MSA6)")
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+Signed-off-by: Joerg Schmidbauer <jschmidb@linux.vnet.ibm.com>
+Signed-off-by: Vasily Gorbik <gor@linux.ibm.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/sunxi-ss/sun4i-ss-cipher.c | 22 ++++++++++++++--------
- 1 file changed, 14 insertions(+), 8 deletions(-)
+ arch/s390/crypto/sha_common.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
-index 6536fd4bee657..7e5e092a23b3c 100644
---- a/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
-+++ b/drivers/crypto/sunxi-ss/sun4i-ss-cipher.c
-@@ -72,7 +72,8 @@ static int noinline_for_stack sun4i_ss_opti_poll(struct skcipher_request *areq)
- 	oi = 0;
- 	oo = 0;
- 	do {
--		todo = min3(rx_cnt, ileft, (mi.length - oi) / 4);
-+		todo = min(rx_cnt, ileft);
-+		todo = min_t(size_t, todo, (mi.length - oi) / 4);
- 		if (todo) {
- 			ileft -= todo;
- 			writesl(ss->base + SS_RXFIFO, mi.addr + oi, todo);
-@@ -87,7 +88,8 @@ static int noinline_for_stack sun4i_ss_opti_poll(struct skcipher_request *areq)
- 		rx_cnt = SS_RXFIFO_SPACES(spaces);
- 		tx_cnt = SS_TXFIFO_SPACES(spaces);
+diff --git a/arch/s390/crypto/sha_common.c b/arch/s390/crypto/sha_common.c
+index d39e0f0792170..686fe7aa192f4 100644
+--- a/arch/s390/crypto/sha_common.c
++++ b/arch/s390/crypto/sha_common.c
+@@ -74,14 +74,17 @@ int s390_sha_final(struct shash_desc *desc, u8 *out)
+ 	struct s390_sha_ctx *ctx = shash_desc_ctx(desc);
+ 	unsigned int bsize = crypto_shash_blocksize(desc->tfm);
+ 	u64 bits;
+-	unsigned int n, mbl_offset;
++	unsigned int n;
++	int mbl_offset;
  
--		todo = min3(tx_cnt, oleft, (mo.length - oo) / 4);
-+		todo = min(tx_cnt, oleft);
-+		todo = min_t(size_t, todo, (mo.length - oo) / 4);
- 		if (todo) {
- 			oleft -= todo;
- 			readsl(ss->base + SS_TXFIFO, mo.addr + oo, todo);
-@@ -239,7 +241,8 @@ static int sun4i_ss_cipher_poll(struct skcipher_request *areq)
- 			 * todo is the number of consecutive 4byte word that we
- 			 * can read from current SG
- 			 */
--			todo = min3(rx_cnt, ileft / 4, (mi.length - oi) / 4);
-+			todo = min(rx_cnt, ileft / 4);
-+			todo = min_t(size_t, todo, (mi.length - oi) / 4);
- 			if (todo && !ob) {
- 				writesl(ss->base + SS_RXFIFO, mi.addr + oi,
- 					todo);
-@@ -253,8 +256,8 @@ static int sun4i_ss_cipher_poll(struct skcipher_request *areq)
- 				 * we need to be able to write all buf in one
- 				 * pass, so it is why we min() with rx_cnt
- 				 */
--				todo = min3(rx_cnt * 4 - ob, ileft,
--					    mi.length - oi);
-+				todo = min(rx_cnt * 4 - ob, ileft);
-+				todo = min_t(size_t, todo, mi.length - oi);
- 				memcpy(buf + ob, mi.addr + oi, todo);
- 				ileft -= todo;
- 				oi += todo;
-@@ -274,7 +277,8 @@ static int sun4i_ss_cipher_poll(struct skcipher_request *areq)
- 		spaces = readl(ss->base + SS_FCSR);
- 		rx_cnt = SS_RXFIFO_SPACES(spaces);
- 		tx_cnt = SS_TXFIFO_SPACES(spaces);
--		dev_dbg(ss->dev, "%x %u/%u %u/%u cnt=%u %u/%u %u/%u cnt=%u %u\n",
-+		dev_dbg(ss->dev,
-+			"%x %u/%zu %u/%u cnt=%u %u/%zu %u/%u cnt=%u %u\n",
- 			mode,
- 			oi, mi.length, ileft, areq->cryptlen, rx_cnt,
- 			oo, mo.length, oleft, areq->cryptlen, tx_cnt, ob);
-@@ -282,7 +286,8 @@ static int sun4i_ss_cipher_poll(struct skcipher_request *areq)
- 		if (!tx_cnt)
- 			continue;
- 		/* todo in 4bytes word */
--		todo = min3(tx_cnt, oleft / 4, (mo.length - oo) / 4);
-+		todo = min(tx_cnt, oleft / 4);
-+		todo = min_t(size_t, todo, (mo.length - oo) / 4);
- 		if (todo) {
- 			readsl(ss->base + SS_TXFIFO, mo.addr + oo, todo);
- 			oleft -= todo * 4;
-@@ -308,7 +313,8 @@ static int sun4i_ss_cipher_poll(struct skcipher_request *areq)
- 				 * no more than remaining buffer
- 				 * no need to test against oleft
- 				 */
--				todo = min(mo.length - oo, obl - obo);
-+				todo = min_t(size_t,
-+					     mo.length - oo, obl - obo);
- 				memcpy(mo.addr + oo, bufo + obo, todo);
- 				oleft -= todo;
- 				obo += todo;
+ 	n = ctx->count % bsize;
+ 	bits = ctx->count * 8;
+-	mbl_offset = s390_crypto_shash_parmsize(ctx->func) / sizeof(u32);
++	mbl_offset = s390_crypto_shash_parmsize(ctx->func);
+ 	if (mbl_offset < 0)
+ 		return -EINVAL;
+ 
++	mbl_offset = mbl_offset / sizeof(u32);
++
+ 	/* set total msg bit length (mbl) in CPACF parmblock */
+ 	switch (ctx->func) {
+ 	case CPACF_KLMD_SHA_1:
 -- 
 2.20.1
 
