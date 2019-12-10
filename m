@@ -7,56 +7,51 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65161C43603
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Dec 2019 21:51:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 962C3C3F68F
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Dec 2019 21:51:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2F4EB205C9
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Dec 2019 21:51:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 60A792073B
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Dec 2019 21:51:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576014678;
-	bh=9+7vMeFtIEPS1Idj+/h7jbMupoSfm4ZM6sFEDLJEMGs=;
+	s=default; t=1576014684;
+	bh=aGsXyfqPX3236EgvbBto0JuppW0QLi8BbTUtHJ12EMU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=hhhxw6tbKdqjte4Hu0H5Ku7rgCmoRocmRPOKO25NHwQ9fUgN01jwljYQwt8Qlymcn
-	 EE+y2zX1zlywrTaO6YljdP28xmyJ7VKXyoX2LzyRaavSKWGgBPVEXITi+NEYY2dAjm
-	 Jpb0rjODPXbLz7O0vueuMTHXfAsvb7yRX0N/VL1U=
+	b=xwjYmsAeUfPDHrTUBxEoQTNIn9TT2GEGAqdD3lc7UJ07eV2G6mzisUojrRvq4SLq4
+	 V3Ummxdo1hrY6Wc7e2LF88A5DjQQxVvP34rs+x2g3DR+w9ts1CPghxagqmMsZqzwWi
+	 iH3rjEGywBVaLxOmAvI8QKQUBv4CnKumhxJIcNBE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729845AbfLJVvJ (ORCPT
+        id S1727904AbfLJVvS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 Dec 2019 16:51:09 -0500
-Received: from mail.kernel.org ([198.145.29.99]:55090 "EHLO mail.kernel.org"
+        Tue, 10 Dec 2019 16:51:18 -0500
+Received: from mail.kernel.org ([198.145.29.99]:55024 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727370AbfLJVIG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Dec 2019 16:08:06 -0500
+        id S1727773AbfLJVIF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 10 Dec 2019 16:08:05 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A094C24683;
-        Tue, 10 Dec 2019 21:08:04 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 85A8320836;
+        Tue, 10 Dec 2019 21:08:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1576012085;
-        bh=9+7vMeFtIEPS1Idj+/h7jbMupoSfm4ZM6sFEDLJEMGs=;
+        s=default; t=1576012084;
+        bh=aGsXyfqPX3236EgvbBto0JuppW0QLi8BbTUtHJ12EMU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=NNytyfQiG28ekOl+LV9L/6pq07X7FFU8JU2UFB8zuyjzTTCN0uHdP2KdouwOzXk8f
-         d0bvS+Z4YyCJPLMSzDNuwVa9gDyI7gx7NX1ET9yeOcn7UTkRXCts51CnldGFh2+0QJ
-         fyO31Zcj5LIw7RdVgFrkiZARco41Xgha8P9uvtvo=
+        b=dV4vJDoP2MK/IT0MiVmDxJvpbD7VnPVuS1MHAsWgzFHGWOeCWmWzUrVEM8oxrE85u
+         YQCigmBZYhrf/MDTJ6HrRR8NC1ZwrRgQyK+N4gvLbPbTXlW7ZxeadLSk90kC0Gymea
+         6gLFsFTCdMvRH7DgdFDts06kWN914bhElEXSlSHo=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Tony Lindgren <tony@atomide.com>,
-        Aaro Koskinen <aaro.koskinen@iki.fi>,
-        Adam Ford <aford173@gmail.com>,
-        =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali.rohar@gmail.com>,
-        Sebastian Reichel <sre@kernel.org>,
-        Tero Kristo <t-kristo@ti.com>,
+Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 063/350] hwrng: omap3-rom - Call clk_disable_unprepare() on exit only if not idled
-Date:   Tue, 10 Dec 2019 16:02:48 -0500
-Message-Id: <20191210210735.9077-24-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
+        clang-built-linux@googlegroups.com
+Subject: [PATCH AUTOSEL 5.4 062/350] crypto: aegis128-neon - use Clang compatible cflags for ARM
+Date:   Tue, 10 Dec 2019 16:02:47 -0500
+Message-Id: <20191210210735.9077-23-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20191210210735.9077-1-sashal@kernel.org>
 References: <20191210210735.9077-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -65,44 +60,47 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Tony Lindgren <tony@atomide.com>
+From: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 
-[ Upstream commit eaecce12f5f0d2c35d278e41e1bc4522393861ab ]
+[ Upstream commit 2eb2d198bd6cd0083a5363ce66272fb34a19928f ]
 
-When unloading omap3-rom-rng, we'll get the following:
+The next version of Clang will start policing compiler command line
+options, and will reject combinations of -march and -mfpu that it
+thinks are incompatible.
 
-WARNING: CPU: 0 PID: 100 at drivers/clk/clk.c:948 clk_core_disable
+This results in errors like
 
-This is because the clock may be already disabled by omap3_rom_rng_idle().
-Let's fix the issue by checking for rng_idle on exit.
+  clang-10: warning: ignoring extension 'crypto' because the 'armv7-a'
+  architecture does not support it [-Winvalid-command-line-argument]
+  /tmp/aegis128-neon-inner-5ee428.s: Assembler messages:
+            /tmp/aegis128-neon-inner-5ee428.s:73: Error: selected
+  processor does not support `aese.8 q2,q14' in ARM mode
 
-Cc: Aaro Koskinen <aaro.koskinen@iki.fi>
-Cc: Adam Ford <aford173@gmail.com>
-Cc: Pali Rohár <pali.rohar@gmail.com>
-Cc: Sebastian Reichel <sre@kernel.org>
-Cc: Tero Kristo <t-kristo@ti.com>
-Fixes: 1c6b7c2108bd ("hwrng: OMAP3 ROM Random Number Generator support")
-Signed-off-by: Tony Lindgren <tony@atomide.com>
+when buiding the SIMD aegis128 code for 32-bit ARM, given that the
+'armv7-a' -march argument is considered to be compatible with the
+ARM crypto extensions. Instead, we should use armv8-a, which does
+allow the crypto extensions to be enabled.
+
+Signed-off-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/char/hw_random/omap3-rom-rng.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ crypto/Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/char/hw_random/omap3-rom-rng.c b/drivers/char/hw_random/omap3-rom-rng.c
-index 38b719017186e..648e39ce6bd95 100644
---- a/drivers/char/hw_random/omap3-rom-rng.c
-+++ b/drivers/char/hw_random/omap3-rom-rng.c
-@@ -121,7 +121,8 @@ static int omap3_rom_rng_remove(struct platform_device *pdev)
- {
- 	cancel_delayed_work_sync(&idle_work);
- 	hwrng_unregister(&omap3_rom_rng_ops);
--	clk_disable_unprepare(rng_clk);
-+	if (!rng_idle)
-+		clk_disable_unprepare(rng_clk);
- 	return 0;
- }
+diff --git a/crypto/Makefile b/crypto/Makefile
+index fcb1ee6797822..aa740c8492b9d 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -93,7 +93,7 @@ obj-$(CONFIG_CRYPTO_AEGIS128) += aegis128.o
+ aegis128-y := aegis128-core.o
  
+ ifeq ($(ARCH),arm)
+-CFLAGS_aegis128-neon-inner.o += -ffreestanding -march=armv7-a -mfloat-abi=softfp
++CFLAGS_aegis128-neon-inner.o += -ffreestanding -march=armv8-a -mfloat-abi=softfp
+ CFLAGS_aegis128-neon-inner.o += -mfpu=crypto-neon-fp-armv8
+ aegis128-$(CONFIG_CRYPTO_AEGIS128_SIMD) += aegis128-neon.o aegis128-neon-inner.o
+ endif
 -- 
 2.20.1
 
