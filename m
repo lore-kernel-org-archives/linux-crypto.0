@@ -7,56 +7,51 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBCE4C2D0C4
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Dec 2019 22:12:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E4BEC43603
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Dec 2019 22:33:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8696420637
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Dec 2019 22:12:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D1915207FF
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Dec 2019 22:33:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576015978;
-	bh=9+7vMeFtIEPS1Idj+/h7jbMupoSfm4ZM6sFEDLJEMGs=;
+	s=default; t=1576017196;
+	bh=J6B8HlLUigPcN0DeWky0J2jLohY05gbyBwu7gCAHV64=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=flUyuZnYD5MFST1W3Tzfv6oG/uKwBKDaUuejXeb6qv7xPJqwoWck9FoMi3mo3X3bn
-	 +XHXGW9I380LISYl7HxNNSyYFN7uRhVX0KUZbteE5z1424r6nxFvHis3+3PJzME/8i
-	 mkA/McYRTa47xBcvWbEGo+HnKog/RpDCca1VVsNY=
+	b=bXU2wQKbmzl4AeGnCbi4NHoiPNq7IV623tZO4M7ll80SiCppgYMtQkgviAnbz9B2r
+	 RSJTnaiUTeGRGQrN5GkAv2kCCPtfW9Xnv2hHKanupkNBS+6sHSqf3l9JvZzz46XhCQ
+	 oNqlra5EiKJTUBdYx4vcxB99QqGl49pWazjEWvEQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727849AbfLJWDc (ORCPT
+        id S1727237AbfLJWdM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 Dec 2019 17:03:32 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33704 "EHLO mail.kernel.org"
+        Tue, 10 Dec 2019 17:33:12 -0500
+Received: from mail.kernel.org ([198.145.29.99]:52770 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727817AbfLJWDb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Dec 2019 17:03:31 -0500
+        id S1729385AbfLJWcU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 10 Dec 2019 17:32:20 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id F2ADC20838;
-        Tue, 10 Dec 2019 22:03:29 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1E2D4214AF;
+        Tue, 10 Dec 2019 22:32:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1576015411;
-        bh=9+7vMeFtIEPS1Idj+/h7jbMupoSfm4ZM6sFEDLJEMGs=;
+        s=default; t=1576017139;
+        bh=J6B8HlLUigPcN0DeWky0J2jLohY05gbyBwu7gCAHV64=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=jxDYHyIBI233BDMnyfGM0wJcmFfmcTekTOnpRvcXCeK7oW4JCm9b/0nlfMDxqB/s6
-         GgAAJoekFFj+Bf83F9UDIsMYbmgNXdzJu336D3ttRkovY0kB978jm0epj6UUmQ4okp
-         Vq11a44qsNUnq+a4FBoH0+/oZ4WdT5JuWPxWv6rU=
+        b=F+lDwatyxlyuhE24UM1hM4ro2TFYr5nam2xqXPqsGaeRCYEAcFgl0TlQoUa9uHGp/
+         nJs/1CL9NBY3uac4e0lHsCPZMIL9k9XXmMOBnnStG5rx1vAyq693wOlK1pEyhdBJRY
+         jMWFNiP6oGj5MiHMg+sadGmLcSXcl6fzKInUuJYo=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Tony Lindgren <tony@atomide.com>,
-        Aaro Koskinen <aaro.koskinen@iki.fi>,
-        Adam Ford <aford173@gmail.com>,
-        =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali.rohar@gmail.com>,
-        Sebastian Reichel <sre@kernel.org>,
-        Tero Kristo <t-kristo@ti.com>,
+Cc:     Michael Ellerman <mpe@ellerman.id.au>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 024/130] hwrng: omap3-rom - Call clk_disable_unprepare() on exit only if not idled
-Date:   Tue, 10 Dec 2019 17:01:15 -0500
-Message-Id: <20191210220301.13262-24-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH AUTOSEL 4.9 87/91] crypto: vmx - Avoid weird build failures
+Date:   Tue, 10 Dec 2019 17:30:31 -0500
+Message-Id: <20191210223035.14270-87-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20191210220301.13262-1-sashal@kernel.org>
-References: <20191210220301.13262-1-sashal@kernel.org>
+In-Reply-To: <20191210223035.14270-1-sashal@kernel.org>
+References: <20191210223035.14270-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -65,44 +60,65 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Tony Lindgren <tony@atomide.com>
+From: Michael Ellerman <mpe@ellerman.id.au>
 
-[ Upstream commit eaecce12f5f0d2c35d278e41e1bc4522393861ab ]
+[ Upstream commit 4ee812f6143d78d8ba1399671d78c8d78bf2817c ]
 
-When unloading omap3-rom-rng, we'll get the following:
+In the vmx crypto Makefile we assign to a variable called TARGET and
+pass that to the aesp8-ppc.pl and ghashp8-ppc.pl scripts.
 
-WARNING: CPU: 0 PID: 100 at drivers/clk/clk.c:948 clk_core_disable
+The variable is meant to describe what flavour of powerpc we're
+building for, eg. either 32 or 64-bit, and big or little endian.
 
-This is because the clock may be already disabled by omap3_rom_rng_idle().
-Let's fix the issue by checking for rng_idle on exit.
+Unfortunately TARGET is a fairly common name for a make variable, and
+if it happens that TARGET is specified as a command line parameter to
+make, the value specified on the command line will override our value.
 
-Cc: Aaro Koskinen <aaro.koskinen@iki.fi>
-Cc: Adam Ford <aford173@gmail.com>
-Cc: Pali Rohár <pali.rohar@gmail.com>
-Cc: Sebastian Reichel <sre@kernel.org>
-Cc: Tero Kristo <t-kristo@ti.com>
-Fixes: 1c6b7c2108bd ("hwrng: OMAP3 ROM Random Number Generator support")
-Signed-off-by: Tony Lindgren <tony@atomide.com>
+In particular this can happen if the kernel Makefile is driven by an
+external Makefile that uses TARGET for something.
+
+This leads to weird build failures, eg:
+  nonsense  at /build/linux/drivers/crypto/vmx/ghashp8-ppc.pl line 45.
+  /linux/drivers/crypto/vmx/Makefile:20: recipe for target 'drivers/crypto/vmx/ghashp8-ppc.S' failed
+
+Which shows that we passed an empty value for $(TARGET) to the perl
+script, confirmed with make V=1:
+
+  perl /linux/drivers/crypto/vmx/ghashp8-ppc.pl  > drivers/crypto/vmx/ghashp8-ppc.S
+
+We can avoid this confusion by using override, to tell make that we
+don't want anything to override our variable, even a value specified
+on the command line. We can also use a less common name, given the
+script calls it "flavour", let's use that.
+
+Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/char/hw_random/omap3-rom-rng.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/crypto/vmx/Makefile | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/char/hw_random/omap3-rom-rng.c b/drivers/char/hw_random/omap3-rom-rng.c
-index 38b719017186e..648e39ce6bd95 100644
---- a/drivers/char/hw_random/omap3-rom-rng.c
-+++ b/drivers/char/hw_random/omap3-rom-rng.c
-@@ -121,7 +121,8 @@ static int omap3_rom_rng_remove(struct platform_device *pdev)
- {
- 	cancel_delayed_work_sync(&idle_work);
- 	hwrng_unregister(&omap3_rom_rng_ops);
--	clk_disable_unprepare(rng_clk);
-+	if (!rng_idle)
-+		clk_disable_unprepare(rng_clk);
- 	return 0;
- }
+diff --git a/drivers/crypto/vmx/Makefile b/drivers/crypto/vmx/Makefile
+index de6e241b08666..957377c309a91 100644
+--- a/drivers/crypto/vmx/Makefile
++++ b/drivers/crypto/vmx/Makefile
+@@ -2,13 +2,13 @@ obj-$(CONFIG_CRYPTO_DEV_VMX_ENCRYPT) += vmx-crypto.o
+ vmx-crypto-objs := vmx.o aesp8-ppc.o ghashp8-ppc.o aes.o aes_cbc.o aes_ctr.o aes_xts.o ghash.o
  
+ ifeq ($(CONFIG_CPU_LITTLE_ENDIAN),y)
+-TARGET := linux-ppc64le
++override flavour := linux-ppc64le
+ else
+-TARGET := linux-ppc64
++override flavour := linux-ppc64
+ endif
+ 
+ quiet_cmd_perl = PERL $@
+-      cmd_perl = $(PERL) $(<) $(TARGET) > $(@)
++      cmd_perl = $(PERL) $(<) $(flavour) > $(@)
+ 
+ $(src)/aesp8-ppc.S: $(src)/aesp8-ppc.pl
+ 	$(call cmd,perl)
 -- 
 2.20.1
 
