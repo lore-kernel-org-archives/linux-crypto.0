@@ -2,73 +2,80 @@ Return-Path: <SRS0=IyTV=2B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8370C2D0C6
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 11:45:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B85EC43603
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 12:07:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B7CDF2073D
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 11:45:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 19F5420836
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 12:07:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="mlqewS8j"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727851AbfLKLpd (ORCPT
+        id S1729117AbfLKMH5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 Dec 2019 06:45:33 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:7670 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727365AbfLKLpd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Dec 2019 06:45:33 -0500
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 4CA078F1AA9E42983428;
-        Wed, 11 Dec 2019 19:45:30 +0800 (CST)
-Received: from [127.0.0.1] (10.63.139.185) by DGGEMS406-HUB.china.huawei.com
- (10.3.19.206) with Microsoft SMTP Server id 14.3.439.0; Wed, 11 Dec 2019
- 19:45:22 +0800
-Subject: Re: [PATCH 0/3] crypto: hisilicon - Misc qm/zip fixes
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-References: <1574142178-76514-1-git-send-email-wangzhou1@hisilicon.com>
- <20191211093135.2htsnguoke5ngvv3@gondor.apana.org.au>
-CC:     "David S. Miller" <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>, <linuxarm@huawei.com>
-From:   Zhou Wang <wangzhou1@hisilicon.com>
-Message-ID: <5DF0D6D1.5050307@hisilicon.com>
-Date:   Wed, 11 Dec 2019 19:45:21 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:38.0) Gecko/20100101
- Thunderbird/38.5.1
+        Wed, 11 Dec 2019 07:07:57 -0500
+Received: from frisell.zx2c4.com ([192.95.5.64]:59875 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727477AbfLKMH5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 11 Dec 2019 07:07:57 -0500
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 6985870e;
+        Wed, 11 Dec 2019 11:12:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
+        :references:in-reply-to:from:date:message-id:subject:to:cc
+        :content-type; s=mail; bh=C9FwO9B7K+es48HT2oaJ5pAFwII=; b=mlqewS
+        8jCyNq7cpTXkGZmMD7fBCfMzJuJXaSq0+/BxmgynD9T+UwKqxXM0+vL/H2CkverN
+        zx/RCPlsb65oAd8QNz2Fd/+KyqfRjb685Khb7tZbl8E7VMRAt/ryvC4Pv0bUmFdO
+        CDfkyRHedn9KKcBX0e+askiuAdlsHfAERXcQxFSXrn3JN7g80q6pmZ4b/SzDYPkL
+        MPDLHt4puauKs+SZ6GPYX8/8X1TmHuTI4MU2W02dFKcY7Sp0awK3KFArO8fKAYRu
+        sGr0NKe+8k5F5HkHjjkYj6/3hHL2MWEBQN83ObIOoVYATz391UiaUn3YbEpnuoDg
+        MbDXPmQsmSZj/dzw==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id e42bde5c (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
+        Wed, 11 Dec 2019 11:12:15 +0000 (UTC)
+Received: by mail-ot1-f42.google.com with SMTP id i4so18578358otr.3;
+        Wed, 11 Dec 2019 04:07:54 -0800 (PST)
+X-Gm-Message-State: APjAAAUQze3M7QyH2C6FTA0iadraBGucCf1Hky2tOV0f4kH4/WpbtOHq
+        9pHpgHjlgmbK24GOMPuYCE+JrkObil0Wc0ZP87c=
+X-Google-Smtp-Source: APXvYqwe0utfbrRMFWhDsp03hIAgIDRCrndnTnAEWTs1Updy6jeM7OtmSLWXLN2ZN7Fx5sXoEWT/x59M2l/SxJHTvzY=
+X-Received: by 2002:a9d:4f0f:: with SMTP id d15mr2064176otl.179.1576066074187;
+ Wed, 11 Dec 2019 04:07:54 -0800 (PST)
 MIME-Version: 1.0
-In-Reply-To: <20191211093135.2htsnguoke5ngvv3@gondor.apana.org.au>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.63.139.185]
-X-CFilter-Loop: Reflected
+References: <20191211102455.7b55218e@canb.auug.org.au> <20191211092640.107621-1-Jason@zx2c4.com>
+ <CAKv+Gu80vONMAuv=2OpSOuZHvVv22quRxeNtbxnSkFBz_DvfbQ@mail.gmail.com>
+In-Reply-To: <CAKv+Gu80vONMAuv=2OpSOuZHvVv22quRxeNtbxnSkFBz_DvfbQ@mail.gmail.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Wed, 11 Dec 2019 13:07:43 +0100
+X-Gmail-Original-Message-ID: <CAHmME9r09=YNw1MmnzoRLA4szJ9zz-uV4Hut4dFZKHDwG8Qp6A@mail.gmail.com>
+Message-ID: <CAHmME9r09=YNw1MmnzoRLA4szJ9zz-uV4Hut4dFZKHDwG8Qp6A@mail.gmail.com>
+Subject: Re: [PATCH 1/2] crypto: arm/curve25519 - add arch-specific key
+ generation function
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "<netdev@vger.kernel.org>" <netdev@vger.kernel.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2019/12/11 17:31, Herbert Xu wrote:
-> On Tue, Nov 19, 2019 at 01:42:55PM +0800, Zhou Wang wrote:
->> These patches are independent fixes about qm and zip.
->>
->> Jonathan Cameron (2):
->>   crypto: hisilicon - Fix issue with wrong number of sg elements after
->>     dma map
->>   crypto: hisilicon - Use the offset fields in sqe to avoid need to
->>     split scatterlists
->>
->> Zhou Wang (1):
->>   crypto: hisilicon - Remove useless MODULE macros
->>
->>  drivers/crypto/hisilicon/Kconfig          |  1 -
->>  drivers/crypto/hisilicon/sgl.c            | 17 +++---
->>  drivers/crypto/hisilicon/zip/zip.h        |  4 ++
->>  drivers/crypto/hisilicon/zip/zip_crypto.c | 92 ++++++++-----------------------
->>  4 files changed, 35 insertions(+), 79 deletions(-)
-> 
-> All applied.  Thanks.
+On Wed, Dec 11, 2019 at 10:38 AM Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
+> > The x86_64 glue has a specific key
+> > generation implementation, but the Arm one does not. However, it can
+> > still receive the NEON speedups by calling the ordinary DH function
+> > using the base point.
+> >
+> > Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+>
+> With the first sentence dropped,
+>
+> Acked-by: Ard Biesheuvel <ardb@kernel.org>
 
-Thanks!
-
-> 
-
+Herbert - can you pick this up for 5.5-rc2 rather than 5.6?
