@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90F16C2D0C6
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 16:36:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3219AC43603
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 16:36:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6676B214AF
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 16:36:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0804F214D8
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 16:36:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XPTYMVZu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qZoivr6Y"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730134AbfLKQgA (ORCPT
+        id S1729522AbfLKQgB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 Dec 2019 11:36:00 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:34939 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729522AbfLKQf7 (ORCPT
+        Wed, 11 Dec 2019 11:36:01 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:38202 "EHLO
+        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729260AbfLKQgB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Dec 2019 11:35:59 -0500
-Received: by mail-wr1-f65.google.com with SMTP id g17so24759785wro.2
+        Wed, 11 Dec 2019 11:36:01 -0500
+Received: by mail-wm1-f66.google.com with SMTP id p17so7663981wmi.3
         for <linux-crypto@vger.kernel.org>; Wed, 11 Dec 2019 08:35:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=nZKIGCg2nTl1Ul0c6BYVG+oIIW13Px0JgNscQ8/wdtI=;
-        b=XPTYMVZu6ZZumapGWcZcB9eesRMIPb9iqUL/ehdutneob/Qg3DSIxrDDynB4gh7ZT+
-         8d66ZnwyGhpacLwyGN469unKN+mgVKt9ln6iTkAN+kKHqNRkeNTPkXl1m/2lD0fU65jy
-         sPCoNz/6yt3Xf84lQidLbDuDZCBp0pGtvQXeX7AcZ9o3AEQaYPmuVHMPwfZ1Q+A+PZnT
-         7cNP3soXEeMuigotR8uYGaEwUQzRLcRnRBeyUqaiU6bW4aojrH97ammW/j7/1m646Lxt
-         IrbBl39cAeqU9HD/AYF+E/29zugj8uaKBl/tg1LYXEs3Lo2IMopqC2du9NgJtym7W+jX
-         txFA==
+        bh=P/yUfamX8cAKoRPLBpUB3gU7OGBsxgEVu/US14BXdDQ=;
+        b=qZoivr6Y6jABFYLUom62m6R46PtcWDKbcLnnMJ0gs2MWsH3JCh2+I7ByOfOnKhYmSi
+         vwNgfDCGscUbGbqHFHUcVoWqhEFIrubBb/n4HMoDNlYAAqpcjckvDGYP87R+F1etRsWV
+         K40GYcWKcqg5KdMu0gdOFWoVpVXLwQBjK/QXaw92kYU6WXOo6Mpn9Fwt7tltcfPHz/Rh
+         tjTOy1lQ4zJYHA14yuP8ImlqOuZK6sVa7sLv65BNXE/1sE4VL28sRy5QGmPkAQ/eY+QV
+         OhW/bWP4Lx+uKVvl+g2WLRID5B+7efQ2cahzTMso7+d8Hz1nR+2ddZxrpcO73fYslnVk
+         wbpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=nZKIGCg2nTl1Ul0c6BYVG+oIIW13Px0JgNscQ8/wdtI=;
-        b=kyFvRB2OL9/wTZWyEhxOkpFVG80ud4/DBXmTq6G0H3bJuV+YjLxtbW3rz0bprt0RDR
-         ftPeFHpm9noHgluzzaGs1gFbwYW/uB/8JrJBHy5pgJelqFF2i1x6NLUZt8AqEtno3Pm+
-         3vdI9+73vUvJTTTHVA2P+8BQTyeCfBtP8rFrFN9yOu39GXZvR0rEcdgFtz5/W5mzPSdV
-         uWatoeGTeYygfoFlFHbZ1Bcos6P+qXsAWfteLrSnVSy1fmQqWKznAT2J7ISMKjBvWoz4
-         Umo6ke93wQ4mA3vT2M2bz75V7xsOhGp3a+oHARAjWkGqxEI59E/Ojwv5/QC6II0DmEUs
-         H0sw==
-X-Gm-Message-State: APjAAAU107Ab690CA9992EgNv4s65DzErwYgV4EtJI5n7gj8Cqnkz3Ik
-        m2pk84PgMQ88q3ebD4V4/icxO5+bri2LHA==
-X-Google-Smtp-Source: APXvYqyKhCzGlpf6czrew1Vg3aEzJGZhHfCz1NZW+bjsDYtavRBSIA9OHMw8SG5ZMGo5ryWjm8UMMw==
-X-Received: by 2002:adf:e6c5:: with SMTP id y5mr729257wrm.210.1576082158046;
+        bh=P/yUfamX8cAKoRPLBpUB3gU7OGBsxgEVu/US14BXdDQ=;
+        b=rxiEnoidBrBDDFerQ7uNEZ7A80ZbQp5QtoQ3ZHbG11u1IsGJKRGzuIGf4kqlR9o69n
+         6tn1sJ5t1UyB03vNOu+Yu1d085ipc3jp/nlUI/kKi0FxINMS59Rr/2gAIykaU26kpVws
+         Eu0ygjhIqtn8TYT0l7N06qNt+SKgk4Y/j2Uy9VcxIq78ojObYfg6uwYuyqU+8Aic5BBW
+         ZPz7GIfuoZxPmEUnJbnLuRisD3ckvDdwUSCDtao5mJAKxk/YrJLEoooa5cIuialNht+z
+         e5sv2qOoM8bhCRDtuLE9d5zOnd/titUXlj4QM5SnsgAMlqddZ4pVkxLZVHqiabu/4jur
+         5Qmw==
+X-Gm-Message-State: APjAAAUgLio1XkZ7ZTHgq6PfiiHajNqrMIcJv6x4K0DWWkbMmnbae0xb
+        XeU7VNWh5dlxn69bZd1Vq//W1XEPRI9jFQ==
+X-Google-Smtp-Source: APXvYqy2AnfcvD1LUssfkk+uPmqJMWkG2YAwPhoeEMljPZcCXQNijuf6mXYJfHpes3+zhisHi3dTtg==
+X-Received: by 2002:a05:600c:2218:: with SMTP id z24mr790421wml.50.1576082158598;
         Wed, 11 Dec 2019 08:35:58 -0800 (PST)
 Received: from localhost.localdomain.com ([31.149.181.161])
-        by smtp.gmail.com with ESMTPSA id o19sm2162405wmc.18.2019.12.11.08.35.57
+        by smtp.gmail.com with ESMTPSA id o19sm2162405wmc.18.2019.12.11.08.35.58
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 11 Dec 2019 08:35:57 -0800 (PST)
+        Wed, 11 Dec 2019 08:35:58 -0800 (PST)
 From:   Pascal van Leeuwen <pascalvanl@gmail.com>
 X-Google-Original-From: Pascal van Leeuwen <pvanleeuwen@rambus.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     antoine.tenart@bootlin.com, herbert@gondor.apana.org.au,
         davem@davemloft.net, Pascal van Leeuwen <pvanleeuwen@rambus.com>
-Subject: [PATCH 2/3] crypto: inside-secure - Fix hang case on EIP97 with zero length input data
-Date:   Wed, 11 Dec 2019 17:32:36 +0100
-Message-Id: <1576081957-5971-3-git-send-email-pvanleeuwen@rambus.com>
+Subject: [PATCH 3/3] crypto: inside-secure - Fix hang case on EIP97 with basic DES/3DES ops
+Date:   Wed, 11 Dec 2019 17:32:37 +0100
+Message-Id: <1576081957-5971-4-git-send-email-pvanleeuwen@rambus.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1576081957-5971-1-git-send-email-pvanleeuwen@rambus.com>
 References: <1576081957-5971-1-git-send-email-pvanleeuwen@rambus.com>
@@ -72,85 +72,68 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The EIP97 hardware cannot handle zero length input data and will (usually)
-hang when presented with this anyway. This patch converts any zero length
-input to a 1 byte dummy input to prevent this hanging.
+This patch fixes another hang case on the EIP97 caused by sending
+invalidation tokens to the hardware when doing basic (3)DES ECB/CBC
+operations. Invalidation tokens are an EIP197 feature and needed nor
+supported by the EIP97. So they should not be sent for that device.
 
 Signed-off-by: Pascal van Leeuwen <pvanleeuwen@rambus.com>
 ---
- drivers/crypto/inside-secure/safexcel_cipher.c | 40 ++++++++++++++------------
- 1 file changed, 22 insertions(+), 18 deletions(-)
+ drivers/crypto/inside-secure/safexcel_cipher.c | 6 ++++--
+ drivers/crypto/inside-secure/safexcel_hash.c   | 3 ++-
+ 2 files changed, 6 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-index b76f5ab..db26166 100644
+index db26166..6353901 100644
 --- a/drivers/crypto/inside-secure/safexcel_cipher.c
 +++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -782,16 +782,31 @@ static int safexcel_send_req(struct crypto_async_request *base, int ring,
+@@ -1509,6 +1509,7 @@ static int safexcel_des_setkey(struct crypto_skcipher *ctfm, const u8 *key,
+ 			       unsigned int len)
+ {
+ 	struct safexcel_cipher_ctx *ctx = crypto_skcipher_ctx(ctfm);
++	struct safexcel_crypto_priv *priv = ctx->priv;
+ 	int ret;
 
- 	memcpy(ctx->base.ctxr->data, ctx->key, ctx->key_len);
+ 	ret = verify_skcipher_des_key(ctfm, key);
+@@ -1516,7 +1517,7 @@ static int safexcel_des_setkey(struct crypto_skcipher *ctfm, const u8 *key,
+ 		return ret;
 
--	/* The EIP cannot deal with zero length input packets! */
--	if (totlen == 0)
--		totlen = 1;
-+	if (!totlen) {
-+		/*
-+		 * The EIP97 cannot deal with zero length input packets!
-+		 * So stuff a dummy command descriptor indicating a 1 byte
-+		 * (dummy) input packet, using the context record as source.
-+		 */
-+		first_cdesc = safexcel_add_cdesc(priv, ring,
-+						 1, 1, ctx->base.ctxr_dma,
-+						 1, 1, ctx->base.ctxr_dma,
-+						 &atoken);
-+		if (IS_ERR(first_cdesc)) {
-+			/* No space left in the command descriptor ring */
-+			ret = PTR_ERR(first_cdesc);
-+			goto cdesc_rollback;
-+		}
-+		n_cdesc = 1;
-+		goto skip_cdesc;
-+	}
+ 	/* if context exits and key changed, need to invalidate it */
+-	if (ctx->base.ctxr_dma)
++	if (priv->flags & EIP197_TRC_CACHE && ctx->base.ctxr_dma)
+ 		if (memcmp(ctx->key, key, len))
+ 			ctx->base.needs_inv = true;
 
- 	/* command descriptors */
- 	for_each_sg(src, sg, sreq->nr_src, i) {
- 		int len = sg_dma_len(sg);
+@@ -1605,6 +1606,7 @@ static int safexcel_des3_ede_setkey(struct crypto_skcipher *ctfm,
+ 				   const u8 *key, unsigned int len)
+ {
+ 	struct safexcel_cipher_ctx *ctx = crypto_skcipher_ctx(ctfm);
++	struct safexcel_crypto_priv *priv = ctx->priv;
+ 	int err;
 
- 		/* Do not overflow the request */
--		if (queued - len < 0)
-+		if (queued < len)
- 			len = queued;
+ 	err = verify_skcipher_des3_key(ctfm, key);
+@@ -1612,7 +1614,7 @@ static int safexcel_des3_ede_setkey(struct crypto_skcipher *ctfm,
+ 		return err;
 
- 		cdesc = safexcel_add_cdesc(priv, ring, !n_cdesc,
-@@ -803,27 +818,16 @@ static int safexcel_send_req(struct crypto_async_request *base, int ring,
- 			ret = PTR_ERR(cdesc);
- 			goto cdesc_rollback;
- 		}
--		n_cdesc++;
+ 	/* if context exits and key changed, need to invalidate it */
+-	if (ctx->base.ctxr_dma)
++	if (priv->flags & EIP197_TRC_CACHE && ctx->base.ctxr_dma)
+ 		if (memcmp(ctx->key, key, len))
+ 			ctx->base.needs_inv = true;
 
--		if (n_cdesc == 1) {
-+		if (!n_cdesc)
- 			first_cdesc = cdesc;
--		}
+diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
+index ef3a489..25e49d1 100644
+--- a/drivers/crypto/inside-secure/safexcel_hash.c
++++ b/drivers/crypto/inside-secure/safexcel_hash.c
+@@ -282,7 +282,8 @@ static int safexcel_handle_req_result(struct safexcel_crypto_priv *priv,
+ 			sreq->processed = sreq->block_sz;
+ 			sreq->hmac = 0;
 
-+		n_cdesc++;
- 		queued -= len;
- 		if (!queued)
- 			break;
- 	}
--
--	if (unlikely(!n_cdesc)) {
--		/*
--		 * Special case: zero length input buffer.
--		 * The engine always needs the 1st command descriptor, however!
--		 */
--		first_cdesc = safexcel_add_cdesc(priv, ring, 1, 1, 0, 0, totlen,
--						 ctx->base.ctxr_dma, &atoken);
--		n_cdesc = 1;
--	}
--
-+skip_cdesc:
- 	/* Add context control words and token to first command descriptor */
- 	safexcel_context_control(ctx, base, sreq, first_cdesc);
- 	if (ctx->aead)
+-			ctx->base.needs_inv = true;
++			if (priv->flags & EIP197_TRC_CACHE)
++				ctx->base.needs_inv = true;
+ 			areq->nbytes = 0;
+ 			safexcel_ahash_enqueue(areq);
+
 --
 1.8.3.1
