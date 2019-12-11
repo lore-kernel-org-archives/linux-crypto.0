@@ -2,208 +2,182 @@ Return-Path: <SRS0=IyTV=2B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 131F4C43603
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 10:08:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB1E9C43603
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 10:34:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CFE60208C3
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 10:08:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 82A6A21D7D
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 10:34:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l0zmGy5n"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HKFA7/+6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728757AbfLKKIA (ORCPT
+        id S1728857AbfLKKeK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 Dec 2019 05:08:00 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:37491 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728753AbfLKKIA (ORCPT
+        Wed, 11 Dec 2019 05:34:10 -0500
+Received: from mail-il1-f193.google.com ([209.85.166.193]:36919 "EHLO
+        mail-il1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728862AbfLKKeK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Dec 2019 05:08:00 -0500
-Received: by mail-wm1-f67.google.com with SMTP id f129so6315325wmf.2
-        for <linux-crypto@vger.kernel.org>; Wed, 11 Dec 2019 02:07:58 -0800 (PST)
+        Wed, 11 Dec 2019 05:34:10 -0500
+Received: by mail-il1-f193.google.com with SMTP id t9so19002324iln.4;
+        Wed, 11 Dec 2019 02:34:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=gk81PzAbLI8o98/2oqILv8CnZ7KtzZ7BGCA4s/qRTQo=;
-        b=l0zmGy5nn/XJOskQPekSMLWGfaDGaziwasSrhR/VtnGbL6OmzWoGTFV7oIUqABr97R
-         a8jSQzR6DL6rQ6WZaVNx7dWAnRhEqbV7CLxB2WeckvubXRGpv8pnnB9/tt662tToGI23
-         qOVc2NKUue0s7faGQrdTJOQw6a+uoRftgHaiW1ZJlrmf/dV85oN8GFEDt0qwwXZJ9MhD
-         aW+GoAjR4xKRP+hv0ZWB6X6W6azavprw7nkbC6LIkL2JqJ4z0MuOCQl9+fssxUlIxWgs
-         ggoxo+G1CfP8n8/oRgykuzAI2hDNP5SjNexs1i81PX4GdggpHUiZuW6lCwwx3bcNa6gq
-         HCgA==
+        bh=dOmVU46s6nV+n0B47S9FUyCMpYjTYJPpLDGRrRSRigA=;
+        b=HKFA7/+6tylk60vhCVFcqc+BPuWBQ2OPBDe/7Z1erDUzjZdWn9QRbN1+/YWglnVRpn
+         ZEyMWn00OVns4EbGCXtpU0/dDnHxoV6ixZFCdS3p6uqgLHVrt7kJ8l70cPNODSJznmew
+         GTBvgWCcv11jqKiEUs9GCmdP+MvSIzaoYt4vmnWj7dbIAUv9FbR5qKotm0PRAVXDA4yH
+         iahuo7fjQTrLs2z8qdkGTk6OINGZMKPhehiZrx8Ftzw0pVNfprfG0jAgUzM98MrZPrJ4
+         MVTIOpe1l90Vv9OxHIKbGaI6szxgpEIcRlCp4fhF/GOmKxA/RdL2O4OnEza9M4B+RC5g
+         JZiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=gk81PzAbLI8o98/2oqILv8CnZ7KtzZ7BGCA4s/qRTQo=;
-        b=RYZzjw3EpFqDs4HFbpC3u53a2MiPhrhYjb3afBhvOSqKaV/BnyawvIe1/rV76V8YQG
-         s1DImZFoL520GrhtZstnjPdj/AeCMEqeWXEh6mkaLkYTG/o8PO15lS+WlSiY03hn6VEG
-         nLG70V+/Z5+HDhuauWg2jan94/L9XI6tj0Y6ZkirKIHHd5NZSIJx6UyW5xy0jk4UNu6c
-         wXQRTMQebPWF7Vnn6p465ceszHAVwC2JKVAB1VlY/8FYFVqzUihg0MdvqfSN1dE1qHwn
-         nbROFsTWDYijfvMBAdl5sk2berkK/yVuFP4Z0FnMnedrAKNa6BgrXFLT7xMTaNHrUFWG
-         dMtQ==
-X-Gm-Message-State: APjAAAV2RBpbB1urFE2S3WZXMNZcMNZmPDJZFgEJ+X4vUYB2IrTSNW6W
-        QN0l35pl0kOgzHi4aXC5loHivWPEjQlgk7uD9r72sg==
-X-Google-Smtp-Source: APXvYqwI6Cs4wMfaSiJabTG1VtEx71hprkRtI8lhwa9L9Yrmea6XD4zJIFcrmydevphRyDbiD5J3g6rP6zX5G7cSERo=
-X-Received: by 2002:a1c:a943:: with SMTP id s64mr2546152wme.148.1576058877140;
- Wed, 11 Dec 2019 02:07:57 -0800 (PST)
+        bh=dOmVU46s6nV+n0B47S9FUyCMpYjTYJPpLDGRrRSRigA=;
+        b=P8ACIax9nG7oH77diyXogQ3PPKvKmW1kUmR8ewb+DEUBO1uigoTsx+kRozMdlRPOKQ
+         Tcwk7YdkKNrXmvrHK3KxReC13gOZcAB6jrv5NH/iC52UstMaaEWZf2T/KsdFVQyoMEJt
+         f2ycVGMWX3dVenbGlHnNsoQQeuXeO51FqlpsgvHqKqrx0zy6jgzQxLEasH5QNyizvzr2
+         es9y1/CuAnsKJUHNMGKtVJId5IlA/m0dFKxHZY65f20w864H33Ym+rNfmimZGGRiii0S
+         fCgI6U9qMTH+GkaMZ5rHRe11pTMHqaNbwyEgz06/fxIUA9lKwfWJDT+ZCAvSLQ+qW9CU
+         i8Wg==
+X-Gm-Message-State: APjAAAXRnlFW7xNyNFW1OwXd1DD9NzA3+Nyuk2oRakJDDcjUw5Or1Ina
+        eLmnk5R05Ii7pBCX74zBJ23ynrmuToIXVvLKAGI=
+X-Google-Smtp-Source: APXvYqx9ymukFe/tBUQNK7wtKGmsWiAPG+2T6ub8VNY5LvUHiZqsh0RhNmlZhmC+X9W69a0rPzCnGegI2mJzlejoBIk=
+X-Received: by 2002:a92:3919:: with SMTP id g25mr2235862ila.221.1576060449476;
+ Wed, 11 Dec 2019 02:34:09 -0800 (PST)
 MIME-Version: 1.0
-References: <20191210210735.9077-1-sashal@kernel.org> <20191210210735.9077-277-sashal@kernel.org>
-In-Reply-To: <20191210210735.9077-277-sashal@kernel.org>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Wed, 11 Dec 2019 10:07:54 +0000
-Message-ID: <CAKv+Gu-KLGFUEP55iGFp-irspwoG1uc0ZVPW15YDFX9MtXQW2Q@mail.gmail.com>
-Subject: Re: [PATCH AUTOSEL 5.4 316/350] int128: move __uint128_t compiler
- test to Kconfig
-To:     Sasha Levin <sashal@kernel.org>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        stable <stable@vger.kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Masahiro Yamada <yamada.masahiro@socionext.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+References: <20191211084112.971-1-linux.amoon@gmail.com> <a4610efc-844a-2d43-5db1-cf813102e701@baylibre.com>
+ <CANAwSgQOTA0mSvFW5otaCzFPHidhY7VFcrXZHjCD-1XkQpcx3w@mail.gmail.com> <20191211095043.3kngq7wh77xvadge@gondor.apana.org.au>
+In-Reply-To: <20191211095043.3kngq7wh77xvadge@gondor.apana.org.au>
+From:   Anand Moon <linux.amoon@gmail.com>
+Date:   Wed, 11 Dec 2019 16:03:58 +0530
+Message-ID: <CANAwSgTNX1Q4VWymXYyvcByFhr+f3C9AqpG2G7dQp+0DPLR-JA@mail.gmail.com>
+Subject: Re: [PATCHv1 0/3] Enable crypto module on Amlogic GXBB SoC platform
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Neil Armstrong <narmstrong@baylibre.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Corentin Labbe <clabbe@baylibre.com>,
+        Kevin Hilman <khilman@baylibre.com>,
+        Martin Blumenstingl <martin.blumenstingl@googlemail.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        devicetree <devicetree@vger.kernel.org>,
         linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        linux-riscv@lists.infradead.org,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>
+        linux-amlogic@lists.infradead.org,
+        Linux Kernel <linux-kernel@vger.kernel.org>,
+        linux-crypto@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 10 Dec 2019 at 22:13, Sasha Levin <sashal@kernel.org> wrote:
->
-> From: Ard Biesheuvel <ardb@kernel.org>
->
-> [ Upstream commit c12d3362a74bf0cd9e1d488918d40607b62a3104 ]
->
-> In order to use 128-bit integer arithmetic in C code, the architecture
-> needs to have declared support for it by setting ARCH_SUPPORTS_INT128,
-> and it requires a version of the toolchain that supports this at build
-> time. This is why all existing tests for ARCH_SUPPORTS_INT128 also test
-> whether __SIZEOF_INT128__ is defined, since this is only the case for
-> compilers that can support 128-bit integers.
->
-> Let's fold this additional test into the Kconfig declaration of
-> ARCH_SUPPORTS_INT128 so that we can also use the symbol in Makefiles,
-> e.g., to decide whether a certain object needs to be included in the
-> first place.
->
-> Cc: Masahiro Yamada <yamada.masahiro@socionext.com>
-> Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
-> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-> Signed-off-by: Sasha Levin <sashal@kernel.org>
+Hi Herbert,
 
-This does not fix a bug so no need to put it in -stable
-
-> ---
->  arch/arm64/Kconfig | 2 +-
->  arch/riscv/Kconfig | 2 +-
->  arch/x86/Kconfig   | 2 +-
->  crypto/ecc.c       | 2 +-
->  init/Kconfig       | 4 ++++
->  lib/ubsan.c        | 2 +-
->  lib/ubsan.h        | 2 +-
->  7 files changed, 10 insertions(+), 6 deletions(-)
+On Wed, 11 Dec 2019 at 15:20, Herbert Xu <herbert@gondor.apana.org.au> wrote:
 >
-> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
-> index 3f047afb982c8..54c38c9cab88a 100644
-> --- a/arch/arm64/Kconfig
-> +++ b/arch/arm64/Kconfig
-> @@ -67,7 +67,7 @@ config ARM64
->         select ARCH_USE_QUEUED_SPINLOCKS
->         select ARCH_SUPPORTS_MEMORY_FAILURE
->         select ARCH_SUPPORTS_ATOMIC_RMW
-> -       select ARCH_SUPPORTS_INT128 if GCC_VERSION >= 50000 || CC_IS_CLANG
-> +       select ARCH_SUPPORTS_INT128 if CC_HAS_INT128 && (GCC_VERSION >= 50000 || CC_IS_CLANG)
->         select ARCH_SUPPORTS_NUMA_BALANCING
->         select ARCH_WANT_COMPAT_IPC_PARSE_VERSION if COMPAT
->         select ARCH_WANT_DEFAULT_TOPDOWN_MMAP_LAYOUT
-> diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
-> index 8eebbc8860bbd..75a6c91176221 100644
-> --- a/arch/riscv/Kconfig
-> +++ b/arch/riscv/Kconfig
-> @@ -164,7 +164,7 @@ config ARCH_RV32I
->  config ARCH_RV64I
->         bool "RV64I"
->         select 64BIT
-> -       select ARCH_SUPPORTS_INT128 if GCC_VERSION >= 50000
-> +       select ARCH_SUPPORTS_INT128 if CC_HAS_INT128 && GCC_VERSION >= 50000
->         select HAVE_FUNCTION_TRACER
->         select HAVE_FUNCTION_GRAPH_TRACER
->         select HAVE_FTRACE_MCOUNT_RECORD
-> diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
-> index 8ef85139553f5..f2aed8012e9c0 100644
-> --- a/arch/x86/Kconfig
-> +++ b/arch/x86/Kconfig
-> @@ -24,7 +24,7 @@ config X86_64
->         depends on 64BIT
->         # Options that are inherently 64-bit kernel only:
->         select ARCH_HAS_GIGANTIC_PAGE
-> -       select ARCH_SUPPORTS_INT128
-> +       select ARCH_SUPPORTS_INT128 if CC_HAS_INT128
->         select ARCH_USE_CMPXCHG_LOCKREF
->         select HAVE_ARCH_SOFT_DIRTY
->         select MODULES_USE_ELF_RELA
-> diff --git a/crypto/ecc.c b/crypto/ecc.c
-> index dfe114bc0c4af..6e6aab6c987c2 100644
-> --- a/crypto/ecc.c
-> +++ b/crypto/ecc.c
-> @@ -336,7 +336,7 @@ static u64 vli_usub(u64 *result, const u64 *left, u64 right,
->  static uint128_t mul_64_64(u64 left, u64 right)
->  {
->         uint128_t result;
-> -#if defined(CONFIG_ARCH_SUPPORTS_INT128) && defined(__SIZEOF_INT128__)
-> +#if defined(CONFIG_ARCH_SUPPORTS_INT128)
->         unsigned __int128 m = (unsigned __int128)left * right;
+> On Wed, Dec 11, 2019 at 03:07:53PM +0530, Anand Moon wrote:
+> >
+> > name         : ecb(aes)
+> > driver       : ecb-aes-gxl
+> > module       : kernel
+> > priority     : 400
+> > refcnt       : 1
+> > selftest     : passed
+> > internal     : no
+> > type         : skcipher
+> > async        : yes
+> > blocksize    : 16
+> > min keysize  : 16
+> > max keysize  : 32
+> > ivsize       : 0
+> > chunksize    : 16
+> > walksize     : 16
+> >
+> > name         : cbc(aes)
+> > driver       : cbc-aes-gxl
+> > module       : kernel
+> > priority     : 400
+> > refcnt       : 1
+> > selftest     : passed
+> > internal     : no
+> > type         : skcipher
+> > async        : yes
+> > blocksize    : 16
+> > min keysize  : 16
+> > max keysize  : 32
+> > ivsize       : 16
+> > chunksize    : 16
+> > walksize     : 16
 >
->         result.m_low  = m;
-> diff --git a/init/Kconfig b/init/Kconfig
-> index b4daad2bac233..020526f681c03 100644
-> --- a/init/Kconfig
-> +++ b/init/Kconfig
-> @@ -785,6 +785,10 @@ config ARCH_SUPPORTS_NUMA_BALANCING
->  config ARCH_WANT_BATCHED_UNMAP_TLB_FLUSH
->         bool
+> Oh so you did actually get them loaded.  You need to run tcrypt with
+> mode=500 instead of 200 to test the async ciphers.  Does that work?
 >
-> +config CC_HAS_INT128
-> +       def_bool y
-> +       depends on !$(cc-option,-D__SIZEOF_INT128__=0)
-> +
->  #
->  # For architectures that know their GCC __int128 support is sound
->  #
-> diff --git a/lib/ubsan.c b/lib/ubsan.c
-> index 0c4681118fcd2..fc552d524ef77 100644
-> --- a/lib/ubsan.c
-> +++ b/lib/ubsan.c
-> @@ -119,7 +119,7 @@ static void val_to_string(char *str, size_t size, struct type_descriptor *type,
->  {
->         if (type_is_int(type)) {
->                 if (type_bit_width(type) == 128) {
-> -#if defined(CONFIG_ARCH_SUPPORTS_INT128) && defined(__SIZEOF_INT128__)
-> +#if defined(CONFIG_ARCH_SUPPORTS_INT128)
->                         u_max val = get_unsigned_val(type, value);
->
->                         scnprintf(str, size, "0x%08x%08x%08x%08x",
-> diff --git a/lib/ubsan.h b/lib/ubsan.h
-> index b8fa83864467f..7b56c09473a98 100644
-> --- a/lib/ubsan.h
-> +++ b/lib/ubsan.h
-> @@ -78,7 +78,7 @@ struct invalid_value_data {
->         struct type_descriptor *type;
->  };
->
-> -#if defined(CONFIG_ARCH_SUPPORTS_INT128) && defined(__SIZEOF_INT128__)
-> +#if defined(CONFIG_ARCH_SUPPORTS_INT128)
->  typedef __int128 s_max;
->  typedef unsigned __int128 u_max;
->  #else
+> Thanks,
 > --
-> 2.20.1
->
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+I get kernel panic, I will try to look into this much closely.
+
+[alarm@alarm ~]$ sudo modprobe tcrypt sec=1 mode=500
+[sudo] password for alarm:
+[  754.382673] tcrypt:
+[  754.382673] testing speed of async ecb(aes) (ecb-aes-gxl) encryption
+[  754.385583] tcrypt: test 0 (128 bit key, 16 byte blocks):
+[  754.385774] SError Interrupt on CPU1, code 0xbf000000 -- SError
+[  754.385776] CPU: 1 PID: 121 Comm: da832000.crypto Not tainted
+5.5.0-rc1-00012-g6794862a16ef-dirty #3
+[  754.385778] Hardware name: Hardkernel ODROID-C2 (DT)
+[  754.385779] pstate: 60000005 (nZCv daif -PAN -UAO)
+[  754.385781] pc : wait_for_completion_interruptible_timeout+0x20/0x120
+[  754.385782] lr : meson_handle_cipher_request+0x344/0x700
+[  754.385783] sp : ffff800011e9bca0
+[  754.385784] x29: ffff800011e9bca0 x28: 0000000000000040
+[  754.385787] x27: 0000000000000010 x26: 0000000000000000
+[  754.385789] x25: 0000000000000000 x24: 0000000005300080
+[  754.385792] x23: 0000000000000002 x22: ffff00006d08aa00
+[  754.385795] x21: ffff00007f68c4d0 x20: ffff00007f68c4c8
+[  754.385797] x19: 000000000000007d x18: 00000000000000ab
+[  754.385800] x17: 000000000000006c x16: 000000000000001b
+[  754.385802] x15: 000000000000000c x14: 0000000000000010
+[  754.385805] x13: 0000000000000000 x12: 0000000000000000
+[  754.385808] x11: 0000000000000001 x10: ffff8000119d7e80
+[  754.385810] x9 : 0000000000000000 x8 : ffff800011add000
+[  754.385813] x7 : 0000000000000000 x6 : 0000000000000000
+[  754.385815] x5 : 0000000000000000 x4 : 0000000080800010
+[  754.385818] x3 : ffff800011acd000 x2 : 000000006d093002
+[  754.385820] x1 : 000000000000007d x0 : ffff00007f68c4c8
+[  754.385824] Kernel panic - not syncing: Asynchronous SError Interrupt
+[  754.385825] CPU: 1 PID: 121 Comm: da832000.crypto Not tainted
+5.5.0-rc1-00012-g6794862a16ef-dirty #3
+[  754.385827] Hardware name: Hardkernel ODROID-C2 (DT)
+[  754.385828] Call trace:
+[  754.385829]  dump_backtrace+0x0/0x188
+[  754.385830]  show_stack+0x14/0x20
+[  754.385831]  dump_stack+0xb4/0xfc
+[  754.385832]  panic+0x158/0x320
+[  754.385833]  nmi_panic+0x84/0x88
+[  754.385834]  arm64_serror_panic+0x74/0x80
+[  754.385835]  do_serror+0x80/0x138
+[  754.385836]  el1_error+0x84/0x100
+[  754.385838]  wait_for_completion_interruptible_timeout+0x20/0x120
+[  754.385839]  meson_handle_cipher_request+0x344/0x700
+[  754.385840]  crypto_pump_work+0x10c/0x228
+[  754.385841]  kthread_worker_fn+0xa8/0x188
+[  754.385842]  kthread+0xf0/0x120
+[  754.385843]  ret_from_fork+0x10/0x18
+[  754.385862] SMP: stopping secondary CPUs
+[  754.385863] Kernel Offset: disabled
+[  754.385864] CPU features: 0x00002,24002004
+[  754.385865] Memory Limit: none
+
+-Anand
