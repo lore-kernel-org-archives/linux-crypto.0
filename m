@@ -2,60 +2,61 @@ Return-Path: <SRS0=IyTV=2B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54037C43603
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 08:41:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 133E2C43603
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 08:41:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 246242077B
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 08:41:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D6B352077B
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 08:41:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JVeIF5c0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LmSCzEKl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727829AbfLKIlV (ORCPT
+        id S1726983AbfLKIlo (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 Dec 2019 03:41:21 -0500
-Received: from mail-pj1-f65.google.com ([209.85.216.65]:37283 "EHLO
-        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725973AbfLKIlV (ORCPT
+        Wed, 11 Dec 2019 03:41:44 -0500
+Received: from mail-pg1-f193.google.com ([209.85.215.193]:38536 "EHLO
+        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725973AbfLKIlo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Dec 2019 03:41:21 -0500
-Received: by mail-pj1-f65.google.com with SMTP id ep17so8658915pjb.4;
-        Wed, 11 Dec 2019 00:41:20 -0800 (PST)
+        Wed, 11 Dec 2019 03:41:44 -0500
+Received: by mail-pg1-f193.google.com with SMTP id a33so10210398pgm.5;
+        Wed, 11 Dec 2019 00:41:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=s5qKVi0ow9j/+PgSK4g7oFXUi7s8J1QUH2gPB5uRhng=;
-        b=JVeIF5c0x4qPWCcRQP89soeeVAzZ+l7bIv8ArdHIFudN0Hmn6FnS3jwrXH8LqY1GUZ
-         o/amn2pnA2gMC9sf4y2ZK3GJRo8vvpAS9I3soADsyhkeqWeP5IgYcq+tKLlygr6dBAX9
-         dvJnhKdBZy11kJmY8BpIwOpGm9CU7HgzZLyzt2u5d4bXEz+6pKq/0MxAfiLG5gZfNS5A
-         WNVP4/9bZCspt9mlzv273V/drsUYEnATBzarGAk0HBVv/pqpmwiJpILtkBK16uwnzfbw
-         IXEb9fameNjYyZTl2vd4vIGY0uXi5Xgny2ofeE3HuFxA/brdfHJP0BwWnw+agIFavjJp
-         /xTg==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=NsX+54XryMi2VELIlseSEX982HiAeN+ixQnkqnlA7YM=;
+        b=LmSCzEKlLF9GA2NDPubkojoLRS1e9leBh1jLX86uZVx6zzLug+HCFJqv78bTvWeQ+g
+         jKeqADdNLjCPNYb78KIB8IolMywHdHzgFDuqdtrTXlnwQMQ/r0xW54gkzlRpFwEQbYqZ
+         stjB6Lp32jDGktWCXe42LqB9lE+Cg2BizkCyAFox+NMheVEt+/XJDUEA+TOs1xP2a9tn
+         t3JJP8WRF/l48UiXw1RcvV650X2ryFnvl9Vstmk+BqjhdaMWyexnopBPg7lGbCNZLG7c
+         SNp5xDwmmklLOIYTQNOHUBGJ51KL2d2H6JpMM2hz1kGtNDbPB8bH+Pft+0Vq6CEwiQ04
+         T35g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=s5qKVi0ow9j/+PgSK4g7oFXUi7s8J1QUH2gPB5uRhng=;
-        b=c0ZGFoaiMOEZyPZpETiS+PyRfUidwkIE7Tz6nRJq4oGsHsmMVtyf9nx5sn6DhiKIym
-         i1aZfy1GGbEhal0OE6S9X4y+WeF/I4pPMfVPRW+feY+I/in7wA//n3gsMdWj/77M2RTn
-         5wZRMli277/l6zLg/WQHUnxLVZ0Ukrmxquwni1le/wA3qaLHg/1iCouQiNgDYFScaRvf
-         WJhNOZUFNS8nQisjWCarS/htZUkVGflPeLEuSLPHEtOMLD9uJQp9QdnboSbDJ5XayW0H
-         MARv/x2dBXtpsK3I+aErIdG5LoXVcnkcMTkd8VIaXDDhJonO00dxSOTIFQWV0BBIXPx2
-         ps4Q==
-X-Gm-Message-State: APjAAAXnfVfWqqg6sJR4BU4PjlW0BmsD6Byz+EHYrvNcIjXWiuraMzV/
-        GtVYtAvQrI89hchM4l/tHtU=
-X-Google-Smtp-Source: APXvYqyyMQ+AucG9e2uc2shvqk0QaTaNbnFgmIxAXSBua1SEP5Al4wKFWdYvh7CtBxgLX2DYFTKOHw==
-X-Received: by 2002:a17:902:7c83:: with SMTP id y3mr2037257pll.34.1576053680345;
-        Wed, 11 Dec 2019 00:41:20 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=NsX+54XryMi2VELIlseSEX982HiAeN+ixQnkqnlA7YM=;
+        b=lMNUY5wdY559lBdYlXyFjFdqQMEHWb5/rr5fQVJgXOSdajZKY2Zy50th554BsSJFRL
+         enGLzQdX6E9BJ20gqKwSbhrx+CD0A8XPm1EcZEZyoXv4fNOYDXyd9B51xsd9W2WDpmSb
+         ezkLbRMVn23vjndSTo+xEKWecfiOfUcmkRsfNNLZNg8/QF2E0kYud1uE4SUEDr4WVvh3
+         lRRubNzVNqJZdfvuJ0Nwi95qsIE4MyJaYVHVVIFtxA4CqfFJiJplZxtb+kcI++x0w6Z/
+         bKWEMg/DoNEqbqi/8jgwfe4pKv6YiIKs0a8UwmTNQVbfv7F2MR4ow92KVrsOdwfR1moG
+         aOyw==
+X-Gm-Message-State: APjAAAUXKiEk7OxCNLMxfUrK8fMFFd6dbOP40yoFRf7qZBX9tA6Rx23z
+        0z0rHC/Y/kYb2VLsSLaC1Oo=
+X-Google-Smtp-Source: APXvYqzJMVswmGLym+pZbQ6L9I2M3QaOEA5y6ogXLZGiNgCt//erJUC4U3w+uiICKuF3gfbZKbVHcA==
+X-Received: by 2002:a63:d406:: with SMTP id a6mr2888017pgh.264.1576053703526;
+        Wed, 11 Dec 2019 00:41:43 -0800 (PST)
 Received: from localhost.localdomain ([103.51.73.137])
-        by smtp.gmail.com with ESMTPSA id e16sm1806233pgk.77.2019.12.11.00.41.16
+        by smtp.gmail.com with ESMTPSA id e16sm1806233pgk.77.2019.12.11.00.41.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Dec 2019 00:41:19 -0800 (PST)
+        Wed, 11 Dec 2019 00:41:43 -0800 (PST)
 From:   Anand Moon <linux.amoon@gmail.com>
 To:     Rob Herring <robh+dt@kernel.org>,
         Mark Rutland <mark.rutland@arm.com>,
@@ -68,10 +69,12 @@ To:     Rob Herring <robh+dt@kernel.org>,
 Cc:     devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org,
         linux-crypto@vger.kernel.org
-Subject: [PATCHv1 0/3] Enable crypto module on Amlogic GXBB SoC platform
-Date:   Wed, 11 Dec 2019 08:41:09 +0000
-Message-Id: <20191211084112.971-1-linux.amoon@gmail.com>
+Subject: [PATCHv1 1/3] arm64: dts: amlogic: adds crypto hardware node for GXBB SoCs
+Date:   Wed, 11 Dec 2019 08:41:10 +0000
+Message-Id: <20191211084112.971-2-linux.amoon@gmail.com>
 X-Mailer: git-send-email 2.24.0
+In-Reply-To: <20191211084112.971-1-linux.amoon@gmail.com>
+References: <20191211084112.971-1-linux.amoon@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
@@ -79,35 +82,39 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Below changes enable cryto module on Amlogic GXBB SoC.
+This patch adds the crypto hardware node for all GXBB SoCs.
 
-I was realy happy to get this feature working on Odroid C2 SBC.
-I will try on other SBC in the future.
+Cc: Corentin Labbe <clabbe@baylibre.com>
+Cc: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
+Cc: Neil Armstrong <narmstrong@baylibre.com>
+Signed-off-by: Anand Moon <linux.amoon@gmail.com>
+---
+Tested on Odroid C2 GXBB
+---
+ arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-Tested with loading tcrypt module.
-# sudo modprobe tcrypt sec=1 mode=200
-[sudo] password for alarm:
-[  903.867059] tcrypt:
-[  903.867059] testing speed of async ecb(aes) (ecb(aes-arm64)) encryption
-[  903.870265] tcrypt: test 0 (128 bit key, 16 byte blocks): 1922107 operations in 1 seconds (30753712 bytes)
-[  904.872802] tcrypt: test 1 (128 bit key, 64 byte blocks): 679032 operations in 1 seconds (43458048 bytes)
-[  905.872717] tcrypt: test 2 (128 bit key, 256 byte blocks): 190190 operations in 1 seconds (48688640 bytes)
-[  906.872793] tcrypt: test 3 (128 bit key, 1024 byte blocks): 49014 operations in 1 seconds (50190336 bytes)
-[  907.872808] tcrypt: test 4 (128 bit key, 1472 byte blocks): 34342 operations in 1 seconds (50551424 bytes)
-[  908.876828] tcrypt: test 5 (128 bit key, 8192 byte blocks): 6199 operations in 1 seconds (50782208 bytes)
-
--Anand
-
-Anand Moon (3):
-  arm64: dts: amlogic: adds crypto hardware node for GXBB SoCs
-  dt-bindings: crypto: Add compatible string for amlogic GXBB SoC
-  crypto: amlogic: Add new compatible string for amlogic GXBB SoC
-
- .../devicetree/bindings/crypto/amlogic,gxl-crypto.yaml |  1 +
- arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi            | 10 ++++++++++
- drivers/crypto/amlogic/amlogic-gxl-core.c              |  1 +
- 3 files changed, 12 insertions(+)
-
+diff --git a/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi b/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
+index 0cb40326b0d3..bac8fbfd4f01 100644
+--- a/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
++++ b/arch/arm64/boot/dts/amlogic/meson-gxbb.dtsi
+@@ -14,6 +14,16 @@ / {
+ 	compatible = "amlogic,meson-gxbb";
+ 
+ 	soc {
++		crypto: crypto@c883e000 {
++			compatible = "amlogic,gxbb-crypto";
++			reg = <0x0 0xc883e000 0x0 0x36>;
++			interrupts = <GIC_SPI 188 IRQ_TYPE_EDGE_RISING>,
++				     <GIC_SPI 189 IRQ_TYPE_EDGE_RISING>;
++			clocks = <&clkc CLKID_BLKMV>;
++			clock-names = "blkmv";
++			status = "okay";
++		};
++
+ 		usb0_phy: phy@c0000000 {
+ 			compatible = "amlogic,meson-gxbb-usb2-phy";
+ 			#phy-cells = <0>;
 -- 
 2.24.0
 
