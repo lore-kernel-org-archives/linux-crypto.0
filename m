@@ -2,42 +2,73 @@ Return-Path: <SRS0=IyTV=2B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04BDDC43603
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 14:23:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B125C2D0C6
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 14:27:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D536D20836
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 14:23:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E5A43214AF
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 14:27:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z2KBVcOs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729750AbfLKOX5 (ORCPT
+        id S1729855AbfLKO12 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 Dec 2019 09:23:57 -0500
-Received: from skedge03.snt-world.com ([91.208.41.68]:44654 "EHLO
-        skedge03.snt-world.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729671AbfLKOX5 (ORCPT
+        Wed, 11 Dec 2019 09:27:28 -0500
+Received: from mail-io1-f67.google.com ([209.85.166.67]:37179 "EHLO
+        mail-io1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729841AbfLKO12 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Dec 2019 09:23:57 -0500
-Received: from sntmail12r.snt-is.com (unknown [10.203.32.182])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by skedge03.snt-world.com (Postfix) with ESMTPS id C5A2767A6F1;
-        Wed, 11 Dec 2019 15:23:33 +0100 (CET)
-Received: from sntmail12r.snt-is.com (10.203.32.182) by sntmail12r.snt-is.com
- (10.203.32.182) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Wed, 11 Dec
- 2019 15:23:33 +0100
-Received: from sntmail12r.snt-is.com ([fe80::e551:8750:7bba:3305]) by
- sntmail12r.snt-is.com ([fe80::e551:8750:7bba:3305%3]) with mapi id
- 15.01.1713.004; Wed, 11 Dec 2019 15:23:33 +0100
-From:   Schrempf Frieder <frieder.schrempf@kontron.de>
-To:     Horia Geanta <horia.geanta@nxp.com>, Adam Ford <aford173@gmail.com>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "Mark Rutland" <mark.rutland@arm.com>,
+        Wed, 11 Dec 2019 09:27:28 -0500
+Received: by mail-io1-f67.google.com with SMTP id k24so22835194ioc.4;
+        Wed, 11 Dec 2019 06:27:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Faypt5jJbaNtCoHXofsWRZ8YINuZgK4fs840LJrVspY=;
+        b=Z2KBVcOsCkR47+VmQPOkiHjj7vFKRPOwy8osTvnKM5r/Tg62TU0sG4hmG5auAO9PZe
+         mT3KzbzHQZKrbW7H1sBHn51ECGZQXzKZ6DswDgLHURVFuKGX0g7bBcZnzTtUZYNkvZ8x
+         QXSt91qZVnoaJYMbx7l7ka77oIwQHZygkf3v1c3dyplmmWAEnvf4xeHjhaFvYq3UI38b
+         gCSLKK8Kg220Qm1z/EFRy0ZgQ6rwpu+IfjUWOhxaOFdVBfZoQ01vbMst+Vb0yFXnLBjW
+         eJQx6reBYP4mBhH+XKM3CdRjGPxu05kHF2l4cRFsA5M47SwLRxr36WDyLnhB+dhQb7vU
+         aIXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Faypt5jJbaNtCoHXofsWRZ8YINuZgK4fs840LJrVspY=;
+        b=TGMl6gLfTKBFr8HVUqjAj6f+W2dL7d0BEYhFyATDIXWcutugEFjTxpxFrR0zIN0qcG
+         +/tzFX4Lsn9eP47nlfsBofjrg/Gl025I3qTYeLLcZgdIMPekFA7T+GWxlWB7PQnX+o+U
+         czLMzM0jUSKnmi7opYRSWZtv30YZguWFb9Z7HQar5hs8GLwSwTBXwsMWXqTRT7xsJX6P
+         dNGJmjpBenK/V2a/dxc9HdAeRGcVMgtZUf/EY0fkg2P32hPiLsILuyX0u9tKpKcU+A+p
+         yPk/ditykfuMHnImhkYUOfqBwdnRXJd0NwCJ/rV2XLbmkox3HGOhavycjJevrT57m6lc
+         AEig==
+X-Gm-Message-State: APjAAAXsIQwty6Hem9W7qwHYV60ma0ZTnyQmzZ36ZSMFxDEmVsq0rxlF
+        TKrMPf7Lqa7VQjn7X923NDGQPDcQgeAhyhLTyss=
+X-Google-Smtp-Source: APXvYqx25zJakF+83vcjU/NrLZyb4Iyh7/msBEZNeWy88VfcZLcy4mMeUD6cBebcI8aP42hW4L9Hbh1Z30BrvhjsLXQ=
+X-Received: by 2002:a6b:c9ca:: with SMTP id z193mr2766932iof.276.1576074446612;
+ Wed, 11 Dec 2019 06:27:26 -0800 (PST)
+MIME-Version: 1.0
+References: <20191130225153.30111-1-aford173@gmail.com> <e8e429dd-4508-9835-fd01-825d2de8871e@kontron.de>
+ <CAHCN7xLkV1WC=9ACj1Mi8+uE8kRCEjCEe+Y36pXwkNeNrgrNVg@mail.gmail.com>
+ <VI1PR0402MB34857B8C5560B912B34674AB985B0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <d82428e3-326b-db80-2e40-4ef1bdbca060@kontron.de>
+In-Reply-To: <d82428e3-326b-db80-2e40-4ef1bdbca060@kontron.de>
+From:   Adam Ford <aford173@gmail.com>
+Date:   Wed, 11 Dec 2019 08:27:16 -0600
+Message-ID: <CAHCN7xKUSQQeGt984L9FXmXw7XFMqUvR+9RFqn-zv9q-zQdSSg@mail.gmail.com>
+Subject: Re: [PATCH 1/2] crypto: caam: Change the i.MX8MQ check support all
+ i.MX8M variants
+To:     Schrempf Frieder <frieder.schrempf@kontron.de>
+Cc:     Horia Geanta <horia.geanta@nxp.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
         Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "Fabio Estevam" <festevam@gmail.com>,
+        Fabio Estevam <festevam@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
         Sascha Hauer <s.hauer@pengutronix.de>,
@@ -49,93 +80,102 @@ CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
         "linux-arm-kernel@lists.infradead.org" 
         <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH 1/2] crypto: caam: Change the i.MX8MQ check support all
- i.MX8M variants
-Thread-Topic: [PATCH 1/2] crypto: caam: Change the i.MX8MQ check support all
- i.MX8M variants
-Thread-Index: AQHVp9kQe4CI+Rf8yUmun0IOEuspVqe0/KsA
-Date:   Wed, 11 Dec 2019 14:23:32 +0000
-Message-ID: <d82428e3-326b-db80-2e40-4ef1bdbca060@kontron.de>
-References: <20191130225153.30111-1-aford173@gmail.com>
- <e8e429dd-4508-9835-fd01-825d2de8871e@kontron.de>
- <CAHCN7xLkV1WC=9ACj1Mi8+uE8kRCEjCEe+Y36pXwkNeNrgrNVg@mail.gmail.com>
- <VI1PR0402MB34857B8C5560B912B34674AB985B0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-In-Reply-To: <VI1PR0402MB34857B8C5560B912B34674AB985B0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-Accept-Language: de-DE, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.25.9.193]
-x-c2processedorg: 51b406b7-48a2-4d03-b652-521f56ac89f3
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <AA2FCE7CD7265A47BE96B7819248829C@snt-world.com>
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-SnT-MailScanner-Information: Please contact the ISP for more information
-X-SnT-MailScanner-ID: C5A2767A6F1.AF622
-X-SnT-MailScanner: Not scanned: please contact your Internet E-Mail Service Provider for details
-X-SnT-MailScanner-SpamCheck: 
-X-SnT-MailScanner-From: frieder.schrempf@kontron.de
-X-SnT-MailScanner-To: aford173@gmail.com, aymen.sghaier@nxp.com,
-        davem@davemloft.net, devicetree@vger.kernel.org, festevam@gmail.com,
-        herbert@gondor.apana.org.au, horia.geanta@nxp.com,
-        kernel@pengutronix.de, linux-arm-kernel@lists.infradead.org,
-        linux-crypto@vger.kernel.org, linux-imx@nxp.com,
-        linux-kernel@vger.kernel.org, mark.rutland@arm.com,
-        robh+dt@kernel.org, s.hauer@pengutronix.de, shawnguo@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-T24gMTAuMTIuMTkgMDg6NTYsIEhvcmlhIEdlYW50YSB3cm90ZToNCj4gT24gMTIvNi8yMDE5IDk6
-NTUgUE0sIEFkYW0gRm9yZCB3cm90ZToNCj4+IE9uIFdlZCwgRGVjIDQsIDIwMTkgYXQgNTozOCBB
-TSBTY2hyZW1wZiBGcmllZGVyDQo+PiA8ZnJpZWRlci5zY2hyZW1wZkBrb250cm9uLmRlPiB3cm90
-ZToNCj4+Pg0KPj4+IEhpIEFkYW0sDQo+Pj4NCj4+PiBPbiAzMC4xMS4xOSAyMzo1MSwgQWRhbSBG
-b3JkIHdyb3RlOg0KPj4+PiBUaGUgaS5NWDhNIE1pbmkgdXNlcyB0aGUgc2FtZSBjcnlwdG8gZW5n
-aW5lIGFzIHRoZSBpLk1YOE1RLCBidXQNCj4+Pj4gdGhlIGRyaXZlciBpcyByZXN0cmljdGluZyB0
-aGUgY2hlY2sgdG8ganVzdCB0aGUgaS5NWDhNUS4NCj4+Pj4NCj4+Pj4gVGhpcyBwYXRjaCBsZXRz
-IHRoZSBkcml2ZXIgc3VwcG9ydCBhbGwgaS5NWDhNIFZhcmlhbnRzIGlmIGVuYWJsZWQuDQo+Pj4+
-DQo+Pj4+IFNpZ25lZC1vZmYtYnk6IEFkYW0gRm9yZCA8YWZvcmQxNzNAZ21haWwuY29tPg0KPj4+
-DQo+Pj4gV2hhdCBhYm91dCB0aGUgZm9sbG93aW5nIGxpbmVzIGluIHJ1bl9kZXNjcmlwdG9yX2Rl
-Y28wKCk/IERvZXMgdGhpcw0KPj4+IGNvbmRpdGlvbiBhbHNvIGFwcGx5IHRvIGkuTVg4TU0/DQo+
-Pg0KPj4gSSB0aGluayB0aGF0J3MgYSBxdWVzdGlvbiBmb3IgTlhQLiAgSSBhbSBub3Qgc2VlaW5n
-IHRoYXQgaW4gdGhlIE5YUA0KPj4gTGludXggUmVsZWFzZSwgYW5kIEkgZG9uJ3QgaGF2ZSBhbiA4
-TVEgdG8gY29tcGFyZS4NCj4+DQo+IElJUkMgdGhlIGkuTVggQlNQIHJlbGVhc2VzIHVzZSB0aGUg
-SlJJIGZvciBpbml0aWFsaXppbmcgdGhlIFJORywNCj4gYW5kIG5vdCB0aGUgREVDTyByZWdpc3Rl
-ciBpbnRlcmZhY2UuDQo+IA0KPj4gSSB3YXMgYWJsZSB0byBnZXQgdGhlIGRyaXZlciB3b3JraW5n
-IG9uIHRoZSBpLk1YTU0gd2l0aCB0aGUgcGF0Y2guDQo+Pg0KPiBZb3UgYXJlIHByb2JhYmx5IHVz
-aW5nIGEgbmV3ZXIgVS1ib290LCB3aGljaCBpbmNsdWRlcw0KPiBjb21taXQgZGZhZWM3NjAyOWYy
-ICgiY3J5cHRvL2ZzbDogaW5zdGFudGlhdGUgYWxsIHJuZyBzdGF0ZSBoYW5kbGVzIikNCj4gDQo+
-PiBOWFAgIFRlYW0sDQo+Pg0KPj4gRG8geW91IGhhdmUgYW55IG9waW5pb25zIG9uIHRoaXM/DQo+
-Pg0KPiBTaW5jZSBjdXJyZW50IFUtYm9vdCBpbml0aWFsaXplcyBib3RoIFJORyBzdGF0ZSBoYW5k
-bGVzLCBwcmFjdGljYWxseQ0KPiBpbnN0YW50aWF0ZV9ybmcoKSBpcyBhIG5vLW9wLg0KPiANCj4g
-QSBzaW1wbGUgZXhwZXJpbWVudCBpcyB0byAibGllIiBhYm91dCB0aGUgc3RhdGVfaGFuZGxlX21h
-c2ssIHRvIGV4ZXJjaXNlDQo+IHRoZSBERUNPIGFjcXVpcmUgY29kZSAob3IsIGFzIG1lbnRpb25l
-ZCBhYm92ZSwgdG8gcnVuIHdpdGggYW4gb2xkZXIgVS1ib290KToNCj4gDQo+IEBAIC0yNjgsMTIg
-KzI3MiwxOSBAQCBzdGF0aWMgaW50IGluc3RhbnRpYXRlX3JuZyhzdHJ1Y3QgZGV2aWNlICpjdHJs
-ZGV2LCBpbnQgc3RhdGVfaGFuZGxlX21hc2ssDQo+ICAgICAgICAgIHN0cnVjdCBjYWFtX2N0cmwg
-X19pb21lbSAqY3RybDsNCj4gICAgICAgICAgdTMyICpkZXNjLCBzdGF0dXMgPSAwLCByZHN0YV92
-YWw7DQo+ICAgICAgICAgIGludCByZXQgPSAwLCBzaF9pZHg7DQo+ICsgICAgICAgc3RhdGljIGlu
-dCBmb3JjZV9pbml0ID0gMTsNCj4gDQo+ICAgICAgICAgIGN0cmwgPSAoc3RydWN0IGNhYW1fY3Ry
-bCBfX2lvbWVtICopY3RybHByaXYtPmN0cmw7DQo+ICAgICAgICAgIGRlc2MgPSBrbWFsbG9jKENB
-QU1fQ01EX1NaICogNywgR0ZQX0tFUk5FTCk7DQo+ICAgICAgICAgIGlmICghZGVzYykNCj4gICAg
-ICAgICAgICAgICAgICByZXR1cm4gLUVOT01FTTsNCj4gDQo+ICsgICAgICAgaWYgKGZvcmNlX2lu
-aXQgJiYgKHN0YXRlX2hhbmRsZV9tYXNrID09IDB4MykpIHsNCj4gKyAgICAgICAgICAgICAgIGRl
-dl9lcnIoY3RybGRldiwgIkZvcmNpbmcgcmVpbml0IG9mIFJORyBzdGF0ZSBoYW5kbGUgMCFcbiIp
-Ow0KPiArICAgICAgICAgICAgICAgZm9yY2VfaW5pdCA9IDA7DQo+ICsgICAgICAgICAgICAgICBz
-dGF0ZV9oYW5kbGVfbWFzayA9IDB4MjsNCj4gKyAgICAgICB9DQo+ICsNCj4gICAgICAgICAgZm9y
-IChzaF9pZHggPSAwOyBzaF9pZHggPCBSTkc0X01BWF9IQU5ETEVTOyBzaF9pZHgrKykgew0KPiAg
-ICAgICAgICAgICAgICAgIC8qDQo+ICAgICAgICAgICAgICAgICAgICogSWYgdGhlIGNvcnJlc3Bv
-bmRpbmcgYml0IGlzIHNldCwgdGhpcyBzdGF0ZSBoYW5kbGUNCj4gDQo+IEluIHRoaXMgY2FzZSBi
-b290IGxvZyBjb25maXJtcyB0aGUgREVDTyBjYW5ub3QgYmUgYWNxdWlyZWQ6DQo+IFsgICAgMi4x
-MzcxMDFdIGNhYW0gMzA5MDAwMDAuY3J5cHRvOiBGb3JjaW5nIHJlaW5pdCBvZiBSTkcgc3RhdGUg
-aGFuZGxlIDAhDQo+IFsgICAgMi4xNzIyOTNdIGNhYW0gMzA5MDAwMDAuY3J5cHRvOiBmYWlsZWQg
-dG8gYWNxdWlyZSBERUNPIDANCj4gWyAgICAyLjE3Nzc4Nl0gY2FhbSAzMDkwMDAwMC5jcnlwdG86
-IGZhaWxlZCB0byBpbnN0YW50aWF0ZSBSTkcNCj4gDQo+IFRvIHN1bSB1cCwgd3JpdGluZyB0byBE
-RUNPUlNSIGlzIG1hbmRhdG9yeS4NCg0KVGhhbmtzIEhvcmlhIGZvciBwcm92aWRpbmcgdGhlIGRl
-dGFpbHMuDQoNCkFkYW0sIGNhbiB5b3UgdXBkYXRlIHlvdXIgcGF0Y2ggdG8gZW5hYmxlIHRoZSBj
-b2RlIGluIA0KcnVuX2Rlc2NyaXB0b3JfZGVjbzAoKSBmb3IgaS5NWDhNTT8NCg0KSWYgSSB1bmRl
-cnN0YW5kIHRoaXMgY29ycmVjdGx5LCB0aGlzIGlzIG5lY2Vzc2FyeSB0byBoYXZlIHRoZSBSTkcg
-DQppbml0aWFsaXplIGNvcnJlY3RseSBubyBtYXR0ZXIgd2hhdCB2ZXJzaW9uIG9mIFUtQm9vdCBp
-cyB1c2VkLg0KDQpUaGFua3MsDQpGcmllZGVy
+On Wed, Dec 11, 2019 at 8:23 AM Schrempf Frieder
+<frieder.schrempf@kontron.de> wrote:
+>
+> On 10.12.19 08:56, Horia Geanta wrote:
+> > On 12/6/2019 9:55 PM, Adam Ford wrote:
+> >> On Wed, Dec 4, 2019 at 5:38 AM Schrempf Frieder
+> >> <frieder.schrempf@kontron.de> wrote:
+> >>>
+> >>> Hi Adam,
+> >>>
+> >>> On 30.11.19 23:51, Adam Ford wrote:
+> >>>> The i.MX8M Mini uses the same crypto engine as the i.MX8MQ, but
+> >>>> the driver is restricting the check to just the i.MX8MQ.
+> >>>>
+> >>>> This patch lets the driver support all i.MX8M Variants if enabled.
+> >>>>
+> >>>> Signed-off-by: Adam Ford <aford173@gmail.com>
+> >>>
+> >>> What about the following lines in run_descriptor_deco0()? Does this
+> >>> condition also apply to i.MX8MM?
+> >>
+> >> I think that's a question for NXP.  I am not seeing that in the NXP
+> >> Linux Release, and I don't have an 8MQ to compare.
+> >>
+> > IIRC the i.MX BSP releases use the JRI for initializing the RNG,
+> > and not the DECO register interface.
+> >
+> >> I was able to get the driver working on the i.MXMM with the patch.
+> >>
+> > You are probably using a newer U-boot, which includes
+> > commit dfaec76029f2 ("crypto/fsl: instantiate all rng state handles")
+> >
+> >> NXP  Team,
+> >>
+> >> Do you have any opinions on this?
+> >>
+> > Since current U-boot initializes both RNG state handles, practically
+> > instantiate_rng() is a no-op.
+> >
+> > A simple experiment is to "lie" about the state_handle_mask, to exercise
+> > the DECO acquire code (or, as mentioned above, to run with an older U-boot):
+> >
+> > @@ -268,12 +272,19 @@ static int instantiate_rng(struct device *ctrldev, int state_handle_mask,
+> >          struct caam_ctrl __iomem *ctrl;
+> >          u32 *desc, status = 0, rdsta_val;
+> >          int ret = 0, sh_idx;
+> > +       static int force_init = 1;
+> >
+> >          ctrl = (struct caam_ctrl __iomem *)ctrlpriv->ctrl;
+> >          desc = kmalloc(CAAM_CMD_SZ * 7, GFP_KERNEL);
+> >          if (!desc)
+> >                  return -ENOMEM;
+> >
+> > +       if (force_init && (state_handle_mask == 0x3)) {
+> > +               dev_err(ctrldev, "Forcing reinit of RNG state handle 0!\n");
+> > +               force_init = 0;
+> > +               state_handle_mask = 0x2;
+> > +       }
+> > +
+> >          for (sh_idx = 0; sh_idx < RNG4_MAX_HANDLES; sh_idx++) {
+> >                  /*
+> >                   * If the corresponding bit is set, this state handle
+> >
+> > In this case boot log confirms the DECO cannot be acquired:
+> > [    2.137101] caam 30900000.crypto: Forcing reinit of RNG state handle 0!
+> > [    2.172293] caam 30900000.crypto: failed to acquire DECO 0
+> > [    2.177786] caam 30900000.crypto: failed to instantiate RNG
+> >
+> > To sum up, writing to DECORSR is mandatory.
+>
+> Thanks Horia for providing the details.
+
+I appreciate it too.
+
+>
+> Adam, can you update your patch to enable the code in
+> run_descriptor_deco0() for i.MX8MM?
+
+I will work on that.  I have been trying to get the mainline U-Boot to
+start correctly, because I wanted to see if/how this interacted. I'll
+try to get a V2 pushed today.
+
+>
+> If I understand this correctly, this is necessary to have the RNG
+> initialize correctly no matter what version of U-Boot is used.
+
+That makes sense based on Horia's feedback.  With the holidays this
+month, my spare time and weekends have been full.
+
+adam
+>
+> Thanks,
+> Frieder
