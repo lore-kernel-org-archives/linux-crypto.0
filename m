@@ -8,55 +8,55 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57307C43603
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 08:41:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B4D0C43603
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 08:41:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2A87E222C4
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 08:41:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0B4D2214AF
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 08:41:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sypZYZzi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MHUO4Uku"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728370AbfLKIls (ORCPT
+        id S1728383AbfLKIlx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 Dec 2019 03:41:48 -0500
-Received: from mail-pg1-f193.google.com ([209.85.215.193]:41036 "EHLO
-        mail-pg1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728300AbfLKIls (ORCPT
+        Wed, 11 Dec 2019 03:41:53 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:34376 "EHLO
+        mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728300AbfLKIlw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Dec 2019 03:41:48 -0500
-Received: by mail-pg1-f193.google.com with SMTP id x8so10426026pgk.8;
-        Wed, 11 Dec 2019 00:41:47 -0800 (PST)
+        Wed, 11 Dec 2019 03:41:52 -0500
+Received: by mail-pg1-f195.google.com with SMTP id r11so10442185pgf.1;
+        Wed, 11 Dec 2019 00:41:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=wSnofsroC3q0Bz8ZT6LbzRALYay3vg5tkKr0icagGfk=;
-        b=sypZYZziLS/YcWob4MchGqcycarvQZxMn1mSMGNavUXnuWQI15mU3JGLc0COr8rNfa
-         S+x47EZAWcs5BUYfMPqdssiYJVBOrvSDUCVXCTBPRXVATsss+XcCggIYD5ExhI6C23sP
-         IpjDo8WjUaAVIwOkJsbOzF323dESHRNZanM0WrgrlnnkT0EaG9InnfNmbuJHMwiXZPHd
-         DajBDlkcloEhOJdhq1l/qHuRKBvS2gtLH2+IkvgUTugKnpUwUq2sCFG6/o8J4B0wX5/M
-         QII848BqsJJfF5pRqejJVwKftsk7ZCosaHKbVD7MWdFn5qOH9ahs+DEYPluSnUFViw5P
-         KuQg==
+        bh=ZX5iKFff+zirWsLntEazM/Rbpxnzs9FOJJrz4dQumzc=;
+        b=MHUO4UkuzYpZA3AHVcHQwjQ3qiK8LGCGbQkoMcg3lJKv3tAaP6BMTBg2Ib/qK37dA+
+         c5L/hXucjHUBEbtVwOTLq2DQQa2FHXO/lLHOBXi2jFqtXNji3CbRH5LR06+kRCcZKoPb
+         GUgDODlN0gIhiXK6mD4bUE3SSJC0TO6NI3a0MtgQO7kizMf3g7EC9QXW6eoQSU5/GdYi
+         hMvTTgzME/upt+wwKZFcGXQBixnooyz3ez9ipRTbX5T0OX43dsafvRPYbeKrg3GKvDHO
+         hL/fLVDdRs1/KxdVK8O537Rzi0mWV21RQX9bTUJiHBNg9/dj1AGb73qQB6PPnUDTGxIC
+         XJig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=wSnofsroC3q0Bz8ZT6LbzRALYay3vg5tkKr0icagGfk=;
-        b=SUL/a58sKEaYW1CAyBRm00Y5b6VJAdB6JqtcquBuxpB6B4ZXztEL5xLneWy/7omfCy
-         gzij/EVYDABljSifXLfTkn1o3d7H5QfRlXQFuV+P4RMKSMNyH9LMXnCQhU1A8PkzHEKm
-         9c6HtbLmRaGPqpsjtg1Tv075o15tp2GHuHhg1GfKDibWmAAvFOUoUu1Jr5lmsViqapC7
-         moer6r1GteVu2RAPPfytTvXFnVRVQzPXMu8NkKjsMiJi5I5Fxs/X7tZzS4JXSGPlkBUq
-         GuY8PsfdV66yNlElFlq2qjr5br0i//DZUcRTE6KfD0JZIsVc5FoCur4ofPIyd2FopE2C
-         KINw==
-X-Gm-Message-State: APjAAAXoY/HcjXrvkPARuglBKu6MOaR9gwL0mA0mW6cvmVLsvOrUB+J6
-        DkT9yQkL6dwNrt5ZlGYVeJE=
-X-Google-Smtp-Source: APXvYqxLtckOJJeAP+OJm1gWfjjRej8ZWHqTmg1NF79cWSx/7GSvheeLLtEy9ENMm0+iJkCsWsKRfQ==
-X-Received: by 2002:a62:ee0c:: with SMTP id e12mr2595374pfi.38.1576053707552;
-        Wed, 11 Dec 2019 00:41:47 -0800 (PST)
+        bh=ZX5iKFff+zirWsLntEazM/Rbpxnzs9FOJJrz4dQumzc=;
+        b=bz+6QP7XDAmwqrj795Ui45oAT4JKofupzvXYe7RXCwR1hA1kgb5ynzccA2004WdKnC
+         a6fwfkjaSghW++iMv7S3cz7YFKc34oYqh8KX4UwumoBNoyOSg+AvFvhLj3LEkQ8p8Ccw
+         54o5+95HJkiPZi22NVMaCHHNw4IcfX76MRuucfB/hff2i6YdH2+P9dzUspVTbKcYezGF
+         4gvX2N0Dizy/MZU0NO5KIV7J2BdImoDeNgXLYPAxGbdhkUr7cusgMmowcQAEgdEirgf7
+         CXtvcSWbnax5n+jZ7vvtFj5CvKU16oN68hWNHTYScsoMmMEl9duPq3UdwuTD8tZtASJr
+         E9kw==
+X-Gm-Message-State: APjAAAXtRe0c4Llnal+GOPpBIMSOI8zAOjjtc3ZWUn/E71IgTvbNIEJV
+        I/w0S2B9eISKJqERbTmjkm56xjvN
+X-Google-Smtp-Source: APXvYqzO1zopMC7CKJPCqQkkW+wGdyMfN7a2pPRNe/6FbBn7+WTgfsNCmI+0BrTqx7nTq9HCJuuNtQ==
+X-Received: by 2002:a62:b402:: with SMTP id h2mr2447717pfn.55.1576053711611;
+        Wed, 11 Dec 2019 00:41:51 -0800 (PST)
 Received: from localhost.localdomain ([103.51.73.137])
-        by smtp.gmail.com with ESMTPSA id e16sm1806233pgk.77.2019.12.11.00.41.43
+        by smtp.gmail.com with ESMTPSA id e16sm1806233pgk.77.2019.12.11.00.41.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Dec 2019 00:41:47 -0800 (PST)
+        Wed, 11 Dec 2019 00:41:51 -0800 (PST)
 From:   Anand Moon <linux.amoon@gmail.com>
 To:     Rob Herring <robh+dt@kernel.org>,
         Mark Rutland <mark.rutland@arm.com>,
@@ -69,9 +69,9 @@ To:     Rob Herring <robh+dt@kernel.org>,
 Cc:     devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
         linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org,
         linux-crypto@vger.kernel.org
-Subject: [PATCHv1 2/3] dt-bindings: crypto: Add compatible string for amlogic GXBB SoC
-Date:   Wed, 11 Dec 2019 08:41:11 +0000
-Message-Id: <20191211084112.971-3-linux.amoon@gmail.com>
+Subject: [PATCHv1 3/3] crypto: amlogic: Add new compatible string for amlogic GXBB SoC
+Date:   Wed, 11 Dec 2019 08:41:12 +0000
+Message-Id: <20191211084112.971-4-linux.amoon@gmail.com>
 X-Mailer: git-send-email 2.24.0
 In-Reply-To: <20191211084112.971-1-linux.amoon@gmail.com>
 References: <20191211084112.971-1-linux.amoon@gmail.com>
@@ -82,28 +82,29 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add a compatible string to support cryto controller for Amlogic GXBB SoC.
+Add new compatible string to support the cryto controller
+for Amlogic GXBB SoC.
 
 Cc: Corentin Labbe <clabbe@baylibre.com>
 Cc: Martin Blumenstingl <martin.blumenstingl@googlemail.com>
 Cc: Neil Armstrong <narmstrong@baylibre.com>
 Signed-off-by: Anand Moon <linux.amoon@gmail.com>
 ---
- Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml | 1 +
+ drivers/crypto/amlogic/amlogic-gxl-core.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-index 5becc60a0e28..be0c3f73a9cd 100644
---- a/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-+++ b/Documentation/devicetree/bindings/crypto/amlogic,gxl-crypto.yaml
-@@ -12,6 +12,7 @@ maintainers:
- properties:
-   compatible:
-     items:
-+    - const: amlogic,gxbb-crypto
-     - const: amlogic,gxl-crypto
+diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/amlogic/amlogic-gxl-core.c
+index fa05fce1c0de..9859ab023e23 100644
+--- a/drivers/crypto/amlogic/amlogic-gxl-core.c
++++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
+@@ -311,6 +311,7 @@ static int meson_crypto_remove(struct platform_device *pdev)
+ }
  
-   reg:
+ static const struct of_device_id meson_crypto_of_match_table[] = {
++	{ .compatible = "amlogic,gxbb-crypto", },
+ 	{ .compatible = "amlogic,gxl-crypto", },
+ 	{}
+ };
 -- 
 2.24.0
 
