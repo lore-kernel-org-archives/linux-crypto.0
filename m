@@ -2,79 +2,76 @@ Return-Path: <SRS0=IyTV=2B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D511C43603
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 09:40:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A577C43603
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 09:40:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2A0E1205C9
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 09:40:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC341205C9
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 09:40:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="iCxOAaiD"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728104AbfLKJkb (ORCPT
+        id S1728665AbfLKJki (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 Dec 2019 04:40:31 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:54468 "EHLO deadmen.hmeau.com"
+        Wed, 11 Dec 2019 04:40:38 -0500
+Received: from frisell.zx2c4.com ([192.95.5.64]:59015 "EHLO frisell.zx2c4.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727318AbfLKJkb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Dec 2019 04:40:31 -0500
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1ieyTp-0000DT-VC; Wed, 11 Dec 2019 17:40:26 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1ieyTp-00071q-PC; Wed, 11 Dec 2019 17:40:25 +0800
-Date:   Wed, 11 Dec 2019 17:40:25 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Sami Tolvanen <samitolvanen@google.com>
-Cc:     Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Eric Biggers <ebiggers@google.com>,
-        Kees Cook <keescook@chromium.org>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: [PATCH v4] crypto: arm64/sha: fix function types
-Message-ID: <20191211094025.6gagdb5iwk7bcjr3@gondor.apana.org.au>
-References: <20191112223046.176097-1-samitolvanen@google.com>
- <20191127235503.93635-1-samitolvanen@google.com>
+        id S1727318AbfLKJki (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 11 Dec 2019 04:40:38 -0500
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 6ae89909;
+        Wed, 11 Dec 2019 08:44:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
+        :references:in-reply-to:from:date:message-id:subject:to:cc
+        :content-type; s=mail; bh=xCs05TVRd20sagcCLkJLr7Ih37Y=; b=iCxOAa
+        iDv129m8Pn9KewJ2XmScYZ7fUy2vbMJu85DiSN4VanCgVlzLklf3YUtdQrXETtQM
+        iofplR/118knt+uulhH5SYhiaF8wiDHL8jNT+hNm8z8lp25uuZ9n/oh4MKusqagM
+        lrZDiKPn8ZJ8HNoq97LzwizHY7xGNJ5bUj3tDAdAfA+JmfYAoRkAKzRwaCdFz7zd
+        Waa6lTBGEDpNy5m0Hoj0Ca+wcrKmU5E0PUdEOB+sLgCmhklQLbP432pf6v1OtNlU
+        onXOFcx1c0WIG0XZ/lF6f0nj7JUrXZR7N8TJW1hcV1BcdZMGxz2FSPzI+bArjGjg
+        xTRqIr5Y7flqQVYQ==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 9840ad46 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
+        Wed, 11 Dec 2019 08:44:57 +0000 (UTC)
+Received: by mail-oi1-f169.google.com with SMTP id j22so12646683oij.9;
+        Wed, 11 Dec 2019 01:40:35 -0800 (PST)
+X-Gm-Message-State: APjAAAXuB9SHdVgwDIaoVyjX7snR+KiU8BBT5QpUZ+qLSvFHET52jVPh
+        7/bHItf9K/f6Bmm5s9ru+grrhvkNRdXIZHH3cVg=
+X-Google-Smtp-Source: APXvYqyLJolOM0pHmwpzZS4VS9SY01PLdWWlmZdvztdc3o611Q1dZsTEnTnG0YXEt12x7rVC1jDonmBqZl+bwmlLlnA=
+X-Received: by 2002:a05:6808:4cc:: with SMTP id a12mr2090157oie.115.1576057234890;
+ Wed, 11 Dec 2019 01:40:34 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191127235503.93635-1-samitolvanen@google.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+References: <20191211102455.7b55218e@canb.auug.org.au> <20191211092640.107621-1-Jason@zx2c4.com>
+ <CAKv+Gu80vONMAuv=2OpSOuZHvVv22quRxeNtbxnSkFBz_DvfbQ@mail.gmail.com>
+In-Reply-To: <CAKv+Gu80vONMAuv=2OpSOuZHvVv22quRxeNtbxnSkFBz_DvfbQ@mail.gmail.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Wed, 11 Dec 2019 10:40:23 +0100
+X-Gmail-Original-Message-ID: <CAHmME9og1LP8J3w-Uqa+i9VvyXA=N80HrgFnvQ6Gs2kh_80NYA@mail.gmail.com>
+Message-ID: <CAHmME9og1LP8J3w-Uqa+i9VvyXA=N80HrgFnvQ6Gs2kh_80NYA@mail.gmail.com>
+Subject: Re: [PATCH 1/2] crypto: arm/curve25519 - add arch-specific key
+ generation function
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "<netdev@vger.kernel.org>" <netdev@vger.kernel.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Nov 27, 2019 at 03:55:03PM -0800, Sami Tolvanen wrote:
-> Instead of casting pointers to callback functions, add C wrappers
-> to avoid type mismatch failures with Control-Flow Integrity (CFI)
-> checking.
-> 
-> Signed-off-by: Sami Tolvanen <samitolvanen@google.com>
-> Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
-> ---
-> Changes in v4:
->   - Removed unnecessary returns.
-> 
-> Changes in v3:
->   - Removed unnecessary inline attributes.
-> 
-> Changes in v2:
->   - Added wrapper functions instead of changing parameter types
->     for the assembly functions.
-> 
-> ---
->  arch/arm64/crypto/sha1-ce-glue.c   | 17 +++++++++------
->  arch/arm64/crypto/sha2-ce-glue.c   | 34 ++++++++++++++++++------------
->  arch/arm64/crypto/sha256-glue.c    | 32 +++++++++++++++++-----------
->  arch/arm64/crypto/sha512-ce-glue.c | 26 ++++++++++++-----------
->  arch/arm64/crypto/sha512-glue.c    | 15 ++++++++-----
->  5 files changed, 76 insertions(+), 48 deletions(-)
+On Wed, Dec 11, 2019 at 10:38 AM Ard Biesheuvel
+<ard.biesheuvel@linaro.org> wrote:
+>
+> On Wed, 11 Dec 2019 at 10:27, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> >
+> > Somehow this was forgotten when Zinc was being split into oddly shaped
+> > pieces, resulting in linker errors.
+>
+> Zinc has no historical significance here
 
-Patch applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Wow...
