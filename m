@@ -2,97 +2,132 @@ Return-Path: <SRS0=IyTV=2B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8687C2D0C6
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 20:38:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B511BC43603
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 22:04:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 92BC92173E
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 20:38:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8370D2073D
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 22:04:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="qD1PQgWR"
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="GBVpdukN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727780AbfLKUiB (ORCPT
+        id S1726494AbfLKWEv (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 Dec 2019 15:38:01 -0500
-Received: from ozlabs.org ([203.11.71.1]:34943 "EHLO ozlabs.org"
+        Wed, 11 Dec 2019 17:04:51 -0500
+Received: from frisell.zx2c4.com ([192.95.5.64]:51043 "EHLO frisell.zx2c4.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726242AbfLKUiB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Dec 2019 15:38:01 -0500
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 47Y7zV6Cfbz9sR7;
-        Thu, 12 Dec 2019 07:37:58 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1576096679;
-        bh=TqGBa9RdBOyz6xcAX/wv4TSVKSa+idsg3abp07UvJLk=;
-        h=Date:From:To:Cc:Subject:From;
-        b=qD1PQgWRLTvewnvTCIT5SUEQezIMQynjhMSmcBWOq83b4V3/cFgKZbRK9iUuP1pya
-         bAawTvI228Q1fNzP4kRuqoj278xzOfzesC3umyO6vfer8ILlstLRto0t9L27Qja9hA
-         5OtKiXi+nUxMYt3Yvpyx8v4uc8JR4xBtmDKtHqurm4dbfIWHTfxOjJyHA1bvP4856R
-         bRPN4wlDtc/aQLTUBCkUJP2y3WFtsiRu+opY+DgpHqXfmuAUHaAcV4Wq8lbT7HiMAm
-         f8YNsJ+oEO7c1sRWup5Xs9LOQXBv3a+Gz6gOPSmFjbC9dkb4Fo4h9Z+Z673bLSuVD7
-         u+B2Iq0sWlhwQ==
-Date:   Thu, 12 Dec 2019 07:37:50 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto List <linux-crypto@vger.kernel.org>
-Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>
-Subject: linux-next: Fixes tag needs some work in the crypto tree
-Message-ID: <20191212073750.62a974dd@canb.auug.org.au>
+        id S1726141AbfLKWEu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 11 Dec 2019 17:04:50 -0500
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 0cd66f8f
+        for <linux-crypto@vger.kernel.org>;
+        Wed, 11 Dec 2019 21:09:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
+        :references:in-reply-to:from:date:message-id:subject:to:cc
+        :content-type:content-transfer-encoding; s=mail; bh=0LKnwa52M0M9
+        Z3V6jvjU94UIZRo=; b=GBVpdukNy4vVl1Yj6oN71KqAcXvUXZv++VPsy/4dSgWt
+        keFOEVn3fq7I6UA9ju0vBKqsVInOnc7NVsthJY4JvFYguJMuQt4cMf2DT2mM0DRn
+        LbBvDNOx0K+/YUmv+0AKsegJUP6tGu9+Lkuf9fVRMtBkpEdIrgOpKHLweFqofEYL
+        AK4ja4Agpl6XJ7946rsu73G+MF3NMyOga3VwBCyq5pgtKFGfcc6ZIvk8ZxA/w4+h
+        /fdi+mVhmF91VGs2rVj+Ylm1t6q8dIR8gacLu7lz7qOcM3GOtrgJ5op4LuX5bt9s
+        si1B5oaNfEPfCoBcqLXXSlZ/FbNt+gUPggKx0g0jaQ==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id f1746d19 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO)
+        for <linux-crypto@vger.kernel.org>;
+        Wed, 11 Dec 2019 21:09:06 +0000 (UTC)
+Received: by mail-ot1-f47.google.com with SMTP id k14so215177otn.4
+        for <linux-crypto@vger.kernel.org>; Wed, 11 Dec 2019 14:04:48 -0800 (PST)
+X-Gm-Message-State: APjAAAUw0cvkBcgJ5aZ6JdDMECrLYfgd3/TMFFP70mkREu9l7adOelgi
+        NXe6g/d3n5coWyO8w/qBdBZKnFF2F3LzkIOcDdM=
+X-Google-Smtp-Source: APXvYqw1BkbN/8niicN13HnrC9RZja8tV02kH69pho+vRiD4aOoeE48J6HR6rm3E6yVvetfgF1x0xGaNrnNhOEalVyU=
+X-Received: by 2002:a05:6830:1b6a:: with SMTP id d10mr4400535ote.52.1576101888110;
+ Wed, 11 Dec 2019 14:04:48 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/YThANIE2iXQVlG+Kq.23wPW";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+References: <20191211170936.385572-1-Jason@zx2c4.com> <20191211190615.GC82952@gmail.com>
+In-Reply-To: <20191211190615.GC82952@gmail.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Wed, 11 Dec 2019 23:04:36 +0100
+X-Gmail-Original-Message-ID: <CAHmME9oyD+mwOUa7kjx5J5BhgZYVjfpd1S+oXUthZqV52RfMeQ@mail.gmail.com>
+Message-ID: <CAHmME9oyD+mwOUa7kjx5J5BhgZYVjfpd1S+oXUthZqV52RfMeQ@mail.gmail.com>
+Subject: Re: [PATCH crypto-next v1] crypto: poly1305 - add new 32 and 64-bit
+ generic versions
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---Sig_/YThANIE2iXQVlG+Kq.23wPW
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hey Eric,
 
-Hi all,
+Thanks for the review. I just finished porting the x86_64 code, which
+I'll submit alongside v2 tomorrow, pending a night of sleep and some
+rereading: https://git.kernel.org/pub/scm/linux/kernel/git/zx2c4/linux.git/=
+commit/?h=3Djd/crypto-5.5&id=3D7380dd3ac2b8ea4a2b1b111139426c7d25374bba
 
-In commit
+On Wed, Dec 11, 2019 at 8:13 PM Eric Biggers <ebiggers@kernel.org> wrote:
+> Isn't the existing implementation in the kernel already based on the 32x3=
+2 code
+> from Andrew Moon?  Can you elaborate on how the new code is different?
 
-  7278fa25aa0e ("crypto: caam - do not reset pointer size from MCFGR regist=
-er")
+It matches the style of the 64x64 one, so that it's easy to compare
+them. And, as mentioned in the commit message, it precomputes
+s1,s2,s3,s4, speeding up updates.
 
-Fixes tag
+> You can run the self-tests.  But I tried and it doesn't get past nhpoly13=
+05:
+>
+> [    0.856458] alg: shash: nhpoly1305-generic test failed (wrong result) =
+on test vector 1, cfg=3D"init+update+final aligned buffer"
 
-  Fixes: a1cf573ee95 ("crypto: caam - select DMA address size at runtime")
+Oh, right, duh. Okay, I'll submit v2 once I get those tests passing. Thanks=
+.
 
-has these problem(s):
+> > +void poly1305_core_emit(const struct poly1305_state *state, const u32 =
+nonce[4],
+> > +                     void *dst);
+>
+> Adding nonce support here makes the comment above this code outdated.
+>
+>         /*
+>          * Poly1305 core functions.  These implement the =CE=B5-almost-=
+=E2=88=86-universal hash
+>          * function underlying the Poly1305 MAC, i.e. they don't add an e=
+ncrypted nonce
+>          * ("s key") at the end.  They also only support block-aligned in=
+puts.
+>          */
 
-  - SHA1 should be at least 12 digits long
-    Can be fixed by setting core.abbrev to 12 (or more) or (for git v2.11
-    or later) just making sure it is not set (or set to "auto").
+Ack.
 
---=20
-Cheers,
-Stephen Rothwell
+> It would be helpful to include comments for the r64 and h64 fields, like =
+there
+> are for the r and h fields.  What base is being used?
 
---Sig_/YThANIE2iXQVlG+Kq.23wPW
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+Sure, I'll add comments.
 
------BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl3xU54ACgkQAVBC80lX
-0GwWrQgAnRRG1FHbQHrQCQ2UrHc9f8sBoAOaENCMuiw+GZwFN48SC5wlm4bWui+r
-AOJ+B90RFl9tbGX7cUbvTwfQO6LKx18dqP3AdWcCtSRO7/FteXJnT6Ry0k/oz5dU
-voAHWjwYDCmg9LWRlDGoMHhRemUEmRj7HMVM5+5zAxumoNMI84olB/DwhICGUDLU
-n3CIDxgptPGerGQ8w1luxuA8Un9IeuyIrrhqqAMFGGkyiVyT3PXwp8PwSyT3uGa7
-0HF584uS0yY4pntbsebAa0WYOzJo7eq8my8vIIDH8R4OlcmX6sfWs1HPgeaD2hXU
-Tz0L2mW178H5rReqsliwiR9iUMiybg==
-=l8JG
------END PGP SIGNATURE-----
+> This assumes the struct poly1305_key is actually part of an array.  This =
+is
+> probably what's causing the self-tests to fail, since some callers provid=
+e only
+> a single struct poly1305_key.
 
---Sig_/YThANIE2iXQVlG+Kq.23wPW--
+Thanks. Good catch.
+
+> Shouldn't this detail be hidden in struct poly1305_key?  Or at least the
+> functions should take 'struct poly1305_key key[2]' to make this assumptio=
+n
+> explicit.
+
+I'll make it explicit. The way things work right now, the desc_ctx is
+an array of a .config-number of keys. In some future cleanup, I think
+that should basically be opaque instead, but I'll leave this out of
+this now, and instead fix up the signatures to make clear what's going
+on, and audit all callers.
+
+Jason
