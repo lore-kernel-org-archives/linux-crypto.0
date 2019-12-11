@@ -2,1133 +2,211 @@ Return-Path: <SRS0=IyTV=2B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B3FDC43603
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 17:09:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F716C43603
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 19:06:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F16862054F
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 17:09:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="lqrlfXay"
+	by mail.kernel.org (Postfix) with ESMTP id 2112F21556
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 19:06:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1576091180;
+	bh=LkOzKJFV2DBa/4avtVwHZDrQXWd514uVebIpA+Rk054=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=fFYKxkNNTKtXoe8+YInjbqx8A+ZC3GTyptQKbk+k3aeZv6KoKp8iHQEHsE4bWVtg2
+	 M/Z841Unl5dRhoh6H54aLunbaWaWaJtKDxDa4tlm8ZvmcdWPbbOnRyN7gs3uI0QxEG
+	 6t/4YvoM9NzVvI0w2vxrR0DDV/1vgWtWe/BKntvo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730505AbfLKRJ4 (ORCPT
+        id S1726595AbfLKTGT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 Dec 2019 12:09:56 -0500
-Received: from frisell.zx2c4.com ([192.95.5.64]:40743 "EHLO frisell.zx2c4.com"
+        Wed, 11 Dec 2019 14:06:19 -0500
+Received: from mail.kernel.org ([198.145.29.99]:49650 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730488AbfLKRJ4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Dec 2019 12:09:56 -0500
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 29988389;
-        Wed, 11 Dec 2019 16:14:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=from:to:cc
-        :subject:date:message-id:mime-version:content-transfer-encoding;
-         s=mail; bh=WcOT+xWA53hSeok5ZT8idD1YzA4=; b=lqrlfXayMm7f9tcGiINh
-        64v2CMMtnZVBTRh3wIugCqOFfPkY4zDTpiEVcUxfLj9NKLxkexXSdC2mzV+tnHN7
-        B8jJ8dDLPhjereRBpeMuirbC3SMxbQeB9pBIvGy4D9cESFd/eZfpR493WfTDYeKB
-        JZ4cNDBwRIkRWTqB73enljAzI8519MakXwkVtwePpSnajAmJQzpegIgLy8VITkCR
-        M4kDLrVTnDOqa9EEUNNaBtEyMxJ4tl7BPeb6UAF3MWtt1LBVjEFIonOgvU25s/XB
-        nOf9KB5z+V9xGI9m/axFTus9ZXuj0Uy12fnXQIFq4m9NMMZUYnWhCvu7qdQmciU0
-        cg==
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 1b2f310b (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
-        Wed, 11 Dec 2019 16:14:12 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Eric Biggers <ebiggers@kernel.org>
-Subject: [PATCH crypto-next v1] crypto: poly1305 - add new 32 and 64-bit generic versions
-Date:   Wed, 11 Dec 2019 18:09:36 +0100
-Message-Id: <20191211170936.385572-1-Jason@zx2c4.com>
+        id S1727096AbfLKTGT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 11 Dec 2019 14:06:19 -0500
+Received: from gmail.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 664C320836;
+        Wed, 11 Dec 2019 19:06:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1576091178;
+        bh=LkOzKJFV2DBa/4avtVwHZDrQXWd514uVebIpA+Rk054=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=zv2l5KgAlmc6pV5Q/dkBdhby8aA/OrSI7doA5ZH4w+3TTSajouYU4JSeFoDB0Gzqr
+         MZc1H0kVwY8Yhsbpe+yKfiDlHelWnYbm9ll7n8kP6pJvfNRsQJNnfBzgt8Sg1s7+du
+         1LPH2Xz3kc95nNCi00RSQTawNlfDyLKqQzq5Tpao=
+Date:   Wed, 11 Dec 2019 11:06:16 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-crypto@vger.kernel.org
+Subject: Re: [PATCH crypto-next v1] crypto: poly1305 - add new 32 and 64-bit
+ generic versions
+Message-ID: <20191211190615.GC82952@gmail.com>
+References: <20191211170936.385572-1-Jason@zx2c4.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191211170936.385572-1-Jason@zx2c4.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-These two C implementations from Zinc -- a 32x32 one and a 64x64 one,
-depending on the platform -- come from Andrew Moon's public domain
-poly1305-donna portable code, modified for usage in the kernel. The
-precomputation in the 32-bit version and the use of 64x64 multiplies in
-the 64-bit version make these perform better than the code it replaces.
-Moon's code is also very widespread and has received many eyeballs of
-scrutiny.
+On Wed, Dec 11, 2019 at 06:09:36PM +0100, Jason A. Donenfeld wrote:
+> These two C implementations from Zinc -- a 32x32 one and a 64x64 one,
+> depending on the platform -- come from Andrew Moon's public domain
+> poly1305-donna portable code, modified for usage in the kernel. The
+> precomputation in the 32-bit version and the use of 64x64 multiplies in
+> the 64-bit version make these perform better than the code it replaces.
+> Moon's code is also very widespread and has received many eyeballs of
+> scrutiny.
 
-There's a bit of interference between the x86 implementation, which
-relies on internal details of the old scalar implementation. Soon the
-x86 implementation will be replaced with a faster one that doesn't rely
-on this, but for now, we inline the bits of the old implementation that
-the x86 implementation relied on. Also, since we now support a slightly
-larger key space, via the union, some offsets had to be fixed up.
+Isn't the existing implementation in the kernel already based on the 32x32 code
+from Andrew Moon?  Can you elaborate on how the new code is different?
 
-Nonce calculation was folded in with the emit function, to take
-advantage of 64x64 arithmetic. However, Adiantum appeared to rely on no
-nonce handling in emit, so this path was conditionalized. I don't have
-an Adiantum rig handy, so I'd appreciate a review from somebody who does
-and can make sure this doesn't break it.
+> 
+> There's a bit of interference between the x86 implementation, which
+> relies on internal details of the old scalar implementation. Soon the
+> x86 implementation will be replaced with a faster one that doesn't rely
+> on this, but for now, we inline the bits of the old implementation that
+> the x86 implementation relied on. Also, since we now support a slightly
+> larger key space, via the union, some offsets had to be fixed up.
+> 
+> Nonce calculation was folded in with the emit function, to take
+> advantage of 64x64 arithmetic. However, Adiantum appeared to rely on no
+> nonce handling in emit, so this path was conditionalized. I don't have
+> an Adiantum rig handy, so I'd appreciate a review from somebody who does
+> and can make sure this doesn't break it.
+> 
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> Cc: Eric Biggers <ebiggers@kernel.org>
 
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Cc: Eric Biggers <ebiggers@kernel.org>
----
- arch/x86/crypto/poly1305-avx2-x86_64.S |  20 +--
- arch/x86/crypto/poly1305_glue.c        | 215 +++++++++++++++++++++++--
- crypto/adiantum.c                      |   2 +-
- crypto/nhpoly1305.c                    |   2 +-
- crypto/poly1305_generic.c              |  23 +++
- include/crypto/internal/poly1305.h     |  32 +---
- include/crypto/poly1305.h              |  10 +-
- lib/crypto/Kconfig                     |   2 +-
- lib/crypto/Makefile                    |   4 +-
- lib/crypto/poly1305-donna32.c          | 204 +++++++++++++++++++++++
- lib/crypto/poly1305-donna64.c          | 185 +++++++++++++++++++++
- lib/crypto/poly1305.c                  | 160 +-----------------
- 12 files changed, 644 insertions(+), 215 deletions(-)
- create mode 100644 lib/crypto/poly1305-donna32.c
- create mode 100644 lib/crypto/poly1305-donna64.c
+You can run the self-tests.  But I tried and it doesn't get past nhpoly1305:
 
-diff --git a/arch/x86/crypto/poly1305-avx2-x86_64.S b/arch/x86/crypto/poly1305-avx2-x86_64.S
-index d6063feda9da..8f56989ea599 100644
---- a/arch/x86/crypto/poly1305-avx2-x86_64.S
-+++ b/arch/x86/crypto/poly1305-avx2-x86_64.S
-@@ -34,16 +34,16 @@ ORMASK:	.octa 0x00000000010000000000000001000000
- #define u2 0x08(%r8)
- #define u3 0x0c(%r8)
- #define u4 0x10(%r8)
--#define w0 0x14(%r8)
--#define w1 0x18(%r8)
--#define w2 0x1c(%r8)
--#define w3 0x20(%r8)
--#define w4 0x24(%r8)
--#define y0 0x28(%r8)
--#define y1 0x2c(%r8)
--#define y2 0x30(%r8)
--#define y3 0x34(%r8)
--#define y4 0x38(%r8)
-+#define w0 0x18(%r8)
-+#define w1 0x1c(%r8)
-+#define w2 0x20(%r8)
-+#define w3 0x24(%r8)
-+#define w4 0x28(%r8)
-+#define y0 0x30(%r8)
-+#define y1 0x34(%r8)
-+#define y2 0x38(%r8)
-+#define y3 0x3c(%r8)
-+#define y4 0x40(%r8)
- #define m %rsi
- #define hc0 %ymm0
- #define hc1 %ymm1
-diff --git a/arch/x86/crypto/poly1305_glue.c b/arch/x86/crypto/poly1305_glue.c
-index 0cc4537e6617..633e6d5093fa 100644
---- a/arch/x86/crypto/poly1305_glue.c
-+++ b/arch/x86/crypto/poly1305_glue.c
-@@ -25,6 +25,21 @@ asmlinkage void poly1305_4block_avx2(u32 *h, const u8 *src, const u32 *r,
- static __ro_after_init DEFINE_STATIC_KEY_FALSE(poly1305_use_simd);
- static __ro_after_init DEFINE_STATIC_KEY_FALSE(poly1305_use_avx2);
- 
-+static inline u64 mlt(u64 a, u64 b)
-+{
-+	return a * b;
-+}
-+
-+static inline u32 sr(u64 v, u_char n)
-+{
-+	return v >> n;
-+}
-+
-+static inline u32 and(u32 v, u32 mask)
-+{
-+	return v & mask;
-+}
-+
- static void poly1305_simd_mult(u32 *a, const u32 *b)
- {
- 	u8 m[POLY1305_BLOCK_SIZE];
-@@ -36,6 +51,168 @@ static void poly1305_simd_mult(u32 *a, const u32 *b)
- 	poly1305_block_sse2(a, m, b, 1);
- }
- 
-+static void poly1305_integer_setkey(struct poly1305_key *key, const u8 *raw_key)
-+{
-+	/* r &= 0xffffffc0ffffffc0ffffffc0fffffff */
-+	key->r[0] = (get_unaligned_le32(raw_key +  0) >> 0) & 0x3ffffff;
-+	key->r[1] = (get_unaligned_le32(raw_key +  3) >> 2) & 0x3ffff03;
-+	key->r[2] = (get_unaligned_le32(raw_key +  6) >> 4) & 0x3ffc0ff;
-+	key->r[3] = (get_unaligned_le32(raw_key +  9) >> 6) & 0x3f03fff;
-+	key->r[4] = (get_unaligned_le32(raw_key + 12) >> 8) & 0x00fffff;
-+}
-+
-+static void poly1305_integer_blocks(struct poly1305_state *state,
-+				    const struct poly1305_key *key,
-+				    const void *src,
-+				    unsigned int nblocks, u32 hibit)
-+{
-+	u32 r0, r1, r2, r3, r4;
-+	u32 s1, s2, s3, s4;
-+	u32 h0, h1, h2, h3, h4;
-+	u64 d0, d1, d2, d3, d4;
-+
-+	if (!nblocks)
-+		return;
-+
-+	r0 = key->r[0];
-+	r1 = key->r[1];
-+	r2 = key->r[2];
-+	r3 = key->r[3];
-+	r4 = key->r[4];
-+
-+	s1 = r1 * 5;
-+	s2 = r2 * 5;
-+	s3 = r3 * 5;
-+	s4 = r4 * 5;
-+
-+	h0 = state->h[0];
-+	h1 = state->h[1];
-+	h2 = state->h[2];
-+	h3 = state->h[3];
-+	h4 = state->h[4];
-+
-+	do {
-+		/* h += m[i] */
-+		h0 += (get_unaligned_le32(src +  0) >> 0) & 0x3ffffff;
-+		h1 += (get_unaligned_le32(src +  3) >> 2) & 0x3ffffff;
-+		h2 += (get_unaligned_le32(src +  6) >> 4) & 0x3ffffff;
-+		h3 += (get_unaligned_le32(src +  9) >> 6) & 0x3ffffff;
-+		h4 += (get_unaligned_le32(src + 12) >> 8) | (hibit << 24);
-+
-+		/* h *= r */
-+		d0 = mlt(h0, r0) + mlt(h1, s4) + mlt(h2, s3) +
-+		     mlt(h3, s2) + mlt(h4, s1);
-+		d1 = mlt(h0, r1) + mlt(h1, r0) + mlt(h2, s4) +
-+		     mlt(h3, s3) + mlt(h4, s2);
-+		d2 = mlt(h0, r2) + mlt(h1, r1) + mlt(h2, r0) +
-+		     mlt(h3, s4) + mlt(h4, s3);
-+		d3 = mlt(h0, r3) + mlt(h1, r2) + mlt(h2, r1) +
-+		     mlt(h3, r0) + mlt(h4, s4);
-+		d4 = mlt(h0, r4) + mlt(h1, r3) + mlt(h2, r2) +
-+		     mlt(h3, r1) + mlt(h4, r0);
-+
-+		/* (partial) h %= p */
-+		d1 += sr(d0, 26);     h0 = and(d0, 0x3ffffff);
-+		d2 += sr(d1, 26);     h1 = and(d1, 0x3ffffff);
-+		d3 += sr(d2, 26);     h2 = and(d2, 0x3ffffff);
-+		d4 += sr(d3, 26);     h3 = and(d3, 0x3ffffff);
-+		h0 += sr(d4, 26) * 5; h4 = and(d4, 0x3ffffff);
-+		h1 += h0 >> 26;       h0 = h0 & 0x3ffffff;
-+
-+		src += POLY1305_BLOCK_SIZE;
-+	} while (--nblocks);
-+
-+	state->h[0] = h0;
-+	state->h[1] = h1;
-+	state->h[2] = h2;
-+	state->h[3] = h3;
-+	state->h[4] = h4;
-+}
-+
-+static void poly1305_integer_emit(const struct poly1305_state *state, void *dst)
-+{
-+	u32 h0, h1, h2, h3, h4;
-+	u32 g0, g1, g2, g3, g4;
-+	u32 mask;
-+
-+	/* fully carry h */
-+	h0 = state->h[0];
-+	h1 = state->h[1];
-+	h2 = state->h[2];
-+	h3 = state->h[3];
-+	h4 = state->h[4];
-+
-+	h2 += (h1 >> 26);     h1 = h1 & 0x3ffffff;
-+	h3 += (h2 >> 26);     h2 = h2 & 0x3ffffff;
-+	h4 += (h3 >> 26);     h3 = h3 & 0x3ffffff;
-+	h0 += (h4 >> 26) * 5; h4 = h4 & 0x3ffffff;
-+	h1 += (h0 >> 26);     h0 = h0 & 0x3ffffff;
-+
-+	/* compute h + -p */
-+	g0 = h0 + 5;
-+	g1 = h1 + (g0 >> 26);             g0 &= 0x3ffffff;
-+	g2 = h2 + (g1 >> 26);             g1 &= 0x3ffffff;
-+	g3 = h3 + (g2 >> 26);             g2 &= 0x3ffffff;
-+	g4 = h4 + (g3 >> 26) - (1 << 26); g3 &= 0x3ffffff;
-+
-+	/* select h if h < p, or h + -p if h >= p */
-+	mask = (g4 >> ((sizeof(u32) * 8) - 1)) - 1;
-+	g0 &= mask;
-+	g1 &= mask;
-+	g2 &= mask;
-+	g3 &= mask;
-+	g4 &= mask;
-+	mask = ~mask;
-+	h0 = (h0 & mask) | g0;
-+	h1 = (h1 & mask) | g1;
-+	h2 = (h2 & mask) | g2;
-+	h3 = (h3 & mask) | g3;
-+	h4 = (h4 & mask) | g4;
-+
-+	/* h = h % (2^128) */
-+	put_unaligned_le32((h0 >>  0) | (h1 << 26), dst +  0);
-+	put_unaligned_le32((h1 >>  6) | (h2 << 20), dst +  4);
-+	put_unaligned_le32((h2 >> 12) | (h3 << 14), dst +  8);
-+	put_unaligned_le32((h3 >> 18) | (h4 <<  8), dst + 12);
-+}
-+
-+void poly1305_init_arch(struct poly1305_desc_ctx *desc, const u8 *key)
-+{
-+	poly1305_integer_setkey(desc->r, key);
-+	desc->s[0] = get_unaligned_le32(key + 16);
-+	desc->s[1] = get_unaligned_le32(key + 20);
-+	desc->s[2] = get_unaligned_le32(key + 24);
-+	desc->s[3] = get_unaligned_le32(key + 28);
-+	poly1305_core_init(&desc->h);
-+	desc->buflen = 0;
-+	desc->sset = true;
-+	desc->rset = 1;
-+}
-+EXPORT_SYMBOL_GPL(poly1305_init_arch);
-+
-+static unsigned int crypto_poly1305_setdesckey(struct poly1305_desc_ctx *dctx,
-+					       const u8 *src, unsigned int srclen)
-+{
-+	if (!dctx->sset) {
-+		if (!dctx->rset && srclen >= POLY1305_BLOCK_SIZE) {
-+			poly1305_integer_setkey(dctx->r, src);
-+			src += POLY1305_BLOCK_SIZE;
-+			srclen -= POLY1305_BLOCK_SIZE;
-+			dctx->rset = 1;
-+		}
-+		if (srclen >= POLY1305_BLOCK_SIZE) {
-+			dctx->s[0] = get_unaligned_le32(src +  0);
-+			dctx->s[1] = get_unaligned_le32(src +  4);
-+			dctx->s[2] = get_unaligned_le32(src +  8);
-+			dctx->s[3] = get_unaligned_le32(src + 12);
-+			src += POLY1305_BLOCK_SIZE;
-+			srclen -= POLY1305_BLOCK_SIZE;
-+			dctx->sset = true;
-+		}
-+	}
-+	return srclen;
-+}
-+
- static unsigned int poly1305_scalar_blocks(struct poly1305_desc_ctx *dctx,
- 					   const u8 *src, unsigned int srclen)
- {
-@@ -47,8 +224,8 @@ static unsigned int poly1305_scalar_blocks(struct poly1305_desc_ctx *dctx,
- 		srclen = datalen;
- 	}
- 	if (srclen >= POLY1305_BLOCK_SIZE) {
--		poly1305_core_blocks(&dctx->h, dctx->r, src,
--				     srclen / POLY1305_BLOCK_SIZE, 1);
-+		poly1305_integer_blocks(&dctx->h, dctx->r, src,
-+					srclen / POLY1305_BLOCK_SIZE, 1);
- 		srclen %= POLY1305_BLOCK_SIZE;
- 	}
- 	return srclen;
-@@ -105,12 +282,6 @@ static unsigned int poly1305_simd_blocks(struct poly1305_desc_ctx *dctx,
- 	return srclen;
- }
- 
--void poly1305_init_arch(struct poly1305_desc_ctx *desc, const u8 *key)
--{
--	poly1305_init_generic(desc, key);
--}
--EXPORT_SYMBOL(poly1305_init_arch);
--
- void poly1305_update_arch(struct poly1305_desc_ctx *dctx, const u8 *src,
- 			  unsigned int srclen)
- {
-@@ -158,9 +329,31 @@ void poly1305_update_arch(struct poly1305_desc_ctx *dctx, const u8 *src,
- }
- EXPORT_SYMBOL(poly1305_update_arch);
- 
--void poly1305_final_arch(struct poly1305_desc_ctx *desc, u8 *digest)
-+void poly1305_final_arch(struct poly1305_desc_ctx *desc, u8 *dst)
- {
--	poly1305_final_generic(desc, digest);
-+	__le32 digest[4];
-+	u64 f = 0;
-+
-+	if (unlikely(desc->buflen)) {
-+		desc->buf[desc->buflen++] = 1;
-+		memset(desc->buf + desc->buflen, 0,
-+		       POLY1305_BLOCK_SIZE - desc->buflen);
-+		poly1305_integer_blocks(&desc->h, desc->r, desc->buf, 1, 0);
-+	}
-+
-+	poly1305_integer_emit(&desc->h, digest);
-+
-+	/* mac = (h + s) % (2^128) */
-+	f = (f >> 32) + le32_to_cpu(digest[0]) + desc->s[0];
-+	put_unaligned_le32(f, dst + 0);
-+	f = (f >> 32) + le32_to_cpu(digest[1]) + desc->s[1];
-+	put_unaligned_le32(f, dst + 4);
-+	f = (f >> 32) + le32_to_cpu(digest[2]) + desc->s[2];
-+	put_unaligned_le32(f, dst + 8);
-+	f = (f >> 32) + le32_to_cpu(digest[3]) + desc->s[3];
-+	put_unaligned_le32(f, dst + 12);
-+
-+	*desc = (struct poly1305_desc_ctx){};
- }
- EXPORT_SYMBOL(poly1305_final_arch);
- 
-@@ -183,7 +376,7 @@ static int crypto_poly1305_final(struct shash_desc *desc, u8 *dst)
- 	if (unlikely(!dctx->sset))
- 		return -ENOKEY;
- 
--	poly1305_final_generic(dctx, dst);
-+	poly1305_final_arch(dctx, dst);
- 	return 0;
- }
- 
-diff --git a/crypto/adiantum.c b/crypto/adiantum.c
-index aded26092268..2a45faf81201 100644
---- a/crypto/adiantum.c
-+++ b/crypto/adiantum.c
-@@ -249,7 +249,7 @@ static void adiantum_hash_header(struct skcipher_request *req)
- 	poly1305_core_blocks(&state, &tctx->header_hash_key, req->iv,
- 			     TWEAK_SIZE / POLY1305_BLOCK_SIZE, 1);
- 
--	poly1305_core_emit(&state, &rctx->header_hash);
-+	poly1305_core_emit(&state, NULL, &rctx->header_hash);
- }
- 
- /* Hash the left-hand part (the "bulk") of the message using NHPoly1305 */
-diff --git a/crypto/nhpoly1305.c b/crypto/nhpoly1305.c
-index f6b6a52092b4..8a3006c3b51b 100644
---- a/crypto/nhpoly1305.c
-+++ b/crypto/nhpoly1305.c
-@@ -210,7 +210,7 @@ int crypto_nhpoly1305_final_helper(struct shash_desc *desc, u8 *dst, nh_t nh_fn)
- 	if (state->nh_remaining)
- 		process_nh_hash_value(state, key);
- 
--	poly1305_core_emit(&state->poly_state, dst);
-+	poly1305_core_emit(&state->poly_state, NULL, dst);
- 	return 0;
- }
- EXPORT_SYMBOL(crypto_nhpoly1305_final_helper);
-diff --git a/crypto/poly1305_generic.c b/crypto/poly1305_generic.c
-index 21edbd8c99fb..e2c8bc81ab02 100644
---- a/crypto/poly1305_generic.c
-+++ b/crypto/poly1305_generic.c
-@@ -31,6 +31,29 @@ static int crypto_poly1305_init(struct shash_desc *desc)
- 	return 0;
- }
- 
-+static unsigned int crypto_poly1305_setdesckey(struct poly1305_desc_ctx *dctx,
-+					       const u8 *src, unsigned int srclen)
-+{
-+	if (!dctx->sset) {
-+		if (!dctx->rset && srclen >= POLY1305_BLOCK_SIZE) {
-+			poly1305_core_setkey(dctx->r, src);
-+			src += POLY1305_BLOCK_SIZE;
-+			srclen -= POLY1305_BLOCK_SIZE;
-+			dctx->rset = 2;
-+		}
-+		if (srclen >= POLY1305_BLOCK_SIZE) {
-+			dctx->s[0] = get_unaligned_le32(src +  0);
-+			dctx->s[1] = get_unaligned_le32(src +  4);
-+			dctx->s[2] = get_unaligned_le32(src +  8);
-+			dctx->s[3] = get_unaligned_le32(src + 12);
-+			src += POLY1305_BLOCK_SIZE;
-+			srclen -= POLY1305_BLOCK_SIZE;
-+			dctx->sset = true;
-+		}
-+	}
-+	return srclen;
-+}
-+
- static void poly1305_blocks(struct poly1305_desc_ctx *dctx, const u8 *src,
- 			    unsigned int srclen)
- {
-diff --git a/include/crypto/internal/poly1305.h b/include/crypto/internal/poly1305.h
-index 479b0cab2a1a..6e275d3e5969 100644
---- a/include/crypto/internal/poly1305.h
-+++ b/include/crypto/internal/poly1305.h
-@@ -24,35 +24,7 @@ static inline void poly1305_core_init(struct poly1305_state *state)
- void poly1305_core_blocks(struct poly1305_state *state,
- 			  const struct poly1305_key *key, const void *src,
- 			  unsigned int nblocks, u32 hibit);
--void poly1305_core_emit(const struct poly1305_state *state, void *dst);
--
--/*
-- * Poly1305 requires a unique key for each tag, which implies that we can't set
-- * it on the tfm that gets accessed by multiple users simultaneously. Instead we
-- * expect the key as the first 32 bytes in the update() call.
-- */
--static inline
--unsigned int crypto_poly1305_setdesckey(struct poly1305_desc_ctx *dctx,
--					const u8 *src, unsigned int srclen)
--{
--	if (!dctx->sset) {
--		if (!dctx->rset && srclen >= POLY1305_BLOCK_SIZE) {
--			poly1305_core_setkey(dctx->r, src);
--			src += POLY1305_BLOCK_SIZE;
--			srclen -= POLY1305_BLOCK_SIZE;
--			dctx->rset = 1;
--		}
--		if (srclen >= POLY1305_BLOCK_SIZE) {
--			dctx->s[0] = get_unaligned_le32(src +  0);
--			dctx->s[1] = get_unaligned_le32(src +  4);
--			dctx->s[2] = get_unaligned_le32(src +  8);
--			dctx->s[3] = get_unaligned_le32(src + 12);
--			src += POLY1305_BLOCK_SIZE;
--			srclen -= POLY1305_BLOCK_SIZE;
--			dctx->sset = true;
--		}
--	}
--	return srclen;
--}
-+void poly1305_core_emit(const struct poly1305_state *state, const u32 nonce[4],
-+			void *dst);
- 
- #endif
-diff --git a/include/crypto/poly1305.h b/include/crypto/poly1305.h
-index 74c6e1cd73ee..dec2bd6b5aee 100644
---- a/include/crypto/poly1305.h
-+++ b/include/crypto/poly1305.h
-@@ -14,11 +14,17 @@
- #define POLY1305_DIGEST_SIZE	16
- 
- struct poly1305_key {
--	u32 r[5];	/* key, base 2^26 */
-+	union {
-+		u32 r[5];	/* key, base 2^26 */
-+		u64 r64[3];
-+	};
- };
- 
- struct poly1305_state {
--	u32 h[5];	/* accumulator, base 2^26 */
-+	union {
-+		u32 h[5];	/* accumulator, base 2^26 */
-+		u64 h64[3];
-+	};
- };
- 
- struct poly1305_desc_ctx {
-diff --git a/lib/crypto/Kconfig b/lib/crypto/Kconfig
-index 0b2c4fce26d9..2d4a8f385e62 100644
---- a/lib/crypto/Kconfig
-+++ b/lib/crypto/Kconfig
-@@ -92,7 +92,7 @@ config CRYPTO_LIB_POLY1305_RSIZE
- 	default 2 if MIPS
- 	default 4 if X86_64
- 	default 9 if ARM || ARM64
--	default 1
-+	default 2
- 
- config CRYPTO_ARCH_HAVE_LIB_POLY1305
- 	tristate
-diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
-index 34a701ab8b92..d19e5195569e 100644
---- a/lib/crypto/Makefile
-+++ b/lib/crypto/Makefile
-@@ -28,7 +28,9 @@ obj-$(CONFIG_CRYPTO_LIB_DES)			+= libdes.o
- libdes-y					:= des.o
- 
- obj-$(CONFIG_CRYPTO_LIB_POLY1305_GENERIC)	+= libpoly1305.o
--libpoly1305-y					:= poly1305.o
-+libpoly1305-y					:= poly1305-donna32.o
-+libpoly1305-$(CONFIG_ARCH_SUPPORTS_INT128)	:= poly1305-donna64.o
-+libpoly1305-y					+= poly1305.o
- 
- obj-$(CONFIG_CRYPTO_LIB_SHA256)			+= libsha256.o
- libsha256-y					:= sha256.o
-diff --git a/lib/crypto/poly1305-donna32.c b/lib/crypto/poly1305-donna32.c
-new file mode 100644
-index 000000000000..39b3fde68dcf
---- /dev/null
-+++ b/lib/crypto/poly1305-donna32.c
-@@ -0,0 +1,204 @@
-+// SPDX-License-Identifier: GPL-2.0 OR MIT
-+/*
-+ * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-+ *
-+ * This is based in part on Andrew Moon's poly1305-donna, which is in the
-+ * public domain.
-+ */
-+
-+#include <linux/kernel.h>
-+#include <asm/unaligned.h>
-+#include <crypto/internal/poly1305.h>
-+
-+void poly1305_core_setkey(struct poly1305_key *key, const u8 raw_key[16])
-+{
-+	/* r &= 0xffffffc0ffffffc0ffffffc0fffffff */
-+	key[0].r[0] = (get_unaligned_le32(&raw_key[0])) & 0x3ffffff;
-+	key[0].r[1] = (get_unaligned_le32(&raw_key[3]) >> 2) & 0x3ffff03;
-+	key[0].r[2] = (get_unaligned_le32(&raw_key[6]) >> 4) & 0x3ffc0ff;
-+	key[0].r[3] = (get_unaligned_le32(&raw_key[9]) >> 6) & 0x3f03fff;
-+	key[0].r[4] = (get_unaligned_le32(&raw_key[12]) >> 8) & 0x00fffff;
-+
-+	/* s = 5*r */
-+	key[1].r[0] = key[0].r[1] * 5;
-+	key[1].r[1] = key[0].r[2] * 5;
-+	key[1].r[2] = key[0].r[3] * 5;
-+	key[1].r[3] = key[0].r[4] * 5;
-+}
-+EXPORT_SYMBOL(poly1305_core_setkey);
-+
-+void poly1305_core_blocks(struct poly1305_state *state,
-+			  const struct poly1305_key *key, const void *src,
-+			  unsigned int nblocks, u32 hibit)
-+{
-+	const u8 *input = src;
-+	u32 r0, r1, r2, r3, r4;
-+	u32 s1, s2, s3, s4;
-+	u32 h0, h1, h2, h3, h4;
-+	u64 d0, d1, d2, d3, d4;
-+	u32 c;
-+
-+	if (!nblocks)
-+		return;
-+
-+	hibit <<= 24;
-+
-+	r0 = key[0].r[0];
-+	r1 = key[0].r[1];
-+	r2 = key[0].r[2];
-+	r3 = key[0].r[3];
-+	r4 = key[0].r[4];
-+
-+	s1 = key[1].r[0];
-+	s2 = key[1].r[1];
-+	s3 = key[1].r[2];
-+	s4 = key[1].r[3];
-+
-+	h0 = state->h[0];
-+	h1 = state->h[1];
-+	h2 = state->h[2];
-+	h3 = state->h[3];
-+	h4 = state->h[4];
-+
-+	do {
-+		/* h += m[i] */
-+		h0 += (get_unaligned_le32(&input[0])) & 0x3ffffff;
-+		h1 += (get_unaligned_le32(&input[3]) >> 2) & 0x3ffffff;
-+		h2 += (get_unaligned_le32(&input[6]) >> 4) & 0x3ffffff;
-+		h3 += (get_unaligned_le32(&input[9]) >> 6) & 0x3ffffff;
-+		h4 += (get_unaligned_le32(&input[12]) >> 8) | hibit;
-+
-+		/* h *= r */
-+		d0 = ((u64)h0 * r0) + ((u64)h1 * s4) +
-+		     ((u64)h2 * s3) + ((u64)h3 * s2) +
-+		     ((u64)h4 * s1);
-+		d1 = ((u64)h0 * r1) + ((u64)h1 * r0) +
-+		     ((u64)h2 * s4) + ((u64)h3 * s3) +
-+		     ((u64)h4 * s2);
-+		d2 = ((u64)h0 * r2) + ((u64)h1 * r1) +
-+		     ((u64)h2 * r0) + ((u64)h3 * s4) +
-+		     ((u64)h4 * s3);
-+		d3 = ((u64)h0 * r3) + ((u64)h1 * r2) +
-+		     ((u64)h2 * r1) + ((u64)h3 * r0) +
-+		     ((u64)h4 * s4);
-+		d4 = ((u64)h0 * r4) + ((u64)h1 * r3) +
-+		     ((u64)h2 * r2) + ((u64)h3 * r1) +
-+		     ((u64)h4 * r0);
-+
-+		/* (partial) h %= p */
-+		c = (u32)(d0 >> 26);
-+		h0 = (u32)d0 & 0x3ffffff;
-+		d1 += c;
-+		c = (u32)(d1 >> 26);
-+		h1 = (u32)d1 & 0x3ffffff;
-+		d2 += c;
-+		c = (u32)(d2 >> 26);
-+		h2 = (u32)d2 & 0x3ffffff;
-+		d3 += c;
-+		c = (u32)(d3 >> 26);
-+		h3 = (u32)d3 & 0x3ffffff;
-+		d4 += c;
-+		c = (u32)(d4 >> 26);
-+		h4 = (u32)d4 & 0x3ffffff;
-+		h0 += c * 5;
-+		c = (h0 >> 26);
-+		h0 = h0 & 0x3ffffff;
-+		h1 += c;
-+
-+		input += POLY1305_BLOCK_SIZE;
-+	} while (--nblocks);
-+
-+	state->h[0] = h0;
-+	state->h[1] = h1;
-+	state->h[2] = h2;
-+	state->h[3] = h3;
-+	state->h[4] = h4;
-+}
-+EXPORT_SYMBOL(poly1305_core_blocks);
-+
-+void poly1305_core_emit(const struct poly1305_state *state, const u32 nonce[4],
-+			void *dst)
-+{
-+	u8 *mac = dst;
-+	u32 h0, h1, h2, h3, h4, c;
-+	u32 g0, g1, g2, g3, g4;
-+	u64 f;
-+	u32 mask;
-+
-+	/* fully carry h */
-+	h0 = state->h[0];
-+	h1 = state->h[1];
-+	h2 = state->h[2];
-+	h3 = state->h[3];
-+	h4 = state->h[4];
-+
-+	c = h1 >> 26;
-+	h1 = h1 & 0x3ffffff;
-+	h2 += c;
-+	c = h2 >> 26;
-+	h2 = h2 & 0x3ffffff;
-+	h3 += c;
-+	c = h3 >> 26;
-+	h3 = h3 & 0x3ffffff;
-+	h4 += c;
-+	c = h4 >> 26;
-+	h4 = h4 & 0x3ffffff;
-+	h0 += c * 5;
-+	c = h0 >> 26;
-+	h0 = h0 & 0x3ffffff;
-+	h1 += c;
-+
-+	/* compute h + -p */
-+	g0 = h0 + 5;
-+	c = g0 >> 26;
-+	g0 &= 0x3ffffff;
-+	g1 = h1 + c;
-+	c = g1 >> 26;
-+	g1 &= 0x3ffffff;
-+	g2 = h2 + c;
-+	c = g2 >> 26;
-+	g2 &= 0x3ffffff;
-+	g3 = h3 + c;
-+	c = g3 >> 26;
-+	g3 &= 0x3ffffff;
-+	g4 = h4 + c - (1UL << 26);
-+
-+	/* select h if h < p, or h + -p if h >= p */
-+	mask = (g4 >> ((sizeof(u32) * 8) - 1)) - 1;
-+	g0 &= mask;
-+	g1 &= mask;
-+	g2 &= mask;
-+	g3 &= mask;
-+	g4 &= mask;
-+	mask = ~mask;
-+
-+	h0 = (h0 & mask) | g0;
-+	h1 = (h1 & mask) | g1;
-+	h2 = (h2 & mask) | g2;
-+	h3 = (h3 & mask) | g3;
-+	h4 = (h4 & mask) | g4;
-+
-+	/* h = h % (2^128) */
-+	h0 = ((h0) | (h1 << 26)) & 0xffffffff;
-+	h1 = ((h1 >> 6) | (h2 << 20)) & 0xffffffff;
-+	h2 = ((h2 >> 12) | (h3 << 14)) & 0xffffffff;
-+	h3 = ((h3 >> 18) | (h4 << 8)) & 0xffffffff;
-+
-+	if (likely(nonce)) {
-+		/* mac = (h + nonce) % (2^128) */
-+		f = (u64)h0 + nonce[0];
-+		h0 = (u32)f;
-+		f = (u64)h1 + nonce[1] + (f >> 32);
-+		h1 = (u32)f;
-+		f = (u64)h2 + nonce[2] + (f >> 32);
-+		h2 = (u32)f;
-+		f = (u64)h3 + nonce[3] + (f >> 32);
-+		h3 = (u32)f;
-+	}
-+
-+	put_unaligned_le32(h0, &mac[0]);
-+	put_unaligned_le32(h1, &mac[4]);
-+	put_unaligned_le32(h2, &mac[8]);
-+	put_unaligned_le32(h3, &mac[12]);
-+}
-+EXPORT_SYMBOL(poly1305_core_emit);
-diff --git a/lib/crypto/poly1305-donna64.c b/lib/crypto/poly1305-donna64.c
-new file mode 100644
-index 000000000000..c8a5d80ce768
---- /dev/null
-+++ b/lib/crypto/poly1305-donna64.c
-@@ -0,0 +1,185 @@
-+// SPDX-License-Identifier: GPL-2.0 OR MIT
-+/*
-+ * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-+ *
-+ * This is based in part on Andrew Moon's poly1305-donna, which is in the
-+ * public domain.
-+ */
-+
-+#include <linux/kernel.h>
-+#include <asm/unaligned.h>
-+#include <crypto/internal/poly1305.h>
-+
-+typedef __uint128_t u128;
-+
-+void poly1305_core_setkey(struct poly1305_key *key, const u8 raw_key[16])
-+{
-+	u64 t0, t1;
-+
-+	/* r &= 0xffffffc0ffffffc0ffffffc0fffffff */
-+	t0 = get_unaligned_le64(&raw_key[0]);
-+	t1 = get_unaligned_le64(&raw_key[8]);
-+
-+	key[0].r64[0] = t0 & 0xffc0fffffffULL;
-+	key[0].r64[1] = ((t0 >> 44) | (t1 << 20)) & 0xfffffc0ffffULL;
-+	key[0].r64[2] = ((t1 >> 24)) & 0x00ffffffc0fULL;
-+
-+	/* s = 20*r */
-+	key[1].r64[0] = key[0].r64[1] * 20;
-+	key[1].r64[1] = key[0].r64[2] * 20;
-+}
-+EXPORT_SYMBOL(poly1305_core_setkey);
-+
-+void poly1305_core_blocks(struct poly1305_state *state,
-+			  const struct poly1305_key *key, const void *src,
-+			  unsigned int nblocks, u32 hibit)
-+{
-+	const u8 *input = src;
-+	u64 hibit64;
-+	u64 r0, r1, r2;
-+	u64 s1, s2;
-+	u64 h0, h1, h2;
-+	u64 c;
-+	u128 d0, d1, d2, d;
-+
-+	if (!nblocks)
-+		return;
-+
-+	hibit64 = ((u64)hibit) << 40;
-+
-+	r0 = key[0].r64[0];
-+	r1 = key[0].r64[1];
-+	r2 = key[0].r64[2];
-+
-+	h0 = state->h64[0];
-+	h1 = state->h64[1];
-+	h2 = state->h64[2];
-+
-+	s1 = key[1].r64[0];
-+	s2 = key[1].r64[1];
-+
-+	do {
-+		u64 t0, t1;
-+
-+		/* h += m[i] */
-+		t0 = get_unaligned_le64(&input[0]);
-+		t1 = get_unaligned_le64(&input[8]);
-+
-+		h0 += t0 & 0xfffffffffffULL;
-+		h1 += ((t0 >> 44) | (t1 << 20)) & 0xfffffffffffULL;
-+		h2 += (((t1 >> 24)) & 0x3ffffffffffULL) | hibit64;
-+
-+		/* h *= r */
-+		d0 = (u128)h0 * r0;
-+		d = (u128)h1 * s2;
-+		d0 += d;
-+		d = (u128)h2 * s1;
-+		d0 += d;
-+		d1 = (u128)h0 * r1;
-+		d = (u128)h1 * r0;
-+		d1 += d;
-+		d = (u128)h2 * s2;
-+		d1 += d;
-+		d2 = (u128)h0 * r2;
-+		d = (u128)h1 * r1;
-+		d2 += d;
-+		d = (u128)h2 * r0;
-+		d2 += d;
-+
-+		/* (partial) h %= p */
-+		c = (u64)(d0 >> 44);
-+		h0 = (u64)d0 & 0xfffffffffffULL;
-+		d1 += c;
-+		c = (u64)(d1 >> 44);
-+		h1 = (u64)d1 & 0xfffffffffffULL;
-+		d2 += c;
-+		c = (u64)(d2 >> 42);
-+		h2 = (u64)d2 & 0x3ffffffffffULL;
-+		h0 += c * 5;
-+		c = h0 >> 44;
-+		h0 = h0 & 0xfffffffffffULL;
-+		h1 += c;
-+
-+		input += POLY1305_BLOCK_SIZE;
-+	} while (--nblocks);
-+
-+	state->h64[0] = h0;
-+	state->h64[1] = h1;
-+	state->h64[2] = h2;
-+}
-+EXPORT_SYMBOL(poly1305_core_blocks);
-+
-+void poly1305_core_emit(const struct poly1305_state *state, const u32 nonce[4],
-+			void *dst)
-+{
-+	u8 *mac = dst;
-+	u64 h0, h1, h2, c;
-+	u64 g0, g1, g2;
-+	u64 t0, t1;
-+
-+	/* fully carry h */
-+	h0 = state->h64[0];
-+	h1 = state->h64[1];
-+	h2 = state->h64[2];
-+
-+	c = h1 >> 44;
-+	h1 &= 0xfffffffffffULL;
-+	h2 += c;
-+	c = h2 >> 42;
-+	h2 &= 0x3ffffffffffULL;
-+	h0 += c * 5;
-+	c = h0 >> 44;
-+	h0 &= 0xfffffffffffULL;
-+	h1 += c;
-+	c = h1 >> 44;
-+	h1 &= 0xfffffffffffULL;
-+	h2 += c;
-+	c = h2 >> 42;
-+	h2 &= 0x3ffffffffffULL;
-+	h0 += c * 5;
-+	c = h0 >> 44;
-+	h0 &= 0xfffffffffffULL;
-+	h1 += c;
-+
-+	/* compute h + -p */
-+	g0 = h0 + 5;
-+	c  = g0 >> 44;
-+	g0 &= 0xfffffffffffULL;
-+	g1 = h1 + c;
-+	c  = g1 >> 44;
-+	g1 &= 0xfffffffffffULL;
-+	g2 = h2 + c - (1ULL << 42);
-+
-+	/* select h if h < p, or h + -p if h >= p */
-+	c = (g2 >> ((sizeof(u64) * 8) - 1)) - 1;
-+	g0 &= c;
-+	g1 &= c;
-+	g2 &= c;
-+	c  = ~c;
-+	h0 = (h0 & c) | g0;
-+	h1 = (h1 & c) | g1;
-+	h2 = (h2 & c) | g2;
-+
-+	if (likely(nonce)) {
-+		/* h = (h + nonce) */
-+		t0 = ((u64)nonce[1] << 32) | nonce[0];
-+		t1 = ((u64)nonce[3] << 32) | nonce[2];
-+
-+		h0 += t0 & 0xfffffffffffULL;
-+		c = h0 >> 44;
-+		h0 &= 0xfffffffffffULL;
-+		h1 += (((t0 >> 44) | (t1 << 20)) & 0xfffffffffffULL) + c;
-+		c = h1 >> 44;
-+		h1 &= 0xfffffffffffULL;
-+		h2 += (((t1 >> 24)) & 0x3ffffffffffULL) + c;
-+		h2 &= 0x3ffffffffffULL;
-+	}
-+
-+	/* mac = h % (2^128) */
-+	h0 = h0 | (h1 << 44);
-+	h1 = (h1 >> 20) | (h2 << 24);
-+
-+	put_unaligned_le64(h0, &mac[0]);
-+	put_unaligned_le64(h1, &mac[8]);
-+}
-+EXPORT_SYMBOL(poly1305_core_emit);
-diff --git a/lib/crypto/poly1305.c b/lib/crypto/poly1305.c
-index 32ec293c65ae..93b15c82c38d 100644
---- a/lib/crypto/poly1305.c
-+++ b/lib/crypto/poly1305.c
-@@ -12,148 +12,6 @@
- #include <linux/module.h>
- #include <asm/unaligned.h>
- 
--static inline u64 mlt(u64 a, u64 b)
--{
--	return a * b;
--}
--
--static inline u32 sr(u64 v, u_char n)
--{
--	return v >> n;
--}
--
--static inline u32 and(u32 v, u32 mask)
--{
--	return v & mask;
--}
--
--void poly1305_core_setkey(struct poly1305_key *key, const u8 *raw_key)
--{
--	/* r &= 0xffffffc0ffffffc0ffffffc0fffffff */
--	key->r[0] = (get_unaligned_le32(raw_key +  0) >> 0) & 0x3ffffff;
--	key->r[1] = (get_unaligned_le32(raw_key +  3) >> 2) & 0x3ffff03;
--	key->r[2] = (get_unaligned_le32(raw_key +  6) >> 4) & 0x3ffc0ff;
--	key->r[3] = (get_unaligned_le32(raw_key +  9) >> 6) & 0x3f03fff;
--	key->r[4] = (get_unaligned_le32(raw_key + 12) >> 8) & 0x00fffff;
--}
--EXPORT_SYMBOL_GPL(poly1305_core_setkey);
--
--void poly1305_core_blocks(struct poly1305_state *state,
--			  const struct poly1305_key *key, const void *src,
--			  unsigned int nblocks, u32 hibit)
--{
--	u32 r0, r1, r2, r3, r4;
--	u32 s1, s2, s3, s4;
--	u32 h0, h1, h2, h3, h4;
--	u64 d0, d1, d2, d3, d4;
--
--	if (!nblocks)
--		return;
--
--	r0 = key->r[0];
--	r1 = key->r[1];
--	r2 = key->r[2];
--	r3 = key->r[3];
--	r4 = key->r[4];
--
--	s1 = r1 * 5;
--	s2 = r2 * 5;
--	s3 = r3 * 5;
--	s4 = r4 * 5;
--
--	h0 = state->h[0];
--	h1 = state->h[1];
--	h2 = state->h[2];
--	h3 = state->h[3];
--	h4 = state->h[4];
--
--	do {
--		/* h += m[i] */
--		h0 += (get_unaligned_le32(src +  0) >> 0) & 0x3ffffff;
--		h1 += (get_unaligned_le32(src +  3) >> 2) & 0x3ffffff;
--		h2 += (get_unaligned_le32(src +  6) >> 4) & 0x3ffffff;
--		h3 += (get_unaligned_le32(src +  9) >> 6) & 0x3ffffff;
--		h4 += (get_unaligned_le32(src + 12) >> 8) | (hibit << 24);
--
--		/* h *= r */
--		d0 = mlt(h0, r0) + mlt(h1, s4) + mlt(h2, s3) +
--		     mlt(h3, s2) + mlt(h4, s1);
--		d1 = mlt(h0, r1) + mlt(h1, r0) + mlt(h2, s4) +
--		     mlt(h3, s3) + mlt(h4, s2);
--		d2 = mlt(h0, r2) + mlt(h1, r1) + mlt(h2, r0) +
--		     mlt(h3, s4) + mlt(h4, s3);
--		d3 = mlt(h0, r3) + mlt(h1, r2) + mlt(h2, r1) +
--		     mlt(h3, r0) + mlt(h4, s4);
--		d4 = mlt(h0, r4) + mlt(h1, r3) + mlt(h2, r2) +
--		     mlt(h3, r1) + mlt(h4, r0);
--
--		/* (partial) h %= p */
--		d1 += sr(d0, 26);     h0 = and(d0, 0x3ffffff);
--		d2 += sr(d1, 26);     h1 = and(d1, 0x3ffffff);
--		d3 += sr(d2, 26);     h2 = and(d2, 0x3ffffff);
--		d4 += sr(d3, 26);     h3 = and(d3, 0x3ffffff);
--		h0 += sr(d4, 26) * 5; h4 = and(d4, 0x3ffffff);
--		h1 += h0 >> 26;       h0 = h0 & 0x3ffffff;
--
--		src += POLY1305_BLOCK_SIZE;
--	} while (--nblocks);
--
--	state->h[0] = h0;
--	state->h[1] = h1;
--	state->h[2] = h2;
--	state->h[3] = h3;
--	state->h[4] = h4;
--}
--EXPORT_SYMBOL_GPL(poly1305_core_blocks);
--
--void poly1305_core_emit(const struct poly1305_state *state, void *dst)
--{
--	u32 h0, h1, h2, h3, h4;
--	u32 g0, g1, g2, g3, g4;
--	u32 mask;
--
--	/* fully carry h */
--	h0 = state->h[0];
--	h1 = state->h[1];
--	h2 = state->h[2];
--	h3 = state->h[3];
--	h4 = state->h[4];
--
--	h2 += (h1 >> 26);     h1 = h1 & 0x3ffffff;
--	h3 += (h2 >> 26);     h2 = h2 & 0x3ffffff;
--	h4 += (h3 >> 26);     h3 = h3 & 0x3ffffff;
--	h0 += (h4 >> 26) * 5; h4 = h4 & 0x3ffffff;
--	h1 += (h0 >> 26);     h0 = h0 & 0x3ffffff;
--
--	/* compute h + -p */
--	g0 = h0 + 5;
--	g1 = h1 + (g0 >> 26);             g0 &= 0x3ffffff;
--	g2 = h2 + (g1 >> 26);             g1 &= 0x3ffffff;
--	g3 = h3 + (g2 >> 26);             g2 &= 0x3ffffff;
--	g4 = h4 + (g3 >> 26) - (1 << 26); g3 &= 0x3ffffff;
--
--	/* select h if h < p, or h + -p if h >= p */
--	mask = (g4 >> ((sizeof(u32) * 8) - 1)) - 1;
--	g0 &= mask;
--	g1 &= mask;
--	g2 &= mask;
--	g3 &= mask;
--	g4 &= mask;
--	mask = ~mask;
--	h0 = (h0 & mask) | g0;
--	h1 = (h1 & mask) | g1;
--	h2 = (h2 & mask) | g2;
--	h3 = (h3 & mask) | g3;
--	h4 = (h4 & mask) | g4;
--
--	/* h = h % (2^128) */
--	put_unaligned_le32((h0 >>  0) | (h1 << 26), dst +  0);
--	put_unaligned_le32((h1 >>  6) | (h2 << 20), dst +  4);
--	put_unaligned_le32((h2 >> 12) | (h3 << 14), dst +  8);
--	put_unaligned_le32((h3 >> 18) | (h4 <<  8), dst + 12);
--}
--EXPORT_SYMBOL_GPL(poly1305_core_emit);
--
- void poly1305_init_generic(struct poly1305_desc_ctx *desc, const u8 *key)
- {
- 	poly1305_core_setkey(desc->r, key);
-@@ -164,7 +22,7 @@ void poly1305_init_generic(struct poly1305_desc_ctx *desc, const u8 *key)
- 	poly1305_core_init(&desc->h);
- 	desc->buflen = 0;
- 	desc->sset = true;
--	desc->rset = 1;
-+	desc->rset = 2;
- }
- EXPORT_SYMBOL_GPL(poly1305_init_generic);
- 
-@@ -202,9 +60,6 @@ EXPORT_SYMBOL_GPL(poly1305_update_generic);
- 
- void poly1305_final_generic(struct poly1305_desc_ctx *desc, u8 *dst)
- {
--	__le32 digest[4];
--	u64 f = 0;
--
- 	if (unlikely(desc->buflen)) {
- 		desc->buf[desc->buflen++] = 1;
- 		memset(desc->buf + desc->buflen, 0,
-@@ -212,18 +67,7 @@ void poly1305_final_generic(struct poly1305_desc_ctx *desc, u8 *dst)
- 		poly1305_core_blocks(&desc->h, desc->r, desc->buf, 1, 0);
- 	}
- 
--	poly1305_core_emit(&desc->h, digest);
--
--	/* mac = (h + s) % (2^128) */
--	f = (f >> 32) + le32_to_cpu(digest[0]) + desc->s[0];
--	put_unaligned_le32(f, dst + 0);
--	f = (f >> 32) + le32_to_cpu(digest[1]) + desc->s[1];
--	put_unaligned_le32(f, dst + 4);
--	f = (f >> 32) + le32_to_cpu(digest[2]) + desc->s[2];
--	put_unaligned_le32(f, dst + 8);
--	f = (f >> 32) + le32_to_cpu(digest[3]) + desc->s[3];
--	put_unaligned_le32(f, dst + 12);
--
-+	poly1305_core_emit(&desc->h, desc->s, dst);
- 	*desc = (struct poly1305_desc_ctx){};
- }
- EXPORT_SYMBOL_GPL(poly1305_final_generic);
--- 
-2.24.0
+[    0.856458] alg: shash: nhpoly1305-generic test failed (wrong result) on test vector 1, cfg="init+update+final aligned buffer"
 
+> diff --git a/include/crypto/internal/poly1305.h b/include/crypto/internal/poly1305.h
+> index 479b0cab2a1a..6e275d3e5969 100644
+> --- a/include/crypto/internal/poly1305.h
+> +++ b/include/crypto/internal/poly1305.h
+> @@ -24,35 +24,7 @@ static inline void poly1305_core_init(struct poly1305_state *state)
+>  void poly1305_core_blocks(struct poly1305_state *state,
+>  			  const struct poly1305_key *key, const void *src,
+>  			  unsigned int nblocks, u32 hibit);
+> -void poly1305_core_emit(const struct poly1305_state *state, void *dst);
+> -
+> -/*
+> - * Poly1305 requires a unique key for each tag, which implies that we can't set
+> - * it on the tfm that gets accessed by multiple users simultaneously. Instead we
+> - * expect the key as the first 32 bytes in the update() call.
+> - */
+> -static inline
+> -unsigned int crypto_poly1305_setdesckey(struct poly1305_desc_ctx *dctx,
+> -					const u8 *src, unsigned int srclen)
+> -{
+> -	if (!dctx->sset) {
+> -		if (!dctx->rset && srclen >= POLY1305_BLOCK_SIZE) {
+> -			poly1305_core_setkey(dctx->r, src);
+> -			src += POLY1305_BLOCK_SIZE;
+> -			srclen -= POLY1305_BLOCK_SIZE;
+> -			dctx->rset = 1;
+> -		}
+> -		if (srclen >= POLY1305_BLOCK_SIZE) {
+> -			dctx->s[0] = get_unaligned_le32(src +  0);
+> -			dctx->s[1] = get_unaligned_le32(src +  4);
+> -			dctx->s[2] = get_unaligned_le32(src +  8);
+> -			dctx->s[3] = get_unaligned_le32(src + 12);
+> -			src += POLY1305_BLOCK_SIZE;
+> -			srclen -= POLY1305_BLOCK_SIZE;
+> -			dctx->sset = true;
+> -		}
+> -	}
+> -	return srclen;
+> -}
+> +void poly1305_core_emit(const struct poly1305_state *state, const u32 nonce[4],
+> +			void *dst);
+
+Adding nonce support here makes the comment above this code outdated.
+
+	/*
+	 * Poly1305 core functions.  These implement the ε-almost-∆-universal hash
+	 * function underlying the Poly1305 MAC, i.e. they don't add an encrypted nonce
+	 * ("s key") at the end.  They also only support block-aligned inputs.
+	 */
+
+> diff --git a/include/crypto/poly1305.h b/include/crypto/poly1305.h
+> index 74c6e1cd73ee..dec2bd6b5aee 100644
+> --- a/include/crypto/poly1305.h
+> +++ b/include/crypto/poly1305.h
+> @@ -14,11 +14,17 @@
+>  #define POLY1305_DIGEST_SIZE	16
+>  
+>  struct poly1305_key {
+> -	u32 r[5];	/* key, base 2^26 */
+> +	union {
+> +		u32 r[5];	/* key, base 2^26 */
+> +		u64 r64[3];
+> +	};
+>  };
+>  
+>  struct poly1305_state {
+> -	u32 h[5];	/* accumulator, base 2^26 */
+> +	union {
+> +		u32 h[5];	/* accumulator, base 2^26 */
+> +		u64 h64[3];
+> +	};
+>  };
+
+It would be helpful to include comments for the r64 and h64 fields, like there
+are for the r and h fields.  What base is being used?
+
+> diff --git a/lib/crypto/poly1305-donna32.c b/lib/crypto/poly1305-donna32.c
+> new file mode 100644
+> index 000000000000..39b3fde68dcf
+> --- /dev/null
+> +++ b/lib/crypto/poly1305-donna32.c
+> @@ -0,0 +1,204 @@
+> +// SPDX-License-Identifier: GPL-2.0 OR MIT
+> +/*
+> + * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
+> + *
+> + * This is based in part on Andrew Moon's poly1305-donna, which is in the
+> + * public domain.
+> + */
+> +
+> +#include <linux/kernel.h>
+> +#include <asm/unaligned.h>
+> +#include <crypto/internal/poly1305.h>
+> +
+> +void poly1305_core_setkey(struct poly1305_key *key, const u8 raw_key[16])
+> +{
+> +	/* r &= 0xffffffc0ffffffc0ffffffc0fffffff */
+> +	key[0].r[0] = (get_unaligned_le32(&raw_key[0])) & 0x3ffffff;
+> +	key[0].r[1] = (get_unaligned_le32(&raw_key[3]) >> 2) & 0x3ffff03;
+> +	key[0].r[2] = (get_unaligned_le32(&raw_key[6]) >> 4) & 0x3ffc0ff;
+> +	key[0].r[3] = (get_unaligned_le32(&raw_key[9]) >> 6) & 0x3f03fff;
+> +	key[0].r[4] = (get_unaligned_le32(&raw_key[12]) >> 8) & 0x00fffff;
+> +
+> +	/* s = 5*r */
+> +	key[1].r[0] = key[0].r[1] * 5;
+> +	key[1].r[1] = key[0].r[2] * 5;
+> +	key[1].r[2] = key[0].r[3] * 5;
+> +	key[1].r[3] = key[0].r[4] * 5;
+> +}
+> +EXPORT_SYMBOL(poly1305_core_setkey);
+
+This assumes the struct poly1305_key is actually part of an array.  This is
+probably what's causing the self-tests to fail, since some callers provide only
+a single struct poly1305_key.
+
+Shouldn't this detail be hidden in struct poly1305_key?  Or at least the
+functions should take 'struct poly1305_key key[2]' to make this assumption
+explicit.
+
+- Eric
