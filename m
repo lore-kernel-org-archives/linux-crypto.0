@@ -2,77 +2,79 @@ Return-Path: <SRS0=IyTV=2B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5084C43603
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 09:36:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FDCAC43603
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 09:37:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A1C0B205C9
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 09:36:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6F2DA21556
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 09:37:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727829AbfLKJgx (ORCPT
+        id S1728456AbfLKJhG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 Dec 2019 04:36:53 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:54176 "EHLO deadmen.hmeau.com"
+        Wed, 11 Dec 2019 04:37:06 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:54224 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727493AbfLKJgx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Dec 2019 04:36:53 -0500
+        id S1727493AbfLKJhF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 11 Dec 2019 04:37:05 -0500
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1ieyQ8-0008Ql-42; Wed, 11 Dec 2019 17:36:36 +0800
+        id 1ieyQR-0008Qx-Cx; Wed, 11 Dec 2019 17:36:55 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1ieyQ3-0003HT-Iz; Wed, 11 Dec 2019 17:36:31 +0800
-Date:   Wed, 11 Dec 2019 17:36:31 +0800
+        id 1ieyQP-0003bR-2n; Wed, 11 Dec 2019 17:36:53 +0800
+Date:   Wed, 11 Dec 2019 17:36:53 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Krzysztof Kozlowski <krzk@kernel.org>
-Cc:     linux-kernel@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Atul Gupta <atul.gupta@chelsio.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        linux-crypto@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH v2] crypto: Fix Kconfig indentation
-Message-ID: <20191211093631.sf2es6tnao6ypk52@gondor.apana.org.au>
-References: <1574306448-31868-1-git-send-email-krzk@kernel.org>
+To:     Peter Ujfalusi <peter.ujfalusi@ti.com>
+Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
+        alexandre.belloni@bootlin.com, ludovic.desroches@microchip.com,
+        vkoul@kernel.org, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/3] crypto: atmel - Retire
+ dma_request_slave_channel_compat()
+Message-ID: <20191211093652.a53uljmw6kns6l4a@gondor.apana.org.au>
+References: <20191121101602.21941-1-peter.ujfalusi@ti.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1574306448-31868-1-git-send-email-krzk@kernel.org>
+In-Reply-To: <20191121101602.21941-1-peter.ujfalusi@ti.com>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Nov 21, 2019 at 04:20:48AM +0100, Krzysztof Kozlowski wrote:
-> Adjust indentation from spaces to tab (+optional two spaces) as in
-> coding style with command like:
-> 	$ sed -e 's/^        /\t/' -i */Kconfig
-> 
-> Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
-> Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
-> 
-> ---
+On Thu, Nov 21, 2019 at 12:15:59PM +0200, Peter Ujfalusi wrote:
+> Hi,
 > 
 > Changes since v1:
-> 1. Fix also 7-space and tab+1 space indentation issues.
+> - Rebased on next-20191121 to avoid conflict for atmel-aes
+> 
+> I'm going through the kernel to crack down on dma_request_slave_channel_compat()
+> users.
+> 
+> These drivers no longer needs it as they are only probed via DT and even if they
+> would probe in legacy mode, the dma_request_chan() + dma_slave_map must be used
+> for supporting non DT boots.
+> 
+> I have only compile tested the drivers!
+> 
+> Regards,
+> Peter
 > ---
->  drivers/crypto/Kconfig         | 22 +++++++++++-----------
->  drivers/crypto/caam/Kconfig    | 14 +++++++-------
->  drivers/crypto/chelsio/Kconfig | 30 +++++++++++++++---------------
->  drivers/crypto/stm32/Kconfig   |  6 +++---
->  drivers/crypto/ux500/Kconfig   | 16 ++++++++--------
->  5 files changed, 44 insertions(+), 44 deletions(-)
+> Peter Ujfalusi (3):
+>   crypto: atmel-aes - Retire dma_request_slave_channel_compat()
+>   crypto: atmel-sha - Retire dma_request_slave_channel_compat()
+>   crypto: atmel-tdes - Retire dma_request_slave_channel_compat()
+> 
+>  drivers/crypto/atmel-aes.c  | 50 ++++++++-----------------------------
+>  drivers/crypto/atmel-sha.c  | 39 ++++++-----------------------
+>  drivers/crypto/atmel-tdes.c | 47 ++++++++++------------------------
+>  3 files changed, 30 insertions(+), 106 deletions(-)
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
