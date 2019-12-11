@@ -2,211 +2,200 @@ Return-Path: <SRS0=IyTV=2B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-11.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F716C43603
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 19:06:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BB81C2D0C6
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 19:27:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2112F21556
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 19:06:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576091180;
-	bh=LkOzKJFV2DBa/4avtVwHZDrQXWd514uVebIpA+Rk054=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=fFYKxkNNTKtXoe8+YInjbqx8A+ZC3GTyptQKbk+k3aeZv6KoKp8iHQEHsE4bWVtg2
-	 M/Z841Unl5dRhoh6H54aLunbaWaWaJtKDxDa4tlm8ZvmcdWPbbOnRyN7gs3uI0QxEG
-	 6t/4YvoM9NzVvI0w2vxrR0DDV/1vgWtWe/BKntvo=
+	by mail.kernel.org (Postfix) with ESMTP id 3364421556
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Dec 2019 19:27:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BHEbvjoH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726595AbfLKTGT (ORCPT
+        id S1729025AbfLKT1u (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 Dec 2019 14:06:19 -0500
-Received: from mail.kernel.org ([198.145.29.99]:49650 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727096AbfLKTGT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Dec 2019 14:06:19 -0500
-Received: from gmail.com (unknown [104.132.1.77])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 664C320836;
-        Wed, 11 Dec 2019 19:06:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1576091178;
-        bh=LkOzKJFV2DBa/4avtVwHZDrQXWd514uVebIpA+Rk054=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=zv2l5KgAlmc6pV5Q/dkBdhby8aA/OrSI7doA5ZH4w+3TTSajouYU4JSeFoDB0Gzqr
-         MZc1H0kVwY8Yhsbpe+yKfiDlHelWnYbm9ll7n8kP6pJvfNRsQJNnfBzgt8Sg1s7+du
-         1LPH2Xz3kc95nNCi00RSQTawNlfDyLKqQzq5Tpao=
-Date:   Wed, 11 Dec 2019 11:06:16 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-crypto@vger.kernel.org
-Subject: Re: [PATCH crypto-next v1] crypto: poly1305 - add new 32 and 64-bit
- generic versions
-Message-ID: <20191211190615.GC82952@gmail.com>
-References: <20191211170936.385572-1-Jason@zx2c4.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20191211170936.385572-1-Jason@zx2c4.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        Wed, 11 Dec 2019 14:27:50 -0500
+Received: from mail-pg1-f201.google.com ([209.85.215.201]:46071 "EHLO
+        mail-pg1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729003AbfLKT1u (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 11 Dec 2019 14:27:50 -0500
+Received: by mail-pg1-f201.google.com with SMTP id q1so6897050pge.12
+        for <linux-crypto@vger.kernel.org>; Wed, 11 Dec 2019 11:27:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=KFmQdAdZh8/B/wh1g4c+i5ALsP3kFx6ncDBf/RCXchM=;
+        b=BHEbvjoHWqZ7Nv64QnvdKu9CN/PsQfHYxZZQz1Q10KydrF+m2IHzcnK5CrZKkXxx4b
+         2YMOz+hd3HzxKnkbWedNtKO00vtCc2M3iMLn8LoGBw3qqR4py04EUe+8nahF6KzgWO/b
+         vx1yhOmUkc/tCU9SZaP784yXIevMeiNK8sTRWzHqze2L7IbBFAHJC4itwqTKgrxGtnjj
+         YeOhn/aOPE4f5oqAfM8DBWqmaHF/yW9Y7gmPjj650DnJ/PPd/Wng33I4+uBaDrD616/p
+         ZRtT+uj/OzuuvRgRQ2d0fDYsZ2aGXgohBEYAYMIdTYa6aIe9iYQrbTB4SE+EyIfKIqoL
+         sEbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=KFmQdAdZh8/B/wh1g4c+i5ALsP3kFx6ncDBf/RCXchM=;
+        b=Z18zLp9k/Kg9kJZRUj9nXA60Jv3W20LW2L3DCPxab4MGV2YRESNU2lZO/KvApgDaVB
+         cnJXthWX5BdTKSBruE9P9/Qdvy1FqvSMtt4QYS4ffdTPU9RP6vt3pTuShw7ByejCoEwv
+         2dmGiynuKK/0Iu5LaES3uQaHu6qKACtsr9AOLu2hkpO9lc0BEKuZXTxW15ZYXr234/o9
+         V99tbWZ0wSEbUxI1N5ZW3U2FKhZnTTzbjCyV24fSy09u6jCxkSVGgNnvP90mLT0mNwDW
+         JQAWXEaZiTX0cDG09YqYDeNSUGWjvZSKp8baHJIq76fWkXs1xtx0n0aKwRLGXlBvo5vb
+         3kPA==
+X-Gm-Message-State: APjAAAXsankwOobGdKh0HSrVnyqIjC+5kdjTBh67s1tk4dTcG3+8hlur
+        wfP3+b6GAPJ/ABwRp+yiYsIMJNicUkZyPNsmujFaPg==
+X-Google-Smtp-Source: APXvYqycyWWqOB+1R/dWpmqnOlhdQUifRBeUd7lNrtDIGomABUXQd06geDk/YSSdxQdhxW6XmQloW5ZXtQ6ql5pkVCc82w==
+X-Received: by 2002:a63:f60:: with SMTP id 32mr5943939pgp.206.1576092468990;
+ Wed, 11 Dec 2019 11:27:48 -0800 (PST)
+Date:   Wed, 11 Dec 2019 11:27:35 -0800
+Message-Id: <20191211192742.95699-1-brendanhiggins@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.24.0.525.g8f36a354ae-goog
+Subject: [PATCH v1 0/7] uml: add unspecified HAS_IOMEM dependencies
+From:   Brendan Higgins <brendanhiggins@google.com>
+To:     jdike@addtoit.com, richard@nod.at, anton.ivanov@cambridgegreys.com,
+        "David S. Miller" <davem@davemloft.net>,
+        Alistar Popple <alistair@popple.id.au>,
+        Andrew Jeffery <andrew@aj.id.au>,
+        Antoine Tenart <antoine.tenart@bootlin.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>,
+        Boris Brezillon <bbrezillon@kernel.org>,
+        Corentin Labbe <clabbe@baylibre.com>,
+        Eddie James <eajames@linux.ibm.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Jeremy Kerr <jk@ozlabs.org>, Joel Stanley <joel@jms.id.au>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Michal Simek <michal.simek@xilinx.com>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Moses Christopher <moseschristopherb@gmail.com>,
+        Piotr Sroka <piotrs@cadence.com>,
+        Radhey Shyam Pandey <radhey.shyam.pandey@xilinx.com>,
+        Vignesh Raghavendra <vigneshr@ti.com>
+Cc:     linux-um@lists.infradead.org, linux-kernel@vger.kernel.org,
+        davidgow@google.com, Brendan Higgins <brendanhiggins@google.com>,
+        devel@driverdev.osuosl.org, linux-amlogic@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-aspeed@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+        linux-fsi@lists.ozlabs.org, linux-gpio@vger.kernel.org,
+        linux-mtd@lists.infradead.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 11, 2019 at 06:09:36PM +0100, Jason A. Donenfeld wrote:
-> These two C implementations from Zinc -- a 32x32 one and a 64x64 one,
-> depending on the platform -- come from Andrew Moon's public domain
-> poly1305-donna portable code, modified for usage in the kernel. The
-> precomputation in the 32-bit version and the use of 64x64 multiplies in
-> the 64-bit version make these perform better than the code it replaces.
-> Moon's code is also very widespread and has received many eyeballs of
-> scrutiny.
+# TL;DR
 
-Isn't the existing implementation in the kernel already based on the 32x32 code
-from Andrew Moon?  Can you elaborate on how the new code is different?
+This patchset adds a missing HAS_IOMEM dependency to several drivers in
+an attempt to get allyesconfig closer to working for ARCH=um.
 
-> 
-> There's a bit of interference between the x86 implementation, which
-> relies on internal details of the old scalar implementation. Soon the
-> x86 implementation will be replaced with a faster one that doesn't rely
-> on this, but for now, we inline the bits of the old implementation that
-> the x86 implementation relied on. Also, since we now support a slightly
-> larger key space, via the union, some offsets had to be fixed up.
-> 
-> Nonce calculation was folded in with the emit function, to take
-> advantage of 64x64 arithmetic. However, Adiantum appeared to rely on no
-> nonce handling in emit, so this path was conditionalized. I don't have
-> an Adiantum rig handy, so I'd appreciate a review from somebody who does
-> and can make sure this doesn't break it.
-> 
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> Cc: Eric Biggers <ebiggers@kernel.org>
+# What am I trying to do?
 
-You can run the self-tests.  But I tried and it doesn't get past nhpoly1305:
+This patchset is part of my attempt to get `make ARCH=um allyesconfig`
+to produce a config that will build *and* boot to init, so that I can
+use it as a mechanism to run tests[1].
 
-[    0.856458] alg: shash: nhpoly1305-generic test failed (wrong result) on test vector 1, cfg="init+update+final aligned buffer"
+This patchset is attempting to deal with
 
-> diff --git a/include/crypto/internal/poly1305.h b/include/crypto/internal/poly1305.h
-> index 479b0cab2a1a..6e275d3e5969 100644
-> --- a/include/crypto/internal/poly1305.h
-> +++ b/include/crypto/internal/poly1305.h
-> @@ -24,35 +24,7 @@ static inline void poly1305_core_init(struct poly1305_state *state)
->  void poly1305_core_blocks(struct poly1305_state *state,
->  			  const struct poly1305_key *key, const void *src,
->  			  unsigned int nblocks, u32 hibit);
-> -void poly1305_core_emit(const struct poly1305_state *state, void *dst);
-> -
-> -/*
-> - * Poly1305 requires a unique key for each tag, which implies that we can't set
-> - * it on the tfm that gets accessed by multiple users simultaneously. Instead we
-> - * expect the key as the first 32 bytes in the update() call.
-> - */
-> -static inline
-> -unsigned int crypto_poly1305_setdesckey(struct poly1305_desc_ctx *dctx,
-> -					const u8 *src, unsigned int srclen)
-> -{
-> -	if (!dctx->sset) {
-> -		if (!dctx->rset && srclen >= POLY1305_BLOCK_SIZE) {
-> -			poly1305_core_setkey(dctx->r, src);
-> -			src += POLY1305_BLOCK_SIZE;
-> -			srclen -= POLY1305_BLOCK_SIZE;
-> -			dctx->rset = 1;
-> -		}
-> -		if (srclen >= POLY1305_BLOCK_SIZE) {
-> -			dctx->s[0] = get_unaligned_le32(src +  0);
-> -			dctx->s[1] = get_unaligned_le32(src +  4);
-> -			dctx->s[2] = get_unaligned_le32(src +  8);
-> -			dctx->s[3] = get_unaligned_le32(src + 12);
-> -			src += POLY1305_BLOCK_SIZE;
-> -			srclen -= POLY1305_BLOCK_SIZE;
-> -			dctx->sset = true;
-> -		}
-> -	}
-> -	return srclen;
-> -}
-> +void poly1305_core_emit(const struct poly1305_state *state, const u32 nonce[4],
-> +			void *dst);
+CONFIG_PINCTRL_EQUILIBRIUM=y
+CONFIG_MTD_NAND_CADENCE=y
+CONFIG_FSI_MASTER_ASPEED=y
+CONFIG_CRYPTO_DEV_SAFEXCEL=y
+CONFIG_XIL_AXIS_FIFO=y
+CONFIG_CRYPTO_DEV_AMLOGIC_GXL=y
+CONFIG_XILINX_AXI_EMAC=y
 
-Adding nonce support here makes the comment above this code outdated.
+which are selected by `make ARCH=um allyesconfig`, but prevent it from
+building.
 
-	/*
-	 * Poly1305 core functions.  These implement the ε-almost-∆-universal hash
-	 * function underlying the Poly1305 MAC, i.e. they don't add an encrypted nonce
-	 * ("s key") at the end.  They also only support block-aligned inputs.
-	 */
+# How far away are we from an allyesconfig UML kernel?
 
-> diff --git a/include/crypto/poly1305.h b/include/crypto/poly1305.h
-> index 74c6e1cd73ee..dec2bd6b5aee 100644
-> --- a/include/crypto/poly1305.h
-> +++ b/include/crypto/poly1305.h
-> @@ -14,11 +14,17 @@
->  #define POLY1305_DIGEST_SIZE	16
->  
->  struct poly1305_key {
-> -	u32 r[5];	/* key, base 2^26 */
-> +	union {
-> +		u32 r[5];	/* key, base 2^26 */
-> +		u64 r64[3];
-> +	};
->  };
->  
->  struct poly1305_state {
-> -	u32 h[5];	/* accumulator, base 2^26 */
-> +	union {
-> +		u32 h[5];	/* accumulator, base 2^26 */
-> +		u64 h64[3];
-> +	};
->  };
+I have identified 33 Kconfigs that are selected by allyesconfig, but
+will either not build on UML, or prevent it from booting. They are:
 
-It would be helpful to include comments for the r64 and h64 fields, like there
-are for the r and h fields.  What base is being used?
+CONFIG_STATIC_LINK=y
+CONFIG_UML_NET_PCAP=y
+CONFIG_NET_PTP_CLASSIFY=y
+CONFIG_IP_VS=y
+CONFIG_BRIDGE_EBT_BROUTE=y
+CONFIG_BRIDGE_EBT_T_FILTER=y
+CONFIG_BRIDGE_EBT_T_NAT=y
+CONFIG_MTD_NAND_CADENCE=y
+CONFIG_MTD_NAND_NANDSIM=y
+CONFIG_BLK_DEV_NULL_BLK=y
+CONFIG_BLK_DEV_RAM=y
+CONFIG_SCSI_DEBUG=y
+CONFIG_NET_VENDOR_XILINX=y
+CONFIG_NULL_TTY=y
+CONFIG_PTP_1588_CLOCK=y
+CONFIG_PINCTRL_EQUILIBRIUM=y
+CONFIG_DMABUF_SELFTESTS=y
+CONFIG_COMEDI=y
+CONFIG_XIL_AXIS_FIFO=y
+CONFIG_EXFAT_FS=y
+CONFIG_STM_DUMMY=y
+CONFIG_FSI_MASTER_ASPEED=y
+CONFIG_JFS_FS=y
+CONFIG_UBIFS_FS=y
+CONFIG_CRAMFS=y
+CONFIG_CRYPTO_DEV_SAFEXCEL=y
+CONFIG_CRYPTO_DEV_AMLOGIC_GXL=y
+CONFIG_KCOV=y
+CONFIG_LKDTM=y
+CONFIG_REED_SOLOMON_TEST=y
+CONFIG_TEST_RHASHTABLE=y
+CONFIG_TEST_MEMINIT=y
+CONFIG_NETWORK_PHY_TIMESTAMPING=y
 
-> diff --git a/lib/crypto/poly1305-donna32.c b/lib/crypto/poly1305-donna32.c
-> new file mode 100644
-> index 000000000000..39b3fde68dcf
-> --- /dev/null
-> +++ b/lib/crypto/poly1305-donna32.c
-> @@ -0,0 +1,204 @@
-> +// SPDX-License-Identifier: GPL-2.0 OR MIT
-> +/*
-> + * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-> + *
-> + * This is based in part on Andrew Moon's poly1305-donna, which is in the
-> + * public domain.
-> + */
-> +
-> +#include <linux/kernel.h>
-> +#include <asm/unaligned.h>
-> +#include <crypto/internal/poly1305.h>
-> +
-> +void poly1305_core_setkey(struct poly1305_key *key, const u8 raw_key[16])
-> +{
-> +	/* r &= 0xffffffc0ffffffc0ffffffc0fffffff */
-> +	key[0].r[0] = (get_unaligned_le32(&raw_key[0])) & 0x3ffffff;
-> +	key[0].r[1] = (get_unaligned_le32(&raw_key[3]) >> 2) & 0x3ffff03;
-> +	key[0].r[2] = (get_unaligned_le32(&raw_key[6]) >> 4) & 0x3ffc0ff;
-> +	key[0].r[3] = (get_unaligned_le32(&raw_key[9]) >> 6) & 0x3f03fff;
-> +	key[0].r[4] = (get_unaligned_le32(&raw_key[12]) >> 8) & 0x00fffff;
-> +
-> +	/* s = 5*r */
-> +	key[1].r[0] = key[0].r[1] * 5;
-> +	key[1].r[1] = key[0].r[2] * 5;
-> +	key[1].r[2] = key[0].r[3] * 5;
-> +	key[1].r[3] = key[0].r[4] * 5;
-> +}
-> +EXPORT_SYMBOL(poly1305_core_setkey);
+CONFIG_STATIC_LINK=y and CONFIG_UML_NET_PCAP=y already have fixes on
+their way.
 
-This assumes the struct poly1305_key is actually part of an array.  This is
-probably what's causing the self-tests to fail, since some callers provide only
-a single struct poly1305_key.
+I also have a patchset that just got accepted to fix
+CONFIG_EXFAT_FS=y[2].
 
-Shouldn't this detail be hidden in struct poly1305_key?  Or at least the
-functions should take 'struct poly1305_key key[2]' to make this assumption
-explicit.
+So with this patchset and these other three fixes mentioned here, we
+will be about a third of the way there. There is only one more broken
+config that prevents UML from building, CONFIG_LKDTM=y. After this there
+will still be 22 broken configs which will prevent the UML allyesconfig
+kernel from reaching the end of init; nevertheless, this is a good
+milestone where, once reached, we can stop some of this bleeding by
+adding a build test.
 
-- Eric
+# Why won't allyesconfig break again after this series of fixes?
+
+As I mentioned above, I am using UML for testing the kernel, and I am
+currently working on getting my tests to run on KernelCI. As part of our
+testing procedure for KernelCI, we are planning on building a UML kernel
+using allyesconfig and running our tests on it. Thus, we will find out
+very quickly once someone breaks allyesconfig again once we get this all
+working.
+
+Brendan Higgins (7):
+  pinctrl: equilibrium: add unspecified HAS_IOMEM dependency
+  mtd: rawnand: add unspecified HAS_IOMEM dependency
+  net: axienet: add unspecified HAS_IOMEM dependency
+  crypto: inside-secure: add unspecified HAS_IOMEM dependency
+  crypto: amlogic: add unspecified HAS_IOMEM dependency
+  staging: axis-fifo: add unspecified HAS_IOMEM dependency
+  fsi: aspeed: add unspecified HAS_IOMEM dependency
+
+ drivers/crypto/Kconfig              | 2 +-
+ drivers/crypto/amlogic/Kconfig      | 1 +
+ drivers/fsi/Kconfig                 | 1 +
+ drivers/mtd/nand/raw/Kconfig        | 2 +-
+ drivers/net/ethernet/xilinx/Kconfig | 1 +
+ drivers/pinctrl/Kconfig             | 1 +
+ drivers/staging/axis-fifo/Kconfig   | 2 +-
+ 7 files changed, 7 insertions(+), 3 deletions(-)
+
+[1] https://bugzilla.kernel.org/show_bug.cgi?id=205223
+[2] https://patchwork.kernel.org/patch/11273771/
+
+-- 
+2.24.0.525.g8f36a354ae-goog
+
