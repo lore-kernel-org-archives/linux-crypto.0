@@ -2,62 +2,62 @@ Return-Path: <SRS0=MXL1=2C=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5D9BC43603
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Dec 2019 06:08:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 489A9C43603
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Dec 2019 06:08:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AF02321655
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Dec 2019 06:08:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 285A32073D
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Dec 2019 06:08:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726833AbfLLGIX (ORCPT
+        id S1726977AbfLLGIw (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Dec 2019 01:08:23 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:54204 "EHLO deadmen.hmeau.com"
+        Thu, 12 Dec 2019 01:08:52 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:54236 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726784AbfLLGIX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Dec 2019 01:08:23 -0500
+        id S1726784AbfLLGIw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 12 Dec 2019 01:08:52 -0500
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1ifHe9-0003qw-8Q; Thu, 12 Dec 2019 14:08:21 +0800
+        id 1ifHec-0003t1-Po; Thu, 12 Dec 2019 14:08:50 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1ifHe6-0002vB-W1; Thu, 12 Dec 2019 14:08:19 +0800
-Date:   Thu, 12 Dec 2019 14:08:18 +0800
+        id 1ifHeb-0002vX-AV; Thu, 12 Dec 2019 14:08:49 +0800
+Date:   Thu, 12 Dec 2019 14:08:49 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, sfr@canb.auug.org.au
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "<netdev@vger.kernel.org>" <netdev@vger.kernel.org>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Subject: Re: [PATCH 1/2] crypto: arm/curve25519 - add arch-specific key
  generation function
-Message-ID: <20191212060818.w4orbhieq66btymf@gondor.apana.org.au>
+Message-ID: <20191212060849.jwlpbg5m75xopq3d@gondor.apana.org.au>
 References: <20191211102455.7b55218e@canb.auug.org.au>
  <20191211092640.107621-1-Jason@zx2c4.com>
+ <CAKv+Gu80vONMAuv=2OpSOuZHvVv22quRxeNtbxnSkFBz_DvfbQ@mail.gmail.com>
+ <CAHmME9r09=YNw1MmnzoRLA4szJ9zz-uV4Hut4dFZKHDwG8Qp6A@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191211092640.107621-1-Jason@zx2c4.com>
+In-Reply-To: <CAHmME9r09=YNw1MmnzoRLA4szJ9zz-uV4Hut4dFZKHDwG8Qp6A@mail.gmail.com>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 11, 2019 at 10:26:39AM +0100, Jason A. Donenfeld wrote:
-> Somehow this was forgotten when Zinc was being split into oddly shaped
-> pieces, resulting in linker errors. The x86_64 glue has a specific key
-> generation implementation, but the Arm one does not. However, it can
-> still receive the NEON speedups by calling the ordinary DH function
-> using the base point.
-> 
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> ---
->  arch/arm/crypto/curve25519-glue.c | 7 +++++++
->  1 file changed, 7 insertions(+)
+On Wed, Dec 11, 2019 at 01:07:43PM +0100, Jason A. Donenfeld wrote:
+>
+> Herbert - can you pick this up for 5.5-rc2 rather than 5.6?
 
-Patch applied.  Thanks.
+Yes I'll be pushing this patch for 5.5.
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
