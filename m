@@ -2,118 +2,265 @@ Return-Path: <SRS0=MXL1=2C=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F4A6C3F68F
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Dec 2019 14:44:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 883C4C43603
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Dec 2019 14:59:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3F308227BF
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Dec 2019 14:44:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 53BEF2054F
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Dec 2019 14:59:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Vs0irhNZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729786AbfLLOoE (ORCPT
+        id S1728599AbfLLO7r (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Dec 2019 09:44:04 -0500
-Received: from foss.arm.com ([217.140.110.172]:49196 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729526AbfLLOoE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Dec 2019 09:44:04 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4B0E530E;
-        Thu, 12 Dec 2019 06:44:03 -0800 (PST)
-Received: from bogus (e107155-lin.cambridge.arm.com [10.1.196.42])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D90EA3F718;
-        Thu, 12 Dec 2019 06:44:00 -0800 (PST)
-Date:   Thu, 12 Dec 2019 14:43:55 +0000
-From:   Sudeep Holla <sudeep.holla@arm.com>
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     Neal Liu <neal.liu@mediatek.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
-        Lars Persson <lists@bofh.nu>,
-        Mark Rutland <mark.rutland@arm.com>,
-        DTML <devicetree@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        wsd_upstream <wsd_upstream@mediatek.com>,
-        Sean Wang <sean.wang@kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Crystal Guo =?utf-8?B?KOmDreaZtik=?= <Crystal.Guo@mediatek.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Matt Mackall <mpm@selenic.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        "linux-mediatek@lists.infradead.org" 
-        <linux-mediatek@lists.infradead.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>
-Subject: Re: [PATCH v5 3/3] hwrng: add mtk-sec-rng driver
-Message-ID: <20191212144355.GA13263@bogus>
-References: <1574864578-467-1-git-send-email-neal.liu@mediatek.com>
- <1574864578-467-4-git-send-email-neal.liu@mediatek.com>
- <CADnJP=uhD=J2NrpSwiX8oCTd-u_q05=HhsAV-ErCsXNDwVS0rA@mail.gmail.com>
- <1575027046.24848.4.camel@mtkswgap22>
- <CAKv+Gu_um7eRYXbieW7ogDX5mmZaxP7JQBJM9CajK+6CsO5RgQ@mail.gmail.com>
+        Thu, 12 Dec 2019 09:59:47 -0500
+Received: from mail-qt1-f196.google.com ([209.85.160.196]:36144 "EHLO
+        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728598AbfLLO7r (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 12 Dec 2019 09:59:47 -0500
+Received: by mail-qt1-f196.google.com with SMTP id k11so2524852qtm.3
+        for <linux-crypto@vger.kernel.org>; Thu, 12 Dec 2019 06:59:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=Bne6QclCdHVbeYrK9OqCGvDheWSNH24kX8Y3DsNcdIs=;
+        b=Vs0irhNZRPP/xt+ksGWxEEK5nrgpPDI2BrwNayPgZpRdEple5n/CWBwYdwH/9luvOO
+         of4YM8dRAN48lRFW18ijhJFtwdOLHMkC701z6rQeC+SfolS5oCtHk4QcNlS4IFkC4iMv
+         FS4LtR4eQgmbSi2gulFdHLdepDPAyG6G/S3UCYgW46CSWQBLHxhjtBes0cF3tAEJSbWQ
+         opvAUqHJKWHGUp7jJkZg0yhjaWRqB3L6WUFO/CCVoDBdETQUs73M0uR7tSwQn3P1TtvL
+         k6nxCHCmob+rRfDSpI30Hz2NYOZ7+73V0ohEuvAQEhkTigVRsX/ngAiNhvyO4nSB45sU
+         3k5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=Bne6QclCdHVbeYrK9OqCGvDheWSNH24kX8Y3DsNcdIs=;
+        b=LRZ/jsvFRyJKZmhzreFaGAofnQI7Cfb1c3IV/JP9yV9r7zOEJ0E7ieIEqrThqlaC4N
+         VNnGnL2BjN+r6BJ5Hx2umdeV98cNYAfucHOJNGQTviqPOY32OOklCEzDjYXlUgkPtuCU
+         X9fb9KCVn7tPWSef4QpO3g5DkrQN1X7cPLCdZg0PXGs5xC1d324WfnW6op1TzbclXgoU
+         cd76k03iLcVlsUxmcSOBmmDYYeEYNmlATeZLQ0gU5j0tgZ+A2c4v+rFADIPejrSRq51G
+         wveexYKv91fzTXVtY7lG4hsKTTv4sT/YT3TSDhOPWlgJbOIqPTjq4fMQfjhZQElw5iSS
+         saew==
+X-Gm-Message-State: APjAAAWZN9HL5AJBoi/XVi/GwknvzsGgknOqG2h16J6zhSToyJ983hPm
+        erpu7cZxDhmLwqkt8TWZviklZysAyS17WMu8SqvzTg==
+X-Google-Smtp-Source: APXvYqwd5WR0vNqvP1XlKJhmS+nzT+JazIs9A6E74U80IlxebjOIog9rqWYrp5k21rknDbkFFqtEb3c68LPZBVhDcWY=
+X-Received: by 2002:ac8:330d:: with SMTP id t13mr7684710qta.379.1576162785349;
+ Thu, 12 Dec 2019 06:59:45 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKv+Gu_um7eRYXbieW7ogDX5mmZaxP7JQBJM9CajK+6CsO5RgQ@mail.gmail.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+References: <20191211170936.385572-1-Jason@zx2c4.com> <20191212093008.217086-1-Jason@zx2c4.com>
+ <20191212093008.217086-3-Jason@zx2c4.com>
+In-Reply-To: <20191212093008.217086-3-Jason@zx2c4.com>
+From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Date:   Thu, 12 Dec 2019 15:59:34 +0100
+Message-ID: <CAKv+Gu-JdxYpQDjiw5-mNo7QnDak5D--8HAtp-pyuPnRe18bjw@mail.gmail.com>
+Subject: Re: [PATCH crypto-next v2 3/3] crypto: arm/arm64/mips/poly1305 -
+ remove redundant non-reduction from emit
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>, Eric Biggers <ebiggers@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Dec 02, 2019 at 04:12:09PM +0000, Ard Biesheuvel wrote:
-> (adding some more arm64 folks)
-> 
-> On Fri, 29 Nov 2019 at 11:30, Neal Liu <neal.liu@mediatek.com> wrote:
-> >
-> > On Fri, 2019-11-29 at 18:02 +0800, Lars Persson wrote:
-> > > Hi Neal,
-> > >
-> > > On Wed, Nov 27, 2019 at 3:23 PM Neal Liu <neal.liu@mediatek.com> wrote:
-> > > >
-> > > > For MediaTek SoCs on ARMv8 with TrustZone enabled, peripherals like
-> > > > entropy sources is not accessible from normal world (linux) and
-> > > > rather accessible from secure world (ATF/TEE) only. This driver aims
-> > > > to provide a generic interface to ATF rng service.
-> > > >
-> > >
-> > > I am working on several SoCs that also will need this kind of driver
-> > > to get entropy from Arm trusted firmware.
-> > > If you intend to make this a generic interface, please clean up the
-> > > references to MediaTek and give it a more generic name. For example
-> > > "Arm Trusted Firmware random number driver".
-> > >
-> > > It will also be helpful if the SMC call number is configurable.
-> > >
-> > > - Lars
-> >
-> > Yes, I'm trying to make this to a generic interface. I'll try to make
-> > HW/platform related dependency to be configurable and let it more
-> > generic.
-> > Thanks for your suggestion.
-> >
-> 
-> I don't think it makes sense for each arm64 platform to expose an
-> entropy source via SMC calls in a slightly different way, and model it
-> as a h/w driver. Instead, we should try to standardize this, and
-> perhaps expose it via the architectural helpers that already exist
-> (get_random_seed_long() and friends), so they get plugged into the
-> kernel random pool driver directly.
-> 
-> Note that in addition to drivers based on vendor SMC calls, we already
-> have a RNG h/w driver based on OP-TEE as well, where the driver
-> attaches to a standardized trusted OS interface identified by a UUID,
-> and which also gets invoked via SMC calls into secure firmware.
+On Thu, 12 Dec 2019 at 10:30, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+>
+> This appears to be some kind of copy and paste error, and is actually
+> dead code.
+>
+> Pre: f =3D 0 =E2=87=92 (f >> 32) =3D 0
+>     f =3D (f >> 32) + le32_to_cpu(digest[0]);
+> Post: 0 =E2=89=A4 f < 2=C2=B3=C2=B2
+>     put_unaligned_le32(f, dst);
+>
+> Pre: 0 =E2=89=A4 f < 2=C2=B3=C2=B2 =E2=87=92 (f >> 32) =3D 0
+>     f =3D (f >> 32) + le32_to_cpu(digest[1]);
+> Post: 0 =E2=89=A4 f < 2=C2=B3=C2=B2
+>     put_unaligned_le32(f, dst + 4);
+>
+> Pre: 0 =E2=89=A4 f < 2=C2=B3=C2=B2 =E2=87=92 (f >> 32) =3D 0
+>     f =3D (f >> 32) + le32_to_cpu(digest[2]);
+> Post: 0 =E2=89=A4 f < 2=C2=B3=C2=B2
+>     put_unaligned_le32(f, dst + 8);
+>
+> Pre: 0 =E2=89=A4 f < 2=C2=B3=C2=B2 =E2=87=92 (f >> 32) =3D 0
+>     f =3D (f >> 32) + le32_to_cpu(digest[3]);
+> Post: 0 =E2=89=A4 f < 2=C2=B3=C2=B2
+>     put_unaligned_le32(f, dst + 12);
+>
+> Therefore this sequence is redundant. And Andy's code appears to handle
+> misalignment acceptably.
+>
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+> ---
 
-Yes, I agree. I had raised the issue internally and forgot to follow up.
-I raised this few months back after I read a blog[1]
+The change is obviously correct, but I ran it on a big-endian system
+just to be sure.
 
---
-Regards,
-Sudeep
+Tested-by: Ard Biesheuvel <ardb@kernel.org>
+Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
 
-[1] https://community.arm.com/developer/ip-products/processors/f/cortex-a-forum/43679/arm-really-should-standardize-an-smc-interface-for-hardware-random-number-generators
+>  arch/arm/crypto/poly1305-glue.c   | 18 ++----------------
+>  arch/arm64/crypto/poly1305-glue.c | 18 ++----------------
+>  arch/mips/crypto/poly1305-glue.c  | 18 ++----------------
+>  3 files changed, 6 insertions(+), 48 deletions(-)
+>
+> diff --git a/arch/arm/crypto/poly1305-glue.c b/arch/arm/crypto/poly1305-g=
+lue.c
+> index abe3f2d587dc..ceec04ec2f40 100644
+> --- a/arch/arm/crypto/poly1305-glue.c
+> +++ b/arch/arm/crypto/poly1305-glue.c
+> @@ -20,7 +20,7 @@
+>
+>  void poly1305_init_arm(void *state, const u8 *key);
+>  void poly1305_blocks_arm(void *state, const u8 *src, u32 len, u32 hibit)=
+;
+> -void poly1305_emit_arm(void *state, __le32 *digest, const u32 *nonce);
+> +void poly1305_emit_arm(void *state, u8 *digest, const u32 *nonce);
+>
+>  void __weak poly1305_blocks_neon(void *state, const u8 *src, u32 len, u3=
+2 hibit)
+>  {
+> @@ -179,9 +179,6 @@ EXPORT_SYMBOL(poly1305_update_arch);
+>
+>  void poly1305_final_arch(struct poly1305_desc_ctx *dctx, u8 *dst)
+>  {
+> -       __le32 digest[4];
+> -       u64 f =3D 0;
+> -
+>         if (unlikely(dctx->buflen)) {
+>                 dctx->buf[dctx->buflen++] =3D 1;
+>                 memset(dctx->buf + dctx->buflen, 0,
+> @@ -189,18 +186,7 @@ void poly1305_final_arch(struct poly1305_desc_ctx *d=
+ctx, u8 *dst)
+>                 poly1305_blocks_arm(&dctx->h, dctx->buf, POLY1305_BLOCK_S=
+IZE, 0);
+>         }
+>
+> -       poly1305_emit_arm(&dctx->h, digest, dctx->s);
+> -
+> -       /* mac =3D (h + s) % (2^128) */
+> -       f =3D (f >> 32) + le32_to_cpu(digest[0]);
+> -       put_unaligned_le32(f, dst);
+> -       f =3D (f >> 32) + le32_to_cpu(digest[1]);
+> -       put_unaligned_le32(f, dst + 4);
+> -       f =3D (f >> 32) + le32_to_cpu(digest[2]);
+> -       put_unaligned_le32(f, dst + 8);
+> -       f =3D (f >> 32) + le32_to_cpu(digest[3]);
+> -       put_unaligned_le32(f, dst + 12);
+> -
+> +       poly1305_emit_arm(&dctx->h, dst, dctx->s);
+>         *dctx =3D (struct poly1305_desc_ctx){};
+>  }
+>  EXPORT_SYMBOL(poly1305_final_arch);
+> diff --git a/arch/arm64/crypto/poly1305-glue.c b/arch/arm64/crypto/poly13=
+05-glue.c
+> index 83a2338a8826..e97b092f56b8 100644
+> --- a/arch/arm64/crypto/poly1305-glue.c
+> +++ b/arch/arm64/crypto/poly1305-glue.c
+> @@ -21,7 +21,7 @@
+>  asmlinkage void poly1305_init_arm64(void *state, const u8 *key);
+>  asmlinkage void poly1305_blocks(void *state, const u8 *src, u32 len, u32=
+ hibit);
+>  asmlinkage void poly1305_blocks_neon(void *state, const u8 *src, u32 len=
+, u32 hibit);
+> -asmlinkage void poly1305_emit(void *state, __le32 *digest, const u32 *no=
+nce);
+> +asmlinkage void poly1305_emit(void *state, u8 *digest, const u32 *nonce)=
+;
+>
+>  static __ro_after_init DEFINE_STATIC_KEY_FALSE(have_neon);
+>
+> @@ -162,9 +162,6 @@ EXPORT_SYMBOL(poly1305_update_arch);
+>
+>  void poly1305_final_arch(struct poly1305_desc_ctx *dctx, u8 *dst)
+>  {
+> -       __le32 digest[4];
+> -       u64 f =3D 0;
+> -
+>         if (unlikely(dctx->buflen)) {
+>                 dctx->buf[dctx->buflen++] =3D 1;
+>                 memset(dctx->buf + dctx->buflen, 0,
+> @@ -172,18 +169,7 @@ void poly1305_final_arch(struct poly1305_desc_ctx *d=
+ctx, u8 *dst)
+>                 poly1305_blocks(&dctx->h, dctx->buf, POLY1305_BLOCK_SIZE,=
+ 0);
+>         }
+>
+> -       poly1305_emit(&dctx->h, digest, dctx->s);
+> -
+> -       /* mac =3D (h + s) % (2^128) */
+> -       f =3D (f >> 32) + le32_to_cpu(digest[0]);
+> -       put_unaligned_le32(f, dst);
+> -       f =3D (f >> 32) + le32_to_cpu(digest[1]);
+> -       put_unaligned_le32(f, dst + 4);
+> -       f =3D (f >> 32) + le32_to_cpu(digest[2]);
+> -       put_unaligned_le32(f, dst + 8);
+> -       f =3D (f >> 32) + le32_to_cpu(digest[3]);
+> -       put_unaligned_le32(f, dst + 12);
+> -
+> +       poly1305_emit(&dctx->h, dst, dctx->s);
+>         *dctx =3D (struct poly1305_desc_ctx){};
+>  }
+>  EXPORT_SYMBOL(poly1305_final_arch);
+> diff --git a/arch/mips/crypto/poly1305-glue.c b/arch/mips/crypto/poly1305=
+-glue.c
+> index b37d29cf5d0a..fc881b46d911 100644
+> --- a/arch/mips/crypto/poly1305-glue.c
+> +++ b/arch/mips/crypto/poly1305-glue.c
+> @@ -15,7 +15,7 @@
+>
+>  asmlinkage void poly1305_init_mips(void *state, const u8 *key);
+>  asmlinkage void poly1305_blocks_mips(void *state, const u8 *src, u32 len=
+, u32 hibit);
+> -asmlinkage void poly1305_emit_mips(void *state, __le32 *digest, const u3=
+2 *nonce);
+> +asmlinkage void poly1305_emit_mips(void *state, u8 *digest, const u32 *n=
+once);
+>
+>  void poly1305_init_arch(struct poly1305_desc_ctx *dctx, const u8 *key)
+>  {
+> @@ -134,9 +134,6 @@ EXPORT_SYMBOL(poly1305_update_arch);
+>
+>  void poly1305_final_arch(struct poly1305_desc_ctx *dctx, u8 *dst)
+>  {
+> -       __le32 digest[4];
+> -       u64 f =3D 0;
+> -
+>         if (unlikely(dctx->buflen)) {
+>                 dctx->buf[dctx->buflen++] =3D 1;
+>                 memset(dctx->buf + dctx->buflen, 0,
+> @@ -144,18 +141,7 @@ void poly1305_final_arch(struct poly1305_desc_ctx *d=
+ctx, u8 *dst)
+>                 poly1305_blocks_mips(&dctx->h, dctx->buf, POLY1305_BLOCK_=
+SIZE, 0);
+>         }
+>
+> -       poly1305_emit_mips(&dctx->h, digest, dctx->s);
+> -
+> -       /* mac =3D (h + s) % (2^128) */
+> -       f =3D (f >> 32) + le32_to_cpu(digest[0]);
+> -       put_unaligned_le32(f, dst);
+> -       f =3D (f >> 32) + le32_to_cpu(digest[1]);
+> -       put_unaligned_le32(f, dst + 4);
+> -       f =3D (f >> 32) + le32_to_cpu(digest[2]);
+> -       put_unaligned_le32(f, dst + 8);
+> -       f =3D (f >> 32) + le32_to_cpu(digest[3]);
+> -       put_unaligned_le32(f, dst + 12);
+> -
+> +       poly1305_emit_mips(&dctx->h, dst, dctx->s);
+>         *dctx =3D (struct poly1305_desc_ctx){};
+>  }
+>  EXPORT_SYMBOL(poly1305_final_arch);
+> --
+> 2.24.0
+>
