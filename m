@@ -2,101 +2,231 @@ Return-Path: <SRS0=MXL1=2C=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4C4DC43603
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Dec 2019 14:26:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8739BC43603
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Dec 2019 14:30:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 75683214D8
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Dec 2019 14:26:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="u6i604Gu"
+	by mail.kernel.org (Postfix) with ESMTP id 535212067C
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Dec 2019 14:30:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1576161048;
+	bh=7cvjOI8mAgaor2T+Guv9aKerg629/9PwKUUrQzRsQUs=;
+	h=To:Subject:Date:From:Cc:In-Reply-To:References:List-ID:From;
+	b=mG6Gi8Q1/KFolkLqrnQ/ePsyP2vZn2gHt/Jlqj0SowMEmmUEDjqWTVjV6EQr78NHM
+	 6hoK3LHEiikWX+mEia5rQpR04K6D6VR6xKrFTAY+nPhuMJvqkSZsWsIvK9Rf2olY8O
+	 5OIF0+iOWHujHQ8X5iC0iwZjdk3JcoVevrj9Vn20=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729591AbfLLO0g (ORCPT
+        id S1729716AbfLLOao (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Dec 2019 09:26:36 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:55155 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729392AbfLLO0g (ORCPT
+        Thu, 12 Dec 2019 09:30:44 -0500
+Received: from inca-roads.misterjones.org ([213.251.177.50]:41234 "EHLO
+        inca-roads.misterjones.org" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729612AbfLLOao (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Dec 2019 09:26:36 -0500
-Received: by mail-wm1-f68.google.com with SMTP id b11so2572672wmj.4
-        for <linux-crypto@vger.kernel.org>; Thu, 12 Dec 2019 06:26:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=/DN6p2Ch7R+6bHk3UTVmBnzdRsugLPXoWrAyTdUkcw8=;
-        b=u6i604GuOCZ/0XT4pJYSmeCPPhoaB8Nf6Nt1XZ/4jFfXgxRBzoSoOpyW1iVkLiaJh/
-         o8bcEVve9Pw5JOmbj+4meLGvI52cyB+yUkGMpZRPAhP4/7+JnjE3Rjbp/tLiP2vu7DcB
-         eDF1Q1IPKyi0A+qmExTdXWZtie++lmgp599WBoYZ/LrKsjC4aOJAOtXMQjaUIYe3SGCL
-         f4g3PFQ5KHZacG+sYT4+BgHMJJ/iO95JLi0QXl94RBbveszEQDC+2iyKLvmdTg83wizG
-         5VgnvW8mDhNyATj+u/KtzTcJtd1pTKayejX0sILRz+K0r5duGwV1DUPVoNW701+J8SPQ
-         8mpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/DN6p2Ch7R+6bHk3UTVmBnzdRsugLPXoWrAyTdUkcw8=;
-        b=t2HjrM2vaILiblMXuEneJi9LqHw98XcWgp5PC5w+BAnPZOKQ8OtiU1Et39+d0RcWdo
-         ZGBBVNjI2uyt4yjwsySp0cI2NJ4/U65C1WscZrK8iILYbwc6l+trQeqsXM/nZ9IfzE8R
-         1gXrKF7xSz/TsXOcmKLZNJX2yGw6Ll8/6a7j6FEq7pBzN+4ElX9bVqebZhkIwQeQtTFU
-         S3EIMFrPmmQcCRihyMOyJfcJIJlEf4r6WL3glJSchO/oQ7Aw82Zyb56ANNcwzA62tc6T
-         5IqnEix9u7qNHIWBW1ApQXrI2vjfEWfAGh3AddyXrWq7zR81sQJ22S5i+0CDsJV5fTzk
-         Oz/Q==
-X-Gm-Message-State: APjAAAUWG4VfS5Bs3G0esnaEbFT/OM4fwbXldXuP6RHsmqbCKzaz8R/Y
-        LlQRq5sSswn6NBkPYYIXYEq00V3Dq2bK/QXMrtuv+tkA5HDr/w==
-X-Google-Smtp-Source: APXvYqxm1kZCoWk19Tg6h5hEk2VBNoWUWzbRMXFBcOgUiOk78sPoaOQjPstajKQOAWCQpUcuIcfb0Uvvr5L0ZhIH6yA=
-X-Received: by 2002:a1c:a795:: with SMTP id q143mr6684960wme.52.1576160794693;
- Thu, 12 Dec 2019 06:26:34 -0800 (PST)
+        Thu, 12 Dec 2019 09:30:44 -0500
+Received: from www-data by cheepnis.misterjones.org with local (Exim 4.80)
+        (envelope-from <maz@kernel.org>)
+        id 1ifPUF-0002s6-2y; Thu, 12 Dec 2019 15:30:39 +0100
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [PATCH v5 3/3] hwrng: add mtk-sec-rng driver
+X-PHP-Originating-Script: 0:main.inc
 MIME-Version: 1.0
-References: <20191211170936.385572-1-Jason@zx2c4.com> <20191212093008.217086-1-Jason@zx2c4.com>
- <d55e0390c7187b09f820e123b05df1e5e680df0b.camel@strongswan.org>
- <CAHmME9ovvwX3Or1ctRH8U5PjpNNMe9ixOZLi3F0vbO9SqA04Ow@mail.gmail.com> <CAHmME9reEXXSmQr+6vPM1cwr+pjvwPwJ5n3UZ0BUSjO2kQQcNg@mail.gmail.com>
-In-Reply-To: <CAHmME9reEXXSmQr+6vPM1cwr+pjvwPwJ5n3UZ0BUSjO2kQQcNg@mail.gmail.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Thu, 12 Dec 2019 15:26:22 +0100
-Message-ID: <CAKv+Gu80EVN-_aHPSYUu=0TvFJERBMKFvQS-gce3z_jx=X7www@mail.gmail.com>
-Subject: Re: [PATCH crypto-next v2 1/3] crypto: poly1305 - add new 32 and
- 64-bit generic versions
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Martin Willi <martin@strongswan.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Thu, 12 Dec 2019 14:30:38 +0000
+From:   Marc Zyngier <maz@kernel.org>
+Cc:     Neal Liu <neal.liu@mediatek.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Pawel Moll <pawel.moll@arm.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        DTML <devicetree@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        wsd_upstream <wsd_upstream@mediatek.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Sean Wang <sean.wang@kernel.org>,
+        "moderated list:ARM/Mediatek SoC support" 
+        <linux-mediatek@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>, Matt Mackall <mpm@selenic.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        =?UTF-8?Q?Crystal_Guo_=28=E9=83=AD=E6=99=B6=29?= 
+        <crystal.guo@mediatek.com>, Will Deacon <will@kernel.org>,
+        Lars Persson <lists@bofh.nu>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>
+In-Reply-To: <CAKv+Gu9YhkzpKbrxa=xDOkS6=kZSMaidor_4DqGY6f1M0tO7kQ@mail.gmail.com>
+References: <1574864578-467-1-git-send-email-neal.liu@mediatek.com>
+ <1574864578-467-4-git-send-email-neal.liu@mediatek.com>
+ <CADnJP=uhD=J2NrpSwiX8oCTd-u_q05=HhsAV-ErCsXNDwVS0rA@mail.gmail.com>
+ <1575027046.24848.4.camel@mtkswgap22>
+ <CAKv+Gu_um7eRYXbieW7ogDX5mmZaxP7JQBJM9CajK+6CsO5RgQ@mail.gmail.com>
+ <20191202191146.79e6368c@why>
+ <299029b0-0689-c2c4-4656-36ced31ed513@gmail.com>
+ <b7043e932211911a81383274e0cc983d@www.loen.fr>
+ <1576127609.27185.8.camel@mtkswgap22>
+ <a5982b8ed10440eef14c04df6e6060b6@www.loen.fr>
+ <CAKv+Gu9YhkzpKbrxa=xDOkS6=kZSMaidor_4DqGY6f1M0tO7kQ@mail.gmail.com>
+Message-ID: <9de12c45b4b022cfb01d89ca56429d53@www.loen.fr>
+X-Sender: maz@kernel.org
+User-Agent: Roundcube Webmail/0.7.2
+X-SA-Exim-Connect-IP: <locally generated>
+X-SA-Exim-Rcpt-To: ard.biesheuvel@linaro.org, neal.liu@mediatek.com, f.fainelli@gmail.com, pawel.moll@arm.com, mark.rutland@arm.com, devicetree@vger.kernel.org, herbert@gondor.apana.org.au, wsd_upstream@mediatek.com, catalin.marinas@arm.com, sean.wang@kernel.org, linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org, robh+dt@kernel.org, linux-crypto@vger.kernel.org, mpm@selenic.com, matthias.bgg@gmail.com, crystal.guo@mediatek.com, will@kernel.org, lists@bofh.nu, linux-arm-kernel@lists.infradead.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on cheepnis.misterjones.org); SAEximRunCond expanded to false
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 12 Dec 2019 at 14:47, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+On 2019-12-12 14:03, Ard Biesheuvel wrote:
+> On Thu, 12 Dec 2019 at 12:45, Marc Zyngier <maz@kernel.org> wrote:
+>>
+>> On 2019-12-12 05:13, Neal Liu wrote:
+>> > On Tue, 2019-12-03 at 11:17 +0000, Marc Zyngier wrote:
+>> >> On 2019-12-03 04:16, Florian Fainelli wrote:
+>> >> > On 12/2/2019 11:11 AM, Marc Zyngier wrote:
+>> >> >> On Mon, 2 Dec 2019 16:12:09 +0000
+>> >> >> Ard Biesheuvel <ard.biesheuvel@linaro.org> wrote:
+>> >> >>
+>> >> >>> (adding some more arm64 folks)
+>> >> >>>
+>> >> >>> On Fri, 29 Nov 2019 at 11:30, Neal Liu 
+>> <neal.liu@mediatek.com>
+>> >> >>> wrote:
+>> >> >>>>
+>> >> >>>> On Fri, 2019-11-29 at 18:02 +0800, Lars Persson wrote:
+>> >> >>>>> Hi Neal,
+>> >> >>>>>
+>> >> >>>>> On Wed, Nov 27, 2019 at 3:23 PM Neal Liu
+>> >> <neal.liu@mediatek.com>
+>> >> >>>>> wrote:
+>> >> >>>>>>
+>> >> >>>>>> For MediaTek SoCs on ARMv8 with TrustZone enabled,
+>> >> peripherals
+>> >> >>>>>> like
+>> >> >>>>>> entropy sources is not accessible from normal world 
+>> (linux)
+>> >> and
+>> >> >>>>>> rather accessible from secure world (ATF/TEE) only. This
+>> >> driver
+>> >> >>>>>> aims
+>> >> >>>>>> to provide a generic interface to ATF rng service.
+>> >> >>>>>>
+>> >> >>>>>
+>> >> >>>>> I am working on several SoCs that also will need this kind 
+>> of
+>> >> >>>>> driver
+>> >> >>>>> to get entropy from Arm trusted firmware.
+>> >> >>>>> If you intend to make this a generic interface, please 
+>> clean
+>> >> up
+>> >> >>>>> the
+>> >> >>>>> references to MediaTek and give it a more generic name. For
+>> >> >>>>> example
+>> >> >>>>> "Arm Trusted Firmware random number driver".
+>> >> >>>>>
+>> >> >>>>> It will also be helpful if the SMC call number is
+>> >> configurable.
+>> >> >>>>>
+>> >> >>>>> - Lars
+>> >> >>>>
+>> >> >>>> Yes, I'm trying to make this to a generic interface. I'll 
+>> try
+>> >> to
+>> >> >>>> make
+>> >> >>>> HW/platform related dependency to be configurable and let it
+>> >> more
+>> >> >>>> generic.
+>> >> >>>> Thanks for your suggestion.
+>> >> >>>>
+>> >> >>>
+>> >> >>> I don't think it makes sense for each arm64 platform to 
+>> expose
+>> >> an
+>> >> >>> entropy source via SMC calls in a slightly different way, and
+>> >> model
+>> >> >>> it
+>> >> >>> as a h/w driver. Instead, we should try to standardize this, 
+>> and
+>> >> >>> perhaps expose it via the architectural helpers that already
+>> >> exist
+>> >> >>> (get_random_seed_long() and friends), so they get plugged 
+>> into
+>> >> the
+>> >> >>> kernel random pool driver directly.
+>> >> >>
+>> >> >> Absolutely. I'd love to see a standard, ARM-specified,
+>> >> virtualizable
+>> >> >> RNG that is abstracted from the HW.
+>> >> >
+>> >> > Do you think we could use virtio-rng on top of a modified
+>> >> virtio-mmio
+>> >> > which instead of being backed by a hardware mailbox, could use
+>> >> > hvc/smc
+>> >> > calls to signal writes to shared memory and get notifications 
+>> via
+>> >> an
+>> >> > interrupt? This would also open up the doors to other virtio 
+>> uses
+>> >> > cases
+>> >> > beyond just RNG (e.g.: console, block devices?). If this is
+>> >> > completely
+>> >> > stupid, then please disregard this comment.
+>> >>
+>> >> The problem with a virtio device is that it is a ... device. What 
+>> we
+>> >> want
+>> >> is to be able to have access to an entropy source extremely early 
+>> in
+>> >> the
+>> >> kernel life, and devices tend to be available pretty late in the
+>> >> game.
+>> >> This means we cannot plug them in the architectural helpers that 
+>> Ard
+>> >> mentions above.
+>> >>
+>> >> What you're suggesting looks more like a new kind of virtio
+>> >> transport,
+>> >> which is interesting, in a remarkably twisted way... ;-)
+>> >>
+>> >> Thanks,
+>> >>
+>> >>          M.
+>> >
+>> > In conclusion, is it helpful that hw_random has a generic 
+>> interface
+>> > to
+>> > add device randomness by talking to hwrng which is implemented in 
+>> the
+>> > firmware or the hypervisor?
+>> > For most chip vendors, I think the answer is yes. We already 
+>> prepared
+>> > a
+>> > new patchset and need you agree with this idea.
+>>
+>> As long as it is a *unified* interface, I'm all for that.
+>>
 >
-> On Thu, Dec 12, 2019 at 2:08 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> >
-> > Hi Martin,
-> >
-> > On Thu, Dec 12, 2019 at 1:03 PM Martin Willi <martin@strongswan.org> wrote:
-> > > Can you provide some numbers to testify that? In my tests, the 32-bit
-> > > version gives me exact the same results.
-> >
-> > On 32-bit, if you only call update() once, then the results are the
-> > same. However, as soon as you call it more than once, this new version
-> > has increasing gains. Other than that, they should behave pretty much
-> > identically.
 >
-> Oh, you asked for numbers. I just fired up an Armada 370/XP and am
-> seeing a 8% increase in performance on calls to the update function.
+> Yeah, but I'm not sure it makes sense to model it as a device like
+> this. It would be nice if we could tie this into the ARM SMCCC
+> discovery, and use the SMC calls to back arch_get_random_seed_long()
 
-It would help if we could get some actual numbers. I usually try to
-capture the performance delta for a small set of block sizes that are
-significant for the use case at hand, e.g., like so [0], and also
-include blocksizes that are not 2^n. If the change improves the
-general case without causing any significant regressions elsewhere, I
-don't think we need to continue this debate.
+Probably I wasn't clear enough, but that's really what I meant by
+a unified interface (implemented by the firmware or the hypervisor).
 
+> [provided we fix the braindead way in which that is being used today
+> in the interrupt code]
 
+Ah, I said I'd look into it. Thanks for the reminder...
 
+Thanks,
 
-[0] https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git/commit/?id=11031c0d7d6e9bca0df233a8acfd6708d2b89470
+         M.
+-- 
+Jazz is not dead. It just smells funny...
