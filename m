@@ -2,121 +2,63 @@ Return-Path: <SRS0=MXL1=2C=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D72DC43603
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Dec 2019 05:31:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5D9BC43603
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Dec 2019 06:08:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F185D22527
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Dec 2019 05:31:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576128677;
-	bh=IqT00ys4+en9fWFNviGZ5cJEB2KyitXoZ7Fsi/IzO9k=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=hoV3FGN0T4NgsJyrPZT8jTFfoGhdnFl9lVXWszwjsgv2RPR+c2wU1oAcY2w6xVNDq
-	 3aPUSKnn8jZ4MOIRUL+DyMa8k0QC5VSClZ67kjiwBLfa44w69ZJv2i7cxt186w+Oo+
-	 6oveFCIkGQ3RLoBX+SZdu44WNEdX1mVHHprqGguo=
+	by mail.kernel.org (Postfix) with ESMTP id AF02321655
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Dec 2019 06:08:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726690AbfLLFbQ (ORCPT
+        id S1726833AbfLLGIX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Dec 2019 00:31:16 -0500
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:63787 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725980AbfLLFbQ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Dec 2019 00:31:16 -0500
-Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182]) (authenticated)
-        by conssluserg-03.nifty.com with ESMTP id xBC5UtvP010862;
-        Thu, 12 Dec 2019 14:30:55 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-03.nifty.com xBC5UtvP010862
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1576128656;
-        bh=yoxmpqDe2x6QTk+OCI2TnHYO1f9S6bQL94maOXXu9Cg=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=BFMJ0fqyvkgSQU6XTqtRTdjRVMGf2K4LKdULuCjmxrJWmEHbKkLTL08Jq3uyKFVWQ
-         r4z0QcWjdD2c6KDnie9ikxQRa1XFzD6r+OKJRJi2GlzbLkLCA2OFTq483TGWTRxdev
-         xYWai3NjWpSNEvWhjJjrKsz3PgzeKZ5V1fstOAV2RAjbvGY3qRGLQA3L+7GLUrCoO7
-         oE6znrbosrNWUtV+Jt3KUpR0KxJe8isMHFxHkrF7i4Ozq9Y2dV5rOc1ZJTOxGPzWfg
-         DHhHtSHkeZsCF1CNMGn79CYhEJ4hDt93Rwr+rBYcydoDo9cZ+0ReAF239Y55rpytp2
-         8FAz7fY+UmymA==
-X-Nifty-SrcIP: [209.85.221.182]
-Received: by mail-vk1-f182.google.com with SMTP id s62so55073vkb.10;
-        Wed, 11 Dec 2019 21:30:55 -0800 (PST)
-X-Gm-Message-State: APjAAAU4yAC9S9XsgqNCoyD1w/Dy1qZM/z4hhi6mh/CXHcSSsrCuFMqh
-        Od1BN49kZ1ME+CzCdZsM6Lqbwnt5nG21/LirURU=
-X-Google-Smtp-Source: APXvYqzyAz3nSzfmsWApFSr+H7lqWz4keVsUzY5ov/PBG2Gnw3VZND0u41kQMEzVp4JKD2lPAcUKpZx5ND+FxHbatqM=
-X-Received: by 2002:a1f:2e4a:: with SMTP id u71mr3546169vku.96.1576128654360;
- Wed, 11 Dec 2019 21:30:54 -0800 (PST)
+        Thu, 12 Dec 2019 01:08:23 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:54204 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726784AbfLLGIX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 12 Dec 2019 01:08:23 -0500
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1ifHe9-0003qw-8Q; Thu, 12 Dec 2019 14:08:21 +0800
+Received: from herbert by gondobar with local (Exim 4.89)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1ifHe6-0002vB-W1; Thu, 12 Dec 2019 14:08:19 +0800
+Date:   Thu, 12 Dec 2019 14:08:18 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, sfr@canb.auug.org.au
+Subject: Re: [PATCH 1/2] crypto: arm/curve25519 - add arch-specific key
+ generation function
+Message-ID: <20191212060818.w4orbhieq66btymf@gondor.apana.org.au>
+References: <20191211102455.7b55218e@canb.auug.org.au>
+ <20191211092640.107621-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-References: <87wob4tf9b.fsf@alyssa.is>
-In-Reply-To: <87wob4tf9b.fsf@alyssa.is>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Thu, 12 Dec 2019 14:30:18 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAQ2+=jCO5SUpB-C8NZHODLVXs3SJ2qyYR9J+OiU_+1iAg@mail.gmail.com>
-Message-ID: <CAK7LNAQ2+=jCO5SUpB-C8NZHODLVXs3SJ2qyYR9J+OiU_+1iAg@mail.gmail.com>
-Subject: Re: Bogus dependency for HW_RANDOM_VIRTIO with oldconfig
-To:     Alyssa Ross <hi@alyssa.is>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        linux-crypto@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        virtualization@lists.linux-foundation.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191211092640.107621-1-Jason@zx2c4.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Dec 10, 2019 at 11:41 PM Alyssa Ross <hi@alyssa.is> wrote:
->
-> I'm new here and not sure if I'm contacting the correct people/groups --
-> please point me in the right direction if not.  I don't know if the
-> culprit here is Kconfig, the virtio Kconfig file, the hw_random Kconfig
-> file, or some combination of those.
->
-> I believe I have discovered an issue with the order in which make
-> oldconfig asks for virtio-related options, and would appreciate some
-> advice on how to solve it:
->
-> HW_RANDOM_VIRTIO=y depends on VIRTIO=y.  In my kernel, VIRTIO=y is
-> selected by VIRITO_PCI=y, but when make oldconfig prompts for
-> HW_RANDOM_VIRTIO, VIRTIO_PCI has not been prompted for yet, and so
-> VIRTIO is still set to m.
->
-> This means that it's not possible for me to set HW_RANDOM_VIRTIO=y using
-> oldconfig without setting an VIRTIO-selecting option I don't need, but
-> that is prompted for _before_ HW_RANDOM_VIRTIO.  One such option that I
-> have identified so far is VOP.  It is prompted for before
-> HW_RANDOM_VIRTIO, and so if I set VOP=y it is now possible to set
-> HW_RANDOM_VIRTIO.
->
-> When using menuconfig on a config file generated with oldconfig, that
-> does not have HW_RANDOM_VIRTIO enabled, I am able to set HW_RANDOM=y and
-> HW_RANDOM_VIRTIO=y, and after saving I can confirm that no other changes
-> have been made to the configuration file.  This tells me that there's no
-> need for a dependency on e.g. VOP, except when using oldconfig.
+On Wed, Dec 11, 2019 at 10:26:39AM +0100, Jason A. Donenfeld wrote:
+> Somehow this was forgotten when Zinc was being split into oddly shaped
+> pieces, resulting in linker errors. The x86_64 glue has a specific key
+> generation implementation, but the Arm one does not. However, it can
+> still receive the NEON speedups by calling the ordinary DH function
+> using the base point.
+> 
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+>  arch/arm/crypto/curve25519-glue.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
 
-OK, you are right.
-
-Actually, the oldconfig restarts when it finds a newly-visible option.
-For example, when VIRTIO is changed from n to y,
-oldconfig restarts the menu and shows a prompt for HW_RANDOM_VIRTIO.
-
-But, this does not happen when VIRTIO is changed from m to y.
-
-> So, I think there is an ordering issue here, and that oldconfig
-> should not prompt for HW_RANDOM_VIRTIO until after any option that might
-> select VIRTIO=y.
->
-> I would be happy to try to submit or test a patch to fix this, but I
-> don't know where to go from here.
-
-Perhaps check_conf() could be fixed, though I have not looked into it yet.
-
-
+Patch applied.  Thanks.
 -- 
-Best Regards
-Masahiro Yamada
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
