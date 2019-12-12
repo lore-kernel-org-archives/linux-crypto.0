@@ -2,101 +2,118 @@ Return-Path: <SRS0=MXL1=2C=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D13A6C43603
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Dec 2019 14:30:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F4A6C3F68F
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Dec 2019 14:44:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9211E22527
-	for <linux-crypto@archiver.kernel.org>; Thu, 12 Dec 2019 14:30:55 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="rUIj2xwk"
+	by mail.kernel.org (Postfix) with ESMTP id 3F308227BF
+	for <linux-crypto@archiver.kernel.org>; Thu, 12 Dec 2019 14:44:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729752AbfLLOaz (ORCPT
+        id S1729786AbfLLOoE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 12 Dec 2019 09:30:55 -0500
-Received: from frisell.zx2c4.com ([192.95.5.64]:52105 "EHLO frisell.zx2c4.com"
+        Thu, 12 Dec 2019 09:44:04 -0500
+Received: from foss.arm.com ([217.140.110.172]:49196 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729612AbfLLOay (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 12 Dec 2019 09:30:54 -0500
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 0002d49a
-        for <linux-crypto@vger.kernel.org>;
-        Thu, 12 Dec 2019 13:35:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
-        :references:in-reply-to:from:date:message-id:subject:to:cc
-        :content-type; s=mail; bh=iehgp+nXsGk8SuvtzvDstSbnKtM=; b=rUIj2x
-        wknQfs5R5cqVVmb2UhBpfGLJRSZ+hxkHE/g1dIP8pji1XnNGPPmc9d7QdrQufNL5
-        m4hvy36eDN43zYvujBWE8zpgSFiZ7axVOKSGnX2X3HU7edpipeijYRX7T+oKkWq4
-        z3sEMiu8E04aqCPA0MKzFFrKwQtWBUjBSB+EerVlc2veS1PqXkE4jYDANEjYHCaH
-        1IAPWkE4OKVLpia6lLHf+NuqfTX1MtaYh/mTalHiPuIL0hMCqahZtpo61Nwt0A4+
-        6h6kYjgXEkegTrunIEIiNPqh7XipXM2au7iVHO07ZKxmzkWFeLBv9cYrmzw42cyN
-        5vsywf/1Y7NaePPg==
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 41d5348e (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO)
-        for <linux-crypto@vger.kernel.org>;
-        Thu, 12 Dec 2019 13:35:04 +0000 (UTC)
-Received: by mail-oi1-f170.google.com with SMTP id a124so540707oii.13
-        for <linux-crypto@vger.kernel.org>; Thu, 12 Dec 2019 06:30:52 -0800 (PST)
-X-Gm-Message-State: APjAAAXsuBVpp6Zbqqdlk9A51QL7b2xgiwGYF6P3FMfpXZKuNtzDCPDM
-        41XALau9H4XEpv+8ktVdaPh05IGBlD3GdYK39LQ=
-X-Google-Smtp-Source: APXvYqzXh34RlNRnz1wuJGB6xzQtAht+OGSgv0wuSv1vrBjsgyY9uo3dhE6YnDNS0jJ/Rth3FkvCY3ijBjUAzS75EcA=
-X-Received: by 2002:aca:5143:: with SMTP id f64mr4942382oib.66.1576161051500;
- Thu, 12 Dec 2019 06:30:51 -0800 (PST)
-MIME-Version: 1.0
-References: <20191211170936.385572-1-Jason@zx2c4.com> <20191212093008.217086-1-Jason@zx2c4.com>
- <d55e0390c7187b09f820e123b05df1e5e680df0b.camel@strongswan.org>
- <CAHmME9ovvwX3Or1ctRH8U5PjpNNMe9ixOZLi3F0vbO9SqA04Ow@mail.gmail.com>
- <CAHmME9reEXXSmQr+6vPM1cwr+pjvwPwJ5n3UZ0BUSjO2kQQcNg@mail.gmail.com> <CAKv+Gu80EVN-_aHPSYUu=0TvFJERBMKFvQS-gce3z_jx=X7www@mail.gmail.com>
-In-Reply-To: <CAKv+Gu80EVN-_aHPSYUu=0TvFJERBMKFvQS-gce3z_jx=X7www@mail.gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Thu, 12 Dec 2019 15:30:39 +0100
-X-Gmail-Original-Message-ID: <CAHmME9oQ-Yj2WWuvNj1KNm=d4+PgnVFOusnh8HG0=yYWdi2UXQ@mail.gmail.com>
-Message-ID: <CAHmME9oQ-Yj2WWuvNj1KNm=d4+PgnVFOusnh8HG0=yYWdi2UXQ@mail.gmail.com>
-Subject: Re: [PATCH crypto-next v2 1/3] crypto: poly1305 - add new 32 and
- 64-bit generic versions
+        id S1729526AbfLLOoE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 12 Dec 2019 09:44:04 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4B0E530E;
+        Thu, 12 Dec 2019 06:44:03 -0800 (PST)
+Received: from bogus (e107155-lin.cambridge.arm.com [10.1.196.42])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id D90EA3F718;
+        Thu, 12 Dec 2019 06:44:00 -0800 (PST)
+Date:   Thu, 12 Dec 2019 14:43:55 +0000
+From:   Sudeep Holla <sudeep.holla@arm.com>
 To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     Martin Willi <martin@strongswan.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Cc:     Neal Liu <neal.liu@mediatek.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        Lars Persson <lists@bofh.nu>,
+        Mark Rutland <mark.rutland@arm.com>,
+        DTML <devicetree@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        wsd_upstream <wsd_upstream@mediatek.com>,
+        Sean Wang <sean.wang@kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Crystal Guo =?utf-8?B?KOmDreaZtik=?= <Crystal.Guo@mediatek.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Matt Mackall <mpm@selenic.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        "linux-mediatek@lists.infradead.org" 
+        <linux-mediatek@lists.infradead.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH v5 3/3] hwrng: add mtk-sec-rng driver
+Message-ID: <20191212144355.GA13263@bogus>
+References: <1574864578-467-1-git-send-email-neal.liu@mediatek.com>
+ <1574864578-467-4-git-send-email-neal.liu@mediatek.com>
+ <CADnJP=uhD=J2NrpSwiX8oCTd-u_q05=HhsAV-ErCsXNDwVS0rA@mail.gmail.com>
+ <1575027046.24848.4.camel@mtkswgap22>
+ <CAKv+Gu_um7eRYXbieW7ogDX5mmZaxP7JQBJM9CajK+6CsO5RgQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu_um7eRYXbieW7ogDX5mmZaxP7JQBJM9CajK+6CsO5RgQ@mail.gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Dec 12, 2019 at 3:26 PM Ard Biesheuvel
-<ard.biesheuvel@linaro.org> wrote:
->
-> On Thu, 12 Dec 2019 at 14:47, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+On Mon, Dec 02, 2019 at 04:12:09PM +0000, Ard Biesheuvel wrote:
+> (adding some more arm64 folks)
+> 
+> On Fri, 29 Nov 2019 at 11:30, Neal Liu <neal.liu@mediatek.com> wrote:
 > >
-> > On Thu, Dec 12, 2019 at 2:08 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> > On Fri, 2019-11-29 at 18:02 +0800, Lars Persson wrote:
+> > > Hi Neal,
 > > >
-> > > Hi Martin,
+> > > On Wed, Nov 27, 2019 at 3:23 PM Neal Liu <neal.liu@mediatek.com> wrote:
+> > > >
+> > > > For MediaTek SoCs on ARMv8 with TrustZone enabled, peripherals like
+> > > > entropy sources is not accessible from normal world (linux) and
+> > > > rather accessible from secure world (ATF/TEE) only. This driver aims
+> > > > to provide a generic interface to ATF rng service.
+> > > >
 > > >
-> > > On Thu, Dec 12, 2019 at 1:03 PM Martin Willi <martin@strongswan.org> wrote:
-> > > > Can you provide some numbers to testify that? In my tests, the 32-bit
-> > > > version gives me exact the same results.
+> > > I am working on several SoCs that also will need this kind of driver
+> > > to get entropy from Arm trusted firmware.
+> > > If you intend to make this a generic interface, please clean up the
+> > > references to MediaTek and give it a more generic name. For example
+> > > "Arm Trusted Firmware random number driver".
 > > >
-> > > On 32-bit, if you only call update() once, then the results are the
-> > > same. However, as soon as you call it more than once, this new version
-> > > has increasing gains. Other than that, they should behave pretty much
-> > > identically.
+> > > It will also be helpful if the SMC call number is configurable.
+> > >
+> > > - Lars
 > >
-> > Oh, you asked for numbers. I just fired up an Armada 370/XP and am
-> > seeing a 8% increase in performance on calls to the update function.
->
-> It would help if we could get some actual numbers. I usually try to
-> capture the performance delta for a small set of block sizes that are
-> significant for the use case at hand, e.g., like so [0], and also
-> include blocksizes that are not 2^n. If the change improves the
-> general case without causing any significant regressions elsewhere, I
-> don't think we need to continue this debate.
+> > Yes, I'm trying to make this to a generic interface. I'll try to make
+> > HW/platform related dependency to be configurable and let it more
+> > generic.
+> > Thanks for your suggestion.
+> >
+> 
+> I don't think it makes sense for each arm64 platform to expose an
+> entropy source via SMC calls in a slightly different way, and model it
+> as a h/w driver. Instead, we should try to standardize this, and
+> perhaps expose it via the architectural helpers that already exist
+> (get_random_seed_long() and friends), so they get plugged into the
+> kernel random pool driver directly.
+> 
+> Note that in addition to drivers based on vendor SMC calls, we already
+> have a RNG h/w driver based on OP-TEE as well, where the driver
+> attaches to a standardized trusted OS interface identified by a UUID,
+> and which also gets invoked via SMC calls into secure firmware.
 
-I'm not sure I understand why the 32x32 performance discussion is even
-happening in the first place. The new 32x32 code most certainly
-doesn't make anything worse. It most likely makes some things better
-in some places -- 8% on that machine I fired up, maybe more and maybe
-less other places. But who even cares? The principle advantage of this
-patchset is the 64x64 code, and I think we gain something else,
-immeasurable, by having parallel and comparable implementations.
-Please, let's not turn this into another pointless debate.
+Yes, I agree. I had raised the issue internally and forgot to follow up.
+I raised this few months back after I read a blog[1]
+
+--
+Regards,
+Sudeep
+
+[1] https://community.arm.com/developer/ip-products/processors/f/cortex-a-forum/43679/arm-really-should-standardize-an-smc-interface-for-hardware-random-number-generators
