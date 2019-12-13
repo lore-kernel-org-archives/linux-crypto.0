@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 291C4C751FD
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED362C341C8
 	for <linux-crypto@archiver.kernel.org>; Fri, 13 Dec 2019 20:39:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 25777246B1
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Dec 2019 20:39:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 104DC2470A
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Dec 2019 20:39:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="G5fxEwXc"
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="WuUkRNkr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728199AbfLMQPn (ORCPT
+        id S1727992AbfLMQRK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Dec 2019 11:15:43 -0500
-Received: from frisell.zx2c4.com ([192.95.5.64]:42043 "EHLO frisell.zx2c4.com"
+        Fri, 13 Dec 2019 11:17:10 -0500
+Received: from frisell.zx2c4.com ([192.95.5.64]:36999 "EHLO frisell.zx2c4.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728188AbfLMQPn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Dec 2019 11:15:43 -0500
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 6910bc08;
-        Fri, 13 Dec 2019 15:19:37 +0000 (UTC)
+        id S1727932AbfLMQRK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 13 Dec 2019 11:17:10 -0500
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 6b165b5b;
+        Fri, 13 Dec 2019 15:21:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=from:to:cc
         :subject:date:message-id:in-reply-to:references:mime-version
         :content-transfer-encoding; s=mail; bh=cITOUPoXZzaC0jEHUAhSfJ/8B
-        tg=; b=G5fxEwXcZMKxvckmouP7ZgHHz2fHOPy29p8UYHOfz8tw4lXflzuPFXIEI
-        dHnfieNZ7xc/BL2I1PKaaPY0RGZH7JTouTv76QQEvaW6Bl5Gye0yxUV/iFFcujN0
-        j5YXbNd86SZXpwpNwBihXIY1dlL9s4T0eudgxnelslX40Wh/tpPWS58WW6mI5nP0
-        tg/cFf+Te/dWnYEGDv4Fwji/YF9Qa93NzCiT5JIpaEO3PyjzwJaQtpbu0+L1Xz0E
-        /qJ15SrHdCWn+DTGmeci8L+JnSRAPd090hpY9t1gsybLfw7uxgs8esOQJ76gu/JR
-        Z4FCULAgatIuzUJ/yWAzsKdR7hIVQ==
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id ab82cc7b (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
-        Fri, 13 Dec 2019 15:19:35 +0000 (UTC)
+        tg=; b=WuUkRNkr/bvEiYgiFohuEhPnPfXcvLYXBML10kj9fo6+yR4dOxoNE23fx
+        3kop/XxHCcROzKQa4XYOUhT3CIqc66Lm2gW3tVe8yvtch5Aq5w1srHMP9JjlLNWs
+        kzveIgxTkz2TcTiDPp0IqTpo91FJStcSBIii2jy3bucGygz8KYabTycVz1xx2Yun
+        Q/IaVLoQC3vp4i7anliaOyA+VGO6FOA/SlVMMUGbMXS23cWcgVLTvZI/aFslQBJ3
+        MKv/t/3AUzUh6HEiyVAbwu+pPyCAJg1q3pUQlUuZy+WxTOCTgZn/ddXIsoIJZT66
+        IafTn5cNX7djnmKJW851gRXvuHfjg==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id a4476b98 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
+        Fri, 13 Dec 2019 15:21:03 +0000 (UTC)
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
         Samuel Neves <sneves@dei.uc.pt>,
         Andy Polyakov <appro@openssl.org>
-Subject: [PATCH 2/3] crypto: x86_64/poly1305 - add faster implementations
-Date:   Fri, 13 Dec 2019 17:15:22 +0100
-Message-Id: <20191213161523.843442-2-Jason@zx2c4.com>
-In-Reply-To: <20191213161523.843442-1-Jason@zx2c4.com>
-References: <20191213161523.843442-1-Jason@zx2c4.com>
+Subject: [PATCH crypto-next v4 2/3] crypto: x86_64/poly1305 - add faster implementations
+Date:   Fri, 13 Dec 2019 17:16:52 +0100
+Message-Id: <20191213161653.843683-2-Jason@zx2c4.com>
+In-Reply-To: <20191213161653.843683-1-Jason@zx2c4.com>
+References: <20191213161653.843683-1-Jason@zx2c4.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
