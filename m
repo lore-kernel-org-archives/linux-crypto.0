@@ -2,167 +2,123 @@ Return-Path: <SRS0=mgHx=2D=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77491C3B189
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Dec 2019 20:38:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0A90C65C05
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Dec 2019 20:38:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A2835246B1
-	for <linux-crypto@archiver.kernel.org>; Fri, 13 Dec 2019 20:38:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D5172246C0
+	for <linux-crypto@archiver.kernel.org>; Fri, 13 Dec 2019 20:38:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="LiCA0Ujv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IpwWQTBz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727536AbfLMP0h (ORCPT
+        id S1727885AbfLMPjW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 13 Dec 2019 10:26:37 -0500
-Received: from frisell.zx2c4.com ([192.95.5.64]:33341 "EHLO frisell.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726599AbfLMP0h (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 13 Dec 2019 10:26:37 -0500
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id eab08f8d
-        for <linux-crypto@vger.kernel.org>;
-        Fri, 13 Dec 2019 14:30:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
-        :references:in-reply-to:from:date:message-id:subject:to:cc
-        :content-type:content-transfer-encoding; s=mail; bh=jvQm8bwLK124
-        gLEtiGuBImsGtCM=; b=LiCA0Ujv4CER8TgITL5r38ZgnqOOUMHBEWJfw3UHb0Ni
-        iwtqt+vkeZDs8OyMHmJEaVptPy82mzT8Z2woVaWh20+Hg7LfHo7SzRu6ZvCX1Wvs
-        DDlNCWrCJBmnYJemlew6sJ442HeTW+enZnWBOwl4zj28KOpStvvpnhB6bLcv1jIN
-        TesIfq7j3Vp5+5o4YjBrBYUW6VfOIcSKIfqSowLKNeQPIEsxpoohsoVjLRp+kj1S
-        2sroYIqd4sdlD1lR+FSmy7zqHQYezMV88oAejwJOboYssWhhi88saSjUaNAXPqEi
-        o2ruQf8kjiHBJ0fsdH3bto5qte+wIiB1J/cvxaXbrQ==
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id e9dce3bd (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO)
-        for <linux-crypto@vger.kernel.org>;
-        Fri, 13 Dec 2019 14:30:39 +0000 (UTC)
-Received: by mail-oi1-f170.google.com with SMTP id c16so454029oic.3
-        for <linux-crypto@vger.kernel.org>; Fri, 13 Dec 2019 07:26:35 -0800 (PST)
-X-Gm-Message-State: APjAAAXgKgAGX4VpoPEz3kuujAugNQfQIpUhygwDsvCpLCHgF8Pekk5y
-        NW5+4YIiEPGW3zB7DyllE6FjmJkYiOzfvAKNu4E=
-X-Google-Smtp-Source: APXvYqw/ISiDD6D5kuhcnQ/0Plebg6INZyySa7f4YuZn/RjHLcjZiVMXwtcl1S/gTAMKlfBMJm1F7ALWVTsZGV4f2NQ=
-X-Received: by 2002:aca:2109:: with SMTP id 9mr6686414oiz.119.1576250794841;
- Fri, 13 Dec 2019 07:26:34 -0800 (PST)
+        Fri, 13 Dec 2019 10:39:22 -0500
+Received: from mail-yw1-f68.google.com ([209.85.161.68]:36378 "EHLO
+        mail-yw1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727904AbfLMPjV (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 13 Dec 2019 10:39:21 -0500
+Received: by mail-yw1-f68.google.com with SMTP id n184so6054ywc.3;
+        Fri, 13 Dec 2019 07:39:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=66dDxa4JQshR1dxJN1HCdA7FRTIVML1Rl2L0x4gBwBs=;
+        b=IpwWQTBzg9+efmz6zpdHlpW7WO6Qb2rzpNyjAvojL6elJWNgpVqmZyQ+VOA2jRdCEh
+         jGyplAdiIPO/JftjYxUO7sovgTvepNOw0lWV1MT9dznUOuusPMO+j+Z13oroUaaD5bil
+         1piYhqNdzEdfXdqhnE+7U5kCEFqfJ8zhu7wceeOYtYpgS0QKCQ+RML/u0oe6npp2nIWC
+         Cc9nOT5KsyorY2X5unKnHKTIQ8r9XxZZz4ec1HolS6nH5SjuT5MeeuFP3YXKRzxK52KC
+         2LdZ8O6EEN/aQaZn8ExiHvWWt6aJrAMgVOeJJTI1AxGZbbtQSCpn6u9Ib/Kn3pQul97X
+         ebAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=66dDxa4JQshR1dxJN1HCdA7FRTIVML1Rl2L0x4gBwBs=;
+        b=paGbHfPminizg1T70Pj3QKYWFmDEp+RQKlsesNVFmI0ad/wLdWJoqyw3ePIWcG8mq+
+         T8vwmv2qTpe57wTHAJ0Sgtlb6+kuNP/7MvthGaWk5HuQwAaJ+kbNTW/J+7DBh5LDn/w4
+         RweWhsi1/HhI7pZFiM+m+7rErHnr9UO7q5wSO8GGRQZy9G5my9yx0H4epRqvrw0/OxJz
+         E4h3lkCHlAMgLgmBwCrHSO+ax2GGU8RDfqwIof7KS+XUcOcV48txEUieTlayZbIWih4K
+         IzZNeLmcHqea3wZVEwN5ELIGdSxgQDrmOK2hWWpAiMmTv5eDnCcPrNM+EJIDp9kvF0aZ
+         Xd+Q==
+X-Gm-Message-State: APjAAAXc0cPpi8bqXwwoMbGK57GYdN/EQWAC0gejCnbz4v1W0LvvpW9F
+        SkzM6ng/EkhNeSZxT7om7A8=
+X-Google-Smtp-Source: APXvYqzO7cb72G93h6pc42x43nIgubOr0x06bTe3Kej8fCH2doIKLJGdJ8weE8MbHkaf+/uMF//KeA==
+X-Received: by 2002:a25:b007:: with SMTP id q7mr7626962ybf.193.1576251560130;
+        Fri, 13 Dec 2019 07:39:20 -0800 (PST)
+Received: from localhost.localdomain (c-73-37-219-234.hsd1.mn.comcast.net. [73.37.219.234])
+        by smtp.gmail.com with ESMTPSA id i17sm4300474ywg.66.2019.12.13.07.39.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 Dec 2019 07:39:19 -0800 (PST)
+From:   Adam Ford <aford173@gmail.com>
+To:     linux-arm-kernel@lists.infradead.org
+Cc:     horia.geanta@nxp.com, Adam Ford <aford173@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Shawn Guo <shawnguo@kernel.org>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Fabio Estevam <festevam@gmail.com>,
+        NXP Linux Team <linux-imx@nxp.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH V2 1/3] crypto: caam: Add support for i.MX8M Mini
+Date:   Fri, 13 Dec 2019 09:39:08 -0600
+Message-Id: <20191213153910.11235-1-aford173@gmail.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-References: <20191212173258.13358-1-Jason@zx2c4.com> <20191212173258.13358-2-Jason@zx2c4.com>
- <20191213030333.GA1109@sol.localdomain>
-In-Reply-To: <20191213030333.GA1109@sol.localdomain>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Fri, 13 Dec 2019 16:26:23 +0100
-X-Gmail-Original-Message-ID: <CAHmME9py920OxZ6LfZ6YdRswDbvhngYbwhwf2TPYFPhA7gw1PA@mail.gmail.com>
-Message-ID: <CAHmME9py920OxZ6LfZ6YdRswDbvhngYbwhwf2TPYFPhA7gw1PA@mail.gmail.com>
-Subject: Re: [PATCH crypto-next v3 1/3] crypto: poly1305 - add new 32 and
- 64-bit generic versions
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Dec 13, 2019 at 4:03 AM Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Thu, Dec 12, 2019 at 06:32:56PM +0100, Jason A. Donenfeld wrote:
-> > diff --git a/include/crypto/internal/poly1305.h b/include/crypto/intern=
-al/poly1305.h
-> > index 479b0cab2a1a..ad97819711eb 100644
-> > --- a/include/crypto/internal/poly1305.h
-> > +++ b/include/crypto/internal/poly1305.h
-> > @@ -11,11 +11,12 @@
-> >  #include <crypto/poly1305.h>
-> >
-> >  /*
-> > - * Poly1305 core functions.  These implement the =CE=B5-almost-=E2=88=
-=86-universal hash
-> > + * Poly1305 core functions.  These can implement the =CE=B5-almost-=E2=
-=88=86-universal hash
-> >   * function underlying the Poly1305 MAC, i.e. they don't add an encryp=
-ted nonce
-> > - * ("s key") at the end.  They also only support block-aligned inputs.
-> > + * ("s key") at the end, by passing NULL to nonce.  They also only sup=
-port
-> > + * block-aligned inputs.
-> >   */
->
-> This comment is now ambiguous because the "i.e." clause wasn't updated to=
- match
-> the change "implement" =3D> "can implement".
->
-> This comment also wasn't updated when the 'hibit' argument was added earl=
-ier
-> anyway.  So how about just rewriting it like:
->
-> /*
->  * Poly1305 core functions.  These only accept whole blocks; the caller m=
-ust
->  * handle any needed block buffering and padding.  'hibit' must be 1 for =
-any
->  * full blocks, or 0 for the final block if it had to be padded.  If 'non=
-ce' is
->  * non-NULL, then it's added at the end to compute the Poly1305 MAC.  Oth=
-erwise,
->  * only the =CE=B5-almost-=E2=88=86-universal hash function (not the full=
- MAC) is computed.
->  */
->
+The i.MX8M Mini uses the same crypto engine as the i.MX8MQ, but
+the driver is restricting the check to just the i.MX8MQ.
 
-Sounds good.
+This patch expands the check for either i.MX8MQ or i.MX8MM.
 
-> > diff --git a/include/crypto/nhpoly1305.h b/include/crypto/nhpoly1305.h
-> > index 53c04423c582..a2f4e37b5107 100644
-> > --- a/include/crypto/nhpoly1305.h
-> > +++ b/include/crypto/nhpoly1305.h
-> > @@ -33,7 +33,7 @@
-> >  #define NHPOLY1305_KEY_SIZE  (POLY1305_BLOCK_SIZE + NH_KEY_BYTES)
-> >
-> >  struct nhpoly1305_key {
-> > -     struct poly1305_key poly_key;
-> > +     struct poly1305_key poly_key[2];
-> >       u32 nh_key[NH_KEY_WORDS];
-> >  };
->
-> I still feel that this makes the code worse.  Before, poly1305_key was an=
- opaque
-> type that represented a Poly1305 key.  After, users would need to know th=
-at an
-> array of 2 "keys" is needed, despite there actually being only one key.
->
-> Given that this even caused an actual bug in v1 of this series, how about=
- going
-> with a less error-prone approach?
->
-> > +void poly1305_core_blocks(struct poly1305_state *state,
-> > +                       const struct poly1305_key *key, const void *src=
-,
-> > +                       unsigned int nblocks, u32 hibit)
-> > +{
-> > +     const u8 *input =3D src;
-> > +     u32 r0, r1, r2, r3, r4;
-> > +     u32 s1, s2, s3, s4;
-> > +     u32 h0, h1, h2, h3, h4;
-> > +     u64 d0, d1, d2, d3, d4;
-> > +     u32 c;
-> > +
-> > +     if (!nblocks)
-> > +             return;
-> > +
-> > +     hibit <<=3D 24;
-> > +
-> > +     r0 =3D key[0].r[0];
-> > +     r1 =3D key[0].r[1];
-> > +     r2 =3D key[0].r[2];
-> > +     r3 =3D key[0].r[3];
-> > +     r4 =3D key[0].r[4];
-> > +
-> > +     s1 =3D key[1].r[0];
-> > +     s2 =3D key[1].r[1];
-> > +     s3 =3D key[1].r[2];
-> > +     s4 =3D key[1].r[3];
->
-> And some of the function prototypes, like this one, still give no indicat=
-ion
-> that 2 "keys" are needed...
+Signed-off-by: Adam Ford <aford173@gmail.com>
 
-I'll try to fix it up a bit using the type system.
+---
+V2:  Expand the check that forces the setting on imx8mq to also be true for imx8mm
+     Explictly state imx8mm compatiblity instead of making it generic to all imx8m*
+      this is mostly due to lack of other hardware to test
+
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index d7c3c3805693..c01dda692ecc 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -102,7 +102,8 @@ static inline int run_descriptor_deco0(struct device *ctrldev, u32 *desc,
+ 	     * Apparently on i.MX8MQ it doesn't matter if virt_en == 1
+ 	     * and the following steps should be performed regardless
+ 	     */
+-	    of_machine_is_compatible("fsl,imx8mq")) {
++	    of_machine_is_compatible("fsl,imx8mq") ||
++	    of_machine_is_compatible("fsl,imx8mm")) {
+ 		clrsetbits_32(&ctrl->deco_rsr, 0, DECORSR_JR0);
+ 
+ 		while (!(rd_reg32(&ctrl->deco_rsr) & DECORSR_VALID) &&
+@@ -509,6 +510,7 @@ static const struct soc_device_attribute caam_imx_soc_table[] = {
+ 	{ .soc_id = "i.MX6*",  .data = &caam_imx6_data },
+ 	{ .soc_id = "i.MX7*",  .data = &caam_imx7_data },
+ 	{ .soc_id = "i.MX8MQ", .data = &caam_imx7_data },
++	{ .soc_id = "i.MX8MM", .data = &caam_imx7_data },
+ 	{ .family = "Freescale i.MX" },
+ 	{ /* sentinel */ }
+ };
+-- 
+2.20.1
+
