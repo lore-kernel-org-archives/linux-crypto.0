@@ -6,56 +6,55 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83D9EC43603
-	for <linux-crypto@archiver.kernel.org>; Sun, 15 Dec 2019 13:02:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2123C43603
+	for <linux-crypto@archiver.kernel.org>; Sun, 15 Dec 2019 13:03:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6065F20726
-	for <linux-crypto@archiver.kernel.org>; Sun, 15 Dec 2019 13:02:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BD866206D7
+	for <linux-crypto@archiver.kernel.org>; Sun, 15 Dec 2019 13:03:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726373AbfLONCv (ORCPT
+        id S1726380AbfLONDW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 15 Dec 2019 08:02:51 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:2848 "EHLO
-        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726103AbfLONCv (ORCPT
+        Sun, 15 Dec 2019 08:03:22 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40752 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726103AbfLONDW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 15 Dec 2019 08:02:51 -0500
-Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBFCuisT146764;
-        Sun, 15 Dec 2019 08:02:28 -0500
+        Sun, 15 Dec 2019 08:03:22 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBFCutcS064010;
+        Sun, 15 Dec 2019 08:03:04 -0500
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2wvue5v1mt-1
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2wwdt8k63w-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 15 Dec 2019 08:02:27 -0500
-Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xBFCujPx146817;
-        Sun, 15 Dec 2019 08:02:27 -0500
-Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2wvue5v1me-1
+        Sun, 15 Dec 2019 08:03:04 -0500
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xBFCxWj1067656;
+        Sun, 15 Dec 2019 08:03:04 -0500
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2wwdt8k63k-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 15 Dec 2019 08:02:27 -0500
-Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
-        by ppma02wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xBFD24vp013160;
-        Sun, 15 Dec 2019 13:02:26 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
-        by ppma02wdc.us.ibm.com with ESMTP id 2wvqc5ucvg-1
+        Sun, 15 Dec 2019 08:03:04 -0500
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+        by ppma01dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xBFD0q0i030900;
+        Sun, 15 Dec 2019 13:03:03 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+        by ppma01dal.us.ibm.com with ESMTP id 2wvqc5x8qm-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 15 Dec 2019 13:02:26 +0000
-Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBFD2PqG22413572
+        Sun, 15 Dec 2019 13:03:03 +0000
+Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
+        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBFD313D50528542
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sun, 15 Dec 2019 13:02:25 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5EE047805C;
-        Sun, 15 Dec 2019 13:02:25 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id DB45A7805E;
-        Sun, 15 Dec 2019 13:02:24 +0000 (GMT)
+        Sun, 15 Dec 2019 13:03:01 GMT
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id C95B113604F;
+        Sun, 15 Dec 2019 13:03:01 +0000 (GMT)
+Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 49159136053;
+        Sun, 15 Dec 2019 13:03:01 +0000 (GMT)
 Received: from [9.70.82.143] (unknown [9.70.82.143])
-        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Sun, 15 Dec 2019 13:02:24 +0000 (GMT)
-Subject: [PATCH 02/10] powerpc/vas: Initialize window attributes for GZIP
- compression
+        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Sun, 15 Dec 2019 13:03:01 +0000 (GMT)
+Subject: [PATCH 03/10] powerpc/vas: Define VAS_TX_WIN_OPEN ioctl API
 From:   Haren Myneni <haren@linux.ibm.com>
 To:     herbert@gondor.apana.org.au
 Cc:     mpe@ellerman.id.au, linux-crypto@vger.kernel.org,
@@ -64,18 +63,18 @@ Cc:     mpe@ellerman.id.au, linux-crypto@vger.kernel.org,
 In-Reply-To: <1576414240.16318.4066.camel@hbabu-laptop>
 References: <1576414240.16318.4066.camel@hbabu-laptop>
 Content-Type: text/plain; charset="UTF-8"
-Date:   Sun, 15 Dec 2019 05:00:35 -0800
-Message-ID: <1576414835.16318.4078.camel@hbabu-laptop>
+Date:   Sun, 15 Dec 2019 05:01:12 -0800
+Message-ID: <1576414872.16318.4081.camel@hbabu-laptop>
 Mime-Version: 1.0
 X-Mailer: Evolution 2.28.3 
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
  definitions=2019-12-15_03:2019-12-13,2019-12-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=1 phishscore=0
- mlxlogscore=999 spamscore=0 priorityscore=1501 adultscore=0 mlxscore=0
- lowpriorityscore=0 clxscore=1015 bulkscore=0 malwarescore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ adultscore=0 malwarescore=0 priorityscore=1501 mlxscore=0 mlxlogscore=598
+ phishscore=0 spamscore=0 clxscore=1015 suspectscore=1 impostorscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-1910280000 definitions=main-1912150124
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
@@ -83,56 +82,58 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 
-Initialize send and receive window attributes for GZIP high and
-normal priority types.
+Define the VAS_TX_WIN_OPEN ioctl interface for NX GZIP access
+from user space. This interface is used to open GZIP send window and
+mmap region which can be used by userspace to send requests to NX
+directly with copy/paste instructions.
 
 Signed-off-by: Haren Myneni <haren@us.ibm.com>
 ---
- arch/powerpc/platforms/powernv/vas-window.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ Documentation/ioctl/ioctl-number.rst    |  1 +
+ arch/powerpc/include/uapi/asm/vas-api.h | 22 ++++++++++++++++++++++
+ 2 files changed, 23 insertions(+)
+ create mode 100644 arch/powerpc/include/uapi/asm/vas-api.h
 
-diff --git a/arch/powerpc/platforms/powernv/vas-window.c b/arch/powerpc/platforms/powernv/vas-window.c
-index b51eac5..cc0f530 100644
---- a/arch/powerpc/platforms/powernv/vas-window.c
-+++ b/arch/powerpc/platforms/powernv/vas-window.c
-@@ -827,7 +827,8 @@ void vas_init_rx_win_attr(struct vas_rx_win_attr *rxattr, enum vas_cop_type cop)
- {
- 	memset(rxattr, 0, sizeof(*rxattr));
- 
--	if (cop == VAS_COP_TYPE_842 || cop == VAS_COP_TYPE_842_HIPRI) {
-+	if (cop == VAS_COP_TYPE_842 || cop == VAS_COP_TYPE_842_HIPRI ||
-+		cop == VAS_COP_TYPE_GZIP || cop == VAS_COP_TYPE_GZIP_HIPRI) {
- 		rxattr->pin_win = true;
- 		rxattr->nx_win = true;
- 		rxattr->fault_win = false;
-@@ -903,7 +904,8 @@ void vas_init_tx_win_attr(struct vas_tx_win_attr *txattr, enum vas_cop_type cop)
- {
- 	memset(txattr, 0, sizeof(*txattr));
- 
--	if (cop == VAS_COP_TYPE_842 || cop == VAS_COP_TYPE_842_HIPRI) {
-+	if (cop == VAS_COP_TYPE_842 || cop == VAS_COP_TYPE_842_HIPRI ||
-+		cop == VAS_COP_TYPE_GZIP || cop == VAS_COP_TYPE_GZIP_HIPRI) {
- 		txattr->rej_no_credit = false;
- 		txattr->rx_wcred_mode = true;
- 		txattr->tx_wcred_mode = true;
-@@ -987,9 +989,14 @@ static bool tx_win_args_valid(enum vas_cop_type cop,
- 	if (attr->wcreds_max > VAS_TX_WCREDS_MAX)
- 		return false;
- 
--	if (attr->user_win &&
--			(cop != VAS_COP_TYPE_FTW || attr->rsvd_txbuf_count))
--		return false;
-+	if (attr->user_win) {
-+		if (attr->rsvd_txbuf_count)
-+			return false;
+diff --git a/Documentation/ioctl/ioctl-number.rst b/Documentation/ioctl/ioctl-number.rst
+index bef79cd..dcfc3fa 100644
+--- a/Documentation/ioctl/ioctl-number.rst
++++ b/Documentation/ioctl/ioctl-number.rst
+@@ -287,6 +287,7 @@ Code  Seq#    Include File                                           Comments
+ 'v'   00-1F  linux/fs.h                                              conflict!
+ 'v'   00-0F  linux/sonypi.h                                          conflict!
+ 'v'   00-0F  media/v4l2-subdev.h                                     conflict!
++'v'   20-27  arch/powerpc/include/uapi/asm/vas-api.h		     VAS API
+ 'v'   C0-FF  linux/meye.h                                            conflict!
+ 'w'   all                                                            CERN SCI driver
+ 'y'   00-1F                                                          packet based user level communications
+diff --git a/arch/powerpc/include/uapi/asm/vas-api.h b/arch/powerpc/include/uapi/asm/vas-api.h
+new file mode 100644
+index 0000000..fe95d67
+--- /dev/null
++++ b/arch/powerpc/include/uapi/asm/vas-api.h
+@@ -0,0 +1,22 @@
++/* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
++/*
++ * Copyright 2019 IBM Corp.
++ */
 +
-+		if (cop != VAS_COP_TYPE_FTW && cop != VAS_COP_TYPE_GZIP &&
-+			cop != VAS_COP_TYPE_GZIP_HIPRI)
-+			return false;
-+	}
- 
- 	return true;
- }
++#ifndef _UAPI_MISC_VAS_H
++#define _UAPI_MISC_VAS_H
++
++#include <asm/ioctl.h>
++
++#define VAS_MAGIC	'v'
++#define VAS_TX_WIN_OPEN	_IOW(VAS_MAGIC, 0x20, struct vas_tx_win_open_attr)
++
++struct vas_tx_win_open_attr {
++	__u32	version;
++	__s16	vas_id;	/* specific instance of vas or -1 for default */
++	__u16	reserved1;
++	__u64	flags;	/* Future use */
++	__u64	reserved2[6];
++};
++
++#endif /* _UAPI_MISC_VAS_H */
 -- 
 1.8.3.1
 
