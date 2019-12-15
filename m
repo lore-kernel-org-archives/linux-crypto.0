@@ -1,73 +1,116 @@
-Return-Path: <SRS0=D8v3=2E=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=cN8K=2F=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4520C43603
-	for <linux-crypto@archiver.kernel.org>; Sat, 14 Dec 2019 22:05:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A075DC43603
+	for <linux-crypto@archiver.kernel.org>; Sun, 15 Dec 2019 01:11:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 85D0B2073D
-	for <linux-crypto@archiver.kernel.org>; Sat, 14 Dec 2019 22:05:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1576361136;
-	bh=I2VWsQ7ikxV/ncRAKaZFTsgS5lVdp1KBdow1jMBx9bU=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
-	b=vcdeyuBuiJgm5XO7tchmrzLxUI4wpsUv7X4VlELp8jIxabhqeWBRZ1ytLlNUnY3Wx
-	 fGFwd7Xu7B3ELfesJ9I2ocwJC00ksWSxzyDDotIwJMrkToSJddUrYJopiyskU4Xzx4
-	 y9E5esTDc7bNDRhDMhLPSwDbjfL7rfypLLFpgO1c=
+	by mail.kernel.org (Postfix) with ESMTP id 7E34A207FD
+	for <linux-crypto@archiver.kernel.org>; Sun, 15 Dec 2019 01:11:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727414AbfLNWFP (ORCPT
+        id S1727148AbfLOBLI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 14 Dec 2019 17:05:15 -0500
-Received: from mail.kernel.org ([198.145.29.99]:44902 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726783AbfLNWFO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 14 Dec 2019 17:05:14 -0500
-Subject: Re: [GIT PULL] Crypto Fixes for 5.5
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1576361114;
-        bh=I2VWsQ7ikxV/ncRAKaZFTsgS5lVdp1KBdow1jMBx9bU=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=FbSZdmMYsZNc+xQpGM1DvtwBJVLiJ46bhuHxB2RYDglaa2o9WmIwkmMVtqRlScxOK
-         vy227D4a0+FiM1GWgjylmiHWuwMi8emch3gZAKpi86+rezwRmWrVNkXswDT/cOSJ/l
-         UstsHc4Fm0JEGYp/04H3baqQP98NTWg6bRTxZEFc=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20191214084749.jt5ekav5o5pd2dcp@gondor.apana.org.au>
-References: <20190916084901.GA20338@gondor.apana.org.au>
- <20190923050515.GA6980@gondor.apana.org.au>
- <20191202062017.ge4rz72ki3vczhgb@gondor.apana.org.au>
- <20191214084749.jt5ekav5o5pd2dcp@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20191214084749.jt5ekav5o5pd2dcp@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-X-PR-Tracked-Commit-Id: 84faa307249b341f6ad8de3e1869d77a65e26669
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: f791ede32a14151a313783e1105049a137bc13c8
-Message-Id: <157636111437.10255.7018789282938420709.pr-tracker-bot@kernel.org>
-Date:   Sat, 14 Dec 2019 22:05:14 +0000
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        Sat, 14 Dec 2019 20:11:08 -0500
+Received: from mail-io1-f70.google.com ([209.85.166.70]:50424 "EHLO
+        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727132AbfLOBLI (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 14 Dec 2019 20:11:08 -0500
+Received: by mail-io1-f70.google.com with SMTP id e13so2910598iob.17
+        for <linux-crypto@vger.kernel.org>; Sat, 14 Dec 2019 17:11:08 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=alNfUoEkuWSRZdtIqrjjboQiyrHVQRKKxp0yHeYHVEQ=;
+        b=Q9q11YfGmRVCGQRbtMRkx2uXaonpysEEm65NPfLX90fZ0sFJLRlhM9WCGsQDh5lIBA
+         RyLOMF09cQlPx5Xvq8lMUvGHs21maegGzqfQDH6YwN9ml5ddIbSAjQd0Uv2E9rOZnkSc
+         F1nrf4Xm/nGyhWPS2FLUO9vc6JVQgFDvQBZluejPXipiZhK946EJVM+cLHtm1bwSFqCI
+         z+zvgks8Xl+oNcxY/nHem8M7jc6ceX+YTvMZkLmJ/suY3gsaSmrNLoVvAvcaZb3l8qZ8
+         o9CajzDxuYdazLbqN0ME+V+vb+EShJWf/rZuBMZs/Gjr6oKSD2gbx7ut9BbabV35F8FY
+         JR5Q==
+X-Gm-Message-State: APjAAAWexUf+C6fR0/JH3nSKKT0X+p0XaSh0CNGaMSGfLr701bkV4ry6
+        9F3y06o8pbrmIL9Y5HrIzl0R83niWtymLOJy0ErvuDBqE5zk
+X-Google-Smtp-Source: APXvYqx689btpc1Zs3b3Q4nyZddXNrIGdxI5GN8tfxAvKmBfnCtUfVPP/uZ+1LfPmh+730t8JtM6pbT4s0a3lLOT2LO4Y0k/tetw
+MIME-Version: 1.0
+X-Received: by 2002:a92:3a9b:: with SMTP id i27mr3385385ilf.39.1576372268022;
+ Sat, 14 Dec 2019 17:11:08 -0800 (PST)
+Date:   Sat, 14 Dec 2019 17:11:08 -0800
+In-Reply-To: <000000000000ca89a80598db0ae5@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000011c6720599b3c5ae@google.com>
+Subject: Re: general protection fault in gcmaes_crypt_by_sg (2)
+From:   syzbot <syzbot+675c45cea768b3819803@syzkaller.appspotmail.com>
+To:     bp@alien8.de, davem@davemloft.net, herbert@gondor.apana.org.au,
+        hpa@zytor.com, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mingo@redhat.com,
+        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pull request you sent on Sat, 14 Dec 2019 16:47:49 +0800:
+syzbot has found a reproducer for the following crash on:
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+HEAD commit:    1d1997db Revert "nfp: abm: fix memory leak in nfp_abm_u32_..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=1051508ee00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=cef1fd5032faee91
+dashboard link: https://syzkaller.appspot.com/bug?extid=675c45cea768b3819803
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10d635a6e00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=114489a9e00000
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/f791ede32a14151a313783e1105049a137bc13c8
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+675c45cea768b3819803@syzkaller.appspotmail.com
 
-Thank you!
+kasan: CONFIG_KASAN_INLINE enabled
+kasan: GPF could be caused by NULL-ptr deref or user memory access
+general protection fault: 0000 [#1] PREEMPT SMP KASAN
+CPU: 1 PID: 183 Comm: kworker/u4:3 Not tainted 5.5.0-rc1-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Workqueue: pencrypt_parallel padata_parallel_worker
+RIP: 0010:scatterwalk_start include/crypto/scatterwalk.h:68 [inline]
+RIP: 0010:scatterwalk_pagedone include/crypto/scatterwalk.h:93 [inline]
+RIP: 0010:scatterwalk_done include/crypto/scatterwalk.h:101 [inline]
+RIP: 0010:gcmaes_crypt_by_sg.constprop.0+0x1035/0x1aa0  
+arch/x86/crypto/aesni-intel_glue.c:786
+Code: e8 90 e8 52 02 48 89 84 24 a8 00 00 00 48 83 c0 08 48 89 c2 48 89 84  
+24 90 00 00 00 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <0f> b6 04 02 84  
+c0 74 08 3c 03 0f 8e 30 09 00 00 48 8b 84 24 a8 00
+RSP: 0018:ffffc900012e7750 EFLAGS: 00010202
+RAX: dffffc0000000000 RBX: 0000000000004000 RCX: ffffffff838cc029
+RDX: 0000000000000001 RSI: ffffffff838cc07b RDI: 0000000000000007
+RBP: ffffc900012e7b20 R08: ffff8880a8c46080 R09: 000000000000000d
+R10: ffff8880a3efe660 R11: 00000000000000d0 R12: 0000000000004000
+R13: 0000000000000000 R14: ffff8880a3efe300 R15: 0000000000004000
+FS:  0000000000000000(0000) GS:ffff8880ae900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fff220a2d90 CR3: 00000000a8d5d000 CR4: 00000000001406e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+  gcmaes_encrypt arch/x86/crypto/aesni-intel_glue.c:840 [inline]
+  generic_gcmaes_encrypt+0x10d/0x160 arch/x86/crypto/aesni-intel_glue.c:1019
+  crypto_aead_encrypt+0xaf/0xf0 crypto/aead.c:94
+  simd_aead_encrypt+0x1a6/0x2b0 crypto/simd.c:335
+  crypto_aead_encrypt+0xaf/0xf0 crypto/aead.c:94
+  pcrypt_aead_enc+0x19/0x80 crypto/pcrypt.c:76
+  padata_parallel_worker+0x28f/0x470 kernel/padata.c:81
+  process_one_work+0x9af/0x1740 kernel/workqueue.c:2264
+  worker_thread+0x98/0xe40 kernel/workqueue.c:2410
+  kthread+0x361/0x430 kernel/kthread.c:255
+  ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
+Modules linked in:
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 183 at kernel/locking/mutex.c:1419  
+mutex_trylock+0x279/0x2f0 kernel/locking/mutex.c:1427
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
