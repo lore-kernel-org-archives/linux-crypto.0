@@ -2,115 +2,248 @@ Return-Path: <SRS0=cN8K=2F=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A075DC43603
-	for <linux-crypto@archiver.kernel.org>; Sun, 15 Dec 2019 01:11:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9875C43603
+	for <linux-crypto@archiver.kernel.org>; Sun, 15 Dec 2019 04:11:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7E34A207FD
-	for <linux-crypto@archiver.kernel.org>; Sun, 15 Dec 2019 01:11:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9AE0D2465E
+	for <linux-crypto@archiver.kernel.org>; Sun, 15 Dec 2019 04:11:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727148AbfLOBLI (ORCPT
+        id S1726019AbfLOELV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 14 Dec 2019 20:11:08 -0500
-Received: from mail-io1-f70.google.com ([209.85.166.70]:50424 "EHLO
-        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727132AbfLOBLI (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 14 Dec 2019 20:11:08 -0500
-Received: by mail-io1-f70.google.com with SMTP id e13so2910598iob.17
-        for <linux-crypto@vger.kernel.org>; Sat, 14 Dec 2019 17:11:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=alNfUoEkuWSRZdtIqrjjboQiyrHVQRKKxp0yHeYHVEQ=;
-        b=Q9q11YfGmRVCGQRbtMRkx2uXaonpysEEm65NPfLX90fZ0sFJLRlhM9WCGsQDh5lIBA
-         RyLOMF09cQlPx5Xvq8lMUvGHs21maegGzqfQDH6YwN9ml5ddIbSAjQd0Uv2E9rOZnkSc
-         F1nrf4Xm/nGyhWPS2FLUO9vc6JVQgFDvQBZluejPXipiZhK946EJVM+cLHtm1bwSFqCI
-         z+zvgks8Xl+oNcxY/nHem8M7jc6ceX+YTvMZkLmJ/suY3gsaSmrNLoVvAvcaZb3l8qZ8
-         o9CajzDxuYdazLbqN0ME+V+vb+EShJWf/rZuBMZs/Gjr6oKSD2gbx7ut9BbabV35F8FY
-         JR5Q==
-X-Gm-Message-State: APjAAAWexUf+C6fR0/JH3nSKKT0X+p0XaSh0CNGaMSGfLr701bkV4ry6
-        9F3y06o8pbrmIL9Y5HrIzl0R83niWtymLOJy0ErvuDBqE5zk
-X-Google-Smtp-Source: APXvYqx689btpc1Zs3b3Q4nyZddXNrIGdxI5GN8tfxAvKmBfnCtUfVPP/uZ+1LfPmh+730t8JtM6pbT4s0a3lLOT2LO4Y0k/tetw
+        Sat, 14 Dec 2019 23:11:21 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:42592 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726005AbfLOELV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 14 Dec 2019 23:11:21 -0500
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1igLFY-0000V5-6W; Sun, 15 Dec 2019 12:11:20 +0800
+Received: from herbert by gondobar with local (Exim 4.89)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1igLFX-0004oQ-Pp; Sun, 15 Dec 2019 12:11:19 +0800
+Date:   Sun, 15 Dec 2019 12:11:19 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [v3 PATCH] crypto: api - Retain alg refcount in crypto_grab_spawn
+Message-ID: <20191215041119.ndcodt4bw4rr52es@gondor.apana.org.au>
+References: <20191206063812.ueudgjfwzri5ekpr@gondor.apana.org.au>
+ <E1id7G9-00051G-5w@gondobar>
+ <20191206224155.GE246840@gmail.com>
+ <20191207033059.h6kgx7j7jtnqotuy@gondor.apana.org.au>
+ <20191207045234.GA5948@sol.localdomain>
+ <20191207145504.gcwc75enxhqfqhxe@gondor.apana.org.au>
+ <20191214064404.qlxgabr3k47473uh@gondor.apana.org.au>
 MIME-Version: 1.0
-X-Received: by 2002:a92:3a9b:: with SMTP id i27mr3385385ilf.39.1576372268022;
- Sat, 14 Dec 2019 17:11:08 -0800 (PST)
-Date:   Sat, 14 Dec 2019 17:11:08 -0800
-In-Reply-To: <000000000000ca89a80598db0ae5@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000011c6720599b3c5ae@google.com>
-Subject: Re: general protection fault in gcmaes_crypt_by_sg (2)
-From:   syzbot <syzbot+675c45cea768b3819803@syzkaller.appspotmail.com>
-To:     bp@alien8.de, davem@davemloft.net, herbert@gondor.apana.org.au,
-        hpa@zytor.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mingo@redhat.com,
-        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191214064404.qlxgabr3k47473uh@gondor.apana.org.au>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-syzbot has found a reproducer for the following crash on:
+On Sat, Dec 14, 2019 at 02:44:04PM +0800, Herbert Xu wrote:
+>
+>  			/*
+> -			 * We may encounter an unregistered instance here, since
+> -			 * an instance's spawns are set up prior to the instance
+> -			 * being registered.  An unregistered instance will have
+> -			 * NULL ->cra_users.next, since ->cra_users isn't
+> -			 * properly initialized until registration.  But an
+> -			 * unregistered instance cannot have any users, so treat
+> -			 * it the same as ->cra_users being empty.
+> +			 * We may encounter an unregistered instance
+> +			 * here, since an instance's spawns are set
+> +			 * up prior to the instance being registered.
+> +			 * An unregistered instance cannot have any
+> +			 * users, so treat it the same as ->cra_users
+> +			 * being empty.
+>  			 */
+> -			if (spawns->next == NULL)
+> +			if (!spawn->registered)
+>  				break;
 
-HEAD commit:    1d1997db Revert "nfp: abm: fix memory leak in nfp_abm_u32_..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1051508ee00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=cef1fd5032faee91
-dashboard link: https://syzkaller.appspot.com/bug?extid=675c45cea768b3819803
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10d635a6e00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=114489a9e00000
+This is not quite right.  spawn->registered only allows us to
+dereference spawn->inst, it doesn't actually mean that inst itself
+is on the cra_list.  Here is a better patch:
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+675c45cea768b3819803@syzkaller.appspotmail.com
+---8<---
+This patch changes crypto_grab_spawn to retain the reference count
+on the algorithm.  This is because the caller needs to access the
+algorithm parameters and without the reference count the algorithm
+can be freed at any time.
 
-kasan: CONFIG_KASAN_INLINE enabled
-kasan: GPF could be caused by NULL-ptr deref or user memory access
-general protection fault: 0000 [#1] PREEMPT SMP KASAN
-CPU: 1 PID: 183 Comm: kworker/u4:3 Not tainted 5.5.0-rc1-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-Workqueue: pencrypt_parallel padata_parallel_worker
-RIP: 0010:scatterwalk_start include/crypto/scatterwalk.h:68 [inline]
-RIP: 0010:scatterwalk_pagedone include/crypto/scatterwalk.h:93 [inline]
-RIP: 0010:scatterwalk_done include/crypto/scatterwalk.h:101 [inline]
-RIP: 0010:gcmaes_crypt_by_sg.constprop.0+0x1035/0x1aa0  
-arch/x86/crypto/aesni-intel_glue.c:786
-Code: e8 90 e8 52 02 48 89 84 24 a8 00 00 00 48 83 c0 08 48 89 c2 48 89 84  
-24 90 00 00 00 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <0f> b6 04 02 84  
-c0 74 08 3c 03 0f 8e 30 09 00 00 48 8b 84 24 a8 00
-RSP: 0018:ffffc900012e7750 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: 0000000000004000 RCX: ffffffff838cc029
-RDX: 0000000000000001 RSI: ffffffff838cc07b RDI: 0000000000000007
-RBP: ffffc900012e7b20 R08: ffff8880a8c46080 R09: 000000000000000d
-R10: ffff8880a3efe660 R11: 00000000000000d0 R12: 0000000000004000
-R13: 0000000000000000 R14: ffff8880a3efe300 R15: 0000000000004000
-FS:  0000000000000000(0000) GS:ffff8880ae900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fff220a2d90 CR3: 00000000a8d5d000 CR4: 00000000001406e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
-  gcmaes_encrypt arch/x86/crypto/aesni-intel_glue.c:840 [inline]
-  generic_gcmaes_encrypt+0x10d/0x160 arch/x86/crypto/aesni-intel_glue.c:1019
-  crypto_aead_encrypt+0xaf/0xf0 crypto/aead.c:94
-  simd_aead_encrypt+0x1a6/0x2b0 crypto/simd.c:335
-  crypto_aead_encrypt+0xaf/0xf0 crypto/aead.c:94
-  pcrypt_aead_enc+0x19/0x80 crypto/pcrypt.c:76
-  padata_parallel_worker+0x28f/0x470 kernel/padata.c:81
-  process_one_work+0x9af/0x1740 kernel/workqueue.c:2264
-  worker_thread+0x98/0xe40 kernel/workqueue.c:2410
-  kthread+0x361/0x430 kernel/kthread.c:255
-  ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
-Modules linked in:
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 183 at kernel/locking/mutex.c:1419  
-mutex_trylock+0x279/0x2f0 kernel/locking/mutex.c:1427
+The reference count will be subsequently dropped by the crypto API
+once the instance has been registered.  The helper crypto_drop_spawn
+will also conditionally drop the reference count depending on whether
+it has been registered.
 
+Note that the code is actually added to crypto_init_spawn.  However,
+unless the caller activates this by setting spawn->dropref beforehand
+then nothing happens.  The only caller that sets dropref is currently
+crypto_grab_spawn.
+
+Once all legacy users of crypto_init_spawn disappear, then we can
+kill the dropref flag.
+
+Internally each instance will maintain a list of its spawns prior
+to registration.  This memory used by this list is shared with
+other fields that are only used after registration.  In order for
+this to work a new flag spawn->registered is added to indicate
+whether spawn->inst can be used.
+
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index cd643e294664..a2a5372efe1d 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -124,8 +124,6 @@ static void crypto_remove_instance(struct crypto_instance *inst,
+ 		return;
+ 
+ 	inst->alg.cra_flags |= CRYPTO_ALG_DEAD;
+-	if (hlist_unhashed(&inst->list))
+-		return;
+ 
+ 	if (!tmpl || !crypto_tmpl_get(tmpl))
+ 		return;
+@@ -179,10 +177,14 @@ void crypto_remove_spawns(struct crypto_alg *alg, struct list_head *list,
+ 
+ 			list_move(&spawn->list, &stack);
+ 
+-			if (&inst->alg == nalg)
++			if (spawn->registered && &inst->alg == nalg)
+ 				break;
+ 
+ 			spawn->dead = true;
++
++			if (!spawn->registered)
++				break;
++
+ 			spawns = &inst->alg.cra_users;
+ 
+ 			/*
+@@ -208,7 +210,7 @@ void crypto_remove_spawns(struct crypto_alg *alg, struct list_head *list,
+ 	list_for_each_entry_safe(spawn, n, &secondary_spawns, list) {
+ 		if (!spawn->dead)
+ 			list_move(&spawn->list, &spawn->alg->cra_users);
+-		else
++		else if (spawn->registered)
+ 			crypto_remove_instance(spawn->inst, list);
+ 	}
+ }
+@@ -588,6 +590,7 @@ int crypto_register_instance(struct crypto_template *tmpl,
+ 			     struct crypto_instance *inst)
+ {
+ 	struct crypto_larval *larval;
++	struct crypto_spawn *spawn;
+ 	int err;
+ 
+ 	err = crypto_check_alg(&inst->alg);
+@@ -599,6 +602,23 @@ int crypto_register_instance(struct crypto_template *tmpl,
+ 
+ 	down_write(&crypto_alg_sem);
+ 
++	larval = ERR_PTR(-EAGAIN);
++	for (spawn = inst->spawns; spawn;) {
++		struct crypto_spawn *next;
++
++		if (spawn->dead)
++			goto unlock;
++
++		next = spawn->next;
++		spawn->inst = inst;
++		spawn->registered = true;
++
++		if (spawn->dropref)
++			crypto_mod_put(spawn->alg);
++
++		spawn = next;
++	}
++
+ 	larval = __crypto_register_alg(&inst->alg);
+ 	if (IS_ERR(larval))
+ 		goto unlock;
+@@ -646,7 +666,9 @@ int crypto_init_spawn(struct crypto_spawn *spawn, struct crypto_alg *alg,
+ 	if (WARN_ON_ONCE(inst == NULL))
+ 		return -EINVAL;
+ 
+-	spawn->inst = inst;
++	spawn->next = inst->spawns;
++	inst->spawns = spawn;
++
+ 	spawn->mask = mask;
+ 
+ 	down_write(&crypto_alg_sem);
+@@ -688,8 +710,10 @@ int crypto_grab_spawn(struct crypto_spawn *spawn, const char *name,
+ 	if (IS_ERR(alg))
+ 		return PTR_ERR(alg);
+ 
++	spawn->dropref = true;
+ 	err = crypto_init_spawn(spawn, alg, spawn->inst, mask);
+-	crypto_mod_put(alg);
++	if (err)
++		crypto_mod_put(alg);
+ 	return err;
+ }
+ EXPORT_SYMBOL_GPL(crypto_grab_spawn);
+@@ -700,6 +724,11 @@ void crypto_drop_spawn(struct crypto_spawn *spawn)
+ 	if (!spawn->dead)
+ 		list_del(&spawn->list);
+ 	up_write(&crypto_alg_sem);
++
++	if (!spawn->dropref || spawn->registered)
++		return;
++
++	crypto_mod_put(spawn->alg);
+ }
+ EXPORT_SYMBOL_GPL(crypto_drop_spawn);
+ 
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index 771a295ac755..29202b8f12fa 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -47,7 +47,13 @@ struct crypto_instance {
+ 	struct crypto_alg alg;
+ 
+ 	struct crypto_template *tmpl;
+-	struct hlist_node list;
++
++	union {
++		/* List of instances after registration. */
++		struct hlist_node list;
++		/* List of attached spawns before registration. */
++		struct crypto_spawn *spawns;
++	};
+ 
+ 	void *__ctx[] CRYPTO_MINALIGN_ATTR;
+ };
+@@ -67,10 +73,17 @@ struct crypto_template {
+ struct crypto_spawn {
+ 	struct list_head list;
+ 	struct crypto_alg *alg;
+-	struct crypto_instance *inst;
++	union {
++		/* Back pointer to instance after registration.*/
++		struct crypto_instance *inst;
++		/* Spawn list pointer prior to registration. */
++		struct crypto_spawn *next;
++	};
+ 	const struct crypto_type *frontend;
+ 	u32 mask;
+ 	bool dead;
++	bool dropref;
++	bool registered;
+ };
+ 
+ struct crypto_queue {
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
