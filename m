@@ -2,66 +2,121 @@ Return-Path: <SRS0=akto=2H=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 657E3C43603
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Dec 2019 09:44:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E40EFC2D0CD
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Dec 2019 09:54:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 373A420716
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Dec 2019 09:44:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BADDD2082E
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Dec 2019 09:54:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="ZOws7pGj"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726164AbfLQJoK (ORCPT
+        id S1727121AbfLQJyb (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Dec 2019 04:44:10 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:42584 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725870AbfLQJoK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Dec 2019 04:44:10 -0500
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1ih9Oj-0005f7-9C; Tue, 17 Dec 2019 17:44:09 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1ih9Od-0007In-7f; Tue, 17 Dec 2019 17:44:03 +0800
-Date:   Tue, 17 Dec 2019 17:44:03 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     "Thomas, Rijo-john" <Rijo-john.Thomas@amd.com>
-Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Nimesh Easow <Nimesh.Easow@amd.com>,
-        Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [RFC PATCH v3 0/6] Add TEE interface support to AMD Secure
- Processor driver
-Message-ID: <20191217094403.xxefstm5gdamwdvp@gondor.apana.org.au>
-References: <cover.1575438845.git.Rijo-john.Thomas@amd.com>
- <26cb9589-8774-897b-4d1e-919e7ad2200f@amd.com>
+        Tue, 17 Dec 2019 04:54:31 -0500
+Received: from mail-eopbgr20068.outbound.protection.outlook.com ([40.107.2.68]:57334
+        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726700AbfLQJya (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 17 Dec 2019 04:54:30 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jxRN88eKkGqsiYbADeQ9pf3cLNRMqt8x7hSQXzgv383UHyfrG/qT8Jjgxo1oOSPkfCURf6v9MHm87VtvblePtN5fYE5HjluPo+mlySH5ioF+ANQzkZEmMxIup2VpjJW0akzpCi+UMoAQuZc/4VruA/nsbHJxD5dJvKFAfShanPMZn7dOAKhEe8z98u+x3KRfNX6Kt6/7fES7vRnbMoPVOe7+3LNJSsR8SzxsZjdlWGBKrpFf8nBlpg0RZ8fVhxTzxvrimBSeLZQJdo7/XZB6ILKY3u39q1vi3BTsGy5f9RVPNH9wfIq8Pzb/QeXLjvUCffQUAgJehEp10lIkGdG11g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=T7tP4hbAl9bMy8r8GyhO+M72eEuQxmoQZBTo0iNRT40=;
+ b=PNH7f1/aABKbJzMvyo6Vc3ivNTjMQcKS7m8ex6Mcp0jcTqkfeeSmCPL17hBSfflcXBPYkIymTlf0GTpbYfEK+0fUg7NohCaYx/1EPcd37AdNq1X1kWpWoecEOnDz2qHuSsv8RrLhQH7dYIFO+4/uyY7xBMNgkAOsXqg70kajNnyZCZwBCulb1YNFth0McNvyDy//uuNyeDnYToigF3EhZNMJLfU+nxvlZQtXKPDmdRu1/Dd1IzZMRqXemWmLLBNkagkcoMwkaddUg8coMgsOt/Wgrn83VRTOZfWNv6bMLqxQ2S/yBhHv89D84uOHqB5Nazw7I/HZyTiKXk+B3QMMBg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=T7tP4hbAl9bMy8r8GyhO+M72eEuQxmoQZBTo0iNRT40=;
+ b=ZOws7pGjNVTyZYx0ejIfAu9gyMQG4a1Hx6LWQoP1qAgaAAOtgzIbjxsPZY08/27oPFbIOw8+EypXI3seWIHtdvrUsr2FJrxg5qeaAVXaliHbv04I8EvuQPEe0QMpbPRUV4bNznLXi/2BiTFRriFF6lMfvPWjPhzJbqn8Sdemg1w=
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
+ VI1PR0402MB3888.eurprd04.prod.outlook.com (52.134.16.151) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2538.16; Tue, 17 Dec 2019 09:54:27 +0000
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::64c8:fba:99e8:5ec4]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::64c8:fba:99e8:5ec4%6]) with mapi id 15.20.2538.019; Tue, 17 Dec 2019
+ 09:54:27 +0000
+From:   Horia Geanta <horia.geanta@nxp.com>
+To:     Adam Ford <aford173@gmail.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>
+CC:     Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Shawn Guo <shawnguo@kernel.org>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Fabio Estevam <festevam@gmail.com>,
+        dl-linux-imx <linux-imx@nxp.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH V2 2/3] arm64: dts: imx8mm: Add Crypto CAAM support
+Thread-Topic: [PATCH V2 2/3] arm64: dts: imx8mm: Add Crypto CAAM support
+Thread-Index: AQHVsct/+SP2Ww+o5k+GDgxV/pyqQQ==
+Date:   Tue, 17 Dec 2019 09:54:27 +0000
+Message-ID: <VI1PR0402MB34858B13E8CA7570A70D87AB98500@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+References: <20191213153910.11235-1-aford173@gmail.com>
+ <20191213153910.11235-2-aford173@gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=horia.geanta@nxp.com; 
+x-originating-ip: [94.69.234.123]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 27d5f69c-f660-4647-a301-08d782d71a9f
+x-ms-traffictypediagnostic: VI1PR0402MB3888:|VI1PR0402MB3888:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <VI1PR0402MB3888284A871D9E0F91EC7F9598500@VI1PR0402MB3888.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7219;
+x-forefront-prvs: 02543CD7CD
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(396003)(346002)(376002)(366004)(39860400002)(189003)(199004)(110136005)(54906003)(71200400001)(558084003)(76116006)(6506007)(316002)(2906002)(81166006)(81156014)(9686003)(7696005)(64756008)(66446008)(66476007)(66946007)(66556008)(52536014)(26005)(7416002)(186003)(44832011)(86362001)(5660300002)(91956017)(4326008)(33656002)(55016002)(8936002)(478600001)(53546011)(8676002)(32563001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3888;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: +c23WI0QZD/2PyYxYGb4zA6JZy7BJ5cUqJ3wiF4ZAWZtgGiHJpqk902V4sZrzq03Dbdw7AlwLsiaBDd5sPuRtFKm6CDwEY0ORTYBZ0GMB23GY2+r1Igd4+rr5sb8V3tzUyB5nmqh0+esy8qyhlnIKEKKx6WXSNh9zvtnm8K1EkjjE0B1TphrTPuvBj5nTLIXCWDtYLcFnSD+KWiBzL1HgZbiRq6xV+2ug5AUTT+4WD2jxq8UZtUEAirvH3RP7aR/zMBIggSn9vUERI+v1Udx1bUTOLS1vofNYFlYDcX3WebBntsR7NjtlAuwoNowdWAnMCr6Q1zJ9FTBziwfegOJ0EYRbjLN2vKkQ8CW/xgSv1ZWCHBqiyCWy/FYTWFgEbKC1OvONJ0CIvWASLiB5+w4RldNyZ613Z1sWlpDOw44viHZ5nMoYB7a5Vrw5ZV27r4RoWjlQdVtx5DWHR45WIzNK7ZYL8gHyJj/Z4wOTfnv5Cc=
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <26cb9589-8774-897b-4d1e-919e7ad2200f@amd.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 27d5f69c-f660-4647-a301-08d782d71a9f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Dec 2019 09:54:27.1124
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: bpHhOkvxBpH70r/4OpI+afK29Rk583hQ4Jgr38M+95RIAZP5DGilH4BjWymS+RhJqS3xRZdz2IgBaePaTw68AA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3888
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Thomas:
-
-On Thu, Dec 12, 2019 at 06:03:20PM +0530, Thomas, Rijo-john wrote:
-> 
-> Please let me know if you have any comment for this patch series.
-> Request you to consider these patches for next merge cycle.
-
-They look fine to me.
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+On 12/13/2019 5:39 PM, Adam Ford wrote:=0A=
+> The i.MX8M Mini supports the same crypto engine as what is in=0A=
+> the i.MX8MQ, but it is not currently present in the device tree.=0A=
+> =0A=
+> This patch places in into the device tree.=0A=
+		    ^ it=0A=
+> =0A=
+> Signed-off-by: Adam Ford <aford173@gmail.com>=0A=
+Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
+=0A=
+Thanks,=0A=
+Horia=0A=
