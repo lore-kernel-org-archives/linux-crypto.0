@@ -7,53 +7,56 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E80AC43603
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Dec 2019 07:33:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D0E8C2D0C5
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Dec 2019 07:35:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 057F32146E
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Dec 2019 07:33:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D71EE2067C
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Dec 2019 07:35:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Q4wIdNlR"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="UUA+YQja"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726801AbfLQHdP (ORCPT
+        id S1726387AbfLQHfL (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Dec 2019 02:33:15 -0500
-Received: from lelv0142.ext.ti.com ([198.47.23.249]:53160 "EHLO
-        lelv0142.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725975AbfLQHdP (ORCPT
+        Tue, 17 Dec 2019 02:35:11 -0500
+Received: from fllv0016.ext.ti.com ([198.47.19.142]:51448 "EHLO
+        fllv0016.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725893AbfLQHfL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Dec 2019 02:33:15 -0500
+        Tue, 17 Dec 2019 02:35:11 -0500
 Received: from fllv0035.itg.ti.com ([10.64.41.0])
-        by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id xBH7WqUl004981;
-        Tue, 17 Dec 2019 01:32:52 -0600
+        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id xBH7YsuK075971;
+        Tue, 17 Dec 2019 01:34:54 -0600
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1576567972;
-        bh=eSQ2dhkByo6FgeZrI6vTF+HFoYKLR2l6HPaoPta+Z3I=;
+        s=ti-com-17Q1; t=1576568094;
+        bh=0FwLBx8XfykMdjHah7/EtEeo+R5IsHmwRrAh/bmn7U4=;
         h=From:To:CC:Subject:Date;
-        b=Q4wIdNlR+Ewu19kOFNosgMC1SS0Y3tRYcj6Hu/+9kipLxunNJVii3JMZSSeX8KJIt
-         CouoVv1wMm96V786m6idYYUoeLxv7j+ZlDWiL0ItcYvF9LKlt5ocFjVgzDL9YgsWzY
-         tzRiDAh6tnWbXPRn+tcds7pygefMmdnAk0CBKRI4=
-Received: from DLEE105.ent.ti.com (dlee105.ent.ti.com [157.170.170.35])
-        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTP id xBH7WqwJ128240;
-        Tue, 17 Dec 2019 01:32:52 -0600
-Received: from DLEE110.ent.ti.com (157.170.170.21) by DLEE105.ent.ti.com
- (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
+        b=UUA+YQjalhxvPMh5NdESQCFfzVRQt2XhwqSL3G3PxYYsp3oW28ySWeHVVVoE/lGba
+         3bd/pHENNNi++tbecyc6j1GI45euxvXFSitWivdhI+x8nPRzhte0iRF0btn3SAdeQ1
+         S2rWKAewPtsdaowSrgNsac+nJie8ugQeaU8rUIjI=
+Received: from DFLE105.ent.ti.com (dfle105.ent.ti.com [10.64.6.26])
+        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTP id xBH7YrYM001109;
+        Tue, 17 Dec 2019 01:34:54 -0600
+Received: from DFLE104.ent.ti.com (10.64.6.25) by DFLE105.ent.ti.com
+ (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3; Tue, 17
- Dec 2019 01:32:51 -0600
-Received: from fllv0040.itg.ti.com (10.64.41.20) by DLEE110.ent.ti.com
- (157.170.170.21) with Microsoft SMTP Server (version=TLS1_2,
+ Dec 2019 01:34:53 -0600
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DFLE104.ent.ti.com
+ (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1847.3 via
- Frontend Transport; Tue, 17 Dec 2019 01:32:51 -0600
+ Frontend Transport; Tue, 17 Dec 2019 01:34:53 -0600
 Received: from feketebors.ti.com (ileax41-snat.itg.ti.com [10.172.224.153])
-        by fllv0040.itg.ti.com (8.15.2/8.15.2) with ESMTP id xBH7WnRn081690;
-        Tue, 17 Dec 2019 01:32:50 -0600
+        by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id xBH7YoW6058420;
+        Tue, 17 Dec 2019 01:34:51 -0600
 From:   Peter Ujfalusi <peter.ujfalusi@ti.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <mcoquelin.stm32@gmail.com>, <alexandre.torgue@st.com>
 CC:     <vkoul@kernel.org>, <linux-crypto@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH] crypto: img-hash - Use dma_request_chan instead dma_request_slave_channel
-Date:   Tue, 17 Dec 2019 09:33:05 +0200
-Message-ID: <20191217073305.20492-1-peter.ujfalusi@ti.com>
+        <linux-kernel@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>
+Subject: [PATCH] crypto: stm32/hash - Use dma_request_chan() instead dma_request_slave_channel()
+Date:   Tue, 17 Dec 2019 09:35:06 +0200
+Message-ID: <20191217073506.20861-1-peter.ujfalusi@ti.com>
 X-Mailer: git-send-email 2.24.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -72,27 +75,27 @@ probing against DMA.
 
 Signed-off-by: Peter Ujfalusi <peter.ujfalusi@ti.com>
 ---
- drivers/crypto/img-hash.c | 6 +++---
+ drivers/crypto/stm32/stm32-hash.c | 6 +++---
  1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/img-hash.c b/drivers/crypto/img-hash.c
-index fe4cc8babe1c..25d5227f74a1 100644
---- a/drivers/crypto/img-hash.c
-+++ b/drivers/crypto/img-hash.c
-@@ -332,10 +332,10 @@ static int img_hash_dma_init(struct img_hash_dev *hdev)
- 	struct dma_slave_config dma_conf;
- 	int err = -EINVAL;
+diff --git a/drivers/crypto/stm32/stm32-hash.c b/drivers/crypto/stm32/stm32-hash.c
+index cfc8e0e37bee..167b80eec437 100644
+--- a/drivers/crypto/stm32/stm32-hash.c
++++ b/drivers/crypto/stm32/stm32-hash.c
+@@ -518,10 +518,10 @@ static int stm32_hash_dma_init(struct stm32_hash_dev *hdev)
+ 	dma_conf.dst_maxburst = hdev->dma_maxburst;
+ 	dma_conf.device_fc = false;
  
--	hdev->dma_lch = dma_request_slave_channel(hdev->dev, "tx");
+-	hdev->dma_lch = dma_request_slave_channel(hdev->dev, "in");
 -	if (!hdev->dma_lch) {
-+	hdev->dma_lch = dma_request_chan(hdev->dev, "tx");
++	hdev->dma_lch = dma_request_chan(hdev->dev, "in");
 +	if (IS_ERR(hdev->dma_lch)) {
  		dev_err(hdev->dev, "Couldn't acquire a slave DMA channel.\n");
 -		return -EBUSY;
 +		return PTR_ERR(hdev->dma_lch);
  	}
- 	dma_conf.direction = DMA_MEM_TO_DEV;
- 	dma_conf.dst_addr = hdev->bus_addr;
+ 
+ 	err = dmaengine_slave_config(hdev->dma_lch, &dma_conf);
 -- 
 Peter
 
