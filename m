@@ -2,134 +2,271 @@ Return-Path: <SRS0=NTKo=2I=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDB79C43603
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Dec 2019 03:34:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0B26C43603
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Dec 2019 07:53:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BEFEC2146E
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Dec 2019 03:34:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c8NEa/YH"
+	by mail.kernel.org (Postfix) with ESMTP id B66DF227BF
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Dec 2019 07:53:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726496AbfLRDeh (ORCPT
+        id S1725955AbfLRHxE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Dec 2019 22:34:37 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:33615 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726492AbfLRDeg (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Dec 2019 22:34:36 -0500
-Received: by mail-pf1-f194.google.com with SMTP id z16so430418pfk.0;
-        Tue, 17 Dec 2019 19:34:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=ONukCPo04MyQ0dGWDhkAJ7/bKcKlZKdzKOh3835rIc0=;
-        b=c8NEa/YH1XpKu6xJWwXlnSnGB2WmMOfYCtydSz7iHpVwl+5eVGYsy8yH638ZoSv4Hq
-         uUFfqstMcdMhs8fvd99tSUaqtn6jwayD/sCLAn/LlORkHPevuDXNBsjSx+CwtQ493F5W
-         Wmt1wUEpC8tPQjlMlNdU9RkhsB8q4RhG4a3AHOSmK5wc2dxasePWOyxWKksBQLBOA7Rj
-         lBoIij+vIpcvhJFQNcI7EEUmLgJp9R4ibhVXYaDfF7QLgq3RKdXCcOr0kV6GFFLlrS9n
-         wfWA9RoZMsKBQfJQkEmo0rLmmBiw4rZ4r1L+Bva1r/y9xiECzY6Jc55eYcBxnoMpgDfi
-         i2pw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=ONukCPo04MyQ0dGWDhkAJ7/bKcKlZKdzKOh3835rIc0=;
-        b=MFgAs6oZzZFhNUMu7QvkjnzsICbM6OaIgcrwRpvcljbXa5GAoJnDdWbbS4TfL93LOT
-         ObD4wr4df7OoF7ZYlcAuVNinMlV8Ciesvkk46Ca5r9XJfHw/ZRoVn55d1gTQDede25kd
-         BO1UoHyWo3P2nbFa6o3V24Pr5zPn6tuB5m+MZtESOyieZfCMa31C2vsOPj2S+Yu6A7o0
-         hCVunPzU6S9LOZQbS+MgTdVIMYRCS2DcRHsqKeSfID9XKsoXJho9i0zSpzvjW/FNhiTl
-         BCwLyP0JeksBX9N0cundOlyBiCM+YFb15oR/wmFOaSJ9OWj5z8kKx57nXyjZMSq6BaVQ
-         r3YQ==
-X-Gm-Message-State: APjAAAUhMYR66AvKZUl6VAxT3RYKXVdLEA0nBMA7G30vf4EUZwATD0cA
-        BS+ZfwNGo/PoqCUJgaumZtCUFXihSth5Hg==
-X-Google-Smtp-Source: APXvYqwMTguHHmmbQPNu/P12kClGPGCj5gkW0POPuZgnv1g9mEaXU1UpbCZ0ywj5EPJHW8UYz0xdrw==
-X-Received: by 2002:a63:b141:: with SMTP id g1mr428607pgp.168.1576640075959;
-        Tue, 17 Dec 2019 19:34:35 -0800 (PST)
-Received: from oslab.tsinghua.edu.cn ([166.111.139.172])
-        by smtp.gmail.com with ESMTPSA id b21sm634059pfp.0.2019.12.17.19.34.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Dec 2019 19:34:35 -0800 (PST)
-From:   Jia-Ju Bai <baijiaju1990@gmail.com>
-To:     atul.gupta@chelsio.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, tglx@linutronix.de, allison@lohutok.net,
-        arjun@chelsio.com, kstewart@linuxfoundation.org,
-        edumazet@google.com
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jia-Ju Bai <baijiaju1990@gmail.com>
-Subject: [PATCH] crypto: chelsio: chtls: fix possible sleep-in-atomic-context bugs in abort_syn_rcv()
-Date:   Wed, 18 Dec 2019 11:34:22 +0800
-Message-Id: <20191218033422.18672-1-baijiaju1990@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        Wed, 18 Dec 2019 02:53:04 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:54942 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726704AbfLRHxE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 18 Dec 2019 02:53:04 -0500
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1ihU8k-0004Fc-Fb; Wed, 18 Dec 2019 15:53:02 +0800
+Received: from herbert by gondobar with local (Exim 4.89)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1ihU8j-0001ac-6C; Wed, 18 Dec 2019 15:53:01 +0800
+Date:   Wed, 18 Dec 2019 15:53:01 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [v4 PATCH] crypto: api - Retain alg refcount in crypto_grab_spawn
+Message-ID: <20191218075301.t5your6vcxbishm5@gondor.apana.org.au>
+References: <20191206063812.ueudgjfwzri5ekpr@gondor.apana.org.au>
+ <E1id7G9-00051G-5w@gondobar>
+ <20191206224155.GE246840@gmail.com>
+ <20191207033059.h6kgx7j7jtnqotuy@gondor.apana.org.au>
+ <20191207045234.GA5948@sol.localdomain>
+ <20191207145504.gcwc75enxhqfqhxe@gondor.apana.org.au>
+ <20191214064404.qlxgabr3k47473uh@gondor.apana.org.au>
+ <20191215041119.ndcodt4bw4rr52es@gondor.apana.org.au>
+ <20191216044649.GA908@sol.localdomain>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191216044649.GA908@sol.localdomain>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The driver may sleep while holding a spinlock.
-The function call path (from bottom to top) in Linux 4.19 is:
+On Sun, Dec 15, 2019 at 08:46:49PM -0800, Eric Biggers wrote:
+>
+> There's still code above that uses spawn->inst without verifying that
+> spawn->registered is set.
+> 
+> 		inst = spawn->inst;
+> 
+> 		BUG_ON(&inst->alg == alg);
 
-drivers/crypto/chelsio/chtls/chtls_cm.c, 1806: 
-	alloc_skb(GFP_KERNEL) in send_abort_rpl
-drivers/crypto/chelsio/chtls/chtls_cm.c, 1925: 
-	send_abort_rpl in abort_syn_rcv
-drivers/crypto/chelsio/chtls/chtls_cm.c, 1920: 
-	spin_lock in abort_syn_rcv
+This is actually safe because spawn->inst is a real pointer to
+a spawn or NULL.  However, I agree that it is needlessly confusing
+and I've changed it in the new version.
 
-drivers/crypto/chelsio/chtls/chtls_cm.c, 1787: 
-	alloc_skb(GFP_KERNEL) in send_defer_abort_rpl
-drivers/crypto/chelsio/chtls/chtls_cm.c, 1811: 
-	send_defer_abort_rpl in send_abort_rpl
-drivers/crypto/chelsio/chtls/chtls_cm.c, 1925: 
-    send_abort_rpl in abort_syn_rcv
-drivers/crypto/chelsio/chtls/chtls_cm.c, 1920: 
-    spin_lock in abort_syn_rcv
+> Also, the below code looks redundant now that it's only executed when
+> spawn->registered.  If it's still needed, maybe the comment needs to be updated?
 
-alloc_skb(GFP_KERNEL) can sleep at runtime.
+It's not actually redundant, because we set spawn->registered
+before the instance is fully registered.  It could actually fail
+during registration which would still trigger this case.  I've
+added some more comments for it.
 
-To fix these possible bugs, GFP_KERNEL is replaced with GFP_ATOMIC.
-Besides, in send_defer_abort_rpl(), error handling code is added to 
-handle the failure of alloc_skb().
+> How about:
+> 
+> 	if (spawn->dropref && !spawn->registered)
+> 		crypto_mod_put(spawn->alg);
 
-These bugs are found by a static analysis tool STCheck written by myself.
-
-Signed-off-by: Jia-Ju Bai <baijiaju1990@gmail.com>
----
- drivers/crypto/chelsio/chtls/chtls_cm.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/crypto/chelsio/chtls/chtls_cm.c b/drivers/crypto/chelsio/chtls/chtls_cm.c
-index aca75237bbcf..e6e4c3ddc368 100644
---- a/drivers/crypto/chelsio/chtls/chtls_cm.c
-+++ b/drivers/crypto/chelsio/chtls/chtls_cm.c
-@@ -1805,8 +1805,11 @@ static void send_defer_abort_rpl(struct chtls_dev *cdev, struct sk_buff *skb)
- 	struct cpl_abort_req_rss *req = cplhdr(skb);
- 	struct sk_buff *reply_skb;
+Done.
  
--	reply_skb = alloc_skb(sizeof(struct cpl_abort_rpl),
--			      GFP_KERNEL | __GFP_NOFAIL);
-+	reply_skb = alloc_skb(sizeof(struct cpl_abort_rpl), GFP_ATOMIC);
-+	if (!reply_skb) {
-+		kfree_skb(skb);
-+		return;
+> This really should say "Node in list of instances after registration."
+> Otherwise it sounds like it's a list, not an element of a list.
+
+Changed.
+
+---8<---
+This patch changes crypto_grab_spawn to retain the reference count
+on the algorithm.  This is because the caller needs to access the
+algorithm parameters and without the reference count the algorithm
+can be freed at any time.
+
+The reference count will be subsequently dropped by the crypto API
+once the instance has been registered.  The helper crypto_drop_spawn
+will also conditionally drop the reference count depending on whether
+it has been registered.
+
+Note that the code is actually added to crypto_init_spawn.  However,
+unless the caller activates this by setting spawn->dropref beforehand
+then nothing happens.  The only caller that sets dropref is currently
+crypto_grab_spawn.
+
+Once all legacy users of crypto_init_spawn disappear, then we can
+kill the dropref flag.
+
+Internally each instance will maintain a list of its spawns prior
+to registration.  This memory used by this list is shared with
+other fields that are only used after registration.  In order for
+this to work a new flag spawn->registered is added to indicate
+whether spawn->inst can be used.
+
+Fixes: d6ef2f198d4c ("crypto: api - Add crypto_grab_spawn primitive")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index cd643e294664..8ffaa1dca23b 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -124,8 +124,6 @@ static void crypto_remove_instance(struct crypto_instance *inst,
+ 		return;
+ 
+ 	inst->alg.cra_flags |= CRYPTO_ALG_DEAD;
+-	if (hlist_unhashed(&inst->list))
+-		return;
+ 
+ 	if (!tmpl || !crypto_tmpl_get(tmpl))
+ 		return;
+@@ -175,17 +173,26 @@ void crypto_remove_spawns(struct crypto_alg *alg, struct list_head *list,
+ 						 list);
+ 			inst = spawn->inst;
+ 
+-			BUG_ON(&inst->alg == alg);
+-
+ 			list_move(&spawn->list, &stack);
++			spawn->dead = !spawn->registered || &inst->alg != nalg;
++
++			if (!spawn->registered)
++				break;
++
++			BUG_ON(&inst->alg == alg);
+ 
+ 			if (&inst->alg == nalg)
+ 				break;
+ 
+-			spawn->dead = true;
+ 			spawns = &inst->alg.cra_users;
+ 
+ 			/*
++			 * Even if spawn->registered is true, the
++			 * instance itself may still be unregistered.
++			 * This is because it may have failed during
++			 * registration.  Therefore we still need to
++			 * make the following test.
++			 *
+ 			 * We may encounter an unregistered instance here, since
+ 			 * an instance's spawns are set up prior to the instance
+ 			 * being registered.  An unregistered instance will have
+@@ -208,7 +215,7 @@ void crypto_remove_spawns(struct crypto_alg *alg, struct list_head *list,
+ 	list_for_each_entry_safe(spawn, n, &secondary_spawns, list) {
+ 		if (!spawn->dead)
+ 			list_move(&spawn->list, &spawn->alg->cra_users);
+-		else
++		else if (spawn->registered)
+ 			crypto_remove_instance(spawn->inst, list);
+ 	}
+ }
+@@ -588,6 +595,7 @@ int crypto_register_instance(struct crypto_template *tmpl,
+ 			     struct crypto_instance *inst)
+ {
+ 	struct crypto_larval *larval;
++	struct crypto_spawn *spawn;
+ 	int err;
+ 
+ 	err = crypto_check_alg(&inst->alg);
+@@ -599,6 +607,23 @@ int crypto_register_instance(struct crypto_template *tmpl,
+ 
+ 	down_write(&crypto_alg_sem);
+ 
++	larval = ERR_PTR(-EAGAIN);
++	for (spawn = inst->spawns; spawn;) {
++		struct crypto_spawn *next;
++
++		if (spawn->dead)
++			goto unlock;
++
++		next = spawn->next;
++		spawn->inst = inst;
++		spawn->registered = true;
++
++		if (spawn->dropref)
++			crypto_mod_put(spawn->alg);
++
++		spawn = next;
 +	}
- 	__skb_put(reply_skb, sizeof(struct cpl_abort_rpl));
- 	set_abort_rpl_wr(reply_skb, GET_TID(req),
- 			 (req->status & CPL_ABORT_NO_RST));
-@@ -1825,7 +1828,7 @@ static void send_abort_rpl(struct sock *sk, struct sk_buff *skb,
- 	csk = rcu_dereference_sk_user_data(sk);
++
+ 	larval = __crypto_register_alg(&inst->alg);
+ 	if (IS_ERR(larval))
+ 		goto unlock;
+@@ -646,7 +671,9 @@ int crypto_init_spawn(struct crypto_spawn *spawn, struct crypto_alg *alg,
+ 	if (WARN_ON_ONCE(inst == NULL))
+ 		return -EINVAL;
  
- 	reply_skb = alloc_skb(sizeof(struct cpl_abort_rpl),
--			      GFP_KERNEL);
-+			      GFP_ATOMIC);
+-	spawn->inst = inst;
++	spawn->next = inst->spawns;
++	inst->spawns = spawn;
++
+ 	spawn->mask = mask;
  
- 	if (!reply_skb) {
- 		req->status = (queue << 1);
+ 	down_write(&crypto_alg_sem);
+@@ -688,8 +715,10 @@ int crypto_grab_spawn(struct crypto_spawn *spawn, const char *name,
+ 	if (IS_ERR(alg))
+ 		return PTR_ERR(alg);
+ 
++	spawn->dropref = true;
+ 	err = crypto_init_spawn(spawn, alg, spawn->inst, mask);
+-	crypto_mod_put(alg);
++	if (err)
++		crypto_mod_put(alg);
+ 	return err;
+ }
+ EXPORT_SYMBOL_GPL(crypto_grab_spawn);
+@@ -700,6 +729,9 @@ void crypto_drop_spawn(struct crypto_spawn *spawn)
+ 	if (!spawn->dead)
+ 		list_del(&spawn->list);
+ 	up_write(&crypto_alg_sem);
++
++	if (spawn->dropref && !spawn->registered)
++		crypto_mod_put(spawn->alg);
+ }
+ EXPORT_SYMBOL_GPL(crypto_drop_spawn);
+ 
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index 771a295ac755..25bc54121848 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -47,7 +47,13 @@ struct crypto_instance {
+ 	struct crypto_alg alg;
+ 
+ 	struct crypto_template *tmpl;
+-	struct hlist_node list;
++
++	union {
++		/* Node in list of instances after registration. */
++		struct hlist_node list;
++		/* List of attached spawns before registration. */
++		struct crypto_spawn *spawns;
++	};
+ 
+ 	void *__ctx[] CRYPTO_MINALIGN_ATTR;
+ };
+@@ -67,10 +73,17 @@ struct crypto_template {
+ struct crypto_spawn {
+ 	struct list_head list;
+ 	struct crypto_alg *alg;
+-	struct crypto_instance *inst;
++	union {
++		/* Back pointer to instance after registration.*/
++		struct crypto_instance *inst;
++		/* Spawn list pointer prior to registration. */
++		struct crypto_spawn *next;
++	};
+ 	const struct crypto_type *frontend;
+ 	u32 mask;
+ 	bool dead;
++	bool dropref;
++	bool registered;
+ };
+ 
+ struct crypto_queue {
 -- 
-2.17.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
