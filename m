@@ -2,338 +2,205 @@ Return-Path: <SRS0=NTKo=2I=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE0D7C43603
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Dec 2019 08:07:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43C8CC43603
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Dec 2019 10:13:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C50D321D7D
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Dec 2019 08:07:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0F44E24650
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Dec 2019 10:13:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Mmfco3fv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725797AbfLRIHg (ORCPT
+        id S1726551AbfLRKNC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 18 Dec 2019 03:07:36 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:56746 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725785AbfLRIHg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 18 Dec 2019 03:07:36 -0500
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1ihUMo-0004Sv-UF; Wed, 18 Dec 2019 16:07:35 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1ihUMn-00023b-Uf; Wed, 18 Dec 2019 16:07:33 +0800
-Date:   Wed, 18 Dec 2019 16:07:33 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Eric Biggers <ebiggers@kernel.org>
-Subject: [v2 PATCH] crypto: skcipher - Add skcipher_ialg_simple helper
-Message-ID: <20191218080733.2ckqf4e5qmgnnrjd@gondor.apana.org.au>
-References: <20191206055704.g2g5y2e5dakxj7za@gondor.apana.org.au>
+        Wed, 18 Dec 2019 05:13:02 -0500
+Received: from mail-qt1-f195.google.com ([209.85.160.195]:41749 "EHLO
+        mail-qt1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725785AbfLRKM7 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 18 Dec 2019 05:12:59 -0500
+Received: by mail-qt1-f195.google.com with SMTP id k40so1506868qtk.8
+        for <linux-crypto@vger.kernel.org>; Wed, 18 Dec 2019 02:12:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=ws9LGLaoc3+Hm+PZ5CI8rYmVt90u1n7ZUCQR2tNutFk=;
+        b=Mmfco3fvj38HtPlrRpC6OWceno0UGchQsnFEUuj30sDWL7f5S1cWZNjicm9tNKOHDx
+         0UCCd7rSVPIJlXhYG1FLDxnCjs6n1pLE5x9irdfNa+OaYxE9X5x2EgzTFJOr4wkm6HCi
+         fxEstdYMF/Nn+3ocy++q8Zq9njFEKgTpbnFR6RdlEjc/uPDLTu0XOe7cnwSLk1c0tTvJ
+         GXjYqkqJ0zYrzx93fdlCHqsZZ4NCyFgNkh9bCK05CEtqJwrdGllS1QcTrOvUVAJCJuCz
+         JJtNlHyGTSPG2ksEmpvfoB4ee1AP0MHnT3wL9x/C/9phcxvsjXv0J6f8yIS/qQq4CGyG
+         uQ3A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=ws9LGLaoc3+Hm+PZ5CI8rYmVt90u1n7ZUCQR2tNutFk=;
+        b=pzB1P7GYwmHvhHejf2zGl4wd0wH9lj64ckVzI7RlbOzC/YykBhe3aTj1DoVEttly6Q
+         QtUXP0e3hNl6QRhl2us3RjBgdA8h/GyE08iZH35wmxK/YVTvT2ecQfjvXuj03hLNFtDj
+         xF51TWyHGiFrShsd1s4UAafttCXB0aCnRAJnKzjdIIiRB+Ab8nrsp4Nq2mZPxNKERa4o
+         l4IeSSqG+Y33k8AO7g6yjsKCIU2nlq93eK/9mYMqQ1eZlExFNF83h5hiNswFss7GKV0J
+         bms5W3REhtdhzy6aR0E4CCYz6JI7/7+sMcZX0KZLGNJQxZqdKd30vzmPlaBBDFZwi9Xu
+         1xmw==
+X-Gm-Message-State: APjAAAWU4WqhzT2tuWiixdt+2EMy7h9JW11MDatKhbJ57tyZzp8jjzMB
+        hrAWoVnLjDeaYk12w+Jcw7C7Yql7pwoccbO7CVmbRA==
+X-Google-Smtp-Source: APXvYqypdYEsGrKFOy8FIj3tJ3oEE00rNcAYDvs1HpbdD3RFNsMIqLxEt1d2URPTxJCc/7+w+KwLHGiDud0X4uFJ5q0=
+X-Received: by 2002:ac8:24c1:: with SMTP id t1mr1375386qtt.257.1576663977714;
+ Wed, 18 Dec 2019 02:12:57 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191206055704.g2g5y2e5dakxj7za@gondor.apana.org.au>
-User-Agent: NeoMutt/20170113 (1.7.2)
+References: <20191208232734.225161-1-Jason@zx2c4.com>
+In-Reply-To: <20191208232734.225161-1-Jason@zx2c4.com>
+From:   Dmitry Vyukov <dvyukov@google.com>
+Date:   Wed, 18 Dec 2019 11:12:46 +0100
+Message-ID: <CACT4Y+bsJVmgbD-WogwU=LfWiPN1JgjBrwx4s8Y14hDd7vqqhQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] net: WireGuard secure network tunnel
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        David Miller <davem@davemloft.net>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch introduces the skcipher_ialg_simple helper which fetches
-the crypto_alg structure from a simple skcpiher instance's spawn.
+On Mon, Dec 9, 2019 at 12:28 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+>
+> WireGuard is a layer 3 secure networking tunnel made specifically for
+> the kernel, that aims to be much simpler and easier to audit than IPsec.
+> Extensive documentation and description of the protocol and
+> considerations, along with formal proofs of the cryptography, are
+> available at:
+>
+>   * https://www.wireguard.com/
+>   * https://www.wireguard.com/papers/wireguard.pdf
+>
+> This commit implements WireGuard as a simple network device driver,
+> accessible in the usual RTNL way used by virtual network drivers. It
+> makes use of the udp_tunnel APIs, GRO, GSO, NAPI, and the usual set of
+> networking subsystem APIs. It has a somewhat novel multicore queueing
+> system designed for maximum throughput and minimal latency of encryption
+> operations, but it is implemented modestly using workqueues and NAPI.
+> Configuration is done via generic Netlink, and following a review from
+> the Netlink maintainer a year ago, several high profile userspace tools
+> have already implemented the API.
+>
+> This commit also comes with several different tests, both in-kernel
+> tests and out-of-kernel tests based on network namespaces, taking profit
+> of the fact that sockets used by WireGuard intentionally stay in the
+> namespace the WireGuard interface was originally created, exactly like
+> the semantics of userspace tun devices. See wireguard.com/netns/ for
+> pictures and examples.
+>
+> The source code is fairly short, but rather than combining everything
+> into a single file, WireGuard is developed as cleanly separable files,
+> making auditing and comprehension easier. Things are laid out as
+> follows:
+>
+>   * noise.[ch], cookie.[ch], messages.h: These implement the bulk of the
+>     cryptographic aspects of the protocol, and are mostly data-only in
+>     nature, taking in buffers of bytes and spitting out buffers of
+>     bytes. They also handle reference counting for their various shared
+>     pieces of data, like keys and key lists.
+>
+>   * ratelimiter.[ch]: Used as an integral part of cookie.[ch] for
+>     ratelimiting certain types of cryptographic operations in accordance
+>     with particular WireGuard semantics.
+>
+>   * allowedips.[ch], peerlookup.[ch]: The main lookup structures of
+>     WireGuard, the former being trie-like with particular semantics, an
+>     integral part of the design of the protocol, and the latter just
+>     being nice helper functions around the various hashtables we use.
+>
+>   * device.[ch]: Implementation of functions for the netdevice and for
+>     rtnl, responsible for maintaining the life of a given interface and
+>     wiring it up to the rest of WireGuard.
+>
+>   * peer.[ch]: Each interface has a list of peers, with helper functions
+>     available here for creation, destruction, and reference counting.
+>
+>   * socket.[ch]: Implementation of functions related to udp_socket and
+>     the general set of kernel socket APIs, for sending and receiving
+>     ciphertext UDP packets, and taking care of WireGuard-specific sticky
+>     socket routing semantics for the automatic roaming.
+>
+>   * netlink.[ch]: Userspace API entry point for configuring WireGuard
+>     peers and devices. The API has been implemented by several userspace
+>     tools and network management utility, and the WireGuard project
+>     distributes the basic wg(8) tool.
+>
+>   * queueing.[ch]: Shared function on the rx and tx path for handling
+>     the various queues used in the multicore algorithms.
+>
+>   * send.c: Handles encrypting outgoing packets in parallel on
+>     multiple cores, before sending them in order on a single core, via
+>     workqueues and ring buffers. Also handles sending handshake and cookie
+>     messages as part of the protocol, in parallel.
+>
+>   * receive.c: Handles decrypting incoming packets in parallel on
+>     multiple cores, before passing them off in order to be ingested via
+>     the rest of the networking subsystem with GRO via the typical NAPI
+>     poll function. Also handles receiving handshake and cookie messages
+>     as part of the protocol, in parallel.
+>
+>   * timers.[ch]: Uses the timer wheel to implement protocol particular
+>     event timeouts, and gives a set of very simple event-driven entry
+>     point functions for callers.
+>
+>   * main.c, version.h: Initialization and deinitialization of the module.
+>
+>   * selftest/*.h: Runtime unit tests for some of the most security
+>     sensitive functions.
+>
+>   * tools/testing/selftests/wireguard/netns.sh: Aforementioned testing
+>     script using network namespaces.
+>
+> This commit aims to be as self-contained as possible, implementing
+> WireGuard as a standalone module not needing much special handling or
+> coordination from the network subsystem. I expect for future
+> optimizations to the network stack to positively improve WireGuard, and
+> vice-versa, but for the time being, this exists as intentionally
+> standalone.
+>
+> We introduce a menu option for CONFIG_WIREGUARD, as well as providing a
+> verbose debug log and self-tests via CONFIG_WIREGUARD_DEBUG.
 
-This allows us to remove the third argument from the function
-skcipher_alloc_instance_simple.
+Hi Jason, Dave,
 
-In doing so the reference count to the algorithm is now maintained
-by the Crypto API and the caller no longer needs to drop the alg
-refcount.
+Some late feedback on CONFIG_WIREGUARD_DEBUG.
 
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Does it really do "verbose debug log"? I only see it is used for
+self-tests and debug checks:
 
-diff --git a/crypto/cbc.c b/crypto/cbc.c
-index dd96bcf4d4b6..e6f6273a7d39 100644
---- a/crypto/cbc.c
-+++ b/crypto/cbc.c
-@@ -54,10 +54,12 @@ static int crypto_cbc_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	struct crypto_alg *alg;
- 	int err;
- 
--	inst = skcipher_alloc_instance_simple(tmpl, tb, &alg);
-+	inst = skcipher_alloc_instance_simple(tmpl, tb);
- 	if (IS_ERR(inst))
- 		return PTR_ERR(inst);
- 
-+	alg = skcipher_ialg_simple(inst);
-+
- 	err = -EINVAL;
- 	if (!is_power_of_2(alg->cra_blocksize))
- 		goto out_free_inst;
-@@ -66,14 +68,11 @@ static int crypto_cbc_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	inst->alg.decrypt = crypto_cbc_decrypt;
- 
- 	err = skcipher_register_instance(tmpl, inst);
--	if (err)
--		goto out_free_inst;
--	goto out_put_alg;
--
-+	if (err) {
- out_free_inst:
--	inst->free(inst);
--out_put_alg:
--	crypto_mod_put(alg);
-+		inst->free(inst);
-+	}
-+
- 	return err;
- }
- 
-diff --git a/crypto/cfb.c b/crypto/cfb.c
-index 7b68fbb61732..4e5219bbcd19 100644
---- a/crypto/cfb.c
-+++ b/crypto/cfb.c
-@@ -203,10 +203,12 @@ static int crypto_cfb_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	struct crypto_alg *alg;
- 	int err;
- 
--	inst = skcipher_alloc_instance_simple(tmpl, tb, &alg);
-+	inst = skcipher_alloc_instance_simple(tmpl, tb);
- 	if (IS_ERR(inst))
- 		return PTR_ERR(inst);
- 
-+	alg = skcipher_ialg_simple(inst);
-+
- 	/* CFB mode is a stream cipher. */
- 	inst->alg.base.cra_blocksize = 1;
- 
-@@ -223,7 +225,6 @@ static int crypto_cfb_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	if (err)
- 		inst->free(inst);
- 
--	crypto_mod_put(alg);
- 	return err;
- }
- 
-diff --git a/crypto/ctr.c b/crypto/ctr.c
-index 70a3fccb82f3..1e9d6b86b3c6 100644
---- a/crypto/ctr.c
-+++ b/crypto/ctr.c
-@@ -129,10 +129,12 @@ static int crypto_ctr_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	struct crypto_alg *alg;
- 	int err;
- 
--	inst = skcipher_alloc_instance_simple(tmpl, tb, &alg);
-+	inst = skcipher_alloc_instance_simple(tmpl, tb);
- 	if (IS_ERR(inst))
- 		return PTR_ERR(inst);
- 
-+	alg = skcipher_ialg_simple(inst);
-+
- 	/* Block size must be >= 4 bytes. */
- 	err = -EINVAL;
- 	if (alg->cra_blocksize < 4)
-@@ -155,14 +157,11 @@ static int crypto_ctr_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	inst->alg.decrypt = crypto_ctr_crypt;
- 
- 	err = skcipher_register_instance(tmpl, inst);
--	if (err)
--		goto out_free_inst;
--	goto out_put_alg;
--
-+	if (err) {
- out_free_inst:
--	inst->free(inst);
--out_put_alg:
--	crypto_mod_put(alg);
-+		inst->free(inst);
-+	}
-+
- 	return err;
- }
- 
-diff --git a/crypto/ecb.c b/crypto/ecb.c
-index 9d6981ca7d5d..249aca75b7dc 100644
---- a/crypto/ecb.c
-+++ b/crypto/ecb.c
-@@ -64,10 +64,12 @@ static int crypto_ecb_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	struct crypto_alg *alg;
- 	int err;
- 
--	inst = skcipher_alloc_instance_simple(tmpl, tb, &alg);
-+	inst = skcipher_alloc_instance_simple(tmpl, tb);
- 	if (IS_ERR(inst))
- 		return PTR_ERR(inst);
- 
-+	alg = skcipher_ialg_simple(inst);
-+
- 	inst->alg.ivsize = 0; /* ECB mode doesn't take an IV */
- 
- 	inst->alg.encrypt = crypto_ecb_encrypt;
-@@ -76,7 +78,7 @@ static int crypto_ecb_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	err = skcipher_register_instance(tmpl, inst);
- 	if (err)
- 		inst->free(inst);
--	crypto_mod_put(alg);
-+
- 	return err;
- }
- 
-diff --git a/crypto/keywrap.c b/crypto/keywrap.c
-index a155c88105ea..0355cce21b1e 100644
---- a/crypto/keywrap.c
-+++ b/crypto/keywrap.c
-@@ -266,10 +266,12 @@ static int crypto_kw_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	struct crypto_alg *alg;
- 	int err;
- 
--	inst = skcipher_alloc_instance_simple(tmpl, tb, &alg);
-+	inst = skcipher_alloc_instance_simple(tmpl, tb);
- 	if (IS_ERR(inst))
- 		return PTR_ERR(inst);
- 
-+	alg = skcipher_ialg_simple(inst);
-+
- 	err = -EINVAL;
- 	/* Section 5.1 requirement for KW */
- 	if (alg->cra_blocksize != sizeof(struct crypto_kw_block))
-@@ -283,14 +285,11 @@ static int crypto_kw_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	inst->alg.decrypt = crypto_kw_decrypt;
- 
- 	err = skcipher_register_instance(tmpl, inst);
--	if (err)
--		goto out_free_inst;
--	goto out_put_alg;
--
-+	if (err) {
- out_free_inst:
--	inst->free(inst);
--out_put_alg:
--	crypto_mod_put(alg);
-+		inst->free(inst);
-+	}
-+
- 	return err;
- }
- 
-diff --git a/crypto/ofb.c b/crypto/ofb.c
-index 133ff4c7f2c6..2ec68e3f2c55 100644
---- a/crypto/ofb.c
-+++ b/crypto/ofb.c
-@@ -55,10 +55,12 @@ static int crypto_ofb_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	struct crypto_alg *alg;
- 	int err;
- 
--	inst = skcipher_alloc_instance_simple(tmpl, tb, &alg);
-+	inst = skcipher_alloc_instance_simple(tmpl, tb);
- 	if (IS_ERR(inst))
- 		return PTR_ERR(inst);
- 
-+	alg = skcipher_ialg_simple(inst);
-+
- 	/* OFB mode is a stream cipher. */
- 	inst->alg.base.cra_blocksize = 1;
- 
-@@ -75,7 +77,6 @@ static int crypto_ofb_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	if (err)
- 		inst->free(inst);
- 
--	crypto_mod_put(alg);
- 	return err;
- }
- 
-diff --git a/crypto/pcbc.c b/crypto/pcbc.c
-index 862cdb8d8b6c..5c5245647208 100644
---- a/crypto/pcbc.c
-+++ b/crypto/pcbc.c
-@@ -156,17 +156,19 @@ static int crypto_pcbc_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	struct crypto_alg *alg;
- 	int err;
- 
--	inst = skcipher_alloc_instance_simple(tmpl, tb, &alg);
-+	inst = skcipher_alloc_instance_simple(tmpl, tb);
- 	if (IS_ERR(inst))
- 		return PTR_ERR(inst);
- 
-+	alg = skcipher_ialg_simple(inst);
-+
- 	inst->alg.encrypt = crypto_pcbc_encrypt;
- 	inst->alg.decrypt = crypto_pcbc_decrypt;
- 
- 	err = skcipher_register_instance(tmpl, inst);
- 	if (err)
- 		inst->free(inst);
--	crypto_mod_put(alg);
-+
- 	return err;
- }
- 
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index 39a718d99220..37adb71f7759 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -938,15 +938,12 @@ static void skcipher_free_instance_simple(struct skcipher_instance *inst)
-  *
-  * @tmpl: the template being instantiated
-  * @tb: the template parameters
-- * @cipher_alg_ret: on success, a pointer to the underlying cipher algorithm is
-- *		    returned here.  It must be dropped with crypto_mod_put().
-  *
-  * Return: a pointer to the new instance, or an ERR_PTR().  The caller still
-  *	   needs to register the instance.
-  */
--struct skcipher_instance *
--skcipher_alloc_instance_simple(struct crypto_template *tmpl, struct rtattr **tb,
--			       struct crypto_alg **cipher_alg_ret)
-+struct skcipher_instance *skcipher_alloc_instance_simple(
-+	struct crypto_template *tmpl, struct rtattr **tb)
- {
- 	struct crypto_attr_type *algt;
- 	struct crypto_alg *cipher_alg;
-@@ -982,6 +979,7 @@ skcipher_alloc_instance_simple(struct crypto_template *tmpl, struct rtattr **tb,
- 	if (err)
- 		goto err_free_inst;
- 
-+	spawn->dropref = true;
- 	err = crypto_init_spawn(spawn, cipher_alg,
- 				skcipher_crypto_instance(inst),
- 				CRYPTO_ALG_TYPE_MASK);
-@@ -1003,7 +1001,6 @@ skcipher_alloc_instance_simple(struct crypto_template *tmpl, struct rtattr **tb,
- 	inst->alg.init = skcipher_init_tfm_simple;
- 	inst->alg.exit = skcipher_exit_tfm_simple;
- 
--	*cipher_alg_ret = cipher_alg;
- 	return inst;
- 
- err_free_inst:
-diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
-index 921c409fe1b1..ad4a6330ff53 100644
---- a/include/crypto/internal/skcipher.h
-+++ b/include/crypto/internal/skcipher.h
-@@ -214,9 +214,17 @@ skcipher_cipher_simple(struct crypto_skcipher *tfm)
- 
- 	return ctx->cipher;
- }
--struct skcipher_instance *
--skcipher_alloc_instance_simple(struct crypto_template *tmpl, struct rtattr **tb,
--			       struct crypto_alg **cipher_alg_ret);
-+
-+struct skcipher_instance *skcipher_alloc_instance_simple(
-+	struct crypto_template *tmpl, struct rtattr **tb);
-+
-+static inline struct crypto_alg *skcipher_ialg_simple(
-+	struct skcipher_instance *inst)
-+{
-+	struct crypto_spawn *spawn = skcipher_instance_ctx(inst);
-+
-+	return spawn->alg;
-+}
- 
- #endif	/* _CRYPTO_INTERNAL_SKCIPHER_H */
- 
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+linux$ grep DEBUG drivers/net/wireguard/*.c
+drivers/net/wireguard/allowedips.c: WARN_ON(IS_ENABLED(DEBUG) && *len >= 128);
+drivers/net/wireguard/allowedips.c: WARN_ON(IS_ENABLED(DEBUG) && len
+>= 128);                      \
+drivers/net/wireguard/main.c:#ifdef DEBUG
+drivers/net/wireguard/noise.c: WARN_ON(IS_ENABLED(DEBUG) &&
+
+There are 3 different things:
+ - boot self-tests
+ - additional debug checks
+ - verbose logging
+
+In different contexts one may enable different sets of these.
+In particular in fuzzing context one absolutely wants additional debug
+checks, but not self tests and definitely no verbose logging. CI and
+various manual scenarios will require different sets as well.
+If this does verbose logging, we won't get debug checks as well during
+fuzzing, which is unfortunate.
+Can make sense splitting CONFIG_WIREGUARD_DEBUG into 2 or 3 separate
+configs (that's what I see frequently). Unfortunately there is no
+standard conventions for anything of this, so CIs will never find your
+boot tests and fuzzing won't find the additional checks...
