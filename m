@@ -2,114 +2,77 @@ Return-Path: <SRS0=NTKo=2I=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BADA6C43603
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Dec 2019 11:50:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B01AC43603
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Dec 2019 12:46:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8C4A421582
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Dec 2019 11:50:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 42174227BF
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Dec 2019 12:46:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="TjcPQ6hX"
+	dkim=pass (1024-bit key) header.d=alien8.de header.i=@alien8.de header.b="CObDVqos"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726718AbfLRLue (ORCPT
+        id S1726710AbfLRMqP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 18 Dec 2019 06:50:34 -0500
-Received: from frisell.zx2c4.com ([192.95.5.64]:57757 "EHLO frisell.zx2c4.com"
+        Wed, 18 Dec 2019 07:46:15 -0500
+Received: from mail.skyhub.de ([5.9.137.197]:38718 "EHLO mail.skyhub.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726710AbfLRLud (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 18 Dec 2019 06:50:33 -0500
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id e37716a2;
-        Wed, 18 Dec 2019 10:53:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
-        :references:in-reply-to:from:date:message-id:subject:to:cc
-        :content-type; s=mail; bh=dF+343L+TdlkZkv3XYQxJv3zHkU=; b=TjcPQ6
-        hXxWKK2YLj+bHj6e8MKS1+2/s45ZVpmfXnTRAP1x36bgHNVA6rckobNs6oHmicFd
-        XiP/F98tGiMcdphyibDkPyNM3ucsuyyYPPAraTVtOwcvz84uSrcyf8PJSQIT6k51
-        yd9h0ujCeDpb2ttx5JyV6jDI/7J/HsGmHTft5s6NGqpsJ9zsoQhMjM5jKDOVVC4F
-        w7wz4KmEIYLotJ2iSrq/ZriiJaQpvN8u2Zem9eoNk6F8EcDVYoc7AyUYdzSOWJSk
-        hbbMFOpNMsQEpqrG4q0zsJV0dvE3rGRIRxflVEYNsoHn0eC30/kquA8HHym3jGdA
-        v0d1ajk3Jv+IHiFg==
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 9bcc9931 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
-        Wed, 18 Dec 2019 10:53:58 +0000 (UTC)
-Received: by mail-ot1-f47.google.com with SMTP id p8so2172391oth.10;
-        Wed, 18 Dec 2019 03:50:31 -0800 (PST)
-X-Gm-Message-State: APjAAAXvqXk7MkqOYS2B2sTTrImQkkRen5kmslxVvgR5gWWHsBJIlpoh
-        c2DJwSBgJ5iT6z/ZalZuY0ZpH5xXCngdJsS8y3I=
-X-Google-Smtp-Source: APXvYqzhY12iR5m2kOBPfSFcgyM7ph/qjcMRfYbool+Jo+GJ1pt8ESvldAOSFjtQuspfXp9ad3F2iB9gc7l+lqvEedc=
-X-Received: by 2002:a9d:4f0f:: with SMTP id d15mr2218022otl.179.1576669831047;
- Wed, 18 Dec 2019 03:50:31 -0800 (PST)
+        id S1726743AbfLRMqP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 18 Dec 2019 07:46:15 -0500
+Received: from zn.tnic (p200300EC2F0B8B004C237F05E7CC242C.dip0.t-ipconnect.de [IPv6:2003:ec:2f0b:8b00:4c23:7f05:e7cc:242c])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id DA5171EC09F1;
+        Wed, 18 Dec 2019 13:46:09 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1576673170;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=yXwLnW+PoY25pshD8Wq5cZaWHHz1WD1asE9i3LHbFgo=;
+        b=CObDVqosp5y7Z8sELy68i2YofwvsnqQOrexIoHXuwx4iBrrN1Ec2LK/g2G2LFmAiahNTHg
+        KIiIEFVVTQ/7/vwqbtJd3690sOFs622Qt+IGBBhv3TTl1kj/mGgkbqwxQazwVNQmuphqqd
+        SBLhof85IDWs90nsRlzcY4JsHr0Bl6I=
+Date:   Wed, 18 Dec 2019 13:46:04 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Thomas Garnier <thgarnie@chromium.org>
+Cc:     kernel-hardening@lists.openwall.com, kristen@linux.intel.com,
+        keescook@chromium.org, Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v10 01/11] x86/crypto: Adapt assembly for PIE support
+Message-ID: <20191218124604.GE24886@zn.tnic>
+References: <20191205000957.112719-1-thgarnie@chromium.org>
+ <20191205000957.112719-2-thgarnie@chromium.org>
 MIME-Version: 1.0
-References: <20191208232734.225161-1-Jason@zx2c4.com> <CACT4Y+bsJVmgbD-WogwU=LfWiPN1JgjBrwx4s8Y14hDd7vqqhQ@mail.gmail.com>
- <CAHmME9o0AparjaaOSoZD14RAW8_AJTfKfcx3Y2ndDAPFNC-MeQ@mail.gmail.com> <CACT4Y+Zssd6OZ2-U4kjw18mNthQyzPWZV_gkH3uATnSv1SVDfA@mail.gmail.com>
-In-Reply-To: <CACT4Y+Zssd6OZ2-U4kjw18mNthQyzPWZV_gkH3uATnSv1SVDfA@mail.gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 18 Dec 2019 12:50:20 +0100
-X-Gmail-Original-Message-ID: <CAHmME9oM=YHMZyg23WEzmZAof=7iv-A01VazB3ihhR99f6X1cg@mail.gmail.com>
-Message-ID: <CAHmME9oM=YHMZyg23WEzmZAof=7iv-A01VazB3ihhR99f6X1cg@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] net: WireGuard secure network tunnel
-To:     Dmitry Vyukov <dvyukov@google.com>
-Cc:     netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        David Miller <davem@davemloft.net>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20191205000957.112719-2-thgarnie@chromium.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Dmitry,
+On Wed, Dec 04, 2019 at 04:09:38PM -0800, Thomas Garnier wrote:
+> Change the assembly code to use only relative references of symbols for the
+> kernel to be PIE compatible.
+> 
+> Position Independent Executable (PIE) support will allow to extend the
+> KASLR randomization range below 0xffffffff80000000.
 
-On Wed, Dec 18, 2019 at 12:37 PM Dmitry Vyukov <dvyukov@google.com> wrote:
-> > Actually with WireGuard, I think that's not the case. The WireGuard
-> > logging has been written with DoS in mind. You /should/ be able to
-> > safely run it on a production system exposed to the wild Internet, and
-> > while there will be some additional things in your dmesg, an attacker
-> > isn't supposed to be able to totally flood it without ratelimiting or
-> > inject malicious strings into it (such as ANSI escape sequence). In
-> > other words, I consider the logging to be fair game attack surface. If
-> > your fuzzer manages to craft some nasty sequence of packets that
-> > tricks some rate limiting logic and lets you litter all over dmesg
-> > totally unbounded, I'd consider that a real security bug worth
-> > stressing out about. So from the perspective of letting your fuzzers
-> > loose on WireGuard, I'd actually like to see this option kept on.
->
-> This is the case even with CONFIG_WIREGUARD_DEBUG turned on, right? Or without?
+FFS, how many times do we have to talk about this auto-sprinkled
+sentence?!
 
-Turned on.
+https://lkml.kernel.org/r/20190805163202.GD18785@zn.tnic
 
-> Well, it may be able to trigger unbounded printing, but that won't be
-> detected as a bug and won't be reported. To be reported it needs to
-> fall into a set of predefined bug cases (e.g. "BUG:" or "WARNING:" on
-> console). Unless of course it triggers total stall/hang.
+-- 
+Regards/Gruss,
+    Boris.
 
-Bummer. Well, at least the stall case is interesting.
-
-> But I'm
-> afraid it will just dirty dmesg, make reading crashes harder and slow
-> down everything without benefit.
-
-Actually the point of the logging is usually to make it more obvious
-why a crash has come about, to provide some trail about the sequence
-of events. This was especially helpful in fixing old race conditions
-where subtle packet timing caused WireGuard's timer-based state
-machine to go haywire. Is syzkaller able to backtrack from crashes to
-the packets and packet timing that caused them, in order to make a
-test case to replay the crash? Is this precise enough for race
-condition bugs? If so, then when debugging the crashes I could always
-replay it later with logging turned on, in which case it might make
-sense to split out the debug logging into CONFIG_WIREGUARD_VERBOSE_LOG
-or similar (unless the logging itself changes the timing constraints
-and I can't repro that way). If this isn't possible, then it seems
-like logging might be something we would benefit from having in the
-crash reports, right? Or am I missing some other detail of how the
-system works?
-
-Jason
+https://people.kernel.org/tglx/notes-about-netiquette
