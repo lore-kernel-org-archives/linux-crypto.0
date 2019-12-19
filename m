@@ -1,82 +1,72 @@
-Return-Path: <SRS0=NTKo=2I=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=xTm+=2J=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7DA7C43603
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Dec 2019 16:45:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F20E6C43603
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Dec 2019 03:52:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B651D2146E
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Dec 2019 16:45:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=alien8.de header.i=@alien8.de header.b="fBUPT53I"
+	by mail.kernel.org (Postfix) with ESMTP id CDB7921582
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Dec 2019 03:52:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727192AbfLRQp6 (ORCPT
+        id S1726771AbfLSDwX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 18 Dec 2019 11:45:58 -0500
-Received: from mail.skyhub.de ([5.9.137.197]:48168 "EHLO mail.skyhub.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727334AbfLRQp5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 18 Dec 2019 11:45:57 -0500
-Received: from zn.tnic (p200300EC2F0B8B009D1D67E59157F47A.dip0.t-ipconnect.de [IPv6:2003:ec:2f0b:8b00:9d1d:67e5:9157:f47a])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 79A931EC09F1;
-        Wed, 18 Dec 2019 17:45:56 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1576687556;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=veM79yV+cFFmEZLqNeH8K6a+RQqwXlPU3rmWJpTwMAc=;
-        b=fBUPT53IBka5z+KEVntYJcp7wP7qQ54cuPs5kQAraLooNx6fq5wjTyKSH0eiAUSHdDQ1+G
-        fpdc81ctMpM6X7VTsRs8eitVE/G7pe4KbfRLNC4VSx/2MN3Nx5BUFW7T1KT/ThFYRm+sCa
-        0TJ3xDKmODWlqfF7szBdTWqtsny89pw=
-Date:   Wed, 18 Dec 2019 17:45:43 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Thomas Garnier <thgarnie@chromium.org>
-Cc:     Kernel Hardening <kernel-hardening@lists.openwall.com>,
-        Kristen Carlson Accardi <kristen@linux.intel.com>,
-        Kees Cook <keescook@chromium.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        the arch/x86 maintainers <x86@kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v10 01/11] x86/crypto: Adapt assembly for PIE support
-Message-ID: <20191218164543.GH24886@zn.tnic>
-References: <20191205000957.112719-1-thgarnie@chromium.org>
- <20191205000957.112719-2-thgarnie@chromium.org>
- <20191218124604.GE24886@zn.tnic>
- <CAJcbSZE56E_JqWpxvpHd194SAVn0fGJRiJWmLy=zfOyTthsGCg@mail.gmail.com>
+        Wed, 18 Dec 2019 22:52:23 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:7716 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726777AbfLSDwW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 18 Dec 2019 22:52:22 -0500
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 815FF1152FD0BD0C9E16;
+        Thu, 19 Dec 2019 11:52:20 +0800 (CST)
+Received: from linux-lmwb.huawei.com (10.175.103.112) by
+ DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
+ 14.3.439.0; Thu, 19 Dec 2019 11:52:10 +0800
+From:   Ma Feng <mafeng.ma@huawei.com>
+To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+CC:     <linux-crypto@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, Ma Feng <mafeng.ma@huawei.com>
+Subject: [PATCH] crypto: allwinner - Remove unneeded semicolon
+Date:   Thu, 19 Dec 2019 11:53:05 +0800
+Message-ID: <1576727585-113063-1-git-send-email-mafeng.ma@huawei.com>
+X-Mailer: git-send-email 2.6.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAJcbSZE56E_JqWpxvpHd194SAVn0fGJRiJWmLy=zfOyTthsGCg@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain
+X-Originating-IP: [10.175.103.112]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 18, 2019 at 08:35:32AM -0800, Thomas Garnier wrote:
-> In the last discussion, we mentioned Ingo (and other people) asked us
+Fixes coccicheck warning:
 
-The last discussion ended up with:
+drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c:558:52-53: Unneeded semicolon
 
-https://lkml.kernel.org/r/CAJcbSZEnPeCnkpc%2BuHmBWRJeaaw4TPy9HPkSGeriDb6mN6HR1g@mail.gmail.com
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: Ma Feng <mafeng.ma@huawei.com>
+---
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-which I read as, you'll remove that silly sentence from every commit
-message.
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
+index 73a7649..5373950 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
+@@ -555,7 +555,7 @@ static int sun8i_ce_probe(struct platform_device *pdev)
+ 		return -EINVAL;
+ 	}
 
--- 
-Regards/Gruss,
-    Boris.
+-	ce->base = devm_platform_ioremap_resource(pdev, 0);;
++	ce->base = devm_platform_ioremap_resource(pdev, 0);
+ 	if (IS_ERR(ce->base))
+ 		return PTR_ERR(ce->base);
 
-https://people.kernel.org/tglx/notes-about-netiquette
+--
+2.6.2
+
