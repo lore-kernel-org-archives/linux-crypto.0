@@ -2,118 +2,77 @@ Return-Path: <SRS0=xTm+=2J=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFA08C43603
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Dec 2019 16:40:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A535C43603
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Dec 2019 19:11:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 927F824672
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Dec 2019 16:40:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="XYNY/1ju"
+	by mail.kernel.org (Postfix) with ESMTP id C6649222C2
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Dec 2019 19:11:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1576782663;
+	bh=BWLeO1fdKRdQ+v3HbRCyNs5cudQrIbteuiI5tEQRpic=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=2BAD2Gpc0VdkDuz7VNHjew7mGhsNm3mEfy+F6+GxXG79Pg4ZpFdNBOdNUleIU/ft7
+	 IWx8zNN8206JmORvE+T8K9hCw3awB1g7ieLyzcwf34quWrb2+EL7AB+x9eFztiuX1j
+	 l3FrjqAgcwfOgjlA2aDdNli8awI0i3o6cwf6V/HA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726880AbfLSQkm (ORCPT
+        id S1728114AbfLSSi6 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Dec 2019 11:40:42 -0500
-Received: from mail-ed1-f67.google.com ([209.85.208.67]:42499 "EHLO
-        mail-ed1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726801AbfLSQkm (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Dec 2019 11:40:42 -0500
-Received: by mail-ed1-f67.google.com with SMTP id e10so5505656edv.9
-        for <linux-crypto@vger.kernel.org>; Thu, 19 Dec 2019 08:40:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Q6MJKY5kaJhdcPD2Yij+K4j3QBznO/FzqxPRwZHg2tA=;
-        b=XYNY/1juioQpuXWDwItjvluLKzqTb1s+LUDJh70eT+FynV6pmhNjrfR8rKpTN0Y4Vq
-         95LNMIm35iIung4zroafpJpZMFHIQW6gyl0nMe0sXzlo0Usj/osB8dJgXFazZDihbiKk
-         TXHN/eqPdNOFXyC7+ATLgVoMdiY/9k9+NozPc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Q6MJKY5kaJhdcPD2Yij+K4j3QBznO/FzqxPRwZHg2tA=;
-        b=XPS591GQX3xGwmFiJDnCcSGD9Qy2an0Knq6BqG8HMBZR7uW0OD+h1wi2tkMve7OzS9
-         QAf/ChNcuJTWw+6DIDnFtPVy6yYiwBT+X/lAEUH0p8npY5FwfK3bBqHHkC3A/mNNspjG
-         zzmgFhXv26X9XxwU/ycCfEd8Qv9Q8Td3vdUslhP2+PvZLFXoX2afOW7t3wAF1+oqqFsL
-         Wiq55dj55Ihw7lUhl3dsidUFBaQt2H3zhQ7bUopcjCSDLdqCchPDRkxT3ZcprHyWZiQE
-         dCrBlAPue+6rjcCA+HmgsRwkF4pb6G0HvyfDFG4UAZ2FbBTyGtKHFLOYti2Tp3w9Y/Cs
-         5IbA==
-X-Gm-Message-State: APjAAAXCA/AbTmhkAYCL/zmn/Gv9TSFiv+/oiJHPrmiAmaGy9p7AXRXu
-        Ku/+aPpY4y2n3ahJyME+F0qjNBfGrqI=
-X-Google-Smtp-Source: APXvYqzodbtPMd6NjiAXGLKNXCMumnzShFXAz7M0aaH7A1/tOZactiJO5/WHt+WfsDnJ0zu9hwg0Ig==
-X-Received: by 2002:a50:e387:: with SMTP id b7mr10200146edm.43.1576773640736;
-        Thu, 19 Dec 2019 08:40:40 -0800 (PST)
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com. [209.85.221.54])
-        by smtp.gmail.com with ESMTPSA id j21sm510435eds.8.2019.12.19.08.40.40
-        for <linux-crypto@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 Dec 2019 08:40:40 -0800 (PST)
-Received: by mail-wr1-f54.google.com with SMTP id b6so6693849wrq.0
-        for <linux-crypto@vger.kernel.org>; Thu, 19 Dec 2019 08:40:40 -0800 (PST)
-X-Received: by 2002:adf:ee92:: with SMTP id b18mr10865736wro.281.1576773336863;
- Thu, 19 Dec 2019 08:35:36 -0800 (PST)
-MIME-Version: 1.0
-References: <20191205000957.112719-1-thgarnie@chromium.org> <20191219133452.GM2827@hirez.programming.kicks-ass.net>
-In-Reply-To: <20191219133452.GM2827@hirez.programming.kicks-ass.net>
-From:   Thomas Garnier <thgarnie@chromium.org>
-Date:   Thu, 19 Dec 2019 08:35:25 -0800
-X-Gmail-Original-Message-ID: <CAJcbSZEubkFN0BLugoBm8fsPrNWxfFCDytC3nYUepr74dQFS=w@mail.gmail.com>
-Message-ID: <CAJcbSZEubkFN0BLugoBm8fsPrNWxfFCDytC3nYUepr74dQFS=w@mail.gmail.com>
-Subject: Re: [PATCH v10 00/11] x86: PIE support to extend KASLR randomization
-To:     Peter Zijlstra <peterz@infradead.org>
-Cc:     Kernel Hardening <kernel-hardening@lists.openwall.com>,
-        Kristen Carlson Accardi <kristen@linux.intel.com>,
-        Kees Cook <keescook@chromium.org>,
+        Thu, 19 Dec 2019 13:38:58 -0500
+Received: from mail.kernel.org ([198.145.29.99]:56996 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727262AbfLSSi5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 19 Dec 2019 13:38:57 -0500
+Received: from gmail.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id D38DE24679;
+        Thu, 19 Dec 2019 18:38:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1576780737;
+        bh=BWLeO1fdKRdQ+v3HbRCyNs5cudQrIbteuiI5tEQRpic=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=a2O6vdy8N9yK49XNdWSDm72qrQpiUNBCNoc4Eh8Al5w+kNEDrbnW+5ik1mQt/YdLd
+         9YhZK441tounFZWVFobf8mg3MFKRHCEvhbudJ5cRCROr6fBG96jUuvcqmihDrdzUp+
+         w90LSpfgz2dn7TXT0+FFy2ZBRgsuxrYVQF0kO72I=
+Date:   Thu, 19 Dec 2019 10:38:55 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Michal Suchanek <msuchanek@suse.de>
+Cc:     linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "the arch/x86 maintainers" <x86@kernel.org>,
-        Andy Lutomirski <luto@kernel.org>,
-        Juergen Gross <jgross@suse.com>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        "VMware, Inc." <pv-drivers@vmware.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Will Deacon <will@kernel.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Alexios Zavras <alexios.zavras@intel.com>,
-        Allison Randal <allison@lohutok.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        virtualization@lists.linux-foundation.org,
-        Linux PM list <linux-pm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: testmgr: allow building a copy as loadable
+ module for testing.
+Message-ID: <20191219183854.GA54076@gmail.com>
+References: <20191219160636.26316-1-msuchanek@suse.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20191219160636.26316-1-msuchanek@suse.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Dec 19, 2019 at 5:35 AM Peter Zijlstra <peterz@infradead.org> wrote:
->
-> On Wed, Dec 04, 2019 at 04:09:37PM -0800, Thomas Garnier wrote:
-> > Minor changes based on feedback and rebase from v9.
-> >
-> > Splitting the previous serie in two. This part contains assembly code
-> > changes required for PIE but without any direct dependencies with the
-> > rest of the patchset.
->
-> ISTR suggestion you add an objtool pass that verifies there are no
-> absolute text references left. Otherwise we'll forever be chasing that
-> last one..
+On Thu, Dec 19, 2019 at 05:06:36PM +0100, Michal Suchanek wrote:
+> There is no way to just run the tests built into testmgr. Also it is
+> rarely possible to build testmgr modular due to KConfig dependencies.
+> 
+> Add a module that does not provide infrastructure, just runs testmgr
+> tests.
+> 
+> Signed-off-by: Michal Suchanek <msuchanek@suse.de>
 
-Correct, I have a reference in the changelog saying I will tackle in
-the next patchset because we still have non-pie references in other
-places but the fix is a bit more complex (for exemple per-cpu) and not
-included in this phase. I will add a better explanation in the next
-message for patch v11.
+Why does this need to be a kernel module?  Since the self-tests are already run
+at algorithm registration time, it's already possible to use AF_ALG or
+crypto_user to allocate all algorithms which have self-tests.
+
+- Eric
