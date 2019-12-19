@@ -2,69 +2,60 @@ Return-Path: <SRS0=xTm+=2J=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F379C2D0C1
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Dec 2019 10:49:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8370FC43603
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Dec 2019 10:50:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1371A222C2
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Dec 2019 10:49:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 47BB321D7D
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Dec 2019 10:50:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="W54SHQ5d"
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="s/qYltPn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726633AbfLSKtg (ORCPT
+        id S1726668AbfLSKuf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Dec 2019 05:49:36 -0500
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:35489 "EHLO
-        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726694AbfLSKtf (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Dec 2019 05:49:35 -0500
-Received: by mail-qk1-f194.google.com with SMTP id z76so4629459qka.2
-        for <linux-crypto@vger.kernel.org>; Thu, 19 Dec 2019 02:49:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=deId2JVQ12jlGeQHYsi9LkbuFlqPgIP/ixlZ7XgRV7I=;
-        b=W54SHQ5dlTm6SThWjY6Bc5SCBNejl/zWftJRnsauXNSyNMSdUA2HX7Q9hbbKpOmyE6
-         lBPZXrRNUT0G5Dhea3G7dyDt5gVpYE4CknR0ofVlj+TBFuiqi5w/Ox2hX93OkAzwWewx
-         zlY1BmrW997a+ZNGk4lECZBdofKldism9dtxUfd3bOZfPKfLioHTJAQ26aCJMicC/4z5
-         ijuY7OAnvYvCoG/VgM39BURMYHeO1cPruRHJIOqPhXqbpsfGPv9rHQzMglUx/cAu+F4j
-         k6FFeRNotAB9W0Ae3zjq5eg6nvI1JwAFmxtBAsObUEtiYfu30ehBlm4FXWc/tOtMHfJp
-         CI7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=deId2JVQ12jlGeQHYsi9LkbuFlqPgIP/ixlZ7XgRV7I=;
-        b=hQxLQEIKcxaobdGdvXqVbn5Qi99+hHkIHBYseT3F+5qTWBpY2LnY4MQOhxCZZE5P3p
-         8m7iRTqSEnza9ECBgynr4kZrOKq6HO+y0nsPdrpvKaF78/lvXhuuG0tCNBZ00jF9LqYI
-         NNqnZ0BOB1t2/G7T22A2WeQZnCQ7ML+fAB1GwRHv7iOM62HsRYDriZxwy878h1YZBQl+
-         GMcEsv7YJBA1cKmW7GeXIXocSsQgnj+MmjpdhcrsPSNuzbA+8UwW8Of2WAI5cW9ERh9O
-         QzwUhKrmb1noDY8XjiqaSY4h8sU9qbKPjK3eRIpmkEsTjisCkR2Mw9XOBYBJXi/VLywK
-         xkgA==
-X-Gm-Message-State: APjAAAXMcsMpCxZsliwisRtuUuTD5eH4A3AH6C6JOrKBkfGHjr+RNvF6
-        P847ucjnNTdUEPTLO1ePkFS07iohM7PGUHalPqqZWbZjlTk=
-X-Google-Smtp-Source: APXvYqzwhtA5yupYMnkUb/LMNdluvQ09zvtZWL+0pPgsXyWCWFF/OnGQd/gYwoadTMrw8erMOsfI9zjM4+SudhHRHf0=
-X-Received: by 2002:ae9:eb48:: with SMTP id b69mr7186389qkg.43.1576752574661;
- Thu, 19 Dec 2019 02:49:34 -0800 (PST)
+        Thu, 19 Dec 2019 05:50:35 -0500
+Received: from frisell.zx2c4.com ([192.95.5.64]:46277 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726633AbfLSKuf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 19 Dec 2019 05:50:35 -0500
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id c667ec1b;
+        Thu, 19 Dec 2019 09:53:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
+        :references:in-reply-to:from:date:message-id:subject:to:cc
+        :content-type; s=mail; bh=GyQANekzB2h7Mmd6y6oCcFxKVhQ=; b=s/qYlt
+        PnIM6A6GkurQlk2Ar8T8qSTXpvyPWHiAEVHfURilOwXrjs3NjyyWNxyNrLK4PL+Y
+        z2T5Qhb6++Ohx9SpLX39m0ULf91XXHGYp3dbTNPBdc7EHleQrWp74iR2QvlzZlks
+        7PEd4Narcu6X0L02O7+WY4CoEpSDhY2QszJBmDyYP/3Df+YSp4uOskXlSMOoe2m2
+        M8XX1nktJ1zndrhm/eq4ftTkPU75ZwZnT4sfC5fFILa3ZW9GagNyUkSP3NHEnfRo
+        NJx3yV0usVkLzzCw9WYhpHpSDN/eNdYlRye5kdW6Zb/VdD+56rLrR4yV6ysQD52j
+        z/dsG686jbmbz9QA==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 135ea1c5 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
+        Thu, 19 Dec 2019 09:53:52 +0000 (UTC)
+Received: by mail-ot1-f43.google.com with SMTP id h9so4145295otj.11;
+        Thu, 19 Dec 2019 02:50:33 -0800 (PST)
+X-Gm-Message-State: APjAAAUVn57XkLUuXcdJWVbFbEWmyzfi2OsMIzwqoi2/8zxdfyGPp8Bh
+        sCaPtuxOU6TDabggpT1sajpCpNHvw478RAkgWII=
+X-Google-Smtp-Source: APXvYqyOjDE/JGl4JOdsCt2LI14BVtDqDKXAQqVTZdkqtmpAnah60r/cQNnslAxZCzGGekHa84RO/mvbmWXDJrEBApU=
+X-Received: by 2002:a9d:674f:: with SMTP id w15mr8304067otm.243.1576752632820;
+ Thu, 19 Dec 2019 02:50:32 -0800 (PST)
 MIME-Version: 1.0
 References: <20191208232734.225161-1-Jason@zx2c4.com> <CACT4Y+bsJVmgbD-WogwU=LfWiPN1JgjBrwx4s8Y14hDd7vqqhQ@mail.gmail.com>
  <CAHmME9o0AparjaaOSoZD14RAW8_AJTfKfcx3Y2ndDAPFNC-MeQ@mail.gmail.com>
  <CACT4Y+Zssd6OZ2-U4kjw18mNthQyzPWZV_gkH3uATnSv1SVDfA@mail.gmail.com>
  <CAHmME9oM=YHMZyg23WEzmZAof=7iv-A01VazB3ihhR99f6X1cg@mail.gmail.com>
  <CACT4Y+aCEZm_BA5mmVTnK2cR8CQUky5w1qvmb2KpSR4-Pzp4Ow@mail.gmail.com>
- <CAHmME9rYstVLCBOgdMLqMeVDrX1V-f92vRKDqWsREROWdPbb6g@mail.gmail.com> <CAHmME9qUWr69o0r+Mtm8tRSeQq3P780DhWAhpJkNWBfZ+J5OYA@mail.gmail.com>
-In-Reply-To: <CAHmME9qUWr69o0r+Mtm8tRSeQq3P780DhWAhpJkNWBfZ+J5OYA@mail.gmail.com>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Thu, 19 Dec 2019 11:49:23 +0100
-Message-ID: <CACT4Y+YfBDvQHdK24ybyyy5p07MXNMnLA7+gq9axq-EizN6jhA@mail.gmail.com>
+ <CAHmME9rYstVLCBOgdMLqMeVDrX1V-f92vRKDqWsREROWdPbb6g@mail.gmail.com> <CACT4Y+Zs=SQwYS8yx3ds7HBhr1RHkDwRe_av2XjJty-5wMTFEA@mail.gmail.com>
+In-Reply-To: <CACT4Y+Zs=SQwYS8yx3ds7HBhr1RHkDwRe_av2XjJty-5wMTFEA@mail.gmail.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Thu, 19 Dec 2019 11:50:21 +0100
+X-Gmail-Original-Message-ID: <CAHmME9pe1XNfT5LN0---WQgQYEHVaFRC9fkqTBsTYcU6GbGnFA@mail.gmail.com>
+Message-ID: <CAHmME9pe1XNfT5LN0---WQgQYEHVaFRC9fkqTBsTYcU6GbGnFA@mail.gmail.com>
 Subject: Re: [PATCH net-next v2] net: WireGuard secure network tunnel
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Dmitry Vyukov <dvyukov@google.com>
 Cc:     netdev <netdev@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>,
         David Miller <davem@davemloft.net>,
@@ -79,31 +70,23 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Dec 19, 2019 at 11:11 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> On Thu, Dec 19, 2019 at 11:07 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> >
-> > On Thu, Dec 19, 2019 at 10:35 AM Dmitry Vyukov <dvyukov@google.com> wrote:
-> > That's exciting about syzcaller having at it with WireGuard. Is there
-> > some place where I can "see" it fuzzing WireGuard, or do I just wait
-> > for the bug reports to come rolling in?
->
-> Ahh, found it: https://storage.googleapis.com/syzkaller/cover/ci-upstream-net-kasan-gce.html
-> Looks like we're at 1% and counting. :)
+On Thu, Dec 19, 2019 at 11:42 AM Dmitry Vyukov <dvyukov@google.com> wrote:
+> Well, unfortunately it does not test wireguard at the moment. I've
+> enabled the config as I saw it appeared in linux-next:
+> https://github.com/google/syzkaller/commit/240ba66ba8a0a99f27e1aac01f376331051a65c2
+> but that's it for now.
 
-Yes, that's it. But that's mostly stray coverage.
-wg_netdevice_notification I guess mostly because it tested _other_ device types.
-And a bit of netlink because it sends random garbage into netlink.
+I do see that in the linux-next and net-next instances you have
+running, it's at least hitting interface creation and netlink.
 
-For netlink part it would require something along these lines:
-https://github.com/google/syzkaller/blob/master/sys/linux/socket_netlink_generic_devlink.txt
-https://github.com/google/syzkaller/blob/master/sys/linux/socket_netlink_crypto.txt
-https://github.com/google/syzkaller/blob/master/sys/linux/socket_netlink_generic_fou.txt
-https://github.com/google/syzkaller/blob/master/sys/linux/socket_netlink_generic_seg6.txt
+> There are 3000 subsystems, are you ready to describe precise interface
+> for all of them with all the necessary setup and prerequisites? Nobody
+> can do it for all subsystems. Developer of a particular subsystem is
+> the best candidate for also describing what it takes to test it ;)
 
-And for device setup, harder to say. Either pre-create one here:
-https://github.com/google/syzkaller/blob/79b211f74b08737aeb4934c6ff69a263b3c38013/executor/common_linux.h#L668
-or teach it how to create them on the fly or both or something else.
-
-Probably some wire packet formats here:
-https://github.com/google/syzkaller/blob/79b211f74b08737aeb4934c6ff69a263b3c38013/sys/linux/vnet.txt
+Sure, I'd be happy to help get things rolling on WireGuard. What do
+you need from me? A small shell script to set up a few interfaces that
+are peered with each other? Sample packets to begin mutations from?
+Since most of WireGuard's surface is behind constant-time/branchless
+crypto, I doubt you'll fuzz your way to having valid key agreement,
+which makes me think some sort of setup is necessary.
