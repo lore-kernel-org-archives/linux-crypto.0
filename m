@@ -2,71 +2,118 @@ Return-Path: <SRS0=xTm+=2J=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F20E6C43603
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Dec 2019 03:52:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44BE0C43603
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Dec 2019 04:55:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CDB7921582
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Dec 2019 03:52:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF7BF24672
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Dec 2019 04:55:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="V+e8y+pN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726771AbfLSDwX (ORCPT
+        id S1726879AbfLSEzX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 18 Dec 2019 22:52:23 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:7716 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726777AbfLSDwW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 18 Dec 2019 22:52:22 -0500
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 815FF1152FD0BD0C9E16;
-        Thu, 19 Dec 2019 11:52:20 +0800 (CST)
-Received: from linux-lmwb.huawei.com (10.175.103.112) by
- DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
- 14.3.439.0; Thu, 19 Dec 2019 11:52:10 +0800
-From:   Ma Feng <mafeng.ma@huawei.com>
-To:     Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-CC:     <linux-crypto@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, Ma Feng <mafeng.ma@huawei.com>
-Subject: [PATCH] crypto: allwinner - Remove unneeded semicolon
-Date:   Thu, 19 Dec 2019 11:53:05 +0800
-Message-ID: <1576727585-113063-1-git-send-email-mafeng.ma@huawei.com>
-X-Mailer: git-send-email 2.6.2
+        Wed, 18 Dec 2019 23:55:23 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:48757 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726834AbfLSEzX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 18 Dec 2019 23:55:23 -0500
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 47dfh85HQfz9sP6;
+        Thu, 19 Dec 2019 15:55:20 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1576731321;
+        bh=4oisl15yYHcWvrgH7/qJUhxc0HGkWrgz8xu4a08nXFA=;
+        h=Date:From:To:Cc:Subject:From;
+        b=V+e8y+pNOKeLNBURT7kjixANS4SVEDYceNYtrVJRyVxgEvz2dKe04Lb/t5K5aSB+S
+         yQ9fycQ5g6a291V/NrF4hzrPwY3FBGP5W4mKejkgIb31ME2I3LqiKqYIR30E9pn3SB
+         QNsgKr3nRWHRn3bifsNWWe3+rLwmK2CLVE1pKJKzH8gtmapf+GVARfzCSnHEf4UrJv
+         bXIVyQ/goN9DjDkpbQejiGhJLZTJTUW2HRhAxGF9ucJWU11uQ9x/I3BYEes7GbgDj8
+         tHt9Gbe7RYUhTF2dPSlFG4wHFmxK5EWkcdFwfhhfoBunmxOK9zJT/uk6b6jfZsM8CW
+         4vb2PY8QkN+2Q==
+Date:   Thu, 19 Dec 2019 15:55:14 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Arnd Bergmann <arnd@arndb.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>
+Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>
+Subject: linux-next: manual merge of the y2038 tree with the crypto tree
+Message-ID: <20191219155514.49589ea3@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.103.112]
-X-CFilter-Loop: Reflected
+Content-Type: multipart/signed; boundary="Sig_/XanQVetIlfap.mZksF7WZM3";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Fixes coccicheck warning:
+--Sig_/XanQVetIlfap.mZksF7WZM3
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c:558:52-53: Unneeded semicolon
+Hi all,
 
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: Ma Feng <mafeng.ma@huawei.com>
----
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Today's linux-next merge of the y2038 tree got a conflict in:
 
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-index 73a7649..5373950 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-@@ -555,7 +555,7 @@ static int sun8i_ce_probe(struct platform_device *pdev)
- 		return -EINVAL;
- 	}
+  Documentation/core-api/index.rst
 
--	ce->base = devm_platform_ioremap_resource(pdev, 0);;
-+	ce->base = devm_platform_ioremap_resource(pdev, 0);
- 	if (IS_ERR(ce->base))
- 		return PTR_ERR(ce->base);
+between commit:
 
---
-2.6.2
+  bfcdcef8c8e3 ("padata: update documentation")
 
+from the crypto tree and commit:
+
+  07430b71bd51 ("Documentation: document ioctl interfaces better")
+
+from the y2038 tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc Documentation/core-api/index.rst
+index ab0b9ec85506,3f28b2f668be..000000000000
+--- a/Documentation/core-api/index.rst
++++ b/Documentation/core-api/index.rst
+@@@ -39,7 -39,7 +39,8 @@@ Core utilitie
+     ../RCU/index
+     gcc-plugins
+     symbol-namespaces
+ +   padata
++    ioctl
+ =20
+ =20
+  Interfaces for kernel debugging
+
+--Sig_/XanQVetIlfap.mZksF7WZM3
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl37ArIACgkQAVBC80lX
+0GwIFQf+JkHLyLZhpezGSHADWZfyGY5U0ShJRjjfKtXqojKdTrXfZ/3cG0IdY4fs
+Kc0V0+zz6+So5uBVAi+GbheVn4N5RrWS9n+fn4UKZ4NckR0UZMCbQ8zgLQaS6710
+8x1LVT0QRe8HLoD49eJ02YBHCKS4ULNI0OXtSk5Q04Uh8l4Rj67n2JQMSRI+tMVQ
+iHBfsFi8qGtEo+71HqX5tJx1uF/JcVpkrzm4hjmc6Go8glS4bPhbK+UDk+0OrKLB
+ez6IA6BlDQDt+nRmn0qNJQGj2UxWe9qnppb1Gn004ZcNW1Jgp6szRKxLcnq3vyHR
+dcUsmWye0W7xA+Qx3c1GOdI34dh8oQ==
+=zKDt
+-----END PGP SIGNATURE-----
+
+--Sig_/XanQVetIlfap.mZksF7WZM3--
