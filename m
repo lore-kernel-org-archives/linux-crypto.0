@@ -2,156 +2,150 @@ Return-Path: <SRS0=xTm+=2J=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E494C43603
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Dec 2019 08:50:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED7FFC43603
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Dec 2019 09:35:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 112AB2064B
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Dec 2019 08:50:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC88424685
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Dec 2019 09:35:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RhZ4L+Xe"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726618AbfLSIuL (ORCPT
+        id S1726813AbfLSJfa (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Dec 2019 03:50:11 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:64576 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726536AbfLSIuL (ORCPT
+        Thu, 19 Dec 2019 04:35:30 -0500
+Received: from mail-qv1-f65.google.com ([209.85.219.65]:38165 "EHLO
+        mail-qv1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726801AbfLSJfa (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Dec 2019 03:50:11 -0500
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id xBJ8mC7l011583;
-        Thu, 19 Dec 2019 03:49:51 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2x04gybmnh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Dec 2019 03:49:51 -0500
-Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id xBJ8mJF3012484;
-        Thu, 19 Dec 2019 03:49:50 -0500
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2x04gybmna-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Dec 2019 03:49:50 -0500
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id xBJ8mNLl007367;
-        Thu, 19 Dec 2019 08:49:50 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
-        by ppma03wdc.us.ibm.com with ESMTP id 2wvqc6vvvb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 19 Dec 2019 08:49:50 +0000
-Received: from b03ledav002.gho.boulder.ibm.com (b03ledav002.gho.boulder.ibm.com [9.17.130.233])
-        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id xBJ8nn0734079220
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 19 Dec 2019 08:49:49 GMT
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 08CC5136053;
-        Thu, 19 Dec 2019 08:49:49 +0000 (GMT)
-Received: from b03ledav002.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 7AD44136051;
-        Thu, 19 Dec 2019 08:49:48 +0000 (GMT)
-Received: from [9.70.82.143] (unknown [9.70.82.143])
-        by b03ledav002.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Thu, 19 Dec 2019 08:49:48 +0000 (GMT)
-Subject: Re: [PATCH 08/10] crypto/NX: Add NX GZIP user space API
-From:   Haren Myneni <haren@linux.ibm.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     mpe@ellerman.id.au, linux-crypto@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, hch@infradead.org,
-        npiggin@gmail.com, mikey@neuling.org, sukadev@linux.vnet.ibm.com
-In-Reply-To: <20191217093334.ihvz3fzzfgjwse32@gondor.apana.org.au>
-References: <1576414240.16318.4066.camel@hbabu-laptop>
-         <1576415119.16318.4094.camel@hbabu-laptop>
-         <20191217093334.ihvz3fzzfgjwse32@gondor.apana.org.au>
+        Thu, 19 Dec 2019 04:35:30 -0500
+Received: by mail-qv1-f65.google.com with SMTP id t6so1966450qvs.5
+        for <linux-crypto@vger.kernel.org>; Thu, 19 Dec 2019 01:35:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=i3kinH9BKdcFWrmC53cr2rYC6iVhtIiNy5b7BJBTamU=;
+        b=RhZ4L+XeesMX8bq4b7b4SjjJMIzYqW/kFA+aLP/E/omYTcpkyqrnaTSkIjYfnrC+j3
+         Yu6QyJHygnNWgDy52rLc3Eh/goTp18pB1gv9G9C4WcM+mz+/8seuKGe5dwZ0ysIXekxD
+         glDiT2rNr+LAgopPqiO0qLmlJ+vQ/FWNrQ6Oc6dHGrNQmZlu83rt2/ris1BRWkMzWbuV
+         SuZoS5+E+tyGeGWAcOT6JApeE3sUyo3swp0HgZCvlT5gQyXCv89Kc5kHhbWNvxg4KaeR
+         UkeCd56nvBhCCmUvgqcOdGB2XnVDvU1LIPPyAfx/JkAdgn4QE+WuguxvpCmcT4rhgA+3
+         OD8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=i3kinH9BKdcFWrmC53cr2rYC6iVhtIiNy5b7BJBTamU=;
+        b=di8uEyBeptZtr1sfAeSM8kHM+qdLy1+hRPrDvI1pP5+/P6yZvJodulKrj6CRh/+xjy
+         hr8/Xcx9NSbnFOywCJxaiUru9apirSB0vX8EMybU8Fn3mOpq8f39mzvXUK1Fcp8aF6X7
+         SjZJJo2PcUcoJ0b+Y2lxjIDnUQQM+RAdpW3EiLEU8VnzYVW5/TCpFEa9RnSKZ4R2gtVZ
+         KI1HEI9/ZaJd8NXZzBO+yaYJix2lzPx4Yszs8qRkSwPly1m5XHMfceNyOTg4UQDtJHOA
+         ONKfjHI4s/CBNYnYZJiIkqaSJi+rp8ZssJ1HjmZXmUeRZvMRP8RTYiRTbdCtinYSVlm9
+         zTOw==
+X-Gm-Message-State: APjAAAX2Kusel0/McYgZKtaFmPMV3NoCWexSXX7VDtfeECQOZ6iSm5Vn
+        VxrNxuBz4DRSZJxmO+vo/40sS7G3RjatbW6BxM5sTg==
+X-Google-Smtp-Source: APXvYqy6Yj7NLDWm5gkYIu8GE7GppWwnrEdh9KUENE1GXmBiReYe5mDSw8lgNZtD5WJAiQ4gh3ZGTlod9wsiTweaUJI=
+X-Received: by 2002:a0c:c351:: with SMTP id j17mr6777104qvi.80.1576748128716;
+ Thu, 19 Dec 2019 01:35:28 -0800 (PST)
+MIME-Version: 1.0
+References: <20191208232734.225161-1-Jason@zx2c4.com> <CACT4Y+bsJVmgbD-WogwU=LfWiPN1JgjBrwx4s8Y14hDd7vqqhQ@mail.gmail.com>
+ <CAHmME9o0AparjaaOSoZD14RAW8_AJTfKfcx3Y2ndDAPFNC-MeQ@mail.gmail.com>
+ <CACT4Y+Zssd6OZ2-U4kjw18mNthQyzPWZV_gkH3uATnSv1SVDfA@mail.gmail.com> <CAHmME9oM=YHMZyg23WEzmZAof=7iv-A01VazB3ihhR99f6X1cg@mail.gmail.com>
+In-Reply-To: <CAHmME9oM=YHMZyg23WEzmZAof=7iv-A01VazB3ihhR99f6X1cg@mail.gmail.com>
+From:   Dmitry Vyukov <dvyukov@google.com>
+Date:   Thu, 19 Dec 2019 10:35:17 +0100
+Message-ID: <CACT4Y+aCEZm_BA5mmVTnK2cR8CQUky5w1qvmb2KpSR4-Pzp4Ow@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] net: WireGuard secure network tunnel
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     netdev <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        David Miller <davem@davemloft.net>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Date:   Thu, 19 Dec 2019 00:49:44 -0800
-Message-ID: <1576745384.12797.37.camel@hbabu-laptop>
-Mime-Version: 1.0
-X-Mailer: Evolution 2.28.3 
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.95,18.0.572
- definitions=2019-12-18_08:2019-12-17,2019-12-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
- impostorscore=0 lowpriorityscore=0 bulkscore=0 spamscore=0 clxscore=1015
- phishscore=0 priorityscore=1501 malwarescore=0 adultscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-1910280000 definitions=main-1912190075
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 2019-12-17 at 17:33 +0800, Herbert Xu wrote:
-> On Sun, Dec 15, 2019 at 05:05:19AM -0800, Haren Myneni wrote:
-> > 
-> > On power9, userspace can send GZIP compression requests directly to NX
-> > once kernel establishes NX channel / window. This patch provides GZIP
-> > engine access to user space via /dev/crypto/nx-gzip device node with
-> > open, VAS_TX_WIN_OPEN ioctl, mmap and close operations.
-> > 
-> > Each window corresponds to file descriptor and application can open
-> > multiple windows. After the window is opened, mmap() system call to map
-> > the hardware address of engine's request queue into the application's
-> > virtual address space.
-> > 
-> > Then the application can then submit one or more requests to the the
-> > engine by using the copy/paste instructions and pasting the CRBs to
-> > the virtual address (aka paste_address) returned by mmap().
-> > 
-> > Signed-off-by: Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
-> > Signed-off-by: Haren Myneni <haren@us.ibm.com>
-> > ---
-> >  drivers/crypto/nx/Makefile            |   2 +-
-> >  drivers/crypto/nx/nx-842-powernv.h    |   2 +
-> >  drivers/crypto/nx/nx-commom-powernv.c |  21 ++-
-> >  drivers/crypto/nx/nx-gzip-powernv.c   | 282 ++++++++++++++++++++++++++++++++++
-> >  4 files changed, 304 insertions(+), 3 deletions(-)
-> >  create mode 100644 drivers/crypto/nx/nx-gzip-powernv.c
-> 
-> We already have a kernel compress API which could be exposed
-> to user-space through af_alg.  If every driver created their
-> own user-space API it would be unmanageable.
+On Wed, Dec 18, 2019 at 12:50 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+>
+> Hi Dmitry,
+>
+> On Wed, Dec 18, 2019 at 12:37 PM Dmitry Vyukov <dvyukov@google.com> wrote:
+> > > Actually with WireGuard, I think that's not the case. The WireGuard
+> > > logging has been written with DoS in mind. You /should/ be able to
+> > > safely run it on a production system exposed to the wild Internet, and
+> > > while there will be some additional things in your dmesg, an attacker
+> > > isn't supposed to be able to totally flood it without ratelimiting or
+> > > inject malicious strings into it (such as ANSI escape sequence). In
+> > > other words, I consider the logging to be fair game attack surface. If
+> > > your fuzzer manages to craft some nasty sequence of packets that
+> > > tricks some rate limiting logic and lets you litter all over dmesg
+> > > totally unbounded, I'd consider that a real security bug worth
+> > > stressing out about. So from the perspective of letting your fuzzers
+> > > loose on WireGuard, I'd actually like to see this option kept on.
+> >
+> > This is the case even with CONFIG_WIREGUARD_DEBUG turned on, right? Or without?
+>
+> Turned on.
+>
+> > Well, it may be able to trigger unbounded printing, but that won't be
+> > detected as a bug and won't be reported. To be reported it needs to
+> > fall into a set of predefined bug cases (e.g. "BUG:" or "WARNING:" on
+> > console). Unless of course it triggers total stall/hang.
+>
+> Bummer. Well, at least the stall case is interesting.
+>
+> > But I'm
+> > afraid it will just dirty dmesg, make reading crashes harder and slow
+> > down everything without benefit.
+>
+> Actually the point of the logging is usually to make it more obvious
+> why a crash has come about, to provide some trail about the sequence
+> of events. This was especially helpful in fixing old race conditions
+> where subtle packet timing caused WireGuard's timer-based state
+> machine to go haywire. Is syzkaller able to backtrack from crashes to
+> the packets and packet timing that caused them, in order to make a
+> test case to replay the crash?
 
-Thanks. 
+Sometimes. You may sort by "Repro" column here to get the ratio:
+https://syzkaller.appspot.com/upstream
+https://syzkaller.appspot.com/upstream/fixed
 
-Virtual Accelerator Switchboard (VAS) can provide support different
-accelerators, Right now only NX is used, but possible to extend to
-others in future. Or different functionalities such as fast thread
-wakeup (VAS feature) with VAS windows. 
+> Is this precise enough for race
+> condition bugs?
 
-So looking common VAS API for any its accelerators. Need open a window /
-channel - open() and ioctl()) calls, and setup the communications with
-mapping address to NX (mmap()) and close the window. Then user space
-communicates to accelerator directly without kernel involvement.
-Specific drivers should set window attributes such as how many requests
-can be send at same time and etc. All other interfaces should be same
-for any accelerator. 
+It's finding lots of race conditions provoked bugs (I would say it's
+the most common cause of kernel bugs).
 
-Also, since user space sends requests directly, should restrict
-malicious users to prevent overload NX (security issue). Allowing
-sysadmin to restrict /dev/crypto/nx-gzip usage. 
+> If so, then when debugging the crashes I could always
+> replay it later with logging turned on, in which case it might make
+> sense to split out the debug logging into CONFIG_WIREGUARD_VERBOSE_LOG
+> or similar (unless the logging itself changes the timing constraints
+> and I can't repro that way). If this isn't possible, then it seems
+> like logging might be something we would benefit from having in the
+> crash reports, right? Or am I missing some other detail of how the
+> system works?
 
+Well, you are missing that wireguard is not the only subsystem
+syzkaller tests (in fact, it does not test it at all) and there are
+3000 other subsystems :)
+If we enable verbose debug logging for all of them, we will get storm
+of output and the wireguard logging you are interested in may simply
+be evicted from the 1MB buffer. Also, the expected case is that a
+program does not crash, in that case we waste performance for
+unnecessary logging (and not finding bugs because of that).
 
-As you suggested, SW crypto API (af_alg) can be used just for NX
-compression like using API based on the accelerator functionalities. It
-is socket based API with AF_ALG socket family. But is there a way for
-sysadmin to restrict usage from user space? Need just few functions in
-struct proto. 
+In some cases there are reproducers, in some cases a bug is trivial to
+debug based on the crash report (no tracing needed).
 
-static struct proto_ops {
-	.family = PF_ALG,
-	.ioctl = nxgzip_ioctl,
-	.mmap = nxgzip_mmap,
-	.release = nxgzip_release,
-};
-
-Thanks
-Haren
-
-
-> 
-> Cheers,
-
-
+But additional debug checks are useful in any testing.
