@@ -2,143 +2,656 @@ Return-Path: <SRS0=xTm+=2J=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0444FC43603
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Dec 2019 14:30:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B0FCC43603
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Dec 2019 16:06:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CAB0924672
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Dec 2019 14:30:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X4JdQxLB"
+	by mail.kernel.org (Postfix) with ESMTP id 6223F2146E
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Dec 2019 16:06:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727089AbfLSOaQ (ORCPT
+        id S1726789AbfLSQGo (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Dec 2019 09:30:16 -0500
-Received: from mail-qt1-f196.google.com ([209.85.160.196]:38343 "EHLO
-        mail-qt1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727066AbfLSOaP (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Dec 2019 09:30:15 -0500
-Received: by mail-qt1-f196.google.com with SMTP id n15so5190894qtp.5
-        for <linux-crypto@vger.kernel.org>; Thu, 19 Dec 2019 06:30:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=B0yYV/zgiGoFwELUZOcLeBECeRrqa1TZpxKzwpeVoiM=;
-        b=X4JdQxLB8A+xTSDcWAFSXvHAsV/pLYvfJ/9CRK25ABgDGZhLlUNXsFVT7NELZzD2xc
-         xyiH63onBkOj2Vc5LVvsXgNy+c0QnawRjs2Wa7mv43P7vl7dLWB+V2XrpFJycD8gF0c/
-         6ZeRZwpFojktTqadOnqqrO4nQBjLmKxim1e6Fp5XlR3TMcp/Hmg6hRC+fCA4eu0xG0St
-         jXcBdBo74M0MPEd0Uc92fsWcYlOzykcDaKYA++0lM4jsh0NOD47Yh89ftDpMUlU7Nu7o
-         kH5+GdBoZIkndyX2iPcAT4xAHCYTfsl52oJaXjVG48eWgFiDOQ9h2fGCAoGRh2+PtvSJ
-         XFwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=B0yYV/zgiGoFwELUZOcLeBECeRrqa1TZpxKzwpeVoiM=;
-        b=sc1vYxC9agced7Gwdpmy3C+eOt0S683WKPcH4Jh7UygyuQEQe65Xs23eovQbVAW951
-         a5ya2DOzdI+4wZLxJftAfib3JXc2wl/w260WAKC0O1hVKhiw0NFDK4U8p6AMmIX/FG4f
-         lUWXlkF4xkZavnxApQi5eMjNPQ6B3jAvH+OaPWRE8vIJxwfImWwSNxw6DF1ryxopAxdL
-         VhcbqOfUbXhKX5+Gdg+x8IXAax7DP45Sc1tSClQfugj5kke7bReOj1EALVT88qZzUzYr
-         emI2hFM1kKIgeWVEZS3Da5W6AfgJ39h0AsGjra7HtZ15AjJRXf/7pXqc7ibToPuE4M3P
-         0rgw==
-X-Gm-Message-State: APjAAAVe4iCx/Cux21KR+sX3z2PEJLU8ViG6P9qiIukLN0TAyfqL1met
-        6NFboAMhuoTH+duWm8f8HZKtzGl6bl508s+0d6XH/A==
-X-Google-Smtp-Source: APXvYqx2rbIcbJPMtKA8mB0LRxssvTcYJ7Y3aCPioQXeqEB2WqVQOig7co6LAUz4OQZd1ryt9r5uOcZQIwZorIPSu2c=
-X-Received: by 2002:aed:2465:: with SMTP id s34mr7287340qtc.158.1576765813772;
- Thu, 19 Dec 2019 06:30:13 -0800 (PST)
-MIME-Version: 1.0
-References: <20191208232734.225161-1-Jason@zx2c4.com> <CACT4Y+bsJVmgbD-WogwU=LfWiPN1JgjBrwx4s8Y14hDd7vqqhQ@mail.gmail.com>
- <CAHmME9o0AparjaaOSoZD14RAW8_AJTfKfcx3Y2ndDAPFNC-MeQ@mail.gmail.com>
- <CACT4Y+Zssd6OZ2-U4kjw18mNthQyzPWZV_gkH3uATnSv1SVDfA@mail.gmail.com>
- <CAHmME9oM=YHMZyg23WEzmZAof=7iv-A01VazB3ihhR99f6X1cg@mail.gmail.com>
- <CACT4Y+aCEZm_BA5mmVTnK2cR8CQUky5w1qvmb2KpSR4-Pzp4Ow@mail.gmail.com>
- <CAHmME9rYstVLCBOgdMLqMeVDrX1V-f92vRKDqWsREROWdPbb6g@mail.gmail.com>
- <CAHmME9qUWr69o0r+Mtm8tRSeQq3P780DhWAhpJkNWBfZ+J5OYA@mail.gmail.com>
- <CACT4Y+YfBDvQHdK24ybyyy5p07MXNMnLA7+gq9axq-EizN6jhA@mail.gmail.com>
- <CAHmME9qcv5izLz-_Z2fQefhgxDKwgVU=MkkJmAkAn3O_dXs5fA@mail.gmail.com>
- <CACT4Y+arVNCYpJZsY7vMhBEKQsaig_o6j7E=ib4tF5d25c-cjw@mail.gmail.com> <CAHmME9ofmwig2=G+8vc1fbOCawuRzv+CcAE=85spadtbneqGag@mail.gmail.com>
-In-Reply-To: <CAHmME9ofmwig2=G+8vc1fbOCawuRzv+CcAE=85spadtbneqGag@mail.gmail.com>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Thu, 19 Dec 2019 15:30:02 +0100
-Message-ID: <CACT4Y+awD47=Q3taT_-yQPfQ4uyW-DRpeWBbSHcG6_=b20PPwg@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] net: WireGuard secure network tunnel
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     netdev <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        David Miller <davem@davemloft.net>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
+        Thu, 19 Dec 2019 11:06:44 -0500
+Received: from mx2.suse.de ([195.135.220.15]:34286 "EHLO mx2.suse.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726778AbfLSQGn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 19 Dec 2019 11:06:43 -0500
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id E1878AD73;
+        Thu, 19 Dec 2019 16:06:39 +0000 (UTC)
+From:   Michal Suchanek <msuchanek@suse.de>
+To:     linux-crypto@vger.kernel.org
+Cc:     Michal Suchanek <msuchanek@suse.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        "David S. Miller" <davem@davemloft.net>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: testmgr: allow building a copy as loadable module for testing.
+Date:   Thu, 19 Dec 2019 17:06:36 +0100
+Message-Id: <20191219160636.26316-1-msuchanek@suse.de>
+X-Mailer: git-send-email 2.23.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Dec 19, 2019 at 12:38 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> On Thu, Dec 19, 2019 at 12:19 PM Dmitry Vyukov <dvyukov@google.com> wrote:
-> > > Ahh, cool, okay. Netlink, device creation, and basic packet structure
-> > > is a good start. What about the crypto, though?
-> >
-> > It depends. What exactly we need there?
-> > syzkaller uses comparison operand interception which allows it e.g. to
-> > guess signatures/checksums in some cases.
->
-> I don't think you'll have too much luck with WireGuard here. Fuzzing
-> your way to a valid handshake message involves guessing the 4th
-> preimage of some elliptic curve scalar multiplication, with some
-> random/changing data mixed in there every time you make a new try.
-> There's a condensed protocol description here which should be less bad
-> to glance at than the academic paper:
-> https://www.wireguard.com/protocol/#first-message-initiator-to-responder
-> . The fuzzers I've written for the crypto bits of WireGuard always
-> involve taking a complete handshake implementation and mutating things
-> from there. So maybe the "outer packet" won't be too fruitful without
-> a bunch of work. At the very least, we can generate packets that have
-> the right field sizes and such, and that should test the first level
-> of error cases I guess.
+There is no way to just run the tests built into testmgr. Also it is
+rarely possible to build testmgr modular due to KConfig dependencies.
 
-Yes, properly formed packets will probably require some procedural support.
-I can't say right away which exactly extension mechanism in syzkaller
-is the best for this.
-But there is another one I forgot to mention - custom pseudo syscalls.
-For the generic fuzzer engine they look like normal syscalls that
-accept/return something:
-https://github.com/google/syzkaller/blob/36650b4b2c942bc382314dce384d311fbadd1208/sys/linux/vnet.txt#L26
-but the actual implementation is our custom C code that can do
-anything (augment data, form packets, call multiple syscalls, take
-result of one syscall, do something with it and use as argument for
-another, etc):
-https://github.com/google/syzkaller/blob/36650b4b2c942bc382314dce384d311fbadd1208/executor/common_linux.h#L972-L1023
-These make doing a complex thing trivial for fuzzer, but the more is
-hardcoded there, the less randomness we get from fuzzing (though that
-presudo-syscall can also accept some additional randomness and use it
-in some way).
+Add a module that does not provide infrastructure, just runs testmgr
+tests.
 
+Signed-off-by: Michal Suchanek <msuchanek@suse.de>
+---
+ crypto/Kconfig            |   8 ++
+ crypto/Makefile           |   3 +
+ crypto/alg_test_desc.h    | 219 ++++++++++++++++++++++++++++++++++++++
+ crypto/algboss.c          |   2 +
+ crypto/algboss_runtests.c |  38 +++++++
+ crypto/testmgr.c          |  71 +-----------
+ crypto/testmgr.h          | 146 +------------------------
+ crypto/testmgr_runtests.c |   1 +
+ 8 files changed, 277 insertions(+), 211 deletions(-)
+ create mode 100644 crypto/alg_test_desc.h
+ create mode 100644 crypto/algboss_runtests.c
+ create mode 120000 crypto/testmgr_runtests.c
 
+diff --git a/crypto/Kconfig b/crypto/Kconfig
+index 5575d48473bd..956379b24c74 100644
+--- a/crypto/Kconfig
++++ b/crypto/Kconfig
+@@ -119,6 +119,14 @@ config CRYPTO_MANAGER
+ 	  Create default cryptographic template instantiations such as
+ 	  cbc(aes).
+ 
++config CRYPTO_MANAGER_RUNTESTS
++	tristate "Cryptographic algorithm manager: test module"
++	depends on CRYPTO_MANAGER2 && !CRYPTO_MANAGER_DISABLE_TESTS
++	default m
++	help
++	  Build a module that runs the tests from cryptographic algorithm
++	  manager when loaded.
++
+ config CRYPTO_MANAGER2
+ 	def_tristate CRYPTO_MANAGER || (CRYPTO_MANAGER!=n && CRYPTO_ALGAPI=y)
+ 	select CRYPTO_AEAD2
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 4ca12b6044f7..c296b27da29e 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -47,6 +47,9 @@ crypto_acompress-y += scompress.o
+ obj-$(CONFIG_CRYPTO_ACOMP2) += crypto_acompress.o
+ 
+ cryptomgr-y := algboss.o testmgr.o
++cryptomgr_runtests-y := testmgr_runtests.o algboss_runtests.o
++
++obj-$(CONFIG_CRYPTO_MANAGER_RUNTESTS) += cryptomgr_runtests.o
+ 
+ obj-$(CONFIG_CRYPTO_MANAGER2) += cryptomgr.o
+ obj-$(CONFIG_CRYPTO_USER) += crypto_user.o
+diff --git a/crypto/alg_test_desc.h b/crypto/alg_test_desc.h
+new file mode 100644
+index 000000000000..a718092737d0
+--- /dev/null
++++ b/crypto/alg_test_desc.h
+@@ -0,0 +1,219 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#ifndef CRYPTO_ALG_TEST_DESC_H
++#define CRYPTO_ALG_TEST_DESC_H
++
++#include <linux/oid_registry.h>
++
++/*
++ * hash_testvec:	structure to describe a hash (message digest) test
++ * @key:	Pointer to key (NULL if none)
++ * @plaintext:	Pointer to source data
++ * @digest:	Pointer to expected digest
++ * @psize:	Length of source data in bytes
++ * @ksize:	Length of @key in bytes (0 if no key)
++ * @setkey_error: Expected error from setkey()
++ * @digest_error: Expected error from digest()
++ */
++struct hash_testvec {
++	const char *key;
++	const char *plaintext;
++	const char *digest;
++	unsigned int psize;
++	unsigned short ksize;
++	int setkey_error;
++	int digest_error;
++};
++
++/*
++ * cipher_testvec:	structure to describe a symmetric cipher test
++ * @key:	Pointer to key
++ * @klen:	Length of @key in bytes
++ * @iv:		Pointer to IV.  If NULL, an all-zeroes IV is used.
++ * @iv_out:	Pointer to output IV, if applicable for the cipher.
++ * @ptext:	Pointer to plaintext
++ * @ctext:	Pointer to ciphertext
++ * @len:	Length of @ptext and @ctext in bytes
++ * @wk:		Does the test need CRYPTO_TFM_REQ_FORBID_WEAK_KEYS?
++ *		( e.g. test needs to fail due to a weak key )
++ * @fips_skip:	Skip the test vector in FIPS mode
++ * @generates_iv: Encryption should ignore the given IV, and output @iv_out.
++ *		  Decryption takes @iv_out.  Needed for AES Keywrap ("kw(aes)").
++ * @setkey_error: Expected error from setkey()
++ * @crypt_error: Expected error from encrypt() and decrypt()
++ */
++struct cipher_testvec {
++	const char *key;
++	const char *iv;
++	const char *iv_out;
++	const char *ptext;
++	const char *ctext;
++	unsigned char wk; /* weak key flag */
++	unsigned short klen;
++	unsigned int len;
++	bool fips_skip;
++	bool generates_iv;
++	int setkey_error;
++	int crypt_error;
++};
++
++/*
++ * aead_testvec:	structure to describe an AEAD test
++ * @key:	Pointer to key
++ * @iv:		Pointer to IV.  If NULL, an all-zeroes IV is used.
++ * @ptext:	Pointer to plaintext
++ * @assoc:	Pointer to associated data
++ * @ctext:	Pointer to the full authenticated ciphertext.  For AEADs that
++ *		produce a separate "ciphertext" and "authentication tag", these
++ *		two parts are concatenated: ciphertext || tag.
++ * @novrfy:	Decryption verification failure expected?
++ * @wk:		Does the test need CRYPTO_TFM_REQ_FORBID_WEAK_KEYS?
++ *		(e.g. setkey() needs to fail due to a weak key)
++ * @klen:	Length of @key in bytes
++ * @plen:	Length of @ptext in bytes
++ * @alen:	Length of @assoc in bytes
++ * @clen:	Length of @ctext in bytes
++ * @setkey_error: Expected error from setkey()
++ * @setauthsize_error: Expected error from setauthsize()
++ * @crypt_error: Expected error from encrypt() and decrypt()
++ */
++struct aead_testvec {
++	const char *key;
++	const char *iv;
++	const char *ptext;
++	const char *assoc;
++	const char *ctext;
++	unsigned char novrfy;
++	unsigned char wk;
++	unsigned char klen;
++	unsigned int plen;
++	unsigned int clen;
++	unsigned int alen;
++	int setkey_error;
++	int setauthsize_error;
++	int crypt_error;
++};
++
++struct cprng_testvec {
++	const char *key;
++	const char *dt;
++	const char *v;
++	const char *result;
++	unsigned char klen;
++	unsigned short dtlen;
++	unsigned short vlen;
++	unsigned short rlen;
++	unsigned short loops;
++};
++
++struct drbg_testvec {
++	const unsigned char *entropy;
++	size_t entropylen;
++	const unsigned char *entpra;
++	const unsigned char *entprb;
++	size_t entprlen;
++	const unsigned char *addtla;
++	const unsigned char *addtlb;
++	size_t addtllen;
++	const unsigned char *pers;
++	size_t perslen;
++	const unsigned char *expected;
++	size_t expectedlen;
++};
++
++struct akcipher_testvec {
++	const unsigned char *key;
++	const unsigned char *params;
++	const unsigned char *m;
++	const unsigned char *c;
++	unsigned int key_len;
++	unsigned int param_len;
++	unsigned int m_size;
++	unsigned int c_size;
++	bool public_key_vec;
++	bool siggen_sigver_test;
++	enum OID algo;
++};
++
++struct kpp_testvec {
++	const unsigned char *secret;
++	const unsigned char *b_secret;
++	const unsigned char *b_public;
++	const unsigned char *expected_a_public;
++	const unsigned char *expected_ss;
++	unsigned short secret_size;
++	unsigned short b_secret_size;
++	unsigned short b_public_size;
++	unsigned short expected_a_public_size;
++	unsigned short expected_ss_size;
++	bool genkey;
++};
++
++
++struct aead_test_suite {
++	const struct aead_testvec *vecs;
++	unsigned int count;
++};
++
++struct cipher_test_suite {
++	const struct cipher_testvec *vecs;
++	unsigned int count;
++};
++
++struct comp_test_suite {
++	struct {
++		const struct comp_testvec *vecs;
++		unsigned int count;
++	} comp, decomp;
++};
++
++struct hash_test_suite {
++	const struct hash_testvec *vecs;
++	unsigned int count;
++};
++
++struct cprng_test_suite {
++	const struct cprng_testvec *vecs;
++	unsigned int count;
++};
++
++struct drbg_test_suite {
++	const struct drbg_testvec *vecs;
++	unsigned int count;
++};
++
++struct akcipher_test_suite {
++	const struct akcipher_testvec *vecs;
++	unsigned int count;
++};
++
++struct kpp_test_suite {
++	const struct kpp_testvec *vecs;
++	unsigned int count;
++};
++
++struct alg_test_desc {
++	const char *alg;
++	const char *generic_driver;
++	int (*test)(const struct alg_test_desc *desc, const char *driver,
++		    u32 type, u32 mask);
++	int fips_allowed;	/* set if alg is allowed in fips mode */
++
++	union {
++		struct aead_test_suite aead;
++		struct cipher_test_suite cipher;
++		struct comp_test_suite comp;
++		struct hash_test_suite hash;
++		struct cprng_test_suite cprng;
++		struct drbg_test_suite drbg;
++		struct akcipher_test_suite akcipher;
++		struct kpp_test_suite kpp;
++	} suite;
++};
++
++int alg_test_cipher(const struct alg_test_desc *desc,
++		    const char *driver, u32 type, u32 mask);
++
++extern const struct alg_test_desc alg_test_descs[];
++extern const int nr_alg_test_descs;
++
++#endif /* CRYPTO_ALG_TEST_DESC_H */
+diff --git a/crypto/algboss.c b/crypto/algboss.c
+index a62149d6c839..be37c78c7833 100644
+--- a/crypto/algboss.c
++++ b/crypto/algboss.c
+@@ -300,5 +300,7 @@ static void __exit cryptomgr_exit(void)
+ arch_initcall(cryptomgr_init);
+ module_exit(cryptomgr_exit);
+ 
++EXPORT_SYMBOL_GPL(alg_test);
++
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("Crypto Algorithm Manager");
+diff --git a/crypto/algboss_runtests.c b/crypto/algboss_runtests.c
+new file mode 100644
+index 000000000000..7aa3459cc4fc
+--- /dev/null
++++ b/crypto/algboss_runtests.c
+@@ -0,0 +1,38 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++#include <linux/module.h>
++#include "alg_test_desc.h"
++
++static int __init testmgr_runtests_init(void)
++{
++	int i;
++	int ret = 0;
++
++	for (i = 0; i < nr_alg_test_descs; i++) {
++		const char *alg = alg_test_descs[i].alg;
++		int rc;
++
++		pr_info("Testing %s ...", alg);
++		rc = alg_test_descs[i].test(alg_test_descs + i, alg, 0, 0);
++		switch (rc) {
++		case 0:
++			pr_info("PASSED\n");
++			break;
++		case -2:
++			pr_info("SKIPPED\n");
++			break;
++
++		default:
++			ret = rc;
++			pr_err("%s FAILED(%i)\n", alg, rc);
++		}
++	}
++	return ret;
++}
++
++static void __exit testmgr_runtests_exit(void) {}
++
++module_init(testmgr_runtests_init);
++module_exit(testmgr_runtests_exit);
++
++MODULE_LICENSE("GPL");
++MODULE_DESCRIPTION("Crypto Algorithm Manager Test Module");
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 82513b6b0abd..85d919285e81 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -79,67 +79,6 @@ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
+ #define ENCRYPT 1
+ #define DECRYPT 0
+ 
+-struct aead_test_suite {
+-	const struct aead_testvec *vecs;
+-	unsigned int count;
+-};
+-
+-struct cipher_test_suite {
+-	const struct cipher_testvec *vecs;
+-	unsigned int count;
+-};
+-
+-struct comp_test_suite {
+-	struct {
+-		const struct comp_testvec *vecs;
+-		unsigned int count;
+-	} comp, decomp;
+-};
+-
+-struct hash_test_suite {
+-	const struct hash_testvec *vecs;
+-	unsigned int count;
+-};
+-
+-struct cprng_test_suite {
+-	const struct cprng_testvec *vecs;
+-	unsigned int count;
+-};
+-
+-struct drbg_test_suite {
+-	const struct drbg_testvec *vecs;
+-	unsigned int count;
+-};
+-
+-struct akcipher_test_suite {
+-	const struct akcipher_testvec *vecs;
+-	unsigned int count;
+-};
+-
+-struct kpp_test_suite {
+-	const struct kpp_testvec *vecs;
+-	unsigned int count;
+-};
+-
+-struct alg_test_desc {
+-	const char *alg;
+-	const char *generic_driver;
+-	int (*test)(const struct alg_test_desc *desc, const char *driver,
+-		    u32 type, u32 mask);
+-	int fips_allowed;	/* set if alg is allowed in fips mode */
+-
+-	union {
+-		struct aead_test_suite aead;
+-		struct cipher_test_suite cipher;
+-		struct comp_test_suite comp;
+-		struct hash_test_suite hash;
+-		struct cprng_test_suite cprng;
+-		struct drbg_test_suite drbg;
+-		struct akcipher_test_suite akcipher;
+-		struct kpp_test_suite kpp;
+-	} suite;
+-};
+-
+ static void hexdump(unsigned char *buf, unsigned int len)
+ {
+ 	print_hex_dump(KERN_CONT, "", DUMP_PREFIX_OFFSET,
+@@ -3232,8 +3171,8 @@ static int test_cprng(struct crypto_rng *tfm,
+ 	return err;
+ }
+ 
+-static int alg_test_cipher(const struct alg_test_desc *desc,
+-			   const char *driver, u32 type, u32 mask)
++int alg_test_cipher(const struct alg_test_desc *desc,
++		    const char *driver, u32 type, u32 mask)
+ {
+ 	const struct cipher_test_suite *suite = &desc->suite.cipher;
+ 	struct crypto_cipher *tfm;
+@@ -3865,7 +3804,7 @@ static int alg_test_null(const struct alg_test_desc *desc,
+ #define __VECS(tv)	{ .vecs = tv, .count = ARRAY_SIZE(tv) }
+ 
+ /* Please keep this list sorted by algorithm name. */
+-static const struct alg_test_desc alg_test_descs[] = {
++const struct alg_test_desc alg_test_descs[] = {
+ 	{
+ 		.alg = "adiantum(xchacha12,aes)",
+ 		.generic_driver = "adiantum(xchacha12-generic,aes-generic,nhpoly1305-generic)",
+@@ -5204,6 +5143,8 @@ static const struct alg_test_desc alg_test_descs[] = {
+ 	}
+ };
+ 
++const int nr_alg_test_descs = ARRAY_SIZE(alg_test_descs);
++
+ static void alg_check_test_descs_order(void)
+ {
+ 	int i;
+@@ -5341,5 +5282,3 @@ int alg_test(const char *driver, const char *alg, u32 type, u32 mask)
+ }
+ 
+ #endif /* CONFIG_CRYPTO_MANAGER_DISABLE_TESTS */
+-
+-EXPORT_SYMBOL_GPL(alg_test);
+diff --git a/crypto/testmgr.h b/crypto/testmgr.h
+index 48da646651cb..378a1bdce74f 100644
+--- a/crypto/testmgr.h
++++ b/crypto/testmgr.h
+@@ -20,154 +20,10 @@
+ #ifndef _CRYPTO_TESTMGR_H
+ #define _CRYPTO_TESTMGR_H
+ 
+-#include <linux/oid_registry.h>
++#include "alg_test_desc.h"
+ 
+ #define MAX_IVLEN		32
+ 
+-/*
+- * hash_testvec:	structure to describe a hash (message digest) test
+- * @key:	Pointer to key (NULL if none)
+- * @plaintext:	Pointer to source data
+- * @digest:	Pointer to expected digest
+- * @psize:	Length of source data in bytes
+- * @ksize:	Length of @key in bytes (0 if no key)
+- * @setkey_error: Expected error from setkey()
+- * @digest_error: Expected error from digest()
+- */
+-struct hash_testvec {
+-	const char *key;
+-	const char *plaintext;
+-	const char *digest;
+-	unsigned int psize;
+-	unsigned short ksize;
+-	int setkey_error;
+-	int digest_error;
+-};
+-
+-/*
+- * cipher_testvec:	structure to describe a symmetric cipher test
+- * @key:	Pointer to key
+- * @klen:	Length of @key in bytes
+- * @iv:		Pointer to IV.  If NULL, an all-zeroes IV is used.
+- * @iv_out:	Pointer to output IV, if applicable for the cipher.
+- * @ptext:	Pointer to plaintext
+- * @ctext:	Pointer to ciphertext
+- * @len:	Length of @ptext and @ctext in bytes
+- * @wk:		Does the test need CRYPTO_TFM_REQ_FORBID_WEAK_KEYS?
+- * 		( e.g. test needs to fail due to a weak key )
+- * @fips_skip:	Skip the test vector in FIPS mode
+- * @generates_iv: Encryption should ignore the given IV, and output @iv_out.
+- *		  Decryption takes @iv_out.  Needed for AES Keywrap ("kw(aes)").
+- * @setkey_error: Expected error from setkey()
+- * @crypt_error: Expected error from encrypt() and decrypt()
+- */
+-struct cipher_testvec {
+-	const char *key;
+-	const char *iv;
+-	const char *iv_out;
+-	const char *ptext;
+-	const char *ctext;
+-	unsigned char wk; /* weak key flag */
+-	unsigned short klen;
+-	unsigned int len;
+-	bool fips_skip;
+-	bool generates_iv;
+-	int setkey_error;
+-	int crypt_error;
+-};
+-
+-/*
+- * aead_testvec:	structure to describe an AEAD test
+- * @key:	Pointer to key
+- * @iv:		Pointer to IV.  If NULL, an all-zeroes IV is used.
+- * @ptext:	Pointer to plaintext
+- * @assoc:	Pointer to associated data
+- * @ctext:	Pointer to the full authenticated ciphertext.  For AEADs that
+- *		produce a separate "ciphertext" and "authentication tag", these
+- *		two parts are concatenated: ciphertext || tag.
+- * @novrfy:	Decryption verification failure expected?
+- * @wk:		Does the test need CRYPTO_TFM_REQ_FORBID_WEAK_KEYS?
+- *		(e.g. setkey() needs to fail due to a weak key)
+- * @klen:	Length of @key in bytes
+- * @plen:	Length of @ptext in bytes
+- * @alen:	Length of @assoc in bytes
+- * @clen:	Length of @ctext in bytes
+- * @setkey_error: Expected error from setkey()
+- * @setauthsize_error: Expected error from setauthsize()
+- * @crypt_error: Expected error from encrypt() and decrypt()
+- */
+-struct aead_testvec {
+-	const char *key;
+-	const char *iv;
+-	const char *ptext;
+-	const char *assoc;
+-	const char *ctext;
+-	unsigned char novrfy;
+-	unsigned char wk;
+-	unsigned char klen;
+-	unsigned int plen;
+-	unsigned int clen;
+-	unsigned int alen;
+-	int setkey_error;
+-	int setauthsize_error;
+-	int crypt_error;
+-};
+-
+-struct cprng_testvec {
+-	const char *key;
+-	const char *dt;
+-	const char *v;
+-	const char *result;
+-	unsigned char klen;
+-	unsigned short dtlen;
+-	unsigned short vlen;
+-	unsigned short rlen;
+-	unsigned short loops;
+-};
+-
+-struct drbg_testvec {
+-	const unsigned char *entropy;
+-	size_t entropylen;
+-	const unsigned char *entpra;
+-	const unsigned char *entprb;
+-	size_t entprlen;
+-	const unsigned char *addtla;
+-	const unsigned char *addtlb;
+-	size_t addtllen;
+-	const unsigned char *pers;
+-	size_t perslen;
+-	const unsigned char *expected;
+-	size_t expectedlen;
+-};
+-
+-struct akcipher_testvec {
+-	const unsigned char *key;
+-	const unsigned char *params;
+-	const unsigned char *m;
+-	const unsigned char *c;
+-	unsigned int key_len;
+-	unsigned int param_len;
+-	unsigned int m_size;
+-	unsigned int c_size;
+-	bool public_key_vec;
+-	bool siggen_sigver_test;
+-	enum OID algo;
+-};
+-
+-struct kpp_testvec {
+-	const unsigned char *secret;
+-	const unsigned char *b_secret;
+-	const unsigned char *b_public;
+-	const unsigned char *expected_a_public;
+-	const unsigned char *expected_ss;
+-	unsigned short secret_size;
+-	unsigned short b_secret_size;
+-	unsigned short b_public_size;
+-	unsigned short expected_a_public_size;
+-	unsigned short expected_ss_size;
+-	bool genkey;
+-};
+-
+ static const char zeroed_string[48];
+ 
+ /*
+diff --git a/crypto/testmgr_runtests.c b/crypto/testmgr_runtests.c
+new file mode 120000
+index 000000000000..e2a85037239d
+--- /dev/null
++++ b/crypto/testmgr_runtests.c
+@@ -0,0 +1 @@
++testmgr.c
+\ No newline at end of file
+-- 
+2.23.0
 
-> However, there's still a decent amount of surface on the "inner
-> packet". For this, we can set up a pair of wireguard interfaces that
-> are preconfigured to talk to each other (in common_linux.h, right? Or
-> do you have some Go file that'd be easier to do that initialization
-> in?), and then syzkaller will figure out itself how to send nasty IP
-> packets through them with send/recv and such. There's a bit of surface
-> here because sending packets provokes the aforementioned handshake,
-> and also moves around the timer state machine. The receiver also needs
-> to do some minimal parsing of the received packet to check
-> "allowedips". So, good fodder for fuzzing.
-
-Yes, there is this location to pre-create some net devices in right states:
-https://github.com/google/syzkaller/blob/79b211f74b08737aeb4934c6ff69a263b3c38013/executor/common_linux.h#L668
-(not in Go, but in C because eventually it will become part of C reproducers).
-For example it creates vcan0 device and then syscall descriptions know
-this name and use it.
