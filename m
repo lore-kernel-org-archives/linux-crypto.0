@@ -8,63 +8,63 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCEB3C43603
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Dec 2019 19:03:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3D25C43603
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Dec 2019 19:03:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A23C3206D8
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Dec 2019 19:03:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7CC96206D8
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Dec 2019 19:03:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="czDZLiSP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GjOofQD/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727508AbfLTTDJ (ORCPT
+        id S1727462AbfLTTDN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Dec 2019 14:03:09 -0500
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:32853 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727390AbfLTTDJ (ORCPT
+        Fri, 20 Dec 2019 14:03:13 -0500
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:42326 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727390AbfLTTDM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Dec 2019 14:03:09 -0500
-Received: by mail-pl1-f194.google.com with SMTP id c13so4498537pls.0
-        for <linux-crypto@vger.kernel.org>; Fri, 20 Dec 2019 11:03:08 -0800 (PST)
+        Fri, 20 Dec 2019 14:03:12 -0500
+Received: by mail-pf1-f193.google.com with SMTP id 4so5705439pfz.9
+        for <linux-crypto@vger.kernel.org>; Fri, 20 Dec 2019 11:03:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=ZmyFDlcXcGUVwErxtLyLopVyByLsVIPIf4ZzlaJLh54=;
-        b=czDZLiSPrCJQPEoDcJ+GHqutg2NlGxGlFhDnfzeETg+3xNjKoFpULauNEoQPcjKNfG
-         cTDThmMxT80dLntbUdoh6AVLnbdGZyR6ocxF5feT2AmU6uF26eIfAgyG/+HlRxWgQXfn
-         w1EYCaz2owJYPDWY1o2sfwkCkY0GrV0DCPqysdgN36seiJRB6JlRHfuMZdQeRgRlNA9m
-         y0NhqKuwYSXxABU2POXsCssBwqu3AlVB2VFTOkDetUdvdOCpDDICPIFhhjXkX0G9fwMQ
-         Icfb+TXcyaDyMKtHVt7k7qRtoHMEJtc+LANDjb00TVHYYwN4kZiTXLS3LPXIiv4zts3N
-         VKDA==
+        bh=k9VHXoez7FZfV4pIIvUMPzblEmmwCwWAxaZpHU4B+7o=;
+        b=GjOofQD/GmW4vYJvez9BqInw0uQfcV+qDSNSfuAXt+OQ+d8N3UQy2ZKwFrSn7c6x9B
+         myzur66DozRkTCuDkKyCB07fdKoLwTxM3yzjIVJsNib19Q9yHEwVmiP0wQJTThlaqP9i
+         QJCXP9FcpgCCDj4D2Km8063mAMJZGNInj6r/fcbJIu8CJeXivhbf4yiH6DEmKNj/Gen2
+         RWimY+zPu+gY/aBkLzC6cts/g2wxGYRxblS6FAx92TcC6WMiPw9+q1G5d5dtwDeHmeHE
+         Y+8h9p+7f8tNqRiAkR+b9DjWryrJ/IP6r+7xpx7Gd/Xz+jN98DOOjJV6lYOUDq4mMdlU
+         a3Ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=ZmyFDlcXcGUVwErxtLyLopVyByLsVIPIf4ZzlaJLh54=;
-        b=Sz4hsssCQgwZyHvKmdk50B2oqVYjUDv2d/s8vO7rpTSzGy3Aegbl5RnDFgBnT2X2Eu
-         BBm5wEGXQbUrpHzKBqLSci3sZaY+I8WjLxpVb9YliGJ/oW+9iKkSIYGzaLimXL1HTScR
-         7aQa3LUSF9P6MVZITnJgbg0hzfvxRqHjxvtYnxRtV8LBya+xKEIUKzIzSGdM94PtZU5h
-         6hs6+ejbgM/uiiU8PZi+RGt1JykAhdwtciiNJjbrhKq6Z0rpBsjpP0cxdXs7bmMB5nG3
-         mFz2BHWfv3DtO3ScajF4ElFplgHBDTAoZJ9/ZCnVn2AEMwkL5HV+pUXZOBm511mlsxQB
-         5CjQ==
-X-Gm-Message-State: APjAAAUuCNs3mR/elbjRxxTnqnyOzTYuDNH4sKm1HBiRzS7XCFR0B92W
-        +K9SgMYNCUHaxvuPQsveoPY=
-X-Google-Smtp-Source: APXvYqx4B2IsR1nvhs+SJFpcDsxGvyDxL8HILTRabukLywiUu/vPr1T11V9CyrMQzL+2uG39mRGxng==
-X-Received: by 2002:a17:902:6bcc:: with SMTP id m12mr16358252plt.272.1576868588173;
-        Fri, 20 Dec 2019 11:03:08 -0800 (PST)
+        bh=k9VHXoez7FZfV4pIIvUMPzblEmmwCwWAxaZpHU4B+7o=;
+        b=m8MF568SRQQVPd1nYd64OqFGgF044hKxXDFcTiRkGSV3qv5kt5UaT+FH2yenQQ2Rm/
+         jxresQeyHlGYiPhn7CJcTrkDyslpJhhqUWyNqlEple7uXJGvWpOhfkQHWapgNW/LwsQ0
+         p3xHCkbloJe+/0Q54O8zRl1aTQAkm61AspSvJ3N8zhR+VRm4Wy49LXdSZRAMmZ9+a/y1
+         mGul9IMHe0pwJdE+iGqSlEW1aDJy6pTK4BpAIRHu6vGsMhDTM9oNFchwXAc6zap7V3t4
+         uQRwAVDsq4IcupPOyhJU2PCN7PcaFHq2T83eFDN5OYbr/NSWln/iK4YvF6jypRJH/1H2
+         5xvw==
+X-Gm-Message-State: APjAAAVgcNDQZiKMTfr7anYXybomMzUHBDshT1uNUnwFHkYeZ4K0rBSi
+        tRAH5Sg41MhKqmOcBxOhJN2oQxvXzOc=
+X-Google-Smtp-Source: APXvYqwyJRqy9ByNaKLL4SnNmJ3K6ABI5BKC3KmNdi7gg6gBXU1tbmXnlYW3JBKKP3S4mEwBPndDXg==
+X-Received: by 2002:a62:2a12:: with SMTP id q18mr18410054pfq.203.1576868592064;
+        Fri, 20 Dec 2019 11:03:12 -0800 (PST)
 Received: from gateway.troianet.com.br (ipv6.troianet.com.br. [2804:688:21:4::2])
-        by smtp.gmail.com with ESMTPSA id i4sm10833612pjw.28.2019.12.20.11.03.05
+        by smtp.gmail.com with ESMTPSA id i4sm10833612pjw.28.2019.12.20.11.03.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Dec 2019 11:03:07 -0800 (PST)
+        Fri, 20 Dec 2019 11:03:10 -0800 (PST)
 From:   Eneas U de Queiroz <cotequeiroz@gmail.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         linux-crypto@vger.kernel.org
 Cc:     Eneas U de Queiroz <cotequeiroz@gmail.com>
-Subject: [PATCH 4/6] crypto: qce - update the skcipher IV
-Date:   Fri, 20 Dec 2019 16:02:16 -0300
-Message-Id: <20191220190218.28884-5-cotequeiroz@gmail.com>
+Subject: [PATCH 5/6] crypto: qce - initialize fallback only for AES
+Date:   Fri, 20 Dec 2019 16:02:17 -0300
+Message-Id: <20191220190218.28884-6-cotequeiroz@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20191220190218.28884-1-cotequeiroz@gmail.com>
 References: <20191220190218.28884-1-cotequeiroz@gmail.com>
@@ -75,30 +75,53 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Update the IV after the completion of each cipher operation.
+Adjust cra_flags to add CRYPTO_NEED_FALLBACK only for AES ciphers, where
+AES-192 is not handled by the qce hardware, and don't allocate & free
+the fallback skcipher for other algorithms.
 
 Signed-off-by: Eneas U de Queiroz <cotequeiroz@gmail.com>
 ---
- drivers/crypto/qce/skcipher.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/crypto/qce/skcipher.c | 17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/crypto/qce/skcipher.c b/drivers/crypto/qce/skcipher.c
-index a9ae356bc2a7..d3852a61cb1d 100644
+index d3852a61cb1d..4217b745f124 100644
 --- a/drivers/crypto/qce/skcipher.c
 +++ b/drivers/crypto/qce/skcipher.c
-@@ -21,6 +21,7 @@ static void qce_skcipher_done(void *data)
- 	struct qce_cipher_reqctx *rctx = skcipher_request_ctx(req);
- 	struct qce_alg_template *tmpl = to_cipher_tmpl(crypto_skcipher_reqtfm(req));
- 	struct qce_device *qce = tmpl->qce;
-+	struct qce_result_dump *result_buf = qce->dma.result_buf;
- 	enum dma_data_direction dir_src, dir_dst;
- 	u32 status;
- 	int error;
-@@ -45,6 +46,7 @@ static void qce_skcipher_done(void *data)
- 	if (error < 0)
- 		dev_dbg(qce->dev, "skcipher operation error (%x)\n", status);
+@@ -257,7 +257,14 @@ static int qce_skcipher_init(struct crypto_skcipher *tfm)
  
-+	memcpy(rctx->iv, result_buf->encr_cntr_iv, rctx->ivsize);
- 	qce->async_req_done(tmpl->qce, error);
- }
+ 	memset(ctx, 0, sizeof(*ctx));
+ 	crypto_skcipher_set_reqsize(tfm, sizeof(struct qce_cipher_reqctx));
++	return 0;
++}
  
++static int qce_skcipher_init_fallback(struct crypto_skcipher *tfm)
++{
++	struct qce_cipher_ctx *ctx = crypto_skcipher_ctx(tfm);
++
++	qce_skcipher_init(tfm);
+ 	ctx->fallback = crypto_alloc_sync_skcipher(crypto_tfm_alg_name(&tfm->base),
+ 						   0, CRYPTO_ALG_NEED_FALLBACK);
+ 	return PTR_ERR_OR_ZERO(ctx->fallback);
+@@ -387,14 +394,18 @@ static int qce_skcipher_register_one(const struct qce_skcipher_def *def,
+ 
+ 	alg->base.cra_priority		= 300;
+ 	alg->base.cra_flags		= CRYPTO_ALG_ASYNC |
+-					  CRYPTO_ALG_NEED_FALLBACK |
+ 					  CRYPTO_ALG_KERN_DRIVER_ONLY;
+ 	alg->base.cra_ctxsize		= sizeof(struct qce_cipher_ctx);
+ 	alg->base.cra_alignmask		= 0;
+ 	alg->base.cra_module		= THIS_MODULE;
+ 
+-	alg->init			= qce_skcipher_init;
+-	alg->exit			= qce_skcipher_exit;
++	if (IS_AES(def->flags)) {
++		alg->base.cra_flags    |= CRYPTO_ALG_NEED_FALLBACK;
++		alg->init		= qce_skcipher_init_fallback;
++		alg->exit		= qce_skcipher_exit;
++	} else {
++		alg->init		= qce_skcipher_init;
++	}
+ 
+ 	INIT_LIST_HEAD(&tmpl->entry);
+ 	tmpl->crypto_alg_type = CRYPTO_ALG_TYPE_SKCIPHER;
