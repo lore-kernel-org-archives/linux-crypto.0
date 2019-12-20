@@ -2,350 +2,110 @@ Return-Path: <SRS0=juXm=2K=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9960EC43603
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Dec 2019 05:29:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1839DC43603
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Dec 2019 07:04:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 540D62465E
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Dec 2019 05:29:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E4DFD2067C
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Dec 2019 07:04:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725920AbfLTF3n (ORCPT
+        id S1727197AbfLTHEq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Dec 2019 00:29:43 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:52034 "EHLO deadmen.hmeau.com"
+        Fri, 20 Dec 2019 02:04:46 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:58640 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725919AbfLTF3n (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Dec 2019 00:29:43 -0500
+        id S1726276AbfLTHEq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 20 Dec 2019 02:04:46 -0500
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1iiAr7-0007GX-Gq; Fri, 20 Dec 2019 13:29:41 +0800
+        id 1iiCL6-0008PG-MV; Fri, 20 Dec 2019 15:04:44 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1iiAr6-0004vM-7p; Fri, 20 Dec 2019 13:29:40 +0800
-Date:   Fri, 20 Dec 2019 13:29:40 +0800
+        id 1iiCL1-0007oZ-Fl; Fri, 20 Dec 2019 15:04:39 +0800
+Date:   Fri, 20 Dec 2019 15:04:39 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: [v3 PATCH] crypto: skcipher - Add skcipher_ialg_simple helper
-Message-ID: <20191220052940.l54zviqbpiayvimi@gondor.apana.org.au>
-References: <20191206055704.g2g5y2e5dakxj7za@gondor.apana.org.au>
- <20191218080733.2ckqf4e5qmgnnrjd@gondor.apana.org.au>
- <20191219203359.GB54076@gmail.com>
+To:     Rijo Thomas <Rijo-john.Thomas@amd.com>
+Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Nimesh Easow <Nimesh.Easow@amd.com>,
+        Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [RFC PATCH v3 0/6] Add TEE interface support to AMD Secure
+ Processor driver
+Message-ID: <20191220070439.etvk73fedrijsrgm@gondor.apana.org.au>
+References: <cover.1575438845.git.Rijo-john.Thomas@amd.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191219203359.GB54076@gmail.com>
+In-Reply-To: <cover.1575438845.git.Rijo-john.Thomas@amd.com>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Dec 19, 2019 at 12:34:00PM -0800, Eric Biggers wrote:
-> On Wed, Dec 18, 2019 at 04:07:33PM +0800, Herbert Xu wrote:
-> > This patch introduces the skcipher_ialg_simple helper which fetches
-> > the crypto_alg structure from a simple skcpiher instance's spawn.
+On Wed, Dec 04, 2019 at 11:48:57AM +0530, Rijo Thomas wrote:
+> The goal of this patch series is to introduce TEE (Trusted Execution
+> Environment) interface support to AMD Secure Processor driver. The
+> TEE is a secure area of a processor which ensures that sensitive data
+> is stored, processed and protected in an isolated and trusted
+> environment. The Platform Security Processor (PSP) is a dedicated
+> processor which provides TEE to enable HW platform security. It offers
+> protection against software attacks generated in Rich Operating System
+> (Rich OS) such as Linux running on x86.
 > 
-> Typo: skcpiher => skcipher
+> Based on the platform feature support, the PSP is capable of supporting
+> either SEV (Secure Encrypted Virtualization) and/or TEE. The first three
+> patches in this series is about moving SEV specific functions and data
+> structures from PSP device driver file to a dedicated SEV interface
+> driver file. The last two patches add TEE interface support to AMD
+> Secure Processor driver. This TEE interface will be used by AMD-TEE
+> driver to submit command buffers for processing in PSP Trusted Execution
+> Environment.
+> 
+> v3:
+> * Rebased the patches onto cryptodev-2.6 tree with base commit
+>   4ee812f6143d (crypto: vmx - Avoid weird build failures)
+> 
+> v2:
+> * Rebased the patches on cryptodev-2.6 tree with base commit
+>   d158367682cd (crypto: atmel - Fix selection of CRYPTO_AUTHENC)
+> * Regenerated patch with correct diff-stat to show file rename
+> * Used Co-developed-by: tag to give proper credit to co-author
+> 
+> Rijo Thomas (6):
+>   crypto: ccp - rename psp-dev files to sev-dev
+>   crypto: ccp - create a generic psp-dev file
+>   crypto: ccp - move SEV vdata to a dedicated data structure
+>   crypto: ccp - check whether PSP supports SEV or TEE before
+>     initialization
+>   crypto: ccp - add TEE support for Raven Ridge
+>   crypto: ccp - provide in-kernel API to submit TEE commands
+> 
+>  drivers/crypto/ccp/Makefile  |    4 +-
+>  drivers/crypto/ccp/psp-dev.c | 1033 ++++------------------------------------
+>  drivers/crypto/ccp/psp-dev.h |   51 +-
+>  drivers/crypto/ccp/sev-dev.c | 1068 ++++++++++++++++++++++++++++++++++++++++++
+>  drivers/crypto/ccp/sev-dev.h |   63 +++
+>  drivers/crypto/ccp/sp-dev.h  |   17 +-
+>  drivers/crypto/ccp/sp-pci.c  |   43 +-
+>  drivers/crypto/ccp/tee-dev.c |  364 ++++++++++++++
+>  drivers/crypto/ccp/tee-dev.h |  110 +++++
+>  include/linux/psp-tee.h      |   73 +++
+>  10 files changed, 1842 insertions(+), 984 deletions(-)
+>  create mode 100644 drivers/crypto/ccp/sev-dev.c
+>  create mode 100644 drivers/crypto/ccp/sev-dev.h
+>  create mode 100644 drivers/crypto/ccp/tee-dev.c
+>  create mode 100644 drivers/crypto/ccp/tee-dev.h
+>  create mode 100644 include/linux/psp-tee.h
 
-...
-
-> For ecb, 'alg' isn't used anymore, so it should just be removed.
-
-Thanks for the review.  Here is an update:
-
----8<---
-This patch introduces the skcipher_ialg_simple helper which fetches
-the crypto_alg structure from a simple skcipher instance's spawn.
-
-This allows us to remove the third argument from the function
-skcipher_alloc_instance_simple.
-
-In doing so the reference count to the algorithm is now maintained
-by the Crypto API and the caller no longer needs to drop the alg
-refcount.
-
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-
-diff --git a/crypto/cbc.c b/crypto/cbc.c
-index dd96bcf4d4b6..e6f6273a7d39 100644
---- a/crypto/cbc.c
-+++ b/crypto/cbc.c
-@@ -54,10 +54,12 @@ static int crypto_cbc_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	struct crypto_alg *alg;
- 	int err;
- 
--	inst = skcipher_alloc_instance_simple(tmpl, tb, &alg);
-+	inst = skcipher_alloc_instance_simple(tmpl, tb);
- 	if (IS_ERR(inst))
- 		return PTR_ERR(inst);
- 
-+	alg = skcipher_ialg_simple(inst);
-+
- 	err = -EINVAL;
- 	if (!is_power_of_2(alg->cra_blocksize))
- 		goto out_free_inst;
-@@ -66,14 +68,11 @@ static int crypto_cbc_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	inst->alg.decrypt = crypto_cbc_decrypt;
- 
- 	err = skcipher_register_instance(tmpl, inst);
--	if (err)
--		goto out_free_inst;
--	goto out_put_alg;
--
-+	if (err) {
- out_free_inst:
--	inst->free(inst);
--out_put_alg:
--	crypto_mod_put(alg);
-+		inst->free(inst);
-+	}
-+
- 	return err;
- }
- 
-diff --git a/crypto/cfb.c b/crypto/cfb.c
-index 7b68fbb61732..4e5219bbcd19 100644
---- a/crypto/cfb.c
-+++ b/crypto/cfb.c
-@@ -203,10 +203,12 @@ static int crypto_cfb_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	struct crypto_alg *alg;
- 	int err;
- 
--	inst = skcipher_alloc_instance_simple(tmpl, tb, &alg);
-+	inst = skcipher_alloc_instance_simple(tmpl, tb);
- 	if (IS_ERR(inst))
- 		return PTR_ERR(inst);
- 
-+	alg = skcipher_ialg_simple(inst);
-+
- 	/* CFB mode is a stream cipher. */
- 	inst->alg.base.cra_blocksize = 1;
- 
-@@ -223,7 +225,6 @@ static int crypto_cfb_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	if (err)
- 		inst->free(inst);
- 
--	crypto_mod_put(alg);
- 	return err;
- }
- 
-diff --git a/crypto/ctr.c b/crypto/ctr.c
-index 70a3fccb82f3..1e9d6b86b3c6 100644
---- a/crypto/ctr.c
-+++ b/crypto/ctr.c
-@@ -129,10 +129,12 @@ static int crypto_ctr_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	struct crypto_alg *alg;
- 	int err;
- 
--	inst = skcipher_alloc_instance_simple(tmpl, tb, &alg);
-+	inst = skcipher_alloc_instance_simple(tmpl, tb);
- 	if (IS_ERR(inst))
- 		return PTR_ERR(inst);
- 
-+	alg = skcipher_ialg_simple(inst);
-+
- 	/* Block size must be >= 4 bytes. */
- 	err = -EINVAL;
- 	if (alg->cra_blocksize < 4)
-@@ -155,14 +157,11 @@ static int crypto_ctr_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	inst->alg.decrypt = crypto_ctr_crypt;
- 
- 	err = skcipher_register_instance(tmpl, inst);
--	if (err)
--		goto out_free_inst;
--	goto out_put_alg;
--
-+	if (err) {
- out_free_inst:
--	inst->free(inst);
--out_put_alg:
--	crypto_mod_put(alg);
-+		inst->free(inst);
-+	}
-+
- 	return err;
- }
- 
-diff --git a/crypto/ecb.c b/crypto/ecb.c
-index 9d6981ca7d5d..69a687cbdf21 100644
---- a/crypto/ecb.c
-+++ b/crypto/ecb.c
-@@ -61,10 +61,9 @@ static int crypto_ecb_decrypt(struct skcipher_request *req)
- static int crypto_ecb_create(struct crypto_template *tmpl, struct rtattr **tb)
- {
- 	struct skcipher_instance *inst;
--	struct crypto_alg *alg;
- 	int err;
- 
--	inst = skcipher_alloc_instance_simple(tmpl, tb, &alg);
-+	inst = skcipher_alloc_instance_simple(tmpl, tb);
- 	if (IS_ERR(inst))
- 		return PTR_ERR(inst);
- 
-@@ -76,7 +75,7 @@ static int crypto_ecb_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	err = skcipher_register_instance(tmpl, inst);
- 	if (err)
- 		inst->free(inst);
--	crypto_mod_put(alg);
-+
- 	return err;
- }
- 
-diff --git a/crypto/keywrap.c b/crypto/keywrap.c
-index a155c88105ea..0355cce21b1e 100644
---- a/crypto/keywrap.c
-+++ b/crypto/keywrap.c
-@@ -266,10 +266,12 @@ static int crypto_kw_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	struct crypto_alg *alg;
- 	int err;
- 
--	inst = skcipher_alloc_instance_simple(tmpl, tb, &alg);
-+	inst = skcipher_alloc_instance_simple(tmpl, tb);
- 	if (IS_ERR(inst))
- 		return PTR_ERR(inst);
- 
-+	alg = skcipher_ialg_simple(inst);
-+
- 	err = -EINVAL;
- 	/* Section 5.1 requirement for KW */
- 	if (alg->cra_blocksize != sizeof(struct crypto_kw_block))
-@@ -283,14 +285,11 @@ static int crypto_kw_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	inst->alg.decrypt = crypto_kw_decrypt;
- 
- 	err = skcipher_register_instance(tmpl, inst);
--	if (err)
--		goto out_free_inst;
--	goto out_put_alg;
--
-+	if (err) {
- out_free_inst:
--	inst->free(inst);
--out_put_alg:
--	crypto_mod_put(alg);
-+		inst->free(inst);
-+	}
-+
- 	return err;
- }
- 
-diff --git a/crypto/ofb.c b/crypto/ofb.c
-index 133ff4c7f2c6..2ec68e3f2c55 100644
---- a/crypto/ofb.c
-+++ b/crypto/ofb.c
-@@ -55,10 +55,12 @@ static int crypto_ofb_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	struct crypto_alg *alg;
- 	int err;
- 
--	inst = skcipher_alloc_instance_simple(tmpl, tb, &alg);
-+	inst = skcipher_alloc_instance_simple(tmpl, tb);
- 	if (IS_ERR(inst))
- 		return PTR_ERR(inst);
- 
-+	alg = skcipher_ialg_simple(inst);
-+
- 	/* OFB mode is a stream cipher. */
- 	inst->alg.base.cra_blocksize = 1;
- 
-@@ -75,7 +77,6 @@ static int crypto_ofb_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	if (err)
- 		inst->free(inst);
- 
--	crypto_mod_put(alg);
- 	return err;
- }
- 
-diff --git a/crypto/pcbc.c b/crypto/pcbc.c
-index 862cdb8d8b6c..ae921fb74dc9 100644
---- a/crypto/pcbc.c
-+++ b/crypto/pcbc.c
-@@ -153,10 +153,9 @@ static int crypto_pcbc_decrypt(struct skcipher_request *req)
- static int crypto_pcbc_create(struct crypto_template *tmpl, struct rtattr **tb)
- {
- 	struct skcipher_instance *inst;
--	struct crypto_alg *alg;
- 	int err;
- 
--	inst = skcipher_alloc_instance_simple(tmpl, tb, &alg);
-+	inst = skcipher_alloc_instance_simple(tmpl, tb);
- 	if (IS_ERR(inst))
- 		return PTR_ERR(inst);
- 
-@@ -166,7 +165,7 @@ static int crypto_pcbc_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	err = skcipher_register_instance(tmpl, inst);
- 	if (err)
- 		inst->free(inst);
--	crypto_mod_put(alg);
-+
- 	return err;
- }
- 
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index 39a718d99220..37adb71f7759 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -938,15 +938,12 @@ static void skcipher_free_instance_simple(struct skcipher_instance *inst)
-  *
-  * @tmpl: the template being instantiated
-  * @tb: the template parameters
-- * @cipher_alg_ret: on success, a pointer to the underlying cipher algorithm is
-- *		    returned here.  It must be dropped with crypto_mod_put().
-  *
-  * Return: a pointer to the new instance, or an ERR_PTR().  The caller still
-  *	   needs to register the instance.
-  */
--struct skcipher_instance *
--skcipher_alloc_instance_simple(struct crypto_template *tmpl, struct rtattr **tb,
--			       struct crypto_alg **cipher_alg_ret)
-+struct skcipher_instance *skcipher_alloc_instance_simple(
-+	struct crypto_template *tmpl, struct rtattr **tb)
- {
- 	struct crypto_attr_type *algt;
- 	struct crypto_alg *cipher_alg;
-@@ -982,6 +979,7 @@ skcipher_alloc_instance_simple(struct crypto_template *tmpl, struct rtattr **tb,
- 	if (err)
- 		goto err_free_inst;
- 
-+	spawn->dropref = true;
- 	err = crypto_init_spawn(spawn, cipher_alg,
- 				skcipher_crypto_instance(inst),
- 				CRYPTO_ALG_TYPE_MASK);
-@@ -1003,7 +1001,6 @@ skcipher_alloc_instance_simple(struct crypto_template *tmpl, struct rtattr **tb,
- 	inst->alg.init = skcipher_init_tfm_simple;
- 	inst->alg.exit = skcipher_exit_tfm_simple;
- 
--	*cipher_alg_ret = cipher_alg;
- 	return inst;
- 
- err_free_inst:
-diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
-index 921c409fe1b1..ad4a6330ff53 100644
---- a/include/crypto/internal/skcipher.h
-+++ b/include/crypto/internal/skcipher.h
-@@ -214,9 +214,17 @@ skcipher_cipher_simple(struct crypto_skcipher *tfm)
- 
- 	return ctx->cipher;
- }
--struct skcipher_instance *
--skcipher_alloc_instance_simple(struct crypto_template *tmpl, struct rtattr **tb,
--			       struct crypto_alg **cipher_alg_ret);
-+
-+struct skcipher_instance *skcipher_alloc_instance_simple(
-+	struct crypto_template *tmpl, struct rtattr **tb);
-+
-+static inline struct crypto_alg *skcipher_ialg_simple(
-+	struct skcipher_instance *inst)
-+{
-+	struct crypto_spawn *spawn = skcipher_instance_ctx(inst);
-+
-+	return spawn->alg;
-+}
- 
- #endif	/* _CRYPTO_INTERNAL_SKCIPHER_H */
- 
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
