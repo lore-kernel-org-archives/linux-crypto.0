@@ -8,63 +8,63 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 037F1C43603
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Dec 2019 19:03:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEC35C43603
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Dec 2019 19:03:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D232020866
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Dec 2019 19:03:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 928F2206D8
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Dec 2019 19:03:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rPBICheQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qYLdb1Sq"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727473AbfLTTDB (ORCPT
+        id S1727478AbfLTTDE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Dec 2019 14:03:01 -0500
-Received: from mail-pj1-f68.google.com ([209.85.216.68]:34479 "EHLO
-        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727390AbfLTTDB (ORCPT
+        Fri, 20 Dec 2019 14:03:04 -0500
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:37046 "EHLO
+        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727390AbfLTTDE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Dec 2019 14:03:01 -0500
-Received: by mail-pj1-f68.google.com with SMTP id s94so4197395pjc.1
-        for <linux-crypto@vger.kernel.org>; Fri, 20 Dec 2019 11:03:00 -0800 (PST)
+        Fri, 20 Dec 2019 14:03:04 -0500
+Received: by mail-pl1-f196.google.com with SMTP id c23so4490428plz.4
+        for <linux-crypto@vger.kernel.org>; Fri, 20 Dec 2019 11:03:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Az4hfXTopX7SrfF1whWHLS+fjneINDp+zU6Cq6OOuU4=;
-        b=rPBICheQoVAzsZ2tln0x+1e9/YenkBMqvTTvQ4+LtS6qG7ZaOVx2D9p5RkYNzux9jK
-         nizzsKP+6Pzxl6f8MkQUUXQ6J2PiiQU/jZnEQj2umbVwYuQPU67Mds/e6/9WnRpHup/8
-         1kIi3xYAhAmSOrXPJPQp+lRMHpRoDbWtnrToQLugwLxrbCnYsV4gpGdxCA5MpeQfk75H
-         auWeSk9zjw+7Msh6EFNHOrAsyVBkOB9mx100S1dOw91w1rZCkIG4YRGprbDqH8QEytGQ
-         yR97LGTy93M3MCdQOSUV/BJfzElwI5lf1ZiodjvlDhyAbHf7rGEwRGpDSdHC+aJ+P/8o
-         05Ew==
+        bh=8g79+8HxgAmptJNweOiWrmJikepmZeeltOX1+NbRKNU=;
+        b=qYLdb1SqIvI20mscu3ddS7O2XmV2HUwMMTkwmie+LgySwl5IBiXyJ9GtAMROyx3uWj
+         mPogga3yRYR8TyqsssX6dX2ChHx/Ao6z/WDRUR8yRhqOdzyD4qCNi7k1fDQKUxUQmkfW
+         JVhHQ8Shn3sTih7QuQhCMOq9VnaW1JoEGVQRRqVsvXkyg7ZwT5kPGHNo+tYgFvipFrs2
+         aGhsgnfTpbNlnW5quKVsA4OpDBglasnPrRWyxDex1nK7jQfMt/EgfyqwtqgqE1btodWB
+         K0sAheBFLUNHG/imNeHezW7SFbMcDAyNedubS8LDJ+jtV52iiskdqdopKBWUw56iJnJL
+         k/bQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Az4hfXTopX7SrfF1whWHLS+fjneINDp+zU6Cq6OOuU4=;
-        b=V+gC2ARDTkwNm6oErpsz31M+n6JFIOfiWC7IaZIfY3ZlWxHK1Py1UPQiAojO5R+9ZM
-         NIc0V9b53c0GgGLA2tYcm+k673dP0Yd6+gHbmpbMzIW9Jt+QI/p7jlADG4VAYakLhTyN
-         HxX1OTqD6jnStTxxkmPYcy1hOr/8E+5Y8/J1shHLO4JW4SCxbLx+6mbDvnW2m1zcmPSw
-         RL/N/cpX0KIlD9aR5bWgOZmsumF8xPjLTZGc3ducsJFEzREgKwzfHrHD7WSB+56QH5YD
-         Rz9nZP6K+z70gDIGN7LdelNZo7ocal9IjdiC3+p7QQCM73+Y0NhKk2Wq75bE7yR80xU/
-         HQCw==
-X-Gm-Message-State: APjAAAXBcKlrsMZYGmihYNjQjPDmb/8RjLdo1zcuIApMff/kreY4CpG2
-        rAjWowsxvA9OBWdpgYtOiPc=
-X-Google-Smtp-Source: APXvYqysOn0HgJF6hHXWiJEUMy3SFDH+X0kH3ZyIKABEsX74AwvpFD1erJKlJHvp5+SRvgeIjmfEzA==
-X-Received: by 2002:a17:90a:2004:: with SMTP id n4mr18027020pjc.20.1576868580484;
-        Fri, 20 Dec 2019 11:03:00 -0800 (PST)
+        bh=8g79+8HxgAmptJNweOiWrmJikepmZeeltOX1+NbRKNU=;
+        b=F6JbtbNCtucpvrFlMP3ibARAum1Ge3c8WvGDalX38DqK2gge+LBX86J7od38nth28v
+         01qShTAlrXXpjQf19ztLMESoStNsdaLMqOdAVVtuZoy6MMkFAmZ2/PaD92K6UtwkdK3U
+         tImOqznDI2oHOo76aF32oJWJAbwdAbzNRTNYlEhWGMJPRJ/LgCbuHs3jm9iR0ZKUnYb0
+         +80/uYqQcCA+l0RLcTajBh6bWVoS7wf86zYi7F1FnGOb6EH5GbOin9ZI+wJCaG+xklCx
+         5J+axWs99AEmsvi2zoJ3zVg2uvuJ6oEl5Q6UG4WNGUHubJ10koYrgB7E7d+Z0+AMg2dS
+         r4Iw==
+X-Gm-Message-State: APjAAAVP0SvyFm3YL1zjdt7Zd53bc9NObBSV93YekzxITS72SuBaapMC
+        wjsGRyHVVd4shSMHseUlEWBa7h3j7yM=
+X-Google-Smtp-Source: APXvYqyDoILnucbpEjUmU+9KRQiGvsRoyA+YJ70Yyub5QifgISMAyr32OOm9bUyUZFeVb9XHKkD8Bw==
+X-Received: by 2002:a17:90a:ba91:: with SMTP id t17mr18176418pjr.74.1576868583267;
+        Fri, 20 Dec 2019 11:03:03 -0800 (PST)
 Received: from gateway.troianet.com.br (ipv6.troianet.com.br. [2804:688:21:4::2])
-        by smtp.gmail.com with ESMTPSA id i4sm10833612pjw.28.2019.12.20.11.02.58
+        by smtp.gmail.com with ESMTPSA id i4sm10833612pjw.28.2019.12.20.11.03.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 Dec 2019 11:03:00 -0800 (PST)
+        Fri, 20 Dec 2019 11:03:02 -0800 (PST)
 From:   Eneas U de Queiroz <cotequeiroz@gmail.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         linux-crypto@vger.kernel.org
 Cc:     Eneas U de Queiroz <cotequeiroz@gmail.com>
-Subject: [PATCH 1/6] crypto: qce - fix ctr-aes-qce block, chunk sizes
-Date:   Fri, 20 Dec 2019 16:02:13 -0300
-Message-Id: <20191220190218.28884-2-cotequeiroz@gmail.com>
+Subject: [PATCH 2/6] crypto: qce - fix xts-aes-qce key sizes
+Date:   Fri, 20 Dec 2019 16:02:14 -0300
+Message-Id: <20191220190218.28884-3-cotequeiroz@gmail.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20191220190218.28884-1-cotequeiroz@gmail.com>
 References: <20191220190218.28884-1-cotequeiroz@gmail.com>
@@ -75,42 +75,59 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Set blocksize of ctr-aes-qce to 1, so it can operate as a stream cipher,
-adding the definition for chucksize instead, where the underlying block
-size belongs.
+XTS-mode uses two keys, so the keysizes should be doubled in
+skcipher_def, and halved when checking if it is AES-128/192/256.
 
 Signed-off-by: Eneas U de Queiroz <cotequeiroz@gmail.com>
 ---
- drivers/crypto/qce/skcipher.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ drivers/crypto/qce/skcipher.c | 13 ++++++++-----
+ 1 file changed, 8 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/crypto/qce/skcipher.c b/drivers/crypto/qce/skcipher.c
-index fee07323f8f9..1f1f40a761fa 100644
+index 1f1f40a761fa..e4f6d87ba51d 100644
 --- a/drivers/crypto/qce/skcipher.c
 +++ b/drivers/crypto/qce/skcipher.c
-@@ -270,6 +270,7 @@ struct qce_skcipher_def {
- 	const char *name;
- 	const char *drv_name;
- 	unsigned int blocksize;
-+	unsigned int chunksize;
- 	unsigned int ivsize;
- 	unsigned int min_keysize;
- 	unsigned int max_keysize;
-@@ -298,7 +299,8 @@ static const struct qce_skcipher_def skcipher_def[] = {
- 		.flags		= QCE_ALG_AES | QCE_MODE_CTR,
- 		.name		= "ctr(aes)",
- 		.drv_name	= "ctr-aes-qce",
--		.blocksize	= AES_BLOCK_SIZE,
-+		.blocksize	= 1,
-+		.chunksize	= AES_BLOCK_SIZE,
- 		.ivsize		= AES_BLOCK_SIZE,
- 		.min_keysize	= AES_MIN_KEY_SIZE,
- 		.max_keysize	= AES_MAX_KEY_SIZE,
-@@ -368,6 +370,7 @@ static int qce_skcipher_register_one(const struct qce_skcipher_def *def,
- 		 def->drv_name);
+@@ -154,12 +154,13 @@ static int qce_skcipher_setkey(struct crypto_skcipher *ablk, const u8 *key,
+ {
+ 	struct crypto_tfm *tfm = crypto_skcipher_tfm(ablk);
+ 	struct qce_cipher_ctx *ctx = crypto_tfm_ctx(tfm);
++	unsigned long flags = to_cipher_tmpl(ablk)->alg_flags;
+ 	int ret;
  
- 	alg->base.cra_blocksize		= def->blocksize;
-+	alg->chunksize			= def->chunksize;
- 	alg->ivsize			= def->ivsize;
- 	alg->min_keysize		= def->min_keysize;
- 	alg->max_keysize		= def->max_keysize;
+ 	if (!key || !keylen)
+ 		return -EINVAL;
+ 
+-	switch (keylen) {
++	switch (IS_XTS(flags) ? keylen >> 1 : keylen) {
+ 	case AES_KEYSIZE_128:
+ 	case AES_KEYSIZE_256:
+ 		break;
+@@ -213,13 +214,15 @@ static int qce_skcipher_crypt(struct skcipher_request *req, int encrypt)
+ 	struct qce_cipher_ctx *ctx = crypto_skcipher_ctx(tfm);
+ 	struct qce_cipher_reqctx *rctx = skcipher_request_ctx(req);
+ 	struct qce_alg_template *tmpl = to_cipher_tmpl(tfm);
++	int keylen;
+ 	int ret;
+ 
+ 	rctx->flags = tmpl->alg_flags;
+ 	rctx->flags |= encrypt ? QCE_ENCRYPT : QCE_DECRYPT;
++	keylen = IS_XTS(rctx->flags) ? ctx->enc_keylen >> 1 : ctx->enc_keylen;
+ 
+-	if (IS_AES(rctx->flags) && ctx->enc_keylen != AES_KEYSIZE_128 &&
+-	    ctx->enc_keylen != AES_KEYSIZE_256) {
++	if (IS_AES(rctx->flags) && keylen != AES_KEYSIZE_128 &&
++	    keylen != AES_KEYSIZE_256) {
+ 		SYNC_SKCIPHER_REQUEST_ON_STACK(subreq, ctx->fallback);
+ 
+ 		skcipher_request_set_sync_tfm(subreq, ctx->fallback);
+@@ -311,8 +314,8 @@ static const struct qce_skcipher_def skcipher_def[] = {
+ 		.drv_name	= "xts-aes-qce",
+ 		.blocksize	= AES_BLOCK_SIZE,
+ 		.ivsize		= AES_BLOCK_SIZE,
+-		.min_keysize	= AES_MIN_KEY_SIZE,
+-		.max_keysize	= AES_MAX_KEY_SIZE,
++		.min_keysize	= AES_MIN_KEY_SIZE * 2,
++		.max_keysize	= AES_MAX_KEY_SIZE * 2,
+ 	},
+ 	{
+ 		.flags		= QCE_ALG_DES | QCE_MODE_ECB,
