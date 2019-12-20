@@ -2,80 +2,101 @@ Return-Path: <SRS0=juXm=2K=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC3B4C2D0D2
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Dec 2019 07:09:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AE74C43603
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Dec 2019 07:42:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C192324680
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Dec 2019 07:09:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DA8C321D7D
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Dec 2019 07:42:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725874AbfLTHJ5 (ORCPT
+        id S1726327AbfLTHmE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Dec 2019 02:09:57 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:59044 "EHLO deadmen.hmeau.com"
+        Fri, 20 Dec 2019 02:42:04 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:33068 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726327AbfLTHJ5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Dec 2019 02:09:57 -0500
+        id S1726210AbfLTHmE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 20 Dec 2019 02:42:04 -0500
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1iiCQ7-0000B9-JX; Fri, 20 Dec 2019 15:09:55 +0800
+        id 1iiCvA-0000hf-3M; Fri, 20 Dec 2019 15:42:00 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1iiCQ7-0007uV-CL; Fri, 20 Dec 2019 15:09:55 +0800
-Date:   Fri, 20 Dec 2019 15:09:55 +0800
+        id 1iiCv6-0007xj-B7; Fri, 20 Dec 2019 15:41:56 +0800
+Date:   Fri, 20 Dec 2019 15:41:56 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] crypto: algapi - make unregistration functions return
- void
-Message-ID: <20191220070955.h7vcx2bghfamz55v@gondor.apana.org.au>
-References: <20191215235119.123636-1-ebiggers@kernel.org>
+To:     Haren Myneni <haren@linux.ibm.com>
+Cc:     mpe@ellerman.id.au, linux-crypto@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, hch@infradead.org,
+        npiggin@gmail.com, mikey@neuling.org, sukadev@linux.vnet.ibm.com
+Subject: Re: [PATCH 08/10] crypto/NX: Add NX GZIP user space API
+Message-ID: <20191220074156.pflm3ydpgaxtthhd@gondor.apana.org.au>
+References: <1576414240.16318.4066.camel@hbabu-laptop>
+ <1576415119.16318.4094.camel@hbabu-laptop>
+ <20191217093334.ihvz3fzzfgjwse32@gondor.apana.org.au>
+ <1576745384.12797.37.camel@hbabu-laptop>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191215235119.123636-1-ebiggers@kernel.org>
+In-Reply-To: <1576745384.12797.37.camel@hbabu-laptop>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Dec 15, 2019 at 11:51:19PM +0000, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Thu, Dec 19, 2019 at 12:49:44AM -0800, Haren Myneni wrote:
 > 
-> Some of the algorithm unregistration functions return -ENOENT when asked
-> to unregister a non-registered algorithm, while others always return 0
-> or always return void.  But no users check the return value, except for
-> two of the bulk unregistration functions which print a message on error
-> but still always return 0 to their caller, and crypto_del_alg() which
-> calls crypto_unregister_instance() which always returns 0.
+> Virtual Accelerator Switchboard (VAS) can provide support different
+> accelerators, Right now only NX is used, but possible to extend to
+> others in future. Or different functionalities such as fast thread
+> wakeup (VAS feature) with VAS windows. 
 > 
-> Since unregistering a non-registered algorithm is always a kernel bug
-> but there isn't anything callers should do to handle this situation at
-> runtime, let's simplify things by making all the unregistration
-> functions return void, and moving the error message into
-> crypto_unregister_alg() and upgrading it to a WARN().
+> So looking common VAS API for any its accelerators. Need open a window /
+> channel - open() and ioctl()) calls, and setup the communications with
+> mapping address to NX (mmap()) and close the window. Then user space
+> communicates to accelerator directly without kernel involvement.
+> Specific drivers should set window attributes such as how many requests
+> can be send at same time and etc. All other interfaces should be same
+> for any accelerator. 
 > 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->  Documentation/crypto/devel-algos.rst | 34 ++++++++++------------------
->  crypto/acompress.c                   |  4 ++--
->  crypto/ahash.c                       |  4 ++--
->  crypto/algapi.c                      | 25 +++++++-------------
->  crypto/crypto_user_base.c            |  3 ++-
->  crypto/scompress.c                   |  4 ++--
->  crypto/shash.c                       | 19 +++++-----------
->  include/crypto/algapi.h              |  2 +-
->  include/crypto/internal/acompress.h  |  4 +---
->  include/crypto/internal/hash.h       |  6 ++---
->  include/crypto/internal/scompress.h  |  4 +---
->  include/linux/crypto.h               |  4 ++--
->  12 files changed, 42 insertions(+), 71 deletions(-)
+> Also, since user space sends requests directly, should restrict
+> malicious users to prevent overload NX (security issue). Allowing
+> sysadmin to restrict /dev/crypto/nx-gzip usage. 
 
-Patch applied.  Thanks.
+If you are going to place your driver through the Crypto API then
+it needs to use the Crypto API interface for user-space access.
+That interface is af_alg.
+
+If this is not a good fit then I suggest that you move your API
+elsewhere, perhaps to the powerpc tree where the user-space API can
+then be properly reviewed.
+
+It is not feasible to review your driver's user-space API through
+the crypto tree.
+
+> As you suggested, SW crypto API (af_alg) can be used just for NX
+> compression like using API based on the accelerator functionalities. It
+> is socket based API with AF_ALG socket family. But is there a way for
+> sysadmin to restrict usage from user space? Need just few functions in
+> struct proto. 
+
+The af_alg interface does not operate in the manner that you
+describe.  It is an interface that maps onto the underlying kernel
+Crypto API operations.  We currently don't have an af_alg module
+for compression, but if we did we would be closely following the
+current kernel compression interface.
+
+One key feature of af_alg is that it normally is agnostic to the
+underlying implementation.  That is, even when the hardware is
+absent it would seamlessly switch over to a software implementation.
+
+I say normally because there can be exceptions, e.g., with paes
+and hardware keys.
+
+Cheers,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
