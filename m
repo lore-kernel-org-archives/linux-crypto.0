@@ -2,110 +2,66 @@ Return-Path: <SRS0=juXm=2K=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1839DC43603
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Dec 2019 07:04:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8729C43603
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Dec 2019 07:05:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E4DFD2067C
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Dec 2019 07:04:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C37912465E
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Dec 2019 07:05:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727197AbfLTHEq (ORCPT
+        id S1726142AbfLTHFP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Dec 2019 02:04:46 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:58640 "EHLO deadmen.hmeau.com"
+        Fri, 20 Dec 2019 02:05:15 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:58668 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726276AbfLTHEq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Dec 2019 02:04:46 -0500
+        id S1726276AbfLTHFP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 20 Dec 2019 02:05:15 -0500
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1iiCL6-0008PG-MV; Fri, 20 Dec 2019 15:04:44 +0800
+        id 1iiCLW-0008QA-97; Fri, 20 Dec 2019 15:05:10 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1iiCL1-0007oZ-Fl; Fri, 20 Dec 2019 15:04:39 +0800
-Date:   Fri, 20 Dec 2019 15:04:39 +0800
+        id 1iiCLU-0007ow-8j; Fri, 20 Dec 2019 15:05:08 +0800
+Date:   Fri, 20 Dec 2019 15:05:08 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Rijo Thomas <Rijo-john.Thomas@amd.com>
-Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
-        Gary Hook <gary.hook@amd.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Nimesh Easow <Nimesh.Easow@amd.com>,
-        Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>,
-        Jens Wiklander <jens.wiklander@linaro.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Subject: Re: [RFC PATCH v3 0/6] Add TEE interface support to AMD Secure
- Processor driver
-Message-ID: <20191220070439.etvk73fedrijsrgm@gondor.apana.org.au>
-References: <cover.1575438845.git.Rijo-john.Thomas@amd.com>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Zhou Wang <wangzhou1@hisilicon.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: hisilicon - still no need to check return value
+ of debugfs_create functions
+Message-ID: <20191220070508.wsckrlhd2v4cwmhv@gondor.apana.org.au>
+References: <20191209152151.GA1282293@kroah.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cover.1575438845.git.Rijo-john.Thomas@amd.com>
+In-Reply-To: <20191209152151.GA1282293@kroah.com>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 04, 2019 at 11:48:57AM +0530, Rijo Thomas wrote:
-> The goal of this patch series is to introduce TEE (Trusted Execution
-> Environment) interface support to AMD Secure Processor driver. The
-> TEE is a secure area of a processor which ensures that sensitive data
-> is stored, processed and protected in an isolated and trusted
-> environment. The Platform Security Processor (PSP) is a dedicated
-> processor which provides TEE to enable HW platform security. It offers
-> protection against software attacks generated in Rich Operating System
-> (Rich OS) such as Linux running on x86.
+On Mon, Dec 09, 2019 at 04:21:51PM +0100, Greg Kroah-Hartman wrote:
+> Just like in 4a97bfc79619 ("crypto: hisilicon - no need to check return
+> value of debugfs_create functions"), there still is no need to ever
+> check the return value.  The function can work or not, but the code
+> logic should never do something different based on this.
 > 
-> Based on the platform feature support, the PSP is capable of supporting
-> either SEV (Secure Encrypted Virtualization) and/or TEE. The first three
-> patches in this series is about moving SEV specific functions and data
-> structures from PSP device driver file to a dedicated SEV interface
-> driver file. The last two patches add TEE interface support to AMD
-> Secure Processor driver. This TEE interface will be used by AMD-TEE
-> driver to submit command buffers for processing in PSP Trusted Execution
-> Environment.
-> 
-> v3:
-> * Rebased the patches onto cryptodev-2.6 tree with base commit
->   4ee812f6143d (crypto: vmx - Avoid weird build failures)
-> 
-> v2:
-> * Rebased the patches on cryptodev-2.6 tree with base commit
->   d158367682cd (crypto: atmel - Fix selection of CRYPTO_AUTHENC)
-> * Regenerated patch with correct diff-stat to show file rename
-> * Used Co-developed-by: tag to give proper credit to co-author
-> 
-> Rijo Thomas (6):
->   crypto: ccp - rename psp-dev files to sev-dev
->   crypto: ccp - create a generic psp-dev file
->   crypto: ccp - move SEV vdata to a dedicated data structure
->   crypto: ccp - check whether PSP supports SEV or TEE before
->     initialization
->   crypto: ccp - add TEE support for Raven Ridge
->   crypto: ccp - provide in-kernel API to submit TEE commands
-> 
->  drivers/crypto/ccp/Makefile  |    4 +-
->  drivers/crypto/ccp/psp-dev.c | 1033 ++++------------------------------------
->  drivers/crypto/ccp/psp-dev.h |   51 +-
->  drivers/crypto/ccp/sev-dev.c | 1068 ++++++++++++++++++++++++++++++++++++++++++
->  drivers/crypto/ccp/sev-dev.h |   63 +++
->  drivers/crypto/ccp/sp-dev.h  |   17 +-
->  drivers/crypto/ccp/sp-pci.c  |   43 +-
->  drivers/crypto/ccp/tee-dev.c |  364 ++++++++++++++
->  drivers/crypto/ccp/tee-dev.h |  110 +++++
->  include/linux/psp-tee.h      |   73 +++
->  10 files changed, 1842 insertions(+), 984 deletions(-)
->  create mode 100644 drivers/crypto/ccp/sev-dev.c
->  create mode 100644 drivers/crypto/ccp/sev-dev.h
->  create mode 100644 drivers/crypto/ccp/tee-dev.c
->  create mode 100644 drivers/crypto/ccp/tee-dev.h
->  create mode 100644 include/linux/psp-tee.h
+> Cc: Zhou Wang <wangzhou1@hisilicon.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: linux-crypto@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> ---
+>  drivers/crypto/hisilicon/hpre/hpre_main.c | 28 +++++------------------
+>  1 file changed, 6 insertions(+), 22 deletions(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
