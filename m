@@ -1,96 +1,70 @@
-Return-Path: <SRS0=MPLy=2O=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=+KeW=2R=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2283C2D0CF
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Dec 2019 13:03:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B81C3C2D0C0
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 Dec 2019 02:43:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9495C2071A
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Dec 2019 13:03:24 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=alien8.de header.i=@alien8.de header.b="reF83Q8g"
+	by mail.kernel.org (Postfix) with ESMTP id 89BDF20409
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 Dec 2019 02:43:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726237AbfLXNDY (ORCPT
+        id S1726193AbfL0Cnc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 24 Dec 2019 08:03:24 -0500
-Received: from mail.skyhub.de ([5.9.137.197]:35750 "EHLO mail.skyhub.de"
+        Thu, 26 Dec 2019 21:43:32 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:51000 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726224AbfLXNDX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Dec 2019 08:03:23 -0500
-Received: from zn.tnic (p200300EC2F0ED600C09669CD883F0A9D.dip0.t-ipconnect.de [IPv6:2003:ec:2f0e:d600:c096:69cd:883f:a9d])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 395AF1EC0AE5;
-        Tue, 24 Dec 2019 14:03:18 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
-        t=1577192598;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
-        bh=RPmKXDdfeilER4Cgaeoi2HiLWA8B3GNUxDgJuxdBXfU=;
-        b=reF83Q8gQU8d8BbbxQtuMbOFtz4tNW0TWem/vVoR96GaFFqKuP34eCfMKbkHGHhpKGdri3
-        pyPpxWQoCT/9pskvQWyrWoFHiWRqJx3nXMkEvHac9OE4eXfjVFUgDyv9Abz9tEzv8ew26N
-        WtLUvAmpJ1NPS+Gi5gUtfB2R8Ui/FNQ=
-Date:   Tue, 24 Dec 2019 14:03:10 +0100
-From:   Borislav Petkov <bp@alien8.de>
-To:     Thomas Garnier <thgarnie@chromium.org>
-Cc:     kernel-hardening@lists.openwall.com, kristen@linux.intel.com,
-        keescook@chromium.org, Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        Andy Lutomirski <luto@kernel.org>,
-        Juergen Gross <jgross@suse.com>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        "VMware, Inc." <pv-drivers@vmware.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Will Deacon <will@kernel.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Alexios Zavras <alexios.zavras@intel.com>,
-        Allison Randal <allison@lohutok.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, linux-pm@vger.kernel.org
-Subject: Re: [PATCH v10 00/11] x86: PIE support to extend KASLR randomization
-Message-ID: <20191224130310.GE21017@zn.tnic>
-References: <20191205000957.112719-1-thgarnie@chromium.org>
+        id S1726115AbfL0Cnb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 26 Dec 2019 21:43:31 -0500
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1ikfb8-0002mH-HC; Fri, 27 Dec 2019 10:43:30 +0800
+Received: from herbert by gondobar with local (Exim 4.89)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1ikfb5-0003If-K7; Fri, 27 Dec 2019 10:43:27 +0800
+Date:   Fri, 27 Dec 2019 10:43:27 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     "Thomas, Rijo-john" <Rijo-john.Thomas@amd.com>
+Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Nimesh Easow <Nimesh.Easow@amd.com>,
+        Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Subject: Re: [RFC PATCH v3 0/6] Add TEE interface support to AMD Secure
+ Processor driver
+Message-ID: <20191227024327.eoa4vhxcfs7qdwe7@gondor.apana.org.au>
+References: <cover.1575438845.git.Rijo-john.Thomas@amd.com>
+ <20191220070439.etvk73fedrijsrgm@gondor.apana.org.au>
+ <a0c7cbd0-2195-195b-d753-7cbadfd4a272@amd.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20191205000957.112719-1-thgarnie@chromium.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <a0c7cbd0-2195-195b-d753-7cbadfd4a272@amd.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Dec 04, 2019 at 04:09:37PM -0800, Thomas Garnier wrote:
-> Minor changes based on feedback and rebase from v9.
+On Tue, Dec 24, 2019 at 04:25:55PM +0530, Thomas, Rijo-john wrote:
+>
+> Thank you for pulling in the changes!
+> Can you also pull in the patch series titled - TEE driver for AMD APUs? It is
+> related to this patch series.
 > 
-> Splitting the previous serie in two. This part contains assembly code
-> changes required for PIE but without any direct dependencies with the
-> rest of the patchset.
+> Jens who is the TEE subsystem maintainer has given an Acked-by for the
+> patch series. Please refer link: https://lkml.org/lkml/2019/12/16/608
 
-Ok, modulo the minor commit message and comments fixup, this looks ok
-and passes testing here.
+Please resubmit the patches with the acks attached to linux-crypto.
 
-I'm going to queue patches 2-11 of the next version unless someone
-complains.
-
-Thx.
-
+Thanks,
 -- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
