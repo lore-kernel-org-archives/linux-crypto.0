@@ -6,73 +6,73 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC6F1C2D0C6
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 Dec 2019 10:38:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDC30C2D0C6
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 Dec 2019 10:38:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CCEF520882
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 Dec 2019 10:38:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C1EE420882
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 Dec 2019 10:38:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726483AbfL0KiP (ORCPT
+        id S1726379AbfL0Kip (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 27 Dec 2019 05:38:15 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:60234 "EHLO deadmen.hmeau.com"
+        Fri, 27 Dec 2019 05:38:45 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:60258 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726408AbfL0KiP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 27 Dec 2019 05:38:15 -0500
+        id S1726365AbfL0Kip (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 27 Dec 2019 05:38:45 -0500
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1ikn0I-0007NS-4x; Fri, 27 Dec 2019 18:37:58 +0800
+        id 1ikn0s-0007O6-GV; Fri, 27 Dec 2019 18:38:34 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1ikn0E-0005mS-GD; Fri, 27 Dec 2019 18:37:54 +0800
-Date:   Fri, 27 Dec 2019 18:37:54 +0800
+        id 1ikn0o-0005nC-B6; Fri, 27 Dec 2019 18:38:30 +0800
+Date:   Fri, 27 Dec 2019 18:38:30 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     "Ben Dooks (Codethink)" <ben.dooks@codethink.co.uk>
-Cc:     Corentin Labbe <clabbe.montjoie@gmail.com>,
+To:     Adam Ford <aford173@gmail.com>
+Cc:     linux-arm-kernel@lists.infradead.org,
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
+        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Shawn Guo <shawnguo@kernel.org>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Fabio Estevam <festevam@gmail.com>,
+        NXP Linux Team <linux-imx@nxp.com>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
         "David S. Miller" <davem@davemloft.net>,
-        Maxime Ripard <mripard@kernel.org>,
-        Chen-Yu Tsai <wens@csie.org>,
-        Allison Randal <allison@lohutok.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        YueHaibing <yuehaibing@huawei.com>,
-        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH] crypto: sun4i-ss: make unexported sun4i_ss_pm_ops static
-Message-ID: <20191227103754.khyipr5avcuhd4or@gondor.apana.org.au>
-References: <20191217113024.2109457-1-ben.dooks@codethink.co.uk>
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH V3 1/3] crypto: caam: Add support for i.MX8M Mini
+Message-ID: <20191227103830.savjawvuzjolpfuj@gondor.apana.org.au>
+References: <20191218130616.13860-1-aford173@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20191217113024.2109457-1-ben.dooks@codethink.co.uk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20191218130616.13860-1-aford173@gmail.com>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Dec 17, 2019 at 11:30:24AM +0000, Ben Dooks (Codethink) wrote:
-> The sun4i_ss_pm_ops is not referenced outside the driver
-> except via a pointer, so make it static to avoid the following
-> warning:
+On Wed, Dec 18, 2019 at 07:06:14AM -0600, Adam Ford wrote:
+> The i.MX8M Mini uses the same crypto engine as the i.MX8MQ, but
+> the driver is restricting the check to just the i.MX8MQ.
 > 
-> drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c:276:25: warning: symbol 'sun4i_ss_pm_ops' was not declared. Should it be static?
+> This patch expands the check for either i.MX8MQ or i.MX8MM.
 > 
-> Signed-off-by: Ben Dooks (Codethink) <ben.dooks@codethink.co.uk>
+> Signed-off-by: Adam Ford <aford173@gmail.com>
+> Tested-by: Iuliana Prodan <iuliana.prodan@nxp.com>
+> Reviewed-by: Iuliana Prodan <iuliana.prodan@nxp.com>
+> Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
 > ---
-> Cc: Corentin Labbe <clabbe.montjoie@gmail.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Maxime Ripard <mripard@kernel.org>
-> Cc: Chen-Yu Tsai <wens@csie.org>
-> Cc: Allison Randal <allison@lohutok.net>
-> Cc: Thomas Gleixner <tglx@linutronix.de>
-> Cc: YueHaibing <yuehaibing@huawei.com>
-> Cc: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
-> Cc: linux-crypto@vger.kernel.org
-> Cc: linux-arm-kernel@lists.infradead.org
-> ---
->  drivers/crypto/allwinner/sun4i-ss/sun4i-ss-core.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> V3:  No Change
+> V2:  Expand the check that forces the setting on imx8mq to also be true for imx8mm
+>      Explictly state imx8mm compatiblity instead of making it generic to all imx8m*
+>       this is mostly due to lack of other hardware to test
 
 Patch applied.  Thanks.
 -- 
