@@ -5,51 +5,50 @@ X-Spam-Level:
 X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE02CC2D0C6
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 Dec 2019 18:38:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CD02C2D0C6
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 Dec 2019 18:38:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9A53E20722
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 Dec 2019 18:38:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 21BA020722
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 Dec 2019 18:38:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="f37vQhl4"
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="2sOiBmv3"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726379AbfL0Sh4 (ORCPT
+        id S1727162AbfL0SiH (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 27 Dec 2019 13:37:56 -0500
-Received: from mail-dm6nam11on2041.outbound.protection.outlook.com ([40.107.223.41]:55427
+        Fri, 27 Dec 2019 13:38:07 -0500
+Received: from mail-dm6nam11on2048.outbound.protection.outlook.com ([40.107.223.48]:62561
         "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726495AbfL0Sh4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 27 Dec 2019 13:37:56 -0500
+        id S1726495AbfL0SiH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 27 Dec 2019 13:38:07 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Pg5pL8s/ORtIhGzPt07LYEufXxxnGnMmeylI9kWC4CCnkApbIGND1f7BZcS8+6rQQ6SPBdzYBd8VO7/7DtgpMjfvLcBSoM8vVZRNQ1ZkrEUL4UECgSzdEbVYDKx1E2jsGPn3fb/s20Kdy7FaT8zn+iRkLgtVdOtYU3237rB7ItT1tnx6Y4dtC3mIABiQ7RB+DSD6yDZ/4eClzdfdaUAgiZqTXZyu+p3oVnOTdudLkJ8nRPuAkR9nRst75JMhzXBt9C8p1vmvOsHlkFyBHg3ZkpwXhX29bGjLngaJTl4ap1dejpqcGt5rA3ANYESYYhA4Oic8l8on/IzWMzdPgrOTQw==
+ b=e3Si+lbV4fMmmQKP2gLIm36MVJmcUNVKwEASebfIawofnbyvujCdyNI4hAMj1la4pi/G3OR00AVX80sfZPtRahX++MNeeU1a2cTwV0HOe4FEomHPTyqOJlMfGJ4n22N3ocNMNOUZg/549J3DDldSYfJHNfyuu1VamwMvi4LF+RBlVdVUBCJJdl4zCz6LiKu+23XgU+wHpcHix1UAJNGcXeRl8JEkrC/HS2+tiBp0ludf9LjKrLzQgHIgwfi0QSyvymDG64d0lSDND0wc7HZkjDLN/PPHPGvIWMm0UwzJinsPrBBvRDMxxCA0+/KzGy0iiK0UhmsEP90RYG45r3+xUQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cFW62oQQ+AJC3k+/rW9SADvIfCC8hXFBjSeWaMQ6gYs=;
- b=a6JVwrHfT9rKqRKvP+rQ3NSOZgjxAl8EvZmFTLueN/GkmAmesbQ164jEfNuIkixitZdG/oG7qQPIPRGj+HrBZkZj1SM7saHwLDF1pV/Q32bDewSf65x++xaZX+QsAvYlqdXvoilEqr2Azqvbwvt9mav4PPgOXdsO14/IMxzbh8Z9ycuK72T3sei9Thq3p86jaE+/cfUSw8x3n8xkQ0uEuX5A7GtGxwCXE//2qj7hU0poAtGLuGo9cEA4ZD/fiLwwGvN1F/keQ9tV/ubkqZtMKMa9hpkM4QRpcBxbRMtljOan0jCf+CrPYOdtiR526e1as0X8VBxHTIMn2ePg0t9xPg==
+ bh=GppsT9s5zEVPgj8GZb9XWb5nwKOJlYeRtDABGY0DUcU=;
+ b=RrMT2p44I235jRZ9cgOsHS6FAbjB5VVHiJEZkUgB6+F6Hn7kln+IJAptCrkSsce9kt/Pm1WItx7bmk7PH9LhRfjcwAsibsFQZDYuGKw575yW2aOTXQUpijseKZkxMAbExw8d8/UqPiQn4mRnvbcHH/zro2XIc+sEkkQw/bgwSXkGH7TniViq+O2HOn5LBAuFyW5UFcsNzzG6szSgohibkBvU5vUhRRsdoNDEsF/es4mKwNpq9NDerpY+F/XuJ5Q/rAjLytY1UgGTcetxhfO/4nIB3GsXCVRkBpPPc64+do4Vb4Fuof7nZzav+tuVRc46PDk+WA0grV1NwKp7wrWXNQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cFW62oQQ+AJC3k+/rW9SADvIfCC8hXFBjSeWaMQ6gYs=;
- b=f37vQhl4Ine5KvIkT7tw4Ji31lLFdeccgvbujCPpgziUazv8jAGWarErGleWrgMPpLNE2Wc2CgVnwT1vKgt89CTbXviVks0vzBrpid/MpReHqWKkiX8s4m2hUllDMvjpafDS32sCVtYdLmknGxpa+M85Jnmj/cXpDzCoDWHyVQA=
+ bh=GppsT9s5zEVPgj8GZb9XWb5nwKOJlYeRtDABGY0DUcU=;
+ b=2sOiBmv3fsMHi6HEdk3BwcOazh7Bym5Vx1m9ykg79/ekIEl5EKQeEl9UOuz9yvh0zVJUO68QQZY6sHo+IpzYrVqskUiaUXEiA4e6AOJE4s3WnYqRzNq4uBGUztw1uNL5ipR1gx3NR4NrYEJR84Nyxb2sLQM3MmuNwZYZk7/7iDE=
 Authentication-Results: spf=none (sender IP is )
  smtp.mailfrom=Gary.Hook@amd.com; 
 Received: from BN8PR12MB2916.namprd12.prod.outlook.com (20.179.66.155) by
  BN8PR12MB3217.namprd12.prod.outlook.com (20.179.67.158) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2581.12; Fri, 27 Dec 2019 18:37:52 +0000
+ 15.20.2581.12; Fri, 27 Dec 2019 18:38:04 +0000
 Received: from BN8PR12MB2916.namprd12.prod.outlook.com
  ([fe80::45d0:ec5c:7480:8029]) by BN8PR12MB2916.namprd12.prod.outlook.com
  ([fe80::45d0:ec5c:7480:8029%5]) with mapi id 15.20.2559.017; Fri, 27 Dec 2019
- 18:37:52 +0000
-Subject: Re: [PATCH 3/4] tee: amdtee: check TEE status during driver
- initialization
+ 18:38:04 +0000
+Subject: Re: [PATCH 4/4] Documentation: tee: add AMD-TEE driver details
 To:     Rijo Thomas <Rijo-john.Thomas@amd.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S . Miller" <davem@davemloft.net>,
@@ -62,13 +61,13 @@ Cc:     Nimesh Easow <Nimesh.Easow@amd.com>,
         Tom Lendacky <thomas.lendacky@amd.com>,
         Gary Hook <gary.hook@amd.com>
 References: <cover.1577423898.git.Rijo-john.Thomas@amd.com>
- <7510087f2b8cffab083184dfefca183a6b73471a.1577423898.git.Rijo-john.Thomas@amd.com>
+ <25ce91ed381479fd0003d2b9670093b8c5cbf638.1577423898.git.Rijo-john.Thomas@amd.com>
 From:   Gary R Hook <ghook@amd.com>
-Message-ID: <67839c5e-32e5-a69b-5dc6-bbbdf8559bf5@amd.com>
-Date:   Fri, 27 Dec 2019 12:37:49 -0600
+Message-ID: <91d1e931-40bf-7988-a413-3a93fc12dfb7@amd.com>
+Date:   Fri, 27 Dec 2019 12:38:02 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.1.1
-In-Reply-To: <7510087f2b8cffab083184dfefca183a6b73471a.1577423898.git.Rijo-john.Thomas@amd.com>
+In-Reply-To: <25ce91ed381479fd0003d2b9670093b8c5cbf638.1577423898.git.Rijo-john.Thomas@amd.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -76,30 +75,30 @@ X-ClientProxiedBy: SN4PR0701CA0018.namprd07.prod.outlook.com
  (2603:10b6:803:28::28) To BN8PR12MB2916.namprd12.prod.outlook.com
  (2603:10b6:408:6a::27)
 MIME-Version: 1.0
-Received: from [4.3.2.105] (47.220.193.178) by SN4PR0701CA0018.namprd07.prod.outlook.com (2603:10b6:803:28::28) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2581.11 via Frontend Transport; Fri, 27 Dec 2019 18:37:51 +0000
+Received: from [4.3.2.105] (47.220.193.178) by SN4PR0701CA0018.namprd07.prod.outlook.com (2603:10b6:803:28::28) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2581.11 via Frontend Transport; Fri, 27 Dec 2019 18:38:03 +0000
 X-Originating-IP: [47.220.193.178]
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: e4e62de7-a268-482c-f21b-08d78afbe164
+X-MS-Office365-Filtering-Correlation-Id: edfa5c3b-92e7-477f-73a9-08d78afbe8a9
 X-MS-TrafficTypeDiagnostic: BN8PR12MB3217:|BN8PR12MB3217:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BN8PR12MB32179AF7E0B660EC65BAC4A4FD2A0@BN8PR12MB3217.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2150;
+X-Microsoft-Antispam-PRVS: <BN8PR12MB32170F5242E00F2ABEE658C8FD2A0@BN8PR12MB3217.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
 X-Forefront-PRVS: 0264FEA5C3
-X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(346002)(396003)(39860400002)(376002)(136003)(189003)(199004)(66946007)(66556008)(66476007)(110136005)(16576012)(54906003)(956004)(6706004)(6486002)(478600001)(4326008)(52116002)(186003)(2616005)(31696002)(5660300002)(8936002)(2906002)(81166006)(36756003)(8676002)(81156014)(316002)(26005)(53546011)(31686004)(16526019)(78286006)(84106002);DIR:OUT;SFP:1101;SCL:1;SRVR:BN8PR12MB3217;H:BN8PR12MB2916.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(346002)(396003)(39860400002)(376002)(136003)(189003)(199004)(66946007)(66556008)(66476007)(110136005)(16576012)(54906003)(956004)(6706004)(6486002)(478600001)(966005)(4326008)(52116002)(186003)(2616005)(31696002)(5660300002)(8936002)(2906002)(81166006)(36756003)(8676002)(81156014)(316002)(26005)(53546011)(31686004)(16526019)(78286006)(84106002);DIR:OUT;SFP:1101;SCL:1;SRVR:BN8PR12MB3217;H:BN8PR12MB2916.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
 Received-SPF: None (protection.outlook.com: amd.com does not designate
  permitted sender hosts)
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ll38DgdXA0pj746YKVIoxTKFs6ZJb80mvy4pRA5uVE7rnO/+vmEetbV5IL3j5+NHe3RgFcUZOFC/0fZit04C/BoEzh3S4tDW1WAmA4/Md8thT1Q9HTkmELm/4a0hBAfqXWHCgHXFbjQGwRAXlsimy9WhgNF0z95UlacoYNJzj5xba5v3md0va2RtPuIY0zsOWg23LgOVx/H1NfEGA/v5yrwKqxSE5+kgeTTF95O5QT4wF6MsdEFpK4DwzRJhQN6GMQFAq/0iKJQRFE3WNEnXhfwDU/bbzNqGfaHM7jIL/uWM3LsOlh3WdTkkmUhbugMn+9uIUjZyfxfTHqjkkNcSKSqaw3eyy1rMqh+TnPhJDzbu3HbQNFaDcbUGHtCezAD8Nz/U61/gEvjAI/iw7YoV/SC6Kyn5mLQuFBBTHTOVydbKpbiLiCz1DCLTwKxsj2hyQ+XGZ2r5f7gd3NX492W7bA0agdwhc520rzIHGBjzouF0xq0pMf9F1m3JU3HA9o3cxKQsLrrxKgptYf6ekPcEcw==
+X-Microsoft-Antispam-Message-Info: IZuVOviELy8RQUjlHGFoY9iV780zorloinAkPSJSoHjVXpkhrazAPLfufK4sETIEPR1RbPnXh9egwMfBaoZ2RH4xJTJJhkP5PAumwGNxRnrMHuw6mtd8ydQkJdF7X12DQgmdeomgRIVOoy5gbCQva11piBoYPGMB3sg/roJU1Vp2DrUMKTzbBhrMPhV7V/O1xZ2Pf8qx2H2TPtjQhTa4qcdcH118UpZhf2f0m6aobNDfaBVYkDFGJrI46/HTt67fd259Oin9+g57KngG1HC78BfOxkNHlTGDNxDHLeDAFHrrGy7saJVX2OqnUQRvwSA6vuBLBaDm8Q5Kjx4q87cPHv49HGxeZ5XnI4DX6er2Sy7kEwdoXZb4g+XjNVQ9SsTd77MBrrBNqg5zVpoq2d45hDISo0b3lZUzchZDG8nlxCFCGlgVHN0LatXBGHc2YJqOsOMaVjzLJNRA1drMKKOGZ0ccThJDeAxbFaCFSnhvcoXeIQITudY7Z28/byhfEk5zhzohyswoXNkZF0F7Ag7vhRyCO4Dh0OQ5sOT+3DueNL7UHi0O/QoCGthz2JLAyVMT
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e4e62de7-a268-482c-f21b-08d78afbe164
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Dec 2019 18:37:52.3745
+X-MS-Exchange-CrossTenant-Network-Message-Id: edfa5c3b-92e7-477f-73a9-08d78afbe8a9
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Dec 2019 18:38:04.3406
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SN6SAeeKpkJfgOvJDvNPGzHBRELfqHyqjaUBJeLHondxKK51DgjPv3uRx4Yki6Vg
+X-MS-Exchange-CrossTenant-UserPrincipalName: 2deQbjokdFr6ImqpXncQdbJ6yjQRTrZIxbKlndqBaJcNfVc+TiuN8BUjJbp8LRtt
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR12MB3217
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
@@ -107,13 +106,9 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 On 12/26/19 11:24 PM, Rijo Thomas wrote:
-> The AMD-TEE driver should check if TEE is available before
-> registering itself with TEE subsystem. This ensures that
-> there is a TEE which the driver can talk to before proceeding
-> with tee device node allocation.
+> Update tee.txt with AMD-TEE driver details. The driver is written
+> to communicate with AMD's TEE.
 > 
-> Cc: Ard Biesheuvel <ard.biesheuvel@linaro.org>
-> Cc: Tom Lendacky <thomas.lendacky@amd.com>
 > Acked-by: Jens Wiklander <jens.wiklander@linaro.org>
 > Co-developed-by: Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>
 > Signed-off-by: Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>
@@ -122,95 +117,104 @@ On 12/26/19 11:24 PM, Rijo Thomas wrote:
 Reviewed-by: Gary R Hook <gary.hook@amd.com>
 
 > ---
->   drivers/crypto/ccp/tee-dev.c | 11 +++++++++++
->   drivers/tee/amdtee/core.c    |  6 ++++++
->   include/linux/psp-tee.h      | 18 ++++++++++++++++++
->   3 files changed, 35 insertions(+)
+>   Documentation/tee.txt | 81 +++++++++++++++++++++++++++++++++++++++++++++++++++
+>   1 file changed, 81 insertions(+)
 > 
-> diff --git a/drivers/crypto/ccp/tee-dev.c b/drivers/crypto/ccp/tee-dev.c
-> index 555c8a7..5e697a9 100644
-> --- a/drivers/crypto/ccp/tee-dev.c
-> +++ b/drivers/crypto/ccp/tee-dev.c
-> @@ -362,3 +362,14 @@ int psp_tee_process_cmd(enum tee_cmd_id cmd_id, void *buf, size_t len,
->   	return 0;
->   }
->   EXPORT_SYMBOL(psp_tee_process_cmd);
-> +
-> +int psp_check_tee_status(void)
-> +{
-> +	struct psp_device *psp = psp_get_master_device();
-> +
-> +	if (!psp || !psp->tee_data)
-> +		return -ENODEV;
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL(psp_check_tee_status);
-> diff --git a/drivers/tee/amdtee/core.c b/drivers/tee/amdtee/core.c
-> index dd360f3..9d0cee1 100644
-> --- a/drivers/tee/amdtee/core.c
-> +++ b/drivers/tee/amdtee/core.c
-> @@ -16,6 +16,7 @@
->   #include <linux/firmware.h>
->   #include "amdtee_private.h"
->   #include "../tee_private.h"
-> +#include <linux/psp-tee.h>
+> diff --git a/Documentation/tee.txt b/Documentation/tee.txt
+> index afacdf2..c8fad81 100644
+> --- a/Documentation/tee.txt
+> +++ b/Documentation/tee.txt
+> @@ -112,6 +112,83 @@ kernel are handled by the kernel driver. Other RPC messages will be forwarded to
+>   tee-supplicant without further involvement of the driver, except switching
+>   shared memory buffer representation.
 >   
->   static struct amdtee_driver_data *drv_data;
->   static DEFINE_MUTEX(session_list_mutex);
-> @@ -438,6 +439,10 @@ static int __init amdtee_driver_init(void)
->   	struct tee_shm_pool *pool = ERR_PTR(-EINVAL);
->   	int rc;
->   
-> +	rc = psp_check_tee_status();
-> +	if (rc)
-> +		goto err_fail;
+> +AMD-TEE driver
+> +==============
 > +
->   	drv_data = kzalloc(sizeof(*drv_data), GFP_KERNEL);
->   	if (IS_ERR(drv_data))
->   		return -ENOMEM;
-> @@ -485,6 +490,7 @@ static int __init amdtee_driver_init(void)
->   	kfree(drv_data);
->   	drv_data = NULL;
->   
-> +err_fail:
->   	pr_err("amd-tee driver initialization failed\n");
->   	return rc;
->   }
-> diff --git a/include/linux/psp-tee.h b/include/linux/psp-tee.h
-> index 63bb221..cb0c95d 100644
-> --- a/include/linux/psp-tee.h
-> +++ b/include/linux/psp-tee.h
-> @@ -62,6 +62,19 @@ enum tee_cmd_id {
->   int psp_tee_process_cmd(enum tee_cmd_id cmd_id, void *buf, size_t len,
->   			u32 *status);
->   
-> +/**
-> + * psp_check_tee_status() - Checks whether there is a TEE which a driver can
-> + * talk to.
-> + *
-> + * This function can be used by AMD-TEE driver to query if there is TEE with
-> + * which it can communicate.
-> + *
-> + * Returns:
-> + * 0          if the device has TEE
-> + * -%ENODEV   if there is no TEE available
-> + */
-> +int psp_check_tee_status(void);
+> +The AMD-TEE driver handles the communication with AMD's TEE environment. The
+> +TEE environment is provided by AMD Secure Processor.
 > +
->   #else /* !CONFIG_CRYPTO_DEV_SP_PSP */
->   
->   static inline int psp_tee_process_cmd(enum tee_cmd_id cmd_id, void *buf,
-> @@ -69,5 +82,10 @@ static inline int psp_tee_process_cmd(enum tee_cmd_id cmd_id, void *buf,
->   {
->   	return -ENODEV;
->   }
+> +The AMD Secure Processor (formerly called Platform Security Processor or PSP)
+> +is a dedicated processor that features ARM TrustZone technology, along with a
+> +software-based Trusted Execution Environment (TEE) designed to enable
+> +third-party Trusted Applications. This feature is currently enabled only for
+> +APUs.
 > +
-> +static inline int psp_check_tee_status(void)
-> +{
-> +	return -ENODEV;
-> +}
->   #endif /* CONFIG_CRYPTO_DEV_SP_PSP */
->   #endif /* __PSP_TEE_H_ */
+> +The following picture shows a high level overview of AMD-TEE::
+> +
+> +                                             |
+> +    x86                                      |
+> +                                             |
+> + User space            (Kernel space)        |    AMD Secure Processor (PSP)
+> + ~~~~~~~~~~            ~~~~~~~~~~~~~~        |    ~~~~~~~~~~~~~~~~~~~~~~~~~~
+> +                                             |
+> + +--------+                                  |       +-------------+
+> + | Client |                                  |       | Trusted     |
+> + +--------+                                  |       | Application |
+> +     /\                                      |       +-------------+
+> +     ||                                      |             /\
+> +     ||                                      |             ||
+> +     ||                                      |             \/
+> +     ||                                      |         +----------+
+> +     ||                                      |         |   TEE    |
+> +     ||                                      |         | Internal |
+> +     \/                                      |         |   API    |
+> + +---------+           +-----------+---------+         +----------+
+> + | TEE     |           | TEE       | AMD-TEE |         | AMD-TEE  |
+> + | Client  |           | subsystem | driver  |         | Trusted  |
+> + | API     |           |           |         |         |   OS     |
+> + +---------+-----------+----+------+---------+---------+----------+
+> + |   Generic TEE API        |      | ASP     |      Mailbox       |
+> + |   IOCTL (TEE_IOC_*)      |      | driver  | Register Protocol  |
+> + +--------------------------+      +---------+--------------------+
+> +
+> +At the lowest level (in x86), the AMD Secure Processor (ASP) driver uses the
+> +CPU to PSP mailbox regsister to submit commands to the PSP. The format of the
+> +command buffer is opaque to the ASP driver. It's role is to submit commands to
+> +the secure processor and return results to AMD-TEE driver. The interface
+> +between AMD-TEE driver and AMD Secure Processor driver can be found in [6].
+> +
+> +The AMD-TEE driver packages the command buffer payload for processing in TEE.
+> +The command buffer format for the different TEE commands can be found in [7].
+> +
+> +The TEE commands supported by AMD-TEE Trusted OS are:
+> +* TEE_CMD_ID_LOAD_TA          - loads a Trusted Application (TA) binary into
+> +                                TEE environment.
+> +* TEE_CMD_ID_UNLOAD_TA        - unloads TA binary from TEE environment.
+> +* TEE_CMD_ID_OPEN_SESSION     - opens a session with a loaded TA.
+> +* TEE_CMD_ID_CLOSE_SESSION    - closes session with loaded TA
+> +* TEE_CMD_ID_INVOKE_CMD       - invokes a command with loaded TA
+> +* TEE_CMD_ID_MAP_SHARED_MEM   - maps shared memory
+> +* TEE_CMD_ID_UNMAP_SHARED_MEM - unmaps shared memory
+> +
+> +AMD-TEE Trusted OS is the firmware running on AMD Secure Processor.
+> +
+> +The AMD-TEE driver registers itself with TEE subsystem and implements the
+> +following driver function callbacks:
+> +
+> +* get_version - returns the driver implementation id and capability.
+> +* open - sets up the driver context data structure.
+> +* release - frees up driver resources.
+> +* open_session - loads the TA binary and opens session with loaded TA.
+> +* close_session -  closes session with loaded TA and unloads it.
+> +* invoke_func - invokes a command with loaded TA.
+> +
+> +cancel_req driver callback is not supported by AMD-TEE.
+> +
+> +The GlobalPlatform TEE Client API [5] can be used by the user space (client) to
+> +talk to AMD's TEE. AMD's TEE provides a secure environment for loading, opening
+> +a session, invoking commands and clossing session with TA.
+> +
+>   References
+>   ==========
+>   
+> @@ -125,3 +202,7 @@ References
+>   
+>   [5] http://www.globalplatform.org/specificationsdevice.asp look for
+>       "TEE Client API Specification v1.0" and click download.
+> +
+> +[6] include/linux/psp-tee.h
+> +
+> +[7] drivers/tee/amdtee/amdtee_if.h
 > 
 
