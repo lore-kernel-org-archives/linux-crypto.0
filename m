@@ -2,122 +2,136 @@ Return-Path: <SRS0=+KeW=2R=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9A8AC2D0C6
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 Dec 2019 10:39:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCC02C2D0C6
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 Dec 2019 18:37:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C3EA820882
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 Dec 2019 10:39:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9FB3B206CB
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 Dec 2019 18:37:28 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="ELJvFend"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726365AbfL0KjJ (ORCPT
+        id S1726527AbfL0Sh2 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 27 Dec 2019 05:39:09 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:60284 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726354AbfL0KjJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 27 Dec 2019 05:39:09 -0500
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1ikn1P-0007QA-RF; Fri, 27 Dec 2019 18:39:07 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1ikn1P-0005p1-LO; Fri, 27 Dec 2019 18:39:07 +0800
-Date:   Fri, 27 Dec 2019 18:39:07 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Eneas U de Queiroz <cotequeiroz@gmail.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Subject: Re: Subject: [PATCH 0/6] crypto: QCE hw-crypto fixes
-Message-ID: <20191227103907.x3sy3dg57yhx2vbz@gondor.apana.org.au>
-References: <20191220190218.28884-1-cotequeiroz@gmail.com>
+        Fri, 27 Dec 2019 13:37:28 -0500
+Received: from mail-dm6nam11on2041.outbound.protection.outlook.com ([40.107.223.41]:6095
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726379AbfL0Sh1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 27 Dec 2019 13:37:27 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EyXIU3c1mKSY21QQA7KAIh5sVNT8xoMOEueKXLoCmHRuCHPxzhSoRmpp4JqvtAA/E7umU3eGSUPATmhulqoiA3nlGFrNuZhSSnktsi3Cs9YTwNAZh9blHtOnkWwonHpeQVR4mE88y1+4jIyxs4N6gXai0UvihvYbSe7xWyymwUZ2t2kN3U8/THcu8SAChvfAlus35tf3cszzXWUcS0AuGCA85Gt0z7x7YCCZuvWqGPcNBoL00MqyNTvvkzDuG2QqJCaXaeMEXsADvL4B+BCErrRGUeZIbtsmSTJtndiT/u5zPy2lpaLiK7M+TDXzpKxkwBqGq9whloqn/yokqaL51g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8854fDKXuI85I3FJ5/M68M5V548PYPZawdyFZxFQSfU=;
+ b=eO7h5J5wF/5NEu1cOvnHMdAbsroJR8xqUhC4JxbTDezmILYuPATBLsEbL2Z32zw+o5GPOVScKw17UDMI+JRJ4DZeTPprpxEMlJqrathXUqxsjUWijDIbt13eDA6vTg6Reeohw85L3AoGbbK4V3co66Z9nbVRycnTwIvj61WGgxFewZYqOnsmjbhax879WghnVPunU0zumGVgZcyuNiewIHutUtXuJp0BSE4xALNAhkdriH6R41Cz2Y9verIKeEsWYYFqyOvHQlFO9UQoi0mx1qwANA6FByum5sR5yYXzhA2bnXVVrGal5rTeg4FM3LW6Z7i5RcISDaSAfTcLMsY1gA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8854fDKXuI85I3FJ5/M68M5V548PYPZawdyFZxFQSfU=;
+ b=ELJvFendP01WmBfUlaBqB/z1iZKUnlXxx67iQCVm7zZv5WSYcT69uMbgJtjvyUe9hwGtugPHN8venpQ4F1na24P4FTegPJQA4+9MK7VFKjV8dHSUMWwNDuMtrmKktr/Re3A5oSwby6Ej+/jOeb7cbtzcOwfcVNOBnq55l+zl5DE=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Gary.Hook@amd.com; 
+Received: from BN8PR12MB2916.namprd12.prod.outlook.com (20.179.66.155) by
+ BN8PR12MB3217.namprd12.prod.outlook.com (20.179.67.158) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2581.12; Fri, 27 Dec 2019 18:37:23 +0000
+Received: from BN8PR12MB2916.namprd12.prod.outlook.com
+ ([fe80::45d0:ec5c:7480:8029]) by BN8PR12MB2916.namprd12.prod.outlook.com
+ ([fe80::45d0:ec5c:7480:8029%5]) with mapi id 15.20.2559.017; Fri, 27 Dec 2019
+ 18:37:23 +0000
+Subject: Re: [PATCH 1/4] tee: allow compilation of tee subsystem for AMD CPUs
+To:     Rijo Thomas <Rijo-john.Thomas@amd.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        tee-dev@lists.linaro.org
+Cc:     Nimesh Easow <Nimesh.Easow@amd.com>,
+        Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Gary Hook <gary.hook@amd.com>
+References: <cover.1577423898.git.Rijo-john.Thomas@amd.com>
+ <515ebade213492080b97ed6426c82a0fe22c03ab.1577423898.git.Rijo-john.Thomas@amd.com>
+From:   Gary R Hook <ghook@amd.com>
+Message-ID: <13954c4f-378f-a31c-2ee4-2ab0aea632e0@amd.com>
+Date:   Fri, 27 Dec 2019 12:37:20 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.1
+In-Reply-To: <515ebade213492080b97ed6426c82a0fe22c03ab.1577423898.git.Rijo-john.Thomas@amd.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN4PR0701CA0020.namprd07.prod.outlook.com
+ (2603:10b6:803:28::30) To BN8PR12MB2916.namprd12.prod.outlook.com
+ (2603:10b6:408:6a::27)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191220190218.28884-1-cotequeiroz@gmail.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+Received: from [4.3.2.105] (47.220.193.178) by SN4PR0701CA0020.namprd07.prod.outlook.com (2603:10b6:803:28::30) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2581.12 via Frontend Transport; Fri, 27 Dec 2019 18:37:22 +0000
+X-Originating-IP: [47.220.193.178]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 375a0d84-b487-4709-2517-08d78afbd01c
+X-MS-TrafficTypeDiagnostic: BN8PR12MB3217:|BN8PR12MB3217:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BN8PR12MB3217DD3C601FF476AE089AD4FD2A0@BN8PR12MB3217.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1332;
+X-Forefront-PRVS: 0264FEA5C3
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(346002)(396003)(39860400002)(376002)(136003)(189003)(199004)(66946007)(66556008)(66476007)(110136005)(16576012)(54906003)(956004)(6706004)(6486002)(478600001)(4326008)(52116002)(186003)(2616005)(31696002)(5660300002)(8936002)(2906002)(81166006)(36756003)(8676002)(81156014)(316002)(26005)(53546011)(31686004)(16526019)(78286006)(84106002);DIR:OUT;SFP:1101;SCL:1;SRVR:BN8PR12MB3217;H:BN8PR12MB2916.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: dwCashLZmH/JI0ApHiw0wVubIAY3z1GOWAfrNDeaWAiFtYlM37MMAMVWsRPYpYq361Gbt0j++2oKq87HXKQGCSLTJmbztroqHcjMIlCHJZ/I2vchgvdKf1B/pXPruOswlYLRZIJxYjFkdMBrafZyTruZQ6GF+1TOISlI3lvtt2AVRF9/TZy9qhNVNlO3xu6s4Uohnmud5bnj9FB15HQF1qvKLAMn34xf5JZ6yOndJ3Uy0bwF1LhLPZ1hVVhP3PXgLOfPID/gG8gBqhAZv9n60UdZ/M+hA7q/iflfZOKXyy6TFoscfllUQ7rqoZc5qc2vlOXlLV2uRsxthJf75ijYECLu7r/idQsgPZRf1OxXJSY1KUUjyGh75fHKafgNzc/PaAv9ALXueyy3GAdScm618a1ECJw/GXbCd2dQ/ABDXLWHVeKIrb31m+KZj9FujFcr0DUFmzP/ekuNjtYsueT4UyRr2P2vEBQOxADes0zZKo+ZF9Sb2boEK8PeflpFEOpmmX40od9XStKQUGG2XkiL7g==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 375a0d84-b487-4709-2517-08d78afbd01c
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Dec 2019 18:37:23.4641
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 6YtsAvdRxvZ5Zjtyy7E2kd6Wr2yOUcNc+iMqRu8f2paFkyxQ+obdKuNrXh+biM5V
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR12MB3217
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Dec 20, 2019 at 04:02:12PM -0300, Eneas U de Queiroz wrote:
-> I've been trying to make the Qualcomm Crypto Engine work with GCM-mode
-> AES.  I fixed some bugs, and added an option to build only hashes or
-> skciphers, as the VPN performance increases if you leave some of that to
-> the CPU.
+On 12/26/19 11:24 PM, Rijo Thomas wrote:
+> Allow compilation of tee subsystem for AMD's CPUs which have a dedicated
+> AMD Secure Processor for Trusted Execution Environment (TEE).
 > 
-> A discussion about this can be found here:
-> https://github.com/openwrt/openwrt/pull/2518
-> 
-> I'm using openwrt to test this, and there's no support for kernel 5.x
-> yet.  So I have backported the recent skcipher updates, and tested this
-> with 4.19. I don't have the hardware with me, but I have run-tested
-> everything, working remotely.
-> 
-> All of the skciphers directly implemented by the driver work.  They pass
-> the tcrypt tests, and also some tests from userspace using AF_ALG:
-> https://github.com/cotequeiroz/afalg_tests
-> 
-> However, I can't get gcm(aes) to work.  When setting the gcm-mode key,
-> it sets the ctr(aes) key, then encrypt a block of zeroes, and uses that
-> as the ghash key.  The driver fails to perform that encryption.  I've
-> dumped the input and output data, and they apparently are not touched by
-> the QCE.  The IV, which written to a buffer appended to the results sg
-> list gets updated, but the results themselves are not.  I'm not sure
-> what goes wrong, if it is a DMA/cache problem, memory alignment, or
-> whatever.
-> 
-> If I take 'be128 hash' out of the 'data' struct, and kzalloc them
-> separately in crypto_gcm_setkey (crypto/gcm.c), it encrypts the data
-> just fine--perhaps the payload and the request struct can't be in the
-> same page?
-> 
-> However, it still fails during decryption of the very first tcrypt test
-> vector (I'm testing with the AF_ALG program, using the same vectors as
-> the kernel), in the final encryption to compute the authentication tag,
-> in the same fashion as it did in 'crypto_gcm_setkey'.  What this case
-> has in common with the ghash key above is the input data, a single block
-> of zeroes, so this may be a hardware bug.  However, if I perform the
-> same encryption using the AF_ALG test, it completes OK.
-> 
-> I am not experienced enough with the Linux Kernel, or with the ARM
-> architecture to wrap this up on my own, so I need some pointers to what
-> to try next.
-> 
-> To come up a working setup, I am passing any AES requests whose length
-> is less than or equal to one AES block to the fallback skcipher.  This
-> hack is not a part of this series, but I can send it if there's any
-> interest in it.
-> 
-> Anyway, the patches in this series are complete enough on their own.
-> With the exception of the last patch, they're all bugfixes.
-> 
-> Cheers,
-> 
-> Eneas
-> 
-> Eneas U de Queiroz (6):
->   crypto: qce - fix ctr-aes-qce block, chunk sizes
->   crypto: qce - fix xts-aes-qce key sizes
->   crypto: qce - save a sg table slot for result buf
->   crypto: qce - update the skcipher IV
->   crypto: qce - initialize fallback only for AES
->   crypto: qce - allow building only hashes/ciphers
-> 
->  drivers/crypto/Kconfig        |  63 ++++++++-
->  drivers/crypto/qce/Makefile   |   7 +-
->  drivers/crypto/qce/common.c   | 244 ++++++++++++++++++----------------
->  drivers/crypto/qce/core.c     |   4 +
->  drivers/crypto/qce/dma.c      |   6 +-
->  drivers/crypto/qce/dma.h      |   3 +-
->  drivers/crypto/qce/skcipher.c |  41 ++++--
->  7 files changed, 229 insertions(+), 139 deletions(-)
+> Acked-by: Jens Wiklander <jens.wiklander@linaro.org>
+> Co-developed-by: Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>
+> Signed-off-by: Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>
+> Signed-off-by: Rijo Thomas <Rijo-john.Thomas@amd.com>
 
-All applied.  Thanks.
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Reviewed-by: Gary R Hook <gary.hook@amd.com>
+
+> ---
+>   drivers/tee/Kconfig | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/tee/Kconfig b/drivers/tee/Kconfig
+> index 676ffcb..4f3197d 100644
+> --- a/drivers/tee/Kconfig
+> +++ b/drivers/tee/Kconfig
+> @@ -2,7 +2,7 @@
+>   # Generic Trusted Execution Environment Configuration
+>   config TEE
+>   	tristate "Trusted Execution Environment support"
+> -	depends on HAVE_ARM_SMCCC || COMPILE_TEST
+> +	depends on HAVE_ARM_SMCCC || COMPILE_TEST || CPU_SUP_AMD
+>   	select DMA_SHARED_BUFFER
+>   	select GENERIC_ALLOCATOR
+>   	help
+> 
+
