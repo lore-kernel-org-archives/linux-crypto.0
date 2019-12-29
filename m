@@ -2,51 +2,48 @@ Return-Path: <SRS0=lkKn=2T=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21F90C2D0D1
-	for <linux-crypto@archiver.kernel.org>; Sun, 29 Dec 2019 02:58:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B79D9C2D0C0
+	for <linux-crypto@archiver.kernel.org>; Sun, 29 Dec 2019 21:50:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ED4FF206F4
-	for <linux-crypto@archiver.kernel.org>; Sun, 29 Dec 2019 02:58:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 83E12208E4
+	for <linux-crypto@archiver.kernel.org>; Sun, 29 Dec 2019 21:50:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1577588299;
-	bh=35uGRs8Mw+Egw214ZqfsVQH9wmDMPthoDPJBCg2YkzY=;
-	h=From:To:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=A7ok+NDWeqIxKocTTSOo2zN/MnOMM2JdxMeYBjDGLYILURWAuISlIFcEIQtPW/cap
-	 Go0axw050n3sJnEPB4SzC0jAHlE9cHkFcZQKcFWyWuZPoMWnA+8a31DMldMQ/N0glr
-	 gpobSDe81OlA8BLIc33RwMmr+T1S82xiHdVLc8v8=
+	s=default; t=1577656205;
+	bh=7cCdW4Es32M3VWtm4dSdymCTWxuaGQtfVJz1UcrT3eM=;
+	h=From:To:Subject:Date:List-ID:From;
+	b=xxDgdSp+d7b+DJ0pGyLLyk8yvuCsPzsrWiQarg4a1r/imx+WfaeNQVCy4KsPRH59f
+	 Ceas8+AwZY1CJ9Jgi9yvhk+OyjD/tcZLJXFIGBov2kX1DG4Xd2AWHupfebz8GEbbz2
+	 joHq1jG1e7nj5FNMVx5prJUuobc2cflOSb55f/Y0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726479AbfL2C6R (ORCPT
+        id S1726417AbfL2VuE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 28 Dec 2019 21:58:17 -0500
-Received: from mail.kernel.org ([198.145.29.99]:44492 "EHLO mail.kernel.org"
+        Sun, 29 Dec 2019 16:50:04 -0500
+Received: from mail.kernel.org ([198.145.29.99]:55488 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726425AbfL2C6L (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 28 Dec 2019 21:58:11 -0500
+        id S1726407AbfL2VuE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 29 Dec 2019 16:50:04 -0500
 Received: from zzz.tds (h75-100-12-111.burkwi.broadband.dynamic.tds.net [75.100.12.111])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 00CFF218AC
-        for <linux-crypto@vger.kernel.org>; Sun, 29 Dec 2019 02:58:10 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 50678206A4
+        for <linux-crypto@vger.kernel.org>; Sun, 29 Dec 2019 21:50:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1577588291;
-        bh=35uGRs8Mw+Egw214ZqfsVQH9wmDMPthoDPJBCg2YkzY=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=pDDOwjMM7io9V+JsVVEu1o9WOkoRWpK2fWkeQZBW6MS3DipyUbYzCltAzGOvhQpcC
-         AXG/p0EDuwlweA2XeL3UUkTL2Z72asP4VxWneCnKJr8vW4C0T5ciNSIf6O3ZgQxOrp
-         vKIHlWwPAcHn7IsRklXblIXOv/bbx97/enT3H9mU=
+        s=default; t=1577656203;
+        bh=7cCdW4Es32M3VWtm4dSdymCTWxuaGQtfVJz1UcrT3eM=;
+        h=From:To:Subject:Date:From;
+        b=hXzsd6p+ptW9OeR+BSWojxh/1s4C1NSxeiCvF4GzTj7uK+DiH0TxChPtCUOBTCK1H
+         0YbBtN04pKdUa4RhuNRkUau7/kbxNIFZsxew0/uqskcATuUWY9TZafN58iW9yAoGno
+         00vRAxHNyM5Db2Z89TopIv6mZ5RPsdtH8rSQSBeI=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Subject: [PATCH 20/28] crypto: skcipher - use crypto_grab_cipher() and simplify error paths
-Date:   Sat, 28 Dec 2019 20:57:06 -0600
-Message-Id: <20191229025714.544159-21-ebiggers@kernel.org>
+Subject: [PATCH 0/6] crypto: remove old way of allocating and freeing instances
+Date:   Sun, 29 Dec 2019 15:48:24 -0600
+Message-Id: <20191229214830.260965-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20191229025714.544159-1-ebiggers@kernel.org>
-References: <20191229025714.544159-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
@@ -54,97 +51,53 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+This series makes all crypto templates use the new way of freeing
+instances where a ->free() method is installed to the instance struct
+itself.  This replaces the weakly-typed method crypto_template::free().
 
-Make skcipher_alloc_instance_simple() use the new function
-crypto_grab_cipher() to initialize its cipher spawn.
+skcipher and akcipher were already using the new way, while aead was
+mostly but not always using the new way.  shash and ahash were using the
+old way.  This series eliminates this inconsistency (and the redundant
+code associated with it) by making everyone use the new way.
 
-This is needed to make all spawns be initialized in a consistent way.
+The last patch adds registration-time checks which verify that all
+instances really have a ->free() method.
 
-Also simplify the error handling by taking advantage of crypto_drop_*()
-now accepting (as a no-op) spawns that haven't been initialized yet, and
-by taking advantage of crypto_grab_*() now handling ERR_PTR() names.
+This series is an internal cleanup only; there are no changes for users
+of the crypto API.
 
-Signed-off-by: Eric Biggers <ebiggers@google.com>
----
- crypto/skcipher.c | 34 +++++++++++++---------------------
- 1 file changed, 13 insertions(+), 21 deletions(-)
+This series is based on top of my other series
+"[PATCH 00/28] crypto: template instantiation cleanup".
 
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index a9418a7e80a9..0615fead1529 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -923,7 +923,7 @@ static void skcipher_exit_tfm_simple(struct crypto_skcipher *tfm)
- 
- static void skcipher_free_instance_simple(struct skcipher_instance *inst)
- {
--	crypto_drop_spawn(skcipher_instance_ctx(inst));
-+	crypto_drop_cipher(skcipher_instance_ctx(inst));
- 	kfree(inst);
- }
- 
-@@ -947,10 +947,10 @@ struct skcipher_instance *skcipher_alloc_instance_simple(
- 	struct crypto_template *tmpl, struct rtattr **tb)
- {
- 	struct crypto_attr_type *algt;
--	struct crypto_alg *cipher_alg;
--	struct skcipher_instance *inst;
--	struct crypto_spawn *spawn;
- 	u32 mask;
-+	struct skcipher_instance *inst;
-+	struct crypto_cipher_spawn *spawn;
-+	struct crypto_alg *cipher_alg;
- 	int err;
- 
- 	algt = crypto_get_attr_type(tb);
-@@ -964,28 +964,22 @@ struct skcipher_instance *skcipher_alloc_instance_simple(
- 		crypto_requires_off(algt->type, algt->mask,
- 				    CRYPTO_ALG_NEED_FALLBACK);
- 
--	cipher_alg = crypto_get_attr_alg(tb, CRYPTO_ALG_TYPE_CIPHER, mask);
--	if (IS_ERR(cipher_alg))
--		return ERR_CAST(cipher_alg);
--
- 	inst = kzalloc(sizeof(*inst) + sizeof(*spawn), GFP_KERNEL);
--	if (!inst) {
--		err = -ENOMEM;
--		goto err_put_cipher_alg;
--	}
-+	if (!inst)
-+		return ERR_PTR(-ENOMEM);
- 	spawn = skcipher_instance_ctx(inst);
- 
--	err = crypto_inst_setname(skcipher_crypto_instance(inst), tmpl->name,
--				  cipher_alg);
-+	err = crypto_grab_cipher(spawn, skcipher_crypto_instance(inst),
-+				 crypto_attr_alg_name(tb[1]), 0, mask);
- 	if (err)
- 		goto err_free_inst;
-+	cipher_alg = crypto_spawn_cipher_alg(spawn);
- 
--	spawn->dropref = true;
--	err = crypto_init_spawn(spawn, cipher_alg,
--				skcipher_crypto_instance(inst),
--				CRYPTO_ALG_TYPE_MASK);
-+	err = crypto_inst_setname(skcipher_crypto_instance(inst), tmpl->name,
-+				  cipher_alg);
- 	if (err)
- 		goto err_free_inst;
-+
- 	inst->free = skcipher_free_instance_simple;
- 
- 	/* Default algorithm properties, can be overridden */
-@@ -1005,9 +999,7 @@ struct skcipher_instance *skcipher_alloc_instance_simple(
- 	return inst;
- 
- err_free_inst:
--	kfree(inst);
--err_put_cipher_alg:
--	crypto_mod_put(cipher_alg);
-+	skcipher_free_instance_simple(inst);
- 	return ERR_PTR(err);
- }
- EXPORT_SYMBOL_GPL(skcipher_alloc_instance_simple);
+Eric Biggers (6):
+  crypto: hash - add support for new way of freeing instances
+  crypto: geniv - convert to new way of freeing instances
+  crypto: cryptd - convert to new way of freeing instances
+  crypto: shash - convert shash_free_instance() to new style
+  crypto: algapi - remove crypto_template::{alloc,free}()
+  crypto: algapi - enforce that all instances have a ->free() method
+
+ crypto/aead.c                   |  8 +++----
+ crypto/ahash.c                  | 11 +++++++++
+ crypto/akcipher.c               |  2 ++
+ crypto/algapi.c                 |  5 ----
+ crypto/algboss.c                | 12 +---------
+ crypto/ccm.c                    |  5 ++--
+ crypto/cmac.c                   |  5 ++--
+ crypto/cryptd.c                 | 42 ++++++++++++++++-----------------
+ crypto/echainiv.c               | 20 ++++------------
+ crypto/geniv.c                  | 15 ++++++------
+ crypto/hmac.c                   |  5 ++--
+ crypto/seqiv.c                  | 20 ++++------------
+ crypto/shash.c                  | 19 +++++++++++----
+ crypto/skcipher.c               |  3 +++
+ crypto/vmac.c                   |  5 ++--
+ crypto/xcbc.c                   |  5 ++--
+ include/crypto/algapi.h         |  2 --
+ include/crypto/internal/geniv.h |  1 -
+ include/crypto/internal/hash.h  |  4 +++-
+ 19 files changed, 89 insertions(+), 100 deletions(-)
+
 -- 
 2.24.1
 
