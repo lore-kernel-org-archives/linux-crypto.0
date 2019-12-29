@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66AD6C2D0C0
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91631C2D0DD
 	for <linux-crypto@archiver.kernel.org>; Sun, 29 Dec 2019 21:50:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 31FD220748
+	by mail.kernel.org (Postfix) with ESMTP id 66F26207FD
 	for <linux-crypto@archiver.kernel.org>; Sun, 29 Dec 2019 21:50:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=default; t=1577656207;
-	bh=2pAoNKI8OJS74mROD6y5dbC2TYjQGU5qgUtm1mv3GIU=;
+	bh=oKWKD6vvBCPdZ7WlDJtKTsaZgdwd0SitWN8pKrtBo68=;
 	h=From:To:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=pvPF+D+l6fger59ZL8KE9B6tw04ajgFB7NFiX75qcX2+FIcJlu3i1DNxliDNtkv54
-	 pAz4n7kXFDrrNHRwAvWdXEzlZvIe2gf+eAEkad6WUwAjKzCzWWHUqLcWUq9vXoN5pC
-	 UC2Lec5uMhdY/2n1aIOcHfG11+qbBvWf3RD899E8=
+	b=t2uwIKtcxwjNxBJCCvslEUNp2pL432dxt9f9EXjjfm/Nf5bw/14TKfYd3pa7B/fXz
+	 Ipj1oMqswwIyVpdH5ZmBDhniynuOqLe1XRd13Yllo3yvEWaeDkkseZGdKv8eAxWhRX
+	 wXfbGF+f/RqmahjSDkTGXFDPWn68daETkLsYT3Y0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726476AbfL2VuG (ORCPT
+        id S1726407AbfL2VuG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Sun, 29 Dec 2019 16:50:06 -0500
-Received: from mail.kernel.org ([198.145.29.99]:55512 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:55502 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726413AbfL2VuG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1726416AbfL2VuG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Sun, 29 Dec 2019 16:50:06 -0500
 Received: from zzz.tds (h75-100-12-111.burkwi.broadband.dynamic.tds.net [75.100.12.111])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E34D6208C4
-        for <linux-crypto@vger.kernel.org>; Sun, 29 Dec 2019 21:50:04 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6090E20748
+        for <linux-crypto@vger.kernel.org>; Sun, 29 Dec 2019 21:50:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=default; t=1577656205;
-        bh=2pAoNKI8OJS74mROD6y5dbC2TYjQGU5qgUtm1mv3GIU=;
+        bh=oKWKD6vvBCPdZ7WlDJtKTsaZgdwd0SitWN8pKrtBo68=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=T4thifatZXy77658MXTNx92Ypaahw8Ij0YQ/U6ffW6Mqn4BYz/UJf9sikNr6GESSd
-         wiFy49XfEh4MVYb0qOcjR/9k9kd1AoXIHxB3P6nqcnEUtR7KVJeNs/LSSkCEXmjAcY
-         BdLhEQkLyNRrJpZEgmr2o/Rtfn//aOZJderYYZJo=
+        b=ci7lBawJ8NdW+uOt76+TtQpiT1b+qKhqniX/69SOggYl7W9dxRAoU6WTp7r18d1Lg
+         KU0Br7tyCzUkDMmHZ3v1fq4MrFRZF9uvacwtrWGVf6Tpc1ujdo+YA9vZkrd1z+Hpf7
+         hCrhVGjkg7wJKosAww5zcN4+kZ95luR+PqYKMGq4=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Subject: [PATCH 4/6] crypto: shash - convert shash_free_instance() to new style
-Date:   Sun, 29 Dec 2019 15:48:28 -0600
-Message-Id: <20191229214830.260965-5-ebiggers@kernel.org>
+Subject: [PATCH 5/6] crypto: algapi - remove crypto_template::{alloc,free}()
+Date:   Sun, 29 Dec 2019 15:48:29 -0600
+Message-Id: <20191229214830.260965-6-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20191229214830.260965-1-ebiggers@kernel.org>
 References: <20191229214830.260965-1-ebiggers@kernel.org>
@@ -56,186 +56,128 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-Convert shash_free_instance() and its users to the new way of freeing
-instances, where a ->free() method is installed to the instance struct
-itself.  This replaces the weakly-typed method crypto_template::free().
-
-This will allow removing support for the old way of freeing instances.
-
-Also give shash_free_instance() a more descriptive name to reflect that
-it's only for instances with a single spawn, not for any instance.
+Now that all templates provide a ->create() method which creates the
+instance, installs a strongly-typed ->free() method directly to it, and
+registers it, the older ->alloc() and ->free() methods in
+'struct crypto_template' are no longer used.  Remove them.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/ccm.c                   | 5 +++--
- crypto/cmac.c                  | 5 +++--
- crypto/hmac.c                  | 5 +++--
- crypto/shash.c                 | 8 ++++----
- crypto/vmac.c                  | 5 +++--
- crypto/xcbc.c                  | 5 +++--
- include/crypto/internal/hash.h | 2 +-
- 7 files changed, 20 insertions(+), 15 deletions(-)
+ crypto/aead.c           |  5 -----
+ crypto/ahash.c          |  5 -----
+ crypto/algapi.c         |  5 -----
+ crypto/algboss.c        | 12 +-----------
+ crypto/shash.c          |  5 -----
+ include/crypto/algapi.h |  2 --
+ 6 files changed, 1 insertion(+), 33 deletions(-)
 
-diff --git a/crypto/ccm.c b/crypto/ccm.c
-index 987c4d69948a..40814a00df80 100644
---- a/crypto/ccm.c
-+++ b/crypto/ccm.c
-@@ -938,10 +938,12 @@ static int cbcmac_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	inst->alg.final = crypto_cbcmac_digest_final;
- 	inst->alg.setkey = crypto_cbcmac_digest_setkey;
+diff --git a/crypto/aead.c b/crypto/aead.c
+index 02a0db076d7e..7707d3223101 100644
+--- a/crypto/aead.c
++++ b/crypto/aead.c
+@@ -185,11 +185,6 @@ static void crypto_aead_free_instance(struct crypto_instance *inst)
+ {
+ 	struct aead_instance *aead = aead_instance(inst);
  
-+	inst->free = shash_free_singlespawn_instance;
-+
- 	err = shash_register_instance(tmpl, inst);
- out:
- 	if (err)
--		shash_free_instance(shash_crypto_instance(inst));
-+		shash_free_singlespawn_instance(inst);
- 	return err;
+-	if (!aead->free) {
+-		inst->tmpl->free(inst);
+-		return;
+-	}
+-
+ 	aead->free(aead);
  }
  
-@@ -949,7 +951,6 @@ static struct crypto_template crypto_ccm_tmpls[] = {
- 	{
- 		.name = "cbcmac",
- 		.create = cbcmac_create,
--		.free = shash_free_instance,
- 		.module = THIS_MODULE,
- 	}, {
- 		.name = "ccm_base",
-diff --git a/crypto/cmac.c b/crypto/cmac.c
-index cc4f46e2c46f..3fcaa555ee01 100644
---- a/crypto/cmac.c
-+++ b/crypto/cmac.c
-@@ -280,17 +280,18 @@ static int cmac_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	inst->alg.final = crypto_cmac_digest_final;
- 	inst->alg.setkey = crypto_cmac_digest_setkey;
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index 61e374d76b04..cd5d9847d513 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -515,11 +515,6 @@ static void crypto_ahash_free_instance(struct crypto_instance *inst)
+ {
+ 	struct ahash_instance *ahash = ahash_instance(inst);
  
-+	inst->free = shash_free_singlespawn_instance;
-+
- 	err = shash_register_instance(tmpl, inst);
- out:
- 	if (err)
--		shash_free_instance(shash_crypto_instance(inst));
-+		shash_free_singlespawn_instance(inst);
- 	return err;
+-	if (!ahash->free) {
+-		inst->tmpl->free(inst);
+-		return;
+-	}
+-
+ 	ahash->free(ahash);
  }
  
- static struct crypto_template crypto_cmac_tmpl = {
- 	.name = "cmac",
- 	.create = cmac_create,
--	.free = shash_free_instance,
- 	.module = THIS_MODULE,
- };
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index 72592795c7e7..69605e21af92 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -65,11 +65,6 @@ static int crypto_check_alg(struct crypto_alg *alg)
  
-diff --git a/crypto/hmac.c b/crypto/hmac.c
-index 1e6b175ce361..ed1a8b0ee039 100644
---- a/crypto/hmac.c
-+++ b/crypto/hmac.c
-@@ -224,17 +224,18 @@ static int hmac_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	inst->alg.init_tfm = hmac_init_tfm;
- 	inst->alg.exit_tfm = hmac_exit_tfm;
- 
-+	inst->free = shash_free_singlespawn_instance;
-+
- 	err = shash_register_instance(tmpl, inst);
- out:
- 	if (err)
--		shash_free_instance(shash_crypto_instance(inst));
-+		shash_free_singlespawn_instance(inst);
- 	return err;
+ static void crypto_free_instance(struct crypto_instance *inst)
+ {
+-	if (!inst->alg.cra_type->free) {
+-		inst->tmpl->free(inst);
+-		return;
+-	}
+-
+ 	inst->alg.cra_type->free(inst);
  }
  
- static struct crypto_template hmac_tmpl = {
- 	.name = "hmac",
- 	.create = hmac_create,
--	.free = shash_free_instance,
- 	.module = THIS_MODULE,
- };
+diff --git a/crypto/algboss.c b/crypto/algboss.c
+index a62149d6c839..535f1f87e6c1 100644
+--- a/crypto/algboss.c
++++ b/crypto/algboss.c
+@@ -58,7 +58,6 @@ static int cryptomgr_probe(void *data)
+ {
+ 	struct cryptomgr_param *param = data;
+ 	struct crypto_template *tmpl;
+-	struct crypto_instance *inst;
+ 	int err;
  
+ 	tmpl = crypto_lookup_template(param->template);
+@@ -66,16 +65,7 @@ static int cryptomgr_probe(void *data)
+ 		goto out;
+ 
+ 	do {
+-		if (tmpl->create) {
+-			err = tmpl->create(tmpl, param->tb);
+-			continue;
+-		}
+-
+-		inst = tmpl->alloc(param->tb);
+-		if (IS_ERR(inst))
+-			err = PTR_ERR(inst);
+-		else if ((err = crypto_register_instance(tmpl, inst)))
+-			tmpl->free(inst);
++		err = tmpl->create(tmpl, param->tb);
+ 	} while (err == -EAGAIN && !signal_pending(current));
+ 
+ 	crypto_tmpl_put(tmpl);
 diff --git a/crypto/shash.c b/crypto/shash.c
-index 2f6adb49727b..e05e75b0f402 100644
+index e05e75b0f402..70faf28b2d14 100644
 --- a/crypto/shash.c
 +++ b/crypto/shash.c
-@@ -590,12 +590,12 @@ int shash_register_instance(struct crypto_template *tmpl,
- }
- EXPORT_SYMBOL_GPL(shash_register_instance);
- 
--void shash_free_instance(struct crypto_instance *inst)
-+void shash_free_singlespawn_instance(struct shash_instance *inst)
+@@ -427,11 +427,6 @@ static void crypto_shash_free_instance(struct crypto_instance *inst)
  {
--	crypto_drop_spawn(crypto_instance_ctx(inst));
--	kfree(shash_instance(inst));
-+	crypto_drop_spawn(shash_instance_ctx(inst));
-+	kfree(inst);
- }
--EXPORT_SYMBOL_GPL(shash_free_instance);
-+EXPORT_SYMBOL_GPL(shash_free_singlespawn_instance);
+ 	struct shash_instance *shash = shash_instance(inst);
  
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Synchronous cryptographic hash type");
-diff --git a/crypto/vmac.c b/crypto/vmac.c
-index 5241b183f8df..1554455359d5 100644
---- a/crypto/vmac.c
-+++ b/crypto/vmac.c
-@@ -662,17 +662,18 @@ static int vmac_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	inst->alg.final = vmac_final;
- 	inst->alg.setkey = vmac_setkey;
- 
-+	inst->free = shash_free_singlespawn_instance;
-+
- 	err = shash_register_instance(tmpl, inst);
- out:
- 	if (err)
--		shash_free_instance(shash_crypto_instance(inst));
-+		shash_free_singlespawn_instance(inst);
- 	return err;
+-	if (!shash->free) {
+-		inst->tmpl->free(inst);
+-		return;
+-	}
+-
+ 	shash->free(shash);
  }
  
- static struct crypto_template vmac64_tmpl = {
- 	.name = "vmac64",
- 	.create = vmac_create,
--	.free = shash_free_instance,
- 	.module = THIS_MODULE,
- };
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index be6a99a63fcd..414bbc6a4b08 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -63,8 +63,6 @@ struct crypto_template {
+ 	struct hlist_head instances;
+ 	struct module *module;
  
-diff --git a/crypto/xcbc.c b/crypto/xcbc.c
-index 5fa700ab4387..d6f969389e18 100644
---- a/crypto/xcbc.c
-+++ b/crypto/xcbc.c
-@@ -239,17 +239,18 @@ static int xcbc_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	inst->alg.final = crypto_xcbc_digest_final;
- 	inst->alg.setkey = crypto_xcbc_digest_setkey;
+-	struct crypto_instance *(*alloc)(struct rtattr **tb);
+-	void (*free)(struct crypto_instance *inst);
+ 	int (*create)(struct crypto_template *tmpl, struct rtattr **tb);
  
-+	inst->free = shash_free_singlespawn_instance;
-+
- 	err = shash_register_instance(tmpl, inst);
- out:
- 	if (err)
--		shash_free_instance(shash_crypto_instance(inst));
-+		shash_free_singlespawn_instance(inst);
- 	return err;
- }
- 
- static struct crypto_template crypto_xcbc_tmpl = {
- 	.name = "xcbc",
- 	.create = xcbc_create,
--	.free = shash_free_instance,
- 	.module = THIS_MODULE,
- };
- 
-diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
-index c550386221bb..89f6f46ab2b8 100644
---- a/include/crypto/internal/hash.h
-+++ b/include/crypto/internal/hash.h
-@@ -125,7 +125,7 @@ int crypto_register_shashes(struct shash_alg *algs, int count);
- void crypto_unregister_shashes(struct shash_alg *algs, int count);
- int shash_register_instance(struct crypto_template *tmpl,
- 			    struct shash_instance *inst);
--void shash_free_instance(struct crypto_instance *inst);
-+void shash_free_singlespawn_instance(struct shash_instance *inst);
- 
- int crypto_grab_shash(struct crypto_shash_spawn *spawn,
- 		      struct crypto_instance *inst,
+ 	char name[CRYPTO_MAX_ALG_NAME];
 -- 
 2.24.1
 
