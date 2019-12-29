@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05A30C2D0DB
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAC25C2D0D1
 	for <linux-crypto@archiver.kernel.org>; Sun, 29 Dec 2019 02:58:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C4F9C21775
-	for <linux-crypto@archiver.kernel.org>; Sun, 29 Dec 2019 02:58:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 914AC21927
+	for <linux-crypto@archiver.kernel.org>; Sun, 29 Dec 2019 02:58:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1577588291;
-	bh=hZFeqYAzEsmlkEGrVH+RMJl1s1c118MVu3XWCo3kdLY=;
+	s=default; t=1577588292;
+	bh=45LRpqjc8rNhpMtauQo9/WmcXxMmtA/5AuM8d0DzFeg=;
 	h=From:To:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=iadPXwWyKZQ/9mU8d1xd7W13TgvitsdwEJinM0asfOES8uPl2xr8+5yI6VCVqYIZ7
-	 Ft6gKgcIyJzmtk3RJYCIsLjnUAWMQOIU6ah/EER3g5M2UOuCwbOH8GeZN8U105hnJ+
-	 9oc8vBqfJh1lGju7lHNdpGw7EvnCid6DbJqgPerI=
+	b=QXhxRTagX5zPcboQigsHiXwEvo/ezHKQmyGQuGeUHzfinhUpNzqZG3KLugqhDGGiy
+	 XDrNamAdpq17VqiyPgvoPMaSzF3pBRx+Lr2hBUUDgrOQHTHzje9U1KNA2bM0OculiB
+	 VJoF9kt5U0BOsayTvxeFUa53v5uCmB6DCOPXVLwU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726364AbfL2C6K (ORCPT
+        id S1726371AbfL2C6K (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Sat, 28 Dec 2019 21:58:10 -0500
-Received: from mail.kernel.org ([198.145.29.99]:44426 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:44448 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726366AbfL2C6G (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 28 Dec 2019 21:58:06 -0500
+        id S1726377AbfL2C6I (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 28 Dec 2019 21:58:08 -0500
 Received: from zzz.tds (h75-100-12-111.burkwi.broadband.dynamic.tds.net [75.100.12.111])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 70CA5218AC
-        for <linux-crypto@vger.kernel.org>; Sun, 29 Dec 2019 02:58:05 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 0835421744
+        for <linux-crypto@vger.kernel.org>; Sun, 29 Dec 2019 02:58:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1577588285;
-        bh=hZFeqYAzEsmlkEGrVH+RMJl1s1c118MVu3XWCo3kdLY=;
+        s=default; t=1577588287;
+        bh=45LRpqjc8rNhpMtauQo9/WmcXxMmtA/5AuM8d0DzFeg=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=KmKR0L70zCJPdIKNLOBCP/G0PYK8f83V4pkYBm2t73XMz7HMpw9ppsPfmaDOyV+A9
-         CqpIEVhQBbyfarOg+hYV3j65EH+Er2UBeBJe0Vi3gyBrMbmeTnTCioVM01J3oTzWnH
-         bvJ24wIm3Srrnh6+pv4VLt9HBBMPYqlZCW/R1qz4=
+        b=EhRntJnHflr7aqBCaPESUJueT7P6XOk/15XMDuPvEsLwlSRBMWhBzKVR59NyDDbNG
+         m7hFOFMUuNxBX2E4qZCpl3WuQ/fWSMIdO5R7j7BtIhXWu40a7YcTSllrE0Ku2l/Fnv
+         1i0reSIYWacj7hzot/0r4GGJdXJlfduXhmeyA42k=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Subject: [PATCH 07/28] crypto: akcipher - pass instance to crypto_grab_akcipher()
-Date:   Sat, 28 Dec 2019 20:56:53 -0600
-Message-Id: <20191229025714.544159-8-ebiggers@kernel.org>
+Subject: [PATCH 11/28] crypto: cipher - introduce crypto_cipher_spawn and crypto_grab_cipher()
+Date:   Sat, 28 Dec 2019 20:56:57 -0600
+Message-Id: <20191229025714.544159-12-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20191229025714.544159-1-ebiggers@kernel.org>
 References: <20191229025714.544159-1-ebiggers@kernel.org>
@@ -56,101 +56,85 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-Initializing a crypto_akcipher_spawn currently requires:
+Currently, "cipher" (single-block cipher) spawns are usually initialized
+by using crypto_get_attr_alg() to look up the algorithm, then calling
+crypto_init_spawn().  In one case, crypto_grab_spawn() is used directly.
 
-1. Set spawn->base.inst to point to the instance.
-2. Call crypto_grab_akcipher().
+The former way is different from how skcipher, aead, and akcipher spawns
+are initialized (they use crypto_grab_*()), and for no good reason.
+This difference introduces unnecessary complexity.
 
-But there's no reason for these steps to be separate, and in fact this
-unneeded complication has caused at least one bug, the one fixed by
-commit 6db43410179b ("crypto: adiantum - initialize crypto_spawn::inst")
+The crypto_grab_*() functions used to have some problems, like not
+holding a reference to the algorithm and requiring the caller to
+initialize spawn->base.inst.  But those problems are fixed now.
 
-So just make crypto_grab_akcipher() take the instance as an argument.
+Also, the cipher spawns are not strongly typed; e.g., the API requires
+that the user manually specify the flags CRYPTO_ALG_TYPE_CIPHER and
+CRYPTO_ALG_TYPE_MASK.  Though the "cipher" algorithm type itself isn't
+yet strongly typed, we can start by making the spawns strongly typed.
 
-To keep the function call from getting too unwieldy due to this extra
-argument, also introduce a 'mask' variable into pkcs1pad_create().
+So, let's introduce a new 'struct crypto_cipher_spawn', and functions
+crypto_grab_cipher() and crypto_drop_cipher() to grab and drop them.
+
+Later patches will convert all cipher spawns to use these, then make
+crypto_spawn_cipher() take 'struct crypto_cipher_spawn' as well, instead
+of a bare 'struct crypto_spawn' as it currently does.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/akcipher.c                  |  6 ++++--
- crypto/rsa-pkcs1pad.c              |  8 +++++---
- include/crypto/internal/akcipher.h | 12 +++---------
- 3 files changed, 12 insertions(+), 14 deletions(-)
+ crypto/cipher.c         | 11 +++++++++++
+ include/crypto/algapi.h | 19 +++++++++++++++++++
+ 2 files changed, 30 insertions(+)
 
-diff --git a/crypto/akcipher.c b/crypto/akcipher.c
-index 7d5cf4939423..84ccf9b02bbe 100644
---- a/crypto/akcipher.c
-+++ b/crypto/akcipher.c
-@@ -90,9 +90,11 @@ static const struct crypto_type crypto_akcipher_type = {
- 	.tfmsize = offsetof(struct crypto_akcipher, base),
- };
- 
--int crypto_grab_akcipher(struct crypto_akcipher_spawn *spawn, const char *name,
--			 u32 type, u32 mask)
-+int crypto_grab_akcipher(struct crypto_akcipher_spawn *spawn,
-+			 struct crypto_instance *inst,
-+			 const char *name, u32 type, u32 mask)
- {
-+	spawn->base.inst = inst;
- 	spawn->base.frontend = &crypto_akcipher_type;
- 	return crypto_grab_spawn(&spawn->base, name, type, mask);
+diff --git a/crypto/cipher.c b/crypto/cipher.c
+index aadd51cb7250..924d9f6575f9 100644
+--- a/crypto/cipher.c
++++ b/crypto/cipher.c
+@@ -92,3 +92,14 @@ void crypto_cipher_decrypt_one(struct crypto_cipher *tfm,
+ 	cipher_crypt_one(tfm, dst, src, false);
  }
-diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
-index 0aa489711ec4..176b63afec8d 100644
---- a/crypto/rsa-pkcs1pad.c
-+++ b/crypto/rsa-pkcs1pad.c
-@@ -598,6 +598,7 @@ static int pkcs1pad_create(struct crypto_template *tmpl, struct rtattr **tb)
- {
- 	const struct rsa_asn1_template *digest_info;
- 	struct crypto_attr_type *algt;
-+	u32 mask;
- 	struct akcipher_instance *inst;
- 	struct pkcs1pad_inst_ctx *ctx;
- 	struct crypto_akcipher_spawn *spawn;
-@@ -613,6 +614,8 @@ static int pkcs1pad_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	if ((algt->type ^ CRYPTO_ALG_TYPE_AKCIPHER) & algt->mask)
- 		return -EINVAL;
- 
-+	mask = crypto_requires_sync(algt->type, algt->mask);
+ EXPORT_SYMBOL_GPL(crypto_cipher_decrypt_one);
 +
- 	rsa_alg_name = crypto_attr_alg_name(tb[1]);
- 	if (IS_ERR(rsa_alg_name))
- 		return PTR_ERR(rsa_alg_name);
-@@ -636,9 +639,8 @@ static int pkcs1pad_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	spawn = &ctx->spawn;
- 	ctx->digest_info = digest_info;
- 
--	crypto_set_spawn(&spawn->base, akcipher_crypto_instance(inst));
--	err = crypto_grab_akcipher(spawn, rsa_alg_name, 0,
--			crypto_requires_sync(algt->type, algt->mask));
-+	err = crypto_grab_akcipher(spawn, akcipher_crypto_instance(inst),
-+				   rsa_alg_name, 0, mask);
- 	if (err)
- 		goto out_free_inst;
- 
-diff --git a/include/crypto/internal/akcipher.h b/include/crypto/internal/akcipher.h
-index d6c8a42789ad..8d3220c9ab77 100644
---- a/include/crypto/internal/akcipher.h
-+++ b/include/crypto/internal/akcipher.h
-@@ -78,15 +78,9 @@ static inline void *akcipher_instance_ctx(struct akcipher_instance *inst)
- 	return crypto_instance_ctx(akcipher_crypto_instance(inst));
++int crypto_grab_cipher(struct crypto_cipher_spawn *spawn,
++		       struct crypto_instance *inst,
++		       const char *name, u32 type, u32 mask)
++{
++	type &= ~CRYPTO_ALG_TYPE_MASK;
++	type |= CRYPTO_ALG_TYPE_CIPHER;
++	mask |= CRYPTO_ALG_TYPE_MASK;
++	return crypto_grab_spawn(&spawn->base, inst, name, type, mask);
++}
++EXPORT_SYMBOL_GPL(crypto_grab_cipher);
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index 2779c8d34ba9..aad3348f60d1 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -208,6 +208,25 @@ static inline void *crypto_instance_ctx(struct crypto_instance *inst)
+ 	return inst->__ctx;
  }
  
--static inline void crypto_set_akcipher_spawn(
--		struct crypto_akcipher_spawn *spawn,
--		struct crypto_instance *inst)
--{
--	crypto_set_spawn(&spawn->base, inst);
--}
--
--int crypto_grab_akcipher(struct crypto_akcipher_spawn *spawn, const char *name,
--		u32 type, u32 mask);
-+int crypto_grab_akcipher(struct crypto_akcipher_spawn *spawn,
-+			 struct crypto_instance *inst,
-+			 const char *name, u32 type, u32 mask);
- 
- static inline struct crypto_akcipher *crypto_spawn_akcipher(
- 		struct crypto_akcipher_spawn *spawn)
++struct crypto_cipher_spawn {
++	struct crypto_spawn base;
++};
++
++int crypto_grab_cipher(struct crypto_cipher_spawn *spawn,
++		       struct crypto_instance *inst,
++		       const char *name, u32 type, u32 mask);
++
++static inline void crypto_drop_cipher(struct crypto_cipher_spawn *spawn)
++{
++	crypto_drop_spawn(&spawn->base);
++}
++
++static inline struct crypto_alg *crypto_spawn_cipher_alg(
++	struct crypto_cipher_spawn *spawn)
++{
++	return spawn->base.alg;
++}
++
+ static inline struct crypto_cipher *crypto_spawn_cipher(
+ 	struct crypto_spawn *spawn)
+ {
 -- 
 2.24.1
 
