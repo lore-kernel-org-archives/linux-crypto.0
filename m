@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAC25C2D0D1
-	for <linux-crypto@archiver.kernel.org>; Sun, 29 Dec 2019 02:58:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A5FAC2D0C8
+	for <linux-crypto@archiver.kernel.org>; Sun, 29 Dec 2019 02:58:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 914AC21927
-	for <linux-crypto@archiver.kernel.org>; Sun, 29 Dec 2019 02:58:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 11BA921927
+	for <linux-crypto@archiver.kernel.org>; Sun, 29 Dec 2019 02:58:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1577588292;
-	bh=45LRpqjc8rNhpMtauQo9/WmcXxMmtA/5AuM8d0DzFeg=;
+	s=default; t=1577588293;
+	bh=FToCZsBhc8K9zHvO5TL3b4cQO2c3AJyhSaZQqRg5qVQ=;
 	h=From:To:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=QXhxRTagX5zPcboQigsHiXwEvo/ezHKQmyGQuGeUHzfinhUpNzqZG3KLugqhDGGiy
-	 XDrNamAdpq17VqiyPgvoPMaSzF3pBRx+Lr2hBUUDgrOQHTHzje9U1KNA2bM0OculiB
-	 VJoF9kt5U0BOsayTvxeFUa53v5uCmB6DCOPXVLwU=
+	b=Le+c+mQm9SvQnV7CX35vvOpeB3t1R5tQh1E5cLHp1iEf8D+4+KFMjQBPOrAa7fmZ2
+	 kVpwxpEu0tLJiTaFDv8FTCrFE7PCQYgOvnjnw/M2IGBQUtC902BPUXhx/cyrKn76zV
+	 3F8BTnbjgilX2+yobrqbGaTq7YGLtTTUZrostwdA=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726371AbfL2C6K (ORCPT
+        id S1726476AbfL2C6L (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 28 Dec 2019 21:58:10 -0500
-Received: from mail.kernel.org ([198.145.29.99]:44448 "EHLO mail.kernel.org"
+        Sat, 28 Dec 2019 21:58:11 -0500
+Received: from mail.kernel.org ([198.145.29.99]:44434 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726377AbfL2C6I (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 28 Dec 2019 21:58:08 -0500
+        id S1726455AbfL2C6L (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 28 Dec 2019 21:58:11 -0500
 Received: from zzz.tds (h75-100-12-111.burkwi.broadband.dynamic.tds.net [75.100.12.111])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0835421744
-        for <linux-crypto@vger.kernel.org>; Sun, 29 Dec 2019 02:58:06 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8BB5C21775
+        for <linux-crypto@vger.kernel.org>; Sun, 29 Dec 2019 02:58:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1577588287;
-        bh=45LRpqjc8rNhpMtauQo9/WmcXxMmtA/5AuM8d0DzFeg=;
+        s=default; t=1577588290;
+        bh=FToCZsBhc8K9zHvO5TL3b4cQO2c3AJyhSaZQqRg5qVQ=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=EhRntJnHflr7aqBCaPESUJueT7P6XOk/15XMDuPvEsLwlSRBMWhBzKVR59NyDDbNG
-         m7hFOFMUuNxBX2E4qZCpl3WuQ/fWSMIdO5R7j7BtIhXWu40a7YcTSllrE0Ku2l/Fnv
-         1i0reSIYWacj7hzot/0r4GGJdXJlfduXhmeyA42k=
+        b=rxsRDAjIU6YAuuLJ9BNlBOK+j4ZIOVZW3Z3UG5gSSrp0nVa1njWYX2/8SqNehLNm4
+         htGl8/SqmFnO8gOyIA7Lo7OVSu0vf9hc26P0Z1JVXs+lpsD8cFojtDa0TFNSDkzPN9
+         t0H9zB8cWes3ytP2+zySUKRJ466ZuKpW+lEuVsCY=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Subject: [PATCH 11/28] crypto: cipher - introduce crypto_cipher_spawn and crypto_grab_cipher()
-Date:   Sat, 28 Dec 2019 20:56:57 -0600
-Message-Id: <20191229025714.544159-12-ebiggers@kernel.org>
+Subject: [PATCH 19/28] crypto: chacha20poly1305 - use crypto_grab_ahash() and simplify error paths
+Date:   Sat, 28 Dec 2019 20:57:05 -0600
+Message-Id: <20191229025714.544159-20-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20191229025714.544159-1-ebiggers@kernel.org>
 References: <20191229025714.544159-1-ebiggers@kernel.org>
@@ -56,85 +56,160 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-Currently, "cipher" (single-block cipher) spawns are usually initialized
-by using crypto_get_attr_alg() to look up the algorithm, then calling
-crypto_init_spawn().  In one case, crypto_grab_spawn() is used directly.
+Make the rfc7539 and rfc7539esp templates use the new function
+crypto_grab_ahash() to initialize their ahash spawn.
 
-The former way is different from how skcipher, aead, and akcipher spawns
-are initialized (they use crypto_grab_*()), and for no good reason.
-This difference introduces unnecessary complexity.
+This is needed to make all spawns be initialized in a consistent way.
 
-The crypto_grab_*() functions used to have some problems, like not
-holding a reference to the algorithm and requiring the caller to
-initialize spawn->base.inst.  But those problems are fixed now.
-
-Also, the cipher spawns are not strongly typed; e.g., the API requires
-that the user manually specify the flags CRYPTO_ALG_TYPE_CIPHER and
-CRYPTO_ALG_TYPE_MASK.  Though the "cipher" algorithm type itself isn't
-yet strongly typed, we can start by making the spawns strongly typed.
-
-So, let's introduce a new 'struct crypto_cipher_spawn', and functions
-crypto_grab_cipher() and crypto_drop_cipher() to grab and drop them.
-
-Later patches will convert all cipher spawns to use these, then make
-crypto_spawn_cipher() take 'struct crypto_cipher_spawn' as well, instead
-of a bare 'struct crypto_spawn' as it currently does.
+Also simplify the error handling by taking advantage of crypto_drop_*()
+now accepting (as a no-op) spawns that haven't been initialized yet, and
+by taking advantage of crypto_grab_*() now handling ERR_PTR() names.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/cipher.c         | 11 +++++++++++
- include/crypto/algapi.h | 19 +++++++++++++++++++
- 2 files changed, 30 insertions(+)
+ crypto/chacha20poly1305.c | 81 ++++++++++++---------------------------
+ 1 file changed, 25 insertions(+), 56 deletions(-)
 
-diff --git a/crypto/cipher.c b/crypto/cipher.c
-index aadd51cb7250..924d9f6575f9 100644
---- a/crypto/cipher.c
-+++ b/crypto/cipher.c
-@@ -92,3 +92,14 @@ void crypto_cipher_decrypt_one(struct crypto_cipher *tfm,
- 	cipher_crypt_one(tfm, dst, src, false);
- }
- EXPORT_SYMBOL_GPL(crypto_cipher_decrypt_one);
+diff --git a/crypto/chacha20poly1305.c b/crypto/chacha20poly1305.c
+index fcb8ec4ba083..714532041dab 100644
+--- a/crypto/chacha20poly1305.c
++++ b/crypto/chacha20poly1305.c
+@@ -16,8 +16,6 @@
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ 
+-#include "internal.h"
+-
+ struct chachapoly_instance_ctx {
+ 	struct crypto_skcipher_spawn chacha;
+ 	struct crypto_ahash_spawn poly;
+@@ -565,11 +563,9 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
+ 	struct crypto_attr_type *algt;
+ 	u32 mask;
+ 	struct aead_instance *inst;
+-	struct skcipher_alg *chacha;
+-	struct crypto_alg *poly;
+-	struct hash_alg_common *poly_hash;
+ 	struct chachapoly_instance_ctx *ctx;
+-	const char *chacha_name, *poly_name;
++	struct skcipher_alg *chacha;
++	struct hash_alg_common *poly;
+ 	int err;
+ 
+ 	if (ivsize > CHACHAPOLY_IV_SIZE)
+@@ -584,68 +580,51 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
+ 
+ 	mask = crypto_requires_sync(algt->type, algt->mask);
+ 
+-	chacha_name = crypto_attr_alg_name(tb[1]);
+-	if (IS_ERR(chacha_name))
+-		return PTR_ERR(chacha_name);
+-	poly_name = crypto_attr_alg_name(tb[2]);
+-	if (IS_ERR(poly_name))
+-		return PTR_ERR(poly_name);
+-
+-	poly = crypto_find_alg(poly_name, &crypto_ahash_type,
+-			       CRYPTO_ALG_TYPE_HASH,
+-			       CRYPTO_ALG_TYPE_AHASH_MASK | mask);
+-	if (IS_ERR(poly))
+-		return PTR_ERR(poly);
+-	poly_hash = __crypto_hash_alg_common(poly);
+-
+-	err = -EINVAL;
+-	if (poly_hash->digestsize != POLY1305_DIGEST_SIZE)
+-		goto out_put_poly;
+-
+-	err = -ENOMEM;
+ 	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
+ 	if (!inst)
+-		goto out_put_poly;
+-
++		return -ENOMEM;
+ 	ctx = aead_instance_ctx(inst);
+ 	ctx->saltlen = CHACHAPOLY_IV_SIZE - ivsize;
+-	err = crypto_init_ahash_spawn(&ctx->poly, poly_hash,
+-				      aead_crypto_instance(inst));
+-	if (err)
+-		goto err_free_inst;
+ 
+ 	err = crypto_grab_skcipher(&ctx->chacha, aead_crypto_instance(inst),
+-				   chacha_name, 0, mask);
++				   crypto_attr_alg_name(tb[1]), 0, mask);
+ 	if (err)
+-		goto err_drop_poly;
+-
++		goto out;
+ 	chacha = crypto_spawn_skcipher_alg(&ctx->chacha);
+ 
++	err = crypto_grab_ahash(&ctx->poly, aead_crypto_instance(inst),
++				crypto_attr_alg_name(tb[2]), 0, mask);
++	if (err)
++		goto out;
++	poly = crypto_spawn_ahash_alg(&ctx->poly);
 +
-+int crypto_grab_cipher(struct crypto_cipher_spawn *spawn,
-+		       struct crypto_instance *inst,
-+		       const char *name, u32 type, u32 mask)
-+{
-+	type &= ~CRYPTO_ALG_TYPE_MASK;
-+	type |= CRYPTO_ALG_TYPE_CIPHER;
-+	mask |= CRYPTO_ALG_TYPE_MASK;
-+	return crypto_grab_spawn(&spawn->base, inst, name, type, mask);
-+}
-+EXPORT_SYMBOL_GPL(crypto_grab_cipher);
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index 2779c8d34ba9..aad3348f60d1 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -208,6 +208,25 @@ static inline void *crypto_instance_ctx(struct crypto_instance *inst)
- 	return inst->__ctx;
+ 	err = -EINVAL;
++	if (poly->digestsize != POLY1305_DIGEST_SIZE)
++		goto out;
+ 	/* Need 16-byte IV size, including Initial Block Counter value */
+ 	if (crypto_skcipher_alg_ivsize(chacha) != CHACHA_IV_SIZE)
+-		goto out_drop_chacha;
++		goto out;
+ 	/* Not a stream cipher? */
+ 	if (chacha->base.cra_blocksize != 1)
+-		goto out_drop_chacha;
++		goto out;
+ 
+ 	err = -ENAMETOOLONG;
+ 	if (snprintf(inst->alg.base.cra_name, CRYPTO_MAX_ALG_NAME,
+ 		     "%s(%s,%s)", name, chacha->base.cra_name,
+-		     poly->cra_name) >= CRYPTO_MAX_ALG_NAME)
+-		goto out_drop_chacha;
++		     poly->base.cra_name) >= CRYPTO_MAX_ALG_NAME)
++		goto out;
+ 	if (snprintf(inst->alg.base.cra_driver_name, CRYPTO_MAX_ALG_NAME,
+ 		     "%s(%s,%s)", name, chacha->base.cra_driver_name,
+-		     poly->cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
+-		goto out_drop_chacha;
++		     poly->base.cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
++		goto out;
+ 
+-	inst->alg.base.cra_flags = (chacha->base.cra_flags | poly->cra_flags) &
+-				   CRYPTO_ALG_ASYNC;
++	inst->alg.base.cra_flags = (chacha->base.cra_flags |
++				    poly->base.cra_flags) & CRYPTO_ALG_ASYNC;
+ 	inst->alg.base.cra_priority = (chacha->base.cra_priority +
+-				       poly->cra_priority) / 2;
++				       poly->base.cra_priority) / 2;
+ 	inst->alg.base.cra_blocksize = 1;
+ 	inst->alg.base.cra_alignmask = chacha->base.cra_alignmask |
+-				       poly->cra_alignmask;
++				       poly->base.cra_alignmask;
+ 	inst->alg.base.cra_ctxsize = sizeof(struct chachapoly_ctx) +
+ 				     ctx->saltlen;
+ 	inst->alg.ivsize = ivsize;
+@@ -661,20 +640,10 @@ static int chachapoly_create(struct crypto_template *tmpl, struct rtattr **tb,
+ 	inst->free = chachapoly_free;
+ 
+ 	err = aead_register_instance(tmpl, inst);
++out:
+ 	if (err)
+-		goto out_drop_chacha;
+-
+-out_put_poly:
+-	crypto_mod_put(poly);
++		chachapoly_free(inst);
+ 	return err;
+-
+-out_drop_chacha:
+-	crypto_drop_skcipher(&ctx->chacha);
+-err_drop_poly:
+-	crypto_drop_ahash(&ctx->poly);
+-err_free_inst:
+-	kfree(inst);
+-	goto out_put_poly;
  }
  
-+struct crypto_cipher_spawn {
-+	struct crypto_spawn base;
-+};
-+
-+int crypto_grab_cipher(struct crypto_cipher_spawn *spawn,
-+		       struct crypto_instance *inst,
-+		       const char *name, u32 type, u32 mask);
-+
-+static inline void crypto_drop_cipher(struct crypto_cipher_spawn *spawn)
-+{
-+	crypto_drop_spawn(&spawn->base);
-+}
-+
-+static inline struct crypto_alg *crypto_spawn_cipher_alg(
-+	struct crypto_cipher_spawn *spawn)
-+{
-+	return spawn->base.alg;
-+}
-+
- static inline struct crypto_cipher *crypto_spawn_cipher(
- 	struct crypto_spawn *spawn)
- {
+ static int rfc7539_create(struct crypto_template *tmpl, struct rtattr **tb)
 -- 
 2.24.1
 
