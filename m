@@ -2,111 +2,100 @@ Return-Path: <SRS0=xlaa=2U=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B540C2D0C2
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Dec 2019 18:52:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1EB2C2D0C2
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Dec 2019 19:42:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6E1312071E
-	for <linux-crypto@archiver.kernel.org>; Mon, 30 Dec 2019 18:52:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="bHZS9r+D"
+	by mail.kernel.org (Postfix) with ESMTP id B5DED20722
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Dec 2019 19:42:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1577734920;
+	bh=Ojy5RggFGZ1qJfcD29JB42N1iaZRbjBGYTko6X4EEbQ=;
+	h=From:To:Subject:Date:List-ID:From;
+	b=tR8CZE6hDb1vCaKEJRikJVkw6vHqiQLe9DNyQCbIdSh1h1zYQmy8dbdZcFRllk9m0
+	 w+t4hrOg+NJwgwizMQNGcMdlV6B8I2WFyqRQbRuHaDNjt101tXjnMhWV9Fdc6e99sa
+	 jO4BMQ83mAUT/KMNPBwZm3qlXDAq6RbaLr3VEalg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727582AbfL3Swb (ORCPT
+        id S1727692AbfL3TmA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 30 Dec 2019 13:52:31 -0500
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:33881 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727571AbfL3Swb (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 30 Dec 2019 13:52:31 -0500
-Received: by mail-ot1-f65.google.com with SMTP id a15so47289952otf.1
-        for <linux-crypto@vger.kernel.org>; Mon, 30 Dec 2019 10:52:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=2PU80e06dVsLEFBPoBP15a3a0bqTWpgCtffJm4G5PGU=;
-        b=bHZS9r+DC7xoeD6cxpH4i3xpSJ/gq50CwlupX1697alL9zoV2RniiOpeS0fzfamIQa
-         WxQ7cCBNSANfXeX4NY4r/hZFK4P1w1JlyzXv9TnOkQRK0d1M4ZscNJljNFAQFM5GFlOM
-         35xcjwPPMRp352B/JuDt4EKyWZZ4Uo+a1Db+c=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=2PU80e06dVsLEFBPoBP15a3a0bqTWpgCtffJm4G5PGU=;
-        b=sq7kzq7qmwBMZF4z+K0J5bPAp2/foecPnF81iMA7Lu5F85sRX+80S7Zu9CSa+33R1+
-         L6bVJ35Jo+8fg4/bMfB2lLpbUOeMw2rpm2aE7Y2o4Ky/gMwMCkKroMM7pkdUWgpE3GiV
-         s71FbZXC+IH9vCmqdo0HsQeGk9iNHaryB1LIa2HLOCZ14u2CRJIc54fb1mnN1xlUBe5v
-         1fLu6pPMyPvRyzktTaLDc/8hfV90Cp8ADeN7RUOBTBrFicooAA9r1w9dtQwSH2FZLUFX
-         vAIUaOtBuWsZbRDmtWiGJQ+M/cRj/+KsQKD7aEnnPHGTzhXhFcIG6/20HfUuuKaPVIHA
-         dNCA==
-X-Gm-Message-State: APjAAAVeUus0InGbfJv5gZdj2UyHguDscrwK5XVw1o4lhdZTylWIH7M6
-        fYjjDkhURQ8ljhH5K6MGfPBBQY8sy8M=
-X-Google-Smtp-Source: APXvYqyRXCmINU65Y6yuKMiO/XiDPdUu64Vn+VoIxbx6ttD2OgkwUiThd7nh2RnWqHJyh6C1czL/mQ==
-X-Received: by 2002:a9d:748d:: with SMTP id t13mr73212089otk.181.1577731950592;
-        Mon, 30 Dec 2019 10:52:30 -0800 (PST)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id r13sm13994800oic.52.2019.12.30.10.52.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Dec 2019 10:52:29 -0800 (PST)
-Date:   Mon, 30 Dec 2019 10:52:28 -0800
-From:   Kees Cook <keescook@chromium.org>
-To:     Borislav Petkov <bp@alien8.de>
-Cc:     Thomas Garnier <thgarnie@chromium.org>,
-        kernel-hardening@lists.openwall.com, kristen@linux.intel.com,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        Andy Lutomirski <luto@kernel.org>,
-        Juergen Gross <jgross@suse.com>,
-        Thomas Hellstrom <thellstrom@vmware.com>,
-        "VMware, Inc." <pv-drivers@vmware.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Will Deacon <will@kernel.org>,
-        Masami Hiramatsu <mhiramat@kernel.org>,
-        Jiri Slaby <jslaby@suse.cz>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Alexios Zavras <alexios.zavras@intel.com>,
-        Allison Randal <allison@lohutok.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, linux-pm@vger.kernel.org
-Subject: Re: [PATCH v10 00/11] x86: PIE support to extend KASLR randomization
-Message-ID: <201912301052.16438D6@keescook>
-References: <20191205000957.112719-1-thgarnie@chromium.org>
- <20191224130310.GE21017@zn.tnic>
+        Mon, 30 Dec 2019 14:42:00 -0500
+Received: from mail.kernel.org ([198.145.29.99]:57732 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727278AbfL3TmA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 30 Dec 2019 14:42:00 -0500
+Received: from zzz.tds (h75-100-12-111.burkwi.broadband.dynamic.tds.net [75.100.12.111])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 56CAD2071E
+        for <linux-crypto@vger.kernel.org>; Mon, 30 Dec 2019 19:41:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1577734919;
+        bh=Ojy5RggFGZ1qJfcD29JB42N1iaZRbjBGYTko6X4EEbQ=;
+        h=From:To:Subject:Date:From;
+        b=U3CRSgN2ZfiGzIH97umXfdwoMg2Y0swIOEzRBzGatDluPNJUEeePUP9ukk3GNY8t3
+         CR7WOP/CrcUozEJQ94Ggfrg545ed5l5464xUeAgtuPcPBmaOi3QWRTbzVW1ytobrGF
+         LZfh8kb0UWOwANz0wokMnqlWx8r5bIYSoBwbHK3Q=
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Subject: [PATCH] crypto: skcipher - remove skcipher_walk_aead()
+Date:   Mon, 30 Dec 2019 13:41:15 -0600
+Message-Id: <20191230194115.71642-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20191224130310.GE21017@zn.tnic>
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Dec 24, 2019 at 02:03:10PM +0100, Borislav Petkov wrote:
-> On Wed, Dec 04, 2019 at 04:09:37PM -0800, Thomas Garnier wrote:
-> > Minor changes based on feedback and rebase from v9.
-> > 
-> > Splitting the previous serie in two. This part contains assembly code
-> > changes required for PIE but without any direct dependencies with the
-> > rest of the patchset.
-> 
-> Ok, modulo the minor commit message and comments fixup, this looks ok
-> and passes testing here.
-> 
-> I'm going to queue patches 2-11 of the next version unless someone
-> complains.
+From: Eric Biggers <ebiggers@google.com>
 
-Great! Thanks very much for the reviews. :)
+skcipher_walk_aead() is unused and is identical to
+skcipher_walk_aead_encrypt(), so remove it.
 
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/skcipher.c                  | 9 ---------
+ include/crypto/internal/skcipher.h | 2 --
+ 2 files changed, 11 deletions(-)
+
+diff --git a/crypto/skcipher.c b/crypto/skcipher.c
+index 8dc9dc80b379..21f1421980e6 100644
+--- a/crypto/skcipher.c
++++ b/crypto/skcipher.c
+@@ -549,15 +549,6 @@ static int skcipher_walk_aead_common(struct skcipher_walk *walk,
+ 	return err;
+ }
+ 
+-int skcipher_walk_aead(struct skcipher_walk *walk, struct aead_request *req,
+-		       bool atomic)
+-{
+-	walk->total = req->cryptlen;
+-
+-	return skcipher_walk_aead_common(walk, req, atomic);
+-}
+-EXPORT_SYMBOL_GPL(skcipher_walk_aead);
+-
+ int skcipher_walk_aead_encrypt(struct skcipher_walk *walk,
+ 			       struct aead_request *req, bool atomic)
+ {
+diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
+index b81cb4902abc..e387424f6247 100644
+--- a/include/crypto/internal/skcipher.h
++++ b/include/crypto/internal/skcipher.h
+@@ -135,8 +135,6 @@ int skcipher_walk_virt(struct skcipher_walk *walk,
+ void skcipher_walk_atomise(struct skcipher_walk *walk);
+ int skcipher_walk_async(struct skcipher_walk *walk,
+ 			struct skcipher_request *req);
+-int skcipher_walk_aead(struct skcipher_walk *walk, struct aead_request *req,
+-		       bool atomic);
+ int skcipher_walk_aead_encrypt(struct skcipher_walk *walk,
+ 			       struct aead_request *req, bool atomic);
+ int skcipher_walk_aead_decrypt(struct skcipher_walk *walk,
 -- 
-Kees Cook
+2.24.1
+
