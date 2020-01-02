@@ -1,148 +1,117 @@
-Return-Path: <SRS0=Hyrp=2W=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=AlyN=2X=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DFB1C2D0DE
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jan 2020 22:41:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1639EC2D0C2
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Jan 2020 19:57:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 69E7B2072C
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Jan 2020 22:41:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DB2FD21655
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Jan 2020 19:57:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WLwZN7rf"
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="HOnW7l6J"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727397AbgAAWli (ORCPT
+        id S1728398AbgABT5X (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Jan 2020 17:41:38 -0500
-Received: from mail-io1-f66.google.com ([209.85.166.66]:39585 "EHLO
-        mail-io1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727312AbgAAWli (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Jan 2020 17:41:38 -0500
-Received: by mail-io1-f66.google.com with SMTP id c16so6968185ioh.6;
-        Wed, 01 Jan 2020 14:41:38 -0800 (PST)
+        Thu, 2 Jan 2020 14:57:23 -0500
+Received: from mail-dm6nam11on2058.outbound.protection.outlook.com ([40.107.223.58]:6085
+        "EHLO NAM11-DM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728260AbgABT5X (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 2 Jan 2020 14:57:23 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NQ1wSDB7YKdPYo/qwGzgKEy7VIiFRhapuwk7O8Ysb0ncy5/gkfgbQqraMBuekp6tBYwd5IJ4U+TtwjgEC6bpjEvbc5f7KctmrlNUtndE9/vQlz8A6R/o0kR34xgfYNz+ksUVHy7L6WUDn9HDdCiz7LbDV9JT+zHyFc8yr7/jND9uKCHWMONchnabN5Odp52Z6R0zPHsiUYfouBpfE5KI+nDRPYgkwVGCmnTxUePhWGgslkFMSYc9uSmt6IzOwLFl+vMkP/BVx4gyh/sS0bFn9NiOrDLWfW8YgBwwI2R/EI166SNOKwzn9x99dkJL4VaorGW7MtRXPhMx3yamndKvZQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EfrI3q6OuFkGJUI2L/MWBwTiecaDUwy/Dtv4JzFStsI=;
+ b=kR12vRNiCnwUEyEwDBtbH+AitCPCzmxr//GUKfDCyjwbPv73H3rWc8KnEBVgBPxvFcQ1czoqj0lNg0lobdrNJ6ZPjEME3lSePxFDw3Y9ubUgak44aUMQozLJcuCGu/P+7wLY52+muGLch04xXNWIVkRcqX2i7sT09zLLA75G3jrn+aMq+kk9RStGVsi+coJ6dl1b8cGjHzB/SpB0+BYeRGRqDScv748lqvKA661JKl5/ahMGvOrOY0kI1enhiKX6ehGCjwlsk0vUqqVTy9T33M1sexPqKcV0WeCHNzczwUI/3cdJ6gke9Fd+RIi3tapBGQKuLKudNFEPL4UzTjFj7A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=onn2kaRu8qHeOZCfu0hDViiisLBTz+9+t6L3wfr8DUc=;
-        b=WLwZN7rfzNDtuKGgQ50YNh1Ptb/5IhKEp1Ugg02orWYHliwrTp4i/WpQ84fPfF/xd6
-         HM28dUtBsh3qdRrHED54HHve30uwQRjzAe9yPyuiHswRNxuaLNasjUrBpVs9tk9EBfwp
-         JGNrtrxVQC0xnUYd7rfBigqkyE8j8CPivvX8tvU4R1Q3l0SXHqq8rBRqTEYWYfeLHDyW
-         Hf2wsq6S6sqTNlIQXmmRKJHkdJ4ohYqwcB57i8ZBIBpVkOPQGsqazsTeMuGysznyc6wf
-         +I03Lm49PgF63eQ1zzwAsRR2WSYiFbASOunR6KjsX90hy2xzTBNpBqFNcqUvahQS9Z5P
-         9gjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=onn2kaRu8qHeOZCfu0hDViiisLBTz+9+t6L3wfr8DUc=;
-        b=Ad+0QPYJoeYTV5IR16k4+4oByaCBbUDjml06KWVQqXYcllfG6cC3XzNSfIUybq3vCn
-         rgfwnEbx+bTzRV9p6tVcgw5dUj/7Uok547+hz2wm8i2k1Y8QLdPO8TYkhaMnla1ar4cR
-         C87qgkcrZbM+u+r77EJBi6KcffXNYDNb9suq2wo7ZZqYma3KH65PgL4DZp5UWUVfSck9
-         nOA1ROuOHbU+qiYSwK44RYwVwu7Qlgh85o4j2XPaYdTuylqcO8fzJB0DV78Glmf9U2pV
-         dmspYJSYtwcHeLtxF6lCH1oln4zYTp7oJP5pHy6ILWaSfsmR4HyVkGkypEUIl391Wcdu
-         3aDQ==
-X-Gm-Message-State: APjAAAXFj8/hRjPWvxL+Ul07EnSB0xwWfClmHDfM/tO13mfmHsw5haH5
-        mq3/jOiupxdtZppnkzWPT972OjUEDH98V6F3V5g=
-X-Google-Smtp-Source: APXvYqx6ei8sTZU+VpaBvdE5BPvS2Lf8otC9ORUm8LAyhktY0sGrmucBFvIIqydp9NRNLgqtuEW+yjYVaTvUmJLD5gc=
-X-Received: by 2002:a5e:8505:: with SMTP id i5mr49776442ioj.158.1577918497545;
- Wed, 01 Jan 2020 14:41:37 -0800 (PST)
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EfrI3q6OuFkGJUI2L/MWBwTiecaDUwy/Dtv4JzFStsI=;
+ b=HOnW7l6JolI0rsxpV6MiVW3XzhKI7S8OZBRxCuiQEhEN40egvZOraQJtpAOatEDfk+I+QhNzSaj14vf6MFeocXfGQGppChFc4SiYqsso1ZZMrgXa67zQpddbKC3EDedMBRwHkMinHQsHzo341YzzjpIOaxnzvND4IdGaGxQjduk=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Gary.Hook@amd.com; 
+Received: from BN8PR12MB2916.namprd12.prod.outlook.com (20.179.66.155) by
+ BN8PR12MB2964.namprd12.prod.outlook.com (20.178.210.216) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2602.12; Thu, 2 Jan 2020 19:57:19 +0000
+Received: from BN8PR12MB2916.namprd12.prod.outlook.com
+ ([fe80::45d0:ec5c:7480:8029]) by BN8PR12MB2916.namprd12.prod.outlook.com
+ ([fe80::45d0:ec5c:7480:8029%5]) with mapi id 15.20.2581.007; Thu, 2 Jan 2020
+ 19:57:19 +0000
+From:   Gary R Hook <gary.hook@amd.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        thomas.lendacky@amd.com, Gary R Hook <gary.hook@amd.com>
+Subject: [PATCH] crypto: ccp - Update MAINTAINERS for CCP driver
+Date:   Thu,  2 Jan 2020 13:57:03 -0600
+Message-Id: <20200102195703.7841-1-gary.hook@amd.com>
+X-Mailer: git-send-email 2.17.1
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SN4PR0701CA0021.namprd07.prod.outlook.com
+ (2603:10b6:803:28::31) To BN8PR12MB2916.namprd12.prod.outlook.com
+ (2603:10b6:408:6a::27)
 MIME-Version: 1.0
-References: <20200101175011.1875-1-michael@amarulasolutions.com>
-In-Reply-To: <20200101175011.1875-1-michael@amarulasolutions.com>
-From:   Adam Ford <aford173@gmail.com>
-Date:   Wed, 1 Jan 2020 16:41:26 -0600
-Message-ID: <CAHCN7xL_jAT4PYtkMXZbBy=VCUyzRqYaCbKs0oi6p297CCiOdg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] arm64: dts: imx8mm: Add CAAM node
-To:     Michael Trimarchi <michael@amarulasolutions.com>
-Cc:     Shawn Guo <shawnguo@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-amarula@amarulasolutions.com,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        NXP Linux Team <linux-imx@nxp.com>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Fabio Estevam <festevam@gmail.com>,
-        arm-soc <linux-arm-kernel@lists.infradead.org>,
-        linux-crypto@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Received: from taos.amd.com (165.204.77.1) by SN4PR0701CA0021.namprd07.prod.outlook.com (2603:10b6:803:28::31) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2602.12 via Frontend Transport; Thu, 2 Jan 2020 19:57:18 +0000
+X-Mailer: git-send-email 2.17.1
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 246f34fd-e8ab-41c0-052e-08d78fbdf950
+X-MS-TrafficTypeDiagnostic: BN8PR12MB2964:|BN8PR12MB2964:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BN8PR12MB2964D8FEEBB6385D44C727ABFD200@BN8PR12MB2964.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1284;
+X-Forefront-PRVS: 0270ED2845
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(39850400004)(396003)(136003)(366004)(376002)(346002)(199004)(189003)(16526019)(7696005)(8676002)(36756003)(6666004)(81166006)(81156014)(66476007)(186003)(2906002)(86362001)(26005)(66556008)(66946007)(52116002)(956004)(8936002)(2616005)(6486002)(6916009)(4326008)(5660300002)(316002)(4744005)(478600001)(1076003);DIR:OUT;SFP:1101;SCL:1;SRVR:BN8PR12MB2964;H:BN8PR12MB2916.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 4E+DcKMoF5XEupS9sZ3CH+eCTFbH+oimPULeYygPa7JOaCdHG/wF4/z99GgwOhc+KQf7LLn3LD6FD0guAyKPQNutf43ghfiauM9m1o7SY5uoxYtcTfojT1ROceyLaGCHp7v3ha+6r39T14CsWNLx92ghM5R9nCzn4h3+g6WhCEmo6CKcFHvikkRZUfwq3Vj2jcSaRA12usXT6MVOXCs35KgaEJhNTNVwP64sDrUshwbxJelAeqQ052haqBcoL+uFKc+K8Opr7Wah8dfOXkg1VKvB9uVfkGcBfzlHedB9DeA9Nhp3AwG7QAybIUy/LqaQHkJFViskGGKmb03dM0UPIjw1xD6+3xU1M85SV0aAaN3/KRs/RB51az15UabSxaEeihta8zrdbL3JqRLRWAd87vFi3BOuxwejBQySWzo9MXbLOg0OFLKoJBrG2HcYALwY
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 246f34fd-e8ab-41c0-052e-08d78fbdf950
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Jan 2020 19:57:19.4694
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: spKE9kQWxpNp8ldtn+1WlCahWCRgUFH4+iJgUQ/b9ABDaLiLNVXALtEhFuizXvB/
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR12MB2964
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jan 1, 2020 at 11:50 AM Michael Trimarchi
-<michael@amarulasolutions.com> wrote:
->
-> Add node for CAAM - Cryptographic Acceleration and Assurance Module.
->
+From: Gary R Hook <gary.hook@amd.com>
 
-I believe a series similar to this was already done and applied:
+Remove Gary R Hook as CCP maintainer.
+---
+ MAINTAINERS | 1 -
+ 1 file changed, 1 deletion(-)
 
-https://patchwork.kernel.org/patch/11300663/
+diff --git a/MAINTAINERS b/MAINTAINERS
+index fecbfc35897c..a0c161895e18 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -789,7 +789,6 @@ F:	include/uapi/rdma/efa-abi.h
+ 
+ AMD CRYPTOGRAPHIC COPROCESSOR (CCP) DRIVER
+ M:	Tom Lendacky <thomas.lendacky@amd.com>
+-M:	Gary Hook <gary.hook@amd.com>
+ L:	linux-crypto@vger.kernel.org
+ S:	Supported
+ F:	drivers/crypto/ccp/
+-- 
+2.17.1
 
-adam
-
-> Signed-off-by: Michael Trimarchi <michael@amarulasolutions.com>
-> ---
->  arch/arm64/boot/dts/freescale/imx8mm.dtsi | 31 +++++++++++++++++++++++
->  1 file changed, 31 insertions(+)
->
-> diff --git a/arch/arm64/boot/dts/freescale/imx8mm.dtsi b/arch/arm64/boot/dts/freescale/imx8mm.dtsi
-> index 7360dc0685eb..428a8b43086e 100644
-> --- a/arch/arm64/boot/dts/freescale/imx8mm.dtsi
-> +++ b/arch/arm64/boot/dts/freescale/imx8mm.dtsi
-> @@ -667,6 +667,37 @@
->                                 status = "disabled";
->                         };
->
-> +                       crypto: crypto@30900000 {
-> +                               compatible = "fsl,sec-v4.0";
-> +                               #address-cells = <1>;
-> +                               #size-cells = <1>;
-> +                               reg = <0x30900000 0x40000>;
-> +                               ranges = <0 0x30900000 0x40000>;
-> +                               interrupts = <GIC_SPI 91 IRQ_TYPE_LEVEL_HIGH>;
-> +                               clocks = <&clk IMX8MM_CLK_AHB>,
-> +                                        <&clk IMX8MM_CLK_IPG_ROOT>;
-> +                               clock-names = "aclk", "ipg";
-> +                               status = "disabled";
-> +
-> +                               sec_jr0: jr0@1000 {
-> +                                        compatible = "fsl,sec-v4.0-job-ring";
-> +                                        reg = <0x1000 0x1000>;
-> +                                        interrupts = <GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH>;
-> +                               };
-> +
-> +                               sec_jr1: jr1@2000 {
-> +                                        compatible = "fsl,sec-v4.0-job-ring";
-> +                                        reg = <0x2000 0x1000>;
-> +                                        interrupts = <GIC_SPI 106 IRQ_TYPE_LEVEL_HIGH>;
-> +                               };
-> +
-> +                               sec_jr2: jr2@3000 {
-> +                                        compatible = "fsl,sec-v4.0-job-ring";
-> +                                        reg = <0x3000 0x1000>;
-> +                                        interrupts = <GIC_SPI 114 IRQ_TYPE_LEVEL_HIGH>;
-> +                               };
-> +                       };
-> +
->                         i2c1: i2c@30a20000 {
->                                 compatible = "fsl,imx8mm-i2c", "fsl,imx21-i2c";
->                                 #address-cells = <1>;
-> --
-> 2.17.1
->
->
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
