@@ -2,197 +2,162 @@ Return-Path: <SRS0=TjYB=2Y=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67820C3276D
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 01:04:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE6B5C2D0CE
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 04:01:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 43C4D217F4
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 01:04:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 99A5722525
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 04:01:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1578024085;
+	bh=PWDBU4ocTsTWITg8BB4v8NoVQT83ZDI66w59/wZN01s=;
+	h=From:To:Subject:Date:List-ID:From;
+	b=ZD5qTs4CVsB8ayAwyWoAmHFi75icpmnE+zO2krWf1XBAwoWMtMIak+Uf7lQ2aN3ts
+	 YxcR55WkLCEoxEMOb8V0ol5Sdwhq9K6JkoGQvM9vKWwExtriFp+p4/bamndQgwByuG
+	 Qw/z4j17Owv/cEez06wB/ekcftWGpixPQ7SbqY0s=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726199AbgACBDP (ORCPT
+        id S1726643AbgACEBZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Jan 2020 20:03:15 -0500
-Received: from inva020.nxp.com ([92.121.34.13]:47338 "EHLO inva020.nxp.com"
+        Thu, 2 Jan 2020 23:01:25 -0500
+Received: from mail.kernel.org ([198.145.29.99]:33472 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725890AbgACBDP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Jan 2020 20:03:15 -0500
-Received: from inva020.nxp.com (localhost [127.0.0.1])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 22F5E1A1B0F;
-        Fri,  3 Jan 2020 02:03:13 +0100 (CET)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 15B621A1B0E;
-        Fri,  3 Jan 2020 02:03:13 +0100 (CET)
-Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id BBFD620567;
-        Fri,  3 Jan 2020 02:03:12 +0100 (CET)
-From:   Iuliana Prodan <iuliana.prodan@nxp.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-imx <linux-imx@nxp.com>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>
-Subject: [PATCH v2 02/10] crypto: caam - refactor ahash_done callbacks
-Date:   Fri,  3 Jan 2020 03:02:45 +0200
-Message-Id: <1578013373-1956-3-git-send-email-iuliana.prodan@nxp.com>
-X-Mailer: git-send-email 2.1.0
-In-Reply-To: <1578013373-1956-1-git-send-email-iuliana.prodan@nxp.com>
-References: <1578013373-1956-1-git-send-email-iuliana.prodan@nxp.com>
-X-Virus-Scanned: ClamAV using ClamSMTP
+        id S1726282AbgACEBY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 2 Jan 2020 23:01:24 -0500
+Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 0FB3521D7D
+        for <linux-crypto@vger.kernel.org>; Fri,  3 Jan 2020 04:01:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1578024084;
+        bh=PWDBU4ocTsTWITg8BB4v8NoVQT83ZDI66w59/wZN01s=;
+        h=From:To:Subject:Date:From;
+        b=sktVId0K8j/eGJtrsoe0QWnx4a+GdikB44WnPcAAqs+/MLhZfFzF5H7000ExtYAIn
+         cChHy753+j2G1z7CBqBXbDW40rGDiMn+dc8nkn4JDaW8iytZaGTxy6dj4vHIaWpnUA
+         m07I0LJlw9+QoC0jjGqi88UQaj7Uxh+MCNc1+vwg=
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Subject: [PATCH v2 00/28] crypto: template instantiation cleanup
+Date:   Thu,  2 Jan 2020 19:58:40 -0800
+Message-Id: <20200103035908.12048-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.24.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Create two common ahash_done_* functions with the dma
-direction as parameter. Then, these 2 are called with
-the proper direction for unmap.
+Hello,
 
-Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
-Reviewed-by: Horia Geanta <horia.geanta@nxp.com>
----
- drivers/crypto/caam/caamhash.c | 88 +++++++++++-------------------------------
- 1 file changed, 22 insertions(+), 66 deletions(-)
+This series makes all crypto templates initialize their spawns (i.e.
+their "inner algorithms") in a consistent way, using a consistent set of
+crypto_grab_*() helper functions.  skcipher, aead, and akcipher spawns
+already used this approach, but shash, ahash, and cipher spawns were
+being initialized differently -- causing confusion and unnecessary code.
 
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 50a8852..84be6db 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -570,8 +570,8 @@ static inline void ahash_unmap_ctx(struct device *dev,
- 	ahash_unmap(dev, edesc, req, dst_len);
- }
- 
--static void ahash_done(struct device *jrdev, u32 *desc, u32 err,
--		       void *context)
-+static inline void ahash_done_cpy(struct device *jrdev, u32 *desc, u32 err,
-+				  void *context, enum dma_data_direction dir)
- {
- 	struct ahash_request *req = context;
- 	struct ahash_edesc *edesc;
-@@ -587,7 +587,7 @@ static void ahash_done(struct device *jrdev, u32 *desc, u32 err,
- 	if (err)
- 		ecode = caam_jr_strstatus(jrdev, err);
- 
--	ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_FROM_DEVICE);
-+	ahash_unmap_ctx(jrdev, edesc, req, digestsize, dir);
- 	memcpy(req->result, state->caam_ctx, digestsize);
- 	kfree(edesc);
- 
-@@ -598,76 +598,20 @@ static void ahash_done(struct device *jrdev, u32 *desc, u32 err,
- 	req->base.complete(&req->base, ecode);
- }
- 
--static void ahash_done_bi(struct device *jrdev, u32 *desc, u32 err,
--			    void *context)
-+static void ahash_done(struct device *jrdev, u32 *desc, u32 err,
-+		       void *context)
- {
--	struct ahash_request *req = context;
--	struct ahash_edesc *edesc;
--	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
--	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
--	struct caam_hash_state *state = ahash_request_ctx(req);
--	int digestsize = crypto_ahash_digestsize(ahash);
--	int ecode = 0;
--
--	dev_dbg(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
--
--	edesc = container_of(desc, struct ahash_edesc, hw_desc[0]);
--	if (err)
--		ecode = caam_jr_strstatus(jrdev, err);
--
--	ahash_unmap_ctx(jrdev, edesc, req, ctx->ctx_len, DMA_BIDIRECTIONAL);
--	kfree(edesc);
--
--	scatterwalk_map_and_copy(state->buf, req->src,
--				 req->nbytes - state->next_buflen,
--				 state->next_buflen, 0);
--	state->buflen = state->next_buflen;
--
--	print_hex_dump_debug("buf@" __stringify(__LINE__)": ",
--			     DUMP_PREFIX_ADDRESS, 16, 4, state->buf,
--			     state->buflen, 1);
--
--	print_hex_dump_debug("ctx@"__stringify(__LINE__)": ",
--			     DUMP_PREFIX_ADDRESS, 16, 4, state->caam_ctx,
--			     ctx->ctx_len, 1);
--	if (req->result)
--		print_hex_dump_debug("result@"__stringify(__LINE__)": ",
--				     DUMP_PREFIX_ADDRESS, 16, 4, req->result,
--				     digestsize, 1);
--
--	req->base.complete(&req->base, ecode);
-+	ahash_done_cpy(jrdev, desc, err, context, DMA_FROM_DEVICE);
- }
- 
- static void ahash_done_ctx_src(struct device *jrdev, u32 *desc, u32 err,
- 			       void *context)
- {
--	struct ahash_request *req = context;
--	struct ahash_edesc *edesc;
--	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
--	int digestsize = crypto_ahash_digestsize(ahash);
--	struct caam_hash_state *state = ahash_request_ctx(req);
--	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
--	int ecode = 0;
--
--	dev_dbg(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
--
--	edesc = container_of(desc, struct ahash_edesc, hw_desc[0]);
--	if (err)
--		ecode = caam_jr_strstatus(jrdev, err);
--
--	ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_BIDIRECTIONAL);
--	memcpy(req->result, state->caam_ctx, digestsize);
--	kfree(edesc);
--
--	print_hex_dump_debug("ctx@"__stringify(__LINE__)": ",
--			     DUMP_PREFIX_ADDRESS, 16, 4, state->caam_ctx,
--			     ctx->ctx_len, 1);
--
--	req->base.complete(&req->base, ecode);
-+	ahash_done_cpy(jrdev, desc, err, context, DMA_BIDIRECTIONAL);
- }
- 
--static void ahash_done_ctx_dst(struct device *jrdev, u32 *desc, u32 err,
--			       void *context)
-+static inline void ahash_done_switch(struct device *jrdev, u32 *desc, u32 err,
-+				     void *context, enum dma_data_direction dir)
- {
- 	struct ahash_request *req = context;
- 	struct ahash_edesc *edesc;
-@@ -683,7 +627,7 @@ static void ahash_done_ctx_dst(struct device *jrdev, u32 *desc, u32 err,
- 	if (err)
- 		ecode = caam_jr_strstatus(jrdev, err);
- 
--	ahash_unmap_ctx(jrdev, edesc, req, ctx->ctx_len, DMA_FROM_DEVICE);
-+	ahash_unmap_ctx(jrdev, edesc, req, ctx->ctx_len, dir);
- 	kfree(edesc);
- 
- 	scatterwalk_map_and_copy(state->buf, req->src,
-@@ -706,6 +650,18 @@ static void ahash_done_ctx_dst(struct device *jrdev, u32 *desc, u32 err,
- 	req->base.complete(&req->base, ecode);
- }
- 
-+static void ahash_done_bi(struct device *jrdev, u32 *desc, u32 err,
-+			  void *context)
-+{
-+	ahash_done_switch(jrdev, desc, err, context, DMA_BIDIRECTIONAL);
-+}
-+
-+static void ahash_done_ctx_dst(struct device *jrdev, u32 *desc, u32 err,
-+			       void *context)
-+{
-+	ahash_done_switch(jrdev, desc, err, context, DMA_FROM_DEVICE);
-+}
-+
- /*
-  * Allocate an enhanced descriptor, which contains the hardware descriptor
-  * and space for hardware scatter table containing sg_num entries.
+As long as it's introducing new crypto_grab_*() functions, this series
+also takes the opportunity to first improve the existing ones to take
+the instance pointer as a parameter, so that all callers don't have to
+store it temporarily to crypto_spawn::inst.
+
+Finally, this series also makes two changes that allow simplifying the
+error handling in template ->create() functions: (1) crypto_drop_spawn()
+is made a no-op on uninitialized instances, and (2) crypto_grab_spawn()
+is made to handle an ERR_PTR() name.
+
+Taking advantage of these two changes, this series also simplifies the
+error handling in the template ->create() functions which were being
+updated anyway to use a new crypto_grab_*() function.  But to keep this
+series manageable, simplifying error handling in the remaining templates
+is left for later.
+
+This series is an internal cleanup only; there are no changes for users
+of the crypto API.  I've tested that all the templates still get
+instantiated correctly and that errors seem to be handled properly.
+
+Changed v1 => v2:
+
+  - Made crypto_grab_cipher() an inline function in order to fix a
+    linkage error reported by the kbuild test robot.
+
+  - Made the error paths use a style 'goto err_free_inst;' rather than
+    'goto out;' in order to be more robust against bugs where an error
+    code accidentally isn't set (which has been a problem in the past).
+
+  - Cleaned up a couple minor things I missed in
+    skcipher_alloc_instance_simple() during the conversion to
+    crypto_cipher_spawn.
+
+Eric Biggers (28):
+  crypto: algapi - make crypto_drop_spawn() a no-op on uninitialized
+    spawns
+  crypto: algapi - make crypto_grab_spawn() handle an ERR_PTR() name
+  crypto: shash - make struct shash_instance be the full size
+  crypto: ahash - make struct ahash_instance be the full size
+  crypto: skcipher - pass instance to crypto_grab_skcipher()
+  crypto: aead - pass instance to crypto_grab_aead()
+  crypto: akcipher - pass instance to crypto_grab_akcipher()
+  crypto: algapi - pass instance to crypto_grab_spawn()
+  crypto: shash - introduce crypto_grab_shash()
+  crypto: ahash - introduce crypto_grab_ahash()
+  crypto: cipher - introduce crypto_cipher_spawn and
+    crypto_grab_cipher()
+  crypto: adiantum - use crypto_grab_{cipher,shash} and simplify error
+    paths
+  crypto: cryptd - use crypto_grab_shash() and simplify error paths
+  crypto: hmac - use crypto_grab_shash() and simplify error paths
+  crypto: authenc - use crypto_grab_ahash() and simplify error paths
+  crypto: authencesn - use crypto_grab_ahash() and simplify error paths
+  crypto: gcm - use crypto_grab_ahash() and simplify error paths
+  crypto: ccm - use crypto_grab_ahash() and simplify error paths
+  crypto: chacha20poly1305 - use crypto_grab_ahash() and simplify error
+    paths
+  crypto: skcipher - use crypto_grab_cipher() and simplify error paths
+  crypto: cbcmac - use crypto_grab_cipher() and simplify error paths
+  crypto: cmac - use crypto_grab_cipher() and simplify error paths
+  crypto: vmac - use crypto_grab_cipher() and simplify error paths
+  crypto: xcbc - use crypto_grab_cipher() and simplify error paths
+  crypto: cipher - make crypto_spawn_cipher() take a crypto_cipher_spawn
+  crypto: algapi - remove obsoleted instance creation helpers
+  crypto: ahash - unexport crypto_ahash_type
+  crypto: algapi - fold crypto_init_spawn() into crypto_grab_spawn()
+
+ crypto/adiantum.c                  |  90 ++++++++---------------
+ crypto/aead.c                      |   7 +-
+ crypto/ahash.c                     |  39 ++++------
+ crypto/akcipher.c                  |   7 +-
+ crypto/algapi.c                    |  99 +++++--------------------
+ crypto/authenc.c                   |  58 +++++----------
+ crypto/authencesn.c                |  58 +++++----------
+ crypto/ccm.c                       | 111 ++++++++++++-----------------
+ crypto/chacha20poly1305.c          |  89 ++++++++---------------
+ crypto/cmac.c                      |  35 +++++----
+ crypto/cryptd.c                    |  76 ++++++--------------
+ crypto/ctr.c                       |   4 +-
+ crypto/cts.c                       |   9 +--
+ crypto/essiv.c                     |  16 ++---
+ crypto/gcm.c                       |  77 ++++++++------------
+ crypto/geniv.c                     |   4 +-
+ crypto/hmac.c                      |  33 +++++----
+ crypto/lrw.c                       |  15 ++--
+ crypto/pcrypt.c                    |   5 +-
+ crypto/rsa-pkcs1pad.c              |   8 ++-
+ crypto/shash.c                     |  28 +++-----
+ crypto/skcipher.c                  |  46 +++++-------
+ crypto/vmac.c                      |  35 +++++----
+ crypto/xcbc.c                      |  40 +++++------
+ crypto/xts.c                       |   9 +--
+ include/crypto/algapi.h            |  64 ++++++++---------
+ include/crypto/internal/aead.h     |  11 +--
+ include/crypto/internal/akcipher.h |  12 +---
+ include/crypto/internal/hash.h     |  70 +++++++++---------
+ include/crypto/internal/skcipher.h |  15 ++--
+ 30 files changed, 427 insertions(+), 743 deletions(-)
+
 -- 
-2.1.0
+2.24.1
 
