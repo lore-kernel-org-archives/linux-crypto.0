@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 944CEC33C8C
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9DA3C33C99
 	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 04:01:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6957921D7D
+	by mail.kernel.org (Postfix) with ESMTP id 93B25222C3
 	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 04:01:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=default; t=1578024094;
-	bh=Sa6BlByOCaXdGV1JFlq85N8cnQd+GJ++0WOjPxkXZL8=;
+	bh=rQzvp8KxeUk1rVTWBDO8KK+J7RJj/YV1MEDOniL6i5Y=;
 	h=From:To:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=mtVttZbsmoEI6ABHVPNYCMwlgcBc2oqXejBLPP60y/+a/5LuHDRr+orSYJVfRKsXJ
-	 Vo2w/JaiMJEaLseH40cDgukD3+EibGImMuabvvZ1kh4ccu1cI9tvv5inTB2g6LZXos
-	 +DbJERo4ooAqnyI2VlhYavDvxp20jZRKxqJAZPvs=
+	b=MSVBlU1pwTe9YzCRv2uFd5aHLBa15RJ5CFkoQ4mRJxTcvBDlntpS1aP7SFRStwwgx
+	 VOB08sKju5p+HuZWDbURMq1kG0UtQtnIyU7n+2uDAixWS/zEKnbXzuU0zP5SNkxE5Y
+	 vZNZ5NIejNlRX4OYcmXp+zK5f+8dSxV3ng/BVIqU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727186AbgACEBb (ORCPT
+        id S1727228AbgACEBd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Jan 2020 23:01:31 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33528 "EHLO mail.kernel.org"
+        Thu, 2 Jan 2020 23:01:33 -0500
+Received: from mail.kernel.org ([198.145.29.99]:33616 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727183AbgACEB2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Jan 2020 23:01:28 -0500
+        id S1727225AbgACEBb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 2 Jan 2020 23:01:31 -0500
 Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0E02722525
-        for <linux-crypto@vger.kernel.org>; Fri,  3 Jan 2020 04:01:27 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 37A582465E
+        for <linux-crypto@vger.kernel.org>; Fri,  3 Jan 2020 04:01:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1578024087;
-        bh=Sa6BlByOCaXdGV1JFlq85N8cnQd+GJ++0WOjPxkXZL8=;
+        s=default; t=1578024089;
+        bh=rQzvp8KxeUk1rVTWBDO8KK+J7RJj/YV1MEDOniL6i5Y=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=p1f87zdYx+P2/QBUXzfGmYZq4F9fdPOz5XGV5LzpnrjdNOP2bDVd53hbQFVz/UGoJ
-         iEGkhohHem6GjNqpIrvDc+/31PmYuMn2bVOTYS021Bb112nw02pyYfAzPbe9YaJUB8
-         PH6oc4pNxTATlLGHRSztdJ4vy7j/Gc7C5uhCZL7Y=
+        b=ENQHtXO93qsAuINTTsk5decntUsD4EZ/UxDtRGK/T4Xhsvc3bGs/6oNUOPLaSyi3r
+         ugqqhstmWY+6qMCGBvm7hLv9zfl2Vo2682rS2ugiY749a1qfet7+ouhznruzFFpn9Y
+         DNzOQt6o+eJgjG8P+VjuBz8ftuMr5XdDGgGISAsQ=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Subject: [PATCH v2 15/28] crypto: authenc - use crypto_grab_ahash() and simplify error paths
-Date:   Thu,  2 Jan 2020 19:58:55 -0800
-Message-Id: <20200103035908.12048-16-ebiggers@kernel.org>
+Subject: [PATCH v2 26/28] crypto: algapi - remove obsoleted instance creation helpers
+Date:   Thu,  2 Jan 2020 19:59:06 -0800
+Message-Id: <20200103035908.12048-27-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200103035908.12048-1-ebiggers@kernel.org>
 References: <20200103035908.12048-1-ebiggers@kernel.org>
@@ -56,121 +56,312 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-Make the authenc template use the new function crypto_grab_ahash() to
-initialize its ahash spawn.
+Remove lots of helper functions that were previously used for
+instantiating crypto templates, but are now unused:
 
-This is needed to make all spawns be initialized in a consistent way.
+- crypto_get_attr_alg() and similar functions looked up an inner
+  algorithm directly from a template parameter.  These were replaced
+  with getting the algorithm's name, then calling crypto_grab_*().
 
-Also simplify the error handling by taking advantage of crypto_drop_*()
-now accepting (as a no-op) spawns that haven't been initialized yet, and
-by taking advantage of crypto_grab_*() now handling ERR_PTR() names.
+- crypto_init_spawn2() and similar functions initialized a spawn, given
+  an algorithm.  Similarly, these were replaced with crypto_grab_*().
+
+- crypto_alloc_instance() and similar functions allocated an instance
+  with a single spawn, given the inner algorithm.  These aren't useful
+  anymore since crypto_grab_*() need the instance allocated first.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/authenc.c | 52 +++++++++++++-----------------------------------
- 1 file changed, 14 insertions(+), 38 deletions(-)
+ crypto/ahash.c                 | 25 ---------------
+ crypto/algapi.c                | 57 ----------------------------------
+ crypto/shash.c                 | 19 ------------
+ include/crypto/algapi.h        | 22 -------------
+ include/crypto/internal/hash.h | 31 ------------------
+ 5 files changed, 154 deletions(-)
 
-diff --git a/crypto/authenc.c b/crypto/authenc.c
-index aef04792702a..87133bfd48b9 100644
---- a/crypto/authenc.c
-+++ b/crypto/authenc.c
-@@ -385,11 +385,10 @@ static int crypto_authenc_create(struct crypto_template *tmpl,
- 	struct crypto_attr_type *algt;
- 	u32 mask;
- 	struct aead_instance *inst;
-+	struct authenc_instance_ctx *ctx;
- 	struct hash_alg_common *auth;
- 	struct crypto_alg *auth_base;
- 	struct skcipher_alg *enc;
--	struct authenc_instance_ctx *ctx;
--	const char *enc_name;
- 	int err;
+diff --git a/crypto/ahash.c b/crypto/ahash.c
+index e98a1398ed7f..2b8449fdb93c 100644
+--- a/crypto/ahash.c
++++ b/crypto/ahash.c
+@@ -655,31 +655,6 @@ int ahash_register_instance(struct crypto_template *tmpl,
+ }
+ EXPORT_SYMBOL_GPL(ahash_register_instance);
  
- 	algt = crypto_get_attr_type(tb);
-@@ -401,35 +400,22 @@ static int crypto_authenc_create(struct crypto_template *tmpl,
- 
- 	mask = crypto_requires_sync(algt->type, algt->mask);
- 
--	auth = ahash_attr_alg(tb[1], CRYPTO_ALG_TYPE_HASH,
--			      CRYPTO_ALG_TYPE_AHASH_MASK | mask);
--	if (IS_ERR(auth))
--		return PTR_ERR(auth);
+-void ahash_free_instance(struct crypto_instance *inst)
+-{
+-	crypto_drop_spawn(crypto_instance_ctx(inst));
+-	kfree(ahash_instance(inst));
+-}
+-EXPORT_SYMBOL_GPL(ahash_free_instance);
 -
--	auth_base = &auth->base;
+-int crypto_init_ahash_spawn(struct crypto_ahash_spawn *spawn,
+-			    struct hash_alg_common *alg,
+-			    struct crypto_instance *inst)
+-{
+-	return crypto_init_spawn2(&spawn->base, &alg->base, inst,
+-				  &crypto_ahash_type);
+-}
+-EXPORT_SYMBOL_GPL(crypto_init_ahash_spawn);
 -
--	enc_name = crypto_attr_alg_name(tb[2]);
--	err = PTR_ERR(enc_name);
--	if (IS_ERR(enc_name))
--		goto out_put_auth;
+-struct hash_alg_common *ahash_attr_alg(struct rtattr *rta, u32 type, u32 mask)
+-{
+-	struct crypto_alg *alg;
 -
- 	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
--	err = -ENOMEM;
- 	if (!inst)
--		goto out_put_auth;
+-	alg = crypto_attr_alg2(rta, &crypto_ahash_type, type, mask);
+-	return IS_ERR(alg) ? ERR_CAST(alg) : __crypto_hash_alg_common(alg);
+-}
+-EXPORT_SYMBOL_GPL(ahash_attr_alg);
 -
-+		return -ENOMEM;
- 	ctx = aead_instance_ctx(inst);
+ bool crypto_hash_alg_has_setkey(struct hash_alg_common *halg)
+ {
+ 	struct crypto_alg *alg = &halg->base;
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index a25ce02918f8..f66a4ff57e6e 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -697,23 +697,6 @@ int crypto_init_spawn(struct crypto_spawn *spawn, struct crypto_alg *alg,
+ }
+ EXPORT_SYMBOL_GPL(crypto_init_spawn);
  
--	err = crypto_init_ahash_spawn(&ctx->auth, auth,
--				      aead_crypto_instance(inst));
-+	err = crypto_grab_ahash(&ctx->auth, aead_crypto_instance(inst),
-+				crypto_attr_alg_name(tb[1]), 0, mask);
- 	if (err)
- 		goto err_free_inst;
-+	auth = crypto_spawn_ahash_alg(&ctx->auth);
-+	auth_base = &auth->base;
- 
- 	err = crypto_grab_skcipher(&ctx->enc, aead_crypto_instance(inst),
--				   enc_name, 0, mask);
-+				   crypto_attr_alg_name(tb[2]), 0, mask);
- 	if (err)
--		goto err_drop_auth;
+-int crypto_init_spawn2(struct crypto_spawn *spawn, struct crypto_alg *alg,
+-		       struct crypto_instance *inst,
+-		       const struct crypto_type *frontend)
+-{
+-	int err = -EINVAL;
 -
-+		goto err_free_inst;
- 	enc = crypto_spawn_skcipher_alg(&ctx->enc);
- 
- 	ctx->reqoff = ALIGN(2 * auth->digestsize + auth_base->cra_alignmask,
-@@ -440,12 +426,12 @@ static int crypto_authenc_create(struct crypto_template *tmpl,
- 		     "authenc(%s,%s)", auth_base->cra_name,
- 		     enc->base.cra_name) >=
- 	    CRYPTO_MAX_ALG_NAME)
--		goto err_drop_enc;
-+		goto err_free_inst;
- 
- 	if (snprintf(inst->alg.base.cra_driver_name, CRYPTO_MAX_ALG_NAME,
- 		     "authenc(%s,%s)", auth_base->cra_driver_name,
- 		     enc->base.cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
--		goto err_drop_enc;
-+		goto err_free_inst;
- 
- 	inst->alg.base.cra_flags = (auth_base->cra_flags |
- 				    enc->base.cra_flags) & CRYPTO_ALG_ASYNC;
-@@ -470,21 +456,11 @@ static int crypto_authenc_create(struct crypto_template *tmpl,
- 	inst->free = crypto_authenc_free;
- 
- 	err = aead_register_instance(tmpl, inst);
--	if (err)
--		goto err_drop_enc;
+-	if ((alg->cra_flags ^ frontend->type) & frontend->maskset)
+-		goto out;
+-
+-	spawn->frontend = frontend;
+-	err = crypto_init_spawn(spawn, alg, inst, frontend->maskset);
 -
 -out:
--	crypto_mod_put(auth_base);
 -	return err;
+-}
+-EXPORT_SYMBOL_GPL(crypto_init_spawn2);
 -
--err_drop_enc:
--	crypto_drop_skcipher(&ctx->enc);
--err_drop_auth:
--	crypto_drop_ahash(&ctx->auth);
-+	if (err) {
- err_free_inst:
--	kfree(inst);
--out_put_auth:
--	goto out;
-+		crypto_authenc_free(inst);
-+	}
-+	return err;
+ int crypto_grab_spawn(struct crypto_spawn *spawn, struct crypto_instance *inst,
+ 		      const char *name, u32 type, u32 mask)
+ {
+@@ -876,20 +859,6 @@ const char *crypto_attr_alg_name(struct rtattr *rta)
+ }
+ EXPORT_SYMBOL_GPL(crypto_attr_alg_name);
+ 
+-struct crypto_alg *crypto_attr_alg2(struct rtattr *rta,
+-				    const struct crypto_type *frontend,
+-				    u32 type, u32 mask)
+-{
+-	const char *name;
+-
+-	name = crypto_attr_alg_name(rta);
+-	if (IS_ERR(name))
+-		return ERR_CAST(name);
+-
+-	return crypto_find_alg(name, frontend, type, mask);
+-}
+-EXPORT_SYMBOL_GPL(crypto_attr_alg2);
+-
+ int crypto_attr_u32(struct rtattr *rta, u32 *num)
+ {
+ 	struct crypto_attr_u32 *nu32;
+@@ -923,32 +892,6 @@ int crypto_inst_setname(struct crypto_instance *inst, const char *name,
+ }
+ EXPORT_SYMBOL_GPL(crypto_inst_setname);
+ 
+-void *crypto_alloc_instance(const char *name, struct crypto_alg *alg,
+-			    unsigned int head)
+-{
+-	struct crypto_instance *inst;
+-	char *p;
+-	int err;
+-
+-	p = kzalloc(head + sizeof(*inst) + sizeof(struct crypto_spawn),
+-		    GFP_KERNEL);
+-	if (!p)
+-		return ERR_PTR(-ENOMEM);
+-
+-	inst = (void *)(p + head);
+-
+-	err = crypto_inst_setname(inst, name, alg);
+-	if (err)
+-		goto err_free_inst;
+-
+-	return p;
+-
+-err_free_inst:
+-	kfree(p);
+-	return ERR_PTR(err);
+-}
+-EXPORT_SYMBOL_GPL(crypto_alloc_instance);
+-
+ void crypto_init_queue(struct crypto_queue *queue, unsigned int max_qlen)
+ {
+ 	INIT_LIST_HEAD(&queue->list);
+diff --git a/crypto/shash.c b/crypto/shash.c
+index e0872ac2729a..4d6ccb59e126 100644
+--- a/crypto/shash.c
++++ b/crypto/shash.c
+@@ -584,24 +584,5 @@ void shash_free_instance(struct crypto_instance *inst)
+ }
+ EXPORT_SYMBOL_GPL(shash_free_instance);
+ 
+-int crypto_init_shash_spawn(struct crypto_shash_spawn *spawn,
+-			    struct shash_alg *alg,
+-			    struct crypto_instance *inst)
+-{
+-	return crypto_init_spawn2(&spawn->base, &alg->base, inst,
+-				  &crypto_shash_type);
+-}
+-EXPORT_SYMBOL_GPL(crypto_init_shash_spawn);
+-
+-struct shash_alg *shash_attr_alg(struct rtattr *rta, u32 type, u32 mask)
+-{
+-	struct crypto_alg *alg;
+-
+-	alg = crypto_attr_alg2(rta, &crypto_shash_type, type, mask);
+-	return IS_ERR(alg) ? ERR_CAST(alg) :
+-	       container_of(alg, struct shash_alg, base);
+-}
+-EXPORT_SYMBOL_GPL(shash_attr_alg);
+-
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("Synchronous cryptographic hash type");
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index bbf85a854a42..224c72743cce 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -113,12 +113,8 @@ void crypto_unregister_instance(struct crypto_instance *inst);
+ 
+ int crypto_init_spawn(struct crypto_spawn *spawn, struct crypto_alg *alg,
+ 		      struct crypto_instance *inst, u32 mask);
+-int crypto_init_spawn2(struct crypto_spawn *spawn, struct crypto_alg *alg,
+-		       struct crypto_instance *inst,
+-		       const struct crypto_type *frontend);
+ int crypto_grab_spawn(struct crypto_spawn *spawn, struct crypto_instance *inst,
+ 		      const char *name, u32 type, u32 mask);
+-
+ void crypto_drop_spawn(struct crypto_spawn *spawn);
+ struct crypto_tfm *crypto_spawn_tfm(struct crypto_spawn *spawn, u32 type,
+ 				    u32 mask);
+@@ -127,21 +123,9 @@ void *crypto_spawn_tfm2(struct crypto_spawn *spawn);
+ struct crypto_attr_type *crypto_get_attr_type(struct rtattr **tb);
+ int crypto_check_attr_type(struct rtattr **tb, u32 type);
+ const char *crypto_attr_alg_name(struct rtattr *rta);
+-struct crypto_alg *crypto_attr_alg2(struct rtattr *rta,
+-				    const struct crypto_type *frontend,
+-				    u32 type, u32 mask);
+-
+-static inline struct crypto_alg *crypto_attr_alg(struct rtattr *rta,
+-						 u32 type, u32 mask)
+-{
+-	return crypto_attr_alg2(rta, NULL, type, mask);
+-}
+-
+ int crypto_attr_u32(struct rtattr *rta, u32 *num);
+ int crypto_inst_setname(struct crypto_instance *inst, const char *name,
+ 			struct crypto_alg *alg);
+-void *crypto_alloc_instance(const char *name, struct crypto_alg *alg,
+-			    unsigned int head);
+ 
+ void crypto_init_queue(struct crypto_queue *queue, unsigned int max_qlen);
+ int crypto_enqueue_request(struct crypto_queue *queue,
+@@ -254,12 +238,6 @@ static inline struct crypto_async_request *crypto_get_backlog(
+ 	       container_of(queue->backlog, struct crypto_async_request, list);
  }
  
- static struct crypto_template crypto_authenc_tmpl = {
+-static inline struct crypto_alg *crypto_get_attr_alg(struct rtattr **tb,
+-						     u32 type, u32 mask)
+-{
+-	return crypto_attr_alg(tb[1], type, mask);
+-}
+-
+ static inline int crypto_requires_off(u32 type, u32 mask, u32 off)
+ {
+ 	return (type ^ off) & mask & off;
+diff --git a/include/crypto/internal/hash.h b/include/crypto/internal/hash.h
+index e1024fa0032f..79e561abef61 100644
+--- a/include/crypto/internal/hash.h
++++ b/include/crypto/internal/hash.h
+@@ -87,7 +87,6 @@ int crypto_register_ahashes(struct ahash_alg *algs, int count);
+ void crypto_unregister_ahashes(struct ahash_alg *algs, int count);
+ int ahash_register_instance(struct crypto_template *tmpl,
+ 			    struct ahash_instance *inst);
+-void ahash_free_instance(struct crypto_instance *inst);
+ 
+ int shash_no_setkey(struct crypto_shash *tfm, const u8 *key,
+ 		    unsigned int keylen);
+@@ -105,10 +104,6 @@ static inline bool crypto_shash_alg_needs_key(struct shash_alg *alg)
+ 
+ bool crypto_hash_alg_has_setkey(struct hash_alg_common *halg);
+ 
+-int crypto_init_ahash_spawn(struct crypto_ahash_spawn *spawn,
+-			    struct hash_alg_common *alg,
+-			    struct crypto_instance *inst);
+-
+ int crypto_grab_ahash(struct crypto_ahash_spawn *spawn,
+ 		      struct crypto_instance *inst,
+ 		      const char *name, u32 type, u32 mask);
+@@ -124,8 +119,6 @@ static inline struct hash_alg_common *crypto_spawn_ahash_alg(
+ 	return __crypto_hash_alg_common(spawn->base.alg);
+ }
+ 
+-struct hash_alg_common *ahash_attr_alg(struct rtattr *rta, u32 type, u32 mask);
+-
+ int crypto_register_shash(struct shash_alg *alg);
+ void crypto_unregister_shash(struct shash_alg *alg);
+ int crypto_register_shashes(struct shash_alg *algs, int count);
+@@ -134,10 +127,6 @@ int shash_register_instance(struct crypto_template *tmpl,
+ 			    struct shash_instance *inst);
+ void shash_free_instance(struct crypto_instance *inst);
+ 
+-int crypto_init_shash_spawn(struct crypto_shash_spawn *spawn,
+-			    struct shash_alg *alg,
+-			    struct crypto_instance *inst);
+-
+ int crypto_grab_shash(struct crypto_shash_spawn *spawn,
+ 		      struct crypto_instance *inst,
+ 		      const char *name, u32 type, u32 mask);
+@@ -153,8 +142,6 @@ static inline struct shash_alg *crypto_spawn_shash_alg(
+ 	return __crypto_shash_alg(spawn->base.alg);
+ }
+ 
+-struct shash_alg *shash_attr_alg(struct rtattr *rta, u32 type, u32 mask);
+-
+ int shash_ahash_update(struct ahash_request *req, struct shash_desc *desc);
+ int shash_ahash_finup(struct ahash_request *req, struct shash_desc *desc);
+ int shash_ahash_digest(struct ahash_request *req, struct shash_desc *desc);
+@@ -195,17 +182,6 @@ static inline void *ahash_instance_ctx(struct ahash_instance *inst)
+ 	return crypto_instance_ctx(ahash_crypto_instance(inst));
+ }
+ 
+-static inline unsigned int ahash_instance_headroom(void)
+-{
+-	return sizeof(struct ahash_alg) - sizeof(struct crypto_alg);
+-}
+-
+-static inline struct ahash_instance *ahash_alloc_instance(
+-	const char *name, struct crypto_alg *alg)
+-{
+-	return crypto_alloc_instance(name, alg, ahash_instance_headroom());
+-}
+-
+ static inline void ahash_request_complete(struct ahash_request *req, int err)
+ {
+ 	req->base.complete(&req->base, err);
+@@ -262,13 +238,6 @@ static inline void *shash_instance_ctx(struct shash_instance *inst)
+ 	return crypto_instance_ctx(shash_crypto_instance(inst));
+ }
+ 
+-static inline struct shash_instance *shash_alloc_instance(
+-	const char *name, struct crypto_alg *alg)
+-{
+-	return crypto_alloc_instance(name, alg,
+-				     sizeof(struct shash_alg) - sizeof(*alg));
+-}
+-
+ static inline struct crypto_shash *crypto_spawn_shash(
+ 	struct crypto_shash_spawn *spawn)
+ {
 -- 
 2.24.1
 
