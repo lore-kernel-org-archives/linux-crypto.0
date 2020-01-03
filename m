@@ -2,48 +2,51 @@ Return-Path: <SRS0=TjYB=2Y=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE6B5C2D0CE
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 04:01:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 011D2C32771
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 04:01:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 99A5722525
+	by mail.kernel.org (Postfix) with ESMTP id C49EC227BF
 	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 04:01:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=default; t=1578024085;
-	bh=PWDBU4ocTsTWITg8BB4v8NoVQT83ZDI66w59/wZN01s=;
-	h=From:To:Subject:Date:List-ID:From;
-	b=ZD5qTs4CVsB8ayAwyWoAmHFi75icpmnE+zO2krWf1XBAwoWMtMIak+Uf7lQ2aN3ts
-	 YxcR55WkLCEoxEMOb8V0ol5Sdwhq9K6JkoGQvM9vKWwExtriFp+p4/bamndQgwByuG
-	 Qw/z4j17Owv/cEez06wB/ekcftWGpixPQ7SbqY0s=
+	bh=0Jmn6rgHyxICeqesUsUiqMF+viPCeJM7M1LgfU0aapQ=;
+	h=From:To:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=Ae1mm20nkAv8dQ/mcIMeBew4RPPI73WNGNz8yztxnYyYP9c1L/oPAFfMdszn2WqRL
+	 Qnry/bXg7IehHXAoUVRs+9U7y1lUtGeA9tRRII0OWCt8CBx6RWJAnZFhrvgK0FsS03
+	 0cslNITCzrNCxmOS2IV9WBRWdTzjo4AzVygp21O8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726643AbgACEBZ (ORCPT
+        id S1726282AbgACEBZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Thu, 2 Jan 2020 23:01:25 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33472 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:33486 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726282AbgACEBY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1726292AbgACEBY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 2 Jan 2020 23:01:24 -0500
 Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0FB3521D7D
+        by mail.kernel.org (Postfix) with ESMTPSA id 406AB222C3
         for <linux-crypto@vger.kernel.org>; Fri,  3 Jan 2020 04:01:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=default; t=1578024084;
-        bh=PWDBU4ocTsTWITg8BB4v8NoVQT83ZDI66w59/wZN01s=;
-        h=From:To:Subject:Date:From;
-        b=sktVId0K8j/eGJtrsoe0QWnx4a+GdikB44WnPcAAqs+/MLhZfFzF5H7000ExtYAIn
-         cChHy753+j2G1z7CBqBXbDW40rGDiMn+dc8nkn4JDaW8iytZaGTxy6dj4vHIaWpnUA
-         m07I0LJlw9+QoC0jjGqi88UQaj7Uxh+MCNc1+vwg=
+        bh=0Jmn6rgHyxICeqesUsUiqMF+viPCeJM7M1LgfU0aapQ=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=wzr0PyT5Sf9Htxgv7mUXnGZCY3iVHPQPqhpzLGyfII5Fpj3gEu3n4lQf2JPwl/h1R
+         i4hRswoXOtZiJhWZjMa9Uey2T62SM2sT4w068CUX6L3/0EfJtLdAca9a3Dw/2s/ILg
+         //ygcO38uiJ203iEiYhjuNl9JUHY/oX6QghFXN0M=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Subject: [PATCH v2 00/28] crypto: template instantiation cleanup
-Date:   Thu,  2 Jan 2020 19:58:40 -0800
-Message-Id: <20200103035908.12048-1-ebiggers@kernel.org>
+Subject: [PATCH v2 01/28] crypto: algapi - make crypto_drop_spawn() a no-op on uninitialized spawns
+Date:   Thu,  2 Jan 2020 19:58:41 -0800
+Message-Id: <20200103035908.12048-2-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.24.1
+In-Reply-To: <20200103035908.12048-1-ebiggers@kernel.org>
+References: <20200103035908.12048-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
@@ -51,113 +54,38 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
+From: Eric Biggers <ebiggers@google.com>
 
-This series makes all crypto templates initialize their spawns (i.e.
-their "inner algorithms") in a consistent way, using a consistent set of
-crypto_grab_*() helper functions.  skcipher, aead, and akcipher spawns
-already used this approach, but shash, ahash, and cipher spawns were
-being initialized differently -- causing confusion and unnecessary code.
+Make crypto_drop_spawn() do nothing when the spawn hasn't been
+initialized with an algorithm yet.  This will allow simplifying error
+handling in all the template ->create() functions, since on error they
+will be able to just call their usual "free instance" function, rather
+than having to handle dropping just the spawns that have been
+initialized so far.
 
-As long as it's introducing new crypto_grab_*() functions, this series
-also takes the opportunity to first improve the existing ones to take
-the instance pointer as a parameter, so that all callers don't have to
-store it temporarily to crypto_spawn::inst.
+This does assume the spawn starts out zero-filled, but that's always the
+case since instances are allocated with kzalloc().  And some other code
+already assumes this anyway.
 
-Finally, this series also makes two changes that allow simplifying the
-error handling in template ->create() functions: (1) crypto_drop_spawn()
-is made a no-op on uninitialized instances, and (2) crypto_grab_spawn()
-is made to handle an ERR_PTR() name.
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/algapi.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-Taking advantage of these two changes, this series also simplifies the
-error handling in the template ->create() functions which were being
-updated anyway to use a new crypto_grab_*() function.  But to keep this
-series manageable, simplifying error handling in the remaining templates
-is left for later.
-
-This series is an internal cleanup only; there are no changes for users
-of the crypto API.  I've tested that all the templates still get
-instantiated correctly and that errors seem to be handled properly.
-
-Changed v1 => v2:
-
-  - Made crypto_grab_cipher() an inline function in order to fix a
-    linkage error reported by the kbuild test robot.
-
-  - Made the error paths use a style 'goto err_free_inst;' rather than
-    'goto out;' in order to be more robust against bugs where an error
-    code accidentally isn't set (which has been a problem in the past).
-
-  - Cleaned up a couple minor things I missed in
-    skcipher_alloc_instance_simple() during the conversion to
-    crypto_cipher_spawn.
-
-Eric Biggers (28):
-  crypto: algapi - make crypto_drop_spawn() a no-op on uninitialized
-    spawns
-  crypto: algapi - make crypto_grab_spawn() handle an ERR_PTR() name
-  crypto: shash - make struct shash_instance be the full size
-  crypto: ahash - make struct ahash_instance be the full size
-  crypto: skcipher - pass instance to crypto_grab_skcipher()
-  crypto: aead - pass instance to crypto_grab_aead()
-  crypto: akcipher - pass instance to crypto_grab_akcipher()
-  crypto: algapi - pass instance to crypto_grab_spawn()
-  crypto: shash - introduce crypto_grab_shash()
-  crypto: ahash - introduce crypto_grab_ahash()
-  crypto: cipher - introduce crypto_cipher_spawn and
-    crypto_grab_cipher()
-  crypto: adiantum - use crypto_grab_{cipher,shash} and simplify error
-    paths
-  crypto: cryptd - use crypto_grab_shash() and simplify error paths
-  crypto: hmac - use crypto_grab_shash() and simplify error paths
-  crypto: authenc - use crypto_grab_ahash() and simplify error paths
-  crypto: authencesn - use crypto_grab_ahash() and simplify error paths
-  crypto: gcm - use crypto_grab_ahash() and simplify error paths
-  crypto: ccm - use crypto_grab_ahash() and simplify error paths
-  crypto: chacha20poly1305 - use crypto_grab_ahash() and simplify error
-    paths
-  crypto: skcipher - use crypto_grab_cipher() and simplify error paths
-  crypto: cbcmac - use crypto_grab_cipher() and simplify error paths
-  crypto: cmac - use crypto_grab_cipher() and simplify error paths
-  crypto: vmac - use crypto_grab_cipher() and simplify error paths
-  crypto: xcbc - use crypto_grab_cipher() and simplify error paths
-  crypto: cipher - make crypto_spawn_cipher() take a crypto_cipher_spawn
-  crypto: algapi - remove obsoleted instance creation helpers
-  crypto: ahash - unexport crypto_ahash_type
-  crypto: algapi - fold crypto_init_spawn() into crypto_grab_spawn()
-
- crypto/adiantum.c                  |  90 ++++++++---------------
- crypto/aead.c                      |   7 +-
- crypto/ahash.c                     |  39 ++++------
- crypto/akcipher.c                  |   7 +-
- crypto/algapi.c                    |  99 +++++--------------------
- crypto/authenc.c                   |  58 +++++----------
- crypto/authencesn.c                |  58 +++++----------
- crypto/ccm.c                       | 111 ++++++++++++-----------------
- crypto/chacha20poly1305.c          |  89 ++++++++---------------
- crypto/cmac.c                      |  35 +++++----
- crypto/cryptd.c                    |  76 ++++++--------------
- crypto/ctr.c                       |   4 +-
- crypto/cts.c                       |   9 +--
- crypto/essiv.c                     |  16 ++---
- crypto/gcm.c                       |  77 ++++++++------------
- crypto/geniv.c                     |   4 +-
- crypto/hmac.c                      |  33 +++++----
- crypto/lrw.c                       |  15 ++--
- crypto/pcrypt.c                    |   5 +-
- crypto/rsa-pkcs1pad.c              |   8 ++-
- crypto/shash.c                     |  28 +++-----
- crypto/skcipher.c                  |  46 +++++-------
- crypto/vmac.c                      |  35 +++++----
- crypto/xcbc.c                      |  40 +++++------
- crypto/xts.c                       |   9 +--
- include/crypto/algapi.h            |  64 ++++++++---------
- include/crypto/internal/aead.h     |  11 +--
- include/crypto/internal/akcipher.h |  12 +---
- include/crypto/internal/hash.h     |  70 +++++++++---------
- include/crypto/internal/skcipher.h |  15 ++--
- 30 files changed, 427 insertions(+), 743 deletions(-)
-
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index 363849983941..4c761f48110d 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -734,6 +734,9 @@ EXPORT_SYMBOL_GPL(crypto_grab_spawn);
+ 
+ void crypto_drop_spawn(struct crypto_spawn *spawn)
+ {
++	if (!spawn->alg) /* not yet initialized? */
++		return;
++
+ 	down_write(&crypto_alg_sem);
+ 	if (!spawn->dead)
+ 		list_del(&spawn->list);
 -- 
 2.24.1
 
