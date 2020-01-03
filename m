@@ -1,130 +1,105 @@
-Return-Path: <SRS0=AlyN=2X=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=TjYB=2Y=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6459CC2D0DD
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Jan 2020 21:14:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAC5DC3276C
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 01:03:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 322D222314
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Jan 2020 21:14:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eyu5H7tt"
+	by mail.kernel.org (Postfix) with ESMTP id 8848C217F4
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 01:03:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726488AbgABVOj (ORCPT
+        id S1726148AbgACBDT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Jan 2020 16:14:39 -0500
-Received: from mail-qk1-f195.google.com ([209.85.222.195]:44516 "EHLO
-        mail-qk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726234AbgABVOj (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Jan 2020 16:14:39 -0500
-Received: by mail-qk1-f195.google.com with SMTP id w127so32334602qkb.11
-        for <linux-crypto@vger.kernel.org>; Thu, 02 Jan 2020 13:14:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=V/OsTfrHJ4dnD2NS1w0Sn8mIRoSC4Lw2ATH8Gyo/s7A=;
-        b=eyu5H7ttZi9tARS8Cnfzkprmox7MLOjyD16A2d2b2d3DmqWGIM+2rPuspcfRX03ERv
-         nFNzaX9FKnsb9QugoWPC69vHQkGUdLRU0uorKMXlBRmMQRfJgoj5zyzOb6s4OmOuUjKK
-         DAm4SwmIu7aHKNcBUyFxqZPj3KuymhHIrQzJIq4i3uwgzAP4zcBmXFInSurFXgI20ryK
-         /TaoiUprQ2Vw7KtaRKEi8LUQF75dSR/bg1SLVwKYc+CtDTFZ+xQiNFn1pyS6/ErfCHMX
-         K0/d2oI70PozVvhSkmRVOxioKabpWGXYpIzgHv+n58tJP3Rniy4iB2CIITZiEjtO0/kf
-         RBzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=V/OsTfrHJ4dnD2NS1w0Sn8mIRoSC4Lw2ATH8Gyo/s7A=;
-        b=XeingvdU5LErNVb+mzjCaaCiX7no7tdzwDizbBVryX4GAjvhbsmUCkytVdjqAA7Ppz
-         D2B0Ky/Y3wfJF0rIG3b9pFqrkZuVRb5B1fmoMtRVV5MI4F+SIJrgD5xMjRHEJ/GPuAS+
-         u5GGjDMk6nU7rjN83HLTSHqYeEva2HoISmgVsoMg0oFs5gpS1vmuGfuX2IdXj4ZHNcGi
-         8fbZLmICpRV+MTub9OF1mBIrq4JNom4Jn1B6myktLf0XLa/M/91cV9I8fFCM2/0uvn2Y
-         bs65brZWZW1M1TTjLwCqTiZfsYnjPnNWXlzDhelkOk+x2cezIJJNPJP7ta1DojVJyhov
-         PDEg==
-X-Gm-Message-State: APjAAAXm90PIVIpfybNHxF2gUWyx2T17zL2VnSJe8El4V3oqabVlp1K7
-        VqAdr6bpe5awsYEMOJ0D5OuQt4jL6/Xg1kMyY1KQVALv
-X-Google-Smtp-Source: APXvYqzKZQF/maQ/u7E/LjcSzAwL1yTgluTQanRyn2kiZKmqKsLmo1zJnJYWInWF3r9zXMIbqaxKtB4B1dKiYpY77c8=
-X-Received: by 2002:a05:620a:16bb:: with SMTP id s27mr71612515qkj.368.1577999678159;
- Thu, 02 Jan 2020 13:14:38 -0800 (PST)
-MIME-Version: 1.0
-References: <20191220190218.28884-1-cotequeiroz@gmail.com> <CAKv+Gu9ZXCK41xOavw+2KEhhsZq9BFH6mxXKPNomzB6q+DP_FQ@mail.gmail.com>
- <CAPxccB2LGANG8DcmF4nwUDOzDzf2RHX4S-4w9z6TcO9csu4xSw@mail.gmail.com>
-In-Reply-To: <CAPxccB2LGANG8DcmF4nwUDOzDzf2RHX4S-4w9z6TcO9csu4xSw@mail.gmail.com>
-From:   Eneas Queiroz <cotequeiroz@gmail.com>
-Date:   Thu, 2 Jan 2020 18:14:12 -0300
-Message-ID: <CAPxccB3atGOCi_Na8-7wceOTjGQ8twZCwzvP9zHuaMDdv6zv9w@mail.gmail.com>
-Subject: Fwd: QCE hw-crypto DMA issues
-To:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Thu, 2 Jan 2020 20:03:19 -0500
+Received: from inva020.nxp.com ([92.121.34.13]:47460 "EHLO inva020.nxp.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727134AbgACBDT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 2 Jan 2020 20:03:19 -0500
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 6107A1A1B0C;
+        Fri,  3 Jan 2020 02:03:12 +0100 (CET)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 543001A1B0B;
+        Fri,  3 Jan 2020 02:03:12 +0100 (CET)
+Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 0416B205C2;
+        Fri,  3 Jan 2020 02:03:11 +0100 (CET)
+From:   Iuliana Prodan <iuliana.prodan@nxp.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-imx <linux-imx@nxp.com>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>
+Subject: [PATCH v2 00/10] crypto: caam - backlogging support
+Date:   Fri,  3 Jan 2020 03:02:43 +0200
+Message-Id: <1578013373-1956-1-git-send-email-iuliana.prodan@nxp.com>
+X-Mailer: git-send-email 2.1.0
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-I'm changing the subject title, as the original series has been merged.
+Integrate crypto_engine framework into CAAM, to make use of
+the engine queue.
+Added support for SKCIPHER, HASH, RSA and AEAD algorithms.
+This is intended to be used for CAAM backlogging support.
+The requests, with backlog flag (e.g. from dm-crypt) will be
+listed into crypto-engine queue and processed by CAAM when free.
 
-On Mon, Dec 23, 2019 at 6:46 AM Ard Biesheuvel
-<ard.biesheuvel@linaro.org> wrote:
->
-> On Fri, 20 Dec 2019 at 20:02, Eneas U de Queiroz <cotequeiroz@gmail.com> wrote:
-> >
-> > I've been trying to make the Qualcomm Crypto Engine work with GCM-mode
-> > AES.  I fixed some bugs, and added an option to build only hashes or
-> > skciphers, as the VPN performance increases if you leave some of that to
-> > the CPU.
-> >
-> > A discussion about this can be found here:
-> > https://github.com/openwrt/openwrt/pull/2518
-> >
-> > I'm using openwrt to test this, and there's no support for kernel 5.x
-> > yet.  So I have backported the recent skcipher updates, and tested this
-> > with 4.19. I don't have the hardware with me, but I have run-tested
-> > everything, working remotely.
-> >
-> > All of the skciphers directly implemented by the driver work.  They pass
-> > the tcrypt tests, and also some tests from userspace using AF_ALG:
-> > https://github.com/cotequeiroz/afalg_tests
-> >
-> > However, I can't get gcm(aes) to work.  When setting the gcm-mode key,
-> > it sets the ctr(aes) key, then encrypt a block of zeroes, and uses that
-> > as the ghash key.  The driver fails to perform that encryption.  I've
-> > dumped the input and output data, and they apparently are not touched by
-> > the QCE.  The IV, which written to a buffer appended to the results sg
-> > list gets updated, but the results themselves are not.  I'm not sure
-> > what goes wrong, if it is a DMA/cache problem, memory alignment, or
-> > whatever.
-> >
->
-> This does sound like a DMA problem. I assume the accelerator is not
-> cache coherent?
->
-> In any case, it is dubious whether the round trip to the accelerator
-> is worth it when encrypting the GHASH key. Just call aes_encrypt()
-> instead, and do it in software.
+While here, I've also made some refactorization.
+Patches #1 - #4 include some refactorizations on caamalg, caamhash
+and caampkc.
+Patches #5, #6 change the return code of caam_jr_enqueue function
+to -EINPROGRESS, in case of success, -ENOSPC in case the CAAM is
+busy, -EIO if it cannot map the caller's descriptor.
+Also, to keep each request information, like backlog flag, a new
+struct is passed as argument to enqueue function.
+Patches #7 - #10 integrate crypto_engine into CAAM, for
+SKCIPHER/AEAD/RSA/HASH algorithms.
 
-ipsec still fails, even if I use software for every single-block
-operation. I can perhaps leave that as an optimization, but it won't
-fix the main issue.
+---
+Changes since V1:
+	- remove helper function - akcipher_request_cast;
+	- remove any references to crypto_async_request,
+	  use specific request type;
+	- remove bypass crypto-engine queue, in case is empty;
+	- update some commit messages;
+	- remove unrelated changes, like whitespaces;
+	- squash some changes from patch #9 to patch #6;
+	- added Reviewed-by.
+---
 
-> > If I take 'be128 hash' out of the 'data' struct, and kzalloc them
-> > separately in crypto_gcm_setkey (crypto/gcm.c), it encrypts the data
-> > just fine--perhaps the payload and the request struct can't be in the
-> > same page?
-> >
->
-> Non-cache coherent DMA involves cache invalidation on inbound data. So
-> if both the device and the CPU write to the same cacheline while the
-> buffer is mapped for DMA from device to memory, one of the updates
-> gets lost.
+Iuliana Prodan (10):
+  crypto: caam - refactor skcipher/aead/gcm/chachapoly {en,de}crypt
+    functions
+  crypto: caam - refactor ahash_done callbacks
+  crypto: caam - refactor ahash_edesc_alloc
+  crypto: caam - refactor RSA private key _done callbacks
+  crypto: caam - change return code in caam_jr_enqueue function
+  crypto: caam - refactor caam_jr_enqueue
+  crypto: caam - support crypto_engine framework for SKCIPHER algorithms
+  crypto: caam - add crypto_engine support for AEAD algorithms
+  crypto: caam - add crypto_engine support for RSA algorithms
+  crypto: caam - add crypto_engine support for HASH algorithms
 
-Can you give me any pointers/examples of how I can make this work?
+ drivers/crypto/caam/Kconfig    |   1 +
+ drivers/crypto/caam/caamalg.c  | 450 +++++++++++++++++++----------------------
+ drivers/crypto/caam/caamhash.c | 357 +++++++++++++++++---------------
+ drivers/crypto/caam/caampkc.c  | 205 ++++++++++++-------
+ drivers/crypto/caam/caampkc.h  |  22 ++
+ drivers/crypto/caam/caamrng.c  |   4 +-
+ drivers/crypto/caam/intern.h   |   3 +
+ drivers/crypto/caam/jr.c       |  37 +++-
+ drivers/crypto/caam/key_gen.c  |   2 +-
+ 9 files changed, 597 insertions(+), 484 deletions(-)
 
-Thanks,
+-- 
+2.1.0
 
-Eneas
