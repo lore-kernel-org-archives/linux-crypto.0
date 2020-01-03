@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDD13C2D0CE
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 04:01:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C255CC32767
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 04:01:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 969A721D7D
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 04:01:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 99BFB21D7D
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 04:01:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1578024095;
-	bh=V3lijhL1CcRJBGzyQYzwYDpjzE+0JY70cR572uthStI=;
+	s=default; t=1578024096;
+	bh=tAi1LDeEgdA1WNWu7/InvNa+PobcDutTXa4U5Xr/HQM=;
 	h=From:To:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=sh8m9Rp2+67CvWq7oXUrUGNyk8tAgXE6TNuksRffV9Bo6x20pGsdAw49V0BqW6ETI
-	 uoiZIiLzzpEZ1SUmCATC1PiwiZYkydx9YAsReOJcbWciSjzV6qt7v7Jt0kXeoqP68m
-	 Le+tdN06J1IFoSBwa2CMpSwXZECs73y7snJWCqbM=
+	b=yBCc/yMSUY5nWNHiHIzb9gaWzDx5gTK7yalmyv/96Wfg0VktYd3owhC74tlafxLz+
+	 NOuXVugVyLCIFhx7DV9PCvKqIlT2ITLYxKmSZXE3wqmv51gDkwCB4wzXpuVI7zRo+v
+	 HR7F8vtKr+Jm7Any8h73fVWn7lpIw0iPPRR0dCZU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727225AbgACEBe (ORCPT
+        id S1727230AbgACEBf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Jan 2020 23:01:34 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33514 "EHLO mail.kernel.org"
+        Thu, 2 Jan 2020 23:01:35 -0500
+Received: from mail.kernel.org ([198.145.29.99]:33626 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727234AbgACEBa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Jan 2020 23:01:30 -0500
+        id S1727200AbgACEB2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 2 Jan 2020 23:01:28 -0500
 Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9868E24672
-        for <linux-crypto@vger.kernel.org>; Fri,  3 Jan 2020 04:01:29 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9E56824125
+        for <linux-crypto@vger.kernel.org>; Fri,  3 Jan 2020 04:01:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1578024089;
-        bh=V3lijhL1CcRJBGzyQYzwYDpjzE+0JY70cR572uthStI=;
+        s=default; t=1578024087;
+        bh=tAi1LDeEgdA1WNWu7/InvNa+PobcDutTXa4U5Xr/HQM=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=AkSdzzljJGMqe396AU8h5zUQH5mWXMkNoSKBpQ9nERkpzsvobex8bBS/zwEHjAbK6
-         IKRkds3PHoCCdf8nu/MZ320LlbmCdNJONn3dknJnIZ+zNxS34BQQihMTfeUToXfQUA
-         mEqRtW3BsIDaZDxEJAWSvlpUujdUfdtcIVOQw9M4=
+        b=G4drM+ywT6/R4Nc8+jEZd3FPDsfVt1tdc+usBObRrvu9rN/jiu7sdtS6ZIdr4pNWE
+         XW1N1uGy3Igz5cUscG9E2fHr8ci8QLo7+MwTKdiqIV7LuG0xr8luXtVxH98B9Z1GWi
+         E1kvLZhpULtTfQ0Y9ZDcayytYwOu9lDHGn0E8DI8=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Subject: [PATCH v2 28/28] crypto: algapi - fold crypto_init_spawn() into crypto_grab_spawn()
-Date:   Thu,  2 Jan 2020 19:59:08 -0800
-Message-Id: <20200103035908.12048-29-ebiggers@kernel.org>
+Subject: [PATCH v2 18/28] crypto: ccm - use crypto_grab_ahash() and simplify error paths
+Date:   Thu,  2 Jan 2020 19:58:58 -0800
+Message-Id: <20200103035908.12048-19-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200103035908.12048-1-ebiggers@kernel.org>
 References: <20200103035908.12048-1-ebiggers@kernel.org>
@@ -56,123 +56,142 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-Now that crypto_init_spawn() is only called by crypto_grab_spawn(),
-simplify things by moving its functionality into crypto_grab_spawn().
+Make the ccm and ccm_base templates use the new function
+crypto_grab_ahash() to initialize their ahash spawn.
 
-In the process of doing this, also be more consistent about when the
-spawn and instance are updated, and remove the crypto_spawn::dropref
-flag since now it's always set.
+This is needed to make all spawns be initialized in a consistent way.
+
+Also simplify the error handling by taking advantage of crypto_drop_*()
+now accepting (as a no-op) spawns that haven't been initialized yet.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/algapi.c         | 43 ++++++++++++++---------------------------
- include/crypto/algapi.h |  3 ---
- 2 files changed, 14 insertions(+), 32 deletions(-)
+ crypto/ccm.c | 61 +++++++++++++++++-----------------------------------
+ 1 file changed, 20 insertions(+), 41 deletions(-)
 
-diff --git a/crypto/algapi.c b/crypto/algapi.c
-index f66a4ff57e6e..72592795c7e7 100644
---- a/crypto/algapi.c
-+++ b/crypto/algapi.c
-@@ -629,8 +629,7 @@ int crypto_register_instance(struct crypto_template *tmpl,
- 		spawn->inst = inst;
- 		spawn->registered = true;
+diff --git a/crypto/ccm.c b/crypto/ccm.c
+index 9c377976581d..48c2b2c565a6 100644
+--- a/crypto/ccm.c
++++ b/crypto/ccm.c
+@@ -15,8 +15,6 @@
+ #include <linux/module.h>
+ #include <linux/slab.h>
  
--		if (spawn->dropref)
--			crypto_mod_put(spawn->alg);
-+		crypto_mod_put(spawn->alg);
- 
- 		spawn = next;
- 	}
-@@ -672,47 +671,33 @@ void crypto_unregister_instance(struct crypto_instance *inst)
- }
- EXPORT_SYMBOL_GPL(crypto_unregister_instance);
- 
--int crypto_init_spawn(struct crypto_spawn *spawn, struct crypto_alg *alg,
--		      struct crypto_instance *inst, u32 mask)
-+int crypto_grab_spawn(struct crypto_spawn *spawn, struct crypto_instance *inst,
-+		      const char *name, u32 type, u32 mask)
- {
-+	struct crypto_alg *alg;
- 	int err = -EAGAIN;
- 
- 	if (WARN_ON_ONCE(inst == NULL))
- 		return -EINVAL;
- 
--	spawn->next = inst->spawns;
--	inst->spawns = spawn;
-+	/* Allow the result of crypto_attr_alg_name() to be passed directly */
-+	if (IS_ERR(name))
-+		return PTR_ERR(name);
- 
--	spawn->mask = mask;
-+	alg = crypto_find_alg(name, spawn->frontend, type, mask);
-+	if (IS_ERR(alg))
-+		return PTR_ERR(alg);
- 
- 	down_write(&crypto_alg_sem);
- 	if (!crypto_is_moribund(alg)) {
- 		list_add(&spawn->list, &alg->cra_users);
- 		spawn->alg = alg;
-+		spawn->mask = mask;
-+		spawn->next = inst->spawns;
-+		inst->spawns = spawn;
- 		err = 0;
- 	}
- 	up_write(&crypto_alg_sem);
+-#include "internal.h"
 -
--	return err;
--}
--EXPORT_SYMBOL_GPL(crypto_init_spawn);
--
--int crypto_grab_spawn(struct crypto_spawn *spawn, struct crypto_instance *inst,
--		      const char *name, u32 type, u32 mask)
--{
--	struct crypto_alg *alg;
--	int err;
--
--	/* Allow the result of crypto_attr_alg_name() to be passed directly */
--	if (IS_ERR(name))
--		return PTR_ERR(name);
--
--	alg = crypto_find_alg(name, spawn->frontend, type, mask);
--	if (IS_ERR(alg))
--		return PTR_ERR(alg);
--
--	spawn->dropref = true;
--	err = crypto_init_spawn(spawn, alg, inst, mask);
- 	if (err)
- 		crypto_mod_put(alg);
- 	return err;
-@@ -729,7 +714,7 @@ void crypto_drop_spawn(struct crypto_spawn *spawn)
- 		list_del(&spawn->list);
- 	up_write(&crypto_alg_sem);
- 
--	if (spawn->dropref && !spawn->registered)
-+	if (!spawn->registered)
- 		crypto_mod_put(spawn->alg);
- }
- EXPORT_SYMBOL_GPL(crypto_drop_spawn);
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index 224c72743cce..c16c50f8dac1 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -82,7 +82,6 @@ struct crypto_spawn {
- 	const struct crypto_type *frontend;
+ struct ccm_instance_ctx {
+ 	struct crypto_skcipher_spawn ctr;
+ 	struct crypto_ahash_spawn mac;
+@@ -459,10 +457,9 @@ static int crypto_ccm_create_common(struct crypto_template *tmpl,
+ 	struct crypto_attr_type *algt;
  	u32 mask;
- 	bool dead;
--	bool dropref;
- 	bool registered;
- };
+ 	struct aead_instance *inst;
++	struct ccm_instance_ctx *ictx;
+ 	struct skcipher_alg *ctr;
+-	struct crypto_alg *mac_alg;
+ 	struct hash_alg_common *mac;
+-	struct ccm_instance_ctx *ictx;
+ 	int err;
  
-@@ -111,8 +110,6 @@ int crypto_register_instance(struct crypto_template *tmpl,
- 			     struct crypto_instance *inst);
- void crypto_unregister_instance(struct crypto_instance *inst);
+ 	algt = crypto_get_attr_type(tb);
+@@ -474,35 +471,26 @@ static int crypto_ccm_create_common(struct crypto_template *tmpl,
  
--int crypto_init_spawn(struct crypto_spawn *spawn, struct crypto_alg *alg,
--		      struct crypto_instance *inst, u32 mask);
- int crypto_grab_spawn(struct crypto_spawn *spawn, struct crypto_instance *inst,
- 		      const char *name, u32 type, u32 mask);
- void crypto_drop_spawn(struct crypto_spawn *spawn);
+ 	mask = crypto_requires_sync(algt->type, algt->mask);
+ 
+-	mac_alg = crypto_find_alg(mac_name, &crypto_ahash_type,
+-				  CRYPTO_ALG_TYPE_HASH,
+-				  CRYPTO_ALG_TYPE_AHASH_MASK |
+-				  CRYPTO_ALG_ASYNC);
+-	if (IS_ERR(mac_alg))
+-		return PTR_ERR(mac_alg);
+-
+-	mac = __crypto_hash_alg_common(mac_alg);
+-	err = -EINVAL;
+-	if (strncmp(mac->base.cra_name, "cbcmac(", 7) != 0 ||
+-	    mac->digestsize != 16)
+-		goto out_put_mac;
+-
+ 	inst = kzalloc(sizeof(*inst) + sizeof(*ictx), GFP_KERNEL);
+-	err = -ENOMEM;
+ 	if (!inst)
+-		goto out_put_mac;
+-
++		return -ENOMEM;
+ 	ictx = aead_instance_ctx(inst);
+-	err = crypto_init_ahash_spawn(&ictx->mac, mac,
+-				      aead_crypto_instance(inst));
++
++	err = crypto_grab_ahash(&ictx->mac, aead_crypto_instance(inst),
++				mac_name, 0, CRYPTO_ALG_ASYNC);
+ 	if (err)
+ 		goto err_free_inst;
++	mac = crypto_spawn_ahash_alg(&ictx->mac);
++
++	err = -EINVAL;
++	if (strncmp(mac->base.cra_name, "cbcmac(", 7) != 0 ||
++	    mac->digestsize != 16)
++		goto err_free_inst;
+ 
+ 	err = crypto_grab_skcipher(&ictx->ctr, aead_crypto_instance(inst),
+ 				   ctr_name, 0, mask);
+ 	if (err)
+-		goto err_drop_mac;
+-
++		goto err_free_inst;
+ 	ctr = crypto_spawn_skcipher_alg(&ictx->ctr);
+ 
+ 	/* The skcipher algorithm must be CTR mode, using 16-byte blocks. */
+@@ -510,21 +498,21 @@ static int crypto_ccm_create_common(struct crypto_template *tmpl,
+ 	if (strncmp(ctr->base.cra_name, "ctr(", 4) != 0 ||
+ 	    crypto_skcipher_alg_ivsize(ctr) != 16 ||
+ 	    ctr->base.cra_blocksize != 1)
+-		goto err_drop_ctr;
++		goto err_free_inst;
+ 
+ 	/* ctr and cbcmac must use the same underlying block cipher. */
+ 	if (strcmp(ctr->base.cra_name + 4, mac->base.cra_name + 7) != 0)
+-		goto err_drop_ctr;
++		goto err_free_inst;
+ 
+ 	err = -ENAMETOOLONG;
+ 	if (snprintf(inst->alg.base.cra_name, CRYPTO_MAX_ALG_NAME,
+ 		     "ccm(%s", ctr->base.cra_name + 4) >= CRYPTO_MAX_ALG_NAME)
+-		goto err_drop_ctr;
++		goto err_free_inst;
+ 
+ 	if (snprintf(inst->alg.base.cra_driver_name, CRYPTO_MAX_ALG_NAME,
+ 		     "ccm_base(%s,%s)", ctr->base.cra_driver_name,
+ 		     mac->base.cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
+-		goto err_drop_ctr;
++		goto err_free_inst;
+ 
+ 	inst->alg.base.cra_flags = ctr->base.cra_flags & CRYPTO_ALG_ASYNC;
+ 	inst->alg.base.cra_priority = (mac->base.cra_priority +
+@@ -546,20 +534,11 @@ static int crypto_ccm_create_common(struct crypto_template *tmpl,
+ 	inst->free = crypto_ccm_free;
+ 
+ 	err = aead_register_instance(tmpl, inst);
+-	if (err)
+-		goto err_drop_ctr;
+-
+-out_put_mac:
+-	crypto_mod_put(mac_alg);
+-	return err;
+-
+-err_drop_ctr:
+-	crypto_drop_skcipher(&ictx->ctr);
+-err_drop_mac:
+-	crypto_drop_ahash(&ictx->mac);
++	if (err) {
+ err_free_inst:
+-	kfree(inst);
+-	goto out_put_mac;
++		crypto_ccm_free(inst);
++	}
++	return err;
+ }
+ 
+ static int crypto_ccm_create(struct crypto_template *tmpl, struct rtattr **tb)
 -- 
 2.24.1
 
