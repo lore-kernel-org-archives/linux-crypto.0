@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1164C33C8C
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 04:01:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85134C33C9A
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 04:01:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C4727222C3
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 04:01:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5C23822314
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 04:01:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1578024096;
-	bh=O6Qi4RtnGdOnfUjv5j2KZA5bGZeV08coTLag13kUOWI=;
+	s=default; t=1578024097;
+	bh=1E5RBDoLVBtABBUS2OP6sJOSfTyOrDAVlQHMJSjNI4Y=;
 	h=From:To:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=RbrxdZRvGWD4TlxHLhb1M65zJk/gifMHTsucO8pQ/ZJzM59QlLXmRUAoIOCY89ATa
-	 UahD4K9f5a2LEIGORwW9wkGbVSINjrJ9orN7Hp0pdecy+i8GLEMTfACoLZCrm2BckA
-	 tGmrLfK7MaxMQt5NK/GET03EDOHheV5ZFYNUB7MI=
+	b=tN8/4cTv1oU2SXtYfHg1YBlfKpecucLWne/9X0d/z5Aq1xAzmwOdhomSCHwOpw6ix
+	 BPoWQgQ0ap7083diRPR9gtoqGdv4vKtWetWQbklziH2LQC49dx5x4suqS5K5Dsvuzv
+	 BUHzgsO2zed7BaluAmxLSjX4gj2ggFng0jG5WRW4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727234AbgACEBf (ORCPT
+        id S1727200AbgACEBf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Thu, 2 Jan 2020 23:01:35 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33642 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:33654 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727230AbgACEBa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Jan 2020 23:01:30 -0500
+        id S1727215AbgACEB2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 2 Jan 2020 23:01:28 -0500
 Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 07AFF2465A
-        for <linux-crypto@vger.kernel.org>; Fri,  3 Jan 2020 04:01:29 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3CBF424653
+        for <linux-crypto@vger.kernel.org>; Fri,  3 Jan 2020 04:01:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1578024089;
-        bh=O6Qi4RtnGdOnfUjv5j2KZA5bGZeV08coTLag13kUOWI=;
+        s=default; t=1578024088;
+        bh=1E5RBDoLVBtABBUS2OP6sJOSfTyOrDAVlQHMJSjNI4Y=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=wTGLLwSCYJHFP1GiQDCVs9dfwdHQoL0PrkNt15sbKuvtBnG9uknF+uFrf24phbcFJ
-         vPvM61SMF2taiXahup1KLmCRhQ3utNsJpITt8N0N70O4kRgwh0loWe6IKgVlmDDmHW
-         hQtub+skyV5tuSWmDJnPHrA8bw/7k5eUWy+en6lo=
+        b=ND8Rss7c5HYp35O/CQSsqis35eqBuhNnZ7NrIwc869LqDZyhLX9rHKkmBCHZkER6a
+         5ac7sTXGV1b7zMV3VSHat/08YXvA1aqgT+V0AYAtiK0C/M8keRBapyoxC+IT+88oM7
+         BI8BtTut92DVsJBr/Frtj29NTDEOPttQ6p/LPYFo=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Subject: [PATCH v2 25/28] crypto: cipher - make crypto_spawn_cipher() take a crypto_cipher_spawn
-Date:   Thu,  2 Jan 2020 19:59:05 -0800
-Message-Id: <20200103035908.12048-26-ebiggers@kernel.org>
+Subject: [PATCH v2 21/28] crypto: cbcmac - use crypto_grab_cipher() and simplify error paths
+Date:   Thu,  2 Jan 2020 19:59:01 -0800
+Message-Id: <20200103035908.12048-22-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200103035908.12048-1-ebiggers@kernel.org>
 References: <20200103035908.12048-1-ebiggers@kernel.org>
@@ -56,119 +56,85 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-Now that all users of single-block cipher spawns have been converted to
-use 'struct crypto_cipher_spawn' rather than the less specifically typed
-'struct crypto_spawn', make crypto_spawn_cipher() take a pointer to a
-'struct crypto_cipher_spawn' rather than a 'struct crypto_spawn'.
+Make the cbcmac template use the new function crypto_grab_cipher() to
+initialize its cipher spawn.
+
+This is needed to make all spawns be initialized in a consistent way.
+
+This required making cbcmac_create() allocate the instance directly
+rather than use shash_alloc_instance().
+
+Also simplify the error handling by taking advantage of crypto_drop_*()
+now accepting (as a no-op) spawns that haven't been initialized yet, and
+by taking advantage of crypto_grab_*() now handling ERR_PTR() names.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/adiantum.c       | 2 +-
- crypto/ccm.c            | 2 +-
- crypto/cmac.c           | 2 +-
- crypto/skcipher.c       | 2 +-
- crypto/vmac.c           | 2 +-
- crypto/xcbc.c           | 2 +-
- include/crypto/algapi.h | 4 ++--
- 7 files changed, 8 insertions(+), 8 deletions(-)
+ crypto/ccm.c | 33 +++++++++++++++------------------
+ 1 file changed, 15 insertions(+), 18 deletions(-)
 
-diff --git a/crypto/adiantum.c b/crypto/adiantum.c
-index 8abaecde1464..3b1fef8b6219 100644
---- a/crypto/adiantum.c
-+++ b/crypto/adiantum.c
-@@ -416,7 +416,7 @@ static int adiantum_init_tfm(struct crypto_skcipher *tfm)
- 	if (IS_ERR(streamcipher))
- 		return PTR_ERR(streamcipher);
- 
--	blockcipher = crypto_spawn_cipher(&ictx->blockcipher_spawn.base);
-+	blockcipher = crypto_spawn_cipher(&ictx->blockcipher_spawn);
- 	if (IS_ERR(blockcipher)) {
- 		err = PTR_ERR(blockcipher);
- 		goto err_free_streamcipher;
 diff --git a/crypto/ccm.c b/crypto/ccm.c
-index 798ae729c77f..c7a887565c51 100644
+index 48c2b2c565a6..798ae729c77f 100644
 --- a/crypto/ccm.c
 +++ b/crypto/ccm.c
-@@ -878,7 +878,7 @@ static int cbcmac_init_tfm(struct crypto_tfm *tfm)
+@@ -899,6 +899,7 @@ static void cbcmac_exit_tfm(struct crypto_tfm *tfm)
+ static int cbcmac_create(struct crypto_template *tmpl, struct rtattr **tb)
  {
- 	struct crypto_cipher *cipher;
- 	struct crypto_instance *inst = (void *)tfm->__crt_alg;
--	struct crypto_spawn *spawn = crypto_instance_ctx(inst);
-+	struct crypto_cipher_spawn *spawn = crypto_instance_ctx(inst);
- 	struct cbcmac_tfm_ctx *ctx = crypto_tfm_ctx(tfm);
+ 	struct shash_instance *inst;
++	struct crypto_cipher_spawn *spawn;
+ 	struct crypto_alg *alg;
+ 	int err;
  
- 	cipher = crypto_spawn_cipher(spawn);
-diff --git a/crypto/cmac.c b/crypto/cmac.c
-index c6bf78b5321a..58dc644416bb 100644
---- a/crypto/cmac.c
-+++ b/crypto/cmac.c
-@@ -201,7 +201,7 @@ static int cmac_init_tfm(struct crypto_tfm *tfm)
- {
- 	struct crypto_cipher *cipher;
- 	struct crypto_instance *inst = (void *)tfm->__crt_alg;
--	struct crypto_spawn *spawn = crypto_instance_ctx(inst);
-+	struct crypto_cipher_spawn *spawn = crypto_instance_ctx(inst);
- 	struct cmac_tfm_ctx *ctx = crypto_tfm_ctx(tfm);
+@@ -906,21 +907,20 @@ static int cbcmac_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	if (err)
+ 		return err;
  
- 	cipher = crypto_spawn_cipher(spawn);
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index 5869ed0ddcad..8c37243307aa 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -902,7 +902,7 @@ static int skcipher_setkey_simple(struct crypto_skcipher *tfm, const u8 *key,
- static int skcipher_init_tfm_simple(struct crypto_skcipher *tfm)
- {
- 	struct skcipher_instance *inst = skcipher_alg_instance(tfm);
--	struct crypto_spawn *spawn = skcipher_instance_ctx(inst);
-+	struct crypto_cipher_spawn *spawn = skcipher_instance_ctx(inst);
- 	struct skcipher_ctx_simple *ctx = crypto_skcipher_ctx(tfm);
- 	struct crypto_cipher *cipher;
+-	alg = crypto_get_attr_alg(tb, CRYPTO_ALG_TYPE_CIPHER,
+-				  CRYPTO_ALG_TYPE_MASK);
+-	if (IS_ERR(alg))
+-		return PTR_ERR(alg);
++	inst = kzalloc(sizeof(*inst) + sizeof(*spawn), GFP_KERNEL);
++	if (!inst)
++		return -ENOMEM;
++	spawn = shash_instance_ctx(inst);
  
-diff --git a/crypto/vmac.c b/crypto/vmac.c
-index 8924f914dc44..3841b6e46081 100644
---- a/crypto/vmac.c
-+++ b/crypto/vmac.c
-@@ -598,7 +598,7 @@ static int vmac_final(struct shash_desc *desc, u8 *out)
- static int vmac_init_tfm(struct crypto_tfm *tfm)
- {
- 	struct crypto_instance *inst = crypto_tfm_alg_instance(tfm);
--	struct crypto_spawn *spawn = crypto_instance_ctx(inst);
-+	struct crypto_cipher_spawn *spawn = crypto_instance_ctx(inst);
- 	struct vmac_tfm_ctx *tctx = crypto_tfm_ctx(tfm);
- 	struct crypto_cipher *cipher;
+-	inst = shash_alloc_instance("cbcmac", alg);
+-	err = PTR_ERR(inst);
+-	if (IS_ERR(inst))
+-		goto out_put_alg;
++	err = crypto_grab_cipher(spawn, shash_crypto_instance(inst),
++				 crypto_attr_alg_name(tb[1]), 0, 0);
++	if (err)
++		goto err_free_inst;
++	alg = crypto_spawn_cipher_alg(spawn);
  
-diff --git a/crypto/xcbc.c b/crypto/xcbc.c
-index 9b97fa511f10..9265e00ea663 100644
---- a/crypto/xcbc.c
-+++ b/crypto/xcbc.c
-@@ -167,7 +167,7 @@ static int xcbc_init_tfm(struct crypto_tfm *tfm)
- {
- 	struct crypto_cipher *cipher;
- 	struct crypto_instance *inst = (void *)tfm->__crt_alg;
--	struct crypto_spawn *spawn = crypto_instance_ctx(inst);
-+	struct crypto_cipher_spawn *spawn = crypto_instance_ctx(inst);
- 	struct xcbc_tfm_ctx *ctx = crypto_tfm_ctx(tfm);
+-	err = crypto_init_spawn(shash_instance_ctx(inst), alg,
+-				shash_crypto_instance(inst),
+-				CRYPTO_ALG_TYPE_MASK);
++	err = crypto_inst_setname(shash_crypto_instance(inst), tmpl->name, alg);
+ 	if (err)
+-		goto out_free_inst;
++		goto err_free_inst;
  
- 	cipher = crypto_spawn_cipher(spawn);
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index 7705387f9459..bbf85a854a42 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -234,12 +234,12 @@ static inline struct crypto_alg *crypto_spawn_cipher_alg(
+ 	inst->alg.base.cra_priority = alg->cra_priority;
+ 	inst->alg.base.cra_blocksize = 1;
+@@ -940,13 +940,10 @@ static int cbcmac_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	inst->alg.setkey = crypto_cbcmac_digest_setkey;
+ 
+ 	err = shash_register_instance(tmpl, inst);
+-
+-out_free_inst:
+-	if (err)
++	if (err) {
++err_free_inst:
+ 		shash_free_instance(shash_crypto_instance(inst));
+-
+-out_put_alg:
+-	crypto_mod_put(alg);
++	}
+ 	return err;
  }
  
- static inline struct crypto_cipher *crypto_spawn_cipher(
--	struct crypto_spawn *spawn)
-+	struct crypto_cipher_spawn *spawn)
- {
- 	u32 type = CRYPTO_ALG_TYPE_CIPHER;
- 	u32 mask = CRYPTO_ALG_TYPE_MASK;
- 
--	return __crypto_cipher_cast(crypto_spawn_tfm(spawn, type, mask));
-+	return __crypto_cipher_cast(crypto_spawn_tfm(&spawn->base, type, mask));
- }
- 
- static inline struct cipher_alg *crypto_cipher_alg(struct crypto_cipher *tfm)
 -- 
 2.24.1
 
