@@ -7,47 +7,48 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85134C33C9A
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 04:01:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 842FCC2D0CE
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 04:01:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5C23822314
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 04:01:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 51B5421D7D
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 04:01:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1578024097;
-	bh=1E5RBDoLVBtABBUS2OP6sJOSfTyOrDAVlQHMJSjNI4Y=;
+	s=default; t=1578024098;
+	bh=VAy7i9KLF+tp4M9JhwoVIwor8TQDhSF7HRM9Xv2hSLM=;
 	h=From:To:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=tN8/4cTv1oU2SXtYfHg1YBlfKpecucLWne/9X0d/z5Aq1xAzmwOdhomSCHwOpw6ix
-	 BPoWQgQ0ap7083diRPR9gtoqGdv4vKtWetWQbklziH2LQC49dx5x4suqS5K5Dsvuzv
-	 BUHzgsO2zed7BaluAmxLSjX4gj2ggFng0jG5WRW4=
+	b=UiZRVgaMY3uBkm2bBs20prpdc6MTbnuQGKF0IIHst5dbF83UfhA6oLJ6SmLNoC+AU
+	 QoEZQNiARdt+cNgGk2q4jlO3YaZNxMrtdbRidGFlgSv70gu76tTNxCB01tmDHyE0hr
+	 AyZ96PU8bBVz3CLtEv0upYXLB4f/0cLy8IznYE2A=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727200AbgACEBf (ORCPT
+        id S1726481AbgACEBh (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Jan 2020 23:01:35 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33654 "EHLO mail.kernel.org"
+        Thu, 2 Jan 2020 23:01:37 -0500
+Received: from mail.kernel.org ([198.145.29.99]:33508 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727215AbgACEB2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Jan 2020 23:01:28 -0500
+        id S1726792AbgACEB1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 2 Jan 2020 23:01:27 -0500
 Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3CBF424653
-        for <linux-crypto@vger.kernel.org>; Fri,  3 Jan 2020 04:01:28 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 73ED822314
+        for <linux-crypto@vger.kernel.org>; Fri,  3 Jan 2020 04:01:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1578024088;
-        bh=1E5RBDoLVBtABBUS2OP6sJOSfTyOrDAVlQHMJSjNI4Y=;
+        s=default; t=1578024086;
+        bh=VAy7i9KLF+tp4M9JhwoVIwor8TQDhSF7HRM9Xv2hSLM=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=ND8Rss7c5HYp35O/CQSsqis35eqBuhNnZ7NrIwc869LqDZyhLX9rHKkmBCHZkER6a
-         5ac7sTXGV1b7zMV3VSHat/08YXvA1aqgT+V0AYAtiK0C/M8keRBapyoxC+IT+88oM7
-         BI8BtTut92DVsJBr/Frtj29NTDEOPttQ6p/LPYFo=
+        b=zlX1uGc0xeCVEKD7Y/Qjbw4bk/Hd2mk9mCIuOKUnHDEKLP1oSgE7JNm/LR7WvmxdO
+         YuEZWdvt9jvcJ5B/j9kU9l9kXR9IDP4/IFj15CVB6+jyqN5B5eNDn1Jrr5P0Oia6gf
+         mXaGl59Etrk6I99+hO6AVKu2LxyPLjKTQvOVCEgI=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Subject: [PATCH v2 21/28] crypto: cbcmac - use crypto_grab_cipher() and simplify error paths
-Date:   Thu,  2 Jan 2020 19:59:01 -0800
-Message-Id: <20200103035908.12048-22-ebiggers@kernel.org>
+Subject: [PATCH v2 12/28] crypto: adiantum - use crypto_grab_{cipher,shash} and simplify error paths
+Date:   Thu,  2 Jan 2020 19:58:52 -0800
+Message-Id: <20200103035908.12048-13-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200103035908.12048-1-ebiggers@kernel.org>
 References: <20200103035908.12048-1-ebiggers@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
@@ -56,13 +57,10 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-Make the cbcmac template use the new function crypto_grab_cipher() to
-initialize its cipher spawn.
+Make the adiantum template use the new functions crypto_grab_cipher()
+and crypto_grab_shash() to initialize its cipher and shash spawns.
 
 This is needed to make all spawns be initialized in a consistent way.
-
-This required making cbcmac_create() allocate the instance directly
-rather than use shash_alloc_instance().
 
 Also simplify the error handling by taking advantage of crypto_drop_*()
 now accepting (as a no-op) spawns that haven't been initialized yet, and
@@ -70,67 +68,182 @@ by taking advantage of crypto_grab_*() now handling ERR_PTR() names.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/ccm.c | 33 +++++++++++++++------------------
- 1 file changed, 15 insertions(+), 18 deletions(-)
+ crypto/adiantum.c | 85 ++++++++++++++---------------------------------
+ 1 file changed, 25 insertions(+), 60 deletions(-)
 
-diff --git a/crypto/ccm.c b/crypto/ccm.c
-index 48c2b2c565a6..798ae729c77f 100644
---- a/crypto/ccm.c
-+++ b/crypto/ccm.c
-@@ -899,6 +899,7 @@ static void cbcmac_exit_tfm(struct crypto_tfm *tfm)
- static int cbcmac_create(struct crypto_template *tmpl, struct rtattr **tb)
+diff --git a/crypto/adiantum.c b/crypto/adiantum.c
+index 9e44180111c8..8abaecde1464 100644
+--- a/crypto/adiantum.c
++++ b/crypto/adiantum.c
+@@ -39,8 +39,6 @@
+ #include <crypto/scatterwalk.h>
+ #include <linux/module.h>
+ 
+-#include "internal.h"
+-
+ /*
+  * Size of right-hand part of input data, in bytes; also the size of the block
+  * cipher's block size and the hash function's output.
+@@ -64,7 +62,7 @@
+ 
+ struct adiantum_instance_ctx {
+ 	struct crypto_skcipher_spawn streamcipher_spawn;
+-	struct crypto_spawn blockcipher_spawn;
++	struct crypto_cipher_spawn blockcipher_spawn;
+ 	struct crypto_shash_spawn hash_spawn;
+ };
+ 
+@@ -418,7 +416,7 @@ static int adiantum_init_tfm(struct crypto_skcipher *tfm)
+ 	if (IS_ERR(streamcipher))
+ 		return PTR_ERR(streamcipher);
+ 
+-	blockcipher = crypto_spawn_cipher(&ictx->blockcipher_spawn);
++	blockcipher = crypto_spawn_cipher(&ictx->blockcipher_spawn.base);
+ 	if (IS_ERR(blockcipher)) {
+ 		err = PTR_ERR(blockcipher);
+ 		goto err_free_streamcipher;
+@@ -469,7 +467,7 @@ static void adiantum_free_instance(struct skcipher_instance *inst)
+ 	struct adiantum_instance_ctx *ictx = skcipher_instance_ctx(inst);
+ 
+ 	crypto_drop_skcipher(&ictx->streamcipher_spawn);
+-	crypto_drop_spawn(&ictx->blockcipher_spawn);
++	crypto_drop_cipher(&ictx->blockcipher_spawn);
+ 	crypto_drop_shash(&ictx->hash_spawn);
+ 	kfree(inst);
+ }
+@@ -502,14 +500,11 @@ static int adiantum_create(struct crypto_template *tmpl, struct rtattr **tb)
  {
- 	struct shash_instance *inst;
-+	struct crypto_cipher_spawn *spawn;
- 	struct crypto_alg *alg;
+ 	struct crypto_attr_type *algt;
+ 	u32 mask;
+-	const char *streamcipher_name;
+-	const char *blockcipher_name;
+ 	const char *nhpoly1305_name;
+ 	struct skcipher_instance *inst;
+ 	struct adiantum_instance_ctx *ictx;
+ 	struct skcipher_alg *streamcipher_alg;
+ 	struct crypto_alg *blockcipher_alg;
+-	struct crypto_alg *_hash_alg;
+ 	struct shash_alg *hash_alg;
  	int err;
  
-@@ -906,21 +907,20 @@ static int cbcmac_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	if (err)
- 		return err;
+@@ -522,20 +517,6 @@ static int adiantum_create(struct crypto_template *tmpl, struct rtattr **tb)
  
--	alg = crypto_get_attr_alg(tb, CRYPTO_ALG_TYPE_CIPHER,
--				  CRYPTO_ALG_TYPE_MASK);
--	if (IS_ERR(alg))
--		return PTR_ERR(alg);
-+	inst = kzalloc(sizeof(*inst) + sizeof(*spawn), GFP_KERNEL);
-+	if (!inst)
-+		return -ENOMEM;
-+	spawn = shash_instance_ctx(inst);
+ 	mask = crypto_requires_sync(algt->type, algt->mask);
  
--	inst = shash_alloc_instance("cbcmac", alg);
--	err = PTR_ERR(inst);
--	if (IS_ERR(inst))
--		goto out_put_alg;
-+	err = crypto_grab_cipher(spawn, shash_crypto_instance(inst),
-+				 crypto_attr_alg_name(tb[1]), 0, 0);
-+	if (err)
-+		goto err_free_inst;
-+	alg = crypto_spawn_cipher_alg(spawn);
- 
--	err = crypto_init_spawn(shash_instance_ctx(inst), alg,
--				shash_crypto_instance(inst),
--				CRYPTO_ALG_TYPE_MASK);
-+	err = crypto_inst_setname(shash_crypto_instance(inst), tmpl->name, alg);
+-	streamcipher_name = crypto_attr_alg_name(tb[1]);
+-	if (IS_ERR(streamcipher_name))
+-		return PTR_ERR(streamcipher_name);
+-
+-	blockcipher_name = crypto_attr_alg_name(tb[2]);
+-	if (IS_ERR(blockcipher_name))
+-		return PTR_ERR(blockcipher_name);
+-
+-	nhpoly1305_name = crypto_attr_alg_name(tb[3]);
+-	if (nhpoly1305_name == ERR_PTR(-ENOENT))
+-		nhpoly1305_name = "nhpoly1305";
+-	if (IS_ERR(nhpoly1305_name))
+-		return PTR_ERR(nhpoly1305_name);
+-
+ 	inst = kzalloc(sizeof(*inst) + sizeof(*ictx), GFP_KERNEL);
+ 	if (!inst)
+ 		return -ENOMEM;
+@@ -544,33 +525,29 @@ static int adiantum_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	/* Stream cipher, e.g. "xchacha12" */
+ 	err = crypto_grab_skcipher(&ictx->streamcipher_spawn,
+ 				   skcipher_crypto_instance(inst),
+-				   streamcipher_name, 0, mask);
++				   crypto_attr_alg_name(tb[1]), 0, mask);
  	if (err)
 -		goto out_free_inst;
 +		goto err_free_inst;
+ 	streamcipher_alg = crypto_spawn_skcipher_alg(&ictx->streamcipher_spawn);
  
- 	inst->alg.base.cra_priority = alg->cra_priority;
- 	inst->alg.base.cra_blocksize = 1;
-@@ -940,13 +940,10 @@ static int cbcmac_create(struct crypto_template *tmpl, struct rtattr **tb)
- 	inst->alg.setkey = crypto_cbcmac_digest_setkey;
+ 	/* Block cipher, e.g. "aes" */
+-	err = crypto_grab_spawn(&ictx->blockcipher_spawn,
+-				skcipher_crypto_instance(inst),
+-				blockcipher_name,
+-				CRYPTO_ALG_TYPE_CIPHER, CRYPTO_ALG_TYPE_MASK);
++	err = crypto_grab_cipher(&ictx->blockcipher_spawn,
++				 skcipher_crypto_instance(inst),
++				 crypto_attr_alg_name(tb[2]), 0, mask);
+ 	if (err)
+-		goto out_drop_streamcipher;
+-	blockcipher_alg = ictx->blockcipher_spawn.alg;
++		goto err_free_inst;
++	blockcipher_alg = crypto_spawn_cipher_alg(&ictx->blockcipher_spawn);
  
- 	err = shash_register_instance(tmpl, inst);
--
--out_free_inst:
+ 	/* NHPoly1305 ε-∆U hash function */
+-	_hash_alg = crypto_alg_mod_lookup(nhpoly1305_name,
+-					  CRYPTO_ALG_TYPE_SHASH,
+-					  CRYPTO_ALG_TYPE_MASK);
+-	if (IS_ERR(_hash_alg)) {
+-		err = PTR_ERR(_hash_alg);
+-		goto out_drop_blockcipher;
+-	}
+-	hash_alg = __crypto_shash_alg(_hash_alg);
+-	err = crypto_init_shash_spawn(&ictx->hash_spawn, hash_alg,
+-				      skcipher_crypto_instance(inst));
++	nhpoly1305_name = crypto_attr_alg_name(tb[3]);
++	if (nhpoly1305_name == ERR_PTR(-ENOENT))
++		nhpoly1305_name = "nhpoly1305";
++	err = crypto_grab_shash(&ictx->hash_spawn,
++				skcipher_crypto_instance(inst),
++				nhpoly1305_name, 0, mask);
+ 	if (err)
+-		goto out_put_hash;
++		goto err_free_inst;
++	hash_alg = crypto_spawn_shash_alg(&ictx->hash_spawn);
+ 
+ 	/* Check the set of algorithms */
+ 	if (!adiantum_supported_algorithms(streamcipher_alg, blockcipher_alg,
+@@ -579,7 +556,7 @@ static int adiantum_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 			streamcipher_alg->base.cra_name,
+ 			blockcipher_alg->cra_name, hash_alg->base.cra_name);
+ 		err = -EINVAL;
+-		goto out_drop_hash;
++		goto err_free_inst;
+ 	}
+ 
+ 	/* Instance fields */
+@@ -588,13 +565,13 @@ static int adiantum_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	if (snprintf(inst->alg.base.cra_name, CRYPTO_MAX_ALG_NAME,
+ 		     "adiantum(%s,%s)", streamcipher_alg->base.cra_name,
+ 		     blockcipher_alg->cra_name) >= CRYPTO_MAX_ALG_NAME)
+-		goto out_drop_hash;
++		goto err_free_inst;
+ 	if (snprintf(inst->alg.base.cra_driver_name, CRYPTO_MAX_ALG_NAME,
+ 		     "adiantum(%s,%s,%s)",
+ 		     streamcipher_alg->base.cra_driver_name,
+ 		     blockcipher_alg->cra_driver_name,
+ 		     hash_alg->base.cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
+-		goto out_drop_hash;
++		goto err_free_inst;
+ 
+ 	inst->alg.base.cra_flags = streamcipher_alg->base.cra_flags &
+ 				   CRYPTO_ALG_ASYNC;
+@@ -624,22 +601,10 @@ static int adiantum_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	inst->free = adiantum_free_instance;
+ 
+ 	err = skcipher_register_instance(tmpl, inst);
 -	if (err)
+-		goto out_drop_hash;
+-
+-	crypto_mod_put(_hash_alg);
+-	return 0;
+-
+-out_drop_hash:
+-	crypto_drop_shash(&ictx->hash_spawn);
+-out_put_hash:
+-	crypto_mod_put(_hash_alg);
+-out_drop_blockcipher:
+-	crypto_drop_spawn(&ictx->blockcipher_spawn);
+-out_drop_streamcipher:
+-	crypto_drop_skcipher(&ictx->streamcipher_spawn);
+-out_free_inst:
+-	kfree(inst);
 +	if (err) {
 +err_free_inst:
- 		shash_free_instance(shash_crypto_instance(inst));
--
--out_put_alg:
--	crypto_mod_put(alg);
++		adiantum_free_instance(inst);
 +	}
  	return err;
  }
