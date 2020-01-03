@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35E91C2D0CE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4FA9C32767
 	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 04:01:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 00F0F21D7D
+	by mail.kernel.org (Postfix) with ESMTP id 8D1AD21D7D
 	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 04:01:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=default; t=1578024091;
-	bh=ZWZKRU2mBzIREo72I47XbqSuNNF67PNQUGEaj77DA3Q=;
+	bh=VJsUI3nZQBs1+NtInId6C4UnPbvxMWpEAX+GXI/7fVw=;
 	h=From:To:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=t4IRyMltDiqOHYSIgVm+/Ye+6LOXTWp/FD/ztfIm5SDmT3ZgvQN37vxnTi21G2N4M
-	 oWPtYhUvgwgpzpIIoQ1DeT+7s0rm/2q1+Vtke8JevYUzwnxZYqSwjutK0KWIXgHSV6
-	 wjiGLL38HCJFVleWZBy44GVOkQrQ2sjrN1N5ty4g=
+	b=KcJ+kjupJc4MKkjeK4yRuCzrEJy61+Y/Kv3KWnTyxjynxi7KeBE2f5cnrWl7WTZNM
+	 kQkAeK+gYWvpTBmkRxVhAklRnzYQIZjhmSoZ1zUmSiKIUFhOERKoMVLFD+sZeU1vFl
+	 Fy/s9UmtB/2/SyxFioNnfr+xbqQODR7emZo/o9n8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727253AbgACEBa (ORCPT
+        id S1727210AbgACEBa (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Thu, 2 Jan 2020 23:01:30 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33642 "EHLO mail.kernel.org"
+Received: from mail.kernel.org ([198.145.29.99]:33558 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727213AbgACEB3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Jan 2020 23:01:29 -0500
+        id S1727186AbgACEB2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 2 Jan 2020 23:01:28 -0500
 Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0D6362464E
-        for <linux-crypto@vger.kernel.org>; Fri,  3 Jan 2020 04:01:28 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 3FB9B227BF
+        for <linux-crypto@vger.kernel.org>; Fri,  3 Jan 2020 04:01:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1578024088;
-        bh=ZWZKRU2mBzIREo72I47XbqSuNNF67PNQUGEaj77DA3Q=;
+        s=default; t=1578024087;
+        bh=VJsUI3nZQBs1+NtInId6C4UnPbvxMWpEAX+GXI/7fVw=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=0auWb3dE2dmepdXhKxCWAJrP56Qv+1rB5JTBeZH2/dO3Sehcj+g+lO+SBN+dd2RUi
-         lxjNGS8kwtAbwNi2dDtRmB6JUlapZ2av6bvpvAWOYaRuIPxP41xhX0AiMODFrTXoI5
-         gm7f00CffbSNY/upQN+CE829rLqXwqQcJ9m65R5Q=
+        b=psxp+Wv4eZ8vgXKqcEf3LNGh4fR4GeARw7aF83SnyVDYq0GVzpS27BHJ++p6phqnC
+         oZPIpk8h/0HzlfOliyMUILRExCnMscgWlKlJTN5+WItGNGCqLlr2gc1tkmXR4lGHaV
+         Lv09nwk81wKIaLz2VrjpmhiqYxPd0hsPRa3W/CgA=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Subject: [PATCH v2 20/28] crypto: skcipher - use crypto_grab_cipher() and simplify error paths
-Date:   Thu,  2 Jan 2020 19:59:00 -0800
-Message-Id: <20200103035908.12048-21-ebiggers@kernel.org>
+Subject: [PATCH v2 16/28] crypto: authencesn - use crypto_grab_ahash() and simplify error paths
+Date:   Thu,  2 Jan 2020 19:58:56 -0800
+Message-Id: <20200103035908.12048-17-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200103035908.12048-1-ebiggers@kernel.org>
 References: <20200103035908.12048-1-ebiggers@kernel.org>
@@ -56,8 +56,8 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-Make skcipher_alloc_instance_simple() use the new function
-crypto_grab_cipher() to initialize its cipher spawn.
+Make the authencesn template use the new function crypto_grab_ahash() to
+initialize its ahash spawn.
 
 This is needed to make all spawns be initialized in a consistent way.
 
@@ -67,107 +67,109 @@ by taking advantage of crypto_grab_*() now handling ERR_PTR() names.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/skcipher.c                  | 39 ++++++++++++------------------
- include/crypto/internal/skcipher.h |  4 +--
- 2 files changed, 17 insertions(+), 26 deletions(-)
+ crypto/authencesn.c | 52 ++++++++++++---------------------------------
+ 1 file changed, 14 insertions(+), 38 deletions(-)
 
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index a9418a7e80a9..5869ed0ddcad 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -923,7 +923,7 @@ static void skcipher_exit_tfm_simple(struct crypto_skcipher *tfm)
- 
- static void skcipher_free_instance_simple(struct skcipher_instance *inst)
- {
--	crypto_drop_spawn(skcipher_instance_ctx(inst));
-+	crypto_drop_cipher(skcipher_instance_ctx(inst));
- 	kfree(inst);
- }
- 
-@@ -947,10 +947,10 @@ struct skcipher_instance *skcipher_alloc_instance_simple(
- 	struct crypto_template *tmpl, struct rtattr **tb)
- {
+diff --git a/crypto/authencesn.c b/crypto/authencesn.c
+index 48582c3741dc..030cbcd2fe39 100644
+--- a/crypto/authencesn.c
++++ b/crypto/authencesn.c
+@@ -403,11 +403,10 @@ static int crypto_authenc_esn_create(struct crypto_template *tmpl,
  	struct crypto_attr_type *algt;
--	struct crypto_alg *cipher_alg;
--	struct skcipher_instance *inst;
--	struct crypto_spawn *spawn;
  	u32 mask;
-+	struct skcipher_instance *inst;
-+	struct crypto_cipher_spawn *spawn;
-+	struct crypto_alg *cipher_alg;
+ 	struct aead_instance *inst;
++	struct authenc_esn_instance_ctx *ctx;
+ 	struct hash_alg_common *auth;
+ 	struct crypto_alg *auth_base;
+ 	struct skcipher_alg *enc;
+-	struct authenc_esn_instance_ctx *ctx;
+-	const char *enc_name;
  	int err;
  
  	algt = crypto_get_attr_type(tb);
-@@ -960,32 +960,25 @@ struct skcipher_instance *skcipher_alloc_instance_simple(
- 	if ((algt->type ^ CRYPTO_ALG_TYPE_SKCIPHER) & algt->mask)
- 		return ERR_PTR(-EINVAL);
+@@ -419,47 +418,34 @@ static int crypto_authenc_esn_create(struct crypto_template *tmpl,
  
--	mask = CRYPTO_ALG_TYPE_MASK |
--		crypto_requires_off(algt->type, algt->mask,
--				    CRYPTO_ALG_NEED_FALLBACK);
+ 	mask = crypto_requires_sync(algt->type, algt->mask);
+ 
+-	auth = ahash_attr_alg(tb[1], CRYPTO_ALG_TYPE_HASH,
+-			      CRYPTO_ALG_TYPE_AHASH_MASK | mask);
+-	if (IS_ERR(auth))
+-		return PTR_ERR(auth);
 -
--	cipher_alg = crypto_get_attr_alg(tb, CRYPTO_ALG_TYPE_CIPHER, mask);
--	if (IS_ERR(cipher_alg))
--		return ERR_CAST(cipher_alg);
-+	mask = crypto_requires_off(algt->type, algt->mask,
-+				   CRYPTO_ALG_NEED_FALLBACK);
+-	auth_base = &auth->base;
+-
+-	enc_name = crypto_attr_alg_name(tb[2]);
+-	err = PTR_ERR(enc_name);
+-	if (IS_ERR(enc_name))
+-		goto out_put_auth;
+-
+ 	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
+-	err = -ENOMEM;
+ 	if (!inst)
+-		goto out_put_auth;
+-
++		return -ENOMEM;
+ 	ctx = aead_instance_ctx(inst);
  
- 	inst = kzalloc(sizeof(*inst) + sizeof(*spawn), GFP_KERNEL);
--	if (!inst) {
--		err = -ENOMEM;
--		goto err_put_cipher_alg;
--	}
-+	if (!inst)
-+		return ERR_PTR(-ENOMEM);
- 	spawn = skcipher_instance_ctx(inst);
- 
--	err = crypto_inst_setname(skcipher_crypto_instance(inst), tmpl->name,
--				  cipher_alg);
-+	err = crypto_grab_cipher(spawn, skcipher_crypto_instance(inst),
-+				 crypto_attr_alg_name(tb[1]), 0, mask);
+-	err = crypto_init_ahash_spawn(&ctx->auth, auth,
+-				      aead_crypto_instance(inst));
++	err = crypto_grab_ahash(&ctx->auth, aead_crypto_instance(inst),
++				crypto_attr_alg_name(tb[1]), 0, mask);
  	if (err)
  		goto err_free_inst;
-+	cipher_alg = crypto_spawn_cipher_alg(spawn);
++	auth = crypto_spawn_ahash_alg(&ctx->auth);
++	auth_base = &auth->base;
  
--	spawn->dropref = true;
--	err = crypto_init_spawn(spawn, cipher_alg,
--				skcipher_crypto_instance(inst),
--				CRYPTO_ALG_TYPE_MASK);
-+	err = crypto_inst_setname(skcipher_crypto_instance(inst), tmpl->name,
-+				  cipher_alg);
+ 	err = crypto_grab_skcipher(&ctx->enc, aead_crypto_instance(inst),
+-				   enc_name, 0, mask);
++				   crypto_attr_alg_name(tb[2]), 0, mask);
  	if (err)
- 		goto err_free_inst;
-+
- 	inst->free = skcipher_free_instance_simple;
+-		goto err_drop_auth;
+-
++		goto err_free_inst;
+ 	enc = crypto_spawn_skcipher_alg(&ctx->enc);
  
- 	/* Default algorithm properties, can be overridden */
-@@ -1005,9 +998,7 @@ struct skcipher_instance *skcipher_alloc_instance_simple(
- 	return inst;
+ 	err = -ENAMETOOLONG;
+ 	if (snprintf(inst->alg.base.cra_name, CRYPTO_MAX_ALG_NAME,
+ 		     "authencesn(%s,%s)", auth_base->cra_name,
+ 		     enc->base.cra_name) >= CRYPTO_MAX_ALG_NAME)
+-		goto err_drop_enc;
++		goto err_free_inst;
  
+ 	if (snprintf(inst->alg.base.cra_driver_name, CRYPTO_MAX_ALG_NAME,
+ 		     "authencesn(%s,%s)", auth_base->cra_driver_name,
+ 		     enc->base.cra_driver_name) >= CRYPTO_MAX_ALG_NAME)
+-		goto err_drop_enc;
++		goto err_free_inst;
+ 
+ 	inst->alg.base.cra_flags = (auth_base->cra_flags |
+ 				    enc->base.cra_flags) & CRYPTO_ALG_ASYNC;
+@@ -485,21 +471,11 @@ static int crypto_authenc_esn_create(struct crypto_template *tmpl,
+ 	inst->free = crypto_authenc_esn_free,
+ 
+ 	err = aead_register_instance(tmpl, inst);
+-	if (err)
+-		goto err_drop_enc;
+-
+-out:
+-	crypto_mod_put(auth_base);
+-	return err;
+-
+-err_drop_enc:
+-	crypto_drop_skcipher(&ctx->enc);
+-err_drop_auth:
+-	crypto_drop_ahash(&ctx->auth);
++	if (err) {
  err_free_inst:
 -	kfree(inst);
--err_put_cipher_alg:
--	crypto_mod_put(cipher_alg);
-+	skcipher_free_instance_simple(inst);
- 	return ERR_PTR(err);
- }
- EXPORT_SYMBOL_GPL(skcipher_alloc_instance_simple);
-diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
-index b81cb4902abc..d46517275b3c 100644
---- a/include/crypto/internal/skcipher.h
-+++ b/include/crypto/internal/skcipher.h
-@@ -216,9 +216,9 @@ struct skcipher_instance *skcipher_alloc_instance_simple(
- static inline struct crypto_alg *skcipher_ialg_simple(
- 	struct skcipher_instance *inst)
- {
--	struct crypto_spawn *spawn = skcipher_instance_ctx(inst);
-+	struct crypto_cipher_spawn *spawn = skcipher_instance_ctx(inst);
- 
--	return spawn->alg;
-+	return crypto_spawn_cipher_alg(spawn);
+-out_put_auth:
+-	goto out;
++		crypto_authenc_esn_free(inst);
++	}
++	return err;
  }
  
- #endif	/* _CRYPTO_INTERNAL_SKCIPHER_H */
+ static struct crypto_template crypto_authenc_esn_tmpl = {
 -- 
 2.24.1
 
