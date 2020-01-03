@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C53F1C33C9A
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 04:01:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 595A3C33C9B
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 04:01:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9B1BF24654
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 04:01:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2B46024650
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 04:01:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1578024088;
-	bh=D6Bu9h7hmOJg0m8gd7GKpA4ERivZRyr1Jj0yFjm1CGk=;
+	s=default; t=1578024089;
+	bh=T3wXyJUd3JddE1g429EumTNn10IDMcTcuSRCr0rOByY=;
 	h=From:To:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=g1qvZsnxe7Slrl/sbsGj/DPDH2IX/L67PiVPenHjjNeGhQsZdV9mh2pNtL7fa44vl
-	 QFJODreG4XH4Jm/u3sNAlabv1+ka9CcQoFjW4LyAlzdzVzlAcoKjiUvwPdRDcaC7VD
-	 Wbx1D5KkaVBie1qblrEGRTjfL5D6bfURWeS7kYbA=
+	b=NXuCsr8HQkkY9jwmjnPyUOKG8/hPHu134OrT6lagx58kVkpLoHrF4re7Y0Q+ggEow
+	 xXQXJGmlfSQROUJb+y2Gt2VDglixV1vgKRzLFiFtWyRvGkjo7HLHk0ld2mG6mqi/29
+	 Xt2zenE1uSY5WtGCLwl0zhzy1cZ1YtOfrwO0TBHw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727134AbgACEB1 (ORCPT
+        id S1727220AbgACEB2 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Jan 2020 23:01:27 -0500
-Received: from mail.kernel.org ([198.145.29.99]:33528 "EHLO mail.kernel.org"
+        Thu, 2 Jan 2020 23:01:28 -0500
+Received: from mail.kernel.org ([198.145.29.99]:33554 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727145AbgACEB0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1726292AbgACEB0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 2 Jan 2020 23:01:26 -0500
 Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 41FE622B48
-        for <linux-crypto@vger.kernel.org>; Fri,  3 Jan 2020 04:01:26 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id A78352253D
+        for <linux-crypto@vger.kernel.org>; Fri,  3 Jan 2020 04:01:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1578024086;
-        bh=D6Bu9h7hmOJg0m8gd7GKpA4ERivZRyr1Jj0yFjm1CGk=;
+        s=default; t=1578024085;
+        bh=T3wXyJUd3JddE1g429EumTNn10IDMcTcuSRCr0rOByY=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=1le0w7VA4CFDfOy2vUn8Yb2r6RU8MXipybYBGDVVQRS4io4Fhj5ejVIDACF3JPaTk
-         fTLSEAysJCwhkh8R8H211BmNTHZ0Gb7r9wE0Lhq3jLBZ9vxzAfBoFRmGLbVUummFL4
-         DV/15oAkgPiOOGXj5whcePuQ3LVAjiR8T4YygIf8=
+        b=GZpeq/DJYh4gMX/n3j4X5P3+/crzElntoeY4269uBsC1wuQ8TQBarblwUzWVi4sPM
+         kE8CZgFO+evP0S7euOSASUhOx2Yp+DnwXsIo0d5F/O7hJyEWlKuijVrv0HRwiu/yDw
+         bQuT+kjDbjviiOP9vQbEk64pUxMhqew8uWHIJvkU=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Subject: [PATCH v2 11/28] crypto: cipher - introduce crypto_cipher_spawn and crypto_grab_cipher()
-Date:   Thu,  2 Jan 2020 19:58:51 -0800
-Message-Id: <20200103035908.12048-12-ebiggers@kernel.org>
+Subject: [PATCH v2 08/28] crypto: algapi - pass instance to crypto_grab_spawn()
+Date:   Thu,  2 Jan 2020 19:58:48 -0800
+Message-Id: <20200103035908.12048-9-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200103035908.12048-1-ebiggers@kernel.org>
 References: <20200103035908.12048-1-ebiggers@kernel.org>
@@ -56,71 +56,137 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-Currently, "cipher" (single-block cipher) spawns are usually initialized
-by using crypto_get_attr_alg() to look up the algorithm, then calling
-crypto_init_spawn().  In one case, crypto_grab_spawn() is used directly.
+Currently, crypto_spawn::inst is first used temporarily to pass the
+instance to crypto_grab_spawn().  Then crypto_init_spawn() overwrites it
+with crypto_spawn::next, which shares the same union.  Finally,
+crypto_spawn::inst is set again when the instance is registered.
 
-The former way is different from how skcipher, aead, and akcipher spawns
-are initialized (they use crypto_grab_*()), and for no good reason.
-This difference introduces unnecessary complexity.
-
-The crypto_grab_*() functions used to have some problems, like not
-holding a reference to the algorithm and requiring the caller to
-initialize spawn->base.inst.  But those problems are fixed now.
-
-Also, the cipher spawns are not strongly typed; e.g., the API requires
-that the user manually specify the flags CRYPTO_ALG_TYPE_CIPHER and
-CRYPTO_ALG_TYPE_MASK.  Though the "cipher" algorithm type itself isn't
-yet strongly typed, we can start by making the spawns strongly typed.
-
-So, let's introduce a new 'struct crypto_cipher_spawn', and functions
-crypto_grab_cipher() and crypto_drop_cipher() to grab and drop them.
-
-Later patches will convert all cipher spawns to use these, then make
-crypto_spawn_cipher() take 'struct crypto_cipher_spawn' as well, instead
-of a bare 'struct crypto_spawn' as it currently does.
+Make this less convoluted by just passing the instance as an argument to
+crypto_grab_spawn() instead.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- include/crypto/algapi.h | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ crypto/adiantum.c       |  6 +++---
+ crypto/aead.c           |  3 +--
+ crypto/akcipher.c       |  3 +--
+ crypto/algapi.c         |  6 +++---
+ crypto/skcipher.c       |  3 +--
+ include/crypto/algapi.h | 10 ++--------
+ 6 files changed, 11 insertions(+), 20 deletions(-)
 
+diff --git a/crypto/adiantum.c b/crypto/adiantum.c
+index aaf8a66f871c..9e44180111c8 100644
+--- a/crypto/adiantum.c
++++ b/crypto/adiantum.c
+@@ -550,9 +550,9 @@ static int adiantum_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	streamcipher_alg = crypto_spawn_skcipher_alg(&ictx->streamcipher_spawn);
+ 
+ 	/* Block cipher, e.g. "aes" */
+-	crypto_set_spawn(&ictx->blockcipher_spawn,
+-			 skcipher_crypto_instance(inst));
+-	err = crypto_grab_spawn(&ictx->blockcipher_spawn, blockcipher_name,
++	err = crypto_grab_spawn(&ictx->blockcipher_spawn,
++				skcipher_crypto_instance(inst),
++				blockcipher_name,
+ 				CRYPTO_ALG_TYPE_CIPHER, CRYPTO_ALG_TYPE_MASK);
+ 	if (err)
+ 		goto out_drop_streamcipher;
+diff --git a/crypto/aead.c b/crypto/aead.c
+index c7135e00b8ea..02a0db076d7e 100644
+--- a/crypto/aead.c
++++ b/crypto/aead.c
+@@ -211,9 +211,8 @@ int crypto_grab_aead(struct crypto_aead_spawn *spawn,
+ 		     struct crypto_instance *inst,
+ 		     const char *name, u32 type, u32 mask)
+ {
+-	spawn->base.inst = inst;
+ 	spawn->base.frontend = &crypto_aead_type;
+-	return crypto_grab_spawn(&spawn->base, name, type, mask);
++	return crypto_grab_spawn(&spawn->base, inst, name, type, mask);
+ }
+ EXPORT_SYMBOL_GPL(crypto_grab_aead);
+ 
+diff --git a/crypto/akcipher.c b/crypto/akcipher.c
+index 84ccf9b02bbe..eeed6c151d2f 100644
+--- a/crypto/akcipher.c
++++ b/crypto/akcipher.c
+@@ -94,9 +94,8 @@ int crypto_grab_akcipher(struct crypto_akcipher_spawn *spawn,
+ 			 struct crypto_instance *inst,
+ 			 const char *name, u32 type, u32 mask)
+ {
+-	spawn->base.inst = inst;
+ 	spawn->base.frontend = &crypto_akcipher_type;
+-	return crypto_grab_spawn(&spawn->base, name, type, mask);
++	return crypto_grab_spawn(&spawn->base, inst, name, type, mask);
+ }
+ EXPORT_SYMBOL_GPL(crypto_grab_akcipher);
+ 
+diff --git a/crypto/algapi.c b/crypto/algapi.c
+index a5223c5f2275..a25ce02918f8 100644
+--- a/crypto/algapi.c
++++ b/crypto/algapi.c
+@@ -714,8 +714,8 @@ int crypto_init_spawn2(struct crypto_spawn *spawn, struct crypto_alg *alg,
+ }
+ EXPORT_SYMBOL_GPL(crypto_init_spawn2);
+ 
+-int crypto_grab_spawn(struct crypto_spawn *spawn, const char *name,
+-		      u32 type, u32 mask)
++int crypto_grab_spawn(struct crypto_spawn *spawn, struct crypto_instance *inst,
++		      const char *name, u32 type, u32 mask)
+ {
+ 	struct crypto_alg *alg;
+ 	int err;
+@@ -729,7 +729,7 @@ int crypto_grab_spawn(struct crypto_spawn *spawn, const char *name,
+ 		return PTR_ERR(alg);
+ 
+ 	spawn->dropref = true;
+-	err = crypto_init_spawn(spawn, alg, spawn->inst, mask);
++	err = crypto_init_spawn(spawn, alg, inst, mask);
+ 	if (err)
+ 		crypto_mod_put(alg);
+ 	return err;
+diff --git a/crypto/skcipher.c b/crypto/skcipher.c
+index e5083dccccdc..a9418a7e80a9 100644
+--- a/crypto/skcipher.c
++++ b/crypto/skcipher.c
+@@ -761,9 +761,8 @@ int crypto_grab_skcipher(struct crypto_skcipher_spawn *spawn,
+ 			 struct crypto_instance *inst,
+ 			 const char *name, u32 type, u32 mask)
+ {
+-	spawn->base.inst = inst;
+ 	spawn->base.frontend = &crypto_skcipher_type;
+-	return crypto_grab_spawn(&spawn->base, name, type, mask);
++	return crypto_grab_spawn(&spawn->base, inst, name, type, mask);
+ }
+ EXPORT_SYMBOL_GPL(crypto_grab_skcipher);
+ 
 diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index 2779c8d34ba9..7705387f9459 100644
+index 5022cada4fc6..2779c8d34ba9 100644
 --- a/include/crypto/algapi.h
 +++ b/include/crypto/algapi.h
-@@ -208,6 +208,31 @@ static inline void *crypto_instance_ctx(struct crypto_instance *inst)
- 	return inst->__ctx;
- }
+@@ -116,20 +116,14 @@ int crypto_init_spawn(struct crypto_spawn *spawn, struct crypto_alg *alg,
+ int crypto_init_spawn2(struct crypto_spawn *spawn, struct crypto_alg *alg,
+ 		       struct crypto_instance *inst,
+ 		       const struct crypto_type *frontend);
+-int crypto_grab_spawn(struct crypto_spawn *spawn, const char *name,
+-		      u32 type, u32 mask);
++int crypto_grab_spawn(struct crypto_spawn *spawn, struct crypto_instance *inst,
++		      const char *name, u32 type, u32 mask);
  
-+struct crypto_cipher_spawn {
-+	struct crypto_spawn base;
-+};
-+
-+static inline int crypto_grab_cipher(struct crypto_cipher_spawn *spawn,
-+				     struct crypto_instance *inst,
-+				     const char *name, u32 type, u32 mask)
-+{
-+	type &= ~CRYPTO_ALG_TYPE_MASK;
-+	type |= CRYPTO_ALG_TYPE_CIPHER;
-+	mask |= CRYPTO_ALG_TYPE_MASK;
-+	return crypto_grab_spawn(&spawn->base, inst, name, type, mask);
-+}
-+
-+static inline void crypto_drop_cipher(struct crypto_cipher_spawn *spawn)
-+{
-+	crypto_drop_spawn(&spawn->base);
-+}
-+
-+static inline struct crypto_alg *crypto_spawn_cipher_alg(
-+	struct crypto_cipher_spawn *spawn)
-+{
-+	return spawn->base.alg;
-+}
-+
- static inline struct crypto_cipher *crypto_spawn_cipher(
- 	struct crypto_spawn *spawn)
- {
+ void crypto_drop_spawn(struct crypto_spawn *spawn);
+ struct crypto_tfm *crypto_spawn_tfm(struct crypto_spawn *spawn, u32 type,
+ 				    u32 mask);
+ void *crypto_spawn_tfm2(struct crypto_spawn *spawn);
+ 
+-static inline void crypto_set_spawn(struct crypto_spawn *spawn,
+-				    struct crypto_instance *inst)
+-{
+-	spawn->inst = inst;
+-}
+-
+ struct crypto_attr_type *crypto_get_attr_type(struct rtattr **tb);
+ int crypto_check_attr_type(struct rtattr **tb, u32 type);
+ const char *crypto_attr_alg_name(struct rtattr *rta);
 -- 
 2.24.1
 
