@@ -2,87 +2,88 @@ Return-Path: <SRS0=TjYB=2Y=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB576C2D0C2
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 14:38:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37423C32767
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 17:13:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7518D21835
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 14:38:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZP9G0htX"
+	by mail.kernel.org (Postfix) with ESMTP id 052AB20866
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Jan 2020 17:13:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1578071608;
+	bh=Ym8SYG07h6MSMiq3hCZsshutvz9c46Tk7032If5mw2M=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=hGsZqjRKHBqmsNIXQ8WfDFgn34SK0pDsplOO0j0xmwb+45S4vNkYw5JpGqllwNB0i
+	 J1P2Ld995g9U7Spi/Ab5VqXKZQFxZY4q2Nvv0GjqAgPBxQnECrwFGWHnD2wLYJ5K3w
+	 dcm+oybP+ZDY4/n8L8XTe46pt+UlvzZpnZkFAMSM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727598AbgACOiM (ORCPT
+        id S1728312AbgACRMo (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 3 Jan 2020 09:38:12 -0500
-Received: from mail-qk1-f182.google.com ([209.85.222.182]:36189 "EHLO
-        mail-qk1-f182.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727527AbgACOiM (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Jan 2020 09:38:12 -0500
-Received: by mail-qk1-f182.google.com with SMTP id a203so34247788qkc.3
-        for <linux-crypto@vger.kernel.org>; Fri, 03 Jan 2020 06:38:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=vevwVm8lg+5OCh2+rEmRWvOe9hK3MNOQnmIUXBHghLg=;
-        b=ZP9G0htX41CHYkVtUDLFI/G76FnynZzdNsZTM8KfAAfrXZhFueqV14qv/qc398wSS4
-         q0iLUWLsst5oLOASvpzqycBAoOAQez4yLnXe8ZlsV6+ws+1LbHQaohnB1ulU1SshD5B9
-         GLSQs6awJxX4kQO7hnMvXwhIl131+0eLOMESqSYqc77HSTLUlctPszo23ySoNEhxy45H
-         8xw0hRLpTn9ccqffR/fQowqFj1/o716vptRaS3RX5b0bs99r3eXPIbbydbPsvHRH7xR9
-         yxcgZO1Ds014i6rVOF5gl4t7mnfDQeVyWkGUw/JXjQ+VCSMP45vKY1JHGn0NB667dH+Z
-         u7tA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=vevwVm8lg+5OCh2+rEmRWvOe9hK3MNOQnmIUXBHghLg=;
-        b=T2hGiYkRhoyrdOabAR1YXImWBftghCZILtT5nZzlMd6XilbbmPwOmnr/NXLca0mh5v
-         kCQsjfCMlV8AMD33rhVg0bl3cYMjaJ4INBnTkLiK85zVOjt/QUp1CqbKEYcpUgFssMAp
-         vjwdmz093p82+kUl8VuOTYWVxS9qpw5X4uskR6gVrTw5+/sACAcG14w8YYt0in+RNrms
-         LnY+CkZUtX8bds9eOvLqhswwhROOi0NAMV3cYA9Zq3OTAUdvLGtSmOAH49Kmr0YGDRm8
-         F4ZUnZVg9/u0h2kib56OAjRtDQ/R/tWXVpCZ47lA5QvKFCPQlZCEo2mBJToOTVcngj2A
-         L7xQ==
-X-Gm-Message-State: APjAAAX3P55P2IiQhdD46l8MF46mmICD3eFMBHd8BB88RtTW7IlC+EjD
-        Z1+JTtSIl9WpzATOIXSMNKUEMczip4BEy61dDZ0=
-X-Google-Smtp-Source: APXvYqziBH9iuzvk0OWdC7OfIUHwVSNg2H0X4VZaj29nBXChe0SC89Y9cdaZDN3wPsfqSsK3ZvAzD1qqLdfwQxGYrhA=
-X-Received: by 2002:a05:620a:16bb:: with SMTP id s27mr74910529qkj.368.1578062291323;
- Fri, 03 Jan 2020 06:38:11 -0800 (PST)
-MIME-Version: 1.0
-References: <20191220190218.28884-1-cotequeiroz@gmail.com> <CAKv+Gu9ZXCK41xOavw+2KEhhsZq9BFH6mxXKPNomzB6q+DP_FQ@mail.gmail.com>
- <CAPxccB2LGANG8DcmF4nwUDOzDzf2RHX4S-4w9z6TcO9csu4xSw@mail.gmail.com> <CAKv+Gu9fUs_xOZgUw5smrJf7+jrovkPL+1fF4fRcNhRieYSwhA@mail.gmail.com>
-In-Reply-To: <CAKv+Gu9fUs_xOZgUw5smrJf7+jrovkPL+1fF4fRcNhRieYSwhA@mail.gmail.com>
-From:   Eneas Queiroz <cotequeiroz@gmail.com>
-Date:   Fri, 3 Jan 2020 11:37:45 -0300
-Message-ID: <CAPxccB2w0_hmeChtSF-CUZ=dFm9srbQChhrL55fEvAH8nU-wCQ@mail.gmail.com>
-Subject: Re: QCE hw-crypto DMA issues
-To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Fri, 3 Jan 2020 12:12:44 -0500
+Received: from mail.kernel.org ([198.145.29.99]:47874 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728307AbgACRMo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 3 Jan 2020 12:12:44 -0500
+Received: from localhost.localdomain (unknown [194.230.155.149])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 59A39215A4;
+        Fri,  3 Jan 2020 17:12:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1578071563;
+        bh=Ym8SYG07h6MSMiq3hCZsshutvz9c46Tk7032If5mw2M=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=Up8KLxowJ+RcRCBcNS6T9x3TM5AA8AMB0i1lBM7tpaS2geLAKBU5Q5PQga71L+r/I
+         XKnQQBI2N2XQ9ojANEj7/I8QFN/WTUSHvzSbiUVrZ761mQekZbRlMTwVRX2VpmJy8S
+         gfDyb7zSLQng0otY/LHV2Vbr3LhXexvR4da49l8w=
+From:   Krzysztof Kozlowski <krzk@kernel.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Krzysztof Kozlowski <krzk@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH 11/19] crypto: exynos-rng - Rename Exynos to lowercase
+Date:   Fri,  3 Jan 2020 18:11:23 +0100
+Message-Id: <20200103171131.9900-12-krzk@kernel.org>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200103171131.9900-1-krzk@kernel.org>
+References: <20200103171131.9900-1-krzk@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jan 3, 2020 at 11:33 AM Ard Biesheuvel
-<ard.biesheuvel@linaro.org> wrote:
->
-> On Thu, 2 Jan 2020 at 22:09, Eneas Queiroz <cotequeiroz@gmail.com> wrote:
-> >>
-> >> Non-cache coherent DMA involves cache invalidation on inbound data. So
-> >> if both the device and the CPU write to the same cacheline while the
-> >> buffer is mapped for DMA from device to memory, one of the updates
-> >> gets lost.
-> >
-> >
-> >  Can you give me any pointers/examples of how I can make this work?
-> >
->
-> You could have a look at commit ed527b13d800dd515a9e6c582f0a73eca65b2e1b
+Fix up inconsistent usage of upper and lowercase letters in "Exynos"
+name.
 
-Thanks, I'll check it out.
+"EXYNOS" is not an abbreviation but a regular trademarked name.
+Therefore it should be written with lowercase letters starting with
+capital letter.
+
+The lowercase "Exynos" name is promoted by its manufacturer Samsung
+Electronics Co., Ltd., in advertisement materials and on website.
+
+Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
+---
+ drivers/crypto/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index d02e79ac81c0..de0b40889680 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -430,7 +430,7 @@ config CRYPTO_DEV_SAHARA
+ 	  found in some Freescale i.MX chips.
+ 
+ config CRYPTO_DEV_EXYNOS_RNG
+-	tristate "EXYNOS HW pseudo random number generator support"
++	tristate "Exynos HW pseudo random number generator support"
+ 	depends on ARCH_EXYNOS || COMPILE_TEST
+ 	depends on HAS_IOMEM
+ 	select CRYPTO_RNG
+-- 
+2.17.1
+
