@@ -2,88 +2,103 @@ Return-Path: <SRS0=+ioq=2Z=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BDA8C3276F
-	for <linux-crypto@archiver.kernel.org>; Sat,  4 Jan 2020 15:22:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2559C32767
+	for <linux-crypto@archiver.kernel.org>; Sat,  4 Jan 2020 23:41:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6209F24655
-	for <linux-crypto@archiver.kernel.org>; Sat,  4 Jan 2020 15:22:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1578151365;
-	bh=Ym8SYG07h6MSMiq3hCZsshutvz9c46Tk7032If5mw2M=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=q7yAkvRh9TIeJayTtxMcmvuVPLNHsU0NIGbMi5hJZbtuXRgwxSFAaamFVXxonAqgW
-	 h3RgSkQnJpn27O8TzbiYjDDzPqoeNC70NRkls+93wE+6+y1CQv47e909ylY4AKo9Kx
-	 Ed5CoSXMFeY0/iUhU0H9E4551E3vHrxZ04UgnBbI=
+	by mail.kernel.org (Postfix) with ESMTP id 7687D21734
+	for <linux-crypto@archiver.kernel.org>; Sat,  4 Jan 2020 23:41:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="hvFTcPLc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727183AbgADPWl (ORCPT
+        id S1726181AbgADXlx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 4 Jan 2020 10:22:41 -0500
-Received: from mail.kernel.org ([198.145.29.99]:60634 "EHLO mail.kernel.org"
+        Sat, 4 Jan 2020 18:41:53 -0500
+Received: from frisell.zx2c4.com ([192.95.5.64]:54611 "EHLO frisell.zx2c4.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725946AbgADPWk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 4 Jan 2020 10:22:40 -0500
-Received: from localhost.localdomain (unknown [194.230.155.149])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 903CB24655;
-        Sat,  4 Jan 2020 15:22:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1578151359;
-        bh=Ym8SYG07h6MSMiq3hCZsshutvz9c46Tk7032If5mw2M=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=YC29VBJo024Lx3valzVs8SaGm5VfUau3M8ZqcOuIDHKioew0hsMBefxcaLYXkHUYu
-         QCRcZ9kU7HPgODeaIJCJNSUHYQ3+DAbcRxT3PehjE01Qf2bk3/shyQa93F/LhCBN/X
-         IMXazKPWUe5zeh0OsneZR+qN2aT/j5aOp6jEdes0=
-From:   Krzysztof Kozlowski <krzk@kernel.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Krzysztof Kozlowski <krzk@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH v2 12/20] crypto: exynos-rng - Rename Exynos to lowercase
-Date:   Sat,  4 Jan 2020 16:20:59 +0100
-Message-Id: <20200104152107.11407-13-krzk@kernel.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200104152107.11407-1-krzk@kernel.org>
-References: <20200104152107.11407-1-krzk@kernel.org>
+        id S1726135AbgADXlx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 4 Jan 2020 18:41:53 -0500
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 0e78eb3e;
+        Sat, 4 Jan 2020 22:43:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=from:to:cc
+        :subject:date:message-id:mime-version:content-type
+        :content-transfer-encoding; s=mail; bh=6G9hU+h/1mvB0tk0YUS7G3DTS
+        0o=; b=hvFTcPLcyM36ynaQJBNZofjQAEpiwQA7QSji9rCLR5BCrDGBVufuH99ba
+        fYXRjN3Cfk8/qM5QaVC4K1tb5lS28tD25YkZ4yKxCCngDaUpn7j9lN2pduzETCM6
+        EZrjMMULdTO9hwvTzik9g4uGQw+zFEK03ZjEw1WKNXhGbGNkRcYgIa6XtOA1Bi+X
+        0ggiyY/yoblobXgg83eMz/HjROru++zAMcE5wgoC3nfpmc29kfyTwRCHvGTI8cb2
+        G/eJdy2/3v11nLivrcL30els9vzUA3suR5IKtbQ4imdzfiJspRzgQDA+3qv28gl8
+        453k8lypeYev2zpiAjiPloo432uwA==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id a31169a8 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
+        Sat, 4 Jan 2020 22:43:02 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH v7 0/4] crypto: poly1305 improvements
+Date:   Sat,  4 Jan 2020 18:41:37 -0500
+Message-Id: <20200104234141.4624-1-Jason@zx2c4.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Fix up inconsistent usage of upper and lowercase letters in "Exynos"
-name.
+Version 7 incorporates suggestions from the mailing list on version 6.
+We now use a union type to handle the poly1305_core_key, per suggestion.
+And now the changes to the cryptogams code are nicely split out into its
+own commit, with detail on the (limited) scope of the changes. I believe
+this should address the last of issues brought up.
 
-"EXYNOS" is not an abbreviation but a regular trademarked name.
-Therefore it should be written with lowercase letters starting with
-capital letter.
+####
 
-The lowercase "Exynos" name is promoted by its manufacturer Samsung
-Electronics Co., Ltd., in advertisement materials and on website.
+These are some improvements to the Poly1305 code that I think should be
+fairly uncontroversial. The first part, the new C implementations, adds
+cleaner code in two forms that can easily be compared and reviewed, and
+also results in performance speedups. The second part, the new x86_64
+implementation, replaces an slow unvetted implementation with an
+extremely fast implementation that has received many eyeballs. Finally,
+we fix up some deadcode.
 
-Signed-off-by: Krzysztof Kozlowski <krzk@kernel.org>
----
- drivers/crypto/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Jason A. Donenfeld (4):
+  crypto: poly1305 - add new 32 and 64-bit generic versions
+  crypto: x86_64/poly1305 - import unmodified cryptogams implementation
+  crypto: x86_64/poly1305 - wire up faster implementations for kernel
+  crypto: arm/arm64/mips/poly1305 - remove redundant non-reduction from
+    emit
 
-diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
-index d02e79ac81c0..de0b40889680 100644
---- a/drivers/crypto/Kconfig
-+++ b/drivers/crypto/Kconfig
-@@ -430,7 +430,7 @@ config CRYPTO_DEV_SAHARA
- 	  found in some Freescale i.MX chips.
- 
- config CRYPTO_DEV_EXYNOS_RNG
--	tristate "EXYNOS HW pseudo random number generator support"
-+	tristate "Exynos HW pseudo random number generator support"
- 	depends on ARCH_EXYNOS || COMPILE_TEST
- 	depends on HAS_IOMEM
- 	select CRYPTO_RNG
+ arch/arm/crypto/poly1305-glue.c        |   18 +-
+ arch/arm64/crypto/poly1305-glue.c      |   18 +-
+ arch/mips/crypto/poly1305-glue.c       |   18 +-
+ arch/x86/crypto/.gitignore             |    1 +
+ arch/x86/crypto/Makefile               |   11 +-
+ arch/x86/crypto/poly1305-avx2-x86_64.S |  390 ---
+ arch/x86/crypto/poly1305-sse2-x86_64.S |  590 ----
+ arch/x86/crypto/poly1305-x86_64.pl     | 4265 ++++++++++++++++++++++++
+ arch/x86/crypto/poly1305_glue.c        |  308 +-
+ crypto/adiantum.c                      |    4 +-
+ crypto/nhpoly1305.c                    |    2 +-
+ crypto/poly1305_generic.c              |   25 +-
+ include/crypto/internal/poly1305.h     |   45 +-
+ include/crypto/nhpoly1305.h            |    4 +-
+ include/crypto/poly1305.h              |   26 +-
+ lib/crypto/Kconfig                     |    2 +-
+ lib/crypto/Makefile                    |    4 +-
+ lib/crypto/poly1305-donna32.c          |  204 ++
+ lib/crypto/poly1305-donna64.c          |  185 +
+ lib/crypto/poly1305.c                  |  169 +-
+ 20 files changed, 4924 insertions(+), 1365 deletions(-)
+ create mode 100644 arch/x86/crypto/.gitignore
+ delete mode 100644 arch/x86/crypto/poly1305-avx2-x86_64.S
+ delete mode 100644 arch/x86/crypto/poly1305-sse2-x86_64.S
+ create mode 100644 arch/x86/crypto/poly1305-x86_64.pl
+ create mode 100644 lib/crypto/poly1305-donna32.c
+ create mode 100644 lib/crypto/poly1305-donna64.c
+
 -- 
-2.17.1
+2.24.1
 
