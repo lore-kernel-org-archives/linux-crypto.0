@@ -2,96 +2,162 @@ Return-Path: <SRS0=chSI=24=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6BA5C33C9E
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jan 2020 09:53:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98163C33C9B
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jan 2020 13:36:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B1BFB21744
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jan 2020 09:53:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1578390790;
-	bh=rcKJiBOHF/a0+MDVGltwkYmA7kAiSShXv3OfBucNo/w=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=jlpgz6TOZznC38WbmaiRd+eAi0/SzwruKSeUNZjk+hbGC9gEIS9xSSpslab4iWF5j
-	 g32yyMRkNtqzTKqGlLGKLI7QC2cNDo8UVYkz/uKFBxOlRTrU4LfCjY/1Un7U+dqUxH
-	 TJXSQTG90ieIoOo7hcS6UgBXSXPDaCj09FUlf2PA=
+	by mail.kernel.org (Postfix) with ESMTP id 78CC6207E0
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jan 2020 13:36:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727177AbgAGJxK (ORCPT
+        id S1728308AbgAGNgA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 7 Jan 2020 04:53:10 -0500
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:37397 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726485AbgAGJxJ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 7 Jan 2020 04:53:09 -0500
-Received: by mail-ot1-f68.google.com with SMTP id k14so75721552otn.4;
-        Tue, 07 Jan 2020 01:53:09 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=rcKJiBOHF/a0+MDVGltwkYmA7kAiSShXv3OfBucNo/w=;
-        b=spnwUusnFCnaGf0nGyhvYIrZK7fZxpchw6XZAQvKRpfSTstjz1xbvLHYrIer0tt1NQ
-         pOmR9iHuZCi+Xad2SBPYWR6XjJkc4WH7f3RhtWQkE6vD+CgiLwJIigIoZNqKDFrTCOi7
-         ekkK6FQuLloN7K5IWcCA84W2PhEU4sDup6KXC05A4Xxe9Lasl3W4GTxQgROtxvrI9bd6
-         q9tMJfTKCxvF+uud38NFqdU1SayNNThFi/oRzzlSbqgduMZHY3uh04R+StFmSVF4ESxl
-         NTcdfFFqTxRKvTLoH8H8z21jlPBhA70Ue0eYGza7RPMIyHLRyx+YU+ZjKOKrdfSJXYgf
-         EnLA==
-X-Gm-Message-State: APjAAAU2zApQ8IQFnvMckrK9/w5ky0goBRLpYuAYc5ANu/OU/zxkuzeR
-        TbAhQBPYuloBuxZ1Rhvfa5fE9o92Le7TkqYwgCQ=
-X-Google-Smtp-Source: APXvYqyijdjeyq4HJ5FCDcI015uTWnvTRQoFeaQRgxTWy1DfLN1zgBL6llgNmNnOtPrGgkpTZXmDGjkn5Is6S8EHkt8=
-X-Received: by 2002:a9d:62c7:: with SMTP id z7mr111166052otk.189.1578390788841;
- Tue, 07 Jan 2020 01:53:08 -0800 (PST)
+        Tue, 7 Jan 2020 08:36:00 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:9118 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728301AbgAGNgA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 7 Jan 2020 08:36:00 -0500
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 5CFA47C50F4EC5F5ED37;
+        Tue,  7 Jan 2020 21:35:56 +0800 (CST)
+Received: from localhost (10.133.213.239) by DGGEMS413-HUB.china.huawei.com
+ (10.3.19.213) with Microsoft SMTP Server id 14.3.439.0; Tue, 7 Jan 2020
+ 21:35:49 +0800
+From:   YueHaibing <yuehaibing@huawei.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <Jason@zx2c4.com>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        YueHaibing <yuehaibing@huawei.com>
+Subject: [PATCH -next] crypto: curve25519 - Fix selftests build error
+Date:   Tue, 7 Jan 2020 21:35:47 +0800
+Message-ID: <20200107133547.44000-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.10.2.windows.1
 MIME-Version: 1.0
-References: <20200106045833.1725-1-masahiroy@kernel.org>
-In-Reply-To: <20200106045833.1725-1-masahiroy@kernel.org>
-From:   "Rafael J. Wysocki" <rafael@kernel.org>
-Date:   Tue, 7 Jan 2020 10:52:57 +0100
-Message-ID: <CAJZ5v0jBEq+GiTP8V4ZzQvR9qbSBdEz_P8EZNX7yNZMzTjB86Q@mail.gmail.com>
-Subject: Re: [PATCH] treewide: remove redundent IS_ERR() before error code check
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Julia Lawall <julia.lawall@lip6.fr>,
-        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-clk <linux-clk@vger.kernel.org>,
-        linux-crypto@vger.kernel.org, linux-gpio@vger.kernel.org,
-        linux-i2c <linux-i2c@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-mtd@lists.infradead.org, netdev <netdev@vger.kernel.org>,
-        "moderated list:SOUND - SOC LAYER / DYNAMIC AUDIO POWER MANAGEM..." 
-        <alsa-devel@alsa-project.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Originating-IP: [10.133.213.239]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jan 6, 2020 at 6:11 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> 'PTR_ERR(p) == -E*' is a stronger condition than IS_ERR(p).
-> Hence, IS_ERR(p) is unneeded.
->
-> The semantic patch that generates this commit is as follows:
->
-> // <smpl>
-> @@
-> expression ptr;
-> constant error_code;
-> @@
-> -IS_ERR(ptr) && (PTR_ERR(ptr) == - error_code)
-> +PTR_ERR(ptr) == - error_code
-> // </smpl>
->
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-> ---
+If CRYPTO_CURVE25519 is y, CRYPTO_LIB_CURVE25519_GENERIC will be
+y, but CRYPTO_LIB_CURVE25519 may be set to m, cause build errors:
 
-Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+lib/crypto/curve25519-selftest.o: In function `curve25519':
+curve25519-selftest.c:(.text.unlikely+0xc): undefined reference to `curve25519_arch'
+lib/crypto/curve25519-selftest.o: In function `curve25519_selftest':
+curve25519-selftest.c:(.init.text+0x17e): undefined reference to `curve25519_base_arch'
 
-for the acpi/scan.c change, but there seems to be a typo in the subject:
+This splits the curve25519 test code into its own source file.
 
-s/redundent/redundant/
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Fixes: aa127963f1ca ("crypto: lib/curve25519 - re-add selftests")
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+---
+ lib/crypto/Makefile              |  6 +++++-
+ lib/crypto/curve25519-selftest.c | 23 ++++++++++++++++++++++-
+ lib/crypto/curve25519.c          | 17 -----------------
+ 3 files changed, 27 insertions(+), 19 deletions(-)
+
+diff --git a/lib/crypto/Makefile b/lib/crypto/Makefile
+index f97f9b94..87c99da 100644
+--- a/lib/crypto/Makefile
++++ b/lib/crypto/Makefile
+@@ -36,5 +36,9 @@ libsha256-y					:= sha256.o
+ ifneq ($(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS),y)
+ libblake2s-y					+= blake2s-selftest.o
+ libchacha20poly1305-y				+= chacha20poly1305-selftest.o
+-libcurve25519-y					+= curve25519-selftest.o
++ifneq ($(CONFIG_CRYPTO_ARCH_HAVE_LIB_CURVE25519),)
++obj-$(CONFIG_CRYPTO_ARCH_HAVE_LIB_CURVE25519)	+= curve25519-selftest.o
++else
++obj-$(CONFIG_CRYPTO_LIB_CURVE25519_GENERIC)	+= curve25519-selftest.o
++endif
+ endif
+diff --git a/lib/crypto/curve25519-selftest.c b/lib/crypto/curve25519-selftest.c
+index c85e853..c4cfa26 100644
+--- a/lib/crypto/curve25519-selftest.c
++++ b/lib/crypto/curve25519-selftest.c
+@@ -4,6 +4,8 @@
+  */
+ 
+ #include <crypto/curve25519.h>
++#include <linux/module.h>
++#include <linux/init.h>
+ 
+ struct curve25519_test_vector {
+ 	u8 private[CURVE25519_KEY_SIZE];
+@@ -1280,7 +1282,7 @@ static const struct curve25519_test_vector curve25519_test_vectors[] __initconst
+ 	}
+ };
+ 
+-bool __init curve25519_selftest(void)
++static bool __init curve25519_selftest(void)
+ {
+ 	bool success = true, ret, ret2;
+ 	size_t i = 0, j;
+@@ -1319,3 +1321,22 @@ bool __init curve25519_selftest(void)
+ 
+ 	return success;
+ }
++
++static int __init mod_init(void)
++{
++	if (!IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS) &&
++	    WARN_ON(!curve25519_selftest()))
++		return -ENODEV;
++	return 0;
++}
++
++static void __exit mod_exit(void)
++{
++}
++
++module_init(mod_init);
++module_exit(mod_exit);
++
++MODULE_LICENSE("GPL v2");
++MODULE_DESCRIPTION("Curve25519 selftest");
++MODULE_AUTHOR("Jason A. Donenfeld <Jason@zx2c4.com>");
+diff --git a/lib/crypto/curve25519.c b/lib/crypto/curve25519.c
+index c03ccdb..0106beb 100644
+--- a/lib/crypto/curve25519.c
++++ b/lib/crypto/curve25519.c
+@@ -13,8 +13,6 @@
+ #include <linux/module.h>
+ #include <linux/init.h>
+ 
+-bool curve25519_selftest(void);
+-
+ const u8 curve25519_null_point[CURVE25519_KEY_SIZE] __aligned(32) = { 0 };
+ const u8 curve25519_base_point[CURVE25519_KEY_SIZE] __aligned(32) = { 9 };
+ 
+@@ -22,21 +20,6 @@ EXPORT_SYMBOL(curve25519_null_point);
+ EXPORT_SYMBOL(curve25519_base_point);
+ EXPORT_SYMBOL(curve25519_generic);
+ 
+-static int __init mod_init(void)
+-{
+-	if (!IS_ENABLED(CONFIG_CRYPTO_MANAGER_DISABLE_TESTS) &&
+-	    WARN_ON(!curve25519_selftest()))
+-		return -ENODEV;
+-	return 0;
+-}
+-
+-static void __exit mod_exit(void)
+-{
+-}
+-
+-module_init(mod_init);
+-module_exit(mod_exit);
+-
+ MODULE_LICENSE("GPL v2");
+ MODULE_DESCRIPTION("Curve25519 scalar multiplication");
+ MODULE_AUTHOR("Jason A. Donenfeld <Jason@zx2c4.com>");
+-- 
+2.7.4
+
+
