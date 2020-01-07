@@ -2,95 +2,112 @@ Return-Path: <SRS0=chSI=24=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6363DC33C9E
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jan 2020 21:21:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73E57C282DD
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jan 2020 21:23:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3D8802081E
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jan 2020 21:21:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 47BC82081E
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jan 2020 21:23:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="dJP4nyfS";
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=hansenpartnership.com header.i=@hansenpartnership.com header.b="dJP4nyfS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728178AbgAGVVa (ORCPT
+        id S1727335AbgAGVXe (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 7 Jan 2020 16:21:30 -0500
-Received: from mout.kundenserver.de ([212.227.17.13]:35995 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729067AbgAGVV3 (ORCPT
+        Tue, 7 Jan 2020 16:23:34 -0500
+Received: from bedivere.hansenpartnership.com ([66.63.167.143]:51488 "EHLO
+        bedivere.hansenpartnership.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728521AbgAGVBR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 7 Jan 2020 16:21:29 -0500
-Received: from mail-qk1-f176.google.com ([209.85.222.176]) by
- mrelayeu.kundenserver.de (mreue108 [212.227.15.145]) with ESMTPSA (Nemesis)
- id 1MRCBm-1j0wpH32MG-00NBCp; Tue, 07 Jan 2020 22:21:27 +0100
-Received: by mail-qk1-f176.google.com with SMTP id d71so820445qkc.0;
-        Tue, 07 Jan 2020 13:21:27 -0800 (PST)
-X-Gm-Message-State: APjAAAW22VWjWv8b9Ao6dyhJ0RYF1wjEWypQJHn4ATzEZjzNxoHsu7yz
-        XHngJmWNcOd2tlMU/OjbLn0xMvkqIl3yYACs1U0=
-X-Google-Smtp-Source: APXvYqwWX14oOMnhpeDIoY9y/919XllKVczGD7LmnCZAjDLYU2w9nCEzI9WjKQKE+gbrCYDkW3aHGRLQ/VQ1GiU5OO4=
-X-Received: by 2002:a05:620a:cef:: with SMTP id c15mr1363924qkj.352.1578432086524;
- Tue, 07 Jan 2020 13:21:26 -0800 (PST)
-MIME-Version: 1.0
-References: <20200107201327.3863345-1-arnd@arndb.de> <CAHmME9rnevSYwWvfyv8LRitVo-=KVpPCoGLwYxo62mwnW0vjiQ@mail.gmail.com>
-In-Reply-To: <CAHmME9rnevSYwWvfyv8LRitVo-=KVpPCoGLwYxo62mwnW0vjiQ@mail.gmail.com>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Tue, 7 Jan 2020 22:21:10 +0100
-X-Gmail-Original-Message-ID: <CAK8P3a3N=Zcq3rztj94Ty0_Fbfkw4db+-fLgASvK_UD4LTY=Ww@mail.gmail.com>
-Message-ID: <CAK8P3a3N=Zcq3rztj94Ty0_Fbfkw4db+-fLgASvK_UD4LTY=Ww@mail.gmail.com>
-Subject: Re: [PATCH] crypto: curve25519 - Work around link failure
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Tue, 7 Jan 2020 16:01:17 -0500
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 5F18A8EE105;
+        Tue,  7 Jan 2020 13:01:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
+        s=20151216; t=1578430876;
+        bh=5nkpePHUcSUhoPkX858UIhz0z07V7G0lUgNBG3ZeUKE=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=dJP4nyfSqEMdbel5HbM1+ys5w61xBuazOrWII0ss4Jjqy5OHi5dsbTf88scjxZ1MW
+         ++vUvHuuRwZZMdW999ecyDAebpSRrrSbWjbHL/C6wEhZTuWt2Y0YOJuqaut0CUiotI
+         xXf9zLynZpT4Y/NdswGb79UiN7KJBPXG6W8SBLf0=
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id vgHvvARI9W0c; Tue,  7 Jan 2020 13:01:16 -0800 (PST)
+Received: from jarvis.lan (unknown [50.35.76.230])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 7EE488EE0F8;
+        Tue,  7 Jan 2020 13:01:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=hansenpartnership.com;
+        s=20151216; t=1578430876;
+        bh=5nkpePHUcSUhoPkX858UIhz0z07V7G0lUgNBG3ZeUKE=;
+        h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+        b=dJP4nyfSqEMdbel5HbM1+ys5w61xBuazOrWII0ss4Jjqy5OHi5dsbTf88scjxZ1MW
+         ++vUvHuuRwZZMdW999ecyDAebpSRrrSbWjbHL/C6wEhZTuWt2Y0YOJuqaut0CUiotI
+         xXf9zLynZpT4Y/NdswGb79UiN7KJBPXG6W8SBLf0=
+Message-ID: <1578430874.4288.2.camel@HansenPartnership.com>
+Subject: Re: [PATCH] ima: make ASYMMETRIC_PUBLIC_KEY_SUBTYPE 'bool'
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     Arnd Bergmann <arnd@arndb.de>, David Howells <dhowells@redhat.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Russell King <linux@armlinux.org.uk>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Andy Polyakov <appro@cryptogams.org>,
-        Samuel Neves <sneves@dei.uc.pt>,
-        Ondrej Mosnacek <omosnace@redhat.com>,
-        Eric Biggers <ebiggers@google.com>,
-        Vitaly Chikunov <vt@altlinux.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        Lakshmi Ramasubramanian <nramas@linux.microsoft.com>,
+        Mimi Zohar <zohar@linux.ibm.com>
+Cc:     keyrings@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Date:   Tue, 07 Jan 2020 13:01:14 -0800
+In-Reply-To: <20200107203041.843060-1-arnd@arndb.de>
+References: <20200107203041.843060-1-arnd@arndb.de>
 Content-Type: text/plain; charset="UTF-8"
-X-Provags-ID: V03:K1:no2J6gE6SmsJ60PMl8NVwoArJBS4zufmwUfx8IRJAkKAr6hz8Y5
- zoZJ4SvFDO+ERCALKL/FmdEUuHUnda9SC0AWMLF9/karNoDjKJxHuFPbPjXBndwp0uUrXT5
- FbyvBPYSsrU3vfv9nPSYOOBCMMkR1xFUOjNW1FLoe7o/DyCzzmsMLgaZ4e5xOKgFlcOeNYq
- ZzipicfnquO02Qmjzl2Mw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:zuwX3DRtQJ4=:MaNpG9j+Cmp3pA5lz1WiVb
- aKjMy3lu26YwJskFp/MRd3tlKvlgV6INHCadmPqs7uyAq4v5gy1HsUdK6gRcqy+5jXEKyHTYv
- pORuAKiUCJZ2yHohuWA1HpuYnmDp4NMYwsUQLQnW/cOc3mk85JHUE64xIQEK8lj5/x7GmnZXq
- r2J493EsDVNbGk3wHgD+mQELeyzaXw1+27PdwQZMTcY9zD0peV9irGIwTl2gtB2ht6P33prK9
- OapfzInJ+Q6Czxuxawj+bKdHRxRQPEH9ZMy4hgT2mOpQ8n34E8RzpeqZEOSYLbJxXJ9GQn1pM
- 4s9zDKFNxpBldBI0ajlbXnqbuKSPniNCHokt4Y49o3z2bD0xV0fDKuSOhkYW/opbWK5KCkXgs
- bauSWEPhj/Ogqu/eoCvq3P+rfpEnxgzFsr8lO+gHiTNJ2oIkw59cYBcXpj1s7+C2ql4DG86MA
- ShYW4Kt4loHsg66rsFd2XvTDVIQ17Nx0VR02UGib5jVrUOg8gKOJd9PMlAX5D2e3f2irZ0sFB
- gtIGlbDuQh1ig9Lv56jtevGbjm4nl1QSsr5kXNnw6uX90EVleoh6SlMI1IEkvOBl0z6e+M8gT
- Iuzt9Mgcv/sRdUuvfxTMBrdy6KD0FgB4ztO4sRFuPrAzTMhdmn8NJC1KBozJpPT5nrUgEqjYl
- drEba9p8fp85x8dve/cCyQ88TG2nLbEkrAdhfoNwelFJfkYo8K4CWjZQ8xzEDdmgEkeM/XL/d
- oSbBMx4vFfCkVGDJ3LNgXrQTyd4S/3XhNeBGfpEPwruRIuYNsqyJ0aXyiEYsckl+YZAtLTfkn
- ma+cIGsMspeSFUX3Dtr5mpsHO6Rxa1hZZmIpxk1nl8aTK1QgUXu/6HhtHEifobl51xLkEoEZX
- 3TtN8KozTGMxxobMxMfw==
+X-Mailer: Evolution 3.26.6 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jan 7, 2020 at 9:26 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> Hey Arnd,
->
-> Another solution to this was already posted:
->
-> https://lore.kernel.org/linux-crypto/CAHmME9pg4KWw1zNVybxn1WLGusyGCjqeAHLQXY=Dr4zznUM82g@mail.gmail.com/T/#t
->
-> That might be slightly cleaner, though yours is shorter. I'm alright
-> with either one.
+On Tue, 2020-01-07 at 21:30 +0100, Arnd Bergmann wrote:
+> The asymmetric key subtype is only used by the key subsystem that
+> cannot itself be a loadable module, so when
+> ASYMMETRIC_PUBLIC_KEY_SUBTYPE is set to =m, it just does not get
+> used. It also produces a compile-time
+> warning:
+> 
+> WARNING: modpost: missing MODULE_LICENSE() in
+> security/integrity/ima/ima_asymmetric_keys.o
+> 
+> Make this a 'bool' symbol to avoid both problems.
+> 
+> Fixes: 88e70da170e8 ("IMA: Define an IMA hook to measure keys")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  crypto/asymmetric_keys/Kconfig | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/crypto/asymmetric_keys/Kconfig
+> b/crypto/asymmetric_keys/Kconfig
+> index 1f1f004dc757..f2846293e4d5 100644
+> --- a/crypto/asymmetric_keys/Kconfig
+> +++ b/crypto/asymmetric_keys/Kconfig
+> @@ -11,7 +11,7 @@ menuconfig ASYMMETRIC_KEY_TYPE
+>  if ASYMMETRIC_KEY_TYPE
+>  
+>  config ASYMMETRIC_PUBLIC_KEY_SUBTYPE
+> -	tristate "Asymmetric public-key crypto algorithm subtype"
+> +	bool "Asymmetric public-key crypto algorithm subtype"
 
-Yes, I agree the other approach looks nicer. I've added that to my randconfig
-builder in place of my patch to see if it's sufficient. If not, I'll
-let you know.
+I believe the crypto guys do like stuff to be modular.
 
-        Arnd
+However, we've already implemented this solution:
+
+https://lore.kernel.org/linux-integrity/20200107194350.3782-2-nramas@linux.microsoft.com/
+
+To solve the problem via an intermediate boolean config variable.
+
+James
+
