@@ -4,187 +4,140 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3507BC282DD
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jan 2020 20:10:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DD46C47409
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jan 2020 20:14:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 10F1E2080A
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jan 2020 20:10:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5AB4524656
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jan 2020 20:14:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728457AbgAGUK3 (ORCPT
+        id S1728711AbgAGUO3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 7 Jan 2020 15:10:29 -0500
-Received: from mout.kundenserver.de ([212.227.17.10]:47025 "EHLO
+        Tue, 7 Jan 2020 15:14:29 -0500
+Received: from mout.kundenserver.de ([212.227.126.135]:59605 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728358AbgAGUK3 (ORCPT
+        with ESMTP id S1728379AbgAGUO3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 7 Jan 2020 15:10:29 -0500
+        Tue, 7 Jan 2020 15:14:29 -0500
 Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
- (mreue107 [212.227.15.145]) with ESMTPA (Nemesis) id
- 1M8xwu-1ijzDT3bJ0-0063Ph; Tue, 07 Jan 2020 21:09:29 +0100
+ (mreue012 [212.227.15.129]) with ESMTPA (Nemesis) id
+ 1MTfgb-1jGb592rZl-00U0gY; Tue, 07 Jan 2020 21:13:34 +0100
 From:   Arnd Bergmann <arnd@arndb.de>
-To:     Zaibo Xu <xuzaibo@huawei.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Longfang Liu <liulongfang@huawei.com>
+        "Jason A. Donenfeld" <Jason@zx2c4.com>
 Cc:     Arnd Bergmann <arnd@arndb.de>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: hisilicon/sec2 - Use atomics instead of __sync
-Date:   Tue,  7 Jan 2020 21:08:58 +0100
-Message-Id: <20200107200926.3659010-1-arnd@arndb.de>
+        Russell King <linux@armlinux.org.uk>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Andy Polyakov <appro@cryptogams.org>,
+        Samuel Neves <sneves@dei.uc.pt>,
+        Ondrej Mosnacek <omosnace@redhat.com>,
+        Eric Biggers <ebiggers@google.com>,
+        Vitaly Chikunov <vt@altlinux.org>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: curve25519 - Work around link failure
+Date:   Tue,  7 Jan 2020 21:12:52 +0100
+Message-Id: <20200107201327.3863345-1-arnd@arndb.de>
 X-Mailer: git-send-email 2.20.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:w1wytbvXRZBmag8cVS6euN3xO5LlAwtVdiB6qobvrnXb9JgOjvs
- BuZfHilEI3cwS+6I6WJesu/xjz9bPmc83lbniFl3WwA5GUv3o6NEynaZf1ZLJYKoBXEMmbG
- WWb6wO//Ws1TQCYL6TEZSFOPivkGT8NJve2wBlirXR4waZvjaACN2rKG3urICG9i9YC2SMR
- U+iUhF+MfFL9JG3TKQO0Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:R6e4FEN+IIs=:OiG5rM7pOqLOs3ENAnBFzE
- 3bTZmUWsn2LQfptAj6EEoW/a7lMr+xBvgWhFXJaQU5FVaZD5M+Pqp47NZ/Li/2Q6ds/k27zPH
- TKvPKsPpqY+4MbtDIe97oYSJ4JrEoqWEEeYc4HLr/V/0GXxPodKpbCK9/M5oBXbv75DNu4c5r
- svibHktol2V2gARTxpuabhcB138kc9a6XXidcwBa7ECbcgRWcbFYPf388Gc2px6QqiYNkl2Rt
- mWmpbRPkBN6led/V6hcAj0xthRk2EFPmHRGkmzvJtoSpuF8W+kSeg4LmFspWxbyO33Zf3eUHO
- 4TGzxdhy5EJd7mI1V7Zjxa1t1HT66j7RJBUHmfgonYFI4bnOp3Ryx23yLfkIxVjovDjtfscR2
- OCCrAQ9sc7RoIVZmDSl4PmJujJTgkwAi4uHJ39bNNOpdWLq5W5q+obkQer+2P4EtBRr090unH
- z2W5+XE2SWYSYFCYhzrjQcSvOhMREU/rC4fRymMnf+dUcM2c02x8ETjKvvAe5A/LbNOQQpNu3
- sT1UqSRd2Df/cZlH/01iuXq+kjz+Nxu4cXVmCaduwjocQCenYjZTdE+dnSRrTppIlNRTbXUr+
- JPwzDkINrqDY6oiW4zlYt8J3xmBkJj9ZqLIFV28PKPqcIP56O4k5oZH9RG/g53SKaZVYlP67Q
- vpINfnhyp0ehnT72X/CW13PcqTIzXwGQbLPUqYfD54Rwvm8Y5JgElq47HQszBAkwnUDHxrWZM
- JhAoTz2JdoKaxZZzPcOJo0HBQPHEH8AwiCGWMg19WHQpOfxAC4NQELnTiu/0Bt9uOA2DTj3ze
- v49fifI9jOhfaeWVJ9812Bhk6we9jLlwh0aAFYTn54LE4zd9CqqylSjNRizUfIlSLmJygwxPC
- LOPGotTVGzPWx/A7KxSQ==
+X-Provags-ID: V03:K1:pH50uSqCPXHunlRYi6L8CL6v1F+HPRpeGWLVm1siLpp01pLtaYn
+ 2PDMeX31+oZWljGNiyUjWfyxUAFZwK/QAfPI1wCcfZl5GAPYJx5qHOhEpBctrIl2uSjelXj
+ i1UTXn5i/CNQUw0e09IOKdcp8GXAp2bsUdxECMYVmA0h1keXVYE+yFYXhAL5ixNOMrFMeQw
+ TFVM2igKOFrWWhhnU2NUg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:tDcVV9wxuqU=:t8AUGn6nGKs3yyta8KcKP9
+ YezldtC334Khb/zyCxX4Fu431iOpWdOxOc9G3oFdit+QZ2W3BW4i7FDBhGMWSDe/eF1m0hCHt
+ oXUfPnslXBwdE5ok7fJkCYAQM9UDMAp0hKGIge5Wpk+ygXLgA0ob73HjQRi0YzRXC1tKogWq+
+ H6Kit0nwKikgOhDWy+1aHIO681UnKANQgTn1Ni8AnssmzzAWOuSwF6QiTyyjQyJLwD4o8GtQo
+ wS/yE6dJrhWtHYpUMAaoU1UfjiYtt1MR5FYhRNMTRNh87Zvr2rFixrKANALKT1mf3rk9uC8d4
+ i6YuQwE7HI/bGAHs3jKN/QOIXJJ1FRruNQVhTL/zEZujMszjaLc6R03kNW2XQIf7p4nO42U/W
+ FiFkMy1iV7GZ5rwv38Xy9YeDyrLjT1wrWWOclFTgof+QoMdfsYFFhXeu7rUysNAoFhO+9RfOg
+ t2KxGnJV/Q9wx9PRTY0/e5VHmarkx8Zx/sJUhU7azenscql3gXSITqJkGmGBvjVP00LZNwrKA
+ EStlkmVMa3GgKb1tPQhMRcNaRwKGAGSQbFNVHMV5Vc1IMuX713DOS6JusgMuGAKyA+GsPFaoa
+ ZyxVll8+IOIJCw8bMPb7sUNWWvoCexA5E2hdmeQxuauQZ5BEI3f3sOvFNTYemcv+8ma6Spg1g
+ h0VllTvNpGHXiww1strijITU48e7q/RmxzKm5dK8z+WcPT+iRZmcjkgghcv++j0aX6i7cpIb9
+ O1NRNJ3fyT2sshmooUf71rr1om2p6WjYb5qRDNHEO6RJOxw2xjsEzH5xsJHgFlKjeJs9m7Ljj
+ Urp5ZSnywq+FNozooUpaW/j2zFufIRrtkNpG4N3lDDlGhdEO1W5qCWR38VhXtov6MNnNNim3T
+ 5zcMACR9nlBNHY2eU8KA==
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The use of __sync functions for atomic memory access is not
-supported in the kernel, and can result in a link error depending
-on configuration:
+The curve25519 selftest causes a link failure when one of the two
+implementations is built-in and the other one is a loadable module,
+as then the library gets built in as well but cannot call into the
+module:
 
-ERROR: "__tsan_atomic32_compare_exchange_strong" [drivers/crypto/hisilicon/sec2/hisi_sec2.ko] undefined!
-ERROR: "__tsan_atomic64_fetch_add" [drivers/crypto/hisilicon/sec2/hisi_sec2.ko] undefined!
+lib/crypto/curve25519-selftest.o: In function `curve25519_selftest':
+curve25519-selftest.c:(.init.text+0x5c): undefined reference to `curve25519_arch'
+curve25519-selftest.c:(.init.text+0xfd): undefined reference to `curve25519_base_arch'
+curve25519-selftest.c:(.init.text+0x15a): undefined reference to `curve25519_arch'
 
-Use the kernel's own atomic interfaces instead. This way the
-debugfs interface actually reads the counter atomically.
+There is probably a better fix, but this is the local workaround
+that I used to get a clean randconfig build again, using Makefile
+tricks to make all the curve25519 code built-in if any of the
+implementations are.
 
-Fixes: 416d82204df4 ("crypto: hisilicon - add HiSilicon SEC V2 driver")
+Fixes: aa127963f1ca ("crypto: lib/curve25519 - re-add selftests")
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- drivers/crypto/hisilicon/sec2/sec.h        |  6 +++---
- drivers/crypto/hisilicon/sec2/sec_crypto.c | 12 ++++++------
- drivers/crypto/hisilicon/sec2/sec_main.c   | 14 ++++++++++++--
- 3 files changed, 21 insertions(+), 11 deletions(-)
+ arch/arm/crypto/Makefile | 4 +++-
+ arch/x86/crypto/Makefile | 4 +++-
+ crypto/Makefile          | 5 ++++-
+ 3 files changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
-index 26754d0570ba..b846d73d9a85 100644
---- a/drivers/crypto/hisilicon/sec2/sec.h
-+++ b/drivers/crypto/hisilicon/sec2/sec.h
-@@ -40,7 +40,7 @@ struct sec_req {
- 	int req_id;
+diff --git a/arch/arm/crypto/Makefile b/arch/arm/crypto/Makefile
+index b745c17d356f..a7b3957aca58 100644
+--- a/arch/arm/crypto/Makefile
++++ b/arch/arm/crypto/Makefile
+@@ -12,7 +12,9 @@ obj-$(CONFIG_CRYPTO_SHA512_ARM) += sha512-arm.o
+ obj-$(CONFIG_CRYPTO_CHACHA20_NEON) += chacha-neon.o
+ obj-$(CONFIG_CRYPTO_POLY1305_ARM) += poly1305-arm.o
+ obj-$(CONFIG_CRYPTO_NHPOLY1305_NEON) += nhpoly1305-neon.o
+-obj-$(CONFIG_CRYPTO_CURVE25519_NEON) += curve25519-neon.o
++ifdef CONFIG_CRYPTO_CURVE25519_NEON
++obj-$(CONFIG_CRYPTO_LIB_CURVE25519_GENERIC) += curve25519-neon.o
++endif
  
- 	/* Status of the SEC request */
--	int fake_busy;
-+	atomic_t fake_busy;
- };
+ obj-$(CONFIG_CRYPTO_AES_ARM_CE) += aes-arm-ce.o
+ obj-$(CONFIG_CRYPTO_SHA1_ARM_CE) += sha1-arm-ce.o
+diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
+index 958440eae27e..7546c276e2f0 100644
+--- a/arch/x86/crypto/Makefile
++++ b/arch/x86/crypto/Makefile
+@@ -39,7 +39,9 @@ obj-$(CONFIG_CRYPTO_AEGIS128_AESNI_SSE2) += aegis128-aesni.o
  
- /**
-@@ -132,8 +132,8 @@ struct sec_debug_file {
- };
+ obj-$(CONFIG_CRYPTO_NHPOLY1305_SSE2) += nhpoly1305-sse2.o
+ obj-$(CONFIG_CRYPTO_NHPOLY1305_AVX2) += nhpoly1305-avx2.o
+-obj-$(CONFIG_CRYPTO_CURVE25519_X86) += curve25519-x86_64.o
++ifdef CONFIG_CRYPTO_CURVE25519_X86
++obj-$(CONFIG_CRYPTO_LIB_CURVE25519_GENERIC) += curve25519-x86_64.o
++endif
  
- struct sec_dfx {
--	u64 send_cnt;
--	u64 recv_cnt;
-+	atomic64_t send_cnt;
-+	atomic64_t recv_cnt;
- };
- 
- struct sec_debug {
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-index 62b04e19067c..0a5391fff485 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-@@ -120,7 +120,7 @@ static void sec_req_cb(struct hisi_qp *qp, void *resp)
- 		return;
- 	}
- 
--	__sync_add_and_fetch(&req->ctx->sec->debug.dfx.recv_cnt, 1);
-+	atomic64_inc(&req->ctx->sec->debug.dfx.recv_cnt);
- 
- 	req->ctx->req_op->buf_unmap(req->ctx, req);
- 
-@@ -135,13 +135,13 @@ static int sec_bd_send(struct sec_ctx *ctx, struct sec_req *req)
- 	mutex_lock(&qp_ctx->req_lock);
- 	ret = hisi_qp_send(qp_ctx->qp, &req->sec_sqe);
- 	mutex_unlock(&qp_ctx->req_lock);
--	__sync_add_and_fetch(&ctx->sec->debug.dfx.send_cnt, 1);
-+	atomic64_inc(&ctx->sec->debug.dfx.send_cnt);
- 
- 	if (ret == -EBUSY)
- 		return -ENOBUFS;
- 
- 	if (!ret) {
--		if (req->fake_busy)
-+		if (atomic_read(&req->fake_busy))
- 			ret = -EBUSY;
- 		else
- 			ret = -EINPROGRESS;
-@@ -641,7 +641,7 @@ static void sec_skcipher_callback(struct sec_ctx *ctx, struct sec_req *req)
- 	if (ctx->c_ctx.c_mode == SEC_CMODE_CBC && req->c_req.encrypt)
- 		sec_update_iv(req);
- 
--	if (__sync_bool_compare_and_swap(&req->fake_busy, 1, 0))
-+	if (atomic_cmpxchg(&req->fake_busy, 1, 0) != 1)
- 		sk_req->base.complete(&sk_req->base, -EINPROGRESS);
- 
- 	sk_req->base.complete(&sk_req->base, req->err_type);
-@@ -672,9 +672,9 @@ static int sec_request_init(struct sec_ctx *ctx, struct sec_req *req)
- 	}
- 
- 	if (ctx->fake_req_limit <= atomic_inc_return(&qp_ctx->pending_reqs))
--		req->fake_busy = 1;
-+		atomic_set(&req->fake_busy, 1);
- 	else
--		req->fake_busy = 0;
-+		atomic_set(&req->fake_busy, 0);
- 
- 	ret = ctx->req_op->get_res(ctx, req);
- 	if (ret) {
-diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-index 74f0654028c9..ab742dfbab99 100644
---- a/drivers/crypto/hisilicon/sec2/sec_main.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-@@ -608,6 +608,14 @@ static const struct file_operations sec_dbg_fops = {
- 	.write = sec_debug_write,
- };
- 
-+static int debugfs_atomic64_t_get(void *data, u64 *val)
-+{
-+        *val = atomic64_read((atomic64_t *)data);
-+        return 0;
-+}
-+DEFINE_DEBUGFS_ATTRIBUTE(fops_atomic64_t_ro, debugfs_atomic64_t_get, NULL,
-+                        "%lld\n");
+ # These modules require assembler to support AVX.
+ ifeq ($(avx_supported),yes)
+diff --git a/crypto/Makefile b/crypto/Makefile
+index 4ca12b6044f7..93ecbfe50285 100644
+--- a/crypto/Makefile
++++ b/crypto/Makefile
+@@ -166,7 +166,10 @@ obj-$(CONFIG_CRYPTO_ZSTD) += zstd.o
+ obj-$(CONFIG_CRYPTO_OFB) += ofb.o
+ obj-$(CONFIG_CRYPTO_ECC) += ecc.o
+ obj-$(CONFIG_CRYPTO_ESSIV) += essiv.o
+-obj-$(CONFIG_CRYPTO_CURVE25519) += curve25519-generic.o
 +
- static int sec_core_debug_init(struct sec_dev *sec)
- {
- 	struct hisi_qm *qm = &sec->qm;
-@@ -628,9 +636,11 @@ static int sec_core_debug_init(struct sec_dev *sec)
++ifdef CONFIG_CRYPTO_CURVE25519
++obj-$(CONFIG_CRYPTO_LIB_CURVE25519_GENERIC) += curve25519-generic.o
++endif
  
- 	debugfs_create_regset32("regs", 0444, tmp_d, regset);
- 
--	debugfs_create_u64("send_cnt", 0444, tmp_d, &dfx->send_cnt);
-+	debugfs_create_file("send_cnt", 0444, tmp_d, &dfx->send_cnt,
-+			    &fops_atomic64_t_ro);
- 
--	debugfs_create_u64("recv_cnt", 0444, tmp_d, &dfx->recv_cnt);
-+	debugfs_create_file("recv_cnt", 0444, tmp_d, &dfx->recv_cnt,
-+			    &fops_atomic64_t_ro);
- 
- 	return 0;
- }
+ ecdh_generic-y += ecdh.o
+ ecdh_generic-y += ecdh_helper.o
 -- 
 2.20.0
 
