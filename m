@@ -1,107 +1,90 @@
-Return-Path: <SRS0=95aS=23=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=chSI=24=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAB8DC3F68F
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Jan 2020 20:02:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18153C33C9B
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jan 2020 05:15:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7E56E20731
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Jan 2020 20:02:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DA77B207FF
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 Jan 2020 05:15:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1578374137;
+	bh=7IRn73LOcIxtOPF38vt+jdde9KSqRJ/hkO43TQ+PV6U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=GOchf6ac02SZI8vdKbVGN8xVFnqljS5y25asoKt+c/rAjYsWCFm/xdM5iZozIRbB7
+	 TZNVPnuelOtCtNPhMkunORiHCiUA5Ro0gpP0HgfszIRaqYAkhO4tnGT9ylZbnWfrby
+	 eqBxtHA3qUYNKHemUApCijdqh1e9kLndVcHqmbAI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726701AbgAFUCD (ORCPT
+        id S1725920AbgAGFPZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 6 Jan 2020 15:02:03 -0500
-Received: from inva020.nxp.com ([92.121.34.13]:45932 "EHLO inva020.nxp.com"
+        Tue, 7 Jan 2020 00:15:25 -0500
+Received: from mail.kernel.org ([198.145.29.99]:39250 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726657AbgAFUCD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Jan 2020 15:02:03 -0500
-Received: from inva020.nxp.com (localhost [127.0.0.1])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 563561A0E3F;
-        Mon,  6 Jan 2020 21:02:01 +0100 (CET)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 469CA1A0E3C;
-        Mon,  6 Jan 2020 21:02:01 +0100 (CET)
-Received: from fsr-ub1864-014.ea.freescale.net (fsr-ub1864-014.ea.freescale.net [10.171.95.219])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 89CDB203CC;
-        Mon,  6 Jan 2020 21:02:00 +0100 (CET)
-From:   =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-To:     Shawn Guo <shawnguo@kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Fabio Estevam <festevam@gmail.com>,
-        NXP Linux Team <linux-imx@nxp.com>,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] arm64: dts: imx8mn: add crypto node
-Date:   Mon,  6 Jan 2020 22:01:54 +0200
-Message-Id: <20200106200154.30643-2-horia.geanta@nxp.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200106200154.30643-1-horia.geanta@nxp.com>
-References: <20200106200154.30643-1-horia.geanta@nxp.com>
+        id S1725267AbgAGFPZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 7 Jan 2020 00:15:25 -0500
+Received: from sol.localdomain (c-24-5-143-220.hsd1.ca.comcast.net [24.5.143.220])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 214E7207FD;
+        Tue,  7 Jan 2020 05:15:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1578374124;
+        bh=7IRn73LOcIxtOPF38vt+jdde9KSqRJ/hkO43TQ+PV6U=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=dnpAH75AkRY/1sigQosliNYb44fjXUGI2Xe+Dafae7NTasmhJWZx+xPPtruGzof9z
+         ekmuxXw3RYrNLLwaqyFrIQ2MDeGdHqUhMO/aBvrxvBjJb4RYfgduqd6DFtDSNZ7i++
+         Gt/q+ebKKUIWAqAO7XQIDe03Tvpx6CNDuA2Yb8dk=
+Date:   Mon, 6 Jan 2020 21:15:21 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Julia Lawall <julia.lawall@lip6.fr>,
+        linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mtd@lists.infradead.org,
+        netdev@vger.kernel.org, alsa-devel@alsa-project.org,
+        devicetree@vger.kernel.org
+Subject: Re: [PATCH] treewide: remove redundent IS_ERR() before error code
+ check
+Message-ID: <20200107051521.GF705@sol.localdomain>
+References: <20200106045833.1725-1-masahiroy@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: ClamAV using ClamSMTP
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200106045833.1725-1-masahiroy@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add node for CAAM - Cryptographic Acceleration and Assurance Module.
+On Mon, Jan 06, 2020 at 01:58:33PM +0900, Masahiro Yamada wrote:
+> 'PTR_ERR(p) == -E*' is a stronger condition than IS_ERR(p).
+> Hence, IS_ERR(p) is unneeded.
+> 
+> The semantic patch that generates this commit is as follows:
+> 
+> // <smpl>
+> @@
+> expression ptr;
+> constant error_code;
+> @@
+> -IS_ERR(ptr) && (PTR_ERR(ptr) == - error_code)
+> +PTR_ERR(ptr) == - error_code
+> // </smpl>
+> 
+> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
 
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
----
- arch/arm64/boot/dts/freescale/imx8mn.dtsi | 30 +++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+Any reason for not doing instead:
 
-diff --git a/arch/arm64/boot/dts/freescale/imx8mn.dtsi b/arch/arm64/boot/dts/freescale/imx8mn.dtsi
-index cce65b9a861f..c3fec19f4f05 100644
---- a/arch/arm64/boot/dts/freescale/imx8mn.dtsi
-+++ b/arch/arm64/boot/dts/freescale/imx8mn.dtsi
-@@ -537,6 +537,36 @@
- 				status = "disabled";
- 			};
- 
-+			crypto: crypto@30900000 {
-+				compatible = "fsl,sec-v4.0";
-+				#address-cells = <1>;
-+				#size-cells = <1>;
-+				reg = <0x30900000 0x40000>;
-+				ranges = <0 0x30900000 0x40000>;
-+				interrupts = <GIC_SPI 91 IRQ_TYPE_LEVEL_HIGH>;
-+				clocks = <&clk IMX8MN_CLK_AHB>,
-+					 <&clk IMX8MN_CLK_IPG_ROOT>;
-+				clock-names = "aclk", "ipg";
-+
-+				sec_jr0: jr0@1000 {
-+					 compatible = "fsl,sec-v4.0-job-ring";
-+					 reg = <0x1000 0x1000>;
-+					 interrupts = <GIC_SPI 105 IRQ_TYPE_LEVEL_HIGH>;
-+				};
-+
-+				sec_jr1: jr1@2000 {
-+					 compatible = "fsl,sec-v4.0-job-ring";
-+					 reg = <0x2000 0x1000>;
-+					 interrupts = <GIC_SPI 106 IRQ_TYPE_LEVEL_HIGH>;
-+				};
-+
-+				sec_jr2: jr2@3000 {
-+					 compatible = "fsl,sec-v4.0-job-ring";
-+					 reg = <0x3000 0x1000>;
-+					 interrupts = <GIC_SPI 114 IRQ_TYPE_LEVEL_HIGH>;
-+				};
-+			};
-+
- 			i2c1: i2c@30a20000 {
- 				compatible = "fsl,imx8mn-i2c", "fsl,imx21-i2c";
- 				#address-cells = <1>;
--- 
-2.17.1
+	ptr == ERR_PTR(-error_code)
 
+?  To me it seems weird to use PTR_ERR() on non-error pointers.  I even had to
+double check that it returns a 'long' and not an 'int'.  (If it returned an
+'int', it wouldn't work...)
+
+- Eric
