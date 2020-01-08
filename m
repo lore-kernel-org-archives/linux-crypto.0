@@ -2,126 +2,189 @@ Return-Path: <SRS0=xmdE=25=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74E48C33C9E
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jan 2020 00:36:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D664C33C99
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jan 2020 01:08:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 497D120692
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jan 2020 00:36:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="sa6le+kJ"
+	by mail.kernel.org (Postfix) with ESMTP id 3E5502075A
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jan 2020 01:08:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726155AbgAHAgx (ORCPT
+        id S1725812AbgAHBIz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 7 Jan 2020 19:36:53 -0500
-Received: from linux.microsoft.com ([13.77.154.182]:54842 "EHLO
-        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725812AbgAHAgx (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 7 Jan 2020 19:36:53 -0500
-Received: from nramas-ThinkStation-P520.corp.microsoft.com (unknown [131.107.174.108])
-        by linux.microsoft.com (Postfix) with ESMTPSA id 1854E200766E;
-        Tue,  7 Jan 2020 16:36:52 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 1854E200766E
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1578443812;
-        bh=uDFbL012Mn3QsfVJrcwLvdlFl64rDMvh5io3nyEQNeo=;
-        h=From:To:Cc:Subject:Date:From;
-        b=sa6le+kJcA1AZqAz7G7FzWIlVhQA1Y75jL8ILo67ae81XGWbeW347zan9ZBjbCtEt
-         43i4cpo8jOE9OfWgDMyPqRX49sK9pr0cJiKZFn2NIjK+MgTVue6H/NwCgxOdPLu5y2
-         XaTVav+j4cX+qDjxgrYY0EmKKVsX0QNn8l0kbhYk=
-From:   Lakshmi Ramasubramanian <nramas@linux.microsoft.com>
-To:     zohar@linux.ibm.com, James.Bottomley@HansenPartnership.com,
-        arnd@arndb.de, linux-integrity@vger.kernel.org
-Cc:     dhowells@redhat.com, sashal@kernel.org,
-        linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH] IMA: Defined CONFIG_IMA_MEASURE_ASYMMETRIC_KEYS to enable IMA hook to measure keys
-Date:   Tue,  7 Jan 2020 16:36:47 -0800
-Message-Id: <20200108003647.2472-1-nramas@linux.microsoft.com>
-X-Mailer: git-send-email 2.17.1
+        Tue, 7 Jan 2020 20:08:55 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:9121 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725601AbgAHBIz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 7 Jan 2020 20:08:55 -0500
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 10948CCB81128B92F9C4;
+        Wed,  8 Jan 2020 09:08:53 +0800 (CST)
+Received: from [127.0.0.1] (10.67.101.242) by DGGEMS404-HUB.china.huawei.com
+ (10.3.19.204) with Microsoft SMTP Server id 14.3.439.0; Wed, 8 Jan 2020
+ 09:08:42 +0800
+Subject: Re: [PATCH] crypto: hisilicon/sec2 - Use atomics instead of __sync
+To:     Arnd Bergmann <arnd@arndb.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Longfang Liu <liulongfang@huawei.com>
+References: <20200107200926.3659010-1-arnd@arndb.de>
+CC:     Dan Carpenter <dan.carpenter@oracle.com>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+From:   Xu Zaibo <xuzaibo@huawei.com>
+Message-ID: <b89ff368-31ae-473b-c2c9-3f7b99714781@huawei.com>
+Date:   Wed, 8 Jan 2020 09:08:42 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
+MIME-Version: 1.0
+In-Reply-To: <20200107200926.3659010-1-arnd@arndb.de>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.101.242]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-CONFIG_ASYMMETRIC_PUBLIC_KEY_SUBTYPE is a tristate and not a bool.
-If this config is set to "=m", ima_asymmetric_keys.c is built
-as a kernel module when it is actually not.
+Hi,
 
-Defined a new config CONFIG_IMA_MEASURE_ASYMMETRIC_KEYS that is
-defined when CONFIG_IMA and CONFIG_ASYMMETRIC_PUBLIC_KEY_SUBTYPE
-are defined.
+I will send out a patch set soon, which fixes this problem. Thanks.
 
-Asymmetric key structure is defined only when
-CONFIG_ASYMMETRIC_PUBLIC_KEY_SUBTYPE is defined. Since the IMA hook
-measures asymmetric keys, the IMA hook is defined in
-ima_asymmetric_keys.c which is built only if
-CONFIG_IMA_MEASURE_ASYMMETRIC_KEYS is defined.
+cheers,
 
-Signed-off-by: Lakshmi Ramasubramanian <nramas@linux.microsoft.com>
-Cc: David Howells <dhowells@redhat.com>
-Cc: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-Reported-by: kbuild test robot <lkp@intel.com> # ima_asymmetric_keys.c
-is built as a kernel module when it is actually not.
-Fixes: 88e70da170e8 ("IMA: Define an IMA hook to measure keys")
-Fixes: cb1aa3823c92 ("KEYS: Call the IMA hook to measure keys")
----
- include/linux/ima.h             | 4 ++--
- security/integrity/ima/Kconfig  | 6 ++++++
- security/integrity/ima/Makefile | 2 +-
- 3 files changed, 9 insertions(+), 3 deletions(-)
+Zaibo
 
-diff --git a/include/linux/ima.h b/include/linux/ima.h
-index 3b89136bc218..f4644c54f648 100644
---- a/include/linux/ima.h
-+++ b/include/linux/ima.h
-@@ -101,7 +101,7 @@ static inline void ima_add_kexec_buffer(struct kimage *image)
- {}
- #endif
- 
--#if defined(CONFIG_IMA) && defined(CONFIG_ASYMMETRIC_PUBLIC_KEY_SUBTYPE)
-+#ifdef CONFIG_IMA_MEASURE_ASYMMETRIC_KEYS
- extern void ima_post_key_create_or_update(struct key *keyring,
- 					  struct key *key,
- 					  const void *payload, size_t plen,
-@@ -113,7 +113,7 @@ static inline void ima_post_key_create_or_update(struct key *keyring,
- 						 size_t plen,
- 						 unsigned long flags,
- 						 bool create) {}
--#endif  /* CONFIG_IMA && CONFIG_ASYMMETRIC_PUBLIC_KEY_SUBTYPE */
-+#endif  /* CONFIG_IMA_MEASURE_ASYMMETRIC_KEYS */
- 
- #ifdef CONFIG_IMA_APPRAISE
- extern bool is_ima_appraise_enabled(void);
-diff --git a/security/integrity/ima/Kconfig b/security/integrity/ima/Kconfig
-index 838476d780e5..355754a6b6ca 100644
---- a/security/integrity/ima/Kconfig
-+++ b/security/integrity/ima/Kconfig
-@@ -310,3 +310,9 @@ config IMA_APPRAISE_SIGNED_INIT
- 	default n
- 	help
- 	   This option requires user-space init to be signed.
-+
-+config IMA_MEASURE_ASYMMETRIC_KEYS
-+	bool
-+	depends on IMA
-+	depends on ASYMMETRIC_PUBLIC_KEY_SUBTYPE=y
-+	default y
-diff --git a/security/integrity/ima/Makefile b/security/integrity/ima/Makefile
-index 207a0a9eb72c..3e9d0ad68c7b 100644
---- a/security/integrity/ima/Makefile
-+++ b/security/integrity/ima/Makefile
-@@ -12,4 +12,4 @@ ima-$(CONFIG_IMA_APPRAISE) += ima_appraise.o
- ima-$(CONFIG_IMA_APPRAISE_MODSIG) += ima_modsig.o
- ima-$(CONFIG_HAVE_IMA_KEXEC) += ima_kexec.o
- obj-$(CONFIG_IMA_BLACKLIST_KEYRING) += ima_mok.o
--obj-$(CONFIG_ASYMMETRIC_PUBLIC_KEY_SUBTYPE) += ima_asymmetric_keys.o
-+obj-$(CONFIG_IMA_MEASURE_ASYMMETRIC_KEYS) += ima_asymmetric_keys.o
--- 
-2.17.1
+.
+
+
+On 2020/1/8 4:08, Arnd Bergmann wrote:
+> The use of __sync functions for atomic memory access is not
+> supported in the kernel, and can result in a link error depending
+> on configuration:
+>
+> ERROR: "__tsan_atomic32_compare_exchange_strong" [drivers/crypto/hisilicon/sec2/hisi_sec2.ko] undefined!
+> ERROR: "__tsan_atomic64_fetch_add" [drivers/crypto/hisilicon/sec2/hisi_sec2.ko] undefined!
+>
+> Use the kernel's own atomic interfaces instead. This way the
+> debugfs interface actually reads the counter atomically.
+>
+> Fixes: 416d82204df4 ("crypto: hisilicon - add HiSilicon SEC V2 driver")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>   drivers/crypto/hisilicon/sec2/sec.h        |  6 +++---
+>   drivers/crypto/hisilicon/sec2/sec_crypto.c | 12 ++++++------
+>   drivers/crypto/hisilicon/sec2/sec_main.c   | 14 ++++++++++++--
+>   3 files changed, 21 insertions(+), 11 deletions(-)
+>
+> diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
+> index 26754d0570ba..b846d73d9a85 100644
+> --- a/drivers/crypto/hisilicon/sec2/sec.h
+> +++ b/drivers/crypto/hisilicon/sec2/sec.h
+> @@ -40,7 +40,7 @@ struct sec_req {
+>   	int req_id;
+>   
+>   	/* Status of the SEC request */
+> -	int fake_busy;
+> +	atomic_t fake_busy;
+>   };
+>   
+>   /**
+> @@ -132,8 +132,8 @@ struct sec_debug_file {
+>   };
+>   
+>   struct sec_dfx {
+> -	u64 send_cnt;
+> -	u64 recv_cnt;
+> +	atomic64_t send_cnt;
+> +	atomic64_t recv_cnt;
+>   };
+>   
+>   struct sec_debug {
+> diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+> index 62b04e19067c..0a5391fff485 100644
+> --- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
+> +++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+> @@ -120,7 +120,7 @@ static void sec_req_cb(struct hisi_qp *qp, void *resp)
+>   		return;
+>   	}
+>   
+> -	__sync_add_and_fetch(&req->ctx->sec->debug.dfx.recv_cnt, 1);
+> +	atomic64_inc(&req->ctx->sec->debug.dfx.recv_cnt);
+>   
+>   	req->ctx->req_op->buf_unmap(req->ctx, req);
+>   
+> @@ -135,13 +135,13 @@ static int sec_bd_send(struct sec_ctx *ctx, struct sec_req *req)
+>   	mutex_lock(&qp_ctx->req_lock);
+>   	ret = hisi_qp_send(qp_ctx->qp, &req->sec_sqe);
+>   	mutex_unlock(&qp_ctx->req_lock);
+> -	__sync_add_and_fetch(&ctx->sec->debug.dfx.send_cnt, 1);
+> +	atomic64_inc(&ctx->sec->debug.dfx.send_cnt);
+>   
+>   	if (ret == -EBUSY)
+>   		return -ENOBUFS;
+>   
+>   	if (!ret) {
+> -		if (req->fake_busy)
+> +		if (atomic_read(&req->fake_busy))
+>   			ret = -EBUSY;
+>   		else
+>   			ret = -EINPROGRESS;
+> @@ -641,7 +641,7 @@ static void sec_skcipher_callback(struct sec_ctx *ctx, struct sec_req *req)
+>   	if (ctx->c_ctx.c_mode == SEC_CMODE_CBC && req->c_req.encrypt)
+>   		sec_update_iv(req);
+>   
+> -	if (__sync_bool_compare_and_swap(&req->fake_busy, 1, 0))
+> +	if (atomic_cmpxchg(&req->fake_busy, 1, 0) != 1)
+>   		sk_req->base.complete(&sk_req->base, -EINPROGRESS);
+>   
+>   	sk_req->base.complete(&sk_req->base, req->err_type);
+> @@ -672,9 +672,9 @@ static int sec_request_init(struct sec_ctx *ctx, struct sec_req *req)
+>   	}
+>   
+>   	if (ctx->fake_req_limit <= atomic_inc_return(&qp_ctx->pending_reqs))
+> -		req->fake_busy = 1;
+> +		atomic_set(&req->fake_busy, 1);
+>   	else
+> -		req->fake_busy = 0;
+> +		atomic_set(&req->fake_busy, 0);
+>   
+>   	ret = ctx->req_op->get_res(ctx, req);
+>   	if (ret) {
+> diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+> index 74f0654028c9..ab742dfbab99 100644
+> --- a/drivers/crypto/hisilicon/sec2/sec_main.c
+> +++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+> @@ -608,6 +608,14 @@ static const struct file_operations sec_dbg_fops = {
+>   	.write = sec_debug_write,
+>   };
+>   
+> +static int debugfs_atomic64_t_get(void *data, u64 *val)
+> +{
+> +        *val = atomic64_read((atomic64_t *)data);
+> +        return 0;
+> +}
+> +DEFINE_DEBUGFS_ATTRIBUTE(fops_atomic64_t_ro, debugfs_atomic64_t_get, NULL,
+> +                        "%lld\n");
+> +
+>   static int sec_core_debug_init(struct sec_dev *sec)
+>   {
+>   	struct hisi_qm *qm = &sec->qm;
+> @@ -628,9 +636,11 @@ static int sec_core_debug_init(struct sec_dev *sec)
+>   
+>   	debugfs_create_regset32("regs", 0444, tmp_d, regset);
+>   
+> -	debugfs_create_u64("send_cnt", 0444, tmp_d, &dfx->send_cnt);
+> +	debugfs_create_file("send_cnt", 0444, tmp_d, &dfx->send_cnt,
+> +			    &fops_atomic64_t_ro);
+>   
+> -	debugfs_create_u64("recv_cnt", 0444, tmp_d, &dfx->recv_cnt);
+> +	debugfs_create_file("recv_cnt", 0444, tmp_d, &dfx->recv_cnt,
+> +			    &fops_atomic64_t_ro);
+>   
+>   	return 0;
+>   }
+
 
