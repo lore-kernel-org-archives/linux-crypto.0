@@ -5,58 +5,58 @@ X-Spam-Level:
 X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5D73C282DD
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jan 2020 15:42:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D939CC33CA1
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jan 2020 15:42:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 892A62072A
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jan 2020 15:42:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF54A2073A
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jan 2020 15:42:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YsQN8sZD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X695sjDZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729040AbgAHPmG (ORCPT
+        id S1729051AbgAHPmI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 Jan 2020 10:42:06 -0500
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:33595 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726363AbgAHPmC (ORCPT
+        Wed, 8 Jan 2020 10:42:08 -0500
+Received: from mail-pj1-f67.google.com ([209.85.216.67]:52291 "EHLO
+        mail-pj1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729045AbgAHPmH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Jan 2020 10:42:02 -0500
-Received: by mail-pf1-f193.google.com with SMTP id z16so1830490pfk.0;
-        Wed, 08 Jan 2020 07:42:02 -0800 (PST)
+        Wed, 8 Jan 2020 10:42:07 -0500
+Received: by mail-pj1-f67.google.com with SMTP id a6so1236778pjh.2;
+        Wed, 08 Jan 2020 07:42:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=e1VydrddQQ2iYB1DThmBo5L3jMtREdgLznIozdRQZ6Q=;
-        b=YsQN8sZDCsVBLyqVqglFYQX3ipzdNfpAUgQ8dxBhxSuL45z81+BFcKCb3k8LSqqBIy
-         8yjy0b2ow+l/gtoaQcoU+C7T/8s1DL5R6evI3b6cwef3mYlKGvO6gJkO6FnrblnbiEnh
-         e/h96a3ANkKUIaP1TLQBCH05aR7CvW7/zKAl5z7Cp4xBFeJzwDFKNcuFvJtaAXuVg+Qj
-         zxjfuONcUpwegTVDC2p8PvEr/kCvYuVK1LS8nGnAuQb9NPWx8xHvLDpQj0ATfs0itati
-         nUYljY6+1MAWRv+zoIlZq963wyGuJ234s910bSQ+LuovSBGGQiyM2Pqo0eIJFFAtrhp5
-         N+Bg==
+        bh=NqcNgcBIdsIjxgPBGKJAVyvsIKyRH4Nc8ZAOSc+D0fE=;
+        b=X695sjDZ3I4ZjRLo6I24zQ/zy2+HMnhKMYzkrip6EpfcvthHq8Ax+KZkMQsZxEeUUU
+         wYJvnt0YXY/nrHPafYHkVWd3Upn3aFRB4M3ZqLt16ZC5jtWFU1b922rTKr3Zp7sFnSU/
+         XP/vOOnJ13BHHu9QXBXe2w3HKY+QbtdcXqtFZiXmYuKsYt84Wd96oZ/98gX4lrZfqzBz
+         P4WyVoM+o+lAN7Az6Ck9gNUiO4X1lzN2RQ5T3Tbh9KQj4NUq9d0C3ZFwZbKTtWWmgAgB
+         oJTzakpiEr1vCInId1dZ1l709PXO/UG7uEJXgGn2WRxilb4D3HmAAnQb70HdqSiYViZi
+         DpBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=e1VydrddQQ2iYB1DThmBo5L3jMtREdgLznIozdRQZ6Q=;
-        b=U+CsERhGGY+BPZGK3MQIc0kjE+JtXJolijv5pXy//XRXoZTASxH2Yz1O17VDNY1tPI
-         snH53SNFCUvgwCmbMRvHJ5DgNO5NQ2IOO/P3DVkqUK6vwzTuM6b2jFy7EH3egvqog4mW
-         4zbYQ7ZLb5hBeqW4jMlfW4T+HCP2YqzbB79MCEkf5l3jA4wyKR+HkO0LI1qNIJRjomY8
-         Zpkd0I69lwihWOxPGPdVx/voCpOXnVvSnp1v3onL1d9BL048qUB4ifpA40cipK7T4zAU
-         B8yrJer+nFMnYjmkQ7pp4V7vZeHXzeT5BoWg4WyQsgTm7SZlL46DTyYslscpnezuaHVb
-         dgTg==
-X-Gm-Message-State: APjAAAU2I8ejS+6Wkei8RRHhT1wjGMh50LIhaiyllTGJLKaGqQYnyiOA
-        qD390nQyuA8tevj07eC38pdD4D9I
-X-Google-Smtp-Source: APXvYqx3dfQwyBq6j3FDwObhn/gSdqmirlOoClvmjzVDteEIveTxU2sklT6ftL0+rbntMCSOsgYZ9Q==
-X-Received: by 2002:a62:1d87:: with SMTP id d129mr5551144pfd.87.1578498121397;
-        Wed, 08 Jan 2020 07:42:01 -0800 (PST)
+        bh=NqcNgcBIdsIjxgPBGKJAVyvsIKyRH4Nc8ZAOSc+D0fE=;
+        b=iOWbrqtV3gMXLeRGH+iq+3AvCwWIAtOY1p19vdLIqk0j0SPzLUeQq2WG2kiC1R678t
+         ze3Dnzxda78rkTtg8uh9+qCMR9zswAPp3hjVv7wyGuT8jvHTw2OGDZySNt33I7VJL5im
+         xr9v40K7Jhd68jxs6bB8rubjeQebtJqW+LInKk0YUNj4yr7G15dz/c9Z1l9WWhF9lQ1U
+         JZxdKY9I8RJjOjUtehambq3rvSRRbs7etLEWRJ1oSmYeRyb9zM2MA+ETgI3PyS5/nakg
+         QFRV91CtPNK+p8qtRgUWg1OzohZbiW44NdxR2m0v8/qxNsMjPASX3QzA0u6eClsBQKmm
+         3TZw==
+X-Gm-Message-State: APjAAAUBEGOsI/A++eVaDT011snrgGa5KnOKyfF3+b83dBKZ2g229rLS
+        4lngOTjtwDAQiFAhA74Q6PpK4yzt
+X-Google-Smtp-Source: APXvYqza+Ai3sj9qXmjB+8LuxnlqvhRuDxggGyIJVthk929D3XxHkipgLVT+kgJlJhcVp0zhz0eDrA==
+X-Received: by 2002:a17:902:7203:: with SMTP id ba3mr5794754plb.249.1578498126366;
+        Wed, 08 Jan 2020 07:42:06 -0800 (PST)
 Received: from localhost.localdomain (c-67-165-113-11.hsd1.wa.comcast.net. [67.165.113.11])
-        by smtp.gmail.com with ESMTPSA id e1sm4286640pfl.98.2020.01.08.07.41.59
+        by smtp.gmail.com with ESMTPSA id e1sm4286640pfl.98.2020.01.08.07.42.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Jan 2020 07:42:00 -0800 (PST)
+        Wed, 08 Jan 2020 07:42:05 -0800 (PST)
 From:   Andrey Smirnov <andrew.smirnov@gmail.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
@@ -66,9 +66,9 @@ Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Iuliana Prodan <iuliana.prodan@nxp.com>,
         linux-kernel@vger.kernel.org, linux-imx@nxp.com
-Subject: [PATCH v6 4/7] crypto: caam - check if RNG job failed
-Date:   Wed,  8 Jan 2020 07:40:44 -0800
-Message-Id: <20200108154047.12526-5-andrew.smirnov@gmail.com>
+Subject: [PATCH v6 7/7] crypto: caam - limit single JD RNG output to maximum of 16 bytes
+Date:   Wed,  8 Jan 2020 07:40:47 -0800
+Message-Id: <20200108154047.12526-8-andrew.smirnov@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200108154047.12526-1-andrew.smirnov@gmail.com>
 References: <20200108154047.12526-1-andrew.smirnov@gmail.com>
@@ -80,8 +80,14 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-We shouldn't stay silent if RNG job fails. Add appropriate code to
-check for that case and propagate error code up appropriately.
+In order to follow recommendation in SP800-90C (section "9.4 The
+Oversampling-NRBG Construction") limit the output of "generate" JD
+submitted to CAAM. See
+https://lore.kernel.org/linux-crypto/VI1PR0402MB3485EF10976A4A69F90E5B0F98580@VI1PR0402MB3485.eurprd04.prod.outlook.com/
+for more details.
+
+This change should make CAAM's hwrng driver good enough to have 999
+quality rating.
 
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 Cc: Chris Healy <cphealy@gmail.com>
@@ -93,60 +99,38 @@ Cc: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 Cc: linux-imx@nxp.com
 ---
- drivers/crypto/caam/caamrng.c | 17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
+ drivers/crypto/caam/caamrng.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
-index 3960f5c81c97..554aafbd4d11 100644
+index 91ccde0240fe..2b75ffffcac9 100644
 --- a/drivers/crypto/caam/caamrng.c
 +++ b/drivers/crypto/caam/caamrng.c
-@@ -52,6 +52,11 @@ struct caam_rng_ctx {
- 	struct kfifo fifo;
- };
+@@ -23,7 +23,7 @@
+ #include "error.h"
  
-+struct caam_rng_job_ctx {
-+	struct completion *done;
-+	int *err;
-+};
-+
- static struct caam_rng_ctx *to_caam_rng_ctx(struct hwrng *r)
- {
- 	return container_of(r, struct caam_rng_ctx, rng);
-@@ -60,12 +65,12 @@ static struct caam_rng_ctx *to_caam_rng_ctx(struct hwrng *r)
- static void caam_rng_done(struct device *jrdev, u32 *desc, u32 err,
- 			  void *context)
- {
--	struct completion *done = context;
-+	struct caam_rng_job_ctx *jctx = context;
+ /* length of descriptors */
+-#define CAAM_RNG_MAX_FIFO_STORE_SIZE	U16_MAX
++#define CAAM_RNG_MAX_FIFO_STORE_SIZE	16
  
- 	if (err)
--		caam_jr_strstatus(jrdev, err);
-+		*jctx->err = caam_jr_strstatus(jrdev, err);
+ #define CAAM_RNG_FIFO_LEN		SZ_32K /* Must be a multiple of 2 */
  
--	complete(done);
-+	complete(jctx->done);
- }
+@@ -134,7 +134,7 @@ static void caam_rng_fill_async(struct caam_rng_ctx *ctx)
  
- static u32 *caam_init_desc(u32 *desc, dma_addr_t dst_dma, int len)
-@@ -89,6 +94,10 @@ static int caam_rng_read_one(struct device *jrdev,
- {
- 	dma_addr_t dst_dma;
- 	int err;
-+	struct caam_rng_job_ctx jctx = {
-+		.done = done,
-+		.err  = &err,
-+	};
+ 	sg_init_table(sg, ARRAY_SIZE(sg));
+ 	nents = kfifo_dma_in_prepare(&ctx->fifo, sg, ARRAY_SIZE(sg),
+-				     CAAM_RNG_FIFO_LEN);
++				     CAAM_RNG_MAX_FIFO_STORE_SIZE);
+ 	if (!nents)
+ 		return;
  
- 	len = min_t(int, len, CAAM_RNG_MAX_FIFO_STORE_SIZE);
+@@ -241,6 +241,7 @@ int caam_rng_init(struct device *ctrldev)
+ 	ctx->rng.init    = caam_init;
+ 	ctx->rng.cleanup = caam_cleanup;
+ 	ctx->rng.read    = caam_read;
++	ctx->rng.quality = 999;
  
-@@ -101,7 +110,7 @@ static int caam_rng_read_one(struct device *jrdev,
- 	init_completion(done);
- 	err = caam_jr_enqueue(jrdev,
- 			      caam_init_desc(desc, dst_dma, len),
--			      caam_rng_done, done);
-+			      caam_rng_done, &jctx);
- 	if (!err)
- 		wait_for_completion(done);
+ 	dev_info(ctrldev, "registering rng-caam\n");
  
 -- 
 2.21.0
