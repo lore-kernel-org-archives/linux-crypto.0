@@ -2,180 +2,319 @@ Return-Path: <SRS0=xmdE=25=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B827DC33CA2
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jan 2020 16:06:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BF94C282DD
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jan 2020 16:47:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 853212073A
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jan 2020 16:06:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=microchiptechnology.onmicrosoft.com header.i=@microchiptechnology.onmicrosoft.com header.b="f4pI9bXZ"
+	by mail.kernel.org (Postfix) with ESMTP id 18DB520692
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jan 2020 16:47:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726651AbgAHQGK (ORCPT
+        id S1729370AbgAHQr4 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 Jan 2020 11:06:10 -0500
-Received: from esa2.microchip.iphmx.com ([68.232.149.84]:63553 "EHLO
-        esa2.microchip.iphmx.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728399AbgAHQGJ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Jan 2020 11:06:09 -0500
-Received-SPF: Pass (esa2.microchip.iphmx.com: domain of
-  Tudor.Ambarus@microchip.com designates 198.175.253.82 as
-  permitted sender) identity=mailfrom;
-  client-ip=198.175.253.82; receiver=esa2.microchip.iphmx.com;
-  envelope-from="Tudor.Ambarus@microchip.com";
-  x-sender="Tudor.Ambarus@microchip.com";
-  x-conformance=spf_only; x-record-type="v=spf1";
-  x-record-text="v=spf1 mx a:ushub1.microchip.com
-  a:smtpout.microchip.com -exists:%{i}.spf.microchip.iphmx.com
-  include:servers.mcsv.net include:mktomail.com
-  include:spf.protection.outlook.com ~all"
-Received-SPF: None (esa2.microchip.iphmx.com: no sender
-  authenticity information available from domain of
-  postmaster@email.microchip.com) identity=helo;
-  client-ip=198.175.253.82; receiver=esa2.microchip.iphmx.com;
-  envelope-from="Tudor.Ambarus@microchip.com";
-  x-sender="postmaster@email.microchip.com";
-  x-conformance=spf_only
-Authentication-Results: esa2.microchip.iphmx.com; spf=Pass smtp.mailfrom=Tudor.Ambarus@microchip.com; spf=None smtp.helo=postmaster@email.microchip.com; dkim=pass (signature verified) header.i=@microchiptechnology.onmicrosoft.com; dmarc=pass (p=none dis=none) d=microchip.com
-IronPort-SDR: nutv9ZNUF9QsbJSld5Xi2dVCAMacL/rmV2e6QosdpEFK/zm1KVQRZw3TsQBB0EDXwJYb+O0idC
- CiPIZ0/nTW3VovVqXjZA5COB5asWtqM57CP//wRDZFKlmRsxL2wqeokI+1JzWV4YlCC6Pt7I8t
- F2T4QjHmtnTOqfT4amE1BsuPavedXLa9xqoZCwFS0b4f9e9jT8cpIILdYJiEffSy7guHSgqsOB
- zJ640Txkbp548L5ZgCPMAwg22gjEfhu8e9sbAbDfbXWlNCtrI/asIyCMkifDt4DcDG/xmaT75k
- LrY=
+        Wed, 8 Jan 2020 11:47:56 -0500
+Received: from mga01.intel.com ([192.55.52.88]:37305 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727606AbgAHQr4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 8 Jan 2020 11:47:56 -0500
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/DHE-RSA-AES256-GCM-SHA384; 08 Jan 2020 08:47:55 -0800
+X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.69,410,1571727600"; 
-   d="scan'208";a="61974856"
-Received: from smtpout.microchip.com (HELO email.microchip.com) ([198.175.253.82])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 08 Jan 2020 09:06:08 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Wed, 8 Jan 2020 09:06:07 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (10.10.215.89) by
- email.microchip.com (10.10.87.72) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5 via Frontend
- Transport; Wed, 8 Jan 2020 09:06:07 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gKHJ2UObMKLmhPvHlWj5iz+heeFK32F/oKoU/HKuA0KXPTya/E8zn1kenNNbiF3fQTiTYOHQ7bkAT/qKdRkQ2D9f9WJwKjz2zh6oeSp5kXj2l0+r6ixTA6KL0QyMBKDFt6kF31Rc1tv8IIHaqWuDvUAmNA0zdvGIozHXARQrKu5qY116CVWYNcnA2h+y/Me31kGZvgUPtkk1KV4h13phWtW/T7qXojIuV3nbLilIdg95L0xGAxz4hIP22iVEJSiLmbDG/QNnB06B4Ugt94TeDyzhuJRpnreVZEp1/ltWCGmcLU09A0Cz3801A9MxoUkWKl8E3WK7+l6tye+QV5QQ3Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hi7KgIqjlA6akDQu6a5zgdXw9YfnT7ZrvZffezTdOGY=;
- b=AzxPC5uki4f4363MuDbhD2UJbqZMe1U4VhK4bsHe025sX2vBHGJRQleDOM1CQYTl7ewzybooPrNWT1C8eefIafOaM6oB5TD09t3Z663uc1hOSMO7vSISHyzHBRPXT61VWI80y/dPu796o+45X4+bBHB553Q2wWjiAtaEmkjuK24YOH2Si8CjY1wBnZNJi3TBHOnRkDGL9kjY4AJQA4T0QUFBSy8F0bI6pnITr90HaYY4+SRzJgoGLwhpb9AYEbVMa87FVWG1mmSk9+QRsoeUlOYgquv1WWZjrUW34YXl2BLg8nsicTq9QeHIoruDrnPREVooUm3b2lojMvMcuhJKag==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=microchiptechnology.onmicrosoft.com;
- s=selector2-microchiptechnology-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hi7KgIqjlA6akDQu6a5zgdXw9YfnT7ZrvZffezTdOGY=;
- b=f4pI9bXZKnTgZ8RtEhkJ8BMTEWtqOF4iNigdduvbzg1DCJFmInP0JsitRroVIvOjZZasdG6ShXDHbWduz8WuEOIx/AXbrfdtr3+9iiP28O56RMgJuF4adHcmGX3r1ExbjHPF4bN4I9mO81tKufD1NubklhNVHKl8K2DeBQ60crs=
-Received: from MN2PR11MB4448.namprd11.prod.outlook.com (52.135.39.157) by
- MN2PR11MB3886.namprd11.prod.outlook.com (20.179.150.15) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2623.9; Wed, 8 Jan 2020 16:06:06 +0000
-Received: from MN2PR11MB4448.namprd11.prod.outlook.com
- ([fe80::71cc:a5d4:8e1a:198b]) by MN2PR11MB4448.namprd11.prod.outlook.com
- ([fe80::71cc:a5d4:8e1a:198b%7]) with mapi id 15.20.2602.017; Wed, 8 Jan 2020
- 16:06:06 +0000
-From:   <Tudor.Ambarus@microchip.com>
-To:     <linux-crypto@vger.kernel.org>
-CC:     <ebiggers@kernel.org>
-Subject: Re: [PATCH 3/8] crypto: atmel-sha - fix error handling when setting
- hmac key
-Thread-Topic: [PATCH 3/8] crypto: atmel-sha - fix error handling when setting
- hmac key
-Thread-Index: AQHVxj2Ii3AtBld1UEew6HdX3jag3A==
-Date:   Wed, 8 Jan 2020 16:06:06 +0000
-Message-ID: <2028004.Oqa5o8bvTI@localhost.localdomain>
-References: <20191231031938.241705-1-ebiggers@kernel.org>
- <20191231031938.241705-4-ebiggers@kernel.org>
-In-Reply-To: <20191231031938.241705-4-ebiggers@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [94.177.32.156]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 3078aded-d291-4a69-7fa9-08d79454ab38
-x-ms-traffictypediagnostic: MN2PR11MB3886:
-x-microsoft-antispam-prvs: <MN2PR11MB3886C33F00B9DC63691D37C2F03E0@MN2PR11MB3886.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2582;
-x-forefront-prvs: 02760F0D1C
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(396003)(39860400002)(136003)(346002)(376002)(366004)(189003)(199004)(6512007)(9686003)(4326008)(6486002)(2906002)(6916009)(81156014)(81166006)(26005)(71200400001)(8676002)(66446008)(66556008)(8936002)(66476007)(66946007)(76116006)(91956017)(316002)(64756008)(53546011)(5660300002)(478600001)(6506007)(86362001)(186003)(39026012);DIR:OUT;SFP:1101;SCL:1;SRVR:MN2PR11MB3886;H:MN2PR11MB4448.namprd11.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: microchip.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: L77P0WM8mvHTV7cby49KHAwI9TO2jJu3d+eMFAI0DYgQ9Odsb9DWirAUtWa+Y0HAuyUnq/TrBcznMeaMBBEd3/icckwBMBQoOv7QLPJxvnWHE4KpvzcAU9kKPp6WgNvj7jnO4THGwvoVG/YrxekzkkzmKu0TgQvwpbBwhj1LTkKlFj6JEynS7sGRZpWDHSkqc8wOS6bQZcj/p+2cpfKhghghoX08OoTF9oETJe7n2W4niru0soiCPdnlkQZ7rUtCNK1wsG+Y5sCVrvlpvuaMF0+SBVLYgC5X1g+O+rgnwm5CALg1Ps6OXp/vaPAGZ2DvPb2pXoBhALviaou92ZfVSSutyBGFsZs0vvGgu3OnasqiJ+2cgODQYgKlRZmnb991lcEBkxC47/79k7y5h+j9fc8mTom5IpU7c5ok+UoJK69Wb6Gs0M9R1q2PvyaddqPU6aCUwsNNQp93JHjU54SLcwHoy17EfUZd19MLIChL+Wrjk8A8Sn29H8tx1AP2ZK4T
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <0869F0EF533E26408ED7E6D835DAB7E3@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+   d="scan'208";a="222980237"
+Received: from djiang5-desk3.ch.intel.com ([143.182.136.137])
+  by orsmga006.jf.intel.com with ESMTP; 08 Jan 2020 08:47:54 -0800
+Subject: Re: [PATCH v10 0/4] Add uacce module for Accelerator
+To:     Zhangfei Gao <zhangfei.gao@linaro.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        jonathan.cameron@huawei.com, grant.likely@arm.com,
+        jean-philippe <jean-philippe@linaro.org>,
+        Jerome Glisse <jglisse@redhat.com>,
+        ilias.apalodimas@linaro.org, francois.ozog@linaro.org,
+        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
+        "haojian . zhuang" <haojian.zhuang@linaro.org>,
+        guodong.xu@linaro.org
+Cc:     iommu@lists.linux-foundation.org, linux-kernel@vger.kernel.org,
+        linux-accelerators@lists.ozlabs.org, linux-crypto@vger.kernel.org
+References: <1576465697-27946-1-git-send-email-zhangfei.gao@linaro.org>
+From:   Dave Jiang <dave.jiang@intel.com>
+Message-ID: <ee0a3557-9b4b-d541-27ba-84b53af2bfba@intel.com>
+Date:   Wed, 8 Jan 2020 09:47:53 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.2
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3078aded-d291-4a69-7fa9-08d79454ab38
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Jan 2020 16:06:06.5995
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: d6bHJrfy964DV2wkTJaMnQvb78SYArCBLqfvpAG3I3fOzXKQQK6IkThrQvfDgUFqoZu1lOJ8o3oWwukUVgFe6mao/ghqMmaycCjFpJVJDk0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB3886
+In-Reply-To: <1576465697-27946-1-git-send-email-zhangfei.gao@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tuesday, December 31, 2019 5:19:33 AM EET Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
->=20
-> HMAC keys can be of any length, and atmel_sha_hmac_key_set() can only
-> fail due to -ENOMEM.  But atmel_sha_hmac_setkey() incorrectly treated
-> any error as a "bad key length" error.  Fix it to correctly propagate
-> the -ENOMEM error code and not set any tfm result flags.
->=20
-> Fixes: 81d8750b2b59 ("crypto: atmel-sha - add support to hmac(shaX)")
-> Cc: Nicolas Ferre <nicolas.ferre@microchip.com>
-> Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>
-> Cc: Ludovic Desroches <ludovic.desroches@microchip.com>
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->  drivers/crypto/atmel-sha.c | 7 +------
->  1 file changed, 1 insertion(+), 6 deletions(-)
->=20
-> diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-> index e8e4200c1ab3..d3bcd14201c2 100644
-> --- a/drivers/crypto/atmel-sha.c
-> +++ b/drivers/crypto/atmel-sha.c
-> @@ -1853,12 +1853,7 @@ static int atmel_sha_hmac_setkey(struct crypto_aha=
-sh
-> *tfm, const u8 *key, {
->  	struct atmel_sha_hmac_ctx *hmac =3D crypto_ahash_ctx(tfm);
->=20
-> -	if (atmel_sha_hmac_key_set(&hmac->hkey, key, keylen)) {
-> -		crypto_ahash_set_flags(tfm,=20
-CRYPTO_TFM_RES_BAD_KEY_LEN);
-> -		return -EINVAL;
-> -	}
-> -
-> -	return 0;
-> +	return atmel_sha_hmac_key_set(&hmac->hkey, key, keylen);
+On 12/15/19 8:08 PM, Zhangfei Gao wrote:
+> Uacce (Unified/User-space-access-intended Accelerator Framework) targets to
+> provide Shared Virtual Addressing (SVA) between accelerators and processes.
+> So accelerator can access any data structure of the main cpu.
+> This differs from the data sharing between cpu and io device, which share
+> data content rather than address.
+> Because of unified address, hardware and user space of process can share
+> the same virtual address in the communication.
+> 
+> Uacce is intended to be used with Jean Philippe Brucker's SVA
+> patchset[1], which enables IO side page fault and PASID support.
+> We have keep verifying with Jean's sva patchset [2]
+> We also keep verifying with Eric's SMMUv3 Nested Stage patches [3]
 
-The atmel_sha_hmac_key_set() is used just here, maybe it is worth getting r=
-id=20
-of the function and copy its body here. As this is just a cosmetic suggesti=
-on,=20
-with or without this, one can add:
+Looking forward to this common framework going upstream. I'm currently 
+in the process of upstreaming the device driver (idxd) [1] for the 
+recently announced Intel Data Streaming Accelerator [2] [3] that also 
+supports SVA.
 
-Reviewed-by: Tudor Ambarus <tudor.ambarus@microchip.com>
+[1] https://lkml.org/lkml/2020/1/7/905
+[2] https://01.org/blogs/2019/introducing-intel-data-streaming-accelerator
+[3] 
+https://software.intel.com/en-us/download/intel-data-streaming-accelerator-preliminary-architecture-specification
 
->  }
->=20
->  static int atmel_sha_hmac_init(struct ahash_request *req)
+And I think with this framework upstream I can potentially drop the in 
+driver exported char device support code and use this framework directly.
 
 
-
+> 
+> This series and related zip & qm driver
+> https://github.com/Linaro/linux-kernel-warpdrive/tree/v5.5-rc1-uacce-v10
+> 
+> The library and user application:
+> https://github.com/Linaro/warpdrive/tree/wdprd-upstream-v10
+> 
+> References:
+> [1] http://jpbrucker.net/sva/
+> [2] http://jpbrucker.net/git/linux/log/?h=sva/zip-devel
+> [3] https://github.com/eauger/linux/tree/v5.3.0-rc0-2stage-v9
+> 
+> Change History:
+> v10:
+> Modify the include header to fix kbuild test erorr in other arch.
+> 
+> v9:
+> Suggested by Jonathan
+> 1. Remove sysfs: numa_distance, node_id, id, also add is_visible callback
+> 2. Split the api to solve the potential race
+> struct uacce_device *uacce_alloc(struct device *parent,
+> 				 struct uacce_interface *interface)
+> int uacce_register(struct uacce_device *uacce)
+> void uacce_remove(struct uacce_device *uacce)
+> 3. Split clean up patch 03
+> 
+> v8:
+> Address some comments from Jonathan
+> Merge Jean's patch, using uacce_mm instead of pid for sva_exit
+> 
+> v7:
+> As suggested by Jean and Jerome
+> Only consider sva case and remove unused dma apis for the first patch.
+> Also add mm_exit for sva and vm_ops.close etc
+> 
+> 
+> v6: https://lkml.org/lkml/2019/10/16/231
+> Change sys qfrs_size to different file, suggested by Jonathan
+> Fix crypto daily build issue and based on crypto code base, also 5.4-rc1.
+> 
+> v5: https://lkml.org/lkml/2019/10/14/74
+> Add an example patch using the uacce interface, suggested by Greg
+> 0003-crypto-hisilicon-register-zip-engine-to-uacce.patch
+> 
+> v4: https://lkml.org/lkml/2019/9/17/116
+> Based on 5.4-rc1
+> Considering other driver integrating uacce,
+> if uacce not compiled, uacce_register return error and uacce_unregister is empty.
+> Simplify uacce flag: UACCE_DEV_SVA.
+> Address Greg's comments:
+> Fix state machine, remove potential syslog triggered from user space etc.
+> 
+> v3: https://lkml.org/lkml/2019/9/2/990
+> Recommended by Greg, use sturct uacce_device instead of struct uacce,
+> and use struct *cdev in struct uacce_device, as a result,
+> cdev can be released by itself when refcount decreased to 0.
+> So the two structures are decoupled and self-maintained by themsleves.
+> Also add dev.release for put_device.
+> 
+> v2: https://lkml.org/lkml/2019/8/28/565
+> Address comments from Greg and Jonathan
+> Modify interface uacce_register
+> Drop noiommu mode first
+> 
+> v1: https://lkml.org/lkml/2019/8/14/277
+> 1. Rebase to 5.3-rc1
+> 2. Build on iommu interface
+> 3. Verifying with Jean's sva and Eric's nested mode iommu.
+> 4. User library has developed a lot: support zlib, openssl etc.
+> 5. Move to misc first
+> 
+> RFC3:
+> https://lkml.org/lkml/2018/11/12/1951
+> 
+> RFC2:
+> https://lwn.net/Articles/763990/
+> 
+> 
+> Background of why Uacce:
+> Von Neumann processor is not good at general data manipulation.
+> It is designed for control-bound rather than data-bound application.
+> The latter need less control path facility and more/specific ALUs.
+> So there are more and more heterogeneous processors, such as
+> encryption/decryption accelerators, TPUs, or
+> EDGE (Explicated Data Graph Execution) processors, introduced to gain
+> better performance or power efficiency for particular applications
+> these days.
+> 
+> There are generally two ways to make use of these heterogeneous processors:
+> 
+> The first is to make them co-processors, just like FPU.
+> This is good for some application but it has its own cons:
+> It changes the ISA set permanently.
+> You must save all state elements when the process is switched out.
+> But most data-bound processors have a huge set of state elements.
+> It makes the kernel scheduler more complex.
+> 
+> The second is Accelerator.
+> It is taken as a IO device from the CPU's point of view
+> (but it need not to be physically). The process, running on CPU,
+> hold a context of the accelerator and send instructions to it as if
+> it calls a function or thread running with FPU.
+> The context is bound with the processor itself.
+> So the state elements remain in the hardware context until
+> the context is released.
+> 
+> We believe this is the core feature of an "Accelerator" vs. Co-processor
+> or other heterogeneous processors.
+> 
+> The intention of Uacce is to provide the basic facility to backup
+> this scenario. Its first step is to make sure the accelerator and process
+> can share the same address space. So the accelerator ISA can directly
+> address any data structure of the main CPU.
+> This differs from the data sharing between CPU and IO device,
+> which share data content rather than address.
+> So it is different comparing to the other DMA libraries.
+> 
+> In the future, we may add more facility to support linking accelerator
+> library to the main application, or managing the accelerator context as
+> special thread.
+> But no matter how, this can be a solid start point for new processor
+> to be used as an "accelerator" as this is the essential requirement.
+> 
+> 
+> The Fork Scenario
+> =================
+> For a process with allocated queues and shared memory, what happen if it forks
+> a child?
+> 
+> The fd of the queue is duplicated on fork, but requests sent from the child
+> process are blocked.
+> 
+> It is recommended to add O_CLOEXEC to the queue file.
+> 
+> The queue mmap space has a VM_DONTCOPY in its VMA. So the child will lose all
+> those VMAs.
+> 
+> This is a reason why Uacce does not adopt the mode used in VFIO and
+> InfiniBand.  Both solutions can set any user pointer for hardware sharing.
+> But they cannot support fork when the dma is in process. Or the
+> "Copy-On-Write" procedure will make the parent process lost its physical
+> pages.
+> 
+> 
+> Difference to the VFIO and IB framework
+> ---------------------------------------
+> The essential function of Uacce is to let the device access the user
+> address directly. There are many device drivers doing the same in the kernel.
+> And both VFIO and IB can provide similar functions in framework level.
+> 
+> But Uacce has a different goal: "share address space". It is
+> not taken the request to the accelerator as an enclosure data structure. It
+> takes the accelerator as another thread of the same process. So the
+> accelerator can refer to any address used by the process.
+> 
+> Both VFIO and IB are taken this as "memory sharing", not "address sharing".
+> They care more on sharing the block of memory. But if there is an address
+> stored in the block and referring to another memory region. The address may
+> not be valid.
+> 
+> By adding more constraints to the VFIO and IB framework, in some sense, we may
+> achieve a similar goal. But we gave it up finally. Both VFIO and IB have extra
+> assumption which is unnecessary to Uacce. They may hurt each other if we
+> try to merge them together.
+> 
+> VFIO manages resource of a hardware as a "virtual device". If a device need to
+> serve a separated application. It must isolate the resource as a separate
+> virtual device.  And the life cycle of the application and virtual device are
+> unnecessary unrelated. And most concepts, such as bus, driver, probe and
+> so on, to make it as a "device" is unnecessary either. And the logic added to
+> VFIO to make address sharing do no help on "creating a virtual device".
+> 
+> IB creates a "verbs" standard for sharing memory region to another remote
+> entity.  Most of these verbs are to make memory region between entities to be
+> synchronized.  This is not what accelerator need. Accelerator is in the same
+> memory system with the CPU. It refers to the same memory system among CPU and
+> devices. So the local memory terms/verbs are good enough for it. Extra "verbs"
+> are not necessary. And its queue (like queue pair in IB) is the communication
+> channel direct to the accelerator hardware. There is nothing about memory
+> itself.
+> 
+> Further, both VFIO and IB use the "pin" (get_user_page) way to lock local
+> memory in place.  This is flexible. But it can cause other problems. For
+> example, if the user process fork a child process. The COW procedure may make
+> the parent process lost its pages which are sharing with the device. These may
+> be fixed in the future. But is not going to be easy. (There is a discussion
+> about this on Linux Plumbers Conference 2018 [1])
+> 
+> So we choose to build the solution directly on top of IOMMU interface. IOMMU
+> is the essential way for device and process to share their page mapping from
+> the hardware perspective. It will be safe to create a software solution on
+> this assumption.  Uacce manages the IOMMU interface for the accelerator
+> device, so the device driver can export some of the resources to the user
+> space. Uacce than can make sure the device and the process have the same
+> address space.
+> 
+> 
+> References
+> ==========
+> .. [1] https://lwn.net/Articles/774411/
+> 
+> Kenneth Lee (2):
+>    uacce: Add documents for uacce
+>    uacce: add uacce driver
+> 
+> Zhangfei Gao (2):
+>    crypto: hisilicon - Remove module_param uacce_mode
+>    crypto: hisilicon - register zip engine to uacce
+> 
+>   Documentation/ABI/testing/sysfs-driver-uacce |  37 ++
+>   Documentation/misc-devices/uacce.rst         | 176 ++++++++
+>   drivers/crypto/hisilicon/qm.c                | 236 +++++++++-
+>   drivers/crypto/hisilicon/qm.h                |  11 +
+>   drivers/crypto/hisilicon/zip/zip_main.c      |  47 +-
+>   drivers/misc/Kconfig                         |   1 +
+>   drivers/misc/Makefile                        |   1 +
+>   drivers/misc/uacce/Kconfig                   |  13 +
+>   drivers/misc/uacce/Makefile                  |   2 +
+>   drivers/misc/uacce/uacce.c                   | 628 +++++++++++++++++++++++++++
+>   include/linux/uacce.h                        | 161 +++++++
+>   include/uapi/misc/uacce/hisi_qm.h            |  23 +
+>   include/uapi/misc/uacce/uacce.h              |  38 ++
+>   13 files changed, 1341 insertions(+), 33 deletions(-)
+>   create mode 100644 Documentation/ABI/testing/sysfs-driver-uacce
+>   create mode 100644 Documentation/misc-devices/uacce.rst
+>   create mode 100644 drivers/misc/uacce/Kconfig
+>   create mode 100644 drivers/misc/uacce/Makefile
+>   create mode 100644 drivers/misc/uacce/uacce.c
+>   create mode 100644 include/linux/uacce.h
+>   create mode 100644 include/uapi/misc/uacce/hisi_qm.h
+>   create mode 100644 include/uapi/misc/uacce/uacce.h
+> 
