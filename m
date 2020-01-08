@@ -2,123 +2,114 @@ Return-Path: <SRS0=xmdE=25=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66294C00523
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jan 2020 07:53:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41485C33C9B
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jan 2020 10:18:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 396F62082E
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jan 2020 07:53:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EYsjZsFA"
+	by mail.kernel.org (Postfix) with ESMTP id 233682072A
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Jan 2020 10:18:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726593AbgAHHx1 (ORCPT
+        id S1727240AbgAHKSO (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 Jan 2020 02:53:27 -0500
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:39046 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726182AbgAHHx1 (ORCPT
+        Wed, 8 Jan 2020 05:18:14 -0500
+Received: from mout.kundenserver.de ([212.227.17.24]:50347 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726368AbgAHKSO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Jan 2020 02:53:27 -0500
-Received: by mail-oi1-f194.google.com with SMTP id a67so1864639oib.6
-        for <linux-crypto@vger.kernel.org>; Tue, 07 Jan 2020 23:53:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=camziUii29p0luivFHpHfiIofvd34K0/ntq20cnWejQ=;
-        b=EYsjZsFAsUzuW2XCUGVOeJWRTDpsijA5eG5WJTpjNPOKwMOlWw6m74WmBpygMw4Wal
-         CHfd15+K/BxFl/GhaT6DN+6B6+5nGqFEgtbS87PFoKKF44WyOu59XGPLdRtdKjUOyCV6
-         d4aWD2Xh3x5tCfggne33yy9ezgsieutkI6AXqPXkYIZI8vMDMsimzfC5yfaslwdYKx0T
-         KINyphhUgkHEd8YOel3atJFy5i4FBC9bCRSI7pQxWUVe7+S2BkNzWsohuJ1BDQzbpb2G
-         0tQY7yXDvwPrQMH6R+Cz4bfge1cUOvyUnR/n4ZfuAseGuET2OvABs6s2SHmxbtHAcQ7w
-         Uf+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=camziUii29p0luivFHpHfiIofvd34K0/ntq20cnWejQ=;
-        b=RnyjKQ/5MlI5C0vzSgiTy/7Y+U/0GmbnN6/SebzFctVCI/AS3MQ8QIk1YOTOstyeuM
-         fL03NMv8c3uq67SUOV6f2mSE9qcw5grwJADwkRbuJnqp0gd8pEKaOpXzAdJaTeCnZxtD
-         b7xEOnGzmYioqDLFLF6atAIqPHWGM3Ykmc+wsejpUKLHBmYws1DcU6hb9xlqjQSzu875
-         LwHMR6bFZoC7yrYm2+SbKJ/AXFlOEW4Vh19GbHyCkislVMVOqr8r+aYX7XqgADyioGMZ
-         p/kusSmCjugxEVtAAc2qPvAObc/iyOYpHVZB3qOoWCHKQ4wa9UtJ5dkkzP9TRg9d//+X
-         aNMw==
-X-Gm-Message-State: APjAAAUX5TkL49uhjCXIqMwD4tRzCz6PmjxSW88SbuuPDRziIEV/txGq
-        ilLf35DF0zWigDoBZZ8LUDD0i/Y1vUC4PLZ5T+LOZg==
-X-Google-Smtp-Source: APXvYqxsAtXexafEFaXtmUeIIS4EH/aSV390STPoMyxFSIwMe1yBuRA3WSSQE9MEkVKLcLWGmgrgMHKiWL6UBoFX72g=
-X-Received: by 2002:a05:6808:b37:: with SMTP id t23mr2101890oij.149.1578470006357;
- Tue, 07 Jan 2020 23:53:26 -0800 (PST)
+        Wed, 8 Jan 2020 05:18:14 -0500
+Received: from [192.168.1.155] ([95.114.105.36]) by mrelayeu.kundenserver.de
+ (mreue108 [212.227.15.183]) with ESMTPSA (Nemesis) id
+ 1MWAWq-1jDvbf2ieg-00XfCY; Wed, 08 Jan 2020 11:17:21 +0100
+Subject: Re: [PATCH 6/6] (v3) drivers: hwmon: i5k_amb: simplify probing /
+ device identification
+To:     Bjorn Helgaas <helgaas@kernel.org>,
+        Guenter Roeck <linux@roeck-us.net>
+Cc:     "Enrico Weigelt, metux IT consult" <info@metux.net>,
+        linux-kernel@vger.kernel.org, tim@buttersideup.com,
+        james.morse@arm.com, rrichter@marvell.com, jdelvare@suse.com,
+        miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com,
+        linux-crypto@vger.kernel.org, linux-edac@vger.kernel.org,
+        linux-hwmon@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-pci@vger.kernel.org
+References: <20191210232529.GA171629@google.com>
+From:   "Enrico Weigelt, metux IT consult" <lkml@metux.net>
+Message-ID: <07148b8e-5b87-66ad-e52b-be2b8b22e712@metux.net>
+Date:   Wed, 8 Jan 2020 11:16:47 +0100
+User-Agent: Mozilla/5.0 (X11; Linux i686 on x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-References: <20200107143601.105321-1-colin.king@canonical.com> <747f9c93-7465-99aa-0b91-a05fd64c7d1f@amd.com>
-In-Reply-To: <747f9c93-7465-99aa-0b91-a05fd64c7d1f@amd.com>
-From:   Jens Wiklander <jens.wiklander@linaro.org>
-Date:   Wed, 8 Jan 2020 08:53:15 +0100
-Message-ID: <CAHUa44E7H0wPWQFNQrmAuDtOw=514mxx6fHVAcTpH05HKPvtzA@mail.gmail.com>
-Subject: Re: [PATCH][next] tee: fix memory allocation failure checks on
- drv_data and amdtee
-To:     "Thomas, Rijo-john" <Rijo-john.Thomas@amd.com>
-Cc:     Colin King <colin.king@canonical.com>,
-        Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Gary R Hook <gary.hook@amd.com>,
-        "tee-dev @ lists . linaro . org" <tee-dev@lists.linaro.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        kernel-janitors@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20191210232529.GA171629@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: tl
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:TAwu3cp8xgdnoC+QVXxTZuo1d6L730Y/hIlnNlnChNeKzUKMs/t
+ vNr9OrZqijZoHde4YF3t7ezNikPhOGlTm3R3WPK2sFjTW0Ghd5q8U73Bqf/Cf638mqBacxr
+ rxW5gCPbhzuRN5HCty8OClMKTVVag/UlQVZYL0GJ2GBhW/C9h/k8rH8iNTxaRPLMZo+G2+T
+ SFaY74zTgfT3qK8buR+QQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:UX0qjWzvj1w=:MNJwBZoBg0zHdAbLIu7jZ1
+ NQ6YqkA9o0GZJBWd8Ad4X7sj60ITE703Y9e7n05lpKaAE5k4kxh/DB85CtkI7X1e4k8xYOZju
+ qK7RFrKDmrWjMa7E0xlTfWdlhUMF80E7Ft/CnN2WDqFZB82yOlvrFHdDEW3AVYU0FQVAVvOu+
+ YmGlw72B3Pym8MYoAVDb71/m3UmCh3k9BDSmEAjNRLbRDCF2VVgSjzJ1oEeH9x+WoP421kWi5
+ Yibzza7ZuNPPOXysDmnaFlJ+GxbCHrX7w8VWIbYFTw3vaN575729znMCT2FoTnPZhukzP1dh/
+ fYYEgmMZtopETatbu1oflvhY/l55FbEBlrPy0u4Wzl91jtzfmJvgE5bmDrELARWK6dxISKLko
+ rptrWYwfFHMjKBsQ9ruUZGnliXn1/wOeqNvtxFkQ5qxNSGilOnQxwnWpNCB729Y8lm1ofBN3U
+ 14o+bKqmdkWaauabumrjuFSSKvU7c/SUXKWHBtZOokt4B1jhLIu1Pr1xtT6BfE9DITZEKEvNL
+ iObWk/IDco3bI5QmqGf7qRYlCBeLsoGR03KQRp4nuIgelCd7prjiVFVB0DJ8tRsfBa60fl9eV
+ jT11ZBjzj/yBOIOnx5stFSioHSAQ1CvygDOgp+DpWJ79kX/VOOV4wXTUYts9aGe2YUTA6ypVT
+ /6J1nf5LJtaUhKFBTCxakheBb4RQryHo9BA0eHR/n1345Ne0yrVogVyoksPgsmFAQhJpc45OK
+ jfW41Y6in+LRLl0JH8xDJqmpy/HOOzN664Cm9yV7fKSDPnfiHAhRW50ZmtyT86rLVy8E3zfbZ
+ WlLquMtpmnga8pIzXT7MyITSbdmrIdww1ALX9SRXPNcMu/QxOueQBuTGUOMb2+PsngyEZbdzs
+ qBetrh5ZIRf5o9ia/XdQ==
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jan 8, 2020 at 8:03 AM Thomas, Rijo-john
-<Rijo-john.Thomas@amd.com> wrote:
->
-> +linux-crypto
->
-> On 07/01/20 8:06 pm, Colin King wrote:
-> > From: Colin Ian King <colin.king@canonical.com>
-> >
-> > Currently the memory allocation failure checks on drv_data and
-> > amdtee are using IS_ERR rather than checking for a null pointer.
-> > Fix these checks to use the conventional null pointer check.
-> >
-> > Addresses-Coverity: ("Dereference null return")
-> > Fixes: 757cc3e9ff1d ("tee: add AMD-TEE driver")
-> > Signed-off-by: Colin Ian King <colin.king@canonical.com>
->
-> Reviewed-by: Rijo Thomas <Rijo-john.Thomas@amd.com>
+On 11.12.19 00:25, Bjorn Helgaas wrote:
 
-Acked-by: Jens Wiklander <jens.wiklander@linaro.org>
+Hi,
 
-Thanks,
-Jens
+>   2) I despise the pci_get_device() interfaces because they're
+>   inefficient, not hotplug-safe, they circumvent the device model
+>   claim mechanism, and it's hard to do the reference counting
+>   correctly.
 
->
-> > ---
-> >  drivers/tee/amdtee/core.c | 4 ++--
-> >  1 file changed, 2 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/drivers/tee/amdtee/core.c b/drivers/tee/amdtee/core.c
-> > index 9d0cee1c837f..5fda810c79dc 100644
-> > --- a/drivers/tee/amdtee/core.c
-> > +++ b/drivers/tee/amdtee/core.c
-> > @@ -444,11 +444,11 @@ static int __init amdtee_driver_init(void)
-> >               goto err_fail;
-> >
-> >       drv_data = kzalloc(sizeof(*drv_data), GFP_KERNEL);
-> > -     if (IS_ERR(drv_data))
-> > +     if (!drv_data)
-> >               return -ENOMEM;
-> >
-> >       amdtee = kzalloc(sizeof(*amdtee), GFP_KERNEL);
-> > -     if (IS_ERR(amdtee)) {
-> > +     if (!amdtee) {
-> >               rc = -ENOMEM;
-> >               goto err_kfree_drv_data;
-> >       }
-> >
+Agreed, but for that we'd have to edac and hwmo driver together into
+one (or maybe a MFD). That would be a major rewrite, and I don't have
+the necessary HW to test it.
+
+>   3) There are several things going on in this patch and it would be
+>   easier to read if you could split them into separate patches:
+> 
+>     - Removing the redundancy between chipset_ids[] and i5k_amb_ids[].
+>       This seems like a nice change.
+> 
+>     - The "chipset_ids[i].fbd0 + 1" thing was weird and the new
+>       ".driver_data + 1" is still weird.  Those are PCI device IDs,
+>       and addition is not a valid operation on those IDs.  IMHO both
+>       PCI_DEVICE_ID_INTEL_5000_FBD0 and PCI_DEVICE_ID_INTEL_5000_FBD1
+>       should be listed explicitly in the driver instead of trying to
+>       compute PCI_DEVICE_ID_INTEL_5000_FBD1.
+
+Ok, good point.
+
+>     - Replacing the hard-coding of PCI_VENDOR_ID_INTEL with the vendor
+>       ID from i5k_amb_ids[] seems worthwhile and should be its own
+>       separate patch (if possible).
+> 
+>     - Changing to use pci_get_device_by_id().  This should be trivial
+>       to verify, like the other patches.
+
+Ok, I'll try to split it up more clearly, once I've got some more spare
+time.
+
+
+--mtx
+
+---
+Enrico Weigelt, metux IT consult
+Free software and Linux embedded engineering
+info@metux.net -- +49-151-27565287
