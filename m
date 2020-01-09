@@ -2,359 +2,88 @@ Return-Path: <SRS0=LmLS=26=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA199C32771
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jan 2020 08:50:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFF58C32771
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jan 2020 09:00:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B1E6D2067D
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jan 2020 08:50:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 85DBF2067D
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jan 2020 09:00:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="RelB3NVV"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="t3pwlIAF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728538AbgAIIuU (ORCPT
+        id S1729049AbgAIJAh (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 Jan 2020 03:50:20 -0500
-Received: from mo4-p04-ob.smtp.rzone.de ([85.215.255.120]:30282 "EHLO
-        mo4-p04-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728792AbgAIIuT (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Jan 2020 03:50:19 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1578559817;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=Du411IrEhmoDvR4JDxDpm9VCcrRLOIA4MMci5cZJZ+w=;
-        b=RelB3NVVUMJcElkAWeVinb8UOBI9dqxL4yMt1fFHd4Hp/EKu4/c4hK/rYknAexSqUk
-        YeUy+54DexNKfrSjuOm0mmZXGapLx7pjpz/mXLfeFMrcZWsgCpU7tBsKrXx4932NNXet
-        46YpC0xVrrGk/wLrORiiDjZXvnMYi7FYxw/4/cmF48fZpSvTXPF56U4taossymois8wB
-        MUPlsPGExT5Cnud1Pu4FqXY305BDMVXTIXFbzHFIvCig96KGikWJoi1jPwrWIxjZrRJ4
-        cKBAFQLvn7KwT/SNQOMgqdJWbyJFxozu4dRlgnuv8DQLWwS/Ham4XAJfdCw+0DHMYsxz
-        XuKw==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPZJPScHivh"
-X-RZG-CLASS-ID: mo00
-Received: from positron.chronox.de
-        by smtp.strato.de (RZmta 46.1.4 DYNA|AUTH)
-        with ESMTPSA id u04585w098cC2Zp
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-        Thu, 9 Jan 2020 09:38:12 +0100 (CET)
-From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        linux-api@vger.kernel.org,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        "Alexander E. Patrakov" <patrakov@gmail.com>,
-        "Ahmed S. Darwish" <darwish.07@gmail.com>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
-        Matthew Garrett <mjg59@srcf.ucam.org>,
-        Vito Caputo <vcaputo@pengaru.com>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
-        William Jon McCann <mccann@jhu.edu>,
-        zhangjs <zachary@baishancloud.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Florian Weimer <fweimer@redhat.com>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Nicolai Stange <nstange@suse.de>,
-        "Peter, Matthias" <matthias.peter@bsi.bund.de>,
-        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
-        Roman Drahtmueller <draht@schaltsekun.de>,
-        Neil Horman <nhorman@redhat.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Julia Lawall <julia.lawall@inria.fr>
-Subject: [PATCH v27 03/12] LRNG - sysctls and /proc interface
-Date:   Thu, 09 Jan 2020 09:31:39 +0100
-Message-ID: <2649838.LjHEXeKtmW@positron.chronox.de>
-In-Reply-To: <2641155.iNH938UiKq@positron.chronox.de>
-References: <6157374.ptSnyUpaCn@positron.chronox.de> <2722222.P16TYeLAVu@positron.chronox.de> <2641155.iNH938UiKq@positron.chronox.de>
+        Thu, 9 Jan 2020 04:00:37 -0500
+Received: from bilbo.ozlabs.org ([203.11.71.1]:43313 "EHLO ozlabs.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728919AbgAIJAh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 9 Jan 2020 04:00:37 -0500
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 47tg7Q2Z50z9sQp;
+        Thu,  9 Jan 2020 20:00:34 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1578560434;
+        bh=dzx7HLZJUiOr/H9eH8PAr+Mta7u59cFYzgiQYZF92zs=;
+        h=Date:From:To:Cc:Subject:From;
+        b=t3pwlIAFWYlxBamGmd8/Yubl7TCXYwLU1r3nzoGopOvwKt87XYgGD4UE/ArOKcsuq
+         wBWD2EH/qa9lWC4/3zKdNGdhXcdD4qM9gJeilhXYHixJxjZH1C+xXesC8IXdVqjKl8
+         4M60Yf1w0vr1sprkgNr7Q2WQ9D5GC2wI2QFnTRni/JDvVcCuzdjcRzoORIgUV10go2
+         9ia+h9VXZjVrx3/5o6UFXDxS4JbWLZFVkr3HuW0x61zfNlVq1ixdERd0er5oabk/fE
+         LcjSzJ7Em2Sg9adi5SJso71wNvb/GjUmoZVQLGhp25kaL9B8RiNVNla3coqQwgxA4b
+         5SNCyc0hj3pnA==
+Date:   Thu, 9 Jan 2020 20:00:32 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>
+Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Gary R Hook <gary.hook@amd.com>
+Subject: linux-next: Signed-off-by missing for commit in the crypto tree
+Message-ID: <20200109200032.61ef862c@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: multipart/signed; boundary="Sig_/WWl7=5LoKJ2.IFv/3gnRzUR";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The LRNG sysctl interface provides the same controls as the existing
-/dev/random implementation. These sysctls behave identically and are
-implemented identically. The goal is to allow a possible merge of the
-existing /dev/random implementation with this implementation which
-implies that this patch tries have a very close similarity. Yet, all
-sysctls are documented at [1].
+--Sig_/WWl7=5LoKJ2.IFv/3gnRzUR
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-In addition, it provides the file lrng_type which provides details about
-the LRNG:
+Hi all,
 
-=2D the name of the DRNG that produces the random numbers for /dev/random,
-/dev/urandom, getrandom(2)
+Commit
 
-=2D the hash used to produce random numbers from the entropy pool
+  e91e785e1821 ("crypto: ccp - Update MAINTAINERS for CCP driver")
 
-=2D the number of secondary DRNG instances
+is missing a Signed-off-by from its author.
 
-=2D indicator whether the LRNG operates SP800-90B compliant
+--=20
+Cheers,
+Stephen Rothwell
 
-=2D indicator whether a high-resolution timer is identified - only with a
-high-resolution timer the interrupt noise source will deliver sufficient
-entropy
+--Sig_/WWl7=5LoKJ2.IFv/3gnRzUR
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-=2D indicator whether the LRNG has been minimally seeded (i.e. is the
-secondary DRNG seeded with at least 128 bits of of entropy)
+-----BEGIN PGP SIGNATURE-----
 
-=2D indicator whether the LRNG has been fully seeded (i.e. is the
-secondary DRNG seeded with at least 256 bits of entropy)
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl4W67AACgkQAVBC80lX
+0GzhSQgAosDm0u9w+pQhS17m4BGbjRdY32/bTATa5rZZ7xO3EWjH0jHVM1LvBMs+
+idxhtHHsimIp5r7eWofBGNkB/u0qw4aYcRxz1ZHGCy+4+1V8upH7hEnDk/InCZow
+8lpiMHcecP5kg94hV5vgVa+Je4pX0DO/MDeFl/qDvNDvOCgg/twqODZPPhHQt9qU
+zn0h0PxaPQyAy9txsqIO/3EioQigR8geelT7nPtWeeSbVKPXNnyhzmbq7Hsu+d+M
+tBKBMVyYOfoTG0TCSpOF5vZafBqtNgtTzqTbpTzFLRA2gXGM+pWk3sXlMI+nsKiI
+1qEYO/5UYawenFDD5kgNjnQ+c0qlqw==
+=E+wR
+-----END PGP SIGNATURE-----
 
-[1] https://www.chronox.de/lrng.html
-
-CC: "Eric W. Biederman" <ebiederm@xmission.com>
-CC: "Alexander E. Patrakov" <patrakov@gmail.com>
-CC: "Ahmed S. Darwish" <darwish.07@gmail.com>
-CC: "Theodore Y. Ts'o" <tytso@mit.edu>
-CC: Willy Tarreau <w@1wt.eu>
-CC: Matthew Garrett <mjg59@srcf.ucam.org>
-CC: Vito Caputo <vcaputo@pengaru.com>
-CC: Andreas Dilger <adilger.kernel@dilger.ca>
-CC: Jan Kara <jack@suse.cz>
-CC: Ray Strode <rstrode@redhat.com>
-CC: William Jon McCann <mccann@jhu.edu>
-CC: zhangjs <zachary@baishancloud.com>
-CC: Andy Lutomirski <luto@kernel.org>
-CC: Florian Weimer <fweimer@redhat.com>
-CC: Lennart Poettering <mzxreary@0pointer.de>
-CC: Nicolai Stange <nstange@suse.de>
-Reviewed-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
-Reviewed-by: Roman Drahtmueller <draht@schaltsekun.de>
-Tested-by: Roman Drahtm=FCller <draht@schaltsekun.de>
-Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
-Tested-by: Neil Horman <nhorman@redhat.com>
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
-=2D--
- drivers/char/lrng/Makefile          |   1 +
- drivers/char/lrng/lrng_interfaces.c |   1 -
- drivers/char/lrng/lrng_internal.h   |   4 +
- drivers/char/lrng/lrng_proc.c       | 163 ++++++++++++++++++++++++++++
- 4 files changed, 168 insertions(+), 1 deletion(-)
- create mode 100644 drivers/char/lrng/lrng_proc.c
-
-diff --git a/drivers/char/lrng/Makefile b/drivers/char/lrng/Makefile
-index 0a32f22c2c1a..e69c176f0161 100644
-=2D-- a/drivers/char/lrng/Makefile
-+++ b/drivers/char/lrng/Makefile
-@@ -9,3 +9,4 @@ obj-y				+=3D lrng_pool.o lrng_aux.o \
- 				   lrng_interfaces.o \
-=20
- obj-$(CONFIG_NUMA)		+=3D lrng_numa.o
-+obj-$(CONFIG_SYSCTL)		+=3D lrng_proc.o
-diff --git a/drivers/char/lrng/lrng_interfaces.c b/drivers/char/lrng/lrng_i=
-nterfaces.c
-index ff40ed37ddd6..8c4bf53d86ec 100644
-=2D-- a/drivers/char/lrng/lrng_interfaces.c
-+++ b/drivers/char/lrng/lrng_interfaces.c
-@@ -34,7 +34,6 @@ static DECLARE_WAIT_QUEUE_HEAD(lrng_write_wait);
- static DECLARE_WAIT_QUEUE_HEAD(lrng_init_wait);
- static struct fasync_struct *fasync;
-=20
-=2Dstruct ctl_table random_table[];
- /********************************** Helper *******************************=
-****/
-=20
- /* Is the DRNG seed level too low? */
-diff --git a/drivers/char/lrng/lrng_internal.h b/drivers/char/lrng/lrng_int=
-ernal.h
-index c2b0a467548e..349152d3c1b0 100644
-=2D-- a/drivers/char/lrng/lrng_internal.h
-+++ b/drivers/char/lrng/lrng_internal.h
-@@ -116,7 +116,11 @@ void lrng_cc20_init_state(struct chacha20_state *state=
-);
-=20
- /********************************** /proc ********************************=
-*****/
-=20
-+#ifdef CONFIG_SYSCTL
-+void lrng_pool_inc_numa_node(void);
-+#else
- static inline void lrng_pool_inc_numa_node(void) { }
-+#endif
-=20
- /****************************** LRNG interfaces **************************=
-*****/
-=20
-diff --git a/drivers/char/lrng/lrng_proc.c b/drivers/char/lrng/lrng_proc.c
-new file mode 100644
-index 000000000000..f4ee01f61925
-=2D-- /dev/null
-+++ b/drivers/char/lrng/lrng_proc.c
-@@ -0,0 +1,163 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
-+/*
-+ * LRNG proc and sysctl interfaces
-+ *
-+ * Copyright (C) 2016 - 2020, Stephan Mueller <smueller@chronox.de>
-+ */
-+
-+#include <linux/lrng.h>
-+#include <linux/proc_fs.h>
-+#include <linux/seq_file.h>
-+#include <linux/sysctl.h>
-+#include <linux/uuid.h>
-+
-+#include "lrng_internal.h"
-+
-+/*
-+ * This function is used to return both the bootid UUID, and random
-+ * UUID.  The difference is in whether table->data is NULL; if it is,
-+ * then a new UUID is generated and returned to the user.
-+ *
-+ * If the user accesses this via the proc interface, the UUID will be
-+ * returned as an ASCII string in the standard UUID format; if via the
-+ * sysctl system call, as 16 bytes of binary data.
-+ */
-+static int lrng_proc_do_uuid(struct ctl_table *table, int write,
-+			     void __user *buffer, size_t *lenp, loff_t *ppos)
-+{
-+	struct ctl_table fake_table;
-+	unsigned char buf[64], tmp_uuid[16], *uuid;
-+
-+	uuid =3D table->data;
-+	if (!uuid) {
-+		uuid =3D tmp_uuid;
-+		generate_random_uuid(uuid);
-+	} else {
-+		static DEFINE_SPINLOCK(bootid_spinlock);
-+
-+		spin_lock(&bootid_spinlock);
-+		if (!uuid[8])
-+			generate_random_uuid(uuid);
-+		spin_unlock(&bootid_spinlock);
-+	}
-+
-+	sprintf(buf, "%pU", uuid);
-+
-+	fake_table.data =3D buf;
-+	fake_table.maxlen =3D sizeof(buf);
-+
-+	return proc_dostring(&fake_table, write, buffer, lenp, ppos);
-+}
-+
-+static int lrng_proc_do_entropy(struct ctl_table *table, int write,
-+				void __user *buffer, size_t *lenp, loff_t *ppos)
-+{
-+	struct ctl_table fake_table;
-+	int entropy_count;
-+
-+	entropy_count =3D lrng_avail_entropy();
-+
-+	fake_table.data =3D &entropy_count;
-+	fake_table.maxlen =3D sizeof(entropy_count);
-+
-+	return proc_dointvec(&fake_table, write, buffer, lenp, ppos);
-+}
-+
-+static int lrng_sysctl_poolsize =3D LRNG_POOL_SIZE_BITS;
-+static int lrng_min_write_thresh;
-+static int lrng_max_write_thresh =3D LRNG_POOL_SIZE_BITS;
-+static char lrng_sysctl_bootid[16];
-+static int lrng_drng_reseed_max_min;
-+
-+struct ctl_table random_table[] =3D {
-+	{
-+		.procname	=3D "poolsize",
-+		.data		=3D &lrng_sysctl_poolsize,
-+		.maxlen		=3D sizeof(int),
-+		.mode		=3D 0444,
-+		.proc_handler	=3D proc_dointvec,
-+	},
-+	{
-+		.procname	=3D "entropy_avail",
-+		.maxlen		=3D sizeof(int),
-+		.mode		=3D 0444,
-+		.proc_handler	=3D lrng_proc_do_entropy,
-+	},
-+	{
-+		.procname	=3D "write_wakeup_threshold",
-+		.data		=3D &lrng_write_wakeup_bits,
-+		.maxlen		=3D sizeof(int),
-+		.mode		=3D 0644,
-+		.proc_handler	=3D proc_dointvec_minmax,
-+		.extra1		=3D &lrng_min_write_thresh,
-+		.extra2		=3D &lrng_max_write_thresh,
-+	},
-+	{
-+		.procname	=3D "boot_id",
-+		.data		=3D &lrng_sysctl_bootid,
-+		.maxlen		=3D 16,
-+		.mode		=3D 0444,
-+		.proc_handler	=3D lrng_proc_do_uuid,
-+	},
-+	{
-+		.procname	=3D "uuid",
-+		.maxlen		=3D 16,
-+		.mode		=3D 0444,
-+		.proc_handler	=3D lrng_proc_do_uuid,
-+	},
-+	{
-+		.procname       =3D "urandom_min_reseed_secs",
-+		.data           =3D &lrng_drng_reseed_max_time,
-+		.maxlen         =3D sizeof(int),
-+		.mode           =3D 0644,
-+		.proc_handler   =3D proc_dointvec,
-+		.extra1		=3D &lrng_drng_reseed_max_min,
-+	},
-+	{ }
-+};
-+
-+/* Number of online DRNGs */
-+static u32 numa_drngs =3D 1;
-+
-+void lrng_pool_inc_numa_node(void)
-+{
-+	numa_drngs++;
-+}
-+
-+static int lrng_proc_type_show(struct seq_file *m, void *v)
-+{
-+	struct lrng_drng *lrng_drng_init =3D lrng_drng_init_instance();
-+	unsigned long flags =3D 0;
-+	unsigned char buf[300];
-+
-+	lrng_drng_lock(lrng_drng_init, &flags);
-+	snprintf(buf, sizeof(buf),
-+		 "DRNG name: %s\n"
-+		 "Hash for reading entropy pool: %s\n"
-+		 "DRNG security strength: %d bits\n"
-+		 "number of DRNG instances: %u\n"
-+		 "SP800-90B compliance: %s\n"
-+		 "High-resolution timer: %s\n"
-+		 "LRNG minimally seeded: %s\n"
-+		 "LRNG fully seeded: %s\n",
-+		 lrng_drng_init->crypto_cb->lrng_drng_name(),
-+		 lrng_drng_init->crypto_cb->lrng_hash_name(),
-+		 LRNG_DRNG_SECURITY_STRENGTH_BITS, numa_drngs,
-+		 lrng_sp80090b_compliant() ? "true" : "false",
-+		 lrng_pool_highres_timer() ? "true" : "false",
-+		 lrng_state_min_seeded() ? "true" : "false",
-+		 lrng_state_fully_seeded() ? "true" : "false");
-+	lrng_drng_unlock(lrng_drng_init, &flags);
-+
-+	seq_write(m, buf, strlen(buf));
-+
-+	return 0;
-+}
-+
-+static int __init lrng_proc_type_init(void)
-+{
-+	proc_create_single("lrng_type", 0444, NULL, &lrng_proc_type_show);
-+	return 0;
-+}
-+
-+module_init(lrng_proc_type_init);
-=2D-=20
-2.24.1
-
-
-
-
+--Sig_/WWl7=5LoKJ2.IFv/3gnRzUR--
