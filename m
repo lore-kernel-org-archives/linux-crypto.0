@@ -2,88 +2,73 @@ Return-Path: <SRS0=LmLS=26=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFF58C32771
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jan 2020 09:00:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87584C33CA3
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jan 2020 10:43:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 85DBF2067D
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jan 2020 09:00:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="t3pwlIAF"
+	by mail.kernel.org (Postfix) with ESMTP id 5CB4C2067D
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jan 2020 10:43:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1578566595;
+	bh=YNqb12KEnTIPfkhGZEULgW7dTJYPnkCVqbWis7dT6TU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=1is1uBeFCtgKKzNKhnDaf+u5sqgLH2KMwDrSl0kDfGBRArGmIOmQK9KCJgBuxjJS2
+	 YeaB6G6g/MDRLq5c5T/kO3X3P5TJKJ2f+mMv2wzWuqpofRiSYIxnS8qe/cMQrAjBm2
+	 mSOIM5PuxIYssIFYUP5C+pu/6Xr9hP+LxG+gDlIQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729049AbgAIJAh (ORCPT
+        id S1730408AbgAIKnE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 Jan 2020 04:00:37 -0500
-Received: from bilbo.ozlabs.org ([203.11.71.1]:43313 "EHLO ozlabs.org"
+        Thu, 9 Jan 2020 05:43:04 -0500
+Received: from mail.kernel.org ([198.145.29.99]:50194 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728919AbgAIJAh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Jan 2020 04:00:37 -0500
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        id S1730407AbgAIKnC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 9 Jan 2020 05:43:02 -0500
+Received: from T480 (98.142.130.235.16clouds.com [98.142.130.235])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 47tg7Q2Z50z9sQp;
-        Thu,  9 Jan 2020 20:00:34 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1578560434;
-        bh=dzx7HLZJUiOr/H9eH8PAr+Mta7u59cFYzgiQYZF92zs=;
-        h=Date:From:To:Cc:Subject:From;
-        b=t3pwlIAFWYlxBamGmd8/Yubl7TCXYwLU1r3nzoGopOvwKt87XYgGD4UE/ArOKcsuq
-         wBWD2EH/qa9lWC4/3zKdNGdhXcdD4qM9gJeilhXYHixJxjZH1C+xXesC8IXdVqjKl8
-         4M60Yf1w0vr1sprkgNr7Q2WQ9D5GC2wI2QFnTRni/JDvVcCuzdjcRzoORIgUV10go2
-         9ia+h9VXZjVrx3/5o6UFXDxS4JbWLZFVkr3HuW0x61zfNlVq1ixdERd0er5oabk/fE
-         LcjSzJ7Em2Sg9adi5SJso71wNvb/GjUmoZVQLGhp25kaL9B8RiNVNla3coqQwgxA4b
-         5SNCyc0hj3pnA==
-Date:   Thu, 9 Jan 2020 20:00:32 +1100
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto List <linux-crypto@vger.kernel.org>
-Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Gary R Hook <gary.hook@amd.com>
-Subject: linux-next: Signed-off-by missing for commit in the crypto tree
-Message-ID: <20200109200032.61ef862c@canb.auug.org.au>
+        by mail.kernel.org (Postfix) with ESMTPSA id B25AE2067D;
+        Thu,  9 Jan 2020 10:42:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1578566582;
+        bh=YNqb12KEnTIPfkhGZEULgW7dTJYPnkCVqbWis7dT6TU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=qZiIMUBCmB6il2OBWLC4G23Lk2FnsUJAMrGmvcmZYsfVPMfhitVMg4Cw5aoxAj8vz
+         jXAadX+HGRf6R4yJCMjHXEnuJsRohyBD66Zph83bmygqrD18ZauYYTvaI3QTl4YhEl
+         aJSlmauHVbuyCuJqnUowPFOH0ugzEefrdUVg8zQw=
+Date:   Thu, 9 Jan 2020 18:42:54 +0800
+From:   Shawn Guo <shawnguo@kernel.org>
+To:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
+Cc:     Sascha Hauer <s.hauer@pengutronix.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Fabio Estevam <festevam@gmail.com>,
+        NXP Linux Team <linux-imx@nxp.com>,
+        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] arm64: dts: imx8mn: add crypto node
+Message-ID: <20200109104254.GQ4456@T480>
+References: <20200106200154.30643-1-horia.geanta@nxp.com>
+ <20200106200154.30643-2-horia.geanta@nxp.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/WWl7=5LoKJ2.IFv/3gnRzUR";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20200106200154.30643-2-horia.geanta@nxp.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---Sig_/WWl7=5LoKJ2.IFv/3gnRzUR
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Mon, Jan 06, 2020 at 10:01:54PM +0200, Horia Geantă wrote:
+> Add node for CAAM - Cryptographic Acceleration and Assurance Module.
+> 
+> Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
 
-Hi all,
-
-Commit
-
-  e91e785e1821 ("crypto: ccp - Update MAINTAINERS for CCP driver")
-
-is missing a Signed-off-by from its author.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/WWl7=5LoKJ2.IFv/3gnRzUR
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl4W67AACgkQAVBC80lX
-0GzhSQgAosDm0u9w+pQhS17m4BGbjRdY32/bTATa5rZZ7xO3EWjH0jHVM1LvBMs+
-idxhtHHsimIp5r7eWofBGNkB/u0qw4aYcRxz1ZHGCy+4+1V8upH7hEnDk/InCZow
-8lpiMHcecP5kg94hV5vgVa+Je4pX0DO/MDeFl/qDvNDvOCgg/twqODZPPhHQt9qU
-zn0h0PxaPQyAy9txsqIO/3EioQigR8geelT7nPtWeeSbVKPXNnyhzmbq7Hsu+d+M
-tBKBMVyYOfoTG0TCSpOF5vZafBqtNgtTzqTbpTzFLRA2gXGM+pWk3sXlMI+nsKiI
-1qEYO/5UYawenFDD5kgNjnQ+c0qlqw==
-=E+wR
------END PGP SIGNATURE-----
-
---Sig_/WWl7=5LoKJ2.IFv/3gnRzUR--
+Applied, thanks.
