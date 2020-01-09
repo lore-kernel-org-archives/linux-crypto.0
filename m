@@ -2,328 +2,827 @@ Return-Path: <SRS0=LmLS=26=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D12F7C282DD
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jan 2020 17:49:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 027A7C282DD
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jan 2020 22:21:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 92C8720678
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jan 2020 17:49:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B53242077B
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jan 2020 22:21:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1578608484;
+	bh=R4cywW+LwgPD2vuU4tHxNwln/uNRdQsJ6FS2UIIVMy0=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=zREnbCtD6vaIKpnrMnbetHtVbT+IgRM2YTk8TxnNB5NsUEA4SnDj1kIdSJ1kf1u1W
+	 xW1OIHBJC2hgsaUaSz1SjaI74mpg7O+wVKOmsbN6qCLVSliszz6vrljxLl8uSSO4fO
+	 eY0uEiyVw6CjbzKjqlyOF5NiQm1Ko/lrUm/zE3Js=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388333AbgAIRt4 (ORCPT
+        id S1729347AbgAIWVY (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 Jan 2020 12:49:56 -0500
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2246 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728724AbgAIRtz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Jan 2020 12:49:55 -0500
-Received: from lhreml701-cah.china.huawei.com (unknown [172.18.7.108])
-        by Forcepoint Email with ESMTP id 8EB72E47F66C9830D46A;
-        Thu,  9 Jan 2020 17:49:54 +0000 (GMT)
-Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml701-cah.china.huawei.com (10.201.108.42) with Microsoft SMTP Server
- (TLS) id 14.3.408.0; Thu, 9 Jan 2020 17:49:54 +0000
-Received: from localhost (10.202.226.57) by lhreml710-chm.china.huawei.com
- (10.201.108.61) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Thu, 9 Jan 2020
- 17:49:53 +0000
-Date:   Thu, 9 Jan 2020 17:49:52 +0000
-From:   Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To:     Zhangfei Gao <zhangfei.gao@linaro.org>
-CC:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        <grant.likely@arm.com>, jean-philippe <jean-philippe@linaro.org>,
-        "Jerome Glisse" <jglisse@redhat.com>,
-        <ilias.apalodimas@linaro.org>, <francois.ozog@linaro.org>,
-        <kenneth-lee-2012@foxmail.com>, Wangzhou <wangzhou1@hisilicon.com>,
-        "haojian . zhuang" <haojian.zhuang@linaro.org>,
-        <guodong.xu@linaro.org>, <linux-accelerators@lists.ozlabs.org>,
-        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
-        <iommu@lists.linux-foundation.org>,
-        Dave Jiang <dave.jiang@intel.com>
-Subject: Re: [PATCH v10 0/4] Add uacce module for Accelerator
-Message-ID: <20200109174952.000051e1@Huawei.com>
-In-Reply-To: <1576465697-27946-1-git-send-email-zhangfei.gao@linaro.org>
-References: <1576465697-27946-1-git-send-email-zhangfei.gao@linaro.org>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; i686-w64-mingw32)
+        Thu, 9 Jan 2020 17:21:24 -0500
+Received: from mail.kernel.org ([198.145.29.99]:37570 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729293AbgAIWVY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 9 Jan 2020 17:21:24 -0500
+Received: from localhost.localdomain (amontpellier-657-1-18-247.w109-210.abo.wanadoo.fr [109.210.65.247])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id C98C32077B;
+        Thu,  9 Jan 2020 22:21:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1578608481;
+        bh=R4cywW+LwgPD2vuU4tHxNwln/uNRdQsJ6FS2UIIVMy0=;
+        h=From:To:Cc:Subject:Date:From;
+        b=Vea0JXoOs3F82NoflSyRchHoafvS4+wIv3+FsdepoDz2S9Ye4a+p3ZgxIoKixA/XV
+         XE2JsRmFnLBR6PzGqXPbZmBiqJ9zTSG19fE/pGYJRAiCbhGsgagbsETlVJOIA+mpgN
+         slMLWA5lfCh3LZnknZcHsI5LBV4/5EhI9TN6e2M4=
+From:   Ard Biesheuvel <ardb@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH] crypto: cipher - move API definition to internal header file
+Date:   Thu,  9 Jan 2020 23:21:08 +0100
+Message-Id: <20200109222108.15228-1-ardb@kernel.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.202.226.57]
-X-ClientProxiedBy: lhreml711-chm.china.huawei.com (10.201.108.62) To
- lhreml710-chm.china.huawei.com (10.201.108.61)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 16 Dec 2019 11:08:13 +0800
-Zhangfei Gao <zhangfei.gao@linaro.org> wrote:
+The single block cipher API is not intended for general use, and so it
+should not be exposed to users outside of the crypto subsystem via the
+public header files. So create a new internal header file and move the
+definitions there.
 
-> Uacce (Unified/User-space-access-intended Accelerator Framework) targets to
-> provide Shared Virtual Addressing (SVA) between accelerators and processes.
-> So accelerator can access any data structure of the main cpu.
-> This differs from the data sharing between cpu and io device, which share
-> data content rather than address.
-> Because of unified address, hardware and user space of process can share
-> the same virtual address in the communication.
-> 
-> Uacce is intended to be used with Jean Philippe Brucker's SVA
-> patchset[1], which enables IO side page fault and PASID support. 
-> We have keep verifying with Jean's sva patchset [2]
-> We also keep verifying with Eric's SMMUv3 Nested Stage patches [3]
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
+---
+ Documentation/crypto/api-skcipher.rst         |   9 -
+ arch/arm/crypto/aes-neonbs-glue.c             |   1 +
+ arch/s390/crypto/aes_s390.c                   |   1 +
+ crypto/adiantum.c                             |   1 +
+ crypto/ansi_cprng.c                           |   1 +
+ crypto/cbc.c                                  |   1 +
+ crypto/ccm.c                                  |   1 +
+ crypto/cfb.c                                  |   1 +
+ crypto/cipher.c                               |   1 +
+ crypto/cmac.c                                 |   1 +
+ crypto/ctr.c                                  |   1 +
+ crypto/drbg.c                                 |   1 +
+ crypto/ecb.c                                  |   1 +
+ crypto/essiv.c                                |   1 +
+ crypto/keywrap.c                              |   1 +
+ crypto/ofb.c                                  |   1 +
+ crypto/pcbc.c                                 |   1 +
+ crypto/skcipher.c                             |   1 +
+ crypto/vmac.c                                 |   1 +
+ crypto/xcbc.c                                 |   1 +
+ crypto/xts.c                                  |   1 +
+ drivers/crypto/geode-aes.c                    |   1 +
+ .../crypto/inside-secure/safexcel_cipher.c    |   1 +
+ drivers/crypto/inside-secure/safexcel_hash.c  |   1 +
+ include/crypto/algapi.h                       |  29 ---
+ include/crypto/internal/cipher.h              | 206 ++++++++++++++++++
+ include/linux/crypto.h                        | 163 --------------
+ 27 files changed, 229 insertions(+), 201 deletions(-)
+ create mode 100644 include/crypto/internal/cipher.h
 
-Hi Zhangfei Gao,
-
-Just to check my understanding...
-
-This patch set is not dependent on either 2 or 3?
-
-To use it on our hardware, we need 2, but the interfaces used are already
-upstream, so this could move forwards in parallel.
-
-Given interest from Dave it would be great if it can!
-
-Thanks,
-
-Jonathan
-
-> 
-> This series and related zip & qm driver
-> https://github.com/Linaro/linux-kernel-warpdrive/tree/v5.5-rc1-uacce-v10
-> 
-> The library and user application:
-> https://github.com/Linaro/warpdrive/tree/wdprd-upstream-v10
-> 
-> References:
-> [1] http://jpbrucker.net/sva/
-> [2] http://jpbrucker.net/git/linux/log/?h=sva/zip-devel
-> [3] https://github.com/eauger/linux/tree/v5.3.0-rc0-2stage-v9
-> 
-> Change History:
-> v10:
-> Modify the include header to fix kbuild test erorr in other arch.
-> 
-> v9:
-> Suggested by Jonathan
-> 1. Remove sysfs: numa_distance, node_id, id, also add is_visible callback
-> 2. Split the api to solve the potential race
-> struct uacce_device *uacce_alloc(struct device *parent,
-> 				 struct uacce_interface *interface)
-> int uacce_register(struct uacce_device *uacce)
-> void uacce_remove(struct uacce_device *uacce)
-> 3. Split clean up patch 03
-> 
-> v8:
-> Address some comments from Jonathan
-> Merge Jean's patch, using uacce_mm instead of pid for sva_exit
-> 
-> v7:
-> As suggested by Jean and Jerome
-> Only consider sva case and remove unused dma apis for the first patch.
-> Also add mm_exit for sva and vm_ops.close etc
-> 
-> 
-> v6: https://lkml.org/lkml/2019/10/16/231
-> Change sys qfrs_size to different file, suggested by Jonathan
-> Fix crypto daily build issue and based on crypto code base, also 5.4-rc1.
-> 
-> v5: https://lkml.org/lkml/2019/10/14/74
-> Add an example patch using the uacce interface, suggested by Greg
-> 0003-crypto-hisilicon-register-zip-engine-to-uacce.patch
-> 
-> v4: https://lkml.org/lkml/2019/9/17/116
-> Based on 5.4-rc1
-> Considering other driver integrating uacce, 
-> if uacce not compiled, uacce_register return error and uacce_unregister is empty.
-> Simplify uacce flag: UACCE_DEV_SVA.
-> Address Greg's comments: 
-> Fix state machine, remove potential syslog triggered from user space etc.
-> 
-> v3: https://lkml.org/lkml/2019/9/2/990
-> Recommended by Greg, use sturct uacce_device instead of struct uacce,
-> and use struct *cdev in struct uacce_device, as a result, 
-> cdev can be released by itself when refcount decreased to 0.
-> So the two structures are decoupled and self-maintained by themsleves.
-> Also add dev.release for put_device.
-> 
-> v2: https://lkml.org/lkml/2019/8/28/565
-> Address comments from Greg and Jonathan
-> Modify interface uacce_register
-> Drop noiommu mode first
-> 
-> v1: https://lkml.org/lkml/2019/8/14/277
-> 1. Rebase to 5.3-rc1
-> 2. Build on iommu interface
-> 3. Verifying with Jean's sva and Eric's nested mode iommu.
-> 4. User library has developed a lot: support zlib, openssl etc.
-> 5. Move to misc first
-> 
-> RFC3:
-> https://lkml.org/lkml/2018/11/12/1951
-> 
-> RFC2:
-> https://lwn.net/Articles/763990/
-> 
-> 
-> Background of why Uacce:
-> Von Neumann processor is not good at general data manipulation.
-> It is designed for control-bound rather than data-bound application.
-> The latter need less control path facility and more/specific ALUs.
-> So there are more and more heterogeneous processors, such as
-> encryption/decryption accelerators, TPUs, or
-> EDGE (Explicated Data Graph Execution) processors, introduced to gain
-> better performance or power efficiency for particular applications
-> these days.
-> 
-> There are generally two ways to make use of these heterogeneous processors:
-> 
-> The first is to make them co-processors, just like FPU.
-> This is good for some application but it has its own cons:
-> It changes the ISA set permanently.
-> You must save all state elements when the process is switched out.
-> But most data-bound processors have a huge set of state elements.
-> It makes the kernel scheduler more complex.
-> 
-> The second is Accelerator.
-> It is taken as a IO device from the CPU's point of view
-> (but it need not to be physically). The process, running on CPU,
-> hold a context of the accelerator and send instructions to it as if
-> it calls a function or thread running with FPU.
-> The context is bound with the processor itself.
-> So the state elements remain in the hardware context until
-> the context is released.
-> 
-> We believe this is the core feature of an "Accelerator" vs. Co-processor
-> or other heterogeneous processors.
-> 
-> The intention of Uacce is to provide the basic facility to backup
-> this scenario. Its first step is to make sure the accelerator and process
-> can share the same address space. So the accelerator ISA can directly
-> address any data structure of the main CPU.
-> This differs from the data sharing between CPU and IO device,
-> which share data content rather than address.
-> So it is different comparing to the other DMA libraries.
-> 
-> In the future, we may add more facility to support linking accelerator
-> library to the main application, or managing the accelerator context as
-> special thread.
-> But no matter how, this can be a solid start point for new processor
-> to be used as an "accelerator" as this is the essential requirement.
-> 
-> 
-> The Fork Scenario
-> =================
-> For a process with allocated queues and shared memory, what happen if it forks
-> a child?
-> 
-> The fd of the queue is duplicated on fork, but requests sent from the child
-> process are blocked.
-> 
-> It is recommended to add O_CLOEXEC to the queue file.
-> 
-> The queue mmap space has a VM_DONTCOPY in its VMA. So the child will lose all
-> those VMAs.
-> 
-> This is a reason why Uacce does not adopt the mode used in VFIO and
-> InfiniBand.  Both solutions can set any user pointer for hardware sharing.
-> But they cannot support fork when the dma is in process. Or the
-> "Copy-On-Write" procedure will make the parent process lost its physical
-> pages.
-> 
-> 
-> Difference to the VFIO and IB framework
-> ---------------------------------------
-> The essential function of Uacce is to let the device access the user
-> address directly. There are many device drivers doing the same in the kernel.
-> And both VFIO and IB can provide similar functions in framework level.
-> 
-> But Uacce has a different goal: "share address space". It is
-> not taken the request to the accelerator as an enclosure data structure. It
-> takes the accelerator as another thread of the same process. So the
-> accelerator can refer to any address used by the process.
-> 
-> Both VFIO and IB are taken this as "memory sharing", not "address sharing".
-> They care more on sharing the block of memory. But if there is an address
-> stored in the block and referring to another memory region. The address may
-> not be valid.
-> 
-> By adding more constraints to the VFIO and IB framework, in some sense, we may
-> achieve a similar goal. But we gave it up finally. Both VFIO and IB have extra
-> assumption which is unnecessary to Uacce. They may hurt each other if we
-> try to merge them together.
-> 
-> VFIO manages resource of a hardware as a "virtual device". If a device need to
-> serve a separated application. It must isolate the resource as a separate
-> virtual device.  And the life cycle of the application and virtual device are
-> unnecessary unrelated. And most concepts, such as bus, driver, probe and
-> so on, to make it as a "device" is unnecessary either. And the logic added to
-> VFIO to make address sharing do no help on "creating a virtual device".
-> 
-> IB creates a "verbs" standard for sharing memory region to another remote
-> entity.  Most of these verbs are to make memory region between entities to be
-> synchronized.  This is not what accelerator need. Accelerator is in the same
-> memory system with the CPU. It refers to the same memory system among CPU and
-> devices. So the local memory terms/verbs are good enough for it. Extra "verbs"
-> are not necessary. And its queue (like queue pair in IB) is the communication
-> channel direct to the accelerator hardware. There is nothing about memory
-> itself.
-> 
-> Further, both VFIO and IB use the "pin" (get_user_page) way to lock local
-> memory in place.  This is flexible. But it can cause other problems. For
-> example, if the user process fork a child process. The COW procedure may make
-> the parent process lost its pages which are sharing with the device. These may
-> be fixed in the future. But is not going to be easy. (There is a discussion
-> about this on Linux Plumbers Conference 2018 [1])
-> 
-> So we choose to build the solution directly on top of IOMMU interface. IOMMU
-> is the essential way for device and process to share their page mapping from
-> the hardware perspective. It will be safe to create a software solution on
-> this assumption.  Uacce manages the IOMMU interface for the accelerator
-> device, so the device driver can export some of the resources to the user
-> space. Uacce than can make sure the device and the process have the same
-> address space.
-> 
-> 
-> References
-> ==========
-> .. [1] https://lwn.net/Articles/774411/
-> 
-> Kenneth Lee (2):
->   uacce: Add documents for uacce
->   uacce: add uacce driver
-> 
-> Zhangfei Gao (2):
->   crypto: hisilicon - Remove module_param uacce_mode
->   crypto: hisilicon - register zip engine to uacce
-> 
->  Documentation/ABI/testing/sysfs-driver-uacce |  37 ++
->  Documentation/misc-devices/uacce.rst         | 176 ++++++++
->  drivers/crypto/hisilicon/qm.c                | 236 +++++++++-
->  drivers/crypto/hisilicon/qm.h                |  11 +
->  drivers/crypto/hisilicon/zip/zip_main.c      |  47 +-
->  drivers/misc/Kconfig                         |   1 +
->  drivers/misc/Makefile                        |   1 +
->  drivers/misc/uacce/Kconfig                   |  13 +
->  drivers/misc/uacce/Makefile                  |   2 +
->  drivers/misc/uacce/uacce.c                   | 628 +++++++++++++++++++++++++++
->  include/linux/uacce.h                        | 161 +++++++
->  include/uapi/misc/uacce/hisi_qm.h            |  23 +
->  include/uapi/misc/uacce/uacce.h              |  38 ++
->  13 files changed, 1341 insertions(+), 33 deletions(-)
->  create mode 100644 Documentation/ABI/testing/sysfs-driver-uacce
->  create mode 100644 Documentation/misc-devices/uacce.rst
->  create mode 100644 drivers/misc/uacce/Kconfig
->  create mode 100644 drivers/misc/uacce/Makefile
->  create mode 100644 drivers/misc/uacce/uacce.c
->  create mode 100644 include/linux/uacce.h
->  create mode 100644 include/uapi/misc/uacce/hisi_qm.h
->  create mode 100644 include/uapi/misc/uacce/uacce.h
-> 
-
+diff --git a/Documentation/crypto/api-skcipher.rst b/Documentation/crypto/api-skcipher.rst
+index 1aaf8985894b..563d5bb06a7a 100644
+--- a/Documentation/crypto/api-skcipher.rst
++++ b/Documentation/crypto/api-skcipher.rst
+@@ -24,12 +24,3 @@ Symmetric Key Cipher Request Handle
+ 
+ .. kernel-doc:: include/crypto/skcipher.h
+    :functions: crypto_skcipher_reqsize skcipher_request_set_tfm skcipher_request_alloc skcipher_request_free skcipher_request_set_callback skcipher_request_set_crypt
+-
+-Single Block Cipher API
+------------------------
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :doc: Single Block Cipher API
+-
+-.. kernel-doc:: include/linux/crypto.h
+-   :functions: crypto_alloc_cipher crypto_free_cipher crypto_has_cipher crypto_cipher_blocksize crypto_cipher_setkey crypto_cipher_encrypt_one crypto_cipher_decrypt_one
+diff --git a/arch/arm/crypto/aes-neonbs-glue.c b/arch/arm/crypto/aes-neonbs-glue.c
+index e85839a8aaeb..03a7a37d6393 100644
+--- a/arch/arm/crypto/aes-neonbs-glue.c
++++ b/arch/arm/crypto/aes-neonbs-glue.c
+@@ -10,6 +10,7 @@
+ #include <crypto/aes.h>
+ #include <crypto/cbc.h>
+ #include <crypto/ctr.h>
++#include <crypto/internal/cipher.h>
+ #include <crypto/internal/simd.h>
+ #include <crypto/internal/skcipher.h>
+ #include <crypto/scatterwalk.h>
+diff --git a/arch/s390/crypto/aes_s390.c b/arch/s390/crypto/aes_s390.c
+index 1c23d84a9097..33c606521412 100644
+--- a/arch/s390/crypto/aes_s390.c
++++ b/arch/s390/crypto/aes_s390.c
+@@ -21,6 +21,7 @@
+ #include <crypto/algapi.h>
+ #include <crypto/ghash.h>
+ #include <crypto/internal/aead.h>
++#include <crypto/internal/cipher.h>
+ #include <crypto/internal/skcipher.h>
+ #include <crypto/scatterwalk.h>
+ #include <linux/err.h>
+diff --git a/crypto/adiantum.c b/crypto/adiantum.c
+index 4d7a6cac82ed..49c94d147184 100644
+--- a/crypto/adiantum.c
++++ b/crypto/adiantum.c
+@@ -32,6 +32,7 @@
+ 
+ #include <crypto/b128ops.h>
+ #include <crypto/chacha.h>
++#include <crypto/internal/cipher.h>
+ #include <crypto/internal/hash.h>
+ #include <crypto/internal/poly1305.h>
+ #include <crypto/internal/skcipher.h>
+diff --git a/crypto/ansi_cprng.c b/crypto/ansi_cprng.c
+index c475c1129ff2..4320a961d013 100644
+--- a/crypto/ansi_cprng.c
++++ b/crypto/ansi_cprng.c
+@@ -7,6 +7,7 @@
+  *  (C) Neil Horman <nhorman@tuxdriver.com>
+  */
+ 
++#include <crypto/internal/cipher.h>
+ #include <crypto/internal/rng.h>
+ #include <linux/err.h>
+ #include <linux/init.h>
+diff --git a/crypto/cbc.c b/crypto/cbc.c
+index e6f6273a7d39..45fe3117cd39 100644
+--- a/crypto/cbc.c
++++ b/crypto/cbc.c
+@@ -7,6 +7,7 @@
+ 
+ #include <crypto/algapi.h>
+ #include <crypto/cbc.h>
++#include <crypto/internal/cipher.h>
+ #include <crypto/internal/skcipher.h>
+ #include <linux/err.h>
+ #include <linux/init.h>
+diff --git a/crypto/ccm.c b/crypto/ccm.c
+index 241ecdc5c4e0..731fb0fe3dda 100644
+--- a/crypto/ccm.c
++++ b/crypto/ccm.c
+@@ -6,6 +6,7 @@
+  */
+ 
+ #include <crypto/internal/aead.h>
++#include <crypto/internal/cipher.h>
+ #include <crypto/internal/hash.h>
+ #include <crypto/internal/skcipher.h>
+ #include <crypto/scatterwalk.h>
+diff --git a/crypto/cfb.c b/crypto/cfb.c
+index 4e5219bbcd19..343263554876 100644
+--- a/crypto/cfb.c
++++ b/crypto/cfb.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include <crypto/algapi.h>
++#include <crypto/internal/cipher.h>
+ #include <crypto/internal/skcipher.h>
+ #include <linux/err.h>
+ #include <linux/init.h>
+diff --git a/crypto/cipher.c b/crypto/cipher.c
+index fd78150deb1c..6ae67731f81e 100644
+--- a/crypto/cipher.c
++++ b/crypto/cipher.c
+@@ -9,6 +9,7 @@
+  */
+ 
+ #include <crypto/algapi.h>
++#include <crypto/internal/cipher.h>
+ #include <linux/kernel.h>
+ #include <linux/crypto.h>
+ #include <linux/errno.h>
+diff --git a/crypto/cmac.c b/crypto/cmac.c
+index 143a6544c873..66177a217cb4 100644
+--- a/crypto/cmac.c
++++ b/crypto/cmac.c
+@@ -11,6 +11,7 @@
+  *   Author: Kazunori Miyazawa <miyazawa@linux-ipv6.org>
+  */
+ 
++#include <crypto/internal/cipher.h>
+ #include <crypto/internal/hash.h>
+ #include <linux/err.h>
+ #include <linux/kernel.h>
+diff --git a/crypto/ctr.c b/crypto/ctr.c
+index a8feab621c6c..2192d72eec1d 100644
+--- a/crypto/ctr.c
++++ b/crypto/ctr.c
+@@ -7,6 +7,7 @@
+ 
+ #include <crypto/algapi.h>
+ #include <crypto/ctr.h>
++#include <crypto/internal/cipher.h>
+ #include <crypto/internal/skcipher.h>
+ #include <linux/err.h>
+ #include <linux/init.h>
+diff --git a/crypto/drbg.c b/crypto/drbg.c
+index b6929eb5f565..bcb22065caf4 100644
+--- a/crypto/drbg.c
++++ b/crypto/drbg.c
+@@ -98,6 +98,7 @@
+  */
+ 
+ #include <crypto/drbg.h>
++#include <crypto/internal/cipher.h>
+ #include <linux/kernel.h>
+ 
+ /***************************************************************
+diff --git a/crypto/ecb.c b/crypto/ecb.c
+index 69a687cbdf21..71fbb0543d64 100644
+--- a/crypto/ecb.c
++++ b/crypto/ecb.c
+@@ -6,6 +6,7 @@
+  */
+ 
+ #include <crypto/algapi.h>
++#include <crypto/internal/cipher.h>
+ #include <crypto/internal/skcipher.h>
+ #include <linux/err.h>
+ #include <linux/init.h>
+diff --git a/crypto/essiv.c b/crypto/essiv.c
+index 20d7c1fdbf5d..c19524e323ff 100644
+--- a/crypto/essiv.c
++++ b/crypto/essiv.c
+@@ -31,6 +31,7 @@
+ #include <crypto/authenc.h>
+ #include <crypto/internal/aead.h>
+ #include <crypto/internal/hash.h>
++#include <crypto/internal/cipher.h>
+ #include <crypto/internal/skcipher.h>
+ #include <crypto/scatterwalk.h>
+ #include <linux/module.h>
+diff --git a/crypto/keywrap.c b/crypto/keywrap.c
+index 0355cce21b1e..1b87e6d3a5e6 100644
+--- a/crypto/keywrap.c
++++ b/crypto/keywrap.c
+@@ -85,6 +85,7 @@
+ #include <linux/crypto.h>
+ #include <linux/scatterlist.h>
+ #include <crypto/scatterwalk.h>
++#include <crypto/internal/cipher.h>
+ #include <crypto/internal/skcipher.h>
+ 
+ struct crypto_kw_block {
+diff --git a/crypto/ofb.c b/crypto/ofb.c
+index 2ec68e3f2c55..7fc426935b45 100644
+--- a/crypto/ofb.c
++++ b/crypto/ofb.c
+@@ -8,6 +8,7 @@
+  */
+ 
+ #include <crypto/algapi.h>
++#include <crypto/internal/cipher.h>
+ #include <crypto/internal/skcipher.h>
+ #include <linux/err.h>
+ #include <linux/init.h>
+diff --git a/crypto/pcbc.c b/crypto/pcbc.c
+index ae921fb74dc9..7ab6003eeaa5 100644
+--- a/crypto/pcbc.c
++++ b/crypto/pcbc.c
+@@ -10,6 +10,7 @@
+  */
+ 
+ #include <crypto/algapi.h>
++#include <crypto/internal/cipher.h>
+ #include <crypto/internal/skcipher.h>
+ #include <linux/err.h>
+ #include <linux/init.h>
+diff --git a/crypto/skcipher.c b/crypto/skcipher.c
+index 7221def7b9a7..fab5e39e9fac 100644
+--- a/crypto/skcipher.c
++++ b/crypto/skcipher.c
+@@ -10,6 +10,7 @@
+  */
+ 
+ #include <crypto/internal/aead.h>
++#include <crypto/internal/cipher.h>
+ #include <crypto/internal/skcipher.h>
+ #include <crypto/scatterwalk.h>
+ #include <linux/bug.h>
+diff --git a/crypto/vmac.c b/crypto/vmac.c
+index 2d906830df96..0cba941ec368 100644
+--- a/crypto/vmac.c
++++ b/crypto/vmac.c
+@@ -36,6 +36,7 @@
+ #include <linux/scatterlist.h>
+ #include <asm/byteorder.h>
+ #include <crypto/scatterwalk.h>
++#include <crypto/internal/cipher.h>
+ #include <crypto/internal/hash.h>
+ 
+ /*
+diff --git a/crypto/xcbc.c b/crypto/xcbc.c
+index 598ec88abf0f..9bc998699180 100644
+--- a/crypto/xcbc.c
++++ b/crypto/xcbc.c
+@@ -6,6 +6,7 @@
+  * 	Kazunori Miyazawa <miyazawa@linux-ipv6.org>
+  */
+ 
++#include <crypto/internal/cipher.h>
+ #include <crypto/internal/hash.h>
+ #include <linux/err.h>
+ #include <linux/kernel.h>
+diff --git a/crypto/xts.c b/crypto/xts.c
+index 29efa15f1495..91e3eb63f00e 100644
+--- a/crypto/xts.c
++++ b/crypto/xts.c
+@@ -7,6 +7,7 @@
+  * Based on ecb.c
+  * Copyright (c) 2006 Herbert Xu <herbert@gondor.apana.org.au>
+  */
++#include <crypto/internal/cipher.h>
+ #include <crypto/internal/skcipher.h>
+ #include <crypto/scatterwalk.h>
+ #include <linux/err.h>
+diff --git a/drivers/crypto/geode-aes.c b/drivers/crypto/geode-aes.c
+index f4f18bfc2247..a25fb9783c7e 100644
+--- a/drivers/crypto/geode-aes.c
++++ b/drivers/crypto/geode-aes.c
+@@ -10,6 +10,7 @@
+ #include <linux/spinlock.h>
+ #include <crypto/algapi.h>
+ #include <crypto/aes.h>
++#include <crypto/internal/cipher.h>
+ #include <crypto/internal/skcipher.h>
+ 
+ #include <linux/io.h>
+diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
+index 0c5e80c3f6e3..159653985388 100644
+--- a/drivers/crypto/inside-secure/safexcel_cipher.c
++++ b/drivers/crypto/inside-secure/safexcel_cipher.c
+@@ -24,6 +24,7 @@
+ #include <crypto/xts.h>
+ #include <crypto/skcipher.h>
+ #include <crypto/internal/aead.h>
++#include <crypto/internal/cipher.h>
+ #include <crypto/internal/skcipher.h>
+ 
+ #include "safexcel.h"
+diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
+index 43962bc709c6..648ea63c9224 100644
+--- a/drivers/crypto/inside-secure/safexcel_hash.c
++++ b/drivers/crypto/inside-secure/safexcel_hash.c
+@@ -12,6 +12,7 @@
+ #include <crypto/sha3.h>
+ #include <crypto/skcipher.h>
+ #include <crypto/sm3.h>
++#include <crypto/internal/cipher.h>
+ #include <linux/device.h>
+ #include <linux/dma-mapping.h>
+ #include <linux/dmapool.h>
+diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
+index e115f9215ed5..a278ceaaeb6f 100644
+--- a/include/crypto/algapi.h
++++ b/include/crypto/algapi.h
+@@ -191,41 +191,12 @@ struct crypto_cipher_spawn {
+ 	struct crypto_spawn base;
+ };
+ 
+-static inline int crypto_grab_cipher(struct crypto_cipher_spawn *spawn,
+-				     struct crypto_instance *inst,
+-				     const char *name, u32 type, u32 mask)
+-{
+-	type &= ~CRYPTO_ALG_TYPE_MASK;
+-	type |= CRYPTO_ALG_TYPE_CIPHER;
+-	mask |= CRYPTO_ALG_TYPE_MASK;
+-	return crypto_grab_spawn(&spawn->base, inst, name, type, mask);
+-}
+-
+-static inline void crypto_drop_cipher(struct crypto_cipher_spawn *spawn)
+-{
+-	crypto_drop_spawn(&spawn->base);
+-}
+-
+ static inline struct crypto_alg *crypto_spawn_cipher_alg(
+ 	struct crypto_cipher_spawn *spawn)
+ {
+ 	return spawn->base.alg;
+ }
+ 
+-static inline struct crypto_cipher *crypto_spawn_cipher(
+-	struct crypto_cipher_spawn *spawn)
+-{
+-	u32 type = CRYPTO_ALG_TYPE_CIPHER;
+-	u32 mask = CRYPTO_ALG_TYPE_MASK;
+-
+-	return __crypto_cipher_cast(crypto_spawn_tfm(&spawn->base, type, mask));
+-}
+-
+-static inline struct cipher_alg *crypto_cipher_alg(struct crypto_cipher *tfm)
+-{
+-	return &crypto_cipher_tfm(tfm)->__crt_alg->cra_cipher;
+-}
+-
+ static inline struct crypto_async_request *crypto_get_backlog(
+ 	struct crypto_queue *queue)
+ {
+diff --git a/include/crypto/internal/cipher.h b/include/crypto/internal/cipher.h
+new file mode 100644
+index 000000000000..0784fa2e3531
+--- /dev/null
++++ b/include/crypto/internal/cipher.h
+@@ -0,0 +1,206 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ * Copyright (c) 2002 James Morris <jmorris@intercode.com.au>
++ * Copyright (c) 2002 David S. Miller (davem@redhat.com)
++ * Copyright (c) 2005 Herbert Xu <herbert@gondor.apana.org.au>
++ */
++
++#ifndef _CRYPTO_INTERNAL_CIPHER_H
++#define _CRYPTO_INTERNAL_CIPHER_H
++
++#include <linux/crypto.h>
++#include <crypto/algapi.h>
++
++struct crypto_cipher {
++	struct crypto_tfm base;
++};
++
++/**
++ * DOC: Single Block Cipher API
++ *
++ * The single block cipher API is used with the ciphers of type
++ * CRYPTO_ALG_TYPE_CIPHER (listed as type "cipher" in /proc/crypto).
++ *
++ * Using the single block cipher API calls, operations with the basic cipher
++ * primitive can be implemented. These cipher primitives exclude any block
++ * chaining operations including IV handling.
++ *
++ * The purpose of this single block cipher API is to support the implementation
++ * of templates or other concepts that only need to perform the cipher operation
++ * on one block at a time. Templates invoke the underlying cipher primitive
++ * block-wise and process either the input or the output data of these cipher
++ * operations.
++ */
++
++static inline struct crypto_cipher *__crypto_cipher_cast(struct crypto_tfm *tfm)
++{
++	return (struct crypto_cipher *)tfm;
++}
++
++/**
++ * crypto_alloc_cipher() - allocate single block cipher handle
++ * @alg_name: is the cra_name / name or cra_driver_name / driver name of the
++ *	     single block cipher
++ * @type: specifies the type of the cipher
++ * @mask: specifies the mask for the cipher
++ *
++ * Allocate a cipher handle for a single block cipher. The returned struct
++ * crypto_cipher is the cipher handle that is required for any subsequent API
++ * invocation for that single block cipher.
++ *
++ * Return: allocated cipher handle in case of success; IS_ERR() is true in case
++ *	   of an error, PTR_ERR() returns the error code.
++ */
++static inline struct crypto_cipher *crypto_alloc_cipher(const char *alg_name,
++							u32 type, u32 mask)
++{
++	type &= ~CRYPTO_ALG_TYPE_MASK;
++	type |= CRYPTO_ALG_TYPE_CIPHER;
++	mask |= CRYPTO_ALG_TYPE_MASK;
++
++	return __crypto_cipher_cast(crypto_alloc_base(alg_name, type, mask));
++}
++
++static inline struct crypto_tfm *crypto_cipher_tfm(struct crypto_cipher *tfm)
++{
++	return &tfm->base;
++}
++
++/**
++ * crypto_free_cipher() - zeroize and free the single block cipher handle
++ * @tfm: cipher handle to be freed
++ */
++static inline void crypto_free_cipher(struct crypto_cipher *tfm)
++{
++	crypto_free_tfm(crypto_cipher_tfm(tfm));
++}
++
++/**
++ * crypto_has_cipher() - Search for the availability of a single block cipher
++ * @alg_name: is the cra_name / name or cra_driver_name / driver name of the
++ *	     single block cipher
++ * @type: specifies the type of the cipher
++ * @mask: specifies the mask for the cipher
++ *
++ * Return: true when the single block cipher is known to the kernel crypto API;
++ *	   false otherwise
++ */
++static inline int crypto_has_cipher(const char *alg_name, u32 type, u32 mask)
++{
++	type &= ~CRYPTO_ALG_TYPE_MASK;
++	type |= CRYPTO_ALG_TYPE_CIPHER;
++	mask |= CRYPTO_ALG_TYPE_MASK;
++
++	return crypto_has_alg(alg_name, type, mask);
++}
++
++/**
++ * crypto_cipher_blocksize() - obtain block size for cipher
++ * @tfm: cipher handle
++ *
++ * The block size for the single block cipher referenced with the cipher handle
++ * tfm is returned. The caller may use that information to allocate appropriate
++ * memory for the data returned by the encryption or decryption operation
++ *
++ * Return: block size of cipher
++ */
++static inline unsigned int crypto_cipher_blocksize(struct crypto_cipher *tfm)
++{
++	return crypto_tfm_alg_blocksize(crypto_cipher_tfm(tfm));
++}
++
++static inline unsigned int crypto_cipher_alignmask(struct crypto_cipher *tfm)
++{
++	return crypto_tfm_alg_alignmask(crypto_cipher_tfm(tfm));
++}
++
++static inline u32 crypto_cipher_get_flags(struct crypto_cipher *tfm)
++{
++	return crypto_tfm_get_flags(crypto_cipher_tfm(tfm));
++}
++
++static inline void crypto_cipher_set_flags(struct crypto_cipher *tfm,
++					   u32 flags)
++{
++	crypto_tfm_set_flags(crypto_cipher_tfm(tfm), flags);
++}
++
++static inline void crypto_cipher_clear_flags(struct crypto_cipher *tfm,
++					     u32 flags)
++{
++	crypto_tfm_clear_flags(crypto_cipher_tfm(tfm), flags);
++}
++
++/**
++ * crypto_cipher_setkey() - set key for cipher
++ * @tfm: cipher handle
++ * @key: buffer holding the key
++ * @keylen: length of the key in bytes
++ *
++ * The caller provided key is set for the single block cipher referenced by the
++ * cipher handle.
++ *
++ * Note, the key length determines the cipher type. Many block ciphers implement
++ * different cipher modes depending on the key size, such as AES-128 vs AES-192
++ * vs. AES-256. When providing a 16 byte key for an AES cipher handle, AES-128
++ * is performed.
++ *
++ * Return: 0 if the setting of the key was successful; < 0 if an error occurred
++ */
++int crypto_cipher_setkey(struct crypto_cipher *tfm,
++			 const u8 *key, unsigned int keylen);
++
++/**
++ * crypto_cipher_encrypt_one() - encrypt one block of plaintext
++ * @tfm: cipher handle
++ * @dst: points to the buffer that will be filled with the ciphertext
++ * @src: buffer holding the plaintext to be encrypted
++ *
++ * Invoke the encryption operation of one block. The caller must ensure that
++ * the plaintext and ciphertext buffers are at least one block in size.
++ */
++void crypto_cipher_encrypt_one(struct crypto_cipher *tfm,
++			       u8 *dst, const u8 *src);
++
++/**
++ * crypto_cipher_decrypt_one() - decrypt one block of ciphertext
++ * @tfm: cipher handle
++ * @dst: points to the buffer that will be filled with the plaintext
++ * @src: buffer holding the ciphertext to be decrypted
++ *
++ * Invoke the decryption operation of one block. The caller must ensure that
++ * the plaintext and ciphertext buffers are at least one block in size.
++ */
++void crypto_cipher_decrypt_one(struct crypto_cipher *tfm,
++			       u8 *dst, const u8 *src);
++
++static inline int crypto_grab_cipher(struct crypto_cipher_spawn *spawn,
++				     struct crypto_instance *inst,
++				     const char *name, u32 type, u32 mask)
++{
++	type &= ~CRYPTO_ALG_TYPE_MASK;
++	type |= CRYPTO_ALG_TYPE_CIPHER;
++	mask |= CRYPTO_ALG_TYPE_MASK;
++	return crypto_grab_spawn(&spawn->base, inst, name, type, mask);
++}
++
++static inline void crypto_drop_cipher(struct crypto_cipher_spawn *spawn)
++{
++	crypto_drop_spawn(&spawn->base);
++}
++
++static inline struct crypto_cipher *crypto_spawn_cipher(
++	struct crypto_cipher_spawn *spawn)
++{
++	u32 type = CRYPTO_ALG_TYPE_CIPHER;
++	u32 mask = CRYPTO_ALG_TYPE_MASK;
++
++	return __crypto_cipher_cast(crypto_spawn_tfm(&spawn->base, type, mask));
++}
++
++static inline struct cipher_alg *crypto_cipher_alg(struct crypto_cipher *tfm)
++{
++	return &crypto_cipher_tfm(tfm)->__crt_alg->cra_cipher;
++}
++
++#endif
+diff --git a/include/linux/crypto.h b/include/linux/crypto.h
+index 763863dbc079..defe6bd76232 100644
+--- a/include/linux/crypto.h
++++ b/include/linux/crypto.h
+@@ -603,10 +603,6 @@ struct crypto_tfm {
+ 	void *__crt_ctx[] CRYPTO_MINALIGN_ATTR;
+ };
+ 
+-struct crypto_cipher {
+-	struct crypto_tfm base;
+-};
+-
+ struct crypto_comp {
+ 	struct crypto_tfm base;
+ };
+@@ -710,165 +706,6 @@ static inline unsigned int crypto_tfm_ctx_alignment(void)
+ 	return __alignof__(tfm->__crt_ctx);
+ }
+ 
+-/**
+- * DOC: Single Block Cipher API
+- *
+- * The single block cipher API is used with the ciphers of type
+- * CRYPTO_ALG_TYPE_CIPHER (listed as type "cipher" in /proc/crypto).
+- *
+- * Using the single block cipher API calls, operations with the basic cipher
+- * primitive can be implemented. These cipher primitives exclude any block
+- * chaining operations including IV handling.
+- *
+- * The purpose of this single block cipher API is to support the implementation
+- * of templates or other concepts that only need to perform the cipher operation
+- * on one block at a time. Templates invoke the underlying cipher primitive
+- * block-wise and process either the input or the output data of these cipher
+- * operations.
+- */
+-
+-static inline struct crypto_cipher *__crypto_cipher_cast(struct crypto_tfm *tfm)
+-{
+-	return (struct crypto_cipher *)tfm;
+-}
+-
+-/**
+- * crypto_alloc_cipher() - allocate single block cipher handle
+- * @alg_name: is the cra_name / name or cra_driver_name / driver name of the
+- *	     single block cipher
+- * @type: specifies the type of the cipher
+- * @mask: specifies the mask for the cipher
+- *
+- * Allocate a cipher handle for a single block cipher. The returned struct
+- * crypto_cipher is the cipher handle that is required for any subsequent API
+- * invocation for that single block cipher.
+- *
+- * Return: allocated cipher handle in case of success; IS_ERR() is true in case
+- *	   of an error, PTR_ERR() returns the error code.
+- */
+-static inline struct crypto_cipher *crypto_alloc_cipher(const char *alg_name,
+-							u32 type, u32 mask)
+-{
+-	type &= ~CRYPTO_ALG_TYPE_MASK;
+-	type |= CRYPTO_ALG_TYPE_CIPHER;
+-	mask |= CRYPTO_ALG_TYPE_MASK;
+-
+-	return __crypto_cipher_cast(crypto_alloc_base(alg_name, type, mask));
+-}
+-
+-static inline struct crypto_tfm *crypto_cipher_tfm(struct crypto_cipher *tfm)
+-{
+-	return &tfm->base;
+-}
+-
+-/**
+- * crypto_free_cipher() - zeroize and free the single block cipher handle
+- * @tfm: cipher handle to be freed
+- */
+-static inline void crypto_free_cipher(struct crypto_cipher *tfm)
+-{
+-	crypto_free_tfm(crypto_cipher_tfm(tfm));
+-}
+-
+-/**
+- * crypto_has_cipher() - Search for the availability of a single block cipher
+- * @alg_name: is the cra_name / name or cra_driver_name / driver name of the
+- *	     single block cipher
+- * @type: specifies the type of the cipher
+- * @mask: specifies the mask for the cipher
+- *
+- * Return: true when the single block cipher is known to the kernel crypto API;
+- *	   false otherwise
+- */
+-static inline int crypto_has_cipher(const char *alg_name, u32 type, u32 mask)
+-{
+-	type &= ~CRYPTO_ALG_TYPE_MASK;
+-	type |= CRYPTO_ALG_TYPE_CIPHER;
+-	mask |= CRYPTO_ALG_TYPE_MASK;
+-
+-	return crypto_has_alg(alg_name, type, mask);
+-}
+-
+-/**
+- * crypto_cipher_blocksize() - obtain block size for cipher
+- * @tfm: cipher handle
+- *
+- * The block size for the single block cipher referenced with the cipher handle
+- * tfm is returned. The caller may use that information to allocate appropriate
+- * memory for the data returned by the encryption or decryption operation
+- *
+- * Return: block size of cipher
+- */
+-static inline unsigned int crypto_cipher_blocksize(struct crypto_cipher *tfm)
+-{
+-	return crypto_tfm_alg_blocksize(crypto_cipher_tfm(tfm));
+-}
+-
+-static inline unsigned int crypto_cipher_alignmask(struct crypto_cipher *tfm)
+-{
+-	return crypto_tfm_alg_alignmask(crypto_cipher_tfm(tfm));
+-}
+-
+-static inline u32 crypto_cipher_get_flags(struct crypto_cipher *tfm)
+-{
+-	return crypto_tfm_get_flags(crypto_cipher_tfm(tfm));
+-}
+-
+-static inline void crypto_cipher_set_flags(struct crypto_cipher *tfm,
+-					   u32 flags)
+-{
+-	crypto_tfm_set_flags(crypto_cipher_tfm(tfm), flags);
+-}
+-
+-static inline void crypto_cipher_clear_flags(struct crypto_cipher *tfm,
+-					     u32 flags)
+-{
+-	crypto_tfm_clear_flags(crypto_cipher_tfm(tfm), flags);
+-}
+-
+-/**
+- * crypto_cipher_setkey() - set key for cipher
+- * @tfm: cipher handle
+- * @key: buffer holding the key
+- * @keylen: length of the key in bytes
+- *
+- * The caller provided key is set for the single block cipher referenced by the
+- * cipher handle.
+- *
+- * Note, the key length determines the cipher type. Many block ciphers implement
+- * different cipher modes depending on the key size, such as AES-128 vs AES-192
+- * vs. AES-256. When providing a 16 byte key for an AES cipher handle, AES-128
+- * is performed.
+- *
+- * Return: 0 if the setting of the key was successful; < 0 if an error occurred
+- */
+-int crypto_cipher_setkey(struct crypto_cipher *tfm,
+-			 const u8 *key, unsigned int keylen);
+-
+-/**
+- * crypto_cipher_encrypt_one() - encrypt one block of plaintext
+- * @tfm: cipher handle
+- * @dst: points to the buffer that will be filled with the ciphertext
+- * @src: buffer holding the plaintext to be encrypted
+- *
+- * Invoke the encryption operation of one block. The caller must ensure that
+- * the plaintext and ciphertext buffers are at least one block in size.
+- */
+-void crypto_cipher_encrypt_one(struct crypto_cipher *tfm,
+-			       u8 *dst, const u8 *src);
+-
+-/**
+- * crypto_cipher_decrypt_one() - decrypt one block of ciphertext
+- * @tfm: cipher handle
+- * @dst: points to the buffer that will be filled with the plaintext
+- * @src: buffer holding the ciphertext to be decrypted
+- *
+- * Invoke the decryption operation of one block. The caller must ensure that
+- * the plaintext and ciphertext buffers are at least one block in size.
+- */
+-void crypto_cipher_decrypt_one(struct crypto_cipher *tfm,
+-			       u8 *dst, const u8 *src);
+-
+ static inline struct crypto_comp *__crypto_comp_cast(struct crypto_tfm *tfm)
+ {
+ 	return (struct crypto_comp *)tfm;
+-- 
+2.20.1
 
