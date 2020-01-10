@@ -1,828 +1,524 @@
-Return-Path: <SRS0=LmLS=26=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=JhzL=27=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 027A7C282DD
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jan 2020 22:21:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5F93C282DD
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jan 2020 00:21:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B53242077B
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Jan 2020 22:21:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1578608484;
-	bh=R4cywW+LwgPD2vuU4tHxNwln/uNRdQsJ6FS2UIIVMy0=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=zREnbCtD6vaIKpnrMnbetHtVbT+IgRM2YTk8TxnNB5NsUEA4SnDj1kIdSJ1kf1u1W
-	 xW1OIHBJC2hgsaUaSz1SjaI74mpg7O+wVKOmsbN6qCLVSliszz6vrljxLl8uSSO4fO
-	 eY0uEiyVw6CjbzKjqlyOF5NiQm1Ko/lrUm/zE3Js=
+	by mail.kernel.org (Postfix) with ESMTP id 6F81720661
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jan 2020 00:21:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="WOdo0u4E"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729347AbgAIWVY (ORCPT
+        id S1730072AbgAJAVc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 Jan 2020 17:21:24 -0500
-Received: from mail.kernel.org ([198.145.29.99]:37570 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729293AbgAIWVY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Jan 2020 17:21:24 -0500
-Received: from localhost.localdomain (amontpellier-657-1-18-247.w109-210.abo.wanadoo.fr [109.210.65.247])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id C98C32077B;
-        Thu,  9 Jan 2020 22:21:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1578608481;
-        bh=R4cywW+LwgPD2vuU4tHxNwln/uNRdQsJ6FS2UIIVMy0=;
-        h=From:To:Cc:Subject:Date:From;
-        b=Vea0JXoOs3F82NoflSyRchHoafvS4+wIv3+FsdepoDz2S9Ye4a+p3ZgxIoKixA/XV
-         XE2JsRmFnLBR6PzGqXPbZmBiqJ9zTSG19fE/pGYJRAiCbhGsgagbsETlVJOIA+mpgN
-         slMLWA5lfCh3LZnknZcHsI5LBV4/5EhI9TN6e2M4=
-From:   Ard Biesheuvel <ardb@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, ebiggers@kernel.org,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH] crypto: cipher - move API definition to internal header file
-Date:   Thu,  9 Jan 2020 23:21:08 +0100
-Message-Id: <20200109222108.15228-1-ardb@kernel.org>
-X-Mailer: git-send-email 2.20.1
+        Thu, 9 Jan 2020 19:21:32 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:34542 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730042AbgAJAVb (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 9 Jan 2020 19:21:31 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
+        Subject:Sender:Reply-To:Content-ID:Content-Description:Resent-Date:
+        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+         bh=8kyKdBs+VT1Y2BpHqBqU+1Sj3j0IbI2hHSmTV3zehC4=; b=WOdo0u4EieFYEkcKToNSGes7b
+        SIdHAYOSMi8HVPd4nt3eYTiLgR7sYnrg5pC7SjwS+3Lg0Ipl3iBdGjPQCGJTnEoT6LilSwTeYxYBt
+        68Xy0Me/r4dUnPFKG2AbIqY1mEPRJA2SSJ8BP0TzN6etvTHOzVZ0nDGSlFOyc8//ILShGJPJhRUED
+        61/Kcbrz4PyiSFzpMih9ueF1CDwAUr/QQ2lUq0ElhgZbTLnVmfHODjowJIJ1htCYG4VrB0M9uU7Iz
+        4T656aUYr5Wf6TyeIOYwmYTR2kDd1RAp+leGEzg+rF3mheyLe6fLtW9b8LEH9jMqiFbNlZI6APS3e
+        l80JjSLyg==;
+Received: from [2601:1c0:6280:3f0::ed68]
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1ipi2f-00038w-QP; Fri, 10 Jan 2020 00:20:45 +0000
+Subject: Re: [PATCH v27 10/12] LRNG - add SP800-90B compliant health tests
+To:     =?UTF-8?Q?Stephan_M=c3=bcller?= <smueller@chronox.de>,
+        Arnd Bergmann <arnd@arndb.de>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        linux-api@vger.kernel.org,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Nicolai Stange <nstange@suse.de>,
+        "Peter, Matthias" <matthias.peter@bsi.bund.de>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Roman Drahtmueller <draht@schaltsekun.de>,
+        Neil Horman <nhorman@redhat.com>,
+        Julia Lawall <julia.lawall@inria.fr>
+References: <6157374.ptSnyUpaCn@positron.chronox.de>
+ <2722222.P16TYeLAVu@positron.chronox.de>
+ <2641155.iNH938UiKq@positron.chronox.de>
+ <2325404.ZKTBb4nKji@positron.chronox.de>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <cd9e893a-ce63-4e9a-fc19-553b1c5f1cff@infradead.org>
+Date:   Thu, 9 Jan 2020 16:20:44 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.2.1
 MIME-Version: 1.0
+In-Reply-To: <2325404.ZKTBb4nKji@positron.chronox.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The single block cipher API is not intended for general use, and so it
-should not be exposed to users outside of the crypto subsystem via the
-public header files. So create a new internal header file and move the
-definitions there.
+Hi,
 
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
----
- Documentation/crypto/api-skcipher.rst         |   9 -
- arch/arm/crypto/aes-neonbs-glue.c             |   1 +
- arch/s390/crypto/aes_s390.c                   |   1 +
- crypto/adiantum.c                             |   1 +
- crypto/ansi_cprng.c                           |   1 +
- crypto/cbc.c                                  |   1 +
- crypto/ccm.c                                  |   1 +
- crypto/cfb.c                                  |   1 +
- crypto/cipher.c                               |   1 +
- crypto/cmac.c                                 |   1 +
- crypto/ctr.c                                  |   1 +
- crypto/drbg.c                                 |   1 +
- crypto/ecb.c                                  |   1 +
- crypto/essiv.c                                |   1 +
- crypto/keywrap.c                              |   1 +
- crypto/ofb.c                                  |   1 +
- crypto/pcbc.c                                 |   1 +
- crypto/skcipher.c                             |   1 +
- crypto/vmac.c                                 |   1 +
- crypto/xcbc.c                                 |   1 +
- crypto/xts.c                                  |   1 +
- drivers/crypto/geode-aes.c                    |   1 +
- .../crypto/inside-secure/safexcel_cipher.c    |   1 +
- drivers/crypto/inside-secure/safexcel_hash.c  |   1 +
- include/crypto/algapi.h                       |  29 ---
- include/crypto/internal/cipher.h              | 206 ++++++++++++++++++
- include/linux/crypto.h                        | 163 --------------
- 27 files changed, 229 insertions(+), 201 deletions(-)
- create mode 100644 include/crypto/internal/cipher.h
+On 1/9/20 12:34 AM, Stephan Müller wrote:
+> ---
+>  drivers/char/lrng/Kconfig       |  56 +++++
+>  drivers/char/lrng/Makefile      |   1 +
+>  drivers/char/lrng/lrng_health.c | 409 ++++++++++++++++++++++++++++++++
+>  3 files changed, 466 insertions(+)
+>  create mode 100644 drivers/char/lrng/lrng_health.c
+> 
+> diff --git a/drivers/char/lrng/Kconfig b/drivers/char/lrng/Kconfig
+> index 10b7cbdb8c8e..7b2bb3da066c 100644
+> --- a/drivers/char/lrng/Kconfig
+> +++ b/drivers/char/lrng/Kconfig
+> @@ -103,4 +103,60 @@ config LRNG_JENT
+>  	  time or at runtime with the lrng_base.jitterrng configuration
+>  	  variable.
+>  
+> +config LRNG_HEALTH_TESTS
+> +	bool "Enable noise source online health tests"
+> +	help
+> +	  The online health tests validate the noise source at
+> +	  runtime for fatal errors. These tests include SP800-90B
+> +	  compliant tests which are invoked if the system is booted
+> +	  with fips=1. In case of fatal errors during active
+> +	  SP800-90B tests, the issue is logged and the noise
+> +	  data is discarded. These tests are required for full
+> +	  compliance with SP800-90B.
+> +
+> +	  If unsure, say Y.
+> +
+> +config LRNG_RCT_BROKEN
+> +	bool "SP800-90B RCT with dangerous low cutoff value"
+> +	depends on LRNG_HEALTH_TESTS
+> +	depends on BROKEN
+> +	default n
+> +	help
+> +	  This option enables a dangerously low SP800-90B repetitive
+> +	  count test (RCT) cutoff value which makes it very likely
+> +	  that the RCT is triggered to raise a self test failure.
 
-diff --git a/Documentation/crypto/api-skcipher.rst b/Documentation/crypto/api-skcipher.rst
-index 1aaf8985894b..563d5bb06a7a 100644
---- a/Documentation/crypto/api-skcipher.rst
-+++ b/Documentation/crypto/api-skcipher.rst
-@@ -24,12 +24,3 @@ Symmetric Key Cipher Request Handle
- 
- .. kernel-doc:: include/crypto/skcipher.h
-    :functions: crypto_skcipher_reqsize skcipher_request_set_tfm skcipher_request_alloc skcipher_request_free skcipher_request_set_callback skcipher_request_set_crypt
--
--Single Block Cipher API
-------------------------
--
--.. kernel-doc:: include/linux/crypto.h
--   :doc: Single Block Cipher API
--
--.. kernel-doc:: include/linux/crypto.h
--   :functions: crypto_alloc_cipher crypto_free_cipher crypto_has_cipher crypto_cipher_blocksize crypto_cipher_setkey crypto_cipher_encrypt_one crypto_cipher_decrypt_one
-diff --git a/arch/arm/crypto/aes-neonbs-glue.c b/arch/arm/crypto/aes-neonbs-glue.c
-index e85839a8aaeb..03a7a37d6393 100644
---- a/arch/arm/crypto/aes-neonbs-glue.c
-+++ b/arch/arm/crypto/aes-neonbs-glue.c
-@@ -10,6 +10,7 @@
- #include <crypto/aes.h>
- #include <crypto/cbc.h>
- #include <crypto/ctr.h>
-+#include <crypto/internal/cipher.h>
- #include <crypto/internal/simd.h>
- #include <crypto/internal/skcipher.h>
- #include <crypto/scatterwalk.h>
-diff --git a/arch/s390/crypto/aes_s390.c b/arch/s390/crypto/aes_s390.c
-index 1c23d84a9097..33c606521412 100644
---- a/arch/s390/crypto/aes_s390.c
-+++ b/arch/s390/crypto/aes_s390.c
-@@ -21,6 +21,7 @@
- #include <crypto/algapi.h>
- #include <crypto/ghash.h>
- #include <crypto/internal/aead.h>
-+#include <crypto/internal/cipher.h>
- #include <crypto/internal/skcipher.h>
- #include <crypto/scatterwalk.h>
- #include <linux/err.h>
-diff --git a/crypto/adiantum.c b/crypto/adiantum.c
-index 4d7a6cac82ed..49c94d147184 100644
---- a/crypto/adiantum.c
-+++ b/crypto/adiantum.c
-@@ -32,6 +32,7 @@
- 
- #include <crypto/b128ops.h>
- #include <crypto/chacha.h>
-+#include <crypto/internal/cipher.h>
- #include <crypto/internal/hash.h>
- #include <crypto/internal/poly1305.h>
- #include <crypto/internal/skcipher.h>
-diff --git a/crypto/ansi_cprng.c b/crypto/ansi_cprng.c
-index c475c1129ff2..4320a961d013 100644
---- a/crypto/ansi_cprng.c
-+++ b/crypto/ansi_cprng.c
-@@ -7,6 +7,7 @@
-  *  (C) Neil Horman <nhorman@tuxdriver.com>
-  */
- 
-+#include <crypto/internal/cipher.h>
- #include <crypto/internal/rng.h>
- #include <linux/err.h>
- #include <linux/init.h>
-diff --git a/crypto/cbc.c b/crypto/cbc.c
-index e6f6273a7d39..45fe3117cd39 100644
---- a/crypto/cbc.c
-+++ b/crypto/cbc.c
-@@ -7,6 +7,7 @@
- 
- #include <crypto/algapi.h>
- #include <crypto/cbc.h>
-+#include <crypto/internal/cipher.h>
- #include <crypto/internal/skcipher.h>
- #include <linux/err.h>
- #include <linux/init.h>
-diff --git a/crypto/ccm.c b/crypto/ccm.c
-index 241ecdc5c4e0..731fb0fe3dda 100644
---- a/crypto/ccm.c
-+++ b/crypto/ccm.c
-@@ -6,6 +6,7 @@
-  */
- 
- #include <crypto/internal/aead.h>
-+#include <crypto/internal/cipher.h>
- #include <crypto/internal/hash.h>
- #include <crypto/internal/skcipher.h>
- #include <crypto/scatterwalk.h>
-diff --git a/crypto/cfb.c b/crypto/cfb.c
-index 4e5219bbcd19..343263554876 100644
---- a/crypto/cfb.c
-+++ b/crypto/cfb.c
-@@ -20,6 +20,7 @@
-  */
- 
- #include <crypto/algapi.h>
-+#include <crypto/internal/cipher.h>
- #include <crypto/internal/skcipher.h>
- #include <linux/err.h>
- #include <linux/init.h>
-diff --git a/crypto/cipher.c b/crypto/cipher.c
-index fd78150deb1c..6ae67731f81e 100644
---- a/crypto/cipher.c
-+++ b/crypto/cipher.c
-@@ -9,6 +9,7 @@
-  */
- 
- #include <crypto/algapi.h>
-+#include <crypto/internal/cipher.h>
- #include <linux/kernel.h>
- #include <linux/crypto.h>
- #include <linux/errno.h>
-diff --git a/crypto/cmac.c b/crypto/cmac.c
-index 143a6544c873..66177a217cb4 100644
---- a/crypto/cmac.c
-+++ b/crypto/cmac.c
-@@ -11,6 +11,7 @@
-  *   Author: Kazunori Miyazawa <miyazawa@linux-ipv6.org>
-  */
- 
-+#include <crypto/internal/cipher.h>
- #include <crypto/internal/hash.h>
- #include <linux/err.h>
- #include <linux/kernel.h>
-diff --git a/crypto/ctr.c b/crypto/ctr.c
-index a8feab621c6c..2192d72eec1d 100644
---- a/crypto/ctr.c
-+++ b/crypto/ctr.c
-@@ -7,6 +7,7 @@
- 
- #include <crypto/algapi.h>
- #include <crypto/ctr.h>
-+#include <crypto/internal/cipher.h>
- #include <crypto/internal/skcipher.h>
- #include <linux/err.h>
- #include <linux/init.h>
-diff --git a/crypto/drbg.c b/crypto/drbg.c
-index b6929eb5f565..bcb22065caf4 100644
---- a/crypto/drbg.c
-+++ b/crypto/drbg.c
-@@ -98,6 +98,7 @@
-  */
- 
- #include <crypto/drbg.h>
-+#include <crypto/internal/cipher.h>
- #include <linux/kernel.h>
- 
- /***************************************************************
-diff --git a/crypto/ecb.c b/crypto/ecb.c
-index 69a687cbdf21..71fbb0543d64 100644
---- a/crypto/ecb.c
-+++ b/crypto/ecb.c
-@@ -6,6 +6,7 @@
-  */
- 
- #include <crypto/algapi.h>
-+#include <crypto/internal/cipher.h>
- #include <crypto/internal/skcipher.h>
- #include <linux/err.h>
- #include <linux/init.h>
-diff --git a/crypto/essiv.c b/crypto/essiv.c
-index 20d7c1fdbf5d..c19524e323ff 100644
---- a/crypto/essiv.c
-+++ b/crypto/essiv.c
-@@ -31,6 +31,7 @@
- #include <crypto/authenc.h>
- #include <crypto/internal/aead.h>
- #include <crypto/internal/hash.h>
-+#include <crypto/internal/cipher.h>
- #include <crypto/internal/skcipher.h>
- #include <crypto/scatterwalk.h>
- #include <linux/module.h>
-diff --git a/crypto/keywrap.c b/crypto/keywrap.c
-index 0355cce21b1e..1b87e6d3a5e6 100644
---- a/crypto/keywrap.c
-+++ b/crypto/keywrap.c
-@@ -85,6 +85,7 @@
- #include <linux/crypto.h>
- #include <linux/scatterlist.h>
- #include <crypto/scatterwalk.h>
-+#include <crypto/internal/cipher.h>
- #include <crypto/internal/skcipher.h>
- 
- struct crypto_kw_block {
-diff --git a/crypto/ofb.c b/crypto/ofb.c
-index 2ec68e3f2c55..7fc426935b45 100644
---- a/crypto/ofb.c
-+++ b/crypto/ofb.c
-@@ -8,6 +8,7 @@
-  */
- 
- #include <crypto/algapi.h>
-+#include <crypto/internal/cipher.h>
- #include <crypto/internal/skcipher.h>
- #include <linux/err.h>
- #include <linux/init.h>
-diff --git a/crypto/pcbc.c b/crypto/pcbc.c
-index ae921fb74dc9..7ab6003eeaa5 100644
---- a/crypto/pcbc.c
-+++ b/crypto/pcbc.c
-@@ -10,6 +10,7 @@
-  */
- 
- #include <crypto/algapi.h>
-+#include <crypto/internal/cipher.h>
- #include <crypto/internal/skcipher.h>
- #include <linux/err.h>
- #include <linux/init.h>
-diff --git a/crypto/skcipher.c b/crypto/skcipher.c
-index 7221def7b9a7..fab5e39e9fac 100644
---- a/crypto/skcipher.c
-+++ b/crypto/skcipher.c
-@@ -10,6 +10,7 @@
-  */
- 
- #include <crypto/internal/aead.h>
-+#include <crypto/internal/cipher.h>
- #include <crypto/internal/skcipher.h>
- #include <crypto/scatterwalk.h>
- #include <linux/bug.h>
-diff --git a/crypto/vmac.c b/crypto/vmac.c
-index 2d906830df96..0cba941ec368 100644
---- a/crypto/vmac.c
-+++ b/crypto/vmac.c
-@@ -36,6 +36,7 @@
- #include <linux/scatterlist.h>
- #include <asm/byteorder.h>
- #include <crypto/scatterwalk.h>
-+#include <crypto/internal/cipher.h>
- #include <crypto/internal/hash.h>
- 
- /*
-diff --git a/crypto/xcbc.c b/crypto/xcbc.c
-index 598ec88abf0f..9bc998699180 100644
---- a/crypto/xcbc.c
-+++ b/crypto/xcbc.c
-@@ -6,6 +6,7 @@
-  * 	Kazunori Miyazawa <miyazawa@linux-ipv6.org>
-  */
- 
-+#include <crypto/internal/cipher.h>
- #include <crypto/internal/hash.h>
- #include <linux/err.h>
- #include <linux/kernel.h>
-diff --git a/crypto/xts.c b/crypto/xts.c
-index 29efa15f1495..91e3eb63f00e 100644
---- a/crypto/xts.c
-+++ b/crypto/xts.c
-@@ -7,6 +7,7 @@
-  * Based on ecb.c
-  * Copyright (c) 2006 Herbert Xu <herbert@gondor.apana.org.au>
-  */
-+#include <crypto/internal/cipher.h>
- #include <crypto/internal/skcipher.h>
- #include <crypto/scatterwalk.h>
- #include <linux/err.h>
-diff --git a/drivers/crypto/geode-aes.c b/drivers/crypto/geode-aes.c
-index f4f18bfc2247..a25fb9783c7e 100644
---- a/drivers/crypto/geode-aes.c
-+++ b/drivers/crypto/geode-aes.c
-@@ -10,6 +10,7 @@
- #include <linux/spinlock.h>
- #include <crypto/algapi.h>
- #include <crypto/aes.h>
-+#include <crypto/internal/cipher.h>
- #include <crypto/internal/skcipher.h>
- 
- #include <linux/io.h>
-diff --git a/drivers/crypto/inside-secure/safexcel_cipher.c b/drivers/crypto/inside-secure/safexcel_cipher.c
-index 0c5e80c3f6e3..159653985388 100644
---- a/drivers/crypto/inside-secure/safexcel_cipher.c
-+++ b/drivers/crypto/inside-secure/safexcel_cipher.c
-@@ -24,6 +24,7 @@
- #include <crypto/xts.h>
- #include <crypto/skcipher.h>
- #include <crypto/internal/aead.h>
-+#include <crypto/internal/cipher.h>
- #include <crypto/internal/skcipher.h>
- 
- #include "safexcel.h"
-diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-index 43962bc709c6..648ea63c9224 100644
---- a/drivers/crypto/inside-secure/safexcel_hash.c
-+++ b/drivers/crypto/inside-secure/safexcel_hash.c
-@@ -12,6 +12,7 @@
- #include <crypto/sha3.h>
- #include <crypto/skcipher.h>
- #include <crypto/sm3.h>
-+#include <crypto/internal/cipher.h>
- #include <linux/device.h>
- #include <linux/dma-mapping.h>
- #include <linux/dmapool.h>
-diff --git a/include/crypto/algapi.h b/include/crypto/algapi.h
-index e115f9215ed5..a278ceaaeb6f 100644
---- a/include/crypto/algapi.h
-+++ b/include/crypto/algapi.h
-@@ -191,41 +191,12 @@ struct crypto_cipher_spawn {
- 	struct crypto_spawn base;
- };
- 
--static inline int crypto_grab_cipher(struct crypto_cipher_spawn *spawn,
--				     struct crypto_instance *inst,
--				     const char *name, u32 type, u32 mask)
--{
--	type &= ~CRYPTO_ALG_TYPE_MASK;
--	type |= CRYPTO_ALG_TYPE_CIPHER;
--	mask |= CRYPTO_ALG_TYPE_MASK;
--	return crypto_grab_spawn(&spawn->base, inst, name, type, mask);
--}
--
--static inline void crypto_drop_cipher(struct crypto_cipher_spawn *spawn)
--{
--	crypto_drop_spawn(&spawn->base);
--}
--
- static inline struct crypto_alg *crypto_spawn_cipher_alg(
- 	struct crypto_cipher_spawn *spawn)
- {
- 	return spawn->base.alg;
- }
- 
--static inline struct crypto_cipher *crypto_spawn_cipher(
--	struct crypto_cipher_spawn *spawn)
--{
--	u32 type = CRYPTO_ALG_TYPE_CIPHER;
--	u32 mask = CRYPTO_ALG_TYPE_MASK;
--
--	return __crypto_cipher_cast(crypto_spawn_tfm(&spawn->base, type, mask));
--}
--
--static inline struct cipher_alg *crypto_cipher_alg(struct crypto_cipher *tfm)
--{
--	return &crypto_cipher_tfm(tfm)->__crt_alg->cra_cipher;
--}
--
- static inline struct crypto_async_request *crypto_get_backlog(
- 	struct crypto_queue *queue)
- {
-diff --git a/include/crypto/internal/cipher.h b/include/crypto/internal/cipher.h
-new file mode 100644
-index 000000000000..0784fa2e3531
---- /dev/null
-+++ b/include/crypto/internal/cipher.h
-@@ -0,0 +1,206 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * Copyright (c) 2002 James Morris <jmorris@intercode.com.au>
-+ * Copyright (c) 2002 David S. Miller (davem@redhat.com)
-+ * Copyright (c) 2005 Herbert Xu <herbert@gondor.apana.org.au>
-+ */
-+
-+#ifndef _CRYPTO_INTERNAL_CIPHER_H
-+#define _CRYPTO_INTERNAL_CIPHER_H
-+
-+#include <linux/crypto.h>
-+#include <crypto/algapi.h>
-+
-+struct crypto_cipher {
-+	struct crypto_tfm base;
-+};
-+
-+/**
-+ * DOC: Single Block Cipher API
-+ *
-+ * The single block cipher API is used with the ciphers of type
-+ * CRYPTO_ALG_TYPE_CIPHER (listed as type "cipher" in /proc/crypto).
-+ *
-+ * Using the single block cipher API calls, operations with the basic cipher
-+ * primitive can be implemented. These cipher primitives exclude any block
-+ * chaining operations including IV handling.
-+ *
-+ * The purpose of this single block cipher API is to support the implementation
-+ * of templates or other concepts that only need to perform the cipher operation
-+ * on one block at a time. Templates invoke the underlying cipher primitive
-+ * block-wise and process either the input or the output data of these cipher
-+ * operations.
-+ */
-+
-+static inline struct crypto_cipher *__crypto_cipher_cast(struct crypto_tfm *tfm)
-+{
-+	return (struct crypto_cipher *)tfm;
-+}
-+
-+/**
-+ * crypto_alloc_cipher() - allocate single block cipher handle
-+ * @alg_name: is the cra_name / name or cra_driver_name / driver name of the
-+ *	     single block cipher
-+ * @type: specifies the type of the cipher
-+ * @mask: specifies the mask for the cipher
-+ *
-+ * Allocate a cipher handle for a single block cipher. The returned struct
-+ * crypto_cipher is the cipher handle that is required for any subsequent API
-+ * invocation for that single block cipher.
-+ *
-+ * Return: allocated cipher handle in case of success; IS_ERR() is true in case
-+ *	   of an error, PTR_ERR() returns the error code.
-+ */
-+static inline struct crypto_cipher *crypto_alloc_cipher(const char *alg_name,
-+							u32 type, u32 mask)
-+{
-+	type &= ~CRYPTO_ALG_TYPE_MASK;
-+	type |= CRYPTO_ALG_TYPE_CIPHER;
-+	mask |= CRYPTO_ALG_TYPE_MASK;
-+
-+	return __crypto_cipher_cast(crypto_alloc_base(alg_name, type, mask));
-+}
-+
-+static inline struct crypto_tfm *crypto_cipher_tfm(struct crypto_cipher *tfm)
-+{
-+	return &tfm->base;
-+}
-+
-+/**
-+ * crypto_free_cipher() - zeroize and free the single block cipher handle
-+ * @tfm: cipher handle to be freed
-+ */
-+static inline void crypto_free_cipher(struct crypto_cipher *tfm)
-+{
-+	crypto_free_tfm(crypto_cipher_tfm(tfm));
-+}
-+
-+/**
-+ * crypto_has_cipher() - Search for the availability of a single block cipher
-+ * @alg_name: is the cra_name / name or cra_driver_name / driver name of the
-+ *	     single block cipher
-+ * @type: specifies the type of the cipher
-+ * @mask: specifies the mask for the cipher
-+ *
-+ * Return: true when the single block cipher is known to the kernel crypto API;
-+ *	   false otherwise
-+ */
-+static inline int crypto_has_cipher(const char *alg_name, u32 type, u32 mask)
-+{
-+	type &= ~CRYPTO_ALG_TYPE_MASK;
-+	type |= CRYPTO_ALG_TYPE_CIPHER;
-+	mask |= CRYPTO_ALG_TYPE_MASK;
-+
-+	return crypto_has_alg(alg_name, type, mask);
-+}
-+
-+/**
-+ * crypto_cipher_blocksize() - obtain block size for cipher
-+ * @tfm: cipher handle
-+ *
-+ * The block size for the single block cipher referenced with the cipher handle
-+ * tfm is returned. The caller may use that information to allocate appropriate
-+ * memory for the data returned by the encryption or decryption operation
-+ *
-+ * Return: block size of cipher
-+ */
-+static inline unsigned int crypto_cipher_blocksize(struct crypto_cipher *tfm)
-+{
-+	return crypto_tfm_alg_blocksize(crypto_cipher_tfm(tfm));
-+}
-+
-+static inline unsigned int crypto_cipher_alignmask(struct crypto_cipher *tfm)
-+{
-+	return crypto_tfm_alg_alignmask(crypto_cipher_tfm(tfm));
-+}
-+
-+static inline u32 crypto_cipher_get_flags(struct crypto_cipher *tfm)
-+{
-+	return crypto_tfm_get_flags(crypto_cipher_tfm(tfm));
-+}
-+
-+static inline void crypto_cipher_set_flags(struct crypto_cipher *tfm,
-+					   u32 flags)
-+{
-+	crypto_tfm_set_flags(crypto_cipher_tfm(tfm), flags);
-+}
-+
-+static inline void crypto_cipher_clear_flags(struct crypto_cipher *tfm,
-+					     u32 flags)
-+{
-+	crypto_tfm_clear_flags(crypto_cipher_tfm(tfm), flags);
-+}
-+
-+/**
-+ * crypto_cipher_setkey() - set key for cipher
-+ * @tfm: cipher handle
-+ * @key: buffer holding the key
-+ * @keylen: length of the key in bytes
-+ *
-+ * The caller provided key is set for the single block cipher referenced by the
-+ * cipher handle.
-+ *
-+ * Note, the key length determines the cipher type. Many block ciphers implement
-+ * different cipher modes depending on the key size, such as AES-128 vs AES-192
-+ * vs. AES-256. When providing a 16 byte key for an AES cipher handle, AES-128
-+ * is performed.
-+ *
-+ * Return: 0 if the setting of the key was successful; < 0 if an error occurred
-+ */
-+int crypto_cipher_setkey(struct crypto_cipher *tfm,
-+			 const u8 *key, unsigned int keylen);
-+
-+/**
-+ * crypto_cipher_encrypt_one() - encrypt one block of plaintext
-+ * @tfm: cipher handle
-+ * @dst: points to the buffer that will be filled with the ciphertext
-+ * @src: buffer holding the plaintext to be encrypted
-+ *
-+ * Invoke the encryption operation of one block. The caller must ensure that
-+ * the plaintext and ciphertext buffers are at least one block in size.
-+ */
-+void crypto_cipher_encrypt_one(struct crypto_cipher *tfm,
-+			       u8 *dst, const u8 *src);
-+
-+/**
-+ * crypto_cipher_decrypt_one() - decrypt one block of ciphertext
-+ * @tfm: cipher handle
-+ * @dst: points to the buffer that will be filled with the plaintext
-+ * @src: buffer holding the ciphertext to be decrypted
-+ *
-+ * Invoke the decryption operation of one block. The caller must ensure that
-+ * the plaintext and ciphertext buffers are at least one block in size.
-+ */
-+void crypto_cipher_decrypt_one(struct crypto_cipher *tfm,
-+			       u8 *dst, const u8 *src);
-+
-+static inline int crypto_grab_cipher(struct crypto_cipher_spawn *spawn,
-+				     struct crypto_instance *inst,
-+				     const char *name, u32 type, u32 mask)
-+{
-+	type &= ~CRYPTO_ALG_TYPE_MASK;
-+	type |= CRYPTO_ALG_TYPE_CIPHER;
-+	mask |= CRYPTO_ALG_TYPE_MASK;
-+	return crypto_grab_spawn(&spawn->base, inst, name, type, mask);
-+}
-+
-+static inline void crypto_drop_cipher(struct crypto_cipher_spawn *spawn)
-+{
-+	crypto_drop_spawn(&spawn->base);
-+}
-+
-+static inline struct crypto_cipher *crypto_spawn_cipher(
-+	struct crypto_cipher_spawn *spawn)
-+{
-+	u32 type = CRYPTO_ALG_TYPE_CIPHER;
-+	u32 mask = CRYPTO_ALG_TYPE_MASK;
-+
-+	return __crypto_cipher_cast(crypto_spawn_tfm(&spawn->base, type, mask));
-+}
-+
-+static inline struct cipher_alg *crypto_cipher_alg(struct crypto_cipher *tfm)
-+{
-+	return &crypto_cipher_tfm(tfm)->__crt_alg->cra_cipher;
-+}
-+
-+#endif
-diff --git a/include/linux/crypto.h b/include/linux/crypto.h
-index 763863dbc079..defe6bd76232 100644
---- a/include/linux/crypto.h
-+++ b/include/linux/crypto.h
-@@ -603,10 +603,6 @@ struct crypto_tfm {
- 	void *__crt_ctx[] CRYPTO_MINALIGN_ATTR;
- };
- 
--struct crypto_cipher {
--	struct crypto_tfm base;
--};
--
- struct crypto_comp {
- 	struct crypto_tfm base;
- };
-@@ -710,165 +706,6 @@ static inline unsigned int crypto_tfm_ctx_alignment(void)
- 	return __alignof__(tfm->__crt_ctx);
- }
- 
--/**
-- * DOC: Single Block Cipher API
-- *
-- * The single block cipher API is used with the ciphers of type
-- * CRYPTO_ALG_TYPE_CIPHER (listed as type "cipher" in /proc/crypto).
-- *
-- * Using the single block cipher API calls, operations with the basic cipher
-- * primitive can be implemented. These cipher primitives exclude any block
-- * chaining operations including IV handling.
-- *
-- * The purpose of this single block cipher API is to support the implementation
-- * of templates or other concepts that only need to perform the cipher operation
-- * on one block at a time. Templates invoke the underlying cipher primitive
-- * block-wise and process either the input or the output data of these cipher
-- * operations.
-- */
--
--static inline struct crypto_cipher *__crypto_cipher_cast(struct crypto_tfm *tfm)
--{
--	return (struct crypto_cipher *)tfm;
--}
--
--/**
-- * crypto_alloc_cipher() - allocate single block cipher handle
-- * @alg_name: is the cra_name / name or cra_driver_name / driver name of the
-- *	     single block cipher
-- * @type: specifies the type of the cipher
-- * @mask: specifies the mask for the cipher
-- *
-- * Allocate a cipher handle for a single block cipher. The returned struct
-- * crypto_cipher is the cipher handle that is required for any subsequent API
-- * invocation for that single block cipher.
-- *
-- * Return: allocated cipher handle in case of success; IS_ERR() is true in case
-- *	   of an error, PTR_ERR() returns the error code.
-- */
--static inline struct crypto_cipher *crypto_alloc_cipher(const char *alg_name,
--							u32 type, u32 mask)
--{
--	type &= ~CRYPTO_ALG_TYPE_MASK;
--	type |= CRYPTO_ALG_TYPE_CIPHER;
--	mask |= CRYPTO_ALG_TYPE_MASK;
--
--	return __crypto_cipher_cast(crypto_alloc_base(alg_name, type, mask));
--}
--
--static inline struct crypto_tfm *crypto_cipher_tfm(struct crypto_cipher *tfm)
--{
--	return &tfm->base;
--}
--
--/**
-- * crypto_free_cipher() - zeroize and free the single block cipher handle
-- * @tfm: cipher handle to be freed
-- */
--static inline void crypto_free_cipher(struct crypto_cipher *tfm)
--{
--	crypto_free_tfm(crypto_cipher_tfm(tfm));
--}
--
--/**
-- * crypto_has_cipher() - Search for the availability of a single block cipher
-- * @alg_name: is the cra_name / name or cra_driver_name / driver name of the
-- *	     single block cipher
-- * @type: specifies the type of the cipher
-- * @mask: specifies the mask for the cipher
-- *
-- * Return: true when the single block cipher is known to the kernel crypto API;
-- *	   false otherwise
-- */
--static inline int crypto_has_cipher(const char *alg_name, u32 type, u32 mask)
--{
--	type &= ~CRYPTO_ALG_TYPE_MASK;
--	type |= CRYPTO_ALG_TYPE_CIPHER;
--	mask |= CRYPTO_ALG_TYPE_MASK;
--
--	return crypto_has_alg(alg_name, type, mask);
--}
--
--/**
-- * crypto_cipher_blocksize() - obtain block size for cipher
-- * @tfm: cipher handle
-- *
-- * The block size for the single block cipher referenced with the cipher handle
-- * tfm is returned. The caller may use that information to allocate appropriate
-- * memory for the data returned by the encryption or decryption operation
-- *
-- * Return: block size of cipher
-- */
--static inline unsigned int crypto_cipher_blocksize(struct crypto_cipher *tfm)
--{
--	return crypto_tfm_alg_blocksize(crypto_cipher_tfm(tfm));
--}
--
--static inline unsigned int crypto_cipher_alignmask(struct crypto_cipher *tfm)
--{
--	return crypto_tfm_alg_alignmask(crypto_cipher_tfm(tfm));
--}
--
--static inline u32 crypto_cipher_get_flags(struct crypto_cipher *tfm)
--{
--	return crypto_tfm_get_flags(crypto_cipher_tfm(tfm));
--}
--
--static inline void crypto_cipher_set_flags(struct crypto_cipher *tfm,
--					   u32 flags)
--{
--	crypto_tfm_set_flags(crypto_cipher_tfm(tfm), flags);
--}
--
--static inline void crypto_cipher_clear_flags(struct crypto_cipher *tfm,
--					     u32 flags)
--{
--	crypto_tfm_clear_flags(crypto_cipher_tfm(tfm), flags);
--}
--
--/**
-- * crypto_cipher_setkey() - set key for cipher
-- * @tfm: cipher handle
-- * @key: buffer holding the key
-- * @keylen: length of the key in bytes
-- *
-- * The caller provided key is set for the single block cipher referenced by the
-- * cipher handle.
-- *
-- * Note, the key length determines the cipher type. Many block ciphers implement
-- * different cipher modes depending on the key size, such as AES-128 vs AES-192
-- * vs. AES-256. When providing a 16 byte key for an AES cipher handle, AES-128
-- * is performed.
-- *
-- * Return: 0 if the setting of the key was successful; < 0 if an error occurred
-- */
--int crypto_cipher_setkey(struct crypto_cipher *tfm,
--			 const u8 *key, unsigned int keylen);
--
--/**
-- * crypto_cipher_encrypt_one() - encrypt one block of plaintext
-- * @tfm: cipher handle
-- * @dst: points to the buffer that will be filled with the ciphertext
-- * @src: buffer holding the plaintext to be encrypted
-- *
-- * Invoke the encryption operation of one block. The caller must ensure that
-- * the plaintext and ciphertext buffers are at least one block in size.
-- */
--void crypto_cipher_encrypt_one(struct crypto_cipher *tfm,
--			       u8 *dst, const u8 *src);
--
--/**
-- * crypto_cipher_decrypt_one() - decrypt one block of ciphertext
-- * @tfm: cipher handle
-- * @dst: points to the buffer that will be filled with the plaintext
-- * @src: buffer holding the ciphertext to be decrypted
-- *
-- * Invoke the decryption operation of one block. The caller must ensure that
-- * the plaintext and ciphertext buffers are at least one block in size.
-- */
--void crypto_cipher_decrypt_one(struct crypto_cipher *tfm,
--			       u8 *dst, const u8 *src);
--
- static inline struct crypto_comp *__crypto_comp_cast(struct crypto_tfm *tfm)
- {
- 	return (struct crypto_comp *)tfm;
+	                                       self-test
+
+> +
+> +	  This option is ONLY intended for developers wanting to
+> +	  test the effectiveness of the SP800-90B RCT health test.
+> +
+> +	  If unsure, say N.
+> +
+> +config LRNG_APT_BROKEN
+> +	bool "SP800-90B APT with dangerous low cutoff value"
+> +	depends on LRNG_HEALTH_TESTS
+> +	depends on BROKEN
+> +	default n
+> +	help
+> +	  This option enables a dangerously low SP800-90B adaptive
+> +	  proportion test (APT) cutoff value which makes it very
+> +	  likely that the RCT is triggered to raise a self test
+
+	                                              self-test
+
+> +	  failure.
+> +
+> +	  This option is ONLY intended for developers wanting to
+> +	  test the effectiveness of the SP800-90B APT health test.
+> +
+> +	  If unsure, say N.
+> +
+> +# Default taken from SP800-90B sec 4.4.1 - significance level 2^-30
+> +config LRNG_RCT_CUTOFF
+> +	int
+> +	default 30 if !LRNG_RCT_BROKEN
+> +	default 1 if LRNG_RCT_BROKEN
+> +
+> +# Default taken from SP800-90B sec 4.4.2 - significance level 2^-30
+> +config LRNG_APT_CUTOFF
+> +	int
+> +	default 325 if !LRNG_APT_BROKEN
+> +	default 32 if LRNG_APT_BROKEN
+> +
+>  endif # LRNG
+
+> diff --git a/drivers/char/lrng/lrng_health.c b/drivers/char/lrng/lrng_health.c
+> new file mode 100644
+> index 000000000000..da8b42b96918
+> --- /dev/null
+> +++ b/drivers/char/lrng/lrng_health.c
+> @@ -0,0 +1,409 @@
+> +// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
+> +/*
+> + * Linux Random Number Generator (LRNG) Health Testing
+> + *
+> + * Copyright (C) 2019 - 2020, Stephan Mueller <smueller@chronox.de>
+> + */
+
+[snip]
+
+> +
+> +/***************************************************************************
+> + * SP800-90B Compliance
+> + *
+> + * If the Linux-RNG is booted into FIPS mode, the following interfaces
+> + * provide an SP800-90B compliant noise source:
+> + *
+> + * * /dev/random
+> + * * getrandom(2)
+> + * * get_random_bytes when using it in conjunction with
+> + *   add_random_ready_callback
+> + *
+> + * All other interfaces, including /dev/urandom or get_random_bytes without
+> + * the add_random_ready_callback cannot claim to use an SP800-90B compliant
+> + * noise source.
+> + ***************************************************************************/
+> +
+> +/**
+> + * Perform SP800-90B startup testing
+> + */
+
+/** in the kernel sources means "this is the beginning of a kernel-doc comment block",
+but this is not a kernel-doc comment block, so just use /* to begin the comment.
+
+> +static inline void lrng_sp80090b_startup(struct lrng_health *health)
+> +{
+> +	if (!health->sp80090b_startup_done &&
+> +	    atomic_dec_and_test(&health->sp80090b_startup_blocks)) {
+> +		health->sp80090b_startup_done = true;
+> +		pr_info("SP800-90B startup health tests completed\n");
+> +		lrng_init_ops(0);
+> +
+> +		/*
+> +		 * Force a reseed of DRNGs to ensure they are seeded with
+> +		 * entropy that passed the SP800-90B health tests.
+> +		 * As the DRNG always will reseed before generating
+> +		 * random numbers, it does not need a reseed trigger.
+> +		 */
+> +		lrng_drng_force_reseed();
+> +	}
+> +}
+> +
+> +/**
+> + * Handle failure of SP800-90B startup testing
+> + */
+
+ditto
+
+> +static inline void lrng_sp80090b_startup_failure(struct lrng_health *health)
+> +{
+> +	/* Reset of LRNG and its entropy - NOTE: we are in atomic context */
+> +	lrng_reset();
+> +
+> +	/*
+> +	 * Reset the SP800-90B startup test.
+> +	 *
+> +	 * NOTE SP800-90B section 4.3 bullet 4 does not specify what
+> +	 * exactly is to be done in case of failure! Thus, we do what
+> +	 * makes sense, i.e. restarting the health test and thus gating
+> +	 * the output function of /dev/random and getrandom(2).
+> +	 */
+> +	atomic_set(&health->sp80090b_startup_blocks,
+> +		   LRNG_SP80090B_STARTUP_BLOCKS);
+> +}
+> +
+> +/**
+> + * Handle failure of SP800-90B runtime testing
+> + */
+
+ditto
+
+> +static inline void lrng_sp80090b_runtime_failure(struct lrng_health *health)
+> +{
+> +	lrng_sp80090b_startup_failure(health);
+> +	health->sp80090b_startup_done = false;
+> +}
+> +
+> +static inline void lrng_sp80090b_failure(struct lrng_health *health)
+> +{
+> +	if (health->sp80090b_startup_done) {
+> +		pr_err("SP800-90B runtime health test failure - invalidating "
+> +		       "all existing entropy and initiate SP800-90B startup\n");
+> +		lrng_sp80090b_runtime_failure(health);
+> +	} else {
+> +		pr_err("SP800-90B startup test failure - resetting\n");
+> +		lrng_sp80090b_startup_failure(health);
+> +	}
+> +}
+> +
+> +/**
+> + * Is the SP800-90B startup testing complete?
+> + *
+> + * This function is called by the LRNG to determine whether to unblock
+> + * a certain user interface. Therefore, only the potentially blocking
+> + * user interfaces are considered SP800-90B compliant.
+> + */
+
+ditto.
+
+> +bool lrng_sp80090b_startup_complete(void)
+> +{
+> +	struct lrng_health *health = &lrng_health;
+> +
+> +	return (lrng_sp80090b_health_enabled()) ? health->sp80090b_startup_done:
+> +						  true;
+> +}
+> +
+> +bool lrng_sp80090b_compliant(void)
+> +{
+> +	struct lrng_health *health = &lrng_health;
+> +
+> +	return lrng_sp80090b_health_enabled() && health->sp80090b_startup_done;
+> +}
+> +
+> +/***************************************************************************
+> + * Adaptive Proportion Test
+> + *
+> + * This test complies with SP800-90B section 4.4.2.
+> + ***************************************************************************/
+> +
+> +/**
+> + * Reset the APT counter
+> + *
+> + * @health [in] Reference to health state
+> + */
+
+ditto
+
+> +static inline void lrng_apt_reset(struct lrng_health *health,
+> +				  unsigned int time_masked)
+> +{
+> +	struct lrng_apt *apt = &health->apt;
+> +
+> +	pr_debug("APT value %d for base %d\n",
+> +		 atomic_read(&apt->apt_count), atomic_read(&apt->apt_base));
+> +
+> +	/* Reset APT */
+> +	atomic_set(&apt->apt_count, 0);
+> +	atomic_set(&apt->apt_base, time_masked);
+> +}
+> +
+> +static inline void lrng_apt_restart(struct lrng_health *health)
+> +{
+> +	struct lrng_apt *apt = &health->apt;
+> +
+> +	atomic_set(&apt->apt_trigger, LRNG_APT_WINDOW_SIZE);
+> +}
+> +
+> +/**
+> + * Insert a new entropy event into APT
+> + *
+> + * This function does is void as it does not decide about the fate of a time
+> + * stamp. An APT failure can only happen at the same time of a stuck test
+> + * failure. Thus, the stuck failure will already decide how the time stamp
+> + * is handled.
+> + *
+> + * @health [in] Reference to health state
+> + * @now_time [in] Time stamp to process
+> + */
+
+ditto
+or use complete kernel-doc notation.
+
+> +static inline void lrng_apt_insert(struct lrng_health *health,
+> +				   unsigned int now_time)
+> +{
+> +	struct lrng_apt *apt = &health->apt;
+> +
+> +	if (!lrng_sp80090b_health_requested())
+> +		return;
+> +
+> +	now_time &= LRNG_APT_WORD_MASK;
+> +
+> +	/* Initialization of APT */
+> +	if (!apt->apt_base_set) {
+> +		atomic_set(&apt->apt_base, now_time);
+> +		apt->apt_base_set = true;
+> +		return;
+> +	}
+> +
+> +	if (now_time == (unsigned int)atomic_read(&apt->apt_base)) {
+> +		u32 apt_val = (u32)atomic_inc_return_relaxed(&apt->apt_count);
+> +
+> +		if (apt_val >= CONFIG_LRNG_APT_CUTOFF)
+> +			lrng_sp80090b_failure(health);
+> +	}
+> +
+> +	if (atomic_dec_and_test(&apt->apt_trigger)) {
+> +		lrng_apt_restart(health);
+> +		lrng_apt_reset(health, now_time);
+> +		lrng_sp80090b_startup(health);
+> +	}
+> +}
+> +
+> +/***************************************************************************
+> + * Repetition Count Test
+> + *
+> + * The LRNG uses an enhanced version of the Repetition Count Test
+> + * (RCT) specified in SP800-90B section 4.4.1. Instead of counting identical
+> + * back-to-back values, the input to the RCT is the counting of the stuck
+> + * values while filling the entropy pool.
+> + *
+> + * The RCT is applied with an alpha of 2^-30 compliant to FIPS 140-2 IG 9.8.
+> + *
+> + * During the counting operation, the LRNG always calculates the RCT
+> + * cut-off value of C. If that value exceeds the allowed cut-off value,
+> + * the LRNG will invalidate all entropy for the entropy pool which implies
+> + * that no data can be extracted from the entropy pool unless new entropy
+> + * is received.
+> + ***************************************************************************/
+> +
+> +/**
+> + * Hot code path - Insert data for Repetition Count Test
+> + *
+> + * @health: Reference to health information
+> + * @stuck: Decision of stuck test
+> + */
+
+ditto
+
+> +static inline void lrng_rct(struct lrng_health *health, int stuck)
+> +{
+> +	struct lrng_rct *rct = &health->rct;
+> +
+> +	if (!lrng_sp80090b_health_requested())
+> +		return;
+> +
+> +	if (stuck) {
+> +		u32 rct_count = atomic_add_return_relaxed(1, &rct->rct_count);
+> +
+> +		pr_debug("RCT count: %u\n", rct_count);
+> +
+> +		/*
+> +		 * The cutoff value is based on the following consideration:
+> +		 * alpha = 2^-30 as recommended in FIPS 140-2 IG 9.8.
+> +		 * In addition, we imply an entropy value H of 1 bit as this
+> +		 * is the minimum entropy required to provide full entropy.
+> +		 *
+> +		 * Note, rct_count (which equals to value B in the
+> +		 * pseudo code of SP800-90B section 4.4.1) starts with zero.
+> +		 * Hence we need to subtract one from the cutoff value as
+> +		 * calculated following SP800-90B.
+> +		 */
+> +		if (rct_count >= CONFIG_LRNG_RCT_CUTOFF) {
+> +			atomic_set(&rct->rct_count, 0);
+> +
+> +			/*
+> +			 * APT must start anew as we consider all previously
+> +			 * recorded data to contain no entropy.
+> +			 */
+> +			lrng_apt_restart(health);
+> +
+> +			lrng_sp80090b_failure(health);
+> +		}
+> +	} else {
+> +		atomic_set(&rct->rct_count, 0);
+> +	}
+> +}
+> +
+> +/***************************************************************************
+> + * Stuck Test
+> + *
+> + * Checking the:
+> + *      1st derivative of the event occurrence (time delta)
+> + *      2nd derivative of the event occurrence (delta of time deltas)
+> + *      3rd derivative of the event occurrence (delta of delta of time deltas)
+> + *
+> + * All values must always be non-zero. The stuck test is only valid disabled if
+> + * high-resolution time stamps are identified after initialization.
+> + ***************************************************************************/
+> +
+> +static inline u32 lrng_delta(u32 prev, u32 next)
+> +{
+> +	/*
+> +	 * Note that this (unsigned) subtraction does yield the correct value
+> +	 * in the wraparound-case, i.e. when next < prev.
+> +	 */
+> +	return (next - prev);
+> +}
+> +
+> +/**
+> + * Hot code path
+> + *
+> + * @health: Reference to health information
+> + * @now: Event time
+> + * @return: 0 event occurrence not stuck (good time stamp)
+> + *	    != 0 event occurrence stuck (reject time stamp)
+> + */
+
+ditto
+
+> +static inline int lrng_irq_stuck(struct lrng_stuck_test *stuck, u32 now_time)
+> +{
+> +	u32 delta = lrng_delta(stuck->last_time, now_time);
+> +	u32 delta2 = lrng_delta(stuck->last_delta, delta);
+> +	u32 delta3 = lrng_delta(stuck->last_delta2, delta2);
+> +
+> +	stuck->last_time = now_time;
+> +	stuck->last_delta = delta;
+> +	stuck->last_delta2 = delta2;
+> +
+> +	if (!delta || !delta2 || !delta3)
+> +		return 1;
+> +
+> +	return 0;
+> +}
+> +
+> +/***************************************************************************
+> + * Health test interfaces
+> + ***************************************************************************/
+> +
+> +/**
+> + * Disable all health tests
+> + */
+
+ditto
+
+> +void lrng_health_disable(void)
+> +{
+> +	struct lrng_health *health = &lrng_health;
+> +
+> +	health->health_test_enabled = false;
+> +
+> +	if (lrng_sp80090b_health_requested())
+> +		pr_warn("SP800-90B compliance requested but the Linux RNG is "
+> +			"NOT SP800-90B compliant\n");
+> +}
+> +
+> +/**
+> + * Hot code path - Perform health test on time stamp received from an event
+> + *
+> + * @now_time Time stap
+> + */
+
+ditto
+
+> +enum lrng_health_res lrng_health_test(u32 now_time)
+> +{
+
+
+Thanks.
 -- 
-2.20.1
+~Randy
 
