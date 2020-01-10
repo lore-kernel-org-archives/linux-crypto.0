@@ -7,32 +7,32 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8A30C33CA3
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jan 2020 14:54:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69522C282DD
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jan 2020 14:54:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B05BD20721
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jan 2020 14:54:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 374F520721
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jan 2020 14:54:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1578668092;
-	bh=3fZXe01M1DES1nCJzaQ2syzPGlGt6/Fcr4JJpAfV2kg=;
+	s=default; t=1578668094;
+	bh=NnO8LD80BLQ6NMe8Vcq34YRLsH8jn+4NOHXtIyTJHKY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=BggAk8yX+x9ytgJp2xEPmzi0CqmCtG2WlKUyiQxgqYQ28Z5UMIm8dTKghf8/Y+Uqn
-	 wHG1/UMQrV1nNRjXytYT3Qt1EWhILN6hGnLf74kbjNZ1LeySymDe07okMQs+cX1JAH
-	 iASCivP+vM7++sF9tyg9RM+iglRtMNZGot94tv/s=
+	b=eHSCVP3Tem+1ic96unczO44K5Bjdh1y4LKlBbGXot7mZVXt6a2R4pUnTykKAT0m2u
+	 3w12nbBfkKDewsdOArHumcClY0OlPeQCF5xe4CTyv8zUoRU5s9pw1ND1b4tuCs3pL1
+	 8pUoITVDjbczP6tZwkPuRzHG/g8S58419vs8V0yI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728384AbgAJOyu (ORCPT
+        id S1728317AbgAJOyu (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Fri, 10 Jan 2020 09:54:50 -0500
-Received: from foss.arm.com ([217.140.110.172]:45932 "EHLO foss.arm.com"
+Received: from foss.arm.com ([217.140.110.172]:45952 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728370AbgAJOyp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Jan 2020 09:54:45 -0500
+        id S1728381AbgAJOyr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 10 Jan 2020 09:54:47 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0FA23142F;
-        Fri, 10 Jan 2020 06:54:45 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2B5271063;
+        Fri, 10 Jan 2020 06:54:47 -0800 (PST)
 Received: from localhost (unknown [10.37.6.21])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8D1A53F6C4;
-        Fri, 10 Jan 2020 06:54:44 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A9E913F6C4;
+        Fri, 10 Jan 2020 06:54:46 -0800 (PST)
 From:   Mark Brown <broonie@kernel.org>
 To:     linux-arch@vger.kernel.org
 Cc:     Richard Henderson <richard.henderson@linaro.org>,
@@ -40,12 +40,13 @@ Cc:     Richard Henderson <richard.henderson@linaro.org>,
         herbert@gondor.apana.org.au, x86@kernel.org,
         linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         linux-arm-kernel@lists.infradead.org,
+        Michael Ellerman <mpe@ellerman.id.au>,
         Ard Biesheuvel <ardb@kernel.org>,
         Richard Henderson <rth@twiddle.net>,
         Mark Brown <broonie@kernel.org>
-Subject: [PATCH v2 08/10] powerpc: Use bool in archrandom.h
-Date:   Fri, 10 Jan 2020 14:54:20 +0000
-Message-Id: <20200110145422.49141-9-broonie@kernel.org>
+Subject: [PATCH v2 09/10] powerpc: Mark archrandom.h functions __must_check
+Date:   Fri, 10 Jan 2020 14:54:21 +0000
+Message-Id: <20200110145422.49141-10-broonie@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200110145422.49141-1-broonie@kernel.org>
 References: <20200110145422.49141-1-broonie@kernel.org>
@@ -58,56 +59,51 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-The generic interface uses bool not int; match that.
+We must not use the pointer output without validating the
+success of the random read.
 
+Acked-by: Michael Ellerman <mpe@ellerman.id.au>
 Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- arch/powerpc/include/asm/archrandom.h | 17 +++++++++--------
- 1 file changed, 9 insertions(+), 8 deletions(-)
+ arch/powerpc/include/asm/archrandom.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/arch/powerpc/include/asm/archrandom.h b/arch/powerpc/include/asm/archrandom.h
-index 2fa7cdfbba24..f0f16b4fc5ea 100644
+index f0f16b4fc5ea..9a53e29680f4 100644
 --- a/arch/powerpc/include/asm/archrandom.h
 +++ b/arch/powerpc/include/asm/archrandom.h
-@@ -6,27 +6,28 @@
+@@ -6,17 +6,17 @@
  
  #include <asm/machdep.h>
  
--static inline int arch_get_random_long(unsigned long *v)
-+static inline bool arch_get_random_long(unsigned long *v)
+-static inline bool arch_get_random_long(unsigned long *v)
++static inline bool __must_check arch_get_random_long(unsigned long *v)
  {
--	return 0;
-+	return false;
+ 	return false;
  }
  
--static inline int arch_get_random_int(unsigned int *v)
-+static inline bool arch_get_random_int(unsigned int *v)
+-static inline bool arch_get_random_int(unsigned int *v)
++static inline bool __must_check arch_get_random_int(unsigned int *v)
  {
--	return 0;
-+	return false;
+ 	return false;
  }
  
--static inline int arch_get_random_seed_long(unsigned long *v)
-+static inline bool arch_get_random_seed_long(unsigned long *v)
+-static inline bool arch_get_random_seed_long(unsigned long *v)
++static inline bool __must_check arch_get_random_seed_long(unsigned long *v)
  {
  	if (ppc_md.get_random_seed)
  		return ppc_md.get_random_seed(v);
- 
--	return 0;
-+	return false;
+@@ -24,7 +24,7 @@ static inline bool arch_get_random_seed_long(unsigned long *v)
+ 	return false;
  }
--static inline int arch_get_random_seed_int(unsigned int *v)
-+
-+static inline bool arch_get_random_seed_int(unsigned int *v)
+ 
+-static inline bool arch_get_random_seed_int(unsigned int *v)
++static inline bool __must_check arch_get_random_seed_int(unsigned int *v)
  {
  	unsigned long val;
--	int rc;
-+	bool rc;
- 
- 	rc = arch_get_random_seed_long(&val);
- 	if (rc)
+ 	bool rc;
 -- 
 2.20.1
 
