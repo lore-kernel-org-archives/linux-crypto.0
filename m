@@ -7,32 +7,32 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F47EC33CA4
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jan 2020 14:54:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74A1FC282DD
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jan 2020 14:54:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 06CB12080D
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jan 2020 14:54:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E1F620880
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jan 2020 14:54:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1578668086;
-	bh=aMwJZ686WU+COYac3SkKSQr+JAT9g3lOGRCy09JPsSQ=;
+	s=default; t=1578668091;
+	bh=i1gdtXo9+DyaFORNsps4ObFPn5D/HfkaqpeoNPgfARs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=KJVDhY9ZmrSdjMPNSG+8fOXM8mTqahfn9nSP1Cg4GTqCnSbrL1lu8L7ltykLeZLm6
-	 TAYonUdCJAYDHncOV3BZKxsbWy7Ff6Cz8yZILqtDBku0KKMvVwH6PBYp2MxSjoQtRi
-	 USpIBFxUcgImXaWmFAnZzsfEQebcKuNc7wPNk7Lw=
+	b=ZdoaAa9iXcVhHFVG4cLTepMUZEgIuoADNItfBSFJLNx70IN+yRM0LLPJ/Zy0gaYbu
+	 X8i4izJCOeVVIeGtwEBcqaFGX+Tzgl1BXnyYBQxf5ljKWepUUyBiiFm7PWlycA8mKX
+	 4gaLvoyYwVTFjB9G+i+xxsBaFyw+qK2eeSLBCKW4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728378AbgAJOyp (ORCPT
+        id S1728389AbgAJOyu (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 10 Jan 2020 09:54:45 -0500
-Received: from foss.arm.com ([217.140.110.172]:45914 "EHLO foss.arm.com"
+        Fri, 10 Jan 2020 09:54:50 -0500
+Received: from foss.arm.com ([217.140.110.172]:45970 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728374AbgAJOyn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Jan 2020 09:54:43 -0500
+        id S1728385AbgAJOyt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 10 Jan 2020 09:54:49 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id EAF47DA7;
-        Fri, 10 Jan 2020 06:54:42 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 722F2106F;
+        Fri, 10 Jan 2020 06:54:49 -0800 (PST)
 Received: from localhost (unknown [10.37.6.21])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 762A83F6C4;
-        Fri, 10 Jan 2020 06:54:42 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C26D83F6C4;
+        Fri, 10 Jan 2020 06:54:48 -0800 (PST)
 From:   Mark Brown <broonie@kernel.org>
 To:     linux-arch@vger.kernel.org
 Cc:     Richard Henderson <richard.henderson@linaro.org>,
@@ -40,12 +40,13 @@ Cc:     Richard Henderson <richard.henderson@linaro.org>,
         herbert@gondor.apana.org.au, x86@kernel.org,
         linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
         linux-arm-kernel@lists.infradead.org,
+        Harald Freudenberger <freude@linux.ibm.com>,
         Ard Biesheuvel <ardb@kernel.org>,
         Richard Henderson <rth@twiddle.net>,
         Mark Brown <broonie@kernel.org>
-Subject: [PATCH v2 07/10] x86: Mark archrandom.h functions __must_check
-Date:   Fri, 10 Jan 2020 14:54:19 +0000
-Message-Id: <20200110145422.49141-8-broonie@kernel.org>
+Subject: [PATCH v2 10/10] s390x: Mark archrandom.h functions __must_check
+Date:   Fri, 10 Jan 2020 14:54:22 +0000
+Message-Id: <20200110145422.49141-11-broonie@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200110145422.49141-1-broonie@kernel.org>
 References: <20200110145422.49141-1-broonie@kernel.org>
@@ -61,80 +62,48 @@ From: Richard Henderson <richard.henderson@linaro.org>
 We must not use the pointer output without validating the
 success of the random read.
 
+Reviewed-by: Harald Freudenberger <freude@linux.ibm.com>
 Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
 Signed-off-by: Richard Henderson <rth@twiddle.net>
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- arch/x86/include/asm/archrandom.h | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ arch/s390/include/asm/archrandom.h | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/include/asm/archrandom.h b/arch/x86/include/asm/archrandom.h
-index feb59461046c..7a4bb1bd4bdb 100644
---- a/arch/x86/include/asm/archrandom.h
-+++ b/arch/x86/include/asm/archrandom.h
-@@ -27,7 +27,7 @@
+diff --git a/arch/s390/include/asm/archrandom.h b/arch/s390/include/asm/archrandom.h
+index 9a6835137a16..de61ce562052 100644
+--- a/arch/s390/include/asm/archrandom.h
++++ b/arch/s390/include/asm/archrandom.h
+@@ -21,17 +21,17 @@ extern atomic64_t s390_arch_random_counter;
  
- /* Unconditional execution of RDRAND and RDSEED */
- 
--static inline bool rdrand_long(unsigned long *v)
-+static inline bool __must_check rdrand_long(unsigned long *v)
- {
- 	bool ok;
- 	unsigned int retry = RDRAND_RETRY_LOOPS;
-@@ -41,7 +41,7 @@ static inline bool rdrand_long(unsigned long *v)
- 	return false;
- }
- 
--static inline bool rdrand_int(unsigned int *v)
-+static inline bool __must_check rdrand_int(unsigned int *v)
- {
- 	bool ok;
- 	unsigned int retry = RDRAND_RETRY_LOOPS;
-@@ -55,7 +55,7 @@ static inline bool rdrand_int(unsigned int *v)
- 	return false;
- }
- 
--static inline bool rdseed_long(unsigned long *v)
-+static inline bool __must_check rdseed_long(unsigned long *v)
- {
- 	bool ok;
- 	asm volatile(RDSEED_LONG
-@@ -64,7 +64,7 @@ static inline bool rdseed_long(unsigned long *v)
- 	return ok;
- }
- 
--static inline bool rdseed_int(unsigned int *v)
-+static inline bool __must_check rdseed_int(unsigned int *v)
- {
- 	bool ok;
- 	asm volatile(RDSEED_INT
-@@ -80,22 +80,22 @@ static inline bool rdseed_int(unsigned int *v)
-  */
- #ifdef CONFIG_ARCH_RANDOM
+ bool s390_arch_random_generate(u8 *buf, unsigned int nbytes);
  
 -static inline bool arch_get_random_long(unsigned long *v)
 +static inline bool __must_check arch_get_random_long(unsigned long *v)
  {
- 	return static_cpu_has(X86_FEATURE_RDRAND) ? rdrand_long(v) : false;
+ 	return false;
  }
  
 -static inline bool arch_get_random_int(unsigned int *v)
 +static inline bool __must_check arch_get_random_int(unsigned int *v)
  {
- 	return static_cpu_has(X86_FEATURE_RDRAND) ? rdrand_int(v) : false;
+ 	return false;
  }
  
 -static inline bool arch_get_random_seed_long(unsigned long *v)
 +static inline bool __must_check arch_get_random_seed_long(unsigned long *v)
  {
- 	return static_cpu_has(X86_FEATURE_RDSEED) ? rdseed_long(v) : false;
+ 	if (static_branch_likely(&s390_arch_random_available)) {
+ 		return s390_arch_random_generate((u8 *)v, sizeof(*v));
+@@ -39,7 +39,7 @@ static inline bool arch_get_random_seed_long(unsigned long *v)
+ 	return false;
  }
  
 -static inline bool arch_get_random_seed_int(unsigned int *v)
 +static inline bool __must_check arch_get_random_seed_int(unsigned int *v)
  {
- 	return static_cpu_has(X86_FEATURE_RDSEED) ? rdseed_int(v) : false;
- }
+ 	if (static_branch_likely(&s390_arch_random_available)) {
+ 		return s390_arch_random_generate((u8 *)v, sizeof(*v));
 -- 
 2.20.1
 
