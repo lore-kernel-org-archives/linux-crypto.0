@@ -6,25 +6,25 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED91DC33CA2
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jan 2020 07:53:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AE51C33CA4
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jan 2020 07:53:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CDE1D2077C
+	by mail.kernel.org (Postfix) with ESMTP id F00332080D
 	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jan 2020 07:53:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726549AbgAJHx5 (ORCPT
+        id S1726636AbgAJHx5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Fri, 10 Jan 2020 02:53:57 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:42548 "EHLO huawei.com"
+Received: from szxga07-in.huawei.com ([45.249.212.35]:42540 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726583AbgAJHx4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Jan 2020 02:53:56 -0500
+        id S1726549AbgAJHxz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 10 Jan 2020 02:53:55 -0500
 Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 30D72648F64E3696AD26;
+        by Forcepoint Email with ESMTP id 20C8C25F27279EA81904;
         Fri, 10 Jan 2020 15:53:52 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.24) by
  DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
- 14.3.439.0; Fri, 10 Jan 2020 15:53:42 +0800
+ 14.3.439.0; Fri, 10 Jan 2020 15:53:44 +0800
 From:   Zaibo Xu <xuzaibo@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-crypto@vger.kernel.org>, <linuxarm@huawei.com>,
@@ -33,9 +33,9 @@ CC:     <linux-crypto@vger.kernel.org>, <linuxarm@huawei.com>,
         <liulongfang@huawei.com>, <qianweili@huawei.com>,
         <zhangwei375@huawei.com>, <fanghao11@huawei.com>,
         <forest.zhouchang@huawei.com>
-Subject: [PATCH 1/9] crypto: hisilicon - fix debugfs usage of SEC V2
-Date:   Fri, 10 Jan 2020 15:49:50 +0800
-Message-ID: <1578642598-8584-2-git-send-email-xuzaibo@huawei.com>
+Subject: [PATCH 7/9] crypto: hisilicon - Add branch prediction macro
+Date:   Fri, 10 Jan 2020 15:49:56 +0800
+Message-ID: <1578642598-8584-8-git-send-email-xuzaibo@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1578642598-8584-1-git-send-email-xuzaibo@huawei.com>
 References: <1578642598-8584-1-git-send-email-xuzaibo@huawei.com>
@@ -48,116 +48,134 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Applied some advices of Marco Elver on atomic usage of Debugfs.
+After adding branch prediction for skcipher hot path,
+a little bit income of performance is gotten.
 
-Reported-by: Marco Elver <elver@google.com>
 Signed-off-by: Zaibo Xu <xuzaibo@huawei.com>
 ---
- drivers/crypto/hisilicon/sec2/sec.h        |  6 +++---
- drivers/crypto/hisilicon/sec2/sec_crypto.c | 10 +++++-----
- drivers/crypto/hisilicon/sec2/sec_main.c   | 14 ++++++++++++--
- 3 files changed, 20 insertions(+), 10 deletions(-)
+ drivers/crypto/hisilicon/sec2/sec_crypto.c | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
-index 26754d0..841f4c5 100644
---- a/drivers/crypto/hisilicon/sec2/sec.h
-+++ b/drivers/crypto/hisilicon/sec2/sec.h
-@@ -40,7 +40,7 @@ struct sec_req {
- 	int req_id;
- 
- 	/* Status of the SEC request */
--	int fake_busy;
-+	bool fake_busy;
- };
- 
- /**
-@@ -132,8 +132,8 @@ struct sec_debug_file {
- };
- 
- struct sec_dfx {
--	u64 send_cnt;
--	u64 recv_cnt;
-+	atomic64_t send_cnt;
-+	atomic64_t recv_cnt;
- };
- 
- struct sec_debug {
 diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-index 62b04e1..2475aaf 100644
+index 568c174..521bab8 100644
 --- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
 +++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-@@ -120,7 +120,7 @@ static void sec_req_cb(struct hisi_qp *qp, void *resp)
+@@ -69,7 +69,7 @@ static int sec_alloc_req_id(struct sec_req *req, struct sec_qp_ctx *qp_ctx)
+ 	req_id = idr_alloc_cyclic(&qp_ctx->req_idr, NULL,
+ 				  0, QM_Q_DEPTH, GFP_ATOMIC);
+ 	mutex_unlock(&qp_ctx->req_lock);
+-	if (req_id < 0) {
++	if (unlikely(req_id < 0)) {
+ 		dev_err(SEC_CTX_DEV(req->ctx), "alloc req id fail!\n");
+ 		return req_id;
+ 	}
+@@ -84,7 +84,7 @@ static void sec_free_req_id(struct sec_req *req)
+ 	struct sec_qp_ctx *qp_ctx = req->qp_ctx;
+ 	int req_id = req->req_id;
+ 
+-	if (req_id < 0 || req_id >= QM_Q_DEPTH) {
++	if (unlikely(req_id < 0 || req_id >= QM_Q_DEPTH)) {
+ 		dev_err(SEC_CTX_DEV(req->ctx), "free request id invalid!\n");
  		return;
  	}
+@@ -108,7 +108,7 @@ static void sec_req_cb(struct hisi_qp *qp, void *resp)
+ 	u8 type;
  
--	__sync_add_and_fetch(&req->ctx->sec->debug.dfx.recv_cnt, 1);
-+	atomic64_inc(&req->ctx->sec->debug.dfx.recv_cnt);
- 
- 	req->ctx->req_op->buf_unmap(req->ctx, req);
- 
-@@ -135,7 +135,7 @@ static int sec_bd_send(struct sec_ctx *ctx, struct sec_req *req)
- 	mutex_lock(&qp_ctx->req_lock);
- 	ret = hisi_qp_send(qp_ctx->qp, &req->sec_sqe);
+ 	type = bd->type_cipher_auth & SEC_TYPE_MASK;
+-	if (type != SEC_BD_TYPE2) {
++	if (unlikely(type != SEC_BD_TYPE2)) {
+ 		pr_err("err bd type [%d]\n", type);
+ 		return;
+ 	}
+@@ -144,7 +144,7 @@ static int sec_bd_send(struct sec_ctx *ctx, struct sec_req *req)
  	mutex_unlock(&qp_ctx->req_lock);
--	__sync_add_and_fetch(&ctx->sec->debug.dfx.send_cnt, 1);
-+	atomic64_inc(&ctx->sec->debug.dfx.send_cnt);
+ 	atomic64_inc(&ctx->sec->debug.dfx.send_cnt);
  
- 	if (ret == -EBUSY)
+-	if (ret == -EBUSY)
++	if (unlikely(ret == -EBUSY))
  		return -ENOBUFS;
-@@ -641,7 +641,7 @@ static void sec_skcipher_callback(struct sec_ctx *ctx, struct sec_req *req)
- 	if (ctx->c_ctx.c_mode == SEC_CMODE_CBC && req->c_req.encrypt)
+ 
+ 	if (!ret) {
+@@ -526,13 +526,13 @@ static int sec_request_transfer(struct sec_ctx *ctx, struct sec_req *req)
+ 	int ret;
+ 
+ 	ret = ctx->req_op->buf_map(ctx, req);
+-	if (ret)
++	if (unlikely(ret))
+ 		return ret;
+ 
+ 	ctx->req_op->do_transfer(ctx, req);
+ 
+ 	ret = ctx->req_op->bd_fill(ctx, req);
+-	if (ret)
++	if (unlikely(ret))
+ 		goto unmap_req_buf;
+ 
+ 	return ret;
+@@ -617,7 +617,7 @@ static void sec_update_iv(struct sec_req *req)
+ 
+ 	sz = sg_pcopy_to_buffer(sgl, sg_nents(sgl), sk_req->iv,
+ 				iv_size, sk_req->cryptlen - iv_size);
+-	if (sz != iv_size)
++	if (unlikely(sz != iv_size))
+ 		dev_err(SEC_CTX_DEV(req->ctx), "copy output iv error!\n");
+ }
+ 
+@@ -659,7 +659,7 @@ static int sec_request_init(struct sec_ctx *ctx, struct sec_req *req)
+ 	qp_ctx = &ctx->qp_ctx[queue_id];
+ 
+ 	req->req_id = sec_alloc_req_id(req, qp_ctx);
+-	if (req->req_id < 0) {
++	if (unlikely(req->req_id < 0)) {
+ 		sec_free_queue_id(ctx, req);
+ 		return req->req_id;
+ 	}
+@@ -677,11 +677,11 @@ static int sec_process(struct sec_ctx *ctx, struct sec_req *req)
+ 	int ret;
+ 
+ 	ret = sec_request_init(ctx, req);
+-	if (ret)
++	if (unlikely(ret))
+ 		return ret;
+ 
+ 	ret = sec_request_transfer(ctx, req);
+-	if (ret)
++	if (unlikely(ret))
+ 		goto err_uninit_req;
+ 
+ 	/* Output IV as decrypto */
+@@ -689,7 +689,7 @@ static int sec_process(struct sec_ctx *ctx, struct sec_req *req)
  		sec_update_iv(req);
  
--	if (__sync_bool_compare_and_swap(&req->fake_busy, 1, 0))
-+	if (req->fake_busy)
- 		sk_req->base.complete(&sk_req->base, -EINPROGRESS);
- 
- 	sk_req->base.complete(&sk_req->base, req->err_type);
-@@ -672,9 +672,9 @@ static int sec_request_init(struct sec_ctx *ctx, struct sec_req *req)
+ 	ret = ctx->req_op->bd_send(ctx, req);
+-	if (ret != -EBUSY && ret != -EINPROGRESS) {
++	if (unlikely(ret != -EBUSY && ret != -EINPROGRESS)) {
+ 		dev_err_ratelimited(SEC_CTX_DEV(ctx), "send sec request failed!\n");
+ 		goto err_send_req;
  	}
+@@ -740,19 +740,19 @@ static int sec_skcipher_param_check(struct sec_ctx *ctx, struct sec_req *sreq)
+ 	struct device *dev = SEC_CTX_DEV(ctx);
+ 	u8 c_alg = ctx->c_ctx.c_alg;
  
- 	if (ctx->fake_req_limit <= atomic_inc_return(&qp_ctx->pending_reqs))
--		req->fake_busy = 1;
-+		req->fake_busy = true;
- 	else
--		req->fake_busy = 0;
-+		req->fake_busy = false;
- 
- 	ret = ctx->req_op->get_res(ctx, req);
- 	if (ret) {
-diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-index 74f0654..d40e2da 100644
---- a/drivers/crypto/hisilicon/sec2/sec_main.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-@@ -608,6 +608,14 @@ static const struct file_operations sec_dbg_fops = {
- 	.write = sec_debug_write,
- };
- 
-+static int sec_debugfs_atomic64_get(void *data, u64 *val)
-+{
-+	*val = atomic64_read((atomic64_t *)data);
-+	return 0;
-+}
-+DEFINE_DEBUGFS_ATTRIBUTE(sec_atomic64_ops, sec_debugfs_atomic64_get,
-+			 NULL, "%lld\n");
-+
- static int sec_core_debug_init(struct sec_dev *sec)
- {
- 	struct hisi_qm *qm = &sec->qm;
-@@ -628,9 +636,11 @@ static int sec_core_debug_init(struct sec_dev *sec)
- 
- 	debugfs_create_regset32("regs", 0444, tmp_d, regset);
- 
--	debugfs_create_u64("send_cnt", 0444, tmp_d, &dfx->send_cnt);
-+	debugfs_create_file("send_cnt", 0444, tmp_d,
-+			    &dfx->send_cnt, &sec_atomic64_ops);
- 
--	debugfs_create_u64("recv_cnt", 0444, tmp_d, &dfx->recv_cnt);
-+	debugfs_create_file("recv_cnt", 0444, tmp_d,
-+			    &dfx->recv_cnt, &sec_atomic64_ops);
- 
- 	return 0;
- }
+-	if (!sk_req->src || !sk_req->dst) {
++	if (unlikely(!sk_req->src || !sk_req->dst)) {
+ 		dev_err(dev, "skcipher input param error!\n");
+ 		return -EINVAL;
+ 	}
+ 	sreq->c_req.c_len = sk_req->cryptlen;
+ 	if (c_alg == SEC_CALG_3DES) {
+-		if (sk_req->cryptlen & (DES3_EDE_BLOCK_SIZE - 1)) {
++		if (unlikely(sk_req->cryptlen & (DES3_EDE_BLOCK_SIZE - 1))) {
+ 			dev_err(dev, "skcipher 3des input length error!\n");
+ 			return -EINVAL;
+ 		}
+ 		return 0;
+ 	} else if (c_alg == SEC_CALG_AES || c_alg == SEC_CALG_SM4) {
+-		if (sk_req->cryptlen & (AES_BLOCK_SIZE - 1)) {
++		if (unlikely(sk_req->cryptlen & (AES_BLOCK_SIZE - 1))) {
+ 			dev_err(dev, "skcipher aes input length error!\n");
+ 			return -EINVAL;
+ 		}
 -- 
 2.8.1
 
