@@ -2,113 +2,212 @@ Return-Path: <SRS0=JhzL=27=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 851F3C33C99
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jan 2020 07:07:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9714EC33CA3
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jan 2020 07:46:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4F9A32072E
-	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jan 2020 07:07:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 63D042082E
+	for <linux-crypto@archiver.kernel.org>; Fri, 10 Jan 2020 07:46:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="AmGIEKHX"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="IEuAW6+2"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726199AbgAJHHV (ORCPT
+        id S1726636AbgAJHqs (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 10 Jan 2020 02:07:21 -0500
-Received: from mail-pj1-f68.google.com ([209.85.216.68]:53639 "EHLO
-        mail-pj1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726276AbgAJHHV (ORCPT
+        Fri, 10 Jan 2020 02:46:48 -0500
+Received: from mo4-p02-ob.smtp.rzone.de ([85.215.255.83]:27982 "EHLO
+        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726276AbgAJHqs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Jan 2020 02:07:21 -0500
-Received: by mail-pj1-f68.google.com with SMTP id n96so576626pjc.3
-        for <linux-crypto@vger.kernel.org>; Thu, 09 Jan 2020 23:07:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=M/y3Ml3cM/VSoJud1Dw7FXrO1acMY+sKEerO9outbBk=;
-        b=AmGIEKHX7/ltZPW8KBppPh4dfNgAw9BawReONfu20SdOsEMncM7QmHQ/DgfwDnmv8T
-         21IGIPGILhSA7JnW3FoEIgT4DYGLgTZWZ1IgT0UNnkSecFHfuf+XkuOKLuTKXUIZpMSW
-         oZ/qPcKd9Hnl6huv7035dakRp5WDhXPAbrr8JERWj/eZFYO7UQslkIXRFmZpVlEJcFyg
-         lekKzu3LWCNQl4rxLeOawb8CmQTU0MELvaG1Nz7V9uX9L7UXTTXz/37cCAfTZ/CdjQV3
-         SoubjbvyPfUl5rmF5IblznHxKkK3UgeseKeDecNWC44R+Qu6A//67AV1VnVdSbZI1CrM
-         woAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=M/y3Ml3cM/VSoJud1Dw7FXrO1acMY+sKEerO9outbBk=;
-        b=jw7JXZXY0/dQ6WEy91+c2EAZ584TLbdfkJN8bciWRn/lu19V+CmixRsIiXvPmyBAVI
-         GDGatWiKYx/fVAa+SIaMG1zBMqXHCNI0suYsQW1WY1I/IS0WUnwb1lwo0z5e8PSgDpAU
-         jj/yvFBDsZp1qLHVuCXWqw4vzgFBThEZYlEhbCGtJL1O0Lzp1ysblAt866UBc4apm3dG
-         hr9CHb7UA8/M7PEqX11wsUeFWiYlWBbR3t3MDE0KO4l1pyYcurc/L3hWulHTUcgQVbzl
-         h2S0CPJ55pxrXoym7wlQrnumscBZLJi+RfSXeQwnrFAbDtrUSGgYHOY52FwrkHuKffD1
-         lyxw==
-X-Gm-Message-State: APjAAAWK6aBpnrm7FLo6Tb5ybxKZ6uFsbXFXai4HUIblaeGhID07mgkZ
-        ABDd74k0O812FcC3iBd3G+599w==
-X-Google-Smtp-Source: APXvYqyQSw6X8cyO2gBQIiXxpRCvLX2QZNn/mPymYICp5ZQha+ZzrZ0O7cBocngIOaOdKKOTZmMvxw==
-X-Received: by 2002:a17:902:8601:: with SMTP id f1mr2473221plo.289.1578640040800;
-        Thu, 09 Jan 2020 23:07:20 -0800 (PST)
-Received: from [10.151.2.174] ([45.135.186.75])
-        by smtp.gmail.com with ESMTPSA id l14sm1147746pgt.42.2020.01.09.23.07.12
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 09 Jan 2020 23:07:20 -0800 (PST)
-Subject: Re: [PATCH v10 4/4] crypto: hisilicon - register zip engine to uacce
-To:     Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>, grant.likely@arm.com,
-        jean-philippe <jean-philippe@linaro.org>,
-        Jerome Glisse <jglisse@redhat.com>,
-        ilias.apalodimas@linaro.org, francois.ozog@linaro.org,
-        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
-        "haojian . zhuang" <haojian.zhuang@linaro.org>,
-        guodong.xu@linaro.org, linux-accelerators@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        iommu@lists.linux-foundation.org
-References: <1576465697-27946-1-git-send-email-zhangfei.gao@linaro.org>
- <1576465697-27946-5-git-send-email-zhangfei.gao@linaro.org>
- <20200109174859.00004b7b@Huawei.com>
-From:   zhangfei <zhangfei.gao@linaro.org>
-Message-ID: <8d35168e-ff68-1bb9-20e1-6bbac5afde00@linaro.org>
-Date:   Fri, 10 Jan 2020 15:07:08 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        Fri, 10 Jan 2020 02:46:48 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1578642405;
+        s=strato-dkim-0002; d=chronox.de;
+        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=iGK7Pgzw6tKu2VK9x2Icryn9l1IuJ/TgQW4Aouj2aqc=;
+        b=IEuAW6+2Q10mR3Gb6lYgkCOqpINUw9glVT/0aBTgxrOCWB4hMX4gzmOhDO19ebXC8+
+        MKP8kVd/0aKIVjbwtM6grPp965sIxpVl5DHrmWQHGc0jON531pupkupZ7waVw289Yq9N
+        5+lAddOiN1mhfmv6PVH5CniZHgTn5pve4LoYn+Q6rc2/Tp5xQRpt5BaGp9qqYL/hjL5e
+        9boJ4BspX6MURO8P21C2GRVAqsKys8CBzWQImYgCx0EN3Ke4SfB0CdpUYJ7JVu1Y5NvC
+        pHisfoXHoyl6Krtm6nRN5Yj2gsxE3MsLy7iTosB5a0OhU3OnhTeRM6GjDDvAOczN1mc2
+        uQlA==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPZJPScHivh"
+X-RZG-CLASS-ID: mo00
+Received: from tauon.chronox.de
+        by smtp.strato.de (RZmta 46.1.4 DYNA|AUTH)
+        with ESMTPSA id u04585w0A7jN7hj
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+        Fri, 10 Jan 2020 08:45:23 +0100 (CET)
+From:   Stephan Mueller <smueller@chronox.de>
+To:     Randy Dunlap <rdunlap@infradead.org>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        linux-api@vger.kernel.org,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Nicolai Stange <nstange@suse.de>,
+        "Peter, Matthias" <matthias.peter@bsi.bund.de>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Roman Drahtmueller <draht@schaltsekun.de>,
+        Neil Horman <nhorman@redhat.com>,
+        Julia Lawall <julia.lawall@inria.fr>
+Subject: Re: [PATCH v27 09/12] LRNG - add Jitter RNG fast noise source
+Date:   Fri, 10 Jan 2020 08:45:22 +0100
+Message-ID: <3881936.EWlHz54Di6@tauon.chronox.de>
+In-Reply-To: <0ba976fa-fed1-4720-c039-043160dbce9e@infradead.org>
+References: <6157374.ptSnyUpaCn@positron.chronox.de> <6341883.UacF4FzDma@positron.chronox.de> <0ba976fa-fed1-4720-c039-043160dbce9e@infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <20200109174859.00004b7b@Huawei.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Am Freitag, 10. Januar 2020, 01:24:47 CET schrieb Randy Dunlap:
+
+Hi Randy,
+
+> Hi,
+>=20
+> On 1/9/20 12:34 AM, Stephan M=FCller wrote:
+> > ---
+> >=20
+> >  drivers/char/lrng/Kconfig     | 11 +++++
+> >  drivers/char/lrng/Makefile    |  1 +
+> >  drivers/char/lrng/lrng_jent.c | 87 +++++++++++++++++++++++++++++++++++
+> >  3 files changed, 99 insertions(+)
+> >  create mode 100644 drivers/char/lrng/lrng_jent.c
+> >=20
+> > diff --git a/drivers/char/lrng/lrng_jent.c b/drivers/char/lrng/lrng_jen=
+t.c
+> > new file mode 100644
+> > index 000000000000..97c0d192e9c8
+> > --- /dev/null
+> > +++ b/drivers/char/lrng/lrng_jent.c
+> > @@ -0,0 +1,87 @@
+> > +// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
+> > +/*
+> > + * LRNG Fast Noise Source: Jitter RNG
+> > + *
+> > + * Copyright (C) 2016 - 2020, Stephan Mueller <smueller@chronox.de>
+> > + */
+> > +
+> > +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
+> > +
+> > +#include <linux/types.h>
+> > +#include <crypto/internal/jitterentropy.h>
+> > +
+> > +#include "lrng_internal.h"
+> > +
+> > +/*
+> > + * Estimated entropy of data is a 16th of
+> > LRNG_DRNG_SECURITY_STRENGTH_BITS. + * Albeit a full entropy assessment =
+is
+> > provided for the noise source indicating + * that it provides high
+> > entropy rates and considering that it deactivates + * when it detects
+> > insufficient hardware, the chosen under estimation of + * entropy is
+> > considered to be acceptable to all reviewers.
+> > + */
+> > +static u32 jitterrng =3D LRNG_DRNG_SECURITY_STRENGTH_BITS>>4;
+> > +module_param(jitterrng, uint, 0644);
+> > +MODULE_PARM_DESC(jitterrng, "Entropy in bits of 256 data bits from Jit=
+ter
+> > " +			    "RNG noise source");
+> > +
+> > +/**
+> > + * Get Jitter RNG entropy
+> > + *
+> > + * @outbuf buffer to store entropy
+> > + * @outbuflen length of buffer
+> > + * @return > 0 on success where value provides the added entropy in bi=
+ts
+> > + *	   0 if no fast source was available
+> > + */
+>=20
+> Don't begin the comment block with /**
+> or convert it to Linux kernel-doc notation format.
+
+Yes, the colons are missing and there is no @return. It will be fixed with =
+the=20
+next patch set.
+
+Thank you.
+>=20
+> > +static struct rand_data *lrng_jent_state;
+> > +
+> > +u32 lrng_get_jent(u8 *outbuf, unsigned int outbuflen)
+> > +{
+> > +	int ret;
+> > +	u32 ent_bits =3D jitterrng;
+> > +	unsigned long flags;
+> > +	static DEFINE_SPINLOCK(lrng_jent_lock);
+> > +	static int lrng_jent_initialized =3D 0;
+> > +
+> > +	spin_lock_irqsave(&lrng_jent_lock, flags);
+> > +
+> > +	if (!ent_bits || (lrng_jent_initialized =3D=3D -1)) {
+> > +		spin_unlock_irqrestore(&lrng_jent_lock, flags);
+> > +		return 0;
+> > +	}
+> > +
+> > +	if (!lrng_jent_initialized) {
+> > +		lrng_jent_state =3D jent_lrng_entropy_collector();
+> > +		if (!lrng_jent_state) {
+> > +			jitterrng =3D 0;
+> > +			lrng_jent_initialized =3D -1;
+> > +			spin_unlock_irqrestore(&lrng_jent_lock, flags);
+> > +			pr_info("Jitter RNG unusable on current system\n");
+> > +			return 0;
+> > +		}
+> > +		lrng_jent_initialized =3D 1;
+> > +		pr_debug("Jitter RNG working on current system\n");
+> > +	}
+> > +	ret =3D jent_read_entropy(lrng_jent_state, outbuf, outbuflen);
+> > +	spin_unlock_irqrestore(&lrng_jent_lock, flags);
+> > +
+> > +	if (ret) {
+> > +		pr_debug("Jitter RNG failed with %d\n", ret);
+> > +		return 0;
+> > +	}
+> > +
+> > +	/* Obtain entropy statement */
+> > +	if (outbuflen !=3D LRNG_DRNG_SECURITY_STRENGTH_BYTES)
+> > +		ent_bits =3D (ent_bits * outbuflen<<3) /
+> > +			   LRNG_DRNG_SECURITY_STRENGTH_BITS;
+> > +	/* Cap entropy to buffer size in bits */
+> > +	ent_bits =3D min_t(u32, ent_bits, outbuflen<<3);
+> > +	pr_debug("obtained %u bits of entropy from Jitter RNG noise source\n",
+> > +		 ent_bits);
+> > +
+> > +	return ent_bits;
+> > +}
+> > +
+> > +u32 lrng_jent_entropylevel(void)
+> > +{
+> > +	return min_t(u32, jitterrng, LRNG_DRNG_SECURITY_STRENGTH_BITS);
+> > +}
+>=20
+> thanks.
 
 
-On 2020/1/10 上午1:48, Jonathan Cameron wrote:
-> On Mon, 16 Dec 2019 11:08:17 +0800
-> Zhangfei Gao <zhangfei.gao@linaro.org> wrote:
->
->> Register qm to uacce framework for user crypto driver
->>
->> Signed-off-by: Zhangfei Gao <zhangfei.gao@linaro.org>
->> Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
-> Very nice to see how minimal the changes are.
->
-> Whilst uacce in general isn't crypto specific, as we are looking
-> at changes in a crypto driver, this will need a crypto Ack.
->
-> Herbert, this is about as non invasive as things can get and
-> provide a user space shared virtual addressing based interface.
-> What do you think?
->
->  From my side, for what it's worth...
->
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 
-Thanks Jonathan
+Ciao
+Stephan
+
+
