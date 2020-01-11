@@ -2,65 +2,150 @@ Return-Path: <SRS0=WlNz=3A=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EDF4C282DD
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Jan 2020 00:17:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82A9EC33CA2
+	for <linux-crypto@archiver.kernel.org>; Sat, 11 Jan 2020 02:45:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2BCB4206ED
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Jan 2020 00:17:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="3ZFX7eJQ"
+	by mail.kernel.org (Postfix) with ESMTP id 4F82120721
+	for <linux-crypto@archiver.kernel.org>; Sat, 11 Jan 2020 02:45:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727499AbgAKARM (ORCPT
+        id S1728200AbgAKCpv (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 10 Jan 2020 19:17:12 -0500
-Received: from frisell.zx2c4.com ([192.95.5.64]:41161 "EHLO frisell.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727444AbgAKARM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Jan 2020 19:17:12 -0500
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 63d7c969;
-        Fri, 10 Jan 2020 23:17:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
-        :references:in-reply-to:from:date:message-id:subject:to:cc
-        :content-type; s=mail; bh=8rcos00mpgiRgNOZRS7kR9yv6aU=; b=3ZFX7e
-        JQz0q1Reo4TNVsXrYcB2CvEEem6Lb3wEyjS9clPkpnZ0Is6Hk+VG0cqQxK/plTau
-        nbLvcRR9nMmsVSKvznc3+ZosjQLz1c1BbkK1Vu+HdBYaZi9dxJh93SGu40p9uqYY
-        iVz5NyjkLClLYlkBjVKSv2Uqj2YT4sNQG7+cmtnwGspJnZKEUHvjzI/ZoD9qJE4s
-        6Zrs1TIuN/5xi0QI5Y6IK8WhrOaODxFY0AGXefRIoONyI9mc9QnAve6rh3psG6Dt
-        tLWg1sDG4wC2d9CN2b3d/h+6SGbIVwxuv8JUncT1Wcm9yRDyCb36BcbqVxSEqE+Y
-        DeZacrrIGVn0kZuQ==
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 4971434f (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
-        Fri, 10 Jan 2020 23:17:33 +0000 (UTC)
-Received: by mail-ot1-f53.google.com with SMTP id a15so3716687otf.1;
-        Fri, 10 Jan 2020 16:17:08 -0800 (PST)
-X-Gm-Message-State: APjAAAVUBp7jDkXp8GYlZICWL6yexG3jeiGxeMJhx4pPhFGWlxO/eRHp
-        IZauBlutsY6UsTIW46DpcL5CZSS61cDbMVzSnHo=
-X-Google-Smtp-Source: APXvYqy7XgL1zSl8e2cFgPv6d1rIDwTEU7p9SGp27oiQ68yGfUA9pFOWs9Go7vhAr4VtyzD/DJj20B/NMxGZEd6UjlM=
-X-Received: by 2002:a05:6830:1141:: with SMTP id x1mr5050155otq.120.1578701827660;
- Fri, 10 Jan 2020 16:17:07 -0800 (PST)
+        Fri, 10 Jan 2020 21:45:51 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:45380 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728195AbgAKCpv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 10 Jan 2020 21:45:51 -0500
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 56A80761319FBECDECC4;
+        Sat, 11 Jan 2020 10:45:49 +0800 (CST)
+Received: from localhost.localdomain (10.67.165.24) by
+ DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
+ 14.3.439.0; Sat, 11 Jan 2020 10:45:41 +0800
+From:   Zaibo Xu <xuzaibo@huawei.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     <linux-crypto@vger.kernel.org>, <linuxarm@huawei.com>,
+        <jonathan.cameron@huawei.com>, <wangzhou1@hisilicon.com>,
+        <tanghui20@huawei.com>, <yekai13@huawei.com>,
+        <liulongfang@huawei.com>, <qianweili@huawei.com>,
+        <zhangwei375@huawei.com>, <fanghao11@huawei.com>,
+        <forest.zhouchang@huawei.com>
+Subject: [PATCH v2 1/9] crypto: hisilicon - Update debugfs usage of SEC V2
+Date:   Sat, 11 Jan 2020 10:41:48 +0800
+Message-ID: <1578710516-40535-2-git-send-email-xuzaibo@huawei.com>
+X-Mailer: git-send-email 2.8.1
+In-Reply-To: <1578710516-40535-1-git-send-email-xuzaibo@huawei.com>
+References: <1578710516-40535-1-git-send-email-xuzaibo@huawei.com>
 MIME-Version: 1.0
-References: <20200107133547.44000-1-yuehaibing@huawei.com> <CAHmME9pg4KWw1zNVybxn1WLGusyGCjqeAHLQXY=Dr4zznUM82g@mail.gmail.com>
- <20200108043735.hkhkyq47neatatt4@gondor.apana.org.au>
-In-Reply-To: <20200108043735.hkhkyq47neatatt4@gondor.apana.org.au>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Fri, 10 Jan 2020 19:16:56 -0500
-X-Gmail-Original-Message-ID: <CAHmME9pOq8DCpvozendC0NTBct9EQgFzJaNP1xzRbkcWtcXYWA@mail.gmail.com>
-Message-ID: <CAHmME9pOq8DCpvozendC0NTBct9EQgFzJaNP1xzRbkcWtcXYWA@mail.gmail.com>
-Subject: Re: [v2 PATCH] crypto: curve25519 - Fix selftest build error
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     YueHaibing <yuehaibing@huawei.com>,
-        David Miller <davem@davemloft.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Originating-IP: [10.67.165.24]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Thanks for the analysis.
+Applied some advices of Marco Elver on atomic usage of Debugfs,
+which is carried out by basing on Arnd Bergmann's fixing patch.
 
-Reviewed-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Reported-by: Arnd Bergmann <arnd@arndb.de>
+Reported-by: Marco Elver <elver@google.com>
+Signed-off-by: Zaibo Xu <xuzaibo@huawei.com>
+---
+ drivers/crypto/hisilicon/sec2/sec.h        |  2 +-
+ drivers/crypto/hisilicon/sec2/sec_crypto.c |  8 ++++----
+ drivers/crypto/hisilicon/sec2/sec_main.c   | 18 +++++++++---------
+ 3 files changed, 14 insertions(+), 14 deletions(-)
+
+diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
+index b846d73..841f4c5 100644
+--- a/drivers/crypto/hisilicon/sec2/sec.h
++++ b/drivers/crypto/hisilicon/sec2/sec.h
+@@ -40,7 +40,7 @@ struct sec_req {
+ 	int req_id;
+ 
+ 	/* Status of the SEC request */
+-	atomic_t fake_busy;
++	bool fake_busy;
+ };
+ 
+ /**
+diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+index 0a5391f..2475aaf 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
++++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+@@ -141,7 +141,7 @@ static int sec_bd_send(struct sec_ctx *ctx, struct sec_req *req)
+ 		return -ENOBUFS;
+ 
+ 	if (!ret) {
+-		if (atomic_read(&req->fake_busy))
++		if (req->fake_busy)
+ 			ret = -EBUSY;
+ 		else
+ 			ret = -EINPROGRESS;
+@@ -641,7 +641,7 @@ static void sec_skcipher_callback(struct sec_ctx *ctx, struct sec_req *req)
+ 	if (ctx->c_ctx.c_mode == SEC_CMODE_CBC && req->c_req.encrypt)
+ 		sec_update_iv(req);
+ 
+-	if (atomic_cmpxchg(&req->fake_busy, 1, 0) != 1)
++	if (req->fake_busy)
+ 		sk_req->base.complete(&sk_req->base, -EINPROGRESS);
+ 
+ 	sk_req->base.complete(&sk_req->base, req->err_type);
+@@ -672,9 +672,9 @@ static int sec_request_init(struct sec_ctx *ctx, struct sec_req *req)
+ 	}
+ 
+ 	if (ctx->fake_req_limit <= atomic_inc_return(&qp_ctx->pending_reqs))
+-		atomic_set(&req->fake_busy, 1);
++		req->fake_busy = true;
+ 	else
+-		atomic_set(&req->fake_busy, 0);
++		req->fake_busy = false;
+ 
+ 	ret = ctx->req_op->get_res(ctx, req);
+ 	if (ret) {
+diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+index ab742df..d40e2da 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_main.c
++++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+@@ -608,13 +608,13 @@ static const struct file_operations sec_dbg_fops = {
+ 	.write = sec_debug_write,
+ };
+ 
+-static int debugfs_atomic64_t_get(void *data, u64 *val)
++static int sec_debugfs_atomic64_get(void *data, u64 *val)
+ {
+-        *val = atomic64_read((atomic64_t *)data);
+-        return 0;
++	*val = atomic64_read((atomic64_t *)data);
++	return 0;
+ }
+-DEFINE_DEBUGFS_ATTRIBUTE(fops_atomic64_t_ro, debugfs_atomic64_t_get, NULL,
+-                        "%lld\n");
++DEFINE_DEBUGFS_ATTRIBUTE(sec_atomic64_ops, sec_debugfs_atomic64_get,
++			 NULL, "%lld\n");
+ 
+ static int sec_core_debug_init(struct sec_dev *sec)
+ {
+@@ -636,11 +636,11 @@ static int sec_core_debug_init(struct sec_dev *sec)
+ 
+ 	debugfs_create_regset32("regs", 0444, tmp_d, regset);
+ 
+-	debugfs_create_file("send_cnt", 0444, tmp_d, &dfx->send_cnt,
+-			    &fops_atomic64_t_ro);
++	debugfs_create_file("send_cnt", 0444, tmp_d,
++			    &dfx->send_cnt, &sec_atomic64_ops);
+ 
+-	debugfs_create_file("recv_cnt", 0444, tmp_d, &dfx->recv_cnt,
+-			    &fops_atomic64_t_ro);
++	debugfs_create_file("recv_cnt", 0444, tmp_d,
++			    &dfx->recv_cnt, &sec_atomic64_ops);
+ 
+ 	return 0;
+ }
+-- 
+2.8.1
+
