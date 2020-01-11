@@ -2,954 +2,332 @@ Return-Path: <SRS0=WlNz=3A=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BB6CC33CA4
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Jan 2020 02:45:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E731C33CA2
+	for <linux-crypto@archiver.kernel.org>; Sat, 11 Jan 2020 02:49:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4007D20721
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Jan 2020 02:45:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3A00520721
+	for <linux-crypto@archiver.kernel.org>; Sat, 11 Jan 2020 02:49:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="R9qaD8Rx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728196AbgAKCp5 (ORCPT
+        id S1728221AbgAKCtK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 10 Jan 2020 21:45:57 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:45522 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728187AbgAKCp4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 10 Jan 2020 21:45:56 -0500
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 5380C6563FA6F0B547C5;
-        Sat, 11 Jan 2020 10:45:54 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.24) by
- DGGEMS414-HUB.china.huawei.com (10.3.19.214) with Microsoft SMTP Server id
- 14.3.439.0; Sat, 11 Jan 2020 10:45:43 +0800
-From:   Zaibo Xu <xuzaibo@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <linux-crypto@vger.kernel.org>, <linuxarm@huawei.com>,
-        <jonathan.cameron@huawei.com>, <wangzhou1@hisilicon.com>,
-        <tanghui20@huawei.com>, <yekai13@huawei.com>,
-        <liulongfang@huawei.com>, <qianweili@huawei.com>,
-        <zhangwei375@huawei.com>, <fanghao11@huawei.com>,
-        <forest.zhouchang@huawei.com>
-Subject: [PATCH v2 9/9] crypto: hisilicon - Add aead support on SEC2
-Date:   Sat, 11 Jan 2020 10:41:56 +0800
-Message-ID: <1578710516-40535-10-git-send-email-xuzaibo@huawei.com>
-X-Mailer: git-send-email 2.8.1
-In-Reply-To: <1578710516-40535-1-git-send-email-xuzaibo@huawei.com>
-References: <1578710516-40535-1-git-send-email-xuzaibo@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.67.165.24]
-X-CFilter-Loop: Reflected
+        Fri, 10 Jan 2020 21:49:10 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:32956 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728162AbgAKCtK (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 10 Jan 2020 21:49:10 -0500
+Received: by mail-pf1-f195.google.com with SMTP id z16so2055644pfk.0
+        for <linux-crypto@vger.kernel.org>; Fri, 10 Jan 2020 18:49:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id;
+        bh=sFyjfLvFq9RupN4vUArl0dNN0CsBFnfersrjkyGGBjs=;
+        b=R9qaD8RxxArTNbC2T7lPBQGhQpZt2yhl6oHH3LWH9cPOzklmKWyfAfZ4DV0V1Qa/wX
+         XjP/NSBrfXFi9ONwE0LWbCmN3hfbdwPbb7clsLRrZMnz1MacCx2L7JF7vxFX6gvhO5cb
+         j0VM4DNDeg5QTen2+3xf60YoGO8MB2aMGlV62E9U2EpPkDG5XA98yEYf8HKjnFZXBONx
+         PQcEsqZXMr5GIErWFRjSUejUnY/dY1or5yZKDWOAOYaU2jt8FxXdGpCwoUZlLCh4ocui
+         Zb3bxnw/RwB9rlOsomR6l2YK0jN4zsc/AqDOSn8tZGyEbOw8LbI1Hglwt281JBYLRIJO
+         IKvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=sFyjfLvFq9RupN4vUArl0dNN0CsBFnfersrjkyGGBjs=;
+        b=U4VLqMUC4JIzqd/IwMA4MQhzOwK0WVR5KT+qHcvIF5ldDIYqhggViNTECH4a5/5R1Z
+         /QPhae1I5cwxn5tzkjvsqat/4gn6pnHwB6eL838lIJQPxbSbu17TMIfsOeaaDCnX5Ulz
+         No8iDH35sDE7UHyVra3lfEWJyIICzmlpZPBVdL6Wc40AK/OehDkzBreHLJOAnAxbMQEO
+         lVrdrPPomcsFXH0K1C4EKjwc33NqBLH7IL4jXqDz3djSCGMwGBBLobprwu6gOM4OafuF
+         LC3Xs/WTkjtJdNj6V6lJXgI4mb+GyDD8ZA3d6/eVcUUTBKPJGoTvHTZT4xYVTWBx/OFh
+         1ilw==
+X-Gm-Message-State: APjAAAUp3NDMfq54Yz13bYlNSv3c4CZsPuKkwONcpNVSxDzyeLJrUP5Z
+        k+gCc9by5odb/fLXzeluc1K24w==
+X-Google-Smtp-Source: APXvYqxU+RhKptnZCfo5ND31Yt2XOI732KCQtvYt21XM1urFbMss5UByZIvvkVeyKVPdoQb12tWo7w==
+X-Received: by 2002:a63:4853:: with SMTP id x19mr8384380pgk.385.1578710949104;
+        Fri, 10 Jan 2020 18:49:09 -0800 (PST)
+Received: from localhost.localdomain ([45.135.186.78])
+        by smtp.gmail.com with ESMTPSA id r7sm4778472pfg.34.2020.01.10.18.48.57
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Fri, 10 Jan 2020 18:49:08 -0800 (PST)
+From:   Zhangfei Gao <zhangfei.gao@linaro.org>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        jonathan.cameron@huawei.com, dave.jiang@intel.com,
+        grant.likely@arm.com, jean-philippe <jean-philippe@linaro.org>,
+        Jerome Glisse <jglisse@redhat.com>,
+        ilias.apalodimas@linaro.org, francois.ozog@linaro.org,
+        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
+        "haojian . zhuang" <haojian.zhuang@linaro.org>,
+        guodong.xu@linaro.org
+Cc:     linux-accelerators@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
+        Zhangfei Gao <zhangfei.gao@linaro.org>
+Subject: [PATCH v11 0/4] Add uacce module for Accelerator
+Date:   Sat, 11 Jan 2020 10:48:35 +0800
+Message-Id: <1578710919-12141-1-git-send-email-zhangfei.gao@linaro.org>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-authenc(hmac(sha1),cbc(aes)), authenc(hmac(sha256),cbc(aes)), and
-authenc(hmac(sha512),cbc(aes)) support are added for SEC v2.
+Uacce (Unified/User-space-access-intended Accelerator Framework) targets to
+provide Shared Virtual Addressing (SVA) between accelerators and processes.
+So accelerator can access any data structure of the main cpu.
+This differs from the data sharing between cpu and io device, which share
+data content rather than address.
+Because of unified address, hardware and user space of process can share
+the same virtual address in the communication.
 
-Signed-off-by: Zaibo Xu <xuzaibo@huawei.com>
----
- drivers/crypto/hisilicon/Kconfig           |   8 +-
- drivers/crypto/hisilicon/sec2/sec.h        |  29 +-
- drivers/crypto/hisilicon/sec2/sec_crypto.c | 589 +++++++++++++++++++++++++++--
- drivers/crypto/hisilicon/sec2/sec_crypto.h |  18 +
- 4 files changed, 620 insertions(+), 24 deletions(-)
+Uacce is intended to be used with Jean Philippe Brucker's SVA
+patchset[1], which enables IO side page fault and PASID support. 
+We have keep verifying with Jean's sva patchset [2]
+We also keep verifying with Eric's SMMUv3 Nested Stage patches [3]
 
-diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
-index 6e7c757..8851161 100644
---- a/drivers/crypto/hisilicon/Kconfig
-+++ b/drivers/crypto/hisilicon/Kconfig
-@@ -20,12 +20,18 @@ config CRYPTO_DEV_HISI_SEC2
- 	select CRYPTO_ALGAPI
- 	select CRYPTO_LIB_DES
- 	select CRYPTO_DEV_HISI_QM
-+	select CRYPTO_AEAD
-+	select CRYPTO_AUTHENC
-+	select CRYPTO_HMAC
-+	select CRYPTO_SHA1
-+	select CRYPTO_SHA256
-+	select CRYPTO_SHA512
- 	depends on PCI && PCI_MSI
- 	depends on ARM64 || (COMPILE_TEST && 64BIT)
- 	help
- 	  Support for HiSilicon SEC Engine of version 2 in crypto subsystem.
- 	  It provides AES, SM4, and 3DES algorithms with ECB
--	  CBC, and XTS cipher mode.
-+	  CBC, and XTS cipher mode, and AEAD algorithms.
- 
- 	  To compile this as a module, choose M here: the module
-           will be called hisi_sec2.
-diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
-index 97d5150..13e2d8d 100644
---- a/drivers/crypto/hisilicon/sec2/sec.h
-+++ b/drivers/crypto/hisilicon/sec2/sec.h
-@@ -13,6 +13,8 @@
- struct sec_alg_res {
- 	u8 *c_ivin;
- 	dma_addr_t c_ivin_dma;
-+	u8 *out_mac;
-+	dma_addr_t out_mac_dma;
- };
- 
- /* Cipher request of SEC private */
-@@ -26,14 +28,21 @@ struct sec_cipher_req {
- 	bool encrypt;
- };
- 
-+struct sec_aead_req {
-+	u8 *out_mac;
-+	dma_addr_t out_mac_dma;
-+	struct aead_request *aead_req;
-+};
-+
- /* SEC request of Crypto */
- struct sec_req {
- 	struct sec_sqe sec_sqe;
- 	struct sec_ctx *ctx;
- 	struct sec_qp_ctx *qp_ctx;
- 
--	/* Cipher supported only at present */
- 	struct sec_cipher_req c_req;
-+	struct sec_aead_req aead_req;
-+
- 	int err_type;
- 	int req_id;
- 
-@@ -60,6 +69,16 @@ struct sec_req_op {
- 	int (*process)(struct sec_ctx *ctx, struct sec_req *req);
- };
- 
-+/* SEC auth context */
-+struct sec_auth_ctx {
-+	dma_addr_t a_key_dma;
-+	u8 *a_key;
-+	u8 a_key_len;
-+	u8 mac_len;
-+	u8 a_alg;
-+	struct crypto_shash *hash_tfm;
-+};
-+
- /* SEC cipher context which cipher's relatives */
- struct sec_cipher_ctx {
- 	u8 *c_key;
-@@ -85,6 +104,11 @@ struct sec_qp_ctx {
- 	atomic_t pending_reqs;
- };
- 
-+enum sec_alg_type {
-+	SEC_SKCIPHER,
-+	SEC_AEAD
-+};
-+
- /* SEC Crypto TFM context which defines queue and cipher .etc relatives */
- struct sec_ctx {
- 	struct sec_qp_ctx *qp_ctx;
-@@ -102,7 +126,10 @@ struct sec_ctx {
- 
- 	 /* Currrent cyclic index to select a queue for decipher */
- 	atomic_t dec_qcyclic;
-+
-+	enum sec_alg_type alg_type;
- 	struct sec_cipher_ctx c_ctx;
-+	struct sec_auth_ctx a_ctx;
- };
- 
- enum sec_endian {
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-index f919dea..a0a3568 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-@@ -3,7 +3,11 @@
- 
- #include <crypto/aes.h>
- #include <crypto/algapi.h>
-+#include <crypto/authenc.h>
- #include <crypto/des.h>
-+#include <crypto/hash.h>
-+#include <crypto/internal/aead.h>
-+#include <crypto/sha.h>
- #include <crypto/skcipher.h>
- #include <crypto/xts.h>
- #include <linux/crypto.h>
-@@ -27,6 +31,10 @@
- #define SEC_SRC_SGL_OFFSET	7
- #define SEC_CKEY_OFFSET		9
- #define SEC_CMODE_OFFSET	12
-+#define SEC_AKEY_OFFSET         5
-+#define SEC_AEAD_ALG_OFFSET     11
-+#define SEC_AUTH_OFFSET		6
-+
- #define SEC_FLAG_OFFSET		7
- #define SEC_FLAG_MASK		0x0780
- #define SEC_TYPE_MASK		0x0F
-@@ -35,11 +43,16 @@
- #define SEC_TOTAL_IV_SZ		(SEC_IV_SIZE * QM_Q_DEPTH)
- #define SEC_SGL_SGE_NR		128
- #define SEC_CTX_DEV(ctx)	(&(ctx)->sec->qm.pdev->dev)
-+#define SEC_CIPHER_AUTH		0xfe
-+#define SEC_AUTH_CIPHER		0x1
-+#define SEC_MAX_MAC_LEN		64
-+#define SEC_TOTAL_MAC_SZ	(SEC_MAX_MAC_LEN * QM_Q_DEPTH)
-+#define SEC_SQE_LEN_RATE	4
- #define SEC_SQE_CFLAG		2
-+#define SEC_SQE_AEAD_FLAG	3
- #define SEC_SQE_DONE		0x1
- 
--static DEFINE_MUTEX(sec_algs_lock);
--static unsigned int sec_active_devs;
-+static atomic_t sec_active_devs;
- 
- /* Get an en/de-cipher queue cyclically to balance load over queues of TFM */
- static inline int sec_alloc_queue_id(struct sec_ctx *ctx, struct sec_req *req)
-@@ -97,6 +110,27 @@ static void sec_free_req_id(struct sec_req *req)
- 	mutex_unlock(&qp_ctx->req_lock);
- }
- 
-+static int sec_aead_verify(struct sec_req *req, struct sec_qp_ctx *qp_ctx)
-+{
-+	struct aead_request *aead_req = req->aead_req.aead_req;
-+	struct crypto_aead *tfm = crypto_aead_reqtfm(aead_req);
-+	u8 *mac_out = qp_ctx->res[req->req_id].out_mac;
-+	size_t authsize = crypto_aead_authsize(tfm);
-+	u8 *mac = mac_out + SEC_MAX_MAC_LEN;
-+	struct scatterlist *sgl = aead_req->src;
-+	size_t sz;
-+
-+	sz = sg_pcopy_to_buffer(sgl, sg_nents(sgl), mac, authsize,
-+				aead_req->cryptlen + aead_req->assoclen -
-+				authsize);
-+	if (unlikely(sz != authsize || memcmp(mac_out, mac, sz))) {
-+		dev_err(SEC_CTX_DEV(req->ctx), "aead verify failure!\n");
-+		return -EBADMSG;
-+	}
-+
-+	return 0;
-+}
-+
- static void sec_req_cb(struct hisi_qp *qp, void *resp)
- {
- 	struct sec_qp_ctx *qp_ctx = qp->qp_ctx;
-@@ -119,14 +153,18 @@ static void sec_req_cb(struct hisi_qp *qp, void *resp)
- 	done = le16_to_cpu(bd->type2.done_flag) & SEC_DONE_MASK;
- 	flag = (le16_to_cpu(bd->type2.done_flag) &
- 		SEC_FLAG_MASK) >> SEC_FLAG_OFFSET;
--	if (req->err_type || done != SEC_SQE_DONE ||
--	    flag != SEC_SQE_CFLAG) {
-+	if (unlikely(req->err_type || done != SEC_SQE_DONE ||
-+	    (ctx->alg_type == SEC_SKCIPHER && flag != SEC_SQE_CFLAG) ||
-+	    (ctx->alg_type == SEC_AEAD && flag != SEC_SQE_AEAD_FLAG))) {
- 		dev_err(SEC_CTX_DEV(ctx),
- 			"err_type[%d],done[%d],flag[%d]\n",
- 			req->err_type, done, flag);
- 		err = -EIO;
- 	}
- 
-+	if (ctx->alg_type == SEC_AEAD && !req->c_req.encrypt)
-+		err = sec_aead_verify(req, qp_ctx);
-+
- 	atomic64_inc(&ctx->sec->debug.dfx.recv_cnt);
- 
- 	ctx->req_op->buf_unmap(ctx, req);
-@@ -182,12 +220,53 @@ static void sec_free_civ_resource(struct device *dev, struct sec_alg_res *res)
- 				  res->c_ivin, res->c_ivin_dma);
- }
- 
-+static int sec_alloc_mac_resource(struct device *dev, struct sec_alg_res *res)
-+{
-+	int i;
-+
-+	res->out_mac = dma_alloc_coherent(dev, SEC_TOTAL_MAC_SZ << 1,
-+					  &res->out_mac_dma, GFP_KERNEL);
-+	if (!res->out_mac)
-+		return -ENOMEM;
-+
-+	for (i = 1; i < QM_Q_DEPTH; i++) {
-+		res[i].out_mac_dma = res->out_mac_dma +
-+				     i * (SEC_MAX_MAC_LEN << 1);
-+		res[i].out_mac = res->out_mac + i * (SEC_MAX_MAC_LEN << 1);
-+	}
-+
-+	return 0;
-+}
-+
-+static void sec_free_mac_resource(struct device *dev, struct sec_alg_res *res)
-+{
-+	if (res->out_mac)
-+		dma_free_coherent(dev, SEC_TOTAL_MAC_SZ << 1,
-+				  res->out_mac, res->out_mac_dma);
-+}
-+
- static int sec_alg_resource_alloc(struct sec_ctx *ctx,
- 				  struct sec_qp_ctx *qp_ctx)
- {
- 	struct device *dev = SEC_CTX_DEV(ctx);
-+	struct sec_alg_res *res = qp_ctx->res;
-+	int ret;
-+
-+	ret = sec_alloc_civ_resource(dev, res);
-+	if (ret)
-+		return ret;
- 
--	return sec_alloc_civ_resource(dev, qp_ctx->res);
-+	if (ctx->alg_type == SEC_AEAD) {
-+		ret = sec_alloc_mac_resource(dev, res);
-+		if (ret)
-+			goto get_fail;
-+	}
-+
-+	return 0;
-+get_fail:
-+	sec_free_civ_resource(dev, res);
-+
-+	return ret;
- }
- 
- static void sec_alg_resource_free(struct sec_ctx *ctx,
-@@ -196,6 +275,9 @@ static void sec_alg_resource_free(struct sec_ctx *ctx,
- 	struct device *dev = SEC_CTX_DEV(ctx);
- 
- 	sec_free_civ_resource(dev, qp_ctx->res);
-+
-+	if (ctx->alg_type == SEC_AEAD)
-+		sec_free_mac_resource(dev, qp_ctx->res);
- }
- 
- static int sec_create_qp_ctx(struct hisi_qm *qm, struct sec_ctx *ctx,
-@@ -339,12 +421,34 @@ static void sec_cipher_uninit(struct sec_ctx *ctx)
- 			  c_ctx->c_key, c_ctx->c_key_dma);
- }
- 
-+static int sec_auth_init(struct sec_ctx *ctx)
-+{
-+	struct sec_auth_ctx *a_ctx = &ctx->a_ctx;
-+
-+	a_ctx->a_key = dma_alloc_coherent(SEC_CTX_DEV(ctx), SEC_MAX_KEY_SIZE,
-+					  &a_ctx->a_key_dma, GFP_KERNEL);
-+	if (!a_ctx->a_key)
-+		return -ENOMEM;
-+
-+	return 0;
-+}
-+
-+static void sec_auth_uninit(struct sec_ctx *ctx)
-+{
-+	struct sec_auth_ctx *a_ctx = &ctx->a_ctx;
-+
-+	memzero_explicit(a_ctx->a_key, SEC_MAX_KEY_SIZE);
-+	dma_free_coherent(SEC_CTX_DEV(ctx), SEC_MAX_KEY_SIZE,
-+			  a_ctx->a_key, a_ctx->a_key_dma);
-+}
-+
- static int sec_skcipher_init(struct crypto_skcipher *tfm)
- {
- 	struct sec_ctx *ctx = crypto_skcipher_ctx(tfm);
- 	int ret;
- 
- 	ctx = crypto_skcipher_ctx(tfm);
-+	ctx->alg_type = SEC_SKCIPHER;
- 	crypto_skcipher_set_reqsize(tfm, sizeof(struct sec_req));
- 	ctx->c_ctx.ivsize = crypto_skcipher_ivsize(tfm);
- 	if (ctx->c_ctx.ivsize > SEC_IV_SIZE) {
-@@ -547,6 +651,126 @@ static void sec_skcipher_sgl_unmap(struct sec_ctx *ctx, struct sec_req *req)
- 	sec_cipher_unmap(dev, c_req, sk_req->src, sk_req->dst);
- }
- 
-+static int sec_aead_aes_set_key(struct sec_cipher_ctx *c_ctx,
-+				struct crypto_authenc_keys *keys)
-+{
-+	switch (keys->enckeylen) {
-+	case AES_KEYSIZE_128:
-+		c_ctx->c_key_len = SEC_CKEY_128BIT;
-+		break;
-+	case AES_KEYSIZE_192:
-+		c_ctx->c_key_len = SEC_CKEY_192BIT;
-+		break;
-+	case AES_KEYSIZE_256:
-+		c_ctx->c_key_len = SEC_CKEY_256BIT;
-+		break;
-+	default:
-+		pr_err("hisi_sec2: aead aes key error!\n");
-+		return -EINVAL;
-+	}
-+	memcpy(c_ctx->c_key, keys->enckey, keys->enckeylen);
-+
-+	return 0;
-+}
-+
-+static int sec_aead_auth_set_key(struct sec_auth_ctx *ctx,
-+				 struct crypto_authenc_keys *keys)
-+{
-+	struct crypto_shash *hash_tfm = ctx->hash_tfm;
-+	SHASH_DESC_ON_STACK(shash, hash_tfm);
-+	int blocksize, ret;
-+
-+	if (!keys->authkeylen) {
-+		pr_err("hisi_sec2: aead auth key error!\n");
-+		return -EINVAL;
-+	}
-+
-+	blocksize = crypto_shash_blocksize(hash_tfm);
-+	if (keys->authkeylen > blocksize) {
-+		ret = crypto_shash_digest(shash, keys->authkey,
-+					  keys->authkeylen, ctx->a_key);
-+		if (ret) {
-+			pr_err("hisi_sec2: aead auth disgest error!\n");
-+			return -EINVAL;
-+		}
-+		ctx->a_key_len = blocksize;
-+	} else {
-+		memcpy(ctx->a_key, keys->authkey, keys->authkeylen);
-+		ctx->a_key_len = keys->authkeylen;
-+	}
-+
-+	return 0;
-+}
-+
-+static int sec_aead_setkey(struct crypto_aead *tfm, const u8 *key,
-+			   const u32 keylen, const enum sec_hash_alg a_alg,
-+			   const enum sec_calg c_alg,
-+			   const enum sec_mac_len mac_len,
-+			   const enum sec_cmode c_mode)
-+{
-+	struct sec_ctx *ctx = crypto_aead_ctx(tfm);
-+	struct sec_cipher_ctx *c_ctx = &ctx->c_ctx;
-+	struct crypto_authenc_keys keys;
-+	int ret;
-+
-+	ctx->a_ctx.a_alg = a_alg;
-+	ctx->c_ctx.c_alg = c_alg;
-+	ctx->a_ctx.mac_len = mac_len;
-+	c_ctx->c_mode = c_mode;
-+
-+	if (crypto_authenc_extractkeys(&keys, key, keylen))
-+		goto bad_key;
-+
-+	ret = sec_aead_aes_set_key(c_ctx, &keys);
-+	if (ret) {
-+		dev_err(SEC_CTX_DEV(ctx), "set sec cipher key err!\n");
-+		goto bad_key;
-+	}
-+
-+	ret = sec_aead_auth_set_key(&ctx->a_ctx, &keys);
-+	if (ret) {
-+		dev_err(SEC_CTX_DEV(ctx), "set sec auth key err!\n");
-+		goto bad_key;
-+	}
-+
-+	return 0;
-+bad_key:
-+	memzero_explicit(&keys, sizeof(struct crypto_authenc_keys));
-+
-+	return -EINVAL;
-+}
-+
-+
-+#define GEN_SEC_AEAD_SETKEY_FUNC(name, aalg, calg, maclen, cmode)	\
-+static int sec_setkey_##name(struct crypto_aead *tfm, const u8 *key,	\
-+	u32 keylen)							\
-+{									\
-+	return sec_aead_setkey(tfm, key, keylen, aalg, calg, maclen, cmode);\
-+}
-+
-+GEN_SEC_AEAD_SETKEY_FUNC(aes_cbc_sha1, SEC_A_HMAC_SHA1,
-+			 SEC_CALG_AES, SEC_HMAC_SHA1_MAC, SEC_CMODE_CBC)
-+GEN_SEC_AEAD_SETKEY_FUNC(aes_cbc_sha256, SEC_A_HMAC_SHA256,
-+			 SEC_CALG_AES, SEC_HMAC_SHA256_MAC, SEC_CMODE_CBC)
-+GEN_SEC_AEAD_SETKEY_FUNC(aes_cbc_sha512, SEC_A_HMAC_SHA512,
-+			 SEC_CALG_AES, SEC_HMAC_SHA512_MAC, SEC_CMODE_CBC)
-+
-+static int sec_aead_sgl_map(struct sec_ctx *ctx, struct sec_req *req)
-+{
-+	struct aead_request *aq = req->aead_req.aead_req;
-+
-+	return sec_cipher_map(SEC_CTX_DEV(ctx), req, aq->src, aq->dst);
-+}
-+
-+static void sec_aead_sgl_unmap(struct sec_ctx *ctx, struct sec_req *req)
-+{
-+	struct device *dev = SEC_CTX_DEV(ctx);
-+	struct sec_cipher_req *cq = &req->c_req;
-+	struct aead_request *aq = req->aead_req.aead_req;
-+
-+	sec_cipher_unmap(dev, cq, aq->src, aq->dst);
-+}
-+
- static int sec_request_transfer(struct sec_ctx *ctx, struct sec_req *req)
- {
- 	int ret;
-@@ -629,20 +853,31 @@ static int sec_skcipher_bd_fill(struct sec_ctx *ctx, struct sec_req *req)
- 	return 0;
- }
- 
--static void sec_update_iv(struct sec_req *req)
-+static void sec_update_iv(struct sec_req *req, enum sec_alg_type alg_type)
- {
-+	struct aead_request *aead_req = req->aead_req.aead_req;
- 	struct skcipher_request *sk_req = req->c_req.sk_req;
- 	u32 iv_size = req->ctx->c_ctx.ivsize;
- 	struct scatterlist *sgl;
-+	unsigned int cryptlen;
- 	size_t sz;
-+	u8 *iv;
- 
- 	if (req->c_req.encrypt)
--		sgl = sk_req->dst;
-+		sgl = alg_type == SEC_SKCIPHER ? sk_req->dst : aead_req->dst;
- 	else
--		sgl = sk_req->src;
-+		sgl = alg_type == SEC_SKCIPHER ? sk_req->src : aead_req->src;
-+
-+	if (alg_type == SEC_SKCIPHER) {
-+		iv = sk_req->iv;
-+		cryptlen = sk_req->cryptlen;
-+	} else {
-+		iv = aead_req->iv;
-+		cryptlen = aead_req->cryptlen;
-+	}
- 
--	sz = sg_pcopy_to_buffer(sgl, sg_nents(sgl), sk_req->iv,
--				iv_size, sk_req->cryptlen - iv_size);
-+	sz = sg_pcopy_to_buffer(sgl, sg_nents(sgl), iv, iv_size,
-+				cryptlen - iv_size);
- 	if (unlikely(sz != iv_size))
- 		dev_err(SEC_CTX_DEV(req->ctx), "copy output iv error!\n");
- }
-@@ -658,7 +893,7 @@ static void sec_skcipher_callback(struct sec_ctx *ctx, struct sec_req *req,
- 
- 	/* IV output at encrypto of CBC mode */
- 	if (!err && ctx->c_ctx.c_mode == SEC_CMODE_CBC && req->c_req.encrypt)
--		sec_update_iv(req);
-+		sec_update_iv(req, SEC_SKCIPHER);
- 
- 	if (req->fake_busy)
- 		sk_req->base.complete(&sk_req->base, -EINPROGRESS);
-@@ -666,6 +901,102 @@ static void sec_skcipher_callback(struct sec_ctx *ctx, struct sec_req *req,
- 	sk_req->base.complete(&sk_req->base, err);
- }
- 
-+static void sec_aead_copy_iv(struct sec_ctx *ctx, struct sec_req *req)
-+{
-+	struct aead_request *aead_req = req->aead_req.aead_req;
-+	u8 *c_ivin = req->qp_ctx->res[req->req_id].c_ivin;
-+
-+	memcpy(c_ivin, aead_req->iv, ctx->c_ctx.ivsize);
-+}
-+
-+static void sec_auth_bd_fill_ex(struct sec_auth_ctx *ctx, int dir,
-+			       struct sec_req *req, struct sec_sqe *sec_sqe)
-+{
-+	struct sec_aead_req *a_req = &req->aead_req;
-+	struct sec_cipher_req *c_req = &req->c_req;
-+	struct aead_request *aq = a_req->aead_req;
-+
-+	sec_sqe->type2.a_key_addr = cpu_to_le64(ctx->a_key_dma);
-+
-+	sec_sqe->type2.mac_key_alg =
-+			cpu_to_le32(ctx->mac_len / SEC_SQE_LEN_RATE);
-+
-+	sec_sqe->type2.mac_key_alg |=
-+			cpu_to_le32((u32)((ctx->a_key_len) /
-+			SEC_SQE_LEN_RATE) << SEC_AKEY_OFFSET);
-+
-+	sec_sqe->type2.mac_key_alg |=
-+			cpu_to_le32((u32)(ctx->a_alg) << SEC_AEAD_ALG_OFFSET);
-+
-+	sec_sqe->type_cipher_auth |= SEC_AUTH_TYPE1 << SEC_AUTH_OFFSET;
-+
-+	if (dir)
-+		sec_sqe->sds_sa_type &= SEC_CIPHER_AUTH;
-+	else
-+		sec_sqe->sds_sa_type |= SEC_AUTH_CIPHER;
-+
-+	sec_sqe->type2.alen_ivllen = cpu_to_le32(c_req->c_len + aq->assoclen);
-+
-+	sec_sqe->type2.cipher_src_offset = cpu_to_le16((u16)aq->assoclen);
-+
-+	sec_sqe->type2.mac_addr =
-+		cpu_to_le64(req->qp_ctx->res[req->req_id].out_mac_dma);
-+}
-+
-+static int sec_aead_bd_fill(struct sec_ctx *ctx, struct sec_req *req)
-+{
-+	struct sec_auth_ctx *auth_ctx = &ctx->a_ctx;
-+	struct sec_sqe *sec_sqe = &req->sec_sqe;
-+	int ret;
-+
-+	ret = sec_skcipher_bd_fill(ctx, req);
-+	if (unlikely(ret)) {
-+		dev_err(SEC_CTX_DEV(ctx), "skcipher bd fill is error!\n");
-+		return ret;
-+	}
-+
-+	sec_auth_bd_fill_ex(auth_ctx, req->c_req.encrypt, req, sec_sqe);
-+
-+	return 0;
-+}
-+
-+static void sec_aead_callback(struct sec_ctx *c, struct sec_req *req, int err)
-+{
-+	struct aead_request *a_req = req->aead_req.aead_req;
-+	struct crypto_aead *tfm = crypto_aead_reqtfm(a_req);
-+	struct sec_cipher_req *c_req = &req->c_req;
-+	size_t authsize = crypto_aead_authsize(tfm);
-+	struct sec_qp_ctx *qp_ctx = req->qp_ctx;
-+	size_t sz;
-+
-+	atomic_dec(&qp_ctx->pending_reqs);
-+
-+	if (!err && c->c_ctx.c_mode == SEC_CMODE_CBC && c_req->encrypt)
-+		sec_update_iv(req, SEC_AEAD);
-+
-+	/* Copy output mac */
-+	if (!err && c_req->encrypt) {
-+		struct scatterlist *sgl = a_req->dst;
-+
-+		sz = sg_pcopy_from_buffer(sgl, sg_nents(sgl),
-+					  qp_ctx->res[req->req_id].out_mac,
-+					  authsize, a_req->cryptlen +
-+					  a_req->assoclen);
-+
-+		if (unlikely(sz != authsize)) {
-+			dev_err(SEC_CTX_DEV(req->ctx), "copy out mac err!\n");
-+			err = -EINVAL;
-+		}
-+	}
-+
-+	sec_free_req_id(req);
-+
-+	if (req->fake_busy)
-+		a_req->base.complete(&a_req->base, -EINPROGRESS);
-+
-+	a_req->base.complete(&a_req->base, err);
-+}
-+
- static void sec_request_uninit(struct sec_ctx *ctx, struct sec_req *req)
- {
- 	struct sec_qp_ctx *qp_ctx = req->qp_ctx;
-@@ -712,7 +1043,7 @@ static int sec_process(struct sec_ctx *ctx, struct sec_req *req)
- 
- 	/* Output IV as decrypto */
- 	if (ctx->c_ctx.c_mode == SEC_CMODE_CBC && !req->c_req.encrypt)
--		sec_update_iv(req);
-+		sec_update_iv(req, ctx->alg_type);
- 
- 	ret = ctx->req_op->bd_send(ctx, req);
- 	if (unlikely(ret != -EBUSY && ret != -EINPROGRESS)) {
-@@ -724,10 +1055,16 @@ static int sec_process(struct sec_ctx *ctx, struct sec_req *req)
- 
- err_send_req:
- 	/* As failing, restore the IV from user */
--	if (ctx->c_ctx.c_mode == SEC_CMODE_CBC && !req->c_req.encrypt)
--		memcpy(req->c_req.sk_req->iv,
--		       req->qp_ctx->res[req->req_id].c_ivin,
--		       ctx->c_ctx.ivsize);
-+	if (ctx->c_ctx.c_mode == SEC_CMODE_CBC && !req->c_req.encrypt) {
-+		if (ctx->alg_type == SEC_SKCIPHER)
-+			memcpy(req->c_req.sk_req->iv,
-+			       req->qp_ctx->res[req->req_id].c_ivin,
-+			       ctx->c_ctx.ivsize);
-+		else
-+			memcpy(req->aead_req.aead_req->iv,
-+			       req->qp_ctx->res[req->req_id].c_ivin,
-+			       ctx->c_ctx.ivsize);
-+	}
- 
- 	sec_request_untransfer(ctx, req);
- err_uninit_req:
-@@ -746,6 +1083,16 @@ static const struct sec_req_op sec_skcipher_req_ops = {
- 	.process	= sec_process,
- };
- 
-+static const struct sec_req_op sec_aead_req_ops = {
-+	.buf_map	= sec_aead_sgl_map,
-+	.buf_unmap	= sec_aead_sgl_unmap,
-+	.do_transfer	= sec_aead_copy_iv,
-+	.bd_fill	= sec_aead_bd_fill,
-+	.bd_send	= sec_bd_send,
-+	.callback	= sec_aead_callback,
-+	.process	= sec_process,
-+};
-+
- static int sec_skcipher_ctx_init(struct crypto_skcipher *tfm)
- {
- 	struct sec_ctx *ctx = crypto_skcipher_ctx(tfm);
-@@ -760,6 +1107,96 @@ static void sec_skcipher_ctx_exit(struct crypto_skcipher *tfm)
- 	sec_skcipher_uninit(tfm);
- }
- 
-+static int sec_aead_init(struct crypto_aead *tfm)
-+{
-+	struct sec_ctx *ctx = crypto_aead_ctx(tfm);
-+	int ret;
-+
-+	crypto_aead_set_reqsize(tfm, sizeof(struct sec_req));
-+	ctx->alg_type = SEC_AEAD;
-+	ctx->c_ctx.ivsize = crypto_aead_ivsize(tfm);
-+	if (ctx->c_ctx.ivsize > SEC_IV_SIZE) {
-+		dev_err(SEC_CTX_DEV(ctx), "get error aead iv size!\n");
-+		return -EINVAL;
-+	}
-+
-+	ctx->req_op = &sec_aead_req_ops;
-+	ret = sec_ctx_base_init(ctx);
-+	if (ret)
-+		return ret;
-+
-+	ret = sec_auth_init(ctx);
-+	if (ret)
-+		goto err_auth_init;
-+
-+	ret = sec_cipher_init(ctx);
-+	if (ret)
-+		goto err_cipher_init;
-+
-+	return ret;
-+
-+err_cipher_init:
-+	sec_auth_uninit(ctx);
-+err_auth_init:
-+	sec_ctx_base_uninit(ctx);
-+
-+	return ret;
-+}
-+
-+static void sec_aead_exit(struct crypto_aead *tfm)
-+{
-+	struct sec_ctx *ctx = crypto_aead_ctx(tfm);
-+
-+	sec_cipher_uninit(ctx);
-+	sec_auth_uninit(ctx);
-+	sec_ctx_base_uninit(ctx);
-+}
-+
-+static int sec_aead_ctx_init(struct crypto_aead *tfm, const char *hash_name)
-+{
-+	struct sec_ctx *ctx = crypto_aead_ctx(tfm);
-+	struct sec_auth_ctx *auth_ctx = &ctx->a_ctx;
-+	int ret;
-+
-+	ret = sec_aead_init(tfm);
-+	if (ret) {
-+		pr_err("hisi_sec2: aead init error!\n");
-+		return ret;
-+	}
-+
-+	auth_ctx->hash_tfm = crypto_alloc_shash(hash_name, 0, 0);
-+	if (IS_ERR(auth_ctx->hash_tfm)) {
-+		dev_err(SEC_CTX_DEV(ctx), "aead alloc shash error!\n");
-+		sec_aead_exit(tfm);
-+		return PTR_ERR(auth_ctx->hash_tfm);
-+	}
-+
-+	return 0;
-+}
-+
-+static void sec_aead_ctx_exit(struct crypto_aead *tfm)
-+{
-+	struct sec_ctx *ctx = crypto_aead_ctx(tfm);
-+
-+	crypto_free_shash(ctx->a_ctx.hash_tfm);
-+	sec_aead_exit(tfm);
-+}
-+
-+static int sec_aead_sha1_ctx_init(struct crypto_aead *tfm)
-+{
-+	return sec_aead_ctx_init(tfm, "sha1");
-+}
-+
-+static int sec_aead_sha256_ctx_init(struct crypto_aead *tfm)
-+{
-+	return sec_aead_ctx_init(tfm, "sha256");
-+}
-+
-+static int sec_aead_sha512_ctx_init(struct crypto_aead *tfm)
-+{
-+	return sec_aead_ctx_init(tfm, "sha512");
-+}
-+
- static int sec_skcipher_param_check(struct sec_ctx *ctx, struct sec_req *sreq)
- {
- 	struct skcipher_request *sk_req = sreq->c_req.sk_req;
-@@ -877,25 +1314,133 @@ static struct skcipher_alg sec_skciphers[] = {
- 			 AES_BLOCK_SIZE, AES_BLOCK_SIZE)
- };
- 
-+static int sec_aead_param_check(struct sec_ctx *ctx, struct sec_req *sreq)
-+{
-+	u8 c_alg = ctx->c_ctx.c_alg;
-+	struct aead_request *req = sreq->aead_req.aead_req;
-+	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
-+	size_t authsize = crypto_aead_authsize(tfm);
-+
-+	if (unlikely(!req->src || !req->dst || !req->cryptlen)) {
-+		dev_err(SEC_CTX_DEV(ctx), "aead input param error!\n");
-+		return -EINVAL;
-+	}
-+
-+	/* Support AES only */
-+	if (unlikely(c_alg != SEC_CALG_AES)) {
-+		dev_err(SEC_CTX_DEV(ctx), "aead crypto alg error!\n");
-+		return -EINVAL;
-+
-+	}
-+	if (sreq->c_req.encrypt)
-+		sreq->c_req.c_len = req->cryptlen;
-+	else
-+		sreq->c_req.c_len = req->cryptlen - authsize;
-+
-+	if (unlikely(sreq->c_req.c_len & (AES_BLOCK_SIZE - 1))) {
-+		dev_err(SEC_CTX_DEV(ctx), "aead crypto length error!\n");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static int sec_aead_crypto(struct aead_request *a_req, bool encrypt)
-+{
-+	struct crypto_aead *tfm = crypto_aead_reqtfm(a_req);
-+	struct sec_req *req = aead_request_ctx(a_req);
-+	struct sec_ctx *ctx = crypto_aead_ctx(tfm);
-+	int ret;
-+
-+	req->aead_req.aead_req = a_req;
-+	req->c_req.encrypt = encrypt;
-+	req->ctx = ctx;
-+
-+	ret = sec_aead_param_check(ctx, req);
-+	if (unlikely(ret))
-+		return -EINVAL;
-+
-+	return ctx->req_op->process(ctx, req);
-+}
-+
-+static int sec_aead_encrypt(struct aead_request *a_req)
-+{
-+	return sec_aead_crypto(a_req, true);
-+}
-+
-+static int sec_aead_decrypt(struct aead_request *a_req)
-+{
-+	return sec_aead_crypto(a_req, false);
-+}
-+
-+#define SEC_AEAD_GEN_ALG(sec_cra_name, sec_set_key, ctx_init,\
-+			 ctx_exit, blk_size, iv_size, max_authsize)\
-+{\
-+	.base = {\
-+		.cra_name = sec_cra_name,\
-+		.cra_driver_name = "hisi_sec_"sec_cra_name,\
-+		.cra_priority = SEC_PRIORITY,\
-+		.cra_flags = CRYPTO_ALG_ASYNC,\
-+		.cra_blocksize = blk_size,\
-+		.cra_ctxsize = sizeof(struct sec_ctx),\
-+		.cra_module = THIS_MODULE,\
-+	},\
-+	.init = ctx_init,\
-+	.exit = ctx_exit,\
-+	.setkey = sec_set_key,\
-+	.decrypt = sec_aead_decrypt,\
-+	.encrypt = sec_aead_encrypt,\
-+	.ivsize = iv_size,\
-+	.maxauthsize = max_authsize,\
-+}
-+
-+#define SEC_AEAD_ALG(algname, keyfunc, aead_init, blksize, ivsize, authsize)\
-+	SEC_AEAD_GEN_ALG(algname, keyfunc, aead_init,\
-+			sec_aead_ctx_exit, blksize, ivsize, authsize)
-+
-+static struct aead_alg sec_aeads[] = {
-+	SEC_AEAD_ALG("authenc(hmac(sha1),cbc(aes))",
-+		     sec_setkey_aes_cbc_sha1, sec_aead_sha1_ctx_init,
-+		     AES_BLOCK_SIZE, AES_BLOCK_SIZE, SHA1_DIGEST_SIZE),
-+
-+	SEC_AEAD_ALG("authenc(hmac(sha256),cbc(aes))",
-+		     sec_setkey_aes_cbc_sha256, sec_aead_sha256_ctx_init,
-+		     AES_BLOCK_SIZE, AES_BLOCK_SIZE, SHA256_DIGEST_SIZE),
-+
-+	SEC_AEAD_ALG("authenc(hmac(sha512),cbc(aes))",
-+		     sec_setkey_aes_cbc_sha512, sec_aead_sha512_ctx_init,
-+		     AES_BLOCK_SIZE, AES_BLOCK_SIZE, SHA512_DIGEST_SIZE),
-+};
-+
- int sec_register_to_crypto(void)
- {
- 	int ret = 0;
- 
- 	/* To avoid repeat register */
--	mutex_lock(&sec_algs_lock);
--	if (++sec_active_devs == 1)
-+	if (atomic_add_return(1, &sec_active_devs) == 1) {
- 		ret = crypto_register_skciphers(sec_skciphers,
- 						ARRAY_SIZE(sec_skciphers));
--	mutex_unlock(&sec_algs_lock);
-+		if (ret)
-+			return ret;
-+
-+		ret = crypto_register_aeads(sec_aeads, ARRAY_SIZE(sec_aeads));
-+		if (ret)
-+			goto reg_aead_fail;
-+	}
-+
-+	return ret;
-+
-+reg_aead_fail:
-+	crypto_unregister_skciphers(sec_skciphers, ARRAY_SIZE(sec_skciphers));
- 
- 	return ret;
- }
- 
- void sec_unregister_from_crypto(void)
- {
--	mutex_lock(&sec_algs_lock);
--	if (--sec_active_devs == 0)
-+	if (atomic_sub_return(1, &sec_active_devs) == 0) {
- 		crypto_unregister_skciphers(sec_skciphers,
- 					    ARRAY_SIZE(sec_skciphers));
--	mutex_unlock(&sec_algs_lock);
-+		crypto_unregister_aeads(sec_aeads, ARRAY_SIZE(sec_aeads));
-+	}
- }
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.h b/drivers/crypto/hisilicon/sec2/sec_crypto.h
-index 46b3a35..b2786e1 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.h
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.h
-@@ -14,6 +14,18 @@ enum sec_calg {
- 	SEC_CALG_SM4  = 0x3,
- };
- 
-+enum sec_hash_alg {
-+	SEC_A_HMAC_SHA1   = 0x10,
-+	SEC_A_HMAC_SHA256 = 0x11,
-+	SEC_A_HMAC_SHA512 = 0x15,
-+};
-+
-+enum sec_mac_len {
-+	SEC_HMAC_SHA1_MAC   = 20,
-+	SEC_HMAC_SHA256_MAC = 32,
-+	SEC_HMAC_SHA512_MAC = 64,
-+};
-+
- enum sec_cmode {
- 	SEC_CMODE_ECB    = 0x0,
- 	SEC_CMODE_CBC    = 0x1,
-@@ -34,6 +46,12 @@ enum sec_bd_type {
- 	SEC_BD_TYPE2 = 0x2,
- };
- 
-+enum sec_auth {
-+	SEC_NO_AUTH = 0x0,
-+	SEC_AUTH_TYPE1 = 0x1,
-+	SEC_AUTH_TYPE2 = 0x2,
-+};
-+
- enum sec_cipher_dir {
- 	SEC_CIPHER_ENC = 0x1,
- 	SEC_CIPHER_DEC = 0x2,
+This series and related zip & qm driver
+https://github.com/Linaro/linux-kernel-warpdrive/tree/v5.5-rc1-uacce-v11
+
+The library and user application:
+https://github.com/Linaro/warpdrive/tree/wdprd-upstream-v11
+
+References:
+[1] http://jpbrucker.net/sva/
+[2] http://jpbrucker.net/git/linux/log/?h=sva/zip-devel
+[3] https://github.com/eauger/linux/tree/v5.3.0-rc0-2stage-v9
+
+The series contains 4 patches,
+Patch 1 & 2 are for uacce
+Patch 3 & 4 are an example using uacce, which happens to be crypto, can be merged later.
+
+Change History:
+v11:
+add Reviewed-by, and fix one mismatch with sys
+
+v10:
+Modify the include header to fix kbuild test erorr in other arch.
+
+v9:
+Suggested by Jonathan
+1. Remove sysfs: numa_distance, node_id, id, also add is_visible callback
+2. Split the api to solve the potential race
+struct uacce_device *uacce_alloc(struct device *parent,
+				 struct uacce_interface *interface)
+int uacce_register(struct uacce_device *uacce)
+void uacce_remove(struct uacce_device *uacce)
+3. Split clean up patch 03
+
+v8:
+Address some comments from Jonathan
+Merge Jean's patch, using uacce_mm instead of pid for sva_exit
+
+v7:
+As suggested by Jean and Jerome
+Only consider sva case and remove unused dma apis for the first patch.
+Also add mm_exit for sva and vm_ops.close etc
+
+
+v6: https://lkml.org/lkml/2019/10/16/231
+Change sys qfrs_size to different file, suggested by Jonathan
+Fix crypto daily build issue and based on crypto code base, also 5.4-rc1.
+
+v5: https://lkml.org/lkml/2019/10/14/74
+Add an example patch using the uacce interface, suggested by Greg
+0003-crypto-hisilicon-register-zip-engine-to-uacce.patch
+
+v4: https://lkml.org/lkml/2019/9/17/116
+Based on 5.4-rc1
+Considering other driver integrating uacce, 
+if uacce not compiled, uacce_register return error and uacce_unregister is empty.
+Simplify uacce flag: UACCE_DEV_SVA.
+Address Greg's comments: 
+Fix state machine, remove potential syslog triggered from user space etc.
+
+v3: https://lkml.org/lkml/2019/9/2/990
+Recommended by Greg, use sturct uacce_device instead of struct uacce,
+and use struct *cdev in struct uacce_device, as a result, 
+cdev can be released by itself when refcount decreased to 0.
+So the two structures are decoupled and self-maintained by themsleves.
+Also add dev.release for put_device.
+
+v2: https://lkml.org/lkml/2019/8/28/565
+Address comments from Greg and Jonathan
+Modify interface uacce_register
+Drop noiommu mode first
+
+v1: https://lkml.org/lkml/2019/8/14/277
+1. Rebase to 5.3-rc1
+2. Build on iommu interface
+3. Verifying with Jean's sva and Eric's nested mode iommu.
+4. User library has developed a lot: support zlib, openssl etc.
+5. Move to misc first
+
+RFC3:
+https://lkml.org/lkml/2018/11/12/1951
+
+RFC2:
+https://lwn.net/Articles/763990/
+
+
+Background of why Uacce:
+Von Neumann processor is not good at general data manipulation.
+It is designed for control-bound rather than data-bound application.
+The latter need less control path facility and more/specific ALUs.
+So there are more and more heterogeneous processors, such as
+encryption/decryption accelerators, TPUs, or
+EDGE (Explicated Data Graph Execution) processors, introduced to gain
+better performance or power efficiency for particular applications
+these days.
+
+There are generally two ways to make use of these heterogeneous processors:
+
+The first is to make them co-processors, just like FPU.
+This is good for some application but it has its own cons:
+It changes the ISA set permanently.
+You must save all state elements when the process is switched out.
+But most data-bound processors have a huge set of state elements.
+It makes the kernel scheduler more complex.
+
+The second is Accelerator.
+It is taken as a IO device from the CPU's point of view
+(but it need not to be physically). The process, running on CPU,
+hold a context of the accelerator and send instructions to it as if
+it calls a function or thread running with FPU.
+The context is bound with the processor itself.
+So the state elements remain in the hardware context until
+the context is released.
+
+We believe this is the core feature of an "Accelerator" vs. Co-processor
+or other heterogeneous processors.
+
+The intention of Uacce is to provide the basic facility to backup
+this scenario. Its first step is to make sure the accelerator and process
+can share the same address space. So the accelerator ISA can directly
+address any data structure of the main CPU.
+This differs from the data sharing between CPU and IO device,
+which share data content rather than address.
+So it is different comparing to the other DMA libraries.
+
+In the future, we may add more facility to support linking accelerator
+library to the main application, or managing the accelerator context as
+special thread.
+But no matter how, this can be a solid start point for new processor
+to be used as an "accelerator" as this is the essential requirement.
+
+
+The Fork Scenario
+=================
+For a process with allocated queues and shared memory, what happen if it forks
+a child?
+
+The fd of the queue is duplicated on fork, but requests sent from the child
+process are blocked.
+
+It is recommended to add O_CLOEXEC to the queue file.
+
+The queue mmap space has a VM_DONTCOPY in its VMA. So the child will lose all
+those VMAs.
+
+This is a reason why Uacce does not adopt the mode used in VFIO and
+InfiniBand.  Both solutions can set any user pointer for hardware sharing.
+But they cannot support fork when the dma is in process. Or the
+"Copy-On-Write" procedure will make the parent process lost its physical
+pages.
+
+
+Difference to the VFIO and IB framework
+---------------------------------------
+The essential function of Uacce is to let the device access the user
+address directly. There are many device drivers doing the same in the kernel.
+And both VFIO and IB can provide similar functions in framework level.
+
+But Uacce has a different goal: "share address space". It is
+not taken the request to the accelerator as an enclosure data structure. It
+takes the accelerator as another thread of the same process. So the
+accelerator can refer to any address used by the process.
+
+Both VFIO and IB are taken this as "memory sharing", not "address sharing".
+They care more on sharing the block of memory. But if there is an address
+stored in the block and referring to another memory region. The address may
+not be valid.
+
+By adding more constraints to the VFIO and IB framework, in some sense, we may
+achieve a similar goal. But we gave it up finally. Both VFIO and IB have extra
+assumption which is unnecessary to Uacce. They may hurt each other if we
+try to merge them together.
+
+VFIO manages resource of a hardware as a "virtual device". If a device need to
+serve a separated application. It must isolate the resource as a separate
+virtual device.  And the life cycle of the application and virtual device are
+unnecessary unrelated. And most concepts, such as bus, driver, probe and
+so on, to make it as a "device" is unnecessary either. And the logic added to
+VFIO to make address sharing do no help on "creating a virtual device".
+
+IB creates a "verbs" standard for sharing memory region to another remote
+entity.  Most of these verbs are to make memory region between entities to be
+synchronized.  This is not what accelerator need. Accelerator is in the same
+memory system with the CPU. It refers to the same memory system among CPU and
+devices. So the local memory terms/verbs are good enough for it. Extra "verbs"
+are not necessary. And its queue (like queue pair in IB) is the communication
+channel direct to the accelerator hardware. There is nothing about memory
+itself.
+
+Further, both VFIO and IB use the "pin" (get_user_page) way to lock local
+memory in place.  This is flexible. But it can cause other problems. For
+example, if the user process fork a child process. The COW procedure may make
+the parent process lost its pages which are sharing with the device. These may
+be fixed in the future. But is not going to be easy. (There is a discussion
+about this on Linux Plumbers Conference 2018 [1])
+
+So we choose to build the solution directly on top of IOMMU interface. IOMMU
+is the essential way for device and process to share their page mapping from
+the hardware perspective. It will be safe to create a software solution on
+this assumption.  Uacce manages the IOMMU interface for the accelerator
+device, so the device driver can export some of the resources to the user
+space. Uacce than can make sure the device and the process have the same
+address space.
+
+
+References
+==========
+.. [1] https://lwn.net/Articles/774411/
+
+Kenneth Lee (2):
+  uacce: Add documents for uacce
+  uacce: add uacce driver
+
+Zhangfei Gao (2):
+  crypto: hisilicon - Remove module_param uacce_mode
+  crypto: hisilicon - register zip engine to uacce
+
+ Documentation/ABI/testing/sysfs-driver-uacce |  39 ++
+ Documentation/misc-devices/uacce.rst         | 176 ++++++++
+ drivers/crypto/hisilicon/qm.c                | 236 +++++++++-
+ drivers/crypto/hisilicon/qm.h                |  11 +
+ drivers/crypto/hisilicon/zip/zip_main.c      |  47 +-
+ drivers/misc/Kconfig                         |   1 +
+ drivers/misc/Makefile                        |   1 +
+ drivers/misc/uacce/Kconfig                   |  13 +
+ drivers/misc/uacce/Makefile                  |   2 +
+ drivers/misc/uacce/uacce.c                   | 626 +++++++++++++++++++++++++++
+ include/linux/uacce.h                        | 161 +++++++
+ include/uapi/misc/uacce/hisi_qm.h            |  23 +
+ include/uapi/misc/uacce/uacce.h              |  38 ++
+ 13 files changed, 1341 insertions(+), 33 deletions(-)
+ create mode 100644 Documentation/ABI/testing/sysfs-driver-uacce
+ create mode 100644 Documentation/misc-devices/uacce.rst
+ create mode 100644 drivers/misc/uacce/Kconfig
+ create mode 100644 drivers/misc/uacce/Makefile
+ create mode 100644 drivers/misc/uacce/uacce.c
+ create mode 100644 include/linux/uacce.h
+ create mode 100644 include/uapi/misc/uacce/hisi_qm.h
+ create mode 100644 include/uapi/misc/uacce/uacce.h
+
 -- 
-2.8.1
+2.7.4
 
