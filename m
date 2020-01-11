@@ -6,21 +6,21 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C05A1C33CA4
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Jan 2020 09:02:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 780D1C3F68F
+	for <linux-crypto@archiver.kernel.org>; Sat, 11 Jan 2020 09:02:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A0A512077C
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Jan 2020 09:02:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 583E320842
+	for <linux-crypto@archiver.kernel.org>; Sat, 11 Jan 2020 09:02:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728031AbgAKJCO (ORCPT
+        id S1728027AbgAKJCO (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Sat, 11 Jan 2020 04:02:14 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:8694 "EHLO huawei.com"
+Received: from szxga05-in.huawei.com ([45.249.212.191]:8697 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728346AbgAKJCN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 11 Jan 2020 04:02:13 -0500
+        id S1728417AbgAKJCO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 11 Jan 2020 04:02:14 -0500
 Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id DA5FF426E62474ECB505;
+        by Forcepoint Email with ESMTP id DEBE2DB374B07D05D707;
         Sat, 11 Jan 2020 17:02:11 +0800 (CST)
 Received: from localhost.localdomain (10.67.165.24) by
  DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
@@ -32,9 +32,9 @@ CC:     <linux-crypto@vger.kernel.org>, <linuxarm@huawei.com>,
         <tanghui20@huawei.com>, <yekai13@huawei.com>,
         <liulongfang@huawei.com>, <qianweili@huawei.com>,
         <fanghao11@huawei.com>, <forest.zhouchang@huawei.com>
-Subject: [PATCH 4/4] crypto: hisilicon - add branch prediction macro
-Date:   Sat, 11 Jan 2020 16:58:18 +0800
-Message-ID: <1578733098-13863-5-git-send-email-xuzaibo@huawei.com>
+Subject: [PATCH 1/4] crypto: hisilicon - Bugfixed tfm leak
+Date:   Sat, 11 Jan 2020 16:58:15 +0800
+Message-ID: <1578733098-13863-2-git-send-email-xuzaibo@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1578733098-13863-1-git-send-email-xuzaibo@huawei.com>
 References: <1578733098-13863-1-git-send-email-xuzaibo@huawei.com>
@@ -47,189 +47,75 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This branch prediction macro on the hot path can improve
-small performance(about 2%) according to the test.
+1.Fixed the bug of software tfm leakage.
+2.Update HW error log message.
 
 Signed-off-by: Zaibo Xu <xuzaibo@huawei.com>
 ---
- drivers/crypto/hisilicon/hpre/hpre_crypto.c | 44 ++++++++++++++---------------
- 1 file changed, 22 insertions(+), 22 deletions(-)
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c |  7 ++++++-
+ drivers/crypto/hisilicon/hpre/hpre_main.c   | 24 ++++++++++++------------
+ 2 files changed, 18 insertions(+), 13 deletions(-)
 
 diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-index 954134d..5d400d6 100644
+index 98f037e..d8b0152 100644
 --- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
 +++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-@@ -123,7 +123,7 @@ static int hpre_add_req_to_ctx(struct hpre_asym_request *hpre_req)
+@@ -1043,6 +1043,7 @@ static unsigned int hpre_rsa_max_size(struct crypto_akcipher *tfm)
+ static int hpre_rsa_init_tfm(struct crypto_akcipher *tfm)
+ {
+ 	struct hpre_ctx *ctx = akcipher_tfm_ctx(tfm);
++	int ret;
  
- 	ctx = hpre_req->ctx;
- 	id = hpre_alloc_req_id(ctx);
--	if (id < 0)
-+	if (unlikely(id < 0))
- 		return -EINVAL;
- 
- 	ctx->req_list[id] = hpre_req;
-@@ -190,7 +190,7 @@ static int hpre_get_data_dma_addr(struct hpre_asym_request *hpre_req,
- 	}
- 	*tmp = dma_map_single(dev, sg_virt(data),
- 			      len, dma_dir);
--	if (dma_mapping_error(dev, *tmp)) {
-+	if (unlikely(dma_mapping_error(dev, *tmp))) {
- 		dev_err(dev, "dma map data err!\n");
- 		return -ENOMEM;
- 	}
-@@ -208,11 +208,11 @@ static int hpre_prepare_dma_buf(struct hpre_asym_request *hpre_req,
- 	int shift;
- 
- 	shift = ctx->key_sz - len;
--	if (shift < 0)
-+	if (unlikely(shift < 0))
- 		return -EINVAL;
- 
- 	ptr = dma_alloc_coherent(dev, ctx->key_sz, tmp, GFP_KERNEL);
--	if (!ptr)
-+	if (unlikely(!ptr))
- 		return -ENOMEM;
- 
- 	if (is_src) {
-@@ -241,7 +241,7 @@ static int hpre_hw_data_init(struct hpre_asym_request *hpre_req,
- 	else
- 		ret = hpre_prepare_dma_buf(hpre_req, data, len,
- 					  is_src, &tmp);
--	if (ret)
-+	if (unlikely(ret))
- 		return ret;
- 
- 	if (is_src)
-@@ -262,7 +262,7 @@ static void hpre_hw_data_clr_all(struct hpre_ctx *ctx,
- 	dma_addr_t tmp;
- 
- 	tmp = le64_to_cpu(sqe->in);
--	if (!tmp)
-+	if (unlikely(!tmp))
- 		return;
- 
- 	if (src) {
-@@ -275,7 +275,7 @@ static void hpre_hw_data_clr_all(struct hpre_ctx *ctx,
+ 	ctx->rsa.soft_tfm = crypto_alloc_akcipher("rsa-generic", 0, 0);
+ 	if (IS_ERR(ctx->rsa.soft_tfm)) {
+@@ -1050,7 +1051,11 @@ static int hpre_rsa_init_tfm(struct crypto_akcipher *tfm)
+ 		return PTR_ERR(ctx->rsa.soft_tfm);
  	}
  
- 	tmp = le64_to_cpu(sqe->out);
--	if (!tmp)
-+	if (unlikely(!tmp))
- 		return;
+-	return hpre_ctx_init(ctx);
++	ret = hpre_ctx_init(ctx);
++	if (ret)
++		crypto_free_akcipher(ctx->rsa.soft_tfm);
++
++	return ret;
+ }
  
- 	if (req->dst) {
-@@ -309,7 +309,7 @@ static int hpre_alg_res_post_hf(struct hpre_ctx *ctx, struct hpre_sqe *sqe,
- 	done = (le32_to_cpu(sqe->dw0) >> HPRE_SQE_DONE_SHIFT) &
- 		HREE_SQE_DONE_MASK;
+ static void hpre_rsa_exit_tfm(struct crypto_akcipher *tfm)
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+index 711f5d1..753e43d 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_main.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+@@ -106,18 +106,18 @@ static const char * const hpre_debug_file_name[] = {
+ };
  
--	if (err == HPRE_NO_HW_ERR &&  done == HPRE_HW_TASK_DONE)
-+	if (likely(err == HPRE_NO_HW_ERR && done == HPRE_HW_TASK_DONE))
- 		return  0;
+ static const struct hpre_hw_error hpre_hw_errors[] = {
+-	{ .int_msk = BIT(0), .msg = "hpre_ecc_1bitt_err" },
+-	{ .int_msk = BIT(1), .msg = "hpre_ecc_2bit_err" },
+-	{ .int_msk = BIT(2), .msg = "hpre_data_wr_err" },
+-	{ .int_msk = BIT(3), .msg = "hpre_data_rd_err" },
+-	{ .int_msk = BIT(4), .msg = "hpre_bd_rd_err" },
+-	{ .int_msk = BIT(5), .msg = "hpre_ooo_2bit_ecc_err" },
+-	{ .int_msk = BIT(6), .msg = "hpre_cltr1_htbt_tm_out_err" },
+-	{ .int_msk = BIT(7), .msg = "hpre_cltr2_htbt_tm_out_err" },
+-	{ .int_msk = BIT(8), .msg = "hpre_cltr3_htbt_tm_out_err" },
+-	{ .int_msk = BIT(9), .msg = "hpre_cltr4_htbt_tm_out_err" },
+-	{ .int_msk = GENMASK(15, 10), .msg = "hpre_ooo_rdrsp_err" },
+-	{ .int_msk = GENMASK(21, 16), .msg = "hpre_ooo_wrrsp_err" },
++	{ .int_msk = BIT(0), .msg = "core_ecc_1bit_err_int_set" },
++	{ .int_msk = BIT(1), .msg = "core_ecc_2bit_err_int_set" },
++	{ .int_msk = BIT(2), .msg = "dat_wb_poison_int_set" },
++	{ .int_msk = BIT(3), .msg = "dat_rd_poison_int_set" },
++	{ .int_msk = BIT(4), .msg = "bd_rd_poison_int_set" },
++	{ .int_msk = BIT(5), .msg = "ooo_ecc_2bit_err_int_set" },
++	{ .int_msk = BIT(6), .msg = "cluster1_shb_timeout_int_set" },
++	{ .int_msk = BIT(7), .msg = "cluster2_shb_timeout_int_set" },
++	{ .int_msk = BIT(8), .msg = "cluster3_shb_timeout_int_set" },
++	{ .int_msk = BIT(9), .msg = "cluster4_shb_timeout_int_set" },
++	{ .int_msk = GENMASK(15, 10), .msg = "ooo_rdrsp_err_int_set" },
++	{ .int_msk = GENMASK(21, 16), .msg = "ooo_wrrsp_err_int_set" },
+ 	{ /* sentinel */ }
+ };
  
- 	return -EINVAL;
-@@ -456,17 +456,17 @@ static int hpre_dh_compute_value(struct kpp_request *req)
- 	int ret;
- 
- 	ret = hpre_msg_request_set(ctx, req, false);
--	if (ret)
-+	if (unlikely(ret))
- 		return ret;
- 
- 	if (req->src) {
- 		ret = hpre_hw_data_init(hpre_req, req->src, req->src_len, 1, 1);
--		if (ret)
-+		if (unlikely(ret))
- 			goto clear_all;
- 	}
- 
- 	ret = hpre_hw_data_init(hpre_req, req->dst, req->dst_len, 0, 1);
--	if (ret)
-+	if (unlikely(ret))
- 		goto clear_all;
- 
- 	if (ctx->crt_g2_mode && !req->src)
-@@ -478,7 +478,7 @@ static int hpre_dh_compute_value(struct kpp_request *req)
- 	} while (ret == -EBUSY && ctr++ < HPRE_TRY_SEND_TIMES);
- 
- 	/* success */
--	if (!ret)
-+	if (likely(!ret))
- 		return -EINPROGRESS;
- 
- clear_all:
-@@ -667,22 +667,22 @@ static int hpre_rsa_enc(struct akcipher_request *req)
- 		return ret;
- 	}
- 
--	if (!ctx->rsa.pubkey)
-+	if (unlikely(!ctx->rsa.pubkey))
- 		return -EINVAL;
- 
- 	ret = hpre_msg_request_set(ctx, req, true);
--	if (ret)
-+	if (unlikely(ret))
- 		return ret;
- 
- 	msg->dw0 |= cpu_to_le32(HPRE_ALG_NC_NCRT);
- 	msg->key = cpu_to_le64((u64)ctx->rsa.dma_pubkey);
- 
- 	ret = hpre_hw_data_init(hpre_req, req->src, req->src_len, 1, 0);
--	if (ret)
-+	if (unlikely(ret))
- 		goto clear_all;
- 
- 	ret = hpre_hw_data_init(hpre_req, req->dst, req->dst_len, 0, 0);
--	if (ret)
-+	if (unlikely(ret))
- 		goto clear_all;
- 
- 	do {
-@@ -690,7 +690,7 @@ static int hpre_rsa_enc(struct akcipher_request *req)
- 	} while (ret == -EBUSY && ctr++ < HPRE_TRY_SEND_TIMES);
- 
- 	/* success */
--	if (!ret)
-+	if (likely(!ret))
- 		return -EINPROGRESS;
- 
- clear_all:
-@@ -719,11 +719,11 @@ static int hpre_rsa_dec(struct akcipher_request *req)
- 		return ret;
- 	}
- 
--	if (!ctx->rsa.prikey)
-+	if (unlikely(!ctx->rsa.prikey))
- 		return -EINVAL;
- 
- 	ret = hpre_msg_request_set(ctx, req, true);
--	if (ret)
-+	if (unlikely(ret))
- 		return ret;
- 
- 	if (ctx->crt_g2_mode) {
-@@ -737,11 +737,11 @@ static int hpre_rsa_dec(struct akcipher_request *req)
- 	}
- 
- 	ret = hpre_hw_data_init(hpre_req, req->src, req->src_len, 1, 0);
--	if (ret)
-+	if (unlikely(ret))
- 		goto clear_all;
- 
- 	ret = hpre_hw_data_init(hpre_req, req->dst, req->dst_len, 0, 0);
--	if (ret)
-+	if (unlikely(ret))
- 		goto clear_all;
- 
- 	do {
-@@ -749,7 +749,7 @@ static int hpre_rsa_dec(struct akcipher_request *req)
- 	} while (ret == -EBUSY && ctr++ < HPRE_TRY_SEND_TIMES);
- 
- 	/* success */
--	if (!ret)
-+	if (likely(!ret))
- 		return -EINPROGRESS;
- 
- clear_all:
 -- 
 2.8.1
 
