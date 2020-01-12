@@ -2,95 +2,159 @@ Return-Path: <SRS0=5sH2=3B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 208D0C32771
-	for <linux-crypto@archiver.kernel.org>; Sun, 12 Jan 2020 06:40:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBAC0C32771
+	for <linux-crypto@archiver.kernel.org>; Sun, 12 Jan 2020 10:21:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E9CE62082E
-	for <linux-crypto@archiver.kernel.org>; Sun, 12 Jan 2020 06:40:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9348B22314
+	for <linux-crypto@archiver.kernel.org>; Sun, 12 Jan 2020 10:21:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="PAtKzfwM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732289AbgALGkh (ORCPT
+        id S1732561AbgALKVP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 12 Jan 2020 01:40:37 -0500
-Received: from mail3-bck.iservicesmail.com ([217.130.24.85]:32104 "EHLO
-        mail3-bck.iservicesmail.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732282AbgALGkh (ORCPT
+        Sun, 12 Jan 2020 05:21:15 -0500
+Received: from mo4-p02-ob.smtp.rzone.de ([81.169.146.168]:11364 "EHLO
+        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732559AbgALKVP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 12 Jan 2020 01:40:37 -0500
-X-Greylist: delayed 301 seconds by postgrey-1.27 at vger.kernel.org; Sun, 12 Jan 2020 01:40:36 EST
-IronPort-SDR: ky94rd+KjmjaxB7RGMEAB1ah/5QZVzyrbzoPN9eRgtf1+lot0OSilRRrbsIjOnCo5bWNtvlS4c
- 6xAp/u6iSWgA==
-IronPort-PHdr: =?us-ascii?q?9a23=3AUJLVexBQKWbwuG1BcZGEUyQJP3N1i/DPJgcQr6?=
- =?us-ascii?q?AfoPdwSPTyocbcNUDSrc9gkEXOFd2Cra4d0KyM7f6rCDdIyK3CmUhKSIZLWR?=
- =?us-ascii?q?4BhJdetC0bK+nBN3fGKuX3ZTcxBsVIWQwt1Xi6NU9IBJS2PAWK8TW94jEIBx?=
- =?us-ascii?q?rwKxd+KPjrFY7OlcS30P2594HObwlSizexfL1/IA+ooQjQt8Qajo9vJ6gswR?=
- =?us-ascii?q?bVv3VEfPhby3l1LlyJhRb84cmw/J9n8ytOvv8q6tBNX6bncakmVLJUFDspPX?=
- =?us-ascii?q?w7683trhnDUBCA5mAAXWUMkxpHGBbK4RfnVZrsqCT6t+592C6HPc3qSL0/RD?=
- =?us-ascii?q?qv47t3RBLulSwLMTk1/nzLhcNqiaJaoAutqgJ4w47OeIGVM+B+cbnBfdwEXG?=
- =?us-ascii?q?ZOQMBRWzVdD4Ogc4sAFfYOPeZGoIn4uVQOqwe+CRCyC+Pp0zNGgXj23ask3O?=
- =?us-ascii?q?UhCA3JwgogFM8KvHnasNn5KKIeXOaox6fK0DrDdetb1zn95ojSbB4vouyCUr?=
- =?us-ascii?q?1sfsTe0kQvCwHIgUmMpYD5Iz+ZyOIAuHWb4ep6UuKvjnYqpRtvrTiz2MgskJ?=
- =?us-ascii?q?TCiYISylDC+iVy3YE4JcWmR05nf9GkCpVRtyacN4t5Wc4iQ3potz0mxbEcpZ?=
- =?us-ascii?q?G7ey0KxI4nxx7ccvGKdZWD7BH7VOuJPzt0mXBodKiiixu87USs0PPwW8au3F?=
- =?us-ascii?q?tEridIlMTHuGoX2BzJ8MeHT+Nw/kKm2TmSyQ/e8vpEIUUolarDLJ4h36Iwmo?=
- =?us-ascii?q?ITsUvdGi/2n137jKqMeUUl/uio8froYrH6qpKTLYN0lAb+Pbk0lcyxBuQ4NB?=
- =?us-ascii?q?YBU3KF9uSnzLHj/Ev5T6tWjvAujKXVrZLXKd4GqqO3HwNZyJgv5hmlAzqo0N?=
- =?us-ascii?q?kUhXwHI0hEeBKDgYjpIVbOIPXgAPennVusjClkx+rIP73mBJXNIWPOkLf6fb?=
- =?us-ascii?q?lm90FQ0hY8zdda555OCrEBI+r/WlXtu9zAEh85Lwu0zv7jCNV80IMeRG2ODr?=
- =?us-ascii?q?aFP6PIsV6I/v4vI+6XaY8LtzbyNeIl6+TtjXAng18de7em3Z8NZHC/BPRmLB?=
- =?us-ascii?q?bRXX25htYHDHdPtRAvVPDtoEONXCQVZHuoWa84oDYhB9GcAJ/HV7yq1YSMwC?=
- =?us-ascii?q?qhVqJRYG8OXkiBDXryaIKCVPcPaDmYKedulzUFUf6qTIp3hj+0swqv87d7I/?=
- =?us-ascii?q?CcxSoeutq3zNVp6vfMkhc93TxvBc/b2GaICWF3yDBbDwQq1bxy9BUugmyI1r?=
- =?us-ascii?q?J11qcATdE=3D?=
-X-IronPort-Anti-Spam-Filtered: true
-X-IronPort-Anti-Spam-Result: =?us-ascii?q?A2GeAgA1vRpelyMYgtlNGBoBAQEBAQE?=
- =?us-ascii?q?BAQEDAQEBAREBAQECAgEBAQGBaAQBAQEBCwEBGwgBgSWBTVIgEpNQgU0fg0O?=
- =?us-ascii?q?LY4EAgx4VhgcUDIFbDQEBAQEBNQIBAYRATgEXgQ8kNQgOAgMNAQEFAQEBAQE?=
- =?us-ascii?q?FBAEBAhABAQEBAQYYBoVzgh0MHgEEAQEBAQMDAwEBDAGDXQcZDzlKTAEOAVO?=
- =?us-ascii?q?DBIJLAQEznXEBjQQNDQKFHYJKBAqBCYEaI4E2AYwYGoFBP4EjIYIrCAGCAYJ?=
- =?us-ascii?q?/ARIBbIJIglkEjUISIYEHiCmYF4JBBHaJTIwCgjcBD4gBhDEDEIJFD4EJiAO?=
- =?us-ascii?q?EToF9ozdXdAGBHnEzGoImGoEgTxgNiBuOLUCBFhACT4xbgjIBAQ?=
-X-IPAS-Result: =?us-ascii?q?A2GeAgA1vRpelyMYgtlNGBoBAQEBAQEBAQEDAQEBAREBA?=
- =?us-ascii?q?QECAgEBAQGBaAQBAQEBCwEBGwgBgSWBTVIgEpNQgU0fg0OLY4EAgx4VhgcUD?=
- =?us-ascii?q?IFbDQEBAQEBNQIBAYRATgEXgQ8kNQgOAgMNAQEFAQEBAQEFBAEBAhABAQEBA?=
- =?us-ascii?q?QYYBoVzgh0MHgEEAQEBAQMDAwEBDAGDXQcZDzlKTAEOAVODBIJLAQEznXEBj?=
- =?us-ascii?q?QQNDQKFHYJKBAqBCYEaI4E2AYwYGoFBP4EjIYIrCAGCAYJ/ARIBbIJIglkEj?=
- =?us-ascii?q?UISIYEHiCmYF4JBBHaJTIwCgjcBD4gBhDEDEIJFD4EJiAOEToF9ozdXdAGBH?=
- =?us-ascii?q?nEzGoImGoEgTxgNiBuOLUCBFhACT4xbgjIBAQ?=
-X-IronPort-AV: E=Sophos;i="5.69,424,1571695200"; 
-   d="scan'208";a="323228095"
-Received: from mailrel04.vodafone.es ([217.130.24.35])
-  by mail02.vodafone.es with ESMTP; 12 Jan 2020 07:35:33 +0100
-Received: (qmail 24222 invoked from network); 12 Jan 2020 05:00:20 -0000
-Received: from unknown (HELO 192.168.1.3) (quesosbelda@[217.217.179.17])
-          (envelope-sender <peterwong@hsbc.com.hk>)
-          by mailrel04.vodafone.es (qmail-ldap-1.03) with SMTP
-          for <linux-crypto@vger.kernel.org>; 12 Jan 2020 05:00:20 -0000
-Date:   Sun, 12 Jan 2020 06:00:18 +0100 (CET)
-From:   Peter Wong <peterwong@hsbc.com.hk>
-Reply-To: Peter Wong <peterwonghkhsbc@gmail.com>
-To:     linux-crypto@vger.kernel.org
-Message-ID: <1572402.460728.1578805219919.JavaMail.cash@217.130.24.55>
-Subject: Investment opportunity
+        Sun, 12 Jan 2020 05:21:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1578824470;
+        s=strato-dkim-0002; d=chronox.de;
+        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=spDiSF2kVe66KeNhBEUZtkVMiNeZ0VQUQ1+8pDQUBF0=;
+        b=PAtKzfwMGJgAKz1akesGIDjKheUMH9ElOBDykgcOdY1ntnYZobk5o1XAOpZcuxGD/l
+        r4DdQ4D+8llM7kzKowjqEor6czaMBn6u5+O/+MRcGJTl4AgYQwQ1+dec0Z5M5k09iLnU
+        Gt17Kfd/uQg8+7viRgHh55mijK2KpqtUlk9uO51ZeQbuakHAaUO1X4c5cNsdAU9CYIDO
+        H/MKxrIZ+PAJg5cN33EP0kbOKOop1FpNbrT/5fxMbNbWF8cHD8RtrWiB+AzMIHtOtobi
+        MtExUzRvFI5Mx3IB5xOuIhAqIBlH/cHBv8mOFVtjhtJrsE1htAcE5NB0uuEd++152xNz
+        VvfA==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9zXABM8C3w2hSri9QCQ=="
+X-RZG-CLASS-ID: mo00
+Received: from positron.chronox.de
+        by smtp.strato.de (RZmta 46.1.4 DYNA|AUTH)
+        with ESMTPSA id u04585w0CAJlFOm
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+        Sun, 12 Jan 2020 11:19:47 +0100 (CET)
+From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To:     kbuild test robot <lkp@intel.com>
+Cc:     kbuild-all@lists.01.org, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        linux-api@vger.kernel.org,
+        "Eric W. Biederman" <ebiederm@xmission.com>,
+        "Alexander E. Patrakov" <patrakov@gmail.com>,
+        "Ahmed S. Darwish" <darwish.07@gmail.com>,
+        "Theodore Y. Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
+        Matthew Garrett <mjg59@srcf.ucam.org>,
+        Vito Caputo <vcaputo@pengaru.com>,
+        Andreas Dilger <adilger.kernel@dilger.ca>,
+        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
+        William Jon McCann <mccann@jhu.edu>,
+        zhangjs <zachary@baishancloud.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Florian Weimer <fweimer@redhat.com>,
+        Lennart Poettering <mzxreary@0pointer.de>,
+        Nicolai Stange <nstange@suse.de>,
+        "Peter, Matthias" <matthias.peter@bsi.bund.de>,
+        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
+        Roman Drahtmueller <draht@schaltsekun.de>,
+        Neil Horman <nhorman@redhat.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Julia Lawall <julia.lawall@inria.fr>
+Subject: Re: [PATCH v27 04/12] LRNG - add switchable DRNG support
+Date:   Sun, 12 Jan 2020 11:12:49 +0100
+Message-ID: <6344127.aaDc98gsnP@positron.chronox.de>
+In-Reply-To: <202001111540.5y2emdGQ%lkp@intel.com>
+References: <5087131.2PHHu6SUIE@positron.chronox.de> <202001111540.5y2emdGQ%lkp@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Greetings,
-Please read the attached investment proposal and reply for more details.
-Are you interested in loan?
-Sincerely: Peter Wong
+Am Samstag, 11. Januar 2020, 08:09:50 CET schrieb kbuild test robot:
 
+Hi,
 
+> Hi "Stephan,
+>=20
+> Thank you for the patch! Perhaps something to improve:
+>=20
+> [auto build test WARNING on char-misc/char-misc-testing]
+> [also build test WARNING on cryptodev/master crypto/master v5.5-rc5
+> next-20200110] [if your patch is applied to the wrong git tree, please dr=
+op
+> us a note to help improve the system. BTW, we also suggest to use '--base'
+> option to specify the base tree in git format-patch, please see
+> https://stackoverflow.com/a/37406982]
+>=20
+> url:  =20
+> https://github.com/0day-ci/linux/commits/Stephan-M-ller/dev-random-a-new-=
+ap
+> proach-with-full-SP800-90B/20200110-084934 base: =20
+> https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/char-misc.git
+> 68faa679b8be1a74e6663c21c3a9d25d32f1c079 reproduce:
+>         # apt-get install sparse
+>         # sparse version: v0.6.1-129-g341daf20-dirty
+>         make ARCH=3Dx86_64 allmodconfig
+>         make C=3D1 CF=3D'-fdiagnostic-prefix -D__CHECK_ENDIAN__'
+>=20
+> If you fix the issue, kindly add following tag
+> Reported-by: kbuild test robot <lkp@intel.com>
+>=20
+>=20
+> sparse warnings: (new ones prefixed by >>)
+>=20
+> >> drivers/char/lrng/lrng_internal.h:239:39: sparse: sparse: context
+> >> imbalance in 'lrng_drng_switch' - unexpected unlock
+> vim +/lrng_drng_switch +239 drivers/char/lrng/lrng_internal.h
+>=20
+> 58c283819a1e87 Stephan M=FCller 2020-01-09  233
+> 58c283819a1e87 Stephan M=FCller 2020-01-09  234  /* Unlock the DRNG */
+> 58c283819a1e87 Stephan M=FCller 2020-01-09  235  static __always_inline v=
+oid
+> lrng_drng_unlock(struct lrng_drng *drng, 58c283819a1e87 Stephan M=FCller
+> 2020-01-09  236  					     unsigned long *flags)=20
+58c283819a1e87 Stephan
+> M=FCller 2020-01-09  237  {
+> 58c283819a1e87 Stephan M=FCller 2020-01-09  238  	if
+> (lrng_drng_is_atomic(drng)) 58c283819a1e87 Stephan M=FCller 2020-01-09 @2=
+39=20
+> 		spin_unlock_irqrestore(&drng->spin_lock, *flags); 58c283819a1e87=20
+Stephan
+> M=FCller 2020-01-09  240  	else
+> 58c283819a1e87 Stephan M=FCller 2020-01-09  241  		mutex_unlock(&drng-
+>lock);
+> 58c283819a1e87 Stephan M=FCller 2020-01-09  242  }
+> 58c283819a1e87 Stephan M=FCller 2020-01-09  243
+>=20
+> :::::: The code at line 239 was first introduced by commit
+> :::::: 58c283819a1e879bc2e30d05720285f9709f7f6d Linux Random Number
+> :::::: Generator
+> ::::::=20
+> :::::: TO: Stephan M=FCller <smueller@chronox.de>
+> :::::: CC: 0day robot <lkp@intel.com>
+>=20
+> ---
+> 0-DAY kernel test infrastructure                 Open Source Technology
+> Center https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org Intel
+> Corporation
 
+After analyzing the issue a bit more, it seems that I have to remove=20
+"unlikely" from lrng_drng_lock which seems to cause additional grief
+with sparse. Note, sparse will still report a lock context imbalance as it
+used to since we indeed have two lock context as documented in
+lrng_drng_switch.
 
-----------------------------------------------------
-This email was sent by the shareware version of Postman Professional.
+Ciao
+Stephan
+
 
