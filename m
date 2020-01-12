@@ -1,111 +1,96 @@
-Return-Path: <SRS0=WlNz=3A=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=5sH2=3B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6F9AC282DD
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Jan 2020 20:02:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 208D0C32771
+	for <linux-crypto@archiver.kernel.org>; Sun, 12 Jan 2020 06:40:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7E44F208E4
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Jan 2020 20:02:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1578772924;
-	bh=4bxlJS8vU/MMH+Ybyi3LMPzmFH6dAF8uh/1PGTdl3xA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=BEwGebn+9X+YzzLngWPkFRVLj6b+1hLdOhgS474UquJ2PIVATJX9JSV/qkLNv6tOJ
-	 ip53dwzPOCrE/10veASs+4dYZ14/6px1Gm+LxL3CTu976zUbyQxC0KqHs8udpASvFu
-	 kVVs0nPhK9FHKBRvXbAfdvXbuu9JOTXL5cbPhs98=
+	by mail.kernel.org (Postfix) with ESMTP id E9CE62082E
+	for <linux-crypto@archiver.kernel.org>; Sun, 12 Jan 2020 06:40:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731085AbgAKUCD (ORCPT
+        id S1732289AbgALGkh (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 11 Jan 2020 15:02:03 -0500
-Received: from mail.kernel.org ([198.145.29.99]:55860 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731083AbgAKUCD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 11 Jan 2020 15:02:03 -0500
-Received: from localhost (unknown [62.119.166.9])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3066A20866;
-        Sat, 11 Jan 2020 20:02:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1578772922;
-        bh=4bxlJS8vU/MMH+Ybyi3LMPzmFH6dAF8uh/1PGTdl3xA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=S9eCIiQmHgrpL7kJjjR0uW8UKxu9gv1wYz0w8LRH6KFUekcDJf56aMKwU1jPaU3x3
-         YuK6X5QP/6MiL3LOSO8uSOf5djvapdHtKotypUbvoPY8c1xKgmrCuuSd2I2WMrCDxV
-         tia3Y7mfUL6e33emaKXl/gAS4XhRzh32P3AhDuKs=
-Date:   Sat, 11 Jan 2020 20:40:06 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Zhangfei Gao <zhangfei.gao@linaro.org>
-Cc:     Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        jonathan.cameron@huawei.com, dave.jiang@intel.com,
-        grant.likely@arm.com, jean-philippe <jean-philippe@linaro.org>,
-        Jerome Glisse <jglisse@redhat.com>,
-        ilias.apalodimas@linaro.org, francois.ozog@linaro.org,
-        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
-        "haojian . zhuang" <haojian.zhuang@linaro.org>,
-        guodong.xu@linaro.org, linux-accelerators@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        iommu@lists.linux-foundation.org,
-        Kenneth Lee <liguozhu@hisilicon.com>,
-        Zaibo Xu <xuzaibo@huawei.com>
-Subject: Re: [PATCH v11 2/4] uacce: add uacce driver
-Message-ID: <20200111194006.GD435222@kroah.com>
-References: <1578710919-12141-1-git-send-email-zhangfei.gao@linaro.org>
- <1578710919-12141-3-git-send-email-zhangfei.gao@linaro.org>
+        Sun, 12 Jan 2020 01:40:37 -0500
+Received: from mail3-bck.iservicesmail.com ([217.130.24.85]:32104 "EHLO
+        mail3-bck.iservicesmail.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1732282AbgALGkh (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 12 Jan 2020 01:40:37 -0500
+X-Greylist: delayed 301 seconds by postgrey-1.27 at vger.kernel.org; Sun, 12 Jan 2020 01:40:36 EST
+IronPort-SDR: ky94rd+KjmjaxB7RGMEAB1ah/5QZVzyrbzoPN9eRgtf1+lot0OSilRRrbsIjOnCo5bWNtvlS4c
+ 6xAp/u6iSWgA==
+IronPort-PHdr: =?us-ascii?q?9a23=3AUJLVexBQKWbwuG1BcZGEUyQJP3N1i/DPJgcQr6?=
+ =?us-ascii?q?AfoPdwSPTyocbcNUDSrc9gkEXOFd2Cra4d0KyM7f6rCDdIyK3CmUhKSIZLWR?=
+ =?us-ascii?q?4BhJdetC0bK+nBN3fGKuX3ZTcxBsVIWQwt1Xi6NU9IBJS2PAWK8TW94jEIBx?=
+ =?us-ascii?q?rwKxd+KPjrFY7OlcS30P2594HObwlSizexfL1/IA+ooQjQt8Qajo9vJ6gswR?=
+ =?us-ascii?q?bVv3VEfPhby3l1LlyJhRb84cmw/J9n8ytOvv8q6tBNX6bncakmVLJUFDspPX?=
+ =?us-ascii?q?w7683trhnDUBCA5mAAXWUMkxpHGBbK4RfnVZrsqCT6t+592C6HPc3qSL0/RD?=
+ =?us-ascii?q?qv47t3RBLulSwLMTk1/nzLhcNqiaJaoAutqgJ4w47OeIGVM+B+cbnBfdwEXG?=
+ =?us-ascii?q?ZOQMBRWzVdD4Ogc4sAFfYOPeZGoIn4uVQOqwe+CRCyC+Pp0zNGgXj23ask3O?=
+ =?us-ascii?q?UhCA3JwgogFM8KvHnasNn5KKIeXOaox6fK0DrDdetb1zn95ojSbB4vouyCUr?=
+ =?us-ascii?q?1sfsTe0kQvCwHIgUmMpYD5Iz+ZyOIAuHWb4ep6UuKvjnYqpRtvrTiz2MgskJ?=
+ =?us-ascii?q?TCiYISylDC+iVy3YE4JcWmR05nf9GkCpVRtyacN4t5Wc4iQ3potz0mxbEcpZ?=
+ =?us-ascii?q?G7ey0KxI4nxx7ccvGKdZWD7BH7VOuJPzt0mXBodKiiixu87USs0PPwW8au3F?=
+ =?us-ascii?q?tEridIlMTHuGoX2BzJ8MeHT+Nw/kKm2TmSyQ/e8vpEIUUolarDLJ4h36Iwmo?=
+ =?us-ascii?q?ITsUvdGi/2n137jKqMeUUl/uio8froYrH6qpKTLYN0lAb+Pbk0lcyxBuQ4NB?=
+ =?us-ascii?q?YBU3KF9uSnzLHj/Ev5T6tWjvAujKXVrZLXKd4GqqO3HwNZyJgv5hmlAzqo0N?=
+ =?us-ascii?q?kUhXwHI0hEeBKDgYjpIVbOIPXgAPennVusjClkx+rIP73mBJXNIWPOkLf6fb?=
+ =?us-ascii?q?lm90FQ0hY8zdda555OCrEBI+r/WlXtu9zAEh85Lwu0zv7jCNV80IMeRG2ODr?=
+ =?us-ascii?q?aFP6PIsV6I/v4vI+6XaY8LtzbyNeIl6+TtjXAng18de7em3Z8NZHC/BPRmLB?=
+ =?us-ascii?q?bRXX25htYHDHdPtRAvVPDtoEONXCQVZHuoWa84oDYhB9GcAJ/HV7yq1YSMwC?=
+ =?us-ascii?q?qhVqJRYG8OXkiBDXryaIKCVPcPaDmYKedulzUFUf6qTIp3hj+0swqv87d7I/?=
+ =?us-ascii?q?CcxSoeutq3zNVp6vfMkhc93TxvBc/b2GaICWF3yDBbDwQq1bxy9BUugmyI1r?=
+ =?us-ascii?q?J11qcATdE=3D?=
+X-IronPort-Anti-Spam-Filtered: true
+X-IronPort-Anti-Spam-Result: =?us-ascii?q?A2GeAgA1vRpelyMYgtlNGBoBAQEBAQE?=
+ =?us-ascii?q?BAQEDAQEBAREBAQECAgEBAQGBaAQBAQEBCwEBGwgBgSWBTVIgEpNQgU0fg0O?=
+ =?us-ascii?q?LY4EAgx4VhgcUDIFbDQEBAQEBNQIBAYRATgEXgQ8kNQgOAgMNAQEFAQEBAQE?=
+ =?us-ascii?q?FBAEBAhABAQEBAQYYBoVzgh0MHgEEAQEBAQMDAwEBDAGDXQcZDzlKTAEOAVO?=
+ =?us-ascii?q?DBIJLAQEznXEBjQQNDQKFHYJKBAqBCYEaI4E2AYwYGoFBP4EjIYIrCAGCAYJ?=
+ =?us-ascii?q?/ARIBbIJIglkEjUISIYEHiCmYF4JBBHaJTIwCgjcBD4gBhDEDEIJFD4EJiAO?=
+ =?us-ascii?q?EToF9ozdXdAGBHnEzGoImGoEgTxgNiBuOLUCBFhACT4xbgjIBAQ?=
+X-IPAS-Result: =?us-ascii?q?A2GeAgA1vRpelyMYgtlNGBoBAQEBAQEBAQEDAQEBAREBA?=
+ =?us-ascii?q?QECAgEBAQGBaAQBAQEBCwEBGwgBgSWBTVIgEpNQgU0fg0OLY4EAgx4VhgcUD?=
+ =?us-ascii?q?IFbDQEBAQEBNQIBAYRATgEXgQ8kNQgOAgMNAQEFAQEBAQEFBAEBAhABAQEBA?=
+ =?us-ascii?q?QYYBoVzgh0MHgEEAQEBAQMDAwEBDAGDXQcZDzlKTAEOAVODBIJLAQEznXEBj?=
+ =?us-ascii?q?QQNDQKFHYJKBAqBCYEaI4E2AYwYGoFBP4EjIYIrCAGCAYJ/ARIBbIJIglkEj?=
+ =?us-ascii?q?UISIYEHiCmYF4JBBHaJTIwCgjcBD4gBhDEDEIJFD4EJiAOEToF9ozdXdAGBH?=
+ =?us-ascii?q?nEzGoImGoEgTxgNiBuOLUCBFhACT4xbgjIBAQ?=
+X-IronPort-AV: E=Sophos;i="5.69,424,1571695200"; 
+   d="scan'208";a="323228095"
+Received: from mailrel04.vodafone.es ([217.130.24.35])
+  by mail02.vodafone.es with ESMTP; 12 Jan 2020 07:35:33 +0100
+Received: (qmail 24222 invoked from network); 12 Jan 2020 05:00:20 -0000
+Received: from unknown (HELO 192.168.1.3) (quesosbelda@[217.217.179.17])
+          (envelope-sender <peterwong@hsbc.com.hk>)
+          by mailrel04.vodafone.es (qmail-ldap-1.03) with SMTP
+          for <linux-crypto@vger.kernel.org>; 12 Jan 2020 05:00:20 -0000
+Date:   Sun, 12 Jan 2020 06:00:18 +0100 (CET)
+From:   Peter Wong <peterwong@hsbc.com.hk>
+Reply-To: Peter Wong <peterwonghkhsbc@gmail.com>
+To:     linux-crypto@vger.kernel.org
+Message-ID: <1572402.460728.1578805219919.JavaMail.cash@217.130.24.55>
+Subject: Investment opportunity
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1578710919-12141-3-git-send-email-zhangfei.gao@linaro.org>
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Jan 11, 2020 at 10:48:37AM +0800, Zhangfei Gao wrote:
-> +static int uacce_fops_open(struct inode *inode, struct file *filep)
-> +{
-> +	struct uacce_mm *uacce_mm = NULL;
-> +	struct uacce_device *uacce;
-> +	struct uacce_queue *q;
-> +	int ret = 0;
-> +
-> +	uacce = xa_load(&uacce_xa, iminor(inode));
-> +	if (!uacce)
-> +		return -ENODEV;
-> +
-> +	if (!try_module_get(uacce->parent->driver->owner))
-> +		return -ENODEV;
+Greetings,
+Please read the attached investment proposal and reply for more details.
+Are you interested in loan?
+Sincerely: Peter Wong
 
-Why are you trying to grab the module reference of the parent device?
-Why is that needed and what is that going to help with here?
 
-This shouldn't be needed as the module reference of the owner of the
-fileops for this module is incremented, and the "parent" module depends
-on this module, so how could it be unloaded without this code being
-unloaded?
 
-Yes, if you build this code into the kernel and the "parent" driver is a
-module, then you will not have a reference, but when you remove that
-parent driver the device will be removed as it has to be unregistered
-before that parent driver can be removed from the system, right?
 
-Or what am I missing here?
+----------------------------------------------------
+This email was sent by the shareware version of Postman Professional.
 
-> +static void uacce_release(struct device *dev)
-> +{
-> +	struct uacce_device *uacce = to_uacce_device(dev);
-> +
-> +	kfree(uacce);
-> +	uacce = NULL;
-
-That line didn't do anything :)
-
-thanks,
-
-greg k-h
