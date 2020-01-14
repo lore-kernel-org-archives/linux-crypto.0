@@ -2,128 +2,136 @@ Return-Path: <SRS0=ZPJC=3D=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A095DC33CB1
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jan 2020 14:00:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 785FDC33CB1
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jan 2020 14:59:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 75FF12467A
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jan 2020 14:00:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vf0d1GFb"
+	by mail.kernel.org (Postfix) with ESMTP id 3D63F24672
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jan 2020 14:59:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1579013980;
+	bh=JsWfRq3X3gD6BI5Jjp77gShsE9xbLIe4k4ACCqlIDUs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=BKs8UpZvPtzHCSA6FdoqD9Nt/r7+6K0KAoX/qAW8kZJSkb8d5t/ptK66fBW1FWWod
+	 d3hj/F0ob9eKFm/7rJ5FBpVamfT3N5/cMSVQKNZzeenN8jl1G8WJPEKr440XLCFZ3M
+	 mSIasWpk50rsZdT7XfhGkTcGsLzfnLN8Jo57iJ8U=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729145AbgANOAd (ORCPT
+        id S1726450AbgANO7j (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 14 Jan 2020 09:00:33 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:37401 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728909AbgANN7y (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Jan 2020 08:59:54 -0500
-Received: by mail-wr1-f65.google.com with SMTP id w15so12304724wru.4;
-        Tue, 14 Jan 2020 05:59:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=vXhhnXKXoxYSpa1+LXBS7VNs2uspXwnX5jIhIQmwFrM=;
-        b=vf0d1GFbo08+NG6G7zxZJeTZMiLIJ81itsHNzneSbCkxlMw9PSK/5EefhFcFVz9UQt
-         opn2DFmB99e8fxSV8zDeioxOunCEPA1JwLFUV1JZ7tohx4yS9VeIx8szZELtTSaUVi8e
-         MpWVfqUzXzlqC8OzVcKJK0ejjOuekOA7kfio69OKQHzwuuBCoSSJilnH5swyZxmwDZJF
-         tN3p1UTmeFTOKAHtBkIz5KeyE9Q4FZuzTOg9R23HG9C9cgjdnkGH0O/sF2p6DB0IkmgJ
-         U5ZD/0/mbzXaXbqd6FkEoMNCPZqXCdUeNLQe5nz7k+II0heYxnrX1j0mMKgnkq6aGLYT
-         cx4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=vXhhnXKXoxYSpa1+LXBS7VNs2uspXwnX5jIhIQmwFrM=;
-        b=Oy7B2bqjPKt3JraVLq+uRzyqxAQ+oq1+bZQRKVEb9acahUDnzYz6RYg0EahBGWJC54
-         XF70JortqoD97HwErlkrFyPa1MsByZvV/YiscIxclzu1wUBV7vgCOib0EmUlpB/lB+YC
-         Rwlmjuad+RxWwJYv4RNQzWU1EVQqAaWDxN0YH1wrsQ3HdSERoOvFdW4wdNeF6pW+P4eQ
-         geC62V7fs6qg4iJw0tgBG1n5YIwk16WrmKLmWFpJZ/V50sBTiUorDtUTLUoFvnVZvPqB
-         9WDwceEDDJiJB8CK6tVKKkKlfZDPARo0lYeJda4GinAEy1/rCKN62s8rzU7wcOFvyrsi
-         ixsw==
-X-Gm-Message-State: APjAAAUCBWmJx19grPHAOvID7IXwC5JqNXR8kEznfFcMxAhcAB/nnNVo
-        3wnixloHzpZJLBDEDxIDD0c=
-X-Google-Smtp-Source: APXvYqzIL5QDAbPSLYL8aOpzAthE16eu5faMIOdeePz7IfOOcLviaBT2dTkTsFRl6NklQxS0c9Fjhw==
-X-Received: by 2002:a5d:6703:: with SMTP id o3mr26238015wru.235.1579010392992;
-        Tue, 14 Jan 2020 05:59:52 -0800 (PST)
-Received: from Red.localdomain ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id 4sm17854448wmg.22.2020.01.14.05.59.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jan 2020 05:59:52 -0800 (PST)
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     alexandre.torgue@st.com, davem@davemloft.net,
-        herbert@gondor.apana.org.au, mcoquelin.stm32@gmail.com,
-        mripard@kernel.org, wens@csie.org, iuliana.prodan@nxp.com,
-        horia.geanta@nxp.com, aymen.sghaier@nxp.com
-Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-sunxi@googlegroups.com,
-        Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH RFC 02/10] crypto: sun8i-ce: increase task list size
-Date:   Tue, 14 Jan 2020 14:59:28 +0100
-Message-Id: <20200114135936.32422-3-clabbe.montjoie@gmail.com>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200114135936.32422-1-clabbe.montjoie@gmail.com>
-References: <20200114135936.32422-1-clabbe.montjoie@gmail.com>
+        Tue, 14 Jan 2020 09:59:39 -0500
+Received: from mail.kernel.org ([198.145.29.99]:41638 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725904AbgANO7j (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 14 Jan 2020 09:59:39 -0500
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 35DDA222C4;
+        Tue, 14 Jan 2020 14:59:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1579013977;
+        bh=JsWfRq3X3gD6BI5Jjp77gShsE9xbLIe4k4ACCqlIDUs=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=jUh8clVtpbFL6PQgYE4wIm+2XEKpZn2NscpzUMxJZsQAdvIISnx5yHyocs6hXUN9C
+         GGVkxtTHDzTHhgMuycAWt+4/A9wOFUGhZxM+JkceSC3lzD1GJovA1TP3c0IB6YMRP2
+         dd736FW18wIbuSp2jizlxsiVLT0vY2P1Aq5uAsE0=
+Date:   Tue, 14 Jan 2020 15:59:34 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     zhangfei <zhangfei.gao@linaro.org>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        jonathan.cameron@huawei.com, dave.jiang@intel.com,
+        grant.likely@arm.com, jean-philippe <jean-philippe@linaro.org>,
+        Jerome Glisse <jglisse@redhat.com>,
+        ilias.apalodimas@linaro.org, francois.ozog@linaro.org,
+        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
+        "haojian . zhuang" <haojian.zhuang@linaro.org>,
+        guodong.xu@linaro.org, linux-accelerators@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        iommu@lists.linux-foundation.org,
+        Kenneth Lee <liguozhu@hisilicon.com>,
+        Zaibo Xu <xuzaibo@huawei.com>
+Subject: Re: [PATCH v11 2/4] uacce: add uacce driver
+Message-ID: <20200114145934.GA1960403@kroah.com>
+References: <1578710919-12141-1-git-send-email-zhangfei.gao@linaro.org>
+ <1578710919-12141-3-git-send-email-zhangfei.gao@linaro.org>
+ <20200111194006.GD435222@kroah.com>
+ <053ccd05-4f11-5be6-47c2-eee5c2f1fdc4@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <053ccd05-4f11-5be6-47c2-eee5c2f1fdc4@linaro.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The CE can handle more than 1 task at once, so this patch increase the size of
-the task list up to 8.
-For the moment I did not see more gain beyong this value.
+On Mon, Jan 13, 2020 at 11:34:55AM +0800, zhangfei wrote:
+> Hi, Greg
+> 
+> Thanks for the review.
+> 
+> On 2020/1/12 上午3:40, Greg Kroah-Hartman wrote:
+> > On Sat, Jan 11, 2020 at 10:48:37AM +0800, Zhangfei Gao wrote:
+> > > +static int uacce_fops_open(struct inode *inode, struct file *filep)
+> > > +{
+> > > +	struct uacce_mm *uacce_mm = NULL;
+> > > +	struct uacce_device *uacce;
+> > > +	struct uacce_queue *q;
+> > > +	int ret = 0;
+> > > +
+> > > +	uacce = xa_load(&uacce_xa, iminor(inode));
+> > > +	if (!uacce)
+> > > +		return -ENODEV;
+> > > +
+> > > +	if (!try_module_get(uacce->parent->driver->owner))
+> > > +		return -ENODEV;
+> > Why are you trying to grab the module reference of the parent device?
+> > Why is that needed and what is that going to help with here?
+> > 
+> > This shouldn't be needed as the module reference of the owner of the
+> > fileops for this module is incremented, and the "parent" module depends
+> > on this module, so how could it be unloaded without this code being
+> > unloaded?
+> > 
+> > Yes, if you build this code into the kernel and the "parent" driver is a
+> > module, then you will not have a reference, but when you remove that
+> > parent driver the device will be removed as it has to be unregistered
+> > before that parent driver can be removed from the system, right?
+> > 
+> > Or what am I missing here?
+> The refcount here is preventing rmmod "parent" module after fd is opened,
+> since user driver has mmap kernel memory to user space, like mmio, which may
+> still in-use.
+> 
+> With the refcount protection, rmmod "parent" module will fail until
+> application free the fd.
+> log like: rmmod: ERROR: Module hisi_zip is in use
 
-Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
----
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c | 4 ++--
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h      | 1 +
- 2 files changed, 3 insertions(+), 2 deletions(-)
+But if the "parent" module is to be unloaded, it has to unregister the
+"child" device and that will call the destructor in here and then you
+will tear everything down and all should be good.
 
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-index f72346a44e69..e8bf7bf31061 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-@@ -321,7 +321,7 @@ static void sun8i_ce_free_chanlist(struct sun8i_ce_dev *ce, int i)
- 	while (i >= 0) {
- 		crypto_engine_exit(ce->chanlist[i].engine);
- 		if (ce->chanlist[i].tl)
--			dma_free_coherent(ce->dev, sizeof(struct ce_task),
-+			dma_free_coherent(ce->dev, sizeof(struct ce_task) * MAXTASK,
- 					  ce->chanlist[i].tl,
- 					  ce->chanlist[i].t_phy);
- 		i--;
-@@ -356,7 +356,7 @@ static int sun8i_ce_allocate_chanlist(struct sun8i_ce_dev *ce)
- 			goto error_engine;
- 		}
- 		ce->chanlist[i].tl = dma_alloc_coherent(ce->dev,
--							sizeof(struct ce_task),
-+							sizeof(struct ce_task) * MAXTASK,
- 							&ce->chanlist[i].t_phy,
- 							GFP_KERNEL);
- 		if (!ce->chanlist[i].tl) {
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
-index 49507ef2ec63..049b3175d755 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
-@@ -73,6 +73,7 @@
- #define CE_MAX_CLOCKS 3
- 
- #define MAXFLOW 4
-+#define MAXTASK 8
- 
- /*
-  * struct ce_clock - Describe clocks used by sun8i-ce
--- 
-2.24.1
+There's no need to "forbid" a module from being unloaded, even if it is
+being used.  Look at all networking drivers, they work that way, right?
 
+> > > +static void uacce_release(struct device *dev)
+> > > +{
+> > > +	struct uacce_device *uacce = to_uacce_device(dev);
+> > > +
+> > > +	kfree(uacce);
+> > > +	uacce = NULL;
+> > That line didn't do anything :)
+> Yes, this is a mistake.
+> It is up to caller to set to NULL to prevent release multi times.
+
+Release function is called by the driver core which will not touch the
+value again.
+
+thanks,
+
+greg k-h
