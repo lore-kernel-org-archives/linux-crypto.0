@@ -8,55 +8,55 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F100C33CB3
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7D61C33CB1
 	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jan 2020 14:00:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CD1BB2468D
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jan 2020 14:00:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 92FE32467A
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jan 2020 14:00:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="efXBmH3q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oSFvsfR/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728978AbgANOAB (ORCPT
+        id S1728951AbgANN76 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 14 Jan 2020 09:00:01 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:37866 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727289AbgANOAA (ORCPT
+        Tue, 14 Jan 2020 08:59:58 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:40020 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728926AbgANN75 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Jan 2020 09:00:00 -0500
-Received: by mail-wm1-f68.google.com with SMTP id f129so13858985wmf.2;
-        Tue, 14 Jan 2020 05:59:58 -0800 (PST)
+        Tue, 14 Jan 2020 08:59:57 -0500
+Received: by mail-wr1-f67.google.com with SMTP id c14so12269688wrn.7;
+        Tue, 14 Jan 2020 05:59:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=QK7uW2JyHvV/1Sv2A8qlxlva+nc6onlWMSezJazY5hk=;
-        b=efXBmH3q24U2Ufo+ifFyvvi/Yqw1RTmkeHkZXJeT9nLqdmsYllLF/q2N9FAhZlqGqu
-         RBRE6imvHtTjPuAT6uSI0u8gEa/aPiV6fx5u9Qii+wAEjQj3bN75LYbj3UReGbmzuu/S
-         +EzcxW3bE2JtTlpJKXIIUfixjAHAB/MQ0QBD0T6YKviQ0xcdASq9RQWCkCEqLyk9Yur1
-         wclEEH0H2U8Vb3gbbzVV57N6NPZcXUO0AMROkDiuduyRPXBEl4w51A/OdtHtlcbeBr/v
-         80KsdAyRRVrqwaBL/Cr8miC6ZA8T/MZhNVmkKio/bN9Ns/IdyFqzfoBa/JNmlZzDl1fz
-         RpVA==
+        bh=t9FT5fa3SeoozrvYAEFmKmMXN/EPpMMGGoi0s6SDiyU=;
+        b=oSFvsfR/LJOKaCs8d7wwS3haZMNmt9yVMFgpfRLn2shhRClhS1eumasQBeBg6P1WIf
+         EWgofZKZ2JeBcfnsbgwg2NzMLRh51ivNtRUwOJW5KHOmEb5a1zY3ZLh7jB1lN/iQkEVH
+         8orzTRi/8f+jnRtzLhxEZ4LNftMcmaYCD/dS5lilG/OXNQTF/Y4HA/6SLS28Hm2wEkWj
+         6fCqEzadKadEgcFW04TPWTSsKtux74+cwwT871kCJy/rbMhsI9r25HBcMql4Kpuxwr7v
+         7r8ADb/enBtLFwrKWsyo7av1/mrgvaLqZgWDFUYTv21H25VfZyQYqmy8ykMObOCJtWpC
+         Gysg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=QK7uW2JyHvV/1Sv2A8qlxlva+nc6onlWMSezJazY5hk=;
-        b=UGzfRfT/MDVcHYwmJhFL06OMwiCi25XBroy00lFDlp35UxG2Lv44DfR2b1mVJwlQf3
-         pihc29BBGDeRhfZBwfFnv8T9RG6X/mwNO5b0eiPNFokWYV/4ss7oeaOb28rzTjeUNaID
-         gouza+QP97Pprjyeu+JFhLcpBJc7O7fAqlQBCjcACWZjStIiqscwKnb9yBhQ4KRNLUdG
-         vMIyiPMlrM/ijFsnI98osskOyLNPq7RJbJhyk0E4/2Mt4MNMkCF4CheN5pnp6vSqGmgR
-         MzknDtLVXrfD1ETc6qbjOaQZyZZMOvc3RVozveWsoWO8a0Bq2Mf3inOVmeFcVWrop5TN
-         m/mg==
-X-Gm-Message-State: APjAAAXonO638IBONKh0oRhaZhF7Og4cB0SmV8cL8cN3r0y3j+MuOkkh
-        si2ST3vgp6czMKIRkHo3fm8=
-X-Google-Smtp-Source: APXvYqwah42w9ldVBz5YQTGbbxH1zgfKmZAqapYTzwVE0gSRGQr7ndjMeZOzQrZT2x49dlCWNGYM4g==
-X-Received: by 2002:a1c:1d16:: with SMTP id d22mr27986303wmd.158.1579010397577;
-        Tue, 14 Jan 2020 05:59:57 -0800 (PST)
+        bh=t9FT5fa3SeoozrvYAEFmKmMXN/EPpMMGGoi0s6SDiyU=;
+        b=Rcq0WHjquQ1hf+tcidjdXegnBGivq005jo0yGqWVGIH69cogNhM9PUnzIJfqIr4dON
+         ueaWvth8kaGY8qnF69dAe2bOTu8iUwAODP7+UfXgFZY6jxAfsCYCMR/SL7fCfm/zAF9m
+         9ycmkzI2VU3J/TRQK/NcZI6OhdxJ85cXhLtEPtm0s1E7Bgt6EQTeYVU1j4pmzWKQXvWu
+         XPM8svbMLk/CFYBavZL9WnKWItx0G/670JuQzrUZ9EFJ1G2mlI1copeonfsZRa8cXVr1
+         EeumgjKI0PZ+ay7Zs5aoY3uIWPmDMGTqWZokSk0dqRPxP+SECpS5tyv+B8shqZhGBFut
+         5hMQ==
+X-Gm-Message-State: APjAAAUDDSPMoUZwe/VKNBdfvIII8B6RYb2cdSs9FMCva+b0vK6n1isv
+        1DRQ5PO5DDaj2FMLynbu7yY=
+X-Google-Smtp-Source: APXvYqxeoPOewBzfM1WWeAN9PbUvz883FCNn39JDjsvf/kr7lRyYmTOjgl6pRX5IxaOrrboo+lb4yw==
+X-Received: by 2002:a5d:494f:: with SMTP id r15mr26124939wrs.143.1579010394666;
+        Tue, 14 Jan 2020 05:59:54 -0800 (PST)
 Received: from Red.localdomain ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id 4sm17854448wmg.22.2020.01.14.05.59.56
+        by smtp.googlemail.com with ESMTPSA id 4sm17854448wmg.22.2020.01.14.05.59.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jan 2020 05:59:57 -0800 (PST)
+        Tue, 14 Jan 2020 05:59:54 -0800 (PST)
 From:   Corentin Labbe <clabbe.montjoie@gmail.com>
 To:     alexandre.torgue@st.com, davem@davemloft.net,
         herbert@gondor.apana.org.au, mcoquelin.stm32@gmail.com,
@@ -67,9 +67,9 @@ Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
         linux-stm32@st-md-mailman.stormreply.com,
         linux-sunxi@googlegroups.com,
         Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH RFC 05/10] crypto: engine: transform cur_req in an array
-Date:   Tue, 14 Jan 2020 14:59:31 +0100
-Message-Id: <20200114135936.32422-6-clabbe.montjoie@gmail.com>
+Subject: [PATCH RFC 03/10] crypto: sun8i-ce: split into prepare/run/unprepare
+Date:   Tue, 14 Jan 2020 14:59:29 +0100
+Message-Id: <20200114135936.32422-4-clabbe.montjoie@gmail.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200114135936.32422-1-clabbe.montjoie@gmail.com>
 References: <20200114135936.32422-1-clabbe.montjoie@gmail.com>
@@ -80,169 +80,144 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-For having the ability of doing a batch of request in one do_one_request(), we
-should be able to store them in an array. (for unpreparing them later).
-This patch converts cur_req in an array of request, but for the moment
-hardcode the maximum to 1.
+This patch split the do_one_request into three.
+Prepare will handle all DMA mapping and initialisation of the task
+structure.
+Unprepare will clean all DMA mapping.
+And the do_one_request will be limited to just excuting the task.
 
 Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 ---
- crypto/crypto_engine.c  | 32 ++++++++++++++++++--------------
- include/crypto/engine.h | 19 +++++++++++++++----
- 2 files changed, 33 insertions(+), 18 deletions(-)
+ .../allwinner/sun8i-ce/sun8i-ce-cipher.c      | 70 ++++++++++++++++---
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h  |  4 ++
+ 2 files changed, 66 insertions(+), 8 deletions(-)
 
-diff --git a/crypto/crypto_engine.c b/crypto/crypto_engine.c
-index eb029ff1e05a..b72873550587 100644
---- a/crypto/crypto_engine.c
-+++ b/crypto/crypto_engine.c
-@@ -30,26 +30,27 @@ static void crypto_finalize_request(struct crypto_engine *engine,
- 	struct crypto_engine_ctx *enginectx;
- 
- 	spin_lock_irqsave(&engine->queue_lock, flags);
--	if (engine->cur_req == req)
-+	if (engine->cur_reqs[0].req == req)
- 		finalize_cur_req = true;
- 	spin_unlock_irqrestore(&engine->queue_lock, flags);
- 
- 	if (finalize_cur_req) {
--		enginectx = crypto_tfm_ctx(req->tfm);
--		if (engine->cur_req_prepared &&
-+		enginectx = crypto_tfm_ctx(engine->cur_reqs[0].req->tfm);
-+		if (engine->cur_reqs[0].prepared &&
- 		    enginectx->op.unprepare_request) {
--			ret = enginectx->op.unprepare_request(engine, req);
-+			ret = enginectx->op.unprepare_request(engine, engine->cur_reqs[0].req);
- 			if (ret)
- 				dev_err(engine->dev, "failed to unprepare request\n");
- 		}
-+		engine->cur_reqs[0].req->complete(engine->cur_reqs[0].req, err);
- 		spin_lock_irqsave(&engine->queue_lock, flags);
--		engine->cur_req = NULL;
--		engine->cur_req_prepared = false;
-+		engine->cur_reqs[0].prepared = false;
-+		engine->cur_reqs[0].req = NULL;
- 		spin_unlock_irqrestore(&engine->queue_lock, flags);
-+	} else {
-+		req->complete(req, err);
- 	}
- 
--	req->complete(req, err);
--
- 	kthread_queue_work(engine->kworker, &engine->pump_requests);
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+index 6108cea0e0bd..401f39f144ea 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+@@ -78,8 +78,9 @@ static int sun8i_ce_cipher_fallback(struct skcipher_request *areq)
+ 	return err;
  }
  
-@@ -74,7 +75,7 @@ static void crypto_pump_requests(struct crypto_engine *engine,
- 	spin_lock_irqsave(&engine->queue_lock, flags);
- 
- 	/* Make sure we are not already running a request */
--	if (engine->cur_req)
-+	if (engine->cur_reqs[0].req)
- 		goto out;
- 
- 	/* If another context is idling then defer */
-@@ -114,7 +115,7 @@ static void crypto_pump_requests(struct crypto_engine *engine,
- 	if (!async_req)
- 		goto out;
- 
--	engine->cur_req = async_req;
-+	engine->cur_reqs[0].req = async_req;
- 	if (backlog)
- 		backlog->complete(backlog, -EINPROGRESS);
- 
-@@ -143,14 +144,14 @@ static void crypto_pump_requests(struct crypto_engine *engine,
- 				ret);
- 			goto req_err;
- 		}
--		engine->cur_req_prepared = true;
-+		engine->cur_reqs[0].prepared = true;
+-static int sun8i_ce_cipher(struct skcipher_request *areq)
++static int sun8i_ce_cipher_prepare(struct crypto_engine *engine, void *async_req)
+ {
++	struct skcipher_request *areq = container_of(async_req, struct skcipher_request, base);
+ 	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(areq);
+ 	struct sun8i_cipher_tfm_ctx *op = crypto_skcipher_ctx(tfm);
+ 	struct sun8i_ce_dev *ce = op->ce;
+@@ -237,7 +238,9 @@ static int sun8i_ce_cipher(struct skcipher_request *areq)
  	}
- 	if (!enginectx->op.do_one_request) {
- 		dev_err(engine->dev, "failed to do request\n");
- 		ret = -EINVAL;
- 		goto req_err;
- 	}
--	ret = enginectx->op.do_one_request(engine, async_req);
-+	ret = enginectx->op.do_one_request(engine, engine->cur_reqs[0].req);
- 	if (ret) {
- 		dev_err(engine->dev, "Failed to do one request from queue: %d\n", ret);
- 		goto req_err;
-@@ -158,7 +159,7 @@ static void crypto_pump_requests(struct crypto_engine *engine,
- 	return;
  
- req_err:
--	crypto_finalize_request(engine, async_req, ret);
-+	crypto_finalize_request(engine, engine->cur_reqs[0].req, ret);
- 	return;
+ 	chan->timeout = areq->cryptlen;
+-	err = sun8i_ce_run_task(ce, flow, crypto_tfm_alg_name(areq->base.tfm));
++	rctx->nr_sgs = nr_sgs;
++	rctx->nr_sgd = nr_sgd;
++	return 0;
  
- out:
-@@ -411,10 +412,13 @@ struct crypto_engine *crypto_engine_alloc_init(struct device *dev, bool rt)
- 	engine->running = false;
- 	engine->busy = false;
- 	engine->idling = false;
--	engine->cur_req_prepared = false;
- 	engine->priv_data = dev;
- 	snprintf(engine->name, sizeof(engine->name),
- 		 "%s-engine", dev_name(dev));
-+	engine->rmax = 1;
-+	engine->cur_reqs = devm_kzalloc(dev, sizeof(struct cur_req) * engine->rmax, GFP_KERNEL);
-+	if (!engine->cur_reqs)
-+		return NULL;
+ theend_sgs:
+ 	if (areq->src == areq->dst) {
+@@ -271,13 +274,64 @@ static int sun8i_ce_cipher(struct skcipher_request *areq)
+ 	return err;
+ }
  
- 	crypto_init_queue(&engine->queue, CRYPTO_ENGINE_MAX_QLEN);
- 	spin_lock_init(&engine->queue_lock);
-diff --git a/include/crypto/engine.h b/include/crypto/engine.h
-index e29cd67f93c7..362134e226f4 100644
---- a/include/crypto/engine.h
-+++ b/include/crypto/engine.h
-@@ -18,13 +18,23 @@
- #include <crypto/skcipher.h>
+-static int sun8i_ce_handle_cipher_request(struct crypto_engine *engine, void *areq)
++int sun8i_ce_cipher_run(struct crypto_engine *engine, void *areq)
+ {
+-	int err;
+ 	struct skcipher_request *breq = container_of(areq, struct skcipher_request, base);
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(breq);
++	struct sun8i_cipher_tfm_ctx *op = crypto_skcipher_ctx(tfm);
++	struct sun8i_ce_dev *ce = op->ce;
++	struct sun8i_cipher_req_ctx *rctx = skcipher_request_ctx(breq);
++	int flow, err;
  
- #define ENGINE_NAME_LEN	30
+-	err = sun8i_ce_cipher(breq);
++	flow = rctx->flow;
++	err = sun8i_ce_run_task(ce, flow, crypto_tfm_alg_name(breq->base.tfm));
+ 	crypto_finalize_skcipher_request(engine, breq, err);
++	return 0;
++}
 +
-+/*
-+ * struct cur_req - Represent a request to be processed
-+ * @prepared:	Does the request was prepared
-+ * @req:	The request to be processed
-+ */
-+struct cur_req {
-+	bool				prepared;
-+	struct crypto_async_request	*req;
-+};
++static int sun8i_ce_cipher_unprepare(struct crypto_engine *engine, void *async_req)
++{
++	struct skcipher_request *areq = container_of(async_req, struct skcipher_request, base);
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(areq);
++	struct sun8i_cipher_tfm_ctx *op = crypto_skcipher_ctx(tfm);
++	struct sun8i_ce_dev *ce = op->ce;
++	struct sun8i_cipher_req_ctx *rctx = skcipher_request_ctx(areq);
++	struct sun8i_ce_flow *chan;
++	struct ce_task *cet;
++	unsigned int ivsize, offset;
++	int nr_sgs = rctx->nr_sgs;
++	int nr_sgd = rctx->nr_sgd;
++	int flow;
 +
- /*
-  * struct crypto_engine - crypto hardware engine
-  * @name: the engine name
-  * @idling: the engine is entering idle state
-  * @busy: request pump is busy
-  * @running: the engine is on working
-- * @cur_req_prepared: current request is prepared
-  * @list: link with the global crypto engine list
-  * @queue_lock: spinlock to syncronise access to request queue
-  * @queue: the crypto queue of the engine
-@@ -38,14 +48,14 @@
-  * @kworker: kthread worker struct for request pump
-  * @pump_requests: work struct for scheduling work to the request pump
-  * @priv_data: the engine private data
-- * @cur_req: the current request which is on processing
-+ * @rmax:	The number of request which can be processed in one batch
-+ * @cur_reqs: 	A list for requests to be processed
++	flow = rctx->flow;
++	chan = &ce->chanlist[flow];
++	cet = chan->tl;
++	ivsize = crypto_skcipher_ivsize(tfm);
++
++	if (areq->src == areq->dst) {
++		dma_unmap_sg(ce->dev, areq->src, nr_sgs, DMA_BIDIRECTIONAL);
++	} else {
++		if (nr_sgs > 0)
++			dma_unmap_sg(ce->dev, areq->src, nr_sgs, DMA_TO_DEVICE);
++		dma_unmap_sg(ce->dev, areq->dst, nr_sgd, DMA_FROM_DEVICE);
++	}
++
++	if (areq->iv && ivsize > 0) {
++		if (cet->t_iv)
++			dma_unmap_single(ce->dev, cet->t_iv, rctx->ivlen,
++					 DMA_TO_DEVICE);
++		offset = areq->cryptlen - ivsize;
++		if (rctx->op_dir & CE_DECRYPTION) {
++			memcpy(areq->iv, rctx->backup_iv, ivsize);
++			kzfree(rctx->backup_iv);
++		} else {
++			scatterwalk_map_and_copy(areq->iv, areq->dst, offset,
++						 ivsize, 0);
++		}
++		kfree(rctx->bounce_iv);
++	}
++
++	dma_unmap_single(ce->dev, cet->t_key, op->keylen, DMA_TO_DEVICE);
+ 
+ 	return 0;
+ }
+@@ -347,9 +401,9 @@ int sun8i_ce_cipher_init(struct crypto_tfm *tfm)
+ 		 crypto_tfm_alg_driver_name(&sktfm->base),
+ 		 crypto_tfm_alg_driver_name(crypto_skcipher_tfm(&op->fallback_tfm->base)));
+ 
+-	op->enginectx.op.do_one_request = sun8i_ce_handle_cipher_request;
+-	op->enginectx.op.prepare_request = NULL;
+-	op->enginectx.op.unprepare_request = NULL;
++	op->enginectx.op.do_one_request = sun8i_ce_cipher_run;
++	op->enginectx.op.prepare_request = sun8i_ce_cipher_prepare;
++	op->enginectx.op.unprepare_request = sun8i_ce_cipher_unprepare;
+ 
+ 	err = pm_runtime_get_sync(op->ce->dev);
+ 	if (err < 0)
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
+index 049b3175d755..2d3325a13bf1 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
+@@ -183,6 +183,8 @@ struct sun8i_ce_dev {
+  * @backup_iv:	buffer which contain the next IV to store
+  * @bounce_iv:	buffer which contain a copy of IV
+  * @ivlen:	size of bounce_iv
++ * @nr_sgs:	The number of source SG (as given by dma_map_sg())
++ * @nr_sgd:	The number of destination SG (as given by dma_map_sg())
   */
- struct crypto_engine {
- 	char			name[ENGINE_NAME_LEN];
- 	bool			idling;
- 	bool			busy;
- 	bool			running;
--	bool			cur_req_prepared;
- 
- 	struct list_head	list;
- 	spinlock_t		queue_lock;
-@@ -61,7 +71,8 @@ struct crypto_engine {
- 	struct kthread_work             pump_requests;
- 
- 	void				*priv_data;
--	struct crypto_async_request	*cur_req;
-+	int 				rmax;
-+	struct cur_req 			*cur_reqs;
+ struct sun8i_cipher_req_ctx {
+ 	u32 op_dir;
+@@ -190,6 +192,8 @@ struct sun8i_cipher_req_ctx {
+ 	void *backup_iv;
+ 	void *bounce_iv;
+ 	unsigned int ivlen;
++	int nr_sgs;
++	int nr_sgd;
  };
  
  /*
