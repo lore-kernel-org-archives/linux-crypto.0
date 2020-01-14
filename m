@@ -8,55 +8,55 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23295C33CB1
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jan 2020 14:00:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A095DC33CB1
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jan 2020 14:00:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E83202468C
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jan 2020 14:00:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 75FF12467A
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jan 2020 14:00:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EUO5m76U"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="vf0d1GFb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728863AbgANOAX (ORCPT
+        id S1729145AbgANOAd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 14 Jan 2020 09:00:23 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:34765 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728939AbgANN76 (ORCPT
+        Tue, 14 Jan 2020 09:00:33 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:37401 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728909AbgANN7y (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Jan 2020 08:59:58 -0500
-Received: by mail-wm1-f66.google.com with SMTP id w5so2378446wmi.1;
-        Tue, 14 Jan 2020 05:59:56 -0800 (PST)
+        Tue, 14 Jan 2020 08:59:54 -0500
+Received: by mail-wr1-f65.google.com with SMTP id w15so12304724wru.4;
+        Tue, 14 Jan 2020 05:59:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=xjPV4Ha5BYE0MCX17Wl6xnLI6QAy5DnWASz8VTCVvYQ=;
-        b=EUO5m76UvmdUwWtNzcIKhgu1b3wsytiLJXK+nCU8Jd+QLUFj3sjQ6tp4GDPLdz01Tk
-         CqD2W85UbyrcCOMSjLf/dFpOusOr7BW9TGliVE1RP6bXsB8Sxe8ahdtC2GAFpvVWPHtu
-         huctNx72GCsTAiGkF1SCKWPEXR1HgUR4pAxwdKl8372GYVvlcoKFEIjoubnexI0StKy6
-         x656qiDvIBYjjnHT10RUOQDzOjyDF4tIiOjDG3EtntrJNHGhnm/SU9hhc3qJmCNhKtuH
-         mUG4dI9ncJ9bO9nTWh1qxkJkNIl9HucXdHS5WgPs9si0eKsDk+9KCo/JNtoxvjSE9hva
-         LINg==
+        bh=vXhhnXKXoxYSpa1+LXBS7VNs2uspXwnX5jIhIQmwFrM=;
+        b=vf0d1GFbo08+NG6G7zxZJeTZMiLIJ81itsHNzneSbCkxlMw9PSK/5EefhFcFVz9UQt
+         opn2DFmB99e8fxSV8zDeioxOunCEPA1JwLFUV1JZ7tohx4yS9VeIx8szZELtTSaUVi8e
+         MpWVfqUzXzlqC8OzVcKJK0ejjOuekOA7kfio69OKQHzwuuBCoSSJilnH5swyZxmwDZJF
+         tN3p1UTmeFTOKAHtBkIz5KeyE9Q4FZuzTOg9R23HG9C9cgjdnkGH0O/sF2p6DB0IkmgJ
+         U5ZD/0/mbzXaXbqd6FkEoMNCPZqXCdUeNLQe5nz7k+II0heYxnrX1j0mMKgnkq6aGLYT
+         cx4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=xjPV4Ha5BYE0MCX17Wl6xnLI6QAy5DnWASz8VTCVvYQ=;
-        b=ZBE7vZM9HVNLRuZmt9dln8hZtzG/Us4DLZr+UkHN7nm4HMJvN4Gqrl2wRu119GoQfl
-         Eb9uRuejZQePAs8jFmSExHCdaC1xF+0h/NnubT9CY4tz+Vg/+CRtwOojC6ofk1Rh3Qpb
-         gp+MwiT9p5gNYN5OTWZlSG+39b9Z82sEeL/E+Ol8wu8L3pm9ybxY0G0E882c/ckB3f8c
-         WkMR5hRpDvFQT0n3QyrTKZ/joAK+VRre6nfAeHfGqVspHI3PcU5cDpZZJUUwOkppVJXN
-         nkSaz/NGPu8B0ZkewieLw5gRkchdcStg28nnGTeh/zqZDt4m075m6iRIlnwyBpy4mQO+
-         h2zQ==
-X-Gm-Message-State: APjAAAWxKCwXYbGOKXbGWrRqd1S8ymmvzKMRPXtfLPd4pzq/0psrM+MQ
-        MFPePSigY86y5dUpyx5ZBsY=
-X-Google-Smtp-Source: APXvYqzVCraPGaXbAoGqhP1ygDTY7R+QHVftrzEYOGKAwqSEbThaIsz0cQp5wFfFNd9DXBamDMmh5Q==
-X-Received: by 2002:a1c:62c1:: with SMTP id w184mr28138545wmb.150.1579010396021;
-        Tue, 14 Jan 2020 05:59:56 -0800 (PST)
+        bh=vXhhnXKXoxYSpa1+LXBS7VNs2uspXwnX5jIhIQmwFrM=;
+        b=Oy7B2bqjPKt3JraVLq+uRzyqxAQ+oq1+bZQRKVEb9acahUDnzYz6RYg0EahBGWJC54
+         XF70JortqoD97HwErlkrFyPa1MsByZvV/YiscIxclzu1wUBV7vgCOib0EmUlpB/lB+YC
+         Rwlmjuad+RxWwJYv4RNQzWU1EVQqAaWDxN0YH1wrsQ3HdSERoOvFdW4wdNeF6pW+P4eQ
+         geC62V7fs6qg4iJw0tgBG1n5YIwk16WrmKLmWFpJZ/V50sBTiUorDtUTLUoFvnVZvPqB
+         9WDwceEDDJiJB8CK6tVKKkKlfZDPARo0lYeJda4GinAEy1/rCKN62s8rzU7wcOFvyrsi
+         ixsw==
+X-Gm-Message-State: APjAAAUCBWmJx19grPHAOvID7IXwC5JqNXR8kEznfFcMxAhcAB/nnNVo
+        3wnixloHzpZJLBDEDxIDD0c=
+X-Google-Smtp-Source: APXvYqzIL5QDAbPSLYL8aOpzAthE16eu5faMIOdeePz7IfOOcLviaBT2dTkTsFRl6NklQxS0c9Fjhw==
+X-Received: by 2002:a5d:6703:: with SMTP id o3mr26238015wru.235.1579010392992;
+        Tue, 14 Jan 2020 05:59:52 -0800 (PST)
 Received: from Red.localdomain ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id 4sm17854448wmg.22.2020.01.14.05.59.54
+        by smtp.googlemail.com with ESMTPSA id 4sm17854448wmg.22.2020.01.14.05.59.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jan 2020 05:59:55 -0800 (PST)
+        Tue, 14 Jan 2020 05:59:52 -0800 (PST)
 From:   Corentin Labbe <clabbe.montjoie@gmail.com>
 To:     alexandre.torgue@st.com, davem@davemloft.net,
         herbert@gondor.apana.org.au, mcoquelin.stm32@gmail.com,
@@ -67,9 +67,9 @@ Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
         linux-stm32@st-md-mailman.stormreply.com,
         linux-sunxi@googlegroups.com,
         Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH RFC 04/10] crypto: sun8i-ce: introduce the slot number
-Date:   Tue, 14 Jan 2020 14:59:30 +0100
-Message-Id: <20200114135936.32422-5-clabbe.montjoie@gmail.com>
+Subject: [PATCH RFC 02/10] crypto: sun8i-ce: increase task list size
+Date:   Tue, 14 Jan 2020 14:59:28 +0100
+Message-Id: <20200114135936.32422-3-clabbe.montjoie@gmail.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200114135936.32422-1-clabbe.montjoie@gmail.com>
 References: <20200114135936.32422-1-clabbe.montjoie@gmail.com>
@@ -80,65 +80,50 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch adds the slot position, for choosing which task in the task
-list should be prepared/unprepared.
-The slot is for the moment is always 0 until the infrastructure will handle
-non 0 value.
+The CE can handle more than 1 task at once, so this patch increase the size of
+the task list up to 8.
+For the moment I did not see more gain beyong this value.
 
 Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 ---
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 6 ++++--
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c   | 2 +-
- 2 files changed, 5 insertions(+), 3 deletions(-)
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c | 4 ++--
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h      | 1 +
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-index 401f39f144ea..9c1f6c9eaaf9 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-@@ -96,6 +96,7 @@ static int sun8i_ce_cipher_prepare(struct crypto_engine *engine, void *async_req
- 	int flow, i;
- 	int nr_sgs = 0;
- 	int nr_sgd = 0;
-+	int slot = 0;
- 	int err = 0;
- 
- 	algt = container_of(alg, struct sun8i_ce_alg_template, alg.skcipher);
-@@ -114,7 +115,7 @@ static int sun8i_ce_cipher_prepare(struct crypto_engine *engine, void *async_req
- 
- 	chan = &ce->chanlist[flow];
- 
--	cet = chan->tl;
-+	cet = &chan->tl[slot];
- 	memset(cet, 0, sizeof(struct ce_task));
- 
- 	cet->t_id = cpu_to_le32(flow);
-@@ -301,11 +302,12 @@ static int sun8i_ce_cipher_unprepare(struct crypto_engine *engine, void *async_r
- 	unsigned int ivsize, offset;
- 	int nr_sgs = rctx->nr_sgs;
- 	int nr_sgd = rctx->nr_sgd;
-+	int slot = 0;
- 	int flow;
- 
- 	flow = rctx->flow;
- 	chan = &ce->chanlist[flow];
--	cet = chan->tl;
-+	cet = &chan->tl[slot];
- 	ivsize = crypto_skcipher_ivsize(tfm);
- 
- 	if (areq->src == areq->dst) {
 diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-index e8bf7bf31061..bd355f4b95f3 100644
+index f72346a44e69..e8bf7bf31061 100644
 --- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
 +++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-@@ -120,7 +120,7 @@ int sun8i_ce_run_task(struct sun8i_ce_dev *ce, int flow, const char *name)
- 	/* Be sure all data is written before enabling the task */
- 	wmb();
+@@ -321,7 +321,7 @@ static void sun8i_ce_free_chanlist(struct sun8i_ce_dev *ce, int i)
+ 	while (i >= 0) {
+ 		crypto_engine_exit(ce->chanlist[i].engine);
+ 		if (ce->chanlist[i].tl)
+-			dma_free_coherent(ce->dev, sizeof(struct ce_task),
++			dma_free_coherent(ce->dev, sizeof(struct ce_task) * MAXTASK,
+ 					  ce->chanlist[i].tl,
+ 					  ce->chanlist[i].t_phy);
+ 		i--;
+@@ -356,7 +356,7 @@ static int sun8i_ce_allocate_chanlist(struct sun8i_ce_dev *ce)
+ 			goto error_engine;
+ 		}
+ 		ce->chanlist[i].tl = dma_alloc_coherent(ce->dev,
+-							sizeof(struct ce_task),
++							sizeof(struct ce_task) * MAXTASK,
+ 							&ce->chanlist[i].t_phy,
+ 							GFP_KERNEL);
+ 		if (!ce->chanlist[i].tl) {
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
+index 49507ef2ec63..049b3175d755 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
+@@ -73,6 +73,7 @@
+ #define CE_MAX_CLOCKS 3
  
--	v = 1 | (ce->chanlist[flow].tl->t_common_ctl & 0x7F) << 8;
-+	v = 1 | (ce->chanlist[flow].tl[0].t_common_ctl & 0x7F) << 8;
- 	writel(v, ce->base + CE_TLR);
- 	mutex_unlock(&ce->mlock);
+ #define MAXFLOW 4
++#define MAXTASK 8
  
+ /*
+  * struct ce_clock - Describe clocks used by sun8i-ce
 -- 
 2.24.1
 
