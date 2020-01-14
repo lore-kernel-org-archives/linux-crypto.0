@@ -2,126 +2,132 @@ Return-Path: <SRS0=ZPJC=3D=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E18DC33CB1
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jan 2020 13:54:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 127E0C33CB1
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jan 2020 13:59:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4EB82214AF
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jan 2020 13:54:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D719D24679
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jan 2020 13:59:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="veQmBW9B"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W5yD7THh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726106AbgANNx7 (ORCPT
+        id S1728739AbgANN7w (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 14 Jan 2020 08:53:59 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:51933 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725994AbgANNx7 (ORCPT
+        Tue, 14 Jan 2020 08:59:52 -0500
+Received: from mail-wm1-f41.google.com ([209.85.128.41]:36852 "EHLO
+        mail-wm1-f41.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725994AbgANN7w (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Jan 2020 08:53:59 -0500
-Received: by mail-wm1-f66.google.com with SMTP id d73so13861523wmd.1;
-        Tue, 14 Jan 2020 05:53:58 -0800 (PST)
+        Tue, 14 Jan 2020 08:59:52 -0500
+Received: by mail-wm1-f41.google.com with SMTP id p17so13869409wma.1;
+        Tue, 14 Jan 2020 05:59:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=NG+zhbtnS25eEsQP2J1dL+HmOFUEElVQuvgkp4X4amQ=;
-        b=veQmBW9BNI/uYnVnWk17UlaI7mThr5G1v8/RHR8cRChG9cNml5/AY2gRiy70xmgWWP
-         ref+SQ1wixocTc0F0pIe0wBqJswcI4w13RqumQW59cFgOIMrG9lrXk4+sI5x7HGmG74H
-         lFfM+QUyOzlGEcRsDN8TXNpt3DXrEg1yspZ8lGyomiY1Q11tqt4n7u1sns7A1P2MLlhg
-         MIvVehDYRKfT3vAgG3VI7ZmjOcohxHFqbbmozYl6owCqSbyG3ck4doGgT81Lp+N3rjMT
-         A1QN/4YwDb4ngtP/J7s9SFlREEo9uZA+AZM4dnE9nOQ9RVUxJs9GcI7eocT/cOs/M0yU
-         jzeg==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=WxdkQ4fln/Ubg69SQWZPku8d8xfNPtcWo6lDszFAgoU=;
+        b=W5yD7THh9GoPrqpAR+V6A99baoCffIA80ESDKdfUT4jQ43HWe7mgvJtpFBECNzWpfo
+         bz8xxkmz7NEenvBfXfcRuOdyeWxr/pUVVyFOh9D5p9Nqf4DNNkAg8yMwt2KipmDXSA4m
+         F/Xi7b8c+8LkgBp35W80e9OVXqAPJNH2bBe+He6wKRT0YZa0l/hFhJpvHkcEUovLUEpi
+         UHyC1DShgeL4HbPe4cvV8l153bzO81NZY3bLWpc1uh9L8pOP8grJOHDrSBs/SEUo7Q/G
+         C6IkbFOdSBNykmToWLZSS6dvZWgV7mwwdZTUK+lIjdgNba/X1T0dVEkSEzSu50mSY97i
+         xWOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=NG+zhbtnS25eEsQP2J1dL+HmOFUEElVQuvgkp4X4amQ=;
-        b=b+BPK6LYv/8ohrC1fE0g8kWUFEnWSUzsQDcbWDsXAZDqhBNNFHwlLV8s2avgbLtZou
-         Tsxe8M9qnhV1PT2UAgAAX//+F3LsXAmCSUBXddLWckslxZhWTsVIErh3wapwN40xYPEY
-         1esSYyZ/6WP7BBB1zFewwZ6gnvYJmFEmHanye7iD7a3aqf04/4kOIpbPd5qovHnUvabh
-         e4Aj2bDHeNDttRYr8FOFT/H70FwG4EecDFBaOhG5gE8eNYLfXHwlzCXNbyb9af7NOXrd
-         wv4T0WHPEJLEq1YYKE3U+/FziEUfOPeUxTvibJ2bzHGWbB/wH/8mK3dIvtY8sXGOTu1M
-         jWJg==
-X-Gm-Message-State: APjAAAV4Z0Euq07xb8YAA+7eDAhoDj9ML7iXWcYgL1nI/ezZDFQyG3RC
-        WKlpJ8BZQ3rS4QOOsFfV4znqJQ2t
-X-Google-Smtp-Source: APXvYqwvBkG3giMIZMH3MRxfPsfX+B/DQjAwIiobVKBYBt9W1qAo4mYCcKKF5NhZNJ2HNpDms63rxA==
-X-Received: by 2002:a1c:7205:: with SMTP id n5mr28002839wmc.9.1579010037888;
-        Tue, 14 Jan 2020 05:53:57 -0800 (PST)
-Received: from Red ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id o1sm19708771wrn.84.2020.01.14.05.53.56
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=WxdkQ4fln/Ubg69SQWZPku8d8xfNPtcWo6lDszFAgoU=;
+        b=MQPDaq883hDxv/L/2ACMJZQ2Bmg6p18NXzsPxP8T2LjCnCy32wmf3b62J1rtzIEMVp
+         GEeEO022/ZMN80jUWChj181jxa69Ngd5ZpPstZeMkkjIZFWIIa7kLLzM+3ZDZ/nkryQE
+         NcAoAcJK6BxENuRKyYQzS1ScZhFNvG4X2CA/V/69eqdROPcfU4TMW5YKA/dUBY6Aog8V
+         Xwn0kDLa3iSkhQ68zmxHUkIeaf9jabJIJxrqZDhkF7oMezqFm6s8Q1/WWl5kgD4a0Cus
+         jmrzLAM2d61SiDZPh54RuH7yTqQ5mB0kvMPXPUqtg086pmMO1SH3DYEkcovnMIhwbOQk
+         oTww==
+X-Gm-Message-State: APjAAAUqLadIONRnjWOpae8X//iqp9dNK4ZwpwlHvbshi4TCfd9Dxhb4
+        tAwH/W0dRs02ANYR/ILLJPM=
+X-Google-Smtp-Source: APXvYqzNVQbW7IsfrQ2HGsc5vwBjjCjT9FNXhoYr/xxz+X6aphiPMpyQ6yCNL9Z9aspgGTjXkf82iw==
+X-Received: by 2002:a05:600c:20e:: with SMTP id 14mr19620970wmi.104.1579010389767;
+        Tue, 14 Jan 2020 05:59:49 -0800 (PST)
+Received: from Red.localdomain ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
+        by smtp.googlemail.com with ESMTPSA id 4sm17854448wmg.22.2020.01.14.05.59.48
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jan 2020 05:53:57 -0800 (PST)
-Date:   Tue, 14 Jan 2020 14:53:54 +0100
+        Tue, 14 Jan 2020 05:59:49 -0800 (PST)
 From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Iuliana Prodan <iuliana.prodan@nxp.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "baolin.wang@linaro.org" <baolin.wang@linaro.org>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>,
-        Silvano Di Ninno <silvano.dininno@nxp.com>
-Subject: Re: [PATCH v2 09/10] crypto: caam - add crypto_engine support for
- RSA algorithms
-Message-ID: <20200114135354.GA3088@Red>
-References: <1578013373-1956-1-git-send-email-iuliana.prodan@nxp.com>
- <1578013373-1956-10-git-send-email-iuliana.prodan@nxp.com>
- <VI1PR0402MB3485162217C242B16CF1371B98380@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <VI1PR04MB44452FF06F35075413CF87F88C350@VI1PR04MB4445.eurprd04.prod.outlook.com>
- <20200114001440.baeadihvlqiucw63@gondor.apana.org.au>
- <VI1PR04MB4445E44C69277F17CFBDB9128C340@VI1PR04MB4445.eurprd04.prod.outlook.com>
+To:     alexandre.torgue@st.com, davem@davemloft.net,
+        herbert@gondor.apana.org.au, mcoquelin.stm32@gmail.com,
+        mripard@kernel.org, wens@csie.org, iuliana.prodan@nxp.com,
+        horia.geanta@nxp.com, aymen.sghaier@nxp.com
+Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        linux-stm32@st-md-mailman.stormreply.com,
+        linux-sunxi@googlegroups.com,
+        Corentin Labbe <clabbe.montjoie@gmail.com>
+Subject: [PATCH RFC 00/10] crypto: engine: permit to batch requests
+Date:   Tue, 14 Jan 2020 14:59:26 +0100
+Message-Id: <20200114135936.32422-1-clabbe.montjoie@gmail.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <VI1PR04MB4445E44C69277F17CFBDB9128C340@VI1PR04MB4445.eurprd04.prod.outlook.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jan 14, 2020 at 10:40:53AM +0000, Iuliana Prodan wrote:
-> On 1/14/2020 2:14 AM, Herbert Xu wrote:
-> > On Mon, Jan 13, 2020 at 09:48:11AM +0000, Iuliana Prodan wrote:
-> >>
-> >> Regarding the transfer request to crypto-engine: if sending all requests
-> >> to crypto-engine, multibuffer tests, for non-backlogging requests fail
-> >> after only 10 requests, since crypto-engine queue has 10 entries.
-> > 
-> > That isn't right.  The crypto engine should never refuse to accept
-> > a request 
-> Crypto-engine accepts all request that have the backlog flag, the 
-> non-backlog are accepted till the configured limit (of 10).
-> 
-> > unless the hardware queue is really full.  
-> Crypto-engine doesn't check the status of hardware queue.
-> The non-backlog requests are dropped after 10 entries.
-> 
-> > Perhaps the
-> > crypto engine code needs to be fixed?
-> To me, crypto-engine seems to be made for backlogged request, that's why 
-> I'm sending the non-backlog directly to CAAM. The implicit serialization 
-> of request in crypto-engine is the bottleneck.
-> 
-> But, as I said before, I want to update crypto-engine to set queue 
-> length when initialize crypto-engine, and remove serialization of 
-> requests in crypto-engine by adding knowledge about the underlying hw 
-> accelerator (number of request that can be processed in parallel).
-> I'll send a RFC with my proposal for crypto-engine enhancements.
-> 
-> But, until then, I would like to have a backlogging solution in CAAM driver.
-> 
-
 Hello
 
-I have already something for queue length and processing in parallel.
-I will send it soon.
+The sun8i-ce hardware can work on multiple requests in one batch.
+For this it use a task descriptor, and chain them.
+For the moment, the driver does not use this mechanism and do requests
+one at a time and issue an irq for each.
+
+Using the chaning will permit to issue less interrupts, and increase
+thoughput.
+
+But the crypto/engine can enqueue lots of requests but can ran them only
+one by one.
+
+This serie introduce a way to batch requests in crypto/engine by
+- setting a batch limit (1 by default)
+- refactor the prepare/unprepare code to permit to have x requests
+  prepared/unprepared at the same time.
+
+For testing the serie, the selftest are not enough, since it issue
+request one at a time.
+I have used LUKS for testing it.
+
+Please give me what you think about this serie, specially maintainers
+which have hardware with the same kind of capability.
 
 Regards
+
+Corentin Labbe (10):
+  crypto: sun8i-ce: move iv data to request context
+  crypto: sun8i-ce: increase task list size
+  crypto: sun8i-ce: split into prepare/run/unprepare
+  crypto: sun8i-ce: introduce the slot number
+  crypto: engine: transform cur_req in an array
+  crypto: engine: introduce ct
+  crypto: sun8i-ce: handle slot > 0
+  crypto: engine: add slot parameter
+  crypto: engine: permit to batch requests
+  crypto: sun8i-ce: use the new batch mechanism
+
+ crypto/crypto_engine.c                        |  76 +++++++----
+ .../allwinner/sun8i-ce/sun8i-ce-cipher.c      | 121 +++++++++++++-----
+ .../crypto/allwinner/sun8i-ce/sun8i-ce-core.c |  17 ++-
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h  |  17 ++-
+ drivers/crypto/omap-aes-gcm.c                 |   2 +-
+ drivers/crypto/omap-aes.c                     |   4 +-
+ drivers/crypto/omap-des.c                     |   4 +-
+ drivers/crypto/stm32/stm32-cryp.c             |   8 +-
+ drivers/crypto/stm32/stm32-hash.c             |   4 +-
+ include/crypto/engine.h                       |  27 +++-
+ 10 files changed, 201 insertions(+), 79 deletions(-)
+
+-- 
+2.24.1
+
