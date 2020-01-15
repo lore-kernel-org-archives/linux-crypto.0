@@ -2,436 +2,176 @@ Return-Path: <SRS0=cdcO=3E=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BCDBC33CB3
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 Jan 2020 10:40:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70E04C33CB1
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 Jan 2020 11:18:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0E8022467A
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 Jan 2020 10:40:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 422762187F
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 Jan 2020 11:18:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="rJn3b3w8"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="g3Mcxwnk"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730086AbgAOKkL (ORCPT
+        id S1729747AbgAOLS6 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 15 Jan 2020 05:40:11 -0500
-Received: from mo4-p04-ob.smtp.rzone.de ([81.169.146.179]:17831 "EHLO
-        mo4-p04-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729819AbgAOKj2 (ORCPT
+        Wed, 15 Jan 2020 06:18:58 -0500
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:42892 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726045AbgAOLS6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 Jan 2020 05:39:28 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1579084763;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=tGyEyETRclcDtvR7783kjfwCH0crxI4vRKnr1Tu3U3U=;
-        b=rJn3b3w8GoYqqgHhkKfWXXDosPxC1cZFVIOeY31uxw6pJpcILvEFX+Y9vdPf4Bx2YR
-        iy1PW03Vpe5kBXNE/+ZinhKZTf8mublKJvOjxWYwzwO4xdWQH9He2QMFGprAvBSKGWn2
-        P/E3n28ixB+9q0jmUSfmlofOgGXQgP9IzTpFUYJFTxrGzqMCTabVKrEB+t7gMMbMyB79
-        flMFo3V0V0tiEGi0NzEtZi8IYQqqaU73wP4kzF/ZAumn+7IHz5881J4DCs19Y4nGrAMH
-        QfAFZnCplZHKgbPgXaBEkXfy8zB5WNCHdhADiTPJSJrAMf24EMxUPo6H6osAZpCaPT6S
-        BsRg==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPZJPScHivh"
-X-RZG-CLASS-ID: mo00
-Received: from positron.chronox.de
-        by smtp.strato.de (RZmta 46.1.4 DYNA|AUTH)
-        with ESMTPSA id u04585w0FAc6W06
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-        Wed, 15 Jan 2020 11:38:06 +0100 (CET)
-From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        linux-api@vger.kernel.org,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        "Alexander E. Patrakov" <patrakov@gmail.com>,
-        "Ahmed S. Darwish" <darwish.07@gmail.com>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
-        Matthew Garrett <mjg59@srcf.ucam.org>,
-        Vito Caputo <vcaputo@pengaru.com>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
-        William Jon McCann <mccann@jhu.edu>,
-        zhangjs <zachary@baishancloud.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Florian Weimer <fweimer@redhat.com>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Nicolai Stange <nstange@suse.de>,
-        "Peter, Matthias" <matthias.peter@bsi.bund.de>,
-        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
-        Roman Drahtmueller <draht@schaltsekun.de>,
-        Neil Horman <nhorman@redhat.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Julia Lawall <julia.lawall@inria.fr>,
-        Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [PATCH v28 06/12] LRNG - add SP800-90A DRBG extension
-Date:   Wed, 15 Jan 2020 11:33:44 +0100
-Message-ID: <12396284.QuoJzrrf7p@positron.chronox.de>
-In-Reply-To: <5951792.lmNsirYsPE@positron.chronox.de>
-References: <6157374.ptSnyUpaCn@positron.chronox.de> <2641155.iNH938UiKq@positron.chronox.de> <5951792.lmNsirYsPE@positron.chronox.de>
+        Wed, 15 Jan 2020 06:18:58 -0500
+Received: by mail-pf1-f194.google.com with SMTP id 4so8386885pfz.9
+        for <linux-crypto@vger.kernel.org>; Wed, 15 Jan 2020 03:18:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=fXqQU6rEG13cTg0zIPcmRK0xunIDxm/XK6227+s03nA=;
+        b=g3McxwnkUANkgahUsKI7co1RacshzyopeqJjkhK09l59YJUmMmGMx6/LWt3mOzcUO4
+         mw3t0NReHqJDSWcyPsbwbwjtA/tAjeFFeJpb5e+QJhaHuJT5ZiyiiXzqpZqrkwE0EL2T
+         CSSa/Eeg+ZCYGW7arDj+xGWsXc3E+2liHsByajZb2107lndiT4wwOi127YPB8mAOWCwI
+         JYHw14WoDEFoeNk9yxP1XtMEoYfEeGkkAI4nxW6PWcWzKHPBeiIyNOTNs1Jlcrwf9YyM
+         3v6UdXIs9DS4zqOWlKHOXCyhk5UflqruxB1yYtWiIFvxWMnGWsJHhnlEkD8+goIpAzad
+         OQgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=fXqQU6rEG13cTg0zIPcmRK0xunIDxm/XK6227+s03nA=;
+        b=Rq+KpvoNfyGWvcfeK9GhXygm2GDSqrA5JNLHvKXA0LshAI2t7326DV0w0YgBaRfvfU
+         s8Qavy2pPz5zyzQBb7Fm8f9RnP/jFNOA5umz5teBgjqB0PvoG78WNMWwGhbNxpCit2TU
+         JZ+Hn8q++8Y5KgtImGdJtHxYBaEwtfweGs7GlvJP+1rEyO6qRY/CBSpN4IldRXXufCeR
+         kvL2mfJZtsWyndYccFevL+Z9O6MqT2WWl3f4KAyugZ5IZCnlCg28mpCRPY0hoFanFpb/
+         +EViYXX62ApkXLwMbz3dRtiNJPaQySCRdSxZXx3GKahhwD4ndf6vhuJ1K3CLGsY3g2GV
+         G/nw==
+X-Gm-Message-State: APjAAAXSsHM76iP60IcoefGgOz6QV/sKA7VT66V0Oo/gG8SuU4B1ldx6
+        D+NwdT/nZAlzpl9FMVTbEt+RWA==
+X-Google-Smtp-Source: APXvYqwzl+XFVZuDlxHINgXocwnPKmenS6n4tYr3MFMQB417i0lAf852X/6hrV3aU+jpJeUh7Th2Fw==
+X-Received: by 2002:a63:3409:: with SMTP id b9mr32626131pga.320.1579087137475;
+        Wed, 15 Jan 2020 03:18:57 -0800 (PST)
+Received: from [10.79.0.170] ([45.135.186.87])
+        by smtp.gmail.com with ESMTPSA id a28sm21582026pfh.119.2020.01.15.03.18.40
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 15 Jan 2020 03:18:56 -0800 (PST)
+Subject: Re: [PATCH v11 2/4] uacce: add uacce driver
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        jonathan.cameron@huawei.com, dave.jiang@intel.com,
+        grant.likely@arm.com, jean-philippe <jean-philippe@linaro.org>,
+        Jerome Glisse <jglisse@redhat.com>,
+        ilias.apalodimas@linaro.org, francois.ozog@linaro.org,
+        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
+        "haojian . zhuang" <haojian.zhuang@linaro.org>,
+        guodong.xu@linaro.org, linux-accelerators@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        iommu@lists.linux-foundation.org,
+        Kenneth Lee <liguozhu@hisilicon.com>,
+        Zaibo Xu <xuzaibo@huawei.com>
+References: <1578710919-12141-1-git-send-email-zhangfei.gao@linaro.org>
+ <1578710919-12141-3-git-send-email-zhangfei.gao@linaro.org>
+ <20200111194006.GD435222@kroah.com>
+ <053ccd05-4f11-5be6-47c2-eee5c2f1fdc4@linaro.org>
+ <20200114145934.GA1960403@kroah.com>
+From:   zhangfei <zhangfei.gao@linaro.org>
+Message-ID: <c71b402c-a185-50a7-2827-c1836cc6c237@linaro.org>
+Date:   Wed, 15 Jan 2020 19:18:34 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
+In-Reply-To: <20200114145934.GA1960403@kroah.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Using the LRNG switchable DRNG support, the SP800-90A DRBG extension is
-implemented.
+Hi, Greg
 
-The DRBG uses the kernel crypto API DRBG implementation. In addition, it
-uses the kernel crypto API SHASH support to provide the hashing
-operation.
+On 2020/1/14 下午10:59, Greg Kroah-Hartman wrote:
+> On Mon, Jan 13, 2020 at 11:34:55AM +0800, zhangfei wrote:
+>> Hi, Greg
+>>
+>> Thanks for the review.
+>>
+>> On 2020/1/12 上午3:40, Greg Kroah-Hartman wrote:
+>>> On Sat, Jan 11, 2020 at 10:48:37AM +0800, Zhangfei Gao wrote:
+>>>> +static int uacce_fops_open(struct inode *inode, struct file *filep)
+>>>> +{
+>>>> +	struct uacce_mm *uacce_mm = NULL;
+>>>> +	struct uacce_device *uacce;
+>>>> +	struct uacce_queue *q;
+>>>> +	int ret = 0;
+>>>> +
+>>>> +	uacce = xa_load(&uacce_xa, iminor(inode));
+>>>> +	if (!uacce)
+>>>> +		return -ENODEV;
+>>>> +
+>>>> +	if (!try_module_get(uacce->parent->driver->owner))
+>>>> +		return -ENODEV;
+>>> Why are you trying to grab the module reference of the parent device?
+>>> Why is that needed and what is that going to help with here?
+>>>
+>>> This shouldn't be needed as the module reference of the owner of the
+>>> fileops for this module is incremented, and the "parent" module depends
+>>> on this module, so how could it be unloaded without this code being
+>>> unloaded?
+>>>
+>>> Yes, if you build this code into the kernel and the "parent" driver is a
+>>> module, then you will not have a reference, but when you remove that
+>>> parent driver the device will be removed as it has to be unregistered
+>>> before that parent driver can be removed from the system, right?
+>>>
+>>> Or what am I missing here?
+>> The refcount here is preventing rmmod "parent" module after fd is opened,
+>> since user driver has mmap kernel memory to user space, like mmio, which may
+>> still in-use.
+>>
+>> With the refcount protection, rmmod "parent" module will fail until
+>> application free the fd.
+>> log like: rmmod: ERROR: Module hisi_zip is in use
+> But if the "parent" module is to be unloaded, it has to unregister the
+> "child" device and that will call the destructor in here and then you
+> will tear everything down and all should be good.
+>
+> There's no need to "forbid" a module from being unloaded, even if it is
+> being used.  Look at all networking drivers, they work that way, right?
+Thanks Greg for the kind suggestion.
 
-The DRBG supports the choice of either a CTR DRBG using AES-256, HMAC
-DRBG with SHA-512 core or Hash DRBG with SHA-512 core. The used core can
-be selected with the module parameter lrng_drbg_type. The default is the
-CTR DRBG.
+I still have one uncertainty.
+Does uacce has to block process continue accessing the mmapped area when 
+remove "parent" module?
+Uacce can block device access the physical memory when parent module 
+call uacce_remove.
+But application is still running, and suppose it is not the kernel 
+driver's responsibility to call unmap.
 
-When compiling the DRBG extension statically, the DRBG is loaded at
-late_initcall stage which implies that with the start of user space, the
-user space interfaces of getrandom(2), /dev/random and /dev/urandom
-provide random data produced by an SP800-90A DRBG.
+I am looking for some examples in kernel,
+looks vfio does not block process continue accessing when 
+vfio_unregister_iommu_driver either.
 
-CC: "Eric W. Biederman" <ebiederm@xmission.com>
-CC: "Alexander E. Patrakov" <patrakov@gmail.com>
-CC: "Ahmed S. Darwish" <darwish.07@gmail.com>
-CC: "Theodore Y. Ts'o" <tytso@mit.edu>
-CC: Willy Tarreau <w@1wt.eu>
-CC: Matthew Garrett <mjg59@srcf.ucam.org>
-CC: Vito Caputo <vcaputo@pengaru.com>
-CC: Andreas Dilger <adilger.kernel@dilger.ca>
-CC: Jan Kara <jack@suse.cz>
-CC: Ray Strode <rstrode@redhat.com>
-CC: William Jon McCann <mccann@jhu.edu>
-CC: zhangjs <zachary@baishancloud.com>
-CC: Andy Lutomirski <luto@kernel.org>
-CC: Florian Weimer <fweimer@redhat.com>
-CC: Lennart Poettering <mzxreary@0pointer.de>
-CC: Nicolai Stange <nstange@suse.de>
-Reviewed-by: Roman Drahtmueller <draht@schaltsekun.de>
-Tested-by: Roman Drahtm=FCller <draht@schaltsekun.de>
-Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
-Tested-by: Neil Horman <nhorman@redhat.com>
-Signed-off-by: Stephan Mueller <smueller@chronox.de>
-=2D--
- drivers/char/lrng/Kconfig     |  11 ++
- drivers/char/lrng/Makefile    |   1 +
- drivers/char/lrng/lrng_drbg.c | 260 ++++++++++++++++++++++++++++++++++
- 3 files changed, 272 insertions(+)
- create mode 100644 drivers/char/lrng/lrng_drbg.c
+In my test, application will keep waiting after rmmod parent, until 
+ctrl+c, when unmap is called.
+During the process, kernel does not report any error.
 
-diff --git a/drivers/char/lrng/Kconfig b/drivers/char/lrng/Kconfig
-index cb701bb0b8b6..15fb623d9d1f 100644
-=2D-- a/drivers/char/lrng/Kconfig
-+++ b/drivers/char/lrng/Kconfig
-@@ -71,4 +71,15 @@ menuconfig LRNG_DRNG_SWITCH
- 	  accessible via the external interfaces. With this configuration
- 	  option other DRNGs can be selected and loaded at runtime.
-=20
-+if LRNG_DRNG_SWITCH
-+config LRNG_DRBG
-+	tristate "SP800-90A support for the LRNG"
-+	select CRYPTO_DRBG_MENU
-+	select CRYPTO_CMAC if CRYPTO_DRBG_CTR
-+	help
-+	  Enable the SP800-90A DRBG support for the LRNG. Once the
-+	  module is loaded, output from /dev/random, /dev/urandom,
-+	  getrandom(2), or get_random_bytes is provided by a DRBG.
-+endif # LRNG_DRNG_SWITCH
-+
- endif # LRNG
-diff --git a/drivers/char/lrng/Makefile b/drivers/char/lrng/Makefile
-index 31cfe87c999e..0d320fcb7b9e 100644
-=2D-- a/drivers/char/lrng/Makefile
-+++ b/drivers/char/lrng/Makefile
-@@ -11,3 +11,4 @@ obj-y				+=3D lrng_pool.o lrng_aux.o \
- obj-$(CONFIG_NUMA)		+=3D lrng_numa.o
- obj-$(CONFIG_SYSCTL)		+=3D lrng_proc.o
- obj-$(CONFIG_LRNG_DRNG_SWITCH)	+=3D lrng_switch.o
-+obj-$(CONFIG_LRNG_DRBG)		+=3D lrng_drbg.o
-diff --git a/drivers/char/lrng/lrng_drbg.c b/drivers/char/lrng/lrng_drbg.c
-new file mode 100644
-index 000000000000..8bf2badb1fe0
-=2D-- /dev/null
-+++ b/drivers/char/lrng/lrng_drbg.c
-@@ -0,0 +1,260 @@
-+// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
-+/*
-+ * Backend for the LRNG providing the cryptographic primitives using the
-+ * kernel crypto API and its DRBG.
-+ *
-+ * Copyright (C) 2016 - 2020, Stephan Mueller <smueller@chronox.de>
-+ */
-+
-+#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-+
-+#include <crypto/drbg.h>
-+#include <linux/init.h>
-+#include <linux/module.h>
-+#include <linux/lrng.h>
-+
-+/*
-+ * Define a DRBG plus a hash / MAC used to extract data from the entropy p=
-ool.
-+ * For LRNG_HASH_NAME you can use a hash or a MAC (HMAC or CMAC) of your c=
-hoice
-+ * (Note, you should use the suggested selections below -- using SHA-1 or =
-MD5
-+ * is not wise). The idea is that the used cipher primitive can be selecte=
-d to
-+ * be the same as used for the DRBG. I.e. the LRNG only uses one cipher
-+ * primitive using the same cipher implementation with the options offered=
- in
-+ * the following. This means, if the CTR DRBG is selected and AES-NI is pr=
-esent,
-+ * both the CTR DRBG and the selected cmac(aes) use AES-NI.
-+ *
-+ * The security strengths of the DRBGs are all 256 bits according to
-+ * SP800-57 section 5.6.1.
-+ *
-+ * This definition is allowed to be changed.
-+ */
-+#ifdef CONFIG_CRYPTO_DRBG_CTR
-+static unsigned int lrng_drbg_type =3D 0;
-+#elif defined CONFIG_CRYPTO_DRBG_HMAC
-+static unsigned int lrng_drbg_type =3D 1;
-+#elif defined CONFIG_CRYPTO_DRBG_HASH
-+static unsigned int lrng_drbg_type =3D 2;
-+#else
-+#error "Unknown DRBG in use"
-+#endif
-+
-+/* The parameter must be r/o in sysfs as otherwise races appear. */
-+module_param(lrng_drbg_type, uint, 0444);
-+MODULE_PARM_DESC(lrng_drbg_type, "DRBG type used for LRNG (0->CTR_DRBG, "
-+				 "1->HMAC_DRBG, 2->Hash_DRBG)");
-+
-+struct lrng_drbg {
-+	const char *hash_name;
-+	const char *drbg_core;
-+};
-+
-+static const struct lrng_drbg lrng_drbg_types[] =3D {
-+	{	/* CTR_DRBG with AES-256 using derivation function */
-+		.hash_name =3D "cmac(aes)",
-+		.drbg_core =3D "drbg_nopr_ctr_aes256",
-+	}, {	/* HMAC_DRBG with SHA-512 */
-+		.hash_name =3D "sha512",
-+		.drbg_core =3D "drbg_nopr_hmac_sha512",
-+	}, {	/* Hash_DRBG with SHA-512 using derivation function */
-+		.hash_name =3D "sha512",
-+		.drbg_core =3D "drbg_nopr_sha512"
-+	}
-+};
-+
-+struct lrng_hash_info {
-+	struct shash_desc shash;
-+	char ctx[];
-+};
-+
-+static int lrng_drbg_drng_seed_helper(void *drng, const u8 *inbuf, u32 inb=
-uflen)
-+{
-+	struct drbg_state *drbg =3D (struct drbg_state *)drng;
-+	LIST_HEAD(seedlist);
-+	struct drbg_string data;
-+	int ret;
-+
-+	drbg_string_fill(&data, inbuf, inbuflen);
-+	list_add_tail(&data.list, &seedlist);
-+	ret =3D drbg->d_ops->update(drbg, &seedlist, drbg->seeded);
-+
-+	if (ret >=3D 0)
-+		drbg->seeded =3D true;
-+
-+	return ret;
-+}
-+
-+static int lrng_drbg_drng_generate_helper(void *drng, u8 *outbuf, u32 outb=
-uflen)
-+{
-+	struct drbg_state *drbg =3D (struct drbg_state *)drng;
-+
-+	return drbg->d_ops->generate(drbg, outbuf, outbuflen, NULL);
-+}
-+
-+static void *lrng_drbg_drng_alloc(u32 sec_strength)
-+{
-+	struct drbg_state *drbg;
-+	int coreref =3D -1;
-+	bool pr =3D false;
-+	int ret;
-+
-+	drbg_convert_tfm_core(lrng_drbg_types[lrng_drbg_type].drbg_core,
-+			      &coreref, &pr);
-+	if (coreref < 0)
-+		return ERR_PTR(-EFAULT);
-+
-+	drbg =3D kzalloc(sizeof(struct drbg_state), GFP_KERNEL);
-+	if (!drbg)
-+		return ERR_PTR(-ENOMEM);
-+
-+	drbg->core =3D &drbg_cores[coreref];
-+	drbg->seeded =3D false;
-+	ret =3D drbg_alloc_state(drbg);
-+	if (ret)
-+		goto err;
-+
-+	if (sec_strength > drbg_sec_strength(drbg->core->flags)) {
-+		pr_err("Security strength of DRBG (%u bits) lower than "
-+		       "requested by LRNG (%u bits)\n",
-+			drbg_sec_strength(drbg->core->flags) * 8,
-+			sec_strength * 8);
-+		goto dealloc;
-+	}
-+
-+	if (sec_strength < drbg_sec_strength(drbg->core->flags))
-+		pr_warn("Security strength of DRBG (%u bits) higher than "
-+			"requested by LRNG (%u bits)\n",
-+			drbg_sec_strength(drbg->core->flags) * 8,
-+			sec_strength * 8);
-+
-+	pr_info("DRBG with %s core allocated\n", drbg->core->backend_cra_name);
-+
-+	return drbg;
-+
-+dealloc:
-+	if (drbg->d_ops)
-+		drbg->d_ops->crypto_fini(drbg);
-+	drbg_dealloc_state(drbg);
-+err:
-+	kfree(drbg);
-+	return ERR_PTR(-EINVAL);
-+}
-+
-+static void lrng_drbg_drng_dealloc(void *drng)
-+{
-+	struct drbg_state *drbg =3D (struct drbg_state *)drng;
-+
-+	drbg_dealloc_state(drbg);
-+	kzfree(drbg);
-+	pr_info("DRBG deallocated\n");
-+}
-+
-+static void *lrng_drbg_hash_alloc(const u8 *key, u32 keylen)
-+{
-+	struct lrng_hash_info *lrng_hash;
-+	struct crypto_shash *tfm;
-+	int size, ret;
-+
-+	tfm =3D crypto_alloc_shash(lrng_drbg_types[lrng_drbg_type].hash_name,
-+				 0, 0);
-+	if (IS_ERR(tfm)) {
-+		pr_err("could not allocate hash %s\n",
-+		       lrng_drbg_types[lrng_drbg_type].hash_name);
-+		return ERR_CAST(tfm);
-+	}
-+
-+	size =3D sizeof(struct lrng_hash_info) + crypto_shash_descsize(tfm);
-+	lrng_hash =3D kmalloc(size, GFP_KERNEL);
-+	if (!lrng_hash) {
-+		crypto_free_shash(tfm);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	lrng_hash->shash.tfm =3D tfm;
-+
-+	/* If the used hash is no MAC, ignore the ENOSYS return code */
-+	ret =3D crypto_shash_setkey(tfm, key, keylen);
-+	if (ret && ret !=3D -ENOSYS) {
-+		pr_err("could not set the key for MAC\n");
-+		crypto_free_shash(tfm);
-+		kfree(lrng_hash);
-+		return ERR_PTR(ret);
-+	}
-+
-+	pr_info("Hash %s allocated\n",
-+		lrng_drbg_types[lrng_drbg_type].hash_name);
-+
-+	return lrng_hash;
-+}
-+
-+static void lrng_drbg_hash_dealloc(void *hash)
-+{
-+	struct lrng_hash_info *lrng_hash =3D (struct lrng_hash_info *)hash;
-+	struct shash_desc *shash =3D &lrng_hash->shash;
-+	struct crypto_shash *tfm =3D shash->tfm;
-+
-+	crypto_free_shash(tfm);
-+	kfree(lrng_hash);
-+	pr_info("Hash deallocated\n");
-+}
-+
-+static u32 lrng_drbg_hash_digestsize(void *hash)
-+{
-+	struct lrng_hash_info *lrng_hash =3D (struct lrng_hash_info *)hash;
-+	struct shash_desc *shash =3D &lrng_hash->shash;
-+
-+	return crypto_shash_digestsize(shash->tfm);
-+}
-+
-+static int lrng_drbg_hash_buffer(void *hash, const u8 *inbuf, u32 inbuflen,
-+				 u8 *digest)
-+{
-+	struct lrng_hash_info *lrng_hash =3D (struct lrng_hash_info *)hash;
-+	struct shash_desc *shash =3D &lrng_hash->shash;
-+
-+	return crypto_shash_digest(shash, inbuf, inbuflen, digest);
-+}
-+
-+static const char *lrng_drbg_name(void)
-+{
-+	return lrng_drbg_types[lrng_drbg_type].drbg_core;
-+}
-+
-+static const char *lrng_hash_name(void)
-+{
-+	return lrng_drbg_types[lrng_drbg_type].hash_name;
-+}
-+
-+const static struct lrng_crypto_cb lrng_drbg_crypto_cb =3D {
-+	.lrng_drng_name			=3D lrng_drbg_name,
-+	.lrng_hash_name			=3D lrng_hash_name,
-+	.lrng_drng_alloc		=3D lrng_drbg_drng_alloc,
-+	.lrng_drng_dealloc		=3D lrng_drbg_drng_dealloc,
-+	.lrng_drng_seed_helper		=3D lrng_drbg_drng_seed_helper,
-+	.lrng_drng_generate_helper	=3D lrng_drbg_drng_generate_helper,
-+	.lrng_hash_alloc		=3D lrng_drbg_hash_alloc,
-+	.lrng_hash_dealloc		=3D lrng_drbg_hash_dealloc,
-+	.lrng_hash_digestsize		=3D lrng_drbg_hash_digestsize,
-+	.lrng_hash_buffer		=3D lrng_drbg_hash_buffer,
-+};
-+
-+static int __init lrng_drbg_init(void)
-+{
-+	if (lrng_drbg_type >=3D ARRAY_SIZE(lrng_drbg_types)) {
-+		pr_err("lrng_drbg_type parameter too large (given %u - max: %lu)",
-+		       lrng_drbg_type,
-+		       (unsigned long)ARRAY_SIZE(lrng_drbg_types) - 1);
-+		return -EAGAIN;
-+	}
-+	return lrng_set_drng_cb(&lrng_drbg_crypto_cb);
-+}
-+
-+static void __exit lrng_drbg_exit(void)
-+{
-+	lrng_set_drng_cb(NULL);
-+}
-+
-+late_initcall(lrng_drbg_init);
-+module_exit(lrng_drbg_exit);
-+MODULE_LICENSE("Dual BSD/GPL");
-+MODULE_AUTHOR("Stephan Mueller <smueller@chronox.de>");
-+MODULE_DESCRIPTION("Linux Random Number Generator - SP800-90A DRBG backend=
-");
-=2D-=20
-2.24.1
+Do you have any advice?
 
+>>>> +static void uacce_release(struct device *dev)
+>>>> +{
+>>>> +	struct uacce_device *uacce = to_uacce_device(dev);
+>>>> +
+>>>> +	kfree(uacce);
+>>>> +	uacce = NULL;
+>>> That line didn't do anything :)
+>> Yes, this is a mistake.
+>> It is up to caller to set to NULL to prevent release multi times.
+> Release function is called by the driver core which will not touch the
+> value again.
+Yes, I understand, it's my mistake. Will remove it.
 
-
-
+Thanks
