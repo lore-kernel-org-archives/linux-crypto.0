@@ -1,383 +1,616 @@
-Return-Path: <SRS0=ZPJC=3D=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=cdcO=3E=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFD14C33C9E
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jan 2020 22:04:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 068CCC33C9E
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 Jan 2020 02:28:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B496024673
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Jan 2020 22:04:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B19E524679
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 Jan 2020 02:28:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="Y4Iorx0h"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728795AbgANWEN (ORCPT
+        id S1728883AbgAOC2w (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 14 Jan 2020 17:04:13 -0500
-Received: from mail-il1-f200.google.com ([209.85.166.200]:55281 "EHLO
-        mail-il1-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727331AbgANWEN (ORCPT
+        Tue, 14 Jan 2020 21:28:52 -0500
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:37732 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728862AbgAOC2v (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Jan 2020 17:04:13 -0500
-Received: by mail-il1-f200.google.com with SMTP id t4so11644924ili.21
-        for <linux-crypto@vger.kernel.org>; Tue, 14 Jan 2020 14:04:12 -0800 (PST)
+        Tue, 14 Jan 2020 21:28:51 -0500
+Received: by mail-pf1-f193.google.com with SMTP id p14so7678044pfn.4
+        for <linux-crypto@vger.kernel.org>; Tue, 14 Jan 2020 18:28:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:mime-version:content-disposition;
+        bh=GKFQ6H4SE7yWHHIWl/0MAoXjABDt/6l59XNgIveYJNQ=;
+        b=Y4Iorx0hh102pVM1DTGwsDLytrYe3f9TCZA5kFWYJjrvg5vdG5hRifLdvtGwqKNaUi
+         3Y9O4nHJiSyL+Dj7oopJeKeByTyEVQJ111OTNk4dEIjkp/es9csYXbjxxEGl1dclG6II
+         OnNUWmq56qggeE8dLGiJe8yg28z9ciFvKSSvo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=eMHW3wOLXebnWAJm9k4zcnGaWoDH60aioQnabNtGfyo=;
-        b=ps5SlCultpzfVzSDdza+69OVf/5LCyokLHjXrrFdnuRhjQLFlsAf48v5R3iRIPfiQa
-         XvPXbeJ8QqHxQD5tvFCAS9uWT8gazNeEQm4u874jS3Fct5nCYC5A9POyEBzIy1YxHwJb
-         kHywbYzkK3SN682lF0w2NlVc6UUhO57k5MpZ578KIrT28nttbQjvGoq3CDNkQ3N9YrPL
-         yLbM2gPXTB6Ym3dDHXJt1tW/No0mM21zM1Tr6BgZaGMiCzoBAbbREWMDau6ZeSK2IApG
-         Yw/qjK8GZ7nuXtAKqcqQ3OzSlo9x6w9aFwk14qjT4tgYqxqPb5sDAWVCZ1JFRL80e2/X
-         Oi+Q==
-X-Gm-Message-State: APjAAAUC0Q4O1boOmVSjZ+TJ7ITkoSO3pCSDjZcqW3UD3H7V/byCVSnH
-        hSE1MSF/GeRkQArH641EIDg9hXtbi0O+wwSr4zS6bCVJdKDO
-X-Google-Smtp-Source: APXvYqz+F+uIHCsCPgWMIVFLIEtm+KjeYSok2IWRCOjyN//4I+0dhvSlqjfGw1/XFBPusaiG1RyfcfseAU66iAJELq50R18YY/py
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=GKFQ6H4SE7yWHHIWl/0MAoXjABDt/6l59XNgIveYJNQ=;
+        b=LmFmyAhJgSdd54TLBp9Rxty5M/MxqdbP9IuvcaavdCTiCeCi7i6w2yj80XZlU9zuKW
+         9snuI5ic9tdtxWGiZVN2E7pBqQ2xPXJRVuCNCMo1pyqEtGWF+jFkw7JOy5eOmbKMl60j
+         MEKxx97FKgGRmuHHjwDIvCQwdDEQa8h5GKQKVe+8UOmbOYWfoJvmE2NNBJE4Gb+pgsng
+         rtENe0u6D8/oplgCaZWMGhzPIuBhYNtUkgjIFCWrEiGJ+x++l2LmMG1VBON73dvZAIn2
+         7TK1nnKxBuLvwbWCI5/ulOjcv1CnZFJri4dGBdoFm07q9fjz/igIl2YldH1M8UbPGiZi
+         AuEQ==
+X-Gm-Message-State: APjAAAWiPRp/wS+Odc7pvmuYOYnTgudahweTtdVhr8XKh02UB9GPllX4
+        x2J3d/CwrtbcWIoGSuP4oWawXQ==
+X-Google-Smtp-Source: APXvYqx/ONSiOBi3f5hzX6Dk1b8X4kN0/2EORMrnh/kZS7j1ywPCfKE/q+ANdhsoTibACHUtCt4SZA==
+X-Received: by 2002:a63:62c2:: with SMTP id w185mr31995778pgb.271.1579055330544;
+        Tue, 14 Jan 2020 18:28:50 -0800 (PST)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id b21sm20954498pfp.0.2020.01.14.18.28.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 14 Jan 2020 18:28:49 -0800 (PST)
+Date:   Tue, 14 Jan 2020 18:28:48 -0800
+From:   Kees Cook <keescook@chromium.org>
+To:     Eric Biggers <ebiggers@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-kernel@vger.kernel.org, x86@kernel.org,
+        linux-crypto@vger.kernel.org,
+        Sami Tolvanen <samitolvanen@google.com>
+Subject: [PATCH v2] crypto, x86/sha: Eliminate casts on asm implementations
+Message-ID: <202001141825.8CD52D0@keescook>
 MIME-Version: 1.0
-X-Received: by 2002:a02:ba91:: with SMTP id g17mr21576179jao.106.1579039452053;
- Tue, 14 Jan 2020 14:04:12 -0800 (PST)
-Date:   Tue, 14 Jan 2020 14:04:12 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000a04d03059c20c560@google.com>
-Subject: BUG: workqueue lockup (5)
-From:   syzbot <syzbot+f0b66b520b54883d4b9d@syzkaller.appspotmail.com>
-To:     alexander.deucher@amd.com, christian.koenig@amd.com,
-        harry.wentland@amd.com, himanshujha199640@gmail.com, hpa@zytor.com,
-        kvm@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, mingo@redhat.com,
-        pbonzini@redhat.com, rex.zhu@amd.com, rkrcmar@redhat.com,
-        steffen.klassert@secunet.com, syzkaller-bugs@googlegroups.com,
-        tglx@linutronix.de, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
+In order to avoid CFI function prototype mismatches, this removes the
+casts on assembly implementations of sha1/256/512 accelerators. The
+safety checks from BUILD_BUG_ON() remain.
 
-syzbot found the following crash on:
+Additionally, this renames various arguments for clarity, as suggested
+by Eric Biggers.
 
-HEAD commit:    e69ec487 Merge branch 'for-linus' of git://git.kernel.org/..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=158223fee00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=18698c0c240ba616
-dashboard link: https://syzkaller.appspot.com/bug?extid=f0b66b520b54883d4b9d
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=156c569ee00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=132251b9e00000
-
-The bug was bisected to:
-
-commit ebe02de2c60caa3ee5a1b39c7c8b2a40e1fda2d8
-Author: Himanshu Jha <himanshujha199640@gmail.com>
-Date:   Tue Aug 29 13:12:27 2017 +0000
-
-     drm/amd/powerplay/hwmgr: Remove null check before kfree
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12e9cb25e00000
-final crash:    https://syzkaller.appspot.com/x/report.txt?x=11e9cb25e00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=16e9cb25e00000
-
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+f0b66b520b54883d4b9d@syzkaller.appspotmail.com
-Fixes: ebe02de2c60c ("drm/amd/powerplay/hwmgr: Remove null check before  
-kfree")
-
-BUG: workqueue lockup - pool cpus=1 node=0 flags=0x0 nice=0 stuck for 261s!
-Showing busy workqueues and worker pools:
-workqueue events: flags=0x0
-   pwq 2: cpus=1 node=0 flags=0x0 nice=0 active=3/256 refcnt=4
-     pending: defense_work_handler, free_obj_work, cache_reap
-
-======================================================
-WARNING: possible circular locking dependency detected
-5.5.0-rc5-syzkaller #0 Not tainted
-------------------------------------------------------
-swapper/0/0 is trying to acquire lock:
-ffffffff8999a700 (console_owner){-.-.}, at: log_next  
-kernel/printk/printk.c:516 [inline]
-ffffffff8999a700 (console_owner){-.-.}, at: console_unlock+0x415/0xf00  
-kernel/printk/printk.c:2460
-
-but task is already holding lock:
-ffff8880ae936b58 (&(&pool->lock)->rlock){-.-.}, at: show_workqueue_state  
-kernel/workqueue.c:4767 [inline]
-ffff8880ae936b58 (&(&pool->lock)->rlock){-.-.}, at:  
-show_workqueue_state.cold+0x156/0x802 kernel/workqueue.c:4740
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #4 (&(&pool->lock)->rlock){-.-.}:
-        __raw_spin_lock include/linux/spinlock_api_smp.h:142 [inline]
-        _raw_spin_lock+0x2f/0x40 kernel/locking/spinlock.c:151
-        spin_lock include/linux/spinlock.h:338 [inline]
-        __queue_work+0x285/0x1280 kernel/workqueue.c:1444
-        queue_work_on+0x19f/0x210 kernel/workqueue.c:1513
-        queue_work include/linux/workqueue.h:494 [inline]
-        schedule_work include/linux/workqueue.h:552 [inline]
-        put_pwq kernel/workqueue.c:1113 [inline]
-        put_pwq+0x178/0x1d0 kernel/workqueue.c:1098
-        put_pwq_unlocked.part.0+0x34/0x70 kernel/workqueue.c:1130
-        put_pwq_unlocked kernel/workqueue.c:1124 [inline]
-        apply_wqattrs_cleanup.part.0+0xf6/0x160 kernel/workqueue.c:3878
-        apply_wqattrs_cleanup kernel/workqueue.c:4017 [inline]
-        apply_workqueue_attrs_locked+0xeb/0x140 kernel/workqueue.c:4015
-        apply_workqueue_attrs+0x31/0x50 kernel/workqueue.c:4046
-        padata_setup_cpumasks kernel/padata.c:365 [inline]
-        padata_alloc_pd+0x298/0xb60 kernel/padata.c:436
-        padata_alloc kernel/padata.c:996 [inline]
-        padata_alloc_possible+0x1b6/0x480 kernel/padata.c:1042
-        pcrypt_init_padata+0x20/0x105 crypto/pcrypt.c:311
-        pcrypt_init+0x76/0x11b crypto/pcrypt.c:342
-        do_one_initcall+0x120/0x820 init/main.c:938
-        do_initcall_level init/main.c:1006 [inline]
-        do_initcalls init/main.c:1014 [inline]
-        do_basic_setup init/main.c:1031 [inline]
-        kernel_init_freeable+0x4ca/0x570 init/main.c:1202
-        kernel_init+0x12/0x1bf init/main.c:1109
-        ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
-
--> #3 (&pool->lock/1){..-.}:
-        __raw_spin_lock include/linux/spinlock_api_smp.h:142 [inline]
-        _raw_spin_lock+0x2f/0x40 kernel/locking/spinlock.c:151
-        spin_lock include/linux/spinlock.h:338 [inline]
-        __queue_work+0x285/0x1280 kernel/workqueue.c:1444
-        queue_work_on+0x19f/0x210 kernel/workqueue.c:1513
-        queue_work include/linux/workqueue.h:494 [inline]
-        tty_schedule_flip drivers/tty/tty_buffer.c:413 [inline]
-        tty_flip_buffer_push+0xc5/0x100 drivers/tty/tty_buffer.c:556
-        pty_write+0x1a6/0x200 drivers/tty/pty.c:125
-        n_tty_write+0xb1d/0x1080 drivers/tty/n_tty.c:2356
-        do_tty_write drivers/tty/tty_io.c:962 [inline]
-        tty_write+0x496/0x7f0 drivers/tty/tty_io.c:1046
-        __vfs_write+0x8a/0x110 fs/read_write.c:494
-        vfs_write+0x268/0x5d0 fs/read_write.c:558
-        ksys_write+0x14f/0x290 fs/read_write.c:611
-        __do_sys_write fs/read_write.c:623 [inline]
-        __se_sys_write fs/read_write.c:620 [inline]
-        __x64_sys_write+0x73/0xb0 fs/read_write.c:620
-        do_syscall_64+0xfa/0x790 arch/x86/entry/common.c:294
-        entry_SYSCALL_64_after_hwframe+0x49/0xbe
-
--> #2 (&(&port->lock)->rlock){-.-.}:
-        __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
-        _raw_spin_lock_irqsave+0x95/0xcd kernel/locking/spinlock.c:159
-        tty_port_tty_get+0x24/0x100 drivers/tty/tty_port.c:288
-        tty_port_default_wakeup+0x16/0x40 drivers/tty/tty_port.c:47
-        tty_port_tty_wakeup+0x57/0x70 drivers/tty/tty_port.c:388
-        uart_write_wakeup+0x46/0x70 drivers/tty/serial/serial_core.c:104
-        serial8250_tx_chars+0x495/0xaf0  
-drivers/tty/serial/8250/8250_port.c:1761
-        serial8250_handle_irq.part.0+0x261/0x2b0  
-drivers/tty/serial/8250/8250_port.c:1834
-        serial8250_handle_irq drivers/tty/serial/8250/8250_port.c:1820  
-[inline]
-        serial8250_default_handle_irq+0xc0/0x150  
-drivers/tty/serial/8250/8250_port.c:1850
-        serial8250_interrupt+0xf1/0x1a0  
-drivers/tty/serial/8250/8250_core.c:126
-        __handle_irq_event_percpu+0x15d/0x970 kernel/irq/handle.c:149
-        handle_irq_event_percpu+0x74/0x160 kernel/irq/handle.c:189
-        handle_irq_event+0xa7/0x134 kernel/irq/handle.c:206
-        handle_edge_irq+0x25e/0x8d0 kernel/irq/chip.c:830
-        generic_handle_irq_desc include/linux/irqdesc.h:156 [inline]
-        do_IRQ+0xde/0x280 arch/x86/kernel/irq.c:250
-        ret_from_intr+0x0/0x36
-        native_safe_halt+0xe/0x10 arch/x86/include/asm/irqflags.h:60
-        arch_cpu_idle+0xa/0x10 arch/x86/kernel/process.c:690
-        default_idle_call+0x84/0xb0 kernel/sched/idle.c:94
-        cpuidle_idle_call kernel/sched/idle.c:154 [inline]
-        do_idle+0x3c8/0x6e0 kernel/sched/idle.c:269
-        cpu_startup_entry+0x1b/0x20 kernel/sched/idle.c:361
-        start_secondary+0x2f4/0x410 arch/x86/kernel/smpboot.c:264
-        secondary_startup_64+0xa4/0xb0 arch/x86/kernel/head_64.S:242
-
--> #1 (&port_lock_key){-.-.}:
-        __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
-        _raw_spin_lock_irqsave+0x95/0xcd kernel/locking/spinlock.c:159
-        serial8250_console_write+0x253/0x9a0  
-drivers/tty/serial/8250/8250_port.c:3142
-        univ8250_console_write+0x5f/0x70  
-drivers/tty/serial/8250/8250_core.c:587
-        call_console_drivers kernel/printk/printk.c:1791 [inline]
-        console_unlock+0xb7a/0xf00 kernel/printk/printk.c:2473
-        vprintk_emit+0x2a0/0x700 kernel/printk/printk.c:1996
-        vprintk_default+0x28/0x30 kernel/printk/printk.c:2023
-        vprintk_func+0x7e/0x189 kernel/printk/printk_safe.c:386
-        printk+0xba/0xed kernel/printk/printk.c:2056
-        register_console+0x745/0xb50 kernel/printk/printk.c:2798
-        univ8250_console_init+0x3e/0x4b  
-drivers/tty/serial/8250/8250_core.c:682
-        console_init+0x461/0x67b kernel/printk/printk.c:2884
-        start_kernel+0x653/0x943 init/main.c:712
-        x86_64_start_reservations+0x29/0x2b arch/x86/kernel/head64.c:490
-        x86_64_start_kernel+0x77/0x7b arch/x86/kernel/head64.c:471
-        secondary_startup_64+0xa4/0xb0 arch/x86/kernel/head_64.S:242
-
--> #0 (console_owner){-.-.}:
-        check_prev_add kernel/locking/lockdep.c:2476 [inline]
-        check_prevs_add kernel/locking/lockdep.c:2581 [inline]
-        validate_chain kernel/locking/lockdep.c:2971 [inline]
-        __lock_acquire+0x2596/0x4a00 kernel/locking/lockdep.c:3955
-        lock_acquire+0x190/0x410 kernel/locking/lockdep.c:4485
-        console_lock_spinning_enable kernel/printk/printk.c:1654 [inline]
-        console_unlock+0x47f/0xf00 kernel/printk/printk.c:2470
-        vprintk_emit+0x2a0/0x700 kernel/printk/printk.c:1996
-        vprintk_default+0x28/0x30 kernel/printk/printk.c:2023
-        vprintk_func+0x7e/0x189 kernel/printk/printk_safe.c:386
-        printk+0xba/0xed kernel/printk/printk.c:2056
-        show_pwq+0x154/0x7cb kernel/workqueue.c:4673
-        show_workqueue_state kernel/workqueue.c:4769 [inline]
-        show_workqueue_state.cold+0x1a6/0x802 kernel/workqueue.c:4740
-        wq_watchdog_timer_fn+0x511/0x590 kernel/workqueue.c:5783
-        call_timer_fn+0x1ac/0x780 kernel/time/timer.c:1404
-        expire_timers kernel/time/timer.c:1449 [inline]
-        __run_timers kernel/time/timer.c:1773 [inline]
-        __run_timers kernel/time/timer.c:1740 [inline]
-        run_timer_softirq+0xdca/0x1790 kernel/time/timer.c:1788
-        __do_softirq+0x262/0x98c kernel/softirq.c:292
-        invoke_softirq kernel/softirq.c:373 [inline]
-        irq_exit+0x19b/0x1e0 kernel/softirq.c:413
-        exiting_irq arch/x86/include/asm/apic.h:536 [inline]
-        smp_apic_timer_interrupt+0x1a3/0x610 arch/x86/kernel/apic/apic.c:1137
-        apic_timer_interrupt+0xf/0x20 arch/x86/entry/entry_64.S:829
-        native_safe_halt+0xe/0x10 arch/x86/include/asm/irqflags.h:60
-        arch_cpu_idle+0xa/0x10 arch/x86/kernel/process.c:690
-        default_idle_call+0x84/0xb0 kernel/sched/idle.c:94
-        cpuidle_idle_call kernel/sched/idle.c:154 [inline]
-        do_idle+0x3c8/0x6e0 kernel/sched/idle.c:269
-        cpu_startup_entry+0x1b/0x20 kernel/sched/idle.c:361
-        rest_init+0x23b/0x371 init/main.c:451
-        arch_call_rest_init+0xe/0x1b
-        start_kernel+0x904/0x943 init/main.c:784
-        x86_64_start_reservations+0x29/0x2b arch/x86/kernel/head64.c:490
-        x86_64_start_kernel+0x77/0x7b arch/x86/kernel/head64.c:471
-        secondary_startup_64+0xa4/0xb0 arch/x86/kernel/head_64.S:242
-
-other info that might help us debug this:
-
-Chain exists of:
-   console_owner --> &pool->lock/1 --> &(&pool->lock)->rlock
-
-  Possible unsafe locking scenario:
-
-        CPU0                    CPU1
-        ----                    ----
-   lock(&(&pool->lock)->rlock);
-                                lock(&pool->lock/1);
-                                lock(&(&pool->lock)->rlock);
-   lock(console_owner);
-
-  *** DEADLOCK ***
-
-4 locks held by swapper/0/0:
-  #0: ffffc90000007d50 ((&wq_watchdog_timer)){+.-.}, at: lockdep_copy_map  
-include/linux/lockdep.h:172 [inline]
-  #0: ffffc90000007d50 ((&wq_watchdog_timer)){+.-.}, at:  
-call_timer_fn+0xe0/0x780 kernel/time/timer.c:1394
-  #1: ffffffff899a5340 (rcu_read_lock){....}, at:  
-show_workqueue_state+0x0/0x120 kernel/workqueue.c:4638
-  #2: ffff8880ae936b58 (&(&pool->lock)->rlock){-.-.}, at:  
-show_workqueue_state kernel/workqueue.c:4767 [inline]
-  #2: ffff8880ae936b58 (&(&pool->lock)->rlock){-.-.}, at:  
-show_workqueue_state.cold+0x156/0x802 kernel/workqueue.c:4740
-  #3: ffffffff8999a960 (console_lock){+.+.}, at: console_trylock_spinning  
-kernel/printk/printk.c:1716 [inline]
-  #3: ffffffff8999a960 (console_lock){+.+.}, at: vprintk_emit+0x283/0x700  
-kernel/printk/printk.c:1995
-
-stack backtrace:
-CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.5.0-rc5-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
-Google 01/01/2011
-Call Trace:
-  <IRQ>
-  __dump_stack lib/dump_stack.c:77 [inline]
-  dump_stack+0x197/0x210 lib/dump_stack.c:118
-  print_circular_bug.isra.0.cold+0x163/0x172 kernel/locking/lockdep.c:1685
-  check_noncircular+0x32e/0x3e0 kernel/locking/lockdep.c:1809
-  check_prev_add kernel/locking/lockdep.c:2476 [inline]
-  check_prevs_add kernel/locking/lockdep.c:2581 [inline]
-  validate_chain kernel/locking/lockdep.c:2971 [inline]
-  __lock_acquire+0x2596/0x4a00 kernel/locking/lockdep.c:3955
-  lock_acquire+0x190/0x410 kernel/locking/lockdep.c:4485
-  console_lock_spinning_enable kernel/printk/printk.c:1654 [inline]
-  console_unlock+0x47f/0xf00 kernel/printk/printk.c:2470
-  vprintk_emit+0x2a0/0x700 kernel/printk/printk.c:1996
-  vprintk_default+0x28/0x30 kernel/printk/printk.c:2023
-  vprintk_func+0x7e/0x189 kernel/printk/printk_safe.c:386
-  printk+0xba/0xed kernel/printk/printk.c:2056
-  show_pwq+0x154/0x7cb kernel/workqueue.c:4673
-  show_workqueue_state kernel/workqueue.c:4769 [inline]
-  show_workqueue_state.cold+0x1a6/0x802 kernel/workqueue.c:4740
-  wq_watchdog_timer_fn+0x511/0x590 kernel/workqueue.c:5783
-  call_timer_fn+0x1ac/0x780 kernel/time/timer.c:1404
-  expire_timers kernel/time/timer.c:1449 [inline]
-  __run_timers kernel/time/timer.c:1773 [inline]
-  __run_timers kernel/time/timer.c:1740 [inline]
-  run_timer_softirq+0xdca/0x1790 kernel/time/timer.c:1788
-  __do_softirq+0x262/0x98c kernel/softirq.c:292
-  invoke_softirq kernel/softirq.c:373 [inline]
-  irq_exit+0x19b/0x1e0 kernel/softirq.c:413
-  exiting_irq arch/x86/include/asm/apic.h:536 [inline]
-  smp_apic_timer_interrupt+0x1a3/0x610 arch/x86/kernel/apic/apic.c:1137
-  apic_timer_interrupt+0xf/0x20 arch/x86/entry/entry_64.S:829
-  </IRQ>
-RIP: 0010:native_safe_halt+0xe/0x10 arch/x86/include/asm/irqflags.h:61
-Code: e8 bb db f9 eb 8a cc cc cc cc cc cc e9 07 00 00 00 0f 00 2d 24 4d 51  
-00 f4 c3 66 90 e9 07 00 00 00 0f 00 2d 14 4d 51 00 fb f4 <c3> cc 55 48 89  
-e5 41 57 41 56 41 55 41 54 53 e8 be 8a 8b f9 e8 89
-RSP: 0018:ffffffff89807ce8 EFLAGS: 00000286 ORIG_RAX: ffffffffffffff13
-RAX: 1ffffffff132669e RBX: ffffffff8987a140 RCX: 0000000000000000
-RDX: dffffc0000000000 RSI: 0000000000000006 RDI: ffffffff8987a9d4
-RBP: ffffffff89807d18 R08: ffffffff8987a140 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000000 R12: dffffc0000000000
-R13: ffffffff8a7b87c0 R14: 0000000000000000 R15: 0000000000000000
-  arch_cpu_idle+0xa/0x10 arch/x86/kernel/process.c:690
-  default_idle_call+0x84/0xb0 kernel/sched/idle.c:94
-  cpuidle_idle_call kernel/sched/idle.c:154 [inline]
-  do_idle+0x3c8/0x6e0 kernel/sched/idle.c:269
-  cpu_startup_entry+0x1b/0x20 kernel/sched/idle.c:361
-  rest_init+0x23b/0x371 init/main.c:451
-  arch_call_rest_init+0xe/0x1b
-  start_kernel+0x904/0x943 init/main.c:784
-  x86_64_start_reservations+0x29/0x2b arch/x86/kernel/head64.c:490
-  x86_64_start_kernel+0x77/0x7b arch/x86/kernel/head64.c:471
-  secondary_startup_64+0xa4/0xb0 arch/x86/kernel/head_64.S:242
-workqueue events_power_efficient: flags=0x80
-   pwq 2: cpus=1 node=0 flags=0x0 nice=0 active=2/256 refcnt=3
-     pending: fb_flashcursor, neigh_periodic_work
-   pwq 0: cpus=0 node=0 flags=0x0 nice=0 active=2/256 refcnt=3
-     pending: check_lifetime, gc_worker
-workqueue rcu_gp: flags=0x8
-   pwq 2: cpus=1 node=0 flags=0x0 nice=0 active=1/256 refcnt=2
-     in-flight: 2826:srcu_invoke_callbacks
-workqueue mm_percpu_wq: flags=0x8
-   pwq 2: cpus=1 node=0 flags=0x0 nice=0 active=1/256 refcnt=2
-     pending: vmstat_update
-workqueue dm_bufio_cache: flags=0x8
-   pwq 2: cpus=1 node=0 flags=0x0 nice=0 active=1/256 refcnt=2
-     pending: work_fn
-workqueue ipv6_addrconf: flags=0x40008
-   pwq 2: cpus=1 node=0 flags=0x0 nice=0 active=1/1 refcnt=2
-     pending: addrconf_verify_work
-pool 2: cpus=1 node=0 flags=0x0 nice=0 hung=262s workers=3 idle: 3106 26
-
-
+Signed-off-by: Kees Cook <keescook@chromium.org>
 ---
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+I'm calling this v2 since it's now stand-alone. I think I caught
+everything now...
+v2: clean up more comments (ebiggers)
+v1: https://lore.kernel.org/lkml/20191122030620.GD32523@sol.localdomain/
+---
+ arch/x86/crypto/sha1_avx2_x86_64_asm.S |  6 +--
+ arch/x86/crypto/sha1_ssse3_asm.S       | 14 ++++--
+ arch/x86/crypto/sha1_ssse3_glue.c      | 68 +++++++++++---------------
+ arch/x86/crypto/sha256-avx-asm.S       |  4 +-
+ arch/x86/crypto/sha256-avx2-asm.S      |  4 +-
+ arch/x86/crypto/sha256-ssse3-asm.S     |  6 ++-
+ arch/x86/crypto/sha256_ssse3_glue.c    | 34 ++++++-------
+ arch/x86/crypto/sha512-avx-asm.S       | 11 +++--
+ arch/x86/crypto/sha512-avx2-asm.S      | 11 +++--
+ arch/x86/crypto/sha512-ssse3-asm.S     | 13 +++--
+ arch/x86/crypto/sha512_ssse3_glue.c    | 31 ++++++------
+ 11 files changed, 101 insertions(+), 101 deletions(-)
 
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-syzbot can test patches for this bug, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+diff --git a/arch/x86/crypto/sha1_avx2_x86_64_asm.S b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
+index 6decc85ef7b7..1e594d60afa5 100644
+--- a/arch/x86/crypto/sha1_avx2_x86_64_asm.S
++++ b/arch/x86/crypto/sha1_avx2_x86_64_asm.S
+@@ -62,11 +62,11 @@
+  *Visit http://software.intel.com/en-us/articles/
+  *and refer to improving-the-performance-of-the-secure-hash-algorithm-1/
+  *
+- *Updates 20-byte SHA-1 record in 'hash' for even number of
+- *'num_blocks' consecutive 64-byte blocks
++ *Updates 20-byte SHA-1 record at start of 'state', from 'input', for
++ *even number of 'blocks' consecutive 64-byte blocks.
+  *
+  *extern "C" void sha1_transform_avx2(
+- *	int *hash, const char* input, size_t num_blocks );
++ *	struct sha1_state *state, const u8* input, int blocks );
+  */
+ 
+ #include <linux/linkage.h>
+diff --git a/arch/x86/crypto/sha1_ssse3_asm.S b/arch/x86/crypto/sha1_ssse3_asm.S
+index 5d03c1173690..12e2d19d7402 100644
+--- a/arch/x86/crypto/sha1_ssse3_asm.S
++++ b/arch/x86/crypto/sha1_ssse3_asm.S
+@@ -457,9 +457,13 @@ W_PRECALC_SSSE3
+ 	movdqu	\a,\b
+ .endm
+ 
+-/* SSSE3 optimized implementation:
+- *  extern "C" void sha1_transform_ssse3(u32 *digest, const char *data, u32 *ws,
+- *                                       unsigned int rounds);
++/*
++ * SSSE3 optimized implementation:
++ *
++ * extern "C" void sha1_transform_ssse3(struct sha1_state *state,
++ *					const u8 *data, int blocks);
++ *
++ * Note that struct sha1_state is assumed to begin with u32 state[5].
+  */
+ SHA1_VECTOR_ASM     sha1_transform_ssse3
+ 
+@@ -545,8 +549,8 @@ W_PRECALC_AVX
+ 
+ 
+ /* AVX optimized implementation:
+- *  extern "C" void sha1_transform_avx(u32 *digest, const char *data, u32 *ws,
+- *                                     unsigned int rounds);
++ *  extern "C" void sha1_transform_avx(struct sha1_state *state,
++ *				       const u8 *data, int blocks);
+  */
+ SHA1_VECTOR_ASM     sha1_transform_avx
+ 
+diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
+index 639d4c2fd6a8..f7c8d043f6c1 100644
+--- a/arch/x86/crypto/sha1_ssse3_glue.c
++++ b/arch/x86/crypto/sha1_ssse3_glue.c
+@@ -27,11 +27,8 @@
+ #include <crypto/sha1_base.h>
+ #include <asm/simd.h>
+ 
+-typedef void (sha1_transform_fn)(u32 *digest, const char *data,
+-				unsigned int rounds);
+-
+ static int sha1_update(struct shash_desc *desc, const u8 *data,
+-			     unsigned int len, sha1_transform_fn *sha1_xform)
++			     unsigned int len, sha1_block_fn *sha1_xform)
+ {
+ 	struct sha1_state *sctx = shash_desc_ctx(desc);
+ 
+@@ -39,48 +36,47 @@ static int sha1_update(struct shash_desc *desc, const u8 *data,
+ 	    (sctx->count % SHA1_BLOCK_SIZE) + len < SHA1_BLOCK_SIZE)
+ 		return crypto_sha1_update(desc, data, len);
+ 
+-	/* make sure casting to sha1_block_fn() is safe */
++	/*
++	 * Make sure struct sha1_state begins directly with the SHA1
++	 * 160-bit internal state, as this is what the asm functions expect.
++	 */
+ 	BUILD_BUG_ON(offsetof(struct sha1_state, state) != 0);
+ 
+ 	kernel_fpu_begin();
+-	sha1_base_do_update(desc, data, len,
+-			    (sha1_block_fn *)sha1_xform);
++	sha1_base_do_update(desc, data, len, sha1_xform);
+ 	kernel_fpu_end();
+ 
+ 	return 0;
+ }
+ 
+ static int sha1_finup(struct shash_desc *desc, const u8 *data,
+-		      unsigned int len, u8 *out, sha1_transform_fn *sha1_xform)
++		      unsigned int len, u8 *out, sha1_block_fn *sha1_xform)
+ {
+ 	if (!crypto_simd_usable())
+ 		return crypto_sha1_finup(desc, data, len, out);
+ 
+ 	kernel_fpu_begin();
+ 	if (len)
+-		sha1_base_do_update(desc, data, len,
+-				    (sha1_block_fn *)sha1_xform);
+-	sha1_base_do_finalize(desc, (sha1_block_fn *)sha1_xform);
++		sha1_base_do_update(desc, data, len, sha1_xform);
++	sha1_base_do_finalize(desc, sha1_xform);
+ 	kernel_fpu_end();
+ 
+ 	return sha1_base_finish(desc, out);
+ }
+ 
+-asmlinkage void sha1_transform_ssse3(u32 *digest, const char *data,
+-				     unsigned int rounds);
++asmlinkage void sha1_transform_ssse3(struct sha1_state *state,
++				     const u8 *data, int blocks);
+ 
+ static int sha1_ssse3_update(struct shash_desc *desc, const u8 *data,
+ 			     unsigned int len)
+ {
+-	return sha1_update(desc, data, len,
+-			(sha1_transform_fn *) sha1_transform_ssse3);
++	return sha1_update(desc, data, len, sha1_transform_ssse3);
+ }
+ 
+ static int sha1_ssse3_finup(struct shash_desc *desc, const u8 *data,
+ 			      unsigned int len, u8 *out)
+ {
+-	return sha1_finup(desc, data, len, out,
+-			(sha1_transform_fn *) sha1_transform_ssse3);
++	return sha1_finup(desc, data, len, out, sha1_transform_ssse3);
+ }
+ 
+ /* Add padding and return the message digest. */
+@@ -119,21 +115,19 @@ static void unregister_sha1_ssse3(void)
+ }
+ 
+ #ifdef CONFIG_AS_AVX
+-asmlinkage void sha1_transform_avx(u32 *digest, const char *data,
+-				   unsigned int rounds);
++asmlinkage void sha1_transform_avx(struct sha1_state *state,
++				   const u8 *data, int blocks);
+ 
+ static int sha1_avx_update(struct shash_desc *desc, const u8 *data,
+ 			     unsigned int len)
+ {
+-	return sha1_update(desc, data, len,
+-			(sha1_transform_fn *) sha1_transform_avx);
++	return sha1_update(desc, data, len, sha1_transform_avx);
+ }
+ 
+ static int sha1_avx_finup(struct shash_desc *desc, const u8 *data,
+ 			      unsigned int len, u8 *out)
+ {
+-	return sha1_finup(desc, data, len, out,
+-			(sha1_transform_fn *) sha1_transform_avx);
++	return sha1_finup(desc, data, len, out, sha1_transform_avx);
+ }
+ 
+ static int sha1_avx_final(struct shash_desc *desc, u8 *out)
+@@ -190,8 +184,8 @@ static inline void unregister_sha1_avx(void) { }
+ #if defined(CONFIG_AS_AVX2) && (CONFIG_AS_AVX)
+ #define SHA1_AVX2_BLOCK_OPTSIZE	4	/* optimal 4*64 bytes of SHA1 blocks */
+ 
+-asmlinkage void sha1_transform_avx2(u32 *digest, const char *data,
+-				    unsigned int rounds);
++asmlinkage void sha1_transform_avx2(struct sha1_state *state,
++				    const u8 *data, int blocks);
+ 
+ static bool avx2_usable(void)
+ {
+@@ -203,28 +197,26 @@ static bool avx2_usable(void)
+ 	return false;
+ }
+ 
+-static void sha1_apply_transform_avx2(u32 *digest, const char *data,
+-				unsigned int rounds)
++static void sha1_apply_transform_avx2(struct sha1_state *state,
++				      const u8 *data, int blocks)
+ {
+ 	/* Select the optimal transform based on data block size */
+ 	if (rounds >= SHA1_AVX2_BLOCK_OPTSIZE)
+-		sha1_transform_avx2(digest, data, rounds);
++		sha1_transform_avx2(state, data, blocks);
+ 	else
+-		sha1_transform_avx(digest, data, rounds);
++		sha1_transform_avx(state, data, blocks);
+ }
+ 
+ static int sha1_avx2_update(struct shash_desc *desc, const u8 *data,
+ 			     unsigned int len)
+ {
+-	return sha1_update(desc, data, len,
+-		(sha1_transform_fn *) sha1_apply_transform_avx2);
++	return sha1_update(desc, data, len, sha1_apply_transform_avx2);
+ }
+ 
+ static int sha1_avx2_finup(struct shash_desc *desc, const u8 *data,
+ 			      unsigned int len, u8 *out)
+ {
+-	return sha1_finup(desc, data, len, out,
+-		(sha1_transform_fn *) sha1_apply_transform_avx2);
++	return sha1_finup(desc, data, len, out, sha1_apply_transform_avx2);
+ }
+ 
+ static int sha1_avx2_final(struct shash_desc *desc, u8 *out)
+@@ -267,21 +259,19 @@ static inline void unregister_sha1_avx2(void) { }
+ #endif
+ 
+ #ifdef CONFIG_AS_SHA1_NI
+-asmlinkage void sha1_ni_transform(u32 *digest, const char *data,
+-				   unsigned int rounds);
++asmlinkage void sha1_ni_transform(struct sha1_state *digest, const u8 *data,
++				  int rounds);
+ 
+ static int sha1_ni_update(struct shash_desc *desc, const u8 *data,
+ 			     unsigned int len)
+ {
+-	return sha1_update(desc, data, len,
+-		(sha1_transform_fn *) sha1_ni_transform);
++	return sha1_update(desc, data, len, sha1_ni_transform);
+ }
+ 
+ static int sha1_ni_finup(struct shash_desc *desc, const u8 *data,
+ 			      unsigned int len, u8 *out)
+ {
+-	return sha1_finup(desc, data, len, out,
+-		(sha1_transform_fn *) sha1_ni_transform);
++	return sha1_finup(desc, data, len, out, sha1_ni_transform);
+ }
+ 
+ static int sha1_ni_final(struct shash_desc *desc, u8 *out)
+diff --git a/arch/x86/crypto/sha256-avx-asm.S b/arch/x86/crypto/sha256-avx-asm.S
+index 22e14c8dd2e4..fcbc30f58c38 100644
+--- a/arch/x86/crypto/sha256-avx-asm.S
++++ b/arch/x86/crypto/sha256-avx-asm.S
+@@ -341,8 +341,8 @@ a = TMP_
+ .endm
+ 
+ ########################################################################
+-## void sha256_transform_avx(void *input_data, UINT32 digest[8], UINT64 num_blks)
+-## arg 1 : pointer to digest
++## void sha256_transform_avx(state sha256_state *state, const u8 *data, int blocks)
++## arg 1 : pointer to state
+ ## arg 2 : pointer to input data
+ ## arg 3 : Num blocks
+ ########################################################################
+diff --git a/arch/x86/crypto/sha256-avx2-asm.S b/arch/x86/crypto/sha256-avx2-asm.S
+index 519b551ad576..499d9ec129de 100644
+--- a/arch/x86/crypto/sha256-avx2-asm.S
++++ b/arch/x86/crypto/sha256-avx2-asm.S
+@@ -520,8 +520,8 @@ STACK_SIZE	= _RSP      + _RSP_SIZE
+ .endm
+ 
+ ########################################################################
+-## void sha256_transform_rorx(void *input_data, UINT32 digest[8], UINT64 num_blks)
+-## arg 1 : pointer to digest
++## void sha256_transform_rorx(struct sha256_state *state, const u8 *data, int blocks)
++## arg 1 : pointer to state
+ ## arg 2 : pointer to input data
+ ## arg 3 : Num blocks
+ ########################################################################
+diff --git a/arch/x86/crypto/sha256-ssse3-asm.S b/arch/x86/crypto/sha256-ssse3-asm.S
+index 69cc2f91dc4c..ddfa863b4ee3 100644
+--- a/arch/x86/crypto/sha256-ssse3-asm.S
++++ b/arch/x86/crypto/sha256-ssse3-asm.S
+@@ -347,8 +347,10 @@ a = TMP_
+ .endm
+ 
+ ########################################################################
+-## void sha256_transform_ssse3(void *input_data, UINT32 digest[8], UINT64 num_blks)
+-## arg 1 : pointer to digest
++## void sha256_transform_ssse3(struct sha256_state *state, const u8 *data,
++##			       int blocks);
++## arg 1 : pointer to state
++##	   (struct sha256_state is assumed to begin with u32 state[8])
+ ## arg 2 : pointer to input data
+ ## arg 3 : Num blocks
+ ########################################################################
+diff --git a/arch/x86/crypto/sha256_ssse3_glue.c b/arch/x86/crypto/sha256_ssse3_glue.c
+index f9aff31fe59e..03ad657c04bd 100644
+--- a/arch/x86/crypto/sha256_ssse3_glue.c
++++ b/arch/x86/crypto/sha256_ssse3_glue.c
+@@ -41,12 +41,11 @@
+ #include <linux/string.h>
+ #include <asm/simd.h>
+ 
+-asmlinkage void sha256_transform_ssse3(u32 *digest, const char *data,
+-				       u64 rounds);
+-typedef void (sha256_transform_fn)(u32 *digest, const char *data, u64 rounds);
++asmlinkage void sha256_transform_ssse3(struct sha256_state *state,
++				       const u8 *data, int blocks);
+ 
+ static int _sha256_update(struct shash_desc *desc, const u8 *data,
+-			  unsigned int len, sha256_transform_fn *sha256_xform)
++			  unsigned int len, sha256_block_fn *sha256_xform)
+ {
+ 	struct sha256_state *sctx = shash_desc_ctx(desc);
+ 
+@@ -54,28 +53,29 @@ static int _sha256_update(struct shash_desc *desc, const u8 *data,
+ 	    (sctx->count % SHA256_BLOCK_SIZE) + len < SHA256_BLOCK_SIZE)
+ 		return crypto_sha256_update(desc, data, len);
+ 
+-	/* make sure casting to sha256_block_fn() is safe */
++	/*
++	 * Make sure struct sha256_state begins directly with the SHA256
++	 * 256-bit internal state, as this is what the asm functions expect.
++	 */
+ 	BUILD_BUG_ON(offsetof(struct sha256_state, state) != 0);
+ 
+ 	kernel_fpu_begin();
+-	sha256_base_do_update(desc, data, len,
+-			      (sha256_block_fn *)sha256_xform);
++	sha256_base_do_update(desc, data, len, sha256_xform);
+ 	kernel_fpu_end();
+ 
+ 	return 0;
+ }
+ 
+ static int sha256_finup(struct shash_desc *desc, const u8 *data,
+-	      unsigned int len, u8 *out, sha256_transform_fn *sha256_xform)
++	      unsigned int len, u8 *out, sha256_block_fn *sha256_xform)
+ {
+ 	if (!crypto_simd_usable())
+ 		return crypto_sha256_finup(desc, data, len, out);
+ 
+ 	kernel_fpu_begin();
+ 	if (len)
+-		sha256_base_do_update(desc, data, len,
+-				      (sha256_block_fn *)sha256_xform);
+-	sha256_base_do_finalize(desc, (sha256_block_fn *)sha256_xform);
++		sha256_base_do_update(desc, data, len, sha256_xform);
++	sha256_base_do_finalize(desc, sha256_xform);
+ 	kernel_fpu_end();
+ 
+ 	return sha256_base_finish(desc, out);
+@@ -145,8 +145,8 @@ static void unregister_sha256_ssse3(void)
+ }
+ 
+ #ifdef CONFIG_AS_AVX
+-asmlinkage void sha256_transform_avx(u32 *digest, const char *data,
+-				     u64 rounds);
++asmlinkage void sha256_transform_avx(struct sha256_state *state,
++				     const u8 *data, int blocks);
+ 
+ static int sha256_avx_update(struct shash_desc *desc, const u8 *data,
+ 			 unsigned int len)
+@@ -227,8 +227,8 @@ static inline void unregister_sha256_avx(void) { }
+ #endif
+ 
+ #if defined(CONFIG_AS_AVX2) && defined(CONFIG_AS_AVX)
+-asmlinkage void sha256_transform_rorx(u32 *digest, const char *data,
+-				      u64 rounds);
++asmlinkage void sha256_transform_rorx(struct sha256_state *state,
++				      const u8 *data, int blocks);
+ 
+ static int sha256_avx2_update(struct shash_desc *desc, const u8 *data,
+ 			 unsigned int len)
+@@ -307,8 +307,8 @@ static inline void unregister_sha256_avx2(void) { }
+ #endif
+ 
+ #ifdef CONFIG_AS_SHA256_NI
+-asmlinkage void sha256_ni_transform(u32 *digest, const char *data,
+-				   u64 rounds); /*unsigned int rounds);*/
++asmlinkage void sha256_ni_transform(struct sha256_state *digest,
++				    const u8 *data, int rounds);
+ 
+ static int sha256_ni_update(struct shash_desc *desc, const u8 *data,
+ 			 unsigned int len)
+diff --git a/arch/x86/crypto/sha512-avx-asm.S b/arch/x86/crypto/sha512-avx-asm.S
+index 3704ddd7e5d5..90ea945ba5e6 100644
+--- a/arch/x86/crypto/sha512-avx-asm.S
++++ b/arch/x86/crypto/sha512-avx-asm.S
+@@ -271,11 +271,12 @@ frame_size = frame_GPRSAVE + GPRSAVE_SIZE
+ .endm
+ 
+ ########################################################################
+-# void sha512_transform_avx(void* D, const void* M, u64 L)
+-# Purpose: Updates the SHA512 digest stored at D with the message stored in M.
+-# The size of the message pointed to by M must be an integer multiple of SHA512
+-# message blocks.
+-# L is the message length in SHA512 blocks
++# void sha512_transform_avx(sha512_state *state, const u8 *data, int blocks)
++# Purpose: Updates the SHA512 digest stored at "state" with the message
++# stored in "data".
++# The size of the message pointed to by "data" must be an integer multiple
++# of SHA512 message blocks.
++# "blocks" is the message length in SHA512 blocks
+ ########################################################################
+ SYM_FUNC_START(sha512_transform_avx)
+ 	cmp $0, msglen
+diff --git a/arch/x86/crypto/sha512-avx2-asm.S b/arch/x86/crypto/sha512-avx2-asm.S
+index 80d830e7ee09..3dd886b14e7d 100644
+--- a/arch/x86/crypto/sha512-avx2-asm.S
++++ b/arch/x86/crypto/sha512-avx2-asm.S
+@@ -563,11 +563,12 @@ frame_size = frame_GPRSAVE + GPRSAVE_SIZE
+ .endm
+ 
+ ########################################################################
+-# void sha512_transform_rorx(void* D, const void* M, uint64_t L)#
+-# Purpose: Updates the SHA512 digest stored at D with the message stored in M.
+-# The size of the message pointed to by M must be an integer multiple of SHA512
+-#   message blocks.
+-# L is the message length in SHA512 blocks
++# void sha512_transform_rorx(sha512_state *state, const u8 *data, int blocks)
++# Purpose: Updates the SHA512 digest stored at "state" with the message
++# stored in "data".
++# The size of the message pointed to by "data" must be an integer multiple
++# of SHA512 message blocks.
++# "blocks" is the message length in SHA512 blocks
+ ########################################################################
+ SYM_FUNC_START(sha512_transform_rorx)
+ 	# Allocate Stack Space
+diff --git a/arch/x86/crypto/sha512-ssse3-asm.S b/arch/x86/crypto/sha512-ssse3-asm.S
+index 838f984e95d9..7946a1bee85b 100644
+--- a/arch/x86/crypto/sha512-ssse3-asm.S
++++ b/arch/x86/crypto/sha512-ssse3-asm.S
+@@ -269,11 +269,14 @@ frame_size = frame_GPRSAVE + GPRSAVE_SIZE
+ .endm
+ 
+ ########################################################################
+-# void sha512_transform_ssse3(void* D, const void* M, u64 L)#
+-# Purpose: Updates the SHA512 digest stored at D with the message stored in M.
+-# The size of the message pointed to by M must be an integer multiple of SHA512
+-#   message blocks.
+-# L is the message length in SHA512 blocks.
++## void sha512_transform_ssse3(struct sha512_state *state, const u8 *data,
++##			       int blocks);
++# (struct sha512_state is assumed to begin with u64 state[8])
++# Purpose: Updates the SHA512 digest stored at "state" with the message
++# stored in "data".
++# The size of the message pointed to by "data" must be an integer multiple
++# of SHA512 message blocks.
++# "blocks" is the message length in SHA512 blocks.
+ ########################################################################
+ SYM_FUNC_START(sha512_transform_ssse3)
+ 
+diff --git a/arch/x86/crypto/sha512_ssse3_glue.c b/arch/x86/crypto/sha512_ssse3_glue.c
+index 458356a3f124..1c444f41037c 100644
+--- a/arch/x86/crypto/sha512_ssse3_glue.c
++++ b/arch/x86/crypto/sha512_ssse3_glue.c
+@@ -39,13 +39,11 @@
+ #include <crypto/sha512_base.h>
+ #include <asm/simd.h>
+ 
+-asmlinkage void sha512_transform_ssse3(u64 *digest, const char *data,
+-				       u64 rounds);
+-
+-typedef void (sha512_transform_fn)(u64 *digest, const char *data, u64 rounds);
++asmlinkage void sha512_transform_ssse3(struct sha512_state *state,
++				       const u8 *data, int blocks);
+ 
+ static int sha512_update(struct shash_desc *desc, const u8 *data,
+-		       unsigned int len, sha512_transform_fn *sha512_xform)
++		       unsigned int len, sha512_block_fn *sha512_xform)
+ {
+ 	struct sha512_state *sctx = shash_desc_ctx(desc);
+ 
+@@ -53,28 +51,29 @@ static int sha512_update(struct shash_desc *desc, const u8 *data,
+ 	    (sctx->count[0] % SHA512_BLOCK_SIZE) + len < SHA512_BLOCK_SIZE)
+ 		return crypto_sha512_update(desc, data, len);
+ 
+-	/* make sure casting to sha512_block_fn() is safe */
++	/*
++	 * Make sure struct sha512_state begins directly with the SHA512
++	 * 512-bit internal state, as this is what the asm functions expect.
++	 */
+ 	BUILD_BUG_ON(offsetof(struct sha512_state, state) != 0);
+ 
+ 	kernel_fpu_begin();
+-	sha512_base_do_update(desc, data, len,
+-			      (sha512_block_fn *)sha512_xform);
++	sha512_base_do_update(desc, data, len, sha512_xform);
+ 	kernel_fpu_end();
+ 
+ 	return 0;
+ }
+ 
+ static int sha512_finup(struct shash_desc *desc, const u8 *data,
+-	      unsigned int len, u8 *out, sha512_transform_fn *sha512_xform)
++	      unsigned int len, u8 *out, sha512_block_fn *sha512_xform)
+ {
+ 	if (!crypto_simd_usable())
+ 		return crypto_sha512_finup(desc, data, len, out);
+ 
+ 	kernel_fpu_begin();
+ 	if (len)
+-		sha512_base_do_update(desc, data, len,
+-				      (sha512_block_fn *)sha512_xform);
+-	sha512_base_do_finalize(desc, (sha512_block_fn *)sha512_xform);
++		sha512_base_do_update(desc, data, len, sha512_xform);
++	sha512_base_do_finalize(desc, sha512_xform);
+ 	kernel_fpu_end();
+ 
+ 	return sha512_base_finish(desc, out);
+@@ -144,8 +143,8 @@ static void unregister_sha512_ssse3(void)
+ }
+ 
+ #ifdef CONFIG_AS_AVX
+-asmlinkage void sha512_transform_avx(u64 *digest, const char *data,
+-				     u64 rounds);
++asmlinkage void sha512_transform_avx(struct sha512_state *state,
++				     const u8 *data, int blocks);
+ static bool avx_usable(void)
+ {
+ 	if (!cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL)) {
+@@ -225,8 +224,8 @@ static inline void unregister_sha512_avx(void) { }
+ #endif
+ 
+ #if defined(CONFIG_AS_AVX2) && defined(CONFIG_AS_AVX)
+-asmlinkage void sha512_transform_rorx(u64 *digest, const char *data,
+-				      u64 rounds);
++asmlinkage void sha512_transform_rorx(struct sha512_state *state,
++				      const u8 *data, int blocks);
+ 
+ static int sha512_avx2_update(struct shash_desc *desc, const u8 *data,
+ 		       unsigned int len)
+-- 
+2.20.1
+
+
+-- 
+Kees Cook
