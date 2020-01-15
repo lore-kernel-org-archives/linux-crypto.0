@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
 	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08027C33CB6
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88ED7C33CB2
 	for <linux-crypto@archiver.kernel.org>; Wed, 15 Jan 2020 10:40:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BE2632467D
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 Jan 2020 10:40:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5416D2467A
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 Jan 2020 10:40:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="mnkxoy9l"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="DOYTRwqS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729904AbgAOKjf (ORCPT
+        id S1729898AbgAOKjf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Wed, 15 Jan 2020 05:39:35 -0500
-Received: from mo4-p04-ob.smtp.rzone.de ([85.215.255.121]:30932 "EHLO
-        mo4-p04-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729849AbgAOKjb (ORCPT
+Received: from mo4-p02-ob.smtp.rzone.de ([81.169.146.168]:18420 "EHLO
+        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729585AbgAOKjc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 Jan 2020 05:39:31 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1579084765;
+        Wed, 15 Jan 2020 05:39:32 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1579084762;
         s=strato-dkim-0002; d=chronox.de;
         h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
         X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=ZOYKCPgIvfZRmCnEJgMTAQ5NHbca7NuUuyUIdvnjvC4=;
-        b=mnkxoy9l6eriy6IPdmK6/DIn8gamIjcauspGko02s/OXiiW3J/z6l3DueWJJU6P4NV
-        05eWr+itLAD0L4rzL971F8eqAMRh8/2VVAoKuSvnnJwI75suDSdg7XmR6WjeuoNM8Nk3
-        p+oM6gOy7f5EXYeGm16SV/pnTvCEwTZi4zPrBHL9tHNAsONLcnzD8bvVFg5LNs2iGZzO
-        VqH29ql2sdO/5K9e2pLoamskW5Xe/msDRFyuVNUpBr7w2xGKyE1GJTimGndMvUER/mIv
-        WqEyMUJ4OwX7a5c6Wkjz/TTBZjDSsdNF3DuUIlmVAMw28EbvAX9lSMY+O4WEaJYbm1zM
-        4m8Q==
+        bh=VIVmToJyV5Cstk6/K/JCWKvNHUAWrctfeiIgV6Zpi5o=;
+        b=DOYTRwqSio0VHJ/NC9NGoxrNF05qnfg84U4T4IZGTxhV21FoKzgXdl0zJNSZX2Hh5U
+        ocK9UHhESInjd0LfQWbejpZ3TBSgSXM8VeHReV791Wdmb9fa1T+By0MYsAjn7WTR0+JD
+        u1DScTH3P53LM6ZIKBQytxDlAyQad6gd7B67EUbrqqBU40oVtwt6kM1SsUIN6N7CWP7V
+        yCkladnYuN4BmlEHKUfZK2dv//nZbEWm+xFE874jVEWKuj0SvcjmxaXfcA8bwJcGmLWx
+        8/9ohaJMNDBrLa7vpHyuPxCk2affU5zz/budiMV2FIdhh1s4Eeh2+8oeXaZpn6c9NlVX
+        uG0A==
 X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPZJPScHivh"
 X-RZG-CLASS-ID: mo00
 Received: from positron.chronox.de
         by smtp.strato.de (RZmta 46.1.4 DYNA|AUTH)
-        with ESMTPSA id u04585w0FAcAW0A
+        with ESMTPSA id u04585w0FAc0Vzz
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
         (Client did not present a certificate);
-        Wed, 15 Jan 2020 11:38:10 +0100 (CET)
+        Wed, 15 Jan 2020 11:38:00 +0100 (CET)
 From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 To:     Arnd Bergmann <arnd@arndb.de>
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -67,9 +67,9 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Randy Dunlap <rdunlap@infradead.org>,
         Julia Lawall <julia.lawall@inria.fr>,
         Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [PATCH v28 03/12] LRNG - sysctls and /proc interface
-Date:   Wed, 15 Jan 2020 11:32:31 +0100
-Message-ID: <3470236.xfvW1cKDFL@positron.chronox.de>
+Subject: [PATCH v28 11/12] LRNG - add interface for gathering of raw entropy
+Date:   Wed, 15 Jan 2020 11:35:48 +0100
+Message-ID: <2048458.ADJAtTWDj8@positron.chronox.de>
 In-Reply-To: <5951792.lmNsirYsPE@positron.chronox.de>
 References: <6157374.ptSnyUpaCn@positron.chronox.de> <2641155.iNH938UiKq@positron.chronox.de> <5951792.lmNsirYsPE@positron.chronox.de>
 MIME-Version: 1.0
@@ -80,36 +80,23 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The LRNG sysctl interface provides the same controls as the existing
-/dev/random implementation. These sysctls behave identically and are
-implemented identically. The goal is to allow a possible merge of the
-existing /dev/random implementation with this implementation which
-implies that this patch tries have a very close similarity. Yet, all
-sysctls are documented at [1].
+The test interface allows a privileged process to capture the raw
+unconditioned noise that is collected by the LRNG for statistical
+analysis. Such testing allows the analysis how much entropy
+the interrupt noise source provides on a given platform.
+Extracted noise data is not used to seed the LRNG. This
+is a test interface and not appropriate for production systems.
+Yet, the interface is considered to be sufficiently secured for
+production systems.
 
-In addition, it provides the file lrng_type which provides details about
-the LRNG:
+Access to the data is given through the lrng_raw debugfs file. The
+data buffer should be multiples of sizeof(u32) to fill the entire
+buffer. Using the option lrng_testing.boot_test=3D1 the raw noise of
+the first 1000 entropy events since boot can be sampled.
 
-=2D the name of the DRNG that produces the random numbers for /dev/random,
-/dev/urandom, getrandom(2)
-
-=2D the hash used to produce random numbers from the entropy pool
-
-=2D the number of secondary DRNG instances
-
-=2D indicator whether the LRNG operates SP800-90B compliant
-
-=2D indicator whether a high-resolution timer is identified - only with a
-high-resolution timer the interrupt noise source will deliver sufficient
-entropy
-
-=2D indicator whether the LRNG has been minimally seeded (i.e. is the
-secondary DRNG seeded with at least 128 bits of of entropy)
-
-=2D indicator whether the LRNG has been fully seeded (i.e. is the
-secondary DRNG seeded with at least 256 bits of entropy)
-
-[1] https://www.chronox.de/lrng.html
+This test interface allows generating the data required for
+analysis whether the LRNG is in compliance with SP800-90B
+sections 3.1.3 and 3.1.4.
 
 CC: "Eric W. Biederman" <ebiederm@xmission.com>
 CC: "Alexander E. Patrakov" <patrakov@gmail.com>
@@ -127,232 +114,333 @@ CC: Andy Lutomirski <luto@kernel.org>
 CC: Florian Weimer <fweimer@redhat.com>
 CC: Lennart Poettering <mzxreary@0pointer.de>
 CC: Nicolai Stange <nstange@suse.de>
-Reviewed-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
 Reviewed-by: Roman Drahtmueller <draht@schaltsekun.de>
 Tested-by: Roman Drahtm=FCller <draht@schaltsekun.de>
 Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
 Tested-by: Neil Horman <nhorman@redhat.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 =2D--
- drivers/char/lrng/Makefile          |   1 +
- drivers/char/lrng/lrng_interfaces.c |   1 -
- drivers/char/lrng/lrng_internal.h   |   4 +
- drivers/char/lrng/lrng_proc.c       | 163 ++++++++++++++++++++++++++++
- 4 files changed, 168 insertions(+), 1 deletion(-)
- create mode 100644 drivers/char/lrng/lrng_proc.c
+ drivers/char/lrng/Kconfig        |  16 ++
+ drivers/char/lrng/Makefile       |   1 +
+ drivers/char/lrng/lrng_testing.c | 271 +++++++++++++++++++++++++++++++
+ 3 files changed, 288 insertions(+)
+ create mode 100644 drivers/char/lrng/lrng_testing.c
 
+diff --git a/drivers/char/lrng/Kconfig b/drivers/char/lrng/Kconfig
+index 12b6b3439853..e503a4bb7475 100644
+=2D-- a/drivers/char/lrng/Kconfig
++++ b/drivers/char/lrng/Kconfig
+@@ -159,4 +159,20 @@ config LRNG_APT_CUTOFF
+ 	default 325 if !LRNG_APT_BROKEN
+ 	default 32 if LRNG_APT_BROKEN
+=20
++config LRNG_TESTING
++	bool "Enable entropy test interface to LRNG noise source"
++	depends on DEBUG_FS
++	help
++	  The test interface allows a privileged process to capture
++	  the raw unconditioned noise that is collected by the LRNG
++	  for statistical analysis. Extracted noise data is not used
++	  to seed the LRNG.
++
++	  The raw noise data can be obtained using the lrng_raw
++	  debugfs file. Using the option lrng_testing.boot_test=3D1
++	  the raw noise of the first 1000 entropy events since boot
++	  can be sampled.
++
++	  If unsure, say N.
++
+ endif # LRNG
 diff --git a/drivers/char/lrng/Makefile b/drivers/char/lrng/Makefile
-index 0a32f22c2c1a..e69c176f0161 100644
+index c3008763dd14..b2ce1979dc4b 100644
 =2D-- a/drivers/char/lrng/Makefile
 +++ b/drivers/char/lrng/Makefile
-@@ -9,3 +9,4 @@ obj-y				+=3D lrng_pool.o lrng_aux.o \
- 				   lrng_interfaces.o \
-=20
- obj-$(CONFIG_NUMA)		+=3D lrng_numa.o
-+obj-$(CONFIG_SYSCTL)		+=3D lrng_proc.o
-diff --git a/drivers/char/lrng/lrng_interfaces.c b/drivers/char/lrng/lrng_i=
-nterfaces.c
-index d6ddc72fc9b7..8e96c3ade76e 100644
-=2D-- a/drivers/char/lrng/lrng_interfaces.c
-+++ b/drivers/char/lrng/lrng_interfaces.c
-@@ -34,7 +34,6 @@ static DECLARE_WAIT_QUEUE_HEAD(lrng_write_wait);
- static DECLARE_WAIT_QUEUE_HEAD(lrng_init_wait);
- static struct fasync_struct *fasync;
-=20
-=2Dstruct ctl_table random_table[];
- /********************************** Helper *******************************=
-****/
-=20
- /* Is the DRNG seed level too low? */
-diff --git a/drivers/char/lrng/lrng_internal.h b/drivers/char/lrng/lrng_int=
-ernal.h
-index ecb0a7ad5e7e..f65fc6647e8a 100644
-=2D-- a/drivers/char/lrng/lrng_internal.h
-+++ b/drivers/char/lrng/lrng_internal.h
-@@ -116,7 +116,11 @@ void lrng_cc20_init_state(struct chacha20_state *state=
-);
-=20
- /********************************** /proc ********************************=
-*****/
-=20
-+#ifdef CONFIG_SYSCTL
-+void lrng_pool_inc_numa_node(void);
-+#else
- static inline void lrng_pool_inc_numa_node(void) { }
-+#endif
-=20
- /****************************** LRNG interfaces **************************=
-*****/
-=20
-diff --git a/drivers/char/lrng/lrng_proc.c b/drivers/char/lrng/lrng_proc.c
+@@ -15,3 +15,4 @@ obj-$(CONFIG_LRNG_DRBG)		+=3D lrng_drbg.o
+ obj-$(CONFIG_LRNG_KCAPI)	+=3D lrng_kcapi.o
+ obj-$(CONFIG_LRNG_JENT)		+=3D lrng_jent.o
+ obj-$(CONFIG_LRNG_HEALTH_TESTS)	+=3D lrng_health.o
++obj-$(CONFIG_LRNG_TESTING)	+=3D lrng_testing.o
+diff --git a/drivers/char/lrng/lrng_testing.c b/drivers/char/lrng/lrng_test=
+ing.c
 new file mode 100644
-index 000000000000..f4ee01f61925
+index 000000000000..0e287eccd622
 =2D-- /dev/null
-+++ b/drivers/char/lrng/lrng_proc.c
-@@ -0,0 +1,163 @@
++++ b/drivers/char/lrng/lrng_testing.c
+@@ -0,0 +1,271 @@
 +// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
 +/*
-+ * LRNG proc and sysctl interfaces
++ * Linux Random Number Generator (LRNG) Raw entropy collection tool
 + *
-+ * Copyright (C) 2016 - 2020, Stephan Mueller <smueller@chronox.de>
++ * Copyright (C) 2019 - 2020, Stephan Mueller <smueller@chronox.de>
 + */
 +
-+#include <linux/lrng.h>
-+#include <linux/proc_fs.h>
-+#include <linux/seq_file.h>
-+#include <linux/sysctl.h>
-+#include <linux/uuid.h>
++#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
++
++#include <linux/atomic.h>
++#include <linux/bug.h>
++#include <linux/debugfs.h>
++#include <linux/module.h>
++#include <linux/sched.h>
++#include <linux/sched/signal.h>
++#include <linux/slab.h>
++#include <linux/string.h>
++#include <linux/types.h>
++#include <linux/uaccess.h>
++#include <linux/workqueue.h>
++#include <asm/errno.h>
 +
 +#include "lrng_internal.h"
 +
++#define LRNG_TESTING_RINGBUFFER_SIZE	1024
++#define LRNG_TESTING_RINGBUFFER_MASK	(LRNG_TESTING_RINGBUFFER_SIZE - 1)
++
++static u32 lrng_testing_rb[LRNG_TESTING_RINGBUFFER_SIZE];
++static u32 lrng_rb_reader =3D 0;
++static u32 lrng_rb_writer =3D 0;
++static atomic_t lrng_testing_enabled =3D ATOMIC_INIT(0);
++
++static DECLARE_WAIT_QUEUE_HEAD(lrng_raw_read_wait);
++static DEFINE_SPINLOCK(lrng_raw_lock);
++
 +/*
-+ * This function is used to return both the bootid UUID, and random
-+ * UUID.  The difference is in whether table->data is NULL; if it is,
-+ * then a new UUID is generated and returned to the user.
-+ *
-+ * If the user accesses this via the proc interface, the UUID will be
-+ * returned as an ASCII string in the standard UUID format; if via the
-+ * sysctl system call, as 16 bytes of binary data.
++ * 0 =3D=3D> No boot test, gathering of runtime data allowed
++ * 1 =3D=3D> Boot test enabled and ready for collecting data, gathering ru=
+ntime
++ *	 data is disabled
++ * 2 =3D=3D> Boot test completed and disabled, gathering of runtime data is
++ *	 disabled
 + */
-+static int lrng_proc_do_uuid(struct ctl_table *table, int write,
-+			     void __user *buffer, size_t *lenp, loff_t *ppos)
++static u32 boot_test =3D 0;
++module_param(boot_test, uint, 0644);
++MODULE_PARM_DESC(boot_test, "Enable gathering boot time entropy of the fir=
+st"
++			    " entropy events");
++
++static inline void lrng_raw_entropy_reset(void)
 +{
-+	struct ctl_table fake_table;
-+	unsigned char buf[64], tmp_uuid[16], *uuid;
++	unsigned long flags;
 +
-+	uuid =3D table->data;
-+	if (!uuid) {
-+		uuid =3D tmp_uuid;
-+		generate_random_uuid(uuid);
-+	} else {
-+		static DEFINE_SPINLOCK(bootid_spinlock);
++	spin_lock_irqsave(&lrng_raw_lock, flags);
++	lrng_rb_reader =3D 0;
++	lrng_rb_writer =3D 0;
++	spin_unlock_irqrestore(&lrng_raw_lock, flags);
++}
 +
-+		spin_lock(&bootid_spinlock);
-+		if (!uuid[8])
-+			generate_random_uuid(uuid);
-+		spin_unlock(&bootid_spinlock);
++static void lrng_raw_entropy_init(void)
++{
++	/*
++	 * The boot time testing implies we have a running test. If the
++	 * caller wants to clear it, he has to unset the boot_test flag
++	 * at runtime via sysfs to enable regular runtime testing
++	 */
++	if (boot_test)
++		return;
++
++	lrng_raw_entropy_reset();
++	atomic_set(&lrng_testing_enabled, 1);
++	pr_warn("Enabling raw entropy collection\n");
++}
++
++static void lrng_raw_entropy_fini(void)
++{
++	if (boot_test)
++		return;
++
++	atomic_set(&lrng_testing_enabled, 0);
++	lrng_raw_entropy_reset();
++	pr_warn("Disabling raw entropy collection\n");
++}
++
++bool lrng_raw_entropy_store(u32 value)
++{
++	unsigned long flags;
++
++	if (!atomic_read(&lrng_testing_enabled) && (boot_test !=3D 1))
++		return false;
++
++	spin_lock_irqsave(&lrng_raw_lock, flags);
++
++	/*
++	 * Disable entropy testing for boot time testing after ring buffer
++	 * is filled.
++	 */
++	if (boot_test) {
++		if (lrng_rb_writer > LRNG_TESTING_RINGBUFFER_SIZE) {
++			boot_test =3D 2;
++			pr_warn_once("Boot time entropy collection test "
++				     "disabled\n");
++			spin_unlock_irqrestore(&lrng_raw_lock, flags);
++			return false;
++		}
++
++		if (lrng_rb_writer =3D=3D 1)
++			pr_warn("Boot time entropy collection test enabled\n");
 +	}
 +
-+	sprintf(buf, "%pU", uuid);
++	lrng_testing_rb[lrng_rb_writer & LRNG_TESTING_RINGBUFFER_MASK] =3D value;
++	lrng_rb_writer++;
 +
-+	fake_table.data =3D buf;
-+	fake_table.maxlen =3D sizeof(buf);
++	spin_unlock_irqrestore(&lrng_raw_lock, flags);
 +
-+	return proc_dostring(&fake_table, write, buffer, lenp, ppos);
++	if (wq_has_sleeper(&lrng_raw_read_wait))
++		wake_up_interruptible(&lrng_raw_read_wait);
++
++	return true;
 +}
 +
-+static int lrng_proc_do_entropy(struct ctl_table *table, int write,
-+				void __user *buffer, size_t *lenp, loff_t *ppos)
++static inline bool lrng_raw_have_data(void)
 +{
-+	struct ctl_table fake_table;
-+	int entropy_count;
-+
-+	entropy_count =3D lrng_avail_entropy();
-+
-+	fake_table.data =3D &entropy_count;
-+	fake_table.maxlen =3D sizeof(entropy_count);
-+
-+	return proc_dointvec(&fake_table, write, buffer, lenp, ppos);
++	return ((lrng_rb_writer & LRNG_TESTING_RINGBUFFER_MASK) !=3D
++		 (lrng_rb_reader & LRNG_TESTING_RINGBUFFER_MASK));
 +}
 +
-+static int lrng_sysctl_poolsize =3D LRNG_POOL_SIZE_BITS;
-+static int lrng_min_write_thresh;
-+static int lrng_max_write_thresh =3D LRNG_POOL_SIZE_BITS;
-+static char lrng_sysctl_bootid[16];
-+static int lrng_drng_reseed_max_min;
++static int lrng_raw_entropy_reader(u8 *outbuf, u32 outbuflen)
++{
++	unsigned long flags;
++	int collected_data =3D 0;
 +
-+struct ctl_table random_table[] =3D {
-+	{
-+		.procname	=3D "poolsize",
-+		.data		=3D &lrng_sysctl_poolsize,
-+		.maxlen		=3D sizeof(int),
-+		.mode		=3D 0444,
-+		.proc_handler	=3D proc_dointvec,
-+	},
-+	{
-+		.procname	=3D "entropy_avail",
-+		.maxlen		=3D sizeof(int),
-+		.mode		=3D 0444,
-+		.proc_handler	=3D lrng_proc_do_entropy,
-+	},
-+	{
-+		.procname	=3D "write_wakeup_threshold",
-+		.data		=3D &lrng_write_wakeup_bits,
-+		.maxlen		=3D sizeof(int),
-+		.mode		=3D 0644,
-+		.proc_handler	=3D proc_dointvec_minmax,
-+		.extra1		=3D &lrng_min_write_thresh,
-+		.extra2		=3D &lrng_max_write_thresh,
-+	},
-+	{
-+		.procname	=3D "boot_id",
-+		.data		=3D &lrng_sysctl_bootid,
-+		.maxlen		=3D 16,
-+		.mode		=3D 0444,
-+		.proc_handler	=3D lrng_proc_do_uuid,
-+	},
-+	{
-+		.procname	=3D "uuid",
-+		.maxlen		=3D 16,
-+		.mode		=3D 0444,
-+		.proc_handler	=3D lrng_proc_do_uuid,
-+	},
-+	{
-+		.procname       =3D "urandom_min_reseed_secs",
-+		.data           =3D &lrng_drng_reseed_max_time,
-+		.maxlen         =3D sizeof(int),
-+		.mode           =3D 0644,
-+		.proc_handler   =3D proc_dointvec,
-+		.extra1		=3D &lrng_drng_reseed_max_min,
-+	},
-+	{ }
++	lrng_raw_entropy_init();
++
++	while (outbuflen) {
++		spin_lock_irqsave(&lrng_raw_lock, flags);
++
++		/* We have no data or reached the writer. */
++		if (!lrng_rb_writer || (lrng_rb_writer =3D=3D lrng_rb_reader)) {
++
++			spin_unlock_irqrestore(&lrng_raw_lock, flags);
++
++			/*
++			 * Now we gathered all boot data, enable regular data
++			 * collection.
++			 */
++			if (boot_test) {
++				boot_test =3D 0;
++				goto out;
++			}
++
++			wait_event_interruptible(lrng_raw_read_wait,
++						 lrng_raw_have_data());
++			if (signal_pending(current)) {
++				collected_data =3D -ERESTARTSYS;
++				goto out;
++			}
++
++			continue;
++		}
++
++		/* We copy out word-wise */
++		if (outbuflen < sizeof(u32)) {
++			spin_unlock_irqrestore(&lrng_raw_lock, flags);
++			goto out;
++		}
++
++		memcpy(outbuf, &lrng_testing_rb[lrng_rb_reader], sizeof(u32));
++		lrng_rb_reader++;
++
++		spin_unlock_irqrestore(&lrng_raw_lock, flags);
++
++		outbuf +=3D sizeof(u32);
++		outbuflen -=3D sizeof(u32);
++		collected_data +=3D sizeof(u32);
++	}
++
++out:
++	lrng_raw_entropy_fini();
++	return collected_data;
++}
++
++/**************************************************************************
++ * Debugfs interface
++ *************************************************************************=
+*/
++static int lrng_raw_extract_user(char __user *buf, size_t nbytes)
++{
++	u8 *tmp, *tmp_aligned;
++	int ret =3D 0, large_request =3D (nbytes > 256);
++
++	/*
++	 * The intention of this interface is for collecting at least
++	 * 1000 samples due to the SP800-90B requirements. So, we make no
++	 * effort in avoiding allocating more memory that actually needed
++	 * by the user. Hence, we allocate sufficient memory to always hold
++	 * that amount of data.
++	 */
++	tmp =3D kmalloc(LRNG_TESTING_RINGBUFFER_SIZE + sizeof(u32), GFP_KERNEL);
++	if (!tmp)
++		return -ENOMEM;
++
++	tmp_aligned =3D PTR_ALIGN(tmp, sizeof(u32));
++
++	while (nbytes) {
++		int i;
++
++		if (large_request && need_resched()) {
++			if (signal_pending(current)) {
++				if (ret =3D=3D 0)
++					ret =3D -ERESTARTSYS;
++				break;
++			}
++			schedule();
++		}
++
++		i =3D min_t(int, nbytes, LRNG_TESTING_RINGBUFFER_SIZE);
++		i =3D lrng_raw_entropy_reader(tmp_aligned, i);
++		if (i <=3D 0) {
++			if (i < 0)
++				ret =3D i;
++			break;
++		}
++		if (copy_to_user(buf, tmp_aligned, i)) {
++			ret =3D -EFAULT;
++			break;
++		}
++
++		nbytes -=3D i;
++		buf +=3D i;
++		ret +=3D i;
++	}
++
++	kzfree(tmp);
++	return ret;
++}
++
++/* DebugFS operations and definition of the debugfs files */
++static ssize_t lrng_raw_read(struct file *file, char __user *to,
++			     size_t count, loff_t *ppos)
++{
++	loff_t pos =3D *ppos;
++	int ret;
++
++	if (!count)
++		return 0;
++
++	ret =3D lrng_raw_extract_user(to, count);
++	if (ret < 0)
++		return ret;
++
++	count -=3D ret;
++	*ppos =3D pos + count;
++
++	return ret;
++}
++
++static const struct file_operations lrng_raw_name_fops =3D {
++	.owner =3D THIS_MODULE,
++	.read =3D lrng_raw_read,
 +};
 +
-+/* Number of online DRNGs */
-+static u32 numa_drngs =3D 1;
-+
-+void lrng_pool_inc_numa_node(void)
++static int __init lrng_raw_init(void)
 +{
-+	numa_drngs++;
-+}
++	struct dentry *lrng_raw_debugfs_root;
 +
-+static int lrng_proc_type_show(struct seq_file *m, void *v)
-+{
-+	struct lrng_drng *lrng_drng_init =3D lrng_drng_init_instance();
-+	unsigned long flags =3D 0;
-+	unsigned char buf[300];
-+
-+	lrng_drng_lock(lrng_drng_init, &flags);
-+	snprintf(buf, sizeof(buf),
-+		 "DRNG name: %s\n"
-+		 "Hash for reading entropy pool: %s\n"
-+		 "DRNG security strength: %d bits\n"
-+		 "number of DRNG instances: %u\n"
-+		 "SP800-90B compliance: %s\n"
-+		 "High-resolution timer: %s\n"
-+		 "LRNG minimally seeded: %s\n"
-+		 "LRNG fully seeded: %s\n",
-+		 lrng_drng_init->crypto_cb->lrng_drng_name(),
-+		 lrng_drng_init->crypto_cb->lrng_hash_name(),
-+		 LRNG_DRNG_SECURITY_STRENGTH_BITS, numa_drngs,
-+		 lrng_sp80090b_compliant() ? "true" : "false",
-+		 lrng_pool_highres_timer() ? "true" : "false",
-+		 lrng_state_min_seeded() ? "true" : "false",
-+		 lrng_state_fully_seeded() ? "true" : "false");
-+	lrng_drng_unlock(lrng_drng_init, &flags);
-+
-+	seq_write(m, buf, strlen(buf));
++	lrng_raw_debugfs_root =3D debugfs_create_dir(KBUILD_MODNAME, NULL);
++	debugfs_create_file_unsafe("lrng_raw", 0400, lrng_raw_debugfs_root,
++				   NULL, &lrng_raw_name_fops);
 +
 +	return 0;
 +}
 +
-+static int __init lrng_proc_type_init(void)
-+{
-+	proc_create_single("lrng_type", 0444, NULL, &lrng_proc_type_show);
-+	return 0;
-+}
-+
-+module_init(lrng_proc_type_init);
++module_init(lrng_raw_init);
 =2D-=20
 2.24.1
 
