@@ -6,33 +6,34 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67DEDC33CB1
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 10:15:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C18ACC33CB1
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 10:15:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 430962075B
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 10:15:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A2FA5207E0
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 10:15:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730562AbgAPKPB (ORCPT
+        id S1731596AbgAPKPO (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Jan 2020 05:15:01 -0500
-Received: from foss.arm.com ([217.140.110.172]:47446 "EHLO foss.arm.com"
+        Thu, 16 Jan 2020 05:15:14 -0500
+Received: from foss.arm.com ([217.140.110.172]:47484 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726832AbgAPKPB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Jan 2020 05:15:01 -0500
+        id S1731519AbgAPKPO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Jan 2020 05:15:14 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 01EB4139F;
-        Thu, 16 Jan 2020 02:15:01 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B350F31B;
+        Thu, 16 Jan 2020 02:15:13 -0800 (PST)
 Received: from e110176-lin.arm.com (unknown [10.50.4.173])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9D77C3F534;
-        Thu, 16 Jan 2020 02:14:59 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 317DE3F534;
+        Thu, 16 Jan 2020 02:15:12 -0800 (PST)
 From:   Gilad Ben-Yossef <gilad@benyossef.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
 Cc:     Ofir Drang <ofir.drang@arm.com>, Hadar Gat <hadar.gat@arm.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 01/11] crypto: ccree: fix typos in error msgs
-Date:   Thu, 16 Jan 2020 12:14:36 +0200
-Message-Id: <20200116101447.20374-2-gilad@benyossef.com>
+        stable@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 05/11] crypto: ccree - fix pm wrongful error reporting
+Date:   Thu, 16 Jan 2020 12:14:40 +0200
+Message-Id: <20200116101447.20374-6-gilad@benyossef.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20200116101447.20374-1-gilad@benyossef.com>
 References: <20200116101447.20374-1-gilad@benyossef.com>
@@ -43,37 +44,28 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Hadar Gat <hadar.gat@arm.com>
+pm_runtime_get_sync() can return 1 as a valid (none error) return
+code. Treat it as such.
 
-Fixed typos in ccree error msgs.
-
-Signed-off-by: Hadar Gat <hadar.gat@arm.com>
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+Cc: stable@vger.kernel.org # v4.19+
 ---
- drivers/crypto/ccree/cc_request_mgr.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/crypto/ccree/cc_pm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/ccree/cc_request_mgr.c b/drivers/crypto/ccree/cc_request_mgr.c
-index a5606dc04b06..d37b4ab50a25 100644
---- a/drivers/crypto/ccree/cc_request_mgr.c
-+++ b/drivers/crypto/ccree/cc_request_mgr.c
-@@ -423,7 +423,7 @@ int cc_send_request(struct cc_drvdata *drvdata, struct cc_crypto_req *cc_req,
+diff --git a/drivers/crypto/ccree/cc_pm.c b/drivers/crypto/ccree/cc_pm.c
+index 4de25c85d127..79c612144310 100644
+--- a/drivers/crypto/ccree/cc_pm.c
++++ b/drivers/crypto/ccree/cc_pm.c
+@@ -85,7 +85,7 @@ int cc_pm_get(struct device *dev)
+ 	else
+ 		pm_runtime_get_noresume(dev);
  
- 	rc = cc_pm_get(dev);
- 	if (rc) {
--		dev_err(dev, "ssi_power_mgr_runtime_get returned %x\n", rc);
-+		dev_err(dev, "cc_pm_get returned %x\n", rc);
- 		return rc;
- 	}
+-	return rc;
++	return (rc == 1 ? 0 : rc);
+ }
  
-@@ -473,7 +473,7 @@ int cc_send_sync_request(struct cc_drvdata *drvdata,
- 
- 	rc = cc_pm_get(dev);
- 	if (rc) {
--		dev_err(dev, "ssi_power_mgr_runtime_get returned %x\n", rc);
-+		dev_err(dev, "cc_pm_get returned %x\n", rc);
- 		return rc;
- 	}
- 
+ int cc_pm_put_suspend(struct device *dev)
 -- 
 2.23.0
 
