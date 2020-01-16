@@ -7,52 +7,50 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96735C33CAF
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 18:25:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EB51C33CAF
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 18:36:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6A21F2073A
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 18:25:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 59E8E2073A
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 18:36:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1579199104;
-	bh=BsDrq1g+bMq/8XFhrxOFkZEa6EtIzrjo52mrJdI9crs=;
+	s=default; t=1579199797;
+	bh=tdZMzdbq4gVQ5twnlrKuGhiga9ypKlA/c7vC+XIRG1s=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=hXPE3slnGw2Upb1VOBUXgbEKOne8+7xmgObugCQCbxjlCalGKAspUTwYOgw61QDxK
-	 W2/+olTs4qXOA7sS6/LlfSODELZr5VDBSNzKhLElydlv9ukp03uPwu/eu6h+WK/v/t
-	 ZG/DHzK0Vk+opSe8WnblssZlWr/Mld76io9XfXuw=
+	b=d/AQx//bOPrXlVJhek1Y0kTpKkgj6+EmfL4TGy0roXd9k4LF4RQdPezi0gh6kF53R
+	 mzPqSnutseqRUBmD4+hYUvmmpZLLH++CQs2D7Onq6wHZRYMyPpCaWU0j3zHYAz/Dko
+	 vu3kP+1JMpU/tYj+uJDVUDshKlymPuY+U43JyX6Y=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2404094AbgAPSYs (ORCPT
+        id S2391640AbgAPRYM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Jan 2020 13:24:48 -0500
-Received: from mail.kernel.org ([198.145.29.99]:36602 "EHLO mail.kernel.org"
+        Thu, 16 Jan 2020 12:24:12 -0500
+Received: from mail.kernel.org ([198.145.29.99]:58220 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2392408AbgAPR1H (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Jan 2020 12:27:07 -0500
+        id S2391682AbgAPRYK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Jan 2020 12:24:10 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7C475246BE;
-        Thu, 16 Jan 2020 17:27:05 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 46F1124688;
+        Thu, 16 Jan 2020 17:24:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1579195626;
-        bh=BsDrq1g+bMq/8XFhrxOFkZEa6EtIzrjo52mrJdI9crs=;
+        s=default; t=1579195450;
+        bh=tdZMzdbq4gVQ5twnlrKuGhiga9ypKlA/c7vC+XIRG1s=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=VRuQ9vNvRaTzSNE/R/U4ksBwYCkMbvtlm8UEqlIVnSQ1LvhLFVSQiV/K8Yzp7KNug
-         05WnPK/puO6wuTAIAPRVXzA7EliD5u3fjdbsNu1/PZXpMsib8y5tc+3ddYLUJYDd9y
-         G0+b3IGbFNif1SFIE7rCk9Xu7I/Pbix406vYa/Nw=
+        b=F+4fsOLzYRPeRL2inLGArit2Tlhsrgjp5dCj1R+81zlOj2iV+2y/4/GN73OQWW0Wk
+         R+8O3xX/AT56SvjznkAMczOKOK5/YnopW1IyVxHz9EuDOQtaSll0rM1OEuEguHtPl+
+         1+Qguq4Gwg+c3QAOzm6cF4e3MQ3IGHQQPcVEqlq8=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Iuliana Prodan <iuliana.prodan@nxp.com>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+Cc:     Eric Biggers <ebiggers@google.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 196/371] crypto: caam - fix caam_dump_sg that iterates through scatterlist
-Date:   Thu, 16 Jan 2020 12:21:08 -0500
-Message-Id: <20200116172403.18149-139-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 061/371] crypto: tgr192 - fix unaligned memory access
+Date:   Thu, 16 Jan 2020 12:18:53 -0500
+Message-Id: <20200116172403.18149-4-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200116172403.18149-1-sashal@kernel.org>
 References: <20200116172403.18149-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -61,35 +59,48 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Iuliana Prodan <iuliana.prodan@nxp.com>
+From: Eric Biggers <ebiggers@google.com>
 
-[ Upstream commit 8c65d35435e8cbfdf953cafe5ebe3648ee9276a2 ]
+[ Upstream commit f990f7fb58ac8ac9a43316f09a48cff1a49dda42 ]
 
-Fix caam_dump_sg by correctly determining the next scatterlist
-entry in the list.
+Fix an unaligned memory access in tgr192_transform() by using the
+unaligned access helpers.
 
-Fixes: 5ecf8ef9103c ("crypto: caam - fix sg dump")
-Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
-Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
+Fixes: 06ace7a9bafe ("[CRYPTO] Use standard byte order macros wherever possible")
+Signed-off-by: Eric Biggers <ebiggers@google.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/caam/error.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ crypto/tgr192.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/caam/error.c b/drivers/crypto/caam/error.c
-index 8da88beb1abb..832ba2afdcd5 100644
---- a/drivers/crypto/caam/error.c
-+++ b/drivers/crypto/caam/error.c
-@@ -22,7 +22,7 @@ void caam_dump_sg(const char *level, const char *prefix_str, int prefix_type,
- 	size_t len;
- 	void *buf;
+diff --git a/crypto/tgr192.c b/crypto/tgr192.c
+index 321bc6ff2a9d..904c8444aa0a 100644
+--- a/crypto/tgr192.c
++++ b/crypto/tgr192.c
+@@ -25,8 +25,9 @@
+ #include <linux/init.h>
+ #include <linux/module.h>
+ #include <linux/mm.h>
+-#include <asm/byteorder.h>
+ #include <linux/types.h>
++#include <asm/byteorder.h>
++#include <asm/unaligned.h>
  
--	for (it = sg; it && tlen > 0 ; it = sg_next(sg)) {
-+	for (it = sg; it && tlen > 0 ; it = sg_next(it)) {
- 		/*
- 		 * make sure the scatterlist's page
- 		 * has a valid virtual memory mapping
+ #define TGR192_DIGEST_SIZE 24
+ #define TGR160_DIGEST_SIZE 20
+@@ -468,10 +469,9 @@ static void tgr192_transform(struct tgr192_ctx *tctx, const u8 * data)
+ 	u64 a, b, c, aa, bb, cc;
+ 	u64 x[8];
+ 	int i;
+-	const __le64 *ptr = (const __le64 *)data;
+ 
+ 	for (i = 0; i < 8; i++)
+-		x[i] = le64_to_cpu(ptr[i]);
++		x[i] = get_unaligned_le64(data + i * sizeof(__le64));
+ 
+ 	/* save */
+ 	a = aa = tctx->a;
 -- 
 2.20.1
 
