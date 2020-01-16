@@ -4,54 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4C83C33CAF
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 17:03:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45E4AC33CAF
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 17:07:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 86AD02077B
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 17:03:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C06D2081E
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 17:07:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1579194238;
-	bh=7xz+vLnFw4XjnRLafaQcO0K8hzVM1v1QHQw2s1h9R3w=;
+	s=default; t=1579194469;
+	bh=Yw7Sxwca5v+5wc2avdjj/iOaHU0AHaZFoEdAY1dbTaA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=rkGoepG9bCqQeWpGNJ30ngDoUgeUddhnioU0ENsS4wfd3uypnQaug9nL8MRhzR2ko
-	 5lVQi5qH5rQCYt/WECtrZA+U+avlGZKHqhIpDAGCGNIZJLlN7gUeD4QCA8IskI43lS
-	 e1vYOcOui2tJyQLtCpPNgFdF++RnT2gyeRn8JM/8=
+	b=mdc3MB6yfJyaxmsewU8sVtIfNRDkAMg2yfMr330cxvsI77fo9B4Tv+hUHaHSqLtRv
+	 PLtPuYoX6ZTL+ulPEJm73/74ml4HtjFUNtDXzp6Zv++ZyI3M8/lkFXtfVMp5pGEyEi
+	 z090r/Jn7d0c63UARXrHyYNnnIhH2SzL9+s+ek/A=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732702AbgAPRDy (ORCPT
+        id S2389210AbgAPRHs (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Jan 2020 12:03:54 -0500
-Received: from mail.kernel.org ([198.145.29.99]:56452 "EHLO mail.kernel.org"
+        Thu, 16 Jan 2020 12:07:48 -0500
+Received: from mail.kernel.org ([198.145.29.99]:40200 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388024AbgAPRC4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Jan 2020 12:02:56 -0500
+        id S2387474AbgAPRHq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Jan 2020 12:07:46 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 66F9C24653;
-        Thu, 16 Jan 2020 17:02:54 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 51619217F4;
+        Thu, 16 Jan 2020 17:07:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1579194175;
-        bh=7xz+vLnFw4XjnRLafaQcO0K8hzVM1v1QHQw2s1h9R3w=;
+        s=default; t=1579194466;
+        bh=Yw7Sxwca5v+5wc2avdjj/iOaHU0AHaZFoEdAY1dbTaA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qKz9uwGZgwfXW1zZw1M1kT0RzuyUwj6yYdLXGx5lUr4o/sYPSnrZy016LSdpoOEvF
-         casriQ2qURnN0gZfRmYaPHZOgkgBb1PRQLYP1wPnkoJB73WzMJ8bx3uw0MB0wAL1FH
-         xnfyn478eq3vstIeASNMdS9yWEWbXjeC2LKUxM1M=
+        b=J8p+xcfMr6RUXwVUWCf7TRoWlxWlFkcB5gFffskG8LlD1BtLEh6A3uhCMFXh1nmfJ
+         Jlx6eyCk0jGwG1NDTJlCVfCbg3HY49m8WEYgrByh0dgfpTnyN8kRhQYWjHhPSq6fxA
+         mQ3Zmuk/REDx5VNr1mVm+yO/G898R/Ur7+z07iN8=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Arnd Bergmann <arnd@arndb.de>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
+Cc:     "Hook, Gary" <Gary.Hook@amd.com>, Gary R Hook <gary.hook@amd.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
-        clang-built-linux@googlegroups.com
-Subject: [PATCH AUTOSEL 4.19 253/671] crypto: ccree - reduce kernel stack usage with clang
-Date:   Thu, 16 Jan 2020 11:52:42 -0500
-Message-Id: <20200116165940.10720-136-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 372/671] crypto: ccp - Fix 3DES complaint from ccp-crypto module
+Date:   Thu, 16 Jan 2020 12:00:10 -0500
+Message-Id: <20200116170509.12787-109-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200116165940.10720-1-sashal@kernel.org>
-References: <20200116165940.10720-1-sashal@kernel.org>
+In-Reply-To: <20200116170509.12787-1-sashal@kernel.org>
+References: <20200116170509.12787-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -61,50 +59,75 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Arnd Bergmann <arnd@arndb.de>
+From: "Hook, Gary" <Gary.Hook@amd.com>
 
-[ Upstream commit 5db46ac29a6797541943d3c4081821747e342732 ]
+[ Upstream commit 89646fdda4cae203185444ac7988835f36a21ee1 ]
 
-Building with clang for a 32-bit architecture runs over the stack
-frame limit in the setkey function:
+Crypto self-tests reveal an error:
 
-drivers/crypto/ccree/cc_cipher.c:318:12: error: stack frame size of 1152 bytes in function 'cc_cipher_setkey' [-Werror,-Wframe-larger-than=]
+alg: skcipher: cbc-des3-ccp encryption test failed (wrong output IV) on test vector 0, cfg="in-place"
 
-The problem is that there are two large variables: the temporary
-'tmp' array and the SHASH_DESC_ON_STACK() declaration. Moving
-the first into the block in which it is used reduces the
-total frame size to 768 bytes, which seems more reasonable
-and is under the warning limit.
+The offset value should not be recomputed when retrieving the context.
+Also, a code path exists which makes decisions based on older (version 3)
+hardware; a v3 device deosn't support 3DES so remove this check.
 
-Fixes: 63ee04c8b491 ("crypto: ccree - add skcipher support")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-Acked-By: Gilad Ben-Yossef <gilad@benyossef.com>
+Fixes: 990672d48515 ('crypto: ccp - Enable 3DES function on v5 CCPs')
+
+Signed-off-by: Gary R Hook <gary.hook@amd.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/ccree/cc_cipher.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/ccp/ccp-ops.c | 15 ++++-----------
+ 1 file changed, 4 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
-index 54a39164aab8..28a5b8b38fa2 100644
---- a/drivers/crypto/ccree/cc_cipher.c
-+++ b/drivers/crypto/ccree/cc_cipher.c
-@@ -306,7 +306,6 @@ static int cc_cipher_setkey(struct crypto_skcipher *sktfm, const u8 *key,
- 	struct crypto_tfm *tfm = crypto_skcipher_tfm(sktfm);
- 	struct cc_cipher_ctx *ctx_p = crypto_tfm_ctx(tfm);
- 	struct device *dev = drvdata_to_dev(ctx_p->drvdata);
--	u32 tmp[DES3_EDE_EXPKEY_WORDS];
- 	struct cc_crypto_alg *cc_alg =
- 			container_of(tfm->__crt_alg, struct cc_crypto_alg,
- 				     skcipher_alg.base);
-@@ -332,6 +331,7 @@ static int cc_cipher_setkey(struct crypto_skcipher *sktfm, const u8 *key,
- 	 * HW does the expansion on its own.
+diff --git a/drivers/crypto/ccp/ccp-ops.c b/drivers/crypto/ccp/ccp-ops.c
+index 1e2e42106dee..4b48b8523a40 100644
+--- a/drivers/crypto/ccp/ccp-ops.c
++++ b/drivers/crypto/ccp/ccp-ops.c
+@@ -1293,6 +1293,9 @@ static int ccp_run_des3_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 	int ret;
+ 
+ 	/* Error checks */
++	if (cmd_q->ccp->vdata->version < CCP_VERSION(5, 0))
++		return -EINVAL;
++
+ 	if (!cmd_q->ccp->vdata->perform->des3)
+ 		return -EINVAL;
+ 
+@@ -1375,8 +1378,6 @@ static int ccp_run_des3_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 	 * passthru option to convert from big endian to little endian.
  	 */
- 	if (ctx_p->flow_mode == S_DIN_to_DES) {
-+		u32 tmp[DES3_EDE_EXPKEY_WORDS];
- 		if (keylen == DES3_EDE_KEY_SIZE &&
- 		    __des3_ede_setkey(tmp, &tfm->crt_flags, key,
- 				      DES3_EDE_KEY_SIZE)) {
+ 	if (des3->mode != CCP_DES3_MODE_ECB) {
+-		u32 load_mode;
+-
+ 		op.sb_ctx = cmd_q->sb_ctx;
+ 
+ 		ret = ccp_init_dm_workarea(&ctx, cmd_q,
+@@ -1392,12 +1393,8 @@ static int ccp_run_des3_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 		if (ret)
+ 			goto e_ctx;
+ 
+-		if (cmd_q->ccp->vdata->version == CCP_VERSION(3, 0))
+-			load_mode = CCP_PASSTHRU_BYTESWAP_NOOP;
+-		else
+-			load_mode = CCP_PASSTHRU_BYTESWAP_256BIT;
+ 		ret = ccp_copy_to_sb(cmd_q, &ctx, op.jobid, op.sb_ctx,
+-				     load_mode);
++				     CCP_PASSTHRU_BYTESWAP_256BIT);
+ 		if (ret) {
+ 			cmd->engine_error = cmd_q->cmd_error;
+ 			goto e_ctx;
+@@ -1459,10 +1456,6 @@ static int ccp_run_des3_cmd(struct ccp_cmd_queue *cmd_q, struct ccp_cmd *cmd)
+ 		}
+ 
+ 		/* ...but we only need the last DES3_EDE_BLOCK_SIZE bytes */
+-		if (cmd_q->ccp->vdata->version == CCP_VERSION(3, 0))
+-			dm_offset = CCP_SB_BYTES - des3->iv_len;
+-		else
+-			dm_offset = 0;
+ 		ccp_get_dm_area(&ctx, dm_offset, des3->iv, 0,
+ 				DES3_EDE_BLOCK_SIZE);
+ 	}
 -- 
 2.20.1
 
