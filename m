@@ -7,50 +7,50 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08EA7C47409
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 17:59:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBF07C33CAF
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 18:05:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CDCA52464B
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 17:59:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C97BC22522
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 18:05:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1579197580;
-	bh=6Fd7Q3BMWeJNBGk0kKO5Sfece9B848AW7wMsA8jHAYA=;
+	s=default; t=1579197932;
+	bh=OPa98pr8229ebjPXj4IhS5LOxf8G/Y4/ZXRc9zvSDi0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=2J0XT9t5yFKHiIS9HKqBuURdFAEBB/ZWkCfWgfNMSoKC9ewhAGMA5Szp4EYKwulr3
-	 Z1hMrdYt2a3Vj5Cd7VR4sgYzfNr++vSubHtExZ/OIlKkqgDHC+z1WaKMXkUOGZzb5/
-	 mIsEECVQyGW+RBMOkiNLQ7umJ7Ac1/iKmZiu9zo8=
+	b=wsC8+/8L4FqsMF+AHjvTndkKFNnlpkECrDTJ90d2dSuSNg+0MPNaS7IjQGqd0gFLK
+	 0280MKFanGFQ/xusQN7rzF9i/SgCAL4u9ybl/vh3J9BmFHGvQIB8Tsy3kLFVj2Eq1I
+	 JJ4TivuNPrHRNSEi+dKuhaqPuqMsx/wp3oDqglnY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394757AbgAPR7d (ORCPT
+        id S2393577AbgAPRkD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Jan 2020 12:59:33 -0500
-Received: from mail.kernel.org ([198.145.29.99]:32890 "EHLO mail.kernel.org"
+        Thu, 16 Jan 2020 12:40:03 -0500
+Received: from mail.kernel.org ([198.145.29.99]:56874 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2393839AbgAPRnA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Jan 2020 12:43:00 -0500
+        id S2393568AbgAPRkC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Jan 2020 12:40:02 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 43413246A4;
-        Thu, 16 Jan 2020 17:42:59 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id F024524725;
+        Thu, 16 Jan 2020 17:40:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1579196580;
-        bh=6Fd7Q3BMWeJNBGk0kKO5Sfece9B848AW7wMsA8jHAYA=;
+        s=default; t=1579196401;
+        bh=OPa98pr8229ebjPXj4IhS5LOxf8G/Y4/ZXRc9zvSDi0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=h6SwAh7BMjEfwnLFVtp6bSRuA9QjJs43UKSaNj+XHT0ez1h2s83sd9eNmaLaLhAMb
-         4k1yeSA4x17g9Jd5KRBBrePQdtWSKhtmi+pt4Rf/VHesuPnswMoeoiAAr4/s0PPmvL
-         prZr81RyxPKbgyxGwnwsc0H2j8Q+oQJ+xpshKfGM=
+        b=0CxQLyiqPomsI8VQTrVTc4Kt1HGnzfIzY6+yqcEx2sup78MIAp56T7gkFkjtgKveF
+         svs5T3Qo8rR3KuMLT4PNZETJqKk0NFnhB3hE2tttZ2nyq9vSn7G4u66EKwaWq/bNrC
+         M0JlQ5h1HFKjmBqM0T+tQWr4EkiU8Kbr/YCMvldo=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Colin Ian King <colin.king@canonical.com>,
+Cc:     Iuliana Prodan <iuliana.prodan@nxp.com>,
+        Horia Geanta <horia.geanta@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
-        clang-built-linux@googlegroups.com
-Subject: [PATCH AUTOSEL 4.4 006/174] pcrypt: use format specifier in kobject_add
-Date:   Thu, 16 Jan 2020 12:40:03 -0500
-Message-Id: <20200116174251.24326-6-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.9 178/251] crypto: caam - free resources in case caam_rng registration failed
+Date:   Thu, 16 Jan 2020 12:35:27 -0500
+Message-Id: <20200116173641.22137-138-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200116174251.24326-1-sashal@kernel.org>
-References: <20200116174251.24326-1-sashal@kernel.org>
+In-Reply-To: <20200116173641.22137-1-sashal@kernel.org>
+References: <20200116173641.22137-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -60,41 +60,38 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Colin Ian King <colin.king@canonical.com>
+From: Iuliana Prodan <iuliana.prodan@nxp.com>
 
-[ Upstream commit b1e3874c75ab15288f573b3532e507c37e8e7656 ]
+[ Upstream commit c59a1d41672a89b5cac49db1a472ff889e35a2d2 ]
 
-Passing string 'name' as the format specifier is potentially hazardous
-because name could (although very unlikely to) have a format specifier
-embedded in it causing issues when parsing the non-existent arguments
-to these.  Follow best practice by using the "%s" format string for
-the string 'name'.
+Check the return value of the hardware registration for caam_rng and free
+resources in case of failure.
 
-Cleans up clang warning:
-crypto/pcrypt.c:397:40: warning: format string is not a string literal
-(potentially insecure) [-Wformat-security]
-
-Fixes: a3fb1e330dd2 ("pcrypt: Added sysfs interface to pcrypt")
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
+Fixes: e24f7c9e87d4 ("crypto: caam - hwrng support")
+Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
+Reviewed-by: Horia Geanta <horia.geanta@nxp.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- crypto/pcrypt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/caam/caamrng.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
-index f8ec3d4ba4a8..a5718c0a3dc4 100644
---- a/crypto/pcrypt.c
-+++ b/crypto/pcrypt.c
-@@ -394,7 +394,7 @@ static int pcrypt_sysfs_add(struct padata_instance *pinst, const char *name)
- 	int ret;
+diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
+index 9b92af2c7241..a77319bf221d 100644
+--- a/drivers/crypto/caam/caamrng.c
++++ b/drivers/crypto/caam/caamrng.c
+@@ -361,7 +361,10 @@ static int __init caam_rng_init(void)
+ 		goto free_rng_ctx;
  
- 	pinst->kobj.kset = pcrypt_kset;
--	ret = kobject_add(&pinst->kobj, NULL, name);
-+	ret = kobject_add(&pinst->kobj, NULL, "%s", name);
- 	if (!ret)
- 		kobject_uevent(&pinst->kobj, KOBJ_ADD);
+ 	dev_info(dev, "registering rng-caam\n");
+-	return hwrng_register(&caam_rng);
++
++	err = hwrng_register(&caam_rng);
++	if (!err)
++		return err;
  
+ free_rng_ctx:
+ 	kfree(rng_ctx);
 -- 
 2.20.1
 
