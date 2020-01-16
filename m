@@ -7,52 +7,54 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA65BC33CAF
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 18:56:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B52CCC33CB3
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 19:04:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8389B2053B
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 18:56:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9245D206E6
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 19:04:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1579201001;
-	bh=BsDrq1g+bMq/8XFhrxOFkZEa6EtIzrjo52mrJdI9crs=;
+	s=default; t=1579201463;
+	bh=Arr1726Id5mEVcSp5PE/MtW4ooJu4KwJFMqCkc++vG4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=cFYI3x9RvX4WYNX3X5IkzjPoEINEPQ1FmhrKmWkewVR8JIEzhqG4DiNzhZdikZqAu
-	 5UaXFIn0jCfRquiawN+cCWayFhHk09sDodYMLwuM7mcdUoJ/IMAtPl6Tol39dwG8a/
-	 PdqMRKlZSCeNHXrkU07orVMzjmhCnPHQ8jk4IOgs=
+	b=RNivG/2XOz+zT0/5xbHvFWoCHsuZ2yAFkQ0hCyGh7J0yM4JV0/UCNGNSy9K8VMMsR
+	 aaF1W+gOnn0lmHcjTSNAEWpMXoRUwJZH8WW4Ah/4eX3qN6z3d5gZ/L321tH/G3CwM+
+	 YzOLYsUKvRvYGk99wbq7tV2NWmNhEuc0s+zUDd9Q=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389112AbgAPRHO (ORCPT
+        id S2389782AbgAPTEL (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Jan 2020 12:07:14 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38710 "EHLO mail.kernel.org"
+        Thu, 16 Jan 2020 14:04:11 -0500
+Received: from mail.kernel.org ([198.145.29.99]:55014 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389109AbgAPRHN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Jan 2020 12:07:13 -0500
+        id S2387934AbgAPRCW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Jan 2020 12:02:22 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id F37C320663;
-        Thu, 16 Jan 2020 17:07:11 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9BAA720730;
+        Thu, 16 Jan 2020 17:02:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1579194432;
-        bh=BsDrq1g+bMq/8XFhrxOFkZEa6EtIzrjo52mrJdI9crs=;
+        s=default; t=1579194141;
+        bh=Arr1726Id5mEVcSp5PE/MtW4ooJu4KwJFMqCkc++vG4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=WC2kkTov1f6/yyiNxGXGf4WdTtKn80kg4A0rJncEaX6DOrZyZyFrUSRbmfcBzrGrT
-         v+J0JSLG+Dd0mbFb2IWXPRcGzh9HRiUjEfWmKzk9RF752DF2uQ3Zz9L42JTqGqShtb
-         bKLFM3rw/rjxS8HiJDkuEP0vYA++ycj6IAGXhy/0=
+        b=TBA4yWuW2SPxELObiTIT9AOZ2+XzAAwuGz3AHJP7VVH9r2IwVDGFjzm9MkMUah01g
+         CMFuI41pt4osmvHshFtv2C1aoyymgELT85AN7PQz8uFnVvkytQYwBfPdef1iUIxSn7
+         r9dgI1qUR80yNRaFVo88iguEBxhXtmAbbQy8yju4=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Iuliana Prodan <iuliana.prodan@nxp.com>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+Cc:     Jonas Gorski <jonas.gorski@gmail.com>,
+        Florian Fainelli <f.fainelli@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 348/671] crypto: caam - fix caam_dump_sg that iterates through scatterlist
-Date:   Thu, 16 Jan 2020 11:59:46 -0500
-Message-Id: <20200116170509.12787-85-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
+        bcm-kernel-feedback-list@broadcom.com,
+        linux-rpi-kernel@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org
+Subject: [PATCH AUTOSEL 4.19 228/671] hwrng: bcm2835 - fix probe as platform device
+Date:   Thu, 16 Jan 2020 11:52:17 -0500
+Message-Id: <20200116165940.10720-111-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200116170509.12787-1-sashal@kernel.org>
-References: <20200116170509.12787-1-sashal@kernel.org>
+In-Reply-To: <20200116165940.10720-1-sashal@kernel.org>
+References: <20200116165940.10720-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -61,35 +63,56 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Iuliana Prodan <iuliana.prodan@nxp.com>
+From: Jonas Gorski <jonas.gorski@gmail.com>
 
-[ Upstream commit 8c65d35435e8cbfdf953cafe5ebe3648ee9276a2 ]
+[ Upstream commit 984798de671a927ac73da31096a150df42e6aaf3 ]
 
-Fix caam_dump_sg by correctly determining the next scatterlist
-entry in the list.
+BCM63XX (MIPS) does not use device tree, so there cannot be any
+of_device_id, causing the driver to fail on probe:
 
-Fixes: 5ecf8ef9103c ("crypto: caam - fix sg dump")
-Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
-Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
+[    0.904564] bcm2835-rng: probe of bcm63xx-rng failed with error -22
+
+Fix this by checking for match data only if we are probing from device
+tree.
+
+Fixes: 8705f24f7b57 ("hwrng: bcm2835 - Enable BCM2835 RNG to work on BCM63xx platforms")
+Signed-off-by: Jonas Gorski <jonas.gorski@gmail.com>
+Acked-by: Florian Fainelli <f.fainelli@gmail.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/caam/error.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/char/hw_random/bcm2835-rng.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/crypto/caam/error.c b/drivers/crypto/caam/error.c
-index 8da88beb1abb..832ba2afdcd5 100644
---- a/drivers/crypto/caam/error.c
-+++ b/drivers/crypto/caam/error.c
-@@ -22,7 +22,7 @@ void caam_dump_sg(const char *level, const char *prefix_str, int prefix_type,
- 	size_t len;
- 	void *buf;
+diff --git a/drivers/char/hw_random/bcm2835-rng.c b/drivers/char/hw_random/bcm2835-rng.c
+index 6767d965c36c..19bde680aee1 100644
+--- a/drivers/char/hw_random/bcm2835-rng.c
++++ b/drivers/char/hw_random/bcm2835-rng.c
+@@ -171,14 +171,16 @@ static int bcm2835_rng_probe(struct platform_device *pdev)
+ 	priv->rng.read = bcm2835_rng_read;
+ 	priv->rng.cleanup = bcm2835_rng_cleanup;
  
--	for (it = sg; it && tlen > 0 ; it = sg_next(sg)) {
-+	for (it = sg; it && tlen > 0 ; it = sg_next(it)) {
- 		/*
- 		 * make sure the scatterlist's page
- 		 * has a valid virtual memory mapping
+-	rng_id = of_match_node(bcm2835_rng_of_match, np);
+-	if (!rng_id)
+-		return -EINVAL;
+-
+-	/* Check for rng init function, execute it */
+-	of_data = rng_id->data;
+-	if (of_data)
+-		priv->mask_interrupts = of_data->mask_interrupts;
++	if (dev_of_node(dev)) {
++		rng_id = of_match_node(bcm2835_rng_of_match, np);
++		if (!rng_id)
++			return -EINVAL;
++
++		/* Check for rng init function, execute it */
++		of_data = rng_id->data;
++		if (of_data)
++			priv->mask_interrupts = of_data->mask_interrupts;
++	}
+ 
+ 	/* register driver */
+ 	err = devm_hwrng_register(dev, &priv->rng);
 -- 
 2.20.1
 
