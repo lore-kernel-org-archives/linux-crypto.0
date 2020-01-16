@@ -2,105 +2,68 @@ Return-Path: <SRS0=he+G=3F=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EB51C33CAF
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 18:36:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F403C33CB3
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 18:36:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 59E8E2073A
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 18:36:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1579199797;
-	bh=tdZMzdbq4gVQ5twnlrKuGhiga9ypKlA/c7vC+XIRG1s=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=d/AQx//bOPrXlVJhek1Y0kTpKkgj6+EmfL4TGy0roXd9k4LF4RQdPezi0gh6kF53R
-	 mzPqSnutseqRUBmD4+hYUvmmpZLLH++CQs2D7Onq6wHZRYMyPpCaWU0j3zHYAz/Dko
-	 vu3kP+1JMpU/tYj+uJDVUDshKlymPuY+U43JyX6Y=
+	by mail.kernel.org (Postfix) with ESMTP id 27BEE208C3
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 18:36:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="HaChmZtN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391640AbgAPRYM (ORCPT
+        id S2389850AbgAPRYI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Jan 2020 12:24:12 -0500
-Received: from mail.kernel.org ([198.145.29.99]:58220 "EHLO mail.kernel.org"
+        Thu, 16 Jan 2020 12:24:08 -0500
+Received: from frisell.zx2c4.com ([192.95.5.64]:38265 "EHLO frisell.zx2c4.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391682AbgAPRYK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Jan 2020 12:24:10 -0500
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 46F1124688;
-        Thu, 16 Jan 2020 17:24:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1579195450;
-        bh=tdZMzdbq4gVQ5twnlrKuGhiga9ypKlA/c7vC+XIRG1s=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=F+4fsOLzYRPeRL2inLGArit2Tlhsrgjp5dCj1R+81zlOj2iV+2y/4/GN73OQWW0Wk
-         R+8O3xX/AT56SvjznkAMczOKOK5/YnopW1IyVxHz9EuDOQtaSll0rM1OEuEguHtPl+
-         1+Qguq4Gwg+c3QAOzm6cF4e3MQ3IGHQQPcVEqlq8=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Eric Biggers <ebiggers@google.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 061/371] crypto: tgr192 - fix unaligned memory access
-Date:   Thu, 16 Jan 2020 12:18:53 -0500
-Message-Id: <20200116172403.18149-4-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200116172403.18149-1-sashal@kernel.org>
-References: <20200116172403.18149-1-sashal@kernel.org>
+        id S1733197AbgAPRYH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Jan 2020 12:24:07 -0500
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 817523b2;
+        Thu, 16 Jan 2020 16:23:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=from:to:cc
+        :subject:date:message-id:mime-version:content-transfer-encoding;
+         s=mail; bh=50bNfiEpYG6sVj+x/enmT20pq+8=; b=HaChmZtNljAHfXiuU4oi
+        nTKdEllGn9MOg1FY92BAlaYRF+9CV85OYvMNUBbseZITJ36cvU5dYhy7fVFfogt6
+        xNpi/rL3u/0VcBtp9qUvnF6LkS7/q5Q9klgEFXkzwtrblC8h0lIq93Vr8c6TSgUT
+        pdmpW//kUgs284tZezRurW2e11v3AIopHwkNARYrWtmS5wlvje6xqa20uQ3WPWSz
+        mOBmfyGnDMkqYTH42S7BW3a4tRl0m5n9sgGYG4IuwXVHaadmfJEKO54eneVRYVHS
+        lzQMgJbeW2CdFCLa65U5hAftmuCGCEnl/OCCmSG3VmBbDPy6M7GEO3PqyiaNHwk+
+        Gg==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 6f70810e (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
+        Thu, 16 Jan 2020 16:23:46 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH] crypto: x86/poly1305: fix .gitignore typo
+Date:   Thu, 16 Jan 2020 18:23:55 +0100
+Message-Id: <20200116172355.13255-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+Admist the kbuild robot induced changes, the .gitignore file for the
+generated file wasn't updated with the non-clashing filename. This
+commit adjusts that.
 
-[ Upstream commit f990f7fb58ac8ac9a43316f09a48cff1a49dda42 ]
-
-Fix an unaligned memory access in tgr192_transform() by using the
-unaligned access helpers.
-
-Fixes: 06ace7a9bafe ("[CRYPTO] Use standard byte order macros wherever possible")
-Signed-off-by: Eric Biggers <ebiggers@google.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
- crypto/tgr192.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ arch/x86/crypto/.gitignore | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/crypto/tgr192.c b/crypto/tgr192.c
-index 321bc6ff2a9d..904c8444aa0a 100644
---- a/crypto/tgr192.c
-+++ b/crypto/tgr192.c
-@@ -25,8 +25,9 @@
- #include <linux/init.h>
- #include <linux/module.h>
- #include <linux/mm.h>
--#include <asm/byteorder.h>
- #include <linux/types.h>
-+#include <asm/byteorder.h>
-+#include <asm/unaligned.h>
- 
- #define TGR192_DIGEST_SIZE 24
- #define TGR160_DIGEST_SIZE 20
-@@ -468,10 +469,9 @@ static void tgr192_transform(struct tgr192_ctx *tctx, const u8 * data)
- 	u64 a, b, c, aa, bb, cc;
- 	u64 x[8];
- 	int i;
--	const __le64 *ptr = (const __le64 *)data;
- 
- 	for (i = 0; i < 8; i++)
--		x[i] = le64_to_cpu(ptr[i]);
-+		x[i] = get_unaligned_le64(data + i * sizeof(__le64));
- 
- 	/* save */
- 	a = aa = tctx->a;
+diff --git a/arch/x86/crypto/.gitignore b/arch/x86/crypto/.gitignore
+index c406ea6571fa..30be0400a439 100644
+--- a/arch/x86/crypto/.gitignore
++++ b/arch/x86/crypto/.gitignore
+@@ -1 +1 @@
+-poly1305-x86_64.S
++poly1305-x86_64-cryptogams.S
 -- 
-2.20.1
+2.24.1
 
