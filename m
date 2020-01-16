@@ -4,53 +4,53 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C3E2C33CAF
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 19:15:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A78D2C33CAF
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 19:20:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4B33C206E6
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 19:15:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E6982073A
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 19:20:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1579202120;
-	bh=6Fd7Q3BMWeJNBGk0kKO5Sfece9B848AW7wMsA8jHAYA=;
+	s=default; t=1579202438;
+	bh=KgWLpGmJabYFlPdaEcw9F4Ql3GDN+A68D5/eBZPRZNk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=xWZyyYAyT+JBYnFOyyLvhQyAMy/AD9Rb9qyYUgJTvxqP8DmcjbZDG5PpcTdxmXIaj
-	 sEfF0WQ7Qzfy49CTB6QBQCNOT998GJwxBKNjYA7XlOWLa+WmRqox//vhIOXI38nJCV
-	 qKvuTqB/smYPMr1/raDN0UvNx3VXlf1nYbXCI998=
+	b=cNdtb8FjJRcEqeQUmzf05ONv3bMFHk1D+ZfSeiIoFEr1P7LAy0ukKKwaS5C0m88xq
+	 qU86f5+QEQNZ5IZdzeADPgp26jwGsyIW+tHe5kPAOMg3YyLMVJiDj/J4uenKIngZRS
+	 e5MDCoVvEpO99ss8KDMWpVeVn4u/3uz6GFZm2I/E=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733172AbgAPTPT (ORCPT
+        id S1731455AbgAPTUf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Jan 2020 14:15:19 -0500
-Received: from mail.kernel.org ([198.145.29.99]:42002 "EHLO mail.kernel.org"
+        Thu, 16 Jan 2020 14:20:35 -0500
+Received: from mail.kernel.org ([198.145.29.99]:38062 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1733145AbgAPQ4C (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Jan 2020 11:56:02 -0500
+        id S1729285AbgAPQx4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Jan 2020 11:53:56 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D316A2467C;
-        Thu, 16 Jan 2020 16:56:00 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 72DA220730;
+        Thu, 16 Jan 2020 16:53:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1579193761;
-        bh=6Fd7Q3BMWeJNBGk0kKO5Sfece9B848AW7wMsA8jHAYA=;
+        s=default; t=1579193635;
+        bh=KgWLpGmJabYFlPdaEcw9F4Ql3GDN+A68D5/eBZPRZNk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ihPQzphy+LG9NPkWQ6WakpMAiLQ4YWtWnkG5dA3C/uTq3UYfqpRkhjADuJ3CTXKAX
-         KFEuLIerUtsaie66toY/XjQW5CNoMiC+iuOEG9o/e7R8fZ8jfR9hhtBZ7TGe+Gi6If
-         LMIBKmZ6GCjxN9DKDXuDexGVUIU6JSwsazsPIMGI=
+        b=qndo76CEdaPTH6I9zBd2303VpKl6/ryXHtzKkdmJuH0HRt//TVSW1jV30q7aRPl70
+         PgM0g2vN/inAbFUTLrjfAliPe1ByoLjSH3Opl6/i4ghIxp2ZY1VoxP/XLtHO26T/DG
+         EmVn11W/Dd2clUhKzSBLULCt77lCbWvfqfh/hbbM=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Colin Ian King <colin.king@canonical.com>,
+Cc:     Corentin Labbe <clabbe.montjoie@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
-        clang-built-linux@googlegroups.com
-Subject: [PATCH AUTOSEL 4.19 048/671] pcrypt: use format specifier in kobject_add
-Date:   Thu, 16 Jan 2020 11:44:39 -0500
-Message-Id: <20200116165502.8838-48-sashal@kernel.org>
+        linux-arm-kernel@lists.infradead.org
+Subject: [PATCH AUTOSEL 5.4 168/205] crypto: sun4i-ss - fix big endian issues
+Date:   Thu, 16 Jan 2020 11:42:23 -0500
+Message-Id: <20200116164300.6705-168-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200116165502.8838-1-sashal@kernel.org>
-References: <20200116165502.8838-1-sashal@kernel.org>
+In-Reply-To: <20200116164300.6705-1-sashal@kernel.org>
+References: <20200116164300.6705-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -60,41 +60,90 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Colin Ian King <colin.king@canonical.com>
+From: Corentin Labbe <clabbe.montjoie@gmail.com>
 
-[ Upstream commit b1e3874c75ab15288f573b3532e507c37e8e7656 ]
+[ Upstream commit d1d787bcebfe122a5bd443ae565696661e2e9656 ]
 
-Passing string 'name' as the format specifier is potentially hazardous
-because name could (although very unlikely to) have a format specifier
-embedded in it causing issues when parsing the non-existent arguments
-to these.  Follow best practice by using the "%s" format string for
-the string 'name'.
+When testing BigEndian kernel, the sun4i-ss was failling all crypto
+tests.
+This patch fix endian issues with it.
 
-Cleans up clang warning:
-crypto/pcrypt.c:397:40: warning: format string is not a string literal
-(potentially insecure) [-Wformat-security]
-
-Fixes: a3fb1e330dd2 ("pcrypt: Added sysfs interface to pcrypt")
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
+Fixes: 6298e948215f ("crypto: sunxi-ss - Add Allwinner Security System crypto accelerator")
+Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- crypto/pcrypt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/sunxi-ss/sun4i-ss-hash.c | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
 
-diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
-index f8ec3d4ba4a8..a5718c0a3dc4 100644
---- a/crypto/pcrypt.c
-+++ b/crypto/pcrypt.c
-@@ -394,7 +394,7 @@ static int pcrypt_sysfs_add(struct padata_instance *pinst, const char *name)
- 	int ret;
+diff --git a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
+index 1369c5fa3087..07df012893bb 100644
+--- a/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
++++ b/drivers/crypto/sunxi-ss/sun4i-ss-hash.c
+@@ -175,7 +175,7 @@ static int sun4i_hash(struct ahash_request *areq)
+ 	 */
+ 	unsigned int i = 0, end, fill, min_fill, nwait, nbw = 0, j = 0, todo;
+ 	unsigned int in_i = 0;
+-	u32 spaces, rx_cnt = SS_RX_DEFAULT, bf[32] = {0}, wb = 0, v, ivmode = 0;
++	u32 spaces, rx_cnt = SS_RX_DEFAULT, bf[32] = {0}, v, ivmode = 0;
+ 	struct sun4i_req_ctx *op = ahash_request_ctx(areq);
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
+ 	struct sun4i_tfm_ctx *tfmctx = crypto_ahash_ctx(tfm);
+@@ -184,6 +184,7 @@ static int sun4i_hash(struct ahash_request *areq)
+ 	struct sg_mapping_iter mi;
+ 	int in_r, err = 0;
+ 	size_t copied = 0;
++	__le32 wb = 0;
  
- 	pinst->kobj.kset = pcrypt_kset;
--	ret = kobject_add(&pinst->kobj, NULL, name);
-+	ret = kobject_add(&pinst->kobj, NULL, "%s", name);
- 	if (!ret)
- 		kobject_uevent(&pinst->kobj, KOBJ_ADD);
+ 	dev_dbg(ss->dev, "%s %s bc=%llu len=%u mode=%x wl=%u h0=%0x",
+ 		__func__, crypto_tfm_alg_name(areq->base.tfm),
+@@ -395,7 +396,7 @@ static int sun4i_hash(struct ahash_request *areq)
  
+ 		nbw = op->len - 4 * nwait;
+ 		if (nbw) {
+-			wb = *(u32 *)(op->buf + nwait * 4);
++			wb = cpu_to_le32(*(u32 *)(op->buf + nwait * 4));
+ 			wb &= GENMASK((nbw * 8) - 1, 0);
+ 
+ 			op->byte_count += nbw;
+@@ -404,7 +405,7 @@ static int sun4i_hash(struct ahash_request *areq)
+ 
+ 	/* write the remaining bytes of the nbw buffer */
+ 	wb |= ((1 << 7) << (nbw * 8));
+-	bf[j++] = wb;
++	bf[j++] = le32_to_cpu(wb);
+ 
+ 	/*
+ 	 * number of space to pad to obtain 64o minus 8(size) minus 4 (final 1)
+@@ -423,13 +424,13 @@ static int sun4i_hash(struct ahash_request *areq)
+ 
+ 	/* write the length of data */
+ 	if (op->mode == SS_OP_SHA1) {
+-		__be64 bits = cpu_to_be64(op->byte_count << 3);
+-		bf[j++] = lower_32_bits(bits);
+-		bf[j++] = upper_32_bits(bits);
++		__be64 *bits = (__be64 *)&bf[j];
++		*bits = cpu_to_be64(op->byte_count << 3);
++		j += 2;
+ 	} else {
+-		__le64 bits = op->byte_count << 3;
+-		bf[j++] = lower_32_bits(bits);
+-		bf[j++] = upper_32_bits(bits);
++		__le64 *bits = (__le64 *)&bf[j];
++		*bits = cpu_to_le64(op->byte_count << 3);
++		j += 2;
+ 	}
+ 	writesl(ss->base + SS_RXFIFO, bf, j);
+ 
+@@ -471,7 +472,7 @@ static int sun4i_hash(struct ahash_request *areq)
+ 		}
+ 	} else {
+ 		for (i = 0; i < 4; i++) {
+-			v = readl(ss->base + SS_MD0 + i * 4);
++			v = cpu_to_le32(readl(ss->base + SS_MD0 + i * 4));
+ 			memcpy(areq->result + i * 4, &v, 4);
+ 		}
+ 	}
 -- 
 2.20.1
 
