@@ -4,49 +4,49 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C8F2C33CAF
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 17:08:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 339B1C33CB8
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 17:12:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 62C9424683
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 17:08:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0ACAE24692
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 17:12:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1579194505;
-	bh=ktKayj4vR4a5/DigIu8znMV+M/E0kYyG1sE7OYTItto=;
+	s=default; t=1579194728;
+	bh=NEJ9cspdl9wGfVplcbENKdgyFw0bHoTrRFhM9X9pK4U=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=fykxcbX0Le409SD2oAp1xel2oBDzdsOuij19SZk49P6gw+3DWf1P963sstMP5DRqG
-	 D7O4Y4EsqNKv47UJUb3MIY8rDdT/dSFEojKpIq6p7Y1wbredMf+MLwrEND1qJ/9HpA
-	 Iq2IsYhevG7eKeUS15uyxpOieZv4sV7YGg/weubo=
+	b=J3PLBJEx4h6CuF+qtOdZ68rFxNGDHdIDC9UGXI87sIFQMiAQMwbNKI7SSN0GxN8nx
+	 P1AxOjoxft7+whA3HRou8eGtdF4wVwVZzJVn9rGq51CQ7FTYbFYYtorrwKfae4G7XQ
+	 AdZRR8rQ+d6PFM80DMfOVp87ZR9b2ofaq2J4+LzQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389397AbgAPRIY (ORCPT
+        id S2390392AbgAPRMG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Jan 2020 12:08:24 -0500
-Received: from mail.kernel.org ([198.145.29.99]:41886 "EHLO mail.kernel.org"
+        Thu, 16 Jan 2020 12:12:06 -0500
+Received: from mail.kernel.org ([198.145.29.99]:54182 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389393AbgAPRIW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Jan 2020 12:08:22 -0500
+        id S2390385AbgAPRMF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Jan 2020 12:12:05 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 703802192A;
-        Thu, 16 Jan 2020 17:08:21 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 155FF24698;
+        Thu, 16 Jan 2020 17:12:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1579194502;
-        bh=ktKayj4vR4a5/DigIu8znMV+M/E0kYyG1sE7OYTItto=;
+        s=default; t=1579194725;
+        bh=NEJ9cspdl9wGfVplcbENKdgyFw0bHoTrRFhM9X9pK4U=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=SGdjIggqI02Ejhe6q+fGX2YIspoNw7A3iFLNkw2eBBFXtQ9p6iyXafW8POH+YHnEB
-         mV4zUDBNhiQTHf95Uw1exl0lukzbr78Y8Blyf9hbC0+fOEg1fkcEueBirwq+df50rW
-         9VuPBaApoTq4MAGvYrIbyIbRcy0q2df6VCZ/IrwY=
+        b=H4bA+mFHOr2FWN58RHdQT8cALrbU4O/4F9sU/67mtKXRIoeEF1m2Yz57RY60hCoFX
+         zfQsCU8elNowf2+PVerS56sGgfOllqYABZwtBJqnM3MruQxU/1Z4NPh72EZSE7tfjE
+         5/droG66x6CsyJDT3MIYUp6VzdiXB7fB3363QNN0=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Antoine Tenart <antoine.tenart@bootlin.com>,
+Cc:     Yunfeng Ye <yeyunfeng@huawei.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 398/671] crypto: inside-secure - fix zeroing of the request in ahash_exit_inv
-Date:   Thu, 16 Jan 2020 12:00:36 -0500
-Message-Id: <20200116170509.12787-135-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 559/671] crypto: hisilicon - Matching the dma address for dma_pool_free()
+Date:   Thu, 16 Jan 2020 12:03:17 -0500
+Message-Id: <20200116170509.12787-296-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200116170509.12787-1-sashal@kernel.org>
 References: <20200116170509.12787-1-sashal@kernel.org>
@@ -59,36 +59,91 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Antoine Tenart <antoine.tenart@bootlin.com>
+From: Yunfeng Ye <yeyunfeng@huawei.com>
 
-[ Upstream commit b926213d6fede9c9427d7c12eaf7d9f0895deb4e ]
+[ Upstream commit e00371af1d4ce73d527d8ee69fda2febaf5a42c2 ]
 
-A request is zeroed in safexcel_ahash_exit_inv(). This request total
-size is EIP197_AHASH_REQ_SIZE while the memset zeroing it uses
-sizeof(struct ahash_request), which happens to be less than
-EIP197_AHASH_REQ_SIZE. This patch fixes it.
+When dma_pool_zalloc() fail in sec_alloc_and_fill_hw_sgl(),
+dma_pool_free() is invoked, but the parameters that sgl_current and
+sgl_current->next_sgl is not match.
 
-Fixes: f6beaea30487 ("crypto: inside-secure - authenc(hmac(sha256), cbc(aes)) support")
-Signed-off-by: Antoine Tenart <antoine.tenart@bootlin.com>
+Using sec_free_hw_sgl() instead of the original free routine.
+
+Fixes: 915e4e8413da ("crypto: hisilicon - SEC security accelerator driver")
+Signed-off-by: Yunfeng Ye <yeyunfeng@huawei.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/inside-secure/safexcel_hash.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/hisilicon/sec/sec_algs.c | 44 +++++++++++--------------
+ 1 file changed, 19 insertions(+), 25 deletions(-)
 
-diff --git a/drivers/crypto/inside-secure/safexcel_hash.c b/drivers/crypto/inside-secure/safexcel_hash.c
-index ac9282c1a5ec..9a02f64a45b9 100644
---- a/drivers/crypto/inside-secure/safexcel_hash.c
-+++ b/drivers/crypto/inside-secure/safexcel_hash.c
-@@ -486,7 +486,7 @@ static int safexcel_ahash_exit_inv(struct crypto_tfm *tfm)
- 	struct safexcel_inv_result result = {};
- 	int ring = ctx->base.ring;
+diff --git a/drivers/crypto/hisilicon/sec/sec_algs.c b/drivers/crypto/hisilicon/sec/sec_algs.c
+index db2983c51f1e..bf9658800bda 100644
+--- a/drivers/crypto/hisilicon/sec/sec_algs.c
++++ b/drivers/crypto/hisilicon/sec/sec_algs.c
+@@ -153,6 +153,24 @@ static void sec_alg_skcipher_init_context(struct crypto_skcipher *atfm,
+ 				       ctx->cipher_alg);
+ }
  
--	memset(req, 0, sizeof(struct ahash_request));
-+	memset(req, 0, EIP197_AHASH_REQ_SIZE);
++static void sec_free_hw_sgl(struct sec_hw_sgl *hw_sgl,
++			    dma_addr_t psec_sgl, struct sec_dev_info *info)
++{
++	struct sec_hw_sgl *sgl_current, *sgl_next;
++	dma_addr_t sgl_next_dma;
++
++	sgl_current = hw_sgl;
++	while (sgl_current) {
++		sgl_next = sgl_current->next;
++		sgl_next_dma = sgl_current->next_sgl;
++
++		dma_pool_free(info->hw_sgl_pool, sgl_current, psec_sgl);
++
++		sgl_current = sgl_next;
++		psec_sgl = sgl_next_dma;
++	}
++}
++
+ static int sec_alloc_and_fill_hw_sgl(struct sec_hw_sgl **sec_sgl,
+ 				     dma_addr_t *psec_sgl,
+ 				     struct scatterlist *sgl,
+@@ -199,36 +217,12 @@ static int sec_alloc_and_fill_hw_sgl(struct sec_hw_sgl **sec_sgl,
+ 	return 0;
  
- 	/* create invalidation request */
- 	init_completion(&result.completion);
+ err_free_hw_sgls:
+-	sgl_current = *sec_sgl;
+-	while (sgl_current) {
+-		sgl_next = sgl_current->next;
+-		dma_pool_free(info->hw_sgl_pool, sgl_current,
+-			      sgl_current->next_sgl);
+-		sgl_current = sgl_next;
+-	}
++	sec_free_hw_sgl(*sec_sgl, *psec_sgl, info);
+ 	*psec_sgl = 0;
+ 
+ 	return ret;
+ }
+ 
+-static void sec_free_hw_sgl(struct sec_hw_sgl *hw_sgl,
+-			    dma_addr_t psec_sgl, struct sec_dev_info *info)
+-{
+-	struct sec_hw_sgl *sgl_current, *sgl_next;
+-	dma_addr_t sgl_next_dma;
+-
+-	sgl_current = hw_sgl;
+-	while (sgl_current) {
+-		sgl_next = sgl_current->next;
+-		sgl_next_dma = sgl_current->next_sgl;
+-
+-		dma_pool_free(info->hw_sgl_pool, sgl_current, psec_sgl);
+-
+-		sgl_current = sgl_next;
+-		psec_sgl = sgl_next_dma;
+-	}
+-}
+-
+ static int sec_alg_skcipher_setkey(struct crypto_skcipher *tfm,
+ 				   const u8 *key, unsigned int keylen,
+ 				   enum sec_cipher_alg alg)
 -- 
 2.20.1
 
