@@ -6,34 +6,33 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35357C33CB6
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 10:15:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35F0DC33CB3
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 10:15:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 127CD206B7
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 10:15:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 17443207E0
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 10:15:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730768AbgAPKPU (ORCPT
+        id S1731519AbgAPKPS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Jan 2020 05:15:20 -0500
-Received: from foss.arm.com ([217.140.110.172]:47500 "EHLO foss.arm.com"
+        Thu, 16 Jan 2020 05:15:18 -0500
+Received: from foss.arm.com ([217.140.110.172]:47492 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726832AbgAPKPU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Jan 2020 05:15:20 -0500
+        id S1730964AbgAPKPR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Jan 2020 05:15:17 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ED5E431B;
-        Thu, 16 Jan 2020 02:15:19 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C33D231B;
+        Thu, 16 Jan 2020 02:15:16 -0800 (PST)
 Received: from e110176-lin.arm.com (unknown [10.50.4.173])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6B0513F534;
-        Thu, 16 Jan 2020 02:15:18 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 6B23F3F534;
+        Thu, 16 Jan 2020 02:15:15 -0800 (PST)
 From:   Gilad Ben-Yossef <gilad@benyossef.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
 Cc:     Ofir Drang <ofir.drang@arm.com>, Hadar Gat <hadar.gat@arm.com>,
-        stable@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 07/11] crypto: ccree - fix FDE descriptor sequence
-Date:   Thu, 16 Jan 2020 12:14:42 +0200
-Message-Id: <20200116101447.20374-8-gilad@benyossef.com>
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 06/11] crypto: ccree - cc_do_send_request() is void func
+Date:   Thu, 16 Jan 2020 12:14:41 +0200
+Message-Id: <20200116101447.20374-7-gilad@benyossef.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20200116101447.20374-1-gilad@benyossef.com>
 References: <20200116101447.20374-1-gilad@benyossef.com>
@@ -44,102 +43,94 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Ofir Drang <ofir.drang@arm.com>
+cc_do_send_request() cannot fail and always returns
+-EINPROGRESS. Turn it into a void function and simplify
+code.
 
-In FDE mode (xts, essiv and bitlocker) the cryptocell hardware requires
-that the the XEX key will be loaded after Key1.
-
-Signed-off-by: Ofir Drang <ofir.drang@arm.com>
-Cc: stable@vger.kernel.org 
+Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
- drivers/crypto/ccree/cc_cipher.c | 48 ++++++++++++++++++++++++++++++--
- 1 file changed, 45 insertions(+), 3 deletions(-)
+ drivers/crypto/ccree/cc_request_mgr.c | 36 ++++++++-------------------
+ 1 file changed, 11 insertions(+), 25 deletions(-)
 
-diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
-index 03aa4fb8e6cb..7d6252d892d7 100644
---- a/drivers/crypto/ccree/cc_cipher.c
-+++ b/drivers/crypto/ccree/cc_cipher.c
-@@ -520,6 +520,7 @@ static void cc_setup_readiv_desc(struct crypto_tfm *tfm,
+diff --git a/drivers/crypto/ccree/cc_request_mgr.c b/drivers/crypto/ccree/cc_request_mgr.c
+index d37b4ab50a25..ce09c430c8b9 100644
+--- a/drivers/crypto/ccree/cc_request_mgr.c
++++ b/drivers/crypto/ccree/cc_request_mgr.c
+@@ -275,12 +275,11 @@ static int cc_queues_status(struct cc_drvdata *drvdata,
+  * \param len The crypto sequence length
+  * \param add_comp If "true": add an artificial dout DMA to mark completion
+  *
+- * \return int Returns -EINPROGRESS or error code
+  */
+-static int cc_do_send_request(struct cc_drvdata *drvdata,
+-			      struct cc_crypto_req *cc_req,
+-			      struct cc_hw_desc *desc, unsigned int len,
+-				bool add_comp)
++static void cc_do_send_request(struct cc_drvdata *drvdata,
++			       struct cc_crypto_req *cc_req,
++			       struct cc_hw_desc *desc, unsigned int len,
++			       bool add_comp)
+ {
+ 	struct cc_req_mgr_handle *req_mgr_h = drvdata->request_mgr_handle;
+ 	unsigned int used_sw_slots;
+@@ -328,9 +327,6 @@ static int cc_do_send_request(struct cc_drvdata *drvdata,
+ 		/* Update the free slots in HW queue */
+ 		req_mgr_h->q_free_slots -= total_seq_len;
  	}
+-
+-	/* Operation still in process */
+-	return -EINPROGRESS;
  }
  
-+
- static void cc_setup_state_desc(struct crypto_tfm *tfm,
- 				 struct cipher_req_ctx *req_ctx,
- 				 unsigned int ivsize, unsigned int nbytes,
-@@ -531,8 +532,6 @@ static void cc_setup_state_desc(struct crypto_tfm *tfm,
- 	int cipher_mode = ctx_p->cipher_mode;
- 	int flow_mode = ctx_p->flow_mode;
- 	int direction = req_ctx->gen_ctx.op_type;
--	dma_addr_t key_dma_addr = ctx_p->user.key_dma_addr;
--	unsigned int key_len = ctx_p->keylen;
- 	dma_addr_t iv_dma_addr = req_ctx->gen_ctx.iv_dma_addr;
- 	unsigned int du_size = nbytes;
+ static void cc_enqueue_backlog(struct cc_drvdata *drvdata,
+@@ -390,16 +386,10 @@ static void cc_proc_backlog(struct cc_drvdata *drvdata)
+ 			return;
+ 		}
  
-@@ -567,6 +566,47 @@ static void cc_setup_state_desc(struct crypto_tfm *tfm,
- 		break;
- 	case DRV_CIPHER_XTS:
- 	case DRV_CIPHER_ESSIV:
-+	case DRV_CIPHER_BITLOCKER:
-+		break;
-+	default:
-+		dev_err(dev, "Unsupported cipher mode (%d)\n", cipher_mode);
+-		rc = cc_do_send_request(drvdata, &bli->creq, bli->desc,
+-					bli->len, false);
+-
++		cc_do_send_request(drvdata, &bli->creq, bli->desc, bli->len,
++				   false);
+ 		spin_unlock(&mgr->hw_lock);
+ 
+-		if (rc != -EINPROGRESS) {
+-			cc_pm_put_suspend(dev);
+-			creq->user_cb(dev, req, rc);
+-		}
+-
+ 		/* Remove ourselves from the backlog list */
+ 		spin_lock(&mgr->bl_lock);
+ 		list_del(&bli->list);
+@@ -452,8 +442,10 @@ int cc_send_request(struct cc_drvdata *drvdata, struct cc_crypto_req *cc_req,
+ 		return -EBUSY;
+ 	}
+ 
+-	if (!rc)
+-		rc = cc_do_send_request(drvdata, cc_req, desc, len, false);
++	if (!rc) {
++		cc_do_send_request(drvdata, cc_req, desc, len, false);
++		rc = -EINPROGRESS;
 +	}
-+}
-+
-+
-+static void cc_setup_xex_state_desc(struct crypto_tfm *tfm,
-+				 struct cipher_req_ctx *req_ctx,
-+				 unsigned int ivsize, unsigned int nbytes,
-+				 struct cc_hw_desc desc[],
-+				 unsigned int *seq_size)
-+{
-+	struct cc_cipher_ctx *ctx_p = crypto_tfm_ctx(tfm);
-+	struct device *dev = drvdata_to_dev(ctx_p->drvdata);
-+	int cipher_mode = ctx_p->cipher_mode;
-+	int flow_mode = ctx_p->flow_mode;
-+	int direction = req_ctx->gen_ctx.op_type;
-+	dma_addr_t key_dma_addr = ctx_p->user.key_dma_addr;
-+	unsigned int key_len = ctx_p->keylen;
-+	dma_addr_t iv_dma_addr = req_ctx->gen_ctx.iv_dma_addr;
-+	unsigned int du_size = nbytes;
-+
-+	struct cc_crypto_alg *cc_alg =
-+		container_of(tfm->__crt_alg, struct cc_crypto_alg,
-+			     skcipher_alg.base);
-+
-+	if (cc_alg->data_unit)
-+		du_size = cc_alg->data_unit;
-+
-+	switch (cipher_mode) {
-+	case DRV_CIPHER_ECB:
-+		break;
-+	case DRV_CIPHER_CBC:
-+	case DRV_CIPHER_CBC_CTS:
-+	case DRV_CIPHER_CTR:
-+	case DRV_CIPHER_OFB:
-+		break;
-+	case DRV_CIPHER_XTS:
-+	case DRV_CIPHER_ESSIV:
- 	case DRV_CIPHER_BITLOCKER:
- 		/* load XEX key */
- 		hw_desc_init(&desc[*seq_size]);
-@@ -877,12 +917,14 @@ static int cc_cipher_process(struct skcipher_request *req,
  
- 	/* STAT_PHASE_2: Create sequence */
+ 	spin_unlock_bh(&mgr->hw_lock);
+ 	return rc;
+@@ -493,14 +485,8 @@ int cc_send_sync_request(struct cc_drvdata *drvdata,
+ 		reinit_completion(&drvdata->hw_queue_avail);
+ 	}
  
--	/* Setup IV and XEX key used */
-+	/* Setup state (IV)  */
- 	cc_setup_state_desc(tfm, req_ctx, ivsize, nbytes, desc, &seq_len);
- 	/* Setup MLLI line, if needed */
- 	cc_setup_mlli_desc(tfm, req_ctx, dst, src, nbytes, req, desc, &seq_len);
- 	/* Setup key */
- 	cc_setup_key_desc(tfm, req_ctx, nbytes, desc, &seq_len);
-+	/* Setup state (IV and XEX key)  */
-+	cc_setup_xex_state_desc(tfm, req_ctx, ivsize, nbytes, desc, &seq_len);
- 	/* Data processing */
- 	cc_setup_flow_desc(tfm, req_ctx, dst, src, nbytes, desc, &seq_len);
- 	/* Read next IV */
+-	rc = cc_do_send_request(drvdata, cc_req, desc, len, true);
++	cc_do_send_request(drvdata, cc_req, desc, len, true);
+ 	spin_unlock_bh(&mgr->hw_lock);
+-
+-	if (rc != -EINPROGRESS) {
+-		cc_pm_put_suspend(dev);
+-		return rc;
+-	}
+-
+ 	wait_for_completion(&cc_req->seq_compl);
+ 	return 0;
+ }
 -- 
 2.23.0
 
