@@ -2,134 +2,98 @@ Return-Path: <SRS0=he+G=3F=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84BB8C33CB1
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 13:21:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56B77C33CB1
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 13:54:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 575E8206D5
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 13:21:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y1tnjYY9"
+	by mail.kernel.org (Postfix) with ESMTP id 34404214AF
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 13:54:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726827AbgAPNVN (ORCPT
+        id S1726957AbgAPNye (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Jan 2020 08:21:13 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:43868 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726362AbgAPNVN (ORCPT
+        Thu, 16 Jan 2020 08:54:34 -0500
+Received: from mail1.bemta26.messagelabs.com ([85.158.142.114]:41889 "EHLO
+        mail1.bemta26.messagelabs.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1729137AbgAPNy0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Jan 2020 08:21:13 -0500
-Received: by mail-wr1-f65.google.com with SMTP id d16so19128178wre.10;
-        Thu, 16 Jan 2020 05:21:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=tbAt5pOcctelyMI0Pw/2Boj48DssPhA/WaoryvyZ5m0=;
-        b=Y1tnjYY9zApO2OQtTlDt04IWqpItEAIZ5N7I1UyRyrMF0VujSdOWoWeW23YpRJREit
-         Ye7auccjOUK5vicYqb5Kybo0WeIT3zvCnpw2YhunRBvypG34tKCGQO+Am7f7xzTZmKzG
-         O/CU2sLyQOWI0vysFxCMbgNRbAFQK7aw6ke/dLrtXqmXBOxY7x1mSWOtn8uIb/A5+bcO
-         VSayKSZztrGF42u+FDH0K6DMs3+GPpUFxslOKs//lWPYKSNF+Vc+xUua0Top/zxAdZhO
-         rQEOPlOwktWilbCv0LX37iTT08dPftP+a5KI+ymcN1qZpKbzkkhaYj8DmKqhEKoWAlck
-         x1+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=tbAt5pOcctelyMI0Pw/2Boj48DssPhA/WaoryvyZ5m0=;
-        b=pI7/AQgLgWXKo7zwk+sgBhsFRHD72+22H3PuKWCQWv7S16nMCYnQLAbJLxRVNXcKm4
-         GQjZVMMrLIWKkIzNP+th/P3b+ECcwU1JdTG+3FToOUQIldTJL+GhyJyW2CQ34V67RUw+
-         j1PUWh3Drv6+lhgrxB8AZechvsADvIiJOMa6xs/WVDKFtCMN3NnNGcnmT4eJ8Nzpabt5
-         jXMaQUfKHNlh/2MUAii016YX+2WG12vuvn7cBRhSzdJrHxyBOWntQx4duw/Q+T/c3iCw
-         pCk4e7bedZ7LkCPa2Y2Dc2Tfr+ymvoe0xaVz5x5JDUyoKI2EP46c0sCT/gk6Yol4RvKI
-         R/dg==
-X-Gm-Message-State: APjAAAUfp66ZxPRWY+3ZHo8I2+gxbOQ4nj7toDlWakaPbtpGEYSTbqG7
-        sxnL0V8MRgpesX9+4NEJiDQ=
-X-Google-Smtp-Source: APXvYqw01+GqfkH35JYXyBsSnjwvr0X4uh+5I3kzup5rww9ZVJeL67W4XhmH/pce4L5zuqrTSc5t4g==
-X-Received: by 2002:a05:6000:1187:: with SMTP id g7mr3415042wrx.109.1579180870884;
-        Thu, 16 Jan 2020 05:21:10 -0800 (PST)
-Received: from Red ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id o15sm29681752wra.83.2020.01.16.05.21.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Jan 2020 05:21:09 -0800 (PST)
-Date:   Thu, 16 Jan 2020 14:21:07 +0100
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Iuliana Prodan <iuliana.prodan@nxp.com>
-Cc:     "alexandre.torgue@st.com" <alexandre.torgue@st.com>,
+        Thu, 16 Jan 2020 08:54:26 -0500
+Received: from [85.158.142.199] (using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256 bits))
+        by server-3.bemta.az-b.eu-central-1.aws.symcld.net id BC/D0-07000-01B602E5; Thu, 16 Jan 2020 13:54:24 +0000
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprCKsWRWlGSWpSXmKPExsVyU+ECq65AtkK
+  cwYnJahb37/1kcmD0+LxJLoAxijUzLym/IoE1o/1VM1tBI1fF/rk3WBsYP3B2MXJxCAnsY5S4
+  vHUCK4RzllHi2ult7F2MnBxsAloSM7ZOZQSxRQQcJbqnbmIEKWIW2MUo8W/qOVaQhLCAlUTj5
+  jY2iCJ7iXvrl7FC2HoSe/bdYwKxWQRUJTa0TACzeQV0JTquXgKrYRSQlXi08hfYMmYBcYlbT+
+  aD1UgICEgs2XOeGcIWlXj5+B8rhG0gsXXpPhYIW1Hi2vwTQAdxANnWEjce8IOYzAKaEut36UN
+  MVJSY0v2QHWKroMTJmU9YJjCKzEKybBZCxywkHbOQdCxgZFnFaJlUlJmeUZKbmJmja2hgoGto
+  aKxrpmtoaqmXWKWbpJdaqpucmldSlAiU1UssL9YrrsxNzknRy0st2cQIjJqUQrb5Oxjn/3ynd
+  4hRkoNJSZRXZI9snBBfUn5KZUZicUZ8UWlOavEhRhkODiUJ3mdpCnFCgkWp6akVaZk5wAiGSU
+  tw8CiJ8L7IAErzFhck5hZnpkOkTjEac0x4OXcRM8eRuUsXMQux5OXnpUqJ83JmApUKgJRmlOb
+  BDYIllkuMslLCvIwMDAxCPAWpRbmZJajyrxjFORiVhHkFQKbwZOaVwO17BXQKE9ApE5zlQE4p
+  SURISTUw9XdWfeXJVWSx6rflEIk4yDPva19vx437nX0m8XzKN+1+J68qcmPa6GLkwcF2xXLr2
+  WOtRapp/43sd7E4Rm76efBcQFC+vO77t6YOqkc1/y3zXmCw613hnyrt5osc55oTT/Zdmr/79u
+  Plm2pdLXWi5vmcFAq4os+4RON0e8mMVMuLEbpnZDOm/+bc8vH3kcmrT2nKc+hfrfxc1zE7eo2
+  XnkNnlHeolJPedRvmRWWHD0/1b0rriPQIPH0t9MadO3bM/ovyWhy/7rB5KH0w6MW7VQt+rpy1
+  +OIb7uifUlbMM06sm3JK5kUhRzV/q/je/vRm9fefw5cYWnvb2ZTeXV+tlcg4Perp1DUmPLZ/g
+  6SVWIozEg21mIuKEwGhl6c8pwMAAA==
+X-Env-Sender: david.kim@ncipher.com
+X-Msg-Ref: server-20.tower-244.messagelabs.com!1579182864!34681!2
+X-Originating-IP: [217.32.208.5]
+X-SYMC-ESS-Client-Auth: outbound-route-from=pass
+X-StarScan-Received: 
+X-StarScan-Version: 9.44.25; banners=-,-,-
+X-VirusChecked: Checked
+Received: (qmail 28004 invoked from network); 16 Jan 2020 13:54:24 -0000
+Received: from unknown (HELO exukdagfar02.INTERNAL.ROOT.TES) (217.32.208.5)
+  by server-20.tower-244.messagelabs.com with ECDHE-RSA-AES256-SHA384 encrypted SMTP; 16 Jan 2020 13:54:24 -0000
+Received: from exukdagfar01.INTERNAL.ROOT.TES (10.194.2.70) by
+ exukdagfar02.INTERNAL.ROOT.TES (10.194.2.71) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Thu, 16 Jan 2020 13:54:23 +0000
+Received: from exukdagfar01.INTERNAL.ROOT.TES ([fe80::48de:aa33:fc4c:d1f5]) by
+ exukdagfar01.INTERNAL.ROOT.TES ([fe80::48de:aa33:fc4c:d1f5%14]) with mapi id
+ 15.00.1497.000; Thu, 16 Jan 2020 13:54:23 +0000
+From:   "Kim, David" <david.kim@ncipher.com>
+To:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
         "davem@davemloft.net" <davem@davemloft.net>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "mcoquelin.stm32@gmail.com" <mcoquelin.stm32@gmail.com>,
-        "mripard@kernel.org" <mripard@kernel.org>,
-        "wens@csie.org" <wens@csie.org>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-stm32@st-md-mailman.stormreply.com" 
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        "linux-sunxi@googlegroups.com" <linux-sunxi@googlegroups.com>
-Subject: Re: [PATCH RFC 06/10] crypto: engine: introduce ct
-Message-ID: <20200116132107.GB26487@Red>
-References: <20200114135936.32422-1-clabbe.montjoie@gmail.com>
- <20200114135936.32422-7-clabbe.montjoie@gmail.com>
- <VI1PR04MB44455F7F7830159B6ED336648C360@VI1PR04MB4445.eurprd04.prod.outlook.com>
+        Greg KH <gregkh@linuxfoundation.org>,
+        "Magee, Tim" <tim.magee@ncipher.com>
+Subject: Feedback request on nCipher HSM driver submission
+Thread-Topic: Feedback request on nCipher HSM driver submission
+Thread-Index: AQHVzHNLGhaTD/19VkW+gxijFp3LlA==
+Date:   Thu, 16 Jan 2020 13:54:23 +0000
+Message-ID: <1579182863430.79006@ncipher.com>
+Accept-Language: en-US, en-GB
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [172.23.136.54]
+x-exclaimer-md-config: 7ae4f661-56ee-4cc7-9363-621ce9eeb65f
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <VI1PR04MB44455F7F7830159B6ED336648C360@VI1PR04MB4445.eurprd04.prod.outlook.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jan 16, 2020 at 11:34:19AM +0000, Iuliana Prodan wrote:
-> On 1/14/2020 4:00 PM, Corentin Labbe wrote:
-> > We will store the number of request in a batch in engine->ct.
-> > This patch adds all loop to unprepare all requests of a batch.
-> > 
-> > Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-> > ---
-> >   crypto/crypto_engine.c  | 30 ++++++++++++++++++------------
-> >   include/crypto/engine.h |  2 ++
-> >   2 files changed, 20 insertions(+), 12 deletions(-)
-> > 
-> > diff --git a/crypto/crypto_engine.c b/crypto/crypto_engine.c
-> > index b72873550587..591dea5ddeec 100644
-> > --- a/crypto/crypto_engine.c
-> > +++ b/crypto/crypto_engine.c
-> > @@ -28,6 +28,7 @@ static void crypto_finalize_request(struct crypto_engine *engine,
-> >   	bool finalize_cur_req = false;
-> >   	int ret;
-> >   	struct crypto_engine_ctx *enginectx;
-> > +	int i = 0;
-> >   
-> >   	spin_lock_irqsave(&engine->queue_lock, flags);
-> >   	if (engine->cur_reqs[0].req == req)
-> You're checking here just the first request, but do the completion for 
-> all? Why? Shouldn't we check for each request if it was done by hw or not?
-
-The first request is a sort of key for the whole batch.
-> 
-> I've also seen that the do_one_request is called only on the first 
-> request, from the batch.
-
-Since the request are linked, this is not a problem.
-But I miss this explanaition in the code.
-
-> 
-> In your driver you do the prepare/unprepare for the whole batch at once, 
-> but not all drivers, who uses crypto-engine, are doing this (see virtio, 
-> amlogic, stm32). And I don't know if they can...
-
-prepare is optionnal, and unprepare is optional even if prepare is done.
-Furthermore, doing prepare/unprepare is optional per request.
-I have tested this serie on sun8i-ss and amlogic which dont use prepare/unprepare.
-
+SGkgRGF2aWQgYW5kIEhlcmJlcnQsDQoNCkFwb2xvZ2llcyBmb3IgdGhlIHByZXZpb3VzIGF0dGVt
+cHRzIGF0IHNlbmRpbmcgdGhpcy4gSSBiZWVuIHN0cnVnZ2xpbmcgd2l0aCBvdXRsb29rDQpzZXR0
+aW5ncyBhbmQgdGhlIG1haWxpbmcgbGlzdCBidXQgaG9wZWZ1bGx5IHRoaXMgdGltZSBJJ20gc3Vj
+Y2Vzc2Z1bCBhdCBnZXR0aW5nIHRoaXMgb250bw0KdGhlIGNyeXB0byBsaXN0Lg0KDQpXZSBhcmUg
+dHJ5aW5nIHRvIHVwc3RyZWFtIG91ciBIU00gZHJpdmVyIGludG8gZHJpdmVycy9taXNjIGFuZCBH
+cmVnIEtIIGhhcw0KcmVxdWVzdGVkIHRoYXQgd2UgY29udGFjdCB5b3UgZm9yIHlvdXIgYXBwcm92
+YWwgYmVmb3JlIGhlIGNhbiBtYWtlIGEgZGVjaXNpb24NCm9uIG91ciBjb2RlLg0KDQpXZSBhcmUg
+Y3VycmVudGx5IGF0IHBhdGNoIHYyIGFuZCB0aGUgc3VibWlzc2lvbiBlbWFpbCBpcyBoZXJlOg0K
+aHR0cHM6Ly9tYXJjLmluZm8vP2w9bGludXgta2VybmVsJm09MTU3Njg1Njg5NjI1OTg3Jnc9Mg0K
+DQpHcmVnIGhhZCByYWlzZWQgYSBjb3VwbGUgaW5pdGlhbCBjb21tZW50cyBhbmQgd2UgYWRkcmVz
+c2VkIHRoZW0gaW4gdGhlc2UgZW1haWxzOg0KaHR0cHM6Ly9tYXJjLmluZm8vP2w9bGludXgta2Vy
+bmVsJm09MTU3ODM4NzA2MDA2ODE3Jnc9Mg0KaHR0cHM6Ly9tYXJjLmluZm8vP2w9bGludXgta2Vy
+bmVsJm09MTU3ODU2MTg0MzI0MzM5Jnc9Mg0KDQpJIHdvdWxkIGJlIGdyYXRlZnVsIGZvciB5b3Vy
+IGlucHV0IGFuZCB0aGFuayB5b3UgaW4gYWR2YW5jZSBmb3IgeW91ciBoZWxwLg0KDQpSZWdhcmRz
+LA0KRGF2ZQ0KDQoNCkRhdmlkIEtpbQ0KU2VuaW9yIFNvZnR3YXJlIEVuZ2luZWVyDQpUZWw6ICs0
+NCAxMjIzIDcwMzQ0OQ0KDQpuQ2lwaGVyIFNlY3VyaXR5DQpPbmUgU3RhdGlvbiBTcXVhcmUNCkNh
+bWJyaWRnZSBDQjEgMkdBDQpVbml0ZWQgS2luZ2RvbQ0KDQo=
