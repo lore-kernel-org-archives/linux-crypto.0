@@ -4,53 +4,53 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B7EAC33CB6
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 19:12:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C3E2C33CAF
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 19:15:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 47427206E6
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 19:12:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4B33C206E6
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 19:15:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1579201970;
-	bh=HPKnGGuPdxpm1YbEAfCX474VeF75CT7FyJ7NfTa04Nc=;
+	s=default; t=1579202120;
+	bh=6Fd7Q3BMWeJNBGk0kKO5Sfece9B848AW7wMsA8jHAYA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=VYEeyGQ2jRRs18QL3SG/ejjSOKaU0fR3uj7VD/Kr9KqIIe4Gktk+CMmTD9f06g+dF
-	 sUjDM13A3dZp9KUtxWYSurVvx0IKPwQexnZ/4dlgfNN6XxmP0LQtTx0bMJ/4guMw7Q
-	 XKo607YRlPF7rJaY/jSq7nknSG33j7JpIWl4lVZI=
+	b=xWZyyYAyT+JBYnFOyyLvhQyAMy/AD9Rb9qyYUgJTvxqP8DmcjbZDG5PpcTdxmXIaj
+	 sEfF0WQ7Qzfy49CTB6QBQCNOT998GJwxBKNjYA7XlOWLa+WmRqox//vhIOXI38nJCV
+	 qKvuTqB/smYPMr1/raDN0UvNx3VXlf1nYbXCI998=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387881AbgAPTMo (ORCPT
+        id S1733172AbgAPTPT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Jan 2020 14:12:44 -0500
-Received: from mail.kernel.org ([198.145.29.99]:48936 "EHLO mail.kernel.org"
+        Thu, 16 Jan 2020 14:15:19 -0500
+Received: from mail.kernel.org ([198.145.29.99]:42002 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387580AbgAPQ7t (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Jan 2020 11:59:49 -0500
+        id S1733145AbgAPQ4C (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Jan 2020 11:56:02 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D23EB24687;
-        Thu, 16 Jan 2020 16:59:47 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id D316A2467C;
+        Thu, 16 Jan 2020 16:56:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1579193989;
-        bh=HPKnGGuPdxpm1YbEAfCX474VeF75CT7FyJ7NfTa04Nc=;
+        s=default; t=1579193761;
+        bh=6Fd7Q3BMWeJNBGk0kKO5Sfece9B848AW7wMsA8jHAYA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=HVAPIdxUX57YDhaJcs/Hz3I9gTTLb7x1KZ3vkVciG5ial6ei4nrpjCien3MyioAap
-         B3wYruFYNNUFAlhXno/1sgZnOF7LbaUZBP4X/NXg+kAVdFOtgn2POewtzGCY0zFmvg
-         FMaKUUf7Pn92a5A7NHImxDVp0MbKN3T65El5b9qM=
+        b=ihPQzphy+LG9NPkWQ6WakpMAiLQ4YWtWnkG5dA3C/uTq3UYfqpRkhjADuJ3CTXKAX
+         KFEuLIerUtsaie66toY/XjQW5CNoMiC+iuOEG9o/e7R8fZ8jfR9hhtBZ7TGe+Gi6If
+         LMIBKmZ6GCjxN9DKDXuDexGVUIU6JSwsazsPIMGI=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     YueHaibing <yuehaibing@huawei.com>,
-        Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>,
+Cc:     Colin Ian King <colin.king@canonical.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 120/671] crypto: brcm - Fix some set-but-not-used warning
-Date:   Thu, 16 Jan 2020 11:50:29 -0500
-Message-Id: <20200116165940.10720-3-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
+        clang-built-linux@googlegroups.com
+Subject: [PATCH AUTOSEL 4.19 048/671] pcrypt: use format specifier in kobject_add
+Date:   Thu, 16 Jan 2020 11:44:39 -0500
+Message-Id: <20200116165502.8838-48-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200116165940.10720-1-sashal@kernel.org>
-References: <20200116165940.10720-1-sashal@kernel.org>
+In-Reply-To: <20200116165502.8838-1-sashal@kernel.org>
+References: <20200116165502.8838-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -60,63 +60,41 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: YueHaibing <yuehaibing@huawei.com>
+From: Colin Ian King <colin.king@canonical.com>
 
-[ Upstream commit 707d0cf8f7cff6dfee9197002859912310532c4f ]
+[ Upstream commit b1e3874c75ab15288f573b3532e507c37e8e7656 ]
 
-Fixes gcc '-Wunused-but-set-variable' warning:
+Passing string 'name' as the format specifier is potentially hazardous
+because name could (although very unlikely to) have a format specifier
+embedded in it causing issues when parsing the non-existent arguments
+to these.  Follow best practice by using the "%s" format string for
+the string 'name'.
 
-drivers/crypto/bcm/cipher.c: In function 'handle_ahash_req':
-drivers/crypto/bcm/cipher.c:720:15: warning:
- variable 'chunk_start' set but not used [-Wunused-but-set-variable]
+Cleans up clang warning:
+crypto/pcrypt.c:397:40: warning: format string is not a string literal
+(potentially insecure) [-Wformat-security]
 
-drivers/crypto/bcm/cipher.c: In function 'spu_rx_callback':
-drivers/crypto/bcm/cipher.c:1679:31: warning:
- variable 'areq' set but not used [-Wunused-but-set-variable]
-
-drivers/crypto/bcm/cipher.c:1678:22: warning:
- variable 'ctx' set but not used [-Wunused-but-set-variable]
-
-Fixes: 9d12ba86f818 ("crypto: brcm - Add Broadcom SPU driver")
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
-Reviewed-by: Raveendra Padasalagi <raveendra.padasalagi@broadcom.com>
+Fixes: a3fb1e330dd2 ("pcrypt: Added sysfs interface to pcrypt")
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/bcm/cipher.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+ crypto/pcrypt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
-index 49c0097fa474..0b1fc5664b1d 100644
---- a/drivers/crypto/bcm/cipher.c
-+++ b/drivers/crypto/bcm/cipher.c
-@@ -717,7 +717,7 @@ static int handle_ahash_req(struct iproc_reqctx_s *rctx)
- 	 */
- 	unsigned int new_data_len;
+diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
+index f8ec3d4ba4a8..a5718c0a3dc4 100644
+--- a/crypto/pcrypt.c
++++ b/crypto/pcrypt.c
+@@ -394,7 +394,7 @@ static int pcrypt_sysfs_add(struct padata_instance *pinst, const char *name)
+ 	int ret;
  
--	unsigned int chunk_start = 0;
-+	unsigned int __maybe_unused chunk_start = 0;
- 	u32 db_size;	 /* Length of data field, incl gcm and hash padding */
- 	int pad_len = 0; /* total pad len, including gcm, hash, stat padding */
- 	u32 data_pad_len = 0;	/* length of GCM/CCM padding */
-@@ -1675,8 +1675,6 @@ static void spu_rx_callback(struct mbox_client *cl, void *msg)
- 	struct spu_hw *spu = &iproc_priv.spu;
- 	struct brcm_message *mssg = msg;
- 	struct iproc_reqctx_s *rctx;
--	struct iproc_ctx_s *ctx;
--	struct crypto_async_request *areq;
- 	int err = 0;
+ 	pinst->kobj.kset = pcrypt_kset;
+-	ret = kobject_add(&pinst->kobj, NULL, name);
++	ret = kobject_add(&pinst->kobj, NULL, "%s", name);
+ 	if (!ret)
+ 		kobject_uevent(&pinst->kobj, KOBJ_ADD);
  
- 	rctx = mssg->ctx;
-@@ -1686,8 +1684,6 @@ static void spu_rx_callback(struct mbox_client *cl, void *msg)
- 		err = -EFAULT;
- 		goto cb_finish;
- 	}
--	areq = rctx->parent;
--	ctx = rctx->ctx;
- 
- 	/* process the SPU status */
- 	err = spu->spu_status_process(rctx->msg_buf.rx_stat);
 -- 
 2.20.1
 
