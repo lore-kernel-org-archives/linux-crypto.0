@@ -7,51 +7,58 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B191C33CB6
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 17:21:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAA20C33CB7
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 17:22:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D98C720684
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 17:21:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7122C214AF
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 17:22:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1579195288;
-	bh=6Fd7Q3BMWeJNBGk0kKO5Sfece9B848AW7wMsA8jHAYA=;
+	s=default; t=1579195360;
+	bh=/FXCf94PdZgl717MD2fnFyovBfP7w7ngbe/Z5W2PWME=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=x74k0tIjokDUkQDaKzuV+Bk0YCS9SsnVnD2XjTN3aR2D1xmQ7blsaxMyB9eccCG9v
-	 FJzdDGec2NEEBEjaIhpxL4yIDJMl9D5HHxYjFy3nJWVjgBBVLw9LdMPy3lcsrSz7Zu
-	 bFQiSPsxXtae0f9dnb8lPIXjZ/Xy4q/jDdo1Hs4k=
+	b=wJS8RvoNNyOMGw599cOO8eWiOrlS4Srmdt59cZvkg/9lyA+7a+bBFP7jvi9d3c8zM
+	 83c8Nh0EeiOJBJ5u6H64Yi3kIgteEcTtkqmyJEkbuv+6IuDCuZ0WXEU/uvMK5gGc1B
+	 PYztTVH1FO5hD0WflsjtXcU7IoSx5UnyUKEBFV44=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391180AbgAPRRn (ORCPT
+        id S2390763AbgAPRNb (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Jan 2020 12:17:43 -0500
-Received: from mail.kernel.org ([198.145.29.99]:43416 "EHLO mail.kernel.org"
+        Thu, 16 Jan 2020 12:13:31 -0500
+Received: from mail.kernel.org ([198.145.29.99]:58668 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732461AbgAPRRn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Jan 2020 12:17:43 -0500
+        id S2390757AbgAPRNa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Jan 2020 12:13:30 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6678C246AA;
-        Thu, 16 Jan 2020 17:17:41 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id D0328246A3;
+        Thu, 16 Jan 2020 17:13:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1579195062;
-        bh=6Fd7Q3BMWeJNBGk0kKO5Sfece9B848AW7wMsA8jHAYA=;
+        s=default; t=1579194809;
+        bh=/FXCf94PdZgl717MD2fnFyovBfP7w7ngbe/Z5W2PWME=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=PoBpmXvv7/5yvwZ4sx7+DJMT4tsxlcBXj4/8nIb3oGNO45DzwJkea5EIK7jpqT1AX
-         9NqHcWPX/Gu56vfOsNjJXq1dD1YepIWdYLILW2ZCLUregg1TWpVDd7EfPEaWxpJCXc
-         RloRPpUETBRPsINn20+MAsyUk61lXd2YmHXDIUP4=
+        b=mLMsUg90/Owxl0TxhOzpwOUvZPPYrg/hF7II6NAPZ273fuL637MISE9tbLlgnKtKh
+         OeKp00oCqqm4bIDumin6tCBTObsYxEOpYBhsSafKfhaiLR8QVzlF36z3hNHI6Sp7YV
+         t14qM8y6+UbBKXqA/gAfbWcwXcH190+77cm343BM=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Colin Ian King <colin.king@canonical.com>,
+Cc:     Tony Lindgren <tony@atomide.com>, devicetree@vger.kernel.org,
+        Aaro Koskinen <aaro.koskinen@iki.fi>,
+        Adam Ford <aford173@gmail.com>,
+        =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali.rohar@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Sebastian Reichel <sre@kernel.org>,
+        Tero Kristo <t-kristo@ti.com>, Rob Herring <robh@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
-        clang-built-linux@googlegroups.com
-Subject: [PATCH AUTOSEL 4.14 017/371] pcrypt: use format specifier in kobject_add
-Date:   Thu, 16 Jan 2020 12:11:25 -0500
-Message-Id: <20200116171719.16965-17-sashal@kernel.org>
+        linux-omap@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: [PATCH AUTOSEL 4.19 617/671] hwrng: omap3-rom - Fix missing clock by probing with device tree
+Date:   Thu, 16 Jan 2020 12:04:15 -0500
+Message-Id: <20200116170509.12787-354-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200116171719.16965-1-sashal@kernel.org>
-References: <20200116171719.16965-1-sashal@kernel.org>
+In-Reply-To: <20200116170509.12787-1-sashal@kernel.org>
+References: <20200116170509.12787-1-sashal@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -60,41 +67,182 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Colin Ian King <colin.king@canonical.com>
+From: Tony Lindgren <tony@atomide.com>
 
-[ Upstream commit b1e3874c75ab15288f573b3532e507c37e8e7656 ]
+[ Upstream commit 0c0ef9ea6f3f0d5979dc7b094b0a184c1a94716b ]
 
-Passing string 'name' as the format specifier is potentially hazardous
-because name could (although very unlikely to) have a format specifier
-embedded in it causing issues when parsing the non-existent arguments
-to these.  Follow best practice by using the "%s" format string for
-the string 'name'.
+Commit 0ed266d7ae5e ("clk: ti: omap3: cleanup unnecessary clock aliases")
+removed old omap3 clock framework aliases but caused omap3-rom-rng to
+stop working with clock not found error.
 
-Cleans up clang warning:
-crypto/pcrypt.c:397:40: warning: format string is not a string literal
-(potentially insecure) [-Wformat-security]
+Based on discussions on the mailing list it was requested by Tero Kristo
+that it would be best to fix this issue by probing omap3-rom-rng using
+device tree to provide a proper clk property. The other option would be
+to add back the missing clock alias, but that does not help moving things
+forward with removing old legacy platform_data.
 
-Fixes: a3fb1e330dd2 ("pcrypt: Added sysfs interface to pcrypt")
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
+Let's also add a proper device tree binding and keep it together with
+the fix.
+
+Cc: devicetree@vger.kernel.org
+Cc: Aaro Koskinen <aaro.koskinen@iki.fi>
+Cc: Adam Ford <aford173@gmail.com>
+Cc: Pali Rohár <pali.rohar@gmail.com>
+Cc: Rob Herring <robh+dt@kernel.org>
+Cc: Sebastian Reichel <sre@kernel.org>
+Cc: Tero Kristo <t-kristo@ti.com>
+Fixes: 0ed266d7ae5e ("clk: ti: omap3: cleanup unnecessary clock aliases")
+Reported-by: Aaro Koskinen <aaro.koskinen@iki.fi>
+Signed-off-by: Tony Lindgren <tony@atomide.com>
+Acked-by: Rob Herring <robh@kernel.org>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- crypto/pcrypt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ .../devicetree/bindings/rng/omap3_rom_rng.txt | 27 +++++++++++++++++++
+ arch/arm/boot/dts/omap3-n900.dts              |  6 +++++
+ arch/arm/mach-omap2/pdata-quirks.c            | 12 +--------
+ drivers/char/hw_random/omap3-rom-rng.c        | 17 ++++++++++--
+ 4 files changed, 49 insertions(+), 13 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/rng/omap3_rom_rng.txt
 
-diff --git a/crypto/pcrypt.c b/crypto/pcrypt.c
-index f8ec3d4ba4a8..a5718c0a3dc4 100644
---- a/crypto/pcrypt.c
-+++ b/crypto/pcrypt.c
-@@ -394,7 +394,7 @@ static int pcrypt_sysfs_add(struct padata_instance *pinst, const char *name)
- 	int ret;
+diff --git a/Documentation/devicetree/bindings/rng/omap3_rom_rng.txt b/Documentation/devicetree/bindings/rng/omap3_rom_rng.txt
+new file mode 100644
+index 000000000000..f315c9723bd2
+--- /dev/null
++++ b/Documentation/devicetree/bindings/rng/omap3_rom_rng.txt
+@@ -0,0 +1,27 @@
++OMAP ROM RNG driver binding
++
++Secure SoCs may provide RNG via secure ROM calls like Nokia N900 does. The
++implementation can depend on the SoC secure ROM used.
++
++- compatible:
++	Usage: required
++	Value type: <string>
++	Definition: must be "nokia,n900-rom-rng"
++
++- clocks:
++	Usage: required
++	Value type: <prop-encoded-array>
++	Definition: reference to the the RNG interface clock
++
++- clock-names:
++	Usage: required
++	Value type: <stringlist>
++	Definition: must be "ick"
++
++Example:
++
++	rom_rng: rng {
++		compatible = "nokia,n900-rom-rng";
++		clocks = <&rng_ick>;
++		clock-names = "ick";
++	};
+diff --git a/arch/arm/boot/dts/omap3-n900.dts b/arch/arm/boot/dts/omap3-n900.dts
+index 182a53991c90..37785e7d1238 100644
+--- a/arch/arm/boot/dts/omap3-n900.dts
++++ b/arch/arm/boot/dts/omap3-n900.dts
+@@ -158,6 +158,12 @@
+ 		pwms = <&pwm9 0 26316 0>; /* 38000 Hz */
+ 	};
  
- 	pinst->kobj.kset = pcrypt_kset;
--	ret = kobject_add(&pinst->kobj, NULL, name);
-+	ret = kobject_add(&pinst->kobj, NULL, "%s", name);
- 	if (!ret)
- 		kobject_uevent(&pinst->kobj, KOBJ_ADD);
++	rom_rng: rng {
++		compatible = "nokia,n900-rom-rng";
++		clocks = <&rng_ick>;
++		clock-names = "ick";
++	};
++
+ 	/* controlled (enabled/disabled) directly by bcm2048 and wl1251 */
+ 	vctcxo: vctcxo {
+ 		compatible = "fixed-clock";
+diff --git a/arch/arm/mach-omap2/pdata-quirks.c b/arch/arm/mach-omap2/pdata-quirks.c
+index dae726228770..b57faa2310a2 100644
+--- a/arch/arm/mach-omap2/pdata-quirks.c
++++ b/arch/arm/mach-omap2/pdata-quirks.c
+@@ -263,14 +263,6 @@ static void __init am3517_evm_legacy_init(void)
+ 	am35xx_emac_reset();
+ }
  
+-static struct platform_device omap3_rom_rng_device = {
+-	.name		= "omap3-rom-rng",
+-	.id		= -1,
+-	.dev	= {
+-		.platform_data	= rx51_secure_rng_call,
+-	},
+-};
+-
+ static void __init nokia_n900_legacy_init(void)
+ {
+ 	hsmmc2_internal_input_clk();
+@@ -286,9 +278,6 @@ static void __init nokia_n900_legacy_init(void)
+ 			pr_warn("RX-51: Not enabling ARM errata 430973 workaround\n");
+ 			pr_warn("Thumb binaries may crash randomly without this workaround\n");
+ 		}
+-
+-		pr_info("RX-51: Registering OMAP3 HWRNG device\n");
+-		platform_device_register(&omap3_rom_rng_device);
+ 	}
+ }
+ 
+@@ -466,6 +455,7 @@ static struct of_dev_auxdata omap_auxdata_lookup[] = {
+ 	OF_DEV_AUXDATA("ti,davinci_mdio", 0x5c030000, "davinci_mdio.0", NULL),
+ 	OF_DEV_AUXDATA("ti,am3517-emac", 0x5c000000, "davinci_emac.0",
+ 		       &am35xx_emac_pdata),
++	OF_DEV_AUXDATA("nokia,n900-rom-rng", 0, NULL, rx51_secure_rng_call),
+ 	/* McBSP modules with sidetone core */
+ #if IS_ENABLED(CONFIG_SND_OMAP_SOC_MCBSP)
+ 	OF_DEV_AUXDATA("ti,omap3-mcbsp", 0x49022000, "49022000.mcbsp", &mcbsp_pdata),
+diff --git a/drivers/char/hw_random/omap3-rom-rng.c b/drivers/char/hw_random/omap3-rom-rng.c
+index 648e39ce6bd9..8df3cad7c97a 100644
+--- a/drivers/char/hw_random/omap3-rom-rng.c
++++ b/drivers/char/hw_random/omap3-rom-rng.c
+@@ -20,6 +20,8 @@
+ #include <linux/workqueue.h>
+ #include <linux/clk.h>
+ #include <linux/err.h>
++#include <linux/of.h>
++#include <linux/of_device.h>
+ #include <linux/platform_device.h>
+ 
+ #define RNG_RESET			0x01
+@@ -86,14 +88,18 @@ static int omap3_rom_rng_read(struct hwrng *rng, void *data, size_t max, bool w)
+ 
+ static struct hwrng omap3_rom_rng_ops = {
+ 	.name		= "omap3-rom",
+-	.read		= omap3_rom_rng_read,
+ };
+ 
+ static int omap3_rom_rng_probe(struct platform_device *pdev)
+ {
+ 	int ret = 0;
+ 
+-	pr_info("initializing\n");
++	omap3_rom_rng_ops.read = of_device_get_match_data(&pdev->dev);
++	if (!omap3_rom_rng_ops.read) {
++		dev_err(&pdev->dev, "missing rom code handler\n");
++
++		return -ENODEV;
++	}
+ 
+ 	omap3_rom_rng_call = pdev->dev.platform_data;
+ 	if (!omap3_rom_rng_call) {
+@@ -126,9 +132,16 @@ static int omap3_rom_rng_remove(struct platform_device *pdev)
+ 	return 0;
+ }
+ 
++static const struct of_device_id omap_rom_rng_match[] = {
++	{ .compatible = "nokia,n900-rom-rng", .data = omap3_rom_rng_read, },
++	{ /* sentinel */ },
++};
++MODULE_DEVICE_TABLE(of, omap_rom_rng_match);
++
+ static struct platform_driver omap3_rom_rng_driver = {
+ 	.driver = {
+ 		.name		= "omap3-rom-rng",
++		.of_match_table = omap_rom_rng_match,
+ 	},
+ 	.probe		= omap3_rom_rng_probe,
+ 	.remove		= omap3_rom_rng_remove,
 -- 
 2.20.1
 
