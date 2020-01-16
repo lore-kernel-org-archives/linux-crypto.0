@@ -2,256 +2,189 @@ Return-Path: <SRS0=he+G=3F=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53FB4C33CB6
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 16:21:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74922C33CB1
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 16:45:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2A350206D9
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 16:21:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 49750208C3
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 16:45:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1579193101;
+	bh=RQF1PiCG7acveFNY9DlVnizY1ykU/sDhUTklWAECA98=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=GSvZera+P4NkkCxJzpOv6CS5UpjaCF1+kGwB2P6b1p5mUHGKPwfRbMG9MuyGYVt8t
+	 6o6VZM3IBS9H0wq32ioEzayTril44Lu7c/zGPiZ+CPqGMir9tR0hELsV9yYopaIxKK
+	 pxIWsB0bWXLH55tMO+VTQA4GOoRvkKaYszLMqCqc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727047AbgAPQVn (ORCPT
+        id S1729497AbgAPQpA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Jan 2020 11:21:43 -0500
-Received: from inva021.nxp.com ([92.121.34.21]:58034 "EHLO inva021.nxp.com"
+        Thu, 16 Jan 2020 11:45:00 -0500
+Received: from mail.kernel.org ([198.145.29.99]:53462 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726994AbgAPQVL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Jan 2020 11:21:11 -0500
-Received: from inva021.nxp.com (localhost [127.0.0.1])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id A6B742006D8;
-        Thu, 16 Jan 2020 17:21:09 +0100 (CET)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 98ABF200314;
-        Thu, 16 Jan 2020 17:21:09 +0100 (CET)
-Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 30DB32047A;
-        Thu, 16 Jan 2020 17:21:09 +0100 (CET)
-From:   Iuliana Prodan <iuliana.prodan@nxp.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Silvano Di Ninno <silvano.dininno@nxp.com>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-imx <linux-imx@nxp.com>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>
-Subject: [PATCH v3 3/9] crypto: caam - refactor ahash_edesc_alloc
-Date:   Thu, 16 Jan 2020 18:20:47 +0200
-Message-Id: <1579191653-400-4-git-send-email-iuliana.prodan@nxp.com>
-X-Mailer: git-send-email 2.1.0
-In-Reply-To: <1579191653-400-1-git-send-email-iuliana.prodan@nxp.com>
-References: <1579191653-400-1-git-send-email-iuliana.prodan@nxp.com>
-X-Virus-Scanned: ClamAV using ClamSMTP
+        id S1729033AbgAPQo7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Jan 2020 11:44:59 -0500
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id C3F11207FF;
+        Thu, 16 Jan 2020 16:44:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1579193098;
+        bh=RQF1PiCG7acveFNY9DlVnizY1ykU/sDhUTklWAECA98=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=LBU+8vbTjYVq5Onb+sbj4PhL8vdZbWlbuBUaZw17awrH8DWt/abxdz3Hv4PQsIPPj
+         ga8LpdLxj3pi7KmQo9xbdLOa6AMtWpqgUTI2zLJYkCecNVU8Gn/nQFhXky++Oo8Z6r
+         jOL8ngyJ48B+843LyjD7ri536MK5oWzqD8oSteLU=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.4 024/205] crypto: algif_skcipher - Use chunksize instead of blocksize
+Date:   Thu, 16 Jan 2020 11:39:59 -0500
+Message-Id: <20200116164300.6705-24-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200116164300.6705-1-sashal@kernel.org>
+References: <20200116164300.6705-1-sashal@kernel.org>
+MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Changed parameters for ahash_edesc_alloc function:
-- remove flags since they can be computed in
-ahash_edesc_alloc, the only place they are needed;
-- use ahash_request instead of caam_hash_ctx, to be
-able to compute gfp flags.
+From: Herbert Xu <herbert@gondor.apana.org.au>
 
-Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
-Reviewed-by: Horia Geanta <horia.geanta@nxp.com>
+[ Upstream commit 5b0fe9552336338acb52756daf65dd7a4eeca73f ]
+
+When algif_skcipher does a partial operation it always process data
+that is a multiple of blocksize.  However, for algorithms such as
+CTR this is wrong because even though it can process any number of
+bytes overall, the partial block must come at the very end and not
+in the middle.
+
+This is exactly what chunksize is meant to describe so this patch
+changes blocksize to chunksize.
+
+Fixes: 8ff590903d5f ("crypto: algif_skcipher - User-space...")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/caam/caamhash.c | 62 +++++++++++++++---------------------------
- 1 file changed, 22 insertions(+), 40 deletions(-)
+ crypto/algif_skcipher.c            |  2 +-
+ include/crypto/internal/skcipher.h | 30 ------------------------------
+ include/crypto/skcipher.h          | 30 ++++++++++++++++++++++++++++++
+ 3 files changed, 31 insertions(+), 31 deletions(-)
 
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 59881a8..4db8507 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -661,11 +661,14 @@ static void ahash_done_ctx_dst(struct device *jrdev, u32 *desc, u32 err,
-  * Allocate an enhanced descriptor, which contains the hardware descriptor
-  * and space for hardware scatter table containing sg_num entries.
-  */
--static struct ahash_edesc *ahash_edesc_alloc(struct caam_hash_ctx *ctx,
-+static struct ahash_edesc *ahash_edesc_alloc(struct ahash_request *req,
- 					     int sg_num, u32 *sh_desc,
--					     dma_addr_t sh_desc_dma,
--					     gfp_t flags)
-+					     dma_addr_t sh_desc_dma)
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index c1601edd70e3..e2c8ab408bed 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -56,7 +56,7 @@ static int _skcipher_recvmsg(struct socket *sock, struct msghdr *msg,
+ 	struct alg_sock *pask = alg_sk(psk);
+ 	struct af_alg_ctx *ctx = ask->private;
+ 	struct crypto_skcipher *tfm = pask->private;
+-	unsigned int bs = crypto_skcipher_blocksize(tfm);
++	unsigned int bs = crypto_skcipher_chunksize(tfm);
+ 	struct af_alg_async_req *areq;
+ 	int err = 0;
+ 	size_t len = 0;
+diff --git a/include/crypto/internal/skcipher.h b/include/crypto/internal/skcipher.h
+index 734b6f7081b8..3175dfeaed2c 100644
+--- a/include/crypto/internal/skcipher.h
++++ b/include/crypto/internal/skcipher.h
+@@ -205,19 +205,6 @@ static inline unsigned int crypto_skcipher_alg_max_keysize(
+ 	return alg->max_keysize;
+ }
+ 
+-static inline unsigned int crypto_skcipher_alg_chunksize(
+-	struct skcipher_alg *alg)
+-{
+-	if ((alg->base.cra_flags & CRYPTO_ALG_TYPE_MASK) ==
+-	    CRYPTO_ALG_TYPE_BLKCIPHER)
+-		return alg->base.cra_blocksize;
+-
+-	if (alg->base.cra_ablkcipher.encrypt)
+-		return alg->base.cra_blocksize;
+-
+-	return alg->chunksize;
+-}
+-
+ static inline unsigned int crypto_skcipher_alg_walksize(
+ 	struct skcipher_alg *alg)
  {
-+	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
-+	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
-+	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
-+		       GFP_KERNEL : GFP_ATOMIC;
- 	struct ahash_edesc *edesc;
- 	unsigned int sg_size = sg_num * sizeof(struct sec4_sg_entry);
+@@ -231,23 +218,6 @@ static inline unsigned int crypto_skcipher_alg_walksize(
+ 	return alg->walksize;
+ }
  
-@@ -724,8 +727,6 @@ static int ahash_update_ctx(struct ahash_request *req)
- 	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
- 	struct caam_hash_state *state = ahash_request_ctx(req);
- 	struct device *jrdev = ctx->jrdev;
--	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
--		       GFP_KERNEL : GFP_ATOMIC;
- 	u8 *buf = state->buf;
- 	int *buflen = &state->buflen;
- 	int *next_buflen = &state->next_buflen;
-@@ -779,8 +780,8 @@ static int ahash_update_ctx(struct ahash_request *req)
- 		 * allocate space for base edesc and hw desc commands,
- 		 * link tables
- 		 */
--		edesc = ahash_edesc_alloc(ctx, pad_nents, ctx->sh_desc_update,
--					  ctx->sh_desc_update_dma, flags);
-+		edesc = ahash_edesc_alloc(req, pad_nents, ctx->sh_desc_update,
-+					  ctx->sh_desc_update_dma);
- 		if (!edesc) {
- 			dma_unmap_sg(jrdev, req->src, src_nents, DMA_TO_DEVICE);
- 			return -ENOMEM;
-@@ -854,8 +855,6 @@ static int ahash_final_ctx(struct ahash_request *req)
- 	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
- 	struct caam_hash_state *state = ahash_request_ctx(req);
- 	struct device *jrdev = ctx->jrdev;
--	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
--		       GFP_KERNEL : GFP_ATOMIC;
- 	int buflen = state->buflen;
- 	u32 *desc;
- 	int sec4_sg_bytes;
-@@ -867,8 +866,8 @@ static int ahash_final_ctx(struct ahash_request *req)
- 			sizeof(struct sec4_sg_entry);
+-/**
+- * crypto_skcipher_chunksize() - obtain chunk size
+- * @tfm: cipher handle
+- *
+- * The block size is set to one for ciphers such as CTR.  However,
+- * you still need to provide incremental updates in multiples of
+- * the underlying block size as the IV does not have sub-block
+- * granularity.  This is known in this API as the chunk size.
+- *
+- * Return: chunk size in bytes
+- */
+-static inline unsigned int crypto_skcipher_chunksize(
+-	struct crypto_skcipher *tfm)
+-{
+-	return crypto_skcipher_alg_chunksize(crypto_skcipher_alg(tfm));
+-}
+-
+ /**
+  * crypto_skcipher_walksize() - obtain walk size
+  * @tfm: cipher handle
+diff --git a/include/crypto/skcipher.h b/include/crypto/skcipher.h
+index 37c164234d97..aada87916918 100644
+--- a/include/crypto/skcipher.h
++++ b/include/crypto/skcipher.h
+@@ -304,6 +304,36 @@ static inline unsigned int crypto_skcipher_blocksize(
+ 	return crypto_tfm_alg_blocksize(crypto_skcipher_tfm(tfm));
+ }
  
- 	/* allocate space for base edesc and hw desc commands, link tables */
--	edesc = ahash_edesc_alloc(ctx, 4, ctx->sh_desc_fin,
--				  ctx->sh_desc_fin_dma, flags);
-+	edesc = ahash_edesc_alloc(req, 4, ctx->sh_desc_fin,
-+				  ctx->sh_desc_fin_dma);
- 	if (!edesc)
- 		return -ENOMEM;
- 
-@@ -920,8 +919,6 @@ static int ahash_finup_ctx(struct ahash_request *req)
- 	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
- 	struct caam_hash_state *state = ahash_request_ctx(req);
- 	struct device *jrdev = ctx->jrdev;
--	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
--		       GFP_KERNEL : GFP_ATOMIC;
- 	int buflen = state->buflen;
- 	u32 *desc;
- 	int sec4_sg_src_index;
-@@ -950,9 +947,8 @@ static int ahash_finup_ctx(struct ahash_request *req)
- 	sec4_sg_src_index = 1 + (buflen ? 1 : 0);
- 
- 	/* allocate space for base edesc and hw desc commands, link tables */
--	edesc = ahash_edesc_alloc(ctx, sec4_sg_src_index + mapped_nents,
--				  ctx->sh_desc_fin, ctx->sh_desc_fin_dma,
--				  flags);
-+	edesc = ahash_edesc_alloc(req, sec4_sg_src_index + mapped_nents,
-+				  ctx->sh_desc_fin, ctx->sh_desc_fin_dma);
- 	if (!edesc) {
- 		dma_unmap_sg(jrdev, req->src, src_nents, DMA_TO_DEVICE);
- 		return -ENOMEM;
-@@ -1000,8 +996,6 @@ static int ahash_digest(struct ahash_request *req)
- 	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
- 	struct caam_hash_state *state = ahash_request_ctx(req);
- 	struct device *jrdev = ctx->jrdev;
--	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
--		       GFP_KERNEL : GFP_ATOMIC;
- 	u32 *desc;
- 	int digestsize = crypto_ahash_digestsize(ahash);
- 	int src_nents, mapped_nents;
-@@ -1028,9 +1022,8 @@ static int ahash_digest(struct ahash_request *req)
- 	}
- 
- 	/* allocate space for base edesc and hw desc commands, link tables */
--	edesc = ahash_edesc_alloc(ctx, mapped_nents > 1 ? mapped_nents : 0,
--				  ctx->sh_desc_digest, ctx->sh_desc_digest_dma,
--				  flags);
-+	edesc = ahash_edesc_alloc(req, mapped_nents > 1 ? mapped_nents : 0,
-+				  ctx->sh_desc_digest, ctx->sh_desc_digest_dma);
- 	if (!edesc) {
- 		dma_unmap_sg(jrdev, req->src, src_nents, DMA_TO_DEVICE);
- 		return -ENOMEM;
-@@ -1077,8 +1070,6 @@ static int ahash_final_no_ctx(struct ahash_request *req)
- 	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
- 	struct caam_hash_state *state = ahash_request_ctx(req);
- 	struct device *jrdev = ctx->jrdev;
--	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
--		       GFP_KERNEL : GFP_ATOMIC;
- 	u8 *buf = state->buf;
- 	int buflen = state->buflen;
- 	u32 *desc;
-@@ -1087,8 +1078,8 @@ static int ahash_final_no_ctx(struct ahash_request *req)
- 	int ret;
- 
- 	/* allocate space for base edesc and hw desc commands, link tables */
--	edesc = ahash_edesc_alloc(ctx, 0, ctx->sh_desc_digest,
--				  ctx->sh_desc_digest_dma, flags);
-+	edesc = ahash_edesc_alloc(req, 0, ctx->sh_desc_digest,
-+				  ctx->sh_desc_digest_dma);
- 	if (!edesc)
- 		return -ENOMEM;
- 
-@@ -1136,8 +1127,6 @@ static int ahash_update_no_ctx(struct ahash_request *req)
- 	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
- 	struct caam_hash_state *state = ahash_request_ctx(req);
- 	struct device *jrdev = ctx->jrdev;
--	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
--		       GFP_KERNEL : GFP_ATOMIC;
- 	u8 *buf = state->buf;
- 	int *buflen = &state->buflen;
- 	int *next_buflen = &state->next_buflen;
-@@ -1190,10 +1179,9 @@ static int ahash_update_no_ctx(struct ahash_request *req)
- 		 * allocate space for base edesc and hw desc commands,
- 		 * link tables
- 		 */
--		edesc = ahash_edesc_alloc(ctx, pad_nents,
-+		edesc = ahash_edesc_alloc(req, pad_nents,
- 					  ctx->sh_desc_update_first,
--					  ctx->sh_desc_update_first_dma,
--					  flags);
-+					  ctx->sh_desc_update_first_dma);
- 		if (!edesc) {
- 			dma_unmap_sg(jrdev, req->src, src_nents, DMA_TO_DEVICE);
- 			return -ENOMEM;
-@@ -1261,8 +1249,6 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
- 	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
- 	struct caam_hash_state *state = ahash_request_ctx(req);
- 	struct device *jrdev = ctx->jrdev;
--	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
--		       GFP_KERNEL : GFP_ATOMIC;
- 	int buflen = state->buflen;
- 	u32 *desc;
- 	int sec4_sg_bytes, sec4_sg_src_index, src_nents, mapped_nents;
-@@ -1292,9 +1278,8 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
- 			 sizeof(struct sec4_sg_entry);
- 
- 	/* allocate space for base edesc and hw desc commands, link tables */
--	edesc = ahash_edesc_alloc(ctx, sec4_sg_src_index + mapped_nents,
--				  ctx->sh_desc_digest, ctx->sh_desc_digest_dma,
--				  flags);
-+	edesc = ahash_edesc_alloc(req, sec4_sg_src_index + mapped_nents,
-+				  ctx->sh_desc_digest, ctx->sh_desc_digest_dma);
- 	if (!edesc) {
- 		dma_unmap_sg(jrdev, req->src, src_nents, DMA_TO_DEVICE);
- 		return -ENOMEM;
-@@ -1347,8 +1332,6 @@ static int ahash_update_first(struct ahash_request *req)
- 	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
- 	struct caam_hash_state *state = ahash_request_ctx(req);
- 	struct device *jrdev = ctx->jrdev;
--	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
--		       GFP_KERNEL : GFP_ATOMIC;
- 	u8 *buf = state->buf;
- 	int *buflen = &state->buflen;
- 	int *next_buflen = &state->next_buflen;
-@@ -1396,11 +1379,10 @@ static int ahash_update_first(struct ahash_request *req)
- 		 * allocate space for base edesc and hw desc commands,
- 		 * link tables
- 		 */
--		edesc = ahash_edesc_alloc(ctx, mapped_nents > 1 ?
-+		edesc = ahash_edesc_alloc(req, mapped_nents > 1 ?
- 					  mapped_nents : 0,
- 					  ctx->sh_desc_update_first,
--					  ctx->sh_desc_update_first_dma,
--					  flags);
-+					  ctx->sh_desc_update_first_dma);
- 		if (!edesc) {
- 			dma_unmap_sg(jrdev, req->src, src_nents, DMA_TO_DEVICE);
- 			return -ENOMEM;
++static inline unsigned int crypto_skcipher_alg_chunksize(
++	struct skcipher_alg *alg)
++{
++	if ((alg->base.cra_flags & CRYPTO_ALG_TYPE_MASK) ==
++	    CRYPTO_ALG_TYPE_BLKCIPHER)
++		return alg->base.cra_blocksize;
++
++	if (alg->base.cra_ablkcipher.encrypt)
++		return alg->base.cra_blocksize;
++
++	return alg->chunksize;
++}
++
++/**
++ * crypto_skcipher_chunksize() - obtain chunk size
++ * @tfm: cipher handle
++ *
++ * The block size is set to one for ciphers such as CTR.  However,
++ * you still need to provide incremental updates in multiples of
++ * the underlying block size as the IV does not have sub-block
++ * granularity.  This is known in this API as the chunk size.
++ *
++ * Return: chunk size in bytes
++ */
++static inline unsigned int crypto_skcipher_chunksize(
++	struct crypto_skcipher *tfm)
++{
++	return crypto_skcipher_alg_chunksize(crypto_skcipher_alg(tfm));
++}
++
+ static inline unsigned int crypto_sync_skcipher_blocksize(
+ 	struct crypto_sync_skcipher *tfm)
+ {
 -- 
-2.1.0
+2.20.1
 
