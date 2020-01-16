@@ -2,176 +2,190 @@ Return-Path: <SRS0=he+G=3F=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3419FC32771
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 00:18:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAAD5C32771
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 02:12:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 06DAC2084D
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 00:18:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A2F57222C3
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 02:12:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="lw2cBnfc"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="i2BXAPLH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729327AbgAPASw (ORCPT
+        id S1730643AbgAPCMC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 15 Jan 2020 19:18:52 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:54636 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726310AbgAPASw (ORCPT
+        Wed, 15 Jan 2020 21:12:02 -0500
+Received: from mail-pj1-f66.google.com ([209.85.216.66]:54769 "EHLO
+        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730599AbgAPCMB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 Jan 2020 19:18:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        Content-Type:In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:
-        Subject:Sender:Reply-To:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=L3ioD26th/wm3eYc9K20nMrNLwYjuFwfcgehlyvc/ZQ=; b=lw2cBnfcr+3/zPcRgsnl8XSH/
-        M9BdQMP/WUuSwuchi1Rzm6YnFogsDEV9PmMWTDjuslrYYQ1XjtTQS1/Ttr1/ZpyT3JWmEBmllBGVK
-        x+zCeMSrKT31Fa1r/CccUbbcG9xYnYrBhUvaNY/UnYiM+YDgzqWI+d0wdWfutfxc7PY2czlbLUwi2
-        Kc9jTaP3y9hDIXCcQJ3INyMsadrR+mT6RPotuTDuv7NaCuXyWxV0PSkIjLs2HkGBaxdsIirDVaO9n
-        Vi8CnsKp2OBGGGe3/4W3STsjrQnVnHGlNp9HSsuk1sh1JeLzUQ7SV6ixcC8PhV0pWxTZGJPCpvcbK
-        aSKgBrVVg==;
-Received: from [2601:1c0:6280:3f0::ed68]
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1irsrc-0003q7-KU; Thu, 16 Jan 2020 00:18:20 +0000
-Subject: Re: [PATCH v28 11/12] LRNG - add interface for gathering of raw
- entropy
-To:     =?UTF-8?Q?Stephan_M=c3=bcller?= <smueller@chronox.de>,
-        Arnd Bergmann <arnd@arndb.de>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        linux-api@vger.kernel.org,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        "Alexander E. Patrakov" <patrakov@gmail.com>,
-        "Ahmed S. Darwish" <darwish.07@gmail.com>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
-        Matthew Garrett <mjg59@srcf.ucam.org>,
-        Vito Caputo <vcaputo@pengaru.com>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
-        William Jon McCann <mccann@jhu.edu>,
-        zhangjs <zachary@baishancloud.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Florian Weimer <fweimer@redhat.com>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Nicolai Stange <nstange@suse.de>,
-        "Peter, Matthias" <matthias.peter@bsi.bund.de>,
-        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
-        Roman Drahtmueller <draht@schaltsekun.de>,
-        Neil Horman <nhorman@redhat.com>,
-        Julia Lawall <julia.lawall@inria.fr>,
-        Dan Carpenter <dan.carpenter@oracle.com>
-References: <6157374.ptSnyUpaCn@positron.chronox.de>
- <2641155.iNH938UiKq@positron.chronox.de>
- <5951792.lmNsirYsPE@positron.chronox.de>
- <2048458.ADJAtTWDj8@positron.chronox.de>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Message-ID: <abde84fe-2599-0db8-2bad-d2ff29a3c4f0@infradead.org>
-Date:   Wed, 15 Jan 2020 16:18:18 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.3.0
+        Wed, 15 Jan 2020 21:12:01 -0500
+Received: by mail-pj1-f66.google.com with SMTP id kx11so787340pjb.4
+        for <linux-crypto@vger.kernel.org>; Wed, 15 Jan 2020 18:12:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=ISxVLQvK8s5nY6LD7WJ8K+q3IuJWjWSPNsTVjYjwR80=;
+        b=i2BXAPLH47Eap5rnuaSk8R3uM2RBSpnlp2GmGBNYBu9aWN7QmFKWYXXjSZ0zO2NJ5l
+         TtgRXB620x7o7cZqjHRAu5vtlw8XUy026f4IXofijWYbgiqL6OZkmTv0LALmnqLA3GI0
+         apyz/E6RIb6mnB31hZ5IWR9SRCdBnv3ROCv4zfnvf7ABKpOha1w44MuNGwgY5aDHoGfy
+         dZNbKRKgKfaNxkoOSGBRVZPlGyIOAkWZEpoZY0gUle3V95e44IgMYbrwbTbw+qWnwwFc
+         tMqnci8VTrjsBHDFf1sunwD9DjGW33qVtO23fpOgUW05G3QsHLKwN/RpRkVszP7ZITFN
+         QhbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=ISxVLQvK8s5nY6LD7WJ8K+q3IuJWjWSPNsTVjYjwR80=;
+        b=JS8T5j8fOk/k/y+70/t0T/v+6Zob3iPDglBu1wXDi3wInrFMbiS5gh4W9B9HnP7DXG
+         P6dKvWxP6LK13r0aOP5MrqCi1gS8VwUYW8563BqVNLFNpjerVN7Vvo0dHb8SdRIWzREO
+         xLOzGZY9fHnqDFW8e4GXIGqUMU2khgdSwcxLnJD7lMzyl2c+2lvblqB+0qLE02AJ7fsV
+         o3BFwBhlrv7/X0U6NKvwBz8LYiRPFt8A4AhBh3ODfAiowuvLsB7jLgs4ryyP1JViEvuT
+         LaGP7T3LuTasovUGMif8amc/YZpjGr3yVHfadgfoZemOHOj4BzK77AGcZR79T+ggkMgj
+         Y6zQ==
+X-Gm-Message-State: APjAAAUayidB4fabZJ92wmFuaFpvBKcQKjvvtsjqDyxDdUxKd1nRRtt9
+        wZQtS6y7zRTYWGqUa7A8pGmJ7g==
+X-Google-Smtp-Source: APXvYqwPtaRpD5q+1zpA9jWTonAeFglbEPocCdD4h8NzV1Oc8GcurWseUbRfe1v2M61Rtj3lXNrDwA==
+X-Received: by 2002:a17:902:462:: with SMTP id 89mr29644947ple.270.1579140720839;
+        Wed, 15 Jan 2020 18:12:00 -0800 (PST)
+Received: from ?IPv6:240e:362:43d:200:56f:3d32:378b:3366? ([240e:362:43d:200:56f:3d32:378b:3366])
+        by smtp.gmail.com with ESMTPSA id g11sm22149064pgd.26.2020.01.15.18.11.30
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 15 Jan 2020 18:12:00 -0800 (PST)
+Subject: Re: [PATCH v11 2/4] uacce: add uacce driver
+To:     Dave Jiang <dave.jiang@intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        jonathan.cameron@huawei.com, grant.likely@arm.com,
+        jean-philippe <jean-philippe@linaro.org>,
+        Jerome Glisse <jglisse@redhat.com>,
+        ilias.apalodimas@linaro.org, francois.ozog@linaro.org,
+        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
+        "haojian . zhuang" <haojian.zhuang@linaro.org>,
+        guodong.xu@linaro.org, linux-accelerators@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        iommu@lists.linux-foundation.org,
+        Kenneth Lee <liguozhu@hisilicon.com>,
+        Zaibo Xu <xuzaibo@huawei.com>
+References: <1578710919-12141-1-git-send-email-zhangfei.gao@linaro.org>
+ <1578710919-12141-3-git-send-email-zhangfei.gao@linaro.org>
+ <20200111194006.GD435222@kroah.com>
+ <053ccd05-4f11-5be6-47c2-eee5c2f1fdc4@linaro.org>
+ <20200114145934.GA1960403@kroah.com>
+ <c71b402c-a185-50a7-2827-c1836cc6c237@linaro.org>
+ <9454d674-85db-32ba-4f28-eb732777d59d@intel.com>
+From:   zhangfei <zhangfei.gao@linaro.org>
+Message-ID: <6c08d1ad-53a5-0238-3767-c40d7b10df3c@linaro.org>
+Date:   Thu, 16 Jan 2020 10:11:20 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-In-Reply-To: <2048458.ADJAtTWDj8@positron.chronox.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+In-Reply-To: <9454d674-85db-32ba-4f28-eb732777d59d@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 1/15/20 2:35 AM, Stephan Müller wrote:
+Hi, Dave
 
-> 
-> CC: "Eric W. Biederman" <ebiederm@xmission.com>
-> CC: "Alexander E. Patrakov" <patrakov@gmail.com>
-> CC: "Ahmed S. Darwish" <darwish.07@gmail.com>
-> CC: "Theodore Y. Ts'o" <tytso@mit.edu>
-> CC: Willy Tarreau <w@1wt.eu>
-> CC: Matthew Garrett <mjg59@srcf.ucam.org>
-> CC: Vito Caputo <vcaputo@pengaru.com>
-> CC: Andreas Dilger <adilger.kernel@dilger.ca>
-> CC: Jan Kara <jack@suse.cz>
-> CC: Ray Strode <rstrode@redhat.com>
-> CC: William Jon McCann <mccann@jhu.edu>
-> CC: zhangjs <zachary@baishancloud.com>
-> CC: Andy Lutomirski <luto@kernel.org>
-> CC: Florian Weimer <fweimer@redhat.com>
-> CC: Lennart Poettering <mzxreary@0pointer.de>
-> CC: Nicolai Stange <nstange@suse.de>
-> Reviewed-by: Roman Drahtmueller <draht@schaltsekun.de>
-> Tested-by: Roman Drahtmüller <draht@schaltsekun.de>
-> Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
-> Tested-by: Neil Horman <nhorman@redhat.com>
-> Signed-off-by: Stephan Mueller <smueller@chronox.de>
-> ---
->  drivers/char/lrng/Kconfig        |  16 ++
->  drivers/char/lrng/Makefile       |   1 +
->  drivers/char/lrng/lrng_testing.c | 271 +++++++++++++++++++++++++++++++
->  3 files changed, 288 insertions(+)
->  create mode 100644 drivers/char/lrng/lrng_testing.c
-> 
+On 2020/1/16 上午12:43, Dave Jiang wrote:
+>
+>
+> On 1/15/20 4:18 AM, zhangfei wrote:
+>> Hi, Greg
+>>
+>> On 2020/1/14 下午10:59, Greg Kroah-Hartman wrote:
+>>> On Mon, Jan 13, 2020 at 11:34:55AM +0800, zhangfei wrote:
+>>>> Hi, Greg
+>>>>
+>>>> Thanks for the review.
+>>>>
+>>>> On 2020/1/12 上午3:40, Greg Kroah-Hartman wrote:
+>>>>> On Sat, Jan 11, 2020 at 10:48:37AM +0800, Zhangfei Gao wrote:
+>>>>>> +static int uacce_fops_open(struct inode *inode, struct file *filep)
+>>>>>> +{
+>>>>>> +    struct uacce_mm *uacce_mm = NULL;
+>>>>>> +    struct uacce_device *uacce;
+>>>>>> +    struct uacce_queue *q;
+>>>>>> +    int ret = 0;
+>>>>>> +
+>>>>>> +    uacce = xa_load(&uacce_xa, iminor(inode));
+>>>>>> +    if (!uacce)
+>>>>>> +        return -ENODEV;
+>>>>>> +
+>>>>>> +    if (!try_module_get(uacce->parent->driver->owner))
+>>>>>> +        return -ENODEV;
+>>>>> Why are you trying to grab the module reference of the parent device?
+>>>>> Why is that needed and what is that going to help with here?
+>>>>>
+>>>>> This shouldn't be needed as the module reference of the owner of the
+>>>>> fileops for this module is incremented, and the "parent" module 
+>>>>> depends
+>>>>> on this module, so how could it be unloaded without this code being
+>>>>> unloaded?
+>>>>>
+>>>>> Yes, if you build this code into the kernel and the "parent" 
+>>>>> driver is a
+>>>>> module, then you will not have a reference, but when you remove that
+>>>>> parent driver the device will be removed as it has to be unregistered
+>>>>> before that parent driver can be removed from the system, right?
+>>>>>
+>>>>> Or what am I missing here?
+>>>> The refcount here is preventing rmmod "parent" module after fd is 
+>>>> opened,
+>>>> since user driver has mmap kernel memory to user space, like mmio, 
+>>>> which may
+>>>> still in-use.
+>>>>
+>>>> With the refcount protection, rmmod "parent" module will fail until
+>>>> application free the fd.
+>>>> log like: rmmod: ERROR: Module hisi_zip is in use
+>>> But if the "parent" module is to be unloaded, it has to unregister the
+>>> "child" device and that will call the destructor in here and then you
+>>> will tear everything down and all should be good.
+>>>
+>>> There's no need to "forbid" a module from being unloaded, even if it is
+>>> being used.  Look at all networking drivers, they work that way, right?
+>> Thanks Greg for the kind suggestion.
+>>
+>> I still have one uncertainty.
+>> Does uacce has to block process continue accessing the mmapped area 
+>> when remove "parent" module?
+>> Uacce can block device access the physical memory when parent module 
+>> call uacce_remove.
+>> But application is still running, and suppose it is not the kernel 
+>> driver's responsibility to call unmap.
+>>
+>> I am looking for some examples in kernel,
+>> looks vfio does not block process continue accessing when 
+>> vfio_unregister_iommu_driver either.
+>>
+>> In my test, application will keep waiting after rmmod parent, until 
+>> ctrl+c, when unmap is called.
+>> During the process, kernel does not report any error.
+>>
+>> Do you have any advice?
+>
+> Would it work to call unmap_mapping_range() on the char dev 
+> inode->i_mappings? I think you need to set the vma->fault function ptr 
+> for the vm_operations_struct in the original mmap(). After the 
+> mappings are unmapped, you can set a state variable to trigger the 
+> return of VM_FAULT_SIGBUS in the ->fault function when the user app 
+> accesses the mmap region again and triggers a page fault. The user app 
+> needs to be programmed to catch exceptions to deal with that.
 
-> diff --git a/drivers/char/lrng/lrng_testing.c b/drivers/char/lrng/lrng_testing.c
-> new file mode 100644
-> index 000000000000..0e287eccd622
-> --- /dev/null
-> +++ b/drivers/char/lrng/lrng_testing.c
-> @@ -0,0 +1,271 @@
-> +// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
-> +/*
-> + * Linux Random Number Generator (LRNG) Raw entropy collection tool
-> + *
-> + * Copyright (C) 2019 - 2020, Stephan Mueller <smueller@chronox.de>
-> + */
-> +
-> +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-> +
-> +#include <linux/atomic.h>
-> +#include <linux/bug.h>
-> +#include <linux/debugfs.h>
-> +#include <linux/module.h>
-> +#include <linux/sched.h>
-> +#include <linux/sched/signal.h>
-> +#include <linux/slab.h>
-> +#include <linux/string.h>
-> +#include <linux/types.h>
-> +#include <linux/uaccess.h>
-> +#include <linux/workqueue.h>
-> +#include <asm/errno.h>
-> +
-> +#include "lrng_internal.h"
-> +
-> +#define LRNG_TESTING_RINGBUFFER_SIZE	1024
-> +#define LRNG_TESTING_RINGBUFFER_MASK	(LRNG_TESTING_RINGBUFFER_SIZE - 1)
-> +
-> +static u32 lrng_testing_rb[LRNG_TESTING_RINGBUFFER_SIZE];
-> +static u32 lrng_rb_reader = 0;
-> +static u32 lrng_rb_writer = 0;
-> +static atomic_t lrng_testing_enabled = ATOMIC_INIT(0);
-> +
-> +static DECLARE_WAIT_QUEUE_HEAD(lrng_raw_read_wait);
-> +static DEFINE_SPINLOCK(lrng_raw_lock);
-> +
-> +/*
-> + * 0 ==> No boot test, gathering of runtime data allowed
-> + * 1 ==> Boot test enabled and ready for collecting data, gathering runtime
-> + *	 data is disabled
-> + * 2 ==> Boot test completed and disabled, gathering of runtime data is
-> + *	 disabled
-> + */
-> +static u32 boot_test = 0;
-> +module_param(boot_test, uint, 0644);
-> +MODULE_PARM_DESC(boot_test, "Enable gathering boot time entropy of the first"
-> +			    " entropy events");
+Thanks Dave for the advice.
+Will look into it, may need some time to investigate.
+I would like to make an additional patch for this issue, since it does 
+not impact the main function.
 
-One line for the string, please.
+Thanks
 
-
--- 
-~Randy
-Reported-by: Randy Dunlap <rdunlap@infradead.org>
