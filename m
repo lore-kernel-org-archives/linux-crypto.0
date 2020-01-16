@@ -2,211 +2,74 @@ Return-Path: <SRS0=he+G=3F=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8ABBC33CB1
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 06:56:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1DFCC33CB1
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 07:06:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 703112075B
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 06:56:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="IzCOiLLN"
+	by mail.kernel.org (Postfix) with ESMTP id 9A6F720730
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 07:06:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729274AbgAPG44 (ORCPT
+        id S1729241AbgAPHF4 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Jan 2020 01:56:56 -0500
-Received: from mo4-p04-ob.smtp.rzone.de ([85.215.255.124]:11269 "EHLO
-        mo4-p04-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725973AbgAPG44 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Jan 2020 01:56:56 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1579157814;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=MRtrnJw57guEE5LArJpaKZhgNwpa4EE/ln+auVPoa8g=;
-        b=IzCOiLLNb9uIyPH/hbxj1Vo6opERlp0y06VWLeLkK8Pbj7gVmba+p74cgmUOCtrDuO
-        AHkBXJ1EqWLZW85lvGNowgwOy0icYW9+4ESpLO4x2r3/VjM/Pnb0xEmdOPx/5vDmYZOr
-        NXsg06gVkIMw1lJVU5jTWGPvcZV5vYG/BbvFMSBl797T2qtIrJSBPqegaS508E9FYZGd
-        m1x+NjHZ/Oy0i5NdE258g4xL6aLhIpjqP+ZXNpXt6/Te6XXBk/WikEul2Rlo+3t+L+Z/
-        0NbEMJbN58Ky7G03lAADoGJdCMGz4+nYO7bObXsLqQcKDMcxIB82N3Z+ge8CWHtXdzHV
-        tHZw==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPZJPScHivh"
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-        by smtp.strato.de (RZmta 46.1.4 DYNA|AUTH)
-        with ESMTPSA id u04585w0G6teaBM
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-        Thu, 16 Jan 2020 07:55:40 +0100 (CET)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Randy Dunlap <rdunlap@infradead.org>
-Cc:     Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
-        linux-api@vger.kernel.org,
-        "Eric W. Biederman" <ebiederm@xmission.com>,
-        "Alexander E. Patrakov" <patrakov@gmail.com>,
-        "Ahmed S. Darwish" <darwish.07@gmail.com>,
-        "Theodore Y. Ts'o" <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>,
-        Matthew Garrett <mjg59@srcf.ucam.org>,
-        Vito Caputo <vcaputo@pengaru.com>,
-        Andreas Dilger <adilger.kernel@dilger.ca>,
-        Jan Kara <jack@suse.cz>, Ray Strode <rstrode@redhat.com>,
-        William Jon McCann <mccann@jhu.edu>,
-        zhangjs <zachary@baishancloud.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Florian Weimer <fweimer@redhat.com>,
-        Lennart Poettering <mzxreary@0pointer.de>,
-        Nicolai Stange <nstange@suse.de>,
-        "Peter, Matthias" <matthias.peter@bsi.bund.de>,
-        Marcelo Henrique Cerri <marcelo.cerri@canonical.com>,
-        Roman Drahtmueller <draht@schaltsekun.de>,
-        Neil Horman <nhorman@redhat.com>,
-        Julia Lawall <julia.lawall@inria.fr>,
-        Dan Carpenter <dan.carpenter@oracle.com>
-Subject: Re: [PATCH v28 06/12] LRNG - add SP800-90A DRBG extension
-Date:   Thu, 16 Jan 2020 07:55:40 +0100
-Message-ID: <54845098.RitduxjIfl@tauon.chronox.de>
-In-Reply-To: <55a89cdf-e36d-fb36-29fa-46ebfb139294@infradead.org>
-References: <6157374.ptSnyUpaCn@positron.chronox.de> <12396284.QuoJzrrf7p@positron.chronox.de> <55a89cdf-e36d-fb36-29fa-46ebfb139294@infradead.org>
+        Thu, 16 Jan 2020 02:05:56 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:38450 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726925AbgAPHF4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Jan 2020 02:05:56 -0500
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1irzDx-0005Bk-Ai; Thu, 16 Jan 2020 15:05:49 +0800
+Received: from herbert by gondobar with local (Exim 4.89)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1irzDs-0006Vy-ML; Thu, 16 Jan 2020 15:05:44 +0800
+Date:   Thu, 16 Jan 2020 15:05:44 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     "Thomas, Rijo-john" <Rijo-john.Thomas@amd.com>
+Cc:     Colin King <colin.king@canonical.com>,
+        Jens Wiklander <jens.wiklander@linaro.org>,
+        Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>,
+        Gary R Hook <gary.hook@amd.com>, tee-dev@lists.linaro.org,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH][next] tee: fix memory allocation failure checks on
+ drv_data and amdtee
+Message-ID: <20200116070544.doegatlwgsftbhc4@gondor.apana.org.au>
+References: <20200107143601.105321-1-colin.king@canonical.com>
+ <747f9c93-7465-99aa-0b91-a05fd64c7d1f@amd.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <747f9c93-7465-99aa-0b91-a05fd64c7d1f@amd.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Donnerstag, 16. Januar 2020, 01:14:35 CET schrieb Randy Dunlap:
+On Wed, Jan 08, 2020 at 12:33:08PM +0530, Thomas, Rijo-john wrote:
+> +linux-crypto
+> 
+> On 07/01/20 8:06 pm, Colin King wrote:
+> > From: Colin Ian King <colin.king@canonical.com>
+> > 
+> > Currently the memory allocation failure checks on drv_data and
+> > amdtee are using IS_ERR rather than checking for a null pointer.
+> > Fix these checks to use the conventional null pointer check.
+> > 
+> > Addresses-Coverity: ("Dereference null return")
+> > Fixes: 757cc3e9ff1d ("tee: add AMD-TEE driver")
+> > Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> 
+> Reviewed-by: Rijo Thomas <Rijo-john.Thomas@amd.com>
 
-Hi Randy,
+This patch needs to be resubmitted to the linux-crypto list for
+it to be picked up by patchwork.
 
-> On 1/15/20 2:33 AM, Stephan M=FCller wrote:
-> > CC: "Eric W. Biederman" <ebiederm@xmission.com>
-> > CC: "Alexander E. Patrakov" <patrakov@gmail.com>
-> > CC: "Ahmed S. Darwish" <darwish.07@gmail.com>
-> > CC: "Theodore Y. Ts'o" <tytso@mit.edu>
-> > CC: Willy Tarreau <w@1wt.eu>
-> > CC: Matthew Garrett <mjg59@srcf.ucam.org>
-> > CC: Vito Caputo <vcaputo@pengaru.com>
-> > CC: Andreas Dilger <adilger.kernel@dilger.ca>
-> > CC: Jan Kara <jack@suse.cz>
-> > CC: Ray Strode <rstrode@redhat.com>
-> > CC: William Jon McCann <mccann@jhu.edu>
-> > CC: zhangjs <zachary@baishancloud.com>
-> > CC: Andy Lutomirski <luto@kernel.org>
-> > CC: Florian Weimer <fweimer@redhat.com>
-> > CC: Lennart Poettering <mzxreary@0pointer.de>
-> > CC: Nicolai Stange <nstange@suse.de>
-> > Reviewed-by: Roman Drahtmueller <draht@schaltsekun.de>
-> > Tested-by: Roman Drahtm=FCller <draht@schaltsekun.de>
-> > Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
-> > Tested-by: Neil Horman <nhorman@redhat.com>
-> > Signed-off-by: Stephan Mueller <smueller@chronox.de>
-> > ---
-> >=20
-> >  drivers/char/lrng/Kconfig     |  11 ++
-> >  drivers/char/lrng/Makefile    |   1 +
-> >  drivers/char/lrng/lrng_drbg.c | 260 ++++++++++++++++++++++++++++++++++
-> >  3 files changed, 272 insertions(+)
-> >  create mode 100644 drivers/char/lrng/lrng_drbg.c
-> >=20
-> > diff --git a/drivers/char/lrng/Kconfig b/drivers/char/lrng/Kconfig
-> > index cb701bb0b8b6..15fb623d9d1f 100644
-> > --- a/drivers/char/lrng/Kconfig
-> > +++ b/drivers/char/lrng/Kconfig
-> > @@ -71,4 +71,15 @@ menuconfig LRNG_DRNG_SWITCH
-> >=20
-> >  	  accessible via the external interfaces. With this configuration
-> >  	  option other DRNGs can be selected and loaded at runtime.
-> >=20
-> > +if LRNG_DRNG_SWITCH
-> > +config LRNG_DRBG
-> > +	tristate "SP800-90A support for the LRNG"
-> > +	select CRYPTO_DRBG_MENU
-> > +	select CRYPTO_CMAC if CRYPTO_DRBG_CTR
->=20
-> Don't select these if CRYPTO is not already set/enabled.
-> It causes Kconfig warnings and possible build errors.
-
-I added "depends on CRYPTO"
->=20
-> > +	help
-> > +	  Enable the SP800-90A DRBG support for the LRNG. Once the
-> > +	  module is loaded, output from /dev/random, /dev/urandom,
-> > +	  getrandom(2), or get_random_bytes is provided by a DRBG.
-> > +endif # LRNG_DRNG_SWITCH
-> > +
-> >=20
-> >  endif # LRNG
-> >=20
-> > diff --git a/drivers/char/lrng/lrng_drbg.c b/drivers/char/lrng/lrng_drb=
-g.c
-> > new file mode 100644
-> > index 000000000000..8bf2badb1fe0
-> > --- /dev/null
-> > +++ b/drivers/char/lrng/lrng_drbg.c
-> > @@ -0,0 +1,260 @@
-> > +// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
-> > +/*
-> > + * Backend for the LRNG providing the cryptographic primitives using t=
-he
-> > + * kernel crypto API and its DRBG.
-> > + *
-> > + * Copyright (C) 2016 - 2020, Stephan Mueller <smueller@chronox.de>
-> > + */
-> > +
-> > +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
-> > +
-> > +#include <crypto/drbg.h>
-> > +#include <linux/init.h>
-> > +#include <linux/module.h>
-> > +#include <linux/lrng.h>
-> > +
-> > +/*
-> > + * Define a DRBG plus a hash / MAC used to extract data from the entro=
-py
-> > pool. + * For LRNG_HASH_NAME you can use a hash or a MAC (HMAC or CMAC)
-> > of your choice + * (Note, you should use the suggested selections below
-> > -- using SHA-1 or MD5 + * is not wise). The idea is that the used cipher
-> > primitive can be selected to + * be the same as used for the DRBG. I.e.
-> > the LRNG only uses one cipher + * primitive using the same cipher
-> > implementation with the options offered in + * the following. This mean=
-s,
-> > if the CTR DRBG is selected and AES-NI is present, + * both the CTR DRBG
-> > and the selected cmac(aes) use AES-NI.
-> > + *
-> > + * The security strengths of the DRBGs are all 256 bits according to
-> > + * SP800-57 section 5.6.1.
-> > + *
-> > + * This definition is allowed to be changed.
-> > + */
-> > +#ifdef CONFIG_CRYPTO_DRBG_CTR
-> > +static unsigned int lrng_drbg_type =3D 0;
-> > +#elif defined CONFIG_CRYPTO_DRBG_HMAC
-> > +static unsigned int lrng_drbg_type =3D 1;
-> > +#elif defined CONFIG_CRYPTO_DRBG_HASH
-> > +static unsigned int lrng_drbg_type =3D 2;
-> > +#else
-> > +#error "Unknown DRBG in use"
-> > +#endif
-> > +
-> > +/* The parameter must be r/o in sysfs as otherwise races appear. */
-> > +module_param(lrng_drbg_type, uint, 0444);
-> > +MODULE_PARM_DESC(lrng_drbg_type, "DRBG type used for LRNG (0->CTR_DRBG=
-, "
-> > +				 "1->HMAC_DRBG, 2->Hash_DRBG)");
->=20
-> One line for the string, please, not split.
-
-Changed
-
-Thank you.
-
-Ciao
-Stephan
-
-
+Thanks,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
