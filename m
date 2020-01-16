@@ -2,106 +2,139 @@ Return-Path: <SRS0=he+G=3F=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F9CEC33CB1
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 13:10:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B594C33CB1
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 13:16:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6F33A206D5
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 13:10:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A0BD20663
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 13:16:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QctqX+SA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727022AbgAPNKm (ORCPT
+        id S1726160AbgAPNQJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Jan 2020 08:10:42 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:40602 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726853AbgAPNKm (ORCPT
+        Thu, 16 Jan 2020 08:16:09 -0500
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:55271 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726018AbgAPNQJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Jan 2020 08:10:42 -0500
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00GD7Yh7142335
-        for <linux-crypto@vger.kernel.org>; Thu, 16 Jan 2020 08:10:40 -0500
-Received: from e06smtp02.uk.ibm.com (e06smtp02.uk.ibm.com [195.75.94.98])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2xhgv6vmw5-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Thu, 16 Jan 2020 08:10:40 -0500
-Received: from localhost
-        by e06smtp02.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <zohar@linux.ibm.com>;
-        Thu, 16 Jan 2020 13:10:38 -0000
-Received: from b06cxnps4074.portsmouth.uk.ibm.com (9.149.109.196)
-        by e06smtp02.uk.ibm.com (192.168.101.132) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Thu, 16 Jan 2020 13:10:35 -0000
-Received: from d06av26.portsmouth.uk.ibm.com (d06av26.portsmouth.uk.ibm.com [9.149.105.62])
-        by b06cxnps4074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00GDAYc411272198
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 16 Jan 2020 13:10:34 GMT
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 6FDA9AE057;
-        Thu, 16 Jan 2020 13:10:34 +0000 (GMT)
-Received: from d06av26.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5C7BEAE06A;
-        Thu, 16 Jan 2020 13:10:33 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.85.139.213])
-        by d06av26.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Thu, 16 Jan 2020 13:10:33 +0000 (GMT)
-Subject: Re: [PATCH] IMA: inconsistent lock state in ima_process_queued_keys
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     Lakshmi Ramasubramanian <nramas@linux.microsoft.com>,
-        dvyukov@google.com, James.Bottomley@HansenPartnership.com,
-        arnd@arndb.de, linux-integrity@vger.kernel.org
-Cc:     dhowells@redhat.com, sashal@kernel.org,
-        linux-kernel@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Date:   Thu, 16 Jan 2020 08:10:32 -0500
-In-Reply-To: <20200116031342.3418-1-nramas@linux.microsoft.com>
-References: <20200116031342.3418-1-nramas@linux.microsoft.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.20.5 (3.20.5-1.fc24) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-x-cbid: 20011613-0008-0000-0000-00000349E7B0
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20011613-0009-0000-0000-00004A6A416F
-Message-Id: <1579180232.5857.23.camel@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-01-16_04:2020-01-16,2020-01-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- lowpriorityscore=0 mlxlogscore=766 bulkscore=0 impostorscore=0
- malwarescore=0 phishscore=0 clxscore=1015 adultscore=0 suspectscore=2
- mlxscore=0 priorityscore=1501 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-1910280000 definitions=main-2001160112
+        Thu, 16 Jan 2020 08:16:09 -0500
+Received: by mail-wm1-f67.google.com with SMTP id b19so3703424wmj.4;
+        Thu, 16 Jan 2020 05:16:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=2fUXK8SpQFeNUTHHjq17WKEa2HX3RjBEp1dlf1605d8=;
+        b=QctqX+SABPym4k6LOX1hzx5gGwkEvbayU2AwkCvhTMCpEs7ix0z3Y9lzgR8BIzExGs
+         7Nmlqo7vmRyMi5++i7LRdKtmyQT8h2AfO8p5VVGLeEuuRSByY4ji0ucCpYlyiAntiLhu
+         VsZz2FGp/upKFVJQvg0CGbvNSY1KlWk+pFvE8a8aihQPntSsMDotWqDTQIiPgwfSrpeP
+         kj7Hfcr35pFToHNz5/Ub5rPit4WdGxYOcZuxPMdDsVrPknOEcggUKzQu2umL1Fkw76g8
+         oiToDbmSTMNxl31Lfusng0BIhaz9f+r7aGAksBjS7megI67hE+Gmn+5o41tNxzsfXU5V
+         +X6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=2fUXK8SpQFeNUTHHjq17WKEa2HX3RjBEp1dlf1605d8=;
+        b=tUbi2p5WjbBfzZgznHVeJQjjPG2ckZs4lZQoDSjzjT0v0bB8R6u11fV9ua1pALlYHV
+         JSp2mny091jnf/dSh4H32lloq1GKltqrT3Aq5uC4G5/rV3kXDPvdTELBH/gZmwweWlkC
+         Dm+uyXa2CQh0NzOgZ+MmAuHF72Vj0sSQEmY33FIvZFGQLxIZKxzs97Iiz9EibUdTx9ac
+         RvUDAMccjnnoYHygwaWMQ5sokQl7jYj95cM8DvdHgdeb69vNX22sstGJHy1GbGyfcgiU
+         Y9OAKJSlk7/EamVeRILdZqJbLy5TkX5R1vHEFLD3tObpKwdfguLwST6BwdJcBvqbGHGd
+         tAaw==
+X-Gm-Message-State: APjAAAWNLBmLqKWcKgvf3yyJFAqmf4dxYYlq4GorHgYSOiOcJ0I6CBOf
+        pOH4qqz672EecdB761EfXr4=
+X-Google-Smtp-Source: APXvYqy+KZj1RE5Da5UJUk8yDqkXjQ9G20krvYN+N07Q3VSfPwOBls/Wn9bvazOAR6xdN4I5BNBNVg==
+X-Received: by 2002:a05:600c:224d:: with SMTP id a13mr6139437wmm.70.1579180566478;
+        Thu, 16 Jan 2020 05:16:06 -0800 (PST)
+Received: from Red ([2a01:cb1d:147:7200:2e56:dcff:fed2:c6d6])
+        by smtp.googlemail.com with ESMTPSA id y139sm3415692wmd.24.2020.01.16.05.16.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Jan 2020 05:16:05 -0800 (PST)
+Date:   Thu, 16 Jan 2020 14:16:03 +0100
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     Iuliana Prodan <iuliana.prodan@nxp.com>
+Cc:     "alexandre.torgue@st.com" <alexandre.torgue@st.com>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "mcoquelin.stm32@gmail.com" <mcoquelin.stm32@gmail.com>,
+        "mripard@kernel.org" <mripard@kernel.org>,
+        "wens@csie.org" <wens@csie.org>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-stm32@st-md-mailman.stormreply.com" 
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        "linux-sunxi@googlegroups.com" <linux-sunxi@googlegroups.com>
+Subject: Re: [PATCH RFC 00/10] crypto: engine: permit to batch requests
+Message-ID: <20200116131603.GA26487@Red>
+References: <20200114135936.32422-1-clabbe.montjoie@gmail.com>
+ <VI1PR04MB444530675D82743E8AFFD8FE8C360@VI1PR04MB4445.eurprd04.prod.outlook.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <VI1PR04MB444530675D82743E8AFFD8FE8C360@VI1PR04MB4445.eurprd04.prod.outlook.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 2020-01-15 at 19:13 -0800, Lakshmi Ramasubramanian wrote:
-> ima_queued_keys() is called from a non-interrupt context, but
-> ima_process_queued_keys() may be called from both an interrupt
-> context (ima_timer_handler) and non-interrupt context
-> (ima_update_policy). Since the spinlock named ima_keys_lock is used
-> in both ima_queued_keys() and ima_process_queued_keys(),
-> irq version of the spinlock macros, spin_lock_irqsave() and
-> spin_unlock_irqrestore(), should be used[1].
+On Thu, Jan 16, 2020 at 11:33:24AM +0000, Iuliana Prodan wrote:
+> On 1/14/2020 3:59 PM, Corentin Labbe wrote:
+> > Hello
+> > 
+> > The sun8i-ce hardware can work on multiple requests in one batch.
+> > For this it use a task descriptor, and chain them.
+> > For the moment, the driver does not use this mechanism and do requests
+> > one at a time and issue an irq for each.
+> > 
+> > Using the chaning will permit to issue less interrupts, and increase
+> > thoughput.
+> > 
+> > But the crypto/engine can enqueue lots of requests but can ran them only
+> > one by one.
+> > 
+> > This serie introduce a way to batch requests in crypto/engine by
+> > - setting a batch limit (1 by default)
+> > - refactor the prepare/unprepare code to permit to have x requests
+> >    prepared/unprepared at the same time.
+> > 
+> > For testing the serie, the selftest are not enough, since it issue
+> > request one at a time.
+> > I have used LUKS for testing it.
+> > 
+> > Please give me what you think about this serie, specially maintainers
+> > which have hardware with the same kind of capability.
+> > 
+> Hi,
 > 
-> This patch fixes the "inconsistent lock state" issue caused by
-> using the non-irq version of the spinlock macros in ima_queue_key()
-> and ima_process_queued_keys().
+> I'm working on CAAM, on adding support for crypto-engine.
+> These modifications are not working on CAAM.
+> They seem to be specific to requests that are linked. CAAM can work on 
+> multiple request, at the same time, but they are processed independently.
+> So, I believe the parallelization is a good idea, but the requests still 
+> need to be independent.
+> I'll follow up with comments on each patch.
+
+Hello
+
+Thanks for the review.
+Yes my serie is for doing "linked" request.
+For the CAAM, if you can do multiple request independently, why not having x crypto engine ? (like sun8i-ce/sun8i-ss/amlogic)
+
 > 
-> [1] Documentation/locking/spinlocks.rst
-> 
-> Signed-off-by: Lakshmi Ramasubramanian <nramas@linux.microsoft.com>
-> Reported-by: syzbot <syzbot+a4a503d7f37292ae1664@syzkaller.appspotmail.com>
-> Suggested-by: Dmitry Vyukov <dvyukov@google.com>
-> Fixes: 8f5d2d06f217 ("IMA: Defined timer to free queued keys")
-> Fixes: 9fb38e76b5f1 ("IMA: Define workqueue for early boot key measurements")
+> Also, IMO you should send the patches for crypto-engine improvements in 
+> a separate series from the one for allwinner driver.
 
-Thanks!  This patch is now queued in next-integrity-testing.
+For this RFC serie, I tried to do real atomic patch, for let people see the whole process.
 
-Mimi
-
+Regards
