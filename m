@@ -4,50 +4,51 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 237B6C33CB3
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 16:45:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78B49C3F68F
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 16:51:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E54E1214AF
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 16:45:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 45AEA2081E
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 16:51:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1579193117;
-	bh=1105cNsB3lE0xNOzbHnklhaaO2PN7/IcCNpK3vSUZEs=;
+	s=default; t=1579193499;
+	bh=/U6vsz57qdSJa/4AbKCXyUcyEIv3LT/mA9sAA6aZM6c=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=WQCTiUU4bS7LFZuGZEYrt9Z8X/R0t3FhPkyxzSMASBTl42ZKFKggyU1ov4MolqMMD
-	 433b1uPrHotdslFnlhdjYvXuAQDtXwMWeIHch0/AI3C+PBtDFDP6nUOBmDHEXZqWaA
-	 FtdGDVL9xCRuCmrRl4vj2ha7Uodl4I2WFUshyvFY=
+	b=RBtPidNClfJv8Dz7CWFQx/IRYAVl4cxwbqIJ/0wN1pP9UQ70n/ActWipXPcutZojg
+	 +JlAcyIKM3xFELDLyeXfrnCWnzTirVu4huX1SBkQtnzTWVkhUO9pQihBuzyt7f84YJ
+	 zNB44VpNFKNNYOVRW1KiZAgpHiZHrL31Zij3ho/4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729139AbgAPQpM (ORCPT
+        id S1729221AbgAPQvi (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Jan 2020 11:45:12 -0500
-Received: from mail.kernel.org ([198.145.29.99]:53864 "EHLO mail.kernel.org"
+        Thu, 16 Jan 2020 11:51:38 -0500
+Received: from mail.kernel.org ([198.145.29.99]:34410 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726706AbgAPQpM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Jan 2020 11:45:12 -0500
+        id S1727005AbgAPQvi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Jan 2020 11:51:38 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4818B21582;
-        Thu, 16 Jan 2020 16:45:06 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1FDC020730;
+        Thu, 16 Jan 2020 16:51:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1579193111;
-        bh=1105cNsB3lE0xNOzbHnklhaaO2PN7/IcCNpK3vSUZEs=;
+        s=default; t=1579193497;
+        bh=/U6vsz57qdSJa/4AbKCXyUcyEIv3LT/mA9sAA6aZM6c=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=rv4Y1RfAQRRXaNv9JxVQSqc8zVos/VIDUOBvNbCrooHrupAQlACTD5h7Ncb+zejhu
-         cwdZkkyXqOPa1nluKV2OWmFZLa14/9ZBkxjRZE8DC/MVJ4No8NWscNGIbwMktFZX3X
-         wR+u1hkYwP8pD6qtOIAc+zMlAugy2VEGQpuo8HwA=
+        b=GM5gfN5c0Fhns/bbFFNJN0c7kGrb9Y0w7mpjWQe1FRBLGEZuXI6bKQE5+mQjijlT+
+         9wfGkbgNcsh/Jjf7RxsamBxOu8Mahcu9bg9eI9DmGsCKw2HHk/Sz6VfIzCUfFihPMp
+         fHwDvcQTJMvHJL2DoCo5W/pqTS9Aaq9vmm38fUz8=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Phani Kiran Hemadri <phemadri@marvell.com>,
-        Srikanth Jampala <jsrikanth@marvell.com>,
+Cc:     Yunfeng Ye <yeyunfeng@huawei.com>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 026/205] crypto: cavium/nitrox - fix firmware assignment to AE cores
-Date:   Thu, 16 Jan 2020 11:40:01 -0500
-Message-Id: <20200116164300.6705-26-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Subject: [PATCH AUTOSEL 5.4 091/205] crypto: arm64/aes-neonbs - add return value of skcipher_walk_done() in __xts_crypt()
+Date:   Thu, 16 Jan 2020 11:41:06 -0500
+Message-Id: <20200116164300.6705-91-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200116164300.6705-1-sashal@kernel.org>
 References: <20200116164300.6705-1-sashal@kernel.org>
@@ -60,51 +61,37 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Phani Kiran Hemadri <phemadri@marvell.com>
+From: Yunfeng Ye <yeyunfeng@huawei.com>
 
-[ Upstream commit 6a97a99db848748d582d79447f7c9c330ce1688e ]
+[ Upstream commit 9b537997b669c42cec67893538037e8d1c83c91c ]
 
-This patch fixes assigning UCD block number of Asymmetric crypto
-firmware to AE cores of CNN55XX device.
+A warning is found by the static code analysis tool:
+  "Identical condition 'err', second condition is always false"
 
-Fixes: a7268c4d4205 ("crypto: cavium/nitrox - Add support for loading asymmetric crypto firmware")
-Signed-off-by: Phani Kiran Hemadri <phemadri@marvell.com>
-Reviewed-by: Srikanth Jampala <jsrikanth@marvell.com>
+Fix this by adding return value of skcipher_walk_done().
+
+Fixes: 67cfa5d3b721 ("crypto: arm64/aes-neonbs - implement ciphertext stealing for XTS")
+Signed-off-by: Yunfeng Ye <yeyunfeng@huawei.com>
+Acked-by: Ard Biesheuvel <ard.biesheuvel@linaro.org>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/cavium/nitrox/nitrox_main.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ arch/arm64/crypto/aes-neonbs-glue.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_main.c b/drivers/crypto/cavium/nitrox/nitrox_main.c
-index bc924980e10c..c4632d84c9a1 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_main.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_main.c
-@@ -103,8 +103,7 @@ static void write_to_ucd_unit(struct nitrox_device *ndev, u32 ucode_size,
- 	offset = UCD_UCODE_LOAD_BLOCK_NUM;
- 	nitrox_write_csr(ndev, offset, block_num);
+diff --git a/arch/arm64/crypto/aes-neonbs-glue.c b/arch/arm64/crypto/aes-neonbs-glue.c
+index ea873b8904c4..e3e27349a9fe 100644
+--- a/arch/arm64/crypto/aes-neonbs-glue.c
++++ b/arch/arm64/crypto/aes-neonbs-glue.c
+@@ -384,7 +384,7 @@ static int __xts_crypt(struct skcipher_request *req, bool encrypt,
+ 			goto xts_tail;
  
--	code_size = ucode_size;
--	code_size = roundup(code_size, 8);
-+	code_size = roundup(ucode_size, 16);
- 	while (code_size) {
- 		data = ucode_data[i];
- 		/* write 8 bytes at a time */
-@@ -220,11 +219,11 @@ static int nitrox_load_fw(struct nitrox_device *ndev)
+ 		kernel_neon_end();
+-		skcipher_walk_done(&walk, nbytes);
++		err = skcipher_walk_done(&walk, nbytes);
+ 	}
  
- 	/* write block number and firmware length
- 	 * bit:<2:0> block number
--	 * bit:3 is set SE uses 32KB microcode
--	 * bit:3 is clear SE uses 64KB microcode
-+	 * bit:3 is set AE uses 32KB microcode
-+	 * bit:3 is clear AE uses 64KB microcode
- 	 */
- 	core_2_eid_val.value = 0ULL;
--	core_2_eid_val.ucode_blk = 0;
-+	core_2_eid_val.ucode_blk = 2;
- 	if (ucode_size <= CNN55XX_UCD_BLOCK_SIZE)
- 		core_2_eid_val.ucode_len = 1;
- 	else
+ 	if (err || likely(!tail))
 -- 
 2.20.1
 
