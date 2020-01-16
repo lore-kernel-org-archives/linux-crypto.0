@@ -2,68 +2,96 @@ Return-Path: <SRS0=he+G=3F=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F403C33CB3
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 18:36:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EE8AC33CAF
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 18:46:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 27BEE208C3
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 18:36:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="HaChmZtN"
+	by mail.kernel.org (Postfix) with ESMTP id 4B1BC206B7
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Jan 2020 18:46:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1579200372;
+	bh=cCRaRvBuPhcQPa9+/4rPGVxmyznYiXD4RfIyjgTKUb0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=K73H9Q4Ct5ZRSAqvm+IBFaC0oO4Hc+OVNO3O2/+ZSK44ohbHJIttHoK/DPcN9QmxT
+	 SexYkx4jUJBGm2XruKpFaj1FyEHXkZPbJJQ2QljMX9TfMy+b5n6FXBBUFfkZ6za9Vj
+	 ADH/V4TvIaohV/uVny3u19aWyxundjeBAOvziA00=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389850AbgAPRYI (ORCPT
+        id S1733212AbgAPSqF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Jan 2020 12:24:08 -0500
-Received: from frisell.zx2c4.com ([192.95.5.64]:38265 "EHLO frisell.zx2c4.com"
+        Thu, 16 Jan 2020 13:46:05 -0500
+Received: from mail.kernel.org ([198.145.29.99]:48606 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1733197AbgAPRYH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Jan 2020 12:24:07 -0500
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 817523b2;
-        Thu, 16 Jan 2020 16:23:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=from:to:cc
-        :subject:date:message-id:mime-version:content-transfer-encoding;
-         s=mail; bh=50bNfiEpYG6sVj+x/enmT20pq+8=; b=HaChmZtNljAHfXiuU4oi
-        nTKdEllGn9MOg1FY92BAlaYRF+9CV85OYvMNUBbseZITJ36cvU5dYhy7fVFfogt6
-        xNpi/rL3u/0VcBtp9qUvnF6LkS7/q5Q9klgEFXkzwtrblC8h0lIq93Vr8c6TSgUT
-        pdmpW//kUgs284tZezRurW2e11v3AIopHwkNARYrWtmS5wlvje6xqa20uQ3WPWSz
-        mOBmfyGnDMkqYTH42S7BW3a4tRl0m5n9sgGYG4IuwXVHaadmfJEKO54eneVRYVHS
-        lzQMgJbeW2CdFCLa65U5hAftmuCGCEnl/OCCmSG3VmBbDPy6M7GEO3PqyiaNHwk+
-        Gg==
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 6f70810e (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
-        Thu, 16 Jan 2020 16:23:46 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH] crypto: x86/poly1305: fix .gitignore typo
-Date:   Thu, 16 Jan 2020 18:23:55 +0100
-Message-Id: <20200116172355.13255-1-Jason@zx2c4.com>
+        id S2389937AbgAPRK0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Jan 2020 12:10:26 -0500
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5D87024685;
+        Thu, 16 Jan 2020 17:10:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1579194626;
+        bh=cCRaRvBuPhcQPa9+/4rPGVxmyznYiXD4RfIyjgTKUb0=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=lcdfoAGtXESZDa7KJbinyTKb7R7QzEvHwrMvq3255bu0Bfe60jQP/1CImlgADuO0h
+         /muKMGnB2giK9eA8JpzfpOkxVA5NVz+64W0kw71Ps6m8HcdQ5I1AO4M8HzLMxrJjGC
+         AbCeXf4aFtjdVk2DwKIw/OHEJk2fE/CKSfFFGCBs=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Iuliana Prodan <iuliana.prodan@nxp.com>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.19 486/671] crypto: caam - free resources in case caam_rng registration failed
+Date:   Thu, 16 Jan 2020 12:02:04 -0500
+Message-Id: <20200116170509.12787-223-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200116170509.12787-1-sashal@kernel.org>
+References: <20200116170509.12787-1-sashal@kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Admist the kbuild robot induced changes, the .gitignore file for the
-generated file wasn't updated with the non-clashing filename. This
-commit adjusts that.
+From: Iuliana Prodan <iuliana.prodan@nxp.com>
 
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+[ Upstream commit c59a1d41672a89b5cac49db1a472ff889e35a2d2 ]
+
+Check the return value of the hardware registration for caam_rng and free
+resources in case of failure.
+
+Fixes: e24f7c9e87d4 ("crypto: caam - hwrng support")
+Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
+Reviewed-by: Horia Geanta <horia.geanta@nxp.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- arch/x86/crypto/.gitignore | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/caam/caamrng.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/arch/x86/crypto/.gitignore b/arch/x86/crypto/.gitignore
-index c406ea6571fa..30be0400a439 100644
---- a/arch/x86/crypto/.gitignore
-+++ b/arch/x86/crypto/.gitignore
-@@ -1 +1 @@
--poly1305-x86_64.S
-+poly1305-x86_64-cryptogams.S
+diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
+index fde07d4ff019..ff6718a11e9e 100644
+--- a/drivers/crypto/caam/caamrng.c
++++ b/drivers/crypto/caam/caamrng.c
+@@ -353,7 +353,10 @@ static int __init caam_rng_init(void)
+ 		goto free_rng_ctx;
+ 
+ 	dev_info(dev, "registering rng-caam\n");
+-	return hwrng_register(&caam_rng);
++
++	err = hwrng_register(&caam_rng);
++	if (!err)
++		return err;
+ 
+ free_rng_ctx:
+ 	kfree(rng_ctx);
 -- 
-2.24.1
+2.20.1
 
