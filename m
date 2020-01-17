@@ -2,86 +2,144 @@ Return-Path: <SRS0=A/Go=3G=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 450EDC33CB1
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jan 2020 07:04:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B061CC33CB1
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jan 2020 09:39:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 15DD520728
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jan 2020 07:04:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E62920730
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jan 2020 09:39:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727030AbgAQHEf (ORCPT
+        id S1729121AbgAQJjM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 Jan 2020 02:04:35 -0500
-Received: from a.mx.secunet.com ([62.96.220.36]:37010 "EHLO a.mx.secunet.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726726AbgAQHEf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Jan 2020 02:04:35 -0500
-Received: from localhost (localhost [127.0.0.1])
-        by a.mx.secunet.com (Postfix) with ESMTP id C64A920411;
-        Fri, 17 Jan 2020 08:04:32 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-        by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id f9YOAIht69iG; Fri, 17 Jan 2020 08:04:32 +0100 (CET)
-Received: from mail-essen-01.secunet.de (mail-essen-01.secunet.de [10.53.40.204])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by a.mx.secunet.com (Postfix) with ESMTPS id 62956200AC;
-        Fri, 17 Jan 2020 08:04:32 +0100 (CET)
-Received: from gauss2.secunet.de (10.182.7.193) by mail-essen-01.secunet.de
- (10.53.40.204) with Microsoft SMTP Server id 14.3.439.0; Fri, 17 Jan 2020
- 08:04:32 +0100
-Received: by gauss2.secunet.de (Postfix, from userid 1000)      id 1215E31801A7;
- Fri, 17 Jan 2020 08:04:32 +0100 (CET)
-Date:   Fri, 17 Jan 2020 08:04:32 +0100
-From:   Steffen Klassert <steffen.klassert@secunet.com>
-To:     Ayush Sawal <ayush.sawal@asicdesigners.com>
-CC:     Herbert Xu <herbert@gondor.apana.org.au>,
-        <linux-crypto@vger.kernel.org>, <manojmalviya@chelsio.com>,
-        Ayush Sawal <ayush.sawal@chelsio.com>, <netdev@vger.kernel.org>
-Subject: Re: Advertise maximum number of sg supported by driver in single
- request
-Message-ID: <20200117070431.GE23018@gauss3.secunet.de>
-References: <20200115060234.4mm6fsmsrryzpymi@gondor.apana.org.au>
- <9fd07805-8e2e-8c3f-6e5e-026ad2102c5a@chelsio.com>
- <c8d64068-a87b-36dd-910d-fb98e09c7e4b@asicdesigners.com>
- <20200117062300.qfngm2degxvjskkt@gondor.apana.org.au>
- <20d97886-e442-ed47-5685-ff5cd9fcbf1c@asicdesigners.com>
+        Fri, 17 Jan 2020 04:39:12 -0500
+Received: from mail-il1-f200.google.com ([209.85.166.200]:39369 "EHLO
+        mail-il1-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728596AbgAQJjL (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 17 Jan 2020 04:39:11 -0500
+Received: by mail-il1-f200.google.com with SMTP id n6so18438281ile.6
+        for <linux-crypto@vger.kernel.org>; Fri, 17 Jan 2020 01:39:11 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=A4/U4UrkTKcxcGAlIspe/ocMHXIdH0kJgqb8CqaSZic=;
+        b=TjnmsN+ZHt/LYR7uZl+fky6wuGSZuTmrEVR8GDOpWhI2OBwcZ09ISICiTwRGY7yIXI
+         c0ka38TLMMCLSlhQp8j5dP/kElMlUg8mU7XLgWp/t8//INw8L7/6tw3PZJqmDiEI2nxm
+         n8UMwtsEdeQsAV82JNMYofAmodGOLxM1ludldQY1dm0jnY1/e3WqdqNPw4T5SW42qT+E
+         fW7I27N2sFn26esRYvcWxlmL1nfXjYQKlK2aB9zvT4Hdw5S1XHqm3ks+AFyUD3qH0N7y
+         bf0mh41FmBDH1/vdbxGQuRNw3BLAarHanhBlmK+n+M6S1fuGIVNLGRKu0FPhBBLDiJXz
+         F9Nw==
+X-Gm-Message-State: APjAAAUN1iO+ixur+VDqyejflV0DtUCAQwtbCuULBNryBaUmEDrb8W78
+        tE/tHchO4fi3T9AZFXd3G5tQdfNF68XkdmyGkNSS3WylGm/+
+X-Google-Smtp-Source: APXvYqzzHR8vGnogFsiE07xYB2aNaD3AJPyjJ2yf2kqHMWgTxoo+rbUTnUtk9KghvrjYg8BG9lV4/4ISO3yT96xk91v3N9E+eeaK
 MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20d97886-e442-ed47-5685-ff5cd9fcbf1c@asicdesigners.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+X-Received: by 2002:a92:88d0:: with SMTP id m77mr2373438ilh.9.1579253950789;
+ Fri, 17 Jan 2020 01:39:10 -0800 (PST)
+Date:   Fri, 17 Jan 2020 01:39:10 -0800
+In-Reply-To: <0000000000003e5aa90598ed7415@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000bf411c059c52b660@google.com>
+Subject: Re: BUG: sleeping function called from invalid context in lock_sock_nested
+From:   syzbot <syzbot+c2f1558d49e25cc36e5e@syzkaller.appspotmail.com>
+To:     andriin@fb.com, ast@kernel.org, bpf@vger.kernel.org,
+        daniel@iogearbox.net, davem@davemloft.net, eric.dumazet@gmail.com,
+        herbert@gondor.apana.org.au, john.fastabend@gmail.com,
+        kafai@fb.com, linux-crypto@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, songliubraving@fb.com,
+        syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk,
+        yhs@fb.com
+Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jan 17, 2020 at 12:13:07PM +0530, Ayush Sawal wrote:
-> Hi Herbert,
-> 
-> On 1/17/2020 11:53 AM, Herbert Xu wrote:
-> > On Thu, Jan 16, 2020 at 01:27:24PM +0530, Ayush Sawal wrote:
-> > > The max data limit is 15 sgs where each sg contains data of mtu size .
-> > > we are running a netperf udp stream test over ipsec tunnel .The ipsec tunnel
-> > > is established between two hosts which are directly connected
-> > Are you actually getting 15-element SG lists from IPsec? What is
-> > generating an skb with 15-element SG lists?
-> we have established the ipsec tunnel in transport mode using ip xfrm.
-> and running traffic using netserver and netperf.
-> 
-> In server side we are running
-> netserver -4
-> In client side we are running
-> "netperf -H <serverip> -p <port> -t UDP_STREAM  -Cc -- -m 21k"
-> where the packet size is 21k ,which is then fragmented into 15 ip fragments
-> each of mtu size.
+syzbot has found a reproducer for the following crash on:
 
-I'm lacking a bit of context here, but this should generate 15 IP
-packets that are encrypted one by one.
+HEAD commit:    93ad0f96 net: wan: lapbether.c: Use built-in RCU list chec..
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=1159eb8ee00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=7e89bd00623fe71e
+dashboard link: https://syzkaller.appspot.com/bug?extid=c2f1558d49e25cc36e5e
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1070cad1e00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17de84a5e00000
+
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+c2f1558d49e25cc36e5e@syzkaller.appspotmail.com
+
+BUG: sleeping function called from invalid context at net/core/sock.c:2935
+in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 3198, name:  
+kworker/0:112
+4 locks held by kworker/0:112/3198:
+  #0: ffff8880aa426d28 ((wq_completion)events){+.+.}, at: __write_once_size  
+include/linux/compiler.h:226 [inline]
+  #0: ffff8880aa426d28 ((wq_completion)events){+.+.}, at: arch_atomic64_set  
+arch/x86/include/asm/atomic64_64.h:34 [inline]
+  #0: ffff8880aa426d28 ((wq_completion)events){+.+.}, at: atomic64_set  
+include/asm-generic/atomic-instrumented.h:855 [inline]
+  #0: ffff8880aa426d28 ((wq_completion)events){+.+.}, at: atomic_long_set  
+include/asm-generic/atomic-long.h:40 [inline]
+  #0: ffff8880aa426d28 ((wq_completion)events){+.+.}, at: set_work_data  
+kernel/workqueue.c:615 [inline]
+  #0: ffff8880aa426d28 ((wq_completion)events){+.+.}, at:  
+set_work_pool_and_clear_pending kernel/workqueue.c:642 [inline]
+  #0: ffff8880aa426d28 ((wq_completion)events){+.+.}, at:  
+process_one_work+0x88b/0x1740 kernel/workqueue.c:2235
+  #1: ffffc9000951fdc0 ((work_completion)(&map->work)){+.+.}, at:  
+process_one_work+0x8c1/0x1740 kernel/workqueue.c:2239
+  #2: ffffffff899a3f00 (rcu_read_lock){....}, at: sock_hash_free+0x0/0x540  
+net/core/sock_map.c:317
+  #3: ffffc90002478d20 (&htab->buckets[i].lock){+...}, at:  
+sock_hash_free+0x131/0x540 net/core/sock_map.c:865
+Preemption disabled at:
+[<ffffffff86341331>] sock_hash_free+0x131/0x540 net/core/sock_map.c:865
+CPU: 0 PID: 3198 Comm: kworker/0:112 Not tainted 5.5.0-rc5-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS  
+Google 01/01/2011
+Workqueue: events bpf_map_free_deferred
+Call Trace:
+  __dump_stack lib/dump_stack.c:77 [inline]
+  dump_stack+0x197/0x210 lib/dump_stack.c:118
+  ___might_sleep.cold+0x1fb/0x23e kernel/sched/core.c:6800
+  __might_sleep+0x95/0x190 kernel/sched/core.c:6753
+  lock_sock_nested+0x39/0x120 net/core/sock.c:2935
+  lock_sock include/net/sock.h:1531 [inline]
+  sock_hash_free+0x29f/0x540 net/core/sock_map.c:868
+  bpf_map_free_deferred+0xb3/0x100 kernel/bpf/syscall.c:327
+  process_one_work+0x9af/0x1740 kernel/workqueue.c:2264
+  worker_thread+0x98/0xe40 kernel/workqueue.c:2410
+  kthread+0x361/0x430 kernel/kthread.c:255
+  ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
+BUG: scheduling while atomic: kworker/0:112/3198/0x00000202
+4 locks held by kworker/0:112/3198:
+  #0: ffff8880aa426d28 ((wq_completion)events){+.+.}, at: __write_once_size  
+include/linux/compiler.h:226 [inline]
+  #0: ffff8880aa426d28 ((wq_completion)events){+.+.}, at: arch_atomic64_set  
+arch/x86/include/asm/atomic64_64.h:34 [inline]
+  #0: ffff8880aa426d28 ((wq_completion)events){+.+.}, at: atomic64_set  
+include/asm-generic/atomic-instrumented.h:855 [inline]
+  #0: ffff8880aa426d28 ((wq_completion)events){+.+.}, at: atomic_long_set  
+include/asm-generic/atomic-long.h:40 [inline]
+  #0: ffff8880aa426d28 ((wq_completion)events){+.+.}, at: set_work_data  
+kernel/workqueue.c:615 [inline]
+  #0: ffff8880aa426d28 ((wq_completion)events){+.+.}, at:  
+set_work_pool_and_clear_pending kernel/workqueue.c:642 [inline]
+  #0: ffff8880aa426d28 ((wq_completion)events){+.+.}, at:  
+process_one_work+0x88b/0x1740 kernel/workqueue.c:2235
+  #1: ffffc9000951fdc0 ((work_completion)(&map->work)){+.+.}, at:  
+process_one_work+0x8c1/0x1740 kernel/workqueue.c:2239
+  #2: ffffffff899a3f00 (rcu_read_lock){....}, at: sock_hash_free+0x0/0x540  
+net/core/sock_map.c:317
+  #3: ffffc90002478d20 (&htab->buckets[i].lock){+...}, at:  
+sock_hash_free+0x131/0x540 net/core/sock_map.c:865
+Modules linked in:
+Preemption disabled at:
+[<ffffffff86341331>] sock_hash_free+0x131/0x540 net/core/sock_map.c:865
 
