@@ -6,65 +6,82 @@ X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 272A6C33CB1
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jan 2020 06:43:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 450EDC33CB1
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jan 2020 07:04:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EE0DF20730
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jan 2020 06:43:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 15DD520728
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jan 2020 07:04:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727008AbgAQGnb (ORCPT
+        id S1727030AbgAQHEf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 Jan 2020 01:43:31 -0500
-Received: from stargate.chelsio.com ([12.32.117.8]:5723 "EHLO
-        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726675AbgAQGnb (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Jan 2020 01:43:31 -0500
-Received: from [10.193.191.49] (ayushsawal.asicdesigners.com [10.193.191.49])
-        by stargate.chelsio.com (8.13.8/8.13.8) with ESMTP id 00H6h97R009989;
-        Thu, 16 Jan 2020 22:43:10 -0800
-Cc:     ayush.sawal@asicdesigners.com, linux-crypto@vger.kernel.org,
-        manojmalviya@chelsio.com, Ayush Sawal <ayush.sawal@chelsio.com>,
-        netdev@vger.kernel.org,
-        Steffen Klassert <steffen.klassert@secunet.com>
+        Fri, 17 Jan 2020 02:04:35 -0500
+Received: from a.mx.secunet.com ([62.96.220.36]:37010 "EHLO a.mx.secunet.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726726AbgAQHEf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 17 Jan 2020 02:04:35 -0500
+Received: from localhost (localhost [127.0.0.1])
+        by a.mx.secunet.com (Postfix) with ESMTP id C64A920411;
+        Fri, 17 Jan 2020 08:04:32 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+        by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id f9YOAIht69iG; Fri, 17 Jan 2020 08:04:32 +0100 (CET)
+Received: from mail-essen-01.secunet.de (mail-essen-01.secunet.de [10.53.40.204])
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by a.mx.secunet.com (Postfix) with ESMTPS id 62956200AC;
+        Fri, 17 Jan 2020 08:04:32 +0100 (CET)
+Received: from gauss2.secunet.de (10.182.7.193) by mail-essen-01.secunet.de
+ (10.53.40.204) with Microsoft SMTP Server id 14.3.439.0; Fri, 17 Jan 2020
+ 08:04:32 +0100
+Received: by gauss2.secunet.de (Postfix, from userid 1000)      id 1215E31801A7;
+ Fri, 17 Jan 2020 08:04:32 +0100 (CET)
+Date:   Fri, 17 Jan 2020 08:04:32 +0100
+From:   Steffen Klassert <steffen.klassert@secunet.com>
+To:     Ayush Sawal <ayush.sawal@asicdesigners.com>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        <linux-crypto@vger.kernel.org>, <manojmalviya@chelsio.com>,
+        Ayush Sawal <ayush.sawal@chelsio.com>, <netdev@vger.kernel.org>
 Subject: Re: Advertise maximum number of sg supported by driver in single
  request
-To:     Herbert Xu <herbert@gondor.apana.org.au>
+Message-ID: <20200117070431.GE23018@gauss3.secunet.de>
 References: <20200115060234.4mm6fsmsrryzpymi@gondor.apana.org.au>
  <9fd07805-8e2e-8c3f-6e5e-026ad2102c5a@chelsio.com>
  <c8d64068-a87b-36dd-910d-fb98e09c7e4b@asicdesigners.com>
  <20200117062300.qfngm2degxvjskkt@gondor.apana.org.au>
-From:   Ayush Sawal <ayush.sawal@asicdesigners.com>
-Message-ID: <20d97886-e442-ed47-5685-ff5cd9fcbf1c@asicdesigners.com>
-Date:   Fri, 17 Jan 2020 12:13:07 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ <20d97886-e442-ed47-5685-ff5cd9fcbf1c@asicdesigners.com>
 MIME-Version: 1.0
-In-Reply-To: <20200117062300.qfngm2degxvjskkt@gondor.apana.org.au>
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+In-Reply-To: <20d97886-e442-ed47-5685-ff5cd9fcbf1c@asicdesigners.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Herbert,
+On Fri, Jan 17, 2020 at 12:13:07PM +0530, Ayush Sawal wrote:
+> Hi Herbert,
+> 
+> On 1/17/2020 11:53 AM, Herbert Xu wrote:
+> > On Thu, Jan 16, 2020 at 01:27:24PM +0530, Ayush Sawal wrote:
+> > > The max data limit is 15 sgs where each sg contains data of mtu size .
+> > > we are running a netperf udp stream test over ipsec tunnel .The ipsec tunnel
+> > > is established between two hosts which are directly connected
+> > Are you actually getting 15-element SG lists from IPsec? What is
+> > generating an skb with 15-element SG lists?
+> we have established the ipsec tunnel in transport mode using ip xfrm.
+> and running traffic using netserver and netperf.
+> 
+> In server side we are running
+> netserver -4
+> In client side we are running
+> "netperf -H <serverip> -p <port> -t UDP_STREAM  -Cc -- -m 21k"
+> where the packet size is 21k ,which is then fragmented into 15 ip fragments
+> each of mtu size.
 
-On 1/17/2020 11:53 AM, Herbert Xu wrote:
-> On Thu, Jan 16, 2020 at 01:27:24PM +0530, Ayush Sawal wrote:
->> The max data limit is 15 sgs where each sg contains data of mtu size .
->> we are running a netperf udp stream test over ipsec tunnel .The ipsec tunnel
->> is established between two hosts which are directly connected
-> Are you actually getting 15-element SG lists from IPsec? What is
-> generating an skb with 15-element SG lists?
-we have established the ipsec tunnel in transport mode using ip xfrm.
-and running traffic using netserver and netperf.
+I'm lacking a bit of context here, but this should generate 15 IP
+packets that are encrypted one by one.
 
-In server side we are running
-netserver -4
-In client side we are running
-"netperf -H <serverip> -p <port> -t UDP_STREAMÂ  -Cc -- -m 21k"
-where the packet size is 21k ,which is then fragmented into 15 ip 
-fragments each of mtu size.
-The mtu size currently is 1500bytes.
