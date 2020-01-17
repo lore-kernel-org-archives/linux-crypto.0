@@ -2,81 +2,93 @@ Return-Path: <SRS0=A/Go=3G=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33EC5C33CB1
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jan 2020 10:42:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FE25C33CB1
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jan 2020 10:59:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DBE282082F
-	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jan 2020 10:42:30 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="1JrRf0nB"
+	by mail.kernel.org (Postfix) with ESMTP id 5C7CF2072B
+	for <linux-crypto@archiver.kernel.org>; Fri, 17 Jan 2020 10:59:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726362AbgAQKma (ORCPT
+        id S1726362AbgAQK7J (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 17 Jan 2020 05:42:30 -0500
-Received: from frisell.zx2c4.com ([192.95.5.64]:56425 "EHLO frisell.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726196AbgAQKma (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 17 Jan 2020 05:42:30 -0500
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 4e386738;
-        Fri, 17 Jan 2020 09:42:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=from:to:cc
-        :subject:date:message-id:mime-version:content-transfer-encoding;
-         s=mail; bh=Ew3xej6KngIGHQvI5TbFIQsPzpg=; b=1JrRf0nBvixM+O8MiTwy
-        j7bEWRRvYmA5UKRdKTstvGTqC0kWwtbq/cdhSrxPpGW6ZLH3WAcN1dkAvk8kivUY
-        DSdda9bB+QeteUEUtEe301nw9389uaNhJl46TKmfW+teD/bBk1Nb0J4vX349/tfX
-        /rNtWETNwNw8mUL79vUgoU0EAJcFd9DGqNIg4BOnA1O6xiAn+rWgvWZgKGoFKVKp
-        xZsbAnMfSodG4h97jaO+/icmdycv1OjtHmtCbMcBHiL2g33kheNDQOl70aOhHaCv
-        dvWOpxiyoWFCDJiaZbnLjxUdU6tykniCm80YnD1SChsR3j1sh3jS04A8U/Jl3yYs
-        7w==
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 379364e0 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
-        Fri, 17 Jan 2020 09:42:03 +0000 (UTC)
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Subject: [PATCH] crypto: x86/poly1305 - emit does base conversion itself
-Date:   Fri, 17 Jan 2020 11:42:22 +0100
-Message-Id: <20200117104222.303112-1-Jason@zx2c4.com>
+        Fri, 17 Jan 2020 05:59:09 -0500
+Received: from stargate.chelsio.com ([12.32.117.8]:24445 "EHLO
+        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726196AbgAQK7J (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 17 Jan 2020 05:59:09 -0500
+Received: from [10.193.191.49] (ayushsawal.asicdesigners.com [10.193.191.49])
+        by stargate.chelsio.com (8.13.8/8.13.8) with ESMTP id 00HAwurF011014;
+        Fri, 17 Jan 2020 02:58:56 -0800
+Cc:     ayush.sawal@asicdesigners.com,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, manojmalviya@chelsio.com,
+        Ayush Sawal <ayush.sawal@chelsio.com>, netdev@vger.kernel.org
+Subject: Re: Advertise maximum number of sg supported by driver in single
+ request
+To:     Steffen Klassert <steffen.klassert@secunet.com>
+References: <20200115060234.4mm6fsmsrryzpymi@gondor.apana.org.au>
+ <9fd07805-8e2e-8c3f-6e5e-026ad2102c5a@chelsio.com>
+ <c8d64068-a87b-36dd-910d-fb98e09c7e4b@asicdesigners.com>
+ <20200117062300.qfngm2degxvjskkt@gondor.apana.org.au>
+ <20d97886-e442-ed47-5685-ff5cd9fcbf1c@asicdesigners.com>
+ <20200117070431.GE23018@gauss3.secunet.de>
+From:   Ayush Sawal <ayush.sawal@asicdesigners.com>
+Message-ID: <318fd818-0135-8387-6695-6f9ba2a6f28e@asicdesigners.com>
+Date:   Fri, 17 Jan 2020 16:28:54 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
+In-Reply-To: <20200117070431.GE23018@gauss3.secunet.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The emit code does optional base conversion itself in assembly, so we
-don't need to do that here. Also, neither one of these functions uses
-simd instructions, so checking for that doesn't make sense either.
+Hi steffen,
 
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
----
- arch/x86/crypto/poly1305_glue.c | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
+On 1/17/2020 12:34 PM, Steffen Klassert wrote:
+> On Fri, Jan 17, 2020 at 12:13:07PM +0530, Ayush Sawal wrote:
+>> Hi Herbert,
+>>
+>> On 1/17/2020 11:53 AM, Herbert Xu wrote:
+>>> On Thu, Jan 16, 2020 at 01:27:24PM +0530, Ayush Sawal wrote:
+>>>> The max data limit is 15 sgs where each sg contains data of mtu size .
+>>>> we are running a netperf udp stream test over ipsec tunnel .The ipsec tunnel
+>>>> is established between two hosts which are directly connected
+>>> Are you actually getting 15-element SG lists from IPsec? What is
+>>> generating an skb with 15-element SG lists?
+>> we have established the ipsec tunnel in transport mode using ip xfrm.
+>> and running traffic using netserver and netperf.
+>>
+>> In server side we are running
+>> netserver -4
+>> In client side we are running
+>> "netperf -H <serverip> -p <port> -t UDP_STREAM  -Cc -- -m 21k"
+>> where the packet size is 21k ,which is then fragmented into 15 ip fragments
+>> each of mtu size.
+> I'm lacking a bit of context here, but this should generate 15 IP
+> packets that are encrypted one by one.
+This is what i observed ,please correct me if i am wrong.
+The packet when reaches esp_output(),is in socket buffer and based on 
+the number of frags ,sg is initialized  using
+sg_init_table(sg,frags),where frags are 15 in our case.
 
-diff --git a/arch/x86/crypto/poly1305_glue.c b/arch/x86/crypto/poly1305_glue.c
-index 657363588e0c..79bb58737d52 100644
---- a/arch/x86/crypto/poly1305_glue.c
-+++ b/arch/x86/crypto/poly1305_glue.c
-@@ -123,13 +123,9 @@ static void poly1305_simd_blocks(void *ctx, const u8 *inp, size_t len,
- static void poly1305_simd_emit(void *ctx, u8 mac[POLY1305_DIGEST_SIZE],
- 			       const u32 nonce[4])
- {
--	struct poly1305_arch_internal *state = ctx;
--
--	if (!IS_ENABLED(CONFIG_AS_AVX) || !static_branch_likely(&poly1305_use_avx) ||
--	    !state->is_base2_26 || !crypto_simd_usable()) {
--		convert_to_base2_64(ctx);
-+	if (!IS_ENABLED(CONFIG_AS_AVX) || !static_branch_likely(&poly1305_use_avx))
- 		poly1305_emit_x86_64(ctx, mac, nonce);
--	} else
-+	else
- 		poly1305_emit_avx(ctx, mac, nonce);
- }
- 
--- 
-2.24.1
+The socket buffer data is then copied to this sg and then struct 
+aead_request members are filled.
+After this crypto aead request which contains all data in its sg list 
+goes to hw crypto driver for encryption in a single request.
+
+In the crypto driver we are receiving a single aead-request with all 15 
+sgs in that request.
+
+Thanks,
+
+Ayush
 
