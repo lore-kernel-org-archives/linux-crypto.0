@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=DATE_IN_PAST_06_12,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_RHS_DOB
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 128E4C33CB8
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jan 2020 07:02:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9780C33CA1
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jan 2020 07:02:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CA195207E0
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jan 2020 07:02:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AB05B207E0
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jan 2020 07:02:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="E1xkvN2I"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="FJxEILRa"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728748AbgATHCL (ORCPT
+        id S1726798AbgATHCQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Jan 2020 02:02:11 -0500
-Received: from mo4-p04-ob.smtp.rzone.de ([85.215.255.122]:14792 "EHLO
-        mo4-p04-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726089AbgATHCK (ORCPT
+        Mon, 20 Jan 2020 02:02:16 -0500
+Received: from mo4-p02-ob.smtp.rzone.de ([81.169.146.170]:13586 "EHLO
+        mo4-p02-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728792AbgATHCO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Jan 2020 02:02:10 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1579503726;
+        Mon, 20 Jan 2020 02:02:14 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1579503732;
         s=strato-dkim-0002; d=chronox.de;
         h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
         X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=SL76R+x3xnCbsccg0UNdJ64H0iNg82brAV2uASaraaY=;
-        b=E1xkvN2IfHSTRqi8Uu1zPpYWwPmDqQTcTPypQaFYd2F8Hf5tjvhHgMqJWdiNPJpRAA
-        oILShjHQ74wDJoogfN7vjCS/9W4jaRLVbbHKYA3K8L2GcfURWq8D6BoDX0auftD88ga6
-        b4npKGqwzlSb2GbuXXSpzkzb8WqAVx0yc0jgORVrSDinCSznBF/yVMwPx6lM2JRwjd9z
-        T4fWCAJlbAf0zy2/uqm0XiiK2CNpJIw6yC4qD5kj9vOxNCSozPNKBYISUMijv9UThjWV
-        nYgD4pjjCLGh0Zews+tIshRVG40e0zboh9vhdBeL5YGw6f82ENyKhp1gXXIDyWgC5F4D
-        J+sQ==
+        bh=uv5/qJz3bbCyj/3JHIEm1nTmUxNp25UGkL+SIFAEE3g=;
+        b=FJxEILRa0USHXZjA/tifthHCddXnOwEPi57foEzO2EL/xeSKj8MAowIXG+sxvzu2jj
+        8sVyBOmJcIbfUf4IZZhiGMxKgUBAGjH0M1BqhWZdsJbHa32PNtu2kujY9rgEXtcrRW8s
+        r7bYB8LljvKDVRJ8NemsNxP4JGNqmMq4/AoWXql+RlzxZdLi/G3VkpLyZaGbNK7Xan5i
+        g4vStGeuE89GUNIYHTdahRYmy4ecJ6LLvXC+YTO5q/OtAIweAVrqzeEVxbdfEtE8rup9
+        TCF/MP41o+3XWDH3eHJQ7TGWAtO91p+FwbgAuu03DnxDR1EsVAkvrHG1871FDMv2niIV
+        o5lQ==
 X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaJvSfTe7W"
 X-RZG-CLASS-ID: mo00
 Received: from positron.chronox.de
         by smtp.strato.de (RZmta 46.1.4 DYNA|AUTH)
-        with ESMTPSA id u04585w0K6xoqZQ
+        with ESMTPSA id u04585w0K6xjqZK
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
         (Client did not present a certificate);
-        Mon, 20 Jan 2020 07:59:50 +0100 (CET)
+        Mon, 20 Jan 2020 07:59:45 +0100 (CET)
 From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
 To:     Arnd Bergmann <arnd@arndb.de>
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -68,9 +68,9 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Randy Dunlap <rdunlap@infradead.org>,
         Julia Lawall <julia.lawall@inria.fr>,
         Dan Carpenter <dan.carpenter@oracle.com>
-Subject: [PATCH v29 07/12] LRNG - add kernel crypto API PRNG extension
-Date:   Sun, 19 Jan 2020 22:16:43 +0100
-Message-ID: <20041252.vrp9WXmmXk@positron.chronox.de>
+Subject: [PATCH v29 11/12] LRNG - add interface for gathering of raw entropy
+Date:   Sun, 19 Jan 2020 22:19:02 +0100
+Message-ID: <6391226.MlAH9Dbcxa@positron.chronox.de>
 In-Reply-To: <1967138.dxe05VgvIB@positron.chronox.de>
 References: <6157374.ptSnyUpaCn@positron.chronox.de> <5951792.lmNsirYsPE@positron.chronox.de> <1967138.dxe05VgvIB@positron.chronox.de>
 MIME-Version: 1.0
@@ -81,18 +81,23 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add runtime-pluggable support for all PRNGs that are accessible via
-the kernel crypto API, including hardware PRNGs. The PRNG is selected
-with the module parameter drng_name where the name must be one that the
-kernel crypto API can resolve into an RNG.
+The test interface allows a privileged process to capture the raw
+unconditioned noise that is collected by the LRNG for statistical
+analysis. Such testing allows the analysis how much entropy
+the interrupt noise source provides on a given platform.
+Extracted noise data is not used to seed the LRNG. This
+is a test interface and not appropriate for production systems.
+Yet, the interface is considered to be sufficiently secured for
+production systems.
 
-This allows using of the kernel crypto API PRNG implementations that
-provide an interface to hardware PRNGs. Using this extension,
-the LRNG uses the hardware PRNGs to generate random numbers. An
-example is the S390 CPACF support providing such a PRNG.
+Access to the data is given through the lrng_raw debugfs file. The
+data buffer should be multiples of sizeof(u32) to fill the entire
+buffer. Using the option lrng_testing.boot_test=3D1 the raw noise of
+the first 1000 entropy events since boot can be sampled.
 
-The hash is provided by a kernel crypto API SHASH whose digest size
-complies with the seedsize of the PRNG.
+This test interface allows generating the data required for
+analysis whether the LRNG is in compliance with SP800-90B
+sections 3.1.3 and 3.1.4.
 
 CC: "Eric W. Biederman" <ebiederm@xmission.com>
 CC: "Alexander E. Patrakov" <patrakov@gmail.com>
@@ -110,385 +115,331 @@ CC: Andy Lutomirski <luto@kernel.org>
 CC: Florian Weimer <fweimer@redhat.com>
 CC: Lennart Poettering <mzxreary@0pointer.de>
 CC: Nicolai Stange <nstange@suse.de>
-Reviewed-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
 Reviewed-by: Roman Drahtmueller <draht@schaltsekun.de>
 Tested-by: Roman Drahtm=FCller <draht@schaltsekun.de>
 Tested-by: Marcelo Henrique Cerri <marcelo.cerri@canonical.com>
 Tested-by: Neil Horman <nhorman@redhat.com>
 Signed-off-by: Stephan Mueller <smueller@chronox.de>
 =2D--
- drivers/char/lrng/Kconfig      |  11 ++
- drivers/char/lrng/Makefile     |   1 +
- drivers/char/lrng/lrng_kcapi.c | 321 +++++++++++++++++++++++++++++++++
- 3 files changed, 333 insertions(+)
- create mode 100644 drivers/char/lrng/lrng_kcapi.c
+ drivers/char/lrng/Kconfig        |  16 ++
+ drivers/char/lrng/Makefile       |   1 +
+ drivers/char/lrng/lrng_testing.c | 269 +++++++++++++++++++++++++++++++
+ 3 files changed, 286 insertions(+)
+ create mode 100644 drivers/char/lrng/lrng_testing.c
 
 diff --git a/drivers/char/lrng/Kconfig b/drivers/char/lrng/Kconfig
-index b32442484823..7afc965a4d52 100644
+index 323c657f7005..014ee82df79a 100644
 =2D-- a/drivers/char/lrng/Kconfig
 +++ b/drivers/char/lrng/Kconfig
-@@ -81,6 +81,17 @@ config LRNG_DRBG
- 	  Enable the SP800-90A DRBG support for the LRNG. Once the
- 	  module is loaded, output from /dev/random, /dev/urandom,
- 	  getrandom(2), or get_random_bytes is provided by a DRBG.
-+
-+config LRNG_KCAPI
-+	tristate "Kernel Crypto API support for the LRNG"
-+	depends on CRYPTO
-+	select CRYPTO_RNG
-+	help
-+	  Enable the support for generic pseudo-random number
-+	  generators offered by the kernel crypto API with the
-+	  LRNG. Once the module is loaded, output from /dev/random,
-+	  /dev/urandom, getrandom(2), or get_random_bytes is
-+	  provided by the selected kernel crypto API RNG.
- endif # LRNG_DRNG_SWITCH
+@@ -162,4 +162,20 @@ config LRNG_APT_CUTOFF
+ 	default 325 if !LRNG_APT_BROKEN
+ 	default 32 if LRNG_APT_BROKEN
 =20
++config LRNG_TESTING
++	bool "Enable entropy test interface to LRNG noise source"
++	depends on DEBUG_FS
++	help
++	  The test interface allows a privileged process to capture
++	  the raw unconditioned noise that is collected by the LRNG
++	  for statistical analysis. Extracted noise data is not used
++	  to seed the LRNG.
++
++	  The raw noise data can be obtained using the lrng_raw
++	  debugfs file. Using the option lrng_testing.boot_test=3D1
++	  the raw noise of the first 1000 entropy events since boot
++	  can be sampled.
++
++	  If unsure, say N.
++
  endif # LRNG
 diff --git a/drivers/char/lrng/Makefile b/drivers/char/lrng/Makefile
-index 0d320fcb7b9e..94b2dfb2dfdb 100644
+index c3008763dd14..b2ce1979dc4b 100644
 =2D-- a/drivers/char/lrng/Makefile
 +++ b/drivers/char/lrng/Makefile
-@@ -12,3 +12,4 @@ obj-$(CONFIG_NUMA)		+=3D lrng_numa.o
- obj-$(CONFIG_SYSCTL)		+=3D lrng_proc.o
- obj-$(CONFIG_LRNG_DRNG_SWITCH)	+=3D lrng_switch.o
- obj-$(CONFIG_LRNG_DRBG)		+=3D lrng_drbg.o
-+obj-$(CONFIG_LRNG_KCAPI)	+=3D lrng_kcapi.o
-diff --git a/drivers/char/lrng/lrng_kcapi.c b/drivers/char/lrng/lrng_kcapi.c
+@@ -15,3 +15,4 @@ obj-$(CONFIG_LRNG_DRBG)		+=3D lrng_drbg.o
+ obj-$(CONFIG_LRNG_KCAPI)	+=3D lrng_kcapi.o
+ obj-$(CONFIG_LRNG_JENT)		+=3D lrng_jent.o
+ obj-$(CONFIG_LRNG_HEALTH_TESTS)	+=3D lrng_health.o
++obj-$(CONFIG_LRNG_TESTING)	+=3D lrng_testing.o
+diff --git a/drivers/char/lrng/lrng_testing.c b/drivers/char/lrng/lrng_test=
+ing.c
 new file mode 100644
-index 000000000000..482f31627422
+index 000000000000..996fc665a0a0
 =2D-- /dev/null
-+++ b/drivers/char/lrng/lrng_kcapi.c
-@@ -0,0 +1,321 @@
++++ b/drivers/char/lrng/lrng_testing.c
+@@ -0,0 +1,269 @@
 +// SPDX-License-Identifier: GPL-2.0 OR BSD-2-Clause
 +/*
-+ * Backend for the LRNG providing the cryptographic primitives using the
-+ * kernel crypto API.
++ * Linux Random Number Generator (LRNG) Raw entropy collection tool
 + *
-+ * Copyright (C) 2018 - 2020, Stephan Mueller <smueller@chronox.de>
++ * Copyright (C) 2019 - 2020, Stephan Mueller <smueller@chronox.de>
 + */
 +
 +#define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 +
-+#include <crypto/hash.h>
-+#include <crypto/rng.h>
-+#include <linux/init.h>
++#include <linux/atomic.h>
++#include <linux/bug.h>
++#include <linux/debugfs.h>
 +#include <linux/module.h>
-+#include <linux/lrng.h>
++#include <linux/sched.h>
++#include <linux/sched/signal.h>
++#include <linux/slab.h>
++#include <linux/string.h>
++#include <linux/types.h>
++#include <linux/uaccess.h>
++#include <linux/workqueue.h>
++#include <asm/errno.h>
 +
-+static char *drng_name =3D NULL;
-+module_param(drng_name, charp, 0444);
-+MODULE_PARM_DESC(drng_name, "Kernel crypto API name of DRNG");
++#include "lrng_internal.h"
 +
-+static char *pool_hash =3D "sha512";
-+module_param(pool_hash, charp, 0444);
-+MODULE_PARM_DESC(pool_hash,
-+		 "Kernel crypto API name of hash or keyed message digest to read the ent=
-ropy pool");
++#define LRNG_TESTING_RINGBUFFER_SIZE	1024
++#define LRNG_TESTING_RINGBUFFER_MASK	(LRNG_TESTING_RINGBUFFER_SIZE - 1)
 +
-+static char *seed_hash =3D NULL;
-+module_param(seed_hash, charp, 0444);
-+MODULE_PARM_DESC(seed_hash,
-+		 "Kernel crypto API name of hash with output size equal to seedsize of D=
-RNG to bring seed string to the size required by the DRNG");
++static u32 lrng_testing_rb[LRNG_TESTING_RINGBUFFER_SIZE];
++static u32 lrng_rb_reader =3D 0;
++static u32 lrng_rb_writer =3D 0;
++static atomic_t lrng_testing_enabled =3D ATOMIC_INIT(0);
 +
-+struct lrng_hash_info {
-+	struct shash_desc shash;
-+	char ctx[];
-+};
++static DECLARE_WAIT_QUEUE_HEAD(lrng_raw_read_wait);
++static DEFINE_SPINLOCK(lrng_raw_lock);
 +
-+struct lrng_drng_info {
-+	struct crypto_rng *kcapi_rng;
-+	struct lrng_hash_info *lrng_hash;
-+};
++/*
++ * 0 =3D=3D> No boot test, gathering of runtime data allowed
++ * 1 =3D=3D> Boot test enabled and ready for collecting data, gathering ru=
+ntime
++ *	 data is disabled
++ * 2 =3D=3D> Boot test completed and disabled, gathering of runtime data is
++ *	 disabled
++ */
++static u32 boot_test =3D 0;
++module_param(boot_test, uint, 0644);
++MODULE_PARM_DESC(boot_test, "Enable gathering boot time entropy of the fir=
+st entropy events");
 +
-+static struct lrng_hash_info *_lrng_kcapi_hash_alloc(const char *name)
++static inline void lrng_raw_entropy_reset(void)
 +{
-+	struct lrng_hash_info *lrng_hash;
-+	struct crypto_shash *tfm;
-+	int size;
++	unsigned long flags;
 +
-+	if (!name) {
-+		pr_err("Hash name missing\n");
-+		return ERR_PTR(-EINVAL);
-+	}
-+
-+	tfm =3D crypto_alloc_shash(name, 0, 0);
-+	if (IS_ERR(tfm)) {
-+		pr_err("could not allocate hash %s\n", name);
-+		return ERR_CAST(tfm);
-+	}
-+
-+	size =3D sizeof(struct lrng_hash_info) + crypto_shash_descsize(tfm);
-+	lrng_hash =3D kmalloc(size, GFP_KERNEL);
-+	if (!lrng_hash) {
-+		crypto_free_shash(tfm);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	lrng_hash->shash.tfm =3D tfm;
-+
-+	return lrng_hash;
++	spin_lock_irqsave(&lrng_raw_lock, flags);
++	lrng_rb_reader =3D 0;
++	lrng_rb_writer =3D 0;
++	spin_unlock_irqrestore(&lrng_raw_lock, flags);
 +}
 +
-+static inline u32 _lrng_kcapi_hash_digestsize(struct lrng_hash_info *lrng_=
-hash)
++static void lrng_raw_entropy_init(void)
 +{
-+	struct shash_desc *shash =3D &lrng_hash->shash;
-+	struct crypto_shash *tfm =3D shash->tfm;
++	/*
++	 * The boot time testing implies we have a running test. If the
++	 * caller wants to clear it, he has to unset the boot_test flag
++	 * at runtime via sysfs to enable regular runtime testing
++	 */
++	if (boot_test)
++		return;
 +
-+	return crypto_shash_digestsize(tfm);
++	lrng_raw_entropy_reset();
++	atomic_set(&lrng_testing_enabled, 1);
++	pr_warn("Enabling raw entropy collection\n");
 +}
 +
-+static inline void _lrng_kcapi_hash_free(struct lrng_hash_info *lrng_hash)
++static void lrng_raw_entropy_fini(void)
 +{
-+	struct shash_desc *shash =3D &lrng_hash->shash;
-+	struct crypto_shash *tfm =3D shash->tfm;
++	if (boot_test)
++		return;
 +
-+	crypto_free_shash(tfm);
-+	kfree(lrng_hash);
++	atomic_set(&lrng_testing_enabled, 0);
++	lrng_raw_entropy_reset();
++	pr_warn("Disabling raw entropy collection\n");
 +}
 +
-+static void *lrng_kcapi_hash_alloc(const u8 *key, u32 keylen)
++bool lrng_raw_entropy_store(u32 value)
 +{
-+	struct lrng_hash_info *lrng_hash;
-+	int ret;
++	unsigned long flags;
 +
-+	lrng_hash =3D _lrng_kcapi_hash_alloc(pool_hash);
-+	if (IS_ERR(lrng_hash))
-+		return ERR_CAST(lrng_hash);
++	if (!atomic_read(&lrng_testing_enabled) && (boot_test !=3D 1))
++		return false;
 +
-+	/* If the used hash is no MAC, ignore the ENOSYS return code */
-+	ret =3D crypto_shash_setkey(lrng_hash->shash.tfm, key, keylen);
-+	if (ret && ret !=3D -ENOSYS) {
-+		pr_err("could not set the key for MAC\n");
-+		_lrng_kcapi_hash_free(lrng_hash);
-+		return ERR_PTR(ret);
++	spin_lock_irqsave(&lrng_raw_lock, flags);
++
++	/*
++	 * Disable entropy testing for boot time testing after ring buffer
++	 * is filled.
++	 */
++	if (boot_test) {
++		if (lrng_rb_writer > LRNG_TESTING_RINGBUFFER_SIZE) {
++			boot_test =3D 2;
++			pr_warn_once("Boot time entropy collection test disabled\n");
++			spin_unlock_irqrestore(&lrng_raw_lock, flags);
++			return false;
++		}
++
++		if (lrng_rb_writer =3D=3D 1)
++			pr_warn("Boot time entropy collection test enabled\n");
 +	}
 +
-+	pr_info("Hash %s allocated\n", pool_hash);
++	lrng_testing_rb[lrng_rb_writer & LRNG_TESTING_RINGBUFFER_MASK] =3D value;
++	lrng_rb_writer++;
 +
-+	return lrng_hash;
++	spin_unlock_irqrestore(&lrng_raw_lock, flags);
++
++	if (wq_has_sleeper(&lrng_raw_read_wait))
++		wake_up_interruptible(&lrng_raw_read_wait);
++
++	return true;
 +}
 +
-+static void lrng_kcapi_hash_dealloc(void *hash)
++static inline bool lrng_raw_have_data(void)
 +{
-+	struct lrng_hash_info *lrng_hash =3D (struct lrng_hash_info *)hash;
-+
-+	_lrng_kcapi_hash_free(lrng_hash);
-+	pr_info("Hash %s deallocated\n", pool_hash);
++	return ((lrng_rb_writer & LRNG_TESTING_RINGBUFFER_MASK) !=3D
++		 (lrng_rb_reader & LRNG_TESTING_RINGBUFFER_MASK));
 +}
 +
-+static u32 lrng_kcapi_hash_digestsize(void *hash)
++static int lrng_raw_entropy_reader(u8 *outbuf, u32 outbuflen)
 +{
-+	struct lrng_hash_info *lrng_hash =3D (struct lrng_hash_info *)hash;
++	unsigned long flags;
++	int collected_data =3D 0;
 +
-+	return _lrng_kcapi_hash_digestsize(lrng_hash);
-+}
++	lrng_raw_entropy_init();
 +
-+static int lrng_kcapi_hash_buffer(void *hash, const u8 *inbuf, u32 inbufle=
-n,
-+				  u8 *digest)
-+{
-+	struct lrng_hash_info *lrng_hash =3D (struct lrng_hash_info *)hash;
-+	struct shash_desc *shash =3D &lrng_hash->shash;
++	while (outbuflen) {
++		spin_lock_irqsave(&lrng_raw_lock, flags);
 +
-+	return crypto_shash_digest(shash, inbuf, inbuflen, digest);
-+}
++		/* We have no data or reached the writer. */
++		if (!lrng_rb_writer || (lrng_rb_writer =3D=3D lrng_rb_reader)) {
 +
-+static int lrng_kcapi_drng_seed_helper(void *drng, const u8 *inbuf,
-+				       u32 inbuflen)
-+{
-+	struct lrng_drng_info *lrng_drng_info =3D (struct lrng_drng_info *)drng;
-+	struct crypto_rng *kcapi_rng =3D lrng_drng_info->kcapi_rng;
-+	struct lrng_hash_info *lrng_hash =3D lrng_drng_info->lrng_hash;
++			spin_unlock_irqrestore(&lrng_raw_lock, flags);
 +
-+	if (lrng_hash) {
-+		struct shash_desc *shash =3D &lrng_hash->shash;
-+		u32 digestsize =3D _lrng_kcapi_hash_digestsize(lrng_hash);
-+		u8 digest[64] __aligned(8);
-+		int ret;
++			/*
++			 * Now we gathered all boot data, enable regular data
++			 * collection.
++			 */
++			if (boot_test) {
++				boot_test =3D 0;
++				goto out;
++			}
 +
-+		BUG_ON(digestsize > sizeof(digest));
++			wait_event_interruptible(lrng_raw_read_wait,
++						 lrng_raw_have_data());
++			if (signal_pending(current)) {
++				collected_data =3D -ERESTARTSYS;
++				goto out;
++			}
 +
-+		ret =3D crypto_shash_digest(shash, inbuf, inbuflen, digest);
-+		if (ret)
-+			return ret;
++			continue;
++		}
 +
-+		ret =3D crypto_rng_reset(kcapi_rng, digest, digestsize);
-+		if (ret)
-+			return ret;
++		/* We copy out word-wise */
++		if (outbuflen < sizeof(u32)) {
++			spin_unlock_irqrestore(&lrng_raw_lock, flags);
++			goto out;
++		}
 +
-+		memzero_explicit(digest, digestsize);
++		memcpy(outbuf, &lrng_testing_rb[lrng_rb_reader], sizeof(u32));
++		lrng_rb_reader++;
 +
-+		return 0;
-+	} else {
-+		return crypto_rng_reset(kcapi_rng, inbuf, inbuflen);
-+	}
-+}
++		spin_unlock_irqrestore(&lrng_raw_lock, flags);
 +
-+static int lrng_kcapi_drng_generate_helper(void *drng, u8 *outbuf,
-+					   u32 outbuflen)
-+{
-+	struct lrng_drng_info *lrng_drng_info =3D (struct lrng_drng_info *)drng;
-+	struct crypto_rng *kcapi_rng =3D lrng_drng_info->kcapi_rng;
-+	int ret =3D crypto_rng_get_bytes(kcapi_rng, outbuf, outbuflen);
-+
-+	if (ret < 0)
-+		return ret;
-+
-+	return outbuflen;
-+}
-+
-+static void *lrng_kcapi_drng_alloc(u32 sec_strength)
-+{
-+	struct lrng_drng_info *lrng_drng_info;
-+	struct crypto_rng *kcapi_rng;
-+	int seedsize;
-+	void *ret =3D  ERR_PTR(-ENOMEM);
-+
-+	if (!drng_name) {
-+		pr_err("DRNG name missing\n");
-+		return ERR_PTR(-EINVAL);
++		outbuf +=3D sizeof(u32);
++		outbuflen -=3D sizeof(u32);
++		collected_data +=3D sizeof(u32);
 +	}
 +
-+	if (!memcmp(drng_name, "drbg", 4)) {
-+		pr_err("SP800-90A DRBG cannot be allocated using lrng_kcapi backend, use=
- lrng_drbg backend instead\n");
-+		return ERR_PTR(-EINVAL);
-+	}
++out:
++	lrng_raw_entropy_fini();
++	return collected_data;
++}
 +
-+	if (!memcmp(drng_name, "stdrng", 6)) {
-+		pr_err("stdrng cannot be allocated using lrng_kcapi backend, it is too u=
-nspecific and potentially may allocate the DRBG\n");
-+		return ERR_PTR(-EINVAL);
-+	}
++/**************************************************************************
++ * Debugfs interface
++ *************************************************************************=
+*/
++static int lrng_raw_extract_user(char __user *buf, size_t nbytes)
++{
++	u8 *tmp, *tmp_aligned;
++	int ret =3D 0, large_request =3D (nbytes > 256);
 +
-+	lrng_drng_info =3D kmalloc(sizeof(*lrng_drng_info), GFP_KERNEL);
-+	if (!lrng_drng_info)
-+		return ERR_PTR(-ENOMEM);
++	/*
++	 * The intention of this interface is for collecting at least
++	 * 1000 samples due to the SP800-90B requirements. So, we make no
++	 * effort in avoiding allocating more memory that actually needed
++	 * by the user. Hence, we allocate sufficient memory to always hold
++	 * that amount of data.
++	 */
++	tmp =3D kmalloc(LRNG_TESTING_RINGBUFFER_SIZE + sizeof(u32), GFP_KERNEL);
++	if (!tmp)
++		return -ENOMEM;
 +
-+	kcapi_rng =3D crypto_alloc_rng(drng_name, 0, 0);
-+	if (IS_ERR(kcapi_rng)) {
-+		pr_err("DRNG %s cannot be allocated\n", drng_name);
-+		ret =3D ERR_CAST(kcapi_rng);
-+		goto free;
-+	}
-+	lrng_drng_info->kcapi_rng =3D kcapi_rng;
++	tmp_aligned =3D PTR_ALIGN(tmp, sizeof(u32));
 +
-+	seedsize =3D  crypto_rng_seedsize(kcapi_rng);
++	while (nbytes) {
++		int i;
 +
-+	if (sec_strength > seedsize)
-+		pr_info("Seedsize DRNG (%u bits) lower than security strength of LRNG no=
-ise source (%u bits)\n",
-+			crypto_rng_seedsize(kcapi_rng) * 8, sec_strength * 8);
-+
-+	if (seedsize) {
-+		struct lrng_hash_info *lrng_hash;
-+
-+		if (!seed_hash) {
-+			switch (seedsize) {
-+			case 32:
-+				seed_hash =3D "sha256";
-+				break;
-+			case 48:
-+				seed_hash =3D "sha384";
-+				break;
-+			case 64:
-+				seed_hash =3D "sha512";
-+				break;
-+			default:
-+				pr_err("Seed size %d cannot be processed\n",
-+				       seedsize);
-+				goto dealloc;
++		if (large_request && need_resched()) {
++			if (signal_pending(current)) {
++				if (ret =3D=3D 0)
++					ret =3D -ERESTARTSYS;
 +				break;
 +			}
++			schedule();
 +		}
 +
-+		lrng_hash =3D _lrng_kcapi_hash_alloc(seed_hash);
-+		if (IS_ERR(lrng_hash)) {
-+			ret =3D ERR_CAST(lrng_hash);
-+			goto dealloc;
++		i =3D min_t(int, nbytes, LRNG_TESTING_RINGBUFFER_SIZE);
++		i =3D lrng_raw_entropy_reader(tmp_aligned, i);
++		if (i <=3D 0) {
++			if (i < 0)
++				ret =3D i;
++			break;
++		}
++		if (copy_to_user(buf, tmp_aligned, i)) {
++			ret =3D -EFAULT;
++			break;
 +		}
 +
-+		if (seedsize !=3D _lrng_kcapi_hash_digestsize(lrng_hash)) {
-+			pr_err("Seed hash output size not equal to DRNG seed size\n");
-+			_lrng_kcapi_hash_free(lrng_hash);
-+			ret =3D ERR_PTR(-EINVAL);
-+			goto dealloc;
-+		}
-+
-+		lrng_drng_info->lrng_hash =3D lrng_hash;
-+
-+		pr_info("Seed hash %s allocated\n", seed_hash);
-+	} else {
-+		lrng_drng_info->lrng_hash =3D NULL;
++		nbytes -=3D i;
++		buf +=3D i;
++		ret +=3D i;
 +	}
 +
-+	pr_info("Kernel crypto API DRNG %s allocated\n", drng_name);
-+
-+	return lrng_drng_info;
-+
-+dealloc:
-+	crypto_free_rng(kcapi_rng);
-+free:
-+	kfree(lrng_drng_info);
++	kzfree(tmp);
 +	return ret;
 +}
 +
-+static void lrng_kcapi_drng_dealloc(void *drng)
++/* DebugFS operations and definition of the debugfs files */
++static ssize_t lrng_raw_read(struct file *file, char __user *to,
++			     size_t count, loff_t *ppos)
 +{
-+	struct lrng_drng_info *lrng_drng_info =3D (struct lrng_drng_info *)drng;
-+	struct crypto_rng *kcapi_rng =3D lrng_drng_info->kcapi_rng;
-+	struct lrng_hash_info *lrng_hash =3D lrng_drng_info->lrng_hash;
++	loff_t pos =3D *ppos;
++	int ret;
 +
-+	crypto_free_rng(kcapi_rng);
-+	if (lrng_hash) {
-+		_lrng_kcapi_hash_free(lrng_hash);
-+		pr_info("Seed hash %s deallocated\n", seed_hash);
-+	}
-+	kfree(lrng_drng_info);
-+	pr_info("DRNG %s deallocated\n", drng_name);
++	if (!count)
++		return 0;
++
++	ret =3D lrng_raw_extract_user(to, count);
++	if (ret < 0)
++		return ret;
++
++	count -=3D ret;
++	*ppos =3D pos + count;
++
++	return ret;
 +}
 +
-+static const char *lrng_kcapi_drng_name(void)
-+{
-+	return drng_name;
-+}
-+
-+static const char *lrng_kcapi_pool_hash(void)
-+{
-+	return pool_hash;
-+}
-+
-+const static struct lrng_crypto_cb lrng_kcapi_crypto_cb =3D {
-+	.lrng_drng_name			=3D lrng_kcapi_drng_name,
-+	.lrng_hash_name			=3D lrng_kcapi_pool_hash,
-+	.lrng_drng_alloc		=3D lrng_kcapi_drng_alloc,
-+	.lrng_drng_dealloc		=3D lrng_kcapi_drng_dealloc,
-+	.lrng_drng_seed_helper		=3D lrng_kcapi_drng_seed_helper,
-+	.lrng_drng_generate_helper	=3D lrng_kcapi_drng_generate_helper,
-+	.lrng_hash_alloc		=3D lrng_kcapi_hash_alloc,
-+	.lrng_hash_dealloc		=3D lrng_kcapi_hash_dealloc,
-+	.lrng_hash_digestsize		=3D lrng_kcapi_hash_digestsize,
-+	.lrng_hash_buffer		=3D lrng_kcapi_hash_buffer,
++static const struct file_operations lrng_raw_name_fops =3D {
++	.owner =3D THIS_MODULE,
++	.read =3D lrng_raw_read,
 +};
 +
-+static int __init lrng_kcapi_init(void)
++static int __init lrng_raw_init(void)
 +{
-+	return lrng_set_drng_cb(&lrng_kcapi_crypto_cb);
-+}
-+static void __exit lrng_kcapi_exit(void)
-+{
-+	lrng_set_drng_cb(NULL);
++	struct dentry *lrng_raw_debugfs_root;
++
++	lrng_raw_debugfs_root =3D debugfs_create_dir(KBUILD_MODNAME, NULL);
++	debugfs_create_file_unsafe("lrng_raw", 0400, lrng_raw_debugfs_root,
++				   NULL, &lrng_raw_name_fops);
++
++	return 0;
 +}
 +
-+late_initcall(lrng_kcapi_init);
-+module_exit(lrng_kcapi_exit);
-+MODULE_LICENSE("Dual BSD/GPL");
-+MODULE_AUTHOR("Stephan Mueller <smueller@chronox.de>");
-+MODULE_DESCRIPTION("Linux Random Number Generator - kernel crypto API DRNG=
- backend");
++module_init(lrng_raw_init);
 =2D-=20
 2.24.1
 
