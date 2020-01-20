@@ -2,199 +2,121 @@ Return-Path: <SRS0=QLPS=3J=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64EDDC2D0DB
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jan 2020 12:25:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DD22C2D0DB
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jan 2020 12:35:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3B05F21569
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jan 2020 12:25:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7714622314
+	for <linux-crypto@archiver.kernel.org>; Mon, 20 Jan 2020 12:35:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726958AbgATMYQ (ORCPT
+        id S1726642AbgATMff (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Jan 2020 07:24:16 -0500
-Received: from inva021.nxp.com ([92.121.34.21]:46842 "EHLO inva021.nxp.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726796AbgATMYQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Jan 2020 07:24:16 -0500
-Received: from inva021.nxp.com (localhost [127.0.0.1])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id DD799200574;
-        Mon, 20 Jan 2020 13:24:14 +0100 (CET)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id CF32E200275;
-        Mon, 20 Jan 2020 13:24:14 +0100 (CET)
-Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 648AE20414;
-        Mon, 20 Jan 2020 13:24:14 +0100 (CET)
-From:   Iuliana Prodan <iuliana.prodan@nxp.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Silvano Di Ninno <silvano.dininno@nxp.com>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-imx <linux-imx@nxp.com>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>
-Subject: [PATCH v4 2/9] crypto: caam - refactor ahash_done callbacks
-Date:   Mon, 20 Jan 2020 14:24:01 +0200
-Message-Id: <1579523048-21078-3-git-send-email-iuliana.prodan@nxp.com>
-X-Mailer: git-send-email 2.1.0
-In-Reply-To: <1579523048-21078-1-git-send-email-iuliana.prodan@nxp.com>
-References: <1579523048-21078-1-git-send-email-iuliana.prodan@nxp.com>
-X-Virus-Scanned: ClamAV using ClamSMTP
+        Mon, 20 Jan 2020 07:35:35 -0500
+Received: from stargate.chelsio.com ([12.32.117.8]:3904 "EHLO
+        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726626AbgATMff (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 20 Jan 2020 07:35:35 -0500
+Received: from [10.193.191.36] (ayushsawal.asicdesigners.com [10.193.191.36])
+        by stargate.chelsio.com (8.13.8/8.13.8) with ESMTP id 00KCZIiD027585;
+        Mon, 20 Jan 2020 04:35:19 -0800
+Cc:     ayush.sawal@asicdesigners.com,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, manojmalviya@chelsio.com,
+        Ayush Sawal <ayush.sawal@chelsio.com>, netdev@vger.kernel.org
+Subject: Re: Advertise maximum number of sg supported by driver in single
+ request
+To:     Steffen Klassert <steffen.klassert@secunet.com>
+References: <20200115060234.4mm6fsmsrryzpymi@gondor.apana.org.au>
+ <9fd07805-8e2e-8c3f-6e5e-026ad2102c5a@chelsio.com>
+ <c8d64068-a87b-36dd-910d-fb98e09c7e4b@asicdesigners.com>
+ <20200117062300.qfngm2degxvjskkt@gondor.apana.org.au>
+ <20d97886-e442-ed47-5685-ff5cd9fcbf1c@asicdesigners.com>
+ <20200117070431.GE23018@gauss3.secunet.de>
+ <318fd818-0135-8387-6695-6f9ba2a6f28e@asicdesigners.com>
+ <20200117121722.GG26283@gauss3.secunet.de>
+ <179f6f7e-f361-798b-a1c6-30926d8e8bf5@asicdesigners.com>
+ <20200120093712.GM23018@gauss3.secunet.de>
+From:   Ayush Sawal <ayush.sawal@asicdesigners.com>
+Message-ID: <b0b4ba4b-1cdd-ad0b-32e4-2bc9610ff3e1@asicdesigners.com>
+Date:   Mon, 20 Jan 2020 18:05:17 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+MIME-Version: 1.0
+In-Reply-To: <20200120093712.GM23018@gauss3.secunet.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Create two common ahash_done_* functions with the dma
-direction as parameter. Then, these 2 are called with
-the proper direction for unmap.
+Hi Steffen,
 
-Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
-Reviewed-by: Horia Geanta <horia.geanta@nxp.com>
----
- drivers/crypto/caam/caamhash.c | 88 +++++++++++-------------------------------
- 1 file changed, 22 insertions(+), 66 deletions(-)
+On 1/20/2020 3:07 PM, Steffen Klassert wrote:
+> On Fri, Jan 17, 2020 at 07:08:05PM +0530, Ayush Sawal wrote:
+>> Hi steffen,
+>>
+>> On 1/17/2020 5:47 PM, Steffen Klassert wrote:
+>>> On Fri, Jan 17, 2020 at 04:28:54PM +0530, Ayush Sawal wrote:
+>>>> Hi steffen,
+>>>>
+>>>> On 1/17/2020 12:34 PM, Steffen Klassert wrote:
+>>>>> On Fri, Jan 17, 2020 at 12:13:07PM +0530, Ayush Sawal wrote:
+>>>>>> Hi Herbert,
+>>>>>>
+>>>>>> On 1/17/2020 11:53 AM, Herbert Xu wrote:
+>>>>>>> On Thu, Jan 16, 2020 at 01:27:24PM +0530, Ayush Sawal wrote:
+>>>>>>>> The max data limit is 15 sgs where each sg contains data of mtu size .
+>>>>>>>> we are running a netperf udp stream test over ipsec tunnel .The ipsec tunnel
+>>>>>>>> is established between two hosts which are directly connected
+>>>>>>> Are you actually getting 15-element SG lists from IPsec? What is
+>>>>>>> generating an skb with 15-element SG lists?
+>>>>>> we have established the ipsec tunnel in transport mode using ip xfrm.
+>>>>>> and running traffic using netserver and netperf.
+>>>>>>
+>>>>>> In server side we are running
+>>>>>> netserver -4
+>>>>>> In client side we are running
+>>>>>> "netperf -H <serverip> -p <port> -t UDP_STREAM  -Cc -- -m 21k"
+>>>>>> where the packet size is 21k ,which is then fragmented into 15 ip fragments
+>>>>>> each of mtu size.
+>>>>> I'm lacking a bit of context here, but this should generate 15 IP
+>>>>> packets that are encrypted one by one.
+>>>> This is what i observed ,please correct me if i am wrong.
+>>>> The packet when reaches esp_output(),is in socket buffer and based on the
+>>>> number of frags ,sg is initialized  using
+>>>> sg_init_table(sg,frags),where frags are 15 in our case.
+>>> The packet should be IP fragmented before it enters esp_output()
+>>> unless this is a UDP GSO packet. What kind of device do you use
+>>> here? Is it a crypto accelerator or a NIC that can do ESP offloads?
+>> We have device which works as a crypto accelerator . It just encrypts the
+>> packets and send it back to kernel.
+> I just did a test and I see the same behaviour. Seems like I was
+> mistaken, we actually fragment the ESP packets. The only case
+> where we do pre-encap fragmentation is IPv6 tunnel mode. But I
+> wonder if it would make sense to avoid to have ESP fragments on
+> the wire.
 
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 8d91434..59881a8 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -565,8 +565,8 @@ static inline void ahash_unmap_ctx(struct device *dev,
- 	ahash_unmap(dev, edesc, req, dst_len);
- }
- 
--static void ahash_done(struct device *jrdev, u32 *desc, u32 err,
--		       void *context)
-+static inline void ahash_done_cpy(struct device *jrdev, u32 *desc, u32 err,
-+				  void *context, enum dma_data_direction dir)
- {
- 	struct ahash_request *req = context;
- 	struct ahash_edesc *edesc;
-@@ -582,7 +582,7 @@ static void ahash_done(struct device *jrdev, u32 *desc, u32 err,
- 	if (err)
- 		ecode = caam_jr_strstatus(jrdev, err);
- 
--	ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_FROM_DEVICE);
-+	ahash_unmap_ctx(jrdev, edesc, req, digestsize, dir);
- 	memcpy(req->result, state->caam_ctx, digestsize);
- 	kfree(edesc);
- 
-@@ -593,76 +593,20 @@ static void ahash_done(struct device *jrdev, u32 *desc, u32 err,
- 	req->base.complete(&req->base, ecode);
- }
- 
--static void ahash_done_bi(struct device *jrdev, u32 *desc, u32 err,
--			    void *context)
-+static void ahash_done(struct device *jrdev, u32 *desc, u32 err,
-+		       void *context)
- {
--	struct ahash_request *req = context;
--	struct ahash_edesc *edesc;
--	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
--	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
--	struct caam_hash_state *state = ahash_request_ctx(req);
--	int digestsize = crypto_ahash_digestsize(ahash);
--	int ecode = 0;
--
--	dev_dbg(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
--
--	edesc = container_of(desc, struct ahash_edesc, hw_desc[0]);
--	if (err)
--		ecode = caam_jr_strstatus(jrdev, err);
--
--	ahash_unmap_ctx(jrdev, edesc, req, ctx->ctx_len, DMA_BIDIRECTIONAL);
--	kfree(edesc);
--
--	scatterwalk_map_and_copy(state->buf, req->src,
--				 req->nbytes - state->next_buflen,
--				 state->next_buflen, 0);
--	state->buflen = state->next_buflen;
--
--	print_hex_dump_debug("buf@" __stringify(__LINE__)": ",
--			     DUMP_PREFIX_ADDRESS, 16, 4, state->buf,
--			     state->buflen, 1);
--
--	print_hex_dump_debug("ctx@"__stringify(__LINE__)": ",
--			     DUMP_PREFIX_ADDRESS, 16, 4, state->caam_ctx,
--			     ctx->ctx_len, 1);
--	if (req->result)
--		print_hex_dump_debug("result@"__stringify(__LINE__)": ",
--				     DUMP_PREFIX_ADDRESS, 16, 4, req->result,
--				     digestsize, 1);
--
--	req->base.complete(&req->base, ecode);
-+	ahash_done_cpy(jrdev, desc, err, context, DMA_FROM_DEVICE);
- }
- 
- static void ahash_done_ctx_src(struct device *jrdev, u32 *desc, u32 err,
- 			       void *context)
- {
--	struct ahash_request *req = context;
--	struct ahash_edesc *edesc;
--	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
--	int digestsize = crypto_ahash_digestsize(ahash);
--	struct caam_hash_state *state = ahash_request_ctx(req);
--	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
--	int ecode = 0;
--
--	dev_dbg(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
--
--	edesc = container_of(desc, struct ahash_edesc, hw_desc[0]);
--	if (err)
--		ecode = caam_jr_strstatus(jrdev, err);
--
--	ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_BIDIRECTIONAL);
--	memcpy(req->result, state->caam_ctx, digestsize);
--	kfree(edesc);
--
--	print_hex_dump_debug("ctx@"__stringify(__LINE__)": ",
--			     DUMP_PREFIX_ADDRESS, 16, 4, state->caam_ctx,
--			     ctx->ctx_len, 1);
--
--	req->base.complete(&req->base, ecode);
-+	ahash_done_cpy(jrdev, desc, err, context, DMA_BIDIRECTIONAL);
- }
- 
--static void ahash_done_ctx_dst(struct device *jrdev, u32 *desc, u32 err,
--			       void *context)
-+static inline void ahash_done_switch(struct device *jrdev, u32 *desc, u32 err,
-+				     void *context, enum dma_data_direction dir)
- {
- 	struct ahash_request *req = context;
- 	struct ahash_edesc *edesc;
-@@ -678,7 +622,7 @@ static void ahash_done_ctx_dst(struct device *jrdev, u32 *desc, u32 err,
- 	if (err)
- 		ecode = caam_jr_strstatus(jrdev, err);
- 
--	ahash_unmap_ctx(jrdev, edesc, req, ctx->ctx_len, DMA_FROM_DEVICE);
-+	ahash_unmap_ctx(jrdev, edesc, req, ctx->ctx_len, dir);
- 	kfree(edesc);
- 
- 	scatterwalk_map_and_copy(state->buf, req->src,
-@@ -701,6 +645,18 @@ static void ahash_done_ctx_dst(struct device *jrdev, u32 *desc, u32 err,
- 	req->base.complete(&req->base, ecode);
- }
- 
-+static void ahash_done_bi(struct device *jrdev, u32 *desc, u32 err,
-+			  void *context)
-+{
-+	ahash_done_switch(jrdev, desc, err, context, DMA_BIDIRECTIONAL);
-+}
-+
-+static void ahash_done_ctx_dst(struct device *jrdev, u32 *desc, u32 err,
-+			       void *context)
-+{
-+	ahash_done_switch(jrdev, desc, err, context, DMA_FROM_DEVICE);
-+}
-+
- /*
-  * Allocate an enhanced descriptor, which contains the hardware descriptor
-  * and space for hardware scatter table containing sg_num entries.
--- 
-2.1.0
+
+As we have a crypto accelarator as device when the request is send to 
+the crypto driver from esp_output ,
+the aead_request has all the fragments in its src sg and the problem 
+which we are facing is when this
+src sg nents becomes greater than 15 ,15 is our crypto driver's max sg 
+limit to handle the request in one shot.
+
+Does it make sense for a crypto driver to advertise the maximum amount 
+of sg it can handle for a single
+request and then handling this in crypto framework while forming the 
+crypto request?
+
+Thanks,
+Ayush
+
+
 
