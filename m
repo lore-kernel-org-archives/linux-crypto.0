@@ -2,67 +2,53 @@ Return-Path: <SRS0=kzJ7=3K=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34DB4C2D0CE
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Jan 2020 10:01:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71F71C33CAA
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Jan 2020 10:08:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DE90320882
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Jan 2020 10:01:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 48DD420882
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Jan 2020 10:08:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fZAlENPC"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="A+YazgyR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728842AbgAUKBA (ORCPT
+        id S1728792AbgAUKI5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Jan 2020 05:01:00 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:54560 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728682AbgAUKBA (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Jan 2020 05:01:00 -0500
-Received: by mail-wm1-f68.google.com with SMTP id b19so2237439wmj.4;
-        Tue, 21 Jan 2020 02:00:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=V2jd2/b1zP/msRsC+f1C0Jm+Ihc4SsxoAEDKUoWjQQw=;
-        b=fZAlENPCll+6kG4U0EIIyE+7bAN+pMwh9o+bzr3WAq5dueuQqfAKDtZ+YlIUpJbGsq
-         tKiqC8kxW6lElguepJW7PFfx6Ox6Un5AGJZXrm2aqIDlOjbKJK7qEBInf53jXLeESEKE
-         eT+FIvhmj0hDeSFFa0cQDUGyrk1YucdddIHkSz3UPLFAdJYCHWP825ZU67scFdeNNS2j
-         n7gxte93tahms4okPTRxQVxx/H9KuVJuwgTFyAf6QxaQRYsoQPPs3HjWLzLAQtDnylHA
-         pfzSkMXKiOJsNhS1/rf1JMCB41v8qClNZBv/cu+fQiT9L4GZDP9lLeLGGDNXQn2KsCiM
-         8tlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=V2jd2/b1zP/msRsC+f1C0Jm+Ihc4SsxoAEDKUoWjQQw=;
-        b=hcuQYMI9THshN4y7vzpQFBGFsRd7BDHSO45uJRgOcFD1/+swx99f094PqEdNpqfnFU
-         OztRn0IP2k8tzoVR9EtjCib3w4d8Jku/wIs2VZIhHdfv/Y38ht2iBjaTJJ9+DOgVqjy1
-         oBjMTtYs1vtlEBsYgsXtH9mhXwJt+PO3sHxLvv96+pQ640WOaH8BNGtecqMr+CrPWxGZ
-         O//OMaro6jmipvQOuKXF03zJluBEpywb+Yv6yNoOOeLZWzGbL/FMiDnmUMoMbrYvzN2M
-         IqTEE1lfzSmXGttN78FOAUnsvnlEmYr5ZypSpwTO5Hc0A6VaUiD3b5ngaDeOgNHYusrh
-         TDRA==
-X-Gm-Message-State: APjAAAWuHnTol3jNLQEkrFHnKo4Q3Dh4kDTaaQNwSA4Re2oIhlILE9By
-        Sy+NEycYTD3bV7iSm361at4=
-X-Google-Smtp-Source: APXvYqyQFMgkpi4I32IAhZgDuYWsk/dPw1r0dnQD3LB47kAzk1tzqfgwIkWaj0qP2IVyEEcN3H+mHA==
-X-Received: by 2002:a1c:61c1:: with SMTP id v184mr3627574wmb.160.1579600856405;
-        Tue, 21 Jan 2020 02:00:56 -0800 (PST)
-Received: from Red ([2a01:cb1d:3d5:a100:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id z11sm53930480wrt.82.2020.01.21.02.00.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jan 2020 02:00:55 -0800 (PST)
-Date:   Tue, 21 Jan 2020 11:00:53 +0100
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Iuliana Prodan <iuliana.prodan@nxp.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Baolin Wang <baolin.wang@linaro.org>,
+        Tue, 21 Jan 2020 05:08:57 -0500
+Received: from mail-vi1eur05on2050.outbound.protection.outlook.com ([40.107.21.50]:17006
+        "EHLO EUR05-VI1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728512AbgAUKI5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 21 Jan 2020 05:08:57 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FJJKCVdPg4IXv8PQnCbnptqP+ah3xtx/4FLjG5xj9XwQGZSy3BYjtFwhieupzXFvp9dJH4XoWxxBQhkm7DvFnhjuCZwHK+B/3KPT3Pm0XgVC0NTrERw4le1Q1/BPbrrrPFnFoNVSPY3n7Ty8BF5BCbDNOuBYlDwbS9vQJKd95e9vonD1bl801nFnIHmxYFxYtOx8Wq8Bgr+kl23RS9ETo5fHa6v6P1Yt1/eC1eAaWwGr/U92Zv3xE74qSa3M8uT++xhtsbnK2YNl0snarlpimJy+Jd8cacQI2JlypvF0Zwvb+dT5f4TDleiKPLVXk/9VrYx++p0bWdkez88/SiJliw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Vw4JK3ECOBOqOQS6fl1HZ3Z+jP0Bujttb3n8t1cuqN8=;
+ b=fXdMdAg51TZgem4bBY2yxCEPKWTLH84mpysNoDNaX3HCspPW/8bmrM0jhMni6grWtV9koWE7zCxmONv8Kwo+f83z1CJj7bMbejQdSJELyJQHNGD1nfi7wf8HEwa3znOokT/GogLBNSNM7f7B1oSzaQpVPzFsA68LW61rZzhIcF+RX6sESpSAE8AmuUoHvEodyaywfh47E6nGs9RgPXmKYdkSwNEZwsVCXvqzaQ3/iGTlPl9Fqin5gM74/D9UVQ1rnbxb6i3elwpxmyH9j8Y0ivCEXsNlOIx4DrFPrTZhrNMvSeDNb+LTe3GE/6ZBlUfK9FIoMUeZubvE2Z3huD26Xw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Vw4JK3ECOBOqOQS6fl1HZ3Z+jP0Bujttb3n8t1cuqN8=;
+ b=A+YazgyRgfZTybvUC0tHfEK9QWuLUWbwc2KL1RveUp2yy9CcVMZiktXia4VkFP5BNVItkUZAiuw1ovIPDdINB4VFoNGPwSEor4UGtFqcWXziPz3gYr7X//OQosx4dLPeS0Xtkzze2HLUF7TFVaAWbIrOmic/vuQqtwEunEIAX7I=
+Received: from VI1PR04MB4445.eurprd04.prod.outlook.com (20.177.55.161) by
+ VI1PR04MB4606.eurprd04.prod.outlook.com (20.177.56.17) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2644.20; Tue, 21 Jan 2020 10:08:53 +0000
+Received: from VI1PR04MB4445.eurprd04.prod.outlook.com
+ ([fe80::304d:b7d8:1233:2ae0]) by VI1PR04MB4445.eurprd04.prod.outlook.com
+ ([fe80::304d:b7d8:1233:2ae0%6]) with mapi id 15.20.2644.027; Tue, 21 Jan 2020
+ 10:08:53 +0000
+From:   Iuliana Prodan <iuliana.prodan@nxp.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+CC:     Baolin Wang <baolin.wang@linaro.org>,
         Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Corentin Labbe <clabbe.montjoie@gmail.com>,
         Horia Geanta <horia.geanta@nxp.com>,
         Maxime Coquelin <mcoquelin.stm32@gmail.com>,
         Alexandre Torgue <alexandre.torgue@st.com>,
@@ -71,340 +57,84 @@ Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Silvano Di Ninno <silvano.dininno@nxp.com>,
         Franck Lenormand <franck.lenormand@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-imx <linux-imx@nxp.com>
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        dl-linux-imx <linux-imx@nxp.com>
 Subject: Re: [RFC PATCH] Crypto-engine support for parallel requests
-Message-ID: <20200121100053.GA14095@Red>
+Thread-Topic: [RFC PATCH] Crypto-engine support for parallel requests
+Thread-Index: AQHVz+nyH19jpegvq0OzoQlSx1aIPw==
+Date:   Tue, 21 Jan 2020 10:08:53 +0000
+Message-ID: <VI1PR04MB444594375C6CAAEE125C65C48C0D0@VI1PR04MB4445.eurprd04.prod.outlook.com>
 References: <1579563149-3678-1-git-send-email-iuliana.prodan@nxp.com>
+ <20200121091102.magzogr7tnj6joqm@gondor.apana.org.au>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=iuliana.prodan@nxp.com; 
+x-originating-ip: [212.146.100.6]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 7df4c1a5-3303-4ee7-8fbe-08d79e59eb79
+x-ms-traffictypediagnostic: VI1PR04MB4606:|VI1PR04MB4606:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <VI1PR04MB46060C9506572EB60C6600638C0D0@VI1PR04MB4606.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 0289B6431E
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(346002)(39860400002)(376002)(136003)(396003)(366004)(189003)(199004)(7696005)(55016002)(4326008)(76116006)(2906002)(316002)(86362001)(66556008)(64756008)(91956017)(44832011)(66946007)(7416002)(66476007)(66446008)(478600001)(54906003)(186003)(6916009)(5660300002)(53546011)(52536014)(6506007)(33656002)(8676002)(9686003)(71200400001)(81166006)(26005)(81156014)(8936002);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR04MB4606;H:VI1PR04MB4445.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 7K6NTZ0hbCFfnll2mBADtGoPLAjGnCHtkrFrVAMxtxQpLx41xZhUJqYSQnsPCvW5thrHAqWqqCMZfYFtxPJTfqZdSV0qnqI+qyy+G2WePfWavYUGVEsH0WuONpnQnO5McmdeVrBpDRwjGgeBBIzVtpXYSGlG3tFgpR6KZp7+h94bweWL+Z4Cx0v2+eqHeQVHndpvyO4r6ocpz5n6ezLCpbsHATfev766RoUzzKIP5PgxpfaEm6mhRn0Tg6T+niutXzBm6Y/iPzFqDnG+v2ZOWDEMY1aMcNMs4fFMiRLSLfUMgDTXfMRFxbB6IgQaf/MECLYkB4ghCQi1PnLhSPrXu4ZzGQ2+pr04GNJ0RaqH9V0fJKBNVIrZ7l7mlaE94Bzrt3Jn9t5pvVtdZWoRXtNK25XWp7q58E8CXfcKhm3zTxudHoipeV7U5NZmOmYvYLSo
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1579563149-3678-1-git-send-email-iuliana.prodan@nxp.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7df4c1a5-3303-4ee7-8fbe-08d79e59eb79
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Jan 2020 10:08:53.4742
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: S5s5BcNcYQPNBhEyz0ReyGTPvBwFHoZZpz7S2St04TLLknBggMzrL1RQSw8jsNIsOF6jGmLCfRi5UHvY2Pq/9g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB4606
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Jan 21, 2020 at 01:32:29AM +0200, Iuliana Prodan wrote:
-> Added support for executing multiple requests, in parallel,
-> for crypto engine.
-> A no_reqs is initialized and set in the new
-> crypto_engine_alloc_init_and_set function.
-> Here, is also set the maximum size for crypto-engine software
-> queue (not hardcoded anymore).
-> On crypto_pump_requests the no_reqs is increased, until the
-> max_no_reqs is reached, and decreased on crypto_finalize_request,
-> or on error path (in case a prepare_request or do_one_request
-> operation was unsuccessful).
-> 
-> Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
-> ---
->  crypto/crypto_engine.c  | 112 +++++++++++++++++++++++++++++++++---------------
->  include/crypto/engine.h |  11 +++--
->  2 files changed, 84 insertions(+), 39 deletions(-)
-> 
-> diff --git a/crypto/crypto_engine.c b/crypto/crypto_engine.c
-> index eb029ff..5219141 100644
-> --- a/crypto/crypto_engine.c
-> +++ b/crypto/crypto_engine.c
-> @@ -14,6 +14,7 @@
->  #include "internal.h"
->  
->  #define CRYPTO_ENGINE_MAX_QLEN 10
-> +#define CRYPTO_ENGINE_MAX_CONCURRENT_REQS 1
->  
->  /**
->   * crypto_finalize_request - finalize one request if the request is done
-> @@ -22,32 +23,27 @@
->   * @err: error number
->   */
->  static void crypto_finalize_request(struct crypto_engine *engine,
-> -			     struct crypto_async_request *req, int err)
-> +				    struct crypto_async_request *req, int err)
->  {
->  	unsigned long flags;
-> -	bool finalize_cur_req = false;
-> +	bool finalize_req = false;
->  	int ret;
->  	struct crypto_engine_ctx *enginectx;
->  
->  	spin_lock_irqsave(&engine->queue_lock, flags);
-> -	if (engine->cur_req == req)
-> -		finalize_cur_req = true;
-> +	if (engine->no_reqs > 0) {
-> +		finalize_req = true;
-> +		engine->no_reqs--;
-> +	}
->  	spin_unlock_irqrestore(&engine->queue_lock, flags);
->  
-> -	if (finalize_cur_req) {
-> -		enginectx = crypto_tfm_ctx(req->tfm);
-> -		if (engine->cur_req_prepared &&
-> -		    enginectx->op.unprepare_request) {
-> -			ret = enginectx->op.unprepare_request(engine, req);
-> -			if (ret)
-> -				dev_err(engine->dev, "failed to unprepare request\n");
-> -		}
-> -		spin_lock_irqsave(&engine->queue_lock, flags);
-> -		engine->cur_req = NULL;
-> -		engine->cur_req_prepared = false;
-> -		spin_unlock_irqrestore(&engine->queue_lock, flags);
-> +	enginectx = crypto_tfm_ctx(req->tfm);
-> +	if (finalize_req && enginectx->op.prepare_request &&
-> +	    enginectx->op.unprepare_request) {
-> +		ret = enginectx->op.unprepare_request(engine, req);
-> +		if (ret)
-> +			dev_err(engine->dev, "failed to unprepare request\n");
->  	}
-> -
->  	req->complete(req, err);
->  
->  	kthread_queue_work(engine->kworker, &engine->pump_requests);
-> @@ -73,8 +69,8 @@ static void crypto_pump_requests(struct crypto_engine *engine,
->  
->  	spin_lock_irqsave(&engine->queue_lock, flags);
->  
-> -	/* Make sure we are not already running a request */
-> -	if (engine->cur_req)
-> +	/* Make sure we have space, for more requests to run */
-> +	if (engine->no_reqs >= engine->max_no_reqs)
->  		goto out;
->  
->  	/* If another context is idling then defer */
-> @@ -108,13 +104,16 @@ static void crypto_pump_requests(struct crypto_engine *engine,
->  		goto out;
->  	}
->  
-> +retry:
->  	/* Get the fist request from the engine queue to handle */
->  	backlog = crypto_get_backlog(&engine->queue);
->  	async_req = crypto_dequeue_request(&engine->queue);
->  	if (!async_req)
->  		goto out;
->  
-> -	engine->cur_req = async_req;
-> +	/* Increase the number of concurrent requests that are in execution */
-> +	engine->no_reqs++;
-> +
->  	if (backlog)
->  		backlog->complete(backlog, -EINPROGRESS);
->  
-> @@ -130,7 +129,7 @@ static void crypto_pump_requests(struct crypto_engine *engine,
->  		ret = engine->prepare_crypt_hardware(engine);
->  		if (ret) {
->  			dev_err(engine->dev, "failed to prepare crypt hardware\n");
-> -			goto req_err;
-> +			goto req_err_2;
->  		}
->  	}
->  
-> @@ -141,26 +140,45 @@ static void crypto_pump_requests(struct crypto_engine *engine,
->  		if (ret) {
->  			dev_err(engine->dev, "failed to prepare request: %d\n",
->  				ret);
-> -			goto req_err;
-> +			goto req_err_2;
->  		}
-> -		engine->cur_req_prepared = true;
->  	}
->  	if (!enginectx->op.do_one_request) {
->  		dev_err(engine->dev, "failed to do request\n");
->  		ret = -EINVAL;
-> -		goto req_err;
-> +		goto req_err_1;
->  	}
-> +
->  	ret = enginectx->op.do_one_request(engine, async_req);
->  	if (ret) {
->  		dev_err(engine->dev, "Failed to do one request from queue: %d\n", ret);
-> -		goto req_err;
-> +		goto req_err_1;
->  	}
-> -	return;
-> -
-> -req_err:
-> -	crypto_finalize_request(engine, async_req, ret);
-> -	return;
->  
-> +	/*
-> +	 * If there is still space for concurrent requests,
-> +	 * try and send a new one
-> +	 */
-> +	spin_lock_irqsave(&engine->queue_lock, flags);
-> +	if (engine->no_reqs < engine->max_no_reqs)
-> +		goto retry;
-
-You should check if engine->queue.qlen > 0 before retry.
-
-> +	goto out;
-> +
-> +req_err_1:
-> +	if (enginectx->op.unprepare_request) {
-> +		ret = enginectx->op.unprepare_request(engine, async_req);
-> +		if (ret)
-> +			dev_err(engine->dev, "failed to unprepare request\n");
-> +	}
-> +req_err_2:
-> +	async_req->complete(async_req, ret);
-> +	spin_lock_irqsave(&engine->queue_lock, flags);
-> +	/*
-> +	 * If unable to prepare or execute the request,
-> +	 * decrease the number of concurrent requests
-> +	 */
-> +	engine->no_reqs--;
-> +	goto retry;
-
-You should check if engine->queue.qlen > 0 before retry.
-
->  out:
->  	spin_unlock_irqrestore(&engine->queue_lock, flags);
->  }
-> @@ -386,15 +404,21 @@ int crypto_engine_stop(struct crypto_engine *engine)
->  EXPORT_SYMBOL_GPL(crypto_engine_stop);
->  
->  /**
-> - * crypto_engine_alloc_init - allocate crypto hardware engine structure and
-> - * initialize it.
-> + * crypto_engine_alloc_init_and_set - allocate crypto hardware engine structure
-> + * and initialize it by setting the maximum number of entries in the software
-> + * crypto-engine queue and the maximum number of concurrent requests that can
-> + * be executed at once.
->   * @dev: the device attached with one hardware engine
->   * @rt: whether this queue is set to run as a realtime task
-> + * @max_no_reqs: maximum number of request that can be executed in parallel
-> + * @qlen: maximum size of the crypto-engine queue
->   *
->   * This must be called from context that can sleep.
->   * Return: the crypto engine structure on success, else NULL.
->   */
-> -struct crypto_engine *crypto_engine_alloc_init(struct device *dev, bool rt)
-> +struct crypto_engine *crypto_engine_alloc_init_and_set(struct device *dev,
-> +						       bool rt, int max_no_reqs,
-> +						       int qlen)
->  {
->  	struct sched_param param = { .sched_priority = MAX_RT_PRIO / 2 };
->  	struct crypto_engine *engine;
-> @@ -411,12 +435,13 @@ struct crypto_engine *crypto_engine_alloc_init(struct device *dev, bool rt)
->  	engine->running = false;
->  	engine->busy = false;
->  	engine->idling = false;
-> -	engine->cur_req_prepared = false;
->  	engine->priv_data = dev;
->  	snprintf(engine->name, sizeof(engine->name),
->  		 "%s-engine", dev_name(dev));
-> +	engine->max_no_reqs = max_no_reqs;
-> +	engine->no_reqs = 0;
->  
-> -	crypto_init_queue(&engine->queue, CRYPTO_ENGINE_MAX_QLEN);
-> +	crypto_init_queue(&engine->queue, qlen);
->  	spin_lock_init(&engine->queue_lock);
->  
->  	engine->kworker = kthread_create_worker(0, "%s", engine->name);
-> @@ -433,6 +458,23 @@ struct crypto_engine *crypto_engine_alloc_init(struct device *dev, bool rt)
->  
->  	return engine;
->  }
-> +EXPORT_SYMBOL_GPL(crypto_engine_alloc_init_and_set);
-> +
-> +/**
-> + * crypto_engine_alloc_init - allocate crypto hardware engine structure and
-> + * initialize it.
-> + * @dev: the device attached with one hardware engine
-> + * @rt: whether this queue is set to run as a realtime task
-> + *
-> + * This must be called from context that can sleep.
-> + * Return: the crypto engine structure on success, else NULL.
-> + */
-> +struct crypto_engine *crypto_engine_alloc_init(struct device *dev, bool rt)
-> +{
-> +	return crypto_engine_alloc_init_and_set(dev, rt,
-> +						CRYPTO_ENGINE_MAX_CONCURRENT_REQS,
-> +						CRYPTO_ENGINE_MAX_QLEN);
-> +}
->  EXPORT_SYMBOL_GPL(crypto_engine_alloc_init);
->  
->  /**
-> diff --git a/include/crypto/engine.h b/include/crypto/engine.h
-> index e29cd67..5f9a6df 100644
-> --- a/include/crypto/engine.h
-> +++ b/include/crypto/engine.h
-> @@ -24,7 +24,6 @@
->   * @idling: the engine is entering idle state
->   * @busy: request pump is busy
->   * @running: the engine is on working
-> - * @cur_req_prepared: current request is prepared
->   * @list: link with the global crypto engine list
->   * @queue_lock: spinlock to syncronise access to request queue
->   * @queue: the crypto queue of the engine
-> @@ -38,14 +37,14 @@
->   * @kworker: kthread worker struct for request pump
->   * @pump_requests: work struct for scheduling work to the request pump
->   * @priv_data: the engine private data
-> - * @cur_req: the current request which is on processing
-> + * @max_no_reqs: maximum number of request which can be processed in parallel
-> + * @no_reqs: current number of request which are processed in parallel
->   */
->  struct crypto_engine {
->  	char			name[ENGINE_NAME_LEN];
->  	bool			idling;
->  	bool			busy;
->  	bool			running;
-> -	bool			cur_req_prepared;
->  
->  	struct list_head	list;
->  	spinlock_t		queue_lock;
-> @@ -61,7 +60,8 @@ struct crypto_engine {
->  	struct kthread_work             pump_requests;
->  
->  	void				*priv_data;
-> -	struct crypto_async_request	*cur_req;
-> +	int			max_no_reqs;
-> +	int			no_reqs;
->  };
->  
->  /*
-> @@ -102,6 +102,9 @@ void crypto_finalize_skcipher_request(struct crypto_engine *engine,
->  int crypto_engine_start(struct crypto_engine *engine);
->  int crypto_engine_stop(struct crypto_engine *engine);
->  struct crypto_engine *crypto_engine_alloc_init(struct device *dev, bool rt);
-> +struct crypto_engine *crypto_engine_alloc_init_and_set(struct device *dev,
-> +						       bool rt, int max_no_reqs,
-> +						       int qlen);
->  int crypto_engine_exit(struct crypto_engine *engine);
->  
->  #endif /* _CRYPTO_ENGINE_H */
-> -- 
-> 2.1.0
-> 
-
-Hello
-
-In your model, who is running finalize_request() ?
-In caam it seems that you have a taskqueue dedicated for that but you cannot assume that all drivers will have this.
-I think the crypto_engine should be sufficient by itself and does not need external thread/taskqueue.
-
-But in your case, it seems that you dont have the choice, since do_one_request does not "do" but simply enqueue the request in the "jobring".
-
-What about adding along prepare/do_one_request/unprepare a new enqueue()/can_do_more() function ?
-
-The stream will be:
-retry:
-optionnal prepare
-optionnal enqueue
-optionnal can_do_more() (goto retry)
-optionnal do_one_request
-
-then
-finalize()
-optionnal unprepare
-
-The can_do_more simply will tell if we can enqueue more (this will handle your case(ringjob), and my case(batching)
-Instead of storing the limit in the crypto_engine, you keep control on the driver side.
-
-For your case the do_one_request will be unset, for mine I will use to ran the batch.
-But for other drivers, no change will be necessary (appart adding some enqueue=NULL,can_do_more=NULL).
-
-We can also imagine an easier solution like enqueue returning a positive value saying to queue more.
-
-Regards
+On 1/21/2020 11:11 AM, Herbert Xu wrote:=0A=
+> On Tue, Jan 21, 2020 at 01:32:29AM +0200, Iuliana Prodan wrote:=0A=
+>>=0A=
+>> +	if (engine->no_reqs < engine->max_no_reqs)=0A=
+>> +		goto retry;=0A=
+> =0A=
+> We should not hard-code this number into the engine.  Instead,=0A=
+> we should just let the driver tell us when it is ready to accept=0A=
+> more requests.=0A=
+> =0A=
+This is not hardcoded in crypto-engine.=0A=
+I've added the crypto_engine_alloc_init_and_set function to configure =0A=
+how crypto-engine works.=0A=
+The max_no_req means how many request the driver can process in parallel.=
+=0A=
+If this doesn't apply on some drivers they can call =0A=
+crypto_engine_alloc_init, which has max_no_req =3D 1 - this is the current =
+=0A=
+behavior. That is serialization of requests by crypto-engine which is a =0A=
+bottleneck.=0A=
+=0A=
+> Perhaps we should add a new function for drivers that wish to=0A=
+> support this that would accept a list of requests instead of=0A=
+> a single one.  It would then process as many requests as it=0A=
+> can from that list and only return either when the list is=0A=
+> exhausted or when it can't process any more requests.=0A=
+> =0A=
+=0A=
+Linking requests is something different that is not addressed by my =0A=
+proposal.=0A=
+I want to remove this serialization, done by crypto-engine, of unrelated =
+=0A=
+requests.=0A=
