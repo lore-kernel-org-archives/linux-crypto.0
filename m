@@ -2,143 +2,99 @@ Return-Path: <SRS0=EdI7=3L=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A241CC33CB6
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jan 2020 16:51:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DB1FC2D0DB
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jan 2020 17:03:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 81E8A21835
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jan 2020 16:51:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB4F524656
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jan 2020 17:03:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="udoNc8+p"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725970AbgAVQvZ (ORCPT
+        id S1728927AbgAVRDc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Jan 2020 11:51:25 -0500
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:39588 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725802AbgAVQvY (ORCPT
+        Wed, 22 Jan 2020 12:03:32 -0500
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:33794 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728901AbgAVRDc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Jan 2020 11:51:24 -0500
-Received: by mail-oi1-f194.google.com with SMTP id z2so15091oih.6;
-        Wed, 22 Jan 2020 08:51:24 -0800 (PST)
+        Wed, 22 Jan 2020 12:03:32 -0500
+Received: by mail-pl1-f193.google.com with SMTP id c9so31195plo.1;
+        Wed, 22 Jan 2020 09:03:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=jqNBkbZMwy19kOHcx6NrygN9IcG823sl9KjLJVX13II=;
+        b=udoNc8+pJuT1/uLXNiK/pdBWmz4h5ouYltOmOXxoesWun39QRITmN2aPCFYQurU1yr
+         zANY36cnhereu90S2EOXl+gUtZOy/uMty/7j+ukXQlE1/Dfkwnieuw4opEpaux0Eos/k
+         T3CaW1rdIFo/Fw6jMYE7xwFZwjJ6u3qoweN4+reZw3dJXhDfEgeJEWnwiNeWaINTr8Aq
+         xA60sss57Rq+7/EHNVwlLB6VzhO3yhq5S4I/SXA8KZme5qbJqmBs7iN1TuaxF3/5qEd2
+         ZQu0vOXzMgtcJdO55ITMCXUYlfa4byZjiRQiRMsKLl8kGBQTxb4kBzJ7Sl70QQLSMNjl
+         EI/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=YgHrm/eRDAbATyHCYt7XJCqYc4ngWaOB9tO9AQpkPhI=;
-        b=lb6sgzkcwUpkLL5f3YM0CGVZmIwwEUBgeSN8aEJyMW9UUo4nCBXLQcUpwf5Ct7p37R
-         isp+DPrPNjxp8br6T+HRUwOBlLI9xmXKX3/oJN+EGqenyGaEWNOMPsGNcOjRoijwxiiA
-         zrzxjKt5LMvx/hVSZSVWWPt/DwEDWHCmjI+XRNz47goY0KYetE2IfwMaCoGgHEgJcQId
-         SAtxgwb3dP+0FYkpT5qq6BODOuQT4sN7jT0dV4tfnqPGCUqc4kO0MRpQGqWfId2IKWCX
-         lVkPyhs5yfMxXwx5WJWmdYLLrMmcXRGfAla54eB2K0RY/zfdJjFE5L2v300QCIgG/Atv
-         8AIQ==
-X-Gm-Message-State: APjAAAXBnWi8Wz+YXXYUKLV/33kc/IK0hf+8qNnQ90bEWyD5LuSTS+/Z
-        /BFXqHvtTm1tfF5cwdgpk5qXHvD7X44l/mbvNX4=
-X-Google-Smtp-Source: APXvYqxJlZ2b+/l9ADmdxd7t0ZwxcdQXgEpClQjkpkvGxw4yF4ABAT0wA9LsJp3VbrjpyM8unQlXHu/sz0v0QhQbkNE=
-X-Received: by 2002:aca:1a06:: with SMTP id a6mr7125489oia.148.1579711883817;
- Wed, 22 Jan 2020 08:51:23 -0800 (PST)
-MIME-Version: 1.0
-References: <20200116101447.20374-1-gilad@benyossef.com>
-In-Reply-To: <20200116101447.20374-1-gilad@benyossef.com>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Wed, 22 Jan 2020 17:51:12 +0100
-Message-ID: <CAMuHMdUhR83SZyWX9Du9d3Sp4A48x_msKaOHGsa88EQKStEDQg@mail.gmail.com>
-Subject: Re: [PATCH 00/11] crypto: ccree - fixes and cleanups
-To:     Gilad Ben-Yossef <gilad@benyossef.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Ofir Drang <ofir.drang@arm.com>, Hadar Gat <hadar.gat@arm.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux-Renesas <linux-renesas-soc@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=jqNBkbZMwy19kOHcx6NrygN9IcG823sl9KjLJVX13II=;
+        b=C35DMxWpxphvIxABwD4OWFVDWbvMm5JbICxma4tulcV6zCmqTrViZM7L9181QvdH0t
+         l3aDsurwzkqDr7FBz5rbb9rJxZYGGLcASqZ36U4bCZH9hXVxG5dn3hJ7t0Lx+P92tkxH
+         zbX9NGFR/+6pcFrzwKI9jC5Zd2I0YSw5nk9viNermW8v6e/QQ64FMS7zMJScIkYEohny
+         CjllTpdalV3PlZ6GXwJw839F3X76c2r3B8R0guNB24kLfaEOypulwWEM2pk3/0RSVQ/w
+         crVk/72GgYNpHNXt0gvrstrACDNtJLtucs6g8OA80pEHDf6VSzbG94U1UJt3AFfjxAOE
+         3YSg==
+X-Gm-Message-State: APjAAAW5zLK/ci9cW4jR4FL9hASnyLmhGTV04eHGlVjzElTa2HW+wavm
+        BAwP1Ajik580QCPSKUul2J4y85g=
+X-Google-Smtp-Source: APXvYqy99bLz1JWoyph9iIgOzcLd/caqRGosXjDmnNy32D/Yy85xL9gRmYMlNuhEsnqM5Xbl3ZZ63g==
+X-Received: by 2002:a17:90a:fa88:: with SMTP id cu8mr3848711pjb.141.1579712611677;
+        Wed, 22 Jan 2020 09:03:31 -0800 (PST)
+Received: from madhuparna-HP-Notebook.nitk.ac.in ([2402:3a80:1eee:fc60:1df1:6c1a:3227:9ec0])
+        by smtp.gmail.com with ESMTPSA id b8sm48682682pfr.64.2020.01.22.09.03.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Jan 2020 09:03:31 -0800 (PST)
+From:   madhuparnabhowmik10@gmail.com
+To:     steffen.klassert@secunet.com
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        joel@joelfernandes.org, frextrite@gmail.com, rcu@vger.kernel.org,
+        linux-kernel-mentees@lists.linuxfoundation.org, paulmck@kernel.org,
+        Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
+Subject: [PATCH] padata.h: Annotate parallel_data with __rcu
+Date:   Wed, 22 Jan 2020 22:32:46 +0530
+Message-Id: <20200122170246.20177-1-madhuparnabhowmik10@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Gilad,
+From: Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
 
-On Thu, Jan 16, 2020 at 11:25 AM Gilad Ben-Yossef <gilad@benyossef.com> wrote:
-> A bunch of fixes and code cleanups for the ccree driver
+This patch fixes the following sparse errors:
+kernel/padata.c:110:14: error: incompatible types in comparison expression
+kernel/padata.c:520:9: error: incompatible types in comparison expression
+kernel/padata.c:1000:9: error: incompatible types in comparison expression
 
-Thank you!
+Signed-off-by: Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
+---
+ include/linux/padata.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I wanted to give this a try, but it looks like CCREE is no longer working
-on R-Car H3, both with/without this series.
-
-E.g. with renesas-devel[*] and renesas_defconfig +
-CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=n, I get the following crash:
-
-ccree e6601000.crypto: ARM CryptoCell 630P Driver: HW version
-0xAF400001/0xDCC63000, Driver version 5.0
-alg: No test for authenc(xcbc(aes),cbc(aes)) (authenc-xcbc-aes-cbc-aes-ccree)
-alg: No test for authenc(xcbc(aes),rfc3686(ctr(aes)))
-(authenc-xcbc-aes-rfc3686-ctr-aes-ccree)
-------------[ cut here ]------------
-kernel BUG at kernel/dma/swiotlb.c:497!
-Internal error: Oops - BUG: 0 [#1] PREEMPT SMP
-CPU: 7 PID: 189 Comm: cryptomgr_test Not tainted 5.5.0-rc7-arm64-renesas #463
-Hardware name: Renesas Salvator-X 2nd version board based on r8a77951 (DT)
-pstate: 80000005 (Nzcv daif -PAN -UAO)
-pc : swiotlb_tbl_map_single+0x30c/0x380
-lr : swiotlb_map+0xb0/0x300
-sp : ffff800012313430
-x29: ffff800012313430 x28: 0000000000000000
-x27: 0000000000000000 x26: 0000000738e7e000
-x25: ffff0006fa5f8010 x24: 0000000000000000
-x23: ffff800011aed000 x22: 0000000000000000
-x21: 0000000000000000 x20: 00000000000e8000
-x19: ffff80001105e000 x18: ffffffffffffffff
-x17: 0000000000000007 x16: 0000000000000001
-x15: ffff800010f5f908 x14: ffff800092313cf7
-x13: ffff0006ff0b4000 x12: 0000000000000001
-x11: 0000000000000003 x10: 0000000000200000
-x9 : 0000000000000000 x8 : 0000000000000001
-x7 : ffff800011aed9e0 x6 : 0000000000000000
-x5 : 0000000000000000 x4 : 0000000000000000
-x3 : 0000000000000000 x2 : 0000000000000000
-x1 : 0000000074000000 x0 : 0000000000000000
-Call trace:
- swiotlb_tbl_map_single+0x30c/0x380
- swiotlb_map+0xb0/0x300
- dma_direct_map_page+0xb8/0x140
- dma_direct_map_sg+0x78/0xe0
- cc_map_sg+0x10c/0x1a8
- cc_map_aead_request+0x160/0x990
- cc_proc_aead+0x140/0xef8
- cc_aead_encrypt+0x48/0x68
- crypto_aead_encrypt+0x20/0x30
- test_aead_vec_cfg+0x20c/0x848
- test_aead+0xb8/0x140
- alg_test_aead+0x94/0x178
- alg_test+0x108/0x3f8
- cryptomgr_test+0x40/0x48
- kthread+0x11c/0x120
- ret_from_fork+0x10/0x18
-Code: f9402fbc 17ffffa0 f9000bb3 f9002fbc (d4210000)
----[ end trace 272124cd4e3fd6f0 ]---
-note: cryptomgr_test[189] exited with preempt_count 1
-------------[ cut here ]------------
-
-FWIW, the same happens on R-Car H3 ES1.0.
-I haven't tried investigating when it stopped working.
-I stopped running the crypto manager tests when they were broken by
-CONFIG_HARDENED_USERCOPY_PAGESPAN=y.
-
-Do you have a clue?
-Thanks!
-
-[*] https://git.kernel.org/pub/scm/linux/kernel/git/geert/renesas-devel.git/
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
+diff --git a/include/linux/padata.h b/include/linux/padata.h
+index 23717eeaad23..72a081dd2b73 100644
+--- a/include/linux/padata.h
++++ b/include/linux/padata.h
+@@ -143,7 +143,7 @@ struct padata_instance {
+ 	struct hlist_node		 node;
+ 	struct workqueue_struct		*parallel_wq;
+ 	struct workqueue_struct		*serial_wq;
+-	struct parallel_data		*pd;
++	struct parallel_data __rcu		*pd;
+ 	struct padata_cpumask		cpumask;
+ 	struct blocking_notifier_head	 cpumask_change_notifier;
+ 	struct kobject                   kobj;
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+2.17.1
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
