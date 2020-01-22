@@ -8,64 +8,64 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F4AFC2D0DB
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jan 2020 10:46:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A184C33CB6
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jan 2020 10:46:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 35BBA2465B
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jan 2020 10:46:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 008802465B
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jan 2020 10:46:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EykB0ac2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ds2DOy1l"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729261AbgAVKqJ (ORCPT
+        id S1729679AbgAVKps (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Jan 2020 05:46:09 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:40701 "EHLO
-        mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729701AbgAVKpv (ORCPT
+        Wed, 22 Jan 2020 05:45:48 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:53332 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729643AbgAVKps (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Jan 2020 05:45:51 -0500
-Received: by mail-wm1-f66.google.com with SMTP id t14so6629170wmi.5;
-        Wed, 22 Jan 2020 02:45:50 -0800 (PST)
+        Wed, 22 Jan 2020 05:45:48 -0500
+Received: by mail-wm1-f68.google.com with SMTP id m24so6292885wmc.3;
+        Wed, 22 Jan 2020 02:45:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=vXhhnXKXoxYSpa1+LXBS7VNs2uspXwnX5jIhIQmwFrM=;
-        b=EykB0ac2kjYrYahu/jZIfG6FfpaSNjvW7yVd/WDy3Fs3kS6TW94qvZDp2Z9zG6y7kk
-         P182nzjKGL3aJwP3fYx1VS8CqcqsglP0XtShXtt5mB83h7kB/UbCZwsbp6itjDxeZffB
-         YQgI0AiY2tL/6LwGZDDHn51fT+IL2IyLOtJQbC8iWc60bEqkTi5iz8TYmdwyp2skjvuS
-         J6QJlKUQwoIRUe59EjCf264gffqZjLFpzOEQ2lNaYtjUU9bkehFD0RuPP4ufl7wraoTK
-         6cIcb4utrANC0cdjxDGPLZ1PkCSHMLDxt7jewacut+G9zXpgQ50ouZwP7IZT5fnbJL5k
-         AUjw==
+        bh=4S+yn/Cw6FGkvqLirx1JEfwucBuYI5yAQeYyvQqpsxI=;
+        b=ds2DOy1lyspOM14eZEZs2/17U7vnqFrKa7f9ZBdQhN3W9OxGpcntPuZZiS4Hsl6ioY
+         r4D3P5iDPZSf3E90XC1Aow6iI6BUhadDjEJm9/ucW2Y0H37h0r+yiyeMlf0MZhMNTD11
+         fH3qWP+32nBsBvXOUSWj+uMPXUpB9LLHMgvRSEbLfbyRLiFhBaoJZnCjIx2a5gkcwPP+
+         aXO8SMILlAgDBw++VXJwFn7X/MUproKFpz7HMI/rJNEMkdv3vJ7ijVAgHB4zs6g3erol
+         Kzi1VfRw2TEIFy6U8aurXO4lk4IR7j/SykPiA4WjQJ1hH0t/V3eRkJg/4nCnrWwDBl0e
+         bHcQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=vXhhnXKXoxYSpa1+LXBS7VNs2uspXwnX5jIhIQmwFrM=;
-        b=HEF+FN0Poq1tGTAAeqoMyFmrEC7dEr1QFhyDF9pwU3ATFNG/C2Hosuhz2tpry5D7IS
-         ZqznwZxCn6S47AmX3qm+jSpB7+E6EMvpIvLmfynWgWl8nVXV78nR5kjSlV0euozw/Bc/
-         Ey9wJwsypED8h+w7gOWjPhmTO8C0JK0dHXpuf/yNUDsKtGxS+HVS7TWDf/g9fHNoUJrr
-         Oz1ENaT+UThdBC7WGPQKizMQZujE9QjcI8/PGb6us21NlvHMMEPVH83pqCmnRyJ2cQo0
-         35RkFXgXqHmKeq8Ph7xRrL9hukV+Y2Nz31JrSTgKxauMAAf+M4jOwRt1d5gQpdE2zrxk
-         1xSA==
-X-Gm-Message-State: APjAAAWjEGCX4rrZeEZSKiVvhQdMFAm5lGM3vfaIwyVRVzgd6eE0YLxw
-        unHq0k3dNX5QdNYSiv3obos=
-X-Google-Smtp-Source: APXvYqxzgTFSZ6oqp6dWOuexRw6nwIAhgLOfYgEFyNAyKcSwm1Rtry4hWg/6bgd0XM2rcSVRYbPuVw==
-X-Received: by 2002:a1c:5945:: with SMTP id n66mr2249307wmb.98.1579689949561;
-        Wed, 22 Jan 2020 02:45:49 -0800 (PST)
+        bh=4S+yn/Cw6FGkvqLirx1JEfwucBuYI5yAQeYyvQqpsxI=;
+        b=sNdggCDbBhOyMVT0+NepbucIgdfihWFfDlVUWmoBYTnDCYDL+W9NVZJcY5GzuYZQAT
+         n46LPJE2z+hH4b+znq94y7RDQxBArHPg7pVGn8Qc2p9kOStET4aQVYZT6X7fyWsOhhpa
+         lyaorJeDFsyHawg18x5aSEs+gxu2w9fi473GaiiMx0yDX73S2vmQbETA1uvemQq10vyB
+         NHWUacye1+LRGL3CDLQeaX+DKSgquR6DoM0RoJIXSQk15YuCj+cN5lx3KLzTBgr9oBoO
+         xBdH2yNRonh1/2V2Zz//5/lxkrMTn1P1Byd7ZkkE+XXzRiuFtkrJgBLsrWVLk0ix2EE/
+         gSTQ==
+X-Gm-Message-State: APjAAAWm9jQA7DzwVKJ/GS9BLsT1TeBWsE4f5exXECujd6+L1Cb/qzDZ
+        jZw9yQfd3pdnMP5W109WFD8=
+X-Google-Smtp-Source: APXvYqzkbte6byNdOwmDLXzTtCGjykKZZDRnZdH9h1iEP0BQW3vmY4+IZrPO4ti01TA5oPeKafpHYg==
+X-Received: by 2002:a1c:6308:: with SMTP id x8mr2357168wmb.80.1579689946278;
+        Wed, 22 Jan 2020 02:45:46 -0800 (PST)
 Received: from Red.localdomain ([2a01:cb1d:3d5:a100:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id n3sm3443953wmc.27.2020.01.22.02.45.48
+        by smtp.googlemail.com with ESMTPSA id n3sm3443953wmc.27.2020.01.22.02.45.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jan 2020 02:45:48 -0800 (PST)
+        Wed, 22 Jan 2020 02:45:45 -0800 (PST)
 From:   Corentin Labbe <clabbe.montjoie@gmail.com>
 To:     davem@davemloft.net, herbert@gondor.apana.org.au,
         mripard@kernel.org, wens@csie.org, iuliana.prodan@nxp.com
 Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-sunxi@googlegroups.com,
         Corentin Labbe <clabbe.montjoie@gmail.com>
-Subject: [PATCH 7/9] crypto: sun8i-ce: increase task list size
-Date:   Wed, 22 Jan 2020 11:45:26 +0100
-Message-Id: <20200122104528.30084-8-clabbe.montjoie@gmail.com>
+Subject: [PATCH 5/9] crypto: engine: add enqueue_request/can_do_more
+Date:   Wed, 22 Jan 2020 11:45:24 +0100
+Message-Id: <20200122104528.30084-6-clabbe.montjoie@gmail.com>
 X-Mailer: git-send-email 2.24.1
 In-Reply-To: <20200122104528.30084-1-clabbe.montjoie@gmail.com>
 References: <20200122104528.30084-1-clabbe.montjoie@gmail.com>
@@ -76,50 +76,91 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The CE can handle more than 1 task at once, so this patch increase the size of
-the task list up to 8.
-For the moment I did not see more gain beyong this value.
+This patchs adds two new function wrapper in crypto_engine.
+- enqueue_request() for drivers enqueuing request to hardware.
+- can_queue_more() for letting drivers to tell if they can
+enqueue/prepare more.
+
+Since some drivers (like caam) only enqueue request without "doing"
+them, do_one_request() is now optional.
 
 Signed-off-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 ---
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c | 4 ++--
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h      | 1 +
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ crypto/crypto_engine.c  | 25 ++++++++++++++++++++++---
+ include/crypto/engine.h | 14 ++++++++------
+ 2 files changed, 30 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-index f72346a44e69..e8bf7bf31061 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-@@ -321,7 +321,7 @@ static void sun8i_ce_free_chanlist(struct sun8i_ce_dev *ce, int i)
- 	while (i >= 0) {
- 		crypto_engine_exit(ce->chanlist[i].engine);
- 		if (ce->chanlist[i].tl)
--			dma_free_coherent(ce->dev, sizeof(struct ce_task),
-+			dma_free_coherent(ce->dev, sizeof(struct ce_task) * MAXTASK,
- 					  ce->chanlist[i].tl,
- 					  ce->chanlist[i].t_phy);
- 		i--;
-@@ -356,7 +356,7 @@ static int sun8i_ce_allocate_chanlist(struct sun8i_ce_dev *ce)
- 			goto error_engine;
+diff --git a/crypto/crypto_engine.c b/crypto/crypto_engine.c
+index 5bcb1e740fd9..4a28548c49aa 100644
+--- a/crypto/crypto_engine.c
++++ b/crypto/crypto_engine.c
+@@ -83,6 +83,7 @@ static void crypto_pump_requests(struct crypto_engine *engine,
+ 		goto out;
+ 	}
+ 
++retry:
+ 	/* Get the fist request from the engine queue to handle */
+ 	backlog = crypto_get_backlog(&engine->queue);
+ 	async_req = crypto_dequeue_request(&engine->queue);
+@@ -118,10 +119,28 @@ static void crypto_pump_requests(struct crypto_engine *engine,
+ 			goto req_err2;
  		}
- 		ce->chanlist[i].tl = dma_alloc_coherent(ce->dev,
--							sizeof(struct ce_task),
-+							sizeof(struct ce_task) * MAXTASK,
- 							&ce->chanlist[i].t_phy,
- 							GFP_KERNEL);
- 		if (!ce->chanlist[i].tl) {
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
-index 49507ef2ec63..049b3175d755 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
-@@ -73,6 +73,7 @@
- #define CE_MAX_CLOCKS 3
+ 	}
++
++	if (enginectx->op.enqueue_request) {
++		ret = enginectx->op.enqueue_request(engine, async_req);
++		if (ret) {
++			dev_err(engine->dev, "failed to enqueue request: %d\n",
++				ret);
++			goto req_err;
++		}
++	}
++	if (enginectx->op.can_queue_more && engine->queue.qlen > 0) {
++		ret = enginectx->op.can_queue_more(engine, async_req);
++		if (ret > 0) {
++			spin_lock_irqsave(&engine->queue_lock, flags);
++			goto retry;
++		}
++		if (ret < 0) {
++			dev_err(engine->dev, "failed to call can_queue_more\n");
++			/* TODO */
++		}
++	}
+ 	if (!enginectx->op.do_one_request) {
+-		dev_err(engine->dev, "failed to do request\n");
+-		ret = -EINVAL;
+-		goto req_err;
++		return;
+ 	}
+ 	ret = enginectx->op.do_one_request(engine, async_req);
+ 	if (ret) {
+diff --git a/include/crypto/engine.h b/include/crypto/engine.h
+index 03d9f9ec1cea..8ab9d26e30fe 100644
+--- a/include/crypto/engine.h
++++ b/include/crypto/engine.h
+@@ -63,14 +63,16 @@ struct crypto_engine {
+  * @prepare__request: do some prepare if need before handle the current request
+  * @unprepare_request: undo any work done by prepare_request()
+  * @do_one_request: do encryption for current request
++ * @enqueue_request:	Enqueue the request in the hardware
++ * @can_queue_more:	if this function return > 0, it will tell the crypto
++ * 	engine that more space are availlable for prepare/enqueue request
+  */
+ struct crypto_engine_op {
+-	int (*prepare_request)(struct crypto_engine *engine,
+-			       void *areq);
+-	int (*unprepare_request)(struct crypto_engine *engine,
+-				 void *areq);
+-	int (*do_one_request)(struct crypto_engine *engine,
+-			      void *areq);
++	int (*prepare_request)(struct crypto_engine *engine, void *areq);
++	int (*unprepare_request)(struct crypto_engine *engine, void *areq);
++	int (*do_one_request)(struct crypto_engine *engine, void *areq);
++	int (*enqueue_request)(struct crypto_engine *engine, void *areq);
++	int (*can_queue_more)(struct crypto_engine *engine, void *areq);
+ };
  
- #define MAXFLOW 4
-+#define MAXTASK 8
- 
- /*
-  * struct ce_clock - Describe clocks used by sun8i-ce
+ struct crypto_engine_ctx {
 -- 
 2.24.1
 
