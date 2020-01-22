@@ -6,63 +6,52 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07323C2D0DB
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jan 2020 10:14:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD399C2D0DB
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jan 2020 10:15:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D95BE24683
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jan 2020 10:14:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E3D92467F
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jan 2020 10:15:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728998AbgAVKOY (ORCPT
+        id S1726078AbgAVKPN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Jan 2020 05:14:24 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:39122 "EHLO deadmen.hmeau.com"
+        Wed, 22 Jan 2020 05:15:13 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:39170 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725911AbgAVKOX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Jan 2020 05:14:23 -0500
+        id S1725911AbgAVKPN (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 22 Jan 2020 05:15:13 -0500
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1iuD1f-0000Wi-6Z; Wed, 22 Jan 2020 18:14:19 +0800
+        id 1iuD2W-0000Xi-BX; Wed, 22 Jan 2020 18:15:12 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1iuD1d-00042S-Sz; Wed, 22 Jan 2020 18:14:17 +0800
-Date:   Wed, 22 Jan 2020 18:14:17 +0800
+        id 1iuD2V-00043o-Fs; Wed, 22 Jan 2020 18:15:11 +0800
+Date:   Wed, 22 Jan 2020 18:15:11 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Colin King <colin.king@canonical.com>
-Cc:     Jens Wiklander <jens.wiklander@linaro.org>,
-        Devaraj Rangasamy <Devaraj.Rangasamy@amd.com>,
-        Gary R Hook <gary.hook@amd.com>,
-        Rijo Thomas <Rijo-john.Thomas@amd.com>,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH][next][V2] tee: fix memory allocation failure checks on
- drv_data and amdtee
-Message-ID: <20200122101417.fi22dzeehugxgsnk@gondor.apana.org.au>
-References: <20200116154852.84532-1-colin.king@canonical.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-crypto@vger.kernel.org, Jason@zx2c4.com
+Subject: Re: [PATCH] crypto: x86/poly1305: fix .gitignore typo
+Message-ID: <20200122101511.2fyb5kuxvvowsmsa@gondor.apana.org.au>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200116154852.84532-1-colin.king@canonical.com>
+In-Reply-To: <20200116172355.13255-1-Jason@zx2c4.com>
+X-Newsgroups: apana.lists.os.linux.cryptoapi
+Organization: Core
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jan 16, 2020 at 03:48:52PM +0000, Colin King wrote:
-> From: Colin Ian King <colin.king@canonical.com>
+Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> Admist the kbuild robot induced changes, the .gitignore file for the
+> generated file wasn't updated with the non-clashing filename. This
+> commit adjusts that.
 > 
-> Currently the memory allocation failure checks on drv_data and
-> amdtee are using IS_ERR rather than checking for a null pointer.
-> Fix these checks to use the conventional null pointer check.
-> 
-> Addresses-Coverity: ("Dereference null return")
-> Fixes: 757cc3e9ff1d ("tee: add AMD-TEE driver")
-> Signed-off-by: Colin Ian King <colin.king@canonical.com>
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 > ---
-> V2: update to apply against cryptodev-2.6 tree tip
-> ---
->  drivers/tee/amdtee/core.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> arch/x86/crypto/.gitignore | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
