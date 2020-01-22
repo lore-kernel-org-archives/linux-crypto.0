@@ -2,192 +2,132 @@ Return-Path: <SRS0=EdI7=3L=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21C93C2D0DB
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jan 2020 13:30:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77FD3C2D0DB
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jan 2020 13:37:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D7038205F4
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jan 2020 13:30:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 279C020704
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Jan 2020 13:37:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EoYfJOtq"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="NdA8pk76"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729760AbgAVNWL (ORCPT
+        id S1725883AbgAVNhS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Jan 2020 08:22:11 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:36964 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730421AbgAVNWK (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Jan 2020 08:22:10 -0500
-Received: by mail-wm1-f68.google.com with SMTP id f129so7187367wmf.2;
-        Wed, 22 Jan 2020 05:22:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=2G0pgtzq+Lyj/tGzjq3LHj1TlXfbz2J/exRt4E8NcoI=;
-        b=EoYfJOtqT1cvIhcZu50Re8efHWPTlV/mhYqH62yB30rVbD/9qaJkE0niw6a6eXi+WY
-         3IUShAgPgHoYjqVrhPdq9aIkmi9rM2b7zb0t+okoEbq8Ofga8Py+EqiPrq3HjVLcvBrE
-         d4G1X7/1gxDg7Yt4XRkTMA3ZBz3kO9SSKZpEklU4Xx+GgJC7ipX2Lj/zLa8lD8QAKKDn
-         n+GYq6am7vFMXY5V/TtdVqs0gEUEDrLkuqQKX8g5GfnF/Ama+nOexiVSOcF9y+/y3H7T
-         Sb/JkEOBDSvL6IPjiYmp8Qalqfut7DXs5pI7sxdUR0IPMojUKnunCIWJuISh4dYXvQ9t
-         Z8pA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=2G0pgtzq+Lyj/tGzjq3LHj1TlXfbz2J/exRt4E8NcoI=;
-        b=FpWWjoncfwaAdee3uygC7YKeCPtRYbOdYcnGtd2zBcp+eAe3ZG0VlfARDTXZcPZ7Qm
-         LlD+GU/mRk//KV4lbVz425bRaUCB9lXWZq0+uvCGZEtRtBqCNFRHxp00MkKEjfcUUR5Y
-         78LYt1tHc7QCHItUZfoYrnXnIwXDibKBVtkcyKhmV8hv7M/7KMSIvfdzfLsigNgbvPcy
-         gRjKrJN2aewkfHmVefEcUZ7PsK23eUIr2L0foTVzHyqzoAYdF6qKQ9Cx7JpZAnJwvwvs
-         SfnP4VLWphC3Ejc8+Pm43Kr3oiW0FJJXcyZ32OKXERVAn1o12cI1uerbmVe2bIx03VbC
-         EJMQ==
-X-Gm-Message-State: APjAAAWrpryWEIkyFqlCcxFIhPuO/Z5YFvfvshltmCSHRqKUnc1Osous
-        X5SIVAImEEZ5XIm3hf4sA6k=
-X-Google-Smtp-Source: APXvYqwVmd49homZNLcif21Pl96KhzwdqnbIZPWV5d5YJZmk2GbwM4qbHiOnm046xvUkIk46vO3NJg==
-X-Received: by 2002:a05:600c:1003:: with SMTP id c3mr3019534wmc.120.1579699328068;
-        Wed, 22 Jan 2020 05:22:08 -0800 (PST)
-Received: from Red ([2a01:cb1d:3d5:a100:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id p18sm4071624wmb.8.2020.01.22.05.22.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jan 2020 05:22:06 -0800 (PST)
-Date:   Wed, 22 Jan 2020 14:22:04 +0100
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Iuliana Prodan <iuliana.prodan@nxp.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Baolin Wang <baolin.wang@linaro.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Silvano Di Ninno <silvano.dininno@nxp.com>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Wed, 22 Jan 2020 08:37:18 -0500
+Received: from mail-eopbgr10063.outbound.protection.outlook.com ([40.107.1.63]:41918
+        "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725856AbgAVNhS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 22 Jan 2020 08:37:18 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GXIOdc2xE9K6Lkc+Czt4g9igA21i7CGtmeDpOelSFBU9RpRNKtkZ0rxFb2baiKYV47jZ1/CPIOs2d+JTAAgPnIme1AF1cl3GTZtiMpMtFvETkl6Spx/WAxhYyxb6in14m4fUFrcpgkcSvbB4M8IAWx1uRPgvG5r7wOaWWiisQ6tIeFNyk8i/qM35hAAAcq0dvphdxj8ozrID+/T8YUVpzfkO+KKYiptOn8Yu7se/BmefOxUZ24UC/hWL3mpI150v6YYzZ5l0gHgKn7kxKyIMISbXzF8MHJiLWeJILTORDvzJT9srYE8Yb0xC2pnX3IH/unbnI3w+jBekJkSV66VG1w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Xe+kS4aN8Hji4TO5CgRKSkA3+PT6jIorPf4+ua+HAs4=;
+ b=bnhvY2SXN6qpCHudPVF8tJkJq4tBIuVlYMJ4xOGsVsOsYFbHlk0uEwmF9rq7NC9OCVXaYLOYKtla7H0PhCPXK+vGn5z0BpPvE5wf38ZTA7MlT/TveL2jkflyIITTCXhxRe/inHS8MR913/i6tszd4OPOY/jp0oXJot+T17VYYGYK1v98j+1LiE88hCumtwGsohKS817yCCqID4IUbzk851IlSgdewBpTGCAnvl/7Hl6dB7HlB27kLk93j8B9/Lu09x6F+Ke3rJbi6iOPXWIx2VUvZYwhqnZEMRof5ys7mQFTo+KOdb/VgpkJk/rqN8WZErmMxr6FkQJktgKIf2/0Vg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Xe+kS4aN8Hji4TO5CgRKSkA3+PT6jIorPf4+ua+HAs4=;
+ b=NdA8pk76E3R+uDBeaqPhtNbMqPFE9jJaJ0WlQTzLU7+0osUq9oaaP8DF3BRqjxDVzNPFNd9wIxKTHnlr2gKPUzyXI/GDtORcnyf2waURlW8njiRbR5gVcMDk5Mj9J1Fz+SdkQGD9uPlQzRh2cY0/OkT5P33mCL39SKcril1cJFc=
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
+ VI1PR0402MB3551.eurprd04.prod.outlook.com (52.134.5.11) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2644.23; Wed, 22 Jan 2020 13:37:12 +0000
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::85e9:f844:f8b0:27d]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::85e9:f844:f8b0:27d%7]) with mapi id 15.20.2644.027; Wed, 22 Jan 2020
+ 13:37:12 +0000
+From:   Horia Geanta <horia.geanta@nxp.com>
+To:     Andrey Smirnov <andrew.smirnov@gmail.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC:     Chris Healy <cphealy@gmail.com>,
+        Lucas Stach <l.stach@pengutronix.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         dl-linux-imx <linux-imx@nxp.com>
-Subject: Re: [RFC PATCH] Crypto-engine support for parallel requests
-Message-ID: <20200122132204.GB13173@Red>
-References: <1579563149-3678-1-git-send-email-iuliana.prodan@nxp.com>
- <20200121100053.GA14095@Red>
- <VI1PR04MB44454A0468073981FDA603B38C0D0@VI1PR04MB4445.eurprd04.prod.outlook.com>
- <20200122104134.GA13173@Red>
- <VI1PR04MB44455343230CBA7400D21C998C0C0@VI1PR04MB4445.eurprd04.prod.outlook.com>
+Subject: Re: [PATCH v6 6/7] crypto: caam - enable prediction resistance in
+ HRWNG
+Thread-Topic: [PATCH v6 6/7] crypto: caam - enable prediction resistance in
+ HRWNG
+Thread-Index: AQHVxjouh/c8xz5csUKnQ9CkhtEExg==
+Date:   Wed, 22 Jan 2020 13:37:11 +0000
+Message-ID: <VI1PR0402MB3485015AD186F00B258F76D4980C0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+References: <20200108154047.12526-1-andrew.smirnov@gmail.com>
+ <20200108154047.12526-7-andrew.smirnov@gmail.com>
+ <VI1PR0402MB3485B3F4C3E39D0D94A1D8C6980D0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=horia.geanta@nxp.com; 
+x-originating-ip: [212.146.100.6]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 648ffc44-697d-4c76-abb2-08d79f402f8b
+x-ms-traffictypediagnostic: VI1PR0402MB3551:|VI1PR0402MB3551:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <VI1PR0402MB3551740D42BB27A39ACC3C72980C0@VI1PR0402MB3551.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7219;
+x-forefront-prvs: 029097202E
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(366004)(346002)(376002)(136003)(396003)(189003)(199004)(4326008)(52536014)(71200400001)(9686003)(478600001)(86362001)(55016002)(54906003)(2906002)(110136005)(33656002)(66476007)(64756008)(66446008)(7696005)(66946007)(316002)(76116006)(91956017)(66556008)(81156014)(8676002)(8936002)(81166006)(6506007)(5660300002)(186003)(53546011)(44832011)(26005);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3551;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: cyZduGGIIYXQnEPVqnb2DwjRjRBwwq8o6NxeP/4GZDhcUKa5APlcgYsd2Z81ZIPOozjBSndx9EFocnZEgWZw99+4Gzp6x9hEjKTskSmlhfCu7As7pjHazPivLwjSjPZooTl3AbHNe+PXYpFL9AgWAGlPqRBOgGLZnWlUlQwwe5clQDRWepTldEAw4FhHHNgtqu2X5Ve7wjSFgZKVdl5ysn0u7SdV8Q0bmn1Rn2R7ijuDBrwE6Dx+mgIjL85NRGHygwPgtLpn2NHvOMgZ/Ji9Ln7JtqV4BiwPkX7JHGoxm+6FZi/k0Herj4jfsOi3/1iFzzEUUkNvXq0JFidcqejIZmiM1lr6WUcd9ttzCkpbgImmRRtam+vX1Qscf5DQttMF4s7o0h2jrF+DF14qUe61X43zxK78AZJhcoY/IW2VFTqySVREJnEz80bmLz0a3tLZ
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <VI1PR04MB44455343230CBA7400D21C998C0C0@VI1PR04MB4445.eurprd04.prod.outlook.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 648ffc44-697d-4c76-abb2-08d79f402f8b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jan 2020 13:37:11.9567
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: AHF57iDF2E4AloJaJTIEOo2g+urgR55OLbr+H5TAJGQOFrVMhiIwdUG4DftpP2GqI6ahzgosmw6iN2w+3g/q0A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3551
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Jan 22, 2020 at 12:29:22PM +0000, Iuliana Prodan wrote:
-> On 1/22/2020 12:41 PM, Corentin Labbe wrote:
-> > On Tue, Jan 21, 2020 at 02:20:27PM +0000, Iuliana Prodan wrote:
-> >> On 1/21/2020 12:00 PM, Corentin Labbe wrote:
-> >>> On Tue, Jan 21, 2020 at 01:32:29AM +0200, Iuliana Prodan wrote:
-> >>>> Added support for executing multiple requests, in parallel,
-> >>>> for crypto engine.
-> >>>> A no_reqs is initialized and set in the new
-> >>>> crypto_engine_alloc_init_and_set function.
-> >>>> 
-> >>>>
-> >>>
-> >>> Hello
-> >>>
-> >>> In your model, who is running finalize_request() ?
-> >> finalize_request() in CAAM, and in other drivers, is called on the _done
-> >> callback (stm32, virtio and omap).
-> >>
-> >>> In caam it seems that you have a taskqueue dedicated for that but you cannot assume that all drivers will have this.
-> >>> I think the crypto_engine should be sufficient by itself and does not need external thread/taskqueue.
-> >>>
-> >>> But in your case, it seems that you dont have the choice, since do_one_request does not "do" but simply enqueue the request in the "jobring".
-> >>>
-> >> But, do_one_request it shouldn't, necessary,  execute the request. Is ok
-> >> to enqueue it, since we have asynchronous requests. do_one_request is
-> >> not blocking.
-> >>
-> >>> What about adding along prepare/do_one_request/unprepare a new enqueue()/can_do_more() function ?
-> >>>
-> >>> The stream will be:
-> >>> retry:
-> >>> optionnal prepare
-> >>> optionnal enqueue
-> >>> optionnal can_do_more() (goto retry)
-> >>> optionnal do_one_request
-> >>>
-> >>> then
-> >>> finalize()
-> >>> optionnal unprepare
-> >>>
-> >>
-> >> I'm planning to improve crypto-engine incrementally, so I'm taking one
-> >> step at a time :)
-> >> But I'm not sure if adding an enqueue operation is a good idea, since,
-> >> my understanding, is that do_one_request is a non-blocking operation and
-> >> it shouldn't execute the request.
-> > 
-> > do_one_request is a blocking operation on amlogic/sun8i-ce/sun8i-ss and the "documentation" is clear "@do_one_request: do encryption for current request".
-> > But I agree that is a bit small for a documentation.
-> > 
-> 
-> Herbert, Baolin,
-> 
-> What do you think about do_one_requet operation: is blocking or not?
-> 
-> There are several drivers (stm32, omap, virtio, caam) that include 
-> crypto-engine, and uses do_one_request as non-blocking, only the ones 
-> mentioned and implemented by Corentin use do_one_request as blocking.
-> 
-> >>
-> >> IMO, the crypto-engine flow should be kept simple:
-> >> 1. a request comes to hw -> this is doing transfer_request_to_engine;
-> >> 2. CE enqueue the requests
-> >> 3. on pump_requests:
-> >> 	3. a) optional prepare operation
-> >> 	3. b) sends the reqs to hw, by do_one_request operation. To wait for
-> >> completion here it contradicts the asynchronous crypto API.
-> > 
-> > There are no contradiction, the call is asynchronous for the user of the API.
-> > 
-> >> do_one_request operation has a crypto_async_request type as argument.
-> >> Note: Step 3. b) can be done several times, depending on size of hw queue.
-> >> 4. in driver, when req is done:
-> >> 	4. a) optional unprepare operation
-> >> 	4. b) crypto_finalize_request is called
-> >> 	
-> > 
-> > Since Herbert say the same thing than me:
-> > "Instead, we should just let the driver tell us when it is ready to accept more requests."
-> > Let me insist on my proposal, I have updated my serie, and it should handle your case and mine.
-> > I will send it within minutes.
-> > 
-> 
-> Corentin,
-> 
-> In your new proposal, a few patches include my modifications. The others 
-> include a solution that fits your drivers very well, but implies 
-> modifications in all the other 4 drivers. It's not backwards compatible.
-> I believe it can be done better, so we won't need to modify, _at all_, 
-> the other drivers.
-
-Others driver should work the same, I dont see what changes they need.
-As I said, I tested caam with my changes, it works the same.
-Please show me what changes they need to continue to work and proof that they are broken with my changes.
-
-> 
-> I'm working on a new version for my RFC, that has the can_enqueue_more, 
-> as Herbert suggested, but I would really want to know how 
-> crypto-engine's do_one_request was thought: blocking or non-blocking?
-
-We know that both way works, so this is not really a problem.
+On 1/21/2020 6:38 PM, Horia Geanta wrote:=0A=
+> On 1/8/2020 5:42 PM, Andrey Smirnov wrote:=0A=
+>> @@ -275,12 +276,25 @@ static int instantiate_rng(struct device *ctrldev,=
+ int state_handle_mask,=0A=
+>>  		return -ENOMEM;=0A=
+>>  =0A=
+>>  	for (sh_idx =3D 0; sh_idx < RNG4_MAX_HANDLES; sh_idx++) {=0A=
+>> +		const u32 rdsta_if =3D RDSTA_IF0 << sh_idx;=0A=
+>> +		const u32 rdsta_pr =3D RDSTA_PR0 << sh_idx;=0A=
+>> +		const u32 rdsta_mask =3D rdsta_if | rdsta_pr;=0A=
+>>  		/*=0A=
+>>  		 * If the corresponding bit is set, this state handle=0A=
+>>  		 * was initialized by somebody else, so it's left alone.=0A=
+>>  		 */=0A=
+>> -		if ((1 << sh_idx) & state_handle_mask)=0A=
+>> -			continue;=0A=
+>> +		if (rdsta_if & state_handle_mask) {=0A=
+>> +			if (rdsta_pr & state_handle_mask)=0A=
+> instantiate_rng() is called with=0A=
+> 	state_handle_mask =3D rd_reg32(&ctrl->r4tst[0].rdsta) & RDSTA_IFMASK;=0A=
+> so if (rdsta_pr & state_handle_mask) will always be false,=0A=
+> leading to unneeded state handle re-initialization.=0A=
+> =0A=
+Sorry, I missed this change:=0A=
+-#define RDSTA_IFMASK (RDSTA_IF1 | RDSTA_IF0)=0A=
++#define RDSTA_IFMASK (RDSTA_PR1 | RDSTA_PR0 | RDSTA_IF1 | RDSTA_IF0)=0A=
+=0A=
+which means code is correct (though I must admit not so intuitive).=0A=
+=0A=
+Horia=0A=
