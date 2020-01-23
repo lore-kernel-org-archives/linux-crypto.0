@@ -2,104 +2,132 @@ Return-Path: <SRS0=jQAN=3M=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4395FC2D0DB
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jan 2020 16:09:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2EADC2D0DB
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jan 2020 18:19:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1B6F122522
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jan 2020 16:09:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 955CE24655
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jan 2020 18:19:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="XCrBGgrY"
+	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="vWDImQhW"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729174AbgAWQJB (ORCPT
+        id S1728998AbgAWSTB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Jan 2020 11:09:01 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:51046 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726231AbgAWQJB (ORCPT
+        Thu, 23 Jan 2020 13:19:01 -0500
+Received: from mail-vs1-f66.google.com ([209.85.217.66]:34512 "EHLO
+        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727278AbgAWSTB (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Jan 2020 11:09:01 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00NFwZZJ007967;
-        Thu, 23 Jan 2020 16:08:45 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2019-08-05;
- bh=sIDGp/oEBR2StqKw04W1x4gi0FRiIz5M+YjbmfBvszs=;
- b=XCrBGgrYj9bndyOobOoM8k5DYXHJfr1LPqt3+wr5qcoGmJLNtIfq78+281u4BfrvfzVi
- a0I2DtfFLW/snynjFqvrhnIChESd8xA1roDVJNldRARO5BVL6VEIGSHJRRg0Ftmk4rwH
- oskLVpTfdnGnS5U2mRfYZCWITkC1bB103TNoaQfnJvPlXfpiNlP1rWrveGrqKSHGi3Sy
- LWNggW28CHBmk2pI1zRgux+6PXvl812eQuCoyuCVTK9oOploaaLBnh4GlyZQk4TMI2mV
- 8X2V2YSIIYSx6IJlDSg8mPkEdDudQHUAY7z+KPkPcFiH3lSiC3k8iphraCxqWqKQzN7A lA== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 2xkseuudfv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 23 Jan 2020 16:08:45 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.27/8.16.0.27) with SMTP id 00NFxJMg072214;
-        Thu, 23 Jan 2020 16:08:44 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 2xpq7n2pej-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 23 Jan 2020 16:08:44 +0000
-Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 00NG8etx011729;
-        Thu, 23 Jan 2020 16:08:40 GMT
-Received: from ca-dmjordan1.us.oracle.com (/10.211.9.48)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 23 Jan 2020 08:08:40 -0800
-Date:   Thu, 23 Jan 2020 11:08:50 -0500
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     madhuparnabhowmik10@gmail.com
-Cc:     steffen.klassert@secunet.com, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, joel@joelfernandes.org,
-        frextrite@gmail.com, rcu@vger.kernel.org,
-        linux-kernel-mentees@lists.linuxfoundation.org, paulmck@kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCH] padata.h: Annotate parallel_data with __rcu
-Message-ID: <20200123160850.gcwoydrdpw6saotk@ca-dmjordan1.us.oracle.com>
-References: <20200122170246.20177-1-madhuparnabhowmik10@gmail.com>
+        Thu, 23 Jan 2020 13:19:01 -0500
+Received: by mail-vs1-f66.google.com with SMTP id g15so2402700vsf.1
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Jan 2020 10:19:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=OqxshwjEZk15r2HIYLwJvhZobDP5rWlqMcRJh/RNTO4=;
+        b=vWDImQhWepEclk+VMgrMtqjicDFT3eIkDyKl3fKOvmTY2bj7EAZYV9HgzGnmXfPlyg
+         33UX4671AAMqIUqxSIklCyvbUM30AmviPYm12FXMYgej0FKwPweLv45xc1BfDMdgiG34
+         fhTZSJ4nNbHmRXGc7WLTKF/9kEQrTQ228JcsXqf3xjED9wHtbBOkBNVIjPUh0CLVCbxA
+         +hVOaTvN+d82xDY2LuN0revzmFywaEhJr+Gg+/0cbl12fITXYJlswyhvQHOnjjlLHJ3g
+         ok4rOPVTbE3Bkb2/+WzzTZpApczhCIYVhA9PBBcbPt+fpuWgJXt0WDoSljKei5NBivKF
+         q5Pg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=OqxshwjEZk15r2HIYLwJvhZobDP5rWlqMcRJh/RNTO4=;
+        b=qrkE6QayFaid0xUCZYfRgR9uOWduDUdBcCeDNOgOfmMnzLIkgaQQr9R3JkrcTGqYoi
+         PkdvOJlr08e91+pq4zejYpdNT8PwCiNzclPfxlbQEC3vfbbw7AtW0Dwkx7kGxT4aD4xR
+         ReWWigjy1I8wyhcd8PXN2YqnZzIK3SQCZvqpfdqAx9rfW4UQ0gymyn8hyj4bdfJLuo0I
+         hvNbBd+vof24C6NATLifOxoeYEweiHU5FmglutprqPLIQvJ5WOWpKUcrYlH2ZnFhYqTG
+         vT/gg1J9o/vaLW86RGnLDrwSoscqFImAweSRBSXG6xmpPeK4eTsmqOJ2jJCJZpIiNOQc
+         EFkA==
+X-Gm-Message-State: APjAAAUKTmhFolXS1BlGFGuL+mRvuAWgwzy9+LLb4iL2qgNbBjWPq5G9
+        eg2lLEzz7i0n2sJ6gMlSkB9ZZd7uNHsHXj+qCTgrlvNNNKU=
+X-Google-Smtp-Source: APXvYqzOjOD3kh4FjOTrXgXqCPEKCyM8OuN7CeGs4LHHfnmXvUi9lx3crZYBAUn3Op+myZU5Ui/tHw3vwrtGAzpq1BY=
+X-Received: by 2002:a67:c90d:: with SMTP id w13mr6769203vsk.164.1579803540508;
+ Thu, 23 Jan 2020 10:19:00 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200122170246.20177-1-madhuparnabhowmik10@gmail.com>
-User-Agent: NeoMutt/20180716
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9508 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 malwarescore=0
- phishscore=0 bulkscore=0 spamscore=0 mlxscore=0 mlxlogscore=385
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.0.1-1911140001 definitions=main-2001230130
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9508 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 malwarescore=0
- suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 clxscore=1011
- lowpriorityscore=0 mlxscore=0 impostorscore=0 mlxlogscore=440 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.0.1-1911140001
- definitions=main-2001230130
+References: <20200116101447.20374-1-gilad@benyossef.com> <CAMuHMdUhR83SZyWX9Du9d3Sp4A48x_msKaOHGsa88EQKStEDQg@mail.gmail.com>
+ <CAOtvUMfDnoFu8V7sYvhgsstX6fuUk3foq+9FJ6SbUKEFnq-zMw@mail.gmail.com> <CAMuHMdUZbbNX-vsa4TmU7DNKAz2Qo3SR1pHXDOsO4Rh5G8ygZw@mail.gmail.com>
+In-Reply-To: <CAMuHMdUZbbNX-vsa4TmU7DNKAz2Qo3SR1pHXDOsO4Rh5G8ygZw@mail.gmail.com>
+From:   Gilad Ben-Yossef <gilad@benyossef.com>
+Date:   Thu, 23 Jan 2020 20:18:45 +0200
+Message-ID: <CAOtvUMdCm8LTfVOgrkGAa5ig6dodyd7QwcEvHz-TnvkMfnhDZA@mail.gmail.com>
+Subject: Re: [PATCH 00/11] crypto: ccree - fixes and cleanups
+To:     Geert Uytterhoeven <geert@linux-m68k.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Ofir Drang <ofir.drang@arm.com>, Hadar Gat <hadar.gat@arm.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-[add Herbert]
+On Thu, Jan 23, 2020 at 5:46 PM Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+>
+> Hi Gilad
+>
+> On Thu, Jan 23, 2020 at 12:44 PM Gilad Ben-Yossef <gilad@benyossef.com> wrote:
+> > On Wed, Jan 22, 2020 at 6:51 PM Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+> > > On Thu, Jan 16, 2020 at 11:25 AM Gilad Ben-Yossef <gilad@benyossef.com> wrote:
+> > > > A bunch of fixes and code cleanups for the ccree driver
+> > >
+> > > Thank you!
+> > >
+> > > I wanted to give this a try, but it looks like CCREE is no longer working
+> > > on R-Car H3, both with/without this series.
+> > >
+> > > E.g. with renesas-devel[*] and renesas_defconfig +
+> > > CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=n, I get the following crash:
+> >
+> > Thank you for the bug report Geert!
+> >
+> > My R-Car board is on loan at the moment to another project. I didn't
+> > see this on our internal test board.
+> > I will track down my R-Car board and reproduce this - hopefully
+> > beginning of next week and will get back to you.
+>
+> In the mean time, I've bisected this failure to commit cdfee5623290bc89
+> ("driver core: initialize a default DMA mask for platform device").
+> However, this looks like a red herring, and seems to be only an exposer
+> of an underlying problem.
 
-Hi Madhuparna,
+Thank you for continue digging into this.
 
-On Wed, Jan 22, 2020 at 10:32:46PM +0530, madhuparnabhowmik10@gmail.com wrote:
-> From: Madhuparna Bhowmik <madhuparnabhowmik10@gmail.com>
-> 
-> This patch fixes the following sparse errors:
-> kernel/padata.c:110:14: error: incompatible types in comparison expression
-> kernel/padata.c:520:9: error: incompatible types in comparison expression
-> kernel/padata.c:1000:9: error: incompatible types in comparison expression
+> What's happening is that cc_map_aead_request() receives a request with
+> cryptlen = 0.  Due to DRV_CRYPTO_DIRECTION_ENCRYPT, the length to map is
+> increased by 8.  This seems to works fine if there is sufficient space
+> in the request's scatterlist.  However, if the scatterlist has only a
+> single entry of size zero, cc_map_sg() tries to map a zero-length DMA
+> buffer, and the BUG)() is triggered.
+>
 
-This recent patch to padata in the cryptodev tree has fixed these sparse errors
-and is heading for mainline soon:
+OK, this does rings a bell - can you verify please if
+CONFIG_CRYPTO_MANAGER_EXTRA_TESTS is enabled and if it does can you
+see if it happens if it is turned off?
 
-https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git/commit/?id=bbefa1dd6a6d53537c11624752219e39959d04fb
+There was an issue I've seen happen only with
+CONFIG_CRYPTO_MANAGER_EXTRA_TESTS enabled and only after commit
+49763fc6b1af4 ("crypto: testmgr - generate inauthentic AEAD test
+vectors") which I am chasing. I was half starting to believe it
+was an issue in the testmgr commit and not the ccree driver.
 
-Thanks,
-Daniel
+However, the stack trace doesn't look exactly the same but the
+description of the issue does. It seems you are seeing the same issue
+in another code path.
+
+Thank you - this is very helpful!
+
+I now have a better direction to look into...
+
+Gilad
