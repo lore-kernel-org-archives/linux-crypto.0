@@ -2,115 +2,185 @@ Return-Path: <SRS0=jQAN=3M=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82750C2D0DB
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jan 2020 14:48:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D746EC33CB6
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jan 2020 15:46:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2C911214AF
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jan 2020 14:48:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="YxDU0BNb"
+	by mail.kernel.org (Postfix) with ESMTP id B66DE21D7D
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jan 2020 15:46:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729008AbgAWOsC (ORCPT
+        id S1727453AbgAWPqx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Jan 2020 09:48:02 -0500
-Received: from mail-eopbgr00064.outbound.protection.outlook.com ([40.107.0.64]:33679
-        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728921AbgAWOsC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Jan 2020 09:48:02 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=S2+/7dWPaA58oJxU6wnwmkwrNBguTGWji9eORLCOdeZYYJekaPHOxenNinhUur9L2QHWt+2a0WcihqtU9noVg1/4opyDJ+4DG0WprN3mssgSPlMDNby94U9yX0NRGv0/ZHWvuogv1DqbhIMvMjZFQ9i8isvJLqxul/dRi6gPRSyYyssWAdr7F28VisXBcwX6Htk6O2jWFlWn2LHiOFKV8xcfoAqTgaQYF9k/di8MAPmJN4jey2ACMcYFWTMMCitNl7ZBD0olNDlPtIox+s3Vg5soba1JJ91PjrNX7gHfqZPwqghECOgjZafkJ8pwraUC0fz0A41STuHOPbZCUdPp4A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bJuDDdkOR6J7Zi7B5yj9y6OQP/qoFMNiWYh4gszCEH0=;
- b=iwXpEtQvKmjgreFt2bRbCps4xjWvYPzmGbvhGDbsz0WtsSayxfCf/CMA2mr5g/nEfI6j9rwDmGcy4NQbF/+qJAqN8QbKelKtnse92zAC9JhWCbhUE/C1+Grgv4Te+jpXjp/JAIv9sG32W6mKFaTa4oSt9eHEWhjsdMDb0+Gd8kuTFVNw96JqauNokt0tpWSHbgSCVRaux6Dsbbm0w2wxWEpERsCpi+BdOJZyU/EtFILHmgTMfJ5BBqabyOS4VkPxOGYCaefmhAklY5aG+172/GIIPqB0L9VKnEev+mCsdXl/DKaSzi3ycg/U9Dn7PFCTBS5gc5dlw5/BgfZ/Hsf5aw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bJuDDdkOR6J7Zi7B5yj9y6OQP/qoFMNiWYh4gszCEH0=;
- b=YxDU0BNbnXeHhtFpsqyNhAxCeTTuo26MMqn9DCoAz+EuvZas4mr2KfEVCBwQ/EKimlMaz3hBPLrQHnvXAHALZzIhyvimvGvmF4HUqr60btXIdhWpQSmYYeKxcr4T8lwbfEtCwSQZUU2fts2jwqAphBebg+1Nh1O0/YbQC/tXSiA=
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB3821.eurprd04.prod.outlook.com (52.134.13.161) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2644.20; Thu, 23 Jan 2020 14:47:58 +0000
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::85e9:f844:f8b0:27d]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::85e9:f844:f8b0:27d%7]) with mapi id 15.20.2644.027; Thu, 23 Jan 2020
- 14:47:58 +0000
-From:   Horia Geanta <horia.geanta@nxp.com>
-To:     Pankaj Gupta <pankaj.gupta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-CC:     Arun Pathak <arun.pathak@nxp.com>
-Subject: Re: [PATCH] add support for TLS1.2 algorithms offload
-Thread-Topic: [PATCH] add support for TLS1.2 algorithms offload
-Thread-Index: AQHV0d9fpUp9vdyUr0ua541zV8eJNw==
-Date:   Thu, 23 Jan 2020 14:47:58 +0000
-Message-ID: <VI1PR0402MB34855705F10BB498911FEF78980F0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <20200123110413.23064-1-pankaj.gupta@nxp.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=horia.geanta@nxp.com; 
-x-originating-ip: [84.117.251.185]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: f9d68ff8-6262-4603-32ff-08d7a0133ce5
-x-ms-traffictypediagnostic: VI1PR0402MB3821:|VI1PR0402MB3821:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <VI1PR0402MB382140965DBCC77B37E96241980F0@VI1PR0402MB3821.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6108;
-x-forefront-prvs: 029174C036
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(346002)(396003)(376002)(136003)(39860400002)(366004)(199004)(189003)(7696005)(4326008)(66946007)(66446008)(66476007)(64756008)(9686003)(478600001)(55016002)(91956017)(8936002)(76116006)(86362001)(33656002)(66556008)(966005)(5660300002)(44832011)(4744005)(186003)(53546011)(26005)(110136005)(52536014)(71200400001)(2906002)(316002)(81156014)(6506007)(81166006)(8676002);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3821;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: pzjCd6GNSeaFxXrWCFoobLaK2c80vD/5RPjTHidAqZkwgdFiPTZ5K0sQhGnBGjCywLo+KSK6+h3vy3L+YiBtWxXilzhvtdfSKJY9khAm8u0C4OIacmI4qYDoV44lIfQvY7bNh2qS5O3wgyyqPKU45VFqE9eelkOKe/kBz7wgxeo/XIyWW3K1nHHUHQm0OqCPDb5kpQs67PMhtDQSjTyU/ofImA0iz42UZWFgQeeibdh5iXD+JgJB6iNxI9LhZLNRIZrew9a3k40T+H17PL2TpM/p0Ii1tARDvYxg61BPCiplyb61Xao0KqHhrJJJR9/G66IxB3d60oA4u9gVVNeUKRQzzHItOKN79ogQRS552bBKES3KxWY0/2n6nvdTQKWl6V4yyutzzyf9BMQ2cRBFWIyjlpNdsYdc45kIvdsGafwTEWAGFY95k29KftTg6WZlLhEUQuxDORFKN2QSyucJbZP9kPowYNBmyzVvNLVp7I0=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Thu, 23 Jan 2020 10:46:53 -0500
+Received: from mail-oi1-f196.google.com ([209.85.167.196]:40768 "EHLO
+        mail-oi1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726232AbgAWPqx (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 23 Jan 2020 10:46:53 -0500
+Received: by mail-oi1-f196.google.com with SMTP id c77so3302603oib.7;
+        Thu, 23 Jan 2020 07:46:51 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=RftF1ldwzLppC9Ac3+m4A9Jal0SaT1mPfGz1y7gPc6I=;
+        b=KBD8K+BYpyOuPfZcgjmjRGasEQykuDYA36NX5ECXDbY4UqgZSB38bZ4/F+hzNi9mNg
+         AbNifunFfO/S3PS52PgAYtRTrVdWezPlFxrB3NAFAT3dwH76gCN7O5k9/7LeC0e8EKmD
+         qndSLiVi+TznrOGO/H3LdnFJW0dn+GPCzsH//mfbAogO9kMoNEMEltZ6XMpBrsG5alKc
+         k657YjaFal+frGKx2h6xjXU42QYnXlmOCBY5BYjrrBsSunAUUps+np551yqqQJYlU8gm
+         XVCjV1T2uqM5WeHVf/I2lRC2h8UQJ4NbwmGiIJDNIBtVuO+w7s6ce3sTKXs+ql8NnnHy
+         44Dg==
+X-Gm-Message-State: APjAAAUjL9h8UJwkoo4I0y29yS9sG0sKl4d+Uura76A/ymodjckQrTFo
+        y5izIZHkACYpWnMa4ZEceH09NRM5goR9frnHjFxQEAxD
+X-Google-Smtp-Source: APXvYqwVon4o8+3XZRgb1s1P9ZASZtrfJ8l/BcEXdtO5DQhrgn0rpFRLl3oxTASw5GCYgM+eLvqvyMsOT+/c48L83DY=
+X-Received: by 2002:aca:1a06:: with SMTP id a6mr10421340oia.148.1579794411477;
+ Thu, 23 Jan 2020 07:46:51 -0800 (PST)
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f9d68ff8-6262-4603-32ff-08d7a0133ce5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jan 2020 14:47:58.0944
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: QLJRwQa2K74ZUfO8ioUncGeH6N8pgUVwoR4lWcbMXt5G+UgHRFEYE7i86muPTU7xOuFPRl0+xpoS6BN62KnstQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3821
+References: <20200116101447.20374-1-gilad@benyossef.com> <CAMuHMdUhR83SZyWX9Du9d3Sp4A48x_msKaOHGsa88EQKStEDQg@mail.gmail.com>
+ <CAOtvUMfDnoFu8V7sYvhgsstX6fuUk3foq+9FJ6SbUKEFnq-zMw@mail.gmail.com>
+In-Reply-To: <CAOtvUMfDnoFu8V7sYvhgsstX6fuUk3foq+9FJ6SbUKEFnq-zMw@mail.gmail.com>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Thu, 23 Jan 2020 16:46:40 +0100
+Message-ID: <CAMuHMdUZbbNX-vsa4TmU7DNKAz2Qo3SR1pHXDOsO4Rh5G8ygZw@mail.gmail.com>
+Subject: Re: [PATCH 00/11] crypto: ccree - fixes and cleanups
+To:     Gilad Ben-Yossef <gilad@benyossef.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Ofir Drang <ofir.drang@arm.com>, Hadar Gat <hadar.gat@arm.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 1/23/2020 1:22 PM, Pankaj Gupta wrote:=0A=
->         - aes-128-cbc-hmac-sha256=0A=
->         - aes-256-cbc-hmac-sha256=0A=
-> =0A=
-> Enabled the support of TLS1.1 algorithms offload=0A=
-> =0A=
->         - aes-128-cbc-hmac-sha1=0A=
->         - aes-256-cbc-hmac-sha1=0A=
-> =0A=
-Patch does not apply, since there's no specific tls support=0A=
-in upstream caam drivers.=0A=
-=0A=
-caam drivers register crypto algorithms to the crypto API,=0A=
-and ktls uses whatever it pleases:=0A=
-https://www.kernel.org/doc/html/latest/networking/tls-offload.html=0A=
-https://www.kernel.org/doc/html/latest/networking/tls.html=0A=
-=0A=
-Horia=0A=
+Hi Gilad
+
+On Thu, Jan 23, 2020 at 12:44 PM Gilad Ben-Yossef <gilad@benyossef.com> wrote:
+> On Wed, Jan 22, 2020 at 6:51 PM Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+> > On Thu, Jan 16, 2020 at 11:25 AM Gilad Ben-Yossef <gilad@benyossef.com> wrote:
+> > > A bunch of fixes and code cleanups for the ccree driver
+> >
+> > Thank you!
+> >
+> > I wanted to give this a try, but it looks like CCREE is no longer working
+> > on R-Car H3, both with/without this series.
+> >
+> > E.g. with renesas-devel[*] and renesas_defconfig +
+> > CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=n, I get the following crash:
+>
+> Thank you for the bug report Geert!
+>
+> My R-Car board is on loan at the moment to another project. I didn't
+> see this on our internal test board.
+> I will track down my R-Car board and reproduce this - hopefully
+> beginning of next week and will get back to you.
+
+In the mean time, I've bisected this failure to commit cdfee5623290bc89
+("driver core: initialize a default DMA mask for platform device").
+However, this looks like a red herring, and seems to be only an exposer
+of an underlying problem.
+
+What's happening is that cc_map_aead_request() receives a request with
+cryptlen = 0.  Due to DRV_CRYPTO_DIRECTION_ENCRYPT, the length to map is
+increased by 8.  This seems to works fine if there is sufficient space
+in the request's scatterlist.  However, if the scatterlist has only a
+single entry of size zero, cc_map_sg() tries to map a zero-length DMA
+buffer, and the BUG)() is triggered.
+
+I noticed commits 04e6d25c5bb244c1 ("crypto: caam - fix zero-length
+buffer DMA mapping") and 07586d3ddf284dd7 ("crypto: caam/qi2 - fix
+zero-length buffer DMA mapping") fixed other issues related to
+zero-length DMA buffers.  But this one seems to be different, and a bit
+more complex.
+
+Adding "if (!req->cryptlen) return 0;" to the top of cc_proc_aead() fixes
+the crash, but makes the tests fail:
+
+    cc_proc_aead:1946: cryptlen is zero!
+    alg: aead: ccm-aes-ccree encryption test failed (wrong result) on
+test vector 9, cfg="in-place"
+    cc_proc_aead:1946: cryptlen is zero!
+    alg: aead: gcm-aes-ccree encryption test failed (wrong result) on
+test vector 0, cfg="in-place"
+
+Do you have a clue?
+Thanks!
+
+> > ccree e6601000.crypto: ARM CryptoCell 630P Driver: HW version
+> > 0xAF400001/0xDCC63000, Driver version 5.0
+> > alg: No test for authenc(xcbc(aes),cbc(aes)) (authenc-xcbc-aes-cbc-aes-ccree)
+> > alg: No test for authenc(xcbc(aes),rfc3686(ctr(aes)))
+> > (authenc-xcbc-aes-rfc3686-ctr-aes-ccree)
+> > ------------[ cut here ]------------
+> > kernel BUG at kernel/dma/swiotlb.c:497!
+> > Internal error: Oops - BUG: 0 [#1] PREEMPT SMP
+> > CPU: 7 PID: 189 Comm: cryptomgr_test Not tainted 5.5.0-rc7-arm64-renesas #463
+> > Hardware name: Renesas Salvator-X 2nd version board based on r8a77951 (DT)
+> > pstate: 80000005 (Nzcv daif -PAN -UAO)
+> > pc : swiotlb_tbl_map_single+0x30c/0x380
+> > lr : swiotlb_map+0xb0/0x300
+> > sp : ffff800012313430
+> > x29: ffff800012313430 x28: 0000000000000000
+> > x27: 0000000000000000 x26: 0000000738e7e000
+> > x25: ffff0006fa5f8010 x24: 0000000000000000
+> > x23: ffff800011aed000 x22: 0000000000000000
+> > x21: 0000000000000000 x20: 00000000000e8000
+> > x19: ffff80001105e000 x18: ffffffffffffffff
+> > x17: 0000000000000007 x16: 0000000000000001
+> > x15: ffff800010f5f908 x14: ffff800092313cf7
+> > x13: ffff0006ff0b4000 x12: 0000000000000001
+> > x11: 0000000000000003 x10: 0000000000200000
+> > x9 : 0000000000000000 x8 : 0000000000000001
+> > x7 : ffff800011aed9e0 x6 : 0000000000000000
+> > x5 : 0000000000000000 x4 : 0000000000000000
+> > x3 : 0000000000000000 x2 : 0000000000000000
+> > x1 : 0000000074000000 x0 : 0000000000000000
+> > Call trace:
+> >  swiotlb_tbl_map_single+0x30c/0x380
+> >  swiotlb_map+0xb0/0x300
+> >  dma_direct_map_page+0xb8/0x140
+> >  dma_direct_map_sg+0x78/0xe0
+> >  cc_map_sg+0x10c/0x1a8
+> >  cc_map_aead_request+0x160/0x990
+> >  cc_proc_aead+0x140/0xef8
+> >  cc_aead_encrypt+0x48/0x68
+> >  crypto_aead_encrypt+0x20/0x30
+> >  test_aead_vec_cfg+0x20c/0x848
+> >  test_aead+0xb8/0x140
+> >  alg_test_aead+0x94/0x178
+> >  alg_test+0x108/0x3f8
+> >  cryptomgr_test+0x40/0x48
+> >  kthread+0x11c/0x120
+> >  ret_from_fork+0x10/0x18
+> > Code: f9402fbc 17ffffa0 f9000bb3 f9002fbc (d4210000)
+> > ---[ end trace 272124cd4e3fd6f0 ]---
+> > note: cryptomgr_test[189] exited with preempt_count 1
+> > ------------[ cut here ]------------
+> >
+> > FWIW, the same happens on R-Car H3 ES1.0.
+> > I haven't tried investigating when it stopped working.
+> > I stopped running the crypto manager tests when they were broken by
+> > CONFIG_HARDENED_USERCOPY_PAGESPAN=y.
+> >
+> > Do you have a clue?
+> > Thanks!
+> >
+> > [*] https://git.kernel.org/pub/scm/linux/kernel/git/geert/renesas-devel.git/
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
