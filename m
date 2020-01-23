@@ -3,153 +3,377 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65D8FC2D0DB
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jan 2020 11:12:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D0D8C2D0DB
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jan 2020 11:22:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2C88124684
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jan 2020 11:12:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 252C024125
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jan 2020 11:22:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="i6KS5hEH"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="Px1i0B0B"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729014AbgAWLMh (ORCPT
+        id S1726194AbgAWLW3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Jan 2020 06:12:37 -0500
-Received: from mail-mw2nam12on2046.outbound.protection.outlook.com ([40.107.244.46]:6232
-        "EHLO NAM12-MW2-obe.outbound.protection.outlook.com"
+        Thu, 23 Jan 2020 06:22:29 -0500
+Received: from mail-db8eur05on2089.outbound.protection.outlook.com ([40.107.20.89]:29664
+        "EHLO EUR05-DB8-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729012AbgAWLMh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Jan 2020 06:12:37 -0500
+        id S1726026AbgAWLW3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 23 Jan 2020 06:22:29 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=h5Ea8IqwlapU6uwT3Rd3zHZbOEiGLzQy7uOXuuM8OfdKDULD0MdJ9gERut/kTJGih59f66YG89l9w092Yl3n6qOqiYE9M78Hy3QwUKPjjEjr4RC5sgTLcy0WLovj0JjwWz5jARNQ23aRWEkFAIA+qpAVmdlVdvadvP2yWeC89S8AJiagOy6Ab4d/Gkvi1dVqYiWdpwhnXNxPo4QtEcG/GaVfsyQxIGwPCBipFek5ZJhfHqV2Qcra/HbIzPjGsG2wQauL64d9XUugBca1olEOkgEoYAqWUv8Az+Z7R3MUorseU1cudqvDU0OdmitwPprID7V8BCOCDT7ECocRwR6YJg==
+ b=G2eUr+FqdwiFvhjZA5xpyADOhhNHY3E949wIY3wBYR+/shNl9EaukkqBkonwBzV+erjpa4gxmd2V8ewWyHssKEDD5QcqpWtbrroGK1RENPZgB6nYgecjYbg94EpCOVchX+9ya4lncW05+mxJwRMWKjAeKF81/n7/8YGpv/R/3mCTGlW1u2S1lpeA3uODaY5BFMNBDbguLIu9bbtO2+luBQ0jWA4GtFrzzWq1rzvf1nGLJb6J7nBb0WR+9LLFYmxO/1tW3iGFLN6rExck/s9N8lo3LYrHbA1lHzvWIKRQ6YIQhmz7XNrdHohcmr5ruYV/zqvPo9peI36mYDeRjuYc/Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=L1bM0EYu5TyW0Xfnl54FBQ/xod4oyrMnC4TJCUFLFYU=;
- b=UbXvJKN0gV++pI6+TluV0tkzPqOmaLOQVM8vokCsxVhqk9ylCowZhYsax0+gKus9a3P5q8fPr9ITkTojLHqUoLukIR5KfrbfsHkzx35xUtkp4Ec+++50M+iBc86WSZDp7bBruQwtVjGygnlCEYesS99OIkfhO0GhnMT0buJxAp32sth6LLGIzK027qZA4qRftwZK5HR6Rc37vLPtU9xodWf9U4IlwdMkrgrjKJEXvXmT6xQKrWzmF88RneYyCR1QFehCy6uip4lopU7tdb7xvJP7bDOl7chKdsXJIcx9wPBNveKaDp1y+jJ9pzHzidzXykLdU+ZUa6uEjZpKJ592rw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 149.199.60.83) smtp.rcpttodomain=davemloft.net smtp.mailfrom=xilinx.com;
- dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
- not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
+ bh=gkTJsLT1WYmw3N18ti4UtKrohtvlb6CiMMWAANflwWc=;
+ b=EOZ7uVh+4QYOXxuMtKS3XhbE91WCC7Vga+0vofKFXsKDkhb4/DyD3UAg52bRLIzEmjPoZEwnZCOIYeZWIzlEl72YltdoFbERlPnWSeN2Vt/vD0qFPpqumef1OvOad26c7OrtYuWLemAtLh1sXbpcD/uh4fmoSO1TwMJ1LxaqAwEXZ+46PkcZZ8Q9zFLotPsOVUD/ZkXeuHu7eJW/GBBbmAZJHVRsAPM+62NafVt5uXc37iD8ziev3FS4G0Bue61HDYzA/Dmuq6kVtM12tpPHBDApXXOdpdCXli4Nfq+E5GaCzCTpaIQZdO4gI006tcu8OxlzSq4K53V7iQKEKu9IiQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=L1bM0EYu5TyW0Xfnl54FBQ/xod4oyrMnC4TJCUFLFYU=;
- b=i6KS5hEHORt82pUPC90nA7XabszvW80IbkfH41VqKahJzfrBOu7h023nqP+VG6FinYCWQUuv5rBBfebhMS5x17/U+fcVqTKAJI1CAtcXhqoqqlIHCBy9TLxjCnYmGaQ7/l2GgbQ1MuG/xjeoI/s1/0AIaFv2QbRDUz142enKPVo=
-Received: from MN2PR02CA0008.namprd02.prod.outlook.com (2603:10b6:208:fc::21)
- by BN7PR02MB5348.namprd02.prod.outlook.com (2603:10b6:408:2c::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2644.19; Thu, 23 Jan
- 2020 11:12:34 +0000
-Received: from BL2NAM02FT022.eop-nam02.prod.protection.outlook.com
- (2a01:111:f400:7e46::204) by MN2PR02CA0008.outlook.office365.com
- (2603:10b6:208:fc::21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2644.19 via Frontend
- Transport; Thu, 23 Jan 2020 11:12:34 +0000
-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
- smtp.mailfrom=xilinx.com; davemloft.net; dkim=none (message not signed)
- header.d=none;davemloft.net; dmarc=bestguesspass action=none
- header.from=xilinx.com;
-Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
- 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
- client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
-Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- BL2NAM02FT022.mail.protection.outlook.com (10.152.77.153) with Microsoft SMTP
- Server (version=TLS1_0, cipher=TLS_RSA_WITH_AES_256_CBC_SHA) id 15.20.2665.18
- via Frontend Transport; Thu, 23 Jan 2020 11:12:33 +0000
-Received: from unknown-38-66.xilinx.com ([149.199.38.66] helo=xsj-pvapsmtp01)
-        by xsj-pvapsmtpgw01 with esmtp (Exim 4.63)
-        (envelope-from <kalyani.akula@xilinx.com>)
-        id 1iuaPZ-0007hk-40; Thu, 23 Jan 2020 03:12:33 -0800
-Received: from [127.0.0.1] (helo=localhost)
-        by xsj-pvapsmtp01 with smtp (Exim 4.63)
-        (envelope-from <kalyani.akula@xilinx.com>)
-        id 1iuaPU-0007gf-0O; Thu, 23 Jan 2020 03:12:28 -0800
-Received: from [172.23.155.80] (helo=xhdengvm155080.xilinx.com)
-        by xsj-pvapsmtp01 with esmtp (Exim 4.63)
-        (envelope-from <kalyania@xilinx.com>)
-        id 1iuaPL-0007fL-Ih; Thu, 23 Jan 2020 03:12:19 -0800
-Received: by xhdengvm155080.xilinx.com (Postfix, from userid 23151)
-        id 1E47C800C7; Thu, 23 Jan 2020 16:41:26 +0530 (IST)
-From:   Kalyani Akula <kalyani.akula@xilinx.com>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net, monstr@seznam.cz,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Rob Herring <robh+dt@kernel.org>, devicetree@vger.kernel.org,
-        git-dev <git-dev@xilinx.com>,
-        Mohan Marutirao Dhanawade <mohand@xilinx.com>,
-        Sarat Chand Savitala <saratcha@xilinx.com>,
-        Harsh Jain <harshj@xilinx.com>,
-        Michal Simek <michal.simek@xilinx.com>,
-        Kalyani Akula <kalyania@xilinx.com>,
-        Kalyani Akula <kalyani.akula@xilinx.com>
-Subject: [PATCH V5 4/4] arm64: zynqmp: Add Xilinx AES node.
-Date:   Thu, 23 Jan 2020 16:41:17 +0530
-Message-Id: <1579777877-10553-5-git-send-email-kalyani.akula@xilinx.com>
-X-Mailer: git-send-email 1.9.5
-In-Reply-To: <1579777877-10553-1-git-send-email-kalyani.akula@xilinx.com>
-References: <1579777877-10553-1-git-send-email-kalyani.akula@xilinx.com>
-X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
-X-TM-AS-User-Approved-Sender: Yes;Yes
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-Forefront-Antispam-Report: CIP:149.199.60.83;IPV:;CTRY:US;EFV:NLI;SFV:NSPM;SFS:(10009020)(4636009)(136003)(39860400002)(396003)(376002)(346002)(199004)(189003)(81156014)(26005)(81166006)(36756003)(8676002)(4744005)(107886003)(2906002)(316002)(5660300002)(336012)(70586007)(70206006)(356004)(6266002)(6666004)(54906003)(2616005)(478600001)(44832011)(426003)(186003)(4326008)(42186006)(8936002);DIR:OUT;SFP:1101;SCL:1;SRVR:BN7PR02MB5348;H:xsj-pvapsmtpgw01;FPR:;SPF:Pass;LANG:en;PTR:unknown-60-83.xilinx.com;A:1;MX:1;
+ bh=gkTJsLT1WYmw3N18ti4UtKrohtvlb6CiMMWAANflwWc=;
+ b=Px1i0B0BBimtpT1VrIkM5AOrXt7uBkWyUMap3L9YgPxYZRV+I9EtuFzZ7ddWeqqlSCP41JkFwMKFbt+DRKm/lXlXvjfS9L77c4ECZ7HxEbMXMJ7WaRP/JfAd/d58PPHJHFXzRA+T/X2BrJW9TfnydfM9sl4fM3qKNfKT2P+DrBo=
+Received: from AM0PR04MB5089.eurprd04.prod.outlook.com (52.134.89.85) by
+ AM0PR04MB5730.eurprd04.prod.outlook.com (20.178.119.87) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2644.18; Thu, 23 Jan 2020 11:22:18 +0000
+Received: from AM0PR04MB5089.eurprd04.prod.outlook.com
+ ([fe80::6105:a475:df04:bfb1]) by AM0PR04MB5089.eurprd04.prod.outlook.com
+ ([fe80::6105:a475:df04:bfb1%7]) with mapi id 15.20.2644.027; Thu, 23 Jan 2020
+ 11:22:18 +0000
+Received: from pankaj-S2600CP.ap.freescale.net (92.120.1.69) by TYAPR01CA0032.jpnprd01.prod.outlook.com (2603:1096:404:28::20) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2644.20 via Frontend Transport; Thu, 23 Jan 2020 11:22:14 +0000
+From:   Pankaj Gupta <pankaj.gupta@nxp.com>
+To:     Horia Geanta <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC:     Pankaj Gupta <pankaj.gupta@nxp.com>,
+        Arun Pathak <arun.pathak@nxp.com>
+Subject: [PATCH] add support for TLS1.2 algorithms offload
+Thread-Topic: [PATCH] add support for TLS1.2 algorithms offload
+Thread-Index: AQHV0d9fpUp9vdyUr0ua541zV8eJNw==
+Date:   Thu, 23 Jan 2020 11:22:17 +0000
+Message-ID: <20200123110413.23064-1-pankaj.gupta@nxp.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-mailer: git-send-email 2.17.1
+x-originating-ip: [92.120.1.69]
+x-clientproxiedby: TYAPR01CA0032.jpnprd01.prod.outlook.com
+ (2603:1096:404:28::20) To AM0PR04MB5089.eurprd04.prod.outlook.com
+ (2603:10a6:208:c6::21)
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=pankaj.gupta@nxp.com; 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 920a481b-10c9-4599-1735-08d79ff68152
+x-ms-traffictypediagnostic: AM0PR04MB5730:|AM0PR04MB5730:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM0PR04MB573018F86CB4D577703B4471950F0@AM0PR04MB5730.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:4941;
+x-forefront-prvs: 029174C036
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(39860400002)(346002)(376002)(366004)(396003)(199004)(189003)(5660300002)(316002)(186003)(16526019)(956004)(2616005)(26005)(110136005)(54906003)(71200400001)(6486002)(52116002)(6506007)(478600001)(86362001)(6512007)(1076003)(2906002)(36756003)(8676002)(81166006)(66946007)(66446008)(66476007)(8936002)(4326008)(44832011)(81156014)(64756008)(66556008);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR04MB5730;H:AM0PR04MB5089.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: xvHcozoRd6rQ+SGjSOh0V72NPFP/Wy7k6riFyU1iphuXF2mCyxMjmwPyd8mFaE2FwVLca8f2ec6GF32YFvuj0LEKmcVLuuRMkLzkJa+ZcyMW//bxdZOJfYVI3wUL5hW1rXOdLF6feSx8QPY3srm1yfOKHXs53Bw0kgBkCGWndQm43osu7lDo2TzeYzvOt2V8p0NOfVtlBuKtyh7fUMTrnxwOhxcR342HDiNQfbPB5CdREbTRe5Uq8dNVdFFqEoOQhSjgRgXD6iiuH+5qqxmXGt0AVj9d89tzmimvmlcuUWdB93j7SNDdyCVLleQzOMPiY7otReI22ttJvjw1WQRICHgJzz5O6FqBxIzRoJ3ezEXmk/QhLTt0X5ljfAa6WG/YFW1f9EJfWHLgy/m6PreswPFkwl1NAqIoY273AjpjaemY7cI/ZtmqH0HUQ7+16i+m
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 0dbda26b-bcfc-4a39-0d32-08d79ff52564
-X-MS-TrafficTypeDiagnostic: BN7PR02MB5348:
-X-Microsoft-Antispam-PRVS: <BN7PR02MB53483362B4FDA292FB8107A7AF0F0@BN7PR02MB5348.namprd02.prod.outlook.com>
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:4125;
-X-Forefront-PRVS: 029174C036
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: DioHXt3j88T2TcrzNCoSZ220A6hNcQdnio/Do8GIPrB0Qh1DTNxJJQeAp5c0g8Li7QSKY0aNVAR7BON6P0Syv0LCL73wKsKtSk727j0rbwJQ6sgGV2MN/Ph0D2WBoIlCTkU/LFjJr4SjRsbBJlCoIHv91mIVZt0LG5ZKb3NJpcIlhY40A3v0Y8xya4VEWD7YNsRhAqvstEPVLcEYhqVsJomLxQTiu+J9qfPloFpcmLFSwm2jQyJgWPi1Ns3GtBb6tbgEcW5HHyyWT38QT6VgnXu6RReKKoAwNuK3TZ9wMEPomWTIa4/Q29N2jkH+3IqJ+Juz+RJxF+ypxeV/DfgWyGUVXUYl7SVaStvNSk0B7ccrkiuR/4jIKWiv3L5F9yh5sh+uPVhVa7MVF/wTUBlBqeYn5UaD12yS1JlzoWljdSkoSrY8DEMF7OXU27g6GitK
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jan 2020 11:12:33.7552
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 920a481b-10c9-4599-1735-08d79ff68152
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jan 2020 11:22:17.9874
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0dbda26b-bcfc-4a39-0d32-08d79ff52564
-X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c;Ip=[149.199.60.83];Helo=[xsj-pvapsmtpgw01]
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PR02MB5348
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: hIjt/FeZcyZ4on/RLlUtCNDWdVvQYAII/tNW77fABRBZoKjy+RYdMarZtKTxNVvqvUihAU46UOdUULJPzhPotA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR04MB5730
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This patch adds a AES DT node for Xilinx ZynqMP SoC.
+        - aes-128-cbc-hmac-sha256
+        - aes-256-cbc-hmac-sha256
 
-Signed-off-by: Kalyani Akula <kalyani.akula@xilinx.com>
+Enabled the support of TLS1.1 algorithms offload
+
+        - aes-128-cbc-hmac-sha1
+        - aes-256-cbc-hmac-sha1
+
+Signed-off-by: Arun Pathak <arun.pathak@nxp.com>
+Signed-off-by: Pankaj Gupta <pankaj.gupta@nxp.com>
 ---
+ drivers/crypto/caam/caamalg_desc.c | 47 ++++++++++++++++++++++++++++--
+ drivers/crypto/caam/caamalg_desc.h |  5 ++++
+ drivers/crypto/caam/caamalg_qi.c   | 33 +++++++++++++++++++--
+ drivers/crypto/caam/caamalg_qi2.c  | 34 +++++++++++++++++++--
+ 4 files changed, 112 insertions(+), 7 deletions(-)
 
-V5 Changes:
-- Moved arm64: zynqmp: Add Xilinx AES node patch from 2/4 to 4/4
-- Corrected typo in the subject.
-- Updated zynqmp-aes node to correct location.
-
-
- arch/arm64/boot/dts/xilinx/zynqmp.dtsi | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/arch/arm64/boot/dts/xilinx/zynqmp.dtsi b/arch/arm64/boot/dts/xilinx/zynqmp.dtsi
-index 3c731e7..e9fbbe1 100644
---- a/arch/arm64/boot/dts/xilinx/zynqmp.dtsi
-+++ b/arch/arm64/boot/dts/xilinx/zynqmp.dtsi
-@@ -133,6 +133,10 @@
- 			zynqmp_pcap: pcap {
- 				compatible = "xlnx,zynqmp-pcap-fpga";
- 			};
+diff --git a/drivers/crypto/caam/caamalg_desc.c b/drivers/crypto/caam/caama=
+lg_desc.c
+index 0fea15eabf6e..ee9ed9d90530 100644
+--- a/drivers/crypto/caam/caamalg_desc.c
++++ b/drivers/crypto/caam/caamalg_desc.c
+@@ -643,6 +643,9 @@ void cnstr_shdsc_tls_encap(u32 * const desc, struct alg=
+info *cdata,
+ 			   unsigned int blocksize, int era)
+ {
+ 	u32 *key_jump_cmd, *zero_payload_jump_cmd;
++#if TLS1_1_SUPPORT
++	u32 *tls10_jump_cmd, *xplicit_iv_jump_cmd;
++#endif
+ 	u32 genpad, idx_ld_datasz, idx_ld_pad, stidx;
+=20
+ 	/*
+@@ -697,15 +700,42 @@ void cnstr_shdsc_tls_encap(u32 * const desc, struct a=
+lginfo *cdata,
+ 	append_operation(desc, cdata->algtype | OP_ALG_AS_INITFINAL |
+ 			 OP_ALG_ENCRYPT);
+=20
++#ifdef TLS1_1_SUPPORT
++	/* skip data to the TLS version field in the Assoclen
++	 * IV + 9 bytes of assoclen =3D 25
++	 */
++	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_SKIP | 25);
 +
-+			xlnx_aes: zynqmp-aes {
-+				compatible = "xlnx,zynqmp-aes";
-+			};
- 		};
- 	};
- 
--- 
-1.9.5
++	append_cmd(desc, CMD_SEQ_LOAD | LDST_CLASS_DECO |
++		   LDST_SRCDST_WORD_DECO_MATH3 | (6 << LDST_OFFSET_SHIFT) | 2);
++	append_jump(desc, JUMP_TEST_ALL | JUMP_COND_CALM | 1);
++
++	/* rewind input sequence */
++	append_seq_in_ptr(desc, 0, 27, SQIN_RTO);
++#endif
++
++#ifdef TLS1_1_SUPPORT
++	append_math_and_imm_u64(desc, REG1, REG3, IMM, 0xFCFE);
++	xplicit_iv_jump_cmd =3D append_jump(desc, JUMP_TEST_ALL |
++					    JUMP_COND_MATH_Z);
++	append_math_add_imm_u32(desc, REG2, ZERO, IMM, ivsize);
++	set_jump_tgt_here(desc, xplicit_iv_jump_cmd);
++#endif
++
+ 	/* payloadlen =3D input data length - (assoclen + ivlen) */
+ 	append_math_sub_imm_u32(desc, REG0, SEQINLEN, IMM, assoclen + ivsize);
+-
++#ifdef TLS1_1_SUPPORT
++	append_math_sub(desc, REG0, REG0, REG2, 4);
++#endif
+ 	/* math1 =3D payloadlen + icvlen */
+ 	append_math_add_imm_u32(desc, REG1, REG0, IMM, authsize);
++#ifdef TLS1_1_SUPPORT
++	append_math_add(desc, REG1, REG1, REG2, 4);
++#endif
+=20
+ 	/* padlen =3D block_size - math1 % block_size */
+-	append_math_and_imm_u32(desc, REG3, REG1, IMM, blocksize - 1);
+-	append_math_sub_imm_u32(desc, REG2, IMM, REG3, blocksize);
++	append_math_and_imm_u32(desc, REG2, REG1, IMM, blocksize - 1);
++	append_math_sub_imm_u32(desc, REG2, IMM, REG2, blocksize);
+=20
+ 	/* cryptlen =3D payloadlen + icvlen + padlen */
+ 	append_math_add(desc, VARSEQOUTLEN, REG1, REG2, 4);
+@@ -740,6 +770,17 @@ void cnstr_shdsc_tls_encap(u32 * const desc, struct al=
+ginfo *cdata,
+ 	/* read assoc for authentication */
+ 	append_seq_fifo_load(desc, assoclen, FIFOLD_CLASS_CLASS2 |
+ 			     FIFOLD_TYPE_MSG);
++#ifdef TLS1_1_SUPPORT
++	append_math_and_imm_u64(desc, REG2, REG3, IMM, 0xFCFE);
++	tls10_jump_cmd =3D append_jump(desc, JUMP_TEST_ALL |
++					    JUMP_COND_MATH_Z);
++
++	/* read xplicit iv in case of >TL10 */
++	append_seq_fifo_load(desc, ivsize, FIFOLD_CLASS_CLASS1 |
++				     FIFOLD_TYPE_MSG);
++
++	set_jump_tgt_here(desc, tls10_jump_cmd);
++#endif
+ 	/* insnoop payload */
+ 	append_seq_fifo_load(desc, 0, FIFOLD_CLASS_BOTH | FIFOLD_TYPE_MSG |
+ 			     FIFOLD_TYPE_LAST2 | FIFOLDST_VLF);
+diff --git a/drivers/crypto/caam/caamalg_desc.h b/drivers/crypto/caam/caama=
+lg_desc.h
+index 99f0d1471d9c..7b4bfd2d7b96 100644
+--- a/drivers/crypto/caam/caamalg_desc.h
++++ b/drivers/crypto/caam/caamalg_desc.h
+@@ -16,9 +16,14 @@
+ #define DESC_QI_AEAD_ENC_LEN		(DESC_AEAD_ENC_LEN + 3 * CAAM_CMD_SZ)
+ #define DESC_QI_AEAD_DEC_LEN		(DESC_AEAD_DEC_LEN + 3 * CAAM_CMD_SZ)
+ #define DESC_QI_AEAD_GIVENC_LEN		(DESC_AEAD_GIVENC_LEN + 3 * CAAM_CMD_SZ)
++#define TLS1_1_SUPPORT			1
+=20
+ #define DESC_TLS_BASE			(4 * CAAM_CMD_SZ)
++#ifdef TLS1_1_SUPPORT
++#define DESC_TLS10_ENC_LEN		(DESC_TLS_BASE + 45  * CAAM_CMD_SZ)
++#else
+ #define DESC_TLS10_ENC_LEN		(DESC_TLS_BASE + 29 * CAAM_CMD_SZ)
++#endif
+=20
+ /* Note: Nonce is counted in cdata.keylen */
+ #define DESC_AEAD_CTR_RFC3686_LEN	(4 * CAAM_CMD_SZ)
+diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg=
+_qi.c
+index fceeef155863..29a354ee960e 100644
+--- a/drivers/crypto/caam/caamalg_qi.c
++++ b/drivers/crypto/caam/caamalg_qi.c
+@@ -296,8 +296,10 @@ static int tls_set_sh_desc(struct crypto_aead *tls)
+ 	unsigned int ivsize =3D crypto_aead_ivsize(tls);
+ 	unsigned int blocksize =3D crypto_aead_blocksize(tls);
+ 	unsigned int assoclen =3D 13; /* always 13 bytes for TLS */
++#ifndef TLS1_1_SUPPORT
+ 	unsigned int data_len[2];
+ 	u32 inl_mask;
++#endif
+ 	struct caam_drv_private *ctrlpriv =3D dev_get_drvdata(ctx->jrdev->parent)=
+;
+=20
+ 	if (!ctx->cdata.keylen || !ctx->authsize)
+@@ -308,6 +310,7 @@ static int tls_set_sh_desc(struct crypto_aead *tls)
+ 	 * Job Descriptor and Shared Descriptor
+ 	 * must fit into the 64-word Descriptor h/w Buffer
+ 	 */
++#ifndef TLS1_1_SUPPORT
+ 	data_len[0] =3D ctx->adata.keylen_pad;
+ 	data_len[1] =3D ctx->cdata.keylen;
+=20
+@@ -327,6 +330,12 @@ static int tls_set_sh_desc(struct crypto_aead *tls)
+=20
+ 	ctx->adata.key_inline =3D !!(inl_mask & 1);
+ 	ctx->cdata.key_inline =3D !!(inl_mask & 2);
++#else
++	ctx->adata.key_dma =3D ctx->key_dma;
++	ctx->cdata.key_dma =3D ctx->key_dma + ctx->adata.keylen_pad;
++	ctx->adata.key_inline =3D false;
++	ctx->cdata.key_inline =3D false;
++#endif
+=20
+ 	cnstr_shdsc_tls_encap(ctx->sh_desc_enc, &ctx->cdata, &ctx->adata,
+ 			      assoclen, ivsize, ctx->authsize, blocksize,
+@@ -2847,8 +2856,8 @@ static struct caam_aead_alg driver_aeads[] =3D {
+ 	{
+ 		.aead =3D {
+ 			.base =3D {
+-				.cra_name =3D "tls10(hmac(sha1),cbc(aes))",
+-				.cra_driver_name =3D "tls10-hmac-sha1-cbc-aes-caam-qi",
++				.cra_name =3D "tls11(hmac(sha1),cbc(aes))",
++				.cra_driver_name =3D "tls11-hmac-sha1-cbc-aes-caam-qi",
+ 				.cra_blocksize =3D AES_BLOCK_SIZE,
+ 			},
+ 			.setkey =3D tls_setkey,
+@@ -2862,6 +2871,26 @@ static struct caam_aead_alg driver_aeads[] =3D {
+ 			.class1_alg_type =3D OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
+ 			.class2_alg_type =3D OP_ALG_ALGSEL_SHA1 |
+ 					   OP_ALG_AAI_HMAC_PRECOMP,
++		},
++	},
++	{
++		.aead =3D {
++			.base =3D {
++				.cra_name =3D "tls12(hmac(sha256),cbc(aes))",
++				.cra_driver_name =3D "tls12-hmac-sha256-cbc-aes-caam-qi",
++				.cra_blocksize =3D AES_BLOCK_SIZE,
++			},
++			.setkey =3D tls_setkey,
++			.setauthsize =3D tls_setauthsize,
++			.encrypt =3D tls_encrypt,
++			.decrypt =3D tls_decrypt,
++			.ivsize =3D AES_BLOCK_SIZE,
++			.maxauthsize =3D SHA256_DIGEST_SIZE,
++		},
++		.caam =3D {
++			.class1_alg_type =3D OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
++			.class2_alg_type =3D OP_ALG_ALGSEL_SHA256 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
+ 		}
+ 	}
+ };
+diff --git a/drivers/crypto/caam/caamalg_qi2.c b/drivers/crypto/caam/caamal=
+g_qi2.c
+index 5fd86bac5cf6..46e1bbe14ecf 100644
+--- a/drivers/crypto/caam/caamalg_qi2.c
++++ b/drivers/crypto/caam/caamalg_qi2.c
+@@ -773,8 +773,10 @@ static int tls_set_sh_desc(struct crypto_aead *tls)
+ 	struct caam_flc *flc;
+ 	u32 *desc;
+ 	unsigned int assoclen =3D 13; /* always 13 bytes for TLS */
++#ifndef TLS1_1_SUPPORT
+ 	unsigned int data_len[2];
+ 	u32 inl_mask;
++#endif
+=20
+ 	if (!ctx->cdata.keylen || !ctx->authsize)
+ 		return 0;
+@@ -784,6 +786,7 @@ static int tls_set_sh_desc(struct crypto_aead *tls)
+ 	 * Job Descriptor and Shared Descriptor
+ 	 * must fit into the 64-word Descriptor h/w Buffer
+ 	 */
++#ifndef TLS1_1_SUPPORT
+ 	data_len[0] =3D ctx->adata.keylen_pad;
+ 	data_len[1] =3D ctx->cdata.keylen;
+=20
+@@ -803,6 +806,13 @@ static int tls_set_sh_desc(struct crypto_aead *tls)
+=20
+ 	ctx->adata.key_inline =3D !!(inl_mask & 1);
+ 	ctx->cdata.key_inline =3D !!(inl_mask & 2);
++#else
++	ctx->adata.key_dma =3D ctx->key_dma;
++	ctx->cdata.key_dma =3D ctx->key_dma + ctx->adata.keylen_pad;
++	ctx->adata.key_inline =3D false;
++	ctx->cdata.key_inline =3D false;
++#endif
++
+=20
+ 	flc =3D &ctx->flc[ENCRYPT];
+ 	desc =3D flc->sh_desc;
+@@ -3362,8 +3372,8 @@ static struct caam_aead_alg driver_aeads[] =3D {
+ 	{
+ 		.aead =3D {
+ 			.base =3D {
+-				.cra_name =3D "tls10(hmac(sha1),cbc(aes))",
+-				.cra_driver_name =3D "tls10-hmac-sha1-cbc-aes-caam-qi2",
++				.cra_name =3D "tls11(hmac(sha1),cbc(aes))",
++				.cra_driver_name =3D "tls11-hmac-sha1-cbc-aes-caam-qi2",
+ 				.cra_blocksize =3D AES_BLOCK_SIZE,
+ 			},
+ 			.setkey =3D tls_setkey,
+@@ -3379,6 +3389,26 @@ static struct caam_aead_alg driver_aeads[] =3D {
+ 					   OP_ALG_AAI_HMAC_PRECOMP,
+ 		},
+ 	},
++	{
++		.aead =3D {
++			.base =3D {
++				.cra_name =3D "tls12(hmac(sha256),cbc(aes))",
++				.cra_driver_name =3D "tls12-hmac-sha256-cbc-aes-caam-qi2",
++				.cra_blocksize =3D AES_BLOCK_SIZE,
++			},
++			.setkey =3D tls_setkey,
++			.setauthsize =3D tls_setauthsize,
++			.encrypt =3D tls_encrypt,
++			.decrypt =3D tls_decrypt,
++			.ivsize =3D AES_BLOCK_SIZE,
++			.maxauthsize =3D SHA256_DIGEST_SIZE,
++		},
++		.caam =3D {
++			.class1_alg_type =3D OP_ALG_ALGSEL_AES | OP_ALG_AAI_CBC,
++			.class2_alg_type =3D OP_ALG_ALGSEL_SHA1 |
++					   OP_ALG_AAI_HMAC_PRECOMP,
++		},
++	},
+ };
+=20
+ static void caam_skcipher_alg_init(struct caam_skcipher_alg *t_alg)
+--=20
+2.17.1
 
