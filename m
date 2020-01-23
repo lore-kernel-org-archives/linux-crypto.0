@@ -2,189 +2,134 @@ Return-Path: <SRS0=jQAN=3M=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8760C33CB6
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jan 2020 11:44:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3109C2D0DB
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jan 2020 11:52:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B49F92253D
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jan 2020 11:44:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9BC9424655
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Jan 2020 11:52:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="tFSNFy7T"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZUN40+oI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726026AbgAWLo5 (ORCPT
+        id S1726191AbgAWLwj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Jan 2020 06:44:57 -0500
-Received: from mail-vk1-f195.google.com ([209.85.221.195]:34073 "EHLO
-        mail-vk1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726191AbgAWLo4 (ORCPT
+        Thu, 23 Jan 2020 06:52:39 -0500
+Received: from us-smtp-delivery-1.mimecast.com ([207.211.31.120]:57188 "EHLO
+        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1726170AbgAWLwi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Jan 2020 06:44:56 -0500
-Received: by mail-vk1-f195.google.com with SMTP id w67so895399vkf.1
-        for <linux-crypto@vger.kernel.org>; Thu, 23 Jan 2020 03:44:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=nyiurIf26J2PnKEaG0CFQgYd31QfXbKBOura+Qp9DBM=;
-        b=tFSNFy7TaEacy7bRpPIqB4cdCI5aO5jI7z4Cz85Gpq+te0ukUI1F9tsIluuVi7pitp
-         IASLT0XUDz+7mt6+T5PWGQVi2TyP99a4j7wI8IeGOK8IJfM0ZvZqWOVzMwjZa/SZIlRO
-         UhjSe3iGotRv80qlMo4mh8woMNVDkRC7+S8hpJpGFGUCPWKYGpkLj7gJgZcNHyTPTi8N
-         n7IT5cBKS3ckzzajq3S2TmVlfBqFqJibhUuToaaVHHQOKdGG9sxZIVOt+He66nhFu/qM
-         xZnIkhCjLDz+TZB9Knu+i4BqsL7fdf0Q7KTUfWx0IVfeUvdoCcw3oUaaDvSb5pG4gw22
-         tC+g==
+        Thu, 23 Jan 2020 06:52:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1579780357;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=InTGFoFr4K0JH5iJeKl7FcrQzJzUete0v0UfYk0ekVs=;
+        b=ZUN40+oIEvEynQNhzyzM9Funuik6m5tDDDdo4sKJ9mY1bJCMC7hII2DLOqBMEj+wjvOUFg
+        zyHbeqIXtSasxgKKmKsIFoYGeYmLQMXdEu+4acImTC4RS6BIo8mRON/J7tBMbyurmiOKQ1
+        MruXXq2jIPbv5ZKE1Yphit3OrePVIic=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-271-s0T3ePKkOnODc3LA8a4h8A-1; Thu, 23 Jan 2020 06:52:36 -0500
+X-MC-Unique: s0T3ePKkOnODc3LA8a4h8A-1
+Received: by mail-wr1-f71.google.com with SMTP id f15so1609687wrr.2
+        for <linux-crypto@vger.kernel.org>; Thu, 23 Jan 2020 03:52:35 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=nyiurIf26J2PnKEaG0CFQgYd31QfXbKBOura+Qp9DBM=;
-        b=RbVg6fEHBizVbfY0W7lXjDcRAiCQ3qHLv6PoSCPff3KxfJmE/8kuje/iwWIxq5MSDf
-         IroGN0lFEVetLOpaCP3jgGPKXyR3PFSNZNBp4fucX/Hk2PCju00uZjYtQTrnPTG3dLEa
-         28H0qcNR45vevqg9/P7Wl+6s5Q10D0Kl0x+4LPyyeeGEImZ/DQ7A4JOAN+Og+At+z+Fj
-         F4Jmk4ugNtVNk0XQimv4Nq3q7sK0Li3LtNm4BESoqsvPNa1RhDHBRcADvYjHsgUBUIBx
-         heg19xmaqU9cLTW1T+va9w02PlzMirHigSoerFwaqJqQgx+7SebtYLs9nYawo60q4BWp
-         hjSA==
-X-Gm-Message-State: APjAAAW0+sudXcOZYot7md9CGwmzH/pnujw6lTEK/ZWMxtSH+wzc2gu7
-        Wsk99Z8c4OsYkUxXk4iGl+MQryXsuAnB0x/IX4a4pl/2APs=
-X-Google-Smtp-Source: APXvYqzNR8YxDD7XcoX4QE85sxHKmUMY554jZmO4LxS//U6VPPcRLCy7qBezxGpzkc27vKwsef+pT4RGYMyYwlw0Pz0=
-X-Received: by 2002:a1f:7cc2:: with SMTP id x185mr9354470vkc.1.1579779895649;
- Thu, 23 Jan 2020 03:44:55 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=InTGFoFr4K0JH5iJeKl7FcrQzJzUete0v0UfYk0ekVs=;
+        b=aFvHamF4EYuo6mkhN6E9vDLGKt4xd0Q/4TpyMLEBwxXFfUbhv7C8RZiNWGiy/R+WPZ
+         KGewaQNL3rA//iUXJLXl7FmEZYYkWkA3yCyDu25ICY5tvl3mPNxdVp9WGTVwc+nsQcO5
+         qtiNpB88CXESHD0+JEtduzcalExjy9w+Be/o9flFo23cGpH72Pq9C7gMxTCo/BbTrlQT
+         3xk8+WvIv+nkwbhaGHTdNaWA24QLSNj5n4ZoAu+h0Bsr3ZAvzan7oJOpaWMkLp0noITl
+         POpmIBDK633AM0hanki7Ukt6K72vavJcm9Esd+UO8i1pIVn6oJkq1kN0K2OqH/6jzckJ
+         cALw==
+X-Gm-Message-State: APjAAAUKt50dm7SaKa5GzmA83uELoLbhW1z7FCUq6s8DiQpZXoKDgk++
+        OXCC9+gtSB47zRxAy1dHdGr94UWqmleIrXRuZyRHQByBMUkTjfBayMXUYaz9qyWW1Mn/Fd3Nsr/
+        sISuwEQ+WSDU2Rvmjzku/Jmab
+X-Received: by 2002:adf:82a7:: with SMTP id 36mr17569555wrc.203.1579780353397;
+        Thu, 23 Jan 2020 03:52:33 -0800 (PST)
+X-Google-Smtp-Source: APXvYqz5O2ZqEQVqQn32hTKvSwhWMEEvVB7a4Div4tqNA/qDlS49TvRgqkmhE+r7V5GWwO3fPdE5RA==
+X-Received: by 2002:adf:82a7:: with SMTP id 36mr17569535wrc.203.1579780353079;
+        Thu, 23 Jan 2020 03:52:33 -0800 (PST)
+Received: from redhat.com (bzq-79-176-0-156.red.bezeqint.net. [79.176.0.156])
+        by smtp.gmail.com with ESMTPSA id a9sm2320787wmm.15.2020.01.23.03.52.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jan 2020 03:52:32 -0800 (PST)
+Date:   Thu, 23 Jan 2020 06:52:29 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     LABBE Corentin <clabbe@baylibre.com>
+Cc:     arei.gonglei@huawei.com, jasowang@redhat.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        virtualization@lists.linux-foundation.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [CRASH] crypto: virtio: crash when modprobing tcrypt on 5.5-rc7
+ / next-20200122
+Message-ID: <20200123065150-mutt-send-email-mst@kernel.org>
+References: <20200123101000.GB24255@Red>
 MIME-Version: 1.0
-References: <20200116101447.20374-1-gilad@benyossef.com> <CAMuHMdUhR83SZyWX9Du9d3Sp4A48x_msKaOHGsa88EQKStEDQg@mail.gmail.com>
-In-Reply-To: <CAMuHMdUhR83SZyWX9Du9d3Sp4A48x_msKaOHGsa88EQKStEDQg@mail.gmail.com>
-From:   Gilad Ben-Yossef <gilad@benyossef.com>
-Date:   Thu, 23 Jan 2020 13:44:43 +0200
-Message-ID: <CAOtvUMfDnoFu8V7sYvhgsstX6fuUk3foq+9FJ6SbUKEFnq-zMw@mail.gmail.com>
-Subject: Re: [PATCH 00/11] crypto: ccree - fixes and cleanups
-To:     Geert Uytterhoeven <geert@linux-m68k.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Ofir Drang <ofir.drang@arm.com>, Hadar Gat <hadar.gat@arm.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux-Renesas <linux-renesas-soc@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200123101000.GB24255@Red>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+On Thu, Jan 23, 2020 at 11:10:00AM +0100, LABBE Corentin wrote:
+> Hello
+> 
+> When modprobing tcrypt on qemu 4.1.0 I get a kernel panic on 5.5-rc7 and next-20200122
+> qemu is started by:
+> /usr/bin/qemu-system-x86_64 -cpu host -enable-kvm -nographic -net nic,model=e1000,macaddr=52:54:00:12:34:58 -net tap -m 512 -monitor none -object cryptodev-backend-builtin,id=cryptodev0 -device virtio-crypto-pci,id=crypto0,cryptodev=cryptodev0 -append 'console=ttyS0 root=/dev/ram0 ip=dhcp' -kernel /var/lib/lava/dispatcher/tmp/41332/deployimages-td18675m/kernel/bzImage -initrd /var/lib/lava/dispatcher/tmp/41332/deployimages-td18675m/ramdisk/rootfs.cpio.gz -drive format=qcow2,file=/var/lib/lava/dispatcher/tmp/41332/apply-overlay-guest-icy4k1ol/lava-guest.qcow2,media=disk,if=ide,id=lavatest
+> 
+> [  112.771925] general protection fault: 0000 [#1] SMP PTI
+> [  112.772686] CPU: 0 PID: 126 Comm: virtio0-engine Not tainted 5.5.0-rc7+ #1
+> [  112.773576] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ?-20190711_202441-buildvm-armv7-10.arm.fedoraproject.org-2.fc31 04/01/2014
+> [  112.775319] RIP: 0010:sg_next+0x0/0x20
+> [  112.775821] Code: cc cc cc cc cc cc cc cc cc cc c7 47 10 00 00 00 00 89 57 0c 48 89 37 89 4f 08 c3 0f 1f 44 00 00 66 2e 0f 1f 84 00 00 00 00 00 <f6> 07 02 75 17 48 8b 57 20 48 8d 47 20 48 89 d1 48 83 e1 fc 83 e2
+> [  112.778330] RSP: 0018:ffffa92440237d90 EFLAGS: 00010006
+> [  112.779071] RAX: fefefefe00000000 RBX: 000000000000000a RCX: fefefefe00000000
+> [  112.780081] RDX: 0000000000000001 RSI: ffff9b19da1a2180 RDI: fefefefe00000000
+> [  112.781081] RBP: ffff9b19da1a2198 R08: ffff9b19dfb24ee8 R09: 0000000000000a20
+> [  112.782079] R10: ffff9b19da125010 R11: 0000000000000000 R12: ffff9b19da1a21b8
+> [  112.783079] R13: 0000000000000003 R14: ffff9b19da1a2180 R15: 0000000000000004
+> [  112.784077] FS:  0000000000000000(0000) GS:ffff9b19de400000(0000) knlGS:0000000000000000
+> [  112.785202] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [  112.786030] CR2: 00007f18a157b050 CR3: 000000001040a004 CR4: 0000000000060ef0
+> [  112.787034] Call Trace:
+> [  112.787393]  virtqueue_add_sgs+0x4c/0x90
+> [  112.787998]  virtio_crypto_skcipher_crypt_req+0x310/0x3e0
+> [  112.788817]  crypto_pump_work+0x10c/0x240
+> [  112.789420]  ? __kthread_init_worker+0x50/0x50
+> [  112.790082]  kthread_worker_fn+0x89/0x180
+> [  112.790690]  kthread+0x10e/0x130
+> [  112.791182]  ? kthread_park+0x80/0x80
+> [  112.791736]  ret_from_fork+0x35/0x40
+> [  112.792282] Modules linked in: cts lzo salsa20_generic camellia_x86_64 camellia_generic fcrypt pcbc tgr192 anubis wp512 khazad tea michael_mic arc4 cast6_generic cast5_generic cast_common deflate sha512_ssse3 sha512_generic cfb ofb serpent_sse2_x86_64 serpent_generic lrw twofish_x86_64_3way twofish_x86_64 crypto_simd cryptd glue_helper twofish_generic twofish_common blowfish_x86_64 blowfish_generic blowfish_common md4 tcrypt(+)
+> [  112.797652] ---[ end trace 4a8142d4a08c2518 ]---
+> [  112.798320] RIP: 0010:sg_next+0x0/0x20
+> [  112.798865] Code: cc cc cc cc cc cc cc cc cc cc c7 47 10 00 00 00 00 89 57 0c 48 89 37 89 4f 08 c3 0f 1f 44 00 00 66 2e 0f 1f 84 00 00 00 00 00 <f6> 07 02 75 17 48 8b 57 20 48 8d 47 20 48 89 d1 48 83 e1 fc 83 e2
+> [  112.801452] RSP: 0018:ffffa92440237d90 EFLAGS: 00010006
+> [  112.802189] RAX: fefefefe00000000 RBX: 000000000000000a RCX: fefefefe00000000
+> [  112.803190] RDX: 0000000000000001 RSI: ffff9b19da1a2180 RDI: fefefefe00000000
+> [  112.804192] RBP: ffff9b19da1a2198 R08: ffff9b19dfb24ee8 R09: 0000000000000a20
+> [  112.805201] R10: ffff9b19da125010 R11: 0000000000000000 R12: ffff9b19da1a21b8
+> [  112.806195] R13: 0000000000000003 R14: ffff9b19da1a2180 R15: 0000000000000004
+> [  112.807222] FS:  0000000000000000(0000) GS:ffff9b19de400000(0000) knlGS:0000000000000000
+> [  112.808352] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [  112.809169] CR2: 00007f18a157b050 CR3: 000000001040a004 CR4: 0000000000060ef0
+> 
+> I have tested also 5.4.14 
+> and I got random freeze with:
+> qemu-system-x86_64: virtio: zero sized buffers are not allowed
+> 
+> Regards
 
-On Wed, Jan 22, 2020 at 6:51 PM Geert Uytterhoeven <geert@linux-m68k.org> w=
-rote:
->
-> Hi Gilad,
->
-> On Thu, Jan 16, 2020 at 11:25 AM Gilad Ben-Yossef <gilad@benyossef.com> w=
-rote:
-> > A bunch of fixes and code cleanups for the ccree driver
->
-> Thank you!
->
-> I wanted to give this a try, but it looks like CCREE is no longer working
-> on R-Car H3, both with/without this series.
->
-> E.g. with renesas-devel[*] and renesas_defconfig +
-> CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=3Dn, I get the following crash:
->
+did any of previous versions work for you?
+Any chance of a bisect?
 
-Thank you for the bug report Geert!
-
-My R-Car board is on loan at the moment to another project. I didn't
-see this on our internal test board.
-I will track down my R-Car board and reproduce this - hopefully
-beginning of next week and will get back to you.
-
-Thanks again,
-Gilad
-
-> ccree e6601000.crypto: ARM CryptoCell 630P Driver: HW version
-> 0xAF400001/0xDCC63000, Driver version 5.0
-> alg: No test for authenc(xcbc(aes),cbc(aes)) (authenc-xcbc-aes-cbc-aes-cc=
-ree)
-> alg: No test for authenc(xcbc(aes),rfc3686(ctr(aes)))
-> (authenc-xcbc-aes-rfc3686-ctr-aes-ccree)
-> ------------[ cut here ]------------
-> kernel BUG at kernel/dma/swiotlb.c:497!
-> Internal error: Oops - BUG: 0 [#1] PREEMPT SMP
-> CPU: 7 PID: 189 Comm: cryptomgr_test Not tainted 5.5.0-rc7-arm64-renesas =
-#463
-> Hardware name: Renesas Salvator-X 2nd version board based on r8a77951 (DT=
-)
-> pstate: 80000005 (Nzcv daif -PAN -UAO)
-> pc : swiotlb_tbl_map_single+0x30c/0x380
-> lr : swiotlb_map+0xb0/0x300
-> sp : ffff800012313430
-> x29: ffff800012313430 x28: 0000000000000000
-> x27: 0000000000000000 x26: 0000000738e7e000
-> x25: ffff0006fa5f8010 x24: 0000000000000000
-> x23: ffff800011aed000 x22: 0000000000000000
-> x21: 0000000000000000 x20: 00000000000e8000
-> x19: ffff80001105e000 x18: ffffffffffffffff
-> x17: 0000000000000007 x16: 0000000000000001
-> x15: ffff800010f5f908 x14: ffff800092313cf7
-> x13: ffff0006ff0b4000 x12: 0000000000000001
-> x11: 0000000000000003 x10: 0000000000200000
-> x9 : 0000000000000000 x8 : 0000000000000001
-> x7 : ffff800011aed9e0 x6 : 0000000000000000
-> x5 : 0000000000000000 x4 : 0000000000000000
-> x3 : 0000000000000000 x2 : 0000000000000000
-> x1 : 0000000074000000 x0 : 0000000000000000
-> Call trace:
->  swiotlb_tbl_map_single+0x30c/0x380
->  swiotlb_map+0xb0/0x300
->  dma_direct_map_page+0xb8/0x140
->  dma_direct_map_sg+0x78/0xe0
->  cc_map_sg+0x10c/0x1a8
->  cc_map_aead_request+0x160/0x990
->  cc_proc_aead+0x140/0xef8
->  cc_aead_encrypt+0x48/0x68
->  crypto_aead_encrypt+0x20/0x30
->  test_aead_vec_cfg+0x20c/0x848
->  test_aead+0xb8/0x140
->  alg_test_aead+0x94/0x178
->  alg_test+0x108/0x3f8
->  cryptomgr_test+0x40/0x48
->  kthread+0x11c/0x120
->  ret_from_fork+0x10/0x18
-> Code: f9402fbc 17ffffa0 f9000bb3 f9002fbc (d4210000)
-> ---[ end trace 272124cd4e3fd6f0 ]---
-> note: cryptomgr_test[189] exited with preempt_count 1
-> ------------[ cut here ]------------
->
-> FWIW, the same happens on R-Car H3 ES1.0.
-> I haven't tried investigating when it stopped working.
-> I stopped running the crypto manager tests when they were broken by
-> CONFIG_HARDENED_USERCOPY_PAGESPAN=3Dy.
->
-> Do you have a clue?
-> Thanks!
->
-> [*] https://git.kernel.org/pub/scm/linux/kernel/git/geert/renesas-devel.g=
-it/
->
-> Gr{oetje,eeting}s,
->
->                         Geert
->
-> --
-> Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m6=
-8k.org
->
-> In personal conversations with technical people, I call myself a hacker. =
-But
-> when I'm talking to journalists I just say "programmer" or something like=
- that.
->                                 -- Linus Torvalds
-
-
-
---=20
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-values of =CE=B2 will give rise to dom!
