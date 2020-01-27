@@ -2,108 +2,177 @@ Return-Path: <SRS0=Q+7j=3Q=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19915C2D0DB
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jan 2020 15:50:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19740C2D0DB
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jan 2020 16:57:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DDB1C24654
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jan 2020 15:50:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1580140228;
-	bh=yuIIMVFgehN2evVkHN1c5oRnLCR4k9TmqG/yb2ag9Lw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=ir7GcxQaHW0MkX8iMKJuJ+p2ThPf0ojkV/q3oS4fJ0KTJtb8MjJ6Sq0IbXC+mIHrs
-	 7HpIft4+TGYrTB9WYETyQfGdqUVFr+LfDbA9uhXBuU+GjI0f1buaLr1WEJUZv4OhOt
-	 oJYu7+U7nNoVT0v5inKMFNlEug/XioI/SJg0gwpc=
+	by mail.kernel.org (Postfix) with ESMTP id D786B214AF
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jan 2020 16:57:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="idxvBz2w"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729422AbgA0PuY (ORCPT
+        id S1726240AbgA0Q5G (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Jan 2020 10:50:24 -0500
-Received: from mail-ot1-f68.google.com ([209.85.210.68]:34618 "EHLO
-        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728783AbgA0PuY (ORCPT
+        Mon, 27 Jan 2020 11:57:06 -0500
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:43907 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725845AbgA0Q5G (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Jan 2020 10:50:24 -0500
-Received: by mail-ot1-f68.google.com with SMTP id a15so8806053otf.1;
-        Mon, 27 Jan 2020 07:50:24 -0800 (PST)
+        Mon, 27 Jan 2020 11:57:06 -0500
+Received: by mail-pf1-f194.google.com with SMTP id s1so4566663pfh.10;
+        Mon, 27 Jan 2020 08:57:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=bv9qjL9p/yTO8gI2IwvUm3d5y0oyhFWSWAgOHXsx4wg=;
+        b=idxvBz2w+aDPboH83G0TRCoZR93M3a2oRwDAmVMg1dLJzwz3N4Gz6UO/P3zpwkJguc
+         df25uXyjtvEgHVSz/1zgE3ApQoCjgbFPxwublu9lT7bjTeQM01xOhE/5b++tQC2pFnwg
+         tsQoG8HgK5eYDV80f1Yr5oGvE5XMoPr8uLId9pWNyAbls3JUcTo8TFO6ZhpFS9nOU8Rp
+         zVQBmJqpKq7fnlYpqwoDO0oGq4xmkRqqD/FUsoBwFM/rptFa81G1cw4f5uwPtN/seKEO
+         Nv9vdsIHPDB//SNwZS/EADC8AoJuP8P16Ak73jJxRQyfcNFWPwNCrUVd9Is0EbR0cFGQ
+         Krxw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=beqY/DCoJ59EhwodDnm/pkcRiaCO+zbELfu5AXa7uk4=;
-        b=TXXFCw9+jMWKAavB9RkhUdFuk+bN5PCWEGWja2zUXCZv/PDRdNaOeRbaH0ojgWUitF
-         4uL11ZiaP/VFkCjWRuzAVP7DG0pmtcBhFkut2CmX8R8N1xPG51CKHmL39KN4/ZAyD8iQ
-         2dKx0CBEC7C+YBcN9iE67c9+n0N1j08GKGjcr2a6qCvJtzjk5SAIW7mMj3g3O/UXNJAU
-         ZTr1drABsZ1d7C9OQLhsQMZJWDwYvQ2vPgZ4J8WisEom+8LyVoCtnS7Iaz241+cRhcuV
-         R/wv0OrTd41yGy62almCt6ZIHQC+2hEOiHhNeAv4H1f3Lh1tM2Hm3nFENBvU3gztD9yR
-         C3BQ==
-X-Gm-Message-State: APjAAAUZmUbo6f7Fq7tyxheyyDwsxkokK3qiOi49nJjLXx8G6wp5oK1a
-        EptXgoaUs9/J85CqHWCE2Q==
-X-Google-Smtp-Source: APXvYqyn0BH6mGOr5Sh0ZRs/MHfVUVRkxZjQe26RelsSGtz2sJEWvA4FuKGh6M47f/plr8u4qbEHcg==
-X-Received: by 2002:a05:6830:1094:: with SMTP id y20mr5291444oto.12.1580140223624;
-        Mon, 27 Jan 2020 07:50:23 -0800 (PST)
-Received: from rob-hp-laptop (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
-        by smtp.gmail.com with ESMTPSA id t203sm4894791oig.39.2020.01.27.07.50.22
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=bv9qjL9p/yTO8gI2IwvUm3d5y0oyhFWSWAgOHXsx4wg=;
+        b=bAi5eI4oNy4V2ZpGVZvDRehhNST5e1hGm6D6oB7TkW0Va3didNYtUWYBlMyfSTZB42
+         HMJPST7HKhHyhOKXrEdbKjGCTw+McAgVD7GmhLkYj/Sub73N8lEOJRgVxiUo5MhTh1vm
+         DiIH7Vl06moRJMeDW3xrBhZrkfQWx5AIe536oYFjUjKpbUCics5B/RT+0bjsEHMxUyPJ
+         KfohdzxzTIsaR5x6ZK59xZTg7FKntQ+wW3spTd/1S7BXvtrjspRTWlUGzrn/nEyY5gU5
+         WIxI2PHtoc2r1WND1B3o+1u1T917Uzkk/5CAUbBUkZiw6cCqlaJ000r1RrK/PzymMlug
+         kMtg==
+X-Gm-Message-State: APjAAAW21bwvYf7zhZDaUy9NHu/3mfNZSKedUknYwaOIoCCxo5qcujxI
+        ZtriSfgFnwZfZ/9wTKZnKFKsR1vM
+X-Google-Smtp-Source: APXvYqx3i4UK2TRjRn6wDnlzBZRK6VspL+auphc16edtcsB/OENNnTGMJ8MeaR8r+W+gKdTyE+tX+A==
+X-Received: by 2002:a62:5213:: with SMTP id g19mr12705647pfb.188.1580144224832;
+        Mon, 27 Jan 2020 08:57:04 -0800 (PST)
+Received: from localhost.localdomain (c-67-165-113-11.hsd1.wa.comcast.net. [67.165.113.11])
+        by smtp.gmail.com with ESMTPSA id u23sm16368642pfm.29.2020.01.27.08.57.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jan 2020 07:50:22 -0800 (PST)
-Received: (nullmailer pid 19844 invoked by uid 1000);
-        Mon, 27 Jan 2020 15:50:21 -0000
-Date:   Mon, 27 Jan 2020 09:50:21 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     Kalyani Akula <kalyani.akula@xilinx.com>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net, monstr@seznam.cz,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        devicetree@vger.kernel.org, git-dev <git-dev@xilinx.com>,
-        Mohan Marutirao Dhanawade <mohand@xilinx.com>,
-        Sarat Chand Savitala <saratcha@xilinx.com>,
-        Harsh Jain <harshj@xilinx.com>,
-        Michal Simek <michal.simek@xilinx.com>,
-        Kalyani Akula <kalyania@xilinx.com>
-Subject: Re: [PATCH V5 2/4] dt-bindings: crypto: Add bindings for ZynqMP
- AES-GCM driver
-Message-ID: <20200127155021.GA16897@bogus>
-References: <1579777877-10553-1-git-send-email-kalyani.akula@xilinx.com>
- <1579777877-10553-3-git-send-email-kalyani.akula@xilinx.com>
+        Mon, 27 Jan 2020 08:57:03 -0800 (PST)
+From:   Andrey Smirnov <andrew.smirnov@gmail.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
+        Chris Healy <cphealy@gmail.com>,
+        Lucas Stach <l.stach@pengutronix.de>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
+        linux-kernel@vger.kernel.org, linux-imx@nxp.com
+Subject: [PATCH v7 0/9] enable CAAM's HWRNG as default
+Date:   Mon, 27 Jan 2020 08:56:37 -0800
+Message-Id: <20200127165646.19806-1-andrew.smirnov@gmail.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1579777877-10553-3-git-send-email-kalyani.akula@xilinx.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Jan 23, 2020 at 04:41:15PM +0530, Kalyani Akula wrote:
-> Add documentation to describe Xilinx ZynqMP AES-GCM driver bindings.
-> 
-> Signed-off-by: Kalyani Akula <kalyani.akula@xilinx.com>
-> ---
-> 
-> V5 Changes:
-> - Moved dt-bindings patch from 1/4 to 2/4
-> - Converted dt-bindings from .txt to .yaml format.
-> 
->  .../bindings/crypto/xlnx,zynqmp-aes.yaml           | 37 ++++++++++++++++++++++
->  1 file changed, 37 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/crypto/xlnx,zynqmp-aes.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/crypto/xlnx,zynqmp-aes.yaml b/Documentation/devicetree/bindings/crypto/xlnx,zynqmp-aes.yaml
-> new file mode 100644
-> index 0000000..b2bca4b
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/crypto/xlnx,zynqmp-aes.yaml
-> @@ -0,0 +1,37 @@
-> +# SPDX-License-Identifier: GPL-2.0
+Everyone:
 
-Dual license new bindings:
+This series is a continuation of original [discussion]. I don't know
+if what's in the series is enough to use CAAMs HWRNG system wide, but
+I am hoping that with enough iterations and feedback it will be.
 
-(GPL-2.0-only OR BSD-2-Clause)
+Changes since [v1]:
 
-With that,
+    - Original hw_random replaced with the one using output of TRNG directly
 
-Reviewed-by: Rob Herring <robh@kernel.org>
+    - SEC4 DRNG IP block exposed via crypto API
+
+    - Small fix regarding use of GFP_DMA added to the series
+
+Chagnes since [v2]:
+
+    - msleep in polling loop to avoid wasting CPU cycles
+
+    - caam_trng_read() bails out early if 'wait' is set to 'false'
+
+    - fixed typo in ZII's name
+
+Changes since [v3]:
+
+    - DRNG's .cra_name is now "stdrng"
+
+    - collected Reviewd-by tag from Lucas
+
+    - typo fixes in commit messages of the series
+
+Changes since [v4]:
+
+    - Dropped "crypto: caam - RNG4 TRNG errata" and "crypto: caam -
+      enable prediction resistance in HRWNG" to limit the scope of the
+      series. Those two patches are not yet ready and can be submitted
+      separately later.
+
+    - Collected Tested-by from Chris
+
+Changes since [v5]:
+
+    - Series is converted back to implementing HWRNG using a job ring
+      as per feedback from Horia.
+
+Changes since [v6]:
+
+    - "crypto: caam - drop global context pointer and init_done"
+      changed to use devres group to allow freeing HWRNG resource
+      independently of the parent device lifecycle. Code to deal with
+      circular deallocation dependency is added as well
+
+    - Removed worker self-scheduling in "crypto: caam - simplify RNG
+      implementation". It didn't bring much value, but meant that
+      simple cleanup with just a call to flush_work() wasn't good
+      enough.
+
+    - Added a simple function with a FIXME item for MC firmware check in
+      "crypto: caam - enable prediction resistance in HRWNG"
+
+    - "crypto: caam - limit single JD RNG output to maximum of 16
+      bytes" now shrinks async FIFO size from 32K to 64 bytes, since
+      having a buffer that big doesn't seem to do any good given that
+      througput of TRNG
+
+Feedback is welcome!
+
+Thanks,
+Andrey Smirnov
+
+[discussion] https://patchwork.kernel.org/patch/9850669/
+[v1] https://lore.kernel.org/lkml/20191029162916.26579-1-andrew.smirnov@gmail.com
+[v2] https://lore.kernel.org/lkml/20191118153843.28136-1-andrew.smirnov@gmail.com
+[v3] https://lore.kernel.org/lkml/20191120165341.32669-1-andrew.smirnov@gmail.com
+[v4] https://lore.kernel.org/lkml/20191121155554.1227-1-andrew.smirnov@gmail.com
+[v5] https://lore.kernel.org/lkml/20191203162357.21942-1-andrew.smirnov@gmail.com
+[v6] https://lore.kernel.org/lkml/20200108154047.12526-1-andrew.smirnov@gmail.com
+
+
+Andrey Smirnov (9):
+  crypto: caam - allocate RNG instantiation descriptor with GFP_DMA
+  crypto: caam - use struct hwrng's .init for initialization
+  crypto: caam - use devm_kzalloc to allocate JR data
+  crypto: caam - drop global context pointer and init_done
+  crypto: caam - simplify RNG implementation
+  crypto: caam - check if RNG job failed
+  crypto: caam - invalidate entropy register during RNG initialization
+  crypto: caam - enable prediction resistance in HRWNG
+  crypto: caam - limit single JD RNG output to maximum of 16 bytes
+
+ drivers/crypto/caam/caamrng.c | 395 +++++++++++++---------------------
+ drivers/crypto/caam/ctrl.c    |  56 +++--
+ drivers/crypto/caam/desc.h    |   2 +
+ drivers/crypto/caam/intern.h  |   7 +-
+ drivers/crypto/caam/jr.c      |  13 +-
+ drivers/crypto/caam/regs.h    |   7 +-
+ 6 files changed, 209 insertions(+), 271 deletions(-)
+
+--
+2.21.0
