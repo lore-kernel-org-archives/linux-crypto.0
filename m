@@ -2,150 +2,144 @@ Return-Path: <SRS0=Q+7j=3Q=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 681F8C32771
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jan 2020 08:03:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF3C4C32771
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jan 2020 08:04:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 43128214AF
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jan 2020 08:03:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BEC222071E
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jan 2020 08:04:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="XpJkwm3z"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727285AbgA0IDb (ORCPT
+        id S1726029AbgA0IEi (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Jan 2020 03:03:31 -0500
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:35358 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725955AbgA0IDb (ORCPT
+        Mon, 27 Jan 2020 03:04:38 -0500
+Received: from mail-ua1-f66.google.com ([209.85.222.66]:46667 "EHLO
+        mail-ua1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725955AbgA0IEi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Jan 2020 03:03:31 -0500
-Received: by mail-oi1-f194.google.com with SMTP id b18so1888594oie.2;
-        Mon, 27 Jan 2020 00:03:31 -0800 (PST)
+        Mon, 27 Jan 2020 03:04:38 -0500
+Received: by mail-ua1-f66.google.com with SMTP id l6so3085127uap.13
+        for <linux-crypto@vger.kernel.org>; Mon, 27 Jan 2020 00:04:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:from:date:message-id:subject:to:cc
+         :content-transfer-encoding;
+        bh=Dd1uQbbEeuZKBdMMGYg6LsCBUEaMJRt4GAhfQIGnjyw=;
+        b=XpJkwm3zGSKngtRR/yxRetfuEA4WYHE1yRBm3w9OXbNWUA61OOSbJmJupph/kQCSVL
+         AIHSjMqy7tHL5VSFbWq2sCZ2kUstRdGqy8G57mrmz4OE/HzLpAPVkLFBMZzSWpFOWZHx
+         XAzjNqM6lNp7N6apdCrH4srLBj/vIOBVoiHazvIN3aiRRLclEkFGsZAqY2ZYwlQJZ8QO
+         lCgGUcVq0+qHx0x8gKhpI7ObgB0GLuWX/kPfYpOvZ/WnL9hn4QeO0LT6AWLi8vHk660q
+         ElFX0JcD0iUeGIseqRhmB6jEGB3yCEZmLxqbH93eufBYqctMEZ0JeJ/Ou1NsfzhNF7H6
+         hBDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=KgXdDYkIY4+UUqK2Dq+7mVKD4OIm8lXoJ8rViIw8xNg=;
-        b=gM3G5XE/slCfRMJXxCtiKdpCE3MI2MdeUID3tZjdFSB0TWT8dJnfY+uAqshw2RcOGa
-         XFdGJxA9fApeiti/PQxrfPUWHW5iitMxESIxfWhZGSocMZ5GC92ugF3Aeun/wl/wrNZ9
-         HKZ0teIdxyhcgeMycs/SlGRikybeyHeaCs7YmIzm+5K6tmVtngfmezSQk4sup4OSocL5
-         gVBgilZJ+5RhR9QYnScMGAXfVFFykEtzI7VwEh+QoL+OHiDLE+5DweW1+/HtK7Q1ek4I
-         OFpCwJYQ5tUTd5mgt+KF6QPv9Zy36LotAY8P9AuS0fri6PNe8B3A79EFMqcnNs4tPGGd
-         0xiA==
-X-Gm-Message-State: APjAAAXqOhBrpmHRnb/vCFBNlUjU4YafG8eNfolIXwUtBpPHxFueSO3Q
-        slhbFy+G+FSzyLTQQNvBqe7uljUHuiXSON0wSQlDh7m2
-X-Google-Smtp-Source: APXvYqy0qdoCEfCJgb0TnjJLPz4hHSZ5XEbNqTVRatdAxLMHxYZWUQ+YeqIBg/KeEYWzfDRydhyJhTS1GPrz+FLhyLU=
-X-Received: by 2002:a54:4707:: with SMTP id k7mr4863437oik.153.1580112210830;
- Mon, 27 Jan 2020 00:03:30 -0800 (PST)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc
+         :content-transfer-encoding;
+        bh=Dd1uQbbEeuZKBdMMGYg6LsCBUEaMJRt4GAhfQIGnjyw=;
+        b=sjWDGOUqxSkP1QaAEAhF6d/0ITy5oGq/nERQdjoi3/vu5rKXziH9pPESEA7AG1zaIk
+         S9OXdgX5r24+oXwwjUPoHRtBaiKWdOG91jlJ0nfPIEzwQjs2Kb7cu2k8Tu+d2ziE9Hol
+         CNk306eSwIfWJOJxJR9RhsC/489bhNHJod9hG1L16kTqQPgAABV+48gu+XlSvSks0Gbr
+         ak7EbAkNzxtknoSDOmuCDOY39lLLmF2BuZeu1XK63KrqSY8IwVvI2PXZkx7N1fARXxEE
+         YqJvukbvKTezCU8aCq9mAE1JpQkl8uVdfd23nnHcRrineQeIGyuh6MgeGkymwNsvUZEM
+         qEHA==
+X-Gm-Message-State: APjAAAWTqAF23uoQbMdGjycutxv1Ht42N2YcvZ+B28YoC9UEvmx7rtQD
+        YSo0m9UYI3oGjyGrWaKmv1ONbKA0auyOkmcylCNqbY2Ehp1fHaVl
+X-Google-Smtp-Source: APXvYqzgJRFpfT3qOSRSyDxAIb44eApsVA5cAKBvx9d1WAjeD3uvPxPgz1erY+N1B0fEPXw/kjUrsntVkmkFjy3QVGc=
+X-Received: by 2002:ab0:77d7:: with SMTP id y23mr8638431uar.4.1580112276963;
+ Mon, 27 Jan 2020 00:04:36 -0800 (PST)
 MIME-Version: 1.0
-References: <20200126133805.20294-1-gilad@benyossef.com>
-In-Reply-To: <20200126133805.20294-1-gilad@benyossef.com>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Mon, 27 Jan 2020 09:03:19 +0100
-Message-ID: <CAMuHMdXHgMn8L2_CZ8kXcp3g4Y+3HfQsvFhyTZatf8-xk2kUdQ@mail.gmail.com>
-Subject: Re: [RFC] crypto: ccree - protect against short scatterlists
-To:     Gilad Ben-Yossef <gilad@benyossef.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Ofir Drang <ofir.drang@arm.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+From:   Gilad Ben-Yossef <gilad@benyossef.com>
+Date:   Mon, 27 Jan 2020 10:04:26 +0200
+Message-ID: <CAOtvUMcwLtwgigFE2mx7LVjhhEgcZsSS4WyR_SQ2gixTZxyBfg@mail.gmail.com>
+Subject: Possible issue with new inauthentic AEAD in extended crypto tests
+To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Eric Biggers <ebiggers@google.com>
+Cc:     Geert Uytterhoeven <geert@linux-m68k.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        David Miller <davem@davemloft.net>,
+        Ofir Drang <Ofir.Drang@arm.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Gilad,
+Hi,
 
-On Sun, Jan 26, 2020 at 2:38 PM Gilad Ben-Yossef <gilad@benyossef.com> wrote:
-> Deal gracefully with the event of being handed a scatterlist
-> which is shorter than expected.
->
-> This mitigates a crash in some cases of crashes due to
-> attempt to map empty (but not NULL) scatterlists with none
-> zero lengths.
->
-> This is an interim patch, to help diagnoze the issue, not
-> intended for mainline in its current form as of yet.
->
-> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
+I've ran into some problems when enabling the extended crypto tests
+after commit 49763fc6b1af ("crypto: testmgr - generate inauthentic
+AEAD test vectors").
+After looking into the matter, I've found something that seems like a
+possible problem with the tests, but I am not sure and would
+appreciate your consideration:
 
-Thanks for your patch!
+include/crypto/aead.h has this piece of wisdom to offer:
 
-Unfortunately this doesn't make a difference, as ...
+"* It is important to note that if multiple scatter gather list entries for=
+m
+ * the input data mentioned above, the first entry must not point to a NULL
+ * buffer. If there is any potential where the AAD buffer can be NULL, the
+ * calling code must contain a precaution to ensure that this does not resu=
+lt
+ * in the first scatter gather list entry pointing to a NULL buffer."
 
-> --- a/drivers/crypto/ccree/cc_buffer_mgr.c
-> +++ b/drivers/crypto/ccree/cc_buffer_mgr.c
-> @@ -286,10 +286,32 @@ static void cc_add_sg_entry(struct device *dev, struct buffer_array *sgl_data,
->         sgl_data->num_of_buffers++;
->  }
->
-> +static unsigned int cc_sg_trunc_len(struct scatterlist *sg, unsigned int len)
-> +{
-> +       unsigned int total;
-> +
-> +       if (!len)
-> +               return 0;
-> +
-> +       for (total = 0; sg; sg = sg_next(sg)) {
-> +               total += sg->length;
-> +               if (total >= len) {
-> +                       total = len;
-> +                       break;
-> +               }
-> +       }
-> +
-> +       return total;
-> +}
-> +
->  static int cc_map_sg(struct device *dev, struct scatterlist *sg,
->                      unsigned int nbytes, int direction, u32 *nents,
->                      u32 max_sg_nents, u32 *lbytes, u32 *mapped_nents)
->  {
-> +       int ret;
-> +
-> +       nbytes = cc_sg_trunc_len(sg, nbytes);
-> +
->         if (sg_is_last(sg)) {
+However, in generate_random_aead_testvec() we have:
 
-(1) this branch is taken, and not the else below,
-(2) nothing acts upon detecting nbytes = 0.
+        /* AAD, plaintext, and ciphertext lengths */
+        total_len =3D generate_random_length(maxdatasize);
+        if (prandom_u32() % 4 =3D=3D 0)
+                vec->alen =3D 0;
+        else
+                vec->alen =3D generate_random_length(total_len);
+        vec->plen =3D total_len - vec->alen;
+        vec->clen =3D vec->plen + authsize;
 
-With extra debug print:
+Which later calls into generate_aead_message() that has:
 
-    cc_map_sg: nbytes  = 0, first branch taken
+                int i =3D 0;
+                struct scatterlist src[2], dst;
+                u8 iv[MAX_IVLEN];
+                DECLARE_CRYPTO_WAIT(wait);
 
->                 /* One entry only case -set to DLLI */
->                 if (dma_map_sg(dev, sg, 1, direction) != 1) {
-> @@ -313,12 +335,14 @@ static int cc_map_sg(struct device *dev, struct scatterlist *sg,
->                 /* In case of mmu the number of mapped nents might
->                  * be changed from the original sgl nents
->                  */
-> -               *mapped_nents = dma_map_sg(dev, sg, *nents, direction);
-> -               if (*mapped_nents == 0) {
-> +               ret = dma_map_sg(dev, sg, *nents, direction);
-> +               if (dma_mapping_error(dev, ret)) {
->                         *nents = 0;
-> -                       dev_err(dev, "dma_map_sg() sg buffer failed\n");
-> +                       dev_err(dev, "dma_map_sg() sg buffer failed %d\n", ret);
->                         return -ENOMEM;
->                 }
-> +
-> +               *mapped_nents = ret;
->         }
->
->         return 0;
+                /* Generate a random plaintext and encrypt it. */
+                sg_init_table(src, 2);
+                if (vec->alen)
+                        sg_set_buf(&src[i++], vec->assoc, vec->alen);
+                if (vec->plen) {
+                        generate_random_bytes((u8 *)vec->ptext, vec->plen);
+                        sg_set_buf(&src[i++], vec->ptext, vec->plen);
+                }
+                sg_init_one(&dst, vec->ctext, vec->alen + vec->clen);
+                memcpy(iv, vec->iv, ivsize);
+                aead_request_set_callback(req, 0, crypto_req_done, &wait);
+                aead_request_set_crypt(req, src, &dst, vec->plen, iv);
+                aead_request_set_ad(req, vec->alen);
+                vec->crypt_error =3D crypto_wait_req(crypto_aead_encrypt(re=
+q),
+                                                   &wait);
 
-Gr{oetje,eeting}s,
 
-                        Geert
+When both vec->alen and vec->plen are 0, which can happen as
+generate_random_bytes will happily generate  zero length from time to
+time,
+we seem to be getting a scatterlist with the first entry (as well as
+the 2nd) being a NULL.
 
--- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+This seems to violate the words of wisdom from aead.h and much more
+important to me crashes the ccree driver :-)
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Is there anything I am missing or is this a valid concern?
+
+Thanks!
+Gilad
+
+--=20
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+values of =CE=B2 will give rise to dom!
