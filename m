@@ -2,122 +2,337 @@ Return-Path: <SRS0=Q+7j=3Q=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF900C33CB1
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jan 2020 16:57:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 079A8C2D0DB
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jan 2020 22:17:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A5438214AF
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jan 2020 16:57:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b/0JK8rL"
+	by mail.kernel.org (Postfix) with ESMTP id CB4752467B
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jan 2020 22:17:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726360AbgA0Q5I (ORCPT
+        id S1726173AbgA0WRY (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Jan 2020 11:57:08 -0500
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:35700 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725845AbgA0Q5H (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Jan 2020 11:57:07 -0500
-Received: by mail-pf1-f194.google.com with SMTP id i23so5180010pfo.2;
-        Mon, 27 Jan 2020 08:57:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=PRvyPinTl56WwRZm2jsRHtlpDEBNkMeEQKYla1GuCIw=;
-        b=b/0JK8rLW0meh5MIeuVFHvWBBpCn1O29dxZ03qSEmxyll1+Gc6RA5Me90MYDUBFVsc
-         VbETHo0zOMkTQzUUI22zwbKXZiXcAcZ0vsao/8V98Ykai6kvARj/JsS3DXgIKRXQH9ic
-         YjHPPkk1Ga6FKSq0bJI2jIqQkXifeoG32YQjLrRmEzmy3XCElhKbTk3monR/QRQr+KdY
-         IB9dqWNadIYPxFQ3KCmPEIGs+W+NQJezHgDeUeyOLcOsIh/oDDNJJLdYKbmY6dF8lkQs
-         /6obPj6nAREV1wkRCf0mRQble+phLko1xBy5t2O4qzPwHxImIuEKUjxCRPgpXkVdiv0N
-         dVUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=PRvyPinTl56WwRZm2jsRHtlpDEBNkMeEQKYla1GuCIw=;
-        b=AbjqNJrzx+iKkIH90TM1Y/Al5DVyLhqkx8kkp29+WoWomDEaQTJ5/8CHE5ZPUw2NDj
-         CDo+MyXouX5mdJscz0UhMfk/oO7mv0UcWuqzKpN/OKIjv7pKrB0RyLMSgJkTvQxHicE8
-         otExeLie9IeAsKKF5EL+sr9iYK/iBPCDPZJqlb4kGV5slre41340G2Zsvs1RWHCrr3Aa
-         ApdJ8luUxmxyuRL7NWQygfHI43XxSCDLIlsgLLicFHsAA4QhdY+mJgQwCTKaD4unQYpP
-         1ashDhAX25MtQFqTV76M8qxPFcpEtt1fCp2jfFmIi3qM3cMnkNye/ORLX4OV9OBw6keg
-         wP/w==
-X-Gm-Message-State: APjAAAVwV5aiIYDTPOn7ybZrw6XVzpR8y3r8+FwrPy+5tkDoRkWbTYKq
-        Hl7dLV5IQY7OjZipHyIleoXc3rPm
-X-Google-Smtp-Source: APXvYqyXsf4V2K/sgqhMu7zKf/lgK1gLTBOUt2bvgQzvui+PFHJq4tiRWQR+BilWnYd0eETdexVbew==
-X-Received: by 2002:a63:3487:: with SMTP id b129mr20431160pga.320.1580144226195;
-        Mon, 27 Jan 2020 08:57:06 -0800 (PST)
-Received: from localhost.localdomain (c-67-165-113-11.hsd1.wa.comcast.net. [67.165.113.11])
-        by smtp.gmail.com with ESMTPSA id u23sm16368642pfm.29.2020.01.27.08.57.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jan 2020 08:57:05 -0800 (PST)
-From:   Andrey Smirnov <andrew.smirnov@gmail.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
-        Chris Healy <cphealy@gmail.com>,
-        Lucas Stach <l.stach@pengutronix.de>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>, linux-imx@nxp.com,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v7 1/9] crypto: caam - allocate RNG instantiation descriptor with GFP_DMA
-Date:   Mon, 27 Jan 2020 08:56:38 -0800
-Message-Id: <20200127165646.19806-2-andrew.smirnov@gmail.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200127165646.19806-1-andrew.smirnov@gmail.com>
-References: <20200127165646.19806-1-andrew.smirnov@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+        Mon, 27 Jan 2020 17:17:24 -0500
+Received: from inva021.nxp.com ([92.121.34.21]:37894 "EHLO inva021.nxp.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726101AbgA0WRY (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 27 Jan 2020 17:17:24 -0500
+Received: from inva021.nxp.com (localhost [127.0.0.1])
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id AE9C521B9E6;
+        Mon, 27 Jan 2020 23:17:20 +0100 (CET)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id A066121BA0A;
+        Mon, 27 Jan 2020 23:17:20 +0100 (CET)
+Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 082B9205A3;
+        Mon, 27 Jan 2020 23:17:19 +0100 (CET)
+From:   Iuliana Prodan <iuliana.prodan@nxp.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Baolin Wang <baolin.wang@linaro.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Corentin Labbe <clabbe.montjoie@gmail.com>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        Maxime Ripard <mripard@kernel.org>
+Cc:     Aymen Sghaier <aymen.sghaier@nxp.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Silvano Di Ninno <silvano.dininno@nxp.com>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-imx <linux-imx@nxp.com>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>
+Subject: [PATCH] crypto: engine - support for parallel requests
+Date:   Tue, 28 Jan 2020 00:17:05 +0200
+Message-Id: <1580163425-13266-1-git-send-email-iuliana.prodan@nxp.com>
+X-Mailer: git-send-email 2.1.0
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Be consistent with the rest of the codebase and use GFP_DMA when
-allocating memory for a CAAM JR descriptor.
+Added support for executing multiple requests, in parallel,
+for crypto engine.
+A new callback is added, can_enqueue_hardware, which asks the
+driver if the hardware has free space, to enqueue a new request.
+The new crypto_engine_alloc_init_and_set function, initialize
+crypto-engine, sets the maximum size for crypto-engine software
+queue (not hardcoded anymore) and the can_enqueue_hardware callback.
+On crypto_pump_requests, if can_enqueue_hardware callback returns true,
+a new request is send to hardware, until there is no space and the
+callback returns false.
 
-Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
-Cc: Chris Healy <cphealy@gmail.com>
-Cc: Lucas Stach <l.stach@pengutronix.de>
-Cc: Horia Geantă <horia.geanta@nxp.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Iuliana Prodan <iuliana.prodan@nxp.com>
-Cc: linux-imx@nxp.com
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
+
 ---
- drivers/crypto/caam/ctrl.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Changes since V0 (RFC):
+	- removed max_no_req and no_req, as the number of request that
+	  can be processed in parallel;
+	- added a new callback, can_enqueue_hardware, to check whether
+	  the hardware can process a new request. 
+---
 
-diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-index 6659c8d9672e..a11c13a89ef8 100644
---- a/drivers/crypto/caam/ctrl.c
-+++ b/drivers/crypto/caam/ctrl.c
-@@ -194,7 +194,7 @@ static int deinstantiate_rng(struct device *ctrldev, int state_handle_mask)
- 	u32 *desc, status;
- 	int sh_idx, ret = 0;
+ crypto/crypto_engine.c  | 105 ++++++++++++++++++++++++++++++------------------
+ include/crypto/engine.h |  10 +++--
+ 2 files changed, 71 insertions(+), 44 deletions(-)
+
+diff --git a/crypto/crypto_engine.c b/crypto/crypto_engine.c
+index eb029ff..ee3a610 100644
+--- a/crypto/crypto_engine.c
++++ b/crypto/crypto_engine.c
+@@ -22,32 +22,18 @@
+  * @err: error number
+  */
+ static void crypto_finalize_request(struct crypto_engine *engine,
+-			     struct crypto_async_request *req, int err)
++				    struct crypto_async_request *req, int err)
+ {
+-	unsigned long flags;
+-	bool finalize_cur_req = false;
+ 	int ret;
+ 	struct crypto_engine_ctx *enginectx;
  
--	desc = kmalloc(CAAM_CMD_SZ * 3, GFP_KERNEL);
-+	desc = kmalloc(CAAM_CMD_SZ * 3, GFP_KERNEL | GFP_DMA);
- 	if (!desc)
- 		return -ENOMEM;
+-	spin_lock_irqsave(&engine->queue_lock, flags);
+-	if (engine->cur_req == req)
+-		finalize_cur_req = true;
+-	spin_unlock_irqrestore(&engine->queue_lock, flags);
+-
+-	if (finalize_cur_req) {
+-		enginectx = crypto_tfm_ctx(req->tfm);
+-		if (engine->cur_req_prepared &&
+-		    enginectx->op.unprepare_request) {
+-			ret = enginectx->op.unprepare_request(engine, req);
+-			if (ret)
+-				dev_err(engine->dev, "failed to unprepare request\n");
+-		}
+-		spin_lock_irqsave(&engine->queue_lock, flags);
+-		engine->cur_req = NULL;
+-		engine->cur_req_prepared = false;
+-		spin_unlock_irqrestore(&engine->queue_lock, flags);
++	enginectx = crypto_tfm_ctx(req->tfm);
++	if (enginectx->op.prepare_request &&
++	    enginectx->op.unprepare_request) {
++		ret = enginectx->op.unprepare_request(engine, req);
++		if (ret)
++			dev_err(engine->dev, "failed to unprepare request\n");
+ 	}
+-
+ 	req->complete(req, err);
  
-@@ -271,7 +271,7 @@ static int instantiate_rng(struct device *ctrldev, int state_handle_mask,
- 	int ret = 0, sh_idx;
+ 	kthread_queue_work(engine->kworker, &engine->pump_requests);
+@@ -73,10 +59,6 @@ static void crypto_pump_requests(struct crypto_engine *engine,
  
- 	ctrl = (struct caam_ctrl __iomem *)ctrlpriv->ctrl;
--	desc = kmalloc(CAAM_CMD_SZ * 7, GFP_KERNEL);
-+	desc = kmalloc(CAAM_CMD_SZ * 7, GFP_KERNEL | GFP_DMA);
- 	if (!desc)
- 		return -ENOMEM;
+ 	spin_lock_irqsave(&engine->queue_lock, flags);
  
+-	/* Make sure we are not already running a request */
+-	if (engine->cur_req)
+-		goto out;
+-
+ 	/* If another context is idling then defer */
+ 	if (engine->idling) {
+ 		kthread_queue_work(engine->kworker, &engine->pump_requests);
+@@ -108,13 +90,18 @@ static void crypto_pump_requests(struct crypto_engine *engine,
+ 		goto out;
+ 	}
+ 
++start_request:
++	/* If hw is busy, do not send any request */
++	if (engine->can_enqueue_hardware &&
++	    !engine->can_enqueue_hardware(engine->dev))
++		goto out;
++
+ 	/* Get the fist request from the engine queue to handle */
+ 	backlog = crypto_get_backlog(&engine->queue);
+ 	async_req = crypto_dequeue_request(&engine->queue);
+ 	if (!async_req)
+ 		goto out;
+ 
+-	engine->cur_req = async_req;
+ 	if (backlog)
+ 		backlog->complete(backlog, -EINPROGRESS);
+ 
+@@ -130,7 +117,7 @@ static void crypto_pump_requests(struct crypto_engine *engine,
+ 		ret = engine->prepare_crypt_hardware(engine);
+ 		if (ret) {
+ 			dev_err(engine->dev, "failed to prepare crypt hardware\n");
+-			goto req_err;
++			goto req_err_2;
+ 		}
+ 	}
+ 
+@@ -141,26 +128,38 @@ static void crypto_pump_requests(struct crypto_engine *engine,
+ 		if (ret) {
+ 			dev_err(engine->dev, "failed to prepare request: %d\n",
+ 				ret);
+-			goto req_err;
++			goto req_err_2;
+ 		}
+-		engine->cur_req_prepared = true;
+ 	}
+ 	if (!enginectx->op.do_one_request) {
+ 		dev_err(engine->dev, "failed to do request\n");
+ 		ret = -EINVAL;
+-		goto req_err;
++		goto req_err_1;
+ 	}
++
+ 	ret = enginectx->op.do_one_request(engine, async_req);
+ 	if (ret) {
+ 		dev_err(engine->dev, "Failed to do one request from queue: %d\n", ret);
+-		goto req_err;
++		goto req_err_1;
+ 	}
+-	return;
+ 
+-req_err:
+-	crypto_finalize_request(engine, async_req, ret);
+-	return;
++	goto retry;
++
++req_err_1:
++	if (enginectx->op.unprepare_request) {
++		ret = enginectx->op.unprepare_request(engine, async_req);
++		if (ret)
++			dev_err(engine->dev, "failed to unprepare request\n");
++	}
++req_err_2:
++	async_req->complete(async_req, ret);
+ 
++retry:
++	if (engine->can_enqueue_hardware) {
++		spin_lock_irqsave(&engine->queue_lock, flags);
++		goto start_request;
++	}
++	return;
+ out:
+ 	spin_unlock_irqrestore(&engine->queue_lock, flags);
+ }
+@@ -386,15 +385,25 @@ int crypto_engine_stop(struct crypto_engine *engine)
+ EXPORT_SYMBOL_GPL(crypto_engine_stop);
+ 
+ /**
+- * crypto_engine_alloc_init - allocate crypto hardware engine structure and
+- * initialize it.
++ * crypto_engine_alloc_init_and_set - allocate crypto hardware engine structure
++ * and initialize it by setting the maximum number of entries in the software
++ * crypto-engine queue.
+  * @dev: the device attached with one hardware engine
++ * @cbk: pointer to a callback function to be invoked when pumping requests
++ *       to check whether the hardware can process a new request.
++ *       This has the form:
++ *       callback(struct device *dev)
++ *       where:
++ *       @dev: contains the device that processed this response.
+  * @rt: whether this queue is set to run as a realtime task
++ * @qlen: maximum size of the crypto-engine queue
+  *
+  * This must be called from context that can sleep.
+  * Return: the crypto engine structure on success, else NULL.
+  */
+-struct crypto_engine *crypto_engine_alloc_init(struct device *dev, bool rt)
++struct crypto_engine *crypto_engine_alloc_init_and_set(struct device *dev,
++						       bool (*cbk)(struct device *dev),
++						       bool rt, int qlen)
+ {
+ 	struct sched_param param = { .sched_priority = MAX_RT_PRIO / 2 };
+ 	struct crypto_engine *engine;
+@@ -411,12 +420,12 @@ struct crypto_engine *crypto_engine_alloc_init(struct device *dev, bool rt)
+ 	engine->running = false;
+ 	engine->busy = false;
+ 	engine->idling = false;
+-	engine->cur_req_prepared = false;
+ 	engine->priv_data = dev;
++	engine->can_enqueue_hardware = cbk;
+ 	snprintf(engine->name, sizeof(engine->name),
+ 		 "%s-engine", dev_name(dev));
+ 
+-	crypto_init_queue(&engine->queue, CRYPTO_ENGINE_MAX_QLEN);
++	crypto_init_queue(&engine->queue, qlen);
+ 	spin_lock_init(&engine->queue_lock);
+ 
+ 	engine->kworker = kthread_create_worker(0, "%s", engine->name);
+@@ -433,6 +442,22 @@ struct crypto_engine *crypto_engine_alloc_init(struct device *dev, bool rt)
+ 
+ 	return engine;
+ }
++EXPORT_SYMBOL_GPL(crypto_engine_alloc_init_and_set);
++
++/**
++ * crypto_engine_alloc_init - allocate crypto hardware engine structure and
++ * initialize it.
++ * @dev: the device attached with one hardware engine
++ * @rt: whether this queue is set to run as a realtime task
++ *
++ * This must be called from context that can sleep.
++ * Return: the crypto engine structure on success, else NULL.
++ */
++struct crypto_engine *crypto_engine_alloc_init(struct device *dev, bool rt)
++{
++	return crypto_engine_alloc_init_and_set(dev, NULL, rt,
++						CRYPTO_ENGINE_MAX_QLEN);
++}
+ EXPORT_SYMBOL_GPL(crypto_engine_alloc_init);
+ 
+ /**
+diff --git a/include/crypto/engine.h b/include/crypto/engine.h
+index e29cd67..15d1150 100644
+--- a/include/crypto/engine.h
++++ b/include/crypto/engine.h
+@@ -24,7 +24,6 @@
+  * @idling: the engine is entering idle state
+  * @busy: request pump is busy
+  * @running: the engine is on working
+- * @cur_req_prepared: current request is prepared
+  * @list: link with the global crypto engine list
+  * @queue_lock: spinlock to syncronise access to request queue
+  * @queue: the crypto queue of the engine
+@@ -35,17 +34,17 @@
+  * @unprepare_crypt_hardware: there are currently no more requests on the
+  * queue so the subsystem notifies the driver that it may relax the
+  * hardware by issuing this call
++ * @can_enqueue_hardware: callback to check whether the hardware can process
++ * a new request
+  * @kworker: kthread worker struct for request pump
+  * @pump_requests: work struct for scheduling work to the request pump
+  * @priv_data: the engine private data
+- * @cur_req: the current request which is on processing
+  */
+ struct crypto_engine {
+ 	char			name[ENGINE_NAME_LEN];
+ 	bool			idling;
+ 	bool			busy;
+ 	bool			running;
+-	bool			cur_req_prepared;
+ 
+ 	struct list_head	list;
+ 	spinlock_t		queue_lock;
+@@ -56,12 +55,12 @@ struct crypto_engine {
+ 
+ 	int (*prepare_crypt_hardware)(struct crypto_engine *engine);
+ 	int (*unprepare_crypt_hardware)(struct crypto_engine *engine);
++	bool (*can_enqueue_hardware)(struct device *dev);
+ 
+ 	struct kthread_worker           *kworker;
+ 	struct kthread_work             pump_requests;
+ 
+ 	void				*priv_data;
+-	struct crypto_async_request	*cur_req;
+ };
+ 
+ /*
+@@ -102,6 +101,9 @@ void crypto_finalize_skcipher_request(struct crypto_engine *engine,
+ int crypto_engine_start(struct crypto_engine *engine);
+ int crypto_engine_stop(struct crypto_engine *engine);
+ struct crypto_engine *crypto_engine_alloc_init(struct device *dev, bool rt);
++struct crypto_engine *crypto_engine_alloc_init_and_set(struct device *dev,
++						       bool (*cbk)(struct device *dev),
++						       bool rt, int qlen);
+ int crypto_engine_exit(struct crypto_engine *engine);
+ 
+ #endif /* _CRYPTO_ENGINE_H */
 -- 
-2.21.0
+2.1.0
 
