@@ -7,59 +7,60 @@ X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABEFFC2D0DB
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jan 2020 13:44:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C0E9C2D0DB
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jan 2020 13:45:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7AAFD207FD
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jan 2020 13:44:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4BFCB207FD
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jan 2020 13:45:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FeYTk/q3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cRL0v/bF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726101AbgA0Noq (ORCPT
+        id S1726442AbgA0Np4 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Jan 2020 08:44:46 -0500
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:35384 "EHLO
+        Mon, 27 Jan 2020 08:45:56 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:41481 "EHLO
         mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725828AbgA0Noq (ORCPT
+        with ESMTP id S1725828AbgA0Np4 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Jan 2020 08:44:46 -0500
-Received: by mail-wr1-f67.google.com with SMTP id g17so11354556wro.2;
-        Mon, 27 Jan 2020 05:44:44 -0800 (PST)
+        Mon, 27 Jan 2020 08:45:56 -0500
+Received: by mail-wr1-f67.google.com with SMTP id c9so11351490wrw.8;
+        Mon, 27 Jan 2020 05:45:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=wJSM4ovv9urnItT3LFQeBCPJ1eUfCvXrI8Ak3RPAcP0=;
-        b=FeYTk/q3iZiBUCABCEpMEd1HkkmgIvE5pd8LUwS4kaiUJQRaevvB1H2gJiOIcCTH5R
-         nC7oWr8w2PUdWvEfbEcpaWMndGq6UB9df0/gUzaj9yzEHjLlRMFTLjkkid9WbXN6p36C
-         0qKrsVRtT2Xo8oyImwkafwMI54Y/3/uXKTyrI6VT7tbWO1aOxMj1YGib6VNfZR/R44/X
-         XwWHdW6kjTJrTgtssS38yOnWGjaHcnEg60BwZnL9WACleTBI5qBzI0aW7KwXJd5Doj6z
-         M6nupCmMBlNdG8YSaeZMBZj1dNqCEEN/wfAuAqhS7FfGT5o8j0VePqSbkGKRLx4bxzz0
-         eQ0A==
+        bh=z8wEogbygRvbp++ia3Wid/2+2KW6gEIuAoacWgq7qzc=;
+        b=cRL0v/bFbFZAZhiad103inFwPBpqos0ja22iRbW+dOrWsh74BdcetI5WcSEMSIEinN
+         KRB2F9FP/e13dq+bJQOy8yLRxlAxblXwQqV5mFUfJjqOFbU7/JluNgf1+7LCN3efoQF7
+         dYSFNXoV8vA3I5e2vgVtt2uoYTFqTs+14rfvZX2JnD3KE/s6Am2NCl8E+HoUWheX+2WT
+         zILZAJz7ve7m06cyTDMfzUgPY5x/NOUYZWnJx+JHRRa69Du994Hkyje/Fti4dGaulGTY
+         7UedkXMUiNgdJSWFCW6aq4xzq+/Vh2uZcqXvBU4KaW2sXgRTaG7HHNqq20zMGwDQrr+2
+         iddg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=wJSM4ovv9urnItT3LFQeBCPJ1eUfCvXrI8Ak3RPAcP0=;
-        b=f2lPhz49x+JE/pN6nXlZdjPWGJWfKc2bMhygIGGxW6Nuv2X6XSz6g5DXXSIuyeR7B3
-         wNLCq7y9h0BmmnHHNE7chGbXfSrCHsgiWXgOI1R4So3YBVJR4P5xgKu6Y95dDMY6J+pk
-         FEGIBdeyt4pq4cpoE59vzfYWGiAf14pdpRvuXVz7jWwx9pLfMfjlVvPMrOkSEFZY0pTb
-         Q29Ntc5S+qJxITy1RKgAufpcT9JHdWXYd4crC+Q4Xvv27+uRbiWqbxD8082qLfqkayHR
-         Xa/qz/Cn6iND2sB/ggUbbOUj5hKUIb7BcPO7lt4hxCwAlwQmkgZZsj+fGmsFDKqMxpRG
-         gMRQ==
-X-Gm-Message-State: APjAAAXPcEXYCCJadPyi4VLU1iBjCoLwHoA3BtxyowdsGCIZ+RbCXxKB
-        tvsXsXtnpvRDDTJy10yGztUbP8k5WmxkexdBegU=
-X-Google-Smtp-Source: APXvYqzr/40tz/O3/Nl+urt8glsN4lt1n5Ym9GpkWk99Tb3CAgn8sqibjWHF2t5MJu0tVo55XyH3VrjpzNTVhAOCMd4=
-X-Received: by 2002:a5d:6390:: with SMTP id p16mr22908043wru.170.1580132684214;
- Mon, 27 Jan 2020 05:44:44 -0800 (PST)
+        bh=z8wEogbygRvbp++ia3Wid/2+2KW6gEIuAoacWgq7qzc=;
+        b=aYTOwWsyzqgAAiZrxUPiXXl+3oofxiZEpUu4S8TaVKgUlX3+z+c9YqzuXjeI6zXGd4
+         tAkxmbsecjtI89Nbk/LR6lvtQarxpuR9onymqkd3G46e26uibcJHURlfVC3Rr9MyGux4
+         MeFH5k/P89KhyGUpBrdbD6gcATecwOhdv1qIR92kzaKgD9kEUWKxiQqN8PpnTVoefJrX
+         WO2w7+KPycY7xvBq5zT8T7jeyZIvPjCQpbNTDkeNYqlgQdB0ju7ugEPpSWtPwXD9nHkG
+         uCm2bcVCaDps9JaNKayHl6732gqEBu9MO9Y1zu+DaFZlKSfhanfXtJwkuhVjEIaetI1j
+         q5NQ==
+X-Gm-Message-State: APjAAAWbHPk7eU570C2he22ueHjGIoZbHKz04Cwk8XPtO7D+xKvNprYB
+        +HWcH9N0jvFc9gCWHChEj94OZxBTZl0ClZRUVZI=
+X-Google-Smtp-Source: APXvYqy9UtPthtDDo0IABzhU454S5hEjWywRyR/c9pHdOIJGh/RDB5dsYOSfJOcmnuriBjgxgc/EA/GA1SCGsaQXAtc=
+X-Received: by 2002:adf:ea42:: with SMTP id j2mr20895943wrn.270.1580132754034;
+ Mon, 27 Jan 2020 05:45:54 -0800 (PST)
 MIME-Version: 1.0
 References: <20200108154047.12526-1-andrew.smirnov@gmail.com>
- <20200108154047.12526-3-andrew.smirnov@gmail.com> <VI1PR0402MB3485A38A9A71500E632191AD98350@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-In-Reply-To: <VI1PR0402MB3485A38A9A71500E632191AD98350@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <20200108154047.12526-7-andrew.smirnov@gmail.com> <VI1PR0402MB3485B3F4C3E39D0D94A1D8C6980D0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <VI1PR0402MB3485015AD186F00B258F76D4980C0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+In-Reply-To: <VI1PR0402MB3485015AD186F00B258F76D4980C0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
 From:   Andrey Smirnov <andrew.smirnov@gmail.com>
-Date:   Mon, 27 Jan 2020 05:44:32 -0800
-Message-ID: <CAHQ1cqHmn2JwNVjOGdbjuSnf6abfOUVe4xoCE=qvV8++jSFdZg@mail.gmail.com>
-Subject: Re: [PATCH v6 2/7] crypto: caam - drop global context pointer and init_done
+Date:   Mon, 27 Jan 2020 05:45:42 -0800
+Message-ID: <CAHQ1cqG185EmhTYGwfm4LBrhbX1ibACaTAjZ5UnZ5uYx+o88HQ@mail.gmail.com>
+Subject: Re: [PATCH v6 6/7] crypto: caam - enable prediction resistance in HRWNG
 To:     Horia Geanta <horia.geanta@nxp.com>
 Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         Chris Healy <cphealy@gmail.com>,
@@ -74,45 +75,37 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jan 13, 2020 at 1:41 AM Horia Geanta <horia.geanta@nxp.com> wrote:
+On Wed, Jan 22, 2020 at 5:37 AM Horia Geanta <horia.geanta@nxp.com> wrote:
 >
-> On 1/8/2020 5:42 PM, Andrey Smirnov wrote:
-> > @@ -342,18 +324,16 @@ int caam_rng_init(struct device *ctrldev)
-> >       if (!rng_inst)
-> >               return 0;
+> On 1/21/2020 6:38 PM, Horia Geanta wrote:
+> > On 1/8/2020 5:42 PM, Andrey Smirnov wrote:
+> >> @@ -275,12 +276,25 @@ static int instantiate_rng(struct device *ctrldev, int state_handle_mask,
+> >>              return -ENOMEM;
+> >>
+> >>      for (sh_idx = 0; sh_idx < RNG4_MAX_HANDLES; sh_idx++) {
+> >> +            const u32 rdsta_if = RDSTA_IF0 << sh_idx;
+> >> +            const u32 rdsta_pr = RDSTA_PR0 << sh_idx;
+> >> +            const u32 rdsta_mask = rdsta_if | rdsta_pr;
+> >>              /*
+> >>               * If the corresponding bit is set, this state handle
+> >>               * was initialized by somebody else, so it's left alone.
+> >>               */
+> >> -            if ((1 << sh_idx) & state_handle_mask)
+> >> -                    continue;
+> >> +            if (rdsta_if & state_handle_mask) {
+> >> +                    if (rdsta_pr & state_handle_mask)
+> > instantiate_rng() is called with
+> >       state_handle_mask = rd_reg32(&ctrl->r4tst[0].rdsta) & RDSTA_IFMASK;
+> > so if (rdsta_pr & state_handle_mask) will always be false,
+> > leading to unneeded state handle re-initialization.
 > >
-> > -     rng_ctx = kmalloc(sizeof(*rng_ctx), GFP_DMA | GFP_KERNEL);
-> > -     if (!rng_ctx)
-> > +     ctx = devm_kzalloc(ctrldev, sizeof(*ctx), GFP_DMA | GFP_KERNEL);
-> > +     if (!ctx)
-> >               return -ENOMEM;
-> >
-> > -     dev_info(ctrldev, "registering rng-caam\n");
-> > +     ctx->rng.name    = "rng-caam";
-> > +     ctx->rng.init    = caam_init;
-> > +     ctx->rng.cleanup = caam_cleanup;
-> > +     ctx->rng.read    = caam_read;
-> >
-> > -     err = hwrng_register(&caam_rng);
-> > -     if (!err) {
-> > -             init_done = true;
-> > -             return err;
-> > -     }
-> > +     dev_info(ctrldev, "registering rng-caam\n");
-> >
-> > -     kfree(rng_ctx);
-> > -     return err;
-> > +     return devm_hwrng_register(ctrldev, &ctx->rng);
-> This means hwrng_unregister() is called only when ctrldev is removed.
+> Sorry, I missed this change:
+> -#define RDSTA_IFMASK (RDSTA_IF1 | RDSTA_IF0)
+> +#define RDSTA_IFMASK (RDSTA_PR1 | RDSTA_PR0 | RDSTA_IF1 | RDSTA_IF0)
 >
-> OTOH caam_rng_init() could be called multiple times, e.g. if there's only one
-> jrdev left in the system and it's removed then added back.
-> This will lead to caam_rng_init() -> hwrng_register() called twice
-> with the same "rng-caam" name, without a hwrng_unregister() called in-between.
->
+> which means code is correct (though I must admit not so intuitive).
 
-True, but the logic you describe is broken in reality due to circular
-reference from HWRNG, which we never fixed. I'll fix both in v7.
+Renamed this to RDSTA_MASK in v7, to, hopefully make things more clear.
 
 Thanks,
 Andrey Smirnov
