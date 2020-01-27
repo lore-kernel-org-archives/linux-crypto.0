@@ -2,202 +2,106 @@ Return-Path: <SRS0=Q+7j=3Q=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18424C33CB7
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jan 2020 15:08:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 333EBC2D0DB
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jan 2020 15:10:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EB0DD20702
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jan 2020 15:08:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EEF04214DB
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Jan 2020 15:10:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="gB8aH9bX"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729251AbgA0PIy (ORCPT
+        id S1729147AbgA0PKE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Jan 2020 10:08:54 -0500
-Received: from foss.arm.com ([217.140.110.172]:45864 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729213AbgA0PIy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Jan 2020 10:08:54 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8CADD31B;
-        Mon, 27 Jan 2020 07:08:53 -0800 (PST)
-Received: from e110176-lin.kfn.arm.com (unknown [10.50.4.146])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 316B33F67D;
-        Mon, 27 Jan 2020 07:08:52 -0800 (PST)
-From:   Gilad Ben-Yossef <gilad@benyossef.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     Ofir Drang <ofir.drang@arm.com>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [RFC v3] crypto: ccree - protect against short scatterlists
-Date:   Mon, 27 Jan 2020 17:08:21 +0200
-Message-Id: <20200127150822.12126-1-gilad@benyossef.com>
-X-Mailer: git-send-email 2.23.0
+        Mon, 27 Jan 2020 10:10:04 -0500
+Received: from mail-vs1-f66.google.com ([209.85.217.66]:40646 "EHLO
+        mail-vs1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727453AbgA0PKE (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 27 Jan 2020 10:10:04 -0500
+Received: by mail-vs1-f66.google.com with SMTP id g23so5817865vsr.7
+        for <linux-crypto@vger.kernel.org>; Mon, 27 Jan 2020 07:10:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=NkoAUVzWFZjHMMtEdPmvHpOHaSeOlTobo/dhUR4U2mI=;
+        b=gB8aH9bXLODaT5xi6+YHilW7T0QWwBAAdJXLkkbJnINh/xj60xu3s2hA6DzCwXv+DS
+         3aQFGUF9eIk05QAu4EhBap3BxPNU4qG6au51QwFeTW6qPx1AckH1AbWL8k1K0WsC5wu5
+         vHie2JLP6hSf9W+59v383Hpr35ojnQNblt8gf+ozgUyd/GQzPax1JGQbCOCSA1sbpmxe
+         x2bjcvOhEjsaSKEZ25/CkFgazKBSIvHnyz1d+6VQBFH8EKS4Kj7vHhlyZAZJPYd2084W
+         UeUtrhvCVukGhxtzatJIyWhVYMlrdc0lzhy8m5b9p8BUVYRi/aH2dGrsABVOrOYg3PeH
+         dilA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=NkoAUVzWFZjHMMtEdPmvHpOHaSeOlTobo/dhUR4U2mI=;
+        b=F3RVd3uN06a0hecdnPLgXicp+ope9Ad5UyxZNLltcnvvkBi6ynCF4Blo8cDjfsU0G0
+         91nclcmX6DvTdlsGh1sXLlL/aae32cQly5ZcPv3PlmFCFmIJ4fmec/wAxh4NTIv5khvW
+         3hG2Mgsv+1i9TzDGzHfdRYRaOB+PSL+dWRC2bKomAoX4vs3fPA0jN5+uKiSIoJuTLZHo
+         Iuwe1AHOlDeJsPllQrqKUqA7kNKrb7ET0OyeamXpkaKD5uO+iiY5NqM6v9DIHei7AtPu
+         XRctV7itRMEOjRahaV8o9iSQPHazsljb01la1PqGuSnq/2uoNFLG5ujkrRDjvIOtqTfp
+         vIHQ==
+X-Gm-Message-State: APjAAAUUsJxt1FTpg4ep2IbsISvYiRnXa9JUyoY6syhimYlXjOVUI/6O
+        aSlPDNVhoQ02wCpY7UjTG5jfstqDSMVpHqd21CoJ1y4CSdM=
+X-Google-Smtp-Source: APXvYqwXtEK+nyeYN+ImrtWqCwzLW1sUUPSn17lF3dhK2jYXgmqlEoxWUYBw5LsFIOvXnu7JeeiZnw8mTYQ34xHNQug=
+X-Received: by 2002:a67:fb14:: with SMTP id d20mr9765471vsr.136.1580137803056;
+ Mon, 27 Jan 2020 07:10:03 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200127122939.6952-1-gilad@benyossef.com> <CAMuHMdVrQh-1cEncfWoAjhd6SjJRHZPg9Qt7yVyw5Qrdo+-nrQ@mail.gmail.com>
+In-Reply-To: <CAMuHMdVrQh-1cEncfWoAjhd6SjJRHZPg9Qt7yVyw5Qrdo+-nrQ@mail.gmail.com>
+From:   Gilad Ben-Yossef <gilad@benyossef.com>
+Date:   Mon, 27 Jan 2020 17:09:51 +0200
+Message-ID: <CAOtvUMcmw_W-WVMGusCnkKBg71540c8Bo7LCMhz+t+dOsPUG3Q@mail.gmail.com>
+Subject: Re: [RFC] crypto: ccree - protect against short scatterlists
+To:     Geert Uytterhoeven <geert@linux-m68k.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Ofir Drang <ofir.drang@arm.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Deal gracefully with the event of being handed a scatterlist
-which is shorter than expected.
+On Mon, Jan 27, 2020 at 2:52 PM Geert Uytterhoeven <geert@linux-m68k.org> w=
+rote:
+>
+> Hi Gilad,
+>
+> On Mon, Jan 27, 2020 at 1:29 PM Gilad Ben-Yossef <gilad@benyossef.com> wr=
+ote:
+> > Deal gracefully with the event of being handed a scatterlist
+> > which is shorter than expected.
+> >
+> > This mitigates a crash in some cases of Crypto API calls due with
+> > scatterlists with a NULL first buffer, despite the aead.h
+> > forbidding doing so.
+> >
+> > Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+> > Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
+>
+> Thanks for your patch!
+>
+> Unable to handle kernel paging request at virtual address fffeffffc000000=
+0
 
-This mitigates a crash in some cases due to
-attempt to map empty (but not NULL) scatterlists with none
-zero lengths.
+OK, this is a progress of a sort.
+We now crash during unmap, not map.
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
----
- drivers/crypto/ccree/cc_buffer_mgr.c | 65 +++++++++++++---------------
- drivers/crypto/ccree/cc_buffer_mgr.h |  1 +
- 2 files changed, 31 insertions(+), 35 deletions(-)
+Sent another go. If this doesn't work I'll wait till I reunite with the boa=
+rd.
+Blind debugging is hard...
 
-diff --git a/drivers/crypto/ccree/cc_buffer_mgr.c b/drivers/crypto/ccree/cc_buffer_mgr.c
-index a72586eccd81..c5d58becb66d 100644
---- a/drivers/crypto/ccree/cc_buffer_mgr.c
-+++ b/drivers/crypto/ccree/cc_buffer_mgr.c
-@@ -87,6 +87,11 @@ static unsigned int cc_get_sgl_nents(struct device *dev,
- {
- 	unsigned int nents = 0;
- 
-+	*lbytes = 0;
-+
-+	if (!sg_list || !sg_list->length)
-+		goto out;
-+
- 	while (nbytes && sg_list) {
- 		nents++;
- 		/* get the number of bytes in the last entry */
-@@ -95,6 +100,8 @@ static unsigned int cc_get_sgl_nents(struct device *dev,
- 				nbytes : sg_list->length;
- 		sg_list = sg_next(sg_list);
- 	}
-+
-+out:
- 	dev_dbg(dev, "nents %d last bytes %d\n", nents, *lbytes);
- 	return nents;
- }
-@@ -290,37 +297,25 @@ static int cc_map_sg(struct device *dev, struct scatterlist *sg,
- 		     unsigned int nbytes, int direction, u32 *nents,
- 		     u32 max_sg_nents, u32 *lbytes, u32 *mapped_nents)
- {
--	if (sg_is_last(sg)) {
--		/* One entry only case -set to DLLI */
--		if (dma_map_sg(dev, sg, 1, direction) != 1) {
--			dev_err(dev, "dma_map_sg() single buffer failed\n");
--			return -ENOMEM;
--		}
--		dev_dbg(dev, "Mapped sg: dma_address=%pad page=%p addr=%pK offset=%u length=%u\n",
--			&sg_dma_address(sg), sg_page(sg), sg_virt(sg),
--			sg->offset, sg->length);
--		*lbytes = nbytes;
--		*nents = 1;
--		*mapped_nents = 1;
--	} else {  /*sg_is_last*/
--		*nents = cc_get_sgl_nents(dev, sg, nbytes, lbytes);
--		if (*nents > max_sg_nents) {
--			*nents = 0;
--			dev_err(dev, "Too many fragments. current %d max %d\n",
--				*nents, max_sg_nents);
--			return -ENOMEM;
--		}
--		/* In case of mmu the number of mapped nents might
--		 * be changed from the original sgl nents
--		 */
--		*mapped_nents = dma_map_sg(dev, sg, *nents, direction);
--		if (*mapped_nents == 0) {
--			*nents = 0;
--			dev_err(dev, "dma_map_sg() sg buffer failed\n");
--			return -ENOMEM;
--		}
-+	int ret = 0;
-+
-+	*nents = cc_get_sgl_nents(dev, sg, nbytes, lbytes);
-+	if (*nents > max_sg_nents) {
-+		*nents = 0;
-+		dev_err(dev, "Too many fragments. current %d max %d\n",
-+			*nents, max_sg_nents);
-+		return -ENOMEM;
- 	}
- 
-+	ret = dma_map_sg(dev, sg, *nents, direction);
-+	if (dma_mapping_error(dev, ret)) {
-+		*nents = 0;
-+		dev_err(dev, "dma_map_sg() sg buffer failed %d\n", ret);
-+		return -ENOMEM;
-+	}
-+
-+	*mapped_nents = ret;
-+
- 	return 0;
- }
- 
-@@ -555,11 +550,11 @@ void cc_unmap_aead_request(struct device *dev, struct aead_request *req)
- 		sg_virt(req->src), areq_ctx->src.nents, areq_ctx->assoc.nents,
- 		areq_ctx->assoclen, req->cryptlen);
- 
--	dma_unmap_sg(dev, req->src, sg_nents(req->src), DMA_BIDIRECTIONAL);
-+	dma_unmap_sg(dev, req->src, areq_ctx->src.mapped_nents, DMA_BIDIRECTIONAL);
- 	if (req->src != req->dst) {
- 		dev_dbg(dev, "Unmapping dst sgl: req->dst=%pK\n",
- 			sg_virt(req->dst));
--		dma_unmap_sg(dev, req->dst, sg_nents(req->dst),
-+		dma_unmap_sg(dev, req->dst, areq_ctx->dst.mapped_nents,
- 			     DMA_BIDIRECTIONAL);
- 	}
- 	if (drvdata->coherent &&
-@@ -881,7 +876,7 @@ static int cc_aead_chain_data(struct cc_drvdata *drvdata,
- 					    &src_last_bytes);
- 	sg_index = areq_ctx->src_sgl->length;
- 	//check where the data starts
--	while (sg_index <= size_to_skip) {
-+	while (src_mapped_nents && (sg_index <= size_to_skip)) {
- 		src_mapped_nents--;
- 		offset -= areq_ctx->src_sgl->length;
- 		sgl = sg_next(areq_ctx->src_sgl);
-@@ -908,7 +903,7 @@ static int cc_aead_chain_data(struct cc_drvdata *drvdata,
- 			size_for_map += crypto_aead_ivsize(tfm);
- 
- 		rc = cc_map_sg(dev, req->dst, size_for_map, DMA_BIDIRECTIONAL,
--			       &areq_ctx->dst.nents,
-+			       &areq_ctx->dst.mapped_nents,
- 			       LLI_MAX_NUM_OF_DATA_ENTRIES, &dst_last_bytes,
- 			       &dst_mapped_nents);
- 		if (rc)
-@@ -921,7 +916,7 @@ static int cc_aead_chain_data(struct cc_drvdata *drvdata,
- 	offset = size_to_skip;
- 
- 	//check where the data starts
--	while (sg_index <= size_to_skip) {
-+	while (dst_mapped_nents && sg_index <= size_to_skip) {
- 		dst_mapped_nents--;
- 		offset -= areq_ctx->dst_sgl->length;
- 		sgl = sg_next(areq_ctx->dst_sgl);
-@@ -1123,7 +1118,7 @@ int cc_map_aead_request(struct cc_drvdata *drvdata, struct aead_request *req)
- 	if (is_gcm4543)
- 		size_to_map += crypto_aead_ivsize(tfm);
- 	rc = cc_map_sg(dev, req->src, size_to_map, DMA_BIDIRECTIONAL,
--		       &areq_ctx->src.nents,
-+		       &areq_ctx->src.mapped_nents,
- 		       (LLI_MAX_NUM_OF_ASSOC_DATA_ENTRIES +
- 			LLI_MAX_NUM_OF_DATA_ENTRIES),
- 		       &dummy, &mapped_nents);
-diff --git a/drivers/crypto/ccree/cc_buffer_mgr.h b/drivers/crypto/ccree/cc_buffer_mgr.h
-index af434872c6ff..827b6cb1236e 100644
---- a/drivers/crypto/ccree/cc_buffer_mgr.h
-+++ b/drivers/crypto/ccree/cc_buffer_mgr.h
-@@ -25,6 +25,7 @@ enum cc_sg_cpy_direct {
- 
- struct cc_mlli {
- 	cc_sram_addr_t sram_addr;
-+	unsigned int mapped_nents;
- 	unsigned int nents; //sg nents
- 	unsigned int mlli_nents; //mlli nents might be different than the above
- };
--- 
-2.23.0
+Thanks again!
+Gilad
 
+
+values of =CE=B2 will give rise to dom!
