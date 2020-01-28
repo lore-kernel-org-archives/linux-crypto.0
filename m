@@ -2,92 +2,118 @@ Return-Path: <SRS0=0bM2=3R=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9828C33CB7
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jan 2020 03:01:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCFB4C33CB7
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jan 2020 03:15:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7D6832467F
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jan 2020 03:01:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1580180470;
-	bh=dgrFC/YlQ6vdFSWhyXSefEtBu5RQiQmH81+Yg354x4M=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=q8orVP7xLZejtL1z0O3gBcSHVWOVEEfD9tDxda9IQTyAmtcFkKagW9zVqZZHiKWqx
-	 TM3Jm9uQOH3puPYM+oIoBKyEDWtwCSFv9SifoVa83nwMIS9DBnanREi4gdSjjnsZpB
-	 wvLsaeMETvQPvsse8c4LaBxHn2Lj0IiGJcN+HwFk=
+	by mail.kernel.org (Postfix) with ESMTP id 1626F24656
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Jan 2020 03:15:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="AXd0PE4T"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726569AbgA1DBJ (ORCPT
+        id S1726293AbgA1DPe (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Jan 2020 22:01:09 -0500
-Received: from mail.kernel.org ([198.145.29.99]:45198 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726101AbgA1DBJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Jan 2020 22:01:09 -0500
-Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id DA9FC2173E;
-        Tue, 28 Jan 2020 03:01:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1580180469;
-        bh=dgrFC/YlQ6vdFSWhyXSefEtBu5RQiQmH81+Yg354x4M=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Sf7i7IYZ0uS4LnBOERwv1uqa4ceGCqq1UdA0Y651rMIVD9VSu82bNt/HeQqWiTs0w
-         D0xoPbpjVPTR1H8CcV4Y5VazM9WNc3YPBUImegCWEJwQgAm8d90CuF7YQcVRceoTP1
-         iwSkABjAfIqXqKCOxN6zB2D0JkEzxVq229+zPpyY=
-Date:   Mon, 27 Jan 2020 19:01:07 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Geert Uytterhoeven <geert@linux-m68k.org>
+        Mon, 27 Jan 2020 22:15:34 -0500
+Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.50]:19317 "EHLO
+        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726267AbgA1DPe (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 27 Jan 2020 22:15:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1580181329;
+        s=strato-dkim-0002; d=chronox.de;
+        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=lJ11o0DcTDvqJFDrY21f/t0VEMjs0mR17MYiJMNSHa8=;
+        b=AXd0PE4Tvk5HYxiLI509aL0gy9Pd+83DOwOYZDjBV+X7D9nye54wZYlXM33ss+iNbh
+        dh5ffNHYip+e5ETdjvboLE0FN7aS2saMa4AI8+q9CKnFU8s6bt7uj64wrhDJeoZKTYtZ
+        ZLr5AvkGCsQasvkddbZya/GUvo+HLji5cIhbfUwsv6zLDyQW9gcI5YNiQcYRb2K2XHqo
+        wcfLwIYMOeiUg9FWOx7yeHrJPNJvANzuWQR2emCVTYOfZN7QDFQEKbkzqpE7KDrhLeoi
+        MNiWHkvcM3N5qntV3IaCY76t0nJj5r29bY1wE6Ppull/HloyMu7qFrYWr6KGpfp0ZYQa
+        GbsA==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9ym4dPkYX6am8zHoI"
+X-RZG-CLASS-ID: mo00
+Received: from tauon.chronox.de
+        by smtp.strato.de (RZmta 46.1.7 AUTH)
+        with ESMTPSA id I05c44w0S3FFLNz
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+        Tue, 28 Jan 2020 04:15:15 +0100 (CET)
+From:   Stephan Mueller <smueller@chronox.de>
+To:     Eric Biggers <ebiggers@kernel.org>
 Cc:     Gilad Ben-Yossef <gilad@benyossef.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Ofir Drang <ofir.drang@arm.com>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC v3] crypto: ccree - protect against short scatterlists
-Message-ID: <20200128030107.GF960@sol.localdomain>
-References: <20200127150822.12126-1-gilad@benyossef.com>
- <CAMuHMdVFcsS9K=7+LfT_Tmmpz4LMS69=+EO+8_BkJoXCOfPzPA@mail.gmail.com>
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        David Miller <davem@davemloft.net>,
+        Ofir Drang <Ofir.Drang@arm.com>
+Subject: Re: Possible issue with new inauthentic AEAD in extended crypto tests
+Date:   Tue, 28 Jan 2020 04:15:11 +0100
+Message-ID: <3730881.07ufDO6WFW@tauon.chronox.de>
+In-Reply-To: <20200128023455.GC960@sol.localdomain>
+References: <CAOtvUMcwLtwgigFE2mx7LVjhhEgcZsSS4WyR_SQ2gixTZxyBfg@mail.gmail.com> <20200128023455.GC960@sol.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAMuHMdVFcsS9K=7+LfT_Tmmpz4LMS69=+EO+8_BkJoXCOfPzPA@mail.gmail.com>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Jan 27, 2020 at 04:22:53PM +0100, Geert Uytterhoeven wrote:
-> Hi Gilad,
-> 
-> On Mon, Jan 27, 2020 at 4:08 PM Gilad Ben-Yossef <gilad@benyossef.com> wrote:
-> > Deal gracefully with the event of being handed a scatterlist
-> > which is shorter than expected.
-> >
-> > This mitigates a crash in some cases due to
-> > attempt to map empty (but not NULL) scatterlists with none
-> > zero lengths.
-> >
-> > Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-> > Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> 
-> Thank you, boots fine on Salvator-XS with R-Car H3ES2.0, and
-> CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=y.
-> 
-> Tested-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> 
-> Gr{oetje,eeting}s,
-> 
+Am Dienstag, 28. Januar 2020, 03:34:55 CET schrieb Eric Biggers:
 
-Note that you need to *unset* CONFIG_CRYPTO_MANAGER_DISABLE_TESTS to enable the
-self-tests.
+Hi Eric,
 
-So to run the full tests, the following is needed:
+> On Mon, Jan 27, 2020 at 10:04:26AM +0200, Gilad Ben-Yossef wrote:
+> > When both vec->alen and vec->plen are 0, which can happen as
+> > generate_random_bytes will happily generate  zero length from time to
+> > time,
+> > we seem to be getting a scatterlist with the first entry (as well as
+> > the 2nd) being a NULL.
+> > 
+> > This seems to violate the words of wisdom from aead.h and much more
+> > important to me crashes the ccree driver :-)
+> > 
+> > Is there anything I am missing or is this a valid concern?
+> 
+> My understanding is that all crypto API functions that take scatterlists
+> only forbid zero-length scatterlist elements in the part of the scatterlist
+> that's actually passed to the API call.  The input to these functions is
+> never simply a scatterlist, but rather a (scatterlist, length) pair. 
+> Algorithms shouldn't look beyond 'length', so in the case of 'length == 0',
+> they shouldn't look at the scatterlist at all -- which may be just a NULL
+> pointer.
+> 
+> If that's the case, there's no problem with this test code.
 
-# CONFIG_CRYPTO_MANAGER_DISABLE_TESTS is not set
-CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
+I agree with your assessment. Not only when looking at cipher or template 
+implementations, but also when looking at the scatterwalk API the SGL length 
+field is processed first. If the length field is insufficient then the SGL is 
+not processed.
+> 
+> I'm not sure the comment in aead.h is relevant here.  It sounds like it's
+> warning about not providing an empty scatterlist element for the AAD when
+> it's followed by a nonempty scatterlist element for the plaintext.  I'm not
+> sure it's meant to also cover the case where both are empty.
 
-- Eric
+The statement here (and maybe it could be updated) refers to a valid SGL with 
+a size > 0, but where the first SGL entry points to a NULL buffer. This is an 
+invalid use of an SGL.
+
+Specifically for AEAD, the SGL must have the form of (assoc data || 
+plaintext). As the AAD is not required for a successful cipher operation, the 
+caller of the crypto API must guarantee the AAD is either non-NULL or the SGL 
+must start with the plaintext as the first entry.
+> 
+> Herbert and Stephan, any thoughts on what was intended?
+> 
+> - Eric
+
+
+
+Ciao
+Stephan
+
+
