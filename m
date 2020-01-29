@@ -2,242 +2,275 @@ Return-Path: <SRS0=eQ+U=3S=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.5 required=3.0 tests=DATE_IN_PAST_03_06,
-	DKIM_INVALID,DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDC24C33CB2
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jan 2020 04:34:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DA9CC33CB2
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jan 2020 08:40:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B084E207FD
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jan 2020 04:34:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D5BE20702
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jan 2020 08:40:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="aKTYHo9w"
+	dkim=pass (1024-bit key) header.d=rambus.com header.i=@rambus.com header.b="JzeW/SBS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726487AbgA2Eeu (ORCPT
+        id S1726116AbgA2Ike (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Jan 2020 23:34:50 -0500
-Received: from mo4-p01-ob.smtp.rzone.de ([81.169.146.166]:21683 "EHLO
-        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726401AbgA2Eeu (ORCPT
+        Wed, 29 Jan 2020 03:40:34 -0500
+Received: from us-smtp-delivery-148.mimecast.com ([216.205.24.148]:54155 "EHLO
+        us-smtp-delivery-148.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726068AbgA2Ike (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Jan 2020 23:34:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1580272484;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=2VPayVNGITV4ygmG0shnR19vCwSF4Xq607xo+3bjFQk=;
-        b=aKTYHo9wDQ+xH8G+9JcnI2sCK9TawpH1rbE/uUppmsWNoiJ/o9BWzIEUoo+XSVFUlD
-        oSGfm3W0sBg+Ff1pEUY0NX/Lj2vhser/jytK8p8RpeFwLDL69WsB2rVEGa/nUJ5lQweC
-        AVgHdjE1za9DQwNKWdUoALWnjlVFnQBX3Y5K+NdJmJy0R/Ai6LbS3lG10wFpaQfrAjW4
-        rqxwL2CWLRtLfe4ddIcIRpGZO9lCy9Os13egdjeN8M8uGSy9pgLwcN7PKuBLBrNmTEDD
-        ou8LQzER/qZr/4zkz6PPZW95rFEG4N4eq3E71cIpXm/Fl5I/EkI2zFV22ul/ncJyL2nh
-        wniw==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9ym4dPkYX6am8zHoI"
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-        by smtp.strato.de (RZmta 46.1.7 AUTH)
-        with ESMTPSA id I05c44w0T4YXSCa
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-        Wed, 29 Jan 2020 05:34:33 +0100 (CET)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     "Van Leeuwen, Pascal" <pvanleeuwen@rambus.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
+        Wed, 29 Jan 2020 03:40:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rambus.com;
+        s=mimecast20161209; t=1580287232;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xPSleg3pS4ic4o5/6gDtPIuHLKispUaCjpJVQy20d3A=;
+        b=JzeW/SBSAv1qU83uQYpjPm8Qc6Ka+jFb4+P3E91+xCLmxptDCTPODwF8aOFNdhiY7IGWC6
+        iJPTWsAVXoBhBET4srHtZe1/HqMfl+kp1vsTvOgBJGrJImGz2D4dk6mdJ1+08mIXnHI7eK
+        nSLr+zBkT+VOiQZCcUMZClct6w4bG4k=
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com
+ (mail-dm6nam12lp2170.outbound.protection.outlook.com [104.47.59.170])
+ (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-269-v8e8fwlcOquMVwVdkifKQg-1; Wed, 29 Jan 2020 03:40:30 -0500
+Received: from CY4PR0401MB3652.namprd04.prod.outlook.com (52.132.97.155) by
+ CY4PR0401MB3666.namprd04.prod.outlook.com (52.132.97.149) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2665.23; Wed, 29 Jan 2020 08:40:28 +0000
+Received: from CY4PR0401MB3652.namprd04.prod.outlook.com
+ ([fe80::8140:5c22:404e:65e7]) by CY4PR0401MB3652.namprd04.prod.outlook.com
+ ([fe80::8140:5c22:404e:65e7%7]) with mapi id 15.20.2665.026; Wed, 29 Jan 2020
+ 08:40:28 +0000
+From:   "Van Leeuwen, Pascal" <pvanleeuwen@rambus.com>
+To:     Stephan Mueller <smueller@chronox.de>
+CC:     Eric Biggers <ebiggers@kernel.org>,
         Gilad Ben-Yossef <gilad@benyossef.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Geert Uytterhoeven <geert@linux-m68k.org>,
         David Miller <davem@davemloft.net>,
         Ofir Drang <Ofir.Drang@arm.com>
-Subject: Re: Possible issue with new inauthentic AEAD in extended crypto tests
-Date:   Wed, 29 Jan 2020 02:26:47 +0100
-Message-ID: <5573296.77rzmo0hQ5@tauon.chronox.de>
-In-Reply-To: <CY4PR0401MB3652A030115942389B57A8E3C3050@CY4PR0401MB3652.namprd04.prod.outlook.com>
-References: <CAOtvUMcwLtwgigFE2mx7LVjhhEgcZsSS4WyR_SQ2gixTZxyBfg@mail.gmail.com> <b5a529fd1abd46ea881b18c387fcd4dc@MN2PR20MB2973.namprd20.prod.outlook.com> <CY4PR0401MB3652A030115942389B57A8E3C3050@CY4PR0401MB3652.namprd04.prod.outlook.com>
+Subject: RE: Possible issue with new inauthentic AEAD in extended crypto tests
+Thread-Topic: Possible issue with new inauthentic AEAD in extended crypto
+ tests
+Thread-Index: AQHV1Ohtfj6tA7gaZ0uNkoHJDpcQdaf/XTuAgAARvQCAAD8mgIAA510AgAAczlCAACo+gIAAdKww
+Date:   Wed, 29 Jan 2020 08:40:28 +0000
+Message-ID: <CY4PR0401MB365296BC605383E0C0506C04C3050@CY4PR0401MB3652.namprd04.prod.outlook.com>
+References: <CAOtvUMcwLtwgigFE2mx7LVjhhEgcZsSS4WyR_SQ2gixTZxyBfg@mail.gmail.com>
+ <b5a529fd1abd46ea881b18c387fcd4dc@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <CY4PR0401MB3652A030115942389B57A8E3C3050@CY4PR0401MB3652.namprd04.prod.outlook.com>
+ <11489dad16d64075939db69181b5ecbb@MN2PR20MB2973.namprd20.prod.outlook.com>
+In-Reply-To: <11489dad16d64075939db69181b5ecbb@MN2PR20MB2973.namprd20.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [31.149.181.161]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: fcf5a34c-4ee3-4cd1-ca6d-08d7a496e4e8
+x-ms-traffictypediagnostic: CY4PR0401MB3666:
+x-microsoft-antispam-prvs: <CY4PR0401MB366621123E90C39460690A2BC3050@CY4PR0401MB3666.namprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:3826;
+x-forefront-prvs: 02973C87BC
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(346002)(136003)(376002)(366004)(396003)(39830400003)(199004)(189003)(2906002)(55016002)(52536014)(4326008)(5660300002)(81156014)(26005)(7696005)(9686003)(186003)(53546011)(478600001)(6506007)(81166006)(71200400001)(8676002)(8936002)(66946007)(6916009)(76116006)(66556008)(33656002)(66446008)(316002)(86362001)(54906003)(64756008)(66476007);DIR:OUT;SFP:1101;SCL:1;SRVR:CY4PR0401MB3666;H:CY4PR0401MB3652.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: NVLpDPy9CObSkoFGHcRKgQ1PRgc++lzDoJU4bITx2LqJUCiOmK9wohzs9onApsxlVAMvBz9cbTa5QhpEHpSZ1uZozrhnVhbiotx9qjFRO+FmSXuX+lx3IGYiGg0WhwiO580E4jJdOgMIAZmfkE1XFDa7g+PygzFWNRSM2Fxj8sJqQZ61QKxLTKeg4T02udZRh0QBrhJTDi65A6jHkV7yj+bUV8sq6fhCRas6yilgub9Dgy9OUBFKURC9uLGnndwnZutSBDBH0hvRxLpbWy78dAuD1ejBudzKvrBm1f0cZnRC0tLQj2lJV2Jts01u+nYFfrg18lWOHuZWnPf/py7l4p+KFNE5mf7PKzajq+PFESxrxQ8C/s6OzH+KKEifii9t8g1JdgLiaG7ugn9g7zfzA5XLRPhVOfOEey9hE21Nt2hLWvTsfDCm/8PkqW1G49H+bRRMr6wSqoK+ObNypLlO9x++UzqBQMFDUJ5LpftcBN98lnroQUXunj//WWR5IGI9FcHo6Gw9xLbsR06PrlyTUA==
+x-ms-exchange-antispam-messagedata: +XHJUwDmJHVjN7uSKA0Qohr1B6ODNmcuuADWS3N8EoPKpPDYMgs/h2WghdoC+4cdqsEYtA/MLMdwx8IUqjcfGswUlbdo8uY9OyjeW82ChE5n+PIEK2AppEZkvRkC5cO9OFim4o0WL47PY+tpztGMwQ==
+x-ms-exchange-transport-forked: True
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+X-OriginatorOrg: rambus.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fcf5a34c-4ee3-4cd1-ca6d-08d7a496e4e8
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Jan 2020 08:40:28.6776
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bd0ba799-c2b9-413c-9c56-5d1731c4827c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: aEG62TE9WwNtDMfbp5wW3e/7FHdBVdqLhGiZzE1eq7DfmbCHHYrlEiyiZSQk7+yhQVGKzL33wmhdCf6u5973GQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR0401MB3666
+X-MC-Unique: v8e8fwlcOquMVwVdkifKQg-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: rambus.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Mittwoch, 29. Januar 2020, 01:18:29 CET schrieb Van Leeuwen, Pascal:
-
-Hi Pascal,
-
-> > -----Original Message-----
-> > From: linux-crypto-owner@vger.kernel.org
-> > <linux-crypto-owner@vger.kernel.org> On Behalf Of Eric Biggers
- Sent:
-> > Tuesday, January 28, 2020 10:13 PM
-> > To: Gilad Ben-Yossef <gilad@benyossef.com>
-> > Cc: Herbert Xu <herbert@gondor.apana.org.au>; Stephan Mueller
-> > <smueller@chronox.de>; Linux Crypto Mailing List <linux-
-> > crypto@vger.kernel.org>; Geert Uytterhoeven <geert@linux-m68k.org>; David
-> > Miller <davem@davemloft.net>; Ofir Drang <Ofir.Drang@arm.com>
-> > Subject: Re: Possible issue with new inauthentic AEAD in extended crypto
-> > tests
->
-> >
-> >
-> > <<< External Email >>>
-> > CAUTION: This email originated from outside of the organization. Do not
-> > click links or open attachments unless you recognize the
- sender/sender
-> > address and know the content is safe.
-> >
-> >
-> >
-> >
-> > On Tue, Jan 28, 2020 at 09:24:25AM +0200, Gilad Ben-Yossef wrote:
-> > 
-> > > - The source is presumed to have enough room for both the associated
-> > > data and the plaintext.
-> > > - Unless it's in-place encryption, in which case, you also presume to
-> > > have room for the authentication tag
-> >
-> >
-> >
-> > The authentication tag is part of the ciphertext, not the plaintext.  So
-> > the
- rule is just that the ciphertext buffer needs to have room for it,
-> > not the plaintext.
-> >
-> >
-> >
-> > Of course, when doing in-place encryption/decryption, the two buffers are
-> > the
- same, so both will have room for it, even though the tag is only
-> > meaningful on the ciphertext side.  That's just the logical consequence
-> > of "in-place".>
-> >
-> >
-> > > - The only way to tell if this is in-place encryption or not is to
-> > > compare the pointers to the source and destination - there is no flag.
-> >
-> >
-> >
-> > Requiring users to remember to provide a flag to indicate in-place
-> > encryption/decryption, in addition to passing the same scatterlist, would
-> > make
- the API more complex.
-> >
-> >
-> 
-> Also, what would the benefit? You'd still have to compare the flag. The
-> performance
- difference of comparing the flag vs comparing 2 pointers (that
-> you need to read anyway) is likely completely negligible on most modern CPU
-> architectures ... 
-> 
-> > > - You can count on the scattergather list not having  a first NULL
-> > > buffer, *unless* the plaintext and associated data length are both
-> > > zero AND it's not in place encryption.
-> > > - You can count on not getting NULL as a scatterlist point, *unless*
-> > > the plaintext and associated data length are both zero AND it's not in
-> > > place encryption. (I'm actually unsure of this one?)
-> >
-> >
-> >
-> > If we consider that the input is not just a scatterlist, but rather a
-> > scatterlist and a length, then these observations are really just "you
-> > can
-> > access the first byte, unless the length is 0" -- which is sort of
-> > obvious.  And requiring a dereferencable pointer for length = 0 is
-> > generally considered to be bad API design; see the memcpy() fiasco
-> > (https://www.imperialviolet.org/2016/06/26/nonnull.html).
-> >
-> >
-> >
-> > The API could be simplified by only supporting full scatterlists, but it
-> > seems that users are currently relying on being able to encrypt/decrypt
-> > just a prefix.>
-> >
-> >
-> > IMO, the biggest problems with the AEAD API are actually things you
-> > didn't
-> > mention, such as the fact that the AAD isn't given in a separate
-> > scatterlist,
->
-> >
-> 
-> While I can understand this may be beneficial in some cases, I believe they
-> do not
-> outweigh the downsides:
-> - In many use cases, AAD+cipher text are stored as one contiguous string.
-
-Then refer to that one linear buffer with one SGL entry.
-
-> Requiring this
-> string to be spit into seperate particles for AAD and
-> ciphertext would be a burden.
-
-There is no need to split a string. All that is said is that the SGL needs to 
-point to memory that is AAD||PT or AAD||CT||TAG. There is no statement about 
-the number of SGL entries to point to these buffer(s). So you could have one 
-linear buffer for these components pointing to it with an SGL holding one 
-entry.
-
-> - For hardware accelerators, there is a cost
-> associated with each additional particle, in terms of either bandwidth or
-> performance or both. So less particles = better, generally. 
-> The only thing that I find odd is that if you do a non-inplace operation you
-> have this
-> undefined(?) gap in the output data where the AAD would be for
-> inplace. That makes little sense to me and requires extra effort to skip
-> over in the driver. 
-> 
-> > and that the API only supports scatterlists and not virtual addresses
-> > (which makes it difficult to use in some cases).
-> >
-> >
-> 
-> While I can understand that this is difficult if the API user just got this
-> virtual address
- provided from somewhere else and needs to do the
-> translation, the other side of the medal is that any hardware driver would
-> otherwise have to do address translation and scatterlist building on the
-> fly (as hardware needs to access contiguous physical memory), which would
-> be real burden there. While many API users_are_ able to provide a nice
-> scatterlist at negligible extra cost. So why burden those?
-> 
-> 
-> > In any case we do need much better documentation.  I'm planning to improve
-> > some
- of the crypto API documentation, but I'll probably do the hash and
-> > skcipher algorithm types first before getting to AEAD.  So if you want to
-> > improve the AEAD documentation in the mean time, please go ahead.
-> >
-> >
-> >
-> > - Eric
-> 
-> 
-> Regards,
-> Pascal van Leeuwen
-> Silicon IP Architect Multi-Protocol Engines, Rambus Security
-> Rambus ROTW Holding BV
-> +31-73 6581953
-> 
-> Note: The Inside Secure/Verimatrix Silicon IP team was recently acquired by
-> Rambus.
- Please be so kind to update your e-mail address book with my new
-> e-mail address. 
-> 
-> ** This message and any attachments are for the sole use of the intended
-> recipient(s). It may contain information that is confidential and
-> privileged. If you are not the intended recipient of this message, you are
-> prohibited from printing, copying, forwarding or saving it. Please delete
-> the message and attachments and notify the sender immediately. **
- 
-> Rambus Inc.<http://www.rambus.com>
-
-
-
-Ciao
-Stephan
-
+SGkgU3RlcGhhbiwNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBsaW51
+eC1jcnlwdG8tb3duZXJAdmdlci5rZXJuZWwub3JnIDxsaW51eC1jcnlwdG8tb3duZXJAdmdlci5r
+ZXJuZWwub3JnPiBPbiBCZWhhbGYgT2YgU3RlcGhhbiBNdWVsbGVyDQo+IFNlbnQ6IFdlZG5lc2Rh
+eSwgSmFudWFyeSAyOSwgMjAyMCAyOjI3IEFNDQo+IFRvOiBWYW4gTGVldXdlbiwgUGFzY2FsIDxw
+dmFubGVldXdlbkByYW1idXMuY29tPg0KPiBDYzogRXJpYyBCaWdnZXJzIDxlYmlnZ2Vyc0BrZXJu
+ZWwub3JnPjsgR2lsYWQgQmVuLVlvc3NlZiA8Z2lsYWRAYmVueW9zc2VmLmNvbT47IEhlcmJlcnQg
+WHUgPGhlcmJlcnRAZ29uZG9yLmFwYW5hLm9yZy5hdT47DQo+IExpbnV4IENyeXB0byBNYWlsaW5n
+IExpc3QgPGxpbnV4LWNyeXB0b0B2Z2VyLmtlcm5lbC5vcmc+OyBHZWVydCBVeXR0ZXJob2V2ZW4g
+PGdlZXJ0QGxpbnV4LW02OGsub3JnPjsgRGF2aWQgTWlsbGVyDQo+IDxkYXZlbUBkYXZlbWxvZnQu
+bmV0PjsgT2ZpciBEcmFuZyA8T2Zpci5EcmFuZ0Bhcm0uY29tPg0KPiBTdWJqZWN0OiBSZTogUG9z
+c2libGUgaXNzdWUgd2l0aCBuZXcgaW5hdXRoZW50aWMgQUVBRCBpbiBleHRlbmRlZCBjcnlwdG8g
+dGVzdHMNCj4NCj4gPDw8IEV4dGVybmFsIEVtYWlsID4+Pg0KPiBDQVVUSU9OOiBUaGlzIGVtYWls
+IG9yaWdpbmF0ZWQgZnJvbSBvdXRzaWRlIG9mIHRoZSBvcmdhbml6YXRpb24uIERvIG5vdCBjbGlj
+ayBsaW5rcyBvciBvcGVuIGF0dGFjaG1lbnRzIHVubGVzcyB5b3UgcmVjb2duaXplIHRoZQ0KPiBz
+ZW5kZXIvc2VuZGVyIGFkZHJlc3MgYW5kIGtub3cgdGhlIGNvbnRlbnQgaXMgc2FmZS4NCj4NCj4N
+Cj4gQW0gTWl0dHdvY2gsIDI5LiBKYW51YXIgMjAyMCwgMDE6MTg6MjkgQ0VUIHNjaHJpZWIgVmFu
+IExlZXV3ZW4sIFBhc2NhbDoNCj4NCj4gSGkgUGFzY2FsLA0KPg0KPiA+ID4gLS0tLS1PcmlnaW5h
+bCBNZXNzYWdlLS0tLS0NCj4gPiA+IEZyb206IGxpbnV4LWNyeXB0by1vd25lckB2Z2VyLmtlcm5l
+bC5vcmcNCj4gPiA+IDxsaW51eC1jcnlwdG8tb3duZXJAdmdlci5rZXJuZWwub3JnPiBPbiBCZWhh
+bGYgT2YgRXJpYyBCaWdnZXJzDQo+ICBTZW50Og0KPiA+ID4gVHVlc2RheSwgSmFudWFyeSAyOCwg
+MjAyMCAxMDoxMyBQTQ0KPiA+ID4gVG86IEdpbGFkIEJlbi1Zb3NzZWYgPGdpbGFkQGJlbnlvc3Nl
+Zi5jb20+DQo+ID4gPiBDYzogSGVyYmVydCBYdSA8aGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1
+PjsgU3RlcGhhbiBNdWVsbGVyDQo+ID4gPiA8c211ZWxsZXJAY2hyb25veC5kZT47IExpbnV4IENy
+eXB0byBNYWlsaW5nIExpc3QgPGxpbnV4LQ0KPiA+ID4gY3J5cHRvQHZnZXIua2VybmVsLm9yZz47
+IEdlZXJ0IFV5dHRlcmhvZXZlbiA8Z2VlcnRAbGludXgtbTY4ay5vcmc+OyBEYXZpZA0KPiA+ID4g
+TWlsbGVyIDxkYXZlbUBkYXZlbWxvZnQubmV0PjsgT2ZpciBEcmFuZyA8T2Zpci5EcmFuZ0Bhcm0u
+Y29tPg0KPiA+ID4gU3ViamVjdDogUmU6IFBvc3NpYmxlIGlzc3VlIHdpdGggbmV3IGluYXV0aGVu
+dGljIEFFQUQgaW4gZXh0ZW5kZWQgY3J5cHRvDQo+ID4gPiB0ZXN0cw0KPiA+DQo+ID4gPg0KPiA+
+ID4NCj4gPiA+IDw8PCBFeHRlcm5hbCBFbWFpbCA+Pj4NCj4gPiA+IENBVVRJT046IFRoaXMgZW1h
+aWwgb3JpZ2luYXRlZCBmcm9tIG91dHNpZGUgb2YgdGhlIG9yZ2FuaXphdGlvbi4gRG8gbm90DQo+
+ID4gPiBjbGljayBsaW5rcyBvciBvcGVuIGF0dGFjaG1lbnRzIHVubGVzcyB5b3UgcmVjb2duaXpl
+IHRoZQ0KPiAgc2VuZGVyL3NlbmRlcg0KPiA+ID4gYWRkcmVzcyBhbmQga25vdyB0aGUgY29udGVu
+dCBpcyBzYWZlLg0KPiA+ID4NCj4gPiA+DQo+ID4gPg0KPiA+ID4NCj4gPiA+IE9uIFR1ZSwgSmFu
+IDI4LCAyMDIwIGF0IDA5OjI0OjI1QU0gKzAyMDAsIEdpbGFkIEJlbi1Zb3NzZWYgd3JvdGU6DQo+
+ID4gPg0KPiA+ID4gPiAtIFRoZSBzb3VyY2UgaXMgcHJlc3VtZWQgdG8gaGF2ZSBlbm91Z2ggcm9v
+bSBmb3IgYm90aCB0aGUgYXNzb2NpYXRlZA0KPiA+ID4gPiBkYXRhIGFuZCB0aGUgcGxhaW50ZXh0
+Lg0KPiA+ID4gPiAtIFVubGVzcyBpdCdzIGluLXBsYWNlIGVuY3J5cHRpb24sIGluIHdoaWNoIGNh
+c2UsIHlvdSBhbHNvIHByZXN1bWUgdG8NCj4gPiA+ID4gaGF2ZSByb29tIGZvciB0aGUgYXV0aGVu
+dGljYXRpb24gdGFnDQo+ID4gPg0KPiA+ID4NCj4gPiA+DQo+ID4gPiBUaGUgYXV0aGVudGljYXRp
+b24gdGFnIGlzIHBhcnQgb2YgdGhlIGNpcGhlcnRleHQsIG5vdCB0aGUgcGxhaW50ZXh0LiAgU28N
+Cj4gPiA+IHRoZQ0KPiAgcnVsZSBpcyBqdXN0IHRoYXQgdGhlIGNpcGhlcnRleHQgYnVmZmVyIG5l
+ZWRzIHRvIGhhdmUgcm9vbSBmb3IgaXQsDQo+ID4gPiBub3QgdGhlIHBsYWludGV4dC4NCj4gPiA+
+DQo+ID4gPg0KPiA+ID4NCj4gPiA+IE9mIGNvdXJzZSwgd2hlbiBkb2luZyBpbi1wbGFjZSBlbmNy
+eXB0aW9uL2RlY3J5cHRpb24sIHRoZSB0d28gYnVmZmVycyBhcmUNCj4gPiA+IHRoZQ0KPiAgc2Ft
+ZSwgc28gYm90aCB3aWxsIGhhdmUgcm9vbSBmb3IgaXQsIGV2ZW4gdGhvdWdoIHRoZSB0YWcgaXMg
+b25seQ0KPiA+ID4gbWVhbmluZ2Z1bCBvbiB0aGUgY2lwaGVydGV4dCBzaWRlLiAgVGhhdCdzIGp1
+c3QgdGhlIGxvZ2ljYWwgY29uc2VxdWVuY2UNCj4gPiA+IG9mICJpbi1wbGFjZSIuPg0KPiA+ID4N
+Cj4gPiA+DQo+ID4gPiA+IC0gVGhlIG9ubHkgd2F5IHRvIHRlbGwgaWYgdGhpcyBpcyBpbi1wbGFj
+ZSBlbmNyeXB0aW9uIG9yIG5vdCBpcyB0bw0KPiA+ID4gPiBjb21wYXJlIHRoZSBwb2ludGVycyB0
+byB0aGUgc291cmNlIGFuZCBkZXN0aW5hdGlvbiAtIHRoZXJlIGlzIG5vIGZsYWcuDQo+ID4gPg0K
+PiA+ID4NCj4gPiA+DQo+ID4gPiBSZXF1aXJpbmcgdXNlcnMgdG8gcmVtZW1iZXIgdG8gcHJvdmlk
+ZSBhIGZsYWcgdG8gaW5kaWNhdGUgaW4tcGxhY2UNCj4gPiA+IGVuY3J5cHRpb24vZGVjcnlwdGlv
+biwgaW4gYWRkaXRpb24gdG8gcGFzc2luZyB0aGUgc2FtZSBzY2F0dGVybGlzdCwgd291bGQNCj4g
+PiA+IG1ha2UNCj4gIHRoZSBBUEkgbW9yZSBjb21wbGV4Lg0KPiA+ID4NCj4gPiA+DQo+ID4NCj4g
+PiBBbHNvLCB3aGF0IHdvdWxkIHRoZSBiZW5lZml0PyBZb3UnZCBzdGlsbCBoYXZlIHRvIGNvbXBh
+cmUgdGhlIGZsYWcuIFRoZQ0KPiA+IHBlcmZvcm1hbmNlDQo+ICBkaWZmZXJlbmNlIG9mIGNvbXBh
+cmluZyB0aGUgZmxhZyB2cyBjb21wYXJpbmcgMiBwb2ludGVycyAodGhhdA0KPiA+IHlvdSBuZWVk
+IHRvIHJlYWQgYW55d2F5KSBpcyBsaWtlbHkgY29tcGxldGVseSBuZWdsaWdpYmxlIG9uIG1vc3Qg
+bW9kZXJuIENQVQ0KPiA+IGFyY2hpdGVjdHVyZXMgLi4uDQo+ID4NCj4gPiA+ID4gLSBZb3UgY2Fu
+IGNvdW50IG9uIHRoZSBzY2F0dGVyZ2F0aGVyIGxpc3Qgbm90IGhhdmluZyAgYSBmaXJzdCBOVUxM
+DQo+ID4gPiA+IGJ1ZmZlciwgKnVubGVzcyogdGhlIHBsYWludGV4dCBhbmQgYXNzb2NpYXRlZCBk
+YXRhIGxlbmd0aCBhcmUgYm90aA0KPiA+ID4gPiB6ZXJvIEFORCBpdCdzIG5vdCBpbiBwbGFjZSBl
+bmNyeXB0aW9uLg0KPiA+ID4gPiAtIFlvdSBjYW4gY291bnQgb24gbm90IGdldHRpbmcgTlVMTCBh
+cyBhIHNjYXR0ZXJsaXN0IHBvaW50LCAqdW5sZXNzKg0KPiA+ID4gPiB0aGUgcGxhaW50ZXh0IGFu
+ZCBhc3NvY2lhdGVkIGRhdGEgbGVuZ3RoIGFyZSBib3RoIHplcm8gQU5EIGl0J3Mgbm90IGluDQo+
+ID4gPiA+IHBsYWNlIGVuY3J5cHRpb24uIChJJ20gYWN0dWFsbHkgdW5zdXJlIG9mIHRoaXMgb25l
+PykNCj4gPiA+DQo+ID4gPg0KPiA+ID4NCj4gPiA+IElmIHdlIGNvbnNpZGVyIHRoYXQgdGhlIGlu
+cHV0IGlzIG5vdCBqdXN0IGEgc2NhdHRlcmxpc3QsIGJ1dCByYXRoZXIgYQ0KPiA+ID4gc2NhdHRl
+cmxpc3QgYW5kIGEgbGVuZ3RoLCB0aGVuIHRoZXNlIG9ic2VydmF0aW9ucyBhcmUgcmVhbGx5IGp1
+c3QgInlvdQ0KPiA+ID4gY2FuDQo+ID4gPiBhY2Nlc3MgdGhlIGZpcnN0IGJ5dGUsIHVubGVzcyB0
+aGUgbGVuZ3RoIGlzIDAiIC0tIHdoaWNoIGlzIHNvcnQgb2YNCj4gPiA+IG9idmlvdXMuICBBbmQg
+cmVxdWlyaW5nIGEgZGVyZWZlcmVuY2FibGUgcG9pbnRlciBmb3IgbGVuZ3RoID0gMCBpcw0KPiA+
+ID4gZ2VuZXJhbGx5IGNvbnNpZGVyZWQgdG8gYmUgYmFkIEFQSSBkZXNpZ247IHNlZSB0aGUgbWVt
+Y3B5KCkgZmlhc2NvDQo+ID4gPiAoaHR0cHM6Ly93d3cuaW1wZXJpYWx2aW9sZXQub3JnLzIwMTYv
+MDYvMjYvbm9ubnVsbC5odG1sKS4NCj4gPiA+DQo+ID4gPg0KPiA+ID4NCj4gPiA+IFRoZSBBUEkg
+Y291bGQgYmUgc2ltcGxpZmllZCBieSBvbmx5IHN1cHBvcnRpbmcgZnVsbCBzY2F0dGVybGlzdHMs
+IGJ1dCBpdA0KPiA+ID4gc2VlbXMgdGhhdCB1c2VycyBhcmUgY3VycmVudGx5IHJlbHlpbmcgb24g
+YmVpbmcgYWJsZSB0byBlbmNyeXB0L2RlY3J5cHQNCj4gPiA+IGp1c3QgYSBwcmVmaXguPg0KPiA+
+ID4NCj4gPiA+DQo+ID4gPiBJTU8sIHRoZSBiaWdnZXN0IHByb2JsZW1zIHdpdGggdGhlIEFFQUQg
+QVBJIGFyZSBhY3R1YWxseSB0aGluZ3MgeW91DQo+ID4gPiBkaWRuJ3QNCj4gPiA+IG1lbnRpb24s
+IHN1Y2ggYXMgdGhlIGZhY3QgdGhhdCB0aGUgQUFEIGlzbid0IGdpdmVuIGluIGEgc2VwYXJhdGUN
+Cj4gPiA+IHNjYXR0ZXJsaXN0LA0KPiA+DQo+ID4gPg0KPiA+DQo+ID4gV2hpbGUgSSBjYW4gdW5k
+ZXJzdGFuZCB0aGlzIG1heSBiZSBiZW5lZmljaWFsIGluIHNvbWUgY2FzZXMsIEkgYmVsaWV2ZSB0
+aGV5DQo+ID4gZG8gbm90DQo+ID4gb3V0d2VpZ2ggdGhlIGRvd25zaWRlczoNCj4gPiAtIEluIG1h
+bnkgdXNlIGNhc2VzLCBBQUQrY2lwaGVyIHRleHQgYXJlIHN0b3JlZCBhcyBvbmUgY29udGlndW91
+cyBzdHJpbmcuDQo+DQo+IFRoZW4gcmVmZXIgdG8gdGhhdCBvbmUgbGluZWFyIGJ1ZmZlciB3aXRo
+IG9uZSBTR0wgZW50cnkuDQo+DQpIbW0gLi4uIEkgYmVsaWV2ZSBoYXZpbmcgYSBzZXBlcmF0ZSBz
+Y2F0dGVyIGxpc3QgZm9yIEFBRCB3b3VsZCBpbXBseSB0aGF0IHlvdSBoYXZlDQpzZXBlcmF0ZSBz
+Y2F0dGVyIGVudHJpZXMgZm9yIEFBRCAoaW4gdGhhdCBsaXN0KSBhbmQgQ3J5cHRvWytUQUddIChp
+biB0aGUgb3RoZXIgbGlzdCkuDQpTbyB5b3Ugc3RpbGwgaGF2ZSB0aGUgYnVyZGVuIG9mIGNvbnN0
+cnVjdGluZyAyIHNjYXR0ZXJsaXN0cyBpbnN0ZWFkIG9mIG9uZSwgZmlndXJpbmcNCm91dCB3aGVy
+ZSB0aGUgc2Vjb25kIG9uZSBzdGFydHMuIFBsdXMgdGhlIGJ1cmRlbiBvZiBhbnkgaGFyZHdhcmUg
+YWNjZWxlcmF0b3INCmhhdmluZyB0byBoYW5kbGUgMiBwYXJ0aWNsZXMgaW5zdGVhZCBvZiBvbmUu
+DQoNCk5vdGUgdGhhdCBldmVuIHdpdGggb25lIHNjYXR0ZXJsaXN0IHlvdSBjYW4gc3RpbGwgaGF2
+ZSB0aGUgQUFEIGRhdGEgY29taW5nIGZyb20NCnNvbWUgc3BlY2lmaWMgQUFELW9ubHkgYnVmZmVy
+KHMpLiBKdXN0IHB1dCBpdCBpdCBpdHMgb3duIChzZXQgb2YpIHBhcnRpY2xlKHMpLCBzZXBlcmF0
+ZQ0KZnJvbSB0aGUgY3J5cHRvIGRhdGEgcGFydGljbGVzLiBTbyB0aGF0IGlzIG5vdCBhIHJlYXNv
+biB0byBoYXZlIHNlcGVyYXRlICpsaXN0cyouDQoNClRoZSBvbmx5IGFkdmFudGFnZSBvZiBoYXZp
+bmcgQUFEIHNlcGVyYXRlIEkgY2FuIHRoaW5rIG9mIGlzIGZvciBzb2Z0d2FyZQ0KY3J5cHRvIGlt
+cGxlbWVudGF0aW9ucywgbm90IGhhdmluZyB0byBza2lwIG92ZXIgdGhlIEFBRCBmb3IgdGhlIHNj
+YXR0ZXJsaXN0IHRoZXkNCnNlbmQgdG8gdGhlIHBhcmFsbGVsIGVuY3J5cHRpb24gcGFydC4gV2hp
+Y2ggSU1ITyBpcyBvbmx5IGEgbWlub3IgaW5jb252ZW5pZW5jZQ0KdGhhdCB5b3Ugc2hvdWxkbid0
+IHB1c2ggdG8gYWxsIHRoZSB1c2VycyBvZiB0aGUgQVBJLg0KDQo+ID4gUmVxdWlyaW5nIHRoaXMN
+Cj4gPiBzdHJpbmcgdG8gYmUgc3BpdCBpbnRvIHNlcGVyYXRlIHBhcnRpY2xlcyBmb3IgQUFEIGFu
+ZA0KPiA+IGNpcGhlcnRleHQgd291bGQgYmUgYSBidXJkZW4uDQo+DQo+IFRoZXJlIGlzIG5vIG5l
+ZWQgdG8gc3BsaXQgYSBzdHJpbmcuIEFsbCB0aGF0IGlzIHNhaWQgaXMgdGhhdCB0aGUgU0dMIG5l
+ZWRzIHRvDQo+IHBvaW50IHRvIG1lbW9yeSB0aGF0IGlzIEFBRHx8UFQgb3IgQUFEfHxDVHx8VEFH
+LiBUaGVyZSBpcyBubyBzdGF0ZW1lbnQgYWJvdXQNCj4gdGhlIG51bWJlciBvZiBTR0wgZW50cmll
+cyB0byBwb2ludCB0byB0aGVzZSBidWZmZXIocykuIFNvIHlvdSBjb3VsZCBoYXZlIG9uZQ0KPiBs
+aW5lYXIgYnVmZmVyIGZvciB0aGVzZSBjb21wb25lbnRzIHBvaW50aW5nIHRvIGl0IHdpdGggYW4g
+U0dMIGhvbGRpbmcgb25lDQo+IGVudHJ5Lg0KPg0KVGhlIHJlbWFyayBJIHJlc3BvbmRlZCB0byB3
+YXMgYWJvdXQgaGF2aW5nIGEgc2VwZXJhdGUgc2NhdHRlcmxpc3QgZm9yIEFBRCBkYXRhLg0KV2hp
+Y2gsIGluIG15IHdvcmxkLCBpbXBsaWVzIHRoYXQgdGhlICpvdGhlciogc2NhdHRlcmxpc3QgZG9l
+cyBOT1QgaW5jbHVkZSB0aGUgQUFEDQpkYXRhLiBTbyB0aGF0IG9uZSB3b3VsZCB0aGVuIG5lZWQg
+dG8gYmUgb25seSBQVCBvciBDVHx8VEFHLiBXaGljaCBkb2VzIHJlcXVpcmUNCiJzcGxpdHRpbmcg
+dGhlIHN0cmluZyIgKHZpcnR1YWxseSwgYW55d2F5KSBiZXR3ZWVuIEFBRCBhbmQgUFQvQ1QuDQoN
+Ckl0J3Mgbm90IGFib3V0IHNwbGl0dGluZyB0aGUgZGF0YSBwaHlzaWNhbGx5IChpLmUuIG1vdmlu
+ZyBpdCkuIEl0J3MgYWJvdXQgc3BsaXR0aW5nIHRoZQ0KcGFydGljbGVzLCBjcmVhdGluZyAyIHBh
+cnRpY2xlcyAoaW4gMiBsaXN0cykgd2hlcmUgeW91IHdvdWxkIG5vdyBvbmx5IG5lZWQgMS4NCg0K
+PiA+IC0gRm9yIGhhcmR3YXJlIGFjY2VsZXJhdG9ycywgdGhlcmUgaXMgYSBjb3N0DQo+ID4gYXNz
+b2NpYXRlZCB3aXRoIGVhY2ggYWRkaXRpb25hbCBwYXJ0aWNsZSwgaW4gdGVybXMgb2YgZWl0aGVy
+IGJhbmR3aWR0aCBvcg0KPiA+IHBlcmZvcm1hbmNlIG9yIGJvdGguIFNvIGxlc3MgcGFydGljbGVz
+ID0gYmV0dGVyLCBnZW5lcmFsbHkuDQo+ID4gVGhlIG9ubHkgdGhpbmcgdGhhdCBJIGZpbmQgb2Rk
+IGlzIHRoYXQgaWYgeW91IGRvIGEgbm9uLWlucGxhY2Ugb3BlcmF0aW9uIHlvdQ0KPiA+IGhhdmUg
+dGhpcw0KPiA+IHVuZGVmaW5lZCg/KSBnYXAgaW4gdGhlIG91dHB1dCBkYXRhIHdoZXJlIHRoZSBB
+QUQgd291bGQgYmUgZm9yDQo+ID4gaW5wbGFjZS4gVGhhdCBtYWtlcyBsaXR0bGUgc2Vuc2UgdG8g
+bWUgYW5kIHJlcXVpcmVzIGV4dHJhIGVmZm9ydCB0byBza2lwDQo+ID4gb3ZlciBpbiB0aGUgZHJp
+dmVyLg0KPiA+DQo+ID4gPiBhbmQgdGhhdCB0aGUgQVBJIG9ubHkgc3VwcG9ydHMgc2NhdHRlcmxp
+c3RzIGFuZCBub3QgdmlydHVhbCBhZGRyZXNzZXMNCj4gPiA+ICh3aGljaCBtYWtlcyBpdCBkaWZm
+aWN1bHQgdG8gdXNlIGluIHNvbWUgY2FzZXMpLg0KPiA+ID4NCj4gPiA+DQo+ID4NCj4gPiBXaGls
+ZSBJIGNhbiB1bmRlcnN0YW5kIHRoYXQgdGhpcyBpcyBkaWZmaWN1bHQgaWYgdGhlIEFQSSB1c2Vy
+IGp1c3QgZ290IHRoaXMNCj4gPiB2aXJ0dWFsIGFkZHJlc3MNCj4gIHByb3ZpZGVkIGZyb20gc29t
+ZXdoZXJlIGVsc2UgYW5kIG5lZWRzIHRvIGRvIHRoZQ0KPiA+IHRyYW5zbGF0aW9uLCB0aGUgb3Ro
+ZXIgc2lkZSBvZiB0aGUgbWVkYWwgaXMgdGhhdCBhbnkgaGFyZHdhcmUgZHJpdmVyIHdvdWxkDQo+
+ID4gb3RoZXJ3aXNlIGhhdmUgdG8gZG8gYWRkcmVzcyB0cmFuc2xhdGlvbiBhbmQgc2NhdHRlcmxp
+c3QgYnVpbGRpbmcgb24gdGhlDQo+ID4gZmx5IChhcyBoYXJkd2FyZSBuZWVkcyB0byBhY2Nlc3Mg
+Y29udGlndW91cyBwaHlzaWNhbCBtZW1vcnkpLCB3aGljaCB3b3VsZA0KPiA+IGJlIHJlYWwgYnVy
+ZGVuIHRoZXJlLiBXaGlsZSBtYW55IEFQSSB1c2Vyc19hcmVfIGFibGUgdG8gcHJvdmlkZSBhIG5p
+Y2UNCj4gPiBzY2F0dGVybGlzdCBhdCBuZWdsaWdpYmxlIGV4dHJhIGNvc3QuIFNvIHdoeSBidXJk
+ZW4gdGhvc2U/DQo+ID4NCj4gPg0KPiA+ID4gSW4gYW55IGNhc2Ugd2UgZG8gbmVlZCBtdWNoIGJl
+dHRlciBkb2N1bWVudGF0aW9uLiAgSSdtIHBsYW5uaW5nIHRvIGltcHJvdmUNCj4gPiA+IHNvbWUN
+Cj4gIG9mIHRoZSBjcnlwdG8gQVBJIGRvY3VtZW50YXRpb24sIGJ1dCBJJ2xsIHByb2JhYmx5IGRv
+IHRoZSBoYXNoIGFuZA0KPiA+ID4gc2tjaXBoZXIgYWxnb3JpdGhtIHR5cGVzIGZpcnN0IGJlZm9y
+ZSBnZXR0aW5nIHRvIEFFQUQuICBTbyBpZiB5b3Ugd2FudCB0bw0KPiA+ID4gaW1wcm92ZSB0aGUg
+QUVBRCBkb2N1bWVudGF0aW9uIGluIHRoZSBtZWFuIHRpbWUsIHBsZWFzZSBnbyBhaGVhZC4NCj4g
+PiA+DQo+ID4gPg0KPiA+ID4NCj4gPiA+IC0gRXJpYw0KPiA+DQo+ID4NCj4gPiBSZWdhcmRzLA0K
+PiA+IFBhc2NhbCB2YW4gTGVldXdlbg0KPiA+IFNpbGljb24gSVAgQXJjaGl0ZWN0IE11bHRpLVBy
+b3RvY29sIEVuZ2luZXMsIFJhbWJ1cyBTZWN1cml0eQ0KPiA+IFJhbWJ1cyBST1RXIEhvbGRpbmcg
+QlYNCj4gPiArMzEtNzMgNjU4MTk1Mw0KPiA+DQo+ID4gTm90ZTogVGhlIEluc2lkZSBTZWN1cmUv
+VmVyaW1hdHJpeCBTaWxpY29uIElQIHRlYW0gd2FzIHJlY2VudGx5IGFjcXVpcmVkIGJ5DQo+ID4g
+UmFtYnVzLg0KPiAgUGxlYXNlIGJlIHNvIGtpbmQgdG8gdXBkYXRlIHlvdXIgZS1tYWlsIGFkZHJl
+c3MgYm9vayB3aXRoIG15IG5ldw0KPiA+IGUtbWFpbCBhZGRyZXNzLg0KPiA+DQo+ID4gKiogVGhp
+cyBtZXNzYWdlIGFuZCBhbnkgYXR0YWNobWVudHMgYXJlIGZvciB0aGUgc29sZSB1c2Ugb2YgdGhl
+IGludGVuZGVkDQo+ID4gcmVjaXBpZW50KHMpLiBJdCBtYXkgY29udGFpbiBpbmZvcm1hdGlvbiB0
+aGF0IGlzIGNvbmZpZGVudGlhbCBhbmQNCj4gPiBwcml2aWxlZ2VkLiBJZiB5b3UgYXJlIG5vdCB0
+aGUgaW50ZW5kZWQgcmVjaXBpZW50IG9mIHRoaXMgbWVzc2FnZSwgeW91IGFyZQ0KPiA+IHByb2hp
+Yml0ZWQgZnJvbSBwcmludGluZywgY29weWluZywgZm9yd2FyZGluZyBvciBzYXZpbmcgaXQuIFBs
+ZWFzZSBkZWxldGUNCj4gPiB0aGUgbWVzc2FnZSBhbmQgYXR0YWNobWVudHMgYW5kIG5vdGlmeSB0
+aGUgc2VuZGVyIGltbWVkaWF0ZWx5LiAqKg0KPg0KPiA+IFJhbWJ1cyBJbmMuPGh0dHA6Ly93d3cu
+cmFtYnVzLmNvbT4NCj4NCj4NCj4NCj4gQ2lhbw0KPiBTdGVwaGFuDQoNClJlZ2FyZHMsDQpQYXNj
+YWwgdmFuIExlZXV3ZW4NClNpbGljb24gSVAgQXJjaGl0ZWN0IE11bHRpLVByb3RvY29sIEVuZ2lu
+ZXMsIFJhbWJ1cyBTZWN1cml0eQ0KUmFtYnVzIFJPVFcgSG9sZGluZyBCVg0KKzMxLTczIDY1ODE5
+NTMNCg0KTm90ZTogVGhlIEluc2lkZSBTZWN1cmUvVmVyaW1hdHJpeCBTaWxpY29uIElQIHRlYW0g
+d2FzIHJlY2VudGx5IGFjcXVpcmVkIGJ5IFJhbWJ1cy4NClBsZWFzZSBiZSBzbyBraW5kIHRvIHVw
+ZGF0ZSB5b3VyIGUtbWFpbCBhZGRyZXNzIGJvb2sgd2l0aCBteSBuZXcgZS1tYWlsIGFkZHJlc3Mu
+DQoNCg0KKiogVGhpcyBtZXNzYWdlIGFuZCBhbnkgYXR0YWNobWVudHMgYXJlIGZvciB0aGUgc29s
+ZSB1c2Ugb2YgdGhlIGludGVuZGVkIHJlY2lwaWVudChzKS4gSXQgbWF5IGNvbnRhaW4gaW5mb3Jt
+YXRpb24gdGhhdCBpcyBjb25maWRlbnRpYWwgYW5kIHByaXZpbGVnZWQuIElmIHlvdSBhcmUgbm90
+IHRoZSBpbnRlbmRlZCByZWNpcGllbnQgb2YgdGhpcyBtZXNzYWdlLCB5b3UgYXJlIHByb2hpYml0
+ZWQgZnJvbSBwcmludGluZywgY29weWluZywgZm9yd2FyZGluZyBvciBzYXZpbmcgaXQuIFBsZWFz
+ZSBkZWxldGUgdGhlIG1lc3NhZ2UgYW5kIGF0dGFjaG1lbnRzIGFuZCBub3RpZnkgdGhlIHNlbmRl
+ciBpbW1lZGlhdGVseS4gKioNCg0KUmFtYnVzIEluYy48aHR0cDovL3d3dy5yYW1idXMuY29tPg0K
 
