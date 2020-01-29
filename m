@@ -2,204 +2,128 @@ Return-Path: <SRS0=eQ+U=3S=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2508CC2D0DB
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jan 2020 14:38:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43E62C2D0DB
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jan 2020 14:58:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ED366206F0
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jan 2020 14:38:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 218042070E
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jan 2020 14:58:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726666AbgA2OiI (ORCPT
+        id S1726620AbgA2O6H (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 29 Jan 2020 09:38:08 -0500
-Received: from foss.arm.com ([217.140.110.172]:41960 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726261AbgA2OiI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Jan 2020 09:38:08 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E8CD41045;
-        Wed, 29 Jan 2020 06:38:07 -0800 (PST)
-Received: from e110176-lin.kfn.arm.com (unknown [10.50.4.146])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 49E083F52E;
-        Wed, 29 Jan 2020 06:38:06 -0800 (PST)
-From:   Gilad Ben-Yossef <gilad@benyossef.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     Ofir Drang <ofir.drang@arm.com>, stable@vger.kernel.org,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 1/4] crypto: ccree - protect against empty or NULL scatterlists
-Date:   Wed, 29 Jan 2020 16:37:54 +0200
-Message-Id: <20200129143757.680-2-gilad@benyossef.com>
-X-Mailer: git-send-email 2.25.0
-In-Reply-To: <20200129143757.680-1-gilad@benyossef.com>
-References: <20200129143757.680-1-gilad@benyossef.com>
+        Wed, 29 Jan 2020 09:58:07 -0500
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:35883 "EHLO
+        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726605AbgA2O6H (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 29 Jan 2020 09:58:07 -0500
+Received: by mail-ot1-f68.google.com with SMTP id g15so15817075otp.3;
+        Wed, 29 Jan 2020 06:58:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=98/1pZSuwZiSFwLJuAyYfT+2dHa717H2MdqRYmDk+Pc=;
+        b=NCnTYnwURfwnLce1Clv3d3riEC1JmRyqakTyGcC2yzoEZCOz2TKsIfWCruLv5FWXkF
+         Nu8F2uHy1D6kKy9CGltiwqYfIu/JGytCDWTPe1D0zWFY94gRX+DWZKfd0B8ADlGRlMTV
+         o3Qs0pl0hho1B/Jkj5JWQloKEoLyeMs5worUOyesyO2n3P86evGfzDkl5N4uwkF4cVdQ
+         jnoYxutbDI2umTipKO/7y6lQ+OTcArj/U964vfOAIlQeACl9nygU0F/tAGE2gwn3Yz3R
+         gXInVrdbZiP4v+gKHVRkDa0tsCS2TZ5dILKNXahMqvCEwQjQMZnt8fHS3twmE4mLRS1W
+         oSpQ==
+X-Gm-Message-State: APjAAAX8CRXZ0SX4p4T401biO5Z3LonT8UDkjdH3s/OWuAlnJfgSVYq2
+        teyyTPibvB/B49YJmOUcnsCahUIIYiH8mq363bM=
+X-Google-Smtp-Source: APXvYqyfOrUHbnkU98kQkt60f3TFC6BBB4lD5Yff/pIGG/upfr4Yn5+6q3+JWtiC5lDOiDs7eHTutvtsBwt2shwhvuA=
+X-Received: by 2002:a9d:dc1:: with SMTP id 59mr21064913ots.250.1580309886519;
+ Wed, 29 Jan 2020 06:58:06 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200129143757.680-1-gilad@benyossef.com> <20200129143757.680-4-gilad@benyossef.com>
+In-Reply-To: <20200129143757.680-4-gilad@benyossef.com>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Wed, 29 Jan 2020 15:57:55 +0100
+Message-ID: <CAMuHMdV0jPF_jWh_qhdNnazYunMpq-xZqG7AKj4m1oAMDp72WQ@mail.gmail.com>
+Subject: Re: [PATCH 3/4] crypto: ccree - fix some reported cipher block sizes
+To:     Gilad Ben-Yossef <gilad@benyossef.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Ofir Drang <ofir.drang@arm.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Deal gracefully with a NULL or empty scatterlist which can happen
-if both cryptlen and assoclen are zero and we're doing in-place
-AEAD encryption.
+Hi Gilad,
 
-This fixes a crash when this causes us to try and map a NULL page,
-at least with some platforms / DMA mapping configs.
+On Wed, Jan 29, 2020 at 3:38 PM Gilad Ben-Yossef <gilad@benyossef.com> wrote:
+> OFB and CTR modes block sizes were wrongfully reported as
+> the underlying block sizes. Fix it to 1 bytes as they
+> turn the block ciphers into stream ciphers.
+>
+> Also document why our XTS differes from the generic
+> implementation.
+>
+> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+> ---
+>  drivers/crypto/ccree/cc_cipher.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
+> index c08dee04941b..73457548ee92 100644
+> --- a/drivers/crypto/ccree/cc_cipher.c
+> +++ b/drivers/crypto/ccree/cc_cipher.c
+> @@ -1236,6 +1236,10 @@ static const struct cc_alg_template skcipher_algs[] = {
+>                 .sec_func = true,
+>         },
+>         {
+> +               /* See https://www.mail-archive.com/linux-crypto@vger.kernel.org/msg40576.html
 
-Cc: stable@vger.kernel.org # v4.19+
-Reported-by: Geert Uytterhoeven <geert+renesas@glider.be>
-Tested-by: Geert Uytterhoeven <geert+renesas@glider.be>
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
----
- drivers/crypto/ccree/cc_buffer_mgr.c | 62 ++++++++++++----------------
- drivers/crypto/ccree/cc_buffer_mgr.h |  1 +
- 2 files changed, 28 insertions(+), 35 deletions(-)
+You may want to refer to
+https://lore.kernel.org/linux-crypto/20190910012134.GA24413@gondor.apana.org.au/
+instead, as mail-archive is maintained externally.
 
-diff --git a/drivers/crypto/ccree/cc_buffer_mgr.c b/drivers/crypto/ccree/cc_buffer_mgr.c
-index a72586eccd81..b938ceae7ae7 100644
---- a/drivers/crypto/ccree/cc_buffer_mgr.c
-+++ b/drivers/crypto/ccree/cc_buffer_mgr.c
-@@ -87,6 +87,8 @@ static unsigned int cc_get_sgl_nents(struct device *dev,
- {
- 	unsigned int nents = 0;
- 
-+	*lbytes = 0;
-+
- 	while (nbytes && sg_list) {
- 		nents++;
- 		/* get the number of bytes in the last entry */
-@@ -95,6 +97,7 @@ static unsigned int cc_get_sgl_nents(struct device *dev,
- 				nbytes : sg_list->length;
- 		sg_list = sg_next(sg_list);
- 	}
-+
- 	dev_dbg(dev, "nents %d last bytes %d\n", nents, *lbytes);
- 	return nents;
- }
-@@ -290,37 +293,25 @@ static int cc_map_sg(struct device *dev, struct scatterlist *sg,
- 		     unsigned int nbytes, int direction, u32 *nents,
- 		     u32 max_sg_nents, u32 *lbytes, u32 *mapped_nents)
- {
--	if (sg_is_last(sg)) {
--		/* One entry only case -set to DLLI */
--		if (dma_map_sg(dev, sg, 1, direction) != 1) {
--			dev_err(dev, "dma_map_sg() single buffer failed\n");
--			return -ENOMEM;
--		}
--		dev_dbg(dev, "Mapped sg: dma_address=%pad page=%p addr=%pK offset=%u length=%u\n",
--			&sg_dma_address(sg), sg_page(sg), sg_virt(sg),
--			sg->offset, sg->length);
--		*lbytes = nbytes;
--		*nents = 1;
--		*mapped_nents = 1;
--	} else {  /*sg_is_last*/
--		*nents = cc_get_sgl_nents(dev, sg, nbytes, lbytes);
--		if (*nents > max_sg_nents) {
--			*nents = 0;
--			dev_err(dev, "Too many fragments. current %d max %d\n",
--				*nents, max_sg_nents);
--			return -ENOMEM;
--		}
--		/* In case of mmu the number of mapped nents might
--		 * be changed from the original sgl nents
--		 */
--		*mapped_nents = dma_map_sg(dev, sg, *nents, direction);
--		if (*mapped_nents == 0) {
--			*nents = 0;
--			dev_err(dev, "dma_map_sg() sg buffer failed\n");
--			return -ENOMEM;
--		}
-+	int ret = 0;
-+
-+	*nents = cc_get_sgl_nents(dev, sg, nbytes, lbytes);
-+	if (*nents > max_sg_nents) {
-+		*nents = 0;
-+		dev_err(dev, "Too many fragments. current %d max %d\n",
-+			*nents, max_sg_nents);
-+		return -ENOMEM;
- 	}
- 
-+	ret = dma_map_sg(dev, sg, *nents, direction);
-+	if (dma_mapping_error(dev, ret)) {
-+		*nents = 0;
-+		dev_err(dev, "dma_map_sg() sg buffer failed %d\n", ret);
-+		return -ENOMEM;
-+	}
-+
-+	*mapped_nents = ret;
-+
- 	return 0;
- }
- 
-@@ -555,11 +546,12 @@ void cc_unmap_aead_request(struct device *dev, struct aead_request *req)
- 		sg_virt(req->src), areq_ctx->src.nents, areq_ctx->assoc.nents,
- 		areq_ctx->assoclen, req->cryptlen);
- 
--	dma_unmap_sg(dev, req->src, sg_nents(req->src), DMA_BIDIRECTIONAL);
-+	dma_unmap_sg(dev, req->src, areq_ctx->src.mapped_nents,
-+		     DMA_BIDIRECTIONAL);
- 	if (req->src != req->dst) {
- 		dev_dbg(dev, "Unmapping dst sgl: req->dst=%pK\n",
- 			sg_virt(req->dst));
--		dma_unmap_sg(dev, req->dst, sg_nents(req->dst),
-+		dma_unmap_sg(dev, req->dst, areq_ctx->dst.mapped_nents,
- 			     DMA_BIDIRECTIONAL);
- 	}
- 	if (drvdata->coherent &&
-@@ -881,7 +873,7 @@ static int cc_aead_chain_data(struct cc_drvdata *drvdata,
- 					    &src_last_bytes);
- 	sg_index = areq_ctx->src_sgl->length;
- 	//check where the data starts
--	while (sg_index <= size_to_skip) {
-+	while (src_mapped_nents && (sg_index <= size_to_skip)) {
- 		src_mapped_nents--;
- 		offset -= areq_ctx->src_sgl->length;
- 		sgl = sg_next(areq_ctx->src_sgl);
-@@ -908,7 +900,7 @@ static int cc_aead_chain_data(struct cc_drvdata *drvdata,
- 			size_for_map += crypto_aead_ivsize(tfm);
- 
- 		rc = cc_map_sg(dev, req->dst, size_for_map, DMA_BIDIRECTIONAL,
--			       &areq_ctx->dst.nents,
-+			       &areq_ctx->dst.mapped_nents,
- 			       LLI_MAX_NUM_OF_DATA_ENTRIES, &dst_last_bytes,
- 			       &dst_mapped_nents);
- 		if (rc)
-@@ -921,7 +913,7 @@ static int cc_aead_chain_data(struct cc_drvdata *drvdata,
- 	offset = size_to_skip;
- 
- 	//check where the data starts
--	while (sg_index <= size_to_skip) {
-+	while (dst_mapped_nents && sg_index <= size_to_skip) {
- 		dst_mapped_nents--;
- 		offset -= areq_ctx->dst_sgl->length;
- 		sgl = sg_next(areq_ctx->dst_sgl);
-@@ -1123,7 +1115,7 @@ int cc_map_aead_request(struct cc_drvdata *drvdata, struct aead_request *req)
- 	if (is_gcm4543)
- 		size_to_map += crypto_aead_ivsize(tfm);
- 	rc = cc_map_sg(dev, req->src, size_to_map, DMA_BIDIRECTIONAL,
--		       &areq_ctx->src.nents,
-+		       &areq_ctx->src.mapped_nents,
- 		       (LLI_MAX_NUM_OF_ASSOC_DATA_ENTRIES +
- 			LLI_MAX_NUM_OF_DATA_ENTRIES),
- 		       &dummy, &mapped_nents);
-diff --git a/drivers/crypto/ccree/cc_buffer_mgr.h b/drivers/crypto/ccree/cc_buffer_mgr.h
-index af434872c6ff..827b6cb1236e 100644
---- a/drivers/crypto/ccree/cc_buffer_mgr.h
-+++ b/drivers/crypto/ccree/cc_buffer_mgr.h
-@@ -25,6 +25,7 @@ enum cc_sg_cpy_direct {
- 
- struct cc_mlli {
- 	cc_sram_addr_t sram_addr;
-+	unsigned int mapped_nents;
- 	unsigned int nents; //sg nents
- 	unsigned int mlli_nents; //mlli nents might be different than the above
- };
--- 
-2.25.0
 
+> +                * for the reason why this differs from the generic
+> +                * implementation.
+> +                */
+>                 .name = "xts(aes)",
+>                 .driver_name = "xts-aes-ccree",
+>                 .blocksize = 1,
+> @@ -1431,7 +1435,7 @@ static const struct cc_alg_template skcipher_algs[] = {
+>         {
+>                 .name = "ofb(aes)",
+>                 .driver_name = "ofb-aes-ccree",
+> -               .blocksize = AES_BLOCK_SIZE,
+> +               .blocksize = 1,
+>                 .template_skcipher = {
+>                         .setkey = cc_cipher_setkey,
+>                         .encrypt = cc_cipher_encrypt,
+> @@ -1584,7 +1588,7 @@ static const struct cc_alg_template skcipher_algs[] = {
+>         {
+>                 .name = "ctr(sm4)",
+>                 .driver_name = "ctr-sm4-ccree",
+> -               .blocksize = SM4_BLOCK_SIZE,
+> +               .blocksize = 1,
+>                 .template_skcipher = {
+>                         .setkey = cc_cipher_setkey,
+>                         .encrypt = cc_cipher_encrypt,
+> --
+> 2.25.0
+>
+
+
+--
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
