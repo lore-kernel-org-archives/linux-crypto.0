@@ -2,471 +2,232 @@ Return-Path: <SRS0=eQ+U=3S=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AABBC2D0DB
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jan 2020 12:55:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 850F3C2D0DB
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jan 2020 13:28:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1FB3720716
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jan 2020 12:55:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 424432070E
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jan 2020 13:28:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="RVIuNKXG"
+	dkim=pass (1024-bit key) header.d=rambus.com header.i=@rambus.com header.b="N+T3mt9m"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726140AbgA2MzH (ORCPT
+        id S1726178AbgA2N2l (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 29 Jan 2020 07:55:07 -0500
-Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.54]:30073 "EHLO
-        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726069AbgA2MzH (ORCPT
+        Wed, 29 Jan 2020 08:28:41 -0500
+Received: from us-smtp-delivery-148.mimecast.com ([216.205.24.148]:43663 "EHLO
+        us-smtp-delivery-148.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726069AbgA2N2l (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Jan 2020 07:55:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1580302500;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=kbBDQ/CFiNDzf1QmOXQP49xea+1FaRNOAwy0p+mDpt0=;
-        b=RVIuNKXGDoiVWkXsKPmqCZr2hIaOOFBdwqdobc+aCkQmTHFXD+kW/AyTY/XRKTxLZ8
-        B0v+QMq6Qk0+Tg2uEwczxSGMw3p9Pnd8qQEJb9Nl5cFo1W9nk1zPIsPrY0lxRbdscV/H
-        o94xvOjQbigrAJafjXEAOevm59oPhBJ9xJKVv+jc+4egWyLeB1Z4WWbdRz6S32QAdUY+
-        9/7cvc+rY78BNm5DPw6dcEiGggUL9GTE8JOUeT5y0+XDFwbF1oEGVCkmDI8XBsdynJQz
-        iB5YjhUEbwmASWdPZJsPYI1jxfHB6VjIbR1+zEHkInemuJiYpXTt7tSOqxDbCR3klMAT
-        qDOg==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9ym4dPkYX6am8zHoI"
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-        by smtp.strato.de (RZmta 46.1.7 AUTH)
-        with ESMTPSA id I05c44w0TCsnVXQ
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-        Wed, 29 Jan 2020 13:54:49 +0100 (CET)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     "Van Leeuwen, Pascal" <pvanleeuwen@rambus.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+        Wed, 29 Jan 2020 08:28:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rambus.com;
+        s=mimecast20161209; t=1580304519;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=WC/URs7E273waaI8XMkVUxGaTGjObGtWMy95orFElPA=;
+        b=N+T3mt9mOKJoSB9euVds/C8LeJG+2XCLIATh0nIXy0f2YUtLhAUPe2ibTD+Yu4yWEUlInw
+        2PtACHMNv8FvImqhClBCn0FR1gMmgzFBRz60Igyd80poyqZkcVLx4h8yNl8Yop3mjdEFyh
+        AvAkejXNWD3hl1KqQuRLmtal+4ck2iA=
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com
+ (mail-dm6nam12lp2169.outbound.protection.outlook.com [104.47.59.169])
+ (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-149-TWTvGqM7MSG6KHDUvIm-Dw-1; Wed, 29 Jan 2020 08:28:37 -0500
+Received: from CY4PR0401MB3652.namprd04.prod.outlook.com (52.132.97.155) by
+ CY4PR0401MB3698.namprd04.prod.outlook.com (52.132.100.159) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2665.20; Wed, 29 Jan 2020 13:28:35 +0000
+Received: from CY4PR0401MB3652.namprd04.prod.outlook.com
+ ([fe80::8140:5c22:404e:65e7]) by CY4PR0401MB3652.namprd04.prod.outlook.com
+ ([fe80::8140:5c22:404e:65e7%7]) with mapi id 15.20.2665.026; Wed, 29 Jan 2020
+ 13:28:34 +0000
+From:   "Van Leeuwen, Pascal" <pvanleeuwen@rambus.com>
+To:     Gilad Ben-Yossef <gilad@benyossef.com>,
+        Eric Biggers <ebiggers@kernel.org>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Stephan Mueller <smueller@chronox.de>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Geert Uytterhoeven <geert@linux-m68k.org>,
         David Miller <davem@davemloft.net>,
         Ofir Drang <Ofir.Drang@arm.com>
-Subject: Re: Possible issue with new inauthentic AEAD in extended crypto tests
-Date:   Wed, 29 Jan 2020 13:54:44 +0100
-Message-ID: <5036173.rU9AjI9tPH@tauon.chronox.de>
-In-Reply-To: <CY4PR0401MB365296BC605383E0C0506C04C3050@CY4PR0401MB3652.namprd04.prod.outlook.com>
-References: <CAOtvUMcwLtwgigFE2mx7LVjhhEgcZsSS4WyR_SQ2gixTZxyBfg@mail.gmail.com> <11489dad16d64075939db69181b5ecbb@MN2PR20MB2973.namprd20.prod.outlook.com> <CY4PR0401MB365296BC605383E0C0506C04C3050@CY4PR0401MB3652.namprd04.prod.outlook.com>
+Subject: RE: Possible issue with new inauthentic AEAD in extended crypto tests
+Thread-Topic: Possible issue with new inauthentic AEAD in extended crypto
+ tests
+Thread-Index: AQHV1Ohtfj6tA7gaZ0uNkoHJDpcQdaf/XTuAgAARvQCAAD8mgIAA510AgADvFQCAAAIccA==
+Date:   Wed, 29 Jan 2020 13:28:34 +0000
+Message-ID: <CY4PR0401MB3652F248EE6B43107EFA1D45C3050@CY4PR0401MB3652.namprd04.prod.outlook.com>
+References: <CAOtvUMcwLtwgigFE2mx7LVjhhEgcZsSS4WyR_SQ2gixTZxyBfg@mail.gmail.com>
+ <20200128023455.GC960@sol.localdomain>
+ <20200128033824.p3z3jhc7mp7wlikp@gondor.apana.org.au>
+ <CAOtvUMeJmhXL2V74e+LGxDEUJcDy5=f+x0MH86eyHq0u=HvKXw@mail.gmail.com>
+ <20200128211229.GA224488@gmail.com>
+ <2f3e874fae2242d99f4e4095ae42eb75@MN2PR20MB2973.namprd20.prod.outlook.com>
+In-Reply-To: <2f3e874fae2242d99f4e4095ae42eb75@MN2PR20MB2973.namprd20.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [31.149.181.161]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 8cc2d0f7-def0-4e88-afaa-08d7a4bf2423
+x-ms-traffictypediagnostic: CY4PR0401MB3698:
+x-microsoft-antispam-prvs: <CY4PR0401MB3698269411B71A33671EA47DC3050@CY4PR0401MB3698.namprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 02973C87BC
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39850400004)(136003)(396003)(376002)(366004)(346002)(199004)(189003)(5660300002)(8676002)(8936002)(86362001)(52536014)(66446008)(66946007)(81166006)(81156014)(76116006)(64756008)(71200400001)(66556008)(66476007)(55016002)(478600001)(2906002)(6506007)(9686003)(53546011)(316002)(186003)(54906003)(110136005)(33656002)(26005)(7696005)(4326008);DIR:OUT;SFP:1101;SCL:1;SRVR:CY4PR0401MB3698;H:CY4PR0401MB3652.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: pFV1rH3Ddpyb2cRUBlHwYBdd+A7u/UV62zhg6Gm7HodUgHtHhX/50fpornleHHpufb7Vy+JUA4GVG05C8aqxH5aNFDE7yTbtmJukNHGEaXdX962EB1OS2aPkwpg+nb+RTggXXOxJbzXKuol0jWHLtfUofNTsKa2mMNfCR1/68TYLacbBep7n45kzfEgzZ1ILyBJ5nHLRrJ845OpCLevqCcNLQIFKl2KavJWXnwUzsV8b1xTScCLU2/E/LS6WISgF/Tc02LV64J8xSjDWqVhWA5bmXaBsQ4pSD6QP68zZCZ5f09T519DPQBYCAmLgLgCXxqt/qeXeptZioo6KF9LLZtKmMUPBfKbcyJgNY9IrgsMuspEAEKR/i+Xts3A6PalaPwO2g7VsZc4u8y9KGqmHMHe6OASIx2dTXFipAsSLvnQCoTmI0+CmL5fjB0d/AI1ccooWsHp2/fobTKiS5TkD3CGhj9MjqjhazO44jefOTgNYEjueE1RTWnNAjXRUpDIvMTOgsF1s2sx3seaV6rZVKQ==
+x-ms-exchange-antispam-messagedata: o8vNo3hG0qlJD1C2MnF5hwZuqlCz7uvekOXXnAC/p9w6MBBBAwifpELiFX/69ZIG2boEwHFdPEcwwFJu/rEEq9ycN9l7biwJWpSs+7MjekYHGyjIaFxXqCWFgfDoZ0t/4VSnM3rih38FioLaH6hzsA==
+x-ms-exchange-transport-forked: True
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+X-OriginatorOrg: rambus.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8cc2d0f7-def0-4e88-afaa-08d7a4bf2423
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Jan 2020 13:28:34.6802
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bd0ba799-c2b9-413c-9c56-5d1731c4827c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: RNNiiEpNECGGs2K99Xj8FrLoNVLbDGOaV9e+UAgHR+yVVmNg0KyxUSKNZdasmpk0pEG7/rc5HRbwHw6FqMUFBg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR0401MB3698
+X-MC-Unique: TWTvGqM7MSG6KHDUvIm-Dw-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: rambus.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Mittwoch, 29. Januar 2020, 09:40:28 CET schrieb Van Leeuwen, Pascal:
-
-Hi Pascal,
-
-> Hi Stephan,
-> 
-> 
-> > -----Original Message-----
-> > From: linux-crypto-owner@vger.kernel.org
-> > <linux-crypto-owner@vger.kernel.org> On Behalf Of Stephan Mueller
- Sent:
-> > Wednesday, January 29, 2020 2:27 AM
-> > To: Van Leeuwen, Pascal <pvanleeuwen@rambus.com>
-> > Cc: Eric Biggers <ebiggers@kernel.org>; Gilad Ben-Yossef
-> > <gilad@benyossef.com>; Herbert Xu <herbert@gondor.apana.org.au>;
- Linux
-> > Crypto Mailing List <linux-crypto@vger.kernel.org>; Geert Uytterhoeven
-> > <geert@linux-m68k.org>; David Miller <davem@davemloft.net>; Ofir Drang
-> > <Ofir.Drang@arm.com>
-> > Subject: Re: Possible issue with new inauthentic AEAD in extended crypto
-> > tests
->
-> >
-> >
-> > <<< External Email >>>
-> > CAUTION: This email originated from outside of the organization. Do not
-> > click links or open attachments unless you recognize the
- sender/sender
-> > address and know the content is safe.
-> >
-> >
-> >
-> >
-> > Am Mittwoch, 29. Januar 2020, 01:18:29 CET schrieb Van Leeuwen, Pascal:
-> >
-> >
-> >
-> > Hi Pascal,
-> >
-> >
-> >
-> > > > -----Original Message-----
-> > > > From: linux-crypto-owner@vger.kernel.org
-> > > > <linux-crypto-owner@vger.kernel.org> On Behalf Of Eric Biggers
-> >  
-> >  Sent:
-> >  
-> > > > Tuesday, January 28, 2020 10:13 PM
-> > > > To: Gilad Ben-Yossef <gilad@benyossef.com>
-> > > > Cc: Herbert Xu <herbert@gondor.apana.org.au>; Stephan Mueller
-> > > > <smueller@chronox.de>; Linux Crypto Mailing List <linux-
-> > > > crypto@vger.kernel.org>; Geert Uytterhoeven <geert@linux-m68k.org>;
-> > > > David
-> > > > Miller <davem@davemloft.net>; Ofir Drang <Ofir.Drang@arm.com>
-> > > > Subject: Re: Possible issue with new inauthentic AEAD in extended
-> > > > crypto
-> > > > tests
-> > >
-> > >
-> > >
-> > > >
-> > > >
-> > > >
-> > > > <<< External Email >>>
-> > > > CAUTION: This email originated from outside of the organization. Do
-> > > > not
-> > > > click links or open attachments unless you recognize the
-> >  
-> >  sender/sender
-> >  
-> > > > address and know the content is safe.
-> > > >
-> > > >
-> > > >
-> > > >
-> > > >
-> > > >
-> > > > On Tue, Jan 28, 2020 at 09:24:25AM +0200, Gilad Ben-Yossef wrote:
-> > > >
-> > > >
-> > > >
-> > > > > - The source is presumed to have enough room for both the
-> > > > > associated
-> > > > > data and the plaintext.
-> > > > > - Unless it's in-place encryption, in which case, you also presume
-> > > > > to
-> > > > > have room for the authentication tag
-> > > >
-> > > >
-> > > >
-> > > >
-> > > >
-> > > > The authentication tag is part of the ciphertext, not the plaintext. 
-> > > > So
-> > > > the
-> >  
-> >  rule is just that the ciphertext buffer needs to have room for it,
-> >  
-> > > > not the plaintext.
-> > > >
-> > > >
-> > > >
-> > > >
-> > > >
-> > > > Of course, when doing in-place encryption/decryption, the two buffers
-> > > > are
-> > > > the
-> >  
-> >  same, so both will have room for it, even though the tag is only
-> >  
-> > > > meaningful on the ciphertext side.  That's just the logical
-> > > > consequence
-> > > > of "in-place".>
-> > > >
-> > > >
-> > > >
-> > > >
-> > > > > - The only way to tell if this is in-place encryption or not is to
-> > > > > compare the pointers to the source and destination - there is no
-> > > > > flag.
-> > > >
-> > > >
-> > > >
-> > > >
-> > > >
-> > > > Requiring users to remember to provide a flag to indicate in-place
-> > > > encryption/decryption, in addition to passing the same scatterlist,
-> > > > would
-> > > > make
-> >  
-> >  the API more complex.
-> >  
-> > > >
-> > > >
-> > >
-> > >
-> > >
-> > > Also, what would the benefit? You'd still have to compare the flag. The
-> > > performance
-> >  
-> >  difference of comparing the flag vs comparing 2 pointers (that
-> >  
-> > > you need to read anyway) is likely completely negligible on most modern
-> > > CPU
- architectures ...
-> > >
-> > >
-> > >
-> > > > > - You can count on the scattergather list not having  a first NULL
-> > > > > buffer, *unless* the plaintext and associated data length are both
-> > > > > zero AND it's not in place encryption.
-> > > > > - You can count on not getting NULL as a scatterlist point,
-> > > > > *unless*
-> > > > > the plaintext and associated data length are both zero AND it's not
-> > > > > in
-> > > > > place encryption. (I'm actually unsure of this one?)
-> > > >
-> > > >
-> > > >
-> > > >
-> > > >
-> > > > If we consider that the input is not just a scatterlist, but rather a
-> > > > scatterlist and a length, then these observations are really just
-> > > > "you
-> > > > can
-> > > > access the first byte, unless the length is 0" -- which is sort of
-> > > > obvious.  And requiring a dereferencable pointer for length = 0 is
-> > > > generally considered to be bad API design; see the memcpy() fiasco
-> > > > (https://www.imperialviolet.org/2016/06/26/nonnull.html).
-> > > >
-> > > >
-> > > >
-> > > >
-> > > >
-> > > > The API could be simplified by only supporting full scatterlists, but
-> > > > it
-> > > > seems that users are currently relying on being able to
-> > > > encrypt/decrypt
-> > > > just a prefix.>
-> > > >
-> > > >
-> > > >
-> > > >
-> > > > IMO, the biggest problems with the AEAD API are actually things you
-> > > > didn't
-> > > > mention, such as the fact that the AAD isn't given in a separate
-> > > > scatterlist,
-> > >
-> > >
-> > >
-> > > >
-> > >
-> > >
-> > >
-> > > While I can understand this may be beneficial in some cases, I believe
-> > > they
- do not
-> > > outweigh the downsides:
-> > > - In many use cases, AAD+cipher text are stored as one contiguous
-> > > string.
-> >
-> >
-> >
-> > Then refer to that one linear buffer with one SGL entry.
-> >
-> >
-> 
-> Hmm ... I believe having a seperate scatter list for AAD would imply that
-> you have
- seperate scatter entries for AAD (in that list) and Crypto[+TAG]
-> (in the other list).
-
-Who says that we need a separate SGL entry for the AAD?
-
-> So you still have the burden of constructing 2
-> scatterlists instead of one, figuring out where the second one starts.
-
-
-I do not see the requirement that the caller must have at least two SGL 
-entries.
-
-In fact, for the AF_ALG interface, af_alg_get_rsgl creates the destination SGL 
-and creates one SGL entry per user-space IOVEC. If user space provides a 
-linear buffer with one IOVEC holding the AAD, CT, Tag, only one SGL entry is 
-created.
-
-For the source SGL, af_alg_sendmsg tries to be efficient to put as much as 
-possible into one page referenced by one SGL entry. So, if user space provides 
-AAD||PT which is less than a page in size, you get one SGL entry for the 
-entire input data.
-
-> Plus
-> the burden of any hardware accelerator having to handle 2 particles instead
-> of one.
-
-Well, the cipher implementation must be capable of processing any SGL 
-structure. It is not given that the SGL with the source data has exactly 2 
-entries. It can have one entry with AAD||PT. It can have two entries where the 
-split is between AAD and PT. But it can have 2 entries where the split is in 
-the middle of, say, AAD. Or it can have more SGL entries.
-
-Please do not mix up the structure of the data to be contained in the SGL 
-(say, AAD||PT) with the physical memory structure (e.g. how many SGL entries 
-there are).
-
-> 
-> Note that even with one scatterlist you can still have the AAD data coming
-> from
- some specific AAD-only buffer(s). Just put it it its own (set of)
-> particle(s), seperate from the crypto data particles. So that is not a
-> reason to have seperate *lists*. 
-> The only advantage of having AAD seperate I can think of is for software
-> crypto implementations, not having to skip over the AAD for the scatterlist
-> they
- send to the parallel encryption part. Which IMHO is only a minor
-> inconvenience that you shouldn't push to all the users of the API.
-> 
-> 
-> > > Requiring this
-> > > string to be spit into seperate particles for AAD and
-> > > ciphertext would be a burden.
-> >
-> >
-> >
-> > There is no need to split a string. All that is said is that the SGL needs
-> > to
- point to memory that is AAD||PT or AAD||CT||TAG. There is no
-> > statement about the number of SGL entries to point to these buffer(s). So
-> > you could have one linear buffer for these components pointing to it with
-> > an SGL holding one entry.
-> >
-> >
-> 
-> The remark I responded to was about having a seperate scatterlist for AAD
-> data.
- Which, in my world, implies that the *other* scatterlist does NOT
-> include the AAD data. So that one would then need to be only PT or CT||TAG.
-> Which does require "splitting the string" (virtually, anyway) between AAD
-> and PT/CT. 
-> It's not about splitting the data physically (i.e. moving it). It's about
-> splitting the
- particles, creating 2 particles (in 2 lists) where you would
-> now only need 1. 
-> 
-> > > - For hardware accelerators, there is a cost
-> > > associated with each additional particle, in terms of either bandwidth
-> > > or
-> > > performance or both. So less particles = better, generally.
-> > > The only thing that I find odd is that if you do a non-inplace operation
-> > > you
- have this
-> > > undefined(?) gap in the output data where the AAD would be for
-> > > inplace. That makes little sense to me and requires extra effort to
-> > > skip
-> > > over in the driver.
-> > >
-> > >
-> > >
-> > > > and that the API only supports scatterlists and not virtual addresses
-> > > > (which makes it difficult to use in some cases).
-> > > >
-> > > >
-> > > >
-> > >
-> > >
-> > >
-> > > While I can understand that this is difficult if the API user just got
-> > > this
- virtual address
-> >  
-> >  provided from somewhere else and needs to do the
-> >  
-> > > translation, the other side of the medal is that any hardware driver
-> > > would
-> > > otherwise have to do address translation and scatterlist building on
-> > > the
-> > > fly (as hardware needs to access contiguous physical memory), which
-> > > would
-> > > be real burden there. While many API users_are_ able to provide a nice
-> > > scatterlist at negligible extra cost. So why burden those?
-> > >
-> > >
-> > >
-> > >
-> > > > In any case we do need much better documentation.  I'm planning to
-> > > > improve
-> > > > some
-> >  
-> >  of the crypto API documentation, but I'll probably do the hash and
-> >  
-> > > > skcipher algorithm types first before getting to AEAD.  So if you want
-> > > > to
-> > > > improve the AEAD documentation in the mean time, please go ahead.
-> > > >
-> > > >
-> > > >
-> > > >
-> > > >
-> > > > - Eric
-> > >
-> > >
-> > >
-> > >
-> > > Regards,
-> > > Pascal van Leeuwen
-> > > Silicon IP Architect Multi-Protocol Engines, Rambus Security
-> > > Rambus ROTW Holding BV
-> > > +31-73 6581953
-> > >
-> > >
-> > >
-> > > Note: The Inside Secure/Verimatrix Silicon IP team was recently acquired
-> > > by
- Rambus.
-> >  
-> >  Please be so kind to update your e-mail address book with my new
-> >  
-> > > e-mail address.
-> > >
-> > >
-> > >
-> > > ** This message and any attachments are for the sole use of the
-> > > intended
-> > > recipient(s). It may contain information that is confidential and
-> > > privileged. If you are not the intended recipient of this message, you
-> > > are
-> > > prohibited from printing, copying, forwarding or saving it. Please
-> > > delete
-> > > the message and attachments and notify the sender immediately. **
-> >
-> >
-> >
-> > > Rambus Inc.<http://www.rambus.com>
-> >
-> >
-> >
-> >
-> >
-> > Ciao
-> > Stephan
-> 
-> 
-> Regards,
-> Pascal van Leeuwen
-> Silicon IP Architect Multi-Protocol Engines, Rambus Security
-> Rambus ROTW Holding BV
-> +31-73 6581953
-> 
-> Note: The Inside Secure/Verimatrix Silicon IP team was recently acquired by
-> Rambus.
- Please be so kind to update your e-mail address book with my new
-> e-mail address. 
-> 
-> ** This message and any attachments are for the sole use of the intended
-> recipient(s). It may contain information that is confidential and
-> privileged. If you are not the intended recipient of this message, you are
-> prohibited from printing, copying, forwarding or saving it. Please delete
-> the message and attachments and notify the sender immediately. **
- 
-> Rambus Inc.<http://www.rambus.com>
-
-
-
-Ciao
-Stephan
-
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBsaW51eC1jcnlwdG8tb3duZXJA
+dmdlci5rZXJuZWwub3JnIDxsaW51eC1jcnlwdG8tb3duZXJAdmdlci5rZXJuZWwub3JnPiBPbiBC
+ZWhhbGYgT2YgR2lsYWQgQmVuLVlvc3NlZg0KPiBTZW50OiBXZWRuZXNkYXksIEphbnVhcnkgMjks
+IDIwMjAgMTI6MjggUE0NCj4gVG86IEVyaWMgQmlnZ2VycyA8ZWJpZ2dlcnNAa2VybmVsLm9yZz4N
+Cj4gQ2M6IEhlcmJlcnQgWHUgPGhlcmJlcnRAZ29uZG9yLmFwYW5hLm9yZy5hdT47IFN0ZXBoYW4g
+TXVlbGxlciA8c211ZWxsZXJAY2hyb25veC5kZT47IExpbnV4IENyeXB0byBNYWlsaW5nIExpc3Qg
+PGxpbnV4LQ0KPiBjcnlwdG9Admdlci5rZXJuZWwub3JnPjsgR2VlcnQgVXl0dGVyaG9ldmVuIDxn
+ZWVydEBsaW51eC1tNjhrLm9yZz47IERhdmlkIE1pbGxlciA8ZGF2ZW1AZGF2ZW1sb2Z0Lm5ldD47
+IE9maXIgRHJhbmcNCj4gPE9maXIuRHJhbmdAYXJtLmNvbT4NCj4gU3ViamVjdDogUmU6IFBvc3Np
+YmxlIGlzc3VlIHdpdGggbmV3IGluYXV0aGVudGljIEFFQUQgaW4gZXh0ZW5kZWQgY3J5cHRvIHRl
+c3RzDQo+DQo+IDw8PCBFeHRlcm5hbCBFbWFpbCA+Pj4NCj4gQ0FVVElPTjogVGhpcyBlbWFpbCBv
+cmlnaW5hdGVkIGZyb20gb3V0c2lkZSBvZiB0aGUgb3JnYW5pemF0aW9uLiBEbyBub3QgY2xpY2sg
+bGlua3Mgb3Igb3BlbiBhdHRhY2htZW50cyB1bmxlc3MgeW91IHJlY29nbml6ZSB0aGUNCj4gc2Vu
+ZGVyL3NlbmRlciBhZGRyZXNzIGFuZCBrbm93IHRoZSBjb250ZW50IGlzIHNhZmUuDQo+DQo+DQo+
+IE9uIFR1ZSwgSmFuIDI4LCAyMDIwIGF0IDExOjEyIFBNIEVyaWMgQmlnZ2VycyA8ZWJpZ2dlcnNA
+a2VybmVsLm9yZz4gd3JvdGU6DQo+ID4NCj4gPiBPbiBUdWUsIEphbiAyOCwgMjAyMCBhdCAwOToy
+NDoyNUFNICswMjAwLCBHaWxhZCBCZW4tWW9zc2VmIHdyb3RlOg0KPiA+ID4gLSBUaGUgc291cmNl
+IGlzIHByZXN1bWVkIHRvIGhhdmUgZW5vdWdoIHJvb20gZm9yIGJvdGggdGhlIGFzc29jaWF0ZWQN
+Cj4gPiA+IGRhdGEgYW5kIHRoZSBwbGFpbnRleHQuDQo+ID4gPiAtIFVubGVzcyBpdCdzIGluLXBs
+YWNlIGVuY3J5cHRpb24sIGluIHdoaWNoIGNhc2UsIHlvdSBhbHNvIHByZXN1bWUgdG8NCj4gPiA+
+IGhhdmUgcm9vbSBmb3IgdGhlIGF1dGhlbnRpY2F0aW9uIHRhZw0KPiA+DQo+ID4gVGhlIGF1dGhl
+bnRpY2F0aW9uIHRhZyBpcyBwYXJ0IG9mIHRoZSBjaXBoZXJ0ZXh0LCBub3QgdGhlIHBsYWludGV4
+dC4gIFNvIHRoZQ0KPiA+IHJ1bGUgaXMganVzdCB0aGF0IHRoZSBjaXBoZXJ0ZXh0IGJ1ZmZlciBu
+ZWVkcyB0byBoYXZlIHJvb20gZm9yIGl0LCBub3QgdGhlDQo+ID4gcGxhaW50ZXh0Lg0KPiA+DQo+
+ID4gT2YgY291cnNlLCB3aGVuIGRvaW5nIGluLXBsYWNlIGVuY3J5cHRpb24vZGVjcnlwdGlvbiwg
+dGhlIHR3byBidWZmZXJzIGFyZSB0aGUNCj4gPiBzYW1lLCBzbyBib3RoIHdpbGwgaGF2ZSByb29t
+IGZvciBpdCwgZXZlbiB0aG91Z2ggdGhlIHRhZyBpcyBvbmx5IG1lYW5pbmdmdWwgb24NCj4gPiB0
+aGUgY2lwaGVydGV4dCBzaWRlLiAgVGhhdCdzIGp1c3QgdGhlIGxvZ2ljYWwgY29uc2VxdWVuY2Ug
+b2YgImluLXBsYWNlIi4NCj4NCj4gWWVzLCBvZiBjb3Vyc2UuIEkgdW5kZXJzdGFuZCB0aGUgcHVy
+cG9zZSBhbGwgb2YgdGhpcyBzZXJ2ZXMuDQo+DQo+ID4NCj4gPiA+IC0gVGhlIG9ubHkgd2F5IHRv
+IHRlbGwgaWYgdGhpcyBpcyBpbi1wbGFjZSBlbmNyeXB0aW9uIG9yIG5vdCBpcyB0bw0KPiA+ID4g
+Y29tcGFyZSB0aGUgcG9pbnRlcnMgdG8gdGhlIHNvdXJjZSBhbmQgZGVzdGluYXRpb24gLSB0aGVy
+ZSBpcyBubyBmbGFnLg0KPiA+DQo+ID4gUmVxdWlyaW5nIHVzZXJzIHRvIHJlbWVtYmVyIHRvIHBy
+b3ZpZGUgYSBmbGFnIHRvIGluZGljYXRlIGluLXBsYWNlDQo+ID4gZW5jcnlwdGlvbi9kZWNyeXB0
+aW9uLCBpbiBhZGRpdGlvbiB0byBwYXNzaW5nIHRoZSBzYW1lIHNjYXR0ZXJsaXN0LCB3b3VsZCBt
+YWtlDQo+ID4gdGhlIEFQSSBtb3JlIGNvbXBsZXguDQo+ID4NCj4NCj4gQXNraW5nIHRoZSB1c2Vy
+IHRvIHByb3ZpZGUgdGhlIGZsYWcgaXMgdGhyb3dpbmcgdGhlIHByb2JsZW0gYXQgdGhlIHVzZXIg
+LQ0KPiBzbyBpbmRlZWQsIG5vdCBhIGdvb2QgaWRlYS4gQnV0IHRoYXQgc3RpbGwgZG9lc24ndCBt
+ZWFuIHdlIG5lZWQgdG8gaGF2ZQ0KPiAicmVhLT5zcmMgPT0gcmVxLT5kc3QiIGluIGV2ZXJ5IGRy
+aXZlci4gV2UgY2FuIGhhdmUgdGhlIEFQSSBmcmFtZXdvcmsNCj4gZG8gdGhpcy4NCj4NCldoaWNo
+IHdvdWxkIG1lYW4gdGhlIGZyYW1ld29yayB3b3VsZCBkbyB0aGUgcG9pbnRlciBjb21wYXJlLCBz
+ZXQNCnRoZSBmbGFnIGFwcHJvcHJpYXRlbHkgYW5kIHRoZW4sIG9uIHRvcCBvZiB0aGF0LCB0aGUg
+ZHJpdmVyIHN0aWxsIGhhcyB0bw0KY2hlY2svY29tcGFyZSB0aGF0IGZsYWcgYXMgd2VsbCwgaS5l
+Lg0KImlmIChpbnBsYWNlKSB7IG1hcCBiaWRpcmVjdGlvbmFsIH0gZWxzZSB7IG1hcCB1bmlkaXJl
+Y3Rpb25hbCB9OyINCkhvdyB3b3VsZCB0aGF0IGJlIGFuIGltcHJvdmVtZW50IG9mIGFueSBzb3J0
+PyBJdCBqdXN0IGFkZHMgb3ZlcmhlYWQuDQpFc3BlY2lhbGx5IGZvciBTVyBpbXBsZW1lbnRhdGlv
+bnMgdGhhdCBtYXkgbm90IGV2ZW4gbmVlZCB0byBrbm93Lg0KSXQncyBub3QgbGlrZSB0aGF0IHNp
+bmdsZSBwb2ludGVyIGNvbXBhcmUgaXMgdGVycmlibHkgY29tcGxpY2F0ZWQgdG8gZG8NCm9yIGRp
+ZmZpY3VsdCB0byB1bmRlcnN0YW5kIC4uLg0KDQo+ID4gPiAtIFlvDQp1IGNhbiBjb3VudCBvbiB0
+aGUgc2NhdHRlcmdhdGhlciBsaXN0IG5vdCBoYXZpbmcgIGEgZmlyc3QgTlVMTA0KPiA+ID4gYnVm
+ZmVyLCAqdW5sZXNzKiB0aGUgcGxhaW50ZXh0IGFuZCBhc3NvY2lhdGVkIGRhdGEgbGVuZ3RoIGFy
+ZSBib3RoDQo+ID4gPiB6ZXJvIEFORCBpdCdzIG5vdCBpbiBwbGFjZSBlbmNyeXB0aW9uLg0KPiA+
+ID4gLSBZb3UgY2FuIGNvdW50IG9uIG5vdCBnZXR0aW5nIE5VTEwgYXMgYSBzY2F0dGVybGlzdCBw
+b2ludCwgKnVubGVzcyoNCj4gPiA+IHRoZSBwbGFpbnRleHQgYW5kIGFzc29jaWF0ZWQgZGF0YSBs
+ZW5ndGggYXJlIGJvdGggemVybyBBTkQgaXQncyBub3QgaW4NCj4gPiA+IHBsYWNlIGVuY3J5cHRp
+b24uIChJJ20gYWN0dWFsbHkgdW5zdXJlIG9mIHRoaXMgb25lPykNCj4gPg0KPiA+IElmIHdlIGNv
+bnNpZGVyIHRoYXQgdGhlIGlucHV0IGlzIG5vdCBqdXN0IGEgc2NhdHRlcmxpc3QsIGJ1dCByYXRo
+ZXIgYQ0KPiA+IHNjYXR0ZXJsaXN0IGFuZCBhIGxlbmd0aCwgdGhlbiB0aGVzZSBvYnNlcnZhdGlv
+bnMgYXJlIHJlYWxseSBqdXN0ICJ5b3UgY2FuDQo+ID4gYWNjZXNzIHRoZSBmaXJzdCBieXRlLCB1
+bmxlc3MgdGhlIGxlbmd0aCBpcyAwIiAtLSB3aGljaCBpcyBzb3J0IG9mIG9idmlvdXMuICBBbmQN
+Cj4NCj4gWWVzLCBpZiBpdCBpcyBpbmRlZWQgYSBzY2F0dGVybGlzdCBhbmQgbGVuZ3RoLiBJbiBm
+YWN0IGl0IGlzbid0IC0gaXQncw0KPiBhIHNjYXR0ZXJsaXN0DQo+IGFuZCBmb3VyIGRpZmZlcmVu
+dCBsZW5ndGhzOiBwbGFpbnRleHQsIGFzc29jaWF0ZWQgZGF0YSwgSVYgYW5kIGF1dGggdGFnLg0K
+PiBTb21lIG9mIHRoZW0gYXJlIHVzZWQgaW4gdmFyaW91cyBzY2VuYXJpb3MgYW5kIHNvbWUgYXJl
+bid0Lg0KPiBXaGljaCBpcyBleGFjdGx5IG15IHBvaW50Lg0KPg0KQWdyZWVkIHRoYXQgd2hhdCBp
+cyBpbmNsdWRlZCBpbiBjcnlwdGxlbiBpcyBub3QgY29uc2lzdGVudCBvciBvYnZpb3VzLg0KRWl0
+aGVyIG1ha2UgaXQgaW5jbHVkZSBPTkxZIHRoZSBQVC9DVCBkYXRhIChhcyB0aGUgbmFtZSBpbXBs
+aWVzISksIG9yDQptYWtlIGl0IHRoZSBmdWxsIGlucHV0IGxlbmd0aCBvciBzb21ldGhpbmcuIChi
+dXQgaXQncyB0b28gbGF0ZSBmb3IgdGhhdCBub3cpDQoNCj4gPiByZXF1aXJpbmcgYSBkZXJlZmVy
+ZW5jYWJsZSBwb2ludGVyIGZvciBsZW5ndGggPSAwIGlzIGdlbmVyYWxseSBjb25zaWRlcmVkIHRv
+IGJlDQo+ID4gYmFkIEFQSSBkZXNpZ247IHNlZSB0aGUgbWVtY3B5KCkgZmlhc2NvDQo+ID4gKGh0
+dHBzOi8vd3d3LmltcGVyaWFsdmlvbGV0Lm9yZy8yMDE2LzA2LzI2L25vbm51bGwuaHRtbCkuDQo+
+DQo+IFllcywgdGhhdCdzIG5vdCBhIGdvb2Qgb3B0aW9uIC0gYnV0IG5laXRoZXIgaXMgaGF2aW5n
+IGEgY29tbWVudCB0aGF0DQo+IGNhbiBiZSByZWFkIHRvIGltcGx5DQo+IHRoYXQgdGhlIEFQSSBy
+ZXF1aXJlcyBpdCBpZiBpdCBkb2Vzbid0IDotKQ0KPg0KSG1tIC4uLiB3aHkgc2hvdWxkbid0IHlv
+dSBiZSBhbGxvd2VkIHRvIGJlIF9tb3JlXyByZXN0cmljdGl2ZSBpbiB5b3VyDQpkb2N1bWVudGF0
+aW9uIHRoZW4geW91ciBpbXBsZW1lbnRhdGlvbj8gSXQncyBjYWxsZWQgZXJyaW5nIG9uIHRoZSBz
+YWZlDQpzaWRlLiBJdCBoYXBwZW5zIGFsbCB0aGUgdGltZSwgaWYgb25seSB0byBzYXZlIHZlcmlm
+aWNhdGlvbiBlZmZvcnQgZm9yIGFsbCB0aG9zZQ0KYWRkaXRpb25hbCBjb3JuZXIgY2FzZXMgOi0p
+DQoNCj4gVGhpbmtpbmcgYWJvdXQgaXQsIEknbSB3b25kZXJpbmcgaWYgaGF2aW5nIHNvbWV0aGlu
+ZyBsaWtlIHRoaXMgd2lsbA0KPiBzYXZlIGJvaWxlcnBsYXRlIGNvZGUgaW4gbWFueSBkcml2ZXJz
+Og0KPg0KPiBzdGF0aWMgaW5saW5lIGJvb2wgY3J5cHRvX2FlYWRfaW5wbGFjZShzdHJ1Y3QgYWVh
+ZF9yZXF1ZXN0IHJlcSkNCj4gew0KPiAgICAgICAgIHJldHVybiAocmVxLT5zcmMgPT0gcmVxLT5k
+c3QpOw0KPiB9DQo+DQpUaGF0IHdvdWxkIHNhdmUgb25seSBhIGZldyBjaGFyYWN0ZXJzIG9mIHR5
+cGluZyB1bmxlc3MgeW91IHNob3J0ZW4gdGhhdCBmdW5jdGlvbg0KbmFtZSA7LSkgQW5kIHdvdWxk
+IGl0IF9yZWFsbHlfIGJlIG1vcmUgY2xlYXIgdG8gdGhlIHJlYWRlciBvZiB0aGUgY29kZT8NCg0K
+PiB1bnNpZ25lZCBpbnQgY3J5cHRvX2FlYWRfc2dfbGVuKHN0cnVjdCBhZWFkX3JlcXVlc3QgcmVx
+LCBib29sIGVuYywgYm9vbCBzcmMsDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+IGludCBhdXRoc2l6ZSwgYm9vbCBuZWVkX2l2KQ0KPiB7DQo+ICAgICAgICAgc3RydWN0IGNyeXB0
+b19hZWFkICp0Zm0gPSBjcnlwdG9fYWVhZF9yZXF0Zm0ocmVxKTsNCj4gICAgICAgICB1bnNpZ25l
+ZCBpbnQgbGVuID0gcmVxLT5hc3NvY2xlbiArIHJlcS0+Y3J5cHRsZW47DQo+DQo+ICAgICAgICAg
+aWYgKG5lZWRfaXYpDQo+ICAgICAgICAgICAgICAgICBsZW4gKz0gY3J5cHRvX2FlYWRfaXZzaXpl
+KHRmbSk7DQo+DQo+ICAgICAgICAgaWYgKHNyYyAmJiAhZW5jKSB8fCAoIXNyYyAmJiBlbmMpIHx8
+IGNyeXB0b19hZWFkX2lucGxhY2UocmVxKSkNCj4gICAgICAgICAgICAgICAgIGxlbiArPSBhdXRo
+c2l6ZTsNCj4NCj4gICAgICAgICByZXR1cm4gbGVuOw0KPiB9DQo+DQpJbnRlcmVzdGluZyAuLi4g
+bXkgaGFyZHdhcmUgaXMgX3ZlcnlfIHNlbnNpdGl2ZSB0byBpbnB1dCBsZW5ndGggeWV0IEkgb25s
+eSBuZWVkDQp0byBldmVyIGRvIGFzc29jbGVuK2NyeXB0bGVuIGZvciB0aGF0IGFuZCB0aGF0IHdv
+cmtzIGZpbmU/IC4uLg0KU28gSSBkb24ndCB1bmRlcnN0YW5kIHRoZSAraXZzaXplIGFuZCArYXV0
+aHNpemUgZm9yIHNyYy4gU2VlbXMgdG8gYmUgYWxyZWFkeSBpbmNsdWRlZC4NCg0KQW5kIGZvciB0
+aGUgZGVjcnlwdCBkZXN0aW5hdGlvbiBzaXplLCB5b3Ugc2hvdWxkIG5lZWQgdG8gZG8gLWF1dGhz
+aXplIGFzIHRoZSBJQ1YgaXMgaW5jbHVkZWQNCmluIGNyeXB0bGVuIGJ1dCBub3Qgd3JpdHRlbiBv
+dXQoPykuDQoNCk90aGVyIHRoYW4gdGhhdCwgdGhlIGlkZWEgb2YgaGF2aW5nIHN1Y2ggYSBmdW5j
+dGlvbiBhdmFpbGFibGUgaXNuJ3QgYmFkLCBhcyBsb25nDQphcyB5b3UgbWFrZSBpdCBpbmxpbmVh
+YmxlIGFzIHlvdSBuZWVkIGl0IGluIHRoZSBjcml0aWNhbCBwYXRoIG9mIHRoZSBkcml2ZXIuDQoN
+Cj4gSXQgd291bGQgYmUgYmV0dGVyIGV2ZW4gaWYgd2UgY2FuIHB1dCB0aGUgYXV0aHNpemUgYW5k
+IG5lZWRfaXYgaW50byB0aGUgdGZ2DQo+IGF0IHJlZ2lzdHJhdGlvbiB0aW1lIGFuZCBub3QgaGF2
+ZSB0byBwYXNzIHRoZW0gYXMgcGFyYW1ldGVycyBhdCBhbGwuDQo+DQpUaGVuIGFnYWluIHBhc3Np
+bmcgdGhlbSBhcyBwYXJhbWV0ZXJzIG1heSBiZSBiZXR0ZXIgYXMgdGhleSBtYXkgYmUgY29uc3Rh
+bnQNCmluIHRoZSBzcGVjaWZpYyBwYXRoIHdoZXJlIHRoZSBmdW5jdGlvbiBpcyBjYWxsZWQuIEFs
+bG93aW5nIHRoZSBmdW5jdGlvbiB0byBiZSBpbmxpbmVkDQp3b3VsZCB0aGVuIGFsbG93IHRoZSBj
+b21waWxlciB0byBvcHRpbWl6ZSB1bm5lY2Vzc2FyeSBjb21wdXRhdGlvbnMgYW5kIGJyYW5jaGVz
+DQphd2F5IC4uDQoNCj4gPHNuaXA+DQo+DQo+IEFueXdheXMsIHRoYW5rcyBmb3IgZW50ZXJ0YWlu
+aW5nIG15IHJhbWJsaW5ncy4uLiA6LSkNCj4NCj4gVGhhbmtzLA0KPiBHaWxhZA0KPg0KPiAtLQ0K
+PiBHaWxhZCBCZW4tWW9zc2VmDQo+IENoaWVmIENvZmZlZSBEcmlua2VyDQo+DQo+IHZhbHVlcyBv
+ZiDOsiB3aWxsIGdpdmUgcmlzZSB0byBkb20hDQoNCg0KUmVnYXJkcywNClBhc2NhbCB2YW4gTGVl
+dXdlbg0KU2lsaWNvbiBJUCBBcmNoaXRlY3QgTXVsdGktUHJvdG9jb2wgRW5naW5lcywgUmFtYnVz
+IFNlY3VyaXR5DQpSYW1idXMgUk9UVyBIb2xkaW5nIEJWDQorMzEtNzMgNjU4MTk1Mw0KDQpOb3Rl
+OiBUaGUgSW5zaWRlIFNlY3VyZS9WZXJpbWF0cml4IFNpbGljb24gSVAgdGVhbSB3YXMgcmVjZW50
+bHkgYWNxdWlyZWQgYnkgUmFtYnVzLg0KUGxlYXNlIGJlIHNvIGtpbmQgdG8gdXBkYXRlIHlvdXIg
+ZS1tYWlsIGFkZHJlc3MgYm9vayB3aXRoIG15IG5ldyBlLW1haWwgYWRkcmVzcy4NCg0KDQoqKiBU
+aGlzIG1lc3NhZ2UgYW5kIGFueSBhdHRhY2htZW50cyBhcmUgZm9yIHRoZSBzb2xlIHVzZSBvZiB0
+aGUgaW50ZW5kZWQgcmVjaXBpZW50KHMpLiBJdCBtYXkgY29udGFpbiBpbmZvcm1hdGlvbiB0aGF0
+IGlzIGNvbmZpZGVudGlhbCBhbmQgcHJpdmlsZWdlZC4gSWYgeW91IGFyZSBub3QgdGhlIGludGVu
+ZGVkIHJlY2lwaWVudCBvZiB0aGlzIG1lc3NhZ2UsIHlvdSBhcmUgcHJvaGliaXRlZCBmcm9tIHBy
+aW50aW5nLCBjb3B5aW5nLCBmb3J3YXJkaW5nIG9yIHNhdmluZyBpdC4gUGxlYXNlIGRlbGV0ZSB0
+aGUgbWVzc2FnZSBhbmQgYXR0YWNobWVudHMgYW5kIG5vdGlmeSB0aGUgc2VuZGVyIGltbWVkaWF0
+ZWx5LiAqKg0KDQpSYW1idXMgSW5jLjxodHRwOi8vd3d3LnJhbWJ1cy5jb20+DQo=
 
