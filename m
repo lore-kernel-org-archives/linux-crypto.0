@@ -2,178 +2,471 @@ Return-Path: <SRS0=eQ+U=3S=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40951C35240
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jan 2020 12:27:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AABBC2D0DB
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jan 2020 12:55:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 172832071E
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jan 2020 12:27:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1FB3720716
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Jan 2020 12:55:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="RVIuNKXG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726145AbgA2M1S (ORCPT
+        id S1726140AbgA2MzH (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 29 Jan 2020 07:27:18 -0500
-Received: from mail-il1-f197.google.com ([209.85.166.197]:32812 "EHLO
-        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726260AbgA2M1K (ORCPT
+        Wed, 29 Jan 2020 07:55:07 -0500
+Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.54]:30073 "EHLO
+        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726069AbgA2MzH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Jan 2020 07:27:10 -0500
-Received: by mail-il1-f197.google.com with SMTP id s9so12888847ilk.0
-        for <linux-crypto@vger.kernel.org>; Wed, 29 Jan 2020 04:27:10 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=x2c2rAUs5VjWNl2yVpMiXXd6LGKNk8O648CMLyi/yxs=;
-        b=WfNUOzpkjnfPgtnlsjvfw3qMyy9v9ALRJzZIlgwCZBL6eBEE/E6RbWBCj16Xi129OV
-         0BvjuQPXy15+VXeizwJdmqLCvvsDMn9TPshhOM8yHvWaXw2gXUfU2FFM4F7NZaXcBPYm
-         YDs/6JWZN+nxbWEBqEhD4cjt6MWiyu4F9Rp4KzjEYAPH9yD2d6u9Lx7lrDLa9Gbgg735
-         cuqmlTzbhYvuHeAeGBRK4RAQTwAAohTINsOMMuCquOVb4zGTUj8xla2y4VVwoHYepnv7
-         RqubYPhjnqgst6VLRK0jFH9bAuuzu6kG5AK+VsEdUJfKHTYiM/ueojOpW+CxA21GO+sa
-         J1Eg==
-X-Gm-Message-State: APjAAAVLg4V9g/4q6ZXPPZGAD+fUitd0hn6KOCM7WUvclH/+wy9bHLzU
-        lm5QlU2x1ALow2UjKPvEEsJGRhturDslo/BVfqQ32r9OZwgm
-X-Google-Smtp-Source: APXvYqy/vSrWy9MZoQS72VuYFVeLhSUiZRHRekQs1zZiXtmnAz1jlL1FLLfxa/VhRcEv5gf8cg+Dl8N9Fc2cXjhbsDyIjihK+7Zu
+        Wed, 29 Jan 2020 07:55:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1580302500;
+        s=strato-dkim-0002; d=chronox.de;
+        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=kbBDQ/CFiNDzf1QmOXQP49xea+1FaRNOAwy0p+mDpt0=;
+        b=RVIuNKXGDoiVWkXsKPmqCZr2hIaOOFBdwqdobc+aCkQmTHFXD+kW/AyTY/XRKTxLZ8
+        B0v+QMq6Qk0+Tg2uEwczxSGMw3p9Pnd8qQEJb9Nl5cFo1W9nk1zPIsPrY0lxRbdscV/H
+        o94xvOjQbigrAJafjXEAOevm59oPhBJ9xJKVv+jc+4egWyLeB1Z4WWbdRz6S32QAdUY+
+        9/7cvc+rY78BNm5DPw6dcEiGggUL9GTE8JOUeT5y0+XDFwbF1oEGVCkmDI8XBsdynJQz
+        iB5YjhUEbwmASWdPZJsPYI1jxfHB6VjIbR1+zEHkInemuJiYpXTt7tSOqxDbCR3klMAT
+        qDOg==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9ym4dPkYX6am8zHoI"
+X-RZG-CLASS-ID: mo00
+Received: from tauon.chronox.de
+        by smtp.strato.de (RZmta 46.1.7 AUTH)
+        with ESMTPSA id I05c44w0TCsnVXQ
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+        Wed, 29 Jan 2020 13:54:49 +0100 (CET)
+From:   Stephan Mueller <smueller@chronox.de>
+To:     "Van Leeuwen, Pascal" <pvanleeuwen@rambus.com>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        David Miller <davem@davemloft.net>,
+        Ofir Drang <Ofir.Drang@arm.com>
+Subject: Re: Possible issue with new inauthentic AEAD in extended crypto tests
+Date:   Wed, 29 Jan 2020 13:54:44 +0100
+Message-ID: <5036173.rU9AjI9tPH@tauon.chronox.de>
+In-Reply-To: <CY4PR0401MB365296BC605383E0C0506C04C3050@CY4PR0401MB3652.namprd04.prod.outlook.com>
+References: <CAOtvUMcwLtwgigFE2mx7LVjhhEgcZsSS4WyR_SQ2gixTZxyBfg@mail.gmail.com> <11489dad16d64075939db69181b5ecbb@MN2PR20MB2973.namprd20.prod.outlook.com> <CY4PR0401MB365296BC605383E0C0506C04C3050@CY4PR0401MB3652.namprd04.prod.outlook.com>
 MIME-Version: 1.0
-X-Received: by 2002:a92:5806:: with SMTP id m6mr24436789ilb.234.1580300829812;
- Wed, 29 Jan 2020 04:27:09 -0800 (PST)
-Date:   Wed, 29 Jan 2020 04:27:09 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000996f3c059d46757a@google.com>
-Subject: KASAN: use-after-free Write in chaoskey_disconnect
-From:   syzbot <syzbot+73163a4458e7367880a0@syzkaller.appspotmail.com>
-To:     andreyknvl@google.com, arnd@arndb.de, gregkh@linuxfoundation.org,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-        lvivier@redhat.com, mchehab+samsung@kernel.org, mpm@selenic.com,
-        swboyd@chromium.org, syzkaller-bugs@googlegroups.com, tytso@mit.edu
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello,
+Am Mittwoch, 29. Januar 2020, 09:40:28 CET schrieb Van Leeuwen, Pascal:
 
-syzbot found the following crash on:
+Hi Pascal,
 
-HEAD commit:    cd234325 usb: gadget: add raw-gadget interface
-git tree:       https://github.com/google/kasan.git usb-fuzzer
-console output: https://syzkaller.appspot.com/x/log.txt?x=140e49bee00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=bb745005307bc641
-dashboard link: https://syzkaller.appspot.com/bug?extid=73163a4458e7367880a0
-compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+> Hi Stephan,
+> 
+> 
+> > -----Original Message-----
+> > From: linux-crypto-owner@vger.kernel.org
+> > <linux-crypto-owner@vger.kernel.org> On Behalf Of Stephan Mueller
+ Sent:
+> > Wednesday, January 29, 2020 2:27 AM
+> > To: Van Leeuwen, Pascal <pvanleeuwen@rambus.com>
+> > Cc: Eric Biggers <ebiggers@kernel.org>; Gilad Ben-Yossef
+> > <gilad@benyossef.com>; Herbert Xu <herbert@gondor.apana.org.au>;
+ Linux
+> > Crypto Mailing List <linux-crypto@vger.kernel.org>; Geert Uytterhoeven
+> > <geert@linux-m68k.org>; David Miller <davem@davemloft.net>; Ofir Drang
+> > <Ofir.Drang@arm.com>
+> > Subject: Re: Possible issue with new inauthentic AEAD in extended crypto
+> > tests
+>
+> >
+> >
+> > <<< External Email >>>
+> > CAUTION: This email originated from outside of the organization. Do not
+> > click links or open attachments unless you recognize the
+ sender/sender
+> > address and know the content is safe.
+> >
+> >
+> >
+> >
+> > Am Mittwoch, 29. Januar 2020, 01:18:29 CET schrieb Van Leeuwen, Pascal:
+> >
+> >
+> >
+> > Hi Pascal,
+> >
+> >
+> >
+> > > > -----Original Message-----
+> > > > From: linux-crypto-owner@vger.kernel.org
+> > > > <linux-crypto-owner@vger.kernel.org> On Behalf Of Eric Biggers
+> >  
+> >  Sent:
+> >  
+> > > > Tuesday, January 28, 2020 10:13 PM
+> > > > To: Gilad Ben-Yossef <gilad@benyossef.com>
+> > > > Cc: Herbert Xu <herbert@gondor.apana.org.au>; Stephan Mueller
+> > > > <smueller@chronox.de>; Linux Crypto Mailing List <linux-
+> > > > crypto@vger.kernel.org>; Geert Uytterhoeven <geert@linux-m68k.org>;
+> > > > David
+> > > > Miller <davem@davemloft.net>; Ofir Drang <Ofir.Drang@arm.com>
+> > > > Subject: Re: Possible issue with new inauthentic AEAD in extended
+> > > > crypto
+> > > > tests
+> > >
+> > >
+> > >
+> > > >
+> > > >
+> > > >
+> > > > <<< External Email >>>
+> > > > CAUTION: This email originated from outside of the organization. Do
+> > > > not
+> > > > click links or open attachments unless you recognize the
+> >  
+> >  sender/sender
+> >  
+> > > > address and know the content is safe.
+> > > >
+> > > >
+> > > >
+> > > >
+> > > >
+> > > >
+> > > > On Tue, Jan 28, 2020 at 09:24:25AM +0200, Gilad Ben-Yossef wrote:
+> > > >
+> > > >
+> > > >
+> > > > > - The source is presumed to have enough room for both the
+> > > > > associated
+> > > > > data and the plaintext.
+> > > > > - Unless it's in-place encryption, in which case, you also presume
+> > > > > to
+> > > > > have room for the authentication tag
+> > > >
+> > > >
+> > > >
+> > > >
+> > > >
+> > > > The authentication tag is part of the ciphertext, not the plaintext. 
+> > > > So
+> > > > the
+> >  
+> >  rule is just that the ciphertext buffer needs to have room for it,
+> >  
+> > > > not the plaintext.
+> > > >
+> > > >
+> > > >
+> > > >
+> > > >
+> > > > Of course, when doing in-place encryption/decryption, the two buffers
+> > > > are
+> > > > the
+> >  
+> >  same, so both will have room for it, even though the tag is only
+> >  
+> > > > meaningful on the ciphertext side.  That's just the logical
+> > > > consequence
+> > > > of "in-place".>
+> > > >
+> > > >
+> > > >
+> > > >
+> > > > > - The only way to tell if this is in-place encryption or not is to
+> > > > > compare the pointers to the source and destination - there is no
+> > > > > flag.
+> > > >
+> > > >
+> > > >
+> > > >
+> > > >
+> > > > Requiring users to remember to provide a flag to indicate in-place
+> > > > encryption/decryption, in addition to passing the same scatterlist,
+> > > > would
+> > > > make
+> >  
+> >  the API more complex.
+> >  
+> > > >
+> > > >
+> > >
+> > >
+> > >
+> > > Also, what would the benefit? You'd still have to compare the flag. The
+> > > performance
+> >  
+> >  difference of comparing the flag vs comparing 2 pointers (that
+> >  
+> > > you need to read anyway) is likely completely negligible on most modern
+> > > CPU
+ architectures ...
+> > >
+> > >
+> > >
+> > > > > - You can count on the scattergather list not having  a first NULL
+> > > > > buffer, *unless* the plaintext and associated data length are both
+> > > > > zero AND it's not in place encryption.
+> > > > > - You can count on not getting NULL as a scatterlist point,
+> > > > > *unless*
+> > > > > the plaintext and associated data length are both zero AND it's not
+> > > > > in
+> > > > > place encryption. (I'm actually unsure of this one?)
+> > > >
+> > > >
+> > > >
+> > > >
+> > > >
+> > > > If we consider that the input is not just a scatterlist, but rather a
+> > > > scatterlist and a length, then these observations are really just
+> > > > "you
+> > > > can
+> > > > access the first byte, unless the length is 0" -- which is sort of
+> > > > obvious.  And requiring a dereferencable pointer for length = 0 is
+> > > > generally considered to be bad API design; see the memcpy() fiasco
+> > > > (https://www.imperialviolet.org/2016/06/26/nonnull.html).
+> > > >
+> > > >
+> > > >
+> > > >
+> > > >
+> > > > The API could be simplified by only supporting full scatterlists, but
+> > > > it
+> > > > seems that users are currently relying on being able to
+> > > > encrypt/decrypt
+> > > > just a prefix.>
+> > > >
+> > > >
+> > > >
+> > > >
+> > > > IMO, the biggest problems with the AEAD API are actually things you
+> > > > didn't
+> > > > mention, such as the fact that the AAD isn't given in a separate
+> > > > scatterlist,
+> > >
+> > >
+> > >
+> > > >
+> > >
+> > >
+> > >
+> > > While I can understand this may be beneficial in some cases, I believe
+> > > they
+ do not
+> > > outweigh the downsides:
+> > > - In many use cases, AAD+cipher text are stored as one contiguous
+> > > string.
+> >
+> >
+> >
+> > Then refer to that one linear buffer with one SGL entry.
+> >
+> >
+> 
+> Hmm ... I believe having a seperate scatter list for AAD would imply that
+> you have
+ seperate scatter entries for AAD (in that list) and Crypto[+TAG]
+> (in the other list).
 
-Unfortunately, I don't have any reproducer for this crash yet.
+Who says that we need a separate SGL entry for the AAD?
 
-IMPORTANT: if you fix the bug, please add the following tag to the commit:
-Reported-by: syzbot+73163a4458e7367880a0@syzkaller.appspotmail.com
-
-usb 2-1: USB disconnect, device number 45
-==================================================================
-BUG: KASAN: use-after-free in atomic_fetch_add include/asm-generic/atomic-instrumented.h:111 [inline]
-BUG: KASAN: use-after-free in refcount_add include/linux/refcount.h:188 [inline]
-BUG: KASAN: use-after-free in refcount_inc include/linux/refcount.h:228 [inline]
-BUG: KASAN: use-after-free in get_task_struct include/linux/sched/task.h:113 [inline]
-BUG: KASAN: use-after-free in kthread_stop+0x90/0x780 kernel/kthread.c:554
-Write of size 4 at addr ffff8881ca88e220 by task kworker/0:10/18542
-
-CPU: 0 PID: 18542 Comm: kworker/0:10 Not tainted 5.5.0-rc7-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Workqueue: usb_hub_wq hub_event
-Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0xef/0x16e lib/dump_stack.c:118
- print_address_description.constprop.0.cold+0xd3/0x314 mm/kasan/report.c:374
- __kasan_report.cold+0x37/0x85 mm/kasan/report.c:506
- kasan_report+0xe/0x20 mm/kasan/common.c:639
- check_memory_region_inline mm/kasan/generic.c:185 [inline]
- check_memory_region+0x152/0x1c0 mm/kasan/generic.c:192
- atomic_fetch_add include/asm-generic/atomic-instrumented.h:111 [inline]
- refcount_add include/linux/refcount.h:188 [inline]
- refcount_inc include/linux/refcount.h:228 [inline]
- get_task_struct include/linux/sched/task.h:113 [inline]
- kthread_stop+0x90/0x780 kernel/kthread.c:554
- hwrng_unregister+0x24f/0x330 drivers/char/hw_random/core.c:556
- chaoskey_disconnect+0x216/0x290 drivers/usb/misc/chaoskey.c:232
- usb_unbind_interface+0x1bd/0x8a0 drivers/usb/core/driver.c:423
- __device_release_driver drivers/base/dd.c:1134 [inline]
- device_release_driver_internal+0x42f/0x500 drivers/base/dd.c:1165
- bus_remove_device+0x2eb/0x5a0 drivers/base/bus.c:532
- device_del+0x481/0xd30 drivers/base/core.c:2664
- usb_disable_device+0x23d/0x790 drivers/usb/core/message.c:1237
- usb_disconnect+0x293/0x900 drivers/usb/core/hub.c:2201
- hub_port_connect drivers/usb/core/hub.c:5036 [inline]
- hub_port_connect_change drivers/usb/core/hub.c:5325 [inline]
- port_event drivers/usb/core/hub.c:5471 [inline]
- hub_event+0x1a1d/0x4300 drivers/usb/core/hub.c:5553
- process_one_work+0x945/0x15c0 kernel/workqueue.c:2264
- worker_thread+0x96/0xe20 kernel/workqueue.c:2410
- kthread+0x318/0x420 kernel/kthread.c:255
- ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
-
-Allocated by task 1824:
- save_stack+0x1b/0x80 mm/kasan/common.c:72
- set_track mm/kasan/common.c:80 [inline]
- __kasan_kmalloc mm/kasan/common.c:513 [inline]
- __kasan_kmalloc.constprop.0+0xbf/0xd0 mm/kasan/common.c:486
- slab_post_alloc_hook mm/slab.h:584 [inline]
- slab_alloc_node mm/slub.c:2759 [inline]
- kmem_cache_alloc_node+0xdc/0x330 mm/slub.c:2795
- alloc_task_struct_node kernel/fork.c:169 [inline]
- dup_task_struct kernel/fork.c:868 [inline]
- copy_process+0x43e3/0x6710 kernel/fork.c:1911
- _do_fork+0x12d/0xfd0 kernel/fork.c:2421
- __do_sys_clone kernel/fork.c:2576 [inline]
- __se_sys_clone kernel/fork.c:2557 [inline]
- __x64_sys_clone+0x182/0x210 kernel/fork.c:2557
- do_syscall_64+0xb6/0x5a0 arch/x86/entry/common.c:294
- entry_SYSCALL_64_after_hwframe+0x49/0xbe
-
-Freed by task 1824:
- save_stack+0x1b/0x80 mm/kasan/common.c:72
- set_track mm/kasan/common.c:80 [inline]
- kasan_set_free_info mm/kasan/common.c:335 [inline]
- __kasan_slab_free+0x117/0x160 mm/kasan/common.c:474
- slab_free_hook mm/slub.c:1425 [inline]
- slab_free_freelist_hook mm/slub.c:1458 [inline]
- slab_free mm/slub.c:3005 [inline]
- kmem_cache_free+0x9b/0x360 mm/slub.c:3021
- __put_task_struct+0x220/0x510 kernel/fork.c:751
- put_task_struct include/linux/sched/task.h:122 [inline]
- delayed_put_task_struct+0x22a/0x370 kernel/exit.c:182
- __rcu_reclaim kernel/rcu/rcu.h:222 [inline]
- rcu_do_batch kernel/rcu/tree.c:2183 [inline]
- rcu_core+0x664/0x1e10 kernel/rcu/tree.c:2408
- __do_softirq+0x21e/0x950 kernel/softirq.c:292
-
-The buggy address belongs to the object at ffff8881ca88e200
- which belongs to the cache task_struct of size 6016
-The buggy address is located 32 bytes inside of
- 6016-byte region [ffff8881ca88e200, ffff8881ca88f980)
-The buggy address belongs to the page:
-page:ffffea00072a2200 refcount:1 mapcount:0 mapping:ffff8881da116000 index:0x0 compound_mapcount: 0
-raw: 0200000000010200 dead000000000100 dead000000000122 ffff8881da116000
-raw: 0000000000000000 0000000000050005 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
- ffff8881ca88e100: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff8881ca88e180: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->ffff8881ca88e200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                               ^
- ffff8881ca88e280: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
- ffff8881ca88e300: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-==================================================================
+> So you still have the burden of constructing 2
+> scatterlists instead of one, figuring out where the second one starts.
 
 
----
-This bug is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+I do not see the requirement that the caller must have at least two SGL 
+entries.
 
-syzbot will keep track of this bug report. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+In fact, for the AF_ALG interface, af_alg_get_rsgl creates the destination SGL 
+and creates one SGL entry per user-space IOVEC. If user space provides a 
+linear buffer with one IOVEC holding the AAD, CT, Tag, only one SGL entry is 
+created.
+
+For the source SGL, af_alg_sendmsg tries to be efficient to put as much as 
+possible into one page referenced by one SGL entry. So, if user space provides 
+AAD||PT which is less than a page in size, you get one SGL entry for the 
+entire input data.
+
+> Plus
+> the burden of any hardware accelerator having to handle 2 particles instead
+> of one.
+
+Well, the cipher implementation must be capable of processing any SGL 
+structure. It is not given that the SGL with the source data has exactly 2 
+entries. It can have one entry with AAD||PT. It can have two entries where the 
+split is between AAD and PT. But it can have 2 entries where the split is in 
+the middle of, say, AAD. Or it can have more SGL entries.
+
+Please do not mix up the structure of the data to be contained in the SGL 
+(say, AAD||PT) with the physical memory structure (e.g. how many SGL entries 
+there are).
+
+> 
+> Note that even with one scatterlist you can still have the AAD data coming
+> from
+ some specific AAD-only buffer(s). Just put it it its own (set of)
+> particle(s), seperate from the crypto data particles. So that is not a
+> reason to have seperate *lists*. 
+> The only advantage of having AAD seperate I can think of is for software
+> crypto implementations, not having to skip over the AAD for the scatterlist
+> they
+ send to the parallel encryption part. Which IMHO is only a minor
+> inconvenience that you shouldn't push to all the users of the API.
+> 
+> 
+> > > Requiring this
+> > > string to be spit into seperate particles for AAD and
+> > > ciphertext would be a burden.
+> >
+> >
+> >
+> > There is no need to split a string. All that is said is that the SGL needs
+> > to
+ point to memory that is AAD||PT or AAD||CT||TAG. There is no
+> > statement about the number of SGL entries to point to these buffer(s). So
+> > you could have one linear buffer for these components pointing to it with
+> > an SGL holding one entry.
+> >
+> >
+> 
+> The remark I responded to was about having a seperate scatterlist for AAD
+> data.
+ Which, in my world, implies that the *other* scatterlist does NOT
+> include the AAD data. So that one would then need to be only PT or CT||TAG.
+> Which does require "splitting the string" (virtually, anyway) between AAD
+> and PT/CT. 
+> It's not about splitting the data physically (i.e. moving it). It's about
+> splitting the
+ particles, creating 2 particles (in 2 lists) where you would
+> now only need 1. 
+> 
+> > > - For hardware accelerators, there is a cost
+> > > associated with each additional particle, in terms of either bandwidth
+> > > or
+> > > performance or both. So less particles = better, generally.
+> > > The only thing that I find odd is that if you do a non-inplace operation
+> > > you
+ have this
+> > > undefined(?) gap in the output data where the AAD would be for
+> > > inplace. That makes little sense to me and requires extra effort to
+> > > skip
+> > > over in the driver.
+> > >
+> > >
+> > >
+> > > > and that the API only supports scatterlists and not virtual addresses
+> > > > (which makes it difficult to use in some cases).
+> > > >
+> > > >
+> > > >
+> > >
+> > >
+> > >
+> > > While I can understand that this is difficult if the API user just got
+> > > this
+ virtual address
+> >  
+> >  provided from somewhere else and needs to do the
+> >  
+> > > translation, the other side of the medal is that any hardware driver
+> > > would
+> > > otherwise have to do address translation and scatterlist building on
+> > > the
+> > > fly (as hardware needs to access contiguous physical memory), which
+> > > would
+> > > be real burden there. While many API users_are_ able to provide a nice
+> > > scatterlist at negligible extra cost. So why burden those?
+> > >
+> > >
+> > >
+> > >
+> > > > In any case we do need much better documentation.  I'm planning to
+> > > > improve
+> > > > some
+> >  
+> >  of the crypto API documentation, but I'll probably do the hash and
+> >  
+> > > > skcipher algorithm types first before getting to AEAD.  So if you want
+> > > > to
+> > > > improve the AEAD documentation in the mean time, please go ahead.
+> > > >
+> > > >
+> > > >
+> > > >
+> > > >
+> > > > - Eric
+> > >
+> > >
+> > >
+> > >
+> > > Regards,
+> > > Pascal van Leeuwen
+> > > Silicon IP Architect Multi-Protocol Engines, Rambus Security
+> > > Rambus ROTW Holding BV
+> > > +31-73 6581953
+> > >
+> > >
+> > >
+> > > Note: The Inside Secure/Verimatrix Silicon IP team was recently acquired
+> > > by
+ Rambus.
+> >  
+> >  Please be so kind to update your e-mail address book with my new
+> >  
+> > > e-mail address.
+> > >
+> > >
+> > >
+> > > ** This message and any attachments are for the sole use of the
+> > > intended
+> > > recipient(s). It may contain information that is confidential and
+> > > privileged. If you are not the intended recipient of this message, you
+> > > are
+> > > prohibited from printing, copying, forwarding or saving it. Please
+> > > delete
+> > > the message and attachments and notify the sender immediately. **
+> >
+> >
+> >
+> > > Rambus Inc.<http://www.rambus.com>
+> >
+> >
+> >
+> >
+> >
+> > Ciao
+> > Stephan
+> 
+> 
+> Regards,
+> Pascal van Leeuwen
+> Silicon IP Architect Multi-Protocol Engines, Rambus Security
+> Rambus ROTW Holding BV
+> +31-73 6581953
+> 
+> Note: The Inside Secure/Verimatrix Silicon IP team was recently acquired by
+> Rambus.
+ Please be so kind to update your e-mail address book with my new
+> e-mail address. 
+> 
+> ** This message and any attachments are for the sole use of the intended
+> recipient(s). It may contain information that is confidential and
+> privileged. If you are not the intended recipient of this message, you are
+> prohibited from printing, copying, forwarding or saving it. Please delete
+> the message and attachments and notify the sender immediately. **
+ 
+> Rambus Inc.<http://www.rambus.com>
+
+
+
+Ciao
+Stephan
+
+
