@@ -2,199 +2,126 @@ Return-Path: <SRS0=mI8h=3T=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B929C33CB2
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jan 2020 00:50:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3660C33CB3
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jan 2020 11:33:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5E74120716
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jan 2020 00:50:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B8256206D3
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jan 2020 11:33:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="m1CNO0r9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727446AbgA3AuS (ORCPT
+        id S1727210AbgA3LdZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 29 Jan 2020 19:50:18 -0500
-Received: from inva021.nxp.com ([92.121.34.21]:52860 "EHLO inva021.nxp.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726671AbgA3Atr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Jan 2020 19:49:47 -0500
-Received: from inva021.nxp.com (localhost [127.0.0.1])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 49E5520050B;
-        Thu, 30 Jan 2020 01:49:44 +0100 (CET)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 3BF112004BA;
-        Thu, 30 Jan 2020 01:49:44 +0100 (CET)
-Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id D2103204BE;
-        Thu, 30 Jan 2020 01:49:43 +0100 (CET)
-From:   Iuliana Prodan <iuliana.prodan@nxp.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Silvano Di Ninno <silvano.dininno@nxp.com>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-imx <linux-imx@nxp.com>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>
-Subject: [PATCH v5 2/9] crypto: caam - refactor ahash_done callbacks
-Date:   Thu, 30 Jan 2020 02:49:17 +0200
-Message-Id: <1580345364-7606-3-git-send-email-iuliana.prodan@nxp.com>
-X-Mailer: git-send-email 2.1.0
-In-Reply-To: <1580345364-7606-1-git-send-email-iuliana.prodan@nxp.com>
-References: <1580345364-7606-1-git-send-email-iuliana.prodan@nxp.com>
-X-Virus-Scanned: ClamAV using ClamSMTP
+        Thu, 30 Jan 2020 06:33:25 -0500
+Received: from mail-vs1-f68.google.com ([209.85.217.68]:35092 "EHLO
+        mail-vs1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727164AbgA3LdZ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 30 Jan 2020 06:33:25 -0500
+Received: by mail-vs1-f68.google.com with SMTP id x123so1851292vsc.2
+        for <linux-crypto@vger.kernel.org>; Thu, 30 Jan 2020 03:33:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=sachUFQOePxVrLNclWklF0gCfdMb5uCt5/iIiiOjQ6k=;
+        b=m1CNO0r97qGHq1nZLkvorYbHCl6n3yiSngEKvS8X15JFdYJBqxFNmht5iX0MecxIOP
+         4O6kew+CVKxdg87E9RakdF7ZlSNNkO0O1OoKOxGWLojbtznM9xvA2OxGq3aXJsNzwrDm
+         1IYGvi7B54p545j97fkkv04Amo4Hq9RpS2+z+lyNUoF4an8lBtJjS/G4cTjJbQkmX2bc
+         h7nNqV39Z5K0/ImATsG6f52N36W+LLu5YT3ohyEgwAbYlPcglHJRq56hKNjEu74wW88j
+         EMpyr9P8VkVZQJk6fiw8x7mSXBySOcs1tFJc2COZrCNRnWB+2VDvGZapfDNs+Ksg28iw
+         zZYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=sachUFQOePxVrLNclWklF0gCfdMb5uCt5/iIiiOjQ6k=;
+        b=jcLfpgR64Sa2P3r3gt919L9Lm3fQrllus0YbARwYlOuQ0wWF30/YsZ78Zx7pvk8I4D
+         HEQ5SzF1BJ4y770q3IxgwwK0P938HkLCPhEkzVt2EjNwlM6LTn4ZcESHiP7ptVU0voaJ
+         yvpIGa8hS0qQnvfCSB5P39q1B75VlyJJqpx7l5c7yWEqEmTU59sYdzF1TP/hM1mV0P7y
+         G5M8Dwa/oT5k/LOXhWro/RoRckTLHM+Og0WX7E2dIfS4nrzDro18+2LjUB4/uBI6qFbu
+         yykMMcRvLHgsFRv2kfQTizlgm4VNxALaIYNEnPQAz6emkstifWPHIrm8rzLcDlhBDLx1
+         NSNQ==
+X-Gm-Message-State: APjAAAUBJZPSG0QbaYtlzH2KyG3AiafH0UnR1JtrugCWnCgCAlmQ4KTI
+        mymYF4OPKym0PTblqr4Pa+/2d0ckwgcQ3YtIdrsXOQ==
+X-Google-Smtp-Source: APXvYqwRQewNB6JLSsvrZO8yrxek6cyYeBRvAzzDHbobVzvuHWcoLLJAsh/yeAgxIeeiqq8PqEYjkLQByU/8fRohxEg=
+X-Received: by 2002:a67:fb14:: with SMTP id d20mr2749866vsr.136.1580384004008;
+ Thu, 30 Jan 2020 03:33:24 -0800 (PST)
+MIME-Version: 1.0
+References: <20200129143757.680-1-gilad@benyossef.com> <20200129143757.680-5-gilad@benyossef.com>
+ <CAMuHMdVb_AGa7980fRXaxon=uDojZ1x5d6z-FCJAt5aMEGMcbw@mail.gmail.com>
+In-Reply-To: <CAMuHMdVb_AGa7980fRXaxon=uDojZ1x5d6z-FCJAt5aMEGMcbw@mail.gmail.com>
+From:   Gilad Ben-Yossef <gilad@benyossef.com>
+Date:   Thu, 30 Jan 2020 13:33:11 +0200
+Message-ID: <CAOtvUMdUBMkmZ6nzGVxi1W_Y4yFvcd6rfvz6BA63h4eq2QFUdA@mail.gmail.com>
+Subject: Re: [PATCH 4/4] crypto: ccree - fix AEAD blocksize registration
+To:     Geert Uytterhoeven <geert@linux-m68k.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Ofir Drang <ofir.drang@arm.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Create two common ahash_done_* functions with the dma
-direction as parameter. Then, these 2 are called with
-the proper direction for unmap.
+On Wed, Jan 29, 2020 at 5:17 PM Geert Uytterhoeven <geert@linux-m68k.org> wrote:
+>
+> Hi Gilad,
+>
+> On Wed, Jan 29, 2020 at 3:39 PM Gilad Ben-Yossef <gilad@benyossef.com> wrote:
+> > Fix an error causing no block sizes to be reported during
+> > all AEAD registrations.
+> >
+> > Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+>
+> Thanks, this fixes:
+>
+>     alg: aead: blocksize for authenc-hmac-sha1-cbc-aes-ccree (0)
+> doesn't match generic impl (16)
+>     alg: aead: blocksize for authenc-hmac-sha256-cbc-aes-ccree (0)
+> doesn't match generic impl (16)
+>
+> which you may want to mention in the commit description, so
+> people who search for the error message will find the fix.
+>
+> Tested-by: Geert Uytterhoeven <geert+renesas@glider.be>
+>
+> Note that even after applying this series, the kernel still crashes with
+>
+> kernel BUG at kernel/dma/swiotlb.c:497!
+> ....
+> Call trace:
+>  swiotlb_tbl_map_single+0x30c/0x380
+>  swiotlb_map+0xb0/0x300
+>  dma_direct_map_page+0xb8/0x140
+>  dma_direct_map_sg+0x78/0xe0
+>  cc_map_sg+0xa0/0xd0
+>  cc_aead_chain_data.constprop.25+0x17c/0x6a0
+>  cc_map_aead_request+0x61c/0x990
+>  cc_proc_aead+0x140/0xeb0
+>  cc_aead_decrypt+0x48/0x68
+>  crypto_aead_decrypt+0x30/0x48
+>  test_aead_vec_cfg+0x5a0/0x8d0
+>
+> but you may be aware of that.
+>
+> CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=n
+> CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
 
-Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
-Reviewed-by: Horia Geanta <horia.geanta@nxp.com>
----
- drivers/crypto/caam/caamhash.c | 88 +++++++++++-------------------------------
- 1 file changed, 22 insertions(+), 66 deletions(-)
 
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 8d91434..59881a8 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -565,8 +565,8 @@ static inline void ahash_unmap_ctx(struct device *dev,
- 	ahash_unmap(dev, edesc, req, dst_len);
- }
- 
--static void ahash_done(struct device *jrdev, u32 *desc, u32 err,
--		       void *context)
-+static inline void ahash_done_cpy(struct device *jrdev, u32 *desc, u32 err,
-+				  void *context, enum dma_data_direction dir)
- {
- 	struct ahash_request *req = context;
- 	struct ahash_edesc *edesc;
-@@ -582,7 +582,7 @@ static void ahash_done(struct device *jrdev, u32 *desc, u32 err,
- 	if (err)
- 		ecode = caam_jr_strstatus(jrdev, err);
- 
--	ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_FROM_DEVICE);
-+	ahash_unmap_ctx(jrdev, edesc, req, digestsize, dir);
- 	memcpy(req->result, state->caam_ctx, digestsize);
- 	kfree(edesc);
- 
-@@ -593,76 +593,20 @@ static void ahash_done(struct device *jrdev, u32 *desc, u32 err,
- 	req->base.complete(&req->base, ecode);
- }
- 
--static void ahash_done_bi(struct device *jrdev, u32 *desc, u32 err,
--			    void *context)
-+static void ahash_done(struct device *jrdev, u32 *desc, u32 err,
-+		       void *context)
- {
--	struct ahash_request *req = context;
--	struct ahash_edesc *edesc;
--	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
--	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
--	struct caam_hash_state *state = ahash_request_ctx(req);
--	int digestsize = crypto_ahash_digestsize(ahash);
--	int ecode = 0;
--
--	dev_dbg(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
--
--	edesc = container_of(desc, struct ahash_edesc, hw_desc[0]);
--	if (err)
--		ecode = caam_jr_strstatus(jrdev, err);
--
--	ahash_unmap_ctx(jrdev, edesc, req, ctx->ctx_len, DMA_BIDIRECTIONAL);
--	kfree(edesc);
--
--	scatterwalk_map_and_copy(state->buf, req->src,
--				 req->nbytes - state->next_buflen,
--				 state->next_buflen, 0);
--	state->buflen = state->next_buflen;
--
--	print_hex_dump_debug("buf@" __stringify(__LINE__)": ",
--			     DUMP_PREFIX_ADDRESS, 16, 4, state->buf,
--			     state->buflen, 1);
--
--	print_hex_dump_debug("ctx@"__stringify(__LINE__)": ",
--			     DUMP_PREFIX_ADDRESS, 16, 4, state->caam_ctx,
--			     ctx->ctx_len, 1);
--	if (req->result)
--		print_hex_dump_debug("result@"__stringify(__LINE__)": ",
--				     DUMP_PREFIX_ADDRESS, 16, 4, req->result,
--				     digestsize, 1);
--
--	req->base.complete(&req->base, ecode);
-+	ahash_done_cpy(jrdev, desc, err, context, DMA_FROM_DEVICE);
- }
- 
- static void ahash_done_ctx_src(struct device *jrdev, u32 *desc, u32 err,
- 			       void *context)
- {
--	struct ahash_request *req = context;
--	struct ahash_edesc *edesc;
--	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
--	int digestsize = crypto_ahash_digestsize(ahash);
--	struct caam_hash_state *state = ahash_request_ctx(req);
--	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
--	int ecode = 0;
--
--	dev_dbg(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
--
--	edesc = container_of(desc, struct ahash_edesc, hw_desc[0]);
--	if (err)
--		ecode = caam_jr_strstatus(jrdev, err);
--
--	ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_BIDIRECTIONAL);
--	memcpy(req->result, state->caam_ctx, digestsize);
--	kfree(edesc);
--
--	print_hex_dump_debug("ctx@"__stringify(__LINE__)": ",
--			     DUMP_PREFIX_ADDRESS, 16, 4, state->caam_ctx,
--			     ctx->ctx_len, 1);
--
--	req->base.complete(&req->base, ecode);
-+	ahash_done_cpy(jrdev, desc, err, context, DMA_BIDIRECTIONAL);
- }
- 
--static void ahash_done_ctx_dst(struct device *jrdev, u32 *desc, u32 err,
--			       void *context)
-+static inline void ahash_done_switch(struct device *jrdev, u32 *desc, u32 err,
-+				     void *context, enum dma_data_direction dir)
- {
- 	struct ahash_request *req = context;
- 	struct ahash_edesc *edesc;
-@@ -678,7 +622,7 @@ static void ahash_done_ctx_dst(struct device *jrdev, u32 *desc, u32 err,
- 	if (err)
- 		ecode = caam_jr_strstatus(jrdev, err);
- 
--	ahash_unmap_ctx(jrdev, edesc, req, ctx->ctx_len, DMA_FROM_DEVICE);
-+	ahash_unmap_ctx(jrdev, edesc, req, ctx->ctx_len, dir);
- 	kfree(edesc);
- 
- 	scatterwalk_map_and_copy(state->buf, req->src,
-@@ -701,6 +645,18 @@ static void ahash_done_ctx_dst(struct device *jrdev, u32 *desc, u32 err,
- 	req->base.complete(&req->base, ecode);
- }
- 
-+static void ahash_done_bi(struct device *jrdev, u32 *desc, u32 err,
-+			  void *context)
-+{
-+	ahash_done_switch(jrdev, desc, err, context, DMA_BIDIRECTIONAL);
-+}
-+
-+static void ahash_done_ctx_dst(struct device *jrdev, u32 *desc, u32 err,
-+			       void *context)
-+{
-+	ahash_done_switch(jrdev, desc, err, context, DMA_FROM_DEVICE);
-+}
-+
- /*
-  * Allocate an enhanced descriptor, which contains the hardware descriptor
-  * and space for hardware scatter table containing sg_num entries.
--- 
-2.1.0
+OK, this is a new one yet - we are now crashing in out-of-place decryption.
+And again, I am not seeing this in the different test board, even with
+DMA debug turned on.
 
+Can you help me out and print the cryptlen and assoclen (I'm guessing
+both are zero), authlen and which AEAD/mode this is?
+
+Thanks alot,
+Gilad
