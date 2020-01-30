@@ -2,32 +2,32 @@ Return-Path: <SRS0=mI8h=3T=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C6D1C33CB2
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jan 2020 00:49:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ED86C35240
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jan 2020 00:49:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 41F4220661
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jan 2020 00:49:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0E2D62071E
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jan 2020 00:49:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726856AbgA3Atp (ORCPT
+        id S1726618AbgA3Ats (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 29 Jan 2020 19:49:45 -0500
-Received: from inva020.nxp.com ([92.121.34.13]:42154 "EHLO inva020.nxp.com"
+        Wed, 29 Jan 2020 19:49:48 -0500
+Received: from inva020.nxp.com ([92.121.34.13]:42282 "EHLO inva020.nxp.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726528AbgA3Atp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Jan 2020 19:49:45 -0500
+        id S1727202AbgA3Atr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 29 Jan 2020 19:49:47 -0500
 Received: from inva020.nxp.com (localhost [127.0.0.1])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 65D321A01EC;
-        Thu, 30 Jan 2020 01:49:43 +0100 (CET)
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id AB3301A1427;
+        Thu, 30 Jan 2020 01:49:45 +0100 (CET)
 Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 570201A0535;
-        Thu, 30 Jan 2020 01:49:43 +0100 (CET)
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 9C5FE1A0535;
+        Thu, 30 Jan 2020 01:49:45 +0100 (CET)
 Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id EDBF9204BE;
-        Thu, 30 Jan 2020 01:49:42 +0100 (CET)
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 3E487203BF;
+        Thu, 30 Jan 2020 01:49:45 +0100 (CET)
 From:   Iuliana Prodan <iuliana.prodan@nxp.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         Horia Geanta <horia.geanta@nxp.com>,
@@ -38,80 +38,310 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-imx <linux-imx@nxp.com>,
         Iuliana Prodan <iuliana.prodan@nxp.com>
-Subject: [PATCH v5 0/9] crypto: caam - backlogging support
-Date:   Thu, 30 Jan 2020 02:49:15 +0200
-Message-Id: <1580345364-7606-1-git-send-email-iuliana.prodan@nxp.com>
+Subject: [PATCH v5 5/9] crypto: caam - change return code in caam_jr_enqueue function
+Date:   Thu, 30 Jan 2020 02:49:20 +0200
+Message-Id: <1580345364-7606-6-git-send-email-iuliana.prodan@nxp.com>
 X-Mailer: git-send-email 2.1.0
+In-Reply-To: <1580345364-7606-1-git-send-email-iuliana.prodan@nxp.com>
+References: <1580345364-7606-1-git-send-email-iuliana.prodan@nxp.com>
 X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Integrate crypto_engine framework into CAAM, to make use of
-the engine queue.
-Added support for SKCIPHER, HASH, RSA and AEAD algorithms.
-This is intended to be used for CAAM backlogging support.
-The requests, with backlog flag (e.g. from dm-crypt) will be
-listed into crypto-engine queue and processed by CAAM when free.
+Based on commit 6b80ea389a0b ("crypto: change transient busy return code to -ENOSPC"),
+change the return code of caam_jr_enqueue function to -EINPROGRESS, in
+case of success, -ENOSPC in case the CAAM is busy (has no space left
+in job ring queue), -EIO if it cannot map the caller's descriptor.
 
-While here, I've also made some refactorization.
-Patches #1 - #4 include some refactorizations on caamalg, caamhash
-and caampkc.
-Patch #5 changes the return code of caam_jr_enqueue function
-to -EINPROGRESS, in case of success, -ENOSPC in case the CAAM is
-busy, -EIO if it cannot map the caller's descriptor.
-Patches #6 - #9 integrate crypto_engine into CAAM, for
-SKCIPHER/AEAD/RSA/HASH algorithms.
+Update, also, the cases for resource-freeing for each algorithm type.
 
+This is done for later use, on backlogging support in CAAM.
+
+Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
+Reviewed-by: Horia Geanta <horia.geanta@nxp.com>
 ---
-Changes since V4:
-	- reorganize {skcipher,aead,rsa}_edesc struct for a proper
-	  cacheline sharing.
+ drivers/crypto/caam/caamalg.c  | 16 ++++------------
+ drivers/crypto/caam/caamhash.c | 34 +++++++++++-----------------------
+ drivers/crypto/caam/caampkc.c  | 16 ++++++++--------
+ drivers/crypto/caam/caamrng.c  |  4 ++--
+ drivers/crypto/caam/jr.c       |  8 ++++----
+ drivers/crypto/caam/key_gen.c  |  2 +-
+ 6 files changed, 30 insertions(+), 50 deletions(-)
 
-Changes since V3:
-	- update return on ahash_enqueue_req function from patch #9.
-
-Changes since V2:
-	- remove patch ("crypto: caam - refactor caam_jr_enqueue"),
-	  that added some structures not needed anymore;
-	- use _done_ callback function directly for skcipher and aead;
-	- handle resource leak in case of transfer request to crypto-engine;
-	- update commit messages.
-
-Changes since V1:
-	- remove helper function - akcipher_request_cast;
-	- remove any references to crypto_async_request,
-	  use specific request type;
-	- remove bypass crypto-engine queue, in case is empty;
-	- update some commit messages;
-	- remove unrelated changes, like whitespaces;
-	- squash some changes from patch #9 to patch #6;
-	- added Reviewed-by.
-
-Iuliana Prodan (9):
-  crypto: caam - refactor skcipher/aead/gcm/chachapoly {en,de}crypt
-    functions
-  crypto: caam - refactor ahash_done callbacks
-  crypto: caam - refactor ahash_edesc_alloc
-  crypto: caam - refactor RSA private key _done callbacks
-  crypto: caam - change return code in caam_jr_enqueue function
-  crypto: caam - support crypto_engine framework for SKCIPHER algorithms
-  crypto: caam - add crypto_engine support for AEAD algorithms
-  crypto: caam - add crypto_engine support for RSA algorithms
-  crypto: caam - add crypto_engine support for HASH algorithms
-
- drivers/crypto/caam/Kconfig    |   1 +
- drivers/crypto/caam/caamalg.c  | 416 ++++++++++++++++++-----------------------
- drivers/crypto/caam/caamhash.c | 341 ++++++++++++++++-----------------
- drivers/crypto/caam/caampkc.c  | 187 +++++++++++-------
- drivers/crypto/caam/caampkc.h  |  10 +
- drivers/crypto/caam/caamrng.c  |   4 +-
- drivers/crypto/caam/intern.h   |   2 +
- drivers/crypto/caam/jr.c       |  37 +++-
- drivers/crypto/caam/key_gen.c  |   2 +-
- 9 files changed, 523 insertions(+), 477 deletions(-)
-
+diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
+index 30fca37..c1dd885 100644
+--- a/drivers/crypto/caam/caamalg.c
++++ b/drivers/crypto/caam/caamalg.c
+@@ -1398,9 +1398,7 @@ static inline int chachapoly_crypt(struct aead_request *req, bool encrypt)
+ 			     1);
+ 
+ 	ret = caam_jr_enqueue(jrdev, desc, aead_crypt_done, req);
+-	if (!ret) {
+-		ret = -EINPROGRESS;
+-	} else {
++	if (ret != -EINPROGRESS) {
+ 		aead_unmap(jrdev, edesc, req);
+ 		kfree(edesc);
+ 	}
+@@ -1443,9 +1441,7 @@ static inline int aead_crypt(struct aead_request *req, bool encrypt)
+ 
+ 	desc = edesc->hw_desc;
+ 	ret = caam_jr_enqueue(jrdev, desc, aead_crypt_done, req);
+-	if (!ret) {
+-		ret = -EINPROGRESS;
+-	} else {
++	if (ret != -EINPROGRESS) {
+ 		aead_unmap(jrdev, edesc, req);
+ 		kfree(edesc);
+ 	}
+@@ -1488,9 +1484,7 @@ static inline int gcm_crypt(struct aead_request *req, bool encrypt)
+ 
+ 	desc = edesc->hw_desc;
+ 	ret = caam_jr_enqueue(jrdev, desc, aead_crypt_done, req);
+-	if (!ret) {
+-		ret = -EINPROGRESS;
+-	} else {
++	if (ret != -EINPROGRESS) {
+ 		aead_unmap(jrdev, edesc, req);
+ 		kfree(edesc);
+ 	}
+@@ -1706,9 +1700,7 @@ static inline int skcipher_crypt(struct skcipher_request *req, bool encrypt)
+ 	desc = edesc->hw_desc;
+ 	ret = caam_jr_enqueue(jrdev, desc, skcipher_crypt_done, req);
+ 
+-	if (!ret) {
+-		ret = -EINPROGRESS;
+-	} else {
++	if (ret != -EINPROGRESS) {
+ 		skcipher_unmap(jrdev, edesc, req);
+ 		kfree(edesc);
+ 	}
+diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
+index 4db8507..2af9e66 100644
+--- a/drivers/crypto/caam/caamhash.c
++++ b/drivers/crypto/caam/caamhash.c
+@@ -395,7 +395,7 @@ static int hash_digest_key(struct caam_hash_ctx *ctx, u32 *keylen, u8 *key,
+ 	init_completion(&result.completion);
+ 
+ 	ret = caam_jr_enqueue(jrdev, desc, split_key_done, &result);
+-	if (!ret) {
++	if (ret == -EINPROGRESS) {
+ 		/* in progress */
+ 		wait_for_completion(&result.completion);
+ 		ret = result.err;
+@@ -828,10 +828,8 @@ static int ahash_update_ctx(struct ahash_request *req)
+ 				     desc_bytes(desc), 1);
+ 
+ 		ret = caam_jr_enqueue(jrdev, desc, ahash_done_bi, req);
+-		if (ret)
++		if (ret != -EINPROGRESS)
+ 			goto unmap_ctx;
+-
+-		ret = -EINPROGRESS;
+ 	} else if (*next_buflen) {
+ 		scatterwalk_map_and_copy(buf + *buflen, req->src, 0,
+ 					 req->nbytes, 0);
+@@ -903,10 +901,9 @@ static int ahash_final_ctx(struct ahash_request *req)
+ 			     1);
+ 
+ 	ret = caam_jr_enqueue(jrdev, desc, ahash_done_ctx_src, req);
+-	if (ret)
+-		goto unmap_ctx;
++	if (ret == -EINPROGRESS)
++		return ret;
+ 
+-	return -EINPROGRESS;
+  unmap_ctx:
+ 	ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_BIDIRECTIONAL);
+ 	kfree(edesc);
+@@ -980,10 +977,9 @@ static int ahash_finup_ctx(struct ahash_request *req)
+ 			     1);
+ 
+ 	ret = caam_jr_enqueue(jrdev, desc, ahash_done_ctx_src, req);
+-	if (ret)
+-		goto unmap_ctx;
++	if (ret == -EINPROGRESS)
++		return ret;
+ 
+-	return -EINPROGRESS;
+  unmap_ctx:
+ 	ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_BIDIRECTIONAL);
+ 	kfree(edesc);
+@@ -1053,9 +1049,7 @@ static int ahash_digest(struct ahash_request *req)
+ 			     1);
+ 
+ 	ret = caam_jr_enqueue(jrdev, desc, ahash_done, req);
+-	if (!ret) {
+-		ret = -EINPROGRESS;
+-	} else {
++	if (ret != -EINPROGRESS) {
+ 		ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_FROM_DEVICE);
+ 		kfree(edesc);
+ 	}
+@@ -1105,9 +1099,7 @@ static int ahash_final_no_ctx(struct ahash_request *req)
+ 			     1);
+ 
+ 	ret = caam_jr_enqueue(jrdev, desc, ahash_done, req);
+-	if (!ret) {
+-		ret = -EINPROGRESS;
+-	} else {
++	if (ret != -EINPROGRESS) {
+ 		ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_FROM_DEVICE);
+ 		kfree(edesc);
+ 	}
+@@ -1218,10 +1210,9 @@ static int ahash_update_no_ctx(struct ahash_request *req)
+ 				     desc_bytes(desc), 1);
+ 
+ 		ret = caam_jr_enqueue(jrdev, desc, ahash_done_ctx_dst, req);
+-		if (ret)
++		if (ret != -EINPROGRESS)
+ 			goto unmap_ctx;
+ 
+-		ret = -EINPROGRESS;
+ 		state->update = ahash_update_ctx;
+ 		state->finup = ahash_finup_ctx;
+ 		state->final = ahash_final_ctx;
+@@ -1310,9 +1301,7 @@ static int ahash_finup_no_ctx(struct ahash_request *req)
+ 			     1);
+ 
+ 	ret = caam_jr_enqueue(jrdev, desc, ahash_done, req);
+-	if (!ret) {
+-		ret = -EINPROGRESS;
+-	} else {
++	if (ret != -EINPROGRESS) {
+ 		ahash_unmap_ctx(jrdev, edesc, req, digestsize, DMA_FROM_DEVICE);
+ 		kfree(edesc);
+ 	}
+@@ -1406,10 +1395,9 @@ static int ahash_update_first(struct ahash_request *req)
+ 				     desc_bytes(desc), 1);
+ 
+ 		ret = caam_jr_enqueue(jrdev, desc, ahash_done_ctx_dst, req);
+-		if (ret)
++		if (ret != -EINPROGRESS)
+ 			goto unmap_ctx;
+ 
+-		ret = -EINPROGRESS;
+ 		state->update = ahash_update_ctx;
+ 		state->finup = ahash_finup_ctx;
+ 		state->final = ahash_final_ctx;
+diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.c
+index ebf1677..7f7ea32 100644
+--- a/drivers/crypto/caam/caampkc.c
++++ b/drivers/crypto/caam/caampkc.c
+@@ -634,8 +634,8 @@ static int caam_rsa_enc(struct akcipher_request *req)
+ 	init_rsa_pub_desc(edesc->hw_desc, &edesc->pdb.pub);
+ 
+ 	ret = caam_jr_enqueue(jrdev, edesc->hw_desc, rsa_pub_done, req);
+-	if (!ret)
+-		return -EINPROGRESS;
++	if (ret == -EINPROGRESS)
++		return ret;
+ 
+ 	rsa_pub_unmap(jrdev, edesc, req);
+ 
+@@ -667,8 +667,8 @@ static int caam_rsa_dec_priv_f1(struct akcipher_request *req)
+ 	init_rsa_priv_f1_desc(edesc->hw_desc, &edesc->pdb.priv_f1);
+ 
+ 	ret = caam_jr_enqueue(jrdev, edesc->hw_desc, rsa_priv_f_done, req);
+-	if (!ret)
+-		return -EINPROGRESS;
++	if (ret == -EINPROGRESS)
++		return ret;
+ 
+ 	rsa_priv_f1_unmap(jrdev, edesc, req);
+ 
+@@ -700,8 +700,8 @@ static int caam_rsa_dec_priv_f2(struct akcipher_request *req)
+ 	init_rsa_priv_f2_desc(edesc->hw_desc, &edesc->pdb.priv_f2);
+ 
+ 	ret = caam_jr_enqueue(jrdev, edesc->hw_desc, rsa_priv_f_done, req);
+-	if (!ret)
+-		return -EINPROGRESS;
++	if (ret == -EINPROGRESS)
++		return ret;
+ 
+ 	rsa_priv_f2_unmap(jrdev, edesc, req);
+ 
+@@ -733,8 +733,8 @@ static int caam_rsa_dec_priv_f3(struct akcipher_request *req)
+ 	init_rsa_priv_f3_desc(edesc->hw_desc, &edesc->pdb.priv_f3);
+ 
+ 	ret = caam_jr_enqueue(jrdev, edesc->hw_desc, rsa_priv_f_done, req);
+-	if (!ret)
+-		return -EINPROGRESS;
++	if (ret == -EINPROGRESS)
++		return ret;
+ 
+ 	rsa_priv_f3_unmap(jrdev, edesc, req);
+ 
+diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
+index e8baaca..34cbb4a 100644
+--- a/drivers/crypto/caam/caamrng.c
++++ b/drivers/crypto/caam/caamrng.c
+@@ -133,7 +133,7 @@ static inline int submit_job(struct caam_rng_ctx *ctx, int to_current)
+ 	dev_dbg(jrdev, "submitting job %d\n", !(to_current ^ ctx->current_buf));
+ 	init_completion(&bd->filled);
+ 	err = caam_jr_enqueue(jrdev, desc, rng_done, ctx);
+-	if (err)
++	if (err != -EINPROGRESS)
+ 		complete(&bd->filled); /* don't wait on failed job*/
+ 	else
+ 		atomic_inc(&bd->empty); /* note if pending */
+@@ -153,7 +153,7 @@ static int caam_read(struct hwrng *rng, void *data, size_t max, bool wait)
+ 		if (atomic_read(&bd->empty) == BUF_EMPTY) {
+ 			err = submit_job(ctx, 1);
+ 			/* if can't submit job, can't even wait */
+-			if (err)
++			if (err != -EINPROGRESS)
+ 				return 0;
+ 		}
+ 		/* no immediate data, so exit if not waiting */
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index fc97cde..df2a050 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -324,8 +324,8 @@ void caam_jr_free(struct device *rdev)
+ EXPORT_SYMBOL(caam_jr_free);
+ 
+ /**
+- * caam_jr_enqueue() - Enqueue a job descriptor head. Returns 0 if OK,
+- * -EBUSY if the queue is full, -EIO if it cannot map the caller's
++ * caam_jr_enqueue() - Enqueue a job descriptor head. Returns -EINPROGRESS
++ * if OK, -ENOSPC if the queue is full, -EIO if it cannot map the caller's
+  * descriptor.
+  * @dev:  device of the job ring to be used. This device should have
+  *        been assigned prior by caam_jr_register().
+@@ -377,7 +377,7 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
+ 	    CIRC_SPACE(head, tail, JOBR_DEPTH) <= 0) {
+ 		spin_unlock_bh(&jrp->inplock);
+ 		dma_unmap_single(dev, desc_dma, desc_size, DMA_TO_DEVICE);
+-		return -EBUSY;
++		return -ENOSPC;
+ 	}
+ 
+ 	head_entry = &jrp->entinfo[head];
+@@ -414,7 +414,7 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
+ 
+ 	spin_unlock_bh(&jrp->inplock);
+ 
+-	return 0;
++	return -EINPROGRESS;
+ }
+ EXPORT_SYMBOL(caam_jr_enqueue);
+ 
+diff --git a/drivers/crypto/caam/key_gen.c b/drivers/crypto/caam/key_gen.c
+index 5a851dd..b0e8a49 100644
+--- a/drivers/crypto/caam/key_gen.c
++++ b/drivers/crypto/caam/key_gen.c
+@@ -108,7 +108,7 @@ int gen_split_key(struct device *jrdev, u8 *key_out,
+ 	init_completion(&result.completion);
+ 
+ 	ret = caam_jr_enqueue(jrdev, desc, split_key_done, &result);
+-	if (!ret) {
++	if (ret == -EINPROGRESS) {
+ 		/* in progress */
+ 		wait_for_completion(&result.completion);
+ 		ret = result.err;
 -- 
 2.1.0
 
