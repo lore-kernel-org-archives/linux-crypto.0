@@ -2,146 +2,236 @@ Return-Path: <SRS0=IjeW=3U=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAFC8C35240
-	for <linux-crypto@archiver.kernel.org>; Fri, 31 Jan 2020 10:13:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA5CEC33CB2
+	for <linux-crypto@archiver.kernel.org>; Fri, 31 Jan 2020 11:06:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8024220CC7
-	for <linux-crypto@archiver.kernel.org>; Fri, 31 Jan 2020 10:13:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1580465629;
-	bh=8QUpI61BLdakaGA80VxEEzPug/l8r0KDGCYoC7Sv28w=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=SKm603vL9QagdP7Rwx8Z+s3Sp0CyRP0BFA8jVJMWA56AHFqOq6VJ8zyDCubumFCzi
-	 HK2JAOAmpPAJPs3IfXEakglRdEji5zgR55EJsCYjdl032XMBCo/t505ibj0uYMVblK
-	 D7B3bp7+hnJwTCm3bv7/gwDpY8e7K1iVcD5TmqVs=
+	by mail.kernel.org (Postfix) with ESMTP id A9ECA20661
+	for <linux-crypto@archiver.kernel.org>; Fri, 31 Jan 2020 11:06:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728289AbgAaKNp (ORCPT
+        id S1728357AbgAaLGL (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 31 Jan 2020 05:13:45 -0500
-Received: from mail-oi1-f194.google.com ([209.85.167.194]:34300 "EHLO
-        mail-oi1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728160AbgAaKNp (ORCPT
+        Fri, 31 Jan 2020 06:06:11 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:15822 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728268AbgAaLGL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 31 Jan 2020 05:13:45 -0500
-Received: by mail-oi1-f194.google.com with SMTP id l136so6747661oig.1;
-        Fri, 31 Jan 2020 02:13:44 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=raabJwU4zEa7l6nAkAqDBvubVlQSjL6C05vgOXbsY4Y=;
-        b=qBYoO8hSNd26sXZI9kaAHYcDMa/5/Xn91LZOGK50pqpaiv31ONUX9azCTRz3Mwls2t
-         YOs9s11m7SUKvtCq22bDEY85YzZMrnWKEtIhnn+1S9TIYMCdXmvRQcvbwpxRrFbCtrA0
-         Kwgrt+oyfh87L4MKFp+bB5cpOgungwqPpxtAwsWhB6zUHPBaiFsTX+Vndbel9prcQgph
-         N9cZoSZa7glDODlM3Xk1z9ZaI1RfA5FcE/YtotrvRpE5uuXSvhmvOJL5Xy+d5iAWfVIC
-         pyJZI4h8yyYgfUcAzFaPUnxTYV/YWeDOyjrX7qGJb2X8KnmZqHRwgW7sncoV4f23+wAA
-         HfLQ==
-X-Gm-Message-State: APjAAAW9Sxvu+VVEvZY+vfN/FYfYjFJNSuot2WOBpj3OVAidi5yZMCM6
-        sZOM5fDrPZfaeMM643+BgB1UDqqq9mM9URfp73A=
-X-Google-Smtp-Source: APXvYqwANun9+k0d+8aGujSI7AOEX1OlHtdp2RAu5sqPcA4CFr9uMMT9NzlT9H2xd2gMjMXa+DzdY9SgamiGDUmN1xw=
-X-Received: by 2002:aca:bfc2:: with SMTP id p185mr5936669oif.57.1580465624588;
- Fri, 31 Jan 2020 02:13:44 -0800 (PST)
+        Fri, 31 Jan 2020 06:06:11 -0500
+Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 00VB4m8C071838
+        for <linux-crypto@vger.kernel.org>; Fri, 31 Jan 2020 06:06:09 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2xubcuc1nc-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Fri, 31 Jan 2020 06:06:08 -0500
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <freude@linux.ibm.com>;
+        Fri, 31 Jan 2020 11:06:06 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Fri, 31 Jan 2020 11:06:05 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 00VB64VW61276208
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 31 Jan 2020 11:06:04 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1D29142042;
+        Fri, 31 Jan 2020 11:06:04 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BB2C342041;
+        Fri, 31 Jan 2020 11:06:03 +0000 (GMT)
+Received: from funtu.home (unknown [9.145.166.162])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri, 31 Jan 2020 11:06:03 +0000 (GMT)
+Subject: Re: [PATCH 3/3] crypto/testmgr: add selftests for paes-s390
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org, heiko.carstens@de.ibm.com,
+        Vasily Gorbik <gor@linux.ibm.com>
+References: <20191113105523.8007-1-freude@linux.ibm.com>
+ <20191113105523.8007-4-freude@linux.ibm.com>
+ <20191122081611.vznhvhouim6hnehc@gondor.apana.org.au>
+From:   Harald Freudenberger <freude@linux.ibm.com>
+Date:   Fri, 31 Jan 2020 12:06:04 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-References: <20200124132957.15769-1-geert+renesas@glider.be> <20200124132957.15769-2-geert+renesas@glider.be>
-In-Reply-To: <20200124132957.15769-2-geert+renesas@glider.be>
-From:   "Rafael J. Wysocki" <rafael@kernel.org>
-Date:   Fri, 31 Jan 2020 11:13:33 +0100
-Message-ID: <CAJZ5v0ihj48QwB0HqA8LUYkSYiOVEbRmNd4acpy6hbq_0RDzLA@mail.gmail.com>
-Subject: Re: [PATCH 1/2] debugfs: regset32: Add Runtime PM support
-To:     Geert Uytterhoeven <geert+renesas@glider.be>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        "Rafael J . Wysocki" <rafael@kernel.org>,
-        Rob Clark <robdclark@gmail.com>, Sean Paul <sean@poorly.run>,
-        Felipe Balbi <balbi@kernel.org>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        Thierry Reding <thierry.reding@gmail.com>,
-        Jonathan Hunter <jonathanh@nvidia.com>,
-        Mathias Nyman <mathias.nyman@intel.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Chunfeng Yun <chunfeng.yun@mediatek.com>,
-        Bin Liu <b-liu@ti.com>, linux-crypto@vger.kernel.org,
-        Linux PM <linux-pm@vger.kernel.org>,
-        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
-        "open list:ULTRA-WIDEBAND (UWB) SUBSYSTEM:" 
-        <linux-usb@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20191122081611.vznhvhouim6hnehc@gondor.apana.org.au>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+x-cbid: 20013111-0016-0000-0000-000002E27DF9
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20013111-0017-0000-0000-000033454D16
+Message-Id: <403c438d-1f3e-f25d-8df2-4f03d9ef731c@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-01-31_03:2020-01-30,2020-01-31 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
+ clxscore=1011 adultscore=0 phishscore=0 suspectscore=0 malwarescore=0
+ priorityscore=1501 spamscore=0 mlxscore=0 lowpriorityscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-1911200001 definitions=main-2001310098
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Jan 24, 2020 at 2:30 PM Geert Uytterhoeven
-<geert+renesas@glider.be> wrote:
+On 22.11.19 09:16, Herbert Xu wrote:
+> On Wed, Nov 13, 2019 at 11:55:23AM +0100, Harald Freudenberger wrote:
+>> This patch adds selftests for the s390 specific protected key
+>> AES (PAES) cipher implementations:
+>>   * cbc-paes-s390
+>>   * ctr-paes-s390
+>>   * ecb-paes-s390
+>>   * xts-paes-s390
+>> PAES is an AES cipher but with encrypted ('protected') key
+>> material. So here come ordinary AES enciphered data values
+>> but with a special key format understood by the PAES
+>> implementation.
+>>
+>> The testdata definitons and testlist entries are surrounded
+>> by #if IS_ENABLED(CONFIG_CRYPTO_PAES_S390) because they don't
+>> make any sense on non s390 platforms or without the PAES
+>> cipher implementation.
+>>
+>> Signed-off-by: Harald Freudenberger <freude@linux.ibm.com>
+>> ---
+>>  crypto/testmgr.c |  36 +++++
+>>  crypto/testmgr.h | 334 +++++++++++++++++++++++++++++++++++++++++++++++
+>>  2 files changed, 370 insertions(+)
+> So with your cleartext work, I gather that you can now supply
+> arbitrary keys to paes? If so my preferred method of testing it
+> would be to add a paes-specific tester function that massaged the
+> existing aes vectors into the format required by paes so you
+> get exactly the same testing coverage as plain aes.
 >
-> Hardware registers of devices under control of power management cannot
-> be accessed at all times.  If such a device is suspended, register
-> accesses may lead to undefined behavior, like reading bogus values, or
-> causing exceptions or system locks.
+> Is this possible?
 >
-> Extend struct debugfs_regset32 with an optional field to let device
-> drivers specify the device the registers in the set belong to.  This
-> allows debugfs_show_regset32() to make sure the device is resumed while
-> its registers are being read.
->
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> Thanks,
 
-LGTM:
 
-Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+So here is now a reworked version of the paes selftest invocation within the testmanager code.
+I picked your suggestions and now the paes ciphers are able to deal with plain aes key values
+and so can benefit from the generic aes testcases.
+Please note, this patch needs as a prerequirement some other patches which enable the
+base functionality in the zcyrpt device driver and the pkey kernel module. These patches
+will come with the next s390 subsystem merge for the 5.6 development kernel. If you agree
+to this patch, then Vasily will push this patch with the s390 subsystem together as part of the patch
+series.
 
-> ---
->  fs/debugfs/file.c       | 8 ++++++++
->  include/linux/debugfs.h | 1 +
->  2 files changed, 9 insertions(+)
->
-> diff --git a/fs/debugfs/file.c b/fs/debugfs/file.c
-> index dede25247b81f72a..5e52d68421c678f2 100644
-> --- a/fs/debugfs/file.c
-> +++ b/fs/debugfs/file.c
-> @@ -18,6 +18,7 @@
->  #include <linux/slab.h>
->  #include <linux/atomic.h>
->  #include <linux/device.h>
-> +#include <linux/pm_runtime.h>
->  #include <linux/poll.h>
->  #include <linux/security.h>
->
-> @@ -1057,7 +1058,14 @@ static int debugfs_show_regset32(struct seq_file *s, void *data)
->  {
->         struct debugfs_regset32 *regset = s->private;
->
-> +       if (regset->dev)
-> +               pm_runtime_get_sync(regset->dev);
-> +
->         debugfs_print_regs32(s, regset->regs, regset->nregs, regset->base, "");
-> +
-> +       if (regset->dev)
-> +               pm_runtime_put(regset->dev);
-> +
->         return 0;
->  }
->
-> diff --git a/include/linux/debugfs.h b/include/linux/debugfs.h
-> index bf9b6cafa4c26a68..5d0783ae09f365ac 100644
-> --- a/include/linux/debugfs.h
-> +++ b/include/linux/debugfs.h
-> @@ -35,6 +35,7 @@ struct debugfs_regset32 {
->         const struct debugfs_reg32 *regs;
->         int nregs;
->         void __iomem *base;
-> +       struct device *dev;     /* Optional device for Runtime PM */
->  };
->
->  extern struct dentry *arch_debugfs_dir;
-> --
-> 2.17.1
->
+Thanks and here is the patch for the testmanager:
+
+============================================================
+
+From fb82ea49910b8cde33ca7286c8855c0326e78177 Mon Sep 17 00:00:00 2001
+From: Harald Freudenberger <freude@linux.ibm.com>
+Date: Wed, 22 Jan 2020 14:43:23 +0100
+Subject: [PATCH] crypto/testmgr: enable selftests for paes-s390 ciphers
+
+This patch enables the selftests for the s390 specific protected key
+AES (PAES) cipher implementations:
+  * cbc-paes-s390
+  * ctr-paes-s390
+  * ecb-paes-s390
+  * xts-paes-s390
+PAES is an AES cipher but with encrypted ('protected') key
+material. However, the paes ciphers are able to derive an protected
+key from clear key material with the help of the pkey kernel module.
+
+So this patch now enables the generic AES tests for the paes
+ciphers. Under the hood the setkey() functions rearrange the clear key
+values as clear key token and so the pkey kernel module is able to
+provide protected key blobs from the given clear key values. The
+derived protected key blobs are then used within the paes cipers and
+should produce the very same results as the generic AES implementation
+with the clear key values.
+
+The s390-paes cipher testlist entries are surrounded
+by #if IS_ENABLED(CONFIG_CRYPTO_PAES_S390) because they don't
+make any sense on non s390 platforms or without the PAES
+cipher implementation.
+
+Signed-off-by: Harald Freudenberger <freude@linux.ibm.com>
+Reviewed-by: Ingo Franzki <ifranzki@linux.ibm.com>
+Acked-by: Vasily Gorbik <gor@linux.ibm.com>
+---
+ crypto/testmgr.c | 36 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 36 insertions(+)
+
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 82513b6b0abd..6c4a98102825 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -4156,6 +4156,15 @@ static const struct alg_test_desc alg_test_descs[] = {
+             .cipher = __VECS(tf_cbc_tv_template)
+         },
+     }, {
++#if IS_ENABLED(CONFIG_CRYPTO_PAES_S390)
++        .alg = "cbc-paes-s390",
++        .fips_allowed = 1,
++        .test = alg_test_skcipher,
++        .suite = {
++            .cipher = __VECS(aes_cbc_tv_template)
++        }
++    }, {
++#endif
+         .alg = "cbcmac(aes)",
+         .fips_allowed = 1,
+         .test = alg_test_hash,
+@@ -4304,6 +4313,15 @@ static const struct alg_test_desc alg_test_descs[] = {
+             .cipher = __VECS(tf_ctr_tv_template)
+         }
+     }, {
++#if IS_ENABLED(CONFIG_CRYPTO_PAES_S390)
++        .alg = "ctr-paes-s390",
++        .fips_allowed = 1,
++        .test = alg_test_skcipher,
++        .suite = {
++            .cipher = __VECS(aes_ctr_tv_template)
++        }
++    }, {
++#endif
+         .alg = "cts(cbc(aes))",
+         .test = alg_test_skcipher,
+         .fips_allowed = 1,
+@@ -4596,6 +4614,15 @@ static const struct alg_test_desc alg_test_descs[] = {
+             .cipher = __VECS(xtea_tv_template)
+         }
+     }, {
++#if IS_ENABLED(CONFIG_CRYPTO_PAES_S390)
++        .alg = "ecb-paes-s390",
++        .fips_allowed = 1,
++        .test = alg_test_skcipher,
++        .suite = {
++            .cipher = __VECS(aes_tv_template)
++        }
++    }, {
++#endif
+         .alg = "ecdh",
+         .test = alg_test_kpp,
+         .fips_allowed = 1,
+@@ -5167,6 +5194,15 @@ static const struct alg_test_desc alg_test_descs[] = {
+             .cipher = __VECS(tf_xts_tv_template)
+         }
+     }, {
++#if IS_ENABLED(CONFIG_CRYPTO_PAES_S390)
++        .alg = "xts-paes-s390",
++        .fips_allowed = 1,
++        .test = alg_test_skcipher,
++        .suite = {
++            .cipher = __VECS(aes_xts_tv_template)
++        }
++    }, {
++#endif
+         .alg = "xts4096(paes)",
+         .test = alg_test_null,
+         .fips_allowed = 1,
+-- 
+2.17.1
+
+
