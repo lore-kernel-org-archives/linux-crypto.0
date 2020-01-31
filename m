@@ -1,153 +1,151 @@
-Return-Path: <SRS0=mI8h=3T=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=IjeW=3U=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E65FAC33CB3
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jan 2020 20:45:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51D8FC35240
+	for <linux-crypto@archiver.kernel.org>; Fri, 31 Jan 2020 10:11:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C311B20674
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Jan 2020 20:45:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 17037214D8
+	for <linux-crypto@archiver.kernel.org>; Fri, 31 Jan 2020 10:11:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1580465502;
+	bh=W6rmAmhaqfrKj2I7tZZmP52UDEZFXbB/gAuwQWlB2HQ=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=oHzyZ6DK37amPIQiZlN1L25GTbxclG3ofjHQD3SR8XnDnPdwq9Zl3nx4+fnwMSkHg
+	 y9y1+UWegx+MRPWfa7gK8XTfFqsN+MIrvT1boWoj+/7HKROp3951CuUz8TcG97hdTD
+	 MrK8SXhT/R5Ek+KeG7wY1w5yzShigs5vtr8vLtWk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727735AbgA3Upa (ORCPT
+        id S1728289AbgAaKLl (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 Jan 2020 15:45:30 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:35081 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727235AbgA3UpY (ORCPT
+        Fri, 31 Jan 2020 05:11:41 -0500
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:39327 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728160AbgAaKLl (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Jan 2020 15:45:24 -0500
-Received: by mail-wr1-f65.google.com with SMTP id g17so5876781wro.2;
-        Thu, 30 Jan 2020 12:45:21 -0800 (PST)
+        Fri, 31 Jan 2020 05:11:41 -0500
+Received: by mail-ot1-f65.google.com with SMTP id 77so6075430oty.6;
+        Fri, 31 Jan 2020 02:11:40 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=c3k6VjpBHrIjrTaQQqSSGNBzkMebYDOeyw44+9Ugl28=;
-        b=BZbL7AZmPKc+N/zSWqpQwIg9PS5WhatQpMDFlKj9pbvh1MPpjOzOeI35auwFWimMqh
-         km4io1AwxZ0BGwZ/sZx8gu71qjj5Igb22xaJssDy84Md3aEEvrtYvFwAigu/HxlMKRIK
-         TeTXehQbW9+Q6atDHlk9F8j4lPLd4eu/yECKzOH2VGtcDnuh0lheQCUUQf1saD6y6Q8b
-         esaHUs7CkrnsPownPc9EcXKcVZ3UhyqpXZnJdQc9yM2oD7BrwZfUXHOsJ8paXMXsz3xT
-         wwx/FJlcFJWRoWlDS8y4mLzbAMLr+eJy7Q6aaxmFFXdMX0PBSa5OiDYv6c9Iozpwe5VW
-         YQBw==
-X-Gm-Message-State: APjAAAXWrWJkmhZfr3jbMlQhKWGLdF1kG0tpJ1WXTuQz0Bn/Cuq40ktE
-        2j+frSH3YR0dvZDXXETJBApdGbU/R2I=
-X-Google-Smtp-Source: APXvYqzufaKIH2yFtJKt/PAlyEiLYKiQxZwNEqm75p8FMQ5XDYt4a/jHjsFBr4WM0QP6oZC70qK17A==
-X-Received: by 2002:a05:6000:8c:: with SMTP id m12mr1285707wrx.142.1580417120933;
-        Thu, 30 Jan 2020 12:45:20 -0800 (PST)
-Received: from 1aq-andre.garage.tyco.com ([77.107.218.170])
-        by smtp.gmail.com with ESMTPSA id x7sm8874885wrq.41.2020.01.30.12.45.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jan 2020 12:45:20 -0800 (PST)
-From:   =?UTF-8?q?Andr=C3=A9=20Draszik?= <git@andred.net>
-To:     linux-kernel@vger.kernel.org
-Cc:     =?UTF-8?q?Andr=C3=A9=20Draszik?= <git@andred.net>,
-        Anson Huang <Anson.Huang@nxp.com>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-input@vger.kernel.org
-Subject: [PATCH 1/3] ARM: dts: imx7s: add snvs clock to pwrkey
-Date:   Thu, 30 Jan 2020 20:45:14 +0000
-Message-Id: <20200130204516.4760-1-git@andred.net>
-X-Mailer: git-send-email 2.23.0.rc1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=dSq/O5z4OiKt2gIxWlmYXDdfWXOXBwGpqYL0q2hrwZQ=;
+        b=hfxHnOabjLtHmshzS23bvfpf6uonOdaofUKFUkaVj5ngOjGYLfQ8VPomyRR76zQclQ
+         4IhWIphL2avzbuhgaHKVm2gPD/eh1F9STX5LKAKQV+yWFLGa7x4izC0H1svzeNNLH3QS
+         H5wcnDKJZ0jRx6MTwY7CQy1tcav8wO2pvp4ZGJTwSpdWyiQS9Rb/wpYAYwJVPxomSNjD
+         D3HwopchQJ4sd2Z57vy0Vv12D3VK3Vi7VP4KbtW2fmd0JZ/hF6JpnnKgwDd/NAGoLOO2
+         N1MR4eGOLUNMD4T23f8jpAGfTocYvOkZq6cpSU+pZqdtC2ESVDgoIkx8ABgOMm77peCk
+         5SXQ==
+X-Gm-Message-State: APjAAAU7fAoTAh5EFhxb+sDvC9prRU3ibipRaBk5qoi4Ae+6zxI/hKln
+        iVfhukU4T7u5rYcoWUC47SzvHceDW2XrsWnOMdo=
+X-Google-Smtp-Source: APXvYqzvE5/+Pbp+3XgX3B4B6R/3TqiKaD+1/9bs8HNzUkgVsARShDsPlW5lSa4ht2ZHeJy9a0d6wVgWmSFh7YrtAg8=
+X-Received: by 2002:a9d:67d7:: with SMTP id c23mr7192372otn.262.1580465499703;
+ Fri, 31 Jan 2020 02:11:39 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20200124132957.15769-1-geert+renesas@glider.be> <20200124132957.15769-3-geert+renesas@glider.be>
+In-Reply-To: <20200124132957.15769-3-geert+renesas@glider.be>
+From:   "Rafael J. Wysocki" <rafael@kernel.org>
+Date:   Fri, 31 Jan 2020 11:11:28 +0100
+Message-ID: <CAJZ5v0hqzs1GaJ+qs=8DHhe-zK4QSNGJiKn1B9qsp0jcK3pSuQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] crypto: ccree - fix debugfs register access while suspended
+To:     Geert Uytterhoeven <geert+renesas@glider.be>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        Rob Clark <robdclark@gmail.com>, Sean Paul <sean@poorly.run>,
+        Felipe Balbi <balbi@kernel.org>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Mathias Nyman <mathias.nyman@intel.com>,
+        Matthias Brugger <matthias.bgg@gmail.com>,
+        Chunfeng Yun <chunfeng.yun@mediatek.com>,
+        Bin Liu <b-liu@ti.com>, linux-crypto@vger.kernel.org,
+        Linux PM <linux-pm@vger.kernel.org>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>,
+        "open list:ULTRA-WIDEBAND (UWB) SUBSYSTEM:" 
+        <linux-usb@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On i.MX7, the SNVS requires a clock. This is similar to the clock
-bound to the SNVS RTC node, but if the SNVS RTC driver isn't enabled,
-then SNVS doesn't work, and as such the pwrkey driver doesn't
-work (i.e. hangs the kernel, as the clock isn't enabled).
+On Fri, Jan 24, 2020 at 2:30 PM Geert Uytterhoeven
+<geert+renesas@glider.be> wrote:
+>
+> Reading the debugfs files under /sys/kernel/debug/ccree/ can be done by
+> the user at any time.  On R-Car SoCs, the CCREE device is power-managed
+> using a moduile clock, and if this clock is not running, bogus register
+> values may be read.
+>
+> Fix this by filling in the debugfs_regset32.dev field, so debugfs will
+> make sure the device is resumed while its registers are being read.
+>
+> This fixes the bogus values (0x00000260) in the register dumps on R-Car
+> H3 ES1.0:
+>
+>     -e6601000.crypto/regs:HOST_IRR = 0x00000260
+>     -e6601000.crypto/regs:HOST_POWER_DOWN_EN = 0x00000260
+>     +e6601000.crypto/regs:HOST_IRR = 0x00000038
+>     +e6601000.crypto/regs:HOST_POWER_DOWN_EN = 0x00000038
+>      e6601000.crypto/regs:AXIM_MON_ERR = 0x00000000
+>      e6601000.crypto/regs:DSCRPTR_QUEUE_CONTENT = 0x000002aa
+>     -e6601000.crypto/regs:HOST_IMR = 0x00000260
+>     +e6601000.crypto/regs:HOST_IMR = 0x017ffeff
+>      e6601000.crypto/regs:AXIM_CFG = 0x001f0007
+>      e6601000.crypto/regs:AXIM_CACHE_PARAMS = 0x00000000
+>     -e6601000.crypto/regs:GPR_HOST = 0x00000260
+>     +e6601000.crypto/regs:GPR_HOST = 0x017ffeff
+>      e6601000.crypto/regs:AXIM_MON_COMP = 0x00000000
+>     -e6601000.crypto/version:SIGNATURE = 0x00000260
+>     -e6601000.crypto/version:VERSION = 0x00000260
+>     +e6601000.crypto/version:SIGNATURE = 0xdcc63000
+>     +e6601000.crypto/version:VERSION = 0xaf400001
+>
+> Note that this behavior is system-dependent, and the issue does not show
+> up on all R-Car Gen3 SoCs and boards.  Even when the device is
+> suspended, the module clock may be left enabled, if configured by the
+> firmware for Secure Mode, or when controlled by the Real-Time Core.
+>
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
-Also see commit ec2a844ef7c1
-("ARM: dts: imx7s: add snvs rtc clock")
-for a similar fix.
+LGTM:
 
-Signed-off-by: André Draszik <git@andred.net>
-Cc: Anson Huang <Anson.Huang@nxp.com>
-Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Cc: "Horia Geantă" <horia.geanta@nxp.com>
-Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Rob Herring <robh+dt@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: linux-crypto@vger.kernel.org
-Cc: devicetree@vger.kernel.org
-Cc: linux-input@vger.kernel.org
----
- .../devicetree/bindings/crypto/fsl-sec4.txt     | 17 +++++++++++++++++
- arch/arm/boot/dts/imx7s.dtsi                    |  2 ++
- 2 files changed, 19 insertions(+)
+Acked-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
 
-diff --git a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-index 2fe245ca816a..755c2838d658 100644
---- a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-+++ b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
-@@ -449,6 +449,19 @@ System ON/OFF key driver
-       Value type: <phandle>
-       Definition: this is phandle to the register map node.
- 
-+   - clocks
-+      Usage: optional, required if SNVS LP requires explicit
-+          enablement of clocks
-+      Value type: <prop_encoded-array>
-+      Definition:  a clock specifier describing the clock required for
-+          enabling and disabling SNVS LP RTC.
-+
-+   - clock-names
-+      Usage: optional, required if SNVS LP requires explicit
-+          enablement of clocks
-+      Value type: <string>
-+      Definition: clock name string should be "snvs-pwrkey".
-+
- EXAMPLE:
- 	snvs-pwrkey@020cc000 {
- 		compatible = "fsl,sec-v4.0-pwrkey";
-@@ -456,6 +469,8 @@ EXAMPLE:
- 		interrupts = <0 4 0x4>
- 	        linux,keycode = <116>; /* KEY_POWER */
- 		wakeup-source;
-+		clocks = <&clks IMX7D_SNVS_CLK>;
-+		clock-names = "snvs-pwrkey";
- 	};
- 
- =====================================================================
-@@ -547,6 +562,8 @@ FULL EXAMPLE
- 			interrupts = <0 4 0x4>;
- 			linux,keycode = <116>; /* KEY_POWER */
- 			wakeup-source;
-+			clocks = <&clks IMX7D_SNVS_CLK>;
-+			clock-names = "snvs-pwrkey";
- 		};
- 	};
- 
-diff --git a/arch/arm/boot/dts/imx7s.dtsi b/arch/arm/boot/dts/imx7s.dtsi
-index 1b812f4e7453..6240a6f58048 100644
---- a/arch/arm/boot/dts/imx7s.dtsi
-+++ b/arch/arm/boot/dts/imx7s.dtsi
-@@ -614,6 +614,8 @@
- 					linux,keycode = <KEY_POWER>;
- 					wakeup-source;
- 					status = "disabled";
-+					clocks = <&clks IMX7D_SNVS_CLK>;
-+					clock-names = "snvs-pwrkey";
- 				};
- 			};
- 
--- 
-2.23.0.rc1
-
+> ---
+>  drivers/crypto/ccree/cc_debugfs.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>
+> diff --git a/drivers/crypto/ccree/cc_debugfs.c b/drivers/crypto/ccree/cc_debugfs.c
+> index 5669997386988055..35f3a2137502bd96 100644
+> --- a/drivers/crypto/ccree/cc_debugfs.c
+> +++ b/drivers/crypto/ccree/cc_debugfs.c
+> @@ -81,6 +81,7 @@ int cc_debugfs_init(struct cc_drvdata *drvdata)
+>         regset->regs = debug_regs;
+>         regset->nregs = ARRAY_SIZE(debug_regs);
+>         regset->base = drvdata->cc_base;
+> +       regset->dev = dev;
+>
+>         ctx->dir = debugfs_create_dir(drvdata->plat_dev->name, cc_debugfs_dir);
+>
+> @@ -102,6 +103,7 @@ int cc_debugfs_init(struct cc_drvdata *drvdata)
+>                 verset->nregs = ARRAY_SIZE(pid_cid_regs);
+>         }
+>         verset->base = drvdata->cc_base;
+> +       verset->dev = dev;
+>
+>         debugfs_create_regset32("version", 0400, ctx->dir, verset);
+>
+> --
+> 2.17.1
+>
