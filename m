@@ -1,295 +1,202 @@
-Return-Path: <SRS0=IjeW=3U=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=2eH/=3W=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBE3AC2D0DB
-	for <linux-crypto@archiver.kernel.org>; Fri, 31 Jan 2020 14:16:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7330CC3524C
+	for <linux-crypto@archiver.kernel.org>; Sun,  2 Feb 2020 13:04:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 388D120707
-	for <linux-crypto@archiver.kernel.org>; Fri, 31 Jan 2020 14:16:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 48CFB20658
+	for <linux-crypto@archiver.kernel.org>; Sun,  2 Feb 2020 13:04:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="o+nCQbGW"
+	dkim=pass (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b="iw1BAjEc";
+	dkim=pass (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b="iw1BAjEc"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728752AbgAaOQC (ORCPT
+        id S1726342AbgBBNEf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 31 Jan 2020 09:16:02 -0500
-Received: from mail-eopbgr150057.outbound.protection.outlook.com ([40.107.15.57]:9378
-        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
+        Sun, 2 Feb 2020 08:04:35 -0500
+Received: from mail-vi1eur05on2067.outbound.protection.outlook.com ([40.107.21.67]:31525
+        "EHLO EUR05-VI1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728730AbgAaOQC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 31 Jan 2020 09:16:02 -0500
+        id S1726198AbgBBNEf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 2 Feb 2020 08:04:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GhzTq6bU3tmr4n7/ocJkaXpGfB4eqsZ3atLTT/+zYnE=;
+ b=iw1BAjEca4+0vPCJKo65UWqXCO/Nu3P+1+ekjfllZSIFCHP5RSDE1AMthl2Awsbqpnq6LsCAuu7+35rplpJS5GHORbslHWBW/ZINSi1ucqWwSOZ89Mds/BRCpUCc/RXJI1kDjCDHkZrCrPC858QdJvl3dea6C70dpJKD0JSNsJI=
+Received: from VI1PR0801CA0090.eurprd08.prod.outlook.com
+ (2603:10a6:800:7d::34) by AM6PR08MB3591.eurprd08.prod.outlook.com
+ (2603:10a6:20b:4e::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2686.32; Sun, 2 Feb
+ 2020 13:04:29 +0000
+Received: from DB5EUR03FT060.eop-EUR03.prod.protection.outlook.com
+ (2a01:111:f400:7e0a::206) by VI1PR0801CA0090.outlook.office365.com
+ (2603:10a6:800:7d::34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2686.30 via Frontend
+ Transport; Sun, 2 Feb 2020 13:04:29 +0000
+Authentication-Results: spf=pass (sender IP is 63.35.35.123)
+ smtp.mailfrom=arm.com; vger.kernel.org; dkim=pass (signature was verified)
+ header.d=armh.onmicrosoft.com;vger.kernel.org; dmarc=bestguesspass
+ action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
+ client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
+Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
+ DB5EUR03FT060.mail.protection.outlook.com (10.152.21.231) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2665.18 via Frontend Transport; Sun, 2 Feb 2020 13:04:29 +0000
+Received: ("Tessian outbound 0420f1404d58:v42"); Sun, 02 Feb 2020 13:04:29 +0000
+X-CR-MTA-TID: 64aa7808
+Received: from 9d15a3a38520.1
+        by 64aa7808-outbound-1.mta.getcheckrecipient.com id D014FA81-4ABF-4FC5-98E1-C081986FC9B6.1;
+        Sun, 02 Feb 2020 13:04:23 +0000
+Received: from EUR04-VI1-obe.outbound.protection.outlook.com
+    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 9d15a3a38520.1
+    (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
+    Sun, 02 Feb 2020 13:04:23 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RboftnTD4gkY6DRdlhRw2CUvB7CysPV45Ev4LpN3nHrNx4HTu8ZgpR4HyW59/sU/k3YGRAOlzdUpLNUvLHJJMsLFRLYCSmAT8pFPea/kNPdvQ2FvZMa8yyjiaKyrUcJ8q8hStiMWYGit86UMTsOYflLGhl9NHvW4OLLA0uCZOOTlWP8IERw/MUSBz1kyu7fXJZN+Do2f2ygZXh85XSeCN7dbumEvO6Yna/e9cV2ZdwK1pcBbnSHf5F0+MUlqVE9Zb7SMJUdVvQmKJUPzz9cOtcorIyhwH/S0Oek/VmE2MkNxLBdpYD8eZoB4bOH2sl5R5e7FFN6e7W+k6pKqDzOGAQ==
+ b=nPcI39ZazZre1DdqEAETQBLEN45eWkbqS0y8yEanaxNy4l+h4ONWn9yZ0dBcrotdmf5p61s6sGdYe1lFwM4d6Tb9bpFq97F7ZsmhNXgJarjpStNIthW9ufwrj484d/9FdiX0IcwHzCwD6SId0FpKd0eKeEXAo9Xd7trlEvyi3a6QfTAm3cWUA9sHPB5no7fI/OoatolCa0nFm/SpmynR0+8IZZx5OAh3Pg+9ygC+qk/JdY7t/3//1PrEFkxEE0QflOrqc1PWjANOazH8BXtYRqwS4nhOyEDEzPCexTWerPVvCd87AB9cIf8J3Ks5qAq/BTtOBKE4cAH7xDIvv285kg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/c4OTTCI6lGKKCrA0XUvafmIc4kd3nYG+KZbpaV7v8I=;
- b=Hul32XRV5CRZ+Kgn1meQPlw8B6eUqmxl34lblOty6XHZ2AScWAiG1RxdgqDdvhwRWr6aavcz9kWiwNFWD1yUFG7NGVJ+YOnn8qJqy8I6Ts+XR6bRIGICnoi/Z2BZaPV8NFlsKZJsqvpXhGcHmRb1EFGv1x0afrCUgUx7+tU9j4EuhmZBVjRenbkWyL9E3jrt8j46rQhtw/6R6RmbszsxXzKRl99f85juZLb7nQS0hgQsmYdfEhtlUvVzz9VFmY81CjtFPaSh0OHarVRzYyloLIRJcC0eXMu9dzTbJCsxh5t11Jf2zYTjadKDnx1F4jmdt0NJfsJ01URqKe4e2uQpfA==
+ bh=GhzTq6bU3tmr4n7/ocJkaXpGfB4eqsZ3atLTT/+zYnE=;
+ b=kPwjdpZpED7Rg+lIleB2sRH36/OW75YvXZID6pl/YX5tZlttipXyGsvvHbD14otQb14xgNUgnc8eYpnH7HLpeJwdzjiLbEt0lunY/yHhpFTxRyD0b2N4DnD9GleIfe88pLvL+BMrBUmSJfSidRUm5auIcX+kIqEChm4HLtJCuQpwCjq9leXqgAxW89H0pQATCP1DQC3cwXLK4pNiv3uwuyWkCu7LgZlwzJHH82cNZl+0NTAHgFfeKlw7ayq7ruXp271MCt2QqQbPSsGnkyita5YAvc3KVzALrAXNFZWtI+XgJE0L2w+YcIkuqqCUSyEGjUiGG0jGwAWuUganAEbkYQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
+ s=selector2-armh-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/c4OTTCI6lGKKCrA0XUvafmIc4kd3nYG+KZbpaV7v8I=;
- b=o+nCQbGWPVQmFmjXvSoFEgushsyZKlYb9UzeSe2N+D9Hnz53xN0wc8n9hrLqRqQpqSBNGuR0roeoHsaH3HuypOVFbH68u57LsZgsmvEYLSmyMyguAko0s9B/k5dMA8ZU5ZMcQYwbHh2mhSpwa9RrUPC6pMV6UhRpAtyvEnl8puA=
-Received: from VI1PR04MB6031.eurprd04.prod.outlook.com (20.179.28.145) by
- VI1PR04MB5328.eurprd04.prod.outlook.com (20.177.50.89) with Microsoft SMTP
+ bh=GhzTq6bU3tmr4n7/ocJkaXpGfB4eqsZ3atLTT/+zYnE=;
+ b=iw1BAjEca4+0vPCJKo65UWqXCO/Nu3P+1+ekjfllZSIFCHP5RSDE1AMthl2Awsbqpnq6LsCAuu7+35rplpJS5GHORbslHWBW/ZINSi1ucqWwSOZ89Mds/BRCpUCc/RXJI1kDjCDHkZrCrPC858QdJvl3dea6C70dpJKD0JSNsJI=
+Received: from AM5PR0801MB1665.eurprd08.prod.outlook.com (10.169.247.15) by
+ AM5PR0801MB2066.eurprd08.prod.outlook.com (10.168.159.13) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2686.26; Fri, 31 Jan 2020 14:15:56 +0000
-Received: from VI1PR04MB6031.eurprd04.prod.outlook.com
- ([fe80::3471:11cb:7be8:d1dc]) by VI1PR04MB6031.eurprd04.prod.outlook.com
- ([fe80::3471:11cb:7be8:d1dc%6]) with mapi id 15.20.2665.027; Fri, 31 Jan 2020
- 14:15:56 +0000
-Received: from ubuntu16VB.ea.freescale.net (212.146.100.6) by AM5PR0202CA0010.eurprd02.prod.outlook.com (2603:10a6:203:69::20) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.20.2665.22 via Frontend Transport; Fri, 31 Jan 2020 14:15:55 +0000
-From:   Valentin Ciocoi Radulescu <valentin.ciocoi@nxp.com>
-To:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        Horia Geanta <horia.geanta@nxp.com>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: [PATCH] crypto: caam/qi - optimize frame queue cleanup
-Thread-Topic: [PATCH] crypto: caam/qi - optimize frame queue cleanup
-Thread-Index: AQHV2ED0kruhWvne9kajdpPmzr8twQ==
-Date:   Fri, 31 Jan 2020 14:15:56 +0000
-Message-ID: <1580480151-1299-1-git-send-email-valentin.ciocoi@nxp.com>
+ 15.20.2686.27; Sun, 2 Feb 2020 13:04:21 +0000
+Received: from AM5PR0801MB1665.eurprd08.prod.outlook.com
+ ([fe80::a9de:d56:93b9:46ec]) by AM5PR0801MB1665.eurprd08.prod.outlook.com
+ ([fe80::a9de:d56:93b9:46ec%6]) with mapi id 15.20.2686.030; Sun, 2 Feb 2020
+ 13:04:21 +0000
+From:   Hadar Gat <Hadar.Gat@arm.com>
+To:     Rob Herring <robh@kernel.org>
+CC:     Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Ofir Drang <Ofir.Drang@arm.com>
+Subject: RE: [PATCH 1/3] dt-bindings: add device tree binding for Arm
+ CryptoCell trng engine
+Thread-Topic: [PATCH 1/3] dt-bindings: add device tree binding for Arm
+ CryptoCell trng engine
+Thread-Index: AQHV1PRnqZEtfroZkkOFtb+Gjzy4pqf+kfAAgAlV1+A=
+Date:   Sun, 2 Feb 2020 13:04:20 +0000
+Message-ID: <AM5PR0801MB166521BDC556D3725F14CD86E9010@AM5PR0801MB1665.eurprd08.prod.outlook.com>
+References: <1580117304-12682-1-git-send-email-hadar.gat@arm.com>
+ <1580117304-12682-2-git-send-email-hadar.gat@arm.com>
+ <20200127142738.GA31451@bogus>
+In-Reply-To: <20200127142738.GA31451@bogus>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
 X-MS-TNEF-Correlator: 
-x-mailer: git-send-email 2.7.4
-x-clientproxiedby: AM5PR0202CA0010.eurprd02.prod.outlook.com
- (2603:10a6:203:69::20) To VI1PR04MB6031.eurprd04.prod.outlook.com
- (2603:10a6:803:102::17)
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=valentin.ciocoi@nxp.com; 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-originating-ip: [212.146.100.6]
+x-ts-tracking-id: e7a4314c-c614-46a6-808b-36fa4962a534.1
+x-checkrecipientchecked: true
+Authentication-Results-Original: spf=none (sender IP is )
+ smtp.mailfrom=Hadar.Gat@arm.com; 
+x-originating-ip: [217.140.106.29]
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 1df08a81-a1b4-410f-3f78-08d7a6581682
-x-ms-traffictypediagnostic: VI1PR04MB5328:|VI1PR04MB5328:
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: ed38b58f-70c6-43cc-3081-08d7a7e07039
+X-MS-TrafficTypeDiagnostic: AM5PR0801MB2066:|AM5PR0801MB2066:|AM6PR08MB3591:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <VI1PR04MB532863D91C579A3F1F79BBD2FE070@VI1PR04MB5328.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:4714;
-x-forefront-prvs: 029976C540
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(376002)(136003)(366004)(346002)(39860400002)(189003)(199004)(81166006)(81156014)(316002)(8936002)(2616005)(71200400001)(8676002)(36756003)(64756008)(4326008)(66946007)(66446008)(110136005)(956004)(66556008)(6636002)(66476007)(6506007)(26005)(2906002)(5660300002)(186003)(52116002)(6512007)(16526019)(6486002)(478600001)(86362001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR04MB5328;H:VI1PR04MB6031.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
+X-Microsoft-Antispam-PRVS: <AM6PR08MB3591B528E185515FA17F9987E9010@AM6PR08MB3591.eurprd08.prod.outlook.com>
+x-checkrecipientrouted: true
+nodisclaimer: true
+x-ms-oob-tlc-oobclassifiers: OLM:8273;OLM:9508;
+x-forefront-prvs: 0301360BF5
+X-Forefront-Antispam-Report-Untrusted: SFV:NSPM;SFS:(10009020)(4636009)(366004)(376002)(39850400004)(396003)(346002)(136003)(189003)(199004)(966005)(86362001)(76116006)(2906002)(66946007)(66476007)(64756008)(66446008)(66556008)(6916009)(9686003)(8936002)(33656002)(5660300002)(186003)(81166006)(26005)(7696005)(52536014)(55016002)(316002)(4326008)(71200400001)(81156014)(8676002)(478600001)(53546011)(54906003)(6506007);DIR:OUT;SFP:1101;SCL:1;SRVR:AM5PR0801MB2066;H:AM5PR0801MB1665.eurprd08.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: arm.com does not designate
  permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: MDRYvc44rmiYqlqJCglQKQRnFKSZLjmDIG98NcuFmfBt1W3lUz9EtL+iSmm6E/RmEx/FTx1GXaoGFHPNTWHb/ju1IDCgt34LFP5SlN0Zex2lF8+/ZrRWjEOa5iq5Eqgee/3PRZ1q5dkHOuSfsJxL8LLmxCbjdnZIpqFg0F7nCr7ZOxCi7irplWuIMuA+HJqMvSSmtFQoVMBEyiQwh9mbycmOfKPVQFi/YoxYUjAIPKrKM6Cg9VzT4+dLwRzswhptk1TCUZbXAzmPSkpk9/yTqwn16xryfUSxW+P2y7nxNZORS1uOo3SyFILEKfvRxXC95VsM7ykF85/viMkR33tTkV+J9Smtd1rD4+LAGBy3OiGz0D7l8Mi0pmk5k0H7QtUA5fiPbJ5p0FVP0KWiK6qYyZ3gPpS37yE8KMeiJRhiL1mZq9htVnNtqeb7T2jaafdH
-x-ms-exchange-antispam-messagedata: o4x9Tskr88Pk7IeyW+/PHuBXEjVlzJZrh7yesPnyND5LirgcaETGoZSj5ZJR8Wjpisgpk25dg2m93xECQPTt+eDAWrU7rFvWAlP4LlMSEMeh+t34VbOjXRk6ye1sovpLAe4AQq1GnGXGJFWyDDqcFA==
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam-Untrusted: BCL:0;
+X-Microsoft-Antispam-Message-Info-Original: guLDTh0HF+Yf8j3I6GRdtXRmYu0NoOtMsdg7hTYukUqotzdmTfII2pby5ykhdAs6jxAWY1Efe2pXg9ook9ggBxMMi9orcQb3C9e2XzS0b9qgjC5j1kq0NvI3rmxV8dLiZl0Uy8tIwf52pieizZvezx8lgCpSbBvgOQJvlVPj/QoSFN9bYCKSXYcAapaNQwwBcWAlB5Ad2Juwk9zYgoj1+DzyoK9gkcFRKembDBmFfQs2qUNdWW4wopAlKUqnmMCS9OVWERLJ09XoCl4gzYCQLdMxZc1qN+wp5EleRJQ/vLnCo8gFojuqoU/7XkxUyByutgY7geNNGHxzN3mkB0xKj8St4tlmShkfgR8aNDq4wYbE2YAdlyyOQwzPHlZycPp7qH6h8cZgmOeqDKiE8Vi2Um+n4hXTkxPnaZz6Hn8CB4Lf/fMGBO0pF9u90/8EngLOjGr9KHQnFKkh4hZ75QEuopYxhF+8Rxq2TKSks2mhtY+57rL7Iuhkv7XG0sAayZq4huxCA0RUEhW4XiHAphWr9A==
+x-ms-exchange-antispam-messagedata: osOJXpkvRvwYUC+yaUAuSr8+HnhvVxBzIXMYBht4bOV+CTBck4sNCdYNYuyImT2Z7E6Cct5Md8FG1WV//MfJ8EQI7hgRyvKHYU/9sh4ARpBjmX0OpVLvtzoov75JoSQ/5J08+RM59DJKOtdLNeBmjQ==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1df08a81-a1b4-410f-3f78-08d7a6581682
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Jan 2020 14:15:56.2891
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0801MB2066
+Original-Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Hadar.Gat@arm.com; 
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped: DB5EUR03FT060.eop-EUR03.prod.protection.outlook.com
+X-Forefront-Antispam-Report: CIP:63.35.35.123;IPV:CAL;SCL:-1;CTRY:IE;EFV:NLI;SFV:NSPM;SFS:(10009020)(4636009)(396003)(39850400004)(136003)(346002)(376002)(199004)(189003)(53546011)(9686003)(4326008)(55016002)(6862004)(450100002)(6506007)(54906003)(316002)(186003)(7696005)(966005)(478600001)(26826003)(26005)(336012)(356004)(86362001)(70586007)(70206006)(2906002)(8936002)(81166006)(81156014)(8676002)(33656002)(52536014)(5660300002);DIR:OUT;SFP:1101;SCL:1;SRVR:AM6PR08MB3591;H:64aa7808-outbound-1.mta.getcheckrecipient.com;FPR:;SPF:Pass;LANG:en;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;A:1;MX:1;
+X-MS-Office365-Filtering-Correlation-Id-Prvs: a75be843-eeb6-4832-33fa-08d7a7e06b6e
+X-Forefront-PRVS: 0301360BF5
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: SLt0pQpqK4v1Ebl3NCJGlK/9LjfQLkThxxPPX4G5dcAR+DTssT9PgfHh8JGyLxWWliDln5MCEZwLh8xTIh13pxNtzTwGDVWRrNsZiWxczMZirD2vKmuHLh21VQYYKSCxcl3vKqCHbUkOwZ8s3iC0RPe18x499sFhqQnKHJxj/jACOUQqayMSun3ZIjybUQyK9ZobnslPfawITJoZkkgzIoeKU4nPofBxrek7e/oNrjazsJtnIzym6TOCK1QU4UwHNt8OzEB8XnFKdTbuBMH0RJZSHGYKi41LQMJc/+mVv9CIdv39qx3e7O5uZpFK4lHI/RgVU1QOjQ/Qx0lV6h1SKXSmAjXdtTHCfPVbjNZvHfRUl9yf+txCbMVALJaSzypMj5zrM3lu6PVO3Mop5NL0ql9QK344PugCzuHk6p/SVkhg3Cu6BS623Ydn1wT0083U4jCtyBjW5TcOr6BIVz2w8a3PzfjWY3gNiQ8Q9xwSRcjRFYPj3IjLFekUXINM5Yl8MrJSOa0iWaWujmnkQVL0Mw==
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Feb 2020 13:04:29.2422
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: AdUgkwhx+Suo48fxVGAFm20ZXevXonGdOrMuoi2bBMZA3IzxM9bk76LjnOxqzVXog2O3a9gthMvuLIn5Ygdnrg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR04MB5328
+X-MS-Exchange-CrossTenant-Network-Message-Id: ed38b58f-70c6-43cc-3081-08d7a7e07039
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3591
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add reference counter incremented for each frame enqueued in CAAM
-and replace unconditional sleep in empty_caam_fq() with polling the
-reference counter.
-
-When CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=3Dy boot time on LS1043A
-platform with this optimization decreases from ~1100s to ~11s.
-
-Signed-off-by: Valentin Ciocoi Radulescu <valentin.ciocoi@nxp.com>
----
- drivers/crypto/caam/qi.c | 60 +++++++++++++++++++++++++++++++-------------=
-----
- drivers/crypto/caam/qi.h |  4 +++-
- 2 files changed, 42 insertions(+), 22 deletions(-)
-
-diff --git a/drivers/crypto/caam/qi.c b/drivers/crypto/caam/qi.c
-index dacf2fa..b390b93 100644
---- a/drivers/crypto/caam/qi.c
-+++ b/drivers/crypto/caam/qi.c
-@@ -4,7 +4,7 @@
-  * Queue Interface backend functionality
-  *
-  * Copyright 2013-2016 Freescale Semiconductor, Inc.
-- * Copyright 2016-2017, 2019 NXP
-+ * Copyright 2016-2017, 2019-2020 NXP
-  */
-=20
- #include <linux/cpumask.h>
-@@ -124,8 +124,10 @@ int caam_qi_enqueue(struct device *qidev, struct caam_=
-drv_req *req)
-=20
- 	do {
- 		ret =3D qman_enqueue(req->drv_ctx->req_fq, &fd);
--		if (likely(!ret))
-+		if (likely(!ret)) {
-+			refcount_inc(&req->drv_ctx->refcnt);
- 			return 0;
-+		}
-=20
- 		if (ret !=3D -EBUSY)
- 			break;
-@@ -148,11 +150,6 @@ static void caam_fq_ern_cb(struct qman_portal *qm, str=
-uct qman_fq *fq,
-=20
- 	fd =3D &msg->ern.fd;
-=20
--	if (qm_fd_get_format(fd) !=3D qm_fd_compound) {
--		dev_err(qidev, "Non-compound FD from CAAM\n");
--		return;
--	}
--
- 	drv_req =3D caam_iova_to_virt(priv->domain, qm_fd_addr_get64(fd));
- 	if (!drv_req) {
- 		dev_err(qidev,
-@@ -160,6 +157,13 @@ static void caam_fq_ern_cb(struct qman_portal *qm, str=
-uct qman_fq *fq,
- 		return;
- 	}
-=20
-+	refcount_dec(&drv_req->drv_ctx->refcnt);
-+
-+	if (qm_fd_get_format(fd) !=3D qm_fd_compound) {
-+		dev_err(qidev, "Non-compound FD from CAAM\n");
-+		return;
-+	}
-+
- 	dma_unmap_single(drv_req->drv_ctx->qidev, qm_fd_addr(fd),
- 			 sizeof(drv_req->fd_sgt), DMA_BIDIRECTIONAL);
-=20
-@@ -287,9 +291,10 @@ static int kill_fq(struct device *qidev, struct qman_f=
-q *fq)
- 	return ret;
- }
-=20
--static int empty_caam_fq(struct qman_fq *fq)
-+static int empty_caam_fq(struct qman_fq *fq, struct caam_drv_ctx *drv_ctx)
- {
- 	int ret;
-+	int retries =3D 10;
- 	struct qm_mcr_queryfq_np np;
-=20
- 	/* Wait till the older CAAM FQ get empty */
-@@ -304,11 +309,18 @@ static int empty_caam_fq(struct qman_fq *fq)
- 		msleep(20);
- 	} while (1);
-=20
--	/*
--	 * Give extra time for pending jobs from this FQ in holding tanks
--	 * to get processed
--	 */
--	msleep(20);
-+	/* Wait until pending jobs from this FQ are processed by CAAM */
-+	do {
-+		if (refcount_read(&drv_ctx->refcnt) =3D=3D 1)
-+			break;
-+
-+		msleep(20);
-+	} while (--retries);
-+
-+	if (!retries)
-+		dev_warn_once(drv_ctx->qidev, "%d frames from FQID %u still pending in C=
-AAM\n",
-+			      refcount_read(&drv_ctx->refcnt), fq->fqid);
-+
- 	return 0;
- }
-=20
-@@ -340,7 +352,7 @@ int caam_drv_ctx_update(struct caam_drv_ctx *drv_ctx, u=
-32 *sh_desc)
- 	drv_ctx->req_fq =3D new_fq;
-=20
- 	/* Empty and remove the older FQ */
--	ret =3D empty_caam_fq(old_fq);
-+	ret =3D empty_caam_fq(old_fq, drv_ctx);
- 	if (ret) {
- 		dev_err(qidev, "Old CAAM FQ empty failed: %d\n", ret);
-=20
-@@ -453,6 +465,9 @@ struct caam_drv_ctx *caam_drv_ctx_init(struct device *q=
-idev,
- 		return ERR_PTR(-ENOMEM);
- 	}
-=20
-+	/* init reference counter used to track references to request FQ */
-+	refcount_set(&drv_ctx->refcnt, 1);
-+
- 	drv_ctx->qidev =3D qidev;
- 	return drv_ctx;
- }
-@@ -571,6 +586,16 @@ static enum qman_cb_dqrr_result caam_rsp_fq_dqrr_cb(st=
-ruct qman_portal *p,
- 		return qman_cb_dqrr_stop;
-=20
- 	fd =3D &dqrr->fd;
-+
-+	drv_req =3D caam_iova_to_virt(priv->domain, qm_fd_addr_get64(fd));
-+	if (unlikely(!drv_req)) {
-+		dev_err(qidev,
-+			"Can't find original request for caam response\n");
-+		return qman_cb_dqrr_consume;
-+	}
-+
-+	refcount_dec(&drv_req->drv_ctx->refcnt);
-+
- 	status =3D be32_to_cpu(fd->status);
- 	if (unlikely(status)) {
- 		u32 ssrc =3D status & JRSTA_SSRC_MASK;
-@@ -588,13 +613,6 @@ static enum qman_cb_dqrr_result caam_rsp_fq_dqrr_cb(st=
-ruct qman_portal *p,
- 		return qman_cb_dqrr_consume;
- 	}
-=20
--	drv_req =3D caam_iova_to_virt(priv->domain, qm_fd_addr_get64(fd));
--	if (unlikely(!drv_req)) {
--		dev_err(qidev,
--			"Can't find original request for caam response\n");
--		return qman_cb_dqrr_consume;
--	}
--
- 	dma_unmap_single(drv_req->drv_ctx->qidev, qm_fd_addr(fd),
- 			 sizeof(drv_req->fd_sgt), DMA_BIDIRECTIONAL);
-=20
-diff --git a/drivers/crypto/caam/qi.h b/drivers/crypto/caam/qi.h
-index 8489589..5894f16 100644
---- a/drivers/crypto/caam/qi.h
-+++ b/drivers/crypto/caam/qi.h
-@@ -3,7 +3,7 @@
-  * Public definitions for the CAAM/QI (Queue Interface) backend.
-  *
-  * Copyright 2013-2016 Freescale Semiconductor, Inc.
-- * Copyright 2016-2017 NXP
-+ * Copyright 2016-2017, 2020 NXP
-  */
-=20
- #ifndef __QI_H__
-@@ -52,6 +52,7 @@ enum optype {
-  * @context_a: shared descriptor dma address
-  * @req_fq: to-CAAM request frame queue
-  * @rsp_fq: from-CAAM response frame queue
-+ * @refcnt: reference counter incremented for each frame enqueued in to-CA=
-AM FQ
-  * @cpu: cpu on which to receive CAAM response
-  * @op_type: operation type
-  * @qidev: device pointer for CAAM/QI backend
-@@ -62,6 +63,7 @@ struct caam_drv_ctx {
- 	dma_addr_t context_a;
- 	struct qman_fq *req_fq;
- 	struct qman_fq *rsp_fq;
-+	refcount_t refcnt;
- 	int cpu;
- 	enum optype op_type;
- 	struct device *qidev;
---=20
-2.7.4
-
+Um9iLA0KVGhhbmsgeW91IGZvciBub3RpY2luZyBhbmQgbm90aWZ5aW5nLg0KSSB3aWxsIGZpeCB0
+aGlzIGFuZCByZS1zdWJtaXQuDQpIYWRhcg0KDQotLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0K
+RnJvbTogUm9iIEhlcnJpbmcgPHJvYmhAa2VybmVsLm9yZz4NClNlbnQ6IE1vbmRheSwgMjcgSmFu
+dWFyeSAyMDIwIDE2OjI4DQpUbzogSGFkYXIgR2F0IDxIYWRhci5HYXRAYXJtLmNvbT4NCkNjOiBN
+YXR0IE1hY2thbGwgPG1wbUBzZWxlbmljLmNvbT47IEhlcmJlcnQgWHUgPGhlcmJlcnRAZ29uZG9y
+LmFwYW5hLm9yZy5hdT47IERhdmlkIFMuIE1pbGxlciA8ZGF2ZW1AZGF2ZW1sb2Z0Lm5ldD47IEpv
+bmF0aGFuIENhbWVyb24gPEpvbmF0aGFuLkNhbWVyb25AaHVhd2VpLmNvbT47IGxpbnV4LWNyeXB0
+b0B2Z2VyLmtlcm5lbC5vcmc7IGRldmljZXRyZWVAdmdlci5rZXJuZWwub3JnOyBsaW51eC1rZXJu
+ZWxAdmdlci5rZXJuZWwub3JnOyBHaWxhZCBCZW4tWW9zc2VmIDxnaWxhZEBiZW55b3NzZWYuY29t
+PjsgT2ZpciBEcmFuZyA8T2Zpci5EcmFuZ0Bhcm0uY29tPjsgSGFkYXIgR2F0IDxIYWRhci5HYXRA
+YXJtLmNvbT4NClN1YmplY3Q6IFJlOiBbUEFUQ0ggMS8zXSBkdC1iaW5kaW5nczogYWRkIGRldmlj
+ZSB0cmVlIGJpbmRpbmcgZm9yIEFybSBDcnlwdG9DZWxsIHRybmcgZW5naW5lDQoNCk9uIE1vbiwg
+MjcgSmFuIDIwMjAgMTE6Mjg6MjIgKzAyMDAsIEhhZGFyIEdhdCB3cm90ZToNCj4gVGhlIEFybSBD
+cnlwdG9DZWxsIGlzIGEgaGFyZHdhcmUgc2VjdXJpdHkgZW5naW5lLiBUaGlzIHBhdGNoIGFkZHMg
+RFQNCj4gYmluZGluZ3MgZm9yIGl0cyBUUk5HIChUcnVlIFJhbmRvbSBOdW1iZXIgR2VuZXJhdG9y
+KSBlbmdpbmUuDQo+DQo+IFNpZ25lZC1vZmYtYnk6IEhhZGFyIEdhdCA8aGFkYXIuZ2F0QGFybS5j
+b20+DQo+IC0tLQ0KPiAgLi4uL2RldmljZXRyZWUvYmluZGluZ3Mvcm5nL2FybS1jY3RybmcueWFt
+bCAgICAgICAgfCA0OSArKysrKysrKysrKysrKysrKysrKysrDQo+ICAxIGZpbGUgY2hhbmdlZCwg
+NDkgaW5zZXJ0aW9ucygrKQ0KPiAgY3JlYXRlIG1vZGUgMTAwNjQ0DQo+IERvY3VtZW50YXRpb24v
+ZGV2aWNldHJlZS9iaW5kaW5ncy9ybmcvYXJtLWNjdHJuZy55YW1sDQo+DQoNCk15IGJvdCBmb3Vu
+ZCBlcnJvcnMgcnVubmluZyAnbWFrZSBkdF9iaW5kaW5nX2NoZWNrJyBvbiB5b3VyIHBhdGNoOg0K
+DQp3YXJuaW5nOiBubyBzY2hlbWEgZm91bmQgaW4gZmlsZTogRG9jdW1lbnRhdGlvbi9kZXZpY2V0
+cmVlL2JpbmRpbmdzL3JuZy9hcm0tY2N0cm5nLnlhbWwNCi9idWlsZHMvcm9iaGVycmluZy9saW51
+eC1kdC1yZXZpZXcvRG9jdW1lbnRhdGlvbi9kZXZpY2V0cmVlL2JpbmRpbmdzL3JuZy9hcm0tY2N0
+cm5nLnlhbWw6IGlnbm9yaW5nLCBlcnJvciBwYXJzaW5nIGZpbGUNCkRvY3VtZW50YXRpb24vZGV2
+aWNldHJlZS9iaW5kaW5ncy9kaXNwbGF5L3NpbXBsZS1mcmFtZWJ1ZmZlci5leGFtcGxlLmR0czoy
+MS4xNi0zNy4xMTogV2FybmluZyAoY2hvc2VuX25vZGVfaXNfcm9vdCk6IC9leGFtcGxlLTAvY2hv
+c2VuOiBjaG9zZW4gbm9kZSBtdXN0IGJlIGF0IHJvb3Qgbm9kZQ0KRG9jdW1lbnRhdGlvbi9kZXZp
+Y2V0cmVlL2JpbmRpbmdzL3JuZy9hcm0tY2N0cm5nLnlhbWw6ICB3aGlsZSBwYXJzaW5nIGEgYmxv
+Y2sgbWFwcGluZw0KICBpbiAiPHVuaWNvZGUgc3RyaW5nPiIsIGxpbmUgNDIsIGNvbHVtbiAzIGRp
+ZCBub3QgZmluZCBleHBlY3RlZCBrZXkNCiAgaW4gIjx1bmljb2RlIHN0cmluZz4iLCBsaW5lIDQ3
+LCBjb2x1bW4gMw0KRG9jdW1lbnRhdGlvbi9kZXZpY2V0cmVlL2JpbmRpbmdzL01ha2VmaWxlOjEy
+OiByZWNpcGUgZm9yIHRhcmdldCAnRG9jdW1lbnRhdGlvbi9kZXZpY2V0cmVlL2JpbmRpbmdzL3Ju
+Zy9hcm0tY2N0cm5nLmV4YW1wbGUuZHRzJyBmYWlsZWQNCm1ha2VbMV06ICoqKiBbRG9jdW1lbnRh
+dGlvbi9kZXZpY2V0cmVlL2JpbmRpbmdzL3JuZy9hcm0tY2N0cm5nLmV4YW1wbGUuZHRzXSBFcnJv
+ciAxDQpNYWtlZmlsZToxMjYzOiByZWNpcGUgZm9yIHRhcmdldCAnZHRfYmluZGluZ19jaGVjaycg
+ZmFpbGVkDQptYWtlOiAqKiogW2R0X2JpbmRpbmdfY2hlY2tdIEVycm9yIDINCg0KU2VlIGh0dHBz
+Oi8vcGF0Y2h3b3JrLm96bGFicy5vcmcvcGF0Y2gvMTIyOTYzOA0KUGxlYXNlIGNoZWNrIGFuZCBy
+ZS1zdWJtaXQuDQpJTVBPUlRBTlQgTk9USUNFOiBUaGUgY29udGVudHMgb2YgdGhpcyBlbWFpbCBh
+bmQgYW55IGF0dGFjaG1lbnRzIGFyZSBjb25maWRlbnRpYWwgYW5kIG1heSBhbHNvIGJlIHByaXZp
+bGVnZWQuIElmIHlvdSBhcmUgbm90IHRoZSBpbnRlbmRlZCByZWNpcGllbnQsIHBsZWFzZSBub3Rp
+ZnkgdGhlIHNlbmRlciBpbW1lZGlhdGVseSBhbmQgZG8gbm90IGRpc2Nsb3NlIHRoZSBjb250ZW50
+cyB0byBhbnkgb3RoZXIgcGVyc29uLCB1c2UgaXQgZm9yIGFueSBwdXJwb3NlLCBvciBzdG9yZSBv
+ciBjb3B5IHRoZSBpbmZvcm1hdGlvbiBpbiBhbnkgbWVkaXVtLiBUaGFuayB5b3UuDQo=
