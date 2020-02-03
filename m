@@ -2,107 +2,236 @@ Return-Path: <SRS0=nOCY=3X=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8418AC33CAC
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Feb 2020 10:11:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B637C33CAC
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Feb 2020 10:27:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 56D8E20658
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Feb 2020 10:11:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B2F852080D
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Feb 2020 10:27:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gNXtJhDN"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="FQhXxTwE"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727566AbgBCKLV (ORCPT
+        id S1727165AbgBCK1q (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 3 Feb 2020 05:11:21 -0500
-Received: from mail-pj1-f66.google.com ([209.85.216.66]:52922 "EHLO
-        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727308AbgBCKLV (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 3 Feb 2020 05:11:21 -0500
-Received: by mail-pj1-f66.google.com with SMTP id ep11so6105811pjb.2;
-        Mon, 03 Feb 2020 02:11:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=4dC5vZjnr8IWvufmlwLWuCfxRjV7yLvgDjVS1/z103Q=;
-        b=gNXtJhDNv08S4fJzniL6YYfHrPochu1S78UL6QYeJlnVpLV0vinCkGwH8B/gzyBZO5
-         QauncyeOmUrcZWzAcCxAxLmhc+gz/CJG3ii4UPaf55f6uCqNr4pFmaksaV/qOlR3mG2X
-         V5kfb6rS7WifHScLmVAKmVI3NqpIEADkgfjFxcaXCT784raeWl5jM2OFkuc9N3csCDxd
-         e4ywrFJnDdI8XhyHGMYiYFtUg0ZzdEGFKR5eiX8k2IFDiYwmTI/9rcDJvLCrv7KdfnyB
-         rdmCRsu/g7OQNvg7OSJHJfxbeRLnDKswIwnDFBgK8cRlJvSQhCNIk5iI7xrHex0RwEkp
-         GEHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=4dC5vZjnr8IWvufmlwLWuCfxRjV7yLvgDjVS1/z103Q=;
-        b=RB433vD2Av/bjgcjNrA9hohzgzsELN7eGT75BVeeEanEU2qXmPVb9tig0z+l6IvIq5
-         KhsbLVn/r9+PMaexCso1bIBs/NtqqzM0BuIFu7+Ty7duAyz5SgxK6oMZpmVtnDv81GQE
-         oQmEfIUimYPlmDkcp64Cbq4QF09CsTokxiGqMvOjjGw1iBvRKm851aPlENVAKnFn2AQm
-         MWp4Ghr1tHPv2i/zk6T25s5hQ0WqYxeNlFGhyCzCosk+G7pb4UozpGoZ65Mam5Bla+yg
-         k263PHx1a5uJXCZtzB10TlMNE6u6yiwnxRTu2kWywFL6Rb+OQS2JmiJzNKIoR7V+j5v1
-         /Rcw==
-X-Gm-Message-State: APjAAAW83r6a4WGqTaIrSe1e7YHeIdwyAvD2Xu8LyIgEKdw2eW4R5DXC
-        01msxfnwcRefKgHjUl4heWsBu+85/BFeydWdlBU=
-X-Google-Smtp-Source: APXvYqwvSk3kyzFEkF16zgVr87wi9kTgBo74pIIZQvaZ95Y0VScXP+UxOQwValhzbgbSNpxG+b6SSg+VgL3Dcl7uSbE=
-X-Received: by 2002:a17:90b:3109:: with SMTP id gc9mr28494608pjb.30.1580724681048;
- Mon, 03 Feb 2020 02:11:21 -0800 (PST)
-MIME-Version: 1.0
-References: <1580650021-8578-1-git-send-email-hadar.gat@arm.com> <1580650021-8578-4-git-send-email-hadar.gat@arm.com>
-In-Reply-To: <1580650021-8578-4-git-send-email-hadar.gat@arm.com>
-From:   Andy Shevchenko <andy.shevchenko@gmail.com>
-Date:   Mon, 3 Feb 2020 12:11:13 +0200
-Message-ID: <CAHp75Vd4VYJD9kSgMU+iKOC5FOarPtMG4eG3Jbnf7OeebWuC7w@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] MAINTAINERS: add HG as cctrng maintainer
-To:     Hadar Gat <hadar.gat@arm.com>
-Cc:     Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Daniel Thompson <daniel.thompson@linaro.org>,
-        Tomer Maimon <tmaimon77@gmail.com>,
-        Stefan Wahren <wahrenst@gmx.net>,
-        Sumit Garg <sumit.garg@linaro.org>,
-        Zaibo Xu <xuzaibo@huawei.com>,
-        Weili Qian <qianweili@huawei.com>,
-        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        linux-crypto <linux-crypto@vger.kernel.org>,
-        devicetree <devicetree@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Ofir Drang <ofir.drang@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+        Mon, 3 Feb 2020 05:27:46 -0500
+Received: from mx1.tq-group.com ([62.157.118.193]:51690 "EHLO mx1.tq-group.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726100AbgBCK1p (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 3 Feb 2020 05:27:45 -0500
+X-Greylist: delayed 428 seconds by postgrey-1.27 at vger.kernel.org; Mon, 03 Feb 2020 05:27:44 EST
+IronPort-SDR: X1Gz/oUg2tDO+KeeBbID8o/+NyshHFoLcFqQjiUnk7LIik9RWLlCrmVbCuxrXzlqhUNlKcU8j8
+ fOMDCDG9Baa5t/FsrZerhwXcnKhkMbldApDeC9NkW3ciEA28p8N2XSwbkhCgvhhAjaqVQVM6pe
+ YAjnC9k5l5/Sqejrv647jV8/qivic2LjlZz2kS5D0H7BO/8j/jxb2G6bbyRnjgORpXQg3BJjgX
+ YGMCP4Ds4PPwg/msfhNfy7msu81op68+57uzh22t/WXU7Dpx/hQ/maTVZvGYgdsgFWH/wygVm1
+ gxc=
+X-IronPort-AV: E=Sophos;i="5.70,397,1574118000"; 
+   d="scan'208";a="10771158"
+Received: from unknown (HELO tq-pgp-pr1.tq-net.de) ([192.168.6.15])
+  by mx1-pgp.tq-group.com with ESMTP; 03 Feb 2020 11:20:35 +0100
+Received: from mx1.tq-group.com ([192.168.6.7])
+  by tq-pgp-pr1.tq-net.de (PGP Universal service);
+  Mon, 03 Feb 2020 11:20:35 +0100
+X-PGP-Universal: processed;
+        by tq-pgp-pr1.tq-net.de on Mon, 03 Feb 2020 11:20:35 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1580725235; x=1612261235;
+  h=from:to:cc:subject:date:message-id;
+  bh=D1tHKRm9/T8SfmVVqmQjih0yc81AuYCA3oGPGsPn+YE=;
+  b=FQhXxTwE6Pt62rPMDxweje/LiYgCfSxl/rwALdTyNU9QRx5Gd0Bk2RRD
+   dZjpuU4DpKTjk1Rgd3Fib+kTGX3pcUKHHmCA7ZQSBsWG9KRauhzzd/Zjw
+   E7ph7iltbyu6860wgckYLbAV//ZsTaZlwZN6GHil+YPFk0d0HfcSxwZ+z
+   d5sgPhxwQjV3jSiAJEs2wGA5/Pxq9SnvP94udf0LKW9KEFLcl/5DWTR+A
+   hkke88G6HidkmoAuOi6pwTCPLQcH+c3ashYBpCvYpbawaMPlfjhMqRiYt
+   KUvEe4Y4U2Oin/QXY/o5pialF5z6kLNst9BzDbjOJGayCj9+LNu3R4sEJ
+   w==;
+IronPort-SDR: mim3VmcPh0LqA7R+lC6X8G4512MuGwfV4r/yUaOvfKLTPFOEOGzV7/ZblatpikgN6nwNl06Run
+ qgvYCVUiF8ZjBm6dGi+F+rwgVQhensHMOQLG3LyAAEBdeddoEFeQk5CeLDvjL1znO3QXfgCAcs
+ Gr+4nwxM6RdyqzB3jxAuzQiXWyEaaLfVDVkxsScoOMPtWSeR5vJkbMRFP3ATXFCH2x9ImX06sR
+ fQyF4dZLtna4RrfQZ9Yhk6B5z4gXFKmYJjsfASK84Hp/mz2omlpcqmbB4MR1KKKTfyAUzogM+s
+ si0=
+X-IronPort-AV: E=Sophos;i="5.70,397,1574118000"; 
+   d="scan'208";a="10771157"
+Received: from vtuxmail01.tq-net.de ([10.115.0.20])
+  by mx1.tq-group.com with ESMTP; 03 Feb 2020 11:20:35 +0100
+Received: from schifferm-ubuntu4.tq-net.de (schifferm-ubuntu4.tq-net.de [10.117.49.26])
+        by vtuxmail01.tq-net.de (Postfix) with ESMTPA id 5A659280065;
+        Mon,  3 Feb 2020 11:20:37 +0100 (CET)
+From:   Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+To:     horia.geanta@nxp.com, aymen.sghaier@nxp.com
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Subject: [RFC] crypto: caam: re-init JR on resume
+Date:   Mon,  3 Feb 2020 11:18:50 +0100
+Message-Id: <20200203101850.22570-1-matthias.schiffer@ew.tq-group.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Feb 2, 2020 at 3:29 PM Hadar Gat <hadar.gat@arm.com> wrote:
->
-> I work for Arm on maintaining the TrustZone CryptoCell TRNG driver.
+The JR loses its configuration during suspend-to-RAM (at least on
+i.MX6UL). Re-initialize the hardware on resume.
 
-> +CCTRNG ARM TRUSTZONE CRYPTOCELL TRUE RANDOM NUMBER GENERATOR (TRNG) DRIVER
-> +M:     Hadar Gat <hadar.gat@arm.com>
-> +L:     linux-crypto@vger.kernel.org
-> +S:     Supported
-> +F:     drivers/char/hw_random/cctrng.c
-> +F:     drivers/char/hw_random/cctrng.h
-> +F:     Documentation/devicetree/bindings/rng/arm-cctrng.txt
-> +W:     https://developer.arm.com/products/system-ip/trustzone-cryptocell/cryptocell-700-family
-> +
+Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+---
 
-Had you run parse-maintainers.pl afterwards to be sure everything is okay?
+I've come across the issue that the CAAM would not work anymore after
+deep sleep on i.MX6UL. It turned out that the CAAM loses its state
+during suspend-to-RAM, so all registers read as zero and need to be
+reinitialized.
 
+This patch is my first attempt at fixing the issue. It seems to work
+well enough, but I assume I'm missing some synchronization to prevent
+that some CAAM operation is currently under way when the suspend
+happens? I don't know the PM and crypto subsystems well enough to judge
+if this is possible, and if it is, how to prevent it.
+
+I've only compile-tested this version of the patch, as I had to port it
+from our board kernel, which is based on the heavily-modified NXP branch.
+
+
+ drivers/crypto/caam/intern.h |  3 ++
+ drivers/crypto/caam/jr.c     | 62 +++++++++++++++++++++++++-----------
+ 2 files changed, 46 insertions(+), 19 deletions(-)
+
+diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
+index c7c10c90464b..5d2e9091d5c2 100644
+--- a/drivers/crypto/caam/intern.h
++++ b/drivers/crypto/caam/intern.h
+@@ -47,6 +47,9 @@ struct caam_drv_private_jr {
+ 	struct tasklet_struct irqtask;
+ 	int irq;			/* One per queue */
+ 
++	dma_addr_t inpbusaddr;
++	dma_addr_t outbusaddr;
++
+ 	/* Number of scatterlist crypt transforms active on the JobR */
+ 	atomic_t tfm_count ____cacheline_aligned;
+ 
+diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+index fc97cde27059..2dabf5fd7818 100644
+--- a/drivers/crypto/caam/jr.c
++++ b/drivers/crypto/caam/jr.c
+@@ -418,13 +418,31 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
+ }
+ EXPORT_SYMBOL(caam_jr_enqueue);
+ 
++static void caam_jr_setup_rings(struct caam_drv_private_jr *jrp)
++{
++	jrp->out_ring_read_index = 0;
++	jrp->head = 0;
++	jrp->tail = 0;
++
++	wr_reg64(&jrp->rregs->inpring_base, jrp->inpbusaddr);
++	wr_reg64(&jrp->rregs->outring_base, jrp->outbusaddr);
++	wr_reg32(&jrp->rregs->inpring_size, JOBR_DEPTH);
++	wr_reg32(&jrp->rregs->outring_size, JOBR_DEPTH);
++
++	jrp->inpring_avail = JOBR_DEPTH;
++
++	/* Select interrupt coalescing parameters */
++	clrsetbits_32(&jrp->rregs->rconfig_lo, 0, JOBR_INTC |
++		      (JOBR_INTC_COUNT_THLD << JRCFG_ICDCT_SHIFT) |
++		      (JOBR_INTC_TIME_THLD << JRCFG_ICTT_SHIFT));
++}
++
+ /*
+  * Init JobR independent of platform property detection
+  */
+ static int caam_jr_init(struct device *dev)
+ {
+ 	struct caam_drv_private_jr *jrp;
+-	dma_addr_t inpbusaddr, outbusaddr;
+ 	int i, error;
+ 
+ 	jrp = dev_get_drvdata(dev);
+@@ -434,13 +452,13 @@ static int caam_jr_init(struct device *dev)
+ 		return error;
+ 
+ 	jrp->inpring = dmam_alloc_coherent(dev, SIZEOF_JR_INPENTRY *
+-					   JOBR_DEPTH, &inpbusaddr,
++					   JOBR_DEPTH, &jrp->inpbusaddr,
+ 					   GFP_KERNEL);
+ 	if (!jrp->inpring)
+ 		return -ENOMEM;
+ 
+ 	jrp->outring = dmam_alloc_coherent(dev, SIZEOF_JR_OUTENTRY *
+-					   JOBR_DEPTH, &outbusaddr,
++					   JOBR_DEPTH, &jrp->outbusaddr,
+ 					   GFP_KERNEL);
+ 	if (!jrp->outring)
+ 		return -ENOMEM;
+@@ -453,24 +471,9 @@ static int caam_jr_init(struct device *dev)
+ 	for (i = 0; i < JOBR_DEPTH; i++)
+ 		jrp->entinfo[i].desc_addr_dma = !0;
+ 
+-	/* Setup rings */
+-	jrp->out_ring_read_index = 0;
+-	jrp->head = 0;
+-	jrp->tail = 0;
+-
+-	wr_reg64(&jrp->rregs->inpring_base, inpbusaddr);
+-	wr_reg64(&jrp->rregs->outring_base, outbusaddr);
+-	wr_reg32(&jrp->rregs->inpring_size, JOBR_DEPTH);
+-	wr_reg32(&jrp->rregs->outring_size, JOBR_DEPTH);
+-
+-	jrp->inpring_avail = JOBR_DEPTH;
+-
+ 	spin_lock_init(&jrp->inplock);
+ 
+-	/* Select interrupt coalescing parameters */
+-	clrsetbits_32(&jrp->rregs->rconfig_lo, 0, JOBR_INTC |
+-		      (JOBR_INTC_COUNT_THLD << JRCFG_ICDCT_SHIFT) |
+-		      (JOBR_INTC_TIME_THLD << JRCFG_ICTT_SHIFT));
++	caam_jr_setup_rings(jrp);
+ 
+ 	tasklet_init(&jrp->irqtask, caam_jr_dequeue, (unsigned long)dev);
+ 
+@@ -486,6 +489,20 @@ static int caam_jr_init(struct device *dev)
+ 	return error;
+ }
+ 
++static int caam_jr_reinit(struct device *dev)
++{
++	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
++	int error;
++
++	error = caam_reset_hw_jr(dev);
++	if (error)
++		return error;
++
++	caam_jr_setup_rings(jrp);
++
++	return 0;
++}
++
+ static void caam_jr_irq_dispose_mapping(void *data)
+ {
+ 	irq_dispose_mapping((unsigned long)data);
+@@ -578,10 +595,17 @@ static const struct of_device_id caam_jr_match[] = {
+ };
+ MODULE_DEVICE_TABLE(of, caam_jr_match);
+ 
++#ifdef CONFIG_PM
++static SIMPLE_DEV_PM_OPS(caam_jr_pm_ops, caam_reset_hw_jr, caam_jr_reinit);
++#endif
++
+ static struct platform_driver caam_jr_driver = {
+ 	.driver = {
+ 		.name = "caam_jr",
+ 		.of_match_table = caam_jr_match,
++#ifdef CONFIG_PM
++		.pm = &caam_jr_pm_ops,
++#endif
+ 	},
+ 	.probe       = caam_jr_probe,
+ 	.remove      = caam_jr_remove,
 -- 
-With Best Regards,
-Andy Shevchenko
+2.17.1
+
