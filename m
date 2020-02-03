@@ -2,105 +2,113 @@ Return-Path: <SRS0=nOCY=3X=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC484C33C9E
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Feb 2020 04:09:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AD66C3524D
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Feb 2020 09:55:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8E2F120679
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Feb 2020 04:09:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=aj.id.au header.i=@aj.id.au header.b="jLEEj6Du";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="DmuPSaKp"
+	by mail.kernel.org (Postfix) with ESMTP id 1B9262070A
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Feb 2020 09:55:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727266AbgBCEJW (ORCPT
+        id S1727097AbgBCJzI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 2 Feb 2020 23:09:22 -0500
-Received: from new2-smtp.messagingengine.com ([66.111.4.224]:42353 "EHLO
-        new2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727327AbgBCEJV (ORCPT
+        Mon, 3 Feb 2020 04:55:08 -0500
+Received: from mout.kundenserver.de ([212.227.126.134]:58209 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726287AbgBCJzI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 2 Feb 2020 23:09:21 -0500
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-        by mailnew.nyi.internal (Postfix) with ESMTP id C156E6D27;
-        Sun,  2 Feb 2020 23:09:20 -0500 (EST)
-Received: from imap2 ([10.202.2.52])
-  by compute4.internal (MEProxy); Sun, 02 Feb 2020 23:09:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=aj.id.au; h=
-        mime-version:message-id:in-reply-to:references:date:from:to:cc
-        :subject:content-type; s=fm1; bh=RjS6hrJkvw6HKnule/qYTODmaAYp/hQ
-        FP4smKfPmKGQ=; b=jLEEj6DuOY9JFldgz6GzluSbsV/j8Jxqp+dWzKfNwmDCsKk
-        NP/mF1lEvBeknCTiyR4uzNfKGEiO3QDXQbc8/kaCqDMH7OqMNHWHqs0RXrXYMLZ0
-        bMH0krwIh9AUdzsI/6YuMa6EgbgrmwclYfUUEgaZwT2QFNQj3tT5cxrKcu41T2Xi
-        3NOXXV/ugy4b3jHye2tAfpgw5sSAMXIYrVGoedPkwAZ74WhvJuv1FqRtD+MNRQHS
-        7o1n5mWsHYu0XM961jK+M0LkZjt6d1gnBKL86rfmR0N1djBSWIS5cP/6/bPdlnNd
-        PX1bxHEsSj30BetS5LE01430WIHG9PWyr7oV5+A==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-type:date:from:in-reply-to
-        :message-id:mime-version:references:subject:to:x-me-proxy
-        :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=RjS6hr
-        Jkvw6HKnule/qYTODmaAYp/hQFP4smKfPmKGQ=; b=DmuPSaKpvAxsFkXQD2TjPV
-        457IBibzflOvIL/OIV3vx87Qo172/hR1rP41uWk/PS5DXGNAeuKnZWrVYiLIB2Po
-        tHFT7+Yyz0VlzOs+bcxOtK2rGtbFxrifqIxBMb97IOHud5xRNsoLA3jFgbrMna9K
-        ezAp2WRpmdoRJqOYWR+7OuToXToM8VJlnoT599ClS9KaEveGOd6Bk3Ix6EMO8gg3
-        NwjjuJCA9YylBi303dieFUYdkHeiWIf/f7/R0b4n1IxSNhgTWDT6MmhyNJX1OOXC
-        5rWc8qMmrRiJi0w8Ougj7k8sqzbA5QvAPc+JgtAtjSewhEjcc9TFgzDkyjONC6rw
-        ==
-X-ME-Sender: <xms:8Jw3Xr1SJOTNsngXqFBtuTDrEzdzuCTzo7B2CDSeJhBr414ExuothQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedugedrgeeigdeiiecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefofgggkfgjfhffhffvufgtsehttdertderredtnecuhfhrohhmpedftehnughr
-    vgifucflvghffhgvrhihfdcuoegrnhgurhgvfiesrghjrdhiugdrrghuqeenucevlhhush
-    htvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrnhgurhgvfiesrghj
-    rdhiugdrrghu
-X-ME-Proxy: <xmx:8Jw3XrUkY22zjYfoyBETKyB-x-H9Zh5jGuEbV2mSyqYdBdkFyOr8JA>
-    <xmx:8Jw3XkVD1fVPMiiaKnDZgRUt8hkIBZgKTmm3s1FuLwEg8xNxAlmnJA>
-    <xmx:8Jw3XnCzSnKK85gkFNgd56lWmuj2Ao3jH1hxFZJidO6xNHF8TIgXmw>
-    <xmx:8Jw3XmszI8conWzhsZjiGRm5Lr_AzefRMi4d4IHNJknWRjABi4ymHA>
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 965ECE00A2; Sun,  2 Feb 2020 23:09:20 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.1.7-802-g7a41c81-fmstable-20200203v1
-Mime-Version: 1.0
-Message-Id: <42173df3-c060-4c62-a5b9-7f1deade21d1@www.fastmail.com>
-In-Reply-To: <f6beee98-360c-4239-ab01-86ba41629f9b@www.fastmail.com>
-References: <20200120150113.2565-1-linux@neuralgames.com>
- <CACPK8XfuVN3Q=npEoOP-amQS0-wemxcx6LKaHHZEsBAHzq1wzA@mail.gmail.com>
- <4446ffb694c7742ca9492c7360856789@neuralgames.com>
- <575811fd-24ca-409c-8d33-c2152ee401d7@www.fastmail.com>
- <136bbab84d13d8d56a5ac297e415975e@neuralgames.com>
- <b83f2a1f-e1be-433c-8dc8-c469cb38f423@www.fastmail.com>
- <27c5505acd8d09f70ec9cd12982b2e3e@neuralgames.com>
- <f6beee98-360c-4239-ab01-86ba41629f9b@www.fastmail.com>
-Date:   Mon, 03 Feb 2020 14:39:06 +1030
-From:   "Andrew Jeffery" <andrew@aj.id.au>
-To:     "Oscar A Perez" <linux@neuralgames.com>
-Cc:     "Joel Stanley" <joel@jms.id.au>, "Matt Mackall" <mpm@selenic.com>,
-        "Herbert Xu" <herbert@gondor.apana.org.au>,
-        "Rob Herring" <robh+dt@kernel.org>,
-        "Mark Rutland" <mark.rutland@arm.com>,
-        "Linux Crypto Mailing List" <linux-crypto@vger.kernel.org>,
-        devicetree <devicetree@vger.kernel.org>,
-        "Linux ARM" <linux-arm-kernel@lists.infradead.org>,
-        linux-aspeed <linux-aspeed@lists.ozlabs.org>,
-        "Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 1/2] hwrng: Add support for ASPEED RNG
-Content-Type: text/plain
+        Mon, 3 Feb 2020 04:55:08 -0500
+Received: from mail-qt1-f177.google.com ([209.85.160.177]) by
+ mrelayeu.kundenserver.de (mreue012 [212.227.15.129]) with ESMTPSA (Nemesis)
+ id 1MYcy3-1j22n30H0l-00Ve4V; Mon, 03 Feb 2020 10:55:06 +0100
+Received: by mail-qt1-f177.google.com with SMTP id v25so10922209qto.7;
+        Mon, 03 Feb 2020 01:55:05 -0800 (PST)
+X-Gm-Message-State: APjAAAXayw9ab16LOK21AgEd0lxUsYho5mtNcu66Wi0RkBaatjsfQjZJ
+        QJ+pGyM0AwC1hJF8xieNXBnvnGjm4/ySOsWfVVA=
+X-Google-Smtp-Source: APXvYqy6+v9jhWwlyFzCmvPj6FYnUGsrTB9Nh92b9LW7+F8pu5Zr3Tk51OmqHmojYKDT3Q6CDxzqbjHbal9X0W6ejfg=
+X-Received: by 2002:ac8:34b2:: with SMTP id w47mr22353154qtb.142.1580723704779;
+ Mon, 03 Feb 2020 01:55:04 -0800 (PST)
+MIME-Version: 1.0
+References: <1580650021-8578-1-git-send-email-hadar.gat@arm.com>
+In-Reply-To: <1580650021-8578-1-git-send-email-hadar.gat@arm.com>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Mon, 3 Feb 2020 10:54:48 +0100
+X-Gmail-Original-Message-ID: <CAK8P3a3C7hfCQwupKQqtnOmwu7faoeKH9fcEZFQW3WmrScKzUw@mail.gmail.com>
+Message-ID: <CAK8P3a3C7hfCQwupKQqtnOmwu7faoeKH9fcEZFQW3WmrScKzUw@mail.gmail.com>
+Subject: Re: [PATCH v2 0/3] hw_random: introduce Arm CryptoCell TRNG driver
+To:     Hadar Gat <hadar.gat@arm.com>
+Cc:     Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Daniel Thompson <daniel.thompson@linaro.org>,
+        Tomer Maimon <tmaimon77@gmail.com>,
+        Stefan Wahren <wahrenst@gmx.net>,
+        Sumit Garg <sumit.garg@linaro.org>,
+        Zaibo Xu <xuzaibo@huawei.com>,
+        Weili Qian <qianweili@huawei.com>,
+        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>, DTML <devicetree@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Ofir Drang <ofir.drang@arm.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:2kNRGSn8mD8fztnzDOZ4453fdsXLWQVkYcjEjq19+MXcTDRlRfj
+ 6RSPW498pqvA7nX0QvVkzWk3sr+bXKJYLoNs0v87JN8Ddt7ttxoezyhxhpApv9GAE7t4Z52
+ P+E+sAJLWrSWP9DU+l0oCpBrzlSrYfdrS9jrJZ85W1akTi+QgK6n+bLQx7kttk2hNoYKaB0
+ 7XFgF38IfZMnKhTXPQvkA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:bQNM/1/Sv1U=:WDiBf8dOswSkZBYWYJwh7W
+ gSduKWT7O6TkmOG+fNudlBbUEjr3XaYonkGCH6QNqKzFP61KcSu3ibwkrv5yjZr52yz1HLkfK
+ b6zZ0BtcZdZC+h920iAIQsvvqrm9NQadFhOZxOStPonyEGbL1XoIlW/yruAkpTMCExmngxbJ7
+ OWqC0c1pji+LAaRQPoCzooHW2Uy61EBGzh8KkIysuffI0eX1R6KDzwJOhi32zQf+LikAhUXmK
+ BrLFsowxuAwlllqkMRXH05lCfRf0ka/3RtwymwfG9xH4Yv1cGfxPauPhxy7zynrrCHjWJyXdU
+ aKMyvh1BVoBz277kZdRGQ9TUqP+LZKKea8vRnQt1W5E8MpdrRBQqLSX/xRjiHQakA+T3F5mqm
+ bmOtjNpjDmqEuNwDhSnwTWrvqbtA6+DW5iSSVhATQbOnY68e+tDML5OL/kR+Y3k0p0GrBYk8U
+ WAcas9OvZOLDC1oZbL/sld8zlWRIrO0Q7vPze+I+HOxy1OVj4ISJ3Do9c6v5WhQ6Nnm7RMa6u
+ KMvYfBh6uYok/iVAuw7/AhSoaF8LSO7T4t+EaS1YX/VWKm1YeL86sRRqg/9C47nB/V0p8NKai
+ jNmVDSxoZa3jwPRNlTVfa3L6RYxf+HT984Xpu4krfD5NXD4SVpMPwr3J0LwmcJHWii2WOe3es
+ JiL7oOScaO3txbhhXIxx98Q4E+F/SYQZH5Ld4e5EehecJwk8eMCC3ojqixwPJjmcjrvTDUCQb
+ Ucr+i6QBdpaqmprBPDsscYxfK6iydjD49heFYXfhGtUeWzz4lh4G43+R2TFdJc+c1ESXPivHl
+ TBd1rI7GdfnUFPJslXFUEAIh86eMx68uCqODBn0E75ZEwF6vlY=
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Sun, Feb 2, 2020 at 2:27 PM Hadar Gat <hadar.gat@arm.com> wrote:
+>
+> The Arm CryptoCell is a hardware security engine.
+> This patch introduces driver for its TRNG (True Random Number Generator)
+> engine.
+>
+> Changes from previous veriosn: fixed 'make dt_bnding_check' errors.
+>
+> Hadar Gat (3):
+>   dt-bindings: add device tree binding for Arm CryptoCell trng engine
+>   hw_random: cctrng: introduce Arm CryptoCell driver
+>   MAINTAINERS: add HG as cctrng maintainer
 
+I looked at the patches briefly and everything makes sense to me,
 
-On Mon, 3 Feb 2020, at 14:37, Andrew Jeffery wrote:
-> 
-> I think we should leverage existing work where we can. Lets not make
-> more extra for ourselves :)
+Acked-by: Arnd Bergmann <arnd@arndb.de>
 
-Dammit, replaced the wrong word there - the irony:
+There are two style issues that you could improve:
 
-"Lets not make _extra work_ for ourselves"
+- The header is only included from a single file, so I would just fold
+  its contents into the driver itself.
+
+- You have a lot of "#ifdef CONFIG_PM" that are easy to get wrong
+  with various combinations of config symbols. It's often better to
+  leave that all compiled unconditionally and have the logic in
+  UNIVERSAL_DEV_PM_OPS() take care of dropping the unused
+  bits, with a __maybe_unused annotation on functions that cause
+  a warning otherwise.
+
+       Arnd
