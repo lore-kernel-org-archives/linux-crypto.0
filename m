@@ -2,236 +2,231 @@ Return-Path: <SRS0=nOCY=3X=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_DBL_ABUSE_MALW,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B637C33CAC
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Feb 2020 10:27:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5E93C33CAC
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Feb 2020 10:32:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B2F852080D
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Feb 2020 10:27:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="FQhXxTwE"
+	by mail.kernel.org (Postfix) with ESMTP id 7562420721
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Feb 2020 10:32:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1580725924;
+	bh=+tclQKs/WNr0VvFV0+aZqL7hnHWDrlqlyWS1+r/kyTc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=wJl8iHyQpatzNN5J/ug30OZL6+SJGp0iKW6/qwkR9MdEp6IfU3w+obqAwJYnbo+U7
+	 hLsic4Y8JTso8uz/x9BFNaJoNNcBTgtLb/cGagbp3396PavkaRH8CYa94tRDHObokK
+	 c7cvLrXmkRlnPZ3RAySIPhgEePbognxHRt/uhmz4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727165AbgBCK1q (ORCPT
+        id S1727458AbgBCKcE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 3 Feb 2020 05:27:46 -0500
-Received: from mx1.tq-group.com ([62.157.118.193]:51690 "EHLO mx1.tq-group.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726100AbgBCK1p (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 3 Feb 2020 05:27:45 -0500
-X-Greylist: delayed 428 seconds by postgrey-1.27 at vger.kernel.org; Mon, 03 Feb 2020 05:27:44 EST
-IronPort-SDR: X1Gz/oUg2tDO+KeeBbID8o/+NyshHFoLcFqQjiUnk7LIik9RWLlCrmVbCuxrXzlqhUNlKcU8j8
- fOMDCDG9Baa5t/FsrZerhwXcnKhkMbldApDeC9NkW3ciEA28p8N2XSwbkhCgvhhAjaqVQVM6pe
- YAjnC9k5l5/Sqejrv647jV8/qivic2LjlZz2kS5D0H7BO/8j/jxb2G6bbyRnjgORpXQg3BJjgX
- YGMCP4Ds4PPwg/msfhNfy7msu81op68+57uzh22t/WXU7Dpx/hQ/maTVZvGYgdsgFWH/wygVm1
- gxc=
-X-IronPort-AV: E=Sophos;i="5.70,397,1574118000"; 
-   d="scan'208";a="10771158"
-Received: from unknown (HELO tq-pgp-pr1.tq-net.de) ([192.168.6.15])
-  by mx1-pgp.tq-group.com with ESMTP; 03 Feb 2020 11:20:35 +0100
-Received: from mx1.tq-group.com ([192.168.6.7])
-  by tq-pgp-pr1.tq-net.de (PGP Universal service);
-  Mon, 03 Feb 2020 11:20:35 +0100
-X-PGP-Universal: processed;
-        by tq-pgp-pr1.tq-net.de on Mon, 03 Feb 2020 11:20:35 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1580725235; x=1612261235;
-  h=from:to:cc:subject:date:message-id;
-  bh=D1tHKRm9/T8SfmVVqmQjih0yc81AuYCA3oGPGsPn+YE=;
-  b=FQhXxTwE6Pt62rPMDxweje/LiYgCfSxl/rwALdTyNU9QRx5Gd0Bk2RRD
-   dZjpuU4DpKTjk1Rgd3Fib+kTGX3pcUKHHmCA7ZQSBsWG9KRauhzzd/Zjw
-   E7ph7iltbyu6860wgckYLbAV//ZsTaZlwZN6GHil+YPFk0d0HfcSxwZ+z
-   d5sgPhxwQjV3jSiAJEs2wGA5/Pxq9SnvP94udf0LKW9KEFLcl/5DWTR+A
-   hkke88G6HidkmoAuOi6pwTCPLQcH+c3ashYBpCvYpbawaMPlfjhMqRiYt
-   KUvEe4Y4U2Oin/QXY/o5pialF5z6kLNst9BzDbjOJGayCj9+LNu3R4sEJ
-   w==;
-IronPort-SDR: mim3VmcPh0LqA7R+lC6X8G4512MuGwfV4r/yUaOvfKLTPFOEOGzV7/ZblatpikgN6nwNl06Run
- qgvYCVUiF8ZjBm6dGi+F+rwgVQhensHMOQLG3LyAAEBdeddoEFeQk5CeLDvjL1znO3QXfgCAcs
- Gr+4nwxM6RdyqzB3jxAuzQiXWyEaaLfVDVkxsScoOMPtWSeR5vJkbMRFP3ATXFCH2x9ImX06sR
- fQyF4dZLtna4RrfQZ9Yhk6B5z4gXFKmYJjsfASK84Hp/mz2omlpcqmbB4MR1KKKTfyAUzogM+s
- si0=
-X-IronPort-AV: E=Sophos;i="5.70,397,1574118000"; 
-   d="scan'208";a="10771157"
-Received: from vtuxmail01.tq-net.de ([10.115.0.20])
-  by mx1.tq-group.com with ESMTP; 03 Feb 2020 11:20:35 +0100
-Received: from schifferm-ubuntu4.tq-net.de (schifferm-ubuntu4.tq-net.de [10.117.49.26])
-        by vtuxmail01.tq-net.de (Postfix) with ESMTPA id 5A659280065;
-        Mon,  3 Feb 2020 11:20:37 +0100 (CET)
-From:   Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-To:     horia.geanta@nxp.com, aymen.sghaier@nxp.com
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-Subject: [RFC] crypto: caam: re-init JR on resume
-Date:   Mon,  3 Feb 2020 11:18:50 +0100
-Message-Id: <20200203101850.22570-1-matthias.schiffer@ew.tq-group.com>
-X-Mailer: git-send-email 2.17.1
+        Mon, 3 Feb 2020 05:32:04 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:43192 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727501AbgBCKcD (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 3 Feb 2020 05:32:03 -0500
+Received: by mail-wr1-f67.google.com with SMTP id z9so5054607wrs.10;
+        Mon, 03 Feb 2020 02:32:01 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=NFuh06mCbIFHLnWl/yp4KwHBKhZRCL1Lbf1jiW0JM98=;
+        b=ZuVjPYv/+rlib8L06dwZsEkxJknUcLobQfL9w8OvPwoYQvAcpY3sq/6eJKpt7smvBa
+         Ckxro4jxKtPq3kIkzpbgrYv8cFv+lS4yKYBz4fRNnWW3hO2W+zlZiJwd888ts4o4iqV9
+         5nQI0gdpHO1pXhRUMVgFJzTbTEkrXY9VloIk6kIf5+DQzy7TZ/FGFt0NJlan2PabCZcm
+         l4DZdM6mVC95LZA4KLXykvzlb9saWsmx8fkrQelLmeI2z2FKzRgorb2eqR3Rs6GHGO86
+         xSLyBU/8ZXw0fK25p6yj1WRYLMQSKMd91s8QuhyGDYHzipMvG3+aMqleiXsEVmA/IpMR
+         d/TA==
+X-Gm-Message-State: APjAAAUa4py3qVsaNm9Upu+aF1CIYMYs3TeWrvc/TttRwWWpsQcenBH8
+        V669DWt5yYvhAGqsrYd39A==
+X-Google-Smtp-Source: APXvYqyQJyScAUAfc7hRV/ni9Ov1rrCOL/vQpSraOmoLvu0hd1vpN6CEC4XJZDRuzYtupTLkxa0YGQ==
+X-Received: by 2002:a5d:6445:: with SMTP id d5mr14473037wrw.244.1580725921100;
+        Mon, 03 Feb 2020 02:32:01 -0800 (PST)
+Received: from rob-hp-laptop ([212.187.182.163])
+        by smtp.gmail.com with ESMTPSA id t131sm23233901wmb.13.2020.02.03.02.31.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Feb 2020 02:32:00 -0800 (PST)
+Received: (nullmailer pid 31847 invoked by uid 1000);
+        Mon, 03 Feb 2020 10:31:58 -0000
+Date:   Mon, 3 Feb 2020 10:31:58 +0000
+From:   Rob Herring <robh@kernel.org>
+To:     Oscar A Perez <linux@neuralgames.com>
+Cc:     Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Joel Stanley <joel@jms.id.au>,
+        Andrew Jeffery <andrew@aj.id.au>, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-aspeed@lists.ozlabs.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] hwrng: Add support for ASPEED RNG
+Message-ID: <20200203103158.GA9276@bogus>
+References: <20200120150113.2565-1-linux@neuralgames.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200120150113.2565-1-linux@neuralgames.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The JR loses its configuration during suspend-to-RAM (at least on
-i.MX6UL). Re-initialize the hardware on resume.
+On Mon, Jan 20, 2020 at 03:01:08PM +0000, Oscar A Perez wrote:
+> This minimal driver adds support for the Hardware Random Number Generator
+> that comes with the AST2400/AST2500/AST2600 SOCs from AspeedTech.
 
-Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
----
+This patch is not a driver. 'dt-bindings: rng: ...' for the subject. 
+(Plus, 2 patches with the same subject is never a good idea.)
 
-I've come across the issue that the CAAM would not work anymore after
-deep sleep on i.MX6UL. It turned out that the CAAM loses its state
-during suspend-to-RAM, so all registers read as zero and need to be
-reinitialized.
+> 
+> The HRNG on these SOCs uses Ring Oscillators working together to generate
+> a stream of random bits that can be read by the platform via a 32bit data
+> register.
+> 
+> Signed-off-by: Oscar A Perez <linux@neuralgames.com>
+> ---
+>  .../devicetree/bindings/rng/aspeed-rng.yaml   | 90 +++++++++++++++++++
+>  1 file changed, 90 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/rng/aspeed-rng.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/rng/aspeed-rng.yaml b/Documentation/devicetree/bindings/rng/aspeed-rng.yaml
+> new file mode 100644
+> index 000000000000..06070ebe1c33
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/rng/aspeed-rng.yaml
+> @@ -0,0 +1,90 @@
+> +# SPDX-License-Identifier: GPL-2.0
 
-This patch is my first attempt at fixing the issue. It seems to work
-well enough, but I assume I'm missing some synchronization to prevent
-that some CAAM operation is currently under way when the suspend
-happens? I don't know the PM and crypto subsystems well enough to judge
-if this is possible, and if it is, how to prevent it.
+Dual license new bindings:
 
-I've only compile-tested this version of the patch, as I had to port it
-from our board kernel, which is based on the heavily-modified NXP branch.
+(GPL-2.0-only OR BSD-2-Clause)
 
+> +%YAML 1.2
+> +---
+> +$id: "http://devicetree.org/schemas/rng/aspeed-rng.yaml#"
+> +$schema: "http://devicetree.org/meta-schemas/core.yaml#"
+> +
+> +
+> +title: Bindings for Aspeed Hardware Random Number Generator
+> +
+> +
+> +maintainers:
+> +  - Oscar A Perez <linux@neuralgames.com>
+> +
+> +
+> +description: |
+> +  The HRNG on the AST2400/AST2500/AST2600 SOCs from AspeedTech  uses four Ring
+> +  Oscillators working together to generate a stream of random bits that can be
+> +  read by the platform via a 32bit data register every one microsecond.
+> +  All the platform has to do is to provide to the driver the 'quality' entropy
+> +  value, the  'mode' in which the combining  ROs will generate the  stream  of
+> +  random bits and, the 'period' value that is used as a wait-time between reads
+> +  from the 32bit data register.
+> +
+> +
+> +properties:
+> +  compatible:
+> +    oneOf:
+> +      - items:
+> +          - enum:
+> +              - aspeed,ast2400-rng
+> +              - aspeed,ast2500-rng
+> +              - aspeed,ast2600-rng
 
- drivers/crypto/caam/intern.h |  3 ++
- drivers/crypto/caam/jr.c     | 62 +++++++++++++++++++++++++-----------
- 2 files changed, 46 insertions(+), 19 deletions(-)
+Just:
 
-diff --git a/drivers/crypto/caam/intern.h b/drivers/crypto/caam/intern.h
-index c7c10c90464b..5d2e9091d5c2 100644
---- a/drivers/crypto/caam/intern.h
-+++ b/drivers/crypto/caam/intern.h
-@@ -47,6 +47,9 @@ struct caam_drv_private_jr {
- 	struct tasklet_struct irqtask;
- 	int irq;			/* One per queue */
- 
-+	dma_addr_t inpbusaddr;
-+	dma_addr_t outbusaddr;
-+
- 	/* Number of scatterlist crypt transforms active on the JobR */
- 	atomic_t tfm_count ____cacheline_aligned;
- 
-diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
-index fc97cde27059..2dabf5fd7818 100644
---- a/drivers/crypto/caam/jr.c
-+++ b/drivers/crypto/caam/jr.c
-@@ -418,13 +418,31 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
- }
- EXPORT_SYMBOL(caam_jr_enqueue);
- 
-+static void caam_jr_setup_rings(struct caam_drv_private_jr *jrp)
-+{
-+	jrp->out_ring_read_index = 0;
-+	jrp->head = 0;
-+	jrp->tail = 0;
-+
-+	wr_reg64(&jrp->rregs->inpring_base, jrp->inpbusaddr);
-+	wr_reg64(&jrp->rregs->outring_base, jrp->outbusaddr);
-+	wr_reg32(&jrp->rregs->inpring_size, JOBR_DEPTH);
-+	wr_reg32(&jrp->rregs->outring_size, JOBR_DEPTH);
-+
-+	jrp->inpring_avail = JOBR_DEPTH;
-+
-+	/* Select interrupt coalescing parameters */
-+	clrsetbits_32(&jrp->rregs->rconfig_lo, 0, JOBR_INTC |
-+		      (JOBR_INTC_COUNT_THLD << JRCFG_ICDCT_SHIFT) |
-+		      (JOBR_INTC_TIME_THLD << JRCFG_ICTT_SHIFT));
-+}
-+
- /*
-  * Init JobR independent of platform property detection
-  */
- static int caam_jr_init(struct device *dev)
- {
- 	struct caam_drv_private_jr *jrp;
--	dma_addr_t inpbusaddr, outbusaddr;
- 	int i, error;
- 
- 	jrp = dev_get_drvdata(dev);
-@@ -434,13 +452,13 @@ static int caam_jr_init(struct device *dev)
- 		return error;
- 
- 	jrp->inpring = dmam_alloc_coherent(dev, SIZEOF_JR_INPENTRY *
--					   JOBR_DEPTH, &inpbusaddr,
-+					   JOBR_DEPTH, &jrp->inpbusaddr,
- 					   GFP_KERNEL);
- 	if (!jrp->inpring)
- 		return -ENOMEM;
- 
- 	jrp->outring = dmam_alloc_coherent(dev, SIZEOF_JR_OUTENTRY *
--					   JOBR_DEPTH, &outbusaddr,
-+					   JOBR_DEPTH, &jrp->outbusaddr,
- 					   GFP_KERNEL);
- 	if (!jrp->outring)
- 		return -ENOMEM;
-@@ -453,24 +471,9 @@ static int caam_jr_init(struct device *dev)
- 	for (i = 0; i < JOBR_DEPTH; i++)
- 		jrp->entinfo[i].desc_addr_dma = !0;
- 
--	/* Setup rings */
--	jrp->out_ring_read_index = 0;
--	jrp->head = 0;
--	jrp->tail = 0;
--
--	wr_reg64(&jrp->rregs->inpring_base, inpbusaddr);
--	wr_reg64(&jrp->rregs->outring_base, outbusaddr);
--	wr_reg32(&jrp->rregs->inpring_size, JOBR_DEPTH);
--	wr_reg32(&jrp->rregs->outring_size, JOBR_DEPTH);
--
--	jrp->inpring_avail = JOBR_DEPTH;
--
- 	spin_lock_init(&jrp->inplock);
- 
--	/* Select interrupt coalescing parameters */
--	clrsetbits_32(&jrp->rregs->rconfig_lo, 0, JOBR_INTC |
--		      (JOBR_INTC_COUNT_THLD << JRCFG_ICDCT_SHIFT) |
--		      (JOBR_INTC_TIME_THLD << JRCFG_ICTT_SHIFT));
-+	caam_jr_setup_rings(jrp);
- 
- 	tasklet_init(&jrp->irqtask, caam_jr_dequeue, (unsigned long)dev);
- 
-@@ -486,6 +489,20 @@ static int caam_jr_init(struct device *dev)
- 	return error;
- }
- 
-+static int caam_jr_reinit(struct device *dev)
-+{
-+	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
-+	int error;
-+
-+	error = caam_reset_hw_jr(dev);
-+	if (error)
-+		return error;
-+
-+	caam_jr_setup_rings(jrp);
-+
-+	return 0;
-+}
-+
- static void caam_jr_irq_dispose_mapping(void *data)
- {
- 	irq_dispose_mapping((unsigned long)data);
-@@ -578,10 +595,17 @@ static const struct of_device_id caam_jr_match[] = {
- };
- MODULE_DEVICE_TABLE(of, caam_jr_match);
- 
-+#ifdef CONFIG_PM
-+static SIMPLE_DEV_PM_OPS(caam_jr_pm_ops, caam_reset_hw_jr, caam_jr_reinit);
-+#endif
-+
- static struct platform_driver caam_jr_driver = {
- 	.driver = {
- 		.name = "caam_jr",
- 		.of_match_table = caam_jr_match,
-+#ifdef CONFIG_PM
-+		.pm = &caam_jr_pm_ops,
-+#endif
- 	},
- 	.probe       = caam_jr_probe,
- 	.remove      = caam_jr_remove,
--- 
-2.17.1
+compatible:
+  enum: ...
 
+> +
+> +
+> +  reg:
+> +    description:
+> +      Base address and length of the register set of this block.
+
+Drop. That's *every* 'reg' property.
+
+> +      Currently 'reg' must be eight bytes wide and 32-bit aligned.
+
+Currently? Is that going to change? Are things going to break if the DT 
+has a bigger size?
+
+> +
+> +    maxItems: 1
+> +
+> +
+> +  period:
+
+Needs a vendor prefix and unit suffix.
+
+> +    description:
+> +      Wait time in microseconds to be used between reads.
+> +      The RNG on these Aspeed SOCs generates 32bit of random data
+> +      every one microsecond. Choose between 1 and n microseconds.
+
+Why would you pick something more than 1?
+
+> +
+> +    maxItems: 1
+> +
+> +
+> +  mode:
+
+Needs a vendor prefix and a type reference.
+
+> +    description:
+> +      One of the eight modes in which the four internal ROs (Ring
+> +      Oscillators)  are combined to generate a stream  of random
+> +      bits. The default mode is seven which is the default method
+> +      of combining RO random bits on these Aspeed SOCs.
+> +
+> +    maxItems: 1
+> +
+> +
+> +  quality:
+
+Needs a vendor prefix and a type reference.
+
+> +    description:
+> +      Estimated number of bits of entropy per 1024 bits read from
+> +      the RNG.  Note that the default quality is zero which stops
+> +      this HRNG from automatically filling the kernel's entropy
+> +      pool with data.
+> +
+> +    maxItems: 1
+> +
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - period
+> +  - quality
+> +
+> +
+> +examples:
+> +  - |
+> +    rng: hwrng@1e6e2074 {
+
+rng@...
+
+> +         compatible = "aspeed,ast2500-rng";
+> +         reg = <0x1e6e2074 0x8>;
+> +         period = <4>;
+> +         quality = <128>;
+> +         mode = <0x7>;
+> +    };
+> +
+> +
+> +...
+> -- 
+> 2.17.1
+> 
+> 
+> _______________________________________________
+> linux-arm-kernel mailing list
+> linux-arm-kernel@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
