@@ -2,47 +2,69 @@ Return-Path: <SRS0=nOCY=3X=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AD66C3524D
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Feb 2020 09:55:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8418AC33CAC
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Feb 2020 10:11:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1B9262070A
-	for <linux-crypto@archiver.kernel.org>; Mon,  3 Feb 2020 09:55:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 56D8E20658
+	for <linux-crypto@archiver.kernel.org>; Mon,  3 Feb 2020 10:11:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gNXtJhDN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727097AbgBCJzI (ORCPT
+        id S1727566AbgBCKLV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 3 Feb 2020 04:55:08 -0500
-Received: from mout.kundenserver.de ([212.227.126.134]:58209 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726287AbgBCJzI (ORCPT
+        Mon, 3 Feb 2020 05:11:21 -0500
+Received: from mail-pj1-f66.google.com ([209.85.216.66]:52922 "EHLO
+        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727308AbgBCKLV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 3 Feb 2020 04:55:08 -0500
-Received: from mail-qt1-f177.google.com ([209.85.160.177]) by
- mrelayeu.kundenserver.de (mreue012 [212.227.15.129]) with ESMTPSA (Nemesis)
- id 1MYcy3-1j22n30H0l-00Ve4V; Mon, 03 Feb 2020 10:55:06 +0100
-Received: by mail-qt1-f177.google.com with SMTP id v25so10922209qto.7;
-        Mon, 03 Feb 2020 01:55:05 -0800 (PST)
-X-Gm-Message-State: APjAAAXayw9ab16LOK21AgEd0lxUsYho5mtNcu66Wi0RkBaatjsfQjZJ
-        QJ+pGyM0AwC1hJF8xieNXBnvnGjm4/ySOsWfVVA=
-X-Google-Smtp-Source: APXvYqy6+v9jhWwlyFzCmvPj6FYnUGsrTB9Nh92b9LW7+F8pu5Zr3Tk51OmqHmojYKDT3Q6CDxzqbjHbal9X0W6ejfg=
-X-Received: by 2002:ac8:34b2:: with SMTP id w47mr22353154qtb.142.1580723704779;
- Mon, 03 Feb 2020 01:55:04 -0800 (PST)
+        Mon, 3 Feb 2020 05:11:21 -0500
+Received: by mail-pj1-f66.google.com with SMTP id ep11so6105811pjb.2;
+        Mon, 03 Feb 2020 02:11:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=4dC5vZjnr8IWvufmlwLWuCfxRjV7yLvgDjVS1/z103Q=;
+        b=gNXtJhDNv08S4fJzniL6YYfHrPochu1S78UL6QYeJlnVpLV0vinCkGwH8B/gzyBZO5
+         QauncyeOmUrcZWzAcCxAxLmhc+gz/CJG3ii4UPaf55f6uCqNr4pFmaksaV/qOlR3mG2X
+         V5kfb6rS7WifHScLmVAKmVI3NqpIEADkgfjFxcaXCT784raeWl5jM2OFkuc9N3csCDxd
+         e4ywrFJnDdI8XhyHGMYiYFtUg0ZzdEGFKR5eiX8k2IFDiYwmTI/9rcDJvLCrv7KdfnyB
+         rdmCRsu/g7OQNvg7OSJHJfxbeRLnDKswIwnDFBgK8cRlJvSQhCNIk5iI7xrHex0RwEkp
+         GEHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=4dC5vZjnr8IWvufmlwLWuCfxRjV7yLvgDjVS1/z103Q=;
+        b=RB433vD2Av/bjgcjNrA9hohzgzsELN7eGT75BVeeEanEU2qXmPVb9tig0z+l6IvIq5
+         KhsbLVn/r9+PMaexCso1bIBs/NtqqzM0BuIFu7+Ty7duAyz5SgxK6oMZpmVtnDv81GQE
+         oQmEfIUimYPlmDkcp64Cbq4QF09CsTokxiGqMvOjjGw1iBvRKm851aPlENVAKnFn2AQm
+         MWp4Ghr1tHPv2i/zk6T25s5hQ0WqYxeNlFGhyCzCosk+G7pb4UozpGoZ65Mam5Bla+yg
+         k263PHx1a5uJXCZtzB10TlMNE6u6yiwnxRTu2kWywFL6Rb+OQS2JmiJzNKIoR7V+j5v1
+         /Rcw==
+X-Gm-Message-State: APjAAAW83r6a4WGqTaIrSe1e7YHeIdwyAvD2Xu8LyIgEKdw2eW4R5DXC
+        01msxfnwcRefKgHjUl4heWsBu+85/BFeydWdlBU=
+X-Google-Smtp-Source: APXvYqwvSk3kyzFEkF16zgVr87wi9kTgBo74pIIZQvaZ95Y0VScXP+UxOQwValhzbgbSNpxG+b6SSg+VgL3Dcl7uSbE=
+X-Received: by 2002:a17:90b:3109:: with SMTP id gc9mr28494608pjb.30.1580724681048;
+ Mon, 03 Feb 2020 02:11:21 -0800 (PST)
 MIME-Version: 1.0
-References: <1580650021-8578-1-git-send-email-hadar.gat@arm.com>
-In-Reply-To: <1580650021-8578-1-git-send-email-hadar.gat@arm.com>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Mon, 3 Feb 2020 10:54:48 +0100
-X-Gmail-Original-Message-ID: <CAK8P3a3C7hfCQwupKQqtnOmwu7faoeKH9fcEZFQW3WmrScKzUw@mail.gmail.com>
-Message-ID: <CAK8P3a3C7hfCQwupKQqtnOmwu7faoeKH9fcEZFQW3WmrScKzUw@mail.gmail.com>
-Subject: Re: [PATCH v2 0/3] hw_random: introduce Arm CryptoCell TRNG driver
+References: <1580650021-8578-1-git-send-email-hadar.gat@arm.com> <1580650021-8578-4-git-send-email-hadar.gat@arm.com>
+In-Reply-To: <1580650021-8578-4-git-send-email-hadar.gat@arm.com>
+From:   Andy Shevchenko <andy.shevchenko@gmail.com>
+Date:   Mon, 3 Feb 2020 12:11:13 +0200
+Message-ID: <CAHp75Vd4VYJD9kSgMU+iKOC5FOarPtMG4eG3Jbnf7OeebWuC7w@mail.gmail.com>
+Subject: Re: [PATCH v2 3/3] MAINTAINERS: add HG as cctrng maintainer
 To:     Hadar Gat <hadar.gat@arm.com>
 Cc:     Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Rob Herring <robh+dt@kernel.org>,
         Mark Rutland <mark.rutland@arm.com>,
+        Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Krzysztof Kozlowski <krzk@kernel.org>,
         Daniel Thompson <daniel.thompson@linaro.org>,
@@ -54,61 +76,33 @@ Cc:     Matt Mackall <mpm@selenic.com>,
         Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
         Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>, DTML <devicetree@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        linux-crypto <linux-crypto@vger.kernel.org>,
+        devicetree <devicetree@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Gilad Ben-Yossef <gilad@benyossef.com>,
         Ofir Drang <ofir.drang@arm.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Provags-ID: V03:K1:2kNRGSn8mD8fztnzDOZ4453fdsXLWQVkYcjEjq19+MXcTDRlRfj
- 6RSPW498pqvA7nX0QvVkzWk3sr+bXKJYLoNs0v87JN8Ddt7ttxoezyhxhpApv9GAE7t4Z52
- P+E+sAJLWrSWP9DU+l0oCpBrzlSrYfdrS9jrJZ85W1akTi+QgK6n+bLQx7kttk2hNoYKaB0
- 7XFgF38IfZMnKhTXPQvkA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:bQNM/1/Sv1U=:WDiBf8dOswSkZBYWYJwh7W
- gSduKWT7O6TkmOG+fNudlBbUEjr3XaYonkGCH6QNqKzFP61KcSu3ibwkrv5yjZr52yz1HLkfK
- b6zZ0BtcZdZC+h920iAIQsvvqrm9NQadFhOZxOStPonyEGbL1XoIlW/yruAkpTMCExmngxbJ7
- OWqC0c1pji+LAaRQPoCzooHW2Uy61EBGzh8KkIysuffI0eX1R6KDzwJOhi32zQf+LikAhUXmK
- BrLFsowxuAwlllqkMRXH05lCfRf0ka/3RtwymwfG9xH4Yv1cGfxPauPhxy7zynrrCHjWJyXdU
- aKMyvh1BVoBz277kZdRGQ9TUqP+LZKKea8vRnQt1W5E8MpdrRBQqLSX/xRjiHQakA+T3F5mqm
- bmOtjNpjDmqEuNwDhSnwTWrvqbtA6+DW5iSSVhATQbOnY68e+tDML5OL/kR+Y3k0p0GrBYk8U
- WAcas9OvZOLDC1oZbL/sld8zlWRIrO0Q7vPze+I+HOxy1OVj4ISJ3Do9c6v5WhQ6Nnm7RMa6u
- KMvYfBh6uYok/iVAuw7/AhSoaF8LSO7T4t+EaS1YX/VWKm1YeL86sRRqg/9C47nB/V0p8NKai
- jNmVDSxoZa3jwPRNlTVfa3L6RYxf+HT984Xpu4krfD5NXD4SVpMPwr3J0LwmcJHWii2WOe3es
- JiL7oOScaO3txbhhXIxx98Q4E+F/SYQZH5Ld4e5EehecJwk8eMCC3ojqixwPJjmcjrvTDUCQb
- Ucr+i6QBdpaqmprBPDsscYxfK6iydjD49heFYXfhGtUeWzz4lh4G43+R2TFdJc+c1ESXPivHl
- TBd1rI7GdfnUFPJslXFUEAIh86eMx68uCqODBn0E75ZEwF6vlY=
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Feb 2, 2020 at 2:27 PM Hadar Gat <hadar.gat@arm.com> wrote:
+On Sun, Feb 2, 2020 at 3:29 PM Hadar Gat <hadar.gat@arm.com> wrote:
 >
-> The Arm CryptoCell is a hardware security engine.
-> This patch introduces driver for its TRNG (True Random Number Generator)
-> engine.
->
-> Changes from previous veriosn: fixed 'make dt_bnding_check' errors.
->
-> Hadar Gat (3):
->   dt-bindings: add device tree binding for Arm CryptoCell trng engine
->   hw_random: cctrng: introduce Arm CryptoCell driver
->   MAINTAINERS: add HG as cctrng maintainer
+> I work for Arm on maintaining the TrustZone CryptoCell TRNG driver.
 
-I looked at the patches briefly and everything makes sense to me,
+> +CCTRNG ARM TRUSTZONE CRYPTOCELL TRUE RANDOM NUMBER GENERATOR (TRNG) DRIVER
+> +M:     Hadar Gat <hadar.gat@arm.com>
+> +L:     linux-crypto@vger.kernel.org
+> +S:     Supported
+> +F:     drivers/char/hw_random/cctrng.c
+> +F:     drivers/char/hw_random/cctrng.h
+> +F:     Documentation/devicetree/bindings/rng/arm-cctrng.txt
+> +W:     https://developer.arm.com/products/system-ip/trustzone-cryptocell/cryptocell-700-family
+> +
 
-Acked-by: Arnd Bergmann <arnd@arndb.de>
+Had you run parse-maintainers.pl afterwards to be sure everything is okay?
 
-There are two style issues that you could improve:
-
-- The header is only included from a single file, so I would just fold
-  its contents into the driver itself.
-
-- You have a lot of "#ifdef CONFIG_PM" that are easy to get wrong
-  with various combinations of config symbols. It's often better to
-  leave that all compiled unconditionally and have the logic in
-  UNIVERSAL_DEV_PM_OPS() take care of dropping the unused
-  bits, with a __maybe_unused annotation on functions that cause
-  a warning otherwise.
-
-       Arnd
+-- 
+With Best Regards,
+Andy Shevchenko
