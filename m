@@ -6,77 +6,69 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E241C35254
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Feb 2020 14:00:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7483C35254
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Feb 2020 14:07:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3AC4E2082E
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Feb 2020 14:00:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C3643217BA
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Feb 2020 14:07:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726575AbgBEOAR (ORCPT
+        id S1726597AbgBEOHT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 5 Feb 2020 09:00:17 -0500
-Received: from metis.ext.pengutronix.de ([85.220.165.71]:46745 "EHLO
-        metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727162AbgBEOAR (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Feb 2020 09:00:17 -0500
-Received: from pty.hi.pengutronix.de ([2001:67c:670:100:1d::c5])
-        by metis.ext.pengutronix.de with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1izLDt-0004pI-U4; Wed, 05 Feb 2020 15:00:09 +0100
-Received: from ukl by pty.hi.pengutronix.de with local (Exim 4.89)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1izLDq-0001oe-7L; Wed, 05 Feb 2020 15:00:06 +0100
-From:   =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-To:     Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     kernel@pengutronix.de, NXP Linux Team <linux-imx@nxp.com>,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH] hwrng: imx-rngc: improve dependencies
-Date:   Wed,  5 Feb 2020 15:00:02 +0100
-Message-Id: <20200205140002.26273-1-u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.24.0
+        Wed, 5 Feb 2020 09:07:19 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:55946 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726575AbgBEOHT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 5 Feb 2020 09:07:19 -0500
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id C70FF382BE53C4C5180A;
+        Wed,  5 Feb 2020 22:07:16 +0800 (CST)
+Received: from localhost.localdomain.localdomain (10.175.113.25) by
+ DGGEMS409-HUB.china.huawei.com (10.3.19.209) with Microsoft SMTP Server id
+ 14.3.439.0; Wed, 5 Feb 2020 22:07:09 +0800
+From:   Chen Zhou <chenzhou10@huawei.com>
+To:     <clabbe.montjoie@gmail.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>, <mripard@kernel.org>, <wens@csie.org>
+CC:     <linux-crypto@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>, <chenzhou10@huawei.com>
+Subject: [PATCH -next] crypto: allwinner - remove redundant platform_get_irq error message
+Date:   Wed, 5 Feb 2020 22:01:30 +0800
+Message-ID: <20200205140130.164805-1-chenzhou10@huawei.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c5
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.113.25]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The imx-rngc driver binds to devices that are compatible to
-"fsl,imx25-rngb". Grepping through the device tree sources suggests this
-only exists on i.MX25. So restrict dependencies to configs that have
-this SoC enabled, but allow compile testing. For the latter additional
-dependencies for clk and readl/writel are necessary.
+Function dev_err() after platform_get_irq() is redundant because
+platform_get_irq() already prints an error.
 
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+Signed-off-by: Chen Zhou <chenzhou10@huawei.com>
 ---
- drivers/char/hw_random/Kconfig | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-index 8486c29d8324..17fe954fccde 100644
---- a/drivers/char/hw_random/Kconfig
-+++ b/drivers/char/hw_random/Kconfig
-@@ -244,7 +244,8 @@ config HW_RANDOM_MXC_RNGA
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
+index f72346a..3e4e4bb 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
+@@ -565,10 +565,8 @@ static int sun8i_ce_probe(struct platform_device *pdev)
  
- config HW_RANDOM_IMX_RNGC
- 	tristate "Freescale i.MX RNGC Random Number Generator"
--	depends on ARCH_MXC
-+	depends on HAS_IOMEM && HAVE_CLK
-+	depends on SOC_IMX25 || COMPILE_TEST
- 	default HW_RANDOM
- 	---help---
- 	  This driver provides kernel-side support for the Random Number
+ 	/* Get Non Secure IRQ */
+ 	irq = platform_get_irq(pdev, 0);
+-	if (irq < 0) {
+-		dev_err(ce->dev, "Cannot get CryptoEngine Non-secure IRQ\n");
++	if (irq < 0)
+ 		return irq;
+-	}
+ 
+ 	ce->reset = devm_reset_control_get(&pdev->dev, NULL);
+ 	if (IS_ERR(ce->reset)) {
 -- 
-2.24.0
+2.7.4
 
