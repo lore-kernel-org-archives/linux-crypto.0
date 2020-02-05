@@ -4,73 +4,59 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E07C1C35249
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Feb 2020 05:19:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A297C35249
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Feb 2020 07:25:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9C65F217BA
-	for <linux-crypto@archiver.kernel.org>; Wed,  5 Feb 2020 05:19:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5F4EC2085B
+	for <linux-crypto@archiver.kernel.org>; Wed,  5 Feb 2020 07:25:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725913AbgBEFTk (ORCPT
+        id S1725793AbgBEHZ0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 5 Feb 2020 00:19:40 -0500
-Received: from stargate.chelsio.com ([12.32.117.8]:19113 "EHLO
-        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725385AbgBEFTk (ORCPT
+        Wed, 5 Feb 2020 02:25:26 -0500
+Received: from out30-56.freemail.mail.aliyun.com ([115.124.30.56]:48041 "EHLO
+        out30-56.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1725468AbgBEHZ0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 5 Feb 2020 00:19:40 -0500
-Received: from chumthang.blr.asicdesigners.com (chumthang.blr.asicdesigners.com [10.193.186.96])
-        by stargate.chelsio.com (8.13.8/8.13.8) with ESMTP id 0155J7iT019895;
-        Tue, 4 Feb 2020 21:19:34 -0800
-From:   Ayush Sawal <ayush.sawal@chelsio.com>
-To:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org
-Cc:     manojmalviya@chelsio.com, Ayush Sawal <ayush.sawal@chelsio.com>
-Subject: [PATCH crypto/chcr 2/2] This fixes the kernel panic which occurs during a libkcapi test
-Date:   Wed,  5 Feb 2020 10:48:42 +0530
-Message-Id: <20200205051842.29324-3-ayush.sawal@chelsio.com>
-X-Mailer: git-send-email 2.25.0.114.g5b0ca87
-In-Reply-To: <20200205051842.29324-1-ayush.sawal@chelsio.com>
-References: <20200205051842.29324-1-ayush.sawal@chelsio.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Wed, 5 Feb 2020 02:25:26 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R601e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e07488;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0TpBaC5u_1580887523;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0TpBaC5u_1580887523)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Wed, 05 Feb 2020 15:25:24 +0800
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] crypto: proc - simplify the c_show function
+Date:   Wed,  5 Feb 2020 15:25:23 +0800
+Message-Id: <20200205072523.40176-1-tianjia.zhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The libkcapi test which causes kernel panic is
-aead asynchronous vmsplice multiple test.
+The path with the CRYPTO_ALG_LARVAL flag has jumped to the end before
 
-./bin/kcapi  -v -d 4 -x 10   -c "ccm(aes)"
--q 4edb58e8d5eb6bc711c43a6f3693daebde2e5524f1b55297abb29f003236e43d
--t a7877c99 -n 674742abd0f5ba -k 2861fd0253705d7875c95ba8a53171b4
--a fb7bc304a3909e66e2e0c5ef952712dd884ce3e7324171369f2c5db1adc48c7d
-
-This patch avoids dma_mapping of a zero length sg which causes the panic,
-by using sg_nents_for_len which maps only upto a specific length
-
-Signed-off-by: Ayush Sawal <ayush.sawal@chelsio.com>
+Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 ---
- drivers/crypto/chelsio/chcr_algo.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ crypto/proc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index 699e3053895a..02b0ddb785a4 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -2489,8 +2489,9 @@ int chcr_aead_dma_map(struct device *dev,
- 	else
- 		reqctx->b0_dma = 0;
- 	if (req->src == req->dst) {
--		error = dma_map_sg(dev, req->src, sg_nents(req->src),
--				   DMA_BIDIRECTIONAL);
-+		error = dma_map_sg(dev, req->src,
-+				sg_nents_for_len(req->src, dst_size),
-+					DMA_BIDIRECTIONAL);
- 		if (!error)
- 			goto err;
- 	} else {
+diff --git a/crypto/proc.c b/crypto/proc.c
+index 7b91557adccb..08d8c2bc7e62 100644
+--- a/crypto/proc.c
++++ b/crypto/proc.c
+@@ -60,7 +60,7 @@ static int c_show(struct seq_file *m, void *p)
+ 		goto out;
+ 	}
+ 	
+-	switch (alg->cra_flags & (CRYPTO_ALG_TYPE_MASK | CRYPTO_ALG_LARVAL)) {
++	switch (alg->cra_flags & CRYPTO_ALG_TYPE_MASK) {
+ 	case CRYPTO_ALG_TYPE_CIPHER:
+ 		seq_printf(m, "type         : cipher\n");
+ 		seq_printf(m, "blocksize    : %u\n", alg->cra_blocksize);
 -- 
-2.25.0.114.g5b0ca87
+2.17.1
 
