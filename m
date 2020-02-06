@@ -2,73 +2,46 @@ Return-Path: <SRS0=xlEn=32=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9719CC2D0B1
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Feb 2020 11:41:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 499B4C352A2
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Feb 2020 11:42:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6D86720661
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Feb 2020 11:41:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16D1520661
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Feb 2020 11:42:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uMw7orJq"
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="gVIA+J/d"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727653AbgBFLla (ORCPT
+        id S1727415AbgBFLmn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Feb 2020 06:41:30 -0500
-Received: from mail-qk1-f196.google.com ([209.85.222.196]:33527 "EHLO
-        mail-qk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727415AbgBFLl3 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Feb 2020 06:41:29 -0500
-Received: by mail-qk1-f196.google.com with SMTP id h4so5210652qkm.0
-        for <linux-crypto@vger.kernel.org>; Thu, 06 Feb 2020 03:41:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=qu7ooKR6DgewFpJKq46pIZD5BtoS5iVf4kRfIooEK68=;
-        b=uMw7orJqxVfVoqrcXx0BZGUZ+WbJ8MWHwzr0LEbX7sRPEToqOismvLQvjvzsPRm6EV
-         relXJWugDDne+z2RIgHhAQI0s96cxg1lsaBrNuWvBSRVXzcGichpSfNVFYauMBCPhqK6
-         41htdGPLxqm3x97QXsT+dFMP0zOvFaZfsm5dvQ1aa6qn1vrLlGddLTcDxomHkYMr+s6f
-         bQYbe/X6kVMxLq0BQaKbX7RfZRxXoT3dEpgu0uv38wnliCbLMdP4q66enJq6MygWKUoB
-         QYgmXbGAXtUN3dgQbcvrCQdBuo2vEjvSOyHToDDESClEa0HLKhYwe29L0nYL2D8OoLAa
-         HX/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=qu7ooKR6DgewFpJKq46pIZD5BtoS5iVf4kRfIooEK68=;
-        b=EFeOgveBJHG0Uw8stMaIFUcxk9uLzM4v31+GN6UOxr68IeWTA7rYupq1VxqudfI0jk
-         H+CjMKSijI89cdcWRNiNtlyRz6gdl4pcHTi7dKunWLBp1dA8pEjrPppnjJDlFErJ89XE
-         c+e8OvB7iQ5mZgZuJmY7rFalPy0LagKnz2jPnNmbU0PdXXvIyfCCcWr8pXzEEnVmngOq
-         +qRN5f4CgLqTpC+JwCv1Aym6gRsot8ZBPGLVW6oi5z9gqKYqL28KNcYVo0+qNHB2OAcy
-         4qQV7xFy1yTJjMAbYTE7oj1xzlY+mMoGfqMVLWN71oTud47URT7pPVtEZVeU9ZBU8C2I
-         QGBQ==
-X-Gm-Message-State: APjAAAWIZpgpJg1slTYiTTFbHU2fArWVly4BEDSkuj0OdiEAEonb5KZ/
-        qO1qitwqNqBU/UQvUg7yr09k5JWs
-X-Google-Smtp-Source: APXvYqz2djPdV8c6dNH56nUw3S8TWpzDUui5mnIAp7hN7MlCw7kq9F9soVW/CYW7HEv5Pifr2q0S3g==
-X-Received: by 2002:a05:620a:210b:: with SMTP id l11mr2014170qkl.69.1580989288654;
-        Thu, 06 Feb 2020 03:41:28 -0800 (PST)
-Received: from gateway.troianet.com.br ([2804:688:21:4::2])
-        by smtp.gmail.com with ESMTPSA id g37sm1507283qte.60.2020.02.06.03.41.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Feb 2020 03:41:28 -0800 (PST)
-From:   Eneas U de Queiroz <cotequeiroz@gmail.com>
-To:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     Ard Biesheuvel <ardb@kernel.org>,
-        Eneas U de Queiroz <cotequeiroz@gmail.com>
-Subject: [PATCH v3 3/3] crypto: qce - handle AES-XTS cases that qce fails
-Date:   Thu,  6 Feb 2020 08:39:47 -0300
-Message-Id: <20200206113947.31396-4-cotequeiroz@gmail.com>
-X-Mailer: git-send-email 2.23.0
-In-Reply-To: <20200206012036.25614-1-cotequeiroz@gmail.com>
-References: <20200206012036.25614-1-cotequeiroz@gmail.com>
+        Thu, 6 Feb 2020 06:42:43 -0500
+Received: from frisell.zx2c4.com ([192.95.5.64]:56295 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727111AbgBFLmn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 6 Feb 2020 06:42:43 -0500
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id e4934e92;
+        Thu, 6 Feb 2020 11:41:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=from:to:cc
+        :subject:date:message-id:mime-version:content-transfer-encoding;
+         s=mail; bh=t4Len6Fa4vj2dKk9fEebpyLi4CE=; b=gVIA+J/d6t0WzqD5VlPR
+        4w6WZ87s2rKNhWLtVh+9JdsL0UBtVrBOp/aqteq81+fh0aBD6NAvbvnn9l0HpG2b
+        re8DQv4++vlATlZg/CK7vA8so7svhSkexO8Fxvhr/XBeX4dsjqYmc9pgnFHfyHXY
+        xbt/AQdk7gHgR22e9HZ3IvvAeqUtT36kUjjPBQ812ZqST0nSsDTdWL2+GgiI4D/x
+        7lnuGtM2rRTe5SMKemBlEzGfS4OUDmeKHzFWgCbQjfx/2yWKKLpMsYjrxor15IHh
+        xXp9675M9a8316r3dJU2PDlMGE4HkM/tpVM6ZCe0i+bJHlJNw463S50e4WbzpbFe
+        DQ==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 242809b6 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
+        Thu, 6 Feb 2020 11:41:36 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Ard Biesheuvel <ardb@kernel.org>, stable@vger.kernel.org
+Subject: [PATCH stable] crypto: chacha20poly1305 - prevent integer overflow on large input
+Date:   Thu,  6 Feb 2020 12:42:01 +0100
+Message-Id: <20200206114201.25438-1-Jason@zx2c4.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
@@ -76,56 +49,37 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-QCE hangs when presented with an AES-XTS request whose length is larger
-than QCE_SECTOR_SIZE (512-bytes), and is not a multiple of it.  Let the
-fallback cipher handle them.
+This code assigns src_len (size_t) to sl (int), which causes problems
+when src_len is very large. Probably nobody in the kernel should be
+passing this much data to chacha20poly1305 all in one go anyway, so I
+don't think we need to change the algorithm or introduce larger types
+or anything. But we should at least error out early in this case and
+print a warning so that we get reports if this does happen and can look
+into why anybody is possibly passing it that much data or if they're
+accidently passing -1 or similar.
 
-Signed-off-by: Eneas U de Queiroz <cotequeiroz@gmail.com>
+Fixes: d95312a3ccc0 ("crypto: lib/chacha20poly1305 - reimplement crypt_from_sg() routine")
+Cc: Ard Biesheuvel <ardb@kernel.org>
+Cc: stable@vger.kernel.org # 5.5+
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+ lib/crypto/chacha20poly1305.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/crypto/qce/common.c b/drivers/crypto/qce/common.c
-index 629e7f34dc09..5006e74c40cd 100644
---- a/drivers/crypto/qce/common.c
-+++ b/drivers/crypto/qce/common.c
-@@ -15,8 +15,6 @@
- #include "regs-v5.h"
- #include "sha.h"
+diff --git a/lib/crypto/chacha20poly1305.c b/lib/crypto/chacha20poly1305.c
+index 6d83cafebc69..ad0699ce702f 100644
+--- a/lib/crypto/chacha20poly1305.c
++++ b/lib/crypto/chacha20poly1305.c
+@@ -235,6 +235,9 @@ bool chacha20poly1305_crypt_sg_inplace(struct scatterlist *src,
+ 		__le64 lens[2];
+ 	} b __aligned(16);
  
--#define QCE_SECTOR_SIZE		512
--
- static inline u32 qce_read(struct qce_device *qce, u32 offset)
- {
- 	return readl(qce->base + offset);
-diff --git a/drivers/crypto/qce/common.h b/drivers/crypto/qce/common.h
-index 282d4317470d..9f989cba0f1b 100644
---- a/drivers/crypto/qce/common.h
-+++ b/drivers/crypto/qce/common.h
-@@ -12,6 +12,9 @@
- #include <crypto/hash.h>
- #include <crypto/internal/skcipher.h>
- 
-+/* xts du size */
-+#define QCE_SECTOR_SIZE			512
++	if (WARN_ON(src_len > INT_MAX))
++		return false;
 +
- /* key size in bytes */
- #define QCE_SHA_HMAC_KEY_SIZE		64
- #define QCE_MAX_CIPHER_KEY_SIZE		AES_KEYSIZE_256
-diff --git a/drivers/crypto/qce/skcipher.c b/drivers/crypto/qce/skcipher.c
-index a3536495b6b0..377714cea23a 100644
---- a/drivers/crypto/qce/skcipher.c
-+++ b/drivers/crypto/qce/skcipher.c
-@@ -227,9 +227,14 @@ static int qce_skcipher_crypt(struct skcipher_request *req, int encrypt)
- 	rctx->flags |= encrypt ? QCE_ENCRYPT : QCE_DECRYPT;
- 	keylen = IS_XTS(rctx->flags) ? ctx->enc_keylen >> 1 : ctx->enc_keylen;
+ 	chacha_load_key(b.k, key);
  
-+	/* qce is hanging when AES-XTS request len > QCE_SECTOR_SIZE and
-+	 * is not a multiple of it; pass such requests to the fallback
-+	 */
- 	if (IS_AES(rctx->flags) &&
- 	    ((keylen != AES_KEYSIZE_128 && keylen != AES_KEYSIZE_256)
--	     || req->cryptlen <= aes_sw_max_len)) {
-+	     || req->cryptlen <= aes_sw_max_len)
-+	     || (IS_XTS(rctx->flags) && req->cryptlen > QCE_SECTOR_SIZE &&
-+		 req->cryptlen % QCE_SECTOR_SIZE)) {
- 		SYNC_SKCIPHER_REQUEST_ON_STACK(subreq, ctx->fallback);
- 
- 		skcipher_request_set_sync_tfm(subreq, ctx->fallback);
+ 	b.iv[0] = 0;
+-- 
+2.25.0
+
