@@ -2,190 +2,161 @@ Return-Path: <SRS0=xlEn=32=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F7DAC352A3
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Feb 2020 20:47:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31857C35247
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Feb 2020 21:02:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E85DA21775
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Feb 2020 20:47:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1581022033;
-	bh=IKtvLJH3POdpqJGJPZGuuIFX0JHRAm8o5gtj6atoK6o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=vc2klsaspwGoAIaiuvovyD8m2kG35H+SmsFPNeErCI+rgVmP3aOPFcJDXElCdyVaE
-	 8v2JVRh6cnxAbFsWoQtJAwCnap6g3xyX5XlgEVSq1rycY1joySBdFqXe0ku/ffcYxs
-	 ol3gwO2Ixx0FTzvs3efCTLTu1l8VuNK/7jB1ONJU=
+	by mail.kernel.org (Postfix) with ESMTP id F1F3A20720
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Feb 2020 21:02:44 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TyFXP1xH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728036AbgBFUpq (ORCPT
+        id S1727830AbgBFVCo (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Feb 2020 15:45:46 -0500
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:36737 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728030AbgBFUpp (ORCPT
+        Thu, 6 Feb 2020 16:02:44 -0500
+Received: from mail-qk1-f194.google.com ([209.85.222.194]:34254 "EHLO
+        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727711AbgBFVCo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 6 Feb 2020 15:45:45 -0500
-Received: by mail-pl1-f194.google.com with SMTP id a6so43447plm.3;
-        Thu, 06 Feb 2020 12:45:45 -0800 (PST)
+        Thu, 6 Feb 2020 16:02:44 -0500
+Received: by mail-qk1-f194.google.com with SMTP id a23so99670qka.1
+        for <linux-crypto@vger.kernel.org>; Thu, 06 Feb 2020 13:02:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=zI3TjwN7LJ7pqIcCXM6aXOKYuQCzr3fiuSGdPGq37e8=;
+        b=TyFXP1xHv3jLYqPV4bO1WT99KLgwjPOlYgo5Z9fqjFpRTA5bRpWniPpvuYBHlVaUGv
+         8nw9g/Kn4qrpL+gSh1JpiZ2UL0XgRnoLbT7rmeUzgYBAwoZvu3E14j3hO3XUVxSh+3um
+         CqUv9wnhi5XnayQyNX0QEiybTAqUdkU1C82Du+RkaJpER5iXS/ttNvLJrxXMs0p/asum
+         rIlodokl+Y6kwfSIaVMVn3KhZ36FpVByugbvMXeKbnINdMCRNnF8eMYuss5ssGoUK6Lg
+         ubtXBTtxVQvEjfv/KwwslS7FoMpmBLnpzGEPUYo+St7sS53lJt1Xj8Z11UtfubozjLDr
+         Lmfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=CCWnD6/En746LfUHwkqymcGUcnPpptz2DSpQ1Ez5SOo=;
-        b=JbMds/ho9nUpnm8cXEfGvud8BFeLZ9ipAnA4JLFKDUF4BYe3CIWXQOM5gR3m7gzeEA
-         1A+pTXVsEPit3pKuf5RnI5UvsfGEsEbcptcYSaKMsNvMcEs7dcEdc4aVdlQmLHrlXU5C
-         ueP24f3fTKcZQ0juWY+huACagivPU6mR7mL0bjvDiUnyUy6ZOmu4mkTU7UyT5cCQ5SDh
-         rcmQHKvmdqlhtYfxsB+MCOgmqVa6+wRmMm5aWAu3IPxTytIIqjmhbQK9V0j4LM9kL2D0
-         C+Gr0wiwyYJek2DPl5GT89WYFxI7Uo15f8OZ9cjSCfkzB1dBkVA06/5DYVv58ZAQTkka
-         85qA==
-X-Gm-Message-State: APjAAAViT93hNv9dMvBQzcmoLGdPiJogoExPCcAs3nPQhue4p1COiFk/
-        Qbjflp+s1dfXaTma6XGtfA==
-X-Google-Smtp-Source: APXvYqwe1ExZhSMFyKB8on4CDR61XtJcPmp+HJxgSNnoGXk7d9N9LdjNbUm6Le3nrUv0jQvz1qW0Pw==
-X-Received: by 2002:a17:90a:bf0c:: with SMTP id c12mr6380858pjs.112.1581021944891;
-        Thu, 06 Feb 2020 12:45:44 -0800 (PST)
-Received: from rob-hp-laptop (63-158-47-182.dia.static.qwest.net. [63.158.47.182])
-        by smtp.gmail.com with ESMTPSA id c6sm279450pgk.78.2020.02.06.12.45.43
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=zI3TjwN7LJ7pqIcCXM6aXOKYuQCzr3fiuSGdPGq37e8=;
+        b=r0kIZ7vRMGzRUYEOLs+7hOabAtNehf9boY6nHii4YgNNJECrUvcJMmTOCDZpz0vV1m
+         JtJXCOnjNyGu1dRLVFbpMiwcXYz75FOiiu/TAVQcB2fnp5Rmv8zXOcNw2oXlXKVb649I
+         UIUf0XkHvfw0YQANA3jJEixhOw6qlWth6UVX2YPEFolqwNrgRsZAtSDxOBaMaMft5QZH
+         cHYYIaPAMla8CDEWRJ6TJ6gtSMjn59m+FWNCuxsHNDDRi9iJyvGnyq67iYrp36BRjpcQ
+         Sv9rp696qaVHl+dUYf19q5nnnCLxJnROcd5fI64MI5jVdquc8ezD/srp5JrQ2HMdUw3g
+         tkeg==
+X-Gm-Message-State: APjAAAWj/WxqYg7759eFP8kkUZ0tw/6LM986SUn0CSHmLcZGM22NxBMN
+        PPZhIlJ7SGMB/6j8nRmHUmFMFcdk
+X-Google-Smtp-Source: APXvYqwulHmnvP4His6SRhmkvlpxOrzSISTEtDyxEnDwBqEj1+Lg4fgoZzMqE7jXlsDgwtt8I3mZFQ==
+X-Received: by 2002:a37:7cc7:: with SMTP id x190mr4293971qkc.10.1581022962903;
+        Thu, 06 Feb 2020 13:02:42 -0800 (PST)
+Received: from gateway.troianet.com.br (ipv6.troianet.com.br. [2804:688:21:4::2])
+        by smtp.gmail.com with ESMTPSA id o12sm252869qke.79.2020.02.06.13.02.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Feb 2020 12:45:44 -0800 (PST)
-Received: (nullmailer pid 25171 invoked by uid 1000);
-        Thu, 06 Feb 2020 18:56:51 -0000
-Date:   Thu, 6 Feb 2020 18:56:51 +0000
-From:   Rob Herring <robh@kernel.org>
-To:     Hadar Gat <hadar.gat@arm.com>
-Cc:     Matt Mackall <mpm@selenic.com>,
+        Thu, 06 Feb 2020 13:02:42 -0800 (PST)
+From:   Eneas U de Queiroz <cotequeiroz@gmail.com>
+To:     linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Daniel Thompson <daniel.thompson@linaro.org>,
-        Tomer Maimon <tmaimon77@gmail.com>,
-        Stefan Wahren <wahrenst@gmx.net>,
-        Sumit Garg <sumit.garg@linaro.org>,
-        Zaibo Xu <xuzaibo@huawei.com>,
-        Weili Qian <qianweili@huawei.com>,
-        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Ofir Drang <ofir.drang@arm.com>
-Subject: Re: [PATCH v2 1/3] dt-bindings: add device tree binding for Arm
- CryptoCell trng engine
-Message-ID: <20200206185651.GA14044@bogus>
-References: <1580650021-8578-1-git-send-email-hadar.gat@arm.com>
- <1580650021-8578-2-git-send-email-hadar.gat@arm.com>
+        "David S. Miller" <davem@davemloft.net>
+Cc:     Ard Biesheuvel <ardb@kernel.org>,
+        Eneas U de Queiroz <cotequeiroz@gmail.com>
+Subject: [PATCH v4 1/3] crypto: qce - use cryptlen when adding extra sgl
+Date:   Thu,  6 Feb 2020 18:02:05 -0300
+Message-Id: <20200206210207.21849-1-cotequeiroz@gmail.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1580650021-8578-2-git-send-email-hadar.gat@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Feb 02, 2020 at 03:26:59PM +0200, Hadar Gat wrote:
-> The Arm CryptoCell is a hardware security engine. This patch adds DT
-> bindings for its TRNG (True Random Number Generator) engine.
-> 
-> Signed-off-by: Hadar Gat <hadar.gat@arm.com>
-> ---
->  .../devicetree/bindings/rng/arm-cctrng.yaml        | 51 ++++++++++++++++++++++
->  1 file changed, 51 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/rng/arm-cctrng.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/rng/arm-cctrng.yaml b/Documentation/devicetree/bindings/rng/arm-cctrng.yaml
-> new file mode 100644
-> index 0000000..fe9422e
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/rng/arm-cctrng.yaml
-> @@ -0,0 +1,51 @@
-> +# SPDX-License-Identifier: GPL-2.0
+The qce crypto driver appends an extra entry to the dst sgl, to maintain
+private state information.
 
-Dual license new bindings:
+When the gcm driver sends requests to the ctr skcipher, it passes the
+authentication tag after the actual crypto payload, but it must not be
+touched.
 
-(GPL-2.0-only OR BSD-2-Clause)
+Commit 1336c2221bee ("crypto: qce - save a sg table slot for result
+buf") limited the destination sgl to avoid overwriting the
+authentication tag but it assumed the tag would be in a separate sgl
+entry.
 
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/rng/arm-cctrng.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Arm ZrustZone CryptoCell TRNG engine
-> +
-> +maintainers:
-> +  - Hadar Gat <hadar.gat@arm.com>
-> +
-> +description: |+
-> +  Arm ZrustZone CryptoCell TRNG (True Random Number Generator) engine.
-> +
-> +properties:
-> +  compatible:
-> +    description: Should be "arm,cryptocell-7x3-trng"
+This is not always the case, so it is better to limit the length of the
+destination buffer to req->cryptlen before appending the result buf.
 
-Drop. That's what the schema says.
+Signed-off-by: Eneas U de Queiroz <cotequeiroz@gmail.com>
+--
+v1 -> v4: no change
 
-> +    const: arm,cryptocell-7x3-trng
-
-Is 'x' a wildcard? We don't do wildcards unless you have other ways to 
-get the specific version.
-
-> +
-> +  interrupts:
-> +    description: Interrupt number for the device.
-
-Drop. That's all 'interrupts'.
-
-> +    maxItems: 1
-> +
-> +  reg:
-> +    description: Base physical address of the engine and length of memory
-> +                 mapped region.
-
-Drop.
-
-> +    maxItems: 1
-> +
-> +  rosc-ratio:
-> +    description: Sampling ratio values from calibration for 4 ring oscillators.
-> +    maxItems: 1
-
-Is this an array?
-
-Needs a vendor prefix, a type ref and any constraints you can come up 
-with.
+diff --git a/drivers/crypto/qce/dma.c b/drivers/crypto/qce/dma.c
+index 7da893dc00e7..46db5bf366b4 100644
+--- a/drivers/crypto/qce/dma.c
++++ b/drivers/crypto/qce/dma.c
+@@ -48,9 +48,10 @@ void qce_dma_release(struct qce_dma_data *dma)
  
-> +
-> +  clocks:
-> +    description: Reference to the crypto engine clock.
-
-How many clocks?
-
-> +
-> +required:
-> +  - compatible
-> +  - interrupts
-> +  - reg
-> +  - rosc-ratio
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    arm_cctrng: arm_cctrng@60000000 {
-
-rng@...
-
-> +        compatible = "arm,cryptocell-7x3-trng";
-> +        interrupts = <0 29 4>;
-> +        reg = <0x60000000 0x10000>;
-> +        rosc-ratio = <5000 1000 500 0>;
-> +    };
-> -- 
-> 2.7.4
-> 
+ struct scatterlist *
+ qce_sgtable_add(struct sg_table *sgt, struct scatterlist *new_sgl,
+-		int max_ents)
++		unsigned int max_len)
+ {
+ 	struct scatterlist *sg = sgt->sgl, *sg_last = NULL;
++	unsigned int new_len;
+ 
+ 	while (sg) {
+ 		if (!sg_page(sg))
+@@ -61,13 +62,13 @@ qce_sgtable_add(struct sg_table *sgt, struct scatterlist *new_sgl,
+ 	if (!sg)
+ 		return ERR_PTR(-EINVAL);
+ 
+-	while (new_sgl && sg && max_ents) {
+-		sg_set_page(sg, sg_page(new_sgl), new_sgl->length,
+-			    new_sgl->offset);
++	while (new_sgl && sg && max_len) {
++		new_len = new_sgl->length > max_len ? max_len : new_sgl->length;
++		sg_set_page(sg, sg_page(new_sgl), new_len, new_sgl->offset);
+ 		sg_last = sg;
+ 		sg = sg_next(sg);
+ 		new_sgl = sg_next(new_sgl);
+-		max_ents--;
++		max_len -= new_len;
+ 	}
+ 
+ 	return sg_last;
+diff --git a/drivers/crypto/qce/dma.h b/drivers/crypto/qce/dma.h
+index ed25a0d9829e..786402169360 100644
+--- a/drivers/crypto/qce/dma.h
++++ b/drivers/crypto/qce/dma.h
+@@ -43,6 +43,6 @@ void qce_dma_issue_pending(struct qce_dma_data *dma);
+ int qce_dma_terminate_all(struct qce_dma_data *dma);
+ struct scatterlist *
+ qce_sgtable_add(struct sg_table *sgt, struct scatterlist *sg_add,
+-		int max_ents);
++		unsigned int max_len);
+ 
+ #endif /* _DMA_H_ */
+diff --git a/drivers/crypto/qce/skcipher.c b/drivers/crypto/qce/skcipher.c
+index 4217b745f124..63ae75809cb7 100644
+--- a/drivers/crypto/qce/skcipher.c
++++ b/drivers/crypto/qce/skcipher.c
+@@ -97,13 +97,14 @@ qce_skcipher_async_req_handle(struct crypto_async_request *async_req)
+ 
+ 	sg_init_one(&rctx->result_sg, qce->dma.result_buf, QCE_RESULT_BUF_SZ);
+ 
+-	sg = qce_sgtable_add(&rctx->dst_tbl, req->dst, rctx->dst_nents - 1);
++	sg = qce_sgtable_add(&rctx->dst_tbl, req->dst, req->cryptlen);
+ 	if (IS_ERR(sg)) {
+ 		ret = PTR_ERR(sg);
+ 		goto error_free;
+ 	}
+ 
+-	sg = qce_sgtable_add(&rctx->dst_tbl, &rctx->result_sg, 1);
++	sg = qce_sgtable_add(&rctx->dst_tbl, &rctx->result_sg,
++			     QCE_RESULT_BUF_SZ);
+ 	if (IS_ERR(sg)) {
+ 		ret = PTR_ERR(sg);
+ 		goto error_free;
