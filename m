@@ -2,414 +2,122 @@ Return-Path: <SRS0=xlEn=32=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33734C47409
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Feb 2020 15:11:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44900C3B187
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Feb 2020 15:11:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0335720838
-	for <linux-crypto@archiver.kernel.org>; Thu,  6 Feb 2020 15:11:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A9C020838
+	for <linux-crypto@archiver.kernel.org>; Thu,  6 Feb 2020 15:11:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1581001908;
-	bh=v7VaydWSAceQL49yaEGidbrVpAS3EDgUZ7WBRom2Iok=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=aO5V07EWfXuMWG1J755p5W83ZG+4rxqQDZXc87Ah6oBJdfDT2Gg023kiAMPzMAQpO
-	 Dba6UI9SAg6bXs8PXmPNpcpqCdk5nDGLzOQ+njiHFwcTnVgZ85hDH/YL3oSCOw1Tm3
-	 Tva9naNqPMX96FYj9A3272ozDqbGK06TI1l6w3gM=
+	s=default; t=1581001911;
+	bh=i30whJ7D2bpvmToMc489B2VfCm0FjpxIYAYkHNRm1/k=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=PsG9NM7A6mFOp3TH/XfFdBPuMh52mLEXCV5AceCavLtEx8TaO7egKyLGDZsNjiH82
+	 JCLfXH9g1b1DzhtxBnPiRrxRnfLcbPhTs3YS7H62u/MH3ZYqwlaFqiMMXtdWqUO+d3
+	 pS6NHYTdCVib3b+lcu1r4fT2ioFzgkneZeDwQtas=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727804AbgBFPLq (ORCPT
+        id S1727806AbgBFPLt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 6 Feb 2020 10:11:46 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:37564 "EHLO
+        Thu, 6 Feb 2020 10:11:49 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:37572 "EHLO
         bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727586AbgBFPLn (ORCPT
+        with ESMTP id S1727590AbgBFPLn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 6 Feb 2020 10:11:43 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20170209; h=Sender:Content-Transfer-Encoding:
-        Content-Type:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:
-        To:From:Reply-To:Content-ID:Content-Description;
-        bh=VuPZopcPVgZNDCW51vVmxg0nP0lSy2Z9nj9rgMXxMGE=; b=oEMWikM547BejTB3Bf8tF5ReeT
-        MuNfvoyQKIj3bPsdWbXtYMA0/JxHk7PrseMXGozyFS8CsHx6RDdLIZ/ckNEbUFFQXwYnieSfKFUzu
-        2Iuo6K49GbphWudWsugqLVBuzvhd+3q2lf/6aoiriPeU7qlXdJfAQJ6uBBpASlmGYyH91dRaSQAa/
-        XUosRKCj2ZnNwgltECJzr88CST5IgA7UcASB8Rw37lzRkWMyBWV+KJBRaJWWDEMSY4HR39mldKwSx
-        ES9gumOyzD31K7hb+uA9gxomOQQp7l+i7Hf6VasXeCcsCAGVsXqq/6GXSrRkyGmCOK+Hks5q+HiaC
-        dKQgRB9A==;
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=bJ6PILGfUOQthYtbZN3ove/bOTHIs1fSUTSyIzy3I3s=; b=Sef8CK/oc5vfowAvrz0puPQxZS
+        3pQTIUt14KlxR/ipQqYeok30cNc070WFIlyNjf7QPepexT9TtKJyhAr7vi+jUOzdSLNwVOOFYiW3W
+        0Ux486wUblaP4/DyDEqsvG5fnhzIrUe6h4Uvvj9FmIoRJXTzqWxb22F+YmvZfAI3NMGovBXDPW/H2
+        SbMtEk1qWe0qufiTx1oOJ5GKvQmdNeCP3ioiSvUs7Iry8RGyRASwZNW5BdmeEa1NaYaw0xqzZJpz+
+        Lsh3zeo56Hc1hm9TdZauCL6VJSKwjrUreM5Qtt6Fzq2nOq4s83fAUIEjikevO1CqUyCSgiItFSWH4
+        cCEPbHMw==;
 Received: from [179.95.15.160] (helo=bombadil.infradead.org)
         by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1izioc-000433-UO; Thu, 06 Feb 2020 15:11:42 +0000
+        id 1izioc-000434-UW; Thu, 06 Feb 2020 15:11:42 +0000
 Received: from mchehab by bombadil.infradead.org with local (Exim 4.92.3)
         (envelope-from <mchehab@bombadil.infradead.org>)
-        id 1izioV-002oMw-PI; Thu, 06 Feb 2020 16:11:31 +0100
+        id 1izioV-002oMj-Lo; Thu, 06 Feb 2020 16:11:31 +0100
 From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To:     Linux Media Mailing List <linux-media@vger.kernel.org>
 Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
         Mauro Carvalho Chehab <mchehab@infradead.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>, linux-crypto@vger.kernel.org,
-        linux-doc@vger.kernel.org
-Subject: [PATCH 03/11] docs: crypto: convert api-intro.txt to ReST format
-Date:   Thu,  6 Feb 2020 16:11:22 +0100
-Message-Id: <a8b452cd37f90bc96841af29e84dccf3f7b37560.1581001737.git.mchehab+huawei@kernel.org>
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-doc@vger.kernel.org, linux-crypto@vger.kernel.org,
+        Dan Williams <dan.j.williams@intel.com>,
+        Javi Merino <javi.merino@kernel.org>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        linux-pm@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        David Howells <dhowells@redhat.com>,
+        Amit Daniel Kachhap <amit.kachhap@gmail.com>,
+        keyrings@vger.kernel.org
+Subject: [PATCH 00/11] Manually convert  thermal, crypto and misc-devices to ReST
+Date:   Thu,  6 Feb 2020 16:11:19 +0100
+Message-Id: <cover.1581001737.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.24.1
-In-Reply-To: <cover.1581001737.git.mchehab+huawei@kernel.org>
-References: <cover.1581001737.git.mchehab+huawei@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-- Change title markups;
-- Mark literal blocks;
-- Use list markups at authors/credits;
-- Add blank lines when needed;
-- Remove trailing whitespaces.
+Manually convert some files from thermal, crypto and misc-devices
+to ReST format.
 
-Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
----
- .../crypto/{api-intro.txt => api-intro.rst}   | 186 ++++++++++--------
- Documentation/crypto/index.rst                |   1 +
- 2 files changed, 100 insertions(+), 87 deletions(-)
+This patch is against linux-next 20200204 tag.
+
+Mauro Carvalho Chehab (11):
+  docs: thermal: convert cpu-idle-cooling.rst to ReST
+  docs: crypto: convert asymmetric-keys.txt to ReST
+  docs: crypto: convert api-intro.txt to ReST format
+  docs: crypto: convert async-tx-api.txt to ReST format
+  docs: crypto: descore-readme.txt: convert to ReST format
+  docs: misc-devices/spear-pcie-gadget.txt: convert to ReST
+  docs: misc-devices/pci-endpoint-test.txt: convert to ReST
+  docs: misc-devices/pci-endpoint-test.txt: convert to ReST
+  docs: misc-devices/c2port.txt: convert to ReST format
+  docs: misc-devices/bh1770glc.txt: convert to ReST
+  docs: misc-devices/apds990x.txt: convert to ReST format
+
+ .../crypto/{api-intro.txt => api-intro.rst}   | 186 +++++++------
+ ...symmetric-keys.txt => asymmetric-keys.rst} |  91 +++----
+ .../{async-tx-api.txt => async-tx-api.rst}    | 253 +++++++++++-------
+ ...{descore-readme.txt => descore-readme.rst} | 152 +++++++----
+ Documentation/crypto/index.rst                |   5 +
+ .../driver-api/thermal/cpu-idle-cooling.rst   |  18 +-
+ Documentation/driver-api/thermal/index.rst    |   1 +
+ .../{ad525x_dpot.txt => ad525x_dpot.rst}      |  24 +-
+ .../{apds990x.txt => apds990x.rst}            |  31 ++-
+ .../{bh1770glc.txt => bh1770glc.rst}          |  45 +++-
+ .../misc-devices/{c2port.txt => c2port.rst}   |  58 ++--
+ Documentation/misc-devices/index.rst          |   6 +
+ .../misc-devices/pci-endpoint-test.rst        |  56 ++++
+ .../misc-devices/pci-endpoint-test.txt        |  41 ---
+ .../misc-devices/spear-pcie-gadget.rst        | 170 ++++++++++++
+ .../misc-devices/spear-pcie-gadget.txt        | 130 ---------
+ 16 files changed, 747 insertions(+), 520 deletions(-)
  rename Documentation/crypto/{api-intro.txt => api-intro.rst} (70%)
+ rename Documentation/crypto/{asymmetric-keys.txt => asymmetric-keys.rst} (91%)
+ rename Documentation/crypto/{async-tx-api.txt => async-tx-api.rst} (55%)
+ rename Documentation/crypto/{descore-readme.txt => descore-readme.rst} (81%)
+ rename Documentation/misc-devices/{ad525x_dpot.txt => ad525x_dpot.rst} (85%)
+ rename Documentation/misc-devices/{apds990x.txt => apds990x.rst} (86%)
+ rename Documentation/misc-devices/{bh1770glc.txt => bh1770glc.rst} (83%)
+ rename Documentation/misc-devices/{c2port.txt => c2port.rst} (59%)
+ create mode 100644 Documentation/misc-devices/pci-endpoint-test.rst
+ delete mode 100644 Documentation/misc-devices/pci-endpoint-test.txt
+ create mode 100644 Documentation/misc-devices/spear-pcie-gadget.rst
+ delete mode 100644 Documentation/misc-devices/spear-pcie-gadget.txt
 
-diff --git a/Documentation/crypto/api-intro.txt b/Documentation/crypto/api-intro.rst
-similarity index 70%
-rename from Documentation/crypto/api-intro.txt
-rename to Documentation/crypto/api-intro.rst
-index 45d943fcae5b..bcff47d42189 100644
---- a/Documentation/crypto/api-intro.txt
-+++ b/Documentation/crypto/api-intro.rst
-@@ -1,7 +1,11 @@
-+.. SPDX-License-Identifier: GPL-2.0
- 
--                    Scatterlist Cryptographic API
--                   
--INTRODUCTION
-+=============================
-+Scatterlist Cryptographic API
-+=============================
-+
-+Introduction
-+============
- 
- The Scatterlist Crypto API takes page vectors (scatterlists) as
- arguments, and works directly on pages.  In some cases (e.g. ECB
-@@ -13,22 +17,23 @@ so that processing can be applied to paged skb's without the need
- for linearization.
- 
- 
--DETAILS
-+Details
-+=======
- 
- At the lowest level are algorithms, which register dynamically with the
- API.
- 
- 'Transforms' are user-instantiated objects, which maintain state, handle all
--of the implementation logic (e.g. manipulating page vectors) and provide an 
--abstraction to the underlying algorithms.  However, at the user 
-+of the implementation logic (e.g. manipulating page vectors) and provide an
-+abstraction to the underlying algorithms.  However, at the user
- level they are very simple.
- 
--Conceptually, the API layering looks like this:
-+Conceptually, the API layering looks like this::
- 
-   [transform api]  (user interface)
-   [transform ops]  (per-type logic glue e.g. cipher.c, compress.c)
-   [algorithm api]  (for registering algorithms)
--  
-+
- The idea is to make the user interface and algorithm registration API
- very simple, while hiding the core logic from both.  Many good ideas
- from existing APIs such as Cryptoapi and Nettle have been adapted for this.
-@@ -44,21 +49,21 @@ one block while the former can operate on an arbitrary amount of data,
- subject to block size requirements (i.e., non-stream ciphers can only
- process multiples of blocks).
- 
--Here's an example of how to use the API:
-+Here's an example of how to use the API::
- 
- 	#include <crypto/hash.h>
- 	#include <linux/err.h>
- 	#include <linux/scatterlist.h>
--	
-+
- 	struct scatterlist sg[2];
- 	char result[128];
- 	struct crypto_ahash *tfm;
- 	struct ahash_request *req;
--	
-+
- 	tfm = crypto_alloc_ahash("md5", 0, CRYPTO_ALG_ASYNC);
- 	if (IS_ERR(tfm))
- 		fail();
--		
-+
- 	/* ... set up the scatterlists ... */
- 
- 	req = ahash_request_alloc(tfm, GFP_ATOMIC);
-@@ -67,18 +72,19 @@ Here's an example of how to use the API:
- 
- 	ahash_request_set_callback(req, 0, NULL, NULL);
- 	ahash_request_set_crypt(req, sg, result, 2);
--	
-+
- 	if (crypto_ahash_digest(req))
- 		fail();
- 
- 	ahash_request_free(req);
- 	crypto_free_ahash(tfm);
- 
--    
-+
- Many real examples are available in the regression test module (tcrypt.c).
- 
- 
--DEVELOPER NOTES
-+Developer Notes
-+===============
- 
- Transforms may only be allocated in user context, and cryptographic
- methods may only be called from softirq and user contexts.  For
-@@ -91,7 +97,8 @@ size (typically 8 bytes).  This prevents having to do any copying
- across non-aligned page fragment boundaries.
- 
- 
--ADDING NEW ALGORITHMS
-+Adding New Algorithms
-+=====================
- 
- When submitting a new algorithm for inclusion, a mandatory requirement
- is that at least a few test vectors from known sources (preferably
-@@ -119,132 +126,137 @@ Also check the TODO list at the web site listed below to see what people
- might already be working on.
- 
- 
--BUGS
-+Bugs
-+====
- 
- Send bug reports to:
--linux-crypto@vger.kernel.org
--Cc: Herbert Xu <herbert@gondor.apana.org.au>,
-+    linux-crypto@vger.kernel.org
-+
-+Cc:
-+    Herbert Xu <herbert@gondor.apana.org.au>,
-     David S. Miller <davem@redhat.com>
- 
- 
--FURTHER INFORMATION
-+Further Information
-+===================
- 
- For further patches and various updates, including the current TODO
- list, see:
- http://gondor.apana.org.au/~herbert/crypto/
- 
- 
--AUTHORS
-+Authors
-+=======
- 
--James Morris
--David S. Miller
--Herbert Xu
-+- James Morris
-+- David S. Miller
-+- Herbert Xu
- 
- 
--CREDITS
-+Credits
-+=======
- 
- The following people provided invaluable feedback during the development
- of the API:
- 
--  Alexey Kuznetzov
--  Rusty Russell
--  Herbert Valerio Riedel
--  Jeff Garzik
--  Michael Richardson
--  Andrew Morton
--  Ingo Oeser
--  Christoph Hellwig
-+  - Alexey Kuznetzov
-+  - Rusty Russell
-+  - Herbert Valerio Riedel
-+  - Jeff Garzik
-+  - Michael Richardson
-+  - Andrew Morton
-+  - Ingo Oeser
-+  - Christoph Hellwig
- 
- Portions of this API were derived from the following projects:
--  
-+
-   Kerneli Cryptoapi (http://www.kerneli.org/)
--    Alexander Kjeldaas
--    Herbert Valerio Riedel
--    Kyle McMartin
--    Jean-Luc Cooke
--    David Bryson
--    Clemens Fruhwirth
--    Tobias Ringstrom
--    Harald Welte
-+   - Alexander Kjeldaas
-+   - Herbert Valerio Riedel
-+   - Kyle McMartin
-+   - Jean-Luc Cooke
-+   - David Bryson
-+   - Clemens Fruhwirth
-+   - Tobias Ringstrom
-+   - Harald Welte
- 
- and;
--  
-+
-   Nettle (http://www.lysator.liu.se/~nisse/nettle/)
--    Niels Möller
-+   - Niels Möller
- 
- Original developers of the crypto algorithms:
- 
--  Dana L. How (DES)
--  Andrew Tridgell and Steve French (MD4)
--  Colin Plumb (MD5)
--  Steve Reid (SHA1)
--  Jean-Luc Cooke (SHA256, SHA384, SHA512)
--  Kazunori Miyazawa / USAGI (HMAC)
--  Matthew Skala (Twofish)
--  Dag Arne Osvik (Serpent)
--  Brian Gladman (AES)
--  Kartikey Mahendra Bhatt (CAST6)
--  Jon Oberheide (ARC4)
--  Jouni Malinen (Michael MIC)
--  NTT(Nippon Telegraph and Telephone Corporation) (Camellia)
-+  - Dana L. How (DES)
-+  - Andrew Tridgell and Steve French (MD4)
-+  - Colin Plumb (MD5)
-+  - Steve Reid (SHA1)
-+  - Jean-Luc Cooke (SHA256, SHA384, SHA512)
-+  - Kazunori Miyazawa / USAGI (HMAC)
-+  - Matthew Skala (Twofish)
-+  - Dag Arne Osvik (Serpent)
-+  - Brian Gladman (AES)
-+  - Kartikey Mahendra Bhatt (CAST6)
-+  - Jon Oberheide (ARC4)
-+  - Jouni Malinen (Michael MIC)
-+  - NTT(Nippon Telegraph and Telephone Corporation) (Camellia)
- 
- SHA1 algorithm contributors:
--  Jean-Francois Dive
--  
-+  - Jean-Francois Dive
-+
- DES algorithm contributors:
--  Raimar Falke
--  Gisle Sælensminde
--  Niels Möller
-+  - Raimar Falke
-+  - Gisle Sælensminde
-+  - Niels Möller
- 
- Blowfish algorithm contributors:
--  Herbert Valerio Riedel
--  Kyle McMartin
-+  - Herbert Valerio Riedel
-+  - Kyle McMartin
- 
- Twofish algorithm contributors:
--  Werner Koch
--  Marc Mutz
-+  - Werner Koch
-+  - Marc Mutz
- 
- SHA256/384/512 algorithm contributors:
--  Andrew McDonald
--  Kyle McMartin
--  Herbert Valerio Riedel
--  
-+  - Andrew McDonald
-+  - Kyle McMartin
-+  - Herbert Valerio Riedel
-+
- AES algorithm contributors:
--  Alexander Kjeldaas
--  Herbert Valerio Riedel
--  Kyle McMartin
--  Adam J. Richter
--  Fruhwirth Clemens (i586)
--  Linus Torvalds (i586)
-+  - Alexander Kjeldaas
-+  - Herbert Valerio Riedel
-+  - Kyle McMartin
-+  - Adam J. Richter
-+  - Fruhwirth Clemens (i586)
-+  - Linus Torvalds (i586)
- 
- CAST5 algorithm contributors:
--  Kartikey Mahendra Bhatt (original developers unknown, FSF copyright).
-+  - Kartikey Mahendra Bhatt (original developers unknown, FSF copyright).
- 
- TEA/XTEA algorithm contributors:
--  Aaron Grothe
--  Michael Ringe
-+  - Aaron Grothe
-+  - Michael Ringe
- 
- Khazad algorithm contributors:
--  Aaron Grothe
-+  - Aaron Grothe
- 
- Whirlpool algorithm contributors:
--  Aaron Grothe
--  Jean-Luc Cooke
-+  - Aaron Grothe
-+  - Jean-Luc Cooke
- 
- Anubis algorithm contributors:
--  Aaron Grothe
-+  - Aaron Grothe
- 
- Tiger algorithm contributors:
--  Aaron Grothe
-+  - Aaron Grothe
- 
- VIA PadLock contributors:
--  Michal Ludvig
-+  - Michal Ludvig
- 
- Camellia algorithm contributors:
--  NTT(Nippon Telegraph and Telephone Corporation) (Camellia)
-+  - NTT(Nippon Telegraph and Telephone Corporation) (Camellia)
- 
- Generic scatterwalk code by Adam J. Richter <adam@yggdrasil.com>
- 
- Please send any credits updates or corrections to:
- Herbert Xu <herbert@gondor.apana.org.au>
--
-diff --git a/Documentation/crypto/index.rst b/Documentation/crypto/index.rst
-index 2bcaf422731e..b2eeab3c8631 100644
---- a/Documentation/crypto/index.rst
-+++ b/Documentation/crypto/index.rst
-@@ -17,6 +17,7 @@ for cryptographic use cases, as well as programming examples.
-    :maxdepth: 2
- 
-    intro
-+   api-intro
-    architecture
-    asymmetric-keys
-    devel-algos
 -- 
 2.24.1
+
 
