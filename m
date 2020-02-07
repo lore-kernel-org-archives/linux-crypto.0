@@ -2,174 +2,212 @@ Return-Path: <SRS0=xktg=33=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1E6DC352A2
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 10:47:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 405F2C352A2
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 11:26:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9B885206CC
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 10:47:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 031B320726
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 11:26:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cz036zNL"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="lygOrMyh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726974AbgBGKrE (ORCPT
+        id S1726956AbgBGL0m (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Feb 2020 05:47:04 -0500
-Received: from mail-wr1-f54.google.com ([209.85.221.54]:40407 "EHLO
-        mail-wr1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726587AbgBGKrE (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Feb 2020 05:47:04 -0500
-Received: by mail-wr1-f54.google.com with SMTP id t3so2070067wru.7;
-        Fri, 07 Feb 2020 02:47:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=vihhkM3cjNfJ7+zDL+cP7K8N6569xYSRREcWllK4iDk=;
-        b=cz036zNLcNTQwykCoPwezXZPyqpwU18OJIT8S2CVfBz3uJK0kbO2cf0KetM/z7B1rz
-         qiyLiWYhbNdzg72QELONo4iksAILZyy68zADFAytRaGaY1h/l9+CS0pRLPyIDmGI0Yix
-         If6MrvLczQIHQe62VCSvHU2LVg8a6cwdRfJ+iY1f6QHVOdguc6hsUgRHRWNGtsWFqCYH
-         Cmjp5RAItXO/iZvhR07MNkNCcZNSKnzBfiPAc/i47rI0Zf5Wq3azWXmhRqFHESsSDoB6
-         hwrBve8TOtf8GfBB4qqlQmJjp9rHYTWdLhRL9HHByG9js57yT4lX0o4aXpTcn/OT1Mf0
-         wZ9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=vihhkM3cjNfJ7+zDL+cP7K8N6569xYSRREcWllK4iDk=;
-        b=E/I1yf5nk1m+E2Gmas3ZEIrHchc/pArYVMyHwc866uCWDgq8iZoFTOBHaOcP/4doLd
-         p2h2fOBm4gA6kJ91WnTAm2q/8yAiVhrmHjkKZKXCbIkoeZRRCQJw4tiJ1xmcAuK0MVYe
-         zyvmlGaBQyF6IoqiD0o6KCSB7wzLthWRnrF+SwwDyBjaBrf+rvWPb204+APJLyHAUHYr
-         I9fIY2lsYH6bmkgxlI2lLjxdtIspzWDTyX2jkCWl9uxg8bOkaOfcbArZ8Rsa5eoXTM3v
-         pE/ibHah5JfVWPkXyuhqoxYR8vQWRUch5Uh5Nq7NFKzPmKkUWvjk6GlFC8E+nCiwGqp0
-         vpRA==
-X-Gm-Message-State: APjAAAVnAitbGgMLm9fOohjZq7/5Q/80G2ylbqSh8NqLa9APmWNrIGuZ
-        dODy8FDkK6q5hc46WFmxU+W92sm8
-X-Google-Smtp-Source: APXvYqxM4QoR3bADCDvE3nCZA/eWQrnNGKeqRV5MW+VfnNeqtIPb30czXNHomLkzv0Apgy+ypsLI1A==
-X-Received: by 2002:adf:ab49:: with SMTP id r9mr4175556wrc.351.1581072421527;
-        Fri, 07 Feb 2020 02:47:01 -0800 (PST)
-Received: from Red ([2a01:cb1d:3d5:a100:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id m9sm2870038wrx.55.2020.02.07.02.47.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Feb 2020 02:47:01 -0800 (PST)
-Date:   Fri, 7 Feb 2020 11:46:59 +0100
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [BUG] crypto: export() overran state buffer on test vector
-Message-ID: <20200207104659.GA10979@Red>
-References: <20200206085442.GA5585@Red>
- <20200207065719.GA8284@sol.localdomain>
+        Fri, 7 Feb 2020 06:26:42 -0500
+Received: from mail-eopbgr30042.outbound.protection.outlook.com ([40.107.3.42]:14020
+        "EHLO EUR03-AM5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726798AbgBGL0m (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 7 Feb 2020 06:26:42 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JOC+o3PH8/o4Q74/t5/QL+iFfXdLTK70AbI55oBMQ1hNRLFm8wb1bN1+qTd1uWkkDXkvEgN4Aw0dwe23ssRCxp0DEXTTCb32y3IWMJjgxmF1Tkw8L038xdkTAJGMZD6pCJNmluDxm94GUnw0hgdtI125ctK8QxflISyA1EQ/BX+OZy74+ga9epp5jm87eyvmWr9WhIJSkRAJtMdy2uDDmnixUeWcJIYvvBI4B+G/ui0Y3W1Pd1lQASsNN+th0bzHxpHvDMpx9W9kmlyv1UdZhcMxbUikLLzzgYdvb90oZ4zNnGfzr0CfpVvjSljkxIa9WBROi7dLAkTp6KFoTg3J1g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Oh60Z76SN3npqkO38LqYNDbKN8yjHAqbbjyBmnS3mmk=;
+ b=SaN4oljqWp3LCbX4DnnkKfZOuFcghOcGqlKMy0G4uUl/HCyZtRixuS1tXBkhnd6eGuYxqNcdc/pFLbw9DIR+wsL3GF717ArgWURMt8WUp4MtVK830Wh80swdWg2EOz4ixOiKj3Awxiq8RJCH7+G13gRBgd9sbSxnpkinIMdzwNWkgP3hYgB96zyHGkDIGxLyNmR2jyT3iaS9OZu8WGexKHKrrZXLOIqT0oaE9Vq5JcvQD0I84Ut7SVYN/P1LOt5ufJlppXjX55j+hw15cFMmrOvV/tw01GBfR+MFiY6LTyYScPPUDDrvzHnVtcpEdmo1dEBs2Im5aa1aESh3Rz1pWw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Oh60Z76SN3npqkO38LqYNDbKN8yjHAqbbjyBmnS3mmk=;
+ b=lygOrMyhxQa3bXMAAv2WL3X9WzQ4a+N6huxEjS0S/8S8LThiYcT5rFwFuMK81M4VRnpBRim6Mq/Hxu2Tx4cC1KiejwLXM+BphZ/gUIcQoynORI00ZJoG6ZEdl+rbxl7h7xdkKT8t+ccnAxDNIleCDrdiUYMf/Sx4A0t3xBvvH5c=
+Received: from AM0PR04MB7171.eurprd04.prod.outlook.com (10.186.130.205) by
+ AM0PR04MB4964.eurprd04.prod.outlook.com (20.177.40.75) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2707.23; Fri, 7 Feb 2020 11:26:39 +0000
+Received: from AM0PR04MB7171.eurprd04.prod.outlook.com
+ ([fe80::b8df:72f3:9624:1256]) by AM0PR04MB7171.eurprd04.prod.outlook.com
+ ([fe80::b8df:72f3:9624:1256%7]) with mapi id 15.20.2707.020; Fri, 7 Feb 2020
+ 11:26:39 +0000
+From:   Iuliana Prodan <iuliana.prodan@nxp.com>
+To:     Corentin Labbe <clabbe.montjoie@gmail.com>
+CC:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Baolin Wang <baolin.wang@linaro.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Silvano Di Ninno <silvano.dininno@nxp.com>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        dl-linux-imx <linux-imx@nxp.com>
+Subject: Re: [PATCH v2 1/2] crypto: engine - support for parallel requests
+Thread-Topic: [PATCH v2 1/2] crypto: engine - support for parallel requests
+Thread-Index: AQHV21d9ovH+nULTjUSN5UBY10erRw==
+Date:   Fri, 7 Feb 2020 11:26:38 +0000
+Message-ID: <AM0PR04MB71711FEFD0738893772BE3198C1C0@AM0PR04MB7171.eurprd04.prod.outlook.com>
+References: <1580819660-30211-1-git-send-email-iuliana.prodan@nxp.com>
+ <1580819660-30211-2-git-send-email-iuliana.prodan@nxp.com>
+ <20200205191128.GA32606@Red>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=iuliana.prodan@nxp.com; 
+x-originating-ip: [212.146.100.6]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: fda9f352-b5a6-40be-ef3b-08d7abc09953
+x-ms-traffictypediagnostic: AM0PR04MB4964:|AM0PR04MB4964:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM0PR04MB49643E5C33C05D66A7A9D02B8C1C0@AM0PR04MB4964.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-forefront-prvs: 0306EE2ED4
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(366004)(376002)(396003)(346002)(136003)(199004)(189003)(4326008)(186003)(6506007)(53546011)(54906003)(26005)(316002)(55016002)(8676002)(81166006)(81156014)(7416002)(5660300002)(8936002)(6916009)(52536014)(9686003)(71200400001)(86362001)(2906002)(66446008)(33656002)(66476007)(66946007)(66556008)(64756008)(76116006)(44832011)(7696005)(478600001);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR04MB4964;H:AM0PR04MB7171.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: NCPVGh+HlATU4jGS2EsfvzJPbiFGtsrX4FLMZor8YEBbkmVW2hRZBwKU3JxA1Vr7kE2G0f3cCedRcVGMJSY6scyJoUN9auVP1ZkRx7E91NxFSvQCW2YJitis5DKRco1vZQ8hPfCkTNOYU/7Sl/hqG0xDNtTsYyovNYTPh+d+DlbgjB24lJMAXXdxazFHsOrczNI8Ht6wKifvz9FlegoUNkgxdzeGV7Q0bjov3qmcHOhLRs006jzxY/OowEL5v2ticS0F1LJEmRcY3yie8J4eZNUqLR2hfGAPIkoyV6vkNPwCL5ljvJh01DWbynISIrlSduBm76TZFXbEckX1SYdXdEs77OJaimHtFVsqO59eOhic/gP/8LbMDGWBGiH0XJkfsmPVsw+E4KKZNRewoOjmHCCa8TwXfiecj1fWQGtqoOCI25KWD5CSAcR76gD9/z3D
+x-ms-exchange-antispam-messagedata: MDEDPhnVA8plwD+arzy8TrU3O0lfqYRMuPlw2neiGv5XHiKDlEN14SEcIe/w/+g/DaO7A8uExLB2C+ILN2Phhd0O52pMDGWndyb3OLoR4ipuZKVAMTx3KFvxHqUioV3fbAO5lX4RfXaVXEmQfnk7kg==
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200207065719.GA8284@sol.localdomain>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fda9f352-b5a6-40be-ef3b-08d7abc09953
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Feb 2020 11:26:38.9783
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: RLlB6TidNyd43O+dAL0kgKsUw3kILkoNLegGYoRYH5uR9+X1txZqZg/Pm8i5+lDybNPVfZfo3mE0aGgef0smug==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR04MB4964
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Feb 06, 2020 at 10:57:19PM -0800, Eric Biggers wrote:
-> On Thu, Feb 06, 2020 at 09:54:42AM +0100, Corentin Labbe wrote:
-> > Hello
-> > 
-> > When working on adding hash support on sun8i-ce, I made a simple version which always fallback.
-> > but booting it lead to this:
-> > [   52.274278] sun8i-ce 1c15000.crypto: Register sha1
-> > [   52.279286] sun8i-ce 1c15000.crypto: sun8i_hash_crainit statesize is 96
-> > [   52.285933] sun8i-ce 1c15000.crypto: Fallback for sha1-sun8i-ce is sha1-ce
-> > [   52.312423] shash_default_export descsize=104
-> > [   52.316021] alg: ahash: sha1-sun8i-ce export() overran state buffer on test vector 0, cfg=\"import/export\" statesize=96
-> > [   52.333189] sun8i-ce 1c15000.crypto: Register sha224
-> > [   52.338387] sun8i-ce 1c15000.crypto: sun8i_hash_crainit statesize is 104
-> > [   52.345097] sun8i-ce 1c15000.crypto: Fallback for sha224-sun8i-ce is sha224-ce
-> > [   52.371865] shash_default_export descsize=112
-> > [   52.375459] alg: ahash: sha224-sun8i-ce export() overran state buffer on test vector 0, cfg=\"import/export\" statesize=104
-> > [   52.393039] sun8i-ce 1c15000.crypto: Register sha256
-> > [   52.398219] sun8i-ce 1c15000.crypto: sun8i_hash_crainit statesize is 104
-> > [   52.404937] sun8i-ce 1c15000.crypto: Fallback for sha256-sun8i-ce is sha256-ce
-> > [   52.431476] shash_default_export descsize=112
-> > [   52.435073] alg: ahash: sha256-sun8i-ce export() overran state buffer on test vector 0, cfg=\"import/export\" statesize=104
-> > 
-> > For sha1, sha224 and sha256, my driver fail to pass the test.
-> > This is due to the fact that export() (and so shash_async_export/shash_default_export) use crypto_shash_descsize() as length but selftest expect it to be statesize.
-> 
-> That doesn't appear to actually be the problem.  shash_default_export() does
-> assume descsize == statesize, but it's only used when that's the case.
-> See shash_prepare_alg().  
-> 
-> > Just in case, this is my export code:
-> > int sun8i_hash_crainit(struct crypto_tfm *tfm)
-> > {
-> >         struct sun8i_hash_tfm_ctx *op = crypto_tfm_ctx(tfm);
-> >         struct ahash_alg *alg = __crypto_ahash_alg(tfm->__crt_alg);
-> >         struct sun8i_ce_alg_template *algt;
-> > 
-> >         memset(op, 0, sizeof(struct sun8i_hash_tfm_ctx));
-> > 
-> >         crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm), sizeof(struct sun8i_hash_reqctx));
-> > 
-> >         op->fallback_tfm = crypto_alloc_ahash(crypto_tfm_alg_name(tfm), 0, CRYPTO_ALG_NEED_FALLBACK);
-> >         if (IS_ERR(op->fallback_tfm)) {
-> >                 dev_err(algt->ce->dev, "Fallback driver cound no be loaded\n");
-> >                 return PTR_ERR(op->fallback_tfm);
-> >         }
-> >         dev_info(op->ce->dev, "%s statesize is %u\n", __func__, algt->alg.hash.halg.statesize);
-> >         dev_info(op->ce->dev, "Fallback for %s is %s\n",
-> >                 crypto_tfm_alg_driver_name(tfm),
-> >                 crypto_tfm_alg_driver_name(&op->fallback_tfm->base));
-> >         return 0;
-> > }
-> > 
-> > int sun8i_hash_init(struct ahash_request *areq)
-> > {
-> >         struct sun8i_hash_reqctx *rctx = ahash_request_ctx(areq);
-> >         struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-> >         struct sun8i_hash_tfm_ctx *tfmctx = crypto_ahash_ctx(tfm);
-> > 
-> >         memset(rctx, 0, sizeof(struct sun8i_hash_reqctx));
-> > 
-> >         ahash_request_set_tfm(&rctx->fallback_req, tfmctx->fallback_tfm);
-> >         rctx->fallback_req.base.flags = areq->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP;
-> > 
-> >         return crypto_ahash_init(&rctx->fallback_req);
-> > }
-> > 
-> > int sun8i_hash_export(struct ahash_request *areq, void *out)
-> > {
-> >         struct sun8i_hash_reqctx *rctx = ahash_request_ctx(areq);
-> >         struct crypto_ahash *tfm = crypto_ahash_reqtfm(areq);
-> >         struct sun8i_hash_tfm_ctx *tfmctx = crypto_ahash_ctx(tfm);
-> > 
-> >         ahash_request_set_tfm(&rctx->fallback_req, tfmctx->fallback_tfm);
-> >         rctx->fallback_req.base.flags = areq->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP;
-> >                                                                                 
-> >         return crypto_ahash_export(&rctx->fallback_req, out);                   
-> > }
-> 
-> It seems the actual problem is that you're doing the export using a fallback
-> algorithm, which may have a statesize different from the one you're setting.
-> 
-
-Should not be a problem since all stuff before export is done by the fallback.
-
-> But I'm not sure what you should do here, since the correct statesize can only
-> be known when a tfm is allocated, not when the algorithm is registered.
-> 
-> Possibly statesize needs to be made a property of the tfm (struct crypto_ahash
-> and crypto_shash) rather than the algorithm (struct hash_alg_common).
-> 
-> But are you sure you actually need a fallback algorithm for any hash algorithms
-> in your driver in the first place?
-> 
-
-My goal is to do like n2-crypto/rk3288crypto/etc..., fallback for init/update/final/finup and only do stuff with digest().
-So I have just exactly copied what they do.
-
-Regards
+On 2/5/2020 9:11 PM, Corentin Labbe wrote:=0A=
+> On Tue, Feb 04, 2020 at 02:34:19PM +0200, Iuliana Prodan wrote:=0A=
+>> Added support for executing multiple requests, in parallel,=0A=
+>> for crypto engine.=0A=
+>> A new callback is added, can_enqueue_more, which asks the=0A=
+>> driver if the hardware has free space, to enqueue a new request.=0A=
+>> The new crypto_engine_alloc_init_and_set function, initialize=0A=
+>> crypto-engine, sets the maximum size for crypto-engine software=0A=
+>> queue (not hardcoded anymore) and the can_enqueue_more callback.=0A=
+>> On crypto_pump_requests, if can_enqueue_more callback returns true,=0A=
+>> a new request is send to hardware, until there is no space and the=0A=
+>> callback returns false.=0A=
+>>=0A=
+>> Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>=0A=
+>> ---=0A=
+>>   crypto/crypto_engine.c  | 106 ++++++++++++++++++++++++++++++----------=
+--------=0A=
+>>   include/crypto/engine.h |  10 +++--=0A=
+>>   2 files changed, 72 insertions(+), 44 deletions(-)=0A=
+>>=0A=
+>> diff --git a/crypto/crypto_engine.c b/crypto/crypto_engine.c=0A=
+>> index eb029ff..aba934f 100644=0A=
+>> --- a/crypto/crypto_engine.c=0A=
+>> +++ b/crypto/crypto_engine.c=0A=
+>> @@ -22,32 +22,18 @@=0A=
+>>    * @err: error number=0A=
+>>    */=0A=
+>>   static void crypto_finalize_request(struct crypto_engine *engine,=0A=
+>> -			     struct crypto_async_request *req, int err)=0A=
+>> +				    struct crypto_async_request *req, int err)=0A=
+>>   {=0A=
+>> -	unsigned long flags;=0A=
+>> -	bool finalize_cur_req =3D false;=0A=
+>>   	int ret;=0A=
+>>   	struct crypto_engine_ctx *enginectx;=0A=
+>>   =0A=
+>> -	spin_lock_irqsave(&engine->queue_lock, flags);=0A=
+>> -	if (engine->cur_req =3D=3D req)=0A=
+>> -		finalize_cur_req =3D true;=0A=
+>> -	spin_unlock_irqrestore(&engine->queue_lock, flags);=0A=
+>> -=0A=
+>> -	if (finalize_cur_req) {=0A=
+>> -		enginectx =3D crypto_tfm_ctx(req->tfm);=0A=
+>> -		if (engine->cur_req_prepared &&=0A=
+>> -		    enginectx->op.unprepare_request) {=0A=
+>> -			ret =3D enginectx->op.unprepare_request(engine, req);=0A=
+>> -			if (ret)=0A=
+>> -				dev_err(engine->dev, "failed to unprepare request\n");=0A=
+>> -		}=0A=
+>> -		spin_lock_irqsave(&engine->queue_lock, flags);=0A=
+>> -		engine->cur_req =3D NULL;=0A=
+>> -		engine->cur_req_prepared =3D false;=0A=
+>> -		spin_unlock_irqrestore(&engine->queue_lock, flags);=0A=
+>> +	enginectx =3D crypto_tfm_ctx(req->tfm);=0A=
+>> +	if (enginectx->op.prepare_request &&=0A=
+>> +	    enginectx->op.unprepare_request) {=0A=
+>> +		ret =3D enginectx->op.unprepare_request(engine, req);=0A=
+>> +		if (ret)=0A=
+>> +			dev_err(engine->dev, "failed to unprepare request\n");=0A=
+>>   	}=0A=
+>> -=0A=
+>>   	req->complete(req, err);=0A=
+>>   =0A=
+>>   	kthread_queue_work(engine->kworker, &engine->pump_requests);=0A=
+>> @@ -73,10 +59,6 @@ static void crypto_pump_requests(struct crypto_engine=
+ *engine,=0A=
+>>   =0A=
+>>   	spin_lock_irqsave(&engine->queue_lock, flags);=0A=
+>>   =0A=
+>> -	/* Make sure we are not already running a request */=0A=
+>> -	if (engine->cur_req)=0A=
+>> -		goto out;=0A=
+>> -=0A=
+> =0A=
+> Hello=0A=
+> =0A=
+> Your patch has the same problem than mine reported by Horia.=0A=
+> If a queue has more than one request, a first crypto_pump_requests() will=
+ send a request and for drivers which do not block on do_one_request() cryp=
+to_pump_requests() will end.=0A=
+> Then another crypto_pump_requests() will fire sending a second request wh=
+ile the driver does not support that.=0A=
+=0A=
+> So we need to replace engine->cur_req by another locking mechanism.=0A=
+> Perhaps the cleaner is to add a "request count" (increased when do_one_re=
+quest, decreased in crypto_finalize_request)=0A=
+> I know that the early version have that and it was removed, but I do not =
+see any better way.=0A=
+> =0A=
+=0A=
+The "request count" I've change it to can_enqueue_more, so the hw can =0A=
+"answer" if it can enqueue or not.=0A=
+=0A=
+I'll (re)add the cur_req in crypto-engine.=0A=
+If the new callback, can_enqueue_more, is not implemented the crypto- =0A=
+engine will work as before - will send requests to hardware, one-by-one, =
+=0A=
+on crypto_pump_requests, and complete it, on crypto_finalize_request, =0A=
+and so on.=0A=
+=0A=
+Thanks,=0A=
+Iulia=0A=
+=0A=
