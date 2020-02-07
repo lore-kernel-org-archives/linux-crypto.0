@@ -2,229 +2,216 @@ Return-Path: <SRS0=xktg=33=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7339EC352A2
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 07:56:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9985C352A2
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 08:10:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C413220838
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 07:56:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A0E8B21741
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 08:10:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="EafjajYv"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="j5eYJ8iZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726417AbgBGH4S (ORCPT
+        id S1726626AbgBGIK3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Feb 2020 02:56:18 -0500
-Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.54]:15365 "EHLO
-        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726130AbgBGH4S (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Feb 2020 02:56:18 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1581062174;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=1fEM9CnSaXlHJobgsEaq++nNUof1KVyyOdPhR5nQZas=;
-        b=EafjajYvVUd5MRfM9hmJqaLXPHbTqsgiB7dh6HxJ5dK0MpDFMAcQvAolZEKvp8PNGm
-        3Wif/+PFM5Uas0RgoRtBtnq2LLjRkCNAKh49Nhh7bjzUp0xLvjqlPCCLIRrCpoc/RQhO
-        EXoBNzl/ZQJUJzrRZkxikckjF4SxGxlIDHPscG9pWjaLFACANHSXFECai+J5yVht3vjL
-        fwUWRUwri4W5lI7JelWxb2fh87OX3YddCgWft3fOzXFB8fC3dA679CY87xPLVhoysiA9
-        YSfC3FBzvYPLhREVU+iCmTBWtHZpZrGUjWrE8bek8pNK5yff+roarHSFCzJzLFyICZO8
-        OWLw==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaIfScugJ3"
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-        by smtp.strato.de (RZmta 46.1.12 DYNA|AUTH)
-        with ESMTPSA id 608a92w177u6cd2
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-        Fri, 7 Feb 2020 08:56:06 +0100 (CET)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Gilad Ben-Yossef <gilad@benyossef.com>,
+        Fri, 7 Feb 2020 03:10:29 -0500
+Received: from mail-eopbgr00089.outbound.protection.outlook.com ([40.107.0.89]:12707
+        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726130AbgBGIK2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 7 Feb 2020 03:10:28 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=CclBG4vWG8BW28zU4IStJ11FWF51MZOFpA7XxtralPBXaXTjjP3uRxpFbsiVyLZy+gBvNHZVtQwftJGe9zatlhlS+kgS+8jJpqxkuCmneLRvzmiyMBiDde0HNNdGs63EvzPIz1bTV2FNPfG2XMPrzYojTcoEchqWMYItYWCnQMKZzYWo7rLyoVEYJNmJYOto/FHJl4YuYotXn/2MEcEQ0JEn9F/ggL2edz5OrEaOMVbPW9ehKP07zoaBpxdPAQiIBwJYxLZXP7l1m4UZa6i0AUnCrjRwISLc4YxHExPQ3kSMVESAaLGtSoR9c73fnLsmDbsdrFCVbPveqofWPCbmvw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tWpfQjQ8kJI8DTUzc69VkE9kwzJn0d+di+JsZZZjwtQ=;
+ b=AfRWFwJWBsRt+4dJanhkUCn0kdfMqWw2WkHMERKi8CB6H1E3hp8+4XGHxfZ12gyaZOK3F+Sglt1WPYK/G5VVqoMKRh3ApgCNop/TavSu+cZ0YodccY6rL+ZxZrCMloTiPi4M1LR38lvrrerb4Mzh3neMCUNYyWj2pMKtb5SN0HCCqrfjOslwj4BTSwh8MMA7utJFnCG2EAfAlsyC45XyTj4/TWzedUeQCxW0aPNS2898PUEV1eqx38SkZy1q9kPwU95RWDnpDV+ILyuYN/NFY7m9izH83+S+KvNB7Ri/00TcGn98yuTTLqSIKtf5zvE+IM0w+VWQ0EewUALn704CHQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tWpfQjQ8kJI8DTUzc69VkE9kwzJn0d+di+JsZZZjwtQ=;
+ b=j5eYJ8iZjZjCEfv/RtWhOgQYhxhfnDwxYXX/RLcP/cXmwaX0JgoGYriW73vuZdHqTjYo/1LOPbZUz3y7POpMTOViUZuy5LCOaTYSMJoN7sjBzObyyrCpb9WdXHBgeDMmoDoqhk62yv593nFAXgdJAaaCLWmKeMnFXY4sj0WWCwM=
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
+ VI1PR0402MB2831.eurprd04.prod.outlook.com (10.175.23.136) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2707.21; Fri, 7 Feb 2020 08:10:22 +0000
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::85e9:f844:f8b0:27d]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::85e9:f844:f8b0:27d%7]) with mapi id 15.20.2707.024; Fri, 7 Feb 2020
+ 08:10:22 +0000
+From:   Horia Geanta <horia.geanta@nxp.com>
+To:     =?iso-8859-2?Q?Andr=E9_Draszik?= <git@andred.net>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC:     Anson Huang <anson.huang@nxp.com>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        David Miller <davem@davemloft.net>,
-        Ofir Drang <Ofir.Drang@arm.com>
-Subject: Re: Possible issue with new inauthentic AEAD in extended crypto tests
-Date:   Fri, 07 Feb 2020 08:56:05 +0100
-Message-ID: <28236835.Fk5ARk2Leh@tauon.chronox.de>
-In-Reply-To: <20200207072709.GB8284@sol.localdomain>
-References: <CAOtvUMcwLtwgigFE2mx7LVjhhEgcZsSS4WyR_SQ2gixTZxyBfg@mail.gmail.com> <CAOtvUMeVXTDvH5bxVFemYmD9rpZ=xX3MkypAGyZn5VROw6sgZg@mail.gmail.com> <20200207072709.GB8284@sol.localdomain>
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-input@vger.kernel.org" <linux-input@vger.kernel.org>,
+        Robin Gong <yibin.gong@nxp.com>,
+        dl-linux-imx <linux-imx@nxp.com>
+Subject: Re: [PATCH 2/3] Input: snvs_pwrkey - enable snvs clock as needed
+Thread-Topic: [PATCH 2/3] Input: snvs_pwrkey - enable snvs clock as needed
+Thread-Index: AQHV164yHhXoESmTiUqzHJu+3DHGMA==
+Date:   Fri, 7 Feb 2020 08:10:22 +0000
+Message-ID: <VI1PR0402MB3485EC2F82DDE52DC5CA0795981C0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+References: <20200130204516.4760-1-git@andred.net>
+ <20200130204516.4760-2-git@andred.net>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=horia.geanta@nxp.com; 
+x-originating-ip: [212.146.100.6]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 8580592e-cffa-4e3d-d394-08d7aba52de4
+x-ms-traffictypediagnostic: VI1PR0402MB2831:|VI1PR0402MB2831:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <VI1PR0402MB28313F3E7789B81307AFE51A981C0@VI1PR0402MB2831.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6790;
+x-forefront-prvs: 0306EE2ED4
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(136003)(376002)(366004)(346002)(39860400002)(199004)(189003)(44832011)(71200400001)(478600001)(54906003)(110136005)(86362001)(52536014)(5660300002)(6506007)(53546011)(33656002)(7696005)(9686003)(7416002)(26005)(55016002)(2906002)(186003)(316002)(8676002)(4326008)(66446008)(76116006)(66476007)(91956017)(81156014)(66946007)(64756008)(66556008)(81166006)(8936002);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB2831;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 5i593SuVIV9VlrFODnta1JRZxl64VhMc52UqyZNe/iHQ3TjHU/NZK6KvXsgBuk1i8M0egru7iTPEX44Sr9M7qhGv5mqGR0qx7J0AqY63U2eRYS1zbh9PeSuTuX0h1dNVaSEA/zaWhdwZt31JcVMxwag3Owsf+DABF1VJnr15OjS7QwxG9sUNwmVG+TLolAg+oFolZTbbDQj2YRmO6tmOhMj5PxvwxuaxH8vbyBMwluDsyk1EANm20UHPVhq0PvCA304kHcqJvAYNhw+BWspLo8q6hpq9nf4QeseM2Ar2LWtucXSzq4CK156/h4LtYcXAwVzlsVXQkKcxma7P9awkSwHQA/ILXGw0DGBcq1I7B0L9nEErB2PqCWZ0Ca6DolBsKpeT5u4FOY+PKNjwbUW3cWS6QDT+98cnnhyhaiqQO2Swd3Cy087rsEzr3yc9jDck
+x-ms-exchange-antispam-messagedata: Bhp15MSc5oNhXwm9ztodemqNFKrR8LMyHqD0nq9Qe9HfUVi4abqGMgiz82+N9FDrfNeKX9AVklGOBCVvMmSubnGct0j432qeIQBvoyr+jLNDez5oQiAx5ck0q9xdXutmMGgZmKfLKqd1upQrQPJZqQ==
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8580592e-cffa-4e3d-d394-08d7aba52de4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Feb 2020 08:10:22.3029
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Xb7V0opFCYwMk2eE4+4oWGRLomzYNRU0HQQnyoOW28xmUxdsbRHOSjCbWA2Z3PXxsZ0MDZ40JCigQ3+cVkeoow==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB2831
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Freitag, 7. Februar 2020, 08:27:09 CET schrieb Eric Biggers:
-
-Hi Eric,
-
-> On Wed, Feb 05, 2020 at 04:48:16PM +0200, Gilad Ben-Yossef wrote:
-> > Probably another issue with my driver, but just in case -
-> > 
-> > include/crypot/aead.h says:
-> >  * The scatter list pointing to the input data must contain:
-> >  *
-> >  * * for RFC4106 ciphers, the concatenation of
-> >  *   associated authentication data || IV || plaintext or ciphertext.
-> >  Note, the *   same IV (buffer) is also set with the
-> >  aead_request_set_crypt call. Note, *   the API call of
-> >  aead_request_set_ad must provide the length of the AAD and *   the IV.
-> >  The API call of aead_request_set_crypt only points to the size of *  
-> >  the input plaintext or ciphertext.
-> > 
-> > I seem to be missing the place where this is handled in
-> > generate_random_aead_testvec()
-> > and generate_aead_message()
-> > 
-> > We seem to be generating a random IV for providing as the parameter to
-> > aead_request_set_crypt()
-> > but than have other random bytes set in aead_request_set_ad() - or am
-> > I'm missing something again?
-> 
-> Yes, for rfc4106 the tests don't pass the same IV in both places.  This is
-> because I wrote the tests from the perspective of a generic AEAD that
-> doesn't have this weird IV quirk, and then I added the minimum quirks to
-> get the weird algorithms like rfc4106 passing.
-> 
-> Since the actual behavior of the generic implementation of rfc4106 is that
-> the last 8 bytes of the AAD are ignored, that means that currently the
-> tests just avoid mutating these bytes when generating inauthentic input
-> tests.  They don't know that they're (apparently) meant to be another copy
-> of the IV.
-> 
-> So it seems we need to clearly define the behavior when the two IV copies
-> don't match.  Should one or the other be used, should an error be returned,
-> or should the behavior be unspecified (in which case the tests would need
-> to be updated)?
-> 
-> Unspecified behavior is bad, but it would be easiest for software to use
-> req->iv, while hardware might want to use the IV in the scatterlist...
-> 
-> Herbert and Stephan, any idea what was intended here?
-> 
-> - Eric
-
-The full structure of RFC4106 is the following:
-
-- the key to be set is always 4 bytes larger than required for the respective 
-AES operation (i.e. the key is 20, 28 or 36 bytes respectively). The key value 
-contains the following information: key || first 4 bytes of the IV (note, the 
-first 4 bytes of the IV are the bytes derived from the KDF invoked by IKE - 
-i.e. they come from user space and are fixed)
-
-- data block contains AAD || trailing 8 bytes of IV || plaintext or ciphertext 
-- the trailing 8 bytes of the IV are the SPI which is updated for each new  
-IPSec package
-
-aead_request_set_ad points to the AAD plus the 8 bytes of IV in the use case 
-of rfc4106(gcm(aes)) as part of IPSec.
-
-Considering your question about the aead_request_set_ad vs 
-aead_request_set_crypt I think the RFC4106 gives the answer: the IV is used in 
-two locations considering that the IV is also the SPI in our case. If you see 
-RFC 4106 chapter 3 you see the trailing 8 bytes of the IV as, well, the GCM IV 
-(which is extended by the 4 byte salt as defined in chapter 4 that we provide 
-with the trailing 4 bytes of the key). The kernel uses the SPI for this. In 
-chapter 5 RFC4106 you see that the SP is however used as part of the AAD as 
-well.
-
-Bottom line: if you do not set the same IV value for both, the AAD and the GCM 
-IV, you deviate from the use case of rfc4106(gcm(aes)) in IPSec. Yet, from a 
-pure mathematical point of view and also from a cipher implementation point of 
-view, it does not matter whether the AAD and the IV point to the same value - 
-the implementation must always process that data. The result however will not 
-be identical to the IPSec use case.
-
-Some code to illustrate it - this code is from my CAVS test harness used to 
-perform the crypto testing for FIPS 140-2:
-
-
-Preparation of the key:
-
-        /*
-         * RFC4106 special handling: append the first 4 bytes of the IV to
-         * the key. If IV is NULL, append NULL string (i.e. the fixed field is
-         * zero in case of internal IV generation). The first 4 bytes of
-         * the IV must be removed from the IV string.
-         */
-        if (strcasestr(ciphername, "rfc4106")) {
-                struct buffer rfc;
-
-                memset(&rfc, 0, sizeof(struct buffer));
-                if (alloc_buf(data->key.len + 4, &rfc))
-                        goto out;
-
-                /* copy the key into buffer */
-                memcpy(rfc.buf, data->key.buf, data->key.len);
-                if (data->iv.len >= 4) {
-                        uint32_t i = 0;
-
-                        /* Copy first four bytes of the IV into key */
-                        memcpy(rfc.buf + data->key.len, data->iv.buf, 4);
-
-                        /* move remaining bytes to the front to be used as IV 
-*/
-                        for (i = 0; i < (data->iv.len - 4); i++)
-                                data->iv.buf[i] = data->iv.buf[(i + 4)];
-                        data->iv.len -= 4;
-                }
-
-
-Preparation of the SGL - the IV here is the trailing 8 bytes after the 
-operation above:
-
-        if (aead_assoc->len) {
-                if (rfc4106) {
-                        sg_init_table(sg, 3);
-                        sg_set_buf(&sg[0], aead_assoc->data, aead_assoc->len);
-                        sg_set_buf(&sg[1], iv->data, iv->len);
-                        sg_set_buf(&sg[2], data->data, data->len +
-                                (kccavs_test->type & TYPE_ENC ? authsize : 
-0));
-                } else {
-                        sg_init_table(sg, 2);
-                        sg_set_buf(&sg[0], aead_assoc->data, aead_assoc->len);
-                        sg_set_buf(&sg[1], data->data, data->len +
-                                (kccavs_test->type & TYPE_ENC ? authsize : 
-0));
-                }
-        } else {
-                if (rfc4106) {
-                        sg_init_table(sg, 2);
-                        sg_set_buf(&sg[0], iv->data, iv->len);
-                        sg_set_buf(&sg[1], data->data, data->len +
-                                (kccavs_test->type & TYPE_ENC ? authsize : 
-0));
-                } else {
-                        sg_init_table(sg, 1);
-                        sg_set_buf(&sg[0], data->data, data->len +
-                                (kccavs_test->type & TYPE_ENC ? authsize : 
-0));
-                }
-        }
-
-
-Informing the kernel crypto API about the AAD size:
-
-        if (rfc4106)
-                aead_request_set_ad(req, aead_assoc->len + iv->len);
-        else
-                aead_request_set_ad(req, aead_assoc->len);
-
-
-Set the buffers:
-
-	aead_request_set_crypt(req, sg, sg, data->len, iv->data);
-
-Ciao
-Stephan
-
-
+On 1/30/2020 10:45 PM, Andr=E9 Draszik wrote:=0A=
+> At the moment, enabling this driver without the SNVS RTC driver=0A=
+> being active will hang the kernel as soon as the power button=0A=
+> is pressed.=0A=
+> =0A=
+> The reason is that in that case the SNVS isn't enabled, and=0A=
+> any attempt to read the SNVS registers will simply hang forever.=0A=
+> =0A=
+> Ensure the clock is enabled (during the interrupt handler) to=0A=
+> make this driver work.=0A=
+> =0A=
+> Also see commit 7f8993995410 ("drivers/rtc/rtc-snvs: add clock support")=
+=0A=
+> and commit edb190cb1734=0A=
+> ("rtc: snvs: make sure clock is enabled for interrupt handle")=0A=
+> for similar updates to the snvs rtc driver.=0A=
+> =0A=
+> Signed-off-by: Andr=E9 Draszik <git@andred.net>=0A=
+> Cc: Anson Huang <Anson.Huang@nxp.com>=0A=
+> Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>=0A=
+> Cc: "Horia Geant=E3" <horia.geanta@nxp.com>=0A=
+> Cc: Aymen Sghaier <aymen.sghaier@nxp.com>=0A=
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>=0A=
+> Cc: "David S. Miller" <davem@davemloft.net>=0A=
+> Cc: Rob Herring <robh+dt@kernel.org>=0A=
+> Cc: Mark Rutland <mark.rutland@arm.com>=0A=
+> Cc: linux-crypto@vger.kernel.org=0A=
+> Cc: devicetree@vger.kernel.org=0A=
+> Cc: linux-input@vger.kernel.org=0A=
+> ---=0A=
+>  drivers/input/keyboard/snvs_pwrkey.c | 27 +++++++++++++++++++++++++++=0A=
+>  1 file changed, 27 insertions(+)=0A=
+> =0A=
+> diff --git a/drivers/input/keyboard/snvs_pwrkey.c b/drivers/input/keyboar=
+d/snvs_pwrkey.c=0A=
+> index 2f5e3ab5ed63..c29711d8735c 100644=0A=
+> --- a/drivers/input/keyboard/snvs_pwrkey.c=0A=
+> +++ b/drivers/input/keyboard/snvs_pwrkey.c=0A=
+> @@ -16,6 +16,7 @@=0A=
+>  #include <linux/of_address.h>=0A=
+>  #include <linux/platform_device.h>=0A=
+>  #include <linux/pm_wakeirq.h>=0A=
+> +#include <linux/clk.h>=0A=
+>  #include <linux/mfd/syscon.h>=0A=
+>  #include <linux/regmap.h>=0A=
+>  =0A=
+> @@ -38,6 +39,7 @@ struct pwrkey_drv_data {=0A=
+>  	int wakeup;=0A=
+>  	struct timer_list check_timer;=0A=
+>  	struct input_dev *input;=0A=
+> +	struct clk *clk;=0A=
+>  	u8 minor_rev;=0A=
+>  };=0A=
+>  =0A=
+> @@ -72,6 +74,9 @@ static irqreturn_t imx_snvs_pwrkey_interrupt(int irq, v=
+oid *dev_id)=0A=
+>  	struct input_dev *input =3D pdata->input;=0A=
+>  	u32 lp_status;=0A=
+>  =0A=
+> +	if (pdata->clk)=0A=
+> +		clk_enable(pdata->clk);=0A=
+> +=0A=
+clk framework handles NULL pointers internally, the check is redundant.=0A=
+=0A=
+>  	pm_wakeup_event(input->dev.parent, 0);=0A=
+>  =0A=
+>  	regmap_read(pdata->snvs, SNVS_LPSR_REG, &lp_status);=0A=
+> @@ -96,6 +101,9 @@ static irqreturn_t imx_snvs_pwrkey_interrupt(int irq, =
+void *dev_id)=0A=
+>  	/* clear SPO status */=0A=
+>  	regmap_write(pdata->snvs, SNVS_LPSR_REG, SNVS_LPSR_SPO);=0A=
+>  =0A=
+> +	if (pdata->clk)=0A=
+> +		clk_disable(pdata->clk);=0A=
+> +=0A=
+>  	return IRQ_HANDLED;=0A=
+>  }=0A=
+>  =0A=
+> @@ -140,6 +148,25 @@ static int imx_snvs_pwrkey_probe(struct platform_dev=
+ice *pdev)=0A=
+>  	if (pdata->irq < 0)=0A=
+>  		return -EINVAL;=0A=
+>  =0A=
+> +	pdata->clk =3D devm_clk_get(&pdev->dev, "snvs-pwrkey");=0A=
+> +	if (IS_ERR(pdata->clk)) {=0A=
+> +		pdata->clk =3D NULL;=0A=
+Using devm_clk_get_optional() would simplify error handling.=0A=
+=0A=
+> +	} else {=0A=
+> +		error =3D clk_prepare_enable(pdata->clk);=0A=
+> +		if (error) {=0A=
+> +			dev_err(&pdev->dev,=0A=
+> +				"Could not prepare or enable the snvs clock\n");=0A=
+> +			return error;=0A=
+> +		}=0A=
+> +		error =3D devm_add_action_or_reset(&pdev->dev,=0A=
+> +				(void(*)(void *))clk_disable_unprepare,=0A=
+> +				pdata->clk);=0A=
+> +		if (error) {=0A=
+> +			dev_err(&pdev->dev, "failed to add reset action on 'snvs-pwrkey'");=
+=0A=
+> +			return error;=0A=
+> +		}=0A=
+> +	}=0A=
+> +=0A=
+>  	regmap_read(pdata->snvs, SNVS_HPVIDR1_REG, &vid);=0A=
+>  	pdata->minor_rev =3D vid & 0xff;=0A=
+>  =0A=
+> =0A=
