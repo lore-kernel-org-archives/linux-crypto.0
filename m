@@ -2,70 +2,73 @@ Return-Path: <SRS0=xktg=33=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52406C04EB5
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 15:02:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92429C04EB5
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 15:03:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0E1C4214AF
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 15:02:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6828121775
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 15:03:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lvv/L02g"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c4uisUdN"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727129AbgBGPC6 (ORCPT
+        id S1726674AbgBGPDB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Feb 2020 10:02:58 -0500
-Received: from mail-qv1-f66.google.com ([209.85.219.66]:33347 "EHLO
-        mail-qv1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726674AbgBGPC6 (ORCPT
+        Fri, 7 Feb 2020 10:03:01 -0500
+Received: from mail-qt1-f194.google.com ([209.85.160.194]:36683 "EHLO
+        mail-qt1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727130AbgBGPDA (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Feb 2020 10:02:58 -0500
-Received: by mail-qv1-f66.google.com with SMTP id z3so1144904qvn.0
-        for <linux-crypto@vger.kernel.org>; Fri, 07 Feb 2020 07:02:57 -0800 (PST)
+        Fri, 7 Feb 2020 10:03:00 -0500
+Received: by mail-qt1-f194.google.com with SMTP id t13so2056373qto.3
+        for <linux-crypto@vger.kernel.org>; Fri, 07 Feb 2020 07:02:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Lw2eBX37HV3I+iZgkoQ/m7G3lORVIcniU/MJl17AlpI=;
-        b=lvv/L02gCUff+GhyXrjk31y//gR/tCCtpTgRB2hQ/Qk/Dem+KYvZhDqU5E3rcIzuw+
-         UTHe9zuhPXVRiwFt9mtusAQXL3Ud97CwtrQwf28YBpZQJUIx+xQnPbiIRmgYgbt+CoX6
-         146TPVccNr+VPjcyvR/NcnKZyh4pYZLzW9uwWCQPUnFq7lQo4cFwTye3eY65zOYeIOyA
-         Rqj4sHGXYCwPiMl1eGGNdYWp60jOOzHswt5wZTuRuOMRPfNLzhWNL1KTSMkzjUsLKSja
-         FpxzitCZ3GqojK38kfZxjQWrjbcDsa9axZTGLOwjuJRPevyGBGcXXcPapsH2D77+b/cI
-         pDmA==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=Dy9o98hzu1MS+RljWNRsefU29lbZAdlv1mMfEvRfL38=;
+        b=c4uisUdNLTzpymbPFXvGawpmXIi9FZWG3/LhMHqCU0TSVujhM2pkLyJNIXZqfpUBi5
+         6un4dAGQQPlGxY/fL87oCA+krbjeXB3O6cObO1hNFYQ77QTzZSKn009Z6cHCRB2+/g4Q
+         L+1GuFiL7TI69lzrqsHwn3QhAl2u+r9NRbeUvLme6SvlAdddKMnjZ9Z05yTkN5jt5NeG
+         TcpCnWKv+J+am625vuXmg/rLtIv0Kyv1m/nsdZF59wg0L1ZyQOKnfMx/B1qyhfB9jlFZ
+         +NkqKT+mpps19AmT9GFEeAOVAZaNSRoSgV+CaQm0Dt9C9Sz0BgnZ57/dOmZ0oD8merE4
+         dXWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Lw2eBX37HV3I+iZgkoQ/m7G3lORVIcniU/MJl17AlpI=;
-        b=jDEkbXRQ+55IxeRSNvDz7Z7Fgu9E54nqMUsdTX2s0IniDjeWwiaaB8yBdkTVESRfTe
-         Hu/QzDamJ/8w0wthMt5nS8jNB41OnCNMsew+/EqthfKzY7hROXGE7DOLYwlKXRpWP834
-         kPrZVwX7gC8e0qCCwfYXf0uqUfZdzjKLTST/jvakRtGiP7zjJsWSOXGPS5iy3HUr2EHS
-         5jpkEci+bAgdwXETZObe+F18KnHaFDvPv+VTtdPEBQDuuNgh14n5ileXcW/FjGaC3IvW
-         mDU7F0Rm49AQLlqgkpDkogcw5hgCMSuusrUYQ8i639w5esdhFKv0xUpoZlyOX9O+Au9H
-         QkoA==
-X-Gm-Message-State: APjAAAWSblMypx/0p1WjS7wEU5hFtIqzkbYexnvFJIz+3sHj/MjK5Ppj
-        Ya2rwbpYJM5dGHAZoa+jBrrLrfZN
-X-Google-Smtp-Source: APXvYqx5hbrs4heMJaTMV251b3Zw/7a3b9dh1qPIsaDAsvhkYPd7T9kizl8Qu0ojtwmOUYw9M/Lnig==
-X-Received: by 2002:a05:6214:b23:: with SMTP id w3mr7325443qvj.181.1581087776424;
-        Fri, 07 Feb 2020 07:02:56 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=Dy9o98hzu1MS+RljWNRsefU29lbZAdlv1mMfEvRfL38=;
+        b=bjEd4V4rb/wh0X0nTKMXxxM4E//vCrlhAgFnTbld14y6Z90XdTIOYhpb/dzSEKL6X0
+         u6Z4UTJgU5m0SbKSaBrvJVJD2ldzSriqj0WhBdHRn/Clm/lSHX9eSKcFh4+CeGWb7zS+
+         J4Gta5ZrxQ3ycK57TEGxeSeVFFD3dO5Q0vBLzVIuK7tI0DXyLx6UnuSjfHbfWgo8XPa2
+         cUPNc7B0NpBHtUNa7/Sw3SSwxCw6rwK9hNHZQUnfDgiEKDhgno8tNf4Q3nOzZYS3Lm5Y
+         iY79UBwAfLxT/7YfrjvKhihEGPaqUXxtqTa8abOvUnDmLyqTOZ+Ssm6yA2TIbZjylPrK
+         cwKQ==
+X-Gm-Message-State: APjAAAXjItRLFBpiinhtfXw7hbnBWl7O03SvaDr5NY3xKEC+W1H+/Avo
+        cHYJ4y8zwPZmW7+1leX9ROvA30Qc
+X-Google-Smtp-Source: APXvYqyZkrye44WvXCmhyvOgtzxDzh9c+Hki0/k0tOhBqqEcxsmpj0YilESM2n3cY6Yi2hYdGKRErA==
+X-Received: by 2002:ac8:7caf:: with SMTP id z15mr7808295qtv.68.1581087778660;
+        Fri, 07 Feb 2020 07:02:58 -0800 (PST)
 Received: from gateway.troianet.com.br (ipv6.troianet.com.br. [2804:688:21:4::2])
-        by smtp.gmail.com with ESMTPSA id c10sm420740qkm.56.2020.02.07.07.02.54
+        by smtp.gmail.com with ESMTPSA id c10sm420740qkm.56.2020.02.07.07.02.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Feb 2020 07:02:55 -0800 (PST)
+        Fri, 07 Feb 2020 07:02:58 -0800 (PST)
 From:   Eneas U de Queiroz <cotequeiroz@gmail.com>
 To:     linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>
 Cc:     Ard Biesheuvel <ardb@kernel.org>,
         Eneas U de Queiroz <cotequeiroz@gmail.com>
-Subject: [PATCH v5 0/3] crypto: qce driver fixes for gcm
-Date:   Fri,  7 Feb 2020 12:02:24 -0300
-Message-Id: <20200207150227.31014-1-cotequeiroz@gmail.com>
+Subject: [PATCH v5 1/3] crypto: qce - use cryptlen when adding extra sgl
+Date:   Fri,  7 Feb 2020 12:02:25 -0300
+Message-Id: <20200207150227.31014-2-cotequeiroz@gmail.com>
 X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20200207150227.31014-1-cotequeiroz@gmail.com>
+References: <20200207150227.31014-1-cotequeiroz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
@@ -73,117 +76,90 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-I've made enough mistakes in this series, I'll just start over.  It's
-been hard for me not to be able to run test this in master, and have to
-go back and forth between it and 4.19; that's why I have messed up so
-many times.  I apologize for the noise again.
+The qce crypto driver appends an extra entry to the dst sgl, to maintain
+private state information.
 
-If you've read the cover letter from v1 and v2, there's not anything too
-relevant that I'm changing here.
+When the gcm driver sends requests to the ctr skcipher, it passes the
+authentication tag after the actual crypto payload, but it must not be
+touched.
 
----
+Commit 1336c2221bee ("crypto: qce - save a sg table slot for result
+buf") limited the destination sgl to avoid overwriting the
+authentication tag but it assumed the tag would be in a separate sgl
+entry.
 
-I've finally managed to get gcm(aes) working with the qce crypto engine.
+This is not always the case, so it is better to limit the length of the
+destination buffer to req->cryptlen before appending the result buf.
 
-These first patch fixes a bug where the gcm authentication tag was being
-overwritten during gcm decryption, because it was passed in the same sgl
-buffer as the crypto payload.  The qce driver appends some private state
-buffer to the request destination sgl, but it was not checking the
-length of the sgl being passed.
+Signed-off-by: Eneas U de Queiroz <cotequeiroz@gmail.com>
 
-The second patch works around a problem, which I frankly can't pinpoint
-what exactly is the cause, but after some help from Ard Biesheuvel, I
-think it is related to DMA.  When gcm sends a request in
-crypto_gcm_setkey, it stores the hash (the crypto payload) and the iv in
-the same data struct.  When the driver updates the IV, then the payload
-gets overwritten with the unencrypted data, or all zeroes, it may be a
-coincidence.
+--
+v1 -> v5: no change
 
-However, it works if I pass the request down to the fallback driver--it
-is used by the driver to accept 192-bit-key requests.  All I had to do
-was setup the fallback regardless of key size, and then check the
-payload length along with the keysize to pass the request to the
-fallback.  This turns out to enhance performance, because of the
-avoided latency that comes with using the hardware.
-
-I've started with checking for a single 16-byte AES block, and that is
-enough to make gcm work.  Next thing I've done was to tune the request
-size for performance.  What got me started into looking at the qce
-driver was reports of it being detrimental to VPN speed, by the way.
-I've tested this win an Asus RT-AC58U, but the slow VPN reports[1] have
-more devices affected.  Access to the device was kindly provided by
-@simsasss.
-
-I've added a 768-byte block size to tcrypt to get some measurements to
-come up with an optimal threshold to transition from software to
-hardware, and encountered another bug in the qce driver: it apparently
-cannot handle aes-xts requests that are greater than 512 bytes, but not
-a multiple of it.  It failed with 768, 1280; XTS is usually used with a
-512-byte sector (or a multiple of it), so I'm concluding that is the
-cause of failure.
-
-With that fixed, I added a module parameter to set the maximum request
-size that will be handled by the software fallback cipher and made some
-speed measurements using tcrypt to come up with an optimum value.
-
-I've documented this briefly in the parameter description, pointing out
-that gcm will not work if you set it to 0, and in better detail in the
-Kconfig help.
-
-TLDR: In the worst (where the hardware is slowest) case, hardware and
-software speed match at around 768 bytes, but I lowered the threshold to
-512 to benefit the CPU offload.
-
-Here's a sample comparing three runs, using the proposed driver, varying
-the aes_sw_max_len parameter: 1st run will always use fallback, second
-run will use the default fallback for len <= 512, and third run will
-never use the fallback.
-
-testing speed of async cbc(aes) (cbc-aes-qce) encryption
-------------------      ----------   ----------    ----------
-aes_sw_max_len              32,768          512             0
-------------------      ----------   ----------    ----------
-128 bit   16 bytes       8,081,136    5,614,448       430,416
-128 bit   64 bytes      13,152,768   13,205,952     1,745,088
-128 bit  256 bytes      16,094,464   16,101,120     6,969,600
-128 bit  512 bytes      16,701,440   16,705,024    12,866,048
-128 bit  768 bytes      16,883,712   13,192,704    15,186,432
-128 bit 1024 bytes      17,036,288   17,149,952    19,716,096
-128 bit 2048 bytes      17,108,992   30,842,880    32,868,352
-128 bit 4096 bytes      17,203,200   44,929,024    49,655,808
-128 bit 8192 bytes      17,219,584   58,966,016    74,186,752
-256 bit   16 bytes       6,962,432    1,943,616       419,088
-256 bit   64 bytes      10,485,568   10,421,952     1,681,536
-256 bit  256 bytes      12,211,712   12,160,000     6,701,312
-256 bit  512 bytes      12,499,456   12,584,448     9,882,112
-256 bit  768 bytes      12,622,080   12,550,656    14,701,824
-256 bit 1024 bytes      12,750,848   16,079,872    19,585,024
-256 bit 2048 bytes      12,812,288   28,293,120    27,693,056
-256 bit 4096 bytes      12,939,264   34,234,368    44,142,592
-256 bit 8192 bytes      12,845,056   50,274,304    63,520,768
-
-The numbers vary from run to run, sometimes greatly.
-
-I've tried running the same tests with the arm-neon drivers, but the
-results don't change with any cipher mode, so I'm assuming the fallback
-is always aes-generic.
-
-I've made the measurements using an Asus RT-AC58U only, so I don't know
-how other hardware performs, but the user can always override the
-parameter, or even its default value.
-
-[1] https://forum.openwrt.org/t/ipsec-performance-issue/39690
-
-Eneas U de Queiroz (3):
-  crypto: qce - use cryptlen when adding extra sgl
-  crypto: qce - use AES fallback for small requests
-  crypto: qce - handle AES-XTS cases that qce fails
-
- drivers/crypto/Kconfig        | 23 +++++++++++++++++++++++
- drivers/crypto/qce/common.c   |  2 --
- drivers/crypto/qce/common.h   |  3 +++
- drivers/crypto/qce/dma.c      | 11 ++++++-----
- drivers/crypto/qce/dma.h      |  2 +-
- drivers/crypto/qce/skcipher.c | 30 ++++++++++++++++++++----------
- 6 files changed, 53 insertions(+), 18 deletions(-)
-
+diff --git a/drivers/crypto/qce/dma.c b/drivers/crypto/qce/dma.c
+index 7da893dc00e7..46db5bf366b4 100644
+--- a/drivers/crypto/qce/dma.c
++++ b/drivers/crypto/qce/dma.c
+@@ -48,9 +48,10 @@ void qce_dma_release(struct qce_dma_data *dma)
+ 
+ struct scatterlist *
+ qce_sgtable_add(struct sg_table *sgt, struct scatterlist *new_sgl,
+-		int max_ents)
++		unsigned int max_len)
+ {
+ 	struct scatterlist *sg = sgt->sgl, *sg_last = NULL;
++	unsigned int new_len;
+ 
+ 	while (sg) {
+ 		if (!sg_page(sg))
+@@ -61,13 +62,13 @@ qce_sgtable_add(struct sg_table *sgt, struct scatterlist *new_sgl,
+ 	if (!sg)
+ 		return ERR_PTR(-EINVAL);
+ 
+-	while (new_sgl && sg && max_ents) {
+-		sg_set_page(sg, sg_page(new_sgl), new_sgl->length,
+-			    new_sgl->offset);
++	while (new_sgl && sg && max_len) {
++		new_len = new_sgl->length > max_len ? max_len : new_sgl->length;
++		sg_set_page(sg, sg_page(new_sgl), new_len, new_sgl->offset);
+ 		sg_last = sg;
+ 		sg = sg_next(sg);
+ 		new_sgl = sg_next(new_sgl);
+-		max_ents--;
++		max_len -= new_len;
+ 	}
+ 
+ 	return sg_last;
+diff --git a/drivers/crypto/qce/dma.h b/drivers/crypto/qce/dma.h
+index ed25a0d9829e..786402169360 100644
+--- a/drivers/crypto/qce/dma.h
++++ b/drivers/crypto/qce/dma.h
+@@ -43,6 +43,6 @@ void qce_dma_issue_pending(struct qce_dma_data *dma);
+ int qce_dma_terminate_all(struct qce_dma_data *dma);
+ struct scatterlist *
+ qce_sgtable_add(struct sg_table *sgt, struct scatterlist *sg_add,
+-		int max_ents);
++		unsigned int max_len);
+ 
+ #endif /* _DMA_H_ */
+diff --git a/drivers/crypto/qce/skcipher.c b/drivers/crypto/qce/skcipher.c
+index 4217b745f124..63ae75809cb7 100644
+--- a/drivers/crypto/qce/skcipher.c
++++ b/drivers/crypto/qce/skcipher.c
+@@ -97,13 +97,14 @@ qce_skcipher_async_req_handle(struct crypto_async_request *async_req)
+ 
+ 	sg_init_one(&rctx->result_sg, qce->dma.result_buf, QCE_RESULT_BUF_SZ);
+ 
+-	sg = qce_sgtable_add(&rctx->dst_tbl, req->dst, rctx->dst_nents - 1);
++	sg = qce_sgtable_add(&rctx->dst_tbl, req->dst, req->cryptlen);
+ 	if (IS_ERR(sg)) {
+ 		ret = PTR_ERR(sg);
+ 		goto error_free;
+ 	}
+ 
+-	sg = qce_sgtable_add(&rctx->dst_tbl, &rctx->result_sg, 1);
++	sg = qce_sgtable_add(&rctx->dst_tbl, &rctx->result_sg,
++			     QCE_RESULT_BUF_SZ);
+ 	if (IS_ERR(sg)) {
+ 		ret = PTR_ERR(sg);
+ 		goto error_free;
