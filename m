@@ -2,98 +2,108 @@ Return-Path: <SRS0=xktg=33=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF2FDC352A2
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 12:30:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96D09C352A2
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 12:36:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2DA4020720
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 12:30:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="risa1OP3"
+	by mail.kernel.org (Postfix) with ESMTP id 652C6217BA
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 12:36:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726897AbgBGM37 (ORCPT
+        id S1726894AbgBGMg0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Feb 2020 07:29:59 -0500
-Received: from mo4-p01-ob.smtp.rzone.de ([85.215.255.52]:16623 "EHLO
-        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726890AbgBGM37 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Feb 2020 07:29:59 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1581078597;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=KtjZ/hcfzGexdUOqkVZ3eTpPAhXVGcnWWMQFTkp83LE=;
-        b=risa1OP3toCV2WvPPw7/yCF9Vi5ImnDeC05ZGhOmXH6W4k3GZdXkM5gQkaIjnIOh77
-        ZiwlHCT8Wh+rKw8SoO2sERkrqJIKRN1CK0T8l4P79ebg88E29MS9RLmHbVJBW/Cfmr73
-        DjDpyQ9+5z1MPEUmfXJqef49/g8Oc2kykOoQTn1Z2kGTwtgWmE0qCSYRK4Kfx6DGMDeb
-        SBzB5VKZnDBJ4x4E8Nc9lB8FjKObB/5NeGjjK3q9sgME5aCGgECCWGS05UU8uTHR8qWp
-        YyKeuu6YfisT72TrXN3/CorBYLSFS8DD31JSGTpmanLLQrSyIOl+EELAOYWcXm+3wak1
-        E7gQ==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaIfScugJ3"
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-        by smtp.strato.de (RZmta 46.1.12 DYNA|AUTH)
-        with ESMTPSA id 608a92w17CTleTE
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-        Fri, 7 Feb 2020 13:29:47 +0100 (CET)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Gilad Ben-Yossef <gilad@benyossef.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        David Miller <davem@davemloft.net>,
-        Ofir Drang <Ofir.Drang@arm.com>
-Subject: Re: Possible issue with new inauthentic AEAD in extended crypto tests
-Date:   Fri, 07 Feb 2020 13:29:47 +0100
-Message-ID: <6968686.FA8oO0t0Vk@tauon.chronox.de>
-In-Reply-To: <CAOtvUMchWrNsvmLJ2D-qiGOAAgbr_yxtt3h81yOHesa7C6ifZQ@mail.gmail.com>
-References: <CAOtvUMcwLtwgigFE2mx7LVjhhEgcZsSS4WyR_SQ2gixTZxyBfg@mail.gmail.com> <28236835.Fk5ARk2Leh@tauon.chronox.de> <CAOtvUMchWrNsvmLJ2D-qiGOAAgbr_yxtt3h81yOHesa7C6ifZQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+        Fri, 7 Feb 2020 07:36:26 -0500
+Received: from inva020.nxp.com ([92.121.34.13]:51300 "EHLO inva020.nxp.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726819AbgBGMg0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 7 Feb 2020 07:36:26 -0500
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 493F31A49D9;
+        Fri,  7 Feb 2020 13:36:24 +0100 (CET)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 3AE081A49C2;
+        Fri,  7 Feb 2020 13:36:24 +0100 (CET)
+Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 951DA203CD;
+        Fri,  7 Feb 2020 13:36:23 +0100 (CET)
+From:   Iuliana Prodan <iuliana.prodan@nxp.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Baolin Wang <baolin.wang@linaro.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Corentin Labbe <clabbe.montjoie@gmail.com>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        Maxime Ripard <mripard@kernel.org>
+Cc:     Aymen Sghaier <aymen.sghaier@nxp.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Silvano Di Ninno <silvano.dininno@nxp.com>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-imx <linux-imx@nxp.com>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>
+Subject: [PATCH v3 0/2] crypto: engine - support for parallel and batch requests
+Date:   Fri,  7 Feb 2020 14:36:12 +0200
+Message-Id: <1581078974-14778-1-git-send-email-iuliana.prodan@nxp.com>
+X-Mailer: git-send-email 2.1.0
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Freitag, 7. Februar 2020, 12:50:51 CET schrieb Gilad Ben-Yossef:
+Added support for executing multiple, independent or not, requests
+for crypto engine. This is based on a callback, can_enqueue_more, which
+asks the driver if the hardware has free space, to enqueue a new request.
+If hardware supports batch requests, crypto-engine can handle this use-case
+through do_batch_requests callback.
 
-Hi Gilad,
+Since, these new features, cannot be supported by all hardware,
+the crypto-engine framework is backward compatible:
+- by using the crypto_engine_alloc_init function, to initialize
+crypto-engine, the new callbacks are NULL and the engine will work
+as before these changes;
+- to support only multiple requests, in parallel, the can_enqueue_more
+callback must be implemented in driver. On crypto_pump_requests, if
+can_enqueue_more callback returns true, a new request is send
+to hardware, until there is no space and the callback returns false.
+- to support batch requests, do_batch_requests callback must be
+implemented in driver, to execute a batch of requests. The link
+between the requests, is expected to be done in driver, in
+do_one_request(). 
 
-> 
-> It is correct, but is it smart?
-> 
-> Either we require the same IV to be passed twice as we do today, in which
-> case passing different IV should fail in a predictable manner OR we should
-> define the operation is taking two IV like structures - one as the IV and
-> one as bytes in the associated data and have the IPsec code use it in a
-> specific way of happen to pass the same IV in both places.
-> 
-> I don't care either way - but right now the tests basically relies on
-> undefined behaviour
-> which is always a bad thing, I think.
+Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
 
-I am not sure about the motivation of this discussion: we have exactly one 
-user of the RFC4106 implementation: IPSec. Providing the IV/AAD is efficient 
-as the rfc4106 template intents to require the data in a format that requires 
-minimal processing on the IPSec side to bring it in the right format.
+---
+Changes since V2:
+- readded cur_req in crypto-engine, to keep, the exact behavior as before
+these changes, if can_enqueue_more is not implemented: send requests to hardware,
+_one-by-one_, on crypto_pump_requests, and complete it, on
+crypto_finalize_request, and so on.
+- do_batch_requests is available only with can_enqueue_more.
 
-On the other hand, the cipher implementation should just do the operation 
-regardless of where the data comes from or whether the AAD buffer overlaps 
-with the IV buffer. I.e. the cipher should try to interpret the data but just 
-do the work.
+Changes since V1:
+- changed the name of can_enqueue_hardware callback to can_enqueue_more, and
+the argument of this callback to crypto_engine structure (for cases when more
+than ore crypto-engine is used).
+- added a new patch with support for batch requests.
 
-So, where is it inefficient? Maybe the API for RFC4106 could be a bit nicer, 
-but it needs to fit into the overall AEAD API as a specific RFC4106-API seems 
-to be overkill.
+Changes since V0 (RFC):
+- removed max_no_req and no_req, as the number of request that can be
+processed in parallel;
+- added a new callback, can_enqueue_more, to check whether the hardware
+can process a new request.
 
-Ciao
-Stephan
+Iuliana Prodan (2):
+  crypto: engine - support for parallel requests
+  crypto: engine - support for batch requests
 
+ crypto/crypto_engine.c  | 132 +++++++++++++++++++++++++++++++++++++-----------
+ include/crypto/engine.h |  14 +++--
+ 2 files changed, 113 insertions(+), 33 deletions(-)
+
+-- 
+2.1.0
 
