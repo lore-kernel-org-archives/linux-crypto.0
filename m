@@ -2,209 +2,186 @@ Return-Path: <SRS0=xktg=33=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9B8AC352A2
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 11:51:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08672C352A2
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 12:17:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A485B20838
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 11:51:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C3F9220838
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 12:17:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="i/J1a+c3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="p14V7iD5"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726819AbgBGLvH (ORCPT
+        id S1726819AbgBGMR3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Feb 2020 06:51:07 -0500
-Received: from mail-vs1-f65.google.com ([209.85.217.65]:38857 "EHLO
-        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726867AbgBGLvH (ORCPT
+        Fri, 7 Feb 2020 07:17:29 -0500
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:35644 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726674AbgBGMR3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Feb 2020 06:51:07 -0500
-Received: by mail-vs1-f65.google.com with SMTP id r18so1019187vso.5
-        for <linux-crypto@vger.kernel.org>; Fri, 07 Feb 2020 03:51:06 -0800 (PST)
+        Fri, 7 Feb 2020 07:17:29 -0500
+Received: by mail-wr1-f65.google.com with SMTP id w12so2455893wrt.2;
+        Fri, 07 Feb 2020 04:17:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=nCx6jLVRpNQVgGkkHrxN06X1SBx4IO3a9+xDsN5YYmc=;
-        b=i/J1a+c3vFAPSjOLWlfsf+OTGEHGFDocQ8r06FQJEDM6qvjQqsb+nMflG4o00oIOVI
-         0nDQ5epRLIgPRoP7gDI2bYTTcHw3QHAUajWTDTHBQOIgWPQBFe8rYU4u/UW2fI18xIy3
-         tfdhJVLZB9+Qo53Phj6Utk8XbreEKGqdSux+c0Nk/LdDmJULRy4jAV1Cp397aUxjmHO2
-         a20lxnTEU3hAux8dBuhAZ9QM1Wj9oOZInda95+hPgrzC58Tyhk8lO+mWO79Af96L9ord
-         iKC5xFiCrmxcvvJolbtDhxs8jEHl0iwbDK20PI2oSrHUa0NDFwmb/EzFpnQh0fWYvn//
-         m6Ng==
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=14BCez9Md8qjMVgprwHOmq3SMfh9WR/fd6ynsVwnQHM=;
+        b=p14V7iD564ngsVqBUQJI1q6/pp9IxFCc75PikyQ+k4eJagKSVUPQdWAagnIHdTnBBV
+         WBD5xKvjWEqg9YL2zehqyl5VZpBBLRf0lfI5/7KEUFU2sPbFa9dJeEJnGZUOwypfq7hL
+         ksNZ/iaQ9MUvtSWAWep5YXIbcdg37P04XKtOLVUcnWZ2NnVBzxbqWDVs3xTe5Mah1gAh
+         3gfiRiChU3+2mxlGsWnRm2xO+qLBXoyg665L1C/WI0bJ0/MpoHwEeECqiA+jT7Qi8LT+
+         iqom3ccSnXd6k6XmtxDZi1N1efN4G5ouCA7IK6Ocq2m63CPBOLHttAnK76uoWh5yGlBV
+         WVPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=nCx6jLVRpNQVgGkkHrxN06X1SBx4IO3a9+xDsN5YYmc=;
-        b=I3wWMYF+9MRlN2tI1cT2tNqrKhgdMPvIyvBmLYOvUqJrOOHpkCqCciN/mwrfHbYquR
-         Z7iEYNb235MrD6EbpqFkPlku4SrecVPPkJv3MyXkTpJJJwOhe53RYSoyegNX94P2It08
-         KiZcQfhAszd0COK3hYPH0fCRqO0cykAlxydRTEzSfWMHoTOyUFERpVOLn8ntDWaNhgGJ
-         O5f+CnhuLQ/nnoHTLkVXOPPxvzcmuyufFyo9LqjrizJSsBZKYwax+wYXy/uvTllrycgg
-         VDSYRa28n76NqmNLIulU+ubwW/9dT0bKaRUDHX3Sn730R4bBSqmkaMHExIciVmKLF2Fs
-         bxjA==
-X-Gm-Message-State: APjAAAXrSHpLSG4fwIET+/Bc7ZmtDN+gQqhyzOn0SsQedGZTWPFL1n85
-        D780YytoIIswJyPpDsweuH/5aym2pkFSO3yRtSz/oA==
-X-Google-Smtp-Source: APXvYqz3UQndenixuBtRoK87HqhQS5YFlaZ0y4G5Mgz7ThlUvgt+SHj7xoj2TBtOxOUWJg727ldZYCbQEhCezOGZcmE=
-X-Received: by 2002:a67:c90d:: with SMTP id w13mr4602849vsk.164.1581076265458;
- Fri, 07 Feb 2020 03:51:05 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=14BCez9Md8qjMVgprwHOmq3SMfh9WR/fd6ynsVwnQHM=;
+        b=k20d4izR7aCuu0rjoFdfiH9v9VfmOb/avPgMrg7AQZjuaz2vpCVRK7/+xqp9tGZRag
+         HwXnn309zSJ1I37dsolafr9za2cotmqJ5BHdDeXmWv9EB0wkTqgb/GLGQKYOx9aTK9/T
+         CUD2x0rn6P2kG+8H6LXT7/m/K6kb9Lh2Xt70OXGwHL26fpHNnxpIBvGtixrvKX/5o17C
+         Pk8M+90ZzwLZ6gzpSYi+M+zf9mSaVxlRVV6V3NrCkmZjL9mWreN+W/dqgCF10CNMDy3/
+         gvS9yAfFBdQ2i3FB7dupx2oB2tiXKzUfwl0NJUCJoj8EdryYzxDVerZaiOuU5Ikn5Iuj
+         LhnQ==
+X-Gm-Message-State: APjAAAW7t7j2AkSEpAtMW1DwGuPu5tZ4bPGpjYtgLE7xfazMDmiKsdMC
+        Rg2tRZveXhMgDU82z63EGLE=
+X-Google-Smtp-Source: APXvYqwd1KlpxD8gC5hOi1tP09C3sPfcfdaGnwHeyiZvdpKqsCaDfK/KoFL/V9SqLOMlJSv+Z8k8gA==
+X-Received: by 2002:adf:ee43:: with SMTP id w3mr4441395wro.339.1581077845933;
+        Fri, 07 Feb 2020 04:17:25 -0800 (PST)
+Received: from Red ([2a01:cb1d:3d5:a100:2e56:dcff:fed2:c6d6])
+        by smtp.googlemail.com with ESMTPSA id 18sm3047895wmf.1.2020.02.07.04.17.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Feb 2020 04:17:25 -0800 (PST)
+Date:   Fri, 7 Feb 2020 13:17:23 +0100
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     Iuliana Prodan <iuliana.prodan@nxp.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Baolin Wang <baolin.wang@linaro.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>,
+        Maxime Ripard <mripard@kernel.org>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Silvano Di Ninno <silvano.dininno@nxp.com>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        dl-linux-imx <linux-imx@nxp.com>
+Subject: Re: [PATCH v2 1/2] crypto: engine - support for parallel requests
+Message-ID: <20200207121723.GB10979@Red>
+References: <1580819660-30211-1-git-send-email-iuliana.prodan@nxp.com>
+ <1580819660-30211-2-git-send-email-iuliana.prodan@nxp.com>
+ <20200205191128.GA32606@Red>
+ <AM0PR04MB71711FEFD0738893772BE3198C1C0@AM0PR04MB7171.eurprd04.prod.outlook.com>
 MIME-Version: 1.0
-References: <CAOtvUMcwLtwgigFE2mx7LVjhhEgcZsSS4WyR_SQ2gixTZxyBfg@mail.gmail.com>
- <CAOtvUMeVXTDvH5bxVFemYmD9rpZ=xX3MkypAGyZn5VROw6sgZg@mail.gmail.com>
- <20200207072709.GB8284@sol.localdomain> <28236835.Fk5ARk2Leh@tauon.chronox.de>
-In-Reply-To: <28236835.Fk5ARk2Leh@tauon.chronox.de>
-From:   Gilad Ben-Yossef <gilad@benyossef.com>
-Date:   Fri, 7 Feb 2020 13:50:51 +0200
-Message-ID: <CAOtvUMchWrNsvmLJ2D-qiGOAAgbr_yxtt3h81yOHesa7C6ifZQ@mail.gmail.com>
-Subject: Re: Possible issue with new inauthentic AEAD in extended crypto tests
-To:     Stephan Mueller <smueller@chronox.de>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        David Miller <davem@davemloft.net>,
-        Ofir Drang <Ofir.Drang@arm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <AM0PR04MB71711FEFD0738893772BE3198C1C0@AM0PR04MB7171.eurprd04.prod.outlook.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Feb 7, 2020 at 9:56 AM Stephan Mueller <smueller@chronox.de> wrote:
->
-> Am Freitag, 7. Februar 2020, 08:27:09 CET schrieb Eric Biggers:
->
-> Hi Eric,
->
-> > On Wed, Feb 05, 2020 at 04:48:16PM +0200, Gilad Ben-Yossef wrote:
-> > > Probably another issue with my driver, but just in case -
-> > >
-> > > include/crypot/aead.h says:
-> > >  * The scatter list pointing to the input data must contain:
-> > >  *
-> > >  * * for RFC4106 ciphers, the concatenation of
-> > >  *   associated authentication data || IV || plaintext or ciphertext.
-> > >  Note, the *   same IV (buffer) is also set with the
-> > >  aead_request_set_crypt call. Note, *   the API call of
-> > >  aead_request_set_ad must provide the length of the AAD and *   the I=
-V.
-> > >  The API call of aead_request_set_crypt only points to the size of *
-> > >  the input plaintext or ciphertext.
-> > >
-> > > I seem to be missing the place where this is handled in
-> > > generate_random_aead_testvec()
-> > > and generate_aead_message()
-> > >
-> > > We seem to be generating a random IV for providing as the parameter t=
-o
-> > > aead_request_set_crypt()
-> > > but than have other random bytes set in aead_request_set_ad() - or am
-> > > I'm missing something again?
-> >
-> > Yes, for rfc4106 the tests don't pass the same IV in both places.  This=
- is
-> > because I wrote the tests from the perspective of a generic AEAD that
-> > doesn't have this weird IV quirk, and then I added the minimum quirks t=
-o
-> > get the weird algorithms like rfc4106 passing.
-> >
-> > Since the actual behavior of the generic implementation of rfc4106 is t=
-hat
-> > the last 8 bytes of the AAD are ignored, that means that currently the
-> > tests just avoid mutating these bytes when generating inauthentic input
-> > tests.  They don't know that they're (apparently) meant to be another c=
-opy
-> > of the IV.
-> >
-> > So it seems we need to clearly define the behavior when the two IV copi=
-es
-> > don't match.  Should one or the other be used, should an error be retur=
-ned,
-> > or should the behavior be unspecified (in which case the tests would ne=
-ed
-> > to be updated)?
-> >
-> > Unspecified behavior is bad, but it would be easiest for software to us=
-e
-> > req->iv, while hardware might want to use the IV in the scatterlist...
-> >
-> > Herbert and Stephan, any idea what was intended here?
-> >
-> > - Eric
->
-> The full structure of RFC4106 is the following:
->
-> - the key to be set is always 4 bytes larger than required for the respec=
-tive
-> AES operation (i.e. the key is 20, 28 or 36 bytes respectively). The key =
-value
-> contains the following information: key || first 4 bytes of the IV (note,=
- the
-> first 4 bytes of the IV are the bytes derived from the KDF invoked by IKE=
- -
-> i.e. they come from user space and are fixed)
->
-> - data block contains AAD || trailing 8 bytes of IV || plaintext or ciphe=
-rtext
-> - the trailing 8 bytes of the IV are the SPI which is updated for each ne=
-w
-> IPSec package
->
-> aead_request_set_ad points to the AAD plus the 8 bytes of IV in the use c=
-ase
-> of rfc4106(gcm(aes)) as part of IPSec.
->
-> Considering your question about the aead_request_set_ad vs
-> aead_request_set_crypt I think the RFC4106 gives the answer: the IV is us=
-ed in
-> two locations considering that the IV is also the SPI in our case. If you=
- see
-> RFC 4106 chapter 3 you see the trailing 8 bytes of the IV as, well, the G=
-CM IV
-> (which is extended by the 4 byte salt as defined in chapter 4 that we pro=
-vide
-> with the trailing 4 bytes of the key). The kernel uses the SPI for this. =
-In
-> chapter 5 RFC4106 you see that the SP is however used as part of the AAD =
-as
-> well.
->
-> Bottom line: if you do not set the same IV value for both, the AAD and th=
-e GCM
-> IV, you deviate from the use case of rfc4106(gcm(aes)) in IPSec. Yet, fro=
-m a
-> pure mathematical point of view and also from a cipher implementation poi=
-nt of
-> view, it does not matter whether the AAD and the IV point to the same val=
-ue -
-> the implementation must always process that data. The result however will=
- not
-> be identical to the IPSec use case.
->
+On Fri, Feb 07, 2020 at 11:26:38AM +0000, Iuliana Prodan wrote:
+> On 2/5/2020 9:11 PM, Corentin Labbe wrote:
+> > On Tue, Feb 04, 2020 at 02:34:19PM +0200, Iuliana Prodan wrote:
+> >> Added support for executing multiple requests, in parallel,
+> >> for crypto engine.
+> >> A new callback is added, can_enqueue_more, which asks the
+> >> driver if the hardware has free space, to enqueue a new request.
+> >> The new crypto_engine_alloc_init_and_set function, initialize
+> >> crypto-engine, sets the maximum size for crypto-engine software
+> >> queue (not hardcoded anymore) and the can_enqueue_more callback.
+> >> On crypto_pump_requests, if can_enqueue_more callback returns true,
+> >> a new request is send to hardware, until there is no space and the
+> >> callback returns false.
+> >>
+> >> Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
+> >> ---
+> >>   crypto/crypto_engine.c  | 106 ++++++++++++++++++++++++++++++------------------
+> >>   include/crypto/engine.h |  10 +++--
+> >>   2 files changed, 72 insertions(+), 44 deletions(-)
+> >>
+> >> diff --git a/crypto/crypto_engine.c b/crypto/crypto_engine.c
+> >> index eb029ff..aba934f 100644
+> >> --- a/crypto/crypto_engine.c
+> >> +++ b/crypto/crypto_engine.c
+> >> @@ -22,32 +22,18 @@
+> >>    * @err: error number
+> >>    */
+> >>   static void crypto_finalize_request(struct crypto_engine *engine,
+> >> -			     struct crypto_async_request *req, int err)
+> >> +				    struct crypto_async_request *req, int err)
+> >>   {
+> >> -	unsigned long flags;
+> >> -	bool finalize_cur_req = false;
+> >>   	int ret;
+> >>   	struct crypto_engine_ctx *enginectx;
+> >>   
+> >> -	spin_lock_irqsave(&engine->queue_lock, flags);
+> >> -	if (engine->cur_req == req)
+> >> -		finalize_cur_req = true;
+> >> -	spin_unlock_irqrestore(&engine->queue_lock, flags);
+> >> -
+> >> -	if (finalize_cur_req) {
+> >> -		enginectx = crypto_tfm_ctx(req->tfm);
+> >> -		if (engine->cur_req_prepared &&
+> >> -		    enginectx->op.unprepare_request) {
+> >> -			ret = enginectx->op.unprepare_request(engine, req);
+> >> -			if (ret)
+> >> -				dev_err(engine->dev, "failed to unprepare request\n");
+> >> -		}
+> >> -		spin_lock_irqsave(&engine->queue_lock, flags);
+> >> -		engine->cur_req = NULL;
+> >> -		engine->cur_req_prepared = false;
+> >> -		spin_unlock_irqrestore(&engine->queue_lock, flags);
+> >> +	enginectx = crypto_tfm_ctx(req->tfm);
+> >> +	if (enginectx->op.prepare_request &&
+> >> +	    enginectx->op.unprepare_request) {
+> >> +		ret = enginectx->op.unprepare_request(engine, req);
+> >> +		if (ret)
+> >> +			dev_err(engine->dev, "failed to unprepare request\n");
+> >>   	}
+> >> -
+> >>   	req->complete(req, err);
+> >>   
+> >>   	kthread_queue_work(engine->kworker, &engine->pump_requests);
+> >> @@ -73,10 +59,6 @@ static void crypto_pump_requests(struct crypto_engine *engine,
+> >>   
+> >>   	spin_lock_irqsave(&engine->queue_lock, flags);
+> >>   
+> >> -	/* Make sure we are not already running a request */
+> >> -	if (engine->cur_req)
+> >> -		goto out;
+> >> -
+> > 
+> > Hello
+> > 
+> > Your patch has the same problem than mine reported by Horia.
+> > If a queue has more than one request, a first crypto_pump_requests() will send a request and for drivers which do not block on do_one_request() crypto_pump_requests() will end.
+> > Then another crypto_pump_requests() will fire sending a second request while the driver does not support that.
+> 
+> > So we need to replace engine->cur_req by another locking mechanism.
+> > Perhaps the cleaner is to add a "request count" (increased when do_one_request, decreased in crypto_finalize_request)
+> > I know that the early version have that and it was removed, but I do not see any better way.
+> > 
+> 
+> The "request count" I've change it to can_enqueue_more, so the hw can 
+> "answer" if it can enqueue or not.
+> 
+> I'll (re)add the cur_req in crypto-engine.
+> If the new callback, can_enqueue_more, is not implemented the crypto- 
+> engine will work as before - will send requests to hardware, one-by-one, 
+> on crypto_pump_requests, and complete it, on crypto_finalize_request, 
+> and so on.
+> 
 
-It is correct, but is it smart?
-
-Either we require the same IV to be passed twice as we do today, in which c=
-ase
-passing different IV should fail in a predictable manner OR we should defin=
-e
-the operation is taking two IV like structures - one as the IV and one as
-bytes in the associated data and have the IPsec code use it in a specific w=
-ay of
-happen to pass the same IV in both places.
-
-I don't care either way - but right now the tests basically relies on
-undefined behaviour
-which is always a bad thing, I think.
-
-Gilad
-
---=20
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-values of =CE=B2 will give rise to dom!
+But if the crypto_engine use can_enqueue_more, cur_req is a lie, so the name should be changed (or this fact need to be heavy documented on each of its occurence).
