@@ -2,287 +2,297 @@ Return-Path: <SRS0=xktg=33=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AD7EC2BA83
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 14:07:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD0A1C04EB5
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 14:29:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4951920715
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 14:07:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E46EF20838
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 14:29:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=rambus.com header.i=@rambus.com header.b="bTZf5LT3"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="kvjHAFvv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726819AbgBGOH5 (ORCPT
+        id S1727367AbgBGO3a (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Feb 2020 09:07:57 -0500
-Received: from us-smtp-delivery-148.mimecast.com ([63.128.21.148]:54248 "EHLO
-        us-smtp-delivery-148.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726674AbgBGOH5 (ORCPT
+        Fri, 7 Feb 2020 09:29:30 -0500
+Received: from mo4-p01-ob.smtp.rzone.de ([81.169.146.164]:32117 "EHLO
+        mo4-p01-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727692AbgBGO33 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Feb 2020 09:07:57 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rambus.com;
-        s=mimecast20161209; t=1581084474;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=TJ8WNQjLxwHDAeLoQP8+uWz4PdpKMkRHOQNtTwsslhk=;
-        b=bTZf5LT3WMQmxZbixU1sqdNMNlXc5WCeaTy/zUXqdMkCWVzMGT7p71mzX0k05DUFl4qacI
-        bYXEvJb3qh16mwEwU59lCwQQoNghC1RE4qP3Yta7NidXzVbt7oG5DSmmpnY30AVBse8ZbR
-        Qb34vYpRchgXoCIl8g1O+Q7JXJ9D8pU=
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com
- (mail-bn8nam12lp2168.outbound.protection.outlook.com [104.47.55.168])
- (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-160-hFMZ1E3rPXuGM5z2dgS4uQ-1; Fri, 07 Feb 2020 09:07:51 -0500
-Received: from SN4PR0401MB3663.namprd04.prod.outlook.com (10.167.133.19) by
- SN4PR0401MB3632.namprd04.prod.outlook.com (10.167.133.20) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2686.27; Fri, 7 Feb 2020 14:07:49 +0000
-Received: from SN4PR0401MB3663.namprd04.prod.outlook.com
- ([fe80::c071:99a5:6da8:924e]) by SN4PR0401MB3663.namprd04.prod.outlook.com
- ([fe80::c071:99a5:6da8:924e%7]) with mapi id 15.20.2707.023; Fri, 7 Feb 2020
- 14:07:49 +0000
-From:   "Van Leeuwen, Pascal" <pvanleeuwen@rambus.com>
-To:     Stephan Mueller <smueller@chronox.de>,
-        Eric Biggers <ebiggers@kernel.org>
-CC:     Gilad Ben-Yossef <gilad@benyossef.com>,
+        Fri, 7 Feb 2020 09:29:29 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1581085764;
+        s=strato-dkim-0002; d=chronox.de;
+        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=sI8mQh2xsR/tmB1qUx5CgDfFCAYQroaTAzAvePeFLVs=;
+        b=kvjHAFvv4zyjE9OX8ez9hwvkOlWpY4OdhNeY9tesZg4PA60P/RxOkvCZV0cEwgMnFl
+        mrdSfVZ1lNyTNuKk433kk5TVq2WcC1lF0DWLFbxbAWFI2e+tLAZKzDO6bbbS9xmK7THY
+        anB9RM1OPYkBYjotOEdptqUpqLYNbRgE1Wr7FO6gPX8qurpCerrbDPvfAJTZwtS+aJMh
+        O9VD66H2aQO3DYvL7I4KvHVh2fYD1pK/+JXVaBoy0D8eiUnveFD8biXkZlMYWwq1S4jy
+        kG5yWa7J3ZxDoKw54bYICbFE0btIoXtJyTLRpx0eJ3mPvWU5ParBknb1R88/PqkdeFt5
+        8sZw==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaIfScugJ3"
+X-RZG-CLASS-ID: mo00
+Received: from tauon.chronox.de
+        by smtp.strato.de (RZmta 46.1.12 DYNA|AUTH)
+        with ESMTPSA id 608a92w17ETFf62
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+        Fri, 7 Feb 2020 15:29:15 +0100 (CET)
+From:   Stephan Mueller <smueller@chronox.de>
+To:     "Van Leeuwen, Pascal" <pvanleeuwen@rambus.com>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Geert Uytterhoeven <geert@linux-m68k.org>,
         David Miller <davem@davemloft.net>,
         Ofir Drang <Ofir.Drang@arm.com>
-Subject: RE: Possible issue with new inauthentic AEAD in extended crypto tests
-Thread-Topic: Possible issue with new inauthentic AEAD in extended crypto
- tests
-Thread-Index: AQHV1Ohtfj6tA7gaZ0uNkoHJDpcQdaf/XTuAgAARvQCAAD8mgIAA510AgAwnTACAAqlrgIAACBWAgABYvKA=
-Date:   Fri, 7 Feb 2020 14:07:49 +0000
-Message-ID: <SN4PR0401MB366399E54E5B7EE0E54A7E0BC31C0@SN4PR0401MB3663.namprd04.prod.outlook.com>
-References: <CAOtvUMcwLtwgigFE2mx7LVjhhEgcZsSS4WyR_SQ2gixTZxyBfg@mail.gmail.com>
- <CAOtvUMeVXTDvH5bxVFemYmD9rpZ=xX3MkypAGyZn5VROw6sgZg@mail.gmail.com>
- <20200207072709.GB8284@sol.localdomain>
- <70156395ce424f41949feb13fd9f978b@MN2PR20MB2973.namprd20.prod.outlook.com>
-In-Reply-To: <70156395ce424f41949feb13fd9f978b@MN2PR20MB2973.namprd20.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [188.204.2.113]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 223a4ef4-b4be-44a5-6ef6-08d7abd71d59
-x-ms-traffictypediagnostic: SN4PR0401MB3632:
-x-microsoft-antispam-prvs: <SN4PR0401MB36320C12D2BAD74AE769462DC31C0@SN4PR0401MB3632.namprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8882;
-x-forefront-prvs: 0306EE2ED4
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(366004)(39850400004)(136003)(396003)(376002)(346002)(189003)(199004)(7696005)(26005)(71200400001)(2906002)(66556008)(52536014)(66446008)(66476007)(64756008)(186003)(55016002)(478600001)(66946007)(9686003)(76116006)(5660300002)(53546011)(86362001)(81166006)(81156014)(8676002)(4326008)(8936002)(6506007)(54906003)(110136005)(33656002)(316002);DIR:OUT;SFP:1101;SCL:1;SRVR:SN4PR0401MB3632;H:SN4PR0401MB3663.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 2TvaDXDPJI+TNsvBUsbCORPeqbLOlWFsnbGSbmM7UQYAMRjYstm7qgegMjQELBm/dTBDXegEiLPfuNcpIyboq/mQIRuS/apPTE1/vZXWPDe+uGlotJxIxtwBg6zCvCusszgEVqxZ9Muga908n4a0DVbgbuxX3g6YO9eB5g6eafyc6zalTANaiQluahVxhgbKNduxqGyVpGzEYtzeEkT1tGDxkEcepjAnqH6a2wUnUbxh8d57679j+qPSCFPC+Z13Yh355JEcfNs/vshlKkdkeTVighmPiKG+XxJWm7TFIoiLP3UWjRTCw0sWiy7CRjRKA1+2/eF4RknfMUlZGPMUe2J+nC4X1nBeJFIm/NlV2a7Gg7Ou9qeJTz/s59QueVtjanfwt7OwVuAuW7Zpt/EgG7YnzeL2h5vemTWFn41k/dMYUoezsOvokLIt4lwdevEA
-x-ms-exchange-antispam-messagedata: FKAwkZ8M5iFsvlOEQtePW7FqW/Xw1lRlXZaO3NP7fPCUUqzkcW7WIhiJDh8JpvdRCph8ik4lghH2dIuJdv/GFxaBO72t3a23PrxVU51NKdQN4drT1iZ9h9dtyI6wpT3gku+yYGtrsr+w2zG/0WDeHQ==
-x-ms-exchange-transport-forked: True
+Subject: Re: Possible issue with new inauthentic AEAD in extended crypto tests
+Date:   Fri, 07 Feb 2020 15:29:14 +0100
+Message-ID: <3122095.o01qsJJ3EY@tauon.chronox.de>
+In-Reply-To: <SN4PR0401MB366399E54E5B7EE0E54A7E0BC31C0@SN4PR0401MB3663.namprd04.prod.outlook.com>
+References: <CAOtvUMcwLtwgigFE2mx7LVjhhEgcZsSS4WyR_SQ2gixTZxyBfg@mail.gmail.com> <70156395ce424f41949feb13fd9f978b@MN2PR20MB2973.namprd20.prod.outlook.com> <SN4PR0401MB366399E54E5B7EE0E54A7E0BC31C0@SN4PR0401MB3663.namprd04.prod.outlook.com>
 MIME-Version: 1.0
-X-OriginatorOrg: rambus.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 223a4ef4-b4be-44a5-6ef6-08d7abd71d59
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Feb 2020 14:07:49.3144
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bd0ba799-c2b9-413c-9c56-5d1731c4827c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 3OuYEnzldtV/b8TX2ia1dGODQSUu+dblZeCVpqR6iRUx++zHQEyPzQVNZ0UZX2MEZf5shtX4ifmvnySZ+aT1xQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR0401MB3632
-X-MC-Unique: hFMZ1E3rPXuGM5z2dgS4uQ-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: rambus.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-SGkgU3RlcGhhbiwNCg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBsaW51
-eC1jcnlwdG8tb3duZXJAdmdlci5rZXJuZWwub3JnIDxsaW51eC1jcnlwdG8tb3duZXJAdmdlci5r
-ZXJuZWwub3JnPiBPbiBCZWhhbGYgT2YgU3RlcGhhbiBNdWVsbGVyDQo+IFNlbnQ6IEZyaWRheSwg
-RmVicnVhcnkgNywgMjAyMCA4OjU2IEFNDQo+IFRvOiBFcmljIEJpZ2dlcnMgPGViaWdnZXJzQGtl
-cm5lbC5vcmc+DQo+IENjOiBHaWxhZCBCZW4tWW9zc2VmIDxnaWxhZEBiZW55b3NzZWYuY29tPjsg
-SGVyYmVydCBYdSA8aGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1PjsgTGludXggQ3J5cHRvIE1h
-aWxpbmcgTGlzdCA8bGludXgtDQo+IGNyeXB0b0B2Z2VyLmtlcm5lbC5vcmc+OyBHZWVydCBVeXR0
-ZXJob2V2ZW4gPGdlZXJ0QGxpbnV4LW02OGsub3JnPjsgRGF2aWQgTWlsbGVyIDxkYXZlbUBkYXZl
-bWxvZnQubmV0PjsgT2ZpciBEcmFuZw0KPiA8T2Zpci5EcmFuZ0Bhcm0uY29tPg0KPiBTdWJqZWN0
-OiBSZTogUG9zc2libGUgaXNzdWUgd2l0aCBuZXcgaW5hdXRoZW50aWMgQUVBRCBpbiBleHRlbmRl
-ZCBjcnlwdG8gdGVzdHMNCj4NCj4gPDw8IEV4dGVybmFsIEVtYWlsID4+Pg0KPiBDQVVUSU9OOiBU
-aGlzIGVtYWlsIG9yaWdpbmF0ZWQgZnJvbSBvdXRzaWRlIG9mIHRoZSBvcmdhbml6YXRpb24uIERv
-IG5vdCBjbGljayBsaW5rcyBvciBvcGVuIGF0dGFjaG1lbnRzIHVubGVzcyB5b3UgcmVjb2duaXpl
-IHRoZQ0KPiBzZW5kZXIvc2VuZGVyIGFkZHJlc3MgYW5kIGtub3cgdGhlIGNvbnRlbnQgaXMgc2Fm
-ZS4NCj4NCj4NCj4gQW0gRnJlaXRhZywgNy4gRmVicnVhciAyMDIwLCAwODoyNzowOSBDRVQgc2No
-cmllYiBFcmljIEJpZ2dlcnM6DQo+DQo+IEhpIEVyaWMsDQo+DQo+ID4gT24gV2VkLCBGZWIgMDUs
-IDIwMjAgYXQgMDQ6NDg6MTZQTSArMDIwMCwgR2lsYWQgQmVuLVlvc3NlZiB3cm90ZToNCj4gPiA+
-IFByb2JhYmx5IGFub3RoZXIgaXNzdWUgd2l0aCBteSBkcml2ZXIsIGJ1dCBqdXN0IGluIGNhc2Ug
-LQ0KPiA+ID4NCj4gPiA+IGluY2x1ZGUvY3J5cG90L2FlYWQuaCBzYXlzOg0KPiA+ID4gICogVGhl
-IHNjYXR0ZXIgbGlzdCBwb2ludGluZyB0byB0aGUgaW5wdXQgZGF0YSBtdXN0IGNvbnRhaW46DQo+
-ID4gPiAgKg0KPiA+ID4gICogKiBmb3IgUkZDNDEwNiBjaXBoZXJzLCB0aGUgY29uY2F0ZW5hdGlv
-biBvZg0KPiA+ID4gICogICBhc3NvY2lhdGVkIGF1dGhlbnRpY2F0aW9uIGRhdGEgfHwgSVYgfHwg
-cGxhaW50ZXh0IG9yIGNpcGhlcnRleHQuDQo+ID4gPiAgTm90ZSwgdGhlICogICBzYW1lIElWIChi
-dWZmZXIpIGlzIGFsc28gc2V0IHdpdGggdGhlDQo+ID4gPiAgYWVhZF9yZXF1ZXN0X3NldF9jcnlw
-dCBjYWxsLiBOb3RlLCAqICAgdGhlIEFQSSBjYWxsIG9mDQo+ID4gPiAgYWVhZF9yZXF1ZXN0X3Nl
-dF9hZCBtdXN0IHByb3ZpZGUgdGhlIGxlbmd0aCBvZiB0aGUgQUFEIGFuZCAqICAgdGhlIElWLg0K
-PiA+ID4gIFRoZSBBUEkgY2FsbCBvZiBhZWFkX3JlcXVlc3Rfc2V0X2NyeXB0IG9ubHkgcG9pbnRz
-IHRvIHRoZSBzaXplIG9mICoNCj4gPiA+ICB0aGUgaW5wdXQgcGxhaW50ZXh0IG9yIGNpcGhlcnRl
-eHQuDQo+ID4gPg0KPiA+ID4gSSBzZWVtIHRvIGJlIG1pc3NpbmcgdGhlIHBsYWNlIHdoZXJlIHRo
-aXMgaXMgaGFuZGxlZCBpbg0KPiA+ID4gZ2VuZXJhdGVfcmFuZG9tX2FlYWRfdGVzdHZlYygpDQo+
-ID4gPiBhbmQgZ2VuZXJhdGVfYWVhZF9tZXNzYWdlKCkNCj4gPiA+DQo+ID4gPiBXZSBzZWVtIHRv
-IGJlIGdlbmVyYXRpbmcgYSByYW5kb20gSVYgZm9yIHByb3ZpZGluZyBhcyB0aGUgcGFyYW1ldGVy
-IHRvDQo+ID4gPiBhZWFkX3JlcXVlc3Rfc2V0X2NyeXB0KCkNCj4gPiA+IGJ1dCB0aGFuIGhhdmUg
-b3RoZXIgcmFuZG9tIGJ5dGVzIHNldCBpbiBhZWFkX3JlcXVlc3Rfc2V0X2FkKCkgLSBvciBhbQ0K
-PiA+ID4gSSdtIG1pc3Npbmcgc29tZXRoaW5nIGFnYWluPw0KPiA+DQo+ID4gWWVzLCBmb3IgcmZj
-NDEwNiB0aGUgdGVzdHMgZG9uJ3QgcGFzcyB0aGUgc2FtZSBJViBpbiBib3RoIHBsYWNlcy4gIFRo
-aXMgaXMNCj4gPiBiZWNhdXNlIEkgd3JvdGUgdGhlIHRlc3RzIGZyb20gdGhlIHBlcnNwZWN0aXZl
-IG9mIGEgZ2VuZXJpYyBBRUFEIHRoYXQNCj4gPiBkb2Vzbid0IGhhdmUgdGhpcyB3ZWlyZCBJViBx
-dWlyaywgYW5kIHRoZW4gSSBhZGRlZCB0aGUgbWluaW11bSBxdWlya3MgdG8NCj4gPiBnZXQgdGhl
-IHdlaXJkIGFsZ29yaXRobXMgbGlrZSByZmM0MTA2IHBhc3NpbmcuDQo+ID4NCj4gPiBTaW5jZSB0
-aGUgYWN0dWFsIGJlaGF2aW9yIG9mIHRoZSBnZW5lcmljIGltcGxlbWVudGF0aW9uIG9mIHJmYzQx
-MDYgaXMgdGhhdA0KPiA+IHRoZSBsYXN0IDggYnl0ZXMgb2YgdGhlIEFBRCBhcmUgaWdub3JlZCwg
-dGhhdCBtZWFucyB0aGF0IGN1cnJlbnRseSB0aGUNCj4gPiB0ZXN0cyBqdXN0IGF2b2lkIG11dGF0
-aW5nIHRoZXNlIGJ5dGVzIHdoZW4gZ2VuZXJhdGluZyBpbmF1dGhlbnRpYyBpbnB1dA0KPiA+IHRl
-c3RzLiAgVGhleSBkb24ndCBrbm93IHRoYXQgdGhleSdyZSAoYXBwYXJlbnRseSkgbWVhbnQgdG8g
-YmUgYW5vdGhlciBjb3B5DQo+ID4gb2YgdGhlIElWLg0KPiA+DQo+ID4gU28gaXQgc2VlbXMgd2Ug
-bmVlZCB0byBjbGVhcmx5IGRlZmluZSB0aGUgYmVoYXZpb3Igd2hlbiB0aGUgdHdvIElWIGNvcGll
-cw0KPiA+IGRvbid0IG1hdGNoLiAgU2hvdWxkIG9uZSBvciB0aGUgb3RoZXIgYmUgdXNlZCwgc2hv
-dWxkIGFuIGVycm9yIGJlIHJldHVybmVkLA0KPiA+IG9yIHNob3VsZCB0aGUgYmVoYXZpb3IgYmUg
-dW5zcGVjaWZpZWQgKGluIHdoaWNoIGNhc2UgdGhlIHRlc3RzIHdvdWxkIG5lZWQNCj4gPiB0byBi
-ZSB1cGRhdGVkKT8NCj4gPg0KPiA+IFVuc3BlY2lmaWVkIGJlaGF2aW9yIGlzIGJhZCwgYnV0IGl0
-IHdvdWxkIGJlIGVhc2llc3QgZm9yIHNvZnR3YXJlIHRvIHVzZQ0KPiA+IHJlcS0+aXYsIHdoaWxl
-IGhhcmR3YXJlIG1pZ2h0IHdhbnQgdG8gdXNlIHRoZSBJViBpbiB0aGUgc2NhdHRlcmxpc3QuLi4N
-Cj4gPg0KPiA+IEhlcmJlcnQgYW5kIFN0ZXBoYW4sIGFueSBpZGVhIHdoYXQgd2FzIGludGVuZGVk
-IGhlcmU/DQo+ID4NCj4gPiAtIEVyaWMNCj4NCj4gVGhlIGZ1bGwgc3RydWN0dXJlIG9mIFJGQzQx
-MDYgaXMgdGhlIGZvbGxvd2luZzoNCj4NCj4gLSB0aGUga2V5IHRvIGJlIHNldCBpcyBhbHdheXMg
-NCBieXRlcyBsYXJnZXIgdGhhbiByZXF1aXJlZCBmb3IgdGhlIHJlc3BlY3RpdmUNCj4gQUVTIG9w
-ZXJhdGlvbiAoaS5lLiB0aGUga2V5IGlzIDIwLCAyOCBvciAzNiBieXRlcyByZXNwZWN0aXZlbHkp
-LiBUaGUga2V5IHZhbHVlDQo+IGNvbnRhaW5zIHRoZSBmb2xsb3dpbmcgaW5mb3JtYXRpb246IGtl
-eSB8fCBmaXJzdCA0IGJ5dGVzIG9mIHRoZSBJViAobm90ZSwgdGhlDQo+IGZpcnN0IDQgYnl0ZXMg
-b2YgdGhlIElWIGFyZSB0aGUgYnl0ZXMgZGVyaXZlZCBmcm9tIHRoZSBLREYgaW52b2tlZCBieSBJ
-S0UgLQ0KPiBpLmUuIHRoZXkgY29tZSBmcm9tIHVzZXIgc3BhY2UgYW5kIGFyZSBmaXhlZCkNCj4N
-Cj4gLSBkYXRhIGJsb2NrIGNvbnRhaW5zIEFBRCB8fCB0cmFpbGluZyA4IGJ5dGVzIG9mIElWIHx8
-IHBsYWludGV4dCBvciBjaXBoZXJ0ZXh0DQo+IC0gdGhlIHRyYWlsaW5nIDggYnl0ZXMgb2YgdGhl
-IElWIGFyZSB0aGUgU1BJIHdoaWNoIGlzIHVwZGF0ZWQgZm9yIGVhY2ggbmV3DQo+IElQU2VjIHBh
-Y2thZ2UNCj4NCkJ5IFNQSSB5b3UgbXVzdCBtZWFuIHNlcXVlbmNlIG51bWJlcj8NCihUaGUgU1BJ
-IGlzIGFjdHVhbGx5IHRoZSBTQSBpbmRleCB3aGljaCBjZXJ0YWlubHkgZG9lc24ndCBjaGFuZ2Ug
-cGVyIHBhY2tldCEpDQpUaGF0IHdvdWxkIGJlIG9uZSBwb3NzaWJsZSB3YXkgb2YgZ2VuZXJhdGlu
-ZyB0aGUgZXhwbGljaXQgSVYsIGJ1dCB5b3UgY2VydGFpbmx5DQpjYW5ub3QgY291bnQgb24gdGhh
-dC4gQW55dGhpbmcgdW5pcXVlIHVuZGVyIHRoZSBrZXkgd291bGQgYmUgZmluZSBmb3IgR0NNLg0K
-DQo+IGFlYWRfcmVxdWVzdF9zZXRfYWQgcG9pbnRzIHRvIHRoZSBBQUQgcGx1cyB0aGUgOCBieXRl
-cyBvZiBJViBpbiB0aGUgdXNlIGNhc2UNCj4gb2YgcmZjNDEwNihnY20oYWVzKSkgYXMgcGFydCBv
-ZiBJUFNlYy4NCj4NCj4gQ29uc2lkZXJpbmcgeW91ciBxdWVzdGlvbiBhYm91dCB0aGUgYWVhZF9y
-ZXF1ZXN0X3NldF9hZCB2cw0KPiBhZWFkX3JlcXVlc3Rfc2V0X2NyeXB0IEkgdGhpbmsgdGhlIFJG
-QzQxMDYgZ2l2ZXMgdGhlIGFuc3dlcjogdGhlIElWIGlzIHVzZWQgaW4NCj4gdHdvIGxvY2F0aW9u
-cyBjb25zaWRlcmluZyB0aGF0IHRoZSBJViBpcyBhbHNvIHRoZSBTUEkgaW4gb3VyIGNhc2UuIElm
-IHlvdSBzZWUNCj4gUkZDIDQxMDYgY2hhcHRlciAzIHlvdSBzZWUgdGhlIHRyYWlsaW5nIDggYnl0
-ZXMgb2YgdGhlIElWIGFzLCB3ZWxsLCB0aGUgR0NNIElWDQo+ICh3aGljaCBpcyBleHRlbmRlZCBi
-eSB0aGUgNCBieXRlIHNhbHQgYXMgZGVmaW5lZCBpbiBjaGFwdGVyIDQgdGhhdCB3ZSBwcm92aWRl
-DQo+IHdpdGggdGhlIHRyYWlsaW5nIDQgYnl0ZXMgb2YgdGhlIGtleSkuIFRoZSBrZXJuZWwgdXNl
-cyB0aGUgU1BJIGZvciB0aGlzLg0KPg0KQWdhaW4sIGJ5ICBTUEkgeW91IG11c3QgbWVhbiBzZXF1
-ZW5jZSBudW1iZXIuIFRoZSBTUEkgaXRzZWxmIGlzIGVudGlyZWx5IHNlcGVyYXRlLg0KU28gdGhl
-IElWIGlzIG5vdCAidXNlZCBpbiB0d28gcGxhY2VzIiwgaXQgaXMgb25seSB1c2VkIGFzIElWIGZv
-ciB0aGUgQUVBRCBvcGVyYXRpb24sDQp3aXRoIHRoZSBleHBsaWNpdCBwYXJ0ICg4IGJ5dGVzKSBp
-bnNlcnRlZCBpbnRvIHRoZSBwYWNrZXQuDQpbRm9yIEdDTSB0aGUgSVYsIGRlc3BpdGUgYmVpbmcg
-aW4gdGhlIEFBRCBidWZmZXIsICBpcyBfbm90XyBhdXRoZW50aWNhdGVkXQ0KVGhlIHNlcXVlbmNl
-IG51bWJlciBfbWF5XyBiZSB1c2VkIGluIHR3byBwbGFjZXMgKEFBRCBhbmQgZXhwbGljaXQgcGFy
-dCBvZiB0aGUgSVYpLA0KYnV0IHRoYXQgaXMgbm90IGEgZ2l2ZW4gYW5kIG91dCBvZiB0aGUgc2Nv
-cGUgb2YgdGhlIGNyeXB0byBBUEkuIEkgd291bGQgbm90IG1ha2UNCmFueSBhc3N1bXB0aW9ucyB0
-aGVyZS4NCg0KVGhlICJwcm9ibGVtIiBHaWxhZCB3YXMgcmVmZXJyaW5nIHRvIGlzIHRoYXQgdGhl
-IF9leHBsaWNpdF8gcGFydCBvZiB0aGUgIElWIGFwcGVhcnMgdG8gYmUNCmF2YWlsYWJsZSAgZnJv
-bSBib3RoIHJlcS0+aXYgYW5kIGZyb20gdGhlIEFBRCBzY2F0dGVyYnVmZmVyLiBXaGljaCBvbmUg
-c2hvdWxkIHlvdSB1c2U/DQpBUEkgd2lzZSBJIHdvdWxkIGFzc3VtZSByZXEtPml2IGJ1dCBmcm9t
-IGEgKG91cikgaGFyZHdhcmUgcGVyc3BlY3RpdmUsIGl0IHdvdWxkDQpiZSBtb3JlIGVmZmljaWVu
-dCB0byBleHRyYWN0IGl0IGZyb20gdGhlIGRhdGFzdHJlYW0uIEJ1dCBpcyBpdCBhbGxvd2VkIHRv
-IGFzc3VtZQ0KdGhlcmUgaXMgYSB2YWxpZCBJViBzdG9yZWQgdGhlcmU/ICh3aGljaCBpbXBsaWVz
-IHRoYXQgaXQgaGFzIHRvIG1hdGNoIHJlcS0+aXYsDQpvdGhlcndpc2UgYmVoYXZpb3VyIHdvdWxk
-IGRldmlhdGUgZnJvbSBpbXBsZW1lbnRhdGlvbnMgdXNpbmcgdGhhdCkNCg0KPiBJbiBjaGFwdGVy
-IDUgUkZDNDEwNiB5b3Ugc2VlIHRoYXQgdGhlIFNQIGlzIGhvd2V2ZXIgdXNlZCBhcyBwYXJ0IG9m
-IHRoZSBBQUQgYXMNCj4gd2VsbC4NCj4NCj4gQm90dG9tIGxpbmU6IGlmIHlvdSBkbyBub3Qgc2V0
-IHRoZSBzYW1lIElWIHZhbHVlIGZvciBib3RoLCB0aGUgQUFEIGFuZCB0aGUgR0NNDQo+IElWLCB5
-b3UgZGV2aWF0ZSBmcm9tIHRoZSB1c2UgY2FzZSBvZiByZmM0MTA2KGdjbShhZXMpKSBpbiBJUFNl
-Yy4gWWV0LCBmcm9tIGENCj4gcHVyZSBtYXRoZW1hdGljYWwgcG9pbnQgb2YgdmlldyBhbmQgYWxz
-byBmcm9tIGEgY2lwaGVyIGltcGxlbWVudGF0aW9uIHBvaW50IG9mDQo+IHZpZXcsIGl0IGRvZXMg
-bm90IG1hdHRlciB3aGV0aGVyIHRoZSBBQUQgYW5kIHRoZSBJViBwb2ludCB0byB0aGUgc2FtZSB2
-YWx1ZSAtDQo+IHRoZSBpbXBsZW1lbnRhdGlvbiBtdXN0IGFsd2F5cyBwcm9jZXNzIHRoYXQgZGF0
-YS4gVGhlIHJlc3VsdCBob3dldmVyIHdpbGwgbm90DQo+IGJlIGlkZW50aWNhbCB0byB0aGUgSVBT
-ZWMgdXNlIGNhc2UuDQo+DQpGb3IgdGhlIElQc2VjIHVzZSBjYXNlLCBpdCdzIHBlcmZlY3RseSBs
-ZWdhbCB0byBoYXZlIElWICE9IHNlcXVlbmNlIG51bWJlciBhcyBsb25nDQphcyBpdCBpcyB1bmlx
-dWUgdW5kZXIgdGhlIGtleS4NClNvIHlvdSBzaG91bGQgbm90IGFzc3VtZSB0aGUgc2VxdWVuY2Ug
-bnVtYmVyIHBhcnQgb2YgdGhlIEFBRCBidWZmZXIgdG8gbWF0Y2gNCnRoZSBJViBwYXJ0IChvciBy
-ZXEtPml2KSwgYnV0IGl0IF93b3VsZF8gbWFrZSBzZW5zZSBpZiB0aGUgSVYgcGFydCBvZiB0aGUg
-QUFEIG1hdGNoZXMNCnJlcS0+aXYuICh0aGVuIGFnYWluLCBpZiB0aGlzIGlzIG5vdCBfcmVxdWly
-ZWRfIGJ5IHRoZSBBUEkgdGhlIGFwcGxpY2F0aW9uIG1pZ2h0IG5vdA0KYm90aGVyIHByb3ZpZGlu
-ZyBpdCwgd2hpY2ggaXMgbXkgcmVhc29uIG5vdCB0byB1c2UgaW4gaW4gdGhlIGluc2lkZV9zZWN1
-cmUgZHJpdmVyKQ0KDQo+IFNvbWUgY29kZSB0byBpbGx1c3RyYXRlIGl0IC0gdGhpcyBjb2RlIGlz
-IGZyb20gbXkgQ0FWUyB0ZXN0IGhhcm5lc3MgdXNlZCB0bw0KPiBwZXJmb3JtIHRoZSBjcnlwdG8g
-dGVzdGluZyBmb3IgRklQUyAxNDAtMjoNCj4NCj4NCj4gUHJlcGFyYXRpb24gb2YgdGhlIGtleToN
-Cj4NCj4gICAgICAgICAvKg0KPiAgICAgICAgICAqIFJGQzQxMDYgc3BlY2lhbCBoYW5kbGluZzog
-YXBwZW5kIHRoZSBmaXJzdCA0IGJ5dGVzIG9mIHRoZSBJViB0bw0KPiAgICAgICAgICAqIHRoZSBr
-ZXkuIElmIElWIGlzIE5VTEwsIGFwcGVuZCBOVUxMIHN0cmluZyAoaS5lLiB0aGUgZml4ZWQgZmll
-bGQgaXMNCj4gICAgICAgICAgKiB6ZXJvIGluIGNhc2Ugb2YgaW50ZXJuYWwgSVYgZ2VuZXJhdGlv
-bikuIFRoZSBmaXJzdCA0IGJ5dGVzIG9mDQo+ICAgICAgICAgICogdGhlIElWIG11c3QgYmUgcmVt
-b3ZlZCBmcm9tIHRoZSBJViBzdHJpbmcuDQo+ICAgICAgICAgICovDQo+ICAgICAgICAgaWYgKHN0
-cmNhc2VzdHIoY2lwaGVybmFtZSwgInJmYzQxMDYiKSkgew0KPiAgICAgICAgICAgICAgICAgc3Ry
-dWN0IGJ1ZmZlciByZmM7DQo+DQo+ICAgICAgICAgICAgICAgICBtZW1zZXQoJnJmYywgMCwgc2l6
-ZW9mKHN0cnVjdCBidWZmZXIpKTsNCj4gICAgICAgICAgICAgICAgIGlmIChhbGxvY19idWYoZGF0
-YS0+a2V5LmxlbiArIDQsICZyZmMpKQ0KPiAgICAgICAgICAgICAgICAgICAgICAgICBnb3RvIG91
-dDsNCj4NCj4gICAgICAgICAgICAgICAgIC8qIGNvcHkgdGhlIGtleSBpbnRvIGJ1ZmZlciAqLw0K
-PiAgICAgICAgICAgICAgICAgbWVtY3B5KHJmYy5idWYsIGRhdGEtPmtleS5idWYsIGRhdGEtPmtl
-eS5sZW4pOw0KPiAgICAgICAgICAgICAgICAgaWYgKGRhdGEtPml2LmxlbiA+PSA0KSB7DQo+ICAg
-ICAgICAgICAgICAgICAgICAgICAgIHVpbnQzMl90IGkgPSAwOw0KPg0KPiAgICAgICAgICAgICAg
-ICAgICAgICAgICAvKiBDb3B5IGZpcnN0IGZvdXIgYnl0ZXMgb2YgdGhlIElWIGludG8ga2V5ICov
-DQo+ICAgICAgICAgICAgICAgICAgICAgICAgIG1lbWNweShyZmMuYnVmICsgZGF0YS0+a2V5Lmxl
-biwgZGF0YS0+aXYuYnVmLCA0KTsNCj4NCj4gICAgICAgICAgICAgICAgICAgICAgICAgLyogbW92
-ZSByZW1haW5pbmcgYnl0ZXMgdG8gdGhlIGZyb250IHRvIGJlIHVzZWQgYXMgSVYNCj4gKi8NCj4g
-ICAgICAgICAgICAgICAgICAgICAgICAgZm9yIChpID0gMDsgaSA8IChkYXRhLT5pdi5sZW4gLSA0
-KTsgaSsrKQ0KPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGRhdGEtPml2LmJ1Zltp
-XSA9IGRhdGEtPml2LmJ1ZlsoaSArIDQpXTsNCj4gICAgICAgICAgICAgICAgICAgICAgICAgZGF0
-YS0+aXYubGVuIC09IDQ7DQo+ICAgICAgICAgICAgICAgICB9DQo+DQo+DQo+IFByZXBhcmF0aW9u
-IG9mIHRoZSBTR0wgLSB0aGUgSVYgaGVyZSBpcyB0aGUgdHJhaWxpbmcgOCBieXRlcyBhZnRlciB0
-aGUNCj4gb3BlcmF0aW9uIGFib3ZlOg0KPg0KPiAgICAgICAgIGlmIChhZWFkX2Fzc29jLT5sZW4p
-IHsNCj4gICAgICAgICAgICAgICAgIGlmIChyZmM0MTA2KSB7DQo+ICAgICAgICAgICAgICAgICAg
-ICAgICAgIHNnX2luaXRfdGFibGUoc2csIDMpOw0KPiAgICAgICAgICAgICAgICAgICAgICAgICBz
-Z19zZXRfYnVmKCZzZ1swXSwgYWVhZF9hc3NvYy0+ZGF0YSwgYWVhZF9hc3NvYy0+bGVuKTsNCj4g
-ICAgICAgICAgICAgICAgICAgICAgICAgc2dfc2V0X2J1Zigmc2dbMV0sIGl2LT5kYXRhLCBpdi0+
-bGVuKTsNCj4gICAgICAgICAgICAgICAgICAgICAgICAgc2dfc2V0X2J1Zigmc2dbMl0sIGRhdGEt
-PmRhdGEsIGRhdGEtPmxlbiArDQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgKGtj
-Y2F2c190ZXN0LT50eXBlICYgVFlQRV9FTkMgPyBhdXRoc2l6ZSA6DQo+IDApKTsNCj4gICAgICAg
-ICAgICAgICAgIH0gZWxzZSB7DQo+ICAgICAgICAgICAgICAgICAgICAgICAgIHNnX2luaXRfdGFi
-bGUoc2csIDIpOw0KPiAgICAgICAgICAgICAgICAgICAgICAgICBzZ19zZXRfYnVmKCZzZ1swXSwg
-YWVhZF9hc3NvYy0+ZGF0YSwgYWVhZF9hc3NvYy0+bGVuKTsNCj4gICAgICAgICAgICAgICAgICAg
-ICAgICAgc2dfc2V0X2J1Zigmc2dbMV0sIGRhdGEtPmRhdGEsIGRhdGEtPmxlbiArDQo+ICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgKGtjY2F2c190ZXN0LT50eXBlICYgVFlQRV9FTkMg
-PyBhdXRoc2l6ZSA6DQo+IDApKTsNCj4gICAgICAgICAgICAgICAgIH0NCj4gICAgICAgICB9IGVs
-c2Ugew0KPiAgICAgICAgICAgICAgICAgaWYgKHJmYzQxMDYpIHsNCj4gICAgICAgICAgICAgICAg
-ICAgICAgICAgc2dfaW5pdF90YWJsZShzZywgMik7DQo+ICAgICAgICAgICAgICAgICAgICAgICAg
-IHNnX3NldF9idWYoJnNnWzBdLCBpdi0+ZGF0YSwgaXYtPmxlbik7DQo+ICAgICAgICAgICAgICAg
-ICAgICAgICAgIHNnX3NldF9idWYoJnNnWzFdLCBkYXRhLT5kYXRhLCBkYXRhLT5sZW4gKw0KPiAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIChrY2NhdnNfdGVzdC0+dHlwZSAmIFRZUEVf
-RU5DID8gYXV0aHNpemUgOg0KPiAwKSk7DQo+ICAgICAgICAgICAgICAgICB9IGVsc2Ugew0KPiAg
-ICAgICAgICAgICAgICAgICAgICAgICBzZ19pbml0X3RhYmxlKHNnLCAxKTsNCj4gICAgICAgICAg
-ICAgICAgICAgICAgICAgc2dfc2V0X2J1Zigmc2dbMF0sIGRhdGEtPmRhdGEsIGRhdGEtPmxlbiAr
-DQo+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgKGtjY2F2c190ZXN0LT50eXBlICYg
-VFlQRV9FTkMgPyBhdXRoc2l6ZSA6DQo+IDApKTsNCj4gICAgICAgICAgICAgICAgIH0NCj4gICAg
-ICAgICB9DQo+DQo+DQo+IEluZm9ybWluZyB0aGUga2VybmVsIGNyeXB0byBBUEkgYWJvdXQgdGhl
-IEFBRCBzaXplOg0KPg0KPiAgICAgICAgIGlmIChyZmM0MTA2KQ0KPiAgICAgICAgICAgICAgICAg
-YWVhZF9yZXF1ZXN0X3NldF9hZChyZXEsIGFlYWRfYXNzb2MtPmxlbiArIGl2LT5sZW4pOw0KPiAg
-ICAgICAgIGVsc2UNCj4gICAgICAgICAgICAgICAgIGFlYWRfcmVxdWVzdF9zZXRfYWQocmVxLCBh
-ZWFkX2Fzc29jLT5sZW4pOw0KPg0KPg0KPiBTZXQgdGhlIGJ1ZmZlcnM6DQo+DQo+ICAgICAgICAg
-YWVhZF9yZXF1ZXN0X3NldF9jcnlwdChyZXEsIHNnLCBzZywgZGF0YS0+bGVuLCBpdi0+ZGF0YSk7
-DQo+DQo+IENpYW8NCj4gU3RlcGhhbg0KDQpSZWdhcmRzLA0KUGFzY2FsIHZhbiBMZWV1d2VuDQpT
-aWxpY29uIElQIEFyY2hpdGVjdCBNdWx0aS1Qcm90b2NvbCBFbmdpbmVzLCBSYW1idXMgU2VjdXJp
-dHkNClJhbWJ1cyBST1RXIEhvbGRpbmcgQlYNCiszMS03MyA2NTgxOTUzDQoNCk5vdGU6IFRoZSBJ
-bnNpZGUgU2VjdXJlL1ZlcmltYXRyaXggU2lsaWNvbiBJUCB0ZWFtIHdhcyByZWNlbnRseSBhY3F1
-aXJlZCBieSBSYW1idXMuDQpQbGVhc2UgYmUgc28ga2luZCB0byB1cGRhdGUgeW91ciBlLW1haWwg
-YWRkcmVzcyBib29rIHdpdGggbXkgbmV3IGUtbWFpbCBhZGRyZXNzLg0KDQoNCioqIFRoaXMgbWVz
-c2FnZSBhbmQgYW55IGF0dGFjaG1lbnRzIGFyZSBmb3IgdGhlIHNvbGUgdXNlIG9mIHRoZSBpbnRl
-bmRlZCByZWNpcGllbnQocykuIEl0IG1heSBjb250YWluIGluZm9ybWF0aW9uIHRoYXQgaXMgY29u
-ZmlkZW50aWFsIGFuZCBwcml2aWxlZ2VkLiBJZiB5b3UgYXJlIG5vdCB0aGUgaW50ZW5kZWQgcmVj
-aXBpZW50IG9mIHRoaXMgbWVzc2FnZSwgeW91IGFyZSBwcm9oaWJpdGVkIGZyb20gcHJpbnRpbmcs
-IGNvcHlpbmcsIGZvcndhcmRpbmcgb3Igc2F2aW5nIGl0LiBQbGVhc2UgZGVsZXRlIHRoZSBtZXNz
-YWdlIGFuZCBhdHRhY2htZW50cyBhbmQgbm90aWZ5IHRoZSBzZW5kZXIgaW1tZWRpYXRlbHkuICoq
-DQoNClJhbWJ1cyBJbmMuPGh0dHA6Ly93d3cucmFtYnVzLmNvbT4NCg==
+Am Freitag, 7. Februar 2020, 15:07:49 CET schrieb Van Leeuwen, Pascal:
+
+Hi Pascal,
+
+> Hi Stephan,
+> 
+> 
+> > -----Original Message-----
+> > From: linux-crypto-owner@vger.kernel.org
+> > <linux-crypto-owner@vger.kernel.org> On Behalf Of Stephan Mueller
+ Sent:
+> > Friday, February 7, 2020 8:56 AM
+> > To: Eric Biggers <ebiggers@kernel.org>
+> > Cc: Gilad Ben-Yossef <gilad@benyossef.com>; Herbert Xu
+> > <herbert@gondor.apana.org.au>; Linux Crypto Mailing List <linux-
+> > crypto@vger.kernel.org>; Geert Uytterhoeven <geert@linux-m68k.org>; David
+> > Miller <davem@davemloft.net>; Ofir Drang <Ofir.Drang@arm.com>
+> > Subject: Re: Possible issue with new inauthentic AEAD in extended crypto
+> > tests
+>
+> >
+> >
+> > <<< External Email >>>
+> > CAUTION: This email originated from outside of the organization. Do not
+> > click links or open attachments unless you recognize the
+ sender/sender
+> > address and know the content is safe.
+> >
+> >
+> >
+> >
+> > Am Freitag, 7. Februar 2020, 08:27:09 CET schrieb Eric Biggers:
+> >
+> >
+> >
+> > Hi Eric,
+> >
+> >
+> >
+> > > On Wed, Feb 05, 2020 at 04:48:16PM +0200, Gilad Ben-Yossef wrote:
+> > > 
+> > > > Probably another issue with my driver, but just in case -
+> > > >
+> > > >
+> > > >
+> > > > include/crypot/aead.h says:
+> > > > 
+> > > >  * The scatter list pointing to the input data must contain:
+> > > >  *
+> > > >  * * for RFC4106 ciphers, the concatenation of
+> > > >  *   associated authentication data || IV || plaintext or ciphertext.
+> > > >  Note, the *   same IV (buffer) is also set with the
+> > > >  aead_request_set_crypt call. Note, *   the API call of
+> > > >  aead_request_set_ad must provide the length of the AAD and *   the
+> > > >  IV.
+> > > >  The API call of aead_request_set_crypt only points to the size of *
+> > > >  the input plaintext or ciphertext.
+> > > >
+> > > >
+> > > >
+> > > > I seem to be missing the place where this is handled in
+> > > > generate_random_aead_testvec()
+> > > > and generate_aead_message()
+> > > >
+> > > >
+> > > >
+> > > > We seem to be generating a random IV for providing as the parameter
+> > > > to
+> > > > aead_request_set_crypt()
+> > > > but than have other random bytes set in aead_request_set_ad() - or am
+> > > > I'm missing something again?
+> > >
+> > >
+> > >
+> > > Yes, for rfc4106 the tests don't pass the same IV in both places.  This
+> > > is
+> > > because I wrote the tests from the perspective of a generic AEAD that
+> > > doesn't have this weird IV quirk, and then I added the minimum quirks
+> > > to
+> > > get the weird algorithms like rfc4106 passing.
+> > >
+> > >
+> > >
+> > > Since the actual behavior of the generic implementation of rfc4106 is
+> > > that
+> > > the last 8 bytes of the AAD are ignored, that means that currently the
+> > > tests just avoid mutating these bytes when generating inauthentic input
+> > > tests.  They don't know that they're (apparently) meant to be another
+> > > copy
+> > > of the IV.
+> > >
+> > >
+> > >
+> > > So it seems we need to clearly define the behavior when the two IV
+> > > copies
+> > > don't match.  Should one or the other be used, should an error be
+> > > returned,
+ or should the behavior be unspecified (in which case the
+> > > tests would need to be updated)?
+> > >
+> > >
+> > >
+> > > Unspecified behavior is bad, but it would be easiest for software to
+> > > use
+> > > req->iv, while hardware might want to use the IV in the scatterlist...
+> > >
+> > >
+> > >
+> > > Herbert and Stephan, any idea what was intended here?
+> > >
+> > >
+> > >
+> > > - Eric
+> >
+> >
+> >
+> > The full structure of RFC4106 is the following:
+> >
+> >
+> >
+> > - the key to be set is always 4 bytes larger than required for the
+> > respective
+ AES operation (i.e. the key is 20, 28 or 36 bytes
+> > respectively). The key value contains the following information: key ||
+> > first 4 bytes of the IV (note, the first 4 bytes of the IV are the bytes
+> > derived from the KDF invoked by IKE - i.e. they come from user space and
+> > are fixed)
+> >
+> >
+> >
+> > - data block contains AAD || trailing 8 bytes of IV || plaintext or
+> > ciphertext
+ - the trailing 8 bytes of the IV are the SPI which is updated
+> > for each new IPSec package
+> >
+> >
+> 
+> By SPI you must mean sequence number?
+> (The SPI is actually the SA index which certainly doesn't change per
+> packet!)
+> That would be one possible way of generating the explicit IV, but
+> you certainly cannot count on that. Anything unique under the key would be
+> fine for GCM. 
+
+The IV actually is generated with an IV generator (I think it is the SEQIV 
+generator from crypto/seqiv.c - it is set in the XFRM framework). It is a 
+deterministic construction XORed with a random number from the SP800-90A DRBG.
+
+> 
+> > aead_request_set_ad points to the AAD plus the 8 bytes of IV in the use
+> > case
+ of rfc4106(gcm(aes)) as part of IPSec.
+> >
+> >
+> >
+> > Considering your question about the aead_request_set_ad vs
+> > aead_request_set_crypt I think the RFC4106 gives the answer: the IV is
+> > used in
+ two locations considering that the IV is also the SPI in our
+> > case. If you see RFC 4106 chapter 3 you see the trailing 8 bytes of the
+> > IV as, well, the GCM IV (which is extended by the 4 byte salt as defined
+> > in chapter 4 that we provide with the trailing 4 bytes of the key). The
+> > kernel uses the SPI for this.>
+> >
+> 
+> Again, by  SPI you must mean sequence number. The SPI itself is entirely
+> seperate.
+
+See above, it is actually not the SPI, or sequence number, it is what the IV 
+generator provides.
+
+> So the IV is not "used in two places", it is only used as IV for
+> the AEAD operation, with the explicit part (8 bytes) inserted into the
+> packet.
+> [For GCM the IV, despite being in the AAD buffer,  is _not_ authenticated]
+> The sequence number _may_ be used in two places (AAD and explicit part of
+> the IV),
+> but that is not a given and out of the scope of the crypto API. I
+> would not make any assumptions there.
+> 
+> The "problem" Gilad was referring to is that the _explicit_ part of the  IV
+> appears to be
+> available  from both req->iv and from the AAD scatterbuffer.
+> Which one should you use? API wise I would assume req->iv but from a (our)
+> hardware perspective, it would be more efficient to extract it from the
+> datastream. But is it allowed to assume there is a valid IV stored there?
+> (which implies that it has to match req->iv, otherwise behaviour would
+> deviate from implementations using that) 
+
+req->iv is your IV.
+
+The use of the IV as part of the AAD is just a use case for rfc4106. Although 
+I doubt that the rfc4106 structure will change any time soon, I would not use 
+the IV from the AAD but only look at the req->iv.
+
+> 
+> > In chapter 5 RFC4106 you see that the SP is however used as part of the
+> > AAD as
+ well.
+> >
+> >
+> >
+> > Bottom line: if you do not set the same IV value for both, the AAD and the
+> > GCM
+ IV, you deviate from the use case of rfc4106(gcm(aes)) in IPSec.
+> > Yet, from a pure mathematical point of view and also from a cipher
+> > implementation point of view, it does not matter whether the AAD and the
+> > IV point to the same value - the implementation must always process that
+> > data. The result however will not be identical to the IPSec use case.
+> >
+> >
+> 
+> For the IPsec use case, it's perfectly legal to have IV != sequence number
+> as long
+> as it is unique under the key.
+
+Right, it is a perfectly legal way of doing it, but it is currently not done 
+that way in the kernel. Thus, I would reiterate my suggestion from above to 
+always use req->iv as your IV.
+
+> So you should not assume the sequence number part of the AAD buffer to
+> match
+> the IV part (or req->iv), but it _would_ make sense if the IV part
+> of the AAD matches req->iv. (then again, if this is not _required_ by the
+> API the application might not bother providing it, which is my reason not
+> to use in in the inside_secure driver) 
+
+Precisely.
+
+Ciao
+Stephan
+
 
