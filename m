@@ -2,235 +2,188 @@ Return-Path: <SRS0=xktg=33=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2060C04EB5
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 14:30:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52406C04EB5
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 15:02:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 97C1E214AF
-	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 14:30:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0E1C4214AF
+	for <linux-crypto@archiver.kernel.org>; Fri,  7 Feb 2020 15:02:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=rambus.com header.i=@rambus.com header.b="EwxUoDOq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lvv/L02g"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726954AbgBGOap (ORCPT
+        id S1727129AbgBGPC6 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 7 Feb 2020 09:30:45 -0500
-Received: from us-smtp-delivery-148.mimecast.com ([216.205.24.148]:50612 "EHLO
-        us-smtp-delivery-148.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726982AbgBGOap (ORCPT
+        Fri, 7 Feb 2020 10:02:58 -0500
+Received: from mail-qv1-f66.google.com ([209.85.219.66]:33347 "EHLO
+        mail-qv1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726674AbgBGPC6 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 7 Feb 2020 09:30:45 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rambus.com;
-        s=mimecast20161209; t=1581085843;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=0zKpWERELxf60E5/gLNnYHMraFqyEiSY4KT+PT29sBQ=;
-        b=EwxUoDOq6B+1o6MTYFx9xYjwetO+4Iwpb1NlMZ2J13RlatyR23no9aCsw4mhM+igUmE1Pn
-        LYK0D2kCaY1W/ymRRDRq1Wt4KfV1NXijCv6FMAmSntdGelpfwbzr4VcXNaB5oW0iWhyUTe
-        8f0qPEa3dGNZWtq4Ncw1evuxHKjeFjY=
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com
- (mail-bn8nam12lp2177.outbound.protection.outlook.com [104.47.55.177])
- (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-185-GxkM7r4BMp2Z3wdXF49aFA-1; Fri, 07 Feb 2020 09:30:41 -0500
-Received: from SN4PR0401MB3663.namprd04.prod.outlook.com (10.167.133.19) by
- SN4PR0401MB3567.namprd04.prod.outlook.com (10.167.141.155) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2686.29; Fri, 7 Feb 2020 14:30:38 +0000
-Received: from SN4PR0401MB3663.namprd04.prod.outlook.com
- ([fe80::c071:99a5:6da8:924e]) by SN4PR0401MB3663.namprd04.prod.outlook.com
- ([fe80::c071:99a5:6da8:924e%7]) with mapi id 15.20.2707.023; Fri, 7 Feb 2020
- 14:30:38 +0000
-From:   "Van Leeuwen, Pascal" <pvanleeuwen@rambus.com>
-To:     Gilad Ben-Yossef <gilad@benyossef.com>,
-        Stephan Mueller <smueller@chronox.de>
-CC:     Eric Biggers <ebiggers@kernel.org>,
+        Fri, 7 Feb 2020 10:02:58 -0500
+Received: by mail-qv1-f66.google.com with SMTP id z3so1144904qvn.0
+        for <linux-crypto@vger.kernel.org>; Fri, 07 Feb 2020 07:02:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Lw2eBX37HV3I+iZgkoQ/m7G3lORVIcniU/MJl17AlpI=;
+        b=lvv/L02gCUff+GhyXrjk31y//gR/tCCtpTgRB2hQ/Qk/Dem+KYvZhDqU5E3rcIzuw+
+         UTHe9zuhPXVRiwFt9mtusAQXL3Ud97CwtrQwf28YBpZQJUIx+xQnPbiIRmgYgbt+CoX6
+         146TPVccNr+VPjcyvR/NcnKZyh4pYZLzW9uwWCQPUnFq7lQo4cFwTye3eY65zOYeIOyA
+         Rqj4sHGXYCwPiMl1eGGNdYWp60jOOzHswt5wZTuRuOMRPfNLzhWNL1KTSMkzjUsLKSja
+         FpxzitCZ3GqojK38kfZxjQWrjbcDsa9axZTGLOwjuJRPevyGBGcXXcPapsH2D77+b/cI
+         pDmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Lw2eBX37HV3I+iZgkoQ/m7G3lORVIcniU/MJl17AlpI=;
+        b=jDEkbXRQ+55IxeRSNvDz7Z7Fgu9E54nqMUsdTX2s0IniDjeWwiaaB8yBdkTVESRfTe
+         Hu/QzDamJ/8w0wthMt5nS8jNB41OnCNMsew+/EqthfKzY7hROXGE7DOLYwlKXRpWP834
+         kPrZVwX7gC8e0qCCwfYXf0uqUfZdzjKLTST/jvakRtGiP7zjJsWSOXGPS5iy3HUr2EHS
+         5jpkEci+bAgdwXETZObe+F18KnHaFDvPv+VTtdPEBQDuuNgh14n5ileXcW/FjGaC3IvW
+         mDU7F0Rm49AQLlqgkpDkogcw5hgCMSuusrUYQ8i639w5esdhFKv0xUpoZlyOX9O+Au9H
+         QkoA==
+X-Gm-Message-State: APjAAAWSblMypx/0p1WjS7wEU5hFtIqzkbYexnvFJIz+3sHj/MjK5Ppj
+        Ya2rwbpYJM5dGHAZoa+jBrrLrfZN
+X-Google-Smtp-Source: APXvYqx5hbrs4heMJaTMV251b3Zw/7a3b9dh1qPIsaDAsvhkYPd7T9kizl8Qu0ojtwmOUYw9M/Lnig==
+X-Received: by 2002:a05:6214:b23:: with SMTP id w3mr7325443qvj.181.1581087776424;
+        Fri, 07 Feb 2020 07:02:56 -0800 (PST)
+Received: from gateway.troianet.com.br (ipv6.troianet.com.br. [2804:688:21:4::2])
+        by smtp.gmail.com with ESMTPSA id c10sm420740qkm.56.2020.02.07.07.02.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Feb 2020 07:02:55 -0800 (PST)
+From:   Eneas U de Queiroz <cotequeiroz@gmail.com>
+To:     linux-crypto@vger.kernel.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        David Miller <davem@davemloft.net>,
-        Ofir Drang <Ofir.Drang@arm.com>
-Subject: RE: Possible issue with new inauthentic AEAD in extended crypto tests
-Thread-Topic: Possible issue with new inauthentic AEAD in extended crypto
- tests
-Thread-Index: AQHV1Ohtfj6tA7gaZ0uNkoHJDpcQdaf/XTuAgAARvQCAAD8mgIAA510AgAwnTACAAqlrgIAACBWAgABBmICAACb98A==
-Date:   Fri, 7 Feb 2020 14:30:38 +0000
-Message-ID: <SN4PR0401MB3663B748BAF480B6B6C9E78FC31C0@SN4PR0401MB3663.namprd04.prod.outlook.com>
-References: <CAOtvUMcwLtwgigFE2mx7LVjhhEgcZsSS4WyR_SQ2gixTZxyBfg@mail.gmail.com>
- <CAOtvUMeVXTDvH5bxVFemYmD9rpZ=xX3MkypAGyZn5VROw6sgZg@mail.gmail.com>
- <20200207072709.GB8284@sol.localdomain>
- <28236835.Fk5ARk2Leh@tauon.chronox.de>
- <3b65754206a049e596efeb76619eef5c@MN2PR20MB2973.namprd20.prod.outlook.com>
-In-Reply-To: <3b65754206a049e596efeb76619eef5c@MN2PR20MB2973.namprd20.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [188.204.2.113]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: b5015bba-0e2f-44b8-072b-08d7abda4d97
-x-ms-traffictypediagnostic: SN4PR0401MB3567:
-x-microsoft-antispam-prvs: <SN4PR0401MB35676355764FC99B9270B1CCC31C0@SN4PR0401MB3567.namprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 0306EE2ED4
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(366004)(396003)(346002)(39850400004)(136003)(376002)(189003)(199004)(71200400001)(66446008)(86362001)(64756008)(66556008)(76116006)(66946007)(66476007)(2906002)(316002)(110136005)(8936002)(4326008)(81166006)(54906003)(8676002)(81156014)(26005)(55016002)(7696005)(5660300002)(52536014)(53546011)(9686003)(6506007)(478600001)(33656002)(186003);DIR:OUT;SFP:1101;SCL:1;SRVR:SN4PR0401MB3567;H:SN4PR0401MB3663.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 5CYtzuIDANTkbVpYz0HmhR40ntmiqJ9rZm4qpMX9e+1eh/2V1QO+6AymjMEhkpijGp7E8bvSfGA97cer2051k1/4kRTV/2ZTIzAwsu9ca/jsfI1/YOKzyb9EyGremwzklq5cKLXQaWNScsBJsd+nzFC0pByau5p4i2eYLPJ69vM8dp1vJHmICPTIxt9wi0CxoIuQxOQfOOYdKiuH7Zn4raKwNFOy4T7KWN5PheDKcbrsF4FlnSqBc6ulkixzDcB2FJGbPLUZX+rSPmJPF0pULxt2rydbzesYbV7QunP2sIWiE4eYPSKQvBIfGcdVeKPGTOJzF0tTjJUwstGqkCuQ+/v9vvRkc/GxUa7yCAelExDzZ7BhIV/ZwIJu8d9uPYqAQ6DUC+AvLgu1bR7yYNmCz04mz/zxqJXpAzkA1W9+ZTmk3RHo2lmFS68C/IO2Cngb
-x-ms-exchange-antispam-messagedata: QacbTqP6yg874+HdXNTD9dvWUWOhlZLYrgv6lTAi/amQv3VXflvkzs+o9XPhMopdxg1rJwV3rL3yuYR91+ZRzAAQrZvWrUbQe7UxQdvQpNlZ4PwPBZEyYTgElbk0P/8yKnYqo3OireMCm1rzZwo2Nw==
-x-ms-exchange-transport-forked: True
+        "David S. Miller" <davem@davemloft.net>
+Cc:     Ard Biesheuvel <ardb@kernel.org>,
+        Eneas U de Queiroz <cotequeiroz@gmail.com>
+Subject: [PATCH v5 0/3] crypto: qce driver fixes for gcm
+Date:   Fri,  7 Feb 2020 12:02:24 -0300
+Message-Id: <20200207150227.31014-1-cotequeiroz@gmail.com>
+X-Mailer: git-send-email 2.23.0
 MIME-Version: 1.0
-X-OriginatorOrg: rambus.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b5015bba-0e2f-44b8-072b-08d7abda4d97
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Feb 2020 14:30:38.8088
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bd0ba799-c2b9-413c-9c56-5d1731c4827c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: dhtEKIPt1Hvagg87Drwd3a3J4bXjrpkss4xa2wAFbw1EG1ShMiqweEZo4yiSf9xx9m34UpbqHu0nDOaxnhXhiA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR0401MB3567
-X-MC-Unique: GxkM7r4BMp2Z3wdXF49aFA-1
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: rambus.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBsaW51eC1jcnlwdG8tb3duZXJA
-dmdlci5rZXJuZWwub3JnIDxsaW51eC1jcnlwdG8tb3duZXJAdmdlci5rZXJuZWwub3JnPiBPbiBC
-ZWhhbGYgT2YgR2lsYWQgQmVuLVlvc3NlZg0KPiBTZW50OiBGcmlkYXksIEZlYnJ1YXJ5IDcsIDIw
-MjAgMTI6NTEgUE0NCj4gVG86IFN0ZXBoYW4gTXVlbGxlciA8c211ZWxsZXJAY2hyb25veC5kZT4N
-Cj4gQ2M6IEVyaWMgQmlnZ2VycyA8ZWJpZ2dlcnNAa2VybmVsLm9yZz47IEhlcmJlcnQgWHUgPGhl
-cmJlcnRAZ29uZG9yLmFwYW5hLm9yZy5hdT47IExpbnV4IENyeXB0byBNYWlsaW5nIExpc3QgPGxp
-bnV4LQ0KPiBjcnlwdG9Admdlci5rZXJuZWwub3JnPjsgR2VlcnQgVXl0dGVyaG9ldmVuIDxnZWVy
-dEBsaW51eC1tNjhrLm9yZz47IERhdmlkIE1pbGxlciA8ZGF2ZW1AZGF2ZW1sb2Z0Lm5ldD47IE9m
-aXIgRHJhbmcNCj4gPE9maXIuRHJhbmdAYXJtLmNvbT4NCj4gU3ViamVjdDogUmU6IFBvc3NpYmxl
-IGlzc3VlIHdpdGggbmV3IGluYXV0aGVudGljIEFFQUQgaW4gZXh0ZW5kZWQgY3J5cHRvIHRlc3Rz
-DQo+DQo+IDw8PCBFeHRlcm5hbCBFbWFpbCA+Pj4NCj4gQ0FVVElPTjogVGhpcyBlbWFpbCBvcmln
-aW5hdGVkIGZyb20gb3V0c2lkZSBvZiB0aGUgb3JnYW5pemF0aW9uLiBEbyBub3QgY2xpY2sgbGlu
-a3Mgb3Igb3BlbiBhdHRhY2htZW50cyB1bmxlc3MgeW91IHJlY29nbml6ZSB0aGUNCj4gc2VuZGVy
-L3NlbmRlciBhZGRyZXNzIGFuZCBrbm93IHRoZSBjb250ZW50IGlzIHNhZmUuDQo+DQo+DQo+IE9u
-IEZyaSwgRmViIDcsIDIwMjAgYXQgOTo1NiBBTSBTdGVwaGFuIE11ZWxsZXIgPHNtdWVsbGVyQGNo
-cm9ub3guZGU+IHdyb3RlOg0KPiA+DQo+ID4gQW0gRnJlaXRhZywgNy4gRmVicnVhciAyMDIwLCAw
-ODoyNzowOSBDRVQgc2NocmllYiBFcmljIEJpZ2dlcnM6DQo+ID4NCj4gPiBIaSBFcmljLA0KPiA+
-DQo+ID4gPiBPbiBXZWQsIEZlYiAwNSwgMjAyMCBhdCAwNDo0ODoxNlBNICswMjAwLCBHaWxhZCBC
-ZW4tWW9zc2VmIHdyb3RlOg0KPiA+ID4gPiBQcm9iYWJseSBhbm90aGVyIGlzc3VlIHdpdGggbXkg
-ZHJpdmVyLCBidXQganVzdCBpbiBjYXNlIC0NCj4gPiA+ID4NCj4gPiA+ID4gaW5jbHVkZS9jcnlw
-b3QvYWVhZC5oIHNheXM6DQo+ID4gPiA+ICAqIFRoZSBzY2F0dGVyIGxpc3QgcG9pbnRpbmcgdG8g
-dGhlIGlucHV0IGRhdGEgbXVzdCBjb250YWluOg0KPiA+ID4gPiAgKg0KPiA+ID4gPiAgKiAqIGZv
-ciBSRkM0MTA2IGNpcGhlcnMsIHRoZSBjb25jYXRlbmF0aW9uIG9mDQo+ID4gPiA+ICAqICAgYXNz
-b2NpYXRlZCBhdXRoZW50aWNhdGlvbiBkYXRhIHx8IElWIHx8IHBsYWludGV4dCBvciBjaXBoZXJ0
-ZXh0Lg0KPiA+ID4gPiAgTm90ZSwgdGhlICogICBzYW1lIElWIChidWZmZXIpIGlzIGFsc28gc2V0
-IHdpdGggdGhlDQo+ID4gPiA+ICBhZWFkX3JlcXVlc3Rfc2V0X2NyeXB0IGNhbGwuIE5vdGUsICog
-ICB0aGUgQVBJIGNhbGwgb2YNCj4gPiA+ID4gIGFlYWRfcmVxdWVzdF9zZXRfYWQgbXVzdCBwcm92
-aWRlIHRoZSBsZW5ndGggb2YgdGhlIEFBRCBhbmQgKiAgIHRoZSBJVi4NCj4gPiA+ID4gIFRoZSBB
-UEkgY2FsbCBvZiBhZWFkX3JlcXVlc3Rfc2V0X2NyeXB0IG9ubHkgcG9pbnRzIHRvIHRoZSBzaXpl
-IG9mICoNCj4gPiA+ID4gIHRoZSBpbnB1dCBwbGFpbnRleHQgb3IgY2lwaGVydGV4dC4NCj4gPiA+
-ID4NCj4gPiA+ID4gSSBzZWVtIHRvIGJlIG1pc3NpbmcgdGhlIHBsYWNlIHdoZXJlIHRoaXMgaXMg
-aGFuZGxlZCBpbg0KPiA+ID4gPiBnZW5lcmF0ZV9yYW5kb21fYWVhZF90ZXN0dmVjKCkNCj4gPiA+
-ID4gYW5kIGdlbmVyYXRlX2FlYWRfbWVzc2FnZSgpDQo+ID4gPiA+DQo+ID4gPiA+IFdlIHNlZW0g
-dG8gYmUgZ2VuZXJhdGluZyBhIHJhbmRvbSBJViBmb3IgcHJvdmlkaW5nIGFzIHRoZSBwYXJhbWV0
-ZXIgdG8NCj4gPiA+ID4gYWVhZF9yZXF1ZXN0X3NldF9jcnlwdCgpDQo+ID4gPiA+IGJ1dCB0aGFu
-IGhhdmUgb3RoZXIgcmFuZG9tIGJ5dGVzIHNldCBpbiBhZWFkX3JlcXVlc3Rfc2V0X2FkKCkgLSBv
-ciBhbQ0KPiA+ID4gPiBJJ20gbWlzc2luZyBzb21ldGhpbmcgYWdhaW4/DQo+ID4gPg0KPiA+ID4g
-WWVzLCBmb3IgcmZjNDEwNiB0aGUgdGVzdHMgZG9uJ3QgcGFzcyB0aGUgc2FtZSBJViBpbiBib3Ro
-IHBsYWNlcy4gIFRoaXMgaXMNCj4gPiA+IGJlY2F1c2UgSSB3cm90ZSB0aGUgdGVzdHMgZnJvbSB0
-aGUgcGVyc3BlY3RpdmUgb2YgYSBnZW5lcmljIEFFQUQgdGhhdA0KPiA+ID4gZG9lc24ndCBoYXZl
-IHRoaXMgd2VpcmQgSVYgcXVpcmssIGFuZCB0aGVuIEkgYWRkZWQgdGhlIG1pbmltdW0gcXVpcmtz
-IHRvDQo+ID4gPiBnZXQgdGhlIHdlaXJkIGFsZ29yaXRobXMgbGlrZSByZmM0MTA2IHBhc3Npbmcu
-DQo+ID4gPg0KPiA+ID4gU2luY2UgdGhlIGFjdHVhbCBiZWhhdmlvciBvZiB0aGUgZ2VuZXJpYyBp
-bXBsZW1lbnRhdGlvbiBvZiByZmM0MTA2IGlzIHRoYXQNCj4gPiA+IHRoZSBsYXN0IDggYnl0ZXMg
-b2YgdGhlIEFBRCBhcmUgaWdub3JlZCwgdGhhdCBtZWFucyB0aGF0IGN1cnJlbnRseSB0aGUNCj4g
-PiA+IHRlc3RzIGp1c3QgYXZvaWQgbXV0YXRpbmcgdGhlc2UgYnl0ZXMgd2hlbiBnZW5lcmF0aW5n
-IGluYXV0aGVudGljIGlucHV0DQo+ID4gPiB0ZXN0cy4gIFRoZXkgZG9uJ3Qga25vdyB0aGF0IHRo
-ZXkncmUgKGFwcGFyZW50bHkpIG1lYW50IHRvIGJlIGFub3RoZXIgY29weQ0KPiA+ID4gb2YgdGhl
-IElWLg0KPiA+ID4NCj4gPiA+IFNvIGl0IHNlZW1zIHdlIG5lZWQgdG8gY2xlYXJseSBkZWZpbmUg
-dGhlIGJlaGF2aW9yIHdoZW4gdGhlIHR3byBJViBjb3BpZXMNCj4gPiA+IGRvbid0IG1hdGNoLiAg
-U2hvdWxkIG9uZSBvciB0aGUgb3RoZXIgYmUgdXNlZCwgc2hvdWxkIGFuIGVycm9yIGJlIHJldHVy
-bmVkLA0KPiA+ID4gb3Igc2hvdWxkIHRoZSBiZWhhdmlvciBiZSB1bnNwZWNpZmllZCAoaW4gd2hp
-Y2ggY2FzZSB0aGUgdGVzdHMgd291bGQgbmVlZA0KPiA+ID4gdG8gYmUgdXBkYXRlZCk/DQo+ID4g
-Pg0KPiA+ID4gVW5zcGVjaWZpZWQgYmVoYXZpb3IgaXMgYmFkLCBidXQgaXQgd291bGQgYmUgZWFz
-aWVzdCBmb3Igc29mdHdhcmUgdG8gdXNlDQo+ID4gPiByZXEtPml2LCB3aGlsZSBoYXJkd2FyZSBt
-aWdodCB3YW50IHRvIHVzZSB0aGUgSVYgaW4gdGhlIHNjYXR0ZXJsaXN0Li4uDQo+ID4gPg0KPiA+
-ID4gSGVyYmVydCBhbmQgU3RlcGhhbiwgYW55IGlkZWEgd2hhdCB3YXMgaW50ZW5kZWQgaGVyZT8N
-Cj4gPiA+DQo+ID4gPiAtIEVyaWMNCj4gPg0KPiA+IFRoZSBmdWxsIHN0cnVjdHVyZSBvZiBSRkM0
-MTA2IGlzIHRoZSBmb2xsb3dpbmc6DQo+ID4NCj4gPiAtIHRoZSBrZXkgdG8gYmUgc2V0IGlzIGFs
-d2F5cyA0IGJ5dGVzIGxhcmdlciB0aGFuIHJlcXVpcmVkIGZvciB0aGUgcmVzcGVjdGl2ZQ0KPiA+
-IEFFUyBvcGVyYXRpb24gKGkuZS4gdGhlIGtleSBpcyAyMCwgMjggb3IgMzYgYnl0ZXMgcmVzcGVj
-dGl2ZWx5KS4gVGhlIGtleSB2YWx1ZQ0KPiA+IGNvbnRhaW5zIHRoZSBmb2xsb3dpbmcgaW5mb3Jt
-YXRpb246IGtleSB8fCBmaXJzdCA0IGJ5dGVzIG9mIHRoZSBJViAobm90ZSwgdGhlDQo+ID4gZmly
-c3QgNCBieXRlcyBvZiB0aGUgSVYgYXJlIHRoZSBieXRlcyBkZXJpdmVkIGZyb20gdGhlIEtERiBp
-bnZva2VkIGJ5IElLRSAtDQo+ID4gaS5lLiB0aGV5IGNvbWUgZnJvbSB1c2VyIHNwYWNlIGFuZCBh
-cmUgZml4ZWQpDQo+ID4NCj4gPiAtIGRhdGEgYmxvY2sgY29udGFpbnMgQUFEIHx8IHRyYWlsaW5n
-IDggYnl0ZXMgb2YgSVYgfHwgcGxhaW50ZXh0IG9yIGNpcGhlcnRleHQNCj4gPiAtIHRoZSB0cmFp
-bGluZyA4IGJ5dGVzIG9mIHRoZSBJViBhcmUgdGhlIFNQSSB3aGljaCBpcyB1cGRhdGVkIGZvciBl
-YWNoIG5ldw0KPiA+IElQU2VjIHBhY2thZ2UNCj4gPg0KPiA+IGFlYWRfcmVxdWVzdF9zZXRfYWQg
-cG9pbnRzIHRvIHRoZSBBQUQgcGx1cyB0aGUgOCBieXRlcyBvZiBJViBpbiB0aGUgdXNlIGNhc2UN
-Cj4gPiBvZiByZmM0MTA2KGdjbShhZXMpKSBhcyBwYXJ0IG9mIElQU2VjLg0KPiA+DQo+ID4gQ29u
-c2lkZXJpbmcgeW91ciBxdWVzdGlvbiBhYm91dCB0aGUgYWVhZF9yZXF1ZXN0X3NldF9hZCB2cw0K
-PiA+IGFlYWRfcmVxdWVzdF9zZXRfY3J5cHQgSSB0aGluayB0aGUgUkZDNDEwNiBnaXZlcyB0aGUg
-YW5zd2VyOiB0aGUgSVYgaXMgdXNlZCBpbg0KPiA+IHR3byBsb2NhdGlvbnMgY29uc2lkZXJpbmcg
-dGhhdCB0aGUgSVYgaXMgYWxzbyB0aGUgU1BJIGluIG91ciBjYXNlLiBJZiB5b3Ugc2VlDQo+ID4g
-UkZDIDQxMDYgY2hhcHRlciAzIHlvdSBzZWUgdGhlIHRyYWlsaW5nIDggYnl0ZXMgb2YgdGhlIElW
-IGFzLCB3ZWxsLCB0aGUgR0NNIElWDQo+ID4gKHdoaWNoIGlzIGV4dGVuZGVkIGJ5IHRoZSA0IGJ5
-dGUgc2FsdCBhcyBkZWZpbmVkIGluIGNoYXB0ZXIgNCB0aGF0IHdlIHByb3ZpZGUNCj4gPiB3aXRo
-IHRoZSB0cmFpbGluZyA0IGJ5dGVzIG9mIHRoZSBrZXkpLiBUaGUga2VybmVsIHVzZXMgdGhlIFNQ
-SSBmb3IgdGhpcy4gSW4NCj4gPiBjaGFwdGVyIDUgUkZDNDEwNiB5b3Ugc2VlIHRoYXQgdGhlIFNQ
-IGlzIGhvd2V2ZXIgdXNlZCBhcyBwYXJ0IG9mIHRoZSBBQUQgYXMNCj4gPiB3ZWxsLg0KPiA+DQo+
-ID4gQm90dG9tIGxpbmU6IGlmIHlvdSBkbyBub3Qgc2V0IHRoZSBzYW1lIElWIHZhbHVlIGZvciBi
-b3RoLCB0aGUgQUFEIGFuZCB0aGUgR0NNDQo+ID4gSVYsIHlvdSBkZXZpYXRlIGZyb20gdGhlIHVz
-ZSBjYXNlIG9mIHJmYzQxMDYoZ2NtKGFlcykpIGluIElQU2VjLiBZZXQsIGZyb20gYQ0KPiA+IHB1
-cmUgbWF0aGVtYXRpY2FsIHBvaW50IG9mIHZpZXcgYW5kIGFsc28gZnJvbSBhIGNpcGhlciBpbXBs
-ZW1lbnRhdGlvbiBwb2ludCBvZg0KPiA+IHZpZXcsIGl0IGRvZXMgbm90IG1hdHRlciB3aGV0aGVy
-IHRoZSBBQUQgYW5kIHRoZSBJViBwb2ludCB0byB0aGUgc2FtZSB2YWx1ZSAtDQo+ID4gdGhlIGlt
-cGxlbWVudGF0aW9uIG11c3QgYWx3YXlzIHByb2Nlc3MgdGhhdCBkYXRhLiBUaGUgcmVzdWx0IGhv
-d2V2ZXIgd2lsbCBub3QNCj4gPiBiZSBpZGVudGljYWwgdG8gdGhlIElQU2VjIHVzZSBjYXNlLg0K
-PiA+DQo+DQo+IEl0IGlzIGNvcnJlY3QsIGJ1dCBpcyBpdCBzbWFydD8NCj4NCj4gRWl0aGVyIHdl
-IHJlcXVpcmUgdGhlIHNhbWUgSVYgdG8gYmUgcGFzc2VkIHR3aWNlIGFzIHdlIGRvIHRvZGF5LCBp
-biB3aGljaCBjYXNlDQo+IHBhc3NpbmcgZGlmZmVyZW50IElWIHNob3VsZCBmYWlsIGluIGEgcHJl
-ZGljdGFibGUgbWFubmVyDQo+DQpJIGhvcGUgeW91IGFyZSBub3Qgc3VnZ2VzdGluZyBjb21wYXJp
-bmcgdHdvIG9uIHRoZSBmbHkgLi4uDQpGb3IgR0NNLCBpdCBpcyBqdXN0IGEgbWF0dGVyIG9mIGVp
-dGhlciBjbGVhcmx5IGRlZmluaW5nIHdoZXJlIHRvIHRha2UgdGhlIElWIChlaXRoZXINCnJlcS0+
-aXYgX29yXyB0aGUgQUFEIGJ1ZmZlcikgX29yXyBfcmVxdWlyaW5nXyB0aGVtIHRvIGJlIGFsd2F5
-cyBpZGVudGljYWwNCihQdXNoaW5nIHRoYXQgcmVzcG9uc2liaWxpdHkgdG8gdGhlIGFwcGxpY2F0
-aW9uLiBBbmQgSSB3b3VsZCBleHBlY3QgdGhlIGtlcm5lbA0KSVBzZWMgc3BlYyB0byBqdXN0IG1h
-a2UgcmVxLT5pdiBwb2ludCB0byB0aGUgSVYgaW4gdGhhdCBBQUQgc2NhdHRlciBidWZmZXIgd2hp
-Y2gNCndvdWxkIG1lYW4gdGhleSBhcmUgaW5kZWVkIGFsd2F5cyBpZGVudGljYWwuIEJ1dCB0aGF0
-IGp1c3QgYSBndWVzcy4pDQoNCklmIHRoYXQgcmVxdWlyZW1lbnQgaXMgbm90IG1ldCwgSSB3b3Vs
-ZCBleHBlY3QgYW4gYXV0aGVudGljYXRpb24gZmFpbCwgZWl0aGVyDQpvbiB0aGUgbG9jYWwgc2lk
-ZSBmb3IgZGVjcnlwdGlvbiBvciBvbiB0aGUgcmVtb3RlIHNpZGUgZm9yIGVuY3J5cHRpb24uDQoN
-CkkganVzdCByZWFsaXNlZCB0aGF0IGZvciB0aGUgc2ltaWxhciByZmM0NTQzLCB0aGUgSVYgX2lz
-XyBhdXRoZW50aWNhdGVkIHNvIHRoZXJlDQp0aGUgSVYgaW4gdGhlIEFBRCAgX211c3RfIGVpdGhl
-ciBtYXRjaCByZXEtPml2IG9yIGl0IHNob3VsZCBiZSB1c2VkIGluc3RlYWQgb2YNCnJlcS0+aXYu
-IEluIGFueSBjYXNlLCBpZiB0aGF0IHJlcXVpcmVtZW50IGlzIG5vdCBtZXQgeW91IHNob3VsZCBn
-ZXQgc2ltaWxhciBmYWlscyB0bw0Kd2hhdCBJIG1lbnRpb25lZCBmb3IgR0NNIGFib3ZlLg0KDQo+
-IE9SIHdlIHNob3VsZCBkZWZpbmUNCj4gdGhlIG9wZXJhdGlvbiBpcyB0YWtpbmcgdHdvIElWIGxp
-a2Ugc3RydWN0dXJlcyAtIG9uZSBhcyB0aGUgSVYgYW5kIG9uZSBhcw0KPiBieXRlcyBpbiB0aGUg
-YXNzb2NpYXRlZCBkYXRhIGFuZCBoYXZlIHRoZSBJUHNlYyBjb2RlIHVzZSBpdCBpbiBhIHNwZWNp
-ZmljIHdheSBvZg0KPiBoYXBwZW4gdG8gcGFzcyB0aGUgc2FtZSBJViBpbiBib3RoIHBsYWNlcy4N
-Cj4NCj4gSSBkb24ndCBjYXJlIGVpdGhlciB3YXkgLSBidXQgcmlnaHQgbm93IHRoZSB0ZXN0cyBi
-YXNpY2FsbHkgcmVsaWVzIG9uDQo+IHVuZGVmaW5lZCBiZWhhdmlvdXINCj4gd2hpY2ggaXMgYWx3
-YXlzIGEgYmFkIHRoaW5nLCBJIHRoaW5rLg0KPg0KSSB0aGluayB0aGUgY3VycmVudCBpbXBsZW1l
-bnRhdGlvbiBpcyBwcmltYXJpbHkgYmFzZWQgb24gd2hhdCB3b3VsZCBiZQ0KY29udmVuaWVudCBm
-b3IgdGhlIG9ubHkgdXNlciAtIHRoZSBrZXJuZWwgSVBzZWMgc3RhY2sgLi4uDQoNCj4gR2lsYWQN
-Cj4NCj4gLS0NCj4gR2lsYWQgQmVuLVlvc3NlZg0KPiBDaGllZiBDb2ZmZWUgRHJpbmtlcg0KPg0K
-PiB2YWx1ZXMgb2YgzrIgd2lsbCBnaXZlIHJpc2UgdG8gZG9tIQ0KDQoNClJlZ2FyZHMsDQpQYXNj
-YWwgdmFuIExlZXV3ZW4NClNpbGljb24gSVAgQXJjaGl0ZWN0IE11bHRpLVByb3RvY29sIEVuZ2lu
-ZXMsIFJhbWJ1cyBTZWN1cml0eQ0KUmFtYnVzIFJPVFcgSG9sZGluZyBCVg0KKzMxLTczIDY1ODE5
-NTMNCg0KTm90ZTogVGhlIEluc2lkZSBTZWN1cmUvVmVyaW1hdHJpeCBTaWxpY29uIElQIHRlYW0g
-d2FzIHJlY2VudGx5IGFjcXVpcmVkIGJ5IFJhbWJ1cy4NClBsZWFzZSBiZSBzbyBraW5kIHRvIHVw
-ZGF0ZSB5b3VyIGUtbWFpbCBhZGRyZXNzIGJvb2sgd2l0aCBteSBuZXcgZS1tYWlsIGFkZHJlc3Mu
-DQoNCg0KKiogVGhpcyBtZXNzYWdlIGFuZCBhbnkgYXR0YWNobWVudHMgYXJlIGZvciB0aGUgc29s
-ZSB1c2Ugb2YgdGhlIGludGVuZGVkIHJlY2lwaWVudChzKS4gSXQgbWF5IGNvbnRhaW4gaW5mb3Jt
-YXRpb24gdGhhdCBpcyBjb25maWRlbnRpYWwgYW5kIHByaXZpbGVnZWQuIElmIHlvdSBhcmUgbm90
-IHRoZSBpbnRlbmRlZCByZWNpcGllbnQgb2YgdGhpcyBtZXNzYWdlLCB5b3UgYXJlIHByb2hpYml0
-ZWQgZnJvbSBwcmludGluZywgY29weWluZywgZm9yd2FyZGluZyBvciBzYXZpbmcgaXQuIFBsZWFz
-ZSBkZWxldGUgdGhlIG1lc3NhZ2UgYW5kIGF0dGFjaG1lbnRzIGFuZCBub3RpZnkgdGhlIHNlbmRl
-ciBpbW1lZGlhdGVseS4gKioNCg0KUmFtYnVzIEluYy48aHR0cDovL3d3dy5yYW1idXMuY29tPg0K
+I've made enough mistakes in this series, I'll just start over.  It's
+been hard for me not to be able to run test this in master, and have to
+go back and forth between it and 4.19; that's why I have messed up so
+many times.  I apologize for the noise again.
+
+If you've read the cover letter from v1 and v2, there's not anything too
+relevant that I'm changing here.
+
+---
+
+I've finally managed to get gcm(aes) working with the qce crypto engine.
+
+These first patch fixes a bug where the gcm authentication tag was being
+overwritten during gcm decryption, because it was passed in the same sgl
+buffer as the crypto payload.  The qce driver appends some private state
+buffer to the request destination sgl, but it was not checking the
+length of the sgl being passed.
+
+The second patch works around a problem, which I frankly can't pinpoint
+what exactly is the cause, but after some help from Ard Biesheuvel, I
+think it is related to DMA.  When gcm sends a request in
+crypto_gcm_setkey, it stores the hash (the crypto payload) and the iv in
+the same data struct.  When the driver updates the IV, then the payload
+gets overwritten with the unencrypted data, or all zeroes, it may be a
+coincidence.
+
+However, it works if I pass the request down to the fallback driver--it
+is used by the driver to accept 192-bit-key requests.  All I had to do
+was setup the fallback regardless of key size, and then check the
+payload length along with the keysize to pass the request to the
+fallback.  This turns out to enhance performance, because of the
+avoided latency that comes with using the hardware.
+
+I've started with checking for a single 16-byte AES block, and that is
+enough to make gcm work.  Next thing I've done was to tune the request
+size for performance.  What got me started into looking at the qce
+driver was reports of it being detrimental to VPN speed, by the way.
+I've tested this win an Asus RT-AC58U, but the slow VPN reports[1] have
+more devices affected.  Access to the device was kindly provided by
+@simsasss.
+
+I've added a 768-byte block size to tcrypt to get some measurements to
+come up with an optimal threshold to transition from software to
+hardware, and encountered another bug in the qce driver: it apparently
+cannot handle aes-xts requests that are greater than 512 bytes, but not
+a multiple of it.  It failed with 768, 1280; XTS is usually used with a
+512-byte sector (or a multiple of it), so I'm concluding that is the
+cause of failure.
+
+With that fixed, I added a module parameter to set the maximum request
+size that will be handled by the software fallback cipher and made some
+speed measurements using tcrypt to come up with an optimum value.
+
+I've documented this briefly in the parameter description, pointing out
+that gcm will not work if you set it to 0, and in better detail in the
+Kconfig help.
+
+TLDR: In the worst (where the hardware is slowest) case, hardware and
+software speed match at around 768 bytes, but I lowered the threshold to
+512 to benefit the CPU offload.
+
+Here's a sample comparing three runs, using the proposed driver, varying
+the aes_sw_max_len parameter: 1st run will always use fallback, second
+run will use the default fallback for len <= 512, and third run will
+never use the fallback.
+
+testing speed of async cbc(aes) (cbc-aes-qce) encryption
+------------------      ----------   ----------    ----------
+aes_sw_max_len              32,768          512             0
+------------------      ----------   ----------    ----------
+128 bit   16 bytes       8,081,136    5,614,448       430,416
+128 bit   64 bytes      13,152,768   13,205,952     1,745,088
+128 bit  256 bytes      16,094,464   16,101,120     6,969,600
+128 bit  512 bytes      16,701,440   16,705,024    12,866,048
+128 bit  768 bytes      16,883,712   13,192,704    15,186,432
+128 bit 1024 bytes      17,036,288   17,149,952    19,716,096
+128 bit 2048 bytes      17,108,992   30,842,880    32,868,352
+128 bit 4096 bytes      17,203,200   44,929,024    49,655,808
+128 bit 8192 bytes      17,219,584   58,966,016    74,186,752
+256 bit   16 bytes       6,962,432    1,943,616       419,088
+256 bit   64 bytes      10,485,568   10,421,952     1,681,536
+256 bit  256 bytes      12,211,712   12,160,000     6,701,312
+256 bit  512 bytes      12,499,456   12,584,448     9,882,112
+256 bit  768 bytes      12,622,080   12,550,656    14,701,824
+256 bit 1024 bytes      12,750,848   16,079,872    19,585,024
+256 bit 2048 bytes      12,812,288   28,293,120    27,693,056
+256 bit 4096 bytes      12,939,264   34,234,368    44,142,592
+256 bit 8192 bytes      12,845,056   50,274,304    63,520,768
+
+The numbers vary from run to run, sometimes greatly.
+
+I've tried running the same tests with the arm-neon drivers, but the
+results don't change with any cipher mode, so I'm assuming the fallback
+is always aes-generic.
+
+I've made the measurements using an Asus RT-AC58U only, so I don't know
+how other hardware performs, but the user can always override the
+parameter, or even its default value.
+
+[1] https://forum.openwrt.org/t/ipsec-performance-issue/39690
+
+Eneas U de Queiroz (3):
+  crypto: qce - use cryptlen when adding extra sgl
+  crypto: qce - use AES fallback for small requests
+  crypto: qce - handle AES-XTS cases that qce fails
+
+ drivers/crypto/Kconfig        | 23 +++++++++++++++++++++++
+ drivers/crypto/qce/common.c   |  2 --
+ drivers/crypto/qce/common.h   |  3 +++
+ drivers/crypto/qce/dma.c      | 11 ++++++-----
+ drivers/crypto/qce/dma.h      |  2 +-
+ drivers/crypto/qce/skcipher.c | 30 ++++++++++++++++++++----------
+ 6 files changed, 53 insertions(+), 18 deletions(-)
 
