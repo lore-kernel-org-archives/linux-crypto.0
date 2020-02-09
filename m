@@ -6,124 +6,98 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C705CC35250
-	for <linux-crypto@archiver.kernel.org>; Sun,  9 Feb 2020 08:05:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6382C35250
+	for <linux-crypto@archiver.kernel.org>; Sun,  9 Feb 2020 08:10:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 939222080C
-	for <linux-crypto@archiver.kernel.org>; Sun,  9 Feb 2020 08:05:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B91C020656
+	for <linux-crypto@archiver.kernel.org>; Sun,  9 Feb 2020 08:10:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="yG/ZTbcu"
+	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="gHSZGZ7I"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726005AbgBIIFM (ORCPT
+        id S1726005AbgBIIKJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 9 Feb 2020 03:05:12 -0500
-Received: from mail-vs1-f45.google.com ([209.85.217.45]:32943 "EHLO
-        mail-vs1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725911AbgBIIFL (ORCPT
+        Sun, 9 Feb 2020 03:10:09 -0500
+Received: from mail-vk1-f178.google.com ([209.85.221.178]:35210 "EHLO
+        mail-vk1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725900AbgBIIKJ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 9 Feb 2020 03:05:11 -0500
-Received: by mail-vs1-f45.google.com with SMTP id n27so2237692vsa.0
-        for <linux-crypto@vger.kernel.org>; Sun, 09 Feb 2020 00:05:11 -0800 (PST)
+        Sun, 9 Feb 2020 03:10:09 -0500
+Received: by mail-vk1-f178.google.com with SMTP id o187so977040vka.2
+        for <linux-crypto@vger.kernel.org>; Sun, 09 Feb 2020 00:10:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=benyossef-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=UukrQbD4Fgb2HOTXj2n65dHIumKclm6QTeeUOPVcbgM=;
-        b=yG/ZTbcun0KjVG+c1C9xzGpG/t4bEFMNW8NvEZHXkLmEvHJT0x/yqdYwHribRRXPEi
-         zTy7qjYrqq3ptuBiWjzg4LfqAzgZGUcEiiuTLPaqkl9RmF4C5iQhHguDzTrEWfNUocVP
-         tF6IuTlN+9XxzYMyXh8pm3YNdLLM1YA55mKIYpPyCPe5NIDH5bf2P/9WhqtAMrJaAH41
-         CWRe54pcji6BquEAaCWyN2BU4PiM9mrUj/omC+QdoeBUIw1640EBEEHrIMcBHAX8mNmH
-         yYzisiR45zaJg8Uk13mb1MDWXfYmcTjv20CJUzXN+Bv49S82oGIKZf3kKQp/w85c/uH8
-         CfCg==
+         :cc;
+        bh=kcXc8Nc9KBoeoKUcsLWvAWNOC+kSckSzv0zdmuBDQ98=;
+        b=gHSZGZ7IIDQ6jG5R85YM6323HzHa5ScUfzn4Amb0mIwvHEgmJqwmmUo2WnaFEsTr3p
+         HaNGE+6qzONbm6kS+YKqueu0Woi1lwDVT+Nsp8+6gEhEwauKq6Z7QMmff8/6vhgiuFkE
+         5G998Mx8yp07eTwC8DbSkl7h0L17zbi5xGy2QDJri1Uuk4x3/j8DASHTeXp0pie1Fss6
+         vwHprHjFErWqxfF6GDumcFdiKYeKokEvKSriBFn1hx8Um8qmpryTitOUCk/KIadLyUL+
+         hnVHvUN/g80zOQWc21/AbKmEab+AfJJtp1H9xwPJ5prkye3bQHc9bSKiW1W/aPGNziDh
+         ZAYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=UukrQbD4Fgb2HOTXj2n65dHIumKclm6QTeeUOPVcbgM=;
-        b=bprP6ZLADLQK7wujYuFZppy5IST4hTGcyFt9y4YY+LGT2oGl2AYJq5mRKVZjFwXbW3
-         Ux7+EdSQA6PtcdTT9Wa8tpazH51fyYGlVLWrt5Cyt5TpoAYQLfHZhNBIpFpLLHZjga5+
-         c7h1/pwKo7RuRF+D4Ic3m+lJnTUgzyFStbFPpyDTtX6OcxhG2g6sesHni/UJqkklO/dK
-         NB4ut2MMknWvQByreca3u7eoQ7AhDzTsn5SYFHL/NJO6wgLlRBjMmNk29ms02lW7m7F2
-         AmT8ksjD55hIk7cZRKeg5UWZnSTR5hnwNgZx5/22pqLrrg6r0XnERO5ihSKQwSn5Wgkj
-         7i4w==
-X-Gm-Message-State: APjAAAWg77ieCCbCeC50z1xaRv0BNyL5fAJevSXLUsHskTneYXglZfhV
-        ALgVRftK4UTaaB74BWltWrkqEMnf9l9hr2CMIYFwNc6u8T4=
-X-Google-Smtp-Source: APXvYqzO/5+dJ7ULE/bpLMrVGlVGeCPO6i/joV9KGyYfOjPG1Vx5we8BBp8FTmh4Hmbg7wJ94YStKhPEu2ARkB1cDEo=
-X-Received: by 2002:a67:fb14:: with SMTP id d20mr3161497vsr.136.1581235510558;
- Sun, 09 Feb 2020 00:05:10 -0800 (PST)
+         :message-id:subject:to:cc;
+        bh=kcXc8Nc9KBoeoKUcsLWvAWNOC+kSckSzv0zdmuBDQ98=;
+        b=qUkzRP5/WSrQDb0yZkCDwx+CXRA8bELP8UirI2ydTKi5QzU42lP6RIp/2fCAAYy2RP
+         YB2sOtU+zBSswmqjIReeLQU4x4cxMsizOJaH1YLQ+ZU73Jcby9jPu08jrN5aKW2MT04t
+         ZqxqHRKl9E+NTeXWoil231eqAioaoqTcev6vuXy1mXqDxOYZAP9jWz+KoIXhBGbB3UeP
+         iodtEs4fPXpfnGXOL4ssMPVqXbiK+SGw21zdrDQ+ZFnm1tmGRALcneg3fC85ORDmv0nn
+         xxRHtWwVKtkT2jvKpkj//77ZcU+cFbAc2mhnmsoxGfufPBxe4QO2tkV1DICCC0+NUcez
+         kMXA==
+X-Gm-Message-State: APjAAAVW9YGWnUDysqihlXG0hcvogfiBaDevngK+s6RgdgpVXV//7mfc
+        LoLLZvwCHU12W1MFTVGPN1lMk+aiKz0luMR0GaG9RQ==
+X-Google-Smtp-Source: APXvYqyFS4FHl4+WUSHevCab8dbGnOMljuHl6Ekgf3qUdWh6q7NvWD/TGmo8Qo3uO90VDzcjnOexHJaHxz8+reyL7fA=
+X-Received: by 2002:a1f:7cc2:: with SMTP id x185mr3522854vkc.1.1581235807823;
+ Sun, 09 Feb 2020 00:10:07 -0800 (PST)
 MIME-Version: 1.0
 References: <CAOtvUMcwLtwgigFE2mx7LVjhhEgcZsSS4WyR_SQ2gixTZxyBfg@mail.gmail.com>
- <28236835.Fk5ARk2Leh@tauon.chronox.de> <CAOtvUMchWrNsvmLJ2D-qiGOAAgbr_yxtt3h81yOHesa7C6ifZQ@mail.gmail.com>
- <6968686.FA8oO0t0Vk@tauon.chronox.de>
-In-Reply-To: <6968686.FA8oO0t0Vk@tauon.chronox.de>
+ <CAOtvUMeVXTDvH5bxVFemYmD9rpZ=xX3MkypAGyZn5VROw6sgZg@mail.gmail.com>
+ <20200207072709.GB8284@sol.localdomain> <70156395ce424f41949feb13fd9f978b@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <SN4PR0401MB366399E54E5B7EE0E54A7E0BC31C0@SN4PR0401MB3663.namprd04.prod.outlook.com>
+In-Reply-To: <SN4PR0401MB366399E54E5B7EE0E54A7E0BC31C0@SN4PR0401MB3663.namprd04.prod.outlook.com>
 From:   Gilad Ben-Yossef <gilad@benyossef.com>
-Date:   Sun, 9 Feb 2020 10:04:55 +0200
-Message-ID: <CAOtvUMcqod8ubo_Y9_czM__+U9pWge4s6bLZoZ8YBa-WJTTWNg@mail.gmail.com>
+Date:   Sun, 9 Feb 2020 10:09:53 +0200
+Message-ID: <CAOtvUMeFZXwxxYT1hz=e09CaBrv1qBXvWcRCghA=wRGwZZ9S3g@mail.gmail.com>
 Subject: Re: Possible issue with new inauthentic AEAD in extended crypto tests
-To:     Stephan Mueller <smueller@chronox.de>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
+To:     "Van Leeuwen, Pascal" <pvanleeuwen@rambus.com>
+Cc:     Stephan Mueller <smueller@chronox.de>,
+        Eric Biggers <ebiggers@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Geert Uytterhoeven <geert@linux-m68k.org>,
         David Miller <davem@davemloft.net>,
         Ofir Drang <Ofir.Drang@arm.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Feb 7, 2020 at 2:30 PM Stephan Mueller <smueller@chronox.de> wrote:
->
-> Am Freitag, 7. Februar 2020, 12:50:51 CET schrieb Gilad Ben-Yossef:
->
-> Hi Gilad,
->
-> >
-> > It is correct, but is it smart?
-> >
-> > Either we require the same IV to be passed twice as we do today, in whi=
-ch
-> > case passing different IV should fail in a predictable manner OR we sho=
-uld
-> > define the operation is taking two IV like structures - one as the IV a=
-nd
-> > one as bytes in the associated data and have the IPsec code use it in a
-> > specific way of happen to pass the same IV in both places.
-> >
-> > I don't care either way - but right now the tests basically relies on
-> > undefined behaviour
-> > which is always a bad thing, I think.
->
-> I am not sure about the motivation of this discussion: we have exactly on=
-e
-> user of the RFC4106 implementation: IPSec. Providing the IV/AAD is effici=
-ent
-> as the rfc4106 template intents to require the data in a format that requ=
-ires
-> minimal processing on the IPSec side to bring it in the right format.
+On Fri, Feb 7, 2020 at 4:07 PM Van Leeuwen, Pascal
+<pvanleeuwen@rambus.com> wrote:
+
+> The "problem" Gilad was referring to is that the _explicit_ part of the  IV appears to be
+> available  from both req->iv and from the AAD scatterbuffer. Which one should you use?
+> API wise I would assume req->iv but from a (our) hardware perspective, it would
+> be more efficient to extract it from the datastream. But is it allowed to assume
+> there is a valid IV stored there? (which implies that it has to match req->iv,
+> otherwise behaviour would deviate from implementations using that)
 >
 
-The motivation for this discussion is that our current test suite for
-RFC4106 generates test messages where req->iv is different than the
-copy in the associated data.
-This is not per my interpretation of RFC 4106, this is not the API as
-is described in the header files and finally it is not per the use
-case of the single user of RFC 4106 in the kernel and right now these
-tests
-causes the ccree driver to fail these tests.
 
-Again, I am *not* suggesting or discussing changing the API.
+No, it isn't.
 
-I am asking the very practical question if it makes sense to me to
-delve into understanding why this use case is failing versus fixing
-the test suite to  test what we actually use.
+The problem that I was referring to was that part of our test suites
+passes different values in req->iv and as part of the AAD,
+in contrast to what we document as the API requirements in the include
+file, my understanding of the relevant standard and
+the single users of this API in the kernel and that the driver I'm
+maintaining fails these tests,
+
+I'm all fine with getting my hands dirty and fixing the driver, I'm
+just suspect fixing a driver to pass a test that misuses the API
+may not actually improve the quality of the driver.
 
 Gilad
-
---=20
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-values of =CE=B2 will give rise to dom!
