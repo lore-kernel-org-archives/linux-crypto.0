@@ -2,90 +2,128 @@ Return-Path: <SRS0=Lfag=35=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A00C6C2BA83
-	for <linux-crypto@archiver.kernel.org>; Sun,  9 Feb 2020 04:22:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C705CC35250
+	for <linux-crypto@archiver.kernel.org>; Sun,  9 Feb 2020 08:05:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6732620714
-	for <linux-crypto@archiver.kernel.org>; Sun,  9 Feb 2020 04:22:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 939222080C
+	for <linux-crypto@archiver.kernel.org>; Sun,  9 Feb 2020 08:05:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="yG/ZTbcu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727586AbgBIEWP (ORCPT
+        id S1726005AbgBIIFM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 8 Feb 2020 23:22:15 -0500
-Received: from mail01.vodafone.es ([217.130.24.71]:7054 "EHLO
-        mail01.vodafone.es" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727585AbgBIEWP (ORCPT
+        Sun, 9 Feb 2020 03:05:12 -0500
+Received: from mail-vs1-f45.google.com ([209.85.217.45]:32943 "EHLO
+        mail-vs1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725911AbgBIIFL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 8 Feb 2020 23:22:15 -0500
-IronPort-SDR: pcGwNFTGskV+oIi7C96BD8pxD76R7f0dw6SUtiT4lX8iBMjnX0vBv1nmPCPMWQuGh3j2UI2Zx8
- vSNg5YINkHZQ==
-IronPort-PHdr: =?us-ascii?q?9a23=3Am2UdVxbyDq2GccLna/tzF4L/LSx+4OfEezUN45?=
- =?us-ascii?q?9isYplN5qZr8+4bnLW6fgltlLVR4KTs6sC17OK9f2wEjJcqdbZ6TZeKccKD0?=
- =?us-ascii?q?dEwewt3CUYSPafDkP6KPO4JwcbJ+9lEGFfwnegLEJOE9z/bVCB6le77DoVBw?=
- =?us-ascii?q?mtfVEtfre9FYHdldm42P6v8JPPfQpImCC9YbRvJxmqsAndrMYbjZZtJ6oryh?=
- =?us-ascii?q?bEoXREduVZyGh1IV6fgwvw6t2/8ZJ+/Slcoe4t+9JFXa7nY6k2ULtUASg8PW?=
- =?us-ascii?q?so/sPrrx7DTQWO5nsYTGoblwdDDhbG4h/nQJr/qzP2ueVh1iaUO832Vq00Vi?=
- =?us-ascii?q?+576h3Uh/oiTwIOCA//WrKl8F/lqNboBampxxi347ZZZyeOfRicq/Be94RWG?=
- =?us-ascii?q?xMVdtTWSNcGIOxd4UBAeobPehGrIfzulQBogexCwS3GOPiyCNHimPq0aEmze?=
- =?us-ascii?q?gsFxzN0gw6H9IJtXTZtM/7O7kOUe+r1qnD0DXMb/RQ2Tfy9YPFdQghru+QXb?=
- =?us-ascii?q?1ua8rQx04vFwXKjliLsoPlOC6a2f4Msmic6epvS/ijhHIgqwF0uzWiwNonhI?=
- =?us-ascii?q?rRho8N1FzI6Cd0zJwoKdC2VEJ3e8CoHZRKuyyUN4Z7RN4pTXtytyYg0LIGvI?=
- =?us-ascii?q?a2fC0NyJs62RHSc+eHc42U4hL7U+aRPCt4iGpleL2hgxay9lCtyujmWcm11F?=
- =?us-ascii?q?ZKtDRKkt3Qun0CzRDT9M+HReZn8Uev3jaP0R7c5vtaLkAvjabbKpghzaAslp?=
- =?us-ascii?q?cLr0jPAy37lF/rgKKYakko4Pak5uv9brjoppKQL4p0hRv/MqQqlMy/G+M4Mg?=
- =?us-ascii?q?0WUmiD5+u8yKPs/Vf3QbVNiP02nbLUv4vdJcsGvKG4AghV0oA95BqlEzim19?=
- =?us-ascii?q?EYkWEdLF1ZYBKHk5TpO1bWLfD8DPe/hUmskThyy//aJL3gAo3NLmTEkLr6Y7?=
- =?us-ascii?q?Z95FBTyBApwdBc+Z1UELcBL+z3WkPrs9zYFBA5YESIxLPjCdNgxsYVQ3OXHq?=
- =?us-ascii?q?ixLqzfqxmL6/gpLu3KY5Ua6wzwM/w02/m7tXIllEVVQq6v0tNDcH2kE+55JE?=
- =?us-ascii?q?OWYWHmidcCOWgPtws6CuftjQvRfyRUYiOKUr4x/HkED4SpRdPbS5ygmqOG2i?=
- =?us-ascii?q?iTFJpab3JBDF3KGnDtIdbXE8wQYT6fd5cy2gcPUqKsHtcs?=
-X-IronPort-Anti-Spam-Filtered: true
-X-IronPort-Anti-Spam-Result: =?us-ascii?q?A2FJbQAbiD9eeiMYgtlmHQEBAQkBEQU?=
- =?us-ascii?q?FAYF7AgGBPQKBVlINExKMZIZvgU0fg0OLaIEAgzOGCBOBZw0BAQEBARsaAgE?=
- =?us-ascii?q?BhECCRiQ8Ag0CAw0BAQUBAQEBAQUEAQECEAEBCwsLBCuFSkIBDAGBayKDcCA?=
- =?us-ascii?q?POUpMAQ4BhiIBATOlPIkBDQ0ChR6CTQQKgQiBGyOBNgIBAYwhGoFBP4EjIYI?=
- =?us-ascii?q?rCAGCAYJ/ARIBboJIglkEjVASIYk/mDCCRAR4lWuCOAEPiBGENQOCWA+BC4M?=
- =?us-ascii?q?dgwiBZ4RSgX6fWIQSV4Egc3EzGiOCHYEgTxgNnGICQIEXEAJPhDuGNoIyAQE?=
-X-IPAS-Result: =?us-ascii?q?A2FJbQAbiD9eeiMYgtlmHQEBAQkBEQUFAYF7AgGBPQKBV?=
- =?us-ascii?q?lINExKMZIZvgU0fg0OLaIEAgzOGCBOBZw0BAQEBARsaAgEBhECCRiQ8Ag0CA?=
- =?us-ascii?q?w0BAQUBAQEBAQUEAQECEAEBCwsLBCuFSkIBDAGBayKDcCAPOUpMAQ4BhiIBA?=
- =?us-ascii?q?TOlPIkBDQ0ChR6CTQQKgQiBGyOBNgIBAYwhGoFBP4EjIYIrCAGCAYJ/ARIBb?=
- =?us-ascii?q?oJIglkEjVASIYk/mDCCRAR4lWuCOAEPiBGENQOCWA+BC4MdgwiBZ4RSgX6fW?=
- =?us-ascii?q?IQSV4Egc3EzGiOCHYEgTxgNnGICQIEXEAJPhDuGNoIyAQE?=
-X-IronPort-AV: E=Sophos;i="5.70,420,1574118000"; 
-   d="scan'208";a="315734664"
-Received: from mailrel04.vodafone.es ([217.130.24.35])
-  by mail01.vodafone.es with ESMTP; 09 Feb 2020 05:22:12 +0100
-Received: (qmail 7825 invoked from network); 9 Feb 2020 00:49:06 -0000
-Received: from unknown (HELO 192.168.1.163) (apamar@[217.217.179.17])
-          (envelope-sender <peterwong@bodazone.com>)
-          by mailrel04.vodafone.es (qmail-ldap-1.03) with SMTP
-          for <linux-crypto@vger.kernel.org>; 9 Feb 2020 00:49:06 -0000
-Date:   Sun, 9 Feb 2020 01:49:06 +0100 (CET)
-From:   Peter Wong <peterwong@bodazone.com>
-Reply-To: Peter Wong <peterwonghsbchk@gmail.com>
-To:     linux-crypto@vger.kernel.org
-Message-ID: <10428972.233521.1581209346692.JavaMail.cash@217.130.24.55>
-Subject: Investment opportunity
+        Sun, 9 Feb 2020 03:05:11 -0500
+Received: by mail-vs1-f45.google.com with SMTP id n27so2237692vsa.0
+        for <linux-crypto@vger.kernel.org>; Sun, 09 Feb 2020 00:05:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=UukrQbD4Fgb2HOTXj2n65dHIumKclm6QTeeUOPVcbgM=;
+        b=yG/ZTbcun0KjVG+c1C9xzGpG/t4bEFMNW8NvEZHXkLmEvHJT0x/yqdYwHribRRXPEi
+         zTy7qjYrqq3ptuBiWjzg4LfqAzgZGUcEiiuTLPaqkl9RmF4C5iQhHguDzTrEWfNUocVP
+         tF6IuTlN+9XxzYMyXh8pm3YNdLLM1YA55mKIYpPyCPe5NIDH5bf2P/9WhqtAMrJaAH41
+         CWRe54pcji6BquEAaCWyN2BU4PiM9mrUj/omC+QdoeBUIw1640EBEEHrIMcBHAX8mNmH
+         yYzisiR45zaJg8Uk13mb1MDWXfYmcTjv20CJUzXN+Bv49S82oGIKZf3kKQp/w85c/uH8
+         CfCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=UukrQbD4Fgb2HOTXj2n65dHIumKclm6QTeeUOPVcbgM=;
+        b=bprP6ZLADLQK7wujYuFZppy5IST4hTGcyFt9y4YY+LGT2oGl2AYJq5mRKVZjFwXbW3
+         Ux7+EdSQA6PtcdTT9Wa8tpazH51fyYGlVLWrt5Cyt5TpoAYQLfHZhNBIpFpLLHZjga5+
+         c7h1/pwKo7RuRF+D4Ic3m+lJnTUgzyFStbFPpyDTtX6OcxhG2g6sesHni/UJqkklO/dK
+         NB4ut2MMknWvQByreca3u7eoQ7AhDzTsn5SYFHL/NJO6wgLlRBjMmNk29ms02lW7m7F2
+         AmT8ksjD55hIk7cZRKeg5UWZnSTR5hnwNgZx5/22pqLrrg6r0XnERO5ihSKQwSn5Wgkj
+         7i4w==
+X-Gm-Message-State: APjAAAWg77ieCCbCeC50z1xaRv0BNyL5fAJevSXLUsHskTneYXglZfhV
+        ALgVRftK4UTaaB74BWltWrkqEMnf9l9hr2CMIYFwNc6u8T4=
+X-Google-Smtp-Source: APXvYqzO/5+dJ7ULE/bpLMrVGlVGeCPO6i/joV9KGyYfOjPG1Vx5we8BBp8FTmh4Hmbg7wJ94YStKhPEu2ARkB1cDEo=
+X-Received: by 2002:a67:fb14:: with SMTP id d20mr3161497vsr.136.1581235510558;
+ Sun, 09 Feb 2020 00:05:10 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+References: <CAOtvUMcwLtwgigFE2mx7LVjhhEgcZsSS4WyR_SQ2gixTZxyBfg@mail.gmail.com>
+ <28236835.Fk5ARk2Leh@tauon.chronox.de> <CAOtvUMchWrNsvmLJ2D-qiGOAAgbr_yxtt3h81yOHesa7C6ifZQ@mail.gmail.com>
+ <6968686.FA8oO0t0Vk@tauon.chronox.de>
+In-Reply-To: <6968686.FA8oO0t0Vk@tauon.chronox.de>
+From:   Gilad Ben-Yossef <gilad@benyossef.com>
+Date:   Sun, 9 Feb 2020 10:04:55 +0200
+Message-ID: <CAOtvUMcqod8ubo_Y9_czM__+U9pWge4s6bLZoZ8YBa-WJTTWNg@mail.gmail.com>
+Subject: Re: Possible issue with new inauthentic AEAD in extended crypto tests
+To:     Stephan Mueller <smueller@chronox.de>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        David Miller <davem@davemloft.net>,
+        Ofir Drang <Ofir.Drang@arm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Greetings,
-Please check the attached email for a buisness proposal to explore.
-Looking forward to hearing from you for more details.
-Sincerely: Peter Wong
+On Fri, Feb 7, 2020 at 2:30 PM Stephan Mueller <smueller@chronox.de> wrote:
+>
+> Am Freitag, 7. Februar 2020, 12:50:51 CET schrieb Gilad Ben-Yossef:
+>
+> Hi Gilad,
+>
+> >
+> > It is correct, but is it smart?
+> >
+> > Either we require the same IV to be passed twice as we do today, in whi=
+ch
+> > case passing different IV should fail in a predictable manner OR we sho=
+uld
+> > define the operation is taking two IV like structures - one as the IV a=
+nd
+> > one as bytes in the associated data and have the IPsec code use it in a
+> > specific way of happen to pass the same IV in both places.
+> >
+> > I don't care either way - but right now the tests basically relies on
+> > undefined behaviour
+> > which is always a bad thing, I think.
+>
+> I am not sure about the motivation of this discussion: we have exactly on=
+e
+> user of the RFC4106 implementation: IPSec. Providing the IV/AAD is effici=
+ent
+> as the rfc4106 template intents to require the data in a format that requ=
+ires
+> minimal processing on the IPSec side to bring it in the right format.
+>
 
+The motivation for this discussion is that our current test suite for
+RFC4106 generates test messages where req->iv is different than the
+copy in the associated data.
+This is not per my interpretation of RFC 4106, this is not the API as
+is described in the header files and finally it is not per the use
+case of the single user of RFC 4106 in the kernel and right now these
+tests
+causes the ccree driver to fail these tests.
 
+Again, I am *not* suggesting or discussing changing the API.
 
+I am asking the very practical question if it makes sense to me to
+delve into understanding why this use case is failing versus fixing
+the test suite to  test what we actually use.
 
-----------------------------------------------------
-This email was sent by the shareware version of Postman Professional.
+Gilad
 
+--=20
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+values of =CE=B2 will give rise to dom!
