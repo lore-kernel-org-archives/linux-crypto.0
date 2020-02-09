@@ -8,54 +8,54 @@ X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9ADAC3F68F
-	for <linux-crypto@archiver.kernel.org>; Sun,  9 Feb 2020 03:36:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3BE8C35254
+	for <linux-crypto@archiver.kernel.org>; Sun,  9 Feb 2020 03:36:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CC9662080C
-	for <linux-crypto@archiver.kernel.org>; Sun,  9 Feb 2020 03:36:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF4F22080C
+	for <linux-crypto@archiver.kernel.org>; Sun,  9 Feb 2020 03:36:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rvM8c8XS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D2/tcHE0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727559AbgBIDgn (ORCPT
+        id S1726474AbgBIDgp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 8 Feb 2020 22:36:43 -0500
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:33733 "EHLO
+        Sat, 8 Feb 2020 22:36:45 -0500
+Received: from mail-pg1-f195.google.com ([209.85.215.195]:46652 "EHLO
         mail-pg1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726474AbgBIDgn (ORCPT
+        with ESMTP id S1727550AbgBIDgo (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 8 Feb 2020 22:36:43 -0500
-Received: by mail-pg1-f195.google.com with SMTP id 6so1997591pgk.0;
-        Sat, 08 Feb 2020 19:36:42 -0800 (PST)
+        Sat, 8 Feb 2020 22:36:44 -0500
+Received: by mail-pg1-f195.google.com with SMTP id b35so1955066pgm.13;
+        Sat, 08 Feb 2020 19:36:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=subject:to:cc:references:from:autocrypt:message-id:date:user-agent
          :mime-version:in-reply-to:content-language:content-transfer-encoding;
         bh=u5xVb4qK/WgI3BDzMQAZaLyyPJD9b+m9QwnFsxrCXLM=;
-        b=rvM8c8XSlthNvxEzhDmOo2UX58EUTtWQtvkvi8PE8pRUH3qiq8tTlENpQSe6XrBqZm
-         Mx0QH1kqzor2KYekY6PCdWd72E7BCUczZDVRyC0qczwSd1B38NMkoCehMEBH8c+3+tSi
-         u5Fb7vGsNEkkCAOq+NuNXkCMR+I0tc/NAeHxeM3GQ7iTU52YxkmLiPt5CdhFVEberVcG
-         9TTQMkkvq8V8zNW7ohi3MADPfRlm8g4L38BUsNgxkHGmr63cZGX1PECs2xUypye/xVHg
-         oH09MD0rfbymcVmCdNWE0Vd0wcg0gVqDiLrOYhi0qppeyYktCIDDPyr7KSV78GJxn3iO
-         IsXw==
+        b=D2/tcHE0+OxplR/HKiSIONeX+yEMYoi4zi/gPUstrUhQ7bt3jBd/KQHFsTsgc9LFT0
+         UtPN7+3iBwha4os+dBOoIogRrTu36HoFVuMwQAQRcZw2RWgTZsajN88MWBX25DSE0OMX
+         mD3Fuu6nB0WIi6A0BQRlle74c8dyNfeCft+NtneMqSI64q7kBSROXYAh5gXW9Mrd8UGd
+         nhPrGmRwDpgWysH4cx/AhfDUgA5oDVvKBVeqYkpzj/LsjIlruYaAWkE6cAnG0Z8qvjMA
+         eldtqmHCwqLUxR8nYs+Ky5fElpsVIN/YY65Rml+I+btuXMftvG0M1WCdZAg5DeXON0vM
+         CcTg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:subject:to:cc:references:from:autocrypt
          :message-id:date:user-agent:mime-version:in-reply-to
          :content-language:content-transfer-encoding;
         bh=u5xVb4qK/WgI3BDzMQAZaLyyPJD9b+m9QwnFsxrCXLM=;
-        b=P+SEiWJj4/YgpB90PPQv/HR6xveIgDeBVUACFa48xNho6arYqb4w/GynesAYiDRdX6
-         ilZshT2G2grYVz5sTTRQzqTm9Vtjy94Gvv9316HdxR/dwRPzX+6niSisE42uD07hbUe0
-         l5a0UeD9krq/nf6hlf1wME87o/1k/yFKn0UO43zcXV4f9gZ7mxA6E4G/oc6jk1TZhyhB
-         pNFCdOhJ4etPnnW7TLeNpFcsnktZp78PUqmIe/xtX5Xa4CdJMiWMop1XQsxI4ngpVfOV
-         +15Va1p8Gw9LgrF1cgGxrbECodXSqNmivJHZniO8wUsDwmyT856ERt9l5eQFhDhfkybv
-         9wJA==
-X-Gm-Message-State: APjAAAWDrK2Aht/ccTnilPnfFvlNyRlHxl6dCFH7CIpxyzbWtfn69BVX
-        Kz2NIl4UvOy7K9MZ719qcNX+Nsyi
-X-Google-Smtp-Source: APXvYqyqra+nR3mPhk2WDlqrRRQVwqbqFnCo6GeQOma7PXWLOLH05Yug4zg88FLlN9AxVpQ8DyVoqg==
-X-Received: by 2002:aa7:968c:: with SMTP id f12mr6802634pfk.235.1581219402125;
+        b=g4SzefemmAlbhgsttDn6fyjKQtRJVsapMYQLQ+4WpGgkYKSrwSTL16CIqRVnE3Y8zT
+         P204y7zt8dM1iuI0VSVxaiUdVjH9TxmiHhSp+HyQLukHP62NYgWMQbVtDsKAF5NZ8AFT
+         x96aegicYmWIdeYo7HcSuCgn9zCTvQs38G1ejbfRT073O6QPQJ4cCaMdTxXHG0/jsQn1
+         6iMQjAT8P+C6UdTiuI0zpiGz/rq/OZcbx4jV1nvN+x3bAFEfp6KdZ0KxVIs8Wu5lWAbC
+         QD4BKcgZWFd9CB1W+pE0zere200szjbQ/0iqw9T5VOQwUBSwJ4ndGgwqSqvSqvvXbYBu
+         jC4w==
+X-Gm-Message-State: APjAAAXlkBHkMvUr5ZGRoo9Nms5Vy7cDb7jfzCTunBamqO6VHuXxdTtp
+        4863o8Be7yha4vDWW9cNEQFQRZiB
+X-Google-Smtp-Source: APXvYqw02Gx7hhl9EwfkbY/K+PQLcr+ZKLs2kebGBxpD04e261jc9/ayE5wMe+4djuJ69UzIkGdwzw==
+X-Received: by 2002:aa7:9a01:: with SMTP id w1mr6654894pfj.231.1581219402762;
         Sat, 08 Feb 2020 19:36:42 -0800 (PST)
 Received: from [192.168.1.3] (ip68-111-84-250.oc.oc.cox.net. [68.111.84.250])
-        by smtp.gmail.com with ESMTPSA id u2sm7598386pgj.7.2020.02.08.19.36.40
+        by smtp.gmail.com with ESMTPSA id r62sm7884043pfc.89.2020.02.08.19.36.40
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
         Sat, 08 Feb 2020 19:36:41 -0800 (PST)
 Subject: Re: [PATCH] dt-bindings: rng: Convert BCM2835 to DT schema
@@ -128,7 +128,7 @@ Autocrypt: addr=f.fainelli@gmail.com; keydata=
  caxTGgc5zzQHeX67eMzrGomG3ZnIxmd1sAbgvJUDaD2GrYlulfwGWwWyTNbWRvMighVdPkSF
  6XFgQaosWxkV0OELLy2N485YrTr2Uq64VKyxpncLh50e2RnyAJ9qfUATKC9NgZjRvBztfqy4
  a9BQwACgnzGuH1BVeT2J0Ra+ZYgkx7DaPR0=
-Message-ID: <7fa098b8-376e-c282-2503-8b1218a16a7c@gmail.com>
+Message-ID: <da7af5d1-ecd7-0700-b956-41cb3becb575@gmail.com>
 Date:   Sat, 8 Feb 2020 19:36:39 -0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.2
