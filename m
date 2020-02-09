@@ -2,102 +2,112 @@ Return-Path: <SRS0=Lfag=35=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6382C35250
-	for <linux-crypto@archiver.kernel.org>; Sun,  9 Feb 2020 08:10:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F10CC35250
+	for <linux-crypto@archiver.kernel.org>; Sun,  9 Feb 2020 09:12:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B91C020656
-	for <linux-crypto@archiver.kernel.org>; Sun,  9 Feb 2020 08:10:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 01F4B2082E
+	for <linux-crypto@archiver.kernel.org>; Sun,  9 Feb 2020 09:12:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="gHSZGZ7I"
+	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="za6voBik"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726005AbgBIIKJ (ORCPT
+        id S1727653AbgBIJMQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 9 Feb 2020 03:10:09 -0500
-Received: from mail-vk1-f178.google.com ([209.85.221.178]:35210 "EHLO
-        mail-vk1-f178.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725900AbgBIIKJ (ORCPT
+        Sun, 9 Feb 2020 04:12:16 -0500
+Received: from mail-vs1-f65.google.com ([209.85.217.65]:33681 "EHLO
+        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726078AbgBIJMP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 9 Feb 2020 03:10:09 -0500
-Received: by mail-vk1-f178.google.com with SMTP id o187so977040vka.2
-        for <linux-crypto@vger.kernel.org>; Sun, 09 Feb 2020 00:10:08 -0800 (PST)
+        Sun, 9 Feb 2020 04:12:15 -0500
+Received: by mail-vs1-f65.google.com with SMTP id n27so2279205vsa.0
+        for <linux-crypto@vger.kernel.org>; Sun, 09 Feb 2020 01:12:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=benyossef-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=kcXc8Nc9KBoeoKUcsLWvAWNOC+kSckSzv0zdmuBDQ98=;
-        b=gHSZGZ7IIDQ6jG5R85YM6323HzHa5ScUfzn4Amb0mIwvHEgmJqwmmUo2WnaFEsTr3p
-         HaNGE+6qzONbm6kS+YKqueu0Woi1lwDVT+Nsp8+6gEhEwauKq6Z7QMmff8/6vhgiuFkE
-         5G998Mx8yp07eTwC8DbSkl7h0L17zbi5xGy2QDJri1Uuk4x3/j8DASHTeXp0pie1Fss6
-         vwHprHjFErWqxfF6GDumcFdiKYeKokEvKSriBFn1hx8Um8qmpryTitOUCk/KIadLyUL+
-         hnVHvUN/g80zOQWc21/AbKmEab+AfJJtp1H9xwPJ5prkye3bQHc9bSKiW1W/aPGNziDh
-         ZAYw==
+        bh=FaRo0DyGZ3JEibnWQUuqaMdipbBAOildr4YngTtGzS4=;
+        b=za6voBik9xca17vJt6IsXS/BJA6UkpR54wHiykt8Wa3L3RuwWMjeyWnE4wK+Sgk0a6
+         SWR/57/jufqmiPnd2sY05aZvDyFo/FlJGdF8jGkxdimq7knamxOqOGM2+FcaD6JAvlGO
+         Bl/zZnoCJ2J3yyZBYvHUVY15kgsU9eABQW0B267mCQD+QihfC+/FQ31fvuQfk6TuhimA
+         07rF4zU7KigBu98Url7eE/REbC3mSwnmVq0TEJc8Y9quuhnmEXRR5EOzVaYJuhXBbfmi
+         rpHEzhdA/DDZQ5QNnjCYE2gseqrOaddsy3JFLk6fAckP7pdPsaCFuspQCPUTZCOUBdKt
+         1JQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=kcXc8Nc9KBoeoKUcsLWvAWNOC+kSckSzv0zdmuBDQ98=;
-        b=qUkzRP5/WSrQDb0yZkCDwx+CXRA8bELP8UirI2ydTKi5QzU42lP6RIp/2fCAAYy2RP
-         YB2sOtU+zBSswmqjIReeLQU4x4cxMsizOJaH1YLQ+ZU73Jcby9jPu08jrN5aKW2MT04t
-         ZqxqHRKl9E+NTeXWoil231eqAioaoqTcev6vuXy1mXqDxOYZAP9jWz+KoIXhBGbB3UeP
-         iodtEs4fPXpfnGXOL4ssMPVqXbiK+SGw21zdrDQ+ZFnm1tmGRALcneg3fC85ORDmv0nn
-         xxRHtWwVKtkT2jvKpkj//77ZcU+cFbAc2mhnmsoxGfufPBxe4QO2tkV1DICCC0+NUcez
-         kMXA==
-X-Gm-Message-State: APjAAAVW9YGWnUDysqihlXG0hcvogfiBaDevngK+s6RgdgpVXV//7mfc
-        LoLLZvwCHU12W1MFTVGPN1lMk+aiKz0luMR0GaG9RQ==
-X-Google-Smtp-Source: APXvYqyFS4FHl4+WUSHevCab8dbGnOMljuHl6Ekgf3qUdWh6q7NvWD/TGmo8Qo3uO90VDzcjnOexHJaHxz8+reyL7fA=
-X-Received: by 2002:a1f:7cc2:: with SMTP id x185mr3522854vkc.1.1581235807823;
- Sun, 09 Feb 2020 00:10:07 -0800 (PST)
+        bh=FaRo0DyGZ3JEibnWQUuqaMdipbBAOildr4YngTtGzS4=;
+        b=O3xY4MxLCAPHoQUDzYpImaOS/6dv4w8hbwsRqwAo5pywhVEBWSGjCVnXkdLsDhTEEa
+         Qs6QbiVb5SU5MIVNxFRTCFEML1f0iPNFzPSQZs5hEWxR7sTCC2r2yQ7Ef4D5Gk8vPHyv
+         bC8CGel/VJxcJDkGMoYK6P45yjFLcp2XuJfmlUSbqIZvLpOntkagRPy4PsgxDlnjNj4E
+         CYZCWSHDfQygx0mDRC8g8If9f9G4o8tMAJ09djnHHzG6TCYibgs0wV3wRi+kjADSkYf/
+         mlkAM+ohemj0RxguFJonr7dibYBJR5PSrPAnCP8xSXWU3A7/ZoZ0O8m4jEDFkb/by3D3
+         frvg==
+X-Gm-Message-State: APjAAAVMsp54YS/rYHv+LBsxe2n9KDXZKVo4GS8PTSy6+S5buIGEqdFS
+        OWzwYJHKEhw4TENHZjX31RFCUExhQq9prxizmGJtBQ==
+X-Google-Smtp-Source: APXvYqwQexAgKAy3Dlat76o1Ft/+eitvGa8VRzFGeqWMYrG+oxpDX33F2OG0XGAzXbA1+OrWD1M4P+PylDNemJcaWd0=
+X-Received: by 2002:a67:6746:: with SMTP id b67mr3658804vsc.193.1581239532982;
+ Sun, 09 Feb 2020 01:12:12 -0800 (PST)
 MIME-Version: 1.0
-References: <CAOtvUMcwLtwgigFE2mx7LVjhhEgcZsSS4WyR_SQ2gixTZxyBfg@mail.gmail.com>
- <CAOtvUMeVXTDvH5bxVFemYmD9rpZ=xX3MkypAGyZn5VROw6sgZg@mail.gmail.com>
- <20200207072709.GB8284@sol.localdomain> <70156395ce424f41949feb13fd9f978b@MN2PR20MB2973.namprd20.prod.outlook.com>
- <SN4PR0401MB366399E54E5B7EE0E54A7E0BC31C0@SN4PR0401MB3663.namprd04.prod.outlook.com>
-In-Reply-To: <SN4PR0401MB366399E54E5B7EE0E54A7E0BC31C0@SN4PR0401MB3663.namprd04.prod.outlook.com>
+References: <20200202161914.9551-1-gilad@benyossef.com> <CAMuHMdVgxBx2x7=nTK0HtvufMNBGLruUD6Y1a0pSnX+CDsvCDA@mail.gmail.com>
+In-Reply-To: <CAMuHMdVgxBx2x7=nTK0HtvufMNBGLruUD6Y1a0pSnX+CDsvCDA@mail.gmail.com>
 From:   Gilad Ben-Yossef <gilad@benyossef.com>
-Date:   Sun, 9 Feb 2020 10:09:53 +0200
-Message-ID: <CAOtvUMeFZXwxxYT1hz=e09CaBrv1qBXvWcRCghA=wRGwZZ9S3g@mail.gmail.com>
-Subject: Re: Possible issue with new inauthentic AEAD in extended crypto tests
-To:     "Van Leeuwen, Pascal" <pvanleeuwen@rambus.com>
-Cc:     Stephan Mueller <smueller@chronox.de>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+Date:   Sun, 9 Feb 2020 11:11:58 +0200
+Message-ID: <CAOtvUMdE-5DiLAKBM1bPXme+EmGrmjK+AYzN0Zz2LsF4WBQ9Xg@mail.gmail.com>
+Subject: Re: [PATCH] crypto: ccree - dec auth tag size from cryptlen map
+To:     Geert Uytterhoeven <geert@linux-m68k.org>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Ofir Drang <ofir.drang@arm.com>,
+        stable <stable@vger.kernel.org>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        David Miller <davem@davemloft.net>,
-        Ofir Drang <Ofir.Drang@arm.com>
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux-Renesas <linux-renesas-soc@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Feb 7, 2020 at 4:07 PM Van Leeuwen, Pascal
-<pvanleeuwen@rambus.com> wrote:
-
-> The "problem" Gilad was referring to is that the _explicit_ part of the  IV appears to be
-> available  from both req->iv and from the AAD scatterbuffer. Which one should you use?
-> API wise I would assume req->iv but from a (our) hardware perspective, it would
-> be more efficient to extract it from the datastream. But is it allowed to assume
-> there is a valid IV stored there? (which implies that it has to match req->iv,
-> otherwise behaviour would deviate from implementations using that)
+On Thu, Feb 6, 2020 at 4:45 PM Geert Uytterhoeven <geert@linux-m68k.org> wrote:
 >
+> Hi Gilad,
+>
+> On Sun, Feb 2, 2020 at 5:19 PM Gilad Ben-Yossef <gilad@benyossef.com> wrote:
+> > Remove the auth tag size from cryptlen before mapping the destination
+> > in out-of-place AEAD decryption thus resolving a crash with
+> > extended testmgr tests.
+> >
+> > Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+> > Reported-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> > Cc: stable@vger.kernel.org # v4.19+
+>
+> Thanks, this fixes the crash seen on R-Car H3 ES2.0 with renesas_defconfig,
+> CONFIG_CRYPTO_MANAGER_DISABLE_TESTS=n, and CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y
+>
+> Tested-by: Geert Uytterhoeven <geert+renesas@glider.be>
+
+Thanks again for your help.
+
+>
+> Remaining issues reported during boot:
+>   1. alg: skcipher: blocksize for xts-aes-ccree (1) doesn't match
+> generic impl (16)
+
+Yes, this is actually a known issue with the generic XTS implementation.
+See: https://lore.kernel.org/linux-crypto/VI1PR0402MB34858E4EF0ACA7CDB446FF5798CE0@VI1PR0402MB3485.eurprd04.prod.outlook.com/
 
 
-No, it isn't.
+>   2. alg: aead: rfc4543-gcm-aes-ccree decryption unexpectedly
+> succeeded on test vector "random: alen=16 plen=39 authsize=16 klen=20
+> novrfy=1"; expected_error=-EBADMSG or -22, cfg="random: may_sleep
+> use_digest src_divs=[4.47%@+3553, 30.80%@+4065, 12.0%@+11,
+> 6.22%@+2999, 46.51%@alignmask+3468]"
 
-The problem that I was referring to was that part of our test suites
-passes different values in req->iv and as part of the AAD,
-in contrast to what we document as the API requirements in the include
-file, my understanding of the relevant standard and
-the single users of this API in the kernel and that the driver I'm
-maintaining fails these tests,
+Yes, I am working on this one right now.
 
-I'm all fine with getting my hands dirty and fixing the driver, I'm
-just suspect fixing a driver to pass a test that misuses the API
-may not actually improve the quality of the driver.
-
+Many thanks,
 Gilad
