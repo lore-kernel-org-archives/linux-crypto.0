@@ -1,86 +1,54 @@
 Return-Path: <SRS0=9Lzg=36=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Level: *
+X-Spam-Status: No, score=1.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,PDS_TONAME_EQ_TOLOCAL_SHORT,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 867E6C352A3
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Feb 2020 11:04:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D3E5C352A5
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Feb 2020 12:07:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 64B802082F
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Feb 2020 11:04:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5749F20873
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Feb 2020 12:07:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727003AbgBJLEn (ORCPT
+        id S1727347AbgBJMHD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Feb 2020 06:04:43 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:32912 "EHLO deadmen.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726796AbgBJLEn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Feb 2020 06:04:43 -0500
-Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
-        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1j16rn-0002aQ-CC; Mon, 10 Feb 2020 19:04:39 +0800
-Received: from herbert by gondobar with local (Exim 4.89)
-        (envelope-from <herbert@gondor.apana.org.au>)
-        id 1j16rf-00051U-QY; Mon, 10 Feb 2020 19:04:31 +0800
-Date:   Mon, 10 Feb 2020 19:04:31 +0800
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Gilad Ben-Yossef <gilad@benyossef.com>,
-        Stephan Mueller <smueller@chronox.de>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        David Miller <davem@davemloft.net>,
-        Ofir Drang <Ofir.Drang@arm.com>
-Subject: Re: Possible issue with new inauthentic AEAD in extended crypto tests
-Message-ID: <20200210110431.mhn7hlkmp3usad7s@gondor.apana.org.au>
-References: <CAOtvUMcwLtwgigFE2mx7LVjhhEgcZsSS4WyR_SQ2gixTZxyBfg@mail.gmail.com>
- <20200128023455.GC960@sol.localdomain>
- <20200128033824.p3z3jhc7mp7wlikp@gondor.apana.org.au>
- <CAOtvUMeJmhXL2V74e+LGxDEUJcDy5=f+x0MH86eyHq0u=HvKXw@mail.gmail.com>
- <20200128211229.GA224488@gmail.com>
- <CAOtvUMeVXTDvH5bxVFemYmD9rpZ=xX3MkypAGyZn5VROw6sgZg@mail.gmail.com>
- <20200207072709.GB8284@sol.localdomain>
+        Mon, 10 Feb 2020 07:07:03 -0500
+Received: from out30-45.freemail.mail.aliyun.com ([115.124.30.45]:47839 "EHLO
+        out30-45.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726950AbgBJMHD (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 10 Feb 2020 07:07:03 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01f04452;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DW;RN=12;SR=0;TI=W4_5790132_DEFAULT_0AC264CC_1581336418827_o7001c68b;
+Received: from WS-web (tianjia.zhang@linux.alibaba.com[W4_5790132_DEFAULT_0AC264CC_1581336418827_o7001c68b]) by e01e07467.eu6 at Mon, 10 Feb 2020 20:06:58 +0800
+Date:   Mon, 10 Feb 2020 20:06:58 +0800
+From:   "Tianjia Zhang" <tianjia.zhang@linux.alibaba.com>
+To:     "linux-crypto-owner" <linux-crypto-owner@vger.kernel.org>,
+        "ebiggers" <ebiggers@kernel.org>
+Cc:     "herbert" <herbert@gondor.apana.org.au>,
+        "davem" <davem@davemloft.net>, "zohar" <zohar@linux.ibm.com>,
+        "dmitry.kasatkin" <dmitry.kasatkin@gmail.com>,
+        "jmorris" <jmorris@namei.org>, "serge" <serge@hallyn.com>,
+        "linux-crypto" <linux-crypto@vger.kernel.org>,
+        "linux-integrity" <linux-integrity@vger.kernel.org>,
+        "linux-security-module" <linux-security-module@vger.kernel.org>,
+        "linux-kernel" <linux-kernel@vger.kernel.org>
+Reply-To: "Tianjia Zhang" <tianjia.zhang@linux.alibaba.com>
+Message-ID: <44ccb074-e2f4-4b6d-b33c-a91ca7393ebe.tianjia.zhang@linux.alibaba.com>
+Subject: =?UTF-8?B?5Zue5aSN77yaW1BBVENIIDEvMl0gY3J5cHRvOiBzbTMgLSBhZGQgYSBuZXcgYWxpYXMgbmFt?=
+  =?UTF-8?B?ZSBzbTMtMjU2?=
+X-Mailer: [Alimail-Mailagent revision 3][W4_5790132][DEFAULT][Chrome]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200207072709.GB8284@sol.localdomain>
-User-Agent: NeoMutt/20170113 (1.7.2)
+References: <20200207092219.115056-1-tianjia.zhang@linux.alibaba.com> <20200207092219.115056-2-tianjia.zhang@linux.alibaba.com>,<20200210031717.GA5198@sol.localdomain>,<b7ce247b-ede1-4b01-bb11-894c042679e1.tianjia.zhang@linux.alibaba.com>
+x-aliyun-mail-creator: W4_5790132_DEFAULT_MzYTW96aWxsYS81LjAgKFdpbmRvd3MgTlQgNi4xOyBXaW42NDsgeDY0KSBBcHBsZVdlYktpdC81MzcuMzYgKEtIVE1MLCBsaWtlIEdlY2tvKSBDaHJvbWUvNzkuMC4zOTQ1LjExNyBTYWZhcmkvNTM3LjM2zc
+In-Reply-To: <b7ce247b-ede1-4b01-bb11-894c042679e1.tianjia.zhang@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Feb 06, 2020 at 11:27:09PM -0800, Eric Biggers wrote:
->
-> Yes, for rfc4106 the tests don't pass the same IV in both places.  This is
-> because I wrote the tests from the perspective of a generic AEAD that doesn't
-> have this weird IV quirk, and then I added the minimum quirks to get the weird
-> algorithms like rfc4106 passing.
-> 
-> Since the actual behavior of the generic implementation of rfc4106 is that the
-> last 8 bytes of the AAD are ignored, that means that currently the tests just
-> avoid mutating these bytes when generating inauthentic input tests.  They don't
-> know that they're (apparently) meant to be another copy of the IV.
-> 
-> So it seems we need to clearly define the behavior when the two IV copies don't
-> match.  Should one or the other be used, should an error be returned, or should
-> the behavior be unspecified (in which case the tests would need to be updated)?
-> 
-> Unspecified behavior is bad, but it would be easiest for software to use
-> req->iv, while hardware might want to use the IV in the scatterlist...
-> 
-> Herbert and Stephan, any idea what was intended here?
-
-I think unspecified would be OK here to give the hardware the
-maximum latitude.  However, we also don't want it to crash or
-do something funny so perhaps generate the test vectors as you
-do now but compare it against the generic using two IV values?
-
-Cheers,
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+SXQgaXMgYWxzbyBhIGdvb2QgaWRlYSB0byBjaGFuZ2UgInNtMy0yNTYiIHRvICJzbTMiIGluIGhh
+c2hfaW5mbywgSSB3aWxsIHN1Ym1pdCBhIG5ldyBwYXRjaCB0byBmaXggdGhpcyBwcm9ibGVtLg==
