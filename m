@@ -4,36 +4,36 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0930C352A4
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Feb 2020 12:44:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FCE4C352A4
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Feb 2020 12:49:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A772C2051A
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Feb 2020 12:44:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 793572051A
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Feb 2020 12:49:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730707AbgBJMos (ORCPT
+        id S1729326AbgBJMou (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Feb 2020 07:44:48 -0500
-Received: from out30-42.freemail.mail.aliyun.com ([115.124.30.42]:54641 "EHLO
-        out30-42.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1729971AbgBJMor (ORCPT
+        Mon, 10 Feb 2020 07:44:50 -0500
+Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:60893 "EHLO
+        out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1730700AbgBJMou (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Feb 2020 07:44:47 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01f04397;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0Tpbo3du_1581338683;
-Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0Tpbo3du_1581338683)
+        Mon, 10 Feb 2020 07:44:50 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R481e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01f04446;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0Tpbr4vV_1581338685;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0Tpbr4vV_1581338685)
           by smtp.aliyun-inc.com(127.0.0.1);
-          Mon, 10 Feb 2020 20:44:44 +0800
+          Mon, 10 Feb 2020 20:44:45 +0800
 From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 To:     herbert@gondor.apana.org.au, davem@davemloft.net,
         zohar@linux.ibm.com, dmitry.kasatkin@gmail.com, jmorris@namei.org,
         serge@hallyn.com, ebiggers@kernel.org
 Cc:     linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
         linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] crypto: rename sm3-256 to sm3 in hash_algo_name
-Date:   Mon, 10 Feb 2020 20:44:39 +0800
-Message-Id: <20200210124440.23929-2-tianjia.zhang@linux.alibaba.com>
+Subject: [PATCH 2/2] ima: add sm3 algorithm to hash algorithm configuration list
+Date:   Mon, 10 Feb 2020 20:44:40 +0800
+Message-Id: <20200210124440.23929-3-tianjia.zhang@linux.alibaba.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200210124440.23929-1-tianjia.zhang@linux.alibaba.com>
 References: <20200210124440.23929-1-tianjia.zhang@linux.alibaba.com>
@@ -42,31 +42,38 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The name sm3-256 is defined in hash_algo_name in hash_info, but the
-algorithm name implemented in sm3_generic.c is sm3, which will cause
-the sm3-256 algorithm to be not found in some application scenarios of
-the hash algorithm, and an ENOENT error will occur. For example,
-IMA, keys, and other subsystems that reference hash_algo_name all use
-the hash algorithm of sm3.
+sm3 has been supported by the ima hash algorithm, but it is not
+yet in the Kconfig configuration list. After adding, both ima and tpm2
+can support sm3 well.
 
 Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
 ---
- crypto/hash_info.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ security/integrity/ima/Kconfig | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/crypto/hash_info.c b/crypto/hash_info.c
-index c754cb75dd1a..a49ff96bde77 100644
---- a/crypto/hash_info.c
-+++ b/crypto/hash_info.c
-@@ -26,7 +26,7 @@ const char *const hash_algo_name[HASH_ALGO__LAST] = {
- 	[HASH_ALGO_TGR_128]	= "tgr128",
- 	[HASH_ALGO_TGR_160]	= "tgr160",
- 	[HASH_ALGO_TGR_192]	= "tgr192",
--	[HASH_ALGO_SM3_256]	= "sm3-256",
-+	[HASH_ALGO_SM3_256]	= "sm3",
- 	[HASH_ALGO_STREEBOG_256] = "streebog256",
- 	[HASH_ALGO_STREEBOG_512] = "streebog512",
- };
+diff --git a/security/integrity/ima/Kconfig b/security/integrity/ima/Kconfig
+index 838476d780e5..ace6762c1cf1 100644
+--- a/security/integrity/ima/Kconfig
++++ b/security/integrity/ima/Kconfig
+@@ -112,6 +112,10 @@ choice
+ 	config IMA_DEFAULT_HASH_WP512
+ 		bool "WP512"
+ 		depends on CRYPTO_WP512=y && !IMA_TEMPLATE
++
++	config IMA_DEFAULT_HASH_SM3
++		bool "SM3"
++		depends on CRYPTO_SM3=y && !IMA_TEMPLATE
+ endchoice
+ 
+ config IMA_DEFAULT_HASH
+@@ -121,6 +125,7 @@ config IMA_DEFAULT_HASH
+ 	default "sha256" if IMA_DEFAULT_HASH_SHA256
+ 	default "sha512" if IMA_DEFAULT_HASH_SHA512
+ 	default "wp512" if IMA_DEFAULT_HASH_WP512
++	default "sm3" if IMA_DEFAULT_HASH_SM3
+ 
+ config IMA_WRITE_POLICY
+ 	bool "Enable multiple writes to the IMA policy"
 -- 
 2.17.1
 
