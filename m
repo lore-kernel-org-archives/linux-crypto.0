@@ -2,135 +2,242 @@ Return-Path: <SRS0=9Lzg=36=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD8B3C3B185
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Feb 2020 06:33:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46A22C352A4
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Feb 2020 07:19:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B2FF722464
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Feb 2020 06:33:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="UNpf+y54"
+	by mail.kernel.org (Postfix) with ESMTP id 14B9220838
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Feb 2020 07:19:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726231AbgBJGdg (ORCPT
+        id S1726584AbgBJHTZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Feb 2020 01:33:36 -0500
-Received: from mail-am6eur05on2050.outbound.protection.outlook.com ([40.107.22.50]:20321
-        "EHLO EUR05-AM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726170AbgBJGdf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Feb 2020 01:33:35 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XwpCy8QhrGCC8CTAm6rj8wAuqfU1ZoP0OCS7sa3AJHff675jT4+8McT38UHWEhTDzBpEfdxiiOWi6Blj00lHNjUnzjk25n1fQQe88wmgnpIPvqSMs586iSQziV9axr3gLdDWC0ZYoKgh6FUegEmOImeGE3zOYwepfwHhD8o0Ss0TBwskIPko3DBv+xav964D76wApWsyBqKfLZExUxtApeZgnIkPS3Q7Bawu6Dn9ZQyNF20i2jL/NSwYc+jG7o48kLn3hWy5HGRa3aqNqVohm8Oh5KSXx/haWiesT4mXI1JB9g5CXRNWCSoOoBaJFCYLvnaMvAxIIdWX5+YV8NqAxg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xfqXd+DMI+6U6SVoYMG0ts1qqSXaeiBmvnHHLLBT+xs=;
- b=h88sylbFwbyPwnvVM16oTM2LsVMH8F4wQdy69Cgb9GxrTN3lIS/dOW0zhHUeDbEdYFd7q1jBspEA6O5r/EAaKy+fm/n/zFwtKRbUeO5Wm3J3IijUX7rZX2El6Hrm8Zsj4LXkhw0HzAIEzZdFRhrq+S0bdShxZi0H4e3sJNM/4GTUoXQcdwNtUBfp5uOJwwAf6zRs9rXO8qdat8/Y9R4TIsXeXrHP5Rvq5bvhzlo+qGKXfsTbtgiUlSaw3LMg4/kuuFLHz0jtMu0cLcqnc+MUNqmaBdhMp99EdznQ59ncMpW7O3VPIT9X/67DlqKSMN5AIrLMzsICiXktnouLCHcPSA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xfqXd+DMI+6U6SVoYMG0ts1qqSXaeiBmvnHHLLBT+xs=;
- b=UNpf+y54UymTMbY53z6wTxwY298iXTcCarZDJoAO+0KoijqUjujnoaKRPvz8fFYGazKw7qrAsDDewqtDEPvDILjHN5UhCBiz2xlgEg6RhdPP49LMUlq4V3/R7zQaXzrd7VkPWfxFS7r+yQTyAZQyv6dkWPQ6mhT9RYOBEXMnWvg=
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB3344.eurprd04.prod.outlook.com (52.134.8.16) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2707.29; Mon, 10 Feb 2020 06:33:31 +0000
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::85e9:f844:f8b0:27d]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::85e9:f844:f8b0:27d%7]) with mapi id 15.20.2707.028; Mon, 10 Feb 2020
- 06:33:31 +0000
-From:   Horia Geanta <horia.geanta@nxp.com>
-To:     Robin Gong <yibin.gong@nxp.com>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>
-CC:     =?iso-8859-1?Q?Andr=E9_Draszik?= <git@andred.net>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Anson Huang <anson.huang@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-input@vger.kernel.org" <linux-input@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>
-Subject: Re: [PATCH 2/3] Input: snvs_pwrkey - enable snvs clock as needed
-Thread-Topic: [PATCH 2/3] Input: snvs_pwrkey - enable snvs clock as needed
-Thread-Index: AQHV35muNBIBR/iti0mqpaUfcGw1rg==
-Date:   Mon, 10 Feb 2020 06:33:30 +0000
-Message-ID: <VI1PR0402MB34851857F012286250BF3BBE98190@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <20200130204516.4760-1-git@andred.net>
- <20200130204516.4760-2-git@andred.net>
- <VI1PR0402MB3485EC2F82DDE52DC5CA0795981C0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
- <20200209223836.GA199269@dtor-ws>
- <VE1PR04MB6638A4F4E3BABE0ED0CD4A5189190@VE1PR04MB6638.eurprd04.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=horia.geanta@nxp.com; 
-x-originating-ip: [212.146.100.6]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: c486d2cc-3528-4bb1-3bc9-08d7adf3254c
-x-ms-traffictypediagnostic: VI1PR0402MB3344:|VI1PR0402MB3344:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <VI1PR0402MB33440FCE435599ACB6A1CBB698190@VI1PR0402MB3344.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-forefront-prvs: 03094A4065
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(376002)(366004)(346002)(136003)(39860400002)(199004)(189003)(81166006)(66446008)(66556008)(64756008)(66946007)(81156014)(8936002)(6506007)(66476007)(91956017)(8676002)(5660300002)(76116006)(53546011)(186003)(7416002)(52536014)(26005)(44832011)(71200400001)(86362001)(2906002)(478600001)(33656002)(54906003)(110136005)(9686003)(55016002)(4326008)(7696005)(316002)(4744005);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3344;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: r2szjdFPevfgeS7Hkfl9pgTOyHO7e6W4Qu4MjADVgg6mAls4gOrwoicJeI0jQWTP8tbUYfsCvk6yTxEL8wcZHzfwD/226uXeE9kvVuRDHt5UGJhX1cQc4N1Uo6VyT8LrlXIRGDjMFt3O7zAthkc/FMnn8PS1Ol78Bt17BB0WmYsKymxzWRw5t+zigyWfrGVa6vdv60bXyd/T16UqK9G0gbjjyRfRWOpc/EEX4yufjsiRu+hH9y4fqPBwMGzHu+gryOnj7wiAW3UVzk9WP9TgDkpthUpZJUs+wOS+wUjHaLforlCSSy7DiJGUGQM1Gnwcd8DHLycmpUuRRZUMAUlyLIW4UOkOTEYVH4QMrHtDC1DhKBMfIp5uT2L0VrQFcYvWeftq1m1HOIYoEFcEvdeOgVrZOR/BMypMWIxulNOvU2NecwrbDcT8A7GzqK2sNGA+
-x-ms-exchange-antispam-messagedata: 7OkPOFhmJAnUDvZ8Jp/sSU2THut1MsLL54J15o2K5+/O925FHw8l59I7ddf5q5DEXY9dUS9W47OmQbW2zn1sU4+Q2R+WSI1N6mJ3S+uYfoIMQnP36CFpnYd4+ZzwdI4mycoDA9G4i+qNIdwzc3rj+Q==
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+        Mon, 10 Feb 2020 02:19:25 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:24448 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726118AbgBJHTZ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 10 Feb 2020 02:19:25 -0500
+Received: from pps.filterd (m0098416.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01A7EB37058166
+        for <linux-crypto@vger.kernel.org>; Mon, 10 Feb 2020 02:19:24 -0500
+Received: from e06smtp03.uk.ibm.com (e06smtp03.uk.ibm.com [195.75.94.99])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2y1u7yt55b-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Mon, 10 Feb 2020 02:19:24 -0500
+Received: from localhost
+        by e06smtp03.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <freude@linux.ibm.com>;
+        Mon, 10 Feb 2020 07:19:22 -0000
+Received: from b06cxnps3075.portsmouth.uk.ibm.com (9.149.109.195)
+        by e06smtp03.uk.ibm.com (192.168.101.133) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Mon, 10 Feb 2020 07:19:21 -0000
+Received: from d06av24.portsmouth.uk.ibm.com (d06av24.portsmouth.uk.ibm.com [9.149.105.60])
+        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01A7JKKm58916868
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 10 Feb 2020 07:19:20 GMT
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 53CD242045;
+        Mon, 10 Feb 2020 07:19:20 +0000 (GMT)
+Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id EEAB842041;
+        Mon, 10 Feb 2020 07:19:19 +0000 (GMT)
+Received: from funtu.home (unknown [9.145.79.3])
+        by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Mon, 10 Feb 2020 07:19:19 +0000 (GMT)
+Subject: Re: [PATCH 3/3] crypto/testmgr: add selftests for paes-s390
+From:   Harald Freudenberger <freude@linux.ibm.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org, heiko.carstens@de.ibm.com,
+        Vasily Gorbik <gor@linux.ibm.com>
+References: <20191113105523.8007-1-freude@linux.ibm.com>
+ <20191113105523.8007-4-freude@linux.ibm.com>
+ <20191122081611.vznhvhouim6hnehc@gondor.apana.org.au>
+ <403c438d-1f3e-f25d-8df2-4f03d9ef731c@linux.ibm.com>
+Date:   Mon, 10 Feb 2020 08:19:25 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c486d2cc-3528-4bb1-3bc9-08d7adf3254c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Feb 2020 06:33:30.9376
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: JTZPSjPV101M+GXmm05d+Dv+K+CGsv/Il7fWui4U4C2yI4J2CG9LhG43ZHadxixoKu2M7w/obgBagvBqlPZ8NQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3344
+In-Reply-To: <403c438d-1f3e-f25d-8df2-4f03d9ef731c@linux.ibm.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+x-cbid: 20021007-0012-0000-0000-00000385653F
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20021007-0013-0000-0000-000021C1DB3D
+Message-Id: <e97a3c21-3364-728f-3706-0ed208a22b06@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-10_01:2020-02-07,2020-02-10 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
+ mlxlogscore=999 spamscore=0 priorityscore=1501 suspectscore=0
+ impostorscore=0 lowpriorityscore=0 phishscore=0 mlxscore=0 clxscore=1015
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002100061
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2/10/2020 4:03 AM, Robin Gong wrote:=0A=
-> On 2020/02/10 Dmitry Torokhov <dmitry.torokhov@gmail.com> wrote: =0A=
->> On Fri, Feb 07, 2020 at 08:10:22AM +0000, Horia Geanta wrote:=0A=
->>> On 1/30/2020 10:45 PM, Andr=E9 Draszik wrote:=0A=
->>>> @@ -140,6 +148,25 @@ static int imx_snvs_pwrkey_probe(struct=0A=
->> platform_device *pdev)=0A=
->>>>  	if (pdata->irq < 0)=0A=
->>>>  		return -EINVAL;=0A=
->>>>=0A=
->>>> +	pdata->clk =3D devm_clk_get(&pdev->dev, "snvs-pwrkey");=0A=
->>>> +	if (IS_ERR(pdata->clk)) {=0A=
->>>> +		pdata->clk =3D NULL;=0A=
->>> Using devm_clk_get_optional() would simplify error handling.=0A=
->>=0A=
->> It sounds to me that this clock is not at all optional and the driver cu=
-rrently=0A=
->> "works" only by accident and therefore optional is not suitable here.=0A=
-> Yes, then we need to add all snvs clk in dts for on legacy i.MX chips in =
-this patchset=0A=
-> to avoid any potential function broken.=0A=
-In that case the DT binding should be updated too,=0A=
-to make the clock mandatory.=0A=
-But before doing this all i.MX SoCs should be checked.=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
+Hello Herbert
+
+sorry for my pressing ... but I received questions from a distro about if they can pick
+this. And the pre requirement is to have this upstream accepted. So will you accept this
+and it will appear in the 5.6 kernel or do you want me to do some rework ?
+
+Thanks
+
+On 31.01.20 12:06, Harald Freudenberger wrote:
+> On 22.11.19 09:16, Herbert Xu wrote:
+>> On Wed, Nov 13, 2019 at 11:55:23AM +0100, Harald Freudenberger wrote:
+>>> This patch adds selftests for the s390 specific protected key
+>>> AES (PAES) cipher implementations:
+>>>   * cbc-paes-s390
+>>>   * ctr-paes-s390
+>>>   * ecb-paes-s390
+>>>   * xts-paes-s390
+>>> PAES is an AES cipher but with encrypted ('protected') key
+>>> material. So here come ordinary AES enciphered data values
+>>> but with a special key format understood by the PAES
+>>> implementation.
+>>>
+>>> The testdata definitons and testlist entries are surrounded
+>>> by #if IS_ENABLED(CONFIG_CRYPTO_PAES_S390) because they don't
+>>> make any sense on non s390 platforms or without the PAES
+>>> cipher implementation.
+>>>
+>>> Signed-off-by: Harald Freudenberger <freude@linux.ibm.com>
+>>> ---
+>>>  crypto/testmgr.c |  36 +++++
+>>>  crypto/testmgr.h | 334 +++++++++++++++++++++++++++++++++++++++++++++++
+>>>  2 files changed, 370 insertions(+)
+>> So with your cleartext work, I gather that you can now supply
+>> arbitrary keys to paes? If so my preferred method of testing it
+>> would be to add a paes-specific tester function that massaged the
+>> existing aes vectors into the format required by paes so you
+>> get exactly the same testing coverage as plain aes.
+>>
+>> Is this possible?
+>>
+>> Thanks,
+>
+> So here is now a reworked version of the paes selftest invocation within the testmanager code.
+> I picked your suggestions and now the paes ciphers are able to deal with plain aes key values
+> and so can benefit from the generic aes testcases.
+> Please note, this patch needs as a prerequirement some other patches which enable the
+> base functionality in the zcyrpt device driver and the pkey kernel module. These patches
+> will come with the next s390 subsystem merge for the 5.6 development kernel. If you agree
+> to this patch, then Vasily will push this patch with the s390 subsystem together as part of the patch
+> series.
+>
+> Thanks and here is the patch for the testmanager:
+>
+> ============================================================
+>
+> From fb82ea49910b8cde33ca7286c8855c0326e78177 Mon Sep 17 00:00:00 2001
+> From: Harald Freudenberger <freude@linux.ibm.com>
+> Date: Wed, 22 Jan 2020 14:43:23 +0100
+> Subject: [PATCH] crypto/testmgr: enable selftests for paes-s390 ciphers
+>
+> This patch enables the selftests for the s390 specific protected key
+> AES (PAES) cipher implementations:
+>   * cbc-paes-s390
+>   * ctr-paes-s390
+>   * ecb-paes-s390
+>   * xts-paes-s390
+> PAES is an AES cipher but with encrypted ('protected') key
+> material. However, the paes ciphers are able to derive an protected
+> key from clear key material with the help of the pkey kernel module.
+>
+> So this patch now enables the generic AES tests for the paes
+> ciphers. Under the hood the setkey() functions rearrange the clear key
+> values as clear key token and so the pkey kernel module is able to
+> provide protected key blobs from the given clear key values. The
+> derived protected key blobs are then used within the paes cipers and
+> should produce the very same results as the generic AES implementation
+> with the clear key values.
+>
+> The s390-paes cipher testlist entries are surrounded
+> by #if IS_ENABLED(CONFIG_CRYPTO_PAES_S390) because they don't
+> make any sense on non s390 platforms or without the PAES
+> cipher implementation.
+>
+> Signed-off-by: Harald Freudenberger <freude@linux.ibm.com>
+> Reviewed-by: Ingo Franzki <ifranzki@linux.ibm.com>
+> Acked-by: Vasily Gorbik <gor@linux.ibm.com>
+> ---
+>  crypto/testmgr.c | 36 ++++++++++++++++++++++++++++++++++++
+>  1 file changed, 36 insertions(+)
+>
+> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+> index 82513b6b0abd..6c4a98102825 100644
+> --- a/crypto/testmgr.c
+> +++ b/crypto/testmgr.c
+> @@ -4156,6 +4156,15 @@ static const struct alg_test_desc alg_test_descs[] = {
+>              .cipher = __VECS(tf_cbc_tv_template)
+>          },
+>      }, {
+> +#if IS_ENABLED(CONFIG_CRYPTO_PAES_S390)
+> +        .alg = "cbc-paes-s390",
+> +        .fips_allowed = 1,
+> +        .test = alg_test_skcipher,
+> +        .suite = {
+> +            .cipher = __VECS(aes_cbc_tv_template)
+> +        }
+> +    }, {
+> +#endif
+>          .alg = "cbcmac(aes)",
+>          .fips_allowed = 1,
+>          .test = alg_test_hash,
+> @@ -4304,6 +4313,15 @@ static const struct alg_test_desc alg_test_descs[] = {
+>              .cipher = __VECS(tf_ctr_tv_template)
+>          }
+>      }, {
+> +#if IS_ENABLED(CONFIG_CRYPTO_PAES_S390)
+> +        .alg = "ctr-paes-s390",
+> +        .fips_allowed = 1,
+> +        .test = alg_test_skcipher,
+> +        .suite = {
+> +            .cipher = __VECS(aes_ctr_tv_template)
+> +        }
+> +    }, {
+> +#endif
+>          .alg = "cts(cbc(aes))",
+>          .test = alg_test_skcipher,
+>          .fips_allowed = 1,
+> @@ -4596,6 +4614,15 @@ static const struct alg_test_desc alg_test_descs[] = {
+>              .cipher = __VECS(xtea_tv_template)
+>          }
+>      }, {
+> +#if IS_ENABLED(CONFIG_CRYPTO_PAES_S390)
+> +        .alg = "ecb-paes-s390",
+> +        .fips_allowed = 1,
+> +        .test = alg_test_skcipher,
+> +        .suite = {
+> +            .cipher = __VECS(aes_tv_template)
+> +        }
+> +    }, {
+> +#endif
+>          .alg = "ecdh",
+>          .test = alg_test_kpp,
+>          .fips_allowed = 1,
+> @@ -5167,6 +5194,15 @@ static const struct alg_test_desc alg_test_descs[] = {
+>              .cipher = __VECS(tf_xts_tv_template)
+>          }
+>      }, {
+> +#if IS_ENABLED(CONFIG_CRYPTO_PAES_S390)
+> +        .alg = "xts-paes-s390",
+> +        .fips_allowed = 1,
+> +        .test = alg_test_skcipher,
+> +        .suite = {
+> +            .cipher = __VECS(aes_xts_tv_template)
+> +        }
+> +    }, {
+> +#endif
+>          .alg = "xts4096(paes)",
+>          .test = alg_test_null,
+>          .fips_allowed = 1,
+
