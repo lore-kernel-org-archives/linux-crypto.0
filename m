@@ -2,121 +2,99 @@ Return-Path: <SRS0=9Lzg=36=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87997C3F68F
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Feb 2020 03:17:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 915ABC3B184
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Feb 2020 06:10:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5DF2A214DB
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Feb 2020 03:17:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5E26320870
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Feb 2020 06:10:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1581304651;
-	bh=4+xrRrrol/aiyGAllkyxm+BcBdBXEdtB/xYpBE5mqp0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=AUiGYrMIYXAnIQa/LG2zotmsrH40YWDQxQmOXDrk9rfugbED9Jy/RPZ96MkrHz08x
-	 dtRemWaED+cdnbL0Ol2qbCUuVtGhgxz+IGMD5kVGEM89oeC1j5drtIXT3kpyRUEG8i
-	 wy3FGn/TDbd7bD+//SfYn6jYF150ro3OatH4DdSM=
+	s=default; t=1581315057;
+	bh=8g0hKppIhVXqTMKuYFDl3Cie2wyh70mX7s8ucWyEmP4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
+	b=bN4ykMqpwiD3sHnRnHdLyiHRGrXIBfIgmtlV8BI9G9YvathX3qetHRDSA/8a4UJF5
+	 5EZpnm0Wb5at2fPc+bnHXQAYkFegE7sUqOY949R7TS6mB0q8eHqHXav0XlmLx+Ddgp
+	 1eQaGhcKu892YrXx8jffqFpCL3Ded8FwxMaV14qU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726950AbgBJDRa (ORCPT
+        id S1727481AbgBJGKz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 9 Feb 2020 22:17:30 -0500
-Received: from mail.kernel.org ([198.145.29.99]:54940 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726958AbgBJDRa (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 9 Feb 2020 22:17:30 -0500
-Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 24D7A20870;
-        Mon, 10 Feb 2020 03:17:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581304649;
-        bh=4+xrRrrol/aiyGAllkyxm+BcBdBXEdtB/xYpBE5mqp0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ZY3kL5ThzVIfNdnLnxnWJF8NCVdguistyR88GLQzeaLdSldvkzWM0WyvKl7S7//l2
-         h5CyQ8dnqSJ6Efw9f9tk5mkx4zoPvPz4vob/qxmC05uRe/5Cu6uam5Y2Ru8O1XGBik
-         yhe3fqyYtW+mYcZH3HutsVZ1Qs3A+LfbR5eQKDag=
-Date:   Sun, 9 Feb 2020 19:17:17 -0800
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        zohar@linux.ibm.com, dmitry.kasatkin@gmail.com, jmorris@namei.org,
-        serge@hallyn.com, linux-crypto@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] crypto: sm3 - add a new alias name sm3-256
-Message-ID: <20200210031717.GA5198@sol.localdomain>
-References: <20200207092219.115056-1-tianjia.zhang@linux.alibaba.com>
- <20200207092219.115056-2-tianjia.zhang@linux.alibaba.com>
+        Mon, 10 Feb 2020 01:10:55 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:37068 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726188AbgBJGKz (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 10 Feb 2020 01:10:55 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Subject:Cc:To:
+        From:Date:Sender:Reply-To:Content-ID:Content-Description;
+        bh=goUY2avRCYVAek7mCPEP6D9VvLCgLAVwzsr5XSoA9jI=; b=fCcxVNrKPFdXDSKhgC67R9+Gay
+        OPRuRD3lNe+D7m3D1M+6TCJG3HdpOC960ObyRUJghTHBcs5tnFLz3O3/jHYR58G9IoCl4NUTrYzkL
+        f9Bzz+TWoY6hibjVzfc0OrEeUBOQDYobAQ80+PaPp4ySQ4ZJi/pHVF41MjEumEU3UJhTSvbqkxG5H
+        Qsg89Z+AqdUEBI5FLIfdYeG3X4IXYyjk1HBc78/GYWhQuV/tS0R+PGWaXofxlkWEBkCmOpC81/JPR
+        CEGJjzOxoijWHqxapJT/aEva0/UljFlkYIhiPL/QsDJ0p0W3I2vCUdwYQLF0EJ5LA6v/qFPPpnSF1
+        kdMGLLbw==;
+Received: from [80.156.29.194] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1j12HT-0000wc-Dz; Mon, 10 Feb 2020 06:10:52 +0000
+Date:   Mon, 10 Feb 2020 07:10:47 +0100
+From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To:     Ben Boeckel <mathstuf@gmail.com>
+Cc:     list.lkml.keyrings@me.benboeckel.net,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        Mauro Carvalho Chehab <mchehab@infradead.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>,
+        David Howells <dhowells@redhat.com>,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
+        keyrings@vger.kernel.org
+Subject: Re: [PATCH 02/11] docs: crypto: convert asymmetric-keys.txt to ReST
+Message-ID: <20200210071047.0db3f3a6@kernel.org>
+In-Reply-To: <20200206200911.GA2830394@erythro.kitware.com>
+References: <cover.1581001737.git.mchehab+huawei@kernel.org>
+        <1b6cd1da02dda27a725a6c4214019a1e306a7927.1581001737.git.mchehab+huawei@kernel.org>
+        <20200206200911.GA2830394@erythro.kitware.com>
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200207092219.115056-2-tianjia.zhang@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Feb 07, 2020 at 05:22:18PM +0800, Tianjia Zhang wrote:
-> The name sm3-256 is defined in hash_algo_name in hash_info, but the
-> algorithm name implemented in sm3_generic.c is sm3, which will cause
-> the sm3-256 algorithm to be not found in some application scenarios of
-> the hash algorithm, and an ENOENT error will occur. For example,
-> IMA, keys, and other subsystems that reference hash_algo_name cannot use
-> the hash algorithm of sm3. This patch adds an alias name sm3-256 to sm3,
-> which can better solve the above problems.
-> 
-> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-> ---
->  crypto/sm3_generic.c | 21 +++++++++++++++++----
->  1 file changed, 17 insertions(+), 4 deletions(-)
-> 
-> diff --git a/crypto/sm3_generic.c b/crypto/sm3_generic.c
-> index 3468975215ca..ded41031bd5f 100644
-> --- a/crypto/sm3_generic.c
-> +++ b/crypto/sm3_generic.c
-> @@ -163,7 +163,7 @@ int crypto_sm3_finup(struct shash_desc *desc, const u8 *data,
->  }
->  EXPORT_SYMBOL(crypto_sm3_finup);
->  
-> -static struct shash_alg sm3_alg = {
-> +static struct shash_alg sm3_algs[2] = { {
->  	.digestsize	=	SM3_DIGEST_SIZE,
->  	.init		=	sm3_base_init,
->  	.update		=	crypto_sm3_update,
-> @@ -176,16 +176,28 @@ static struct shash_alg sm3_alg = {
->  		.cra_blocksize	 =	SM3_BLOCK_SIZE,
->  		.cra_module	 =	THIS_MODULE,
->  	}
-> -};
-> +}, {
-> +	.digestsize	=	SM3_DIGEST_SIZE,
-> +	.init		=	sm3_base_init,
-> +	.update		=	crypto_sm3_update,
-> +	.final		=	sm3_final,
-> +	.finup		=	crypto_sm3_finup,
-> +	.descsize	=	sizeof(struct sm3_state),
-> +	.base		=	{
-> +		.cra_name	 =	"sm3-256",
-> +		.cra_blocksize	 =	SM3_BLOCK_SIZE,
-> +		.cra_module	 =	THIS_MODULE,
-> +	}
-> +} };
+Em Thu, 6 Feb 2020 15:09:11 -0500
+Ben Boeckel <mathstuf@gmail.com> escreveu:
 
-According to https://tools.ietf.org/id/draft-oscca-cfrg-sm3-01.html,
-SM3 always produces a 256-bit hash value.  E.g., it says:
+> On Thu, Feb 06, 2020 at 16:11:21 +0100, Mauro Carvalho Chehab wrote:
+> > - (1) If the criterion string is of the form "id:<hexdigits>" then the =
+match
+> > +  1) If the criterion string is of the form "id:<hexdigits>" then the =
+match =20
+>=20
+> This update was followed in all the enumeration changes except=E2=80=A6
+>=20
+> > - (2) If the criterion string is of the form "<subtype>:<hexdigits>" th=
+en the
+> > + 2) If the criterion string is of the form "<subtype>:<hexdigits>" the=
+n the =20
+>=20
+> The whitespace here doesn't match up. Which is preferred?
 
-	"SM3 produces an output hash value of 256 bits long"
+That was a mistake.
 
-and
+>=20
+> > - (1) Signature verification.
+> > +1) Signature verification. =20
+>=20
+> Here, the indentation was lost too. Is this intentional?
 
-	"SM3 is a hash function that generates a 256-bit hash value."
+Both ways would work. I'll keep the original indentation for the next
+version. Thanks for pointing it.
 
-I don't see any mention of "SM3-256".
-
-So why not just keep it as "sm3" and change hash_info.c instead?
-Since the name there is currently wrong, no one can be using it yet.
-
-- Eric
+Cheers,
+Mauro
