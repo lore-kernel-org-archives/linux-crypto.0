@@ -2,44 +2,107 @@ Return-Path: <SRS0=9Lzg=36=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48392C352A3
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Feb 2020 12:49:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97CA8C3F68F
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Feb 2020 16:30:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2B59920708
-	for <linux-crypto@archiver.kernel.org>; Mon, 10 Feb 2020 12:49:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B76F20838
+	for <linux-crypto@archiver.kernel.org>; Mon, 10 Feb 2020 16:30:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730696AbgBJMor (ORCPT
+        id S1727872AbgBJQap (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 10 Feb 2020 07:44:47 -0500
-Received: from out30-42.freemail.mail.aliyun.com ([115.124.30.42]:59349 "EHLO
-        out30-42.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727857AbgBJMoq (ORCPT
+        Mon, 10 Feb 2020 11:30:45 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:8954 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1727686AbgBJQap (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 10 Feb 2020 07:44:46 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01f04428;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0Tpb9ZmV_1581338682;
-Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0Tpb9ZmV_1581338682)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Mon, 10 Feb 2020 20:44:42 +0800
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        Mon, 10 Feb 2020 11:30:45 -0500
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01AGP9F3165028;
+        Mon, 10 Feb 2020 11:30:29 -0500
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2y1u9p5pve-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 10 Feb 2020 11:30:29 -0500
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01AGT1XY006702;
+        Mon, 10 Feb 2020 11:30:28 -0500
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2y1u9p5pum-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 10 Feb 2020 11:30:28 -0500
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01AGUI8A006745;
+        Mon, 10 Feb 2020 16:30:27 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
+        by ppma02wdc.us.ibm.com with ESMTP id 2y1mm6aw4u-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 10 Feb 2020 16:30:27 +0000
+Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01AGUQ8B14484412
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 10 Feb 2020 16:30:26 GMT
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 939A812406E;
+        Mon, 10 Feb 2020 16:30:26 +0000 (GMT)
+Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 693B612405B;
+        Mon, 10 Feb 2020 16:30:26 +0000 (GMT)
+Received: from [9.2.202.60] (unknown [9.2.202.60])
+        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
+        Mon, 10 Feb 2020 16:30:26 +0000 (GMT)
+Subject: Re: [PATCH 1/2] crypto: sm3 - add a new alias name sm3-256
+To:     Eric Biggers <ebiggers@kernel.org>,
+        Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
         zohar@linux.ibm.com, dmitry.kasatkin@gmail.com, jmorris@namei.org,
-        serge@hallyn.com, ebiggers@kernel.org
-Cc:     linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+        serge@hallyn.com, linux-crypto@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
         linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] IMA hash algorithm supports sm3
-Date:   Mon, 10 Feb 2020 20:44:38 +0800
-Message-Id: <20200210124440.23929-1-tianjia.zhang@linux.alibaba.com>
-X-Mailer: git-send-email 2.17.1
+References: <20200207092219.115056-1-tianjia.zhang@linux.alibaba.com>
+ <20200207092219.115056-2-tianjia.zhang@linux.alibaba.com>
+ <20200210031717.GA5198@sol.localdomain>
+From:   Ken Goldman <kgold@linux.ibm.com>
+Message-ID: <1a623251-e83a-3b70-9fbd-8e929a23f7d8@linux.ibm.com>
+Date:   Mon, 10 Feb 2020 11:30:26 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.2
+MIME-Version: 1.0
+In-Reply-To: <20200210031717.GA5198@sol.localdomain>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-10_05:2020-02-10,2020-02-10 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
+ lowpriorityscore=0 suspectscore=0 clxscore=1011 mlxlogscore=899 mlxscore=0
+ malwarescore=0 priorityscore=1501 impostorscore=0 adultscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2002100123
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Fixed an issue where the sm3 algorithm name mismatch in the crypto subsystem hash_algo_name.
-Make IMA support sm3 hash algorithm, added support for sm3 in IMA algorithm Kconfig configuration.
+On 2/9/2020 10:17 PM, Eric Biggers wrote:
+> According to https://tools.ietf.org/id/draft-oscca-cfrg-sm3-01.html,
+> SM3 always produces a 256-bit hash value.  E.g., it says:
+> 
+> 	"SM3 produces an output hash value of 256 bits long"
+> 
+> and
+> 
+> 	"SM3 is a hash function that generates a 256-bit hash value."
+> 
+> I don't see any mention of "SM3-256".
+> 
+> So why not just keep it as "sm3" and change hash_info.c instead?
+> Since the name there is currently wrong, no one can be using it yet.
 
+Question:  Is 256 bits fundamental to SM3?  Could there ever be a 
+variant in the future that's e.g., 512 bits?
 
