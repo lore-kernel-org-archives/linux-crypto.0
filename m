@@ -7,30 +7,30 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09CDFC352A3
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:21:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72705C35242
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:21:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EC272206D6
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:21:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5EA0D20714
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:21:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731374AbgBKSVY (ORCPT
+        id S1727511AbgBKSV2 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Feb 2020 13:21:24 -0500
-Received: from xavier.telenet-ops.be ([195.130.132.52]:45464 "EHLO
-        xavier.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731083AbgBKSTd (ORCPT
+        Tue, 11 Feb 2020 13:21:28 -0500
+Received: from andre.telenet-ops.be ([195.130.132.53]:34358 "EHLO
+        andre.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729724AbgBKSTd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 11 Feb 2020 13:19:33 -0500
 Received: from ramsan ([84.195.182.253])
-        by xavier.telenet-ops.be with bizsmtp
-        id 1WKW220035USYZQ01WKWwT; Tue, 11 Feb 2020 19:19:31 +0100
+        by andre.telenet-ops.be with bizsmtp
+        id 1WKW220015USYZQ01WKWTi; Tue, 11 Feb 2020 19:19:30 +0100
 Received: from rox.of.borg ([192.168.97.57])
         by ramsan with esmtp (Exim 4.90_1)
         (envelope-from <geert@linux-m68k.org>)
-        id 1j1a8A-0002ov-9t; Tue, 11 Feb 2020 19:19:30 +0100
+        id 1j1a89-0002oV-Vs; Tue, 11 Feb 2020 19:19:29 +0100
 Received: from geert by rox.of.borg with local (Exim 4.90_1)
         (envelope-from <geert@linux-m68k.org>)
-        id 1j1a8A-0003zK-8W; Tue, 11 Feb 2020 19:19:30 +0100
+        id 1j1a89-0003yw-Uf; Tue, 11 Feb 2020 19:19:29 +0100
 From:   Geert Uytterhoeven <geert+renesas@glider.be>
 To:     Gilad Ben-Yossef <gilad@benyossef.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -40,9 +40,9 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-crypto@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH v2 26/34] crypto: ccree - improve kerneldoc in cc_hash.[ch]
-Date:   Tue, 11 Feb 2020 19:19:20 +0100
-Message-Id: <20200211181928.15178-27-geert+renesas@glider.be>
+Subject: [PATCH v2 18/34] crypto: ccree - remove struct cc_sram_ctx
+Date:   Tue, 11 Feb 2020 19:19:12 +0100
+Message-Id: <20200211181928.15178-19-geert+renesas@glider.be>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200211181928.15178-1-geert+renesas@glider.be>
 References: <20200211181928.15178-1-geert+renesas@glider.be>
@@ -51,89 +51,102 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Miscellaneous improvements:
-  - Start comment blocks with "/**" to enable kerneldoc,
-  - Mark parameters using "@" instead of "\param",
-  - Add missing function names to kerneldoc headers,
-  - Add missing parameter descriptions.
+The cc_sram_ctx structure contains only a single member, and only one
+instance exists.  Simplify the code and reduce memory consumption by
+moving this member to struct cc_drvdata.
 
 Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 ---
 v2:
   - New.
 
- drivers/crypto/ccree/cc_hash.c | 11 ++++++-----
- drivers/crypto/ccree/cc_hash.h | 24 ++++++++++++------------
- 2 files changed, 18 insertions(+), 17 deletions(-)
+ drivers/crypto/ccree/cc_driver.h   |  2 +-
+ drivers/crypto/ccree/cc_sram_mgr.c | 27 +++++----------------------
+ 2 files changed, 6 insertions(+), 23 deletions(-)
 
-diff --git a/drivers/crypto/ccree/cc_hash.c b/drivers/crypto/ccree/cc_hash.c
-index f3adc1ab0e01abec..738f0debee98ebf1 100644
---- a/drivers/crypto/ccree/cc_hash.c
-+++ b/drivers/crypto/ccree/cc_hash.c
-@@ -2238,14 +2238,15 @@ static const void *cc_larval_digest(struct device *dev, u32 mode)
+diff --git a/drivers/crypto/ccree/cc_driver.h b/drivers/crypto/ccree/cc_driver.h
+index 9e94a29d84ae61f1..7e483c22858245f9 100644
+--- a/drivers/crypto/ccree/cc_driver.h
++++ b/drivers/crypto/ccree/cc_driver.h
+@@ -146,7 +146,7 @@ struct cc_drvdata {
+ 	void *aead_handle;
+ 	void *request_mgr_handle;
+ 	void *fips_handle;
+-	void *sram_mgr_handle;
++	u32 sram_free_offset;	/* offset to non-allocated area in SRAM */
+ 	void *debugfs;
+ 	struct clk *clk;
+ 	bool coherent;
+diff --git a/drivers/crypto/ccree/cc_sram_mgr.c b/drivers/crypto/ccree/cc_sram_mgr.c
+index d46aad7c8140acaa..38f36cbc05b3cf6f 100644
+--- a/drivers/crypto/ccree/cc_sram_mgr.c
++++ b/drivers/crypto/ccree/cc_sram_mgr.c
+@@ -4,14 +4,6 @@
+ #include "cc_driver.h"
+ #include "cc_sram_mgr.h"
+ 
+-/**
+- * struct cc_sram_ctx -Internal RAM context manager
+- * @sram_free_offset:   the offset to the non-allocated area
+- */
+-struct cc_sram_ctx {
+-	u32 sram_free_offset;
+-};
+-
+ /**
+  * cc_sram_mgr_init() - Initializes SRAM pool.
+  *      The pool starts right at the beginning of SRAM.
+@@ -21,7 +13,6 @@ struct cc_sram_ctx {
+  */
+ int cc_sram_mgr_init(struct cc_drvdata *drvdata)
+ {
+-	struct cc_sram_ctx *ctx;
+ 	u32 start = 0;
+ 	struct device *dev = drvdata_to_dev(drvdata);
+ 
+@@ -34,14 +25,7 @@ int cc_sram_mgr_init(struct cc_drvdata *drvdata)
+ 		}
  	}
+ 
+-	/* Allocate "this" context */
+-	ctx = devm_kzalloc(dev, sizeof(*ctx), GFP_KERNEL);
+-	if (!ctx)
+-		return -ENOMEM;
+-
+-	ctx->sram_free_offset = start;
+-	drvdata->sram_mgr_handle = ctx;
+-
++	drvdata->sram_free_offset = start;
+ 	return 0;
  }
  
--/*!
-- * Gets the address of the initial digest in SRAM
-+/**
-+ * cc_larval_digest_addr() - Get the address of the initial digest in SRAM
-  * according to the given hash mode
-  *
-- * \param drvdata
-- * \param mode The Hash mode. Supported modes: MD5/SHA1/SHA224/SHA256
-+ * @drvdata: Associated device driver context
-+ * @mode: The Hash mode. Supported modes: MD5/SHA1/SHA224/SHA256
-  *
-- * \return u32 The address of the initial digest in SRAM
-+ * Return:
-+ * The address of the initial digest in SRAM
+@@ -53,7 +37,6 @@ int cc_sram_mgr_init(struct cc_drvdata *drvdata)
   */
- u32 cc_larval_digest_addr(void *drvdata, u32 mode)
+ u32 cc_sram_alloc(struct cc_drvdata *drvdata, u32 size)
  {
-diff --git a/drivers/crypto/ccree/cc_hash.h b/drivers/crypto/ccree/cc_hash.h
-index d76ecae996ca3fa0..3d0f2179e07ec1ce 100644
---- a/drivers/crypto/ccree/cc_hash.h
-+++ b/drivers/crypto/ccree/cc_hash.h
-@@ -80,26 +80,26 @@ int cc_hash_alloc(struct cc_drvdata *drvdata);
- int cc_init_hash_sram(struct cc_drvdata *drvdata);
- int cc_hash_free(struct cc_drvdata *drvdata);
+-	struct cc_sram_ctx *smgr_ctx = drvdata->sram_mgr_handle;
+ 	struct device *dev = drvdata_to_dev(drvdata);
+ 	u32 p;
  
--/*!
-- * Gets the initial digest length
-+/**
-+ * cc_digest_len_addr() - Gets the initial digest length
-  *
-- * \param drvdata
-- * \param mode The Hash mode. Supported modes:
-- *             MD5/SHA1/SHA224/SHA256/SHA384/SHA512
-+ * @drvdata: Associated device driver context
-+ * @mode: The Hash mode. Supported modes: MD5/SHA1/SHA224/SHA256/SHA384/SHA512
-  *
-- * \return u32 returns the address of the initial digest length in SRAM
-+ * Return:
-+ * Returns the address of the initial digest length in SRAM
-  */
- u32 cc_digest_len_addr(void *drvdata, u32 mode);
+@@ -62,14 +45,14 @@ u32 cc_sram_alloc(struct cc_drvdata *drvdata, u32 size)
+ 			size);
+ 		return NULL_SRAM_ADDR;
+ 	}
+-	if (size > (CC_CC_SRAM_SIZE - smgr_ctx->sram_free_offset)) {
++	if (size > (CC_CC_SRAM_SIZE - drvdata->sram_free_offset)) {
+ 		dev_err(dev, "Not enough space to allocate %u B (at offset %u)\n",
+-			size, smgr_ctx->sram_free_offset);
++			size, drvdata->sram_free_offset);
+ 		return NULL_SRAM_ADDR;
+ 	}
  
--/*!
-- * Gets the address of the initial digest in SRAM
-+/**
-+ * cc_larval_digest_addr() - Gets the address of the initial digest in SRAM
-  * according to the given hash mode
-  *
-- * \param drvdata
-- * \param mode The Hash mode. Supported modes:
-- *             MD5/SHA1/SHA224/SHA256/SHA384/SHA512
-+ * @drvdata: Associated device driver context
-+ * @mode: The Hash mode. Supported modes: MD5/SHA1/SHA224/SHA256/SHA384/SHA512
-  *
-- * \return u32 The address of the initial digest in SRAM
-+ * Return:
-+ * The address of the initial digest in SRAM
-  */
- u32 cc_larval_digest_addr(void *drvdata, u32 mode);
- 
+-	p = smgr_ctx->sram_free_offset;
+-	smgr_ctx->sram_free_offset += size;
++	p = drvdata->sram_free_offset;
++	drvdata->sram_free_offset += size;
+ 	dev_dbg(dev, "Allocated %u B @ %u\n", size, p);
+ 	return p;
+ }
 -- 
 2.17.1
 
