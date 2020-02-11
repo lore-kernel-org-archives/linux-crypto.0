@@ -4,32 +4,33 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F301C3B189
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:19:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95EBBC352A3
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:19:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2D9D020708
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:19:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 82C8F20870
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:19:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729984AbgBKSTr (ORCPT
+        id S1730865AbgBKSTv (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Feb 2020 13:19:47 -0500
-Received: from baptiste.telenet-ops.be ([195.130.132.51]:52120 "EHLO
-        baptiste.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731098AbgBKSTe (ORCPT
+        Tue, 11 Feb 2020 13:19:51 -0500
+Received: from xavier.telenet-ops.be ([195.130.132.52]:45392 "EHLO
+        xavier.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731057AbgBKSTe (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 11 Feb 2020 13:19:34 -0500
 Received: from ramsan ([84.195.182.253])
-        by baptiste.telenet-ops.be with bizsmtp
-        id 1WKV2200M5USYZQ01WKV6z; Tue, 11 Feb 2020 19:19:30 +0100
+        by xavier.telenet-ops.be with bizsmtp
+        id 1WKW220035USYZQ01WKWvy; Tue, 11 Feb 2020 19:19:30 +0100
 Received: from rox.of.borg ([192.168.97.57])
         by ramsan with esmtp (Exim 4.90_1)
         (envelope-from <geert@linux-m68k.org>)
-        id 1j1a89-0002nt-Gy; Tue, 11 Feb 2020 19:19:29 +0100
+        id 1j1a8A-0002oi-4H; Tue, 11 Feb 2020 19:19:30 +0100
 Received: from geert by rox.of.borg with local (Exim 4.90_1)
         (envelope-from <geert@linux-m68k.org>)
-        id 1j1a89-0003yM-Fc; Tue, 11 Feb 2020 19:19:29 +0100
+        id 1j1a8A-0003z8-2u; Tue, 11 Feb 2020 19:19:30 +0100
 From:   Geert Uytterhoeven <geert+renesas@glider.be>
 To:     Gilad Ben-Yossef <gilad@benyossef.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -39,9 +40,9 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-crypto@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH v2 06/34] crypto: ccree - drop duplicated error message on SRAM exhaustion
-Date:   Tue, 11 Feb 2020 19:19:00 +0100
-Message-Id: <20200211181928.15178-7-geert+renesas@glider.be>
+Subject: [PATCH v2 22/34] crypto: ccree - extract cc_init_copy_sram()
+Date:   Tue, 11 Feb 2020 19:19:16 +0100
+Message-Id: <20200211181928.15178-23-geert+renesas@glider.be>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200211181928.15178-1-geert+renesas@glider.be>
 References: <20200211181928.15178-1-geert+renesas@glider.be>
@@ -50,54 +51,161 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When no SRAM can be allocated, cc_sram_alloc() already prints an error
-message.  Hence there is no need to duplicate this in all callers.
+Extract the copy to SRAM of the initial values for a hash algorithm into
+its own function, to improve readability and ease maintenance.
 
 Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 ---
 v2:
   - New.
 
- drivers/crypto/ccree/cc_aead.c   | 1 -
- drivers/crypto/ccree/cc_driver.c | 1 -
- drivers/crypto/ccree/cc_hash.c   | 1 -
- 3 files changed, 3 deletions(-)
+ drivers/crypto/ccree/cc_hash.c | 91 ++++++++++++++--------------------
+ 1 file changed, 36 insertions(+), 55 deletions(-)
 
-diff --git a/drivers/crypto/ccree/cc_aead.c b/drivers/crypto/ccree/cc_aead.c
-index 7a62fb023d8d3769..db89144ce6c5e974 100644
---- a/drivers/crypto/ccree/cc_aead.c
-+++ b/drivers/crypto/ccree/cc_aead.c
-@@ -2682,7 +2682,6 @@ int cc_aead_alloc(struct cc_drvdata *drvdata)
- 							 MAX_HMAC_DIGEST_SIZE);
- 
- 	if (aead_handle->sram_workspace_addr == NULL_SRAM_ADDR) {
--		dev_err(dev, "SRAM pool exhausted\n");
- 		rc = -ENOMEM;
- 		goto fail1;
- 	}
-diff --git a/drivers/crypto/ccree/cc_driver.c b/drivers/crypto/ccree/cc_driver.c
-index fc34d152f42090fc..599936a0b0a2cc63 100644
---- a/drivers/crypto/ccree/cc_driver.c
-+++ b/drivers/crypto/ccree/cc_driver.c
-@@ -477,7 +477,6 @@ static int init_cc_resources(struct platform_device *plat_dev)
- 	new_drvdata->mlli_sram_addr =
- 		cc_sram_alloc(new_drvdata, MAX_MLLI_BUFF_SIZE);
- 	if (new_drvdata->mlli_sram_addr == NULL_SRAM_ADDR) {
--		dev_err(dev, "Failed to alloc MLLI Sram buffer\n");
- 		rc = -ENOMEM;
- 		goto post_sram_mgr_err;
- 	}
 diff --git a/drivers/crypto/ccree/cc_hash.c b/drivers/crypto/ccree/cc_hash.c
-index c3146f550268e7ab..defeb35a16a626ff 100644
+index 0b179aafd484738b..f3adc1ab0e01abec 100644
 --- a/drivers/crypto/ccree/cc_hash.c
 +++ b/drivers/crypto/ccree/cc_hash.c
-@@ -2001,7 +2001,6 @@ int cc_hash_alloc(struct cc_drvdata *drvdata)
+@@ -1865,104 +1865,85 @@ static struct cc_hash_alg *cc_alloc_hash_alg(struct cc_hash_template *template,
+ 	return t_crypto_alg;
+ }
  
- 	sram_buff = cc_sram_alloc(drvdata, sram_size_to_alloc);
- 	if (sram_buff == NULL_SRAM_ADDR) {
--		dev_err(dev, "SRAM pool exhausted\n");
- 		rc = -ENOMEM;
- 		goto fail;
++static int cc_init_copy_sram(struct cc_drvdata *drvdata, const u32 *data,
++			     unsigned int size, u32 *sram_buff_ofs)
++{
++	struct cc_hw_desc larval_seq[CC_DIGEST_SIZE_MAX / sizeof(u32)];
++	unsigned int larval_seq_len = 0;
++	int rc;
++
++	cc_set_sram_desc(data, *sram_buff_ofs, size / sizeof(*data),
++			 larval_seq, &larval_seq_len);
++	rc = send_request_init(drvdata, larval_seq, larval_seq_len);
++	if (rc)
++		return rc;
++
++	*sram_buff_ofs += size;
++	return 0;
++}
++
+ int cc_init_hash_sram(struct cc_drvdata *drvdata)
+ {
+ 	struct cc_hash_handle *hash_handle = drvdata->hash_handle;
+ 	u32 sram_buff_ofs = hash_handle->digest_len_sram_addr;
+-	unsigned int larval_seq_len = 0;
+-	struct cc_hw_desc larval_seq[CC_DIGEST_SIZE_MAX / sizeof(u32)];
+ 	bool large_sha_supported = (drvdata->hw_rev >= CC_HW_REV_712);
+ 	bool sm3_supported = (drvdata->hw_rev >= CC_HW_REV_713);
+ 	int rc = 0;
+ 
+ 	/* Copy-to-sram digest-len */
+-	cc_set_sram_desc(cc_digest_len_init, sram_buff_ofs,
+-			 ARRAY_SIZE(cc_digest_len_init), larval_seq,
+-			 &larval_seq_len);
+-	rc = send_request_init(drvdata, larval_seq, larval_seq_len);
++	rc = cc_init_copy_sram(drvdata, cc_digest_len_init,
++			       sizeof(cc_digest_len_init), &sram_buff_ofs);
+ 	if (rc)
+ 		goto init_digest_const_err;
+ 
+-	sram_buff_ofs += sizeof(cc_digest_len_init);
+-	larval_seq_len = 0;
+-
+ 	if (large_sha_supported) {
+ 		/* Copy-to-sram digest-len for sha384/512 */
+-		cc_set_sram_desc(cc_digest_len_sha512_init, sram_buff_ofs,
+-				 ARRAY_SIZE(cc_digest_len_sha512_init),
+-				 larval_seq, &larval_seq_len);
+-		rc = send_request_init(drvdata, larval_seq, larval_seq_len);
++		rc = cc_init_copy_sram(drvdata, cc_digest_len_sha512_init,
++				       sizeof(cc_digest_len_sha512_init),
++				       &sram_buff_ofs);
+ 		if (rc)
+ 			goto init_digest_const_err;
+-
+-		sram_buff_ofs += sizeof(cc_digest_len_sha512_init);
+-		larval_seq_len = 0;
+ 	}
+ 
+ 	/* The initial digests offset */
+ 	hash_handle->larval_digest_sram_addr = sram_buff_ofs;
+ 
+ 	/* Copy-to-sram initial SHA* digests */
+-	cc_set_sram_desc(cc_md5_init, sram_buff_ofs, ARRAY_SIZE(cc_md5_init),
+-			 larval_seq, &larval_seq_len);
+-	rc = send_request_init(drvdata, larval_seq, larval_seq_len);
++	rc = cc_init_copy_sram(drvdata, cc_md5_init, sizeof(cc_md5_init),
++			       &sram_buff_ofs);
+ 	if (rc)
+ 		goto init_digest_const_err;
+-	sram_buff_ofs += sizeof(cc_md5_init);
+-	larval_seq_len = 0;
+ 
+-	cc_set_sram_desc(cc_sha1_init, sram_buff_ofs,
+-			 ARRAY_SIZE(cc_sha1_init), larval_seq,
+-			 &larval_seq_len);
+-	rc = send_request_init(drvdata, larval_seq, larval_seq_len);
++	rc = cc_init_copy_sram(drvdata, cc_sha1_init, sizeof(cc_sha1_init),
++			       &sram_buff_ofs);
+ 	if (rc)
+ 		goto init_digest_const_err;
+-	sram_buff_ofs += sizeof(cc_sha1_init);
+-	larval_seq_len = 0;
+ 
+-	cc_set_sram_desc(cc_sha224_init, sram_buff_ofs,
+-			 ARRAY_SIZE(cc_sha224_init), larval_seq,
+-			 &larval_seq_len);
+-	rc = send_request_init(drvdata, larval_seq, larval_seq_len);
++	rc = cc_init_copy_sram(drvdata, cc_sha224_init, sizeof(cc_sha224_init),
++			       &sram_buff_ofs);
+ 	if (rc)
+ 		goto init_digest_const_err;
+-	sram_buff_ofs += sizeof(cc_sha224_init);
+-	larval_seq_len = 0;
+ 
+-	cc_set_sram_desc(cc_sha256_init, sram_buff_ofs,
+-			 ARRAY_SIZE(cc_sha256_init), larval_seq,
+-			 &larval_seq_len);
+-	rc = send_request_init(drvdata, larval_seq, larval_seq_len);
++	rc = cc_init_copy_sram(drvdata, cc_sha256_init, sizeof(cc_sha256_init),
++			       &sram_buff_ofs);
+ 	if (rc)
+ 		goto init_digest_const_err;
+-	sram_buff_ofs += sizeof(cc_sha256_init);
+-	larval_seq_len = 0;
+ 
+ 	if (sm3_supported) {
+-		cc_set_sram_desc(cc_sm3_init, sram_buff_ofs,
+-				 ARRAY_SIZE(cc_sm3_init), larval_seq,
+-				 &larval_seq_len);
+-		rc = send_request_init(drvdata, larval_seq, larval_seq_len);
++		rc = cc_init_copy_sram(drvdata, cc_sm3_init,
++				       sizeof(cc_sm3_init), &sram_buff_ofs);
+ 		if (rc)
+ 			goto init_digest_const_err;
+-		sram_buff_ofs += sizeof(cc_sm3_init);
+-		larval_seq_len = 0;
+ 	}
+ 
+ 	if (large_sha_supported) {
+-		cc_set_sram_desc(cc_sha384_init, sram_buff_ofs,
+-				 ARRAY_SIZE(cc_sha384_init), larval_seq,
+-				 &larval_seq_len);
+-		rc = send_request_init(drvdata, larval_seq, larval_seq_len);
++		rc = cc_init_copy_sram(drvdata, cc_sha384_init,
++				       sizeof(cc_sha384_init), &sram_buff_ofs);
+ 		if (rc)
+ 			goto init_digest_const_err;
+-		sram_buff_ofs += sizeof(cc_sha384_init);
+-		larval_seq_len = 0;
+ 
+-		cc_set_sram_desc(cc_sha512_init, sram_buff_ofs,
+-				 ARRAY_SIZE(cc_sha512_init), larval_seq,
+-				 &larval_seq_len);
+-		rc = send_request_init(drvdata, larval_seq, larval_seq_len);
++		rc = cc_init_copy_sram(drvdata, cc_sha512_init,
++				       sizeof(cc_sha512_init), &sram_buff_ofs);
+ 		if (rc)
+ 			goto init_digest_const_err;
  	}
 -- 
 2.17.1
