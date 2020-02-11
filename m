@@ -7,30 +7,30 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16E23C352A3
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:20:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDA47C3B18A
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:20:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0583E2086A
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:20:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DBAF62086A
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:20:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729602AbgBKSTe (ORCPT
+        id S1729146AbgBKSUY (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Feb 2020 13:19:34 -0500
-Received: from albert.telenet-ops.be ([195.130.137.90]:60494 "EHLO
-        albert.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730303AbgBKSTd (ORCPT
+        Tue, 11 Feb 2020 13:20:24 -0500
+Received: from baptiste.telenet-ops.be ([195.130.132.51]:52108 "EHLO
+        baptiste.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728997AbgBKSTd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 11 Feb 2020 13:19:33 -0500
 Received: from ramsan ([84.195.182.253])
-        by albert.telenet-ops.be with bizsmtp
-        id 1WKV2200E5USYZQ06WKWPA; Tue, 11 Feb 2020 19:19:30 +0100
+        by baptiste.telenet-ops.be with bizsmtp
+        id 1WKW220025USYZQ01WKW7D; Tue, 11 Feb 2020 19:19:30 +0100
 Received: from rox.of.borg ([192.168.97.57])
         by ramsan with esmtp (Exim 4.90_1)
         (envelope-from <geert@linux-m68k.org>)
-        id 1j1a8A-0002pM-Gw; Tue, 11 Feb 2020 19:19:30 +0100
+        id 1j1a89-0002oP-TR; Tue, 11 Feb 2020 19:19:29 +0100
 Received: from geert by rox.of.borg with local (Exim 4.90_1)
         (envelope-from <geert@linux-m68k.org>)
-        id 1j1a8A-0003zc-Fi; Tue, 11 Feb 2020 19:19:30 +0100
+        id 1j1a89-0003yq-S2; Tue, 11 Feb 2020 19:19:29 +0100
 From:   Geert Uytterhoeven <geert+renesas@glider.be>
 To:     Gilad Ben-Yossef <gilad@benyossef.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -40,9 +40,9 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-crypto@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH v2 32/34] crypto: ccree - use devm_k[mz]alloc() for AEAD data
-Date:   Tue, 11 Feb 2020 19:19:26 +0100
-Message-Id: <20200211181928.15178-33-geert+renesas@glider.be>
+Subject: [PATCH v2 16/34] crypto: ccree - remove cc_pm_is_dev_suspended() wrapper
+Date:   Tue, 11 Feb 2020 19:19:10 +0100
+Message-Id: <20200211181928.15178-17-geert+renesas@glider.be>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200211181928.15178-1-geert+renesas@glider.be>
 References: <20200211181928.15178-1-geert+renesas@glider.be>
@@ -51,142 +51,76 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-As the lifetime of the AEAD data matches the lifetime of the driver,
-AEAD data can be allocated using the managed allocators.
-While at it, simplify cc_aead_free() by removing an unneeded cast, and
-an unneeded check (aead_handle is always valid here).
+If CONFIG_PM=y, cc_pm_is_dev_suspended() is just a wrapper around
+pm_runtime_suspended().
+If CONFIG_PM=n, cc_pm_is_dev_suspended() a dummy that behaves exactly
+the same as the dummy for pm_runtime_suspended().
+
+Hence remove cc_pm_is_dev_suspended(), and call pm_runtime_suspended()
+directly.
 
 Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 ---
 v2:
   - New.
 
- drivers/crypto/ccree/cc_aead.c   | 35 ++++++++++++--------------------
- drivers/crypto/ccree/cc_cipher.c |  8 ++++----
- drivers/crypto/ccree/cc_hash.c   |  9 ++++----
- 3 files changed, 21 insertions(+), 31 deletions(-)
+ drivers/crypto/ccree/cc_driver.c | 2 +-
+ drivers/crypto/ccree/cc_pm.c     | 6 ------
+ drivers/crypto/ccree/cc_pm.h     | 7 -------
+ 3 files changed, 1 insertion(+), 14 deletions(-)
 
-diff --git a/drivers/crypto/ccree/cc_aead.c b/drivers/crypto/ccree/cc_aead.c
-index be26aaf75e1fe9ea..904aa66752b3bdf4 100644
---- a/drivers/crypto/ccree/cc_aead.c
-+++ b/drivers/crypto/ccree/cc_aead.c
-@@ -2615,7 +2615,7 @@ static struct cc_crypto_alg *cc_create_aead_alg(struct cc_alg_template *tmpl,
- 	struct cc_crypto_alg *t_alg;
- 	struct aead_alg *alg;
+diff --git a/drivers/crypto/ccree/cc_driver.c b/drivers/crypto/ccree/cc_driver.c
+index e365ede32cc0e6a0..02442596310cd98d 100644
+--- a/drivers/crypto/ccree/cc_driver.c
++++ b/drivers/crypto/ccree/cc_driver.c
+@@ -136,7 +136,7 @@ static irqreturn_t cc_isr(int irq, void *dev_id)
  
--	t_alg = kzalloc(sizeof(*t_alg), GFP_KERNEL);
-+	t_alg = devm_kzalloc(dev, sizeof(*t_alg), GFP_KERNEL);
- 	if (!t_alg)
- 		return ERR_PTR(-ENOMEM);
+ 	/* STAT_OP_TYPE_GENERIC STAT_PHASE_0: Interrupt */
+ 	/* if driver suspended return, probably shared interrupt */
+-	if (cc_pm_is_dev_suspended(dev))
++	if (pm_runtime_suspended(dev))
+ 		return IRQ_NONE;
  
-@@ -2645,19 +2645,12 @@ static struct cc_crypto_alg *cc_create_aead_alg(struct cc_alg_template *tmpl,
- int cc_aead_free(struct cc_drvdata *drvdata)
- {
- 	struct cc_crypto_alg *t_alg, *n;
--	struct cc_aead_handle *aead_handle =
--		(struct cc_aead_handle *)drvdata->aead_handle;
+ 	/* read the interrupt status */
+diff --git a/drivers/crypto/ccree/cc_pm.c b/drivers/crypto/ccree/cc_pm.c
+index f7729fc1ee597e9a..3b4927c41a177752 100644
+--- a/drivers/crypto/ccree/cc_pm.c
++++ b/drivers/crypto/ccree/cc_pm.c
+@@ -74,9 +74,3 @@ void cc_pm_put_suspend(struct device *dev)
+ 	pm_runtime_mark_last_busy(dev);
+ 	pm_runtime_put_autosuspend(dev);
+ }
 -
--	if (aead_handle) {
--		/* Remove registered algs */
--		list_for_each_entry_safe(t_alg, n, &aead_handle->aead_list,
--					 entry) {
--			crypto_unregister_aead(&t_alg->aead_alg);
--			list_del(&t_alg->entry);
--			kfree(t_alg);
--		}
--		kfree(aead_handle);
--		drvdata->aead_handle = NULL;
-+	struct cc_aead_handle *aead_handle = drvdata->aead_handle;
-+
-+	/* Remove registered algs */
-+	list_for_each_entry_safe(t_alg, n, &aead_handle->aead_list, entry) {
-+		crypto_unregister_aead(&t_alg->aead_alg);
-+		list_del(&t_alg->entry);
- 	}
+-bool cc_pm_is_dev_suspended(struct device *dev)
+-{
+-	/* check device state using runtime api */
+-	return pm_runtime_suspended(dev);
+-}
+diff --git a/drivers/crypto/ccree/cc_pm.h b/drivers/crypto/ccree/cc_pm.h
+index 2dcf53fa108e77a6..1fe1fc827f62f49e 100644
+--- a/drivers/crypto/ccree/cc_pm.h
++++ b/drivers/crypto/ccree/cc_pm.h
+@@ -19,7 +19,6 @@ int cc_pm_suspend(struct device *dev);
+ int cc_pm_resume(struct device *dev);
+ int cc_pm_get(struct device *dev);
+ void cc_pm_put_suspend(struct device *dev);
+-bool cc_pm_is_dev_suspended(struct device *dev);
  
- 	return 0;
-@@ -2671,7 +2664,7 @@ int cc_aead_alloc(struct cc_drvdata *drvdata)
- 	int alg;
- 	struct device *dev = drvdata_to_dev(drvdata);
+ #else
  
--	aead_handle = kmalloc(sizeof(*aead_handle), GFP_KERNEL);
-+	aead_handle = devm_kmalloc(dev, sizeof(*aead_handle), GFP_KERNEL);
- 	if (!aead_handle) {
- 		rc = -ENOMEM;
- 		goto fail0;
-@@ -2706,18 +2699,16 @@ int cc_aead_alloc(struct cc_drvdata *drvdata)
- 		if (rc) {
- 			dev_err(dev, "%s alg registration failed\n",
- 				t_alg->aead_alg.base.cra_driver_name);
--			goto fail2;
--		} else {
--			list_add_tail(&t_alg->entry, &aead_handle->aead_list);
--			dev_dbg(dev, "Registered %s\n",
--				t_alg->aead_alg.base.cra_driver_name);
-+			goto fail1;
- 		}
-+
-+		list_add_tail(&t_alg->entry, &aead_handle->aead_list);
-+		dev_dbg(dev, "Registered %s\n",
-+			t_alg->aead_alg.base.cra_driver_name);
- 	}
+@@ -30,12 +29,6 @@ static inline int cc_pm_get(struct device *dev)
  
- 	return 0;
+ static inline void cc_pm_put_suspend(struct device *dev) {}
  
--fail2:
--	kfree(t_alg);
- fail1:
- 	cc_aead_free(drvdata);
- fail0:
-diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
-index a1430d669a584a85..517d78f9931943a3 100644
---- a/drivers/crypto/ccree/cc_cipher.c
-+++ b/drivers/crypto/ccree/cc_cipher.c
-@@ -1713,11 +1713,11 @@ int cc_cipher_alloc(struct cc_drvdata *drvdata)
- 				t_alg->skcipher_alg.base.cra_driver_name);
- 			kfree(t_alg);
- 			goto fail0;
--		} else {
--			list_add_tail(&t_alg->entry, &drvdata->alg_list);
--			dev_dbg(dev, "Registered %s\n",
--				t_alg->skcipher_alg.base.cra_driver_name);
- 		}
-+
-+		list_add_tail(&t_alg->entry, &drvdata->alg_list);
-+		dev_dbg(dev, "Registered %s\n",
-+			t_alg->skcipher_alg.base.cra_driver_name);
- 	}
- 	return 0;
+-static inline bool cc_pm_is_dev_suspended(struct device *dev)
+-{
+-	/* if PM not supported device is never suspend */
+-	return false;
+-}
+-
+ #endif
  
-diff --git a/drivers/crypto/ccree/cc_hash.c b/drivers/crypto/ccree/cc_hash.c
-index 738f0debee98ebf1..2ca5532c07a2e2f4 100644
---- a/drivers/crypto/ccree/cc_hash.c
-+++ b/drivers/crypto/ccree/cc_hash.c
-@@ -2024,10 +2024,9 @@ int cc_hash_alloc(struct cc_drvdata *drvdata)
- 					driver_hash[alg].driver_name);
- 				kfree(t_alg);
- 				goto fail;
--			} else {
--				list_add_tail(&t_alg->entry,
--					      &hash_handle->hash_list);
- 			}
-+
-+			list_add_tail(&t_alg->entry, &hash_handle->hash_list);
- 		}
- 		if (hw_mode == DRV_CIPHER_XCBC_MAC ||
- 		    hw_mode == DRV_CIPHER_CMAC)
-@@ -2049,9 +2048,9 @@ int cc_hash_alloc(struct cc_drvdata *drvdata)
- 				driver_hash[alg].driver_name);
- 			kfree(t_alg);
- 			goto fail;
--		} else {
--			list_add_tail(&t_alg->entry, &hash_handle->hash_list);
- 		}
-+
-+		list_add_tail(&t_alg->entry, &hash_handle->hash_list);
- 	}
- 
- 	return 0;
+ #endif /*__POWER_MGR_H__*/
 -- 
 2.17.1
 
