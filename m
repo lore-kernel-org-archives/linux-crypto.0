@@ -2,246 +2,105 @@ Return-Path: <SRS0=l+Io=37=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABE7BC35242
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:26:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D5B0C3B187
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:32:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9108520714
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:26:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2917020842
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:32:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1581445957;
+	bh=l9B+V0tjpsUXumO8m1fXx8yAwXOYw55xHJWpqlZZu64=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=lnhd1+v/wn1oRoJREWARmdCmyUKJFc65RuGR27QTg2dRKHC4I2SPaLcR6rhRCWe6B
+	 Os0CeY0Z0ERR12j+V1lGXOUX2GLbVufGdq9JWWAV2mw9wYtCuQNTMe+W+mWwuWYcaF
+	 GlORKWKzb4ggDvMtZiTDTXZ+aCOI9kQPTmE2LACk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731300AbgBKS04 (ORCPT
+        id S1730492AbgBKScc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Feb 2020 13:26:56 -0500
-Received: from leibniz.telenet-ops.be ([195.130.137.77]:36040 "EHLO
-        leibniz.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731271AbgBKS04 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Feb 2020 13:26:56 -0500
-Received: from baptiste.telenet-ops.be (baptiste.telenet-ops.be [IPv6:2a02:1800:120:4::f00:13])
-        by leibniz.telenet-ops.be (Postfix) with ESMTPS id 48H9z728yvzMv7mh
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Feb 2020 19:19:31 +0100 (CET)
-Received: from ramsan ([84.195.182.253])
-        by baptiste.telenet-ops.be with bizsmtp
-        id 1WKV2200K5USYZQ01WKV6t; Tue, 11 Feb 2020 19:19:30 +0100
-Received: from rox.of.borg ([192.168.97.57])
-        by ramsan with esmtp (Exim 4.90_1)
-        (envelope-from <geert@linux-m68k.org>)
-        id 1j1a89-0002nk-ES; Tue, 11 Feb 2020 19:19:29 +0100
-Received: from geert by rox.of.borg with local (Exim 4.90_1)
-        (envelope-from <geert@linux-m68k.org>)
-        id 1j1a89-0003yG-Ck; Tue, 11 Feb 2020 19:19:29 +0100
-From:   Geert Uytterhoeven <geert+renesas@glider.be>
-To:     Gilad Ben-Yossef <gilad@benyossef.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Rafael J . Wysocki" <rafael@kernel.org>,
-        linux-crypto@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH v2 04/34] crypto: ccree - remove unneeded casts
-Date:   Tue, 11 Feb 2020 19:18:58 +0100
-Message-Id: <20200211181928.15178-5-geert+renesas@glider.be>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200211181928.15178-1-geert+renesas@glider.be>
-References: <20200211181928.15178-1-geert+renesas@glider.be>
+        Tue, 11 Feb 2020 13:32:32 -0500
+Received: from mail.kernel.org ([198.145.29.99]:59442 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730447AbgBKScb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 11 Feb 2020 13:32:31 -0500
+Received: from localhost (unknown [104.133.9.100])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9EE78206D6;
+        Tue, 11 Feb 2020 18:32:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1581445950;
+        bh=l9B+V0tjpsUXumO8m1fXx8yAwXOYw55xHJWpqlZZu64=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=AljyERKVtVZzKWL/35kIi13azAOhEClGA0qIBfrqRNHizL+bxD4i8TJRDkRr3K/ft
+         hHk8rib5cwIff+tzmovuP09YVBlREmmcnpoDgkjn6NGkzmel0nhx3kXjTkbXhu7vSQ
+         bppECNBYnPWY2F7QTqkErI0ga8CUb9sK8z7SLLWE=
+Date:   Tue, 11 Feb 2020 10:32:29 -0800
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Cc:     linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+        linux-usb@vger.kernel.org
+Subject: Re: [PATCH] treewide: Replace zero-length arrays with flexible-array
+ member
+Message-ID: <20200211183229.GA1938663@kroah.com>
+References: <20200211174126.GA29960@embeddedor>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200211174126.GA29960@embeddedor>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Unneeded casts prevent the compiler from performing valuable checks.
-This is especially true for function pointers.
+On Tue, Feb 11, 2020 at 11:41:26AM -0600, Gustavo A. R. Silva wrote:
+> The current codebase makes use of the zero-length array language
+> extension to the C90 standard, but the preferred mechanism to declare
+> variable-length types such as these ones is a flexible array member[1][2],
+> introduced in C99:
+> 
+> struct foo {
+>         int stuff;
+>         struct boo array[];
+> };
+> 
+> By making use of the mechanism above, we will get a compiler warning
+> in case the flexible array does not occur last in the structure, which
+> will help us prevent some kind of undefined behavior bugs from being
+> unadvertenly introduced[3] to the codebase from now on.
+> 
+> All these instances of code were found with the help of the following
+> Coccinelle script:
+> 
+> @@
+> identifier S, member, array;
+> type T1, T2;
+> @@
+> 
+> struct S {
+>   ...
+>   T1 member;
+>   T2 array[
+> - 0
+>   ];
+> };
+> 
+> [1] https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
+> [2] https://github.com/KSPP/linux/issues/21
+> [3] commit 76497732932f ("cxgb3/l2t: Fix undefined behaviour")
+> 
+> NOTE: I'll carry this in my -next tree for the v5.6 merge window.
 
-Remove these casts, to prevent silently introducing bugs when a
-variable's type might be changed in the future.
+Why not carve this up into per-subsystem patches so that we can apply
+them to our 5.7-rc1 trees and then you submit the "remaining" that don't
+somehow get merged at that timeframe for 5.7-rc2?
 
-No change in generated code.
+thanks,
 
-Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
----
-v2:
-  - New.
-
- drivers/crypto/ccree/cc_aead.c       |  7 +++----
- drivers/crypto/ccree/cc_buffer_mgr.c |  7 +++----
- drivers/crypto/ccree/cc_cipher.c     | 10 +++++-----
- drivers/crypto/ccree/cc_hash.c       | 24 ++++++++++++------------
- 4 files changed, 23 insertions(+), 25 deletions(-)
-
-diff --git a/drivers/crypto/ccree/cc_aead.c b/drivers/crypto/ccree/cc_aead.c
-index 0d95bda4de702a4a..7a62fb023d8d3769 100644
---- a/drivers/crypto/ccree/cc_aead.c
-+++ b/drivers/crypto/ccree/cc_aead.c
-@@ -448,8 +448,7 @@ static int cc_get_plain_hmac_key(struct crypto_aead *tfm, const u8 *authkey,
- 		if (!key)
- 			return -ENOMEM;
- 
--		key_dma_addr = dma_map_single(dev, (void *)key, keylen,
--					      DMA_TO_DEVICE);
-+		key_dma_addr = dma_map_single(dev, key, keylen, DMA_TO_DEVICE);
- 		if (dma_mapping_error(dev, key_dma_addr)) {
- 			dev_err(dev, "Mapping key va=0x%p len=%u for DMA failed\n",
- 				key, keylen);
-@@ -1921,8 +1920,8 @@ static int cc_proc_aead(struct aead_request *req,
- 	}
- 
- 	/* Setup request structure */
--	cc_req.user_cb = (void *)cc_aead_complete;
--	cc_req.user_arg = (void *)req;
-+	cc_req.user_cb = cc_aead_complete;
-+	cc_req.user_arg = req;
- 
- 	/* Setup request context */
- 	areq_ctx->gen_ctx.op_type = direct;
-diff --git a/drivers/crypto/ccree/cc_buffer_mgr.c b/drivers/crypto/ccree/cc_buffer_mgr.c
-index 954f14bddf1d7852..1e335abd744024d8 100644
---- a/drivers/crypto/ccree/cc_buffer_mgr.c
-+++ b/drivers/crypto/ccree/cc_buffer_mgr.c
-@@ -118,7 +118,7 @@ void cc_copy_sg_portion(struct device *dev, u8 *dest, struct scatterlist *sg,
- 	u32 nents;
- 
- 	nents = sg_nents_for_len(sg, end);
--	sg_copy_buffer(sg, nents, (void *)dest, (end - to_skip + 1), to_skip,
-+	sg_copy_buffer(sg, nents, dest, (end - to_skip + 1), to_skip,
- 		       (direct == CC_SG_TO_BUF));
- }
- 
-@@ -415,10 +415,9 @@ int cc_map_cipher_request(struct cc_drvdata *drvdata, void *ctx,
- 
- 	/* Map IV buffer */
- 	if (ivsize) {
--		dump_byte_array("iv", (u8 *)info, ivsize);
-+		dump_byte_array("iv", info, ivsize);
- 		req_ctx->gen_ctx.iv_dma_addr =
--			dma_map_single(dev, (void *)info,
--				       ivsize, DMA_BIDIRECTIONAL);
-+			dma_map_single(dev, info, ivsize, DMA_BIDIRECTIONAL);
- 		if (dma_mapping_error(dev, req_ctx->gen_ctx.iv_dma_addr)) {
- 			dev_err(dev, "Mapping iv %u B at va=%pK for DMA failed\n",
- 				ivsize, info);
-diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
-index fc1646ccfe29bcaa..91d2edee47b8c843 100644
---- a/drivers/crypto/ccree/cc_cipher.c
-+++ b/drivers/crypto/ccree/cc_cipher.c
-@@ -184,7 +184,7 @@ static int cc_cipher_init(struct crypto_tfm *tfm)
- 		ctx_p->user.key);
- 
- 	/* Map key buffer */
--	ctx_p->user.key_dma_addr = dma_map_single(dev, (void *)ctx_p->user.key,
-+	ctx_p->user.key_dma_addr = dma_map_single(dev, ctx_p->user.key,
- 						  max_key_buf_size,
- 						  DMA_TO_DEVICE);
- 	if (dma_mapping_error(dev, ctx_p->user.key_dma_addr)) {
-@@ -284,7 +284,7 @@ static int cc_cipher_sethkey(struct crypto_skcipher *sktfm, const u8 *key,
- 
- 	dev_dbg(dev, "Setting HW key in context @%p for %s. keylen=%u\n",
- 		ctx_p, crypto_tfm_alg_name(tfm), keylen);
--	dump_byte_array("key", (u8 *)key, keylen);
-+	dump_byte_array("key", key, keylen);
- 
- 	/* STAT_PHASE_0: Init and sanity checks */
- 
-@@ -387,7 +387,7 @@ static int cc_cipher_setkey(struct crypto_skcipher *sktfm, const u8 *key,
- 
- 	dev_dbg(dev, "Setting key in context @%p for %s. keylen=%u\n",
- 		ctx_p, crypto_tfm_alg_name(tfm), keylen);
--	dump_byte_array("key", (u8 *)key, keylen);
-+	dump_byte_array("key", key, keylen);
- 
- 	/* STAT_PHASE_0: Init and sanity checks */
- 
-@@ -893,8 +893,8 @@ static int cc_cipher_process(struct skcipher_request *req,
- 	}
- 
- 	/* Setup request structure */
--	cc_req.user_cb = (void *)cc_cipher_complete;
--	cc_req.user_arg = (void *)req;
-+	cc_req.user_cb = cc_cipher_complete;
-+	cc_req.user_arg = req;
- 
- 	/* Setup CPP operation details */
- 	if (ctx_p->key_type == CC_POLICY_PROTECTED_KEY) {
-diff --git a/drivers/crypto/ccree/cc_hash.c b/drivers/crypto/ccree/cc_hash.c
-index 912e5ce5079d11ae..36ce015716c317df 100644
---- a/drivers/crypto/ccree/cc_hash.c
-+++ b/drivers/crypto/ccree/cc_hash.c
-@@ -752,7 +752,7 @@ static int cc_hash_setkey(struct crypto_ahash *ahash, const u8 *key,
- 			return -ENOMEM;
- 
- 		ctx->key_params.key_dma_addr =
--			dma_map_single(dev, (void *)ctx->key_params.key, keylen,
-+			dma_map_single(dev, ctx->key_params.key, keylen,
- 				       DMA_TO_DEVICE);
- 		if (dma_mapping_error(dev, ctx->key_params.key_dma_addr)) {
- 			dev_err(dev, "Mapping key va=0x%p len=%u for DMA failed\n",
-@@ -1067,8 +1067,8 @@ static int cc_alloc_ctx(struct cc_hash_ctx *ctx)
- 	ctx->key_params.keylen = 0;
- 
- 	ctx->digest_buff_dma_addr =
--		dma_map_single(dev, (void *)ctx->digest_buff,
--			       sizeof(ctx->digest_buff), DMA_BIDIRECTIONAL);
-+		dma_map_single(dev, ctx->digest_buff, sizeof(ctx->digest_buff),
-+			       DMA_BIDIRECTIONAL);
- 	if (dma_mapping_error(dev, ctx->digest_buff_dma_addr)) {
- 		dev_err(dev, "Mapping digest len %zu B at va=%pK for DMA failed\n",
- 			sizeof(ctx->digest_buff), ctx->digest_buff);
-@@ -1079,7 +1079,7 @@ static int cc_alloc_ctx(struct cc_hash_ctx *ctx)
- 		&ctx->digest_buff_dma_addr);
- 
- 	ctx->opad_tmp_keys_dma_addr =
--		dma_map_single(dev, (void *)ctx->opad_tmp_keys_buff,
-+		dma_map_single(dev, ctx->opad_tmp_keys_buff,
- 			       sizeof(ctx->opad_tmp_keys_buff),
- 			       DMA_BIDIRECTIONAL);
- 	if (dma_mapping_error(dev, ctx->opad_tmp_keys_dma_addr)) {
-@@ -1196,8 +1196,8 @@ static int cc_mac_update(struct ahash_request *req)
- 	idx++;
- 
- 	/* Setup request structure */
--	cc_req.user_cb = (void *)cc_update_complete;
--	cc_req.user_arg = (void *)req;
-+	cc_req.user_cb = cc_update_complete;
-+	cc_req.user_arg = req;
- 
- 	rc = cc_send_request(ctx->drvdata, &cc_req, desc, idx, &req->base);
- 	if (rc != -EINPROGRESS && rc != -EBUSY) {
-@@ -1254,8 +1254,8 @@ static int cc_mac_final(struct ahash_request *req)
- 	}
- 
- 	/* Setup request structure */
--	cc_req.user_cb = (void *)cc_hash_complete;
--	cc_req.user_arg = (void *)req;
-+	cc_req.user_cb = cc_hash_complete;
-+	cc_req.user_arg = req;
- 
- 	if (state->xcbc_count && rem_cnt == 0) {
- 		/* Load key for ECB decryption */
-@@ -1369,8 +1369,8 @@ static int cc_mac_finup(struct ahash_request *req)
- 	}
- 
- 	/* Setup request structure */
--	cc_req.user_cb = (void *)cc_hash_complete;
--	cc_req.user_arg = (void *)req;
-+	cc_req.user_cb = cc_hash_complete;
-+	cc_req.user_arg = req;
- 
- 	if (ctx->hw_mode == DRV_CIPHER_XCBC_MAC) {
- 		key_len = CC_AES_128_BIT_KEY_SIZE;
-@@ -1448,8 +1448,8 @@ static int cc_mac_digest(struct ahash_request *req)
- 	}
- 
- 	/* Setup request structure */
--	cc_req.user_cb = (void *)cc_digest_complete;
--	cc_req.user_arg = (void *)req;
-+	cc_req.user_cb = cc_digest_complete;
-+	cc_req.user_arg = req;
- 
- 	if (ctx->hw_mode == DRV_CIPHER_XCBC_MAC) {
- 		key_len = CC_AES_128_BIT_KEY_SIZE;
--- 
-2.17.1
-
+greg k-h
