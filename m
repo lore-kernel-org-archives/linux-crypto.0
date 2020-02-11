@@ -2,183 +2,155 @@ Return-Path: <SRS0=l+Io=37=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 731EEC3F68F
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 19:40:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ED67C35242
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 20:13:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5507721569
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 19:40:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A77D20708
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 20:13:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="yJGEg6RT"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="aIQ4u3vp"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731069AbgBKTki (ORCPT
+        id S1731751AbgBKUMx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Feb 2020 14:40:38 -0500
-Received: from gateway32.websitewelcome.com ([192.185.145.171]:37504 "EHLO
-        gateway32.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727966AbgBKTki (ORCPT
+        Tue, 11 Feb 2020 15:12:53 -0500
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:38954 "EHLO
+        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731735AbgBKUMx (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Feb 2020 14:40:38 -0500
-Received: from cm13.websitewelcome.com (cm13.websitewelcome.com [100.42.49.6])
-        by gateway32.websitewelcome.com (Postfix) with ESMTP id E59CC83F6DE
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Feb 2020 13:18:11 -0600 (CST)
-Received: from gator4166.hostgator.com ([108.167.133.22])
-        by cmsmtp with SMTP
-        id 1b2xjZkJXRP4z1b2xj1bBl; Tue, 11 Feb 2020 13:18:11 -0600
-X-Authority-Reason: nr=8
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=KUnmNlDbtbYuQNfGMmLFXMIf7snQvngBNj30s4oM6uM=; b=yJGEg6RT2vvuJ/Q81ldBjJ1n1U
-        o8mmVz7UalGiJ3K/QbT5WkBngpsfA6q8umPU2RWldStQ2tx7sNuBdH60VR43/29GXJSM0Nq0Ue+WE
-        35IMZHmrrJAsqUMKypRWzZKV3ZvLjwsJ72DHVxmcD3E6SWG30GO4WurQmBxVu3J1MuHvxWlrYTfLi
-        JbmeXBhpVXyquaw1Y5umkOnv8TNN9Pi1xiH9gop6BeDldYuu6TV+ku3rzPtAtbIU+HSdb4aB8xByC
-        9Tpn35TPGqP1lCrmjdpHRmkG1er7ulFnLMnqalpfOPcZKiqkUuIwrKdy61qghBosOdYTKBJomHadD
-        AG1E6g/Q==;
-Received: from [200.68.140.36] (port=30211 helo=[192.168.43.131])
-        by gator4166.hostgator.com with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
-        (Exim 4.92)
-        (envelope-from <gustavo@embeddedor.com>)
-        id 1j1b2x-00183y-As; Tue, 11 Feb 2020 13:18:11 -0600
-Subject: Re: [PATCH] treewide: Replace zero-length arrays with flexible-array
- member
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     linux-kernel@vger.kernel.org, Kees Cook <keescook@chromium.org>,
+        Tue, 11 Feb 2020 15:12:53 -0500
+Received: by mail-pl1-f194.google.com with SMTP id g6so4709496plp.6
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Feb 2020 12:12:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=O+YlTCrlJTVX8DSxE4IzklKJKrCQ5zp/2SwquObWiWs=;
+        b=aIQ4u3vp7IWSazLOv0YhwW1Z0SrsRv60EnwvwomFDDAGS0EaUThs5IHrwP+u8jx5Uw
+         liDrgSew79qPv3yHPnkvuWLhPs1umkZerRIAFB4c3KYS7IFiHit6BbqBsdPwBeIbNBOl
+         1AVDPSnesP46pHUt5jd+IxvZWo49vSbVbuol0=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=O+YlTCrlJTVX8DSxE4IzklKJKrCQ5zp/2SwquObWiWs=;
+        b=S7Xzwr+B4swCfcbEFuIUWU5RUVoAaPEdDE81evDqxEj5xtBIEGLnwy5eLt6KJ6SxjH
+         nl/Yb4E4WuD/1iFkYoemtkTfpB1giejkIk4cl1I7ocU7CXhd+m4qMEmLJa6sdk15UwXu
+         yJce0w5q+8WyulhfBraXd+W+n+SRJ7bVUfwRM6H6Xj1+pVzvkCz0h1rpHGJqLXJKD+05
+         3Qgx2Rb+DueJ5YamhLRzVv2C4mbISPN0TTx7AxlptmPebplOu8CpYHfm2ZfZrGQkbz8K
+         kIU5FOsGby0tjD5PeM8bekfYFt0SjPeDcvViZfdbwiq83ecBj2glAcuBuepNrB4FEnv1
+         T/3Q==
+X-Gm-Message-State: APjAAAXOnfyWJm7KR3jQBOkU76sQUqCktqCTxkmCgU47aOPuweQbAIb0
+        Muuon9plqA8a/Q5IzE/Hf2ZSEQ==
+X-Google-Smtp-Source: APXvYqzRLaVmMHXEt33UgGXT/mQJIihdN5a7G3O3Avk/5c8ljVgfF5W7gDmWwiC3SOKdcJITd1FtuA==
+X-Received: by 2002:a17:902:8d94:: with SMTP id v20mr4925424plo.259.1581451972636;
+        Tue, 11 Feb 2020 12:12:52 -0800 (PST)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id m26sm5151488pgc.84.2020.02.11.12.12.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Feb 2020 12:12:51 -0800 (PST)
+Date:   Tue, 11 Feb 2020 12:12:50 -0800
+From:   Kees Cook <keescook@chromium.org>
+To:     "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Cc:     Greg KH <gregkh@linuxfoundation.org>, linux-kernel@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
         linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
         linux-usb@vger.kernel.org
+Subject: Re: [PATCH] treewide: Replace zero-length arrays with flexible-array
+ member
+Message-ID: <202002111210.876CEB6@keescook>
 References: <20200211174126.GA29960@embeddedor>
  <20200211183229.GA1938663@kroah.com>
-From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Autocrypt: addr=gustavo@embeddedor.com; keydata=
- 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
- VtSixD1uOgytAP7RWS474w==
-Message-ID: <3fdbb16a-897c-aa5b-d45d-f824f6810412@embeddedor.com>
-Date:   Tue, 11 Feb 2020 13:20:36 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+ <3fdbb16a-897c-aa5b-d45d-f824f6810412@embeddedor.com>
+ <202002111129.77DB1CCC7B@keescook>
+ <20200211193854.GA1972490@kroah.com>
+ <88e09425-8207-7a1e-8802-886f9694a37f@embeddedor.com>
 MIME-Version: 1.0
-In-Reply-To: <20200211183229.GA1938663@kroah.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 200.68.140.36
-X-Source-L: No
-X-Exim-ID: 1j1b2x-00183y-As
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: ([192.168.43.131]) [200.68.140.36]:30211
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 5
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <88e09425-8207-7a1e-8802-886f9694a37f@embeddedor.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-
-On 2/11/20 12:32, Greg KH wrote:
-> On Tue, Feb 11, 2020 at 11:41:26AM -0600, Gustavo A. R. Silva wrote:
->> The current codebase makes use of the zero-length array language
->> extension to the C90 standard, but the preferred mechanism to declare
->> variable-length types such as these ones is a flexible array member[1][2],
->> introduced in C99:
->>
->> struct foo {
->>         int stuff;
->>         struct boo array[];
->> };
->>
->> By making use of the mechanism above, we will get a compiler warning
->> in case the flexible array does not occur last in the structure, which
->> will help us prevent some kind of undefined behavior bugs from being
->> unadvertenly introduced[3] to the codebase from now on.
->>
->> All these instances of code were found with the help of the following
->> Coccinelle script:
->>
->> @@
->> identifier S, member, array;
->> type T1, T2;
->> @@
->>
->> struct S {
->>   ...
->>   T1 member;
->>   T2 array[
->> - 0
->>   ];
->> };
->>
->> [1] https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
->> [2] https://github.com/KSPP/linux/issues/21
->> [3] commit 76497732932f ("cxgb3/l2t: Fix undefined behaviour")
->>
->> NOTE: I'll carry this in my -next tree for the v5.6 merge window.
+On Tue, Feb 11, 2020 at 01:54:22PM -0600, Gustavo A. R. Silva wrote:
 > 
-> Why not carve this up into per-subsystem patches so that we can apply
-> them to our 5.7-rc1 trees and then you submit the "remaining" that don't
-> somehow get merged at that timeframe for 5.7-rc2?
 > 
+> On 2/11/20 13:38, Greg KH wrote:
+> > On Tue, Feb 11, 2020 at 11:32:04AM -0800, Kees Cook wrote:
+> >> On Tue, Feb 11, 2020 at 01:20:36PM -0600, Gustavo A. R. Silva wrote:
+> >>>
+> >>>
+> >>> On 2/11/20 12:32, Greg KH wrote:
+> >>>> On Tue, Feb 11, 2020 at 11:41:26AM -0600, Gustavo A. R. Silva wrote:
+> >>>>> The current codebase makes use of the zero-length array language
+> >>>>> extension to the C90 standard, but the preferred mechanism to declare
+> >>>>> variable-length types such as these ones is a flexible array member[1][2],
+> >>>>> introduced in C99:
+> >>>>>
+> >>>>> struct foo {
+> >>>>>         int stuff;
+> >>>>>         struct boo array[];
+> >>>>> };
+> >>>>>
+> >>>>> By making use of the mechanism above, we will get a compiler warning
+> >>>>> in case the flexible array does not occur last in the structure, which
+> >>>>> will help us prevent some kind of undefined behavior bugs from being
+> >>>>> unadvertenly introduced[3] to the codebase from now on.
+> >>>>>
+> >>>>> All these instances of code were found with the help of the following
+> >>>>> Coccinelle script:
+> >>>>>
+> >>>>> @@
+> >>>>> identifier S, member, array;
+> >>>>> type T1, T2;
+> >>>>> @@
+> >>>>>
+> >>>>> struct S {
+> >>>>>   ...
+> >>>>>   T1 member;
+> >>>>>   T2 array[
+> >>>>> - 0
+> >>>>>   ];
+> >>>>> };
+> >>>>>
+> >>>>> [1] https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
+> >>>>> [2] https://github.com/KSPP/linux/issues/21
+> >>>>> [3] commit 76497732932f ("cxgb3/l2t: Fix undefined behaviour")
+> >>>>>
+> >>>>> NOTE: I'll carry this in my -next tree for the v5.6 merge window.
+> >>>>
+> >>>> Why not carve this up into per-subsystem patches so that we can apply
+> >>>> them to our 5.7-rc1 trees and then you submit the "remaining" that don't
+> >>>> somehow get merged at that timeframe for 5.7-rc2?
+> >>>>
+> >>>
+> >>> Yep, sounds good. I'll do that.
+> >>
+> >> FWIW, I'd just like to point out that since this is a mechanical change
+> >> with no code generation differences (unlike the pre-C90 1-byte array
+> >> conversions), it's a way better use of everyone's time to just splat
+> >> this in all at once.
+> >>
+> >> That said, it looks like Gustavo is up for it, but I'd like us to
+> >> generally consider these kinds of mechanical changes as being easier to
+> >> manage in a single patch. (Though getting Acks tends to be a bit
+> >> harder...)
+> > 
+> > Hey, if this is such a mechanical patch, let's get it to Linus now,
+> > what's preventing that from being merged now?
 
-Yep, sounds good. I'll do that.
+Now would be a good time, yes. (Linus has wanted Acks for such things
+sometimes, but those were more "risky" changes...)
 
-Thanks
---
-Gustavo
+> Well, the only thing is that this has never been in linux-next.
+
+Hmm. Was it in one of your 0day-tested trees?
+
+-- 
+Kees Cook
