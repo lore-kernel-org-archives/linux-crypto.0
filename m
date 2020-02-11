@@ -7,30 +7,30 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F814C3B188
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:20:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16E23C352A3
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:20:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7D1792086A
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:20:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0583E2086A
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:20:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729375AbgBKSUS (ORCPT
+        id S1729602AbgBKSTe (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Feb 2020 13:20:18 -0500
-Received: from albert.telenet-ops.be ([195.130.137.90]:60422 "EHLO
-        albert.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728047AbgBKSTe (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 11 Feb 2020 13:19:34 -0500
+Received: from albert.telenet-ops.be ([195.130.137.90]:60494 "EHLO
+        albert.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730303AbgBKSTd (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 11 Feb 2020 13:19:33 -0500
 Received: from ramsan ([84.195.182.253])
         by albert.telenet-ops.be with bizsmtp
-        id 1WKV2200H5USYZQ06WKVNM; Tue, 11 Feb 2020 19:19:30 +0100
+        id 1WKV2200E5USYZQ06WKWPA; Tue, 11 Feb 2020 19:19:30 +0100
 Received: from rox.of.borg ([192.168.97.57])
         by ramsan with esmtp (Exim 4.90_1)
         (envelope-from <geert@linux-m68k.org>)
-        id 1j1a89-0002nq-Fw; Tue, 11 Feb 2020 19:19:29 +0100
+        id 1j1a8A-0002pM-Gw; Tue, 11 Feb 2020 19:19:30 +0100
 Received: from geert by rox.of.borg with local (Exim 4.90_1)
         (envelope-from <geert@linux-m68k.org>)
-        id 1j1a89-0003yJ-E2; Tue, 11 Feb 2020 19:19:29 +0100
+        id 1j1a8A-0003zc-Fi; Tue, 11 Feb 2020 19:19:30 +0100
 From:   Geert Uytterhoeven <geert+renesas@glider.be>
 To:     Gilad Ben-Yossef <gilad@benyossef.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -40,9 +40,9 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-crypto@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH v2 05/34] crypto: ccree - swap SHA384 and SHA512 larval hashes at build time
-Date:   Tue, 11 Feb 2020 19:18:59 +0100
-Message-Id: <20200211181928.15178-6-geert+renesas@glider.be>
+Subject: [PATCH v2 32/34] crypto: ccree - use devm_k[mz]alloc() for AEAD data
+Date:   Tue, 11 Feb 2020 19:19:26 +0100
+Message-Id: <20200211181928.15178-33-geert+renesas@glider.be>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200211181928.15178-1-geert+renesas@glider.be>
 References: <20200211181928.15178-1-geert+renesas@glider.be>
@@ -51,129 +51,142 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Due to the way the hardware works, every double word in the SHA384 and
-SHA512 larval hashes must be swapped.  Currently this is done at run
-time, during driver initialization.
-
-However, this swapping can easily be done at build time.  Treating each
-double word as two words has the benefit of changing the larval hashes'
-types from u64[] to u32[], like for all other hashes, and allows
-dropping the casts and size doublings when calling cc_set_sram_desc().
+As the lifetime of the AEAD data matches the lifetime of the driver,
+AEAD data can be allocated using the managed allocators.
+While at it, simplify cc_aead_free() by removing an unneeded cast, and
+an unneeded check (aead_handle is always valid here).
 
 Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 ---
 v2:
   - New.
 
- drivers/crypto/ccree/cc_driver.c |  1 -
- drivers/crypto/ccree/cc_hash.c   | 49 +++++++++++---------------------
- drivers/crypto/ccree/cc_hash.h   |  2 --
- 3 files changed, 17 insertions(+), 35 deletions(-)
+ drivers/crypto/ccree/cc_aead.c   | 35 ++++++++++++--------------------
+ drivers/crypto/ccree/cc_cipher.c |  8 ++++----
+ drivers/crypto/ccree/cc_hash.c   |  9 ++++----
+ 3 files changed, 21 insertions(+), 31 deletions(-)
 
-diff --git a/drivers/crypto/ccree/cc_driver.c b/drivers/crypto/ccree/cc_driver.c
-index 532bc95a83736f94..fc34d152f42090fc 100644
---- a/drivers/crypto/ccree/cc_driver.c
-+++ b/drivers/crypto/ccree/cc_driver.c
-@@ -653,7 +653,6 @@ static struct platform_driver ccree_driver = {
+diff --git a/drivers/crypto/ccree/cc_aead.c b/drivers/crypto/ccree/cc_aead.c
+index be26aaf75e1fe9ea..904aa66752b3bdf4 100644
+--- a/drivers/crypto/ccree/cc_aead.c
++++ b/drivers/crypto/ccree/cc_aead.c
+@@ -2615,7 +2615,7 @@ static struct cc_crypto_alg *cc_create_aead_alg(struct cc_alg_template *tmpl,
+ 	struct cc_crypto_alg *t_alg;
+ 	struct aead_alg *alg;
  
- static int __init ccree_init(void)
+-	t_alg = kzalloc(sizeof(*t_alg), GFP_KERNEL);
++	t_alg = devm_kzalloc(dev, sizeof(*t_alg), GFP_KERNEL);
+ 	if (!t_alg)
+ 		return ERR_PTR(-ENOMEM);
+ 
+@@ -2645,19 +2645,12 @@ static struct cc_crypto_alg *cc_create_aead_alg(struct cc_alg_template *tmpl,
+ int cc_aead_free(struct cc_drvdata *drvdata)
  {
--	cc_hash_global_init();
- 	cc_debugfs_global_init();
- 
- 	return platform_driver_register(&ccree_driver);
-diff --git a/drivers/crypto/ccree/cc_hash.c b/drivers/crypto/ccree/cc_hash.c
-index 36ce015716c317df..c3146f550268e7ab 100644
---- a/drivers/crypto/ccree/cc_hash.c
-+++ b/drivers/crypto/ccree/cc_hash.c
-@@ -39,12 +39,19 @@ static const u32 cc_sha256_init[] = {
- 	SHA256_H3, SHA256_H2, SHA256_H1, SHA256_H0 };
- static const u32 cc_digest_len_sha512_init[] = {
- 	0x00000080, 0x00000000, 0x00000000, 0x00000000 };
--static u64 cc_sha384_init[] = {
--	SHA384_H7, SHA384_H6, SHA384_H5, SHA384_H4,
--	SHA384_H3, SHA384_H2, SHA384_H1, SHA384_H0 };
--static u64 cc_sha512_init[] = {
--	SHA512_H7, SHA512_H6, SHA512_H5, SHA512_H4,
--	SHA512_H3, SHA512_H2, SHA512_H1, SHA512_H0 };
+ 	struct cc_crypto_alg *t_alg, *n;
+-	struct cc_aead_handle *aead_handle =
+-		(struct cc_aead_handle *)drvdata->aead_handle;
+-
+-	if (aead_handle) {
+-		/* Remove registered algs */
+-		list_for_each_entry_safe(t_alg, n, &aead_handle->aead_list,
+-					 entry) {
+-			crypto_unregister_aead(&t_alg->aead_alg);
+-			list_del(&t_alg->entry);
+-			kfree(t_alg);
+-		}
+-		kfree(aead_handle);
+-		drvdata->aead_handle = NULL;
++	struct cc_aead_handle *aead_handle = drvdata->aead_handle;
 +
-+/*
-+ * Due to the way the HW works, every double word in the SHA384 and SHA512
-+ * larval hashes must be stored in hi/lo order
-+ */
-+#define hilo(x)	upper_32_bits(x), lower_32_bits(x)
-+static const u32 cc_sha384_init[] = {
-+	hilo(SHA384_H7), hilo(SHA384_H6), hilo(SHA384_H5), hilo(SHA384_H4),
-+	hilo(SHA384_H3), hilo(SHA384_H2), hilo(SHA384_H1), hilo(SHA384_H0) };
-+static const u32 cc_sha512_init[] = {
-+	hilo(SHA512_H7), hilo(SHA512_H6), hilo(SHA512_H5), hilo(SHA512_H4),
-+	hilo(SHA512_H3), hilo(SHA512_H2), hilo(SHA512_H1), hilo(SHA512_H0) };
-+
- static const u32 cc_sm3_init[] = {
- 	SM3_IVH, SM3_IVG, SM3_IVF, SM3_IVE,
- 	SM3_IVD, SM3_IVC, SM3_IVB, SM3_IVA };
-@@ -1942,8 +1949,8 @@ int cc_init_hash_sram(struct cc_drvdata *drvdata)
++	/* Remove registered algs */
++	list_for_each_entry_safe(t_alg, n, &aead_handle->aead_list, entry) {
++		crypto_unregister_aead(&t_alg->aead_alg);
++		list_del(&t_alg->entry);
  	}
  
- 	if (large_sha_supported) {
--		cc_set_sram_desc((u32 *)cc_sha384_init, sram_buff_ofs,
--				 (ARRAY_SIZE(cc_sha384_init) * 2), larval_seq,
-+		cc_set_sram_desc(cc_sha384_init, sram_buff_ofs,
-+				 ARRAY_SIZE(cc_sha384_init), larval_seq,
- 				 &larval_seq_len);
- 		rc = send_request_init(drvdata, larval_seq, larval_seq_len);
- 		if (rc)
-@@ -1951,8 +1958,8 @@ int cc_init_hash_sram(struct cc_drvdata *drvdata)
- 		sram_buff_ofs += sizeof(cc_sha384_init);
- 		larval_seq_len = 0;
+ 	return 0;
+@@ -2671,7 +2664,7 @@ int cc_aead_alloc(struct cc_drvdata *drvdata)
+ 	int alg;
+ 	struct device *dev = drvdata_to_dev(drvdata);
  
--		cc_set_sram_desc((u32 *)cc_sha512_init, sram_buff_ofs,
--				 (ARRAY_SIZE(cc_sha512_init) * 2), larval_seq,
-+		cc_set_sram_desc(cc_sha512_init, sram_buff_ofs,
-+				 ARRAY_SIZE(cc_sha512_init), larval_seq,
- 				 &larval_seq_len);
- 		rc = send_request_init(drvdata, larval_seq, larval_seq_len);
- 		if (rc)
-@@ -1963,28 +1970,6 @@ int cc_init_hash_sram(struct cc_drvdata *drvdata)
- 	return rc;
- }
+-	aead_handle = kmalloc(sizeof(*aead_handle), GFP_KERNEL);
++	aead_handle = devm_kmalloc(dev, sizeof(*aead_handle), GFP_KERNEL);
+ 	if (!aead_handle) {
+ 		rc = -ENOMEM;
+ 		goto fail0;
+@@ -2706,18 +2699,16 @@ int cc_aead_alloc(struct cc_drvdata *drvdata)
+ 		if (rc) {
+ 			dev_err(dev, "%s alg registration failed\n",
+ 				t_alg->aead_alg.base.cra_driver_name);
+-			goto fail2;
+-		} else {
+-			list_add_tail(&t_alg->entry, &aead_handle->aead_list);
+-			dev_dbg(dev, "Registered %s\n",
+-				t_alg->aead_alg.base.cra_driver_name);
++			goto fail1;
+ 		}
++
++		list_add_tail(&t_alg->entry, &aead_handle->aead_list);
++		dev_dbg(dev, "Registered %s\n",
++			t_alg->aead_alg.base.cra_driver_name);
+ 	}
  
--static void __init cc_swap_dwords(u32 *buf, unsigned long size)
--{
--	int i;
--	u32 tmp;
--
--	for (i = 0; i < size; i += 2) {
--		tmp = buf[i];
--		buf[i] = buf[i + 1];
--		buf[i + 1] = tmp;
--	}
--}
--
--/*
-- * Due to the way the HW works we need to swap every
-- * double word in the SHA384 and SHA512 larval hashes
-- */
--void __init cc_hash_global_init(void)
--{
--	cc_swap_dwords((u32 *)&cc_sha384_init, (ARRAY_SIZE(cc_sha384_init) * 2));
--	cc_swap_dwords((u32 *)&cc_sha512_init, (ARRAY_SIZE(cc_sha512_init) * 2));
--}
--
- int cc_hash_alloc(struct cc_drvdata *drvdata)
- {
- 	struct cc_hash_handle *hash_handle;
-diff --git a/drivers/crypto/ccree/cc_hash.h b/drivers/crypto/ccree/cc_hash.h
-index 0d6dc61484d79bc8..3dbd0abefea0546c 100644
---- a/drivers/crypto/ccree/cc_hash.h
-+++ b/drivers/crypto/ccree/cc_hash.h
-@@ -104,6 +104,4 @@ cc_digest_len_addr(void *drvdata, u32 mode);
-  */
- cc_sram_addr_t cc_larval_digest_addr(void *drvdata, u32 mode);
+ 	return 0;
  
--void cc_hash_global_init(void);
--
- #endif /*__CC_HASH_H__*/
+-fail2:
+-	kfree(t_alg);
+ fail1:
+ 	cc_aead_free(drvdata);
+ fail0:
+diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
+index a1430d669a584a85..517d78f9931943a3 100644
+--- a/drivers/crypto/ccree/cc_cipher.c
++++ b/drivers/crypto/ccree/cc_cipher.c
+@@ -1713,11 +1713,11 @@ int cc_cipher_alloc(struct cc_drvdata *drvdata)
+ 				t_alg->skcipher_alg.base.cra_driver_name);
+ 			kfree(t_alg);
+ 			goto fail0;
+-		} else {
+-			list_add_tail(&t_alg->entry, &drvdata->alg_list);
+-			dev_dbg(dev, "Registered %s\n",
+-				t_alg->skcipher_alg.base.cra_driver_name);
+ 		}
++
++		list_add_tail(&t_alg->entry, &drvdata->alg_list);
++		dev_dbg(dev, "Registered %s\n",
++			t_alg->skcipher_alg.base.cra_driver_name);
+ 	}
+ 	return 0;
+ 
+diff --git a/drivers/crypto/ccree/cc_hash.c b/drivers/crypto/ccree/cc_hash.c
+index 738f0debee98ebf1..2ca5532c07a2e2f4 100644
+--- a/drivers/crypto/ccree/cc_hash.c
++++ b/drivers/crypto/ccree/cc_hash.c
+@@ -2024,10 +2024,9 @@ int cc_hash_alloc(struct cc_drvdata *drvdata)
+ 					driver_hash[alg].driver_name);
+ 				kfree(t_alg);
+ 				goto fail;
+-			} else {
+-				list_add_tail(&t_alg->entry,
+-					      &hash_handle->hash_list);
+ 			}
++
++			list_add_tail(&t_alg->entry, &hash_handle->hash_list);
+ 		}
+ 		if (hw_mode == DRV_CIPHER_XCBC_MAC ||
+ 		    hw_mode == DRV_CIPHER_CMAC)
+@@ -2049,9 +2048,9 @@ int cc_hash_alloc(struct cc_drvdata *drvdata)
+ 				driver_hash[alg].driver_name);
+ 			kfree(t_alg);
+ 			goto fail;
+-		} else {
+-			list_add_tail(&t_alg->entry, &hash_handle->hash_list);
+ 		}
++
++		list_add_tail(&t_alg->entry, &hash_handle->hash_list);
+ 	}
+ 
+ 	return 0;
 -- 
 2.17.1
 
