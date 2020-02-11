@@ -2,32 +2,34 @@ Return-Path: <SRS0=l+Io=37=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1C8FC35242
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 20:13:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7D51C35242
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 20:14:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 96DD920708
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 20:13:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE6AC20708
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 20:14:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="UAkNeQGd"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="JR/LUQnv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731768AbgBKUNt (ORCPT
+        id S1731781AbgBKUOd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Feb 2020 15:13:49 -0500
-Received: from gateway32.websitewelcome.com ([192.185.145.171]:12269 "EHLO
-        gateway32.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728946AbgBKUNt (ORCPT
+        Tue, 11 Feb 2020 15:14:33 -0500
+Received: from gateway21.websitewelcome.com ([192.185.45.155]:32391 "EHLO
+        gateway21.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728946AbgBKUOd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Feb 2020 15:13:49 -0500
-Received: from cm12.websitewelcome.com (cm12.websitewelcome.com [100.42.49.8])
-        by gateway32.websitewelcome.com (Postfix) with ESMTP id 365FC83702
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Feb 2020 14:13:45 -0600 (CST)
+        Tue, 11 Feb 2020 15:14:33 -0500
+X-Greylist: delayed 1363 seconds by postgrey-1.27 at vger.kernel.org; Tue, 11 Feb 2020 15:14:32 EST
+Received: from cm16.websitewelcome.com (cm16.websitewelcome.com [100.42.49.19])
+        by gateway21.websitewelcome.com (Postfix) with ESMTP id 0D5A9400D0B0A
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Feb 2020 13:51:49 -0600 (CST)
 Received: from gator4166.hostgator.com ([108.167.133.22])
         by cmsmtp with SMTP
-        id 1bujjGjMovBMd1bujjaLUN; Tue, 11 Feb 2020 14:13:45 -0600
+        id 1bZUjUTKb8vkB1bZUjSeSo; Tue, 11 Feb 2020 13:51:49 -0600
 X-Authority-Reason: nr=8
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
@@ -35,27 +37,29 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
         Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=KF4U0slqD0nZwemRm48vcKehNF2NbyUtC90SR7y0UoM=; b=UAkNeQGdpLxfS26H0J7XBcMziN
-        zILKvQlDd7KBleY82/4L20JdzVeIDm92gRAi1VmBMNzgTltDXvWx84ovMcC9z4X3y0DT589BebZiL
-        gjk0CBYeXm8tWiQ/Vpw4GW2KNaGQ9yXD7tjHPPDn6+SWVRpaXxhRIdpIzMpUe/RDV8Et5FHIzKpr9
-        sA4Dd+1GxInJLsZISqNryGQdMSLbGdhe7e88fNHRM4W4zDv0QxbrfUrQMMOH6Sayt/CRvnrVBWEJg
-        ovDiFDGYi+KM9rS6JE99ybcbNj1nf4knCEuWPeu4cAhzW8SGv3li6dGg7Y3af/IhA059qGtu+D1tw
-        zeRxMYxA==;
-Received: from [200.68.140.36] (port=2377 helo=[192.168.43.131])
+        bh=i48Lhnv8GQvU89eRF+t1XT8THut/4ziywIysSJs41mw=; b=JR/LUQnv6JgWNKPcPXy7n34xSN
+        PlYAM8jnlD4dziIrey8tu/lc4WWc+J6snzvKeoLNgUrbuKQWwwwetsaCR4FWR4RGeKliXcvE1GTy2
+        xn8iSFE/jRVUbW5qS8kxOpcxeHjpAkrC8EV7mgqQyAOKSa3VSmdvpOSEYV+QvWh1nFO+lrzYX1+Ip
+        hsc39xqxVlpPUKx9KkFpLylb9E8VX+UneqcS94VRa/zjOzEfWAJ6+f5X3d4jOnB+GywHo7lFeKHzj
+        pLwB8hUsLIxkVt4OWh1GD3N/Vm/Vq2P7AlsqMfGhTPBCPLQvZM7exGjoB4Uh0ffbXhFZcGzSvWv9d
+        gWDyeUNw==;
+Received: from [200.68.140.36] (port=19713 helo=[192.168.43.131])
         by gator4166.hostgator.com with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
         (Exim 4.92)
         (envelope-from <gustavo@embeddedor.com>)
-        id 1j1bui-001bQa-NQ; Tue, 11 Feb 2020 14:13:44 -0600
+        id 1j1bZU-001PIl-4B; Tue, 11 Feb 2020 13:51:48 -0600
 Subject: Re: [PATCH] treewide: Replace zero-length arrays with flexible-array
  member
-To:     Kees Cook <keescook@chromium.org>
+To:     Greg KH <gregkh@linuxfoundation.org>,
+        Kees Cook <keescook@chromium.org>
 Cc:     linux-kernel@vger.kernel.org,
         "David S. Miller" <davem@davemloft.net>,
-        Greg KH <gregkh@linuxfoundation.org>,
         linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
         linux-usb@vger.kernel.org
 References: <20200211174126.GA29960@embeddedor>
- <202002111132.4A4F073CAF@keescook>
+ <20200211183229.GA1938663@kroah.com>
+ <3fdbb16a-897c-aa5b-d45d-f824f6810412@embeddedor.com>
+ <202002111129.77DB1CCC7B@keescook> <20200211193854.GA1972490@kroah.com>
 From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
 Autocrypt: addr=gustavo@embeddedor.com; keydata=
  xsFNBFssHAwBEADIy3ZoPq3z5UpsUknd2v+IQud4TMJnJLTeXgTf4biSDSrXn73JQgsISBwG
@@ -100,12 +104,12 @@ Autocrypt: addr=gustavo@embeddedor.com; keydata=
  YJWH93PN+ZUh6i6Rd2U/i8jH5WvzR57UeWxE4P8bQc0hNGrUsHQH6bpHV2lbuhDdqo+cM9eh
  GZEO3+gCDFmKrjspZjkJbB5Gadzvts5fcWGOXEvuT8uQSvl+vEL0g6vczsyPBtqoBLa9SNrS
  VtSixD1uOgytAP7RWS474w==
-Message-ID: <541a4f6a-60b3-a171-a223-1692f78b48ee@embeddedor.com>
-Date:   Tue, 11 Feb 2020 14:16:19 -0600
+Message-ID: <88e09425-8207-7a1e-8802-886f9694a37f@embeddedor.com>
+Date:   Tue, 11 Feb 2020 13:54:22 -0600
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.4.1
 MIME-Version: 1.0
-In-Reply-To: <202002111132.4A4F073CAF@keescook>
+In-Reply-To: <20200211193854.GA1972490@kroah.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
@@ -117,13 +121,13 @@ X-AntiAbuse: Sender Address Domain - embeddedor.com
 X-BWhitelist: no
 X-Source-IP: 200.68.140.36
 X-Source-L: No
-X-Exim-ID: 1j1bui-001bQa-NQ
+X-Exim-ID: 1j1bZU-001PIl-4B
 X-Source: 
 X-Source-Args: 
 X-Source-Dir: 
-X-Source-Sender: ([192.168.43.131]) [200.68.140.36]:2377
+X-Source-Sender: ([192.168.43.131]) [200.68.140.36]:19713
 X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 16
+X-Email-Count: 25
 X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
 X-Local-Domain: yes
 Sender: linux-crypto-owner@vger.kernel.org
@@ -133,30 +137,73 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 
 
-On 2/11/20 13:35, Kees Cook wrote:
-> On Tue, Feb 11, 2020 at 11:41:26AM -0600, Gustavo A. R. Silva wrote:
->> The current codebase makes use of the zero-length array language
->> extension to the C90 standard, but the preferred mechanism to declare
->> variable-length types such as these ones is a flexible array member[1][2],
->> introduced in C99:
+On 2/11/20 13:38, Greg KH wrote:
+> On Tue, Feb 11, 2020 at 11:32:04AM -0800, Kees Cook wrote:
+>> On Tue, Feb 11, 2020 at 01:20:36PM -0600, Gustavo A. R. Silva wrote:
+>>>
+>>>
+>>> On 2/11/20 12:32, Greg KH wrote:
+>>>> On Tue, Feb 11, 2020 at 11:41:26AM -0600, Gustavo A. R. Silva wrote:
+>>>>> The current codebase makes use of the zero-length array language
+>>>>> extension to the C90 standard, but the preferred mechanism to declare
+>>>>> variable-length types such as these ones is a flexible array member[1][2],
+>>>>> introduced in C99:
+>>>>>
+>>>>> struct foo {
+>>>>>         int stuff;
+>>>>>         struct boo array[];
+>>>>> };
+>>>>>
+>>>>> By making use of the mechanism above, we will get a compiler warning
+>>>>> in case the flexible array does not occur last in the structure, which
+>>>>> will help us prevent some kind of undefined behavior bugs from being
+>>>>> unadvertenly introduced[3] to the codebase from now on.
+>>>>>
+>>>>> All these instances of code were found with the help of the following
+>>>>> Coccinelle script:
+>>>>>
+>>>>> @@
+>>>>> identifier S, member, array;
+>>>>> type T1, T2;
+>>>>> @@
+>>>>>
+>>>>> struct S {
+>>>>>   ...
+>>>>>   T1 member;
+>>>>>   T2 array[
+>>>>> - 0
+>>>>>   ];
+>>>>> };
+>>>>>
+>>>>> [1] https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
+>>>>> [2] https://github.com/KSPP/linux/issues/21
+>>>>> [3] commit 76497732932f ("cxgb3/l2t: Fix undefined behaviour")
+>>>>>
+>>>>> NOTE: I'll carry this in my -next tree for the v5.6 merge window.
+>>>>
+>>>> Why not carve this up into per-subsystem patches so that we can apply
+>>>> them to our 5.7-rc1 trees and then you submit the "remaining" that don't
+>>>> somehow get merged at that timeframe for 5.7-rc2?
+>>>>
+>>>
+>>> Yep, sounds good. I'll do that.
 >>
->> struct foo {
->>         int stuff;
->>         struct boo array[];
->> };
+>> FWIW, I'd just like to point out that since this is a mechanical change
+>> with no code generation differences (unlike the pre-C90 1-byte array
+>> conversions), it's a way better use of everyone's time to just splat
+>> this in all at once.
 >>
->> By making use of the mechanism above, we will get a compiler warning
->> in case the flexible array does not occur last in the structure, which
->> will help us prevent some kind of undefined behavior bugs from being
->> unadvertenly introduced[3] to the codebase from now on.
+>> That said, it looks like Gustavo is up for it, but I'd like us to
+>> generally consider these kinds of mechanical changes as being easier to
+>> manage in a single patch. (Though getting Acks tends to be a bit
+>> harder...)
 > 
-> Is there a compiler warning we can enable to avoid new 0-byte arrays
-> from entering the kernel source tree? I can only find "-pedantic" which
-> enables way too many other checks.
+> Hey, if this is such a mechanical patch, let's get it to Linus now,
+> what's preventing that from being merged now?
 > 
 
-Months ago, I only found -pedantic, too. And we definitely don't want
-to use it for this. :/
+Well, the only thing is that this has never been in linux-next.
 
+Thanks
 --
 Gustavo
