@@ -4,35 +4,37 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAC01C3B188
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:26:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1149C35242
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:26:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9793420714
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:26:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF651206D6
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:26:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730222AbgBKS0S (ORCPT
+        id S1730049AbgBKS0x (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Feb 2020 13:26:18 -0500
-Received: from newton.telenet-ops.be ([195.130.132.45]:35660 "EHLO
-        newton.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728349AbgBKS0S (ORCPT
+        Tue, 11 Feb 2020 13:26:53 -0500
+Received: from leibniz.telenet-ops.be ([195.130.137.77]:35434 "EHLO
+        leibniz.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728548AbgBKS0x (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Feb 2020 13:26:18 -0500
+        Tue, 11 Feb 2020 13:26:53 -0500
+X-Greylist: delayed 440 seconds by postgrey-1.27 at vger.kernel.org; Tue, 11 Feb 2020 13:26:52 EST
 Received: from albert.telenet-ops.be (albert.telenet-ops.be [IPv6:2a02:1800:110:4::f00:1a])
-        by newton.telenet-ops.be (Postfix) with ESMTPS id 48H9z71GsSzMrJdd
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Feb 2020 19:19:31 +0100 (CET)
+        by leibniz.telenet-ops.be (Postfix) with ESMTPS id 48H9z66pmNzMtgrZ
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Feb 2020 19:19:30 +0100 (CET)
 Received: from ramsan ([84.195.182.253])
         by albert.telenet-ops.be with bizsmtp
-        id 1WKV2200E5USYZQ06WKWPt; Tue, 11 Feb 2020 19:19:31 +0100
+        id 1WKV2200F5USYZQ06WKWPB; Tue, 11 Feb 2020 19:19:30 +0100
 Received: from rox.of.borg ([192.168.97.57])
         by ramsan with esmtp (Exim 4.90_1)
         (envelope-from <geert@linux-m68k.org>)
-        id 1j1a8A-0002p6-Aw; Tue, 11 Feb 2020 19:19:30 +0100
+        id 1j1a8A-0002pI-G8; Tue, 11 Feb 2020 19:19:30 +0100
 Received: from geert by rox.of.borg with local (Exim 4.90_1)
         (envelope-from <geert@linux-m68k.org>)
-        id 1j1a8A-0003zN-9Z; Tue, 11 Feb 2020 19:19:30 +0100
+        id 1j1a8A-0003zZ-El; Tue, 11 Feb 2020 19:19:30 +0100
 From:   Geert Uytterhoeven <geert+renesas@glider.be>
 To:     Gilad Ben-Yossef <gilad@benyossef.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -42,9 +44,9 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-crypto@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH v2 27/34] crypto: ccree - improve kerneldoc in cc_request_mgr.[ch]
-Date:   Tue, 11 Feb 2020 19:19:21 +0100
-Message-Id: <20200211181928.15178-28-geert+renesas@glider.be>
+Subject: [PATCH v2 31/34] crypto: ccree - use existing dev helper in init_cc_resources()
+Date:   Tue, 11 Feb 2020 19:19:25 +0100
+Message-Id: <20200211181928.15178-32-geert+renesas@glider.be>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200211181928.15178-1-geert+renesas@glider.be>
 References: <20200211181928.15178-1-geert+renesas@glider.be>
@@ -53,126 +55,38 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Miscellaneous improvements:
-  - Start comment blocks with "/**" to enable kerneldoc,
-  - Mark parameters using "@" instead of "\param",
-  - Fix copied is_dout parameter of cc_send_request(),
-  - Add missing function names to kerneldoc headers,
-  - Add missing parameter descriptions.
+Use the existing dev helper variable instead of plat_dev->dev.
 
 Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 ---
 v2:
   - New.
 
- drivers/crypto/ccree/cc_request_mgr.c | 41 ++++++++++++++-------------
- drivers/crypto/ccree/cc_request_mgr.h | 19 ++++++-------
- 2 files changed, 31 insertions(+), 29 deletions(-)
+ drivers/crypto/ccree/cc_driver.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/ccree/cc_request_mgr.c b/drivers/crypto/ccree/cc_request_mgr.c
-index b2a18122f320b7b2..2b8a9f5a5bd3edee 100644
---- a/drivers/crypto/ccree/cc_request_mgr.c
-+++ b/drivers/crypto/ccree/cc_request_mgr.c
-@@ -206,12 +206,13 @@ static void enqueue_seq(struct cc_drvdata *drvdata, struct cc_hw_desc seq[],
- 	}
- }
+diff --git a/drivers/crypto/ccree/cc_driver.c b/drivers/crypto/ccree/cc_driver.c
+index bd9db53c68ab4381..2d50991b9a17756b 100644
+--- a/drivers/crypto/ccree/cc_driver.c
++++ b/drivers/crypto/ccree/cc_driver.c
+@@ -331,13 +331,13 @@ static int init_cc_resources(struct platform_device *plat_dev)
  
--/*!
-- * Completion will take place if and only if user requested completion
-- * by cc_send_sync_request().
-+/**
-+ * request_mgr_complete() - Completion will take place if and only if user
-+ * requested completion by cc_send_sync_request().
-  *
-- * \param dev
-- * \param dx_compl_h The completion event to signal
-+ * @dev: Device pointer
-+ * @dx_compl_h: The completion event to signal
-+ * @dummy: unused error code
-  */
- static void request_mgr_complete(struct device *dev, void *dx_compl_h,
- 				 int dummy)
-@@ -264,15 +265,15 @@ static int cc_queues_status(struct cc_drvdata *drvdata,
- 	return -ENOSPC;
- }
+ 	init_completion(&new_drvdata->hw_queue_avail);
  
--/*!
-- * Enqueue caller request to crypto hardware.
-+/**
-+ * cc_do_send_request() - Enqueue caller request to crypto hardware.
-  * Need to be called with HW lock held and PM running
-  *
-- * \param drvdata
-- * \param cc_req The request to enqueue
-- * \param desc The crypto sequence
-- * \param len The crypto sequence length
-- * \param add_comp If "true": add an artificial dout DMA to mark completion
-+ * @drvdata: Associated device driver context
-+ * @cc_req: The request to enqueue
-+ * @desc: The crypto sequence
-+ * @len: The crypto sequence length
-+ * @add_comp: If "true": add an artificial dout DMA to mark completion
-  *
-  */
- static void cc_do_send_request(struct cc_drvdata *drvdata,
-@@ -486,16 +487,18 @@ int cc_send_sync_request(struct cc_drvdata *drvdata,
- 	return 0;
- }
+-	if (!plat_dev->dev.dma_mask)
+-		plat_dev->dev.dma_mask = &plat_dev->dev.coherent_dma_mask;
++	if (!dev->dma_mask)
++		dev->dma_mask = &dev->coherent_dma_mask;
  
--/*!
-- * Enqueue caller request to crypto hardware during init process.
-- * assume this function is not called in middle of a flow,
-+/**
-+ * send_request_init() - Enqueue caller request to crypto hardware during init
-+ * process.
-+ * Assume this function is not called in the middle of a flow,
-  * since we set QUEUE_LAST_IND flag in the last descriptor.
-  *
-- * \param drvdata
-- * \param desc The crypto sequence
-- * \param len The crypto sequence length
-+ * @drvdata: Associated device driver context
-+ * @desc: The crypto sequence
-+ * @len: The crypto sequence length
-  *
-- * \return int Returns "0" upon success
-+ * Return:
-+ * Returns "0" upon success
-  */
- int send_request_init(struct cc_drvdata *drvdata, struct cc_hw_desc *desc,
- 		      unsigned int len)
-diff --git a/drivers/crypto/ccree/cc_request_mgr.h b/drivers/crypto/ccree/cc_request_mgr.h
-index ff7746aaaf355acd..ae25ca843dceabc9 100644
---- a/drivers/crypto/ccree/cc_request_mgr.h
-+++ b/drivers/crypto/ccree/cc_request_mgr.h
-@@ -12,18 +12,17 @@
- 
- int cc_req_mgr_init(struct cc_drvdata *drvdata);
- 
--/*!
-- * Enqueue caller request to crypto hardware.
-+/**
-+ * cc_send_request() - Enqueue caller request to crypto hardware.
-  *
-- * \param drvdata
-- * \param cc_req The request to enqueue
-- * \param desc The crypto sequence
-- * \param len The crypto sequence length
-- * \param is_dout If "true": completion is handled by the caller
-- *	  If "false": this function adds a dummy descriptor completion
-- *	  and waits upon completion signal.
-+ * @drvdata: Associated device driver context
-+ * @cc_req: The request to enqueue
-+ * @desc: The crypto sequence
-+ * @len: The crypto sequence length
-+ * @req: Asynchronous crypto request
-  *
-- * \return int Returns -EINPROGRESS or error
-+ * Return:
-+ * Returns -EINPROGRESS or error
-  */
- int cc_send_request(struct cc_drvdata *drvdata, struct cc_crypto_req *cc_req,
- 		    struct cc_hw_desc *desc, unsigned int len,
+ 	dma_mask = DMA_BIT_MASK(DMA_BIT_MASK_LEN);
+ 	while (dma_mask > 0x7fffffffUL) {
+-		if (dma_supported(&plat_dev->dev, dma_mask)) {
+-			rc = dma_set_coherent_mask(&plat_dev->dev, dma_mask);
++		if (dma_supported(dev, dma_mask)) {
++			rc = dma_set_coherent_mask(dev, dma_mask);
+ 			if (!rc)
+ 				break;
+ 		}
 -- 
 2.17.1
 
