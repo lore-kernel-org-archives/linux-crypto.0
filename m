@@ -4,32 +4,33 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76424C3B187
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:20:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5207C3B187
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:20:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5B8EB20708
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:20:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C0C6B20848
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:20:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731281AbgBKSUf (ORCPT
+        id S1731074AbgBKSUf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Tue, 11 Feb 2020 13:20:35 -0500
-Received: from laurent.telenet-ops.be ([195.130.137.89]:44958 "EHLO
-        laurent.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731074AbgBKSTd (ORCPT
+Received: from xavier.telenet-ops.be ([195.130.132.52]:45480 "EHLO
+        xavier.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730261AbgBKSTd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 11 Feb 2020 13:19:33 -0500
 Received: from ramsan ([84.195.182.253])
-        by laurent.telenet-ops.be with bizsmtp
-        id 1WKV2200N5USYZQ01WKV3D; Tue, 11 Feb 2020 19:19:30 +0100
+        by xavier.telenet-ops.be with bizsmtp
+        id 1WKV2200a5USYZQ01WKWwU; Tue, 11 Feb 2020 19:19:31 +0100
 Received: from rox.of.borg ([192.168.97.57])
         by ramsan with esmtp (Exim 4.90_1)
         (envelope-from <geert@linux-m68k.org>)
-        id 1j1a89-0002nh-D2; Tue, 11 Feb 2020 19:19:29 +0100
+        id 1j1a8A-0002of-3F; Tue, 11 Feb 2020 19:19:30 +0100
 Received: from geert by rox.of.borg with local (Exim 4.90_1)
         (envelope-from <geert@linux-m68k.org>)
-        id 1j1a89-0003yD-B9; Tue, 11 Feb 2020 19:19:29 +0100
+        id 1j1a8A-0003z5-1I; Tue, 11 Feb 2020 19:19:30 +0100
 From:   Geert Uytterhoeven <geert+renesas@glider.be>
 To:     Gilad Ben-Yossef <gilad@benyossef.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -39,9 +40,9 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-crypto@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH v2 03/34] crypto: ccree - fix retry handling in cc_send_sync_request()
-Date:   Tue, 11 Feb 2020 19:18:57 +0100
-Message-Id: <20200211181928.15178-4-geert+renesas@glider.be>
+Subject: [PATCH v2 21/34] crypto: ccree - remove struct cc_cipher_handle
+Date:   Tue, 11 Feb 2020 19:19:15 +0100
+Message-Id: <20200211181928.15178-22-geert+renesas@glider.be>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200211181928.15178-1-geert+renesas@glider.be>
 References: <20200211181928.15178-1-geert+renesas@glider.be>
@@ -50,42 +51,101 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-If cc_queues_status() indicates that the queue is full,
-cc_send_sync_request() should loop and retry.
-
-However, cc_queues_status() returns either 0 (for success), or -ENOSPC
-(for queue full), while cc_send_sync_request() checks for real errors by
-comparing with -EAGAIN.  Hence -ENOSPC is always considered a real
-error, and the code never retries the operation.
-
-Fix this by just removing the check, as cc_queues_status() never returns
-any other error value than -ENOSPC.
+The cc_cipher_handle structure contains only a single member, and only
+one instance exists.  Simplify the code and reduce memory consumption by
+moving this member to struct cc_drvdata.
 
 Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-Acked-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
 v2:
-  - Add Acked-by: Gilad Ben-Yossef <gilad@benyossef.com>,
-  - Drop RFC.
----
- drivers/crypto/ccree/cc_request_mgr.c | 4 ----
- 1 file changed, 4 deletions(-)
+  - New.
 
-diff --git a/drivers/crypto/ccree/cc_request_mgr.c b/drivers/crypto/ccree/cc_request_mgr.c
-index 9d61e6f1247819e2..b2a18122f320b7b2 100644
---- a/drivers/crypto/ccree/cc_request_mgr.c
-+++ b/drivers/crypto/ccree/cc_request_mgr.c
-@@ -476,10 +476,6 @@ int cc_send_sync_request(struct cc_drvdata *drvdata,
- 			break;
+ drivers/crypto/ccree/cc_cipher.c | 33 ++++++++------------------------
+ drivers/crypto/ccree/cc_driver.h |  2 +-
+ 2 files changed, 9 insertions(+), 26 deletions(-)
+
+diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
+index 1c7ced65008bc311..a1430d669a584a85 100644
+--- a/drivers/crypto/ccree/cc_cipher.c
++++ b/drivers/crypto/ccree/cc_cipher.c
+@@ -20,10 +20,6 @@
  
- 		spin_unlock_bh(&mgr->hw_lock);
--		if (rc != -EAGAIN) {
--			cc_pm_put_suspend(dev);
--			return rc;
+ #define template_skcipher	template_u.skcipher
+ 
+-struct cc_cipher_handle {
+-	struct list_head alg_list;
+-};
+-
+ struct cc_user_key_info {
+ 	u8 *key;
+ 	dma_addr_t key_dma_addr;
+@@ -1669,36 +1665,24 @@ static struct cc_crypto_alg *cc_create_alg(const struct cc_alg_template *tmpl,
+ int cc_cipher_free(struct cc_drvdata *drvdata)
+ {
+ 	struct cc_crypto_alg *t_alg, *n;
+-	struct cc_cipher_handle *cipher_handle = drvdata->cipher_handle;
+-
+-	if (cipher_handle) {
+-		/* Remove registered algs */
+-		list_for_each_entry_safe(t_alg, n, &cipher_handle->alg_list,
+-					 entry) {
+-			crypto_unregister_skcipher(&t_alg->skcipher_alg);
+-			list_del(&t_alg->entry);
+-			kfree(t_alg);
 -		}
- 		wait_for_completion_interruptible(&drvdata->hw_queue_avail);
- 		reinit_completion(&drvdata->hw_queue_avail);
+-		kfree(cipher_handle);
+-		drvdata->cipher_handle = NULL;
++
++	/* Remove registered algs */
++	list_for_each_entry_safe(t_alg, n, &drvdata->alg_list, entry) {
++		crypto_unregister_skcipher(&t_alg->skcipher_alg);
++		list_del(&t_alg->entry);
++		kfree(t_alg);
  	}
+ 	return 0;
+ }
+ 
+ int cc_cipher_alloc(struct cc_drvdata *drvdata)
+ {
+-	struct cc_cipher_handle *cipher_handle;
+ 	struct cc_crypto_alg *t_alg;
+ 	struct device *dev = drvdata_to_dev(drvdata);
+ 	int rc = -ENOMEM;
+ 	int alg;
+ 
+-	cipher_handle = kmalloc(sizeof(*cipher_handle), GFP_KERNEL);
+-	if (!cipher_handle)
+-		return -ENOMEM;
+-
+-	INIT_LIST_HEAD(&cipher_handle->alg_list);
+-	drvdata->cipher_handle = cipher_handle;
++	INIT_LIST_HEAD(&drvdata->alg_list);
+ 
+ 	/* Linux crypto */
+ 	dev_dbg(dev, "Number of algorithms = %zu\n",
+@@ -1730,8 +1714,7 @@ int cc_cipher_alloc(struct cc_drvdata *drvdata)
+ 			kfree(t_alg);
+ 			goto fail0;
+ 		} else {
+-			list_add_tail(&t_alg->entry,
+-				      &cipher_handle->alg_list);
++			list_add_tail(&t_alg->entry, &drvdata->alg_list);
+ 			dev_dbg(dev, "Registered %s\n",
+ 				t_alg->skcipher_alg.base.cra_driver_name);
+ 		}
+diff --git a/drivers/crypto/ccree/cc_driver.h b/drivers/crypto/ccree/cc_driver.h
+index 4895f124d2b83fb1..4790eb5cb8bdac3c 100644
+--- a/drivers/crypto/ccree/cc_driver.h
++++ b/drivers/crypto/ccree/cc_driver.h
+@@ -141,7 +141,7 @@ struct cc_drvdata {
+ 	struct platform_device *plat_dev;
+ 	u32 mlli_sram_addr;
+ 	struct dma_pool *mlli_buffs_pool;
+-	void *cipher_handle;
++	struct list_head alg_list;
+ 	void *hash_handle;
+ 	void *aead_handle;
+ 	void *request_mgr_handle;
 -- 
 2.17.1
 
