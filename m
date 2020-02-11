@@ -4,33 +4,32 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7F6CC35242
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:20:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B8EAC35242
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:20:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 91E7420708
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:20:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E16A620708
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:20:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728278AbgBKSUX (ORCPT
+        id S1730161AbgBKSUf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Feb 2020 13:20:23 -0500
-Received: from albert.telenet-ops.be ([195.130.137.90]:60428 "EHLO
+        Tue, 11 Feb 2020 13:20:35 -0500
+Received: from albert.telenet-ops.be ([195.130.137.90]:60510 "EHLO
         albert.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729146AbgBKSTd (ORCPT
+        with ESMTP id S1731145AbgBKSTd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 11 Feb 2020 13:19:33 -0500
 Received: from ramsan ([84.195.182.253])
         by albert.telenet-ops.be with bizsmtp
-        id 1WKV2200K5USYZQ06WKVNN; Tue, 11 Feb 2020 19:19:30 +0100
+        id 1WKV2200M5USYZQ06WKWPC; Tue, 11 Feb 2020 19:19:30 +0100
 Received: from rox.of.borg ([192.168.97.57])
         by ramsan with esmtp (Exim 4.90_1)
         (envelope-from <geert@linux-m68k.org>)
-        id 1j1a89-0002o8-Mc; Tue, 11 Feb 2020 19:19:29 +0100
+        id 1j1a8A-0002pO-I2; Tue, 11 Feb 2020 19:19:30 +0100
 Received: from geert by rox.of.borg with local (Exim 4.90_1)
         (envelope-from <geert@linux-m68k.org>)
-        id 1j1a89-0003yb-LQ; Tue, 11 Feb 2020 19:19:29 +0100
+        id 1j1a8A-0003zf-Gd; Tue, 11 Feb 2020 19:19:30 +0100
 From:   Geert Uytterhoeven <geert+renesas@glider.be>
 To:     Gilad Ben-Yossef <gilad@benyossef.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -40,9 +39,9 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-crypto@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH v2 11/34] crypto: ccree - defer larval_digest_addr init until needed
-Date:   Tue, 11 Feb 2020 19:19:05 +0100
-Message-Id: <20200211181928.15178-12-geert+renesas@glider.be>
+Subject: [PATCH v2 33/34] crypto: ccree - use devm_k[mz]alloc() for cipher data
+Date:   Tue, 11 Feb 2020 19:19:27 +0100
+Message-Id: <20200211181928.15178-34-geert+renesas@glider.be>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200211181928.15178-1-geert+renesas@glider.be>
 References: <20200211181928.15178-1-geert+renesas@glider.be>
@@ -51,66 +50,46 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-While the larval digest addresses are not always used in
-cc_get_plain_hmac_key() and cc_hash_digest(), they are always
-calculated.
-
-Defer their calculations to the points where needed.
+As the lifetime of the cipher data matches the lifetime of the driver,
+cipher data can be allocated using the managed allocators.
 
 Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
 ---
 v2:
   - New.
 
- drivers/crypto/ccree/cc_aead.c | 4 +++-
- drivers/crypto/ccree/cc_hash.c | 5 +++--
- 2 files changed, 6 insertions(+), 3 deletions(-)
+ drivers/crypto/ccree/cc_cipher.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/ccree/cc_aead.c b/drivers/crypto/ccree/cc_aead.c
-index db89144ce6c5e974..d1e7e82b9a40f8ff 100644
---- a/drivers/crypto/ccree/cc_aead.c
-+++ b/drivers/crypto/ccree/cc_aead.c
-@@ -417,7 +417,7 @@ static int cc_get_plain_hmac_key(struct crypto_aead *tfm, const u8 *authkey,
- 	dma_addr_t key_dma_addr = 0;
- 	struct cc_aead_ctx *ctx = crypto_aead_ctx(tfm);
- 	struct device *dev = drvdata_to_dev(ctx->drvdata);
--	u32 larval_addr = cc_larval_digest_addr(ctx->drvdata, ctx->auth_mode);
-+	u32 larval_addr;
- 	struct cc_crypto_req cc_req = {};
- 	unsigned int blocksize;
- 	unsigned int digestsize;
-@@ -459,6 +459,8 @@ static int cc_get_plain_hmac_key(struct crypto_aead *tfm, const u8 *authkey,
- 			/* Load hash initial state */
- 			hw_desc_init(&desc[idx]);
- 			set_cipher_mode(&desc[idx], hashmode);
-+			larval_addr = cc_larval_digest_addr(ctx->drvdata,
-+							    ctx->auth_mode);
- 			set_din_sram(&desc[idx], larval_addr, digestsize);
- 			set_flow_mode(&desc[idx], S_DIN_to_HASH);
- 			set_setup_mode(&desc[idx], SETUP_LOAD_STATE0);
-diff --git a/drivers/crypto/ccree/cc_hash.c b/drivers/crypto/ccree/cc_hash.c
-index defeb35a16a626ff..cebbe2f08f606bf3 100644
---- a/drivers/crypto/ccree/cc_hash.c
-+++ b/drivers/crypto/ccree/cc_hash.c
-@@ -429,8 +429,7 @@ static int cc_hash_digest(struct ahash_request *req)
- 	bool is_hmac = ctx->is_hmac;
- 	struct cc_crypto_req cc_req = {};
- 	struct cc_hw_desc desc[CC_MAX_HASH_SEQ_LEN];
--	cc_sram_addr_t larval_digest_addr =
--		cc_larval_digest_addr(ctx->drvdata, ctx->hash_mode);
-+	cc_sram_addr_t larval_digest_addr;
- 	int idx = 0;
- 	int rc = 0;
- 	gfp_t flags = cc_gfp_flags(&req->base);
-@@ -472,6 +471,8 @@ static int cc_hash_digest(struct ahash_request *req)
- 		set_din_type(&desc[idx], DMA_DLLI, state->digest_buff_dma_addr,
- 			     ctx->inter_digestsize, NS_BIT);
- 	} else {
-+		larval_digest_addr = cc_larval_digest_addr(ctx->drvdata,
-+							   ctx->hash_mode);
- 		set_din_sram(&desc[idx], larval_digest_addr,
- 			     ctx->inter_digestsize);
+diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
+index 517d78f9931943a3..44dc8e6229062a02 100644
+--- a/drivers/crypto/ccree/cc_cipher.c
++++ b/drivers/crypto/ccree/cc_cipher.c
+@@ -1634,7 +1634,7 @@ static struct cc_crypto_alg *cc_create_alg(const struct cc_alg_template *tmpl,
+ 	struct cc_crypto_alg *t_alg;
+ 	struct skcipher_alg *alg;
+ 
+-	t_alg = kzalloc(sizeof(*t_alg), GFP_KERNEL);
++	t_alg = devm_kzalloc(dev, sizeof(*t_alg), GFP_KERNEL);
+ 	if (!t_alg)
+ 		return ERR_PTR(-ENOMEM);
+ 
+@@ -1670,7 +1670,6 @@ int cc_cipher_free(struct cc_drvdata *drvdata)
+ 	list_for_each_entry_safe(t_alg, n, &drvdata->alg_list, entry) {
+ 		crypto_unregister_skcipher(&t_alg->skcipher_alg);
+ 		list_del(&t_alg->entry);
+-		kfree(t_alg);
  	}
+ 	return 0;
+ }
+@@ -1711,7 +1710,6 @@ int cc_cipher_alloc(struct cc_drvdata *drvdata)
+ 		if (rc) {
+ 			dev_err(dev, "%s alg registration failed\n",
+ 				t_alg->skcipher_alg.base.cra_driver_name);
+-			kfree(t_alg);
+ 			goto fail0;
+ 		}
+ 
 -- 
 2.17.1
 
