@@ -6,30 +6,30 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B8EAC35242
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76424C3B187
 	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:20:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E16A620708
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:20:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5B8EB20708
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:20:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730161AbgBKSUf (ORCPT
+        id S1731281AbgBKSUf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Tue, 11 Feb 2020 13:20:35 -0500
-Received: from albert.telenet-ops.be ([195.130.137.90]:60510 "EHLO
-        albert.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731145AbgBKSTd (ORCPT
+Received: from laurent.telenet-ops.be ([195.130.137.89]:44958 "EHLO
+        laurent.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731074AbgBKSTd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 11 Feb 2020 13:19:33 -0500
 Received: from ramsan ([84.195.182.253])
-        by albert.telenet-ops.be with bizsmtp
-        id 1WKV2200M5USYZQ06WKWPC; Tue, 11 Feb 2020 19:19:30 +0100
+        by laurent.telenet-ops.be with bizsmtp
+        id 1WKV2200N5USYZQ01WKV3D; Tue, 11 Feb 2020 19:19:30 +0100
 Received: from rox.of.borg ([192.168.97.57])
         by ramsan with esmtp (Exim 4.90_1)
         (envelope-from <geert@linux-m68k.org>)
-        id 1j1a8A-0002pO-I2; Tue, 11 Feb 2020 19:19:30 +0100
+        id 1j1a89-0002nh-D2; Tue, 11 Feb 2020 19:19:29 +0100
 Received: from geert by rox.of.borg with local (Exim 4.90_1)
         (envelope-from <geert@linux-m68k.org>)
-        id 1j1a8A-0003zf-Gd; Tue, 11 Feb 2020 19:19:30 +0100
+        id 1j1a89-0003yD-B9; Tue, 11 Feb 2020 19:19:29 +0100
 From:   Geert Uytterhoeven <geert+renesas@glider.be>
 To:     Gilad Ben-Yossef <gilad@benyossef.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -39,9 +39,9 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         linux-crypto@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH v2 33/34] crypto: ccree - use devm_k[mz]alloc() for cipher data
-Date:   Tue, 11 Feb 2020 19:19:27 +0100
-Message-Id: <20200211181928.15178-34-geert+renesas@glider.be>
+Subject: [PATCH v2 03/34] crypto: ccree - fix retry handling in cc_send_sync_request()
+Date:   Tue, 11 Feb 2020 19:18:57 +0100
+Message-Id: <20200211181928.15178-4-geert+renesas@glider.be>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200211181928.15178-1-geert+renesas@glider.be>
 References: <20200211181928.15178-1-geert+renesas@glider.be>
@@ -50,46 +50,42 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-As the lifetime of the cipher data matches the lifetime of the driver,
-cipher data can be allocated using the managed allocators.
+If cc_queues_status() indicates that the queue is full,
+cc_send_sync_request() should loop and retry.
+
+However, cc_queues_status() returns either 0 (for success), or -ENOSPC
+(for queue full), while cc_send_sync_request() checks for real errors by
+comparing with -EAGAIN.  Hence -ENOSPC is always considered a real
+error, and the code never retries the operation.
+
+Fix this by just removing the check, as cc_queues_status() never returns
+any other error value than -ENOSPC.
 
 Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+Acked-by: Gilad Ben-Yossef <gilad@benyossef.com>
 ---
 v2:
-  - New.
+  - Add Acked-by: Gilad Ben-Yossef <gilad@benyossef.com>,
+  - Drop RFC.
+---
+ drivers/crypto/ccree/cc_request_mgr.c | 4 ----
+ 1 file changed, 4 deletions(-)
 
- drivers/crypto/ccree/cc_cipher.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
-
-diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_cipher.c
-index 517d78f9931943a3..44dc8e6229062a02 100644
---- a/drivers/crypto/ccree/cc_cipher.c
-+++ b/drivers/crypto/ccree/cc_cipher.c
-@@ -1634,7 +1634,7 @@ static struct cc_crypto_alg *cc_create_alg(const struct cc_alg_template *tmpl,
- 	struct cc_crypto_alg *t_alg;
- 	struct skcipher_alg *alg;
+diff --git a/drivers/crypto/ccree/cc_request_mgr.c b/drivers/crypto/ccree/cc_request_mgr.c
+index 9d61e6f1247819e2..b2a18122f320b7b2 100644
+--- a/drivers/crypto/ccree/cc_request_mgr.c
++++ b/drivers/crypto/ccree/cc_request_mgr.c
+@@ -476,10 +476,6 @@ int cc_send_sync_request(struct cc_drvdata *drvdata,
+ 			break;
  
--	t_alg = kzalloc(sizeof(*t_alg), GFP_KERNEL);
-+	t_alg = devm_kzalloc(dev, sizeof(*t_alg), GFP_KERNEL);
- 	if (!t_alg)
- 		return ERR_PTR(-ENOMEM);
- 
-@@ -1670,7 +1670,6 @@ int cc_cipher_free(struct cc_drvdata *drvdata)
- 	list_for_each_entry_safe(t_alg, n, &drvdata->alg_list, entry) {
- 		crypto_unregister_skcipher(&t_alg->skcipher_alg);
- 		list_del(&t_alg->entry);
--		kfree(t_alg);
+ 		spin_unlock_bh(&mgr->hw_lock);
+-		if (rc != -EAGAIN) {
+-			cc_pm_put_suspend(dev);
+-			return rc;
+-		}
+ 		wait_for_completion_interruptible(&drvdata->hw_queue_avail);
+ 		reinit_completion(&drvdata->hw_queue_avail);
  	}
- 	return 0;
- }
-@@ -1711,7 +1710,6 @@ int cc_cipher_alloc(struct cc_drvdata *drvdata)
- 		if (rc) {
- 			dev_err(dev, "%s alg registration failed\n",
- 				t_alg->skcipher_alg.base.cra_driver_name);
--			kfree(t_alg);
- 			goto fail0;
- 		}
- 
 -- 
 2.17.1
 
