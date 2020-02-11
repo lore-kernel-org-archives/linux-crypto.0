@@ -2,529 +2,146 @@ Return-Path: <SRS0=l+Io=37=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB4F5C3B186
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 07:55:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 690B1C352A3
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 07:56:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A500C2070A
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 07:55:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 35484206CC
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 07:56:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZsaTAO4W"
+	dkim=pass (1024-bit key) header.d=rambus.com header.i=@rambus.com header.b="PUwqkpdt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727578AbgBKHzj (ORCPT
+        id S1726973AbgBKH4L (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Feb 2020 02:55:39 -0500
-Received: from mail-pj1-f66.google.com ([209.85.216.66]:50552 "EHLO
-        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726973AbgBKHzj (ORCPT
+        Tue, 11 Feb 2020 02:56:11 -0500
+Received: from us-smtp-delivery-148.mimecast.com ([63.128.21.148]:50530 "EHLO
+        us-smtp-delivery-148.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727618AbgBKH4L (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Feb 2020 02:55:39 -0500
-Received: by mail-pj1-f66.google.com with SMTP id r67so946109pjb.0
-        for <linux-crypto@vger.kernel.org>; Mon, 10 Feb 2020 23:55:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=8vFs7BtTYVd1LSFhoQs24FthfV+ot+Z7tDrrL6PgPKM=;
-        b=ZsaTAO4WFPsygN+qxGuNhP+6MFSqIVSuVw5mjDcmYdIHvuowNA0qwSbZWFUKav7C6b
-         i1gNRhWUe2eAlGlCVWTd+KnIkO/XCcm3oqPovJwBDxd3bxNMLjR6wO72QXZBR5PLznmu
-         E8KLCdPPg4qQYvE5DyERBmnHCBRuwfMKS1faMDeJF8+LKU/T1pHnaBtyYnQ7bKRfe28+
-         DOuAJl6H5yXvb9SkukzzRPuF0gDEN1Izs3UebhcaWi7bT5zrOAYX2y2oRFf9ONDp89cL
-         j9R3kaYpnEPSnfnXV/BZ3oxovcYJKeKDLsyJvdJlzDmsUrIMXKtaKq/yeoCrj/m1axOK
-         U7OQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=8vFs7BtTYVd1LSFhoQs24FthfV+ot+Z7tDrrL6PgPKM=;
-        b=es6GsOTvQ7u6unw3e8GlVX3nAPGipVDryCq6WJtxxkTevC0WcLECOPMtPEM1VByD3G
-         3zs8GaKxuPg06n+/fvZ4AkUdyh83RQziPUCJcYPfrXeF6qCAQ7m13bivPeYw6QrM0ifT
-         a7qWDMIfcwYKzewwGy3W+sSyqW2GAFxNMZH1WWPZQpB3RGlg7DINU7Jxnrf2GNHVFgjQ
-         Rfl3UcMQgfbfuyvA+aZpC6tPxps1cMvtS0Ox6OD8FTFJIiys9NNnmc4Jv0xEhYNUYSTb
-         rxONYTBRqCgytLq8X4AObO0ruxvxxrcFWa4Tt+0nn2qMC5z4qicBsGo7xoCv5Dur9R+5
-         OnUw==
-X-Gm-Message-State: APjAAAU8cjBkTKX5WfpA5pKO1iRyEEDZzL8Q/tPUkVmWvdcTuaozch31
-        CuvermZYFyTtqb7RqN8sPVTG8w==
-X-Google-Smtp-Source: APXvYqz1uPZ7k3dz270TmnKh1yTCB+7vhihcnsvPtMsvjvNlP13kkFr2wI+NsX5OuvJI005GDFJzWg==
-X-Received: by 2002:a17:902:161:: with SMTP id 88mr2065149plb.129.1581407738213;
-        Mon, 10 Feb 2020 23:55:38 -0800 (PST)
-Received: from localhost.localdomain ([45.135.186.96])
-        by smtp.gmail.com with ESMTPSA id d73sm3011627pfd.109.2020.02.10.23.55.27
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Mon, 10 Feb 2020 23:55:37 -0800 (PST)
-From:   Zhangfei Gao <zhangfei.gao@linaro.org>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        jonathan.cameron@huawei.com, dave.jiang@intel.com,
-        grant.likely@arm.com, jean-philippe <jean-philippe@linaro.org>,
-        Jerome Glisse <jglisse@redhat.com>,
-        ilias.apalodimas@linaro.org, francois.ozog@linaro.org,
-        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
-        "haojian . zhuang" <haojian.zhuang@linaro.org>,
-        guodong.xu@linaro.org
-Cc:     linux-accelerators@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
-        Zhangfei Gao <zhangfei.gao@linaro.org>
-Subject: [PATCH v13 4/4] crypto: hisilicon - register zip engine to uacce
-Date:   Tue, 11 Feb 2020 15:54:25 +0800
-Message-Id: <1581407665-13504-5-git-send-email-zhangfei.gao@linaro.org>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1581407665-13504-1-git-send-email-zhangfei.gao@linaro.org>
-References: <1581407665-13504-1-git-send-email-zhangfei.gao@linaro.org>
+        Tue, 11 Feb 2020 02:56:11 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rambus.com;
+        s=mimecast20161209; t=1581407769;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=mBgaaOr9ApaqiTUqZfIBj4ftiMLPH+ejc1ysarFIJ3E=;
+        b=PUwqkpdt6gOQIchwYJQUKjnIeGgU38U+qS1R0Y7EDzflUavZielHyhGnLJJxr3+mPt99Lr
+        WofbxL0WPP9O4lq7kUW+hvsfqWjIHpGj3bOfkjmcgIrShhMcACz5LAMDudFYiO9bb+tjjL
+        SAvcce70gGib29pbNFpSBjkt1R0v+IM=
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com
+ (mail-mw2nam10lp2101.outbound.protection.outlook.com [104.47.55.101])
+ (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-298-c3Av0bl4MUyNuJHQS-QQvQ-1; Tue, 11 Feb 2020 02:56:07 -0500
+Received: from SN4PR0401MB3663.namprd04.prod.outlook.com (10.167.133.19) by
+ SN4PR0401MB3535.namprd04.prod.outlook.com (10.167.150.25) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2707.23; Tue, 11 Feb 2020 07:56:04 +0000
+Received: from SN4PR0401MB3663.namprd04.prod.outlook.com
+ ([fe80::c071:99a5:6da8:924e]) by SN4PR0401MB3663.namprd04.prod.outlook.com
+ ([fe80::c071:99a5:6da8:924e%7]) with mapi id 15.20.2707.030; Tue, 11 Feb 2020
+ 07:56:04 +0000
+From:   "Van Leeuwen, Pascal" <pvanleeuwen@rambus.com>
+To:     Ken Goldman <kgold@linux.ibm.com>
+CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-integrity@vger.kernel.org" <linux-integrity@vger.kernel.org>,
+        "linux-security-module@vger.kernel.org" 
+        <linux-security-module@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH 1/2] crypto: sm3 - add a new alias name sm3-256
+Thread-Topic: [PATCH 1/2] crypto: sm3 - add a new alias name sm3-256
+Thread-Index: AQHV3ZghOpovmI7C7UCUiLL8Qi2t+6gTxgGAgADdmwCAAAKQgIAAAQJwgAAWNQCAAOe3kA==
+Date:   Tue, 11 Feb 2020 07:56:04 +0000
+Message-ID: <SN4PR0401MB36637D914CAB78B2B104A73EC3180@SN4PR0401MB3663.namprd04.prod.outlook.com>
+References: <20200207092219.115056-1-tianjia.zhang@linux.alibaba.com>
+ <20200207092219.115056-2-tianjia.zhang@linux.alibaba.com>
+ <20200210031717.GA5198@sol.localdomain>
+ <1a623251-e83a-3b70-9fbd-8e929a23f7d8@linux.ibm.com>
+ <7a496bb15f264eab920bf081338d67af@MN2PR20MB2973.namprd20.prod.outlook.com>
+ <CY4PR0401MB36523805F71721000F188F2FC3190@CY4PR0401MB3652.namprd04.prod.outlook.com>
+ <3b21122352a44cb9a20030a32f07e38a@MN2PR20MB2973.namprd20.prod.outlook.com>
+In-Reply-To: <3b21122352a44cb9a20030a32f07e38a@MN2PR20MB2973.namprd20.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [188.204.2.113]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: ae7ca0bf-2d78-4fb2-75c8-08d7aec7d861
+x-ms-traffictypediagnostic: SN4PR0401MB3535:
+x-microsoft-antispam-prvs: <SN4PR0401MB3535D0DC6766B9512E14CBC4C3180@SN4PR0401MB3535.namprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-forefront-prvs: 0310C78181
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(366004)(396003)(136003)(376002)(346002)(39850400004)(199004)(189003)(86362001)(64756008)(2906002)(66556008)(66946007)(66476007)(66446008)(76116006)(316002)(186003)(5660300002)(54906003)(6916009)(71200400001)(8676002)(478600001)(81156014)(9686003)(53546011)(6506007)(81166006)(52536014)(4326008)(26005)(55016002)(8936002)(33656002)(7696005);DIR:OUT;SFP:1101;SCL:1;SRVR:SN4PR0401MB3535;H:SN4PR0401MB3663.namprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ypAjPRCYAOO2PiBRW88lCy83ZSAfvl13Ab2xON9a8j+ZhSrsokzkV/Rb0PDvA1M/pfYE1gOEoPKISj/Q2ktH/aDipP8Ae9Pg7j/apk7DL4i6/+CTpHdbhlDTrqXBsf6qL1fGqmfRO9uzkPlmOn3jLyg65zBDQ//cgCajxqWLhQihvWbXmayqXklo14tklEYxzX6FDUoeX1aaceTtZNe+HOBDFKSTXXKp2OUEbscum4NdJU55dH7j69MOInpfRj5/A1YgF/9Lu4p81yNpsZqxa1OVq1R4ba1AO+fZUHXYnZY2XLr2WwrpJxmZZuV3C9415PDpOpDSEr6YseWOVqbGfJ+q5mNP6gdf9Os/miwUDVEFuoevI/SOwoWnT2pJncDd5jnYcNhW2rrP1wCd7nnvnybHBXS3jKDm+pEIYw+BZj/5Uo2Y7b1O56kc6//E5KUH
+x-ms-exchange-antispam-messagedata: yP9JTU4ai/qunQUnSGCRJeQ6Y6G0xPTZHrH17pJ2bBfrxoZl//TaWg0i7w/oYMVOqPXEKGht8fEOuQPQ8lQecONUqQVEUlgjUUGZ8tCBUgVyslNDIir/F5PtRz96ATElL4Pf/9XC7G3q1zSsdrZanA==
+x-ms-exchange-transport-forked: True
+MIME-Version: 1.0
+X-OriginatorOrg: rambus.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ae7ca0bf-2d78-4fb2-75c8-08d7aec7d861
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Feb 2020 07:56:04.6906
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: bd0ba799-c2b9-413c-9c56-5d1731c4827c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: P0HSWzEqOeWZLXwu4+jNag870tJg9ps/vfTTATY27NUncvUt1uZf0HLvKxdhdd19dqBZXS6nK++hO1UCqAqNEw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR0401MB3535
+X-MC-Unique: c3Av0bl4MUyNuJHQS-QQvQ-1
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: rambus.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Register qm to uacce framework for user crypto driver
-
-Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Signed-off-by: Zhangfei Gao <zhangfei.gao@linaro.org>
-Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
----
- drivers/crypto/hisilicon/qm.c           | 239 +++++++++++++++++++++++-
- drivers/crypto/hisilicon/qm.h           |  11 ++
- drivers/crypto/hisilicon/zip/zip_main.c |  18 +-
- include/uapi/misc/uacce/hisi_qm.h       |  23 +++
- 4 files changed, 283 insertions(+), 8 deletions(-)
- create mode 100644 include/uapi/misc/uacce/hisi_qm.h
-
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index b57da5ef8b5b..61cf3f52ca6e 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -9,6 +9,9 @@
- #include <linux/log2.h>
- #include <linux/seq_file.h>
- #include <linux/slab.h>
-+#include <linux/uacce.h>
-+#include <linux/uaccess.h>
-+#include <uapi/misc/uacce/hisi_qm.h>
- #include "qm.h"
- 
- /* eq/aeq irq enable */
-@@ -465,9 +468,14 @@ static void qm_cq_head_update(struct hisi_qp *qp)
- 
- static void qm_poll_qp(struct hisi_qp *qp, struct hisi_qm *qm)
- {
--	struct qm_cqe *cqe = qp->cqe + qp->qp_status.cq_head;
-+	if (qp->event_cb) {
-+		qp->event_cb(qp);
-+		return;
-+	}
- 
- 	if (qp->req_cb) {
-+		struct qm_cqe *cqe = qp->cqe + qp->qp_status.cq_head;
-+
- 		while (QM_CQE_PHASE(cqe) == qp->qp_status.cqc_phase) {
- 			dma_rmb();
- 			qp->req_cb(qp, qp->sqe + qm->sqe_size *
-@@ -1269,7 +1277,7 @@ static int qm_qp_ctx_cfg(struct hisi_qp *qp, int qp_id, int pasid)
-  * @qp: The qp we want to start to run.
-  * @arg: Accelerator specific argument.
-  *
-- * After this function, qp can receive request from user. Return qp_id if
-+ * After this function, qp can receive request from user. Return 0 if
-  * successful, Return -EBUSY if failed.
-  */
- int hisi_qm_start_qp(struct hisi_qp *qp, unsigned long arg)
-@@ -1314,7 +1322,7 @@ int hisi_qm_start_qp(struct hisi_qp *qp, unsigned long arg)
- 
- 	dev_dbg(dev, "queue %d started\n", qp_id);
- 
--	return qp_id;
-+	return 0;
- }
- EXPORT_SYMBOL_GPL(hisi_qm_start_qp);
- 
-@@ -1395,6 +1403,214 @@ static void hisi_qm_cache_wb(struct hisi_qm *qm)
- 	}
- }
- 
-+static void qm_qp_event_notifier(struct hisi_qp *qp)
-+{
-+	wake_up_interruptible(&qp->uacce_q->wait);
-+}
-+
-+static int hisi_qm_get_available_instances(struct uacce_device *uacce)
-+{
-+	int i, ret;
-+	struct hisi_qm *qm = uacce->priv;
-+
-+	read_lock(&qm->qps_lock);
-+	for (i = 0, ret = 0; i < qm->qp_num; i++)
-+		if (!qm->qp_array[i])
-+			ret++;
-+	read_unlock(&qm->qps_lock);
-+
-+	return ret;
-+}
-+
-+static int hisi_qm_uacce_get_queue(struct uacce_device *uacce,
-+				   unsigned long arg,
-+				   struct uacce_queue *q)
-+{
-+	struct hisi_qm *qm = uacce->priv;
-+	struct hisi_qp *qp;
-+	u8 alg_type = 0;
-+
-+	qp = hisi_qm_create_qp(qm, alg_type);
-+	if (IS_ERR(qp))
-+		return PTR_ERR(qp);
-+
-+	q->priv = qp;
-+	q->uacce = uacce;
-+	qp->uacce_q = q;
-+	qp->event_cb = qm_qp_event_notifier;
-+	qp->pasid = arg;
-+
-+	return 0;
-+}
-+
-+static void hisi_qm_uacce_put_queue(struct uacce_queue *q)
-+{
-+	struct hisi_qp *qp = q->priv;
-+
-+	hisi_qm_cache_wb(qp->qm);
-+	hisi_qm_release_qp(qp);
-+}
-+
-+/* map sq/cq/doorbell to user space */
-+static int hisi_qm_uacce_mmap(struct uacce_queue *q,
-+			      struct vm_area_struct *vma,
-+			      struct uacce_qfile_region *qfr)
-+{
-+	struct hisi_qp *qp = q->priv;
-+	struct hisi_qm *qm = qp->qm;
-+	size_t sz = vma->vm_end - vma->vm_start;
-+	struct pci_dev *pdev = qm->pdev;
-+	struct device *dev = &pdev->dev;
-+	unsigned long vm_pgoff;
-+	int ret;
-+
-+	switch (qfr->type) {
-+	case UACCE_QFRT_MMIO:
-+		if (qm->ver == QM_HW_V2) {
-+			if (sz > PAGE_SIZE * (QM_DOORBELL_PAGE_NR +
-+			    QM_DOORBELL_SQ_CQ_BASE_V2 / PAGE_SIZE))
-+				return -EINVAL;
-+		} else {
-+			if (sz > PAGE_SIZE * QM_DOORBELL_PAGE_NR)
-+				return -EINVAL;
-+		}
-+
-+		vma->vm_flags |= VM_IO;
-+
-+		return remap_pfn_range(vma, vma->vm_start,
-+				       qm->phys_base >> PAGE_SHIFT,
-+				       sz, pgprot_noncached(vma->vm_page_prot));
-+	case UACCE_QFRT_DUS:
-+		if (sz != qp->qdma.size)
-+			return -EINVAL;
-+
-+		/*
-+		 * dma_mmap_coherent() requires vm_pgoff as 0
-+		 * restore vm_pfoff to initial value for mmap()
-+		 */
-+		vm_pgoff = vma->vm_pgoff;
-+		vma->vm_pgoff = 0;
-+		ret = dma_mmap_coherent(dev, vma, qp->qdma.va,
-+					qp->qdma.dma, sz);
-+		vma->vm_pgoff = vm_pgoff;
-+		return ret;
-+
-+	default:
-+		return -EINVAL;
-+	}
-+}
-+
-+static int hisi_qm_uacce_start_queue(struct uacce_queue *q)
-+{
-+	struct hisi_qp *qp = q->priv;
-+
-+	return hisi_qm_start_qp(qp, qp->pasid);
-+}
-+
-+static void hisi_qm_uacce_stop_queue(struct uacce_queue *q)
-+{
-+	hisi_qm_stop_qp(q->priv);
-+}
-+
-+static int qm_set_sqctype(struct uacce_queue *q, u16 type)
-+{
-+	struct hisi_qm *qm = q->uacce->priv;
-+	struct hisi_qp *qp = q->priv;
-+
-+	write_lock(&qm->qps_lock);
-+	qp->alg_type = type;
-+	write_unlock(&qm->qps_lock);
-+
-+	return 0;
-+}
-+
-+static long hisi_qm_uacce_ioctl(struct uacce_queue *q, unsigned int cmd,
-+				unsigned long arg)
-+{
-+	struct hisi_qp *qp = q->priv;
-+	struct hisi_qp_ctx qp_ctx;
-+
-+	if (cmd == UACCE_CMD_QM_SET_QP_CTX) {
-+		if (copy_from_user(&qp_ctx, (void __user *)arg,
-+				   sizeof(struct hisi_qp_ctx)))
-+			return -EFAULT;
-+
-+		if (qp_ctx.qc_type != 0 && qp_ctx.qc_type != 1)
-+			return -EINVAL;
-+
-+		qm_set_sqctype(q, qp_ctx.qc_type);
-+		qp_ctx.id = qp->qp_id;
-+
-+		if (copy_to_user((void __user *)arg, &qp_ctx,
-+				 sizeof(struct hisi_qp_ctx)))
-+			return -EFAULT;
-+	} else {
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static const struct uacce_ops uacce_qm_ops = {
-+	.get_available_instances = hisi_qm_get_available_instances,
-+	.get_queue = hisi_qm_uacce_get_queue,
-+	.put_queue = hisi_qm_uacce_put_queue,
-+	.start_queue = hisi_qm_uacce_start_queue,
-+	.stop_queue = hisi_qm_uacce_stop_queue,
-+	.mmap = hisi_qm_uacce_mmap,
-+	.ioctl = hisi_qm_uacce_ioctl,
-+};
-+
-+static int qm_alloc_uacce(struct hisi_qm *qm)
-+{
-+	struct pci_dev *pdev = qm->pdev;
-+	struct uacce_device *uacce;
-+	unsigned long mmio_page_nr;
-+	unsigned long dus_page_nr;
-+	struct uacce_interface interface = {
-+		.flags = UACCE_DEV_SVA,
-+		.ops = &uacce_qm_ops,
-+	};
-+
-+	strncpy(interface.name, pdev->driver->name, sizeof(interface.name));
-+
-+	uacce = uacce_alloc(&pdev->dev, &interface);
-+	if (IS_ERR(uacce))
-+		return PTR_ERR(uacce);
-+
-+	if (uacce->flags & UACCE_DEV_SVA) {
-+		qm->use_sva = true;
-+	} else {
-+		/* only consider sva case */
-+		uacce_remove(uacce);
-+		qm->uacce = NULL;
-+		return -EINVAL;
-+	}
-+
-+	uacce->is_vf = pdev->is_virtfn;
-+	uacce->priv = qm;
-+	uacce->algs = qm->algs;
-+
-+	if (qm->ver == QM_HW_V1) {
-+		mmio_page_nr = QM_DOORBELL_PAGE_NR;
-+		uacce->api_ver = HISI_QM_API_VER_BASE;
-+	} else {
-+		mmio_page_nr = QM_DOORBELL_PAGE_NR +
-+			QM_DOORBELL_SQ_CQ_BASE_V2 / PAGE_SIZE;
-+		uacce->api_ver = HISI_QM_API_VER2_BASE;
-+	}
-+
-+	dus_page_nr = (PAGE_SIZE - 1 + qm->sqe_size * QM_Q_DEPTH +
-+		       sizeof(struct qm_cqe) * QM_Q_DEPTH) >> PAGE_SHIFT;
-+
-+	uacce->qf_pg_num[UACCE_QFRT_MMIO] = mmio_page_nr;
-+	uacce->qf_pg_num[UACCE_QFRT_DUS]  = dus_page_nr;
-+
-+	qm->uacce = uacce;
-+
-+	return 0;
-+}
-+
- /**
-  * hisi_qm_get_free_qp_num() - Get free number of qp in qm.
-  * @qm: The qm which want to get free qp.
-@@ -1437,10 +1653,14 @@ int hisi_qm_init(struct hisi_qm *qm)
- 		return -EINVAL;
- 	}
- 
-+	ret = qm_alloc_uacce(qm);
-+	if (ret < 0)
-+		dev_warn(&pdev->dev, "fail to alloc uacce (%d)\n", ret);
-+
- 	ret = pci_enable_device_mem(pdev);
- 	if (ret < 0) {
- 		dev_err(&pdev->dev, "Failed to enable device mem!\n");
--		return ret;
-+		goto err_remove_uacce;
- 	}
- 
- 	ret = pci_request_mem_regions(pdev, qm->dev_name);
-@@ -1449,8 +1669,9 @@ int hisi_qm_init(struct hisi_qm *qm)
- 		goto err_disable_pcidev;
- 	}
- 
--	qm->io_base = ioremap(pci_resource_start(pdev, PCI_BAR_2),
--			      pci_resource_len(qm->pdev, PCI_BAR_2));
-+	qm->phys_base = pci_resource_start(pdev, PCI_BAR_2);
-+	qm->phys_size = pci_resource_len(qm->pdev, PCI_BAR_2);
-+	qm->io_base = ioremap(qm->phys_base, qm->phys_size);
- 	if (!qm->io_base) {
- 		ret = -EIO;
- 		goto err_release_mem_regions;
-@@ -1493,6 +1714,9 @@ int hisi_qm_init(struct hisi_qm *qm)
- 	pci_release_mem_regions(pdev);
- err_disable_pcidev:
- 	pci_disable_device(pdev);
-+err_remove_uacce:
-+	uacce_remove(qm->uacce);
-+	qm->uacce = NULL;
- 
- 	return ret;
- }
-@@ -1509,6 +1733,9 @@ void hisi_qm_uninit(struct hisi_qm *qm)
- 	struct pci_dev *pdev = qm->pdev;
- 	struct device *dev = &pdev->dev;
- 
-+	uacce_remove(qm->uacce);
-+	qm->uacce = NULL;
-+
- 	if (qm->use_dma_api && qm->qdma.va) {
- 		hisi_qm_cache_wb(qm);
- 		dma_free_coherent(dev, qm->qdma.size,
-diff --git a/drivers/crypto/hisilicon/qm.h b/drivers/crypto/hisilicon/qm.h
-index 078b8f1f1b77..c096f80a1333 100644
---- a/drivers/crypto/hisilicon/qm.h
-+++ b/drivers/crypto/hisilicon/qm.h
-@@ -77,6 +77,9 @@
- 
- #define HISI_ACC_SGL_SGE_NR_MAX		255
- 
-+/* page number for queue file region */
-+#define QM_DOORBELL_PAGE_NR		1
-+
- enum qp_state {
- 	QP_STOP,
- };
-@@ -162,7 +165,12 @@ struct hisi_qm {
- 	u32 error_mask;
- 	u32 msi_mask;
- 
-+	const char *algs;
- 	bool use_dma_api;
-+	bool use_sva;
-+	resource_size_t phys_base;
-+	resource_size_t phys_size;
-+	struct uacce_device *uacce;
- };
- 
- struct hisi_qp_status {
-@@ -192,10 +200,13 @@ struct hisi_qp {
- 	struct hisi_qp_ops *hw_ops;
- 	void *qp_ctx;
- 	void (*req_cb)(struct hisi_qp *qp, void *data);
-+	void (*event_cb)(struct hisi_qp *qp);
- 	struct work_struct work;
- 	struct workqueue_struct *wq;
- 
- 	struct hisi_qm *qm;
-+	u16 pasid;
-+	struct uacce_queue *uacce_q;
- };
- 
- int hisi_qm_init(struct hisi_qm *qm);
-diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index 93345f0d7415..013252824f88 100644
---- a/drivers/crypto/hisilicon/zip/zip_main.c
-+++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -11,6 +11,7 @@
- #include <linux/pci.h>
- #include <linux/seq_file.h>
- #include <linux/topology.h>
-+#include <linux/uacce.h>
- #include "zip.h"
- 
- #define PCI_DEVICE_ID_ZIP_PF		0xa250
-@@ -350,8 +351,14 @@ static void hisi_zip_set_user_domain_and_cache(struct hisi_zip *hisi_zip)
- 	writel(AXUSER_BASE, base + HZIP_BD_RUSER_32_63);
- 	writel(AXUSER_BASE, base + HZIP_SGL_RUSER_32_63);
- 	writel(AXUSER_BASE, base + HZIP_BD_WUSER_32_63);
--	writel(AXUSER_BASE, base + HZIP_DATA_RUSER_32_63);
--	writel(AXUSER_BASE, base + HZIP_DATA_WUSER_32_63);
-+
-+	if (hisi_zip->qm.use_sva) {
-+		writel(AXUSER_BASE | AXUSER_SSV, base + HZIP_DATA_RUSER_32_63);
-+		writel(AXUSER_BASE | AXUSER_SSV, base + HZIP_DATA_WUSER_32_63);
-+	} else {
-+		writel(AXUSER_BASE, base + HZIP_DATA_RUSER_32_63);
-+		writel(AXUSER_BASE, base + HZIP_DATA_WUSER_32_63);
-+	}
- 
- 	/* let's open all compression/decompression cores */
- 	writel(DECOMP_CHECK_ENABLE | ALL_COMP_DECOMP_EN,
-@@ -792,6 +799,7 @@ static int hisi_zip_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	qm->pdev = pdev;
- 	qm->ver = rev_id;
- 
-+	qm->algs = "zlib\ngzip";
- 	qm->sqe_size = HZIP_SQE_SIZE;
- 	qm->dev_name = hisi_zip_name;
- 	qm->fun_type = (pdev->device == PCI_DEVICE_ID_ZIP_PF) ? QM_HW_PF :
-@@ -835,6 +843,12 @@ static int hisi_zip_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 
- 	hisi_zip_add_to_list(hisi_zip);
- 
-+	if (qm->uacce) {
-+		ret = uacce_register(qm->uacce);
-+		if (ret)
-+			goto err_qm_uninit;
-+	}
-+
- 	if (qm->fun_type == QM_HW_PF && vfs_num > 0) {
- 		ret = hisi_zip_sriov_enable(pdev, vfs_num);
- 		if (ret < 0)
-diff --git a/include/uapi/misc/uacce/hisi_qm.h b/include/uapi/misc/uacce/hisi_qm.h
-new file mode 100644
-index 000000000000..6435f0bcb556
---- /dev/null
-+++ b/include/uapi/misc/uacce/hisi_qm.h
-@@ -0,0 +1,23 @@
-+/* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
-+#ifndef _UAPI_HISI_QM_H
-+#define _UAPI_HISI_QM_H
-+
-+#include <linux/types.h>
-+
-+/**
-+ * struct hisi_qp_ctx - User data for hisi qp.
-+ * @id: qp_index return to user space
-+ * @qc_type: Accelerator algorithm type
-+ */
-+struct hisi_qp_ctx {
-+	__u16 id;
-+	__u16 qc_type;
-+};
-+
-+#define HISI_QM_API_VER_BASE "hisi_qm_v1"
-+#define HISI_QM_API_VER2_BASE "hisi_qm_v2"
-+
-+/* UACCE_CMD_QM_SET_QP_CTX: Set qp algorithm type */
-+#define UACCE_CMD_QM_SET_QP_CTX	_IOWR('H', 10, struct hisi_qp_ctx)
-+
-+#endif
--- 
-2.23.0
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBsaW51eC1jcnlwdG8tb3duZXJA
+dmdlci5rZXJuZWwub3JnIDxsaW51eC1jcnlwdG8tb3duZXJAdmdlci5rZXJuZWwub3JnPiBPbiBC
+ZWhhbGYgT2YgS2VuIEdvbGRtYW4NCj4gU2VudDogTW9uZGF5LCBGZWJydWFyeSAxMCwgMjAyMCA3
+OjAzIFBNDQo+IENjOiBsaW51eC1jcnlwdG9Admdlci5rZXJuZWwub3JnOyBsaW51eC1pbnRlZ3Jp
+dHlAdmdlci5rZXJuZWwub3JnOyBsaW51eC1zZWN1cml0eS1tb2R1bGVAdmdlci5rZXJuZWwub3Jn
+OyBsaW51eC0NCj4ga2VybmVsQHZnZXIua2VybmVsLm9yZw0KPiBTdWJqZWN0OiBSZTogW1BBVENI
+IDEvMl0gY3J5cHRvOiBzbTMgLSBhZGQgYSBuZXcgYWxpYXMgbmFtZSBzbTMtMjU2DQo+DQo+IDw8
+PCBFeHRlcm5hbCBFbWFpbCA+Pj4NCj4gQ0FVVElPTjogVGhpcyBlbWFpbCBvcmlnaW5hdGVkIGZy
+b20gb3V0c2lkZSBvZiB0aGUgb3JnYW5pemF0aW9uLiBEbyBub3QgY2xpY2sgbGlua3Mgb3Igb3Bl
+biBhdHRhY2htZW50cyB1bmxlc3MgeW91IHJlY29nbml6ZSB0aGUNCj4gc2VuZGVyL3NlbmRlciBh
+ZGRyZXNzIGFuZCBrbm93IHRoZSBjb250ZW50IGlzIHNhZmUuDQo+DQo+DQo+IE9uIDIvMTAvMjAy
+MCAxMjowMSBQTSwgVmFuIExlZXV3ZW4sIFBhc2NhbCB3cm90ZToNCj4gPiBXZWxsLCB0aGUgY3Vy
+cmVudCBzcGVjaWZpY2F0aW9uIHN1cmVseSBkb2Vzbid0IGRlZmluZSBhbnl0aGluZyBlbHNlIGFu
+ZCBpcw0KPiA+IGFscmVhZHkgb3ZlciBhIGRlY2FkZSBvbGQuIFNvIHdoYXQgd291bGQgYmUgdGhl
+IG9kZHMgdGhhdCB0aGV5IGFkZCBhDQo+ID4gZGlmZmVyZW50IGJsb2Nrc2l6ZSB2YXJpYW50X25v
+d18gIEFORCBzdGlsbCBjYWxsIHRoYXQgU00zLXNvbWV0aGluZz8NCj4NCj4gSSBqdXN0IGdvdCBh
+IG5vdGUgZnJvbSBhIGNyeXB0b2dyYXBoZXIgd2hvIHNhaWQgdGhlcmUgd2VyZSBkaXNjdXNzaW9u
+cw0KPiBsYXN0IHllYXIgYWJvdXQgYSBmdXR1cmUgU00zIHdpdGggNTEyIGJpdCBvdXRwdXQuDQo+
+DQo+IEdpdmVuIHRoYXQsIHdoeSBub3QgcGxhbiBhaGVhZCBhbmQgdXNlIHNtMy0yNTY/ICBJcyB0
+aGVyZSBhbnkgZG93bnNpZGU/DQo+IElzIHRoZSBjb3N0IGFueSBtb3JlIHRoYW4gNCBieXRlcyBp
+biBzb21lIHNvdXJjZSBjb2RlPw0KPg0KDQpJdCBpcyBhY3R1YWxseSBleHBvcnRlZCBhcyAic20z
+IiBieSBhbGwgaW1wbGVtZW50YXRpb25zLCBpdCdzIGp1c3QgdGhpcyBvbmUgcmVmZXJlbmNlIHRo
+YXQgd2FzIG9mZi4NClNvIGZpeGluZyB0aGF0IG9uZSByZWZlcmVuY2UgaXMgbGVzcyBlZmZvcnQg
+dGhhbiBmaXhpbmcgYWxsIGltcGxlbWVudGF0aW9ucy4NCkkgZG9uJ3QgdGhpbmsgYW55b25lIGNh
+cmVzIGFib3V0IHRoZSA0IGJ5dGVzIG9mIHNvdXJjZSBjb2RlIC4uLg0KDQpBcyBmb3IgU00zLTUx
+MjogdGhhdCB3b3VsZCBieSBzaWxseSwgY29uc2lkZXJpbmcgcmVjZW50IGF0dGFja3MgZm91bmQg
+YWdhaW5zdCBzaW1pbGFyDQpNZXJrbGUtRGFybWdhcmQgc3RydWN0dXJlcy4gIFRoZW4gYWdhaW4s
+IEknbSBub3QgdGFsa2luZyB0byBDaGluZXNlIGNyeXB0b2dyYXBoZXJzLg0KSW4gYW55IGNhc2Us
+IHdoYXQgd291bGQgYmUgdGhlIHByb2JsZW0gd2l0aCBoYXZpbmcgInNtMyIgYW5kICJzbTMtNTEy
+Ij8NCk5vdGUgdGhhdCBub2JvZHkgaW4gdGhlIHdvcmxkIHJlZmVycyB0byB0aGUgY3VycmVudCBT
+TTMgYXMgIlNNMy0yNTYiLg0KDQpSZWdhcmRzLA0KUGFzY2FsIHZhbiBMZWV1d2VuDQpTaWxpY29u
+IElQIEFyY2hpdGVjdCBNdWx0aS1Qcm90b2NvbCBFbmdpbmVzLCBSYW1idXMgU2VjdXJpdHkNClJh
+bWJ1cyBST1RXIEhvbGRpbmcgQlYNCiszMS03MyA2NTgxOTUzDQoNCk5vdGU6IFRoZSBJbnNpZGUg
+U2VjdXJlL1ZlcmltYXRyaXggU2lsaWNvbiBJUCB0ZWFtIHdhcyByZWNlbnRseSBhY3F1aXJlZCBi
+eSBSYW1idXMuDQpQbGVhc2UgYmUgc28ga2luZCB0byB1cGRhdGUgeW91ciBlLW1haWwgYWRkcmVz
+cyBib29rIHdpdGggbXkgbmV3IGUtbWFpbCBhZGRyZXNzLg0KDQoNCioqIFRoaXMgbWVzc2FnZSBh
+bmQgYW55IGF0dGFjaG1lbnRzIGFyZSBmb3IgdGhlIHNvbGUgdXNlIG9mIHRoZSBpbnRlbmRlZCBy
+ZWNpcGllbnQocykuIEl0IG1heSBjb250YWluIGluZm9ybWF0aW9uIHRoYXQgaXMgY29uZmlkZW50
+aWFsIGFuZCBwcml2aWxlZ2VkLiBJZiB5b3UgYXJlIG5vdCB0aGUgaW50ZW5kZWQgcmVjaXBpZW50
+IG9mIHRoaXMgbWVzc2FnZSwgeW91IGFyZSBwcm9oaWJpdGVkIGZyb20gcHJpbnRpbmcsIGNvcHlp
+bmcsIGZvcndhcmRpbmcgb3Igc2F2aW5nIGl0LiBQbGVhc2UgZGVsZXRlIHRoZSBtZXNzYWdlIGFu
+ZCBhdHRhY2htZW50cyBhbmQgbm90aWZ5IHRoZSBzZW5kZXIgaW1tZWRpYXRlbHkuICoqDQoNClJh
+bWJ1cyBJbmMuPGh0dHA6Ly93d3cucmFtYnVzLmNvbT4NCg==
 
