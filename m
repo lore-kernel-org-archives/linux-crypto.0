@@ -2,114 +2,205 @@ Return-Path: <SRS0=l+Io=37=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA105C35242
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:23:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C11E4C47409
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:26:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 70ACA206D6
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:23:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="qaogSs3m"
+	by mail.kernel.org (Postfix) with ESMTP id B004720842
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 18:26:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729004AbgBKSXc (ORCPT
+        id S1730024AbgBKS0R (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Feb 2020 13:23:32 -0500
-Received: from mail-eopbgr20051.outbound.protection.outlook.com ([40.107.2.51]:5443
-        "EHLO EUR02-VE1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729169AbgBKSXc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Feb 2020 13:23:32 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cS76Go5dIgSaOXXvrINr9EhlRYZuPXR/jgHwNMh8GwtBvMuz4ruXMgDgMRQSyvEgfjYqRArPyeCTuh6w8TCH+4hBzOT2HSSCz4jD9VCa3XTVQL1ysw0hApPs0jUmtuPzaSeqn2YSAVh5jzqm0w6tAznhDBy2YDBgqFyLUk8LNMBfSvCJ4FVGGQrATCtBGlxOIB842dFjV0r9JvRsO37p9RV6uu43qrMT+QpbkhgHHBNX6fqEL6NHLRCFWHWjJg6V4+2hToDM4kS+s+7+MxH6Nfj5pftCA4gdBwLQDPaxo0g9o0exen8ThKsq9S7DVf2y90UkDd3l5t6b96TqaNXLNQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1xs20VpbpUL9XF2WJlkF6Mvu7881/xB2hjEaPx0vvgk=;
- b=edsYjrM+MNv9OCrpOSIuh6a0AtK8VHC4r1tRPFGHytCoHH7Wr6Lewt75lMJJLKcNt7eIHpgtDEc1ZI+sbj5Z6Eahz1Ef7ek95b3vm7PwILd/DTB4qsCR0BlCGSbRC91n5LzikWhtzOuMbVWggX850en6DmxWCmAeplhr2X1qh/UjBmGLc2D2xA0+xFuxFIaYxHNUF55xL717m5c9KjV2H3gYGwZC0UjUhKqZ6ogfl+cykloDgIbnPllHVsRkbNWfHjy2NLFJhW46KpAQTIT+smk0NKkthRaUH0wcWa/pvpaG03l6SrarWJ5zGEAOJedv8aYZxB/uE7+LJvXG7lxdbg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1xs20VpbpUL9XF2WJlkF6Mvu7881/xB2hjEaPx0vvgk=;
- b=qaogSs3m6U3sFq5rRUlvprleAfDPCxFc0SfISWu68FnnucfpbWcDx/aKQp1PNatspxOkKOt40U2NQ0lzgxFoNz6ZFl7T0Oiis3mcuu0t5GDKTNbZIehxODigKyCnsODID3ZbJ3kDYC274IM9jTYqstOYmuw8AG4Jm02rqLTkeY8=
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB3901.eurprd04.prod.outlook.com (52.134.12.16) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2707.21; Tue, 11 Feb 2020 18:23:28 +0000
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::85e9:f844:f8b0:27d]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::85e9:f844:f8b0:27d%7]) with mapi id 15.20.2707.030; Tue, 11 Feb 2020
- 18:23:28 +0000
-From:   Horia Geanta <horia.geanta@nxp.com>
-To:     Andrey Smirnov <andrew.smirnov@gmail.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     Chris Healy <cphealy@gmail.com>,
-        Lucas Stach <l.stach@pengutronix.de>,
+        Tue, 11 Feb 2020 13:26:17 -0500
+Received: from newton.telenet-ops.be ([195.130.132.45]:35662 "EHLO
+        newton.telenet-ops.be" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727764AbgBKS0R (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 11 Feb 2020 13:26:17 -0500
+X-Greylist: delayed 403 seconds by postgrey-1.27 at vger.kernel.org; Tue, 11 Feb 2020 13:26:15 EST
+Received: from baptiste.telenet-ops.be (baptiste.telenet-ops.be [IPv6:2a02:1800:120:4::f00:13])
+        by newton.telenet-ops.be (Postfix) with ESMTPS id 48H9z71JGWzMrJdr
+        for <linux-crypto@vger.kernel.org>; Tue, 11 Feb 2020 19:19:31 +0100 (CET)
+Received: from ramsan ([84.195.182.253])
+        by baptiste.telenet-ops.be with bizsmtp
+        id 1WKV2200S5USYZQ01WKV79; Tue, 11 Feb 2020 19:19:30 +0100
+Received: from rox.of.borg ([192.168.97.57])
+        by ramsan with esmtp (Exim 4.90_1)
+        (envelope-from <geert@linux-m68k.org>)
+        id 1j1a89-0002nz-JJ; Tue, 11 Feb 2020 19:19:29 +0100
+Received: from geert by rox.of.borg with local (Exim 4.90_1)
+        (envelope-from <geert@linux-m68k.org>)
+        id 1j1a89-0003yS-Hv; Tue, 11 Feb 2020 19:19:29 +0100
+From:   Geert Uytterhoeven <geert+renesas@glider.be>
+To:     Gilad Ben-Yossef <gilad@benyossef.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>
-Subject: Re: [PATCH v7 3/9] crypto: caam - use devm_kzalloc to allocate JR
- data
-Thread-Topic: [PATCH v7 3/9] crypto: caam - use devm_kzalloc to allocate JR
- data
-Thread-Index: AQHV1TLRWesVqHI1ZkCUMB3X/8VqBg==
-Date:   Tue, 11 Feb 2020 18:23:28 +0000
-Message-ID: <VI1PR0402MB348585D73873E2DFE6B8751698180@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <20200127165646.19806-1-andrew.smirnov@gmail.com>
- <20200127165646.19806-4-andrew.smirnov@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=horia.geanta@nxp.com; 
-x-originating-ip: [84.117.251.185]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: bb5e2784-d242-49a6-ffa5-08d7af1f7dd4
-x-ms-traffictypediagnostic: VI1PR0402MB3901:|VI1PR0402MB3901:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <VI1PR0402MB39019ABD5D16F0EE32A3C2B098180@VI1PR0402MB3901.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:612;
-x-forefront-prvs: 0310C78181
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(39860400002)(376002)(346002)(366004)(136003)(189003)(199004)(54906003)(4744005)(26005)(110136005)(186003)(91956017)(8676002)(44832011)(8936002)(81166006)(81156014)(66476007)(66446008)(66946007)(66556008)(64756008)(478600001)(76116006)(71200400001)(2906002)(6506007)(53546011)(33656002)(316002)(86362001)(7696005)(52536014)(9686003)(5660300002)(55016002)(4326008);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3901;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: u0Dw3+qX+03Ct2DGvoiNqVhc28RI7+51BySRc3YR8rKe8YUzigI4HEPG/4boC1PuOuwcsn1dUzZNSQBzteUZE1eaugMvB+PDerbf3C9sQvxJNkAmzqEfqt34aeSC3Xr56yIWuCNtuJ9Vxcwbyr+x4eBRowxk5E1Suwe0w9wXHDtAkMCk01zoqT9z+tnyNTKgvGsC7C3QZJk8jqaoUPKhviPu7wYtTC8K4inVYGCHA+a0Ai6E49PMkK+gMXooT+gGWkz+0Mo1Xlj6illEG2pNUXwktHrqn9OXxD59ns6qXxQlzYQabGfxMlfqG7KBML4pGBVlJJC1tfzsjCf1pkdhtXpRK2MQsxlRrY+EyordR7G8yVJjWox8FKezrBt4zuI7FWRl5cgbLEtvicxdAlfz0K0jfnjdu6SSwOMOzQaPd93SZTXapgocMzCBG0Vra2DC
-x-ms-exchange-antispam-messagedata: SYhgYwUlHsdf744tksmOJzF7Gri2tspLbZLVc4S1dmAPcCJNXsQGWcgYD1dcd8YMXRrCVOQ2uJXDM3uPqyXCbqr0bZ5WNlMSIMai6uJmmkzvw3KSboO86PD5P55XdYbAckjvynFk/o4X18W+gy5zcQ==
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bb5e2784-d242-49a6-ffa5-08d7af1f7dd4
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Feb 2020 18:23:28.4473
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 4d5bVzWf6XJFS8hIyI/S104yeHKmBHq8OX0Kadp0mlpqHJBzM2HuWtjYRQU3no6EG/jkAtcYlQlAMSzfR2RlqQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3901
+        "David S . Miller" <davem@davemloft.net>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "Rafael J . Wysocki" <rafael@kernel.org>,
+        linux-crypto@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Geert Uytterhoeven <geert+renesas@glider.be>
+Subject: [PATCH v2 08/34] crypto: ccree - clean up clock handling
+Date:   Tue, 11 Feb 2020 19:19:02 +0100
+Message-Id: <20200211181928.15178-9-geert+renesas@glider.be>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200211181928.15178-1-geert+renesas@glider.be>
+References: <20200211181928.15178-1-geert+renesas@glider.be>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 1/27/2020 6:57 PM, Andrey Smirnov wrote:=0A=
-> Use devm_kzalloc() to allocate JR data in order to make sure that it=0A=
-> is initialized consistently every time.=0A=
-> =0A=
-The commit message is a bit vague.=0A=
-=0A=
-I assume this is needed in patch 4/9, which adds a new member (hwrng)=0A=
-in caam_drv_private_jr structure.=0A=
-=0A=
-If so, it's probably better to have the change merged into patch 4/9.=0A=
-=0A=
-Horia=0A=
+Use devm_clk_get_optional() instead of devm_clk_get() and explicit
+optional clock handling.
+As clk_prepare_enable() and clk_disable_unprepare() handle optional
+clocks fine, the cc_clk_on() and cc_clk_off() wrappers can be removed.
+
+While at it, use the new "%pe" format specifier to print error codes.
+
+Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+---
+v2:
+  - New.
+
+ drivers/crypto/ccree/cc_driver.c | 55 ++++++--------------------------
+ drivers/crypto/ccree/cc_driver.h |  2 --
+ drivers/crypto/ccree/cc_pm.c     |  4 +--
+ 3 files changed, 11 insertions(+), 50 deletions(-)
+
+diff --git a/drivers/crypto/ccree/cc_driver.c b/drivers/crypto/ccree/cc_driver.c
+index f8aba89e48730e4d..a7b7f65939e2f620 100644
+--- a/drivers/crypto/ccree/cc_driver.c
++++ b/drivers/crypto/ccree/cc_driver.c
+@@ -302,22 +302,12 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 	platform_set_drvdata(plat_dev, new_drvdata);
+ 	new_drvdata->plat_dev = plat_dev;
+ 
+-	clk = devm_clk_get(dev, NULL);
+-	if (IS_ERR(clk))
+-		switch (PTR_ERR(clk)) {
+-		/* Clock is optional so this might be fine */
+-		case -ENOENT:
+-			break;
+-
+-		/* Clock not available, let's try again soon */
+-		case -EPROBE_DEFER:
+-			return -EPROBE_DEFER;
+-
+-		default:
+-			dev_err(dev, "Error getting clock: %ld\n",
+-				PTR_ERR(clk));
+-			return PTR_ERR(clk);
+-		}
++	clk = devm_clk_get_optional(dev, NULL);
++	if (IS_ERR(clk)) {
++		if (PTR_ERR(clk) != -EPROBE_DEFER)
++			dev_err(dev, "Error getting clock: %pe\n", clk);
++		return PTR_ERR(clk);
++	}
+ 	new_drvdata->clk = clk;
+ 
+ 	new_drvdata->coherent = of_dma_is_coherent(np);
+@@ -362,7 +352,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ 		return rc;
+ 	}
+ 
+-	rc = cc_clk_on(new_drvdata);
++	rc = clk_prepare_enable(new_drvdata->clk);
+ 	if (rc) {
+ 		dev_err(dev, "Failed to enable clock");
+ 		return rc;
+@@ -545,7 +535,7 @@ static int init_cc_resources(struct platform_device *plat_dev)
+ post_regs_err:
+ 	fini_cc_regs(new_drvdata);
+ post_clk_err:
+-	cc_clk_off(new_drvdata);
++	clk_disable_unprepare(new_drvdata->clk);
+ 	return rc;
+ }
+ 
+@@ -569,23 +559,7 @@ static void cleanup_cc_resources(struct platform_device *plat_dev)
+ 	cc_fips_fini(drvdata);
+ 	cc_debugfs_fini(drvdata);
+ 	fini_cc_regs(drvdata);
+-	cc_clk_off(drvdata);
+-}
+-
+-int cc_clk_on(struct cc_drvdata *drvdata)
+-{
+-	struct clk *clk = drvdata->clk;
+-	int rc;
+-
+-	if (IS_ERR(clk))
+-		/* Not all devices have a clock associated with CCREE  */
+-		return 0;
+-
+-	rc = clk_prepare_enable(clk);
+-	if (rc)
+-		return rc;
+-
+-	return 0;
++	clk_disable_unprepare(drvdata->clk);
+ }
+ 
+ unsigned int cc_get_default_hash_len(struct cc_drvdata *drvdata)
+@@ -596,17 +570,6 @@ unsigned int cc_get_default_hash_len(struct cc_drvdata *drvdata)
+ 		return HASH_LEN_SIZE_630;
+ }
+ 
+-void cc_clk_off(struct cc_drvdata *drvdata)
+-{
+-	struct clk *clk = drvdata->clk;
+-
+-	if (IS_ERR(clk))
+-		/* Not all devices have a clock associated with CCREE */
+-		return;
+-
+-	clk_disable_unprepare(clk);
+-}
+-
+ static int ccree_probe(struct platform_device *plat_dev)
+ {
+ 	int rc;
+diff --git a/drivers/crypto/ccree/cc_driver.h b/drivers/crypto/ccree/cc_driver.h
+index c227718ba9923472..b983e721f2f758fe 100644
+--- a/drivers/crypto/ccree/cc_driver.h
++++ b/drivers/crypto/ccree/cc_driver.h
+@@ -212,8 +212,6 @@ static inline void dump_byte_array(const char *name, const u8 *the_array,
+ bool cc_wait_for_reset_completion(struct cc_drvdata *drvdata);
+ int init_cc_regs(struct cc_drvdata *drvdata, bool is_probe);
+ void fini_cc_regs(struct cc_drvdata *drvdata);
+-int cc_clk_on(struct cc_drvdata *drvdata);
+-void cc_clk_off(struct cc_drvdata *drvdata);
+ unsigned int cc_get_default_hash_len(struct cc_drvdata *drvdata);
+ 
+ static inline void cc_iowrite(struct cc_drvdata *drvdata, u32 reg, u32 val)
+diff --git a/drivers/crypto/ccree/cc_pm.c b/drivers/crypto/ccree/cc_pm.c
+index 24c368b866f6b5ea..81376173c3ecf48f 100644
+--- a/drivers/crypto/ccree/cc_pm.c
++++ b/drivers/crypto/ccree/cc_pm.c
+@@ -26,7 +26,7 @@ int cc_pm_suspend(struct device *dev)
+ 	dev_dbg(dev, "set HOST_POWER_DOWN_EN\n");
+ 	fini_cc_regs(drvdata);
+ 	cc_iowrite(drvdata, CC_REG(HOST_POWER_DOWN_EN), POWER_DOWN_ENABLE);
+-	cc_clk_off(drvdata);
++	clk_disable_unprepare(drvdata->clk);
+ 	return 0;
+ }
+ 
+@@ -37,7 +37,7 @@ int cc_pm_resume(struct device *dev)
+ 
+ 	dev_dbg(dev, "unset HOST_POWER_DOWN_EN\n");
+ 	/* Enables the device source clk */
+-	rc = cc_clk_on(drvdata);
++	rc = clk_prepare_enable(drvdata->clk);
+ 	if (rc) {
+ 		dev_err(dev, "failed getting clock back on. We're toast.\n");
+ 		return rc;
+-- 
+2.17.1
+
