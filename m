@@ -1,280 +1,188 @@
 Return-Path: <SRS0=l+Io=37=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Level: *
+X-Spam-Status: No, score=1.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40083C352A3
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 12:21:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31D43C352A3
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 12:25:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 17E4C206DB
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 12:21:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1581423664;
-	bh=sBRtfGkql7WuIgjfYrTGpRDtx+DaytPT7CqY450J90E=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=ZPsIsw/2k+FqV9DWfIxaKIT6xiz7XoDOdKoaCKL72RfF16cS5IuzcfpAdx4LO+rQg
-	 DOudfkykMNaAODtvbtT0aXPzGB9DE1heatstZg2lyDH/9ZRldKtc7O78UY0il46iY6
-	 vicbcj0k5o1XntuEIlXJrZuQTuSE8xd7Xko0BJtE=
+	by mail.kernel.org (Postfix) with ESMTP id D625C20714
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 12:25:53 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="meoRpJzG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728740AbgBKMVD (ORCPT
+        id S1728540AbgBKMZx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Feb 2020 07:21:03 -0500
-Received: from foss.arm.com ([217.140.110.172]:44946 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728404AbgBKMVD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Feb 2020 07:21:03 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id ACFC931B;
-        Tue, 11 Feb 2020 04:21:02 -0800 (PST)
-Received: from localhost (unknown [10.37.6.21])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3110E3F6CF;
-        Tue, 11 Feb 2020 04:21:02 -0800 (PST)
-From:   Mark Brown <broonie@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        Mark Brown <broonie@kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH 2/2] arm64: crypto: Modernize names for AES function macros
-Date:   Tue, 11 Feb 2020 12:20:53 +0000
-Message-Id: <20200211122053.6079-2-broonie@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200211122053.6079-1-broonie@kernel.org>
-References: <20200211122053.6079-1-broonie@kernel.org>
+        Tue, 11 Feb 2020 07:25:53 -0500
+Received: from mail-eopbgr30083.outbound.protection.outlook.com ([40.107.3.83]:4366
+        "EHLO EUR03-AM5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727887AbgBKMZx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 11 Feb 2020 07:25:53 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=g9exbgStF+Rnf2q2cJrWnBsUllsdAtGheN39/5+v2FBz7k5JaSUJK5AtbfZgPbLFauMB2hmCU515GgdhfbPYRuJZPF7tGrgNt/kk0D32NFEm4ERrlrcHhgxszNIiUfc7LAcLryM/Zebr4xWfb6pKnhJ1klpD2txn9rwqRS4NtNEAJlhzj5y5wEV33fbU/s9T/GqGoOs5EM7y+xRqZ/6Sa3NqtYw0jmeEXDkr827sTqbbtS9xyi633OKsBGhnyyeAs+8A3595mGLEwIiru7hzCYF5vTACERAnJXyisDMqxw/iNV3CNAZP0yqG9OB4kN8m+7vlhaRwcu3sWenX50bPbw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Qxjmzh0o2QKrAHpD+MFKKmRcBjIpn7pzlyWEtkwg45s=;
+ b=RPHVNWomZ90UesdtKX03lfePAzP2U6NuzZiFKiBU3UIDEuoucXeQcFv6r7TI8smg3nNXUOq0Gky0RAMq96Cb3iD4+TG/DjqQNkZK+D+CAJS+vLZ3mGQTNlhiiqZLqtnWRDClv4YiZgEuykhOVawQ0iH/N2TzIu9UDFIsPSIJ/Y3YNhQxezEQcwUTa/uZC27nEp+shRKbUb9fDIq1Jv+ZxJpLMPm5HE3o5pPthEZ9rUnp/7bieiQ/tsL6TPg1m7yweplDwvxSGNnNvbOpdcDPjc9gjIS3IEHtwG8tnqyUPMsB85qL8ygwcIQrxULAX7YtE0ArfxnfUwPoMOeGEl+yyg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Qxjmzh0o2QKrAHpD+MFKKmRcBjIpn7pzlyWEtkwg45s=;
+ b=meoRpJzGOUmQQ2ylu1DYFcMONgcVabzbOOrDosxthig3RHr8RFD2lZnhuosV0JQUPN2hf3jkdC4nk1+e4qfE1mIvWxkRhRgtVGV8WZkt9aYfWqqDLZRpjcItOvsfRcrqnQ5zT2eGawkbH3N1txsqWCiT7N0irnIpqIm8P/1I6PQ=
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
+ VI1PR0402MB2880.eurprd04.prod.outlook.com (10.175.22.147) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2707.21; Tue, 11 Feb 2020 12:25:49 +0000
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::85e9:f844:f8b0:27d]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::85e9:f844:f8b0:27d%7]) with mapi id 15.20.2707.030; Tue, 11 Feb 2020
+ 12:25:49 +0000
+From:   Horia Geanta <horia.geanta@nxp.com>
+To:     Iuliana Prodan <iuliana.prodan@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>
+CC:     "David S. Miller" <davem@davemloft.net>,
+        Silvano Di Ninno <silvano.dininno@nxp.com>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        dl-linux-imx <linux-imx@nxp.com>
+Subject: Re: [PATCH v5 9/9] crypto: caam - add crypto_engine support for HASH
+ algorithms
+Thread-Topic: [PATCH v5 9/9] crypto: caam - add crypto_engine support for HASH
+ algorithms
+Thread-Index: AQHV1wcsOwHkZptGCkC3XATUEKlSzg==
+Date:   Tue, 11 Feb 2020 12:25:49 +0000
+Message-ID: <VI1PR0402MB3485F2EA456432F03B2422FF98180@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+References: <1580345364-7606-1-git-send-email-iuliana.prodan@nxp.com>
+ <1580345364-7606-10-git-send-email-iuliana.prodan@nxp.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=horia.geanta@nxp.com; 
+x-originating-ip: [212.146.100.6]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: a3040dd6-6d1b-425c-8dff-08d7aeed876b
+x-ms-traffictypediagnostic: VI1PR0402MB2880:|VI1PR0402MB2880:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <VI1PR0402MB28804BF3ED46F3AF8E6E8BFD98180@VI1PR0402MB2880.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:2399;
+x-forefront-prvs: 0310C78181
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(346002)(39860400002)(136003)(376002)(396003)(366004)(189003)(199004)(8676002)(316002)(186003)(4326008)(9686003)(8936002)(81166006)(26005)(91956017)(53546011)(110136005)(54906003)(81156014)(6506007)(76116006)(55016002)(7696005)(478600001)(86362001)(2906002)(5660300002)(64756008)(71200400001)(6636002)(66946007)(66556008)(66476007)(66446008)(52536014)(33656002)(44832011);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB2880;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: /itCSi7HgVCHZesTt+RnZmZr/AXzOCKEZYAmYtP8op5yQCQdYMXqd98eBfIcQI0GQ3qagCzP2JIijLa12wRZsi+pJXfwqYIQCHGXwGNsI7f+M20KOYc4Lhpiu3OFsC7+npvcjuyKgsxfwilve7d+CHUQ2dxcCfLB7w765Viy4dK2MfN2H1dM4o/uhbtFUppvVEPrp7l7nbpmVgxKkG0Ik/ceQL8ESB6mQhqzcvqheaWshjE4vjqCBSv4/dpRqC3Hq/JxcIkj4eqIj1Q6mr9CWhPb3+38cc6xI/SgcsqmZRruk5r707xjbbEoDbtgCybOb74eL2c99eNVIVbtlys9IcA9k2vPiZKZjfh2E/A7pTZ4TOBwwRWSLNL7w5zX/5um0mOGmLXX1gvPAgU83kwCM2BrjQjplTkSva8Jmk4csb0yL+nqhrV+DVg4uqND9RMR
+x-ms-exchange-antispam-messagedata: t9k4MGabGEdK+gCLNbamixrZinR21WDXM6xSvfQ2ClJ4YlD3/HhR2Esq2nMV7IglBQj33mQQCNyE0hAFl8Xs3pQ253GcWYgGxhSj3tXQnVW/XRmuKiTcIf4MRJqMnNAVIIx+/WRp0pfrQ01nnSFftA==
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a3040dd6-6d1b-425c-8dff-08d7aeed876b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Feb 2020 12:25:49.7110
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: pQZVX9dejtJX+jmnPvJP4XKWWeKE1oxhwsA+WEq+ioBAbt3wqt6Mc3NEZ3gEhvwjZ9QkZIJEbOR23g+32Zkxdg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB2880
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Now that the rest of the code has been converted to the modern START/END
-macros the AES_ENTRY() and AES_ENDPROC() macros look out of place and
-like they need updating. Rename them to AES_FUNC_START() and AES_FUNC_END()
-to line up with the modern style assembly macros.
-
-Signed-off-by: Mark Brown <broonie@kernel.org>
-Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
----
- arch/arm64/crypto/aes-ce.S    |  4 +--
- arch/arm64/crypto/aes-modes.S | 48 +++++++++++++++++------------------
- arch/arm64/crypto/aes-neon.S  |  4 +--
- 3 files changed, 28 insertions(+), 28 deletions(-)
-
-diff --git a/arch/arm64/crypto/aes-ce.S b/arch/arm64/crypto/aes-ce.S
-index 45062553467f..1dc5bbbfeed2 100644
---- a/arch/arm64/crypto/aes-ce.S
-+++ b/arch/arm64/crypto/aes-ce.S
-@@ -9,8 +9,8 @@
- #include <linux/linkage.h>
- #include <asm/assembler.h>
- 
--#define AES_ENTRY(func)		SYM_FUNC_START(ce_ ## func)
--#define AES_ENDPROC(func)	SYM_FUNC_END(ce_ ## func)
-+#define AES_FUNC_START(func)		SYM_FUNC_START(ce_ ## func)
-+#define AES_FUNC_END(func)		SYM_FUNC_END(ce_ ## func)
- 
- 	.arch		armv8-a+crypto
- 
-diff --git a/arch/arm64/crypto/aes-modes.S b/arch/arm64/crypto/aes-modes.S
-index 8a2faa42b57e..cf618d8f6cec 100644
---- a/arch/arm64/crypto/aes-modes.S
-+++ b/arch/arm64/crypto/aes-modes.S
-@@ -51,7 +51,7 @@ SYM_FUNC_END(aes_decrypt_block5x)
- 	 *		   int blocks)
- 	 */
- 
--AES_ENTRY(aes_ecb_encrypt)
-+AES_FUNC_START(aes_ecb_encrypt)
- 	stp		x29, x30, [sp, #-16]!
- 	mov		x29, sp
- 
-@@ -79,10 +79,10 @@ ST5(	st1		{v4.16b}, [x0], #16		)
- .Lecbencout:
- 	ldp		x29, x30, [sp], #16
- 	ret
--AES_ENDPROC(aes_ecb_encrypt)
-+AES_FUNC_END(aes_ecb_encrypt)
- 
- 
--AES_ENTRY(aes_ecb_decrypt)
-+AES_FUNC_START(aes_ecb_decrypt)
- 	stp		x29, x30, [sp, #-16]!
- 	mov		x29, sp
- 
-@@ -110,7 +110,7 @@ ST5(	st1		{v4.16b}, [x0], #16		)
- .Lecbdecout:
- 	ldp		x29, x30, [sp], #16
- 	ret
--AES_ENDPROC(aes_ecb_decrypt)
-+AES_FUNC_END(aes_ecb_decrypt)
- 
- 
- 	/*
-@@ -126,7 +126,7 @@ AES_ENDPROC(aes_ecb_decrypt)
- 	 *			 u32 const rk2[]);
- 	 */
- 
--AES_ENTRY(aes_essiv_cbc_encrypt)
-+AES_FUNC_START(aes_essiv_cbc_encrypt)
- 	ld1		{v4.16b}, [x5]			/* get iv */
- 
- 	mov		w8, #14				/* AES-256: 14 rounds */
-@@ -135,7 +135,7 @@ AES_ENTRY(aes_essiv_cbc_encrypt)
- 	enc_switch_key	w3, x2, x6
- 	b		.Lcbcencloop4x
- 
--AES_ENTRY(aes_cbc_encrypt)
-+AES_FUNC_START(aes_cbc_encrypt)
- 	ld1		{v4.16b}, [x5]			/* get iv */
- 	enc_prepare	w3, x2, x6
- 
-@@ -167,10 +167,10 @@ AES_ENTRY(aes_cbc_encrypt)
- .Lcbcencout:
- 	st1		{v4.16b}, [x5]			/* return iv */
- 	ret
--AES_ENDPROC(aes_cbc_encrypt)
--AES_ENDPROC(aes_essiv_cbc_encrypt)
-+AES_FUNC_END(aes_cbc_encrypt)
-+AES_FUNC_END(aes_essiv_cbc_encrypt)
- 
--AES_ENTRY(aes_essiv_cbc_decrypt)
-+AES_FUNC_START(aes_essiv_cbc_decrypt)
- 	stp		x29, x30, [sp, #-16]!
- 	mov		x29, sp
- 
-@@ -181,7 +181,7 @@ AES_ENTRY(aes_essiv_cbc_decrypt)
- 	encrypt_block	cbciv, w8, x6, x7, w9
- 	b		.Lessivcbcdecstart
- 
--AES_ENTRY(aes_cbc_decrypt)
-+AES_FUNC_START(aes_cbc_decrypt)
- 	stp		x29, x30, [sp, #-16]!
- 	mov		x29, sp
- 
-@@ -238,8 +238,8 @@ ST5(	st1		{v4.16b}, [x0], #16		)
- 	st1		{cbciv.16b}, [x5]		/* return iv */
- 	ldp		x29, x30, [sp], #16
- 	ret
--AES_ENDPROC(aes_cbc_decrypt)
--AES_ENDPROC(aes_essiv_cbc_decrypt)
-+AES_FUNC_END(aes_cbc_decrypt)
-+AES_FUNC_END(aes_essiv_cbc_decrypt)
- 
- 
- 	/*
-@@ -249,7 +249,7 @@ AES_ENDPROC(aes_essiv_cbc_decrypt)
- 	 *		       int rounds, int bytes, u8 const iv[])
- 	 */
- 
--AES_ENTRY(aes_cbc_cts_encrypt)
-+AES_FUNC_START(aes_cbc_cts_encrypt)
- 	adr_l		x8, .Lcts_permute_table
- 	sub		x4, x4, #16
- 	add		x9, x8, #32
-@@ -276,9 +276,9 @@ AES_ENTRY(aes_cbc_cts_encrypt)
- 	st1		{v0.16b}, [x4]			/* overlapping stores */
- 	st1		{v1.16b}, [x0]
- 	ret
--AES_ENDPROC(aes_cbc_cts_encrypt)
-+AES_FUNC_END(aes_cbc_cts_encrypt)
- 
--AES_ENTRY(aes_cbc_cts_decrypt)
-+AES_FUNC_START(aes_cbc_cts_decrypt)
- 	adr_l		x8, .Lcts_permute_table
- 	sub		x4, x4, #16
- 	add		x9, x8, #32
-@@ -305,7 +305,7 @@ AES_ENTRY(aes_cbc_cts_decrypt)
- 	st1		{v2.16b}, [x4]			/* overlapping stores */
- 	st1		{v0.16b}, [x0]
- 	ret
--AES_ENDPROC(aes_cbc_cts_decrypt)
-+AES_FUNC_END(aes_cbc_cts_decrypt)
- 
- 	.section	".rodata", "a"
- 	.align		6
-@@ -324,7 +324,7 @@ AES_ENDPROC(aes_cbc_cts_decrypt)
- 	 *		   int blocks, u8 ctr[])
- 	 */
- 
--AES_ENTRY(aes_ctr_encrypt)
-+AES_FUNC_START(aes_ctr_encrypt)
- 	stp		x29, x30, [sp, #-16]!
- 	mov		x29, sp
- 
-@@ -409,7 +409,7 @@ ST5(	st1		{v4.16b}, [x0], #16		)
- 	rev		x7, x7
- 	ins		vctr.d[0], x7
- 	b		.Lctrcarrydone
--AES_ENDPROC(aes_ctr_encrypt)
-+AES_FUNC_END(aes_ctr_encrypt)
- 
- 
- 	/*
-@@ -433,7 +433,7 @@ AES_ENDPROC(aes_ctr_encrypt)
- 	uzp1		xtsmask.4s, xtsmask.4s, \tmp\().4s
- 	.endm
- 
--AES_ENTRY(aes_xts_encrypt)
-+AES_FUNC_START(aes_xts_encrypt)
- 	stp		x29, x30, [sp, #-16]!
- 	mov		x29, sp
- 
-@@ -518,9 +518,9 @@ AES_ENTRY(aes_xts_encrypt)
- 	st1		{v2.16b}, [x4]			/* overlapping stores */
- 	mov		w4, wzr
- 	b		.Lxtsencctsout
--AES_ENDPROC(aes_xts_encrypt)
-+AES_FUNC_END(aes_xts_encrypt)
- 
--AES_ENTRY(aes_xts_decrypt)
-+AES_FUNC_START(aes_xts_decrypt)
- 	stp		x29, x30, [sp, #-16]!
- 	mov		x29, sp
- 
-@@ -612,13 +612,13 @@ AES_ENTRY(aes_xts_decrypt)
- 	st1		{v2.16b}, [x4]			/* overlapping stores */
- 	mov		w4, wzr
- 	b		.Lxtsdecctsout
--AES_ENDPROC(aes_xts_decrypt)
-+AES_FUNC_END(aes_xts_decrypt)
- 
- 	/*
- 	 * aes_mac_update(u8 const in[], u32 const rk[], int rounds,
- 	 *		  int blocks, u8 dg[], int enc_before, int enc_after)
- 	 */
--AES_ENTRY(aes_mac_update)
-+AES_FUNC_START(aes_mac_update)
- 	frame_push	6
- 
- 	mov		x19, x0
-@@ -676,4 +676,4 @@ AES_ENTRY(aes_mac_update)
- 	ld1		{v0.16b}, [x23]			/* get dg */
- 	enc_prepare	w21, x20, x0
- 	b		.Lmacloop4x
--AES_ENDPROC(aes_mac_update)
-+AES_FUNC_END(aes_mac_update)
-diff --git a/arch/arm64/crypto/aes-neon.S b/arch/arm64/crypto/aes-neon.S
-index 247d34ddaab0..e47d3ec2cfb4 100644
---- a/arch/arm64/crypto/aes-neon.S
-+++ b/arch/arm64/crypto/aes-neon.S
-@@ -8,8 +8,8 @@
- #include <linux/linkage.h>
- #include <asm/assembler.h>
- 
--#define AES_ENTRY(func)		SYM_FUNC_START(neon_ ## func)
--#define AES_ENDPROC(func)	SYM_FUNC_END(neon_ ## func)
-+#define AES_FUNC_START(func)		SYM_FUNC_START(neon_ ## func)
-+#define AES_FUNC_END(func)		SYM_FUNC_END(neon_ ## func)
- 
- 	xtsmask		.req	v7
- 	cbciv		.req	v7
--- 
-2.20.1
-
+On 1/30/2020 2:49 AM, Iuliana Prodan wrote:=0A=
+> @@ -123,6 +128,9 @@ struct caam_export_state {=0A=
+>  	int (*update)(struct ahash_request *req);=0A=
+>  	int (*final)(struct ahash_request *req);=0A=
+>  	int (*finup)(struct ahash_request *req);=0A=
+> +	struct ahash_edesc *edesc;=0A=
+> +	void (*ahash_op_done)(struct device *jrdev, u32 *desc, u32 err,=0A=
+> +			      void *context);=0A=
+These members are used internally by the driver,=0A=
+during ahash request processing.=0A=
+They are recomputed each time a new request is received.=0A=
+=0A=
+This means .import/.export callbacks don't have to deal with them.=0A=
+=0A=
+>  /* submit ahash update if it the first job descriptor after update */=0A=
+> @@ -1209,9 +1280,8 @@ static int ahash_update_no_ctx(struct ahash_request=
+ *req)=0A=
+>  				     DUMP_PREFIX_ADDRESS, 16, 4, desc,=0A=
+>  				     desc_bytes(desc), 1);=0A=
+>  =0A=
+> -		ret =3D caam_jr_enqueue(jrdev, desc, ahash_done_ctx_dst, req);=0A=
+> -		if (ret !=3D -EINPROGRESS)=0A=
+> -			goto unmap_ctx;=0A=
+> +		ret =3D ahash_enqueue_req(jrdev, ahash_done_ctx_dst, req,=0A=
+> +					ctx->ctx_len, DMA_TO_DEVICE);=0A=
+In case ahash_enqueue_req() fails, driver's callbacks state machine=0A=
+changes since the code falls through.=0A=
+=0A=
+>  =0A=
+>  		state->update =3D ahash_update_ctx;=0A=
+>  		state->finup =3D ahash_finup_ctx;=0A=
+=0A=
+> @@ -1394,9 +1459,8 @@ static int ahash_update_first(struct ahash_request =
+*req)=0A=
+>  				     DUMP_PREFIX_ADDRESS, 16, 4, desc,=0A=
+>  				     desc_bytes(desc), 1);=0A=
+>  =0A=
+> -		ret =3D caam_jr_enqueue(jrdev, desc, ahash_done_ctx_dst, req);=0A=
+> -		if (ret !=3D -EINPROGRESS)=0A=
+> -			goto unmap_ctx;=0A=
+> +		ret =3D ahash_enqueue_req(jrdev, ahash_done_ctx_dst, req,=0A=
+> +					ctx->ctx_len, DMA_TO_DEVICE);=0A=
+Same here.=0A=
+=0A=
+>  =0A=
+>  		state->update =3D ahash_update_ctx;=0A=
+>  		state->finup =3D ahash_finup_ctx;=0A=
+=0A=
+> @@ -1752,7 +1820,9 @@ static int caam_hash_cra_init(struct crypto_tfm *tf=
+m)=0A=
+>  	}=0A=
+>  =0A=
+>  	dma_addr =3D dma_map_single_attrs(ctx->jrdev, ctx->sh_desc_update,=0A=
+> -					offsetof(struct caam_hash_ctx, key),=0A=
+> +					offsetof(struct caam_hash_ctx, key) -=0A=
+> +					offsetof(struct caam_hash_ctx,=0A=
+> +						 sh_desc_update),=0A=
+>  					ctx->dir, DMA_ATTR_SKIP_CPU_SYNC);=0A=
+>  	if (dma_mapping_error(ctx->jrdev, dma_addr)) {=0A=
+>  		dev_err(ctx->jrdev, "unable to map shared descriptors\n");=0A=
+> @@ -1770,11 +1840,19 @@ static int caam_hash_cra_init(struct crypto_tfm *=
+tfm)=0A=
+>  	ctx->sh_desc_update_dma =3D dma_addr;=0A=
+>  	ctx->sh_desc_update_first_dma =3D dma_addr +=0A=
+>  					offsetof(struct caam_hash_ctx,=0A=
+> -						 sh_desc_update_first);=0A=
+> +						 sh_desc_update_first) -=0A=
+> +					offsetof(struct caam_hash_ctx,=0A=
+> +						 sh_desc_update);=0A=
+>  	ctx->sh_desc_fin_dma =3D dma_addr + offsetof(struct caam_hash_ctx,=0A=
+> -						   sh_desc_fin);=0A=
+> +						   sh_desc_fin) -=0A=
+> +					  offsetof(struct caam_hash_ctx,=0A=
+> +						   sh_desc_update);=0A=
+>  	ctx->sh_desc_digest_dma =3D dma_addr + offsetof(struct caam_hash_ctx,=
+=0A=
+> -						      sh_desc_digest);=0A=
+> +						      sh_desc_digest) -=0A=
+> +					     offsetof(struct caam_hash_ctx,=0A=
+> +						      sh_desc_update);=0A=
+offsetof(struct caam_hash_ctx, sh_desc_update) is used several times,=0A=
+it deserves a local variable.=0A=
+=0A=
+Horia=0A=
