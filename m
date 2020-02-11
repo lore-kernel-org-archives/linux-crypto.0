@@ -2,225 +2,142 @@ Return-Path: <SRS0=l+Io=37=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FBF3C35242
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 20:50:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1CFFC35242
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 20:57:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5114A20714
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 20:50:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 81369206D6
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 20:57:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="lMUWu+8n"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="qR9asT5p"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728288AbgBKUu5 (ORCPT
+        id S1731844AbgBKU5I (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Feb 2020 15:50:57 -0500
-Received: from gateway36.websitewelcome.com ([192.185.188.18]:35014 "EHLO
-        gateway36.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727786AbgBKUu5 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Feb 2020 15:50:57 -0500
-X-Greylist: delayed 1390 seconds by postgrey-1.27 at vger.kernel.org; Tue, 11 Feb 2020 15:50:56 EST
-Received: from cm16.websitewelcome.com (cm16.websitewelcome.com [100.42.49.19])
-        by gateway36.websitewelcome.com (Postfix) with ESMTP id 7398A400CABE8
-        for <linux-crypto@vger.kernel.org>; Tue, 11 Feb 2020 13:41:43 -0600 (CST)
-Received: from gator4166.hostgator.com ([108.167.133.22])
-        by cmsmtp with SMTP
-        id 1c8FjVLDf8vkB1c8FjTVzy; Tue, 11 Feb 2020 14:27:43 -0600
-X-Authority-Reason: nr=8
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=PPWWdaifeZzk9RLwFlJ5meY5m2rkkfSdPZkRBHo2zLg=; b=lMUWu+8neDtCWoM7HC7ndnZLve
-        CNLfWODYRH0dKfbYGWeisHnLSxwNAv69i74ZGjwscfb0/qmOAypEZD+6HBJFL+fTIjsho7HOEtwG1
-        MkHOsPZmKwA2Q5pvtdb3Fiw15YCeLaJIrWEpEr+djGYU1UyM4rUwYKd2T+uOu6kMzs+8Zoi0P1/fV
-        bYOr6VWSaXgDAjg9G1QXzRO17lr07NmB7n60KgWN3y8bbtk63wqdlYlBwoJS8OYKCJNFDxDDjsT2Q
-        kEdxfEnZv6oclhIyZH55YS7WheIc/5xVs6zTjk/g7Dp8gA06Fof0OK0Aw9jCl+XbJ8x4i5IDqZi6S
-        pym9IHiw==;
-Received: from [200.68.140.36] (port=27441 helo=[192.168.43.131])
-        by gator4166.hostgator.com with esmtpsa (TLSv1.2:ECDHE-RSA-AES128-GCM-SHA256:128)
-        (Exim 4.92)
-        (envelope-from <gustavo@embeddedor.com>)
-        id 1j1c8F-001jRM-5K; Tue, 11 Feb 2020 14:27:43 -0600
-Subject: Re: [PATCH] treewide: Replace zero-length arrays with flexible-array
- member
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Greg KH <gregkh@linuxfoundation.org>, linux-kernel@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
-        linux-usb@vger.kernel.org
-References: <20200211174126.GA29960@embeddedor>
- <20200211183229.GA1938663@kroah.com>
- <3fdbb16a-897c-aa5b-d45d-f824f6810412@embeddedor.com>
- <202002111129.77DB1CCC7B@keescook> <20200211193854.GA1972490@kroah.com>
- <88e09425-8207-7a1e-8802-886f9694a37f@embeddedor.com>
- <202002111210.876CEB6@keescook>
-From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Autocrypt: addr=gustavo@embeddedor.com; keydata=
- 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
- VtSixD1uOgytAP7RWS474w==
-Message-ID: <2b73d115-1259-24ae-6f56-e3aa12e5e408@embeddedor.com>
-Date:   Tue, 11 Feb 2020 14:30:17 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-MIME-Version: 1.0
-In-Reply-To: <202002111210.876CEB6@keescook>
-Content-Type: text/plain; charset=utf-8
+        Tue, 11 Feb 2020 15:57:08 -0500
+Received: from mail-eopbgr10057.outbound.protection.outlook.com ([40.107.1.57]:2103
+        "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728078AbgBKU5H (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 11 Feb 2020 15:57:07 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GioxEj8qRyQ7BhpyT7FSyQZUP6qA7YTxJUJJGpmNXBhYZIhsSf09rkRzqIBUW/zJwR9anPy66chVaWJtOLAtjHxxzHJE6HZsog44BVDUeaC+JpmDVELQahZGgTag6SWLPhppSpFRXn3uYmzWTcD8ezxybyIT1GwNL5aFiBgGpBWhUd/u0fEqhYn0Uh5KXAV9JhdGCa7+5OsT9+fqUhpJOcoslWfm8Fs/yl9eDsT28HHZjsLuBgoTzHv8Xmt39FmJYseTVCvBUXD9kS9Hh/GIOzAI9d+M8v1QVx9mqxODQ2qZmpX9b4waqO3PruWGlrRsXLGGCn+ce+NXtrzGP56gXQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=H5FaFwZKlOiZqVx01x2vo6NrpwmGwmkdmJeErTwK78o=;
+ b=jdtBElwrZerFuI0NinVMYPsP3e2Vcgujw4J+3O0llAmOftJLNWhUf/ht1PPvBidOdApUrbyLY22zJozq1xFaOQIC74kGaDHCf1ASxzgYNIjL0kO4Q711Q50cdb6T5VaymxQdMzqgLtXYeE/tVtT9oKOXo3dJ4LnUGK+xKDn3FoViB/Mg6xDPN5RlAGmam1ht9KI9cxRyLoyh+IvsQjUnFBvP8AN6VVBPe0JxvVeW/OEooAzgUXaZi6Cjmy8+1hQv509UgntxxozBXyLgWQmAFDc90rhhnWNcdtvtelhRrCGerfj3t1V2AjxjTzj7xpuVOWqwVQEx3ZmUK8M5yMFMbQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=H5FaFwZKlOiZqVx01x2vo6NrpwmGwmkdmJeErTwK78o=;
+ b=qR9asT5p1KmU6l7rjow66wWz7D5dggQ1CKAcRrhvH9BaVssQmEMBh1IvZWwP2A7njSJBZ+cBSNftGU0o6YyvBmdoUNIcctD1bePs9r7FovHtMWseF5tJQSG6vsJag+tyWXsVZ/JtNT9N+VNORFfnY0IFWpgYWdoqm6gkSFl/kSE=
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
+ VI1PR0402MB3709.eurprd04.prod.outlook.com (52.134.15.27) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2707.21; Tue, 11 Feb 2020 20:57:01 +0000
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::85e9:f844:f8b0:27d]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::85e9:f844:f8b0:27d%7]) with mapi id 15.20.2707.030; Tue, 11 Feb 2020
+ 20:57:01 +0000
+From:   Horia Geanta <horia.geanta@nxp.com>
+To:     Andrey Smirnov <andrew.smirnov@gmail.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC:     Chris Healy <cphealy@gmail.com>,
+        Lucas Stach <l.stach@pengutronix.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        dl-linux-imx <linux-imx@nxp.com>
+Subject: Re: [PATCH v7 4/9] crypto: caam - drop global context pointer and
+ init_done
+Thread-Topic: [PATCH v7 4/9] crypto: caam - drop global context pointer and
+ init_done
+Thread-Index: AQHV1TLT2rTrmTBv2U6pvLOb9zqi1Q==
+Date:   Tue, 11 Feb 2020 20:57:00 +0000
+Message-ID: <VI1PR0402MB3485A733C0A6B57E129A339198180@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+References: <20200127165646.19806-1-andrew.smirnov@gmail.com>
+ <20200127165646.19806-5-andrew.smirnov@gmail.com>
+Accept-Language: en-US
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 200.68.140.36
-X-Source-L: No
-X-Exim-ID: 1j1c8F-001jRM-5K
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: ([192.168.43.131]) [200.68.140.36]:27441
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 23
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=horia.geanta@nxp.com; 
+x-originating-ip: [84.117.251.185]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 45b5f212-200a-4053-79f8-08d7af34f0e7
+x-ms-traffictypediagnostic: VI1PR0402MB3709:|VI1PR0402MB3709:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <VI1PR0402MB3709BBD1925D4126C820138198180@VI1PR0402MB3709.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6108;
+x-forefront-prvs: 0310C78181
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(39860400002)(366004)(346002)(376002)(396003)(189003)(199004)(5660300002)(4326008)(478600001)(55016002)(9686003)(2906002)(52536014)(316002)(110136005)(54906003)(33656002)(91956017)(76116006)(66476007)(66556008)(64756008)(66446008)(44832011)(186003)(81156014)(53546011)(7696005)(26005)(6506007)(81166006)(86362001)(66946007)(8936002)(71200400001)(8676002);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3709;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: q22zIBnWCK7T09YgwxA09M3rBBGKC9qoJ3PB5OqEMTPNoexbjPfO6FmMKkjOegFEzVMbiovmkoWvKuqsHPzV8Xo46sBVO4jGnL9Vp/shSSg5WnDa0U/x1xREu8q5QSyTygjC69m7sPsuSZkCj/5l3tQ04uETkXVPETrAXpNEonp8N94PO8QAnidXyj5gATECjBAElvBvvqfQZl6p/jZCOsJF6FKKMfdz7Hi/97Byca6S3r3+/GUL+GNr4vQu96CPIrzCVW01vNqkqmkaUSQtHia2zXtcKKzLdK3qvQo0uW48vKr2MCPfV5oatr4vbsNVypVW9YL1S3gpuF2b5IKav3yPJIHBQM364BSESiGaNjgZhhNRW4c+ueyvzz9sS1/7WEcfK+Yayms8rqBL9YbOd8BDv61FeM90sNJxz+SDTEAPE/fZKe9yH23jsAGXhilP
+x-ms-exchange-antispam-messagedata: UyvD1RAK7etgne3yhFZpKK263T4g9RquIhmDUrKRVp5r0NtwLsYDfydvsaxGFQPdOUGbbrW0UlNwewmotcMHUeR8IV7BaYzM+vRkyxAlNb8sDP59zpvt/6OkKnThJozZM1FY7yYsj7LuV9SUi4aMSg==
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 45b5f212-200a-4053-79f8-08d7af34f0e7
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Feb 2020 20:57:00.9947
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ENu5nzjHiIowfGCdQmFl7oEsZjC1cIGBxTHS5/VspUv3iE3l+0wilxBkmNsMaW234El3RRtINZb3oZEQz3N9Vg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3709
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-
-On 2/11/20 14:12, Kees Cook wrote:
-> On Tue, Feb 11, 2020 at 01:54:22PM -0600, Gustavo A. R. Silva wrote:
->>
->>
->> On 2/11/20 13:38, Greg KH wrote:
->>> On Tue, Feb 11, 2020 at 11:32:04AM -0800, Kees Cook wrote:
->>>> On Tue, Feb 11, 2020 at 01:20:36PM -0600, Gustavo A. R. Silva wrote:
->>>>>
->>>>>
->>>>> On 2/11/20 12:32, Greg KH wrote:
->>>>>> On Tue, Feb 11, 2020 at 11:41:26AM -0600, Gustavo A. R. Silva wrote:
->>>>>>> The current codebase makes use of the zero-length array language
->>>>>>> extension to the C90 standard, but the preferred mechanism to declare
->>>>>>> variable-length types such as these ones is a flexible array member[1][2],
->>>>>>> introduced in C99:
->>>>>>>
->>>>>>> struct foo {
->>>>>>>         int stuff;
->>>>>>>         struct boo array[];
->>>>>>> };
->>>>>>>
->>>>>>> By making use of the mechanism above, we will get a compiler warning
->>>>>>> in case the flexible array does not occur last in the structure, which
->>>>>>> will help us prevent some kind of undefined behavior bugs from being
->>>>>>> unadvertenly introduced[3] to the codebase from now on.
->>>>>>>
->>>>>>> All these instances of code were found with the help of the following
->>>>>>> Coccinelle script:
->>>>>>>
->>>>>>> @@
->>>>>>> identifier S, member, array;
->>>>>>> type T1, T2;
->>>>>>> @@
->>>>>>>
->>>>>>> struct S {
->>>>>>>   ...
->>>>>>>   T1 member;
->>>>>>>   T2 array[
->>>>>>> - 0
->>>>>>>   ];
->>>>>>> };
->>>>>>>
->>>>>>> [1] https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
->>>>>>> [2] https://github.com/KSPP/linux/issues/21
->>>>>>> [3] commit 76497732932f ("cxgb3/l2t: Fix undefined behaviour")
->>>>>>>
->>>>>>> NOTE: I'll carry this in my -next tree for the v5.6 merge window.
->>>>>>
->>>>>> Why not carve this up into per-subsystem patches so that we can apply
->>>>>> them to our 5.7-rc1 trees and then you submit the "remaining" that don't
->>>>>> somehow get merged at that timeframe for 5.7-rc2?
->>>>>>
->>>>>
->>>>> Yep, sounds good. I'll do that.
->>>>
->>>> FWIW, I'd just like to point out that since this is a mechanical change
->>>> with no code generation differences (unlike the pre-C90 1-byte array
->>>> conversions), it's a way better use of everyone's time to just splat
->>>> this in all at once.
->>>>
->>>> That said, it looks like Gustavo is up for it, but I'd like us to
->>>> generally consider these kinds of mechanical changes as being easier to
->>>> manage in a single patch. (Though getting Acks tends to be a bit
->>>> harder...)
->>>
->>> Hey, if this is such a mechanical patch, let's get it to Linus now,
->>> what's preventing that from being merged now?
-> 
-> Now would be a good time, yes. (Linus has wanted Acks for such things
-> sometimes, but those were more "risky" changes...)
-> 
->> Well, the only thing is that this has never been in linux-next.
-> 
-> Hmm. Was it in one of your 0day-tested trees?
-> 
-
-It was in my tree for quite a while, but it was never 0day-tested.
-Just recently, the 0day guys started testing my _new_ branches,
-regularly.
-
-Today, I updated my -next branch to v5.6-rc1 and added the
-treewide patch. So, I expect it to be 0day-tested in a couple
-of days.
-
---
-Gustavo
+On 1/27/2020 6:57 PM, Andrey Smirnov wrote:=0A=
+> @@ -70,6 +70,7 @@ struct buf_data {=0A=
+>  =0A=
+>  /* rng per-device context */=0A=
+>  struct caam_rng_ctx {=0A=
+> +	struct hwrng rng;=0A=
+>  	struct device *jrdev;=0A=
+>  	dma_addr_t sh_desc_dma;=0A=
+>  	u32 sh_desc[DESC_RNG_LEN];=0A=
+> @@ -78,13 +79,10 @@ struct caam_rng_ctx {=0A=
+>  	struct buf_data bufs[2];=0A=
+>  };=0A=
+>  =0A=
+> -static struct caam_rng_ctx *rng_ctx;=0A=
+> -=0A=
+> -/*=0A=
+> - * Variable used to avoid double free of resources in case=0A=
+> - * algorithm registration was unsuccessful=0A=
+> - */=0A=
+> -static bool init_done;=0A=
+> +static struct caam_rng_ctx *to_caam_rng_ctx(struct hwrng *r)=0A=
+> +{=0A=
+> +	return container_of(r, struct caam_rng_ctx, rng);=0A=
+> +}=0A=
+[...]=0A=
+> -static struct hwrng caam_rng =3D {=0A=
+> -	.name		=3D "rng-caam",=0A=
+> -	.init           =3D caam_init,=0A=
+> -	.cleanup	=3D caam_cleanup,=0A=
+> -	.read		=3D caam_read,=0A=
+> -};=0A=
+[...]> +	ctx->rng.name    =3D "rng-caam";=0A=
+> +	ctx->rng.init    =3D caam_init;=0A=
+> +	ctx->rng.cleanup =3D caam_cleanup;=0A=
+> +	ctx->rng.read    =3D caam_read;=0A=
+An alternative (probably better) for storing caamrng context=0A=
+is to use what is already available in struct hwrng:=0A=
+ * @priv:               Private data, for use by the RNG driver.=0A=
+=0A=
+Horia=0A=
