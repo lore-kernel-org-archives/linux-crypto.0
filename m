@@ -1,68 +1,68 @@
 Return-Path: <SRS0=l+Io=37=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: *
-X-Spam-Status: No, score=1.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Level: 
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31D43C352A3
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 12:25:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF086C352A3
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 14:39:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D625C20714
-	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 12:25:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8397020708
+	for <linux-crypto@archiver.kernel.org>; Tue, 11 Feb 2020 14:39:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="meoRpJzG"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="MrVk9xkV"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728540AbgBKMZx (ORCPT
+        id S1728882AbgBKOjg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 11 Feb 2020 07:25:53 -0500
-Received: from mail-eopbgr30083.outbound.protection.outlook.com ([40.107.3.83]:4366
-        "EHLO EUR03-AM5-obe.outbound.protection.outlook.com"
+        Tue, 11 Feb 2020 09:39:36 -0500
+Received: from mail-eopbgr80055.outbound.protection.outlook.com ([40.107.8.55]:44768
+        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727887AbgBKMZx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 11 Feb 2020 07:25:53 -0500
+        id S1728868AbgBKOjf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 11 Feb 2020 09:39:35 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=g9exbgStF+Rnf2q2cJrWnBsUllsdAtGheN39/5+v2FBz7k5JaSUJK5AtbfZgPbLFauMB2hmCU515GgdhfbPYRuJZPF7tGrgNt/kk0D32NFEm4ERrlrcHhgxszNIiUfc7LAcLryM/Zebr4xWfb6pKnhJ1klpD2txn9rwqRS4NtNEAJlhzj5y5wEV33fbU/s9T/GqGoOs5EM7y+xRqZ/6Sa3NqtYw0jmeEXDkr827sTqbbtS9xyi633OKsBGhnyyeAs+8A3595mGLEwIiru7hzCYF5vTACERAnJXyisDMqxw/iNV3CNAZP0yqG9OB4kN8m+7vlhaRwcu3sWenX50bPbw==
+ b=HK3O19jk4WBp/DTwBaRAG4UVxNn2AbNjuW0B2MA2h5uGbtm/1khmlg8ck2Os406nOyFO7ponB3PmNDqmN9qFDdwnMYoiNIPjHh0oqwHHgbwvGtIky25sEkwxqUV0WUtm3Vd1mtoWoU9BMHTMi/dzcDOMRtQSFGytqkuLpagmdEG8a2s6/tsdj387NbJLI+jNTUTCgRO04C1Q1sTQZzGYajs0LkayLQkrLlk4o+aEfWn9TcYiX9/SAaSDhy3YiziY5CIski1SDNHE9rCbHzhiXe6mUUsMGT/vVIeAHjqh5CCx49KKfxttc+EXsJakKLCt9LJT3OrfuI1N5+ihqV7qCw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Qxjmzh0o2QKrAHpD+MFKKmRcBjIpn7pzlyWEtkwg45s=;
- b=RPHVNWomZ90UesdtKX03lfePAzP2U6NuzZiFKiBU3UIDEuoucXeQcFv6r7TI8smg3nNXUOq0Gky0RAMq96Cb3iD4+TG/DjqQNkZK+D+CAJS+vLZ3mGQTNlhiiqZLqtnWRDClv4YiZgEuykhOVawQ0iH/N2TzIu9UDFIsPSIJ/Y3YNhQxezEQcwUTa/uZC27nEp+shRKbUb9fDIq1Jv+ZxJpLMPm5HE3o5pPthEZ9rUnp/7bieiQ/tsL6TPg1m7yweplDwvxSGNnNvbOpdcDPjc9gjIS3IEHtwG8tnqyUPMsB85qL8ygwcIQrxULAX7YtE0ArfxnfUwPoMOeGEl+yyg==
+ bh=jI0Y+Wqt2jOM/oQXgfKDapBcoT2AfBndMk+X9/G2k3Y=;
+ b=AMFvcNcWsh6hfvCnCo2iHYPwyhn29Jy/lxP/gN1LIszS4FK71jxWBQHJadAu2pJdmgPXbmJ+ZLHtyhv5GiqftXpqgs/Nnl3uuFZFQZQB7+NnOn5P77m8xGuVHnNl/3bh9s2HfQfvSLzd9DzLzC4+XuSgPqC4vPLWN/wB7xOvMmMS8NE1S62jkv7AjYbf8gX1V99GlAehBsvxPI+cYirBtHlRJV64Ib8+m/F1yiJFxaXotaX2VR2AnY8ihzL2UIgbfWwL77h9maXjcoAptHz7MFyxW3EkJIobnwbR/7HOic3RxiSYMPkowa+HgPxKNQeTg/6sPkdFxLAgIvTsMnLe4w==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Qxjmzh0o2QKrAHpD+MFKKmRcBjIpn7pzlyWEtkwg45s=;
- b=meoRpJzGOUmQQ2ylu1DYFcMONgcVabzbOOrDosxthig3RHr8RFD2lZnhuosV0JQUPN2hf3jkdC4nk1+e4qfE1mIvWxkRhRgtVGV8WZkt9aYfWqqDLZRpjcItOvsfRcrqnQ5zT2eGawkbH3N1txsqWCiT7N0irnIpqIm8P/1I6PQ=
+ bh=jI0Y+Wqt2jOM/oQXgfKDapBcoT2AfBndMk+X9/G2k3Y=;
+ b=MrVk9xkV96+2ngkiy6RXELW/xuHlxSqX496uy2JTzm2amFRsXV7ZRopu2bsb3WMS/DdTukbHA7CHdoj/Ax/dqs8R5ZZig417jpqZJgh+TZOTRkOdgmeV/uED0kgPUUKFg+SRUsIO4dYFHcTQQYV3rWCWTb6F8devrtzgGudQV9Q=
 Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB2880.eurprd04.prod.outlook.com (10.175.22.147) with Microsoft SMTP
+ VI1PR0402MB3949.eurprd04.prod.outlook.com (52.134.17.149) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2707.21; Tue, 11 Feb 2020 12:25:49 +0000
+ 15.20.2707.28; Tue, 11 Feb 2020 14:39:32 +0000
 Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
  ([fe80::85e9:f844:f8b0:27d]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
  ([fe80::85e9:f844:f8b0:27d%7]) with mapi id 15.20.2707.030; Tue, 11 Feb 2020
- 12:25:49 +0000
+ 14:39:32 +0000
 From:   Horia Geanta <horia.geanta@nxp.com>
-To:     Iuliana Prodan <iuliana.prodan@nxp.com>,
+To:     Andrey Smirnov <andrew.smirnov@gmail.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+CC:     Chris Healy <cphealy@gmail.com>,
+        Lucas Stach <l.stach@pengutronix.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>
-CC:     "David S. Miller" <davem@davemloft.net>,
-        Silvano Di Ninno <silvano.dininno@nxp.com>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
         "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
         dl-linux-imx <linux-imx@nxp.com>
-Subject: Re: [PATCH v5 9/9] crypto: caam - add crypto_engine support for HASH
- algorithms
-Thread-Topic: [PATCH v5 9/9] crypto: caam - add crypto_engine support for HASH
- algorithms
-Thread-Index: AQHV1wcsOwHkZptGCkC3XATUEKlSzg==
-Date:   Tue, 11 Feb 2020 12:25:49 +0000
-Message-ID: <VI1PR0402MB3485F2EA456432F03B2422FF98180@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <1580345364-7606-1-git-send-email-iuliana.prodan@nxp.com>
- <1580345364-7606-10-git-send-email-iuliana.prodan@nxp.com>
+Subject: Re: [PATCH v7 2/9] crypto: caam - use struct hwrng's .init for
+ initialization
+Thread-Topic: [PATCH v7 2/9] crypto: caam - use struct hwrng's .init for
+ initialization
+Thread-Index: AQHV1TLQxUc6zq3eJUWWauKEoHl1ZA==
+Date:   Tue, 11 Feb 2020 14:39:32 +0000
+Message-ID: <VI1PR0402MB3485B40FAB528ADE331F506198180@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+References: <20200127165646.19806-1-andrew.smirnov@gmail.com>
+ <20200127165646.19806-3-andrew.smirnov@gmail.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -72,117 +72,50 @@ authentication-results: spf=none (sender IP is )
 x-originating-ip: [212.146.100.6]
 x-ms-publictraffictype: Email
 x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: a3040dd6-6d1b-425c-8dff-08d7aeed876b
-x-ms-traffictypediagnostic: VI1PR0402MB2880:|VI1PR0402MB2880:
+x-ms-office365-filtering-correlation-id: 46d547e3-e365-4330-e966-08d7af003540
+x-ms-traffictypediagnostic: VI1PR0402MB3949:|VI1PR0402MB3949:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <VI1PR0402MB28804BF3ED46F3AF8E6E8BFD98180@VI1PR0402MB2880.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:2399;
+x-microsoft-antispam-prvs: <VI1PR0402MB39491AB76AB401497C7DD31998180@VI1PR0402MB3949.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:597;
 x-forefront-prvs: 0310C78181
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(346002)(39860400002)(136003)(376002)(396003)(366004)(189003)(199004)(8676002)(316002)(186003)(4326008)(9686003)(8936002)(81166006)(26005)(91956017)(53546011)(110136005)(54906003)(81156014)(6506007)(76116006)(55016002)(7696005)(478600001)(86362001)(2906002)(5660300002)(64756008)(71200400001)(6636002)(66946007)(66556008)(66476007)(66446008)(52536014)(33656002)(44832011);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB2880;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(366004)(376002)(39860400002)(346002)(396003)(189003)(199004)(55016002)(316002)(54906003)(8936002)(110136005)(9686003)(71200400001)(7696005)(53546011)(186003)(478600001)(6506007)(26005)(91956017)(4744005)(66446008)(76116006)(4326008)(66476007)(66946007)(66556008)(64756008)(8676002)(33656002)(81166006)(81156014)(44832011)(2906002)(86362001)(5660300002)(52536014)(142923001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3949;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
 received-spf: None (protection.outlook.com: nxp.com does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: /itCSi7HgVCHZesTt+RnZmZr/AXzOCKEZYAmYtP8op5yQCQdYMXqd98eBfIcQI0GQ3qagCzP2JIijLa12wRZsi+pJXfwqYIQCHGXwGNsI7f+M20KOYc4Lhpiu3OFsC7+npvcjuyKgsxfwilve7d+CHUQ2dxcCfLB7w765Viy4dK2MfN2H1dM4o/uhbtFUppvVEPrp7l7nbpmVgxKkG0Ik/ceQL8ESB6mQhqzcvqheaWshjE4vjqCBSv4/dpRqC3Hq/JxcIkj4eqIj1Q6mr9CWhPb3+38cc6xI/SgcsqmZRruk5r707xjbbEoDbtgCybOb74eL2c99eNVIVbtlys9IcA9k2vPiZKZjfh2E/A7pTZ4TOBwwRWSLNL7w5zX/5um0mOGmLXX1gvPAgU83kwCM2BrjQjplTkSva8Jmk4csb0yL+nqhrV+DVg4uqND9RMR
-x-ms-exchange-antispam-messagedata: t9k4MGabGEdK+gCLNbamixrZinR21WDXM6xSvfQ2ClJ4YlD3/HhR2Esq2nMV7IglBQj33mQQCNyE0hAFl8Xs3pQ253GcWYgGxhSj3tXQnVW/XRmuKiTcIf4MRJqMnNAVIIx+/WRp0pfrQ01nnSFftA==
-Content-Type: text/plain; charset="us-ascii"
+x-microsoft-antispam-message-info: 7hjnxELXT6r7KQpb6j/8Il4L+56aF5477XoXACHh0sAVNfyJiXVV/XqnLmE4I9DrwaFdFrLvdUy+woAnlbEzKKV0B7B9+88mjY/K1vi1nTAy7/7+zABhBSEk9EiNVs4zCaQrdBaWfMt8prNF+iOJomyU1E+pLbjPx8sgX1p633GZcZ/H1JbDj4NcfAeEjwYk366cfihv7DpFWSPBP/fx2rom4c5uG+1nkQSyC0zSj+IO19PjM2Zl91eFfToGUO3IhiW/bNRRjM5LdvpztNnvZrBJwu+ktm/6ENhRRQtZKKE+dXXWE5JdfyVeTRMsM5F4++yPPfqsttsBCeB85l3P4YbV1wdHHvRoZLdezkkGs39lRw0sHZlJZuG0paZvhZc+lbB3qhextgDhEa2lCfERePzGSq/eMZNAwdYfGvmIE4OTpNlucGnYW3WTzHdSvDJ86Wu1rtBZhm0+xH+8SBsVUb4RyvQ3F/0Rrc8+OF73xed6iOxGZ8mD8HukLb+t1OXw
+x-ms-exchange-antispam-messagedata: Z3rDhYmlQvFBMfA2SnHsa2xY+//ouSn0uuxUcb/P/2MlSs67H0L9cizP3+cJcUoJUGfO0UZmw1c5/4V693UE7T3ISzlGG3tH6kZe8uIFrhF4tIP1P7M5GMvJg9iYrD/eCZGop8jQNTtWuxJJ9PW8HA==
+Content-Type: text/plain; charset="iso-8859-2"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a3040dd6-6d1b-425c-8dff-08d7aeed876b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Feb 2020 12:25:49.7110
+X-MS-Exchange-CrossTenant-Network-Message-Id: 46d547e3-e365-4330-e966-08d7af003540
+X-MS-Exchange-CrossTenant-originalarrivaltime: 11 Feb 2020 14:39:32.3512
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: pQZVX9dejtJX+jmnPvJP4XKWWeKE1oxhwsA+WEq+ioBAbt3wqt6Mc3NEZ3gEhvwjZ9QkZIJEbOR23g+32Zkxdg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB2880
+X-MS-Exchange-CrossTenant-userprincipalname: dOYKntdtKKboIZWXXm1hIBLzImo5DetImMSYWOW6OENcruvNUGDJPxZKdEB2B5zn6YkAyQetA3ZajvfKmxGGlg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3949
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 1/30/2020 2:49 AM, Iuliana Prodan wrote:=0A=
-> @@ -123,6 +128,9 @@ struct caam_export_state {=0A=
->  	int (*update)(struct ahash_request *req);=0A=
->  	int (*final)(struct ahash_request *req);=0A=
->  	int (*finup)(struct ahash_request *req);=0A=
-> +	struct ahash_edesc *edesc;=0A=
-> +	void (*ahash_op_done)(struct device *jrdev, u32 *desc, u32 err,=0A=
-> +			      void *context);=0A=
-These members are used internally by the driver,=0A=
-during ahash request processing.=0A=
-They are recomputed each time a new request is received.=0A=
+On 1/27/2020 6:57 PM, Andrey Smirnov wrote:=0A=
+> Make caamrng code a bit more symmetric by moving initialization code=0A=
+> to .init hook of struct hwrng.=0A=
+> =0A=
+> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>=0A=
+> Cc: Chris Healy <cphealy@gmail.com>=0A=
+> Cc: Lucas Stach <l.stach@pengutronix.de>=0A=
+> Cc: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>=0A=
+> Cc: Iuliana Prodan <iuliana.prodan@nxp.com>=0A=
+> Cc: linux-crypto@vger.kernel.org=0A=
+> Cc: linux-kernel@vger.kernel.org=0A=
+> Cc: linux-imx@nxp.com=0A=
+Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
 =0A=
-This means .import/.export callbacks don't have to deal with them.=0A=
-=0A=
->  /* submit ahash update if it the first job descriptor after update */=0A=
-> @@ -1209,9 +1280,8 @@ static int ahash_update_no_ctx(struct ahash_request=
- *req)=0A=
->  				     DUMP_PREFIX_ADDRESS, 16, 4, desc,=0A=
->  				     desc_bytes(desc), 1);=0A=
->  =0A=
-> -		ret =3D caam_jr_enqueue(jrdev, desc, ahash_done_ctx_dst, req);=0A=
-> -		if (ret !=3D -EINPROGRESS)=0A=
-> -			goto unmap_ctx;=0A=
-> +		ret =3D ahash_enqueue_req(jrdev, ahash_done_ctx_dst, req,=0A=
-> +					ctx->ctx_len, DMA_TO_DEVICE);=0A=
-In case ahash_enqueue_req() fails, driver's callbacks state machine=0A=
-changes since the code falls through.=0A=
-=0A=
->  =0A=
->  		state->update =3D ahash_update_ctx;=0A=
->  		state->finup =3D ahash_finup_ctx;=0A=
-=0A=
-> @@ -1394,9 +1459,8 @@ static int ahash_update_first(struct ahash_request =
-*req)=0A=
->  				     DUMP_PREFIX_ADDRESS, 16, 4, desc,=0A=
->  				     desc_bytes(desc), 1);=0A=
->  =0A=
-> -		ret =3D caam_jr_enqueue(jrdev, desc, ahash_done_ctx_dst, req);=0A=
-> -		if (ret !=3D -EINPROGRESS)=0A=
-> -			goto unmap_ctx;=0A=
-> +		ret =3D ahash_enqueue_req(jrdev, ahash_done_ctx_dst, req,=0A=
-> +					ctx->ctx_len, DMA_TO_DEVICE);=0A=
-Same here.=0A=
-=0A=
->  =0A=
->  		state->update =3D ahash_update_ctx;=0A=
->  		state->finup =3D ahash_finup_ctx;=0A=
-=0A=
-> @@ -1752,7 +1820,9 @@ static int caam_hash_cra_init(struct crypto_tfm *tf=
-m)=0A=
->  	}=0A=
->  =0A=
->  	dma_addr =3D dma_map_single_attrs(ctx->jrdev, ctx->sh_desc_update,=0A=
-> -					offsetof(struct caam_hash_ctx, key),=0A=
-> +					offsetof(struct caam_hash_ctx, key) -=0A=
-> +					offsetof(struct caam_hash_ctx,=0A=
-> +						 sh_desc_update),=0A=
->  					ctx->dir, DMA_ATTR_SKIP_CPU_SYNC);=0A=
->  	if (dma_mapping_error(ctx->jrdev, dma_addr)) {=0A=
->  		dev_err(ctx->jrdev, "unable to map shared descriptors\n");=0A=
-> @@ -1770,11 +1840,19 @@ static int caam_hash_cra_init(struct crypto_tfm *=
-tfm)=0A=
->  	ctx->sh_desc_update_dma =3D dma_addr;=0A=
->  	ctx->sh_desc_update_first_dma =3D dma_addr +=0A=
->  					offsetof(struct caam_hash_ctx,=0A=
-> -						 sh_desc_update_first);=0A=
-> +						 sh_desc_update_first) -=0A=
-> +					offsetof(struct caam_hash_ctx,=0A=
-> +						 sh_desc_update);=0A=
->  	ctx->sh_desc_fin_dma =3D dma_addr + offsetof(struct caam_hash_ctx,=0A=
-> -						   sh_desc_fin);=0A=
-> +						   sh_desc_fin) -=0A=
-> +					  offsetof(struct caam_hash_ctx,=0A=
-> +						   sh_desc_update);=0A=
->  	ctx->sh_desc_digest_dma =3D dma_addr + offsetof(struct caam_hash_ctx,=
-=0A=
-> -						      sh_desc_digest);=0A=
-> +						      sh_desc_digest) -=0A=
-> +					     offsetof(struct caam_hash_ctx,=0A=
-> +						      sh_desc_update);=0A=
-offsetof(struct caam_hash_ctx, sh_desc_update) is used several times,=0A=
-it deserves a local variable.=0A=
-=0A=
+Thanks,=0A=
 Horia=0A=
