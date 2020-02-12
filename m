@@ -2,136 +2,121 @@ Return-Path: <SRS0=stso=4A=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E30FFC2BA83
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Feb 2020 16:25:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7395C2BA83
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Feb 2020 17:55:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B66F720714
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Feb 2020 16:25:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cP7Dc2Vt"
+	by mail.kernel.org (Postfix) with ESMTP id 97E9520714
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Feb 2020 17:55:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727548AbgBLQZD (ORCPT
+        id S1728673AbgBLRzp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Feb 2020 11:25:03 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:37238 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726728AbgBLQZC (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Feb 2020 11:25:02 -0500
-Received: by mail-pg1-f194.google.com with SMTP id z12so1479072pgl.4;
-        Wed, 12 Feb 2020 08:25:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=zweDaFEU0USsV+JX/LUuDeDmSUEHYWtL+9GANBjwgS4=;
-        b=cP7Dc2VtOxGDgxZ6JHdE2q9Lyhmqv0k2cCO7w6iMWAwBuUc4X1hTFNxnXVCptDXT5x
-         NkTwJ4HwJDTYlXQ/5Q7HYPa3LjvpoW91An4WuKSfHiHl1cCp/idPPX1hDnIWFfwgILph
-         QW9+RaPIhjuK1G7zJ38FF3O6vqRsLjyTFD1u6DPY3hwHwnUAu83W+GE02P7wMvEy32l3
-         eXIX+9iUpxb5H7wLek1JA/nyj2rTQruJVFD7L9dgv3URdIlaLvOkvra0G4uAdd98IqUt
-         FLJTU0BiinQI0yNZwHtYRV5wtxUSO5kAqzg2SG6UUvGIfNaKdm2lxG4iEEO/0uByivN6
-         2ENg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=zweDaFEU0USsV+JX/LUuDeDmSUEHYWtL+9GANBjwgS4=;
-        b=IVjO0a134bw4yJMmWAJVond4xkwVesau28rgyMA5uNt9aiRwgd5B1wBNO8w3YTcB/f
-         UF/DwqdTuutW/dd/TWsz+Lo0gVDjDDyVCwKUzzWibX6tFnAWYjQSTMNaXueFCRonNJuO
-         ynrakaJe8thJuOYQ8EmJc7seFIDYo/PWmSQrHvXJSsmS9Pl8g9+SmUm4REC9nKYHHrBf
-         mJxL2Lf++Lc0JOySCvLhXZtSc0nuQr2Gn5tcMDNbFBmStRbxiUyja+BL4Nlq2wMnTDAB
-         n+Zn9RXW03gtrws7hCYfN2VQG2jYhQxaXdjju+jLaiUv66Vt3Rlo/Wt9bSYFLudjQa/m
-         JAlQ==
-X-Gm-Message-State: APjAAAUIk15enj7dsG5CJ7HXmnpjy2W4ZQZbDis2LC/I6kOQ3W+E3MlR
-        BY8c+f70PCE+yGkT+dqrNmxiPdNO9j6DGfAqrsw=
-X-Google-Smtp-Source: APXvYqxdvvvgkWHaTR3wCKLim8YYFZ3Gilg23ZQv1CNAsUnE4dlwsUOhdWPRIYUJ8aFymPSp2AKT9wOK4ZMF4Mx3X+0=
-X-Received: by 2002:a63:306:: with SMTP id 6mr9363242pgd.337.1581524702320;
- Wed, 12 Feb 2020 08:25:02 -0800 (PST)
-MIME-Version: 1.0
-References: <20200128110102.11522-1-martin@kaiser.cx> <20200128110102.11522-3-martin@kaiser.cx>
-In-Reply-To: <20200128110102.11522-3-martin@kaiser.cx>
-From:   PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Date:   Wed, 12 Feb 2020 21:54:51 +0530
-Message-ID: <CANc+2y60cCtDwBi1jaV=eMtTwoihRf2WiKW7Zo3iC9ALv2OVSw@mail.gmail.com>
-Subject: Re: [PATCH 2/6] hwrng: imx-rngc - use automatic seeding
-To:     Martin Kaiser <martin@kaiser.cx>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        NXP Linux Team <linux-imx@nxp.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        linux-arm-kernel@lists.infradead.org,
-        open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Wed, 12 Feb 2020 12:55:45 -0500
+Received: from inva021.nxp.com ([92.121.34.21]:45156 "EHLO inva021.nxp.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727054AbgBLRzp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 12 Feb 2020 12:55:45 -0500
+Received: from inva021.nxp.com (localhost [127.0.0.1])
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id DF45B2076A7;
+        Wed, 12 Feb 2020 18:55:42 +0100 (CET)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id D2B20207661;
+        Wed, 12 Feb 2020 18:55:42 +0100 (CET)
+Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 574C7204D3;
+        Wed, 12 Feb 2020 18:55:42 +0100 (CET)
+From:   Iuliana Prodan <iuliana.prodan@nxp.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Silvano Di Ninno <silvano.dininno@nxp.com>,
+        Franck Lenormand <franck.lenormand@nxp.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-imx <linux-imx@nxp.com>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>
+Subject: [PATCH v6 0/9] crypto: caam - backlogging support
+Date:   Wed, 12 Feb 2020 19:55:15 +0200
+Message-Id: <1581530124-9135-1-git-send-email-iuliana.prodan@nxp.com>
+X-Mailer: git-send-email 2.1.0
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 28 Jan 2020 at 16:31, Martin Kaiser <martin@kaiser.cx> wrote:
->
-> The rngc requires a new seed for its prng after generating 2^20 160-bit
-> words of random data. At the moment, we seed the prng only once during
-> initalisation.
->
-> Set the rngc to auto seed mode so that it kicks off the internal
-> reseeding operation when a new seed is required.
->
-> Keep the manual calculation of the initial seed when the device is
-> probed and switch to automatic seeding afterwards.
->
-> Signed-off-by: Martin Kaiser <martin@kaiser.cx>
-> ---
->  drivers/char/hw_random/imx-rngc.c | 16 ++++++++++++++--
->  1 file changed, 14 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/char/hw_random/imx-rngc.c b/drivers/char/hw_random/imx-rngc.c
-> index 0576801944fd..903894518c8d 100644
-> --- a/drivers/char/hw_random/imx-rngc.c
-> +++ b/drivers/char/hw_random/imx-rngc.c
-> @@ -31,6 +31,7 @@
->
->  #define RNGC_CTRL_MASK_ERROR           0x00000040
->  #define RNGC_CTRL_MASK_DONE            0x00000020
-> +#define RNGC_CTRL_AUTO_SEED            0x00000010
->
->  #define RNGC_STATUS_ERROR              0x00010000
->  #define RNGC_STATUS_FIFO_LEVEL_MASK    0x00000f00
-> @@ -167,7 +168,7 @@ static irqreturn_t imx_rngc_irq(int irq, void *priv)
->  static int imx_rngc_init(struct hwrng *rng)
->  {
->         struct imx_rngc *rngc = container_of(rng, struct imx_rngc, rng);
-> -       u32 cmd;
-> +       u32 cmd, ctrl;
->         int ret;
->
->         /* clear error */
-> @@ -192,7 +193,18 @@ static int imx_rngc_init(struct hwrng *rng)
->
->         } while (rngc->err_reg == RNGC_ERROR_STATUS_STAT_ERR);
->
-> -       return rngc->err_reg ? -EIO : 0;
-> +       if (rngc->err_reg)
-> +               return -EIO;
-> +
-> +       /*
-> +        * enable automatic seeding, the rngc creates a new seed automatically
-> +        * after serving 2^20 random 160-bit words
-> +        */
-> +       ctrl = readl(rngc->base + RNGC_CONTROL);
-> +       ctrl |= RNGC_CTRL_AUTO_SEED;
-> +       writel(ctrl, rngc->base + RNGC_CONTROL);
-> +
-> +       return 0;
->  }
->
->  static int imx_rngc_probe(struct platform_device *pdev)
-> --
-> 2.20.1
->
+Integrate crypto_engine framework into CAAM, to make use of
+the engine queue.
+Added support for SKCIPHER, HASH, RSA and AEAD algorithms.
+This is intended to be used for CAAM backlogging support.
+The requests, with backlog flag (e.g. from dm-crypt) will be
+listed into crypto-engine queue and processed by CAAM when free.
 
-Reviewed-by: PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+While here, I've also made some refactorization.
+Patches #1 - #4 include some refactorizations on caamalg, caamhash
+and caampkc.
+Patch #5 changes the return code of caam_jr_enqueue function
+to -EINPROGRESS, in case of success, -ENOSPC in case the CAAM is
+busy, -EIO if it cannot map the caller's descriptor.
+Patches #6 - #9 integrate crypto_engine into CAAM, for
+SKCIPHER/AEAD/RSA/HASH algorithms.
+
+---
+Changes since V5:
+	- remove unnecessary initializations;
+	- add local variable for share descriptor offset for skcipher and hash;
+	- handle error case for ahash_update_first and ahash_update_no_ctx.
+
+Changes since V4:
+	- reorganize {skcipher,aead,rsa}_edesc struct for a proper
+	  cacheline sharing.
+
+Changes since V3:
+	- update return on ahash_enqueue_req function from patch #9.
+
+Changes since V2:
+	- remove patch ("crypto: caam - refactor caam_jr_enqueue"),
+	  that added some structures not needed anymore;
+	- use _done_ callback function directly for skcipher and aead;
+	- handle resource leak in case of transfer request to crypto-engine;
+	- update commit messages.
+
+Changes since V1:
+	- remove helper function - akcipher_request_cast;
+	- remove any references to crypto_async_request,
+	  use specific request type;
+	- remove bypass crypto-engine queue, in case is empty;
+	- update some commit messages;
+	- remove unrelated changes, like whitespaces;
+	- squash some changes from patch #9 to patch #6;
+	- added Reviewed-by.
+
+Iuliana Prodan (9):
+  crypto: caam - refactor skcipher/aead/gcm/chachapoly {en,de}crypt
+    functions
+  crypto: caam - refactor ahash_done callbacks
+  crypto: caam - refactor ahash_edesc_alloc
+  crypto: caam - refactor RSA private key _done callbacks
+  crypto: caam - change return code in caam_jr_enqueue function
+  crypto: caam - support crypto_engine framework for SKCIPHER algorithms
+  crypto: caam - add crypto_engine support for AEAD algorithms
+  crypto: caam - add crypto_engine support for RSA algorithms
+  crypto: caam - add crypto_engine support for HASH algorithms
+
+ drivers/crypto/caam/Kconfig    |   1 +
+ drivers/crypto/caam/caamalg.c  | 413 ++++++++++++++++++-----------------------
+ drivers/crypto/caam/caamhash.c | 338 +++++++++++++++++----------------
+ drivers/crypto/caam/caampkc.c  | 185 +++++++++++-------
+ drivers/crypto/caam/caampkc.h  |  10 +
+ drivers/crypto/caam/caamrng.c  |   4 +-
+ drivers/crypto/caam/intern.h   |   2 +
+ drivers/crypto/caam/jr.c       |  36 +++-
+ drivers/crypto/caam/key_gen.c  |   2 +-
+ 9 files changed, 512 insertions(+), 479 deletions(-)
+
+-- 
+2.1.0
+
