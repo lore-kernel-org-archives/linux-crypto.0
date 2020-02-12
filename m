@@ -5,60 +5,60 @@ X-Spam-Level:
 X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29489C2BA83
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Feb 2020 16:24:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E30FFC2BA83
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Feb 2020 16:25:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EF6EF20714
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Feb 2020 16:24:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B66F720714
+	for <linux-crypto@archiver.kernel.org>; Wed, 12 Feb 2020 16:25:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="miH8EZwy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cP7Dc2Vt"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727007AbgBLQYP (ORCPT
+        id S1727548AbgBLQZD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Feb 2020 11:24:15 -0500
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:34922 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727041AbgBLQYP (ORCPT
+        Wed, 12 Feb 2020 11:25:03 -0500
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:37238 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726728AbgBLQZC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Feb 2020 11:24:15 -0500
-Received: by mail-pg1-f196.google.com with SMTP id l24so1478619pgk.2;
-        Wed, 12 Feb 2020 08:24:14 -0800 (PST)
+        Wed, 12 Feb 2020 11:25:02 -0500
+Received: by mail-pg1-f194.google.com with SMTP id z12so1479072pgl.4;
+        Wed, 12 Feb 2020 08:25:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=EdJ9jznJ6wCoLx3M+Q7vLWwv5VYzXfXi+Eg2gF08D2I=;
-        b=miH8EZwyrhb+567BJVz1H3LtOZjolN68vVQomtTgvaRF686bLqKCfLLvGqjKZCAIfO
-         vEwZnoZTnct1ylTVoh6kwFNTk0xX28/mT2r+cZIP+nVlkmL+PT00G5vmr2dEifKCK6t9
-         e0cymh4CgsQiIxIAgrASohWQ2vHA/1ShVebZKDRY0sDXK4egykHjQbpcWfowbTtEbqfB
-         VOD6PXOrRpH0E4EsE0KHSi/EMIbadnTfgueujtGvt9H0KJtvh5EVf9ju7oPDxuoMLhsx
-         T6qp7GJc8KKEtqqSi82gAJA0KqRiTRPiDKeHxotQ2YirxY68n1MR+s0fMKhBznbGtwxC
-         S9Xg==
+        bh=zweDaFEU0USsV+JX/LUuDeDmSUEHYWtL+9GANBjwgS4=;
+        b=cP7Dc2VtOxGDgxZ6JHdE2q9Lyhmqv0k2cCO7w6iMWAwBuUc4X1hTFNxnXVCptDXT5x
+         NkTwJ4HwJDTYlXQ/5Q7HYPa3LjvpoW91An4WuKSfHiHl1cCp/idPPX1hDnIWFfwgILph
+         QW9+RaPIhjuK1G7zJ38FF3O6vqRsLjyTFD1u6DPY3hwHwnUAu83W+GE02P7wMvEy32l3
+         eXIX+9iUpxb5H7wLek1JA/nyj2rTQruJVFD7L9dgv3URdIlaLvOkvra0G4uAdd98IqUt
+         FLJTU0BiinQI0yNZwHtYRV5wtxUSO5kAqzg2SG6UUvGIfNaKdm2lxG4iEEO/0uByivN6
+         2ENg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=EdJ9jznJ6wCoLx3M+Q7vLWwv5VYzXfXi+Eg2gF08D2I=;
-        b=tXFW3luD3H34nUh58tLObqNsbfVnuV5MWfA+o3la2dKN9LLr/ruNOMAbRM1UwbGT9i
-         fTYY+zyTX7Z19a+plZQgqppU+9SGxOcaNzQa0JR8LhkF6Sx8D45MAegjKImG8e8d+HxZ
-         407Xs3g0XvWYymD5yweDD6X94s61Hra+1wpBGv2Un2tcB9MJPg1vtodrAccuAgDYE7XV
-         1jIka8qn+K/ObqKPH8iMP8MKBRAe/3ElElVW06dMcDFtauCeTI9mx2iuOrGcyXFjC79L
-         xymRLOjN7E0AD66B0H2fpv0RCI025120BMQTgYXACBOVOes6wCDHO+3sUuDlHI4JBHy9
-         V3RA==
-X-Gm-Message-State: APjAAAXoX5BiiJX8r4aI0VTt9QU2T6QLzFt845cPM1Wu0dd3ft6DiJXo
-        fEylpDdQdxG0/7O1IvQd2S9ZN3eeKkjIWCa5r3Y=
-X-Google-Smtp-Source: APXvYqwzBgfyekxP6cVyPe5nEedZ7+Oaj2Yy8d5xqV52U+jREyuWzXUbC7v7ynDyQxgDAtlZRKMM87v5w+R1JwlTBNE=
-X-Received: by 2002:a63:583:: with SMTP id 125mr9266610pgf.100.1581524654460;
- Wed, 12 Feb 2020 08:24:14 -0800 (PST)
+        bh=zweDaFEU0USsV+JX/LUuDeDmSUEHYWtL+9GANBjwgS4=;
+        b=IVjO0a134bw4yJMmWAJVond4xkwVesau28rgyMA5uNt9aiRwgd5B1wBNO8w3YTcB/f
+         UF/DwqdTuutW/dd/TWsz+Lo0gVDjDDyVCwKUzzWibX6tFnAWYjQSTMNaXueFCRonNJuO
+         ynrakaJe8thJuOYQ8EmJc7seFIDYo/PWmSQrHvXJSsmS9Pl8g9+SmUm4REC9nKYHHrBf
+         mJxL2Lf++Lc0JOySCvLhXZtSc0nuQr2Gn5tcMDNbFBmStRbxiUyja+BL4Nlq2wMnTDAB
+         n+Zn9RXW03gtrws7hCYfN2VQG2jYhQxaXdjju+jLaiUv66Vt3Rlo/Wt9bSYFLudjQa/m
+         JAlQ==
+X-Gm-Message-State: APjAAAUIk15enj7dsG5CJ7HXmnpjy2W4ZQZbDis2LC/I6kOQ3W+E3MlR
+        BY8c+f70PCE+yGkT+dqrNmxiPdNO9j6DGfAqrsw=
+X-Google-Smtp-Source: APXvYqxdvvvgkWHaTR3wCKLim8YYFZ3Gilg23ZQv1CNAsUnE4dlwsUOhdWPRIYUJ8aFymPSp2AKT9wOK4ZMF4Mx3X+0=
+X-Received: by 2002:a63:306:: with SMTP id 6mr9363242pgd.337.1581524702320;
+ Wed, 12 Feb 2020 08:25:02 -0800 (PST)
 MIME-Version: 1.0
-References: <20200128110102.11522-1-martin@kaiser.cx> <20200128110102.11522-5-martin@kaiser.cx>
-In-Reply-To: <20200128110102.11522-5-martin@kaiser.cx>
+References: <20200128110102.11522-1-martin@kaiser.cx> <20200128110102.11522-3-martin@kaiser.cx>
+In-Reply-To: <20200128110102.11522-3-martin@kaiser.cx>
 From:   PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Date:   Wed, 12 Feb 2020 21:54:03 +0530
-Message-ID: <CANc+2y7ToOCEzRjJR=Mx6LpGim-StDw_NEZAZjT+WWXpK39n1A@mail.gmail.com>
-Subject: Re: [PATCH 4/6] hwrng: imx-rngc - (trivial) simplify error prints
+Date:   Wed, 12 Feb 2020 21:54:51 +0530
+Message-ID: <CANc+2y60cCtDwBi1jaV=eMtTwoihRf2WiKW7Zo3iC9ALv2OVSw@mail.gmail.com>
+Subject: Re: [PATCH 2/6] hwrng: imx-rngc - use automatic seeding
 To:     Martin Kaiser <martin@kaiser.cx>
 Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         NXP Linux Team <linux-imx@nxp.com>,
@@ -74,37 +74,62 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 On Tue, 28 Jan 2020 at 16:31, Martin Kaiser <martin@kaiser.cx> wrote:
 >
-> Remove the device name, it is added by the dev_...() routines.
+> The rngc requires a new seed for its prng after generating 2^20 160-bit
+> words of random data. At the moment, we seed the prng only once during
+> initalisation.
 >
-> Drop the error code as well. It will be shown by the driver core when
-> the probe operation failed.
+> Set the rngc to auto seed mode so that it kicks off the internal
+> reseeding operation when a new seed is required.
+>
+> Keep the manual calculation of the initial seed when the device is
+> probed and switch to automatic seeding afterwards.
 >
 > Signed-off-by: Martin Kaiser <martin@kaiser.cx>
 > ---
->  drivers/char/hw_random/imx-rngc.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  drivers/char/hw_random/imx-rngc.c | 16 ++++++++++++++--
+>  1 file changed, 14 insertions(+), 2 deletions(-)
 >
 > diff --git a/drivers/char/hw_random/imx-rngc.c b/drivers/char/hw_random/imx-rngc.c
-> index 1381ddd5b891..8222055b9e9b 100644
+> index 0576801944fd..903894518c8d 100644
 > --- a/drivers/char/hw_random/imx-rngc.c
 > +++ b/drivers/char/hw_random/imx-rngc.c
-> @@ -258,14 +258,14 @@ static int imx_rngc_probe(struct platform_device *pdev)
->         if (self_test) {
->                 ret = imx_rngc_self_test(rngc);
->                 if (ret) {
-> -                       dev_err(rngc->dev, "FSL RNGC self test failed.\n");
-> +                       dev_err(rngc->dev, "self test failed\n");
->                         goto err;
->                 }
->         }
+> @@ -31,6 +31,7 @@
 >
->         ret = devm_hwrng_register(&pdev->dev, &rngc->rng);
->         if (ret) {
-> -               dev_err(&pdev->dev, "FSL RNGC registering failed (%d)\n", ret);
-> +               dev_err(&pdev->dev, "hwrng registration failed\n");
->                 goto err;
->         }
+>  #define RNGC_CTRL_MASK_ERROR           0x00000040
+>  #define RNGC_CTRL_MASK_DONE            0x00000020
+> +#define RNGC_CTRL_AUTO_SEED            0x00000010
 >
+>  #define RNGC_STATUS_ERROR              0x00010000
+>  #define RNGC_STATUS_FIFO_LEVEL_MASK    0x00000f00
+> @@ -167,7 +168,7 @@ static irqreturn_t imx_rngc_irq(int irq, void *priv)
+>  static int imx_rngc_init(struct hwrng *rng)
+>  {
+>         struct imx_rngc *rngc = container_of(rng, struct imx_rngc, rng);
+> -       u32 cmd;
+> +       u32 cmd, ctrl;
+>         int ret;
+>
+>         /* clear error */
+> @@ -192,7 +193,18 @@ static int imx_rngc_init(struct hwrng *rng)
+>
+>         } while (rngc->err_reg == RNGC_ERROR_STATUS_STAT_ERR);
+>
+> -       return rngc->err_reg ? -EIO : 0;
+> +       if (rngc->err_reg)
+> +               return -EIO;
+> +
+> +       /*
+> +        * enable automatic seeding, the rngc creates a new seed automatically
+> +        * after serving 2^20 random 160-bit words
+> +        */
+> +       ctrl = readl(rngc->base + RNGC_CONTROL);
+> +       ctrl |= RNGC_CTRL_AUTO_SEED;
+> +       writel(ctrl, rngc->base + RNGC_CONTROL);
+> +
+> +       return 0;
+>  }
+>
+>  static int imx_rngc_probe(struct platform_device *pdev)
 > --
 > 2.20.1
 >
