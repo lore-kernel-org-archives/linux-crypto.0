@@ -1,106 +1,80 @@
-Return-Path: <SRS0=stso=4A=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=Q4nt=4B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B5D1C352A4
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Feb 2020 20:45:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32A63C3B186
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Feb 2020 03:32:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E444F2467D
-	for <linux-crypto@archiver.kernel.org>; Wed, 12 Feb 2020 20:45:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 09C3020724
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Feb 2020 03:32:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728185AbgBLUpS (ORCPT
+        id S1729577AbgBMDch (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Feb 2020 15:45:18 -0500
-Received: from metis.ext.pengutronix.de ([85.220.165.71]:43665 "EHLO
-        metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727111AbgBLUpS (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Feb 2020 15:45:18 -0500
-Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
-        by metis.ext.pengutronix.de with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1j1ysh-00039j-DC; Wed, 12 Feb 2020 21:45:11 +0100
-Received: from ukl by ptx.hi.pengutronix.de with local (Exim 4.89)
-        (envelope-from <ukl@pengutronix.de>)
-        id 1j1ysd-0004v8-6T; Wed, 12 Feb 2020 21:45:07 +0100
-Date:   Wed, 12 Feb 2020 21:45:07 +0100
-From:   Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-To:     Horia Geanta <horia.geanta@nxp.com>
-Cc:     Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "kernel@pengutronix.de" <kernel@pengutronix.de>,
-        dl-linux-imx <linux-imx@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH] hwrng: imx-rngc: improve dependencies
-Message-ID: <20200212204507.u4slynuvztxjxbef@pengutronix.de>
-References: <20200205140002.26273-1-u.kleine-koenig@pengutronix.de>
- <VI1PR0402MB3485267DA0BBAD58556611D1981B0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+        Wed, 12 Feb 2020 22:32:37 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:33876 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729467AbgBMDch (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 12 Feb 2020 22:32:37 -0500
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1j25Ew-00028y-8w; Thu, 13 Feb 2020 11:32:34 +0800
+Received: from herbert by gondobar with local (Exim 4.89)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1j25Et-0000io-BV; Thu, 13 Feb 2020 11:32:31 +0800
+Date:   Thu, 13 Feb 2020 11:32:31 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: [GIT PULL] Crypto Fixes for 5.6
+Message-ID: <20200213033231.xjwt6uf54nu26qm5@gondor.apana.org.au>
+References: <20190916084901.GA20338@gondor.apana.org.au>
+ <20190923050515.GA6980@gondor.apana.org.au>
+ <20191202062017.ge4rz72ki3vczhgb@gondor.apana.org.au>
+ <20191214084749.jt5ekav5o5pd2dcp@gondor.apana.org.au>
+ <20200115150812.mo2eycc53lbsgvue@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <VI1PR0402MB3485267DA0BBAD58556611D1981B0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+In-Reply-To: <20200115150812.mo2eycc53lbsgvue@gondor.apana.org.au>
 User-Agent: NeoMutt/20170113 (1.7.2)
-X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Feb 12, 2020 at 07:51:46PM +0000, Horia Geanta wrote:
-> On 2/5/2020 4:00 PM, Uwe Kleine-König wrote:
-> > The imx-rngc driver binds to devices that are compatible to
-> > "fsl,imx25-rngb". Grepping through the device tree sources suggests this
-> > only exists on i.MX25. So restrict dependencies to configs that have
-> The driver could also be used by some i.MX6 SoCs (SL, SLL),
-> that have a compatible rngb.
-> 
-> Actually i.MX6SL has a rngb node in the DT, but unfortunately it lacks
-> a compatible string.
+Hi Linus:
 
-Also the i.MX6ULL might have a compatible device?
+This push fixes a Kconfig anomaly when lib/crypto is enabled without
+Crypto API.
 
-> I am planning to address this short term.
-> 
-> > this SoC enabled, but allow compile testing. For the latter additional
-> > dependencies for clk and readl/writel are necessary.
-> > > Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-> > ---
-> >  drivers/char/hw_random/Kconfig | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-> > index 8486c29d8324..17fe954fccde 100644
-> > --- a/drivers/char/hw_random/Kconfig
-> > +++ b/drivers/char/hw_random/Kconfig
-> > @@ -244,7 +244,8 @@ config HW_RANDOM_MXC_RNGA
-> >  
-> >  config HW_RANDOM_IMX_RNGC
-> >  	tristate "Freescale i.MX RNGC Random Number Generator"
-> > -	depends on ARCH_MXC
-> > +	depends on HAS_IOMEM && HAVE_CLK
-> > +	depends on SOC_IMX25 || COMPILE_TEST
-> I guess SOC_IMX6SL and SOC_IMX6SLL will have to be added.
-> Does this sound good?
+The following changes since commit 0bc81767c5bd9d005fae1099fb39eb3688370cb1:
 
-I'd say currently the patch is right and once the device trees for the
-imx6 variants were expanded to include these, the list here can be
-expanded.
+  crypto: arm/chacha - fix build failured when kernel mode NEON is disabled (2020-01-22 16:21:11 +0800)
 
-Best regards
-Uwe
+are available in the git repository at:
 
+  git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus 
+
+for you to fetch changes up to 2343d1529aff8b552589f622c23932035ed7a05d:
+
+  crypto: Kconfig - allow tests to be disabled when manager is disabled (2020-02-05 17:00:57 +0800)
+
+----------------------------------------------------------------
+Jason A. Donenfeld (1):
+      crypto: Kconfig - allow tests to be disabled when manager is disabled
+
+ crypto/Kconfig | 4 ----
+ 1 file changed, 4 deletions(-)
+
+Thanks,
 -- 
-Pengutronix e.K.                           | Uwe Kleine-König            |
-Industrial Linux Solutions                 | https://www.pengutronix.de/ |
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
