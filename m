@@ -6,52 +6,53 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23073C2BA83
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Feb 2020 09:25:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C983C2BA83
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Feb 2020 09:25:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0043A21734
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Feb 2020 09:25:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A70421734
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Feb 2020 09:25:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729602AbgBMJZT (ORCPT
+        id S1729640AbgBMJZs (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 13 Feb 2020 04:25:19 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:42520 "EHLO deadmen.hmeau.com"
+        Thu, 13 Feb 2020 04:25:48 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:42542 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729600AbgBMJZT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Feb 2020 04:25:19 -0500
+        id S1729578AbgBMJZs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 13 Feb 2020 04:25:48 -0500
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1j2AkI-0004Bi-AD; Thu, 13 Feb 2020 17:25:18 +0800
+        id 1j2Aka-0004Bp-Lc; Thu, 13 Feb 2020 17:25:36 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1j2AkI-0006rR-4H; Thu, 13 Feb 2020 17:25:18 +0800
-Date:   Thu, 13 Feb 2020 17:25:18 +0800
+        id 1j2AkZ-0006rf-OP; Thu, 13 Feb 2020 17:25:35 +0800
+Date:   Thu, 13 Feb 2020 17:25:35 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Devulapally Shiva Krishna <shiva@chelsio.com>
-Cc:     linux-crypto@vger.kernel.org, manojmalviya@chelsio.com
-Subject: Re: [Crypto] chcr: Print the chcr driver information while module
- load.
-Message-ID: <20200213092518.2pxkrpx6z6kpjqk4@gondor.apana.org.au>
-References: <20200205103433.10490-1-shiva@chelsio.com>
+To:     Chen Zhou <chenzhou10@huawei.com>
+Cc:     clabbe.montjoie@gmail.com, davem@davemloft.net, mripard@kernel.org,
+        wens@csie.org, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH -next] crypto: allwinner - remove redundant
+ platform_get_irq error message
+Message-ID: <20200213092535.buas6vaiusonkhrw@gondor.apana.org.au>
+References: <20200205140130.164805-1-chenzhou10@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200205103433.10490-1-shiva@chelsio.com>
+In-Reply-To: <20200205140130.164805-1-chenzhou10@huawei.com>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Feb 05, 2020 at 04:04:33PM +0530, Devulapally Shiva Krishna wrote:
-> No logs are recorded in dmesg during chcr module load, hence
-> adding the print and also appending -ko to driver version.
+On Wed, Feb 05, 2020 at 10:01:30PM +0800, Chen Zhou wrote:
+> Function dev_err() after platform_get_irq() is redundant because
+> platform_get_irq() already prints an error.
 > 
-> Signed-off-by: Devulapally Shiva Krishna <shiva@chelsio.com>
+> Signed-off-by: Chen Zhou <chenzhou10@huawei.com>
 > ---
->  drivers/crypto/chelsio/chcr_core.c | 1 +
->  drivers/crypto/chelsio/chcr_core.h | 3 ++-
->  2 files changed, 3 insertions(+), 1 deletion(-)
+>  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
 
 Patch applied.  Thanks.
 -- 
