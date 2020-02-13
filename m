@@ -4,59 +4,65 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D202AC2BA83
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Feb 2020 09:22:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B818C2BA83
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Feb 2020 09:23:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B23262173E
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Feb 2020 09:22:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A0D721734
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Feb 2020 09:23:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729576AbgBMJWh (ORCPT
+        id S1729526AbgBMJXC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 13 Feb 2020 04:22:37 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:42404 "EHLO deadmen.hmeau.com"
+        Thu, 13 Feb 2020 04:23:02 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:42430 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726545AbgBMJWh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Feb 2020 04:22:37 -0500
+        id S1726545AbgBMJXC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 13 Feb 2020 04:23:02 -0500
 Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
         by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
-        id 1j2AhQ-00048Q-8n; Thu, 13 Feb 2020 17:22:20 +0800
+        id 1j2Ahy-00048Z-9P; Thu, 13 Feb 2020 17:22:54 +0800
 Received: from herbert by gondobar with local (Exim 4.89)
         (envelope-from <herbert@gondor.apana.org.au>)
-        id 1j2AhM-0006pA-UD; Thu, 13 Feb 2020 17:22:16 +0800
-Date:   Thu, 13 Feb 2020 17:22:16 +0800
+        id 1j2Ahu-0006pe-Sr; Thu, 13 Feb 2020 17:22:50 +0800
+Date:   Thu, 13 Feb 2020 17:22:50 +0800
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Gilad Ben-Yossef <gilad@benyossef.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Ofir Drang <ofir.drang@arm.com>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        stable@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: ccree - dec auth tag size from cryptlen map
-Message-ID: <20200213092216.jcbhelawxd6dgzat@gondor.apana.org.au>
-References: <20200202161914.9551-1-gilad@benyossef.com>
+To:     YueHaibing <yuehaibing@huawei.com>
+Cc:     Ofir Drang <ofir.drang@arm.com>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Sumit Semwal <sumit.semwal@linaro.org>,
+        linux-crypto@vger.kernel.org, linux-media@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org,
+        kernel-janitors@vger.kernel.org, Hulk Robot <hulkci@huawei.com>
+Subject: Re: [PATCH -next] crypto: ccree - remove set but not used variable
+ 'du_size'
+Message-ID: <20200213092250.qsvhnv6g55lnvw23@gondor.apana.org.au>
+References: <20200203153921.45273-1-yuehaibing@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200202161914.9551-1-gilad@benyossef.com>
+In-Reply-To: <20200203153921.45273-1-yuehaibing@huawei.com>
 User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Feb 02, 2020 at 06:19:14PM +0200, Gilad Ben-Yossef wrote:
-> Remove the auth tag size from cryptlen before mapping the destination
-> in out-of-place AEAD decryption thus resolving a crash with
-> extended testmgr tests.
+On Mon, Feb 03, 2020 at 03:39:21PM +0000, YueHaibing wrote:
+> Fixes gcc '-Wunused-but-set-variable' warning:
 > 
-> Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-> Reported-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> Cc: stable@vger.kernel.org # v4.19+
+> drivers/crypto/ccree/cc_cipher.c: In function 'cc_setup_state_desc':
+> drivers/crypto/ccree/cc_cipher.c:536:15: warning:
+>  variable 'du_size' set but not used [-Wunused-but-set-variable]
+> 
+> commit 5c83e8ec4d51 ("crypto: ccree - fix FDE descriptor sequence")
+> involved this unused variable, so remove it.
+> 
+> Reported-by: Hulk Robot <hulkci@huawei.com>
+> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
 > ---
->  drivers/crypto/ccree/cc_buffer_mgr.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
+>  drivers/crypto/ccree/cc_cipher.c | 8 --------
+>  1 file changed, 8 deletions(-)
 
 Patch applied.  Thanks.
 -- 
