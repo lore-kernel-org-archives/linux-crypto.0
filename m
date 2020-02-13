@@ -2,94 +2,127 @@ Return-Path: <SRS0=Q4nt=4B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFEE8C2BA83
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Feb 2020 10:44:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1A02C2BA83
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Feb 2020 11:09:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C507D217F4
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Feb 2020 10:44:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1581590676;
-	bh=JbaaM3wCQgbP43CQfcEhVYnKbvSGI/oQuNsbU2J944Q=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=AqcDZI9qlAjz50GxGcv3FuVJixGLY53Llraly5uW2UdV5i6ImisRJuuZvjzPm8phw
-	 393G8TkoXO6Ci2lcyhZJv2GZLlmhVle/Nxo9DqdMefFwSuThr3fThuE3Jmuz0sev4n
-	 d/b7UPkkfBVpHjo1W5xAtG3WsXh5hBcGt97tWg88=
+	by mail.kernel.org (Postfix) with ESMTP id 7AEEE20848
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Feb 2020 11:09:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729828AbgBMKog (ORCPT
+        id S1729852AbgBMLJV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 13 Feb 2020 05:44:36 -0500
-Received: from mail.kernel.org ([198.145.29.99]:36120 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729494AbgBMKog (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Feb 2020 05:44:36 -0500
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 3BFE324670
-        for <linux-crypto@vger.kernel.org>; Thu, 13 Feb 2020 10:44:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581590675;
-        bh=JbaaM3wCQgbP43CQfcEhVYnKbvSGI/oQuNsbU2J944Q=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=d1EIBB3fpdOYfbZVDlipDaNZI7pfvlPVWpb//iA7HKs/0lMMjXl5mDJe5t4qceIAz
-         5e2Uk1qNGCZ205/6pzh87+HEzpmGlgvHip0vzlAN41V5acTE0o0sEfLH+Ar0Zgvc3q
-         DKvC4pdoosfd+AtmO4C8DnAMtJvycS+9DJ79Qx9I=
-Received: by mail-wm1-f42.google.com with SMTP id p9so5650299wmc.2
-        for <linux-crypto@vger.kernel.org>; Thu, 13 Feb 2020 02:44:35 -0800 (PST)
-X-Gm-Message-State: APjAAAVB/42PQaCa5aLRivaEiNrSjyKxqOJfpTZeI5DyJVyMJZUiOOkE
-        AWV92ELgOIqhAefm0Skyyr4frmSprWNVmyn1fFAV/g==
-X-Google-Smtp-Source: APXvYqyeNAdVe/yqJLR6H0X+hoGPMP4zBD/FxKoWXql/TI0MpTRDK9n3nhyRYZYAox7MRIUl0lMPJapkr9XL/Aa5l2U=
-X-Received: by 2002:a1c:b603:: with SMTP id g3mr5427492wmf.133.1581590673662;
- Thu, 13 Feb 2020 02:44:33 -0800 (PST)
+        Thu, 13 Feb 2020 06:09:21 -0500
+Received: from mail-ot1-f68.google.com ([209.85.210.68]:38266 "EHLO
+        mail-ot1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729531AbgBMLJU (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 13 Feb 2020 06:09:20 -0500
+Received: by mail-ot1-f68.google.com with SMTP id z9so5170961oth.5;
+        Thu, 13 Feb 2020 03:09:20 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Rh+bWg1peeSmVzyxxXOPGQpNTf1aI4Yae1qitHYFzC0=;
+        b=kzhbr9MBqncwI+6BAOWb+rhiD9tVNUk4Z2RCOC7+Y0jsF/6BuiNssd4poEdTscvNge
+         814VqTPT3dRLW+ttil4Eo/aXwnZ8mq3Ok4Wna21Kdwq1aD8AJ4tG/gjGvdlgk8Imvjtf
+         HRXtyJp9mvjjP1Wmmq3GF/EWYKqBirQiKx2lFmgfhBupo7VWi2lqi0fTDDDe9+T31B+5
+         VJYdv70B0NOjOV2ThgPGLtlgHpDMgN47ZV1qBNvJ78u7PFXyeJYsckxDg2SYUuSQjCYa
+         utziGj8Hw4V4DIIfVxms7KvKfOK0NtBYakbLmd/c0lsW9DtiSQqC9yssvDzhGmk7waDa
+         Extw==
+X-Gm-Message-State: APjAAAUa9hYxyxmreemfGzRrAALrZ0UGs5pM5yJ9Xga1SwM+bZT3s2GV
+        kouL5oV/CeX4n+HTOROcJgIoIZHGNZ5QRbhD5B1uvu4U
+X-Google-Smtp-Source: APXvYqyUXZecOa5y8YQteeH6PJjeQnUGb2JBJGFxp9TbCjcYGL69hpvf7ToH3S8CyVvwVpokTq8RQvTsXTjARXZoGvI=
+X-Received: by 2002:a9d:dc1:: with SMTP id 59mr13000694ots.250.1581592159889;
+ Thu, 13 Feb 2020 03:09:19 -0800 (PST)
 MIME-Version: 1.0
-References: <20200203233933.19577-1-mcroce@redhat.com> <20200213092355.i77luefms23jkud2@gondor.apana.org.au>
- <20200213103444.GA700076@zx2c4.com> <20200213103851.d26zufgvivamulcg@gondor.apana.org.au>
-In-Reply-To: <20200213103851.d26zufgvivamulcg@gondor.apana.org.au>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Thu, 13 Feb 2020 10:44:22 +0000
-X-Gmail-Original-Message-ID: <CAKv+Gu8XYoCLPN3F3BbMXt6JbbhBvbHvEiyJZu=EdLGxc6tcwA@mail.gmail.com>
-Message-ID: <CAKv+Gu8XYoCLPN3F3BbMXt6JbbhBvbHvEiyJZu=EdLGxc6tcwA@mail.gmail.com>
-Subject: Re: [PATCH] crypto: arm64/poly1305: ignore build files
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Matteo Croce <mcroce@redhat.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Catalin Marinas <catalin.marinas@arm.com>
+References: <20200211174126.GA29960@embeddedor>
+In-Reply-To: <20200211174126.GA29960@embeddedor>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Thu, 13 Feb 2020 12:09:08 +0100
+Message-ID: <CAMuHMdVZq3Lho0HxEvhv8di=OCBhvNEo=O198b1iayX_Wz_QcA@mail.gmail.com>
+Subject: Re: [PATCH] treewide: Replace zero-length arrays with flexible-array member
+To:     "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>,
+        USB list <linux-usb@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 13 Feb 2020 at 11:39, Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> On Thu, Feb 13, 2020 at 11:34:44AM +0100, Jason A. Donenfeld wrote:
-> > On Thu, Feb 13, 2020 at 05:23:55PM +0800, Herbert Xu wrote:
-> > > On Tue, Feb 04, 2020 at 12:39:33AM +0100, Matteo Croce wrote:
-> > > > Add arch/arm64/crypto/poly1305-core.S to .gitignore
-> > > > as it's built from poly1305-core.S_shipped
-> > > >
-> > > > Fixes: f569ca164751 ("crypto: arm64/poly1305 - incorporate OpenSSL/CRYPTOGAMS NEON implementation")
-> > > > Signed-off-by: Matteo Croce <mcroce@redhat.com>
-> > > > ---
-> > > >  arch/arm64/crypto/.gitignore | 1 +
-> > > >  1 file changed, 1 insertion(+)
-> > >
-> > > Patch applied.  Thanks.
-> >
-> > Probably makes sense for 5.6, no?
->
-> No this is too minor.  Only critical bug fixes (e.g., user
-> triggerable crashes) or build issues are routinely accepted.
->
+Hi Gustavo,
 
-Sasha Levin's 'AI' bot finds everything with a 'fixes' tag and
-proposes to backport it if it applies cleanly and doesn't break the
-build, so this patch is going to end up in v5.6 anyway.
+On Tue, Feb 11, 2020 at 10:49 PM Gustavo A. R. Silva
+<gustavo@embeddedor.com> wrote:
+> The current codebase makes use of the zero-length array language
+> extension to the C90 standard, but the preferred mechanism to declare
+> variable-length types such as these ones is a flexible array member[1][2],
+> introduced in C99:
+>
+> struct foo {
+>         int stuff;
+>         struct boo array[];
+> };
+>
+> By making use of the mechanism above, we will get a compiler warning
+> in case the flexible array does not occur last in the structure, which
+> will help us prevent some kind of undefined behavior bugs from being
+> unadvertenly introduced[3] to the codebase from now on.
+>
+> All these instances of code were found with the help of the following
+> Coccinelle script:
+>
+> @@
+> identifier S, member, array;
+> type T1, T2;
+> @@
+>
+> struct S {
+>   ...
+>   T1 member;
+>   T2 array[
+> - 0
+>   ];
+> };
+
+I've stumbled across one more in include/uapi/linux/usb/ch9.h:
+
+    struct usb_key_descriptor {
+            __u8  bLength;
+            __u8  bDescriptorType;
+
+            __u8  tTKID[3];
+            __u8  bReserved;
+            __u8  bKeyData[0];
+    } __attribute__((packed));
+
+And it seems people are (ab)using one-sized arrays for flexible arrays, too:
+
+    struct usb_string_descriptor {
+            __u8  bLength;
+            __u8  bDescriptorType;
+
+            __le16 wData[1];                /* UTF-16LE encoded */
+    } __attribute__ ((packed));
+
+As this is UAPI, we have to be careful for regressions, though.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+-- 
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
