@@ -2,91 +2,84 @@ Return-Path: <SRS0=Q4nt=4B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36CD0C3B189
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Feb 2020 07:47:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC889C2BA83
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Feb 2020 08:39:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 17FD9218AC
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Feb 2020 07:47:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B9E1C217F4
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Feb 2020 08:39:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729831AbgBMHru (ORCPT
+        id S1729586AbgBMIjt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 13 Feb 2020 02:47:50 -0500
-Received: from mail-oi1-f193.google.com ([209.85.167.193]:36299 "EHLO
-        mail-oi1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729706AbgBMHru (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Feb 2020 02:47:50 -0500
-Received: by mail-oi1-f193.google.com with SMTP id c16so4872642oic.3;
-        Wed, 12 Feb 2020 23:47:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=eaXkOVitV4pzkv7pyZH2s/sZrsOAKamY9Cp3kewSSw8=;
-        b=f0LjdD6F+SaN/Yv0dvWukgnvvkUhh83te3YNHnUpWCxAMGJVvf/7mSKEkXzbIYl413
-         wq1CNxb4ALPRqpNDLKheMTqVV2J0yyi1HjxN0nJFgKViR9zbyiTOBmNJk74QUIwBuJ1P
-         tLnckDSBkHze0MebSwLbsIIJqzp1kT6BQmOJrQ0YhBnAytu2j5Y/kjQokVZEcXhQd7qq
-         1kLY4DbnajB9zYZgJtATX3xIe8ii7TO861XLaaDztA6UkXNLqFs5AuSTRkdl/OPvuMle
-         Da8WmVQbZGpFZmGCj/2DzCY0IhIA7a/85TPO2eYYIx9KH35Sx3UFyAf8UdhFzmmeIW6j
-         I3Wg==
-X-Gm-Message-State: APjAAAV8+gxk4Mpky68ycdbVBXTsbXRlEe4avIrV1D5BRsGjytTa12vH
-        jyQGVmq2rPTVzip9og6LGuALL+nKnb4X5ZhuDXM=
-X-Google-Smtp-Source: APXvYqwjVAA0wKcVUuWbP5/5hWV14R7qSAjbxpogUjd0jTCJybva+Yfb49v1/wat2vBzHKdPCH8cW0npSV/Oaw0RhHA=
-X-Received: by 2002:aca:1a06:: with SMTP id a6mr1965717oia.148.1581580069382;
- Wed, 12 Feb 2020 23:47:49 -0800 (PST)
+        Thu, 13 Feb 2020 03:39:49 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:41264 "EHLO deadmen.hmeau.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1729485AbgBMIjs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 13 Feb 2020 03:39:48 -0500
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1j2A2F-0003qG-Nq; Thu, 13 Feb 2020 16:39:47 +0800
+Received: from herbert by gondobar with local (Exim 4.89)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1j2A2E-0001Sg-6E; Thu, 13 Feb 2020 16:39:46 +0800
+Date:   Thu, 13 Feb 2020 16:39:46 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Harald Freudenberger <freude@linux.ibm.com>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>
+Subject: Re: [PATCH] crypto/testmgr: add selftests for paes-s390
+Message-ID: <20200213083946.zicarnnt3wizl5ty@gondor.apana.org.au>
+References: <20191113105523.8007-4-freude@linux.ibm.com>
+ <2391ff22-97be-bc6a-3650-3cade8a78393@linux.ibm.com>
 MIME-Version: 1.0
-References: <20200211181928.15178-1-geert+renesas@glider.be> <CAOtvUMfs84VXAecVNShoEg-CU6APjyiVTUBkogpFq_c3fbaX+Q@mail.gmail.com>
-In-Reply-To: <CAOtvUMfs84VXAecVNShoEg-CU6APjyiVTUBkogpFq_c3fbaX+Q@mail.gmail.com>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Thu, 13 Feb 2020 08:47:38 +0100
-Message-ID: <CAMuHMdXfB9R-1Lwm6Jva6+NPrBJnV7bgHdygbxoqyzikqgqqgQ@mail.gmail.com>
-Subject: Re: [PATCH v2 00/34] crypto: ccree - miscellaneous fixes and improvements
-To:     Gilad Ben-Yossef <gilad@benyossef.com>
-Cc:     Geert Uytterhoeven <geert+renesas@glider.be>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        "Rafael J . Wysocki" <rafael@kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-renesas-soc@vger.kernel.org" 
-        <linux-renesas-soc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2391ff22-97be-bc6a-3650-3cade8a78393@linux.ibm.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Gilad,
+On Thu, Feb 13, 2020 at 08:40:06AM +0100, Harald Freudenberger wrote:
+> This patch enables the selftests for the s390 specific protected key
+> AES (PAES) cipher implementations:
+>   * cbc-paes-s390
+>   * ctr-paes-s390
+>   * ecb-paes-s390
+>   * xts-paes-s390
+> PAES is an AES cipher but with encrypted ('protected') key
+> material. However, the paes ciphers are able to derive an protected
+> key from clear key material with the help of the pkey kernel module.
+> 
+> So this patch now enables the generic AES tests for the paes
+> ciphers. Under the hood the setkey() functions rearrange the clear key
+> values as clear key token and so the pkey kernel module is able to
+> provide protected key blobs from the given clear key values. The
+> derived protected key blobs are then used within the paes cipers and
+> should produce the very same results as the generic AES implementation
+> with the clear key values.
+> 
+> The s390-paes cipher testlist entries are surrounded
+> by #if IS_ENABLED(CONFIG_CRYPTO_PAES_S390) because they don't
+> make any sense on non s390 platforms or without the PAES
+> cipher implementation.
+> 
+> Signed-off-by: Harald Freudenberger <freude@linux.ibm.com>
+> Signed-off-by: Vasily Gorbik <gor@linux.ibm.com>
+> ---
+>  crypto/testmgr.c | 36 ++++++++++++++++++++++++++++++++++++
+>  1 file changed, 36 insertions(+)
 
-On Thu, Feb 13, 2020 at 7:46 AM Gilad Ben-Yossef <gilad@benyossef.com> wrote:
-> On Tuesday, February 11, 2020, Geert Uytterhoeven <geert+renesas@glider.be> wrote:
->> This series contains several fixes, cleanups, and other improvements for
->> the ARM TrustZone CryptoCell driver.
->
->  Thank you so much for doing this Geert.
->
-> The whole series looks wonderful. It does not only makes the driver better, it has made me a better programmer - I'm not ashamed to say I've learned some new things about the kernel API  from this series...
->
-> I am currently out of the office until mid next week and away from my testing lab.
->
-> I'd like to delay formal ACK until I return and run a regression test suite using some of the newer revisions of the hardware which the driver also support, just in case, although I don't forsee any issues. I hope that is ok.
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-Should be OK, we're only at rc1.
-I'm looking forward to the test results on newer hardware revision/
-Thanks!
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
+Thanks,
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
