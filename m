@@ -2,80 +2,92 @@ Return-Path: <SRS0=Q4nt=4B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44239C3B18C
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Feb 2020 16:19:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BC51C3B18C
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Feb 2020 16:38:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1334D206ED
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Feb 2020 16:19:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 486FE2467C
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Feb 2020 16:38:27 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="mR8M3+tF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728076AbgBMQTU (ORCPT
+        id S1728055AbgBMQi0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 13 Feb 2020 11:19:20 -0500
-Received: from os.inf.tu-dresden.de ([141.76.48.99]:51834 "EHLO
-        os.inf.tu-dresden.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727675AbgBMQTU (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 13 Feb 2020 11:19:20 -0500
-Received: from [2002:8d4c:3001:48::120:84]
-        by os.inf.tu-dresden.de with esmtpsa (TLS1.3:TLS_AES_128_GCM_SHA256:128) (Exim 4.93.0.3)
-        id 1j2HCw-0004Br-Lm; Thu, 13 Feb 2020 17:19:18 +0100
-Subject: Re: Remove WQ_CPU_INTENSIVE flag from unbound wq's
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     Zhou Wang <wangzhou1@hisilicon.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Alasdair Kergon <agk@redhat.com>, dm-devel@redhat.com,
-        Song Liu <song@kernel.org>, Gao Xiang <xiang@kernel.org>,
-        Chao Yu <chao@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-erofs@lists.ozlabs.org
-References: <20200213141823.2174236-1-mplaneta@os.inf.tu-dresden.de>
- <20200213153645.GA11313@redhat.com>
-From:   Maksym Planeta <mplaneta@os.inf.tu-dresden.de>
-Message-ID: <82715589-8b59-5cfd-a32f-1e57871327fe@os.inf.tu-dresden.de>
-Date:   Thu, 13 Feb 2020 17:19:01 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        Thu, 13 Feb 2020 11:38:26 -0500
+Received: from frisell.zx2c4.com ([192.95.5.64]:38055 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727778AbgBMQi0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 13 Feb 2020 11:38:26 -0500
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id a4256e13;
+        Thu, 13 Feb 2020 16:36:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=from:to:cc
+        :subject:date:message-id:in-reply-to:references:mime-version
+        :content-transfer-encoding; s=mail; bh=UIUcVigLyhuwbihDTXLa/xFiI
+        A4=; b=mR8M3+tFggkWNkyaj50+0PSDdURdniICmfP9TwV24o9rcc79j4XE0dbf+
+        mcpwdoT1FpsfQmtfW9hUMd/s3ye5OBwx+3NHfSOaFIT0gJOVX1CFJctVg5A/iU0r
+        zAHbB+QrYxXBY/8SO03DSeiQmH3Y7QAzzCwWrYXsA8iwVuUUtjcUXXfIFXAHL1VA
+        j588D9HDIAJQ2q0wRJc50+fZjg14aOdp3wU4ObtmLzNLsjov/l2bGsPkpI0Kqjy8
+        iMXK3U26BlNye9VEoZQeIVt+lCQziEtREXe9tQoZxfGfX76A/GVQbJ2ORFDHlJc5
+        HQkef458NmcADTG8FRdFJRcP3TKJA==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 88524b21 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
+        Thu, 13 Feb 2020 16:36:25 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Ard Biesheuvel <ardb@kernel.org>, stable@vger.kernel.org
+Subject: [PATCH] crypto: chacha20poly1305 - prevent integer overflow on large input
+Date:   Thu, 13 Feb 2020 17:38:13 +0100
+Message-Id: <20200213163813.3210-1-Jason@zx2c4.com>
+In-Reply-To: <20200213114647.cupaio6zmodix3fq@gondor.apana.org.au>
+References: <20200213114647.cupaio6zmodix3fq@gondor.apana.org.au>
 MIME-Version: 1.0
-In-Reply-To: <20200213153645.GA11313@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+This code assigns src_len (size_t) to sl (int), which causes problems
+when src_len is very large. Probably nobody in the kernel should be
+passing this much data to chacha20poly1305 all in one go anyway, so I
+don't think we need to change the algorithm or introduce larger types
+or anything. But we should at least error out early in this case and
+print a warning so that we get reports if this does happen and can look
+into why anybody is possibly passing it that much data or if they're
+accidently passing -1 or similar.
 
+Fixes: d95312a3ccc0 ("crypto: lib/chacha20poly1305 - reimplement crypt_from_sg() routine")
+Cc: Ard Biesheuvel <ardb@kernel.org>
+Cc: stable@vger.kernel.org # 5.5+
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
+---
+Due to the "stable" in the subject line prior, this patch missed
+Herbert's filters. So, I'm simply resending it here so that they can get
+picked up. Note that this is intended for the crypto-2.6.git tree rather
+than cryptodev-2.6.git.
 
-On 13/02/2020 16:36, Mike Snitzer wrote:
-> On Thu, Feb 13 2020 at  9:18am -0500,
-> Maksym Planeta <mplaneta@os.inf.tu-dresden.de> wrote:
-> 
->> The documentation [1] says that WQ_CPU_INTENSIVE is "meaningless" for
->> unbound wq. I remove this flag from places where unbound queue is
->> allocated. This is supposed to improve code readability.
->>
->> 1. https://www.kernel.org/doc/html/latest/core-api/workqueue.html#flags
->>
->> Signed-off-by: Maksym Planeta <mplaneta@os.inf.tu-dresden.de>
-> 
-> What the Documentation says aside, have you cross referenced with the
-> code?  And/or have you done benchmarks to verify no changes?
-> 
+ lib/crypto/chacha20poly1305.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-It seems so from the code. Although, I'm not 100% confident. I did not 
-run benchmarks, instead I relied that on the assumption that 
-documentation is correct.
-
-> Thanks,
-> Mike
-> 
-
+diff --git a/lib/crypto/chacha20poly1305.c b/lib/crypto/chacha20poly1305.c
+index 6d83cafebc69..ad0699ce702f 100644
+--- a/lib/crypto/chacha20poly1305.c
++++ b/lib/crypto/chacha20poly1305.c
+@@ -235,6 +235,9 @@ bool chacha20poly1305_crypt_sg_inplace(struct scatterlist *src,
+ 		__le64 lens[2];
+ 	} b __aligned(16);
+ 
++	if (WARN_ON(src_len > INT_MAX))
++		return false;
++
+ 	chacha_load_key(b.k, key);
+ 
+ 	b.iv[0] = 0;
 -- 
-Regards,
-Maksym Planeta
+2.25.0
+
