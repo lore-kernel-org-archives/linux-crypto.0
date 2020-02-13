@@ -2,89 +2,73 @@ Return-Path: <SRS0=Q4nt=4B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0FA3C352A3
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Feb 2020 04:09:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8556C352A3
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Feb 2020 05:05:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7A40D24671
-	for <linux-crypto@archiver.kernel.org>; Thu, 13 Feb 2020 04:09:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1581566990;
-	bh=ZvRdY2P4FEjO8XWiLdS71L6BPBX7L/QeoOjG/uO/vZc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
-	b=nwsqHQzBpANYJHamuKI1xdoXNZyH5QUn1PCL8zRtk+ISThLkyjV4jPU+3U1CRV3O9
-	 /7sdMsSdKT8PwXqthKTeXg/m2gP+yFIPARO5ZyymG/3BbuOHivIBpMqvWQyARuHV7a
-	 aaXh0VDtx2IwhnVRfivBzjh9Yw+8tYllY52j4jmY=
+	by mail.kernel.org (Postfix) with ESMTP id 821BB20873
+	for <linux-crypto@archiver.kernel.org>; Thu, 13 Feb 2020 05:05:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729443AbgBMEJr (ORCPT
+        id S1726087AbgBMFF5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 12 Feb 2020 23:09:47 -0500
-Received: from mail.kernel.org ([198.145.29.99]:59822 "EHLO mail.kernel.org"
+        Thu, 13 Feb 2020 00:05:57 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:36038 "EHLO deadmen.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729515AbgBMEJr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 12 Feb 2020 23:09:47 -0500
-Received: from cakuba.hsd1.ca.comcast.net (c-73-93-4-247.hsd1.ca.comcast.net [73.93.4.247])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6791F2173E;
-        Thu, 13 Feb 2020 04:09:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581566986;
-        bh=ZvRdY2P4FEjO8XWiLdS71L6BPBX7L/QeoOjG/uO/vZc=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=nDzoygY531SKTNrWfICsg0TBZKNkYBlpr9yM0LsE4hAqoxhQSz2nT2XMCbyVEyWq9
-         mMHBOPFnRn275yLdT3TqwgoU4IhlO2X69peYdHojBc1kzI2GhMWxRAp2Jwrdg7wT/r
-         iz5JNAE8E2toEA/1D/dujHvoyO+DyEHTiHI+fka0=
-Date:   Wed, 12 Feb 2020 20:09:45 -0800
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Rohit Maheshwari <rohitm@chelsio.com>
-Cc:     davem@davemloft.net, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org
-Subject: Re: [net] net/tls: Fix to avoid gettig invalid tls record
-Message-ID: <20200212200945.34460c3a@cakuba.hsd1.ca.comcast.net>
-In-Reply-To: <20200212071630.26650-1-rohitm@chelsio.com>
-References: <20200212071630.26650-1-rohitm@chelsio.com>
+        id S1725446AbgBMFF5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 13 Feb 2020 00:05:57 -0500
+Received: from gondobar.mordor.me.apana.org.au ([192.168.128.4] helo=gondobar)
+        by deadmen.hmeau.com with esmtps (Exim 4.89 #2 (Debian))
+        id 1j26hG-0002hc-Jz; Thu, 13 Feb 2020 13:05:54 +0800
+Received: from herbert by gondobar with local (Exim 4.89)
+        (envelope-from <herbert@gondor.apana.org.au>)
+        id 1j26hE-0000t3-D0; Thu, 13 Feb 2020 13:05:52 +0800
+Date:   Thu, 13 Feb 2020 13:05:52 +0800
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Corentin Labbe <clabbe.montjoie@gmail.com>
+Cc:     Eric Biggers <ebiggers@kernel.org>, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [BUG] crypto: export() overran state buffer on test vector
+Message-ID: <20200213050552.b5fkkravjirsey5y@gondor.apana.org.au>
+References: <20200206085442.GA5585@Red>
+ <20200207065719.GA8284@sol.localdomain>
+ <20200207104659.GA10979@Red>
+ <20200208085713.ftuqxhatk6iioz7e@gondor.apana.org.au>
+ <20200211192118.GA24059@Red>
+ <20200212020628.7grnopgwm6shn3hi@gondor.apana.org.au>
+ <20200212185749.GA9886@Red>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200212185749.GA9886@Red>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 12 Feb 2020 12:46:30 +0530, Rohit Maheshwari wrote:
-> Current code doesn't check if tcp sequence number is starting from (/after)
-> 1st record's start sequnce number. It only checks if seq number is before
-> 1st record's end sequnce number. This problem will always be a possibility
-> in re-transmit case. If a record which belongs to a requested seq number is
-> already deleted, tls_get_record will start looking into list and as per the
-> check it will look if seq number is before the end seq of 1st record, which
-> will always be true and will return 1st record always, it should in fact
-> return NULL. 
+On Wed, Feb 12, 2020 at 07:57:49PM +0100, Corentin Labbe wrote:
+>
+> I just found the problem, it happen with ARM CE which has a bigger state_size (sha256_ce_state) of 4bytes.
+> 
+> Since my driver didnt use statesize at all, I detect this on cra_init() like this:
+> if (algt->alg.hash.halg.statesize < crypto_ahash_statesize(op->fallback_tfm))
+> 	algt->alg.hash.halg.statesize = crypto_ahash_statesize(op->fallback_tfm);
 
-I think I see your point, do you observe this problem in practice 
-or did you find this through code review?
+Thanks for finding this.
 
-> diff --git a/net/tls/tls_device.c b/net/tls/tls_device.c
-> index cd91ad812291..2898517298bf 100644
-> --- a/net/tls/tls_device.c
-> +++ b/net/tls/tls_device.c
-> @@ -602,7 +602,8 @@ struct tls_record_info *tls_get_record(struct tls_offload_context_tx *context,
->  		 */
->  		info = list_first_entry_or_null(&context->records_list,
->  						struct tls_record_info, list);
-> -		if (!info)
-> +		/* return NULL if seq number even before the 1st entry. */
-> +		if (!info || before(seq, info->end_seq - info->len))
+I think this can be fixed by simply adding export/imort functions
+that exported the sha state without the extra finalize field which
+is never used for the exported state (it's only used as an internal
+function parameter).
 
-Is it not more appropriate to use between() in the actual comparison
-below? I feel like with this patch we can get false negatives.
+We should also add some tests to ensure that shash SHA algorithms
+all use the same geometry for export/import.
 
->  			return NULL;
->  		record_sn = context->unacked_record_sn;
->  	}
-
-If you post a v2 please add a Fixes tag and CC maintainers of this code.
+Cheers,
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
