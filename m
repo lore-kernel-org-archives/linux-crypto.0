@@ -7,52 +7,51 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7837EC2BA83
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 16:14:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47276C2BA83
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 16:25:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 45B1D246DD
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 16:14:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1B5A0247C6
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 16:25:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1581696888;
-	bh=aKeGdn6AswwnY5bGNvFbZTnP9hibMN6Y42Cu+W5rI6w=;
+	s=default; t=1581697518;
+	bh=fobOvtTsBlnfM82O2ukhKTEbN7D6+EJ5BS1Y8mr+I0s=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=t3jVUywhjWkfWHoNZtfU0wnWHn3rMA55FtBC+TYuNmVtZf+67A7hab5N4r17r8I6Y
-	 vkis3jLR4EI/DJUWlH/kN+91guAd+3QSNs36TrhGUQS36Odw5bnCbuYNYix4RD2Qnk
-	 EUo3ElC7frqRJkhmg6+nK7KYA4k0AVqKJHSi3Ew4=
+	b=rpGqT55sbcCXMUIIMp4PRaWu607KJNQtAhT8CCSCO4CNJNwK+AXj7O06HqK02ZEzS
+	 Es9fTT3uu4ayUEHTSPfwPRHXiIQI2cjqkRlDBvA/rmwQ/IBNbgEjPRmY7su14DsWJ4
+	 uFv0zz2HlFo9L7xK8MLktD4VqPR8l4n9OcNg+RGw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2392379AbgBNQOq (ORCPT
+        id S2405689AbgBNQZR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Feb 2020 11:14:46 -0500
-Received: from mail.kernel.org ([198.145.29.99]:44480 "EHLO mail.kernel.org"
+        Fri, 14 Feb 2020 11:25:17 -0500
+Received: from mail.kernel.org ([198.145.29.99]:34530 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2392376AbgBNQOo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Feb 2020 11:14:44 -0500
+        id S2393377AbgBNQZO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 14 Feb 2020 11:25:14 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4D821246CD;
-        Fri, 14 Feb 2020 16:14:43 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id E9A49247AA;
+        Fri, 14 Feb 2020 16:25:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581696884;
-        bh=aKeGdn6AswwnY5bGNvFbZTnP9hibMN6Y42Cu+W5rI6w=;
+        s=default; t=1581697513;
+        bh=fobOvtTsBlnfM82O2ukhKTEbN7D6+EJ5BS1Y8mr+I0s=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=uLHdwG4in3Lm9/CQIsFuYljSPscMhN9okhFPca/6qwqwRfnxwtZ/KMti6Gosy2Rjg
-         lfN6nCuANMireD2T9tKBMmigEiRAStg91M5cqAT4ZZonNhvxC/AGLWNJkAQKpeAs68
-         Ib/jDAWYXe2K+L43wBtJ1yWdDOsY0lwnlDL7wYpg=
+        b=u7Ny9QzHbuwOzxXmRYlgsStvYykNgh3Jeit20viP/Za0FltA/ks+bLR6IZo5iszO1
+         2LM5jqExPDSgt7uwax9E4qcTN9ZOnYknBICN0To8xLmrswlOabmbdnpetvVjBf3k78
+         O5I/mIkjyaHbOTP5vB5v4yFrskMe8f8dPxuKgtc4=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Eric Biggers <ebiggers@google.com>,
-        Jesper Nilsson <jesper.nilsson@axis.com>,
-        Lars Persson <lars.persson@axis.com>,
+Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Eric Biggers <ebiggers@kernel.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-arm-kernel@axis.com,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 138/252] crypto: artpec6 - return correct error code for failed setkey()
-Date:   Fri, 14 Feb 2020 11:09:53 -0500
-Message-Id: <20200214161147.15842-138-sashal@kernel.org>
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-crypto@vger.kernel.org, Sasha Levin <sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 039/100] padata: always acquire cpu_hotplug_lock before pinst->lock
+Date:   Fri, 14 Feb 2020 11:23:23 -0500
+Message-Id: <20200214162425.21071-39-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200214161147.15842-1-sashal@kernel.org>
-References: <20200214161147.15842-1-sashal@kernel.org>
+In-Reply-To: <20200214162425.21071-1-sashal@kernel.org>
+References: <20200214162425.21071-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -62,36 +61,69 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+From: Daniel Jordan <daniel.m.jordan@oracle.com>
 
-[ Upstream commit b828f905904cd76424230c69741a4cabb0174168 ]
+[ Upstream commit 38228e8848cd7dd86ccb90406af32de0cad24be3 ]
 
-->setkey() is supposed to retun -EINVAL for invalid key lengths, not -1.
+lockdep complains when padata's paths to update cpumasks via CPU hotplug
+and sysfs are both taken:
 
-Fixes: a21eb94fc4d3 ("crypto: axis - add ARTPEC-6/7 crypto accelerator driver")
-Cc: Jesper Nilsson <jesper.nilsson@axis.com>
-Cc: Lars Persson <lars.persson@axis.com>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
-Acked-by: Lars Persson <lars.persson@axis.com>
+  # echo 0 > /sys/devices/system/cpu/cpu1/online
+  # echo ff > /sys/kernel/pcrypt/pencrypt/parallel_cpumask
+
+  ======================================================
+  WARNING: possible circular locking dependency detected
+  5.4.0-rc8-padata-cpuhp-v3+ #1 Not tainted
+  ------------------------------------------------------
+  bash/205 is trying to acquire lock:
+  ffffffff8286bcd0 (cpu_hotplug_lock.rw_sem){++++}, at: padata_set_cpumask+0x2b/0x120
+
+  but task is already holding lock:
+  ffff8880001abfa0 (&pinst->lock){+.+.}, at: padata_set_cpumask+0x26/0x120
+
+  which lock already depends on the new lock.
+
+padata doesn't take cpu_hotplug_lock and pinst->lock in a consistent
+order.  Which should be first?  CPU hotplug calls into padata with
+cpu_hotplug_lock already held, so it should have priority.
+
+Fixes: 6751fb3c0e0c ("padata: Use get_online_cpus/put_online_cpus")
+Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc: Eric Biggers <ebiggers@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/axis/artpec6_crypto.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ kernel/padata.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/axis/artpec6_crypto.c b/drivers/crypto/axis/artpec6_crypto.c
-index fdcdc751d03bd..3caf57ebdbff5 100644
---- a/drivers/crypto/axis/artpec6_crypto.c
-+++ b/drivers/crypto/axis/artpec6_crypto.c
-@@ -1256,7 +1256,7 @@ static int artpec6_crypto_aead_set_key(struct crypto_aead *tfm, const u8 *key,
+diff --git a/kernel/padata.c b/kernel/padata.c
+index 282b489a286db..2b30113fd3f44 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -661,8 +661,8 @@ int padata_set_cpumask(struct padata_instance *pinst, int cpumask_type,
+ 	struct cpumask *serial_mask, *parallel_mask;
+ 	int err = -EINVAL;
  
- 	if (len != 16 && len != 24 && len != 32) {
- 		crypto_aead_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
--		return -1;
-+		return -EINVAL;
- 	}
+-	mutex_lock(&pinst->lock);
+ 	get_online_cpus();
++	mutex_lock(&pinst->lock);
  
- 	ctx->key_length = len;
+ 	switch (cpumask_type) {
+ 	case PADATA_CPU_PARALLEL:
+@@ -680,8 +680,8 @@ int padata_set_cpumask(struct padata_instance *pinst, int cpumask_type,
+ 	err =  __padata_set_cpumasks(pinst, parallel_mask, serial_mask);
+ 
+ out:
+-	put_online_cpus();
+ 	mutex_unlock(&pinst->lock);
++	put_online_cpus();
+ 
+ 	return err;
+ }
 -- 
 2.20.1
 
