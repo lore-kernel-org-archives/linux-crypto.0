@@ -7,51 +7,46 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F47DC47409
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 17:30:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BA86C3B1A6
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 17:32:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 51A792467B
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 17:30:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E96732168B
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 17:32:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1581701420;
-	bh=+AG47mcdv+Z5uu7zaMQ7K8RGn5uNt6MMQCp2P0BPRO8=;
+	s=default; t=1581701555;
+	bh=w8l2u3DsDpEHt9S27ap6vMdI80qogU2aYfovpE+ynkk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=Y1WZKLDlkLO4tXz+ccrJwBc3odjZ2U/s7FrNuzwV8HPYZn1gDCj9oAwM3FZV4oCFB
-	 fd2swjK/GKEUuy9n53KL8FLalu99u05iA1l6mg5bH7ZQMsUE0Z2P2rmv9zmADgcm/F
-	 fPl5Cn9mU5He2aKwBpdpK0jh0xa5OB9e6A0gGB7I=
+	b=TyXP/ZlAa5lSH1kG0O3NeUeflJcEX1dOrCa/nnjxdVJF+q1WrrSNHzw9nmTCvIfyl
+	 FfC15tkDEV0fskZ8Hp47hB2DXqMSsiupT6eW9FCpkzjWlskd4Yvoxy8Qw7YH89SISD
+	 ZkJd7MQVpw94VLTizJM8d0LFr4OwGvKCKZAbpK3w=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390704AbgBNQHe (ORCPT
+        id S2390286AbgBNRcX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Feb 2020 11:07:34 -0500
-Received: from mail.kernel.org ([198.145.29.99]:59010 "EHLO mail.kernel.org"
+        Fri, 14 Feb 2020 12:32:23 -0500
+Received: from mail.kernel.org ([198.145.29.99]:57414 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390700AbgBNQHd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Feb 2020 11:07:33 -0500
+        id S2390095AbgBNQGr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 14 Feb 2020 11:06:47 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 972112187F;
-        Fri, 14 Feb 2020 16:07:31 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1352D2187F;
+        Fri, 14 Feb 2020 16:06:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581696452;
-        bh=+AG47mcdv+Z5uu7zaMQ7K8RGn5uNt6MMQCp2P0BPRO8=;
+        s=default; t=1581696405;
+        bh=w8l2u3DsDpEHt9S27ap6vMdI80qogU2aYfovpE+ynkk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ZfLIYIxiUSHkrrliBq27Vh/b4vzBm7H50oRC4rdwAAmoBGH8NJehi2YCT6kTAzcIZ
-         cluoE8snJOmF2Gk5Bx5h/lrWGkGQSDj8xjsq8DoMzPQ3eMZtsJFUR6Ht5vAWlUw4lr
-         rRQxkKayQD4t0zWxX7A91+fSrUwo4Rx1ovvdGkOg=
+        b=tqEuNvbMzBannCJ3f2QbMx8ji0NEQ0LJqyyaw8P6T574aXpdVUwoKYe4p7POEPu0m
+         +LU7tJy2EMzZb+TzX2UQomPQpTcDgtFIIjPBO50ET6/44OydV1x4zOg4pBJ+a0mdQ5
+         KfcWaFxUp32Gsy2/IL0OXwNB1vk05BmySOlL8HQE=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Eric Biggers <ebiggers@google.com>,
-        Nicolas Ferre <nicolas.ferre@microchip.com>,
-        Alexandre Belloni <alexandre.belloni@bootlin.com>,
-        Ludovic Desroches <ludovic.desroches@microchip.com>,
-        Tudor Ambarus <tudor.ambarus@microchip.com>,
+Cc:     Vinay Kumar Yadav <vinay.yadav@chelsio.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Subject: [PATCH AUTOSEL 5.4 265/459] crypto: atmel-sha - fix error handling when setting hmac key
-Date:   Fri, 14 Feb 2020 10:58:35 -0500
-Message-Id: <20200214160149.11681-265-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.4 229/459] crypto: chtls - Fixed memory leak
+Date:   Fri, 14 Feb 2020 10:57:59 -0500
+Message-Id: <20200214160149.11681-229-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200214160149.11681-1-sashal@kernel.org>
 References: <20200214160149.11681-1-sashal@kernel.org>
@@ -64,45 +59,143 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
+From: Vinay Kumar Yadav <vinay.yadav@chelsio.com>
 
-[ Upstream commit b529f1983b2dcc46354f311feda92e07b6e9e2da ]
+[ Upstream commit 93e23eb2ed6c11b4f483c8111ac155ec2b1f3042 ]
 
-HMAC keys can be of any length, and atmel_sha_hmac_key_set() can only
-fail due to -ENOMEM.  But atmel_sha_hmac_setkey() incorrectly treated
-any error as a "bad key length" error.  Fix it to correctly propagate
-the -ENOMEM error code and not set any tfm result flags.
+Freed work request skbs when connection terminates.
+enqueue_wr()/ dequeue_wr() is shared between softirq
+and application contexts, should be protected by socket
+lock. Moved dequeue_wr() to appropriate file.
 
-Fixes: 81d8750b2b59 ("crypto: atmel-sha - add support to hmac(shaX)")
-Cc: Nicolas Ferre <nicolas.ferre@microchip.com>
-Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>
-Cc: Ludovic Desroches <ludovic.desroches@microchip.com>
-Signed-off-by: Eric Biggers <ebiggers@google.com>
-Reviewed-by: Tudor Ambarus <tudor.ambarus@microchip.com>
+Signed-off-by: Vinay Kumar Yadav <vinay.yadav@chelsio.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/atmel-sha.c | 7 +------
- 1 file changed, 1 insertion(+), 6 deletions(-)
+ drivers/crypto/chelsio/chtls/chtls_cm.c | 27 +++++++++++++------------
+ drivers/crypto/chelsio/chtls/chtls_cm.h | 21 +++++++++++++++++++
+ drivers/crypto/chelsio/chtls/chtls_hw.c |  3 +++
+ 3 files changed, 38 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index d32626458e67c..1f9c16395a3fc 100644
---- a/drivers/crypto/atmel-sha.c
-+++ b/drivers/crypto/atmel-sha.c
-@@ -1918,12 +1918,7 @@ static int atmel_sha_hmac_setkey(struct crypto_ahash *tfm, const u8 *key,
- {
- 	struct atmel_sha_hmac_ctx *hmac = crypto_ahash_ctx(tfm);
- 
--	if (atmel_sha_hmac_key_set(&hmac->hkey, key, keylen)) {
--		crypto_ahash_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
--		return -EINVAL;
--	}
--
--	return 0;
-+	return atmel_sha_hmac_key_set(&hmac->hkey, key, keylen);
+diff --git a/drivers/crypto/chelsio/chtls/chtls_cm.c b/drivers/crypto/chelsio/chtls/chtls_cm.c
+index aca75237bbcf8..dffa2aa855fdd 100644
+--- a/drivers/crypto/chelsio/chtls/chtls_cm.c
++++ b/drivers/crypto/chelsio/chtls/chtls_cm.c
+@@ -727,6 +727,14 @@ static int chtls_close_listsrv_rpl(struct chtls_dev *cdev, struct sk_buff *skb)
+ 	return 0;
  }
  
- static int atmel_sha_hmac_init(struct ahash_request *req)
++static void chtls_purge_wr_queue(struct sock *sk)
++{
++	struct sk_buff *skb;
++
++	while ((skb = dequeue_wr(sk)) != NULL)
++		kfree_skb(skb);
++}
++
+ static void chtls_release_resources(struct sock *sk)
+ {
+ 	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
+@@ -741,6 +749,11 @@ static void chtls_release_resources(struct sock *sk)
+ 	kfree_skb(csk->txdata_skb_cache);
+ 	csk->txdata_skb_cache = NULL;
+ 
++	if (csk->wr_credits != csk->wr_max_credits) {
++		chtls_purge_wr_queue(sk);
++		chtls_reset_wr_list(csk);
++	}
++
+ 	if (csk->l2t_entry) {
+ 		cxgb4_l2t_release(csk->l2t_entry);
+ 		csk->l2t_entry = NULL;
+@@ -1735,6 +1748,7 @@ static void chtls_peer_close(struct sock *sk, struct sk_buff *skb)
+ 		else
+ 			sk_wake_async(sk, SOCK_WAKE_WAITD, POLL_IN);
+ 	}
++	kfree_skb(skb);
+ }
+ 
+ static void chtls_close_con_rpl(struct sock *sk, struct sk_buff *skb)
+@@ -2062,19 +2076,6 @@ static int chtls_conn_cpl(struct chtls_dev *cdev, struct sk_buff *skb)
+ 	return 0;
+ }
+ 
+-static struct sk_buff *dequeue_wr(struct sock *sk)
+-{
+-	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
+-	struct sk_buff *skb = csk->wr_skb_head;
+-
+-	if (likely(skb)) {
+-	/* Don't bother clearing the tail */
+-		csk->wr_skb_head = WR_SKB_CB(skb)->next_wr;
+-		WR_SKB_CB(skb)->next_wr = NULL;
+-	}
+-	return skb;
+-}
+-
+ static void chtls_rx_ack(struct sock *sk, struct sk_buff *skb)
+ {
+ 	struct cpl_fw4_ack *hdr = cplhdr(skb) + RSS_HDR;
+diff --git a/drivers/crypto/chelsio/chtls/chtls_cm.h b/drivers/crypto/chelsio/chtls/chtls_cm.h
+index 129d7ac649a93..3fac0c74a41fa 100644
+--- a/drivers/crypto/chelsio/chtls/chtls_cm.h
++++ b/drivers/crypto/chelsio/chtls/chtls_cm.h
+@@ -185,6 +185,12 @@ static inline void chtls_kfree_skb(struct sock *sk, struct sk_buff *skb)
+ 	kfree_skb(skb);
+ }
+ 
++static inline void chtls_reset_wr_list(struct chtls_sock *csk)
++{
++	csk->wr_skb_head = NULL;
++	csk->wr_skb_tail = NULL;
++}
++
+ static inline void enqueue_wr(struct chtls_sock *csk, struct sk_buff *skb)
+ {
+ 	WR_SKB_CB(skb)->next_wr = NULL;
+@@ -197,4 +203,19 @@ static inline void enqueue_wr(struct chtls_sock *csk, struct sk_buff *skb)
+ 		WR_SKB_CB(csk->wr_skb_tail)->next_wr = skb;
+ 	csk->wr_skb_tail = skb;
+ }
++
++static inline struct sk_buff *dequeue_wr(struct sock *sk)
++{
++	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
++	struct sk_buff *skb = NULL;
++
++	skb = csk->wr_skb_head;
++
++	if (likely(skb)) {
++	 /* Don't bother clearing the tail */
++		csk->wr_skb_head = WR_SKB_CB(skb)->next_wr;
++		WR_SKB_CB(skb)->next_wr = NULL;
++	}
++	return skb;
++}
+ #endif
+diff --git a/drivers/crypto/chelsio/chtls/chtls_hw.c b/drivers/crypto/chelsio/chtls/chtls_hw.c
+index 2a34035d3cfbc..a217fe72602d4 100644
+--- a/drivers/crypto/chelsio/chtls/chtls_hw.c
++++ b/drivers/crypto/chelsio/chtls/chtls_hw.c
+@@ -350,6 +350,7 @@ int chtls_setkey(struct chtls_sock *csk, u32 keylen, u32 optname)
+ 	kwr->sc_imm.cmd_more = cpu_to_be32(ULPTX_CMD_V(ULP_TX_SC_IMM));
+ 	kwr->sc_imm.len = cpu_to_be32(klen);
+ 
++	lock_sock(sk);
+ 	/* key info */
+ 	kctx = (struct _key_ctx *)(kwr + 1);
+ 	ret = chtls_key_info(csk, kctx, keylen, optname);
+@@ -388,8 +389,10 @@ int chtls_setkey(struct chtls_sock *csk, u32 keylen, u32 optname)
+ 		csk->tlshws.txkey = keyid;
+ 	}
+ 
++	release_sock(sk);
+ 	return ret;
+ out_notcb:
++	release_sock(sk);
+ 	free_tls_keyid(sk);
+ out_nokey:
+ 	kfree_skb(skb);
 -- 
 2.20.1
 
