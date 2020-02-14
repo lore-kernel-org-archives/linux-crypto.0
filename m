@@ -7,46 +7,47 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D89E3C3B1B1
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 17:58:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E486C3B1AF
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 17:58:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A363820848
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 17:58:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 61F3F20848
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 17:58:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1581703119;
-	bh=qkr6acl5AOx9HxzNSn2Ffkl5YYxSy9LryyRo9RewjuA=;
+	s=default; t=1581703122;
+	bh=6vAb/3AnW2cySkICFJWn4lWI0wr0JfuL5Ldafl3W6AE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=zVKV5UJ4xO/5+Wn/pTh3VwpFDIyD05evpQjxqj28SGAO+tK4w6w9Y7dxmFv9HdLcp
-	 JV/cVVzbU3QCB90rYaT7Rjq+myAhB9Q6u4NCgHIJwX4JooPbHjF63Vy4a/9TRXmgUT
-	 zeMnEgPX0zc6efdxXxtsih4fj5nvj9TA/bPPviNI=
+	b=p7LpL/vqIMXPri1xO90BusIq4/yuTptMIQqkdOYOZmJ511ZM5C5LeCsbIwFjTacOi
+	 HK/qiDBn79HFg8Wxpm0eFIhiyEx0lRT1JaeD0DswZlHVPX0zvUBoPXyI1NQiYuTkaZ
+	 WEOW2P/O4hWfXbVvhiwCcg4t4cRBI8XebvgwMI2k=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388134AbgBNP5H (ORCPT
+        id S2388115AbgBNP5F (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Feb 2020 10:57:07 -0500
-Received: from mail.kernel.org ([198.145.29.99]:39552 "EHLO mail.kernel.org"
+        Fri, 14 Feb 2020 10:57:05 -0500
+Received: from mail.kernel.org ([198.145.29.99]:39460 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2388128AbgBNP5H (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Feb 2020 10:57:07 -0500
+        id S2388103AbgBNP5E (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 14 Feb 2020 10:57:04 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id DF19524681;
-        Fri, 14 Feb 2020 15:57:05 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7E89B222C4;
+        Fri, 14 Feb 2020 15:57:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581695826;
-        bh=qkr6acl5AOx9HxzNSn2Ffkl5YYxSy9LryyRo9RewjuA=;
+        s=default; t=1581695824;
+        bh=6vAb/3AnW2cySkICFJWn4lWI0wr0JfuL5Ldafl3W6AE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=hiG64iMqHOgzDFW9fkKFp6vIxfSbtI13upZ41yVKv63NZdsh2FStgFUO3+cF16lYy
-         gFfgOyJJQ2ZHNIXVAMiwtae15kZO8pTsaj8Z1WNo7A3eslPHI74eCdjzEWedK3PV5Z
-         MHaG81kr9FevP3ian4TsRTjIyXhPrAd+2EutWD0o=
+        b=DReua4Uwr5YWFNUVQALTnwoISAtJ+VoqxTyv7eOlPfaI6+h7ftCaPEP9CKRDcKY3L
+         fMJxsetzFjDLoUsBnomeMtUAGYXa93+5lFWofsL/PDkPlJsD7s5PkRMajZrGOhaO+l
+         RxiBsI558Yc954Whv6LpzCZGnGXD2qCOytYn4PO8=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Geert Uytterhoeven <geert@linux-m68k.org>,
+Cc:     Zaibo Xu <xuzaibo@huawei.com>, Arnd Bergmann <arnd@arndb.de>,
+        Marco Elver <elver@google.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.5 380/542] crypto: essiv - fix AEAD capitalization and preposition use in help text
-Date:   Fri, 14 Feb 2020 10:46:12 -0500
-Message-Id: <20200214154854.6746-380-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.5 378/542] crypto: hisilicon - Update debugfs usage of SEC V2
+Date:   Fri, 14 Feb 2020 10:46:10 -0500
+Message-Id: <20200214154854.6746-378-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200214154854.6746-1-sashal@kernel.org>
 References: <20200214154854.6746-1-sashal@kernel.org>
@@ -59,38 +60,110 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Geert Uytterhoeven <geert@linux-m68k.org>
+From: Zaibo Xu <xuzaibo@huawei.com>
 
-[ Upstream commit ab3d436bf3e9d05f58ceaa85ff7475bfcd6e45af ]
+[ Upstream commit ca0d158dc9e5dc0902c1d507d82178d97f6f5709 ]
 
-"AEAD" is capitalized everywhere else.
-Use "an" when followed by a written or spoken vowel.
+Applied some advices of Marco Elver on atomic usage of Debugfs,
+which is carried out by basing on Arnd Bergmann's fixing patch.
 
-Fixes: be1eb7f78aa8fbe3 ("crypto: essiv - create wrapper template for ESSIV generation")
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Reported-by: Arnd Bergmann <arnd@arndb.de>
+Reported-by: Marco Elver <elver@google.com>
+Signed-off-by: Zaibo Xu <xuzaibo@huawei.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- crypto/Kconfig | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/crypto/hisilicon/sec2/sec.h        |  2 +-
+ drivers/crypto/hisilicon/sec2/sec_crypto.c |  8 ++++----
+ drivers/crypto/hisilicon/sec2/sec_main.c   | 18 +++++++++---------
+ 3 files changed, 14 insertions(+), 14 deletions(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 5575d48473bd4..cdb51d4272d0c 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -511,10 +511,10 @@ config CRYPTO_ESSIV
- 	  encryption.
+diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
+index b846d73d9a855..841f4c56ca73c 100644
+--- a/drivers/crypto/hisilicon/sec2/sec.h
++++ b/drivers/crypto/hisilicon/sec2/sec.h
+@@ -40,7 +40,7 @@ struct sec_req {
+ 	int req_id;
  
- 	  This driver implements a crypto API template that can be
--	  instantiated either as a skcipher or as a aead (depending on the
-+	  instantiated either as an skcipher or as an AEAD (depending on the
- 	  type of the first template argument), and which defers encryption
- 	  and decryption requests to the encapsulated cipher after applying
--	  ESSIV to the input IV. Note that in the aead case, it is assumed
-+	  ESSIV to the input IV. Note that in the AEAD case, it is assumed
- 	  that the keys are presented in the same format used by the authenc
- 	  template, and that the IV appears at the end of the authenticated
- 	  associated data (AAD) region (which is how dm-crypt uses it.)
+ 	/* Status of the SEC request */
+-	atomic_t fake_busy;
++	bool fake_busy;
+ };
+ 
+ /**
+diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+index 0a5391fff485c..2475aaf0d59b9 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
++++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+@@ -141,7 +141,7 @@ static int sec_bd_send(struct sec_ctx *ctx, struct sec_req *req)
+ 		return -ENOBUFS;
+ 
+ 	if (!ret) {
+-		if (atomic_read(&req->fake_busy))
++		if (req->fake_busy)
+ 			ret = -EBUSY;
+ 		else
+ 			ret = -EINPROGRESS;
+@@ -641,7 +641,7 @@ static void sec_skcipher_callback(struct sec_ctx *ctx, struct sec_req *req)
+ 	if (ctx->c_ctx.c_mode == SEC_CMODE_CBC && req->c_req.encrypt)
+ 		sec_update_iv(req);
+ 
+-	if (atomic_cmpxchg(&req->fake_busy, 1, 0) != 1)
++	if (req->fake_busy)
+ 		sk_req->base.complete(&sk_req->base, -EINPROGRESS);
+ 
+ 	sk_req->base.complete(&sk_req->base, req->err_type);
+@@ -672,9 +672,9 @@ static int sec_request_init(struct sec_ctx *ctx, struct sec_req *req)
+ 	}
+ 
+ 	if (ctx->fake_req_limit <= atomic_inc_return(&qp_ctx->pending_reqs))
+-		atomic_set(&req->fake_busy, 1);
++		req->fake_busy = true;
+ 	else
+-		atomic_set(&req->fake_busy, 0);
++		req->fake_busy = false;
+ 
+ 	ret = ctx->req_op->get_res(ctx, req);
+ 	if (ret) {
+diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+index ab742dfbab997..d40e2da3b05da 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_main.c
++++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+@@ -608,13 +608,13 @@ static const struct file_operations sec_dbg_fops = {
+ 	.write = sec_debug_write,
+ };
+ 
+-static int debugfs_atomic64_t_get(void *data, u64 *val)
++static int sec_debugfs_atomic64_get(void *data, u64 *val)
+ {
+-        *val = atomic64_read((atomic64_t *)data);
+-        return 0;
++	*val = atomic64_read((atomic64_t *)data);
++	return 0;
+ }
+-DEFINE_DEBUGFS_ATTRIBUTE(fops_atomic64_t_ro, debugfs_atomic64_t_get, NULL,
+-                        "%lld\n");
++DEFINE_DEBUGFS_ATTRIBUTE(sec_atomic64_ops, sec_debugfs_atomic64_get,
++			 NULL, "%lld\n");
+ 
+ static int sec_core_debug_init(struct sec_dev *sec)
+ {
+@@ -636,11 +636,11 @@ static int sec_core_debug_init(struct sec_dev *sec)
+ 
+ 	debugfs_create_regset32("regs", 0444, tmp_d, regset);
+ 
+-	debugfs_create_file("send_cnt", 0444, tmp_d, &dfx->send_cnt,
+-			    &fops_atomic64_t_ro);
++	debugfs_create_file("send_cnt", 0444, tmp_d,
++			    &dfx->send_cnt, &sec_atomic64_ops);
+ 
+-	debugfs_create_file("recv_cnt", 0444, tmp_d, &dfx->recv_cnt,
+-			    &fops_atomic64_t_ro);
++	debugfs_create_file("recv_cnt", 0444, tmp_d,
++			    &dfx->recv_cnt, &sec_atomic64_ops);
+ 
+ 	return 0;
+ }
 -- 
 2.20.1
 
