@@ -4,51 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD738C2BA83
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 18:12:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D270BC3B1B5
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 18:18:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A336422314
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 18:12:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A528F2168B
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 18:18:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1581703959;
-	bh=PBddpNB+DNMdnowJ6YaKlTaS4CE/MvUsfaf/iV7W3yM=;
+	s=default; t=1581704290;
+	bh=+CBIJZj63ooSb9bI1j6y1JoV7Zz9dEHl9Rd4swku03k=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=Fsl+9u6ihjqxY1aSvkNmZWCpjlBCZsXXeqJtz+RGJMmoBjjQSF8SiogPN0J3x2Pzh
-	 HGucjHQmX/mjX28JJiKnZt/o8u8456gOYpSXY1/3GiCD3uujxV/Ktv47IuyNJNFb0J
-	 foyGACTB4IE4w6YSsqD+jCaBMDrSIiiC0fJ6kMr4=
+	b=XhRrXR0XFhm5PITn+sww2IwG0kpec0E1ZrLcb9OObpmqz8l8ZObEHJNAwkBJKFuFw
+	 OnWrG+zhsvUig0XcPwJXv/cg5VOJ6uoZmBaf1cdi6JVYLrkAXkrMujD2f6Mv1H6gO4
+	 99zDu/BYUAZH272iJivvbjIsXALch78Aaf6aHqbM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389302AbgBNSMh (ORCPT
+        id S1729764AbgBNSSC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Feb 2020 13:12:37 -0500
-Received: from mail.kernel.org ([198.145.29.99]:60442 "EHLO mail.kernel.org"
+        Fri, 14 Feb 2020 13:18:02 -0500
+Received: from mail.kernel.org ([198.145.29.99]:55434 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1731147AbgBNPxG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Feb 2020 10:53:06 -0500
+        id S1730632AbgBNPuy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 14 Feb 2020 10:50:54 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 52787222C4;
-        Fri, 14 Feb 2020 15:53:05 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 67A6B22314;
+        Fri, 14 Feb 2020 15:50:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581695586;
-        bh=PBddpNB+DNMdnowJ6YaKlTaS4CE/MvUsfaf/iV7W3yM=;
+        s=default; t=1581695453;
+        bh=+CBIJZj63ooSb9bI1j6y1JoV7Zz9dEHl9Rd4swku03k=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=WC+8PNbrkgDwKlRsVYC7NRe0Ni3f+xvNrLGk5oTE+/dTyRJVdqh66mg3Kd4zw34jw
-         u3batk8dmXU3lox5Ue0Gooo9EMUeDypB1aoslvTGkF8IhMVZNqUkJAeYVpNe2zCNMv
-         2g0yzMTqqbij+S8/IPMIU1xcf+P9hFc+iTp8tq0Y=
+        b=zzSjXzmv+1DEuZ8nvx1tPPT1d3w2P6J5SlFTlLtJtzDivuzBGtfKCZRczANbmwp69
+         QK4UHUuRoTLT+rS9vPVTM4ecwbGE4XHBKoEC2Dyl0DldMctPAYgEdnTuBKrtqZDLWk
+         D5LZiOZjRa2qs1lEgey9nSuYK7pSf5a8BYaoPu8M=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Eric Biggers <ebiggers@kernel.org>,
+Cc:     Ard Biesheuvel <ardb@kernel.org>,
+        Russell King <linux@armlinux.org.uk>,
+        Arnd Bergmann <arnd@arndb.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-crypto@vger.kernel.org, Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 5.5 194/542] padata: always acquire cpu_hotplug_lock before pinst->lock
-Date:   Fri, 14 Feb 2020 10:43:06 -0500
-Message-Id: <20200214154854.6746-194-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Subject: [PATCH AUTOSEL 5.5 092/542] crypto: arm/chacha - fix build failured when kernel mode NEON is disabled
+Date:   Fri, 14 Feb 2020 10:41:24 -0500
+Message-Id: <20200214154854.6746-92-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200214154854.6746-1-sashal@kernel.org>
 References: <20200214154854.6746-1-sashal@kernel.org>
@@ -61,69 +62,62 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Daniel Jordan <daniel.m.jordan@oracle.com>
+From: Ard Biesheuvel <ardb@kernel.org>
 
-[ Upstream commit 38228e8848cd7dd86ccb90406af32de0cad24be3 ]
+[ Upstream commit 0bc81767c5bd9d005fae1099fb39eb3688370cb1 ]
 
-lockdep complains when padata's paths to update cpumasks via CPU hotplug
-and sysfs are both taken:
+When the ARM accelerated ChaCha driver is built as part of a configuration
+that has kernel mode NEON disabled, we expect the compiler to propagate
+the build time constant expression IS_ENABLED(CONFIG_KERNEL_MODE_NEON) in
+a way that eliminates all the cross-object references to the actual NEON
+routines, which allows the chacha-neon-core.o object to be omitted from
+the build entirely.
 
-  # echo 0 > /sys/devices/system/cpu/cpu1/online
-  # echo ff > /sys/kernel/pcrypt/pencrypt/parallel_cpumask
+Unfortunately, this fails to work as expected in some cases, and we may
+end up with a build error such as
 
-  ======================================================
-  WARNING: possible circular locking dependency detected
-  5.4.0-rc8-padata-cpuhp-v3+ #1 Not tainted
-  ------------------------------------------------------
-  bash/205 is trying to acquire lock:
-  ffffffff8286bcd0 (cpu_hotplug_lock.rw_sem){++++}, at: padata_set_cpumask+0x2b/0x120
+  chacha-glue.c:(.text+0xc0): undefined reference to `chacha_4block_xor_neon'
 
-  but task is already holding lock:
-  ffff8880001abfa0 (&pinst->lock){+.+.}, at: padata_set_cpumask+0x26/0x120
+caused by the fact that chacha_doneon() has not been eliminated from the
+object code, even though it will never be called in practice.
 
-  which lock already depends on the new lock.
+Let's fix this by adding some IS_ENABLED(CONFIG_KERNEL_MODE_NEON) tests
+that are not strictly needed from a logical point of view, but should
+help the compiler infer that the NEON code paths are unreachable in
+those cases.
 
-padata doesn't take cpu_hotplug_lock and pinst->lock in a consistent
-order.  Which should be first?  CPU hotplug calls into padata with
-cpu_hotplug_lock already held, so it should have priority.
-
-Fixes: 6751fb3c0e0c ("padata: Use get_online_cpus/put_online_cpus")
-Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc: Eric Biggers <ebiggers@kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+Fixes: b36d8c09e710c71f ("crypto: arm/chacha - remove dependency on generic ...")
+Reported-by: Russell King <linux@armlinux.org.uk>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- kernel/padata.c | 4 ++--
+ arch/arm/crypto/chacha-glue.c | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/kernel/padata.c b/kernel/padata.c
-index fda7a7039422d..fdbbe96547713 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -643,8 +643,8 @@ int padata_set_cpumask(struct padata_instance *pinst, int cpumask_type,
- 	struct cpumask *serial_mask, *parallel_mask;
- 	int err = -EINVAL;
+diff --git a/arch/arm/crypto/chacha-glue.c b/arch/arm/crypto/chacha-glue.c
+index 6ebbb2b241d2b..6fdb0ac62b3d8 100644
+--- a/arch/arm/crypto/chacha-glue.c
++++ b/arch/arm/crypto/chacha-glue.c
+@@ -115,7 +115,7 @@ static int chacha_stream_xor(struct skcipher_request *req,
+ 		if (nbytes < walk.total)
+ 			nbytes = round_down(nbytes, walk.stride);
  
--	mutex_lock(&pinst->lock);
- 	get_online_cpus();
-+	mutex_lock(&pinst->lock);
+-		if (!neon) {
++		if (!IS_ENABLED(CONFIG_KERNEL_MODE_NEON) || !neon) {
+ 			chacha_doarm(walk.dst.virt.addr, walk.src.virt.addr,
+ 				     nbytes, state, ctx->nrounds);
+ 			state[12] += DIV_ROUND_UP(nbytes, CHACHA_BLOCK_SIZE);
+@@ -159,7 +159,7 @@ static int do_xchacha(struct skcipher_request *req, bool neon)
  
- 	switch (cpumask_type) {
- 	case PADATA_CPU_PARALLEL:
-@@ -662,8 +662,8 @@ int padata_set_cpumask(struct padata_instance *pinst, int cpumask_type,
- 	err =  __padata_set_cpumasks(pinst, parallel_mask, serial_mask);
+ 	chacha_init_generic(state, ctx->key, req->iv);
  
- out:
--	put_online_cpus();
- 	mutex_unlock(&pinst->lock);
-+	put_online_cpus();
- 
- 	return err;
- }
+-	if (!neon) {
++	if (!IS_ENABLED(CONFIG_KERNEL_MODE_NEON) || !neon) {
+ 		hchacha_block_arm(state, subctx.key, ctx->nrounds);
+ 	} else {
+ 		kernel_neon_begin();
 -- 
 2.20.1
 
