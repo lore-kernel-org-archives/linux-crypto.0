@@ -4,41 +4,41 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47276C2BA83
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 16:25:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 795ADC3B1A4
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 16:41:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1B5A0247C6
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 16:25:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4F41F2467D
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 16:41:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1581697518;
-	bh=fobOvtTsBlnfM82O2ukhKTEbN7D6+EJ5BS1Y8mr+I0s=;
+	s=default; t=1581698515;
+	bh=HDPTk9KMWGfmBO57K4dZYCHvm0cyIMknNFBja08viRg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=rpGqT55sbcCXMUIIMp4PRaWu607KJNQtAhT8CCSCO4CNJNwK+AXj7O06HqK02ZEzS
-	 Es9fTT3uu4ayUEHTSPfwPRHXiIQI2cjqkRlDBvA/rmwQ/IBNbgEjPRmY7su14DsWJ4
-	 uFv0zz2HlFo9L7xK8MLktD4VqPR8l4n9OcNg+RGw=
+	b=qUug+jbeEUYyHNzXjxDr42N2/LWXSHVX6X1u9DIzbZNmkdU4wiexAqE44fzqnjL8E
+	 rlf77FgrLAYieZdS/HnNYb3sm9IxR7HqwvMf1x7UxuvM0i7Qq4Zl3wzdi/xMN8o9y2
+	 IoUC0KtZ6kR8k2wAva1n+3jzRvwNvriuyr0j+Nh4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2405689AbgBNQZR (ORCPT
+        id S2405562AbgBNQlq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Feb 2020 11:25:17 -0500
-Received: from mail.kernel.org ([198.145.29.99]:34530 "EHLO mail.kernel.org"
+        Fri, 14 Feb 2020 11:41:46 -0500
+Received: from mail.kernel.org ([198.145.29.99]:58096 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2393377AbgBNQZO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Feb 2020 11:25:14 -0500
+        id S2405464AbgBNQWc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 14 Feb 2020 11:22:32 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E9A49247AA;
-        Fri, 14 Feb 2020 16:25:12 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4C664246B0;
+        Fri, 14 Feb 2020 16:22:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581697513;
-        bh=fobOvtTsBlnfM82O2ukhKTEbN7D6+EJ5BS1Y8mr+I0s=;
+        s=default; t=1581697351;
+        bh=HDPTk9KMWGfmBO57K4dZYCHvm0cyIMknNFBja08viRg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=u7Ny9QzHbuwOzxXmRYlgsStvYykNgh3Jeit20viP/Za0FltA/ks+bLR6IZo5iszO1
-         2LM5jqExPDSgt7uwax9E4qcTN9ZOnYknBICN0To8xLmrswlOabmbdnpetvVjBf3k78
-         O5I/mIkjyaHbOTP5vB5v4yFrskMe8f8dPxuKgtc4=
+        b=y5h4oDPLiwuz2HesGqh8uHIeS/Yc/OZpWWagFixiAcybiAFi8ExzslHs2E2abyItb
+         Hi3pxZJtuOLy8SiGHnBA+zAzL0zsLt/jR1rQtjowVVikoY9qk078jt3tmZCQQQItoI
+         Vs8Z8C5ONS/HlCuIJecwj821V6GZJKz07r3ZgCbY=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
@@ -46,12 +46,12 @@ Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Steffen Klassert <steffen.klassert@secunet.com>,
         linux-crypto@vger.kernel.org, Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 4.4 039/100] padata: always acquire cpu_hotplug_lock before pinst->lock
-Date:   Fri, 14 Feb 2020 11:23:23 -0500
-Message-Id: <20200214162425.21071-39-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 054/141] padata: always acquire cpu_hotplug_lock before pinst->lock
+Date:   Fri, 14 Feb 2020 11:19:54 -0500
+Message-Id: <20200214162122.19794-54-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200214162425.21071-1-sashal@kernel.org>
-References: <20200214162425.21071-1-sashal@kernel.org>
+In-Reply-To: <20200214162122.19794-1-sashal@kernel.org>
+References: <20200214162122.19794-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -101,10 +101,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/kernel/padata.c b/kernel/padata.c
-index 282b489a286db..2b30113fd3f44 100644
+index 63449fc584daf..ee5da2394cf57 100644
 --- a/kernel/padata.c
 +++ b/kernel/padata.c
-@@ -661,8 +661,8 @@ int padata_set_cpumask(struct padata_instance *pinst, int cpumask_type,
+@@ -635,8 +635,8 @@ int padata_set_cpumask(struct padata_instance *pinst, int cpumask_type,
  	struct cpumask *serial_mask, *parallel_mask;
  	int err = -EINVAL;
  
@@ -114,7 +114,7 @@ index 282b489a286db..2b30113fd3f44 100644
  
  	switch (cpumask_type) {
  	case PADATA_CPU_PARALLEL:
-@@ -680,8 +680,8 @@ int padata_set_cpumask(struct padata_instance *pinst, int cpumask_type,
+@@ -654,8 +654,8 @@ int padata_set_cpumask(struct padata_instance *pinst, int cpumask_type,
  	err =  __padata_set_cpumasks(pinst, parallel_mask, serial_mask);
  
  out:
