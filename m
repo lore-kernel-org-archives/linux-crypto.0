@@ -4,49 +4,54 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D11A8C3B1A1
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 17:25:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F47DC47409
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 17:30:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A13B12168B
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 17:25:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 51A792467B
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 17:30:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1581701117;
-	bh=JtLdoFb5vk4yL5BF0/BYDK63z/UKKfyFPF6sQjWHJAU=;
+	s=default; t=1581701420;
+	bh=+AG47mcdv+Z5uu7zaMQ7K8RGn5uNt6MMQCp2P0BPRO8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=cgRjkT63RoVDwGqS8gFNrSqnb5JE31rEbzgY/Ewmpr/wNdzj6lh2Q9NOyT0om61rO
-	 oYsxpktnJCyBFFUpWT885XVUSCiw06I6g7rBbaT+IOsphW6jyPIsOSMNFEmBVLGaxY
-	 R2cvmNnOnJ9C6bV5dddmpIJ0w7Lzr1/W4dhKqgac=
+	b=Y1WZKLDlkLO4tXz+ccrJwBc3odjZ2U/s7FrNuzwV8HPYZn1gDCj9oAwM3FZV4oCFB
+	 fd2swjK/GKEUuy9n53KL8FLalu99u05iA1l6mg5bH7ZQMsUE0Z2P2rmv9zmADgcm/F
+	 fPl5Cn9mU5He2aKwBpdpK0jh0xa5OB9e6A0gGB7I=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2391429AbgBNRZQ (ORCPT
+        id S2390704AbgBNQHe (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Feb 2020 12:25:16 -0500
-Received: from mail.kernel.org ([198.145.29.99]:32984 "EHLO mail.kernel.org"
+        Fri, 14 Feb 2020 11:07:34 -0500
+Received: from mail.kernel.org ([198.145.29.99]:59010 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2391087AbgBNQIy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Feb 2020 11:08:54 -0500
+        id S2390700AbgBNQHd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 14 Feb 2020 11:07:33 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 19A4D2467E;
-        Fri, 14 Feb 2020 16:08:53 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 972112187F;
+        Fri, 14 Feb 2020 16:07:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581696533;
-        bh=JtLdoFb5vk4yL5BF0/BYDK63z/UKKfyFPF6sQjWHJAU=;
+        s=default; t=1581696452;
+        bh=+AG47mcdv+Z5uu7zaMQ7K8RGn5uNt6MMQCp2P0BPRO8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=uZs9M9EAa5thcKJRj7BYWughQH/naNcpuGA6XKXvoMuA2/pafGf8IlkFRA0yk8iDy
-         T9gq99v8pKVMJCoRbPC0kgNsWStBe8Z8AushMVhqlSwSQDYa7UitrJ5CC169vlMAsM
-         4vWxRnM3pn8lrxx2N73aWhw2A+B2U5fUHRMrPhag=
+        b=ZfLIYIxiUSHkrrliBq27Vh/b4vzBm7H50oRC4rdwAAmoBGH8NJehi2YCT6kTAzcIZ
+         cluoE8snJOmF2Gk5Bx5h/lrWGkGQSDj8xjsq8DoMzPQ3eMZtsJFUR6Ht5vAWlUw4lr
+         rRQxkKayQD4t0zWxX7A91+fSrUwo4Rx1ovvdGkOg=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Geert Uytterhoeven <geert@linux-m68k.org>,
+Cc:     Eric Biggers <ebiggers@google.com>,
+        Nicolas Ferre <nicolas.ferre@microchip.com>,
+        Alexandre Belloni <alexandre.belloni@bootlin.com>,
+        Ludovic Desroches <ludovic.desroches@microchip.com>,
+        Tudor Ambarus <tudor.ambarus@microchip.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 330/459] crypto: essiv - fix AEAD capitalization and preposition use in help text
-Date:   Fri, 14 Feb 2020 10:59:40 -0500
-Message-Id: <20200214160149.11681-330-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Subject: [PATCH AUTOSEL 5.4 265/459] crypto: atmel-sha - fix error handling when setting hmac key
+Date:   Fri, 14 Feb 2020 10:58:35 -0500
+Message-Id: <20200214160149.11681-265-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200214160149.11681-1-sashal@kernel.org>
 References: <20200214160149.11681-1-sashal@kernel.org>
@@ -59,38 +64,45 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Geert Uytterhoeven <geert@linux-m68k.org>
+From: Eric Biggers <ebiggers@google.com>
 
-[ Upstream commit ab3d436bf3e9d05f58ceaa85ff7475bfcd6e45af ]
+[ Upstream commit b529f1983b2dcc46354f311feda92e07b6e9e2da ]
 
-"AEAD" is capitalized everywhere else.
-Use "an" when followed by a written or spoken vowel.
+HMAC keys can be of any length, and atmel_sha_hmac_key_set() can only
+fail due to -ENOMEM.  But atmel_sha_hmac_setkey() incorrectly treated
+any error as a "bad key length" error.  Fix it to correctly propagate
+the -ENOMEM error code and not set any tfm result flags.
 
-Fixes: be1eb7f78aa8fbe3 ("crypto: essiv - create wrapper template for ESSIV generation")
-Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Fixes: 81d8750b2b59 ("crypto: atmel-sha - add support to hmac(shaX)")
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>
+Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>
+Cc: Ludovic Desroches <ludovic.desroches@microchip.com>
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+Reviewed-by: Tudor Ambarus <tudor.ambarus@microchip.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- crypto/Kconfig | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/crypto/atmel-sha.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
 
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 29472fb795f34..b2cc0ad3792ad 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -500,10 +500,10 @@ config CRYPTO_ESSIV
- 	  encryption.
+diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
+index d32626458e67c..1f9c16395a3fc 100644
+--- a/drivers/crypto/atmel-sha.c
++++ b/drivers/crypto/atmel-sha.c
+@@ -1918,12 +1918,7 @@ static int atmel_sha_hmac_setkey(struct crypto_ahash *tfm, const u8 *key,
+ {
+ 	struct atmel_sha_hmac_ctx *hmac = crypto_ahash_ctx(tfm);
  
- 	  This driver implements a crypto API template that can be
--	  instantiated either as a skcipher or as a aead (depending on the
-+	  instantiated either as an skcipher or as an AEAD (depending on the
- 	  type of the first template argument), and which defers encryption
- 	  and decryption requests to the encapsulated cipher after applying
--	  ESSIV to the input IV. Note that in the aead case, it is assumed
-+	  ESSIV to the input IV. Note that in the AEAD case, it is assumed
- 	  that the keys are presented in the same format used by the authenc
- 	  template, and that the IV appears at the end of the authenticated
- 	  associated data (AAD) region (which is how dm-crypt uses it.)
+-	if (atmel_sha_hmac_key_set(&hmac->hkey, key, keylen)) {
+-		crypto_ahash_set_flags(tfm, CRYPTO_TFM_RES_BAD_KEY_LEN);
+-		return -EINVAL;
+-	}
+-
+-	return 0;
++	return atmel_sha_hmac_key_set(&hmac->hkey, key, keylen);
+ }
+ 
+ static int atmel_sha_hmac_init(struct ahash_request *req)
 -- 
 2.20.1
 
