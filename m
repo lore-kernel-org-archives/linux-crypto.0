@@ -7,53 +7,49 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B07C9C3B1A6
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 17:36:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C9BEC3B1AF
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 17:58:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8555C20873
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 17:36:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4668420848
+	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 17:58:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1581701797;
-	bh=r3IjydITxU+qbJOGrGu3haR6q6CTNp58y6svp+RLu4k=;
+	s=default; t=1581703117;
+	bh=7cQc4SRp6iphGymWqLpNl7n+Za/QHc3wM/3uBQapzDQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=ANDE+Car4z2tvSRvFUBsQw0rWlXRGjhEV+etwZpKixXeZ6xBaqP5jdcSnsYSoybqa
-	 87C+WOE1YX/B9f/cV+ke1m5R4TAWHQWpxSscGXdN+Fi/s5E5/fGFOzpmFDUVAMrTOv
-	 qZPhwKGtsXNnMB0memtatX8ikwENbTyqW0YhYN8E=
+	b=vLpki3dpPvDp3mdkR8KqT+5OfeaSkMaTI5DyNyfRt2FOv1dMlQbpfk6EhqMZGyTSE
+	 ycJrLT/3M+F8sP+QQvktdHgp+SW0d6y3+mH4w5crQzqlsmfGMqlkBC7G/usGgGL6QO
+	 WPTn8bseoHSG4kEWl06rryLps2XwiRCFap7w/HmY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730853AbgBNRgb (ORCPT
+        id S2388142AbgBNP5I (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Feb 2020 12:36:31 -0500
-Received: from mail.kernel.org ([198.145.29.99]:55338 "EHLO mail.kernel.org"
+        Fri, 14 Feb 2020 10:57:08 -0500
+Received: from mail.kernel.org ([198.145.29.99]:39500 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2390178AbgBNQFb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Feb 2020 11:05:31 -0500
+        id S2388122AbgBNP5G (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 14 Feb 2020 10:57:06 -0500
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id EEABF24686;
-        Fri, 14 Feb 2020 16:05:28 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id D3C732067D;
+        Fri, 14 Feb 2020 15:57:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581696330;
-        bh=r3IjydITxU+qbJOGrGu3haR6q6CTNp58y6svp+RLu4k=;
+        s=default; t=1581695825;
+        bh=7cQc4SRp6iphGymWqLpNl7n+Za/QHc3wM/3uBQapzDQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=D6rPX31TBPxblYzSS64wYy9RtxyA94kl4ifZ0uMEcmM4kSrIpd3q2oNLDfzzv7F+D
-         Zkaeta13U8Km/BmkzLFjs9a4Pmqj9FMKWekhk3eM2CT4FF/5dsn0eocrWoasTC3tsq
-         f/LAia7JedITNJdGIGXDk8Oxx0p/U1dV6abnB6xA=
+        b=X9Ddffi6E0noNrhTvfMrSZRwGxaomatNG2BxzQIWK5AJsNCNE63QAFNDPbz8aZ1KW
+         K9cPdg/7mm5uPfnaLHmWKwyz8zpr1XDSklGKRW0QQ1rLyPnC0AWsW/DIgVZ8qM5zyF
+         PoHxzhHDLHSlec0cuZRZwPeehL8GQmN1bN2xrhRM=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Eric Biggers <ebiggers@kernel.org>,
+Cc:     Zaibo Xu <xuzaibo@huawei.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-crypto@vger.kernel.org, Sasha Levin <sashal@kernel.org>
-Subject: [PATCH AUTOSEL 5.4 168/459] padata: validate cpumask without removed CPU during offline
-Date:   Fri, 14 Feb 2020 10:56:58 -0500
-Message-Id: <20200214160149.11681-168-sashal@kernel.org>
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.5 379/542] crypto: hisilicon - Bugfixed tfm leak
+Date:   Fri, 14 Feb 2020 10:46:11 -0500
+Message-Id: <20200214154854.6746-379-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200214160149.11681-1-sashal@kernel.org>
-References: <20200214160149.11681-1-sashal@kernel.org>
+In-Reply-To: <20200214154854.6746-1-sashal@kernel.org>
+References: <20200214154854.6746-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -63,185 +59,81 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Daniel Jordan <daniel.m.jordan@oracle.com>
+From: Zaibo Xu <xuzaibo@huawei.com>
 
-[ Upstream commit 894c9ef9780c5cf2f143415e867ee39a33ecb75d ]
+[ Upstream commit dfee9955abc7ec9364413d16316181322cf44f2f ]
 
-Configuring an instance's parallel mask without any online CPUs...
+1.Fixed the bug of software tfm leakage.
+2.Update HW error log message.
 
-  echo 2 > /sys/kernel/pcrypt/pencrypt/parallel_cpumask
-  echo 0 > /sys/devices/system/cpu/cpu1/online
-
-...makes tcrypt mode=215 crash like this:
-
-  divide error: 0000 [#1] SMP PTI
-  CPU: 4 PID: 283 Comm: modprobe Not tainted 5.4.0-rc8-padata-doc-v2+ #2
-  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ?-20191013_105130-anatol 04/01/2014
-  RIP: 0010:padata_do_parallel+0x114/0x300
-  Call Trace:
-   pcrypt_aead_encrypt+0xc0/0xd0 [pcrypt]
-   crypto_aead_encrypt+0x1f/0x30
-   do_mult_aead_op+0x4e/0xdf [tcrypt]
-   test_mb_aead_speed.constprop.0.cold+0x226/0x564 [tcrypt]
-   do_test+0x28c2/0x4d49 [tcrypt]
-   tcrypt_mod_init+0x55/0x1000 [tcrypt]
-   ...
-
-cpumask_weight() in padata_cpu_hash() returns 0 because the mask has no
-CPUs.  The problem is __padata_remove_cpu() checks for valid masks too
-early and so doesn't mark the instance PADATA_INVALID as expected, which
-would have made padata_do_parallel() return error before doing the
-division.
-
-Fix by introducing a second padata CPU hotplug state before
-CPUHP_BRINGUP_CPU so that __padata_remove_cpu() sees the online mask
-without @cpu.  No need for the second argument to padata_replace() since
-@cpu is now already missing from the online mask.
-
-Fixes: 33e54450683c ("padata: Handle empty padata cpumasks")
-Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc: Eric Biggers <ebiggers@kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Zaibo Xu <xuzaibo@huawei.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- include/linux/cpuhotplug.h |  1 +
- kernel/padata.c            | 30 ++++++++++++++++++------------
- 2 files changed, 19 insertions(+), 12 deletions(-)
+ drivers/crypto/hisilicon/hpre/hpre_crypto.c |  7 +++++-
+ drivers/crypto/hisilicon/hpre/hpre_main.c   | 24 ++++++++++-----------
+ 2 files changed, 18 insertions(+), 13 deletions(-)
 
-diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
-index 068793a619ca8..2d55cee638fc6 100644
---- a/include/linux/cpuhotplug.h
-+++ b/include/linux/cpuhotplug.h
-@@ -59,6 +59,7 @@ enum cpuhp_state {
- 	CPUHP_IOMMU_INTEL_DEAD,
- 	CPUHP_LUSTRE_CFS_DEAD,
- 	CPUHP_AP_ARM_CACHE_B15_RAC_DEAD,
-+	CPUHP_PADATA_DEAD,
- 	CPUHP_WORKQUEUE_PREP,
- 	CPUHP_POWER_NUMA_PREPARE,
- 	CPUHP_HRTIMERS_PREPARE,
-diff --git a/kernel/padata.c b/kernel/padata.c
-index 9c82ee4a97323..fda7a7039422d 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -512,7 +512,7 @@ static int padata_replace_one(struct padata_shell *ps)
- 	return 0;
- }
- 
--static int padata_replace(struct padata_instance *pinst, int cpu)
-+static int padata_replace(struct padata_instance *pinst)
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+index 98f037e6ea3e4..d8b015266ee49 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
+@@ -1043,6 +1043,7 @@ static unsigned int hpre_rsa_max_size(struct crypto_akcipher *tfm)
+ static int hpre_rsa_init_tfm(struct crypto_akcipher *tfm)
  {
- 	int notification_mask = 0;
- 	struct padata_shell *ps;
-@@ -523,16 +523,12 @@ static int padata_replace(struct padata_instance *pinst, int cpu)
- 	cpumask_copy(pinst->omask, pinst->rcpumask.pcpu);
- 	cpumask_and(pinst->rcpumask.pcpu, pinst->cpumask.pcpu,
- 		    cpu_online_mask);
--	if (cpu >= 0)
--		cpumask_clear_cpu(cpu, pinst->rcpumask.pcpu);
- 	if (!cpumask_equal(pinst->omask, pinst->rcpumask.pcpu))
- 		notification_mask |= PADATA_CPU_PARALLEL;
+ 	struct hpre_ctx *ctx = akcipher_tfm_ctx(tfm);
++	int ret;
  
- 	cpumask_copy(pinst->omask, pinst->rcpumask.cbcpu);
- 	cpumask_and(pinst->rcpumask.cbcpu, pinst->cpumask.cbcpu,
- 		    cpu_online_mask);
--	if (cpu >= 0)
--		cpumask_clear_cpu(cpu, pinst->rcpumask.cbcpu);
- 	if (!cpumask_equal(pinst->omask, pinst->rcpumask.cbcpu))
- 		notification_mask |= PADATA_CPU_SERIAL;
- 
-@@ -624,7 +620,7 @@ static int __padata_set_cpumasks(struct padata_instance *pinst,
- 	cpumask_copy(pinst->cpumask.pcpu, pcpumask);
- 	cpumask_copy(pinst->cpumask.cbcpu, cbcpumask);
- 
--	err = padata_setup_cpumasks(pinst) ?: padata_replace(pinst, -1);
-+	err = padata_setup_cpumasks(pinst) ?: padata_replace(pinst);
- 
- 	if (valid)
- 		__padata_start(pinst);
-@@ -715,7 +711,7 @@ static int __padata_add_cpu(struct padata_instance *pinst, int cpu)
- 	int err = 0;
- 
- 	if (cpumask_test_cpu(cpu, cpu_online_mask)) {
--		err = padata_replace(pinst, -1);
-+		err = padata_replace(pinst);
- 
- 		if (padata_validate_cpumask(pinst, pinst->cpumask.pcpu) &&
- 		    padata_validate_cpumask(pinst, pinst->cpumask.cbcpu))
-@@ -729,12 +725,12 @@ static int __padata_remove_cpu(struct padata_instance *pinst, int cpu)
- {
- 	int err = 0;
- 
--	if (cpumask_test_cpu(cpu, cpu_online_mask)) {
-+	if (!cpumask_test_cpu(cpu, cpu_online_mask)) {
- 		if (!padata_validate_cpumask(pinst, pinst->cpumask.pcpu) ||
- 		    !padata_validate_cpumask(pinst, pinst->cpumask.cbcpu))
- 			__padata_stop(pinst);
- 
--		err = padata_replace(pinst, cpu);
-+		err = padata_replace(pinst);
+ 	ctx->rsa.soft_tfm = crypto_alloc_akcipher("rsa-generic", 0, 0);
+ 	if (IS_ERR(ctx->rsa.soft_tfm)) {
+@@ -1050,7 +1051,11 @@ static int hpre_rsa_init_tfm(struct crypto_akcipher *tfm)
+ 		return PTR_ERR(ctx->rsa.soft_tfm);
  	}
  
- 	return err;
-@@ -796,7 +792,7 @@ static int padata_cpu_online(unsigned int cpu, struct hlist_node *node)
- 	return ret;
- }
- 
--static int padata_cpu_prep_down(unsigned int cpu, struct hlist_node *node)
-+static int padata_cpu_dead(unsigned int cpu, struct hlist_node *node)
- {
- 	struct padata_instance *pinst;
- 	int ret;
-@@ -817,6 +813,7 @@ static enum cpuhp_state hp_online;
- static void __padata_free(struct padata_instance *pinst)
- {
- #ifdef CONFIG_HOTPLUG_CPU
-+	cpuhp_state_remove_instance_nocalls(CPUHP_PADATA_DEAD, &pinst->node);
- 	cpuhp_state_remove_instance_nocalls(hp_online, &pinst->node);
- #endif
- 
-@@ -1024,6 +1021,8 @@ static struct padata_instance *padata_alloc(const char *name,
- 
- #ifdef CONFIG_HOTPLUG_CPU
- 	cpuhp_state_add_instance_nocalls_cpuslocked(hp_online, &pinst->node);
-+	cpuhp_state_add_instance_nocalls_cpuslocked(CPUHP_PADATA_DEAD,
-+						    &pinst->node);
- #endif
- 
- 	put_online_cpus();
-@@ -1136,17 +1135,24 @@ static __init int padata_driver_init(void)
- 	int ret;
- 
- 	ret = cpuhp_setup_state_multi(CPUHP_AP_ONLINE_DYN, "padata:online",
--				      padata_cpu_online,
--				      padata_cpu_prep_down);
-+				      padata_cpu_online, NULL);
- 	if (ret < 0)
- 		return ret;
- 	hp_online = ret;
+-	return hpre_ctx_init(ctx);
++	ret = hpre_ctx_init(ctx);
++	if (ret)
++		crypto_free_akcipher(ctx->rsa.soft_tfm);
 +
-+	ret = cpuhp_setup_state_multi(CPUHP_PADATA_DEAD, "padata:dead",
-+				      NULL, padata_cpu_dead);
-+	if (ret < 0) {
-+		cpuhp_remove_multi_state(hp_online);
-+		return ret;
-+	}
- 	return 0;
++	return ret;
  }
- module_init(padata_driver_init);
  
- static __exit void padata_driver_exit(void)
- {
-+	cpuhp_remove_multi_state(CPUHP_PADATA_DEAD);
- 	cpuhp_remove_multi_state(hp_online);
- }
- module_exit(padata_driver_exit);
+ static void hpre_rsa_exit_tfm(struct crypto_akcipher *tfm)
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+index 34e0424410bfc..0c98c37e39f4a 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_main.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+@@ -106,18 +106,18 @@ static const char * const hpre_debug_file_name[] = {
+ };
+ 
+ static const struct hpre_hw_error hpre_hw_errors[] = {
+-	{ .int_msk = BIT(0), .msg = "hpre_ecc_1bitt_err" },
+-	{ .int_msk = BIT(1), .msg = "hpre_ecc_2bit_err" },
+-	{ .int_msk = BIT(2), .msg = "hpre_data_wr_err" },
+-	{ .int_msk = BIT(3), .msg = "hpre_data_rd_err" },
+-	{ .int_msk = BIT(4), .msg = "hpre_bd_rd_err" },
+-	{ .int_msk = BIT(5), .msg = "hpre_ooo_2bit_ecc_err" },
+-	{ .int_msk = BIT(6), .msg = "hpre_cltr1_htbt_tm_out_err" },
+-	{ .int_msk = BIT(7), .msg = "hpre_cltr2_htbt_tm_out_err" },
+-	{ .int_msk = BIT(8), .msg = "hpre_cltr3_htbt_tm_out_err" },
+-	{ .int_msk = BIT(9), .msg = "hpre_cltr4_htbt_tm_out_err" },
+-	{ .int_msk = GENMASK(15, 10), .msg = "hpre_ooo_rdrsp_err" },
+-	{ .int_msk = GENMASK(21, 16), .msg = "hpre_ooo_wrrsp_err" },
++	{ .int_msk = BIT(0), .msg = "core_ecc_1bit_err_int_set" },
++	{ .int_msk = BIT(1), .msg = "core_ecc_2bit_err_int_set" },
++	{ .int_msk = BIT(2), .msg = "dat_wb_poison_int_set" },
++	{ .int_msk = BIT(3), .msg = "dat_rd_poison_int_set" },
++	{ .int_msk = BIT(4), .msg = "bd_rd_poison_int_set" },
++	{ .int_msk = BIT(5), .msg = "ooo_ecc_2bit_err_int_set" },
++	{ .int_msk = BIT(6), .msg = "cluster1_shb_timeout_int_set" },
++	{ .int_msk = BIT(7), .msg = "cluster2_shb_timeout_int_set" },
++	{ .int_msk = BIT(8), .msg = "cluster3_shb_timeout_int_set" },
++	{ .int_msk = BIT(9), .msg = "cluster4_shb_timeout_int_set" },
++	{ .int_msk = GENMASK(15, 10), .msg = "ooo_rdrsp_err_int_set" },
++	{ .int_msk = GENMASK(21, 16), .msg = "ooo_wrrsp_err_int_set" },
+ 	{ /* sentinel */ }
+ };
+ 
 -- 
 2.20.1
 
