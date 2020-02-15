@@ -1,139 +1,51 @@
-Return-Path: <SRS0=Wzqe=4C=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=thAn=4D=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=FREEMAIL_REPLYTO_END_DIGIT,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25216C3B1B5
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 18:23:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2371C3F68F
+	for <linux-crypto@archiver.kernel.org>; Sat, 15 Feb 2020 01:34:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EEBE12168B
-	for <linux-crypto@archiver.kernel.org>; Fri, 14 Feb 2020 18:23:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1581704615;
-	bh=J1j4OCreJQkS7zD0uwA8aoWiIOqAgpvxOtjmXUV0ThQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=dfv2aXaQZqcMUeyBQtn0b8TFbbCvNh4h1o01EuWqlZTIxFhPZB1hsllSJ8f7HBf9F
-	 HsB+JD4Uofq7oHF56QJlJ8uSDyMp4/AbFPDI/0J+wKNYrT00cllMfdlzNpKq9ApmxF
-	 fVLjiaWkTtkFa+pH4O/EvIW1id3ZKCyOxR2EWANw=
+	by mail.kernel.org (Postfix) with ESMTP id A66882081E
+	for <linux-crypto@archiver.kernel.org>; Sat, 15 Feb 2020 01:34:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2394835AbgBNSXd (ORCPT
+        id S1727649AbgBOBe2 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 14 Feb 2020 13:23:33 -0500
-Received: from mail.kernel.org ([198.145.29.99]:51988 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729847AbgBNPtR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 14 Feb 2020 10:49:17 -0500
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B4B5B24684;
-        Fri, 14 Feb 2020 15:49:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1581695356;
-        bh=J1j4OCreJQkS7zD0uwA8aoWiIOqAgpvxOtjmXUV0ThQ=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=s1FOrJSFHK1fcrKCAqWyONa1z7M/tWLqmODPCdEwKKw39JFV5WyjS5bwI87zVXqaj
-         kiJYXwKB/h0IbVaMu25Cm9t4KRsEBU4gEWU7c5jZ/ODfVe2aMvBuE7yMzUhkC7KiHZ
-         XLVN7emu2Qra+z8EIavcCDYrtvDYkIib1uT9/RU8=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Eric Biggers <ebiggers@google.com>,
-        Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org
-Subject: [PATCH AUTOSEL 5.5 017/542] crypto: testmgr - don't try to decrypt uninitialized buffers
-Date:   Fri, 14 Feb 2020 10:40:09 -0500
-Message-Id: <20200214154854.6746-17-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200214154854.6746-1-sashal@kernel.org>
-References: <20200214154854.6746-1-sashal@kernel.org>
+        Fri, 14 Feb 2020 20:34:28 -0500
+Received: from l37-192-35-170.novotelecom.ru ([37.192.35.170]:14432 "EHLO
+        glpak.ru" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727572AbgBOBe1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 14 Feb 2020 20:34:27 -0500
+X-Greylist: delayed 1291 seconds by postgrey-1.27 at vger.kernel.org; Fri, 14 Feb 2020 20:34:26 EST
+Received: from alex.glpak.ru (localhost [127.0.0.1])
+        by glpak.ru (Postfix) with ESMTP id 1BE3CA3DE63
+        for <linux-crypto@vger.kernel.org>; Sat, 15 Feb 2020 08:08:59 +0700 (NOVT)
+X-Virus-Scanned: amavisd-new at glpak.ru
+Received: from glpak.ru ([127.0.0.1])
+        by alex.glpak.ru (glpak.ru [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id CdJlH9+WSTdj for <linux-crypto@vger.kernel.org>;
+        Sat, 15 Feb 2020 08:08:58 +0700 (NOVT)
+Received: from [192.168.88.250] (unknown [185.248.13.181])
+        by glpak.ru (Postfix) with ESMTPA id 93144A3DE02
+        for <linux-crypto@vger.kernel.org>; Sat, 15 Feb 2020 08:08:58 +0700 (NOVT)
+Content-Type: text/plain; charset="iso-8859-1"
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 8BIT
+Content-Description: Mail message body
+Subject: zionitld3@gmail.com
+To:     linux-crypto@vger.kernel.org
+From:   anna@glpak.ru
+Date:   Fri, 14 Feb 2020 17:10:43 -0800
+Reply-To: zionitld3@gmail.com
+X-Antivirus: Avast (VPS 200214-0, 02/14/2020), Outbound message
+X-Antivirus-Status: Clean
+Message-Id: <20200215010859.1BE3CA3DE63@glpak.ru>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eric Biggers <ebiggers@google.com>
-
-[ Upstream commit eb455dbd02cb1074b37872ffca30a81cb2a18eaa ]
-
-Currently if the comparison fuzz tests encounter an encryption error
-when generating an skcipher or AEAD test vector, they will still test
-the decryption side (passing it the uninitialized ciphertext buffer)
-and expect it to fail with the same error.
-
-This is sort of broken because it's not well-defined usage of the API to
-pass an uninitialized buffer, and furthermore in the AEAD case it's
-acceptable for the decryption error to be EBADMSG (meaning "inauthentic
-input") even if the encryption error was something else like EINVAL.
-
-Fix this for skcipher by explicitly initializing the ciphertext buffer
-on error, and for AEAD by skipping the decryption test on error.
-
-Reported-by: Pascal Van Leeuwen <pvanleeuwen@verimatrix.com>
-Fixes: d435e10e67be ("crypto: testmgr - fuzz skciphers against their generic implementation")
-Fixes: 40153b10d91c ("crypto: testmgr - fuzz AEADs against their generic implementation")
-Signed-off-by: Eric Biggers <ebiggers@google.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- crypto/testmgr.c | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
-
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index 82513b6b0abd0..2c96963b2e51e 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -2102,6 +2102,7 @@ static void generate_random_aead_testvec(struct aead_request *req,
- 	 * If the key or authentication tag size couldn't be set, no need to
- 	 * continue to encrypt.
- 	 */
-+	vec->crypt_error = 0;
- 	if (vec->setkey_error || vec->setauthsize_error)
- 		goto done;
- 
-@@ -2245,10 +2246,12 @@ static int test_aead_vs_generic_impl(const char *driver,
- 					req, tsgls);
- 		if (err)
- 			goto out;
--		err = test_aead_vec_cfg(driver, DECRYPT, &vec, vec_name, cfg,
--					req, tsgls);
--		if (err)
--			goto out;
-+		if (vec.crypt_error == 0) {
-+			err = test_aead_vec_cfg(driver, DECRYPT, &vec, vec_name,
-+						cfg, req, tsgls);
-+			if (err)
-+				goto out;
-+		}
- 		cond_resched();
- 	}
- 	err = 0;
-@@ -2678,6 +2681,15 @@ static void generate_random_cipher_testvec(struct skcipher_request *req,
- 	skcipher_request_set_callback(req, 0, crypto_req_done, &wait);
- 	skcipher_request_set_crypt(req, &src, &dst, vec->len, iv);
- 	vec->crypt_error = crypto_wait_req(crypto_skcipher_encrypt(req), &wait);
-+	if (vec->crypt_error != 0) {
-+		/*
-+		 * The only acceptable error here is for an invalid length, so
-+		 * skcipher decryption should fail with the same error too.
-+		 * We'll test for this.  But to keep the API usage well-defined,
-+		 * explicitly initialize the ciphertext buffer too.
-+		 */
-+		memset((u8 *)vec->ctext, 0, vec->len);
-+	}
- done:
- 	snprintf(name, max_namelen, "\"random: len=%u klen=%u\"",
- 		 vec->len, vec->klen);
--- 
-2.20.1
-
+Hello, We from Zion Finance Group currently offers loans to customers at a low interest rate of 3%. This is an opportunity that you cannot miss. We have a few questions to ask; Do you have debts? Do you want to pay off your debts? Do you want to be financially equipped? If so, request a loan today from Zion Finance Group. Interested, customers are expected to contact zionitld3@gmail.com for more information. We wish to assist you with a loan. Greetings, Mr. Bernard.
