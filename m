@@ -1,93 +1,123 @@
-Return-Path: <SRS0=thAn=4D=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=RXXs=4E=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=FAKE_REPLY_C,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A26A9C2BA83
-	for <linux-crypto@archiver.kernel.org>; Sat, 15 Feb 2020 17:16:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06DE7C2BA83
+	for <linux-crypto@archiver.kernel.org>; Sun, 16 Feb 2020 09:00:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 83E7E2081E
-	for <linux-crypto@archiver.kernel.org>; Sat, 15 Feb 2020 17:16:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D256522522
+	for <linux-crypto@archiver.kernel.org>; Sun, 16 Feb 2020 09:00:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726299AbgBORQ2 (ORCPT
+        id S1726237AbgBPJAA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 15 Feb 2020 12:16:28 -0500
-Received: from viti.kaiser.cx ([85.214.81.225]:52716 "EHLO viti.kaiser.cx"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726143AbgBORQ2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 15 Feb 2020 12:16:28 -0500
-Received: from dslb-088-068-092-168.088.068.pools.vodafone-ip.de ([88.68.92.168] helo=martin-debian-2)
-        by viti.kaiser.cx with esmtpsa (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.89)
-        (envelope-from <postmaster@kaiser.cx>)
-        id 1j313J-0005jM-8R; Sat, 15 Feb 2020 18:16:25 +0100
-Received: from martin by martin-debian-2 with local (Exim 4.92)
-        (envelope-from <martin@martin-debian-2>)
-        id 1j313I-0003zr-Mn; Sat, 15 Feb 2020 18:16:24 +0100
-Date:   Sat, 15 Feb 2020 18:16:24 +0100
-From:   Martin Kaiser <martin@kaiser.cx>
-To:     linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] hwrng: imx-rngc: improve dependencies
-Message-ID: <20200215171616.GA15321@martin-debian-1.paytec.ch>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        Sun, 16 Feb 2020 04:00:00 -0500
+Received: from out30-45.freemail.mail.aliyun.com ([115.124.30.45]:50327 "EHLO
+        out30-45.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726178AbgBPJAA (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 16 Feb 2020 04:00:00 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R931e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04407;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0Tq4DoDl_1581843595;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0Tq4DoDl_1581843595)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Sun, 16 Feb 2020 16:59:56 +0800
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        ebiggers@kernel.org, pvanleeuwen@rambus.com, zohar@linux.ibm.com
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH 6/7] X.509: support OSCCA certificate parse
+Date:   Sun, 16 Feb 2020 16:59:27 +0800
+Message-Id: <20200216085928.108838-7-tianjia.zhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200216085928.108838-1-tianjia.zhang@linux.alibaba.com>
+References: <20200216085928.108838-1-tianjia.zhang@linux.alibaba.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Thus wrote Uwe Kleine-König (u.kleine-koenigpengutronix!de):
+The digital certificate format based on SM2 crypto algorithm as
+specified in GM/T 0015-2012. It was published by State Encryption
+Management Bureau, China.
 
-> On Wed, Feb 12, 2020 at 07:51:46PM +0000, Horia Geanta wrote:
-> > On 2/5/2020 4:00 PM, Uwe Kleine-König wrote:
-> > > The imx-rngc driver binds to devices that are compatible to
-> > > "fsl,imx25-rngb". Grepping through the device tree sources suggests this
-> > > only exists on i.MX25. So restrict dependencies to configs that have
-> > The driver could also be used by some i.MX6 SoCs (SL, SLL),
-> > that have a compatible rngb.
+This patch adds the OID object identifier defined by OSCCA. The
+x509 certificate supports sm2-with-sm3 type certificate parsing.
+It uses the standard elliptic curve public key, and the sm2
+algorithm signs the hash generated by sm3.
 
-> > Actually i.MX6SL has a rngb node in the DT, but unfortunately it lacks
-> > a compatible string.
+Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+---
+ crypto/asymmetric_keys/x509_cert_parser.c | 14 +++++++++++++-
+ include/linux/oid_registry.h              |  6 ++++++
+ 2 files changed, 19 insertions(+), 1 deletion(-)
 
-> Also the i.MX6ULL might have a compatible device?
+diff --git a/crypto/asymmetric_keys/x509_cert_parser.c b/crypto/asymmetric_keys/x509_cert_parser.c
+index 26ec20ef4899..6a8aee22bfd4 100644
+--- a/crypto/asymmetric_keys/x509_cert_parser.c
++++ b/crypto/asymmetric_keys/x509_cert_parser.c
+@@ -234,6 +234,10 @@ int x509_note_pkey_algo(void *context, size_t hdrlen,
+ 	case OID_gost2012Signature512:
+ 		ctx->cert->sig->hash_algo = "streebog512";
+ 		goto ecrdsa;
++
++	case OID_sm2_with_sm3:
++		ctx->cert->sig->hash_algo = "sm3";
++		goto sm2;
+ 	}
+ 
+ rsa_pkcs1:
+@@ -246,6 +250,11 @@ int x509_note_pkey_algo(void *context, size_t hdrlen,
+ 	ctx->cert->sig->encoding = "raw";
+ 	ctx->algo_oid = ctx->last_oid;
+ 	return 0;
++sm2:
++	ctx->cert->sig->pkey_algo = "sm2";
++	ctx->cert->sig->encoding = "raw";
++	ctx->algo_oid = ctx->last_oid;
++	return 0;
+ }
+ 
+ /*
+@@ -266,7 +275,8 @@ int x509_note_signature(void *context, size_t hdrlen,
+ 	}
+ 
+ 	if (strcmp(ctx->cert->sig->pkey_algo, "rsa") == 0 ||
+-	    strcmp(ctx->cert->sig->pkey_algo, "ecrdsa") == 0) {
++	    strcmp(ctx->cert->sig->pkey_algo, "ecrdsa") == 0 ||
++	    strcmp(ctx->cert->sig->pkey_algo, "sm2") == 0) {
+ 		/* Discard the BIT STRING metadata */
+ 		if (vlen < 1 || *(const u8 *)value != 0)
+ 			return -EBADMSG;
+@@ -456,6 +466,8 @@ int x509_extract_key_data(void *context, size_t hdrlen,
+ 	else if (ctx->last_oid == OID_gost2012PKey256 ||
+ 		 ctx->last_oid == OID_gost2012PKey512)
+ 		ctx->cert->pub->pkey_algo = "ecrdsa";
++	else if (ctx->last_oid == OID_id_ecPublicKey)
++		ctx->cert->pub->pkey_algo = "sm2";
+ 	else
+ 		return -ENOPKG;
+ 
+diff --git a/include/linux/oid_registry.h b/include/linux/oid_registry.h
+index 657d6bf2c064..48fe3133ff39 100644
+--- a/include/linux/oid_registry.h
++++ b/include/linux/oid_registry.h
+@@ -107,6 +107,12 @@ enum OID {
+ 	OID_gostTC26Sign512B,		/* 1.2.643.7.1.2.1.2.2 */
+ 	OID_gostTC26Sign512C,		/* 1.2.643.7.1.2.1.2.3 */
+ 
++	/* OSCCA */
++	OID_sm2,			/* 1.2.156.10197.1.301 */
++	OID_sm3,			/* 1.2.156.10197.1.401 */
++	OID_sm2_with_sm3,		/* 1.2.156.10197.1.501 */
++	OID_sm3WithRSAEncryption,	/* 1.2.156.10197.1.504 */
++
+ 	OID__NR
+ };
+ 
+-- 
+2.17.1
 
-AFAICS imx35 chips have an rngc which is compatible to this driver as
-well. I don't have any hardware to test this, though.
-
-> > I am planning to address this short term.
-
-> > > this SoC enabled, but allow compile testing. For the latter additional
-> > > dependencies for clk and readl/writel are necessary.
-> > > > Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
-> > > ---
-> > >  drivers/char/hw_random/Kconfig | 3 ++-
-> > >  1 file changed, 2 insertions(+), 1 deletion(-)
-
-> > > diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-> > > index 8486c29d8324..17fe954fccde 100644
-> > > --- a/drivers/char/hw_random/Kconfig
-> > > +++ b/drivers/char/hw_random/Kconfig
-> > > @@ -244,7 +244,8 @@ config HW_RANDOM_MXC_RNGA
-
-> > >  config HW_RANDOM_IMX_RNGC
-> > >  	tristate "Freescale i.MX RNGC Random Number Generator"
-> > > -	depends on ARCH_MXC
-> > > +	depends on HAS_IOMEM && HAVE_CLK
-> > > +	depends on SOC_IMX25 || COMPILE_TEST
-> > I guess SOC_IMX6SL and SOC_IMX6SLL will have to be added.
-> > Does this sound good?
-
-> I'd say currently the patch is right and once the device trees for the
-> imx6 variants were expanded to include these, the list here can be
-> expanded.
-
-Makes sense to me.
-
-Reviewed-by: Martin Kaiser <martin@kaiser.cx>
