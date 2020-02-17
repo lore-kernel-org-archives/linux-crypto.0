@@ -1,89 +1,81 @@
-Return-Path: <SRS0=RXXs=4E=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=Eks8=4F=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B11A4C76199
-	for <linux-crypto@archiver.kernel.org>; Sun, 16 Feb 2020 10:05:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDC41C35254
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Feb 2020 09:35:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 899432084E
-	for <linux-crypto@archiver.kernel.org>; Sun, 16 Feb 2020 10:05:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8D05620679
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Feb 2020 09:35:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726703AbgBPKFC (ORCPT
+        id S1728743AbgBQJf4 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 16 Feb 2020 05:05:02 -0500
-Received: from foss.arm.com ([217.140.110.172]:53048 "EHLO foss.arm.com"
+        Mon, 17 Feb 2020 04:35:56 -0500
+Received: from viti.kaiser.cx ([85.214.81.225]:53246 "EHLO viti.kaiser.cx"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726020AbgBPKFC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 16 Feb 2020 05:05:02 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2D96830E;
-        Sun, 16 Feb 2020 02:05:02 -0800 (PST)
-Received: from ssg-dev-vb.kfn.arm.com (unknown [10.50.4.137])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2D0E63F68F;
-        Sun, 16 Feb 2020 02:04:58 -0800 (PST)
-From:   Hadar Gat <hadar.gat@arm.com>
-To:     Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Daniel Thompson <daniel.thompson@linaro.org>,
-        Tomer Maimon <tmaimon77@gmail.com>,
-        Stefan Wahren <wahrenst@gmx.net>,
-        Sumit Garg <sumit.garg@linaro.org>,
-        Zaibo Xu <xuzaibo@huawei.com>,
-        Weili Qian <qianweili@huawei.com>,
-        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Cc:     linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Ofir Drang <ofir.drang@arm.com>, Hadar Gat <hadar.gat@arm.com>
-Subject: [PATCH v4 3/3] MAINTAINERS: add HG as cctrng maintainer
-Date:   Sun, 16 Feb 2020 12:04:10 +0200
-Message-Id: <1581847450-22924-4-git-send-email-hadar.gat@arm.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1581847450-22924-1-git-send-email-hadar.gat@arm.com>
-References: <1581847450-22924-1-git-send-email-hadar.gat@arm.com>
+        id S1728302AbgBQJf4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 17 Feb 2020 04:35:56 -0500
+Received: from martin by viti.kaiser.cx with local (Exim 4.89)
+        (envelope-from <martin@viti.kaiser.cx>)
+        id 1j3cod-0001mS-3d; Mon, 17 Feb 2020 10:35:47 +0100
+Date:   Mon, 17 Feb 2020 10:35:47 +0100
+From:   Martin Kaiser <martin@kaiser.cx>
+To:     PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        NXP Linux Team <linux-imx@nxp.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        linux-arm-kernel@lists.infradead.org,
+        open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 3/6] hwrng: imx-rngc - use devres for registration
+Message-ID: <20200217093547.3an3bzqfutcewe2i@viti.kaiser.cx>
+References: <20200128110102.11522-1-martin@kaiser.cx>
+ <20200128110102.11522-4-martin@kaiser.cx>
+ <CANc+2y6Scy1=S7zeQ4gVowRoWmzsq4wiNXbLVeY1Qvu0oo9cUw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CANc+2y6Scy1=S7zeQ4gVowRoWmzsq4wiNXbLVeY1Qvu0oo9cUw@mail.gmail.com>
+User-Agent: NeoMutt/20170113 (1.7.2)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-I work for Arm on maintaining the TrustZone CryptoCell TRNG driver.
+Hi PrasannaKumar,
 
-Signed-off-by: Hadar Gat <hadar.gat@arm.com>
----
- MAINTAINERS | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Thus wrote PrasannaKumar Muralidharan (prasannatsmkumar@gmail.com):
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index a0c1618..654585a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3790,6 +3790,15 @@ S:	Supported
- F:	drivers/crypto/ccree/
- W:	https://developer.arm.com/products/system-ip/trustzone-cryptocell/cryptocell-700-family
- 
-+CCTRNG ARM TRUSTZONE CRYPTOCELL TRUE RANDOM NUMBER GENERATOR (TRNG) DRIVER
-+M:	Hadar Gat <hadar.gat@arm.com>
-+L:	linux-crypto@vger.kernel.org
-+S:	Supported
-+F:	drivers/char/hw_random/cctrng.c
-+F:	drivers/char/hw_random/cctrng.h
-+F:	Documentation/devicetree/bindings/rng/arm-cctrng.txt
-+W:	https://developer.arm.com/products/system-ip/trustzone-cryptocell/cryptocell-700-family
-+
- CEC FRAMEWORK
- M:	Hans Verkuil <hverkuil-cisco@xs4all.nl>
- L:	linux-media@vger.kernel.org
--- 
-2.7.4
+> After imx_rngc_remove function hwrng_unregister will get called. This
+> leaves a window where the clock to rng hardware block is disabled but
+> still user space can access it via /dev/hwrng.
 
+thanks for spotting this issue. I see that in __device_release_driver,
+the driver's remove function is called before the devres cleanup.
+
+> This does not look right, please revisit the patch.
+
+I checked again how other hwrng drivers use devres. Some don't have to
+disable a clock and need no remove function at all. Others enable the
+clock in the hwrng init routine and disable it in the cleanup routine.
+
+Both of these approaches don't work here. I should disable the clock
+eventually and I need it in the probe function to run the selftest
+before hwrng init is called.
+
+Therefore, I suggest to drop this patch, at least for the moment.
+Herbert, should I resend the series without this patch or is it ok for
+you to take the remaining patches as-is?
+
+BTW, 3e75241be808 ("hwrng: drivers - Use device-managed registration
+API") makes the same change that I proposed here for a couple of other
+hwrng drivers and seems to introduce the same race condition in som
+drivers e.g. drivers/char/hw_random/exynos-trng.c. Should we try to fix
+this?
+
+Thanks,
+Martin
