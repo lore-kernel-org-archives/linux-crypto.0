@@ -2,80 +2,79 @@ Return-Path: <SRS0=Eks8=4F=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDC41C35254
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Feb 2020 09:35:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45DF4C761A0
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Feb 2020 09:37:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8D05620679
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Feb 2020 09:35:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 287362070B
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Feb 2020 09:37:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728743AbgBQJf4 (ORCPT
+        id S1728922AbgBQJhE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 17 Feb 2020 04:35:56 -0500
-Received: from viti.kaiser.cx ([85.214.81.225]:53246 "EHLO viti.kaiser.cx"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728302AbgBQJf4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Feb 2020 04:35:56 -0500
-Received: from martin by viti.kaiser.cx with local (Exim 4.89)
-        (envelope-from <martin@viti.kaiser.cx>)
-        id 1j3cod-0001mS-3d; Mon, 17 Feb 2020 10:35:47 +0100
-Date:   Mon, 17 Feb 2020 10:35:47 +0100
-From:   Martin Kaiser <martin@kaiser.cx>
-To:     PrasannaKumar Muralidharan <prasannatsmkumar@gmail.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        NXP Linux Team <linux-imx@nxp.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        linux-arm-kernel@lists.infradead.org,
-        open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 3/6] hwrng: imx-rngc - use devres for registration
-Message-ID: <20200217093547.3an3bzqfutcewe2i@viti.kaiser.cx>
-References: <20200128110102.11522-1-martin@kaiser.cx>
- <20200128110102.11522-4-martin@kaiser.cx>
- <CANc+2y6Scy1=S7zeQ4gVowRoWmzsq4wiNXbLVeY1Qvu0oo9cUw@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANc+2y6Scy1=S7zeQ4gVowRoWmzsq4wiNXbLVeY1Qvu0oo9cUw@mail.gmail.com>
-User-Agent: NeoMutt/20170113 (1.7.2)
+        Mon, 17 Feb 2020 04:37:04 -0500
+Received: from out30-54.freemail.mail.aliyun.com ([115.124.30.54]:44127 "EHLO
+        out30-54.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728904AbgBQJhE (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 17 Feb 2020 04:37:04 -0500
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R411e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04407;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0Tq9WTV2_1581932218;
+Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0Tq9WTV2_1581932218)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Mon, 17 Feb 2020 17:36:58 +0800
+From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        jarkko.sakkinen@linux.intel.com, zohar@linux.ibm.com,
+        ebiggers@kernel.org, dmitry.kasatkin@gmail.com, jmorris@namei.org,
+        serge@hallyn.com
+Cc:     linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v2 2/2] ima: add sm3 algorithm to hash algorithm configuration list
+Date:   Mon, 17 Feb 2020 17:36:49 +0800
+Message-Id: <20200217093649.97938-3-tianjia.zhang@linux.alibaba.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200217093649.97938-1-tianjia.zhang@linux.alibaba.com>
+References: <20200217093649.97938-1-tianjia.zhang@linux.alibaba.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi PrasannaKumar,
+sm3 has been supported by the ima hash algorithm, but it is not
+yet in the Kconfig configuration list. After adding, both ima and tpm2
+can support sm3 well.
 
-Thus wrote PrasannaKumar Muralidharan (prasannatsmkumar@gmail.com):
+Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+---
+ security/integrity/ima/Kconfig | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-> After imx_rngc_remove function hwrng_unregister will get called. This
-> leaves a window where the clock to rng hardware block is disabled but
-> still user space can access it via /dev/hwrng.
+diff --git a/security/integrity/ima/Kconfig b/security/integrity/ima/Kconfig
+index 711ff10fa36e..3f3ee4e2eb0d 100644
+--- a/security/integrity/ima/Kconfig
++++ b/security/integrity/ima/Kconfig
+@@ -112,6 +112,10 @@ choice
+ 	config IMA_DEFAULT_HASH_WP512
+ 		bool "WP512"
+ 		depends on CRYPTO_WP512=y && !IMA_TEMPLATE
++
++	config IMA_DEFAULT_HASH_SM3
++		bool "SM3"
++		depends on CRYPTO_SM3=y && !IMA_TEMPLATE
+ endchoice
+ 
+ config IMA_DEFAULT_HASH
+@@ -121,6 +125,7 @@ config IMA_DEFAULT_HASH
+ 	default "sha256" if IMA_DEFAULT_HASH_SHA256
+ 	default "sha512" if IMA_DEFAULT_HASH_SHA512
+ 	default "wp512" if IMA_DEFAULT_HASH_WP512
++	default "sm3" if IMA_DEFAULT_HASH_SM3
+ 
+ config IMA_WRITE_POLICY
+ 	bool "Enable multiple writes to the IMA policy"
+-- 
+2.17.1
 
-thanks for spotting this issue. I see that in __device_release_driver,
-the driver's remove function is called before the devres cleanup.
-
-> This does not look right, please revisit the patch.
-
-I checked again how other hwrng drivers use devres. Some don't have to
-disable a clock and need no remove function at all. Others enable the
-clock in the hwrng init routine and disable it in the cleanup routine.
-
-Both of these approaches don't work here. I should disable the clock
-eventually and I need it in the probe function to run the selftest
-before hwrng init is called.
-
-Therefore, I suggest to drop this patch, at least for the moment.
-Herbert, should I resend the series without this patch or is it ok for
-you to take the remaining patches as-is?
-
-BTW, 3e75241be808 ("hwrng: drivers - Use device-managed registration
-API") makes the same change that I proposed here for a couple of other
-hwrng drivers and seems to introduce the same race condition in som
-drivers e.g. drivers/char/hw_random/exynos-trng.c. Should we try to fix
-this?
-
-Thanks,
-Martin
