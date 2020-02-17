@@ -2,170 +2,157 @@ Return-Path: <SRS0=Eks8=4F=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8456C761A0
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Feb 2020 09:37:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06F3DC35254
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Feb 2020 10:06:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8ABD820801
-	for <linux-crypto@archiver.kernel.org>; Mon, 17 Feb 2020 09:37:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C7ECB20679
+	for <linux-crypto@archiver.kernel.org>; Mon, 17 Feb 2020 10:06:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="aXHsu5Ff"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728986AbgBQJhJ (ORCPT
+        id S1728957AbgBQKGz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 17 Feb 2020 04:37:09 -0500
-Received: from out30-43.freemail.mail.aliyun.com ([115.124.30.43]:55970 "EHLO
-        out30-43.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1728698AbgBQJhI (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 17 Feb 2020 04:37:08 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0Tq9UD5i_1581932217;
-Received: from localhost(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0Tq9UD5i_1581932217)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Mon, 17 Feb 2020 17:36:57 +0800
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        jarkko.sakkinen@linux.intel.com, zohar@linux.ibm.com,
-        ebiggers@kernel.org, dmitry.kasatkin@gmail.com, jmorris@namei.org,
-        serge@hallyn.com
-Cc:     linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/2] crypto: fix mismatched hash algorithm name sm3-256 to sm3
-Date:   Mon, 17 Feb 2020 17:36:48 +0800
-Message-Id: <20200217093649.97938-2-tianjia.zhang@linux.alibaba.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200217093649.97938-1-tianjia.zhang@linux.alibaba.com>
-References: <20200217093649.97938-1-tianjia.zhang@linux.alibaba.com>
+        Mon, 17 Feb 2020 05:06:55 -0500
+Received: from mail-mw2nam10on2068.outbound.protection.outlook.com ([40.107.94.68]:6252
+        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1728833AbgBQKGz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 17 Feb 2020 05:06:55 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OgSdvSSFIHrKDzn+rdzDeFN3Hvq3hdHdxxjO4ueehgVBq1s8gCbT7xtrQZzn2QH4s5wsq8596q5xrchIeUgqNyL+BY0BkffFC3PKIpSCLh2uS9olFNgdtJknU2gXgX/YaOELBXUdRQQDhJQIrgztWFevrMFN77gYkS+4sfqBPPbsaf4uG3uPejjr9miBFDgwJBayWS97gpb7fEeCGlqa9yC5GMa0hVCaRFZo8HapdFenqBLR5tS9erXJvbGnujlSHgLG2KJ3icUtJZlJ6sk1xuwiJlEMva7P4eoUYQHZoEdCywcC4WgJwVnLHsuw7+t+n/zG5LkJZeymBThTDbk7TA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YwEL6IBrFuBo4kLUds4E47cCCgQpkK4bBGnPthAS/L4=;
+ b=D/HIchFGDatSkfuh+pwAnMQGpqe+t1N3GAxJRldtkmLq87Sp4kKhGf96sjpmDn7tBkRT6L+faqiOhG9L2O6pG6ymJC40OOLdIWX2GiS5702sX/tQ/Qe9lKLmUbyW37j3s+Fd6D8b1SSXg578Cat+EVt87Gxe3cLe/kNJSgqvUhptUVq0ItRjY1pMU9eNIJ/Iz++1/t7fMw6yCXtQOhhoJVW/Ns7ZTjyeaJBQBzqX1ywGDL8VNu1q1OuxL/H6cFDbmdmrAaRS9vwFEqGD7fwi+tmP9jQKysqLj4gTCOtBzmRHWyVHZ83vkLHgGARFvXGlhKUSuJRhd/6fDGuiF5+SwQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=xilinx.com; dmarc=pass action=none header.from=xilinx.com;
+ dkim=pass header.d=xilinx.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YwEL6IBrFuBo4kLUds4E47cCCgQpkK4bBGnPthAS/L4=;
+ b=aXHsu5Ffkdf4bNzx45L30dvYb4MxehgtCRnVDarBIvJLTJYogYFob3Rdl5o+fm7F23JOfHiyS3mhC6UI+zjpIz0vSyks/eOyFRLXpZ35A3+4OIYpeF2JRArSAtPB94N8QZGyaGUl386dmS9eqHdA1//o23YrrB/0wjShtXlLxVU=
+Received: from BN7PR02MB5124.namprd02.prod.outlook.com (20.176.27.215) by
+ BN7PR02MB4242.namprd02.prod.outlook.com (52.135.250.26) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2729.30; Mon, 17 Feb 2020 10:06:49 +0000
+Received: from BN7PR02MB5124.namprd02.prod.outlook.com
+ ([fe80::3c2d:7e2:dfb6:adfe]) by BN7PR02MB5124.namprd02.prod.outlook.com
+ ([fe80::3c2d:7e2:dfb6:adfe%5]) with mapi id 15.20.2729.032; Mon, 17 Feb 2020
+ 10:06:48 +0000
+From:   Kalyani Akula <kalyania@xilinx.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+CC:     "davem@davemloft.net" <davem@davemloft.net>,
+        "monstr@seznam.cz" <monstr@seznam.cz>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        git-dev <git-dev@xilinx.com>,
+        Mohan Marutirao Dhanawade <mohand@xilinx.com>,
+        Sarat Chand Savitala <saratcha@xilinx.com>,
+        Harsh Jain <harshj@xilinx.com>,
+        Michal Simek <michals@xilinx.com>,
+        Mohan Marutirao Dhanawade <mohand@xilinx.com>
+Subject: RE: [PATCH V6 3/4] crypto: Add Xilinx AES driver
+Thread-Topic: [PATCH V6 3/4] crypto: Add Xilinx AES driver
+Thread-Index: AQHV1aLi86wN5Of2F06o6+V0ID53EKgY7WuAgAZaW/A=
+Date:   Mon, 17 Feb 2020 10:06:48 +0000
+Message-ID: <BN7PR02MB5124554576DEC68C9121684FAF160@BN7PR02MB5124.namprd02.prod.outlook.com>
+References: <1580192308-10952-1-git-send-email-kalyani.akula@xilinx.com>
+ <1580192308-10952-4-git-send-email-kalyani.akula@xilinx.com>
+ <20200213090241.fksu33yszqi5fjat@gondor.apana.org.au>
+In-Reply-To: <20200213090241.fksu33yszqi5fjat@gondor.apana.org.au>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=kalyania@xilinx.com; 
+x-originating-ip: [149.199.50.133]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: ecef6143-25ad-496e-391d-08d7b3911a24
+x-ms-traffictypediagnostic: BN7PR02MB4242:|BN7PR02MB4242:
+x-ld-processed: 657af505-d5df-48d0-8300-c31994686c5c,ExtAddr
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BN7PR02MB4242EA2806CF1E6FFF45DDB7AF160@BN7PR02MB4242.namprd02.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:741;
+x-forefront-prvs: 0316567485
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(366004)(136003)(346002)(396003)(376002)(199004)(189003)(9686003)(8936002)(54906003)(86362001)(316002)(107886003)(4326008)(7696005)(8676002)(81166006)(6916009)(2906002)(478600001)(81156014)(52536014)(64756008)(966005)(5660300002)(71200400001)(53546011)(66476007)(66556008)(55016002)(26005)(186003)(33656002)(66946007)(66446008)(76116006)(6506007);DIR:OUT;SFP:1101;SCL:1;SRVR:BN7PR02MB4242;H:BN7PR02MB5124.namprd02.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: xilinx.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: GKOWgz67eRTYI0WbH5YVKjLHeumoXJbT3HGeE7y6sx0zLysAkBP5iS89hq0YmJbBeRyY4BecW5J8cyD1Ogtvp/4E4jNrNFhm212MBxy0S2x7StwhK5lb28ptwGydziCmRpG+U/NbpujYUIGrQ9yhavQOMIfzQh57aqbqnAfTGkdhaETG+lOxnCd2kgSeWKxy6OMjrgosRSe5LEoIogJTJdf9bFzsgn+tuSEmrShIezHpZkNLDNJY3fJ2oEZ2bYdpsxgD+YjXq0xIgLiXqpQfkE6R8ZP3E1p/D049+ok8bf4dzIGVB11423JTYCSZMIpBvC9mCy2mo0HkTEcmErvb5r8e4S7M24sYQwOMtAVgzMHC1RHQvrb7FOYQCMyoPu0HrhMlVMWoEx01IJuSqJcK+Lo1Dq5s4YqqQmb7DXguD4F3ag5ujPSKkiO67ghHBGn7woQtrkiYvgswZaOTrp5XaBPF84USqeCxDPZdwQlIDv3HlSVvJ77u5V6XOLsWIm0WuxWOzcgDNcqv1Xn7y7A2zw==
+x-ms-exchange-antispam-messagedata: 9EHD1GoHYY/baiHOpClhjqXN8qcII/a7ENmb7vZ55FmJ6oBlDmzM9ANrLvnlc+98s3gzpTEIB/eLLcuJYRmmQMzEC5oFNCv6qv8OsrVXA+LhF16SCEyDXXjI8Ux/AbUxWBF9wH4Ak1nMUXNDEx1N3g==
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ecef6143-25ad-496e-391d-08d7b3911a24
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Feb 2020 10:06:48.5656
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: UOgwaNKfpXc/37iNl2igbl6VvWeUhZLprXEI3+JJkL5j4ez0j6O/SNXwREiPNO5s0zeF9rrGsAadfl741/XmxA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PR02MB4242
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The name sm3-256 is defined in hash_algo_name in hash_info, but the
-algorithm name implemented in sm3_generic.c is sm3, which will cause
-the sm3-256 algorithm to be not found in some application scenarios of
-the hash algorithm, and an ENOENT error will occur. For example,
-IMA, keys, and other subsystems that reference hash_algo_name all use
-the hash algorithm of sm3.
+Hi Herbert,
 
-According to https://tools.ietf.org/id/draft-oscca-cfrg-sm3-01.html,
-SM3 always produces a 256-bit hash value and there are no plans for
-other length development, so there is no ambiguity in the name of sm3.
+The compilation issue is due to commit af5034e8e4a5 ("crypto: remove propag=
+ation of CRYPTO_TFM_RES_* flags ").
+I will fix it and send V7.
 
-Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Cc: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
----
- Documentation/security/keys/trusted-encrypted.rst | 2 +-
- crypto/hash_info.c                                | 4 ++--
- drivers/char/tpm/tpm2-cmd.c                       | 2 +-
- include/crypto/hash_info.h                        | 2 +-
- include/linux/tpm.h                               | 2 +-
- include/uapi/linux/hash_info.h                    | 2 +-
- security/keys/trusted-keys/trusted_tpm2.c         | 2 +-
- 7 files changed, 8 insertions(+), 8 deletions(-)
+Regards,
+Kalyani
 
-diff --git a/Documentation/security/keys/trusted-encrypted.rst b/Documentation/security/keys/trusted-encrypted.rst
-index 50ac8bcd6970..5b6fea88f335 100644
---- a/Documentation/security/keys/trusted-encrypted.rst
-+++ b/Documentation/security/keys/trusted-encrypted.rst
-@@ -66,7 +66,7 @@ Usage::
-                      default 1 (resealing allowed)
-        hash=         hash algorithm name as a string. For TPM 1.x the only
-                      allowed value is sha1. For TPM 2.x the allowed values
--                     are sha1, sha256, sha384, sha512 and sm3-256.
-+                     are sha1, sha256, sha384, sha512 and sm3.
-        policydigest= digest for the authorization policy. must be calculated
-                      with the same hash algorithm as specified by the 'hash='
-                      option.
-diff --git a/crypto/hash_info.c b/crypto/hash_info.c
-index c754cb75dd1a..fe0119407219 100644
---- a/crypto/hash_info.c
-+++ b/crypto/hash_info.c
-@@ -26,7 +26,7 @@ const char *const hash_algo_name[HASH_ALGO__LAST] = {
- 	[HASH_ALGO_TGR_128]	= "tgr128",
- 	[HASH_ALGO_TGR_160]	= "tgr160",
- 	[HASH_ALGO_TGR_192]	= "tgr192",
--	[HASH_ALGO_SM3_256]	= "sm3-256",
-+	[HASH_ALGO_SM3]		= "sm3",
- 	[HASH_ALGO_STREEBOG_256] = "streebog256",
- 	[HASH_ALGO_STREEBOG_512] = "streebog512",
- };
-@@ -50,7 +50,7 @@ const int hash_digest_size[HASH_ALGO__LAST] = {
- 	[HASH_ALGO_TGR_128]	= TGR128_DIGEST_SIZE,
- 	[HASH_ALGO_TGR_160]	= TGR160_DIGEST_SIZE,
- 	[HASH_ALGO_TGR_192]	= TGR192_DIGEST_SIZE,
--	[HASH_ALGO_SM3_256]	= SM3256_DIGEST_SIZE,
-+	[HASH_ALGO_SM3]		= SM3_DIGEST_SIZE,
- 	[HASH_ALGO_STREEBOG_256] = STREEBOG256_DIGEST_SIZE,
- 	[HASH_ALGO_STREEBOG_512] = STREEBOG512_DIGEST_SIZE,
- };
-diff --git a/drivers/char/tpm/tpm2-cmd.c b/drivers/char/tpm/tpm2-cmd.c
-index 13696deceae8..44412538e47c 100644
---- a/drivers/char/tpm/tpm2-cmd.c
-+++ b/drivers/char/tpm/tpm2-cmd.c
-@@ -19,7 +19,7 @@ static struct tpm2_hash tpm2_hash_map[] = {
- 	{HASH_ALGO_SHA256, TPM_ALG_SHA256},
- 	{HASH_ALGO_SHA384, TPM_ALG_SHA384},
- 	{HASH_ALGO_SHA512, TPM_ALG_SHA512},
--	{HASH_ALGO_SM3_256, TPM_ALG_SM3_256},
-+	{HASH_ALGO_SM3, TPM_ALG_SM3},
- };
- 
- int tpm2_get_timeouts(struct tpm_chip *chip)
-diff --git a/include/crypto/hash_info.h b/include/crypto/hash_info.h
-index eb9d2e368969..07cd6e0b0fee 100644
---- a/include/crypto/hash_info.h
-+++ b/include/crypto/hash_info.h
-@@ -31,7 +31,7 @@
- #define TGR192_DIGEST_SIZE 24
- 
- /* not defined in include/crypto/ */
--#define SM3256_DIGEST_SIZE 32
-+#define SM3_DIGEST_SIZE 32
- 
- extern const char *const hash_algo_name[HASH_ALGO__LAST];
- extern const int hash_digest_size[HASH_ALGO__LAST];
-diff --git a/include/linux/tpm.h b/include/linux/tpm.h
-index 03e9b184411b..042c3eb5f051 100644
---- a/include/linux/tpm.h
-+++ b/include/linux/tpm.h
-@@ -39,7 +39,7 @@ enum tpm_algorithms {
- 	TPM_ALG_SHA384		= 0x000C,
- 	TPM_ALG_SHA512		= 0x000D,
- 	TPM_ALG_NULL		= 0x0010,
--	TPM_ALG_SM3_256		= 0x0012,
-+	TPM_ALG_SM3		= 0x0012,
- };
- 
- struct tpm_digest {
-diff --git a/include/uapi/linux/hash_info.h b/include/uapi/linux/hash_info.h
-index 74a8609fcb4d..1355525dd4aa 100644
---- a/include/uapi/linux/hash_info.h
-+++ b/include/uapi/linux/hash_info.h
-@@ -32,7 +32,7 @@ enum hash_algo {
- 	HASH_ALGO_TGR_128,
- 	HASH_ALGO_TGR_160,
- 	HASH_ALGO_TGR_192,
--	HASH_ALGO_SM3_256,
-+	HASH_ALGO_SM3,
- 	HASH_ALGO_STREEBOG_256,
- 	HASH_ALGO_STREEBOG_512,
- 	HASH_ALGO__LAST
-diff --git a/security/keys/trusted-keys/trusted_tpm2.c b/security/keys/trusted-keys/trusted_tpm2.c
-index 08ec7f48f01d..cbd5574a88c8 100644
---- a/security/keys/trusted-keys/trusted_tpm2.c
-+++ b/security/keys/trusted-keys/trusted_tpm2.c
-@@ -17,7 +17,7 @@ static struct tpm2_hash tpm2_hash_map[] = {
- 	{HASH_ALGO_SHA256, TPM_ALG_SHA256},
- 	{HASH_ALGO_SHA384, TPM_ALG_SHA384},
- 	{HASH_ALGO_SHA512, TPM_ALG_SHA512},
--	{HASH_ALGO_SM3_256, TPM_ALG_SM3_256},
-+	{HASH_ALGO_SM3, TPM_ALG_SM3},
- };
- 
- /**
--- 
-2.17.1
-
+> -----Original Message-----
+> From: Herbert Xu <herbert@gondor.apana.org.au>
+> Sent: Thursday, February 13, 2020 2:33 PM
+> To: Kalyani Akula <kalyania@xilinx.com>
+> Cc: davem@davemloft.net; monstr@seznam.cz; linux-crypto@vger.kernel.org;
+> linux-kernel@vger.kernel.org; Rob Herring <robh+dt@kernel.org>;
+> devicetree@vger.kernel.org; git-dev <git-dev@xilinx.com>; Mohan Marutirao
+> Dhanawade <mohand@xilinx.com>; Sarat Chand Savitala
+> <saratcha@xilinx.com>; Harsh Jain <harshj@xilinx.com>; Michal Simek
+> <michals@xilinx.com>; Kalyani Akula <kalyania@xilinx.com>; Mohan Marutira=
+o
+> Dhanawade <mohand@xilinx.com>
+> Subject: Re: [PATCH V6 3/4] crypto: Add Xilinx AES driver
+>=20
+> On Tue, Jan 28, 2020 at 11:48:27AM +0530, Kalyani Akula wrote:
+> > This patch adds AES driver support for the Xilinx ZynqMP SoC.
+> >
+> > Signed-off-by: Mohan Marutirao Dhanawade
+> <mohan.dhanawade@xilinx.com>
+> > Signed-off-by: Kalyani Akula <kalyani.akula@xilinx.com>
+> > Acked-by: Michal Simek <michal.simek@xilinx.com>
+> > ---
+> >
+> > V5 Changes:
+> > - Replaced ARCH_ZYNQMP with ZYNQMP_FIRMWARE in Kconfig
+> > - Removed extra new lines.
+> > - Moved crypto: Add Xilinx AES driver patch from 4/4 to 3/4.
+> > - Updated Signed-off-by sequence.
+>=20
+> Sorry but this patch doesn't compile against the current cryptodev tree. =
+ Please
+> fix and respost.
+>=20
+> Thanks,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au> Home Page:
+> http://gondor.apana.org.au/~herbert/
+> PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
