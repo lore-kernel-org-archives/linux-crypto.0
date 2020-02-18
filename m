@@ -7,32 +7,32 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24922C34026
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DF64C3404B
 	for <linux-crypto@archiver.kernel.org>; Tue, 18 Feb 2020 20:07:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E6A1421D56
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Feb 2020 20:07:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5F1A222B48
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Feb 2020 20:07:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=default; t=1582056437;
-	bh=yKELR+a2DGlgOWOkRXdu30TYJCriJHRWcmqGrw4F+4Y=;
+	bh=i/rk+ajCdVnD6kEsM9NmAA+PXabLPamz9CGLdNNeYEY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=etQQvGZlAB2vf1fDSlyBoxSkdJF4vbYquygyLWGfvx1Di7EOqDELxhAxA1qgP/WzB
-	 VCC2ddGulZyu33u3Ddx5/eJ5wEp2jgURe+rKQJRRImF5e4FgYAKp5l/W/sH3jUULoa
-	 F3KI0gBq6knXHQpEBhd4l7eV9KPEU+QSmsJtgCms=
+	b=se7fsY/cES1ZiPglJ0kSeopgCDhn5qD4Pj96bSyuMjxQa42Nzm2XsISZe+4HLEhLp
+	 3X+46mqxj5tKJ27l0SX0N3xzxB7fr3SvGMAI2oIGMvPip5p0CKhQuoVnY4wrRfp/qt
+	 GGKg1Tp89+nxqIHInueJZXu2QJFEL4Wb3Iv1T+H4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728382AbgBRT7N (ORCPT
+        id S1726339AbgBRUHQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 Feb 2020 14:59:13 -0500
-Received: from foss.arm.com ([217.140.110.172]:60558 "EHLO foss.arm.com"
+        Tue, 18 Feb 2020 15:07:16 -0500
+Received: from foss.arm.com ([217.140.110.172]:60600 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728032AbgBRT7M (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Feb 2020 14:59:12 -0500
+        id S1727553AbgBRT7Q (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 Feb 2020 14:59:16 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B99B6101E;
-        Tue, 18 Feb 2020 11:59:11 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3B29BFEC;
+        Tue, 18 Feb 2020 11:59:16 -0800 (PST)
 Received: from localhost (unknown [10.37.6.21])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3BBAC3F68F;
-        Tue, 18 Feb 2020 11:59:11 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B0ECB3F68F;
+        Tue, 18 Feb 2020 11:59:15 -0800 (PST)
 From:   Mark Brown <broonie@kernel.org>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
@@ -43,9 +43,9 @@ To:     Herbert Xu <herbert@gondor.apana.org.au>,
         Suzuki K Poulose <suzuki.poulose@arm.com>
 Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
         linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>
-Subject: [PATCH 08/18] arm64: ftrace: Modernise annotation of return_to_handler
-Date:   Tue, 18 Feb 2020 19:58:32 +0000
-Message-Id: <20200218195842.34156-9-broonie@kernel.org>
+Subject: [PATCH 10/18] arm64: head: Annotate stext and preserve_boot_args as code
+Date:   Tue, 18 Feb 2020 19:58:34 +0000
+Message-Id: <20200218195842.34156-11-broonie@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200218195842.34156-1-broonie@kernel.org>
 References: <20200218195842.34156-1-broonie@kernel.org>
@@ -59,37 +59,52 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 In an effort to clarify and simplify the annotation of assembly
 functions new macros have been introduced. These replace ENTRY and
 ENDPROC with two different annotations for normal functions and those
-with unusual calling conventions.
-
-return_to_handler does entertaining things with LR so doesn't follow the
-usual C conventions and should therefore be annotated as code rather than
-a function.
+with unusual calling conventions.  Neither stext nor preserve_boot_args
+is called with the usual AAPCS calling conventions and they should
+therefore be annotated as code.
 
 Signed-off-by: Mark Brown <broonie@kernel.org>
 ---
- arch/arm64/kernel/entry-ftrace.S | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ arch/arm64/kernel/head.S | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/arch/arm64/kernel/entry-ftrace.S b/arch/arm64/kernel/entry-ftrace.S
-index baf5a20a5566..820101821ac4 100644
---- a/arch/arm64/kernel/entry-ftrace.S
-+++ b/arch/arm64/kernel/entry-ftrace.S
-@@ -320,7 +320,7 @@ SYM_FUNC_END(ftrace_stub)
-  * Run ftrace_return_to_handler() before going back to parent.
-  * @fp is checked against the value passed by ftrace_graph_caller().
-  */
--ENTRY(return_to_handler)
-+SYM_CODE_START(return_to_handler)
- 	/* save return value regs */
- 	sub sp, sp, #64
- 	stp x0, x1, [sp]
-@@ -340,5 +340,5 @@ ENTRY(return_to_handler)
- 	add sp, sp, #64
+diff --git a/arch/arm64/kernel/head.S b/arch/arm64/kernel/head.S
+index 716c946c98e9..c334863991e7 100644
+--- a/arch/arm64/kernel/head.S
++++ b/arch/arm64/kernel/head.S
+@@ -105,7 +105,7 @@ pe_header:
+ 	 *  x24        __primary_switch() .. relocate_kernel()
+ 	 *                                        current RELR displacement
+ 	 */
+-ENTRY(stext)
++SYM_CODE_START(stext)
+ 	bl	preserve_boot_args
+ 	bl	el2_setup			// Drop to EL1, w0=cpu_boot_mode
+ 	adrp	x23, __PHYS_OFFSET
+@@ -120,12 +120,12 @@ ENTRY(stext)
+ 	 */
+ 	bl	__cpu_setup			// initialise processor
+ 	b	__primary_switch
+-ENDPROC(stext)
++SYM_CODE_END(stext)
  
- 	ret
--END(return_to_handler)
-+SYM_CODE_END(return_to_handler)
- #endif /* CONFIG_FUNCTION_GRAPH_TRACER */
+ /*
+  * Preserve the arguments passed by the bootloader in x0 .. x3
+  */
+-preserve_boot_args:
++SYM_CODE_START_LOCAL(preserve_boot_args)
+ 	mov	x21, x0				// x21=FDT
+ 
+ 	adr_l	x0, boot_args			// record the contents of
+@@ -137,7 +137,7 @@ preserve_boot_args:
+ 
+ 	mov	x1, #0x20			// 4 x 8 bytes
+ 	b	__inval_dcache_area		// tail call
+-ENDPROC(preserve_boot_args)
++SYM_CODE_END(preserve_boot_args)
+ 
+ /*
+  * Macro to create a table entry to the next page.
 -- 
 2.20.1
 
