@@ -2,119 +2,121 @@ Return-Path: <SRS0=0S/Q=4G=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20C88C34026
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Feb 2020 14:25:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7243CC34047
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Feb 2020 19:58:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 03C4F208C4
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Feb 2020 14:25:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4BCDC24672
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Feb 2020 19:58:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1582055939;
+	bh=rser7L/TlChhfAw4/EWBy5Mt4/UXpcAt5CSaJhFUou8=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=z+tics9JYnzTeCbABJkc2hr3zvZpz+pmUrIKuHxYSw4O2Ywnh8uD6w/835NMjiCVz
+	 KlvvK99HxF8487ATLKTpKB7ReYSH+frJDBT5MdlrF4TKdDiZP9mAHO5NVkXCKkJ/4a
+	 FMc+u9UCDRxx3pLZGeFXYgqHzRCKUZyaVAOAiC6Q=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726683AbgBROZE (ORCPT
+        id S1728335AbgBRT65 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 Feb 2020 09:25:04 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51672 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726442AbgBROZE (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Feb 2020 09:25:04 -0500
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01IENmRV041497
-        for <linux-crypto@vger.kernel.org>; Tue, 18 Feb 2020 09:25:03 -0500
-Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2y89aahtkx-1
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
-        for <linux-crypto@vger.kernel.org>; Tue, 18 Feb 2020 09:25:00 -0500
-Received: from localhost
-        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
-        for <linux-crypto@vger.kernel.org> from <zohar@linux.ibm.com>;
-        Tue, 18 Feb 2020 14:24:50 -0000
-Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
-        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
-        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
-        Tue, 18 Feb 2020 14:24:46 -0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
-        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01IEOjkQ40108542
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 18 Feb 2020 14:24:45 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 5A24611C058;
-        Tue, 18 Feb 2020 14:24:45 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CBCC411C052;
-        Tue, 18 Feb 2020 14:24:43 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.85.142.171])
-        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Tue, 18 Feb 2020 14:24:43 +0000 (GMT)
-Subject: Re: [PATCH v2 1/2] crypto: fix mismatched hash algorithm name
- sm3-256 to sm3
-From:   Mimi Zohar <zohar@linux.ibm.com>
-To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
-        herbert@gondor.apana.org.au, davem@davemloft.net,
-        jarkko.sakkinen@linux.intel.com, ebiggers@kernel.org,
-        dmitry.kasatkin@gmail.com, jmorris@namei.org, serge@hallyn.com
-Cc:     linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Tue, 18 Feb 2020 09:24:43 -0500
-In-Reply-To: <f26b221c-f2e1-a14b-46cb-cae03f1357aa@linux.alibaba.com>
-References: <20200217093649.97938-1-tianjia.zhang@linux.alibaba.com>
-         <20200217093649.97938-2-tianjia.zhang@linux.alibaba.com>
-         <1581989598.8515.233.camel@linux.ibm.com>
-         <f26b221c-f2e1-a14b-46cb-cae03f1357aa@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.20.5 (3.20.5-1.fc24) 
-Mime-Version: 1.0
+        Tue, 18 Feb 2020 14:58:57 -0500
+Received: from foss.arm.com ([217.140.110.172]:60426 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728327AbgBRT64 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 Feb 2020 14:58:56 -0500
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 241B4FEC;
+        Tue, 18 Feb 2020 11:58:56 -0800 (PST)
+Received: from localhost (unknown [10.37.6.21])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 98B4F3F68F;
+        Tue, 18 Feb 2020 11:58:55 -0800 (PST)
+From:   Mark Brown <broonie@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>, Marc Zyngier <maz@kernel.org>,
+        James Morse <james.morse@arm.com>,
+        Julien Thierry <julien.thierry.kdev@gmail.com>,
+        Suzuki K Poulose <suzuki.poulose@arm.com>
+Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
+        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>
+Subject: [PATCH 01/18] arm64: crypto: Modernize some extra assembly annotations
+Date:   Tue, 18 Feb 2020 19:58:25 +0000
+Message-Id: <20200218195842.34156-2-broonie@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200218195842.34156-1-broonie@kernel.org>
+References: <20200218195842.34156-1-broonie@kernel.org>
+MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-x-cbid: 20021814-0016-0000-0000-000002E7FAD5
-X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
-x-cbparentid: 20021814-0017-0000-0000-0000334B0F1B
-Message-Id: <1582035883.4576.8.camel@linux.ibm.com>
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-18_02:2020-02-17,2020-02-18 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 bulkscore=0
- suspectscore=0 mlxlogscore=999 adultscore=0 impostorscore=0 clxscore=1015
- mlxscore=0 spamscore=0 lowpriorityscore=0 malwarescore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002180112
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 2020-02-18 at 10:34 +0800, Tianjia Zhang wrote:
-> On 2020/2/18 9:33, Mimi Zohar wrote:
-> > On Mon, 2020-02-17 at 17:36 +0800, Tianjia Zhang wrote:
-> >> The name sm3-256 is defined in hash_algo_name in hash_info, but the
-> >> algorithm name implemented in sm3_generic.c is sm3, which will cause
-> >> the sm3-256 algorithm to be not found in some application scenarios of
-> >> the hash algorithm, and an ENOENT error will occur. For example,
-> >> IMA, keys, and other subsystems that reference hash_algo_name all use
-> >> the hash algorithm of sm3.
-> >>
-> >> According to https://tools.ietf.org/id/draft-oscca-cfrg-sm3-01.html,
-> >> SM3 always produces a 256-bit hash value and there are no plans for
-> >> other length development, so there is no ambiguity in the name of sm3.
-> >>
-> >> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-> >> Cc: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
-> > The previous version of this patch set is queued in the next-
-> > integrity-testing branch.  That version of this patch didn't
-> > change TPM_ALG_SM3_256.  Unless the TPM standard was modified, the TPM
-> > spec refers to it as TPM_ALG_SM3_256.  Has that changed?
-> >
-> > Mimi
-> 
-> The definition in the TPM specification is still TPM_ALG_SM3_256, please
-> ignore the modification to the TPM definition in this patch.
+A couple of functions were missed in the modernisation of assembly macros,
+update them too.
 
-Ok.  Just confirming that I should ignore v2 of this patch set.
- Upstreaming the original version, as queued in next-integrity-
-testing, is fine.
+Signed-off-by: Mark Brown <broonie@kernel.org>
+Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
+---
+ arch/arm64/crypto/ghash-ce-core.S | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-thanks,
-
-Mimi
+diff --git a/arch/arm64/crypto/ghash-ce-core.S b/arch/arm64/crypto/ghash-ce-core.S
+index 084c6a30b03a..6b958dcdf136 100644
+--- a/arch/arm64/crypto/ghash-ce-core.S
++++ b/arch/arm64/crypto/ghash-ce-core.S
+@@ -587,20 +587,20 @@ CPU_LE(	rev		w8, w8		)
+ 	 *			  struct ghash_key const *k, u64 dg[], u8 ctr[],
+ 	 *			  int rounds, u8 tag)
+ 	 */
+-ENTRY(pmull_gcm_encrypt)
++SYM_FUNC_START(pmull_gcm_encrypt)
+ 	pmull_gcm_do_crypt	1
+-ENDPROC(pmull_gcm_encrypt)
++SYM_FUNC_END(pmull_gcm_encrypt)
+ 
+ 	/*
+ 	 * void pmull_gcm_decrypt(int blocks, u8 dst[], const u8 src[],
+ 	 *			  struct ghash_key const *k, u64 dg[], u8 ctr[],
+ 	 *			  int rounds, u8 tag)
+ 	 */
+-ENTRY(pmull_gcm_decrypt)
++SYM_FUNC_START(pmull_gcm_decrypt)
+ 	pmull_gcm_do_crypt	0
+-ENDPROC(pmull_gcm_decrypt)
++SYM_FUNC_END(pmull_gcm_decrypt)
+ 
+-pmull_gcm_ghash_4x:
++SYM_FUNC_START_LOCAL(pmull_gcm_ghash_4x)
+ 	movi		MASK.16b, #0xe1
+ 	shl		MASK.2d, MASK.2d, #57
+ 
+@@ -681,9 +681,9 @@ pmull_gcm_ghash_4x:
+ 	eor		XL.16b, XL.16b, T2.16b
+ 
+ 	ret
+-ENDPROC(pmull_gcm_ghash_4x)
++SYM_FUNC_END(pmull_gcm_ghash_4x)
+ 
+-pmull_gcm_enc_4x:
++SYM_FUNC_START_LOCAL(pmull_gcm_enc_4x)
+ 	ld1		{KS0.16b}, [x5]			// load upper counter
+ 	sub		w10, w8, #4
+ 	sub		w11, w8, #3
+@@ -746,7 +746,7 @@ pmull_gcm_enc_4x:
+ 	eor		INP3.16b, INP3.16b, KS3.16b
+ 
+ 	ret
+-ENDPROC(pmull_gcm_enc_4x)
++SYM_FUNC_END(pmull_gcm_enc_4x)
+ 
+ 	.section	".rodata", "a"
+ 	.align		6
+-- 
+2.20.1
 
