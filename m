@@ -7,32 +7,32 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7243CC34047
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Feb 2020 19:58:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B766C3404B
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Feb 2020 19:59:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 4BCDC24672
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Feb 2020 19:58:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 267CB2465D
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Feb 2020 19:59:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1582055939;
-	bh=rser7L/TlChhfAw4/EWBy5Mt4/UXpcAt5CSaJhFUou8=;
+	s=default; t=1582055951;
+	bh=cq1/WyEK6G9FtWLN34MWhUx8seO8mDcFqp1C6P6AjXk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=z+tics9JYnzTeCbABJkc2hr3zvZpz+pmUrIKuHxYSw4O2Ywnh8uD6w/835NMjiCVz
-	 KlvvK99HxF8487ATLKTpKB7ReYSH+frJDBT5MdlrF4TKdDiZP9mAHO5NVkXCKkJ/4a
-	 FMc+u9UCDRxx3pLZGeFXYgqHzRCKUZyaVAOAiC6Q=
+	b=Hi162F//FD4Corpa9C+PcpQSVZou+oIAh+n6E65XyRKtf+OWZRtdlyGE2MCfDGDGR
+	 jbugozgQQg5NKy9pMKLcVfINPJWp/+q6XmvYv8t7V7eXLQaAIH8dWHNfABzI+gUvOr
+	 irK+QxMuoGphj6zyOXpQZth4uG3eT57m7kOr/OZg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728335AbgBRT65 (ORCPT
+        id S1728375AbgBRT7K (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 Feb 2020 14:58:57 -0500
-Received: from foss.arm.com ([217.140.110.172]:60426 "EHLO foss.arm.com"
+        Tue, 18 Feb 2020 14:59:10 -0500
+Received: from foss.arm.com ([217.140.110.172]:60542 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728327AbgBRT64 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Feb 2020 14:58:56 -0500
+        id S1726723AbgBRT7J (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 18 Feb 2020 14:59:09 -0500
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 241B4FEC;
-        Tue, 18 Feb 2020 11:58:56 -0800 (PST)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 819B131B;
+        Tue, 18 Feb 2020 11:59:09 -0800 (PST)
 Received: from localhost (unknown [10.37.6.21])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 98B4F3F68F;
-        Tue, 18 Feb 2020 11:58:55 -0800 (PST)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 05B5B3F68F;
+        Tue, 18 Feb 2020 11:59:08 -0800 (PST)
 From:   Mark Brown <broonie@kernel.org>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
@@ -42,11 +42,10 @@ To:     Herbert Xu <herbert@gondor.apana.org.au>,
         Julien Thierry <julien.thierry.kdev@gmail.com>,
         Suzuki K Poulose <suzuki.poulose@arm.com>
 Cc:     linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH 01/18] arm64: crypto: Modernize some extra assembly annotations
-Date:   Tue, 18 Feb 2020 19:58:25 +0000
-Message-Id: <20200218195842.34156-2-broonie@kernel.org>
+        linux-crypto@vger.kernel.org, Mark Brown <broonie@kernel.org>
+Subject: [PATCH 07/18] arm64: ftrace: Correct annotation of ftrace_caller assembly
+Date:   Tue, 18 Feb 2020 19:58:31 +0000
+Message-Id: <20200218195842.34156-8-broonie@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200218195842.34156-1-broonie@kernel.org>
 References: <20200218195842.34156-1-broonie@kernel.org>
@@ -57,66 +56,68 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-A couple of functions were missed in the modernisation of assembly macros,
-update them too.
+In an effort to clarify and simplify the annotation of assembly
+functions new macros have been introduced. These replace ENTRY and
+ENDPROC with two different annotations for normal functions and those
+with unusual calling conventions.
+
+The patchable function entry versions of ftrace_*_caller don't follow the
+usual AAPCS rules, pushing things onto the stack which they don't clean up,
+and therefore should be annotated as code rather than functions.
 
 Signed-off-by: Mark Brown <broonie@kernel.org>
-Reviewed-by: Ard Biesheuvel <ardb@kernel.org>
 ---
- arch/arm64/crypto/ghash-ce-core.S | 16 ++++++++--------
+ arch/arm64/kernel/entry-ftrace.S | 16 ++++++++--------
  1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/arch/arm64/crypto/ghash-ce-core.S b/arch/arm64/crypto/ghash-ce-core.S
-index 084c6a30b03a..6b958dcdf136 100644
---- a/arch/arm64/crypto/ghash-ce-core.S
-+++ b/arch/arm64/crypto/ghash-ce-core.S
-@@ -587,20 +587,20 @@ CPU_LE(	rev		w8, w8		)
- 	 *			  struct ghash_key const *k, u64 dg[], u8 ctr[],
- 	 *			  int rounds, u8 tag)
- 	 */
--ENTRY(pmull_gcm_encrypt)
-+SYM_FUNC_START(pmull_gcm_encrypt)
- 	pmull_gcm_do_crypt	1
--ENDPROC(pmull_gcm_encrypt)
-+SYM_FUNC_END(pmull_gcm_encrypt)
+diff --git a/arch/arm64/kernel/entry-ftrace.S b/arch/arm64/kernel/entry-ftrace.S
+index 3d32b6d325d7..baf5a20a5566 100644
+--- a/arch/arm64/kernel/entry-ftrace.S
++++ b/arch/arm64/kernel/entry-ftrace.S
+@@ -75,17 +75,17 @@
+ 	add	x29, sp, #S_STACKFRAME
+ 	.endm
  
- 	/*
- 	 * void pmull_gcm_decrypt(int blocks, u8 dst[], const u8 src[],
- 	 *			  struct ghash_key const *k, u64 dg[], u8 ctr[],
- 	 *			  int rounds, u8 tag)
- 	 */
--ENTRY(pmull_gcm_decrypt)
-+SYM_FUNC_START(pmull_gcm_decrypt)
- 	pmull_gcm_do_crypt	0
--ENDPROC(pmull_gcm_decrypt)
-+SYM_FUNC_END(pmull_gcm_decrypt)
+-ENTRY(ftrace_regs_caller)
++SYM_CODE_START(ftrace_regs_caller)
+ 	ftrace_regs_entry	1
+ 	b	ftrace_common
+-ENDPROC(ftrace_regs_caller)
++SYM_CODE_END(ftrace_regs_caller)
  
--pmull_gcm_ghash_4x:
-+SYM_FUNC_START_LOCAL(pmull_gcm_ghash_4x)
- 	movi		MASK.16b, #0xe1
- 	shl		MASK.2d, MASK.2d, #57
+-ENTRY(ftrace_caller)
++SYM_CODE_START(ftrace_caller)
+ 	ftrace_regs_entry	0
+ 	b	ftrace_common
+-ENDPROC(ftrace_caller)
++SYM_CODE_END(ftrace_caller)
  
-@@ -681,9 +681,9 @@ pmull_gcm_ghash_4x:
- 	eor		XL.16b, XL.16b, T2.16b
+-ENTRY(ftrace_common)
++SYM_CODE_START(ftrace_common)
+ 	sub	x0, x30, #AARCH64_INSN_SIZE	// ip (callsite's BL insn)
+ 	mov	x1, x9				// parent_ip (callsite's LR)
+ 	ldr_l	x2, function_trace_op		// op
+@@ -122,17 +122,17 @@ ftrace_common_return:
+ 	add	sp, sp, #S_FRAME_SIZE + 16
  
- 	ret
--ENDPROC(pmull_gcm_ghash_4x)
-+SYM_FUNC_END(pmull_gcm_ghash_4x)
+ 	ret	x9
+-ENDPROC(ftrace_common)
++SYM_CODE_END(ftrace_common)
  
--pmull_gcm_enc_4x:
-+SYM_FUNC_START_LOCAL(pmull_gcm_enc_4x)
- 	ld1		{KS0.16b}, [x5]			// load upper counter
- 	sub		w10, w8, #4
- 	sub		w11, w8, #3
-@@ -746,7 +746,7 @@ pmull_gcm_enc_4x:
- 	eor		INP3.16b, INP3.16b, KS3.16b
+ #ifdef CONFIG_FUNCTION_GRAPH_TRACER
+-ENTRY(ftrace_graph_caller)
++SYM_CODE_START(ftrace_graph_caller)
+ 	ldr	x0, [sp, #S_PC]
+ 	sub	x0, x0, #AARCH64_INSN_SIZE	// ip (callsite's BL insn)
+ 	add	x1, sp, #S_LR			// parent_ip (callsite's LR)
+ 	ldr	x2, [sp, #S_FRAME_SIZE]	   	// parent fp (callsite's FP)
+ 	bl	prepare_ftrace_return
+ 	b	ftrace_common_return
+-ENDPROC(ftrace_graph_caller)
++SYM_CODE_END(ftrace_graph_caller)
+ #endif
  
- 	ret
--ENDPROC(pmull_gcm_enc_4x)
-+SYM_FUNC_END(pmull_gcm_enc_4x)
- 
- 	.section	".rodata", "a"
- 	.align		6
+ #else /* CONFIG_DYNAMIC_FTRACE_WITH_REGS */
 -- 
 2.20.1
 
