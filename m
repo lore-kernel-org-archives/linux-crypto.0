@@ -2,186 +2,119 @@ Return-Path: <SRS0=0S/Q=4G=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDE5EC34036
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Feb 2020 09:10:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20C88C34026
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Feb 2020 14:25:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C83ED24654
-	for <linux-crypto@archiver.kernel.org>; Tue, 18 Feb 2020 09:10:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1582017037;
-	bh=qcx7hKSdA43lr91cefm69cgiRF+lTRlAhJkSkXl97uo=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=0SMsEHldzRJXCocp6hp1bdKUT3mCUPhVDIeW43ssVr8jct9spbZCmZoPUL9YLlAka
-	 JplAfwQToJ8941QPmo/L+7F8NnQcC/vBOBn2YzUoE+gUETQjKeNXrPPejutcjuDlNC
-	 W9mQlWwUlf71WgL0HRiu3vKoFOZ48aI2UqEac/JM=
+	by mail.kernel.org (Postfix) with ESMTP id 03C4F208C4
+	for <linux-crypto@archiver.kernel.org>; Tue, 18 Feb 2020 14:25:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726346AbgBRJKg (ORCPT
+        id S1726683AbgBROZE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 18 Feb 2020 04:10:36 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:35180 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726186AbgBRJKg (ORCPT
+        Tue, 18 Feb 2020 09:25:04 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:51672 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726442AbgBROZE (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 18 Feb 2020 04:10:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Sender:Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=gtxCElNvSCXWFICx33F89B+eF/cQ+L9FjqnWYk2rKuI=; b=h/D+gqw5OmQpGOwUjnu/fi4+kH
-        bT0h8EUVx9iIS8HNfPlJzJPk40KKUsFKNf009z67RPKZuDo+88sdToDM6wpb5+YlEa7V9G6OJvFol
-        R8RQl98kwCpA4ooFYQSURvPloAPXb0/KOMWODRXhBfm93RtLstFP639AaaseMhA7rBw6OI8LTEr+J
-        PXc4gR41BMqKLfnINKvS8pLmCqR3uXPMYK/daZvPEV9ynEWBeYzh1jVee6AgvUIOeV700uQ2EOPBg
-        z3vWEhpNHMY0ljZor0m1CokA7zJdOq2gDEs8oPaHQ9a9htLoD+FYLhrx/s8ITQGSuGwynWgVTIITp
-        vszoRJOw==;
-Received: from tmo-109-126.customers.d1-online.com ([80.187.109.126] helo=bombadil.infradead.org)
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1j3ytn-00046s-Vd; Tue, 18 Feb 2020 09:10:36 +0000
-Received: from mchehab by bombadil.infradead.org with local (Exim 4.92.3)
-        (envelope-from <mchehab@bombadil.infradead.org>)
-        id 1j3j8V-000foa-PM; Mon, 17 Feb 2020 17:20:43 +0100
-From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>
-Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Paul Mackerras <paulus@samba.org>,
-        linux-arm-kernel@lists.infradead.org,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>, linux-sh@vger.kernel.org,
-        Will Deacon <will@kernel.org>,
-        Amit Daniel Kachhap <amit.kachhap@gmail.com>,
-        linux-crypto@vger.kernel.org,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        keyrings@vger.kernel.org, Viresh Kumar <viresh.kumar@linaro.org>,
-        linuxppc-dev@lists.ozlabs.org,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        David Howells <dhowells@redhat.com>, linux-pci@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Yoshinori Sato <ysato@users.sourceforge.jp>,
-        Rich Felker <dalias@libc.org>, linux-pm@vger.kernel.org,
-        Javi Merino <javi.merino@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>
-Subject: [PATCH v2 00/24] Manually convert  thermal, crypto and misc devices to ReST
-Date:   Mon, 17 Feb 2020 17:20:18 +0100
-Message-Id: <cover.1581956285.git.mchehab+huawei@kernel.org>
-X-Mailer: git-send-email 2.24.1
-MIME-Version: 1.0
+        Tue, 18 Feb 2020 09:25:04 -0500
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01IENmRV041497
+        for <linux-crypto@vger.kernel.org>; Tue, 18 Feb 2020 09:25:03 -0500
+Received: from e06smtp04.uk.ibm.com (e06smtp04.uk.ibm.com [195.75.94.100])
+        by mx0b-001b2d01.pphosted.com with ESMTP id 2y89aahtkx-1
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NOT)
+        for <linux-crypto@vger.kernel.org>; Tue, 18 Feb 2020 09:25:00 -0500
+Received: from localhost
+        by e06smtp04.uk.ibm.com with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted
+        for <linux-crypto@vger.kernel.org> from <zohar@linux.ibm.com>;
+        Tue, 18 Feb 2020 14:24:50 -0000
+Received: from b06avi18878370.portsmouth.uk.ibm.com (9.149.26.194)
+        by e06smtp04.uk.ibm.com (192.168.101.134) with IBM ESMTP SMTP Gateway: Authorized Use Only! Violators will be prosecuted;
+        (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256/256)
+        Tue, 18 Feb 2020 14:24:46 -0000
+Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com [9.149.105.61])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01IEOjkQ40108542
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 18 Feb 2020 14:24:45 GMT
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 5A24611C058;
+        Tue, 18 Feb 2020 14:24:45 +0000 (GMT)
+Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id CBCC411C052;
+        Tue, 18 Feb 2020 14:24:43 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.85.142.171])
+        by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Tue, 18 Feb 2020 14:24:43 +0000 (GMT)
+Subject: Re: [PATCH v2 1/2] crypto: fix mismatched hash algorithm name
+ sm3-256 to sm3
+From:   Mimi Zohar <zohar@linux.ibm.com>
+To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>,
+        herbert@gondor.apana.org.au, davem@davemloft.net,
+        jarkko.sakkinen@linux.intel.com, ebiggers@kernel.org,
+        dmitry.kasatkin@gmail.com, jmorris@namei.org, serge@hallyn.com
+Cc:     linux-crypto@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Tue, 18 Feb 2020 09:24:43 -0500
+In-Reply-To: <f26b221c-f2e1-a14b-46cb-cae03f1357aa@linux.alibaba.com>
+References: <20200217093649.97938-1-tianjia.zhang@linux.alibaba.com>
+         <20200217093649.97938-2-tianjia.zhang@linux.alibaba.com>
+         <1581989598.8515.233.camel@linux.ibm.com>
+         <f26b221c-f2e1-a14b-46cb-cae03f1357aa@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.20.5 (3.20.5-1.fc24) 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+x-cbid: 20021814-0016-0000-0000-000002E7FAD5
+X-IBM-AV-DETECTION: SAVI=unused REMOTE=unused XFE=unused
+x-cbparentid: 20021814-0017-0000-0000-0000334B0F1B
+Message-Id: <1582035883.4576.8.camel@linux.ibm.com>
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-02-18_02:2020-02-17,2020-02-18 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 bulkscore=0
+ suspectscore=0 mlxlogscore=999 adultscore=0 impostorscore=0 clxscore=1015
+ mlxscore=0 spamscore=0 lowpriorityscore=0 malwarescore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2002180112
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Tue, 2020-02-18 at 10:34 +0800, Tianjia Zhang wrote:
+> On 2020/2/18 9:33, Mimi Zohar wrote:
+> > On Mon, 2020-02-17 at 17:36 +0800, Tianjia Zhang wrote:
+> >> The name sm3-256 is defined in hash_algo_name in hash_info, but the
+> >> algorithm name implemented in sm3_generic.c is sm3, which will cause
+> >> the sm3-256 algorithm to be not found in some application scenarios of
+> >> the hash algorithm, and an ENOENT error will occur. For example,
+> >> IMA, keys, and other subsystems that reference hash_algo_name all use
+> >> the hash algorithm of sm3.
+> >>
+> >> According to https://tools.ietf.org/id/draft-oscca-cfrg-sm3-01.html,
+> >> SM3 always produces a 256-bit hash value and there are no plans for
+> >> other length development, so there is no ambiguity in the name of sm3.
+> >>
+> >> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+> >> Cc: Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>
+> > The previous version of this patch set is queued in the next-
+> > integrity-testing branch.  That version of this patch didn't
+> > change TPM_ALG_SM3_256.  Unless the TPM standard was modified, the TPM
+> > spec refers to it as TPM_ALG_SM3_256.  Has that changed?
+> >
+> > Mimi
+> 
+> The definition in the TPM specification is still TPM_ALG_SM3_256, please
+> ignore the modification to the TPM definition in this patch.
 
-Manually convert some files from thermal, crypto and misc-devices
-to ReST format.
+Ok.  Just confirming that I should ignore v2 of this patch set.
+ Upstreaming the original version, as queued in next-integrity-
+testing, is fine.
 
-This patch is against linux-next 20200217 tag.
+thanks,
 
-v2: 
-
-- a small change at patch 2 to avoid uneeded whitespace changes;
-- added 13 new patches at the end
-
-Mauro Carvalho Chehab (24):
-  docs: thermal: convert cpu-idle-cooling.rst to ReST
-  docs: crypto: convert asymmetric-keys.txt to ReST
-  docs: crypto: convert api-intro.txt to ReST format
-  docs: crypto: convert async-tx-api.txt to ReST format
-  docs: crypto: descore-readme.txt: convert to ReST format
-  docs: misc-devices/spear-pcie-gadget.txt: convert to ReST
-  docs: misc-devices/pci-endpoint-test.txt: convert to ReST
-  docs: misc-devices/pci-endpoint-test.txt: convert to ReST
-  docs: misc-devices/c2port.txt: convert to ReST format
-  docs: misc-devices/bh1770glc.txt: convert to ReST
-  docs: misc-devices/apds990x.txt: convert to ReST format
-  docs: pci: endpoint/function/binding/pci-test.txt convert to ReST
-  docs: arm64: convert perf.txt to ReST format
-  docs: cpu-freq: convert index.txt to ReST
-  docs: cpu-freq: convert amd-powernow.txt to ReST
-  docs: cpu-freq: convert core.txt to ReST
-  docs: cpu-freq: convert cpu-drivers.txt to ReST
-  docs: cpu-freq: convert cpufreq-nforce2.txt to ReST
-  docs: cpu-freq: convert cpufreq-stats.txt to ReST
-  docs: cpu-freq: convert pcc-cpufreq.txt to ReST
-  docs: powerpc: convert vcpudispatch_stats.txt to ReST
-  docs: sh: convert new-machine.txt to ReST
-  docs: sh: convert register-banks.txt to ReST
-  docs: trace: ring-buffer-design.txt: convert to ReST format
-
- .../endpoint/function/binding/pci-test.rst    |  26 +
- .../endpoint/function/binding/pci-test.txt    |  19 -
- Documentation/PCI/endpoint/index.rst          |   2 +
- Documentation/arm64/index.rst                 |   1 +
- Documentation/arm64/{perf.txt => perf.rst}    |   7 +-
- .../{amd-powernow.txt => amd-powernow.rst}    |  12 +-
- Documentation/cpu-freq/{core.txt => core.rst} |  65 +-
- .../{cpu-drivers.txt => cpu-drivers.rst}      | 129 ++-
- ...pufreq-nforce2.txt => cpufreq-nforce2.rst} |  18 +-
- .../{cpufreq-stats.txt => cpufreq-stats.rst}  | 121 +--
- Documentation/cpu-freq/index.rst              |  42 +
- Documentation/cpu-freq/index.txt              |  56 --
- .../{pcc-cpufreq.txt => pcc-cpufreq.rst}      |  86 +-
- .../crypto/{api-intro.txt => api-intro.rst}   | 186 ++--
- ...symmetric-keys.txt => asymmetric-keys.rst} |  91 +-
- .../{async-tx-api.txt => async-tx-api.rst}    | 253 +++---
- ...{descore-readme.txt => descore-readme.rst} | 152 +++-
- Documentation/crypto/index.rst                |   5 +
- .../driver-api/thermal/cpu-idle-cooling.rst   |  18 +-
- Documentation/driver-api/thermal/index.rst    |   1 +
- Documentation/index.rst                       |   1 +
- .../{ad525x_dpot.txt => ad525x_dpot.rst}      |  24 +-
- .../{apds990x.txt => apds990x.rst}            |  31 +-
- .../{bh1770glc.txt => bh1770glc.rst}          |  45 +-
- .../misc-devices/{c2port.txt => c2port.rst}   |  58 +-
- Documentation/misc-devices/index.rst          |   6 +
- .../misc-devices/pci-endpoint-test.rst        |  56 ++
- .../misc-devices/pci-endpoint-test.txt        |  41 -
- .../misc-devices/spear-pcie-gadget.rst        | 170 ++++
- .../misc-devices/spear-pcie-gadget.txt        | 130 ---
- Documentation/powerpc/index.rst               |   1 +
- ...patch_stats.txt => vcpudispatch_stats.rst} |  17 +-
- Documentation/sh/index.rst                    |   6 +
- .../sh/{new-machine.txt => new-machine.rst}   | 193 +++--
- ...{register-banks.txt => register-banks.rst} |  12 +-
- Documentation/trace/index.rst                 |   1 +
- ...ffer-design.txt => ring-buffer-design.rst} | 802 ++++++++++--------
- 37 files changed, 1603 insertions(+), 1281 deletions(-)
- create mode 100644 Documentation/PCI/endpoint/function/binding/pci-test.rst
- delete mode 100644 Documentation/PCI/endpoint/function/binding/pci-test.txt
- rename Documentation/arm64/{perf.txt => perf.rst} (95%)
- rename Documentation/cpu-freq/{amd-powernow.txt => amd-powernow.rst} (89%)
- rename Documentation/cpu-freq/{core.txt => core.rst} (69%)
- rename Documentation/cpu-freq/{cpu-drivers.txt => cpu-drivers.rst} (72%)
- rename Documentation/cpu-freq/{cpufreq-nforce2.txt => cpufreq-nforce2.rst} (55%)
- rename Documentation/cpu-freq/{cpufreq-stats.txt => cpufreq-stats.rst} (53%)
- create mode 100644 Documentation/cpu-freq/index.rst
- delete mode 100644 Documentation/cpu-freq/index.txt
- rename Documentation/cpu-freq/{pcc-cpufreq.txt => pcc-cpufreq.rst} (80%)
- rename Documentation/crypto/{api-intro.txt => api-intro.rst} (70%)
- rename Documentation/crypto/{asymmetric-keys.txt => asymmetric-keys.rst} (91%)
- rename Documentation/crypto/{async-tx-api.txt => async-tx-api.rst} (55%)
- rename Documentation/crypto/{descore-readme.txt => descore-readme.rst} (81%)
- rename Documentation/misc-devices/{ad525x_dpot.txt => ad525x_dpot.rst} (85%)
- rename Documentation/misc-devices/{apds990x.txt => apds990x.rst} (86%)
- rename Documentation/misc-devices/{bh1770glc.txt => bh1770glc.rst} (83%)
- rename Documentation/misc-devices/{c2port.txt => c2port.rst} (59%)
- create mode 100644 Documentation/misc-devices/pci-endpoint-test.rst
- delete mode 100644 Documentation/misc-devices/pci-endpoint-test.txt
- create mode 100644 Documentation/misc-devices/spear-pcie-gadget.rst
- delete mode 100644 Documentation/misc-devices/spear-pcie-gadget.txt
- rename Documentation/powerpc/{vcpudispatch_stats.txt => vcpudispatch_stats.rst} (94%)
- rename Documentation/sh/{new-machine.txt => new-machine.rst} (73%)
- rename Documentation/sh/{register-banks.txt => register-banks.rst} (88%)
- rename Documentation/trace/{ring-buffer-design.txt => ring-buffer-design.rst} (55%)
-
--- 
-2.24.1
-
+Mimi
 
