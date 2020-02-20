@@ -1,241 +1,128 @@
-Return-Path: <SRS0=xEWH=4H=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=ICHr=4I=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C770BC5ACC4
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Feb 2020 22:06:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC34BC11D00
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 Feb 2020 09:03:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9D7D524656
-	for <linux-crypto@archiver.kernel.org>; Wed, 19 Feb 2020 22:06:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1582150008;
-	bh=EBrYs+yq3Y3IgDkDMpRFMtEXCjYHbxS6mXBDsELyYe0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=0QOz3/+KRO+U/VssIP+2ip/A9Y4WYnQ5sht3zdTVp7Nb4bmRCILCDKULxsKMMJa0v
-	 J9bezQIU5GGTRqu/wWjYEUkZHayzjXigub+9VUKhwwsuvSWpy5orja6MPMc+beI3cc
-	 +sZejxJT3IaikRamSTXh+E6ueSwDJ5sncnJEs2wA=
+	by mail.kernel.org (Postfix) with ESMTP id 951A32465D
+	for <linux-crypto@archiver.kernel.org>; Thu, 20 Feb 2020 09:03:57 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oy34RglT"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727326AbgBSWGs (ORCPT
+        id S1726759AbgBTJDz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 19 Feb 2020 17:06:48 -0500
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:39991 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726703AbgBSWGs (ORCPT
+        Thu, 20 Feb 2020 04:03:55 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:36610 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726669AbgBTJDy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 19 Feb 2020 17:06:48 -0500
-Received: by mail-ot1-f67.google.com with SMTP id i6so1722296otr.7;
-        Wed, 19 Feb 2020 14:06:45 -0800 (PST)
+        Thu, 20 Feb 2020 04:03:54 -0500
+Received: by mail-wr1-f67.google.com with SMTP id z3so3718246wru.3;
+        Thu, 20 Feb 2020 01:03:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=kMRJMCeq8NZAOuDhnXD2Su6XH/Sug9+vybd1xVTnymM=;
+        b=Oy34RglTmxJLtibBbGM0mOjmtCzIfi1VS84tpOVQPStsdzxw9bmDP/ccxGzVt8EqPJ
+         QgLiArXg4cjojuSERHhIa8fgsIP1QgM9Y4K2rm2zhkxpu0w437Y9GZmAO3VH0xMokTRz
+         k2FKaPRh7wlIh0Y5psMsLLpt9MsedKuXboQgLTepMW028eMy0jzy+79GZyDB5g4hAoJq
+         Qx4XnhKsULmuMEOYNSwksD/UxjfS7UUshP7vMMiaZx7nx8msR2ipdxYAbwN4S2EapKrU
+         YeQSP1DqMUaFtolcdN9QHhpD0ftXFGsefLviHaerCUre5Vivd3fft/J8fGZIIi8XtGvq
+         ygXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=nX8xqwF3vuVz6SMuQkjOYa0QQbZHhMZp1SMRDtGWins=;
-        b=ZvSU1+Az2K0yb/QUM2TLLYc660LhCLj9uCqfwnmOP6862jjfu7RO06BqVQusJwouUA
-         inGJ6JE7oYcCaoI8kSine2m5wgKbyFeHUT6qlMuSHiY4Nj8Qtvm5vLGziHgsUR480X3m
-         /eOzSVU5szMocfIN8vQ7GA//7B/8/mbrRzF/VI6EaRqsTdl0PE3mnNND62OGS0+IrVhG
-         O72qr4UGTM/egoolcMm4dJuPt8phIc2yPF8U8eR4Hp+ECugRpX2X86Y5MSE+8CaGCQp8
-         +TrOlKON1z3ZLq9QB2kpXfNgP4/FzYfZ0XqmH/zkYevrP/9o5sF5g2eaq3++LfFGSpan
-         pixw==
-X-Gm-Message-State: APjAAAWC1dIG59hysRTOb8BU3SU0Xx28ruTWo8cVspD7u9PytxuImgOi
-        hovEKnOO5sOqBWE7y1xM38OmhJaIKg==
-X-Google-Smtp-Source: APXvYqyzDpAsYbjMChkiOsp8vQqnGzBRtPAhURMvfp0Uf1xlLNMzHvlqRbrPr1aAJf+7mljlZu6F6g==
-X-Received: by 2002:a9d:6548:: with SMTP id q8mr19241216otl.356.1582150005300;
-        Wed, 19 Feb 2020 14:06:45 -0800 (PST)
-Received: from rob-hp-laptop (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
-        by smtp.gmail.com with ESMTPSA id z10sm406828oih.1.2020.02.19.14.06.43
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=kMRJMCeq8NZAOuDhnXD2Su6XH/Sug9+vybd1xVTnymM=;
+        b=ZW2/5sH+4vvNJe7PY1mU8bMLj+LpA1vKCHhLc+gc0n1jTt0P7j5pRC5/17W9i7OQKw
+         2TFl+P/WrVc1FrIuXoagb3sAZBulJ74Vd1+99YW/84imnyF3bdncZ3eTEAfBEU+D9Qhj
+         i0gW1XvKCM0jo0ZYcwZSH/yI2vUn0rWIARj2/tgvvRrSsvUiB3MzESVAEo2S9Mjofd0Z
+         HA6+Erv0UFh4dWtzgRa31kg7V7isAQfvub1N+4TRewJN11zwc2P2c/S82+P4124zrNQr
+         h7jB+TJPLqFnr5p6YKYT7yeBeir6BawQMf4sEcHV4DO3fK+ZmDrn45FNg7mAC+WydcDA
+         LdVw==
+X-Gm-Message-State: APjAAAXiePPidOBBibMCFOInmt+qWxS334n2MhsvhvbHuvWpRwOlYRbx
+        4QTulN5Ij8dZE+YdmIej3Kk=
+X-Google-Smtp-Source: APXvYqyCkswrHjGraF8RCaW0bFvKpMzVB9ieAPAAGbQvXepjaII3MJ2D1bNhg/qX3pKIgcJCJ4JAbQ==
+X-Received: by 2002:a5d:5152:: with SMTP id u18mr40578019wrt.214.1582189432341;
+        Thu, 20 Feb 2020 01:03:52 -0800 (PST)
+Received: from Red ([2a01:cb1d:3d5:a100:2e56:dcff:fed2:c6d6])
+        by smtp.googlemail.com with ESMTPSA id b21sm3635764wmd.37.2020.02.20.01.03.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 Feb 2020 14:06:44 -0800 (PST)
-Received: (nullmailer pid 21809 invoked by uid 1000);
-        Wed, 19 Feb 2020 22:06:43 -0000
-Date:   Wed, 19 Feb 2020 16:06:43 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     =?iso-8859-1?Q?N=EDcolas_F=2E_R=2E_A=2E?= Prado 
-        <nfraprado@protonmail.com>
-Cc:     devicetree@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Nicolas Saenz Julienne <nsaenzjulienne@suse.de>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Ray Jui <rjui@broadcom.com>,
-        Scott Branden <sbranden@broadcom.com>,
-        bcm-kernel-feedback-list@broadcom.com,
-        linux-crypto@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] dt-bindings: rng: Convert BCM2835 to DT schema
-Message-ID: <20200219220643.GA14392@bogus>
-References: <20200207231347.2908737-1-nfraprado@protonmail.com>
+        Thu, 20 Feb 2020 01:03:51 -0800 (PST)
+Date:   Thu, 20 Feb 2020 10:03:50 +0100
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc:     tj@kernel.org, jiangshanlai@gmail.com, will@kernel.org,
+        mark.rutland@arm.com, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org
+Subject: Re: WARNING: at kernel/workqueue.c:1473 __queue_work+0x3b8/0x3d0
+Message-ID: <20200220090350.GA19858@Red>
+References: <20200217204803.GA13479@Red>
+ <20200218163504.y5ofvaejleuf5tbh@ca-dmjordan1.us.oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200207231347.2908737-1-nfraprado@protonmail.com>
+In-Reply-To: <20200218163504.y5ofvaejleuf5tbh@ca-dmjordan1.us.oracle.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Feb 07, 2020 at 11:14:12PM +0000, Nícolas F. R. A. Prado wrote:
-> Convert BCM2835/6368 Random number generator bindings to DT schema.
+On Tue, Feb 18, 2020 at 11:35:04AM -0500, Daniel Jordan wrote:
+> Hi Corentin,
 > 
-> Signed-off-by: Nícolas F. R. A. Prado <nfraprado@protonmail.com>
-> ---
+> On Mon, Feb 17, 2020 at 09:48:03PM +0100, Corentin Labbe wrote:
+> > When running some CI test jobs (targeting crypto tests), I always get the following WARNING:
 > 
-> Hi,
-> wasn't really clear to me who to add as maintainer for this dt-binding.
-> The three names added here as maintainers were based on the get_maintainer
-> script and on previous commits on this file.
-> Please tell me whether these are the right maintainers for this file or not.
-
-Whoever knows the h/w ideally, not who is going to apply patches.
-
+> Can you be more specific about which test triggers this?  I used the config
+> option you mention and failed to reproduce after doing the boot-time crypto
+> tests and running various tcrypt incantations.
 > 
-> This patch was tested with:
-> make ARCH=arm DT_SCHEMA_FILES=Documentation/devicetree/bindings/rng/brcm,bcm2835.yaml dt_binding_check
 
-You also need to make sure without DT_SCHEMA_FILES set everything is 
-fine. That tests the example against all schemas.
+Hello
 
-> make ARCH=arm DT_SCHEMA_FILES=Documentation/devicetree/bindings/rng/brcm,bcm2835.yaml dtbs_check
+It appears before any user space start. But according to the "Modules linked", probably ghash is already loaded and perhaps tested.
+
+Removing GHASH lead to:
+[    7.920931] ------------[ cut here ]------------
+[    7.920955] WARNING: CPU: 1 PID: 120 at kernel/workqueue.c:1469 __queue_work+0x370/0x388
+[    7.920960] Modules linked in: ccm
+
+And removing CCM lead to
+[    7.798877] ------------[ cut here ]------------
+[    7.798902] WARNING: CPU: 2 PID: 127 at kernel/workqueue.c:1469 __queue_work+0x370/0x388
+[    7.798907] Modules linked in: ctr
+
+So it confirm that the problem is not related to the tested crypto algorithm.
+
+> > [    7.886361] ------------[ cut here ]------------
+> > [    7.886388] WARNING: CPU: 2 PID: 147 at kernel/workqueue.c:1473 __queue_work+0x3b8/0x3d0
+> > [    7.886394] Modules linked in: ghash_generic
+> > [    7.886409] CPU: 2 PID: 147 Comm: modprobe Not tainted 5.6.0-rc1-next-20200214-00068-g166c9264f0b1-dirty #545
 > 
-> Thanks,
-> Nícolas
+> I was using just plain next-20200214.  Can't find 166c9264f0b1, what tag/branch
+> were you using exactly?
 > 
->  .../devicetree/bindings/rng/brcm,bcm2835.txt  | 40 ------------
->  .../devicetree/bindings/rng/brcm,bcm2835.yaml | 61 +++++++++++++++++++
->  2 files changed, 61 insertions(+), 40 deletions(-)
->  delete mode 100644 Documentation/devicetree/bindings/rng/brcm,bcm2835.txt
->  create mode 100644 Documentation/devicetree/bindings/rng/brcm,bcm2835.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/rng/brcm,bcm2835.txt b/Documentation/devicetree/bindings/rng/brcm,bcm2835.txt
-> deleted file mode 100644
-> index aaac7975f61c..000000000000
-> --- a/Documentation/devicetree/bindings/rng/brcm,bcm2835.txt
-> +++ /dev/null
-> @@ -1,40 +0,0 @@
-> -BCM2835/6368 Random number generator
-> -
-> -Required properties:
-> -
-> -- compatible : should be one of
-> -	"brcm,bcm2835-rng"
-> -	"brcm,bcm-nsp-rng"
-> -	"brcm,bcm5301x-rng" or
-> -	"brcm,bcm6368-rng"
-> -- reg : Specifies base physical address and size of the registers.
-> -
-> -Optional properties:
-> -
-> -- clocks : phandle to clock-controller plus clock-specifier pair
-> -- clock-names : "ipsec" as a clock name
-> -
-> -Optional properties:
-> -
-> -- interrupts: specify the interrupt for the RNG block
-> -
-> -Example:
-> -
-> -rng {
-> -	compatible = "brcm,bcm2835-rng";
-> -	reg = <0x7e104000 0x10>;
-> -	interrupts = <2 29>;
-> -};
-> -
-> -rng@18033000 {
-> -	compatible = "brcm,bcm-nsp-rng";
-> -	reg = <0x18033000 0x14>;
-> -};
-> -
-> -random: rng@10004180 {
-> -	compatible = "brcm,bcm6368-rng";
-> -	reg = <0x10004180 0x14>;
-> -
-> -	clocks = <&periph_clk 18>;
-> -	clock-names = "ipsec";
-> -};
-> diff --git a/Documentation/devicetree/bindings/rng/brcm,bcm2835.yaml b/Documentation/devicetree/bindings/rng/brcm,bcm2835.yaml
-> new file mode 100644
-> index 000000000000..b1621031721e
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/rng/brcm,bcm2835.yaml
-> @@ -0,0 +1,61 @@
-> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/rng/brcm,bcm2835.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: BCM2835/6368 Random number generator
-> +
-> +maintainers:
-> +  - Stefan Wahren <stefan.wahren@i2se.com>
-> +  - Florian Fainelli <f.fainelli@gmail.com>
-> +  - Herbert Xu <herbert@gondor.apana.org.au>
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - brcm,bcm2835-rng
-> +      - brcm,bcm-nsp-rng
-> +      - brcm,bcm5301x-rng
-> +      - brcm,bcm6368-rng
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  clocks:
-> +    description: phandle to clock-controller plus clock-specifier pair
 
-No need to redefine a common property.
+The pasted example has some commit to try to debug it.
+But I got the same with plain next (like yesterday 5.6.0-rc2-next-20200219 and tomorow 5.6.0-rc2-next-20200220) and master got the same issue.
 
-> +    maxItems: 1
-> +
-> +  clock-names:
-> +    const: ipsec
-> +
-> +  interrupts:
-> +    description: specify the interrupt for the RNG block
+But for reproductability on different hardware, I agree it is difficult.
+For the moment, I got it only on Allwinner H5, A64, H6 SoCs and imx8q.
+[    6.611449] ------------[ cut here ]------------
+[    6.613234] WARNING: CPU: 1 PID: 157 at /srv/data/clabbe/linux-next/kernel/workqueue.c:1471 __queue_work+0x324/0x3b0
+[    6.623809] Modules linked in: ghash_generic
+[    6.628101] CPU: 1 PID: 157 Comm: modprobe Not tainted 5.6.0-rc2-next-20200220 #82
+[    6.635710] Hardware name: NXP i.MX8MNano DDR4 EVK board (DT)
 
-Same here.
+I tried amlogic boards and some qemu "virt" without success.
 
-> +    maxItems: 1
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +
-> +examples:
-> +  - |
-> +    rng {
-> +        compatible = "brcm,bcm2835-rng";
-> +        reg = <0x7e104000 0x10>;
-> +        interrupts = <2 29>;
-> +    };
-> +
-> +  - |
-> +    rng@18033000 {
-> +        compatible = "brcm,bcm-nsp-rng";
-> +        reg = <0x18033000 0x14>;
-> +    };
-> +
-> +  - |
-> +    random: rng@10004180 {
-
-Drop the label.
-
-> +        compatible = "brcm,bcm6368-rng";
-> +        reg = <0x10004180 0x14>;
-> +
-> +        clocks = <&periph_clk 18>;
-> +        clock-names = "ipsec";
-> +    };
-> -- 
-> 2.25.0
-> 
-> 
+(I have added linux-crypto@vger.kernel.org to the CC)
