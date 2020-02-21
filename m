@@ -2,72 +2,75 @@ Return-Path: <SRS0=BixN=4J=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A0F4C35647
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Feb 2020 13:56:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FCB5C35646
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Feb 2020 16:55:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 10D3020658
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Feb 2020 13:56:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4EB76208C4
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Feb 2020 16:55:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728510AbgBUN42 (ORCPT
+        id S1726310AbgBUQzP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 Feb 2020 08:56:28 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:45490 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728477AbgBUN42 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Feb 2020 08:56:28 -0500
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 672E2DF8E568B6A01DC6;
-        Fri, 21 Feb 2020 21:56:24 +0800 (CST)
-Received: from localhost (10.133.213.239) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.439.0; Fri, 21 Feb 2020
- 21:56:13 +0800
-From:   YueHaibing <yuehaibing@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        YueHaibing <yuehaibing@huawei.com>
-Subject: [PATCH -next] crypto: md5: remove unused macros
-Date:   Fri, 21 Feb 2020 21:55:15 +0800
-Message-ID: <20200221135515.14948-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.10.2.windows.1
+        Fri, 21 Feb 2020 11:55:15 -0500
+Received: from verein.lst.de ([213.95.11.211]:56480 "EHLO verein.lst.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725995AbgBUQzP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 21 Feb 2020 11:55:15 -0500
+Received: by verein.lst.de (Postfix, from userid 2005)
+        id E5EB068BFE; Fri, 21 Feb 2020 17:55:11 +0100 (CET)
+Date:   Fri, 21 Feb 2020 17:55:11 +0100
+From:   Torsten Duwe <duwe@lst.de>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Heiko Carstens <heiko.carstens@de.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@de.ibm.com>
+Cc:     linux-crypto@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: s390 crypto: explicitly memzero stack key material in aes_s390.c
+Message-ID: <20200221165511.GB6928@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.133.213.239]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-crypto/md5.c:26:0: warning: macro "MD5_DIGEST_WORDS" is not used [-Wunused-macros]
-crypto/md5.c:27:0: warning: macro "MD5_MESSAGE_BYTES" is not used [-Wunused-macros]
+From: Torsten Duwe <duwe@suse.de>
 
-They are never used since commit 3c7eb3cc8360 ("md5: remove from
-lib and only live in crypto").
+s390 crypto: explicitly memzero stack key material in aes_s390.c
 
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+aes_s390.c has several functions which allocate space for key material on
+the stack and leave the used keys there. It is considered good practice
+to clean these locations before the function returns.
+
+Signed-off-by: Torsten Duwe <duwe@suse.de>
 ---
- crypto/md5.c | 3 ---
- 1 file changed, 3 deletions(-)
+This popped up during our FIPS certification.
+It's obviously a good idea not to leave key material on the stack.
 
-diff --git a/crypto/md5.c b/crypto/md5.c
-index 22dc60b..72c0c46 100644
---- a/crypto/md5.c
-+++ b/crypto/md5.c
-@@ -23,9 +23,6 @@
- #include <linux/types.h>
- #include <asm/byteorder.h>
+--- a/arch/s390/crypto/aes_s390.c
++++ b/arch/s390/crypto/aes_s390.c
+@@ -392,6 +392,7 @@ static int cbc_aes_crypt(struct blkciphe
+ 		ret = blkcipher_walk_done(desc, walk, nbytes - n);
+ 	}
+ 	memcpy(walk->iv, param.iv, AES_BLOCK_SIZE);
++	memzero_explicit(&param, sizeof(param));
+ 	return ret;
+ }
  
--#define MD5_DIGEST_WORDS 4
--#define MD5_MESSAGE_BYTES 64
--
- const u8 md5_zero_message_hash[MD5_DIGEST_SIZE] = {
- 	0xd4, 0x1d, 0x8c, 0xd9, 0x8f, 0x00, 0xb2, 0x04,
- 	0xe9, 0x80, 0x09, 0x98, 0xec, 0xf8, 0x42, 0x7e,
--- 
-2.7.4
-
+@@ -576,6 +577,8 @@ static int xts_aes_crypt(struct blkciphe
+ 			 walk->dst.virt.addr, walk->src.virt.addr, n);
+ 		ret = blkcipher_walk_done(desc, walk, nbytes - n);
+ 	}
++	memzero_explicit(&pcc_param, sizeof(pcc_param));
++	memzero_explicit(&xts_param, sizeof(xts_param));
+ 	return ret;
+ }
+ 
 
