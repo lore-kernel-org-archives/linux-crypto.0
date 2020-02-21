@@ -2,249 +2,123 @@ Return-Path: <SRS0=BixN=4J=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10382C35641
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Feb 2020 08:35:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB074C35640
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Feb 2020 08:39:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D0CF020637
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Feb 2020 08:35:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1582274131;
-	bh=pf9UaLxOlUPcCx5P27LQuskjK8DWuCRpQhEgZzW9TH8=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=Oinh8pxdyQurHSuCwAhustSf45lRoini26guOujHV9m3lO4A792D49CsWNwrPAfhD
-	 QqF1sChXogo2FSRYwNSsZBu5/ron66Ot5eBQ+crFHqLdBkqLUpBpP5EzMtIx1fSEI4
-	 kv8bVuKg3E9FZhGmOSH8r03X7VeMbdCEXtXOBvWc=
+	by mail.kernel.org (Postfix) with ESMTP id 51F7720578
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Feb 2020 08:39:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="b46+Wgfd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731801AbgBUIH2 (ORCPT
+        id S1730944AbgBUIjC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 Feb 2020 03:07:28 -0500
-Received: from mail.kernel.org ([198.145.29.99]:41672 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732056AbgBUIH2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Feb 2020 03:07:28 -0500
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 39CFA20722;
-        Fri, 21 Feb 2020 08:07:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1582272446;
-        bh=pf9UaLxOlUPcCx5P27LQuskjK8DWuCRpQhEgZzW9TH8=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=2BmsQoSI9ZIZYjY7/xt0H90D1ly2PZCc3wy24p0OogVd7KbMzIF1r1I+EsT23OGc3
-         RBWf+EBUVUk93y/n/tHCSJUAgou6eB5LXEwwiYbo5oH4FQviq0lu/8QDNUo9i8FNBX
-         lyXxa8h9zWlBCgOlBOpGlejwKvupeZj3da4E6Q2c=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        linux-crypto@vger.kernel.org, Sasha Levin <sashal@kernel.org>
-Subject: [PATCH 5.4 112/344] padata: validate cpumask without removed CPU during offline
-Date:   Fri, 21 Feb 2020 08:38:31 +0100
-Message-Id: <20200221072359.075822824@linuxfoundation.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200221072349.335551332@linuxfoundation.org>
-References: <20200221072349.335551332@linuxfoundation.org>
-User-Agent: quilt/0.66
+        Fri, 21 Feb 2020 03:39:02 -0500
+Received: from mail-eopbgr150047.outbound.protection.outlook.com ([40.107.15.47]:14463
+        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729805AbgBUIjB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 21 Feb 2020 03:39:01 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JboakKXBSxcg+N+Elz/x1ibHQTVi5LBydb4J9lm0XjazGg30+H9X0pjU8ph1V8saE4NErDmmAiaz4teaR3zdvw0GrAgWPP0IyidddkhXUa6Qzei1LGZlCRChZAZLBACtJpD1uNqSAgvaKjnWuOb1DPgj6h88C73llLalkzjUhWVZX5sfqaJgN3pgJqOwQaEH+Gn1YyLVVXklAH6Eu30ysHPY+UQnxQAb2G5Sj1dMDEL02jdKurjFKZHt/CdakH6XhwJWVsC3/psysgdvvCsp9efUMYnHy/v7VMhL3bHZieiF1kkLt37qa+u2ebJ2eiRWPcPI1Q8sz0iiOYpJPnju2A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=r7hL3X74V/bYChiVFolNqJGsPb4Mixm/+IoZcnky78k=;
+ b=ZqQ3I1IBJQeaDGA16tr9urTS7FssNCYLqxZCf3uL6OVcBNCsz0rgS9kElkzOlUDVv2s+OEB+Aa3vrqKkVnMT8CH/v08geXa6GrlAIe8Ras7yHbMaqZtpKJpmjEM46hoj2oJhhA0zIWZkJViH37NfFwgw/yuHd6sBB9o/JiB+bVcN2DlUYls8NM9utt5xnOSNtwZnh/3mhfoCXHqlC28miahDHj6yywizXK9GnN/iinC6wRktWDThjWRyWLdZVYcCIlpe9LxYQefV+3lgoLP0ilL6KPyGfOWILNzTGN9dmgIt9nnI/qpZb38mkUFmRHT6mOWDFxbKrawdQxrWky+ocg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=r7hL3X74V/bYChiVFolNqJGsPb4Mixm/+IoZcnky78k=;
+ b=b46+WgfdPCmmjQZ1CO//vTpiA1i6d6GibwyD5n+RBvnTdOl8kwkI8Nv66pXfeT+01OlSShW7zMPfJN96YbgOpK6shw49cj5/w0AOo08FdxagRvGq3dm4EcC2p+KHeP2fwloNN5/kHavVA6oMfFkYxdgjf7Y3Ez423SDW+w1EyDo=
+Received: from DBBPR04MB6025.eurprd04.prod.outlook.com (20.179.43.215) by
+ DBBPR04MB6233.eurprd04.prod.outlook.com (20.179.43.17) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2729.25; Fri, 21 Feb 2020 08:38:59 +0000
+Received: from DBBPR04MB6025.eurprd04.prod.outlook.com
+ ([fe80::b978:17a1:d649:85b8]) by DBBPR04MB6025.eurprd04.prod.outlook.com
+ ([fe80::b978:17a1:d649:85b8%5]) with mapi id 15.20.2729.033; Fri, 21 Feb 2020
+ 08:38:59 +0000
+From:   Valentin Ciocoi Radulescu <valentin.ciocoi@nxp.com>
+To:     Horia Geanta <horia.geanta@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+CC:     "David S. Miller" <davem@davemloft.net>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        dl-linux-imx <linux-imx@nxp.com>
+Subject: RE: [PATCH] crypto: caam/qi2 - fix chacha20 data size error
+Thread-Topic: [PATCH] crypto: caam/qi2 - fix chacha20 data size error
+Thread-Index: AQHV6IvXVLFeSwTUXUy7oMx87mqcQaglU0KA
+Date:   Fri, 21 Feb 2020 08:38:59 +0000
+Message-ID: <DBBPR04MB602554E638B8CA1B9B809F6BFE120@DBBPR04MB6025.eurprd04.prod.outlook.com>
+References: <20200221075201.5725-1-horia.geanta@nxp.com>
+In-Reply-To: <20200221075201.5725-1-horia.geanta@nxp.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=valentin.ciocoi@nxp.com; 
+x-originating-ip: [46.97.170.172]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 83bc6a89-0943-4a07-a684-08d7b6a97efc
+x-ms-traffictypediagnostic: DBBPR04MB6233:|DBBPR04MB6233:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <DBBPR04MB6233046D4C8C80A747268F82FE120@DBBPR04MB6233.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6108;
+x-forefront-prvs: 0320B28BE1
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(366004)(376002)(346002)(396003)(39860400002)(199004)(189003)(54906003)(6506007)(66446008)(66556008)(8936002)(4326008)(53546011)(7696005)(66476007)(8676002)(110136005)(64756008)(81166006)(71200400001)(81156014)(26005)(5660300002)(86362001)(66946007)(52536014)(2906002)(9686003)(55016002)(478600001)(33656002)(316002)(186003)(76116006);DIR:OUT;SFP:1101;SCL:1;SRVR:DBBPR04MB6233;H:DBBPR04MB6025.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: oHUZfwtvcw6ThLhJt10OHjEeRosAApqOQLKYdiXhAeVEJ9EukP7K8SyWj9mkw68eEcW3kRez7Eeer8V8tdM3xdnvOtXQeOZziCnaZLKtdCq5WxwSkERC/l4XHVBlbr9paRS6msXlxGCBnW0wlKxrG34+IFOCyjyPTFpYOZxTJ5kUg+RVPZ+16sv0Ggjp6vlsfmqqaF4nxRrywWLZa7hfmKZFBubC18+xgsKOjf0GzwCyWpPva6rh8rlrZEtuxTCaVf3s3Ci9MOUq08pkHqt1LR7o4fMI6jaCsPF+MxnIv7oUeabzhY86Af3K+aJbtGHsxc9PRGUXAkupqXK+iwqfFoFtz8jvXkGoT9SoeU3lOtJFNwvlnRVXqwZUF0JbOM/XAfOBlqeUt3uiNtNMem6El3L8N6QOvzI04PwlJ8NkSq4kiWynQzQFxwuCt2ppmLs5
+x-ms-exchange-antispam-messagedata: zYHfcAtUmRcccOJc0P7qVtQgA3wGtKeCZ0eP1UQLcnsFSY/Dzp5vMINDJ06t7R3Lehgq2zyZaRvaQl+orzRGTq2yCh24K0Kad7eM9FSE0t/pr+Zm2bQoauEe1xyA5BASv9hg2E5vcj9J+cSbaVgBVA==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 83bc6a89-0943-4a07-a684-08d7b6a97efc
+X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Feb 2020 08:38:59.0770
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: t6xzjydRdyBLi6+23gJOqlf1Li17Apl9WTWF28IrJAgaRyJBQH72eJh+2YhQ5ul3pJGt87Uqv67pW1PDW9gT3A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR04MB6233
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Daniel Jordan <daniel.m.jordan@oracle.com>
-
-[ Upstream commit 894c9ef9780c5cf2f143415e867ee39a33ecb75d ]
-
-Configuring an instance's parallel mask without any online CPUs...
-
-  echo 2 > /sys/kernel/pcrypt/pencrypt/parallel_cpumask
-  echo 0 > /sys/devices/system/cpu/cpu1/online
-
-...makes tcrypt mode=215 crash like this:
-
-  divide error: 0000 [#1] SMP PTI
-  CPU: 4 PID: 283 Comm: modprobe Not tainted 5.4.0-rc8-padata-doc-v2+ #2
-  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS ?-20191013_105130-anatol 04/01/2014
-  RIP: 0010:padata_do_parallel+0x114/0x300
-  Call Trace:
-   pcrypt_aead_encrypt+0xc0/0xd0 [pcrypt]
-   crypto_aead_encrypt+0x1f/0x30
-   do_mult_aead_op+0x4e/0xdf [tcrypt]
-   test_mb_aead_speed.constprop.0.cold+0x226/0x564 [tcrypt]
-   do_test+0x28c2/0x4d49 [tcrypt]
-   tcrypt_mod_init+0x55/0x1000 [tcrypt]
-   ...
-
-cpumask_weight() in padata_cpu_hash() returns 0 because the mask has no
-CPUs.  The problem is __padata_remove_cpu() checks for valid masks too
-early and so doesn't mark the instance PADATA_INVALID as expected, which
-would have made padata_do_parallel() return error before doing the
-division.
-
-Fix by introducing a second padata CPU hotplug state before
-CPUHP_BRINGUP_CPU so that __padata_remove_cpu() sees the online mask
-without @cpu.  No need for the second argument to padata_replace() since
-@cpu is now already missing from the online mask.
-
-Fixes: 33e54450683c ("padata: Handle empty padata cpumasks")
-Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc: Eric Biggers <ebiggers@kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- include/linux/cpuhotplug.h |  1 +
- kernel/padata.c            | 30 ++++++++++++++++++------------
- 2 files changed, 19 insertions(+), 12 deletions(-)
-
-diff --git a/include/linux/cpuhotplug.h b/include/linux/cpuhotplug.h
-index 068793a619ca8..2d55cee638fc6 100644
---- a/include/linux/cpuhotplug.h
-+++ b/include/linux/cpuhotplug.h
-@@ -59,6 +59,7 @@ enum cpuhp_state {
- 	CPUHP_IOMMU_INTEL_DEAD,
- 	CPUHP_LUSTRE_CFS_DEAD,
- 	CPUHP_AP_ARM_CACHE_B15_RAC_DEAD,
-+	CPUHP_PADATA_DEAD,
- 	CPUHP_WORKQUEUE_PREP,
- 	CPUHP_POWER_NUMA_PREPARE,
- 	CPUHP_HRTIMERS_PREPARE,
-diff --git a/kernel/padata.c b/kernel/padata.c
-index 9c82ee4a97323..fda7a7039422d 100644
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -512,7 +512,7 @@ static int padata_replace_one(struct padata_shell *ps)
- 	return 0;
- }
- 
--static int padata_replace(struct padata_instance *pinst, int cpu)
-+static int padata_replace(struct padata_instance *pinst)
- {
- 	int notification_mask = 0;
- 	struct padata_shell *ps;
-@@ -523,16 +523,12 @@ static int padata_replace(struct padata_instance *pinst, int cpu)
- 	cpumask_copy(pinst->omask, pinst->rcpumask.pcpu);
- 	cpumask_and(pinst->rcpumask.pcpu, pinst->cpumask.pcpu,
- 		    cpu_online_mask);
--	if (cpu >= 0)
--		cpumask_clear_cpu(cpu, pinst->rcpumask.pcpu);
- 	if (!cpumask_equal(pinst->omask, pinst->rcpumask.pcpu))
- 		notification_mask |= PADATA_CPU_PARALLEL;
- 
- 	cpumask_copy(pinst->omask, pinst->rcpumask.cbcpu);
- 	cpumask_and(pinst->rcpumask.cbcpu, pinst->cpumask.cbcpu,
- 		    cpu_online_mask);
--	if (cpu >= 0)
--		cpumask_clear_cpu(cpu, pinst->rcpumask.cbcpu);
- 	if (!cpumask_equal(pinst->omask, pinst->rcpumask.cbcpu))
- 		notification_mask |= PADATA_CPU_SERIAL;
- 
-@@ -624,7 +620,7 @@ out_replace:
- 	cpumask_copy(pinst->cpumask.pcpu, pcpumask);
- 	cpumask_copy(pinst->cpumask.cbcpu, cbcpumask);
- 
--	err = padata_setup_cpumasks(pinst) ?: padata_replace(pinst, -1);
-+	err = padata_setup_cpumasks(pinst) ?: padata_replace(pinst);
- 
- 	if (valid)
- 		__padata_start(pinst);
-@@ -715,7 +711,7 @@ static int __padata_add_cpu(struct padata_instance *pinst, int cpu)
- 	int err = 0;
- 
- 	if (cpumask_test_cpu(cpu, cpu_online_mask)) {
--		err = padata_replace(pinst, -1);
-+		err = padata_replace(pinst);
- 
- 		if (padata_validate_cpumask(pinst, pinst->cpumask.pcpu) &&
- 		    padata_validate_cpumask(pinst, pinst->cpumask.cbcpu))
-@@ -729,12 +725,12 @@ static int __padata_remove_cpu(struct padata_instance *pinst, int cpu)
- {
- 	int err = 0;
- 
--	if (cpumask_test_cpu(cpu, cpu_online_mask)) {
-+	if (!cpumask_test_cpu(cpu, cpu_online_mask)) {
- 		if (!padata_validate_cpumask(pinst, pinst->cpumask.pcpu) ||
- 		    !padata_validate_cpumask(pinst, pinst->cpumask.cbcpu))
- 			__padata_stop(pinst);
- 
--		err = padata_replace(pinst, cpu);
-+		err = padata_replace(pinst);
- 	}
- 
- 	return err;
-@@ -796,7 +792,7 @@ static int padata_cpu_online(unsigned int cpu, struct hlist_node *node)
- 	return ret;
- }
- 
--static int padata_cpu_prep_down(unsigned int cpu, struct hlist_node *node)
-+static int padata_cpu_dead(unsigned int cpu, struct hlist_node *node)
- {
- 	struct padata_instance *pinst;
- 	int ret;
-@@ -817,6 +813,7 @@ static enum cpuhp_state hp_online;
- static void __padata_free(struct padata_instance *pinst)
- {
- #ifdef CONFIG_HOTPLUG_CPU
-+	cpuhp_state_remove_instance_nocalls(CPUHP_PADATA_DEAD, &pinst->node);
- 	cpuhp_state_remove_instance_nocalls(hp_online, &pinst->node);
- #endif
- 
-@@ -1024,6 +1021,8 @@ static struct padata_instance *padata_alloc(const char *name,
- 
- #ifdef CONFIG_HOTPLUG_CPU
- 	cpuhp_state_add_instance_nocalls_cpuslocked(hp_online, &pinst->node);
-+	cpuhp_state_add_instance_nocalls_cpuslocked(CPUHP_PADATA_DEAD,
-+						    &pinst->node);
- #endif
- 
- 	put_online_cpus();
-@@ -1136,17 +1135,24 @@ static __init int padata_driver_init(void)
- 	int ret;
- 
- 	ret = cpuhp_setup_state_multi(CPUHP_AP_ONLINE_DYN, "padata:online",
--				      padata_cpu_online,
--				      padata_cpu_prep_down);
-+				      padata_cpu_online, NULL);
- 	if (ret < 0)
- 		return ret;
- 	hp_online = ret;
-+
-+	ret = cpuhp_setup_state_multi(CPUHP_PADATA_DEAD, "padata:dead",
-+				      NULL, padata_cpu_dead);
-+	if (ret < 0) {
-+		cpuhp_remove_multi_state(hp_online);
-+		return ret;
-+	}
- 	return 0;
- }
- module_init(padata_driver_init);
- 
- static __exit void padata_driver_exit(void)
- {
-+	cpuhp_remove_multi_state(CPUHP_PADATA_DEAD);
- 	cpuhp_remove_multi_state(hp_online);
- }
- module_exit(padata_driver_exit);
--- 
-2.20.1
-
-
-
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBIb3JpYSBHZWFudMSDIDxob3Jp
+YS5nZWFudGFAbnhwLmNvbT4NCj4gU2VudDogRnJpZGF5LCBGZWJydWFyeSAyMSwgMjAyMCAwOTo1
+Mg0KPiBUbzogSGVyYmVydCBYdSA8aGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1Pg0KPiBDYzog
+RGF2aWQgUy4gTWlsbGVyIDxkYXZlbUBkYXZlbWxvZnQubmV0PjsgQXltZW4gU2doYWllcg0KPiA8
+YXltZW4uc2doYWllckBueHAuY29tPjsgVmFsZW50aW4gQ2lvY29pIFJhZHVsZXNjdQ0KPiA8dmFs
+ZW50aW4uY2lvY29pQG54cC5jb20+OyBsaW51eC1jcnlwdG9Admdlci5rZXJuZWwub3JnOyBkbC1s
+aW51eC1pbXgNCj4gPGxpbnV4LWlteEBueHAuY29tPg0KPiBTdWJqZWN0OiBbUEFUQ0hdIGNyeXB0
+bzogY2FhbS9xaTIgLSBmaXggY2hhY2hhMjAgZGF0YSBzaXplIGVycm9yDQo+IA0KPiBIVyBnZW5l
+cmF0ZXMgYSBEYXRhIFNpemUgZXJyb3IgZm9yIGNoYWNoYTIwIHJlcXVlc3RzIHRoYXQgYXJlIG5v
+dA0KPiBhIG11bHRpcGxlIG9mIDY0Qiwgc2luY2UgYWxnb3JpdGhtIHN0YXRlIChBUykgZG9lcyBu
+b3QgaGF2ZQ0KPiB0aGUgRklOQUwgYml0IHNldC4NCj4gDQo+IFNpbmNlIHVwZGF0aW5nIHJlcS0+
+aXYgKGZvciBjaGFpbmluZykgaXMgbm90IHJlcXVpcmVkLA0KPiBtb2RpZnkgc2tjaXBoZXIgZGVz
+Y3JpcHRvcnMgdG8gc2V0IHRoZSBGSU5BTCBiaXQgZm9yIGNoYWNoYTIwLg0KPiANCj4gW05vdGUg
+dGhhdCBmb3Igc2tjaXBoZXIgZGVjcnlwdGlvbiB3ZSBrbm93IHRoYXQgY3R4MV9pdl9vZmYgaXMg
+MCwNCj4gd2hpY2ggYWxsb3dzIGZvciBhbiBvcHRpbWl6YXRpb24gYnkgbm90IGNoZWNraW5nIGFs
+Z29yaXRobSB0eXBlLA0KPiBzaW5jZSBhcHBlbmRfZGVjX29wMSgpIHNldHMgRklOQUwgYml0IGZv
+ciBhbGwgYWxnb3JpdGhtcyBleGNlcHQgQUVTLl0NCj4gDQo+IEFsc28gZHJvcCB0aGUgZGVzY3Jp
+cHRvciBvcGVyYXRpb25zIHRoYXQgc2F2ZSB0aGUgSVYuDQo+IEhvd2V2ZXIsIGluIG9yZGVyIHRv
+IGtlZXAgY29kZSBsb2dpYyBzaW1wbGUsIHRoaW5ncyBsaWtlDQo+IFMvRyB0YWJsZXMgZ2VuZXJh
+dGlvbiBldGMuIGFyZSBub3QgdG91Y2hlZC4NCj4gDQo+IENjOiA8c3RhYmxlQHZnZXIua2VybmVs
+Lm9yZz4gIyB2NS4zKw0KPiBGaXhlczogMzM0ZDM3YzllMjYzICgiY3J5cHRvOiBjYWFtIC0gdXBk
+YXRlIElWIHVzaW5nIEhXIHN1cHBvcnQiKQ0KPiBTaWduZWQtb2ZmLWJ5OiBIb3JpYSBHZWFudMSD
+IDxob3JpYS5nZWFudGFAbnhwLmNvbT4NCg0KVGVzdGVkLWJ5OiBWYWxlbnRpbiBDaW9jb2kgUmFk
+dWxlc2N1IDx2YWxlbnRpbi5jaW9jb2lAbnhwLmNvbT4NCg0K
