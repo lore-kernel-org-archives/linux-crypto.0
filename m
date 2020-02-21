@@ -1,209 +1,124 @@
-Return-Path: <SRS0=ICHr=4I=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=BixN=4J=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74F94C11D20
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 Feb 2020 21:13:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB62BC11D24
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Feb 2020 05:17:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3D6F520679
-	for <linux-crypto@archiver.kernel.org>; Thu, 20 Feb 2020 21:13:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="x/FOfayU"
+	by mail.kernel.org (Postfix) with ESMTP id A73A2208E4
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Feb 2020 05:17:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729075AbgBTVNU (ORCPT
+        id S1725973AbgBUFRO (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 20 Feb 2020 16:13:20 -0500
-Received: from mail-wm1-f65.google.com ([209.85.128.65]:56300 "EHLO
-        mail-wm1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726670AbgBTVNU (ORCPT
+        Fri, 21 Feb 2020 00:17:14 -0500
+Received: from stargate.chelsio.com ([12.32.117.8]:5324 "EHLO
+        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725800AbgBUFRO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 20 Feb 2020 16:13:20 -0500
-Received: by mail-wm1-f65.google.com with SMTP id q9so51639wmj.5
-        for <linux-crypto@vger.kernel.org>; Thu, 20 Feb 2020 13:13:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=rW5t0PJc3Jr/8TnUKVhYNJ/sFLfIcthwxD1CFSxUYJk=;
-        b=x/FOfayUnF/BRMjAioiFNqHeV0zfqdUHqQl8iVfRkmfljeRLLEO2K6AR/+ZU0WooEK
-         cs4LCRRrCIcpXNuNxO+wWGIhk3KldWgzX4cfsgyfMPQerGfnQWOmttpMYSCJLYn8Wnml
-         Yg37DI+oeXXD1O7i9EXd5p6j8aBCzr38LnaJp5B0XGmilQ+AsFldvo+nTzGd6LvfOQD3
-         /sWSfRLy80BbZJas/ZUSx8ncS/gl53OAhk7iXiDVGSM+BBQwfSCoDSqE4X9BKdObSO+s
-         TfX7lOXXEaxbV8wloNDmbvv/n2yFKAV/fAyBuqv/OCehl7uojWY4cJlBaH+jzmlJiH3K
-         J3kw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=rW5t0PJc3Jr/8TnUKVhYNJ/sFLfIcthwxD1CFSxUYJk=;
-        b=LJY9piBP5YwqCXDreH176xLlGRmyTmFnJoL17ULgv9aKfDMwcTiH2if2ZwShs5WfXw
-         2OCNlYFWJ0nJi9iQhjbSKaduQlJuIC3RBxA/zrARd4eJ8rarEOGPIbqJSjMhBlPL9Ki8
-         6NlgMKgtieNPoc2QY1tX0myeXw4Gtof4AQ5HQPSEZfNi4VQq+vWMt8z9s+ikxvvkP5ei
-         0dPSJBfpwOLbdMfgXxYIrWFsbzi01rlu4WW/0N1kaAnMgHKdPw7gFGs2WVwFIh3p+4mz
-         IWKWXssTivBljllWjIWHQAD5pnZRFo0px3I5vCj3lWCAMSgS+8CQigPSHB6TMYQnLrZk
-         6sUg==
-X-Gm-Message-State: APjAAAWahFIiOK7vN2mek2U1yErpUZkZHl99svRU/cbZXfY/ebok4bBB
-        cE8bUoKO++JVTW20M3ZoSEXN3gxuFbHJ2RDH5zpSIw==
-X-Google-Smtp-Source: APXvYqxCxB4EGH5QGqKKIn14UfWNUkpQYMgngxNj262blMWEIsHj7qRe7X11aPJimXqjUwh/+HlKsQzr/uzE22C+EZ8=
-X-Received: by 2002:a05:600c:248:: with SMTP id 8mr6329781wmj.1.1582233198199;
- Thu, 20 Feb 2020 13:13:18 -0800 (PST)
+        Fri, 21 Feb 2020 00:17:14 -0500
+Received: from [10.193.191.44] (ayushsawal.asicdesigners.com [10.193.191.44])
+        by stargate.chelsio.com (8.13.8/8.13.8) with ESMTP id 01L5H3OK009192;
+        Thu, 20 Feb 2020 21:17:04 -0800
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        vinay.yadav@chelsio.com
+Subject: Re: [RFC][PATCH] almost certain bug in
+ drivers/crypto/chelsio/chcr_algo.c:create_authenc_wr()
+To:     viro@zeniv.linux.org.uk, Herbert Xu <herbert@gondor.apana.org.au>
+References: <20200215061416.GZ23230@ZenIV.linux.org.uk>
+ <CAEopUdxRUoMo+uGgiFLWz8NsM1eL7CnkV7gY5PypxrG_nzhNWw@mail.gmail.com>
+From:   Ayush Sawal <ayush.sawal@chelsio.com>
+Message-ID: <db4ee9c7-400e-5932-8708-581d91b38385@chelsio.com>
+Date:   Fri, 21 Feb 2020 10:47:01 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-References: <20200123085312.GA24255@Red> <f8bdce6e-9dff-6dbf-e084-c5508b5493e5@ti.com>
- <20200220195221.GA17341@Red>
-In-Reply-To: <20200220195221.GA17341@Red>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Thu, 20 Feb 2020 22:13:06 +0100
-Message-ID: <CAKv+Gu-8pGa7QODPKQv_BAqWiq14X=YN4+43Mw6SX2pDK2fLrg@mail.gmail.com>
-Subject: Re: [CRASH] crypto: omap: kernel panic when modprobing tcrypt
-To:     LABBE Corentin <clabbe@baylibre.com>
-Cc:     Tero Kristo <t-kristo@ti.com>,
-        linux-omap <linux-omap@vger.kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>, dmitry.kasatkin@nokia.com,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <CAEopUdxRUoMo+uGgiFLWz8NsM1eL7CnkV7gY5PypxrG_nzhNWw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 20 Feb 2020 at 20:52, LABBE Corentin <clabbe@baylibre.com> wrote:
+On 2/15/2020 11:45 AM, Al Viro wrote:
+
 >
-> On Thu, Jan 23, 2020 at 01:59:21PM +0200, Tero Kristo wrote:
-> > Hi,
-> >
-> > Linux-next has huge pile of fixes in place for omap-crypto, so I would
-> > not recommend testing any older kernels. You are saying -next crashes i=
-n
-> > similar manner though? TI internal kernel has couple of additional fixe=
-s
-> > against 5.4 stable, but can't see why those would help on this. If you
-> > have spare time, you could try it out though [1].
-> >
-> > Today's next doesn't compile for me at all for some reason (some toolin=
-g
-> > failure) so can't really test it myself right now.
-> >
-> > -Tero
-> >
-> > [1]
-> > https://git.ti.com/cgit/ti-linux-kernel/ti-linux-kernel/log/?h=3Dti-lin=
-ux-5.4.y
-> >
+>         kctx_len = (ntohl(KEY_CONTEXT_CTX_LEN_V(aeadctx->key_ctx_hdr)) 
+> << 4)
+>                 - sizeof(chcr_req->key_ctx);
+> can't possibly be endian-safe.  Look: ->key_ctx_hdr is __be32.  And
+> KEY_CONTEXT_CTX_LEN_V is "shift up by 24 bits".  On little-endian hosts it
+> sees
+>         b0 b1 b2 b3
+> in memory, inteprets that into b0 + (b1 << 8) + (b2 << 16) + (b3 << 24),
+> shifts up by 24, resulting in b0 << 24, does ntohl (byteswap on l-e),
+> gets b0 and shifts that up by 4.  So we get b0 * 16 - sizeof(...).
 >
-> I have tested this branch and loading tcrypt lead to a kernel panic
+> Sounds reasonable, but on b-e we get
+> b3 + (b2 << 8) + (b1 << 16) + (b0 << 24), shift up by 24,
+> yielding b3 << 24, do ntohl (no-op on b-e) and then shift up by 4.
+> Resulting in b3 << 28 - sizeof(...), i.e. slightly under b3 * 256M.
+>
+> Then we increase it some more and pass to alloc_skb() as size.
+> Somehow I doubt that we really want a quarter-gigabyte skb allocation
+> here...
+>
+> Note that when you are building those values in
+> #define  FILL_KEY_CTX_HDR(ck_size, mk_size, d_ck, opad, ctx_len) \
+>                 htonl(KEY_CONTEXT_VALID_V(1) | \
+>                       KEY_CONTEXT_CK_SIZE_V((ck_size)) | \
+>                       KEY_CONTEXT_MK_SIZE_V(mk_size) | \
+>                       KEY_CONTEXT_DUAL_CK_V((d_ck)) | \
+>                       KEY_CONTEXT_OPAD_PRESENT_V((opad)) | \
+>                       KEY_CONTEXT_SALT_PRESENT_V(1) | \
+>                       KEY_CONTEXT_CTX_LEN_V((ctx_len)))
+> ctx_len ends up in the first octet (i.e. b0 in the above), which
+> matches the current behaviour on l-e.  If that's the intent, this
+> thing should've been
+>         kctx_len = (KEY_CONTEXT_CTX_LEN_G(ntohl(aeadctx->key_ctx_hdr)) 
+> << 4)
+>                 - sizeof(chcr_req->key_ctx);
+> instead - fetch after ntohl() we get (b0 << 24) + (b1 << 16) + (b2 << 
+> 8) + b3,
+> shift it down by 24 (b0), resuling in b0 * 16 - sizeof(...) both on 
+> l-e and
+> on b-e.
+>
+> PS: when sparse warns you about endianness problems, it might be worth 
+> checking
+> if there really is something wrong.  And I don't mean "slap __force 
+> cast on it"...
+>
+> Signed-off-by: Al Viro <viro@zeniv.linux.org.uk 
+> <mailto:viro@zeniv.linux.org.uk>>
+> ---
+> diff -urN a/drivers/crypto/chelsio/chcr_algo.c 
+> b/drivers/crypto/chelsio/chcr_algo.c
+> --- a/drivers/crypto/chelsio/chcr_algo.c
+> +++ b/drivers/crypto/chelsio/chcr_algo.c
+> @@ -2351,7 +2351,7 @@ static struct sk_buff *create_authenc_wr(struct 
+> aead_request *req,
+>         snents = sg_nents_xlen(req->src, req->assoclen + req->cryptlen,
+>                                CHCR_SRC_SG_SIZE, 0);
+>         dst_size = get_space_for_phys_dsgl(dnents);
+> -       kctx_len = (ntohl(KEY_CONTEXT_CTX_LEN_V(aeadctx->key_ctx_hdr)) 
+> << 4)
+> +       kctx_len = (KEY_CONTEXT_CTX_LEN_G(ntohl(aeadctx->key_ctx_hdr)) 
+> << 4)
+>                 - sizeof(chcr_req->key_ctx);
+>         transhdr_len = CIPHER_TRANSHDR_SIZE(kctx_len, dst_size);
+>         reqctx->imm = (transhdr_len + req->assoclen + req->cryptlen) <
 
-Hi Corentin,
 
-It would be helpful if you could paste the entire error message.
+This was a genuine bug, thanks a lot for pointing it out and providing
+the fix.We are checking other sparse warns in our files, and soon we
+will fix the warnings.
 
+Thanks,
+Ayush
 
-> [  105.664062] Internal error: Oops: 17 [#1] SMP ARM
-> [  105.668792] Modules linked in: vmac xcbc streebog_generic sm3_generic =
-sha3_generic crct10dif_generic crct10dif_common seed rmd320 rmd256 rmd160 r=
-md128 cts ccm salsa20_generic camellia_generic fcrypt pcbc tgr192 anubis wp=
-512 khazad tea michael_mic arc4 libarc4 cast6_generic cast5_generic cast_co=
-mmon sha512_arm sha512_generic cfb ofb ux500_cryp aes_arm serpent_generic l=
-rw twofish_generic twofish_common blowfish_generic blowfish_common md4 tcry=
-pt(+) ghash_generic gf128mul gcm sha256_generic libsha256 hmac md5 des_gene=
-ric ctr sha1_arm_neon sha1_arm phy_generic aes_arm_bs crypto_simd cryptd sh=
-a1_generic omap_aes_driver omap_sham omap2430 ehci_omap omap_des omap_crypt=
-o libdes phy_twl6030_usb musb_hdrc
-> [  105.730743] CPU: 0 PID: 0 Comm: swapper/0 Tainted: G        W         =
-5.4.20-00513-gd274af0de6bd #2
-> [  105.730743] Hardware name: Generic OMAP4 (Flattened Device Tree)
-> [  105.745849] PC is at omap_sham_finish_req+0x10/0x190 [omap_sham]
-> [  105.745880] LR is at omap_sham_done_task+0x58/0x118 [omap_sham]
-> [  105.757843] pc : [<bf04d054>]    lr : [<bf04d63c>]    psr: 20000113
-> [  105.764129] sp : c1701da8  ip : 00000000  fp : ffffe000
-> [  105.769378] r10: c557b268  r9 : 00000040  r8 : c167d100
-> [  105.774627] r7 : c1894b44  r6 : 00000000  r5 : c5622200  r4 : 00000000
-> [  105.781188] r3 : 00000008  r2 : 000002b3  r1 : 00000000  r0 : c5622200
-> [  105.781188] Flags: nzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segme=
-nt none
-> [  105.787750] Control: 10c5387d  Table: 854d004a  DAC: 00000051
-> [  105.787750] Process swapper/0 (pid: 0, stack limit =3D 0xd5fffd75)
-> [  105.806701] Stack: (0xc1701da8 to 0xc1702000)
-> [  105.806701] 1da0:                   c557b240 00000000 ef55b318 c1894b4=
-4 c167d100 bf04d63c
-> [  105.819305] 1dc0: 00000000 c528bab8 c557b264 00000000 ef55b318 c034d8c=
-8 c5544040 00000006
-> [  105.827514] 1de0: c1701efc c1703098 00000007 00000040 00000006 ffffe00=
-0 c1894b44 00000100
-> [  105.827514] 1e00: c1703080 c0302298 c1704e48 00000001 c1672388 c167d10=
-0 c1704e6c 0000000a
-> [  105.827514] 1e20: c1672314 ffffb416 c1703d00 c0f07470 00200002 eea7a66=
-8 00000000 ffffe000
-> [  105.852142] 1e40: 00000000 00000000 00000001 ee824000 fa241100 c18ec14=
-c 00000000 c034e018
-> [  105.860351] 1e60: c167d098 c039be58 c1705528 c1774e04 fa24010c fa24010=
-0 c1701ea0 c06e816c
-> [  105.860351] 1e80: c0c98518 60000113 ffffffff c1701ed4 ef5655b0 c170000=
-0 c18ec14c c0301a8c
-> [  105.876800] 1ea0: 00000000 c170e1e8 2dee9000 00000050 c170e1e8 0000000=
-0 00000000 c1895418
-> [  105.885009] 1ec0: ef5655b0 00000000 c18ec14c 00000000 ee6b2800 c1701ef=
-0 c0c984f0 c0c98518
-> [  105.885009] 1ee0: 60000113 ffffffff 00000051 00000000 9a103e82 0000001=
-8 9a0fc74d 00000018
-> [  105.901428] 1f00: 00000018 c167c5a8 ef569b40 c529a5c4 ef5655b0 c170e1e=
-8 ffffffff ffff0000
-> [  105.909637] 1f20: ffffe000 c18ec14c c529a580 c0c9ae0c 00000002 c1704e6=
-c fe687d92 ef5655b0
-> [  105.909637] 1f40: c170e1e8 00000002 00000001 ef5655b0 c1704e48 c167c5a=
-8 c170e1e8 c0c989b4
-> [  105.926086] 1f60: ffffe000 c1704e6c c1704eb0 c03770ec c18944b2 0000000=
-2 01000000 f99d40c3
-> [  105.934295] 1f80: c15dea3c 000000cd c18a0594 00000001 c18a0540 0000000=
-0 00000001 c15dea3c
-> [  105.934295] 1fa0: ef585280 c037741c c1704e48 c1500ea8 ffffffff fffffff=
-f 00000000 c1500664
-> [  105.934295] 1fc0: 00000000 c15dea3c f99844d7 00000000 00000000 c150033=
-0 00000051 10c0387d
-> [  105.958923] 1fe0: 00000ae7 83f00000 411fc092 10c5387d 00000000 0000000=
-0 00000000 00000000
-> [  105.967163] [<bf04d054>] (omap_sham_finish_req [omap_sham]) from [<bf0=
-4d63c>] (omap_sham_done_task+0x58/0x118 [omap_sham])
-> [  105.978271] [<bf04d63c>] (omap_sham_done_task [omap_sham]) from [<c034=
-d8c8>] (tasklet_action_common.constprop.5+0x70/0x174)
-> [  105.978271] [<c034d8c8>] (tasklet_action_common.constprop.5) from [<c0=
-302298>] (__do_softirq+0x130/0x3b4)
-> [  105.999053] [<c0302298>] (__do_softirq) from [<c034e018>] (irq_exit+0x=
-cc/0xd8)
-> [  106.006317] [<c034e018>] (irq_exit) from [<c039be58>] (__handle_domain=
-_irq+0x60/0xb4)
-> [  106.014190] [<c039be58>] (__handle_domain_irq) from [<c06e816c>] (gic_=
-handle_irq+0x58/0x9c)
-> [  106.022613] [<c06e816c>] (gic_handle_irq) from [<c0301a8c>] (__irq_svc=
-+0x6c/0x90)
-> [  106.022613] Exception stack(0xc1701ea0 to 0xc1701ee8)
-> [  106.022613] 1ea0: 00000000 c170e1e8 2dee9000 00000050 c170e1e8 0000000=
-0 00000000 c1895418
-> [  106.043395] 1ec0: ef5655b0 00000000 c18ec14c 00000000 ee6b2800 c1701ef=
-0 c0c984f0 c0c98518
-> [  106.043395] 1ee0: 60000113 ffffffff
-> [  106.055114] [<c0301a8c>] (__irq_svc) from [<c0c98518>] (cpuidle_enter_=
-state+0x180/0x5b8)
-> [  106.063262] [<c0c98518>] (cpuidle_enter_state) from [<c0c9ae0c>] (cpui=
-dle_enter_state_coupled+0x144/0x3c8)
-> [  106.072967] [<c0c9ae0c>] (cpuidle_enter_state_coupled) from [<c0c989b4=
->] (cpuidle_enter+0x50/0x54)
-> [  106.081970] [<c0c989b4>] (cpuidle_enter) from [<c03770ec>] (do_idle+0x=
-218/0x294)
-> [  106.081970] [<c03770ec>] (do_idle) from [<c037741c>] (cpu_startup_entr=
-y+0x18/0x1c)
-> [  106.097015] [<c037741c>] (cpu_startup_entry) from [<c1500ea8>] (start_=
-kernel+0x480/0x4b0)
-> [  106.097015] Code: e92d41f0 e1a05000 e5904040 e1a06001 (e59430bc)
-> [  106.111358] ---[ end trace 53e3b1ecd80eac62 ]---
-> [  106.115997] Kernel panic - not syncing: Fatal exception in interrupt
-> [  106.115997] SMP: failed to stop secondary CPUs
-> [  106.115997] ---[ end Kernel panic - not syncing: Fatal exception in in=
-terrupt ]---
