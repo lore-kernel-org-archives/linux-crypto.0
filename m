@@ -2,124 +2,131 @@ Return-Path: <SRS0=BixN=4J=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F00BFC35640
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Feb 2020 08:44:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9CBDC35641
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Feb 2020 08:47:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D1398206DB
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Feb 2020 08:44:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ACE142071E
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Feb 2020 08:47:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1582274842;
+	bh=PBddpNB+DNMdnowJ6YaKlTaS4CE/MvUsfaf/iV7W3yM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=IQu/NksOBYEjbibMm/GaN3kq0N9BL1SttnaF6thd88z2p5hzN+wQecArFZjcf88rk
+	 DXViqTmo6EbHgXoVgUxtjE/9NQ5GJBXF+JXsqRWquo6cpny36KnjMYkpbUv8rdnSN2
+	 MZVMxFkPgeKaSHulDpLGsiOeDn7ESaEEylctiBOw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728496AbgBUHwU (ORCPT
+        id S1728736AbgBUIrS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 Feb 2020 02:52:20 -0500
-Received: from inva020.nxp.com ([92.121.34.13]:51524 "EHLO inva020.nxp.com"
+        Fri, 21 Feb 2020 03:47:18 -0500
+Received: from mail.kernel.org ([198.145.29.99]:45108 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729892AbgBUHwS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Feb 2020 02:52:18 -0500
-Received: from inva020.nxp.com (localhost [127.0.0.1])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id C36801A6F35;
-        Fri, 21 Feb 2020 08:52:17 +0100 (CET)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id B70431A6F4B;
-        Fri, 21 Feb 2020 08:52:17 +0100 (CET)
-Received: from fsr-ub1864-014.ea.freescale.net (fsr-ub1864-014.ea.freescale.net [10.171.95.219])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 70998202D2;
-        Fri, 21 Feb 2020 08:52:17 +0100 (CET)
-From:   =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Valentin Ciocoi Radulescu <valentin.ciocoi@nxp.com>,
-        linux-crypto@vger.kernel.org, NXP Linux Team <linux-imx@nxp.com>
-Subject: [PATCH] crypto: caam/qi2 - fix chacha20 data size error
-Date:   Fri, 21 Feb 2020 09:52:01 +0200
-Message-Id: <20200221075201.5725-1-horia.geanta@nxp.com>
-X-Mailer: git-send-email 2.17.1
+        id S1728638AbgBUHsy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 21 Feb 2020 02:48:54 -0500
+Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7E619208C4;
+        Fri, 21 Feb 2020 07:48:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1582271333;
+        bh=PBddpNB+DNMdnowJ6YaKlTaS4CE/MvUsfaf/iV7W3yM=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=VIoG48wgvKE6lJDh/9VbAxY47KqYvYtz6rjWBWGzchlfdXyXPS3hsvlG3xLowj0Q7
+         vkq4VAOaTC5WAtIPuImiHZE/IxrrXjw2mtVlisTDmb4ILtYjQFU8yPfRZKfheSl51A
+         EtYaVEf+M/XrHR8BfeqZULB82V5q81mqwE8FmTQI=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-crypto@vger.kernel.org, Sasha Levin <sashal@kernel.org>
+Subject: [PATCH 5.5 127/399] padata: always acquire cpu_hotplug_lock before pinst->lock
+Date:   Fri, 21 Feb 2020 08:37:32 +0100
+Message-Id: <20200221072414.822394328@linuxfoundation.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200221072402.315346745@linuxfoundation.org>
+References: <20200221072402.315346745@linuxfoundation.org>
+User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-HW generates a Data Size error for chacha20 requests that are not
-a multiple of 64B, since algorithm state (AS) does not have
-the FINAL bit set.
+From: Daniel Jordan <daniel.m.jordan@oracle.com>
 
-Since updating req->iv (for chaining) is not required,
-modify skcipher descriptors to set the FINAL bit for chacha20.
+[ Upstream commit 38228e8848cd7dd86ccb90406af32de0cad24be3 ]
 
-[Note that for skcipher decryption we know that ctx1_iv_off is 0,
-which allows for an optimization by not checking algorithm type,
-since append_dec_op1() sets FINAL bit for all algorithms except AES.]
+lockdep complains when padata's paths to update cpumasks via CPU hotplug
+and sysfs are both taken:
 
-Also drop the descriptor operations that save the IV.
-However, in order to keep code logic simple, things like
-S/G tables generation etc. are not touched.
+  # echo 0 > /sys/devices/system/cpu/cpu1/online
+  # echo ff > /sys/kernel/pcrypt/pencrypt/parallel_cpumask
 
-Cc: <stable@vger.kernel.org> # v5.3+
-Fixes: 334d37c9e263 ("crypto: caam - update IV using HW support")
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+  ======================================================
+  WARNING: possible circular locking dependency detected
+  5.4.0-rc8-padata-cpuhp-v3+ #1 Not tainted
+  ------------------------------------------------------
+  bash/205 is trying to acquire lock:
+  ffffffff8286bcd0 (cpu_hotplug_lock.rw_sem){++++}, at: padata_set_cpumask+0x2b/0x120
+
+  but task is already holding lock:
+  ffff8880001abfa0 (&pinst->lock){+.+.}, at: padata_set_cpumask+0x26/0x120
+
+  which lock already depends on the new lock.
+
+padata doesn't take cpu_hotplug_lock and pinst->lock in a consistent
+order.  Which should be first?  CPU hotplug calls into padata with
+cpu_hotplug_lock already held, so it should have priority.
+
+Fixes: 6751fb3c0e0c ("padata: Use get_online_cpus/put_online_cpus")
+Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc: Eric Biggers <ebiggers@kernel.org>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/caam/caamalg_desc.c | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
+ kernel/padata.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/caam/caamalg_desc.c b/drivers/crypto/caam/caamalg_desc.c
-index aa9ccca67045..372d3d4ed6c5 100644
---- a/drivers/crypto/caam/caamalg_desc.c
-+++ b/drivers/crypto/caam/caamalg_desc.c
-@@ -1379,6 +1379,8 @@ void cnstr_shdsc_skcipher_encap(u32 * const desc, struct alginfo *cdata,
- 				const u32 ctx1_iv_off)
- {
- 	u32 *key_jump_cmd;
-+	bool is_chacha20 = ((cdata->algtype & OP_ALG_ALGSEL_MASK) ==
-+			    OP_ALG_ALGSEL_CHACHA20);
+diff --git a/kernel/padata.c b/kernel/padata.c
+index fda7a7039422d..fdbbe96547713 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -643,8 +643,8 @@ int padata_set_cpumask(struct padata_instance *pinst, int cpumask_type,
+ 	struct cpumask *serial_mask, *parallel_mask;
+ 	int err = -EINVAL;
  
- 	init_sh_desc(desc, HDR_SHARE_SERIAL | HDR_SAVECTX);
- 	/* Skip if already shared */
-@@ -1417,14 +1419,15 @@ void cnstr_shdsc_skcipher_encap(u32 * const desc, struct alginfo *cdata,
- 				      LDST_OFFSET_SHIFT));
+-	mutex_lock(&pinst->lock);
+ 	get_online_cpus();
++	mutex_lock(&pinst->lock);
  
- 	/* Load operation */
--	append_operation(desc, cdata->algtype | OP_ALG_AS_INIT |
--			 OP_ALG_ENCRYPT);
-+	if (is_chacha20)
-+		options |= OP_ALG_AS_FINALIZE;
-+	append_operation(desc, options);
+ 	switch (cpumask_type) {
+ 	case PADATA_CPU_PARALLEL:
+@@ -662,8 +662,8 @@ int padata_set_cpumask(struct padata_instance *pinst, int cpumask_type,
+ 	err =  __padata_set_cpumasks(pinst, parallel_mask, serial_mask);
  
- 	/* Perform operation */
- 	skcipher_append_src_dst(desc);
+ out:
+-	put_online_cpus();
+ 	mutex_unlock(&pinst->lock);
++	put_online_cpus();
  
- 	/* Store IV */
--	if (ivsize)
-+	if (!is_chacha20 && ivsize)
- 		append_seq_store(desc, ivsize, LDST_SRCDST_BYTE_CONTEXT |
- 				 LDST_CLASS_1_CCB | (ctx1_iv_off <<
- 				 LDST_OFFSET_SHIFT));
-@@ -1451,6 +1454,9 @@ void cnstr_shdsc_skcipher_decap(u32 * const desc, struct alginfo *cdata,
- 				const u32 ctx1_iv_off)
- {
- 	u32 *key_jump_cmd;
-+	u32 options = cdata->algtype | OP_ALG_AS_INIT | OP_ALG_ENCRYPT;
-+	bool is_chacha20 = ((cdata->algtype & OP_ALG_ALGSEL_MASK) ==
-+			    OP_ALG_ALGSEL_CHACHA20);
- 
- 	init_sh_desc(desc, HDR_SHARE_SERIAL | HDR_SAVECTX);
- 	/* Skip if already shared */
-@@ -1499,7 +1505,7 @@ void cnstr_shdsc_skcipher_decap(u32 * const desc, struct alginfo *cdata,
- 	skcipher_append_src_dst(desc);
- 
- 	/* Store IV */
--	if (ivsize)
-+	if (!is_chacha20 && ivsize)
- 		append_seq_store(desc, ivsize, LDST_SRCDST_BYTE_CONTEXT |
- 				 LDST_CLASS_1_CCB | (ctx1_iv_off <<
- 				 LDST_OFFSET_SHIFT));
+ 	return err;
+ }
 -- 
-2.17.1
+2.20.1
+
+
 
