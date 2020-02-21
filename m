@@ -2,123 +2,259 @@ Return-Path: <SRS0=BixN=4J=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB074C35640
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Feb 2020 08:39:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B3FBC35641
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Feb 2020 08:43:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 51F7720578
-	for <linux-crypto@archiver.kernel.org>; Fri, 21 Feb 2020 08:39:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC66E206DB
+	for <linux-crypto@archiver.kernel.org>; Fri, 21 Feb 2020 08:43:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="b46+Wgfd"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="UEJqXgOB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730944AbgBUIjC (ORCPT
+        id S1730393AbgBUInr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 Feb 2020 03:39:02 -0500
-Received: from mail-eopbgr150047.outbound.protection.outlook.com ([40.107.15.47]:14463
-        "EHLO EUR01-DB5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729805AbgBUIjB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Feb 2020 03:39:01 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JboakKXBSxcg+N+Elz/x1ibHQTVi5LBydb4J9lm0XjazGg30+H9X0pjU8ph1V8saE4NErDmmAiaz4teaR3zdvw0GrAgWPP0IyidddkhXUa6Qzei1LGZlCRChZAZLBACtJpD1uNqSAgvaKjnWuOb1DPgj6h88C73llLalkzjUhWVZX5sfqaJgN3pgJqOwQaEH+Gn1YyLVVXklAH6Eu30ysHPY+UQnxQAb2G5Sj1dMDEL02jdKurjFKZHt/CdakH6XhwJWVsC3/psysgdvvCsp9efUMYnHy/v7VMhL3bHZieiF1kkLt37qa+u2ebJ2eiRWPcPI1Q8sz0iiOYpJPnju2A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=r7hL3X74V/bYChiVFolNqJGsPb4Mixm/+IoZcnky78k=;
- b=ZqQ3I1IBJQeaDGA16tr9urTS7FssNCYLqxZCf3uL6OVcBNCsz0rgS9kElkzOlUDVv2s+OEB+Aa3vrqKkVnMT8CH/v08geXa6GrlAIe8Ras7yHbMaqZtpKJpmjEM46hoj2oJhhA0zIWZkJViH37NfFwgw/yuHd6sBB9o/JiB+bVcN2DlUYls8NM9utt5xnOSNtwZnh/3mhfoCXHqlC28miahDHj6yywizXK9GnN/iinC6wRktWDThjWRyWLdZVYcCIlpe9LxYQefV+3lgoLP0ilL6KPyGfOWILNzTGN9dmgIt9nnI/qpZb38mkUFmRHT6mOWDFxbKrawdQxrWky+ocg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=r7hL3X74V/bYChiVFolNqJGsPb4Mixm/+IoZcnky78k=;
- b=b46+WgfdPCmmjQZ1CO//vTpiA1i6d6GibwyD5n+RBvnTdOl8kwkI8Nv66pXfeT+01OlSShW7zMPfJN96YbgOpK6shw49cj5/w0AOo08FdxagRvGq3dm4EcC2p+KHeP2fwloNN5/kHavVA6oMfFkYxdgjf7Y3Ez423SDW+w1EyDo=
-Received: from DBBPR04MB6025.eurprd04.prod.outlook.com (20.179.43.215) by
- DBBPR04MB6233.eurprd04.prod.outlook.com (20.179.43.17) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2729.25; Fri, 21 Feb 2020 08:38:59 +0000
-Received: from DBBPR04MB6025.eurprd04.prod.outlook.com
- ([fe80::b978:17a1:d649:85b8]) by DBBPR04MB6025.eurprd04.prod.outlook.com
- ([fe80::b978:17a1:d649:85b8%5]) with mapi id 15.20.2729.033; Fri, 21 Feb 2020
- 08:38:59 +0000
-From:   Valentin Ciocoi Radulescu <valentin.ciocoi@nxp.com>
-To:     Horia Geanta <horia.geanta@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>
-CC:     "David S. Miller" <davem@davemloft.net>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>
-Subject: RE: [PATCH] crypto: caam/qi2 - fix chacha20 data size error
-Thread-Topic: [PATCH] crypto: caam/qi2 - fix chacha20 data size error
-Thread-Index: AQHV6IvXVLFeSwTUXUy7oMx87mqcQaglU0KA
-Date:   Fri, 21 Feb 2020 08:38:59 +0000
-Message-ID: <DBBPR04MB602554E638B8CA1B9B809F6BFE120@DBBPR04MB6025.eurprd04.prod.outlook.com>
-References: <20200221075201.5725-1-horia.geanta@nxp.com>
-In-Reply-To: <20200221075201.5725-1-horia.geanta@nxp.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=valentin.ciocoi@nxp.com; 
-x-originating-ip: [46.97.170.172]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 83bc6a89-0943-4a07-a684-08d7b6a97efc
-x-ms-traffictypediagnostic: DBBPR04MB6233:|DBBPR04MB6233:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DBBPR04MB6233046D4C8C80A747268F82FE120@DBBPR04MB6233.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6108;
-x-forefront-prvs: 0320B28BE1
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(366004)(376002)(346002)(396003)(39860400002)(199004)(189003)(54906003)(6506007)(66446008)(66556008)(8936002)(4326008)(53546011)(7696005)(66476007)(8676002)(110136005)(64756008)(81166006)(71200400001)(81156014)(26005)(5660300002)(86362001)(66946007)(52536014)(2906002)(9686003)(55016002)(478600001)(33656002)(316002)(186003)(76116006);DIR:OUT;SFP:1101;SCL:1;SRVR:DBBPR04MB6233;H:DBBPR04MB6025.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: oHUZfwtvcw6ThLhJt10OHjEeRosAApqOQLKYdiXhAeVEJ9EukP7K8SyWj9mkw68eEcW3kRez7Eeer8V8tdM3xdnvOtXQeOZziCnaZLKtdCq5WxwSkERC/l4XHVBlbr9paRS6msXlxGCBnW0wlKxrG34+IFOCyjyPTFpYOZxTJ5kUg+RVPZ+16sv0Ggjp6vlsfmqqaF4nxRrywWLZa7hfmKZFBubC18+xgsKOjf0GzwCyWpPva6rh8rlrZEtuxTCaVf3s3Ci9MOUq08pkHqt1LR7o4fMI6jaCsPF+MxnIv7oUeabzhY86Af3K+aJbtGHsxc9PRGUXAkupqXK+iwqfFoFtz8jvXkGoT9SoeU3lOtJFNwvlnRVXqwZUF0JbOM/XAfOBlqeUt3uiNtNMem6El3L8N6QOvzI04PwlJ8NkSq4kiWynQzQFxwuCt2ppmLs5
-x-ms-exchange-antispam-messagedata: zYHfcAtUmRcccOJc0P7qVtQgA3wGtKeCZ0eP1UQLcnsFSY/Dzp5vMINDJ06t7R3Lehgq2zyZaRvaQl+orzRGTq2yCh24K0Kad7eM9FSE0t/pr+Zm2bQoauEe1xyA5BASv9hg2E5vcj9J+cSbaVgBVA==
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 83bc6a89-0943-4a07-a684-08d7b6a97efc
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Feb 2020 08:38:59.0770
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: t6xzjydRdyBLi6+23gJOqlf1Li17Apl9WTWF28IrJAgaRyJBQH72eJh+2YhQ5ul3pJGt87Uqv67pW1PDW9gT3A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR04MB6233
+        Fri, 21 Feb 2020 03:43:47 -0500
+Received: from mx1.tq-group.com ([62.157.118.193]:63503 "EHLO mx1.tq-group.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1730127AbgBUInq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 21 Feb 2020 03:43:46 -0500
+IronPort-SDR: VOLac6V/tQXPcJ3dGxdub1nTzBvhoCDb09oeNI2J2RELlZCa2vZln8OAsUkHqFEpHmGgtcC7yf
+ ANhIgG8dxlgD+JsLSViuP6xBX5+IxKNIaATb/0ApC+VMAKOn9vs7v5ebB86txgXjGR/nOVyPH6
+ PocCkTMR1+wfL2QScRUcue+gU1yO4hkhThCxAKoe9ppBBRGICdtRZthl22wYGtM1/MhFA0puM1
+ nGz+i81f29BJ0MlEZtp6///IcyxTd+qeybWBfFiXxLxyiJ+66DeaVMFXj2dzzFbNTv/5mZgqTQ
+ rIw=
+X-IronPort-AV: E=Sophos;i="5.70,467,1574118000"; 
+   d="scan'208";a="11051213"
+Received: from unknown (HELO tq-pgp-pr1.tq-net.de) ([192.168.6.15])
+  by mx1-pgp.tq-group.com with ESMTP; 21 Feb 2020 09:43:44 +0100
+Received: from mx1.tq-group.com ([192.168.6.7])
+  by tq-pgp-pr1.tq-net.de (PGP Universal service);
+  Fri, 21 Feb 2020 09:43:44 +0100
+X-PGP-Universal: processed;
+        by tq-pgp-pr1.tq-net.de on Fri, 21 Feb 2020 09:43:44 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1582274624; x=1613810624;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=oflfLwYqW5xFExYToNds3TpPpBbjgoa1J9+oBBMC8D4=;
+  b=UEJqXgOB148Nqx80QcL4FmjjfhdCTSc/QlekE1+uooidjzkmxPOZYvOl
+   tjY7CZ/xKaSfAqii5MQJo7/RfsGVz/0F/aPdILCz37i5CvSDKHzAtlT8Z
+   ZZF4HxsqKxRqF6kBwN/7Ifwe1pwqHGUIwOb3zdc7YZlMfxQy8hpooXu65
+   BtUDskF32YGADsFuU3iFgNmI+SC+x7Be95HID9EGfmnOtMay+5se3LLzy
+   ZkkjLi5DhdF8sZkGXHy+H2pv39C0lDwo87CgiF2Qu2Ay/HJNHLJZin+0r
+   wA3fl+39G+70Ms8SQYlE14GhGgRC6SUJvR49LAaUKMfrcmD4vzqUF3Amb
+   g==;
+IronPort-SDR: rTRCYoXQqhnGRFfeir1O7hIu2Cs2JQwqGtp4Nsz3f76Ax0PXoEo/CHuCPj2qdMeTkM5xAKdFkV
+ jxu2TReDm2mIX10N752Aq/g+c/gQyB845zY3D7v1bawchfR/vR1/AlfsJJESmDexofDCb+wPpb
+ EtBaGajN5/1QObbpgQVw0yWmf9NtupHz1TMhKtKsqXfPpitHUX6G+SVxKB7EDL/VcCBowOQ6Yz
+ 0cjWOxz62xMC48tLBfwGoTuy6sDIU+mdtYEDpKwRthmxsvZvXs2Q89KNm2K1Xal83hMXyJ5hCS
+ ZqQ=
+X-IronPort-AV: E=Sophos;i="5.70,467,1574118000"; 
+   d="scan'208";a="11051212"
+Received: from vtuxmail01.tq-net.de ([10.115.0.20])
+  by mx1.tq-group.com with ESMTP; 21 Feb 2020 09:43:44 +0100
+Received: from schifferm-ubuntu4.tq-net.de (schifferm-ubuntu4.tq-net.de [10.117.49.26])
+        by vtuxmail01.tq-net.de (Postfix) with ESMTPA id E277C280065;
+        Fri, 21 Feb 2020 09:43:45 +0100 (CET)
+Message-ID: <eca3c07767f2451590496bc890b235c8285f1a0b.camel@ew.tq-group.com>
+Subject: Re: [RFC] crypto: caam: re-init JR on resume
+From:   Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+To:     horia.geanta@nxp.com, aymen.sghaier@nxp.com
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Date:   Fri, 21 Feb 2020 09:43:41 +0100
+In-Reply-To: <20200203101850.22570-1-matthias.schiffer@ew.tq-group.com>
+References: <20200203101850.22570-1-matthias.schiffer@ew.tq-group.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5-0ubuntu0.18.04.1 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBIb3JpYSBHZWFudMSDIDxob3Jp
-YS5nZWFudGFAbnhwLmNvbT4NCj4gU2VudDogRnJpZGF5LCBGZWJydWFyeSAyMSwgMjAyMCAwOTo1
-Mg0KPiBUbzogSGVyYmVydCBYdSA8aGVyYmVydEBnb25kb3IuYXBhbmEub3JnLmF1Pg0KPiBDYzog
-RGF2aWQgUy4gTWlsbGVyIDxkYXZlbUBkYXZlbWxvZnQubmV0PjsgQXltZW4gU2doYWllcg0KPiA8
-YXltZW4uc2doYWllckBueHAuY29tPjsgVmFsZW50aW4gQ2lvY29pIFJhZHVsZXNjdQ0KPiA8dmFs
-ZW50aW4uY2lvY29pQG54cC5jb20+OyBsaW51eC1jcnlwdG9Admdlci5rZXJuZWwub3JnOyBkbC1s
-aW51eC1pbXgNCj4gPGxpbnV4LWlteEBueHAuY29tPg0KPiBTdWJqZWN0OiBbUEFUQ0hdIGNyeXB0
-bzogY2FhbS9xaTIgLSBmaXggY2hhY2hhMjAgZGF0YSBzaXplIGVycm9yDQo+IA0KPiBIVyBnZW5l
-cmF0ZXMgYSBEYXRhIFNpemUgZXJyb3IgZm9yIGNoYWNoYTIwIHJlcXVlc3RzIHRoYXQgYXJlIG5v
-dA0KPiBhIG11bHRpcGxlIG9mIDY0Qiwgc2luY2UgYWxnb3JpdGhtIHN0YXRlIChBUykgZG9lcyBu
-b3QgaGF2ZQ0KPiB0aGUgRklOQUwgYml0IHNldC4NCj4gDQo+IFNpbmNlIHVwZGF0aW5nIHJlcS0+
-aXYgKGZvciBjaGFpbmluZykgaXMgbm90IHJlcXVpcmVkLA0KPiBtb2RpZnkgc2tjaXBoZXIgZGVz
-Y3JpcHRvcnMgdG8gc2V0IHRoZSBGSU5BTCBiaXQgZm9yIGNoYWNoYTIwLg0KPiANCj4gW05vdGUg
-dGhhdCBmb3Igc2tjaXBoZXIgZGVjcnlwdGlvbiB3ZSBrbm93IHRoYXQgY3R4MV9pdl9vZmYgaXMg
-MCwNCj4gd2hpY2ggYWxsb3dzIGZvciBhbiBvcHRpbWl6YXRpb24gYnkgbm90IGNoZWNraW5nIGFs
-Z29yaXRobSB0eXBlLA0KPiBzaW5jZSBhcHBlbmRfZGVjX29wMSgpIHNldHMgRklOQUwgYml0IGZv
-ciBhbGwgYWxnb3JpdGhtcyBleGNlcHQgQUVTLl0NCj4gDQo+IEFsc28gZHJvcCB0aGUgZGVzY3Jp
-cHRvciBvcGVyYXRpb25zIHRoYXQgc2F2ZSB0aGUgSVYuDQo+IEhvd2V2ZXIsIGluIG9yZGVyIHRv
-IGtlZXAgY29kZSBsb2dpYyBzaW1wbGUsIHRoaW5ncyBsaWtlDQo+IFMvRyB0YWJsZXMgZ2VuZXJh
-dGlvbiBldGMuIGFyZSBub3QgdG91Y2hlZC4NCj4gDQo+IENjOiA8c3RhYmxlQHZnZXIua2VybmVs
-Lm9yZz4gIyB2NS4zKw0KPiBGaXhlczogMzM0ZDM3YzllMjYzICgiY3J5cHRvOiBjYWFtIC0gdXBk
-YXRlIElWIHVzaW5nIEhXIHN1cHBvcnQiKQ0KPiBTaWduZWQtb2ZmLWJ5OiBIb3JpYSBHZWFudMSD
-IDxob3JpYS5nZWFudGFAbnhwLmNvbT4NCg0KVGVzdGVkLWJ5OiBWYWxlbnRpbiBDaW9jb2kgUmFk
-dWxlc2N1IDx2YWxlbnRpbi5jaW9jb2lAbnhwLmNvbT4NCg0K
+On Mon, 2020-02-03 at 11:18 +0100, Matthias Schiffer wrote:
+> The JR loses its configuration during suspend-to-RAM (at least on
+> i.MX6UL). Re-initialize the hardware on resume.
+> 
+> Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+> ---
+> 
+> I've come across the issue that the CAAM would not work anymore after
+> deep sleep on i.MX6UL. It turned out that the CAAM loses its state
+> during suspend-to-RAM, so all registers read as zero and need to be
+> reinitialized.
+> 
+> This patch is my first attempt at fixing the issue. It seems to work
+> well enough, but I assume I'm missing some synchronization to prevent
+> that some CAAM operation is currently under way when the suspend
+> happens? I don't know the PM and crypto subsystems well enough to
+> judge
+> if this is possible, and if it is, how to prevent it.
+> 
+> I've only compile-tested this version of the patch, as I had to port
+> it
+> from our board kernel, which is based on the heavily-modified NXP
+> branch.
+
+It would be great to get some feedback on this patch. Is the hardware
+support to lose its state? Does my fix look correct?
+
+Kind regards,
+Matthias
+
+
+
+> 
+> 
+>  drivers/crypto/caam/intern.h |  3 ++
+>  drivers/crypto/caam/jr.c     | 62 +++++++++++++++++++++++++---------
+> --
+>  2 files changed, 46 insertions(+), 19 deletions(-)
+> 
+> diff --git a/drivers/crypto/caam/intern.h
+> b/drivers/crypto/caam/intern.h
+> index c7c10c90464b..5d2e9091d5c2 100644
+> --- a/drivers/crypto/caam/intern.h
+> +++ b/drivers/crypto/caam/intern.h
+> @@ -47,6 +47,9 @@ struct caam_drv_private_jr {
+>  	struct tasklet_struct irqtask;
+>  	int irq;			/* One per queue */
+>  
+> +	dma_addr_t inpbusaddr;
+> +	dma_addr_t outbusaddr;
+> +
+>  	/* Number of scatterlist crypt transforms active on the JobR */
+>  	atomic_t tfm_count ____cacheline_aligned;
+>  
+> diff --git a/drivers/crypto/caam/jr.c b/drivers/crypto/caam/jr.c
+> index fc97cde27059..2dabf5fd7818 100644
+> --- a/drivers/crypto/caam/jr.c
+> +++ b/drivers/crypto/caam/jr.c
+> @@ -418,13 +418,31 @@ int caam_jr_enqueue(struct device *dev, u32
+> *desc,
+>  }
+>  EXPORT_SYMBOL(caam_jr_enqueue);
+>  
+> +static void caam_jr_setup_rings(struct caam_drv_private_jr *jrp)
+> +{
+> +	jrp->out_ring_read_index = 0;
+> +	jrp->head = 0;
+> +	jrp->tail = 0;
+> +
+> +	wr_reg64(&jrp->rregs->inpring_base, jrp->inpbusaddr);
+> +	wr_reg64(&jrp->rregs->outring_base, jrp->outbusaddr);
+> +	wr_reg32(&jrp->rregs->inpring_size, JOBR_DEPTH);
+> +	wr_reg32(&jrp->rregs->outring_size, JOBR_DEPTH);
+> +
+> +	jrp->inpring_avail = JOBR_DEPTH;
+> +
+> +	/* Select interrupt coalescing parameters */
+> +	clrsetbits_32(&jrp->rregs->rconfig_lo, 0, JOBR_INTC |
+> +		      (JOBR_INTC_COUNT_THLD << JRCFG_ICDCT_SHIFT) |
+> +		      (JOBR_INTC_TIME_THLD << JRCFG_ICTT_SHIFT));
+> +}
+> +
+>  /*
+>   * Init JobR independent of platform property detection
+>   */
+>  static int caam_jr_init(struct device *dev)
+>  {
+>  	struct caam_drv_private_jr *jrp;
+> -	dma_addr_t inpbusaddr, outbusaddr;
+>  	int i, error;
+>  
+>  	jrp = dev_get_drvdata(dev);
+> @@ -434,13 +452,13 @@ static int caam_jr_init(struct device *dev)
+>  		return error;
+>  
+>  	jrp->inpring = dmam_alloc_coherent(dev, SIZEOF_JR_INPENTRY *
+> -					   JOBR_DEPTH, &inpbusaddr,
+> +					   JOBR_DEPTH, &jrp-
+> >inpbusaddr,
+>  					   GFP_KERNEL);
+>  	if (!jrp->inpring)
+>  		return -ENOMEM;
+>  
+>  	jrp->outring = dmam_alloc_coherent(dev, SIZEOF_JR_OUTENTRY *
+> -					   JOBR_DEPTH, &outbusaddr,
+> +					   JOBR_DEPTH, &jrp-
+> >outbusaddr,
+>  					   GFP_KERNEL);
+>  	if (!jrp->outring)
+>  		return -ENOMEM;
+> @@ -453,24 +471,9 @@ static int caam_jr_init(struct device *dev)
+>  	for (i = 0; i < JOBR_DEPTH; i++)
+>  		jrp->entinfo[i].desc_addr_dma = !0;
+>  
+> -	/* Setup rings */
+> -	jrp->out_ring_read_index = 0;
+> -	jrp->head = 0;
+> -	jrp->tail = 0;
+> -
+> -	wr_reg64(&jrp->rregs->inpring_base, inpbusaddr);
+> -	wr_reg64(&jrp->rregs->outring_base, outbusaddr);
+> -	wr_reg32(&jrp->rregs->inpring_size, JOBR_DEPTH);
+> -	wr_reg32(&jrp->rregs->outring_size, JOBR_DEPTH);
+> -
+> -	jrp->inpring_avail = JOBR_DEPTH;
+> -
+>  	spin_lock_init(&jrp->inplock);
+>  
+> -	/* Select interrupt coalescing parameters */
+> -	clrsetbits_32(&jrp->rregs->rconfig_lo, 0, JOBR_INTC |
+> -		      (JOBR_INTC_COUNT_THLD << JRCFG_ICDCT_SHIFT) |
+> -		      (JOBR_INTC_TIME_THLD << JRCFG_ICTT_SHIFT));
+> +	caam_jr_setup_rings(jrp);
+>  
+>  	tasklet_init(&jrp->irqtask, caam_jr_dequeue, (unsigned
+> long)dev);
+>  
+> @@ -486,6 +489,20 @@ static int caam_jr_init(struct device *dev)
+>  	return error;
+>  }
+>  
+> +static int caam_jr_reinit(struct device *dev)
+> +{
+> +	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
+> +	int error;
+> +
+> +	error = caam_reset_hw_jr(dev);
+> +	if (error)
+> +		return error;
+> +
+> +	caam_jr_setup_rings(jrp);
+> +
+> +	return 0;
+> +}
+> +
+>  static void caam_jr_irq_dispose_mapping(void *data)
+>  {
+>  	irq_dispose_mapping((unsigned long)data);
+> @@ -578,10 +595,17 @@ static const struct of_device_id
+> caam_jr_match[] = {
+>  };
+>  MODULE_DEVICE_TABLE(of, caam_jr_match);
+>  
+> +#ifdef CONFIG_PM
+> +static SIMPLE_DEV_PM_OPS(caam_jr_pm_ops, caam_reset_hw_jr,
+> caam_jr_reinit);
+> +#endif
+> +
+>  static struct platform_driver caam_jr_driver = {
+>  	.driver = {
+>  		.name = "caam_jr",
+>  		.of_match_table = caam_jr_match,
+> +#ifdef CONFIG_PM
+> +		.pm = &caam_jr_pm_ops,
+> +#endif
+>  	},
+>  	.probe       = caam_jr_probe,
+>  	.remove      = caam_jr_remove,
+
