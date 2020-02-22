@@ -2,147 +2,274 @@ Return-Path: <SRS0=tFxg=4K=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B22EC35641
-	for <linux-crypto@archiver.kernel.org>; Sat, 22 Feb 2020 01:53:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B894C35674
+	for <linux-crypto@archiver.kernel.org>; Sat, 22 Feb 2020 09:00:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 70B3920656
-	for <linux-crypto@archiver.kernel.org>; Sat, 22 Feb 2020 01:53:25 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mPktKWlv"
+	by mail.kernel.org (Postfix) with ESMTP id E956F21741
+	for <linux-crypto@archiver.kernel.org>; Sat, 22 Feb 2020 09:00:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1582362039;
+	bh=ID5ZHomWp6qMj0baZ6JmzNG3bQ+0NRPzPlFMypOUMPY=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=bxnk/LhAYtoFtVQ95blM+mzRjyU6Xg83VWjVjHhoLzaWdqQ5Wc7OBkY+X7s9uQ/D1
+	 Zb02BlB4q7r689HWhxnmJgemzWIjYMQ+casVqaSaSi4pcIEVxoWtLoOr8i18oUKWx9
+	 AM3Pa6RjeyLjxcF8I1MnBMGqbXq7IugsQA6eEeBE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727907AbgBVBxY (ORCPT
+        id S1727206AbgBVJAi (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 Feb 2020 20:53:24 -0500
-Received: from mail-pl1-f195.google.com ([209.85.214.195]:37718 "EHLO
-        mail-pl1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726842AbgBVBxY (ORCPT
+        Sat, 22 Feb 2020 04:00:38 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:33420 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727197AbgBVJAi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Feb 2020 20:53:24 -0500
-Received: by mail-pl1-f195.google.com with SMTP id c23so1637712plz.4
-        for <linux-crypto@vger.kernel.org>; Fri, 21 Feb 2020 17:53:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=t2WN9Y6i+1sMeMmerTg/sIx0hN9tYd17GbQLJc7KWJ4=;
-        b=mPktKWlv91J8zSVtP4T+e9BPp7EcbGwMkei5J/fBl3dBCAU7bzR0Gh9Hrdv25yYi9+
-         KU5dPtNWsjM864SJ4zW/iT/MwY+dXe6EBn0QPYv5gaUfd537Ik6FOLz1nio5+5SPCACT
-         H2zaNJsEkotdbxpnuzIDFodkNIKHUn62v1WuYFB7Flw6y4uugwe6ciVDBaAg/3DQTr7D
-         yOYIWYs2ParfrKfXw8THe7ekRhRjoaUOIX3j0RtXRMw4/Rq89Y6QFmzWMmwrbXk9G6ZW
-         YkPaP40q2o4cISWp+2fU2CXkLpsLcTJ/q7B27GoHMbSVvdbUrMMlVXIb/VXBqn2foHKb
-         ww8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=t2WN9Y6i+1sMeMmerTg/sIx0hN9tYd17GbQLJc7KWJ4=;
-        b=D3lIwnhhCHS8DumhT/ntPtkiT6ExbKmqYpn5H/Kjc14BvD/0FdmJkJmbFDbbGMec43
-         14wsmcy2Bd15rmQ5NRukyRMfcfCBpRlvscUqkjYSpkZRGWwh9xuGRt1trhFYWi+plYkd
-         zcmD6GBGRdw98RiwWt0tr+2Ym3Hqi90o4hUJhwk25OVL6Xfkl9tTxdfgeRPbcsf0pr8Y
-         T0UdLfE3w/LVQvCtSxBcCohOISimbqnsj4Euyg5p1iI4+mjC9Zi0qbBbnj8jOiBNcWua
-         /evKn7HQ5IKsTZFoWWtJJvwmj8X6LAnw1/BQ0MKIcwQ4wmODsG8cCdHh8//bsw2yFNUf
-         5zyw==
-X-Gm-Message-State: APjAAAXxmDOLXUVoDb6Ggg2pWE6mSoMqiMeKYrG+/l3Htc4hnBAf/pVe
-        rvti8ol7HDT1iFXtCLtQfV0gyw==
-X-Google-Smtp-Source: APXvYqzHrVqrmX9+Lk9w9FP91YPzkYcV0jkjab6rvQK3U4g9KuosSje8dbq9YgFdMYQh5L1aPjY6jQ==
-X-Received: by 2002:a17:90a:cf08:: with SMTP id h8mr6352327pju.81.1582336401930;
-        Fri, 21 Feb 2020 17:53:21 -0800 (PST)
-Received: from ?IPv6:240e:362:47d:ee00:e13e:da52:2837:6aff? ([240e:362:47d:ee00:e13e:da52:2837:6aff])
-        by smtp.gmail.com with ESMTPSA id 78sm1436422pge.58.2020.02.21.17.52.52
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 21 Feb 2020 17:53:21 -0800 (PST)
-Subject: Re: [PATCH v13 0/4] Add uacce module for Accelerator
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Arnd Bergmann <arnd@arndb.de>, jonathan.cameron@huawei.com,
-        dave.jiang@intel.com, grant.likely@arm.com,
-        jean-philippe <jean-philippe@linaro.org>,
-        Jerome Glisse <jglisse@redhat.com>,
-        ilias.apalodimas@linaro.org, francois.ozog@linaro.org,
-        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
-        "haojian . zhuang" <haojian.zhuang@linaro.org>,
-        guodong.xu@linaro.org, linux-accelerators@lists.ozlabs.org,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        iommu@lists.linux-foundation.org
-References: <1581407665-13504-1-git-send-email-zhangfei.gao@linaro.org>
- <20200222014148.GC19028@gondor.apana.org.au>
-From:   zhangfei <zhangfei.gao@linaro.org>
-Message-ID: <9048453c-530a-9063-b266-faa8d434015b@linaro.org>
-Date:   Sat, 22 Feb 2020 09:52:41 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.9.0
+        Sat, 22 Feb 2020 04:00:38 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Sender:Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
+        Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=xKgnMQO93QJQetvJpI62DMGjkTEPv/l40a5j0YbnJr8=; b=NtnuuFF07+ZS96sT5Tf7PbHvO4
+        c3WI1tUJs6LrFs7X4oonh7aOnlrQKtQjbz/rW3g3hIW1FAJktFRcf0XuNeCTvDEDDonQAAI80pqX5
+        egozeqx0HHxsfoPg18q/Ic0Of41D1HOewiwgHX1ONcH+JN1F66Tww4fRd76NO2yCoarSZnnG1BuWE
+        Sy8gkjT7GwbQv7Epfe3LxsSZELfXnePAODutVa1Qqh9j+5dMQmxQQX2v/NBPza6u6IUICcWsQDdUK
+        aZv2tdFKwZQcGann9ONdLmr8DQA7JbgQu0gI+XwpfrN6Mb8QfiWy6aHPHiWOXdrbACyAPZHghSNc4
+        sMAYifuw==;
+Received: from [80.156.29.194] (helo=bombadil.infradead.org)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1j5Qdz-0007Hr-C1; Sat, 22 Feb 2020 09:00:15 +0000
+Received: from mchehab by bombadil.infradead.org with local (Exim 4.92.3)
+        (envelope-from <mchehab@bombadil.infradead.org>)
+        id 1j5Qdx-001N4V-LF; Sat, 22 Feb 2020 10:00:13 +0100
+From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>
+Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        Corentin Labbe <clabbe.montjoie@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Maxime Ripard <mripard@kernel.org>,
+        Chen-Yu Tsai <wens@csie.org>, kvm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: [PATCH 5/7] docs: fix broken references for ReST files that moved around
+Date:   Sat, 22 Feb 2020 10:00:05 +0100
+Message-Id: <df38697632818443686a52340d6b38ef83cb0654.1582361738.git.mchehab+huawei@kernel.org>
+X-Mailer: git-send-email 2.24.1
+In-Reply-To: <cover.1582361737.git.mchehab+huawei@kernel.org>
+References: <cover.1582361737.git.mchehab+huawei@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20200222014148.GC19028@gondor.apana.org.au>
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Some broken references happened due to shifting files around
+and ReST renames. Those can't be auto-fixed by the script,
+so let's fix them manually.
 
+Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+---
+ Documentation/admin-guide/sysctl/kernel.rst         | 2 +-
+ Documentation/doc-guide/maintainer-profile.rst      | 2 +-
+ Documentation/virt/kvm/mmu.rst                      | 2 +-
+ Documentation/virt/kvm/review-checklist.rst         | 2 +-
+ arch/x86/kvm/mmu/mmu.c                              | 2 +-
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 2 +-
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c   | 2 +-
+ drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c | 2 +-
+ drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c   | 2 +-
+ drivers/media/v4l2-core/v4l2-fwnode.c               | 2 +-
+ include/uapi/linux/kvm.h                            | 4 ++--
+ tools/include/uapi/linux/kvm.h                      | 4 ++--
+ 12 files changed, 14 insertions(+), 14 deletions(-)
 
-On 2020/2/22 上午9:41, Herbert Xu wrote:
-> On Tue, Feb 11, 2020 at 03:54:21PM +0800, Zhangfei Gao wrote:
->> Uacce (Unified/User-space-access-intended Accelerator Framework) targets to
->> provide Shared Virtual Addressing (SVA) between accelerators and processes.
->> So accelerator can access any data structure of the main cpu.
->> This differs from the data sharing between cpu and io device, which share
->> data content rather than address.
->> Because of unified address, hardware and user space of process can share
->> the same virtual address in the communication.
->>
->> Uacce is intended to be used with Jean Philippe Brucker's SVA
->> patchset[1], which enables IO side page fault and PASID support.
->> We have keep verifying with Jean's sva patchset [2]
->> We also keep verifying with Eric's SMMUv3 Nested Stage patches [3]
->>
->> This series and related zip & qm driver
->> https://github.com/Linaro/linux-kernel-warpdrive/tree/v5.6-rc1-uacce-v13
->>
->> The library and user application:
->> https://github.com/Linaro/warpdrive/tree/wdprd-upstream-v13
->>
->>
->> Kenneth Lee (2):
->>    uacce: Add documents for uacce
->>    uacce: add uacce driver
->>
->> Zhangfei Gao (2):
->>    crypto: hisilicon - Remove module_param uacce_mode
->>    crypto: hisilicon - register zip engine to uacce
->>
->>   Documentation/ABI/testing/sysfs-driver-uacce |  39 ++
->>   Documentation/misc-devices/uacce.rst         | 176 ++++++
->>   drivers/crypto/hisilicon/qm.c                | 239 ++++++-
->>   drivers/crypto/hisilicon/qm.h                |  11 +
->>   drivers/crypto/hisilicon/zip/zip_main.c      |  49 +-
->>   drivers/misc/Kconfig                         |   1 +
->>   drivers/misc/Makefile                        |   1 +
->>   drivers/misc/uacce/Kconfig                   |  13 +
->>   drivers/misc/uacce/Makefile                  |   2 +
->>   drivers/misc/uacce/uacce.c                   | 617 +++++++++++++++++++
->>   include/linux/uacce.h                        | 161 +++++
->>   include/uapi/misc/uacce/hisi_qm.h            |  23 +
->>   include/uapi/misc/uacce/uacce.h              |  38 ++
->>   13 files changed, 1337 insertions(+), 33 deletions(-)
->>   create mode 100644 Documentation/ABI/testing/sysfs-driver-uacce
->>   create mode 100644 Documentation/misc-devices/uacce.rst
->>   create mode 100644 drivers/misc/uacce/Kconfig
->>   create mode 100644 drivers/misc/uacce/Makefile
->>   create mode 100644 drivers/misc/uacce/uacce.c
->>   create mode 100644 include/linux/uacce.h
->>   create mode 100644 include/uapi/misc/uacce/hisi_qm.h
->>   create mode 100644 include/uapi/misc/uacce/uacce.h
-> All applied.  Thanks.
-That's Great,
-Thanks Herbert for the great help.
-
+diff --git a/Documentation/admin-guide/sysctl/kernel.rst b/Documentation/admin-guide/sysctl/kernel.rst
+index 6c0d8c55101c..3b15ac13c8f3 100644
+--- a/Documentation/admin-guide/sysctl/kernel.rst
++++ b/Documentation/admin-guide/sysctl/kernel.rst
+@@ -51,7 +51,7 @@ free space valid for 30 seconds.
+ acpi_video_flags
+ ================
+ 
+-See Documentation/kernel/power/video.txt, it allows mode of video boot
++See Documentation/power/video.rst, it allows mode of video boot
+ to be set during run time.
+ 
+ 
+diff --git a/Documentation/doc-guide/maintainer-profile.rst b/Documentation/doc-guide/maintainer-profile.rst
+index 5afc0ddba40a..755d39f0d407 100644
+--- a/Documentation/doc-guide/maintainer-profile.rst
++++ b/Documentation/doc-guide/maintainer-profile.rst
+@@ -6,7 +6,7 @@ Documentation subsystem maintainer entry profile
+ The documentation "subsystem" is the central coordinating point for the
+ kernel's documentation and associated infrastructure.  It covers the
+ hierarchy under Documentation/ (with the exception of
+-Documentation/device-tree), various utilities under scripts/ and, at least
++Documentation/devicetree), various utilities under scripts/ and, at least
+ some of the time, LICENSES/.
+ 
+ It's worth noting, though, that the boundaries of this subsystem are rather
+diff --git a/Documentation/virt/kvm/mmu.rst b/Documentation/virt/kvm/mmu.rst
+index 60981887d20b..46126ecc70f7 100644
+--- a/Documentation/virt/kvm/mmu.rst
++++ b/Documentation/virt/kvm/mmu.rst
+@@ -319,7 +319,7 @@ Handling a page fault is performed as follows:
+ 
+  - If both P bit and R/W bit of error code are set, this could possibly
+    be handled as a "fast page fault" (fixed without taking the MMU lock).  See
+-   the description in Documentation/virt/kvm/locking.txt.
++   the description in Documentation/virt/kvm/locking.rst.
+ 
+  - if needed, walk the guest page tables to determine the guest translation
+    (gva->gpa or ngpa->gpa)
+diff --git a/Documentation/virt/kvm/review-checklist.rst b/Documentation/virt/kvm/review-checklist.rst
+index 1f86a9d3f705..dc01aea4057b 100644
+--- a/Documentation/virt/kvm/review-checklist.rst
++++ b/Documentation/virt/kvm/review-checklist.rst
+@@ -10,7 +10,7 @@ Review checklist for kvm patches
+ 2.  Patches should be against kvm.git master branch.
+ 
+ 3.  If the patch introduces or modifies a new userspace API:
+-    - the API must be documented in Documentation/virt/kvm/api.txt
++    - the API must be documented in Documentation/virt/kvm/api.rst
+     - the API must be discoverable using KVM_CHECK_EXTENSION
+ 
+ 4.  New state must include support for save/restore.
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 87e9ba27ada1..1b70373ee6c7 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3595,7 +3595,7 @@ static bool fast_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+ 		/*
+ 		 * Currently, fast page fault only works for direct mapping
+ 		 * since the gfn is not stable for indirect shadow page. See
+-		 * Documentation/virt/kvm/locking.txt to get more detail.
++		 * Documentation/virt/kvm/locking.rst to get more detail.
+ 		 */
+ 		fault_handled = fast_pf_fix_direct_spte(vcpu, sp,
+ 							iterator.sptep, spte,
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+index a5fd8975f3d3..a6abb701bfc6 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
+@@ -8,7 +8,7 @@
+  * This file add support for AES cipher with 128,192,256 bits keysize in
+  * CBC and ECB mode.
+  *
+- * You could find a link for the datasheet in Documentation/arm/sunxi/README
++ * You could find a link for the datasheet in Documentation/arm/sunxi.rst
+  */
+ 
+ #include <linux/crypto.h>
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
+index 3e4e4bbda34c..b957061424a1 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
+@@ -7,7 +7,7 @@
+  *
+  * Core file which registers crypto algorithms supported by the CryptoEngine.
+  *
+- * You could find a link for the datasheet in Documentation/arm/sunxi/README
++ * You could find a link for the datasheet in Documentation/arm/sunxi.rst
+  */
+ #include <linux/clk.h>
+ #include <linux/crypto.h>
+diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
+index 84d52fc3a2da..c89cb2ee2496 100644
+--- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
++++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
+@@ -8,7 +8,7 @@
+  * This file add support for AES cipher with 128,192,256 bits keysize in
+  * CBC and ECB mode.
+  *
+- * You could find a link for the datasheet in Documentation/arm/sunxi/README
++ * You could find a link for the datasheet in Documentation/arm/sunxi.rst
+  */
+ 
+ #include <linux/crypto.h>
+diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
+index 6b301afffd11..8ba4f9c81dac 100644
+--- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
++++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
+@@ -7,7 +7,7 @@
+  *
+  * Core file which registers crypto algorithms supported by the SecuritySystem
+  *
+- * You could find a link for the datasheet in Documentation/arm/sunxi/README
++ * You could find a link for the datasheet in Documentation/arm/sunxi.rst
+  */
+ #include <linux/clk.h>
+ #include <linux/crypto.h>
+diff --git a/drivers/media/v4l2-core/v4l2-fwnode.c b/drivers/media/v4l2-core/v4l2-fwnode.c
+index 6ece4320e1d2..b3e8d4c328a8 100644
+--- a/drivers/media/v4l2-core/v4l2-fwnode.c
++++ b/drivers/media/v4l2-core/v4l2-fwnode.c
+@@ -820,7 +820,7 @@ static int v4l2_fwnode_reference_parse(struct device *dev,
+  *
+  * THIS EXAMPLE EXISTS MERELY TO DOCUMENT THIS FUNCTION. DO NOT USE IT AS A
+  * REFERENCE IN HOW ACPI TABLES SHOULD BE WRITTEN!! See documentation under
+- * Documentation/acpi/dsd instead and especially graph.txt,
++ * Documentation/firmware-guide/acpi/dsd/ instead and especially graph.txt,
+  * data-node-references.txt and leds.txt .
+  *
+  *	Scope (\_SB.PCI0.I2C2)
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index 4b95f9a31a2f..e5f32fcec68f 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -116,7 +116,7 @@ struct kvm_irq_level {
+ 	 * ACPI gsi notion of irq.
+ 	 * For IA-64 (APIC model) IOAPIC0: irq 0-23; IOAPIC1: irq 24-47..
+ 	 * For X86 (standard AT mode) PIC0/1: irq 0-15. IOAPIC0: 0-23..
+-	 * For ARM: See Documentation/virt/kvm/api.txt
++	 * For ARM: See Documentation/virt/kvm/api.rst
+ 	 */
+ 	union {
+ 		__u32 irq;
+@@ -1100,7 +1100,7 @@ struct kvm_xen_hvm_config {
+  *
+  * KVM_IRQFD_FLAG_RESAMPLE indicates resamplefd is valid and specifies
+  * the irqfd to operate in resampling mode for level triggered interrupt
+- * emulation.  See Documentation/virt/kvm/api.txt.
++ * emulation.  See Documentation/virt/kvm/api.rst.
+  */
+ #define KVM_IRQFD_FLAG_RESAMPLE (1 << 1)
+ 
+diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
+index 4b95f9a31a2f..e5f32fcec68f 100644
+--- a/tools/include/uapi/linux/kvm.h
++++ b/tools/include/uapi/linux/kvm.h
+@@ -116,7 +116,7 @@ struct kvm_irq_level {
+ 	 * ACPI gsi notion of irq.
+ 	 * For IA-64 (APIC model) IOAPIC0: irq 0-23; IOAPIC1: irq 24-47..
+ 	 * For X86 (standard AT mode) PIC0/1: irq 0-15. IOAPIC0: 0-23..
+-	 * For ARM: See Documentation/virt/kvm/api.txt
++	 * For ARM: See Documentation/virt/kvm/api.rst
+ 	 */
+ 	union {
+ 		__u32 irq;
+@@ -1100,7 +1100,7 @@ struct kvm_xen_hvm_config {
+  *
+  * KVM_IRQFD_FLAG_RESAMPLE indicates resamplefd is valid and specifies
+  * the irqfd to operate in resampling mode for level triggered interrupt
+- * emulation.  See Documentation/virt/kvm/api.txt.
++ * emulation.  See Documentation/virt/kvm/api.rst.
+  */
+ #define KVM_IRQFD_FLAG_RESAMPLE (1 << 1)
+ 
+-- 
+2.24.1
 
