@@ -7,43 +7,47 @@ X-Spam-Status: No, score=-10.3 required=3.0
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F249AC35641
-	for <linux-crypto@archiver.kernel.org>; Sat, 22 Feb 2020 01:43:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7317C35669
+	for <linux-crypto@archiver.kernel.org>; Sat, 22 Feb 2020 01:43:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C538C207FD
-	for <linux-crypto@archiver.kernel.org>; Sat, 22 Feb 2020 01:43:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A902E206EF
+	for <linux-crypto@archiver.kernel.org>; Sat, 22 Feb 2020 01:43:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727896AbgBVBnU (ORCPT
+        id S1727893AbgBVBni (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 Feb 2020 20:43:20 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:52272 "EHLO fornost.hmeau.com"
+        Fri, 21 Feb 2020 20:43:38 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:52288 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727723AbgBVBnU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Feb 2020 20:43:20 -0500
+        id S1727723AbgBVBni (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 21 Feb 2020 20:43:38 -0500
 Received: from gwarestrin.me.apana.org.au ([192.168.0.7] helo=gwarestrin.arnor.me.apana.org.au)
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1j5Jp3-00031R-28; Sat, 22 Feb 2020 12:43:14 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 22 Feb 2020 12:43:12 +1100
-Date:   Sat, 22 Feb 2020 12:43:12 +1100
+        id 1j5Jp9-00032f-IU; Sat, 22 Feb 2020 12:43:20 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 22 Feb 2020 12:43:19 +1100
+Date:   Sat, 22 Feb 2020 12:43:19 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: img-hash - Replace zero-length array with
+Cc:     Krzysztof Kozlowski <krzk@kernel.org>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        Kamil Konieczny <k.konieczny@samsung.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-samsung-soc@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: s5p-sss - Replace zero-length array with
  flexible-array member
-Message-ID: <20200222014312.GG19028@gondor.apana.org.au>
-References: <20200213165054.GA11109@embeddedor>
+Message-ID: <20200222014319.GH19028@gondor.apana.org.au>
+References: <20200213172130.GA13395@embeddedor>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200213165054.GA11109@embeddedor>
+In-Reply-To: <20200213172130.GA13395@embeddedor>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Feb 13, 2020 at 10:50:54AM -0600, Gustavo A. R. Silva wrote:
+On Thu, Feb 13, 2020 at 11:21:30AM -0600, Gustavo A. R. Silva wrote:
 > The current codebase makes use of the zero-length array language
 > extension to the C90 standard, but the preferred mechanism to declare
 > variable-length types such as these ones is a flexible array member[1][2],
@@ -74,7 +78,7 @@ On Thu, Feb 13, 2020 at 10:50:54AM -0600, Gustavo A. R. Silva wrote:
 > 
 > Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
 > ---
->  drivers/crypto/img-hash.c | 2 +-
+>  drivers/crypto/s5p-sss.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Patch applied.  Thanks.
