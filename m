@@ -6,56 +6,67 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9686C35641
-	for <linux-crypto@archiver.kernel.org>; Sat, 22 Feb 2020 01:41:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44CABC35669
+	for <linux-crypto@archiver.kernel.org>; Sat, 22 Feb 2020 01:41:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B65C620722
-	for <linux-crypto@archiver.kernel.org>; Sat, 22 Feb 2020 01:41:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1124820722
+	for <linux-crypto@archiver.kernel.org>; Sat, 22 Feb 2020 01:41:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727859AbgBVBlg (ORCPT
+        id S1727686AbgBVBlr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 21 Feb 2020 20:41:36 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:52192 "EHLO fornost.hmeau.com"
+        Fri, 21 Feb 2020 20:41:47 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:52202 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727686AbgBVBlg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 21 Feb 2020 20:41:36 -0500
+        id S1726912AbgBVBlr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 21 Feb 2020 20:41:47 -0500
 Received: from gwarestrin.me.apana.org.au ([192.168.0.7] helo=gwarestrin.arnor.me.apana.org.au)
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1j5Jn3-0002t0-BW; Sat, 22 Feb 2020 12:41:10 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 22 Feb 2020 12:41:09 +1100
-Date:   Sat, 22 Feb 2020 12:41:09 +1100
+        id 1j5JnR-0002uz-Gc; Sat, 22 Feb 2020 12:41:34 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Sat, 22 Feb 2020 12:41:33 +1100
+Date:   Sat, 22 Feb 2020 12:41:33 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= 
-        <u.kleine-koenig@pengutronix.de>
-Cc:     Matt Mackall <mpm@selenic.com>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        kernel@pengutronix.de, NXP Linux Team <linux-imx@nxp.com>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] hwrng: imx-rngc: improve dependencies
-Message-ID: <20200222014109.GA19028@gondor.apana.org.au>
-References: <20200205140002.26273-1-u.kleine-koenig@pengutronix.de>
+To:     Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc:     Steffen Klassert <steffen.klassert@secunet.com>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] padata: fix uninitialized return value in
+ padata_replace()
+Message-ID: <20200222014133.GB19028@gondor.apana.org.au>
+References: <20200210181100.1288437-1-daniel.m.jordan@oracle.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200205140002.26273-1-u.kleine-koenig@pengutronix.de>
+In-Reply-To: <20200210181100.1288437-1-daniel.m.jordan@oracle.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Feb 05, 2020 at 03:00:02PM +0100, Uwe Kleine-König wrote:
-> The imx-rngc driver binds to devices that are compatible to
-> "fsl,imx25-rngb". Grepping through the device tree sources suggests this
-> only exists on i.MX25. So restrict dependencies to configs that have
-> this SoC enabled, but allow compile testing. For the latter additional
-> dependencies for clk and readl/writel are necessary.
+On Mon, Feb 10, 2020 at 01:11:00PM -0500, Daniel Jordan wrote:
+> According to Geert's report[0],
 > 
-> Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+>   kernel/padata.c: warning: 'err' may be used uninitialized in this
+>     function [-Wuninitialized]:  => 539:2
+> 
+> Warning is seen only with older compilers on certain archs.  The
+> runtime effect is potentially returning garbage down the stack when
+> padata's cpumasks are modified before any pcrypt requests have run.
+> 
+> Simplest fix is to initialize err to the success value.
+> 
+> [0] http://lkml.kernel.org/r/20200210135506.11536-1-geert@linux-m68k.org
+> 
+> Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> Fixes: bbefa1dd6a6d ("crypto: pcrypt - Avoid deadlock by using per-instance padata queues")
+> Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> Cc: Steffen Klassert <steffen.klassert@secunet.com>
+> Cc: linux-crypto@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
 > ---
->  drivers/char/hw_random/Kconfig | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+>  kernel/padata.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Patch applied.  Thanks.
 -- 
