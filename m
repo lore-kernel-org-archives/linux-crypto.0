@@ -2,105 +2,200 @@ Return-Path: <SRS0=tFxg=4K=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C4B5DC35671
-	for <linux-crypto@archiver.kernel.org>; Sat, 22 Feb 2020 19:02:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13D5CC35673
+	for <linux-crypto@archiver.kernel.org>; Sat, 22 Feb 2020 20:01:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9790420707
-	for <linux-crypto@archiver.kernel.org>; Sat, 22 Feb 2020 19:02:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1582398173;
-	bh=DpUM/OsF1FK0wRQ2NhZ1OXxzKYvkGiF6L8aCVgMDtOA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=19ftU4RUFIV2NP65snVwjD7FmWWCg+YdcGBlnFZkwa/j3v+IQSMPr92jUyp2VsMMt
-	 kAZQZ9YF9Fdij4vXDQuATVLT6QXv6h8gUySbPalE2H4UQb2gB8ovkbDmtj2MeORpnP
-	 chZQ7v6V3CXeokJeKlKA4MeLjvg20HdmOAXCTC3A=
+	by mail.kernel.org (Postfix) with ESMTP id E22A1208C4
+	for <linux-crypto@archiver.kernel.org>; Sat, 22 Feb 2020 20:01:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=protonmail.com header.i=@protonmail.com header.b="UdXKmzUu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726928AbgBVTCx (ORCPT
+        id S1726907AbgBVUBL (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 22 Feb 2020 14:02:53 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50100 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726550AbgBVTCw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 22 Feb 2020 14:02:52 -0500
-Received: from localhost (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E4A4F206EF;
-        Sat, 22 Feb 2020 19:02:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1582398172;
-        bh=DpUM/OsF1FK0wRQ2NhZ1OXxzKYvkGiF6L8aCVgMDtOA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=JrBLp1qVxkmorY9bHIuXnzxPpJ2ddR19kuinzPOhnrx4Sv2AUO2/0tWyPo6G9QsBo
-         o5A+L75o4/+JRQfRlXWnGZg8RwZ+Om2MH+L63l2bh4zP4Lm6fgaVyZ/fMvemTn/aTq
-         Cz6l5TryGnnh0fHEM6nZIA5Qi5nuUUeR35iSavuk=
-Date:   Sat, 22 Feb 2020 14:02:50 -0500
-From:   Sasha Levin <sashal@kernel.org>
-To:     Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        Eric Biggers <ebiggers@kernel.org>,
+        Sat, 22 Feb 2020 15:01:11 -0500
+Received: from mail-40131.protonmail.ch ([185.70.40.131]:13526 "EHLO
+        mail-40131.protonmail.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726550AbgBVUBL (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 22 Feb 2020 15:01:11 -0500
+Date:   Sat, 22 Feb 2020 20:00:59 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+        s=default; t=1582401668;
+        bh=9QTCFtpYa096BcF+fNJ+hFEpUdDElt7IQEIk4DEbu8Q=;
+        h=Date:To:From:Cc:Reply-To:Subject:Feedback-ID:From;
+        b=UdXKmzUu7Gi5seNkwIDeLnuW+YM0twYXl5lC4KsTW2NdfsR/GKPL61yxUPlMHnvaO
+         /k2uDlMfAaUmVWjahNU81RmYhYo/u0YVf6HavZMoh4QI3Uw15U3nVqedWKwqidDfm4
+         jmA98Tq5/2163O55NCtKoeFvTuS9RIaBYsksRTEE=
+To:     devicetree@vger.kernel.org
+From:   =?UTF-8?Q?N=C3=ADcolas_F=2E_R=2E_A=2E_Prado?= 
+        <nfraprado@protonmail.com>
+Cc:     Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 4.19 061/191] padata: always acquire cpu_hotplug_lock
- before pinst->lock
-Message-ID: <20200222190250.GD26320@sasha-vm>
-References: <20200221072250.732482588@linuxfoundation.org>
- <20200221072258.745173144@linuxfoundation.org>
- <20200222000045.cl45vclfhvkjursm@ca-dmjordan1.us.oracle.com>
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Nicolas Saenz Julienne <nsaenzjulienne@suse.de>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        bcm-kernel-feedback-list@broadcom.com,
+        linux-crypto@vger.kernel.org, linux-rpi-kernel@lists.infradead.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        lkcamp@lists.libreplanetbr.org
+Reply-To: =?UTF-8?Q?N=C3=ADcolas_F=2E_R=2E_A=2E_Prado?= 
+          <nfraprado@protonmail.com>
+Subject: [PATCH v2] dt-bindings: rng: Convert BCM2835 to DT schema
+Message-ID: <20200222200037.3203931-1-nfraprado@protonmail.com>
+Feedback-ID: cwTKJQq-dqva77NrgNeIaWzOvcDQqfI9VSy7DoyJdvgY6-nEE7fD-E-3GiKFHexW4OBWbzutmMZN6q4SflMDRw==:Ext:ProtonMail
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20200222000045.cl45vclfhvkjursm@ca-dmjordan1.us.oracle.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Feb 21, 2020 at 07:00:45PM -0500, Daniel Jordan wrote:
->On Fri, Feb 21, 2020 at 08:40:34AM +0100, Greg Kroah-Hartman wrote:
->> From: Daniel Jordan <daniel.m.jordan@oracle.com>
->>
->> [ Upstream commit 38228e8848cd7dd86ccb90406af32de0cad24be3 ]
->>
->> lockdep complains when padata's paths to update cpumasks via CPU hotplug
->> and sysfs are both taken:
->>
->>   # echo 0 > /sys/devices/system/cpu/cpu1/online
->>   # echo ff > /sys/kernel/pcrypt/pencrypt/parallel_cpumask
->>
->>   ======================================================
->>   WARNING: possible circular locking dependency detected
->>   5.4.0-rc8-padata-cpuhp-v3+ #1 Not tainted
->>   ------------------------------------------------------
->>   bash/205 is trying to acquire lock:
->>   ffffffff8286bcd0 (cpu_hotplug_lock.rw_sem){++++}, at: padata_set_cpumask+0x2b/0x120
->>
->>   but task is already holding lock:
->>   ffff8880001abfa0 (&pinst->lock){+.+.}, at: padata_set_cpumask+0x26/0x120
->>
->>   which lock already depends on the new lock.
->
->I think this patch should be dropped from all stable queues (4.4, 4.9, 4.14,
->4.19, 5.4, and 5.5).
->
->The main benefit is to un-break lockdep for testing with future padata changes,
->and an actual deadlock seems unlikely.
->
->These stable versions don't fix the ordering in padata_remove_cpu() either
->(nothing calls it though).
->
->I tried the other stable padata patch in this cycle ("padata: validate cpumask
->without removed CPU during offline"), it passed my tests and should stay in.
+Convert BCM2835/6368 Random number generator bindings to DT schema.
 
-I've dropped it, thanks.
+Signed-off-by: N=C3=ADcolas F. R. A. Prado <nfraprado@protonmail.com>
+---
 
--- 
+Changes in v2:
+- Remove description for common properties
+- Drop label from example
+
+This patch was tested with:
+make ARCH=3Darm dt_binding_check
+make ARCH=3Darm DT_SCHEMA_FILES=3DDocumentation/devicetree/bindings/rng/brc=
+m,bcm2835.yaml dtbs_check
+
 Thanks,
-Sasha
+N=C3=ADcolas
+
+ .../devicetree/bindings/rng/brcm,bcm2835.txt  | 40 -------------
+ .../devicetree/bindings/rng/brcm,bcm2835.yaml | 59 +++++++++++++++++++
+ 2 files changed, 59 insertions(+), 40 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/rng/brcm,bcm2835.txt
+ create mode 100644 Documentation/devicetree/bindings/rng/brcm,bcm2835.yaml
+
+diff --git a/Documentation/devicetree/bindings/rng/brcm,bcm2835.txt b/Docum=
+entation/devicetree/bindings/rng/brcm,bcm2835.txt
+deleted file mode 100644
+index aaac7975f61c..000000000000
+--- a/Documentation/devicetree/bindings/rng/brcm,bcm2835.txt
++++ /dev/null
+@@ -1,40 +0,0 @@
+-BCM2835/6368 Random number generator
+-
+-Required properties:
+-
+-- compatible : should be one of
+-=09"brcm,bcm2835-rng"
+-=09"brcm,bcm-nsp-rng"
+-=09"brcm,bcm5301x-rng" or
+-=09"brcm,bcm6368-rng"
+-- reg : Specifies base physical address and size of the registers.
+-
+-Optional properties:
+-
+-- clocks : phandle to clock-controller plus clock-specifier pair
+-- clock-names : "ipsec" as a clock name
+-
+-Optional properties:
+-
+-- interrupts: specify the interrupt for the RNG block
+-
+-Example:
+-
+-rng {
+-=09compatible =3D "brcm,bcm2835-rng";
+-=09reg =3D <0x7e104000 0x10>;
+-=09interrupts =3D <2 29>;
+-};
+-
+-rng@18033000 {
+-=09compatible =3D "brcm,bcm-nsp-rng";
+-=09reg =3D <0x18033000 0x14>;
+-};
+-
+-random: rng@10004180 {
+-=09compatible =3D "brcm,bcm6368-rng";
+-=09reg =3D <0x10004180 0x14>;
+-
+-=09clocks =3D <&periph_clk 18>;
+-=09clock-names =3D "ipsec";
+-};
+diff --git a/Documentation/devicetree/bindings/rng/brcm,bcm2835.yaml b/Docu=
+mentation/devicetree/bindings/rng/brcm,bcm2835.yaml
+new file mode 100644
+index 000000000000..42d9a38e4e1a
+--- /dev/null
++++ b/Documentation/devicetree/bindings/rng/brcm,bcm2835.yaml
+@@ -0,0 +1,59 @@
++# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/rng/brcm,bcm2835.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: BCM2835/6368 Random number generator
++
++maintainers:
++  - Stefan Wahren <stefan.wahren@i2se.com>
++  - Florian Fainelli <f.fainelli@gmail.com>
++  - Herbert Xu <herbert@gondor.apana.org.au>
++
++properties:
++  compatible:
++    enum:
++      - brcm,bcm2835-rng
++      - brcm,bcm-nsp-rng
++      - brcm,bcm5301x-rng
++      - brcm,bcm6368-rng
++
++  reg:
++    maxItems: 1
++
++  clocks:
++    maxItems: 1
++
++  clock-names:
++    const: ipsec
++
++  interrupts:
++    maxItems: 1
++
++required:
++  - compatible
++  - reg
++
++examples:
++  - |
++    rng {
++        compatible =3D "brcm,bcm2835-rng";
++        reg =3D <0x7e104000 0x10>;
++        interrupts =3D <2 29>;
++    };
++
++  - |
++    rng@18033000 {
++        compatible =3D "brcm,bcm-nsp-rng";
++        reg =3D <0x18033000 0x14>;
++    };
++
++  - |
++    rng@10004180 {
++        compatible =3D "brcm,bcm6368-rng";
++        reg =3D <0x10004180 0x14>;
++
++        clocks =3D <&periph_clk 18>;
++        clock-names =3D "ipsec";
++    };
+--=20
+2.25.0
+
+
