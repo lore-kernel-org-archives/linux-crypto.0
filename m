@@ -2,224 +2,171 @@ Return-Path: <SRS0=uNUm=4L=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71DB7C35671
-	for <linux-crypto@archiver.kernel.org>; Sun, 23 Feb 2020 15:07:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E71BC35675
+	for <linux-crypto@archiver.kernel.org>; Sun, 23 Feb 2020 20:23:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 497F020637
-	for <linux-crypto@archiver.kernel.org>; Sun, 23 Feb 2020 15:07:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 086BE206E2
+	for <linux-crypto@archiver.kernel.org>; Sun, 23 Feb 2020 20:23:17 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="tvp3bzOB"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727106AbgBWPHs convert rfc822-to-8bit (ORCPT
+        id S1727151AbgBWUXQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 23 Feb 2020 10:07:48 -0500
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2969 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726208AbgBWPHs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 23 Feb 2020 10:07:48 -0500
-Received: from dggeml405-hub.china.huawei.com (unknown [172.30.72.54])
-        by Forcepoint Email with ESMTP id 24FA44E78D2DE86FD79A;
-        Sun, 23 Feb 2020 23:06:10 +0800 (CST)
-Received: from DGGEML511-MBX.china.huawei.com ([169.254.1.89]) by
- dggeml405-hub.china.huawei.com ([10.3.17.49]) with mapi id 14.03.0439.000;
- Sun, 23 Feb 2020 23:06:01 +0800
-From:   "Gonglei (Arei)" <arei.gonglei@huawei.com>
-To:     LABBE Corentin <clabbe@baylibre.com>
-CC:     "jasowang@redhat.com" <jasowang@redhat.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "mst@redhat.com" <mst@redhat.com>,
-        "Liujinsong (Paul)" <liu.jinsong@huawei.com>
-Subject: RE: [CRASH] crypto: virtio: crash when modprobing tcrypt on 5.5-rc7
- / next-20200122
-Thread-Topic: [CRASH] crypto: virtio: crash when modprobing tcrypt on
- 5.5-rc7 / next-20200122
-Thread-Index: AQHV0dVNhsJsLHebl0+mdNNoLPAyfKgKTXoAgBnNFYCABPE9UA==
-Date:   Sun, 23 Feb 2020 15:06:00 +0000
-Message-ID: <33183CC9F5247A488A2544077AF19020DF4B2ED4@dggeml511-mbx.china.huawei.com>
-References: <20200123101000.GB24255@Red>
- <20200204041419-mutt-send-email-mst@kernel.org> <20200220191553.GA30549@Red>
-In-Reply-To: <20200220191553.GA30549@Red>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.133.225.234]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 8BIT
+        Sun, 23 Feb 2020 15:23:16 -0500
+Received: from mail-wr1-f67.google.com ([209.85.221.67]:33778 "EHLO
+        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727170AbgBWUXQ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 23 Feb 2020 15:23:16 -0500
+Received: by mail-wr1-f67.google.com with SMTP id u6so7986025wrt.0
+        for <linux-crypto@vger.kernel.org>; Sun, 23 Feb 2020 12:23:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=WofHtOBEwg5RRwOmOmC0T+5slXnmFdDtINSsQoPTxEQ=;
+        b=tvp3bzOBDD1a0rT/H5FPrvTS67GL8HxhcVCiDXboMOo0IL3CvqHjft+vfj1E6w0OtZ
+         o+Aa+qBBcuQgkTUaTlYtNSUbYxecdav0vtavkbRLOVlPc7JSYFIT/DUxyIoQkGAc4Roz
+         23P0U8T/9dDy3c4ICsHxcnR5LlK7oHGrjzBK2CyKDnSubM33ipYDK6uIau6LvmdeQRVg
+         vjV6AFpiRvD43Xcsr1TSwiB5qlHRpv4ADg+7JCGURg83OWAlObkVGR2L7RFMittgw1E0
+         ddz2CMrHDrIztr7dkxnzLobuCfp/iGQsoqE8QHeY/4H44P984PgzkFb7gFbIBNzYg+LE
+         BJDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=WofHtOBEwg5RRwOmOmC0T+5slXnmFdDtINSsQoPTxEQ=;
+        b=kE+5IVrLO0/O2GUhxmldczxtdHycEpZpvzH2McFtjkbIYoc5ix6Edw8q/cxB0BDQ9f
+         jx4T257fIxCOAZmAypu0xjoqEgfWuHpbwggEWhjCEqrxMkGsWOHYSzRcoE+98XAW3sMR
+         ceD788WcNPwMXIxCFvJCdoC6vzd6/lhDHteAjCJWYR/b56xcDPXz5LPHt8ch1dsv+Saq
+         3YWUERXbp3o2sPxtwRYuahYMlW9Se7P595Afzul+7YZPZjhONecIQ5wjG9a5FCyTj2le
+         +oDGDT5tjoCpberF9RpDGa7NVJJxpsoHfwIWdQaFP1FvH+sqL6Ca+EDlow0ZjAYC/X8f
+         ID1g==
+X-Gm-Message-State: APjAAAW4l0NGydmWZ5tpdvrlGMg5OMKAvpsU4UfXMenuPRGHR2heJ550
+        5wJSPT3Hfe3cScE2ze0FI4n54Q==
+X-Google-Smtp-Source: APXvYqy/nGfq15ltsFwGAj27YM5HjyJ6Dk9ko42U66ibw34/ft2BRh0sfe8nxBNyV6Sm+74wWCegNQ==
+X-Received: by 2002:adf:edd0:: with SMTP id v16mr61052137wro.310.1582489391606;
+        Sun, 23 Feb 2020 12:23:11 -0800 (PST)
+Received: from Red ([2a01:cb1d:3d5:a100:2e56:dcff:fed2:c6d6])
+        by smtp.googlemail.com with ESMTPSA id n8sm14284572wrx.42.2020.02.23.12.23.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 23 Feb 2020 12:23:10 -0800 (PST)
+Date:   Sun, 23 Feb 2020 21:23:08 +0100
+From:   LABBE Corentin <clabbe@baylibre.com>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+Cc:     Tero Kristo <t-kristo@ti.com>,
+        linux-omap <linux-omap@vger.kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>, dmitry.kasatkin@nokia.com,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [CRASH] crypto: omap: kernel panic when modprobing tcrypt
+Message-ID: <20200223202308.GA28683@Red>
+References: <20200123085312.GA24255@Red>
+ <f8bdce6e-9dff-6dbf-e084-c5508b5493e5@ti.com>
+ <20200220195221.GA17341@Red>
+ <CAKv+Gu-8pGa7QODPKQv_BAqWiq14X=YN4+43Mw6SX2pDK2fLrg@mail.gmail.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu-8pGa7QODPKQv_BAqWiq14X=YN4+43Mw6SX2pDK2fLrg@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
-> -----Original Message-----
-> From: LABBE Corentin [mailto:clabbe@baylibre.com]
-> Sent: Friday, February 21, 2020 3:16 AM
-> To: Gonglei (Arei) <arei.gonglei@huawei.com>
-> Cc: jasowang@redhat.com; herbert@gondor.apana.org.au;
-> davem@davemloft.net; virtualization@lists.linux-foundation.org;
-> linux-crypto@vger.kernel.org; linux-kernel@vger.kernel.org; mst@redhat.com
-> Subject: Re: [CRASH] crypto: virtio: crash when modprobing tcrypt on 5.5-rc7 /
-> next-20200122
-> 
-> On Tue, Feb 04, 2020 at 04:15:22AM -0500, Michael S. Tsirkin wrote:
-> > On Thu, Jan 23, 2020 at 11:10:00AM +0100, LABBE Corentin wrote:
-> > > Hello
-> > >
-> > > When modprobing tcrypt on qemu 4.1.0 I get a kernel panic on 5.5-rc7
-> > > and next-20200122 qemu is started by:
-> > > /usr/bin/qemu-system-x86_64 -cpu host -enable-kvm -nographic -net
-> > > nic,model=e1000,macaddr=52:54:00:12:34:58 -net tap -m 512 -monitor
-> > > none -object cryptodev-backend-builtin,id=cryptodev0 -device
-> > > virtio-crypto-pci,id=crypto0,cryptodev=cryptodev0 -append
-> > > 'console=ttyS0 root=/dev/ram0 ip=dhcp' -kernel
-> > > /var/lib/lava/dispatcher/tmp/41332/deployimages-td18675m/kernel/bzIm
-> > > age -initrd
-> > > /var/lib/lava/dispatcher/tmp/41332/deployimages-td18675m/ramdisk/roo
-> > > tfs.cpio.gz -drive
-> > > format=qcow2,file=/var/lib/lava/dispatcher/tmp/41332/apply-overlay-g
-> > > uest-icy4k1ol/lava-guest.qcow2,media=disk,if=ide,id=lavatest
-> > >
-> > > [  112.771925] general protection fault: 0000 [#1] SMP PTI [
-> > > 112.772686] CPU: 0 PID: 126 Comm: virtio0-engine Not tainted
-> > > 5.5.0-rc7+ #1 [  112.773576] Hardware name: QEMU Standard PC (i440FX
-> > > + PIIX, 1996), BIOS
-> > > ?-20190711_202441-buildvm-armv7-10.arm.fedoraproject.org-2.fc31
-> > > 04/01/2014 [  112.775319] RIP: 0010:sg_next+0x0/0x20 [  112.775821]
-> > > Code: cc cc cc cc cc cc cc cc cc cc c7 47 10 00 00 00 00 89 57 0c 48
-> > > 89 37 89 4f 08 c3 0f 1f 44 00 00 66 2e 0f 1f 84 00 00 00 00 00 <f6>
-> > > 07 02 75 17 48 8b 57 20 48 8d 47 20 48 89 d1 48 83 e1 fc 83 e2 [
-> > > 112.778330] RSP: 0018:ffffa92440237d90 EFLAGS: 00010006 [
-> > > 112.779071] RAX: fefefefe00000000 RBX: 000000000000000a RCX:
-> > > fefefefe00000000 [  112.780081] RDX: 0000000000000001 RSI:
-> > > ffff9b19da1a2180 RDI: fefefefe00000000 [  112.781081] RBP:
-> > > ffff9b19da1a2198 R08: ffff9b19dfb24ee8 R09: 0000000000000a20 [
-> > > 112.782079] R10: ffff9b19da125010 R11: 0000000000000000 R12:
-> ffff9b19da1a21b8 [  112.783079] R13: 0000000000000003 R14:
-> ffff9b19da1a2180 R15: 0000000000000004 [  112.784077] FS:
-> 0000000000000000(0000) GS:ffff9b19de400000(0000)
-> knlGS:0000000000000000 [  112.785202] CS:  0010 DS: 0000 ES: 0000 CR0:
-> 0000000080050033 [  112.786030] CR2: 00007f18a157b050 CR3:
-> 000000001040a004 CR4: 0000000000060ef0 [  112.787034] Call Trace:
-> > > [  112.787393]  virtqueue_add_sgs+0x4c/0x90 [  112.787998]
-> > > virtio_crypto_skcipher_crypt_req+0x310/0x3e0
-> > > [  112.788817]  crypto_pump_work+0x10c/0x240 [  112.789420]  ?
-> > > __kthread_init_worker+0x50/0x50 [  112.790082]
-> > > kthread_worker_fn+0x89/0x180 [  112.790690]  kthread+0x10e/0x130 [
-> > > 112.791182]  ? kthread_park+0x80/0x80 [  112.791736]
-> > > ret_from_fork+0x35/0x40 [  112.792282] Modules linked in: cts lzo
-> > > salsa20_generic camellia_x86_64 camellia_generic fcrypt pcbc tgr192
-> > > anubis wp512 khazad tea michael_mic arc4 cast6_generic cast5_generic
-> > > cast_common deflate sha512_ssse3 sha512_generic cfb ofb
-> > > serpent_sse2_x86_64 serpent_generic lrw twofish_x86_64_3way
-> > > twofish_x86_64 crypto_simd cryptd glue_helper twofish_generic
-> > > twofish_common blowfish_x86_64 blowfish_generic blowfish_common md4
-> > > tcrypt(+) [  112.797652] ---[ end trace 4a8142d4a08c2518 ]--- [
-> > > 112.798320] RIP: 0010:sg_next+0x0/0x20 [  112.798865] Code: cc cc cc
-> > > cc cc cc cc cc cc cc c7 47 10 00 00 00 00 89 57 0c 48 89 37 89 4f 08
-> > > c3 0f 1f 44 00 00 66 2e 0f 1f 84 00 00 00 00 00 <f6> 07 02 75 17 48
-> > > 8b 57 20 48 8d 47 20 48 89 d1 48 83 e1 fc 83 e2 [  112.801452] RSP:
-> > > 0018:ffffa92440237d90 EFLAGS: 00010006 [  112.802189] RAX:
-> > > fefefefe00000000 RBX: 000000000000000a RCX: fefefefe00000000 [
-> > > 112.803190] RDX: 0000000000000001 RSI: ffff9b19da1a2180 RDI:
-> > > fefefefe00000000 [  112.804192] RBP: ffff9b19da1a2198 R08:
-> > > ffff9b19dfb24ee8 R09: 0000000000000a20 [  112.805201] R10:
-> > > ffff9b19da125010 R11: 0000000000000000 R12: ffff9b19da1a21b8 [
-> > > 112.806195] R13: 0000000000000003 R14: ffff9b19da1a2180 R15:
-> > > 0000000000000004 [  112.807222] FS:  0000000000000000(0000)
-> > > GS:ffff9b19de400000(0000) knlGS:0000000000000000 [  112.808352] CS:
-> > > 0010 DS: 0000 ES: 0000 CR0: 0000000080050033 [  112.809169] CR2:
-> > > 00007f18a157b050 CR3: 000000001040a004 CR4: 0000000000060ef0
-> > >
-> > > I have tested also 5.4.14
-> > > and I got random freeze with:
-> > > qemu-system-x86_64: virtio: zero sized buffers are not allowed
-> > >
-> > > Regards
+On Thu, Feb 20, 2020 at 10:13:06PM +0100, Ard Biesheuvel wrote:
+> On Thu, 20 Feb 2020 at 20:52, LABBE Corentin <clabbe@baylibre.com> wrote:
 > >
-> > Cc: Gonglei <arei.gonglei@huawei.com>
+> > On Thu, Jan 23, 2020 at 01:59:21PM +0200, Tero Kristo wrote:
+> > > Hi,
+> > >
+> > > Linux-next has huge pile of fixes in place for omap-crypto, so I would
+> > > not recommend testing any older kernels. You are saying -next crashes in
+> > > similar manner though? TI internal kernel has couple of additional fixes
+> > > against 5.4 stable, but can't see why those would help on this. If you
+> > > have spare time, you could try it out though [1].
+> > >
+> > > Today's next doesn't compile for me at all for some reason (some tooling
+> > > failure) so can't really test it myself right now.
+> > >
+> > > -Tero
+> > >
+> > > [1]
+> > > https://git.ti.com/cgit/ti-linux-kernel/ti-linux-kernel/log/?h=ti-linux-5.4.y
+> > >
 > >
+> > I have tested this branch and loading tcrypt lead to a kernel panic
 > 
-> Hello Gonglei
+> Hi Corentin,
 > 
-> Any plan to fix the driver ? It is broken since its introduction.
+> It would be helpful if you could paste the entire error message.
 > 
-Thanks for your report firstly.
-I've been busy launching new products recently, so I don't have much time
-to invest in the open source community. 
 
-I spent some time investigating the BUG this weekend, 
-and IMO I found the root cause. The following patch, please help test it, thanks!
+Hello
 
-[PATCH] virtio-crypto: fix src/dst scatterlist calculation
+I dont understand, the following trace is the entire error message I get on the console.
 
-Usually the next entry of one sg will be @sg@ + 1, but if this sg element
-is part of a chained scatterlist, it could jump to the start of a new
-scatterlist array. Let's fix it by sg_next() on calculation of src/dst
-scatterlist.
-
-BTW I add a check for sg_nents_for_len() its return value since
-sg_nents_for_len() function could fail.
-
-Signed-off-by: Gonglei <arei.gonglei@huawei.com>
----
- drivers/crypto/virtio/virtio_crypto_algs.c | 20 ++++++++++++++++----
- 1 file changed, 16 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/crypto/virtio/virtio_crypto_algs.c b/drivers/crypto/virtio/virtio_crypto_algs.c
-index fd045e64..bde0539 100644
---- a/drivers/crypto/virtio/virtio_crypto_algs.c
-+++ b/drivers/crypto/virtio/virtio_crypto_algs.c
-@@ -355,8 +355,14 @@ static int virtio_crypto_skcipher_setkey(struct crypto_skcipher *tfm,
- 	unsigned int num_out = 0, num_in = 0;
- 	int sg_total;
- 	uint8_t *iv;
-+	struct scatterlist *sg;
- 
- 	src_nents = sg_nents_for_len(req->src, req->cryptlen);
-+	if (src_nents < 0) {
-+		pr_err("Invalid number of src SG.\n");
-+		return src_nents;
-+	}
-+
- 	dst_nents = sg_nents(req->dst);
- 
- 	pr_debug("virtio_crypto: Number of sgs (src_nents: %d, dst_nents: %d)\n",
-@@ -442,12 +448,18 @@ static int virtio_crypto_skcipher_setkey(struct crypto_skcipher *tfm,
- 	vc_sym_req->iv = iv;
- 
- 	/* Source data */
--	for (i = 0; i < src_nents; i++)
--		sgs[num_out++] = &req->src[i];
-+	sg = req->src;
-+	for (i = 0; sg && i < src_nents; sg = sg_next(sg)) {
-+		i++;
-+		sgs[num_out++] = sg;
-+	}
- 
- 	/* Destination data */
--	for (i = 0; i < dst_nents; i++)
--		sgs[num_out + num_in++] = &req->dst[i];
-+	sg = req->dst;
-+	for (i = 0; sg && i < dst_nents; sg = sg_next(sg)) {
-+		i++;
-+		sgs[num_out + num_in++] = sg;
-+	}
- 
- 	/* Status */
- 	sg_init_one(&status_sg, &vc_req->status, sizeof(vc_req->status));
--- 
-1.8.3.1
-
-
-Regards
--Gonglei
+> 
+> > [  105.664062] Internal error: Oops: 17 [#1] SMP ARM
+> > [  105.668792] Modules linked in: vmac xcbc streebog_generic sm3_generic sha3_generic crct10dif_generic crct10dif_common seed rmd320 rmd256 rmd160 rmd128 cts ccm salsa20_generic camellia_generic fcrypt pcbc tgr192 anubis wp512 khazad tea michael_mic arc4 libarc4 cast6_generic cast5_generic cast_common sha512_arm sha512_generic cfb ofb ux500_cryp aes_arm serpent_generic lrw twofish_generic twofish_common blowfish_generic blowfish_common md4 tcrypt(+) ghash_generic gf128mul gcm sha256_generic libsha256 hmac md5 des_generic ctr sha1_arm_neon sha1_arm phy_generic aes_arm_bs crypto_simd cryptd sha1_generic omap_aes_driver omap_sham omap2430 ehci_omap omap_des omap_crypto libdes phy_twl6030_usb musb_hdrc
+> > [  105.730743] CPU: 0 PID: 0 Comm: swapper/0 Tainted: G        W         5.4.20-00513-gd274af0de6bd #2
+> > [  105.730743] Hardware name: Generic OMAP4 (Flattened Device Tree)
+> > [  105.745849] PC is at omap_sham_finish_req+0x10/0x190 [omap_sham]
+> > [  105.745880] LR is at omap_sham_done_task+0x58/0x118 [omap_sham]
+> > [  105.757843] pc : [<bf04d054>]    lr : [<bf04d63c>]    psr: 20000113
+> > [  105.764129] sp : c1701da8  ip : 00000000  fp : ffffe000
+> > [  105.769378] r10: c557b268  r9 : 00000040  r8 : c167d100
+> > [  105.774627] r7 : c1894b44  r6 : 00000000  r5 : c5622200  r4 : 00000000
+> > [  105.781188] r3 : 00000008  r2 : 000002b3  r1 : 00000000  r0 : c5622200
+> > [  105.781188] Flags: nzCv  IRQs on  FIQs on  Mode SVC_32  ISA ARM  Segment none
+> > [  105.787750] Control: 10c5387d  Table: 854d004a  DAC: 00000051
+> > [  105.787750] Process swapper/0 (pid: 0, stack limit = 0xd5fffd75)
+> > [  105.806701] Stack: (0xc1701da8 to 0xc1702000)
+> > [  105.806701] 1da0:                   c557b240 00000000 ef55b318 c1894b44 c167d100 bf04d63c
+> > [  105.819305] 1dc0: 00000000 c528bab8 c557b264 00000000 ef55b318 c034d8c8 c5544040 00000006
+> > [  105.827514] 1de0: c1701efc c1703098 00000007 00000040 00000006 ffffe000 c1894b44 00000100
+> > [  105.827514] 1e00: c1703080 c0302298 c1704e48 00000001 c1672388 c167d100 c1704e6c 0000000a
+> > [  105.827514] 1e20: c1672314 ffffb416 c1703d00 c0f07470 00200002 eea7a668 00000000 ffffe000
+> > [  105.852142] 1e40: 00000000 00000000 00000001 ee824000 fa241100 c18ec14c 00000000 c034e018
+> > [  105.860351] 1e60: c167d098 c039be58 c1705528 c1774e04 fa24010c fa240100 c1701ea0 c06e816c
+> > [  105.860351] 1e80: c0c98518 60000113 ffffffff c1701ed4 ef5655b0 c1700000 c18ec14c c0301a8c
+> > [  105.876800] 1ea0: 00000000 c170e1e8 2dee9000 00000050 c170e1e8 00000000 00000000 c1895418
+> > [  105.885009] 1ec0: ef5655b0 00000000 c18ec14c 00000000 ee6b2800 c1701ef0 c0c984f0 c0c98518
+> > [  105.885009] 1ee0: 60000113 ffffffff 00000051 00000000 9a103e82 00000018 9a0fc74d 00000018
+> > [  105.901428] 1f00: 00000018 c167c5a8 ef569b40 c529a5c4 ef5655b0 c170e1e8 ffffffff ffff0000
+> > [  105.909637] 1f20: ffffe000 c18ec14c c529a580 c0c9ae0c 00000002 c1704e6c fe687d92 ef5655b0
+> > [  105.909637] 1f40: c170e1e8 00000002 00000001 ef5655b0 c1704e48 c167c5a8 c170e1e8 c0c989b4
+> > [  105.926086] 1f60: ffffe000 c1704e6c c1704eb0 c03770ec c18944b2 00000002 01000000 f99d40c3
+> > [  105.934295] 1f80: c15dea3c 000000cd c18a0594 00000001 c18a0540 00000000 00000001 c15dea3c
+> > [  105.934295] 1fa0: ef585280 c037741c c1704e48 c1500ea8 ffffffff ffffffff 00000000 c1500664
+> > [  105.934295] 1fc0: 00000000 c15dea3c f99844d7 00000000 00000000 c1500330 00000051 10c0387d
+> > [  105.958923] 1fe0: 00000ae7 83f00000 411fc092 10c5387d 00000000 00000000 00000000 00000000
+> > [  105.967163] [<bf04d054>] (omap_sham_finish_req [omap_sham]) from [<bf04d63c>] (omap_sham_done_task+0x58/0x118 [omap_sham])
+> > [  105.978271] [<bf04d63c>] (omap_sham_done_task [omap_sham]) from [<c034d8c8>] (tasklet_action_common.constprop.5+0x70/0x174)
+> > [  105.978271] [<c034d8c8>] (tasklet_action_common.constprop.5) from [<c0302298>] (__do_softirq+0x130/0x3b4)
+> > [  105.999053] [<c0302298>] (__do_softirq) from [<c034e018>] (irq_exit+0xcc/0xd8)
+> > [  106.006317] [<c034e018>] (irq_exit) from [<c039be58>] (__handle_domain_irq+0x60/0xb4)
+> > [  106.014190] [<c039be58>] (__handle_domain_irq) from [<c06e816c>] (gic_handle_irq+0x58/0x9c)
+> > [  106.022613] [<c06e816c>] (gic_handle_irq) from [<c0301a8c>] (__irq_svc+0x6c/0x90)
+> > [  106.022613] Exception stack(0xc1701ea0 to 0xc1701ee8)
+> > [  106.022613] 1ea0: 00000000 c170e1e8 2dee9000 00000050 c170e1e8 00000000 00000000 c1895418
+> > [  106.043395] 1ec0: ef5655b0 00000000 c18ec14c 00000000 ee6b2800 c1701ef0 c0c984f0 c0c98518
+> > [  106.043395] 1ee0: 60000113 ffffffff
+> > [  106.055114] [<c0301a8c>] (__irq_svc) from [<c0c98518>] (cpuidle_enter_state+0x180/0x5b8)
+> > [  106.063262] [<c0c98518>] (cpuidle_enter_state) from [<c0c9ae0c>] (cpuidle_enter_state_coupled+0x144/0x3c8)
+> > [  106.072967] [<c0c9ae0c>] (cpuidle_enter_state_coupled) from [<c0c989b4>] (cpuidle_enter+0x50/0x54)
+> > [  106.081970] [<c0c989b4>] (cpuidle_enter) from [<c03770ec>] (do_idle+0x218/0x294)
+> > [  106.081970] [<c03770ec>] (do_idle) from [<c037741c>] (cpu_startup_entry+0x18/0x1c)
+> > [  106.097015] [<c037741c>] (cpu_startup_entry) from [<c1500ea8>] (start_kernel+0x480/0x4b0)
+> > [  106.097015] Code: e92d41f0 e1a05000 e5904040 e1a06001 (e59430bc)
+> > [  106.111358] ---[ end trace 53e3b1ecd80eac62 ]---
+> > [  106.115997] Kernel panic - not syncing: Fatal exception in interrupt
+> > [  106.115997] SMP: failed to stop secondary CPUs
+> > [  106.115997] ---[ end Kernel panic - not syncing: Fatal exception in interrupt ]---
