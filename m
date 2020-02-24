@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEC02C11D30
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Feb 2020 16:41:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F845C11D30
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Feb 2020 17:16:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7FD1E20836
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Feb 2020 16:41:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 39BA520880
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Feb 2020 17:16:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bx7n5fAi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E2kHgHUH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727706AbgBXQlF (ORCPT
+        id S1727090AbgBXRQ3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 24 Feb 2020 11:41:05 -0500
-Received: from mail-wm1-f68.google.com ([209.85.128.68]:52654 "EHLO
-        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727730AbgBXQlF (ORCPT
+        Mon, 24 Feb 2020 12:16:29 -0500
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:42788 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727746AbgBXRQ2 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Feb 2020 11:41:05 -0500
-Received: by mail-wm1-f68.google.com with SMTP id p9so9647756wmc.2;
-        Mon, 24 Feb 2020 08:41:04 -0800 (PST)
+        Mon, 24 Feb 2020 12:16:28 -0500
+Received: by mail-wr1-f66.google.com with SMTP id p18so7678698wre.9;
+        Mon, 24 Feb 2020 09:16:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=0SHuRI7Htiab/lxIwL+TUGdCTRz+weTd4Cb1gMPoztA=;
-        b=Bx7n5fAi5y0A78UMbnC291WL1mtT2tW3thmm78okwPEsIVq8CB3JKSO5Wia73SUUIn
-         cjVkbPBjrqQBNVpB494itItVk7YaSz7CpCeil+VIiVAQOP5K8556a2On5Q4icSQpv3gX
-         A3Vmm0ixj+kgxDQmkkykP2ZGvy6NgnZpTlS+y/AREspXoo44T80ks77cBWtq/YIXPXM2
-         d3xcP7nP6f8EdvN9tBXouRgYj1CReS43ZRGlFuLDw8SKgr1sgy8tRbYM/zWl6v15eFFb
-         j1HjfAVtpiBIIz+1vSk+xInR55tYZbZB+1DPxG03H3qODjgxF0CtpJsR7MAOAqssmTii
-         dKZg==
+        bh=0mUehRl6KMNyxPy2WBMaLDkn8cB+64Jlo40lEAysQVs=;
+        b=E2kHgHUHZYFsu4ArMDd4YgaJnRYKXqg8RXElwRek/AS2KEntghEVplQNAcQti8+QYa
+         rgxez2p0woWT2m/Ys7GaVR7bLGVp6QvLSdlXWSiC+0aJ2rEkKD3cifLSilvFe/r/iYWO
+         rkyGwVoOhKMB7M6toZl/8D9psgbqaADgxzuqYKe9kCN4e3fxXhvaM3iMP1tYr5WmVQ5t
+         r0jOy+vG67yYgM8T9v7gh5oLkfl6qZc8Ahthf3WMefV5aKjhyfWxKy5D5SjEnJzaFo9f
+         eJ/Q2MmuZOIq+uylv93xouAuCnZEwsR/gg+yM4qfGgh2AOkjFdp4lKQayaRfmgc//bwc
+         OwbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=0SHuRI7Htiab/lxIwL+TUGdCTRz+weTd4Cb1gMPoztA=;
-        b=D+Rq7ytttUqpBRbeaS+2de2jGNgkknAzQtXUN39cUju/62BCPQbp5j5jcFZp3yq/UF
-         xabakAuCXHAVNjpK3dBpm1GBjkzJoCeZR74yC0NwvFKJdhJ4vKhA5v5YqoacAjvNR+zX
-         LDhqvHux0Yj1Dok49KxG8bflPgtABw4YZiK/oXCKlmVNqlZ47+/MgXvBqrWFCg4QjETF
-         G2fKj+u6VKTceNn2qZ7RYFOV+SIToFajxjnm0YhewYMHQ95poyCDmdPAKv5oXcxddh1e
-         CG0fVZlV2fYyIoT9hnYMkQjTfFhWTvp62hEkzrER+/Gx5NhgUETxJ3OrPWlrXpFFHhW/
-         ymAQ==
-X-Gm-Message-State: APjAAAX02DC9rddntdadloVBUCKjfnQ2Kg5DWl1p49Q/YZR45jvevZne
-        3Iq+f6FOGTOMwFBZQZcMhhXCtrMUJgkUYuHjuxE=
-X-Google-Smtp-Source: APXvYqxrOtpqEkpmpIMD54OftRmmsSkpjPZ+BwkaEN0EGpARQI/6S1ogW7Hl0PbK9QvOTD3GowfLOM9zKdj7/qzG47Y=
-X-Received: by 2002:a7b:cd1a:: with SMTP id f26mr21672341wmj.184.1582562463700;
- Mon, 24 Feb 2020 08:41:03 -0800 (PST)
+        bh=0mUehRl6KMNyxPy2WBMaLDkn8cB+64Jlo40lEAysQVs=;
+        b=nEq56RScbod6X9PTM44GzVuAtVX93XFfQre72cRXI8fqN2V+0X/iBY8ZpaYyZTKnY+
+         cNi3C5KRCBj2H6D/TLZwCmx9KLtNG0iA2YHijHGPRclHEJGyrW4YOSZWipNidnMboZwj
+         oy5V17l8CziZg+15tjzRZIOVmLSCRfYai70gOZM4FVHQnTjkoRO5+X+0LDJwd31Ej6dp
+         ltSfAgKZGlS39mwj+4c7yZp8gSI+P5k+87LUKRMrAmDc6jWFzWWxuaTwpE8ssxdy81fa
+         Y9M3kx/zi59jt3SZBOw3oHzNyyzx/hr+FhIbpGHtsxNi5na+CmeuBXmVudNe27hkSxTj
+         pX/g==
+X-Gm-Message-State: APjAAAU8Rgv915phJmYm7icEOu7od2I3Qz540R050LQtvBp/l5n9rD+Y
+        0pI7pzaA04z5VxFdd4zj2jssBXbhJPYJCv+sOhg=
+X-Google-Smtp-Source: APXvYqyYs34kxyM1cQUafvzz2HLWMvmqs3efpVNtCRIY34M1tXu+q5qXU2FMmODfmEHBzQsVh9zoKosyUtXRmIs7/x8=
+X-Received: by 2002:adf:fac9:: with SMTP id a9mr3637820wrs.232.1582564585869;
+ Mon, 24 Feb 2020 09:16:25 -0800 (PST)
 MIME-Version: 1.0
 References: <20200127165646.19806-1-andrew.smirnov@gmail.com>
- <20200127165646.19806-5-andrew.smirnov@gmail.com> <VI1PR0402MB3485A733C0A6B57E129A339198180@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-In-Reply-To: <VI1PR0402MB3485A733C0A6B57E129A339198180@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <20200127165646.19806-6-andrew.smirnov@gmail.com> <VI1PR0402MB348549DDA8FE2EEB436D3F09981B0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+In-Reply-To: <VI1PR0402MB348549DDA8FE2EEB436D3F09981B0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
 From:   Andrey Smirnov <andrew.smirnov@gmail.com>
-Date:   Mon, 24 Feb 2020 08:40:52 -0800
-Message-ID: <CAHQ1cqE7ivNQLYrHo1Jt4S-z7traCJr=NYNTUxmTHHtJJjyNwQ@mail.gmail.com>
-Subject: Re: [PATCH v7 4/9] crypto: caam - drop global context pointer and init_done
+Date:   Mon, 24 Feb 2020 09:16:14 -0800
+Message-ID: <CAHQ1cqGYEubQMS2y7nPnTo=Bbs=97ojCu6OjyNkc6dcVO_w_cA@mail.gmail.com>
+Subject: Re: [PATCH v7 5/9] crypto: caam - simplify RNG implementation
 To:     Horia Geanta <horia.geanta@nxp.com>
 Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         Chris Healy <cphealy@gmail.com>,
@@ -74,49 +74,127 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Feb 11, 2020 at 12:57 PM Horia Geanta <horia.geanta@nxp.com> wrote:
+On Wed, Feb 12, 2020 at 5:20 AM Horia Geanta <horia.geanta@nxp.com> wrote:
 >
 > On 1/27/2020 6:57 PM, Andrey Smirnov wrote:
-> > @@ -70,6 +70,7 @@ struct buf_data {
+> > Rework CAAM RNG implementation as follows:
 > >
-> >  /* rng per-device context */
-> >  struct caam_rng_ctx {
-> > +     struct hwrng rng;
-> >       struct device *jrdev;
-> >       dma_addr_t sh_desc_dma;
-> >       u32 sh_desc[DESC_RNG_LEN];
-> > @@ -78,13 +79,10 @@ struct caam_rng_ctx {
-> >       struct buf_data bufs[2];
-> >  };
+> > - Make use of the fact that HWRNG supports partial reads and will
+> > handle such cases gracefully by removing recursion in caam_read()
 > >
-> > -static struct caam_rng_ctx *rng_ctx;
-> > -
-> > -/*
-> > - * Variable used to avoid double free of resources in case
-> > - * algorithm registration was unsuccessful
-> > - */
-> > -static bool init_done;
-> > +static struct caam_rng_ctx *to_caam_rng_ctx(struct hwrng *r)
-> > +{
-> > +     return container_of(r, struct caam_rng_ctx, rng);
-> > +}
-> [...]
-> > -static struct hwrng caam_rng = {
-> > -     .name           = "rng-caam",
-> > -     .init           = caam_init,
-> > -     .cleanup        = caam_cleanup,
-> > -     .read           = caam_read,
-> > -};
-> [...]> +        ctx->rng.name    = "rng-caam";
-> > +     ctx->rng.init    = caam_init;
-> > +     ctx->rng.cleanup = caam_cleanup;
-> > +     ctx->rng.read    = caam_read;
-> An alternative (probably better) for storing caamrng context
-> is to use what is already available in struct hwrng:
->  * @priv:               Private data, for use by the RNG driver.
+> > - Convert blocking caam_read() codepath to do a single blocking job
+> > read directly into requested buffer, bypassing any intermediary
+> > buffers
+> >
+> > - Convert async caam_read() codepath into a simple single
+> > reader/single writer FIFO use-case, thus simplifying concurrency
+> > handling and delegating buffer read/write position management to KFIFO
+> > subsystem.
+> >
+> > - Leverage the same low level RNG data extraction code for both async
+> > and blocking caam_read() scenarios, get rid of the shared job
+> > descriptor and make non-shared one as a simple as possible (just
+> > HEADER + ALGORITHM OPERATION + FIFO STORE)
+> >
+> > - Split private context from DMA related memory, so that the former
+> > could be allocated without GFP_DMA.
+> >
+> > NOTE: On its face value this commit decreased throughput numbers
+> > reported by
+> >
+> >   dd if=/dev/hwrng of=/dev/null bs=1 count=100K [iflag=nonblock]
+> >
+> > by about 15%, however commits that enable prediction resistance and
+> Running dd as mentioned above, on a i.MX8MM board I see:
+> ~ 20% decrease in non-blocking case (525 kB/s vs. 662 kB/s)
+> ~ 75% decrease in blocking case (170 kB/s vs. 657 kB/s)
+>
+> bs=1 is a bit drastic.
+> Using bs=16 the numbers look better in terms of overall speed,
+> however the relative degradation is still there:
+> ~ 66% decrease in blocking case (3.5 MB/s vs. 10.1 MB/s)
+>
+> > limit JR total size impact the performance so much and move the
+> > bottleneck such as to make this regression irrelevant.
+> >
+> Yes, performance is greatly impacted by moving from a DRBG configuration
+> to a TRNG one.
+>
+> The speed that I get with this patch set (1.3 kB/s)
+> is ~ 20% lower than theoretical output (1.583 kB/s) (see below).
+> Seeing this and also the relative decrease in case of DRBG
+> makes me wonder whether the SW overhead could be lowered.
+>
+> Theoretical TRNG output speed in this configuration
+> can be computed as:
+> Speed = (SZ x CAAM_CLK_FREQ) / (RTSDCTL[ENT_DLY] x RTSDCTL[SAMP_SIZE]) [bps]
+>
+> SZ is sample taken from the DRBG, b/w two consecutive reseedings.
+> As previously discussed, this is limited to 128 bits (16 bytes),
+> such that the DRBG behaves as a TRNG.
+>
+> If:
+> -CAAM_CLK_FREQ = 166 MHz (as for i.MXM*)
+> -RTSDCTL[ENT_DLY] = 3200 clocks (default / POR value)
+> -RTSDCTL[SAMP_SIZE] = 512 (recommended; default / POR value is 2500)
+> then theoretical speed is 1.583 kB/s.
+>
+> > @@ -45,38 +22,34 @@
+> >  #include "jr.h"
+> >  #include "error.h"
+> >
+> > +/* length of descriptors */
+> This comment is misplaced, length of descriptors (CAAM_RNG_DESC_LEN)
+> is further below.
+>
+> > +#define CAAM_RNG_MAX_FIFO_STORE_SIZE U16_MAX
+> > +
+> > +#define CAAM_RNG_FIFO_LEN            SZ_32K /* Must be a multiple of 2 */
+> > +
+> >  /*
+> > - * Maximum buffer size: maximum number of random, cache-aligned bytes that
+> > - * will be generated and moved to seq out ptr (extlen not allowed)
+> > + * See caam_init_desc()
+> >   */
+> > -#define RN_BUF_SIZE                  (0xffff / L1_CACHE_BYTES * \
+> > -                                      L1_CACHE_BYTES)
+> > +#define CAAM_RNG_DESC_LEN (CAAM_CMD_SZ +                             \
+> > +                        CAAM_CMD_SZ +                                \
+> > +                        CAAM_CMD_SZ + CAAM_PTR_SZ_MAX)
+>
+> > +typedef u8 caam_rng_desc[CAAM_RNG_DESC_LEN];
+> Is this really necessary?
 >
 
-OK, will do in v8.
+Will drop in v8.
+
+> > -static int caam_read(struct hwrng *rng, void *data, size_t max, bool wait)
+> > +static int caam_rng_read_one(struct device *jrdev,
+> > +                          void *dst, int len,
+> > +                          void *desc,
+> > +                          struct completion *done)
+> [...]
+> > +     len = min_t(int, len, CAAM_RNG_MAX_FIFO_STORE_SIZE);
+> For the blocking case, i.e. caam_read() -> caam_rng_read_one(),
+> "len" is at least 32B - cf. include/linux/hw_random.h:
+>  * @read:               New API. drivers can fill up to max bytes of data
+>  *                      into the buffer. The buffer is aligned for any type
+>  *                      and max is a multiple of 4 and >= 32 bytes.
+>
+> For reducing the SW overhead, it might be worth optimizing this path.
+> For example, considering
+> min_t(int, len, CAAM_RNG_MAX_FIFO_STORE_SIZE) = CAAM_RNG_MAX_FIFO_STORE_SIZE
+
+This isn't true until next commit. Here CAAM_RNG_MAX_FIFO_STORE_SIZE
+is still 32K, so "len" is going to be smaller. I'll update the code to
+assume fixed length once CAAM_RNG_MAX_FIFO_STORE_SIZE becomes 16
+bytes.
+
+> this means length is fixed, thus also ctx->desc[DESC_SYNC] descriptor is fixed
+> and its generation could be moved out of the hot path.
+
+That descriptor also includes DMA address of a buffer we are given, so
+the descriptor is never fixed.
 
 Thanks,
 Andrey Smirnov
