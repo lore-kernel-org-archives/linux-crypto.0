@@ -2,304 +2,126 @@ Return-Path: <SRS0=ApwQ=4M=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98E1CC11D2F
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Feb 2020 16:18:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B71FBC11D2F
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Feb 2020 16:37:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5369720838
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Feb 2020 16:18:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 86EF320836
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Feb 2020 16:37:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="OHU2Pf21"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OyK0PgTu"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727479AbgBXQSO (ORCPT
+        id S1727438AbgBXQhk (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 24 Feb 2020 11:18:14 -0500
-Received: from gateway21.websitewelcome.com ([192.185.45.38]:42831 "EHLO
-        gateway21.websitewelcome.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727901AbgBXQSN (ORCPT
+        Mon, 24 Feb 2020 11:37:40 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:51431 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727160AbgBXQhk (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Feb 2020 11:18:13 -0500
-Received: from cm12.websitewelcome.com (cm12.websitewelcome.com [100.42.49.8])
-        by gateway21.websitewelcome.com (Postfix) with ESMTP id 10ABF400C7432
-        for <linux-crypto@vger.kernel.org>; Mon, 24 Feb 2020 10:18:12 -0600 (CST)
-Received: from gator4166.hostgator.com ([108.167.133.22])
-        by cmsmtp with SMTP
-        id 6GQujYaLZvBMd6GQujUnoa; Mon, 24 Feb 2020 10:18:12 -0600
-X-Authority-Reason: nr=8
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=embeddedor.com; s=default; h=Content-Type:MIME-Version:Message-ID:Subject:
-        Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=BK34gbLB0O61efyzvyQ9e7T52/oWtRmHRLRXHAw2v7A=; b=OHU2Pf21ilVR4MIoRzfIuodi0t
-        pC+s5ssxjXj8L3bE0xKBCzGGycCO0QybaEiSs0oa/u4/UXDHzCU82ejg2pXvoxO8l4vsTETQ3uWss
-        fxKalF60rtAuTQNT9lFIWavUT3LzGwO1hgYvNuc9GpNEFlLTWFZnvzR+6N2HOUwBmEXJeIhUZciQl
-        5epUOHZpAs7Ae3uniNt4jskl/P1ZENzz4i0NtOuJtErWQJ/rbMHxAaP/RUl9R4UWnvw00KGPHYTaH
-        cSAagkMPtII9V80o5IQ1FUjs4xwqa4cqFwCsDaYJhSs8msYuP2hb01LXn37DfcZQoQGkodd1LvYky
-        WuUVvmiQ==;
-Received: from [200.68.140.135] (port=11044 helo=embeddedor)
-        by gator4166.hostgator.com with esmtpa (Exim 4.92)
-        (envelope-from <gustavo@embeddedor.com>)
-        id 1j6GQr-002hbl-Rj; Mon, 24 Feb 2020 10:18:09 -0600
-Date:   Mon, 24 Feb 2020 10:21:00 -0600
-From:   "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-To:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Atul Gupta <atul.gupta@chelsio.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        Breno =?iso-8859-1?Q?Leit=E3o?= <leitao@debian.org>,
-        Nayna Jain <nayna@linux.ibm.com>,
-        Paulo Flabiano Smorigo <pfsmorigo@gmail.com>,
-        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
-        Paul Mackerras <paulus@samba.org>,
-        Michael Ellerman <mpe@ellerman.id.au>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Subject: [PATCH] crypto: Replace zero-length array with flexible-array member
-Message-ID: <20200224162100.GA25697@embeddedor>
+        Mon, 24 Feb 2020 11:37:40 -0500
+Received: by mail-wm1-f68.google.com with SMTP id t23so9640377wmi.1;
+        Mon, 24 Feb 2020 08:37:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=G+aCWrTPtazwLlxUW4Ddtt63F9Ca8NXitPxy5zGxSeo=;
+        b=OyK0PgTuu8fZ6LWuZ+3xulzUbpo6OkLEHg5JQCENw1b0M3fbmycMihPs93zkd4g5Ip
+         6zUV3hF0GXG8uun2UldTFXG7dSb3ET1ASbVPw2A7sw38RPRA4C9hrEZzG8/kvgu50uyd
+         iJvZJRooEICcStMF8z8Aezj9eQM5Mw293VUUj/fsbAkJgtKjGHD9mTCpikqyZZIfW4Gn
+         FT5CmFQYYmNGDbXI9RyYjHeUmsqoWo6XjFkgYtSuPDBoMdeIPwN3ytRNq6sEEXWM5IVf
+         uFuZxFka9JOmO2uNGtwA6uPVvgsRuccqNw4AHCGPw8X7NuLGyo1pAOZ6UUPW4pRl0XDt
+         DxbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=G+aCWrTPtazwLlxUW4Ddtt63F9Ca8NXitPxy5zGxSeo=;
+        b=uJIQWfxqDKicuAaRhbS/DUBwxnRj7tpCj45FyapevJ/8YOfHHBJTkeCj2868YLf27L
+         TyOvEWPJR8KQm1DZpWO/JgXOkPbjUO8IexuFtD5oBXltoLO9ouNvpR+ehVM5OOcVyuqq
+         KsXEzlzlsnSUvRfd/npsdSZq35372EPyWmDwagU/0gZZxYIzxtbqmG4/iuVsSEOiXfvz
+         5V7kRKngy700gGbHHRrLrB71T3E9ivHR2KqOL+trC5Sl1qFMFFuz6dGiRsDWQoWBEFiK
+         iYTr+bhXWqbt9SukaA6thn8oAUSCfqloa5KOxnwzLV8t71jhEIv2N8a3Le/qgqR4BI0D
+         GU+Q==
+X-Gm-Message-State: APjAAAXoOxLmP2z+GMdA4QZoEl1f9+hiEi7OqCB2PJMrTvttV6nf/AMb
+        j+3qOrkjeUoxJ+3RvWQyqg8ROvh0j4DrCyQPJuQ=
+X-Google-Smtp-Source: APXvYqypeNv5N1UPqLrdNY1QVTfMCrOJzcCdwq3nCvUSqZP/cKgLDJ52UQni4EZNo2D8GxsZtIZcJ6xTcainQzr/3EA=
+X-Received: by 2002:a05:600c:217:: with SMTP id 23mr22797412wmi.124.1582562258838;
+ Mon, 24 Feb 2020 08:37:38 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 200.68.140.135
-X-Source-L: No
-X-Exim-ID: 1j6GQr-002hbl-Rj
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: (embeddedor) [200.68.140.135]:11044
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 32
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
+References: <20200127165646.19806-1-andrew.smirnov@gmail.com>
+ <20200127165646.19806-7-andrew.smirnov@gmail.com> <VI1PR0402MB34857006B42E8F0DAFECC514981B0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+In-Reply-To: <VI1PR0402MB34857006B42E8F0DAFECC514981B0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+From:   Andrey Smirnov <andrew.smirnov@gmail.com>
+Date:   Mon, 24 Feb 2020 08:37:27 -0800
+Message-ID: <CAHQ1cqHDotfJVUM9+Dk7=LyFxDhSWmud66HiZSzbZkKtn9R0Ug@mail.gmail.com>
+Subject: Re: [PATCH v7 6/9] crypto: caam - check if RNG job failed
+To:     Horia Geanta <horia.geanta@nxp.com>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Chris Healy <cphealy@gmail.com>,
+        Lucas Stach <l.stach@pengutronix.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        dl-linux-imx <linux-imx@nxp.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The current codebase makes use of the zero-length array language
-extension to the C90 standard, but the preferred mechanism to declare
-variable-length types such as these ones is a flexible array member[1][2],
-introduced in C99:
+On Wed, Feb 12, 2020 at 2:41 AM Horia Geanta <horia.geanta@nxp.com> wrote:
+>
+> On 1/27/2020 6:57 PM, Andrey Smirnov wrote:
+> > @@ -60,12 +65,12 @@ static struct caam_rng_ctx *to_caam_rng_ctx(struct hwrng *r)
+> >  static void caam_rng_done(struct device *jrdev, u32 *desc, u32 err,
+> >                         void *context)
+> >  {
+> > -     struct completion *done = context;
+> > +     struct caam_rng_job_ctx *jctx = context;
+> >
+> >       if (err)
+> > -             caam_jr_strstatus(jrdev, err);
+> > +             *jctx->err = caam_jr_strstatus(jrdev, err);
+> >
+> > -     complete(done);
+> > +     complete(jctx->done);
+> >  }
+> >
+> >  static u32 *caam_init_desc(u32 *desc, dma_addr_t dst_dma, int len)
+> > @@ -89,6 +94,10 @@ static int caam_rng_read_one(struct device *jrdev,
+> >  {
+> >       dma_addr_t dst_dma;
+> >       int err;
+> > +     struct caam_rng_job_ctx jctx = {
+> > +             .done = done,
+> > +             .err  = &err,
+> > +     };
+> >
+> >       len = min_t(int, len, CAAM_RNG_MAX_FIFO_STORE_SIZE);
+> >
+> > @@ -101,7 +110,7 @@ static int caam_rng_read_one(struct device *jrdev,
+> >       init_completion(done);
+> >       err = caam_jr_enqueue(jrdev,
+> >                             caam_init_desc(desc, dst_dma, len),
+> > -                           caam_rng_done, done);
+> > +                           caam_rng_done, &jctx);
+> AFAICT there's a race condition b/w caam_jr_enqueue() and caam_rng_done(),
+> both writing to "err":
+> caam_jr_enqueue()
+>         -> JR interrupt -> caam_jr_interrupt() -> tasklet_schedule()...
+>         -> spin_unlock_bh()
+>         -> caam_jr_dequeue() -> caam_rng_done() -> write err
+>         -> return 0 -> write err
+>
 
-struct foo {
-        int stuff;
-        struct boo array[];
-};
+Yes, I thought it didn't really matter for calling
+wait_for_completion(done), but now that I think on it again, it can
+return wrong result code from vcaam_rng_read_one(). Will fix in v8.
 
-By making use of the mechanism above, we will get a compiler warning
-in case the flexible array does not occur last in the structure, which
-will help us prevent some kind of undefined behavior bugs from being
-inadvertently introduced[3] to the codebase from now on.
-
-Also, notice that, dynamic memory allocations won't be affected by
-this change:
-
-"Flexible array members have incomplete type, and so the sizeof operator
-may not be applied. As a quirk of the original implementation of
-zero-length arrays, sizeof evaluates to zero."[1]
-
-This issue was found with the help of Coccinelle.
-
-[1] https://gcc.gnu.org/onlinedocs/gcc/Zero-Length.html
-[2] https://github.com/KSPP/linux/issues/21
-[3] commit 76497732932f ("cxgb3/l2t: Fix undefined behaviour")
-
-Signed-off-by: Gustavo A. R. Silva <gustavo@embeddedor.com>
----
- drivers/crypto/caam/caamalg.c              | 2 +-
- drivers/crypto/caam/caamalg_qi.c           | 4 ++--
- drivers/crypto/caam/caamalg_qi2.h          | 6 +++---
- drivers/crypto/caam/caamhash.c             | 2 +-
- drivers/crypto/cavium/nitrox/nitrox_main.c | 2 +-
- drivers/crypto/chelsio/chcr_core.h         | 2 +-
- drivers/crypto/mediatek/mtk-sha.c          | 2 +-
- drivers/crypto/nx/nx.h                     | 2 +-
- drivers/crypto/omap-sham.c                 | 4 ++--
- include/crypto/if_alg.h                    | 2 +-
- 10 files changed, 14 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index 03797f9b1050..b7bb7c30adeb 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -909,7 +909,7 @@ struct skcipher_edesc {
- 	bool bklog;
- 	dma_addr_t sec4_sg_dma;
- 	struct sec4_sg_entry *sec4_sg;
--	u32 hw_desc[0];
-+	u32 hw_desc[];
- };
- 
- static void caam_unmap(struct device *dev, struct scatterlist *src,
-diff --git a/drivers/crypto/caam/caamalg_qi.c b/drivers/crypto/caam/caamalg_qi.c
-index 4a29e0ef9d63..27e36bdf6163 100644
---- a/drivers/crypto/caam/caamalg_qi.c
-+++ b/drivers/crypto/caam/caamalg_qi.c
-@@ -783,7 +783,7 @@ struct aead_edesc {
- 	unsigned int assoclen;
- 	dma_addr_t assoclen_dma;
- 	struct caam_drv_req drv_req;
--	struct qm_sg_entry sgt[0];
-+	struct qm_sg_entry sgt[];
- };
- 
- /*
-@@ -803,7 +803,7 @@ struct skcipher_edesc {
- 	int qm_sg_bytes;
- 	dma_addr_t qm_sg_dma;
- 	struct caam_drv_req drv_req;
--	struct qm_sg_entry sgt[0];
-+	struct qm_sg_entry sgt[];
- };
- 
- static struct caam_drv_ctx *get_drv_ctx(struct caam_ctx *ctx,
-diff --git a/drivers/crypto/caam/caamalg_qi2.h b/drivers/crypto/caam/caamalg_qi2.h
-index 706736776b47..f29cb7bd7dd3 100644
---- a/drivers/crypto/caam/caamalg_qi2.h
-+++ b/drivers/crypto/caam/caamalg_qi2.h
-@@ -114,7 +114,7 @@ struct aead_edesc {
- 	dma_addr_t qm_sg_dma;
- 	unsigned int assoclen;
- 	dma_addr_t assoclen_dma;
--	struct dpaa2_sg_entry sgt[0];
-+	struct dpaa2_sg_entry sgt[];
- };
- 
- /*
-@@ -132,7 +132,7 @@ struct skcipher_edesc {
- 	dma_addr_t iv_dma;
- 	int qm_sg_bytes;
- 	dma_addr_t qm_sg_dma;
--	struct dpaa2_sg_entry sgt[0];
-+	struct dpaa2_sg_entry sgt[];
- };
- 
- /*
-@@ -146,7 +146,7 @@ struct ahash_edesc {
- 	dma_addr_t qm_sg_dma;
- 	int src_nents;
- 	int qm_sg_bytes;
--	struct dpaa2_sg_entry sgt[0];
-+	struct dpaa2_sg_entry sgt[];
- };
- 
- /**
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 2fe852853d40..943bc0296267 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -536,7 +536,7 @@ struct ahash_edesc {
- 	int sec4_sg_bytes;
- 	bool bklog;
- 	u32 hw_desc[DESC_JOB_IO_LEN_MAX / sizeof(u32)] ____cacheline_aligned;
--	struct sec4_sg_entry sec4_sg[0];
-+	struct sec4_sg_entry sec4_sg[];
- };
- 
- static inline void ahash_unmap(struct device *dev,
-diff --git a/drivers/crypto/cavium/nitrox/nitrox_main.c b/drivers/crypto/cavium/nitrox/nitrox_main.c
-index c4632d84c9a1..e91be9b8b083 100644
---- a/drivers/crypto/cavium/nitrox/nitrox_main.c
-+++ b/drivers/crypto/cavium/nitrox/nitrox_main.c
-@@ -71,7 +71,7 @@ struct ucode {
- 	char version[VERSION_LEN - 1];
- 	__be32 code_size;
- 	u8 raz[12];
--	u64 code[0];
-+	u64 code[];
- };
- 
- /**
-diff --git a/drivers/crypto/chelsio/chcr_core.h b/drivers/crypto/chelsio/chcr_core.h
-index b41ef1abfe74..e480096754b5 100644
---- a/drivers/crypto/chelsio/chcr_core.h
-+++ b/drivers/crypto/chelsio/chcr_core.h
-@@ -68,7 +68,7 @@ struct _key_ctx {
- 	__be32 ctx_hdr;
- 	u8 salt[MAX_SALT];
- 	__be64 iv_to_auth;
--	unsigned char key[0];
-+	unsigned char key[];
- };
- 
- #define KEYCTX_TX_WR_IV_S  55
-diff --git a/drivers/crypto/mediatek/mtk-sha.c b/drivers/crypto/mediatek/mtk-sha.c
-index 9e9f48bb7f85..bd6309e57ab8 100644
---- a/drivers/crypto/mediatek/mtk-sha.c
-+++ b/drivers/crypto/mediatek/mtk-sha.c
-@@ -107,7 +107,7 @@ struct mtk_sha_ctx {
- 	u8 id;
- 	u8 buf[SHA_BUF_SIZE] __aligned(sizeof(u32));
- 
--	struct mtk_sha_hmac_ctx	base[0];
-+	struct mtk_sha_hmac_ctx	base[];
- };
- 
- struct mtk_sha_drv {
-diff --git a/drivers/crypto/nx/nx.h b/drivers/crypto/nx/nx.h
-index 91c54289124a..c6233173c612 100644
---- a/drivers/crypto/nx/nx.h
-+++ b/drivers/crypto/nx/nx.h
-@@ -37,7 +37,7 @@ struct max_sync_cop {
- 	u32 fc;
- 	u32 mode;
- 	u32 triplets;
--	struct msc_triplet trip[0];
-+	struct msc_triplet trip[];
- } __packed;
- 
- struct alg_props {
-diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index 4f915a4ef5b0..e4072cd38585 100644
---- a/drivers/crypto/omap-sham.c
-+++ b/drivers/crypto/omap-sham.c
-@@ -159,7 +159,7 @@ struct omap_sham_reqctx {
- 	int			sg_len;
- 	unsigned int		total;	/* total request */
- 
--	u8			buffer[0] OMAP_ALIGNED;
-+	u8			buffer[] OMAP_ALIGNED;
- };
- 
- struct omap_sham_hmac_ctx {
-@@ -176,7 +176,7 @@ struct omap_sham_ctx {
- 	/* fallback stuff */
- 	struct crypto_shash	*fallback;
- 
--	struct omap_sham_hmac_ctx base[0];
-+	struct omap_sham_hmac_ctx base[];
- };
- 
- #define OMAP_SHAM_QUEUE_LENGTH	10
-diff --git a/include/crypto/if_alg.h b/include/crypto/if_alg.h
-index 24cfa96f98ea..56527c85d122 100644
---- a/include/crypto/if_alg.h
-+++ b/include/crypto/if_alg.h
-@@ -66,7 +66,7 @@ struct af_alg_sgl {
- struct af_alg_tsgl {
- 	struct list_head list;
- 	unsigned int cur;		/* Last processed SG entry */
--	struct scatterlist sg[0];	/* Array of SGs forming the SGL */
-+	struct scatterlist sg[];	/* Array of SGs forming the SGL */
- };
- 
- #define MAX_SGL_ENTS ((4096 - sizeof(struct af_alg_tsgl)) / \
--- 
-2.25.0
-
+Thanks,
+Andrey Smirnov
