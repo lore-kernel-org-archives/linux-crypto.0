@@ -4,90 +4,93 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7275C38BE2
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Feb 2020 20:26:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72296C38BE6
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Feb 2020 20:26:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8942621744
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Feb 2020 20:26:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 47FB920726
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Feb 2020 20:26:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="Wv4HPspE"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="BNfZNGy7"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727479AbgBXU0L (ORCPT
+        id S1727401AbgBXU0Q (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 24 Feb 2020 15:26:11 -0500
-Received: from mail-wm1-f66.google.com ([209.85.128.66]:33835 "EHLO
+        Mon, 24 Feb 2020 15:26:16 -0500
+Received: from mail-wm1-f66.google.com ([209.85.128.66]:37487 "EHLO
         mail-wm1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727242AbgBXU0K (ORCPT
+        with ESMTP id S1727459AbgBXU0M (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Feb 2020 15:26:10 -0500
-Received: by mail-wm1-f66.google.com with SMTP id s144so674321wme.1
-        for <linux-crypto@vger.kernel.org>; Mon, 24 Feb 2020 12:26:09 -0800 (PST)
+        Mon, 24 Feb 2020 15:26:12 -0500
+Received: by mail-wm1-f66.google.com with SMTP id a6so729408wme.2
+        for <linux-crypto@vger.kernel.org>; Mon, 24 Feb 2020 12:26:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=baylibre-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id;
-        bh=F7a1q9zaXkmFSVJOCg0lehp0yKULwcs/09ZgYtgpjUU=;
-        b=Wv4HPspEJkZrX2QzJQyje7IucGzsS7rUzgqxdGPdIZWOw1o+1CJE/ZaSrRAZVcUsgq
-         u0j8BUdO73nFXL1/pYTcP03ju/oNFNmclaeoU4sE5jx59swnUqq8lX+q5zeRQOgpwNQY
-         dFxFHil6Ke115v+VbH7j/GGwfwh02Vv2m9TeR8MErXOIQJClm7N9pouprrxsoSuxpdfh
-         9n5nrirbEHkIHINMuriwUoxe7dcdO1DCgXZn1ETFNHbqUMoxNK/Nh8bQoYKFxhXU9UFn
-         du5hl+eRew+oYMtTvMnfJ1Q6C+t/JSLZNFZfKD4Eoy8tklMrTY0Lif0/u89udl/fcTSl
-         oA+w==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=oFJFMPloKOQ/IG47taQgRmVN4tJaMKxeC+zVgEVtvZE=;
+        b=BNfZNGy7WdEPe3PKPsg9YivRp+RUhv0+ve6J8VFZEmqTUOfoLrH7KYhCvGR2g01D4a
+         Pb2Qd2nnV24DKXlrAiHclHT9p98ECp/bhL/RJPy8WzBhzoWZXL9q7Tx/NpJ+sjQyaXTA
+         AytsgDPB+Jh/1R1K6frQ4plfMfnPujtX5tYQufhsqIeCteqiqsPSCbqxu7xebcQ+K3h/
+         AKmdd19qKkwx/PXzTZWPeQh4qYXyKesalj0rkwsCXvgOelKj1nfxpxOlufrBMS1Ddes8
+         /igORiPavhgkBbvaF3Y0jaWDYsD3UvKoVGAKJnelrQpDPSE8TSOtb0nSK1pgx0YyVmWQ
+         2+Ow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=F7a1q9zaXkmFSVJOCg0lehp0yKULwcs/09ZgYtgpjUU=;
-        b=TI9xp8iXbjWM0jHOdurLrVV9iIwhyLxhyN9XQWU8D9wrJhk2I9z24fIGnIjVgipSBp
-         xfOJJEzOJMkZw/XqPcMyVy2h3nwuAVzryDYfJ3iPLwfUGgxxdff/UPd5kcd4bRGuV/kp
-         mQOFFpm5rhchwyOTuGl0cE0hMw7rD4RlvDm7iwIu4BuNUMWefWe/+mVMZDIZnnq/polU
-         XAc6hVMHWBOesCx2iOSgzRD3EohMpytcJzEKHUW86xp2erZw9CufO+6E59iCH9mGs6s2
-         8NgYBmA5fUC6cmzi+CBPSDLCAAe/l+mwvR53HhqdONMOrpbO8Wdatl1EquPGZrCrjMZH
-         NjOA==
-X-Gm-Message-State: APjAAAVNbX7PHChBqEu3NPIYbMV3+jxPQhq8nXe/zcnex/wzyHY9ziVO
-        Uvepr7F9Sqse5S4Za59G3dew0g==
-X-Google-Smtp-Source: APXvYqzUO5DyKjGU4OIrt+jNB0R1fsRpxxtROEgWMHzOWaT3f8jOiJ25/0nAzMg/rQtuhxQqHJnnmA==
-X-Received: by 2002:a1c:bdc5:: with SMTP id n188mr748049wmf.124.1582575968969;
-        Mon, 24 Feb 2020 12:26:08 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=oFJFMPloKOQ/IG47taQgRmVN4tJaMKxeC+zVgEVtvZE=;
+        b=kXmggYa+LmxWVoYvZsj5Kl3Tqi4T2l9WjKm6wb14t3Riu/QQswntlW4+aYFYH1Nvqz
+         RlygnllLI4y3nNtpwRsFuhp2tXOBAcclPNMvpDlLrRBAd8f+qQJUxJTwiHYkDmu3HmZ8
+         goAhFpsl2JkUWAK0k0vP7t7SHhYsQTcMcUX7+yoYl1fsJp3eUHWlO3C1TCmQ9DCeytJY
+         ZboX+s1o3O+09296szgNryms/zbewSDVI5R4BfQdS/3dhAGK7YsJa5+XuW5IY3KyoqMU
+         /u3W19LFdg7i2HUZvtLdZy3W5sFcM/mTKs+gT/FuWormiTpAO4MUIq4cRmGpOWIWAphy
+         +WBA==
+X-Gm-Message-State: APjAAAWIIg0DUWu4e+GpaqNeb9UIShJFGPb7q4KVy0sSh/st2VNdblxJ
+        Zpiwd7szX7g5BewDhmiWGclTtA==
+X-Google-Smtp-Source: APXvYqz6tJk9pKs3DlwhvMLLlWxvdmWF7oCGr0eqdeFZlTpXS6ZQYBkZW/MD5mv+P/ZNP0JEtY3uqw==
+X-Received: by 2002:a7b:c3d8:: with SMTP id t24mr183019wmj.43.1582575969920;
+        Mon, 24 Feb 2020 12:26:09 -0800 (PST)
 Received: from localhost.localdomain ([51.15.160.169])
-        by smtp.googlemail.com with ESMTPSA id a7sm13356602wrm.29.2020.02.24.12.26.08
+        by smtp.googlemail.com with ESMTPSA id a7sm13356602wrm.29.2020.02.24.12.26.09
         (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Mon, 24 Feb 2020 12:26:08 -0800 (PST)
+        Mon, 24 Feb 2020 12:26:09 -0800 (PST)
 From:   Corentin Labbe <clabbe@baylibre.com>
 To:     davem@davemloft.net, herbert@gondor.apana.org.au,
         mripard@kernel.org, wens@csie.org
 Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org, Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH 1/2] crypto: sun8i-ss: fix description of stat_fb
-Date:   Mon, 24 Feb 2020 20:26:02 +0000
-Message-Id: <1582575963-27649-1-git-send-email-clabbe@baylibre.com>
+Subject: [PATCH 2/2] crypto: sun8i-ce: fix description of stat_fb
+Date:   Mon, 24 Feb 2020 20:26:03 +0000
+Message-Id: <1582575963-27649-2-git-send-email-clabbe@baylibre.com>
 X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1582575963-27649-1-git-send-email-clabbe@baylibre.com>
+References: <1582575963-27649-1-git-send-email-clabbe@baylibre.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The description of stat_fb was wrong, let's fix it.
+The description of stat_fb was wrong, let's fix it
+Fixes: 06f751b61329 ("crypto: allwinner - Add sun8i-ce Crypto Engine")
 
-Fixes: f08fcced6d00 ("crypto: allwinner - Add sun8i-ss cryptographic offloader")
 Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
 ---
- drivers/crypto/allwinner/sun8i-ss/sun8i-ss.h | 2 +-
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss.h b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss.h
-index 5ca8da9311b8..66c78c03e376 100644
---- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss.h
-+++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss.h
-@@ -205,7 +205,7 @@ struct sun8i_ss_rng_tfm_ctx {
+diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
+index 8f8404c84a4d..0e9eac397e1b 100644
+--- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
++++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h
+@@ -214,7 +214,7 @@ struct sun8i_cipher_tfm_ctx {
   *			this template
   * @alg:		one of sub struct must be used
   * @stat_req:		number of request done on this template
 - * @stat_fb:		total of all data len done on this template
 + * @stat_fb:		number of request which has fallbacked
   */
- struct sun8i_ss_alg_template {
+ struct sun8i_ce_alg_template {
  	u32 type;
 -- 
 2.24.1
