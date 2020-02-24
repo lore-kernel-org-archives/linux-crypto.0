@@ -7,90 +7,89 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B91CBC11D2F
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Feb 2020 16:39:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB232C11D2F
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Feb 2020 16:40:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8D6B220836
-	for <linux-crypto@archiver.kernel.org>; Mon, 24 Feb 2020 16:39:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7C6A720836
+	for <linux-crypto@archiver.kernel.org>; Mon, 24 Feb 2020 16:40:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VR/V9ht7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FXnMe3te"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727681AbgBXQjR (ORCPT
+        id S1727636AbgBXQkc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 24 Feb 2020 11:39:17 -0500
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:51587 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727486AbgBXQjR (ORCPT
+        Mon, 24 Feb 2020 11:40:32 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:39055 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727486AbgBXQkb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 24 Feb 2020 11:39:17 -0500
-Received: by mail-wm1-f67.google.com with SMTP id t23so9645030wmi.1;
-        Mon, 24 Feb 2020 08:39:16 -0800 (PST)
+        Mon, 24 Feb 2020 11:40:31 -0500
+Received: by mail-wm1-f68.google.com with SMTP id c84so10165532wme.4;
+        Mon, 24 Feb 2020 08:40:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=M0sdWUeHuBr96/VIOIWdMJQh5Jm26LqtJhhLqkI4P9E=;
-        b=VR/V9ht7eiYkE1kOrJhTS3S18UETRmWMnanPviE4Sdd/KzC6tw7wU5EHE9HI1rWNwF
-         v8HHl2b0AWJFaNXX3OoheDHUt0Piu6RAX7x4lnjTIGjq5uuSkaKjMfDSa+TnSHfx40vF
-         Nw0sfJQjmWfvOCanXcycN+b2SWmK6rUb9dG/cyGpiHQrgJvJJzcTU4CuIYVLH0ANNUF2
-         ATCQ3HsGEVTj2/RHrRztv2Gc0AFq3GGyPSvivAb0u4QvZjau0nr7CWBrK3lZ5BgRzhMp
-         IqBmqodaKIHqLCGn/avqnAk82WOg2nN8FrnzkQHTWq5ou12Eqj10iauss70qgojNX2Qg
-         9arg==
+        bh=iTjJbQqtwcZPIXecaEaZiFF1Xn8H3EV5tXJhCaPu0JA=;
+        b=FXnMe3teoPr6pu+e9m1ZzCqlnHALTlI7EQnznms6d/iCyTWO8xqExwefnhmFcTl6cu
+         yI9u/iXeV6PZuH4sYGsVZfjHWG8wLyJSs/R1fZiPbWE8E5cwpCbtr+qbPPBOpjAW5q4O
+         hcQN9zSyYhx0sZp9LqIH7JrAuire1YmH5mw+Q4xvOezBYSRc5kHgaB+bpkDFP48AwwFn
+         /5XO+Gd0dxxPxgIsiNAzSLqVD1KiAACTrIuK/ju8MNoMIfpHICnp5oEGLPL4Vn8YQrgD
+         WU5XaGxXTto4vV/focnz93VSLWzkDxfb8sNwt0VB6wgbgfqHcOotUg11LLXrCSnBIB3g
+         S1hQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=M0sdWUeHuBr96/VIOIWdMJQh5Jm26LqtJhhLqkI4P9E=;
-        b=gRbK6CBchLq4hcIovdeJ4Q1wXEVnsfwxT8771YVBPg48U220BhaUanO0BI4O148shr
-         GYdiswM4yT91RcHQBPYL/03TeD+2E1WhhoS7YDPbpE+J0NTm29f0FGz52mi+1680IoSE
-         f/BWcrRUor8Su/j2Q5VMG0fvvNE1v5zXjE/5KghmsFYb9ON4iEeZcRJ/frUBcwzgv8Ox
-         Oz6Y02OtlNrShhvP3Yt+In6+d3deU9DzU3a5kGZlGu1UvTC2J3ZhtUeL21XXQk0p+U7Q
-         rL600ty0YfMgvVDXw5OgPzJLXf0DhR5nxKMSRHagIDkPj9rzFHH83BYoKFAJYrE/ARqN
-         nR5A==
-X-Gm-Message-State: APjAAAXX8q7Xb+kWh/kZZ3ScW/PHUYU8q5vTbEtrFs77wJOrkjN5TrRg
-        GbGH5u3G223yGTiprfz0XrEXaIL4pueQDOl+bWA=
-X-Google-Smtp-Source: APXvYqzGVFtlF1/ctbev1R8M6BKDpsFvi7TsUPAVaI36W478E4LcYTtrw4XOKhMNTwx+y8oTUMYDP1jkbBVmzfLMrEo=
-X-Received: by 2002:a05:600c:217:: with SMTP id 23mr22803384wmi.124.1582562355408;
- Mon, 24 Feb 2020 08:39:15 -0800 (PST)
+        bh=iTjJbQqtwcZPIXecaEaZiFF1Xn8H3EV5tXJhCaPu0JA=;
+        b=fJL2cVGD+JQeveJ2+yPt5BGgPWbv5KnpWj6+r0LgKgqQtNW4/yVK6LJUvxf8w9YjGr
+         LdHM73y1kWnVuDmvhZStb3fPkt5En1Vk5v89A8sBQUhlk/Zj8KVHqtVlhVhCAdTIeLgF
+         22xktIqK85Vb0cnW8uNG2akWObOc8fu/XOmkvI+wFjH5n9FJILsGhZ12EQkezxZyxSPq
+         zx540+/6f/iBz9NP/z87LgvkCM9E6bWUCHlHinhRCLst2FzliKHRXoHrobVzWbRJUE+6
+         S9euc3WT8ISAnRn7n4SzNiCKTG25tVW1yH/VMSkT9kXbNKZvwVZNCSHaWBJKdiInQJCV
+         MUIw==
+X-Gm-Message-State: APjAAAVfFlNv8nnQhvTOTMvo7WT7vWmbI+C00R28zpENS5LXJA+lMV+3
+        9X1ZQRDfG7v+nkn/JeSgz7Esiex4tQBkhDgmaZc=
+X-Google-Smtp-Source: APXvYqz1PFa7eYxHu8n2pwAXRIbHopxWJqwMVwhAXMhqkpBeiIXZPAv5LQdMm0SMO5Kuq6BMYNOMXM5zpMaptiAy9Jw=
+X-Received: by 2002:a05:600c:230d:: with SMTP id 13mr23863553wmo.13.1582562428814;
+ Mon, 24 Feb 2020 08:40:28 -0800 (PST)
 MIME-Version: 1.0
 References: <20200127165646.19806-1-andrew.smirnov@gmail.com>
- <20200127165646.19806-4-andrew.smirnov@gmail.com> <VI1PR0402MB348585D73873E2DFE6B8751698180@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-In-Reply-To: <VI1PR0402MB348585D73873E2DFE6B8751698180@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <20200127165646.19806-2-andrew.smirnov@gmail.com> <VI1PR0402MB3485FF5402B8C0FFF48FBF2298030@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+In-Reply-To: <VI1PR0402MB3485FF5402B8C0FFF48FBF2298030@VI1PR0402MB3485.eurprd04.prod.outlook.com>
 From:   Andrey Smirnov <andrew.smirnov@gmail.com>
-Date:   Mon, 24 Feb 2020 08:39:03 -0800
-Message-ID: <CAHQ1cqHERbU-dgMZ4=7Htz9Z-AgyTuAx7amBgzDYdxq4Rfqe=g@mail.gmail.com>
-Subject: Re: [PATCH v7 3/9] crypto: caam - use devm_kzalloc to allocate JR data
+Date:   Mon, 24 Feb 2020 08:40:17 -0800
+Message-ID: <CAHQ1cqH1KOwna-8DxX1mZy4ua=56crHRXgExn0mrLZV=t2e7fg@mail.gmail.com>
+Subject: Re: [PATCH v7 1/9] crypto: caam - allocate RNG instantiation
+ descriptor with GFP_DMA
 To:     Horia Geanta <horia.geanta@nxp.com>
 Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
         Chris Healy <cphealy@gmail.com>,
         Lucas Stach <l.stach@pengutronix.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Iuliana Prodan <iuliana.prodan@nxp.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>
+        dl-linux-imx <linux-imx@nxp.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Feb 11, 2020 at 10:23 AM Horia Geanta <horia.geanta@nxp.com> wrote:
+On Tue, Feb 4, 2020 at 6:08 AM Horia Geanta <horia.geanta@nxp.com> wrote:
 >
 > On 1/27/2020 6:57 PM, Andrey Smirnov wrote:
-> > Use devm_kzalloc() to allocate JR data in order to make sure that it
-> > is initialized consistently every time.
+> > Be consistent with the rest of the codebase and use GFP_DMA when
+> > allocating memory for a CAAM JR descriptor.
 > >
-> The commit message is a bit vague.
+> Please use GFP_DMA32 instead.
+> Device is not limited to less than 32 bits of addressing
+> in any of its incarnations.
 >
-> I assume this is needed in patch 4/9, which adds a new member (hwrng)
-> in caam_drv_private_jr structure.
->
-> If so, it's probably better to have the change merged into patch 4/9.
+> s/GFP_DMA/GFP_DMA32 should be performed throughout caam driver.
+> (But of course, I wouldn't include this change in current patch series).
 >
 
-Yes, it is specifically needed for 4/9, but it's generally a good
-practice to zero out allocated memory, so I made it a separate patch.
-Will fold it into 4/9, since that's what you prefer.
+Will do in v8.
 
 Thanks,
 Andrey Smirnov
