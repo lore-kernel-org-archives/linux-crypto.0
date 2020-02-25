@@ -2,210 +2,638 @@ Return-Path: <SRS0=ER22=4N=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6193EC35E04
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Feb 2020 15:06:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5BD1C35E01
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Feb 2020 15:14:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 29A4420CC7
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Feb 2020 15:06:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="i8mWQUOL"
+	by mail.kernel.org (Postfix) with ESMTP id 5C42B218AC
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Feb 2020 15:14:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729810AbgBYPGb (ORCPT
+        id S1730876AbgBYPOc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Feb 2020 10:06:31 -0500
-Received: from mail-eopbgr10055.outbound.protection.outlook.com ([40.107.1.55]:15259
-        "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
+        Tue, 25 Feb 2020 10:14:32 -0500
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2462 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729268AbgBYPGb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Feb 2020 10:06:31 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ROmbGCyegoAVu+nh5neyEXqFeFIYIWSUB2s2JliRg0LlCjzHLDGM+twsd4vo9pfQbCmZlz4QxEKgu1CFwXQcNSGpbB2lP+6VlxYFd/aGZXwCKeWElGZElRpelE9P2DepQ90V36bL/K3wTIThQ/zE5rIE7LMIujeZfchJP5TyfC+ZbszjXb+dEs5vcQ4IALVwDWVSTZ7NvGavXcpn/jIl19TEnzMCRCi0yf+xBJKxcqWzlcfy7QGfE/4/0SwO+wYG7P8pUlh1KFDpQVOsLjGgFDt9WJUB6OWWMLlWYDVamq/M3qmmBgouqXFDtentDchxNzslhYQoUqbhPO/ZcjQK3A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eBqCmOeixAWzJIuE2AMrwhb1irciOUUFnofOCOHo9GI=;
- b=MdiuJvv5I4f3AHeXZmKmnULjvyl/KYSHOYTxzviH670QdQAEOSuE8h92a8f8uUI5rn9JC/LlwtVZWgrK8l5e7id7N4PlyHQYqH+guToxX+yRHAetoFG2I00Aw+WDTQztrUg+WEYnJs/HGiZZx5MOlxLMuUdrpFdjOWuKcP7l+FBL/qVQYp0LGxR/Kz0o7ppkCN/fZRJP7vrTBYJEI+O2HNXEE1yi/heVVx7m1BDvTWEdqjZK4KnjqXYFCyVh12tzsWDEisnT5Cl3qSCAKEhNrXbEcKj7rA5V2fqkksFpYXOPx2+SwFoBH3eDfx15Y99BolATtdT2yHA6F89ZmOXqMg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
- dkim=pass header.d=oss.nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
- s=selector2-NXP1-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eBqCmOeixAWzJIuE2AMrwhb1irciOUUFnofOCOHo9GI=;
- b=i8mWQUOL9Qq5hsINbNyAbrDFn6cK6nf+LlNtuoROG4SCFOGEiJcpkpcC2ii4Lf/MKpPhN0iJb56yqdLLegFEuO/B/k/YxKg7n4ty++aerh0Kklk37V9qNHqNzTZpJR56OiW5IOBT1TIijrp84EwQI+QjMFtTGesZ5c4aBpLzO2E=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=dragos.rosioru@oss.nxp.com; 
-Received: from AM0PR04MB3970.eurprd04.prod.outlook.com (52.134.92.143) by
- AM0PR04MB4308.eurprd04.prod.outlook.com (52.134.91.158) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2750.18; Tue, 25 Feb 2020 15:06:24 +0000
-Received: from AM0PR04MB3970.eurprd04.prod.outlook.com
- ([fe80::799f:d3bb:67ee:9544]) by AM0PR04MB3970.eurprd04.prod.outlook.com
- ([fe80::799f:d3bb:67ee:9544%5]) with mapi id 15.20.2750.021; Tue, 25 Feb 2020
- 15:06:24 +0000
-From:   "Dragos Rosioru (OSS)" <dragos.rosioru@oss.nxp.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Shawn Guo <shawnguo@kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Marek Vasut <marex@denx.de>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Fabio Estevam <festevam@gmail.com>,
-        NXP Linux Team <linux-imx@nxp.com>
-Subject: [PATCH] crypto: dcp - fix scatterlist linearization for hash
-Date:   Tue, 25 Feb 2020 17:05:52 +0200
-Message-Id: <1582643152-17278-1-git-send-email-dragos.rosioru@oss.nxp.com>
-X-Mailer: git-send-email 2.7.4
-Content-Type: text/plain
-X-ClientProxiedBy: AM5PR0201CA0005.eurprd02.prod.outlook.com
- (2603:10a6:203:3d::15) To AM0PR04MB3970.eurprd04.prod.outlook.com
- (2603:10a6:208:5b::15)
+        id S1730753AbgBYPOc (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 25 Feb 2020 10:14:32 -0500
+Received: from lhreml705-cah.china.huawei.com (unknown [172.18.7.108])
+        by Forcepoint Email with ESMTP id 266F95FB310989DA608E;
+        Tue, 25 Feb 2020 15:14:30 +0000 (GMT)
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml705-cah.china.huawei.com (10.201.108.46) with Microsoft SMTP Server
+ (TLS) id 14.3.408.0; Tue, 25 Feb 2020 15:14:29 +0000
+Received: from localhost (10.202.226.57) by lhreml710-chm.china.huawei.com
+ (10.201.108.61) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Tue, 25 Feb
+ 2020 15:14:28 +0000
+Date:   Tue, 25 Feb 2020 15:14:26 +0000
+From:   Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To:     Xu Zaibo <xuzaibo@huawei.com>
+CC:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <qianweili@huawei.com>, <tanghui20@huawei.com>,
+        <forest.zhouchang@huawei.com>, <linuxarm@huawei.com>,
+        <zhangwei375@huawei.com>, <shenyang39@huawei.com>,
+        <yekai13@huawei.com>, <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH 4/4] crypto: hisilicon/sec2 - Add pbuffer mode for SEC
+ driver
+Message-ID: <20200225151426.000009f5@Huawei.com>
+In-Reply-To: <80ab5da7-eceb-920e-dc36-1d411ad57a09@huawei.com>
+References: <1582189495-38051-1-git-send-email-xuzaibo@huawei.com>
+        <1582189495-38051-5-git-send-email-xuzaibo@huawei.com>
+        <20200224140154.00005967@Huawei.com>
+        <80ab5da7-eceb-920e-dc36-1d411ad57a09@huawei.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; i686-w64-mingw32)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from fsr-ub1664-206.ea.freescale.net (89.37.124.34) by AM5PR0201CA0005.eurprd02.prod.outlook.com (2603:10a6:203:3d::15) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.20.2750.18 via Frontend Transport; Tue, 25 Feb 2020 15:06:23 +0000
-X-Mailer: git-send-email 2.7.4
-X-Originating-IP: [89.37.124.34]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: fa1806e6-ddc2-46d1-e419-08d7ba0447ea
-X-MS-TrafficTypeDiagnostic: AM0PR04MB4308:|AM0PR04MB4308:
-X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM0PR04MB4308277C950E64FDE2BFDC68DFED0@AM0PR04MB4308.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
-X-Forefront-PRVS: 0324C2C0E2
-X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(396003)(39860400002)(366004)(346002)(136003)(189003)(199004)(81166006)(6666004)(110136005)(66556008)(478600001)(2906002)(66946007)(5660300002)(316002)(6506007)(6512007)(54906003)(66476007)(52116002)(2616005)(186003)(26005)(8936002)(8676002)(956004)(16526019)(86362001)(6486002)(7416002)(4326008)(81156014);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR04MB4308;H:AM0PR04MB3970.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:0;
-Received-SPF: None (protection.outlook.com: oss.nxp.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: kKk3qRlsOSgajc++4BTnxKibk+NLoodS97VZ4CLxUcdgZlNpVuQRU2ziGt1wNNtVPNDC2Uw7zJz/mfEIGNrTiKqJYS124fdw1Qq8UvyKRYj1fdX9wtD7T4EgOEUV6SIjakhYCSXikt8jak0ZcVe7J0fR3btkM3qtacRqZP8V6NrtqFXBiEZ6oJqwb20ECnO/qXkO8PPDFzfkUHoSjQnB/cCafwOhzxUnUeHaIbsglY3UlkxI7TLBtYynhf5Q6OVgl3Q6LUFYkEfEPgS8Y5+MGWHhHV3sdbEMzBqgqBe3ACGmrfWtmLhuaqKjHrTB8mO28gGsHjqksJpOi01UZjA9brwi7t3Y8RpIvTVRwvIaLovCxMEcccsRBv9jmLqeSqXc5drUGJV1Ex+B/fLapPcmGFVwFlg6O00wlrTt20R9TFzy+dbrMUUYWHGLCjSgzOVr
-X-MS-Exchange-AntiSpam-MessageData: ZoFN2rve7HI5K+IuEJntnI5Dg94dmnu7Mkp3BIv5bSfk8jdBV64+DuRLTSKdGRM7OKCXzLBq0/+I6DM/fRNISlPlX+3+3U8zHX+5lXzlMqWTSLErj7rIlHflM0i2dB6wiuLH2SDr5J7xs8u/wfaDvA==
-X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fa1806e6-ddc2-46d1-e419-08d7ba0447ea
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2020 15:06:24.7415
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jc9+2itHUxVYdzm0uoqcP8EZdZ49GJaoPyGCWI6KGuek01BfMO8kdYCASKTT22u0PEpmTOv59jeelBORbJi2AQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR04MB4308
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.202.226.57]
+X-ClientProxiedBy: lhreml729-chm.china.huawei.com (10.201.108.80) To
+ lhreml710-chm.china.huawei.com (10.201.108.61)
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Rosioru Dragos <dragos.rosioru@nxp.com>
+On Tue, 25 Feb 2020 11:16:52 +0800
+Xu Zaibo <xuzaibo@huawei.com> wrote:
 
-The incorrect traversal of the scatterlist, during the linearization phase
-lead to computing the hash value of the wrong input buffer.
-New implementation uses scatterwalk_map_and_copy()
-to address this issue.
+> Hi,
+> 
+> 
+> On 2020/2/24 22:01, Jonathan Cameron wrote:
+> > On Thu, 20 Feb 2020 17:04:55 +0800
+> > Zaibo Xu <xuzaibo@huawei.com> wrote:
+> >  
+> >> From: liulongfang <liulongfang@huawei.com>
+> >>
+> >> In the scenario of SMMU translation, the SEC performance of short messages
+> >> (<512Bytes) cannot meet our expectations. To avoid this, we reserve the
+> >> plat buffer (PBUF) memory for small packets when creating TFM.
+> >>
+> >> Signed-off-by: liulongfang <liulongfang@huawei.com>
+> >> Signed-off-by: Zaibo Xu <xuzaibo@huawei.com>  
+> > Hi liulongfang,
+> >
+> > This patch might have been easier to review done in two parts.
+> > First part would do the refactor to place c_ivin etc in the sec_alg_res.
+> > That should be really simple to review.  Second part then adds the
+> > pbuf alternative to existing code.  
+> Okay, we will split it.
+> > I'm not sure putting the boolean saying if we are using pbuf or not in
+> > the context makes sense.  Seems liable to introduce race conditions.
+> > Should that not be tied to the request?  
+> I think it makes no sense, we will update here.
+> >
+> > Thanks,
+> >
+> > Jonathan
+> >  
+> >> ---
+> >>   drivers/crypto/hisilicon/sec2/sec.h        |   6 +
+> >>   drivers/crypto/hisilicon/sec2/sec_crypto.c | 244 ++++++++++++++++++++++++-----
+> >>   2 files changed, 213 insertions(+), 37 deletions(-)
+> >>
+> >> diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
+> >> index eab0d22..8e2e34b 100644
+> >> --- a/drivers/crypto/hisilicon/sec2/sec.h
+> >> +++ b/drivers/crypto/hisilicon/sec2/sec.h
+> >> @@ -11,6 +11,8 @@
+> >>   
+> >>   /* Algorithm resource per hardware SEC queue */
+> >>   struct sec_alg_res {
+> >> +	u8 *pbuf;
+> >> +	dma_addr_t pbuf_dma;
+> >>   	u8 *c_ivin;
+> >>   	dma_addr_t c_ivin_dma;
+> >>   	u8 *out_mac;
+> >> @@ -23,6 +25,8 @@ struct sec_cipher_req {
+> >>   	dma_addr_t c_in_dma;
+> >>   	struct hisi_acc_hw_sgl *c_out;
+> >>   	dma_addr_t c_out_dma;
+> >> +	u8 *c_ivin;
+> >> +	dma_addr_t c_ivin_dma;
+> >>   	struct skcipher_request *sk_req;
+> >>   	u32 c_len;
+> >>   	bool encrypt;
+> >> @@ -128,6 +132,8 @@ struct sec_ctx {
+> >>   	atomic_t dec_qcyclic;
+> >>   
+> >>   	enum sec_alg_type alg_type;
+> >> +	bool pbuf_supported;
+> >> +	bool use_pbuf;
+> >>   	struct sec_cipher_ctx c_ctx;
+> >>   	struct sec_auth_ctx a_ctx;
+> >>   };
+> >> diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+> >> index a2cfcc9..022d4bf6 100644
+> >> --- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
+> >> +++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
+> >> @@ -46,7 +46,21 @@
+> >>   #define SEC_CIPHER_AUTH		0xfe
+> >>   #define SEC_AUTH_CIPHER		0x1
+> >>   #define SEC_MAX_MAC_LEN		64
+> >> +#define SEC_MAX_AAD_LEN		65535
+> >>   #define SEC_TOTAL_MAC_SZ	(SEC_MAX_MAC_LEN * QM_Q_DEPTH)
+> >> +
+> >> +#define SEC_PBUF_SZ			512
+> >> +#define SEC_PBUF_IV_OFFSET		SEC_PBUF_SZ
+> >> +#define SEC_PBUF_MAC_OFFSET		(SEC_PBUF_SZ + SEC_IV_SIZE)
+> >> +#define SEC_PBUF_PKG		(SEC_PBUF_SZ + SEC_IV_SIZE +	\
+> >> +			SEC_MAX_MAC_LEN * 2)  
+> > 512 + 24 + 128
+> >
+> > So we get 6 per 4kiB page?  
+> Yes, we tried to hold 6 per 4 KB page.
+> >  
+> >> +#define SEC_PBUF_NUM		(PAGE_SIZE / SEC_PBUF_PKG)
+> >> +#define SEC_PBUF_PAGE_NUM	(QM_Q_DEPTH / SEC_PBUF_NUM)
+> >> +#define SEC_PBUF_LEFT_SZ	(SEC_PBUF_PKG * (QM_Q_DEPTH -	\
+> >> +			SEC_PBUF_PAGE_NUM * SEC_PBUF_NUM))
+> >> +#define SEC_TOTAL_PBUF_SZ	(PAGE_SIZE * SEC_PBUF_PAGE_NUM +	\
+> >> +			SEC_PBUF_LEFT_SZ)
+> >> +
+> >>   #define SEC_SQE_LEN_RATE	4
+> >>   #define SEC_SQE_CFLAG		2
+> >>   #define SEC_SQE_AEAD_FLAG	3
+> >> @@ -110,12 +124,12 @@ static void sec_free_req_id(struct sec_req *req)
+> >>   	mutex_unlock(&qp_ctx->req_lock);
+> >>   }
+> >>   
+> >> -static int sec_aead_verify(struct sec_req *req, struct sec_qp_ctx *qp_ctx)
+> >> +static int sec_aead_verify(struct sec_req *req)
+> >>   {
+> >>   	struct aead_request *aead_req = req->aead_req.aead_req;
+> >>   	struct crypto_aead *tfm = crypto_aead_reqtfm(aead_req);
+> >> -	u8 *mac_out = qp_ctx->res[req->req_id].out_mac;
+> >>   	size_t authsize = crypto_aead_authsize(tfm);
+> >> +	u8 *mac_out = req->aead_req.out_mac;  
+> > This change looks unrelated to the rest of the patch.
+> > Good cleanup but not part of adding pbuffer as far as I can tell.  
+> With Pbuf, 'aead_req' will hold the operational 'out_mac' address from 
+> 'res'.
+> With only SGL buffer, the 'out_mac' of 'aead_req' is only from 'out_mac' 
+> of 'res'.
+> So, should update here.
+> >  
+> >>   	u8 *mac = mac_out + SEC_MAX_MAC_LEN;
+> >>   	struct scatterlist *sgl = aead_req->src;
+> >>   	size_t sz;
+> >> @@ -163,7 +177,7 @@ static void sec_req_cb(struct hisi_qp *qp, void *resp)
+> >>   	}
+> >>   
+> >>   	if (ctx->alg_type == SEC_AEAD && !req->c_req.encrypt)
+> >> -		err = sec_aead_verify(req, qp_ctx);
+> >> +		err = sec_aead_verify(req);
+> >>   
+> >>   	atomic64_inc(&ctx->sec->debug.dfx.recv_cnt);
+> >>   
+> >> @@ -245,6 +259,50 @@ static void sec_free_mac_resource(struct device *dev, struct sec_alg_res *res)
+> >>   				  res->out_mac, res->out_mac_dma);
+> >>   }
+> >>   
+> >> +static void sec_free_pbuf_resource(struct device *dev, struct sec_alg_res *res)
+> >> +{
+> >> +	if (res->pbuf)
+> >> +		dma_free_coherent(dev, SEC_TOTAL_PBUF_SZ,
+> >> +				  res->pbuf, res->pbuf_dma);
+> >> +}
+> >> +
+> >> +/*
+> >> + * To improve performance, pbuffer is used for
+> >> + * small packets (< 576Bytes) as IOMMU translation using.
+> >> + */
+> >> +static int sec_alloc_pbuf_resource(struct device *dev, struct sec_alg_res *res)
+> >> +{
+> >> +	int pbuf_page_offset;
+> >> +	int i, j, k;
+> >> +
+> >> +	res->pbuf = dma_alloc_coherent(dev, SEC_TOTAL_PBUF_SZ,
+> >> +				&res->pbuf_dma, GFP_KERNEL);  
+> > Would it make more sense perhaps to do this as a DMA pool and have
+> > it expand on demand?  
+> Since there exist all kinds of buffer length, I think dma_alloc_coherent 
+> may be better?
 
-Cc: <stable@vger.kernel.org>
-Fixes: 15b59e7c3733 ("crypto: mxs - Add Freescale MXS DCP driver")
-Signed-off-by: Rosioru Dragos <dragos.rosioru@nxp.com>
----
- drivers/crypto/mxs-dcp.c | 58 +++++++++++++++++++++++-------------------------
- 1 file changed, 28 insertions(+), 30 deletions(-)
+As it currently stands we allocate a large buffer in one go but ensure
+we only have a single dma map that occurs at startup.
 
-diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
-index 435ac1c..d845302 100644
---- a/drivers/crypto/mxs-dcp.c
-+++ b/drivers/crypto/mxs-dcp.c
-@@ -20,6 +20,7 @@
- #include <crypto/sha.h>
- #include <crypto/internal/hash.h>
- #include <crypto/internal/skcipher.h>
-+#include <crypto/scatterwalk.h>
- 
- #define DCP_MAX_CHANS	4
- #define DCP_BUF_SZ	PAGE_SIZE
-@@ -611,49 +612,46 @@ static int dcp_sha_req_to_buf(struct crypto_async_request *arq)
- 	struct dcp_async_ctx *actx = crypto_ahash_ctx(tfm);
- 	struct dcp_sha_req_ctx *rctx = ahash_request_ctx(req);
- 	struct hash_alg_common *halg = crypto_hash_alg_common(tfm);
--	const int nents = sg_nents(req->src);
- 
- 	uint8_t *in_buf = sdcp->coh->sha_in_buf;
- 	uint8_t *out_buf = sdcp->coh->sha_out_buf;
- 
--	uint8_t *src_buf;
--
- 	struct scatterlist *src;
- 
--	unsigned int i, len, clen;
-+	unsigned int i, len, clen, oft = 0;
- 	int ret;
- 
- 	int fin = rctx->fini;
- 	if (fin)
- 		rctx->fini = 0;
- 
--	for_each_sg(req->src, src, nents, i) {
--		src_buf = sg_virt(src);
--		len = sg_dma_len(src);
--
--		do {
--			if (actx->fill + len > DCP_BUF_SZ)
--				clen = DCP_BUF_SZ - actx->fill;
--			else
--				clen = len;
--
--			memcpy(in_buf + actx->fill, src_buf, clen);
--			len -= clen;
--			src_buf += clen;
--			actx->fill += clen;
-+	src = req->src;
-+	len = req->nbytes;
- 
--			/*
--			 * If we filled the buffer and still have some
--			 * more data, submit the buffer.
--			 */
--			if (len && actx->fill == DCP_BUF_SZ) {
--				ret = mxs_dcp_run_sha(req);
--				if (ret)
--					return ret;
--				actx->fill = 0;
--				rctx->init = 0;
--			}
--		} while (len);
-+	while (len) {
-+		if (actx->fill + len > DCP_BUF_SZ)
-+			clen = DCP_BUF_SZ - actx->fill;
-+		else
-+			clen = len;
-+
-+		scatterwalk_map_and_copy(in_buf + actx->fill, src, oft, clen,
-+					 0);
-+
-+		len -= clen;
-+		oft += clen;
-+		actx->fill += clen;
-+
-+		/*
-+		 * If we filled the buffer and still have some
-+		 * more data, submit the buffer.
-+		 */
-+		if (len && actx->fill == DCP_BUF_SZ) {
-+			ret = mxs_dcp_run_sha(req);
-+			if (ret)
-+				return ret;
-+			actx->fill = 0;
-+			rctx->init = 0;
-+		}
- 	}
- 
- 	if (fin) {
--- 
-2.7.4
+If we allocate every time (don't use pbuf) performance is hit by
+the need to set up the page table entries and flush for every request.
+
+A dma pool with a fixed size element would at worst (for small messages)
+mean you had to do a dma map / unmap every time 6 ish buffers.
+This would only happen if you filled the whole queue.  Under normal operation
+you will have a fairly steady number of buffers in use at a time, so mostly
+it would be reusing buffers that were already mapped from a previous request.
+
+You could implement your own allocator on top of dma_alloc_coherent but it'll
+probably be a messy and cost you more than using fixed size small elements.
+
+So a dmapool here would give you a mid point between using lots of memory
+and never needing to map/unmap vs map/unmap every time. 
+
+
+> >  
+> >> +	if (!res->pbuf)
+> >> +		return -ENOMEM;
+> >> +
+> >> +	/*
+> >> +	 * SEC_PBUF_PKG contains data pbuf, iv and
+> >> +	 * out_mac : <SEC_PBUF|SEC_IV|SEC_MAC>
+> >> +	 * Every PAGE contains six SEC_PBUF_PKG
+> >> +	 * The sec_qp_ctx contains QM_Q_DEPTH numbers of SEC_PBUF_PKG
+> >> +	 * So we need SEC_PBUF_PAGE_NUM numbers of PAGE
+> >> +	 * for the SEC_TOTAL_PBUF_SZ
+> >> +	 */
+> >> +	for (i = 0; i <= SEC_PBUF_PAGE_NUM; i++) {
+> >> +		pbuf_page_offset = PAGE_SIZE * i;
+> >> +		for (j = 0; j < SEC_PBUF_NUM; j++) {
+> >> +			k = i * SEC_PBUF_NUM + j;
+> >> +			if (k == QM_Q_DEPTH)
+> >> +				break;
+> >> +			res[k].pbuf = res->pbuf +
+> >> +				j * SEC_PBUF_PKG + pbuf_page_offset;
+> >> +			res[k].pbuf_dma = res->pbuf_dma +
+> >> +				j * SEC_PBUF_PKG + pbuf_page_offset;
+> >> +		}
+> >> +	}
+> >> +	return 0;
+> >> +}
+> >> +
+> >>   static int sec_alg_resource_alloc(struct sec_ctx *ctx,
+> >>   				  struct sec_qp_ctx *qp_ctx)
+> >>   {
+> >> @@ -259,11 +317,17 @@ static int sec_alg_resource_alloc(struct sec_ctx *ctx,
+> >>   	if (ctx->alg_type == SEC_AEAD) {
+> >>   		ret = sec_alloc_mac_resource(dev, res);
+> >>   		if (ret)
+> >> -			goto get_fail;
+> >> +			goto alloc_fail;
+> >> +	}
+> >> +	if (ctx->pbuf_supported) {
+> >> +		ret = sec_alloc_pbuf_resource(dev, res);
+> >> +		if (ret) {
+> >> +			dev_err(dev, "fail to alloc pbuf dma resource!\n");
+> >> +			goto alloc_fail;
+> >> +		}
+> >>   	}
+> >> -
+> >>   	return 0;
+> >> -get_fail:
+> >> +alloc_fail:
+> >>   	sec_free_civ_resource(dev, res);
+> >>   
+> >>   	return ret;
+> >> @@ -278,6 +342,8 @@ static void sec_alg_resource_free(struct sec_ctx *ctx,
+> >>   
+> >>   	if (ctx->alg_type == SEC_AEAD)
+> >>   		sec_free_mac_resource(dev, qp_ctx->res);
+> >> +	if (ctx->pbuf_supported)
+> >> +		sec_free_pbuf_resource(dev, qp_ctx->res);
+> >>   }
+> >>   
+> >>   static int sec_create_qp_ctx(struct hisi_qm *qm, struct sec_ctx *ctx,
+> >> @@ -368,6 +434,12 @@ static int sec_ctx_base_init(struct sec_ctx *ctx)
+> >>   	ctx->sec = sec;
+> >>   	ctx->hlf_q_num = sec->ctx_q_num >> 1;
+> >>   
+> >> +	if (ctx->sec->iommu_used)
+> >> +		ctx->pbuf_supported = true;
+> >> +	else
+> >> +		ctx->pbuf_supported = false;  
+> > ctx->pbuf_supported = ctx->sec->iommu_used;  
+> yes, nice idea.
+> >  
+> >> +	ctx->use_pbuf = false;
+> >> +
+> >>   	/* Half of queue depth is taken as fake requests limit in the queue. */
+> >>   	ctx->fake_req_limit = QM_Q_DEPTH >> 1;
+> >>   	ctx->qp_ctx = kcalloc(sec->ctx_q_num, sizeof(struct sec_qp_ctx),
+> >> @@ -447,7 +519,6 @@ static int sec_skcipher_init(struct crypto_skcipher *tfm)
+> >>   	struct sec_ctx *ctx = crypto_skcipher_ctx(tfm);
+> >>   	int ret;
+> >>   
+> >> -	ctx = crypto_skcipher_ctx(tfm);
+> >>   	ctx->alg_type = SEC_SKCIPHER;
+> >>   	crypto_skcipher_set_reqsize(tfm, sizeof(struct sec_req));
+> >>   	ctx->c_ctx.ivsize = crypto_skcipher_ivsize(tfm);
+> >> @@ -591,11 +662,94 @@ GEN_SEC_SETKEY_FUNC(3des_cbc, SEC_CALG_3DES, SEC_CMODE_CBC)
+> >>   GEN_SEC_SETKEY_FUNC(sm4_xts, SEC_CALG_SM4, SEC_CMODE_XTS)
+> >>   GEN_SEC_SETKEY_FUNC(sm4_cbc, SEC_CALG_SM4, SEC_CMODE_CBC)
+> >>   
+> >> -static int sec_cipher_map(struct device *dev, struct sec_req *req,
+> >> +static int sec_cipher_pbuf_map(struct sec_ctx *ctx, struct sec_req *req,
+> >> +			struct scatterlist *src)
+> >> +{
+> >> +	struct aead_request *aead_req = req->aead_req.aead_req;
+> >> +	struct sec_cipher_req *c_req = &req->c_req;
+> >> +	struct sec_qp_ctx *qp_ctx = req->qp_ctx;
+> >> +	struct device *dev = SEC_CTX_DEV(ctx);
+> >> +	int copy_size, pbuf_length;
+> >> +	int req_id = req->req_id;
+> >> +
+> >> +	if (ctx->alg_type == SEC_AEAD)
+> >> +		copy_size = aead_req->cryptlen + aead_req->assoclen;
+> >> +	else
+> >> +		copy_size = c_req->c_len;
+> >> +
+> >> +	pbuf_length = sg_copy_to_buffer(src, sg_nents(src),
+> >> +				qp_ctx->res[req_id].pbuf,
+> >> +				copy_size);
+> >> +
+> >> +	if (unlikely(pbuf_length != copy_size)) {
+> >> +		dev_err(dev, "copy src data to pbuf error!\n");
+> >> +		return -EINVAL;
+> >> +	}
+> >> +
+> >> +	c_req->c_in_dma = qp_ctx->res[req_id].pbuf_dma;
+> >> +
+> >> +	if (!c_req->c_in_dma) {
+> >> +		dev_err(dev, "fail to set pbuffer address!\n");
+> >> +		return -ENOMEM;
+> >> +	}
+> >> +
+> >> +	c_req->c_out_dma = c_req->c_in_dma;
+> >> +
+> >> +	return 0;
+> >> +}
+> >> +
+> >> +static void sec_cipher_pbuf_unmap(struct sec_ctx *ctx, struct sec_req *req,
+> >> +			struct scatterlist *dst)
+> >> +{
+> >> +	struct aead_request *aead_req = req->aead_req.aead_req;
+> >> +	struct sec_cipher_req *c_req = &req->c_req;
+> >> +	struct sec_qp_ctx *qp_ctx = req->qp_ctx;
+> >> +	struct device *dev = SEC_CTX_DEV(ctx);
+> >> +	int copy_size, pbuf_length;
+> >> +	int req_id = req->req_id;
+> >> +
+> >> +	if (ctx->alg_type == SEC_AEAD)
+> >> +		copy_size = c_req->c_len + aead_req->assoclen;
+> >> +	else
+> >> +		copy_size = c_req->c_len;
+> >> +
+> >> +	pbuf_length = sg_copy_from_buffer(dst, sg_nents(dst),
+> >> +				qp_ctx->res[req_id].pbuf,
+> >> +				copy_size);
+> >> +
+> >> +	if (unlikely(pbuf_length != copy_size))
+> >> +		dev_err(dev, "copy pbuf data to dst error!\n");
+> >> +
+> >> +}
+> >> +
+> >> +static int sec_cipher_map(struct sec_ctx *ctx, struct sec_req *req,
+> >>   			  struct scatterlist *src, struct scatterlist *dst)
+> >>   {
+> >>   	struct sec_cipher_req *c_req = &req->c_req;
+> >> +	struct sec_aead_req *a_req = &req->aead_req;
+> >>   	struct sec_qp_ctx *qp_ctx = req->qp_ctx;
+> >> +	struct sec_alg_res *res = &qp_ctx->res[req->req_id];
+> >> +	struct device *dev = SEC_CTX_DEV(ctx);
+> >> +	int ret;
+> >> +
+> >> +	if (ctx->use_pbuf) {
+> >> +		ret = sec_cipher_pbuf_map(ctx, req, src);
+> >> +		c_req->c_ivin = res->pbuf + SEC_PBUF_IV_OFFSET;
+> >> +		c_req->c_ivin_dma = res->pbuf_dma + SEC_PBUF_IV_OFFSET;
+> >> +		if (ctx->alg_type == SEC_AEAD) {
+> >> +			a_req->out_mac = res->pbuf + SEC_PBUF_MAC_OFFSET;
+> >> +			a_req->out_mac_dma = res->pbuf_dma +
+> >> +					SEC_PBUF_MAC_OFFSET;
+> >> +		}
+> >> +
+> >> +		return ret;
+> >> +	}
+> >> +	c_req->c_ivin = res->c_ivin;
+> >> +	c_req->c_ivin_dma = res->c_ivin_dma;
+> >> +	if (ctx->alg_type == SEC_AEAD) {
+> >> +		a_req->out_mac = res->out_mac;
+> >> +		a_req->out_mac_dma = res->out_mac_dma;
+> >> +	}
+> >>   
+> >>   	c_req->c_in = hisi_acc_sg_buf_map_to_hw_sgl(dev, src,
+> >>   						    qp_ctx->c_in_pool,
+> >> @@ -626,29 +780,34 @@ static int sec_cipher_map(struct device *dev, struct sec_req *req,
+> >>   	return 0;
+> >>   }
+> >>   
+> >> -static void sec_cipher_unmap(struct device *dev, struct sec_cipher_req *req,
+> >> +static void sec_cipher_unmap(struct sec_ctx *ctx, struct sec_req *req,
+> >>   			     struct scatterlist *src, struct scatterlist *dst)
+> >>   {
+> >> -	if (dst != src)
+> >> -		hisi_acc_sg_buf_unmap(dev, src, req->c_in);
+> >> +	struct sec_cipher_req *c_req = &req->c_req;
+> >> +	struct device *dev = SEC_CTX_DEV(ctx);
+> >>   
+> >> -	hisi_acc_sg_buf_unmap(dev, dst, req->c_out);
+> >> +	if (ctx->use_pbuf) {  
+> > Are we sure this flag can't have changed?  
+> I thinks this is a bug, we will update it.
+> >> +		sec_cipher_pbuf_unmap(ctx, req, dst);
+> >> +	} else {
+> >> +		if (dst != src)
+> >> +			hisi_acc_sg_buf_unmap(dev, src, c_req->c_in);
+> >> +
+> >> +		hisi_acc_sg_buf_unmap(dev, dst, c_req->c_out);
+> >> +	}
+> >>   }
+> >>   
+> >>   static int sec_skcipher_sgl_map(struct sec_ctx *ctx, struct sec_req *req)
+> >>   {
+> >>   	struct skcipher_request *sq = req->c_req.sk_req;
+> >>   
+> >> -	return sec_cipher_map(SEC_CTX_DEV(ctx), req, sq->src, sq->dst);
+> >> +	return sec_cipher_map(ctx, req, sq->src, sq->dst);
+> >>   }
+> >>   
+> >>   static void sec_skcipher_sgl_unmap(struct sec_ctx *ctx, struct sec_req *req)
+> >>   {
+> >> -	struct device *dev = SEC_CTX_DEV(ctx);
+> >> -	struct sec_cipher_req *c_req = &req->c_req;
+> >> -	struct skcipher_request *sk_req = c_req->sk_req;
+> >> +	struct skcipher_request *sq = req->c_req.sk_req;
+> >>   
+> >> -	sec_cipher_unmap(dev, c_req, sk_req->src, sk_req->dst);
+> >> +	sec_cipher_unmap(ctx, req, sq->src, sq->dst);
+> >>   }
+> >>   
+> >>   static int sec_aead_aes_set_key(struct sec_cipher_ctx *c_ctx,
+> >> @@ -759,16 +918,14 @@ static int sec_aead_sgl_map(struct sec_ctx *ctx, struct sec_req *req)
+> >>   {
+> >>   	struct aead_request *aq = req->aead_req.aead_req;
+> >>   
+> >> -	return sec_cipher_map(SEC_CTX_DEV(ctx), req, aq->src, aq->dst);
+> >> +	return sec_cipher_map(ctx, req, aq->src, aq->dst);
+> >>   }
+> >>   
+> >>   static void sec_aead_sgl_unmap(struct sec_ctx *ctx, struct sec_req *req)
+> >>   {
+> >> -	struct device *dev = SEC_CTX_DEV(ctx);
+> >> -	struct sec_cipher_req *cq = &req->c_req;
+> >>   	struct aead_request *aq = req->aead_req.aead_req;
+> >>   
+> >> -	sec_cipher_unmap(dev, cq, aq->src, aq->dst);
+> >> +	sec_cipher_unmap(ctx, req, aq->src, aq->dst);
+> >>   }
+> >>   
+> >>   static int sec_request_transfer(struct sec_ctx *ctx, struct sec_req *req)
+> >> @@ -801,9 +958,9 @@ static void sec_request_untransfer(struct sec_ctx *ctx, struct sec_req *req)
+> >>   static void sec_skcipher_copy_iv(struct sec_ctx *ctx, struct sec_req *req)
+> >>   {
+> >>   	struct skcipher_request *sk_req = req->c_req.sk_req;
+> >> -	u8 *c_ivin = req->qp_ctx->res[req->req_id].c_ivin;
+> >> +	struct sec_cipher_req *c_req = &req->c_req;
+> >>   
+> >> -	memcpy(c_ivin, sk_req->iv, ctx->c_ctx.ivsize);
+> >> +	memcpy(c_req->c_ivin, sk_req->iv, ctx->c_ctx.ivsize);
+> >>   }
+> >>   
+> >>   static int sec_skcipher_bd_fill(struct sec_ctx *ctx, struct sec_req *req)
+> >> @@ -818,8 +975,7 @@ static int sec_skcipher_bd_fill(struct sec_ctx *ctx, struct sec_req *req)
+> >>   	memset(sec_sqe, 0, sizeof(struct sec_sqe));
+> >>   
+> >>   	sec_sqe->type2.c_key_addr = cpu_to_le64(c_ctx->c_key_dma);
+> >> -	sec_sqe->type2.c_ivin_addr =
+> >> -		cpu_to_le64(req->qp_ctx->res[req->req_id].c_ivin_dma);
+> >> +	sec_sqe->type2.c_ivin_addr = cpu_to_le64(c_req->c_ivin_dma);
+> >>   	sec_sqe->type2.data_src_addr = cpu_to_le64(c_req->c_in_dma);
+> >>   	sec_sqe->type2.data_dst_addr = cpu_to_le64(c_req->c_out_dma);
+> >>   
+> >> @@ -836,7 +992,10 @@ static int sec_skcipher_bd_fill(struct sec_ctx *ctx, struct sec_req *req)
+> >>   		cipher = SEC_CIPHER_DEC << SEC_CIPHER_OFFSET;
+> >>   	sec_sqe->type_cipher_auth = bd_type | cipher;
+> >>   
+> >> -	sa_type = SEC_SGL << SEC_SRC_SGL_OFFSET;
+> >> +	if (ctx->use_pbuf)
+> >> +		sa_type = SEC_PBUF << SEC_SRC_SGL_OFFSET;
+> >> +	else
+> >> +		sa_type = SEC_SGL << SEC_SRC_SGL_OFFSET;
+> >>   	scene = SEC_COMM_SCENE << SEC_SCENE_OFFSET;
+> >>   	if (c_req->c_in_dma != c_req->c_out_dma)
+> >>   		de = 0x1 << SEC_DE_OFFSET;
+> >> @@ -844,7 +1003,10 @@ static int sec_skcipher_bd_fill(struct sec_ctx *ctx, struct sec_req *req)
+> >>   	sec_sqe->sds_sa_type = (de | scene | sa_type);
+> >>   
+> >>   	/* Just set DST address type */
+> >> -	da_type = SEC_SGL << SEC_DST_SGL_OFFSET;
+> >> +	if (ctx->use_pbuf)
+> >> +		da_type = SEC_PBUF << SEC_DST_SGL_OFFSET;
+> >> +	else
+> >> +		da_type = SEC_SGL << SEC_DST_SGL_OFFSET;
+> >>   	sec_sqe->sdm_addr_type |= da_type;
+> >>   
+> >>   	sec_sqe->type2.clen_ivhlen |= cpu_to_le32(c_req->c_len);
+> >> @@ -904,9 +1066,9 @@ static void sec_skcipher_callback(struct sec_ctx *ctx, struct sec_req *req,
+> >>   static void sec_aead_copy_iv(struct sec_ctx *ctx, struct sec_req *req)
+> >>   {
+> >>   	struct aead_request *aead_req = req->aead_req.aead_req;
+> >> -	u8 *c_ivin = req->qp_ctx->res[req->req_id].c_ivin;
+> >> +	struct sec_cipher_req *c_req = &req->c_req;
+> >>   
+> >> -	memcpy(c_ivin, aead_req->iv, ctx->c_ctx.ivsize);
+> >> +	memcpy(c_req->c_ivin, aead_req->iv, ctx->c_ctx.ivsize);
+> >>   }
+> >>   
+> >>   static void sec_auth_bd_fill_ex(struct sec_auth_ctx *ctx, int dir,
+> >> @@ -939,8 +1101,7 @@ static void sec_auth_bd_fill_ex(struct sec_auth_ctx *ctx, int dir,
+> >>   
+> >>   	sec_sqe->type2.cipher_src_offset = cpu_to_le16((u16)aq->assoclen);
+> >>   
+> >> -	sec_sqe->type2.mac_addr =
+> >> -		cpu_to_le64(req->qp_ctx->res[req->req_id].out_mac_dma);
+> >> +	sec_sqe->type2.mac_addr = cpu_to_le64(a_req->out_mac_dma);
+> >>   }
+> >>   
+> >>   static int sec_aead_bd_fill(struct sec_ctx *ctx, struct sec_req *req)
+> >> @@ -964,6 +1125,7 @@ static void sec_aead_callback(struct sec_ctx *c, struct sec_req *req, int err)
+> >>   {
+> >>   	struct aead_request *a_req = req->aead_req.aead_req;
+> >>   	struct crypto_aead *tfm = crypto_aead_reqtfm(a_req);
+> >> +	struct sec_aead_req *aead_req = &req->aead_req;
+> >>   	struct sec_cipher_req *c_req = &req->c_req;
+> >>   	size_t authsize = crypto_aead_authsize(tfm);
+> >>   	struct sec_qp_ctx *qp_ctx = req->qp_ctx;
+> >> @@ -979,7 +1141,7 @@ static void sec_aead_callback(struct sec_ctx *c, struct sec_req *req, int err)
+> >>   		struct scatterlist *sgl = a_req->dst;
+> >>   
+> >>   		sz = sg_pcopy_from_buffer(sgl, sg_nents(sgl),
+> >> -					  qp_ctx->res[req->req_id].out_mac,
+> >> +					  aead_req->out_mac,
+> >>   					  authsize, a_req->cryptlen +
+> >>   					  a_req->assoclen);
+> >>   
+> >> @@ -1031,6 +1193,7 @@ static int sec_request_init(struct sec_ctx *ctx, struct sec_req *req)
+> >>   
+> >>   static int sec_process(struct sec_ctx *ctx, struct sec_req *req)
+> >>   {
+> >> +	struct sec_cipher_req *c_req = &req->c_req;
+> >>   	int ret;
+> >>   
+> >>   	ret = sec_request_init(ctx, req);
+> >> @@ -1057,12 +1220,10 @@ static int sec_process(struct sec_ctx *ctx, struct sec_req *req)
+> >>   	/* As failing, restore the IV from user */
+> >>   	if (ctx->c_ctx.c_mode == SEC_CMODE_CBC && !req->c_req.encrypt) {
+> >>   		if (ctx->alg_type == SEC_SKCIPHER)
+> >> -			memcpy(req->c_req.sk_req->iv,
+> >> -			       req->qp_ctx->res[req->req_id].c_ivin,
+> >> +			memcpy(req->c_req.sk_req->iv, c_req->c_ivin,
+> >>   			       ctx->c_ctx.ivsize);
+> >>   		else
+> >> -			memcpy(req->aead_req.aead_req->iv,
+> >> -			       req->qp_ctx->res[req->req_id].c_ivin,
+> >> +			memcpy(req->aead_req.aead_req->iv, c_req->c_ivin,
+> >>   			       ctx->c_ctx.ivsize);
+> >>   	}
+> >>   
+> >> @@ -1208,6 +1369,10 @@ static int sec_skcipher_param_check(struct sec_ctx *ctx, struct sec_req *sreq)
+> >>   		return -EINVAL;
+> >>   	}
+> >>   	sreq->c_req.c_len = sk_req->cryptlen;
+> >> +
+> >> +	if (ctx->pbuf_supported && sk_req->cryptlen <= SEC_PBUF_SZ)
+> >> +		ctx->use_pbuf = true;  
+> > This is request specific so a bit nasty to put it in the context. If nothing
+> > else it means reviewing this properly requires careful checking that there
+> > isn't a race on that variable.  Can we put the flag in the request somewhere?  
+> Will fix here in V2.
+> 
+> Cheers,
+> Zaibo
+> 
+> .
+> >  
+> >> +
+> >>   	if (c_alg == SEC_CALG_3DES) {
+> >>   		if (unlikely(sk_req->cryptlen & (DES3_EDE_BLOCK_SIZE - 1))) {
+> >>   			dev_err(dev, "skcipher 3des input length error!\n");
+> >> @@ -1321,11 +1486,16 @@ static int sec_aead_param_check(struct sec_ctx *ctx, struct sec_req *sreq)
+> >>   	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
+> >>   	size_t authsize = crypto_aead_authsize(tfm);
+> >>   
+> >> -	if (unlikely(!req->src || !req->dst || !req->cryptlen)) {
+> >> +	if (unlikely(!req->src || !req->dst || !req->cryptlen ||
+> >> +		req->assoclen > SEC_MAX_AAD_LEN)) {
+> >>   		dev_err(SEC_CTX_DEV(ctx), "aead input param error!\n");
+> >>   		return -EINVAL;
+> >>   	}
+> >>   
+> >> +	if (ctx->pbuf_supported && (req->cryptlen + req->assoclen) <=
+> >> +		SEC_PBUF_SZ)
+> >> +		ctx->use_pbuf = true;
+> >> +
+> >>   	/* Support AES only */
+> >>   	if (unlikely(c_alg != SEC_CALG_AES)) {
+> >>   		dev_err(SEC_CTX_DEV(ctx), "aead crypto alg error!\n");  
+> >
+> > .
+> >  
+> 
+> 
+
 
