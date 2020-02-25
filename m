@@ -4,126 +4,90 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E60CC35E04
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Feb 2020 16:12:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 389E9C35E01
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Feb 2020 16:57:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1EB1C20CC7
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Feb 2020 16:12:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16E612082F
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Feb 2020 16:57:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731133AbgBYQMK (ORCPT
+        id S1731232AbgBYQ5x (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Feb 2020 11:12:10 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:42722 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731125AbgBYQMJ (ORCPT
+        Tue, 25 Feb 2020 11:57:53 -0500
+Received: from stargate.chelsio.com ([12.32.117.8]:54524 "EHLO
+        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727983AbgBYQ5x (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Feb 2020 11:12:09 -0500
-Received: by mail-wr1-f68.google.com with SMTP id p18so11750019wre.9;
-        Tue, 25 Feb 2020 08:12:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=5iVYMAf3KBBmBN8bPXGHIYJDp6KSir9PCdvRV/c4buI=;
-        b=ZzuHnvjK7FAcHFoPikOh3iLCFksYqEx1slSgUTeOgKbeVFIevGLfaotmeEgZ2FJmWL
-         MVFMUnn/KjtHAm5uGnsn7ITF3knLkMuH0x2oSe6zNWXj8Mxdp4ySYzm3304M54G2UbPV
-         STfticLkpBHNF4IX1+ukvxoiMDmHoJlFL6S+Ift7G49JGYJb0I7Z6T8692YK237Srnpi
-         ebMVSXaxOVEvVw+FOuAIEOHHnIaQUhl4wAg4no2Te7zRMjBGU22PoPnu67uR+02zeccq
-         igN+khRIkvbl9RoHG+h77Cskdlnr8Z9A7cMeaj1rhv4KugcYON6+IJ28r210xbDQm0Hq
-         fXAg==
-X-Gm-Message-State: APjAAAX8urQfgenqaKTKJXOHGYQKnD4ubgd6pBYNnY4NghBYYOuq1ios
-        punWasO0zwckrppBhT4Mg2YWEqHjZYY=
-X-Google-Smtp-Source: APXvYqwVFbTeK+gtM5LGRrDz4P5JBGZYNZnTL7U+Ql1eq5kiHsrnuyxsnSA9ZxfS5KEcA0Yx+tY6xw==
-X-Received: by 2002:a5d:5647:: with SMTP id j7mr74240686wrw.265.1582647127853;
-        Tue, 25 Feb 2020 08:12:07 -0800 (PST)
-Received: from 1aq-andre.garage.tyco.com ([77.107.218.170])
-        by smtp.gmail.com with ESMTPSA id h10sm4757339wml.18.2020.02.25.08.12.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Feb 2020 08:12:07 -0800 (PST)
-From:   =?UTF-8?q?Andr=C3=A9=20Draszik?= <git@andred.net>
-To:     linux-kernel@vger.kernel.org
-Cc:     =?UTF-8?q?Andr=C3=A9=20Draszik?= <git@andred.net>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Shawn Guo <shawnguo@kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Fabio Estevam <festevam@gmail.com>,
-        NXP Linux Team <linux-imx@nxp.com>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Anson Huang <Anson.Huang@nxp.com>,
-        Robin Gong <yibin.gong@nxp.com>, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-input@vger.kernel.org
-Subject: [PATCH v2 4/6] arm64: dts: imx8mq: add snvs clock to pwrkey
-Date:   Tue, 25 Feb 2020 16:11:59 +0000
-Message-Id: <20200225161201.1975-4-git@andred.net>
-X-Mailer: git-send-email 2.23.0.rc1
-In-Reply-To: <20200225161201.1975-1-git@andred.net>
-References: <20200225161201.1975-1-git@andred.net>
+        Tue, 25 Feb 2020 11:57:53 -0500
+Received: from localhost.localdomain (cyclone.blr.asicdesigners.com [10.193.186.206])
+        by stargate.chelsio.com (8.13.8/8.13.8) with ESMTP id 01PGvfo8021502;
+        Tue, 25 Feb 2020 08:57:42 -0800
+From:   Vinay Kumar Yadav <vinay.yadav@chelsio.com>
+To:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org
+Cc:     Vinay Kumar Yadav <vinay.yadav@chelsio.com>
+Subject: [PATCH] crypto/chelsio: Fixed tls stats
+Date:   Tue, 25 Feb 2020 22:21:20 +0530
+Message-Id: <20200225165119.15798-1-vinay.yadav@chelsio.com>
+X-Mailer: git-send-email 2.24.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On i.MX8MM, the SNVS requires a clock. This is similar to the clock
-bound to the SNVS RTC node, but if the SNVS RTC driver isn't enabled,
-then SNVS doesn't work, and as such the pwrkey driver doesn't
-work (i.e. hangs the kernel, as the clock isn't enabled).
+Added tls rx stats and reset tls rx/tx stats when chtls driver unload.
 
-Also see commit ec2a844ef7c1
-("ARM: dts: imx7s: add snvs rtc clock")
-for a similar fix.
-
-Signed-off-by: André Draszik <git@andred.net>
-Cc: "Horia Geantă" <horia.geanta@nxp.com>
-Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Rob Herring <robh+dt@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>
-Cc: Shawn Guo <shawnguo@kernel.org>
-Cc: Sascha Hauer <s.hauer@pengutronix.de>
-Cc: Pengutronix Kernel Team <kernel@pengutronix.de>
-Cc: Fabio Estevam <festevam@gmail.com>
-Cc: NXP Linux Team <linux-imx@nxp.com>
-Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Cc: Anson Huang <Anson.Huang@nxp.com>
-Cc: Robin Gong <yibin.gong@nxp.com>
-Cc: linux-crypto@vger.kernel.org
-Cc: devicetree@vger.kernel.org
-Cc: linux-arm-kernel@lists.infradead.org
-Cc: linux-input@vger.kernel.org
-
+Signed-off-by: Vinay Kumar Yadav <vinay.yadav@chelsio.com>
 ---
-v2: new patch
----
- arch/arm64/boot/dts/freescale/imx8mq.dtsi | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/crypto/chelsio/chtls/chtls_io.c   | 3 +++
+ drivers/crypto/chelsio/chtls/chtls_main.c | 7 +++++++
+ 2 files changed, 10 insertions(+)
 
-diff --git a/arch/arm64/boot/dts/freescale/imx8mq.dtsi b/arch/arm64/boot/dts/freescale/imx8mq.dtsi
-index 7f9319452b58..e4ab037183d7 100644
---- a/arch/arm64/boot/dts/freescale/imx8mq.dtsi
-+++ b/arch/arm64/boot/dts/freescale/imx8mq.dtsi
-@@ -501,6 +501,8 @@
- 					compatible = "fsl,sec-v4.0-pwrkey";
- 					regmap = <&snvs>;
- 					interrupts = <GIC_SPI 4 IRQ_TYPE_LEVEL_HIGH>;
-+					clocks = <&clk IMX8MQ_CLK_SNVS_ROOT>;
-+					clock-names = "snvs-pwrkey";
- 					linux,keycode = <KEY_POWER>;
- 					wakeup-source;
- 					status = "disabled";
+diff --git a/drivers/crypto/chelsio/chtls/chtls_io.c b/drivers/crypto/chelsio/chtls/chtls_io.c
+index 5cf9b021220b..781fe7c55a27 100644
+--- a/drivers/crypto/chelsio/chtls/chtls_io.c
++++ b/drivers/crypto/chelsio/chtls/chtls_io.c
+@@ -1399,6 +1399,8 @@ static int chtls_pt_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ {
+ 	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
+ 	struct chtls_hws *hws = &csk->tlshws;
++	struct net_device *dev = csk->egress_dev;
++	struct adapter *adap = netdev2adap(dev);
+ 	struct tcp_sock *tp = tcp_sk(sk);
+ 	unsigned long avail;
+ 	int buffers_freed;
+@@ -1540,6 +1542,7 @@ static int chtls_pt_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+ 				tp->copied_seq += skb->len;
+ 				hws->rcvpld = skb->hdr_len;
+ 			} else {
++				atomic_inc(&adap->chcr_stats.tls_pdu_rx);
+ 				tp->copied_seq += hws->rcvpld;
+ 			}
+ 			chtls_free_skb(sk, skb);
+diff --git a/drivers/crypto/chelsio/chtls/chtls_main.c b/drivers/crypto/chelsio/chtls/chtls_main.c
+index 9f06abd340cc..2110d0893bc7 100644
+--- a/drivers/crypto/chelsio/chtls/chtls_main.c
++++ b/drivers/crypto/chelsio/chtls/chtls_main.c
+@@ -174,9 +174,16 @@ static inline void chtls_dev_release(struct kref *kref)
+ {
+ 	struct tls_toe_device *dev;
+ 	struct chtls_dev *cdev;
++	struct adapter *adap;
+ 
+ 	dev = container_of(kref, struct tls_toe_device, kref);
+ 	cdev = to_chtls_dev(dev);
++
++	/* Reset tls rx/tx stats */
++	adap = pci_get_drvdata(cdev->pdev);
++	atomic_set(&adap->chcr_stats.tls_pdu_tx, 0);
++	atomic_set(&adap->chcr_stats.tls_pdu_rx, 0);
++
+ 	chtls_free_uld(cdev);
+ }
+ 
 -- 
-2.23.0.rc1
+2.24.1
 
