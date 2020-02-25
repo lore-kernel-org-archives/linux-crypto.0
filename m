@@ -4,132 +4,157 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61570C35E04
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Feb 2020 16:10:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83CEDC35E0C
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Feb 2020 16:12:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3B80C206E2
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Feb 2020 16:10:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 666C02176D
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Feb 2020 16:12:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728503AbgBYQKb (ORCPT
+        id S1730925AbgBYQMG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Feb 2020 11:10:31 -0500
-Received: from foss.arm.com ([217.140.110.172]:52634 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728499AbgBYQKb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Feb 2020 11:10:31 -0500
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 82F52101E;
-        Tue, 25 Feb 2020 07:48:48 -0800 (PST)
-Received: from e110176-lin.kfn.arm.com (unknown [10.50.4.157])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F1DAE3F703;
-        Tue, 25 Feb 2020 07:48:46 -0800 (PST)
-From:   Gilad Ben-Yossef <gilad@benyossef.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     Ofir Drang <ofir.drang@arm.com>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Eric Biggers <ebiggers@kernel.org>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH 2/2] crypto: testmgr - sync both RFC4106 IV copies
-Date:   Tue, 25 Feb 2020 17:48:34 +0200
-Message-Id: <20200225154834.25108-3-gilad@benyossef.com>
-X-Mailer: git-send-email 2.25.0
-In-Reply-To: <20200225154834.25108-1-gilad@benyossef.com>
-References: <20200225154834.25108-1-gilad@benyossef.com>
+        Tue, 25 Feb 2020 11:12:06 -0500
+Received: from mail-wm1-f68.google.com ([209.85.128.68]:40239 "EHLO
+        mail-wm1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729206AbgBYQMG (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 25 Feb 2020 11:12:06 -0500
+Received: by mail-wm1-f68.google.com with SMTP id t14so3713545wmi.5;
+        Tue, 25 Feb 2020 08:12:05 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=g6DQBCL1J6m7CoP9ENl+OA6l5n10vKz1KQp1E0CCoWY=;
+        b=sRciTubcIEThZ+RT5lykhenWNNSKXJxdptKckXJNiyMWkzy+iJSlzCVPwHZQr6nWM+
+         9hJVEl6NlnZ4iLv+a2bpHBABvfsJ2K//ZR8PH/Jpa9wosMRjh+KvnF1jyzsPke+0/92o
+         YH9frIGUBdp5AD0+x1cTrtMfKdUru+Kn3HIDJSHPEKBMBzQybr7dAEInRIXSnIzMLL86
+         oqbybIkTGK/uUH9nAHmsecbpF4HjPFY1ialbZ+EORUBx3XSjYcuZHOAEKF2K2aXor84I
+         GIk7hEP0xpFPUEHz71MBS66uGPnpY9bH0JBezpjau9zwghggzGWfsLOwbhWU+pDIoW8U
+         Y+QA==
+X-Gm-Message-State: APjAAAVB7sHGtFBLJXfKoqXZ8sB8vHl9BOQmsdEG3Lt9bcoPIBx4cLN/
+        NfM97FdD3EiD7SGOp0Y2F1VG+bXYfXw=
+X-Google-Smtp-Source: APXvYqz2GddcSqaJtZUCCRWuAVNSfLkFf7wKPo8DHL8CvjqQTROqeO/fxgFpdv9+VIUsyHizZWLqZQ==
+X-Received: by 2002:a05:600c:1009:: with SMTP id c9mr30312wmc.162.1582647124463;
+        Tue, 25 Feb 2020 08:12:04 -0800 (PST)
+Received: from 1aq-andre.garage.tyco.com ([77.107.218.170])
+        by smtp.gmail.com with ESMTPSA id h10sm4757339wml.18.2020.02.25.08.12.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Feb 2020 08:12:03 -0800 (PST)
+From:   =?UTF-8?q?Andr=C3=A9=20Draszik?= <git@andred.net>
+To:     linux-kernel@vger.kernel.org
+Cc:     =?UTF-8?q?Andr=C3=A9=20Draszik?= <git@andred.net>,
+        Rob Herring <robh@kernel.org>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Shawn Guo <shawnguo@kernel.org>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Fabio Estevam <festevam@gmail.com>,
+        NXP Linux Team <linux-imx@nxp.com>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Anson Huang <Anson.Huang@nxp.com>,
+        Robin Gong <yibin.gong@nxp.com>, linux-crypto@vger.kernel.org,
+        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-input@vger.kernel.org
+Subject: [PATCH v2 1/6] dt-bindings: crypto: fsl-sec4: add snvs clock to pwrkey
+Date:   Tue, 25 Feb 2020 16:11:56 +0000
+Message-Id: <20200225161201.1975-1-git@andred.net>
+X-Mailer: git-send-email 2.23.0.rc1
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-RFC4106 AEAD ciphers the AAD is the concatenation of associated
-authentication data || IV || plaintext or ciphertext but the
-random AEAD message generation in testmgr extended tests did
-not obey this requirements producing messages with undefined
-behaviours. Fix it by syncing the copies if needed.
+On i.MX7 and i.MX8M, the SNVS requires a clock. This is similar to the
+clock bound to the SNVS RTC node, but if the SNVS RTC driver isn't
+enabled, then SNVS doesn't work, and as such the pwrkey driver doesn't
+work (i.e. hangs the kernel, as the clock isn't enabled).
 
-Since this only relevant for developer only extended tests any
-additional cycles/run time costs are negligible.
+Also see commit ec2a844ef7c1
+("ARM: dts: imx7s: add snvs rtc clock")
+for a similar fix.
 
-This fixes extended AEAD test failures with the ccree driver
-caused by illegal input.
+Signed-off-by: André Draszik <git@andred.net>
+Acked-by: Rob Herring <robh@kernel.org>
+Cc: "Horia Geantă" <horia.geanta@nxp.com>
+Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Rob Herring <robh+dt@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>
+Cc: Shawn Guo <shawnguo@kernel.org>
+Cc: Sascha Hauer <s.hauer@pengutronix.de>
+Cc: Pengutronix Kernel Team <kernel@pengutronix.de>
+Cc: Fabio Estevam <festevam@gmail.com>
+Cc: NXP Linux Team <linux-imx@nxp.com>
+Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+Cc: Anson Huang <Anson.Huang@nxp.com>
+Cc: Robin Gong <yibin.gong@nxp.com>
+Cc: linux-crypto@vger.kernel.org
+Cc: devicetree@vger.kernel.org
+Cc: linux-arm-kernel@lists.infradead.org
+Cc: linux-input@vger.kernel.org
 
-Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-Reported-by: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Eric Biggers <ebiggers@kernel.org>
 ---
- crypto/testmgr.c | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
+v2:
+* split documentation and i.MX7 dts update into two patches
+* remove stray RTC references from documentation (copy/paste error)
+---
+ .../devicetree/bindings/crypto/fsl-sec4.txt     | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
 
-diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-index cf565b063cdf..288f349a0cae 100644
---- a/crypto/testmgr.c
-+++ b/crypto/testmgr.c
-@@ -95,6 +95,11 @@ struct aead_test_suite {
- 	 * AAD buffer during decryption.
- 	 */
- 	unsigned int esp_aad : 1;
+diff --git a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
+index 2fe245ca816a..a73722c58fab 100644
+--- a/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
++++ b/Documentation/devicetree/bindings/crypto/fsl-sec4.txt
+@@ -449,6 +449,19 @@ System ON/OFF key driver
+       Value type: <phandle>
+       Definition: this is phandle to the register map node.
+ 
++   - clocks
++      Usage: optional, required if SNVS LP requires explicit
++          enablement of clocks
++      Value type: <prop_encoded-array>
++      Definition:  a clock specifier describing the clock required for
++          enabling and disabling SNVS LP.
 +
-+	/*
-+	 * Set if the algorithm requires the IV to trail the AAD buffer.
-+	 */
-+	unsigned int iv_aad : 1;
- };
- 
- struct cipher_test_suite {
-@@ -2207,6 +2212,10 @@ static void generate_aead_message(struct aead_request *req,
- 
- 	/* Generate the AAD. */
- 	generate_random_bytes((u8 *)vec->assoc, vec->alen);
-+	/* For RFC4106 algs, a copy of the IV is part of the AAD */
-+	if (suite->iv_aad)
-+		memcpy(((u8 *)vec->assoc + vec->alen - ivsize), vec->iv,
-+		       ivsize);
- 
- 	if (inauthentic && prandom_u32() % 2 == 0) {
- 		/* Generate a random ciphertext. */
-@@ -2247,6 +2256,14 @@ static void generate_aead_message(struct aead_request *req,
- 	vec->novrfy = 1;
- 	if (suite->einval_allowed)
- 		vec->crypt_error = -EINVAL;
++   - clock-names
++      Usage: optional, required if SNVS LP requires explicit
++          enablement of clocks
++      Value type: <string>
++      Definition: clock name string should be "snvs-pwrkey".
 +
-+	/*
-+	 * For RFC4106 algs, the IV is embedded as part of the AAD
-+	 * and we might have mutated the AAD so sync the copies
-+	 */
-+	if (suite->iv_aad)
-+		memcpy((u8 *)vec->iv, (vec->assoc + vec->alen - ivsize),
-+		       ivsize);
- }
+ EXAMPLE:
+ 	snvs-pwrkey@020cc000 {
+ 		compatible = "fsl,sec-v4.0-pwrkey";
+@@ -456,6 +469,8 @@ EXAMPLE:
+ 		interrupts = <0 4 0x4>
+ 	        linux,keycode = <116>; /* KEY_POWER */
+ 		wakeup-source;
++		clocks = <&clks IMX7D_SNVS_CLK>;
++		clock-names = "snvs-pwrkey";
+ 	};
  
- /*
-@@ -5243,6 +5260,7 @@ static const struct alg_test_desc alg_test_descs[] = {
- 				____VECS(aes_gcm_rfc4106_tv_template),
- 				.einval_allowed = 1,
- 				.esp_aad = 1,
-+				.iv_aad = 1,
- 			}
- 		}
- 	}, {
-@@ -5255,6 +5273,7 @@ static const struct alg_test_desc alg_test_descs[] = {
- 				____VECS(aes_ccm_rfc4309_tv_template),
- 				.einval_allowed = 1,
- 				.esp_aad = 1,
-+				.iv_aad = 1,
- 			}
- 		}
- 	}, {
-@@ -5265,6 +5284,7 @@ static const struct alg_test_desc alg_test_descs[] = {
- 			.aead = {
- 				____VECS(aes_gcm_rfc4543_tv_template),
- 				.einval_allowed = 1,
-+				.iv_aad = 1,
- 			}
- 		}
- 	}, {
+ =====================================================================
+@@ -547,6 +562,8 @@ FULL EXAMPLE
+ 			interrupts = <0 4 0x4>;
+ 			linux,keycode = <116>; /* KEY_POWER */
+ 			wakeup-source;
++			clocks = <&clks IMX7D_SNVS_CLK>;
++			clock-names = "snvs-pwrkey";
+ 		};
+ 	};
+ 
 -- 
-2.25.0
+2.23.0.rc1
 
