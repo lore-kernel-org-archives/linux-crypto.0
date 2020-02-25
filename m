@@ -2,143 +2,210 @@ Return-Path: <SRS0=ER22=4N=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6F1AC35E01
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Feb 2020 14:53:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6193EC35E04
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Feb 2020 15:06:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7C4662084E
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Feb 2020 14:53:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 29A4420CC7
+	for <linux-crypto@archiver.kernel.org>; Tue, 25 Feb 2020 15:06:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="GZtN1hpa"
+	dkim=pass (1024-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="i8mWQUOL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730370AbgBYOxj (ORCPT
+        id S1729810AbgBYPGb (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Feb 2020 09:53:39 -0500
-Received: from mail-eopbgr10075.outbound.protection.outlook.com ([40.107.1.75]:22340
+        Tue, 25 Feb 2020 10:06:31 -0500
+Received: from mail-eopbgr10055.outbound.protection.outlook.com ([40.107.1.55]:15259
         "EHLO EUR02-HE1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1730264AbgBYOxi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Feb 2020 09:53:38 -0500
+        id S1729268AbgBYPGb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 25 Feb 2020 10:06:31 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Jnti11WupGUAv6mkPzUzWUKb2btAS2Nmdc/O2O85c8jE0Vi+LTD1gKC/lV21I5k9W9qOekcS0UEEcDfGAYMbgpzrRxGNhkIz9Bw1ITAvsXTG3J03P5PTQS1z86kbtwTDFfj7b7bQbgqiHKx8CzQbyA44oUTI8wbrtPMXB5S8882slz1FNO/1DS9CC9kJNsZe6uoqHnJlh7lSOA7yobUKQCfor9wuPX0qOo03MekeQUNOCCH8XHT/B68sv6XMxRo6za4VlLLF1XKvGrue4f+KTl5/Khj8OL8KL9u9ZNfJQllyZvKEI7EOpjsSu9OlaJlJ9EQVqqwIdebS1414dVFdfA==
+ b=ROmbGCyegoAVu+nh5neyEXqFeFIYIWSUB2s2JliRg0LlCjzHLDGM+twsd4vo9pfQbCmZlz4QxEKgu1CFwXQcNSGpbB2lP+6VlxYFd/aGZXwCKeWElGZElRpelE9P2DepQ90V36bL/K3wTIThQ/zE5rIE7LMIujeZfchJP5TyfC+ZbszjXb+dEs5vcQ4IALVwDWVSTZ7NvGavXcpn/jIl19TEnzMCRCi0yf+xBJKxcqWzlcfy7QGfE/4/0SwO+wYG7P8pUlh1KFDpQVOsLjGgFDt9WJUB6OWWMLlWYDVamq/M3qmmBgouqXFDtentDchxNzslhYQoUqbhPO/ZcjQK3A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dicUWKMYWtpPMysaaYNYv5xInZgYAHnHd0ZZ8EycgHU=;
- b=WEZ6GcKI37zfIcks5RT9mjMBKy9P59mAhborBNC+qSzbvxbubvEgMFpNpJSFwa6xHh2N0++DgxfLgbz8f/lJzX0dMEWfgwqunZcPNQdbp2oKiajp7AuF9ntcYecUfKMz+2j/r/928qD1qQ3MnL9kndSH+YWpOm1d/vTMQuL48gM3FgQocWX1pSfavLNQU4ak22llt6Au/ZSHMQObu7fcpz3x8HQjIlDB8KN7wGquFvoDVxoVff5iUnPXJrJMAcAH/aK8l/9tIQiRsLG35agvPmK3ejKLTc5LmFPTwmyhd/vIJ312t5VK/WOS/+0HktCvTMgYE8tyGv6DuuxC4A/VCg==
+ bh=eBqCmOeixAWzJIuE2AMrwhb1irciOUUFnofOCOHo9GI=;
+ b=MdiuJvv5I4f3AHeXZmKmnULjvyl/KYSHOYTxzviH670QdQAEOSuE8h92a8f8uUI5rn9JC/LlwtVZWgrK8l5e7id7N4PlyHQYqH+guToxX+yRHAetoFG2I00Aw+WDTQztrUg+WEYnJs/HGiZZx5MOlxLMuUdrpFdjOWuKcP7l+FBL/qVQYp0LGxR/Kz0o7ppkCN/fZRJP7vrTBYJEI+O2HNXEE1yi/heVVx7m1BDvTWEdqjZK4KnjqXYFCyVh12tzsWDEisnT5Cl3qSCAKEhNrXbEcKj7rA5V2fqkksFpYXOPx2+SwFoBH3eDfx15Y99BolATtdT2yHA6F89ZmOXqMg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector2-NXP1-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dicUWKMYWtpPMysaaYNYv5xInZgYAHnHd0ZZ8EycgHU=;
- b=GZtN1hpaALsto5uxSCXrRjMs/osYT4iOO9vN4BhsnciWWKyywDBgDVoWgKzmb90WD44hB14Lw+7XHfwGN+vqwKpdnO1cvfxlOAIGYz+BZ4eWWtiOSbvnC9HwlrAJbBCGOrWyTneqgZFM0FbWM6yXmhWQFRblr1VDeRTRXTRON7I=
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB2800.eurprd04.prod.outlook.com (10.175.24.138) with Microsoft SMTP
+ bh=eBqCmOeixAWzJIuE2AMrwhb1irciOUUFnofOCOHo9GI=;
+ b=i8mWQUOL9Qq5hsINbNyAbrDFn6cK6nf+LlNtuoROG4SCFOGEiJcpkpcC2ii4Lf/MKpPhN0iJb56yqdLLegFEuO/B/k/YxKg7n4ty++aerh0Kklk37V9qNHqNzTZpJR56OiW5IOBT1TIijrp84EwQI+QjMFtTGesZ5c4aBpLzO2E=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=dragos.rosioru@oss.nxp.com; 
+Received: from AM0PR04MB3970.eurprd04.prod.outlook.com (52.134.92.143) by
+ AM0PR04MB4308.eurprd04.prod.outlook.com (52.134.91.158) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2750.21; Tue, 25 Feb 2020 14:53:34 +0000
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::85e9:f844:f8b0:27d]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::85e9:f844:f8b0:27d%7]) with mapi id 15.20.2750.021; Tue, 25 Feb 2020
- 14:53:34 +0000
-From:   Horia Geanta <horia.geanta@nxp.com>
-To:     Matthias Schiffer <matthias.schiffer@ew.tq-group.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>
-CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC] crypto: caam: re-init JR on resume
-Thread-Topic: [RFC] crypto: caam: re-init JR on resume
-Thread-Index: AQHV2nuUMVzJk05YSUGngOodcu7wgw==
-Date:   Tue, 25 Feb 2020 14:53:34 +0000
-Message-ID: <VI1PR0402MB348516318CA986084CBE7B5C98ED0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <20200203101850.22570-1-matthias.schiffer@ew.tq-group.com>
- <eca3c07767f2451590496bc890b235c8285f1a0b.camel@ew.tq-group.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=horia.geanta@nxp.com; 
-x-originating-ip: [212.146.100.6]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: fd17ca9c-4ffa-4a5e-044b-08d7ba027cc9
-x-ms-traffictypediagnostic: VI1PR0402MB2800:|VI1PR0402MB2800:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <VI1PR0402MB28001905F5F7A2B47925F37398ED0@VI1PR0402MB2800.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-forefront-prvs: 0324C2C0E2
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(366004)(396003)(376002)(346002)(39860400002)(189003)(199004)(4326008)(71200400001)(33656002)(9686003)(44832011)(478600001)(2906002)(81166006)(26005)(53546011)(6506007)(81156014)(55016002)(52536014)(8936002)(8676002)(91956017)(316002)(64756008)(66476007)(5660300002)(7696005)(6636002)(186003)(66946007)(66446008)(76116006)(110136005)(66556008)(54906003)(86362001);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB2800;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 2hl8afokwwd0XnpT4u6un81dQGNstIZ5OD9KY1/1642DrPZb0ZRvf2YaOh7T3CE+pMNVkuZPuLbFyyl4J1TKd4qqP7ktIgvyO5aziHLvMA8NkOa2CeDNgKYzVPkReUAQskrwVd7Oo9aWM1jya35cDnWajfBFS2Ks6OzWJnl6+R2gZ9byZo3vz1y/eWAzWEftks3SPyox5RMstl0TkpTUpDhER27JO1O5DRT8I1ZrI+m/CY0mwpJH0ujwUbqU5THR9kzNGH6MG99tu9+ZweWVHRKlWvD7U4uM6Kt28N2+unH4QustH9YvNWlzANa4GJKY89yL2WKeQo3RQ7cGklwU37vPi4BYJmuVfOQJmNo/iNvS4xOdILRx9ArKpMG0lRmZvP9vN6C5nCKwNDggTlM4COPdMFhj9psXk6AvmsxVt2nPIQNqPdbWCa57sTXlzBcu
-x-ms-exchange-antispam-messagedata: 3mYutZyKgYqmhFKMIaL73fPz1Zu6IuzlF1jCJ1V3i5+ktEPCNd1QFkpHLIEyC4wLrKC7V3oY8L/vGyZljGLwtG9iEYG3CRES2eYsFxJP/BcC+Q1ZkHAP1y/68tiakmsp0wxpa7zl9RdaEyOwBTERkQ==
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ 15.20.2750.18; Tue, 25 Feb 2020 15:06:24 +0000
+Received: from AM0PR04MB3970.eurprd04.prod.outlook.com
+ ([fe80::799f:d3bb:67ee:9544]) by AM0PR04MB3970.eurprd04.prod.outlook.com
+ ([fe80::799f:d3bb:67ee:9544%5]) with mapi id 15.20.2750.021; Tue, 25 Feb 2020
+ 15:06:24 +0000
+From:   "Dragos Rosioru (OSS)" <dragos.rosioru@oss.nxp.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Shawn Guo <shawnguo@kernel.org>,
+        Sascha Hauer <s.hauer@pengutronix.de>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Marek Vasut <marex@denx.de>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Fabio Estevam <festevam@gmail.com>,
+        NXP Linux Team <linux-imx@nxp.com>
+Subject: [PATCH] crypto: dcp - fix scatterlist linearization for hash
+Date:   Tue, 25 Feb 2020 17:05:52 +0200
+Message-Id: <1582643152-17278-1-git-send-email-dragos.rosioru@oss.nxp.com>
+X-Mailer: git-send-email 2.7.4
+Content-Type: text/plain
+X-ClientProxiedBy: AM5PR0201CA0005.eurprd02.prod.outlook.com
+ (2603:10a6:203:3d::15) To AM0PR04MB3970.eurprd04.prod.outlook.com
+ (2603:10a6:208:5b::15)
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fd17ca9c-4ffa-4a5e-044b-08d7ba027cc9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Feb 2020 14:53:34.1424
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from fsr-ub1664-206.ea.freescale.net (89.37.124.34) by AM5PR0201CA0005.eurprd02.prod.outlook.com (2603:10a6:203:3d::15) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.20.2750.18 via Frontend Transport; Tue, 25 Feb 2020 15:06:23 +0000
+X-Mailer: git-send-email 2.7.4
+X-Originating-IP: [89.37.124.34]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: fa1806e6-ddc2-46d1-e419-08d7ba0447ea
+X-MS-TrafficTypeDiagnostic: AM0PR04MB4308:|AM0PR04MB4308:
+X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM0PR04MB4308277C950E64FDE2BFDC68DFED0@AM0PR04MB4308.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
+X-Forefront-PRVS: 0324C2C0E2
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(396003)(39860400002)(366004)(346002)(136003)(189003)(199004)(81166006)(6666004)(110136005)(66556008)(478600001)(2906002)(66946007)(5660300002)(316002)(6506007)(6512007)(54906003)(66476007)(52116002)(2616005)(186003)(26005)(8936002)(8676002)(956004)(16526019)(86362001)(6486002)(7416002)(4326008)(81156014);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR04MB4308;H:AM0PR04MB3970.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:0;
+Received-SPF: None (protection.outlook.com: oss.nxp.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: kKk3qRlsOSgajc++4BTnxKibk+NLoodS97VZ4CLxUcdgZlNpVuQRU2ziGt1wNNtVPNDC2Uw7zJz/mfEIGNrTiKqJYS124fdw1Qq8UvyKRYj1fdX9wtD7T4EgOEUV6SIjakhYCSXikt8jak0ZcVe7J0fR3btkM3qtacRqZP8V6NrtqFXBiEZ6oJqwb20ECnO/qXkO8PPDFzfkUHoSjQnB/cCafwOhzxUnUeHaIbsglY3UlkxI7TLBtYynhf5Q6OVgl3Q6LUFYkEfEPgS8Y5+MGWHhHV3sdbEMzBqgqBe3ACGmrfWtmLhuaqKjHrTB8mO28gGsHjqksJpOi01UZjA9brwi7t3Y8RpIvTVRwvIaLovCxMEcccsRBv9jmLqeSqXc5drUGJV1Ex+B/fLapPcmGFVwFlg6O00wlrTt20R9TFzy+dbrMUUYWHGLCjSgzOVr
+X-MS-Exchange-AntiSpam-MessageData: ZoFN2rve7HI5K+IuEJntnI5Dg94dmnu7Mkp3BIv5bSfk8jdBV64+DuRLTSKdGRM7OKCXzLBq0/+I6DM/fRNISlPlX+3+3U8zHX+5lXzlMqWTSLErj7rIlHflM0i2dB6wiuLH2SDr5J7xs8u/wfaDvA==
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fa1806e6-ddc2-46d1-e419-08d7ba0447ea
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Feb 2020 15:06:24.7415
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: m5lJIiI+RpttHDauafGipldppdvA8ejl2Bm7uUBb2lGvxgmb5Tj6BnbgyYMHGssshn+GOyUtfO2S59hgdcQZwg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB2800
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jc9+2itHUxVYdzm0uoqcP8EZdZ49GJaoPyGCWI6KGuek01BfMO8kdYCASKTT22u0PEpmTOv59jeelBORbJi2AQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR04MB4308
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2/21/2020 10:43 AM, Matthias Schiffer wrote:=0A=
-> On Mon, 2020-02-03 at 11:18 +0100, Matthias Schiffer wrote:=0A=
->> The JR loses its configuration during suspend-to-RAM (at least on=0A=
->> i.MX6UL). Re-initialize the hardware on resume.=0A=
->>=0A=
->> Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>=0A=
->> ---=0A=
->>=0A=
->> I've come across the issue that the CAAM would not work anymore after=0A=
->> deep sleep on i.MX6UL. It turned out that the CAAM loses its state=0A=
->> during suspend-to-RAM, so all registers read as zero and need to be=0A=
->> reinitialized.=0A=
->>=0A=
->> This patch is my first attempt at fixing the issue. It seems to work=0A=
->> well enough, but I assume I'm missing some synchronization to prevent=0A=
->> that some CAAM operation is currently under way when the suspend=0A=
->> happens? I don't know the PM and crypto subsystems well enough to=0A=
->> judge=0A=
->> if this is possible, and if it is, how to prevent it.=0A=
->>=0A=
->> I've only compile-tested this version of the patch, as I had to port=0A=
->> it=0A=
->> from our board kernel, which is based on the heavily-modified NXP=0A=
->> branch.=0A=
-> =0A=
-> It would be great to get some feedback on this patch. Is the hardware=0A=
-> support to lose its state? Does my fix look correct?=0A=
-> =0A=
-For most parts, yes, CAAM HW block loses state.=0A=
-=0A=
-We are working at upstreaming PM support.=0A=
-=0A=
-A non-exhaustive high-level list of things to be done, on top of your patch=
-:=0A=
--caam controller driver (ctrl.c) also needs support for PM,=0A=
-for e.g. RNG has to be reinitialized when resuming=0A=
--caam/jr driver: a few other registers have to be saved & restored=0A=
--caam/jr driver: flush/abort the jobs in the input ring when suspending=0A=
--implementations of algorithms using "split key" (a.k.a. "derived key"),=0A=
-which is a black / encrypted key, have to convert the key to=0A=
-a persistent blob since KEKs (JDKEK, TDKEK, TDSK registers) are lost=0A=
-and in certain cases cannot be restored to initial values=0A=
-=0A=
-Horia=0A=
+From: Rosioru Dragos <dragos.rosioru@nxp.com>
+
+The incorrect traversal of the scatterlist, during the linearization phase
+lead to computing the hash value of the wrong input buffer.
+New implementation uses scatterwalk_map_and_copy()
+to address this issue.
+
+Cc: <stable@vger.kernel.org>
+Fixes: 15b59e7c3733 ("crypto: mxs - Add Freescale MXS DCP driver")
+Signed-off-by: Rosioru Dragos <dragos.rosioru@nxp.com>
+---
+ drivers/crypto/mxs-dcp.c | 58 +++++++++++++++++++++++-------------------------
+ 1 file changed, 28 insertions(+), 30 deletions(-)
+
+diff --git a/drivers/crypto/mxs-dcp.c b/drivers/crypto/mxs-dcp.c
+index 435ac1c..d845302 100644
+--- a/drivers/crypto/mxs-dcp.c
++++ b/drivers/crypto/mxs-dcp.c
+@@ -20,6 +20,7 @@
+ #include <crypto/sha.h>
+ #include <crypto/internal/hash.h>
+ #include <crypto/internal/skcipher.h>
++#include <crypto/scatterwalk.h>
+ 
+ #define DCP_MAX_CHANS	4
+ #define DCP_BUF_SZ	PAGE_SIZE
+@@ -611,49 +612,46 @@ static int dcp_sha_req_to_buf(struct crypto_async_request *arq)
+ 	struct dcp_async_ctx *actx = crypto_ahash_ctx(tfm);
+ 	struct dcp_sha_req_ctx *rctx = ahash_request_ctx(req);
+ 	struct hash_alg_common *halg = crypto_hash_alg_common(tfm);
+-	const int nents = sg_nents(req->src);
+ 
+ 	uint8_t *in_buf = sdcp->coh->sha_in_buf;
+ 	uint8_t *out_buf = sdcp->coh->sha_out_buf;
+ 
+-	uint8_t *src_buf;
+-
+ 	struct scatterlist *src;
+ 
+-	unsigned int i, len, clen;
++	unsigned int i, len, clen, oft = 0;
+ 	int ret;
+ 
+ 	int fin = rctx->fini;
+ 	if (fin)
+ 		rctx->fini = 0;
+ 
+-	for_each_sg(req->src, src, nents, i) {
+-		src_buf = sg_virt(src);
+-		len = sg_dma_len(src);
+-
+-		do {
+-			if (actx->fill + len > DCP_BUF_SZ)
+-				clen = DCP_BUF_SZ - actx->fill;
+-			else
+-				clen = len;
+-
+-			memcpy(in_buf + actx->fill, src_buf, clen);
+-			len -= clen;
+-			src_buf += clen;
+-			actx->fill += clen;
++	src = req->src;
++	len = req->nbytes;
+ 
+-			/*
+-			 * If we filled the buffer and still have some
+-			 * more data, submit the buffer.
+-			 */
+-			if (len && actx->fill == DCP_BUF_SZ) {
+-				ret = mxs_dcp_run_sha(req);
+-				if (ret)
+-					return ret;
+-				actx->fill = 0;
+-				rctx->init = 0;
+-			}
+-		} while (len);
++	while (len) {
++		if (actx->fill + len > DCP_BUF_SZ)
++			clen = DCP_BUF_SZ - actx->fill;
++		else
++			clen = len;
++
++		scatterwalk_map_and_copy(in_buf + actx->fill, src, oft, clen,
++					 0);
++
++		len -= clen;
++		oft += clen;
++		actx->fill += clen;
++
++		/*
++		 * If we filled the buffer and still have some
++		 * more data, submit the buffer.
++		 */
++		if (len && actx->fill == DCP_BUF_SZ) {
++			ret = mxs_dcp_run_sha(req);
++			if (ret)
++				return ret;
++			actx->fill = 0;
++			rctx->init = 0;
++		}
+ 	}
+ 
+ 	if (fin) {
+-- 
+2.7.4
+
