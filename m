@@ -2,176 +2,120 @@ Return-Path: <SRS0=wQ8K=4O=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E422C4BA1F
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 17:23:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 602BBC4BA24
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 22:17:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 100DE20838
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 17:23:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2F00F21D7E
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 22:17:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1582755465;
+	bh=cs+KD5MTlL+9h4Tj3lAJWI9MH0tgnD0DmNQnuZrw/9c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=BkrVkbIKE8D1RSFBEnpVnnxslKHj7FZbc3XRJDBJeAx1VZdPnrWKJYOKtF10P0vpG
+	 GQs5//NgltKsEVhjQo6JIAc5eS0fa0zopnJwyS5Bz5qs8TScZWocZrp71IymM5k0bj
+	 zig0TEOQIRZus3oi0q56bfEdoX0eXQv/nbu9xtzY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726527AbgBZRX0 (ORCPT
+        id S1727742AbgBZWRo (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Feb 2020 12:23:26 -0500
-Received: from mail-wr1-f68.google.com ([209.85.221.68]:38742 "EHLO
-        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726148AbgBZRXZ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Feb 2020 12:23:25 -0500
-Received: by mail-wr1-f68.google.com with SMTP id e8so4098402wrm.5;
-        Wed, 26 Feb 2020 09:23:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
-         :references:user-agent:mime-version:content-transfer-encoding;
-        bh=aLmTyqAd/P94kRIyBjL+cb/Y+cTLarFng2zpE1bkPwE=;
-        b=U9mCjIWtwLbZtWh/eWgnPNP7lrTs1AJEZUNGnIwreIeBB/1Xo1px4bvLuMHzWgu5Ro
-         +n+LTCC+FLWa7CX8wWw0XI/j5xBRkQTXzdbQxbZEq1fH+muqeA22bmxa/i6dyrUVFZPr
-         I7Jr/37vMSpEdqt4ova00n28gHvUaWWbNl7EFoyqLZU6a3WF7mQEEbRs987Dmln2u2TI
-         pIDMy7AjBobcCTrjcFYRf4ILOgrWDDsv6TbnJ08zD4fdNT4AYOWFn5srgkkMnN6rBFP0
-         l+TbExYwpP44QMtX7+Lv1m7DrrMv5M+dUef/g9quDkSYYEhR8dNgFLIrkhgxxUHqPESf
-         3x9Q==
-X-Gm-Message-State: APjAAAV6sF1NilPzM0HWylJep4ro2X+JS1WocAoOhGin0xwa5v59UqnJ
-        oaKYaP5Z1f+8Qz5pudDunlk=
-X-Google-Smtp-Source: APXvYqyUjShzivLFLN+R84aLDGeH3LJmk13HXBtoRVbokmE0gc0Nd/SoVz2Mm3vNZuChMhpzJT59sA==
-X-Received: by 2002:adf:f3d1:: with SMTP id g17mr6281250wrp.378.1582737803473;
-        Wed, 26 Feb 2020 09:23:23 -0800 (PST)
-Received: from tfsielt31850 ([77.107.218.170])
-        by smtp.gmail.com with ESMTPSA id j12sm4121316wrt.35.2020.02.26.09.23.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Feb 2020 09:23:22 -0800 (PST)
-Message-ID: <f3c4f7791c86235683541a3d51ed02631b784bf6.camel@andred.net>
-Subject: Re: [PATCH v2 6/6] Input: snvs_pwrkey - only IRQ_HANDLED for our
- own events
-From:   =?ISO-8859-1?Q?Andr=E9?= Draszik <git@andred.net>
-To:     Robin Gong <yibin.gong@nxp.com>
-Cc:     Horia Geanta <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+        Wed, 26 Feb 2020 17:17:44 -0500
+Received: from mail.kernel.org ([198.145.29.99]:34802 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727715AbgBZWRo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 26 Feb 2020 17:17:44 -0500
+Received: from gmail.com (unknown [104.132.1.77])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id BC7702072D;
+        Wed, 26 Feb 2020 22:17:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1582755463;
+        bh=cs+KD5MTlL+9h4Tj3lAJWI9MH0tgnD0DmNQnuZrw/9c=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=DAebMMviU1D71LPXnPss901gxpWeddvg5oFWeaWscNgSXKScZnKkl2Dw9x39ynyOG
+         QmpkTRir9i88Bu7uB45IQ0SkYdFKHAzxqgQy4R6/Mi0MFma4i1a/cj2K591KSfyOgG
+         mCSzF8p+g5KzQHhHWKmt7G6rV/26BKVg8kbF6Tk8=
+Date:   Wed, 26 Feb 2020 14:17:42 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Gilad Ben-Yossef <gilad@benyossef.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Shawn Guo <shawnguo@kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Fabio Estevam <festevam@gmail.com>,
-        dl-linux-imx <linux-imx@nxp.com>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Anson Huang <anson.huang@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-input@vger.kernel.org" <linux-input@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Date:   Wed, 26 Feb 2020 17:23:21 +0000
-In-Reply-To: <VE1PR04MB66385DDED7C654AE2181E08E89EA0@VE1PR04MB6638.eurprd04.prod.outlook.com>
-References: <20200225161201.1975-1-git@andred.net>
-         <20200225161201.1975-6-git@andred.net>
-         <VE1PR04MB66385DDED7C654AE2181E08E89EA0@VE1PR04MB6638.eurprd04.prod.outlook.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.30.5-1.1 
+        Ofir Drang <ofir.drang@arm.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux kernel mailing list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 1/2] crypto: testmgr - use generic algs making test vecs
+Message-ID: <20200226221742.GA135806@gmail.com>
+References: <20200225154834.25108-1-gilad@benyossef.com>
+ <20200225154834.25108-2-gilad@benyossef.com>
+ <20200225194551.GA114977@gmail.com>
+ <CAOtvUMeWB=MiYfzkrPjOctOufKJ8Q81E3m6bq8GJY-enbG6Qjg@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOtvUMeWB=MiYfzkrPjOctOufKJ8Q81E3m6bq8GJY-enbG6Qjg@mail.gmail.com>
+User-Agent: Mutt/1.12.2 (2019-09-21)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, 2020-02-26 at 01:15 +0000, Robin Gong wrote:
-> On 2020/02/26 André Draszik <git@andred.net> wrote: 
-> > The snvs_pwrkey shares the SNVS LPSR status register with the snvs_rtc.
-> > 
-> > This driver here should only return IRQ_HANDLED if the status register
-> > indicates that the event we're handling in the irq handler was genuinely
-> > intended for this driver. Otheriwse the interrupt subsystem will assume the
-> > interrupt was handled successfully even though it wasn't at all.
-> > 
-> > Signed-off-by: André Draszik <git@andred.net>
-> > Cc: "Horia Geantă" <horia.geanta@nxp.com>
-> > Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
-> > Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> > Cc: "David S. Miller" <davem@davemloft.net>
-> > Cc: Rob Herring <robh+dt@kernel.org>
-> > Cc: Mark Rutland <mark.rutland@arm.com>
-> > Cc: Shawn Guo <shawnguo@kernel.org>
-> > Cc: Sascha Hauer <s.hauer@pengutronix.de>
-> > Cc: Pengutronix Kernel Team <kernel@pengutronix.de>
-> > Cc: Fabio Estevam <festevam@gmail.com>
-> > Cc: NXP Linux Team <linux-imx@nxp.com>
-> > Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-> > Cc: Anson Huang <Anson.Huang@nxp.com>
-> > Cc: Robin Gong <yibin.gong@nxp.com>
-> > Cc: linux-crypto@vger.kernel.org
-> > Cc: devicetree@vger.kernel.org
-> > Cc: linux-arm-kernel@lists.infradead.org
-> > Cc: linux-input@vger.kernel.org
-> > 
-> > ---
-> > v2:
-> > * no changes
-> > ---
-> >  drivers/input/keyboard/snvs_pwrkey.c | 12 +++++++-----
-> >  1 file changed, 7 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/drivers/input/keyboard/snvs_pwrkey.c
-> > b/drivers/input/keyboard/snvs_pwrkey.c
-> > index 382d2ae82c9b..980867886b34 100644
-> > --- a/drivers/input/keyboard/snvs_pwrkey.c
-> > +++ b/drivers/input/keyboard/snvs_pwrkey.c
-> > @@ -82,7 +82,9 @@ static irqreturn_t imx_snvs_pwrkey_interrupt(int irq, void
-> > *dev_id)
-> >  	clk_enable(pdata->clk);
-> > 
-> >  	regmap_read(pdata->snvs, SNVS_LPSR_REG, &lp_status);
-> > -	if (lp_status & SNVS_LPSR_SPO) {
-> > +	lp_status &= SNVS_LPSR_SPO;
-> > +
-> > +	if (lp_status) {
-> >  		if (pdata->minor_rev == 0) {
-> >  			/*
-> >  			 * The first generation i.MX[6|7] SoCs only send an @@ -98,14
-> > +100,14 @@ static irqreturn_t imx_snvs_pwrkey_interrupt(int irq, void
-> > *dev_id)
-> >  			mod_timer(&pdata->check_timer,
-> >  			          jiffies + msecs_to_jiffies(DEBOUNCE_TIME));
-> >  		}
-> > -	}
-> > 
-> > -	/* clear SPO status */
-> > -	regmap_write(pdata->snvs, SNVS_LPSR_REG, SNVS_LPSR_SPO);
-> > +		/* clear SPO status */
-> > +		regmap_write(pdata->snvs, SNVS_LPSR_REG, SNVS_LPSR_SPO);
-> But irq storm will come in once there is other interrupt triggered as unexpected,
-> although I never met it before. Could we drop this patch now? Others are ok for me.
+On Wed, Feb 26, 2020 at 04:42:45PM +0200, Gilad Ben-Yossef wrote:
+> 
+> The impetus to write this patch came from my experience debugging a
+> test failure with the ccree driver.
+> At some point while tweaking around I got into a situation where the
+> test was succeeding (that is, declaring the message inauthentic) not
+> because the mutation was being detected but because the generation of
+> the origin was producing a bogus ICV.
 
-I don't have strong feelings about this patch, but this bit merely changes behaviour to
-clear SP0 if SP0 was in fact != 0 in the first place, whereas before SP0 was always
-cleared, even if it was == 0 anyway. Seems more logical in my eyes.
+That's being fixed by your patch 2/2 though, right?
 
+> At that point it seemed to me that it would be safer to "isolate" the
+> original AEAD messages generation from the code that was being teste.
+> 
+> > We could also just move test_aead_inauthentic_inputs() to below
+> > test_aead_vs_generic_impl() so that it runs last.
+> 
+> This would probably be better, although I think that this stage also
+> generates inauthentic messages from time to time, no?
 
-> Reviewed-by: Robin Gong <yibin.gong@nxp>
-> > +	}
-> > 
-> >  	clk_disable(pdata->clk);
-> > 
-> > -	return IRQ_HANDLED;
-> > +	return lp_status ? IRQ_HANDLED : IRQ_NONE;
+That's correct, but in test_aead_vs_generic_impl() the generic implementation is
+used to generate the test vectors.
 
-If you're talking about this part, the rtc-snvs driver does the same in its interrupt handler.
-In other words, this driver here could prevent the rtc-snvs driver from seeing its events.
+> At any rate, I don't have strong feelings about it either way. I defer
+> to your judgment whether it is worth it to add a fallback to use the
+> same implementation and fix what needs fixing or drop the patch
+> altogether if you think this isn't worth the trouble - just let me
+> know.
 
+I just want to avoid adding complexity that isn't worthwhile.
+Beyond your patch 2, how about we just do:
 
-
-Cheers,
-Andre'
-
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index 79b431545249a9..2ab48d4d317250 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -2564,11 +2564,11 @@ static int test_aead_extra(const char *driver,
+ 		goto out;
+ 	}
  
-> >  }
-> > 
-> >  static void imx_snvs_pwrkey_act(void *pdata)
-> > --
-> > 2.23.0.rc1
+-	err = test_aead_inauthentic_inputs(ctx);
++	err = test_aead_vs_generic_impl(ctx);
+ 	if (err)
+ 		goto out;
+ 
+-	err = test_aead_vs_generic_impl(ctx);
++	err = test_aead_inauthentic_inputs(ctx);
+ out:
+ 	kfree(ctx->vec.key);
+ 	kfree(ctx->vec.iv);
 
+
+Then the dedicated tests for inauthentic inputs wouldn't be run until the fuzz
+tests vs. generic have already passed.
+
+- Eric
