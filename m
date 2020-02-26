@@ -2,114 +2,85 @@ Return-Path: <SRS0=wQ8K=4O=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3E8CC4BA06
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 01:29:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E98CC4BA09
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 01:42:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 770E121927
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 01:29:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eSRfJrrb"
+	by mail.kernel.org (Postfix) with ESMTP id DA5532082F
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 01:42:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729566AbgBZB3B (ORCPT
+        id S1729465AbgBZBmp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Feb 2020 20:29:01 -0500
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:43757 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729395AbgBZB3B (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Feb 2020 20:29:01 -0500
-Received: by mail-pf1-f193.google.com with SMTP id s1so530867pfh.10
-        for <linux-crypto@vger.kernel.org>; Tue, 25 Feb 2020 17:28:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id;
-        bh=vHnoiE2Lvw7hwJiHoxNVUEj7j+4ABzT2vnGBT++TeTk=;
-        b=eSRfJrrbKwAkCJ/OfjPbB07snFeA90jhWtm3D1d/Ao4a8YWY5b/butwclrugMtQyto
-         YUBnjKdnkb/m4/PV0VlWgwZVMENu91ZfRJQD4h9ez7V68ZunetMSLyhRCo8QCnFeTBAu
-         3AeMMOOGQdycc11Tsvka8XDTeif5lp7H5oneJs1a+o+hFsafhWOXzMrMLf+N01NSzxDA
-         manhXFzq0Gs/cLY8UO7k5q5LuPRSKBV1JTSuu+5L0hWMYk/2CeEkIvjGuRwFdUEHNx6Z
-         TKD0Wd/29fJQexSTPplm65QkreJV7c+Tr7NZQEVC4ctA4Rov2zX6Y7hKVXbufTeQkbQg
-         VE7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=vHnoiE2Lvw7hwJiHoxNVUEj7j+4ABzT2vnGBT++TeTk=;
-        b=aHpJX9y5hJPSpeFxTxuv46th4rW/hbSJRF3/iJYdLD05ofI7wq4IC7XGri++M88A4E
-         gCoY/J7pvR7JdWh+RxedbfUoZdRWtght5j8Y2Igj7V3eqS56N6GnfxkINA+Y/qAd3VM8
-         1PB/dTtNQqZTlCtMuQoLfs9SK1o3Zfx8s2fQd9K31paMs5kMSgCD/eohfyVxBznWCEen
-         hz8DiI4IwFLkzz4IBRRKpkoYrpBvVUbPFRJ9tB5NvYcXXBGUnbAL7CbK/4Opvw5WJ01B
-         7dELmxwpckzzM+dOP1lA7xwyuwKDWrymxOi7k1HzyWaVSItpBqoRlDCX/SosjKQolLDP
-         mBDg==
-X-Gm-Message-State: APjAAAVBrz2d57g1Orhw6qa93QAJRX9Z8nYG3E74z4EV/rrH9a3qCVxM
-        bHlmnFvegohjaE0gy3rKXkJV0g==
-X-Google-Smtp-Source: APXvYqwUNwVRv+swWTZ2eRfOm2MCq483DsIDj+WOD8rH3A5r3EhuhbWBu8Nj/QxikFbvKlieVP4Edw==
-X-Received: by 2002:a63:214e:: with SMTP id s14mr1264455pgm.428.1582680538680;
-        Tue, 25 Feb 2020 17:28:58 -0800 (PST)
-Received: from localhost.localdomain ([240e:362:4c3:8800:a057:bb7f:18d7:2e])
-        by smtp.gmail.com with ESMTPSA id q11sm326994pff.111.2020.02.25.17.28.44
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Tue, 25 Feb 2020 17:28:58 -0800 (PST)
-From:   Zhangfei Gao <zhangfei.gao@linaro.org>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        jonathan.cameron@huawei.com, dave.jiang@intel.com,
-        grant.likely@arm.com, jean-philippe <jean-philippe@linaro.org>,
-        Jerome Glisse <jglisse@redhat.com>,
-        ilias.apalodimas@linaro.org, francois.ozog@linaro.org,
-        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
-        "haojian . zhuang" <haojian.zhuang@linaro.org>,
-        guodong.xu@linaro.org
-Cc:     linux-accelerators@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
-        Zhangfei Gao <zhangfei.gao@linaro.org>
-Subject: [PATCH v2] MAINTAINERS: add maintainers for uacce
-Date:   Wed, 26 Feb 2020 09:28:28 +0800
-Message-Id: <1582680508-596-1-git-send-email-zhangfei.gao@linaro.org>
-X-Mailer: git-send-email 2.7.4
+        Tue, 25 Feb 2020 20:42:45 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:11106 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1729403AbgBZBmp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 25 Feb 2020 20:42:45 -0500
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 0084616CA8CEA96D3FCD;
+        Wed, 26 Feb 2020 09:42:42 +0800 (CST)
+Received: from [127.0.0.1] (10.63.139.185) by DGGEMS411-HUB.china.huawei.com
+ (10.3.19.211) with Microsoft SMTP Server id 14.3.439.0; Wed, 26 Feb 2020
+ 09:42:34 +0800
+Subject: Re: [PATCH -next] crypto: hisilicon - qm depends on UACCE
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+References: <20200225030356.44008-1-yaohongbo@huawei.com>
+ <5E54DE89.2030703@hisilicon.com> <20200225102237.GA31328@gondor.apana.org.au>
+CC:     Hongbo Yao <yaohongbo@huawei.com>, <davem@davemloft.net>,
+        <linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <chenzhou10@huawei.com>, <xuzaibo@huawei.com>
+From:   Zhou Wang <wangzhou1@hisilicon.com>
+Message-ID: <5E55CD0A.4060209@hisilicon.com>
+Date:   Wed, 26 Feb 2020 09:42:34 +0800
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:38.0) Gecko/20100101
+ Thunderbird/38.5.1
+MIME-Version: 1.0
+In-Reply-To: <20200225102237.GA31328@gondor.apana.org.au>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.63.139.185]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add Zhangfei Gao and Zhou Wang as maintainers for uacce
+On 2020/2/25 18:22, Herbert Xu wrote:
+> On Tue, Feb 25, 2020 at 04:44:57PM +0800, Zhou Wang wrote:
+>>
+>>> diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kconfig
+>>> index 8851161f722f..b35c2ec15bc2 100644
+>>> --- a/drivers/crypto/hisilicon/Kconfig
+>>> +++ b/drivers/crypto/hisilicon/Kconfig
+>>> @@ -40,6 +40,7 @@ config CRYPTO_DEV_HISI_QM
+>>>  	tristate
+>>>  	depends on ARM64 || COMPILE_TEST
+>>>  	depends on PCI && PCI_MSI
+>>> +	depends on UACCE
+>>>  	help
+>>>  	  HiSilicon accelerator engines use a common queue management
+>>>  	  interface. Specific engine driver may use this module.
+>>>
+>>
+>> Indeed, this driver does not depend on uacce fully, as if there is no uacce, it still can
+>> register to kernel crypto.
+>>
+>> Seems that changing uacce config to bool can avoid this problem.
+> 
+> You shouldn't make it a bool.  The standard way to solve this is to
+> add this:
+> 
+> 	depends on UACCE || UACCE=n
 
-Signed-off-by: Zhangfei Gao <zhangfei.gao@linaro.org>
-Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
----
-Add list, suggested by Dave
+Thanks! Let's fix together with zip Kconfig.
 
-MAINTAINERS | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+Best,
+Zhou
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 38fe2f3..b5bdef8 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -17039,6 +17039,18 @@ W:	http://linuxtv.org
- S:	Maintained
- F:	drivers/media/pci/tw686x/
- 
-+UACCE ACCELERATOR FRAMEWORK
-+M:	Zhangfei Gao <zhangfei.gao@linaro.org>
-+M:	Zhou Wang <wangzhou1@hisilicon.com>
-+L:	linux-accelerators@lists.ozlabs.org
-+L:	linux-kernel@vger.kernel.org
-+S:	Maintained
-+F:	Documentation/ABI/testing/sysfs-driver-uacce
-+F:	Documentation/misc-devices/uacce.rst
-+F:	drivers/misc/uacce/
-+F:	include/linux/uacce.h
-+F:	include/uapi/misc/uacce/
-+
- UBI FILE SYSTEM (UBIFS)
- M:	Richard Weinberger <richard@nod.at>
- L:	linux-mtd@lists.infradead.org
--- 
-2.7.4
+> 
+> Cheers,
+> 
 
