@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A5E6C4BA14
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50C9EC4BA13
 	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 05:01:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6371020658
+	by mail.kernel.org (Postfix) with ESMTP id 1AB1D20658
 	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 05:01:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=default; t=1582693264;
-	bh=APCpCZ7hSn7B1jgf9/ybXYkfluvNjA0o648Pw0wRYsI=;
+	bh=7SLlCC1YGdRQ/h+aQyJidKzAfNlLQuSKfCThJkShylU=;
 	h=From:To:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=jzo8wXwaGDyTL7VhSWKIrgP5X5Q+W6AO6NyyAHpKFM2Zl1ioDh8WrzhcqD4uU92ol
-	 2PzWxLFnfqpBL0GpHAPRflCnTIyLIr11QINDshSTiG+GNSIhDCQQrwyR41FAWiODMN
-	 8/GKuw4TK34ehqhj/Z9Om7oztD4DJ6cdlCqTl7DE=
+	b=nOPLotSB/cP0E7NaOYRxBoCcedDC4VV1QP33MDUyTslwWVTUFRi53F2NHBouPGovx
+	 7CKFvVKTxLXfkm7vq03aOmMJOEmooFpHRH1ymivUTtgleVlI56v/rgCkWsiGhDJlB2
+	 wIgrEcY/ZA2KkMgf06e2YOdxtpZzlkLqeMUw/KG4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726473AbgBZFBC (ORCPT
+        id S1726396AbgBZFBD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Feb 2020 00:01:02 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50572 "EHLO mail.kernel.org"
+        Wed, 26 Feb 2020 00:01:03 -0500
+Received: from mail.kernel.org ([198.145.29.99]:50560 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726407AbgBZFBB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Feb 2020 00:01:01 -0500
+        id S1726555AbgBZFBC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 26 Feb 2020 00:01:02 -0500
 Received: from sol.hsd1.ca.comcast.net (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1180820726
+        by mail.kernel.org (Postfix) with ESMTPSA id CAEAC24656
         for <linux-crypto@vger.kernel.org>; Wed, 26 Feb 2020 05:01:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=default; t=1582693261;
-        bh=APCpCZ7hSn7B1jgf9/ybXYkfluvNjA0o648Pw0wRYsI=;
+        bh=7SLlCC1YGdRQ/h+aQyJidKzAfNlLQuSKfCThJkShylU=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=ZfH28Ljh0B6h+7y8kzGvSZM2bTxEo4Yyznwaqr3xa+z/+B1m5Fh+jKMNZA5jjZVkA
-         21qzufjXhpEfNDHKoKXaGkyB4R4RFrEDY/ODQmoat44RDLnxqKK7cE4CVYxof6de8u
-         4+4vekOLVN0wnjCenwLB6WUz9gaMhXOqh0BHB7V8=
+        b=nmtWoO0iljjQZaWh6hykw6dKOxmFwUNHmFYEjifW0Buk/bPoKp7flNKgl1wL2bnQU
+         DlODqDVVhXLKiq4WkoFuJLWwRDzv9Ju29PXMpO8y7ujyo+JdTBO5kalh7Z4DoFyOBr
+         DIgqTRxbrE2tu8a2ciiZUOzkceNwBcBm0VJkUdoU=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Subject: [PATCH 07/12] crypto: gcm - simplify error handling in crypto_rfc4543_create()
-Date:   Tue, 25 Feb 2020 20:59:19 -0800
-Message-Id: <20200226045924.97053-8-ebiggers@kernel.org>
+Subject: [PATCH 11/12] crypto: rsa-pkcs1pad - simplify error handling in pkcs1pad_create()
+Date:   Tue, 25 Feb 2020 20:59:23 -0800
+Message-Id: <20200226045924.97053-12-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20200226045924.97053-1-ebiggers@kernel.org>
 References: <20200226045924.97053-1-ebiggers@kernel.org>
@@ -56,112 +56,136 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-Simplify the error handling in crypto_rfc4543_create() by taking
-advantage of crypto_grab_aead() now handling an ERR_PTR() name and by
-taking advantage of crypto_drop_aead() now accepting (as a no-op) a
-spawn that hasn't been grabbed yet.
+Simplify the error handling in pkcs1pad_create() by taking advantage of
+crypto_grab_akcipher() now handling an ERR_PTR() name and by taking
+advantage of crypto_drop_akcipher() now accepting (as a no-op) a spawn
+that hasn't been grabbed yet.
 
-Conveniently, this eliminates the 'ccm_name' variable which was
-incorrectly named (it should have been 'gcm_name').
-
-Also fix a weird case where a line was terminated by a comma rather than
-a semicolon, causing the statement to be continued on the next line.
-Fortunately the code still behaved as intended, though.
+While we're at it, also simplify the way the hash_name optional argument
+is handled.  We only need to check whether it's present in one place,
+and we can just assign directly to ctx->digest_info.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- crypto/gcm.c | 37 ++++++++++++-------------------------
- 1 file changed, 12 insertions(+), 25 deletions(-)
+ crypto/rsa-pkcs1pad.c | 59 +++++++++++++++----------------------------
+ 1 file changed, 20 insertions(+), 39 deletions(-)
 
-diff --git a/crypto/gcm.c b/crypto/gcm.c
-index 5560341e28105..0103d28c541eb 100644
---- a/crypto/gcm.c
-+++ b/crypto/gcm.c
-@@ -1060,10 +1060,8 @@ static int crypto_rfc4543_create(struct crypto_template *tmpl,
+diff --git a/crypto/rsa-pkcs1pad.c b/crypto/rsa-pkcs1pad.c
+index 176b63afec8d9..d31031de51bcb 100644
+--- a/crypto/rsa-pkcs1pad.c
++++ b/crypto/rsa-pkcs1pad.c
+@@ -596,14 +596,11 @@ static void pkcs1pad_free(struct akcipher_instance *inst)
+ 
+ static int pkcs1pad_create(struct crypto_template *tmpl, struct rtattr **tb)
+ {
+-	const struct rsa_asn1_template *digest_info;
  	struct crypto_attr_type *algt;
  	u32 mask;
- 	struct aead_instance *inst;
--	struct crypto_aead_spawn *spawn;
- 	struct aead_alg *alg;
- 	struct crypto_rfc4543_instance_ctx *ctx;
--	const char *ccm_name;
+ 	struct akcipher_instance *inst;
+ 	struct pkcs1pad_inst_ctx *ctx;
+-	struct crypto_akcipher_spawn *spawn;
+ 	struct akcipher_alg *rsa_alg;
+-	const char *rsa_alg_name;
+ 	const char *hash_name;
  	int err;
  
- 	algt = crypto_get_attr_type(tb);
-@@ -1075,32 +1073,27 @@ static int crypto_rfc4543_create(struct crypto_template *tmpl,
+@@ -616,60 +613,49 @@ static int pkcs1pad_create(struct crypto_template *tmpl, struct rtattr **tb)
  
  	mask = crypto_requires_sync(algt->type, algt->mask);
  
--	ccm_name = crypto_attr_alg_name(tb[1]);
--	if (IS_ERR(ccm_name))
--		return PTR_ERR(ccm_name);
+-	rsa_alg_name = crypto_attr_alg_name(tb[1]);
+-	if (IS_ERR(rsa_alg_name))
+-		return PTR_ERR(rsa_alg_name);
+-
+-	hash_name = crypto_attr_alg_name(tb[2]);
+-	if (IS_ERR(hash_name))
+-		hash_name = NULL;
+-
+-	if (hash_name) {
+-		digest_info = rsa_lookup_asn1(hash_name);
+-		if (!digest_info)
+-			return -EINVAL;
+-	} else
+-		digest_info = NULL;
 -
  	inst = kzalloc(sizeof(*inst) + sizeof(*ctx), GFP_KERNEL);
  	if (!inst)
  		return -ENOMEM;
  
- 	ctx = aead_instance_ctx(inst);
--	spawn = &ctx->aead;
--	err = crypto_grab_aead(spawn, aead_crypto_instance(inst),
--			       ccm_name, 0, mask);
-+	err = crypto_grab_aead(&ctx->aead, aead_crypto_instance(inst),
-+			       crypto_attr_alg_name(tb[1]), 0, mask);
+ 	ctx = akcipher_instance_ctx(inst);
+-	spawn = &ctx->spawn;
+-	ctx->digest_info = digest_info;
+ 
+-	err = crypto_grab_akcipher(spawn, akcipher_crypto_instance(inst),
+-				   rsa_alg_name, 0, mask);
++	err = crypto_grab_akcipher(&ctx->spawn, akcipher_crypto_instance(inst),
++				   crypto_attr_alg_name(tb[1]), 0, mask);
  	if (err)
 -		goto out_free_inst;
 +		goto err_free_inst;
  
--	alg = crypto_spawn_aead_alg(spawn);
-+	alg = crypto_spawn_aead_alg(&ctx->aead);
- 
- 	err = -EINVAL;
- 
- 	/* Underlying IV size must be 12. */
- 	if (crypto_aead_alg_ivsize(alg) != GCM_AES_IV_SIZE)
--		goto out_drop_alg;
-+		goto err_free_inst;
- 
- 	/* Not a stream cipher? */
- 	if (alg->base.cra_blocksize != 1)
--		goto out_drop_alg;
-+		goto err_free_inst;
+-	rsa_alg = crypto_spawn_akcipher_alg(spawn);
++	rsa_alg = crypto_spawn_akcipher_alg(&ctx->spawn);
  
  	err = -ENAMETOOLONG;
- 	if (snprintf(inst->alg.base.cra_name, CRYPTO_MAX_ALG_NAME,
-@@ -1109,7 +1102,7 @@ static int crypto_rfc4543_create(struct crypto_template *tmpl,
- 	    snprintf(inst->alg.base.cra_driver_name, CRYPTO_MAX_ALG_NAME,
- 		     "rfc4543(%s)", alg->base.cra_driver_name) >=
- 	    CRYPTO_MAX_ALG_NAME)
--		goto out_drop_alg;
-+		goto err_free_inst;
+-
+-	if (!hash_name) {
++	hash_name = crypto_attr_alg_name(tb[2]);
++	if (IS_ERR(hash_name)) {
+ 		if (snprintf(inst->alg.base.cra_name,
+ 			     CRYPTO_MAX_ALG_NAME, "pkcs1pad(%s)",
+ 			     rsa_alg->base.cra_name) >= CRYPTO_MAX_ALG_NAME)
+-			goto out_drop_alg;
++			goto err_free_inst;
  
- 	inst->alg.base.cra_flags = alg->base.cra_flags & CRYPTO_ALG_ASYNC;
- 	inst->alg.base.cra_priority = alg->base.cra_priority;
-@@ -1130,20 +1123,14 @@ static int crypto_rfc4543_create(struct crypto_template *tmpl,
- 	inst->alg.encrypt = crypto_rfc4543_encrypt;
- 	inst->alg.decrypt = crypto_rfc4543_decrypt;
+ 		if (snprintf(inst->alg.base.cra_driver_name,
+ 			     CRYPTO_MAX_ALG_NAME, "pkcs1pad(%s)",
+ 			     rsa_alg->base.cra_driver_name) >=
+ 			     CRYPTO_MAX_ALG_NAME)
+-			goto out_drop_alg;
++			goto err_free_inst;
+ 	} else {
++		ctx->digest_info = rsa_lookup_asn1(hash_name);
++		if (!ctx->digest_info) {
++			err = -EINVAL;
++			goto err_free_inst;
++		}
++
+ 		if (snprintf(inst->alg.base.cra_name, CRYPTO_MAX_ALG_NAME,
+ 			     "pkcs1pad(%s,%s)", rsa_alg->base.cra_name,
+ 			     hash_name) >= CRYPTO_MAX_ALG_NAME)
+-			goto out_drop_alg;
++			goto err_free_inst;
  
--	inst->free = crypto_rfc4543_free,
-+	inst->free = crypto_rfc4543_free;
+ 		if (snprintf(inst->alg.base.cra_driver_name,
+ 			     CRYPTO_MAX_ALG_NAME, "pkcs1pad(%s,%s)",
+ 			     rsa_alg->base.cra_driver_name,
+ 			     hash_name) >= CRYPTO_MAX_ALG_NAME)
+-			goto out_drop_alg;
++			goto err_free_inst;
+ 	}
  
- 	err = aead_register_instance(tmpl, inst);
+ 	inst->alg.base.cra_flags = rsa_alg->base.cra_flags & CRYPTO_ALG_ASYNC;
+@@ -691,15 +677,10 @@ static int pkcs1pad_create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	inst->free = pkcs1pad_free;
+ 
+ 	err = akcipher_register_instance(tmpl, inst);
 -	if (err)
 -		goto out_drop_alg;
 -
--out:
-+	if (err) {
-+err_free_inst:
-+		crypto_rfc4543_free(inst);
-+	}
- 	return err;
+-	return 0;
 -
 -out_drop_alg:
--	crypto_drop_aead(spawn);
+-	crypto_drop_akcipher(spawn);
 -out_free_inst:
 -	kfree(inst);
--	goto out;
++	if (err) {
++err_free_inst:
++		pkcs1pad_free(inst);
++	}
+ 	return err;
  }
  
- static struct crypto_template crypto_gcm_tmpls[] = {
 -- 
 2.25.1
 
