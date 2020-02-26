@@ -2,129 +2,149 @@ Return-Path: <SRS0=wQ8K=4O=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5CBBC4BA09
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 02:32:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACABEC4BA0A
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 05:01:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6AAE6222C2
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 02:32:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 845F424670
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 05:01:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1582684374;
-	bh=02ouW81DUsPHAJzxSAPTvGoxzGwv4BggF6TdJk2BivY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=NmqYit7UYIZAO+Sxd/I6TRhMhFRSWFKjUcVtxse91yy1RZwjhIDCbGUYsntQHVNGL
-	 ehX48Xa8GluO4Wy52jytPq1avawdXhuRE6hljBtS3YqIpzhM7U0le9AVJ8Jla+hu4G
-	 v3lLXgWta9kCgU5hRpY2cMRbkmmVXFLdarL7J0js=
+	s=default; t=1582693261;
+	bh=LyuWWg9skpodxMCZVIHiqEZ0MIEfa09EvTHzQKrp8KI=;
+	h=From:To:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=Ld1a4GhAF+Ry339hSsldzkJc+804HE8PvZhftDnfUberscH1v+Bh+gvBmgiKcl1TK
+	 fv4ffLsJdyoQ9Bq+TckIDJ6pACLdvaB/lOhF3F+pkC/MYvouWbyVsV75Jv9M2QuifF
+	 u5FEgU5ZsFQE+7xoHTU/NpYBtZt3Jd6xCewmvFVY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729395AbgBZCcx (ORCPT
+        id S1726277AbgBZFBA (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Feb 2020 21:32:53 -0500
-Received: from mail.kernel.org ([198.145.29.99]:49436 "EHLO mail.kernel.org"
+        Wed, 26 Feb 2020 00:01:00 -0500
+Received: from mail.kernel.org ([198.145.29.99]:50554 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729045AbgBZCcx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Feb 2020 21:32:53 -0500
-Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        id S1726046AbgBZFBA (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 26 Feb 2020 00:01:00 -0500
+Received: from sol.hsd1.ca.comcast.net (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1830721D7E;
-        Wed, 26 Feb 2020 02:32:52 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 1D3F120726
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Feb 2020 05:01:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1582684372;
-        bh=02ouW81DUsPHAJzxSAPTvGoxzGwv4BggF6TdJk2BivY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ZLKokWUTzTs0OqW+20nt+1D3cwx7Q4MkCz3mWJn/pl5n9lI1dHWx15PSutwErtEg/
-         gF/1rcGRKMcbixPFtR+T+DS8KCGAad/4MTP1YByuB0HD6F/f4X6DMe2srFf9pejKnl
-         HOIkEaKtNr+FgUDBVQGxmV3Q5MqK/odSzAC+I0UM=
-Date:   Tue, 25 Feb 2020 18:32:50 -0800
+        s=default; t=1582693260;
+        bh=LyuWWg9skpodxMCZVIHiqEZ0MIEfa09EvTHzQKrp8KI=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=d2aumOgG38twj5BaN1SKQeigwXipSiv3enGJNRp/wKvobr06vVTtwDJuKXN/GZYrx
+         +Nm4Vkw2S/5lGtlZKYCzdM4e6ZR2cpHgeKO4FCxOwlQDnC/TvH/hjQGTfKPTNqXGoH
+         2wh7LkssI5XwvCW12TOIQ0C/BoZnlgHlkL7BQoh0=
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Gilad Ben-Yossef <gilad@benyossef.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Ofir Drang <ofir.drang@arm.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] crypto: testmgr - use generic algs making test vecs
-Message-ID: <20200226023250.GA1053@sol.localdomain>
-References: <20200225154834.25108-1-gilad@benyossef.com>
- <20200225154834.25108-2-gilad@benyossef.com>
- <20200225194551.GA114977@gmail.com>
+To:     linux-crypto@vger.kernel.org
+Subject: [PATCH 02/12] crypto: ccm - simplify error handling in crypto_rfc4309_create()
+Date:   Tue, 25 Feb 2020 20:59:14 -0800
+Message-Id: <20200226045924.97053-3-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200226045924.97053-1-ebiggers@kernel.org>
+References: <20200226045924.97053-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200225194551.GA114977@gmail.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Feb 25, 2020 at 11:45:51AM -0800, Eric Biggers wrote:
-> On Tue, Feb 25, 2020 at 05:48:33PM +0200, Gilad Ben-Yossef wrote:
-> > Use generic algs to produce inauthentic AEAD messages,
-> > otherwise we are running the risk of using an untested
-> > code to produce the test messages.
-> > 
-> > As this code is only used in developer only extended tests
-> > any cycles/runtime costs are negligible.
-> > 
-> > Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-> > Cc: Eric Biggers <ebiggers@kernel.org>
-> 
-> It's intentional to use the same implementation to generate the inauthentic AEAD
-> messages, because it allows the inauthentic AEAD input tests to run even if the
-> generic implementation is unavailable.
-> 
-> > @@ -2337,8 +2338,42 @@ static int test_aead_inauthentic_inputs(struct aead_extra_tests_ctx *ctx)
-> >  {
-> >  	unsigned int i;
-> >  	int err;
-> > +	struct crypto_aead *tfm = ctx->tfm;
-> > +	const char *algname = crypto_aead_alg(tfm)->base.cra_name;
-> > +	const char *driver = ctx->driver;
-> > +	const char *generic_driver = ctx->test_desc->generic_driver;
-> > +	char _generic_driver[CRYPTO_MAX_ALG_NAME];
-> > +	struct crypto_aead *generic_tfm = NULL;
-> > +	struct aead_request *generic_req = NULL;
-> > +
-> > +	if (!generic_driver) {
-> > +		err = build_generic_driver_name(algname, _generic_driver);
-> > +		if (err)
-> > +			return err;
-> > +		generic_driver = _generic_driver;
-> > +	}
-> > +
-> > +	if (!strcmp(generic_driver, driver) == 0) {
-> > +		/* Already the generic impl? */
-> > +
-> > +		generic_tfm = crypto_alloc_aead(generic_driver, 0, 0);
-> 
-> I think you meant the condition to be 'if (strcmp(generic_driver, driver) != 0)'
-> and for the comment to be "Not already the generic impl?".
-> 
-> > +		if (IS_ERR(generic_tfm)) {
-> > +			err = PTR_ERR(generic_tfm);
-> > +			pr_err("alg: aead: error allocating %s (generic impl of %s): %d\n",
-> > +			generic_driver, algname, err);
-> > +			return err;
-> > +		}
-> 
-> This means the test won't run if the generic implementation is unavailable.
-> Is there any particular reason to impose that requirement?
-> 
-> You mentioned a concern about the implementation being "untested", but it
-> actually already passed test_aead() before getting to test_aead_extra().
-> 
-> We could also just move test_aead_inauthentic_inputs() to below
-> test_aead_vs_generic_impl() so that it runs last.
-> 
+From: Eric Biggers <ebiggers@google.com>
 
-Also: if we did make the inauthentic input tests use the generic implementation,
-then it would be better to move them into test_aead_vs_generic_impl() so that we
-don't duplicate the code that allocates a tfm and request for the generic
-implementation.
+Simplify the error handling in crypto_rfc4309_create() by taking
+advantage of crypto_grab_aead() now handling an ERR_PTR() name and by
+taking advantage of crypto_drop_aead() now accepting (as a no-op) a
+spawn that hasn't been grabbed yet.
 
-But to me it makes more sense to keep them separate, since a generic
-implementation is not needed to run the inauthentic input tests.
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/ccm.c | 29 +++++++++--------------------
+ 1 file changed, 9 insertions(+), 20 deletions(-)
 
-- Eric
+diff --git a/crypto/ccm.c b/crypto/ccm.c
+index 241ecdc5c4e0e..d1fb01bbc8143 100644
+--- a/crypto/ccm.c
++++ b/crypto/ccm.c
+@@ -717,7 +717,6 @@ static int crypto_rfc4309_create(struct crypto_template *tmpl,
+ 	struct aead_instance *inst;
+ 	struct crypto_aead_spawn *spawn;
+ 	struct aead_alg *alg;
+-	const char *ccm_name;
+ 	int err;
+ 
+ 	algt = crypto_get_attr_type(tb);
+@@ -729,19 +728,15 @@ static int crypto_rfc4309_create(struct crypto_template *tmpl,
+ 
+ 	mask = crypto_requires_sync(algt->type, algt->mask);
+ 
+-	ccm_name = crypto_attr_alg_name(tb[1]);
+-	if (IS_ERR(ccm_name))
+-		return PTR_ERR(ccm_name);
+-
+ 	inst = kzalloc(sizeof(*inst) + sizeof(*spawn), GFP_KERNEL);
+ 	if (!inst)
+ 		return -ENOMEM;
+ 
+ 	spawn = aead_instance_ctx(inst);
+ 	err = crypto_grab_aead(spawn, aead_crypto_instance(inst),
+-			       ccm_name, 0, mask);
++			       crypto_attr_alg_name(tb[1]), 0, mask);
+ 	if (err)
+-		goto out_free_inst;
++		goto err_free_inst;
+ 
+ 	alg = crypto_spawn_aead_alg(spawn);
+ 
+@@ -749,11 +744,11 @@ static int crypto_rfc4309_create(struct crypto_template *tmpl,
+ 
+ 	/* We only support 16-byte blocks. */
+ 	if (crypto_aead_alg_ivsize(alg) != 16)
+-		goto out_drop_alg;
++		goto err_free_inst;
+ 
+ 	/* Not a stream cipher? */
+ 	if (alg->base.cra_blocksize != 1)
+-		goto out_drop_alg;
++		goto err_free_inst;
+ 
+ 	err = -ENAMETOOLONG;
+ 	if (snprintf(inst->alg.base.cra_name, CRYPTO_MAX_ALG_NAME,
+@@ -762,7 +757,7 @@ static int crypto_rfc4309_create(struct crypto_template *tmpl,
+ 	    snprintf(inst->alg.base.cra_driver_name, CRYPTO_MAX_ALG_NAME,
+ 		     "rfc4309(%s)", alg->base.cra_driver_name) >=
+ 	    CRYPTO_MAX_ALG_NAME)
+-		goto out_drop_alg;
++		goto err_free_inst;
+ 
+ 	inst->alg.base.cra_flags = alg->base.cra_flags & CRYPTO_ALG_ASYNC;
+ 	inst->alg.base.cra_priority = alg->base.cra_priority;
+@@ -786,17 +781,11 @@ static int crypto_rfc4309_create(struct crypto_template *tmpl,
+ 	inst->free = crypto_rfc4309_free;
+ 
+ 	err = aead_register_instance(tmpl, inst);
+-	if (err)
+-		goto out_drop_alg;
+-
+-out:
++	if (err) {
++err_free_inst:
++		crypto_rfc4309_free(inst);
++	}
+ 	return err;
+-
+-out_drop_alg:
+-	crypto_drop_aead(spawn);
+-out_free_inst:
+-	kfree(inst);
+-	goto out;
+ }
+ 
+ static int crypto_cbcmac_digest_setkey(struct crypto_shash *parent,
+-- 
+2.25.1
+
