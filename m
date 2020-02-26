@@ -2,206 +2,176 @@ Return-Path: <SRS0=wQ8K=4O=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CE4BC4BA13
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 15:10:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E422C4BA1F
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 17:23:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DC4362467D
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 15:10:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="UVJiUfAM"
+	by mail.kernel.org (Postfix) with ESMTP id 100DE20838
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 17:23:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727066AbgBZPKK (ORCPT
+        id S1726527AbgBZRX0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Feb 2020 10:10:10 -0500
-Received: from mail-vs1-f65.google.com ([209.85.217.65]:34567 "EHLO
-        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726990AbgBZPKK (ORCPT
+        Wed, 26 Feb 2020 12:23:26 -0500
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:38742 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726148AbgBZRXZ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Feb 2020 10:10:10 -0500
-Received: by mail-vs1-f65.google.com with SMTP id g15so2012715vsf.1
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Feb 2020 07:10:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=YwH333YB+c5WkNcA+ALefDNi+G9uKbYvmmOr7YCboTE=;
-        b=UVJiUfAM4+zL4FNaj6BWYdjJGVhdYrZfxgPsMy4YFA55x/zCRNyODDutNTxqY0nTIg
-         9nolSHFWRVM7Xz0TSM5heUPkXwtIU1E+AP8FJpKxBYfkPHs41xNr5dn1R+q3q7SIqTNZ
-         l+dV/+msKw16rgXj4sEXcry9wQHS2ghleCeww1vAE+i3Y39i1nZ4sdf+2f9o7bkPD6sz
-         2r5o3NvdSJRw9Dnd/YoopW/vlFsbXcVY64fkCd5eyffDT4+Y8G2ziT7TO04UC4It3Wql
-         ByluCAQ7A++4rKUYkyhEeTBwre6uDoIbUDShNNwgXpKnMe/tOUdzEFHuZRy7as4Bg06v
-         p4kA==
+        Wed, 26 Feb 2020 12:23:25 -0500
+Received: by mail-wr1-f68.google.com with SMTP id e8so4098402wrm.5;
+        Wed, 26 Feb 2020 09:23:24 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=YwH333YB+c5WkNcA+ALefDNi+G9uKbYvmmOr7YCboTE=;
-        b=gSYMqSXw1Xyb/PBwBpaE6+shtM3E7qHCivSdxbBedKCiwxNQV/gr4zwuOKcWFuTWv7
-         lGrYZ5OYGalGPdFsNgsSoJ84Ra6eGuzf9Obpy5kF0sf2zC5pYJ8Chcj/8e7SILccLUV5
-         3FhoMoU7VkyxlQpQ6vuXLeKVYQQBsFM9efCzbyA6UD5+ZCdvcjHgrSIWtMmyaZPXAYac
-         TvnzU6M/ZMtQJtC3fl2Xfo74u74Zv/99YbaL1oDopSI3obwKMX2Y2LZJBlUVWdiojr96
-         PyB9h9ERKEshc6EyDR82Sl7Qm4k8AfrffQi0kZdR/XAt0j5Ry3xlmOESvTT6Z++QfMyC
-         pMHA==
-X-Gm-Message-State: APjAAAVS4fn4W2DDYgEIJ3DBdaLBYTL94pQYxRM0y8cqYXX/M47eAirZ
-        vd1L8t+z7IhLzaCB91Qm1iHeFth4NS4feY1/UWN8dQ==
-X-Google-Smtp-Source: APXvYqxvSSzNuYDeslmTElbHKRXvxiTarkH7AscU9sikvdlh1m9MEkBDw7Rghi+H5Q5Tqa9p4vzkSjcbG3wuvWpnX5I=
-X-Received: by 2002:a67:6746:: with SMTP id b67mr4354659vsc.193.1582729808210;
- Wed, 26 Feb 2020 07:10:08 -0800 (PST)
-MIME-Version: 1.0
-References: <20200225154834.25108-1-gilad@benyossef.com> <20200225154834.25108-3-gilad@benyossef.com>
- <20200225200244.GB114977@gmail.com>
-In-Reply-To: <20200225200244.GB114977@gmail.com>
-From:   Gilad Ben-Yossef <gilad@benyossef.com>
-Date:   Wed, 26 Feb 2020 17:09:57 +0200
-Message-ID: <CAOtvUMfsDfWskU8HYHfRhwqeN_DZcNZBo9g9MwXbjTcfe3-ocQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] crypto: testmgr - sync both RFC4106 IV copies
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:user-agent:mime-version:content-transfer-encoding;
+        bh=aLmTyqAd/P94kRIyBjL+cb/Y+cTLarFng2zpE1bkPwE=;
+        b=U9mCjIWtwLbZtWh/eWgnPNP7lrTs1AJEZUNGnIwreIeBB/1Xo1px4bvLuMHzWgu5Ro
+         +n+LTCC+FLWa7CX8wWw0XI/j5xBRkQTXzdbQxbZEq1fH+muqeA22bmxa/i6dyrUVFZPr
+         I7Jr/37vMSpEdqt4ova00n28gHvUaWWbNl7EFoyqLZU6a3WF7mQEEbRs987Dmln2u2TI
+         pIDMy7AjBobcCTrjcFYRf4ILOgrWDDsv6TbnJ08zD4fdNT4AYOWFn5srgkkMnN6rBFP0
+         l+TbExYwpP44QMtX7+Lv1m7DrrMv5M+dUef/g9quDkSYYEhR8dNgFLIrkhgxxUHqPESf
+         3x9Q==
+X-Gm-Message-State: APjAAAV6sF1NilPzM0HWylJep4ro2X+JS1WocAoOhGin0xwa5v59UqnJ
+        oaKYaP5Z1f+8Qz5pudDunlk=
+X-Google-Smtp-Source: APXvYqyUjShzivLFLN+R84aLDGeH3LJmk13HXBtoRVbokmE0gc0Nd/SoVz2Mm3vNZuChMhpzJT59sA==
+X-Received: by 2002:adf:f3d1:: with SMTP id g17mr6281250wrp.378.1582737803473;
+        Wed, 26 Feb 2020 09:23:23 -0800 (PST)
+Received: from tfsielt31850 ([77.107.218.170])
+        by smtp.gmail.com with ESMTPSA id j12sm4121316wrt.35.2020.02.26.09.23.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Feb 2020 09:23:22 -0800 (PST)
+Message-ID: <f3c4f7791c86235683541a3d51ed02631b784bf6.camel@andred.net>
+Subject: Re: [PATCH v2 6/6] Input: snvs_pwrkey - only IRQ_HANDLED for our
+ own events
+From:   =?ISO-8859-1?Q?Andr=E9?= Draszik <git@andred.net>
+To:     Robin Gong <yibin.gong@nxp.com>
+Cc:     Horia Geanta <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Ofir Drang <ofir.drang@arm.com>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Shawn Guo <shawnguo@kernel.org>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Fabio Estevam <festevam@gmail.com>,
+        dl-linux-imx <linux-imx@nxp.com>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Anson Huang <anson.huang@nxp.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-input@vger.kernel.org" <linux-input@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Date:   Wed, 26 Feb 2020 17:23:21 +0000
+In-Reply-To: <VE1PR04MB66385DDED7C654AE2181E08E89EA0@VE1PR04MB6638.eurprd04.prod.outlook.com>
+References: <20200225161201.1975-1-git@andred.net>
+         <20200225161201.1975-6-git@andred.net>
+         <VE1PR04MB66385DDED7C654AE2181E08E89EA0@VE1PR04MB6638.eurprd04.prod.outlook.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.30.5-1.1 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Feb 25, 2020 at 10:02 PM Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Tue, Feb 25, 2020 at 05:48:34PM +0200, Gilad Ben-Yossef wrote:
-> > RFC4106 AEAD ciphers the AAD is the concatenation of associated
-> > authentication data || IV || plaintext or ciphertext but the
-> > random AEAD message generation in testmgr extended tests did
-> > not obey this requirements producing messages with undefined
-> > behaviours. Fix it by syncing the copies if needed.
-> >
-> > Since this only relevant for developer only extended tests any
-> > additional cycles/run time costs are negligible.
-> >
-> > This fixes extended AEAD test failures with the ccree driver
-> > caused by illegal input.
-> >
-> > Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-> > Reported-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> > Cc: Eric Biggers <ebiggers@kernel.org>
+On Wed, 2020-02-26 at 01:15 +0000, Robin Gong wrote:
+> On 2020/02/26 André Draszik <git@andred.net> wrote: 
+> > The snvs_pwrkey shares the SNVS LPSR status register with the snvs_rtc.
+> > 
+> > This driver here should only return IRQ_HANDLED if the status register
+> > indicates that the event we're handling in the irq handler was genuinely
+> > intended for this driver. Otheriwse the interrupt subsystem will assume the
+> > interrupt was handled successfully even though it wasn't at all.
+> > 
+> > Signed-off-by: André Draszik <git@andred.net>
+> > Cc: "Horia Geantă" <horia.geanta@nxp.com>
+> > Cc: Aymen Sghaier <aymen.sghaier@nxp.com>
+> > Cc: Herbert Xu <herbert@gondor.apana.org.au>
+> > Cc: "David S. Miller" <davem@davemloft.net>
+> > Cc: Rob Herring <robh+dt@kernel.org>
+> > Cc: Mark Rutland <mark.rutland@arm.com>
+> > Cc: Shawn Guo <shawnguo@kernel.org>
+> > Cc: Sascha Hauer <s.hauer@pengutronix.de>
+> > Cc: Pengutronix Kernel Team <kernel@pengutronix.de>
+> > Cc: Fabio Estevam <festevam@gmail.com>
+> > Cc: NXP Linux Team <linux-imx@nxp.com>
+> > Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>
+> > Cc: Anson Huang <Anson.Huang@nxp.com>
+> > Cc: Robin Gong <yibin.gong@nxp.com>
+> > Cc: linux-crypto@vger.kernel.org
+> > Cc: devicetree@vger.kernel.org
+> > Cc: linux-arm-kernel@lists.infradead.org
+> > Cc: linux-input@vger.kernel.org
+> > 
 > > ---
-> >  crypto/testmgr.c | 20 ++++++++++++++++++++
-> >  1 file changed, 20 insertions(+)
-> >
-> > diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-> > index cf565b063cdf..288f349a0cae 100644
-> > --- a/crypto/testmgr.c
-> > +++ b/crypto/testmgr.c
-> > @@ -95,6 +95,11 @@ struct aead_test_suite {
-> >       /*
-> >        * Set if the algorithm intentionally ignores the last 8 bytes of=
- the
-> >        * AAD buffer during decryption.
-> >        */
-> >       unsigned int esp_aad : 1;
+> > v2:
+> > * no changes
+> > ---
+> >  drivers/input/keyboard/snvs_pwrkey.c | 12 +++++++-----
+> >  1 file changed, 7 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/drivers/input/keyboard/snvs_pwrkey.c
+> > b/drivers/input/keyboard/snvs_pwrkey.c
+> > index 382d2ae82c9b..980867886b34 100644
+> > --- a/drivers/input/keyboard/snvs_pwrkey.c
+> > +++ b/drivers/input/keyboard/snvs_pwrkey.c
+> > @@ -82,7 +82,9 @@ static irqreturn_t imx_snvs_pwrkey_interrupt(int irq, void
+> > *dev_id)
+> >  	clk_enable(pdata->clk);
+> > 
+> >  	regmap_read(pdata->snvs, SNVS_LPSR_REG, &lp_status);
+> > -	if (lp_status & SNVS_LPSR_SPO) {
+> > +	lp_status &= SNVS_LPSR_SPO;
 > > +
-> > +     /*
-> > +      * Set if the algorithm requires the IV to trail the AAD buffer.
-> > +      */
-> > +     unsigned int iv_aad : 1;
-> >  };
->
-> What's the difference between esp_aad and iv_aad?  Are you sure we need a=
-nother
-> flag and not just use the existing flag?
+> > +	if (lp_status) {
+> >  		if (pdata->minor_rev == 0) {
+> >  			/*
+> >  			 * The first generation i.MX[6|7] SoCs only send an @@ -98,14
+> > +100,14 @@ static irqreturn_t imx_snvs_pwrkey_interrupt(int irq, void
+> > *dev_id)
+> >  			mod_timer(&pdata->check_timer,
+> >  			          jiffies + msecs_to_jiffies(DEBOUNCE_TIME));
+> >  		}
+> > -	}
+> > 
+> > -	/* clear SPO status */
+> > -	regmap_write(pdata->snvs, SNVS_LPSR_REG, SNVS_LPSR_SPO);
+> > +		/* clear SPO status */
+> > +		regmap_write(pdata->snvs, SNVS_LPSR_REG, SNVS_LPSR_SPO);
+> But irq storm will come in once there is other interrupt triggered as unexpected,
+> although I never met it before. Could we drop this patch now? Others are ok for me.
 
-Yes, because we have 3 distinct states -
-1. No IV in the AAD buffer - "normal"  AEAD.
-2. There is a copy of the IV in the AAD buffer and it is NOT used for
-ICV computation purposes - RFC4106 and RFC 4309.
-3, There is a copy of the IV in the AAD buffer and it is used for ICV
-computation purposes - RFC 4543.
-
-3 states needs at least 2 bits.
-
-> If they're both needed, please document them properly.  You're currently =
-setting
-
-I will add a remark explaining this.
-I chose to keep the "esp_aad" name, since it was there before, but
-possibly this is not a good choice in light of your comments so will
-change that too.
-
-> them both on some algorithms, which based on the current comments is a lo=
-gical
-> contradiction because esp_aad is documented to mean that the last 8 bytes=
- are
-> ignored while iv_aad is documented to mean that these bytes must be the I=
-V.
-
-I believe it isn't a contradiction after all. Consider -
-
-RFC 4106 needs to have a copy of the IV in the AAD buffer which is
-identical to the one being passed via the normal mechanism in the API.
-If they are not identical, we have no way to know which copy of the IV
-is being used by an implementation as part of the AES-GCM nonce and so
-the generated message may be different from the one being used by the
-generic implementation. which results in encryption test failing when
-compared to the generic implementation  results, even though there is
-nothing wrong with the tested implementation and indeed the previous
-compassion against the precomputed test vectors passes.
-This is what happened with the ccree driver. Note that this has
-nothing to do with mutating the message - this is an encryption test
-failing.
-This is the iv_aad flag, which will need to be true in this case.
-
-On the other hand when testing decryption and mutating the AEAD
-message, we need to know not to mutate the IV copy in the AAD buffer,
-since it is ignored.
-This is the esp_aad flag, which will also needs to be true in this case.
-
-Last but not least, RFC 4543 need a copy of the IV in the AAD buffer
-However, this copy DOES get hashed as part of the ICV computation, so
--
-We need iv_aad flag to be true to let us know we need to copy the IV.
-However, we need esp_aad to be false since it's fine and even
-desirable to mutate the IV copy in the AAD buffer.
-
-You are correct though that I can make the 2nd copy of the IV post
-mutation dependant on esp_aad not being set, though...
+I don't have strong feelings about this patch, but this bit merely changes behaviour to
+clear SP0 if SP0 was in fact != 0 in the first place, whereas before SP0 was always
+cleared, even if it was == 0 anyway. Seems more logical in my eyes.
 
 
-I hope this explains this mess better.
-It certainly took me a while to figure out what is going on...
+> Reviewed-by: Robin Gong <yibin.gong@nxp>
+> > +	}
+> > 
+> >  	clk_disable(pdata->clk);
+> > 
+> > -	return IRQ_HANDLED;
+> > +	return lp_status ? IRQ_HANDLED : IRQ_NONE;
+
+If you're talking about this part, the rtc-snvs driver does the same in its interrupt handler.
+In other words, this driver here could prevent the rtc-snvs driver from seeing its events.
 
 
->
-> >
-> >  struct cipher_test_suite {
-> > @@ -2207,6 +2212,10 @@ static void generate_aead_message(struct aead_re=
-quest *req,
-> >
-> >       /* Generate the AAD. */
-> >       generate_random_bytes((u8 *)vec->assoc, vec->alen);
-> > +     /* For RFC4106 algs, a copy of the IV is part of the AAD */
-> > +     if (suite->iv_aad)
-> > +             memcpy(((u8 *)vec->assoc + vec->alen - ivsize), vec->iv,
-> > +                    ivsize);
->
-> What guarantees that vec->alen >=3D ivsize?
 
-You are right, I need to check for that.
-However, if it isn't this can't be a legal RFC4106 message and we will
-fail encryption .
+Cheers,
+Andre'
 
-Thanks!
-Gilad
+ 
+> >  }
+> > 
+> >  static void imx_snvs_pwrkey_act(void *pdata)
+> > --
+> > 2.23.0.rc1
 
-
---=20
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-values of =CE=B2 will give rise to dom!
