@@ -2,67 +2,68 @@ Return-Path: <SRS0=wQ8K=4O=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4CDAC4BA10
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 14:43:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CE4BC4BA13
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 15:10:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8C65B24680
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 14:43:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC4362467D
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 15:10:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="rZKYZyZe"
+	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="UVJiUfAM"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726974AbgBZOnC (ORCPT
+        id S1727066AbgBZPKK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Feb 2020 09:43:02 -0500
-Received: from mail-ua1-f65.google.com ([209.85.222.65]:44204 "EHLO
-        mail-ua1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727362AbgBZOm7 (ORCPT
+        Wed, 26 Feb 2020 10:10:10 -0500
+Received: from mail-vs1-f65.google.com ([209.85.217.65]:34567 "EHLO
+        mail-vs1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726990AbgBZPKK (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Feb 2020 09:42:59 -0500
-Received: by mail-ua1-f65.google.com with SMTP id a33so1031107uad.11
-        for <linux-crypto@vger.kernel.org>; Wed, 26 Feb 2020 06:42:57 -0800 (PST)
+        Wed, 26 Feb 2020 10:10:10 -0500
+Received: by mail-vs1-f65.google.com with SMTP id g15so2012715vsf.1
+        for <linux-crypto@vger.kernel.org>; Wed, 26 Feb 2020 07:10:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=benyossef-com.20150623.gappssmtp.com; s=20150623;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=2driM7PVKhUuwY8TYsAiPgtqDfJ1mYTYuG83+3NODao=;
-        b=rZKYZyZe5pecUg6ri7spyGNlVIyke9HtZIFWZAO5W3oJk2MG4xqdy++MHeGXvyk2mA
-         WRNiGwLHqe6E1FAGMonL03AJRUsQr1yuV0OKuCuqrm6Pni++rP2T+xfcmnOGwmKQ3R8m
-         +bfV/GYHBchauekkGjlSIc7gDgqJsuFxAIwVxcrf5eKBlGTUfIsbqJhdtUAW2Iyy76Sg
-         SbWghbJWh570IvRvtLULVWnrSGM7hygFOYVyfX7Q3DIHUezDALez8PMnpn8mdqGc4I4p
-         skK0TBi9QlhXRb8869GtBswUI8uEQeWvmnjkpP4Qad5PHd7O4oF6tV+szldTCsV2hvRq
-         PbeA==
+        bh=YwH333YB+c5WkNcA+ALefDNi+G9uKbYvmmOr7YCboTE=;
+        b=UVJiUfAM4+zL4FNaj6BWYdjJGVhdYrZfxgPsMy4YFA55x/zCRNyODDutNTxqY0nTIg
+         9nolSHFWRVM7Xz0TSM5heUPkXwtIU1E+AP8FJpKxBYfkPHs41xNr5dn1R+q3q7SIqTNZ
+         l+dV/+msKw16rgXj4sEXcry9wQHS2ghleCeww1vAE+i3Y39i1nZ4sdf+2f9o7bkPD6sz
+         2r5o3NvdSJRw9Dnd/YoopW/vlFsbXcVY64fkCd5eyffDT4+Y8G2ziT7TO04UC4It3Wql
+         ByluCAQ7A++4rKUYkyhEeTBwre6uDoIbUDShNNwgXpKnMe/tOUdzEFHuZRy7as4Bg06v
+         p4kA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=2driM7PVKhUuwY8TYsAiPgtqDfJ1mYTYuG83+3NODao=;
-        b=g9Xo00a+0HYSJrux1zSkc9CCJmuhFN+fsJi79GTc7LtwMY0GMqTkHp4Jg2EzD6ESfT
-         PsBNrp28qeKEHXh7bUsfay1gw4nssmIdQtoQ8MuT4jHQpaFWBUim/dswshsm9LUBRNc/
-         EV1tUwHa0ll/v2nGzP3FoY+JiRIQXoEbQ4jsoluSgnep3n722B1vgYCsoj4nweGw9AtK
-         am4BImqJLP7SFkcab18mOFA2/qHW38lA2fN6G8R16jpSdenxGYiN+VwnPU7ZqneviPyH
-         hkEBbKtUOh4Yi5tsxphKFnloU23XPPjwXv+ezBNy8vORr3bPbzjnghv+4GIRREQfOGTB
-         PJew==
-X-Gm-Message-State: APjAAAUwRJwuwclAY4eEdcemluW00iAZan3JmmqywT0S5s6Dl3pSDP4t
-        spSGmpeN6OjjqE6jxpiMyIzEm+4MDbkSAdHGw963kg==
-X-Google-Smtp-Source: APXvYqzkgKGcDiFlA58U+y0xkwzn4e25+jVwn5rMMEn8FbTSxS0DJ1hIBhPWzwyEFGqNfRJOZMch419/ZIU78qM1Vds=
-X-Received: by 2002:a9f:226d:: with SMTP id 100mr3924729uad.107.1582728176625;
- Wed, 26 Feb 2020 06:42:56 -0800 (PST)
+        bh=YwH333YB+c5WkNcA+ALefDNi+G9uKbYvmmOr7YCboTE=;
+        b=gSYMqSXw1Xyb/PBwBpaE6+shtM3E7qHCivSdxbBedKCiwxNQV/gr4zwuOKcWFuTWv7
+         lGrYZ5OYGalGPdFsNgsSoJ84Ra6eGuzf9Obpy5kF0sf2zC5pYJ8Chcj/8e7SILccLUV5
+         3FhoMoU7VkyxlQpQ6vuXLeKVYQQBsFM9efCzbyA6UD5+ZCdvcjHgrSIWtMmyaZPXAYac
+         TvnzU6M/ZMtQJtC3fl2Xfo74u74Zv/99YbaL1oDopSI3obwKMX2Y2LZJBlUVWdiojr96
+         PyB9h9ERKEshc6EyDR82Sl7Qm4k8AfrffQi0kZdR/XAt0j5Ry3xlmOESvTT6Z++QfMyC
+         pMHA==
+X-Gm-Message-State: APjAAAVS4fn4W2DDYgEIJ3DBdaLBYTL94pQYxRM0y8cqYXX/M47eAirZ
+        vd1L8t+z7IhLzaCB91Qm1iHeFth4NS4feY1/UWN8dQ==
+X-Google-Smtp-Source: APXvYqxvSSzNuYDeslmTElbHKRXvxiTarkH7AscU9sikvdlh1m9MEkBDw7Rghi+H5Q5Tqa9p4vzkSjcbG3wuvWpnX5I=
+X-Received: by 2002:a67:6746:: with SMTP id b67mr4354659vsc.193.1582729808210;
+ Wed, 26 Feb 2020 07:10:08 -0800 (PST)
 MIME-Version: 1.0
-References: <20200225154834.25108-1-gilad@benyossef.com> <20200225154834.25108-2-gilad@benyossef.com>
- <20200225194551.GA114977@gmail.com>
-In-Reply-To: <20200225194551.GA114977@gmail.com>
+References: <20200225154834.25108-1-gilad@benyossef.com> <20200225154834.25108-3-gilad@benyossef.com>
+ <20200225200244.GB114977@gmail.com>
+In-Reply-To: <20200225200244.GB114977@gmail.com>
 From:   Gilad Ben-Yossef <gilad@benyossef.com>
-Date:   Wed, 26 Feb 2020 16:42:45 +0200
-Message-ID: <CAOtvUMeWB=MiYfzkrPjOctOufKJ8Q81E3m6bq8GJY-enbG6Qjg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] crypto: testmgr - use generic algs making test vecs
+Date:   Wed, 26 Feb 2020 17:09:57 +0200
+Message-ID: <CAOtvUMfsDfWskU8HYHfRhwqeN_DZcNZBo9g9MwXbjTcfe3-ocQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] crypto: testmgr - sync both RFC4106 IV copies
 To:     Eric Biggers <ebiggers@kernel.org>
 Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
         Ofir Drang <ofir.drang@arm.com>,
+        Geert Uytterhoeven <geert+renesas@glider.be>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
         Linux kernel mailing list <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
@@ -72,103 +73,131 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Feb 25, 2020 at 9:45 PM Eric Biggers <ebiggers@kernel.org> wrote:
+On Tue, Feb 25, 2020 at 10:02 PM Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> On Tue, Feb 25, 2020 at 05:48:33PM +0200, Gilad Ben-Yossef wrote:
-> > Use generic algs to produce inauthentic AEAD messages,
-> > otherwise we are running the risk of using an untested
-> > code to produce the test messages.
+> On Tue, Feb 25, 2020 at 05:48:34PM +0200, Gilad Ben-Yossef wrote:
+> > RFC4106 AEAD ciphers the AAD is the concatenation of associated
+> > authentication data || IV || plaintext or ciphertext but the
+> > random AEAD message generation in testmgr extended tests did
+> > not obey this requirements producing messages with undefined
+> > behaviours. Fix it by syncing the copies if needed.
 > >
-> > As this code is only used in developer only extended tests
-> > any cycles/runtime costs are negligible.
+> > Since this only relevant for developer only extended tests any
+> > additional cycles/run time costs are negligible.
+> >
+> > This fixes extended AEAD test failures with the ccree driver
+> > caused by illegal input.
 > >
 > > Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
+> > Reported-by: Geert Uytterhoeven <geert+renesas@glider.be>
 > > Cc: Eric Biggers <ebiggers@kernel.org>
->
-> It's intentional to use the same implementation to generate the inauthent=
-ic AEAD
-> messages, because it allows the inauthentic AEAD input tests to run even =
-if the
-> generic implementation is unavailable.
-
-That is a good.
-We can simply revert to the same implementation if the generic one is
-not available.
-
->
-> > @@ -2337,8 +2338,42 @@ static int test_aead_inauthentic_inputs(struct a=
-ead_extra_tests_ctx *ctx)
-> >  {
-> >       unsigned int i;
-> >       int err;
-> > +     struct crypto_aead *tfm =3D ctx->tfm;
-> > +     const char *algname =3D crypto_aead_alg(tfm)->base.cra_name;
-> > +     const char *driver =3D ctx->driver;
-> > +     const char *generic_driver =3D ctx->test_desc->generic_driver;
-> > +     char _generic_driver[CRYPTO_MAX_ALG_NAME];
-> > +     struct crypto_aead *generic_tfm =3D NULL;
-> > +     struct aead_request *generic_req =3D NULL;
+> > ---
+> >  crypto/testmgr.c | 20 ++++++++++++++++++++
+> >  1 file changed, 20 insertions(+)
+> >
+> > diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+> > index cf565b063cdf..288f349a0cae 100644
+> > --- a/crypto/testmgr.c
+> > +++ b/crypto/testmgr.c
+> > @@ -95,6 +95,11 @@ struct aead_test_suite {
+> >       /*
+> >        * Set if the algorithm intentionally ignores the last 8 bytes of=
+ the
+> >        * AAD buffer during decryption.
+> >        */
+> >       unsigned int esp_aad : 1;
 > > +
-> > +     if (!generic_driver) {
-> > +             err =3D build_generic_driver_name(algname, _generic_drive=
-r);
-> > +             if (err)
-> > +                     return err;
-> > +             generic_driver =3D _generic_driver;
-> > +     }
-> > +
-> > +     if (!strcmp(generic_driver, driver) =3D=3D 0) {
-> > +             /* Already the generic impl? */
-> > +
-> > +             generic_tfm =3D crypto_alloc_aead(generic_driver, 0, 0);
+> > +     /*
+> > +      * Set if the algorithm requires the IV to trail the AAD buffer.
+> > +      */
+> > +     unsigned int iv_aad : 1;
+> >  };
 >
-> I think you meant the condition to be 'if (strcmp(generic_driver, driver)=
- !=3D 0)'
-> and for the comment to be "Not already the generic impl?".
+> What's the difference between esp_aad and iv_aad?  Are you sure we need a=
+nother
+> flag and not just use the existing flag?
 
-Yes, of course. Silly me,
+Yes, because we have 3 distinct states -
+1. No IV in the AAD buffer - "normal"  AEAD.
+2. There is a copy of the IV in the AAD buffer and it is NOT used for
+ICV computation purposes - RFC4106 and RFC 4309.
+3, There is a copy of the IV in the AAD buffer and it is used for ICV
+computation purposes - RFC 4543.
+
+3 states needs at least 2 bits.
+
+> If they're both needed, please document them properly.  You're currently =
+setting
+
+I will add a remark explaining this.
+I chose to keep the "esp_aad" name, since it was there before, but
+possibly this is not a good choice in light of your comments so will
+change that too.
+
+> them both on some algorithms, which based on the current comments is a lo=
+gical
+> contradiction because esp_aad is documented to mean that the last 8 bytes=
+ are
+> ignored while iv_aad is documented to mean that these bytes must be the I=
+V.
+
+I believe it isn't a contradiction after all. Consider -
+
+RFC 4106 needs to have a copy of the IV in the AAD buffer which is
+identical to the one being passed via the normal mechanism in the API.
+If they are not identical, we have no way to know which copy of the IV
+is being used by an implementation as part of the AES-GCM nonce and so
+the generated message may be different from the one being used by the
+generic implementation. which results in encryption test failing when
+compared to the generic implementation  results, even though there is
+nothing wrong with the tested implementation and indeed the previous
+compassion against the precomputed test vectors passes.
+This is what happened with the ccree driver. Note that this has
+nothing to do with mutating the message - this is an encryption test
+failing.
+This is the iv_aad flag, which will need to be true in this case.
+
+On the other hand when testing decryption and mutating the AEAD
+message, we need to know not to mutate the IV copy in the AAD buffer,
+since it is ignored.
+This is the esp_aad flag, which will also needs to be true in this case.
+
+Last but not least, RFC 4543 need a copy of the IV in the AAD buffer
+However, this copy DOES get hashed as part of the ICV computation, so
+-
+We need iv_aad flag to be true to let us know we need to copy the IV.
+However, we need esp_aad to be false since it's fine and even
+desirable to mutate the IV copy in the AAD buffer.
+
+You are correct though that I can make the 2nd copy of the IV post
+mutation dependant on esp_aad not being set, though...
+
+
+I hope this explains this mess better.
+It certainly took me a while to figure out what is going on...
+
 
 >
-> > +             if (IS_ERR(generic_tfm)) {
-> > +                     err =3D PTR_ERR(generic_tfm);
-> > +                     pr_err("alg: aead: error allocating %s (generic i=
-mpl of %s): %d\n",
-> > +                     generic_driver, algname, err);
-> > +                     return err;
-> > +             }
+> >
+> >  struct cipher_test_suite {
+> > @@ -2207,6 +2212,10 @@ static void generate_aead_message(struct aead_re=
+quest *req,
+> >
+> >       /* Generate the AAD. */
+> >       generate_random_bytes((u8 *)vec->assoc, vec->alen);
+> > +     /* For RFC4106 algs, a copy of the IV is part of the AAD */
+> > +     if (suite->iv_aad)
+> > +             memcpy(((u8 *)vec->assoc + vec->alen - ivsize), vec->iv,
+> > +                    ivsize);
 >
-> This means the test won't run if the generic implementation is unavailabl=
-e.
-> Is there any particular reason to impose that requirement?
->
-> You mentioned a concern about the implementation being "untested", but it
-> actually already passed test_aead() before getting to test_aead_extra().
->
+> What guarantees that vec->alen >=3D ivsize?
 
-The impetus to write this patch came from my experience debugging a
-test failure with the ccree driver.
-At some point while tweaking around I got into a situation where the
-test was succeeding (that is, declaring the message inauthentic) not
-because the mutation was being detected but because the generation of
-the origin was producing a bogus ICV.
-At that point it seemed to me that it would be safer to "isolate" the
-original AEAD messages generation from the code that was being teste.
+You are right, I need to check for that.
+However, if it isn't this can't be a legal RFC4106 message and we will
+fail encryption .
 
-> We could also just move test_aead_inauthentic_inputs() to below
-> test_aead_vs_generic_impl() so that it runs last.
-
-This would probably be better, although I think that this stage also
-generates inauthentic messages from time to time, no?
-
-At any rate, I don't have strong feelings about it either way. I defer
-to your judgment whether it is worth it to add a fallback to use the
-same implementation and fix what needs fixing or drop the patch
-altogether if you think this isn't worth the trouble - just let me
-know.
-
-Thanks,
+Thanks!
 Gilad
-
 
 
 --=20
