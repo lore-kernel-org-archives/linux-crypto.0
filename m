@@ -1,129 +1,132 @@
-Return-Path: <SRS0=ER22=4N=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=wQ8K=4O=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9588C35E04
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Feb 2020 20:26:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0302C4BA06
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 01:11:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8748821927
-	for <linux-crypto@archiver.kernel.org>; Tue, 25 Feb 2020 20:26:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B128820732
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 01:11:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="lY4cwsjE"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="o80oA2ww"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728929AbgBYU0R (ORCPT
+        id S1729702AbgBZBLi (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 25 Feb 2020 15:26:17 -0500
-Received: from mail-vi1eur05on2081.outbound.protection.outlook.com ([40.107.21.81]:6063
-        "EHLO EUR05-VI1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1731685AbgBYU0R (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 25 Feb 2020 15:26:17 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Uw1Ix3PbMj9o7FOrpvkavgaONivTimLNO9PFXsVWQWfaKztWawWk5kMo9lsBe/USugBHLWpFGuV1Z6mqZ2tG3CWIC4zdjArAw1wAVLg7friLRhRhGJiAaVjmVth/CG3iUkZkW5HKQlk2CxCzCG4fXAlD49iwpqgGGTOufIL9/AjQrL/bRamE3+9g9UiAG5lgQDAWlPDFjjL+muS8vqR4rrbHWAEjPUZ16/ASCNkU1hpaFIXa9llSTRwVymZYv+QeqC7bw4sd+hx4d9sOZdfWHaU0dXEt805cYR2YqrAJydBTbIkl3p2LJRbkT/7snt2UpPHgAFzgWtV12MQFewL6kQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Cayu79wOyGEn227qtv7X5t4JIzglzRpTlHAZ6QHTDos=;
- b=OedsqO0ibBYpnYAjtKg6MVrjpaJ90dmWtt+qdYv9UmZf3LpZEEdTLmppIOnD7l4ieNCSeUsWEclDjuCz0HKRV+IZEE+ouF0ueMOdxeDYmpCAWe/gH/vM9rFRTTy2e1N8SKa8zKPTApI7j4ywSFutX2Lh6ovAcIOc9sKwCevcrlAzIuZuFtqf+q4PPCAEKp8Z2Gk7LdLfV1RHYHqukxkj6tVuQCA14K4H3GyZi8j00llVN5g6EvPCkFFhOoTF3vnlv5+WhVqQk1WxnKCW+xFPr8d+kj+OUQ7yQmPLuG2ZJZzDNVatzz1Ecv+8eJQuqSHmfunUBfAqnDlwHP7lyG72Xw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Cayu79wOyGEn227qtv7X5t4JIzglzRpTlHAZ6QHTDos=;
- b=lY4cwsjE6doHG5CdpHVHUaoHvAekoV1VTvGxAGs+FAFxZN51AbJitp2ZCHtkbmBEtWOrA1Alm7BA0HXPjeicaspIgm7iCD9Xnwi9rrl2GnO7mR/7fKprD68PGaYlf5+krFdZBOCiSje+hGrge+bAFptuYkzRO0AYAoTK9wTD5/M=
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB3695.eurprd04.prod.outlook.com (52.134.14.156) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2750.22; Tue, 25 Feb 2020 20:26:14 +0000
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::85e9:f844:f8b0:27d]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::85e9:f844:f8b0:27d%7]) with mapi id 15.20.2750.021; Tue, 25 Feb 2020
- 20:26:14 +0000
-From:   Horia Geanta <horia.geanta@nxp.com>
-To:     Andrey Smirnov <andrew.smirnov@gmail.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
-CC:     Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Vipul Kumar <vipul_kumar@mentor.com>,
-        Chris Healy <cphealy@gmail.com>,
-        Lucas Stach <l.stach@pengutronix.de>,
+        Tue, 25 Feb 2020 20:11:38 -0500
+Received: from mail-pf1-f195.google.com ([209.85.210.195]:46948 "EHLO
+        mail-pf1-f195.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729346AbgBZBLi (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 25 Feb 2020 20:11:38 -0500
+Received: by mail-pf1-f195.google.com with SMTP id k29so502112pfp.13
+        for <linux-crypto@vger.kernel.org>; Tue, 25 Feb 2020 17:11:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=p+ckrLz3LRCoSFrfiU30gmbNyc8j6wjK1s1RA2TWajk=;
+        b=o80oA2wwqENPftna7/zKRVKoL3DudW8CJuoNGJhKQurPflg4m7wY+s5rdqW1b+zdpW
+         LoZWVXYuj2kyYWbb2fGxrBwXJpDzoAR7jwOjWCAh/sMSzynLVtPA7Jitj9iy3uJZeokJ
+         BVZn+tnxjRxDXBaXScRBqhEb0zR8BnO6rSER1IyfwRTrfcHXbJ8p3T+zM9czSbbr4SMo
+         0F5uag648+xMEEUTw6hyV+t66j69cLVziSXZ+qdsWweHC2VOPCrXrEGbUo6GZYMxVzvY
+         aUIj/DiaWh8dZVW91xEsFwPIn1D4mAJUmGxxLjyYMHaRlpQYDeUO5fPrKkyqgjV55xXz
+         l9mg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=p+ckrLz3LRCoSFrfiU30gmbNyc8j6wjK1s1RA2TWajk=;
+        b=O/VFoTymOcrer3jKGFMMFeLi1Gb6ueePU6pK7fDt8ST4vMyXJRzZa7fYrCJhIiQjm4
+         X9gag2WmXe1BDQkS2S42qiDiTBF9y0ttT8RpIMrpgmLHsgfzrLmOEe1jhDSt5uKZdKC8
+         Bt9NWYV6++yEWI7xRF7b69eg49vq4C99Df0ZkOTZ99sv4ES7NYwDApWRoZyf0MRsBNz3
+         1qawFuydG374BViI4NDAYEnk3+/OjjgI52bP27IIe9QDjyQABqUD1954v38pHcFsWDf/
+         JPq9DiBQKy65AiQyY2CaeQ0bepNbGx+iCIcLDvAnazfMOrB0C40QOatHIDFrA3fDH0Qp
+         aE3g==
+X-Gm-Message-State: APjAAAWGd1vGjXInhtS6tfbl2R3BVUAhNsUUSQfeD5tgu9Fr4tPxAFi1
+        g0+z38Y3eMx2OH0BqtJxpkbeyg==
+X-Google-Smtp-Source: APXvYqwBrVhiEx4l0romklhpTH+y+CgXMko1VU+ZOxfZOJLkAj7ZLDO3KH4v0RJodC8aSrvfaOpG6g==
+X-Received: by 2002:a62:19d1:: with SMTP id 200mr1501438pfz.26.1582679497101;
+        Tue, 25 Feb 2020 17:11:37 -0800 (PST)
+Received: from ?IPv6:240e:362:4c3:8800:a057:bb7f:18d7:2e? ([240e:362:4c3:8800:a057:bb7f:18d7:2e])
+        by smtp.gmail.com with ESMTPSA id z10sm204892pgz.88.2020.02.25.17.11.19
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 25 Feb 2020 17:11:36 -0800 (PST)
+Subject: Re: [PATCH] MAINTAINERS: add maintainers for uacce
+To:     Dave Jiang <dave.jiang@intel.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Arnd Bergmann <arnd@arndb.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>
-Subject: Re: [PATCH v7 7/9] crypto: caam - invalidate entropy register during
- RNG initialization
-Thread-Topic: [PATCH v7 7/9] crypto: caam - invalidate entropy register during
- RNG initialization
-Thread-Index: AQHV1TLWgWFMXoW0dUik/8LP0jRlww==
-Date:   Tue, 25 Feb 2020 20:26:13 +0000
-Message-ID: <VI1PR0402MB3485FBC57F580FEA36F7336498ED0@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <20200127165646.19806-1-andrew.smirnov@gmail.com>
- <20200127165646.19806-8-andrew.smirnov@gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=horia.geanta@nxp.com; 
-x-originating-ip: [84.117.251.185]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: a24ba5ae-ee12-48d5-8cce-08d7ba30f5c5
-x-ms-traffictypediagnostic: VI1PR0402MB3695:|VI1PR0402MB3695:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <VI1PR0402MB3695F8786E7C0DA8A467DA7198ED0@VI1PR0402MB3695.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:220;
-x-forefront-prvs: 0324C2C0E2
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(346002)(366004)(39860400002)(136003)(396003)(199004)(189003)(52536014)(110136005)(2906002)(5660300002)(44832011)(8676002)(4326008)(26005)(33656002)(316002)(71200400001)(81166006)(54906003)(186003)(81156014)(4744005)(6506007)(55016002)(7696005)(478600001)(9686003)(8936002)(53546011)(86362001)(64756008)(66556008)(66946007)(91956017)(66476007)(76116006)(66446008);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3695;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: umKsa/QXmJSTSdRGylv1WJVLo8Aw9tjGN8YokEYWwbpqKy11KRkFXWZKTRSIW1ywnhcrZ8Jj1dIIXj4x8lQ22dmnExwI8bF0z+zXjl0vnnkbaylyNpETGVAXQjimQYEKoRTWSLSCoEVf3saeNxaVOfw5dQRRcUgfXL5C7P44CDSKOlrv4TJodJ6PzI1TL7RgXDHuPFlABkWPQ5RiLv50AcBUjuyyRHvbqJ3YE3Wux9gVEfm5ooaywcMJnhlUwYOw5QMfVWqeHngOVCopX+ibU72fQY5iZPht4WE3N5g6V9xqB5gUg88Ai/U6TNJ3zF2y13ZQwi0TuN3BKm1w2BE1ypmeQZuBRTb1qNXa0BHARbVTBlg3+D+VN5ZZRnZHwzjJBcnNS2edAN92PggN44Ua2Zfkpkcl/3kXpZpzzle3OM+OZ5ykFzRm2RKWTjrvpHYA
-x-ms-exchange-antispam-messagedata: etryfZHFMNm13U/WzbtWxEveE+kSQzuTWbEebdSumQ/B8bqbViHfztGFrU6cI7zgLQ1+anBUyxI9tZLxRmBOf0YobcDekSgFTQvAsILqDrh9eleTNQ82K8hns2va/QKZ3Du5DwpW2pGi5aoII+dTEQ==
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
+        jonathan.cameron@huawei.com, grant.likely@arm.com,
+        jean-philippe <jean-philippe@linaro.org>,
+        Jerome Glisse <jglisse@redhat.com>,
+        ilias.apalodimas@linaro.org, francois.ozog@linaro.org,
+        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
+        "haojian . zhuang" <haojian.zhuang@linaro.org>,
+        guodong.xu@linaro.org
+Cc:     linux-accelerators@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org
+References: <1582611475-32691-1-git-send-email-zhangfei.gao@linaro.org>
+ <b424d911-7293-0048-3270-0f7c1502c928@intel.com>
+From:   zhangfei <zhangfei.gao@linaro.org>
+Message-ID: <0ed68faa-63f1-2bcb-6044-11629a610b9b@linaro.org>
+Date:   Wed, 26 Feb 2020 09:11:11 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.9.0
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a24ba5ae-ee12-48d5-8cce-08d7ba30f5c5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Feb 2020 20:26:13.9336
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: LAsIk9mrCTRyRDc/Ace0VxwCPOI/Ub1O/jEL1rylym5if7DkbJoOlYP3dFccgiYGfjqcycWi0hCyuIHPYIuwpQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3695
+In-Reply-To: <b424d911-7293-0048-3270-0f7c1502c928@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 1/27/2020 6:57 PM, Andrey Smirnov wrote:=0A=
-> In order to make sure that we always use non-stale entropy data, change=
-=0A=
-> the code to invalidate entropy register during RNG initialization.=0A=
-> =0A=
-> Signed-off-by: Aymen Sghaier <aymen.sghaier@nxp.com>=0A=
-> Signed-off-by: Vipul Kumar <vipul_kumar@mentor.com>=0A=
-> [andrew.smirnov@gmail.com ported to upstream kernel, rewrote commit msg]=
-=0A=
-> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>=0A=
-> Cc: Chris Healy <cphealy@gmail.com>=0A=
-> Cc: Lucas Stach <l.stach@pengutronix.de>=0A=
-> Cc: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>=0A=
-> Cc: Iuliana Prodan <iuliana.prodan@nxp.com>=0A=
-> Cc: linux-crypto@vger.kernel.org=0A=
-> Cc: linux-kernel@vger.kernel.org=0A=
-> Cc: linux-imx@nxp.com=0A=
-Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
-=0A=
+
+
+On 2020/2/26 上午12:02, Dave Jiang wrote:
+>
+>
+> On 2/24/20 11:17 PM, Zhangfei Gao wrote:
+>> Add Zhangfei Gao and Zhou Wang as maintainers for uacce
+>>
+>> Signed-off-by: Zhangfei Gao <zhangfei.gao@linaro.org>
+>> Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
+>> ---
+>>   MAINTAINERS | 10 ++++++++++
+>>   1 file changed, 10 insertions(+)
+>>
+>> diff --git a/MAINTAINERS b/MAINTAINERS
+>> index 38fe2f3..22e647f 100644
+>> --- a/MAINTAINERS
+>> +++ b/MAINTAINERS
+>> @@ -17039,6 +17039,16 @@ W:    http://linuxtv.org
+>>   S:    Maintained
+>>   F:    drivers/media/pci/tw686x/
+>>   +UACCE ACCELERATOR FRAMEWORK
+>> +M:    Zhangfei Gao <zhangfei.gao@linaro.org>
+>> +M:    Zhou Wang <wangzhou1@hisilicon.com>
+>> +S:    Maintained
+>> +F:    Documentation/ABI/testing/sysfs-driver-uacce
+>> +F:    Documentation/misc-devices/uacce.rst
+>> +F:    drivers/misc/uacce/
+>> +F:    include/linux/uacce.h
+>> +F:    include/uapi/misc/uacce/
+>
+> Mailing list for patch submission?
+> +L: linux-accelerators@lists.ozlabs.org ?
+
+Thanks Dave
+
+How about adding both
+linux-accelerators@lists.ozlabs.org
+linux-kernel@vger.kernel.org
+Since the patches will go to misc tree.
+
+Thanks
