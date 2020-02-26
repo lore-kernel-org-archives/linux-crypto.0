@@ -2,164 +2,151 @@ Return-Path: <SRS0=wQ8K=4O=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F36FC4BA0A
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 07:13:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBECEC4BA0B
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 11:19:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 41DF0222C2
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 07:13:04 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nHBsDuat"
+	by mail.kernel.org (Postfix) with ESMTP id B754124685
+	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 11:19:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727012AbgBZHND (ORCPT
+        id S1728028AbgBZLTF (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Feb 2020 02:13:03 -0500
-Received: from mail-pj1-f65.google.com ([209.85.216.65]:51624 "EHLO
-        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726903AbgBZHND (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Feb 2020 02:13:03 -0500
-Received: by mail-pj1-f65.google.com with SMTP id fa20so881612pjb.1
-        for <linux-crypto@vger.kernel.org>; Tue, 25 Feb 2020 23:13:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id;
-        bh=wIycLtohJzZmgbz8Z9KTZsw/kqKcbNO/JXoVgPdvu5k=;
-        b=nHBsDuatJbQdosdW7LvCk7lFzVSx5qBST4bfiBlRhLz/YLONy7ALUeY1N8NsOM3ddi
-         ccg3145g8DOq5tDD4Kk6Y2IXGjRLgkoaGgpUPBxjfYQfp9PGONg/cwaKsxTbjTq8lkfJ
-         NRJFrxTRFogiqdjs41Drldwj1fTeruCaeArsV8sNr3GeGM4aRH7QFYF/iAaYEqBvDxGE
-         vWQWG1fdS5iHFQJECDt/ivKKRqMwmljNqXW5QUs0c/vpy7uJ/rll3Z7gnOy5HDfhcRP5
-         4lAYLHe5Xc63mefpieyn7o/5F3Kwo/Xe8B1uigehlVZlvp/67qNFZDphtRp5zpsFV7h4
-         bYDg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=wIycLtohJzZmgbz8Z9KTZsw/kqKcbNO/JXoVgPdvu5k=;
-        b=XTjrwKcjbCkFtQTCRErXKyQnGAxFG37jldX5v22AmIE2eRRuTrbTbd1mWts7OCY3pk
-         FNGAR7mjj07twUu0sp9n25Tu7Bdn0XzMm1vfe5WA6SffOUq4sdz5vUwxkGYzM8d0Dl3U
-         ptQ1q+jqCMh+KYQqhui3l+rDW4bKAtVYRfC0N9G0dL6c444l5YoeSkT3V7Bc/9Jt3TNV
-         SW5lUWLe5wQZzQrfviReJTS3TxUvy2EfuhvR6JsEmrwAA0wZ1p7vVm2+QDHYWWxja+dj
-         EEJO6yZE8nJcgYB8dDesrMXL6EIQ7uWrOHQid/8xYXkZeSATWfZvw18Amy4qbu+ufqdW
-         M7mA==
-X-Gm-Message-State: APjAAAXxNAXOCKiKy0OpF2aS+8GS00+whAHQCEC6zf149K6JIoUjmz65
-        MR8h2YBbcDzATCNq8KHz5Vf2CQ==
-X-Google-Smtp-Source: APXvYqwB2yOYMGKYdF2cDBBA/GEj2xBPMsZ8piwV6gUkwS3YmQ2LmROMVi5lnWOaX8djXcAihN1Nxg==
-X-Received: by 2002:a17:902:8688:: with SMTP id g8mr2603545plo.277.1582701182230;
-        Tue, 25 Feb 2020 23:13:02 -0800 (PST)
-Received: from localhost.localdomain ([240e:362:4c3:8800:a057:bb7f:18d7:2e])
-        by smtp.gmail.com with ESMTPSA id b24sm1400707pfo.84.2020.02.25.23.12.38
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Tue, 25 Feb 2020 23:13:01 -0800 (PST)
-From:   Zhangfei Gao <zhangfei.gao@linaro.org>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        jonathan.cameron@huawei.com, dave.jiang@intel.com,
-        grant.likely@arm.com, jean-philippe <jean-philippe@linaro.org>,
-        Jerome Glisse <jglisse@redhat.com>,
-        ilias.apalodimas@linaro.org, francois.ozog@linaro.org,
-        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>,
-        "haojian . zhuang" <haojian.zhuang@linaro.org>,
-        guodong.xu@linaro.org
-Cc:     linux-accelerators@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-        linux-crypto@vger.kernel.org, iommu@lists.linux-foundation.org,
-        Zhangfei Gao <zhangfei.gao@linaro.org>
-Subject: [PATCH v2] uacce: unmap remaining mmapping from user space
-Date:   Wed, 26 Feb 2020 15:12:06 +0800
-Message-Id: <1582701126-5312-1-git-send-email-zhangfei.gao@linaro.org>
-X-Mailer: git-send-email 2.7.4
+        Wed, 26 Feb 2020 06:19:05 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:10696 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726555AbgBZLTE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 26 Feb 2020 06:19:04 -0500
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 4FC2B6C342AEF823E5C7;
+        Wed, 26 Feb 2020 19:19:00 +0800 (CST)
+Received: from [127.0.0.1] (10.67.101.242) by DGGEMS412-HUB.china.huawei.com
+ (10.3.19.212) with Microsoft SMTP Server id 14.3.439.0; Wed, 26 Feb 2020
+ 19:18:51 +0800
+Subject: Re: [PATCH 4/4] crypto: hisilicon/sec2 - Add pbuffer mode for SEC
+ driver
+To:     Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+References: <1582189495-38051-1-git-send-email-xuzaibo@huawei.com>
+ <1582189495-38051-5-git-send-email-xuzaibo@huawei.com>
+ <20200224140154.00005967@Huawei.com>
+ <80ab5da7-eceb-920e-dc36-1d411ad57a09@huawei.com>
+ <20200225151426.000009f5@Huawei.com>
+CC:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <qianweili@huawei.com>, <tanghui20@huawei.com>,
+        <forest.zhouchang@huawei.com>, <linuxarm@huawei.com>,
+        <zhangwei375@huawei.com>, <shenyang39@huawei.com>,
+        <yekai13@huawei.com>, <linux-crypto@vger.kernel.org>
+From:   Xu Zaibo <xuzaibo@huawei.com>
+Message-ID: <1fa85493-0e56-745e-2f24-5a12c2fec496@huawei.com>
+Date:   Wed, 26 Feb 2020 19:18:51 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
+MIME-Version: 1.0
+In-Reply-To: <20200225151426.000009f5@Huawei.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.101.242]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When uacce parent device module is removed, user app may
-still keep the mmaped area, which can be accessed unsafely.
-When rmmod, Parent device driver will call uacce_remove,
-which unmap all remaining mapping from user space for safety.
-VM_FAULT_SIGBUS is also reported to user space accordingly.
+Hi,
+On 2020/2/25 23:14, Jonathan Cameron wrote:
+> On Tue, 25 Feb 2020 11:16:52 +0800
+> Xu Zaibo <xuzaibo@huawei.com> wrote:
+>
+>> Hi,
+>>
+>>
+>> On 2020/2/24 22:01, Jonathan Cameron wrote:
+>>> On Thu, 20 Feb 2020 17:04:55 +0800
+>>> Zaibo Xu <xuzaibo@huawei.com> wrote:
+>>>   
+>>>
+[...]
+>>>>    
+>>>> +static void sec_free_pbuf_resource(struct device *dev, struct sec_alg_res *res)
+>>>> +{
+>>>> +	if (res->pbuf)
+>>>> +		dma_free_coherent(dev, SEC_TOTAL_PBUF_SZ,
+>>>> +				  res->pbuf, res->pbuf_dma);
+>>>> +}
+>>>> +
+>>>> +/*
+>>>> + * To improve performance, pbuffer is used for
+>>>> + * small packets (< 576Bytes) as IOMMU translation using.
+>>>> + */
+>>>> +static int sec_alloc_pbuf_resource(struct device *dev, struct sec_alg_res *res)
+>>>> +{
+>>>> +	int pbuf_page_offset;
+>>>> +	int i, j, k;
+>>>> +
+>>>> +	res->pbuf = dma_alloc_coherent(dev, SEC_TOTAL_PBUF_SZ,
+>>>> +				&res->pbuf_dma, GFP_KERNEL);
+>>> Would it make more sense perhaps to do this as a DMA pool and have
+>>> it expand on demand?
+>> Since there exist all kinds of buffer length, I think dma_alloc_coherent
+>> may be better?
+> As it currently stands we allocate a large buffer in one go but ensure
+> we only have a single dma map that occurs at startup.
+>
+> If we allocate every time (don't use pbuf) performance is hit by
+> the need to set up the page table entries and flush for every request.
+>
+> A dma pool with a fixed size element would at worst (for small messages)
+> mean you had to do a dma map / unmap every time 6 ish buffers.
+> This would only happen if you filled the whole queue.  Under normal operation
+> you will have a fairly steady number of buffers in use at a time, so mostly
+> it would be reusing buffers that were already mapped from a previous request.
+Agree, dma pool may give a smaller range of mapped memory, which may 
+increase hits
+of IOMMU TLB.
+>
+> You could implement your own allocator on top of dma_alloc_coherent but it'll
+> probably be a messy and cost you more than using fixed size small elements.
+>
+> So a dmapool here would give you a mid point between using lots of memory
+> and never needing to map/unmap vs map/unmap every time.
+>
+My concern is the spinlock of DMA pool, which adds an exclusion between 
+sending requests
+and receiving responses, since DMA blocks are allocated as sending and 
+freed at receiving.
 
-Suggested-by: Dave Jiang <dave.jiang@intel.com>
-Signed-off-by: Zhangfei Gao <zhangfei.gao@linaro.org>
----
- v2: Unmap before put_queue, where memory is freed, commented from Zaibo.
+Thanks,
+Zaibo
 
- drivers/misc/uacce/uacce.c | 16 ++++++++++++++++
- include/linux/uacce.h      |  2 ++
- 2 files changed, 18 insertions(+)
-
-diff --git a/drivers/misc/uacce/uacce.c b/drivers/misc/uacce/uacce.c
-index ffced4d..d39307f 100644
---- a/drivers/misc/uacce/uacce.c
-+++ b/drivers/misc/uacce/uacce.c
-@@ -224,6 +224,7 @@ static int uacce_fops_open(struct inode *inode, struct file *filep)
- 
- 	init_waitqueue_head(&q->wait);
- 	filep->private_data = q;
-+	uacce->inode = inode;
- 	q->state = UACCE_Q_INIT;
- 
- 	return 0;
-@@ -253,6 +254,14 @@ static int uacce_fops_release(struct inode *inode, struct file *filep)
- 	return 0;
- }
- 
-+static vm_fault_t uacce_vma_fault(struct vm_fault *vmf)
-+{
-+	if (vmf->flags & (FAULT_FLAG_MKWRITE | FAULT_FLAG_WRITE))
-+		return VM_FAULT_SIGBUS;
-+
-+	return 0;
-+}
-+
- static void uacce_vma_close(struct vm_area_struct *vma)
- {
- 	struct uacce_queue *q = vma->vm_private_data;
-@@ -265,6 +274,7 @@ static void uacce_vma_close(struct vm_area_struct *vma)
- }
- 
- static const struct vm_operations_struct uacce_vm_ops = {
-+	.fault = uacce_vma_fault,
- 	.close = uacce_vma_close,
- };
- 
-@@ -556,6 +566,12 @@ void uacce_remove(struct uacce_device *uacce)
- 
- 	if (!uacce)
- 		return;
-+	/*
-+	 * unmap remaining mapping from user space, preventing user still
-+	 * access the mmaped area while parent device is already removed
-+	 */
-+	if (uacce->inode)
-+		unmap_mapping_range(uacce->inode->i_mapping, 0, 0, 1);
- 
- 	/* ensure no open queue remains */
- 	mutex_lock(&uacce->mm_lock);
-diff --git a/include/linux/uacce.h b/include/linux/uacce.h
-index 904a461..0e215e6 100644
---- a/include/linux/uacce.h
-+++ b/include/linux/uacce.h
-@@ -98,6 +98,7 @@ struct uacce_queue {
-  * @priv: private pointer of the uacce
-  * @mm_list: list head of uacce_mm->list
-  * @mm_lock: lock for mm_list
-+ * @inode: core vfs
-  */
- struct uacce_device {
- 	const char *algs;
-@@ -113,6 +114,7 @@ struct uacce_device {
- 	void *priv;
- 	struct list_head mm_list;
- 	struct mutex mm_lock;
-+	struct inode *inode;
- };
- 
- /**
--- 
-2.7.4
+.
+>>>   
+>>>> +	if (!res->pbuf)
+>>>> +		return -ENOMEM;
+>>>> +
+>>>> +	/*
+>>>> +	 * SEC_PBUF_PKG contains data pbuf, iv and
+>>>> +	 * out_mac : <SEC_PBUF|SEC_IV|SEC_MAC>
+>>>> +	 * Every PAGE contains six SEC_PBUF_PKG
+>>>> +	 * The sec_qp_ctx contains QM_Q_DEPTH numbers of SEC_PBUF_PKG
+>>>> +	 * So we need SEC_PBUF_PAGE_NUM numbers of PAGE
+>>>> +	 * for the SEC_TOTAL_PBUF_SZ
+>>>> +	 */
+>>>> +	for (i = 0; i <= SEC_PBUF_PAGE_NUM; i++) {
+>>>> +		pbuf_page_offset = PAGE_SIZE * i;
+>>>> +		for (j = 0; j < SEC_PBUF_NUM; j++) {
+>>>> +			k = i * SEC_PBUF_NUM + j;
+>>>> +			if (k == QM_Q_DEPTH)
+>>>> +				break;
+>>>> +			res[k].pbuf = res->pbuf +
+>>>> +				j * SEC_PBUF_PKG + pbuf_page_offset;
+>>>> +			res[k].pbuf_dma = res->pbuf_dma +
+>>>> +				j * SEC_PBUF_PKG + pbuf_page_offset;
+>>>> +		}
+>>>> +	}
+>>>> +	return 0;
+>>>> +}
+>>>> +
+[...]
 
