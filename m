@@ -1,111 +1,173 @@
-Return-Path: <SRS0=wQ8K=4O=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=0OXc=4P=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC517C4BA24
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 22:24:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07791C4BA35
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Feb 2020 01:13:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9261624670
-	for <linux-crypto@archiver.kernel.org>; Wed, 26 Feb 2020 22:24:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1582755889;
-	bh=utBCZfTn36KBym26hNMCRPLKzjQ4GLb5oB+eAEGEawc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=I/Uw+kItuBwg3KQvI8oUuoyNgGVjGYAf6YUoVIoyCH8jiY5Wm33mBiUSy8WAP/wwK
-	 Vk1iLp+yH3g3LV8BFSRyVmvX6B+g5ImuTYOUdvPjf8SYqdRvrd5ga47dIiWfGl4+XU
-	 i/CIvR6TC/oRPI/8vhhlnjZlL2t/xq1OshnMuTzM=
+	by mail.kernel.org (Postfix) with ESMTP id D68A120656
+	for <linux-crypto@archiver.kernel.org>; Thu, 27 Feb 2020 01:13:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727763AbgBZWYt (ORCPT
+        id S1727973AbgB0BNT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 26 Feb 2020 17:24:49 -0500
-Received: from mail-ot1-f65.google.com ([209.85.210.65]:35826 "EHLO
-        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727709AbgBZWYs (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 26 Feb 2020 17:24:48 -0500
-Received: by mail-ot1-f65.google.com with SMTP id r16so1054452otd.2;
-        Wed, 26 Feb 2020 14:24:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to:user-agent;
-        bh=7Tc2pp6tfwt+3v34tpbOx19kPSdtNqYuqm/8GY/cfw4=;
-        b=ui0X/+wq3tOeJAS9wzI/U+gx79VRj7YYPEZB9pXU3E1IMe++89jfGJLvgCwt1uRSYl
-         Wb4l5zd1n6luzHCZaQUvJb/8iMZMQ19lKpPWCdEBBJKkz627ubPau2/0XOfYExWAzqoj
-         l8u4oUXQKOMejEaEAy6xHXuo5jcAa/GeJCPndUdom9WBHWbc9PYO6jdpG/1rdndmYoVq
-         yfaIc9Ac+GrdXDqcoLWZcemoXWl8NZt4zonSmz02av66wOd7rsi01/WRF9y6ZRxl8V5T
-         EW6WIiTp27Grg5xPxQR25TMogd9+xtglKIAfIcirKM4s0eoZMU+Sr3H/AS5BuW+QC286
-         T6qQ==
-X-Gm-Message-State: APjAAAVcJFzAdrh7B2GA3mfqpiZKnNhD6ZKHRyQKtAWdXxeKD39Dwdat
-        FwISw6eW0DR3GfahB/t1zw==
-X-Google-Smtp-Source: APXvYqxl4VG5brncJNWe6fMfCvBfkuDhRp8hGrhJHHYhzyTZwH2sy+iDxqHEY0c1dykRMxt3Vt/Phw==
-X-Received: by 2002:a05:6830:13da:: with SMTP id e26mr781681otq.97.1582755887742;
-        Wed, 26 Feb 2020 14:24:47 -0800 (PST)
-Received: from rob-hp-laptop (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
-        by smtp.gmail.com with ESMTPSA id b4sm1250798oie.55.2020.02.26.14.24.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Feb 2020 14:24:47 -0800 (PST)
-Received: (nullmailer pid 11405 invoked by uid 1000);
-        Wed, 26 Feb 2020 22:24:46 -0000
-Date:   Wed, 26 Feb 2020 16:24:46 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     =?iso-8859-1?Q?N=EDcolas_F=2E_R=2E_A=2E?= Prado 
-        <nfraprado@protonmail.com>
-Cc:     devicetree@vger.kernel.org, Mark Rutland <mark.rutland@arm.com>,
-        lkcamp@lists.libreplanetbr.org,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Scott Branden <sbranden@broadcom.com>,
-        linux-arm-kernel@lists.infradead.org, Ray Jui <rjui@broadcom.com>,
-        linux-kernel@vger.kernel.org,
-        bcm-kernel-feedback-list@broadcom.com,
-        linux-crypto@vger.kernel.org, Matt Mackall <mpm@selenic.com>,
-        Nicolas Saenz Julienne <nsaenzjulienne@suse.de>,
-        linux-rpi-kernel@lists.infradead.org
-Subject: Re: [PATCH v2] dt-bindings: rng: Convert BCM2835 to DT schema
-Message-ID: <20200226222446.GA11350@bogus>
-References: <20200222200037.3203931-1-nfraprado@protonmail.com>
+        Wed, 26 Feb 2020 20:13:19 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:55552 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727964AbgB0BNT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 26 Feb 2020 20:13:19 -0500
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id B1CCFD18EB6525A78519;
+        Thu, 27 Feb 2020 09:13:16 +0800 (CST)
+Received: from [127.0.0.1] (10.67.101.242) by DGGEMS410-HUB.china.huawei.com
+ (10.3.19.210) with Microsoft SMTP Server id 14.3.439.0; Thu, 27 Feb 2020
+ 09:13:06 +0800
+Subject: Re: [PATCH 4/4] crypto: hisilicon/sec2 - Add pbuffer mode for SEC
+ driver
+To:     Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+References: <1582189495-38051-1-git-send-email-xuzaibo@huawei.com>
+ <1582189495-38051-5-git-send-email-xuzaibo@huawei.com>
+ <20200224140154.00005967@Huawei.com>
+ <80ab5da7-eceb-920e-dc36-1d411ad57a09@huawei.com>
+ <20200225151426.000009f5@Huawei.com>
+ <1fa85493-0e56-745e-2f24-5a12c2fec496@huawei.com>
+ <20200226143037.00007ab0@Huawei.com>
+CC:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <qianweili@huawei.com>, <tanghui20@huawei.com>,
+        <forest.zhouchang@huawei.com>, <linuxarm@huawei.com>,
+        <zhangwei375@huawei.com>, <shenyang39@huawei.com>,
+        <yekai13@huawei.com>, <linux-crypto@vger.kernel.org>
+From:   Xu Zaibo <xuzaibo@huawei.com>
+Message-ID: <bbb04877-dce7-9935-6c2a-87ec0e9485c5@huawei.com>
+Date:   Thu, 27 Feb 2020 09:13:06 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200222200037.3203931-1-nfraprado@protonmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20200226143037.00007ab0@Huawei.com>
+Content-Type: text/plain; charset="windows-1252"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.101.242]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, 22 Feb 2020 20:00:59 +0000, =?UTF-8?Q?N=C3=ADcolas_F=2E_R=2E_A=2E_Prado?= wrote:
-> Convert BCM2835/6368 Random number generator bindings to DT schema.
-> 
-> Signed-off-by: Nícolas F. R. A. Prado <nfraprado@protonmail.com>
-> ---
-> 
-> Changes in v2:
-> - Remove description for common properties
-> - Drop label from example
-> 
-> This patch was tested with:
-> make ARCH=arm dt_binding_check
-> make ARCH=arm DT_SCHEMA_FILES=Documentation/devicetree/bindings/rng/brcm,bcm2835.yaml dtbs_check
-> 
-> Thanks,
-> Nícolas
-> 
->  .../devicetree/bindings/rng/brcm,bcm2835.txt  | 40 -------------
->  .../devicetree/bindings/rng/brcm,bcm2835.yaml | 59 +++++++++++++++++++
->  2 files changed, 59 insertions(+), 40 deletions(-)
->  delete mode 100644 Documentation/devicetree/bindings/rng/brcm,bcm2835.txt
->  create mode 100644 Documentation/devicetree/bindings/rng/brcm,bcm2835.yaml
-> 
+Hi,
+On 2020/2/26 22:30, Jonathan Cameron wrote:
+> On Wed, 26 Feb 2020 19:18:51 +0800
+> Xu Zaibo <xuzaibo@huawei.com> wrote:
+>
+>> Hi,
+>> On 2020/2/25 23:14, Jonathan Cameron wrote:
+>>> On Tue, 25 Feb 2020 11:16:52 +0800
+>>> Xu Zaibo <xuzaibo@huawei.com> wrote:
+>>>   
+>>>> Hi,
+>>>>
+>>>>
+>>>> On 2020/2/24 22:01, Jonathan Cameron wrote:
+>>>>> On Thu, 20 Feb 2020 17:04:55 +0800
+>>>>> Zaibo Xu <xuzaibo@huawei.com> wrote:
+>>>>>    
+>>>>>   
+>> [...]
+>>>>>>     
+>>>>>> +static void sec_free_pbuf_resource(struct device *dev, struct sec_alg_res *res)
+>>>>>> +{
+>>>>>> +	if (res->pbuf)
+>>>>>> +		dma_free_coherent(dev, SEC_TOTAL_PBUF_SZ,
+>>>>>> +				  res->pbuf, res->pbuf_dma);
+>>>>>> +}
+>>>>>> +
+>>>>>> +/*
+>>>>>> + * To improve performance, pbuffer is used for
+>>>>>> + * small packets (< 576Bytes) as IOMMU translation using.
+>>>>>> + */
+>>>>>> +static int sec_alloc_pbuf_resource(struct device *dev, struct sec_alg_res *res)
+>>>>>> +{
+>>>>>> +	int pbuf_page_offset;
+>>>>>> +	int i, j, k;
+>>>>>> +
+>>>>>> +	res->pbuf = dma_alloc_coherent(dev, SEC_TOTAL_PBUF_SZ,
+>>>>>> +				&res->pbuf_dma, GFP_KERNEL);
+>>>>> Would it make more sense perhaps to do this as a DMA pool and have
+>>>>> it expand on demand?
+>>>> Since there exist all kinds of buffer length, I think dma_alloc_coherent
+>>>> may be better?
+>>> As it currently stands we allocate a large buffer in one go but ensure
+>>> we only have a single dma map that occurs at startup.
+>>>
+>>> If we allocate every time (don't use pbuf) performance is hit by
+>>> the need to set up the page table entries and flush for every request.
+>>>
+>>> A dma pool with a fixed size element would at worst (for small messages)
+>>> mean you had to do a dma map / unmap every time 6 ish buffers.
+>>> This would only happen if you filled the whole queue.  Under normal operation
+>>> you will have a fairly steady number of buffers in use at a time, so mostly
+>>> it would be reusing buffers that were already mapped from a previous request.
+>> Agree, dma pool may give a smaller range of mapped memory, which may
+>> increase hits
+>> of IOMMU TLB.
+>>> You could implement your own allocator on top of dma_alloc_coherent but it'll
+>>> probably be a messy and cost you more than using fixed size small elements.
+>>>
+>>> So a dmapool here would give you a mid point between using lots of memory
+>>> and never needing to map/unmap vs map/unmap every time.
+>>>   
+>> My concern is the spinlock of DMA pool, which adds an exclusion between
+>> sending requests
+>> and receiving responses, since DMA blocks are allocated as sending and
+>> freed at receiving.
+> Agreed.  That may be a bottleneck.  Not clear to me whether that would be a
+> significant issue or not.
+>
+Anyway, we will test the performance of DMA pool to get a better solution.
 
-Applied, thanks.
+Thanks,
+Zaibo
 
-Rob
+.
+>
+>
+>> Thanks,
+>> Zaibo
+>>
+>> .
+>>>>>      
+>>>>>> +	if (!res->pbuf)
+>>>>>> +		return -ENOMEM;
+>>>>>> +
+>>>>>> +	/*
+>>>>>> +	 * SEC_PBUF_PKG contains data pbuf, iv and
+>>>>>> +	 * out_mac : <SEC_PBUF|SEC_IV|SEC_MAC>
+>>>>>> +	 * Every PAGE contains six SEC_PBUF_PKG
+>>>>>> +	 * The sec_qp_ctx contains QM_Q_DEPTH numbers of SEC_PBUF_PKG
+>>>>>> +	 * So we need SEC_PBUF_PAGE_NUM numbers of PAGE
+>>>>>> +	 * for the SEC_TOTAL_PBUF_SZ
+>>>>>> +	 */
+>>>>>> +	for (i = 0; i <= SEC_PBUF_PAGE_NUM; i++) {
+>>>>>> +		pbuf_page_offset = PAGE_SIZE * i;
+>>>>>> +		for (j = 0; j < SEC_PBUF_NUM; j++) {
+>>>>>> +			k = i * SEC_PBUF_NUM + j;
+>>>>>> +			if (k == QM_Q_DEPTH)
+>>>>>> +				break;
+>>>>>> +			res[k].pbuf = res->pbuf +
+>>>>>> +				j * SEC_PBUF_PKG + pbuf_page_offset;
+>>>>>> +			res[k].pbuf_dma = res->pbuf_dma +
+>>>>>> +				j * SEC_PBUF_PKG + pbuf_page_offset;
+>>>>>> +		}
+>>>>>> +	}
+>>>>>> +	return 0;
+>>>>>> +}
+>>>>>> +
+>> [...]
+>>
+>
+> .
+>
+
+
