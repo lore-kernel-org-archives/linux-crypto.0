@@ -6,50 +6,52 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 426CEC3F2CD
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Feb 2020 00:51:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B6E3C3F2C6
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Feb 2020 00:53:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1E5792469D
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Feb 2020 00:51:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 301622469D
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Feb 2020 00:53:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730155AbgB1Av4 (ORCPT
+        id S1730191AbgB1Axo (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 27 Feb 2020 19:51:56 -0500
-Received: from helcar.hmeau.com ([216.24.177.18]:55678 "EHLO fornost.hmeau.com"
+        Thu, 27 Feb 2020 19:53:44 -0500
+Received: from helcar.hmeau.com ([216.24.177.18]:55692 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729984AbgB1Av4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 27 Feb 2020 19:51:56 -0500
+        id S1729984AbgB1Axo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 27 Feb 2020 19:53:44 -0500
 Received: from gwarestrin.me.apana.org.au ([192.168.0.7] helo=gwarestrin.arnor.me.apana.org.au)
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1j7Tsf-0000MP-VI; Fri, 28 Feb 2020 11:51:55 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 28 Feb 2020 11:51:53 +1100
-Date:   Fri, 28 Feb 2020 11:51:53 +1100
+        id 1j7TuL-0000OA-KG; Fri, 28 Feb 2020 11:53:38 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 28 Feb 2020 11:53:37 +1100
+Date:   Fri, 28 Feb 2020 11:53:37 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Devulapally Shiva Krishna <shiva@chelsio.com>
-Cc:     linux-crypto@vger.kernel.org, manojmalviya@chelsio.com,
-        ayush.sawal@chelsio.com
-Subject: Re: [PATCH Crypto] chcr: un-register crypto algorithms
-Message-ID: <20200228005153.GC9506@gondor.apana.org.au>
-References: <20200219131357.5679-1-shiva@chelsio.com>
+To:     YueHaibing <yuehaibing@huawei.com>
+Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH -next] crypto: md5: remove unused macros
+Message-ID: <20200228005337.GD9506@gondor.apana.org.au>
+References: <20200221135515.14948-1-yuehaibing@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200219131357.5679-1-shiva@chelsio.com>
+In-Reply-To: <20200221135515.14948-1-yuehaibing@huawei.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Feb 19, 2020 at 06:43:57PM +0530, Devulapally Shiva Krishna wrote:
-> When a PCI device will be removed, cxgb4(LLD) will notify chcr(ULD).
-> Incase if it's a last pci device, chcr should un-register all the crypto
-> algorithms.
+On Fri, Feb 21, 2020 at 09:55:15PM +0800, YueHaibing wrote:
+> crypto/md5.c:26:0: warning: macro "MD5_DIGEST_WORDS" is not used [-Wunused-macros]
+> crypto/md5.c:27:0: warning: macro "MD5_MESSAGE_BYTES" is not used [-Wunused-macros]
 > 
-> Signed-off-by: Devulapally Shiva Krishna <shiva@chelsio.com>
+> They are never used since commit 3c7eb3cc8360 ("md5: remove from
+> lib and only live in crypto").
+> 
+> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
 > ---
->  drivers/crypto/chelsio/chcr_core.c | 2 ++
->  1 file changed, 2 insertions(+)
+>  crypto/md5.c | 3 ---
+>  1 file changed, 3 deletions(-)
 
 Patch applied.  Thanks.
 -- 
