@@ -2,128 +2,156 @@ Return-Path: <SRS0=oD/a=4Q=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BB9DC3F2D1
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Feb 2020 10:23:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE828C3F2D1
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Feb 2020 10:47:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 248C52469F
-	for <linux-crypto@archiver.kernel.org>; Fri, 28 Feb 2020 10:23:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B94EF24697
+	for <linux-crypto@archiver.kernel.org>; Fri, 28 Feb 2020 10:47:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="KTWA0Miy"
+	dkim=pass (1024-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="QwkD2Tu0"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726614AbgB1KXw (ORCPT
+        id S1726897AbgB1Krn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 28 Feb 2020 05:23:52 -0500
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:34930 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726005AbgB1KXw (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 28 Feb 2020 05:23:52 -0500
-Received: by mail-wr1-f65.google.com with SMTP id r7so2356001wro.2
-        for <linux-crypto@vger.kernel.org>; Fri, 28 Feb 2020 02:23:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=9BWu8iueEzRzeq+ljMw3GO5DRJ7WpLyt4g4K03+Dz2U=;
-        b=KTWA0MiyIymXK1ATe6uz1WTX+uZh1NFjhSn/HYL20oh5JOrl+xuw5wSOntPWjheDpX
-         kGr7V+YNENnDtmAZmSBYWYXNd6tx9zjgzOSGVbzH1OIStw6HhgbolY1tuhAAUOwChI+x
-         CxIpmiEZXhMn419GAw1JLw2n4CnMiqmhilpsrOvduDDzT8BGQT23vXZr8LVxi1VC08Vk
-         np7JOcGNQwnxwRe2kxffJGMutUFJ51YmnTePtg30An5qzu0nhYBUgOVq3ceedls5Nqel
-         g7uhLy9OzxwW75lYS5R7WwPDCgGDirl6nncK2xueTAhZUageI22Ms0ns5dvu+4RrP7gG
-         34Ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=9BWu8iueEzRzeq+ljMw3GO5DRJ7WpLyt4g4K03+Dz2U=;
-        b=Vjh9dVzw0/RGLatWvVLRS0PtDnadR+n7lSimYbI4wt5ce6musPEyKP0vKc/5l0RTOn
-         GDbPiT38XUcNDUKfp+N9pA9lrryA7D6NkMm17En5d3kKWCmo2+jxRr9wFC840B9Wg5TB
-         w6i1yUnsApAn3uV8+/1qa009cd883dCIlzfOkxRyIapTb5Eg8dFzLhoY3iZ+/IOLfkpo
-         nJF5Hfn1CSiWCHjUaZ81JETUTN87nDHgF/BlnHfmxu09af3dETgrSMm72RgMxd3oFgiD
-         hhe9SpRHkJ6Bh/CEX8wMzkGrUO0Gz6KUgn6JZHMvA4j18Zxh0slh/DBC4s5yF4J4k+QZ
-         zOEw==
-X-Gm-Message-State: APjAAAXvpqYHTopqsXjgWoxP56ooxzfBP9Vk9tubGnpipSKKre0ho1+L
-        X0LO4LdKj+9geiikWPeMyllnLg==
-X-Google-Smtp-Source: APXvYqxH9owCTU7Ao+s51LMXcNiAO5qGpIEiVwOzyQhqkpDRULgg/35xMMXIZiEqRYYQVhOhgVu2Nw==
-X-Received: by 2002:a5d:5148:: with SMTP id u8mr4423764wrt.132.1582885429318;
-        Fri, 28 Feb 2020 02:23:49 -0800 (PST)
-Received: from Red ([2a01:cb1d:3d5:a100:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id z14sm8597747wrg.76.2020.02.28.02.23.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Feb 2020 02:23:48 -0800 (PST)
-Date:   Fri, 28 Feb 2020 11:23:46 +0100
-From:   LABBE Corentin <clabbe@baylibre.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] crypto: drbg: DRBG_CTR should select CTR
-Message-ID: <20200228102346.GA1662@Red>
-References: <1582127495-5871-1-git-send-email-clabbe@baylibre.com>
- <1582127495-5871-2-git-send-email-clabbe@baylibre.com>
- <20200228003052.GA9060@gondor.apana.org.au>
+        Fri, 28 Feb 2020 05:47:43 -0500
+Received: from mail-eopbgr70057.outbound.protection.outlook.com ([40.107.7.57]:34425
+        "EHLO EUR04-HE1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726765AbgB1Krn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 28 Feb 2020 05:47:43 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DC1aTnqQhzrZQRa8FsTLrx0gTqGi4EzGWCmqOCQJPTLrrTAMtl5aUoCFo2YMQbeV9/0ljNmlAOxQ8SWPCyithZnH8tDqM+O4HO6NvFABG5jJPLZLd7oR6EKu+32SKvQqhvipn8lsvTGquun/FA6/s8KlLVCsvHo4acvNHcMTACmJgRosiEARKnZgnxSPXr936RydPIfZN4TaweomfaH73DVHfFUc7xK33cmCxxt8eAIIx09V7hXuXoNCWfhDN6GWT7UcveOprtX7O8B5L/zSY8YUZqmune4gX7WA/RpFNIkEbWwU+6FUwtDijp8o9Hn3MbnhnhptxXs0qzbuGKktXA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=G6vje7PZ2XqQgQ3nZX6HHfMpv7S8S/3Rpl3oZ8TtoNQ=;
+ b=Ng1D6q8FkvsTXh/aZ/jEM9Qsu/6AKxPcbObCjn1BgJ4IMSP8QVrsZHEVkkiFzu4xcB1TSSAxJAZBZHUeEkoBxhSguvIE9/3V5o3UeuH26Ufsb449AiOc4prGHco3+UZNKfopZeJr3DtpRe6Q/9mHfb744oQOzjC+ax8DDVF2ckaaUYIagktERfhscXjnqlW73IZ82kddf2SyrCaioIdSbBqxjbvipLu1tDvIEM0b0XU2svsGHbltHk0/B6ckKgMMOJZ2ElhPmzbqTeoe0+jPhMuwX9MudVjjj7lK8CTFRe8lU6QANOf9LuooXJb0NbGVRANE2hAssUBRtcWrCv7s8g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector2-NXP1-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=G6vje7PZ2XqQgQ3nZX6HHfMpv7S8S/3Rpl3oZ8TtoNQ=;
+ b=QwkD2Tu0vrJbtRxWKBebvyPCfNosWIAeAcff+qD/KdfWOLVjTHea9bZ0cvrL/4R7+VHyY/b3IJmUxCZQL11JnBx7FPJ48raShb2vVGvzGDibj/qSWWeHEz2vBw/+yf+wliwn/aahy/WiIwTfvupBY8t8AGacue5Jo0qLgqaRCvM=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=andrei.botila@oss.nxp.com; 
+Received: from AM6PR04MB5430.eurprd04.prod.outlook.com (20.178.92.210) by
+ AM6PR04MB6309.eurprd04.prod.outlook.com (20.179.5.81) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2750.17; Fri, 28 Feb 2020 10:47:38 +0000
+Received: from AM6PR04MB5430.eurprd04.prod.outlook.com
+ ([fe80::79f3:d09c:ee2d:396e]) by AM6PR04MB5430.eurprd04.prod.outlook.com
+ ([fe80::79f3:d09c:ee2d:396e%3]) with mapi id 15.20.2772.012; Fri, 28 Feb 2020
+ 10:47:37 +0000
+From:   Andrei Botila <andrei.botila@oss.nxp.com>
+To:     Horia Geanta <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Andrei Botila <andrei.botila@nxp.com>, stable@vger.kernel.org
+Subject: [PATCH] crypto: caam - update xts sector size for large input length
+Date:   Fri, 28 Feb 2020 12:46:48 +0200
+Message-Id: <20200228104648.18898-1-andrei.botila@oss.nxp.com>
+X-Mailer: git-send-email 2.17.1
+Content-Type: text/plain
+X-ClientProxiedBy: AM0PR06CA0074.eurprd06.prod.outlook.com
+ (2603:10a6:208:fa::15) To AM6PR04MB5430.eurprd04.prod.outlook.com
+ (2603:10a6:20b:94::18)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200228003052.GA9060@gondor.apana.org.au>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from lsv15007.swis.ro-buh01.nxp.com (212.146.100.6) by AM0PR06CA0074.eurprd06.prod.outlook.com (2603:10a6:208:fa::15) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2772.14 via Frontend Transport; Fri, 28 Feb 2020 10:47:37 +0000
+X-Mailer: git-send-email 2.17.1
+X-Originating-IP: [212.146.100.6]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 66f1e256-fabb-4522-7467-08d7bc3ba044
+X-MS-TrafficTypeDiagnostic: AM6PR04MB6309:|AM6PR04MB6309:
+X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR04MB63090E087CC22387585E46BFB4E80@AM6PR04MB6309.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:2276;
+X-Forefront-PRVS: 0327618309
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(376002)(136003)(366004)(396003)(346002)(189003)(199004)(8676002)(2906002)(6486002)(44832011)(4326008)(8936002)(81166006)(81156014)(6506007)(16526019)(52116002)(316002)(66946007)(2616005)(86362001)(478600001)(6512007)(956004)(6666004)(1076003)(66556008)(5660300002)(66476007)(26005)(110136005)(186003);DIR:OUT;SFP:1101;SCL:1;SRVR:AM6PR04MB6309;H:AM6PR04MB5430.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:0;
+Received-SPF: None (protection.outlook.com: oss.nxp.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: lJkEleYzIh5kvsjZQXzsDfWR/uU9NlabtKsUbyIWQ1dxfyrPPYkpCF5osjcvOG7fEPycz216zZDeBfMBZAnMdA3CxhzAJaUd1LXV81BgtH83gnlLLgkKXNVrIdYJqL4qbTGjOddgz/+PLyefGH2VWsx5Lri+5u89YtQm3m/19AGCMharKBz7JyYUGhYyvkl5wocMa0A0h0UKh24m3tSw07COFNIhlxu3H+xydukv6VaKpb5y4cua2TNOf1/bv/Xg9SrmlY1mCqRe3AghuorgVs4vZ2tNEK0y7+0uGIeo1saIqzT0dGWX6NsK6+hP5uhNFrMWo1mbpJAkJNWFimgHsVBlYmr/OJ/bk7ZZvsUxKKQKBX9w6suoe6CCi+UVx7H+eLH+eSzoD2UqzOQIr73XjOtDQeyWhSjiJncCYCEJClCsV8UTxVLqZzWIrdYshSD4
+X-MS-Exchange-AntiSpam-MessageData: m7eOy9LJXoa4wOXWTO2VrH1ZCfhq1KntV69UhQSxIe3nrr5h7bIYIQEe9jmNGHWu58CHLE6HQoF+pI+APWGZJ+yHaGFvK3tXCOI0yx4L0+rsjwkuiAPfJ/kMT1O46LNs9K0DVIBPdXactpD77abodg==
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 66f1e256-fabb-4522-7467-08d7bc3ba044
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Feb 2020 10:47:37.5586
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Qa7XrBdhWYd3tkXL0RWsKPFIaFHSE6huWy8wz6yg5o34xmxq8fGstjYSLTj0DGwaEo8a+bOEGbr9bqnCRSkfew==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR04MB6309
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Feb 28, 2020 at 11:30:52AM +1100, Herbert Xu wrote:
-> On Wed, Feb 19, 2020 at 03:51:35PM +0000, Corentin Labbe wrote:
-> > if CRYPTO_DRBG_CTR is builtin and CTR is module, allocating such algo
-> > will fail.
-> > DRBG: could not allocate CTR cipher TFM handle: ctr(aes)
-> > alg: drbg: Failed to reset rng
-> > alg: drbg: Test 0 failed for drbg_pr_ctr_aes128
-> > DRBG: could not allocate CTR cipher TFM handle: ctr(aes)
-> > alg: drbg: Failed to reset rng
-> > alg: drbg: Test 0 failed for drbg_nopr_ctr_aes128
-> > DRBG: could not allocate CTR cipher TFM handle: ctr(aes)
-> > alg: drbg: Failed to reset rng
-> > alg: drbg: Test 0 failed for drbg_nopr_ctr_aes192
-> > DRBG: could not allocate CTR cipher TFM handle: ctr(aes)
-> > alg: drbg: Failed to reset rng
-> > ialg: drbg: Test 0 failed for drbg_nopr_ctr_aes256
-> > 
-> > Since setting DRBG_CTR=CTR lead to a recursive dependency, let's depends
-> > on CTR=y
-> > 
-> > Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> > ---
-> >  crypto/Kconfig | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/crypto/Kconfig b/crypto/Kconfig
-> > index 6d27fc6a7bf5..eddeb43fc01c 100644
-> > --- a/crypto/Kconfig
-> > +++ b/crypto/Kconfig
-> > @@ -1822,7 +1822,7 @@ config CRYPTO_DRBG_HASH
-> >  config CRYPTO_DRBG_CTR
-> >  	bool "Enable CTR DRBG"
-> >  	select CRYPTO_AES
-> > -	depends on CRYPTO_CTR
-> > +	depends on CRYPTO_CTR=y
-> 
-> This should be turned into a select.
-> 
+From: Andrei Botila <andrei.botila@nxp.com>
 
-it fail also if I select it:
-crypto/Kconfig:1800:error: recursive dependency detected!
-crypto/Kconfig:1800:	symbol CRYPTO_DRBG_MENU is selected by CRYPTO_RNG_DEFAULT
-crypto/Kconfig:83:	symbol CRYPTO_RNG_DEFAULT is selected by CRYPTO_SEQIV
-crypto/Kconfig:330:	symbol CRYPTO_SEQIV is selected by CRYPTO_CTR
-crypto/Kconfig:370:	symbol CRYPTO_CTR is selected by CRYPTO_DRBG_CTR
-crypto/Kconfig:1822:	symbol CRYPTO_DRBG_CTR depends on CRYPTO_DRBG_MENU
+Since in the software implementation of XTS-AES there is
+no notion of sector every input length is processed the same way.
+CAAM implementation has the notion of sector which causes different
+results between the software implementation and the one in CAAM
+for input lengths bigger than 512 bytes.
+Increase sector size to maximum value on 16 bits.
 
-I forgot to say it in the commit message.
-I will send a v2 with an updated commit message.
+Fixes: c6415a6016bf ("crypto: caam - add support for acipher xts(aes)")
+Cc: <stable@vger.kernel.org> # v4.12+
+Signed-off-by: Andrei Botila <andrei.botila@nxp.com>
+---
+This patch needs to be applied from v4.12+ because dm-crypt has added support
+for 4K sector size at that version. The commit was
+8f0009a225171 ("dm-crypt: optionally support larger encryption sector size").
 
-Regards
+ drivers/crypto/caam/caamalg_desc.c | 16 ++++++++++++++--
+ 1 file changed, 14 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/crypto/caam/caamalg_desc.c b/drivers/crypto/caam/caamalg_desc.c
+index aa9ccca67045..8ebbbd28b1f7 100644
+--- a/drivers/crypto/caam/caamalg_desc.c
++++ b/drivers/crypto/caam/caamalg_desc.c
+@@ -1518,7 +1518,13 @@ EXPORT_SYMBOL(cnstr_shdsc_skcipher_decap);
+  */
+ void cnstr_shdsc_xts_skcipher_encap(u32 * const desc, struct alginfo *cdata)
+ {
+-	__be64 sector_size = cpu_to_be64(512);
++	/*
++	 * Set sector size to a big value, practically disabling
++	 * sector size segmentation in xts implementation. We cannot
++	 * take full advantage of this HW feature with existing
++	 * crypto API / dm-crypt SW architecture.
++	 */
++	__be64 sector_size = cpu_to_be64(BIT(15));
+ 	u32 *key_jump_cmd;
+ 
+ 	init_sh_desc(desc, HDR_SHARE_SERIAL | HDR_SAVECTX);
+@@ -1571,7 +1577,13 @@ EXPORT_SYMBOL(cnstr_shdsc_xts_skcipher_encap);
+  */
+ void cnstr_shdsc_xts_skcipher_decap(u32 * const desc, struct alginfo *cdata)
+ {
+-	__be64 sector_size = cpu_to_be64(512);
++	/*
++	 * Set sector size to a big value, practically disabling
++	 * sector size segmentation in xts implementation. We cannot
++	 * take full advantage of this HW feature with existing
++	 * crypto API / dm-crypt SW architecture.
++	 */
++	__be64 sector_size = cpu_to_be64(BIT(15));
+ 	u32 *key_jump_cmd;
+ 
+ 	init_sh_desc(desc, HDR_SHARE_SERIAL | HDR_SAVECTX);
+-- 
+2.17.1
+
