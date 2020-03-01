@@ -1,368 +1,422 @@
-Return-Path: <SRS0=WFXP=4R=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=uwZS=4S=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74A91C3F2CE
-	for <linux-crypto@archiver.kernel.org>; Sat, 29 Feb 2020 11:19:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 174DFC3F2CE
+	for <linux-crypto@archiver.kernel.org>; Sun,  1 Mar 2020 08:07:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3BAF3246AF
-	for <linux-crypto@archiver.kernel.org>; Sat, 29 Feb 2020 11:19:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B04D820857
+	for <linux-crypto@archiver.kernel.org>; Sun,  1 Mar 2020 08:07:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="EYI2leuh"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726857AbgB2LT5 (ORCPT
+        id S1725827AbgCAIHO (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 29 Feb 2020 06:19:57 -0500
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:30627 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725747AbgB2LT5 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 29 Feb 2020 06:19:57 -0500
-Received: from pps.filterd (m0098414.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 01TBFpYj086900;
-        Sat, 29 Feb 2020 06:19:40 -0500
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2yfmynt8an-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 29 Feb 2020 06:19:40 -0500
-Received: from m0098414.ppops.net (m0098414.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 01TBIXUA090569;
-        Sat, 29 Feb 2020 06:19:39 -0500
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 2yfmynt8ag-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 29 Feb 2020 06:19:39 -0500
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 01TBEVvx023069;
-        Sat, 29 Feb 2020 11:19:38 GMT
-Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
-        by ppma04dal.us.ibm.com with ESMTP id 2yffk5tx6x-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sat, 29 Feb 2020 11:19:38 +0000
-Received: from b01ledav005.gho.pok.ibm.com (b01ledav005.gho.pok.ibm.com [9.57.199.110])
-        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 01TBJcqc50135450
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Sat, 29 Feb 2020 11:19:38 GMT
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id EE1E7AE060;
-        Sat, 29 Feb 2020 11:19:37 +0000 (GMT)
-Received: from b01ledav005.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 47209AE05C;
-        Sat, 29 Feb 2020 11:19:37 +0000 (GMT)
-Received: from [9.70.82.143] (unknown [9.70.82.143])
-        by b01ledav005.gho.pok.ibm.com (Postfix) with ESMTP;
-        Sat, 29 Feb 2020 11:19:37 +0000 (GMT)
-Subject: [PATCH V2 9/9] Documentation/powerpc: VAS API
-From:   Haren Myneni <haren@linux.ibm.com>
-To:     herbert@gondor.apana.org.au
-Cc:     mpe@ellerman.id.au, mikey@neuling.org, sukadev@linux.vnet.ibm.com,
-        linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
-        npiggin@gmail.com
-In-Reply-To: <1582974266.18705.28.camel@hbabu-laptop>
-References: <1582974266.18705.28.camel@hbabu-laptop>
-Content-Type: text/plain; charset="UTF-8"
-Date:   Sat, 29 Feb 2020 03:18:41 -0800
-Message-ID: <1582975121.18705.58.camel@hbabu-laptop>
-Mime-Version: 1.0
-X-Mailer: Evolution 2.28.3 
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
- definitions=2020-02-29_03:2020-02-28,2020-02-29 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 clxscore=1015
- priorityscore=1501 mlxlogscore=999 malwarescore=0 impostorscore=0
- suspectscore=0 lowpriorityscore=0 bulkscore=0 spamscore=0 adultscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2001150001 definitions=main-2002290088
+        Sun, 1 Mar 2020 03:07:14 -0500
+Received: from frisell.zx2c4.com ([192.95.5.64]:43245 "EHLO frisell.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725787AbgCAIHO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 1 Mar 2020 03:07:14 -0500
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 7e9ea0e4;
+        Sun, 1 Mar 2020 08:03:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=from:to:cc
+        :subject:date:message-id:mime-version:content-transfer-encoding;
+         s=mail; bh=PWd4gaEwdwxzUv9bntUt3ix7rVQ=; b=EYI2leuhfqL1V/ghpwDz
+        fDZNufa5kC8gjVLiEvJxLIkoIdizPZ76FLctdzLtQFrExqrxXSZEzmQ24CaNSnEb
+        vgnrDe9Upp+VdmaEd35r4Aiv1viP7bQJTO2ipuZrp9qLsLpWJ4RWSBmK1rtCczzv
+        IZVk85b+6tD7UxYE8QQUsbP77ZfXhKKwFtOTMpsBIa9zFozY2A324lVoGhyrkuSz
+        pcI6M8Wvm7R9UV0r/dpMO0U79uGUQMAAJK3i18MXgKZ02aKRBRiAvwV4QhfD/U0O
+        Ya64eyG3GgtylozTIVGy08P0RRQonIC+2iEVIIK8SJlLVleSVrxtbikKb9+2ZNYn
+        Hg==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 84ff11e7 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
+        Sun, 1 Mar 2020 08:03:01 +0000 (UTC)
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     linux-crypto@vger.kernel.org, herbert@gondor.apana.org.au
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Subject: [PATCH cryptodev] crypto: x86/curve25519 - leave r12 as spare register
+Date:   Sun,  1 Mar 2020 16:06:56 +0800
+Message-Id: <20200301080656.772440-1-Jason@zx2c4.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+This updates to the newer register selection proved by HACL*, which
+leads to a more compact instruction encoding, and saves around 100
+cycles.
 
-Power9 introduced Virtual Accelerator Switchboard (VAS) which allows
-userspace to communicate with Nest Accelerator (NX) directly. But
-kernel has to establish channel to NX for userspace. This document
-describes user space API that application can use to establish
-communication channel.
-
-Signed-off-by: Sukadev Bhattiprolu <sukadev@linux.ibm.com>
-Signed-off-by: Haren Myneni <haren@linux.ibm.com>
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
- Documentation/powerpc/index.rst   |   1 +
- Documentation/powerpc/vas-api.rst | 246 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 247 insertions(+)
- create mode 100644 Documentation/powerpc/vas-api.rst
+ arch/x86/crypto/curve25519-x86_64.c | 110 ++++++++++++++--------------
+ 1 file changed, 55 insertions(+), 55 deletions(-)
 
-diff --git a/Documentation/powerpc/index.rst b/Documentation/powerpc/index.rst
-index 0d45f0f..afe2d5e 100644
---- a/Documentation/powerpc/index.rst
-+++ b/Documentation/powerpc/index.rst
-@@ -30,6 +30,7 @@ powerpc
-     syscall64-abi
-     transactional_memory
-     ultravisor
-+    vas-api
+diff --git a/arch/x86/crypto/curve25519-x86_64.c b/arch/x86/crypto/curve25519-x86_64.c
+index e4e58b8e9afe..8a17621f7d3a 100644
+--- a/arch/x86/crypto/curve25519-x86_64.c
++++ b/arch/x86/crypto/curve25519-x86_64.c
+@@ -167,28 +167,28 @@ static inline void fmul(u64 *out, const u64 *f1, const u64 *f2, u64 *tmp)
+ 		"  movq 0(%1), %%rdx;"
+ 		"  mulxq 0(%3), %%r8, %%r9;"       "  xor %%r10, %%r10;"     "  movq %%r8, 0(%0);"
+ 		"  mulxq 8(%3), %%r10, %%r11;"     "  adox %%r9, %%r10;"     "  movq %%r10, 8(%0);"
+-		"  mulxq 16(%3), %%r12, %%r13;"    "  adox %%r11, %%r12;"
++		"  mulxq 16(%3), %%rbx, %%r13;"    "  adox %%r11, %%rbx;"
+ 		"  mulxq 24(%3), %%r14, %%rdx;"    "  adox %%r13, %%r14;"    "  mov $0, %%rax;"
+ 		                                   "  adox %%rdx, %%rax;"
+ 		/* Compute src1[1] * src2 */
+ 		"  movq 8(%1), %%rdx;"
+ 		"  mulxq 0(%3), %%r8, %%r9;"       "  xor %%r10, %%r10;"     "  adcxq 8(%0), %%r8;"    "  movq %%r8, 8(%0);"
+-		"  mulxq 8(%3), %%r10, %%r11;"     "  adox %%r9, %%r10;"     "  adcx %%r12, %%r10;"    "  movq %%r10, 16(%0);"
+-		"  mulxq 16(%3), %%r12, %%r13;"    "  adox %%r11, %%r12;"    "  adcx %%r14, %%r12;"    "  mov $0, %%r8;"
++		"  mulxq 8(%3), %%r10, %%r11;"     "  adox %%r9, %%r10;"     "  adcx %%rbx, %%r10;"    "  movq %%r10, 16(%0);"
++		"  mulxq 16(%3), %%rbx, %%r13;"    "  adox %%r11, %%rbx;"    "  adcx %%r14, %%rbx;"    "  mov $0, %%r8;"
+ 		"  mulxq 24(%3), %%r14, %%rdx;"    "  adox %%r13, %%r14;"    "  adcx %%rax, %%r14;"    "  mov $0, %%rax;"
+ 		                                   "  adox %%rdx, %%rax;"    "  adcx %%r8, %%rax;"
+ 		/* Compute src1[2] * src2 */
+ 		"  movq 16(%1), %%rdx;"
+ 		"  mulxq 0(%3), %%r8, %%r9;"       "  xor %%r10, %%r10;"    "  adcxq 16(%0), %%r8;"    "  movq %%r8, 16(%0);"
+-		"  mulxq 8(%3), %%r10, %%r11;"     "  adox %%r9, %%r10;"     "  adcx %%r12, %%r10;"    "  movq %%r10, 24(%0);"
+-		"  mulxq 16(%3), %%r12, %%r13;"    "  adox %%r11, %%r12;"    "  adcx %%r14, %%r12;"    "  mov $0, %%r8;"
++		"  mulxq 8(%3), %%r10, %%r11;"     "  adox %%r9, %%r10;"     "  adcx %%rbx, %%r10;"    "  movq %%r10, 24(%0);"
++		"  mulxq 16(%3), %%rbx, %%r13;"    "  adox %%r11, %%rbx;"    "  adcx %%r14, %%rbx;"    "  mov $0, %%r8;"
+ 		"  mulxq 24(%3), %%r14, %%rdx;"    "  adox %%r13, %%r14;"    "  adcx %%rax, %%r14;"    "  mov $0, %%rax;"
+ 		                                   "  adox %%rdx, %%rax;"    "  adcx %%r8, %%rax;"
+ 		/* Compute src1[3] * src2 */
+ 		"  movq 24(%1), %%rdx;"
+ 		"  mulxq 0(%3), %%r8, %%r9;"       "  xor %%r10, %%r10;"    "  adcxq 24(%0), %%r8;"    "  movq %%r8, 24(%0);"
+-		"  mulxq 8(%3), %%r10, %%r11;"     "  adox %%r9, %%r10;"     "  adcx %%r12, %%r10;"    "  movq %%r10, 32(%0);"
+-		"  mulxq 16(%3), %%r12, %%r13;"    "  adox %%r11, %%r12;"    "  adcx %%r14, %%r12;"    "  movq %%r12, 40(%0);"    "  mov $0, %%r8;"
++		"  mulxq 8(%3), %%r10, %%r11;"     "  adox %%r9, %%r10;"     "  adcx %%rbx, %%r10;"    "  movq %%r10, 32(%0);"
++		"  mulxq 16(%3), %%rbx, %%r13;"    "  adox %%r11, %%rbx;"    "  adcx %%r14, %%rbx;"    "  movq %%rbx, 40(%0);"    "  mov $0, %%r8;"
+ 		"  mulxq 24(%3), %%r14, %%rdx;"    "  adox %%r13, %%r14;"    "  adcx %%rax, %%r14;"    "  movq %%r14, 48(%0);"    "  mov $0, %%rax;"
+ 		                                   "  adox %%rdx, %%rax;"    "  adcx %%r8, %%rax;"     "  movq %%rax, 56(%0);"
+ 		/* Line up pointers */
+@@ -202,11 +202,11 @@ static inline void fmul(u64 *out, const u64 *f1, const u64 *f2, u64 *tmp)
+ 		"  mulxq 32(%1), %%r8, %%r13;"
+ 		"  xor %3, %3;"
+ 		"  adoxq 0(%1), %%r8;"
+-		"  mulxq 40(%1), %%r9, %%r12;"
++		"  mulxq 40(%1), %%r9, %%rbx;"
+ 		"  adcx %%r13, %%r9;"
+ 		"  adoxq 8(%1), %%r9;"
+ 		"  mulxq 48(%1), %%r10, %%r13;"
+-		"  adcx %%r12, %%r10;"
++		"  adcx %%rbx, %%r10;"
+ 		"  adoxq 16(%1), %%r10;"
+ 		"  mulxq 56(%1), %%r11, %%rax;"
+ 		"  adcx %%r13, %%r11;"
+@@ -231,7 +231,7 @@ static inline void fmul(u64 *out, const u64 *f1, const u64 *f2, u64 *tmp)
+ 		"  movq %%r8, 0(%0);"
+ 	: "+&r" (tmp), "+&r" (f1), "+&r" (out), "+&r" (f2)
+ 	:
+-	: "%rax", "%rdx", "%r8", "%r9", "%r10", "%r11", "%r12", "%r13", "%r14", "memory", "cc"
++	: "%rax", "%rdx", "%r8", "%r9", "%r10", "%r11", "%rbx", "%r13", "%r14", "memory", "cc"
+ 	);
+ }
  
- .. only::  subproject and html
+@@ -248,28 +248,28 @@ static inline void fmul2(u64 *out, const u64 *f1, const u64 *f2, u64 *tmp)
+ 		"  movq 0(%1), %%rdx;"
+ 		"  mulxq 0(%3), %%r8, %%r9;"       "  xor %%r10, %%r10;"     "  movq %%r8, 0(%0);"
+ 		"  mulxq 8(%3), %%r10, %%r11;"     "  adox %%r9, %%r10;"     "  movq %%r10, 8(%0);"
+-		"  mulxq 16(%3), %%r12, %%r13;"    "  adox %%r11, %%r12;"
++		"  mulxq 16(%3), %%rbx, %%r13;"    "  adox %%r11, %%rbx;"
+ 		"  mulxq 24(%3), %%r14, %%rdx;"    "  adox %%r13, %%r14;"    "  mov $0, %%rax;"
+ 		                                   "  adox %%rdx, %%rax;"
+ 		/* Compute src1[1] * src2 */
+ 		"  movq 8(%1), %%rdx;"
+ 		"  mulxq 0(%3), %%r8, %%r9;"       "  xor %%r10, %%r10;"     "  adcxq 8(%0), %%r8;"    "  movq %%r8, 8(%0);"
+-		"  mulxq 8(%3), %%r10, %%r11;"     "  adox %%r9, %%r10;"     "  adcx %%r12, %%r10;"    "  movq %%r10, 16(%0);"
+-		"  mulxq 16(%3), %%r12, %%r13;"    "  adox %%r11, %%r12;"    "  adcx %%r14, %%r12;"    "  mov $0, %%r8;"
++		"  mulxq 8(%3), %%r10, %%r11;"     "  adox %%r9, %%r10;"     "  adcx %%rbx, %%r10;"    "  movq %%r10, 16(%0);"
++		"  mulxq 16(%3), %%rbx, %%r13;"    "  adox %%r11, %%rbx;"    "  adcx %%r14, %%rbx;"    "  mov $0, %%r8;"
+ 		"  mulxq 24(%3), %%r14, %%rdx;"    "  adox %%r13, %%r14;"    "  adcx %%rax, %%r14;"    "  mov $0, %%rax;"
+ 		                                   "  adox %%rdx, %%rax;"    "  adcx %%r8, %%rax;"
+ 		/* Compute src1[2] * src2 */
+ 		"  movq 16(%1), %%rdx;"
+ 		"  mulxq 0(%3), %%r8, %%r9;"       "  xor %%r10, %%r10;"    "  adcxq 16(%0), %%r8;"    "  movq %%r8, 16(%0);"
+-		"  mulxq 8(%3), %%r10, %%r11;"     "  adox %%r9, %%r10;"     "  adcx %%r12, %%r10;"    "  movq %%r10, 24(%0);"
+-		"  mulxq 16(%3), %%r12, %%r13;"    "  adox %%r11, %%r12;"    "  adcx %%r14, %%r12;"    "  mov $0, %%r8;"
++		"  mulxq 8(%3), %%r10, %%r11;"     "  adox %%r9, %%r10;"     "  adcx %%rbx, %%r10;"    "  movq %%r10, 24(%0);"
++		"  mulxq 16(%3), %%rbx, %%r13;"    "  adox %%r11, %%rbx;"    "  adcx %%r14, %%rbx;"    "  mov $0, %%r8;"
+ 		"  mulxq 24(%3), %%r14, %%rdx;"    "  adox %%r13, %%r14;"    "  adcx %%rax, %%r14;"    "  mov $0, %%rax;"
+ 		                                   "  adox %%rdx, %%rax;"    "  adcx %%r8, %%rax;"
+ 		/* Compute src1[3] * src2 */
+ 		"  movq 24(%1), %%rdx;"
+ 		"  mulxq 0(%3), %%r8, %%r9;"       "  xor %%r10, %%r10;"    "  adcxq 24(%0), %%r8;"    "  movq %%r8, 24(%0);"
+-		"  mulxq 8(%3), %%r10, %%r11;"     "  adox %%r9, %%r10;"     "  adcx %%r12, %%r10;"    "  movq %%r10, 32(%0);"
+-		"  mulxq 16(%3), %%r12, %%r13;"    "  adox %%r11, %%r12;"    "  adcx %%r14, %%r12;"    "  movq %%r12, 40(%0);"    "  mov $0, %%r8;"
++		"  mulxq 8(%3), %%r10, %%r11;"     "  adox %%r9, %%r10;"     "  adcx %%rbx, %%r10;"    "  movq %%r10, 32(%0);"
++		"  mulxq 16(%3), %%rbx, %%r13;"    "  adox %%r11, %%rbx;"    "  adcx %%r14, %%rbx;"    "  movq %%rbx, 40(%0);"    "  mov $0, %%r8;"
+ 		"  mulxq 24(%3), %%r14, %%rdx;"    "  adox %%r13, %%r14;"    "  adcx %%rax, %%r14;"    "  movq %%r14, 48(%0);"    "  mov $0, %%rax;"
+ 		                                   "  adox %%rdx, %%rax;"    "  adcx %%r8, %%rax;"     "  movq %%rax, 56(%0);"
  
-diff --git a/Documentation/powerpc/vas-api.rst b/Documentation/powerpc/vas-api.rst
-new file mode 100644
-index 0000000..13ce4e7
---- /dev/null
-+++ b/Documentation/powerpc/vas-api.rst
-@@ -0,0 +1,246 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+.. _VAS-API:
-+
-+===================================================
-+Virtual Accelerator Switchboard (VAS) userspace API
-+===================================================
-+
-+Introduction
-+============
-+
-+Power9 processor introduced Virtual Accelerator Switchboard (VAS) which
-+allows both userspace and kernel communicate to co-processor
-+(hardware accelerator) referred to as the Nest Accelerator (NX). The NX
-+unit comprises of one or more hardware engines or co-processor types
-+such as 842 compression, GZIP compression and encryption. On power9,
-+userspace applications will have access to only GZIP Compression engine
-+which supports ZLIB and GZIP compression algorithms in the hardware.
-+
-+To communicate with NX, kernel has to establish a channel or window and
-+then requests can be submitted directly without kernel involvement.
-+Requests to the GZIP engine must be formatted as a co-processor Request
-+Block (CRB) and these CRBs must be submitted to the NX using COPY/PASTE
-+instructions to paste the CRB to hardware address that is associated with
-+the engine's request queue.
-+
-+The GZIP engine provides two priority levels of requests: Normal and
-+High. Only Normal requests are supported from userspace right now.
-+
-+This document explains userspace API that is used to interact with
-+kernel to setup channel / window which can be used to send compression
-+requests directly to NX accelerator.
-+
-+
-+Overview
-+========
-+
-+Application access to the GZIP engine is provided through
-+/dev/crypto/nx-gzip device node implemented by the VAS/NX device driver.
-+An application must open the /dev/crypto/nx-gzip device to obtain a file
-+descriptor (fd). Then should issue VAS_TX_WIN_OPEN ioctl with this fd to
-+establish connection to the engine. It means send window is opened on GZIP
-+engine for this process. Once a connection is established, the application
-+should use the mmap() system call to map the hardware address of engine's
-+request queue into the application's virtual address space.
-+
-+The application can then submit one or more requests to the the engine by
-+using copy/paste instructions and pasting the CRBs to the virtual address
-+(aka paste_address) returned by mmap(). User space can close the
-+established connection or send window by closing the file descriptior
-+(close(fd)) or upon the process exit.
-+
-+Note that applications can send several requests with the same window or
-+can establish multiple windows, but one window for each file descriptor.
-+
-+Following sections provide additional details and references about the
-+individual steps.
-+
-+NX-GZIP Device Node
-+===================
-+
-+There is one /dev/crypto/nx-gzip node in the system and it provides
-+access to all GZIP engines in the system. The only valid operations on
-+/dev/crypto/nx-gzip are:
-+
-+	* open() the device for read and write.
-+	* issue VAS_TX_WIN_OPEN ioctl
-+	* mmap() the engine's request queue into application's virtual
-+	  address space (i.e. get a paste_address for the co-processor
-+	  engine).
-+	* close the device node.
-+
-+Other file operations on this device node are undefined.
-+
-+Note that the copy and paste operations go directly to the hardware and
-+do not go through this device. Refer COPY/PASTE document for more
-+details.
-+
-+Although a system may have several instances of the NX co-processor
-+engines (typically, one per P9 chip) there is just one
-+/dev/crypto/nx-gzip device node in the system. When the nx-gzip device
-+node is opened, Kernel opens send window on a suitable instance of NX
-+accelerator. It finds CPU on which the user process is executing and
-+determine the NX instance for the corresponding chip on which this CPU
-+belongs.
-+
-+Applications may chose a specific instance of the NX co-processor using
-+the vas_id field in the VAS_TX_WIN_OPEN ioctl as detailed below.
-+
-+A userspace library libnxz is available here but still in development:
-+	 https://github.com/abalib/power-gzip
-+
-+Applications that use inflate / deflate calls can link with libnxz
-+instead of libz and use NX GZIP compression without any modification.
-+
-+Open /dev/crypto/nx-gzip
-+========================
-+
-+The nx-gzip device should be opened for read and write. No special
-+privileges are needed to open the device. Each window coreesponds to one
-+file descriptor. So if the userspace process needs multiple windows,
-+several open calls have to be issued.
-+
-+See open(2) system call man pages for other details such as return values,
-+error codes and restrictions.
-+codes and restrictions.
-+
-+VAS_TX_WIN_OPEN ioctl
-+=====================
-+
-+Applications should use the VAS_TX_WIN_OPEN ioctl as follows to establish
-+a connection with NX co-processor engine:
-+
-+	::
-+		struct vas_tx_win_open_attr {
-+			__u32   version;
-+			__s16   vas_id; /* specific instance of vas or -1
-+						for default */
-+			__u16   reserved1;
-+			__u64   flags;	/* For future use */
-+			__u64   reserved2[6];
-+		};
-+
-+	version: The version field must be currently set to 1.
-+	vas_id: If '-1' is passed, kernel will make a best-effort attempt
-+		to assign an optimal instance of NX for the process. To
-+		select the specific VAS instance, refer
-+		"Discovery of available VAS engines" section below.
-+
-+	flags, reserved1 and reserved2[6] fields are for future extension
-+	and must be set to 0.
-+
-+	The attributes attr for the VAS_TX_WIN_OPEN ioctl are defined as
-+	follows:
-+		#define VAS_MAGIC 'v'
-+		#define VAS_TX_WIN_OPEN _IOW(VAS_MAGIC, 1,
-+						struct vas_tx_win_open_attr)
-+
-+		struct vas_tx_win_open_attr attr;
-+		rc = ioctl(fd, VAS_TX_WIN_OPEN, &attr);
-+
-+	The VAS_TX_WIN_OPEN ioctl returns 0 on success. On errors, it
-+	returns -1 and sets the errno variable to indicate the error.
-+
-+	Error conditions:
-+		EINVAL	fd does not refer to a valid VAS device.
-+		EINVAL	Invalid vas ID
-+		EINVAL	version is not set with proper value
-+		EEXIST	Window is already opened for the given fd
-+		ENOMEM	Memory is not available to allocate window
-+		ENOSPC	System has too many active windows (connections)
-+			opened
-+		EINVAL	reserved fields are not set to 0.
-+
-+	See the ioctl(2) man page for more details, error codes and
-+	restrictions.
-+
-+mmap() NX-GZIP device
-+=====================
-+
-+The mmap() system call for a NX-GZIP device fd returns a paste_address
-+that the application can use to copy/paste its CRB to the hardware engines.
-+	::
-+
-+		paste_addr = mmap(addr, size, prot, flags, fd, offset);
-+
-+	Only restrictions on mmap for a NX-GZIP device fd are:
-+		* size should be 4K page size
-+		* offset parameter should be 0ULL
-+
-+	Refer to mmap(2) man page for additional details/restrictions.
-+	In addition to the error conditions listed on the mmap(2) man
-+	page, can also fail with one of the following error codes:
-+
-+		EINVAL	fd is not associated with an open window
-+			(i.e mmap() does not follow a successful call
-+			to the VAS_TX_WIN_OPEN ioctl).
-+		EINVAL	offset field is not 0ULL.
-+
-+Discovery of available VAS engines
-+==================================
-+
-+Each available VAS instance in the system will have a device tree node
-+like /proc/device-tree/vas@* or /proc/device-tree/xscom@*/vas@*.
-+Determine the chip or VAS instance and use the corresponding ibm,vas-id
-+property value in this node to select specific VAS instance.
-+
-+Copy/Paste operations
-+=====================
-+
-+Applications should use the copy and paste instructions defined in the RFC
-+to copy/paste the CRB.
-+
-+CRB Specification and use NX
-+============================
-+
-+Applications should format requests to the co-processor using the
-+co-processor Request Block (CRBs). Refer NX workbook for the format of
-+CRB and use NX from userspace such as sending requests and checking
-+request status.
-+
-+Simple example
-+==============
-+
-+	::
-+		int use_nx_gzip()
-+		{
-+			int rc, fd;
-+			void *addr;
-+			struct vas_setup_attr txattr;
-+
-+			fd = open("/dev/crypto/nx-gzip", O_RDWR);
-+			if (fd < 0) {
-+				fprintf(stderr, "open nx-gzip failed\n");
-+				return -1;
-+			}
-+			memset(&txattr, 0, sizeof(txattr));
-+			txattr.version = 1;
-+			txattr.vas_id = -1
-+			rc = ioctl(fd, VAS_TX_WIN_OPEN,
-+					(unsigned long)&txattr);
-+			if (rc < 0) {
-+				fprintf(stderr, "ioctl() n %d, error %d\n",
-+						rc, errno);
-+				return rc;
-+			}
-+			addr = mmap(NULL, 4096, PROT_READ|PROT_WRITE,
-+					MAP_SHARED, fd, 0ULL);
-+			if (addr == MAP_FAILED) {
-+				fprintf(stderr, "mmap() failed, errno %d\n",
-+						errno);
-+				return -errno;
-+			}
-+			do {
-+				//Format CRB request with compression or
-+				//uncompression
-+				// Refer tests for vas_copy/vas_paste
-+				vas_copy((&crb, 0, 1);
-+				vas_paste(addr, 0, 1);
-+				// Poll on csb.flags with timeout
-+				// csb address is listed in CRB
-+			} while (true)
-+			close(fd) or window can be closed upon process exit
-+		}
-+
-+	Refer https://github.com/abalib/power-gzip for tests or more
-+	use cases.
+@@ -279,28 +279,28 @@ static inline void fmul2(u64 *out, const u64 *f1, const u64 *f2, u64 *tmp)
+ 		"  movq 32(%1), %%rdx;"
+ 		"  mulxq 32(%3), %%r8, %%r9;"       "  xor %%r10, %%r10;"     "  movq %%r8, 64(%0);"
+ 		"  mulxq 40(%3), %%r10, %%r11;"     "  adox %%r9, %%r10;"     "  movq %%r10, 72(%0);"
+-		"  mulxq 48(%3), %%r12, %%r13;"    "  adox %%r11, %%r12;"
++		"  mulxq 48(%3), %%rbx, %%r13;"    "  adox %%r11, %%rbx;"
+ 		"  mulxq 56(%3), %%r14, %%rdx;"    "  adox %%r13, %%r14;"    "  mov $0, %%rax;"
+ 		                                   "  adox %%rdx, %%rax;"
+ 		/* Compute src1[1] * src2 */
+ 		"  movq 40(%1), %%rdx;"
+ 		"  mulxq 32(%3), %%r8, %%r9;"       "  xor %%r10, %%r10;"     "  adcxq 72(%0), %%r8;"    "  movq %%r8, 72(%0);"
+-		"  mulxq 40(%3), %%r10, %%r11;"     "  adox %%r9, %%r10;"     "  adcx %%r12, %%r10;"    "  movq %%r10, 80(%0);"
+-		"  mulxq 48(%3), %%r12, %%r13;"    "  adox %%r11, %%r12;"    "  adcx %%r14, %%r12;"    "  mov $0, %%r8;"
++		"  mulxq 40(%3), %%r10, %%r11;"     "  adox %%r9, %%r10;"     "  adcx %%rbx, %%r10;"    "  movq %%r10, 80(%0);"
++		"  mulxq 48(%3), %%rbx, %%r13;"    "  adox %%r11, %%rbx;"    "  adcx %%r14, %%rbx;"    "  mov $0, %%r8;"
+ 		"  mulxq 56(%3), %%r14, %%rdx;"    "  adox %%r13, %%r14;"    "  adcx %%rax, %%r14;"    "  mov $0, %%rax;"
+ 		                                   "  adox %%rdx, %%rax;"    "  adcx %%r8, %%rax;"
+ 		/* Compute src1[2] * src2 */
+ 		"  movq 48(%1), %%rdx;"
+ 		"  mulxq 32(%3), %%r8, %%r9;"       "  xor %%r10, %%r10;"    "  adcxq 80(%0), %%r8;"    "  movq %%r8, 80(%0);"
+-		"  mulxq 40(%3), %%r10, %%r11;"     "  adox %%r9, %%r10;"     "  adcx %%r12, %%r10;"    "  movq %%r10, 88(%0);"
+-		"  mulxq 48(%3), %%r12, %%r13;"    "  adox %%r11, %%r12;"    "  adcx %%r14, %%r12;"    "  mov $0, %%r8;"
++		"  mulxq 40(%3), %%r10, %%r11;"     "  adox %%r9, %%r10;"     "  adcx %%rbx, %%r10;"    "  movq %%r10, 88(%0);"
++		"  mulxq 48(%3), %%rbx, %%r13;"    "  adox %%r11, %%rbx;"    "  adcx %%r14, %%rbx;"    "  mov $0, %%r8;"
+ 		"  mulxq 56(%3), %%r14, %%rdx;"    "  adox %%r13, %%r14;"    "  adcx %%rax, %%r14;"    "  mov $0, %%rax;"
+ 		                                   "  adox %%rdx, %%rax;"    "  adcx %%r8, %%rax;"
+ 		/* Compute src1[3] * src2 */
+ 		"  movq 56(%1), %%rdx;"
+ 		"  mulxq 32(%3), %%r8, %%r9;"       "  xor %%r10, %%r10;"    "  adcxq 88(%0), %%r8;"    "  movq %%r8, 88(%0);"
+-		"  mulxq 40(%3), %%r10, %%r11;"     "  adox %%r9, %%r10;"     "  adcx %%r12, %%r10;"    "  movq %%r10, 96(%0);"
+-		"  mulxq 48(%3), %%r12, %%r13;"    "  adox %%r11, %%r12;"    "  adcx %%r14, %%r12;"    "  movq %%r12, 104(%0);"    "  mov $0, %%r8;"
++		"  mulxq 40(%3), %%r10, %%r11;"     "  adox %%r9, %%r10;"     "  adcx %%rbx, %%r10;"    "  movq %%r10, 96(%0);"
++		"  mulxq 48(%3), %%rbx, %%r13;"    "  adox %%r11, %%rbx;"    "  adcx %%r14, %%rbx;"    "  movq %%rbx, 104(%0);"    "  mov $0, %%r8;"
+ 		"  mulxq 56(%3), %%r14, %%rdx;"    "  adox %%r13, %%r14;"    "  adcx %%rax, %%r14;"    "  movq %%r14, 112(%0);"    "  mov $0, %%rax;"
+ 		                                   "  adox %%rdx, %%rax;"    "  adcx %%r8, %%rax;"     "  movq %%rax, 120(%0);"
+ 		/* Line up pointers */
+@@ -314,11 +314,11 @@ static inline void fmul2(u64 *out, const u64 *f1, const u64 *f2, u64 *tmp)
+ 		"  mulxq 32(%1), %%r8, %%r13;"
+ 		"  xor %3, %3;"
+ 		"  adoxq 0(%1), %%r8;"
+-		"  mulxq 40(%1), %%r9, %%r12;"
++		"  mulxq 40(%1), %%r9, %%rbx;"
+ 		"  adcx %%r13, %%r9;"
+ 		"  adoxq 8(%1), %%r9;"
+ 		"  mulxq 48(%1), %%r10, %%r13;"
+-		"  adcx %%r12, %%r10;"
++		"  adcx %%rbx, %%r10;"
+ 		"  adoxq 16(%1), %%r10;"
+ 		"  mulxq 56(%1), %%r11, %%rax;"
+ 		"  adcx %%r13, %%r11;"
+@@ -347,11 +347,11 @@ static inline void fmul2(u64 *out, const u64 *f1, const u64 *f2, u64 *tmp)
+ 		"  mulxq 96(%1), %%r8, %%r13;"
+ 		"  xor %3, %3;"
+ 		"  adoxq 64(%1), %%r8;"
+-		"  mulxq 104(%1), %%r9, %%r12;"
++		"  mulxq 104(%1), %%r9, %%rbx;"
+ 		"  adcx %%r13, %%r9;"
+ 		"  adoxq 72(%1), %%r9;"
+ 		"  mulxq 112(%1), %%r10, %%r13;"
+-		"  adcx %%r12, %%r10;"
++		"  adcx %%rbx, %%r10;"
+ 		"  adoxq 80(%1), %%r10;"
+ 		"  mulxq 120(%1), %%r11, %%rax;"
+ 		"  adcx %%r13, %%r11;"
+@@ -376,7 +376,7 @@ static inline void fmul2(u64 *out, const u64 *f1, const u64 *f2, u64 *tmp)
+ 		"  movq %%r8, 32(%0);"
+ 	: "+&r" (tmp), "+&r" (f1), "+&r" (out), "+&r" (f2)
+ 	:
+-	: "%rax", "%rdx", "%r8", "%r9", "%r10", "%r11", "%r12", "%r13", "%r14", "memory", "cc"
++	: "%rax", "%rdx", "%r8", "%r9", "%r10", "%r11", "%rbx", "%r13", "%r14", "memory", "cc"
+ 	);
+ }
+ 
+@@ -388,11 +388,11 @@ static inline void fmul_scalar(u64 *out, const u64 *f1, u64 f2)
+ 	asm volatile(
+ 		/* Compute the raw multiplication of f1*f2 */
+ 		"  mulxq 0(%2), %%r8, %%rcx;"      /* f1[0]*f2 */
+-		"  mulxq 8(%2), %%r9, %%r12;"      /* f1[1]*f2 */
++		"  mulxq 8(%2), %%r9, %%rbx;"      /* f1[1]*f2 */
+ 		"  add %%rcx, %%r9;"
+ 		"  mov $0, %%rcx;"
+ 		"  mulxq 16(%2), %%r10, %%r13;"    /* f1[2]*f2 */
+-		"  adcx %%r12, %%r10;"
++		"  adcx %%rbx, %%r10;"
+ 		"  mulxq 24(%2), %%r11, %%rax;"    /* f1[3]*f2 */
+ 		"  adcx %%r13, %%r11;"
+ 		"  adcx %%rcx, %%rax;"
+@@ -419,7 +419,7 @@ static inline void fmul_scalar(u64 *out, const u64 *f1, u64 f2)
+ 		"  movq %%r8, 0(%1);"
+ 	: "+&r" (f2_r)
+ 	: "r" (out), "r" (f1)
+-	: "%rax", "%rcx", "%r8", "%r9", "%r10", "%r11", "%r12", "%r13", "memory", "cc"
++	: "%rax", "%rcx", "%r8", "%r9", "%r10", "%r11", "%rbx", "%r13", "memory", "cc"
+ 	);
+ }
+ 
+@@ -520,8 +520,8 @@ static inline void fsqr(u64 *out, const u64 *f, u64 *tmp)
+ 		"  mulxq 16(%1), %%r9, %%r10;"     "  adcx %%r14, %%r9;"     /* f[2]*f[0] */
+ 		"  mulxq 24(%1), %%rax, %%rcx;"    "  adcx %%rax, %%r10;"    /* f[3]*f[0] */
+ 		"  movq 24(%1), %%rdx;"                                      /* f[3] */
+-		"  mulxq 8(%1), %%r11, %%r12;"     "  adcx %%rcx, %%r11;"    /* f[1]*f[3] */
+-		"  mulxq 16(%1), %%rax, %%r13;"    "  adcx %%rax, %%r12;"    /* f[2]*f[3] */
++		"  mulxq 8(%1), %%r11, %%rbx;"     "  adcx %%rcx, %%r11;"    /* f[1]*f[3] */
++		"  mulxq 16(%1), %%rax, %%r13;"    "  adcx %%rax, %%rbx;"    /* f[2]*f[3] */
+ 		"  movq 8(%1), %%rdx;"             "  adcx %%r15, %%r13;"    /* f1 */
+ 		"  mulxq 16(%1), %%rax, %%rcx;"    "  mov $0, %%r14;"        /* f[2]*f[1] */
+ 
+@@ -531,12 +531,12 @@ static inline void fsqr(u64 *out, const u64 *f, u64 *tmp)
+ 		"  adcx %%r8, %%r8;"
+ 		"  adox %%rcx, %%r11;"
+ 		"  adcx %%r9, %%r9;"
+-		"  adox %%r15, %%r12;"
++		"  adox %%r15, %%rbx;"
+ 		"  adcx %%r10, %%r10;"
+ 		"  adox %%r15, %%r13;"
+ 		"  adcx %%r11, %%r11;"
+ 		"  adox %%r15, %%r14;"
+-		"  adcx %%r12, %%r12;"
++		"  adcx %%rbx, %%rbx;"
+ 		"  adcx %%r13, %%r13;"
+ 		"  adcx %%r14, %%r14;"
+ 
+@@ -549,7 +549,7 @@ static inline void fsqr(u64 *out, const u64 *f, u64 *tmp)
+ 		"  adcx %%rcx, %%r10;"     "  movq %%r10, 24(%0);"
+ 		"  movq 16(%1), %%rdx;"    "  mulx %%rdx, %%rax, %%rcx;"    /* f[2]^2 */
+ 		"  adcx %%rax, %%r11;"     "  movq %%r11, 32(%0);"
+-		"  adcx %%rcx, %%r12;"     "  movq %%r12, 40(%0);"
++		"  adcx %%rcx, %%rbx;"     "  movq %%rbx, 40(%0);"
+ 		"  movq 24(%1), %%rdx;"    "  mulx %%rdx, %%rax, %%rcx;"    /* f[3]^2 */
+ 		"  adcx %%rax, %%r13;"     "  movq %%r13, 48(%0);"
+ 		"  adcx %%rcx, %%r14;"     "  movq %%r14, 56(%0);"
+@@ -565,11 +565,11 @@ static inline void fsqr(u64 *out, const u64 *f, u64 *tmp)
+ 		"  mulxq 32(%1), %%r8, %%r13;"
+ 		"  xor %%rcx, %%rcx;"
+ 		"  adoxq 0(%1), %%r8;"
+-		"  mulxq 40(%1), %%r9, %%r12;"
++		"  mulxq 40(%1), %%r9, %%rbx;"
+ 		"  adcx %%r13, %%r9;"
+ 		"  adoxq 8(%1), %%r9;"
+ 		"  mulxq 48(%1), %%r10, %%r13;"
+-		"  adcx %%r12, %%r10;"
++		"  adcx %%rbx, %%r10;"
+ 		"  adoxq 16(%1), %%r10;"
+ 		"  mulxq 56(%1), %%r11, %%rax;"
+ 		"  adcx %%r13, %%r11;"
+@@ -594,7 +594,7 @@ static inline void fsqr(u64 *out, const u64 *f, u64 *tmp)
+ 		"  movq %%r8, 0(%0);"
+ 	: "+&r" (tmp), "+&r" (f), "+&r" (out)
+ 	:
+-	: "%rax", "%rcx", "%rdx", "%r8", "%r9", "%r10", "%r11", "%r12", "%r13", "%r14", "%r15", "memory", "cc"
++	: "%rax", "%rcx", "%rdx", "%r8", "%r9", "%r10", "%r11", "%rbx", "%r13", "%r14", "%r15", "memory", "cc"
+ 	);
+ }
+ 
+@@ -611,8 +611,8 @@ static inline void fsqr2(u64 *out, const u64 *f, u64 *tmp)
+ 		"  mulxq 16(%1), %%r9, %%r10;"     "  adcx %%r14, %%r9;"     /* f[2]*f[0] */
+ 		"  mulxq 24(%1), %%rax, %%rcx;"    "  adcx %%rax, %%r10;"    /* f[3]*f[0] */
+ 		"  movq 24(%1), %%rdx;"                                      /* f[3] */
+-		"  mulxq 8(%1), %%r11, %%r12;"     "  adcx %%rcx, %%r11;"    /* f[1]*f[3] */
+-		"  mulxq 16(%1), %%rax, %%r13;"    "  adcx %%rax, %%r12;"    /* f[2]*f[3] */
++		"  mulxq 8(%1), %%r11, %%rbx;"     "  adcx %%rcx, %%r11;"    /* f[1]*f[3] */
++		"  mulxq 16(%1), %%rax, %%r13;"    "  adcx %%rax, %%rbx;"    /* f[2]*f[3] */
+ 		"  movq 8(%1), %%rdx;"             "  adcx %%r15, %%r13;"    /* f1 */
+ 		"  mulxq 16(%1), %%rax, %%rcx;"    "  mov $0, %%r14;"        /* f[2]*f[1] */
+ 
+@@ -622,12 +622,12 @@ static inline void fsqr2(u64 *out, const u64 *f, u64 *tmp)
+ 		"  adcx %%r8, %%r8;"
+ 		"  adox %%rcx, %%r11;"
+ 		"  adcx %%r9, %%r9;"
+-		"  adox %%r15, %%r12;"
++		"  adox %%r15, %%rbx;"
+ 		"  adcx %%r10, %%r10;"
+ 		"  adox %%r15, %%r13;"
+ 		"  adcx %%r11, %%r11;"
+ 		"  adox %%r15, %%r14;"
+-		"  adcx %%r12, %%r12;"
++		"  adcx %%rbx, %%rbx;"
+ 		"  adcx %%r13, %%r13;"
+ 		"  adcx %%r14, %%r14;"
+ 
+@@ -640,7 +640,7 @@ static inline void fsqr2(u64 *out, const u64 *f, u64 *tmp)
+ 		"  adcx %%rcx, %%r10;"     "  movq %%r10, 24(%0);"
+ 		"  movq 16(%1), %%rdx;"    "  mulx %%rdx, %%rax, %%rcx;"    /* f[2]^2 */
+ 		"  adcx %%rax, %%r11;"     "  movq %%r11, 32(%0);"
+-		"  adcx %%rcx, %%r12;"     "  movq %%r12, 40(%0);"
++		"  adcx %%rcx, %%rbx;"     "  movq %%rbx, 40(%0);"
+ 		"  movq 24(%1), %%rdx;"    "  mulx %%rdx, %%rax, %%rcx;"    /* f[3]^2 */
+ 		"  adcx %%rax, %%r13;"     "  movq %%r13, 48(%0);"
+ 		"  adcx %%rcx, %%r14;"     "  movq %%r14, 56(%0);"
+@@ -651,8 +651,8 @@ static inline void fsqr2(u64 *out, const u64 *f, u64 *tmp)
+ 		"  mulxq 48(%1), %%r9, %%r10;"     "  adcx %%r14, %%r9;"     /* f[2]*f[0] */
+ 		"  mulxq 56(%1), %%rax, %%rcx;"    "  adcx %%rax, %%r10;"    /* f[3]*f[0] */
+ 		"  movq 56(%1), %%rdx;"                                      /* f[3] */
+-		"  mulxq 40(%1), %%r11, %%r12;"     "  adcx %%rcx, %%r11;"    /* f[1]*f[3] */
+-		"  mulxq 48(%1), %%rax, %%r13;"    "  adcx %%rax, %%r12;"    /* f[2]*f[3] */
++		"  mulxq 40(%1), %%r11, %%rbx;"     "  adcx %%rcx, %%r11;"    /* f[1]*f[3] */
++		"  mulxq 48(%1), %%rax, %%r13;"    "  adcx %%rax, %%rbx;"    /* f[2]*f[3] */
+ 		"  movq 40(%1), %%rdx;"             "  adcx %%r15, %%r13;"    /* f1 */
+ 		"  mulxq 48(%1), %%rax, %%rcx;"    "  mov $0, %%r14;"        /* f[2]*f[1] */
+ 
+@@ -662,12 +662,12 @@ static inline void fsqr2(u64 *out, const u64 *f, u64 *tmp)
+ 		"  adcx %%r8, %%r8;"
+ 		"  adox %%rcx, %%r11;"
+ 		"  adcx %%r9, %%r9;"
+-		"  adox %%r15, %%r12;"
++		"  adox %%r15, %%rbx;"
+ 		"  adcx %%r10, %%r10;"
+ 		"  adox %%r15, %%r13;"
+ 		"  adcx %%r11, %%r11;"
+ 		"  adox %%r15, %%r14;"
+-		"  adcx %%r12, %%r12;"
++		"  adcx %%rbx, %%rbx;"
+ 		"  adcx %%r13, %%r13;"
+ 		"  adcx %%r14, %%r14;"
+ 
+@@ -680,7 +680,7 @@ static inline void fsqr2(u64 *out, const u64 *f, u64 *tmp)
+ 		"  adcx %%rcx, %%r10;"     "  movq %%r10, 88(%0);"
+ 		"  movq 48(%1), %%rdx;"    "  mulx %%rdx, %%rax, %%rcx;"    /* f[2]^2 */
+ 		"  adcx %%rax, %%r11;"     "  movq %%r11, 96(%0);"
+-		"  adcx %%rcx, %%r12;"     "  movq %%r12, 104(%0);"
++		"  adcx %%rcx, %%rbx;"     "  movq %%rbx, 104(%0);"
+ 		"  movq 56(%1), %%rdx;"    "  mulx %%rdx, %%rax, %%rcx;"    /* f[3]^2 */
+ 		"  adcx %%rax, %%r13;"     "  movq %%r13, 112(%0);"
+ 		"  adcx %%rcx, %%r14;"     "  movq %%r14, 120(%0);"
+@@ -694,11 +694,11 @@ static inline void fsqr2(u64 *out, const u64 *f, u64 *tmp)
+ 		"  mulxq 32(%1), %%r8, %%r13;"
+ 		"  xor %%rcx, %%rcx;"
+ 		"  adoxq 0(%1), %%r8;"
+-		"  mulxq 40(%1), %%r9, %%r12;"
++		"  mulxq 40(%1), %%r9, %%rbx;"
+ 		"  adcx %%r13, %%r9;"
+ 		"  adoxq 8(%1), %%r9;"
+ 		"  mulxq 48(%1), %%r10, %%r13;"
+-		"  adcx %%r12, %%r10;"
++		"  adcx %%rbx, %%r10;"
+ 		"  adoxq 16(%1), %%r10;"
+ 		"  mulxq 56(%1), %%r11, %%rax;"
+ 		"  adcx %%r13, %%r11;"
+@@ -727,11 +727,11 @@ static inline void fsqr2(u64 *out, const u64 *f, u64 *tmp)
+ 		"  mulxq 96(%1), %%r8, %%r13;"
+ 		"  xor %%rcx, %%rcx;"
+ 		"  adoxq 64(%1), %%r8;"
+-		"  mulxq 104(%1), %%r9, %%r12;"
++		"  mulxq 104(%1), %%r9, %%rbx;"
+ 		"  adcx %%r13, %%r9;"
+ 		"  adoxq 72(%1), %%r9;"
+ 		"  mulxq 112(%1), %%r10, %%r13;"
+-		"  adcx %%r12, %%r10;"
++		"  adcx %%rbx, %%r10;"
+ 		"  adoxq 80(%1), %%r10;"
+ 		"  mulxq 120(%1), %%r11, %%rax;"
+ 		"  adcx %%r13, %%r11;"
+@@ -756,7 +756,7 @@ static inline void fsqr2(u64 *out, const u64 *f, u64 *tmp)
+ 		"  movq %%r8, 32(%0);"
+ 	: "+&r" (tmp), "+&r" (f), "+&r" (out)
+ 	:
+-	: "%rax", "%rcx", "%rdx", "%r8", "%r9", "%r10", "%r11", "%r12", "%r13", "%r14", "%r15", "memory", "cc"
++	: "%rax", "%rcx", "%rdx", "%r8", "%r9", "%r10", "%r11", "%rbx", "%r13", "%r14", "%r15", "memory", "cc"
+ 	);
+ }
+ 
 -- 
-1.8.3.1
-
-
+2.25.0
 
