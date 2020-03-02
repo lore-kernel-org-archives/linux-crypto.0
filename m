@@ -2,78 +2,67 @@ Return-Path: <SRS0=CDDf=4T=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D61AFC3F2D2
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 Mar 2020 09:22:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 060F5C3F2D2
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 Mar 2020 09:36:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9324524695
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 Mar 2020 09:22:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C238A246B4
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 Mar 2020 09:36:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="N00SaeGu"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="rBelNWMR"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726390AbgCBJWN (ORCPT
+        id S1727079AbgCBJgh (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 2 Mar 2020 04:22:13 -0500
-Received: from mail-eopbgr50067.outbound.protection.outlook.com ([40.107.5.67]:42244
-        "EHLO EUR03-VE1-obe.outbound.protection.outlook.com"
+        Mon, 2 Mar 2020 04:36:37 -0500
+Received: from mail-eopbgr70073.outbound.protection.outlook.com ([40.107.7.73]:63430
+        "EHLO EUR04-HE1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726382AbgCBJWM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 2 Mar 2020 04:22:12 -0500
+        id S1726674AbgCBJgh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 2 Mar 2020 04:36:37 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lMCoyYXguIMARlkVAdlNbs5Gw7pD/MQRtyuQ7RhzQXevWtQzN52AsTJKbFkzE9PRqEm0TzG8Wd0lhm90ehyl/KiIAtmmvVjqANZMBg737vn55CYktfqLBSfO5oBDt3gdbPS/35YG1Cf7O8gdlgHEr9bIH1MeHePcLfM+y+CxOZ/hHGuLU6XCRtq4mswFQKNnFdSlYIpjMt7BRUqA/GkhROwI95MOS2vDkGNVreXxKxEWu8Yyg4+zSome5nIZFtI6MrKLHEmPinvwIoa/PwaJRde9Qffe20iYvzzRbaUNBFoa3682oEMh16tTFi5+mqlLR3hF8I+ugJhwP/E73chbGg==
+ b=SedSrbbES3d4IfQEPyxrKVPzQAPHNxpIEOPDBC0XmygPGQpgjxKC8tsikokj5Dp6lSrzBEalqMV6iVHe6xvI21rsxQerNt0pYr3A9P+mgz4ZNbiUGC9wcy67G2Zl9lZs/LvcUZiFCfAC8yjrlgj3q0nJyOjkd9NBNKkzwrr1Ag4J96hb6LeLCMFOvrFp3Zw2HN9XEUQYGyph8eISzU42Z4kHdfXGLa4Ub9hXAujsPKNCVL2Ubu8A3ktH1Kh9t/YustkcGGomHAZ1jCe6a7qH+ev/GtQNY/o/ftIUaauUMyMVbLkjIteDCYbOhQsyfZkJpr2HeJxQY6gd8NdH5P60jQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AESask4hxg+NxuR3iw0qgQCIFGwFhuPpQ7urhIoFkJg=;
- b=VjmK2kMBh29twnLy8jLXGjFcKUlaTFk+dLhHb9ZQxdR1wtYsAwki6v9XWOnSxt93W8UqchRiyO3vv17W/ifXBbOLUQZsNZNEdowHF00izIvILYG1j+4sFN2pEnIB01E2ONvwaif3+A2wCyFiqbeMleRKYrgGd8xgnCL2wjA4SpRErW7DscpPN2pLP+yUzuJkY0I2KOD9P1yMkH65mkLRij/Rw/RSgnN8iwHn+56xlnrIAo+OehkQcCI7OXqX8wMLVPFUM6OKJjoA38VeE+kS4rsxE3Gt8w+rxJef0/mSBn5o8nS5krDOq9nOKlSEEP3ms7arz5hZXVKCjIE910xerQ==
+ bh=N4VTMR1y/qGwDF9Opj1UTtjSGLtdWO5PxQxFiOvuLoY=;
+ b=OiYR3VCAZlbwB9cyL6kBueHTnKJCbFOSxYL9FQlbgbMs8Vceo8knUCedapRas4cxpylSM3wwb7Lr5MwtqjYbmvvDRwzHPUMf32ykqNRH8E3MdqbHscmxK/wsGInNFi5rObYufg/KC+DNqNCqlvmNwVMLzPCblifSnnhoLn4tDjoCEgll9d8rL5fkT+dC2eu/v06Qk60Cl13vieieVK1CvJCGZi58TW2zgJcyWMGYpaZL6+sJW+o1MrsXJZwGYlzOjpamvqLZ+9991jqJGNwFI16BU2ttZfwpgigZl189RT9uGPoGM+vG92vyzTbFraoXnAO0MdudkrPEqkIaChNh/Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
  header.d=nxp.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=AESask4hxg+NxuR3iw0qgQCIFGwFhuPpQ7urhIoFkJg=;
- b=N00SaeGusuyckZBlh0Z68xS98Ds4bK8mXsN99wOkixNiKyN5G50Ek5DZqqE5wB4w/KIy0nbsB/1LenTYWvu9CC+SJI+ra2O9FHH9SvYARlMv+fV6C+fn9YEM8sp9xqc82PlGY7rVASUuLHArIONY4JRR3xdEFJVXb8lI5Fnpcok=
+ bh=N4VTMR1y/qGwDF9Opj1UTtjSGLtdWO5PxQxFiOvuLoY=;
+ b=rBelNWMRHvdY1Wj0T03pPHUwjejkt3xK2TeAYJ1ypIaaYHj0sgNK/+8i+kXSoZmXjAkcg3i6j+5jz1cEQvAhdH1kjLOfV6YVc4MZZL1iQpSPT4Gm/0u6F0qDgvhjjxseNG1nNhzPGDcuYOUTQ5Z9x/cANBdkV7A4XF24p30O9gU=
 Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB3950.eurprd04.prod.outlook.com (52.134.18.15) with Microsoft SMTP
+ VI1PR0402MB3552.eurprd04.prod.outlook.com (52.134.4.149) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2772.15; Mon, 2 Mar 2020 09:22:06 +0000
+ 15.20.2772.14; Mon, 2 Mar 2020 09:36:32 +0000
 Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
  ([fe80::751e:7e8d:ed4:ef5f]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
  ([fe80::751e:7e8d:ed4:ef5f%7]) with mapi id 15.20.2772.019; Mon, 2 Mar 2020
- 09:22:06 +0000
+ 09:36:32 +0000
 From:   Horia Geanta <horia.geanta@nxp.com>
-To:     =?iso-8859-2?Q?Andr=E9_Draszik?= <git@andred.net>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-CC:     Aymen Sghaier <aymen.sghaier@nxp.com>,
+To:     "Andrei Botila (OSS)" <andrei.botila@oss.nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Shawn Guo <shawnguo@kernel.org>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Fabio Estevam <festevam@gmail.com>,
-        dl-linux-imx <linux-imx@nxp.com>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Anson Huang <anson.huang@nxp.com>,
-        Robin Gong <yibin.gong@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-input@vger.kernel.org" <linux-input@vger.kernel.org>
-Subject: Re: [PATCH v2 6/6] Input: snvs_pwrkey - only IRQ_HANDLED for our own
- events
-Thread-Topic: [PATCH v2 6/6] Input: snvs_pwrkey - only IRQ_HANDLED for our own
- events
-Thread-Index: AQHV6/ZVd03O0pGg0Eazbugm7ITLfQ==
-Date:   Mon, 2 Mar 2020 09:22:05 +0000
-Message-ID: <VI1PR0402MB3485A743C94442533B6840F298E70@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <20200225161201.1975-1-git@andred.net>
- <20200225161201.1975-6-git@andred.net>
+        "David S. Miller" <davem@davemloft.net>
+CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Andrei Botila <andrei.botila@nxp.com>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>
+Subject: Re: [PATCH] crypto: caam - update xts sector size for large input
+ length
+Thread-Topic: [PATCH] crypto: caam - update xts sector size for large input
+ length
+Thread-Index: AQHV7iR/GJR55F8brEiS/iBRq64oyA==
+Date:   Mon, 2 Mar 2020 09:36:32 +0000
+Message-ID: <VI1PR0402MB34851CC70E092F598E9BF32298E70@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+References: <20200228104648.18898-1-andrei.botila@oss.nxp.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -83,70 +72,103 @@ authentication-results: spf=none (sender IP is )
 x-originating-ip: [212.146.100.6]
 x-ms-publictraffictype: Email
 x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: dc5c0d42-2b77-40b7-6b2b-08d7be8b2cf7
-x-ms-traffictypediagnostic: VI1PR0402MB3950:|VI1PR0402MB3950:
+x-ms-office365-filtering-correlation-id: 08c672b6-2a6c-40ec-4b0e-08d7be8d3158
+x-ms-traffictypediagnostic: VI1PR0402MB3552:|VI1PR0402MB3552:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <VI1PR0402MB395047C915FA595FCA64FAD198E70@VI1PR0402MB3950.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:8273;
+x-microsoft-antispam-prvs: <VI1PR0402MB3552CEFBCD7A318E0B76120598E70@VI1PR0402MB3552.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:3173;
 x-forefront-prvs: 033054F29A
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(39860400002)(396003)(136003)(346002)(366004)(376002)(189003)(199004)(55016002)(478600001)(44832011)(7416002)(33656002)(86362001)(71200400001)(52536014)(66946007)(76116006)(91956017)(66556008)(64756008)(9686003)(26005)(186003)(66476007)(66446008)(4326008)(6506007)(7696005)(53546011)(81166006)(81156014)(8676002)(8936002)(2906002)(5660300002)(54906003)(110136005)(4744005)(316002);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3950;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(396003)(346002)(376002)(136003)(39860400002)(199004)(189003)(52536014)(5660300002)(2906002)(71200400001)(66946007)(91956017)(76116006)(66476007)(64756008)(66446008)(316002)(7696005)(66556008)(6506007)(33656002)(86362001)(54906003)(44832011)(478600001)(8936002)(26005)(186003)(9686003)(55016002)(8676002)(81166006)(4326008)(81156014)(53546011)(110136005);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3552;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
 received-spf: None (protection.outlook.com: nxp.com does not designate
  permitted sender hosts)
 x-ms-exchange-senderadcheck: 1
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: QKTz8HWUx6bn1kv6BfkBz/LOrHy8L6r+9vNWnnsNR9gMLn8BWZHeAfyh/iJ8OOXaRdP1oamsWmI3A6iHnfMhpq+JpR1fxzDIhJiE0S/pOxeR50zAJ1gV9PpGGq9jnX6w2n9MbeB2bMzPF8W/7gQs/5HE8ODgPDH+lX4qc157x/FNDe/3VWIgL2ADg3Dbgv8bxcv0/HBlEdfnZ6NmRc9l3WDNKLEl+yzuHTE1BjToBsYoBy7pLq1m/vjMdw+4/zX2g6zifcMN3SWIaxe2z73jhod5XN20kkjYNQavbzxw/bCjN/Bk69qVITrLnpi7udJn5DHYiqsudbLncFlILx2jVdC03B47EfLGV9x776nBDjsUGIruM4qtcqYTj9D4/jE4nsK1iXSlnwakilUxIKvmCn5ZkmsIj97pE3ERpyxExFul2ioLkgfvxfpgJCJE7EAt
-x-ms-exchange-antispam-messagedata: Pn7nSN/zmOBki6jqqdTydkSzKCcsxxUm4chNhqX0gxh2wKZaqVS2O3aJvBKJ8J0hc/dFTj/kIhOefZYVLGpH+ndr8N11Q1ySW5FoHU4SJyu3lsmiHznP6GmbJ/MPPFwOnifXHrgDpIM6fxI6QIIvEA==
+x-microsoft-antispam-message-info: S55ul4zv80yDSkwHmggKjBbriz8wSUw4SjcjTmBz68pTJ+LVCkp7KyGTE91IWUEtE+bz1N81bk3WbGSB+Nf6Vv3nR67u8ny5Jxhqxw826bzsZktTIia8K1jsEO/0OyJzJCPGIUAHbCiunNtMCoItKb7rXLOUHuZ0z0FZw0Gnkc4XFW02a2eUPlVrG7FCKevfJ8AY7XcFrMFGFfuydG4PavqnGbO/dGrFBY50/V+nC6yTcSYEiMrI6ZcdEPwUkGFzdIwPRMlXfZJ0e/NbkziYgicrf8fFQqbmxzNI1gXy3RfbQvvzLOXVItfd3m5lRw0fk2nXsCRxAVCZ/Yt4Xtc7t+DbBomXq2FXqT3hM1ctr6K4TFfXgjLmJZv4DhunqeXbxGeRQV7oJe9PoFvLPIiLDMQIENgWN3ipadui+eBp/Ekfa+9f9s1rlU9dWAh0WmQf
+x-ms-exchange-antispam-messagedata: b1gwwWdTlZ8bg0ArvcjwWU5oMshxsd7S4ISivJbECXX9L18NQcf6EzNvBxNXKBtQfOcP20cuh7OCYlhWxNhpxexChyd3Ey+pXU4YwslVzh/mt5utiX+43aRBVnntVDy4KaxqLDQ4+nfCqCRYXXQdLQ==
 Content-Type: text/plain; charset="iso-8859-2"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dc5c0d42-2b77-40b7-6b2b-08d7be8b2cf7
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Mar 2020 09:22:05.8549
+X-MS-Exchange-CrossTenant-Network-Message-Id: 08c672b6-2a6c-40ec-4b0e-08d7be8d3158
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Mar 2020 09:36:32.2781
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 6krFPgu6xFm7RKczQrMqcVtUWvBMH2Low4qZ4iiAtZnvs7+QGTyTpXtr+k2TZswDj4QJBIBHGtgMI9ZtamiqJg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3950
+X-MS-Exchange-CrossTenant-userprincipalname: xRsThamCcsSl5TzGVxYY/M5O4+kbVgEhDN1kZrHVwAey91IpEapYnxKBI5Xt6d/vGSCCtXHO4K5f34qmLPv5Zg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3552
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2/25/2020 6:12 PM, Andr=E9 Draszik wrote:=0A=
-> The snvs_pwrkey shares the SNVS LPSR status register with the snvs_rtc.=
++ dm-devel=0A=
 =0A=
+On 2/28/2020 12:47 PM, Andrei Botila (OSS) wrote:=0A=
+> From: Andrei Botila <andrei.botila@nxp.com>=0A=
 > =0A=
-> This driver here should only return IRQ_HANDLED if the status register=0A=
-> indicates that the event we're handling in the irq handler was genuinely=
+> Since in the software implementation of XTS-AES there is=0A=
+> no notion of sector every input length is processed the same way.=0A=
+> CAAM implementation has the notion of sector which causes different=0A=
+> results between the software implementation and the one in CAAM=0A=
+> for input lengths bigger than 512 bytes.=0A=
+> Increase sector size to maximum value on 16 bits.=0A=
+> =0A=
+> Fixes: c6415a6016bf ("crypto: caam - add support for acipher xts(aes)")=
 =0A=
-> intended for this driver. Otheriwse the interrupt subsystem will=0A=
-> assume the interrupt was handled successfully even though it wasn't=0A=
-> at all.=0A=
-> =0A=
-> Signed-off-by: Andr=E9 Draszik <git@andred.net>=0A=
-> Cc: "Horia Geant=E3" <horia.geanta@nxp.com>=0A=
-> Cc: Aymen Sghaier <aymen.sghaier@nxp.com>=0A=
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>=0A=
-> Cc: "David S. Miller" <davem@davemloft.net>=0A=
-> Cc: Rob Herring <robh+dt@kernel.org>=0A=
-> Cc: Mark Rutland <mark.rutland@arm.com>=0A=
-> Cc: Shawn Guo <shawnguo@kernel.org>=0A=
-> Cc: Sascha Hauer <s.hauer@pengutronix.de>=0A=
-> Cc: Pengutronix Kernel Team <kernel@pengutronix.de>=0A=
-> Cc: Fabio Estevam <festevam@gmail.com>=0A=
-> Cc: NXP Linux Team <linux-imx@nxp.com>=0A=
-> Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>=0A=
-> Cc: Anson Huang <Anson.Huang@nxp.com>=0A=
-> Cc: Robin Gong <yibin.gong@nxp.com>=0A=
-> Cc: linux-crypto@vger.kernel.org=0A=
-> Cc: devicetree@vger.kernel.org=0A=
-> Cc: linux-arm-kernel@lists.infradead.org=0A=
-> Cc: linux-input@vger.kernel.org=0A=
-For patches 2-6:=0A=
+> Cc: <stable@vger.kernel.org> # v4.12+=0A=
+> Signed-off-by: Andrei Botila <andrei.botila@nxp.com>=0A=
 Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
-=0A=
-Also imx8mn.dtsi and imx8mp.dtsi will have to be updated.=0A=
 =0A=
 Thanks,=0A=
 Horia=0A=
+=0A=
+> ---=0A=
+> This patch needs to be applied from v4.12+ because dm-crypt has added sup=
+port=0A=
+> for 4K sector size at that version. The commit was=0A=
+> 8f0009a225171 ("dm-crypt: optionally support larger encryption sector siz=
+e").=0A=
+> =0A=
+>  drivers/crypto/caam/caamalg_desc.c | 16 ++++++++++++++--=0A=
+>  1 file changed, 14 insertions(+), 2 deletions(-)=0A=
+> =0A=
+> diff --git a/drivers/crypto/caam/caamalg_desc.c b/drivers/crypto/caam/caa=
+malg_desc.c=0A=
+> index aa9ccca67045..8ebbbd28b1f7 100644=0A=
+> --- a/drivers/crypto/caam/caamalg_desc.c=0A=
+> +++ b/drivers/crypto/caam/caamalg_desc.c=0A=
+> @@ -1518,7 +1518,13 @@ EXPORT_SYMBOL(cnstr_shdsc_skcipher_decap);=0A=
+>   */=0A=
+>  void cnstr_shdsc_xts_skcipher_encap(u32 * const desc, struct alginfo *cd=
+ata)=0A=
+>  {=0A=
+> -	__be64 sector_size =3D cpu_to_be64(512);=0A=
+> +	/*=0A=
+> +	 * Set sector size to a big value, practically disabling=0A=
+> +	 * sector size segmentation in xts implementation. We cannot=0A=
+> +	 * take full advantage of this HW feature with existing=0A=
+> +	 * crypto API / dm-crypt SW architecture.=0A=
+> +	 */=0A=
+> +	__be64 sector_size =3D cpu_to_be64(BIT(15));=0A=
+>  	u32 *key_jump_cmd;=0A=
+>  =0A=
+>  	init_sh_desc(desc, HDR_SHARE_SERIAL | HDR_SAVECTX);=0A=
+> @@ -1571,7 +1577,13 @@ EXPORT_SYMBOL(cnstr_shdsc_xts_skcipher_encap);=0A=
+>   */=0A=
+>  void cnstr_shdsc_xts_skcipher_decap(u32 * const desc, struct alginfo *cd=
+ata)=0A=
+>  {=0A=
+> -	__be64 sector_size =3D cpu_to_be64(512);=0A=
+> +	/*=0A=
+> +	 * Set sector size to a big value, practically disabling=0A=
+> +	 * sector size segmentation in xts implementation. We cannot=0A=
+> +	 * take full advantage of this HW feature with existing=0A=
+> +	 * crypto API / dm-crypt SW architecture.=0A=
+> +	 */=0A=
+> +	__be64 sector_size =3D cpu_to_be64(BIT(15));=0A=
+>  	u32 *key_jump_cmd;=0A=
+>  =0A=
+>  	init_sh_desc(desc, HDR_SHARE_SERIAL | HDR_SAVECTX);=0A=
+> =0A=
+=0A=
