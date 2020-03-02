@@ -2,156 +2,148 @@ Return-Path: <SRS0=CDDf=4T=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F975C3F2D1
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 Mar 2020 08:16:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27D28C3F2D1
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 Mar 2020 08:17:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3E8E6246B9
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 Mar 2020 08:16:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F339F246B4
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 Mar 2020 08:17:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="cnZAWY1p"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="DPbqMB03"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726780AbgCBIQz (ORCPT
+        id S1727195AbgCBIRc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 2 Mar 2020 03:16:55 -0500
-Received: from mail-eopbgr140074.outbound.protection.outlook.com ([40.107.14.74]:41195
-        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
+        Mon, 2 Mar 2020 03:17:32 -0500
+Received: from mail-am6eur05on2060.outbound.protection.outlook.com ([40.107.22.60]:6016
+        "EHLO EUR05-AM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726674AbgCBIQz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 2 Mar 2020 03:16:55 -0500
+        id S1727648AbgCBIR1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 2 Mar 2020 03:17:27 -0500
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gHf75m/hdOT+nOoY9y+mtTMDhfIIODD2VqNad+Fb8ZhpTrGPwMX9L9nVTZFjz9xQwbV5xhqu2pYEUORhZHtbusbYe5nQYCEDw2UuIeLAT5+w7JMYEYl0cW+haXDF9PRzSyDBMnuC6bi8hC0Dj61FquPv9wI9eemr0eqd33uIfb/Sh+XVSDuTyM9ROZhagPBxKaWPwuESHempO4/a5i4Xdm8A4RTCwEfXev0S43CyQTqpmf5u3dUn7bLmf5dsy6Nu3m/2ccpPyUt4f8jUDA6F7jJ4Izjd+uuY3HpSmOnQr68pafcReagaFw5kIoEu6lX4eoHR63AXYZoOxphAcxYR5Q==
+ b=oMl5xZiZDYxmA9IER81/Ms3V13HSmPtm7+J5gmZr2l9lX8x2jRYpuz9uSfKXcImyeJxSntvJGuGFNV1GLywSjwmozDT1KRKmPTwLc56qNzeLdu99SVZb62tGThWwmeE/TW0dhbIdebrAJZymJWuWb8FKC2hsavR9wlUXwJe8L8EvQqhrcsvAj7GrYfwr75oFX33+2EWQqMp3zCS5cnO7TS0fnlaGoiI781qX7Ivbr8K9GybHf9roMFeMgeNbxLUyRS0xm6cTHmnPXgXEBgYWsHiXqF1OSTJZ+7STbioLgya7g54bh2KeE5HOcag5LtoqGVRUc0nSZoyE/YBsEYdG/w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GXpvb8NL8AR/keyslRQVJFUQhjkTvzvkAAGG/Lws8xw=;
- b=C/muIpZkcXAe5tN9+W4dnIGbc8vY4/GGg3H6psgKmaw2eAVL/gLotDAmYpwUQiFA9O92vsEsC0OiRnqupxAAqlDGA6Znw0jdhudsenZhdcRx0q2b5+ufGNkTu/mdleEzXfWThxTagGbarLFb3n1PNUFuAAcHoCju/t6UDESBRJmtoJDB8mSuUPi+tv8rRKg10YuKCnF2xRQNSRlNb2jGsmSWxGg+tU7qTAw9UmCzUdlMJdEonzC7j+d/xiEZp3MdAqks7am8k71OpkOaPq7v/85vm205VfRv6ZAaP6NZaQPmMj1vE7BMDfldXNWfFRn3K6R4iDOsAR6Ar8dZ8NYOOA==
+ bh=AacDFEEEq0oC3BZUdYs1DCJEO11Omnm4+cgCsxyXKSE=;
+ b=GlgAMomynL558sVhD2Ufx6fRJFYAhalN1U94nHG1zYwEX4kU5czXOmqLJ2oWSP2QoukXZt/S8Km+qQtfxRUBFGmqdgGP6jpLBB09Zoro+CJ/ZWLa8wXCIJvA4Z0JNSdndme8eBzDRO0MLmvvh9QpHu1a1u+4MNsvltv2TSKZIMrCO27fd5oRGrgPcri6uIaGcVQ0vOM7DcexoDu5OJt2girZkTqY0babFSm1/AJLy9jZWE9bV6tW4C8WJ+N7UqzNlm0So8vy+ZEZHIjIq490k6e88fMUYbc4WS8ner3sm6Fhg0fbf8FF6a69NWz9lbVFQb2ZFhHXohQd6PBFs3Q1YQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
- dkim=pass header.d=oss.nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
- s=selector2-NXP1-onmicrosoft-com;
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GXpvb8NL8AR/keyslRQVJFUQhjkTvzvkAAGG/Lws8xw=;
- b=cnZAWY1pOTsUd7JVzQwMMNWTbfotrDETaUd5k9Hba6l+5QoaTZNjv6DUHrKyAjBt6cx4E2Naa88I7YqmKWXKj1IZDR30HyLnlaPBohl5Cricn/qLck6Qb36PkTdBvaOdCX7q2v/fP1wHTCyq6A6gEPsBmoJSJEMwlc9qIEYEBXg=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=andrei.botila@oss.nxp.com; 
-Received: from AM6PR04MB5430.eurprd04.prod.outlook.com (20.178.92.210) by
- AM6PR04MB6328.eurprd04.prod.outlook.com (20.179.5.150) with Microsoft SMTP
+ bh=AacDFEEEq0oC3BZUdYs1DCJEO11Omnm4+cgCsxyXKSE=;
+ b=DPbqMB03XLFUXU2SWGzHoFBL4fTxoW6bi1KpyPsvN3sm9MwnoSzKWLhJ3YiKIE5mtbNoWuze8WZIJO4R+aNKmZx5puGcO1SWtMEeFUetE36Rlc95E465tMyq3TfP6LgzNi87GI4ud4D10HymGULQH1CuzPSJnCGV3LkkrbvBa8Q=
+Received: from AM0PR0402MB3476.eurprd04.prod.outlook.com (52.133.50.141) by
+ AM0PR0402MB3556.eurprd04.prod.outlook.com (52.133.43.147) with Microsoft SMTP
  Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2772.16; Mon, 2 Mar 2020 08:16:48 +0000
-Received: from AM6PR04MB5430.eurprd04.prod.outlook.com
- ([fe80::79f3:d09c:ee2d:396e]) by AM6PR04MB5430.eurprd04.prod.outlook.com
- ([fe80::79f3:d09c:ee2d:396e%3]) with mapi id 15.20.2772.019; Mon, 2 Mar 2020
- 08:16:48 +0000
-From:   Andrei Botila <andrei.botila@oss.nxp.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [RFC] crypto: xts - limit accepted key length
-Date:   Mon,  2 Mar 2020 10:16:29 +0200
-Message-Id: <20200302081629.17831-1-andrei.botila@oss.nxp.com>
-X-Mailer: git-send-email 2.17.1
-Content-Type: text/plain
-X-ClientProxiedBy: AM0PR02CA0066.eurprd02.prod.outlook.com
- (2603:10a6:208:d2::43) To AM6PR04MB5430.eurprd04.prod.outlook.com
- (2603:10a6:20b:94::18)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from lsv15007.swis.ro-buh01.nxp.com (212.146.100.6) by AM0PR02CA0066.eurprd02.prod.outlook.com (2603:10a6:208:d2::43) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2772.15 via Frontend Transport; Mon, 2 Mar 2020 08:16:48 +0000
-X-Mailer: git-send-email 2.17.1
-X-Originating-IP: [212.146.100.6]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 6e288297-fe12-49c1-fab0-08d7be820de4
-X-MS-TrafficTypeDiagnostic: AM6PR04MB6328:
-X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
-X-Microsoft-Antispam-PRVS: <AM6PR04MB6328A6E25AB4DF1FDF7F60EDB4E70@AM6PR04MB6328.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2201;
-X-Forefront-PRVS: 033054F29A
-X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(136003)(376002)(346002)(39860400002)(366004)(189003)(199004)(81166006)(8936002)(6486002)(44832011)(6506007)(52116002)(81156014)(8676002)(1076003)(16526019)(2616005)(110136005)(186003)(316002)(956004)(26005)(5660300002)(2906002)(86362001)(66476007)(66946007)(66556008)(4326008)(6666004)(478600001)(6512007);DIR:OUT;SFP:1101;SCL:1;SRVR:AM6PR04MB6328;H:AM6PR04MB5430.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:0;
-Received-SPF: None (protection.outlook.com: oss.nxp.com does not designate
+ 15.20.2772.18; Mon, 2 Mar 2020 08:17:23 +0000
+Received: from AM0PR0402MB3476.eurprd04.prod.outlook.com
+ ([fe80::dc6e:5cc4:dd53:3088]) by AM0PR0402MB3476.eurprd04.prod.outlook.com
+ ([fe80::dc6e:5cc4:dd53:3088%5]) with mapi id 15.20.2772.019; Mon, 2 Mar 2020
+ 08:17:23 +0000
+From:   Horia Geanta <horia.geanta@nxp.com>
+To:     =?iso-8859-2?Q?Andr=E9_Draszik?= <git@andred.net>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC:     Rob Herring <robh@kernel.org>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Shawn Guo <shawnguo@kernel.org>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        Pengutronix Kernel Team <kernel@pengutronix.de>,
+        Fabio Estevam <festevam@gmail.com>,
+        dl-linux-imx <linux-imx@nxp.com>,
+        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+        Anson Huang <anson.huang@nxp.com>,
+        Robin Gong <yibin.gong@nxp.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-input@vger.kernel.org" <linux-input@vger.kernel.org>
+Subject: Re: [PATCH v2 1/6] dt-bindings: crypto: fsl-sec4: add snvs clock to
+ pwrkey
+Thread-Topic: [PATCH v2 1/6] dt-bindings: crypto: fsl-sec4: add snvs clock to
+ pwrkey
+Thread-Index: AQHV6/ZSv/DVqZ+iC02h9uEXERTtvg==
+Date:   Mon, 2 Mar 2020 08:17:23 +0000
+Message-ID: <AM0PR0402MB347685AB405373EBED8A386498E70@AM0PR0402MB3476.eurprd04.prod.outlook.com>
+References: <20200225161201.1975-1-git@andred.net>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: spf=none (sender IP is )
+ smtp.mailfrom=horia.geanta@nxp.com; 
+x-originating-ip: [212.146.100.6]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 197ad76b-7fb0-462a-d815-08d7be822305
+x-ms-traffictypediagnostic: AM0PR0402MB3556:|AM0PR0402MB3556:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <AM0PR0402MB35568B27391383708C495DF398E70@AM0PR0402MB3556.eurprd04.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:1002;
+x-forefront-prvs: 033054F29A
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(376002)(396003)(136003)(366004)(39860400002)(346002)(189003)(199004)(33656002)(55016002)(9686003)(110136005)(54906003)(26005)(2906002)(186003)(7416002)(76116006)(7696005)(6506007)(71200400001)(64756008)(66446008)(5660300002)(4326008)(66946007)(66556008)(52536014)(66476007)(53546011)(91956017)(478600001)(316002)(4744005)(44832011)(8676002)(81166006)(81156014)(8936002)(86362001);DIR:OUT;SFP:1101;SCL:1;SRVR:AM0PR0402MB3556;H:AM0PR0402MB3476.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+received-spf: None (protection.outlook.com: nxp.com does not designate
  permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 7TIO/NXWTOO9fA5z+i/huxAbfNlYm71F1jaMvmHCq3QzP0fqu0gybYnjq0h4YIeAvbLAqIaiqpNS3h4WNMCE5aS2puczkjtRAuaBsDOtBQWdiCVIpJ3DLfgsfdjyeSCYHLqXXuQq/0+9MrbFJP69GmhE+VqkGpzCUkCdVlQPgaBct7eLwD3x3dakynxQJQMTaEC7dFHUhgOTkOFVS+9/eP652+VzzBD8hD8DlJNoFSLc7/y0LNJFr5C9dG1xWFvSdzgklKjWKSjKOfy+VEougm2TmcSWRC8ucJqaEYejMD5a7MTfnFysAGTpviMxhUQY8+EG17ZdyGUmAQ2OkBQdlzmAL/0ebrnFTfVJf+r6ponjg1pankxxluAFvsIhuF+kQt0AMwHVQoc8fpszhzX9+JBoe5ET90Pt4R4U5XYC4ud42uWeTqUIxFcUQtcdTvFw
-X-MS-Exchange-AntiSpam-MessageData: 0vfrcNSixwLH3UECtre4DShik5ACP8jHc223z+dUJLNBlC2Ha6XRk/11+UD9kpNks4TP1zGktw+VjsWE45kWaXP+3UMED46YGxGvardLCyHtYAM/VtSGsZndgRmJ5SM9B3IYhv+vmMqf3jayLv+00Q==
-X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6e288297-fe12-49c1-fab0-08d7be820de4
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Mar 2020 08:16:48.6829
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: fdDP+iDFFTIcvN3C7M08xoNNbI7FaLi7LgTwdR+GubC33BqJ8gNWByo6NOUgw/ftqja6AZiEDhwfLTwatPcU10n0k/4pOUcyT7Vt0pNe5IEUtL92zC2ULgI2fXmFGqZNmLCvnECwi1s/XqdjuQSr04hp5Z1MGS1LeXIkZDP4dI9PDYN2SMAm9erDCYv73+kZaocG4/IfUsVJRAYOiXDCjcmeI3CwMqdJrQfy0ZrylkDGmaiDNw8NPEiVfy/dVByrtGjcToqrJRZm5jqkIm53iZamidKXtjeAJagWbs5F62wyI21cHnRcTyut8L9HwF4HH0+boqE/iqElwzVcX4rNdn0XsBtClyAbqu1wJGsmO8A/rhgR6odgQpjhWn4NA5tZeZvgFHAPITrnC9Fq1U1ILMgbTTVvzPZqICeaHq9aWRONaMHajvYktiVPOEJ9DgqE
+x-ms-exchange-antispam-messagedata: gHr8CuxSNKT77vOO5YAwFQMyghbVCWFmCVdFtyyk7RcnRnWbTxuQaeNn3G91bAGS353LPiiN6ItIXXU15KzW6qoyKww6hI7f0nfeifACuKJXwrK2M/OUxMj+6z5ooEyn/AX5fqihNCsZZEigZll8rA==
+Content-Type: text/plain; charset="iso-8859-2"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 197ad76b-7fb0-462a-d815-08d7be822305
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Mar 2020 08:17:23.7746
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jSdSv9BwQnHFLjuUBVgT6iTie4SNmehM9GtSaGpFKUpsJ/k+yqXohAtwPKmtXH4xsixKfcrG3+L+RC3Gd2pT5w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR04MB6328
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: TsPH7FCxkyNqZQfbkzm3KAOp74O3WPGU7MmpSdv6rBvbyRfN8Aeln4d3KepL6ihBV9yNScyqlpZX2ausndAchg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR0402MB3556
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Andrei Botila <andrei.botila@nxp.com>
-
-Currently in XTS generic implementation the valid key length is
-repesented by any length which is even. This is a deviation from
-the XTS-AES standard (IEEE 1619-2007) which allows keys equal
-to {2 x 16B, 2 x 32B} that correspond to underlying XTS-AES-{128, 256}
-algorithm. XTS-AES-192 is not supported as mentioned in commit
-b66ad0b7aa92 ("crypto: tcrypt - remove AES-XTS-192 speed tests")) or
-any other length beside these two specified.
-
-If this modification is accepted then other ciphers that use XTS mode
-will have to be modified (camellia, cast6, serpent, twofish).
-
-Signed-off-by: Andrei Botila <andrei.botila@nxp.com>
----
- include/crypto/xts.h | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
-
-diff --git a/include/crypto/xts.h b/include/crypto/xts.h
-index 0f8dba69feb4..26e764a5ae46 100644
---- a/include/crypto/xts.h
-+++ b/include/crypto/xts.h
-@@ -4,6 +4,7 @@
- 
- #include <crypto/b128ops.h>
- #include <crypto/internal/skcipher.h>
-+#include <crypto/aes.h>
- #include <linux/fips.h>
- 
- #define XTS_BLOCK_SIZE 16
-@@ -12,10 +13,10 @@ static inline int xts_check_key(struct crypto_tfm *tfm,
- 				const u8 *key, unsigned int keylen)
- {
- 	/*
--	 * key consists of keys of equal size concatenated, therefore
--	 * the length must be even.
-+	 * key consists of keys of equal size concatenated, possible
-+	 * values are 32 or 64 bytes.
- 	 */
--	if (keylen % 2)
-+	if (keylen != 2 * AES_MIN_KEY_SIZE && keylen != 2 * AES_MAX_KEY_SIZE)
- 		return -EINVAL;
- 
- 	/* ensure that the AES and tweak key are not identical */
-@@ -29,10 +30,10 @@ static inline int xts_verify_key(struct crypto_skcipher *tfm,
- 				 const u8 *key, unsigned int keylen)
- {
- 	/*
--	 * key consists of keys of equal size concatenated, therefore
--	 * the length must be even.
-+	 * key consists of keys of equal size concatenated, possible
-+	 * values are 32 or 64 bytes.
- 	 */
--	if (keylen % 2)
-+	if (keylen != 2 * AES_MIN_KEY_SIZE && keylen != 2 * AES_MAX_KEY_SIZE)
- 		return -EINVAL;
- 
- 	/* ensure that the AES and tweak key are not identical */
--- 
-2.17.1
-
+On 2/25/2020 6:12 PM, Andr=E9 Draszik wrote:=0A=
+> On i.MX7 and i.MX8M, the SNVS requires a clock. This is similar to the=0A=
+> clock bound to the SNVS RTC node, but if the SNVS RTC driver isn't=0A=
+> enabled, then SNVS doesn't work, and as such the pwrkey driver doesn't=0A=
+> work (i.e. hangs the kernel, as the clock isn't enabled).=0A=
+> =0A=
+> Also see commit ec2a844ef7c1=0A=
+> ("ARM: dts: imx7s: add snvs rtc clock")=0A=
+> for a similar fix.=0A=
+> =0A=
+> Signed-off-by: Andr=E9 Draszik <git@andred.net>=0A=
+> Acked-by: Rob Herring <robh@kernel.org>=0A=
+> Cc: "Horia Geant=E3" <horia.geanta@nxp.com>=0A=
+> Cc: Aymen Sghaier <aymen.sghaier@nxp.com>=0A=
+> Cc: Herbert Xu <herbert@gondor.apana.org.au>=0A=
+> Cc: "David S. Miller" <davem@davemloft.net>=0A=
+> Cc: Rob Herring <robh+dt@kernel.org>=0A=
+> Cc: Mark Rutland <mark.rutland@arm.com>=0A=
+> Cc: Shawn Guo <shawnguo@kernel.org>=0A=
+> Cc: Sascha Hauer <s.hauer@pengutronix.de>=0A=
+> Cc: Pengutronix Kernel Team <kernel@pengutronix.de>=0A=
+> Cc: Fabio Estevam <festevam@gmail.com>=0A=
+> Cc: NXP Linux Team <linux-imx@nxp.com>=0A=
+> Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>=0A=
+> Cc: Anson Huang <Anson.Huang@nxp.com>=0A=
+> Cc: Robin Gong <yibin.gong@nxp.com>=0A=
+> Cc: linux-crypto@vger.kernel.org=0A=
+> Cc: devicetree@vger.kernel.org=0A=
+> Cc: linux-arm-kernel@lists.infradead.org=0A=
+> Cc: linux-input@vger.kernel.org=0A=
+Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
+=0A=
+Thanks,=0A=
+Horia=0A=
