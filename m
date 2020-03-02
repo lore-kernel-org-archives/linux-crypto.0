@@ -1,96 +1,175 @@
-Return-Path: <SRS0=uwZS=4S=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=CDDf=4T=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BE04C3F2CD
-	for <linux-crypto@archiver.kernel.org>; Sun,  1 Mar 2020 23:37:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03651C3F2D2
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 Mar 2020 06:19:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E9C4720CC7
-	for <linux-crypto@archiver.kernel.org>; Sun,  1 Mar 2020 23:37:20 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=agner.ch header.i=@agner.ch header.b="KYU+jEIv"
+	by mail.kernel.org (Postfix) with ESMTP id D806024697
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 Mar 2020 06:19:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726614AbgCAXhU (ORCPT
+        id S1726030AbgCBGTB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 1 Mar 2020 18:37:20 -0500
-Received: from mail.kmu-office.ch ([178.209.48.109]:51666 "EHLO
-        mail.kmu-office.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726592AbgCAXhU (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 1 Mar 2020 18:37:20 -0500
-Received: from zyt.lan (unknown [IPv6:2a02:169:3df5::564])
-        by mail.kmu-office.ch (Postfix) with ESMTPSA id 17AB65C3CEF;
-        Mon,  2 Mar 2020 00:37:18 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=agner.ch; s=dkim;
-        t=1583105838;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:
-         content-transfer-encoding:content-transfer-encoding:in-reply-to:
-         references; bh=uEXP2A+ZFevJutYapB5Olb+X7MOi5DcNCS5e20uoEP8=;
-        b=KYU+jEIvnTWc3/fWFLC+Vly+OrhuCyPaGadSfgb23VeMF7Y7XySy8A2q0Q6WIINgwNXoja
-        +FdmYKg6spUdRBgV+sSk/eT5fxH+33lsOih/Wsx1M/TjdAs9AOplfU8ixGuf57A0EeyCJl
-        jtuUzSDDzBg6wcTv5yR0lQtVZASr8VI=
-From:   Stefan Agner <stefan@agner.ch>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net
-Cc:     linux@armlinux.org.uk, manojgupta@google.com, jiancai@google.com,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com,
-        Stefan Agner <stefan@agner.ch>
-Subject: [PATCH] crypto: arm/ghash-ce - define fpu before fpu registers are referenced
-Date:   Mon,  2 Mar 2020 00:37:14 +0100
-Message-Id: <c41cc67321d0b366e356440e6dbc9eceb1babfe4.1583105749.git.stefan@agner.ch>
-X-Mailer: git-send-email 2.25.1
+        Mon, 2 Mar 2020 01:19:01 -0500
+Received: from szxga07-in.huawei.com ([45.249.212.35]:35922 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725446AbgCBGTB (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 2 Mar 2020 01:19:01 -0500
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 65A31617530C2866E3A5;
+        Mon,  2 Mar 2020 14:18:57 +0800 (CST)
+Received: from localhost.localdomain (10.67.165.24) by
+ DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
+ 14.3.439.0; Mon, 2 Mar 2020 14:18:51 +0800
+From:   Zaibo Xu <xuzaibo@huawei.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     <linux-crypto@vger.kernel.org>, <linuxarm@huawei.com>,
+        <wangzhou1@hisilicon.com>, <tanghui20@huawei.com>,
+        <yekai13@huawei.com>, <liulongfang@huawei.com>,
+        <qianweili@huawei.com>, <zhangwei375@huawei.com>,
+        <fanghao11@huawei.com>, <forest.zhouchang@huawei.com>
+Subject: [PATCH v2 1/5] crypto: hisilicon - Use one workqueue per qm instead of per qp
+Date:   Mon, 2 Mar 2020 14:15:12 +0800
+Message-ID: <1583129716-28382-2-git-send-email-xuzaibo@huawei.com>
+X-Mailer: git-send-email 2.8.1
+In-Reply-To: <1583129716-28382-1-git-send-email-xuzaibo@huawei.com>
+References: <1583129716-28382-1-git-send-email-xuzaibo@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam: Yes
+Content-Type: text/plain
+X-Originating-IP: [10.67.165.24]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Building ARMv7 with Clang's integrated assembler leads to errors such
-as:
-arch/arm/crypto/ghash-ce-core.S:34:11: error: register name expected
- t3l .req d16
-          ^
+From: Shukun Tan <tanshukun1@huawei.com>
 
-Since no FPU has selected yet Clang considers d16 not a valid register.
-Moving the FPU directive on-top allows Clang to parse the registers and
-allows to successfully build this file with Clang's integrated assembler.
+Because so many work queues are not needed. Using one workqueue
+per QM will reduce the number of kworker threads as well as
+reducing usage of CPU.This would not degrade any performance.
 
-Signed-off-by: Stefan Agner <stefan@agner.ch>
+Signed-off-by: Shukun Tan <tanshukun1@huawei.com>
 ---
- arch/arm/crypto/ghash-ce-core.S | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/crypto/hisilicon/qm.c | 38 +++++++++++++++-----------------------
+ drivers/crypto/hisilicon/qm.h |  5 +++--
+ 2 files changed, 18 insertions(+), 25 deletions(-)
 
-diff --git a/arch/arm/crypto/ghash-ce-core.S b/arch/arm/crypto/ghash-ce-core.S
-index 534c9647726d..9f51e3fa4526 100644
---- a/arch/arm/crypto/ghash-ce-core.S
-+++ b/arch/arm/crypto/ghash-ce-core.S
-@@ -8,6 +8,9 @@
- #include <linux/linkage.h>
- #include <asm/assembler.h>
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index ad7146a..13b0a6f 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -494,17 +494,9 @@ static void qm_poll_qp(struct hisi_qp *qp, struct hisi_qm *qm)
+ 	}
+ }
  
-+	.arch		armv8-a
-+	.fpu		crypto-neon-fp-armv8
+-static void qm_qp_work_func(struct work_struct *work)
++static void qm_work_process(struct work_struct *work)
+ {
+-	struct hisi_qp *qp;
+-
+-	qp = container_of(work, struct hisi_qp, work);
+-	qm_poll_qp(qp, qp->qm);
+-}
+-
+-static irqreturn_t qm_irq_handler(int irq, void *data)
+-{
+-	struct hisi_qm *qm = data;
++	struct hisi_qm *qm = container_of(work, struct hisi_qm, work);
+ 	struct qm_eqe *eqe = qm->eqe + qm->status.eq_head;
+ 	struct hisi_qp *qp;
+ 	int eqe_num = 0;
+@@ -513,7 +505,7 @@ static irqreturn_t qm_irq_handler(int irq, void *data)
+ 		eqe_num++;
+ 		qp = qm_to_hisi_qp(qm, eqe);
+ 		if (qp)
+-			queue_work(qp->wq, &qp->work);
++			qm_poll_qp(qp, qm);
+ 
+ 		if (qm->status.eq_head == QM_Q_DEPTH - 1) {
+ 			qm->status.eqc_phase = !qm->status.eqc_phase;
+@@ -531,6 +523,16 @@ static irqreturn_t qm_irq_handler(int irq, void *data)
+ 	}
+ 
+ 	qm_db(qm, 0, QM_DOORBELL_CMD_EQ, qm->status.eq_head, 0);
++}
 +
- 	SHASH		.req	q0
- 	T1		.req	q1
- 	XL		.req	q2
-@@ -88,8 +91,6 @@
- 	T3_H		.req	d17
++static irqreturn_t do_qm_irq(int irq, void *data)
++{
++	struct hisi_qm *qm = (struct hisi_qm *)data;
++
++	if (qm->wq)
++		queue_work(qm->wq, &qm->work);
++	else
++		schedule_work(&qm->work);
  
- 	.text
--	.arch		armv8-a
--	.fpu		crypto-neon-fp-armv8
+ 	return IRQ_HANDLED;
+ }
+@@ -540,7 +542,7 @@ static irqreturn_t qm_irq(int irq, void *data)
+ 	struct hisi_qm *qm = data;
  
- 	.macro		__pmull_p64, rd, rn, rm, b1, b2, b3, b4
- 	vmull.p64	\rd, \rn, \rm
+ 	if (readl(qm->io_base + QM_VF_EQ_INT_SOURCE))
+-		return qm_irq_handler(irq, data);
++		return do_qm_irq(irq, data);
+ 
+ 	dev_err(&qm->pdev->dev, "invalid int source\n");
+ 	qm_db(qm, 0, QM_DOORBELL_CMD_EQ, qm->status.eq_head, 0);
+@@ -1159,20 +1161,9 @@ struct hisi_qp *hisi_qm_create_qp(struct hisi_qm *qm, u8 alg_type)
+ 
+ 	qp->qp_id = qp_id;
+ 	qp->alg_type = alg_type;
+-	INIT_WORK(&qp->work, qm_qp_work_func);
+-	qp->wq = alloc_workqueue("hisi_qm", WQ_UNBOUND | WQ_HIGHPRI |
+-				 WQ_CPU_INTENSIVE | WQ_MEM_RECLAIM, 0);
+-	if (!qp->wq) {
+-		ret = -EFAULT;
+-		goto err_free_qp_mem;
+-	}
+ 
+ 	return qp;
+ 
+-err_free_qp_mem:
+-	if (qm->use_dma_api)
+-		dma_free_coherent(dev, qp->qdma.size, qp->qdma.va,
+-				  qp->qdma.dma);
+ err_clear_bit:
+ 	write_lock(&qm->qps_lock);
+ 	qm->qp_array[qp_id] = NULL;
+@@ -1704,6 +1695,7 @@ int hisi_qm_init(struct hisi_qm *qm)
+ 	qm->qp_in_used = 0;
+ 	mutex_init(&qm->mailbox_lock);
+ 	rwlock_init(&qm->qps_lock);
++	INIT_WORK(&qm->work, qm_work_process);
+ 
+ 	dev_dbg(dev, "init qm %s with %s\n", pdev->is_physfn ? "pf" : "vf",
+ 		qm->use_dma_api ? "dma api" : "iommu api");
+diff --git a/drivers/crypto/hisilicon/qm.h b/drivers/crypto/hisilicon/qm.h
+index 1a4f208..c72c2e6 100644
+--- a/drivers/crypto/hisilicon/qm.h
++++ b/drivers/crypto/hisilicon/qm.h
+@@ -183,6 +183,9 @@ struct hisi_qm {
+ 	u32 error_mask;
+ 	u32 msi_mask;
+ 
++	struct workqueue_struct *wq;
++	struct work_struct work;
++
+ 	const char *algs;
+ 	bool use_dma_api;
+ 	bool use_sva;
+@@ -219,8 +222,6 @@ struct hisi_qp {
+ 	void *qp_ctx;
+ 	void (*req_cb)(struct hisi_qp *qp, void *data);
+ 	void (*event_cb)(struct hisi_qp *qp);
+-	struct work_struct work;
+-	struct workqueue_struct *wq;
+ 
+ 	struct hisi_qm *qm;
+ 	u16 pasid;
 -- 
-2.25.1
+2.8.1
 
