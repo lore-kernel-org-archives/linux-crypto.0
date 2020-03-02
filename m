@@ -6,30 +6,30 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67D72C3F2D2
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 Mar 2020 11:51:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C99CC3F2D2
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 Mar 2020 11:54:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 40D6320863
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 Mar 2020 11:51:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1DE422086A
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 Mar 2020 11:54:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726979AbgCBLvG (ORCPT
+        id S1727717AbgCBLyM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 2 Mar 2020 06:51:06 -0500
-Received: from lhrrgout.huawei.com ([185.176.76.210]:2489 "EHLO huawei.com"
+        Mon, 2 Mar 2020 06:54:12 -0500
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2490 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726806AbgCBLvG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 2 Mar 2020 06:51:06 -0500
-Received: from lhreml705-cah.china.huawei.com (unknown [172.18.7.106])
-        by Forcepoint Email with ESMTP id D04E8733BB11D338FC64;
-        Mon,  2 Mar 2020 11:51:04 +0000 (GMT)
+        id S1727485AbgCBLyM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 2 Mar 2020 06:54:12 -0500
+Received: from LHREML711-CAH.china.huawei.com (unknown [172.18.7.107])
+        by Forcepoint Email with ESMTP id 886973436FDF33285904;
+        Mon,  2 Mar 2020 11:54:11 +0000 (GMT)
 Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
- lhreml705-cah.china.huawei.com (10.201.108.46) with Microsoft SMTP Server
- (TLS) id 14.3.408.0; Mon, 2 Mar 2020 11:51:04 +0000
+ LHREML711-CAH.china.huawei.com (10.201.108.34) with Microsoft SMTP Server
+ (TLS) id 14.3.408.0; Mon, 2 Mar 2020 11:54:10 +0000
 Received: from localhost (10.202.226.57) by lhreml710-chm.china.huawei.com
  (10.201.108.61) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Mon, 2 Mar 2020
- 11:51:04 +0000
-Date:   Mon, 2 Mar 2020 11:51:03 +0000
+ 11:54:10 +0000
+Date:   Mon, 2 Mar 2020 11:54:09 +0000
 From:   Jonathan Cameron <Jonathan.Cameron@Huawei.com>
 To:     Zaibo Xu <xuzaibo@huawei.com>
 CC:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
@@ -37,12 +37,11 @@ CC:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
         <forest.zhouchang@huawei.com>, <linuxarm@huawei.com>,
         <zhangwei375@huawei.com>, <yekai13@huawei.com>,
         <linux-crypto@vger.kernel.org>
-Subject: Re: [PATCH v2 2/5] crypto: hisilicon/sec2 - Add workqueue for SEC
- driver.
-Message-ID: <20200302115103.00005d06@Huawei.com>
-In-Reply-To: <1583129716-28382-3-git-send-email-xuzaibo@huawei.com>
+Subject: Re: [PATCH v2 3/5] crypto: hisilicon/sec2 - Add iommu status check
+Message-ID: <20200302115409.0000685e@Huawei.com>
+In-Reply-To: <1583129716-28382-4-git-send-email-xuzaibo@huawei.com>
 References: <1583129716-28382-1-git-send-email-xuzaibo@huawei.com>
-        <1583129716-28382-3-git-send-email-xuzaibo@huawei.com>
+        <1583129716-28382-4-git-send-email-xuzaibo@huawei.com>
 Organization: Huawei Technologies Research and Development (UK) Ltd.
 X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; i686-w64-mingw32)
 MIME-Version: 1.0
@@ -57,105 +56,81 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 2 Mar 2020 14:15:13 +0800
+On Mon, 2 Mar 2020 14:15:14 +0800
 Zaibo Xu <xuzaibo@huawei.com> wrote:
 
-> From: yekai13 <yekai13@huawei.com>
+> From: liulongfang <liulongfang@huawei.com>
 > 
-> Allocate one workqueue for each QM instead of one for all QMs,
-> we found the throughput of SEC engine can be increased to
-> the hardware limit throughput during testing sec2 performance.
-> so we added this scheme.
+> In order to improve performance of small packets (<512Bytes)
+> in SMMU translation scenario,We need to identify the type of IOMMU
+> in the SEC probe to process small packets by a different method.
 > 
-> Signed-off-by: yekai13 <yekai13@huawei.com>
 > Signed-off-by: liulongfang <liulongfang@huawei.com>
+> Reviewed-by: Zaibo Xu <xuzaibo@huawei.com>
 
-That first sign off needs fixing.  Needs to be a real name.
-
-Also missing xuzaibo's sign offf.
-
-A question inline that might be worth a follow up patch.
-
-With signoffs fixed
+This looks like what we ended up with for the SECv1 driver.
 
 Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-
-Thanks,
-
-Jonathan
-
 > ---
->  drivers/crypto/hisilicon/sec2/sec_main.c | 26 +++++++++++++++++++++++---
->  1 file changed, 23 insertions(+), 3 deletions(-)
+>  drivers/crypto/hisilicon/sec2/sec.h      |  1 +
+>  drivers/crypto/hisilicon/sec2/sec_main.c | 19 +++++++++++++++++++
+>  2 files changed, 20 insertions(+)
 > 
+> diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
+> index 13e2d8d..eab0d22 100644
+> --- a/drivers/crypto/hisilicon/sec2/sec.h
+> +++ b/drivers/crypto/hisilicon/sec2/sec.h
+> @@ -165,6 +165,7 @@ struct sec_dev {
+>  	struct list_head list;
+>  	struct sec_debug debug;
+>  	u32 ctx_q_num;
+> +	bool iommu_used;
+>  	u32 num_vfs;
+>  	unsigned long status;
+>  };
 > diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-> index 3767fdb..ebafc1c 100644
+> index ebafc1c..6466d90 100644
 > --- a/drivers/crypto/hisilicon/sec2/sec_main.c
 > +++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-> @@ -774,12 +774,24 @@ static void sec_qm_uninit(struct hisi_qm *qm)
+> @@ -7,6 +7,7 @@
+>  #include <linux/debugfs.h>
+>  #include <linux/init.h>
+>  #include <linux/io.h>
+> +#include <linux/iommu.h>
+>  #include <linux/kernel.h>
+>  #include <linux/module.h>
+>  #include <linux/pci.h>
+> @@ -826,6 +827,23 @@ static void sec_probe_uninit(struct hisi_qm *qm)
+>  	destroy_workqueue(qm->wq);
+>  }
 >  
->  static int sec_probe_init(struct hisi_qm *qm, struct sec_dev *sec)
->  {
-> +	int ret;
+> +static void sec_iommu_used_check(struct sec_dev *sec)
+> +{
+> +	struct iommu_domain *domain;
+> +	struct device *dev = &sec->qm.pdev->dev;
 > +
-> +	qm->wq = alloc_workqueue("%s", WQ_HIGHPRI | WQ_CPU_INTENSIVE |
-> +		WQ_MEM_RECLAIM | WQ_UNBOUND, num_online_cpus(),
-> +		pci_name(qm->pdev));
-
-I appreciate that you have the same parameters here as were originally in
-qm.c, but I would like to fully understand why some of these flags are set.
-
-Perhaps a comment for each of them?  I'm not sure I'd consider the work
-to be done in this work queue CPU_INTENSIVE for example.
-
-This could be a follow up patch though as not actually related to this
-change.
-
-> +	if (!qm->wq) {
-> +		pci_err(qm->pdev, "fail to alloc workqueue\n");
-> +		return -ENOMEM;
+> +	domain = iommu_get_domain_for_dev(dev);
+> +
+> +	/* Check if iommu is used */
+> +	sec->iommu_used = false;
+> +	if (domain) {
+> +		if (domain->type & __IOMMU_DOMAIN_PAGING)
+> +			sec->iommu_used = true;
+> +		dev_info(dev, "SMMU Opened, the iommu type = %u\n",
+> +			domain->type);
 > +	}
+> +}
 > +
->  	if (qm->fun_type == QM_HW_PF) {
->  		qm->qp_base = SEC_PF_DEF_Q_BASE;
->  		qm->qp_num = pf_q_num;
->  		qm->debug.curr_qm_qp_num = pf_q_num;
->  
-> -		return sec_pf_probe_init(sec);
-> +		ret = sec_pf_probe_init(sec);
-> +		if (ret)
-> +			goto err_probe_uninit;
->  	} else if (qm->fun_type == QM_HW_VF) {
->  		/*
->  		 * have no way to get qm configure in VM in v1 hardware,
-> @@ -792,18 +804,26 @@ static int sec_probe_init(struct hisi_qm *qm, struct sec_dev *sec)
->  			qm->qp_num = SEC_QUEUE_NUM_V1 - SEC_PF_DEF_Q_NUM;
->  		} else if (qm->ver == QM_HW_V2) {
->  			/* v2 starts to support get vft by mailbox */
-> -			return hisi_qm_get_vft(qm, &qm->qp_base, &qm->qp_num);
-> +			ret = hisi_qm_get_vft(qm, &qm->qp_base, &qm->qp_num);
-> +			if (ret)
-> +				goto err_probe_uninit;
->  		}
->  	} else {
-> -		return -ENODEV;
-> +		ret = -ENODEV;
-> +		goto err_probe_uninit;
->  	}
->  
->  	return 0;
-> +err_probe_uninit:
-> +	destroy_workqueue(qm->wq);
-> +	return ret;
->  }
->  
->  static void sec_probe_uninit(struct hisi_qm *qm)
->  {
->  	hisi_qm_dev_err_uninit(qm);
-> +
-> +	destroy_workqueue(qm->wq);
->  }
->  
 >  static int sec_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>  {
+>  	struct sec_dev *sec;
+> @@ -839,6 +857,7 @@ static int sec_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>  	pci_set_drvdata(pdev, sec);
+>  
+>  	sec->ctx_q_num = ctx_q_num;
+> +	sec_iommu_used_check(sec);
+>  
+>  	qm = &sec->qm;
+>  
 
 
