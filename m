@@ -2,173 +2,212 @@ Return-Path: <SRS0=CDDf=4T=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 060F5C3F2D2
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 Mar 2020 09:36:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5DAFC3F2D7
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 Mar 2020 11:39:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C238A246B4
-	for <linux-crypto@archiver.kernel.org>; Mon,  2 Mar 2020 09:36:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="rBelNWMR"
+	by mail.kernel.org (Postfix) with ESMTP id B874D20675
+	for <linux-crypto@archiver.kernel.org>; Mon,  2 Mar 2020 11:39:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727079AbgCBJgh (ORCPT
+        id S1727470AbgCBLjw convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 2 Mar 2020 04:36:37 -0500
-Received: from mail-eopbgr70073.outbound.protection.outlook.com ([40.107.7.73]:63430
-        "EHLO EUR04-HE1-obe.outbound.protection.outlook.com"
+        Mon, 2 Mar 2020 06:39:52 -0500
+Received: from lhrrgout.huawei.com ([185.176.76.210]:2488 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726674AbgCBJgh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 2 Mar 2020 04:36:37 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SedSrbbES3d4IfQEPyxrKVPzQAPHNxpIEOPDBC0XmygPGQpgjxKC8tsikokj5Dp6lSrzBEalqMV6iVHe6xvI21rsxQerNt0pYr3A9P+mgz4ZNbiUGC9wcy67G2Zl9lZs/LvcUZiFCfAC8yjrlgj3q0nJyOjkd9NBNKkzwrr1Ag4J96hb6LeLCMFOvrFp3Zw2HN9XEUQYGyph8eISzU42Z4kHdfXGLa4Ub9hXAujsPKNCVL2Ubu8A3ktH1Kh9t/YustkcGGomHAZ1jCe6a7qH+ev/GtQNY/o/ftIUaauUMyMVbLkjIteDCYbOhQsyfZkJpr2HeJxQY6gd8NdH5P60jQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=N4VTMR1y/qGwDF9Opj1UTtjSGLtdWO5PxQxFiOvuLoY=;
- b=OiYR3VCAZlbwB9cyL6kBueHTnKJCbFOSxYL9FQlbgbMs8Vceo8knUCedapRas4cxpylSM3wwb7Lr5MwtqjYbmvvDRwzHPUMf32ykqNRH8E3MdqbHscmxK/wsGInNFi5rObYufg/KC+DNqNCqlvmNwVMLzPCblifSnnhoLn4tDjoCEgll9d8rL5fkT+dC2eu/v06Qk60Cl13vieieVK1CvJCGZi58TW2zgJcyWMGYpaZL6+sJW+o1MrsXJZwGYlzOjpamvqLZ+9991jqJGNwFI16BU2ttZfwpgigZl189RT9uGPoGM+vG92vyzTbFraoXnAO0MdudkrPEqkIaChNh/Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=N4VTMR1y/qGwDF9Opj1UTtjSGLtdWO5PxQxFiOvuLoY=;
- b=rBelNWMRHvdY1Wj0T03pPHUwjejkt3xK2TeAYJ1ypIaaYHj0sgNK/+8i+kXSoZmXjAkcg3i6j+5jz1cEQvAhdH1kjLOfV6YVc4MZZL1iQpSPT4Gm/0u6F0qDgvhjjxseNG1nNhzPGDcuYOUTQ5Z9x/cANBdkV7A4XF24p30O9gU=
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
- VI1PR0402MB3552.eurprd04.prod.outlook.com (52.134.4.149) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.2772.14; Mon, 2 Mar 2020 09:36:32 +0000
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::751e:7e8d:ed4:ef5f]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::751e:7e8d:ed4:ef5f%7]) with mapi id 15.20.2772.019; Mon, 2 Mar 2020
- 09:36:32 +0000
-From:   Horia Geanta <horia.geanta@nxp.com>
-To:     "Andrei Botila (OSS)" <andrei.botila@oss.nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Andrei Botila <andrei.botila@nxp.com>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>
-Subject: Re: [PATCH] crypto: caam - update xts sector size for large input
- length
-Thread-Topic: [PATCH] crypto: caam - update xts sector size for large input
- length
-Thread-Index: AQHV7iR/GJR55F8brEiS/iBRq64oyA==
-Date:   Mon, 2 Mar 2020 09:36:32 +0000
-Message-ID: <VI1PR0402MB34851CC70E092F598E9BF32298E70@VI1PR0402MB3485.eurprd04.prod.outlook.com>
-References: <20200228104648.18898-1-andrei.botila@oss.nxp.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: spf=none (sender IP is )
- smtp.mailfrom=horia.geanta@nxp.com; 
-x-originating-ip: [212.146.100.6]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 08c672b6-2a6c-40ec-4b0e-08d7be8d3158
-x-ms-traffictypediagnostic: VI1PR0402MB3552:|VI1PR0402MB3552:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <VI1PR0402MB3552CEFBCD7A318E0B76120598E70@VI1PR0402MB3552.eurprd04.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:3173;
-x-forefront-prvs: 033054F29A
-x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(396003)(346002)(376002)(136003)(39860400002)(199004)(189003)(52536014)(5660300002)(2906002)(71200400001)(66946007)(91956017)(76116006)(66476007)(64756008)(66446008)(316002)(7696005)(66556008)(6506007)(33656002)(86362001)(54906003)(44832011)(478600001)(8936002)(26005)(186003)(9686003)(55016002)(8676002)(81166006)(4326008)(81156014)(53546011)(110136005);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3552;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-received-spf: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: S55ul4zv80yDSkwHmggKjBbriz8wSUw4SjcjTmBz68pTJ+LVCkp7KyGTE91IWUEtE+bz1N81bk3WbGSB+Nf6Vv3nR67u8ny5Jxhqxw826bzsZktTIia8K1jsEO/0OyJzJCPGIUAHbCiunNtMCoItKb7rXLOUHuZ0z0FZw0Gnkc4XFW02a2eUPlVrG7FCKevfJ8AY7XcFrMFGFfuydG4PavqnGbO/dGrFBY50/V+nC6yTcSYEiMrI6ZcdEPwUkGFzdIwPRMlXfZJ0e/NbkziYgicrf8fFQqbmxzNI1gXy3RfbQvvzLOXVItfd3m5lRw0fk2nXsCRxAVCZ/Yt4Xtc7t+DbBomXq2FXqT3hM1ctr6K4TFfXgjLmJZv4DhunqeXbxGeRQV7oJe9PoFvLPIiLDMQIENgWN3ipadui+eBp/Ekfa+9f9s1rlU9dWAh0WmQf
-x-ms-exchange-antispam-messagedata: b1gwwWdTlZ8bg0ArvcjwWU5oMshxsd7S4ISivJbECXX9L18NQcf6EzNvBxNXKBtQfOcP20cuh7OCYlhWxNhpxexChyd3Ey+pXU4YwslVzh/mt5utiX+43aRBVnntVDy4KaxqLDQ4+nfCqCRYXXQdLQ==
-Content-Type: text/plain; charset="iso-8859-2"
-Content-Transfer-Encoding: quoted-printable
+        id S1727107AbgCBLjv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 2 Mar 2020 06:39:51 -0500
+Received: from lhreml703-cah.china.huawei.com (unknown [172.18.7.108])
+        by Forcepoint Email with ESMTP id D14772E7B685E1CB558A;
+        Mon,  2 Mar 2020 11:39:49 +0000 (GMT)
+Received: from lhreml710-chm.china.huawei.com (10.201.108.61) by
+ lhreml703-cah.china.huawei.com (10.201.108.44) with Microsoft SMTP Server
+ (TLS) id 14.3.408.0; Mon, 2 Mar 2020 11:39:49 +0000
+Received: from localhost (10.202.226.57) by lhreml710-chm.china.huawei.com
+ (10.201.108.61) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5; Mon, 2 Mar 2020
+ 11:39:48 +0000
+Date:   Mon, 2 Mar 2020 11:39:46 +0000
+From:   Jonathan Cameron <Jonathan.Cameron@Huawei.com>
+To:     Zaibo Xu <xuzaibo@huawei.com>
+CC:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <qianweili@huawei.com>, <tanghui20@huawei.com>,
+        <forest.zhouchang@huawei.com>, <linuxarm@huawei.com>,
+        <zhangwei375@huawei.com>, <yekai13@huawei.com>,
+        <linux-crypto@vger.kernel.org>
+Subject: Re: [PATCH v2 1/5] crypto: hisilicon - Use one workqueue per qm
+ instead of per qp
+Message-ID: <20200302113946.000062f0@Huawei.com>
+In-Reply-To: <1583129716-28382-2-git-send-email-xuzaibo@huawei.com>
+References: <1583129716-28382-1-git-send-email-xuzaibo@huawei.com>
+        <1583129716-28382-2-git-send-email-xuzaibo@huawei.com>
+Organization: Huawei Technologies Research and Development (UK) Ltd.
+X-Mailer: Claws Mail 3.17.4 (GTK+ 2.24.32; i686-w64-mingw32)
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 08c672b6-2a6c-40ec-4b0e-08d7be8d3158
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Mar 2020 09:36:32.2781
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: xRsThamCcsSl5TzGVxYY/M5O4+kbVgEhDN1kZrHVwAey91IpEapYnxKBI5Xt6d/vGSCCtXHO4K5f34qmLPv5Zg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3552
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 8BIT
+X-Originating-IP: [10.202.226.57]
+X-ClientProxiedBy: lhreml730-chm.china.huawei.com (10.201.108.81) To
+ lhreml710-chm.china.huawei.com (10.201.108.61)
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-+ dm-devel=0A=
-=0A=
-On 2/28/2020 12:47 PM, Andrei Botila (OSS) wrote:=0A=
-> From: Andrei Botila <andrei.botila@nxp.com>=0A=
-> =0A=
-> Since in the software implementation of XTS-AES there is=0A=
-> no notion of sector every input length is processed the same way.=0A=
-> CAAM implementation has the notion of sector which causes different=0A=
-> results between the software implementation and the one in CAAM=0A=
-> for input lengths bigger than 512 bytes.=0A=
-> Increase sector size to maximum value on 16 bits.=0A=
-> =0A=
-> Fixes: c6415a6016bf ("crypto: caam - add support for acipher xts(aes)")=
-=0A=
-> Cc: <stable@vger.kernel.org> # v4.12+=0A=
-> Signed-off-by: Andrei Botila <andrei.botila@nxp.com>=0A=
-Reviewed-by: Horia Geant=E3 <horia.geanta@nxp.com>=0A=
-=0A=
-Thanks,=0A=
-Horia=0A=
-=0A=
-> ---=0A=
-> This patch needs to be applied from v4.12+ because dm-crypt has added sup=
-port=0A=
-> for 4K sector size at that version. The commit was=0A=
-> 8f0009a225171 ("dm-crypt: optionally support larger encryption sector siz=
-e").=0A=
-> =0A=
->  drivers/crypto/caam/caamalg_desc.c | 16 ++++++++++++++--=0A=
->  1 file changed, 14 insertions(+), 2 deletions(-)=0A=
-> =0A=
-> diff --git a/drivers/crypto/caam/caamalg_desc.c b/drivers/crypto/caam/caa=
-malg_desc.c=0A=
-> index aa9ccca67045..8ebbbd28b1f7 100644=0A=
-> --- a/drivers/crypto/caam/caamalg_desc.c=0A=
-> +++ b/drivers/crypto/caam/caamalg_desc.c=0A=
-> @@ -1518,7 +1518,13 @@ EXPORT_SYMBOL(cnstr_shdsc_skcipher_decap);=0A=
->   */=0A=
->  void cnstr_shdsc_xts_skcipher_encap(u32 * const desc, struct alginfo *cd=
-ata)=0A=
->  {=0A=
-> -	__be64 sector_size =3D cpu_to_be64(512);=0A=
-> +	/*=0A=
-> +	 * Set sector size to a big value, practically disabling=0A=
-> +	 * sector size segmentation in xts implementation. We cannot=0A=
-> +	 * take full advantage of this HW feature with existing=0A=
-> +	 * crypto API / dm-crypt SW architecture.=0A=
-> +	 */=0A=
-> +	__be64 sector_size =3D cpu_to_be64(BIT(15));=0A=
->  	u32 *key_jump_cmd;=0A=
->  =0A=
->  	init_sh_desc(desc, HDR_SHARE_SERIAL | HDR_SAVECTX);=0A=
-> @@ -1571,7 +1577,13 @@ EXPORT_SYMBOL(cnstr_shdsc_xts_skcipher_encap);=0A=
->   */=0A=
->  void cnstr_shdsc_xts_skcipher_decap(u32 * const desc, struct alginfo *cd=
-ata)=0A=
->  {=0A=
-> -	__be64 sector_size =3D cpu_to_be64(512);=0A=
-> +	/*=0A=
-> +	 * Set sector size to a big value, practically disabling=0A=
-> +	 * sector size segmentation in xts implementation. We cannot=0A=
-> +	 * take full advantage of this HW feature with existing=0A=
-> +	 * crypto API / dm-crypt SW architecture.=0A=
-> +	 */=0A=
-> +	__be64 sector_size =3D cpu_to_be64(BIT(15));=0A=
->  	u32 *key_jump_cmd;=0A=
->  =0A=
->  	init_sh_desc(desc, HDR_SHARE_SERIAL | HDR_SAVECTX);=0A=
-> =0A=
-=0A=
+On Mon, 2 Mar 2020 14:15:12 +0800
+Zaibo Xu <xuzaibo@huawei.com> wrote:
+
+> From: Shukun Tan <tanshukun1@huawei.com>
+> 
+> Because so many work queues are not needed. Using one workqueue
+> per QM will reduce the number of kworker threads as well as
+> reducing usage of CPU.This would not degrade any performance.
+> 
+> Signed-off-by: Shukun Tan <tanshukun1@huawei.com>
+
+Hi, this is more or less fine I think other than:
+
+1) Needs a sign off from xuzaibo to reflect the handling of the patch.
+2) The description doesn't mention that we aren't actually creating the
+   per QM workqueue in this patch (it comes later in the series)
+3) The fallback to the system workqueue needs documentation inline.
+
+So tidy those up for v3 and I'm happy.
+Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+
+Thanks,
+
+Jonathan
+
+> ---
+>  drivers/crypto/hisilicon/qm.c | 38 +++++++++++++++-----------------------
+>  drivers/crypto/hisilicon/qm.h |  5 +++--
+>  2 files changed, 18 insertions(+), 25 deletions(-)
+> 
+> diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+> index ad7146a..13b0a6f 100644
+> --- a/drivers/crypto/hisilicon/qm.c
+> +++ b/drivers/crypto/hisilicon/qm.c
+> @@ -494,17 +494,9 @@ static void qm_poll_qp(struct hisi_qp *qp, struct hisi_qm *qm)
+>  	}
+>  }
+>  
+> -static void qm_qp_work_func(struct work_struct *work)
+> +static void qm_work_process(struct work_struct *work)
+>  {
+> -	struct hisi_qp *qp;
+> -
+> -	qp = container_of(work, struct hisi_qp, work);
+> -	qm_poll_qp(qp, qp->qm);
+> -}
+> -
+> -static irqreturn_t qm_irq_handler(int irq, void *data)
+> -{
+> -	struct hisi_qm *qm = data;
+> +	struct hisi_qm *qm = container_of(work, struct hisi_qm, work);
+>  	struct qm_eqe *eqe = qm->eqe + qm->status.eq_head;
+>  	struct hisi_qp *qp;
+>  	int eqe_num = 0;
+> @@ -513,7 +505,7 @@ static irqreturn_t qm_irq_handler(int irq, void *data)
+>  		eqe_num++;
+>  		qp = qm_to_hisi_qp(qm, eqe);
+>  		if (qp)
+> -			queue_work(qp->wq, &qp->work);
+> +			qm_poll_qp(qp, qm);
+>  
+>  		if (qm->status.eq_head == QM_Q_DEPTH - 1) {
+>  			qm->status.eqc_phase = !qm->status.eqc_phase;
+> @@ -531,6 +523,16 @@ static irqreturn_t qm_irq_handler(int irq, void *data)
+>  	}
+>  
+>  	qm_db(qm, 0, QM_DOORBELL_CMD_EQ, qm->status.eq_head, 0);
+> +}
+> +
+> +static irqreturn_t do_qm_irq(int irq, void *data)
+> +{
+> +	struct hisi_qm *qm = (struct hisi_qm *)data;
+> +
+> +	if (qm->wq)
+> +		queue_work(qm->wq, &qm->work);
+> +	else
+> +		schedule_work(&qm->work);
+
+This subtle difference between these two could do with an explanatory
+comment.
+
+From an initial look I'm not actually seeing qm->wq being set anywhere?
+Ah it's in a later patch. Please add comment to say that in the introduction.
+
+
+
+
+
+>  
+>  	return IRQ_HANDLED;
+>  }
+> @@ -540,7 +542,7 @@ static irqreturn_t qm_irq(int irq, void *data)
+>  	struct hisi_qm *qm = data;
+>  
+>  	if (readl(qm->io_base + QM_VF_EQ_INT_SOURCE))
+> -		return qm_irq_handler(irq, data);
+> +		return do_qm_irq(irq, data);
+>  
+>  	dev_err(&qm->pdev->dev, "invalid int source\n");
+>  	qm_db(qm, 0, QM_DOORBELL_CMD_EQ, qm->status.eq_head, 0);
+> @@ -1159,20 +1161,9 @@ struct hisi_qp *hisi_qm_create_qp(struct hisi_qm *qm, u8 alg_type)
+>  
+>  	qp->qp_id = qp_id;
+>  	qp->alg_type = alg_type;
+> -	INIT_WORK(&qp->work, qm_qp_work_func);
+> -	qp->wq = alloc_workqueue("hisi_qm", WQ_UNBOUND | WQ_HIGHPRI |
+> -				 WQ_CPU_INTENSIVE | WQ_MEM_RECLAIM, 0);
+> -	if (!qp->wq) {
+> -		ret = -EFAULT;
+> -		goto err_free_qp_mem;
+> -	}
+>  
+>  	return qp;
+>  
+> -err_free_qp_mem:
+> -	if (qm->use_dma_api)
+> -		dma_free_coherent(dev, qp->qdma.size, qp->qdma.va,
+> -				  qp->qdma.dma);
+>  err_clear_bit:
+>  	write_lock(&qm->qps_lock);
+>  	qm->qp_array[qp_id] = NULL;
+> @@ -1704,6 +1695,7 @@ int hisi_qm_init(struct hisi_qm *qm)
+>  	qm->qp_in_used = 0;
+>  	mutex_init(&qm->mailbox_lock);
+>  	rwlock_init(&qm->qps_lock);
+> +	INIT_WORK(&qm->work, qm_work_process);
+>  
+>  	dev_dbg(dev, "init qm %s with %s\n", pdev->is_physfn ? "pf" : "vf",
+>  		qm->use_dma_api ? "dma api" : "iommu api");
+> diff --git a/drivers/crypto/hisilicon/qm.h b/drivers/crypto/hisilicon/qm.h
+> index 1a4f208..c72c2e6 100644
+> --- a/drivers/crypto/hisilicon/qm.h
+> +++ b/drivers/crypto/hisilicon/qm.h
+> @@ -183,6 +183,9 @@ struct hisi_qm {
+>  	u32 error_mask;
+>  	u32 msi_mask;
+>  
+> +	struct workqueue_struct *wq;
+> +	struct work_struct work;
+> +
+>  	const char *algs;
+>  	bool use_dma_api;
+>  	bool use_sva;
+> @@ -219,8 +222,6 @@ struct hisi_qp {
+>  	void *qp_ctx;
+>  	void (*req_cb)(struct hisi_qp *qp, void *data);
+>  	void (*event_cb)(struct hisi_qp *qp);
+> -	struct work_struct work;
+> -	struct workqueue_struct *wq;
+>  
+>  	struct hisi_qm *qm;
+>  	u16 pasid;
+
+
