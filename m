@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF483C3F2C6
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Mar 2020 18:02:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05EBEC3F2DA
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Mar 2020 18:09:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9BCC220866
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Mar 2020 18:02:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CD2BD21739
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Mar 2020 18:09:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1583258578;
-	bh=nBp8M//Wwkue4wWaCuCCtoO0nyJNfejoIKWOMt6EWGA=;
+	s=default; t=1583258978;
+	bh=nekBzOBwg7MSUfjgB1WlnAg8CmwfUXUhpErEo3+ryck=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=PNbay31vaYwhTGto46cfKhMTOAOMEwQ65lGkB0lsuBZ6g3HmDksZMhg060RNq5oN9
-	 214c3yZnvKRg+YnJsO0NC5KkC10MxKtpXXkZPpug+plazja+6d6NHTz+ueZI1X6wip
-	 9T4IWjL/nPAFhU9ONhjyZ/JSMF40tzdir5qdeLsc=
+	b=S/picql9+Nh/tcllsWEka53LntRm5yIf7705CUO3+XzEJVT/zDBuTLIQJKzVp1Erz
+	 bCT6dAaNqoFBZEaYpN9plM0hyNPeDC027n0DCD0qLBChvDSb+O07eFC65o/yI3mvCD
+	 K16OcJyzdWBiJh8xZ2mwmai9hD+dv/LJdWT7gC9I=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2388155AbgCCSCK (ORCPT
+        id S1732092AbgCCRwD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Mar 2020 13:02:10 -0500
-Received: from mail.kernel.org ([198.145.29.99]:46696 "EHLO mail.kernel.org"
+        Tue, 3 Mar 2020 12:52:03 -0500
+Received: from mail.kernel.org ([198.145.29.99]:60300 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2387746AbgCCSCK (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Mar 2020 13:02:10 -0500
+        id S1732089AbgCCRwD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 3 Mar 2020 12:52:03 -0500
 Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 9A91B2072D;
-        Tue,  3 Mar 2020 18:02:09 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 0B0C62146E;
+        Tue,  3 Mar 2020 17:52:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1583258530;
-        bh=nBp8M//Wwkue4wWaCuCCtoO0nyJNfejoIKWOMt6EWGA=;
+        s=default; t=1583257922;
+        bh=nekBzOBwg7MSUfjgB1WlnAg8CmwfUXUhpErEo3+ryck=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=NiKNuv5cmtMdbpALga2Xv0WeDOwIM3worO9FQaRQIRWBS0zZWk/4p5TiaWZ603tra
-         +KeB0Q263WL3VD9mo95QBqPgyGimzOCH8hkZ6mKFa9IE+fARkhukM+Z9laU4H8EoZd
-         ch+voi5YuTc5lsFDH/w81ZmJT13l/yJxohR8aG3c=
+        b=ikp/tQyoM4kVk08ULZcNSKyJkkQ2OSbuF6m2/LnjUj04SBJlUFsUjh5UgRhTLUhDZ
+         tUuBp/P/dz/SyqMoH2DZhoaCfQOxmyYMFZgw6U91V8+b/shuyC5bn8O4V/ZLibEGGZ
+         GTlDDLeeRukFwXNq81nZq2ju+cN4EwXhCTdSdDqQ=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -47,12 +47,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Steffen Klassert <steffen.klassert@secunet.com>,
         linux-crypto@vger.kernel.org
-Subject: [PATCH 4.19 85/87] padata: always acquire cpu_hotplug_lock before pinst->lock
-Date:   Tue,  3 Mar 2020 18:44:16 +0100
-Message-Id: <20200303174357.941131711@linuxfoundation.org>
+Subject: [PATCH 5.5 169/176] padata: always acquire cpu_hotplug_lock before pinst->lock
+Date:   Tue,  3 Mar 2020 18:43:53 +0100
+Message-Id: <20200303174323.557292375@linuxfoundation.org>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20200303174349.075101355@linuxfoundation.org>
-References: <20200303174349.075101355@linuxfoundation.org>
+In-Reply-To: <20200303174304.593872177@linuxfoundation.org>
+References: <20200303174304.593872177@linuxfoundation.org>
 User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -104,7 +104,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/kernel/padata.c
 +++ b/kernel/padata.c
-@@ -671,8 +671,8 @@ int padata_set_cpumask(struct padata_ins
+@@ -643,8 +643,8 @@ int padata_set_cpumask(struct padata_ins
  	struct cpumask *serial_mask, *parallel_mask;
  	int err = -EINVAL;
  
@@ -114,7 +114,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  
  	switch (cpumask_type) {
  	case PADATA_CPU_PARALLEL:
-@@ -690,8 +690,8 @@ int padata_set_cpumask(struct padata_ins
+@@ -662,8 +662,8 @@ int padata_set_cpumask(struct padata_ins
  	err =  __padata_set_cpumasks(pinst, parallel_mask, serial_mask);
  
  out:
