@@ -2,141 +2,181 @@ Return-Path: <SRS0=HdEo=4U=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F052C3F2D7
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Mar 2020 22:20:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6488FC3F2D1
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Mar 2020 22:43:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6321720870
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Mar 2020 22:20:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JoEYFdqH"
+	by mail.kernel.org (Postfix) with ESMTP id 3618720866
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Mar 2020 22:43:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1583275410;
+	bh=KFjLsAjNMx93cGKtEJs8LhZSNNLzN16FDXVUS6jWAAE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=fRo6a2lznGVbr0pkaBoPorMadhHlmkBktjMQbRPcDHjpfeQYL6122fC2lbiHQZfHW
+	 1wDVDcyN9sNaF9O2C09AGtXHndDIScZ9IHOwvBcNTGhb9BgXyU75jLzFHybKA63gD/
+	 7mi9FXQ7nra4BFA/TD+SvkCMXmzCp4NDq7/UfekY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726809AbgCCWUS (ORCPT
+        id S1727837AbgCCWn3 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Mar 2020 17:20:18 -0500
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:35205 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726766AbgCCWUQ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Mar 2020 17:20:16 -0500
-Received: by mail-pf1-f193.google.com with SMTP id i19so2220831pfa.2
-        for <linux-crypto@vger.kernel.org>; Tue, 03 Mar 2020 14:20:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=A0VgoCajNQtcqmr3sAxZ7zwAICIrcd2LUoNAPqwJhMc=;
-        b=JoEYFdqH8VMWl/v3oH9VXqNGlxqWFgnorIuL0o80ZngwzS/ndHRTcASbqclRrUjUFS
-         JqDXYy6BFgb8RRrFi0Wguy7MFjm1Rx9YwjkChVADEVVdGOzA/Nh6wAc8Fvp7yZSOaCZ4
-         cOzTqLmgjn4ShkaCTeB0wEWh3WU2S1mivlUnz8Qn+B2nvfX/AnGjrvd8CNWkq1bd8XQm
-         p0PKu/SVvr1mTlYxgKG5QdG7UrmbLeScp3lDEyEy4N7EHsPCemUBKHbsMhp+PqtNrEMC
-         iDc3Chr898nqiTtFwHk+hlM7QURM5bO50ptPMclx9dGGCYyAG7mOlQR5af5uVt1+dBGK
-         B3qg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=A0VgoCajNQtcqmr3sAxZ7zwAICIrcd2LUoNAPqwJhMc=;
-        b=ZZmv+9tNtgBXSgtoQ5enrWB9Zf5ib8hEXqBLnGDcz6GtPrw1o+4zdejjRweA8vS+s1
-         LfeIsFO3dv80sVu5GLGW6N73tjqi0/v1wDx7ONDNH/H3mX/JR0P15ti1kDDRwd8tJdhP
-         c9AXk74HDzZ9RZtVVfP8tp7cMhaIUBXk0gNTYw2IeoXpEyd6JJoL99+iA1a5KjPWERKo
-         iAOz3DxqX/emJbR4U3GkvOVTC5C+M+6AZi0CslLUqnolqXzYneF1m/Sub5n6//TADoXz
-         uZ5OHisDD1z2ykH5KICaG8daQOgwykAG07tZHfgLvVLmPSsprSo0HhXmneWfWPovHBo3
-         UfLA==
-X-Gm-Message-State: ANhLgQ2D3PqDyJ/1O9d+yhyYsQAoOnZnVzk8+ylZWRsSGH8h+U8y0aME
-        UMTKK0grSv8Blt5xLdxFVJ+jLFTqOa+WRDg1B38GTE77
-X-Google-Smtp-Source: ADFU+vt4X4Q2+Uu+la/wP/hFUKrg/nR+9uZ1co62ESgEa0STG5Q0XI3VwZlAqZ1ci3kOGA0/3riqiLDrYgRWJ+NHPxM=
-X-Received: by 2002:a62:37c7:: with SMTP id e190mr6303201pfa.165.1583274014576;
- Tue, 03 Mar 2020 14:20:14 -0800 (PST)
+        Tue, 3 Mar 2020 17:43:29 -0500
+Received: from mail.kernel.org ([198.145.29.99]:36756 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725796AbgCCWn3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 3 Mar 2020 17:43:29 -0500
+Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9F5FA2072A;
+        Tue,  3 Mar 2020 22:43:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1583275409;
+        bh=KFjLsAjNMx93cGKtEJs8LhZSNNLzN16FDXVUS6jWAAE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ZhVCtl27YLCVh26NOG29luP24Nwr1QwpbSdL/Au+gj/hlBRXXRszO62kMZZurPkJe
+         K1BrNOGlz20BT+GWY8ROBP0fNu/hrykd4dM4TF3Tcq6JEnIKx1efyaFDo2k3BYq+RR
+         tpliTFwHGaFHXqniA2LtPiF4MSV/eFCa2PLapnaI=
+Date:   Tue, 3 Mar 2020 14:43:27 -0800
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc:     Robin Murphy <robin.murphy@arm.com>,
+        Corentin Labbe <clabbe.montjoie@gmail.com>,
+        mark.rutland@arm.com, jiangshanlai@gmail.com,
+        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        tj@kernel.org, Will Deacon <will@kernel.org>,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: WARNING: at kernel/workqueue.c:1473 __queue_work+0x3b8/0x3d0
+Message-ID: <20200303224327.GA89804@sol.localdomain>
+References: <20200217204803.GA13479@Red>
+ <20200218163504.y5ofvaejleuf5tbh@ca-dmjordan1.us.oracle.com>
+ <20200220090350.GA19858@Red>
+ <20200221174223.r3y6tugavp3k5jdl@ca-dmjordan1.us.oracle.com>
+ <20200228123311.GE3275@willie-the-truck>
+ <20200228153331.uimy62rat2tdxxod@ca-dmjordan1.us.oracle.com>
+ <20200301175351.GA11684@Red>
+ <20200302172510.fspofleipqjcdxak@ca-dmjordan1.us.oracle.com>
+ <e7c92da2-42c0-a97d-7427-6fdc769b41b9@arm.com>
+ <20200303213017.tanczhqd3nhpeeak@ca-dmjordan1.us.oracle.com>
 MIME-Version: 1.0
-References: <c41cc67321d0b366e356440e6dbc9eceb1babfe4.1583105749.git.stefan@agner.ch>
-In-Reply-To: <c41cc67321d0b366e356440e6dbc9eceb1babfe4.1583105749.git.stefan@agner.ch>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Tue, 3 Mar 2020 14:20:03 -0800
-Message-ID: <CAKwvOdmvOq9X3zR17TsEZpJ83BYC1vX=pYMPyZ6Db3xeHUxzag@mail.gmail.com>
-Subject: Re: [PATCH] crypto: arm/ghash-ce - define fpu before fpu registers
- are referenced
-To:     Stefan Agner <stefan@agner.ch>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Russell King <linux@armlinux.org.uk>,
-        Manoj Gupta <manojgupta@google.com>,
-        Jian Cai <jiancai@google.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        clang-built-linux <clang-built-linux@googlegroups.com>,
-        Ard.Biesheuvel@arm.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200303213017.tanczhqd3nhpeeak@ca-dmjordan1.us.oracle.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Mar 1, 2020 at 3:37 PM Stefan Agner <stefan@agner.ch> wrote:
->
-> Building ARMv7 with Clang's integrated assembler leads to errors such
-> as:
-> arch/arm/crypto/ghash-ce-core.S:34:11: error: register name expected
->  t3l .req d16
->           ^
->
-> Since no FPU has selected yet Clang considers d16 not a valid register.
-> Moving the FPU directive on-top allows Clang to parse the registers and
-> allows to successfully build this file with Clang's integrated assembler.
+On Tue, Mar 03, 2020 at 04:30:17PM -0500, Daniel Jordan wrote:
+> On Mon, Mar 02, 2020 at 06:00:10PM +0000, Robin Murphy wrote:
+> > On 02/03/2020 5:25 pm, Daniel Jordan wrote:
+> > Something smelled familiar about this discussion, and sure enough that merge
+> > contains c4741b230597 ("crypto: run initcalls for generic implementations
+> > earlier"), which has raised its head before[1].
+> 
+> Yep, that looks suspicious.
+> 
+> The bisect didn't point to that specific commit, even though my version of git
+> tries commits in the merge.  I'm probably missing something.
+> 
+> > > Does this fix it?  I can't verify but figure it's worth trying the simplest
+> > > explanation first, which is that the work isn't initialized by the time it's
+> > > queued.
+> > 
+> > The relative initcall levels would appear to explain the symptom - I guess
+> > the question is whether this represents a bug in a particular test/algorithm
+> > (as with the unaligned accesses) or a fundamental problem in the
+> > infrastructure now being able to poke the module loader too early.
+> 
+> I'm not familiar with the crypto code.  Could it be that the commit moved some
+> request_module() calls before modules_wq_init()?
+> 
+> And, is it "too early" or just "earlier"?  When is it too early for modprobe?
+> 
+> Barring other ideas, Corentin, would you be willing to boot with
+> 
+>     trace_event=initcall:*,module:* trace_options=stacktrace
+> 
+> and
+> 
+> diff --git a/kernel/module.c b/kernel/module.c
+> index 33569a01d6e1..393be6979a27 100644
+> --- a/kernel/module.c
+> +++ b/kernel/module.c
+> @@ -3604,8 +3604,11 @@ static noinline int do_init_module(struct module *mod)
+>  	 * be cleaned up needs to sync with the queued work - ie
+>  	 * rcu_barrier()
+>  	 */
+> -	if (llist_add(&freeinit->node, &init_free_list))
+> +	if (llist_add(&freeinit->node, &init_free_list)) {
+> +		pr_warn("%s: schedule_work for mod=%s\n", __func__, mod->name);
+> +		dump_stack();
+>  		schedule_work(&init_free_wq);
+> +	}
+>  
+>  	mutex_unlock(&module_mutex);
+>  	wake_up_all(&module_wq);
+> 
+> but not my earlier fix and share the dmesg and ftrace output to see if the
+> theory holds?
+> 
+> Also, could you attach your config?  Curious now what your crypto options look
+> like after fiddling with some of them today while trying and failing to see
+> this on x86.
+> 
 
-Certainly a side effect of having a single pass assembler...This does
-fix what otherwise looks like a slew of errors for us, thanks for the
-patch.
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
-Tested-by: Nick Desaulniers <ndesaulniers@google.com>
+Probably the request_module() is coming from the registration-time crypto
+self-tests allocating the generic implementation of algorithm when an
+architecture-specific implementation is registered.  This occurs when
+CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y on Linux v5.2 and later.
+
+If this is causing problems we could do:
+
+diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+index ccb3d60729fc..d89791700b88 100644
+--- a/crypto/testmgr.c
++++ b/crypto/testmgr.c
+@@ -1667,7 +1667,7 @@ static int test_hash_vs_generic_impl(const char *driver,
+ 	if (strcmp(generic_driver, driver) == 0) /* Already the generic impl? */
+ 		return 0;
+ 
+-	generic_tfm = crypto_alloc_shash(generic_driver, 0, 0);
++	generic_tfm = crypto_alloc_shash(generic_driver, 0, CRYPTO_NOLOAD);
+ 	if (IS_ERR(generic_tfm)) {
+ 		err = PTR_ERR(generic_tfm);
+ 		if (err == -ENOENT) {
+@@ -2389,7 +2389,7 @@ static int test_aead_vs_generic_impl(struct aead_extra_tests_ctx *ctx)
+ 	if (strcmp(generic_driver, driver) == 0) /* Already the generic impl? */
+ 		return 0;
+ 
+-	generic_tfm = crypto_alloc_aead(generic_driver, 0, 0);
++	generic_tfm = crypto_alloc_aead(generic_driver, 0, CRYPTO_NOLOAD);
+ 	if (IS_ERR(generic_tfm)) {
+ 		err = PTR_ERR(generic_tfm);
+ 		if (err == -ENOENT) {
+@@ -2993,7 +2993,7 @@ static int test_skcipher_vs_generic_impl(const char *driver,
+ 	if (strcmp(generic_driver, driver) == 0) /* Already the generic impl? */
+ 		return 0;
+ 
+-	generic_tfm = crypto_alloc_skcipher(generic_driver, 0, 0);
++	generic_tfm = crypto_alloc_skcipher(generic_driver, 0, CRYPTO_NOLOAD);
+ 	if (IS_ERR(generic_tfm)) {
+ 		err = PTR_ERR(generic_tfm);
+ 		if (err == -ENOENT) {
 
 
+... but that's not ideal, since it would mean that if someone builds all crypto
+algorithms as modules, then the comparison tests could be unnecessarily skipped.
 
->
-> Signed-off-by: Stefan Agner <stefan@agner.ch>
-> ---
->  arch/arm/crypto/ghash-ce-core.S | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/arm/crypto/ghash-ce-core.S b/arch/arm/crypto/ghash-ce-core.S
-> index 534c9647726d..9f51e3fa4526 100644
-> --- a/arch/arm/crypto/ghash-ce-core.S
-> +++ b/arch/arm/crypto/ghash-ce-core.S
-> @@ -8,6 +8,9 @@
->  #include <linux/linkage.h>
->  #include <asm/assembler.h>
->
-> +       .arch           armv8-a
-> +       .fpu            crypto-neon-fp-armv8
-> +
->         SHASH           .req    q0
->         T1              .req    q1
->         XL              .req    q2
-> @@ -88,8 +91,6 @@
->         T3_H            .req    d17
->
->         .text
-> -       .arch           armv8-a
-> -       .fpu            crypto-neon-fp-armv8
->
->         .macro          __pmull_p64, rd, rn, rm, b1, b2, b3, b4
->         vmull.p64       \rd, \rn, \rm
-> --
-> 2.25.1
->
-> --
-> You received this message because you are subscribed to the Google Groups "Clang Built Linux" group.
-> To unsubscribe from this group and stop receiving emails from it, send an email to clang-built-linux+unsubscribe@googlegroups.com.
-> To view this discussion on the web visit https://groups.google.com/d/msgid/clang-built-linux/c41cc67321d0b366e356440e6dbc9eceb1babfe4.1583105749.git.stefan%40agner.ch.
+But it is really always wrong to be calling request_module() from other
+module_init() functions?  The commit that added 'init_free_wq' was also
+introduced in v5.2; maybe that's the problem here?
 
+	commit 1a7b7d9220819afe79d1ec5d759fe4349bd2453e
+	Author: Rick Edgecombe <rick.p.edgecombe@intel.com>
+	Date:   Thu Apr 25 17:11:37 2019 -0700
 
+	    modules: Use vmalloc special flag
 
---
-Thanks,
-~Nick Desaulniers
+- Eric
