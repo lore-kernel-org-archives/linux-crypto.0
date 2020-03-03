@@ -2,167 +2,411 @@ Return-Path: <SRS0=HdEo=4U=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D952DC3F2D7
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Mar 2020 13:58:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C694C3F2D9
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Mar 2020 13:59:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A735D20857
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Mar 2020 13:58:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="E9rdzTSm"
+	by mail.kernel.org (Postfix) with ESMTP id 42C242086A
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Mar 2020 13:59:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1583243970;
+	bh=v7VaydWSAceQL49yaEGidbrVpAS3EDgUZ7WBRom2Iok=;
+	h=From:Cc:Subject:Date:In-Reply-To:References:To:List-ID:From;
+	b=YH8UI3fkgsg3uhJBcfUjDxGZW1f0fXj1Dmv+Zjc5xeccb0oMkDkpR77OE1Ri0u1w9
+	 5sZq3Ja6dLU3Xy1YxanVNFnP6SJQNQVufzUMzk7TcXJnwa8B6B9gFVBP2vZkFl/QBG
+	 IztfpEaOmDIS/TpUIRLhZPbM8SPqFNgFgvvvZ0cg=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729307AbgCCN6C (ORCPT
+        id S1729221AbgCCN73 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Mar 2020 08:58:02 -0500
-Received: from mail-co1nam11on2088.outbound.protection.outlook.com ([40.107.220.88]:6191
-        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1729221AbgCCN6A (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Mar 2020 08:58:00 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=T4owdKqshwSOhazMFP+285PQwhbrbqCJMozJduJ1rJAmQnGEF8Ai6jhofDgAtT7dl6kxI0ppKxJRhunnbmntolkeprE/cCsu4+cAaN1EEus/rZwDewrO+i27iBC1gwaajkXGVybDdL5lAfnBTqAyjX7egxeOsdPn49nrt1AbQ34p755tCEg8EVgeEbgjbAkv4OlQyn250PSfAa6xZ6U3to9wdm9RpYEd+/6Spp3d0mMOsgyohXMQmcXtm7mVe4wJvN5LjYvjbb+TFiQ2LGGz5rQZz+XZWQzPPeBMpuDuCdf8lsL73jCf8zSJyyPjtdym+5/lJvZ/70XAqec4V4VNmQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mxFF7ge0Np68AOeCRzrePADGpN5rxY8q+5lDAqCGYU4=;
- b=G3taHuilYNSQdaz8Tka8B4jURLVMD0uhNwmsDbs1tE04EmwjuorA+8BtumOG32dXfLa3M9y2Znm7RCbq4hWBg0oKnrfrZ51DRcxZxpZF6MkQ/McXX/cKcMaibqKVt/fJeFtqOjwsnn8aI8Uylo1/7pOXBPv2iuRd2cqd14Tlkn5qI0iKGN+IbgIiZwY+8/r4wsxKLkNPYHduTRGpru6RByTcbfrmnYPiNLB0ElN5TAHJo+gjk1EWlGNcsLmEV4wwBkt+5h/c2V4SQG1RZlkTAdgIIraIzIs5VJufq6LNZWnlffJ+T8+y2rMvcsK4fIO2eI9MIEO2dSc8FOWjDeGMYg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mxFF7ge0Np68AOeCRzrePADGpN5rxY8q+5lDAqCGYU4=;
- b=E9rdzTSmxfriB/kDRWYEMhED1CcxONnKBSg77PpTQGDaU1agKSX6syFtlBNj2bG9XysVwlmSf92W6F+djomtxTwhjSFNpnM04OwN7kSmOBJ510gWfqFhfMZwn8JoYBsmEsvXz/k4twafw45GvUGqZH9Oltr31OPfeY9/DqcpPWM=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=John.Allen@amd.com; 
-Received: from SN1PR12MB2448.namprd12.prod.outlook.com (2603:10b6:802:28::23)
- by SN1PR12MB2414.namprd12.prod.outlook.com (2603:10b6:802:2e::31) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2772.15; Tue, 3 Mar
- 2020 13:57:54 +0000
-Received: from SN1PR12MB2448.namprd12.prod.outlook.com
- ([fe80::4064:dc7:d9b9:1f64]) by SN1PR12MB2448.namprd12.prod.outlook.com
- ([fe80::4064:dc7:d9b9:1f64%7]) with mapi id 15.20.2772.019; Tue, 3 Mar 2020
- 13:57:54 +0000
-From:   John Allen <john.allen@amd.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     thomas.lendacky@amd.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, brijesh.singh@amd.com, bp@suse.de,
-        linux-kernel@vger.kernel.org, John Allen <john.allen@amd.com>
-Subject: [PATCH 2/2] crypto/ccp: Cleanup sp_dev_master in psp_dev_destroy()
-Date:   Tue,  3 Mar 2020 07:57:24 -0600
-Message-Id: <20200303135724.14060-3-john.allen@amd.com>
+        Tue, 3 Mar 2020 08:59:29 -0500
+Received: from mail.kernel.org ([198.145.29.99]:45312 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726898AbgCCN73 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 3 Mar 2020 08:59:29 -0500
+Received: from mail.kernel.org (tmo-101-56.customers.d1-online.com [80.187.101.56])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 5B6B120675;
+        Tue,  3 Mar 2020 13:59:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1583243968;
+        bh=v7VaydWSAceQL49yaEGidbrVpAS3EDgUZ7WBRom2Iok=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=Ijvo5glRV69S3pKCEV3BpvbmwlPw+l9cPmXJPKV3U786DyCyMvhu3hTpuAQyOk7+E
+         lW7kPtbbpCdHIwGpFAbJP4EcqYgr1OoUWbQAL/8W4kQVB1wKgkvxf8MKO9SAkh8hGc
+         n5ns6Z+YL3rHuNmwSvgfz53fng5+13j/OvO4iCMo=
+Received: from mchehab by mail.kernel.org with local (Exim 4.92.3)
+        (envelope-from <mchehab@kernel.org>)
+        id 1j9850-001Yd5-5u; Tue, 03 Mar 2020 14:59:26 +0100
+From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>, linux-crypto@vger.kernel.org,
+        linux-doc@vger.kernel.org
+Subject: [PATCH v3 03/18] docs: crypto: convert api-intro.txt to ReST format
+Date:   Tue,  3 Mar 2020 14:59:10 +0100
+Message-Id: <78d0ddd038a5590c53356ebe8d11cdc3ca85fb30.1583243826.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.24.1
-In-Reply-To: <20200303135724.14060-1-john.allen@amd.com>
-References: <20200303135724.14060-1-john.allen@amd.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: DM5PR07CA0060.namprd07.prod.outlook.com
- (2603:10b6:4:ad::25) To SN1PR12MB2448.namprd12.prod.outlook.com
- (2603:10b6:802:28::23)
+In-Reply-To: <cover.1583243826.git.mchehab+huawei@kernel.org>
+References: <cover.1583243826.git.mchehab+huawei@kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from mojo.amd.com (165.204.77.1) by DM5PR07CA0060.namprd07.prod.outlook.com (2603:10b6:4:ad::25) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2772.18 via Frontend Transport; Tue, 3 Mar 2020 13:57:53 +0000
-X-Mailer: git-send-email 2.24.1
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: e3236002-00d5-4163-c1f6-08d7bf7adee7
-X-MS-TrafficTypeDiagnostic: SN1PR12MB2414:|SN1PR12MB2414:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN1PR12MB24140A6BB62BA3F0DCBA008F9AE40@SN1PR12MB2414.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:480;
-X-Forefront-PRVS: 03319F6FEF
-X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(39860400002)(346002)(376002)(366004)(136003)(189003)(199004)(478600001)(26005)(6486002)(4326008)(8676002)(81166006)(36756003)(8936002)(16526019)(6666004)(52116002)(7696005)(44832011)(86362001)(186003)(81156014)(316002)(1076003)(2616005)(66476007)(956004)(66556008)(66946007)(5660300002)(2906002)(6916009);DIR:OUT;SFP:1101;SCL:1;SRVR:SN1PR12MB2414;H:SN1PR12MB2448.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
-Received-SPF: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: G72HIWkURfMExqwBejq6x39yEfq4/JG6gctWxFxcE3HiCk2vdiFfj3GHFvBcFHQOWoqi3JN3jjOflAyadCWXy6UkmCaLUSMXocFAMrN/SwBV1T7PaKnwSntuVfp945RQJ16TjSlclRM0TuHFMIhrIpom0FNDoiw5TY63fsVH17u55DayXYw1eMD675Josg7Qd9uSLTyJRVOlWekUlqpgY6AagpDcs1UdtyBX1lME3jfDxUpiWeFEzG+HVpAVnbG4WjoCVDVJN7KrBEVmz3U1lkXF0gBWCeL4FIH5een9IKtYzyt3ynsfwLF+Hu/OyB0Z4DuiFuAE1i9keKUyerpEsvJ9gXLae6zj1vx493OuwFyRa+QfFwJV5fjftzggSzT1n4jZmlgOTnwUO1UsdWerKKJ5vsnB92eHgUIkm/JkQtJ7YB9an035ynRvargQdPIm
-X-MS-Exchange-AntiSpam-MessageData: eamE7WfJ8T7UF++26B1K2vlWGTFCRfVvdk4VkyJGyy91vc6hwVw2+So4WcLBNHMG6iFsz2Oi10Yja7ZYVXAWajrVxZwqWiYeKO9Z028GmkANYIbwPxUAHuFiI3LAgOGGAct5SKS5wqEuwAXkUKNjNA==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e3236002-00d5-4163-c1f6-08d7bf7adee7
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Mar 2020 13:57:54.4829
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ZB+WIgCHiRPQ3xVA35+SYOv0SHZ5idGstljhaQUydSd/EraMNpY+7j67yUXn3hA3y1idYo3bkDv3VjAz/6qg6g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR12MB2414
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+To:     unlisted-recipients:; (no To-header on input)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Introduce clear_psp_master_device() to ensure that sp_dev_master gets
-properly cleared on the release of a psp device.
+- Change title markups;
+- Mark literal blocks;
+- Use list markups at authors/credits;
+- Add blank lines when needed;
+- Remove trailing whitespaces.
 
-Fixes: 2a6170dfe755 ("crypto: ccp: Add Platform Security Processor (PSP) device support")
-Signed-off-by: John Allen <john.allen@amd.com>
+Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 ---
- drivers/crypto/ccp/psp-dev.c | 3 +++
- drivers/crypto/ccp/sp-dev.h  | 1 +
- drivers/crypto/ccp/sp-pci.c  | 9 +++++++++
- 3 files changed, 13 insertions(+)
+ .../crypto/{api-intro.txt => api-intro.rst}   | 186 ++++++++++--------
+ Documentation/crypto/index.rst                |   1 +
+ 2 files changed, 100 insertions(+), 87 deletions(-)
+ rename Documentation/crypto/{api-intro.txt => api-intro.rst} (70%)
 
-diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-index e95e7aa5dbf1..ae7b44599914 100644
---- a/drivers/crypto/ccp/psp-dev.c
-+++ b/drivers/crypto/ccp/psp-dev.c
-@@ -215,6 +215,9 @@ void psp_dev_destroy(struct sp_device *sp)
- 	tee_dev_destroy(psp);
+diff --git a/Documentation/crypto/api-intro.txt b/Documentation/crypto/api-intro.rst
+similarity index 70%
+rename from Documentation/crypto/api-intro.txt
+rename to Documentation/crypto/api-intro.rst
+index 45d943fcae5b..bcff47d42189 100644
+--- a/Documentation/crypto/api-intro.txt
++++ b/Documentation/crypto/api-intro.rst
+@@ -1,7 +1,11 @@
++.. SPDX-License-Identifier: GPL-2.0
  
- 	sp_free_psp_irq(sp, psp);
+-                    Scatterlist Cryptographic API
+-                   
+-INTRODUCTION
++=============================
++Scatterlist Cryptographic API
++=============================
 +
-+	if (sp->clear_psp_master_device)
-+		sp->clear_psp_master_device(sp);
- }
++Introduction
++============
  
- void psp_set_sev_irq_handler(struct psp_device *psp, psp_irq_handler_t handler,
-diff --git a/drivers/crypto/ccp/sp-dev.h b/drivers/crypto/ccp/sp-dev.h
-index 423594608ad1..f913f1494af9 100644
---- a/drivers/crypto/ccp/sp-dev.h
-+++ b/drivers/crypto/ccp/sp-dev.h
-@@ -90,6 +90,7 @@ struct sp_device {
- 	/* get and set master device */
- 	struct sp_device*(*get_psp_master_device)(void);
- 	void (*set_psp_master_device)(struct sp_device *);
-+	void (*clear_psp_master_device)(struct sp_device *);
+ The Scatterlist Crypto API takes page vectors (scatterlists) as
+ arguments, and works directly on pages.  In some cases (e.g. ECB
+@@ -13,22 +17,23 @@ so that processing can be applied to paged skb's without the need
+ for linearization.
  
- 	bool irq_registered;
- 	bool use_tasklet;
-diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
-index 56c1f61c0f84..cb6cb47053f4 100644
---- a/drivers/crypto/ccp/sp-pci.c
-+++ b/drivers/crypto/ccp/sp-pci.c
-@@ -146,6 +146,14 @@ static struct sp_device *psp_get_master(void)
- 	return sp_dev_master;
- }
  
-+static void psp_clear_master(struct sp_device *sp)
-+{
-+	if (sp == sp_dev_master) {
-+		sp_dev_master = NULL;
-+		dev_dbg(sp->dev, "Cleared sp_dev_master\n");
-+	}
-+}
+-DETAILS
++Details
++=======
+ 
+ At the lowest level are algorithms, which register dynamically with the
+ API.
+ 
+ 'Transforms' are user-instantiated objects, which maintain state, handle all
+-of the implementation logic (e.g. manipulating page vectors) and provide an 
+-abstraction to the underlying algorithms.  However, at the user 
++of the implementation logic (e.g. manipulating page vectors) and provide an
++abstraction to the underlying algorithms.  However, at the user
+ level they are very simple.
+ 
+-Conceptually, the API layering looks like this:
++Conceptually, the API layering looks like this::
+ 
+   [transform api]  (user interface)
+   [transform ops]  (per-type logic glue e.g. cipher.c, compress.c)
+   [algorithm api]  (for registering algorithms)
+-  
 +
- static int sp_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- {
- 	struct sp_device *sp;
-@@ -206,6 +214,7 @@ static int sp_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	pci_set_master(pdev);
- 	sp->set_psp_master_device = psp_set_master;
- 	sp->get_psp_master_device = psp_get_master;
-+	sp->clear_psp_master_device = psp_clear_master;
+ The idea is to make the user interface and algorithm registration API
+ very simple, while hiding the core logic from both.  Many good ideas
+ from existing APIs such as Cryptoapi and Nettle have been adapted for this.
+@@ -44,21 +49,21 @@ one block while the former can operate on an arbitrary amount of data,
+ subject to block size requirements (i.e., non-stream ciphers can only
+ process multiples of blocks).
  
- 	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(48));
- 	if (ret) {
+-Here's an example of how to use the API:
++Here's an example of how to use the API::
+ 
+ 	#include <crypto/hash.h>
+ 	#include <linux/err.h>
+ 	#include <linux/scatterlist.h>
+-	
++
+ 	struct scatterlist sg[2];
+ 	char result[128];
+ 	struct crypto_ahash *tfm;
+ 	struct ahash_request *req;
+-	
++
+ 	tfm = crypto_alloc_ahash("md5", 0, CRYPTO_ALG_ASYNC);
+ 	if (IS_ERR(tfm))
+ 		fail();
+-		
++
+ 	/* ... set up the scatterlists ... */
+ 
+ 	req = ahash_request_alloc(tfm, GFP_ATOMIC);
+@@ -67,18 +72,19 @@ Here's an example of how to use the API:
+ 
+ 	ahash_request_set_callback(req, 0, NULL, NULL);
+ 	ahash_request_set_crypt(req, sg, result, 2);
+-	
++
+ 	if (crypto_ahash_digest(req))
+ 		fail();
+ 
+ 	ahash_request_free(req);
+ 	crypto_free_ahash(tfm);
+ 
+-    
++
+ Many real examples are available in the regression test module (tcrypt.c).
+ 
+ 
+-DEVELOPER NOTES
++Developer Notes
++===============
+ 
+ Transforms may only be allocated in user context, and cryptographic
+ methods may only be called from softirq and user contexts.  For
+@@ -91,7 +97,8 @@ size (typically 8 bytes).  This prevents having to do any copying
+ across non-aligned page fragment boundaries.
+ 
+ 
+-ADDING NEW ALGORITHMS
++Adding New Algorithms
++=====================
+ 
+ When submitting a new algorithm for inclusion, a mandatory requirement
+ is that at least a few test vectors from known sources (preferably
+@@ -119,132 +126,137 @@ Also check the TODO list at the web site listed below to see what people
+ might already be working on.
+ 
+ 
+-BUGS
++Bugs
++====
+ 
+ Send bug reports to:
+-linux-crypto@vger.kernel.org
+-Cc: Herbert Xu <herbert@gondor.apana.org.au>,
++    linux-crypto@vger.kernel.org
++
++Cc:
++    Herbert Xu <herbert@gondor.apana.org.au>,
+     David S. Miller <davem@redhat.com>
+ 
+ 
+-FURTHER INFORMATION
++Further Information
++===================
+ 
+ For further patches and various updates, including the current TODO
+ list, see:
+ http://gondor.apana.org.au/~herbert/crypto/
+ 
+ 
+-AUTHORS
++Authors
++=======
+ 
+-James Morris
+-David S. Miller
+-Herbert Xu
++- James Morris
++- David S. Miller
++- Herbert Xu
+ 
+ 
+-CREDITS
++Credits
++=======
+ 
+ The following people provided invaluable feedback during the development
+ of the API:
+ 
+-  Alexey Kuznetzov
+-  Rusty Russell
+-  Herbert Valerio Riedel
+-  Jeff Garzik
+-  Michael Richardson
+-  Andrew Morton
+-  Ingo Oeser
+-  Christoph Hellwig
++  - Alexey Kuznetzov
++  - Rusty Russell
++  - Herbert Valerio Riedel
++  - Jeff Garzik
++  - Michael Richardson
++  - Andrew Morton
++  - Ingo Oeser
++  - Christoph Hellwig
+ 
+ Portions of this API were derived from the following projects:
+-  
++
+   Kerneli Cryptoapi (http://www.kerneli.org/)
+-    Alexander Kjeldaas
+-    Herbert Valerio Riedel
+-    Kyle McMartin
+-    Jean-Luc Cooke
+-    David Bryson
+-    Clemens Fruhwirth
+-    Tobias Ringstrom
+-    Harald Welte
++   - Alexander Kjeldaas
++   - Herbert Valerio Riedel
++   - Kyle McMartin
++   - Jean-Luc Cooke
++   - David Bryson
++   - Clemens Fruhwirth
++   - Tobias Ringstrom
++   - Harald Welte
+ 
+ and;
+-  
++
+   Nettle (http://www.lysator.liu.se/~nisse/nettle/)
+-    Niels Möller
++   - Niels Möller
+ 
+ Original developers of the crypto algorithms:
+ 
+-  Dana L. How (DES)
+-  Andrew Tridgell and Steve French (MD4)
+-  Colin Plumb (MD5)
+-  Steve Reid (SHA1)
+-  Jean-Luc Cooke (SHA256, SHA384, SHA512)
+-  Kazunori Miyazawa / USAGI (HMAC)
+-  Matthew Skala (Twofish)
+-  Dag Arne Osvik (Serpent)
+-  Brian Gladman (AES)
+-  Kartikey Mahendra Bhatt (CAST6)
+-  Jon Oberheide (ARC4)
+-  Jouni Malinen (Michael MIC)
+-  NTT(Nippon Telegraph and Telephone Corporation) (Camellia)
++  - Dana L. How (DES)
++  - Andrew Tridgell and Steve French (MD4)
++  - Colin Plumb (MD5)
++  - Steve Reid (SHA1)
++  - Jean-Luc Cooke (SHA256, SHA384, SHA512)
++  - Kazunori Miyazawa / USAGI (HMAC)
++  - Matthew Skala (Twofish)
++  - Dag Arne Osvik (Serpent)
++  - Brian Gladman (AES)
++  - Kartikey Mahendra Bhatt (CAST6)
++  - Jon Oberheide (ARC4)
++  - Jouni Malinen (Michael MIC)
++  - NTT(Nippon Telegraph and Telephone Corporation) (Camellia)
+ 
+ SHA1 algorithm contributors:
+-  Jean-Francois Dive
+-  
++  - Jean-Francois Dive
++
+ DES algorithm contributors:
+-  Raimar Falke
+-  Gisle Sælensminde
+-  Niels Möller
++  - Raimar Falke
++  - Gisle Sælensminde
++  - Niels Möller
+ 
+ Blowfish algorithm contributors:
+-  Herbert Valerio Riedel
+-  Kyle McMartin
++  - Herbert Valerio Riedel
++  - Kyle McMartin
+ 
+ Twofish algorithm contributors:
+-  Werner Koch
+-  Marc Mutz
++  - Werner Koch
++  - Marc Mutz
+ 
+ SHA256/384/512 algorithm contributors:
+-  Andrew McDonald
+-  Kyle McMartin
+-  Herbert Valerio Riedel
+-  
++  - Andrew McDonald
++  - Kyle McMartin
++  - Herbert Valerio Riedel
++
+ AES algorithm contributors:
+-  Alexander Kjeldaas
+-  Herbert Valerio Riedel
+-  Kyle McMartin
+-  Adam J. Richter
+-  Fruhwirth Clemens (i586)
+-  Linus Torvalds (i586)
++  - Alexander Kjeldaas
++  - Herbert Valerio Riedel
++  - Kyle McMartin
++  - Adam J. Richter
++  - Fruhwirth Clemens (i586)
++  - Linus Torvalds (i586)
+ 
+ CAST5 algorithm contributors:
+-  Kartikey Mahendra Bhatt (original developers unknown, FSF copyright).
++  - Kartikey Mahendra Bhatt (original developers unknown, FSF copyright).
+ 
+ TEA/XTEA algorithm contributors:
+-  Aaron Grothe
+-  Michael Ringe
++  - Aaron Grothe
++  - Michael Ringe
+ 
+ Khazad algorithm contributors:
+-  Aaron Grothe
++  - Aaron Grothe
+ 
+ Whirlpool algorithm contributors:
+-  Aaron Grothe
+-  Jean-Luc Cooke
++  - Aaron Grothe
++  - Jean-Luc Cooke
+ 
+ Anubis algorithm contributors:
+-  Aaron Grothe
++  - Aaron Grothe
+ 
+ Tiger algorithm contributors:
+-  Aaron Grothe
++  - Aaron Grothe
+ 
+ VIA PadLock contributors:
+-  Michal Ludvig
++  - Michal Ludvig
+ 
+ Camellia algorithm contributors:
+-  NTT(Nippon Telegraph and Telephone Corporation) (Camellia)
++  - NTT(Nippon Telegraph and Telephone Corporation) (Camellia)
+ 
+ Generic scatterwalk code by Adam J. Richter <adam@yggdrasil.com>
+ 
+ Please send any credits updates or corrections to:
+ Herbert Xu <herbert@gondor.apana.org.au>
+-
+diff --git a/Documentation/crypto/index.rst b/Documentation/crypto/index.rst
+index 2bcaf422731e..b2eeab3c8631 100644
+--- a/Documentation/crypto/index.rst
++++ b/Documentation/crypto/index.rst
+@@ -17,6 +17,7 @@ for cryptographic use cases, as well as programming examples.
+    :maxdepth: 2
+ 
+    intro
++   api-intro
+    architecture
+    asymmetric-keys
+    devel-algos
 -- 
-2.18.2
+2.24.1
 
