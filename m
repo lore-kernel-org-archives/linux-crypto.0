@@ -2,152 +2,141 @@ Return-Path: <SRS0=HdEo=4U=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-14.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80464C3F2D1
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Mar 2020 21:32:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F052C3F2D7
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Mar 2020 22:20:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 480F320CC7
-	for <linux-crypto@archiver.kernel.org>; Tue,  3 Mar 2020 21:32:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6321720870
+	for <linux-crypto@archiver.kernel.org>; Tue,  3 Mar 2020 22:20:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="j9nk4PVP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JoEYFdqH"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732673AbgCCVcM (ORCPT
+        id S1726809AbgCCWUS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 3 Mar 2020 16:32:12 -0500
-Received: from userp2130.oracle.com ([156.151.31.86]:39388 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732667AbgCCVcM (ORCPT
+        Tue, 3 Mar 2020 17:20:18 -0500
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:35205 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726766AbgCCWUQ (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 3 Mar 2020 16:32:12 -0500
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 023LS1go036975;
-        Tue, 3 Mar 2020 21:32:02 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2020-01-29;
- bh=AnKlCnsZKbhYJBc8etzmr5N2OwYTT8txAPj6KkeXERo=;
- b=j9nk4PVPkIxtzadAwWsgGAlZZsgIQ2sAqZ5uHhR0VG1IQwEC1X4uKIA9uQ+4O6fEcTIs
- sKVg2X39iXVBjuZwfcgcLNOe+zYmZlf+IOAIo67cqSLxq8LymK0C7ydoHfKojkV5NMB2
- EK6b2TAVx0x7OWodpUqGvuOOSQUJg7rDMW9AK4/lPxpFeePhNOGzHkyRL8JrQTlKtXH6
- OE4FX6l591SgfU741aeBHwwXkO0Itjl8EqTP/bOezR74EMlMKGwIrSW5jt3ug/pEGyyp
- 9YevRnnIjb17MByx1Eyea6QrXSkHWlsEMetg9bGv2+3kZOfgdX5+ObvwE9KyT4oyik05 RQ== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 2yffcuj7c9-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 03 Mar 2020 21:32:02 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 023LQaoT008213;
-        Tue, 3 Mar 2020 21:30:02 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3030.oracle.com with ESMTP id 2yg1emtngg-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 03 Mar 2020 21:30:01 +0000
-Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 023LU0BL019460;
-        Tue, 3 Mar 2020 21:30:00 GMT
-Received: from ca-dmjordan1.us.oracle.com (/10.211.9.48)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 03 Mar 2020 13:30:00 -0800
-Date:   Tue, 3 Mar 2020 16:30:17 -0500
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Robin Murphy <robin.murphy@arm.com>
-Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
-        mark.rutland@arm.com, jiangshanlai@gmail.com,
-        linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        tj@kernel.org, Will Deacon <will@kernel.org>,
-        linux-arm-kernel@lists.infradead.org
-Subject: Re: WARNING: at kernel/workqueue.c:1473 __queue_work+0x3b8/0x3d0
-Message-ID: <20200303213017.tanczhqd3nhpeeak@ca-dmjordan1.us.oracle.com>
-References: <20200217204803.GA13479@Red>
- <20200218163504.y5ofvaejleuf5tbh@ca-dmjordan1.us.oracle.com>
- <20200220090350.GA19858@Red>
- <20200221174223.r3y6tugavp3k5jdl@ca-dmjordan1.us.oracle.com>
- <20200228123311.GE3275@willie-the-truck>
- <20200228153331.uimy62rat2tdxxod@ca-dmjordan1.us.oracle.com>
- <20200301175351.GA11684@Red>
- <20200302172510.fspofleipqjcdxak@ca-dmjordan1.us.oracle.com>
- <e7c92da2-42c0-a97d-7427-6fdc769b41b9@arm.com>
+        Tue, 3 Mar 2020 17:20:16 -0500
+Received: by mail-pf1-f193.google.com with SMTP id i19so2220831pfa.2
+        for <linux-crypto@vger.kernel.org>; Tue, 03 Mar 2020 14:20:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=A0VgoCajNQtcqmr3sAxZ7zwAICIrcd2LUoNAPqwJhMc=;
+        b=JoEYFdqH8VMWl/v3oH9VXqNGlxqWFgnorIuL0o80ZngwzS/ndHRTcASbqclRrUjUFS
+         JqDXYy6BFgb8RRrFi0Wguy7MFjm1Rx9YwjkChVADEVVdGOzA/Nh6wAc8Fvp7yZSOaCZ4
+         cOzTqLmgjn4ShkaCTeB0wEWh3WU2S1mivlUnz8Qn+B2nvfX/AnGjrvd8CNWkq1bd8XQm
+         p0PKu/SVvr1mTlYxgKG5QdG7UrmbLeScp3lDEyEy4N7EHsPCemUBKHbsMhp+PqtNrEMC
+         iDc3Chr898nqiTtFwHk+hlM7QURM5bO50ptPMclx9dGGCYyAG7mOlQR5af5uVt1+dBGK
+         B3qg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=A0VgoCajNQtcqmr3sAxZ7zwAICIrcd2LUoNAPqwJhMc=;
+        b=ZZmv+9tNtgBXSgtoQ5enrWB9Zf5ib8hEXqBLnGDcz6GtPrw1o+4zdejjRweA8vS+s1
+         LfeIsFO3dv80sVu5GLGW6N73tjqi0/v1wDx7ONDNH/H3mX/JR0P15ti1kDDRwd8tJdhP
+         c9AXk74HDzZ9RZtVVfP8tp7cMhaIUBXk0gNTYw2IeoXpEyd6JJoL99+iA1a5KjPWERKo
+         iAOz3DxqX/emJbR4U3GkvOVTC5C+M+6AZi0CslLUqnolqXzYneF1m/Sub5n6//TADoXz
+         uZ5OHisDD1z2ykH5KICaG8daQOgwykAG07tZHfgLvVLmPSsprSo0HhXmneWfWPovHBo3
+         UfLA==
+X-Gm-Message-State: ANhLgQ2D3PqDyJ/1O9d+yhyYsQAoOnZnVzk8+ylZWRsSGH8h+U8y0aME
+        UMTKK0grSv8Blt5xLdxFVJ+jLFTqOa+WRDg1B38GTE77
+X-Google-Smtp-Source: ADFU+vt4X4Q2+Uu+la/wP/hFUKrg/nR+9uZ1co62ESgEa0STG5Q0XI3VwZlAqZ1ci3kOGA0/3riqiLDrYgRWJ+NHPxM=
+X-Received: by 2002:a62:37c7:: with SMTP id e190mr6303201pfa.165.1583274014576;
+ Tue, 03 Mar 2020 14:20:14 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e7c92da2-42c0-a97d-7427-6fdc769b41b9@arm.com>
-User-Agent: NeoMutt/20180716
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9549 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 suspectscore=2 spamscore=0
- mlxlogscore=999 malwarescore=0 bulkscore=0 mlxscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2003030136
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9549 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 mlxscore=0 bulkscore=0
- adultscore=0 suspectscore=2 spamscore=0 malwarescore=0 impostorscore=0
- priorityscore=1501 mlxlogscore=999 lowpriorityscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
- definitions=main-2003030136
+References: <c41cc67321d0b366e356440e6dbc9eceb1babfe4.1583105749.git.stefan@agner.ch>
+In-Reply-To: <c41cc67321d0b366e356440e6dbc9eceb1babfe4.1583105749.git.stefan@agner.ch>
+From:   Nick Desaulniers <ndesaulniers@google.com>
+Date:   Tue, 3 Mar 2020 14:20:03 -0800
+Message-ID: <CAKwvOdmvOq9X3zR17TsEZpJ83BYC1vX=pYMPyZ6Db3xeHUxzag@mail.gmail.com>
+Subject: Re: [PATCH] crypto: arm/ghash-ce - define fpu before fpu registers
+ are referenced
+To:     Stefan Agner <stefan@agner.ch>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Russell King <linux@armlinux.org.uk>,
+        Manoj Gupta <manojgupta@google.com>,
+        Jian Cai <jiancai@google.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        Ard.Biesheuvel@arm.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Mar 02, 2020 at 06:00:10PM +0000, Robin Murphy wrote:
-> On 02/03/2020 5:25 pm, Daniel Jordan wrote:
-> Something smelled familiar about this discussion, and sure enough that merge
-> contains c4741b230597 ("crypto: run initcalls for generic implementations
-> earlier"), which has raised its head before[1].
+On Sun, Mar 1, 2020 at 3:37 PM Stefan Agner <stefan@agner.ch> wrote:
+>
+> Building ARMv7 with Clang's integrated assembler leads to errors such
+> as:
+> arch/arm/crypto/ghash-ce-core.S:34:11: error: register name expected
+>  t3l .req d16
+>           ^
+>
+> Since no FPU has selected yet Clang considers d16 not a valid register.
+> Moving the FPU directive on-top allows Clang to parse the registers and
+> allows to successfully build this file with Clang's integrated assembler.
 
-Yep, that looks suspicious.
+Certainly a side effect of having a single pass assembler...This does
+fix what otherwise looks like a slew of errors for us, thanks for the
+patch.
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
+Tested-by: Nick Desaulniers <ndesaulniers@google.com>
 
-The bisect didn't point to that specific commit, even though my version of git
-tries commits in the merge.  I'm probably missing something.
 
-> > Does this fix it?  I can't verify but figure it's worth trying the simplest
-> > explanation first, which is that the work isn't initialized by the time it's
-> > queued.
-> 
-> The relative initcall levels would appear to explain the symptom - I guess
-> the question is whether this represents a bug in a particular test/algorithm
-> (as with the unaligned accesses) or a fundamental problem in the
-> infrastructure now being able to poke the module loader too early.
 
-I'm not familiar with the crypto code.  Could it be that the commit moved some
-request_module() calls before modules_wq_init()?
+>
+> Signed-off-by: Stefan Agner <stefan@agner.ch>
+> ---
+>  arch/arm/crypto/ghash-ce-core.S | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+>
+> diff --git a/arch/arm/crypto/ghash-ce-core.S b/arch/arm/crypto/ghash-ce-core.S
+> index 534c9647726d..9f51e3fa4526 100644
+> --- a/arch/arm/crypto/ghash-ce-core.S
+> +++ b/arch/arm/crypto/ghash-ce-core.S
+> @@ -8,6 +8,9 @@
+>  #include <linux/linkage.h>
+>  #include <asm/assembler.h>
+>
+> +       .arch           armv8-a
+> +       .fpu            crypto-neon-fp-armv8
+> +
+>         SHASH           .req    q0
+>         T1              .req    q1
+>         XL              .req    q2
+> @@ -88,8 +91,6 @@
+>         T3_H            .req    d17
+>
+>         .text
+> -       .arch           armv8-a
+> -       .fpu            crypto-neon-fp-armv8
+>
+>         .macro          __pmull_p64, rd, rn, rm, b1, b2, b3, b4
+>         vmull.p64       \rd, \rn, \rm
+> --
+> 2.25.1
+>
+> --
+> You received this message because you are subscribed to the Google Groups "Clang Built Linux" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to clang-built-linux+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgid/clang-built-linux/c41cc67321d0b366e356440e6dbc9eceb1babfe4.1583105749.git.stefan%40agner.ch.
 
-And, is it "too early" or just "earlier"?  When is it too early for modprobe?
 
-Barring other ideas, Corentin, would you be willing to boot with
 
-    trace_event=initcall:*,module:* trace_options=stacktrace
-
-and
-
-diff --git a/kernel/module.c b/kernel/module.c
-index 33569a01d6e1..393be6979a27 100644
---- a/kernel/module.c
-+++ b/kernel/module.c
-@@ -3604,8 +3604,11 @@ static noinline int do_init_module(struct module *mod)
- 	 * be cleaned up needs to sync with the queued work - ie
- 	 * rcu_barrier()
- 	 */
--	if (llist_add(&freeinit->node, &init_free_list))
-+	if (llist_add(&freeinit->node, &init_free_list)) {
-+		pr_warn("%s: schedule_work for mod=%s\n", __func__, mod->name);
-+		dump_stack();
- 		schedule_work(&init_free_wq);
-+	}
- 
- 	mutex_unlock(&module_mutex);
- 	wake_up_all(&module_wq);
-
-but not my earlier fix and share the dmesg and ftrace output to see if the
-theory holds?
-
-Also, could you attach your config?  Curious now what your crypto options look
-like after fiddling with some of them today while trying and failing to see
-this on x86.
-
-thanks,
-Daniel
+--
+Thanks,
+~Nick Desaulniers
