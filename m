@@ -7,54 +7,53 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6364C3F2D7
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Mar 2020 12:26:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 210FBC3F2CD
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Mar 2020 12:26:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 64CAD2166E
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Mar 2020 12:26:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 895CA2166E
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Mar 2020 12:26:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="bQwK4G0D"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Fy6MVALb"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387938AbgCDM0Q (ORCPT
+        id S2387919AbgCDM0P (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 Mar 2020 07:26:16 -0500
-Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:51332 "EHLO
+        Wed, 4 Mar 2020 07:26:15 -0500
+Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:41836 "EHLO
         mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S2387801AbgCDM0Q (ORCPT
+        by vger.kernel.org with ESMTP id S1729118AbgCDM0O (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 Mar 2020 07:26:16 -0500
+        Wed, 4 Mar 2020 07:26:14 -0500
 Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-        by mx0b-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 024CB2lI030863;
-        Wed, 4 Mar 2020 04:25:44 -0800
+        by mx0b-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 024CB5TM030954;
+        Wed, 4 Mar 2020 04:25:38 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
- content-type; s=pfpt0818; bh=v/0ktHhDmaKjiH7RGOX/PX8VEF1HhiTTt7dS3bKCWLc=;
- b=bQwK4G0D50LI4Ir69YJOtv3M+W/H1GizS/zu/ULNigq39T5rYmfcmL3M3DOWfHiS8Vu3
- sM8yc+Uk5KIQRx3g9BxP2AZ0rbxhgqqtuxcOExb2dQZy0kQdmPvDYLq6bN/bfb0koGAL
- GMc3c73Eefvvb0KdY2jDv3aY1NKJpoJOMhqgvYhMJHpCUtSdsVt58jkYH3c0akVpMkof
- ZF5gz17P/1uybc6F4bu9RJPAOexibxqCbLNr2+A551ki75o4lbHb+A7A0T/REiLKNVj7
- jk0fs4OdmM80LYpkhfoo9VNcnjaWSNX3S/cz12pZ3QQ6M1Yz/4o8rz4GH8Hg1ekwdncu pg== 
-Received: from sc-exch02.marvell.com ([199.233.58.182])
-        by mx0b-0016f401.pphosted.com with ESMTP id 2yhn0xy9jh-1
+ content-type; s=pfpt0818; bh=RtdanAeexJ7YC9x0WXX5Ui9/O0EsxtYQZTcDOgGCu/U=;
+ b=Fy6MVALb+WpMWu+eogLhlpv9XxKBAPnxgKNRfIx1EwKDbuRk4c4yIvBD7iekp2V42ybA
+ jkgxfuyoAtam11/liVUNshn/nvpffHsSrPPOa8/d6AS+Vj2rHoL/vYxdXEi/191IfEpl
+ IrCoGF0W8qd2bqjtTq6VVvmLKiKLsWh3SxGFJCy+lt9JHycO0djQnWBuo+XTJ+3u5KS1
+ Y4vO0s9+d1jzX3vchvAlz3G8/ktsLQPmpK1QAd/pMQnFz+Ft7eyCGnefJAA5j23P9V6I
+ 4rN+gMbMW8Cf6F02RAHGaSslcuLq0n1OjgBVKC1f6oRuhNpyDKNK6xGsEwh1eT31WRIV rA== 
+Received: from sc-exch04.marvell.com ([199.233.58.184])
+        by mx0b-0016f401.pphosted.com with ESMTP id 2yhn0xy9jb-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-        Wed, 04 Mar 2020 04:25:43 -0800
-Received: from SC-EXCH03.marvell.com (10.93.176.83) by SC-EXCH02.marvell.com
- (10.93.176.82) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 4 Mar
- 2020 04:25:40 -0800
-Received: from maili.marvell.com (10.93.176.43) by SC-EXCH03.marvell.com
- (10.93.176.83) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Wed, 4 Mar 2020 04:25:40 -0800
+        Wed, 04 Mar 2020 04:25:37 -0800
+Received: from SC-EXCH01.marvell.com (10.93.176.81) by SC-EXCH04.marvell.com
+ (10.93.176.84) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 4 Mar
+ 2020 04:25:33 -0800
+Received: from maili.marvell.com (10.93.176.43) by SC-EXCH01.marvell.com
+ (10.93.176.81) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Wed, 4 Mar 2020 04:25:33 -0800
 Received: from hyd1schalla-dt.marvell.com (hyd1schalla-dt.marvell.com [10.29.8.39])
-        by maili.marvell.com (Postfix) with ESMTP id 5DCDD3F703F;
-        Wed,  4 Mar 2020 04:25:38 -0800 (PST)
+        by maili.marvell.com (Postfix) with ESMTP id 01FB73F7041;
+        Wed,  4 Mar 2020 04:25:30 -0800 (PST)
 From:   Srujana Challa <schalla@marvell.com>
 To:     <herbert@gondor.apana.org.au>
 CC:     <davem@davemloft.net>, <linux-crypto@vger.kernel.org>,
-        <pathreya@marvell.com>, SrujanaChalla <schalla@marvell.com>,
-        Lukasz Bartosik <lbartosik@marvell.com>
-Subject: [PATCH 3/4] drivers: crypto: add the Virtual Function driver for CPT
-Date:   Wed, 4 Mar 2020 17:55:15 +0530
-Message-ID: <1583324716-23633-4-git-send-email-schalla@marvell.com>
+        <pathreya@marvell.com>, SrujanaChalla <schalla@marvell.com>
+Subject: [PATCH 1/4] drivers: crypto: create common Kconfig and Makefile for Marvell
+Date:   Wed, 4 Mar 2020 17:55:13 +0530
+Message-ID: <1583324716-23633-2-git-send-email-schalla@marvell.com>
 X-Mailer: git-send-email 1.9.1
 In-Reply-To: <1583324716-23633-1-git-send-email-schalla@marvell.com>
 References: <1583324716-23633-1-git-send-email-schalla@marvell.com>
@@ -69,4803 +68,8374 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: SrujanaChalla <schalla@marvell.com>
 
-Add support for the cryptographic accelerator unit virtual functions on
-OcteonTX 83XX SoC.
+Creats common Kconfig and Makefile for Marvell crypto drivers.
 
-Co-developed-by: Lukasz Bartosik <lbartosik@marvell.com>
-Signed-off-by: Lukasz Bartosik <lbartosik@marvell.com>
 Signed-off-by: SrujanaChalla <schalla@marvell.com>
 ---
- drivers/crypto/marvell/octeontx/Makefile           |    4 +-
- drivers/crypto/marvell/octeontx/otx_cpt_hw_types.h |  577 ++++++-
- drivers/crypto/marvell/octeontx/otx_cptvf.h        |  104 ++
- drivers/crypto/marvell/octeontx/otx_cptvf_algs.c   | 1744 ++++++++++++++++++++
- drivers/crypto/marvell/octeontx/otx_cptvf_algs.h   |  188 +++
- drivers/crypto/marvell/octeontx/otx_cptvf_main.c   |  985 +++++++++++
- drivers/crypto/marvell/octeontx/otx_cptvf_mbox.c   |  247 +++
- drivers/crypto/marvell/octeontx/otx_cptvf_reqmgr.c |  612 +++++++
- drivers/crypto/marvell/octeontx/otx_cptvf_reqmgr.h |  227 +++
- 9 files changed, 4686 insertions(+), 2 deletions(-)
- create mode 100644 drivers/crypto/marvell/octeontx/otx_cptvf.h
- create mode 100644 drivers/crypto/marvell/octeontx/otx_cptvf_algs.c
- create mode 100644 drivers/crypto/marvell/octeontx/otx_cptvf_algs.h
- create mode 100644 drivers/crypto/marvell/octeontx/otx_cptvf_main.c
- create mode 100644 drivers/crypto/marvell/octeontx/otx_cptvf_mbox.c
- create mode 100644 drivers/crypto/marvell/octeontx/otx_cptvf_reqmgr.c
- create mode 100644 drivers/crypto/marvell/octeontx/otx_cptvf_reqmgr.h
+ drivers/crypto/Kconfig               |   15 +-
+ drivers/crypto/Makefile              |    2 +-
+ drivers/crypto/marvell/Kconfig       |   21 +
+ drivers/crypto/marvell/Makefile      |    6 +-
+ drivers/crypto/marvell/cesa.c        |  615 ---------------
+ drivers/crypto/marvell/cesa.h        |  880 ---------------------
+ drivers/crypto/marvell/cesa/Makefile |    3 +
+ drivers/crypto/marvell/cesa/cesa.c   |  615 +++++++++++++++
+ drivers/crypto/marvell/cesa/cesa.h   |  881 +++++++++++++++++++++
+ drivers/crypto/marvell/cesa/cipher.c |  801 +++++++++++++++++++
+ drivers/crypto/marvell/cesa/hash.c   | 1448 ++++++++++++++++++++++++++++++++++
+ drivers/crypto/marvell/cesa/tdma.c   |  352 +++++++++
+ drivers/crypto/marvell/cipher.c      |  798 -------------------
+ drivers/crypto/marvell/hash.c        | 1442 ---------------------------------
+ drivers/crypto/marvell/tdma.c        |  350 --------
+ 15 files changed, 4126 insertions(+), 4103 deletions(-)
+ create mode 100644 drivers/crypto/marvell/Kconfig
+ delete mode 100644 drivers/crypto/marvell/cesa.c
+ delete mode 100644 drivers/crypto/marvell/cesa.h
+ create mode 100644 drivers/crypto/marvell/cesa/Makefile
+ create mode 100644 drivers/crypto/marvell/cesa/cesa.c
+ create mode 100644 drivers/crypto/marvell/cesa/cesa.h
+ create mode 100644 drivers/crypto/marvell/cesa/cipher.c
+ create mode 100644 drivers/crypto/marvell/cesa/hash.c
+ create mode 100644 drivers/crypto/marvell/cesa/tdma.c
+ delete mode 100644 drivers/crypto/marvell/cipher.c
+ delete mode 100644 drivers/crypto/marvell/hash.c
+ delete mode 100644 drivers/crypto/marvell/tdma.c
 
-diff --git a/drivers/crypto/marvell/octeontx/Makefile b/drivers/crypto/marvell/octeontx/Makefile
-index 627d00e..5e956fe 100644
---- a/drivers/crypto/marvell/octeontx/Makefile
-+++ b/drivers/crypto/marvell/octeontx/Makefile
-@@ -1,4 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
--obj-$(CONFIG_CRYPTO_DEV_OCTEONTX_CPT) += octeontx-cpt.o
-+obj-$(CONFIG_CRYPTO_DEV_OCTEONTX_CPT) += octeontx-cpt.o octeontx-cptvf.o
+diff --git a/drivers/crypto/Kconfig b/drivers/crypto/Kconfig
+index c2767ed..a829f94 100644
+--- a/drivers/crypto/Kconfig
++++ b/drivers/crypto/Kconfig
+@@ -233,20 +233,6 @@ config CRYPTO_CRC32_S390
  
- octeontx-cpt-objs := otx_cptpf_main.o otx_cptpf_mbox.o otx_cptpf_ucode.o
-+octeontx-cptvf-objs := otx_cptvf_main.o otx_cptvf_mbox.o otx_cptvf_reqmgr.o \
-+		       otx_cptvf_algs.o
-diff --git a/drivers/crypto/marvell/octeontx/otx_cpt_hw_types.h b/drivers/crypto/marvell/octeontx/otx_cpt_hw_types.h
-index bec483f..b8bdb9f 100644
---- a/drivers/crypto/marvell/octeontx/otx_cpt_hw_types.h
-+++ b/drivers/crypto/marvell/octeontx/otx_cpt_hw_types.h
-@@ -15,11 +15,19 @@
+ 	  It is available with IBM z13 or later.
  
- /* Device IDs */
- #define OTX_CPT_PCI_PF_DEVICE_ID 0xa040
-+#define OTX_CPT_PCI_VF_DEVICE_ID 0xa041
+-config CRYPTO_DEV_MARVELL_CESA
+-	tristate "Marvell's Cryptographic Engine driver"
+-	depends on PLAT_ORION || ARCH_MVEBU
+-	select CRYPTO_LIB_AES
+-	select CRYPTO_LIB_DES
+-	select CRYPTO_SKCIPHER
+-	select CRYPTO_HASH
+-	select SRAM
+-	help
+-	  This driver allows you to utilize the Cryptographic Engines and
+-	  Security Accelerator (CESA) which can be found on MVEBU and ORION
+-	  platforms.
+-	  This driver supports CPU offload through DMA transfers.
+-
+ config CRYPTO_DEV_NIAGARA2
+ 	tristate "Niagara2 Stream Processing Unit driver"
+ 	select CRYPTO_LIB_DES
+@@ -606,6 +592,7 @@ config CRYPTO_DEV_MXS_DCP
+ source "drivers/crypto/qat/Kconfig"
+ source "drivers/crypto/cavium/cpt/Kconfig"
+ source "drivers/crypto/cavium/nitrox/Kconfig"
++source "drivers/crypto/marvell/Kconfig"
  
- #define OTX_CPT_PCI_PF_SUBSYS_ID 0xa340
-+#define OTX_CPT_PCI_VF_SUBSYS_ID 0xa341
- 
- /* Configuration and status registers are in BAR0 on OcteonTX platform */
- #define OTX_CPT_PF_PCI_CFG_BAR	0
-+#define OTX_CPT_VF_PCI_CFG_BAR	0
-+
-+#define OTX_CPT_BAR_E_CPTX_VFX_BAR0_OFFSET(a, b) \
-+	(0x000020000000ll + 0x1000000000ll * (a) + 0x100000ll * (b))
-+#define OTX_CPT_BAR_E_CPTX_VFX_BAR0_SIZE	0x400000
-+
- /* Mailbox interrupts offset */
- #define OTX_CPT_PF_MBOX_INT	3
- #define OTX_CPT_PF_INT_VEC_E_MBOXX(x, a) ((x) + (a))
-@@ -28,6 +36,19 @@
- /* Maximum supported microcode groups */
- #define OTX_CPT_MAX_ENGINE_GROUPS 8
- 
-+/* CPT instruction size in bytes */
-+#define OTX_CPT_INST_SIZE 64
-+/* CPT queue next chunk pointer size in bytes */
-+#define OTX_CPT_NEXT_CHUNK_PTR_SIZE 8
-+
-+/* OcteonTX CPT VF MSIX vectors and their offsets */
-+#define OTX_CPT_VF_MSIX_VECTORS 2
-+#define OTX_CPT_VF_INTR_MBOX_MASK BIT(0)
-+#define OTX_CPT_VF_INTR_DOVF_MASK BIT(1)
-+#define OTX_CPT_VF_INTR_IRDE_MASK BIT(2)
-+#define OTX_CPT_VF_INTR_NWRP_MASK BIT(3)
-+#define OTX_CPT_VF_INTR_SERR_MASK BIT(4)
-+
- /* OcteonTX CPT PF registers */
- #define OTX_CPT_PF_CONSTANTS		(0x0ll)
- #define OTX_CPT_PF_RESET		(0x100ll)
-@@ -78,6 +99,190 @@
- #define OTX_CPT_PF_VFX_MBOXX(b, c)	(0x8001000ll | (u64)(b) << 20 | \
- 					 (u64)(c) << 8)
- 
-+/* OcteonTX CPT VF registers */
-+#define OTX_CPT_VQX_CTL(b)		(0x100ll | (u64)(b) << 20)
-+#define OTX_CPT_VQX_SADDR(b)		(0x200ll | (u64)(b) << 20)
-+#define OTX_CPT_VQX_DONE_WAIT(b)	(0x400ll | (u64)(b) << 20)
-+#define OTX_CPT_VQX_INPROG(b)		(0x410ll | (u64)(b) << 20)
-+#define OTX_CPT_VQX_DONE(b)		(0x420ll | (u64)(b) << 20)
-+#define OTX_CPT_VQX_DONE_ACK(b)		(0x440ll | (u64)(b) << 20)
-+#define OTX_CPT_VQX_DONE_INT_W1S(b)	(0x460ll | (u64)(b) << 20)
-+#define OTX_CPT_VQX_DONE_INT_W1C(b)	(0x468ll | (u64)(b) << 20)
-+#define OTX_CPT_VQX_DONE_ENA_W1S(b)	(0x470ll | (u64)(b) << 20)
-+#define OTX_CPT_VQX_DONE_ENA_W1C(b)	(0x478ll | (u64)(b) << 20)
-+#define OTX_CPT_VQX_MISC_INT(b)		(0x500ll | (u64)(b) << 20)
-+#define OTX_CPT_VQX_MISC_INT_W1S(b)	(0x508ll | (u64)(b) << 20)
-+#define OTX_CPT_VQX_MISC_ENA_W1S(b)	(0x510ll | (u64)(b) << 20)
-+#define OTX_CPT_VQX_MISC_ENA_W1C(b)	(0x518ll | (u64)(b) << 20)
-+#define OTX_CPT_VQX_DOORBELL(b)		(0x600ll | (u64)(b) << 20)
-+#define OTX_CPT_VFX_PF_MBOXX(b, c)	(0x1000ll | ((b) << 20) | ((c) << 3))
-+
-+/*
-+ * Enumeration otx_cpt_ucode_error_code_e
-+ *
-+ * Enumerates ucode errors
-+ */
-+enum otx_cpt_ucode_error_code_e {
-+	CPT_NO_UCODE_ERROR = 0x00,
-+	ERR_OPCODE_UNSUPPORTED = 0x01,
-+
-+	/* Scatter gather */
-+	ERR_SCATTER_GATHER_WRITE_LENGTH = 0x02,
-+	ERR_SCATTER_GATHER_LIST = 0x03,
-+	ERR_SCATTER_GATHER_NOT_SUPPORTED = 0x04,
-+
-+};
-+
-+/*
-+ * Enumeration otx_cpt_comp_e
-+ *
-+ * CPT OcteonTX Completion Enumeration
-+ * Enumerates the values of CPT_RES_S[COMPCODE].
-+ */
-+enum otx_cpt_comp_e {
-+	CPT_COMP_E_NOTDONE = 0x00,
-+	CPT_COMP_E_GOOD = 0x01,
-+	CPT_COMP_E_FAULT = 0x02,
-+	CPT_COMP_E_SWERR = 0x03,
-+	CPT_COMP_E_HWERR = 0x04,
-+	CPT_COMP_E_LAST_ENTRY = 0x05
-+};
-+
-+/*
-+ * Enumeration otx_cpt_vf_int_vec_e
-+ *
-+ * CPT OcteonTX VF MSI-X Vector Enumeration
-+ * Enumerates the MSI-X interrupt vectors.
-+ */
-+enum otx_cpt_vf_int_vec_e {
-+	CPT_VF_INT_VEC_E_MISC = 0x00,
-+	CPT_VF_INT_VEC_E_DONE = 0x01
-+};
-+
-+/*
-+ * Structure cpt_inst_s
-+ *
-+ * CPT Instruction Structure
-+ * This structure specifies the instruction layout. Instructions are
-+ * stored in memory as little-endian unless CPT()_PF_Q()_CTL[INST_BE] is set.
-+ * cpt_inst_s_s
-+ * Word 0
-+ * doneint:1 Done interrupt.
-+ *	0 = No interrupts related to this instruction.
-+ *	1 = When the instruction completes, CPT()_VQ()_DONE[DONE] will be
-+ *	incremented,and based on the rules described there an interrupt may
-+ *	occur.
-+ * Word 1
-+ * res_addr [127: 64] Result IOVA.
-+ *	If nonzero, specifies where to write CPT_RES_S.
-+ *	If zero, no result structure will be written.
-+ *	Address must be 16-byte aligned.
-+ *	Bits <63:49> are ignored by hardware; software should use a
-+ *	sign-extended bit <48> for forward compatibility.
-+ * Word 2
-+ *  grp:10 [171:162] If [WQ_PTR] is nonzero, the SSO guest-group to use when
-+ *	CPT submits work SSO.
-+ *	For the SSO to not discard the add-work request, FPA_PF_MAP() must map
-+ *	[GRP] and CPT()_PF_Q()_GMCTL[GMID] as valid.
-+ *  tt:2 [161:160] If [WQ_PTR] is nonzero, the SSO tag type to use when CPT
-+ *	submits work to SSO
-+ *  tag:32 [159:128] If [WQ_PTR] is nonzero, the SSO tag to use when CPT
-+ *	submits work to SSO.
-+ * Word 3
-+ *  wq_ptr [255:192] If [WQ_PTR] is nonzero, it is a pointer to a
-+ *	work-queue entry that CPT submits work to SSO after all context,
-+ *	output data, and result write operations are visible to other
-+ *	CNXXXX units and the cores. Bits <2:0> must be zero.
-+ *	Bits <63:49> are ignored by hardware; software should
-+ *	use a sign-extended bit <48> for forward compatibility.
-+ *	Internal:
-+ *	Bits <63:49>, <2:0> are ignored by hardware, treated as always 0x0.
-+ * Word 4
-+ *  ei0; [319:256] Engine instruction word 0. Passed to the AE/SE.
-+ * Word 5
-+ *  ei1; [383:320] Engine instruction word 1. Passed to the AE/SE.
-+ * Word 6
-+ *  ei2; [447:384] Engine instruction word 1. Passed to the AE/SE.
-+ * Word 7
-+ *  ei3; [511:448] Engine instruction word 1. Passed to the AE/SE.
-+ *
-+ */
-+union otx_cpt_inst_s {
-+	u64 u[8];
-+
-+	struct {
-+#if defined(__BIG_ENDIAN_BITFIELD) /* Word 0 - Big Endian */
-+		u64 reserved_17_63:47;
-+		u64 doneint:1;
-+		u64 reserved_0_15:16;
-+#else /* Word 0 - Little Endian */
-+		u64 reserved_0_15:16;
-+		u64 doneint:1;
-+		u64 reserved_17_63:47;
-+#endif /* Word 0 - End */
-+		u64 res_addr;
-+#if defined(__BIG_ENDIAN_BITFIELD) /* Word 2 - Big Endian */
-+		u64 reserved_172_191:20;
-+		u64 grp:10;
-+		u64 tt:2;
-+		u64 tag:32;
-+#else /* Word 2 - Little Endian */
-+		u64 tag:32;
-+		u64 tt:2;
-+		u64 grp:10;
-+		u64 reserved_172_191:20;
-+#endif /* Word 2 - End */
-+		u64 wq_ptr;
-+		u64 ei0;
-+		u64 ei1;
-+		u64 ei2;
-+		u64 ei3;
-+	} s;
-+};
-+
-+/*
-+ * Structure cpt_res_s
-+ *
-+ * CPT Result Structure
-+ * The CPT coprocessor writes the result structure after it completes a
-+ * CPT_INST_S instruction. The result structure is exactly 16 bytes, and
-+ * each instruction completion produces exactly one result structure.
-+ *
-+ * This structure is stored in memory as little-endian unless
-+ * CPT()_PF_Q()_CTL[INST_BE] is set.
-+ * cpt_res_s_s
-+ * Word 0
-+ *  doneint:1 [16:16] Done interrupt. This bit is copied from the
-+ *	corresponding instruction's CPT_INST_S[DONEINT].
-+ *  compcode:8 [7:0] Indicates completion/error status of the CPT coprocessor
-+ *	for the	associated instruction, as enumerated by CPT_COMP_E.
-+ *	Core software may write the memory location containing [COMPCODE] to
-+ *	0x0 before ringing the doorbell, and then poll for completion by
-+ *	checking for a nonzero value.
-+ *	Once the core observes a nonzero [COMPCODE] value in this case,the CPT
-+ *	coprocessor will have also completed L2/DRAM write operations.
-+ * Word 1
-+ *  reserved
-+ *
-+ */
-+union otx_cpt_res_s {
-+	u64 u[2];
-+	struct {
-+#if defined(__BIG_ENDIAN_BITFIELD) /* Word 0 - Big Endian */
-+		u64 reserved_17_63:47;
-+		u64 doneint:1;
-+		u64 reserved_8_15:8;
-+		u64 compcode:8;
-+#else /* Word 0 - Little Endian */
-+		u64 compcode:8;
-+		u64 reserved_8_15:8;
-+		u64 doneint:1;
-+		u64 reserved_17_63:47;
-+#endif /* Word 0 - End */
-+		u64 reserved_64_127;
-+	} s;
-+};
-+
- /*
-  * Register (NCB) otx_cpt#_pf_bist_status
-  *
-@@ -246,4 +451,374 @@
- #endif /* Word 0 - End */
- 	} s;
- };
--#endif /* __OTX_CPT_HW_TYPES_H */
-+
-+/*
-+ * Register (NCB) otx_cpt#_vq#_saddr
-+ *
-+ * CPT Queue Starting Buffer Address Registers
-+ * These registers set the instruction buffer starting address.
-+ * otx_cptx_vqx_saddr_s
-+ * Word0
-+ *  reserved_49_63:15 [63:49] Reserved.
-+ *  ptr:43 [48:6](R/W/H) Instruction buffer IOVA <48:6> (64-byte aligned).
-+ *	When written, it is the initial buffer starting address; when read,
-+ *	it is the next read pointer to be requested from L2C. The PTR field
-+ *	is overwritten with the next pointer each time that the command buffer
-+ *	segment is exhausted. New commands will then be read from the newly
-+ *	specified command buffer pointer.
-+ *  reserved_0_5:6 [5:0] Reserved.
-+ *
-+ */
-+union otx_cptx_vqx_saddr {
-+	u64 u;
-+	struct otx_cptx_vqx_saddr_s {
-+#if defined(__BIG_ENDIAN_BITFIELD) /* Word 0 - Big Endian */
-+		u64 reserved_49_63:15;
-+		u64 ptr:43;
-+		u64 reserved_0_5:6;
-+#else /* Word 0 - Little Endian */
-+		u64 reserved_0_5:6;
-+		u64 ptr:43;
-+		u64 reserved_49_63:15;
-+#endif /* Word 0 - End */
-+	} s;
-+};
-+
-+/*
-+ * Register (NCB) otx_cpt#_vq#_misc_ena_w1s
-+ *
-+ * CPT Queue Misc Interrupt Enable Set Register
-+ * This register sets interrupt enable bits.
-+ * otx_cptx_vqx_misc_ena_w1s_s
-+ * Word0
-+ * reserved_5_63:59 [63:5] Reserved.
-+ * swerr:1 [4:4](R/W1S/H) Reads or sets enable for
-+ *	CPT(0..1)_VQ(0..63)_MISC_INT[SWERR].
-+ * nwrp:1 [3:3](R/W1S/H) Reads or sets enable for
-+ *	CPT(0..1)_VQ(0..63)_MISC_INT[NWRP].
-+ * irde:1 [2:2](R/W1S/H) Reads or sets enable for
-+ *	CPT(0..1)_VQ(0..63)_MISC_INT[IRDE].
-+ * dovf:1 [1:1](R/W1S/H) Reads or sets enable for
-+ *	CPT(0..1)_VQ(0..63)_MISC_INT[DOVF].
-+ * mbox:1 [0:0](R/W1S/H) Reads or sets enable for
-+ *	CPT(0..1)_VQ(0..63)_MISC_INT[MBOX].
-+ *
-+ */
-+union otx_cptx_vqx_misc_ena_w1s {
-+	u64 u;
-+	struct otx_cptx_vqx_misc_ena_w1s_s {
-+#if defined(__BIG_ENDIAN_BITFIELD) /* Word 0 - Big Endian */
-+		u64 reserved_5_63:59;
-+		u64 swerr:1;
-+		u64 nwrp:1;
-+		u64 irde:1;
-+		u64 dovf:1;
-+		u64 mbox:1;
-+#else /* Word 0 - Little Endian */
-+		u64 mbox:1;
-+		u64 dovf:1;
-+		u64 irde:1;
-+		u64 nwrp:1;
-+		u64 swerr:1;
-+		u64 reserved_5_63:59;
-+#endif /* Word 0 - End */
-+	} s;
-+};
-+
-+/*
-+ * Register (NCB) otx_cpt#_vq#_doorbell
-+ *
-+ * CPT Queue Doorbell Registers
-+ * Doorbells for the CPT instruction queues.
-+ * otx_cptx_vqx_doorbell_s
-+ * Word0
-+ *  reserved_20_63:44 [63:20] Reserved.
-+ *  dbell_cnt:20 [19:0](R/W/H) Number of instruction queue 64-bit words to add
-+ *	to the CPT instruction doorbell count. Readback value is the the
-+ *	current number of pending doorbell requests. If counter overflows
-+ *	CPT()_VQ()_MISC_INT[DBELL_DOVF] is set. To reset the count back to
-+ *	zero, write one to clear CPT()_VQ()_MISC_INT_ENA_W1C[DBELL_DOVF],
-+ *	then write a value of 2^20 minus the read [DBELL_CNT], then write one
-+ *	to CPT()_VQ()_MISC_INT_W1C[DBELL_DOVF] and
-+ *	CPT()_VQ()_MISC_INT_ENA_W1S[DBELL_DOVF]. Must be a multiple of 8.
-+ *	All CPT instructions are 8 words and require a doorbell count of
-+ *	multiple of 8.
-+ */
-+union otx_cptx_vqx_doorbell {
-+	u64 u;
-+	struct otx_cptx_vqx_doorbell_s {
-+#if defined(__BIG_ENDIAN_BITFIELD) /* Word 0 - Big Endian */
-+		u64 reserved_20_63:44;
-+		u64 dbell_cnt:20;
-+#else /* Word 0 - Little Endian */
-+		u64 dbell_cnt:20;
-+		u64 reserved_20_63:44;
-+#endif /* Word 0 - End */
-+	} s;
-+};
-+
-+/*
-+ * Register (NCB) otx_cpt#_vq#_inprog
-+ *
-+ * CPT Queue In Progress Count Registers
-+ * These registers contain the per-queue instruction in flight registers.
-+ * otx_cptx_vqx_inprog_s
-+ * Word0
-+ *  reserved_8_63:56 [63:8] Reserved.
-+ *  inflight:8 [7:0](RO/H) Inflight count. Counts the number of instructions
-+ *	for the VF for which CPT is fetching, executing or responding to
-+ *	instructions. However this does not include any interrupts that are
-+ *	awaiting software handling (CPT()_VQ()_DONE[DONE] != 0x0).
-+ *	A queue may not be reconfigured until:
-+ *	1. CPT()_VQ()_CTL[ENA] is cleared by software.
-+ *	2. [INFLIGHT] is polled until equals to zero.
-+ */
-+union otx_cptx_vqx_inprog {
-+	u64 u;
-+	struct otx_cptx_vqx_inprog_s {
-+#if defined(__BIG_ENDIAN_BITFIELD) /* Word 0 - Big Endian */
-+		u64 reserved_8_63:56;
-+		u64 inflight:8;
-+#else /* Word 0 - Little Endian */
-+		u64 inflight:8;
-+		u64 reserved_8_63:56;
-+#endif /* Word 0 - End */
-+	} s;
-+};
-+
-+/*
-+ * Register (NCB) otx_cpt#_vq#_misc_int
-+ *
-+ * CPT Queue Misc Interrupt Register
-+ * These registers contain the per-queue miscellaneous interrupts.
-+ * otx_cptx_vqx_misc_int_s
-+ * Word 0
-+ *  reserved_5_63:59 [63:5] Reserved.
-+ *  swerr:1 [4:4](R/W1C/H) Software error from engines.
-+ *  nwrp:1  [3:3](R/W1C/H) NCB result write response error.
-+ *  irde:1  [2:2](R/W1C/H) Instruction NCB read response error.
-+ *  dovf:1 [1:1](R/W1C/H) Doorbell overflow.
-+ *  mbox:1 [0:0](R/W1C/H) PF to VF mailbox interrupt. Set when
-+ *	CPT()_VF()_PF_MBOX(0) is written.
-+ *
-+ */
-+union otx_cptx_vqx_misc_int {
-+	u64 u;
-+	struct otx_cptx_vqx_misc_int_s {
-+#if defined(__BIG_ENDIAN_BITFIELD) /* Word 0 - Big Endian */
-+		u64 reserved_5_63:59;
-+		u64 swerr:1;
-+		u64 nwrp:1;
-+		u64 irde:1;
-+		u64 dovf:1;
-+		u64 mbox:1;
-+#else /* Word 0 - Little Endian */
-+		u64 mbox:1;
-+		u64 dovf:1;
-+		u64 irde:1;
-+		u64 nwrp:1;
-+		u64 swerr:1;
-+		u64 reserved_5_63:59;
-+#endif /* Word 0 - End */
-+	} s;
-+};
-+
-+/*
-+ * Register (NCB) otx_cpt#_vq#_done_ack
-+ *
-+ * CPT Queue Done Count Ack Registers
-+ * This register is written by software to acknowledge interrupts.
-+ * otx_cptx_vqx_done_ack_s
-+ * Word0
-+ *  reserved_20_63:44 [63:20] Reserved.
-+ *  done_ack:20 [19:0](R/W/H) Number of decrements to CPT()_VQ()_DONE[DONE].
-+ *	Reads CPT()_VQ()_DONE[DONE]. Written by software to acknowledge
-+ *	interrupts. If CPT()_VQ()_DONE[DONE] is still nonzero the interrupt
-+ *	will be re-sent if the conditions described in CPT()_VQ()_DONE[DONE]
-+ *	are satisfied.
-+ *
-+ */
-+union otx_cptx_vqx_done_ack {
-+	u64 u;
-+	struct otx_cptx_vqx_done_ack_s {
-+#if defined(__BIG_ENDIAN_BITFIELD) /* Word 0 - Big Endian */
-+		u64 reserved_20_63:44;
-+		u64 done_ack:20;
-+#else /* Word 0 - Little Endian */
-+		u64 done_ack:20;
-+		u64 reserved_20_63:44;
-+#endif /* Word 0 - End */
-+	} s;
-+};
-+
-+/*
-+ * Register (NCB) otx_cpt#_vq#_done
-+ *
-+ * CPT Queue Done Count Registers
-+ * These registers contain the per-queue instruction done count.
-+ * cptx_vqx_done_s
-+ * Word0
-+ *  reserved_20_63:44 [63:20] Reserved.
-+ *  done:20 [19:0](R/W/H) Done count. When CPT_INST_S[DONEINT] set and that
-+ *	instruction completes, CPT()_VQ()_DONE[DONE] is incremented when the
-+ *	instruction finishes. Write to this field are for diagnostic use only;
-+ *	instead software writes CPT()_VQ()_DONE_ACK with the number of
-+ *	decrements for this field.
-+ *	Interrupts are sent as follows:
-+ *	* When CPT()_VQ()_DONE[DONE] = 0, then no results are pending, the
-+ *	interrupt coalescing timer is held to zero, and an interrupt is not
-+ *	sent.
-+ *	* When CPT()_VQ()_DONE[DONE] != 0, then the interrupt coalescing timer
-+ *	counts. If the counter is >= CPT()_VQ()_DONE_WAIT[TIME_WAIT]*1024, or
-+ *	CPT()_VQ()_DONE[DONE] >= CPT()_VQ()_DONE_WAIT[NUM_WAIT], i.e. enough
-+ *	time has passed or enough results have arrived, then the interrupt is
-+ *	sent.
-+ *	* When CPT()_VQ()_DONE_ACK is written (or CPT()_VQ()_DONE is written
-+ *	but this is not typical), the interrupt coalescing timer restarts.
-+ *	Note after decrementing this interrupt equation is recomputed,
-+ *	for example if CPT()_VQ()_DONE[DONE] >= CPT()_VQ()_DONE_WAIT[NUM_WAIT]
-+ *	and because the timer is zero, the interrupt will be resent immediately.
-+ *	(This covers the race case between software acknowledging an interrupt
-+ *	and a result returning.)
-+ *	* When CPT()_VQ()_DONE_ENA_W1S[DONE] = 0, interrupts are not sent,
-+ *	but the counting described above still occurs.
-+ *	Since CPT instructions complete out-of-order, if software is using
-+ *	completion interrupts the suggested scheme is to request a DONEINT on
-+ *	each request, and when an interrupt arrives perform a "greedy" scan for
-+ *	completions; even if a later command is acknowledged first this will
-+ *	not result in missing a completion.
-+ *	Software is responsible for making sure [DONE] does not overflow;
-+ *	for example by insuring there are not more than 2^20-1 instructions in
-+ *	flight that may request interrupts.
-+ *
-+ */
-+union otx_cptx_vqx_done {
-+	u64 u;
-+	struct otx_cptx_vqx_done_s {
-+#if defined(__BIG_ENDIAN_BITFIELD) /* Word 0 - Big Endian */
-+		u64 reserved_20_63:44;
-+		u64 done:20;
-+#else /* Word 0 - Little Endian */
-+		u64 done:20;
-+		u64 reserved_20_63:44;
-+#endif /* Word 0 - End */
-+	} s;
-+};
-+
-+/*
-+ * Register (NCB) otx_cpt#_vq#_done_wait
-+ *
-+ * CPT Queue Done Interrupt Coalescing Wait Registers
-+ * Specifies the per queue interrupt coalescing settings.
-+ * cptx_vqx_done_wait_s
-+ * Word0
-+ *  reserved_48_63:16 [63:48] Reserved.
-+ *  time_wait:16; [47:32](R/W) Time hold-off. When CPT()_VQ()_DONE[DONE] = 0
-+ *	or CPT()_VQ()_DONE_ACK is written a timer is cleared. When the timer
-+ *	reaches [TIME_WAIT]*1024 then interrupt coalescing ends.
-+ *	see CPT()_VQ()_DONE[DONE]. If 0x0, time coalescing is disabled.
-+ *  reserved_20_31:12 [31:20] Reserved.
-+ *  num_wait:20 [19:0](R/W) Number of messages hold-off.
-+ *	When CPT()_VQ()_DONE[DONE] >= [NUM_WAIT] then interrupt coalescing ends
-+ *	see CPT()_VQ()_DONE[DONE]. If 0x0, same behavior as 0x1.
-+ *
-+ */
-+union otx_cptx_vqx_done_wait {
-+	u64 u;
-+	struct otx_cptx_vqx_done_wait_s {
-+#if defined(__BIG_ENDIAN_BITFIELD) /* Word 0 - Big Endian */
-+		u64 reserved_48_63:16;
-+		u64 time_wait:16;
-+		u64 reserved_20_31:12;
-+		u64 num_wait:20;
-+#else /* Word 0 - Little Endian */
-+		u64 num_wait:20;
-+		u64 reserved_20_31:12;
-+		u64 time_wait:16;
-+		u64 reserved_48_63:16;
-+#endif /* Word 0 - End */
-+	} s;
-+};
-+
-+/*
-+ * Register (NCB) otx_cpt#_vq#_done_ena_w1s
-+ *
-+ * CPT Queue Done Interrupt Enable Set Registers
-+ * Write 1 to these registers will enable the DONEINT interrupt for the queue.
-+ * cptx_vqx_done_ena_w1s_s
-+ * Word0
-+ *  reserved_1_63:63 [63:1] Reserved.
-+ *  done:1 [0:0](R/W1S/H) Write 1 will enable DONEINT for this queue.
-+ *	Write 0 has no effect. Read will return the enable bit.
-+ */
-+union otx_cptx_vqx_done_ena_w1s {
-+	u64 u;
-+	struct otx_cptx_vqx_done_ena_w1s_s {
-+#if defined(__BIG_ENDIAN_BITFIELD) /* Word 0 - Big Endian */
-+		u64 reserved_1_63:63;
-+		u64 done:1;
-+#else /* Word 0 - Little Endian */
-+		u64 done:1;
-+		u64 reserved_1_63:63;
-+#endif /* Word 0 - End */
-+	} s;
-+};
-+
-+/*
-+ * Register (NCB) otx_cpt#_vq#_ctl
-+ *
-+ * CPT VF Queue Control Registers
-+ * This register configures queues. This register should be changed (other than
-+ * clearing [ENA]) only when quiescent (see CPT()_VQ()_INPROG[INFLIGHT]).
-+ * cptx_vqx_ctl_s
-+ * Word0
-+ *  reserved_1_63:63 [63:1] Reserved.
-+ *  ena:1 [0:0](R/W/H) Enables the logical instruction queue.
-+ *	See also CPT()_PF_Q()_CTL[CONT_ERR] and	CPT()_VQ()_INPROG[INFLIGHT].
-+ *	1 = Queue is enabled.
-+ *	0 = Queue is disabled.
-+ */
-+union otx_cptx_vqx_ctl {
-+	u64 u;
-+	struct otx_cptx_vqx_ctl_s {
-+#if defined(__BIG_ENDIAN_BITFIELD) /* Word 0 - Big Endian */
-+		u64 reserved_1_63:63;
-+		u64 ena:1;
-+#else /* Word 0 - Little Endian */
-+		u64 ena:1;
-+		u64 reserved_1_63:63;
-+#endif /* Word 0 - End */
-+	} s;
-+};
-+
-+/*
-+ * Error Address/Error Codes
-+ *
-+ * In the event of a severe error, microcode writes an 8-byte Error Code
-+ * value (ECODE) to host memory at the Rptr address specified by the host
-+ * system (in the 64-byte request).
-+ *
-+ * Word0
-+ *  [63:56](R) 8-bit completion code
-+ *  [55:48](R) Number of the core that reported the severe error
-+ *  [47:0] Lower 6 bytes of M-Inst word2. Used to assist in uniquely
-+ *  identifying which specific instruction caused the error. This assumes
-+ *  that each instruction has a unique result location (RPTR), at least
-+ *  for a given period of time.
-+ */
-+union otx_cpt_error_code {
-+	u64 u;
-+	struct otx_cpt_error_code_s {
-+#if defined(__BIG_ENDIAN_BITFIELD) /* Word 0 - Big Endian */
-+		uint64_t ccode:8;
-+		uint64_t coreid:8;
-+		uint64_t rptr6:48;
-+#else /* Word 0 - Little Endian */
-+		uint64_t rptr6:48;
-+		uint64_t coreid:8;
-+		uint64_t ccode:8;
-+#endif /* Word 0 - End */
-+	} s;
-+};
-+
-+#endif /*__OTX_CPT_HW_TYPES_H */
-diff --git a/drivers/crypto/marvell/octeontx/otx_cptvf.h b/drivers/crypto/marvell/octeontx/otx_cptvf.h
+ config CRYPTO_DEV_CAVIUM_ZIP
+ 	tristate "Cavium ZIP driver"
+diff --git a/drivers/crypto/Makefile b/drivers/crypto/Makefile
+index 40229d4..2306d41 100644
+--- a/drivers/crypto/Makefile
++++ b/drivers/crypto/Makefile
+@@ -18,7 +18,7 @@ obj-$(CONFIG_CRYPTO_DEV_GEODE) += geode-aes.o
+ obj-$(CONFIG_CRYPTO_DEV_HIFN_795X) += hifn_795x.o
+ obj-$(CONFIG_CRYPTO_DEV_IMGTEC_HASH) += img-hash.o
+ obj-$(CONFIG_CRYPTO_DEV_IXP4XX) += ixp4xx_crypto.o
+-obj-$(CONFIG_CRYPTO_DEV_MARVELL_CESA) += marvell/
++obj-$(CONFIG_CRYPTO_DEV_MARVELL) += marvell/
+ obj-$(CONFIG_CRYPTO_DEV_MEDIATEK) += mediatek/
+ obj-$(CONFIG_CRYPTO_DEV_MXS_DCP) += mxs-dcp.o
+ obj-$(CONFIG_CRYPTO_DEV_NIAGARA2) += n2_crypto.o
+diff --git a/drivers/crypto/marvell/Kconfig b/drivers/crypto/marvell/Kconfig
 new file mode 100644
-index 0000000..dd02f21
+index 0000000..9f09845
 --- /dev/null
-+++ b/drivers/crypto/marvell/octeontx/otx_cptvf.h
-@@ -0,0 +1,104 @@
-+/* SPDX-License-Identifier: GPL-2.0
-+ * Marvell OcteonTX CPT driver
-+ *
-+ * Copyright (C) 2019 Marvell International Ltd.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ */
++++ b/drivers/crypto/marvell/Kconfig
+@@ -0,0 +1,21 @@
++#
++# Marvell crypto drivers configuration
++#
 +
-+#ifndef __OTX_CPTVF_H
-+#define __OTX_CPTVF_H
++config CRYPTO_DEV_MARVELL
++	tristate
 +
-+#include <linux/list.h>
-+#include <linux/interrupt.h>
-+#include <linux/device.h>
-+#include "otx_cpt_common.h"
-+#include "otx_cptvf_reqmgr.h"
++config CRYPTO_DEV_MARVELL_CESA
++	tristate "Marvell's Cryptographic Engine driver"
++	depends on PLAT_ORION || ARCH_MVEBU
++	select CRYPTO_LIB_AES
++	select CRYPTO_LIB_DES
++	select CRYPTO_BLKCIPHER
++	select CRYPTO_HASH
++	select SRAM
++	select CRYPTO_DEV_MARVELL
++	help
++	  This driver allows you to utilize the Cryptographic Engines and
++	  Security Accelerator (CESA) which can be found on MVEBU and ORION
++	  platforms.
++	  This driver supports CPU offload through DMA transfers.
+diff --git a/drivers/crypto/marvell/Makefile b/drivers/crypto/marvell/Makefile
+index b27cab6..2030b0b 100644
+--- a/drivers/crypto/marvell/Makefile
++++ b/drivers/crypto/marvell/Makefile
+@@ -1,3 +1,3 @@
+-# SPDX-License-Identifier: GPL-2.0-only
+-obj-$(CONFIG_CRYPTO_DEV_MARVELL_CESA) += marvell-cesa.o
+-marvell-cesa-objs := cesa.o cipher.o hash.o tdma.o
++# SPDX-License-Identifier: GPL-2.0
 +
-+/* Flags to indicate the features supported */
-+#define OTX_CPT_FLAG_DEVICE_READY  BIT(1)
-+#define otx_cpt_device_ready(cpt)  ((cpt)->flags & OTX_CPT_FLAG_DEVICE_READY)
-+/* Default command queue length */
-+#define OTX_CPT_CMD_QLEN	(4*2046)
-+#define OTX_CPT_CMD_QCHUNK_SIZE	1023
-+#define OTX_CPT_NUM_QS_PER_VF	1
-+
-+struct otx_cpt_cmd_chunk {
-+	u8 *head;
-+	dma_addr_t dma_addr;
-+	u32 size; /* Chunk size, max OTX_CPT_INST_CHUNK_MAX_SIZE */
-+	struct list_head nextchunk;
-+};
-+
-+struct otx_cpt_cmd_queue {
-+	u32 idx;	/* Command queue host write idx */
-+	u32 num_chunks;	/* Number of command chunks */
-+	struct otx_cpt_cmd_chunk *qhead;/*
-+					 * Command queue head, instructions
-+					 * are inserted here
-+					 */
-+	struct otx_cpt_cmd_chunk *base;
-+	struct list_head chead;
-+};
-+
-+struct otx_cpt_cmd_qinfo {
-+	u32 qchunksize; /* Command queue chunk size */
-+	struct otx_cpt_cmd_queue queue[OTX_CPT_NUM_QS_PER_VF];
-+};
-+
-+struct otx_cpt_pending_qinfo {
-+	u32 num_queues;	/* Number of queues supported */
-+	struct otx_cpt_pending_queue queue[OTX_CPT_NUM_QS_PER_VF];
-+};
-+
-+#define for_each_pending_queue(qinfo, q, i)	\
-+		for (i = 0, q = &qinfo->queue[i]; i < qinfo->num_queues; i++, \
-+		     q = &qinfo->queue[i])
-+
-+struct otx_cptvf_wqe {
-+	struct tasklet_struct twork;
-+	struct otx_cptvf *cptvf;
-+};
-+
-+struct otx_cptvf_wqe_info {
-+	struct otx_cptvf_wqe vq_wqe[OTX_CPT_NUM_QS_PER_VF];
-+};
-+
-+struct otx_cptvf {
-+	u16 flags;	/* Flags to hold device status bits */
-+	u8 vfid;	/* Device Index 0...OTX_CPT_MAX_VF_NUM */
-+	u8 num_vfs;	/* Number of enabled VFs */
-+	u8 vftype;	/* VF type of SE_TYPE(2) or AE_TYPE(1) */
-+	u8 vfgrp;	/* VF group (0 - 8) */
-+	u8 node;	/* Operating node: Bits (46:44) in BAR0 address */
-+	u8 priority;	/*
-+			 * VF priority ring: 1-High proirity round
-+			 * robin ring;0-Low priority round robin ring;
-+			 */
-+	struct pci_dev *pdev;	/* Pci device handle */
-+	void __iomem *reg_base;	/* Register start address */
-+	void *wqe_info;		/* BH worker info */
-+	/* MSI-X */
-+	cpumask_var_t affinity_mask[OTX_CPT_VF_MSIX_VECTORS];
-+	/* Command and Pending queues */
-+	u32 qsize;
-+	u32 num_queues;
-+	struct otx_cpt_cmd_qinfo cqinfo; /* Command queue information */
-+	struct otx_cpt_pending_qinfo pqinfo; /* Pending queue information */
-+	/* VF-PF mailbox communication */
-+	bool pf_acked;
-+	bool pf_nacked;
-+};
-+
-+int otx_cptvf_send_vf_up(struct otx_cptvf *cptvf);
-+int otx_cptvf_send_vf_down(struct otx_cptvf *cptvf);
-+int otx_cptvf_send_vf_to_grp_msg(struct otx_cptvf *cptvf, int group);
-+int otx_cptvf_send_vf_priority_msg(struct otx_cptvf *cptvf);
-+int otx_cptvf_send_vq_size_msg(struct otx_cptvf *cptvf);
-+int otx_cptvf_check_pf_ready(struct otx_cptvf *cptvf);
-+void otx_cptvf_handle_mbox_intr(struct otx_cptvf *cptvf);
-+void otx_cptvf_write_vq_doorbell(struct otx_cptvf *cptvf, u32 val);
-+
-+#endif /* __OTX_CPTVF_H */
-diff --git a/drivers/crypto/marvell/octeontx/otx_cptvf_algs.c b/drivers/crypto/marvell/octeontx/otx_cptvf_algs.c
++obj-$(CONFIG_CRYPTO_DEV_MARVELL_CESA) += cesa/
+diff --git a/drivers/crypto/marvell/cesa.c b/drivers/crypto/marvell/cesa.c
+deleted file mode 100644
+index 8a5f0b0..0000000
+--- a/drivers/crypto/marvell/cesa.c
++++ /dev/null
+@@ -1,615 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-only
+-/*
+- * Support for Marvell's Cryptographic Engine and Security Accelerator (CESA)
+- * that can be found on the following platform: Orion, Kirkwood, Armada. This
+- * driver supports the TDMA engine on platforms on which it is available.
+- *
+- * Author: Boris Brezillon <boris.brezillon@free-electrons.com>
+- * Author: Arnaud Ebalard <arno@natisbad.org>
+- *
+- * This work is based on an initial version written by
+- * Sebastian Andrzej Siewior < sebastian at breakpoint dot cc >
+- */
+-
+-#include <linux/delay.h>
+-#include <linux/dma-mapping.h>
+-#include <linux/genalloc.h>
+-#include <linux/interrupt.h>
+-#include <linux/io.h>
+-#include <linux/kthread.h>
+-#include <linux/mbus.h>
+-#include <linux/platform_device.h>
+-#include <linux/scatterlist.h>
+-#include <linux/slab.h>
+-#include <linux/module.h>
+-#include <linux/clk.h>
+-#include <linux/of.h>
+-#include <linux/of_platform.h>
+-#include <linux/of_irq.h>
+-
+-#include "cesa.h"
+-
+-/* Limit of the crypto queue before reaching the backlog */
+-#define CESA_CRYPTO_DEFAULT_MAX_QLEN 128
+-
+-struct mv_cesa_dev *cesa_dev;
+-
+-struct crypto_async_request *
+-mv_cesa_dequeue_req_locked(struct mv_cesa_engine *engine,
+-			   struct crypto_async_request **backlog)
+-{
+-	struct crypto_async_request *req;
+-
+-	*backlog = crypto_get_backlog(&engine->queue);
+-	req = crypto_dequeue_request(&engine->queue);
+-
+-	if (!req)
+-		return NULL;
+-
+-	return req;
+-}
+-
+-static void mv_cesa_rearm_engine(struct mv_cesa_engine *engine)
+-{
+-	struct crypto_async_request *req = NULL, *backlog = NULL;
+-	struct mv_cesa_ctx *ctx;
+-
+-
+-	spin_lock_bh(&engine->lock);
+-	if (!engine->req) {
+-		req = mv_cesa_dequeue_req_locked(engine, &backlog);
+-		engine->req = req;
+-	}
+-	spin_unlock_bh(&engine->lock);
+-
+-	if (!req)
+-		return;
+-
+-	if (backlog)
+-		backlog->complete(backlog, -EINPROGRESS);
+-
+-	ctx = crypto_tfm_ctx(req->tfm);
+-	ctx->ops->step(req);
+-}
+-
+-static int mv_cesa_std_process(struct mv_cesa_engine *engine, u32 status)
+-{
+-	struct crypto_async_request *req;
+-	struct mv_cesa_ctx *ctx;
+-	int res;
+-
+-	req = engine->req;
+-	ctx = crypto_tfm_ctx(req->tfm);
+-	res = ctx->ops->process(req, status);
+-
+-	if (res == 0) {
+-		ctx->ops->complete(req);
+-		mv_cesa_engine_enqueue_complete_request(engine, req);
+-	} else if (res == -EINPROGRESS) {
+-		ctx->ops->step(req);
+-	}
+-
+-	return res;
+-}
+-
+-static int mv_cesa_int_process(struct mv_cesa_engine *engine, u32 status)
+-{
+-	if (engine->chain.first && engine->chain.last)
+-		return mv_cesa_tdma_process(engine, status);
+-
+-	return mv_cesa_std_process(engine, status);
+-}
+-
+-static inline void
+-mv_cesa_complete_req(struct mv_cesa_ctx *ctx, struct crypto_async_request *req,
+-		     int res)
+-{
+-	ctx->ops->cleanup(req);
+-	local_bh_disable();
+-	req->complete(req, res);
+-	local_bh_enable();
+-}
+-
+-static irqreturn_t mv_cesa_int(int irq, void *priv)
+-{
+-	struct mv_cesa_engine *engine = priv;
+-	struct crypto_async_request *req;
+-	struct mv_cesa_ctx *ctx;
+-	u32 status, mask;
+-	irqreturn_t ret = IRQ_NONE;
+-
+-	while (true) {
+-		int res;
+-
+-		mask = mv_cesa_get_int_mask(engine);
+-		status = readl(engine->regs + CESA_SA_INT_STATUS);
+-
+-		if (!(status & mask))
+-			break;
+-
+-		/*
+-		 * TODO: avoid clearing the FPGA_INT_STATUS if this not
+-		 * relevant on some platforms.
+-		 */
+-		writel(~status, engine->regs + CESA_SA_FPGA_INT_STATUS);
+-		writel(~status, engine->regs + CESA_SA_INT_STATUS);
+-
+-		/* Process fetched requests */
+-		res = mv_cesa_int_process(engine, status & mask);
+-		ret = IRQ_HANDLED;
+-
+-		spin_lock_bh(&engine->lock);
+-		req = engine->req;
+-		if (res != -EINPROGRESS)
+-			engine->req = NULL;
+-		spin_unlock_bh(&engine->lock);
+-
+-		ctx = crypto_tfm_ctx(req->tfm);
+-
+-		if (res && res != -EINPROGRESS)
+-			mv_cesa_complete_req(ctx, req, res);
+-
+-		/* Launch the next pending request */
+-		mv_cesa_rearm_engine(engine);
+-
+-		/* Iterate over the complete queue */
+-		while (true) {
+-			req = mv_cesa_engine_dequeue_complete_request(engine);
+-			if (!req)
+-				break;
+-
+-			ctx = crypto_tfm_ctx(req->tfm);
+-			mv_cesa_complete_req(ctx, req, 0);
+-		}
+-	}
+-
+-	return ret;
+-}
+-
+-int mv_cesa_queue_req(struct crypto_async_request *req,
+-		      struct mv_cesa_req *creq)
+-{
+-	int ret;
+-	struct mv_cesa_engine *engine = creq->engine;
+-
+-	spin_lock_bh(&engine->lock);
+-	ret = crypto_enqueue_request(&engine->queue, req);
+-	if ((mv_cesa_req_get_type(creq) == CESA_DMA_REQ) &&
+-	    (ret == -EINPROGRESS || ret == -EBUSY))
+-		mv_cesa_tdma_chain(engine, creq);
+-	spin_unlock_bh(&engine->lock);
+-
+-	if (ret != -EINPROGRESS)
+-		return ret;
+-
+-	mv_cesa_rearm_engine(engine);
+-
+-	return -EINPROGRESS;
+-}
+-
+-static int mv_cesa_add_algs(struct mv_cesa_dev *cesa)
+-{
+-	int ret;
+-	int i, j;
+-
+-	for (i = 0; i < cesa->caps->ncipher_algs; i++) {
+-		ret = crypto_register_skcipher(cesa->caps->cipher_algs[i]);
+-		if (ret)
+-			goto err_unregister_crypto;
+-	}
+-
+-	for (i = 0; i < cesa->caps->nahash_algs; i++) {
+-		ret = crypto_register_ahash(cesa->caps->ahash_algs[i]);
+-		if (ret)
+-			goto err_unregister_ahash;
+-	}
+-
+-	return 0;
+-
+-err_unregister_ahash:
+-	for (j = 0; j < i; j++)
+-		crypto_unregister_ahash(cesa->caps->ahash_algs[j]);
+-	i = cesa->caps->ncipher_algs;
+-
+-err_unregister_crypto:
+-	for (j = 0; j < i; j++)
+-		crypto_unregister_skcipher(cesa->caps->cipher_algs[j]);
+-
+-	return ret;
+-}
+-
+-static void mv_cesa_remove_algs(struct mv_cesa_dev *cesa)
+-{
+-	int i;
+-
+-	for (i = 0; i < cesa->caps->nahash_algs; i++)
+-		crypto_unregister_ahash(cesa->caps->ahash_algs[i]);
+-
+-	for (i = 0; i < cesa->caps->ncipher_algs; i++)
+-		crypto_unregister_skcipher(cesa->caps->cipher_algs[i]);
+-}
+-
+-static struct skcipher_alg *orion_cipher_algs[] = {
+-	&mv_cesa_ecb_des_alg,
+-	&mv_cesa_cbc_des_alg,
+-	&mv_cesa_ecb_des3_ede_alg,
+-	&mv_cesa_cbc_des3_ede_alg,
+-	&mv_cesa_ecb_aes_alg,
+-	&mv_cesa_cbc_aes_alg,
+-};
+-
+-static struct ahash_alg *orion_ahash_algs[] = {
+-	&mv_md5_alg,
+-	&mv_sha1_alg,
+-	&mv_ahmac_md5_alg,
+-	&mv_ahmac_sha1_alg,
+-};
+-
+-static struct skcipher_alg *armada_370_cipher_algs[] = {
+-	&mv_cesa_ecb_des_alg,
+-	&mv_cesa_cbc_des_alg,
+-	&mv_cesa_ecb_des3_ede_alg,
+-	&mv_cesa_cbc_des3_ede_alg,
+-	&mv_cesa_ecb_aes_alg,
+-	&mv_cesa_cbc_aes_alg,
+-};
+-
+-static struct ahash_alg *armada_370_ahash_algs[] = {
+-	&mv_md5_alg,
+-	&mv_sha1_alg,
+-	&mv_sha256_alg,
+-	&mv_ahmac_md5_alg,
+-	&mv_ahmac_sha1_alg,
+-	&mv_ahmac_sha256_alg,
+-};
+-
+-static const struct mv_cesa_caps orion_caps = {
+-	.nengines = 1,
+-	.cipher_algs = orion_cipher_algs,
+-	.ncipher_algs = ARRAY_SIZE(orion_cipher_algs),
+-	.ahash_algs = orion_ahash_algs,
+-	.nahash_algs = ARRAY_SIZE(orion_ahash_algs),
+-	.has_tdma = false,
+-};
+-
+-static const struct mv_cesa_caps kirkwood_caps = {
+-	.nengines = 1,
+-	.cipher_algs = orion_cipher_algs,
+-	.ncipher_algs = ARRAY_SIZE(orion_cipher_algs),
+-	.ahash_algs = orion_ahash_algs,
+-	.nahash_algs = ARRAY_SIZE(orion_ahash_algs),
+-	.has_tdma = true,
+-};
+-
+-static const struct mv_cesa_caps armada_370_caps = {
+-	.nengines = 1,
+-	.cipher_algs = armada_370_cipher_algs,
+-	.ncipher_algs = ARRAY_SIZE(armada_370_cipher_algs),
+-	.ahash_algs = armada_370_ahash_algs,
+-	.nahash_algs = ARRAY_SIZE(armada_370_ahash_algs),
+-	.has_tdma = true,
+-};
+-
+-static const struct mv_cesa_caps armada_xp_caps = {
+-	.nengines = 2,
+-	.cipher_algs = armada_370_cipher_algs,
+-	.ncipher_algs = ARRAY_SIZE(armada_370_cipher_algs),
+-	.ahash_algs = armada_370_ahash_algs,
+-	.nahash_algs = ARRAY_SIZE(armada_370_ahash_algs),
+-	.has_tdma = true,
+-};
+-
+-static const struct of_device_id mv_cesa_of_match_table[] = {
+-	{ .compatible = "marvell,orion-crypto", .data = &orion_caps },
+-	{ .compatible = "marvell,kirkwood-crypto", .data = &kirkwood_caps },
+-	{ .compatible = "marvell,dove-crypto", .data = &kirkwood_caps },
+-	{ .compatible = "marvell,armada-370-crypto", .data = &armada_370_caps },
+-	{ .compatible = "marvell,armada-xp-crypto", .data = &armada_xp_caps },
+-	{ .compatible = "marvell,armada-375-crypto", .data = &armada_xp_caps },
+-	{ .compatible = "marvell,armada-38x-crypto", .data = &armada_xp_caps },
+-	{}
+-};
+-MODULE_DEVICE_TABLE(of, mv_cesa_of_match_table);
+-
+-static void
+-mv_cesa_conf_mbus_windows(struct mv_cesa_engine *engine,
+-			  const struct mbus_dram_target_info *dram)
+-{
+-	void __iomem *iobase = engine->regs;
+-	int i;
+-
+-	for (i = 0; i < 4; i++) {
+-		writel(0, iobase + CESA_TDMA_WINDOW_CTRL(i));
+-		writel(0, iobase + CESA_TDMA_WINDOW_BASE(i));
+-	}
+-
+-	for (i = 0; i < dram->num_cs; i++) {
+-		const struct mbus_dram_window *cs = dram->cs + i;
+-
+-		writel(((cs->size - 1) & 0xffff0000) |
+-		       (cs->mbus_attr << 8) |
+-		       (dram->mbus_dram_target_id << 4) | 1,
+-		       iobase + CESA_TDMA_WINDOW_CTRL(i));
+-		writel(cs->base, iobase + CESA_TDMA_WINDOW_BASE(i));
+-	}
+-}
+-
+-static int mv_cesa_dev_dma_init(struct mv_cesa_dev *cesa)
+-{
+-	struct device *dev = cesa->dev;
+-	struct mv_cesa_dev_dma *dma;
+-
+-	if (!cesa->caps->has_tdma)
+-		return 0;
+-
+-	dma = devm_kzalloc(dev, sizeof(*dma), GFP_KERNEL);
+-	if (!dma)
+-		return -ENOMEM;
+-
+-	dma->tdma_desc_pool = dmam_pool_create("tdma_desc", dev,
+-					sizeof(struct mv_cesa_tdma_desc),
+-					16, 0);
+-	if (!dma->tdma_desc_pool)
+-		return -ENOMEM;
+-
+-	dma->op_pool = dmam_pool_create("cesa_op", dev,
+-					sizeof(struct mv_cesa_op_ctx), 16, 0);
+-	if (!dma->op_pool)
+-		return -ENOMEM;
+-
+-	dma->cache_pool = dmam_pool_create("cesa_cache", dev,
+-					   CESA_MAX_HASH_BLOCK_SIZE, 1, 0);
+-	if (!dma->cache_pool)
+-		return -ENOMEM;
+-
+-	dma->padding_pool = dmam_pool_create("cesa_padding", dev, 72, 1, 0);
+-	if (!dma->padding_pool)
+-		return -ENOMEM;
+-
+-	cesa->dma = dma;
+-
+-	return 0;
+-}
+-
+-static int mv_cesa_get_sram(struct platform_device *pdev, int idx)
+-{
+-	struct mv_cesa_dev *cesa = platform_get_drvdata(pdev);
+-	struct mv_cesa_engine *engine = &cesa->engines[idx];
+-	const char *res_name = "sram";
+-	struct resource *res;
+-
+-	engine->pool = of_gen_pool_get(cesa->dev->of_node,
+-				       "marvell,crypto-srams", idx);
+-	if (engine->pool) {
+-		engine->sram = gen_pool_dma_alloc(engine->pool,
+-						  cesa->sram_size,
+-						  &engine->sram_dma);
+-		if (engine->sram)
+-			return 0;
+-
+-		engine->pool = NULL;
+-		return -ENOMEM;
+-	}
+-
+-	if (cesa->caps->nengines > 1) {
+-		if (!idx)
+-			res_name = "sram0";
+-		else
+-			res_name = "sram1";
+-	}
+-
+-	res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
+-					   res_name);
+-	if (!res || resource_size(res) < cesa->sram_size)
+-		return -EINVAL;
+-
+-	engine->sram = devm_ioremap_resource(cesa->dev, res);
+-	if (IS_ERR(engine->sram))
+-		return PTR_ERR(engine->sram);
+-
+-	engine->sram_dma = dma_map_resource(cesa->dev, res->start,
+-					    cesa->sram_size,
+-					    DMA_BIDIRECTIONAL, 0);
+-	if (dma_mapping_error(cesa->dev, engine->sram_dma))
+-		return -ENOMEM;
+-
+-	return 0;
+-}
+-
+-static void mv_cesa_put_sram(struct platform_device *pdev, int idx)
+-{
+-	struct mv_cesa_dev *cesa = platform_get_drvdata(pdev);
+-	struct mv_cesa_engine *engine = &cesa->engines[idx];
+-
+-	if (engine->pool)
+-		gen_pool_free(engine->pool, (unsigned long)engine->sram,
+-			      cesa->sram_size);
+-	else
+-		dma_unmap_resource(cesa->dev, engine->sram_dma,
+-				   cesa->sram_size, DMA_BIDIRECTIONAL, 0);
+-}
+-
+-static int mv_cesa_probe(struct platform_device *pdev)
+-{
+-	const struct mv_cesa_caps *caps = &orion_caps;
+-	const struct mbus_dram_target_info *dram;
+-	const struct of_device_id *match;
+-	struct device *dev = &pdev->dev;
+-	struct mv_cesa_dev *cesa;
+-	struct mv_cesa_engine *engines;
+-	struct resource *res;
+-	int irq, ret, i;
+-	u32 sram_size;
+-
+-	if (cesa_dev) {
+-		dev_err(&pdev->dev, "Only one CESA device authorized\n");
+-		return -EEXIST;
+-	}
+-
+-	if (dev->of_node) {
+-		match = of_match_node(mv_cesa_of_match_table, dev->of_node);
+-		if (!match || !match->data)
+-			return -ENOTSUPP;
+-
+-		caps = match->data;
+-	}
+-
+-	cesa = devm_kzalloc(dev, sizeof(*cesa), GFP_KERNEL);
+-	if (!cesa)
+-		return -ENOMEM;
+-
+-	cesa->caps = caps;
+-	cesa->dev = dev;
+-
+-	sram_size = CESA_SA_DEFAULT_SRAM_SIZE;
+-	of_property_read_u32(cesa->dev->of_node, "marvell,crypto-sram-size",
+-			     &sram_size);
+-	if (sram_size < CESA_SA_MIN_SRAM_SIZE)
+-		sram_size = CESA_SA_MIN_SRAM_SIZE;
+-
+-	cesa->sram_size = sram_size;
+-	cesa->engines = devm_kcalloc(dev, caps->nengines, sizeof(*engines),
+-				     GFP_KERNEL);
+-	if (!cesa->engines)
+-		return -ENOMEM;
+-
+-	spin_lock_init(&cesa->lock);
+-
+-	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "regs");
+-	cesa->regs = devm_ioremap_resource(dev, res);
+-	if (IS_ERR(cesa->regs))
+-		return PTR_ERR(cesa->regs);
+-
+-	ret = mv_cesa_dev_dma_init(cesa);
+-	if (ret)
+-		return ret;
+-
+-	dram = mv_mbus_dram_info_nooverlap();
+-
+-	platform_set_drvdata(pdev, cesa);
+-
+-	for (i = 0; i < caps->nengines; i++) {
+-		struct mv_cesa_engine *engine = &cesa->engines[i];
+-		char res_name[7];
+-
+-		engine->id = i;
+-		spin_lock_init(&engine->lock);
+-
+-		ret = mv_cesa_get_sram(pdev, i);
+-		if (ret)
+-			goto err_cleanup;
+-
+-		irq = platform_get_irq(pdev, i);
+-		if (irq < 0) {
+-			ret = irq;
+-			goto err_cleanup;
+-		}
+-
+-		/*
+-		 * Not all platforms can gate the CESA clocks: do not complain
+-		 * if the clock does not exist.
+-		 */
+-		snprintf(res_name, sizeof(res_name), "cesa%d", i);
+-		engine->clk = devm_clk_get(dev, res_name);
+-		if (IS_ERR(engine->clk)) {
+-			engine->clk = devm_clk_get(dev, NULL);
+-			if (IS_ERR(engine->clk))
+-				engine->clk = NULL;
+-		}
+-
+-		snprintf(res_name, sizeof(res_name), "cesaz%d", i);
+-		engine->zclk = devm_clk_get(dev, res_name);
+-		if (IS_ERR(engine->zclk))
+-			engine->zclk = NULL;
+-
+-		ret = clk_prepare_enable(engine->clk);
+-		if (ret)
+-			goto err_cleanup;
+-
+-		ret = clk_prepare_enable(engine->zclk);
+-		if (ret)
+-			goto err_cleanup;
+-
+-		engine->regs = cesa->regs + CESA_ENGINE_OFF(i);
+-
+-		if (dram && cesa->caps->has_tdma)
+-			mv_cesa_conf_mbus_windows(engine, dram);
+-
+-		writel(0, engine->regs + CESA_SA_INT_STATUS);
+-		writel(CESA_SA_CFG_STOP_DIG_ERR,
+-		       engine->regs + CESA_SA_CFG);
+-		writel(engine->sram_dma & CESA_SA_SRAM_MSK,
+-		       engine->regs + CESA_SA_DESC_P0);
+-
+-		ret = devm_request_threaded_irq(dev, irq, NULL, mv_cesa_int,
+-						IRQF_ONESHOT,
+-						dev_name(&pdev->dev),
+-						engine);
+-		if (ret)
+-			goto err_cleanup;
+-
+-		crypto_init_queue(&engine->queue, CESA_CRYPTO_DEFAULT_MAX_QLEN);
+-		atomic_set(&engine->load, 0);
+-		INIT_LIST_HEAD(&engine->complete_queue);
+-	}
+-
+-	cesa_dev = cesa;
+-
+-	ret = mv_cesa_add_algs(cesa);
+-	if (ret) {
+-		cesa_dev = NULL;
+-		goto err_cleanup;
+-	}
+-
+-	dev_info(dev, "CESA device successfully registered\n");
+-
+-	return 0;
+-
+-err_cleanup:
+-	for (i = 0; i < caps->nengines; i++) {
+-		clk_disable_unprepare(cesa->engines[i].zclk);
+-		clk_disable_unprepare(cesa->engines[i].clk);
+-		mv_cesa_put_sram(pdev, i);
+-	}
+-
+-	return ret;
+-}
+-
+-static int mv_cesa_remove(struct platform_device *pdev)
+-{
+-	struct mv_cesa_dev *cesa = platform_get_drvdata(pdev);
+-	int i;
+-
+-	mv_cesa_remove_algs(cesa);
+-
+-	for (i = 0; i < cesa->caps->nengines; i++) {
+-		clk_disable_unprepare(cesa->engines[i].zclk);
+-		clk_disable_unprepare(cesa->engines[i].clk);
+-		mv_cesa_put_sram(pdev, i);
+-	}
+-
+-	return 0;
+-}
+-
+-static const struct platform_device_id mv_cesa_plat_id_table[] = {
+-	{ .name = "mv_crypto" },
+-	{ /* sentinel */ },
+-};
+-MODULE_DEVICE_TABLE(platform, mv_cesa_plat_id_table);
+-
+-static struct platform_driver marvell_cesa = {
+-	.probe		= mv_cesa_probe,
+-	.remove		= mv_cesa_remove,
+-	.id_table	= mv_cesa_plat_id_table,
+-	.driver		= {
+-		.name	= "marvell-cesa",
+-		.of_match_table = mv_cesa_of_match_table,
+-	},
+-};
+-module_platform_driver(marvell_cesa);
+-
+-MODULE_ALIAS("platform:mv_crypto");
+-MODULE_AUTHOR("Boris Brezillon <boris.brezillon@free-electrons.com>");
+-MODULE_AUTHOR("Arnaud Ebalard <arno@natisbad.org>");
+-MODULE_DESCRIPTION("Support for Marvell's cryptographic engine");
+-MODULE_LICENSE("GPL v2");
+diff --git a/drivers/crypto/marvell/cesa.h b/drivers/crypto/marvell/cesa.h
+deleted file mode 100644
+index f1ed3b8..0000000
+--- a/drivers/crypto/marvell/cesa.h
++++ /dev/null
+@@ -1,880 +0,0 @@
+-/* SPDX-License-Identifier: GPL-2.0 */
+-#ifndef __MARVELL_CESA_H__
+-#define __MARVELL_CESA_H__
+-
+-#include <crypto/algapi.h>
+-#include <crypto/hash.h>
+-#include <crypto/internal/hash.h>
+-#include <crypto/internal/skcipher.h>
+-
+-#include <linux/crypto.h>
+-#include <linux/dmapool.h>
+-
+-#define CESA_ENGINE_OFF(i)			(((i) * 0x2000))
+-
+-#define CESA_TDMA_BYTE_CNT			0x800
+-#define CESA_TDMA_SRC_ADDR			0x810
+-#define CESA_TDMA_DST_ADDR			0x820
+-#define CESA_TDMA_NEXT_ADDR			0x830
+-
+-#define CESA_TDMA_CONTROL			0x840
+-#define CESA_TDMA_DST_BURST			GENMASK(2, 0)
+-#define CESA_TDMA_DST_BURST_32B			3
+-#define CESA_TDMA_DST_BURST_128B		4
+-#define CESA_TDMA_OUT_RD_EN			BIT(4)
+-#define CESA_TDMA_SRC_BURST			GENMASK(8, 6)
+-#define CESA_TDMA_SRC_BURST_32B			(3 << 6)
+-#define CESA_TDMA_SRC_BURST_128B		(4 << 6)
+-#define CESA_TDMA_CHAIN				BIT(9)
+-#define CESA_TDMA_BYTE_SWAP			BIT(11)
+-#define CESA_TDMA_NO_BYTE_SWAP			BIT(11)
+-#define CESA_TDMA_EN				BIT(12)
+-#define CESA_TDMA_FETCH_ND			BIT(13)
+-#define CESA_TDMA_ACT				BIT(14)
+-
+-#define CESA_TDMA_CUR				0x870
+-#define CESA_TDMA_ERROR_CAUSE			0x8c8
+-#define CESA_TDMA_ERROR_MSK			0x8cc
+-
+-#define CESA_TDMA_WINDOW_BASE(x)		(((x) * 0x8) + 0xa00)
+-#define CESA_TDMA_WINDOW_CTRL(x)		(((x) * 0x8) + 0xa04)
+-
+-#define CESA_IVDIG(x)				(0xdd00 + ((x) * 4) +	\
+-						 (((x) < 5) ? 0 : 0x14))
+-
+-#define CESA_SA_CMD				0xde00
+-#define CESA_SA_CMD_EN_CESA_SA_ACCL0		BIT(0)
+-#define CESA_SA_CMD_EN_CESA_SA_ACCL1		BIT(1)
+-#define CESA_SA_CMD_DISABLE_SEC			BIT(2)
+-
+-#define CESA_SA_DESC_P0				0xde04
+-
+-#define CESA_SA_DESC_P1				0xde14
+-
+-#define CESA_SA_CFG				0xde08
+-#define CESA_SA_CFG_STOP_DIG_ERR		GENMASK(1, 0)
+-#define CESA_SA_CFG_DIG_ERR_CONT		0
+-#define CESA_SA_CFG_DIG_ERR_SKIP		1
+-#define CESA_SA_CFG_DIG_ERR_STOP		3
+-#define CESA_SA_CFG_CH0_W_IDMA			BIT(7)
+-#define CESA_SA_CFG_CH1_W_IDMA			BIT(8)
+-#define CESA_SA_CFG_ACT_CH0_IDMA		BIT(9)
+-#define CESA_SA_CFG_ACT_CH1_IDMA		BIT(10)
+-#define CESA_SA_CFG_MULTI_PKT			BIT(11)
+-#define CESA_SA_CFG_PARA_DIS			BIT(13)
+-
+-#define CESA_SA_ACCEL_STATUS			0xde0c
+-#define CESA_SA_ST_ACT_0			BIT(0)
+-#define CESA_SA_ST_ACT_1			BIT(1)
+-
+-/*
+- * CESA_SA_FPGA_INT_STATUS looks like a FPGA leftover and is documented only
+- * in Errata 4.12. It looks like that it was part of an IRQ-controller in FPGA
+- * and someone forgot to remove  it while switching to the core and moving to
+- * CESA_SA_INT_STATUS.
+- */
+-#define CESA_SA_FPGA_INT_STATUS			0xdd68
+-#define CESA_SA_INT_STATUS			0xde20
+-#define CESA_SA_INT_AUTH_DONE			BIT(0)
+-#define CESA_SA_INT_DES_E_DONE			BIT(1)
+-#define CESA_SA_INT_AES_E_DONE			BIT(2)
+-#define CESA_SA_INT_AES_D_DONE			BIT(3)
+-#define CESA_SA_INT_ENC_DONE			BIT(4)
+-#define CESA_SA_INT_ACCEL0_DONE			BIT(5)
+-#define CESA_SA_INT_ACCEL1_DONE			BIT(6)
+-#define CESA_SA_INT_ACC0_IDMA_DONE		BIT(7)
+-#define CESA_SA_INT_ACC1_IDMA_DONE		BIT(8)
+-#define CESA_SA_INT_IDMA_DONE			BIT(9)
+-#define CESA_SA_INT_IDMA_OWN_ERR		BIT(10)
+-
+-#define CESA_SA_INT_MSK				0xde24
+-
+-#define CESA_SA_DESC_CFG_OP_MAC_ONLY		0
+-#define CESA_SA_DESC_CFG_OP_CRYPT_ONLY		1
+-#define CESA_SA_DESC_CFG_OP_MAC_CRYPT		2
+-#define CESA_SA_DESC_CFG_OP_CRYPT_MAC		3
+-#define CESA_SA_DESC_CFG_OP_MSK			GENMASK(1, 0)
+-#define CESA_SA_DESC_CFG_MACM_SHA256		(1 << 4)
+-#define CESA_SA_DESC_CFG_MACM_HMAC_SHA256	(3 << 4)
+-#define CESA_SA_DESC_CFG_MACM_MD5		(4 << 4)
+-#define CESA_SA_DESC_CFG_MACM_SHA1		(5 << 4)
+-#define CESA_SA_DESC_CFG_MACM_HMAC_MD5		(6 << 4)
+-#define CESA_SA_DESC_CFG_MACM_HMAC_SHA1		(7 << 4)
+-#define CESA_SA_DESC_CFG_MACM_MSK		GENMASK(6, 4)
+-#define CESA_SA_DESC_CFG_CRYPTM_DES		(1 << 8)
+-#define CESA_SA_DESC_CFG_CRYPTM_3DES		(2 << 8)
+-#define CESA_SA_DESC_CFG_CRYPTM_AES		(3 << 8)
+-#define CESA_SA_DESC_CFG_CRYPTM_MSK		GENMASK(9, 8)
+-#define CESA_SA_DESC_CFG_DIR_ENC		(0 << 12)
+-#define CESA_SA_DESC_CFG_DIR_DEC		(1 << 12)
+-#define CESA_SA_DESC_CFG_CRYPTCM_ECB		(0 << 16)
+-#define CESA_SA_DESC_CFG_CRYPTCM_CBC		(1 << 16)
+-#define CESA_SA_DESC_CFG_CRYPTCM_MSK		BIT(16)
+-#define CESA_SA_DESC_CFG_3DES_EEE		(0 << 20)
+-#define CESA_SA_DESC_CFG_3DES_EDE		(1 << 20)
+-#define CESA_SA_DESC_CFG_AES_LEN_128		(0 << 24)
+-#define CESA_SA_DESC_CFG_AES_LEN_192		(1 << 24)
+-#define CESA_SA_DESC_CFG_AES_LEN_256		(2 << 24)
+-#define CESA_SA_DESC_CFG_AES_LEN_MSK		GENMASK(25, 24)
+-#define CESA_SA_DESC_CFG_NOT_FRAG		(0 << 30)
+-#define CESA_SA_DESC_CFG_FIRST_FRAG		(1 << 30)
+-#define CESA_SA_DESC_CFG_LAST_FRAG		(2 << 30)
+-#define CESA_SA_DESC_CFG_MID_FRAG		(3 << 30)
+-#define CESA_SA_DESC_CFG_FRAG_MSK		GENMASK(31, 30)
+-
+-/*
+- * /-----------\ 0
+- * | ACCEL CFG |	4 * 8
+- * |-----------| 0x20
+- * | CRYPT KEY |	8 * 4
+- * |-----------| 0x40
+- * |  IV   IN  |	4 * 4
+- * |-----------| 0x40 (inplace)
+- * |  IV BUF   |	4 * 4
+- * |-----------| 0x80
+- * |  DATA IN  |	16 * x (max ->max_req_size)
+- * |-----------| 0x80 (inplace operation)
+- * |  DATA OUT |	16 * x (max ->max_req_size)
+- * \-----------/ SRAM size
+- */
+-
+-/*
+- * Hashing memory map:
+- * /-----------\ 0
+- * | ACCEL CFG |        4 * 8
+- * |-----------| 0x20
+- * | Inner IV  |        8 * 4
+- * |-----------| 0x40
+- * | Outer IV  |        8 * 4
+- * |-----------| 0x60
+- * | Output BUF|        8 * 4
+- * |-----------| 0x80
+- * |  DATA IN  |        64 * x (max ->max_req_size)
+- * \-----------/ SRAM size
+- */
+-
+-#define CESA_SA_CFG_SRAM_OFFSET			0x00
+-#define CESA_SA_DATA_SRAM_OFFSET		0x80
+-
+-#define CESA_SA_CRYPT_KEY_SRAM_OFFSET		0x20
+-#define CESA_SA_CRYPT_IV_SRAM_OFFSET		0x40
+-
+-#define CESA_SA_MAC_IIV_SRAM_OFFSET		0x20
+-#define CESA_SA_MAC_OIV_SRAM_OFFSET		0x40
+-#define CESA_SA_MAC_DIG_SRAM_OFFSET		0x60
+-
+-#define CESA_SA_DESC_CRYPT_DATA(offset)					\
+-	cpu_to_le32((CESA_SA_DATA_SRAM_OFFSET + (offset)) |		\
+-		    ((CESA_SA_DATA_SRAM_OFFSET + (offset)) << 16))
+-
+-#define CESA_SA_DESC_CRYPT_IV(offset)					\
+-	cpu_to_le32((CESA_SA_CRYPT_IV_SRAM_OFFSET + (offset)) |	\
+-		    ((CESA_SA_CRYPT_IV_SRAM_OFFSET + (offset)) << 16))
+-
+-#define CESA_SA_DESC_CRYPT_KEY(offset)					\
+-	cpu_to_le32(CESA_SA_CRYPT_KEY_SRAM_OFFSET + (offset))
+-
+-#define CESA_SA_DESC_MAC_DATA(offset)					\
+-	cpu_to_le32(CESA_SA_DATA_SRAM_OFFSET + (offset))
+-#define CESA_SA_DESC_MAC_DATA_MSK		cpu_to_le32(GENMASK(15, 0))
+-
+-#define CESA_SA_DESC_MAC_TOTAL_LEN(total_len)	cpu_to_le32((total_len) << 16)
+-#define CESA_SA_DESC_MAC_TOTAL_LEN_MSK		cpu_to_le32(GENMASK(31, 16))
+-
+-#define CESA_SA_DESC_MAC_SRC_TOTAL_LEN_MAX	0xffff
+-
+-#define CESA_SA_DESC_MAC_DIGEST(offset)					\
+-	cpu_to_le32(CESA_SA_MAC_DIG_SRAM_OFFSET + (offset))
+-#define CESA_SA_DESC_MAC_DIGEST_MSK		cpu_to_le32(GENMASK(15, 0))
+-
+-#define CESA_SA_DESC_MAC_FRAG_LEN(frag_len)	cpu_to_le32((frag_len) << 16)
+-#define CESA_SA_DESC_MAC_FRAG_LEN_MSK		cpu_to_le32(GENMASK(31, 16))
+-
+-#define CESA_SA_DESC_MAC_IV(offset)					\
+-	cpu_to_le32((CESA_SA_MAC_IIV_SRAM_OFFSET + (offset)) |		\
+-		    ((CESA_SA_MAC_OIV_SRAM_OFFSET + (offset)) << 16))
+-
+-#define CESA_SA_SRAM_SIZE			2048
+-#define CESA_SA_SRAM_PAYLOAD_SIZE		(cesa_dev->sram_size - \
+-						 CESA_SA_DATA_SRAM_OFFSET)
+-
+-#define CESA_SA_DEFAULT_SRAM_SIZE		2048
+-#define CESA_SA_MIN_SRAM_SIZE			1024
+-
+-#define CESA_SA_SRAM_MSK			(2048 - 1)
+-
+-#define CESA_MAX_HASH_BLOCK_SIZE		64
+-#define CESA_HASH_BLOCK_SIZE_MSK		(CESA_MAX_HASH_BLOCK_SIZE - 1)
+-
+-/**
+- * struct mv_cesa_sec_accel_desc - security accelerator descriptor
+- * @config:	engine config
+- * @enc_p:	input and output data pointers for a cipher operation
+- * @enc_len:	cipher operation length
+- * @enc_key_p:	cipher key pointer
+- * @enc_iv:	cipher IV pointers
+- * @mac_src_p:	input pointer and total hash length
+- * @mac_digest:	digest pointer and hash operation length
+- * @mac_iv:	hmac IV pointers
+- *
+- * Structure passed to the CESA engine to describe the crypto operation
+- * to be executed.
+- */
+-struct mv_cesa_sec_accel_desc {
+-	__le32 config;
+-	__le32 enc_p;
+-	__le32 enc_len;
+-	__le32 enc_key_p;
+-	__le32 enc_iv;
+-	__le32 mac_src_p;
+-	__le32 mac_digest;
+-	__le32 mac_iv;
+-};
+-
+-/**
+- * struct mv_cesa_skcipher_op_ctx - cipher operation context
+- * @key:	cipher key
+- * @iv:		cipher IV
+- *
+- * Context associated to a cipher operation.
+- */
+-struct mv_cesa_skcipher_op_ctx {
+-	u32 key[8];
+-	u32 iv[4];
+-};
+-
+-/**
+- * struct mv_cesa_hash_op_ctx - hash or hmac operation context
+- * @key:	cipher key
+- * @iv:		cipher IV
+- *
+- * Context associated to an hash or hmac operation.
+- */
+-struct mv_cesa_hash_op_ctx {
+-	u32 iv[16];
+-	u32 hash[8];
+-};
+-
+-/**
+- * struct mv_cesa_op_ctx - crypto operation context
+- * @desc:	CESA descriptor
+- * @ctx:	context associated to the crypto operation
+- *
+- * Context associated to a crypto operation.
+- */
+-struct mv_cesa_op_ctx {
+-	struct mv_cesa_sec_accel_desc desc;
+-	union {
+-		struct mv_cesa_skcipher_op_ctx skcipher;
+-		struct mv_cesa_hash_op_ctx hash;
+-	} ctx;
+-};
+-
+-/* TDMA descriptor flags */
+-#define CESA_TDMA_DST_IN_SRAM			BIT(31)
+-#define CESA_TDMA_SRC_IN_SRAM			BIT(30)
+-#define CESA_TDMA_END_OF_REQ			BIT(29)
+-#define CESA_TDMA_BREAK_CHAIN			BIT(28)
+-#define CESA_TDMA_SET_STATE			BIT(27)
+-#define CESA_TDMA_TYPE_MSK			GENMASK(26, 0)
+-#define CESA_TDMA_DUMMY				0
+-#define CESA_TDMA_DATA				1
+-#define CESA_TDMA_OP				2
+-#define CESA_TDMA_RESULT			3
+-
+-/**
+- * struct mv_cesa_tdma_desc - TDMA descriptor
+- * @byte_cnt:	number of bytes to transfer
+- * @src:	DMA address of the source
+- * @dst:	DMA address of the destination
+- * @next_dma:	DMA address of the next TDMA descriptor
+- * @cur_dma:	DMA address of this TDMA descriptor
+- * @next:	pointer to the next TDMA descriptor
+- * @op:		CESA operation attached to this TDMA descriptor
+- * @data:	raw data attached to this TDMA descriptor
+- * @flags:	flags describing the TDMA transfer. See the
+- *		"TDMA descriptor flags" section above
+- *
+- * TDMA descriptor used to create a transfer chain describing a crypto
+- * operation.
+- */
+-struct mv_cesa_tdma_desc {
+-	__le32 byte_cnt;
+-	__le32 src;
+-	__le32 dst;
+-	__le32 next_dma;
+-
+-	/* Software state */
+-	dma_addr_t cur_dma;
+-	struct mv_cesa_tdma_desc *next;
+-	union {
+-		struct mv_cesa_op_ctx *op;
+-		void *data;
+-	};
+-	u32 flags;
+-};
+-
+-/**
+- * struct mv_cesa_sg_dma_iter - scatter-gather iterator
+- * @dir:	transfer direction
+- * @sg:		scatter list
+- * @offset:	current position in the scatter list
+- * @op_offset:	current position in the crypto operation
+- *
+- * Iterator used to iterate over a scatterlist while creating a TDMA chain for
+- * a crypto operation.
+- */
+-struct mv_cesa_sg_dma_iter {
+-	enum dma_data_direction dir;
+-	struct scatterlist *sg;
+-	unsigned int offset;
+-	unsigned int op_offset;
+-};
+-
+-/**
+- * struct mv_cesa_dma_iter - crypto operation iterator
+- * @len:	the crypto operation length
+- * @offset:	current position in the crypto operation
+- * @op_len:	sub-operation length (the crypto engine can only act on 2kb
+- *		chunks)
+- *
+- * Iterator used to create a TDMA chain for a given crypto operation.
+- */
+-struct mv_cesa_dma_iter {
+-	unsigned int len;
+-	unsigned int offset;
+-	unsigned int op_len;
+-};
+-
+-/**
+- * struct mv_cesa_tdma_chain - TDMA chain
+- * @first:	first entry in the TDMA chain
+- * @last:	last entry in the TDMA chain
+- *
+- * Stores a TDMA chain for a specific crypto operation.
+- */
+-struct mv_cesa_tdma_chain {
+-	struct mv_cesa_tdma_desc *first;
+-	struct mv_cesa_tdma_desc *last;
+-};
+-
+-struct mv_cesa_engine;
+-
+-/**
+- * struct mv_cesa_caps - CESA device capabilities
+- * @engines:		number of engines
+- * @has_tdma:		whether this device has a TDMA block
+- * @cipher_algs:	supported cipher algorithms
+- * @ncipher_algs:	number of supported cipher algorithms
+- * @ahash_algs:		supported hash algorithms
+- * @nahash_algs:	number of supported hash algorithms
+- *
+- * Structure used to describe CESA device capabilities.
+- */
+-struct mv_cesa_caps {
+-	int nengines;
+-	bool has_tdma;
+-	struct skcipher_alg **cipher_algs;
+-	int ncipher_algs;
+-	struct ahash_alg **ahash_algs;
+-	int nahash_algs;
+-};
+-
+-/**
+- * struct mv_cesa_dev_dma - DMA pools
+- * @tdma_desc_pool:	TDMA desc pool
+- * @op_pool:		crypto operation pool
+- * @cache_pool:		data cache pool (used by hash implementation when the
+- *			hash request is smaller than the hash block size)
+- * @padding_pool:	padding pool (used by hash implementation when hardware
+- *			padding cannot be used)
+- *
+- * Structure containing the different DMA pools used by this driver.
+- */
+-struct mv_cesa_dev_dma {
+-	struct dma_pool *tdma_desc_pool;
+-	struct dma_pool *op_pool;
+-	struct dma_pool *cache_pool;
+-	struct dma_pool *padding_pool;
+-};
+-
+-/**
+- * struct mv_cesa_dev - CESA device
+- * @caps:	device capabilities
+- * @regs:	device registers
+- * @sram_size:	usable SRAM size
+- * @lock:	device lock
+- * @engines:	array of engines
+- * @dma:	dma pools
+- *
+- * Structure storing CESA device information.
+- */
+-struct mv_cesa_dev {
+-	const struct mv_cesa_caps *caps;
+-	void __iomem *regs;
+-	struct device *dev;
+-	unsigned int sram_size;
+-	spinlock_t lock;
+-	struct mv_cesa_engine *engines;
+-	struct mv_cesa_dev_dma *dma;
+-};
+-
+-/**
+- * struct mv_cesa_engine - CESA engine
+- * @id:			engine id
+- * @regs:		engine registers
+- * @sram:		SRAM memory region
+- * @sram_dma:		DMA address of the SRAM memory region
+- * @lock:		engine lock
+- * @req:		current crypto request
+- * @clk:		engine clk
+- * @zclk:		engine zclk
+- * @max_req_len:	maximum chunk length (useful to create the TDMA chain)
+- * @int_mask:		interrupt mask cache
+- * @pool:		memory pool pointing to the memory region reserved in
+- *			SRAM
+- * @queue:		fifo of the pending crypto requests
+- * @load:		engine load counter, useful for load balancing
+- * @chain:		list of the current tdma descriptors being processed
+- * 			by this engine.
+- * @complete_queue:	fifo of the processed requests by the engine
+- *
+- * Structure storing CESA engine information.
+- */
+-struct mv_cesa_engine {
+-	int id;
+-	void __iomem *regs;
+-	void __iomem *sram;
+-	dma_addr_t sram_dma;
+-	spinlock_t lock;
+-	struct crypto_async_request *req;
+-	struct clk *clk;
+-	struct clk *zclk;
+-	size_t max_req_len;
+-	u32 int_mask;
+-	struct gen_pool *pool;
+-	struct crypto_queue queue;
+-	atomic_t load;
+-	struct mv_cesa_tdma_chain chain;
+-	struct list_head complete_queue;
+-};
+-
+-/**
+- * struct mv_cesa_req_ops - CESA request operations
+- * @process:	process a request chunk result (should return 0 if the
+- *		operation, -EINPROGRESS if it needs more steps or an error
+- *		code)
+- * @step:	launch the crypto operation on the next chunk
+- * @cleanup:	cleanup the crypto request (release associated data)
+- * @complete:	complete the request, i.e copy result or context from sram when
+- * 		needed.
+- */
+-struct mv_cesa_req_ops {
+-	int (*process)(struct crypto_async_request *req, u32 status);
+-	void (*step)(struct crypto_async_request *req);
+-	void (*cleanup)(struct crypto_async_request *req);
+-	void (*complete)(struct crypto_async_request *req);
+-};
+-
+-/**
+- * struct mv_cesa_ctx - CESA operation context
+- * @ops:	crypto operations
+- *
+- * Base context structure inherited by operation specific ones.
+- */
+-struct mv_cesa_ctx {
+-	const struct mv_cesa_req_ops *ops;
+-};
+-
+-/**
+- * struct mv_cesa_hash_ctx - CESA hash operation context
+- * @base:	base context structure
+- *
+- * Hash context structure.
+- */
+-struct mv_cesa_hash_ctx {
+-	struct mv_cesa_ctx base;
+-};
+-
+-/**
+- * struct mv_cesa_hash_ctx - CESA hmac operation context
+- * @base:	base context structure
+- * @iv:		initialization vectors
+- *
+- * HMAC context structure.
+- */
+-struct mv_cesa_hmac_ctx {
+-	struct mv_cesa_ctx base;
+-	u32 iv[16];
+-};
+-
+-/**
+- * enum mv_cesa_req_type - request type definitions
+- * @CESA_STD_REQ:	standard request
+- * @CESA_DMA_REQ:	DMA request
+- */
+-enum mv_cesa_req_type {
+-	CESA_STD_REQ,
+-	CESA_DMA_REQ,
+-};
+-
+-/**
+- * struct mv_cesa_req - CESA request
+- * @engine:	engine associated with this request
+- * @chain:	list of tdma descriptors associated  with this request
+- */
+-struct mv_cesa_req {
+-	struct mv_cesa_engine *engine;
+-	struct mv_cesa_tdma_chain chain;
+-};
+-
+-/**
+- * struct mv_cesa_sg_std_iter - CESA scatter-gather iterator for standard
+- *				requests
+- * @iter:	sg mapping iterator
+- * @offset:	current offset in the SG entry mapped in memory
+- */
+-struct mv_cesa_sg_std_iter {
+-	struct sg_mapping_iter iter;
+-	unsigned int offset;
+-};
+-
+-/**
+- * struct mv_cesa_skcipher_std_req - cipher standard request
+- * @op:		operation context
+- * @offset:	current operation offset
+- * @size:	size of the crypto operation
+- */
+-struct mv_cesa_skcipher_std_req {
+-	struct mv_cesa_op_ctx op;
+-	unsigned int offset;
+-	unsigned int size;
+-	bool skip_ctx;
+-};
+-
+-/**
+- * struct mv_cesa_skcipher_req - cipher request
+- * @req:	type specific request information
+- * @src_nents:	number of entries in the src sg list
+- * @dst_nents:	number of entries in the dest sg list
+- */
+-struct mv_cesa_skcipher_req {
+-	struct mv_cesa_req base;
+-	struct mv_cesa_skcipher_std_req std;
+-	int src_nents;
+-	int dst_nents;
+-};
+-
+-/**
+- * struct mv_cesa_ahash_std_req - standard hash request
+- * @offset:	current operation offset
+- */
+-struct mv_cesa_ahash_std_req {
+-	unsigned int offset;
+-};
+-
+-/**
+- * struct mv_cesa_ahash_dma_req - DMA hash request
+- * @padding:		padding buffer
+- * @padding_dma:	DMA address of the padding buffer
+- * @cache_dma:		DMA address of the cache buffer
+- */
+-struct mv_cesa_ahash_dma_req {
+-	u8 *padding;
+-	dma_addr_t padding_dma;
+-	u8 *cache;
+-	dma_addr_t cache_dma;
+-};
+-
+-/**
+- * struct mv_cesa_ahash_req - hash request
+- * @req:		type specific request information
+- * @cache:		cache buffer
+- * @cache_ptr:		write pointer in the cache buffer
+- * @len:		hash total length
+- * @src_nents:		number of entries in the scatterlist
+- * @last_req:		define whether the current operation is the last one
+- *			or not
+- * @state:		hash state
+- */
+-struct mv_cesa_ahash_req {
+-	struct mv_cesa_req base;
+-	union {
+-		struct mv_cesa_ahash_dma_req dma;
+-		struct mv_cesa_ahash_std_req std;
+-	} req;
+-	struct mv_cesa_op_ctx op_tmpl;
+-	u8 cache[CESA_MAX_HASH_BLOCK_SIZE];
+-	unsigned int cache_ptr;
+-	u64 len;
+-	int src_nents;
+-	bool last_req;
+-	bool algo_le;
+-	u32 state[8];
+-};
+-
+-/* CESA functions */
+-
+-extern struct mv_cesa_dev *cesa_dev;
+-
+-
+-static inline void
+-mv_cesa_engine_enqueue_complete_request(struct mv_cesa_engine *engine,
+-					struct crypto_async_request *req)
+-{
+-	list_add_tail(&req->list, &engine->complete_queue);
+-}
+-
+-static inline struct crypto_async_request *
+-mv_cesa_engine_dequeue_complete_request(struct mv_cesa_engine *engine)
+-{
+-	struct crypto_async_request *req;
+-
+-	req = list_first_entry_or_null(&engine->complete_queue,
+-				       struct crypto_async_request,
+-				       list);
+-	if (req)
+-		list_del(&req->list);
+-
+-	return req;
+-}
+-
+-
+-static inline enum mv_cesa_req_type
+-mv_cesa_req_get_type(struct mv_cesa_req *req)
+-{
+-	return req->chain.first ? CESA_DMA_REQ : CESA_STD_REQ;
+-}
+-
+-static inline void mv_cesa_update_op_cfg(struct mv_cesa_op_ctx *op,
+-					 u32 cfg, u32 mask)
+-{
+-	op->desc.config &= cpu_to_le32(~mask);
+-	op->desc.config |= cpu_to_le32(cfg);
+-}
+-
+-static inline u32 mv_cesa_get_op_cfg(const struct mv_cesa_op_ctx *op)
+-{
+-	return le32_to_cpu(op->desc.config);
+-}
+-
+-static inline void mv_cesa_set_op_cfg(struct mv_cesa_op_ctx *op, u32 cfg)
+-{
+-	op->desc.config = cpu_to_le32(cfg);
+-}
+-
+-static inline void mv_cesa_adjust_op(struct mv_cesa_engine *engine,
+-				     struct mv_cesa_op_ctx *op)
+-{
+-	u32 offset = engine->sram_dma & CESA_SA_SRAM_MSK;
+-
+-	op->desc.enc_p = CESA_SA_DESC_CRYPT_DATA(offset);
+-	op->desc.enc_key_p = CESA_SA_DESC_CRYPT_KEY(offset);
+-	op->desc.enc_iv = CESA_SA_DESC_CRYPT_IV(offset);
+-	op->desc.mac_src_p &= ~CESA_SA_DESC_MAC_DATA_MSK;
+-	op->desc.mac_src_p |= CESA_SA_DESC_MAC_DATA(offset);
+-	op->desc.mac_digest &= ~CESA_SA_DESC_MAC_DIGEST_MSK;
+-	op->desc.mac_digest |= CESA_SA_DESC_MAC_DIGEST(offset);
+-	op->desc.mac_iv = CESA_SA_DESC_MAC_IV(offset);
+-}
+-
+-static inline void mv_cesa_set_crypt_op_len(struct mv_cesa_op_ctx *op, int len)
+-{
+-	op->desc.enc_len = cpu_to_le32(len);
+-}
+-
+-static inline void mv_cesa_set_mac_op_total_len(struct mv_cesa_op_ctx *op,
+-						int len)
+-{
+-	op->desc.mac_src_p &= ~CESA_SA_DESC_MAC_TOTAL_LEN_MSK;
+-	op->desc.mac_src_p |= CESA_SA_DESC_MAC_TOTAL_LEN(len);
+-}
+-
+-static inline void mv_cesa_set_mac_op_frag_len(struct mv_cesa_op_ctx *op,
+-					       int len)
+-{
+-	op->desc.mac_digest &= ~CESA_SA_DESC_MAC_FRAG_LEN_MSK;
+-	op->desc.mac_digest |= CESA_SA_DESC_MAC_FRAG_LEN(len);
+-}
+-
+-static inline void mv_cesa_set_int_mask(struct mv_cesa_engine *engine,
+-					u32 int_mask)
+-{
+-	if (int_mask == engine->int_mask)
+-		return;
+-
+-	writel_relaxed(int_mask, engine->regs + CESA_SA_INT_MSK);
+-	engine->int_mask = int_mask;
+-}
+-
+-static inline u32 mv_cesa_get_int_mask(struct mv_cesa_engine *engine)
+-{
+-	return engine->int_mask;
+-}
+-
+-static inline bool mv_cesa_mac_op_is_first_frag(const struct mv_cesa_op_ctx *op)
+-{
+-	return (mv_cesa_get_op_cfg(op) & CESA_SA_DESC_CFG_FRAG_MSK) ==
+-		CESA_SA_DESC_CFG_FIRST_FRAG;
+-}
+-
+-int mv_cesa_queue_req(struct crypto_async_request *req,
+-		      struct mv_cesa_req *creq);
+-
+-struct crypto_async_request *
+-mv_cesa_dequeue_req_locked(struct mv_cesa_engine *engine,
+-			   struct crypto_async_request **backlog);
+-
+-static inline struct mv_cesa_engine *mv_cesa_select_engine(int weight)
+-{
+-	int i;
+-	u32 min_load = U32_MAX;
+-	struct mv_cesa_engine *selected = NULL;
+-
+-	for (i = 0; i < cesa_dev->caps->nengines; i++) {
+-		struct mv_cesa_engine *engine = cesa_dev->engines + i;
+-		u32 load = atomic_read(&engine->load);
+-		if (load < min_load) {
+-			min_load = load;
+-			selected = engine;
+-		}
+-	}
+-
+-	atomic_add(weight, &selected->load);
+-
+-	return selected;
+-}
+-
+-/*
+- * Helper function that indicates whether a crypto request needs to be
+- * cleaned up or not after being enqueued using mv_cesa_queue_req().
+- */
+-static inline int mv_cesa_req_needs_cleanup(struct crypto_async_request *req,
+-					    int ret)
+-{
+-	/*
+-	 * The queue still had some space, the request was queued
+-	 * normally, so there's no need to clean it up.
+-	 */
+-	if (ret == -EINPROGRESS)
+-		return false;
+-
+-	/*
+-	 * The queue had not space left, but since the request is
+-	 * flagged with CRYPTO_TFM_REQ_MAY_BACKLOG, it was added to
+-	 * the backlog and will be processed later. There's no need to
+-	 * clean it up.
+-	 */
+-	if (ret == -EBUSY)
+-		return false;
+-
+-	/* Request wasn't queued, we need to clean it up */
+-	return true;
+-}
+-
+-/* TDMA functions */
+-
+-static inline void mv_cesa_req_dma_iter_init(struct mv_cesa_dma_iter *iter,
+-					     unsigned int len)
+-{
+-	iter->len = len;
+-	iter->op_len = min(len, CESA_SA_SRAM_PAYLOAD_SIZE);
+-	iter->offset = 0;
+-}
+-
+-static inline void mv_cesa_sg_dma_iter_init(struct mv_cesa_sg_dma_iter *iter,
+-					    struct scatterlist *sg,
+-					    enum dma_data_direction dir)
+-{
+-	iter->op_offset = 0;
+-	iter->offset = 0;
+-	iter->sg = sg;
+-	iter->dir = dir;
+-}
+-
+-static inline unsigned int
+-mv_cesa_req_dma_iter_transfer_len(struct mv_cesa_dma_iter *iter,
+-				  struct mv_cesa_sg_dma_iter *sgiter)
+-{
+-	return min(iter->op_len - sgiter->op_offset,
+-		   sg_dma_len(sgiter->sg) - sgiter->offset);
+-}
+-
+-bool mv_cesa_req_dma_iter_next_transfer(struct mv_cesa_dma_iter *chain,
+-					struct mv_cesa_sg_dma_iter *sgiter,
+-					unsigned int len);
+-
+-static inline bool mv_cesa_req_dma_iter_next_op(struct mv_cesa_dma_iter *iter)
+-{
+-	iter->offset += iter->op_len;
+-	iter->op_len = min(iter->len - iter->offset,
+-			   CESA_SA_SRAM_PAYLOAD_SIZE);
+-
+-	return iter->op_len;
+-}
+-
+-void mv_cesa_dma_step(struct mv_cesa_req *dreq);
+-
+-static inline int mv_cesa_dma_process(struct mv_cesa_req *dreq,
+-				      u32 status)
+-{
+-	if (!(status & CESA_SA_INT_ACC0_IDMA_DONE))
+-		return -EINPROGRESS;
+-
+-	if (status & CESA_SA_INT_IDMA_OWN_ERR)
+-		return -EINVAL;
+-
+-	return 0;
+-}
+-
+-void mv_cesa_dma_prepare(struct mv_cesa_req *dreq,
+-			 struct mv_cesa_engine *engine);
+-void mv_cesa_dma_cleanup(struct mv_cesa_req *dreq);
+-void mv_cesa_tdma_chain(struct mv_cesa_engine *engine,
+-			struct mv_cesa_req *dreq);
+-int mv_cesa_tdma_process(struct mv_cesa_engine *engine, u32 status);
+-
+-
+-static inline void
+-mv_cesa_tdma_desc_iter_init(struct mv_cesa_tdma_chain *chain)
+-{
+-	memset(chain, 0, sizeof(*chain));
+-}
+-
+-int mv_cesa_dma_add_result_op(struct mv_cesa_tdma_chain *chain, dma_addr_t src,
+-			  u32 size, u32 flags, gfp_t gfp_flags);
+-
+-struct mv_cesa_op_ctx *mv_cesa_dma_add_op(struct mv_cesa_tdma_chain *chain,
+-					const struct mv_cesa_op_ctx *op_templ,
+-					bool skip_ctx,
+-					gfp_t flags);
+-
+-int mv_cesa_dma_add_data_transfer(struct mv_cesa_tdma_chain *chain,
+-				  dma_addr_t dst, dma_addr_t src, u32 size,
+-				  u32 flags, gfp_t gfp_flags);
+-
+-int mv_cesa_dma_add_dummy_launch(struct mv_cesa_tdma_chain *chain, gfp_t flags);
+-int mv_cesa_dma_add_dummy_end(struct mv_cesa_tdma_chain *chain, gfp_t flags);
+-
+-int mv_cesa_dma_add_op_transfers(struct mv_cesa_tdma_chain *chain,
+-				 struct mv_cesa_dma_iter *dma_iter,
+-				 struct mv_cesa_sg_dma_iter *sgiter,
+-				 gfp_t gfp_flags);
+-
+-/* Algorithm definitions */
+-
+-extern struct ahash_alg mv_md5_alg;
+-extern struct ahash_alg mv_sha1_alg;
+-extern struct ahash_alg mv_sha256_alg;
+-extern struct ahash_alg mv_ahmac_md5_alg;
+-extern struct ahash_alg mv_ahmac_sha1_alg;
+-extern struct ahash_alg mv_ahmac_sha256_alg;
+-
+-extern struct skcipher_alg mv_cesa_ecb_des_alg;
+-extern struct skcipher_alg mv_cesa_cbc_des_alg;
+-extern struct skcipher_alg mv_cesa_ecb_des3_ede_alg;
+-extern struct skcipher_alg mv_cesa_cbc_des3_ede_alg;
+-extern struct skcipher_alg mv_cesa_ecb_aes_alg;
+-extern struct skcipher_alg mv_cesa_cbc_aes_alg;
+-
+-#endif /* __MARVELL_CESA_H__ */
+diff --git a/drivers/crypto/marvell/cesa/Makefile b/drivers/crypto/marvell/cesa/Makefile
 new file mode 100644
-index 0000000..8f73e1f
+index 0000000..b27cab6
 --- /dev/null
-+++ b/drivers/crypto/marvell/octeontx/otx_cptvf_algs.c
-@@ -0,0 +1,1744 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Marvell OcteonTX CPT driver
-+ *
-+ * Copyright (C) 2019 Marvell International Ltd.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ */
-+
-+#include <crypto/aes.h>
-+#include <crypto/authenc.h>
-+#include <crypto/cryptd.h>
-+#include <crypto/des.h>
-+#include <crypto/internal/aead.h>
-+#include <crypto/sha.h>
-+#include <crypto/xts.h>
-+#include <crypto/scatterwalk.h>
-+#include <linux/rtnetlink.h>
-+#include <linux/sort.h>
-+#include <linux/module.h>
-+#include "otx_cptvf.h"
-+#include "otx_cptvf_algs.h"
-+#include "otx_cptvf_reqmgr.h"
-+
-+#define CPT_MAX_VF_NUM	64
-+/* Size of salt in AES GCM mode */
-+#define AES_GCM_SALT_SIZE	4
-+/* Size of IV in AES GCM mode */
-+#define AES_GCM_IV_SIZE		8
-+/* Size of ICV (Integrity Check Value) in AES GCM mode */
-+#define AES_GCM_ICV_SIZE	16
-+/* Offset of IV in AES GCM mode */
-+#define AES_GCM_IV_OFFSET	8
-+#define CONTROL_WORD_LEN	8
-+#define KEY2_OFFSET		48
-+#define DMA_MODE_FLAG(dma_mode) \
-+	(((dma_mode) == OTX_CPT_DMA_GATHER_SCATTER) ? (1 << 7) : 0)
-+
-+/* Truncated SHA digest size */
-+#define SHA1_TRUNC_DIGEST_SIZE		12
-+#define SHA256_TRUNC_DIGEST_SIZE	16
-+#define SHA384_TRUNC_DIGEST_SIZE	24
-+#define SHA512_TRUNC_DIGEST_SIZE	32
-+
-+static DEFINE_MUTEX(mutex);
-+static int is_crypto_registered;
-+
-+struct cpt_device_desc {
-+	enum otx_cptpf_type pf_type;
-+	struct pci_dev *dev;
-+	int num_queues;
-+};
-+
-+struct cpt_device_table {
-+	atomic_t count;
-+	struct cpt_device_desc desc[CPT_MAX_VF_NUM];
-+};
-+
-+static struct cpt_device_table se_devices = {
-+	.count = ATOMIC_INIT(0)
-+};
-+
-+static struct cpt_device_table ae_devices = {
-+	.count = ATOMIC_INIT(0)
-+};
-+
-+static inline int get_se_device(struct pci_dev **pdev, int *cpu_num)
-+{
-+	int count, ret = 0;
-+
-+	count = atomic_read(&se_devices.count);
-+	if (count < 1)
-+		return -ENODEV;
-+
-+	*cpu_num = get_cpu();
-+
-+	if (se_devices.desc[0].pf_type == OTX_CPT_SE) {
-+		/*
-+		 * On OcteonTX platform there is one CPT instruction queue bound
-+		 * to each VF. We get maximum performance if one CPT queue
-+		 * is available for each cpu otherwise CPT queues need to be
-+		 * shared between cpus.
-+		 */
-+		if (*cpu_num >= count)
-+			*cpu_num %= count;
-+		*pdev = se_devices.desc[*cpu_num].dev;
-+	} else {
-+		pr_err("Unknown PF type %d\n", se_devices.desc[0].pf_type);
-+		ret = -EINVAL;
-+	}
-+	put_cpu();
-+
-+	return ret;
-+}
-+
-+static inline int validate_hmac_cipher_null(struct otx_cpt_req_info *cpt_req)
-+{
-+	struct otx_cpt_req_ctx *rctx;
-+	struct aead_request *req;
-+	struct crypto_aead *tfm;
-+
-+	req = container_of(cpt_req->areq, struct aead_request, base);
-+	tfm = crypto_aead_reqtfm(req);
-+	rctx = aead_request_ctx(req);
-+	if (memcmp(rctx->fctx.hmac.s.hmac_calc,
-+		   rctx->fctx.hmac.s.hmac_recv,
-+		   crypto_aead_authsize(tfm)) != 0)
-+		return -EBADMSG;
-+
-+	return 0;
-+}
-+
-+void otx_cpt_aead_callback(int status, void *arg1, void *arg2)
-+{
-+	struct otx_cpt_info_buffer *cpt_info = arg2;
-+	struct crypto_async_request *areq = arg1;
-+	struct otx_cpt_req_info *cpt_req;
-+	struct pci_dev *pdev;
-+
-+	cpt_req = cpt_info->req;
-+	if (!status) {
-+		/*
-+		 * When selected cipher is NULL we need to manually
-+		 * verify whether calculated hmac value matches
-+		 * received hmac value
-+		 */
-+		if (cpt_req->req_type == OTX_CPT_AEAD_ENC_DEC_NULL_REQ &&
-+		    !cpt_req->is_enc)
-+			status = validate_hmac_cipher_null(cpt_req);
-+	}
-+	if (cpt_info) {
-+		pdev = cpt_info->pdev;
-+		do_request_cleanup(pdev, cpt_info);
-+	}
-+	if (areq)
-+		areq->complete(areq, status);
-+}
-+
-+static void output_iv_copyback(struct crypto_async_request *areq)
-+{
-+	struct otx_cpt_req_info *req_info;
-+	struct skcipher_request *sreq;
-+	struct crypto_skcipher *stfm;
-+	struct otx_cpt_req_ctx *rctx;
-+	struct otx_cpt_enc_ctx *ctx;
-+	u32 start, ivsize;
-+
-+	sreq = container_of(areq, struct skcipher_request, base);
-+	stfm = crypto_skcipher_reqtfm(sreq);
-+	ctx = crypto_skcipher_ctx(stfm);
-+	if (ctx->cipher_type == OTX_CPT_AES_CBC ||
-+	    ctx->cipher_type == OTX_CPT_DES3_CBC) {
-+		rctx = skcipher_request_ctx(sreq);
-+		req_info = &rctx->cpt_req;
-+		ivsize = crypto_skcipher_ivsize(stfm);
-+		start = sreq->cryptlen - ivsize;
-+
-+		if (req_info->is_enc) {
-+			scatterwalk_map_and_copy(sreq->iv, sreq->dst, start,
-+						 ivsize, 0);
-+		} else {
-+			if (sreq->src != sreq->dst) {
-+				scatterwalk_map_and_copy(sreq->iv, sreq->src,
-+							 start, ivsize, 0);
-+			} else {
-+				memcpy(sreq->iv, req_info->iv_out, ivsize);
-+				kfree(req_info->iv_out);
-+			}
-+		}
-+	}
-+}
-+
-+void otx_cpt_skcipher_callback(int status, void *arg1, void *arg2)
-+{
-+	struct otx_cpt_info_buffer *cpt_info = arg2;
-+	struct crypto_async_request *areq = arg1;
-+	struct pci_dev *pdev;
-+
-+	if (areq) {
-+		if (!status)
-+			output_iv_copyback(areq);
-+		if (cpt_info) {
-+			pdev = cpt_info->pdev;
-+			do_request_cleanup(pdev, cpt_info);
-+		}
-+		areq->complete(areq, status);
-+	}
-+}
-+
-+static inline void update_input_data(struct otx_cpt_req_info *req_info,
-+				     struct scatterlist *inp_sg,
-+				     u32 nbytes, u32 *argcnt)
-+{
-+	req_info->req.dlen += nbytes;
-+
-+	while (nbytes) {
-+		u32 len = min(nbytes, inp_sg->length);
-+		u8 *ptr = sg_virt(inp_sg);
-+
-+		req_info->in[*argcnt].vptr = (void *)ptr;
-+		req_info->in[*argcnt].size = len;
-+		nbytes -= len;
-+		++(*argcnt);
-+		inp_sg = sg_next(inp_sg);
-+	}
-+}
-+
-+static inline void update_output_data(struct otx_cpt_req_info *req_info,
-+				      struct scatterlist *outp_sg,
-+				      u32 offset, u32 nbytes, u32 *argcnt)
-+{
-+	req_info->rlen += nbytes;
-+
-+	while (nbytes) {
-+		u32 len = min(nbytes, outp_sg->length - offset);
-+		u8 *ptr = sg_virt(outp_sg);
-+
-+		req_info->out[*argcnt].vptr = (void *) (ptr + offset);
-+		req_info->out[*argcnt].size = len;
-+		nbytes -= len;
-+		++(*argcnt);
-+		offset = 0;
-+		outp_sg = sg_next(outp_sg);
-+	}
-+}
-+
-+static inline u32 create_ctx_hdr(struct skcipher_request *req, u32 enc,
-+				 u32 *argcnt)
-+{
-+	struct crypto_skcipher *stfm = crypto_skcipher_reqtfm(req);
-+	struct otx_cpt_req_ctx *rctx = skcipher_request_ctx(req);
-+	struct otx_cpt_req_info *req_info = &rctx->cpt_req;
-+	struct crypto_tfm *tfm = crypto_skcipher_tfm(stfm);
-+	struct otx_cpt_enc_ctx *ctx = crypto_tfm_ctx(tfm);
-+	struct otx_cpt_fc_ctx *fctx = &rctx->fctx;
-+	int ivsize = crypto_skcipher_ivsize(stfm);
-+	u32 start = req->cryptlen - ivsize;
-+	u64 *ctrl_flags = NULL;
-+	gfp_t flags;
-+
-+	flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
-+			GFP_KERNEL : GFP_ATOMIC;
-+	req_info->ctrl.s.dma_mode = OTX_CPT_DMA_GATHER_SCATTER;
-+	req_info->ctrl.s.se_req = OTX_CPT_SE_CORE_REQ;
-+
-+	req_info->req.opcode.s.major = OTX_CPT_MAJOR_OP_FC |
-+				DMA_MODE_FLAG(OTX_CPT_DMA_GATHER_SCATTER);
-+	if (enc) {
-+		req_info->req.opcode.s.minor = 2;
-+	} else {
-+		req_info->req.opcode.s.minor = 3;
-+		if ((ctx->cipher_type == OTX_CPT_AES_CBC ||
-+		    ctx->cipher_type == OTX_CPT_DES3_CBC) &&
-+		    req->src == req->dst) {
-+			req_info->iv_out = kmalloc(ivsize, flags);
-+			if (!req_info->iv_out)
-+				return -ENOMEM;
-+
-+			scatterwalk_map_and_copy(req_info->iv_out, req->src,
-+						 start, ivsize, 0);
-+		}
-+	}
-+	/* Encryption data length */
-+	req_info->req.param1 = req->cryptlen;
-+	/* Authentication data length */
-+	req_info->req.param2 = 0;
-+
-+	fctx->enc.enc_ctrl.e.enc_cipher = ctx->cipher_type;
-+	fctx->enc.enc_ctrl.e.aes_key = ctx->key_type;
-+	fctx->enc.enc_ctrl.e.iv_source = OTX_CPT_FROM_CPTR;
-+
-+	if (ctx->cipher_type == OTX_CPT_AES_XTS)
-+		memcpy(fctx->enc.encr_key, ctx->enc_key, ctx->key_len * 2);
-+	else
-+		memcpy(fctx->enc.encr_key, ctx->enc_key, ctx->key_len);
-+
-+	memcpy(fctx->enc.encr_iv, req->iv, crypto_skcipher_ivsize(stfm));
-+
-+	ctrl_flags = (u64 *)&fctx->enc.enc_ctrl.flags;
-+	*ctrl_flags = cpu_to_be64(*ctrl_flags);
-+
-+	/*
-+	 * Storing  Packet Data Information in offset
-+	 * Control Word First 8 bytes
-+	 */
-+	req_info->in[*argcnt].vptr = (u8 *)&rctx->ctrl_word;
-+	req_info->in[*argcnt].size = CONTROL_WORD_LEN;
-+	req_info->req.dlen += CONTROL_WORD_LEN;
-+	++(*argcnt);
-+
-+	req_info->in[*argcnt].vptr = (u8 *)fctx;
-+	req_info->in[*argcnt].size = sizeof(struct otx_cpt_fc_ctx);
-+	req_info->req.dlen += sizeof(struct otx_cpt_fc_ctx);
-+
-+	++(*argcnt);
-+
-+	return 0;
-+}
-+
-+static inline u32 create_input_list(struct skcipher_request *req, u32 enc,
-+				    u32 enc_iv_len)
-+{
-+	struct otx_cpt_req_ctx *rctx = skcipher_request_ctx(req);
-+	struct otx_cpt_req_info *req_info = &rctx->cpt_req;
-+	u32 argcnt =  0;
-+	int ret;
-+
-+	ret = create_ctx_hdr(req, enc, &argcnt);
-+	if (ret)
-+		return ret;
-+
-+	update_input_data(req_info, req->src, req->cryptlen, &argcnt);
-+	req_info->incnt = argcnt;
-+
-+	return 0;
-+}
-+
-+static inline void create_output_list(struct skcipher_request *req,
-+				      u32 enc_iv_len)
-+{
-+	struct otx_cpt_req_ctx *rctx = skcipher_request_ctx(req);
-+	struct otx_cpt_req_info *req_info = &rctx->cpt_req;
-+	u32 argcnt = 0;
-+
-+	/*
-+	 * OUTPUT Buffer Processing
-+	 * AES encryption/decryption output would be
-+	 * received in the following format
-+	 *
-+	 * ------IV--------|------ENCRYPTED/DECRYPTED DATA-----|
-+	 * [ 16 Bytes/     [   Request Enc/Dec/ DATA Len AES CBC ]
-+	 */
-+	update_output_data(req_info, req->dst, 0, req->cryptlen, &argcnt);
-+	req_info->outcnt = argcnt;
-+}
-+
-+static inline int cpt_enc_dec(struct skcipher_request *req, u32 enc)
-+{
-+	struct crypto_skcipher *stfm = crypto_skcipher_reqtfm(req);
-+	struct otx_cpt_req_ctx *rctx = skcipher_request_ctx(req);
-+	struct otx_cpt_req_info *req_info = &rctx->cpt_req;
-+	u32 enc_iv_len = crypto_skcipher_ivsize(stfm);
-+	struct pci_dev *pdev;
-+	int status, cpu_num;
-+
-+	/* Validate that request doesn't exceed maximum CPT supported size */
-+	if (req->cryptlen > OTX_CPT_MAX_REQ_SIZE)
-+		return -E2BIG;
-+
-+	/* Clear control words */
-+	rctx->ctrl_word.flags = 0;
-+	rctx->fctx.enc.enc_ctrl.flags = 0;
-+
-+	status = create_input_list(req, enc, enc_iv_len);
-+	if (status)
-+		return status;
-+	create_output_list(req, enc_iv_len);
-+
-+	status = get_se_device(&pdev, &cpu_num);
-+	if (status)
-+		return status;
-+
-+	req_info->callback = (void *)otx_cpt_skcipher_callback;
-+	req_info->areq = &req->base;
-+	req_info->req_type = OTX_CPT_ENC_DEC_REQ;
-+	req_info->is_enc = enc;
-+	req_info->is_trunc_hmac = false;
-+	req_info->ctrl.s.grp = 0;
-+
-+	/*
-+	 * We perform an asynchronous send and once
-+	 * the request is completed the driver would
-+	 * intimate through registered call back functions
-+	 */
-+	status = otx_cpt_do_request(pdev, req_info, cpu_num);
-+
-+	return status;
-+}
-+
-+static int otx_cpt_skcipher_encrypt(struct skcipher_request *req)
-+{
-+	return cpt_enc_dec(req, true);
-+}
-+
-+static int otx_cpt_skcipher_decrypt(struct skcipher_request *req)
-+{
-+	return cpt_enc_dec(req, false);
-+}
-+
-+static int otx_cpt_skcipher_xts_setkey(struct crypto_skcipher *tfm,
-+				       const u8 *key, u32 keylen)
-+{
-+	struct otx_cpt_enc_ctx *ctx = crypto_skcipher_ctx(tfm);
-+	const u8 *key2 = key + (keylen / 2);
-+	const u8 *key1 = key;
-+	int ret;
-+
-+	ret = xts_check_key(crypto_skcipher_tfm(tfm), key, keylen);
-+	if (ret)
-+		return ret;
-+	ctx->key_len = keylen;
-+	memcpy(ctx->enc_key, key1, keylen / 2);
-+	memcpy(ctx->enc_key + KEY2_OFFSET, key2, keylen / 2);
-+	ctx->cipher_type = OTX_CPT_AES_XTS;
-+	switch (ctx->key_len) {
-+	case 2 * AES_KEYSIZE_128:
-+		ctx->key_type = OTX_CPT_AES_128_BIT;
-+		break;
-+	case 2 * AES_KEYSIZE_256:
-+		ctx->key_type = OTX_CPT_AES_256_BIT;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static int cpt_des_setkey(struct crypto_skcipher *tfm, const u8 *key,
-+			  u32 keylen, u8 cipher_type)
-+{
-+	struct otx_cpt_enc_ctx *ctx = crypto_skcipher_ctx(tfm);
-+
-+	if (keylen != DES3_EDE_KEY_SIZE)
-+		return -EINVAL;
-+
-+	ctx->key_len = keylen;
-+	ctx->cipher_type = cipher_type;
-+
-+	memcpy(ctx->enc_key, key, keylen);
-+
-+	return 0;
-+}
-+
-+static int cpt_aes_setkey(struct crypto_skcipher *tfm, const u8 *key,
-+			  u32 keylen, u8 cipher_type)
-+{
-+	struct otx_cpt_enc_ctx *ctx = crypto_skcipher_ctx(tfm);
-+
-+	switch (keylen) {
-+	case AES_KEYSIZE_128:
-+		ctx->key_type = OTX_CPT_AES_128_BIT;
-+		break;
-+	case AES_KEYSIZE_192:
-+		ctx->key_type = OTX_CPT_AES_192_BIT;
-+		break;
-+	case AES_KEYSIZE_256:
-+		ctx->key_type = OTX_CPT_AES_256_BIT;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+	ctx->key_len = keylen;
-+	ctx->cipher_type = cipher_type;
-+
-+	memcpy(ctx->enc_key, key, keylen);
-+
-+	return 0;
-+}
-+
-+static int otx_cpt_skcipher_cbc_aes_setkey(struct crypto_skcipher *tfm,
-+					   const u8 *key, u32 keylen)
-+{
-+	return cpt_aes_setkey(tfm, key, keylen, OTX_CPT_AES_CBC);
-+}
-+
-+static int otx_cpt_skcipher_ecb_aes_setkey(struct crypto_skcipher *tfm,
-+					   const u8 *key, u32 keylen)
-+{
-+	return cpt_aes_setkey(tfm, key, keylen, OTX_CPT_AES_ECB);
-+}
-+
-+static int otx_cpt_skcipher_cfb_aes_setkey(struct crypto_skcipher *tfm,
-+					   const u8 *key, u32 keylen)
-+{
-+	return cpt_aes_setkey(tfm, key, keylen, OTX_CPT_AES_CFB);
-+}
-+
-+static int otx_cpt_skcipher_cbc_des3_setkey(struct crypto_skcipher *tfm,
-+					    const u8 *key, u32 keylen)
-+{
-+	return cpt_des_setkey(tfm, key, keylen, OTX_CPT_DES3_CBC);
-+}
-+
-+static int otx_cpt_skcipher_ecb_des3_setkey(struct crypto_skcipher *tfm,
-+					    const u8 *key, u32 keylen)
-+{
-+	return cpt_des_setkey(tfm, key, keylen, OTX_CPT_DES3_ECB);
-+}
-+
-+static int otx_cpt_enc_dec_init(struct crypto_skcipher *tfm)
-+{
-+	struct otx_cpt_enc_ctx *ctx = crypto_skcipher_ctx(tfm);
-+
-+	memset(ctx, 0, sizeof(*ctx));
-+	/*
-+	 * Additional memory for skcipher_request is
-+	 * allocated since the cryptd daemon uses
-+	 * this memory for request_ctx information
-+	 */
-+	crypto_skcipher_set_reqsize(tfm, sizeof(struct otx_cpt_req_ctx) +
-+					sizeof(struct skcipher_request));
-+
-+	return 0;
-+}
-+
-+static int cpt_aead_init(struct crypto_aead *tfm, u8 cipher_type, u8 mac_type)
-+{
-+	struct otx_cpt_aead_ctx *ctx = crypto_aead_ctx(tfm);
-+
-+	ctx->cipher_type = cipher_type;
-+	ctx->mac_type = mac_type;
-+
-+	/*
-+	 * When selected cipher is NULL we use HMAC opcode instead of
-+	 * FLEXICRYPTO opcode therefore we don't need to use HASH algorithms
-+	 * for calculating ipad and opad
-+	 */
-+	if (ctx->cipher_type != OTX_CPT_CIPHER_NULL) {
-+		switch (ctx->mac_type) {
-+		case OTX_CPT_SHA1:
-+			ctx->hashalg = crypto_alloc_shash("sha1", 0,
-+							  CRYPTO_ALG_ASYNC);
-+			if (IS_ERR(ctx->hashalg))
-+				return PTR_ERR(ctx->hashalg);
-+			break;
-+
-+		case OTX_CPT_SHA256:
-+			ctx->hashalg = crypto_alloc_shash("sha256", 0,
-+							  CRYPTO_ALG_ASYNC);
-+			if (IS_ERR(ctx->hashalg))
-+				return PTR_ERR(ctx->hashalg);
-+			break;
-+
-+		case OTX_CPT_SHA384:
-+			ctx->hashalg = crypto_alloc_shash("sha384", 0,
-+							  CRYPTO_ALG_ASYNC);
-+			if (IS_ERR(ctx->hashalg))
-+				return PTR_ERR(ctx->hashalg);
-+			break;
-+
-+		case OTX_CPT_SHA512:
-+			ctx->hashalg = crypto_alloc_shash("sha512", 0,
-+							  CRYPTO_ALG_ASYNC);
-+			if (IS_ERR(ctx->hashalg))
-+				return PTR_ERR(ctx->hashalg);
-+			break;
-+		}
-+	}
-+
-+	crypto_aead_set_reqsize(tfm, sizeof(struct otx_cpt_req_ctx));
-+
-+	return 0;
-+}
-+
-+static int otx_cpt_aead_cbc_aes_sha1_init(struct crypto_aead *tfm)
-+{
-+	return cpt_aead_init(tfm, OTX_CPT_AES_CBC, OTX_CPT_SHA1);
-+}
-+
-+static int otx_cpt_aead_cbc_aes_sha256_init(struct crypto_aead *tfm)
-+{
-+	return cpt_aead_init(tfm, OTX_CPT_AES_CBC, OTX_CPT_SHA256);
-+}
-+
-+static int otx_cpt_aead_cbc_aes_sha384_init(struct crypto_aead *tfm)
-+{
-+	return cpt_aead_init(tfm, OTX_CPT_AES_CBC, OTX_CPT_SHA384);
-+}
-+
-+static int otx_cpt_aead_cbc_aes_sha512_init(struct crypto_aead *tfm)
-+{
-+	return cpt_aead_init(tfm, OTX_CPT_AES_CBC, OTX_CPT_SHA512);
-+}
-+
-+static int otx_cpt_aead_ecb_null_sha1_init(struct crypto_aead *tfm)
-+{
-+	return cpt_aead_init(tfm, OTX_CPT_CIPHER_NULL, OTX_CPT_SHA1);
-+}
-+
-+static int otx_cpt_aead_ecb_null_sha256_init(struct crypto_aead *tfm)
-+{
-+	return cpt_aead_init(tfm, OTX_CPT_CIPHER_NULL, OTX_CPT_SHA256);
-+}
-+
-+static int otx_cpt_aead_ecb_null_sha384_init(struct crypto_aead *tfm)
-+{
-+	return cpt_aead_init(tfm, OTX_CPT_CIPHER_NULL, OTX_CPT_SHA384);
-+}
-+
-+static int otx_cpt_aead_ecb_null_sha512_init(struct crypto_aead *tfm)
-+{
-+	return cpt_aead_init(tfm, OTX_CPT_CIPHER_NULL, OTX_CPT_SHA512);
-+}
-+
-+static int otx_cpt_aead_gcm_aes_init(struct crypto_aead *tfm)
-+{
-+	return cpt_aead_init(tfm, OTX_CPT_AES_GCM, OTX_CPT_MAC_NULL);
-+}
-+
-+static void otx_cpt_aead_exit(struct crypto_aead *tfm)
-+{
-+	struct otx_cpt_aead_ctx *ctx = crypto_aead_ctx(tfm);
-+
-+	kfree(ctx->ipad);
-+	kfree(ctx->opad);
-+	if (ctx->hashalg)
-+		crypto_free_shash(ctx->hashalg);
-+	kfree(ctx->sdesc);
-+}
-+
++++ b/drivers/crypto/marvell/cesa/Makefile
+@@ -0,0 +1,3 @@
++# SPDX-License-Identifier: GPL-2.0-only
++obj-$(CONFIG_CRYPTO_DEV_MARVELL_CESA) += marvell-cesa.o
++marvell-cesa-objs := cesa.o cipher.o hash.o tdma.o
+diff --git a/drivers/crypto/marvell/cesa/cesa.c b/drivers/crypto/marvell/cesa/cesa.c
+new file mode 100644
+index 0000000..8a5f0b0
+--- /dev/null
++++ b/drivers/crypto/marvell/cesa/cesa.c
+@@ -0,0 +1,615 @@
++// SPDX-License-Identifier: GPL-2.0-only
 +/*
-+ * This is the Integrity Check Value validation (aka the authentication tag
-+ * length)
-+ */
-+static int otx_cpt_aead_set_authsize(struct crypto_aead *tfm,
-+				     unsigned int authsize)
-+{
-+	struct otx_cpt_aead_ctx *ctx = crypto_aead_ctx(tfm);
-+
-+	switch (ctx->mac_type) {
-+	case OTX_CPT_SHA1:
-+		if (authsize != SHA1_DIGEST_SIZE &&
-+		    authsize != SHA1_TRUNC_DIGEST_SIZE)
-+			return -EINVAL;
-+
-+		if (authsize == SHA1_TRUNC_DIGEST_SIZE)
-+			ctx->is_trunc_hmac = true;
-+		break;
-+
-+	case OTX_CPT_SHA256:
-+		if (authsize != SHA256_DIGEST_SIZE &&
-+		    authsize != SHA256_TRUNC_DIGEST_SIZE)
-+			return -EINVAL;
-+
-+		if (authsize == SHA256_TRUNC_DIGEST_SIZE)
-+			ctx->is_trunc_hmac = true;
-+		break;
-+
-+	case OTX_CPT_SHA384:
-+		if (authsize != SHA384_DIGEST_SIZE &&
-+		    authsize != SHA384_TRUNC_DIGEST_SIZE)
-+			return -EINVAL;
-+
-+		if (authsize == SHA384_TRUNC_DIGEST_SIZE)
-+			ctx->is_trunc_hmac = true;
-+		break;
-+
-+	case OTX_CPT_SHA512:
-+		if (authsize != SHA512_DIGEST_SIZE &&
-+		    authsize != SHA512_TRUNC_DIGEST_SIZE)
-+			return -EINVAL;
-+
-+		if (authsize == SHA512_TRUNC_DIGEST_SIZE)
-+			ctx->is_trunc_hmac = true;
-+		break;
-+
-+	case OTX_CPT_MAC_NULL:
-+		if (ctx->cipher_type == OTX_CPT_AES_GCM) {
-+			if (authsize != AES_GCM_ICV_SIZE)
-+				return -EINVAL;
-+		} else
-+			return -EINVAL;
-+		break;
-+
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	tfm->authsize = authsize;
-+	return 0;
-+}
-+
-+static struct otx_cpt_sdesc *alloc_sdesc(struct crypto_shash *alg)
-+{
-+	struct otx_cpt_sdesc *sdesc;
-+	int size;
-+
-+	size = sizeof(struct shash_desc) + crypto_shash_descsize(alg);
-+	sdesc = kmalloc(size, GFP_KERNEL);
-+	if (!sdesc)
-+		return NULL;
-+
-+	sdesc->shash.tfm = alg;
-+
-+	return sdesc;
-+}
-+
-+static inline void swap_data32(void *buf, u32 len)
-+{
-+	u32 *store = (u32 *) buf;
-+	int i = 0;
-+
-+	for (i = 0 ; i < len/sizeof(u32); i++, store++)
-+		*store = cpu_to_be32(*store);
-+}
-+
-+static inline void swap_data64(void *buf, u32 len)
-+{
-+	u64 *store = (u64 *) buf;
-+	int i = 0;
-+
-+	for (i = 0 ; i < len/sizeof(u64); i++, store++)
-+		*store = cpu_to_be64(*store);
-+}
-+
-+static int copy_pad(u8 mac_type, u8 *out_pad, u8 *in_pad)
-+{
-+	struct sha512_state *sha512;
-+	struct sha256_state *sha256;
-+	struct sha1_state *sha1;
-+
-+	switch (mac_type) {
-+	case OTX_CPT_SHA1:
-+		sha1 = (struct sha1_state *) in_pad;
-+		swap_data32(sha1->state, SHA1_DIGEST_SIZE);
-+		memcpy(out_pad, &sha1->state, SHA1_DIGEST_SIZE);
-+		break;
-+
-+	case OTX_CPT_SHA256:
-+		sha256 = (struct sha256_state *) in_pad;
-+		swap_data32(sha256->state, SHA256_DIGEST_SIZE);
-+		memcpy(out_pad, &sha256->state, SHA256_DIGEST_SIZE);
-+		break;
-+
-+	case OTX_CPT_SHA384:
-+	case OTX_CPT_SHA512:
-+		sha512 = (struct sha512_state *) in_pad;
-+		swap_data64(sha512->state, SHA512_DIGEST_SIZE);
-+		memcpy(out_pad, &sha512->state, SHA512_DIGEST_SIZE);
-+		break;
-+
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static int aead_hmac_init(struct crypto_aead *cipher)
-+{
-+	struct otx_cpt_aead_ctx *ctx = crypto_aead_ctx(cipher);
-+	int state_size = crypto_shash_statesize(ctx->hashalg);
-+	int ds = crypto_shash_digestsize(ctx->hashalg);
-+	int bs = crypto_shash_blocksize(ctx->hashalg);
-+	int authkeylen = ctx->auth_key_len;
-+	u8 *ipad = NULL, *opad = NULL;
-+	int ret = 0, icount = 0;
-+
-+	ctx->sdesc = alloc_sdesc(ctx->hashalg);
-+	if (!ctx->sdesc)
-+		return -ENOMEM;
-+
-+	ctx->ipad = kzalloc(bs, GFP_KERNEL);
-+	if (!ctx->ipad) {
-+		ret = -ENOMEM;
-+		goto calc_fail;
-+	}
-+
-+	ctx->opad = kzalloc(bs, GFP_KERNEL);
-+	if (!ctx->opad) {
-+		ret = -ENOMEM;
-+		goto calc_fail;
-+	}
-+
-+	ipad = kzalloc(state_size, GFP_KERNEL);
-+	if (!ipad) {
-+		ret = -ENOMEM;
-+		goto calc_fail;
-+	}
-+
-+	opad = kzalloc(state_size, GFP_KERNEL);
-+	if (!opad) {
-+		ret = -ENOMEM;
-+		goto calc_fail;
-+	}
-+
-+	if (authkeylen > bs) {
-+		ret = crypto_shash_digest(&ctx->sdesc->shash, ctx->key,
-+					  authkeylen, ipad);
-+		if (ret)
-+			goto calc_fail;
-+
-+		authkeylen = ds;
-+	} else {
-+		memcpy(ipad, ctx->key, authkeylen);
-+	}
-+
-+	memset(ipad + authkeylen, 0, bs - authkeylen);
-+	memcpy(opad, ipad, bs);
-+
-+	for (icount = 0; icount < bs; icount++) {
-+		ipad[icount] ^= 0x36;
-+		opad[icount] ^= 0x5c;
-+	}
-+
-+	/*
-+	 * Partial Hash calculated from the software
-+	 * algorithm is retrieved for IPAD & OPAD
-+	 */
-+
-+	/* IPAD Calculation */
-+	crypto_shash_init(&ctx->sdesc->shash);
-+	crypto_shash_update(&ctx->sdesc->shash, ipad, bs);
-+	crypto_shash_export(&ctx->sdesc->shash, ipad);
-+	ret = copy_pad(ctx->mac_type, ctx->ipad, ipad);
-+	if (ret)
-+		goto calc_fail;
-+
-+	/* OPAD Calculation */
-+	crypto_shash_init(&ctx->sdesc->shash);
-+	crypto_shash_update(&ctx->sdesc->shash, opad, bs);
-+	crypto_shash_export(&ctx->sdesc->shash, opad);
-+	ret = copy_pad(ctx->mac_type, ctx->opad, opad);
-+	if (ret)
-+		goto calc_fail;
-+
-+	kfree(ipad);
-+	kfree(opad);
-+
-+	return 0;
-+
-+calc_fail:
-+	kfree(ctx->ipad);
-+	ctx->ipad = NULL;
-+	kfree(ctx->opad);
-+	ctx->opad = NULL;
-+	kfree(ipad);
-+	kfree(opad);
-+	kfree(ctx->sdesc);
-+	ctx->sdesc = NULL;
-+
-+	return ret;
-+}
-+
-+static int otx_cpt_aead_cbc_aes_sha_setkey(struct crypto_aead *cipher,
-+					   const unsigned char *key,
-+					   unsigned int keylen)
-+{
-+	struct otx_cpt_aead_ctx *ctx = crypto_aead_ctx(cipher);
-+	struct crypto_authenc_key_param *param;
-+	int enckeylen = 0, authkeylen = 0;
-+	struct rtattr *rta = (void *)key;
-+	int status = -EINVAL;
-+
-+	if (!RTA_OK(rta, keylen))
-+		goto badkey;
-+
-+	if (rta->rta_type != CRYPTO_AUTHENC_KEYA_PARAM)
-+		goto badkey;
-+
-+	if (RTA_PAYLOAD(rta) < sizeof(*param))
-+		goto badkey;
-+
-+	param = RTA_DATA(rta);
-+	enckeylen = be32_to_cpu(param->enckeylen);
-+	key += RTA_ALIGN(rta->rta_len);
-+	keylen -= RTA_ALIGN(rta->rta_len);
-+	if (keylen < enckeylen)
-+		goto badkey;
-+
-+	if (keylen > OTX_CPT_MAX_KEY_SIZE)
-+		goto badkey;
-+
-+	authkeylen = keylen - enckeylen;
-+	memcpy(ctx->key, key, keylen);
-+
-+	switch (enckeylen) {
-+	case AES_KEYSIZE_128:
-+		ctx->key_type = OTX_CPT_AES_128_BIT;
-+		break;
-+	case AES_KEYSIZE_192:
-+		ctx->key_type = OTX_CPT_AES_192_BIT;
-+		break;
-+	case AES_KEYSIZE_256:
-+		ctx->key_type = OTX_CPT_AES_256_BIT;
-+		break;
-+	default:
-+		/* Invalid key length */
-+		goto badkey;
-+	}
-+
-+	ctx->enc_key_len = enckeylen;
-+	ctx->auth_key_len = authkeylen;
-+
-+	status = aead_hmac_init(cipher);
-+	if (status)
-+		goto badkey;
-+
-+	return 0;
-+badkey:
-+	return status;
-+}
-+
-+static int otx_cpt_aead_ecb_null_sha_setkey(struct crypto_aead *cipher,
-+					    const unsigned char *key,
-+					    unsigned int keylen)
-+{
-+	struct otx_cpt_aead_ctx *ctx = crypto_aead_ctx(cipher);
-+	struct crypto_authenc_key_param *param;
-+	struct rtattr *rta = (void *)key;
-+	int enckeylen = 0;
-+
-+	if (!RTA_OK(rta, keylen))
-+		goto badkey;
-+
-+	if (rta->rta_type != CRYPTO_AUTHENC_KEYA_PARAM)
-+		goto badkey;
-+
-+	if (RTA_PAYLOAD(rta) < sizeof(*param))
-+		goto badkey;
-+
-+	param = RTA_DATA(rta);
-+	enckeylen = be32_to_cpu(param->enckeylen);
-+	key += RTA_ALIGN(rta->rta_len);
-+	keylen -= RTA_ALIGN(rta->rta_len);
-+	if (enckeylen != 0)
-+		goto badkey;
-+
-+	if (keylen > OTX_CPT_MAX_KEY_SIZE)
-+		goto badkey;
-+
-+	memcpy(ctx->key, key, keylen);
-+	ctx->enc_key_len = enckeylen;
-+	ctx->auth_key_len = keylen;
-+	return 0;
-+badkey:
-+	return -EINVAL;
-+}
-+
-+static int otx_cpt_aead_gcm_aes_setkey(struct crypto_aead *cipher,
-+				       const unsigned char *key,
-+				       unsigned int keylen)
-+{
-+	struct otx_cpt_aead_ctx *ctx = crypto_aead_ctx(cipher);
-+
-+	/*
-+	 * For aes gcm we expect to get encryption key (16, 24, 32 bytes)
-+	 * and salt (4 bytes)
-+	 */
-+	switch (keylen) {
-+	case AES_KEYSIZE_128 + AES_GCM_SALT_SIZE:
-+		ctx->key_type = OTX_CPT_AES_128_BIT;
-+		ctx->enc_key_len = AES_KEYSIZE_128;
-+		break;
-+	case AES_KEYSIZE_192 + AES_GCM_SALT_SIZE:
-+		ctx->key_type = OTX_CPT_AES_192_BIT;
-+		ctx->enc_key_len = AES_KEYSIZE_192;
-+		break;
-+	case AES_KEYSIZE_256 + AES_GCM_SALT_SIZE:
-+		ctx->key_type = OTX_CPT_AES_256_BIT;
-+		ctx->enc_key_len = AES_KEYSIZE_256;
-+		break;
-+	default:
-+		/* Invalid key and salt length */
-+		return -EINVAL;
-+	}
-+
-+	/* Store encryption key and salt */
-+	memcpy(ctx->key, key, keylen);
-+
-+	return 0;
-+}
-+
-+static inline u32 create_aead_ctx_hdr(struct aead_request *req, u32 enc,
-+				      u32 *argcnt)
-+{
-+	struct otx_cpt_req_ctx *rctx = aead_request_ctx(req);
-+	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
-+	struct otx_cpt_aead_ctx *ctx = crypto_aead_ctx(tfm);
-+	struct otx_cpt_req_info *req_info = &rctx->cpt_req;
-+	struct otx_cpt_fc_ctx *fctx = &rctx->fctx;
-+	int mac_len = crypto_aead_authsize(tfm);
-+	int ds;
-+
-+	rctx->ctrl_word.e.enc_data_offset = req->assoclen;
-+
-+	switch (ctx->cipher_type) {
-+	case OTX_CPT_AES_CBC:
-+		fctx->enc.enc_ctrl.e.iv_source = OTX_CPT_FROM_CPTR;
-+		/* Copy encryption key to context */
-+		memcpy(fctx->enc.encr_key, ctx->key + ctx->auth_key_len,
-+		       ctx->enc_key_len);
-+		/* Copy IV to context */
-+		memcpy(fctx->enc.encr_iv, req->iv, crypto_aead_ivsize(tfm));
-+
-+		ds = crypto_shash_digestsize(ctx->hashalg);
-+		if (ctx->mac_type == OTX_CPT_SHA384)
-+			ds = SHA512_DIGEST_SIZE;
-+		if (ctx->ipad)
-+			memcpy(fctx->hmac.e.ipad, ctx->ipad, ds);
-+		if (ctx->opad)
-+			memcpy(fctx->hmac.e.opad, ctx->opad, ds);
-+		break;
-+
-+	case OTX_CPT_AES_GCM:
-+		fctx->enc.enc_ctrl.e.iv_source = OTX_CPT_FROM_DPTR;
-+		/* Copy encryption key to context */
-+		memcpy(fctx->enc.encr_key, ctx->key, ctx->enc_key_len);
-+		/* Copy salt to context */
-+		memcpy(fctx->enc.encr_iv, ctx->key + ctx->enc_key_len,
-+		       AES_GCM_SALT_SIZE);
-+
-+		rctx->ctrl_word.e.iv_offset = req->assoclen - AES_GCM_IV_OFFSET;
-+		break;
-+
-+	default:
-+		/* Unknown cipher type */
-+		return -EINVAL;
-+	}
-+	rctx->ctrl_word.flags = cpu_to_be64(rctx->ctrl_word.flags);
-+
-+	req_info->ctrl.s.dma_mode = OTX_CPT_DMA_GATHER_SCATTER;
-+	req_info->ctrl.s.se_req = OTX_CPT_SE_CORE_REQ;
-+	req_info->req.opcode.s.major = OTX_CPT_MAJOR_OP_FC |
-+				 DMA_MODE_FLAG(OTX_CPT_DMA_GATHER_SCATTER);
-+	if (enc) {
-+		req_info->req.opcode.s.minor = 2;
-+		req_info->req.param1 = req->cryptlen;
-+		req_info->req.param2 = req->cryptlen + req->assoclen;
-+	} else {
-+		req_info->req.opcode.s.minor = 3;
-+		req_info->req.param1 = req->cryptlen - mac_len;
-+		req_info->req.param2 = req->cryptlen + req->assoclen - mac_len;
-+	}
-+
-+	fctx->enc.enc_ctrl.e.enc_cipher = ctx->cipher_type;
-+	fctx->enc.enc_ctrl.e.aes_key = ctx->key_type;
-+	fctx->enc.enc_ctrl.e.mac_type = ctx->mac_type;
-+	fctx->enc.enc_ctrl.e.mac_len = mac_len;
-+	fctx->enc.enc_ctrl.flags = cpu_to_be64(fctx->enc.enc_ctrl.flags);
-+
-+	/*
-+	 * Storing Packet Data Information in offset
-+	 * Control Word First 8 bytes
-+	 */
-+	req_info->in[*argcnt].vptr = (u8 *)&rctx->ctrl_word;
-+	req_info->in[*argcnt].size = CONTROL_WORD_LEN;
-+	req_info->req.dlen += CONTROL_WORD_LEN;
-+	++(*argcnt);
-+
-+	req_info->in[*argcnt].vptr = (u8 *)fctx;
-+	req_info->in[*argcnt].size = sizeof(struct otx_cpt_fc_ctx);
-+	req_info->req.dlen += sizeof(struct otx_cpt_fc_ctx);
-+	++(*argcnt);
-+
-+	return 0;
-+}
-+
-+static inline u32 create_hmac_ctx_hdr(struct aead_request *req, u32 *argcnt,
-+				      u32 enc)
-+{
-+	struct otx_cpt_req_ctx *rctx = aead_request_ctx(req);
-+	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
-+	struct otx_cpt_aead_ctx *ctx = crypto_aead_ctx(tfm);
-+	struct otx_cpt_req_info *req_info = &rctx->cpt_req;
-+
-+	req_info->ctrl.s.dma_mode = OTX_CPT_DMA_GATHER_SCATTER;
-+	req_info->ctrl.s.se_req = OTX_CPT_SE_CORE_REQ;
-+	req_info->req.opcode.s.major = OTX_CPT_MAJOR_OP_HMAC |
-+				 DMA_MODE_FLAG(OTX_CPT_DMA_GATHER_SCATTER);
-+	req_info->is_trunc_hmac = ctx->is_trunc_hmac;
-+
-+	req_info->req.opcode.s.minor = 0;
-+	req_info->req.param1 = ctx->auth_key_len;
-+	req_info->req.param2 = ctx->mac_type << 8;
-+
-+	/* Add authentication key */
-+	req_info->in[*argcnt].vptr = ctx->key;
-+	req_info->in[*argcnt].size = round_up(ctx->auth_key_len, 8);
-+	req_info->req.dlen += round_up(ctx->auth_key_len, 8);
-+	++(*argcnt);
-+
-+	return 0;
-+}
-+
-+static inline u32 create_aead_input_list(struct aead_request *req, u32 enc)
-+{
-+	struct otx_cpt_req_ctx *rctx = aead_request_ctx(req);
-+	struct otx_cpt_req_info *req_info = &rctx->cpt_req;
-+	u32 inputlen =  req->cryptlen + req->assoclen;
-+	u32 status, argcnt = 0;
-+
-+	status = create_aead_ctx_hdr(req, enc, &argcnt);
-+	if (status)
-+		return status;
-+	update_input_data(req_info, req->src, inputlen, &argcnt);
-+	req_info->incnt = argcnt;
-+
-+	return 0;
-+}
-+
-+static inline u32 create_aead_output_list(struct aead_request *req, u32 enc,
-+					  u32 mac_len)
-+{
-+	struct otx_cpt_req_ctx *rctx = aead_request_ctx(req);
-+	struct otx_cpt_req_info *req_info =  &rctx->cpt_req;
-+	u32 argcnt = 0, outputlen = 0;
-+
-+	if (enc)
-+		outputlen = req->cryptlen +  req->assoclen + mac_len;
-+	else
-+		outputlen = req->cryptlen + req->assoclen - mac_len;
-+
-+	update_output_data(req_info, req->dst, 0, outputlen, &argcnt);
-+	req_info->outcnt = argcnt;
-+
-+	return 0;
-+}
-+
-+static inline u32 create_aead_null_input_list(struct aead_request *req,
-+					      u32 enc, u32 mac_len)
-+{
-+	struct otx_cpt_req_ctx *rctx = aead_request_ctx(req);
-+	struct otx_cpt_req_info *req_info = &rctx->cpt_req;
-+	u32 inputlen, argcnt = 0;
-+
-+	if (enc)
-+		inputlen =  req->cryptlen + req->assoclen;
-+	else
-+		inputlen =  req->cryptlen + req->assoclen - mac_len;
-+
-+	create_hmac_ctx_hdr(req, &argcnt, enc);
-+	update_input_data(req_info, req->src, inputlen, &argcnt);
-+	req_info->incnt = argcnt;
-+
-+	return 0;
-+}
-+
-+static inline u32 create_aead_null_output_list(struct aead_request *req,
-+					       u32 enc, u32 mac_len)
-+{
-+	struct otx_cpt_req_ctx *rctx = aead_request_ctx(req);
-+	struct otx_cpt_req_info *req_info =  &rctx->cpt_req;
-+	struct scatterlist *dst;
-+	u8 *ptr = NULL;
-+	int argcnt = 0, status, offset;
-+	u32 inputlen;
-+
-+	if (enc)
-+		inputlen =  req->cryptlen + req->assoclen;
-+	else
-+		inputlen =  req->cryptlen + req->assoclen - mac_len;
-+
-+	/*
-+	 * If source and destination are different
-+	 * then copy payload to destination
-+	 */
-+	if (req->src != req->dst) {
-+
-+		ptr = kmalloc(inputlen, (req_info->areq->flags &
-+					 CRYPTO_TFM_REQ_MAY_SLEEP) ?
-+					 GFP_KERNEL : GFP_ATOMIC);
-+		if (!ptr) {
-+			status = -ENOMEM;
-+			goto error;
-+		}
-+
-+		status = sg_copy_to_buffer(req->src, sg_nents(req->src), ptr,
-+					   inputlen);
-+		if (status != inputlen) {
-+			status = -EINVAL;
-+			goto error;
-+		}
-+		status = sg_copy_from_buffer(req->dst, sg_nents(req->dst), ptr,
-+					     inputlen);
-+		if (status != inputlen) {
-+			status = -EINVAL;
-+			goto error;
-+		}
-+		kfree(ptr);
-+	}
-+
-+	if (enc) {
-+		/*
-+		 * In an encryption scenario hmac needs
-+		 * to be appended after payload
-+		 */
-+		dst = req->dst;
-+		offset = inputlen;
-+		while (offset >= dst->length) {
-+			offset -= dst->length;
-+			dst = sg_next(dst);
-+			if (!dst) {
-+				status = -ENOENT;
-+				goto error;
-+			}
-+		}
-+
-+		update_output_data(req_info, dst, offset, mac_len, &argcnt);
-+	} else {
-+		/*
-+		 * In a decryption scenario calculated hmac for received
-+		 * payload needs to be compare with hmac received
-+		 */
-+		status = sg_copy_buffer(req->src, sg_nents(req->src),
-+					rctx->fctx.hmac.s.hmac_recv, mac_len,
-+					inputlen, true);
-+		if (status != mac_len) {
-+			status = -EINVAL;
-+			goto error;
-+		}
-+
-+		req_info->out[argcnt].vptr = rctx->fctx.hmac.s.hmac_calc;
-+		req_info->out[argcnt].size = mac_len;
-+		argcnt++;
-+	}
-+
-+	req_info->outcnt = argcnt;
-+	return 0;
-+error:
-+	kfree(ptr);
-+	return status;
-+}
-+
-+static u32 cpt_aead_enc_dec(struct aead_request *req, u8 reg_type, u8 enc)
-+{
-+	struct otx_cpt_req_ctx *rctx = aead_request_ctx(req);
-+	struct otx_cpt_req_info *req_info = &rctx->cpt_req;
-+	struct crypto_aead *tfm = crypto_aead_reqtfm(req);
-+	struct pci_dev *pdev;
-+	u32 status, cpu_num;
-+
-+	/* Clear control words */
-+	rctx->ctrl_word.flags = 0;
-+	rctx->fctx.enc.enc_ctrl.flags = 0;
-+
-+	req_info->callback = otx_cpt_aead_callback;
-+	req_info->areq = &req->base;
-+	req_info->req_type = reg_type;
-+	req_info->is_enc = enc;
-+	req_info->is_trunc_hmac = false;
-+
-+	switch (reg_type) {
-+	case OTX_CPT_AEAD_ENC_DEC_REQ:
-+		status = create_aead_input_list(req, enc);
-+		if (status)
-+			return status;
-+		status = create_aead_output_list(req, enc,
-+						 crypto_aead_authsize(tfm));
-+		if (status)
-+			return status;
-+		break;
-+
-+	case OTX_CPT_AEAD_ENC_DEC_NULL_REQ:
-+		status = create_aead_null_input_list(req, enc,
-+						     crypto_aead_authsize(tfm));
-+		if (status)
-+			return status;
-+		status = create_aead_null_output_list(req, enc,
-+						crypto_aead_authsize(tfm));
-+		if (status)
-+			return status;
-+		break;
-+
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	/* Validate that request doesn't exceed maximum CPT supported size */
-+	if (req_info->req.param1 > OTX_CPT_MAX_REQ_SIZE ||
-+	    req_info->req.param2 > OTX_CPT_MAX_REQ_SIZE)
-+		return -E2BIG;
-+
-+	status = get_se_device(&pdev, &cpu_num);
-+	if (status)
-+		return status;
-+
-+	req_info->ctrl.s.grp = 0;
-+
-+	status = otx_cpt_do_request(pdev, req_info, cpu_num);
-+	/*
-+	 * We perform an asynchronous send and once
-+	 * the request is completed the driver would
-+	 * intimate through registered call back functions
-+	 */
-+	return status;
-+}
-+
-+static int otx_cpt_aead_encrypt(struct aead_request *req)
-+{
-+	return cpt_aead_enc_dec(req, OTX_CPT_AEAD_ENC_DEC_REQ, true);
-+}
-+
-+static int otx_cpt_aead_decrypt(struct aead_request *req)
-+{
-+	return cpt_aead_enc_dec(req, OTX_CPT_AEAD_ENC_DEC_REQ, false);
-+}
-+
-+static int otx_cpt_aead_null_encrypt(struct aead_request *req)
-+{
-+	return cpt_aead_enc_dec(req, OTX_CPT_AEAD_ENC_DEC_NULL_REQ, true);
-+}
-+
-+static int otx_cpt_aead_null_decrypt(struct aead_request *req)
-+{
-+	return cpt_aead_enc_dec(req, OTX_CPT_AEAD_ENC_DEC_NULL_REQ, false);
-+}
-+
-+static struct skcipher_alg otx_cpt_skciphers[] = { {
-+	.base.cra_name = "xts(aes)",
-+	.base.cra_driver_name = "cpt_xts_aes",
-+	.base.cra_flags = CRYPTO_ALG_ASYNC,
-+	.base.cra_blocksize = AES_BLOCK_SIZE,
-+	.base.cra_ctxsize = sizeof(struct otx_cpt_enc_ctx),
-+	.base.cra_alignmask = 7,
-+	.base.cra_priority = 4001,
-+	.base.cra_module = THIS_MODULE,
-+
-+	.init = otx_cpt_enc_dec_init,
-+	.ivsize = AES_BLOCK_SIZE,
-+	.min_keysize = 2 * AES_MIN_KEY_SIZE,
-+	.max_keysize = 2 * AES_MAX_KEY_SIZE,
-+	.setkey = otx_cpt_skcipher_xts_setkey,
-+	.encrypt = otx_cpt_skcipher_encrypt,
-+	.decrypt = otx_cpt_skcipher_decrypt,
-+}, {
-+	.base.cra_name = "cbc(aes)",
-+	.base.cra_driver_name = "cpt_cbc_aes",
-+	.base.cra_flags = CRYPTO_ALG_ASYNC,
-+	.base.cra_blocksize = AES_BLOCK_SIZE,
-+	.base.cra_ctxsize = sizeof(struct otx_cpt_enc_ctx),
-+	.base.cra_alignmask = 7,
-+	.base.cra_priority = 4001,
-+	.base.cra_module = THIS_MODULE,
-+
-+	.init = otx_cpt_enc_dec_init,
-+	.ivsize = AES_BLOCK_SIZE,
-+	.min_keysize = AES_MIN_KEY_SIZE,
-+	.max_keysize = AES_MAX_KEY_SIZE,
-+	.setkey = otx_cpt_skcipher_cbc_aes_setkey,
-+	.encrypt = otx_cpt_skcipher_encrypt,
-+	.decrypt = otx_cpt_skcipher_decrypt,
-+}, {
-+	.base.cra_name = "ecb(aes)",
-+	.base.cra_driver_name = "cpt_ecb_aes",
-+	.base.cra_flags = CRYPTO_ALG_ASYNC,
-+	.base.cra_blocksize = AES_BLOCK_SIZE,
-+	.base.cra_ctxsize = sizeof(struct otx_cpt_enc_ctx),
-+	.base.cra_alignmask = 7,
-+	.base.cra_priority = 4001,
-+	.base.cra_module = THIS_MODULE,
-+
-+	.init = otx_cpt_enc_dec_init,
-+	.ivsize = 0,
-+	.min_keysize = AES_MIN_KEY_SIZE,
-+	.max_keysize = AES_MAX_KEY_SIZE,
-+	.setkey = otx_cpt_skcipher_ecb_aes_setkey,
-+	.encrypt = otx_cpt_skcipher_encrypt,
-+	.decrypt = otx_cpt_skcipher_decrypt,
-+}, {
-+	.base.cra_name = "cfb(aes)",
-+	.base.cra_driver_name = "cpt_cfb_aes",
-+	.base.cra_flags = CRYPTO_ALG_ASYNC,
-+	.base.cra_blocksize = AES_BLOCK_SIZE,
-+	.base.cra_ctxsize = sizeof(struct otx_cpt_enc_ctx),
-+	.base.cra_alignmask = 7,
-+	.base.cra_priority = 4001,
-+	.base.cra_module = THIS_MODULE,
-+
-+	.init = otx_cpt_enc_dec_init,
-+	.ivsize = AES_BLOCK_SIZE,
-+	.min_keysize = AES_MIN_KEY_SIZE,
-+	.max_keysize = AES_MAX_KEY_SIZE,
-+	.setkey = otx_cpt_skcipher_cfb_aes_setkey,
-+	.encrypt = otx_cpt_skcipher_encrypt,
-+	.decrypt = otx_cpt_skcipher_decrypt,
-+}, {
-+	.base.cra_name = "cbc(des3_ede)",
-+	.base.cra_driver_name = "cpt_cbc_des3_ede",
-+	.base.cra_flags = CRYPTO_ALG_ASYNC,
-+	.base.cra_blocksize = DES3_EDE_BLOCK_SIZE,
-+	.base.cra_ctxsize = sizeof(struct otx_cpt_des3_ctx),
-+	.base.cra_alignmask = 7,
-+	.base.cra_priority = 4001,
-+	.base.cra_module = THIS_MODULE,
-+
-+	.init = otx_cpt_enc_dec_init,
-+	.min_keysize = DES3_EDE_KEY_SIZE,
-+	.max_keysize = DES3_EDE_KEY_SIZE,
-+	.ivsize = DES_BLOCK_SIZE,
-+	.setkey = otx_cpt_skcipher_cbc_des3_setkey,
-+	.encrypt = otx_cpt_skcipher_encrypt,
-+	.decrypt = otx_cpt_skcipher_decrypt,
-+}, {
-+	.base.cra_name = "ecb(des3_ede)",
-+	.base.cra_driver_name = "cpt_ecb_des3_ede",
-+	.base.cra_flags = CRYPTO_ALG_ASYNC,
-+	.base.cra_blocksize = DES3_EDE_BLOCK_SIZE,
-+	.base.cra_ctxsize = sizeof(struct otx_cpt_des3_ctx),
-+	.base.cra_alignmask = 7,
-+	.base.cra_priority = 4001,
-+	.base.cra_module = THIS_MODULE,
-+
-+	.init = otx_cpt_enc_dec_init,
-+	.min_keysize = DES3_EDE_KEY_SIZE,
-+	.max_keysize = DES3_EDE_KEY_SIZE,
-+	.ivsize = 0,
-+	.setkey = otx_cpt_skcipher_ecb_des3_setkey,
-+	.encrypt = otx_cpt_skcipher_encrypt,
-+	.decrypt = otx_cpt_skcipher_decrypt,
-+} };
-+
-+struct aead_alg otx_cpt_aeads[] = { {
-+	.base = {
-+		.cra_name = "authenc(hmac(sha1),cbc(aes))",
-+		.cra_driver_name = "cpt_hmac_sha1_cbc_aes",
-+		.cra_blocksize = AES_BLOCK_SIZE,
-+		.cra_flags = CRYPTO_ALG_ASYNC,
-+		.cra_ctxsize = sizeof(struct otx_cpt_aead_ctx),
-+		.cra_priority = 4001,
-+		.cra_alignmask = 0,
-+		.cra_module = THIS_MODULE,
-+	},
-+	.init = otx_cpt_aead_cbc_aes_sha1_init,
-+	.exit = otx_cpt_aead_exit,
-+	.setkey = otx_cpt_aead_cbc_aes_sha_setkey,
-+	.setauthsize = otx_cpt_aead_set_authsize,
-+	.encrypt = otx_cpt_aead_encrypt,
-+	.decrypt = otx_cpt_aead_decrypt,
-+	.ivsize = AES_BLOCK_SIZE,
-+	.maxauthsize = SHA1_DIGEST_SIZE,
-+}, {
-+	.base = {
-+		.cra_name = "authenc(hmac(sha256),cbc(aes))",
-+		.cra_driver_name = "cpt_hmac_sha256_cbc_aes",
-+		.cra_blocksize = AES_BLOCK_SIZE,
-+		.cra_flags = CRYPTO_ALG_ASYNC,
-+		.cra_ctxsize = sizeof(struct otx_cpt_aead_ctx),
-+		.cra_priority = 4001,
-+		.cra_alignmask = 0,
-+		.cra_module = THIS_MODULE,
-+	},
-+	.init = otx_cpt_aead_cbc_aes_sha256_init,
-+	.exit = otx_cpt_aead_exit,
-+	.setkey = otx_cpt_aead_cbc_aes_sha_setkey,
-+	.setauthsize = otx_cpt_aead_set_authsize,
-+	.encrypt = otx_cpt_aead_encrypt,
-+	.decrypt = otx_cpt_aead_decrypt,
-+	.ivsize = AES_BLOCK_SIZE,
-+	.maxauthsize = SHA256_DIGEST_SIZE,
-+}, {
-+	.base = {
-+		.cra_name = "authenc(hmac(sha384),cbc(aes))",
-+		.cra_driver_name = "cpt_hmac_sha384_cbc_aes",
-+		.cra_blocksize = AES_BLOCK_SIZE,
-+		.cra_flags = CRYPTO_ALG_ASYNC,
-+		.cra_ctxsize = sizeof(struct otx_cpt_aead_ctx),
-+		.cra_priority = 4001,
-+		.cra_alignmask = 0,
-+		.cra_module = THIS_MODULE,
-+	},
-+	.init = otx_cpt_aead_cbc_aes_sha384_init,
-+	.exit = otx_cpt_aead_exit,
-+	.setkey = otx_cpt_aead_cbc_aes_sha_setkey,
-+	.setauthsize = otx_cpt_aead_set_authsize,
-+	.encrypt = otx_cpt_aead_encrypt,
-+	.decrypt = otx_cpt_aead_decrypt,
-+	.ivsize = AES_BLOCK_SIZE,
-+	.maxauthsize = SHA384_DIGEST_SIZE,
-+}, {
-+	.base = {
-+		.cra_name = "authenc(hmac(sha512),cbc(aes))",
-+		.cra_driver_name = "cpt_hmac_sha512_cbc_aes",
-+		.cra_blocksize = AES_BLOCK_SIZE,
-+		.cra_flags = CRYPTO_ALG_ASYNC,
-+		.cra_ctxsize = sizeof(struct otx_cpt_aead_ctx),
-+		.cra_priority = 4001,
-+		.cra_alignmask = 0,
-+		.cra_module = THIS_MODULE,
-+	},
-+	.init = otx_cpt_aead_cbc_aes_sha512_init,
-+	.exit = otx_cpt_aead_exit,
-+	.setkey = otx_cpt_aead_cbc_aes_sha_setkey,
-+	.setauthsize = otx_cpt_aead_set_authsize,
-+	.encrypt = otx_cpt_aead_encrypt,
-+	.decrypt = otx_cpt_aead_decrypt,
-+	.ivsize = AES_BLOCK_SIZE,
-+	.maxauthsize = SHA512_DIGEST_SIZE,
-+}, {
-+	.base = {
-+		.cra_name = "authenc(hmac(sha1),ecb(cipher_null))",
-+		.cra_driver_name = "cpt_hmac_sha1_ecb_null",
-+		.cra_blocksize = 1,
-+		.cra_flags = CRYPTO_ALG_ASYNC,
-+		.cra_ctxsize = sizeof(struct otx_cpt_aead_ctx),
-+		.cra_priority = 4001,
-+		.cra_alignmask = 0,
-+		.cra_module = THIS_MODULE,
-+	},
-+	.init = otx_cpt_aead_ecb_null_sha1_init,
-+	.exit = otx_cpt_aead_exit,
-+	.setkey = otx_cpt_aead_ecb_null_sha_setkey,
-+	.setauthsize = otx_cpt_aead_set_authsize,
-+	.encrypt = otx_cpt_aead_null_encrypt,
-+	.decrypt = otx_cpt_aead_null_decrypt,
-+	.ivsize = 0,
-+	.maxauthsize = SHA1_DIGEST_SIZE,
-+}, {
-+	.base = {
-+		.cra_name = "authenc(hmac(sha256),ecb(cipher_null))",
-+		.cra_driver_name = "cpt_hmac_sha256_ecb_null",
-+		.cra_blocksize = 1,
-+		.cra_flags = CRYPTO_ALG_ASYNC,
-+		.cra_ctxsize = sizeof(struct otx_cpt_aead_ctx),
-+		.cra_priority = 4001,
-+		.cra_alignmask = 0,
-+		.cra_module = THIS_MODULE,
-+	},
-+	.init = otx_cpt_aead_ecb_null_sha256_init,
-+	.exit = otx_cpt_aead_exit,
-+	.setkey = otx_cpt_aead_ecb_null_sha_setkey,
-+	.setauthsize = otx_cpt_aead_set_authsize,
-+	.encrypt = otx_cpt_aead_null_encrypt,
-+	.decrypt = otx_cpt_aead_null_decrypt,
-+	.ivsize = 0,
-+	.maxauthsize = SHA256_DIGEST_SIZE,
-+}, {
-+	.base = {
-+		.cra_name = "authenc(hmac(sha384),ecb(cipher_null))",
-+		.cra_driver_name = "cpt_hmac_sha384_ecb_null",
-+		.cra_blocksize = 1,
-+		.cra_flags = CRYPTO_ALG_ASYNC,
-+		.cra_ctxsize = sizeof(struct otx_cpt_aead_ctx),
-+		.cra_priority = 4001,
-+		.cra_alignmask = 0,
-+		.cra_module = THIS_MODULE,
-+	},
-+	.init = otx_cpt_aead_ecb_null_sha384_init,
-+	.exit = otx_cpt_aead_exit,
-+	.setkey = otx_cpt_aead_ecb_null_sha_setkey,
-+	.setauthsize = otx_cpt_aead_set_authsize,
-+	.encrypt = otx_cpt_aead_null_encrypt,
-+	.decrypt = otx_cpt_aead_null_decrypt,
-+	.ivsize = 0,
-+	.maxauthsize = SHA384_DIGEST_SIZE,
-+}, {
-+	.base = {
-+		.cra_name = "authenc(hmac(sha512),ecb(cipher_null))",
-+		.cra_driver_name = "cpt_hmac_sha512_ecb_null",
-+		.cra_blocksize = 1,
-+		.cra_flags = CRYPTO_ALG_ASYNC,
-+		.cra_ctxsize = sizeof(struct otx_cpt_aead_ctx),
-+		.cra_priority = 4001,
-+		.cra_alignmask = 0,
-+		.cra_module = THIS_MODULE,
-+	},
-+	.init = otx_cpt_aead_ecb_null_sha512_init,
-+	.exit = otx_cpt_aead_exit,
-+	.setkey = otx_cpt_aead_ecb_null_sha_setkey,
-+	.setauthsize = otx_cpt_aead_set_authsize,
-+	.encrypt = otx_cpt_aead_null_encrypt,
-+	.decrypt = otx_cpt_aead_null_decrypt,
-+	.ivsize = 0,
-+	.maxauthsize = SHA512_DIGEST_SIZE,
-+}, {
-+	.base = {
-+		.cra_name = "rfc4106(gcm(aes))",
-+		.cra_driver_name = "cpt_rfc4106_gcm_aes",
-+		.cra_blocksize = 1,
-+		.cra_flags = CRYPTO_ALG_ASYNC,
-+		.cra_ctxsize = sizeof(struct otx_cpt_aead_ctx),
-+		.cra_priority = 4001,
-+		.cra_alignmask = 0,
-+		.cra_module = THIS_MODULE,
-+	},
-+	.init = otx_cpt_aead_gcm_aes_init,
-+	.exit = otx_cpt_aead_exit,
-+	.setkey = otx_cpt_aead_gcm_aes_setkey,
-+	.setauthsize = otx_cpt_aead_set_authsize,
-+	.encrypt = otx_cpt_aead_encrypt,
-+	.decrypt = otx_cpt_aead_decrypt,
-+	.ivsize = AES_GCM_IV_SIZE,
-+	.maxauthsize = AES_GCM_ICV_SIZE,
-+} };
-+
-+static inline int is_any_alg_used(void)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(otx_cpt_skciphers); i++)
-+		if (refcount_read(&otx_cpt_skciphers[i].base.cra_refcnt) != 1)
-+			return true;
-+	for (i = 0; i < ARRAY_SIZE(otx_cpt_aeads); i++)
-+		if (refcount_read(&otx_cpt_aeads[i].base.cra_refcnt) != 1)
-+			return true;
-+	return false;
-+}
-+
-+static inline int cpt_register_algs(void)
-+{
-+	int i, err = 0;
-+
-+	if (!IS_ENABLED(CONFIG_DM_CRYPT)) {
-+		for (i = 0; i < ARRAY_SIZE(otx_cpt_skciphers); i++)
-+			otx_cpt_skciphers[i].base.cra_flags &= ~CRYPTO_ALG_DEAD;
-+
-+		err = crypto_register_skciphers(otx_cpt_skciphers,
-+						ARRAY_SIZE(otx_cpt_skciphers));
-+		if (err)
-+			return err;
-+	}
-+
-+	for (i = 0; i < ARRAY_SIZE(otx_cpt_aeads); i++)
-+		otx_cpt_aeads[i].base.cra_flags &= ~CRYPTO_ALG_DEAD;
-+
-+	err = crypto_register_aeads(otx_cpt_aeads, ARRAY_SIZE(otx_cpt_aeads));
-+	if (err) {
-+		crypto_unregister_skciphers(otx_cpt_skciphers,
-+					    ARRAY_SIZE(otx_cpt_skciphers));
-+		return err;
-+	}
-+
-+	return 0;
-+}
-+
-+static inline void cpt_unregister_algs(void)
-+{
-+	crypto_unregister_skciphers(otx_cpt_skciphers,
-+				    ARRAY_SIZE(otx_cpt_skciphers));
-+	crypto_unregister_aeads(otx_cpt_aeads, ARRAY_SIZE(otx_cpt_aeads));
-+}
-+
-+static int compare_func(const void *lptr, const void *rptr)
-+{
-+	struct cpt_device_desc *ldesc = (struct cpt_device_desc *) lptr;
-+	struct cpt_device_desc *rdesc = (struct cpt_device_desc *) rptr;
-+
-+	if (ldesc->dev->devfn < rdesc->dev->devfn)
-+		return -1;
-+	if (ldesc->dev->devfn > rdesc->dev->devfn)
-+		return 1;
-+	return 0;
-+}
-+
-+static void swap_func(void *lptr, void *rptr, int size)
-+{
-+	struct cpt_device_desc *ldesc = (struct cpt_device_desc *) lptr;
-+	struct cpt_device_desc *rdesc = (struct cpt_device_desc *) rptr;
-+	struct cpt_device_desc desc;
-+
-+	desc = *ldesc;
-+	*ldesc = *rdesc;
-+	*rdesc = desc;
-+}
-+
-+int otx_cpt_crypto_init(struct pci_dev *pdev, struct module *mod,
-+			enum otx_cptpf_type pf_type,
-+			enum otx_cptvf_type engine_type,
-+			int num_queues, int num_devices)
-+{
-+	int ret = 0;
-+	int count;
-+
-+	mutex_lock(&mutex);
-+	switch (engine_type) {
-+	case OTX_CPT_SE_TYPES:
-+		count = atomic_read(&se_devices.count);
-+		if (count >= CPT_MAX_VF_NUM) {
-+			dev_err(&pdev->dev, "No space to add a new device");
-+			ret = -ENOSPC;
-+			goto err;
-+		}
-+		se_devices.desc[count].pf_type = pf_type;
-+		se_devices.desc[count].num_queues = num_queues;
-+		se_devices.desc[count++].dev = pdev;
-+		atomic_inc(&se_devices.count);
-+
-+		if (atomic_read(&se_devices.count) == num_devices &&
-+		    is_crypto_registered == false) {
-+			if (cpt_register_algs()) {
-+				dev_err(&pdev->dev,
-+				   "Error in registering crypto algorithms\n");
-+				ret =  -EINVAL;
-+				goto err;
-+			}
-+			try_module_get(mod);
-+			is_crypto_registered = true;
-+		}
-+		sort(se_devices.desc, count, sizeof(struct cpt_device_desc),
-+		     compare_func, swap_func);
-+		break;
-+
-+	case OTX_CPT_AE_TYPES:
-+		count = atomic_read(&ae_devices.count);
-+		if (count >= CPT_MAX_VF_NUM) {
-+			dev_err(&pdev->dev, "No space to a add new device");
-+			ret = -ENOSPC;
-+			goto err;
-+		}
-+		ae_devices.desc[count].pf_type = pf_type;
-+		ae_devices.desc[count].num_queues = num_queues;
-+		ae_devices.desc[count++].dev = pdev;
-+		atomic_inc(&ae_devices.count);
-+		sort(ae_devices.desc, count, sizeof(struct cpt_device_desc),
-+		     compare_func, swap_func);
-+		break;
-+
-+	default:
-+		dev_err(&pdev->dev, "Unknown VF type %d\n", engine_type);
-+		ret = BAD_OTX_CPTVF_TYPE;
-+	}
-+err:
-+	mutex_unlock(&mutex);
-+	return ret;
-+}
-+
-+void otx_cpt_crypto_exit(struct pci_dev *pdev, struct module *mod,
-+			 enum otx_cptvf_type engine_type)
-+{
-+	struct cpt_device_table *dev_tbl;
-+	bool dev_found = false;
-+	int i, j, count;
-+
-+	mutex_lock(&mutex);
-+
-+	dev_tbl = (engine_type == OTX_CPT_AE_TYPES) ? &ae_devices : &se_devices;
-+	count = atomic_read(&dev_tbl->count);
-+	for (i = 0; i < count; i++)
-+		if (pdev == dev_tbl->desc[i].dev) {
-+			for (j = i; j < count-1; j++)
-+				dev_tbl->desc[j] = dev_tbl->desc[j+1];
-+			dev_found = true;
-+			break;
-+		}
-+
-+	if (!dev_found) {
-+		dev_err(&pdev->dev, "%s device not found", __func__);
-+		goto exit;
-+	}
-+
-+	if (engine_type != OTX_CPT_AE_TYPES) {
-+		if (atomic_dec_and_test(&se_devices.count) &&
-+		    !is_any_alg_used()) {
-+			cpt_unregister_algs();
-+			module_put(mod);
-+			is_crypto_registered = false;
-+		}
-+	} else
-+		atomic_dec(&ae_devices.count);
-+exit:
-+	mutex_unlock(&mutex);
-+}
-diff --git a/drivers/crypto/marvell/octeontx/otx_cptvf_algs.h b/drivers/crypto/marvell/octeontx/otx_cptvf_algs.h
-new file mode 100644
-index 0000000..67cc002
---- /dev/null
-+++ b/drivers/crypto/marvell/octeontx/otx_cptvf_algs.h
-@@ -0,0 +1,188 @@
-+/* SPDX-License-Identifier: GPL-2.0
-+ * Marvell OcteonTX CPT driver
++ * Support for Marvell's Cryptographic Engine and Security Accelerator (CESA)
++ * that can be found on the following platform: Orion, Kirkwood, Armada. This
++ * driver supports the TDMA engine on platforms on which it is available.
 + *
-+ * Copyright (C) 2019 Marvell International Ltd.
++ * Author: Boris Brezillon <boris.brezillon@free-electrons.com>
++ * Author: Arnaud Ebalard <arno@natisbad.org>
 + *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ */
-+
-+#ifndef __OTX_CPT_ALGS_H
-+#define __OTX_CPT_ALGS_H
-+
-+#include <crypto/hash.h>
-+#include "otx_cpt_common.h"
-+
-+#define OTX_CPT_MAX_ENC_KEY_SIZE    32
-+#define OTX_CPT_MAX_HASH_KEY_SIZE   64
-+#define OTX_CPT_MAX_KEY_SIZE (OTX_CPT_MAX_ENC_KEY_SIZE + \
-+			      OTX_CPT_MAX_HASH_KEY_SIZE)
-+enum otx_cpt_request_type {
-+	OTX_CPT_ENC_DEC_REQ            = 0x1,
-+	OTX_CPT_AEAD_ENC_DEC_REQ       = 0x2,
-+	OTX_CPT_AEAD_ENC_DEC_NULL_REQ  = 0x3,
-+	OTX_CPT_PASSTHROUGH_REQ	       = 0x4
-+};
-+
-+enum otx_cpt_major_opcodes {
-+	OTX_CPT_MAJOR_OP_MISC = 0x01,
-+	OTX_CPT_MAJOR_OP_FC   = 0x33,
-+	OTX_CPT_MAJOR_OP_HMAC = 0x35,
-+};
-+
-+enum otx_cpt_req_type {
-+		OTX_CPT_AE_CORE_REQ,
-+		OTX_CPT_SE_CORE_REQ
-+};
-+
-+enum otx_cpt_cipher_type {
-+	OTX_CPT_CIPHER_NULL = 0x0,
-+	OTX_CPT_DES3_CBC = 0x1,
-+	OTX_CPT_DES3_ECB = 0x2,
-+	OTX_CPT_AES_CBC  = 0x3,
-+	OTX_CPT_AES_ECB  = 0x4,
-+	OTX_CPT_AES_CFB  = 0x5,
-+	OTX_CPT_AES_CTR  = 0x6,
-+	OTX_CPT_AES_GCM  = 0x7,
-+	OTX_CPT_AES_XTS  = 0x8
-+};
-+
-+enum otx_cpt_mac_type {
-+	OTX_CPT_MAC_NULL = 0x0,
-+	OTX_CPT_MD5      = 0x1,
-+	OTX_CPT_SHA1     = 0x2,
-+	OTX_CPT_SHA224   = 0x3,
-+	OTX_CPT_SHA256   = 0x4,
-+	OTX_CPT_SHA384   = 0x5,
-+	OTX_CPT_SHA512   = 0x6,
-+	OTX_CPT_GMAC     = 0x7
-+};
-+
-+enum otx_cpt_aes_key_len {
-+	OTX_CPT_AES_128_BIT = 0x1,
-+	OTX_CPT_AES_192_BIT = 0x2,
-+	OTX_CPT_AES_256_BIT = 0x3
-+};
-+
-+union otx_cpt_encr_ctrl {
-+	u64 flags;
-+	struct {
-+#if defined(__BIG_ENDIAN_BITFIELD)
-+		u64 enc_cipher:4;
-+		u64 reserved1:1;
-+		u64 aes_key:2;
-+		u64 iv_source:1;
-+		u64 mac_type:4;
-+		u64 reserved2:3;
-+		u64 auth_input_type:1;
-+		u64 mac_len:8;
-+		u64 reserved3:8;
-+		u64 encr_offset:16;
-+		u64 iv_offset:8;
-+		u64 auth_offset:8;
-+#else
-+		u64 auth_offset:8;
-+		u64 iv_offset:8;
-+		u64 encr_offset:16;
-+		u64 reserved3:8;
-+		u64 mac_len:8;
-+		u64 auth_input_type:1;
-+		u64 reserved2:3;
-+		u64 mac_type:4;
-+		u64 iv_source:1;
-+		u64 aes_key:2;
-+		u64 reserved1:1;
-+		u64 enc_cipher:4;
-+#endif
-+	} e;
-+};
-+
-+struct otx_cpt_cipher {
-+	const char *name;
-+	u8 value;
-+};
-+
-+struct otx_cpt_enc_context {
-+	union otx_cpt_encr_ctrl enc_ctrl;
-+	u8 encr_key[32];
-+	u8 encr_iv[16];
-+};
-+
-+union otx_cpt_fchmac_ctx {
-+	struct {
-+		u8 ipad[64];
-+		u8 opad[64];
-+	} e;
-+	struct {
-+		u8 hmac_calc[64]; /* HMAC calculated */
-+		u8 hmac_recv[64]; /* HMAC received */
-+	} s;
-+};
-+
-+struct otx_cpt_fc_ctx {
-+	struct otx_cpt_enc_context enc;
-+	union otx_cpt_fchmac_ctx hmac;
-+};
-+
-+struct otx_cpt_enc_ctx {
-+	u32 key_len;
-+	u8 enc_key[OTX_CPT_MAX_KEY_SIZE];
-+	u8 cipher_type;
-+	u8 key_type;
-+};
-+
-+struct otx_cpt_des3_ctx {
-+	u32 key_len;
-+	u8 des3_key[OTX_CPT_MAX_KEY_SIZE];
-+};
-+
-+union otx_cpt_offset_ctrl_word {
-+	u64 flags;
-+	struct {
-+#if defined(__BIG_ENDIAN_BITFIELD)
-+		u64 reserved:32;
-+		u64 enc_data_offset:16;
-+		u64 iv_offset:8;
-+		u64 auth_offset:8;
-+#else
-+		u64 auth_offset:8;
-+		u64 iv_offset:8;
-+		u64 enc_data_offset:16;
-+		u64 reserved:32;
-+#endif
-+	} e;
-+};
-+
-+struct otx_cpt_req_ctx {
-+	struct otx_cpt_req_info cpt_req;
-+	union otx_cpt_offset_ctrl_word ctrl_word;
-+	struct otx_cpt_fc_ctx fctx;
-+};
-+
-+struct otx_cpt_sdesc {
-+	struct shash_desc shash;
-+};
-+
-+struct otx_cpt_aead_ctx {
-+	u8 key[OTX_CPT_MAX_KEY_SIZE];
-+	struct crypto_shash *hashalg;
-+	struct otx_cpt_sdesc *sdesc;
-+	u8 *ipad;
-+	u8 *opad;
-+	u32 enc_key_len;
-+	u32 auth_key_len;
-+	u8 cipher_type;
-+	u8 mac_type;
-+	u8 key_type;
-+	u8 is_trunc_hmac;
-+};
-+int otx_cpt_crypto_init(struct pci_dev *pdev, struct module *mod,
-+			enum otx_cptpf_type pf_type,
-+			enum otx_cptvf_type engine_type,
-+			int num_queues, int num_devices);
-+void otx_cpt_crypto_exit(struct pci_dev *pdev, struct module *mod,
-+			 enum otx_cptvf_type engine_type);
-+void otx_cpt_callback(int status, void *arg, void *req);
-+
-+#endif /* __OTX_CPT_ALGS_H */
-diff --git a/drivers/crypto/marvell/octeontx/otx_cptvf_main.c b/drivers/crypto/marvell/octeontx/otx_cptvf_main.c
-new file mode 100644
-index 0000000..a91860b
---- /dev/null
-+++ b/drivers/crypto/marvell/octeontx/otx_cptvf_main.c
-@@ -0,0 +1,985 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Marvell OcteonTX CPT driver
-+ *
-+ * Copyright (C) 2019 Marvell International Ltd.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ */
-+
-+#include <linux/interrupt.h>
-+#include <linux/module.h>
-+#include "otx_cptvf.h"
-+#include "otx_cptvf_algs.h"
-+#include "otx_cptvf_reqmgr.h"
-+
-+#define DRV_NAME	"octeontx-cptvf"
-+#define DRV_VERSION	"1.0"
-+
-+static void vq_work_handler(unsigned long data)
-+{
-+	struct otx_cptvf_wqe_info *cwqe_info =
-+					(struct otx_cptvf_wqe_info *) data;
-+
-+	otx_cpt_post_process(&cwqe_info->vq_wqe[0]);
-+}
-+
-+static int init_worker_threads(struct otx_cptvf *cptvf)
-+{
-+	struct pci_dev *pdev = cptvf->pdev;
-+	struct otx_cptvf_wqe_info *cwqe_info;
-+	int i;
-+
-+	cwqe_info = kzalloc(sizeof(*cwqe_info), GFP_KERNEL);
-+	if (!cwqe_info)
-+		return -ENOMEM;
-+
-+	if (cptvf->num_queues) {
-+		dev_dbg(&pdev->dev, "Creating VQ worker threads (%d)\n",
-+			cptvf->num_queues);
-+	}
-+
-+	for (i = 0; i < cptvf->num_queues; i++) {
-+		tasklet_init(&cwqe_info->vq_wqe[i].twork, vq_work_handler,
-+			     (u64)cwqe_info);
-+		cwqe_info->vq_wqe[i].cptvf = cptvf;
-+	}
-+	cptvf->wqe_info = cwqe_info;
-+
-+	return 0;
-+}
-+
-+static void cleanup_worker_threads(struct otx_cptvf *cptvf)
-+{
-+	struct pci_dev *pdev = cptvf->pdev;
-+	struct otx_cptvf_wqe_info *cwqe_info;
-+	int i;
-+
-+	cwqe_info = (struct otx_cptvf_wqe_info *)cptvf->wqe_info;
-+	if (!cwqe_info)
-+		return;
-+
-+	if (cptvf->num_queues) {
-+		dev_dbg(&pdev->dev, "Cleaning VQ worker threads (%u)\n",
-+			cptvf->num_queues);
-+	}
-+
-+	for (i = 0; i < cptvf->num_queues; i++)
-+		tasklet_kill(&cwqe_info->vq_wqe[i].twork);
-+
-+	kzfree(cwqe_info);
-+	cptvf->wqe_info = NULL;
-+}
-+
-+static void free_pending_queues(struct otx_cpt_pending_qinfo *pqinfo)
-+{
-+	struct otx_cpt_pending_queue *queue;
-+	int i;
-+
-+	for_each_pending_queue(pqinfo, queue, i) {
-+		if (!queue->head)
-+			continue;
-+
-+		/* free single queue */
-+		kzfree((queue->head));
-+		queue->front = 0;
-+		queue->rear = 0;
-+		queue->qlen = 0;
-+	}
-+	pqinfo->num_queues = 0;
-+}
-+
-+static int alloc_pending_queues(struct otx_cpt_pending_qinfo *pqinfo, u32 qlen,
-+				u32 num_queues)
-+{
-+	struct otx_cpt_pending_queue *queue = NULL;
-+	size_t size;
-+	int ret;
-+	u32 i;
-+
-+	pqinfo->num_queues = num_queues;
-+	size = (qlen * sizeof(struct otx_cpt_pending_entry));
-+
-+	for_each_pending_queue(pqinfo, queue, i) {
-+		queue->head = kzalloc((size), GFP_KERNEL);
-+		if (!queue->head) {
-+			ret = -ENOMEM;
-+			goto pending_qfail;
-+		}
-+
-+		queue->pending_count = 0;
-+		queue->front = 0;
-+		queue->rear = 0;
-+		queue->qlen = qlen;
-+
-+		/* init queue spin lock */
-+		spin_lock_init(&queue->lock);
-+	}
-+	return 0;
-+
-+pending_qfail:
-+	free_pending_queues(pqinfo);
-+
-+	return ret;
-+}
-+
-+static int init_pending_queues(struct otx_cptvf *cptvf, u32 qlen,
-+			       u32 num_queues)
-+{
-+	struct pci_dev *pdev = cptvf->pdev;
-+	int ret;
-+
-+	if (!num_queues)
-+		return 0;
-+
-+	ret = alloc_pending_queues(&cptvf->pqinfo, qlen, num_queues);
-+	if (ret) {
-+		dev_err(&pdev->dev, "Failed to setup pending queues (%u)\n",
-+			num_queues);
-+		return ret;
-+	}
-+	return 0;
-+}
-+
-+static void cleanup_pending_queues(struct otx_cptvf *cptvf)
-+{
-+	struct pci_dev *pdev = cptvf->pdev;
-+
-+	if (!cptvf->num_queues)
-+		return;
-+
-+	dev_dbg(&pdev->dev, "Cleaning VQ pending queue (%u)\n",
-+		cptvf->num_queues);
-+	free_pending_queues(&cptvf->pqinfo);
-+}
-+
-+static void free_command_queues(struct otx_cptvf *cptvf,
-+				struct otx_cpt_cmd_qinfo *cqinfo)
-+{
-+	struct otx_cpt_cmd_queue *queue = NULL;
-+	struct otx_cpt_cmd_chunk *chunk = NULL;
-+	struct pci_dev *pdev = cptvf->pdev;
-+	int i;
-+
-+	/* clean up for each queue */
-+	for (i = 0; i < cptvf->num_queues; i++) {
-+		queue = &cqinfo->queue[i];
-+
-+		while (!list_empty(&cqinfo->queue[i].chead)) {
-+			chunk = list_first_entry(&cqinfo->queue[i].chead,
-+					struct otx_cpt_cmd_chunk, nextchunk);
-+
-+			dma_free_coherent(&pdev->dev, chunk->size,
-+					  chunk->head,
-+					  chunk->dma_addr);
-+			chunk->head = NULL;
-+			chunk->dma_addr = 0;
-+			list_del(&chunk->nextchunk);
-+			kzfree(chunk);
-+		}
-+		queue->num_chunks = 0;
-+		queue->idx = 0;
-+
-+	}
-+}
-+
-+static int alloc_command_queues(struct otx_cptvf *cptvf,
-+				struct otx_cpt_cmd_qinfo *cqinfo,
-+				u32 qlen)
-+{
-+	struct otx_cpt_cmd_chunk *curr, *first, *last;
-+	struct otx_cpt_cmd_queue *queue = NULL;
-+	struct pci_dev *pdev = cptvf->pdev;
-+	size_t q_size, c_size, rem_q_size;
-+	u32 qcsize_bytes;
-+	int i;
-+
-+
-+	/* Qsize in dwords, needed for SADDR config, 1-next chunk pointer */
-+	cptvf->qsize = min(qlen, cqinfo->qchunksize) *
-+		       OTX_CPT_NEXT_CHUNK_PTR_SIZE + 1;
-+	/* Qsize in bytes to create space for alignment */
-+	q_size = qlen * OTX_CPT_INST_SIZE;
-+
-+	qcsize_bytes = cqinfo->qchunksize * OTX_CPT_INST_SIZE;
-+
-+	/* per queue initialization */
-+	for (i = 0; i < cptvf->num_queues; i++) {
-+		c_size = 0;
-+		rem_q_size = q_size;
-+		first = NULL;
-+		last = NULL;
-+
-+		queue = &cqinfo->queue[i];
-+		INIT_LIST_HEAD(&queue->chead);
-+		do {
-+			curr = kzalloc(sizeof(*curr), GFP_KERNEL);
-+			if (!curr)
-+				goto cmd_qfail;
-+
-+			c_size = (rem_q_size > qcsize_bytes) ? qcsize_bytes :
-+					rem_q_size;
-+			curr->head = dma_alloc_coherent(&pdev->dev,
-+					   c_size + OTX_CPT_NEXT_CHUNK_PTR_SIZE,
-+					   &curr->dma_addr, GFP_KERNEL);
-+			if (!curr->head) {
-+				dev_err(&pdev->dev,
-+				"Command Q (%d) chunk (%d) allocation failed\n",
-+					i, queue->num_chunks);
-+				goto free_curr;
-+			}
-+			curr->size = c_size;
-+
-+			if (queue->num_chunks == 0) {
-+				first = curr;
-+				queue->base  = first;
-+			}
-+			list_add_tail(&curr->nextchunk,
-+				      &cqinfo->queue[i].chead);
-+
-+			queue->num_chunks++;
-+			rem_q_size -= c_size;
-+			if (last)
-+				*((u64 *)(&last->head[last->size])) =
-+					(u64)curr->dma_addr;
-+
-+			last = curr;
-+		} while (rem_q_size);
-+
-+		/*
-+		 * Make the queue circular, tie back last chunk entry to head
-+		 */
-+		curr = first;
-+		*((u64 *)(&last->head[last->size])) = (u64)curr->dma_addr;
-+		queue->qhead = curr;
-+	}
-+	return 0;
-+free_curr:
-+	kfree(curr);
-+cmd_qfail:
-+	free_command_queues(cptvf, cqinfo);
-+	return -ENOMEM;
-+}
-+
-+static int init_command_queues(struct otx_cptvf *cptvf, u32 qlen)
-+{
-+	struct pci_dev *pdev = cptvf->pdev;
-+	int ret;
-+
-+	/* setup command queues */
-+	ret = alloc_command_queues(cptvf, &cptvf->cqinfo, qlen);
-+	if (ret) {
-+		dev_err(&pdev->dev, "Failed to allocate command queues (%u)\n",
-+			cptvf->num_queues);
-+		return ret;
-+	}
-+	return ret;
-+}
-+
-+static void cleanup_command_queues(struct otx_cptvf *cptvf)
-+{
-+	struct pci_dev *pdev = cptvf->pdev;
-+
-+	if (!cptvf->num_queues)
-+		return;
-+
-+	dev_dbg(&pdev->dev, "Cleaning VQ command queue (%u)\n",
-+		cptvf->num_queues);
-+	free_command_queues(cptvf, &cptvf->cqinfo);
-+}
-+
-+static void cptvf_sw_cleanup(struct otx_cptvf *cptvf)
-+{
-+	cleanup_worker_threads(cptvf);
-+	cleanup_pending_queues(cptvf);
-+	cleanup_command_queues(cptvf);
-+}
-+
-+static int cptvf_sw_init(struct otx_cptvf *cptvf, u32 qlen, u32 num_queues)
-+{
-+	struct pci_dev *pdev = cptvf->pdev;
-+	u32 max_dev_queues = 0;
-+	int ret;
-+
-+	max_dev_queues = OTX_CPT_NUM_QS_PER_VF;
-+	/* possible cpus */
-+	num_queues = min_t(u32, num_queues, max_dev_queues);
-+	cptvf->num_queues = num_queues;
-+
-+	ret = init_command_queues(cptvf, qlen);
-+	if (ret) {
-+		dev_err(&pdev->dev, "Failed to setup command queues (%u)\n",
-+			num_queues);
-+		return ret;
-+	}
-+
-+	ret = init_pending_queues(cptvf, qlen, num_queues);
-+	if (ret) {
-+		dev_err(&pdev->dev, "Failed to setup pending queues (%u)\n",
-+			num_queues);
-+		goto setup_pqfail;
-+	}
-+
-+	/* Create worker threads for BH processing */
-+	ret = init_worker_threads(cptvf);
-+	if (ret) {
-+		dev_err(&pdev->dev, "Failed to setup worker threads\n");
-+		goto init_work_fail;
-+	}
-+	return 0;
-+
-+init_work_fail:
-+	cleanup_worker_threads(cptvf);
-+	cleanup_pending_queues(cptvf);
-+
-+setup_pqfail:
-+	cleanup_command_queues(cptvf);
-+
-+	return ret;
-+}
-+
-+static void cptvf_free_irq_affinity(struct otx_cptvf *cptvf, int vec)
-+{
-+	irq_set_affinity_hint(pci_irq_vector(cptvf->pdev, vec), NULL);
-+	free_cpumask_var(cptvf->affinity_mask[vec]);
-+}
-+
-+static void cptvf_write_vq_ctl(struct otx_cptvf *cptvf, bool val)
-+{
-+	union otx_cptx_vqx_ctl vqx_ctl;
-+
-+	vqx_ctl.u = readq(cptvf->reg_base + OTX_CPT_VQX_CTL(0));
-+	vqx_ctl.s.ena = val;
-+	writeq(vqx_ctl.u, cptvf->reg_base + OTX_CPT_VQX_CTL(0));
-+}
-+
-+void otx_cptvf_write_vq_doorbell(struct otx_cptvf *cptvf, u32 val)
-+{
-+	union otx_cptx_vqx_doorbell vqx_dbell;
-+
-+	vqx_dbell.u = readq(cptvf->reg_base + OTX_CPT_VQX_DOORBELL(0));
-+	vqx_dbell.s.dbell_cnt = val * 8; /* Num of Instructions * 8 words */
-+	writeq(vqx_dbell.u, cptvf->reg_base + OTX_CPT_VQX_DOORBELL(0));
-+}
-+
-+static void cptvf_write_vq_inprog(struct otx_cptvf *cptvf, u8 val)
-+{
-+	union otx_cptx_vqx_inprog vqx_inprg;
-+
-+	vqx_inprg.u = readq(cptvf->reg_base + OTX_CPT_VQX_INPROG(0));
-+	vqx_inprg.s.inflight = val;
-+	writeq(vqx_inprg.u, cptvf->reg_base + OTX_CPT_VQX_INPROG(0));
-+}
-+
-+static void cptvf_write_vq_done_numwait(struct otx_cptvf *cptvf, u32 val)
-+{
-+	union otx_cptx_vqx_done_wait vqx_dwait;
-+
-+	vqx_dwait.u = readq(cptvf->reg_base + OTX_CPT_VQX_DONE_WAIT(0));
-+	vqx_dwait.s.num_wait = val;
-+	writeq(vqx_dwait.u, cptvf->reg_base + OTX_CPT_VQX_DONE_WAIT(0));
-+}
-+
-+static u32 cptvf_read_vq_done_numwait(struct otx_cptvf *cptvf)
-+{
-+	union otx_cptx_vqx_done_wait vqx_dwait;
-+
-+	vqx_dwait.u = readq(cptvf->reg_base + OTX_CPT_VQX_DONE_WAIT(0));
-+	return vqx_dwait.s.num_wait;
-+}
-+
-+static void cptvf_write_vq_done_timewait(struct otx_cptvf *cptvf, u16 time)
-+{
-+	union otx_cptx_vqx_done_wait vqx_dwait;
-+
-+	vqx_dwait.u = readq(cptvf->reg_base + OTX_CPT_VQX_DONE_WAIT(0));
-+	vqx_dwait.s.time_wait = time;
-+	writeq(vqx_dwait.u, cptvf->reg_base + OTX_CPT_VQX_DONE_WAIT(0));
-+}
-+
-+
-+static u16 cptvf_read_vq_done_timewait(struct otx_cptvf *cptvf)
-+{
-+	union otx_cptx_vqx_done_wait vqx_dwait;
-+
-+	vqx_dwait.u = readq(cptvf->reg_base + OTX_CPT_VQX_DONE_WAIT(0));
-+	return vqx_dwait.s.time_wait;
-+}
-+
-+static void cptvf_enable_swerr_interrupts(struct otx_cptvf *cptvf)
-+{
-+	union otx_cptx_vqx_misc_ena_w1s vqx_misc_ena;
-+
-+	vqx_misc_ena.u = readq(cptvf->reg_base + OTX_CPT_VQX_MISC_ENA_W1S(0));
-+	/* Enable SWERR interrupts for the requested VF */
-+	vqx_misc_ena.s.swerr = 1;
-+	writeq(vqx_misc_ena.u, cptvf->reg_base + OTX_CPT_VQX_MISC_ENA_W1S(0));
-+}
-+
-+static void cptvf_enable_mbox_interrupts(struct otx_cptvf *cptvf)
-+{
-+	union otx_cptx_vqx_misc_ena_w1s vqx_misc_ena;
-+
-+	vqx_misc_ena.u = readq(cptvf->reg_base + OTX_CPT_VQX_MISC_ENA_W1S(0));
-+	/* Enable MBOX interrupt for the requested VF */
-+	vqx_misc_ena.s.mbox = 1;
-+	writeq(vqx_misc_ena.u, cptvf->reg_base + OTX_CPT_VQX_MISC_ENA_W1S(0));
-+}
-+
-+static void cptvf_enable_done_interrupts(struct otx_cptvf *cptvf)
-+{
-+	union otx_cptx_vqx_done_ena_w1s vqx_done_ena;
-+
-+	vqx_done_ena.u = readq(cptvf->reg_base + OTX_CPT_VQX_DONE_ENA_W1S(0));
-+	/* Enable DONE interrupt for the requested VF */
-+	vqx_done_ena.s.done = 1;
-+	writeq(vqx_done_ena.u, cptvf->reg_base + OTX_CPT_VQX_DONE_ENA_W1S(0));
-+}
-+
-+static void cptvf_clear_dovf_intr(struct otx_cptvf *cptvf)
-+{
-+	union otx_cptx_vqx_misc_int vqx_misc_int;
-+
-+	vqx_misc_int.u = readq(cptvf->reg_base + OTX_CPT_VQX_MISC_INT(0));
-+	/* W1C for the VF */
-+	vqx_misc_int.s.dovf = 1;
-+	writeq(vqx_misc_int.u, cptvf->reg_base + OTX_CPT_VQX_MISC_INT(0));
-+}
-+
-+static void cptvf_clear_irde_intr(struct otx_cptvf *cptvf)
-+{
-+	union otx_cptx_vqx_misc_int vqx_misc_int;
-+
-+	vqx_misc_int.u = readq(cptvf->reg_base + OTX_CPT_VQX_MISC_INT(0));
-+	/* W1C for the VF */
-+	vqx_misc_int.s.irde = 1;
-+	writeq(vqx_misc_int.u, cptvf->reg_base + OTX_CPT_VQX_MISC_INT(0));
-+}
-+
-+static void cptvf_clear_nwrp_intr(struct otx_cptvf *cptvf)
-+{
-+	union otx_cptx_vqx_misc_int vqx_misc_int;
-+
-+	vqx_misc_int.u = readq(cptvf->reg_base + OTX_CPT_VQX_MISC_INT(0));
-+	/* W1C for the VF */
-+	vqx_misc_int.s.nwrp = 1;
-+	writeq(vqx_misc_int.u, cptvf->reg_base + OTX_CPT_VQX_MISC_INT(0));
-+}
-+
-+static void cptvf_clear_mbox_intr(struct otx_cptvf *cptvf)
-+{
-+	union otx_cptx_vqx_misc_int vqx_misc_int;
-+
-+	vqx_misc_int.u = readq(cptvf->reg_base + OTX_CPT_VQX_MISC_INT(0));
-+	/* W1C for the VF */
-+	vqx_misc_int.s.mbox = 1;
-+	writeq(vqx_misc_int.u, cptvf->reg_base + OTX_CPT_VQX_MISC_INT(0));
-+}
-+
-+static void cptvf_clear_swerr_intr(struct otx_cptvf *cptvf)
-+{
-+	union otx_cptx_vqx_misc_int vqx_misc_int;
-+
-+	vqx_misc_int.u = readq(cptvf->reg_base + OTX_CPT_VQX_MISC_INT(0));
-+	/* W1C for the VF */
-+	vqx_misc_int.s.swerr = 1;
-+	writeq(vqx_misc_int.u, cptvf->reg_base + OTX_CPT_VQX_MISC_INT(0));
-+}
-+
-+static u64 cptvf_read_vf_misc_intr_status(struct otx_cptvf *cptvf)
-+{
-+	return readq(cptvf->reg_base + OTX_CPT_VQX_MISC_INT(0));
-+}
-+
-+static irqreturn_t cptvf_misc_intr_handler(int __always_unused irq,
-+					   void *arg)
-+{
-+	struct otx_cptvf *cptvf = arg;
-+	struct pci_dev *pdev = cptvf->pdev;
-+	u64 intr;
-+
-+	intr = cptvf_read_vf_misc_intr_status(cptvf);
-+	/* Check for MISC interrupt types */
-+	if (likely(intr & OTX_CPT_VF_INTR_MBOX_MASK)) {
-+		dev_dbg(&pdev->dev, "Mailbox interrupt 0x%llx on CPT VF %d\n",
-+			intr, cptvf->vfid);
-+		otx_cptvf_handle_mbox_intr(cptvf);
-+		cptvf_clear_mbox_intr(cptvf);
-+	} else if (unlikely(intr & OTX_CPT_VF_INTR_DOVF_MASK)) {
-+		cptvf_clear_dovf_intr(cptvf);
-+		/* Clear doorbell count */
-+		otx_cptvf_write_vq_doorbell(cptvf, 0);
-+		dev_err(&pdev->dev,
-+		"Doorbell overflow error interrupt 0x%llx on CPT VF %d\n",
-+			intr, cptvf->vfid);
-+	} else if (unlikely(intr & OTX_CPT_VF_INTR_IRDE_MASK)) {
-+		cptvf_clear_irde_intr(cptvf);
-+		dev_err(&pdev->dev,
-+		"Instruction NCB read error interrupt 0x%llx on CPT VF %d\n",
-+			intr, cptvf->vfid);
-+	} else if (unlikely(intr & OTX_CPT_VF_INTR_NWRP_MASK)) {
-+		cptvf_clear_nwrp_intr(cptvf);
-+		dev_err(&pdev->dev,
-+		"NCB response write error interrupt 0x%llx on CPT VF %d\n",
-+			intr, cptvf->vfid);
-+	} else if (unlikely(intr & OTX_CPT_VF_INTR_SERR_MASK)) {
-+		cptvf_clear_swerr_intr(cptvf);
-+		dev_err(&pdev->dev,
-+			"Software error interrupt 0x%llx on CPT VF %d\n",
-+			intr, cptvf->vfid);
-+	} else {
-+		dev_err(&pdev->dev, "Unhandled interrupt in OTX_CPT VF %d\n",
-+			cptvf->vfid);
-+	}
-+
-+	return IRQ_HANDLED;
-+}
-+
-+static inline struct otx_cptvf_wqe *get_cptvf_vq_wqe(struct otx_cptvf *cptvf,
-+						     int qno)
-+{
-+	struct otx_cptvf_wqe_info *nwqe_info;
-+
-+	if (unlikely(qno >= cptvf->num_queues))
-+		return NULL;
-+	nwqe_info = (struct otx_cptvf_wqe_info *)cptvf->wqe_info;
-+
-+	return &nwqe_info->vq_wqe[qno];
-+}
-+
-+static inline u32 cptvf_read_vq_done_count(struct otx_cptvf *cptvf)
-+{
-+	union otx_cptx_vqx_done vqx_done;
-+
-+	vqx_done.u = readq(cptvf->reg_base + OTX_CPT_VQX_DONE(0));
-+	return vqx_done.s.done;
-+}
-+
-+static inline void cptvf_write_vq_done_ack(struct otx_cptvf *cptvf,
-+					   u32 ackcnt)
-+{
-+	union otx_cptx_vqx_done_ack vqx_dack_cnt;
-+
-+	vqx_dack_cnt.u = readq(cptvf->reg_base + OTX_CPT_VQX_DONE_ACK(0));
-+	vqx_dack_cnt.s.done_ack = ackcnt;
-+	writeq(vqx_dack_cnt.u, cptvf->reg_base + OTX_CPT_VQX_DONE_ACK(0));
-+}
-+
-+static irqreturn_t cptvf_done_intr_handler(int __always_unused irq,
-+					   void *cptvf_dev)
-+{
-+	struct otx_cptvf *cptvf = (struct otx_cptvf *)cptvf_dev;
-+	struct pci_dev *pdev = cptvf->pdev;
-+	/* Read the number of completions */
-+	u32 intr = cptvf_read_vq_done_count(cptvf);
-+
-+	if (intr) {
-+		struct otx_cptvf_wqe *wqe;
-+
-+		/*
-+		 * Acknowledge the number of scheduled completions for
-+		 * processing
-+		 */
-+		cptvf_write_vq_done_ack(cptvf, intr);
-+		wqe = get_cptvf_vq_wqe(cptvf, 0);
-+		if (unlikely(!wqe)) {
-+			dev_err(&pdev->dev, "No work to schedule for VF (%d)",
-+				cptvf->vfid);
-+			return IRQ_NONE;
-+		}
-+		tasklet_hi_schedule(&wqe->twork);
-+	}
-+
-+	return IRQ_HANDLED;
-+}
-+
-+static void cptvf_set_irq_affinity(struct otx_cptvf *cptvf, int vec)
-+{
-+	struct pci_dev *pdev = cptvf->pdev;
-+	int cpu;
-+
-+	if (!zalloc_cpumask_var(&cptvf->affinity_mask[vec],
-+				GFP_KERNEL)) {
-+		dev_err(&pdev->dev,
-+			"Allocation failed for affinity_mask for VF %d",
-+			cptvf->vfid);
-+		return;
-+	}
-+
-+	cpu = cptvf->vfid % num_online_cpus();
-+	cpumask_set_cpu(cpumask_local_spread(cpu, cptvf->node),
-+			cptvf->affinity_mask[vec]);
-+	irq_set_affinity_hint(pci_irq_vector(pdev, vec),
-+			      cptvf->affinity_mask[vec]);
-+}
-+
-+static void cptvf_write_vq_saddr(struct otx_cptvf *cptvf, u64 val)
-+{
-+	union otx_cptx_vqx_saddr vqx_saddr;
-+
-+	vqx_saddr.u = val;
-+	writeq(vqx_saddr.u, cptvf->reg_base + OTX_CPT_VQX_SADDR(0));
-+}
-+
-+static void cptvf_device_init(struct otx_cptvf *cptvf)
-+{
-+	u64 base_addr = 0;
-+
-+	/* Disable the VQ */
-+	cptvf_write_vq_ctl(cptvf, 0);
-+	/* Reset the doorbell */
-+	otx_cptvf_write_vq_doorbell(cptvf, 0);
-+	/* Clear inflight */
-+	cptvf_write_vq_inprog(cptvf, 0);
-+	/* Write VQ SADDR */
-+	base_addr = (u64)(cptvf->cqinfo.queue[0].qhead->dma_addr);
-+	cptvf_write_vq_saddr(cptvf, base_addr);
-+	/* Configure timerhold / coalescence */
-+	cptvf_write_vq_done_timewait(cptvf, OTX_CPT_TIMER_HOLD);
-+	cptvf_write_vq_done_numwait(cptvf, OTX_CPT_COUNT_HOLD);
-+	/* Enable the VQ */
-+	cptvf_write_vq_ctl(cptvf, 1);
-+	/* Flag the VF ready */
-+	cptvf->flags |= OTX_CPT_FLAG_DEVICE_READY;
-+}
-+
-+static ssize_t vf_type_show(struct device *dev,
-+			    struct device_attribute *attr,
-+			    char *buf)
-+{
-+	struct otx_cptvf *cptvf = dev_get_drvdata(dev);
-+	char *msg;
-+
-+	switch (cptvf->vftype) {
-+	case OTX_CPT_AE_TYPES:
-+		msg = "AE";
-+		break;
-+
-+	case OTX_CPT_SE_TYPES:
-+		msg = "SE";
-+		break;
-+
-+	default:
-+		msg = "Invalid";
-+	}
-+
-+	return scnprintf(buf, PAGE_SIZE, "%s\n", msg);
-+}
-+
-+static ssize_t vf_engine_group_show(struct device *dev,
-+				    struct device_attribute *attr,
-+				    char *buf)
-+{
-+	struct otx_cptvf *cptvf = dev_get_drvdata(dev);
-+
-+	return scnprintf(buf, PAGE_SIZE, "%d\n", cptvf->vfgrp);
-+}
-+
-+static ssize_t vf_engine_group_store(struct device *dev,
-+				     struct device_attribute *attr,
-+				     const char *buf, size_t count)
-+{
-+	struct otx_cptvf *cptvf = dev_get_drvdata(dev);
-+	int val, ret;
-+
-+	ret = kstrtoint(buf, 10, &val);
-+	if (ret)
-+		return ret;
-+
-+	if (val < 0)
-+		return -EINVAL;
-+
-+	if (val >= OTX_CPT_MAX_ENGINE_GROUPS) {
-+		dev_err(dev, "Engine group >= than max available groups %d",
-+			OTX_CPT_MAX_ENGINE_GROUPS);
-+		return -EINVAL;
-+	}
-+
-+	ret = otx_cptvf_send_vf_to_grp_msg(cptvf, val);
-+	if (ret)
-+		return ret;
-+
-+	return count;
-+}
-+
-+static ssize_t vf_coalesc_time_wait_show(struct device *dev,
-+					 struct device_attribute *attr,
-+					 char *buf)
-+{
-+	struct otx_cptvf *cptvf = dev_get_drvdata(dev);
-+
-+	return scnprintf(buf, PAGE_SIZE, "%d\n",
-+			 cptvf_read_vq_done_timewait(cptvf));
-+}
-+
-+static ssize_t vf_coalesc_num_wait_show(struct device *dev,
-+					struct device_attribute *attr,
-+					char *buf)
-+{
-+	struct otx_cptvf *cptvf = dev_get_drvdata(dev);
-+
-+	return scnprintf(buf, PAGE_SIZE, "%d\n",
-+			 cptvf_read_vq_done_numwait(cptvf));
-+}
-+
-+static ssize_t vf_coalesc_time_wait_store(struct device *dev,
-+					  struct device_attribute *attr,
-+					  const char *buf, size_t count)
-+{
-+	struct otx_cptvf *cptvf = dev_get_drvdata(dev);
-+	long val;
-+	int ret;
-+
-+	ret = kstrtol(buf, 10, &val);
-+	if (ret != 0)
-+		return ret;
-+
-+	if (val < OTX_CPT_COALESC_MIN_TIME_WAIT ||
-+	    val > OTX_CPT_COALESC_MAX_TIME_WAIT)
-+		return -EINVAL;
-+
-+	cptvf_write_vq_done_timewait(cptvf, val);
-+	return count;
-+}
-+
-+static ssize_t vf_coalesc_num_wait_store(struct device *dev,
-+					 struct device_attribute *attr,
-+					 const char *buf, size_t count)
-+{
-+	struct otx_cptvf *cptvf = dev_get_drvdata(dev);
-+	long val;
-+	int ret;
-+
-+	ret = kstrtol(buf, 10, &val);
-+	if (ret != 0)
-+		return ret;
-+
-+	if (val < OTX_CPT_COALESC_MIN_NUM_WAIT ||
-+	    val > OTX_CPT_COALESC_MAX_NUM_WAIT)
-+		return -EINVAL;
-+
-+	cptvf_write_vq_done_numwait(cptvf, val);
-+	return count;
-+}
-+
-+static DEVICE_ATTR_RO(vf_type);
-+static DEVICE_ATTR_RW(vf_engine_group);
-+static DEVICE_ATTR_RW(vf_coalesc_time_wait);
-+static DEVICE_ATTR_RW(vf_coalesc_num_wait);
-+
-+static struct attribute *otx_cptvf_attrs[] = {
-+	&dev_attr_vf_type.attr,
-+	&dev_attr_vf_engine_group.attr,
-+	&dev_attr_vf_coalesc_time_wait.attr,
-+	&dev_attr_vf_coalesc_num_wait.attr,
-+	NULL
-+};
-+
-+static const struct attribute_group otx_cptvf_sysfs_group = {
-+	.attrs = otx_cptvf_attrs,
-+};
-+
-+static int otx_cptvf_probe(struct pci_dev *pdev,
-+			   const struct pci_device_id *ent)
-+{
-+	struct device *dev = &pdev->dev;
-+	struct otx_cptvf *cptvf;
-+	int err;
-+
-+	cptvf = devm_kzalloc(dev, sizeof(*cptvf), GFP_KERNEL);
-+	if (!cptvf)
-+		return -ENOMEM;
-+
-+	pci_set_drvdata(pdev, cptvf);
-+	cptvf->pdev = pdev;
-+
-+	err = pci_enable_device(pdev);
-+	if (err) {
-+		dev_err(dev, "Failed to enable PCI device\n");
-+		goto clear_drvdata;
-+	}
-+	err = pci_request_regions(pdev, DRV_NAME);
-+	if (err) {
-+		dev_err(dev, "PCI request regions failed 0x%x\n", err);
-+		goto disable_device;
-+	}
-+	err = pci_set_dma_mask(pdev, DMA_BIT_MASK(48));
-+	if (err) {
-+		dev_err(dev, "Unable to get usable DMA configuration\n");
-+		goto release_regions;
-+	}
-+
-+	err = pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(48));
-+	if (err) {
-+		dev_err(dev, "Unable to get 48-bit DMA for consistent allocations\n");
-+		goto release_regions;
-+	}
-+
-+	/* MAP PF's configuration registers */
-+	cptvf->reg_base = pci_iomap(pdev, OTX_CPT_VF_PCI_CFG_BAR, 0);
-+	if (!cptvf->reg_base) {
-+		dev_err(dev, "Cannot map config register space, aborting\n");
-+		err = -ENOMEM;
-+		goto release_regions;
-+	}
-+
-+	cptvf->node = dev_to_node(&pdev->dev);
-+	err = pci_alloc_irq_vectors(pdev, OTX_CPT_VF_MSIX_VECTORS,
-+				    OTX_CPT_VF_MSIX_VECTORS, PCI_IRQ_MSIX);
-+	if (err < 0) {
-+		dev_err(dev, "Request for #%d msix vectors failed\n",
-+			OTX_CPT_VF_MSIX_VECTORS);
-+		goto unmap_region;
-+	}
-+
-+	err = request_irq(pci_irq_vector(pdev, CPT_VF_INT_VEC_E_MISC),
-+			  cptvf_misc_intr_handler, 0, "CPT VF misc intr",
-+			  cptvf);
-+	if (err) {
-+		dev_err(dev, "Failed to request misc irq");
-+		goto free_vectors;
-+	}
-+
-+	/* Enable mailbox interrupt */
-+	cptvf_enable_mbox_interrupts(cptvf);
-+	cptvf_enable_swerr_interrupts(cptvf);
-+
-+	/* Check cpt pf status, gets chip ID / device Id from PF if ready */
-+	err = otx_cptvf_check_pf_ready(cptvf);
-+	if (err)
-+		goto free_misc_irq;
-+
-+	/* CPT VF software resources initialization */
-+	cptvf->cqinfo.qchunksize = OTX_CPT_CMD_QCHUNK_SIZE;
-+	err = cptvf_sw_init(cptvf, OTX_CPT_CMD_QLEN, OTX_CPT_NUM_QS_PER_VF);
-+	if (err) {
-+		dev_err(dev, "cptvf_sw_init() failed");
-+		goto free_misc_irq;
-+	}
-+	/* Convey VQ LEN to PF */
-+	err = otx_cptvf_send_vq_size_msg(cptvf);
-+	if (err)
-+		goto sw_cleanup;
-+
-+	/* CPT VF device initialization */
-+	cptvf_device_init(cptvf);
-+	/* Send msg to PF to assign currnet Q to required group */
-+	err = otx_cptvf_send_vf_to_grp_msg(cptvf, cptvf->vfgrp);
-+	if (err)
-+		goto sw_cleanup;
-+
-+	cptvf->priority = 1;
-+	err = otx_cptvf_send_vf_priority_msg(cptvf);
-+	if (err)
-+		goto sw_cleanup;
-+
-+	err = request_irq(pci_irq_vector(pdev, CPT_VF_INT_VEC_E_DONE),
-+			  cptvf_done_intr_handler, 0, "CPT VF done intr",
-+			  cptvf);
-+	if (err) {
-+		dev_err(dev, "Failed to request done irq\n");
-+		goto free_done_irq;
-+	}
-+
-+	/* Enable done interrupt */
-+	cptvf_enable_done_interrupts(cptvf);
-+
-+	/* Set irq affinity masks */
-+	cptvf_set_irq_affinity(cptvf, CPT_VF_INT_VEC_E_MISC);
-+	cptvf_set_irq_affinity(cptvf, CPT_VF_INT_VEC_E_DONE);
-+
-+	err = otx_cptvf_send_vf_up(cptvf);
-+	if (err)
-+		goto free_irq_affinity;
-+
-+	/* Initialize algorithms and set ops */
-+	err = otx_cpt_crypto_init(pdev, THIS_MODULE,
-+		    cptvf->vftype == OTX_CPT_SE_TYPES ? OTX_CPT_SE : OTX_CPT_AE,
-+		    cptvf->vftype, 1, cptvf->num_vfs);
-+	if (err) {
-+		dev_err(dev, "Failed to register crypto algs\n");
-+		goto free_irq_affinity;
-+	}
-+
-+	err = sysfs_create_group(&dev->kobj, &otx_cptvf_sysfs_group);
-+	if (err) {
-+		dev_err(dev, "Creating sysfs entries failed\n");
-+		goto crypto_exit;
-+	}
-+
-+	return 0;
-+
-+crypto_exit:
-+	otx_cpt_crypto_exit(pdev, THIS_MODULE, cptvf->vftype);
-+free_irq_affinity:
-+	cptvf_free_irq_affinity(cptvf, CPT_VF_INT_VEC_E_DONE);
-+	cptvf_free_irq_affinity(cptvf, CPT_VF_INT_VEC_E_MISC);
-+free_done_irq:
-+	free_irq(pci_irq_vector(pdev, CPT_VF_INT_VEC_E_DONE), cptvf);
-+sw_cleanup:
-+	cptvf_sw_cleanup(cptvf);
-+free_misc_irq:
-+	free_irq(pci_irq_vector(pdev, CPT_VF_INT_VEC_E_MISC), cptvf);
-+free_vectors:
-+	pci_free_irq_vectors(cptvf->pdev);
-+unmap_region:
-+	pci_iounmap(pdev, cptvf->reg_base);
-+release_regions:
-+	pci_release_regions(pdev);
-+disable_device:
-+	pci_disable_device(pdev);
-+clear_drvdata:
-+	pci_set_drvdata(pdev, NULL);
-+
-+	return err;
-+}
-+
-+static void otx_cptvf_remove(struct pci_dev *pdev)
-+{
-+	struct otx_cptvf *cptvf = pci_get_drvdata(pdev);
-+
-+	if (!cptvf) {
-+		dev_err(&pdev->dev, "Invalid CPT-VF device\n");
-+		return;
-+	}
-+
-+	/* Convey DOWN to PF */
-+	if (otx_cptvf_send_vf_down(cptvf)) {
-+		dev_err(&pdev->dev, "PF not responding to DOWN msg");
-+	} else {
-+		sysfs_remove_group(&pdev->dev.kobj, &otx_cptvf_sysfs_group);
-+		otx_cpt_crypto_exit(pdev, THIS_MODULE, cptvf->vftype);
-+		cptvf_free_irq_affinity(cptvf, CPT_VF_INT_VEC_E_DONE);
-+		cptvf_free_irq_affinity(cptvf, CPT_VF_INT_VEC_E_MISC);
-+		free_irq(pci_irq_vector(pdev, CPT_VF_INT_VEC_E_DONE), cptvf);
-+		free_irq(pci_irq_vector(pdev, CPT_VF_INT_VEC_E_MISC), cptvf);
-+		cptvf_sw_cleanup(cptvf);
-+		pci_free_irq_vectors(cptvf->pdev);
-+		pci_iounmap(pdev, cptvf->reg_base);
-+		pci_release_regions(pdev);
-+		pci_disable_device(pdev);
-+		pci_set_drvdata(pdev, NULL);
-+	}
-+}
-+
-+/* Supported devices */
-+static const struct pci_device_id otx_cptvf_id_table[] = {
-+	{PCI_VDEVICE(CAVIUM, OTX_CPT_PCI_VF_DEVICE_ID), 0},
-+	{ 0, }  /* end of table */
-+};
-+
-+static struct pci_driver otx_cptvf_pci_driver = {
-+	.name = DRV_NAME,
-+	.id_table = otx_cptvf_id_table,
-+	.probe = otx_cptvf_probe,
-+	.remove = otx_cptvf_remove,
-+};
-+
-+module_pci_driver(otx_cptvf_pci_driver);
-+
-+MODULE_AUTHOR("Marvell International Ltd.");
-+MODULE_DESCRIPTION("Marvell OcteonTX CPT Virtual Function Driver");
-+MODULE_LICENSE("GPL v2");
-+MODULE_VERSION(DRV_VERSION);
-+MODULE_DEVICE_TABLE(pci, otx_cptvf_id_table);
-diff --git a/drivers/crypto/marvell/octeontx/otx_cptvf_mbox.c b/drivers/crypto/marvell/octeontx/otx_cptvf_mbox.c
-new file mode 100644
-index 0000000..5663787
---- /dev/null
-+++ b/drivers/crypto/marvell/octeontx/otx_cptvf_mbox.c
-@@ -0,0 +1,247 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Marvell OcteonTX CPT driver
-+ *
-+ * Copyright (C) 2019 Marvell International Ltd.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
++ * This work is based on an initial version written by
++ * Sebastian Andrzej Siewior < sebastian at breakpoint dot cc >
 + */
 +
 +#include <linux/delay.h>
-+#include "otx_cptvf.h"
++#include <linux/dma-mapping.h>
++#include <linux/genalloc.h>
++#include <linux/interrupt.h>
++#include <linux/io.h>
++#include <linux/kthread.h>
++#include <linux/mbus.h>
++#include <linux/platform_device.h>
++#include <linux/scatterlist.h>
++#include <linux/slab.h>
++#include <linux/module.h>
++#include <linux/clk.h>
++#include <linux/of.h>
++#include <linux/of_platform.h>
++#include <linux/of_irq.h>
 +
-+#define CPT_MBOX_MSG_TIMEOUT 2000
++#include "cesa.h"
 +
-+static char *get_mbox_opcode_str(int msg_opcode)
++/* Limit of the crypto queue before reaching the backlog */
++#define CESA_CRYPTO_DEFAULT_MAX_QLEN 128
++
++struct mv_cesa_dev *cesa_dev;
++
++struct crypto_async_request *
++mv_cesa_dequeue_req_locked(struct mv_cesa_engine *engine,
++			   struct crypto_async_request **backlog)
 +{
-+	char *str = "Unknown";
++	struct crypto_async_request *req;
 +
-+	switch (msg_opcode) {
-+	case OTX_CPT_MSG_VF_UP:
-+		str = "UP";
-+		break;
++	*backlog = crypto_get_backlog(&engine->queue);
++	req = crypto_dequeue_request(&engine->queue);
 +
-+	case OTX_CPT_MSG_VF_DOWN:
-+		str = "DOWN";
-+		break;
-+
-+	case OTX_CPT_MSG_READY:
-+		str = "READY";
-+		break;
-+
-+	case OTX_CPT_MSG_QLEN:
-+		str = "QLEN";
-+		break;
-+
-+	case OTX_CPT_MSG_QBIND_GRP:
-+		str = "QBIND_GRP";
-+		break;
-+
-+	case OTX_CPT_MSG_VQ_PRIORITY:
-+		str = "VQ_PRIORITY";
-+		break;
-+
-+	case OTX_CPT_MSG_PF_TYPE:
-+		str = "PF_TYPE";
-+		break;
-+
-+	case OTX_CPT_MSG_ACK:
-+		str = "ACK";
-+		break;
-+
-+	case OTX_CPT_MSG_NACK:
-+		str = "NACK";
-+		break;
-+	}
-+	return str;
-+}
-+
-+static void dump_mbox_msg(struct otx_cpt_mbox *mbox_msg, int vf_id)
-+{
-+	char raw_data_str[OTX_CPT_MAX_MBOX_DATA_STR_SIZE];
-+
-+	hex_dump_to_buffer(mbox_msg, sizeof(struct otx_cpt_mbox), 16, 8,
-+			   raw_data_str, OTX_CPT_MAX_MBOX_DATA_STR_SIZE, false);
-+	if (vf_id >= 0)
-+		pr_debug("MBOX msg %s received from VF%d raw_data %s",
-+			 get_mbox_opcode_str(mbox_msg->msg), vf_id,
-+			 raw_data_str);
-+	else
-+		pr_debug("MBOX msg %s received from PF raw_data %s",
-+			 get_mbox_opcode_str(mbox_msg->msg), raw_data_str);
-+}
-+
-+static void cptvf_send_msg_to_pf(struct otx_cptvf *cptvf,
-+				     struct otx_cpt_mbox *mbx)
-+{
-+	/* Writing mbox(1) causes interrupt */
-+	writeq(mbx->msg, cptvf->reg_base + OTX_CPT_VFX_PF_MBOXX(0, 0));
-+	writeq(mbx->data, cptvf->reg_base + OTX_CPT_VFX_PF_MBOXX(0, 1));
-+}
-+
-+/* Interrupt handler to handle mailbox messages from VFs */
-+void otx_cptvf_handle_mbox_intr(struct otx_cptvf *cptvf)
-+{
-+	struct otx_cpt_mbox mbx = {};
-+
-+	/*
-+	 * MBOX[0] contains msg
-+	 * MBOX[1] contains data
-+	 */
-+	mbx.msg  = readq(cptvf->reg_base + OTX_CPT_VFX_PF_MBOXX(0, 0));
-+	mbx.data = readq(cptvf->reg_base + OTX_CPT_VFX_PF_MBOXX(0, 1));
-+
-+	dump_mbox_msg(&mbx, -1);
-+
-+	switch (mbx.msg) {
-+	case OTX_CPT_MSG_VF_UP:
-+		cptvf->pf_acked = true;
-+		cptvf->num_vfs = mbx.data;
-+		break;
-+	case OTX_CPT_MSG_READY:
-+		cptvf->pf_acked = true;
-+		cptvf->vfid = mbx.data;
-+		dev_dbg(&cptvf->pdev->dev, "Received VFID %d\n", cptvf->vfid);
-+		break;
-+	case OTX_CPT_MSG_QBIND_GRP:
-+		cptvf->pf_acked = true;
-+		cptvf->vftype = mbx.data;
-+		dev_dbg(&cptvf->pdev->dev, "VF %d type %s group %d\n",
-+			cptvf->vfid,
-+			((mbx.data == OTX_CPT_SE_TYPES) ? "SE" : "AE"),
-+			cptvf->vfgrp);
-+		break;
-+	case OTX_CPT_MSG_ACK:
-+		cptvf->pf_acked = true;
-+		break;
-+	case OTX_CPT_MSG_NACK:
-+		cptvf->pf_nacked = true;
-+		break;
-+	default:
-+		dev_err(&cptvf->pdev->dev, "Invalid msg from PF, msg 0x%llx\n",
-+			mbx.msg);
-+		break;
-+	}
-+}
-+
-+static int cptvf_send_msg_to_pf_timeout(struct otx_cptvf *cptvf,
-+					struct otx_cpt_mbox *mbx)
-+{
-+	int timeout = CPT_MBOX_MSG_TIMEOUT;
-+	int sleep = 10;
-+
-+	cptvf->pf_acked = false;
-+	cptvf->pf_nacked = false;
-+	cptvf_send_msg_to_pf(cptvf, mbx);
-+	/* Wait for previous message to be acked, timeout 2sec */
-+	while (!cptvf->pf_acked) {
-+		if (cptvf->pf_nacked)
-+			return -EINVAL;
-+		msleep(sleep);
-+		if (cptvf->pf_acked)
-+			break;
-+		timeout -= sleep;
-+		if (!timeout) {
-+			dev_err(&cptvf->pdev->dev,
-+				"PF didn't ack to mbox msg %llx from VF%u\n",
-+				mbx->msg, cptvf->vfid);
-+			return -EBUSY;
-+		}
-+	}
-+	return 0;
-+}
-+
-+/*
-+ * Checks if VF is able to comminicate with PF
-+ * and also gets the CPT number this VF is associated to.
-+ */
-+int otx_cptvf_check_pf_ready(struct otx_cptvf *cptvf)
-+{
-+	struct otx_cpt_mbox mbx = {};
-+	int ret;
-+
-+	mbx.msg = OTX_CPT_MSG_READY;
-+	ret = cptvf_send_msg_to_pf_timeout(cptvf, &mbx);
-+
-+	return ret;
-+}
-+
-+/*
-+ * Communicate VQs size to PF to program CPT(0)_PF_Q(0-15)_CTL of the VF.
-+ * Must be ACKed.
-+ */
-+int otx_cptvf_send_vq_size_msg(struct otx_cptvf *cptvf)
-+{
-+	struct otx_cpt_mbox mbx = {};
-+	int ret;
-+
-+	mbx.msg = OTX_CPT_MSG_QLEN;
-+	mbx.data = cptvf->qsize;
-+	ret = cptvf_send_msg_to_pf_timeout(cptvf, &mbx);
-+
-+	return ret;
-+}
-+
-+/*
-+ * Communicate VF group required to PF and get the VQ binded to that group
-+ */
-+int otx_cptvf_send_vf_to_grp_msg(struct otx_cptvf *cptvf, int group)
-+{
-+	struct otx_cpt_mbox mbx = {};
-+	int ret;
-+
-+	mbx.msg = OTX_CPT_MSG_QBIND_GRP;
-+	/* Convey group of the VF */
-+	mbx.data = group;
-+	ret = cptvf_send_msg_to_pf_timeout(cptvf, &mbx);
-+	if (ret)
-+		return ret;
-+	cptvf->vfgrp = group;
-+
-+	return 0;
-+}
-+
-+/*
-+ * Communicate VF group required to PF and get the VQ binded to that group
-+ */
-+int otx_cptvf_send_vf_priority_msg(struct otx_cptvf *cptvf)
-+{
-+	struct otx_cpt_mbox mbx = {};
-+	int ret;
-+
-+	mbx.msg = OTX_CPT_MSG_VQ_PRIORITY;
-+	/* Convey group of the VF */
-+	mbx.data = cptvf->priority;
-+	ret = cptvf_send_msg_to_pf_timeout(cptvf, &mbx);
-+
-+	return ret;
-+}
-+
-+/*
-+ * Communicate to PF that VF is UP and running
-+ */
-+int otx_cptvf_send_vf_up(struct otx_cptvf *cptvf)
-+{
-+	struct otx_cpt_mbox mbx = {};
-+	int ret;
-+
-+	mbx.msg = OTX_CPT_MSG_VF_UP;
-+	ret = cptvf_send_msg_to_pf_timeout(cptvf, &mbx);
-+
-+	return ret;
-+}
-+
-+/*
-+ * Communicate to PF that VF is DOWN and running
-+ */
-+int otx_cptvf_send_vf_down(struct otx_cptvf *cptvf)
-+{
-+	struct otx_cpt_mbox mbx = {};
-+	int ret;
-+
-+	mbx.msg = OTX_CPT_MSG_VF_DOWN;
-+	ret = cptvf_send_msg_to_pf_timeout(cptvf, &mbx);
-+
-+	return ret;
-+}
-diff --git a/drivers/crypto/marvell/octeontx/otx_cptvf_reqmgr.c b/drivers/crypto/marvell/octeontx/otx_cptvf_reqmgr.c
-new file mode 100644
-index 0000000..df839b8
---- /dev/null
-+++ b/drivers/crypto/marvell/octeontx/otx_cptvf_reqmgr.c
-@@ -0,0 +1,612 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Marvell OcteonTX CPT driver
-+ *
-+ * Copyright (C) 2019 Marvell International Ltd.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ */
-+
-+#include "otx_cptvf.h"
-+#include "otx_cptvf_algs.h"
-+
-+/* Completion code size and initial value */
-+#define COMPLETION_CODE_SIZE	8
-+#define COMPLETION_CODE_INIT	0
-+
-+/* SG list header size in bytes */
-+#define SG_LIST_HDR_SIZE	8
-+
-+/* Default timeout when waiting for free pending entry in us */
-+#define CPT_PENTRY_TIMEOUT	1000
-+#define CPT_PENTRY_STEP		50
-+
-+/* Default threshold for stopping and resuming sender requests */
-+#define CPT_IQ_STOP_MARGIN	128
-+#define CPT_IQ_RESUME_MARGIN	512
-+
-+#define CPT_DMA_ALIGN		128
-+
-+void otx_cpt_dump_sg_list(struct pci_dev *pdev, struct otx_cpt_req_info *req)
-+{
-+	int i;
-+
-+	pr_debug("Gather list size %d\n", req->incnt);
-+	for (i = 0; i < req->incnt; i++) {
-+		pr_debug("Buffer %d size %d, vptr 0x%p, dmaptr 0x%p\n", i,
-+			 req->in[i].size, req->in[i].vptr,
-+			 (void *) req->in[i].dma_addr);
-+		pr_debug("Buffer hexdump (%d bytes)\n",
-+			 req->in[i].size);
-+		print_hex_dump_debug("", DUMP_PREFIX_NONE, 16, 1,
-+				     req->in[i].vptr, req->in[i].size, false);
-+	}
-+
-+	pr_debug("Scatter list size %d\n", req->outcnt);
-+	for (i = 0; i < req->outcnt; i++) {
-+		pr_debug("Buffer %d size %d, vptr 0x%p, dmaptr 0x%p\n", i,
-+			 req->out[i].size, req->out[i].vptr,
-+			 (void *) req->out[i].dma_addr);
-+		pr_debug("Buffer hexdump (%d bytes)\n", req->out[i].size);
-+		print_hex_dump_debug("", DUMP_PREFIX_NONE, 16, 1,
-+				     req->out[i].vptr, req->out[i].size, false);
-+	}
-+}
-+
-+static inline struct otx_cpt_pending_entry *get_free_pending_entry(
-+						struct otx_cpt_pending_queue *q,
-+						int qlen)
-+{
-+	struct otx_cpt_pending_entry *ent = NULL;
-+
-+	ent = &q->head[q->rear];
-+	if (unlikely(ent->busy))
++	if (!req)
 +		return NULL;
 +
-+	q->rear++;
-+	if (unlikely(q->rear == qlen))
-+		q->rear = 0;
-+
-+	return ent;
++	return req;
 +}
 +
-+static inline u32 modulo_inc(u32 index, u32 length, u32 inc)
++static void mv_cesa_rearm_engine(struct mv_cesa_engine *engine)
 +{
-+	if (WARN_ON(inc > length))
-+		inc = length;
++	struct crypto_async_request *req = NULL, *backlog = NULL;
++	struct mv_cesa_ctx *ctx;
 +
-+	index += inc;
-+	if (unlikely(index >= length))
-+		index -= length;
 +
-+	return index;
++	spin_lock_bh(&engine->lock);
++	if (!engine->req) {
++		req = mv_cesa_dequeue_req_locked(engine, &backlog);
++		engine->req = req;
++	}
++	spin_unlock_bh(&engine->lock);
++
++	if (!req)
++		return;
++
++	if (backlog)
++		backlog->complete(backlog, -EINPROGRESS);
++
++	ctx = crypto_tfm_ctx(req->tfm);
++	ctx->ops->step(req);
 +}
 +
-+static inline void free_pentry(struct otx_cpt_pending_entry *pentry)
++static int mv_cesa_std_process(struct mv_cesa_engine *engine, u32 status)
 +{
-+	pentry->completion_addr = NULL;
-+	pentry->info = NULL;
-+	pentry->callback = NULL;
-+	pentry->areq = NULL;
-+	pentry->resume_sender = false;
-+	pentry->busy = false;
++	struct crypto_async_request *req;
++	struct mv_cesa_ctx *ctx;
++	int res;
++
++	req = engine->req;
++	ctx = crypto_tfm_ctx(req->tfm);
++	res = ctx->ops->process(req, status);
++
++	if (res == 0) {
++		ctx->ops->complete(req);
++		mv_cesa_engine_enqueue_complete_request(engine, req);
++	} else if (res == -EINPROGRESS) {
++		ctx->ops->step(req);
++	}
++
++	return res;
 +}
 +
-+static inline int setup_sgio_components(struct pci_dev *pdev,
-+					struct otx_cpt_buf_ptr *list,
-+					int buf_count, u8 *buffer)
++static int mv_cesa_int_process(struct mv_cesa_engine *engine, u32 status)
 +{
-+	struct otx_cpt_sglist_component *sg_ptr = NULL;
-+	int ret = 0, i, j;
-+	int components;
++	if (engine->chain.first && engine->chain.last)
++		return mv_cesa_tdma_process(engine, status);
 +
-+	if (unlikely(!list)) {
-+		dev_err(&pdev->dev, "Input list pointer is NULL\n");
-+		return -EFAULT;
-+	}
-+
-+	for (i = 0; i < buf_count; i++) {
-+		if (likely(list[i].vptr)) {
-+			list[i].dma_addr = dma_map_single(&pdev->dev,
-+							  list[i].vptr,
-+							  list[i].size,
-+							  DMA_BIDIRECTIONAL);
-+			if (unlikely(dma_mapping_error(&pdev->dev,
-+						       list[i].dma_addr))) {
-+				dev_err(&pdev->dev, "Dma mapping failed\n");
-+				ret = -EIO;
-+				goto sg_cleanup;
-+			}
-+		}
-+	}
-+
-+	components = buf_count / 4;
-+	sg_ptr = (struct otx_cpt_sglist_component *)buffer;
-+	for (i = 0; i < components; i++) {
-+		sg_ptr->u.s.len0 = cpu_to_be16(list[i * 4 + 0].size);
-+		sg_ptr->u.s.len1 = cpu_to_be16(list[i * 4 + 1].size);
-+		sg_ptr->u.s.len2 = cpu_to_be16(list[i * 4 + 2].size);
-+		sg_ptr->u.s.len3 = cpu_to_be16(list[i * 4 + 3].size);
-+		sg_ptr->ptr0 = cpu_to_be64(list[i * 4 + 0].dma_addr);
-+		sg_ptr->ptr1 = cpu_to_be64(list[i * 4 + 1].dma_addr);
-+		sg_ptr->ptr2 = cpu_to_be64(list[i * 4 + 2].dma_addr);
-+		sg_ptr->ptr3 = cpu_to_be64(list[i * 4 + 3].dma_addr);
-+		sg_ptr++;
-+	}
-+	components = buf_count % 4;
-+
-+	switch (components) {
-+	case 3:
-+		sg_ptr->u.s.len2 = cpu_to_be16(list[i * 4 + 2].size);
-+		sg_ptr->ptr2 = cpu_to_be64(list[i * 4 + 2].dma_addr);
-+		/* Fall through */
-+	case 2:
-+		sg_ptr->u.s.len1 = cpu_to_be16(list[i * 4 + 1].size);
-+		sg_ptr->ptr1 = cpu_to_be64(list[i * 4 + 1].dma_addr);
-+		/* Fall through */
-+	case 1:
-+		sg_ptr->u.s.len0 = cpu_to_be16(list[i * 4 + 0].size);
-+		sg_ptr->ptr0 = cpu_to_be64(list[i * 4 + 0].dma_addr);
-+		break;
-+	default:
-+		break;
-+	}
-+	return ret;
-+
-+sg_cleanup:
-+	for (j = 0; j < i; j++) {
-+		if (list[j].dma_addr) {
-+			dma_unmap_single(&pdev->dev, list[i].dma_addr,
-+					 list[i].size, DMA_BIDIRECTIONAL);
-+		}
-+
-+		list[j].dma_addr = 0;
-+	}
-+	return ret;
++	return mv_cesa_std_process(engine, status);
 +}
 +
-+static inline int setup_sgio_list(struct pci_dev *pdev,
-+				  struct otx_cpt_info_buffer **pinfo,
-+				  struct otx_cpt_req_info *req, gfp_t gfp)
++static inline void
++mv_cesa_complete_req(struct mv_cesa_ctx *ctx, struct crypto_async_request *req,
++		     int res)
 +{
-+	u32 dlen, align_dlen, info_len, rlen;
-+	struct otx_cpt_info_buffer *info;
-+	u16 g_sz_bytes, s_sz_bytes;
-+	int align = CPT_DMA_ALIGN;
-+	u32 total_mem_len;
-+
-+	if (unlikely(req->incnt > OTX_CPT_MAX_SG_IN_CNT ||
-+		     req->outcnt > OTX_CPT_MAX_SG_OUT_CNT)) {
-+		dev_err(&pdev->dev, "Error too many sg components\n");
-+		return -EINVAL;
-+	}
-+
-+	g_sz_bytes = ((req->incnt + 3) / 4) *
-+		      sizeof(struct otx_cpt_sglist_component);
-+	s_sz_bytes = ((req->outcnt + 3) / 4) *
-+		      sizeof(struct otx_cpt_sglist_component);
-+
-+	dlen = g_sz_bytes + s_sz_bytes + SG_LIST_HDR_SIZE;
-+	align_dlen = ALIGN(dlen, align);
-+	info_len = ALIGN(sizeof(*info), align);
-+	rlen = ALIGN(sizeof(union otx_cpt_res_s), align);
-+	total_mem_len = align_dlen + info_len + rlen + COMPLETION_CODE_SIZE;
-+
-+	info = kzalloc(total_mem_len, gfp);
-+	if (unlikely(!info)) {
-+		dev_err(&pdev->dev, "Memory allocation failed\n");
-+		return -ENOMEM;
-+	}
-+	*pinfo = info;
-+	info->dlen = dlen;
-+	info->in_buffer = (u8 *)info + info_len;
-+
-+	((u16 *)info->in_buffer)[0] = req->outcnt;
-+	((u16 *)info->in_buffer)[1] = req->incnt;
-+	((u16 *)info->in_buffer)[2] = 0;
-+	((u16 *)info->in_buffer)[3] = 0;
-+	*(u64 *)info->in_buffer = cpu_to_be64p((u64 *)info->in_buffer);
-+
-+	/* Setup gather (input) components */
-+	if (setup_sgio_components(pdev, req->in, req->incnt,
-+				  &info->in_buffer[8])) {
-+		dev_err(&pdev->dev, "Failed to setup gather list\n");
-+		return -EFAULT;
-+	}
-+
-+	if (setup_sgio_components(pdev, req->out, req->outcnt,
-+				  &info->in_buffer[8 + g_sz_bytes])) {
-+		dev_err(&pdev->dev, "Failed to setup scatter list\n");
-+		return -EFAULT;
-+	}
-+
-+	info->dma_len = total_mem_len - info_len;
-+	info->dptr_baddr = dma_map_single(&pdev->dev, (void *)info->in_buffer,
-+					  info->dma_len, DMA_BIDIRECTIONAL);
-+	if (unlikely(dma_mapping_error(&pdev->dev, info->dptr_baddr))) {
-+		dev_err(&pdev->dev, "DMA Mapping failed for cpt req\n");
-+		return -EIO;
-+	}
-+	/*
-+	 * Get buffer for union otx_cpt_res_s response
-+	 * structure and its physical address
-+	 */
-+	info->completion_addr = (u64 *)(info->in_buffer + align_dlen);
-+	info->comp_baddr = info->dptr_baddr + align_dlen;
-+
-+	/* Create and initialize RPTR */
-+	info->out_buffer = (u8 *)info->completion_addr + rlen;
-+	info->rptr_baddr = info->comp_baddr + rlen;
-+
-+	*((u64 *) info->out_buffer) = ~((u64) COMPLETION_CODE_INIT);
-+
-+	return 0;
++	ctx->ops->cleanup(req);
++	local_bh_disable();
++	req->complete(req, res);
++	local_bh_enable();
 +}
 +
-+
-+static void cpt_fill_inst(union otx_cpt_inst_s *inst,
-+			  struct otx_cpt_info_buffer *info,
-+			  struct otx_cpt_iq_cmd *cmd)
++static irqreturn_t mv_cesa_int(int irq, void *priv)
 +{
-+	inst->u[0] = 0x0;
-+	inst->s.doneint = true;
-+	inst->s.res_addr = (u64)info->comp_baddr;
-+	inst->u[2] = 0x0;
-+	inst->s.wq_ptr = 0;
-+	inst->s.ei0 = cmd->cmd.u64;
-+	inst->s.ei1 = cmd->dptr;
-+	inst->s.ei2 = cmd->rptr;
-+	inst->s.ei3 = cmd->cptr.u64;
-+}
++	struct mv_cesa_engine *engine = priv;
++	struct crypto_async_request *req;
++	struct mv_cesa_ctx *ctx;
++	u32 status, mask;
++	irqreturn_t ret = IRQ_NONE;
 +
-+/*
-+ * On OcteonTX platform the parameter db_count is used as a count for ringing
-+ * door bell. The valid values for db_count are:
-+ * 0 - 1 CPT instruction will be enqueued however CPT will not be informed
-+ * 1 - 1 CPT instruction will be enqueued and CPT will be informed
-+ */
-+static void cpt_send_cmd(union otx_cpt_inst_s *cptinst, struct otx_cptvf *cptvf)
-+{
-+	struct otx_cpt_cmd_qinfo *qinfo = &cptvf->cqinfo;
-+	struct otx_cpt_cmd_queue *queue;
-+	struct otx_cpt_cmd_chunk *curr;
-+	u8 *ent;
++	while (true) {
++		int res;
 +
-+	queue = &qinfo->queue[0];
-+	/*
-+	 * cpt_send_cmd is currently called only from critical section
-+	 * therefore no locking is required for accessing instruction queue
-+	 */
-+	ent = &queue->qhead->head[queue->idx * OTX_CPT_INST_SIZE];
-+	memcpy(ent, (void *) cptinst, OTX_CPT_INST_SIZE);
++		mask = mv_cesa_get_int_mask(engine);
++		status = readl(engine->regs + CESA_SA_INT_STATUS);
 +
-+	if (++queue->idx >= queue->qhead->size / 64) {
-+		curr = queue->qhead;
++		if (!(status & mask))
++			break;
 +
-+		if (list_is_last(&curr->nextchunk, &queue->chead))
-+			queue->qhead = queue->base;
-+		else
-+			queue->qhead = list_next_entry(queue->qhead, nextchunk);
-+		queue->idx = 0;
-+	}
-+	/* make sure all memory stores are done before ringing doorbell */
-+	smp_wmb();
-+	otx_cptvf_write_vq_doorbell(cptvf, 1);
-+}
++		/*
++		 * TODO: avoid clearing the FPGA_INT_STATUS if this not
++		 * relevant on some platforms.
++		 */
++		writel(~status, engine->regs + CESA_SA_FPGA_INT_STATUS);
++		writel(~status, engine->regs + CESA_SA_INT_STATUS);
 +
-+static int process_request(struct pci_dev *pdev, struct otx_cpt_req_info *req,
-+			   struct otx_cpt_pending_queue *pqueue,
-+			   struct otx_cptvf *cptvf)
-+{
-+	struct otx_cptvf_request *cpt_req = &req->req;
-+	struct otx_cpt_pending_entry *pentry = NULL;
-+	union otx_cpt_ctrl_info *ctrl = &req->ctrl;
-+	struct otx_cpt_info_buffer *info = NULL;
-+	union otx_cpt_res_s *result = NULL;
-+	struct otx_cpt_iq_cmd iq_cmd;
-+	union otx_cpt_inst_s cptinst;
-+	int retry, ret = 0;
-+	u8 resume_sender;
-+	gfp_t gfp;
++		/* Process fetched requests */
++		res = mv_cesa_int_process(engine, status & mask);
++		ret = IRQ_HANDLED;
 +
-+	gfp = (req->areq->flags & CRYPTO_TFM_REQ_MAY_SLEEP) ? GFP_KERNEL :
-+							      GFP_ATOMIC;
-+	ret = setup_sgio_list(pdev, &info, req, gfp);
-+	if (unlikely(ret)) {
-+		dev_err(&pdev->dev, "Setting up SG list failed");
-+		goto request_cleanup;
-+	}
-+	cpt_req->dlen = info->dlen;
++		spin_lock_bh(&engine->lock);
++		req = engine->req;
++		if (res != -EINPROGRESS)
++			engine->req = NULL;
++		spin_unlock_bh(&engine->lock);
 +
-+	result = (union otx_cpt_res_s *) info->completion_addr;
-+	result->s.compcode = COMPLETION_CODE_INIT;
++		ctx = crypto_tfm_ctx(req->tfm);
 +
-+	spin_lock_bh(&pqueue->lock);
-+	pentry = get_free_pending_entry(pqueue, pqueue->qlen);
-+	retry = CPT_PENTRY_TIMEOUT / CPT_PENTRY_STEP;
-+	while (unlikely(!pentry) && retry--) {
-+		spin_unlock_bh(&pqueue->lock);
-+		udelay(CPT_PENTRY_STEP);
-+		spin_lock_bh(&pqueue->lock);
-+		pentry = get_free_pending_entry(pqueue, pqueue->qlen);
-+	}
++		if (res && res != -EINPROGRESS)
++			mv_cesa_complete_req(ctx, req, res);
 +
-+	if (unlikely(!pentry)) {
-+		ret = -ENOSPC;
-+		spin_unlock_bh(&pqueue->lock);
-+		goto request_cleanup;
-+	}
++		/* Launch the next pending request */
++		mv_cesa_rearm_engine(engine);
 +
-+	/*
-+	 * Check if we are close to filling in entire pending queue,
-+	 * if so then tell the sender to stop/sleep by returning -EBUSY
-+	 * We do it only for context which can sleep (GFP_KERNEL)
-+	 */
-+	if (gfp == GFP_KERNEL &&
-+	    pqueue->pending_count > (pqueue->qlen - CPT_IQ_STOP_MARGIN)) {
-+		pentry->resume_sender = true;
-+	} else
-+		pentry->resume_sender = false;
-+	resume_sender = pentry->resume_sender;
-+	pqueue->pending_count++;
-+
-+	pentry->completion_addr = info->completion_addr;
-+	pentry->info = info;
-+	pentry->callback = req->callback;
-+	pentry->areq = req->areq;
-+	pentry->busy = true;
-+	info->pentry = pentry;
-+	info->time_in = jiffies;
-+	info->req = req;
-+
-+	/* Fill in the command */
-+	iq_cmd.cmd.u64 = 0;
-+	iq_cmd.cmd.s.opcode = cpu_to_be16(cpt_req->opcode.flags);
-+	iq_cmd.cmd.s.param1 = cpu_to_be16(cpt_req->param1);
-+	iq_cmd.cmd.s.param2 = cpu_to_be16(cpt_req->param2);
-+	iq_cmd.cmd.s.dlen   = cpu_to_be16(cpt_req->dlen);
-+
-+	/* 64-bit swap for microcode data reads, not needed for addresses*/
-+	iq_cmd.cmd.u64 = cpu_to_be64(iq_cmd.cmd.u64);
-+	iq_cmd.dptr = info->dptr_baddr;
-+	iq_cmd.rptr = info->rptr_baddr;
-+	iq_cmd.cptr.u64 = 0;
-+	iq_cmd.cptr.s.grp = ctrl->s.grp;
-+
-+	/* Fill in the CPT_INST_S type command for HW interpretation */
-+	cpt_fill_inst(&cptinst, info, &iq_cmd);
-+
-+	/* Print debug info if enabled */
-+	otx_cpt_dump_sg_list(pdev, req);
-+	pr_debug("Cpt_inst_s hexdump (%d bytes)\n", OTX_CPT_INST_SIZE);
-+	print_hex_dump_debug("", 0, 16, 1, &cptinst, OTX_CPT_INST_SIZE, false);
-+	pr_debug("Dptr hexdump (%d bytes)\n", cpt_req->dlen);
-+	print_hex_dump_debug("", 0, 16, 1, info->in_buffer,
-+			     cpt_req->dlen, false);
-+
-+	/* Send CPT command */
-+	cpt_send_cmd(&cptinst, cptvf);
-+
-+	/*
-+	 * We allocate and prepare pending queue entry in critical section
-+	 * together with submitting CPT instruction to CPT instruction queue
-+	 * to make sure that order of CPT requests is the same in both
-+	 * pending and instruction queues
-+	 */
-+	spin_unlock_bh(&pqueue->lock);
-+
-+	ret = resume_sender ? -EBUSY : -EINPROGRESS;
-+	return ret;
-+
-+request_cleanup:
-+	do_request_cleanup(pdev, info);
-+	return ret;
-+}
-+
-+int otx_cpt_do_request(struct pci_dev *pdev, struct otx_cpt_req_info *req,
-+		       int cpu_num)
-+{
-+	struct otx_cptvf *cptvf = pci_get_drvdata(pdev);
-+
-+	if (!otx_cpt_device_ready(cptvf)) {
-+		dev_err(&pdev->dev, "CPT Device is not ready");
-+		return -ENODEV;
-+	}
-+
-+	if ((cptvf->vftype == OTX_CPT_SE_TYPES) && (!req->ctrl.s.se_req)) {
-+		dev_err(&pdev->dev, "CPTVF-%d of SE TYPE got AE request",
-+			cptvf->vfid);
-+		return -EINVAL;
-+	} else if ((cptvf->vftype == OTX_CPT_AE_TYPES) &&
-+		   (req->ctrl.s.se_req)) {
-+		dev_err(&pdev->dev, "CPTVF-%d of AE TYPE got SE request",
-+			cptvf->vfid);
-+		return -EINVAL;
-+	}
-+
-+	return process_request(pdev, req, &cptvf->pqinfo.queue[0], cptvf);
-+}
-+
-+static int cpt_process_ccode(struct pci_dev *pdev,
-+			     union otx_cpt_res_s *cpt_status,
-+			     struct otx_cpt_info_buffer *cpt_info,
-+			     struct otx_cpt_req_info *req, u32 *res_code)
-+{
-+	u8 ccode = cpt_status->s.compcode;
-+	union otx_cpt_error_code ecode;
-+
-+	ecode.u = be64_to_cpu(*((u64 *) cpt_info->out_buffer));
-+	switch (ccode) {
-+	case CPT_COMP_E_FAULT:
-+		dev_err(&pdev->dev,
-+			"Request failed with DMA fault\n");
-+		otx_cpt_dump_sg_list(pdev, req);
-+		break;
-+
-+	case CPT_COMP_E_SWERR:
-+		dev_err(&pdev->dev,
-+			"Request failed with software error code %d\n",
-+			ecode.s.ccode);
-+		otx_cpt_dump_sg_list(pdev, req);
-+		break;
-+
-+	case CPT_COMP_E_HWERR:
-+		dev_err(&pdev->dev,
-+			"Request failed with hardware error\n");
-+		otx_cpt_dump_sg_list(pdev, req);
-+		break;
-+
-+	case COMPLETION_CODE_INIT:
-+		/* check for timeout */
-+		if (time_after_eq(jiffies, cpt_info->time_in +
-+				  OTX_CPT_COMMAND_TIMEOUT * HZ))
-+			dev_warn(&pdev->dev, "Request timed out 0x%p", req);
-+		else if (cpt_info->extra_time < OTX_CPT_TIME_IN_RESET_COUNT) {
-+			cpt_info->time_in = jiffies;
-+			cpt_info->extra_time++;
-+		}
-+		return 1;
-+
-+	case CPT_COMP_E_GOOD:
-+		/* Check microcode completion code */
-+		if (ecode.s.ccode) {
-+			/*
-+			 * If requested hmac is truncated and ucode returns
-+			 * s/g write length error then we report success
-+			 * because ucode writes as many bytes of calculated
-+			 * hmac as available in gather buffer and reports
-+			 * s/g write length error if number of bytes in gather
-+			 * buffer is less than full hmac size.
-+			 */
-+			if (req->is_trunc_hmac &&
-+			    ecode.s.ccode == ERR_SCATTER_GATHER_WRITE_LENGTH) {
-+				*res_code = 0;
++		/* Iterate over the complete queue */
++		while (true) {
++			req = mv_cesa_engine_dequeue_complete_request(engine);
++			if (!req)
 +				break;
-+			}
 +
-+			dev_err(&pdev->dev,
-+				"Request failed with software error code 0x%x\n",
-+				ecode.s.ccode);
-+			otx_cpt_dump_sg_list(pdev, req);
-+			break;
++			ctx = crypto_tfm_ctx(req->tfm);
++			mv_cesa_complete_req(ctx, req, 0);
 +		}
++	}
 +
-+		/* Request has been processed with success */
-+		*res_code = 0;
-+		break;
++	return ret;
++}
 +
-+	default:
-+		dev_err(&pdev->dev, "Request returned invalid status\n");
-+		break;
++int mv_cesa_queue_req(struct crypto_async_request *req,
++		      struct mv_cesa_req *creq)
++{
++	int ret;
++	struct mv_cesa_engine *engine = creq->engine;
++
++	spin_lock_bh(&engine->lock);
++	ret = crypto_enqueue_request(&engine->queue, req);
++	if ((mv_cesa_req_get_type(creq) == CESA_DMA_REQ) &&
++	    (ret == -EINPROGRESS || ret == -EBUSY))
++		mv_cesa_tdma_chain(engine, creq);
++	spin_unlock_bh(&engine->lock);
++
++	if (ret != -EINPROGRESS)
++		return ret;
++
++	mv_cesa_rearm_engine(engine);
++
++	return -EINPROGRESS;
++}
++
++static int mv_cesa_add_algs(struct mv_cesa_dev *cesa)
++{
++	int ret;
++	int i, j;
++
++	for (i = 0; i < cesa->caps->ncipher_algs; i++) {
++		ret = crypto_register_skcipher(cesa->caps->cipher_algs[i]);
++		if (ret)
++			goto err_unregister_crypto;
++	}
++
++	for (i = 0; i < cesa->caps->nahash_algs; i++) {
++		ret = crypto_register_ahash(cesa->caps->ahash_algs[i]);
++		if (ret)
++			goto err_unregister_ahash;
 +	}
 +
 +	return 0;
++
++err_unregister_ahash:
++	for (j = 0; j < i; j++)
++		crypto_unregister_ahash(cesa->caps->ahash_algs[j]);
++	i = cesa->caps->ncipher_algs;
++
++err_unregister_crypto:
++	for (j = 0; j < i; j++)
++		crypto_unregister_skcipher(cesa->caps->cipher_algs[j]);
++
++	return ret;
 +}
 +
-+static inline void process_pending_queue(struct pci_dev *pdev,
-+					 struct otx_cpt_pending_queue *pqueue)
++static void mv_cesa_remove_algs(struct mv_cesa_dev *cesa)
 +{
-+	void (*callback)(int status, void *arg1, void *arg2);
-+	struct otx_cpt_pending_entry *resume_pentry = NULL;
-+	struct otx_cpt_pending_entry *pentry = NULL;
-+	struct otx_cpt_info_buffer *cpt_info = NULL;
-+	union otx_cpt_res_s *cpt_status = NULL;
-+	struct otx_cpt_req_info *req = NULL;
-+	struct crypto_async_request *areq;
-+	u32 res_code, resume_index;
-+
-+	while (1) {
-+		spin_lock_bh(&pqueue->lock);
-+		pentry = &pqueue->head[pqueue->front];
-+
-+		if (WARN_ON(!pentry)) {
-+			spin_unlock_bh(&pqueue->lock);
-+			break;
-+		}
-+
-+		res_code = -EINVAL;
-+		if (unlikely(!pentry->busy)) {
-+			spin_unlock_bh(&pqueue->lock);
-+			break;
-+		}
-+
-+		if (unlikely(!pentry->callback)) {
-+			dev_err(&pdev->dev, "Callback NULL\n");
-+			goto process_pentry;
-+		}
-+
-+		cpt_info = pentry->info;
-+		if (unlikely(!cpt_info)) {
-+			dev_err(&pdev->dev, "Pending entry post arg NULL\n");
-+			goto process_pentry;
-+		}
-+
-+		req = cpt_info->req;
-+		if (unlikely(!req)) {
-+			dev_err(&pdev->dev, "Request NULL\n");
-+			goto process_pentry;
-+		}
-+
-+		cpt_status = (union otx_cpt_res_s *) pentry->completion_addr;
-+		if (unlikely(!cpt_status)) {
-+			dev_err(&pdev->dev, "Completion address NULL\n");
-+			goto process_pentry;
-+		}
-+
-+		if (cpt_process_ccode(pdev, cpt_status, cpt_info, req,
-+				      &res_code)) {
-+			spin_unlock_bh(&pqueue->lock);
-+			return;
-+		}
-+		cpt_info->pdev = pdev;
-+
-+process_pentry:
-+		/*
-+		 * Check if we should inform sending side to resume
-+		 * We do it CPT_IQ_RESUME_MARGIN elements in advance before
-+		 * pending queue becomes empty
-+		 */
-+		resume_index = modulo_inc(pqueue->front, pqueue->qlen,
-+					  CPT_IQ_RESUME_MARGIN);
-+		resume_pentry = &pqueue->head[resume_index];
-+		if (resume_pentry &&
-+		    resume_pentry->resume_sender) {
-+			resume_pentry->resume_sender = false;
-+			callback = resume_pentry->callback;
-+			areq = resume_pentry->areq;
-+
-+			if (callback) {
-+				spin_unlock_bh(&pqueue->lock);
-+
-+				/*
-+				 * EINPROGRESS is an indication for sending
-+				 * side that it can resume sending requests
-+				 */
-+				callback(-EINPROGRESS, areq, cpt_info);
-+				spin_lock_bh(&pqueue->lock);
-+			}
-+		}
-+
-+		callback = pentry->callback;
-+		areq = pentry->areq;
-+		free_pentry(pentry);
-+
-+		pqueue->pending_count--;
-+		pqueue->front = modulo_inc(pqueue->front, pqueue->qlen, 1);
-+		spin_unlock_bh(&pqueue->lock);
-+
-+		/*
-+		 * Call callback after current pending entry has been
-+		 * processed, we don't do it if the callback pointer is
-+		 * invalid.
-+		 */
-+		if (callback)
-+			callback(res_code, areq, cpt_info);
-+	}
-+}
-+
-+void otx_cpt_post_process(struct otx_cptvf_wqe *wqe)
-+{
-+	process_pending_queue(wqe->cptvf->pdev, &wqe->cptvf->pqinfo.queue[0]);
-+}
-diff --git a/drivers/crypto/marvell/octeontx/otx_cptvf_reqmgr.h b/drivers/crypto/marvell/octeontx/otx_cptvf_reqmgr.h
-new file mode 100644
-index 0000000..a4c9ff7
---- /dev/null
-+++ b/drivers/crypto/marvell/octeontx/otx_cptvf_reqmgr.h
-@@ -0,0 +1,227 @@
-+/* SPDX-License-Identifier: GPL-2.0
-+ * Marvell OcteonTX CPT driver
-+ *
-+ * Copyright (C) 2019 Marvell International Ltd.
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
-+ */
-+
-+#ifndef __OTX_CPTVF_REQUEST_MANAGER_H
-+#define __OTX_CPTVF_REQUEST_MANAGER_H
-+
-+#include <linux/types.h>
-+#include <linux/crypto.h>
-+#include <linux/pci.h>
-+#include "otx_cpt_hw_types.h"
-+
-+/*
-+ * Maximum total number of SG buffers is 100, we divide it equally
-+ * between input and output
-+ */
-+#define OTX_CPT_MAX_SG_IN_CNT		50
-+#define OTX_CPT_MAX_SG_OUT_CNT		50
-+
-+/* DMA mode direct or SG */
-+#define OTX_CPT_DMA_DIRECT_DIRECT	0
-+#define OTX_CPT_DMA_GATHER_SCATTER	1
-+
-+/* Context source CPTR or DPTR */
-+#define OTX_CPT_FROM_CPTR		0
-+#define OTX_CPT_FROM_DPTR		1
-+
-+/* CPT instruction queue alignment */
-+#define OTX_CPT_INST_Q_ALIGNMENT	128
-+#define OTX_CPT_MAX_REQ_SIZE		65535
-+
-+/* Default command timeout in seconds */
-+#define OTX_CPT_COMMAND_TIMEOUT		4
-+#define OTX_CPT_TIMER_HOLD		0x03F
-+#define OTX_CPT_COUNT_HOLD		32
-+#define OTX_CPT_TIME_IN_RESET_COUNT     5
-+
-+/* Minimum and maximum values for interrupt coalescing */
-+#define OTX_CPT_COALESC_MIN_TIME_WAIT	0x0
-+#define OTX_CPT_COALESC_MAX_TIME_WAIT	((1<<16)-1)
-+#define OTX_CPT_COALESC_MIN_NUM_WAIT	0x0
-+#define OTX_CPT_COALESC_MAX_NUM_WAIT	((1<<20)-1)
-+
-+union otx_cpt_opcode_info {
-+	u16 flags;
-+	struct {
-+		u8 major;
-+		u8 minor;
-+	} s;
-+};
-+
-+struct otx_cptvf_request {
-+	u32 param1;
-+	u32 param2;
-+	u16 dlen;
-+	union otx_cpt_opcode_info opcode;
-+};
-+
-+struct otx_cpt_buf_ptr {
-+	u8 *vptr;
-+	dma_addr_t dma_addr;
-+	u16 size;
-+};
-+
-+union otx_cpt_ctrl_info {
-+	u32 flags;
-+	struct {
-+#if defined(__BIG_ENDIAN_BITFIELD)
-+		u32 reserved0:26;
-+		u32 grp:3;	/* Group bits */
-+		u32 dma_mode:2;	/* DMA mode */
-+		u32 se_req:1;	/* To SE core */
-+#else
-+		u32 se_req:1;	/* To SE core */
-+		u32 dma_mode:2;	/* DMA mode */
-+		u32 grp:3;	/* Group bits */
-+		u32 reserved0:26;
-+#endif
-+	} s;
-+};
-+
-+/*
-+ * CPT_INST_S software command definitions
-+ * Words EI (0-3)
-+ */
-+union otx_cpt_iq_cmd_word0 {
-+	u64 u64;
-+	struct {
-+		u16 opcode;
-+		u16 param1;
-+		u16 param2;
-+		u16 dlen;
-+	} s;
-+};
-+
-+union otx_cpt_iq_cmd_word3 {
-+	u64 u64;
-+	struct {
-+#if defined(__BIG_ENDIAN_BITFIELD)
-+		u64 grp:3;
-+		u64 cptr:61;
-+#else
-+		u64 cptr:61;
-+		u64 grp:3;
-+#endif
-+	} s;
-+};
-+
-+struct otx_cpt_iq_cmd {
-+	union otx_cpt_iq_cmd_word0 cmd;
-+	u64 dptr;
-+	u64 rptr;
-+	union otx_cpt_iq_cmd_word3 cptr;
-+};
-+
-+struct otx_cpt_sglist_component {
-+	union {
-+		u64 len;
-+		struct {
-+			u16 len0;
-+			u16 len1;
-+			u16 len2;
-+			u16 len3;
-+		} s;
-+	} u;
-+	u64 ptr0;
-+	u64 ptr1;
-+	u64 ptr2;
-+	u64 ptr3;
-+};
-+
-+struct otx_cpt_pending_entry {
-+	u64 *completion_addr;	/* Completion address */
-+	struct otx_cpt_info_buffer *info;
-+	/* Kernel async request callback */
-+	void (*callback)(int status, void *arg1, void *arg2);
-+	struct crypto_async_request *areq; /* Async request callback arg */
-+	u8 resume_sender;	/* Notify sender to resume sending requests */
-+	u8 busy;		/* Entry status (free/busy) */
-+};
-+
-+struct otx_cpt_pending_queue {
-+	struct otx_cpt_pending_entry *head;	/* Head of the queue */
-+	u32 front;			/* Process work from here */
-+	u32 rear;			/* Append new work here */
-+	u32 pending_count;		/* Pending requests count */
-+	u32 qlen;			/* Queue length */
-+	spinlock_t lock;		/* Queue lock */
-+};
-+
-+struct otx_cpt_req_info {
-+	/* Kernel async request callback */
-+	void (*callback)(int status, void *arg1, void *arg2);
-+	struct crypto_async_request *areq; /* Async request callback arg */
-+	struct otx_cptvf_request req;/* Request information (core specific) */
-+	union otx_cpt_ctrl_info ctrl;/* User control information */
-+	struct otx_cpt_buf_ptr in[OTX_CPT_MAX_SG_IN_CNT];
-+	struct otx_cpt_buf_ptr out[OTX_CPT_MAX_SG_OUT_CNT];
-+	u8 *iv_out;     /* IV to send back */
-+	u16 rlen;	/* Output length */
-+	u8 incnt;	/* Number of input buffers */
-+	u8 outcnt;	/* Number of output buffers */
-+	u8 req_type;	/* Type of request */
-+	u8 is_enc;	/* Is a request an encryption request */
-+	u8 is_trunc_hmac;/* Is truncated hmac used */
-+};
-+
-+struct otx_cpt_info_buffer {
-+	struct otx_cpt_pending_entry *pentry;
-+	struct otx_cpt_req_info *req;
-+	struct pci_dev *pdev;
-+	u64 *completion_addr;
-+	u8 *out_buffer;
-+	u8 *in_buffer;
-+	dma_addr_t dptr_baddr;
-+	dma_addr_t rptr_baddr;
-+	dma_addr_t comp_baddr;
-+	unsigned long time_in;
-+	u32 dlen;
-+	u32 dma_len;
-+	u8 extra_time;
-+};
-+
-+static inline void do_request_cleanup(struct pci_dev *pdev,
-+				      struct otx_cpt_info_buffer *info)
-+{
-+	struct otx_cpt_req_info *req;
 +	int i;
 +
-+	if (info->dptr_baddr)
-+		dma_unmap_single(&pdev->dev, info->dptr_baddr,
-+				 info->dma_len, DMA_BIDIRECTIONAL);
++	for (i = 0; i < cesa->caps->nahash_algs; i++)
++		crypto_unregister_ahash(cesa->caps->ahash_algs[i]);
 +
-+	if (info->req) {
-+		req = info->req;
-+		for (i = 0; i < req->outcnt; i++) {
-+			if (req->out[i].dma_addr)
-+				dma_unmap_single(&pdev->dev,
-+						 req->out[i].dma_addr,
-+						 req->out[i].size,
-+						 DMA_BIDIRECTIONAL);
-+		}
-+
-+		for (i = 0; i < req->incnt; i++) {
-+			if (req->in[i].dma_addr)
-+				dma_unmap_single(&pdev->dev,
-+						 req->in[i].dma_addr,
-+						 req->in[i].size,
-+						 DMA_BIDIRECTIONAL);
-+		}
-+	}
-+	kzfree(info);
++	for (i = 0; i < cesa->caps->ncipher_algs; i++)
++		crypto_unregister_skcipher(cesa->caps->cipher_algs[i]);
 +}
 +
-+struct otx_cptvf_wqe;
-+void otx_cpt_dump_sg_list(struct pci_dev *pdev, struct otx_cpt_req_info *req);
-+void otx_cpt_post_process(struct otx_cptvf_wqe *wqe);
-+int otx_cpt_do_request(struct pci_dev *pdev, struct otx_cpt_req_info *req,
-+		       int cpu_num);
++static struct skcipher_alg *orion_cipher_algs[] = {
++	&mv_cesa_ecb_des_alg,
++	&mv_cesa_cbc_des_alg,
++	&mv_cesa_ecb_des3_ede_alg,
++	&mv_cesa_cbc_des3_ede_alg,
++	&mv_cesa_ecb_aes_alg,
++	&mv_cesa_cbc_aes_alg,
++};
 +
-+#endif /* __OTX_CPTVF_REQUEST_MANAGER_H */
++static struct ahash_alg *orion_ahash_algs[] = {
++	&mv_md5_alg,
++	&mv_sha1_alg,
++	&mv_ahmac_md5_alg,
++	&mv_ahmac_sha1_alg,
++};
++
++static struct skcipher_alg *armada_370_cipher_algs[] = {
++	&mv_cesa_ecb_des_alg,
++	&mv_cesa_cbc_des_alg,
++	&mv_cesa_ecb_des3_ede_alg,
++	&mv_cesa_cbc_des3_ede_alg,
++	&mv_cesa_ecb_aes_alg,
++	&mv_cesa_cbc_aes_alg,
++};
++
++static struct ahash_alg *armada_370_ahash_algs[] = {
++	&mv_md5_alg,
++	&mv_sha1_alg,
++	&mv_sha256_alg,
++	&mv_ahmac_md5_alg,
++	&mv_ahmac_sha1_alg,
++	&mv_ahmac_sha256_alg,
++};
++
++static const struct mv_cesa_caps orion_caps = {
++	.nengines = 1,
++	.cipher_algs = orion_cipher_algs,
++	.ncipher_algs = ARRAY_SIZE(orion_cipher_algs),
++	.ahash_algs = orion_ahash_algs,
++	.nahash_algs = ARRAY_SIZE(orion_ahash_algs),
++	.has_tdma = false,
++};
++
++static const struct mv_cesa_caps kirkwood_caps = {
++	.nengines = 1,
++	.cipher_algs = orion_cipher_algs,
++	.ncipher_algs = ARRAY_SIZE(orion_cipher_algs),
++	.ahash_algs = orion_ahash_algs,
++	.nahash_algs = ARRAY_SIZE(orion_ahash_algs),
++	.has_tdma = true,
++};
++
++static const struct mv_cesa_caps armada_370_caps = {
++	.nengines = 1,
++	.cipher_algs = armada_370_cipher_algs,
++	.ncipher_algs = ARRAY_SIZE(armada_370_cipher_algs),
++	.ahash_algs = armada_370_ahash_algs,
++	.nahash_algs = ARRAY_SIZE(armada_370_ahash_algs),
++	.has_tdma = true,
++};
++
++static const struct mv_cesa_caps armada_xp_caps = {
++	.nengines = 2,
++	.cipher_algs = armada_370_cipher_algs,
++	.ncipher_algs = ARRAY_SIZE(armada_370_cipher_algs),
++	.ahash_algs = armada_370_ahash_algs,
++	.nahash_algs = ARRAY_SIZE(armada_370_ahash_algs),
++	.has_tdma = true,
++};
++
++static const struct of_device_id mv_cesa_of_match_table[] = {
++	{ .compatible = "marvell,orion-crypto", .data = &orion_caps },
++	{ .compatible = "marvell,kirkwood-crypto", .data = &kirkwood_caps },
++	{ .compatible = "marvell,dove-crypto", .data = &kirkwood_caps },
++	{ .compatible = "marvell,armada-370-crypto", .data = &armada_370_caps },
++	{ .compatible = "marvell,armada-xp-crypto", .data = &armada_xp_caps },
++	{ .compatible = "marvell,armada-375-crypto", .data = &armada_xp_caps },
++	{ .compatible = "marvell,armada-38x-crypto", .data = &armada_xp_caps },
++	{}
++};
++MODULE_DEVICE_TABLE(of, mv_cesa_of_match_table);
++
++static void
++mv_cesa_conf_mbus_windows(struct mv_cesa_engine *engine,
++			  const struct mbus_dram_target_info *dram)
++{
++	void __iomem *iobase = engine->regs;
++	int i;
++
++	for (i = 0; i < 4; i++) {
++		writel(0, iobase + CESA_TDMA_WINDOW_CTRL(i));
++		writel(0, iobase + CESA_TDMA_WINDOW_BASE(i));
++	}
++
++	for (i = 0; i < dram->num_cs; i++) {
++		const struct mbus_dram_window *cs = dram->cs + i;
++
++		writel(((cs->size - 1) & 0xffff0000) |
++		       (cs->mbus_attr << 8) |
++		       (dram->mbus_dram_target_id << 4) | 1,
++		       iobase + CESA_TDMA_WINDOW_CTRL(i));
++		writel(cs->base, iobase + CESA_TDMA_WINDOW_BASE(i));
++	}
++}
++
++static int mv_cesa_dev_dma_init(struct mv_cesa_dev *cesa)
++{
++	struct device *dev = cesa->dev;
++	struct mv_cesa_dev_dma *dma;
++
++	if (!cesa->caps->has_tdma)
++		return 0;
++
++	dma = devm_kzalloc(dev, sizeof(*dma), GFP_KERNEL);
++	if (!dma)
++		return -ENOMEM;
++
++	dma->tdma_desc_pool = dmam_pool_create("tdma_desc", dev,
++					sizeof(struct mv_cesa_tdma_desc),
++					16, 0);
++	if (!dma->tdma_desc_pool)
++		return -ENOMEM;
++
++	dma->op_pool = dmam_pool_create("cesa_op", dev,
++					sizeof(struct mv_cesa_op_ctx), 16, 0);
++	if (!dma->op_pool)
++		return -ENOMEM;
++
++	dma->cache_pool = dmam_pool_create("cesa_cache", dev,
++					   CESA_MAX_HASH_BLOCK_SIZE, 1, 0);
++	if (!dma->cache_pool)
++		return -ENOMEM;
++
++	dma->padding_pool = dmam_pool_create("cesa_padding", dev, 72, 1, 0);
++	if (!dma->padding_pool)
++		return -ENOMEM;
++
++	cesa->dma = dma;
++
++	return 0;
++}
++
++static int mv_cesa_get_sram(struct platform_device *pdev, int idx)
++{
++	struct mv_cesa_dev *cesa = platform_get_drvdata(pdev);
++	struct mv_cesa_engine *engine = &cesa->engines[idx];
++	const char *res_name = "sram";
++	struct resource *res;
++
++	engine->pool = of_gen_pool_get(cesa->dev->of_node,
++				       "marvell,crypto-srams", idx);
++	if (engine->pool) {
++		engine->sram = gen_pool_dma_alloc(engine->pool,
++						  cesa->sram_size,
++						  &engine->sram_dma);
++		if (engine->sram)
++			return 0;
++
++		engine->pool = NULL;
++		return -ENOMEM;
++	}
++
++	if (cesa->caps->nengines > 1) {
++		if (!idx)
++			res_name = "sram0";
++		else
++			res_name = "sram1";
++	}
++
++	res = platform_get_resource_byname(pdev, IORESOURCE_MEM,
++					   res_name);
++	if (!res || resource_size(res) < cesa->sram_size)
++		return -EINVAL;
++
++	engine->sram = devm_ioremap_resource(cesa->dev, res);
++	if (IS_ERR(engine->sram))
++		return PTR_ERR(engine->sram);
++
++	engine->sram_dma = dma_map_resource(cesa->dev, res->start,
++					    cesa->sram_size,
++					    DMA_BIDIRECTIONAL, 0);
++	if (dma_mapping_error(cesa->dev, engine->sram_dma))
++		return -ENOMEM;
++
++	return 0;
++}
++
++static void mv_cesa_put_sram(struct platform_device *pdev, int idx)
++{
++	struct mv_cesa_dev *cesa = platform_get_drvdata(pdev);
++	struct mv_cesa_engine *engine = &cesa->engines[idx];
++
++	if (engine->pool)
++		gen_pool_free(engine->pool, (unsigned long)engine->sram,
++			      cesa->sram_size);
++	else
++		dma_unmap_resource(cesa->dev, engine->sram_dma,
++				   cesa->sram_size, DMA_BIDIRECTIONAL, 0);
++}
++
++static int mv_cesa_probe(struct platform_device *pdev)
++{
++	const struct mv_cesa_caps *caps = &orion_caps;
++	const struct mbus_dram_target_info *dram;
++	const struct of_device_id *match;
++	struct device *dev = &pdev->dev;
++	struct mv_cesa_dev *cesa;
++	struct mv_cesa_engine *engines;
++	struct resource *res;
++	int irq, ret, i;
++	u32 sram_size;
++
++	if (cesa_dev) {
++		dev_err(&pdev->dev, "Only one CESA device authorized\n");
++		return -EEXIST;
++	}
++
++	if (dev->of_node) {
++		match = of_match_node(mv_cesa_of_match_table, dev->of_node);
++		if (!match || !match->data)
++			return -ENOTSUPP;
++
++		caps = match->data;
++	}
++
++	cesa = devm_kzalloc(dev, sizeof(*cesa), GFP_KERNEL);
++	if (!cesa)
++		return -ENOMEM;
++
++	cesa->caps = caps;
++	cesa->dev = dev;
++
++	sram_size = CESA_SA_DEFAULT_SRAM_SIZE;
++	of_property_read_u32(cesa->dev->of_node, "marvell,crypto-sram-size",
++			     &sram_size);
++	if (sram_size < CESA_SA_MIN_SRAM_SIZE)
++		sram_size = CESA_SA_MIN_SRAM_SIZE;
++
++	cesa->sram_size = sram_size;
++	cesa->engines = devm_kcalloc(dev, caps->nengines, sizeof(*engines),
++				     GFP_KERNEL);
++	if (!cesa->engines)
++		return -ENOMEM;
++
++	spin_lock_init(&cesa->lock);
++
++	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "regs");
++	cesa->regs = devm_ioremap_resource(dev, res);
++	if (IS_ERR(cesa->regs))
++		return PTR_ERR(cesa->regs);
++
++	ret = mv_cesa_dev_dma_init(cesa);
++	if (ret)
++		return ret;
++
++	dram = mv_mbus_dram_info_nooverlap();
++
++	platform_set_drvdata(pdev, cesa);
++
++	for (i = 0; i < caps->nengines; i++) {
++		struct mv_cesa_engine *engine = &cesa->engines[i];
++		char res_name[7];
++
++		engine->id = i;
++		spin_lock_init(&engine->lock);
++
++		ret = mv_cesa_get_sram(pdev, i);
++		if (ret)
++			goto err_cleanup;
++
++		irq = platform_get_irq(pdev, i);
++		if (irq < 0) {
++			ret = irq;
++			goto err_cleanup;
++		}
++
++		/*
++		 * Not all platforms can gate the CESA clocks: do not complain
++		 * if the clock does not exist.
++		 */
++		snprintf(res_name, sizeof(res_name), "cesa%d", i);
++		engine->clk = devm_clk_get(dev, res_name);
++		if (IS_ERR(engine->clk)) {
++			engine->clk = devm_clk_get(dev, NULL);
++			if (IS_ERR(engine->clk))
++				engine->clk = NULL;
++		}
++
++		snprintf(res_name, sizeof(res_name), "cesaz%d", i);
++		engine->zclk = devm_clk_get(dev, res_name);
++		if (IS_ERR(engine->zclk))
++			engine->zclk = NULL;
++
++		ret = clk_prepare_enable(engine->clk);
++		if (ret)
++			goto err_cleanup;
++
++		ret = clk_prepare_enable(engine->zclk);
++		if (ret)
++			goto err_cleanup;
++
++		engine->regs = cesa->regs + CESA_ENGINE_OFF(i);
++
++		if (dram && cesa->caps->has_tdma)
++			mv_cesa_conf_mbus_windows(engine, dram);
++
++		writel(0, engine->regs + CESA_SA_INT_STATUS);
++		writel(CESA_SA_CFG_STOP_DIG_ERR,
++		       engine->regs + CESA_SA_CFG);
++		writel(engine->sram_dma & CESA_SA_SRAM_MSK,
++		       engine->regs + CESA_SA_DESC_P0);
++
++		ret = devm_request_threaded_irq(dev, irq, NULL, mv_cesa_int,
++						IRQF_ONESHOT,
++						dev_name(&pdev->dev),
++						engine);
++		if (ret)
++			goto err_cleanup;
++
++		crypto_init_queue(&engine->queue, CESA_CRYPTO_DEFAULT_MAX_QLEN);
++		atomic_set(&engine->load, 0);
++		INIT_LIST_HEAD(&engine->complete_queue);
++	}
++
++	cesa_dev = cesa;
++
++	ret = mv_cesa_add_algs(cesa);
++	if (ret) {
++		cesa_dev = NULL;
++		goto err_cleanup;
++	}
++
++	dev_info(dev, "CESA device successfully registered\n");
++
++	return 0;
++
++err_cleanup:
++	for (i = 0; i < caps->nengines; i++) {
++		clk_disable_unprepare(cesa->engines[i].zclk);
++		clk_disable_unprepare(cesa->engines[i].clk);
++		mv_cesa_put_sram(pdev, i);
++	}
++
++	return ret;
++}
++
++static int mv_cesa_remove(struct platform_device *pdev)
++{
++	struct mv_cesa_dev *cesa = platform_get_drvdata(pdev);
++	int i;
++
++	mv_cesa_remove_algs(cesa);
++
++	for (i = 0; i < cesa->caps->nengines; i++) {
++		clk_disable_unprepare(cesa->engines[i].zclk);
++		clk_disable_unprepare(cesa->engines[i].clk);
++		mv_cesa_put_sram(pdev, i);
++	}
++
++	return 0;
++}
++
++static const struct platform_device_id mv_cesa_plat_id_table[] = {
++	{ .name = "mv_crypto" },
++	{ /* sentinel */ },
++};
++MODULE_DEVICE_TABLE(platform, mv_cesa_plat_id_table);
++
++static struct platform_driver marvell_cesa = {
++	.probe		= mv_cesa_probe,
++	.remove		= mv_cesa_remove,
++	.id_table	= mv_cesa_plat_id_table,
++	.driver		= {
++		.name	= "marvell-cesa",
++		.of_match_table = mv_cesa_of_match_table,
++	},
++};
++module_platform_driver(marvell_cesa);
++
++MODULE_ALIAS("platform:mv_crypto");
++MODULE_AUTHOR("Boris Brezillon <boris.brezillon@free-electrons.com>");
++MODULE_AUTHOR("Arnaud Ebalard <arno@natisbad.org>");
++MODULE_DESCRIPTION("Support for Marvell's cryptographic engine");
++MODULE_LICENSE("GPL v2");
+diff --git a/drivers/crypto/marvell/cesa/cesa.h b/drivers/crypto/marvell/cesa/cesa.h
+new file mode 100644
+index 0000000..e8632d5
+--- /dev/null
++++ b/drivers/crypto/marvell/cesa/cesa.h
+@@ -0,0 +1,881 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#ifndef __MARVELL_CESA_H__
++#define __MARVELL_CESA_H__
++
++#include <crypto/algapi.h>
++#include <crypto/hash.h>
++#include <crypto/internal/hash.h>
++#include <crypto/internal/skcipher.h>
++
++#include <linux/crypto.h>
++#include <linux/dmapool.h>
++
++#define CESA_ENGINE_OFF(i)			(((i) * 0x2000))
++
++#define CESA_TDMA_BYTE_CNT			0x800
++#define CESA_TDMA_SRC_ADDR			0x810
++#define CESA_TDMA_DST_ADDR			0x820
++#define CESA_TDMA_NEXT_ADDR			0x830
++
++#define CESA_TDMA_CONTROL			0x840
++#define CESA_TDMA_DST_BURST			GENMASK(2, 0)
++#define CESA_TDMA_DST_BURST_32B			3
++#define CESA_TDMA_DST_BURST_128B		4
++#define CESA_TDMA_OUT_RD_EN			BIT(4)
++#define CESA_TDMA_SRC_BURST			GENMASK(8, 6)
++#define CESA_TDMA_SRC_BURST_32B			(3 << 6)
++#define CESA_TDMA_SRC_BURST_128B		(4 << 6)
++#define CESA_TDMA_CHAIN				BIT(9)
++#define CESA_TDMA_BYTE_SWAP			BIT(11)
++#define CESA_TDMA_NO_BYTE_SWAP			BIT(11)
++#define CESA_TDMA_EN				BIT(12)
++#define CESA_TDMA_FETCH_ND			BIT(13)
++#define CESA_TDMA_ACT				BIT(14)
++
++#define CESA_TDMA_CUR				0x870
++#define CESA_TDMA_ERROR_CAUSE			0x8c8
++#define CESA_TDMA_ERROR_MSK			0x8cc
++
++#define CESA_TDMA_WINDOW_BASE(x)		(((x) * 0x8) + 0xa00)
++#define CESA_TDMA_WINDOW_CTRL(x)		(((x) * 0x8) + 0xa04)
++
++#define CESA_IVDIG(x)				(0xdd00 + ((x) * 4) +	\
++						 (((x) < 5) ? 0 : 0x14))
++
++#define CESA_SA_CMD				0xde00
++#define CESA_SA_CMD_EN_CESA_SA_ACCL0		BIT(0)
++#define CESA_SA_CMD_EN_CESA_SA_ACCL1		BIT(1)
++#define CESA_SA_CMD_DISABLE_SEC			BIT(2)
++
++#define CESA_SA_DESC_P0				0xde04
++
++#define CESA_SA_DESC_P1				0xde14
++
++#define CESA_SA_CFG				0xde08
++#define CESA_SA_CFG_STOP_DIG_ERR		GENMASK(1, 0)
++#define CESA_SA_CFG_DIG_ERR_CONT		0
++#define CESA_SA_CFG_DIG_ERR_SKIP		1
++#define CESA_SA_CFG_DIG_ERR_STOP		3
++#define CESA_SA_CFG_CH0_W_IDMA			BIT(7)
++#define CESA_SA_CFG_CH1_W_IDMA			BIT(8)
++#define CESA_SA_CFG_ACT_CH0_IDMA		BIT(9)
++#define CESA_SA_CFG_ACT_CH1_IDMA		BIT(10)
++#define CESA_SA_CFG_MULTI_PKT			BIT(11)
++#define CESA_SA_CFG_PARA_DIS			BIT(13)
++
++#define CESA_SA_ACCEL_STATUS			0xde0c
++#define CESA_SA_ST_ACT_0			BIT(0)
++#define CESA_SA_ST_ACT_1			BIT(1)
++
++/*
++ * CESA_SA_FPGA_INT_STATUS looks like a FPGA leftover and is documented only
++ * in Errata 4.12. It looks like that it was part of an IRQ-controller in FPGA
++ * and someone forgot to remove  it while switching to the core and moving to
++ * CESA_SA_INT_STATUS.
++ */
++#define CESA_SA_FPGA_INT_STATUS			0xdd68
++#define CESA_SA_INT_STATUS			0xde20
++#define CESA_SA_INT_AUTH_DONE			BIT(0)
++#define CESA_SA_INT_DES_E_DONE			BIT(1)
++#define CESA_SA_INT_AES_E_DONE			BIT(2)
++#define CESA_SA_INT_AES_D_DONE			BIT(3)
++#define CESA_SA_INT_ENC_DONE			BIT(4)
++#define CESA_SA_INT_ACCEL0_DONE			BIT(5)
++#define CESA_SA_INT_ACCEL1_DONE			BIT(6)
++#define CESA_SA_INT_ACC0_IDMA_DONE		BIT(7)
++#define CESA_SA_INT_ACC1_IDMA_DONE		BIT(8)
++#define CESA_SA_INT_IDMA_DONE			BIT(9)
++#define CESA_SA_INT_IDMA_OWN_ERR		BIT(10)
++
++#define CESA_SA_INT_MSK				0xde24
++
++#define CESA_SA_DESC_CFG_OP_MAC_ONLY		0
++#define CESA_SA_DESC_CFG_OP_CRYPT_ONLY		1
++#define CESA_SA_DESC_CFG_OP_MAC_CRYPT		2
++#define CESA_SA_DESC_CFG_OP_CRYPT_MAC		3
++#define CESA_SA_DESC_CFG_OP_MSK			GENMASK(1, 0)
++#define CESA_SA_DESC_CFG_MACM_SHA256		(1 << 4)
++#define CESA_SA_DESC_CFG_MACM_HMAC_SHA256	(3 << 4)
++#define CESA_SA_DESC_CFG_MACM_MD5		(4 << 4)
++#define CESA_SA_DESC_CFG_MACM_SHA1		(5 << 4)
++#define CESA_SA_DESC_CFG_MACM_HMAC_MD5		(6 << 4)
++#define CESA_SA_DESC_CFG_MACM_HMAC_SHA1		(7 << 4)
++#define CESA_SA_DESC_CFG_MACM_MSK		GENMASK(6, 4)
++#define CESA_SA_DESC_CFG_CRYPTM_DES		(1 << 8)
++#define CESA_SA_DESC_CFG_CRYPTM_3DES		(2 << 8)
++#define CESA_SA_DESC_CFG_CRYPTM_AES		(3 << 8)
++#define CESA_SA_DESC_CFG_CRYPTM_MSK		GENMASK(9, 8)
++#define CESA_SA_DESC_CFG_DIR_ENC		(0 << 12)
++#define CESA_SA_DESC_CFG_DIR_DEC		(1 << 12)
++#define CESA_SA_DESC_CFG_CRYPTCM_ECB		(0 << 16)
++#define CESA_SA_DESC_CFG_CRYPTCM_CBC		(1 << 16)
++#define CESA_SA_DESC_CFG_CRYPTCM_MSK		BIT(16)
++#define CESA_SA_DESC_CFG_3DES_EEE		(0 << 20)
++#define CESA_SA_DESC_CFG_3DES_EDE		(1 << 20)
++#define CESA_SA_DESC_CFG_AES_LEN_128		(0 << 24)
++#define CESA_SA_DESC_CFG_AES_LEN_192		(1 << 24)
++#define CESA_SA_DESC_CFG_AES_LEN_256		(2 << 24)
++#define CESA_SA_DESC_CFG_AES_LEN_MSK		GENMASK(25, 24)
++#define CESA_SA_DESC_CFG_NOT_FRAG		(0 << 30)
++#define CESA_SA_DESC_CFG_FIRST_FRAG		(1 << 30)
++#define CESA_SA_DESC_CFG_LAST_FRAG		(2 << 30)
++#define CESA_SA_DESC_CFG_MID_FRAG		(3 << 30)
++#define CESA_SA_DESC_CFG_FRAG_MSK		GENMASK(31, 30)
++
++/*
++ * /-----------\ 0
++ * | ACCEL CFG |	4 * 8
++ * |-----------| 0x20
++ * | CRYPT KEY |	8 * 4
++ * |-----------| 0x40
++ * |  IV   IN  |	4 * 4
++ * |-----------| 0x40 (inplace)
++ * |  IV BUF   |	4 * 4
++ * |-----------| 0x80
++ * |  DATA IN  |	16 * x (max ->max_req_size)
++ * |-----------| 0x80 (inplace operation)
++ * |  DATA OUT |	16 * x (max ->max_req_size)
++ * \-----------/ SRAM size
++ */
++
++/*
++ * Hashing memory map:
++ * /-----------\ 0
++ * | ACCEL CFG |        4 * 8
++ * |-----------| 0x20
++ * | Inner IV  |        8 * 4
++ * |-----------| 0x40
++ * | Outer IV  |        8 * 4
++ * |-----------| 0x60
++ * | Output BUF|        8 * 4
++ * |-----------| 0x80
++ * |  DATA IN  |        64 * x (max ->max_req_size)
++ * \-----------/ SRAM size
++ */
++
++#define CESA_SA_CFG_SRAM_OFFSET			0x00
++#define CESA_SA_DATA_SRAM_OFFSET		0x80
++
++#define CESA_SA_CRYPT_KEY_SRAM_OFFSET		0x20
++#define CESA_SA_CRYPT_IV_SRAM_OFFSET		0x40
++
++#define CESA_SA_MAC_IIV_SRAM_OFFSET		0x20
++#define CESA_SA_MAC_OIV_SRAM_OFFSET		0x40
++#define CESA_SA_MAC_DIG_SRAM_OFFSET		0x60
++
++#define CESA_SA_DESC_CRYPT_DATA(offset)					\
++	cpu_to_le32((CESA_SA_DATA_SRAM_OFFSET + (offset)) |		\
++		    ((CESA_SA_DATA_SRAM_OFFSET + (offset)) << 16))
++
++#define CESA_SA_DESC_CRYPT_IV(offset)					\
++	cpu_to_le32((CESA_SA_CRYPT_IV_SRAM_OFFSET + (offset)) |	\
++		    ((CESA_SA_CRYPT_IV_SRAM_OFFSET + (offset)) << 16))
++
++#define CESA_SA_DESC_CRYPT_KEY(offset)					\
++	cpu_to_le32(CESA_SA_CRYPT_KEY_SRAM_OFFSET + (offset))
++
++#define CESA_SA_DESC_MAC_DATA(offset)					\
++	cpu_to_le32(CESA_SA_DATA_SRAM_OFFSET + (offset))
++#define CESA_SA_DESC_MAC_DATA_MSK		cpu_to_le32(GENMASK(15, 0))
++
++#define CESA_SA_DESC_MAC_TOTAL_LEN(total_len)	cpu_to_le32((total_len) << 16)
++#define CESA_SA_DESC_MAC_TOTAL_LEN_MSK		cpu_to_le32(GENMASK(31, 16))
++
++#define CESA_SA_DESC_MAC_SRC_TOTAL_LEN_MAX	0xffff
++
++#define CESA_SA_DESC_MAC_DIGEST(offset)					\
++	cpu_to_le32(CESA_SA_MAC_DIG_SRAM_OFFSET + (offset))
++#define CESA_SA_DESC_MAC_DIGEST_MSK		cpu_to_le32(GENMASK(15, 0))
++
++#define CESA_SA_DESC_MAC_FRAG_LEN(frag_len)	cpu_to_le32((frag_len) << 16)
++#define CESA_SA_DESC_MAC_FRAG_LEN_MSK		cpu_to_le32(GENMASK(31, 16))
++
++#define CESA_SA_DESC_MAC_IV(offset)					\
++	cpu_to_le32((CESA_SA_MAC_IIV_SRAM_OFFSET + (offset)) |		\
++		    ((CESA_SA_MAC_OIV_SRAM_OFFSET + (offset)) << 16))
++
++#define CESA_SA_SRAM_SIZE			2048
++#define CESA_SA_SRAM_PAYLOAD_SIZE		(cesa_dev->sram_size - \
++						 CESA_SA_DATA_SRAM_OFFSET)
++
++#define CESA_SA_DEFAULT_SRAM_SIZE		2048
++#define CESA_SA_MIN_SRAM_SIZE			1024
++
++#define CESA_SA_SRAM_MSK			(2048 - 1)
++
++#define CESA_MAX_HASH_BLOCK_SIZE		64
++#define CESA_HASH_BLOCK_SIZE_MSK		(CESA_MAX_HASH_BLOCK_SIZE - 1)
++
++/**
++ * struct mv_cesa_sec_accel_desc - security accelerator descriptor
++ * @config:	engine config
++ * @enc_p:	input and output data pointers for a cipher operation
++ * @enc_len:	cipher operation length
++ * @enc_key_p:	cipher key pointer
++ * @enc_iv:	cipher IV pointers
++ * @mac_src_p:	input pointer and total hash length
++ * @mac_digest:	digest pointer and hash operation length
++ * @mac_iv:	hmac IV pointers
++ *
++ * Structure passed to the CESA engine to describe the crypto operation
++ * to be executed.
++ */
++struct mv_cesa_sec_accel_desc {
++	__le32 config;
++	__le32 enc_p;
++	__le32 enc_len;
++	__le32 enc_key_p;
++	__le32 enc_iv;
++	__le32 mac_src_p;
++	__le32 mac_digest;
++	__le32 mac_iv;
++};
++
++/**
++ * struct mv_cesa_skcipher_op_ctx - cipher operation context
++ * @key:	cipher key
++ * @iv:		cipher IV
++ *
++ * Context associated to a cipher operation.
++ */
++struct mv_cesa_skcipher_op_ctx {
++	u32 key[8];
++	u32 iv[4];
++};
++
++/**
++ * struct mv_cesa_hash_op_ctx - hash or hmac operation context
++ * @key:	cipher key
++ * @iv:		cipher IV
++ *
++ * Context associated to an hash or hmac operation.
++ */
++struct mv_cesa_hash_op_ctx {
++	u32 iv[16];
++	u32 hash[8];
++};
++
++/**
++ * struct mv_cesa_op_ctx - crypto operation context
++ * @desc:	CESA descriptor
++ * @ctx:	context associated to the crypto operation
++ *
++ * Context associated to a crypto operation.
++ */
++struct mv_cesa_op_ctx {
++	struct mv_cesa_sec_accel_desc desc;
++	union {
++		struct mv_cesa_skcipher_op_ctx skcipher;
++		struct mv_cesa_hash_op_ctx hash;
++	} ctx;
++};
++
++/* TDMA descriptor flags */
++#define CESA_TDMA_DST_IN_SRAM			BIT(31)
++#define CESA_TDMA_SRC_IN_SRAM			BIT(30)
++#define CESA_TDMA_END_OF_REQ			BIT(29)
++#define CESA_TDMA_BREAK_CHAIN			BIT(28)
++#define CESA_TDMA_SET_STATE			BIT(27)
++#define CESA_TDMA_TYPE_MSK			GENMASK(26, 0)
++#define CESA_TDMA_DUMMY				0
++#define CESA_TDMA_DATA				1
++#define CESA_TDMA_OP				2
++#define CESA_TDMA_RESULT			3
++
++/**
++ * struct mv_cesa_tdma_desc - TDMA descriptor
++ * @byte_cnt:	number of bytes to transfer
++ * @src:	DMA address of the source
++ * @dst:	DMA address of the destination
++ * @next_dma:	DMA address of the next TDMA descriptor
++ * @cur_dma:	DMA address of this TDMA descriptor
++ * @next:	pointer to the next TDMA descriptor
++ * @op:		CESA operation attached to this TDMA descriptor
++ * @data:	raw data attached to this TDMA descriptor
++ * @flags:	flags describing the TDMA transfer. See the
++ *		"TDMA descriptor flags" section above
++ *
++ * TDMA descriptor used to create a transfer chain describing a crypto
++ * operation.
++ */
++struct mv_cesa_tdma_desc {
++	__le32 byte_cnt;
++	__le32 src;
++	__le32 dst;
++	__le32 next_dma;
++
++	/* Software state */
++	dma_addr_t cur_dma;
++	struct mv_cesa_tdma_desc *next;
++	union {
++		struct mv_cesa_op_ctx *op;
++		void *data;
++	};
++	u32 flags;
++};
++
++/**
++ * struct mv_cesa_sg_dma_iter - scatter-gather iterator
++ * @dir:	transfer direction
++ * @sg:		scatter list
++ * @offset:	current position in the scatter list
++ * @op_offset:	current position in the crypto operation
++ *
++ * Iterator used to iterate over a scatterlist while creating a TDMA chain for
++ * a crypto operation.
++ */
++struct mv_cesa_sg_dma_iter {
++	enum dma_data_direction dir;
++	struct scatterlist *sg;
++	unsigned int offset;
++	unsigned int op_offset;
++};
++
++/**
++ * struct mv_cesa_dma_iter - crypto operation iterator
++ * @len:	the crypto operation length
++ * @offset:	current position in the crypto operation
++ * @op_len:	sub-operation length (the crypto engine can only act on 2kb
++ *		chunks)
++ *
++ * Iterator used to create a TDMA chain for a given crypto operation.
++ */
++struct mv_cesa_dma_iter {
++	unsigned int len;
++	unsigned int offset;
++	unsigned int op_len;
++};
++
++/**
++ * struct mv_cesa_tdma_chain - TDMA chain
++ * @first:	first entry in the TDMA chain
++ * @last:	last entry in the TDMA chain
++ *
++ * Stores a TDMA chain for a specific crypto operation.
++ */
++struct mv_cesa_tdma_chain {
++	struct mv_cesa_tdma_desc *first;
++	struct mv_cesa_tdma_desc *last;
++};
++
++struct mv_cesa_engine;
++
++/**
++ * struct mv_cesa_caps - CESA device capabilities
++ * @engines:		number of engines
++ * @has_tdma:		whether this device has a TDMA block
++ * @cipher_algs:	supported cipher algorithms
++ * @ncipher_algs:	number of supported cipher algorithms
++ * @ahash_algs:		supported hash algorithms
++ * @nahash_algs:	number of supported hash algorithms
++ *
++ * Structure used to describe CESA device capabilities.
++ */
++struct mv_cesa_caps {
++	int nengines;
++	bool has_tdma;
++	struct skcipher_alg **cipher_algs;
++	int ncipher_algs;
++	struct ahash_alg **ahash_algs;
++	int nahash_algs;
++};
++
++/**
++ * struct mv_cesa_dev_dma - DMA pools
++ * @tdma_desc_pool:	TDMA desc pool
++ * @op_pool:		crypto operation pool
++ * @cache_pool:		data cache pool (used by hash implementation when the
++ *			hash request is smaller than the hash block size)
++ * @padding_pool:	padding pool (used by hash implementation when hardware
++ *			padding cannot be used)
++ *
++ * Structure containing the different DMA pools used by this driver.
++ */
++struct mv_cesa_dev_dma {
++	struct dma_pool *tdma_desc_pool;
++	struct dma_pool *op_pool;
++	struct dma_pool *cache_pool;
++	struct dma_pool *padding_pool;
++};
++
++/**
++ * struct mv_cesa_dev - CESA device
++ * @caps:	device capabilities
++ * @regs:	device registers
++ * @sram_size:	usable SRAM size
++ * @lock:	device lock
++ * @engines:	array of engines
++ * @dma:	dma pools
++ *
++ * Structure storing CESA device information.
++ */
++struct mv_cesa_dev {
++	const struct mv_cesa_caps *caps;
++	void __iomem *regs;
++	struct device *dev;
++	unsigned int sram_size;
++	spinlock_t lock;
++	struct mv_cesa_engine *engines;
++	struct mv_cesa_dev_dma *dma;
++};
++
++/**
++ * struct mv_cesa_engine - CESA engine
++ * @id:			engine id
++ * @regs:		engine registers
++ * @sram:		SRAM memory region
++ * @sram_dma:		DMA address of the SRAM memory region
++ * @lock:		engine lock
++ * @req:		current crypto request
++ * @clk:		engine clk
++ * @zclk:		engine zclk
++ * @max_req_len:	maximum chunk length (useful to create the TDMA chain)
++ * @int_mask:		interrupt mask cache
++ * @pool:		memory pool pointing to the memory region reserved in
++ *			SRAM
++ * @queue:		fifo of the pending crypto requests
++ * @load:		engine load counter, useful for load balancing
++ * @chain:		list of the current tdma descriptors being processed
++ *			by this engine.
++ * @complete_queue:	fifo of the processed requests by the engine
++ *
++ * Structure storing CESA engine information.
++ */
++struct mv_cesa_engine {
++	int id;
++	void __iomem *regs;
++	void __iomem *sram;
++	dma_addr_t sram_dma;
++	spinlock_t lock;
++	struct crypto_async_request *req;
++	struct clk *clk;
++	struct clk *zclk;
++	size_t max_req_len;
++	u32 int_mask;
++	struct gen_pool *pool;
++	struct crypto_queue queue;
++	atomic_t load;
++	struct mv_cesa_tdma_chain chain;
++	struct list_head complete_queue;
++};
++
++/**
++ * struct mv_cesa_req_ops - CESA request operations
++ * @process:	process a request chunk result (should return 0 if the
++ *		operation, -EINPROGRESS if it needs more steps or an error
++ *		code)
++ * @step:	launch the crypto operation on the next chunk
++ * @cleanup:	cleanup the crypto request (release associated data)
++ * @complete:	complete the request, i.e copy result or context from sram when
++ *		needed.
++ */
++struct mv_cesa_req_ops {
++	int (*process)(struct crypto_async_request *req, u32 status);
++	void (*step)(struct crypto_async_request *req);
++	void (*cleanup)(struct crypto_async_request *req);
++	void (*complete)(struct crypto_async_request *req);
++};
++
++/**
++ * struct mv_cesa_ctx - CESA operation context
++ * @ops:	crypto operations
++ *
++ * Base context structure inherited by operation specific ones.
++ */
++struct mv_cesa_ctx {
++	const struct mv_cesa_req_ops *ops;
++};
++
++/**
++ * struct mv_cesa_hash_ctx - CESA hash operation context
++ * @base:	base context structure
++ *
++ * Hash context structure.
++ */
++struct mv_cesa_hash_ctx {
++	struct mv_cesa_ctx base;
++};
++
++/**
++ * struct mv_cesa_hash_ctx - CESA hmac operation context
++ * @base:	base context structure
++ * @iv:		initialization vectors
++ *
++ * HMAC context structure.
++ */
++struct mv_cesa_hmac_ctx {
++	struct mv_cesa_ctx base;
++	u32 iv[16];
++};
++
++/**
++ * enum mv_cesa_req_type - request type definitions
++ * @CESA_STD_REQ:	standard request
++ * @CESA_DMA_REQ:	DMA request
++ */
++enum mv_cesa_req_type {
++	CESA_STD_REQ,
++	CESA_DMA_REQ,
++};
++
++/**
++ * struct mv_cesa_req - CESA request
++ * @engine:	engine associated with this request
++ * @chain:	list of tdma descriptors associated  with this request
++ */
++struct mv_cesa_req {
++	struct mv_cesa_engine *engine;
++	struct mv_cesa_tdma_chain chain;
++};
++
++/**
++ * struct mv_cesa_sg_std_iter - CESA scatter-gather iterator for standard
++ *				requests
++ * @iter:	sg mapping iterator
++ * @offset:	current offset in the SG entry mapped in memory
++ */
++struct mv_cesa_sg_std_iter {
++	struct sg_mapping_iter iter;
++	unsigned int offset;
++};
++
++/**
++ * struct mv_cesa_skcipher_std_req - cipher standard request
++ * @op:		operation context
++ * @offset:	current operation offset
++ * @size:	size of the crypto operation
++ */
++struct mv_cesa_skcipher_std_req {
++	struct mv_cesa_op_ctx op;
++	unsigned int offset;
++	unsigned int size;
++	bool skip_ctx;
++};
++
++/**
++ * struct mv_cesa_skcipher_req - cipher request
++ * @req:	type specific request information
++ * @src_nents:	number of entries in the src sg list
++ * @dst_nents:	number of entries in the dest sg list
++ */
++struct mv_cesa_skcipher_req {
++	struct mv_cesa_req base;
++	struct mv_cesa_skcipher_std_req std;
++	int src_nents;
++	int dst_nents;
++};
++
++/**
++ * struct mv_cesa_ahash_std_req - standard hash request
++ * @offset:	current operation offset
++ */
++struct mv_cesa_ahash_std_req {
++	unsigned int offset;
++};
++
++/**
++ * struct mv_cesa_ahash_dma_req - DMA hash request
++ * @padding:		padding buffer
++ * @padding_dma:	DMA address of the padding buffer
++ * @cache_dma:		DMA address of the cache buffer
++ */
++struct mv_cesa_ahash_dma_req {
++	u8 *padding;
++	dma_addr_t padding_dma;
++	u8 *cache;
++	dma_addr_t cache_dma;
++};
++
++/**
++ * struct mv_cesa_ahash_req - hash request
++ * @req:		type specific request information
++ * @cache:		cache buffer
++ * @cache_ptr:		write pointer in the cache buffer
++ * @len:		hash total length
++ * @src_nents:		number of entries in the scatterlist
++ * @last_req:		define whether the current operation is the last one
++ *			or not
++ * @state:		hash state
++ */
++struct mv_cesa_ahash_req {
++	struct mv_cesa_req base;
++	union {
++		struct mv_cesa_ahash_dma_req dma;
++		struct mv_cesa_ahash_std_req std;
++	} req;
++	struct mv_cesa_op_ctx op_tmpl;
++	u8 cache[CESA_MAX_HASH_BLOCK_SIZE];
++	unsigned int cache_ptr;
++	u64 len;
++	int src_nents;
++	bool last_req;
++	bool algo_le;
++	u32 state[8];
++};
++
++/* CESA functions */
++
++extern struct mv_cesa_dev *cesa_dev;
++
++
++static inline void
++mv_cesa_engine_enqueue_complete_request(struct mv_cesa_engine *engine,
++					struct crypto_async_request *req)
++{
++	list_add_tail(&req->list, &engine->complete_queue);
++}
++
++static inline struct crypto_async_request *
++mv_cesa_engine_dequeue_complete_request(struct mv_cesa_engine *engine)
++{
++	struct crypto_async_request *req;
++
++	req = list_first_entry_or_null(&engine->complete_queue,
++				       struct crypto_async_request,
++				       list);
++	if (req)
++		list_del(&req->list);
++
++	return req;
++}
++
++
++static inline enum mv_cesa_req_type
++mv_cesa_req_get_type(struct mv_cesa_req *req)
++{
++	return req->chain.first ? CESA_DMA_REQ : CESA_STD_REQ;
++}
++
++static inline void mv_cesa_update_op_cfg(struct mv_cesa_op_ctx *op,
++					 u32 cfg, u32 mask)
++{
++	op->desc.config &= cpu_to_le32(~mask);
++	op->desc.config |= cpu_to_le32(cfg);
++}
++
++static inline u32 mv_cesa_get_op_cfg(const struct mv_cesa_op_ctx *op)
++{
++	return le32_to_cpu(op->desc.config);
++}
++
++static inline void mv_cesa_set_op_cfg(struct mv_cesa_op_ctx *op, u32 cfg)
++{
++	op->desc.config = cpu_to_le32(cfg);
++}
++
++static inline void mv_cesa_adjust_op(struct mv_cesa_engine *engine,
++				     struct mv_cesa_op_ctx *op)
++{
++	u32 offset = engine->sram_dma & CESA_SA_SRAM_MSK;
++
++	op->desc.enc_p = CESA_SA_DESC_CRYPT_DATA(offset);
++	op->desc.enc_key_p = CESA_SA_DESC_CRYPT_KEY(offset);
++	op->desc.enc_iv = CESA_SA_DESC_CRYPT_IV(offset);
++	op->desc.mac_src_p &= ~CESA_SA_DESC_MAC_DATA_MSK;
++	op->desc.mac_src_p |= CESA_SA_DESC_MAC_DATA(offset);
++	op->desc.mac_digest &= ~CESA_SA_DESC_MAC_DIGEST_MSK;
++	op->desc.mac_digest |= CESA_SA_DESC_MAC_DIGEST(offset);
++	op->desc.mac_iv = CESA_SA_DESC_MAC_IV(offset);
++}
++
++static inline void mv_cesa_set_crypt_op_len(struct mv_cesa_op_ctx *op, int len)
++{
++	op->desc.enc_len = cpu_to_le32(len);
++}
++
++static inline void mv_cesa_set_mac_op_total_len(struct mv_cesa_op_ctx *op,
++						int len)
++{
++	op->desc.mac_src_p &= ~CESA_SA_DESC_MAC_TOTAL_LEN_MSK;
++	op->desc.mac_src_p |= CESA_SA_DESC_MAC_TOTAL_LEN(len);
++}
++
++static inline void mv_cesa_set_mac_op_frag_len(struct mv_cesa_op_ctx *op,
++					       int len)
++{
++	op->desc.mac_digest &= ~CESA_SA_DESC_MAC_FRAG_LEN_MSK;
++	op->desc.mac_digest |= CESA_SA_DESC_MAC_FRAG_LEN(len);
++}
++
++static inline void mv_cesa_set_int_mask(struct mv_cesa_engine *engine,
++					u32 int_mask)
++{
++	if (int_mask == engine->int_mask)
++		return;
++
++	writel_relaxed(int_mask, engine->regs + CESA_SA_INT_MSK);
++	engine->int_mask = int_mask;
++}
++
++static inline u32 mv_cesa_get_int_mask(struct mv_cesa_engine *engine)
++{
++	return engine->int_mask;
++}
++
++static inline bool mv_cesa_mac_op_is_first_frag(const struct mv_cesa_op_ctx *op)
++{
++	return (mv_cesa_get_op_cfg(op) & CESA_SA_DESC_CFG_FRAG_MSK) ==
++		CESA_SA_DESC_CFG_FIRST_FRAG;
++}
++
++int mv_cesa_queue_req(struct crypto_async_request *req,
++		      struct mv_cesa_req *creq);
++
++struct crypto_async_request *
++mv_cesa_dequeue_req_locked(struct mv_cesa_engine *engine,
++			   struct crypto_async_request **backlog);
++
++static inline struct mv_cesa_engine *mv_cesa_select_engine(int weight)
++{
++	int i;
++	u32 min_load = U32_MAX;
++	struct mv_cesa_engine *selected = NULL;
++
++	for (i = 0; i < cesa_dev->caps->nengines; i++) {
++		struct mv_cesa_engine *engine = cesa_dev->engines + i;
++		u32 load = atomic_read(&engine->load);
++
++		if (load < min_load) {
++			min_load = load;
++			selected = engine;
++		}
++	}
++
++	atomic_add(weight, &selected->load);
++
++	return selected;
++}
++
++/*
++ * Helper function that indicates whether a crypto request needs to be
++ * cleaned up or not after being enqueued using mv_cesa_queue_req().
++ */
++static inline int mv_cesa_req_needs_cleanup(struct crypto_async_request *req,
++					    int ret)
++{
++	/*
++	 * The queue still had some space, the request was queued
++	 * normally, so there's no need to clean it up.
++	 */
++	if (ret == -EINPROGRESS)
++		return false;
++
++	/*
++	 * The queue had not space left, but since the request is
++	 * flagged with CRYPTO_TFM_REQ_MAY_BACKLOG, it was added to
++	 * the backlog and will be processed later. There's no need to
++	 * clean it up.
++	 */
++	if (ret == -EBUSY)
++		return false;
++
++	/* Request wasn't queued, we need to clean it up */
++	return true;
++}
++
++/* TDMA functions */
++
++static inline void mv_cesa_req_dma_iter_init(struct mv_cesa_dma_iter *iter,
++					     unsigned int len)
++{
++	iter->len = len;
++	iter->op_len = min(len, CESA_SA_SRAM_PAYLOAD_SIZE);
++	iter->offset = 0;
++}
++
++static inline void mv_cesa_sg_dma_iter_init(struct mv_cesa_sg_dma_iter *iter,
++					    struct scatterlist *sg,
++					    enum dma_data_direction dir)
++{
++	iter->op_offset = 0;
++	iter->offset = 0;
++	iter->sg = sg;
++	iter->dir = dir;
++}
++
++static inline unsigned int
++mv_cesa_req_dma_iter_transfer_len(struct mv_cesa_dma_iter *iter,
++				  struct mv_cesa_sg_dma_iter *sgiter)
++{
++	return min(iter->op_len - sgiter->op_offset,
++		   sg_dma_len(sgiter->sg) - sgiter->offset);
++}
++
++bool mv_cesa_req_dma_iter_next_transfer(struct mv_cesa_dma_iter *chain,
++					struct mv_cesa_sg_dma_iter *sgiter,
++					unsigned int len);
++
++static inline bool mv_cesa_req_dma_iter_next_op(struct mv_cesa_dma_iter *iter)
++{
++	iter->offset += iter->op_len;
++	iter->op_len = min(iter->len - iter->offset,
++			   CESA_SA_SRAM_PAYLOAD_SIZE);
++
++	return iter->op_len;
++}
++
++void mv_cesa_dma_step(struct mv_cesa_req *dreq);
++
++static inline int mv_cesa_dma_process(struct mv_cesa_req *dreq,
++				      u32 status)
++{
++	if (!(status & CESA_SA_INT_ACC0_IDMA_DONE))
++		return -EINPROGRESS;
++
++	if (status & CESA_SA_INT_IDMA_OWN_ERR)
++		return -EINVAL;
++
++	return 0;
++}
++
++void mv_cesa_dma_prepare(struct mv_cesa_req *dreq,
++			 struct mv_cesa_engine *engine);
++void mv_cesa_dma_cleanup(struct mv_cesa_req *dreq);
++void mv_cesa_tdma_chain(struct mv_cesa_engine *engine,
++			struct mv_cesa_req *dreq);
++int mv_cesa_tdma_process(struct mv_cesa_engine *engine, u32 status);
++
++
++static inline void
++mv_cesa_tdma_desc_iter_init(struct mv_cesa_tdma_chain *chain)
++{
++	memset(chain, 0, sizeof(*chain));
++}
++
++int mv_cesa_dma_add_result_op(struct mv_cesa_tdma_chain *chain, dma_addr_t src,
++			  u32 size, u32 flags, gfp_t gfp_flags);
++
++struct mv_cesa_op_ctx *mv_cesa_dma_add_op(struct mv_cesa_tdma_chain *chain,
++					const struct mv_cesa_op_ctx *op_templ,
++					bool skip_ctx,
++					gfp_t flags);
++
++int mv_cesa_dma_add_data_transfer(struct mv_cesa_tdma_chain *chain,
++				  dma_addr_t dst, dma_addr_t src, u32 size,
++				  u32 flags, gfp_t gfp_flags);
++
++int mv_cesa_dma_add_dummy_launch(struct mv_cesa_tdma_chain *chain, gfp_t flags);
++int mv_cesa_dma_add_dummy_end(struct mv_cesa_tdma_chain *chain, gfp_t flags);
++
++int mv_cesa_dma_add_op_transfers(struct mv_cesa_tdma_chain *chain,
++				 struct mv_cesa_dma_iter *dma_iter,
++				 struct mv_cesa_sg_dma_iter *sgiter,
++				 gfp_t gfp_flags);
++
++/* Algorithm definitions */
++
++extern struct ahash_alg mv_md5_alg;
++extern struct ahash_alg mv_sha1_alg;
++extern struct ahash_alg mv_sha256_alg;
++extern struct ahash_alg mv_ahmac_md5_alg;
++extern struct ahash_alg mv_ahmac_sha1_alg;
++extern struct ahash_alg mv_ahmac_sha256_alg;
++
++extern struct skcipher_alg mv_cesa_ecb_des_alg;
++extern struct skcipher_alg mv_cesa_cbc_des_alg;
++extern struct skcipher_alg mv_cesa_ecb_des3_ede_alg;
++extern struct skcipher_alg mv_cesa_cbc_des3_ede_alg;
++extern struct skcipher_alg mv_cesa_ecb_aes_alg;
++extern struct skcipher_alg mv_cesa_cbc_aes_alg;
++
++#endif /* __MARVELL_CESA_H__ */
+diff --git a/drivers/crypto/marvell/cesa/cipher.c b/drivers/crypto/marvell/cesa/cipher.c
+new file mode 100644
+index 0000000..f133c2c
+--- /dev/null
++++ b/drivers/crypto/marvell/cesa/cipher.c
+@@ -0,0 +1,801 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Cipher algorithms supported by the CESA: DES, 3DES and AES.
++ *
++ * Author: Boris Brezillon <boris.brezillon@free-electrons.com>
++ * Author: Arnaud Ebalard <arno@natisbad.org>
++ *
++ * This work is based on an initial version written by
++ * Sebastian Andrzej Siewior < sebastian at breakpoint dot cc >
++ */
++
++#include <crypto/aes.h>
++#include <crypto/internal/des.h>
++
++#include "cesa.h"
++
++struct mv_cesa_des_ctx {
++	struct mv_cesa_ctx base;
++	u8 key[DES_KEY_SIZE];
++};
++
++struct mv_cesa_des3_ctx {
++	struct mv_cesa_ctx base;
++	u8 key[DES3_EDE_KEY_SIZE];
++};
++
++struct mv_cesa_aes_ctx {
++	struct mv_cesa_ctx base;
++	struct crypto_aes_ctx aes;
++};
++
++struct mv_cesa_skcipher_dma_iter {
++	struct mv_cesa_dma_iter base;
++	struct mv_cesa_sg_dma_iter src;
++	struct mv_cesa_sg_dma_iter dst;
++};
++
++static inline void
++mv_cesa_skcipher_req_iter_init(struct mv_cesa_skcipher_dma_iter *iter,
++			       struct skcipher_request *req)
++{
++	mv_cesa_req_dma_iter_init(&iter->base, req->cryptlen);
++	mv_cesa_sg_dma_iter_init(&iter->src, req->src, DMA_TO_DEVICE);
++	mv_cesa_sg_dma_iter_init(&iter->dst, req->dst, DMA_FROM_DEVICE);
++}
++
++static inline bool
++mv_cesa_skcipher_req_iter_next_op(struct mv_cesa_skcipher_dma_iter *iter)
++{
++	iter->src.op_offset = 0;
++	iter->dst.op_offset = 0;
++
++	return mv_cesa_req_dma_iter_next_op(&iter->base);
++}
++
++static inline void
++mv_cesa_skcipher_dma_cleanup(struct skcipher_request *req)
++{
++	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(req);
++
++	if (req->dst != req->src) {
++		dma_unmap_sg(cesa_dev->dev, req->dst, creq->dst_nents,
++			     DMA_FROM_DEVICE);
++		dma_unmap_sg(cesa_dev->dev, req->src, creq->src_nents,
++			     DMA_TO_DEVICE);
++	} else {
++		dma_unmap_sg(cesa_dev->dev, req->src, creq->src_nents,
++			     DMA_BIDIRECTIONAL);
++	}
++	mv_cesa_dma_cleanup(&creq->base);
++}
++
++static inline void mv_cesa_skcipher_cleanup(struct skcipher_request *req)
++{
++	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(req);
++
++	if (mv_cesa_req_get_type(&creq->base) == CESA_DMA_REQ)
++		mv_cesa_skcipher_dma_cleanup(req);
++}
++
++static void mv_cesa_skcipher_std_step(struct skcipher_request *req)
++{
++	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(req);
++	struct mv_cesa_skcipher_std_req *sreq = &creq->std;
++	struct mv_cesa_engine *engine = creq->base.engine;
++	size_t  len = min_t(size_t, req->cryptlen - sreq->offset,
++			    CESA_SA_SRAM_PAYLOAD_SIZE);
++
++	mv_cesa_adjust_op(engine, &sreq->op);
++	memcpy_toio(engine->sram, &sreq->op, sizeof(sreq->op));
++
++	len = sg_pcopy_to_buffer(req->src, creq->src_nents,
++				 engine->sram + CESA_SA_DATA_SRAM_OFFSET,
++				 len, sreq->offset);
++
++	sreq->size = len;
++	mv_cesa_set_crypt_op_len(&sreq->op, len);
++
++	/* FIXME: only update enc_len field */
++	if (!sreq->skip_ctx) {
++		memcpy_toio(engine->sram, &sreq->op, sizeof(sreq->op));
++		sreq->skip_ctx = true;
++	} else {
++		memcpy_toio(engine->sram, &sreq->op, sizeof(sreq->op.desc));
++	}
++
++	mv_cesa_set_int_mask(engine, CESA_SA_INT_ACCEL0_DONE);
++	writel_relaxed(CESA_SA_CFG_PARA_DIS, engine->regs + CESA_SA_CFG);
++	WARN_ON(readl(engine->regs + CESA_SA_CMD) &
++		CESA_SA_CMD_EN_CESA_SA_ACCL0);
++	writel(CESA_SA_CMD_EN_CESA_SA_ACCL0, engine->regs + CESA_SA_CMD);
++}
++
++static int mv_cesa_skcipher_std_process(struct skcipher_request *req,
++					u32 status)
++{
++	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(req);
++	struct mv_cesa_skcipher_std_req *sreq = &creq->std;
++	struct mv_cesa_engine *engine = creq->base.engine;
++	size_t len;
++
++	len = sg_pcopy_from_buffer(req->dst, creq->dst_nents,
++				   engine->sram + CESA_SA_DATA_SRAM_OFFSET,
++				   sreq->size, sreq->offset);
++
++	sreq->offset += len;
++	if (sreq->offset < req->cryptlen)
++		return -EINPROGRESS;
++
++	return 0;
++}
++
++static int mv_cesa_skcipher_process(struct crypto_async_request *req,
++				    u32 status)
++{
++	struct skcipher_request *skreq = skcipher_request_cast(req);
++	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(skreq);
++	struct mv_cesa_req *basereq = &creq->base;
++
++	if (mv_cesa_req_get_type(basereq) == CESA_STD_REQ)
++		return mv_cesa_skcipher_std_process(skreq, status);
++
++	return mv_cesa_dma_process(basereq, status);
++}
++
++static void mv_cesa_skcipher_step(struct crypto_async_request *req)
++{
++	struct skcipher_request *skreq = skcipher_request_cast(req);
++	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(skreq);
++
++	if (mv_cesa_req_get_type(&creq->base) == CESA_DMA_REQ)
++		mv_cesa_dma_step(&creq->base);
++	else
++		mv_cesa_skcipher_std_step(skreq);
++}
++
++static inline void
++mv_cesa_skcipher_dma_prepare(struct skcipher_request *req)
++{
++	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(req);
++	struct mv_cesa_req *basereq = &creq->base;
++
++	mv_cesa_dma_prepare(basereq, basereq->engine);
++}
++
++static inline void
++mv_cesa_skcipher_std_prepare(struct skcipher_request *req)
++{
++	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(req);
++	struct mv_cesa_skcipher_std_req *sreq = &creq->std;
++
++	sreq->size = 0;
++	sreq->offset = 0;
++}
++
++static inline void mv_cesa_skcipher_prepare(struct crypto_async_request *req,
++					    struct mv_cesa_engine *engine)
++{
++	struct skcipher_request *skreq = skcipher_request_cast(req);
++	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(skreq);
++
++	creq->base.engine = engine;
++
++	if (mv_cesa_req_get_type(&creq->base) == CESA_DMA_REQ)
++		mv_cesa_skcipher_dma_prepare(skreq);
++	else
++		mv_cesa_skcipher_std_prepare(skreq);
++}
++
++static inline void
++mv_cesa_skcipher_req_cleanup(struct crypto_async_request *req)
++{
++	struct skcipher_request *skreq = skcipher_request_cast(req);
++
++	mv_cesa_skcipher_cleanup(skreq);
++}
++
++static void
++mv_cesa_skcipher_complete(struct crypto_async_request *req)
++{
++	struct skcipher_request *skreq = skcipher_request_cast(req);
++	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(skreq);
++	struct mv_cesa_engine *engine = creq->base.engine;
++	unsigned int ivsize;
++
++	atomic_sub(skreq->cryptlen, &engine->load);
++	ivsize = crypto_skcipher_ivsize(crypto_skcipher_reqtfm(skreq));
++
++	if (mv_cesa_req_get_type(&creq->base) == CESA_DMA_REQ) {
++		struct mv_cesa_req *basereq;
++
++		basereq = &creq->base;
++		memcpy(skreq->iv, basereq->chain.last->op->ctx.skcipher.iv,
++		       ivsize);
++	} else {
++		memcpy_fromio(skreq->iv,
++			      engine->sram + CESA_SA_CRYPT_IV_SRAM_OFFSET,
++			      ivsize);
++	}
++}
++
++static const struct mv_cesa_req_ops mv_cesa_skcipher_req_ops = {
++	.step = mv_cesa_skcipher_step,
++	.process = mv_cesa_skcipher_process,
++	.cleanup = mv_cesa_skcipher_req_cleanup,
++	.complete = mv_cesa_skcipher_complete,
++};
++
++static void mv_cesa_skcipher_cra_exit(struct crypto_tfm *tfm)
++{
++	void *ctx = crypto_tfm_ctx(tfm);
++
++	memzero_explicit(ctx, tfm->__crt_alg->cra_ctxsize);
++}
++
++static int mv_cesa_skcipher_cra_init(struct crypto_tfm *tfm)
++{
++	struct mv_cesa_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	ctx->ops = &mv_cesa_skcipher_req_ops;
++
++	crypto_skcipher_set_reqsize(__crypto_skcipher_cast(tfm),
++				    sizeof(struct mv_cesa_skcipher_req));
++
++	return 0;
++}
++
++static int mv_cesa_aes_setkey(struct crypto_skcipher *cipher, const u8 *key,
++			      unsigned int len)
++{
++	struct crypto_tfm *tfm = crypto_skcipher_tfm(cipher);
++	struct mv_cesa_aes_ctx *ctx = crypto_tfm_ctx(tfm);
++	int remaining;
++	int offset;
++	int ret;
++	int i;
++
++	ret = aes_expandkey(&ctx->aes, key, len);
++	if (ret)
++		return ret;
++
++	remaining = (ctx->aes.key_length - 16) / 4;
++	offset = ctx->aes.key_length + 24 - remaining;
++	for (i = 0; i < remaining; i++)
++		ctx->aes.key_dec[4 + i] =
++			cpu_to_le32(ctx->aes.key_enc[offset + i]);
++
++	return 0;
++}
++
++static int mv_cesa_des_setkey(struct crypto_skcipher *cipher, const u8 *key,
++			      unsigned int len)
++{
++	struct mv_cesa_des_ctx *ctx = crypto_skcipher_ctx(cipher);
++	int err;
++
++	err = verify_skcipher_des_key(cipher, key);
++	if (err)
++		return err;
++
++	memcpy(ctx->key, key, DES_KEY_SIZE);
++
++	return 0;
++}
++
++static int mv_cesa_des3_ede_setkey(struct crypto_skcipher *cipher,
++				   const u8 *key, unsigned int len)
++{
++	struct mv_cesa_des_ctx *ctx = crypto_skcipher_ctx(cipher);
++	int err;
++
++	err = verify_skcipher_des3_key(cipher, key);
++	if (err)
++		return err;
++
++	memcpy(ctx->key, key, DES3_EDE_KEY_SIZE);
++
++	return 0;
++}
++
++static int mv_cesa_skcipher_dma_req_init(struct skcipher_request *req,
++					 const struct mv_cesa_op_ctx *op_templ)
++{
++	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(req);
++	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
++		      GFP_KERNEL : GFP_ATOMIC;
++	struct mv_cesa_req *basereq = &creq->base;
++	struct mv_cesa_skcipher_dma_iter iter;
++	bool skip_ctx = false;
++	int ret;
++
++	basereq->chain.first = NULL;
++	basereq->chain.last = NULL;
++
++	if (req->src != req->dst) {
++		ret = dma_map_sg(cesa_dev->dev, req->src, creq->src_nents,
++				 DMA_TO_DEVICE);
++		if (!ret)
++			return -ENOMEM;
++
++		ret = dma_map_sg(cesa_dev->dev, req->dst, creq->dst_nents,
++				 DMA_FROM_DEVICE);
++		if (!ret) {
++			ret = -ENOMEM;
++			goto err_unmap_src;
++		}
++	} else {
++		ret = dma_map_sg(cesa_dev->dev, req->src, creq->src_nents,
++				 DMA_BIDIRECTIONAL);
++		if (!ret)
++			return -ENOMEM;
++	}
++
++	mv_cesa_tdma_desc_iter_init(&basereq->chain);
++	mv_cesa_skcipher_req_iter_init(&iter, req);
++
++	do {
++		struct mv_cesa_op_ctx *op;
++
++		op = mv_cesa_dma_add_op(&basereq->chain, op_templ, skip_ctx,
++					flags);
++		if (IS_ERR(op)) {
++			ret = PTR_ERR(op);
++			goto err_free_tdma;
++		}
++		skip_ctx = true;
++
++		mv_cesa_set_crypt_op_len(op, iter.base.op_len);
++
++		/* Add input transfers */
++		ret = mv_cesa_dma_add_op_transfers(&basereq->chain, &iter.base,
++						   &iter.src, flags);
++		if (ret)
++			goto err_free_tdma;
++
++		/* Add dummy desc to launch the crypto operation */
++		ret = mv_cesa_dma_add_dummy_launch(&basereq->chain, flags);
++		if (ret)
++			goto err_free_tdma;
++
++		/* Add output transfers */
++		ret = mv_cesa_dma_add_op_transfers(&basereq->chain, &iter.base,
++						   &iter.dst, flags);
++		if (ret)
++			goto err_free_tdma;
++
++	} while (mv_cesa_skcipher_req_iter_next_op(&iter));
++
++	/* Add output data for IV */
++	ret = mv_cesa_dma_add_result_op(&basereq->chain,
++					CESA_SA_CFG_SRAM_OFFSET,
++					CESA_SA_DATA_SRAM_OFFSET,
++					CESA_TDMA_SRC_IN_SRAM, flags);
++
++	if (ret)
++		goto err_free_tdma;
++
++	basereq->chain.last->flags |= CESA_TDMA_END_OF_REQ;
++
++	return 0;
++
++err_free_tdma:
++	mv_cesa_dma_cleanup(basereq);
++	if (req->dst != req->src)
++		dma_unmap_sg(cesa_dev->dev, req->dst, creq->dst_nents,
++			     DMA_FROM_DEVICE);
++
++err_unmap_src:
++	dma_unmap_sg(cesa_dev->dev, req->src, creq->src_nents,
++		     req->dst != req->src ? DMA_TO_DEVICE : DMA_BIDIRECTIONAL);
++
++	return ret;
++}
++
++static inline int
++mv_cesa_skcipher_std_req_init(struct skcipher_request *req,
++			      const struct mv_cesa_op_ctx *op_templ)
++{
++	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(req);
++	struct mv_cesa_skcipher_std_req *sreq = &creq->std;
++	struct mv_cesa_req *basereq = &creq->base;
++
++	sreq->op = *op_templ;
++	sreq->skip_ctx = false;
++	basereq->chain.first = NULL;
++	basereq->chain.last = NULL;
++
++	return 0;
++}
++
++static int mv_cesa_skcipher_req_init(struct skcipher_request *req,
++				     struct mv_cesa_op_ctx *tmpl)
++{
++	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(req);
++	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
++	unsigned int blksize = crypto_skcipher_blocksize(tfm);
++	int ret;
++
++	if (!IS_ALIGNED(req->cryptlen, blksize))
++		return -EINVAL;
++
++	creq->src_nents = sg_nents_for_len(req->src, req->cryptlen);
++	if (creq->src_nents < 0) {
++		dev_err(cesa_dev->dev, "Invalid number of src SG");
++		return creq->src_nents;
++	}
++	creq->dst_nents = sg_nents_for_len(req->dst, req->cryptlen);
++	if (creq->dst_nents < 0) {
++		dev_err(cesa_dev->dev, "Invalid number of dst SG");
++		return creq->dst_nents;
++	}
++
++	mv_cesa_update_op_cfg(tmpl, CESA_SA_DESC_CFG_OP_CRYPT_ONLY,
++			      CESA_SA_DESC_CFG_OP_MSK);
++
++	if (cesa_dev->caps->has_tdma)
++		ret = mv_cesa_skcipher_dma_req_init(req, tmpl);
++	else
++		ret = mv_cesa_skcipher_std_req_init(req, tmpl);
++
++	return ret;
++}
++
++static int mv_cesa_skcipher_queue_req(struct skcipher_request *req,
++				      struct mv_cesa_op_ctx *tmpl)
++{
++	int ret;
++	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(req);
++	struct mv_cesa_engine *engine;
++
++	ret = mv_cesa_skcipher_req_init(req, tmpl);
++	if (ret)
++		return ret;
++
++	engine = mv_cesa_select_engine(req->cryptlen);
++	mv_cesa_skcipher_prepare(&req->base, engine);
++
++	ret = mv_cesa_queue_req(&req->base, &creq->base);
++
++	if (mv_cesa_req_needs_cleanup(&req->base, ret))
++		mv_cesa_skcipher_cleanup(req);
++
++	return ret;
++}
++
++static int mv_cesa_des_op(struct skcipher_request *req,
++			  struct mv_cesa_op_ctx *tmpl)
++{
++	struct mv_cesa_des_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
++
++	mv_cesa_update_op_cfg(tmpl, CESA_SA_DESC_CFG_CRYPTM_DES,
++			      CESA_SA_DESC_CFG_CRYPTM_MSK);
++
++	memcpy(tmpl->ctx.skcipher.key, ctx->key, DES_KEY_SIZE);
++
++	return mv_cesa_skcipher_queue_req(req, tmpl);
++}
++
++static int mv_cesa_ecb_des_encrypt(struct skcipher_request *req)
++{
++	struct mv_cesa_op_ctx tmpl;
++
++	mv_cesa_set_op_cfg(&tmpl,
++			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
++			   CESA_SA_DESC_CFG_DIR_ENC);
++
++	return mv_cesa_des_op(req, &tmpl);
++}
++
++static int mv_cesa_ecb_des_decrypt(struct skcipher_request *req)
++{
++	struct mv_cesa_op_ctx tmpl;
++
++	mv_cesa_set_op_cfg(&tmpl,
++			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
++			   CESA_SA_DESC_CFG_DIR_DEC);
++
++	return mv_cesa_des_op(req, &tmpl);
++}
++
++struct skcipher_alg mv_cesa_ecb_des_alg = {
++	.setkey = mv_cesa_des_setkey,
++	.encrypt = mv_cesa_ecb_des_encrypt,
++	.decrypt = mv_cesa_ecb_des_decrypt,
++	.min_keysize = DES_KEY_SIZE,
++	.max_keysize = DES_KEY_SIZE,
++	.base = {
++		.cra_name = "ecb(des)",
++		.cra_driver_name = "mv-ecb-des",
++		.cra_priority = 300,
++		.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
++		.cra_blocksize = DES_BLOCK_SIZE,
++		.cra_ctxsize = sizeof(struct mv_cesa_des_ctx),
++		.cra_alignmask = 0,
++		.cra_module = THIS_MODULE,
++		.cra_init = mv_cesa_skcipher_cra_init,
++		.cra_exit = mv_cesa_skcipher_cra_exit,
++	},
++};
++
++static int mv_cesa_cbc_des_op(struct skcipher_request *req,
++			      struct mv_cesa_op_ctx *tmpl)
++{
++	mv_cesa_update_op_cfg(tmpl, CESA_SA_DESC_CFG_CRYPTCM_CBC,
++			      CESA_SA_DESC_CFG_CRYPTCM_MSK);
++
++	memcpy(tmpl->ctx.skcipher.iv, req->iv, DES_BLOCK_SIZE);
++
++	return mv_cesa_des_op(req, tmpl);
++}
++
++static int mv_cesa_cbc_des_encrypt(struct skcipher_request *req)
++{
++	struct mv_cesa_op_ctx tmpl;
++
++	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_DIR_ENC);
++
++	return mv_cesa_cbc_des_op(req, &tmpl);
++}
++
++static int mv_cesa_cbc_des_decrypt(struct skcipher_request *req)
++{
++	struct mv_cesa_op_ctx tmpl;
++
++	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_DIR_DEC);
++
++	return mv_cesa_cbc_des_op(req, &tmpl);
++}
++
++struct skcipher_alg mv_cesa_cbc_des_alg = {
++	.setkey = mv_cesa_des_setkey,
++	.encrypt = mv_cesa_cbc_des_encrypt,
++	.decrypt = mv_cesa_cbc_des_decrypt,
++	.min_keysize = DES_KEY_SIZE,
++	.max_keysize = DES_KEY_SIZE,
++	.ivsize = DES_BLOCK_SIZE,
++	.base = {
++		.cra_name = "cbc(des)",
++		.cra_driver_name = "mv-cbc-des",
++		.cra_priority = 300,
++		.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
++		.cra_blocksize = DES_BLOCK_SIZE,
++		.cra_ctxsize = sizeof(struct mv_cesa_des_ctx),
++		.cra_alignmask = 0,
++		.cra_module = THIS_MODULE,
++		.cra_init = mv_cesa_skcipher_cra_init,
++		.cra_exit = mv_cesa_skcipher_cra_exit,
++	},
++};
++
++static int mv_cesa_des3_op(struct skcipher_request *req,
++			   struct mv_cesa_op_ctx *tmpl)
++{
++	struct mv_cesa_des3_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
++
++	mv_cesa_update_op_cfg(tmpl, CESA_SA_DESC_CFG_CRYPTM_3DES,
++			      CESA_SA_DESC_CFG_CRYPTM_MSK);
++
++	memcpy(tmpl->ctx.skcipher.key, ctx->key, DES3_EDE_KEY_SIZE);
++
++	return mv_cesa_skcipher_queue_req(req, tmpl);
++}
++
++static int mv_cesa_ecb_des3_ede_encrypt(struct skcipher_request *req)
++{
++	struct mv_cesa_op_ctx tmpl;
++
++	mv_cesa_set_op_cfg(&tmpl,
++			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
++			   CESA_SA_DESC_CFG_3DES_EDE |
++			   CESA_SA_DESC_CFG_DIR_ENC);
++
++	return mv_cesa_des3_op(req, &tmpl);
++}
++
++static int mv_cesa_ecb_des3_ede_decrypt(struct skcipher_request *req)
++{
++	struct mv_cesa_op_ctx tmpl;
++
++	mv_cesa_set_op_cfg(&tmpl,
++			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
++			   CESA_SA_DESC_CFG_3DES_EDE |
++			   CESA_SA_DESC_CFG_DIR_DEC);
++
++	return mv_cesa_des3_op(req, &tmpl);
++}
++
++struct skcipher_alg mv_cesa_ecb_des3_ede_alg = {
++	.setkey = mv_cesa_des3_ede_setkey,
++	.encrypt = mv_cesa_ecb_des3_ede_encrypt,
++	.decrypt = mv_cesa_ecb_des3_ede_decrypt,
++	.min_keysize = DES3_EDE_KEY_SIZE,
++	.max_keysize = DES3_EDE_KEY_SIZE,
++	.ivsize = DES3_EDE_BLOCK_SIZE,
++	.base = {
++		.cra_name = "ecb(des3_ede)",
++		.cra_driver_name = "mv-ecb-des3-ede",
++		.cra_priority = 300,
++		.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
++		.cra_blocksize = DES3_EDE_BLOCK_SIZE,
++		.cra_ctxsize = sizeof(struct mv_cesa_des3_ctx),
++		.cra_alignmask = 0,
++		.cra_module = THIS_MODULE,
++		.cra_init = mv_cesa_skcipher_cra_init,
++		.cra_exit = mv_cesa_skcipher_cra_exit,
++	},
++};
++
++static int mv_cesa_cbc_des3_op(struct skcipher_request *req,
++			       struct mv_cesa_op_ctx *tmpl)
++{
++	memcpy(tmpl->ctx.skcipher.iv, req->iv, DES3_EDE_BLOCK_SIZE);
++
++	return mv_cesa_des3_op(req, tmpl);
++}
++
++static int mv_cesa_cbc_des3_ede_encrypt(struct skcipher_request *req)
++{
++	struct mv_cesa_op_ctx tmpl;
++
++	mv_cesa_set_op_cfg(&tmpl,
++			   CESA_SA_DESC_CFG_CRYPTCM_CBC |
++			   CESA_SA_DESC_CFG_3DES_EDE |
++			   CESA_SA_DESC_CFG_DIR_ENC);
++
++	return mv_cesa_cbc_des3_op(req, &tmpl);
++}
++
++static int mv_cesa_cbc_des3_ede_decrypt(struct skcipher_request *req)
++{
++	struct mv_cesa_op_ctx tmpl;
++
++	mv_cesa_set_op_cfg(&tmpl,
++			   CESA_SA_DESC_CFG_CRYPTCM_CBC |
++			   CESA_SA_DESC_CFG_3DES_EDE |
++			   CESA_SA_DESC_CFG_DIR_DEC);
++
++	return mv_cesa_cbc_des3_op(req, &tmpl);
++}
++
++struct skcipher_alg mv_cesa_cbc_des3_ede_alg = {
++	.setkey = mv_cesa_des3_ede_setkey,
++	.encrypt = mv_cesa_cbc_des3_ede_encrypt,
++	.decrypt = mv_cesa_cbc_des3_ede_decrypt,
++	.min_keysize = DES3_EDE_KEY_SIZE,
++	.max_keysize = DES3_EDE_KEY_SIZE,
++	.ivsize = DES3_EDE_BLOCK_SIZE,
++	.base = {
++		.cra_name = "cbc(des3_ede)",
++		.cra_driver_name = "mv-cbc-des3-ede",
++		.cra_priority = 300,
++		.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
++		.cra_blocksize = DES3_EDE_BLOCK_SIZE,
++		.cra_ctxsize = sizeof(struct mv_cesa_des3_ctx),
++		.cra_alignmask = 0,
++		.cra_module = THIS_MODULE,
++		.cra_init = mv_cesa_skcipher_cra_init,
++		.cra_exit = mv_cesa_skcipher_cra_exit,
++	},
++};
++
++static int mv_cesa_aes_op(struct skcipher_request *req,
++			  struct mv_cesa_op_ctx *tmpl)
++{
++	struct mv_cesa_aes_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
++	int i;
++	u32 *key;
++	u32 cfg;
++
++	cfg = CESA_SA_DESC_CFG_CRYPTM_AES;
++
++	if (mv_cesa_get_op_cfg(tmpl) & CESA_SA_DESC_CFG_DIR_DEC)
++		key = ctx->aes.key_dec;
++	else
++		key = ctx->aes.key_enc;
++
++	for (i = 0; i < ctx->aes.key_length / sizeof(u32); i++)
++		tmpl->ctx.skcipher.key[i] = cpu_to_le32(key[i]);
++
++	if (ctx->aes.key_length == 24)
++		cfg |= CESA_SA_DESC_CFG_AES_LEN_192;
++	else if (ctx->aes.key_length == 32)
++		cfg |= CESA_SA_DESC_CFG_AES_LEN_256;
++
++	mv_cesa_update_op_cfg(tmpl, cfg,
++			      CESA_SA_DESC_CFG_CRYPTM_MSK |
++			      CESA_SA_DESC_CFG_AES_LEN_MSK);
++
++	return mv_cesa_skcipher_queue_req(req, tmpl);
++}
++
++static int mv_cesa_ecb_aes_encrypt(struct skcipher_request *req)
++{
++	struct mv_cesa_op_ctx tmpl;
++
++	mv_cesa_set_op_cfg(&tmpl,
++			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
++			   CESA_SA_DESC_CFG_DIR_ENC);
++
++	return mv_cesa_aes_op(req, &tmpl);
++}
++
++static int mv_cesa_ecb_aes_decrypt(struct skcipher_request *req)
++{
++	struct mv_cesa_op_ctx tmpl;
++
++	mv_cesa_set_op_cfg(&tmpl,
++			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
++			   CESA_SA_DESC_CFG_DIR_DEC);
++
++	return mv_cesa_aes_op(req, &tmpl);
++}
++
++struct skcipher_alg mv_cesa_ecb_aes_alg = {
++	.setkey = mv_cesa_aes_setkey,
++	.encrypt = mv_cesa_ecb_aes_encrypt,
++	.decrypt = mv_cesa_ecb_aes_decrypt,
++	.min_keysize = AES_MIN_KEY_SIZE,
++	.max_keysize = AES_MAX_KEY_SIZE,
++	.base = {
++		.cra_name = "ecb(aes)",
++		.cra_driver_name = "mv-ecb-aes",
++		.cra_priority = 300,
++		.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
++		.cra_blocksize = AES_BLOCK_SIZE,
++		.cra_ctxsize = sizeof(struct mv_cesa_aes_ctx),
++		.cra_alignmask = 0,
++		.cra_module = THIS_MODULE,
++		.cra_init = mv_cesa_skcipher_cra_init,
++		.cra_exit = mv_cesa_skcipher_cra_exit,
++	},
++};
++
++static int mv_cesa_cbc_aes_op(struct skcipher_request *req,
++			      struct mv_cesa_op_ctx *tmpl)
++{
++	mv_cesa_update_op_cfg(tmpl, CESA_SA_DESC_CFG_CRYPTCM_CBC,
++			      CESA_SA_DESC_CFG_CRYPTCM_MSK);
++	memcpy(tmpl->ctx.skcipher.iv, req->iv, AES_BLOCK_SIZE);
++
++	return mv_cesa_aes_op(req, tmpl);
++}
++
++static int mv_cesa_cbc_aes_encrypt(struct skcipher_request *req)
++{
++	struct mv_cesa_op_ctx tmpl;
++
++	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_DIR_ENC);
++
++	return mv_cesa_cbc_aes_op(req, &tmpl);
++}
++
++static int mv_cesa_cbc_aes_decrypt(struct skcipher_request *req)
++{
++	struct mv_cesa_op_ctx tmpl;
++
++	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_DIR_DEC);
++
++	return mv_cesa_cbc_aes_op(req, &tmpl);
++}
++
++struct skcipher_alg mv_cesa_cbc_aes_alg = {
++	.setkey = mv_cesa_aes_setkey,
++	.encrypt = mv_cesa_cbc_aes_encrypt,
++	.decrypt = mv_cesa_cbc_aes_decrypt,
++	.min_keysize = AES_MIN_KEY_SIZE,
++	.max_keysize = AES_MAX_KEY_SIZE,
++	.ivsize = AES_BLOCK_SIZE,
++	.base = {
++		.cra_name = "cbc(aes)",
++		.cra_driver_name = "mv-cbc-aes",
++		.cra_priority = 300,
++		.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
++		.cra_blocksize = AES_BLOCK_SIZE,
++		.cra_ctxsize = sizeof(struct mv_cesa_aes_ctx),
++		.cra_alignmask = 0,
++		.cra_module = THIS_MODULE,
++		.cra_init = mv_cesa_skcipher_cra_init,
++		.cra_exit = mv_cesa_skcipher_cra_exit,
++	},
++};
+diff --git a/drivers/crypto/marvell/cesa/hash.c b/drivers/crypto/marvell/cesa/hash.c
+new file mode 100644
+index 0000000..b971284
+--- /dev/null
++++ b/drivers/crypto/marvell/cesa/hash.c
+@@ -0,0 +1,1448 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Hash algorithms supported by the CESA: MD5, SHA1 and SHA256.
++ *
++ * Author: Boris Brezillon <boris.brezillon@free-electrons.com>
++ * Author: Arnaud Ebalard <arno@natisbad.org>
++ *
++ * This work is based on an initial version written by
++ * Sebastian Andrzej Siewior < sebastian at breakpoint dot cc >
++ */
++
++#include <crypto/hmac.h>
++#include <crypto/md5.h>
++#include <crypto/sha.h>
++
++#include "cesa.h"
++
++struct mv_cesa_ahash_dma_iter {
++	struct mv_cesa_dma_iter base;
++	struct mv_cesa_sg_dma_iter src;
++};
++
++static inline void
++mv_cesa_ahash_req_iter_init(struct mv_cesa_ahash_dma_iter *iter,
++			    struct ahash_request *req)
++{
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
++	unsigned int len = req->nbytes + creq->cache_ptr;
++
++	if (!creq->last_req)
++		len &= ~CESA_HASH_BLOCK_SIZE_MSK;
++
++	mv_cesa_req_dma_iter_init(&iter->base, len);
++	mv_cesa_sg_dma_iter_init(&iter->src, req->src, DMA_TO_DEVICE);
++	iter->src.op_offset = creq->cache_ptr;
++}
++
++static inline bool
++mv_cesa_ahash_req_iter_next_op(struct mv_cesa_ahash_dma_iter *iter)
++{
++	iter->src.op_offset = 0;
++
++	return mv_cesa_req_dma_iter_next_op(&iter->base);
++}
++
++static inline int
++mv_cesa_ahash_dma_alloc_cache(struct mv_cesa_ahash_dma_req *req, gfp_t flags)
++{
++	req->cache = dma_pool_alloc(cesa_dev->dma->cache_pool, flags,
++				    &req->cache_dma);
++	if (!req->cache)
++		return -ENOMEM;
++
++	return 0;
++}
++
++static inline void
++mv_cesa_ahash_dma_free_cache(struct mv_cesa_ahash_dma_req *req)
++{
++	if (!req->cache)
++		return;
++
++	dma_pool_free(cesa_dev->dma->cache_pool, req->cache,
++		      req->cache_dma);
++}
++
++static int mv_cesa_ahash_dma_alloc_padding(struct mv_cesa_ahash_dma_req *req,
++					   gfp_t flags)
++{
++	if (req->padding)
++		return 0;
++
++	req->padding = dma_pool_alloc(cesa_dev->dma->padding_pool, flags,
++				      &req->padding_dma);
++	if (!req->padding)
++		return -ENOMEM;
++
++	return 0;
++}
++
++static void mv_cesa_ahash_dma_free_padding(struct mv_cesa_ahash_dma_req *req)
++{
++	if (!req->padding)
++		return;
++
++	dma_pool_free(cesa_dev->dma->padding_pool, req->padding,
++		      req->padding_dma);
++	req->padding = NULL;
++}
++
++static inline void mv_cesa_ahash_dma_last_cleanup(struct ahash_request *req)
++{
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
++
++	mv_cesa_ahash_dma_free_padding(&creq->req.dma);
++}
++
++static inline void mv_cesa_ahash_dma_cleanup(struct ahash_request *req)
++{
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
++
++	dma_unmap_sg(cesa_dev->dev, req->src, creq->src_nents, DMA_TO_DEVICE);
++	mv_cesa_ahash_dma_free_cache(&creq->req.dma);
++	mv_cesa_dma_cleanup(&creq->base);
++}
++
++static inline void mv_cesa_ahash_cleanup(struct ahash_request *req)
++{
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
++
++	if (mv_cesa_req_get_type(&creq->base) == CESA_DMA_REQ)
++		mv_cesa_ahash_dma_cleanup(req);
++}
++
++static void mv_cesa_ahash_last_cleanup(struct ahash_request *req)
++{
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
++
++	if (mv_cesa_req_get_type(&creq->base) == CESA_DMA_REQ)
++		mv_cesa_ahash_dma_last_cleanup(req);
++}
++
++static int mv_cesa_ahash_pad_len(struct mv_cesa_ahash_req *creq)
++{
++	unsigned int index, padlen;
++
++	index = creq->len & CESA_HASH_BLOCK_SIZE_MSK;
++	padlen = (index < 56) ? (56 - index) : (64 + 56 - index);
++
++	return padlen;
++}
++
++static int mv_cesa_ahash_pad_req(struct mv_cesa_ahash_req *creq, u8 *buf)
++{
++	unsigned int padlen;
++
++	buf[0] = 0x80;
++	/* Pad out to 56 mod 64 */
++	padlen = mv_cesa_ahash_pad_len(creq);
++	memset(buf + 1, 0, padlen - 1);
++
++	if (creq->algo_le) {
++		__le64 bits = cpu_to_le64(creq->len << 3);
++
++		memcpy(buf + padlen, &bits, sizeof(bits));
++	} else {
++		__be64 bits = cpu_to_be64(creq->len << 3);
++
++		memcpy(buf + padlen, &bits, sizeof(bits));
++	}
++
++	return padlen + 8;
++}
++
++static void mv_cesa_ahash_std_step(struct ahash_request *req)
++{
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
++	struct mv_cesa_ahash_std_req *sreq = &creq->req.std;
++	struct mv_cesa_engine *engine = creq->base.engine;
++	struct mv_cesa_op_ctx *op;
++	unsigned int new_cache_ptr = 0;
++	u32 frag_mode;
++	size_t  len;
++	unsigned int digsize;
++	int i;
++
++	mv_cesa_adjust_op(engine, &creq->op_tmpl);
++	memcpy_toio(engine->sram, &creq->op_tmpl, sizeof(creq->op_tmpl));
++
++	if (!sreq->offset) {
++		digsize = crypto_ahash_digestsize(crypto_ahash_reqtfm(req));
++		for (i = 0; i < digsize / 4; i++)
++			writel_relaxed(creq->state[i],
++				       engine->regs + CESA_IVDIG(i));
++	}
++
++	if (creq->cache_ptr)
++		memcpy_toio(engine->sram + CESA_SA_DATA_SRAM_OFFSET,
++			    creq->cache, creq->cache_ptr);
++
++	len = min_t(size_t, req->nbytes + creq->cache_ptr - sreq->offset,
++		    CESA_SA_SRAM_PAYLOAD_SIZE);
++
++	if (!creq->last_req) {
++		new_cache_ptr = len & CESA_HASH_BLOCK_SIZE_MSK;
++		len &= ~CESA_HASH_BLOCK_SIZE_MSK;
++	}
++
++	if (len - creq->cache_ptr)
++		sreq->offset += sg_pcopy_to_buffer(req->src, creq->src_nents,
++						   engine->sram +
++						   CESA_SA_DATA_SRAM_OFFSET +
++						   creq->cache_ptr,
++						   len - creq->cache_ptr,
++						   sreq->offset);
++
++	op = &creq->op_tmpl;
++
++	frag_mode = mv_cesa_get_op_cfg(op) & CESA_SA_DESC_CFG_FRAG_MSK;
++
++	if (creq->last_req && sreq->offset == req->nbytes &&
++	    creq->len <= CESA_SA_DESC_MAC_SRC_TOTAL_LEN_MAX) {
++		if (frag_mode == CESA_SA_DESC_CFG_FIRST_FRAG)
++			frag_mode = CESA_SA_DESC_CFG_NOT_FRAG;
++		else if (frag_mode == CESA_SA_DESC_CFG_MID_FRAG)
++			frag_mode = CESA_SA_DESC_CFG_LAST_FRAG;
++	}
++
++	if (frag_mode == CESA_SA_DESC_CFG_NOT_FRAG ||
++	    frag_mode == CESA_SA_DESC_CFG_LAST_FRAG) {
++		if (len &&
++		    creq->len <= CESA_SA_DESC_MAC_SRC_TOTAL_LEN_MAX) {
++			mv_cesa_set_mac_op_total_len(op, creq->len);
++		} else {
++			int trailerlen = mv_cesa_ahash_pad_len(creq) + 8;
++
++			if (len + trailerlen > CESA_SA_SRAM_PAYLOAD_SIZE) {
++				len &= CESA_HASH_BLOCK_SIZE_MSK;
++				new_cache_ptr = 64 - trailerlen;
++				memcpy_fromio(creq->cache,
++					      engine->sram +
++					      CESA_SA_DATA_SRAM_OFFSET + len,
++					      new_cache_ptr);
++			} else {
++				len += mv_cesa_ahash_pad_req(creq,
++						engine->sram + len +
++						CESA_SA_DATA_SRAM_OFFSET);
++			}
++
++			if (frag_mode == CESA_SA_DESC_CFG_LAST_FRAG)
++				frag_mode = CESA_SA_DESC_CFG_MID_FRAG;
++			else
++				frag_mode = CESA_SA_DESC_CFG_FIRST_FRAG;
++		}
++	}
++
++	mv_cesa_set_mac_op_frag_len(op, len);
++	mv_cesa_update_op_cfg(op, frag_mode, CESA_SA_DESC_CFG_FRAG_MSK);
++
++	/* FIXME: only update enc_len field */
++	memcpy_toio(engine->sram, op, sizeof(*op));
++
++	if (frag_mode == CESA_SA_DESC_CFG_FIRST_FRAG)
++		mv_cesa_update_op_cfg(op, CESA_SA_DESC_CFG_MID_FRAG,
++				      CESA_SA_DESC_CFG_FRAG_MSK);
++
++	creq->cache_ptr = new_cache_ptr;
++
++	mv_cesa_set_int_mask(engine, CESA_SA_INT_ACCEL0_DONE);
++	writel_relaxed(CESA_SA_CFG_PARA_DIS, engine->regs + CESA_SA_CFG);
++	WARN_ON(readl(engine->regs + CESA_SA_CMD) &
++		CESA_SA_CMD_EN_CESA_SA_ACCL0);
++	writel(CESA_SA_CMD_EN_CESA_SA_ACCL0, engine->regs + CESA_SA_CMD);
++}
++
++static int mv_cesa_ahash_std_process(struct ahash_request *req, u32 status)
++{
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
++	struct mv_cesa_ahash_std_req *sreq = &creq->req.std;
++
++	if (sreq->offset < (req->nbytes - creq->cache_ptr))
++		return -EINPROGRESS;
++
++	return 0;
++}
++
++static inline void mv_cesa_ahash_dma_prepare(struct ahash_request *req)
++{
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
++	struct mv_cesa_req *basereq = &creq->base;
++
++	mv_cesa_dma_prepare(basereq, basereq->engine);
++}
++
++static void mv_cesa_ahash_std_prepare(struct ahash_request *req)
++{
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
++	struct mv_cesa_ahash_std_req *sreq = &creq->req.std;
++
++	sreq->offset = 0;
++}
++
++static void mv_cesa_ahash_dma_step(struct ahash_request *req)
++{
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
++	struct mv_cesa_req *base = &creq->base;
++
++	/* We must explicitly set the digest state. */
++	if (base->chain.first->flags & CESA_TDMA_SET_STATE) {
++		struct mv_cesa_engine *engine = base->engine;
++		int i;
++
++		/* Set the hash state in the IVDIG regs. */
++		for (i = 0; i < ARRAY_SIZE(creq->state); i++)
++			writel_relaxed(creq->state[i], engine->regs +
++				       CESA_IVDIG(i));
++	}
++
++	mv_cesa_dma_step(base);
++}
++
++static void mv_cesa_ahash_step(struct crypto_async_request *req)
++{
++	struct ahash_request *ahashreq = ahash_request_cast(req);
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(ahashreq);
++
++	if (mv_cesa_req_get_type(&creq->base) == CESA_DMA_REQ)
++		mv_cesa_ahash_dma_step(ahashreq);
++	else
++		mv_cesa_ahash_std_step(ahashreq);
++}
++
++static int mv_cesa_ahash_process(struct crypto_async_request *req, u32 status)
++{
++	struct ahash_request *ahashreq = ahash_request_cast(req);
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(ahashreq);
++
++	if (mv_cesa_req_get_type(&creq->base) == CESA_DMA_REQ)
++		return mv_cesa_dma_process(&creq->base, status);
++
++	return mv_cesa_ahash_std_process(ahashreq, status);
++}
++
++static void mv_cesa_ahash_complete(struct crypto_async_request *req)
++{
++	struct ahash_request *ahashreq = ahash_request_cast(req);
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(ahashreq);
++	struct mv_cesa_engine *engine = creq->base.engine;
++	unsigned int digsize;
++	int i;
++
++	digsize = crypto_ahash_digestsize(crypto_ahash_reqtfm(ahashreq));
++
++	if (mv_cesa_req_get_type(&creq->base) == CESA_DMA_REQ &&
++	    (creq->base.chain.last->flags & CESA_TDMA_TYPE_MSK) ==
++	     CESA_TDMA_RESULT) {
++		__le32 *data = NULL;
++
++		/*
++		 * Result is already in the correct endianness when the SA is
++		 * used
++		 */
++		data = creq->base.chain.last->op->ctx.hash.hash;
++		for (i = 0; i < digsize / 4; i++)
++			creq->state[i] = cpu_to_le32(data[i]);
++
++		memcpy(ahashreq->result, data, digsize);
++	} else {
++		for (i = 0; i < digsize / 4; i++)
++			creq->state[i] = readl_relaxed(engine->regs +
++						       CESA_IVDIG(i));
++		if (creq->last_req) {
++			/*
++			 * Hardware's MD5 digest is in little endian format, but
++			 * SHA in big endian format
++			 */
++			if (creq->algo_le) {
++				__le32 *result = (void *)ahashreq->result;
++
++				for (i = 0; i < digsize / 4; i++)
++					result[i] = cpu_to_le32(creq->state[i]);
++			} else {
++				__be32 *result = (void *)ahashreq->result;
++
++				for (i = 0; i < digsize / 4; i++)
++					result[i] = cpu_to_be32(creq->state[i]);
++			}
++		}
++	}
++
++	atomic_sub(ahashreq->nbytes, &engine->load);
++}
++
++static void mv_cesa_ahash_prepare(struct crypto_async_request *req,
++				  struct mv_cesa_engine *engine)
++{
++	struct ahash_request *ahashreq = ahash_request_cast(req);
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(ahashreq);
++
++	creq->base.engine = engine;
++
++	if (mv_cesa_req_get_type(&creq->base) == CESA_DMA_REQ)
++		mv_cesa_ahash_dma_prepare(ahashreq);
++	else
++		mv_cesa_ahash_std_prepare(ahashreq);
++}
++
++static void mv_cesa_ahash_req_cleanup(struct crypto_async_request *req)
++{
++	struct ahash_request *ahashreq = ahash_request_cast(req);
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(ahashreq);
++
++	if (creq->last_req)
++		mv_cesa_ahash_last_cleanup(ahashreq);
++
++	mv_cesa_ahash_cleanup(ahashreq);
++
++	if (creq->cache_ptr)
++		sg_pcopy_to_buffer(ahashreq->src, creq->src_nents,
++				   creq->cache,
++				   creq->cache_ptr,
++				   ahashreq->nbytes - creq->cache_ptr);
++}
++
++static const struct mv_cesa_req_ops mv_cesa_ahash_req_ops = {
++	.step = mv_cesa_ahash_step,
++	.process = mv_cesa_ahash_process,
++	.cleanup = mv_cesa_ahash_req_cleanup,
++	.complete = mv_cesa_ahash_complete,
++};
++
++static void mv_cesa_ahash_init(struct ahash_request *req,
++			      struct mv_cesa_op_ctx *tmpl, bool algo_le)
++{
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
++
++	memset(creq, 0, sizeof(*creq));
++	mv_cesa_update_op_cfg(tmpl,
++			      CESA_SA_DESC_CFG_OP_MAC_ONLY |
++			      CESA_SA_DESC_CFG_FIRST_FRAG,
++			      CESA_SA_DESC_CFG_OP_MSK |
++			      CESA_SA_DESC_CFG_FRAG_MSK);
++	mv_cesa_set_mac_op_total_len(tmpl, 0);
++	mv_cesa_set_mac_op_frag_len(tmpl, 0);
++	creq->op_tmpl = *tmpl;
++	creq->len = 0;
++	creq->algo_le = algo_le;
++}
++
++static inline int mv_cesa_ahash_cra_init(struct crypto_tfm *tfm)
++{
++	struct mv_cesa_hash_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	ctx->base.ops = &mv_cesa_ahash_req_ops;
++
++	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
++				 sizeof(struct mv_cesa_ahash_req));
++	return 0;
++}
++
++static bool mv_cesa_ahash_cache_req(struct ahash_request *req)
++{
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
++	bool cached = false;
++
++	if (creq->cache_ptr + req->nbytes < CESA_MAX_HASH_BLOCK_SIZE &&
++	    !creq->last_req) {
++		cached = true;
++
++		if (!req->nbytes)
++			return cached;
++
++		sg_pcopy_to_buffer(req->src, creq->src_nents,
++				   creq->cache + creq->cache_ptr,
++				   req->nbytes, 0);
++
++		creq->cache_ptr += req->nbytes;
++	}
++
++	return cached;
++}
++
++static struct mv_cesa_op_ctx *
++mv_cesa_dma_add_frag(struct mv_cesa_tdma_chain *chain,
++		     struct mv_cesa_op_ctx *tmpl, unsigned int frag_len,
++		     gfp_t flags)
++{
++	struct mv_cesa_op_ctx *op;
++	int ret;
++
++	op = mv_cesa_dma_add_op(chain, tmpl, false, flags);
++	if (IS_ERR(op))
++		return op;
++
++	/* Set the operation block fragment length. */
++	mv_cesa_set_mac_op_frag_len(op, frag_len);
++
++	/* Append dummy desc to launch operation */
++	ret = mv_cesa_dma_add_dummy_launch(chain, flags);
++	if (ret)
++		return ERR_PTR(ret);
++
++	if (mv_cesa_mac_op_is_first_frag(tmpl))
++		mv_cesa_update_op_cfg(tmpl,
++				      CESA_SA_DESC_CFG_MID_FRAG,
++				      CESA_SA_DESC_CFG_FRAG_MSK);
++
++	return op;
++}
++
++static int
++mv_cesa_ahash_dma_add_cache(struct mv_cesa_tdma_chain *chain,
++			    struct mv_cesa_ahash_req *creq,
++			    gfp_t flags)
++{
++	struct mv_cesa_ahash_dma_req *ahashdreq = &creq->req.dma;
++	int ret;
++
++	if (!creq->cache_ptr)
++		return 0;
++
++	ret = mv_cesa_ahash_dma_alloc_cache(ahashdreq, flags);
++	if (ret)
++		return ret;
++
++	memcpy(ahashdreq->cache, creq->cache, creq->cache_ptr);
++
++	return mv_cesa_dma_add_data_transfer(chain,
++					     CESA_SA_DATA_SRAM_OFFSET,
++					     ahashdreq->cache_dma,
++					     creq->cache_ptr,
++					     CESA_TDMA_DST_IN_SRAM,
++					     flags);
++}
++
++static struct mv_cesa_op_ctx *
++mv_cesa_ahash_dma_last_req(struct mv_cesa_tdma_chain *chain,
++			   struct mv_cesa_ahash_dma_iter *dma_iter,
++			   struct mv_cesa_ahash_req *creq,
++			   unsigned int frag_len, gfp_t flags)
++{
++	struct mv_cesa_ahash_dma_req *ahashdreq = &creq->req.dma;
++	unsigned int len, trailerlen, padoff = 0;
++	struct mv_cesa_op_ctx *op;
++	int ret;
++
++	/*
++	 * If the transfer is smaller than our maximum length, and we have
++	 * some data outstanding, we can ask the engine to finish the hash.
++	 */
++	if (creq->len <= CESA_SA_DESC_MAC_SRC_TOTAL_LEN_MAX && frag_len) {
++		op = mv_cesa_dma_add_frag(chain, &creq->op_tmpl, frag_len,
++					  flags);
++		if (IS_ERR(op))
++			return op;
++
++		mv_cesa_set_mac_op_total_len(op, creq->len);
++		mv_cesa_update_op_cfg(op, mv_cesa_mac_op_is_first_frag(op) ?
++						CESA_SA_DESC_CFG_NOT_FRAG :
++						CESA_SA_DESC_CFG_LAST_FRAG,
++				      CESA_SA_DESC_CFG_FRAG_MSK);
++
++		ret = mv_cesa_dma_add_result_op(chain,
++						CESA_SA_CFG_SRAM_OFFSET,
++						CESA_SA_DATA_SRAM_OFFSET,
++						CESA_TDMA_SRC_IN_SRAM, flags);
++		if (ret)
++			return ERR_PTR(-ENOMEM);
++		return op;
++	}
++
++	/*
++	 * The request is longer than the engine can handle, or we have
++	 * no data outstanding. Manually generate the padding, adding it
++	 * as a "mid" fragment.
++	 */
++	ret = mv_cesa_ahash_dma_alloc_padding(ahashdreq, flags);
++	if (ret)
++		return ERR_PTR(ret);
++
++	trailerlen = mv_cesa_ahash_pad_req(creq, ahashdreq->padding);
++
++	len = min(CESA_SA_SRAM_PAYLOAD_SIZE - frag_len, trailerlen);
++	if (len) {
++		ret = mv_cesa_dma_add_data_transfer(chain,
++						CESA_SA_DATA_SRAM_OFFSET +
++						frag_len,
++						ahashdreq->padding_dma,
++						len, CESA_TDMA_DST_IN_SRAM,
++						flags);
++		if (ret)
++			return ERR_PTR(ret);
++
++		op = mv_cesa_dma_add_frag(chain, &creq->op_tmpl, frag_len + len,
++					  flags);
++		if (IS_ERR(op))
++			return op;
++
++		if (len == trailerlen)
++			return op;
++
++		padoff += len;
++	}
++
++	ret = mv_cesa_dma_add_data_transfer(chain,
++					    CESA_SA_DATA_SRAM_OFFSET,
++					    ahashdreq->padding_dma +
++					    padoff,
++					    trailerlen - padoff,
++					    CESA_TDMA_DST_IN_SRAM,
++					    flags);
++	if (ret)
++		return ERR_PTR(ret);
++
++	return mv_cesa_dma_add_frag(chain, &creq->op_tmpl, trailerlen - padoff,
++				    flags);
++}
++
++static int mv_cesa_ahash_dma_req_init(struct ahash_request *req)
++{
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
++	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
++		      GFP_KERNEL : GFP_ATOMIC;
++	struct mv_cesa_req *basereq = &creq->base;
++	struct mv_cesa_ahash_dma_iter iter;
++	struct mv_cesa_op_ctx *op = NULL;
++	unsigned int frag_len;
++	bool set_state = false;
++	int ret;
++	u32 type;
++
++	basereq->chain.first = NULL;
++	basereq->chain.last = NULL;
++
++	if (!mv_cesa_mac_op_is_first_frag(&creq->op_tmpl))
++		set_state = true;
++
++	if (creq->src_nents) {
++		ret = dma_map_sg(cesa_dev->dev, req->src, creq->src_nents,
++				 DMA_TO_DEVICE);
++		if (!ret) {
++			ret = -ENOMEM;
++			goto err;
++		}
++	}
++
++	mv_cesa_tdma_desc_iter_init(&basereq->chain);
++	mv_cesa_ahash_req_iter_init(&iter, req);
++
++	/*
++	 * Add the cache (left-over data from a previous block) first.
++	 * This will never overflow the SRAM size.
++	 */
++	ret = mv_cesa_ahash_dma_add_cache(&basereq->chain, creq, flags);
++	if (ret)
++		goto err_free_tdma;
++
++	if (iter.src.sg) {
++		/*
++		 * Add all the new data, inserting an operation block and
++		 * launch command between each full SRAM block-worth of
++		 * data. We intentionally do not add the final op block.
++		 */
++		while (true) {
++			ret = mv_cesa_dma_add_op_transfers(&basereq->chain,
++							   &iter.base,
++							   &iter.src, flags);
++			if (ret)
++				goto err_free_tdma;
++
++			frag_len = iter.base.op_len;
++
++			if (!mv_cesa_ahash_req_iter_next_op(&iter))
++				break;
++
++			op = mv_cesa_dma_add_frag(&basereq->chain,
++						  &creq->op_tmpl,
++						  frag_len, flags);
++			if (IS_ERR(op)) {
++				ret = PTR_ERR(op);
++				goto err_free_tdma;
++			}
++		}
++	} else {
++		/* Account for the data that was in the cache. */
++		frag_len = iter.base.op_len;
++	}
++
++	/*
++	 * At this point, frag_len indicates whether we have any data
++	 * outstanding which needs an operation.  Queue up the final
++	 * operation, which depends whether this is the final request.
++	 */
++	if (creq->last_req)
++		op = mv_cesa_ahash_dma_last_req(&basereq->chain, &iter, creq,
++						frag_len, flags);
++	else if (frag_len)
++		op = mv_cesa_dma_add_frag(&basereq->chain, &creq->op_tmpl,
++					  frag_len, flags);
++
++	if (IS_ERR(op)) {
++		ret = PTR_ERR(op);
++		goto err_free_tdma;
++	}
++
++	/*
++	 * If results are copied via DMA, this means that this
++	 * request can be directly processed by the engine,
++	 * without partial updates. So we can chain it at the
++	 * DMA level with other requests.
++	 */
++	type = basereq->chain.last->flags & CESA_TDMA_TYPE_MSK;
++
++	if (op && type != CESA_TDMA_RESULT) {
++		/* Add dummy desc to wait for crypto operation end */
++		ret = mv_cesa_dma_add_dummy_end(&basereq->chain, flags);
++		if (ret)
++			goto err_free_tdma;
++	}
++
++	if (!creq->last_req)
++		creq->cache_ptr = req->nbytes + creq->cache_ptr -
++				  iter.base.len;
++	else
++		creq->cache_ptr = 0;
++
++	basereq->chain.last->flags |= CESA_TDMA_END_OF_REQ;
++
++	if (type != CESA_TDMA_RESULT)
++		basereq->chain.last->flags |= CESA_TDMA_BREAK_CHAIN;
++
++	if (set_state) {
++		/*
++		 * Put the CESA_TDMA_SET_STATE flag on the first tdma desc to
++		 * let the step logic know that the IVDIG registers should be
++		 * explicitly set before launching a TDMA chain.
++		 */
++		basereq->chain.first->flags |= CESA_TDMA_SET_STATE;
++	}
++
++	return 0;
++
++err_free_tdma:
++	mv_cesa_dma_cleanup(basereq);
++	dma_unmap_sg(cesa_dev->dev, req->src, creq->src_nents, DMA_TO_DEVICE);
++
++err:
++	mv_cesa_ahash_last_cleanup(req);
++
++	return ret;
++}
++
++static int mv_cesa_ahash_req_init(struct ahash_request *req, bool *cached)
++{
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
++
++	creq->src_nents = sg_nents_for_len(req->src, req->nbytes);
++	if (creq->src_nents < 0) {
++		dev_err(cesa_dev->dev, "Invalid number of src SG");
++		return creq->src_nents;
++	}
++
++	*cached = mv_cesa_ahash_cache_req(req);
++
++	if (*cached)
++		return 0;
++
++	if (cesa_dev->caps->has_tdma)
++		return mv_cesa_ahash_dma_req_init(req);
++	else
++		return 0;
++}
++
++static int mv_cesa_ahash_queue_req(struct ahash_request *req)
++{
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
++	struct mv_cesa_engine *engine;
++	bool cached = false;
++	int ret;
++
++	ret = mv_cesa_ahash_req_init(req, &cached);
++	if (ret)
++		return ret;
++
++	if (cached)
++		return 0;
++
++	engine = mv_cesa_select_engine(req->nbytes);
++	mv_cesa_ahash_prepare(&req->base, engine);
++
++	ret = mv_cesa_queue_req(&req->base, &creq->base);
++
++	if (mv_cesa_req_needs_cleanup(&req->base, ret))
++		mv_cesa_ahash_cleanup(req);
++
++	return ret;
++}
++
++static int mv_cesa_ahash_update(struct ahash_request *req)
++{
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
++
++	creq->len += req->nbytes;
++
++	return mv_cesa_ahash_queue_req(req);
++}
++
++static int mv_cesa_ahash_final(struct ahash_request *req)
++{
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
++	struct mv_cesa_op_ctx *tmpl = &creq->op_tmpl;
++
++	mv_cesa_set_mac_op_total_len(tmpl, creq->len);
++	creq->last_req = true;
++	req->nbytes = 0;
++
++	return mv_cesa_ahash_queue_req(req);
++}
++
++static int mv_cesa_ahash_finup(struct ahash_request *req)
++{
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
++	struct mv_cesa_op_ctx *tmpl = &creq->op_tmpl;
++
++	creq->len += req->nbytes;
++	mv_cesa_set_mac_op_total_len(tmpl, creq->len);
++	creq->last_req = true;
++
++	return mv_cesa_ahash_queue_req(req);
++}
++
++static int mv_cesa_ahash_export(struct ahash_request *req, void *hash,
++				u64 *len, void *cache)
++{
++	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
++	unsigned int digsize = crypto_ahash_digestsize(ahash);
++	unsigned int blocksize;
++
++	blocksize = crypto_ahash_blocksize(ahash);
++
++	*len = creq->len;
++	memcpy(hash, creq->state, digsize);
++	memset(cache, 0, blocksize);
++	memcpy(cache, creq->cache, creq->cache_ptr);
++
++	return 0;
++}
++
++static int mv_cesa_ahash_import(struct ahash_request *req, const void *hash,
++				u64 len, const void *cache)
++{
++	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
++	unsigned int digsize = crypto_ahash_digestsize(ahash);
++	unsigned int blocksize;
++	unsigned int cache_ptr;
++	int ret;
++
++	ret = crypto_ahash_init(req);
++	if (ret)
++		return ret;
++
++	blocksize = crypto_ahash_blocksize(ahash);
++	if (len >= blocksize)
++		mv_cesa_update_op_cfg(&creq->op_tmpl,
++				      CESA_SA_DESC_CFG_MID_FRAG,
++				      CESA_SA_DESC_CFG_FRAG_MSK);
++
++	creq->len = len;
++	memcpy(creq->state, hash, digsize);
++	creq->cache_ptr = 0;
++
++	cache_ptr = do_div(len, blocksize);
++	if (!cache_ptr)
++		return 0;
++
++	memcpy(creq->cache, cache, cache_ptr);
++	creq->cache_ptr = cache_ptr;
++
++	return 0;
++}
++
++static int mv_cesa_md5_init(struct ahash_request *req)
++{
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
++	struct mv_cesa_op_ctx tmpl = { };
++
++	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_MD5);
++
++	mv_cesa_ahash_init(req, &tmpl, true);
++
++	creq->state[0] = MD5_H0;
++	creq->state[1] = MD5_H1;
++	creq->state[2] = MD5_H2;
++	creq->state[3] = MD5_H3;
++
++	return 0;
++}
++
++static int mv_cesa_md5_export(struct ahash_request *req, void *out)
++{
++	struct md5_state *out_state = out;
++
++	return mv_cesa_ahash_export(req, out_state->hash,
++				    &out_state->byte_count, out_state->block);
++}
++
++static int mv_cesa_md5_import(struct ahash_request *req, const void *in)
++{
++	const struct md5_state *in_state = in;
++
++	return mv_cesa_ahash_import(req, in_state->hash, in_state->byte_count,
++				    in_state->block);
++}
++
++static int mv_cesa_md5_digest(struct ahash_request *req)
++{
++	int ret;
++
++	ret = mv_cesa_md5_init(req);
++	if (ret)
++		return ret;
++
++	return mv_cesa_ahash_finup(req);
++}
++
++struct ahash_alg mv_md5_alg = {
++	.init = mv_cesa_md5_init,
++	.update = mv_cesa_ahash_update,
++	.final = mv_cesa_ahash_final,
++	.finup = mv_cesa_ahash_finup,
++	.digest = mv_cesa_md5_digest,
++	.export = mv_cesa_md5_export,
++	.import = mv_cesa_md5_import,
++	.halg = {
++		.digestsize = MD5_DIGEST_SIZE,
++		.statesize = sizeof(struct md5_state),
++		.base = {
++			.cra_name = "md5",
++			.cra_driver_name = "mv-md5",
++			.cra_priority = 300,
++			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_KERN_DRIVER_ONLY,
++			.cra_blocksize = MD5_HMAC_BLOCK_SIZE,
++			.cra_ctxsize = sizeof(struct mv_cesa_hash_ctx),
++			.cra_init = mv_cesa_ahash_cra_init,
++			.cra_module = THIS_MODULE,
++		}
++	}
++};
++
++static int mv_cesa_sha1_init(struct ahash_request *req)
++{
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
++	struct mv_cesa_op_ctx tmpl = { };
++
++	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_SHA1);
++
++	mv_cesa_ahash_init(req, &tmpl, false);
++
++	creq->state[0] = SHA1_H0;
++	creq->state[1] = SHA1_H1;
++	creq->state[2] = SHA1_H2;
++	creq->state[3] = SHA1_H3;
++	creq->state[4] = SHA1_H4;
++
++	return 0;
++}
++
++static int mv_cesa_sha1_export(struct ahash_request *req, void *out)
++{
++	struct sha1_state *out_state = out;
++
++	return mv_cesa_ahash_export(req, out_state->state, &out_state->count,
++				    out_state->buffer);
++}
++
++static int mv_cesa_sha1_import(struct ahash_request *req, const void *in)
++{
++	const struct sha1_state *in_state = in;
++
++	return mv_cesa_ahash_import(req, in_state->state, in_state->count,
++				    in_state->buffer);
++}
++
++static int mv_cesa_sha1_digest(struct ahash_request *req)
++{
++	int ret;
++
++	ret = mv_cesa_sha1_init(req);
++	if (ret)
++		return ret;
++
++	return mv_cesa_ahash_finup(req);
++}
++
++struct ahash_alg mv_sha1_alg = {
++	.init = mv_cesa_sha1_init,
++	.update = mv_cesa_ahash_update,
++	.final = mv_cesa_ahash_final,
++	.finup = mv_cesa_ahash_finup,
++	.digest = mv_cesa_sha1_digest,
++	.export = mv_cesa_sha1_export,
++	.import = mv_cesa_sha1_import,
++	.halg = {
++		.digestsize = SHA1_DIGEST_SIZE,
++		.statesize = sizeof(struct sha1_state),
++		.base = {
++			.cra_name = "sha1",
++			.cra_driver_name = "mv-sha1",
++			.cra_priority = 300,
++			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_KERN_DRIVER_ONLY,
++			.cra_blocksize = SHA1_BLOCK_SIZE,
++			.cra_ctxsize = sizeof(struct mv_cesa_hash_ctx),
++			.cra_init = mv_cesa_ahash_cra_init,
++			.cra_module = THIS_MODULE,
++		}
++	}
++};
++
++static int mv_cesa_sha256_init(struct ahash_request *req)
++{
++	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
++	struct mv_cesa_op_ctx tmpl = { };
++
++	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_SHA256);
++
++	mv_cesa_ahash_init(req, &tmpl, false);
++
++	creq->state[0] = SHA256_H0;
++	creq->state[1] = SHA256_H1;
++	creq->state[2] = SHA256_H2;
++	creq->state[3] = SHA256_H3;
++	creq->state[4] = SHA256_H4;
++	creq->state[5] = SHA256_H5;
++	creq->state[6] = SHA256_H6;
++	creq->state[7] = SHA256_H7;
++
++	return 0;
++}
++
++static int mv_cesa_sha256_digest(struct ahash_request *req)
++{
++	int ret;
++
++	ret = mv_cesa_sha256_init(req);
++	if (ret)
++		return ret;
++
++	return mv_cesa_ahash_finup(req);
++}
++
++static int mv_cesa_sha256_export(struct ahash_request *req, void *out)
++{
++	struct sha256_state *out_state = out;
++
++	return mv_cesa_ahash_export(req, out_state->state, &out_state->count,
++				    out_state->buf);
++}
++
++static int mv_cesa_sha256_import(struct ahash_request *req, const void *in)
++{
++	const struct sha256_state *in_state = in;
++
++	return mv_cesa_ahash_import(req, in_state->state, in_state->count,
++				    in_state->buf);
++}
++
++struct ahash_alg mv_sha256_alg = {
++	.init = mv_cesa_sha256_init,
++	.update = mv_cesa_ahash_update,
++	.final = mv_cesa_ahash_final,
++	.finup = mv_cesa_ahash_finup,
++	.digest = mv_cesa_sha256_digest,
++	.export = mv_cesa_sha256_export,
++	.import = mv_cesa_sha256_import,
++	.halg = {
++		.digestsize = SHA256_DIGEST_SIZE,
++		.statesize = sizeof(struct sha256_state),
++		.base = {
++			.cra_name = "sha256",
++			.cra_driver_name = "mv-sha256",
++			.cra_priority = 300,
++			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_KERN_DRIVER_ONLY,
++			.cra_blocksize = SHA256_BLOCK_SIZE,
++			.cra_ctxsize = sizeof(struct mv_cesa_hash_ctx),
++			.cra_init = mv_cesa_ahash_cra_init,
++			.cra_module = THIS_MODULE,
++		}
++	}
++};
++
++struct mv_cesa_ahash_result {
++	struct completion completion;
++	int error;
++};
++
++static void mv_cesa_hmac_ahash_complete(struct crypto_async_request *req,
++					int error)
++{
++	struct mv_cesa_ahash_result *result = req->data;
++
++	if (error == -EINPROGRESS)
++		return;
++
++	result->error = error;
++	complete(&result->completion);
++}
++
++static int mv_cesa_ahmac_iv_state_init(struct ahash_request *req, u8 *pad,
++				       void *state, unsigned int blocksize)
++{
++	struct mv_cesa_ahash_result result;
++	struct scatterlist sg;
++	int ret;
++
++	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++				   mv_cesa_hmac_ahash_complete, &result);
++	sg_init_one(&sg, pad, blocksize);
++	ahash_request_set_crypt(req, &sg, pad, blocksize);
++	init_completion(&result.completion);
++
++	ret = crypto_ahash_init(req);
++	if (ret)
++		return ret;
++
++	ret = crypto_ahash_update(req);
++	if (ret && ret != -EINPROGRESS)
++		return ret;
++
++	wait_for_completion_interruptible(&result.completion);
++	if (result.error)
++		return result.error;
++
++	ret = crypto_ahash_export(req, state);
++	if (ret)
++		return ret;
++
++	return 0;
++}
++
++static int mv_cesa_ahmac_pad_init(struct ahash_request *req,
++				  const u8 *key, unsigned int keylen,
++				  u8 *ipad, u8 *opad,
++				  unsigned int blocksize)
++{
++	struct mv_cesa_ahash_result result;
++	struct scatterlist sg;
++	int ret;
++	int i;
++
++	if (keylen <= blocksize) {
++		memcpy(ipad, key, keylen);
++	} else {
++		u8 *keydup = kmemdup(key, keylen, GFP_KERNEL);
++
++		if (!keydup)
++			return -ENOMEM;
++
++		ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
++					   mv_cesa_hmac_ahash_complete,
++					   &result);
++		sg_init_one(&sg, keydup, keylen);
++		ahash_request_set_crypt(req, &sg, ipad, keylen);
++		init_completion(&result.completion);
++
++		ret = crypto_ahash_digest(req);
++		if (ret == -EINPROGRESS) {
++			wait_for_completion_interruptible(&result.completion);
++			ret = result.error;
++		}
++
++		/* Set the memory region to 0 to avoid any leak. */
++		kzfree(keydup);
++
++		if (ret)
++			return ret;
++
++		keylen = crypto_ahash_digestsize(crypto_ahash_reqtfm(req));
++	}
++
++	memset(ipad + keylen, 0, blocksize - keylen);
++	memcpy(opad, ipad, blocksize);
++
++	for (i = 0; i < blocksize; i++) {
++		ipad[i] ^= HMAC_IPAD_VALUE;
++		opad[i] ^= HMAC_OPAD_VALUE;
++	}
++
++	return 0;
++}
++
++static int mv_cesa_ahmac_setkey(const char *hash_alg_name,
++				const u8 *key, unsigned int keylen,
++				void *istate, void *ostate)
++{
++	struct ahash_request *req;
++	struct crypto_ahash *tfm;
++	unsigned int blocksize;
++	u8 *ipad = NULL;
++	u8 *opad;
++	int ret;
++
++	tfm = crypto_alloc_ahash(hash_alg_name, 0, 0);
++	if (IS_ERR(tfm))
++		return PTR_ERR(tfm);
++
++	req = ahash_request_alloc(tfm, GFP_KERNEL);
++	if (!req) {
++		ret = -ENOMEM;
++		goto free_ahash;
++	}
++
++	crypto_ahash_clear_flags(tfm, ~0);
++
++	blocksize = crypto_tfm_alg_blocksize(crypto_ahash_tfm(tfm));
++
++	ipad = kcalloc(2, blocksize, GFP_KERNEL);
++	if (!ipad) {
++		ret = -ENOMEM;
++		goto free_req;
++	}
++
++	opad = ipad + blocksize;
++
++	ret = mv_cesa_ahmac_pad_init(req, key, keylen, ipad, opad, blocksize);
++	if (ret)
++		goto free_ipad;
++
++	ret = mv_cesa_ahmac_iv_state_init(req, ipad, istate, blocksize);
++	if (ret)
++		goto free_ipad;
++
++	ret = mv_cesa_ahmac_iv_state_init(req, opad, ostate, blocksize);
++
++free_ipad:
++	kfree(ipad);
++free_req:
++	ahash_request_free(req);
++free_ahash:
++	crypto_free_ahash(tfm);
++
++	return ret;
++}
++
++static int mv_cesa_ahmac_cra_init(struct crypto_tfm *tfm)
++{
++	struct mv_cesa_hmac_ctx *ctx = crypto_tfm_ctx(tfm);
++
++	ctx->base.ops = &mv_cesa_ahash_req_ops;
++
++	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
++				 sizeof(struct mv_cesa_ahash_req));
++	return 0;
++}
++
++static int mv_cesa_ahmac_md5_init(struct ahash_request *req)
++{
++	struct mv_cesa_hmac_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
++	struct mv_cesa_op_ctx tmpl = { };
++
++	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_HMAC_MD5);
++	memcpy(tmpl.ctx.hash.iv, ctx->iv, sizeof(ctx->iv));
++
++	mv_cesa_ahash_init(req, &tmpl, true);
++
++	return 0;
++}
++
++static int mv_cesa_ahmac_md5_setkey(struct crypto_ahash *tfm, const u8 *key,
++				    unsigned int keylen)
++{
++	struct mv_cesa_hmac_ctx *ctx = crypto_tfm_ctx(crypto_ahash_tfm(tfm));
++	struct md5_state istate, ostate;
++	int ret, i;
++
++	ret = mv_cesa_ahmac_setkey("mv-md5", key, keylen, &istate, &ostate);
++	if (ret)
++		return ret;
++
++	for (i = 0; i < ARRAY_SIZE(istate.hash); i++)
++		ctx->iv[i] = be32_to_cpu(istate.hash[i]);
++
++	for (i = 0; i < ARRAY_SIZE(ostate.hash); i++)
++		ctx->iv[i + 8] = be32_to_cpu(ostate.hash[i]);
++
++	return 0;
++}
++
++static int mv_cesa_ahmac_md5_digest(struct ahash_request *req)
++{
++	int ret;
++
++	ret = mv_cesa_ahmac_md5_init(req);
++	if (ret)
++		return ret;
++
++	return mv_cesa_ahash_finup(req);
++}
++
++struct ahash_alg mv_ahmac_md5_alg = {
++	.init = mv_cesa_ahmac_md5_init,
++	.update = mv_cesa_ahash_update,
++	.final = mv_cesa_ahash_final,
++	.finup = mv_cesa_ahash_finup,
++	.digest = mv_cesa_ahmac_md5_digest,
++	.setkey = mv_cesa_ahmac_md5_setkey,
++	.export = mv_cesa_md5_export,
++	.import = mv_cesa_md5_import,
++	.halg = {
++		.digestsize = MD5_DIGEST_SIZE,
++		.statesize = sizeof(struct md5_state),
++		.base = {
++			.cra_name = "hmac(md5)",
++			.cra_driver_name = "mv-hmac-md5",
++			.cra_priority = 300,
++			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_KERN_DRIVER_ONLY,
++			.cra_blocksize = MD5_HMAC_BLOCK_SIZE,
++			.cra_ctxsize = sizeof(struct mv_cesa_hmac_ctx),
++			.cra_init = mv_cesa_ahmac_cra_init,
++			.cra_module = THIS_MODULE,
++		}
++	}
++};
++
++static int mv_cesa_ahmac_sha1_init(struct ahash_request *req)
++{
++	struct mv_cesa_hmac_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
++	struct mv_cesa_op_ctx tmpl = { };
++
++	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_HMAC_SHA1);
++	memcpy(tmpl.ctx.hash.iv, ctx->iv, sizeof(ctx->iv));
++
++	mv_cesa_ahash_init(req, &tmpl, false);
++
++	return 0;
++}
++
++static int mv_cesa_ahmac_sha1_setkey(struct crypto_ahash *tfm, const u8 *key,
++				     unsigned int keylen)
++{
++	struct mv_cesa_hmac_ctx *ctx = crypto_tfm_ctx(crypto_ahash_tfm(tfm));
++	struct sha1_state istate, ostate;
++	int ret, i;
++
++	ret = mv_cesa_ahmac_setkey("mv-sha1", key, keylen, &istate, &ostate);
++	if (ret)
++		return ret;
++
++	for (i = 0; i < ARRAY_SIZE(istate.state); i++)
++		ctx->iv[i] = be32_to_cpu(istate.state[i]);
++
++	for (i = 0; i < ARRAY_SIZE(ostate.state); i++)
++		ctx->iv[i + 8] = be32_to_cpu(ostate.state[i]);
++
++	return 0;
++}
++
++static int mv_cesa_ahmac_sha1_digest(struct ahash_request *req)
++{
++	int ret;
++
++	ret = mv_cesa_ahmac_sha1_init(req);
++	if (ret)
++		return ret;
++
++	return mv_cesa_ahash_finup(req);
++}
++
++struct ahash_alg mv_ahmac_sha1_alg = {
++	.init = mv_cesa_ahmac_sha1_init,
++	.update = mv_cesa_ahash_update,
++	.final = mv_cesa_ahash_final,
++	.finup = mv_cesa_ahash_finup,
++	.digest = mv_cesa_ahmac_sha1_digest,
++	.setkey = mv_cesa_ahmac_sha1_setkey,
++	.export = mv_cesa_sha1_export,
++	.import = mv_cesa_sha1_import,
++	.halg = {
++		.digestsize = SHA1_DIGEST_SIZE,
++		.statesize = sizeof(struct sha1_state),
++		.base = {
++			.cra_name = "hmac(sha1)",
++			.cra_driver_name = "mv-hmac-sha1",
++			.cra_priority = 300,
++			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_KERN_DRIVER_ONLY,
++			.cra_blocksize = SHA1_BLOCK_SIZE,
++			.cra_ctxsize = sizeof(struct mv_cesa_hmac_ctx),
++			.cra_init = mv_cesa_ahmac_cra_init,
++			.cra_module = THIS_MODULE,
++		}
++	}
++};
++
++static int mv_cesa_ahmac_sha256_setkey(struct crypto_ahash *tfm, const u8 *key,
++				       unsigned int keylen)
++{
++	struct mv_cesa_hmac_ctx *ctx = crypto_tfm_ctx(crypto_ahash_tfm(tfm));
++	struct sha256_state istate, ostate;
++	int ret, i;
++
++	ret = mv_cesa_ahmac_setkey("mv-sha256", key, keylen, &istate, &ostate);
++	if (ret)
++		return ret;
++
++	for (i = 0; i < ARRAY_SIZE(istate.state); i++)
++		ctx->iv[i] = be32_to_cpu(istate.state[i]);
++
++	for (i = 0; i < ARRAY_SIZE(ostate.state); i++)
++		ctx->iv[i + 8] = be32_to_cpu(ostate.state[i]);
++
++	return 0;
++}
++
++static int mv_cesa_ahmac_sha256_init(struct ahash_request *req)
++{
++	struct mv_cesa_hmac_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
++	struct mv_cesa_op_ctx tmpl = { };
++
++	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_HMAC_SHA256);
++	memcpy(tmpl.ctx.hash.iv, ctx->iv, sizeof(ctx->iv));
++
++	mv_cesa_ahash_init(req, &tmpl, false);
++
++	return 0;
++}
++
++static int mv_cesa_ahmac_sha256_digest(struct ahash_request *req)
++{
++	int ret;
++
++	ret = mv_cesa_ahmac_sha256_init(req);
++	if (ret)
++		return ret;
++
++	return mv_cesa_ahash_finup(req);
++}
++
++struct ahash_alg mv_ahmac_sha256_alg = {
++	.init = mv_cesa_ahmac_sha256_init,
++	.update = mv_cesa_ahash_update,
++	.final = mv_cesa_ahash_final,
++	.finup = mv_cesa_ahash_finup,
++	.digest = mv_cesa_ahmac_sha256_digest,
++	.setkey = mv_cesa_ahmac_sha256_setkey,
++	.export = mv_cesa_sha256_export,
++	.import = mv_cesa_sha256_import,
++	.halg = {
++		.digestsize = SHA256_DIGEST_SIZE,
++		.statesize = sizeof(struct sha256_state),
++		.base = {
++			.cra_name = "hmac(sha256)",
++			.cra_driver_name = "mv-hmac-sha256",
++			.cra_priority = 300,
++			.cra_flags = CRYPTO_ALG_ASYNC |
++				     CRYPTO_ALG_KERN_DRIVER_ONLY,
++			.cra_blocksize = SHA256_BLOCK_SIZE,
++			.cra_ctxsize = sizeof(struct mv_cesa_hmac_ctx),
++			.cra_init = mv_cesa_ahmac_cra_init,
++			.cra_module = THIS_MODULE,
++		}
++	}
++};
+diff --git a/drivers/crypto/marvell/cesa/tdma.c b/drivers/crypto/marvell/cesa/tdma.c
+new file mode 100644
+index 0000000..b81ee27
+--- /dev/null
++++ b/drivers/crypto/marvell/cesa/tdma.c
+@@ -0,0 +1,352 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Provide TDMA helper functions used by cipher and hash algorithm
++ * implementations.
++ *
++ * Author: Boris Brezillon <boris.brezillon@free-electrons.com>
++ * Author: Arnaud Ebalard <arno@natisbad.org>
++ *
++ * This work is based on an initial version written by
++ * Sebastian Andrzej Siewior < sebastian at breakpoint dot cc >
++ */
++
++#include "cesa.h"
++
++bool mv_cesa_req_dma_iter_next_transfer(struct mv_cesa_dma_iter *iter,
++					struct mv_cesa_sg_dma_iter *sgiter,
++					unsigned int len)
++{
++	if (!sgiter->sg)
++		return false;
++
++	sgiter->op_offset += len;
++	sgiter->offset += len;
++	if (sgiter->offset == sg_dma_len(sgiter->sg)) {
++		if (sg_is_last(sgiter->sg))
++			return false;
++		sgiter->offset = 0;
++		sgiter->sg = sg_next(sgiter->sg);
++	}
++
++	if (sgiter->op_offset == iter->op_len)
++		return false;
++
++	return true;
++}
++
++void mv_cesa_dma_step(struct mv_cesa_req *dreq)
++{
++	struct mv_cesa_engine *engine = dreq->engine;
++
++	writel_relaxed(0, engine->regs + CESA_SA_CFG);
++
++	mv_cesa_set_int_mask(engine, CESA_SA_INT_ACC0_IDMA_DONE);
++	writel_relaxed(CESA_TDMA_DST_BURST_128B | CESA_TDMA_SRC_BURST_128B |
++		       CESA_TDMA_NO_BYTE_SWAP | CESA_TDMA_EN,
++		       engine->regs + CESA_TDMA_CONTROL);
++
++	writel_relaxed(CESA_SA_CFG_ACT_CH0_IDMA | CESA_SA_CFG_MULTI_PKT |
++		       CESA_SA_CFG_CH0_W_IDMA | CESA_SA_CFG_PARA_DIS,
++		       engine->regs + CESA_SA_CFG);
++	writel_relaxed(dreq->chain.first->cur_dma,
++		       engine->regs + CESA_TDMA_NEXT_ADDR);
++	WARN_ON(readl(engine->regs + CESA_SA_CMD) &
++		CESA_SA_CMD_EN_CESA_SA_ACCL0);
++	writel(CESA_SA_CMD_EN_CESA_SA_ACCL0, engine->regs + CESA_SA_CMD);
++}
++
++void mv_cesa_dma_cleanup(struct mv_cesa_req *dreq)
++{
++	struct mv_cesa_tdma_desc *tdma;
++
++	for (tdma = dreq->chain.first; tdma;) {
++		struct mv_cesa_tdma_desc *old_tdma = tdma;
++		u32 type = tdma->flags & CESA_TDMA_TYPE_MSK;
++
++		if (type == CESA_TDMA_OP)
++			dma_pool_free(cesa_dev->dma->op_pool, tdma->op,
++				      le32_to_cpu(tdma->src));
++
++		tdma = tdma->next;
++		dma_pool_free(cesa_dev->dma->tdma_desc_pool, old_tdma,
++			      old_tdma->cur_dma);
++	}
++
++	dreq->chain.first = NULL;
++	dreq->chain.last = NULL;
++}
++
++void mv_cesa_dma_prepare(struct mv_cesa_req *dreq,
++			 struct mv_cesa_engine *engine)
++{
++	struct mv_cesa_tdma_desc *tdma;
++
++	for (tdma = dreq->chain.first; tdma; tdma = tdma->next) {
++		if (tdma->flags & CESA_TDMA_DST_IN_SRAM)
++			tdma->dst = cpu_to_le32(tdma->dst + engine->sram_dma);
++
++		if (tdma->flags & CESA_TDMA_SRC_IN_SRAM)
++			tdma->src = cpu_to_le32(tdma->src + engine->sram_dma);
++
++		if ((tdma->flags & CESA_TDMA_TYPE_MSK) == CESA_TDMA_OP)
++			mv_cesa_adjust_op(engine, tdma->op);
++	}
++}
++
++void mv_cesa_tdma_chain(struct mv_cesa_engine *engine,
++			struct mv_cesa_req *dreq)
++{
++	if (engine->chain.first == NULL && engine->chain.last == NULL) {
++		engine->chain.first = dreq->chain.first;
++		engine->chain.last  = dreq->chain.last;
++	} else {
++		struct mv_cesa_tdma_desc *last;
++
++		last = engine->chain.last;
++		last->next = dreq->chain.first;
++		engine->chain.last = dreq->chain.last;
++
++		/*
++		 * Break the DMA chain if the CESA_TDMA_BREAK_CHAIN is set on
++		 * the last element of the current chain, or if the request
++		 * being queued needs the IV regs to be set before lauching
++		 * the request.
++		 */
++		if (!(last->flags & CESA_TDMA_BREAK_CHAIN) &&
++		    !(dreq->chain.first->flags & CESA_TDMA_SET_STATE))
++			last->next_dma = dreq->chain.first->cur_dma;
++	}
++}
++
++int mv_cesa_tdma_process(struct mv_cesa_engine *engine, u32 status)
++{
++	struct crypto_async_request *req = NULL;
++	struct mv_cesa_tdma_desc *tdma = NULL, *next = NULL;
++	dma_addr_t tdma_cur;
++	int res = 0;
++
++	tdma_cur = readl(engine->regs + CESA_TDMA_CUR);
++
++	for (tdma = engine->chain.first; tdma; tdma = next) {
++		spin_lock_bh(&engine->lock);
++		next = tdma->next;
++		spin_unlock_bh(&engine->lock);
++
++		if (tdma->flags & CESA_TDMA_END_OF_REQ) {
++			struct crypto_async_request *backlog = NULL;
++			struct mv_cesa_ctx *ctx;
++			u32 current_status;
++
++			spin_lock_bh(&engine->lock);
++			/*
++			 * if req is NULL, this means we're processing the
++			 * request in engine->req.
++			 */
++			if (!req)
++				req = engine->req;
++			else
++				req = mv_cesa_dequeue_req_locked(engine,
++								 &backlog);
++
++			/* Re-chaining to the next request */
++			engine->chain.first = tdma->next;
++			tdma->next = NULL;
++
++			/* If this is the last request, clear the chain */
++			if (engine->chain.first == NULL)
++				engine->chain.last  = NULL;
++			spin_unlock_bh(&engine->lock);
++
++			ctx = crypto_tfm_ctx(req->tfm);
++			current_status = (tdma->cur_dma == tdma_cur) ?
++					  status : CESA_SA_INT_ACC0_IDMA_DONE;
++			res = ctx->ops->process(req, current_status);
++			ctx->ops->complete(req);
++
++			if (res == 0)
++				mv_cesa_engine_enqueue_complete_request(engine,
++									req);
++
++			if (backlog)
++				backlog->complete(backlog, -EINPROGRESS);
++		}
++
++		if (res || tdma->cur_dma == tdma_cur)
++			break;
++	}
++
++	/*
++	 * Save the last request in error to engine->req, so that the core
++	 * knows which request was fautly
++	 */
++	if (res) {
++		spin_lock_bh(&engine->lock);
++		engine->req = req;
++		spin_unlock_bh(&engine->lock);
++	}
++
++	return res;
++}
++
++static struct mv_cesa_tdma_desc *
++mv_cesa_dma_add_desc(struct mv_cesa_tdma_chain *chain, gfp_t flags)
++{
++	struct mv_cesa_tdma_desc *new_tdma = NULL;
++	dma_addr_t dma_handle;
++
++	new_tdma = dma_pool_zalloc(cesa_dev->dma->tdma_desc_pool, flags,
++				   &dma_handle);
++	if (!new_tdma)
++		return ERR_PTR(-ENOMEM);
++
++	new_tdma->cur_dma = dma_handle;
++	if (chain->last) {
++		chain->last->next_dma = cpu_to_le32(dma_handle);
++		chain->last->next = new_tdma;
++	} else {
++		chain->first = new_tdma;
++	}
++
++	chain->last = new_tdma;
++
++	return new_tdma;
++}
++
++int mv_cesa_dma_add_result_op(struct mv_cesa_tdma_chain *chain, dma_addr_t src,
++			  u32 size, u32 flags, gfp_t gfp_flags)
++{
++	struct mv_cesa_tdma_desc *tdma, *op_desc;
++
++	tdma = mv_cesa_dma_add_desc(chain, gfp_flags);
++	if (IS_ERR(tdma))
++		return PTR_ERR(tdma);
++
++	/* We re-use an existing op_desc object to retrieve the context
++	 * and result instead of allocating a new one.
++	 * There is at least one object of this type in a CESA crypto
++	 * req, just pick the first one in the chain.
++	 */
++	for (op_desc = chain->first; op_desc; op_desc = op_desc->next) {
++		u32 type = op_desc->flags & CESA_TDMA_TYPE_MSK;
++
++		if (type == CESA_TDMA_OP)
++			break;
++	}
++
++	if (!op_desc)
++		return -EIO;
++
++	tdma->byte_cnt = cpu_to_le32(size | BIT(31));
++	tdma->src = src;
++	tdma->dst = op_desc->src;
++	tdma->op = op_desc->op;
++
++	flags &= (CESA_TDMA_DST_IN_SRAM | CESA_TDMA_SRC_IN_SRAM);
++	tdma->flags = flags | CESA_TDMA_RESULT;
++	return 0;
++}
++
++struct mv_cesa_op_ctx *mv_cesa_dma_add_op(struct mv_cesa_tdma_chain *chain,
++					const struct mv_cesa_op_ctx *op_templ,
++					bool skip_ctx,
++					gfp_t flags)
++{
++	struct mv_cesa_tdma_desc *tdma;
++	struct mv_cesa_op_ctx *op;
++	dma_addr_t dma_handle;
++	unsigned int size;
++
++	tdma = mv_cesa_dma_add_desc(chain, flags);
++	if (IS_ERR(tdma))
++		return ERR_CAST(tdma);
++
++	op = dma_pool_alloc(cesa_dev->dma->op_pool, flags, &dma_handle);
++	if (!op)
++		return ERR_PTR(-ENOMEM);
++
++	*op = *op_templ;
++
++	size = skip_ctx ? sizeof(op->desc) : sizeof(*op);
++
++	tdma = chain->last;
++	tdma->op = op;
++	tdma->byte_cnt = cpu_to_le32(size | BIT(31));
++	tdma->src = cpu_to_le32(dma_handle);
++	tdma->dst = CESA_SA_CFG_SRAM_OFFSET;
++	tdma->flags = CESA_TDMA_DST_IN_SRAM | CESA_TDMA_OP;
++
++	return op;
++}
++
++int mv_cesa_dma_add_data_transfer(struct mv_cesa_tdma_chain *chain,
++				  dma_addr_t dst, dma_addr_t src, u32 size,
++				  u32 flags, gfp_t gfp_flags)
++{
++	struct mv_cesa_tdma_desc *tdma;
++
++	tdma = mv_cesa_dma_add_desc(chain, gfp_flags);
++	if (IS_ERR(tdma))
++		return PTR_ERR(tdma);
++
++	tdma->byte_cnt = cpu_to_le32(size | BIT(31));
++	tdma->src = src;
++	tdma->dst = dst;
++
++	flags &= (CESA_TDMA_DST_IN_SRAM | CESA_TDMA_SRC_IN_SRAM);
++	tdma->flags = flags | CESA_TDMA_DATA;
++
++	return 0;
++}
++
++int mv_cesa_dma_add_dummy_launch(struct mv_cesa_tdma_chain *chain, gfp_t flags)
++{
++	struct mv_cesa_tdma_desc *tdma;
++
++	tdma = mv_cesa_dma_add_desc(chain, flags);
++	return PTR_ERR_OR_ZERO(tdma);
++}
++
++int mv_cesa_dma_add_dummy_end(struct mv_cesa_tdma_chain *chain, gfp_t flags)
++{
++	struct mv_cesa_tdma_desc *tdma;
++
++	tdma = mv_cesa_dma_add_desc(chain, flags);
++	if (IS_ERR(tdma))
++		return PTR_ERR(tdma);
++
++	tdma->byte_cnt = cpu_to_le32(BIT(31));
++
++	return 0;
++}
++
++int mv_cesa_dma_add_op_transfers(struct mv_cesa_tdma_chain *chain,
++				 struct mv_cesa_dma_iter *dma_iter,
++				 struct mv_cesa_sg_dma_iter *sgiter,
++				 gfp_t gfp_flags)
++{
++	u32 flags = sgiter->dir == DMA_TO_DEVICE ?
++		    CESA_TDMA_DST_IN_SRAM : CESA_TDMA_SRC_IN_SRAM;
++	unsigned int len;
++
++	do {
++		dma_addr_t dst, src;
++		int ret;
++
++		len = mv_cesa_req_dma_iter_transfer_len(dma_iter, sgiter);
++		if (sgiter->dir == DMA_TO_DEVICE) {
++			dst = CESA_SA_DATA_SRAM_OFFSET + sgiter->op_offset;
++			src = sg_dma_address(sgiter->sg) + sgiter->offset;
++		} else {
++			dst = sg_dma_address(sgiter->sg) + sgiter->offset;
++			src = CESA_SA_DATA_SRAM_OFFSET + sgiter->op_offset;
++		}
++
++		ret = mv_cesa_dma_add_data_transfer(chain, dst, src, len,
++						    flags, gfp_flags);
++		if (ret)
++			return ret;
++
++	} while (mv_cesa_req_dma_iter_next_transfer(dma_iter, sgiter, len));
++
++	return 0;
++}
+diff --git a/drivers/crypto/marvell/cipher.c b/drivers/crypto/marvell/cipher.c
+deleted file mode 100644
+index c24f34a..0000000
+--- a/drivers/crypto/marvell/cipher.c
++++ /dev/null
+@@ -1,798 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-only
+-/*
+- * Cipher algorithms supported by the CESA: DES, 3DES and AES.
+- *
+- * Author: Boris Brezillon <boris.brezillon@free-electrons.com>
+- * Author: Arnaud Ebalard <arno@natisbad.org>
+- *
+- * This work is based on an initial version written by
+- * Sebastian Andrzej Siewior < sebastian at breakpoint dot cc >
+- */
+-
+-#include <crypto/aes.h>
+-#include <crypto/internal/des.h>
+-
+-#include "cesa.h"
+-
+-struct mv_cesa_des_ctx {
+-	struct mv_cesa_ctx base;
+-	u8 key[DES_KEY_SIZE];
+-};
+-
+-struct mv_cesa_des3_ctx {
+-	struct mv_cesa_ctx base;
+-	u8 key[DES3_EDE_KEY_SIZE];
+-};
+-
+-struct mv_cesa_aes_ctx {
+-	struct mv_cesa_ctx base;
+-	struct crypto_aes_ctx aes;
+-};
+-
+-struct mv_cesa_skcipher_dma_iter {
+-	struct mv_cesa_dma_iter base;
+-	struct mv_cesa_sg_dma_iter src;
+-	struct mv_cesa_sg_dma_iter dst;
+-};
+-
+-static inline void
+-mv_cesa_skcipher_req_iter_init(struct mv_cesa_skcipher_dma_iter *iter,
+-			       struct skcipher_request *req)
+-{
+-	mv_cesa_req_dma_iter_init(&iter->base, req->cryptlen);
+-	mv_cesa_sg_dma_iter_init(&iter->src, req->src, DMA_TO_DEVICE);
+-	mv_cesa_sg_dma_iter_init(&iter->dst, req->dst, DMA_FROM_DEVICE);
+-}
+-
+-static inline bool
+-mv_cesa_skcipher_req_iter_next_op(struct mv_cesa_skcipher_dma_iter *iter)
+-{
+-	iter->src.op_offset = 0;
+-	iter->dst.op_offset = 0;
+-
+-	return mv_cesa_req_dma_iter_next_op(&iter->base);
+-}
+-
+-static inline void
+-mv_cesa_skcipher_dma_cleanup(struct skcipher_request *req)
+-{
+-	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(req);
+-
+-	if (req->dst != req->src) {
+-		dma_unmap_sg(cesa_dev->dev, req->dst, creq->dst_nents,
+-			     DMA_FROM_DEVICE);
+-		dma_unmap_sg(cesa_dev->dev, req->src, creq->src_nents,
+-			     DMA_TO_DEVICE);
+-	} else {
+-		dma_unmap_sg(cesa_dev->dev, req->src, creq->src_nents,
+-			     DMA_BIDIRECTIONAL);
+-	}
+-	mv_cesa_dma_cleanup(&creq->base);
+-}
+-
+-static inline void mv_cesa_skcipher_cleanup(struct skcipher_request *req)
+-{
+-	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(req);
+-
+-	if (mv_cesa_req_get_type(&creq->base) == CESA_DMA_REQ)
+-		mv_cesa_skcipher_dma_cleanup(req);
+-}
+-
+-static void mv_cesa_skcipher_std_step(struct skcipher_request *req)
+-{
+-	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(req);
+-	struct mv_cesa_skcipher_std_req *sreq = &creq->std;
+-	struct mv_cesa_engine *engine = creq->base.engine;
+-	size_t  len = min_t(size_t, req->cryptlen - sreq->offset,
+-			    CESA_SA_SRAM_PAYLOAD_SIZE);
+-
+-	mv_cesa_adjust_op(engine, &sreq->op);
+-	memcpy_toio(engine->sram, &sreq->op, sizeof(sreq->op));
+-
+-	len = sg_pcopy_to_buffer(req->src, creq->src_nents,
+-				 engine->sram + CESA_SA_DATA_SRAM_OFFSET,
+-				 len, sreq->offset);
+-
+-	sreq->size = len;
+-	mv_cesa_set_crypt_op_len(&sreq->op, len);
+-
+-	/* FIXME: only update enc_len field */
+-	if (!sreq->skip_ctx) {
+-		memcpy_toio(engine->sram, &sreq->op, sizeof(sreq->op));
+-		sreq->skip_ctx = true;
+-	} else {
+-		memcpy_toio(engine->sram, &sreq->op, sizeof(sreq->op.desc));
+-	}
+-
+-	mv_cesa_set_int_mask(engine, CESA_SA_INT_ACCEL0_DONE);
+-	writel_relaxed(CESA_SA_CFG_PARA_DIS, engine->regs + CESA_SA_CFG);
+-	BUG_ON(readl(engine->regs + CESA_SA_CMD) &
+-	       CESA_SA_CMD_EN_CESA_SA_ACCL0);
+-	writel(CESA_SA_CMD_EN_CESA_SA_ACCL0, engine->regs + CESA_SA_CMD);
+-}
+-
+-static int mv_cesa_skcipher_std_process(struct skcipher_request *req,
+-					u32 status)
+-{
+-	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(req);
+-	struct mv_cesa_skcipher_std_req *sreq = &creq->std;
+-	struct mv_cesa_engine *engine = creq->base.engine;
+-	size_t len;
+-
+-	len = sg_pcopy_from_buffer(req->dst, creq->dst_nents,
+-				   engine->sram + CESA_SA_DATA_SRAM_OFFSET,
+-				   sreq->size, sreq->offset);
+-
+-	sreq->offset += len;
+-	if (sreq->offset < req->cryptlen)
+-		return -EINPROGRESS;
+-
+-	return 0;
+-}
+-
+-static int mv_cesa_skcipher_process(struct crypto_async_request *req,
+-				    u32 status)
+-{
+-	struct skcipher_request *skreq = skcipher_request_cast(req);
+-	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(skreq);
+-	struct mv_cesa_req *basereq = &creq->base;
+-
+-	if (mv_cesa_req_get_type(basereq) == CESA_STD_REQ)
+-		return mv_cesa_skcipher_std_process(skreq, status);
+-
+-	return mv_cesa_dma_process(basereq, status);
+-}
+-
+-static void mv_cesa_skcipher_step(struct crypto_async_request *req)
+-{
+-	struct skcipher_request *skreq = skcipher_request_cast(req);
+-	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(skreq);
+-
+-	if (mv_cesa_req_get_type(&creq->base) == CESA_DMA_REQ)
+-		mv_cesa_dma_step(&creq->base);
+-	else
+-		mv_cesa_skcipher_std_step(skreq);
+-}
+-
+-static inline void
+-mv_cesa_skcipher_dma_prepare(struct skcipher_request *req)
+-{
+-	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(req);
+-	struct mv_cesa_req *basereq = &creq->base;
+-
+-	mv_cesa_dma_prepare(basereq, basereq->engine);
+-}
+-
+-static inline void
+-mv_cesa_skcipher_std_prepare(struct skcipher_request *req)
+-{
+-	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(req);
+-	struct mv_cesa_skcipher_std_req *sreq = &creq->std;
+-
+-	sreq->size = 0;
+-	sreq->offset = 0;
+-}
+-
+-static inline void mv_cesa_skcipher_prepare(struct crypto_async_request *req,
+-					    struct mv_cesa_engine *engine)
+-{
+-	struct skcipher_request *skreq = skcipher_request_cast(req);
+-	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(skreq);
+-	creq->base.engine = engine;
+-
+-	if (mv_cesa_req_get_type(&creq->base) == CESA_DMA_REQ)
+-		mv_cesa_skcipher_dma_prepare(skreq);
+-	else
+-		mv_cesa_skcipher_std_prepare(skreq);
+-}
+-
+-static inline void
+-mv_cesa_skcipher_req_cleanup(struct crypto_async_request *req)
+-{
+-	struct skcipher_request *skreq = skcipher_request_cast(req);
+-
+-	mv_cesa_skcipher_cleanup(skreq);
+-}
+-
+-static void
+-mv_cesa_skcipher_complete(struct crypto_async_request *req)
+-{
+-	struct skcipher_request *skreq = skcipher_request_cast(req);
+-	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(skreq);
+-	struct mv_cesa_engine *engine = creq->base.engine;
+-	unsigned int ivsize;
+-
+-	atomic_sub(skreq->cryptlen, &engine->load);
+-	ivsize = crypto_skcipher_ivsize(crypto_skcipher_reqtfm(skreq));
+-
+-	if (mv_cesa_req_get_type(&creq->base) == CESA_DMA_REQ) {
+-		struct mv_cesa_req *basereq;
+-
+-		basereq = &creq->base;
+-		memcpy(skreq->iv, basereq->chain.last->op->ctx.skcipher.iv,
+-		       ivsize);
+-	} else {
+-		memcpy_fromio(skreq->iv,
+-			      engine->sram + CESA_SA_CRYPT_IV_SRAM_OFFSET,
+-			      ivsize);
+-	}
+-}
+-
+-static const struct mv_cesa_req_ops mv_cesa_skcipher_req_ops = {
+-	.step = mv_cesa_skcipher_step,
+-	.process = mv_cesa_skcipher_process,
+-	.cleanup = mv_cesa_skcipher_req_cleanup,
+-	.complete = mv_cesa_skcipher_complete,
+-};
+-
+-static void mv_cesa_skcipher_cra_exit(struct crypto_tfm *tfm)
+-{
+-	void *ctx = crypto_tfm_ctx(tfm);
+-
+-	memzero_explicit(ctx, tfm->__crt_alg->cra_ctxsize);
+-}
+-
+-static int mv_cesa_skcipher_cra_init(struct crypto_tfm *tfm)
+-{
+-	struct mv_cesa_ctx *ctx = crypto_tfm_ctx(tfm);
+-
+-	ctx->ops = &mv_cesa_skcipher_req_ops;
+-
+-	crypto_skcipher_set_reqsize(__crypto_skcipher_cast(tfm),
+-				    sizeof(struct mv_cesa_skcipher_req));
+-
+-	return 0;
+-}
+-
+-static int mv_cesa_aes_setkey(struct crypto_skcipher *cipher, const u8 *key,
+-			      unsigned int len)
+-{
+-	struct crypto_tfm *tfm = crypto_skcipher_tfm(cipher);
+-	struct mv_cesa_aes_ctx *ctx = crypto_tfm_ctx(tfm);
+-	int remaining;
+-	int offset;
+-	int ret;
+-	int i;
+-
+-	ret = aes_expandkey(&ctx->aes, key, len);
+-	if (ret)
+-		return ret;
+-
+-	remaining = (ctx->aes.key_length - 16) / 4;
+-	offset = ctx->aes.key_length + 24 - remaining;
+-	for (i = 0; i < remaining; i++)
+-		ctx->aes.key_dec[4 + i] =
+-			cpu_to_le32(ctx->aes.key_enc[offset + i]);
+-
+-	return 0;
+-}
+-
+-static int mv_cesa_des_setkey(struct crypto_skcipher *cipher, const u8 *key,
+-			      unsigned int len)
+-{
+-	struct mv_cesa_des_ctx *ctx = crypto_skcipher_ctx(cipher);
+-	int err;
+-
+-	err = verify_skcipher_des_key(cipher, key);
+-	if (err)
+-		return err;
+-
+-	memcpy(ctx->key, key, DES_KEY_SIZE);
+-
+-	return 0;
+-}
+-
+-static int mv_cesa_des3_ede_setkey(struct crypto_skcipher *cipher,
+-				   const u8 *key, unsigned int len)
+-{
+-	struct mv_cesa_des_ctx *ctx = crypto_skcipher_ctx(cipher);
+-	int err;
+-
+-	err = verify_skcipher_des3_key(cipher, key);
+-	if (err)
+-		return err;
+-
+-	memcpy(ctx->key, key, DES3_EDE_KEY_SIZE);
+-
+-	return 0;
+-}
+-
+-static int mv_cesa_skcipher_dma_req_init(struct skcipher_request *req,
+-					 const struct mv_cesa_op_ctx *op_templ)
+-{
+-	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(req);
+-	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
+-		      GFP_KERNEL : GFP_ATOMIC;
+-	struct mv_cesa_req *basereq = &creq->base;
+-	struct mv_cesa_skcipher_dma_iter iter;
+-	bool skip_ctx = false;
+-	int ret;
+-
+-	basereq->chain.first = NULL;
+-	basereq->chain.last = NULL;
+-
+-	if (req->src != req->dst) {
+-		ret = dma_map_sg(cesa_dev->dev, req->src, creq->src_nents,
+-				 DMA_TO_DEVICE);
+-		if (!ret)
+-			return -ENOMEM;
+-
+-		ret = dma_map_sg(cesa_dev->dev, req->dst, creq->dst_nents,
+-				 DMA_FROM_DEVICE);
+-		if (!ret) {
+-			ret = -ENOMEM;
+-			goto err_unmap_src;
+-		}
+-	} else {
+-		ret = dma_map_sg(cesa_dev->dev, req->src, creq->src_nents,
+-				 DMA_BIDIRECTIONAL);
+-		if (!ret)
+-			return -ENOMEM;
+-	}
+-
+-	mv_cesa_tdma_desc_iter_init(&basereq->chain);
+-	mv_cesa_skcipher_req_iter_init(&iter, req);
+-
+-	do {
+-		struct mv_cesa_op_ctx *op;
+-
+-		op = mv_cesa_dma_add_op(&basereq->chain, op_templ, skip_ctx, flags);
+-		if (IS_ERR(op)) {
+-			ret = PTR_ERR(op);
+-			goto err_free_tdma;
+-		}
+-		skip_ctx = true;
+-
+-		mv_cesa_set_crypt_op_len(op, iter.base.op_len);
+-
+-		/* Add input transfers */
+-		ret = mv_cesa_dma_add_op_transfers(&basereq->chain, &iter.base,
+-						   &iter.src, flags);
+-		if (ret)
+-			goto err_free_tdma;
+-
+-		/* Add dummy desc to launch the crypto operation */
+-		ret = mv_cesa_dma_add_dummy_launch(&basereq->chain, flags);
+-		if (ret)
+-			goto err_free_tdma;
+-
+-		/* Add output transfers */
+-		ret = mv_cesa_dma_add_op_transfers(&basereq->chain, &iter.base,
+-						   &iter.dst, flags);
+-		if (ret)
+-			goto err_free_tdma;
+-
+-	} while (mv_cesa_skcipher_req_iter_next_op(&iter));
+-
+-	/* Add output data for IV */
+-	ret = mv_cesa_dma_add_result_op(&basereq->chain, CESA_SA_CFG_SRAM_OFFSET,
+-				    CESA_SA_DATA_SRAM_OFFSET,
+-				    CESA_TDMA_SRC_IN_SRAM, flags);
+-
+-	if (ret)
+-		goto err_free_tdma;
+-
+-	basereq->chain.last->flags |= CESA_TDMA_END_OF_REQ;
+-
+-	return 0;
+-
+-err_free_tdma:
+-	mv_cesa_dma_cleanup(basereq);
+-	if (req->dst != req->src)
+-		dma_unmap_sg(cesa_dev->dev, req->dst, creq->dst_nents,
+-			     DMA_FROM_DEVICE);
+-
+-err_unmap_src:
+-	dma_unmap_sg(cesa_dev->dev, req->src, creq->src_nents,
+-		     req->dst != req->src ? DMA_TO_DEVICE : DMA_BIDIRECTIONAL);
+-
+-	return ret;
+-}
+-
+-static inline int
+-mv_cesa_skcipher_std_req_init(struct skcipher_request *req,
+-			      const struct mv_cesa_op_ctx *op_templ)
+-{
+-	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(req);
+-	struct mv_cesa_skcipher_std_req *sreq = &creq->std;
+-	struct mv_cesa_req *basereq = &creq->base;
+-
+-	sreq->op = *op_templ;
+-	sreq->skip_ctx = false;
+-	basereq->chain.first = NULL;
+-	basereq->chain.last = NULL;
+-
+-	return 0;
+-}
+-
+-static int mv_cesa_skcipher_req_init(struct skcipher_request *req,
+-				     struct mv_cesa_op_ctx *tmpl)
+-{
+-	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(req);
+-	struct crypto_skcipher *tfm = crypto_skcipher_reqtfm(req);
+-	unsigned int blksize = crypto_skcipher_blocksize(tfm);
+-	int ret;
+-
+-	if (!IS_ALIGNED(req->cryptlen, blksize))
+-		return -EINVAL;
+-
+-	creq->src_nents = sg_nents_for_len(req->src, req->cryptlen);
+-	if (creq->src_nents < 0) {
+-		dev_err(cesa_dev->dev, "Invalid number of src SG");
+-		return creq->src_nents;
+-	}
+-	creq->dst_nents = sg_nents_for_len(req->dst, req->cryptlen);
+-	if (creq->dst_nents < 0) {
+-		dev_err(cesa_dev->dev, "Invalid number of dst SG");
+-		return creq->dst_nents;
+-	}
+-
+-	mv_cesa_update_op_cfg(tmpl, CESA_SA_DESC_CFG_OP_CRYPT_ONLY,
+-			      CESA_SA_DESC_CFG_OP_MSK);
+-
+-	if (cesa_dev->caps->has_tdma)
+-		ret = mv_cesa_skcipher_dma_req_init(req, tmpl);
+-	else
+-		ret = mv_cesa_skcipher_std_req_init(req, tmpl);
+-
+-	return ret;
+-}
+-
+-static int mv_cesa_skcipher_queue_req(struct skcipher_request *req,
+-				      struct mv_cesa_op_ctx *tmpl)
+-{
+-	int ret;
+-	struct mv_cesa_skcipher_req *creq = skcipher_request_ctx(req);
+-	struct mv_cesa_engine *engine;
+-
+-	ret = mv_cesa_skcipher_req_init(req, tmpl);
+-	if (ret)
+-		return ret;
+-
+-	engine = mv_cesa_select_engine(req->cryptlen);
+-	mv_cesa_skcipher_prepare(&req->base, engine);
+-
+-	ret = mv_cesa_queue_req(&req->base, &creq->base);
+-
+-	if (mv_cesa_req_needs_cleanup(&req->base, ret))
+-		mv_cesa_skcipher_cleanup(req);
+-
+-	return ret;
+-}
+-
+-static int mv_cesa_des_op(struct skcipher_request *req,
+-			  struct mv_cesa_op_ctx *tmpl)
+-{
+-	struct mv_cesa_des_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
+-
+-	mv_cesa_update_op_cfg(tmpl, CESA_SA_DESC_CFG_CRYPTM_DES,
+-			      CESA_SA_DESC_CFG_CRYPTM_MSK);
+-
+-	memcpy(tmpl->ctx.skcipher.key, ctx->key, DES_KEY_SIZE);
+-
+-	return mv_cesa_skcipher_queue_req(req, tmpl);
+-}
+-
+-static int mv_cesa_ecb_des_encrypt(struct skcipher_request *req)
+-{
+-	struct mv_cesa_op_ctx tmpl;
+-
+-	mv_cesa_set_op_cfg(&tmpl,
+-			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
+-			   CESA_SA_DESC_CFG_DIR_ENC);
+-
+-	return mv_cesa_des_op(req, &tmpl);
+-}
+-
+-static int mv_cesa_ecb_des_decrypt(struct skcipher_request *req)
+-{
+-	struct mv_cesa_op_ctx tmpl;
+-
+-	mv_cesa_set_op_cfg(&tmpl,
+-			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
+-			   CESA_SA_DESC_CFG_DIR_DEC);
+-
+-	return mv_cesa_des_op(req, &tmpl);
+-}
+-
+-struct skcipher_alg mv_cesa_ecb_des_alg = {
+-	.setkey = mv_cesa_des_setkey,
+-	.encrypt = mv_cesa_ecb_des_encrypt,
+-	.decrypt = mv_cesa_ecb_des_decrypt,
+-	.min_keysize = DES_KEY_SIZE,
+-	.max_keysize = DES_KEY_SIZE,
+-	.base = {
+-		.cra_name = "ecb(des)",
+-		.cra_driver_name = "mv-ecb-des",
+-		.cra_priority = 300,
+-		.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
+-		.cra_blocksize = DES_BLOCK_SIZE,
+-		.cra_ctxsize = sizeof(struct mv_cesa_des_ctx),
+-		.cra_alignmask = 0,
+-		.cra_module = THIS_MODULE,
+-		.cra_init = mv_cesa_skcipher_cra_init,
+-		.cra_exit = mv_cesa_skcipher_cra_exit,
+-	},
+-};
+-
+-static int mv_cesa_cbc_des_op(struct skcipher_request *req,
+-			      struct mv_cesa_op_ctx *tmpl)
+-{
+-	mv_cesa_update_op_cfg(tmpl, CESA_SA_DESC_CFG_CRYPTCM_CBC,
+-			      CESA_SA_DESC_CFG_CRYPTCM_MSK);
+-
+-	memcpy(tmpl->ctx.skcipher.iv, req->iv, DES_BLOCK_SIZE);
+-
+-	return mv_cesa_des_op(req, tmpl);
+-}
+-
+-static int mv_cesa_cbc_des_encrypt(struct skcipher_request *req)
+-{
+-	struct mv_cesa_op_ctx tmpl;
+-
+-	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_DIR_ENC);
+-
+-	return mv_cesa_cbc_des_op(req, &tmpl);
+-}
+-
+-static int mv_cesa_cbc_des_decrypt(struct skcipher_request *req)
+-{
+-	struct mv_cesa_op_ctx tmpl;
+-
+-	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_DIR_DEC);
+-
+-	return mv_cesa_cbc_des_op(req, &tmpl);
+-}
+-
+-struct skcipher_alg mv_cesa_cbc_des_alg = {
+-	.setkey = mv_cesa_des_setkey,
+-	.encrypt = mv_cesa_cbc_des_encrypt,
+-	.decrypt = mv_cesa_cbc_des_decrypt,
+-	.min_keysize = DES_KEY_SIZE,
+-	.max_keysize = DES_KEY_SIZE,
+-	.ivsize = DES_BLOCK_SIZE,
+-	.base = {
+-		.cra_name = "cbc(des)",
+-		.cra_driver_name = "mv-cbc-des",
+-		.cra_priority = 300,
+-		.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
+-		.cra_blocksize = DES_BLOCK_SIZE,
+-		.cra_ctxsize = sizeof(struct mv_cesa_des_ctx),
+-		.cra_alignmask = 0,
+-		.cra_module = THIS_MODULE,
+-		.cra_init = mv_cesa_skcipher_cra_init,
+-		.cra_exit = mv_cesa_skcipher_cra_exit,
+-	},
+-};
+-
+-static int mv_cesa_des3_op(struct skcipher_request *req,
+-			   struct mv_cesa_op_ctx *tmpl)
+-{
+-	struct mv_cesa_des3_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
+-
+-	mv_cesa_update_op_cfg(tmpl, CESA_SA_DESC_CFG_CRYPTM_3DES,
+-			      CESA_SA_DESC_CFG_CRYPTM_MSK);
+-
+-	memcpy(tmpl->ctx.skcipher.key, ctx->key, DES3_EDE_KEY_SIZE);
+-
+-	return mv_cesa_skcipher_queue_req(req, tmpl);
+-}
+-
+-static int mv_cesa_ecb_des3_ede_encrypt(struct skcipher_request *req)
+-{
+-	struct mv_cesa_op_ctx tmpl;
+-
+-	mv_cesa_set_op_cfg(&tmpl,
+-			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
+-			   CESA_SA_DESC_CFG_3DES_EDE |
+-			   CESA_SA_DESC_CFG_DIR_ENC);
+-
+-	return mv_cesa_des3_op(req, &tmpl);
+-}
+-
+-static int mv_cesa_ecb_des3_ede_decrypt(struct skcipher_request *req)
+-{
+-	struct mv_cesa_op_ctx tmpl;
+-
+-	mv_cesa_set_op_cfg(&tmpl,
+-			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
+-			   CESA_SA_DESC_CFG_3DES_EDE |
+-			   CESA_SA_DESC_CFG_DIR_DEC);
+-
+-	return mv_cesa_des3_op(req, &tmpl);
+-}
+-
+-struct skcipher_alg mv_cesa_ecb_des3_ede_alg = {
+-	.setkey = mv_cesa_des3_ede_setkey,
+-	.encrypt = mv_cesa_ecb_des3_ede_encrypt,
+-	.decrypt = mv_cesa_ecb_des3_ede_decrypt,
+-	.min_keysize = DES3_EDE_KEY_SIZE,
+-	.max_keysize = DES3_EDE_KEY_SIZE,
+-	.ivsize = DES3_EDE_BLOCK_SIZE,
+-	.base = {
+-		.cra_name = "ecb(des3_ede)",
+-		.cra_driver_name = "mv-ecb-des3-ede",
+-		.cra_priority = 300,
+-		.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
+-		.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+-		.cra_ctxsize = sizeof(struct mv_cesa_des3_ctx),
+-		.cra_alignmask = 0,
+-		.cra_module = THIS_MODULE,
+-		.cra_init = mv_cesa_skcipher_cra_init,
+-		.cra_exit = mv_cesa_skcipher_cra_exit,
+-	},
+-};
+-
+-static int mv_cesa_cbc_des3_op(struct skcipher_request *req,
+-			       struct mv_cesa_op_ctx *tmpl)
+-{
+-	memcpy(tmpl->ctx.skcipher.iv, req->iv, DES3_EDE_BLOCK_SIZE);
+-
+-	return mv_cesa_des3_op(req, tmpl);
+-}
+-
+-static int mv_cesa_cbc_des3_ede_encrypt(struct skcipher_request *req)
+-{
+-	struct mv_cesa_op_ctx tmpl;
+-
+-	mv_cesa_set_op_cfg(&tmpl,
+-			   CESA_SA_DESC_CFG_CRYPTCM_CBC |
+-			   CESA_SA_DESC_CFG_3DES_EDE |
+-			   CESA_SA_DESC_CFG_DIR_ENC);
+-
+-	return mv_cesa_cbc_des3_op(req, &tmpl);
+-}
+-
+-static int mv_cesa_cbc_des3_ede_decrypt(struct skcipher_request *req)
+-{
+-	struct mv_cesa_op_ctx tmpl;
+-
+-	mv_cesa_set_op_cfg(&tmpl,
+-			   CESA_SA_DESC_CFG_CRYPTCM_CBC |
+-			   CESA_SA_DESC_CFG_3DES_EDE |
+-			   CESA_SA_DESC_CFG_DIR_DEC);
+-
+-	return mv_cesa_cbc_des3_op(req, &tmpl);
+-}
+-
+-struct skcipher_alg mv_cesa_cbc_des3_ede_alg = {
+-	.setkey = mv_cesa_des3_ede_setkey,
+-	.encrypt = mv_cesa_cbc_des3_ede_encrypt,
+-	.decrypt = mv_cesa_cbc_des3_ede_decrypt,
+-	.min_keysize = DES3_EDE_KEY_SIZE,
+-	.max_keysize = DES3_EDE_KEY_SIZE,
+-	.ivsize = DES3_EDE_BLOCK_SIZE,
+-	.base = {
+-		.cra_name = "cbc(des3_ede)",
+-		.cra_driver_name = "mv-cbc-des3-ede",
+-		.cra_priority = 300,
+-		.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
+-		.cra_blocksize = DES3_EDE_BLOCK_SIZE,
+-		.cra_ctxsize = sizeof(struct mv_cesa_des3_ctx),
+-		.cra_alignmask = 0,
+-		.cra_module = THIS_MODULE,
+-		.cra_init = mv_cesa_skcipher_cra_init,
+-		.cra_exit = mv_cesa_skcipher_cra_exit,
+-	},
+-};
+-
+-static int mv_cesa_aes_op(struct skcipher_request *req,
+-			  struct mv_cesa_op_ctx *tmpl)
+-{
+-	struct mv_cesa_aes_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
+-	int i;
+-	u32 *key;
+-	u32 cfg;
+-
+-	cfg = CESA_SA_DESC_CFG_CRYPTM_AES;
+-
+-	if (mv_cesa_get_op_cfg(tmpl) & CESA_SA_DESC_CFG_DIR_DEC)
+-		key = ctx->aes.key_dec;
+-	else
+-		key = ctx->aes.key_enc;
+-
+-	for (i = 0; i < ctx->aes.key_length / sizeof(u32); i++)
+-		tmpl->ctx.skcipher.key[i] = cpu_to_le32(key[i]);
+-
+-	if (ctx->aes.key_length == 24)
+-		cfg |= CESA_SA_DESC_CFG_AES_LEN_192;
+-	else if (ctx->aes.key_length == 32)
+-		cfg |= CESA_SA_DESC_CFG_AES_LEN_256;
+-
+-	mv_cesa_update_op_cfg(tmpl, cfg,
+-			      CESA_SA_DESC_CFG_CRYPTM_MSK |
+-			      CESA_SA_DESC_CFG_AES_LEN_MSK);
+-
+-	return mv_cesa_skcipher_queue_req(req, tmpl);
+-}
+-
+-static int mv_cesa_ecb_aes_encrypt(struct skcipher_request *req)
+-{
+-	struct mv_cesa_op_ctx tmpl;
+-
+-	mv_cesa_set_op_cfg(&tmpl,
+-			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
+-			   CESA_SA_DESC_CFG_DIR_ENC);
+-
+-	return mv_cesa_aes_op(req, &tmpl);
+-}
+-
+-static int mv_cesa_ecb_aes_decrypt(struct skcipher_request *req)
+-{
+-	struct mv_cesa_op_ctx tmpl;
+-
+-	mv_cesa_set_op_cfg(&tmpl,
+-			   CESA_SA_DESC_CFG_CRYPTCM_ECB |
+-			   CESA_SA_DESC_CFG_DIR_DEC);
+-
+-	return mv_cesa_aes_op(req, &tmpl);
+-}
+-
+-struct skcipher_alg mv_cesa_ecb_aes_alg = {
+-	.setkey = mv_cesa_aes_setkey,
+-	.encrypt = mv_cesa_ecb_aes_encrypt,
+-	.decrypt = mv_cesa_ecb_aes_decrypt,
+-	.min_keysize = AES_MIN_KEY_SIZE,
+-	.max_keysize = AES_MAX_KEY_SIZE,
+-	.base = {
+-		.cra_name = "ecb(aes)",
+-		.cra_driver_name = "mv-ecb-aes",
+-		.cra_priority = 300,
+-		.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
+-		.cra_blocksize = AES_BLOCK_SIZE,
+-		.cra_ctxsize = sizeof(struct mv_cesa_aes_ctx),
+-		.cra_alignmask = 0,
+-		.cra_module = THIS_MODULE,
+-		.cra_init = mv_cesa_skcipher_cra_init,
+-		.cra_exit = mv_cesa_skcipher_cra_exit,
+-	},
+-};
+-
+-static int mv_cesa_cbc_aes_op(struct skcipher_request *req,
+-			      struct mv_cesa_op_ctx *tmpl)
+-{
+-	mv_cesa_update_op_cfg(tmpl, CESA_SA_DESC_CFG_CRYPTCM_CBC,
+-			      CESA_SA_DESC_CFG_CRYPTCM_MSK);
+-	memcpy(tmpl->ctx.skcipher.iv, req->iv, AES_BLOCK_SIZE);
+-
+-	return mv_cesa_aes_op(req, tmpl);
+-}
+-
+-static int mv_cesa_cbc_aes_encrypt(struct skcipher_request *req)
+-{
+-	struct mv_cesa_op_ctx tmpl;
+-
+-	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_DIR_ENC);
+-
+-	return mv_cesa_cbc_aes_op(req, &tmpl);
+-}
+-
+-static int mv_cesa_cbc_aes_decrypt(struct skcipher_request *req)
+-{
+-	struct mv_cesa_op_ctx tmpl;
+-
+-	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_DIR_DEC);
+-
+-	return mv_cesa_cbc_aes_op(req, &tmpl);
+-}
+-
+-struct skcipher_alg mv_cesa_cbc_aes_alg = {
+-	.setkey = mv_cesa_aes_setkey,
+-	.encrypt = mv_cesa_cbc_aes_encrypt,
+-	.decrypt = mv_cesa_cbc_aes_decrypt,
+-	.min_keysize = AES_MIN_KEY_SIZE,
+-	.max_keysize = AES_MAX_KEY_SIZE,
+-	.ivsize = AES_BLOCK_SIZE,
+-	.base = {
+-		.cra_name = "cbc(aes)",
+-		.cra_driver_name = "mv-cbc-aes",
+-		.cra_priority = 300,
+-		.cra_flags = CRYPTO_ALG_KERN_DRIVER_ONLY | CRYPTO_ALG_ASYNC,
+-		.cra_blocksize = AES_BLOCK_SIZE,
+-		.cra_ctxsize = sizeof(struct mv_cesa_aes_ctx),
+-		.cra_alignmask = 0,
+-		.cra_module = THIS_MODULE,
+-		.cra_init = mv_cesa_skcipher_cra_init,
+-		.cra_exit = mv_cesa_skcipher_cra_exit,
+-	},
+-};
+diff --git a/drivers/crypto/marvell/hash.c b/drivers/crypto/marvell/hash.c
+deleted file mode 100644
+index a2b35fb..0000000
+--- a/drivers/crypto/marvell/hash.c
++++ /dev/null
+@@ -1,1442 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-only
+-/*
+- * Hash algorithms supported by the CESA: MD5, SHA1 and SHA256.
+- *
+- * Author: Boris Brezillon <boris.brezillon@free-electrons.com>
+- * Author: Arnaud Ebalard <arno@natisbad.org>
+- *
+- * This work is based on an initial version written by
+- * Sebastian Andrzej Siewior < sebastian at breakpoint dot cc >
+- */
+-
+-#include <crypto/hmac.h>
+-#include <crypto/md5.h>
+-#include <crypto/sha.h>
+-
+-#include "cesa.h"
+-
+-struct mv_cesa_ahash_dma_iter {
+-	struct mv_cesa_dma_iter base;
+-	struct mv_cesa_sg_dma_iter src;
+-};
+-
+-static inline void
+-mv_cesa_ahash_req_iter_init(struct mv_cesa_ahash_dma_iter *iter,
+-			    struct ahash_request *req)
+-{
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
+-	unsigned int len = req->nbytes + creq->cache_ptr;
+-
+-	if (!creq->last_req)
+-		len &= ~CESA_HASH_BLOCK_SIZE_MSK;
+-
+-	mv_cesa_req_dma_iter_init(&iter->base, len);
+-	mv_cesa_sg_dma_iter_init(&iter->src, req->src, DMA_TO_DEVICE);
+-	iter->src.op_offset = creq->cache_ptr;
+-}
+-
+-static inline bool
+-mv_cesa_ahash_req_iter_next_op(struct mv_cesa_ahash_dma_iter *iter)
+-{
+-	iter->src.op_offset = 0;
+-
+-	return mv_cesa_req_dma_iter_next_op(&iter->base);
+-}
+-
+-static inline int
+-mv_cesa_ahash_dma_alloc_cache(struct mv_cesa_ahash_dma_req *req, gfp_t flags)
+-{
+-	req->cache = dma_pool_alloc(cesa_dev->dma->cache_pool, flags,
+-				    &req->cache_dma);
+-	if (!req->cache)
+-		return -ENOMEM;
+-
+-	return 0;
+-}
+-
+-static inline void
+-mv_cesa_ahash_dma_free_cache(struct mv_cesa_ahash_dma_req *req)
+-{
+-	if (!req->cache)
+-		return;
+-
+-	dma_pool_free(cesa_dev->dma->cache_pool, req->cache,
+-		      req->cache_dma);
+-}
+-
+-static int mv_cesa_ahash_dma_alloc_padding(struct mv_cesa_ahash_dma_req *req,
+-					   gfp_t flags)
+-{
+-	if (req->padding)
+-		return 0;
+-
+-	req->padding = dma_pool_alloc(cesa_dev->dma->padding_pool, flags,
+-				      &req->padding_dma);
+-	if (!req->padding)
+-		return -ENOMEM;
+-
+-	return 0;
+-}
+-
+-static void mv_cesa_ahash_dma_free_padding(struct mv_cesa_ahash_dma_req *req)
+-{
+-	if (!req->padding)
+-		return;
+-
+-	dma_pool_free(cesa_dev->dma->padding_pool, req->padding,
+-		      req->padding_dma);
+-	req->padding = NULL;
+-}
+-
+-static inline void mv_cesa_ahash_dma_last_cleanup(struct ahash_request *req)
+-{
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
+-
+-	mv_cesa_ahash_dma_free_padding(&creq->req.dma);
+-}
+-
+-static inline void mv_cesa_ahash_dma_cleanup(struct ahash_request *req)
+-{
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
+-
+-	dma_unmap_sg(cesa_dev->dev, req->src, creq->src_nents, DMA_TO_DEVICE);
+-	mv_cesa_ahash_dma_free_cache(&creq->req.dma);
+-	mv_cesa_dma_cleanup(&creq->base);
+-}
+-
+-static inline void mv_cesa_ahash_cleanup(struct ahash_request *req)
+-{
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
+-
+-	if (mv_cesa_req_get_type(&creq->base) == CESA_DMA_REQ)
+-		mv_cesa_ahash_dma_cleanup(req);
+-}
+-
+-static void mv_cesa_ahash_last_cleanup(struct ahash_request *req)
+-{
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
+-
+-	if (mv_cesa_req_get_type(&creq->base) == CESA_DMA_REQ)
+-		mv_cesa_ahash_dma_last_cleanup(req);
+-}
+-
+-static int mv_cesa_ahash_pad_len(struct mv_cesa_ahash_req *creq)
+-{
+-	unsigned int index, padlen;
+-
+-	index = creq->len & CESA_HASH_BLOCK_SIZE_MSK;
+-	padlen = (index < 56) ? (56 - index) : (64 + 56 - index);
+-
+-	return padlen;
+-}
+-
+-static int mv_cesa_ahash_pad_req(struct mv_cesa_ahash_req *creq, u8 *buf)
+-{
+-	unsigned int padlen;
+-
+-	buf[0] = 0x80;
+-	/* Pad out to 56 mod 64 */
+-	padlen = mv_cesa_ahash_pad_len(creq);
+-	memset(buf + 1, 0, padlen - 1);
+-
+-	if (creq->algo_le) {
+-		__le64 bits = cpu_to_le64(creq->len << 3);
+-		memcpy(buf + padlen, &bits, sizeof(bits));
+-	} else {
+-		__be64 bits = cpu_to_be64(creq->len << 3);
+-		memcpy(buf + padlen, &bits, sizeof(bits));
+-	}
+-
+-	return padlen + 8;
+-}
+-
+-static void mv_cesa_ahash_std_step(struct ahash_request *req)
+-{
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
+-	struct mv_cesa_ahash_std_req *sreq = &creq->req.std;
+-	struct mv_cesa_engine *engine = creq->base.engine;
+-	struct mv_cesa_op_ctx *op;
+-	unsigned int new_cache_ptr = 0;
+-	u32 frag_mode;
+-	size_t  len;
+-	unsigned int digsize;
+-	int i;
+-
+-	mv_cesa_adjust_op(engine, &creq->op_tmpl);
+-	memcpy_toio(engine->sram, &creq->op_tmpl, sizeof(creq->op_tmpl));
+-
+-	if (!sreq->offset) {
+-		digsize = crypto_ahash_digestsize(crypto_ahash_reqtfm(req));
+-		for (i = 0; i < digsize / 4; i++)
+-			writel_relaxed(creq->state[i], engine->regs + CESA_IVDIG(i));
+-	}
+-
+-	if (creq->cache_ptr)
+-		memcpy_toio(engine->sram + CESA_SA_DATA_SRAM_OFFSET,
+-			    creq->cache, creq->cache_ptr);
+-
+-	len = min_t(size_t, req->nbytes + creq->cache_ptr - sreq->offset,
+-		    CESA_SA_SRAM_PAYLOAD_SIZE);
+-
+-	if (!creq->last_req) {
+-		new_cache_ptr = len & CESA_HASH_BLOCK_SIZE_MSK;
+-		len &= ~CESA_HASH_BLOCK_SIZE_MSK;
+-	}
+-
+-	if (len - creq->cache_ptr)
+-		sreq->offset += sg_pcopy_to_buffer(req->src, creq->src_nents,
+-						   engine->sram +
+-						   CESA_SA_DATA_SRAM_OFFSET +
+-						   creq->cache_ptr,
+-						   len - creq->cache_ptr,
+-						   sreq->offset);
+-
+-	op = &creq->op_tmpl;
+-
+-	frag_mode = mv_cesa_get_op_cfg(op) & CESA_SA_DESC_CFG_FRAG_MSK;
+-
+-	if (creq->last_req && sreq->offset == req->nbytes &&
+-	    creq->len <= CESA_SA_DESC_MAC_SRC_TOTAL_LEN_MAX) {
+-		if (frag_mode == CESA_SA_DESC_CFG_FIRST_FRAG)
+-			frag_mode = CESA_SA_DESC_CFG_NOT_FRAG;
+-		else if (frag_mode == CESA_SA_DESC_CFG_MID_FRAG)
+-			frag_mode = CESA_SA_DESC_CFG_LAST_FRAG;
+-	}
+-
+-	if (frag_mode == CESA_SA_DESC_CFG_NOT_FRAG ||
+-	    frag_mode == CESA_SA_DESC_CFG_LAST_FRAG) {
+-		if (len &&
+-		    creq->len <= CESA_SA_DESC_MAC_SRC_TOTAL_LEN_MAX) {
+-			mv_cesa_set_mac_op_total_len(op, creq->len);
+-		} else {
+-			int trailerlen = mv_cesa_ahash_pad_len(creq) + 8;
+-
+-			if (len + trailerlen > CESA_SA_SRAM_PAYLOAD_SIZE) {
+-				len &= CESA_HASH_BLOCK_SIZE_MSK;
+-				new_cache_ptr = 64 - trailerlen;
+-				memcpy_fromio(creq->cache,
+-					      engine->sram +
+-					      CESA_SA_DATA_SRAM_OFFSET + len,
+-					      new_cache_ptr);
+-			} else {
+-				len += mv_cesa_ahash_pad_req(creq,
+-						engine->sram + len +
+-						CESA_SA_DATA_SRAM_OFFSET);
+-			}
+-
+-			if (frag_mode == CESA_SA_DESC_CFG_LAST_FRAG)
+-				frag_mode = CESA_SA_DESC_CFG_MID_FRAG;
+-			else
+-				frag_mode = CESA_SA_DESC_CFG_FIRST_FRAG;
+-		}
+-	}
+-
+-	mv_cesa_set_mac_op_frag_len(op, len);
+-	mv_cesa_update_op_cfg(op, frag_mode, CESA_SA_DESC_CFG_FRAG_MSK);
+-
+-	/* FIXME: only update enc_len field */
+-	memcpy_toio(engine->sram, op, sizeof(*op));
+-
+-	if (frag_mode == CESA_SA_DESC_CFG_FIRST_FRAG)
+-		mv_cesa_update_op_cfg(op, CESA_SA_DESC_CFG_MID_FRAG,
+-				      CESA_SA_DESC_CFG_FRAG_MSK);
+-
+-	creq->cache_ptr = new_cache_ptr;
+-
+-	mv_cesa_set_int_mask(engine, CESA_SA_INT_ACCEL0_DONE);
+-	writel_relaxed(CESA_SA_CFG_PARA_DIS, engine->regs + CESA_SA_CFG);
+-	BUG_ON(readl(engine->regs + CESA_SA_CMD) &
+-	       CESA_SA_CMD_EN_CESA_SA_ACCL0);
+-	writel(CESA_SA_CMD_EN_CESA_SA_ACCL0, engine->regs + CESA_SA_CMD);
+-}
+-
+-static int mv_cesa_ahash_std_process(struct ahash_request *req, u32 status)
+-{
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
+-	struct mv_cesa_ahash_std_req *sreq = &creq->req.std;
+-
+-	if (sreq->offset < (req->nbytes - creq->cache_ptr))
+-		return -EINPROGRESS;
+-
+-	return 0;
+-}
+-
+-static inline void mv_cesa_ahash_dma_prepare(struct ahash_request *req)
+-{
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
+-	struct mv_cesa_req *basereq = &creq->base;
+-
+-	mv_cesa_dma_prepare(basereq, basereq->engine);
+-}
+-
+-static void mv_cesa_ahash_std_prepare(struct ahash_request *req)
+-{
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
+-	struct mv_cesa_ahash_std_req *sreq = &creq->req.std;
+-
+-	sreq->offset = 0;
+-}
+-
+-static void mv_cesa_ahash_dma_step(struct ahash_request *req)
+-{
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
+-	struct mv_cesa_req *base = &creq->base;
+-
+-	/* We must explicitly set the digest state. */
+-	if (base->chain.first->flags & CESA_TDMA_SET_STATE) {
+-		struct mv_cesa_engine *engine = base->engine;
+-		int i;
+-
+-		/* Set the hash state in the IVDIG regs. */
+-		for (i = 0; i < ARRAY_SIZE(creq->state); i++)
+-			writel_relaxed(creq->state[i], engine->regs +
+-				       CESA_IVDIG(i));
+-	}
+-
+-	mv_cesa_dma_step(base);
+-}
+-
+-static void mv_cesa_ahash_step(struct crypto_async_request *req)
+-{
+-	struct ahash_request *ahashreq = ahash_request_cast(req);
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(ahashreq);
+-
+-	if (mv_cesa_req_get_type(&creq->base) == CESA_DMA_REQ)
+-		mv_cesa_ahash_dma_step(ahashreq);
+-	else
+-		mv_cesa_ahash_std_step(ahashreq);
+-}
+-
+-static int mv_cesa_ahash_process(struct crypto_async_request *req, u32 status)
+-{
+-	struct ahash_request *ahashreq = ahash_request_cast(req);
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(ahashreq);
+-
+-	if (mv_cesa_req_get_type(&creq->base) == CESA_DMA_REQ)
+-		return mv_cesa_dma_process(&creq->base, status);
+-
+-	return mv_cesa_ahash_std_process(ahashreq, status);
+-}
+-
+-static void mv_cesa_ahash_complete(struct crypto_async_request *req)
+-{
+-	struct ahash_request *ahashreq = ahash_request_cast(req);
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(ahashreq);
+-	struct mv_cesa_engine *engine = creq->base.engine;
+-	unsigned int digsize;
+-	int i;
+-
+-	digsize = crypto_ahash_digestsize(crypto_ahash_reqtfm(ahashreq));
+-
+-	if (mv_cesa_req_get_type(&creq->base) == CESA_DMA_REQ &&
+-	    (creq->base.chain.last->flags & CESA_TDMA_TYPE_MSK) == CESA_TDMA_RESULT) {
+-		__le32 *data = NULL;
+-
+-		/*
+-		 * Result is already in the correct endianess when the SA is
+-		 * used
+-		 */
+-		data = creq->base.chain.last->op->ctx.hash.hash;
+-		for (i = 0; i < digsize / 4; i++)
+-			creq->state[i] = cpu_to_le32(data[i]);
+-
+-		memcpy(ahashreq->result, data, digsize);
+-	} else {
+-		for (i = 0; i < digsize / 4; i++)
+-			creq->state[i] = readl_relaxed(engine->regs +
+-						       CESA_IVDIG(i));
+-		if (creq->last_req) {
+-			/*
+-			* Hardware's MD5 digest is in little endian format, but
+-			* SHA in big endian format
+-			*/
+-			if (creq->algo_le) {
+-				__le32 *result = (void *)ahashreq->result;
+-
+-				for (i = 0; i < digsize / 4; i++)
+-					result[i] = cpu_to_le32(creq->state[i]);
+-			} else {
+-				__be32 *result = (void *)ahashreq->result;
+-
+-				for (i = 0; i < digsize / 4; i++)
+-					result[i] = cpu_to_be32(creq->state[i]);
+-			}
+-		}
+-	}
+-
+-	atomic_sub(ahashreq->nbytes, &engine->load);
+-}
+-
+-static void mv_cesa_ahash_prepare(struct crypto_async_request *req,
+-				  struct mv_cesa_engine *engine)
+-{
+-	struct ahash_request *ahashreq = ahash_request_cast(req);
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(ahashreq);
+-
+-	creq->base.engine = engine;
+-
+-	if (mv_cesa_req_get_type(&creq->base) == CESA_DMA_REQ)
+-		mv_cesa_ahash_dma_prepare(ahashreq);
+-	else
+-		mv_cesa_ahash_std_prepare(ahashreq);
+-}
+-
+-static void mv_cesa_ahash_req_cleanup(struct crypto_async_request *req)
+-{
+-	struct ahash_request *ahashreq = ahash_request_cast(req);
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(ahashreq);
+-
+-	if (creq->last_req)
+-		mv_cesa_ahash_last_cleanup(ahashreq);
+-
+-	mv_cesa_ahash_cleanup(ahashreq);
+-
+-	if (creq->cache_ptr)
+-		sg_pcopy_to_buffer(ahashreq->src, creq->src_nents,
+-				   creq->cache,
+-				   creq->cache_ptr,
+-				   ahashreq->nbytes - creq->cache_ptr);
+-}
+-
+-static const struct mv_cesa_req_ops mv_cesa_ahash_req_ops = {
+-	.step = mv_cesa_ahash_step,
+-	.process = mv_cesa_ahash_process,
+-	.cleanup = mv_cesa_ahash_req_cleanup,
+-	.complete = mv_cesa_ahash_complete,
+-};
+-
+-static void mv_cesa_ahash_init(struct ahash_request *req,
+-			      struct mv_cesa_op_ctx *tmpl, bool algo_le)
+-{
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
+-
+-	memset(creq, 0, sizeof(*creq));
+-	mv_cesa_update_op_cfg(tmpl,
+-			      CESA_SA_DESC_CFG_OP_MAC_ONLY |
+-			      CESA_SA_DESC_CFG_FIRST_FRAG,
+-			      CESA_SA_DESC_CFG_OP_MSK |
+-			      CESA_SA_DESC_CFG_FRAG_MSK);
+-	mv_cesa_set_mac_op_total_len(tmpl, 0);
+-	mv_cesa_set_mac_op_frag_len(tmpl, 0);
+-	creq->op_tmpl = *tmpl;
+-	creq->len = 0;
+-	creq->algo_le = algo_le;
+-}
+-
+-static inline int mv_cesa_ahash_cra_init(struct crypto_tfm *tfm)
+-{
+-	struct mv_cesa_hash_ctx *ctx = crypto_tfm_ctx(tfm);
+-
+-	ctx->base.ops = &mv_cesa_ahash_req_ops;
+-
+-	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
+-				 sizeof(struct mv_cesa_ahash_req));
+-	return 0;
+-}
+-
+-static bool mv_cesa_ahash_cache_req(struct ahash_request *req)
+-{
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
+-	bool cached = false;
+-
+-	if (creq->cache_ptr + req->nbytes < CESA_MAX_HASH_BLOCK_SIZE && !creq->last_req) {
+-		cached = true;
+-
+-		if (!req->nbytes)
+-			return cached;
+-
+-		sg_pcopy_to_buffer(req->src, creq->src_nents,
+-				   creq->cache + creq->cache_ptr,
+-				   req->nbytes, 0);
+-
+-		creq->cache_ptr += req->nbytes;
+-	}
+-
+-	return cached;
+-}
+-
+-static struct mv_cesa_op_ctx *
+-mv_cesa_dma_add_frag(struct mv_cesa_tdma_chain *chain,
+-		     struct mv_cesa_op_ctx *tmpl, unsigned int frag_len,
+-		     gfp_t flags)
+-{
+-	struct mv_cesa_op_ctx *op;
+-	int ret;
+-
+-	op = mv_cesa_dma_add_op(chain, tmpl, false, flags);
+-	if (IS_ERR(op))
+-		return op;
+-
+-	/* Set the operation block fragment length. */
+-	mv_cesa_set_mac_op_frag_len(op, frag_len);
+-
+-	/* Append dummy desc to launch operation */
+-	ret = mv_cesa_dma_add_dummy_launch(chain, flags);
+-	if (ret)
+-		return ERR_PTR(ret);
+-
+-	if (mv_cesa_mac_op_is_first_frag(tmpl))
+-		mv_cesa_update_op_cfg(tmpl,
+-				      CESA_SA_DESC_CFG_MID_FRAG,
+-				      CESA_SA_DESC_CFG_FRAG_MSK);
+-
+-	return op;
+-}
+-
+-static int
+-mv_cesa_ahash_dma_add_cache(struct mv_cesa_tdma_chain *chain,
+-			    struct mv_cesa_ahash_req *creq,
+-			    gfp_t flags)
+-{
+-	struct mv_cesa_ahash_dma_req *ahashdreq = &creq->req.dma;
+-	int ret;
+-
+-	if (!creq->cache_ptr)
+-		return 0;
+-
+-	ret = mv_cesa_ahash_dma_alloc_cache(ahashdreq, flags);
+-	if (ret)
+-		return ret;
+-
+-	memcpy(ahashdreq->cache, creq->cache, creq->cache_ptr);
+-
+-	return mv_cesa_dma_add_data_transfer(chain,
+-					     CESA_SA_DATA_SRAM_OFFSET,
+-					     ahashdreq->cache_dma,
+-					     creq->cache_ptr,
+-					     CESA_TDMA_DST_IN_SRAM,
+-					     flags);
+-}
+-
+-static struct mv_cesa_op_ctx *
+-mv_cesa_ahash_dma_last_req(struct mv_cesa_tdma_chain *chain,
+-			   struct mv_cesa_ahash_dma_iter *dma_iter,
+-			   struct mv_cesa_ahash_req *creq,
+-			   unsigned int frag_len, gfp_t flags)
+-{
+-	struct mv_cesa_ahash_dma_req *ahashdreq = &creq->req.dma;
+-	unsigned int len, trailerlen, padoff = 0;
+-	struct mv_cesa_op_ctx *op;
+-	int ret;
+-
+-	/*
+-	 * If the transfer is smaller than our maximum length, and we have
+-	 * some data outstanding, we can ask the engine to finish the hash.
+-	 */
+-	if (creq->len <= CESA_SA_DESC_MAC_SRC_TOTAL_LEN_MAX && frag_len) {
+-		op = mv_cesa_dma_add_frag(chain, &creq->op_tmpl, frag_len,
+-					  flags);
+-		if (IS_ERR(op))
+-			return op;
+-
+-		mv_cesa_set_mac_op_total_len(op, creq->len);
+-		mv_cesa_update_op_cfg(op, mv_cesa_mac_op_is_first_frag(op) ?
+-						CESA_SA_DESC_CFG_NOT_FRAG :
+-						CESA_SA_DESC_CFG_LAST_FRAG,
+-				      CESA_SA_DESC_CFG_FRAG_MSK);
+-
+-		ret = mv_cesa_dma_add_result_op(chain,
+-						CESA_SA_CFG_SRAM_OFFSET,
+-						CESA_SA_DATA_SRAM_OFFSET,
+-						CESA_TDMA_SRC_IN_SRAM, flags);
+-		if (ret)
+-			return ERR_PTR(-ENOMEM);
+-		return op;
+-	}
+-
+-	/*
+-	 * The request is longer than the engine can handle, or we have
+-	 * no data outstanding. Manually generate the padding, adding it
+-	 * as a "mid" fragment.
+-	 */
+-	ret = mv_cesa_ahash_dma_alloc_padding(ahashdreq, flags);
+-	if (ret)
+-		return ERR_PTR(ret);
+-
+-	trailerlen = mv_cesa_ahash_pad_req(creq, ahashdreq->padding);
+-
+-	len = min(CESA_SA_SRAM_PAYLOAD_SIZE - frag_len, trailerlen);
+-	if (len) {
+-		ret = mv_cesa_dma_add_data_transfer(chain,
+-						CESA_SA_DATA_SRAM_OFFSET +
+-						frag_len,
+-						ahashdreq->padding_dma,
+-						len, CESA_TDMA_DST_IN_SRAM,
+-						flags);
+-		if (ret)
+-			return ERR_PTR(ret);
+-
+-		op = mv_cesa_dma_add_frag(chain, &creq->op_tmpl, frag_len + len,
+-					  flags);
+-		if (IS_ERR(op))
+-			return op;
+-
+-		if (len == trailerlen)
+-			return op;
+-
+-		padoff += len;
+-	}
+-
+-	ret = mv_cesa_dma_add_data_transfer(chain,
+-					    CESA_SA_DATA_SRAM_OFFSET,
+-					    ahashdreq->padding_dma +
+-					    padoff,
+-					    trailerlen - padoff,
+-					    CESA_TDMA_DST_IN_SRAM,
+-					    flags);
+-	if (ret)
+-		return ERR_PTR(ret);
+-
+-	return mv_cesa_dma_add_frag(chain, &creq->op_tmpl, trailerlen - padoff,
+-				    flags);
+-}
+-
+-static int mv_cesa_ahash_dma_req_init(struct ahash_request *req)
+-{
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
+-	gfp_t flags = (req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP) ?
+-		      GFP_KERNEL : GFP_ATOMIC;
+-	struct mv_cesa_req *basereq = &creq->base;
+-	struct mv_cesa_ahash_dma_iter iter;
+-	struct mv_cesa_op_ctx *op = NULL;
+-	unsigned int frag_len;
+-	bool set_state = false;
+-	int ret;
+-	u32 type;
+-
+-	basereq->chain.first = NULL;
+-	basereq->chain.last = NULL;
+-
+-	if (!mv_cesa_mac_op_is_first_frag(&creq->op_tmpl))
+-		set_state = true;
+-
+-	if (creq->src_nents) {
+-		ret = dma_map_sg(cesa_dev->dev, req->src, creq->src_nents,
+-				 DMA_TO_DEVICE);
+-		if (!ret) {
+-			ret = -ENOMEM;
+-			goto err;
+-		}
+-	}
+-
+-	mv_cesa_tdma_desc_iter_init(&basereq->chain);
+-	mv_cesa_ahash_req_iter_init(&iter, req);
+-
+-	/*
+-	 * Add the cache (left-over data from a previous block) first.
+-	 * This will never overflow the SRAM size.
+-	 */
+-	ret = mv_cesa_ahash_dma_add_cache(&basereq->chain, creq, flags);
+-	if (ret)
+-		goto err_free_tdma;
+-
+-	if (iter.src.sg) {
+-		/*
+-		 * Add all the new data, inserting an operation block and
+-		 * launch command between each full SRAM block-worth of
+-		 * data. We intentionally do not add the final op block.
+-		 */
+-		while (true) {
+-			ret = mv_cesa_dma_add_op_transfers(&basereq->chain,
+-							   &iter.base,
+-							   &iter.src, flags);
+-			if (ret)
+-				goto err_free_tdma;
+-
+-			frag_len = iter.base.op_len;
+-
+-			if (!mv_cesa_ahash_req_iter_next_op(&iter))
+-				break;
+-
+-			op = mv_cesa_dma_add_frag(&basereq->chain, &creq->op_tmpl,
+-						  frag_len, flags);
+-			if (IS_ERR(op)) {
+-				ret = PTR_ERR(op);
+-				goto err_free_tdma;
+-			}
+-		}
+-	} else {
+-		/* Account for the data that was in the cache. */
+-		frag_len = iter.base.op_len;
+-	}
+-
+-	/*
+-	 * At this point, frag_len indicates whether we have any data
+-	 * outstanding which needs an operation.  Queue up the final
+-	 * operation, which depends whether this is the final request.
+-	 */
+-	if (creq->last_req)
+-		op = mv_cesa_ahash_dma_last_req(&basereq->chain, &iter, creq,
+-						frag_len, flags);
+-	else if (frag_len)
+-		op = mv_cesa_dma_add_frag(&basereq->chain, &creq->op_tmpl,
+-					  frag_len, flags);
+-
+-	if (IS_ERR(op)) {
+-		ret = PTR_ERR(op);
+-		goto err_free_tdma;
+-	}
+-
+-	/*
+-	 * If results are copied via DMA, this means that this
+-	 * request can be directly processed by the engine,
+-	 * without partial updates. So we can chain it at the
+-	 * DMA level with other requests.
+-	 */
+-	type = basereq->chain.last->flags & CESA_TDMA_TYPE_MSK;
+-
+-	if (op && type != CESA_TDMA_RESULT) {
+-		/* Add dummy desc to wait for crypto operation end */
+-		ret = mv_cesa_dma_add_dummy_end(&basereq->chain, flags);
+-		if (ret)
+-			goto err_free_tdma;
+-	}
+-
+-	if (!creq->last_req)
+-		creq->cache_ptr = req->nbytes + creq->cache_ptr -
+-				  iter.base.len;
+-	else
+-		creq->cache_ptr = 0;
+-
+-	basereq->chain.last->flags |= CESA_TDMA_END_OF_REQ;
+-
+-	if (type != CESA_TDMA_RESULT)
+-		basereq->chain.last->flags |= CESA_TDMA_BREAK_CHAIN;
+-
+-	if (set_state) {
+-		/*
+-		 * Put the CESA_TDMA_SET_STATE flag on the first tdma desc to
+-		 * let the step logic know that the IVDIG registers should be
+-		 * explicitly set before launching a TDMA chain.
+-		 */
+-		basereq->chain.first->flags |= CESA_TDMA_SET_STATE;
+-	}
+-
+-	return 0;
+-
+-err_free_tdma:
+-	mv_cesa_dma_cleanup(basereq);
+-	dma_unmap_sg(cesa_dev->dev, req->src, creq->src_nents, DMA_TO_DEVICE);
+-
+-err:
+-	mv_cesa_ahash_last_cleanup(req);
+-
+-	return ret;
+-}
+-
+-static int mv_cesa_ahash_req_init(struct ahash_request *req, bool *cached)
+-{
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
+-
+-	creq->src_nents = sg_nents_for_len(req->src, req->nbytes);
+-	if (creq->src_nents < 0) {
+-		dev_err(cesa_dev->dev, "Invalid number of src SG");
+-		return creq->src_nents;
+-	}
+-
+-	*cached = mv_cesa_ahash_cache_req(req);
+-
+-	if (*cached)
+-		return 0;
+-
+-	if (cesa_dev->caps->has_tdma)
+-		return mv_cesa_ahash_dma_req_init(req);
+-	else
+-		return 0;
+-}
+-
+-static int mv_cesa_ahash_queue_req(struct ahash_request *req)
+-{
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
+-	struct mv_cesa_engine *engine;
+-	bool cached = false;
+-	int ret;
+-
+-	ret = mv_cesa_ahash_req_init(req, &cached);
+-	if (ret)
+-		return ret;
+-
+-	if (cached)
+-		return 0;
+-
+-	engine = mv_cesa_select_engine(req->nbytes);
+-	mv_cesa_ahash_prepare(&req->base, engine);
+-
+-	ret = mv_cesa_queue_req(&req->base, &creq->base);
+-
+-	if (mv_cesa_req_needs_cleanup(&req->base, ret))
+-		mv_cesa_ahash_cleanup(req);
+-
+-	return ret;
+-}
+-
+-static int mv_cesa_ahash_update(struct ahash_request *req)
+-{
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
+-
+-	creq->len += req->nbytes;
+-
+-	return mv_cesa_ahash_queue_req(req);
+-}
+-
+-static int mv_cesa_ahash_final(struct ahash_request *req)
+-{
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
+-	struct mv_cesa_op_ctx *tmpl = &creq->op_tmpl;
+-
+-	mv_cesa_set_mac_op_total_len(tmpl, creq->len);
+-	creq->last_req = true;
+-	req->nbytes = 0;
+-
+-	return mv_cesa_ahash_queue_req(req);
+-}
+-
+-static int mv_cesa_ahash_finup(struct ahash_request *req)
+-{
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
+-	struct mv_cesa_op_ctx *tmpl = &creq->op_tmpl;
+-
+-	creq->len += req->nbytes;
+-	mv_cesa_set_mac_op_total_len(tmpl, creq->len);
+-	creq->last_req = true;
+-
+-	return mv_cesa_ahash_queue_req(req);
+-}
+-
+-static int mv_cesa_ahash_export(struct ahash_request *req, void *hash,
+-				u64 *len, void *cache)
+-{
+-	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
+-	unsigned int digsize = crypto_ahash_digestsize(ahash);
+-	unsigned int blocksize;
+-
+-	blocksize = crypto_ahash_blocksize(ahash);
+-
+-	*len = creq->len;
+-	memcpy(hash, creq->state, digsize);
+-	memset(cache, 0, blocksize);
+-	memcpy(cache, creq->cache, creq->cache_ptr);
+-
+-	return 0;
+-}
+-
+-static int mv_cesa_ahash_import(struct ahash_request *req, const void *hash,
+-				u64 len, const void *cache)
+-{
+-	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
+-	unsigned int digsize = crypto_ahash_digestsize(ahash);
+-	unsigned int blocksize;
+-	unsigned int cache_ptr;
+-	int ret;
+-
+-	ret = crypto_ahash_init(req);
+-	if (ret)
+-		return ret;
+-
+-	blocksize = crypto_ahash_blocksize(ahash);
+-	if (len >= blocksize)
+-		mv_cesa_update_op_cfg(&creq->op_tmpl,
+-				      CESA_SA_DESC_CFG_MID_FRAG,
+-				      CESA_SA_DESC_CFG_FRAG_MSK);
+-
+-	creq->len = len;
+-	memcpy(creq->state, hash, digsize);
+-	creq->cache_ptr = 0;
+-
+-	cache_ptr = do_div(len, blocksize);
+-	if (!cache_ptr)
+-		return 0;
+-
+-	memcpy(creq->cache, cache, cache_ptr);
+-	creq->cache_ptr = cache_ptr;
+-
+-	return 0;
+-}
+-
+-static int mv_cesa_md5_init(struct ahash_request *req)
+-{
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
+-	struct mv_cesa_op_ctx tmpl = { };
+-
+-	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_MD5);
+-
+-	mv_cesa_ahash_init(req, &tmpl, true);
+-
+-	creq->state[0] = MD5_H0;
+-	creq->state[1] = MD5_H1;
+-	creq->state[2] = MD5_H2;
+-	creq->state[3] = MD5_H3;
+-
+-	return 0;
+-}
+-
+-static int mv_cesa_md5_export(struct ahash_request *req, void *out)
+-{
+-	struct md5_state *out_state = out;
+-
+-	return mv_cesa_ahash_export(req, out_state->hash,
+-				    &out_state->byte_count, out_state->block);
+-}
+-
+-static int mv_cesa_md5_import(struct ahash_request *req, const void *in)
+-{
+-	const struct md5_state *in_state = in;
+-
+-	return mv_cesa_ahash_import(req, in_state->hash, in_state->byte_count,
+-				    in_state->block);
+-}
+-
+-static int mv_cesa_md5_digest(struct ahash_request *req)
+-{
+-	int ret;
+-
+-	ret = mv_cesa_md5_init(req);
+-	if (ret)
+-		return ret;
+-
+-	return mv_cesa_ahash_finup(req);
+-}
+-
+-struct ahash_alg mv_md5_alg = {
+-	.init = mv_cesa_md5_init,
+-	.update = mv_cesa_ahash_update,
+-	.final = mv_cesa_ahash_final,
+-	.finup = mv_cesa_ahash_finup,
+-	.digest = mv_cesa_md5_digest,
+-	.export = mv_cesa_md5_export,
+-	.import = mv_cesa_md5_import,
+-	.halg = {
+-		.digestsize = MD5_DIGEST_SIZE,
+-		.statesize = sizeof(struct md5_state),
+-		.base = {
+-			.cra_name = "md5",
+-			.cra_driver_name = "mv-md5",
+-			.cra_priority = 300,
+-			.cra_flags = CRYPTO_ALG_ASYNC |
+-				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+-			.cra_blocksize = MD5_HMAC_BLOCK_SIZE,
+-			.cra_ctxsize = sizeof(struct mv_cesa_hash_ctx),
+-			.cra_init = mv_cesa_ahash_cra_init,
+-			.cra_module = THIS_MODULE,
+-		 }
+-	}
+-};
+-
+-static int mv_cesa_sha1_init(struct ahash_request *req)
+-{
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
+-	struct mv_cesa_op_ctx tmpl = { };
+-
+-	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_SHA1);
+-
+-	mv_cesa_ahash_init(req, &tmpl, false);
+-
+-	creq->state[0] = SHA1_H0;
+-	creq->state[1] = SHA1_H1;
+-	creq->state[2] = SHA1_H2;
+-	creq->state[3] = SHA1_H3;
+-	creq->state[4] = SHA1_H4;
+-
+-	return 0;
+-}
+-
+-static int mv_cesa_sha1_export(struct ahash_request *req, void *out)
+-{
+-	struct sha1_state *out_state = out;
+-
+-	return mv_cesa_ahash_export(req, out_state->state, &out_state->count,
+-				    out_state->buffer);
+-}
+-
+-static int mv_cesa_sha1_import(struct ahash_request *req, const void *in)
+-{
+-	const struct sha1_state *in_state = in;
+-
+-	return mv_cesa_ahash_import(req, in_state->state, in_state->count,
+-				    in_state->buffer);
+-}
+-
+-static int mv_cesa_sha1_digest(struct ahash_request *req)
+-{
+-	int ret;
+-
+-	ret = mv_cesa_sha1_init(req);
+-	if (ret)
+-		return ret;
+-
+-	return mv_cesa_ahash_finup(req);
+-}
+-
+-struct ahash_alg mv_sha1_alg = {
+-	.init = mv_cesa_sha1_init,
+-	.update = mv_cesa_ahash_update,
+-	.final = mv_cesa_ahash_final,
+-	.finup = mv_cesa_ahash_finup,
+-	.digest = mv_cesa_sha1_digest,
+-	.export = mv_cesa_sha1_export,
+-	.import = mv_cesa_sha1_import,
+-	.halg = {
+-		.digestsize = SHA1_DIGEST_SIZE,
+-		.statesize = sizeof(struct sha1_state),
+-		.base = {
+-			.cra_name = "sha1",
+-			.cra_driver_name = "mv-sha1",
+-			.cra_priority = 300,
+-			.cra_flags = CRYPTO_ALG_ASYNC |
+-				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+-			.cra_blocksize = SHA1_BLOCK_SIZE,
+-			.cra_ctxsize = sizeof(struct mv_cesa_hash_ctx),
+-			.cra_init = mv_cesa_ahash_cra_init,
+-			.cra_module = THIS_MODULE,
+-		 }
+-	}
+-};
+-
+-static int mv_cesa_sha256_init(struct ahash_request *req)
+-{
+-	struct mv_cesa_ahash_req *creq = ahash_request_ctx(req);
+-	struct mv_cesa_op_ctx tmpl = { };
+-
+-	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_SHA256);
+-
+-	mv_cesa_ahash_init(req, &tmpl, false);
+-
+-	creq->state[0] = SHA256_H0;
+-	creq->state[1] = SHA256_H1;
+-	creq->state[2] = SHA256_H2;
+-	creq->state[3] = SHA256_H3;
+-	creq->state[4] = SHA256_H4;
+-	creq->state[5] = SHA256_H5;
+-	creq->state[6] = SHA256_H6;
+-	creq->state[7] = SHA256_H7;
+-
+-	return 0;
+-}
+-
+-static int mv_cesa_sha256_digest(struct ahash_request *req)
+-{
+-	int ret;
+-
+-	ret = mv_cesa_sha256_init(req);
+-	if (ret)
+-		return ret;
+-
+-	return mv_cesa_ahash_finup(req);
+-}
+-
+-static int mv_cesa_sha256_export(struct ahash_request *req, void *out)
+-{
+-	struct sha256_state *out_state = out;
+-
+-	return mv_cesa_ahash_export(req, out_state->state, &out_state->count,
+-				    out_state->buf);
+-}
+-
+-static int mv_cesa_sha256_import(struct ahash_request *req, const void *in)
+-{
+-	const struct sha256_state *in_state = in;
+-
+-	return mv_cesa_ahash_import(req, in_state->state, in_state->count,
+-				    in_state->buf);
+-}
+-
+-struct ahash_alg mv_sha256_alg = {
+-	.init = mv_cesa_sha256_init,
+-	.update = mv_cesa_ahash_update,
+-	.final = mv_cesa_ahash_final,
+-	.finup = mv_cesa_ahash_finup,
+-	.digest = mv_cesa_sha256_digest,
+-	.export = mv_cesa_sha256_export,
+-	.import = mv_cesa_sha256_import,
+-	.halg = {
+-		.digestsize = SHA256_DIGEST_SIZE,
+-		.statesize = sizeof(struct sha256_state),
+-		.base = {
+-			.cra_name = "sha256",
+-			.cra_driver_name = "mv-sha256",
+-			.cra_priority = 300,
+-			.cra_flags = CRYPTO_ALG_ASYNC |
+-				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+-			.cra_blocksize = SHA256_BLOCK_SIZE,
+-			.cra_ctxsize = sizeof(struct mv_cesa_hash_ctx),
+-			.cra_init = mv_cesa_ahash_cra_init,
+-			.cra_module = THIS_MODULE,
+-		 }
+-	}
+-};
+-
+-struct mv_cesa_ahash_result {
+-	struct completion completion;
+-	int error;
+-};
+-
+-static void mv_cesa_hmac_ahash_complete(struct crypto_async_request *req,
+-					int error)
+-{
+-	struct mv_cesa_ahash_result *result = req->data;
+-
+-	if (error == -EINPROGRESS)
+-		return;
+-
+-	result->error = error;
+-	complete(&result->completion);
+-}
+-
+-static int mv_cesa_ahmac_iv_state_init(struct ahash_request *req, u8 *pad,
+-				       void *state, unsigned int blocksize)
+-{
+-	struct mv_cesa_ahash_result result;
+-	struct scatterlist sg;
+-	int ret;
+-
+-	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+-				   mv_cesa_hmac_ahash_complete, &result);
+-	sg_init_one(&sg, pad, blocksize);
+-	ahash_request_set_crypt(req, &sg, pad, blocksize);
+-	init_completion(&result.completion);
+-
+-	ret = crypto_ahash_init(req);
+-	if (ret)
+-		return ret;
+-
+-	ret = crypto_ahash_update(req);
+-	if (ret && ret != -EINPROGRESS)
+-		return ret;
+-
+-	wait_for_completion_interruptible(&result.completion);
+-	if (result.error)
+-		return result.error;
+-
+-	ret = crypto_ahash_export(req, state);
+-	if (ret)
+-		return ret;
+-
+-	return 0;
+-}
+-
+-static int mv_cesa_ahmac_pad_init(struct ahash_request *req,
+-				  const u8 *key, unsigned int keylen,
+-				  u8 *ipad, u8 *opad,
+-				  unsigned int blocksize)
+-{
+-	struct mv_cesa_ahash_result result;
+-	struct scatterlist sg;
+-	int ret;
+-	int i;
+-
+-	if (keylen <= blocksize) {
+-		memcpy(ipad, key, keylen);
+-	} else {
+-		u8 *keydup = kmemdup(key, keylen, GFP_KERNEL);
+-
+-		if (!keydup)
+-			return -ENOMEM;
+-
+-		ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_BACKLOG,
+-					   mv_cesa_hmac_ahash_complete,
+-					   &result);
+-		sg_init_one(&sg, keydup, keylen);
+-		ahash_request_set_crypt(req, &sg, ipad, keylen);
+-		init_completion(&result.completion);
+-
+-		ret = crypto_ahash_digest(req);
+-		if (ret == -EINPROGRESS) {
+-			wait_for_completion_interruptible(&result.completion);
+-			ret = result.error;
+-		}
+-
+-		/* Set the memory region to 0 to avoid any leak. */
+-		kzfree(keydup);
+-
+-		if (ret)
+-			return ret;
+-
+-		keylen = crypto_ahash_digestsize(crypto_ahash_reqtfm(req));
+-	}
+-
+-	memset(ipad + keylen, 0, blocksize - keylen);
+-	memcpy(opad, ipad, blocksize);
+-
+-	for (i = 0; i < blocksize; i++) {
+-		ipad[i] ^= HMAC_IPAD_VALUE;
+-		opad[i] ^= HMAC_OPAD_VALUE;
+-	}
+-
+-	return 0;
+-}
+-
+-static int mv_cesa_ahmac_setkey(const char *hash_alg_name,
+-				const u8 *key, unsigned int keylen,
+-				void *istate, void *ostate)
+-{
+-	struct ahash_request *req;
+-	struct crypto_ahash *tfm;
+-	unsigned int blocksize;
+-	u8 *ipad = NULL;
+-	u8 *opad;
+-	int ret;
+-
+-	tfm = crypto_alloc_ahash(hash_alg_name, 0, 0);
+-	if (IS_ERR(tfm))
+-		return PTR_ERR(tfm);
+-
+-	req = ahash_request_alloc(tfm, GFP_KERNEL);
+-	if (!req) {
+-		ret = -ENOMEM;
+-		goto free_ahash;
+-	}
+-
+-	crypto_ahash_clear_flags(tfm, ~0);
+-
+-	blocksize = crypto_tfm_alg_blocksize(crypto_ahash_tfm(tfm));
+-
+-	ipad = kcalloc(2, blocksize, GFP_KERNEL);
+-	if (!ipad) {
+-		ret = -ENOMEM;
+-		goto free_req;
+-	}
+-
+-	opad = ipad + blocksize;
+-
+-	ret = mv_cesa_ahmac_pad_init(req, key, keylen, ipad, opad, blocksize);
+-	if (ret)
+-		goto free_ipad;
+-
+-	ret = mv_cesa_ahmac_iv_state_init(req, ipad, istate, blocksize);
+-	if (ret)
+-		goto free_ipad;
+-
+-	ret = mv_cesa_ahmac_iv_state_init(req, opad, ostate, blocksize);
+-
+-free_ipad:
+-	kfree(ipad);
+-free_req:
+-	ahash_request_free(req);
+-free_ahash:
+-	crypto_free_ahash(tfm);
+-
+-	return ret;
+-}
+-
+-static int mv_cesa_ahmac_cra_init(struct crypto_tfm *tfm)
+-{
+-	struct mv_cesa_hmac_ctx *ctx = crypto_tfm_ctx(tfm);
+-
+-	ctx->base.ops = &mv_cesa_ahash_req_ops;
+-
+-	crypto_ahash_set_reqsize(__crypto_ahash_cast(tfm),
+-				 sizeof(struct mv_cesa_ahash_req));
+-	return 0;
+-}
+-
+-static int mv_cesa_ahmac_md5_init(struct ahash_request *req)
+-{
+-	struct mv_cesa_hmac_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
+-	struct mv_cesa_op_ctx tmpl = { };
+-
+-	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_HMAC_MD5);
+-	memcpy(tmpl.ctx.hash.iv, ctx->iv, sizeof(ctx->iv));
+-
+-	mv_cesa_ahash_init(req, &tmpl, true);
+-
+-	return 0;
+-}
+-
+-static int mv_cesa_ahmac_md5_setkey(struct crypto_ahash *tfm, const u8 *key,
+-				    unsigned int keylen)
+-{
+-	struct mv_cesa_hmac_ctx *ctx = crypto_tfm_ctx(crypto_ahash_tfm(tfm));
+-	struct md5_state istate, ostate;
+-	int ret, i;
+-
+-	ret = mv_cesa_ahmac_setkey("mv-md5", key, keylen, &istate, &ostate);
+-	if (ret)
+-		return ret;
+-
+-	for (i = 0; i < ARRAY_SIZE(istate.hash); i++)
+-		ctx->iv[i] = be32_to_cpu(istate.hash[i]);
+-
+-	for (i = 0; i < ARRAY_SIZE(ostate.hash); i++)
+-		ctx->iv[i + 8] = be32_to_cpu(ostate.hash[i]);
+-
+-	return 0;
+-}
+-
+-static int mv_cesa_ahmac_md5_digest(struct ahash_request *req)
+-{
+-	int ret;
+-
+-	ret = mv_cesa_ahmac_md5_init(req);
+-	if (ret)
+-		return ret;
+-
+-	return mv_cesa_ahash_finup(req);
+-}
+-
+-struct ahash_alg mv_ahmac_md5_alg = {
+-	.init = mv_cesa_ahmac_md5_init,
+-	.update = mv_cesa_ahash_update,
+-	.final = mv_cesa_ahash_final,
+-	.finup = mv_cesa_ahash_finup,
+-	.digest = mv_cesa_ahmac_md5_digest,
+-	.setkey = mv_cesa_ahmac_md5_setkey,
+-	.export = mv_cesa_md5_export,
+-	.import = mv_cesa_md5_import,
+-	.halg = {
+-		.digestsize = MD5_DIGEST_SIZE,
+-		.statesize = sizeof(struct md5_state),
+-		.base = {
+-			.cra_name = "hmac(md5)",
+-			.cra_driver_name = "mv-hmac-md5",
+-			.cra_priority = 300,
+-			.cra_flags = CRYPTO_ALG_ASYNC |
+-				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+-			.cra_blocksize = MD5_HMAC_BLOCK_SIZE,
+-			.cra_ctxsize = sizeof(struct mv_cesa_hmac_ctx),
+-			.cra_init = mv_cesa_ahmac_cra_init,
+-			.cra_module = THIS_MODULE,
+-		 }
+-	}
+-};
+-
+-static int mv_cesa_ahmac_sha1_init(struct ahash_request *req)
+-{
+-	struct mv_cesa_hmac_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
+-	struct mv_cesa_op_ctx tmpl = { };
+-
+-	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_HMAC_SHA1);
+-	memcpy(tmpl.ctx.hash.iv, ctx->iv, sizeof(ctx->iv));
+-
+-	mv_cesa_ahash_init(req, &tmpl, false);
+-
+-	return 0;
+-}
+-
+-static int mv_cesa_ahmac_sha1_setkey(struct crypto_ahash *tfm, const u8 *key,
+-				     unsigned int keylen)
+-{
+-	struct mv_cesa_hmac_ctx *ctx = crypto_tfm_ctx(crypto_ahash_tfm(tfm));
+-	struct sha1_state istate, ostate;
+-	int ret, i;
+-
+-	ret = mv_cesa_ahmac_setkey("mv-sha1", key, keylen, &istate, &ostate);
+-	if (ret)
+-		return ret;
+-
+-	for (i = 0; i < ARRAY_SIZE(istate.state); i++)
+-		ctx->iv[i] = be32_to_cpu(istate.state[i]);
+-
+-	for (i = 0; i < ARRAY_SIZE(ostate.state); i++)
+-		ctx->iv[i + 8] = be32_to_cpu(ostate.state[i]);
+-
+-	return 0;
+-}
+-
+-static int mv_cesa_ahmac_sha1_digest(struct ahash_request *req)
+-{
+-	int ret;
+-
+-	ret = mv_cesa_ahmac_sha1_init(req);
+-	if (ret)
+-		return ret;
+-
+-	return mv_cesa_ahash_finup(req);
+-}
+-
+-struct ahash_alg mv_ahmac_sha1_alg = {
+-	.init = mv_cesa_ahmac_sha1_init,
+-	.update = mv_cesa_ahash_update,
+-	.final = mv_cesa_ahash_final,
+-	.finup = mv_cesa_ahash_finup,
+-	.digest = mv_cesa_ahmac_sha1_digest,
+-	.setkey = mv_cesa_ahmac_sha1_setkey,
+-	.export = mv_cesa_sha1_export,
+-	.import = mv_cesa_sha1_import,
+-	.halg = {
+-		.digestsize = SHA1_DIGEST_SIZE,
+-		.statesize = sizeof(struct sha1_state),
+-		.base = {
+-			.cra_name = "hmac(sha1)",
+-			.cra_driver_name = "mv-hmac-sha1",
+-			.cra_priority = 300,
+-			.cra_flags = CRYPTO_ALG_ASYNC |
+-				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+-			.cra_blocksize = SHA1_BLOCK_SIZE,
+-			.cra_ctxsize = sizeof(struct mv_cesa_hmac_ctx),
+-			.cra_init = mv_cesa_ahmac_cra_init,
+-			.cra_module = THIS_MODULE,
+-		 }
+-	}
+-};
+-
+-static int mv_cesa_ahmac_sha256_setkey(struct crypto_ahash *tfm, const u8 *key,
+-				       unsigned int keylen)
+-{
+-	struct mv_cesa_hmac_ctx *ctx = crypto_tfm_ctx(crypto_ahash_tfm(tfm));
+-	struct sha256_state istate, ostate;
+-	int ret, i;
+-
+-	ret = mv_cesa_ahmac_setkey("mv-sha256", key, keylen, &istate, &ostate);
+-	if (ret)
+-		return ret;
+-
+-	for (i = 0; i < ARRAY_SIZE(istate.state); i++)
+-		ctx->iv[i] = be32_to_cpu(istate.state[i]);
+-
+-	for (i = 0; i < ARRAY_SIZE(ostate.state); i++)
+-		ctx->iv[i + 8] = be32_to_cpu(ostate.state[i]);
+-
+-	return 0;
+-}
+-
+-static int mv_cesa_ahmac_sha256_init(struct ahash_request *req)
+-{
+-	struct mv_cesa_hmac_ctx *ctx = crypto_tfm_ctx(req->base.tfm);
+-	struct mv_cesa_op_ctx tmpl = { };
+-
+-	mv_cesa_set_op_cfg(&tmpl, CESA_SA_DESC_CFG_MACM_HMAC_SHA256);
+-	memcpy(tmpl.ctx.hash.iv, ctx->iv, sizeof(ctx->iv));
+-
+-	mv_cesa_ahash_init(req, &tmpl, false);
+-
+-	return 0;
+-}
+-
+-static int mv_cesa_ahmac_sha256_digest(struct ahash_request *req)
+-{
+-	int ret;
+-
+-	ret = mv_cesa_ahmac_sha256_init(req);
+-	if (ret)
+-		return ret;
+-
+-	return mv_cesa_ahash_finup(req);
+-}
+-
+-struct ahash_alg mv_ahmac_sha256_alg = {
+-	.init = mv_cesa_ahmac_sha256_init,
+-	.update = mv_cesa_ahash_update,
+-	.final = mv_cesa_ahash_final,
+-	.finup = mv_cesa_ahash_finup,
+-	.digest = mv_cesa_ahmac_sha256_digest,
+-	.setkey = mv_cesa_ahmac_sha256_setkey,
+-	.export = mv_cesa_sha256_export,
+-	.import = mv_cesa_sha256_import,
+-	.halg = {
+-		.digestsize = SHA256_DIGEST_SIZE,
+-		.statesize = sizeof(struct sha256_state),
+-		.base = {
+-			.cra_name = "hmac(sha256)",
+-			.cra_driver_name = "mv-hmac-sha256",
+-			.cra_priority = 300,
+-			.cra_flags = CRYPTO_ALG_ASYNC |
+-				     CRYPTO_ALG_KERN_DRIVER_ONLY,
+-			.cra_blocksize = SHA256_BLOCK_SIZE,
+-			.cra_ctxsize = sizeof(struct mv_cesa_hmac_ctx),
+-			.cra_init = mv_cesa_ahmac_cra_init,
+-			.cra_module = THIS_MODULE,
+-		 }
+-	}
+-};
+diff --git a/drivers/crypto/marvell/tdma.c b/drivers/crypto/marvell/tdma.c
+deleted file mode 100644
+index 45939d5..0000000
+--- a/drivers/crypto/marvell/tdma.c
++++ /dev/null
+@@ -1,350 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0-only
+-/*
+- * Provide TDMA helper functions used by cipher and hash algorithm
+- * implementations.
+- *
+- * Author: Boris Brezillon <boris.brezillon@free-electrons.com>
+- * Author: Arnaud Ebalard <arno@natisbad.org>
+- *
+- * This work is based on an initial version written by
+- * Sebastian Andrzej Siewior < sebastian at breakpoint dot cc >
+- */
+-
+-#include "cesa.h"
+-
+-bool mv_cesa_req_dma_iter_next_transfer(struct mv_cesa_dma_iter *iter,
+-					struct mv_cesa_sg_dma_iter *sgiter,
+-					unsigned int len)
+-{
+-	if (!sgiter->sg)
+-		return false;
+-
+-	sgiter->op_offset += len;
+-	sgiter->offset += len;
+-	if (sgiter->offset == sg_dma_len(sgiter->sg)) {
+-		if (sg_is_last(sgiter->sg))
+-			return false;
+-		sgiter->offset = 0;
+-		sgiter->sg = sg_next(sgiter->sg);
+-	}
+-
+-	if (sgiter->op_offset == iter->op_len)
+-		return false;
+-
+-	return true;
+-}
+-
+-void mv_cesa_dma_step(struct mv_cesa_req *dreq)
+-{
+-	struct mv_cesa_engine *engine = dreq->engine;
+-
+-	writel_relaxed(0, engine->regs + CESA_SA_CFG);
+-
+-	mv_cesa_set_int_mask(engine, CESA_SA_INT_ACC0_IDMA_DONE);
+-	writel_relaxed(CESA_TDMA_DST_BURST_128B | CESA_TDMA_SRC_BURST_128B |
+-		       CESA_TDMA_NO_BYTE_SWAP | CESA_TDMA_EN,
+-		       engine->regs + CESA_TDMA_CONTROL);
+-
+-	writel_relaxed(CESA_SA_CFG_ACT_CH0_IDMA | CESA_SA_CFG_MULTI_PKT |
+-		       CESA_SA_CFG_CH0_W_IDMA | CESA_SA_CFG_PARA_DIS,
+-		       engine->regs + CESA_SA_CFG);
+-	writel_relaxed(dreq->chain.first->cur_dma,
+-		       engine->regs + CESA_TDMA_NEXT_ADDR);
+-	BUG_ON(readl(engine->regs + CESA_SA_CMD) &
+-	       CESA_SA_CMD_EN_CESA_SA_ACCL0);
+-	writel(CESA_SA_CMD_EN_CESA_SA_ACCL0, engine->regs + CESA_SA_CMD);
+-}
+-
+-void mv_cesa_dma_cleanup(struct mv_cesa_req *dreq)
+-{
+-	struct mv_cesa_tdma_desc *tdma;
+-
+-	for (tdma = dreq->chain.first; tdma;) {
+-		struct mv_cesa_tdma_desc *old_tdma = tdma;
+-		u32 type = tdma->flags & CESA_TDMA_TYPE_MSK;
+-
+-		if (type == CESA_TDMA_OP)
+-			dma_pool_free(cesa_dev->dma->op_pool, tdma->op,
+-				      le32_to_cpu(tdma->src));
+-
+-		tdma = tdma->next;
+-		dma_pool_free(cesa_dev->dma->tdma_desc_pool, old_tdma,
+-			      old_tdma->cur_dma);
+-	}
+-
+-	dreq->chain.first = NULL;
+-	dreq->chain.last = NULL;
+-}
+-
+-void mv_cesa_dma_prepare(struct mv_cesa_req *dreq,
+-			 struct mv_cesa_engine *engine)
+-{
+-	struct mv_cesa_tdma_desc *tdma;
+-
+-	for (tdma = dreq->chain.first; tdma; tdma = tdma->next) {
+-		if (tdma->flags & CESA_TDMA_DST_IN_SRAM)
+-			tdma->dst = cpu_to_le32(tdma->dst + engine->sram_dma);
+-
+-		if (tdma->flags & CESA_TDMA_SRC_IN_SRAM)
+-			tdma->src = cpu_to_le32(tdma->src + engine->sram_dma);
+-
+-		if ((tdma->flags & CESA_TDMA_TYPE_MSK) == CESA_TDMA_OP)
+-			mv_cesa_adjust_op(engine, tdma->op);
+-	}
+-}
+-
+-void mv_cesa_tdma_chain(struct mv_cesa_engine *engine,
+-			struct mv_cesa_req *dreq)
+-{
+-	if (engine->chain.first == NULL && engine->chain.last == NULL) {
+-		engine->chain.first = dreq->chain.first;
+-		engine->chain.last  = dreq->chain.last;
+-	} else {
+-		struct mv_cesa_tdma_desc *last;
+-
+-		last = engine->chain.last;
+-		last->next = dreq->chain.first;
+-		engine->chain.last = dreq->chain.last;
+-
+-		/*
+-		 * Break the DMA chain if the CESA_TDMA_BREAK_CHAIN is set on
+-		 * the last element of the current chain, or if the request
+-		 * being queued needs the IV regs to be set before lauching
+-		 * the request.
+-		 */
+-		if (!(last->flags & CESA_TDMA_BREAK_CHAIN) &&
+-		    !(dreq->chain.first->flags & CESA_TDMA_SET_STATE))
+-			last->next_dma = dreq->chain.first->cur_dma;
+-	}
+-}
+-
+-int mv_cesa_tdma_process(struct mv_cesa_engine *engine, u32 status)
+-{
+-	struct crypto_async_request *req = NULL;
+-	struct mv_cesa_tdma_desc *tdma = NULL, *next = NULL;
+-	dma_addr_t tdma_cur;
+-	int res = 0;
+-
+-	tdma_cur = readl(engine->regs + CESA_TDMA_CUR);
+-
+-	for (tdma = engine->chain.first; tdma; tdma = next) {
+-		spin_lock_bh(&engine->lock);
+-		next = tdma->next;
+-		spin_unlock_bh(&engine->lock);
+-
+-		if (tdma->flags & CESA_TDMA_END_OF_REQ) {
+-			struct crypto_async_request *backlog = NULL;
+-			struct mv_cesa_ctx *ctx;
+-			u32 current_status;
+-
+-			spin_lock_bh(&engine->lock);
+-			/*
+-			 * if req is NULL, this means we're processing the
+-			 * request in engine->req.
+-			 */
+-			if (!req)
+-				req = engine->req;
+-			else
+-				req = mv_cesa_dequeue_req_locked(engine,
+-								 &backlog);
+-
+-			/* Re-chaining to the next request */
+-			engine->chain.first = tdma->next;
+-			tdma->next = NULL;
+-
+-			/* If this is the last request, clear the chain */
+-			if (engine->chain.first == NULL)
+-				engine->chain.last  = NULL;
+-			spin_unlock_bh(&engine->lock);
+-
+-			ctx = crypto_tfm_ctx(req->tfm);
+-			current_status = (tdma->cur_dma == tdma_cur) ?
+-					  status : CESA_SA_INT_ACC0_IDMA_DONE;
+-			res = ctx->ops->process(req, current_status);
+-			ctx->ops->complete(req);
+-
+-			if (res == 0)
+-				mv_cesa_engine_enqueue_complete_request(engine,
+-									req);
+-
+-			if (backlog)
+-				backlog->complete(backlog, -EINPROGRESS);
+-		}
+-
+-		if (res || tdma->cur_dma == tdma_cur)
+-			break;
+-	}
+-
+-	/* Save the last request in error to engine->req, so that the core
+-	 * knows which request was fautly */
+-	if (res) {
+-		spin_lock_bh(&engine->lock);
+-		engine->req = req;
+-		spin_unlock_bh(&engine->lock);
+-	}
+-
+-	return res;
+-}
+-
+-static struct mv_cesa_tdma_desc *
+-mv_cesa_dma_add_desc(struct mv_cesa_tdma_chain *chain, gfp_t flags)
+-{
+-	struct mv_cesa_tdma_desc *new_tdma = NULL;
+-	dma_addr_t dma_handle;
+-
+-	new_tdma = dma_pool_zalloc(cesa_dev->dma->tdma_desc_pool, flags,
+-				   &dma_handle);
+-	if (!new_tdma)
+-		return ERR_PTR(-ENOMEM);
+-
+-	new_tdma->cur_dma = dma_handle;
+-	if (chain->last) {
+-		chain->last->next_dma = cpu_to_le32(dma_handle);
+-		chain->last->next = new_tdma;
+-	} else {
+-		chain->first = new_tdma;
+-	}
+-
+-	chain->last = new_tdma;
+-
+-	return new_tdma;
+-}
+-
+-int mv_cesa_dma_add_result_op(struct mv_cesa_tdma_chain *chain, dma_addr_t src,
+-			  u32 size, u32 flags, gfp_t gfp_flags)
+-{
+-	struct mv_cesa_tdma_desc *tdma, *op_desc;
+-
+-	tdma = mv_cesa_dma_add_desc(chain, gfp_flags);
+-	if (IS_ERR(tdma))
+-		return PTR_ERR(tdma);
+-
+-	/* We re-use an existing op_desc object to retrieve the context
+-	 * and result instead of allocating a new one.
+-	 * There is at least one object of this type in a CESA crypto
+-	 * req, just pick the first one in the chain.
+-	 */
+-	for (op_desc = chain->first; op_desc; op_desc = op_desc->next) {
+-		u32 type = op_desc->flags & CESA_TDMA_TYPE_MSK;
+-
+-		if (type == CESA_TDMA_OP)
+-			break;
+-	}
+-
+-	if (!op_desc)
+-		return -EIO;
+-
+-	tdma->byte_cnt = cpu_to_le32(size | BIT(31));
+-	tdma->src = src;
+-	tdma->dst = op_desc->src;
+-	tdma->op = op_desc->op;
+-
+-	flags &= (CESA_TDMA_DST_IN_SRAM | CESA_TDMA_SRC_IN_SRAM);
+-	tdma->flags = flags | CESA_TDMA_RESULT;
+-	return 0;
+-}
+-
+-struct mv_cesa_op_ctx *mv_cesa_dma_add_op(struct mv_cesa_tdma_chain *chain,
+-					const struct mv_cesa_op_ctx *op_templ,
+-					bool skip_ctx,
+-					gfp_t flags)
+-{
+-	struct mv_cesa_tdma_desc *tdma;
+-	struct mv_cesa_op_ctx *op;
+-	dma_addr_t dma_handle;
+-	unsigned int size;
+-
+-	tdma = mv_cesa_dma_add_desc(chain, flags);
+-	if (IS_ERR(tdma))
+-		return ERR_CAST(tdma);
+-
+-	op = dma_pool_alloc(cesa_dev->dma->op_pool, flags, &dma_handle);
+-	if (!op)
+-		return ERR_PTR(-ENOMEM);
+-
+-	*op = *op_templ;
+-
+-	size = skip_ctx ? sizeof(op->desc) : sizeof(*op);
+-
+-	tdma = chain->last;
+-	tdma->op = op;
+-	tdma->byte_cnt = cpu_to_le32(size | BIT(31));
+-	tdma->src = cpu_to_le32(dma_handle);
+-	tdma->dst = CESA_SA_CFG_SRAM_OFFSET;
+-	tdma->flags = CESA_TDMA_DST_IN_SRAM | CESA_TDMA_OP;
+-
+-	return op;
+-}
+-
+-int mv_cesa_dma_add_data_transfer(struct mv_cesa_tdma_chain *chain,
+-				  dma_addr_t dst, dma_addr_t src, u32 size,
+-				  u32 flags, gfp_t gfp_flags)
+-{
+-	struct mv_cesa_tdma_desc *tdma;
+-
+-	tdma = mv_cesa_dma_add_desc(chain, gfp_flags);
+-	if (IS_ERR(tdma))
+-		return PTR_ERR(tdma);
+-
+-	tdma->byte_cnt = cpu_to_le32(size | BIT(31));
+-	tdma->src = src;
+-	tdma->dst = dst;
+-
+-	flags &= (CESA_TDMA_DST_IN_SRAM | CESA_TDMA_SRC_IN_SRAM);
+-	tdma->flags = flags | CESA_TDMA_DATA;
+-
+-	return 0;
+-}
+-
+-int mv_cesa_dma_add_dummy_launch(struct mv_cesa_tdma_chain *chain, gfp_t flags)
+-{
+-	struct mv_cesa_tdma_desc *tdma;
+-
+-	tdma = mv_cesa_dma_add_desc(chain, flags);
+-	return PTR_ERR_OR_ZERO(tdma);
+-}
+-
+-int mv_cesa_dma_add_dummy_end(struct mv_cesa_tdma_chain *chain, gfp_t flags)
+-{
+-	struct mv_cesa_tdma_desc *tdma;
+-
+-	tdma = mv_cesa_dma_add_desc(chain, flags);
+-	if (IS_ERR(tdma))
+-		return PTR_ERR(tdma);
+-
+-	tdma->byte_cnt = cpu_to_le32(BIT(31));
+-
+-	return 0;
+-}
+-
+-int mv_cesa_dma_add_op_transfers(struct mv_cesa_tdma_chain *chain,
+-				 struct mv_cesa_dma_iter *dma_iter,
+-				 struct mv_cesa_sg_dma_iter *sgiter,
+-				 gfp_t gfp_flags)
+-{
+-	u32 flags = sgiter->dir == DMA_TO_DEVICE ?
+-		    CESA_TDMA_DST_IN_SRAM : CESA_TDMA_SRC_IN_SRAM;
+-	unsigned int len;
+-
+-	do {
+-		dma_addr_t dst, src;
+-		int ret;
+-
+-		len = mv_cesa_req_dma_iter_transfer_len(dma_iter, sgiter);
+-		if (sgiter->dir == DMA_TO_DEVICE) {
+-			dst = CESA_SA_DATA_SRAM_OFFSET + sgiter->op_offset;
+-			src = sg_dma_address(sgiter->sg) + sgiter->offset;
+-		} else {
+-			dst = sg_dma_address(sgiter->sg) + sgiter->offset;
+-			src = CESA_SA_DATA_SRAM_OFFSET + sgiter->op_offset;
+-		}
+-
+-		ret = mv_cesa_dma_add_data_transfer(chain, dst, src, len,
+-						    flags, gfp_flags);
+-		if (ret)
+-			return ret;
+-
+-	} while (mv_cesa_req_dma_iter_next_transfer(dma_iter, sgiter, len));
+-
+-	return 0;
+-}
 -- 
 1.9.1
 
