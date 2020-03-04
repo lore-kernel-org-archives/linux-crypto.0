@@ -2,219 +2,120 @@ Return-Path: <SRS0=WWUc=4V=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC36EC3F2D1
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Mar 2020 13:49:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7969AC3F2D9
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Mar 2020 18:21:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AC0E22166E
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Mar 2020 13:49:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C1B32146E
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Mar 2020 18:21:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="aSsRYRkm"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="EtH+RNLz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729461AbgCDNtB (ORCPT
+        id S1730055AbgCDSVx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 Mar 2020 08:49:01 -0500
-Received: from mail-vk1-f196.google.com ([209.85.221.196]:41055 "EHLO
-        mail-vk1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729138AbgCDNtB (ORCPT
+        Wed, 4 Mar 2020 13:21:53 -0500
+Received: from mail-pf1-f194.google.com ([209.85.210.194]:47101 "EHLO
+        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730078AbgCDSVw (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 Mar 2020 08:49:01 -0500
-Received: by mail-vk1-f196.google.com with SMTP id y201so557163vky.8
-        for <linux-crypto@vger.kernel.org>; Wed, 04 Mar 2020 05:48:59 -0800 (PST)
+        Wed, 4 Mar 2020 13:21:52 -0500
+Received: by mail-pf1-f194.google.com with SMTP id o24so1347129pfp.13
+        for <linux-crypto@vger.kernel.org>; Wed, 04 Mar 2020 10:21:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=bjIqzNtbLDluldH86tN+A6cKSOXYcpHj7iqgrGX2u9Q=;
-        b=aSsRYRkml7xmSJkdReWG+LtFzO6SXXltkxNfsYYs8jeMD708jVuf1k9ZkSSte1WuHG
-         rYuYZmkxP9ekNsF12Owz3OWcL2Nd1QktjKQjojrgO4Vikc/jLRW7W2tIRzWwaxnW+/1m
-         BpIfhfPHagu2E5rdF8wB766Ci+1Zz8uVuM72JXxWIpxZ7qhpWLXIlof66jaTX1USvmZ8
-         VQ5L2hOmvqtOFStjMcl4skOdrZZtlpY1yxx90ROu9SnDj1AuBkqRjVKBNtRPMDffPFof
-         Xw9rbl7buYnsYnShnDsJfa7gMaYK8Xh3v/SeTyUPV2GufdCh+1OwIxjNg3AlTKXNZJrp
-         HtEg==
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=xF2I7tf+DwxpQhNciBVkWhhaWOLjPvYzGL3E90sj2so=;
+        b=EtH+RNLzhqY+QqYdV6X7ap6Xu3EpSaat18+ckZb/mOfySU0ooqa/9cKD/lI/wgqztb
+         ZK2Ma6j1qv5DcakHHIlnNCH8JvP6u0Ga6Lxhnp2OX/arBJTY2+8pgH3SNyBm7i2VIJ2k
+         nN0QThNn3RyhAFc+q1sXxzjkc/ZdjOgh2+oOU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=bjIqzNtbLDluldH86tN+A6cKSOXYcpHj7iqgrGX2u9Q=;
-        b=aK5GOQ6i7ajJ1yfRS8iZCzGJGT97GVchcWQXZ/Tdg899PfDQwB1uRMS/3v6fH1uUvh
-         DlUWYdtUfXfALY4Oq2eMAhOrolkuBl9BK7M9MQiGybt/iqur0yolZdkaKs0IYNARnWpX
-         l0pNEAKk6uKv8o+4i85TbaVbaVrhXO1nmMtIg1k9pEnq8mftNjJIXgad+IyRO3zqIsF1
-         5mhibespYFULRXPcLlaNSKutcSvei6prW19qR6G8oVoHv+Xcl/L5d/ZaaIX6eBhbhBrd
-         LcQ4ZUVz3UC+Di1cUCYaYZLZyE15dHRGyBfRAkNCVQdo4/ZJ3Q6ozIIa5gWlBv4mqwdZ
-         I22Q==
-X-Gm-Message-State: ANhLgQ1VL8dw8ySF62n1Rzn67p67JPY+X2EE2q4YmV+pcCCBl0msZOrZ
-        qg3r5EAX3xzx0FFMBgnoFpFzn2YZ4XZoyjDcdFjFqg==
-X-Google-Smtp-Source: ADFU+vvoF/S1C8h9A5Im5xw4Vs7/0s0k+y8QNSIVSeSdg+S7j85qxtjIEaRVsjzMAeYPqqLTGrERlOWGKgHn2FWDNGg=
-X-Received: by 2002:a1f:5e17:: with SMTP id s23mr572459vkb.100.1583329738480;
- Wed, 04 Mar 2020 05:48:58 -0800 (PST)
-MIME-Version: 1.0
-References: <20200303120925.12067-1-gilad@benyossef.com> <20200304000606.GB89804@sol.localdomain>
-In-Reply-To: <20200304000606.GB89804@sol.localdomain>
-From:   Gilad Ben-Yossef <gilad@benyossef.com>
-Date:   Wed, 4 Mar 2020 15:48:47 +0200
-Message-ID: <CAOtvUMd6Ak3n-ABO1h440BoDASJUvh+-9PwEGFi-WzA=g84kLg@mail.gmail.com>
-Subject: Re: [PATCH v2] crypto: testmgr - sync both RFC4106 IV copies
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=xF2I7tf+DwxpQhNciBVkWhhaWOLjPvYzGL3E90sj2so=;
+        b=INiatxcm9HaLO2OxVdsHi7zMJQBCSlbMPfuammPwtrmDXzqnFZXWB/xukyIGkM6RP/
+         10OWj884D8As4SISwrpf277ena9U6N5lziiM/v75/yIN0tv6lw49lhPyWWIrPslWv+u3
+         bRViccdQpt6Ag1Yhz9SvxBxt4dcln2Cm77hhlPMYcTYZw2ZQR4kVQ5Zu9Csnprtoez5j
+         thMeAHkpyeLhxyAFTvnhopmhv0+cB1qN4NFtALoRJE2WJJEsqBqp18cljuECf3qr12W1
+         cdkl0JRFKgofyNfuZ1Z97CuOurU3icjxNraA/e9yNJKcSdga4VYTQ1FJy3gKXve60Uow
+         ngbg==
+X-Gm-Message-State: ANhLgQ0hRlVzjAmdeKgZ9BRnbz8RypNbME6Ts7P4Ktg1XZgF/poO8UuG
+        fJ/CWVRyPEvwXHeMK+mTI6o3yA==
+X-Google-Smtp-Source: ADFU+vuGalFADUNS2CsAir9E+YeLAVnzSZsmifwLoGDru8DbnpAUozLyZDUnqEqdqAQL4AUGpiCQNw==
+X-Received: by 2002:a63:ed14:: with SMTP id d20mr3606078pgi.267.1583346110401;
+        Wed, 04 Mar 2020 10:21:50 -0800 (PST)
+Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
+        by smtp.gmail.com with ESMTPSA id m59sm3603815pjb.41.2020.03.04.10.21.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 04 Mar 2020 10:21:49 -0800 (PST)
+Date:   Wed, 4 Mar 2020 10:21:48 -0800
+From:   Kees Cook <keescook@chromium.org>
+To:     Peter Zijlstra <peterz@infradead.org>
+Cc:     Kristen Carlson Accardi <kristen@linux.intel.com>,
+        Thomas Garnier <thgarnie@chromium.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Kernel Hardening <kernel-hardening@lists.openwall.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Ofir Drang <ofir.drang@arm.com>,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Juergen Gross <jgross@suse.com>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        "VMware, Inc." <pv-drivers@vmware.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
+        Will Deacon <will@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Cao jin <caoj.fnst@cn.fujitsu.com>,
+        Allison Randal <allison@lohutok.net>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        LKML <linux-kernel@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        Linux PM list <linux-pm@vger.kernel.org>
+Subject: Re: [PATCH v11 00/11] x86: PIE support to extend KASLR randomization
+Message-ID: <202003041019.C6386B2F7@keescook>
+References: <20200228000105.165012-1-thgarnie@chromium.org>
+ <202003022100.54CEEE60F@keescook>
+ <20200303095514.GA2596@hirez.programming.kicks-ass.net>
+ <CAJcbSZH1oON2VC2U8HjfC-6=M-xn5eU+JxHG2575iMpVoheKdA@mail.gmail.com>
+ <6e7e4191612460ba96567c16b4171f2d2f91b296.camel@linux.intel.com>
+ <202003031314.1AFFC0E@keescook>
+ <20200304092136.GI2596@hirez.programming.kicks-ass.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200304092136.GI2596@hirez.programming.kicks-ass.net>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+On Wed, Mar 04, 2020 at 10:21:36AM +0100, Peter Zijlstra wrote:
+> But at what cost; it does unspeakable ugly to the asm. And didn't a
+> kernel compiled with the extended PIE range produce a measurably slower
+> kernel due to all the ugly?
 
-On Wed, Mar 4, 2020 at 2:06 AM Eric Biggers <ebiggers@kernel.org> wrote:
->
-> On Tue, Mar 03, 2020 at 02:09:25PM +0200, Gilad Ben-Yossef wrote:
-> > RFC4106 AEAD ciphers the AAD is the concatenation of associated
-> > authentication data || IV || plaintext or ciphertext but the
-> > random AEAD message generation in testmgr extended tests did
-> > not obey this requirements producing messages with undefined
-> > behaviours. Fix it by syncing the copies if needed.
-> >
-> > Since this only relevant for developer only extended tests any
-> > additional cycles/run time costs are negligible.
-> >
-> > This fixes extended AEAD test failures with the ccree driver
-> > caused by illegal input.
-> >
-> > Signed-off-by: Gilad Ben-Yossef <gilad@benyossef.com>
-> > Reported-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> > Cc: Eric Biggers <ebiggers@kernel.org>
-> > ---
-> >
-> >  crypto/testmgr.c | 35 ++++++++++++++++++++++++++---------
-> >  1 file changed, 26 insertions(+), 9 deletions(-)
-> >
-> > diff --git a/crypto/testmgr.c b/crypto/testmgr.c
-> > index 88f33c0efb23..379bd1c7dd5b 100644
-> > --- a/crypto/testmgr.c
-> > +++ b/crypto/testmgr.c
-> > @@ -91,10 +91,16 @@ struct aead_test_suite {
-> >       unsigned int einval_allowed : 1;
-> >
-> >       /*
-> > -      * Set if the algorithm intentionally ignores the last 8 bytes of the
-> > -      * AAD buffer during decryption.
-> > +      * Set if the algorithm includes a copy of the IV (last 8 bytes)
-> > +      * in the AAD buffer but does not include it in calculating the ICV
-> >        */
-> > -     unsigned int esp_aad : 1;
-> > +     unsigned int skip_aad_iv : 1;
->
-> "Authentication tag" would be easier to understand than "ICV" and would match
-> the rest of the code.  "ICV" is an idiosyncrasy used in certain RFCs only.
+Was that true? I thought the final results were a wash and that earlier
+benchmarks weren't accurate for some reason? I can't find the thread
+now. Thomas, do you have numbers on that?
 
-Sure.
+BTW, I totally agree that fgkaslr is the way to go in the future. I
+am mostly arguing for this under the assumption that it doesn't
+have meaningful performance impact and that it gains the kernel some
+flexibility in the kinds of things it can do in the future. If the former
+is not true, then I'd agree, the benefit needs to be more clear.
 
->
-> > +
-> > +     /*
-> > +      * Set if the algorithm includes a copy of the IV (last 8 bytes)
-> > +      * in the AAD buffer and does include it when calculating the ICV
-> > +      */
-> > +     unsigned int auth_aad_iv : 1;
-> >  };
-> >
-> >  struct cipher_test_suite {
-> > @@ -2167,14 +2173,20 @@ struct aead_extra_tests_ctx {
-> >   * here means the full ciphertext including the authentication tag.  The
-> >   * authentication tag (and hence also the ciphertext) is assumed to be nonempty.
-> >   */
-> > -static void mutate_aead_message(struct aead_testvec *vec, bool esp_aad)
-> > +static void mutate_aead_message(struct aead_testvec *vec,
-> > +                             const struct aead_test_suite *suite)
-> >  {
-> > -     const unsigned int aad_tail_size = esp_aad ? 8 : 0;
-> > +     const unsigned int aad_ivsize = 8;
->
-> We should use the algorithm's actual IV size instead of hard-coding 8 bytes.
-
-Yes, I was following the original code example but I agree it would be
-better to pass the IV size.
-
->
-> > +     const unsigned int aad_tail_size = suite->skip_aad_iv ? aad_ivsize : 0;
-> >       const unsigned int authsize = vec->clen - vec->plen;
-> >
-> >       if (prandom_u32() % 2 == 0 && vec->alen > aad_tail_size) {
-> >                /* Mutate the AAD */
-> >               flip_random_bit((u8 *)vec->assoc, vec->alen - aad_tail_size);
-> > +             if (suite->auth_aad_iv)
-> > +                     memcpy((u8 *)vec->iv,
-> > +                            (vec->assoc + vec->alen - aad_ivsize),
-> > +                            aad_ivsize);
->
-> Why sync the IV copies here?  When 'auth_aad_iv', we assume the copy of the IV
-> in the AAD (which was just corrupted) is authenticated.  So we already know that
-> decryption should fail, regardless of the other IV copy.
-
-Nope. We know there needs to be a copy of the IV in the AAD and we know the IV
-should be included in calculating in the authentication tag. We don't know which
-copy of the IV will be used by the implementation.
-
-Case in point - the ccree driver actually currently uses the copy of
-the IV passed via
-req->iv for calculating the IV contribution to the authentication tag,
-not the one in the AAD.
-
-And what happens then if you don't do this copy than is that you get
-an unexpected
-decryption success where the test expects failure, because the driver
-fed the HW the
-none mutated copy of the IV from req->iv and not the mutated copy
-found in the AAD.
-
-> Also, the code doesn't currently mutate vec->iv for any AEAD.  So mutating it
-> for one specific algorithm is a bit odd.  IMO, it would make more sense to do a
-> separate patch later that mutates vec->iv for all AEADs.
-
-That's fine, in that case we should avoid mutating either copies of
-the IV at all
-in the case of RFC 4543 just as we do with RFC 4106 and friends - as
-indeed your patch
-does.
-
-> >               if (prandom_u32() % 2 == 0)
-> >                       return;
-> >       }
-> > @@ -2208,6 +2220,10 @@ static void generate_aead_message(struct aead_request *req,
-> >       /* Generate the AAD. */
-> >       generate_random_bytes((u8 *)vec->assoc, vec->alen);
-> >
-> > +     if (suite->auth_aad_iv && (vec->alen > ivsize))
-> > +             memcpy(((u8 *)vec->assoc + vec->alen - ivsize), vec->iv,
-> > +                    ivsize);
->
-> Shouldn't this be >= ivsize, not > ivsize?
-Indeed.
-
-> And doesn't the IV need to be synced
-> in both the skip_aad_iv and auth_aad_iv cases?
-
-Nope, because in the skip_aad_iv case we never mutate the IV, so no
-point in copying.
-
->
-> There are also unnecessary parentheses here; the memcpy() could be one line.
->
->
-> How about the following patch instead?
-
-Works for me.
-
-Tested-by: Gilad Ben-Yossef <gilad@benyossef.com?
-
-Thanks!
-Gilad
+-- 
+Kees Cook
