@@ -2,154 +2,143 @@ Return-Path: <SRS0=WWUc=4V=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.0 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BBEFC3F2CD
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Mar 2020 08:59:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B5C0C3F2D1
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Mar 2020 09:22:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2EF882166E
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Mar 2020 08:59:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0043820732
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Mar 2020 09:22:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="t45nxzry"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="LDG8TcPS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728642AbgCDI7u (ORCPT
+        id S2387664AbgCDJWT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 Mar 2020 03:59:50 -0500
-Received: from mail-qk1-f194.google.com ([209.85.222.194]:43135 "EHLO
-        mail-qk1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728319AbgCDI7u (ORCPT
+        Wed, 4 Mar 2020 04:22:19 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:52224 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2387644AbgCDJWT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 Mar 2020 03:59:50 -0500
-Received: by mail-qk1-f194.google.com with SMTP id q18so820979qki.10
-        for <linux-crypto@vger.kernel.org>; Wed, 04 Mar 2020 00:59:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=P+jMmXTSo2fxNXWVyhqtxpkECUUfyLXXJQ/Qq+zHIkU=;
-        b=t45nxzry3NYgFSXkHivggCrJt7bt2CcezPmRDwxMHGIc8qHfUb8/0oDGtuHDytFuBI
-         GZDUm6cLW/IXa2iCWYtWErpLSYB01MFLFN/Sx3rLsYvlDKaKRzgq7rXS1mgjs0Qn6871
-         bNC8g8Hm9MmokS0ZEC5WjERxWjqI9hUWHqFsgEPHmA+xM+isntCNgEC0q4oisRd/DEHt
-         4s/e+T3iHOMH4B2fz2Y8iYTD7fBE+QHLT1VoeG6ybnJvI9iBga5jXmzlx06zmTtqQFNd
-         A5UlvBUA8T7ZBAVUynyi+hQKOjH0/PAoqm6i0SEOnh3Alyshwz5eXs+qLASlfCividwM
-         JYig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=P+jMmXTSo2fxNXWVyhqtxpkECUUfyLXXJQ/Qq+zHIkU=;
-        b=dedADtIlKjPV/Xe2UTPCiy8vaLNO2wE5IgIYsFzKwzZ9Xoy9Ge9YmxJ18dWfL6vEwI
-         UfyEz2BLmFdEZ8ZB4/hnjlwQAN9x7tRgL+CjFvVC/BFcTJz34i+GmtdUzcwBY8muwCAM
-         mm6Xu2FI5S51vfNhLgBDm2g9+JBbatScKoH9ctz7RUmnblw34+xxqUZX5Ri+mOfYawFg
-         tuQGWwQ17HA0/z4Kzso7WNu/Pfwl65Pgg8JxU12YTb71P4iKbhWU4y477DV8m1h8PuE9
-         QyRiXHx7Elv/3K5pbtgyaF1gurIKx9wxoSRdw4rsoXRzASUBlqk4wKGdlaoXYEvYNQNj
-         SZJg==
-X-Gm-Message-State: ANhLgQ190mmk6etuLb3Jl/9oiWQUEhwuW3XZZUz7kxorOlJXHi/7THsQ
-        lfQ8ZSyd1OgpprC9/Rme/ojodN/OlsNnpTLM3Lrhbg==
-X-Google-Smtp-Source: ADFU+vst6DLKw48grfAaGDLlzabH/C9a8znxSeS/sQBCw/7iv9QIGoVWNaQIg5Rcw226PV2XkpsGdRS+76ycnyAVhQY=
-X-Received: by 2002:ae9:e003:: with SMTP id m3mr2003769qkk.250.1583312389274;
- Wed, 04 Mar 2020 00:59:49 -0800 (PST)
-MIME-Version: 1.0
-References: <000000000000dd909105a002ebe6@google.com> <CACT4Y+ZyhwEsuGK9aJZ=4vXJ_AfHqFn6n5d58H_5E_-o9qHRWA@mail.gmail.com>
- <96b956f4-62cb-83e6-38c2-ca698a862282@moonlit-rail.com>
-In-Reply-To: <96b956f4-62cb-83e6-38c2-ca698a862282@moonlit-rail.com>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Wed, 4 Mar 2020 09:59:38 +0100
-Message-ID: <CACT4Y+b_U6YKujEk9X=NHX45KkL93dLsyu5gS44PpEDi94qS0w@mail.gmail.com>
-Subject: Re: INFO: rcu detected stall in sys_keyctl
-To:     Kris Karas <linux-1993@moonlit-rail.com>
-Cc:     syzbot <syzbot+0c5c2dbf76930df91489@syzkaller.appspotmail.com>,
-        David Miller <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Kate Stewart <kstewart@linuxfoundation.org>,
+        Wed, 4 Mar 2020 04:22:19 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Xz1gqS8mHQf0FeXfh5Zn6ODmAjqLlTi3e7QpQPXzA9Q=; b=LDG8TcPSz6KerDK5RXGKXHL0+s
+        nd+daixZ03zWZPBsZex2W0SE2BU+bLdvHBFIbasjYsjLE9O6AcvIE4aklaE3c2rh36+IES5zOiJKo
+        CZHk/ZIgcOCzatmD7F0LvmIA2106SZonTNmKrjs8DuOvT6kzu3GSWHE0zWKaxMKARsPaQGewBXixa
+        ItobUKdK8g+0ymqN8mZ30rSgQf5HEI0PdCrTHBXpOW9woanZqUxWXgFDIr91oXYH//OaNr2XpNsGu
+        Foq59USFJcUjcKrB2RUG0sl7wBvbaaaFVwnCCFfz9rz8IvgRMTSRUVdUbDAj+EcyeoS8xmPTFub7+
+        KssVL8pg==;
+Received: from j217100.upc-j.chello.nl ([24.132.217.100] helo=noisy.programming.kicks-ass.net)
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1j9QDl-0008ML-Jr; Wed, 04 Mar 2020 09:21:41 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (Client did not present a certificate)
+        by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id CDE6B30066E;
+        Wed,  4 Mar 2020 10:19:37 +0100 (CET)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+        id 407052011CA98; Wed,  4 Mar 2020 10:21:36 +0100 (CET)
+Date:   Wed, 4 Mar 2020 10:21:36 +0100
+From:   Peter Zijlstra <peterz@infradead.org>
+To:     Kees Cook <keescook@chromium.org>
+Cc:     Kristen Carlson Accardi <kristen@linux.intel.com>,
+        Thomas Garnier <thgarnie@chromium.org>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Eric Biggers <ebiggers@kernel.org>, allison@lohutok.net
-Content-Type: text/plain; charset="UTF-8"
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        Kernel Hardening <kernel-hardening@lists.openwall.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        the arch/x86 maintainers <x86@kernel.org>,
+        Andy Lutomirski <luto@kernel.org>,
+        Juergen Gross <jgross@suse.com>,
+        Thomas Hellstrom <thellstrom@vmware.com>,
+        "VMware, Inc." <pv-drivers@vmware.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <len.brown@intel.com>, Pavel Machek <pavel@ucw.cz>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>,
+        Will Deacon <will@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Masami Hiramatsu <mhiramat@kernel.org>,
+        Jiri Slaby <jslaby@suse.cz>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Josh Poimboeuf <jpoimboe@redhat.com>,
+        Cao jin <caoj.fnst@cn.fujitsu.com>,
+        Allison Randal <allison@lohutok.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        virtualization@lists.linux-foundation.org,
+        Linux PM list <linux-pm@vger.kernel.org>
+Subject: Re: [PATCH v11 00/11] x86: PIE support to extend KASLR randomization
+Message-ID: <20200304092136.GI2596@hirez.programming.kicks-ass.net>
+References: <20200228000105.165012-1-thgarnie@chromium.org>
+ <202003022100.54CEEE60F@keescook>
+ <20200303095514.GA2596@hirez.programming.kicks-ass.net>
+ <CAJcbSZH1oON2VC2U8HjfC-6=M-xn5eU+JxHG2575iMpVoheKdA@mail.gmail.com>
+ <6e7e4191612460ba96567c16b4171f2d2f91b296.camel@linux.intel.com>
+ <202003031314.1AFFC0E@keescook>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202003031314.1AFFC0E@keescook>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Mar 4, 2020 at 9:41 AM Kris Karas <linux-1993@moonlit-rail.com> wrote:
->
-> Resending this to all the original CCs per suggestion of Dmitry.
-> I'm not a member of linux-crypto, no idea if it will bounce; in any
-> case, the OOPS I saw does not appear to be crypto related.
->
-> Dmitry Vyukov wrote:
-> > syzbot wrote:
-> >> Call Trace:
-> >>   <IRQ>
-> >>   __dump_stack lib/dump_stack.c:77 [inline]
-> >>   dump_stack+0x197/0x210 lib/dump_stack.c:118
-> >>   nmi_cpu_backtrace.cold+0x70/0xb2 lib/nmi_backtrace.c:101
-> >>   nmi_trigger_cpumask_backtrace+0x23b/0x28b lib/nmi_backtrace.c:62
-> >>   arch_trigger_cpumask_backtrace+0x14/0x20
-> >> arch/x86/kernel/apic/hw_nmi.c:38
-> >>   trigger_single_cpu_backtrace include/linux/nmi.h:164 [inline]
-> >>   rcu_dump_cpu_stacks+0x183/0x1cf kernel/rcu/tree_stall.h:254
-> >>   print_cpu_stall kernel/rcu/tree_stall.h:475 [inline]
-> >>   check_cpu_stall kernel/rcu/tree_stall.h:549 [inline]
-> >>   rcu_pending kernel/rcu/tree.c:3030 [inline]
-> >>   rcu_sched_clock_irq.cold+0x51a/0xc37 kernel/rcu/tree.c:2276
-> >>   update_process_times+0x2d/0x70 kernel/time/timer.c:1726
-> >>   tick_sched_handle+0xa2/0x190 kernel/time/tick-sched.c:171
-> >>   tick_sched_timer+0x53/0x140 kernel/time/tick-sched.c:1314
-> >>   __run_hrtimer kernel/time/hrtimer.c:1517 [inline]
-> >>   __hrtimer_run_queues+0x364/0xe40 kernel/time/hrtimer.c:1579
-> >>   hrtimer_interrupt+0x314/0x770 kernel/time/hrtimer.c:1641
-> >>   local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1119 [inline]
-> >>   smp_apic_timer_interrupt+0x160/0x610 arch/x86/kernel/apic/apic.c:1144
-> >>   apic_timer_interrupt+0xf/0x20 arch/x86/entry/entry_64.S:829
-> >>   </IRQ>
-> >>
-> > +lib/mpi maintainers
-> >
-> > I wonder if this can also be triggered by remote actors (tls, wifi,
-> > usb, etc).
-> >
->
-> This looks somewhat similar to an OOPS + rcu stall I reported earlier in
-> reply to Greg KH's announcement of 5.5.7:
->
->      rcu: INFO: rcu_sched self-detected stall on CPU
->      rcu:    14-....: (20999 ticks this GP)
-> idle=216/1/0x4000000000000002 softirq=454/454 fqs=5250
->              (t=21004 jiffies g=-755 q=1327)
->      NMI backtrace for cpu 14
->      CPU: 14 PID: 520 Comm: pidof Tainted: G      D           5.5.7 #1
->      Hardware name: To Be Filled By O.E.M. To Be Filled By O.E.M./X470
-> Taichi, BIOS P3.50 07/18/2019
->      Call Trace:
->       <IRQ>
->       dump_stack+0x50/0x70
->       nmi_cpu_backtrace.cold+0x14/0x53
->       ? lapic_can_unplug_cpu.cold+0x44/0x44
->       nmi_trigger_cpumask_backtrace+0x7b/0x88
->       rcu_dump_cpu_stacks+0x7b/0xa9
->       rcu_sched_clock_irq.cold+0x152/0x39b
->       update_process_times+0x1f/0x50
->       tick_sched_timer+0x40/0x90
->       ? tick_sched_do_timer+0x50/0x50
->       __hrtimer_run_queues+0xdd/0x180
->       hrtimer_interrupt+0x108/0x230
->       smp_apic_timer_interrupt+0x53/0xa0
->       apic_timer_interrupt+0xf/0x20
->       </IRQ>
->
-> I don't have a reproducer for it, either.  It showed up in 5.5.7 (but
-> might be from earlier as it reproduces so infrequently).
+On Tue, Mar 03, 2020 at 01:19:22PM -0800, Kees Cook wrote:
+> On Tue, Mar 03, 2020 at 01:01:26PM -0800, Kristen Carlson Accardi wrote:
+> > On Tue, 2020-03-03 at 07:43 -0800, Thomas Garnier wrote:
+> > > On Tue, Mar 3, 2020 at 1:55 AM Peter Zijlstra <peterz@infradead.org>
 
-Hi Kris,
+> > > > But,... do we still need this in the light of that fine-grained
+> > > > kaslr
+> > > > stuff?
+> > > > 
+> > > > What is the actual value of this PIE crud in the face of that?
+> > > 
+> > > If I remember well, it makes it easier/better but I haven't seen a
+> > > recent update on that. Is that accurate Kees?
+> > 
+> > I believe this patchset is valuable if people are trying to brute force
+> > guess the kernel location, but not so awesome in the event of
+> > infoleaks. In the case of the current fgkaslr implementation, we only
+> > randomize within the existing text segment memory area - so with PIE
+> > the text segment base can move around more, but within that it wouldn't
+> > strengthen anything. So, if you have an infoleak, you learn the base
+> > instantly, and are just left with the same extra protection you get
+> > without PIE.
+> 
+> Right -- PIE improves both non- and fg- KASLR similarly, in the sense
+> that the possible entropy for base offset is expanded. It also opens the
+> door to doing even more crazy things. 
 
-What follows after this stack? That's the most interesting part. The
-part that you showed is common for all stalls and does not mean much,
-besides the fact that there is a stall. These can well be very
-different stalls in different parts of kernel.
+So I'm really confused. I see it increases the aslr range, but I'm still
+not sure why we care in the face of fgkaslr. Current kaslr is completely
+broken because the hardware leaks more bits than we currently have, even
+without the kernel itself leaking an address.
+
+But leaking a single address is not a problem with fgkaslr.
+
+> (e.g. why keep the kernel text all
+> in one contiguous chunk?)
+
+Dear gawd, please no. Also, we're limited to 2G text, that's just not a
+lot of room. I'm really going to object when people propose we introduce
+direct PLT for x86.
+
+> And generally speaking, it seems a nice improvement to me, as it gives
+> the kernel greater addressing flexibility.
+
+But at what cost; it does unspeakable ugly to the asm. And didn't a
+kernel compiled with the extended PIE range produce a measurably slower
+kernel due to all the ugly?
+
+So maybe I'm slow, but please spell out the benefit, because I'm not
+seeing it.
