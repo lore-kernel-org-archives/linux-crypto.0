@@ -2,303 +2,138 @@ Return-Path: <SRS0=WWUc=4V=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DF4FC3F2D8
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Mar 2020 07:50:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F131C3F2CD
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Mar 2020 08:08:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DB10C207FD
-	for <linux-crypto@archiver.kernel.org>; Wed,  4 Mar 2020 07:50:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 016AC2166E
+	for <linux-crypto@archiver.kernel.org>; Wed,  4 Mar 2020 08:08:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728486AbgCDHuG (ORCPT
+        id S1728532AbgCDIIN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 4 Mar 2020 02:50:06 -0500
-Received: from szxga07-in.huawei.com ([45.249.212.35]:36678 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728555AbgCDHuF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 4 Mar 2020 02:50:05 -0500
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 5A3EE3782182765B2FBF;
-        Wed,  4 Mar 2020 15:50:02 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
- 14.3.439.0; Wed, 4 Mar 2020 15:49:52 +0800
-From:   Shukun Tan <tanshukun1@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
-        <wangzhou1@hisilicon.com>, <jonathan.cameron@huawei.com>
-Subject: [PATCH 4/4] crypto: hisilicon/sec2 - Add new create qp process
-Date:   Wed, 4 Mar 2020 15:49:25 +0800
-Message-ID: <1583308165-16800-5-git-send-email-tanshukun1@huawei.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1583308165-16800-1-git-send-email-tanshukun1@huawei.com>
-References: <1583308165-16800-1-git-send-email-tanshukun1@huawei.com>
+        Wed, 4 Mar 2020 03:08:13 -0500
+Received: from mail-il1-f198.google.com ([209.85.166.198]:36888 "EHLO
+        mail-il1-f198.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725271AbgCDIIN (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 4 Mar 2020 03:08:13 -0500
+Received: by mail-il1-f198.google.com with SMTP id e70so833823ill.4
+        for <linux-crypto@vger.kernel.org>; Wed, 04 Mar 2020 00:08:11 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=QWihqIbI3h2cwVYItSSsgDU+DanrmjhYM/cRBn7sMYM=;
+        b=pCIJ5jIRXs5CWs8i6IAVZ4mMMu0UwDRBsjkMv9Azwz+NVq16aum9EJ56a2nRY52iTu
+         Mf6ax7daXgnNaVGzZIlDI/3wsKZ0zIUbsMiyFBi//woI4JgBNGUm8BsZ1MGea+o29WlX
+         hxNIaEc03qK+crS/sD5dzb3VpxNcIhWl/BB/eP6dgV9l4JMo98+LUJrpagBi1xztSnkB
+         WRaMZigJUYlWYlss6W0lna5p5InPFLAI3exhngJZoNir/fFa2ll1i6CfkNYczqY6OvDl
+         hoiE4PeCNJagfBnKhAIMT8jU9lez9NouBEmuHbHWMIvB7jf9mLFBQTK8spQf9yTLLWvS
+         6KcA==
+X-Gm-Message-State: ANhLgQ2/MHlXR1S9zjM4IGX08/B7I5ZYNKEaZXdIsZ4GjA6vkaVA+86R
+        vcBdP5yPecHjudwzdxJL6Sy+CdIhOXK2IF6HK3MGRP4PsDyL
+X-Google-Smtp-Source: ADFU+vuO5aJSyB0F3WMNwd9r/kxM2JQMSL8AbibBvCOWRnOfCodaF/8419p9BH+fF/DNjT+h/zRr0l5nq4MoEGP/MnVGS+lg5YZP
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.56]
-X-CFilter-Loop: Reflected
+X-Received: by 2002:a02:a516:: with SMTP id e22mr1642125jam.116.1583309291096;
+ Wed, 04 Mar 2020 00:08:11 -0800 (PST)
+Date:   Wed, 04 Mar 2020 00:08:11 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000dd909105a002ebe6@google.com>
+Subject: INFO: rcu detected stall in sys_keyctl
+From:   syzbot <syzbot+0c5c2dbf76930df91489@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Kai Ye <yekai13@huawei.com>
+Hello,
 
-Combine found device and created qp into one operation instead of found
-device and create qp both are independent operations. when execute
-multiple tasks, the different threads may find same device at the same
-time, but the number of queues is insufficient on the device. causing
-one of threads fail to create a qp. Now fix this, First find device then
-create qp, if result failure. the current thread will find next device.
+syzbot found the following crash on:
 
-Signed-off-by: Kai Ye <yekai13@huawei.com>
-Signed-off-by: Shukun Tan <tanshukun1@huawei.com>
-Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
-Reviewed-by: Zaibo Xu <xuzaibo@huawei.com>
+HEAD commit:    63623fd4 Merge tag 'for-linus' of git://git.kernel.org/pub..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=15257ba1e00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=9833e26bab355358
+dashboard link: https://syzkaller.appspot.com/bug?extid=0c5c2dbf76930df91489
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+
+Unfortunately, I don't have any reproducer for this crash yet.
+
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+0c5c2dbf76930df91489@syzkaller.appspotmail.com
+
+rcu: INFO: rcu_preempt self-detected stall on CPU
+rcu: 	0-....: (1 GPs behind) idle=576/1/0x4000000000000002 softirq=55718/56054 fqs=5235 
+	(t=10500 jiffies g=63445 q=1523)
+NMI backtrace for cpu 0
+CPU: 0 PID: 18804 Comm: syz-executor.4 Not tainted 5.6.0-rc3-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ <IRQ>
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x197/0x210 lib/dump_stack.c:118
+ nmi_cpu_backtrace.cold+0x70/0xb2 lib/nmi_backtrace.c:101
+ nmi_trigger_cpumask_backtrace+0x23b/0x28b lib/nmi_backtrace.c:62
+ arch_trigger_cpumask_backtrace+0x14/0x20 arch/x86/kernel/apic/hw_nmi.c:38
+ trigger_single_cpu_backtrace include/linux/nmi.h:164 [inline]
+ rcu_dump_cpu_stacks+0x183/0x1cf kernel/rcu/tree_stall.h:254
+ print_cpu_stall kernel/rcu/tree_stall.h:475 [inline]
+ check_cpu_stall kernel/rcu/tree_stall.h:549 [inline]
+ rcu_pending kernel/rcu/tree.c:3030 [inline]
+ rcu_sched_clock_irq.cold+0x51a/0xc37 kernel/rcu/tree.c:2276
+ update_process_times+0x2d/0x70 kernel/time/timer.c:1726
+ tick_sched_handle+0xa2/0x190 kernel/time/tick-sched.c:171
+ tick_sched_timer+0x53/0x140 kernel/time/tick-sched.c:1314
+ __run_hrtimer kernel/time/hrtimer.c:1517 [inline]
+ __hrtimer_run_queues+0x364/0xe40 kernel/time/hrtimer.c:1579
+ hrtimer_interrupt+0x314/0x770 kernel/time/hrtimer.c:1641
+ local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1119 [inline]
+ smp_apic_timer_interrupt+0x160/0x610 arch/x86/kernel/apic/apic.c:1144
+ apic_timer_interrupt+0xf/0x20 arch/x86/entry/entry_64.S:829
+ </IRQ>
+RIP: 0010:__sanitizer_cov_trace_const_cmp4+0x16/0x20 kernel/kcov.c:276
+Code: 48 89 e5 48 8b 4d 08 e8 d8 fe ff ff 5d c3 66 0f 1f 44 00 00 55 89 f2 89 fe bf 05 00 00 00 48 89 e5 48 8b 4d 08 e8 ba fe ff ff <5d> c3 0f 1f 84 00 00 00 00 00 55 48 89 f2 48 89 fe bf 07 00 00 00
+RSP: 0018:ffffc900053877d8 EFLAGS: 00000297 ORIG_RAX: ffffffffffffff13
+RAX: 0000000000000002 RBX: 584279fc973b765a RCX: ffffffff83b71a81
+RDX: 00000000ffffff75 RSI: 0000000000000000 RDI: 0000000000000005
+RBP: ffffc900053877d8 R08: ffff888041a265c0 R09: 0000000000000092
+R10: ffffed1015d0707b R11: ffff8880ae8383db R12: ffff88809eb56398
+R13: 000000003ab2c4e4 R14: 1b0d4377a72d08f5 R15: 00000000ffffff75
+ mpihelp_submul_1+0x161/0x1a0 lib/mpi/generic_mpih-mul3.c:45
+ mpihelp_divrem+0x1ce/0x1360 lib/mpi/mpih-div.c:209
+ mpi_powm+0xffb/0x1d20 lib/mpi/mpi-pow.c:205
+ _compute_val crypto/dh.c:39 [inline]
+ dh_compute_value+0x373/0x610 crypto/dh.c:178
+ crypto_kpp_generate_public_key include/crypto/kpp.h:315 [inline]
+ __keyctl_dh_compute+0x9ae/0x1470 security/keys/dh.c:367
+ keyctl_dh_compute+0xcf/0x12d security/keys/dh.c:422
+ __do_sys_keyctl security/keys/keyctl.c:1818 [inline]
+ __se_sys_keyctl security/keys/keyctl.c:1714 [inline]
+ __x64_sys_keyctl+0x159/0x470 security/keys/keyctl.c:1714
+ do_syscall_64+0xfa/0x790 arch/x86/entry/common.c:294
+ entry_SYSCALL_64_after_hwframe+0x49/0xbe
+RIP: 0033:0x45c479
+Code: ad b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 7b b6 fb ff c3 66 2e 0f 1f 84 00 00 00 00
+RSP: 002b:00007f872a51fc78 EFLAGS: 00000246 ORIG_RAX: 00000000000000fa
+RAX: ffffffffffffffda RBX: 00007f872a5206d4 RCX: 000000000045c479
+RDX: 0000000020002700 RSI: 0000000020000400 RDI: 0000000000000017
+RBP: 000000000076bfc0 R08: 0000000000000000 R09: 0000000000000000
+R10: 00000000ffffff84 R11: 0000000000000246 R12: 00000000ffffffff
+R13: 00000000000006fa R14: 00000000004c9883 R15: 000000000076bfcc
+
+
 ---
- drivers/crypto/hisilicon/sec2/sec.h        |  5 +-
- drivers/crypto/hisilicon/sec2/sec_crypto.c | 17 +++----
- drivers/crypto/hisilicon/sec2/sec_main.c   | 81 ++++++++++++------------------
- 3 files changed, 42 insertions(+), 61 deletions(-)
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
-index 13e2d8d..c32e8a8 100644
---- a/drivers/crypto/hisilicon/sec2/sec.h
-+++ b/drivers/crypto/hisilicon/sec2/sec.h
-@@ -114,6 +114,7 @@ struct sec_ctx {
- 	struct sec_qp_ctx *qp_ctx;
- 	struct sec_dev *sec;
- 	const struct sec_req_op *req_op;
-+	struct hisi_qp **qps;
- 
- 	/* Half queues for encipher, and half for decipher */
- 	u32 hlf_q_num;
-@@ -162,14 +163,14 @@ struct sec_debug {
- 
- struct sec_dev {
- 	struct hisi_qm qm;
--	struct list_head list;
- 	struct sec_debug debug;
- 	u32 ctx_q_num;
- 	u32 num_vfs;
- 	unsigned long status;
- };
- 
--struct sec_dev *sec_find_device(int node);
-+void sec_destroy_qps(struct hisi_qp **qps, int qp_num);
-+struct hisi_qp **sec_create_qps(void);
- int sec_register_to_crypto(void);
- void sec_unregister_from_crypto(void);
- #endif
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-index acd1550..17ffd3c 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-@@ -288,11 +288,8 @@ static int sec_create_qp_ctx(struct hisi_qm *qm, struct sec_ctx *ctx,
- 	struct hisi_qp *qp;
- 	int ret = -ENOMEM;
- 
--	qp = hisi_qm_create_qp(qm, alg_type);
--	if (IS_ERR(qp))
--		return PTR_ERR(qp);
--
- 	qp_ctx = &ctx->qp_ctx[qp_ctx_id];
-+	qp = ctx->qps[qp_ctx_id];
- 	qp->req_type = 0;
- 	qp->qp_ctx = qp_ctx;
- 	qp->req_cb = sec_req_cb;
-@@ -335,7 +332,6 @@ static int sec_create_qp_ctx(struct hisi_qm *qm, struct sec_ctx *ctx,
- 	hisi_acc_free_sgl_pool(dev, qp_ctx->c_in_pool);
- err_destroy_idr:
- 	idr_destroy(&qp_ctx->req_idr);
--	hisi_qm_release_qp(qp);
- 
- 	return ret;
- }
-@@ -352,7 +348,6 @@ static void sec_release_qp_ctx(struct sec_ctx *ctx,
- 	hisi_acc_free_sgl_pool(dev, qp_ctx->c_in_pool);
- 
- 	idr_destroy(&qp_ctx->req_idr);
--	hisi_qm_release_qp(qp_ctx->qp);
- }
- 
- static int sec_ctx_base_init(struct sec_ctx *ctx)
-@@ -360,11 +355,13 @@ static int sec_ctx_base_init(struct sec_ctx *ctx)
- 	struct sec_dev *sec;
- 	int i, ret;
- 
--	sec = sec_find_device(cpu_to_node(smp_processor_id()));
--	if (!sec) {
--		pr_err("Can not find proper Hisilicon SEC device!\n");
-+	ctx->qps = sec_create_qps();
-+	if (!ctx->qps) {
-+		pr_err("Can not create sec qps!\n");
- 		return -ENODEV;
- 	}
-+
-+	sec = container_of(ctx->qps[0]->qm, struct sec_dev, qm);
- 	ctx->sec = sec;
- 	ctx->hlf_q_num = sec->ctx_q_num >> 1;
- 
-@@ -386,6 +383,7 @@ static int sec_ctx_base_init(struct sec_ctx *ctx)
- 	for (i = i - 1; i >= 0; i--)
- 		sec_release_qp_ctx(ctx, &ctx->qp_ctx[i]);
- 
-+	sec_destroy_qps(ctx->qps, sec->ctx_q_num);
- 	kfree(ctx->qp_ctx);
- 	return ret;
- }
-@@ -397,6 +395,7 @@ static void sec_ctx_base_uninit(struct sec_ctx *ctx)
- 	for (i = 0; i < ctx->sec->ctx_q_num; i++)
- 		sec_release_qp_ctx(ctx, &ctx->qp_ctx[i]);
- 
-+	sec_destroy_qps(ctx->qps, ctx->sec->ctx_q_num);
- 	kfree(ctx->qp_ctx);
- }
- 
-diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-index 3767fdb..68bbde9 100644
---- a/drivers/crypto/hisilicon/sec2/sec_main.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-@@ -89,8 +89,7 @@ struct sec_hw_error {
- 
- static const char sec_name[] = "hisi_sec2";
- static struct dentry *sec_debugfs_root;
--static LIST_HEAD(sec_list);
--static DEFINE_MUTEX(sec_list_lock);
-+static struct hisi_qm_list sec_devices;
- 
- static const struct sec_hw_error sec_hw_errors[] = {
- 	{.int_msk = BIT(0), .msg = "sec_axi_rresp_err_rint"},
-@@ -105,37 +104,6 @@ static const struct sec_hw_error sec_hw_errors[] = {
- 	{ /* sentinel */ }
- };
- 
--struct sec_dev *sec_find_device(int node)
--{
--#define SEC_NUMA_MAX_DISTANCE	100
--	int min_distance = SEC_NUMA_MAX_DISTANCE;
--	int dev_node = 0, free_qp_num = 0;
--	struct sec_dev *sec, *ret = NULL;
--	struct hisi_qm *qm;
--	struct device *dev;
--
--	mutex_lock(&sec_list_lock);
--	list_for_each_entry(sec, &sec_list, list) {
--		qm = &sec->qm;
--		dev = &qm->pdev->dev;
--#ifdef CONFIG_NUMA
--		dev_node = dev->numa_node;
--		if (dev_node < 0)
--			dev_node = 0;
--#endif
--		if (node_distance(dev_node, node) < min_distance) {
--			free_qp_num = hisi_qm_get_free_qp_num(qm);
--			if (free_qp_num >= sec->ctx_q_num) {
--				ret = sec;
--				min_distance = node_distance(dev_node, node);
--			}
--		}
--	}
--	mutex_unlock(&sec_list_lock);
--
--	return ret;
--}
--
- static const char * const sec_dbg_file_name[] = {
- 	[SEC_CURRENT_QM] = "current_qm",
- 	[SEC_CLEAR_ENABLE] = "clear_enable",
-@@ -238,6 +206,32 @@ static u32 ctx_q_num = SEC_CTX_Q_NUM_DEF;
- module_param_cb(ctx_q_num, &sec_ctx_q_num_ops, &ctx_q_num, 0444);
- MODULE_PARM_DESC(ctx_q_num, "Queue num in ctx (24 default, 2, 4, ..., 32)");
- 
-+void sec_destroy_qps(struct hisi_qp **qps, int qp_num)
-+{
-+	hisi_qm_free_qps(qps, qp_num);
-+	kfree(qps);
-+}
-+
-+struct hisi_qp **sec_create_qps(void)
-+{
-+	int node = cpu_to_node(smp_processor_id());
-+	u32 ctx_num = ctx_q_num;
-+	struct hisi_qp **qps;
-+	int ret;
-+
-+	qps = kcalloc(ctx_num, sizeof(struct hisi_qp *), GFP_KERNEL);
-+	if (!qps)
-+		return NULL;
-+
-+	ret = hisi_qm_alloc_qps_node(&sec_devices, ctx_num, 0, node, qps);
-+	if (!ret)
-+		return qps;
-+
-+	kfree(qps);
-+	return NULL;
-+}
-+
-+
- static const struct pci_device_id sec_dev_ids[] = {
- 	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, SEC_PF_PCI_DEVICE_ID) },
- 	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, SEC_VF_PCI_DEVICE_ID) },
-@@ -245,20 +239,6 @@ static const struct pci_device_id sec_dev_ids[] = {
- };
- MODULE_DEVICE_TABLE(pci, sec_dev_ids);
- 
--static inline void sec_add_to_list(struct sec_dev *sec)
--{
--	mutex_lock(&sec_list_lock);
--	list_add_tail(&sec->list, &sec_list);
--	mutex_unlock(&sec_list_lock);
--}
--
--static inline void sec_remove_from_list(struct sec_dev *sec)
--{
--	mutex_lock(&sec_list_lock);
--	list_del(&sec->list);
--	mutex_unlock(&sec_list_lock);
--}
--
- static u8 sec_get_endian(struct sec_dev *sec)
- {
- 	struct hisi_qm *qm = &sec->qm;
-@@ -844,7 +824,7 @@ static int sec_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	if (ret)
- 		pci_warn(pdev, "Failed to init debugfs!\n");
- 
--	sec_add_to_list(sec);
-+	hisi_qm_add_to_list(qm, &sec_devices);
- 
- 	ret = sec_register_to_crypto();
- 	if (ret < 0) {
-@@ -855,7 +835,7 @@ static int sec_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 	return 0;
- 
- err_remove_from_list:
--	sec_remove_from_list(sec);
-+	hisi_qm_del_from_list(qm, &sec_devices);
- 	sec_debugfs_exit(sec);
- 	hisi_qm_stop(qm);
- 
-@@ -979,7 +959,7 @@ static void sec_remove(struct pci_dev *pdev)
- 
- 	sec_unregister_from_crypto();
- 
--	sec_remove_from_list(sec);
-+	hisi_qm_del_from_list(qm, &sec_devices);
- 
- 	if (qm->fun_type == QM_HW_PF && sec->num_vfs)
- 		(void)sec_sriov_disable(pdev);
-@@ -1026,6 +1006,7 @@ static int __init sec_init(void)
- {
- 	int ret;
- 
-+	hisi_qm_init_list(&sec_devices);
- 	sec_register_debugfs();
- 
- 	ret = pci_register_driver(&sec_pci_driver);
--- 
-2.7.4
-
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
