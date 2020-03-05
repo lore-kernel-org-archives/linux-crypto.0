@@ -2,107 +2,89 @@ Return-Path: <SRS0=yJek=4W=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB7CFC3F2D1
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Mar 2020 06:22:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B705C3F2D7
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Mar 2020 08:22:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B15E5208C3
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Mar 2020 06:22:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qOTBdj4g"
+	by mail.kernel.org (Postfix) with ESMTP id 5431E2146E
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Mar 2020 08:22:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725974AbgCEGWI (ORCPT
+        id S1725944AbgCEIWU (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 Mar 2020 01:22:08 -0500
-Received: from bombadil.infradead.org ([198.137.202.133]:35036 "EHLO
-        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725903AbgCEGWH (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 Mar 2020 01:22:07 -0500
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
-        Content-Type:MIME-Version:Date:Message-ID:Subject:From:Cc:To:Sender:Reply-To:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=8Uv8yfjAePAyCPwv9/ehe9yX6LBL9Q9lCZWm2Tx3ZcM=; b=qOTBdj4gqNy6LTESqeLIZIB3Fs
-        FOmFYttafyaItPS3h+s+Z62K0y4Y+6nRqEdujd4k5wELPJuEcKHHxDDnIqTmbg7yEoCgq/+RYaZo9
-        YLfh5A7xmJwO9zbBD44lvTsG7++UMGroyGYj6pfmnmZb7VPs7b/rWRTms+m/1Kj4JrnZYaWqw28Nl
-        txzKVRn1EHOSO2hcyQ3F9JpWf/STOL/i+877LXzRzZrw4XduVuTBrh51N5oDCp1l2VZELbMyl0Wil
-        xRpW4R5oO2qUccguiasEClmoCXJlk3HErDRK4URCRUTP6AxKs8qPoEyYhMAgdfPHhQqBnh2oTYOiF
-        gFRnqMiw==;
-Received: from [2601:1c0:6280:3f0:897c:6038:c71d:ecac]
-        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
-        id 1j9jtG-0006Qj-9J; Thu, 05 Mar 2020 06:21:50 +0000
-To:     LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Cc:     Vitaly Andrianov <vitalya@ti.com>, Tero Kristo <t-kristo@ti.com>,
-        Murali Karicheri <m-karicheri2@ti.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Matt Mackall <mpm@selenic.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-Subject: [PATCH] hw_random: move TI Keystone driver into the config menu
- structure
-Message-ID: <06417e19-57fe-c090-c493-d4c481dfee00@infradead.org>
-Date:   Wed, 4 Mar 2020 22:21:48 -0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+        Thu, 5 Mar 2020 03:22:20 -0500
+Received: from szxga04-in.huawei.com ([45.249.212.190]:11148 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1725816AbgCEIWU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 5 Mar 2020 03:22:20 -0500
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id DAD5F85F05C65E426F96;
+        Thu,  5 Mar 2020 16:22:12 +0800 (CST)
+Received: from fedora-aep.huawei.cmm (10.175.113.49) by
+ DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
+ 14.3.439.0; Thu, 5 Mar 2020 16:22:07 +0800
+From:   yangerkun <yangerkun@huawei.com>
+To:     <gregkh@linuxfoundation.org>, <herbert@gondor.apana.org.au>
+CC:     <stable@vger.kernel.org>, <linux-crypto@vger.kernel.org>
+Subject: [PATCH 4.4.y] crypto: algif_skcipher - use ZERO_OR_NULL_PTR in skcipher_recvmsg_async
+Date:   Thu, 5 Mar 2020 16:50:10 +0800
+Message-ID: <20200305085010.21324-1-yangerkun@huawei.com>
+X-Mailer: git-send-email 2.17.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [10.175.113.49]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Randy Dunlap <rdunlap@infradead.org>
+Nowdays, we trigger a oops:
+...
+kasan: GPF could be caused by NULL-ptr deref or user memory accessgeneral protection fault: 0000
+...
+ [<ffffffff8114ab47>] do_async_page_fault+0x37/0xb0 x86/../arch/x86/kernel/kvm.c:266
+ [<ffffffff828b4a48>] async_page_fault+0x28/0x30 x86/../arch/x86/entry/entry_64.S:1043
+ [<ffffffff81b47c2a>] iov_iter_zero+0x15a/0x850 x86/../lib/iov_iter.c:445
+ [<ffffffff81e8ca2f>] read_iter_zero+0xcf/0x1b0 x86/../drivers/char/mem.c:708
+ [<ffffffff816ea7c8>] do_iter_readv_writev x86/../fs/read_write.c:679 [inline]
+ [<ffffffff816ea7c8>] do_readv_writev+0x448/0x8e0 x86/../fs/read_write.c:823
+ [<ffffffff816eacdf>] vfs_readv+0x7f/0xb0 x86/../fs/read_write.c:849
+ [<ffffffff816edac3>] SYSC_preadv x86/../fs/read_write.c:927 [inline]
+ [<ffffffff816edac3>] SyS_preadv+0x193/0x240 x86/../fs/read_write.c:913
+ [<ffffffff828b3261>] entry_SYSCALL_64_fastpath+0x1e/0x9a
 
-Move the TI Keystone hardware random number generator into the
-same menu as all of the other hardware random number generators.
+In skcipher_recvmsg_async, we use '!sreq->tsg' to determine does we
+calloc fail. However, kcalloc may return ZERO_SIZE_PTR, and with this,
+the latter sg_init_table will trigger the bug. Fix it be use ZERO_OF_NULL_PTR.
 
-This makes the driver config be listed in the correct place in
-the kconfig tools.
+This function was introduced with ' commit a596999b7ddf ("crypto:
+algif - change algif_skcipher to be asynchronous")', and has been removed
+with 'commit e870456d8e7c ("crypto: algif_skcipher - overhaul memory
+management")'.
 
-Fixes: eb428ee0e3ca ("hwrng: ks-sa - add hw_random driver")
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Vitaly Andrianov <vitalya@ti.com>
-Cc: Tero Kristo <t-kristo@ti.com>
-Cc: Murali Karicheri <m-karicheri2@ti.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Matt Mackall <mpm@selenic.com>
-Cc: linux-crypto@vger.kernel.org
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: yangerkun <yangerkun@huawei.com>
 ---
- drivers/char/hw_random/Kconfig |   14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ crypto/algif_skcipher.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
---- linux-next-20200304.orig/drivers/char/hw_random/Kconfig
-+++ linux-next-20200304/drivers/char/hw_random/Kconfig
-@@ -467,6 +467,13 @@ config HW_RANDOM_NPCM
- 
-  	  If unsure, say Y.
- 
-+config HW_RANDOM_KEYSTONE
-+	depends on ARCH_KEYSTONE || COMPILE_TEST
-+	default HW_RANDOM
-+	tristate "TI Keystone NETCP SA Hardware random number generator"
-+	help
-+	  This option enables Keystone's hardware random generator.
-+
- endif # HW_RANDOM
- 
- config UML_RANDOM
-@@ -483,10 +490,3 @@ config UML_RANDOM
- 	  (check your distro, or download from
- 	  http://sourceforge.net/projects/gkernel/).  rngd periodically reads
- 	  /dev/hwrng and injects the entropy into /dev/random.
--
--config HW_RANDOM_KEYSTONE
--	depends on ARCH_KEYSTONE || COMPILE_TEST
--	default HW_RANDOM
--	tristate "TI Keystone NETCP SA Hardware random number generator"
--	help
--	  This option enables Keystone's hardware random generator.
+diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+index d12782dc9683..9bd4691cc5c5 100644
+--- a/crypto/algif_skcipher.c
++++ b/crypto/algif_skcipher.c
+@@ -538,7 +538,7 @@ static int skcipher_recvmsg_async(struct socket *sock, struct msghdr *msg,
+ 	lock_sock(sk);
+ 	tx_nents = skcipher_all_sg_nents(ctx);
+ 	sreq->tsg = kcalloc(tx_nents, sizeof(*sg), GFP_KERNEL);
+-	if (unlikely(!sreq->tsg))
++	if (unlikely(ZERO_OR_NULL_PTR(sreq->tsg)))
+ 		goto unlock;
+ 	sg_init_table(sreq->tsg, tx_nents);
+ 	memcpy(iv, ctx->iv, ivsize);
+-- 
+2.17.2
 
