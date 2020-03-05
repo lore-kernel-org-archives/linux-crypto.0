@@ -2,89 +2,99 @@ Return-Path: <SRS0=yJek=4W=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8251C3F2D1
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Mar 2020 08:22:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E18E9C3F2D7
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Mar 2020 08:26:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B222B21775
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Mar 2020 08:22:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C1B4F21741
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Mar 2020 08:26:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725912AbgCEIWu (ORCPT
+        id S1726009AbgCEI0H (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 Mar 2020 03:22:50 -0500
-Received: from szxga06-in.huawei.com ([45.249.212.32]:38530 "EHLO huawei.com"
+        Thu, 5 Mar 2020 03:26:07 -0500
+Received: from szxga05-in.huawei.com ([45.249.212.191]:11168 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725816AbgCEIWu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 Mar 2020 03:22:50 -0500
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 2A51EF1B93CA484CD08B;
-        Thu,  5 Mar 2020 16:22:45 +0800 (CST)
-Received: from fedora-aep.huawei.cmm (10.175.113.49) by
- DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
- 14.3.439.0; Thu, 5 Mar 2020 16:22:36 +0800
-From:   yangerkun <yangerkun@huawei.com>
+        id S1725866AbgCEI0H (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 5 Mar 2020 03:26:07 -0500
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id 8D501D23B73DC7F8D8D6;
+        Thu,  5 Mar 2020 16:26:03 +0800 (CST)
+Received: from [127.0.0.1] (10.133.210.141) by DGGEMS402-HUB.china.huawei.com
+ (10.3.19.202) with Microsoft SMTP Server id 14.3.439.0; Thu, 5 Mar 2020
+ 16:25:55 +0800
+Subject: Re: [PATCH 4.4.y] crypto: algif_skcipher - use ZERO_OR_NULL_PTR in
+ skcipher_recvmsg_async
 To:     <gregkh@linuxfoundation.org>, <herbert@gondor.apana.org.au>
 CC:     <stable@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
         <yangerkun@huawei.com>
-Subject: [PATCH 4.4.y] crypto: algif_skcipher - use ZERO_OR_NULL_PTR in skcipher_recvmsg_async
-Date:   Thu, 5 Mar 2020 16:50:40 +0800
-Message-ID: <20200305085040.21551-1-yangerkun@huawei.com>
-X-Mailer: git-send-email 2.17.2
+References: <20200305085040.21551-1-yangerkun@huawei.com>
+From:   yangerkun <yangerkun@huawei.com>
+Message-ID: <9f3c49d6-9a12-7cec-feea-0e7b88d981b3@huawei.com>
+Date:   Thu, 5 Mar 2020 16:25:54 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.0
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.113.49]
+In-Reply-To: <20200305085040.21551-1-yangerkun@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Originating-IP: [10.133.210.141]
 X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Nowdays, we trigger a oops:
-...
-kasan: GPF could be caused by NULL-ptr deref or user memory accessgeneral protection fault: 0000
-...
- [<ffffffff8114ab47>] do_async_page_fault+0x37/0xb0 x86/../arch/x86/kernel/kvm.c:266
- [<ffffffff828b4a48>] async_page_fault+0x28/0x30 x86/../arch/x86/entry/entry_64.S:1043
- [<ffffffff81b47c2a>] iov_iter_zero+0x15a/0x850 x86/../lib/iov_iter.c:445
- [<ffffffff81e8ca2f>] read_iter_zero+0xcf/0x1b0 x86/../drivers/char/mem.c:708
- [<ffffffff816ea7c8>] do_iter_readv_writev x86/../fs/read_write.c:679 [inline]
- [<ffffffff816ea7c8>] do_readv_writev+0x448/0x8e0 x86/../fs/read_write.c:823
- [<ffffffff816eacdf>] vfs_readv+0x7f/0xb0 x86/../fs/read_write.c:849
- [<ffffffff816edac3>] SYSC_preadv x86/../fs/read_write.c:927 [inline]
- [<ffffffff816edac3>] SyS_preadv+0x193/0x240 x86/../fs/read_write.c:913
- [<ffffffff828b3261>] entry_SYSCALL_64_fastpath+0x1e/0x9a
+Drop this, the attach call trace is wrong...
 
-In skcipher_recvmsg_async, we use '!sreq->tsg' to determine does we
-calloc fail. However, kcalloc may return ZERO_SIZE_PTR, and with this,
-the latter sg_init_table will trigger the bug. Fix it be use ZERO_OF_NULL_PTR.
+I am so sorry for this. Will send v2.
 
-This function was introduced with ' commit a596999b7ddf ("crypto:
-algif - change algif_skcipher to be asynchronous")', and has been removed
-with 'commit e870456d8e7c ("crypto: algif_skcipher - overhaul memory
-management")'.
-
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: yangerkun <yangerkun@huawei.com>
----
- crypto/algif_skcipher.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-index d12782dc9683..9bd4691cc5c5 100644
---- a/crypto/algif_skcipher.c
-+++ b/crypto/algif_skcipher.c
-@@ -538,7 +538,7 @@ static int skcipher_recvmsg_async(struct socket *sock, struct msghdr *msg,
- 	lock_sock(sk);
- 	tx_nents = skcipher_all_sg_nents(ctx);
- 	sreq->tsg = kcalloc(tx_nents, sizeof(*sg), GFP_KERNEL);
--	if (unlikely(!sreq->tsg))
-+	if (unlikely(ZERO_OR_NULL_PTR(sreq->tsg)))
- 		goto unlock;
- 	sg_init_table(sreq->tsg, tx_nents);
- 	memcpy(iv, ctx->iv, ivsize);
--- 
-2.17.2
+On 2020/3/5 16:50, yangerkun wrote:
+> Nowdays, we trigger a oops:
+> ...
+> kasan: GPF could be caused by NULL-ptr deref or user memory accessgeneral protection fault: 0000
+> ...
+>   [<ffffffff8114ab47>] do_async_page_fault+0x37/0xb0 x86/../arch/x86/kernel/kvm.c:266
+>   [<ffffffff828b4a48>] async_page_fault+0x28/0x30 x86/../arch/x86/entry/entry_64.S:1043
+>   [<ffffffff81b47c2a>] iov_iter_zero+0x15a/0x850 x86/../lib/iov_iter.c:445
+>   [<ffffffff81e8ca2f>] read_iter_zero+0xcf/0x1b0 x86/../drivers/char/mem.c:708
+>   [<ffffffff816ea7c8>] do_iter_readv_writev x86/../fs/read_write.c:679 [inline]
+>   [<ffffffff816ea7c8>] do_readv_writev+0x448/0x8e0 x86/../fs/read_write.c:823
+>   [<ffffffff816eacdf>] vfs_readv+0x7f/0xb0 x86/../fs/read_write.c:849
+>   [<ffffffff816edac3>] SYSC_preadv x86/../fs/read_write.c:927 [inline]
+>   [<ffffffff816edac3>] SyS_preadv+0x193/0x240 x86/../fs/read_write.c:913
+>   [<ffffffff828b3261>] entry_SYSCALL_64_fastpath+0x1e/0x9a
+>
+> In skcipher_recvmsg_async, we use '!sreq->tsg' to determine does we
+> calloc fail. However, kcalloc may return ZERO_SIZE_PTR, and with this,
+> the latter sg_init_table will trigger the bug. Fix it be use ZERO_OF_NULL_PTR.
+>
+> This function was introduced with ' commit a596999b7ddf ("crypto:
+> algif - change algif_skcipher to be asynchronous")', and has been removed
+> with 'commit e870456d8e7c ("crypto: algif_skcipher - overhaul memory
+> management")'.
+>
+> Reported-by: Hulk Robot <hulkci@huawei.com>
+> Signed-off-by: yangerkun <yangerkun@huawei.com>
+> ---
+>   crypto/algif_skcipher.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+> index d12782dc9683..9bd4691cc5c5 100644
+> --- a/crypto/algif_skcipher.c
+> +++ b/crypto/algif_skcipher.c
+> @@ -538,7 +538,7 @@ static int skcipher_recvmsg_async(struct socket *sock, struct msghdr *msg,
+>   	lock_sock(sk);
+>   	tx_nents = skcipher_all_sg_nents(ctx);
+>   	sreq->tsg = kcalloc(tx_nents, sizeof(*sg), GFP_KERNEL);
+> -	if (unlikely(!sreq->tsg))
+> +	if (unlikely(ZERO_OR_NULL_PTR(sreq->tsg)))
+>   		goto unlock;
+>   	sg_init_table(sreq->tsg, tx_nents);
+>   	memcpy(iv, ctx->iv, ivsize);
 
