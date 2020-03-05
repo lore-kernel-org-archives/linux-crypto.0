@@ -2,414 +2,107 @@ Return-Path: <SRS0=yJek=4W=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 914FBC3F2D7
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Mar 2020 06:10:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB7CFC3F2D1
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Mar 2020 06:22:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 591782146E
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Mar 2020 06:10:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B15E5208C3
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Mar 2020 06:22:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PtP0kMY6"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="qOTBdj4g"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726220AbgCEGKx (ORCPT
+        id S1725974AbgCEGWI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 Mar 2020 01:10:53 -0500
-Received: from mail-qk1-f193.google.com ([209.85.222.193]:46657 "EHLO
-        mail-qk1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725839AbgCEGKx (ORCPT
+        Thu, 5 Mar 2020 01:22:08 -0500
+Received: from bombadil.infradead.org ([198.137.202.133]:35036 "EHLO
+        bombadil.infradead.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725903AbgCEGWH (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 Mar 2020 01:10:53 -0500
-Received: by mail-qk1-f193.google.com with SMTP id u124so4200157qkh.13
-        for <linux-crypto@vger.kernel.org>; Wed, 04 Mar 2020 22:10:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=JwoWDxl4MZkKpSC/BKmR+zwxZllVKYjh7tS9mADZa6w=;
-        b=PtP0kMY6ksf/cE2Y5iTpWcAxqJeYDpYbR8oSFYlySRSzMX9sW+tBU/xntzQy5kNXp6
-         XnmmKFjCilfv01wCpnAZcxzOT0F2hC6ZLc+AOKxZCtbizCOYJ/b6+SZxCLzaeJEVVHhG
-         cXz5O7xsBV2cpcWBmp5LkL4smK3b/klCdDxwqBRWDFb4h2wLckmZ79886FWaaqkZ2hCF
-         LMxLGEAqrBgnAKZRJ4rZW3Lq7RTICYTs7F1KCnPA7KA2rQT2ToZeK7hofjHt9EtUQbub
-         97YjcfvV7eScsOks7WNaddnYcwi7fvL2CyLXnmEPKRZP7F6cdp479w0F+BlXRmEl+Hth
-         8y6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=JwoWDxl4MZkKpSC/BKmR+zwxZllVKYjh7tS9mADZa6w=;
-        b=hhAcywRKaLB/aU1QH49dJ0pzUVCvu/CVKDWo5dr84m/E8jB9YgisL3T6j9SCWIDZs9
-         jDzCksy7HxyGWFNNfaWtZAFjIphSIshUT71h6rs80laluNqIjNkdHTCEzPBVS2FImNUO
-         0UUzdXkJ2tPXtwRzzc/WdTuk6u2OZ2Ou/DdMXsOe+29KKpwHKkkVgJygz+WBkG6VjC+3
-         XO7fXH4SHNtNtNxSfx/fSi1bZ60oH2VByPZEpfKEIwHBXc80Q9u+wu0rRySogUmppZ39
-         WsAYeB70uzEv93TlwS4Rc7MQAYZEhK6AX95dOyCuyNcx5rb8idmTkTOVDt3+XYegaxRT
-         EDAw==
-X-Gm-Message-State: ANhLgQ3rgtpeU2nR0czE8gImT2nlQHFhKXJV4SnQcVgAYYdw/9x62GYi
-        11kW0s8Mh6rkYe3wX6ef8VGpEkHL9rKmQx6VQk0M3g==
-X-Google-Smtp-Source: ADFU+vvm5SxCR197V0UUessoK0aydCluYvzYivbptqUINdkc/OQ7gfL19UdUmIChqNoFS+tY6uNakoa8SIVSSTWvuAY=
-X-Received: by 2002:a37:7c47:: with SMTP id x68mr6657458qkc.8.1583388651106;
- Wed, 04 Mar 2020 22:10:51 -0800 (PST)
-MIME-Version: 1.0
-References: <000000000000dd909105a002ebe6@google.com> <CACT4Y+ZyhwEsuGK9aJZ=4vXJ_AfHqFn6n5d58H_5E_-o9qHRWA@mail.gmail.com>
- <96b956f4-62cb-83e6-38c2-ca698a862282@moonlit-rail.com> <CACT4Y+b_U6YKujEk9X=NHX45KkL93dLsyu5gS44PpEDi94qS0w@mail.gmail.com>
- <32326cc8-86fb-5527-fcf4-db3c19c4ec38@moonlit-rail.com>
-In-Reply-To: <32326cc8-86fb-5527-fcf4-db3c19c4ec38@moonlit-rail.com>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Thu, 5 Mar 2020 07:10:39 +0100
-Message-ID: <CACT4Y+bodV0BO+dGkb_Ks=TWZ=xjudqosW7UkXPCTxzEvZQiVg@mail.gmail.com>
-Subject: Re: INFO: rcu detected stall in sys_keyctl
-To:     Kris Karas <linux-1993@moonlit-rail.com>
-Cc:     syzbot <syzbot+0c5c2dbf76930df91489@syzkaller.appspotmail.com>,
-        David Miller <davem@davemloft.net>,
+        Thu, 5 Mar 2020 01:22:07 -0500
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20170209; h=Content-Transfer-Encoding:
+        Content-Type:MIME-Version:Date:Message-ID:Subject:From:Cc:To:Sender:Reply-To:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=8Uv8yfjAePAyCPwv9/ehe9yX6LBL9Q9lCZWm2Tx3ZcM=; b=qOTBdj4gqNy6LTESqeLIZIB3Fs
+        FOmFYttafyaItPS3h+s+Z62K0y4Y+6nRqEdujd4k5wELPJuEcKHHxDDnIqTmbg7yEoCgq/+RYaZo9
+        YLfh5A7xmJwO9zbBD44lvTsG7++UMGroyGYj6pfmnmZb7VPs7b/rWRTms+m/1Kj4JrnZYaWqw28Nl
+        txzKVRn1EHOSO2hcyQ3F9JpWf/STOL/i+877LXzRzZrw4XduVuTBrh51N5oDCp1l2VZELbMyl0Wil
+        xRpW4R5oO2qUccguiasEClmoCXJlk3HErDRK4URCRUTP6AxKs8qPoEyYhMAgdfPHhQqBnh2oTYOiF
+        gFRnqMiw==;
+Received: from [2601:1c0:6280:3f0:897c:6038:c71d:ecac]
+        by bombadil.infradead.org with esmtpsa (Exim 4.92.3 #3 (Red Hat Linux))
+        id 1j9jtG-0006Qj-9J; Thu, 05 Mar 2020 06:21:50 +0000
+To:     LKML <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc:     Vitaly Andrianov <vitalya@ti.com>, Tero Kristo <t-kristo@ti.com>,
+        Murali Karicheri <m-karicheri2@ti.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Kate Stewart <kstewart@linuxfoundation.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Eric Biggers <ebiggers@kernel.org>, allison@lohutok.net
-Content-Type: text/plain; charset="UTF-8"
+        Matt Mackall <mpm@selenic.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Subject: [PATCH] hw_random: move TI Keystone driver into the config menu
+ structure
+Message-ID: <06417e19-57fe-c090-c493-d4c481dfee00@infradead.org>
+Date:   Wed, 4 Mar 2020 22:21:48 -0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Mar 4, 2020 at 9:36 PM Kris Karas <linux-1993@moonlit-rail.com> wrote:
->
-> Dmitry Vyukov wrote:
-> > Kris Karas wrote:
-> >> [...]
-> >>       rcu: INFO: rcu_sched self-detected stall on CPU
-> >>       rcu:    14-....: (20999 ticks this GP)
-> >> idle=216/1/0x4000000000000002 softirq=454/454 fqs=5250
-> >>               (t=21004 jiffies g=-755 q=1327)
-> >>       NMI backtrace for cpu 14
-> >>       CPU: 14 PID: 520 Comm: pidof Tainted: G      D           5.5.7 #1
-> >> [...]
-> >> I don't have a reproducer for it, either.  It showed up in 5.5.7 (but
-> >> might be from earlier as it reproduces so infrequently).
-> > Hi Kris,
-> >
-> > What follows after this stack? That's the most interesting part. The
-> > part that you showed is common for all stalls and does not mean much,
-> > besides the fact that there is a stall. These can well be very
-> > different stalls in different parts of kernel.
->
-> Hi Dmitry,
->
-> Sorry, dummy me, I should have found my original post in Lore and posted
-> a link to that.
-> Oh, here we go:
->
-> https://lore.kernel.org/lkml/6d4f9ac8-a478-2ae4-0fe3-5d074d267148@moonlit-rail.com/
+From: Randy Dunlap <rdunlap@infradead.org>
 
-These all mention ptrace_may_access, so that looks like a different bug to me.
+Move the TI Keystone hardware random number generator into the
+same menu as all of the other hardware random number generators.
 
-> Given that the stall stack is not terribly useful, it would seem that
-> the OOPS I saw was probably unrelated to this one caught by syzbot,
-> though the stalled CPU does make me curious (as in all the OOPSen I've
-> encountered in the past 25 years have rarely mentioned an RCU stall).
+This makes the driver config be listed in the correct place in
+the kconfig tools.
 
-Well, it means you don't stress the kernel hard enough :)
-Search for "rcu detected stall" here:
-https://syzkaller.appspot.com/upstream
-https://syzkaller.appspot.com/upstream/fixed
-https://syzkaller.appspot.com/linux-4.19
-https://syzkaller.appspot.com/linux-4.14
-and these are all different _bugs_, some of them have tens of
-thousands of crash instances. And that's just in 2.5 years :)
+Fixes: eb428ee0e3ca ("hwrng: ks-sa - add hw_random driver")
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Vitaly Andrianov <vitalya@ti.com>
+Cc: Tero Kristo <t-kristo@ti.com>
+Cc: Murali Karicheri <m-karicheri2@ti.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Matt Mackall <mpm@selenic.com>
+Cc: linux-crypto@vger.kernel.org
+---
+ drivers/char/hw_random/Kconfig |   14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
 
+--- linux-next-20200304.orig/drivers/char/hw_random/Kconfig
++++ linux-next-20200304/drivers/char/hw_random/Kconfig
+@@ -467,6 +467,13 @@ config HW_RANDOM_NPCM
+ 
+  	  If unsure, say Y.
+ 
++config HW_RANDOM_KEYSTONE
++	depends on ARCH_KEYSTONE || COMPILE_TEST
++	default HW_RANDOM
++	tristate "TI Keystone NETCP SA Hardware random number generator"
++	help
++	  This option enables Keystone's hardware random generator.
++
+ endif # HW_RANDOM
+ 
+ config UML_RANDOM
+@@ -483,10 +490,3 @@ config UML_RANDOM
+ 	  (check your distro, or download from
+ 	  http://sourceforge.net/projects/gkernel/).  rngd periodically reads
+ 	  /dev/hwrng and injects the entropy into /dev/random.
+-
+-config HW_RANDOM_KEYSTONE
+-	depends on ARCH_KEYSTONE || COMPILE_TEST
+-	default HW_RANDOM
+-	tristate "TI Keystone NETCP SA Hardware random number generator"
+-	help
+-	  This option enables Keystone's hardware random generator.
 
-> For convenience, I'll re-post everything I was able to salvage from
-> dmesg originally.
->
-> Kris
->
-> The OOPS in the dump, below, occurred while the machine was booting,
-> right about the time that /sbin/init switched from runstate S => 3.
-> System daemons (haveged, named, syslogd, etc...) were starting. The OOPS
-> occurred in /bin/pidof, which is no doubt checking whether a daemon is
-> up before attempting to start it.  Under the OOPS, the filesystem was
-> functioning (at least well enough to save dmesg to a file), though many
-> things were hanging.  It required an Alt-SysRq-E to get me a login
-> prompt, and I lucked out in PAM and friends working well enough to give
-> me a functioning command prompt. Alt-SysRq-S,U,S,B was necessary to
-> reboot.  Without further ado...
->
-> BUG: kernel NULL pointer dereference, address: 00000000000000e8
-> #PF: supervisor read access in kernel mode
-> #PF: error_code(0x0000) - not-present page
-> PGD 7f6a50067 P4D 7f6a50067 PUD 7f6a51067 PMD 0
-> Oops: 0000 [#1] SMP
-> CPU: 3 PID: 516 Comm: pidof Not tainted 5.5.7 #1
-> Hardware name: To Be Filled By O.E.M. To Be Filled By O.E.M./X470 Taichi, BIOS P3.50 07/18/2019
-> RIP: 0010:cap_capable+0x13/0x70
-> Code: bf f4 ff ff ff 66 90 e9 01 ff ff ff 66 66 2e 0f 1f 84 00 00 00 00 00 4c 8b 87 88 00 00 00 4c 39 c6 74 39 45 8b 88 e8 00 00 00 <44> 39 8e e8 00 00 00 7e 18 48 8b 86 e0 00 00 00 4c 39 c0 74 12 48
-> RSP: 0018:ffffc90000777cb0 EFLAGS: 00010207
-> RAX: ffff8887f96ea000 RBX: 0000000000000002 RCX: 0000000000000002
-> RDX: 0000000000000013 RSI: 0000000000000000 RDI: ffff8887f9646480
-> RBP: 0000000000000013 R08: ffffffff82423da0 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-> R13: ffff8887f9646480 R14: ffffffff822a7620 R15: ffff8887fae600c0
-> FS:  00007f8ee26cd740(0000) GS:ffff8887fecc0000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00000000000000e8 CR3: 00000007f8691000 CR4: 00000000003406e0
-> Call Trace:
->   security_capable+0x36/0x50
->   ptrace_has_cap+0x14/0x30
->   __ptrace_may_access+0x76/0x110
->   ptrace_may_access+0x28/0x50
->   do_task_stat+0x7b/0xd90
->   ? do_filp_open+0xab/0x100
->   proc_single_show+0x54/0xc0
->   ? __kmalloc+0x183/0x210
->   seq_read+0xbb/0x3c0
->   vfs_read+0xc6/0x150
->   ksys_read+0x6b/0x100
->   do_syscall_64+0x3d/0x120
->   entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> RIP: 0033:0x7f8ee27d682e
-> Code: c0 e9 f6 fe ff ff 50 48 8d 3d b6 5d 0a 00 e8 e9 fd 01 00 66 0f 1f 84 00 00 00 00 00 64 8b 04 25 18 00 00 00 85 c0 75 14 0f 05 <48> 3d 00 f0 ff ff 77 5a c3 66 0f 1f 84 00 00 00 00 00 48 83 ec 28
-> RSP: 002b:00007ffdc7fdcf58 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
-> RAX: ffffffffffffffda RBX: 00007f8ee28ce958 RCX: 00007f8ee27d682e
-> RDX: 0000000000000400 RSI: 00000000017e2590 RDI: 0000000000000004
-> RBP: 00007f8ee28ce950 R08: 00007f8ee28ac120 R09: 00007ffdc7fdce00
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000004
-> R13: 0000000000000000 R14: 0000000000000000 R15: 00007ffdc7fddf02
-> Modules linked in:
-> CR2: 00000000000000e8
-> ---[ end trace 9da0e81512fbb929 ]---
-> RIP: 0010:cap_capable+0x13/0x70
-> Code: bf f4 ff ff ff 66 90 e9 01 ff ff ff 66 66 2e 0f 1f 84 00 00 00 00 00 4c 8b 87 88 00 00 00 4c 39 c6 74 39 45 8b 88 e8 00 00 00 <44> 39 8e e8 00 00 00 7e 18 48 8b 86 e0 00 00 00 4c 39 c0 74 12 48
-> RSP: 0018:ffffc90000777cb0 EFLAGS: 00010207
-> RAX: ffff8887f96ea000 RBX: 0000000000000002 RCX: 0000000000000002
-> RDX: 0000000000000013 RSI: 0000000000000000 RDI: ffff8887f9646480
-> RBP: 0000000000000013 R08: ffffffff82423da0 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000000 R12: 0000000000000000
-> R13: ffff8887f9646480 R14: ffffffff822a7620 R15: ffff8887fae600c0
-> FS:  00007f8ee26cd740(0000) GS:ffff8887fecc0000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00000000000000e8 CR3: 00000007f8691000 CR4: 00000000003406e0
-> udevd[518]: starting eudev-3.2.9
-> rcu: INFO: rcu_sched self-detected stall on CPU
-> rcu:    14-....: (20999 ticks this GP) idle=216/1/0x4000000000000002 softirq=454/454 fqs=5250
->          (t=21004 jiffies g=-755 q=1327)
-> NMI backtrace for cpu 14
-> CPU: 14 PID: 520 Comm: pidof Tainted: G      D           5.5.7 #1
-> Hardware name: To Be Filled By O.E.M. To Be Filled By O.E.M./X470 Taichi, BIOS P3.50 07/18/2019
-> Call Trace:
->   <IRQ>
->   dump_stack+0x50/0x70
->   nmi_cpu_backtrace.cold+0x14/0x53
->   ? lapic_can_unplug_cpu.cold+0x44/0x44
->   nmi_trigger_cpumask_backtrace+0x7b/0x88
->   rcu_dump_cpu_stacks+0x7b/0xa9
->   rcu_sched_clock_irq.cold+0x152/0x39b
->   update_process_times+0x1f/0x50
->   tick_sched_timer+0x40/0x90
->   ? tick_sched_do_timer+0x50/0x50
->   __hrtimer_run_queues+0xdd/0x180
->   hrtimer_interrupt+0x108/0x230
->   smp_apic_timer_interrupt+0x53/0xa0
->   apic_timer_interrupt+0xf/0x20
->   </IRQ>
-> RIP: 0010:queued_spin_lock_slowpath+0x41/0x1a0
-> Code: 2f 08 0f 92 c0 0f b6 c0 c1 e0 08 89 c2 8b 07 30 e4 09 d0 a9 00 01 ff ff 75 18 85 c0 74 0e 8b 07 84 c0 74 08 f3 90 8b 07 84 c0 <75> f8 66 c7 07 01 00 c3 f6 c4 01 75 04 c6 47 01 00 48 c7 c0 40 29
-> RSP: 0018:ffffc90001e87d08 EFLAGS: 00000202 ORIG_RAX: ffffffffffffff13
-> RAX: 0000000000000101 RBX: ffff8887f96f0000 RCX: ffff8887f96f0000
-> RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff8887f96f0658
-> RBP: 000000000000000d R08: 0000000000000001 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000000 R12: ffff8887f50b7080
-> R13: ffffffff82424480 R14: ffffffff82424480 R15: ffff8887f50b70c0
->   ptrace_may_access+0x1e/0x50
->   do_task_stat+0x7b/0xd90
->   ? do_filp_open+0xab/0x100
->   proc_single_show+0x54/0xc0
->   ? __kmalloc+0x183/0x210
->   seq_read+0xbb/0x3c0
->   vfs_read+0xc6/0x150
->   ksys_read+0x6b/0x100
->   do_syscall_64+0x3d/0x120
->   entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> RIP: 0033:0x7f666796082e
-> Code: c0 e9 f6 fe ff ff 50 48 8d 3d b6 5d 0a 00 e8 e9 fd 01 00 66 0f 1f 84 00 00 00 00 00 64 8b 04 25 18 00 00 00 85 c0 75 14 0f 05 <48> 3d 00 f0 ff ff 77 5a c3 66 0f 1f 84 00 00 00 00 00 48 83 ec 28
-> RSP: 002b:00007ffe26688b38 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
-> RAX: ffffffffffffffda RBX: 00007f6667a58958 RCX: 00007f666796082e
-> RDX: 0000000000000400 RSI: 000000000153e590 RDI: 0000000000000004
-> RBP: 00007f6667a58950 R08: 00007f6667a36120 R09: 00007ffe266889e0
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000004
-> R13: 0000000000000000 R14: 0000000000000000 R15: 00007ffe2668aee9
-> ...
-> sysrq: Terminate All Tasks
-> rcu: INFO: rcu_sched self-detected stall on CPU
-> rcu:    14-....: (83876 ticks this GP) idle=216/1/0x4000000000000002 softirq=454/454 fqs=20970
->          (t=84003 jiffies g=-755 q=2695)
-> NMI backtrace for cpu 14
-> CPU: 14 PID: 520 Comm: pidof Tainted: G      D           5.5.7 #1
-> Hardware name: To Be Filled By O.E.M. To Be Filled By O.E.M./X470 Taichi, BIOS P3.50 07/18/2019
-> Call Trace:
->   <IRQ>
->   dump_stack+0x50/0x70
->   nmi_cpu_backtrace.cold+0x14/0x53
->   ? lapic_can_unplug_cpu.cold+0x44/0x44
->   nmi_trigger_cpumask_backtrace+0x7b/0x88
->   rcu_dump_cpu_stacks+0x7b/0xa9
->   rcu_sched_clock_irq.cold+0x152/0x39b
->   update_process_times+0x1f/0x50
->   tick_sched_timer+0x40/0x90
->   ? tick_sched_do_timer+0x50/0x50
->   __hrtimer_run_queues+0xdd/0x180
->   hrtimer_interrupt+0x108/0x230
->   smp_apic_timer_interrupt+0x53/0xa0
->   apic_timer_interrupt+0xf/0x20
->   </IRQ>
-> RIP: 0010:queued_spin_lock_slowpath+0x3d/0x1a0
-> Code: 3e f0 0f ba 2f 08 0f 92 c0 0f b6 c0 c1 e0 08 89 c2 8b 07 30 e4 09 d0 a9 00 01 ff ff 75 18 85 c0 74 0e 8b 07 84 c0 74 08 f3 90 <8b> 07 84 c0 75 f8 66 c7 07 01 00 c3 f6 c4 01 75 04 c6 47 01 00 48
-> RSP: 0018:ffffc90001e87d08 EFLAGS: 00000202 ORIG_RAX: ffffffffffffff13
-> RAX: 0000000000000101 RBX: ffff8887f96f0000 RCX: ffff8887f96f0000
-> RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff8887f96f0658
-> RBP: 000000000000000d R08: 0000000000000001 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000000 R12: ffff8887f50b7080
-> R13: ffffffff82424480 R14: ffffffff82424480 R15: ffff8887f50b70c0
->   ptrace_may_access+0x1e/0x50
->   do_task_stat+0x7b/0xd90
->   ? do_filp_open+0xab/0x100
->   proc_single_show+0x54/0xc0
->   ? __kmalloc+0x183/0x210
->   seq_read+0xbb/0x3c0
->   vfs_read+0xc6/0x150
->   ksys_read+0x6b/0x100
->   do_syscall_64+0x3d/0x120
->   entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> RIP: 0033:0x7f666796082e
-> Code: c0 e9 f6 fe ff ff 50 48 8d 3d b6 5d 0a 00 e8 e9 fd 01 00 66 0f 1f 84 00 00 00 00 00 64 8b 04 25 18 00 00 00 85 c0 75 14 0f 05 <48> 3d 00 f0 ff ff 77 5a c3 66 0f 1f 84 00 00 00 00 00 48 83 ec 28
-> RSP: 002b:00007ffe26688b38 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
-> RAX: ffffffffffffffda RBX: 00007f6667a58958 RCX: 00007f666796082e
-> RDX: 0000000000000400 RSI: 000000000153e590 RDI: 0000000000000004
-> RBP: 00007f6667a58950 R08: 00007f6667a36120 R09: 00007ffe266889e0
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000004
-> R13: 0000000000000000 R14: 0000000000000000 R15: 00007ffe2668aee9
-> rcu: INFO: rcu_sched detected expedited stalls on CPUs/tasks: { 14-... } 21041 jiffies s: 45 root: 0x4000/.
-> rcu: blocking rcu_node structures:
-> Task dump for CPU 14:
-> pidof           R  running task        0   520      1 0x8000000c
-> Call Trace:
->   ? do_syscall_64+0x3d/0x120
->   ? entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> rcu: INFO: rcu_sched self-detected stall on CPU
-> rcu:    14-....: (146878 ticks this GP) idle=216/1/0x4000000000000002 softirq=454/454 fqs=36715
->          (t=147006 jiffies g=-755 q=3376)
-> NMI backtrace for cpu 14
-> CPU: 14 PID: 520 Comm: pidof Tainted: G      D           5.5.7 #1
-> Hardware name: To Be Filled By O.E.M. To Be Filled By O.E.M./X470 Taichi, BIOS P3.50 07/18/2019
-> Call Trace:
->   <IRQ>
->   dump_stack+0x50/0x70
->   nmi_cpu_backtrace.cold+0x14/0x53
->   ? lapic_can_unplug_cpu.cold+0x44/0x44
->   nmi_trigger_cpumask_backtrace+0x7b/0x88
->   rcu_dump_cpu_stacks+0x7b/0xa9
->   rcu_sched_clock_irq.cold+0x152/0x39b
->   update_process_times+0x1f/0x50
->   tick_sched_timer+0x40/0x90
->   ? tick_sched_do_timer+0x50/0x50
->   __hrtimer_run_queues+0xdd/0x180
->   hrtimer_interrupt+0x108/0x230
->   smp_apic_timer_interrupt+0x53/0xa0
->   apic_timer_interrupt+0xf/0x20
->   </IRQ>
-> RIP: 0010:queued_spin_lock_slowpath+0x3d/0x1a0
-> Code: 3e f0 0f ba 2f 08 0f 92 c0 0f b6 c0 c1 e0 08 89 c2 8b 07 30 e4 09 d0 a9 00 01 ff ff 75 18 85 c0 74 0e 8b 07 84 c0 74 08 f3 90 <8b> 07 84 c0 75 f8 66 c7 07 01 00 c3 f6 c4 01 75 04 c6 47 01 00 48
-> RSP: 0018:ffffc90001e87d08 EFLAGS: 00000202 ORIG_RAX: ffffffffffffff13
-> RAX: 0000000000000101 RBX: ffff8887f96f0000 RCX: ffff8887f96f0000
-> RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff8887f96f0658
-> RBP: 000000000000000d R08: 0000000000000001 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000000 R12: ffff8887f50b7080
-> R13: ffffffff82424480 R14: ffffffff82424480 R15: ffff8887f50b70c0
->   ptrace_may_access+0x1e/0x50
->   do_task_stat+0x7b/0xd90
->   ? do_filp_open+0xab/0x100
->   proc_single_show+0x54/0xc0
->   ? __kmalloc+0x183/0x210
->   seq_read+0xbb/0x3c0
->   vfs_read+0xc6/0x150
->   ksys_read+0x6b/0x100
->   do_syscall_64+0x3d/0x120
->   entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> RIP: 0033:0x7f666796082e
-> Code: c0 e9 f6 fe ff ff 50 48 8d 3d b6 5d 0a 00 e8 e9 fd 01 00 66 0f 1f 84 00 00 00 00 00 64 8b 04 25 18 00 00 00 85 c0 75 14 0f 05 <48> 3d 00 f0 ff ff 77 5a c3 66 0f 1f 84 00 00 00 00 00 48 83 ec 28
-> RSP: 002b:00007ffe26688b38 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
-> RAX: ffffffffffffffda RBX: 00007f6667a58958 RCX: 00007f666796082e
-> RDX: 0000000000000400 RSI: 000000000153e590 RDI: 0000000000000004
-> RBP: 00007f6667a58950 R08: 00007f6667a36120 R09: 00007ffe266889e0
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000004
-> R13: 0000000000000000 R14: 0000000000000000 R15: 00007ffe2668aee9
-> rcu: INFO: rcu_sched detected expedited stalls on CPUs/tasks: { 14-... } 85041 jiffies s: 45 root: 0x4000/.
-> rcu: blocking rcu_node structures:
-> Task dump for CPU 14:
-> pidof           R  running task        0   520      1 0x8000000c
-> Call Trace:
->   ? do_syscall_64+0x3d/0x120
->   ? entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> rcu: INFO: rcu_sched self-detected stall on CPU
-> rcu:    14-....: (209792 ticks this GP) idle=216/1/0x4000000000000002 softirq=454/454 fqs=52439
->          (t=210009 jiffies g=-755 q=3747)
-> NMI backtrace for cpu 14
-> CPU: 14 PID: 520 Comm: pidof Tainted: G      D           5.5.7 #1
-> Hardware name: To Be Filled By O.E.M. To Be Filled By O.E.M./X470 Taichi, BIOS P3.50 07/18/2019
-> Call Trace:
->   <IRQ>
->   dump_stack+0x50/0x70
->   nmi_cpu_backtrace.cold+0x14/0x53
->   ? lapic_can_unplug_cpu.cold+0x44/0x44
->   nmi_trigger_cpumask_backtrace+0x7b/0x88
->   rcu_dump_cpu_stacks+0x7b/0xa9
->   rcu_sched_clock_irq.cold+0x152/0x39b
->   update_process_times+0x1f/0x50
->   tick_sched_timer+0x40/0x90
->   ? tick_sched_do_timer+0x50/0x50
->   __hrtimer_run_queues+0xdd/0x180
->   hrtimer_interrupt+0x108/0x230
->   smp_apic_timer_interrupt+0x53/0xa0
->   apic_timer_interrupt+0xf/0x20
->   </IRQ>
-> RIP: 0010:queued_spin_lock_slowpath+0x3d/0x1a0
-> Code: 3e f0 0f ba 2f 08 0f 92 c0 0f b6 c0 c1 e0 08 89 c2 8b 07 30 e4 09 d0 a9 00 01 ff ff 75 18 85 c0 74 0e 8b 07 84 c0 74 08 f3 90 <8b> 07 84 c0 75 f8 66 c7 07 01 00 c3 f6 c4 01 75 04 c6 47 01 00 48
-> RSP: 0018:ffffc90001e87d08 EFLAGS: 00000202 ORIG_RAX: ffffffffffffff13
-> RAX: 0000000000000101 RBX: ffff8887f96f0000 RCX: ffff8887f96f0000
-> RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff8887f96f0658
-> RBP: 000000000000000d R08: 0000000000000001 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000000 R12: ffff8887f50b7080
-> R13: ffffffff82424480 R14: ffffffff82424480 R15: ffff8887f50b70c0
->   ptrace_may_access+0x1e/0x50
->   do_task_stat+0x7b/0xd90
->   ? do_filp_open+0xab/0x100
->   proc_single_show+0x54/0xc0
->   ? __kmalloc+0x183/0x210
->   seq_read+0xbb/0x3c0
->   vfs_read+0xc6/0x150
->   ksys_read+0x6b/0x100
->   do_syscall_64+0x3d/0x120
->   entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> RIP: 0033:0x7f666796082e
-> Code: c0 e9 f6 fe ff ff 50 48 8d 3d b6 5d 0a 00 e8 e9 fd 01 00 66 0f 1f 84 00 00 00 00 00 64 8b 04 25 18 00 00 00 85 c0 75 14 0f 05 <48> 3d 00 f0 ff ff 77 5a c3 66 0f 1f 84 00 00 00 00 00 48 83 ec 28
-> RSP: 002b:00007ffe26688b38 EFLAGS: 00000246 ORIG_RAX: 0000000000000000
-> RAX: ffffffffffffffda RBX: 00007f6667a58958 RCX: 00007f666796082e
-> RDX: 0000000000000400 RSI: 000000000153e590 RDI: 0000000000000004
-> RBP: 00007f6667a58950 R08: 00007f6667a36120 R09: 00007ffe266889e0
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000004
-> R13: 0000000000000000 R14: 0000000000000000 R15: 00007ffe2668aee9
-> rcu: INFO: rcu_sched detected expedited stalls on CPUs/tasks: { 14-... } 150577 jiffies s: 45 root: 0x4000/.
-> rcu: blocking rcu_node structures:
-> Task dump for CPU 14:
-> pidof           R  running task        0   520      1 0x8000000c
-> Call Trace:
->   ? do_syscall_64+0x3d/0x120
->   ? entry_SYSCALL_64_after_hwframe+0x44/0xa9
->
->
->
