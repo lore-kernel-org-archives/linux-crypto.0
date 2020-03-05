@@ -4,34 +4,34 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B705C3F2D7
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Mar 2020 08:22:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8251C3F2D1
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Mar 2020 08:22:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5431E2146E
-	for <linux-crypto@archiver.kernel.org>; Thu,  5 Mar 2020 08:22:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B222B21775
+	for <linux-crypto@archiver.kernel.org>; Thu,  5 Mar 2020 08:22:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725944AbgCEIWU (ORCPT
+        id S1725912AbgCEIWu (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 Mar 2020 03:22:20 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:11148 "EHLO huawei.com"
+        Thu, 5 Mar 2020 03:22:50 -0500
+Received: from szxga06-in.huawei.com ([45.249.212.32]:38530 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1725816AbgCEIWU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 Mar 2020 03:22:20 -0500
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id DAD5F85F05C65E426F96;
-        Thu,  5 Mar 2020 16:22:12 +0800 (CST)
+        id S1725816AbgCEIWu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 5 Mar 2020 03:22:50 -0500
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 2A51EF1B93CA484CD08B;
+        Thu,  5 Mar 2020 16:22:45 +0800 (CST)
 Received: from fedora-aep.huawei.cmm (10.175.113.49) by
- DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
- 14.3.439.0; Thu, 5 Mar 2020 16:22:07 +0800
+ DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
+ 14.3.439.0; Thu, 5 Mar 2020 16:22:36 +0800
 From:   yangerkun <yangerkun@huawei.com>
 To:     <gregkh@linuxfoundation.org>, <herbert@gondor.apana.org.au>
-CC:     <stable@vger.kernel.org>, <linux-crypto@vger.kernel.org>
+CC:     <stable@vger.kernel.org>, <linux-crypto@vger.kernel.org>,
+        <yangerkun@huawei.com>
 Subject: [PATCH 4.4.y] crypto: algif_skcipher - use ZERO_OR_NULL_PTR in skcipher_recvmsg_async
-Date:   Thu, 5 Mar 2020 16:50:10 +0800
-Message-ID: <20200305085010.21324-1-yangerkun@huawei.com>
+Date:   Thu, 5 Mar 2020 16:50:40 +0800
+Message-ID: <20200305085040.21551-1-yangerkun@huawei.com>
 X-Mailer: git-send-email 2.17.2
 MIME-Version: 1.0
 Content-Type: text/plain
