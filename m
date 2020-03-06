@@ -2,82 +2,114 @@ Return-Path: <SRS0=LFd7=4X=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF531C10F00
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Mar 2020 13:39:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1647CC10DCE
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Mar 2020 13:39:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 7BE85208CD
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Mar 2020 13:39:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E2E652084E
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Mar 2020 13:39:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1583501943;
-	bh=xjWW14TC0TTciWBjku0A3OHDB9CP0FwrNfb3H6Z58Gc=;
+	s=default; t=1583501984;
+	bh=DSzVN77wc9UBW6xxS8MhVz43+mLB9HuADYFSIrfj9Pc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=BF6p0QzZ+vAnQCjBHiBcEXp5oaVzZ+Tt11ZHkAiHULbMlEUyWQLI6DUceB1C5pChH
-	 qOI77c06NQc1xDnuF/LvVsrdbD9mgv9iDbWwJvXsUWSWUzwcXQHfUFkIB1OUxGEyOk
-	 9bvNRtcGva2Cp6J5XYvYXdkU1W1yoEa5b0tHQvy8=
+	b=kVZ4/1kHgi1wZfsxZP8PHLYZv7TWUgnX9p3qfH4yoigwZQ5e/1Y3WKhivR4eoasUD
+	 Z00e+qNWjUPsVhNt0PMOksuqdb9HhIUv+IrI3CESzmegasuKN8YeI3PpSAOHwSt1+P
+	 3dJm7ywrEk1e4wVcZxKTNp4Eer1Ditabr7rZy10E=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727023AbgCFNjC (ORCPT
+        id S1726300AbgCFNjn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 Mar 2020 08:39:02 -0500
-Received: from mail.kernel.org ([198.145.29.99]:56998 "EHLO mail.kernel.org"
+        Fri, 6 Mar 2020 08:39:43 -0500
+Received: from mail.kernel.org ([198.145.29.99]:57336 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726090AbgCFNjC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 Mar 2020 08:39:02 -0500
-Received: from localhost (unknown [122.178.250.113])
+        id S1726090AbgCFNjn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 6 Mar 2020 08:39:43 -0500
+Received: from localhost (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6E5DC2072D;
-        Fri,  6 Mar 2020 13:39:01 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7E6CA2072D;
+        Fri,  6 Mar 2020 13:39:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1583501942;
-        bh=xjWW14TC0TTciWBjku0A3OHDB9CP0FwrNfb3H6Z58Gc=;
+        s=default; t=1583501982;
+        bh=DSzVN77wc9UBW6xxS8MhVz43+mLB9HuADYFSIrfj9Pc=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=C8olfGSKeQvEWcUrS9PoIs6aQmZZbnvMHMHXdKYNnE0vLRtpGtcheuSEHx+WMNakr
-         CRDYhaa/0dA0Wb4TEq0hsq9f4fzszK9HaVpQ3tR2Jxt21Q91HvjEBPnG1HjnSiqWm2
-         oE/ZNZ9HslgG3FT7I0/mMbyHtE1ot/ifytSaUYF8=
-Date:   Fri, 6 Mar 2020 19:08:58 +0530
-From:   Vinod Koul <vkoul@kernel.org>
-To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc:     Dan Williams <dan.j.williams@intel.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Corbet <corbet@lwn.net>, linux-crypto@vger.kernel.org,
-        linux-doc@vger.kernel.org, dmaengine@vger.kernel.org
-Subject: Re: [PATCH v3 04/18] docs: crypto: convert async-tx-api.txt to ReST
- format
-Message-ID: <20200306133858.GI4148@vkoul-mobl>
-References: <cover.1583243826.git.mchehab+huawei@kernel.org>
- <f6c75c58cf682cce5fa46b2cd7f7fe902ff833b1.1583243826.git.mchehab+huawei@kernel.org>
+        b=XDUlPD2INaUHFrx3pmh15B0gffkx5LXpn2S/2JXylCnTFn3ivok8nDnfCJlfWRG4W
+         YHN1MxbjA6sYgczgs/YS2hsXiSnM9WN93iCpx1WBBgdfjJ0W6jnXGrH9vwXBzrQUsQ
+         e4kgTUfIcOSKxg8dRiqG94jIrqtcRUI16Ep37lvk=
+Date:   Fri, 6 Mar 2020 08:39:41 -0500
+From:   Sasha Levin <sashal@kernel.org>
+To:     yangerkun <yangerkun@huawei.com>
+Cc:     gregkh@linuxfoundation.org, herbert@gondor.apana.org.au,
+        stable@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH 4.4.y v2] crypto: algif_skcipher - use ZERO_OR_NULL_PTR
+ in skcipher_recvmsg_async
+Message-ID: <20200306133941.GQ21491@sasha-vm>
+References: <20200305085755.22730-1-yangerkun@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <f6c75c58cf682cce5fa46b2cd7f7fe902ff833b1.1583243826.git.mchehab+huawei@kernel.org>
+In-Reply-To: <20200305085755.22730-1-yangerkun@huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 03-03-20, 14:59, Mauro Carvalho Chehab wrote:
-> - Place the txt index inside a comment;
-> - Use title and chapter markups;
-> - Adjust markups for numbered list;
-> - Mark literal blocks as such;
-> - Use tables markup.
-> - Adjust indentation when needed.
-> 
-> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-> ---
->  .../{async-tx-api.txt => async-tx-api.rst}    | 253 +++++++++++-------
->  Documentation/crypto/index.rst                |   2 +
->  Documentation/driver-api/dmaengine/client.rst |   2 +-
->  .../driver-api/dmaengine/provider.rst         |   2 +-
+On Thu, Mar 05, 2020 at 04:57:55PM +0800, yangerkun wrote:
+>Nowdays, we trigger a oops:
+>...
+>kasan: GPF could be caused by NULL-ptr deref or user memory accessgeneral protection fault: 0000 [#1] SMP KASAN
+>...
+>Call Trace:
+> [<ffffffff81a26fb1>] skcipher_recvmsg_async+0x3f1/0x1400 x86/../crypto/algif_skcipher.c:543
+> [<ffffffff81a28053>] skcipher_recvmsg+0x93/0x7f0 x86/../crypto/algif_skcipher.c:723
+> [<ffffffff823e43a4>] sock_recvmsg_nosec x86/../net/socket.c:702 [inline]
+> [<ffffffff823e43a4>] sock_recvmsg x86/../net/socket.c:710 [inline]
+> [<ffffffff823e43a4>] sock_recvmsg+0x94/0xc0 x86/../net/socket.c:705
+> [<ffffffff823e464b>] sock_read_iter+0x27b/0x3a0 x86/../net/socket.c:787
+> [<ffffffff817f479b>] aio_run_iocb+0x21b/0x7a0 x86/../fs/aio.c:1520
+> [<ffffffff817f57c9>] io_submit_one x86/../fs/aio.c:1630 [inline]
+> [<ffffffff817f57c9>] do_io_submit+0x6b9/0x10b0 x86/../fs/aio.c:1688
+> [<ffffffff817f902d>] SYSC_io_submit x86/../fs/aio.c:1713 [inline]
+> [<ffffffff817f902d>] SyS_io_submit+0x2d/0x40 x86/../fs/aio.c:1710
+> [<ffffffff828b33c3>] tracesys_phase2+0x90/0x95
+>
+>In skcipher_recvmsg_async, we use '!sreq->tsg' to determine does we
+>calloc fail. However, kcalloc may return ZERO_SIZE_PTR, and with this,
+>the latter sg_init_table will trigger the bug. Fix it be use ZERO_OF_NULL_PTR.
+>
+>This function was introduced with ' commit a596999b7ddf ("crypto:
+>algif - change algif_skcipher to be asynchronous")', and has been removed
+>with 'commit e870456d8e7c ("crypto: algif_skcipher - overhaul memory
+>management")'.
+>
+>Reported-by: Hulk Robot <hulkci@huawei.com>
+>Signed-off-by: yangerkun <yangerkun@huawei.com>
+>---
+> crypto/algif_skcipher.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+>
+>v1->v2:
+>update the commit message
+>
+>diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
+>index d12782dc9683..9bd4691cc5c5 100644
+>--- a/crypto/algif_skcipher.c
+>+++ b/crypto/algif_skcipher.c
+>@@ -538,7 +538,7 @@ static int skcipher_recvmsg_async(struct socket *sock, struct msghdr *msg,
+> 	lock_sock(sk);
+> 	tx_nents = skcipher_all_sg_nents(ctx);
+> 	sreq->tsg = kcalloc(tx_nents, sizeof(*sg), GFP_KERNEL);
+>-	if (unlikely(!sreq->tsg))
+>+	if (unlikely(ZERO_OR_NULL_PTR(sreq->tsg)))
 
-For dmaengine parts:
-
-Acked-By: Vinod Koul <vkoul@kernel.org>
+I'm a bit confused: kcalloc() will return ZERO_SIZE_PTR for allocations
+that ask for 0 bytes, but here we ask for "sizeof(*sg)" bytes, which is
+guaranteed to be more than 0, no?
 
 -- 
-~Vinod
+Thanks,
+Sasha
