@@ -2,171 +2,156 @@ Return-Path: <SRS0=LFd7=4X=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-5.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9655DC10DCE
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Mar 2020 15:57:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ACB1C10F25
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Mar 2020 16:12:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5AD9A2072A
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Mar 2020 15:57:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6444A2073D
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Mar 2020 16:12:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="NVp8Dhnn"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="FqzPkzNz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726178AbgCFP5Z (ORCPT
+        id S1726642AbgCFQMY (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 Mar 2020 10:57:25 -0500
-Received: from mail-mw2nam10on2047.outbound.protection.outlook.com ([40.107.94.47]:44449
-        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726231AbgCFP5Z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 Mar 2020 10:57:25 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gaxoh7Iw5YoXdbZhw/hyhXxAlD31w38SeMnltd9ZsEQTldvLAAIfaOn3EXGMc0hVGWLCJJH+NViRuNkh1Qd+n7TLIgjHdksaPunzFWlZLKBsm6taCvp0Ip9CWbvRWTooRfg0BAP6S8QRbkC6292bEcyIKcL6F4PDuMvO0z9gJ1HmnQc5RuT7YXriLsJQZpzGyFNK9zsvIqPNqXUWEEEPAPu9JLTBnMTJF5ZuhuN2799a69GjoMS9IAly2BY0sg7h2onB5faqqWpKhAm4StuE2sW/UUhuy8VcamtaTc/qJmAJE3vNxQTEY7hdSAITjhNBYmpA1wNum/PM2budHer69A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YKGPK1RURm0Urj2/gtQsfdph8YndmPxUqSsSMmpPZ04=;
- b=eZbvIfASN4eSihonxN0TEcN+JAL/BMJy7y8lZppqDSkVRrER4xb1/142eFO5pYD/C+PrYDSJL+VQZ0apkiZ1kmzHnuFMbKTG/Lvq4Umw+nzJZC5cwsLpomny+/bBQu2ovzDfbQu6K0+5otofIRxJq7VkpTsYGI6YdlKgv8lCvn7uIOevvCcSXk2oKON2+qaKD7YOE5w9dpyEQrwzIBF+dawjzsSuahKG4QtRciO4NLKDAZV6kMLp4OJHKgYvq3t0CZAcuqcM+1rWsVo458gxEGtahxUzX2tY4lcE4TRhzd8w1Dey0uISshY31OVGULByaaDfP8iWrv9a8HxEkcUKHQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YKGPK1RURm0Urj2/gtQsfdph8YndmPxUqSsSMmpPZ04=;
- b=NVp8DhnncKJqT46V0kMZEU30t0OTfzBwFxEJhh9G9k8APoQQP6diI562vrF7A8hFQwPTFBH5D26DuWN0B+Ua9J3fjBhWuVhimahczL74qdkmwIErvNB80IRcfuq79ZQcpxBy+Q8mQosmmlxgFMf5NZ1sKidYUmFbKEm7PLwsg1k=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=Thomas.Lendacky@amd.com; 
-Received: from BN8PR12MB3154.namprd12.prod.outlook.com (2603:10b6:408:6d::10)
- by BN8PR12MB3492.namprd12.prod.outlook.com (2603:10b6:408:67::32) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2793.16; Fri, 6 Mar
- 2020 15:57:19 +0000
-Received: from BN8PR12MB3154.namprd12.prod.outlook.com
- ([fe80::fdf0:c7aa:3bd7:7d51]) by BN8PR12MB3154.namprd12.prod.outlook.com
- ([fe80::fdf0:c7aa:3bd7:7d51%4]) with mapi id 15.20.2793.013; Fri, 6 Mar 2020
- 15:57:19 +0000
-Subject: Re: [PATCH 2/2] crypto/ccp: Cleanup sp_dev_master in
- psp_dev_destroy()
-To:     John Allen <john.allen@amd.com>, linux-crypto@vger.kernel.org
-Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        brijesh.singh@amd.com, bp@suse.de, linux-kernel@vger.kernel.org
-References: <20200303135724.14060-1-john.allen@amd.com>
- <20200303135724.14060-3-john.allen@amd.com>
-From:   Tom Lendacky <thomas.lendacky@amd.com>
-Message-ID: <d8e12b10-6a80-fdca-f378-eb3b9ca4b8e2@amd.com>
-Date:   Fri, 6 Mar 2020 09:57:17 -0600
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
-In-Reply-To: <20200303135724.14060-3-john.allen@amd.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SN1PR12CA0079.namprd12.prod.outlook.com
- (2603:10b6:802:21::14) To BN8PR12MB3154.namprd12.prod.outlook.com
- (2603:10b6:408:6d::10)
+        Fri, 6 Mar 2020 11:12:24 -0500
+Received: from userp2130.oracle.com ([156.151.31.86]:46758 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726140AbgCFQMY (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 6 Mar 2020 11:12:24 -0500
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 026FwRdY010762;
+        Fri, 6 Mar 2020 16:12:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=a2clhmmmya55OinwgvvRajQ5WwlmesIYpOf+oPKPgQM=;
+ b=FqzPkzNz52Gafw2/hwj9LD1WFKN/LywIRe5GZZThqIqeUx74TZ6SejHQ1W1F48OEMd+m
+ j8RPR+9YHdBVF95jNvCFmYJkJUYI+BZtWE9lcH0c/npv5/eCByu/5UkMS+M9EfL2udXg
+ pa74fajfUbfAQEyImcEamjtq/J2Dfax9AwuaBpsLv65v5/R1s9AQzpcs2CN5Hg5+dT/P
+ tPvRSQEYruQnCIS96W3MJmj4VN4i+F0hmFlG/XIVF8mf3ny7JFrzdhISSa6kcgsPSimc
+ rrC/oEBZ+xD+tyPSbCaokafhor3D/2VHxoPO/jF9pUcWh3+Pigz7d7B/whr4vaNtEbxs og== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+        by userp2130.oracle.com with ESMTP id 2ykgys2rkq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 06 Mar 2020 16:12:12 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+        by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 026FvUOh156456;
+        Fri, 6 Mar 2020 16:12:12 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by userp3020.oracle.com with ESMTP id 2yg1pdp0wd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 06 Mar 2020 16:12:10 +0000
+Received: from abhmp0017.oracle.com (abhmp0017.oracle.com [141.146.116.23])
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 026GC54e032096;
+        Fri, 6 Mar 2020 16:12:05 GMT
+Received: from ca-dmjordan1.us.oracle.com (/10.211.9.48)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 06 Mar 2020 08:12:04 -0800
+Date:   Fri, 6 Mar 2020 11:12:22 -0500
+From:   Daniel Jordan <daniel.m.jordan@oracle.com>
+To:     Eric Biggers <ebiggers@kernel.org>,
+        Corentin Labbe <clabbe.montjoie@gmail.com>
+Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Robin Murphy <robin.murphy@arm.com>, mark.rutland@arm.com,
+        jiangshanlai@gmail.com, linux-kernel@vger.kernel.org,
+        linux-crypto@vger.kernel.org, tj@kernel.org,
+        Will Deacon <will@kernel.org>,
+        linux-arm-kernel@lists.infradead.org
+Subject: Re: WARNING: at kernel/workqueue.c:1473 __queue_work+0x3b8/0x3d0
+Message-ID: <20200306161222.wsx6nx26f7u7vabf@ca-dmjordan1.us.oracle.com>
+References: <20200218163504.y5ofvaejleuf5tbh@ca-dmjordan1.us.oracle.com>
+ <20200220090350.GA19858@Red>
+ <20200221174223.r3y6tugavp3k5jdl@ca-dmjordan1.us.oracle.com>
+ <20200228123311.GE3275@willie-the-truck>
+ <20200228153331.uimy62rat2tdxxod@ca-dmjordan1.us.oracle.com>
+ <20200301175351.GA11684@Red>
+ <20200302172510.fspofleipqjcdxak@ca-dmjordan1.us.oracle.com>
+ <e7c92da2-42c0-a97d-7427-6fdc769b41b9@arm.com>
+ <20200303213017.tanczhqd3nhpeeak@ca-dmjordan1.us.oracle.com>
+ <20200303224327.GA89804@sol.localdomain>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [10.236.30.118] (165.204.77.1) by SN1PR12CA0079.namprd12.prod.outlook.com (2603:10b6:802:21::14) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2772.19 via Frontend Transport; Fri, 6 Mar 2020 15:57:18 +0000
-X-Originating-IP: [165.204.77.1]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 245d9cc4-8603-4179-3b34-08d7c1e70cd9
-X-MS-TrafficTypeDiagnostic: BN8PR12MB3492:|BN8PR12MB3492:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <BN8PR12MB349290609320585AD3609C10ECE30@BN8PR12MB3492.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:211;
-X-Forefront-PRVS: 0334223192
-X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(136003)(346002)(396003)(39860400002)(376002)(366004)(199004)(189003)(5660300002)(36756003)(66476007)(66556008)(66946007)(53546011)(478600001)(31686004)(2616005)(26005)(16576012)(316002)(4326008)(31696002)(956004)(86362001)(6486002)(52116002)(16526019)(81166006)(186003)(8936002)(81156014)(2906002)(8676002);DIR:OUT;SFP:1101;SCL:1;SRVR:BN8PR12MB3492;H:BN8PR12MB3154.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;MX:1;
-Received-SPF: None (protection.outlook.com: amd.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: njstnxso8t2tlaRWES2tmOSbZ1y52LY4AU/EqTyzttaW5nW6r8Pr8abEmX2UgwuEthzVl90bxdoD1IfqlXSQ1rjl139PMvgdmnSCme4E63wAmW7+O1GQ1j0oKWRfuLjowDiHyW69xWYgc5RZ+9WbkDi+ccD5Xq6qkqrEUhtkBTJ4DgyEL/5ZBGsVA7SkeM2cYhQF3a+UpqYrhvcCSiPU9xe8qyLDIBRnQNRK3pc1HdzU23l92r+j8Zr5SwbJZsm0XLqRl7eFGWJuIoAfGmQQXi2NMMCmH9WUMkWs3RQmn/nNdpqasKc1MjmlkJuF28RZODffsCxtOih7nFh35gnMT/nNnO5HoGAu9Qrqx9jDnw2ak7p+LViLrnewMIV8dQQJ0XufD67akoEVkMM6HA5G+nVkmbN26eA4i1TNZ0+pWl+gHCqjT+RDBazNGGW4zVWy
-X-MS-Exchange-AntiSpam-MessageData: EGUftWtyqP7pBB/ViXb3i1mxgHPlOt6zOhWd9455JrKcakWyA0QNBfua2OZv5DuR7DVjS8lMUaE2aSs+MySMNEI7HIcr3e0G4a6/XPjcnYapk6Ri6qMdFTwFGGH+48vncY6lQ8LakIyCvS8XOyZ3JQ==
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 245d9cc4-8603-4179-3b34-08d7c1e70cd9
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2020 15:57:19.5682
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dp34kKQHKYN3ztEpHlDl9QqXtTUqqFa9o/jkUekNJ0DkrEE96JRlj307viLlguuUzALz9FzbcgSfHgABchQ8Ew==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR12MB3492
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200303224327.GA89804@sol.localdomain>
+User-Agent: NeoMutt/20180716
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9552 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 malwarescore=0
+ mlxlogscore=999 mlxscore=0 spamscore=0 adultscore=0 bulkscore=0
+ suspectscore=2 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2003060110
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9552 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2 lowpriorityscore=0
+ mlxscore=0 mlxlogscore=999 bulkscore=0 impostorscore=0 phishscore=0
+ adultscore=0 priorityscore=1501 spamscore=0 clxscore=1015 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2001150001
+ definitions=main-2003060110
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 3/3/20 7:57 AM, John Allen wrote:
-> Introduce clear_psp_master_device() to ensure that sp_dev_master gets
-> properly cleared on the release of a psp device.
-> 
-> Fixes: 2a6170dfe755 ("crypto: ccp: Add Platform Security Processor (PSP) device support")
-> Signed-off-by: John Allen <john.allen@amd.com>
+On Tue, Mar 03, 2020 at 02:43:27PM -0800, Eric Biggers wrote:
+> Probably the request_module() is coming from the registration-time crypto
+> self-tests allocating the generic implementation of algorithm when an
+> architecture-specific implementation is registered.  This occurs when
+> CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y on Linux v5.2 and later.
 
-Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
+Ok, I can confirm that if we get the debug output from one of Corentin's
+boards.
 
-> ---
->  drivers/crypto/ccp/psp-dev.c | 3 +++
->  drivers/crypto/ccp/sp-dev.h  | 1 +
->  drivers/crypto/ccp/sp-pci.c  | 9 +++++++++
->  3 files changed, 13 insertions(+)
+> If this is causing problems we could do:
 > 
-> diff --git a/drivers/crypto/ccp/psp-dev.c b/drivers/crypto/ccp/psp-dev.c
-> index e95e7aa5dbf1..ae7b44599914 100644
-> --- a/drivers/crypto/ccp/psp-dev.c
-> +++ b/drivers/crypto/ccp/psp-dev.c
-> @@ -215,6 +215,9 @@ void psp_dev_destroy(struct sp_device *sp)
->  	tee_dev_destroy(psp);
+> diff --git a/crypto/testmgr.c b/crypto/testmgr.c
+> index ccb3d60729fc..d89791700b88 100644
+> --- a/crypto/testmgr.c
+> +++ b/crypto/testmgr.c
+> @@ -1667,7 +1667,7 @@ static int test_hash_vs_generic_impl(const char *driver,
+>  	if (strcmp(generic_driver, driver) == 0) /* Already the generic impl? */
+>  		return 0;
 >  
->  	sp_free_psp_irq(sp, psp);
-> +
-> +	if (sp->clear_psp_master_device)
-> +		sp->clear_psp_master_device(sp);
->  }
+> -	generic_tfm = crypto_alloc_shash(generic_driver, 0, 0);
+> +	generic_tfm = crypto_alloc_shash(generic_driver, 0, CRYPTO_NOLOAD);
+>  	if (IS_ERR(generic_tfm)) {
+>  		err = PTR_ERR(generic_tfm);
+>  		if (err == -ENOENT) {
+> @@ -2389,7 +2389,7 @@ static int test_aead_vs_generic_impl(struct aead_extra_tests_ctx *ctx)
+>  	if (strcmp(generic_driver, driver) == 0) /* Already the generic impl? */
+>  		return 0;
 >  
->  void psp_set_sev_irq_handler(struct psp_device *psp, psp_irq_handler_t handler,
-> diff --git a/drivers/crypto/ccp/sp-dev.h b/drivers/crypto/ccp/sp-dev.h
-> index 423594608ad1..f913f1494af9 100644
-> --- a/drivers/crypto/ccp/sp-dev.h
-> +++ b/drivers/crypto/ccp/sp-dev.h
-> @@ -90,6 +90,7 @@ struct sp_device {
->  	/* get and set master device */
->  	struct sp_device*(*get_psp_master_device)(void);
->  	void (*set_psp_master_device)(struct sp_device *);
-> +	void (*clear_psp_master_device)(struct sp_device *);
+> -	generic_tfm = crypto_alloc_aead(generic_driver, 0, 0);
+> +	generic_tfm = crypto_alloc_aead(generic_driver, 0, CRYPTO_NOLOAD);
+>  	if (IS_ERR(generic_tfm)) {
+>  		err = PTR_ERR(generic_tfm);
+>  		if (err == -ENOENT) {
+> @@ -2993,7 +2993,7 @@ static int test_skcipher_vs_generic_impl(const char *driver,
+>  	if (strcmp(generic_driver, driver) == 0) /* Already the generic impl? */
+>  		return 0;
 >  
->  	bool irq_registered;
->  	bool use_tasklet;
-> diff --git a/drivers/crypto/ccp/sp-pci.c b/drivers/crypto/ccp/sp-pci.c
-> index 56c1f61c0f84..cb6cb47053f4 100644
-> --- a/drivers/crypto/ccp/sp-pci.c
-> +++ b/drivers/crypto/ccp/sp-pci.c
-> @@ -146,6 +146,14 @@ static struct sp_device *psp_get_master(void)
->  	return sp_dev_master;
->  }
->  
-> +static void psp_clear_master(struct sp_device *sp)
-> +{
-> +	if (sp == sp_dev_master) {
-> +		sp_dev_master = NULL;
-> +		dev_dbg(sp->dev, "Cleared sp_dev_master\n");
-> +	}
-> +}
-> +
->  static int sp_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->  {
->  	struct sp_device *sp;
-> @@ -206,6 +214,7 @@ static int sp_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->  	pci_set_master(pdev);
->  	sp->set_psp_master_device = psp_set_master;
->  	sp->get_psp_master_device = psp_get_master;
-> +	sp->clear_psp_master_device = psp_clear_master;
->  
->  	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(48));
->  	if (ret) {
+> -	generic_tfm = crypto_alloc_skcipher(generic_driver, 0, 0);
+> +	generic_tfm = crypto_alloc_skcipher(generic_driver, 0, CRYPTO_NOLOAD);
+>  	if (IS_ERR(generic_tfm)) {
+>  		err = PTR_ERR(generic_tfm);
+>  		if (err == -ENOENT) {
 > 
+> 
+> ... but that's not ideal, since it would mean that if someone builds all crypto
+> algorithms as modules, then the comparison tests could be unnecessarily skipped.
+
+We should try to avoid this then.
+
+> But it is really always wrong to be calling request_module() from other
+> module_init() functions?  The commit that added 'init_free_wq' was also
+> introduced in v5.2; maybe that's the problem here?
+> 
+> 	commit 1a7b7d9220819afe79d1ec5d759fe4349bd2453e
+> 	Author: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> 	Date:   Thu Apr 25 17:11:37 2019 -0700
+> 
+> 	    modules: Use vmalloc special flag
+
+Yes, I don't see a reason init_free_wq has to be initialized that late.
