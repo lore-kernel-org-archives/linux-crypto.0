@@ -2,82 +2,82 @@ Return-Path: <SRS0=LFd7=4X=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E856AC3F2D2
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Mar 2020 02:50:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF531C10F00
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Mar 2020 13:39:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B74412072D
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Mar 2020 02:50:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7BE85208CD
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Mar 2020 13:39:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1583501943;
+	bh=xjWW14TC0TTciWBjku0A3OHDB9CP0FwrNfb3H6Z58Gc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=BF6p0QzZ+vAnQCjBHiBcEXp5oaVzZ+Tt11ZHkAiHULbMlEUyWQLI6DUceB1C5pChH
+	 qOI77c06NQc1xDnuF/LvVsrdbD9mgv9iDbWwJvXsUWSWUzwcXQHfUFkIB1OUxGEyOk
+	 9bvNRtcGva2Cp6J5XYvYXdkU1W1yoEa5b0tHQvy8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726359AbgCFCuC (ORCPT
+        id S1727023AbgCFNjC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 5 Mar 2020 21:50:02 -0500
-Received: from szxga04-in.huawei.com ([45.249.212.190]:11160 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726351AbgCFCuC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 5 Mar 2020 21:50:02 -0500
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id C23742D16CA3E2772B25;
-        Fri,  6 Mar 2020 10:50:00 +0800 (CST)
-Received: from [127.0.0.1] (10.63.139.185) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.439.0; Fri, 6 Mar 2020
- 10:49:50 +0800
-Subject: Re: [PATCH v2] crypto: hisilicon - qm depends on UACCE
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-References: <1582787548-28201-1-git-send-email-wangzhou1@hisilicon.com>
- <20200306015132.GI30653@gondor.apana.org.au>
-CC:     "David S. Miller" <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>, Hongbo Yao <yaohongbo@huawei.com>
-From:   Zhou Wang <wangzhou1@hisilicon.com>
-Message-ID: <5E61BA4D.1090502@hisilicon.com>
-Date:   Fri, 6 Mar 2020 10:49:49 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:38.0) Gecko/20100101
- Thunderbird/38.5.1
+        Fri, 6 Mar 2020 08:39:02 -0500
+Received: from mail.kernel.org ([198.145.29.99]:56998 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726090AbgCFNjC (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 6 Mar 2020 08:39:02 -0500
+Received: from localhost (unknown [122.178.250.113])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6E5DC2072D;
+        Fri,  6 Mar 2020 13:39:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1583501942;
+        bh=xjWW14TC0TTciWBjku0A3OHDB9CP0FwrNfb3H6Z58Gc=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=C8olfGSKeQvEWcUrS9PoIs6aQmZZbnvMHMHXdKYNnE0vLRtpGtcheuSEHx+WMNakr
+         CRDYhaa/0dA0Wb4TEq0hsq9f4fzszK9HaVpQ3tR2Jxt21Q91HvjEBPnG1HjnSiqWm2
+         oE/ZNZ9HslgG3FT7I0/mMbyHtE1ot/ifytSaUYF8=
+Date:   Fri, 6 Mar 2020 19:08:58 +0530
+From:   Vinod Koul <vkoul@kernel.org>
+To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc:     Dan Williams <dan.j.williams@intel.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Corbet <corbet@lwn.net>, linux-crypto@vger.kernel.org,
+        linux-doc@vger.kernel.org, dmaengine@vger.kernel.org
+Subject: Re: [PATCH v3 04/18] docs: crypto: convert async-tx-api.txt to ReST
+ format
+Message-ID: <20200306133858.GI4148@vkoul-mobl>
+References: <cover.1583243826.git.mchehab+huawei@kernel.org>
+ <f6c75c58cf682cce5fa46b2cd7f7fe902ff833b1.1583243826.git.mchehab+huawei@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20200306015132.GI30653@gondor.apana.org.au>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.63.139.185]
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f6c75c58cf682cce5fa46b2cd7f7fe902ff833b1.1583243826.git.mchehab+huawei@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2020/3/6 9:51, Herbert Xu wrote:
-> On Thu, Feb 27, 2020 at 03:12:28PM +0800, Zhou Wang wrote:
->> From: Hongbo Yao <yaohongbo@huawei.com>
->>
->> If UACCE=m and CRYPTO_DEV_HISI_QM=y, the following error
->> is seen while building qm.o:
->>
->> drivers/crypto/hisilicon/qm.o: In function `hisi_qm_init':
->> (.text+0x23c6): undefined reference to `uacce_alloc'
->> (.text+0x2474): undefined reference to `uacce_remove'
->> (.text+0x286b): undefined reference to `uacce_remove'
->> drivers/crypto/hisilicon/qm.o: In function `hisi_qm_uninit':
->> (.text+0x2918): undefined reference to `uacce_remove'
->> make[1]: *** [vmlinux] Error 1
->> make: *** [autoksyms_recursive] Error 2
->>
->> This patch fixes the config dependency for QM and ZIP.
->>
->> reported-by: Hulk Robot <hulkci@huawei.com>
->> Suggested-by: Herbert Xu <herbert@gondor.apana.org.au>
->> Signed-off-by: Hongbo Yao <yaohongbo@huawei.com>
->> Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
->> ---
->>  drivers/crypto/hisilicon/Kconfig | 2 ++
->>  1 file changed, 2 insertions(+)
+On 03-03-20, 14:59, Mauro Carvalho Chehab wrote:
+> - Place the txt index inside a comment;
+> - Use title and chapter markups;
+> - Adjust markups for numbered list;
+> - Mark literal blocks as such;
+> - Use tables markup.
+> - Adjust indentation when needed.
 > 
-> Patch applied.  Thanks.
+> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+> ---
+>  .../{async-tx-api.txt => async-tx-api.rst}    | 253 +++++++++++-------
+>  Documentation/crypto/index.rst                |   2 +
+>  Documentation/driver-api/dmaengine/client.rst |   2 +-
+>  .../driver-api/dmaengine/provider.rst         |   2 +-
 
-Thanks and Best,
+For dmaengine parts:
 
-Zhou
+Acked-By: Vinod Koul <vkoul@kernel.org>
 
-> 
-
+-- 
+~Vinod
