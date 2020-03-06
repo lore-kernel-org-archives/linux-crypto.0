@@ -2,114 +2,144 @@ Return-Path: <SRS0=LFd7=4X=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1647CC10DCE
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Mar 2020 13:39:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E711C10DCE
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Mar 2020 15:56:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E2E652084E
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Mar 2020 13:39:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1583501984;
-	bh=DSzVN77wc9UBW6xxS8MhVz43+mLB9HuADYFSIrfj9Pc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=kVZ4/1kHgi1wZfsxZP8PHLYZv7TWUgnX9p3qfH4yoigwZQ5e/1Y3WKhivR4eoasUD
-	 Z00e+qNWjUPsVhNt0PMOksuqdb9HhIUv+IrI3CESzmegasuKN8YeI3PpSAOHwSt1+P
-	 3dJm7ywrEk1e4wVcZxKTNp4Eer1Ditabr7rZy10E=
+	by mail.kernel.org (Postfix) with ESMTP id DF6572073D
+	for <linux-crypto@archiver.kernel.org>; Fri,  6 Mar 2020 15:56:19 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="EzX8qvfx"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726300AbgCFNjn (ORCPT
+        id S1726674AbgCFP4T (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 Mar 2020 08:39:43 -0500
-Received: from mail.kernel.org ([198.145.29.99]:57336 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726090AbgCFNjn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 Mar 2020 08:39:43 -0500
-Received: from localhost (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 7E6CA2072D;
-        Fri,  6 Mar 2020 13:39:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1583501982;
-        bh=DSzVN77wc9UBW6xxS8MhVz43+mLB9HuADYFSIrfj9Pc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=XDUlPD2INaUHFrx3pmh15B0gffkx5LXpn2S/2JXylCnTFn3ivok8nDnfCJlfWRG4W
-         YHN1MxbjA6sYgczgs/YS2hsXiSnM9WN93iCpx1WBBgdfjJ0W6jnXGrH9vwXBzrQUsQ
-         e4kgTUfIcOSKxg8dRiqG94jIrqtcRUI16Ep37lvk=
-Date:   Fri, 6 Mar 2020 08:39:41 -0500
-From:   Sasha Levin <sashal@kernel.org>
-To:     yangerkun <yangerkun@huawei.com>
-Cc:     gregkh@linuxfoundation.org, herbert@gondor.apana.org.au,
-        stable@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 4.4.y v2] crypto: algif_skcipher - use ZERO_OR_NULL_PTR
- in skcipher_recvmsg_async
-Message-ID: <20200306133941.GQ21491@sasha-vm>
-References: <20200305085755.22730-1-yangerkun@huawei.com>
+        Fri, 6 Mar 2020 10:56:19 -0500
+Received: from mail-bn8nam11on2086.outbound.protection.outlook.com ([40.107.236.86]:6111
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726269AbgCFP4T (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 6 Mar 2020 10:56:19 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=HghzkYDHRq69pvY+fggdIPMF+HfmflcLXtARau94oSMmcKbv7n8IntbEzcbbG/2ouVIl6eGpYXEdHCjehDJJ+tKAsOEyOz8VXx76XnikrqplE5d2W3Ak1VwvUkWpFJw8s10InqSdG5U/sqFjVj7VoLj/ohz/77H1epKjdfHApsGTzAWoApo20C/XBCWN/v42bEu9jc3LR+K3J/GU0oSGYxnCrJt30WAkCMBMAcEwefNA4Dt7Ifmjg7JE2JdPn+gxjDakQMu523z/xuZrfupoR+RzreIX4NIFF/sLy/WtXF83HzklaOBi87/ZczwopHod2/29TtER0xiHr3neJu6LLQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wM+THY1TIN/GvSMIsa+6gMNlAmmUcbdxI05htCNGaDs=;
+ b=Tv/aCA0kRh3rTzVSiD0ZA7Co9LWxEs7czWRjb9z3PAuylmwMKF5dxzX9tSPdpTi9WcnjyU/Dhkk1raHWPKQNZyU5ZErEazcgdJjuepzR6+TfZGAeKwOD/gZOpp0Xi89ujQuZnuJnx8SN/9Glw5BQkv1QkEZXvFeRRCmx/OLRBGCcEMX7VbgwnXyUi2cclLmfObny4Ok2Wyrbyf6aSrpfpypLMj7QZuiFbcH9HGdv1FVlUsHNTU+mPkWTed+LZWJ7OmwQBTx8wMqYOVralonzvA6D7VNnZjWaCwtV6T0uxBmFod/WcymgFCOpBigCBXYY6iwffltWdykNUvgQmlv/iw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=wM+THY1TIN/GvSMIsa+6gMNlAmmUcbdxI05htCNGaDs=;
+ b=EzX8qvfx1gK1BtJ0o93okDlhC/8f7Tzua1M+f7aCQnXO380reJWQAXdEAswBl8/23T6ij8IhuvqbWdHcm8MhI0RKd46UUIK184Hw5kTpp1+LQ6oN6sVPhOoplCNjGU580gVtM81DCY0luNIIBPmUR2JjF7VGitLOqhsCOcx6TNI=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Thomas.Lendacky@amd.com; 
+Received: from BN8PR12MB3154.namprd12.prod.outlook.com (2603:10b6:408:6d::10)
+ by BN8PR12MB3297.namprd12.prod.outlook.com (2603:10b6:408:9f::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2793.16; Fri, 6 Mar
+ 2020 15:56:14 +0000
+Received: from BN8PR12MB3154.namprd12.prod.outlook.com
+ ([fe80::fdf0:c7aa:3bd7:7d51]) by BN8PR12MB3154.namprd12.prod.outlook.com
+ ([fe80::fdf0:c7aa:3bd7:7d51%4]) with mapi id 15.20.2793.013; Fri, 6 Mar 2020
+ 15:56:14 +0000
+Subject: Re: [PATCH 1/2] crypto/ccp: Cleanup misc_dev on sev_exit()
+To:     John Allen <john.allen@amd.com>, linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        brijesh.singh@amd.com, bp@suse.de, linux-kernel@vger.kernel.org
+References: <20200303135724.14060-1-john.allen@amd.com>
+ <20200303135724.14060-2-john.allen@amd.com>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+Message-ID: <5bda6954-a4f1-117a-30ad-8b9737b835fa@amd.com>
+Date:   Fri, 6 Mar 2020 09:56:12 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+In-Reply-To: <20200303135724.14060-2-john.allen@amd.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN1PR12CA0081.namprd12.prod.outlook.com
+ (2603:10b6:802:21::16) To BN8PR12MB3154.namprd12.prod.outlook.com
+ (2603:10b6:408:6d::10)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20200305085755.22730-1-yangerkun@huawei.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [10.236.30.118] (165.204.77.1) by SN1PR12CA0081.namprd12.prod.outlook.com (2603:10b6:802:21::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2793.16 via Frontend Transport; Fri, 6 Mar 2020 15:56:13 +0000
+X-Originating-IP: [165.204.77.1]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 99ad2509-c139-4236-ff9d-08d7c1e6e62a
+X-MS-TrafficTypeDiagnostic: BN8PR12MB3297:|BN8PR12MB3297:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <BN8PR12MB329744C4653EEC65B15D8757ECE30@BN8PR12MB3297.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5236;
+X-Forefront-PRVS: 0334223192
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(376002)(346002)(396003)(39860400002)(136003)(189003)(199004)(2616005)(31696002)(956004)(316002)(86362001)(4326008)(31686004)(16576012)(53546011)(52116002)(2906002)(36756003)(26005)(186003)(478600001)(16526019)(8936002)(81156014)(8676002)(81166006)(66476007)(66556008)(5660300002)(6486002)(66946007);DIR:OUT;SFP:1101;SCL:1;SRVR:BN8PR12MB3297;H:BN8PR12MB3154.namprd12.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;MX:1;A:1;
+Received-SPF: None (protection.outlook.com: amd.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: e8zm1uV+t3lFWPCU3BWnkfQ7BWZl30FPJbGRjvDKubgSfACw5cheWGge/JL5JW84lDXQFdLHST6wft2GKjyXj5YriLv/5xppqm33ypbG3/mvwLH79Z1Ak2+ArnTEiGEZcLeXDIGCzvplorPjgVlmeoXpqXKP/ursde7wQjxnJ8cz9/i0isdsKZjMU3hpTgq86XX7CJ95XNVw+S8RzLYA3nJTMhJ73sLmkflULEGth75T2mDcM/K+KF3FmgbDCn/TZH23cCW2XAWunyXDQQboDIbXQYJ7T7XF6vaF8KaYy+PrNsi0archceBV/cyARpq7c3+2sV6ED6BhCHiKufb0E27ubr4/VhnyBP2h+D7YuyXI8BJJfgZ8oFHytd8tEAxb59pIEtrfMHUysZ1beBOJIWYWO9iNE4KjyUP4s0en+6BH0Ljp2jySzQojLIatcfBv
+X-MS-Exchange-AntiSpam-MessageData: twse+rDvlHD59vjHzXP2RG3BoWh4ieLZzkQHGnT+5bX/8a2jay9XTC8e+FpVC8vFh3//B6+NPIM1qwxJwgg8QlDNgJLjUAkrNbSvhnQiKCe6MoS27W2te44gZbFKAxTUeD1XP69+cklzM2F8aE8rkA==
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 99ad2509-c139-4236-ff9d-08d7c1e6e62a
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Mar 2020 15:56:14.6579
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: YP6uCcJB4eWkhqXSwBXFm0TUZWG//NbflzVKneADY3tT7c+3zJl98yomFm1pKs+Cpz9uNorN4d11muJxjL2Wtw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR12MB3297
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Mar 05, 2020 at 04:57:55PM +0800, yangerkun wrote:
->Nowdays, we trigger a oops:
->...
->kasan: GPF could be caused by NULL-ptr deref or user memory accessgeneral protection fault: 0000 [#1] SMP KASAN
->...
->Call Trace:
-> [<ffffffff81a26fb1>] skcipher_recvmsg_async+0x3f1/0x1400 x86/../crypto/algif_skcipher.c:543
-> [<ffffffff81a28053>] skcipher_recvmsg+0x93/0x7f0 x86/../crypto/algif_skcipher.c:723
-> [<ffffffff823e43a4>] sock_recvmsg_nosec x86/../net/socket.c:702 [inline]
-> [<ffffffff823e43a4>] sock_recvmsg x86/../net/socket.c:710 [inline]
-> [<ffffffff823e43a4>] sock_recvmsg+0x94/0xc0 x86/../net/socket.c:705
-> [<ffffffff823e464b>] sock_read_iter+0x27b/0x3a0 x86/../net/socket.c:787
-> [<ffffffff817f479b>] aio_run_iocb+0x21b/0x7a0 x86/../fs/aio.c:1520
-> [<ffffffff817f57c9>] io_submit_one x86/../fs/aio.c:1630 [inline]
-> [<ffffffff817f57c9>] do_io_submit+0x6b9/0x10b0 x86/../fs/aio.c:1688
-> [<ffffffff817f902d>] SYSC_io_submit x86/../fs/aio.c:1713 [inline]
-> [<ffffffff817f902d>] SyS_io_submit+0x2d/0x40 x86/../fs/aio.c:1710
-> [<ffffffff828b33c3>] tracesys_phase2+0x90/0x95
->
->In skcipher_recvmsg_async, we use '!sreq->tsg' to determine does we
->calloc fail. However, kcalloc may return ZERO_SIZE_PTR, and with this,
->the latter sg_init_table will trigger the bug. Fix it be use ZERO_OF_NULL_PTR.
->
->This function was introduced with ' commit a596999b7ddf ("crypto:
->algif - change algif_skcipher to be asynchronous")', and has been removed
->with 'commit e870456d8e7c ("crypto: algif_skcipher - overhaul memory
->management")'.
->
->Reported-by: Hulk Robot <hulkci@huawei.com>
->Signed-off-by: yangerkun <yangerkun@huawei.com>
->---
-> crypto/algif_skcipher.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
->
->v1->v2:
->update the commit message
->
->diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
->index d12782dc9683..9bd4691cc5c5 100644
->--- a/crypto/algif_skcipher.c
->+++ b/crypto/algif_skcipher.c
->@@ -538,7 +538,7 @@ static int skcipher_recvmsg_async(struct socket *sock, struct msghdr *msg,
-> 	lock_sock(sk);
-> 	tx_nents = skcipher_all_sg_nents(ctx);
-> 	sreq->tsg = kcalloc(tx_nents, sizeof(*sg), GFP_KERNEL);
->-	if (unlikely(!sreq->tsg))
->+	if (unlikely(ZERO_OR_NULL_PTR(sreq->tsg)))
+On 3/3/20 7:57 AM, John Allen wrote:
+> Explicitly free and clear misc_dev in sev_exit(). Since devm_kzalloc()
+> associates misc_dev with the first device that gets probed, change from
+> devm_kzalloc() to kzalloc() and explicitly free memory in sev_exit() as
+> the first device probed is not guaranteed to be the last device released.
+> To ensure that the variable gets properly set to NULL, remove the local
+> definition of misc_dev.
+> 
+> Fixes: 200664d5237f ("crypto: ccp: Add Secure Encrypted Virtualization (SEV) command support")
+> Signed-off-by: John Allen <john.allen@amd.com>
 
-I'm a bit confused: kcalloc() will return ZERO_SIZE_PTR for allocations
-that ask for 0 bytes, but here we ask for "sizeof(*sg)" bytes, which is
-guaranteed to be more than 0, no?
+Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
 
--- 
-Thanks,
-Sasha
+> ---
+>  drivers/crypto/ccp/sev-dev.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
+> index e467860f797d..aa591dae067c 100644
+> --- a/drivers/crypto/ccp/sev-dev.c
+> +++ b/drivers/crypto/ccp/sev-dev.c
+> @@ -896,9 +896,9 @@ EXPORT_SYMBOL_GPL(sev_guest_df_flush);
+>  
+>  static void sev_exit(struct kref *ref)
+>  {
+> -	struct sev_misc_dev *misc_dev = container_of(ref, struct sev_misc_dev, refcount);
+> -
+>  	misc_deregister(&misc_dev->misc);
+> +	kfree(misc_dev);
+> +	misc_dev = NULL;
+>  }
+>  
+>  static int sev_misc_init(struct sev_device *sev)
+> @@ -916,7 +916,7 @@ static int sev_misc_init(struct sev_device *sev)
+>  	if (!misc_dev) {
+>  		struct miscdevice *misc;
+>  
+> -		misc_dev = devm_kzalloc(dev, sizeof(*misc_dev), GFP_KERNEL);
+> +		misc_dev = kzalloc(sizeof(*misc_dev), GFP_KERNEL);
+>  		if (!misc_dev)
+>  			return -ENOMEM;
+>  
+> 
