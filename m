@@ -1,122 +1,172 @@
-Return-Path: <SRS0=LFd7=4X=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=eK4E=4Y=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=0.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 285B5C10DCE
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Mar 2020 20:49:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 381A4C10DCE
+	for <linux-crypto@archiver.kernel.org>; Sat,  7 Mar 2020 00:28:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id F088B206CC
-	for <linux-crypto@archiver.kernel.org>; Fri,  6 Mar 2020 20:49:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BoDSQ8+z"
+	by mail.kernel.org (Postfix) with ESMTP id 0B633206E2
+	for <linux-crypto@archiver.kernel.org>; Sat,  7 Mar 2020 00:28:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726498AbgCFUtP (ORCPT
+        id S1726245AbgCGA22 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 6 Mar 2020 15:49:15 -0500
-Received: from us-smtp-delivery-1.mimecast.com ([205.139.110.120]:44064 "EHLO
-        us-smtp-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726090AbgCFUtN (ORCPT
+        Fri, 6 Mar 2020 19:28:28 -0500
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:62466 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1726240AbgCGA22 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 6 Mar 2020 15:49:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583527752;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Vnq654icNMC3OPciKhsbNTJjnPlwkjnJ6PM6ZwzuRt4=;
-        b=BoDSQ8+zWviWWWVEp6YvBv+utspByJKFns2RI0bRjEWNQE4sNZd+uzlyinEU6lKIwXjYD/
-        qeeZt/7tbQSdnKUlxZNbwldXPmYGjUjh82oUv7Z5KBC3i3a/zHngMd5AUXu9ymNe7DbhQd
-        dUhg7LGppHIY/HU75RZ1WoxZ8zRrs3U=
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com
- [209.85.166.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-98-2Z-QhHiFMDiUKyg5WMbJ5g-1; Fri, 06 Mar 2020 15:49:08 -0500
-X-MC-Unique: 2Z-QhHiFMDiUKyg5WMbJ5g-1
-Received: by mail-il1-f200.google.com with SMTP id d2so2450607ilf.19
-        for <linux-crypto@vger.kernel.org>; Fri, 06 Mar 2020 12:49:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Vnq654icNMC3OPciKhsbNTJjnPlwkjnJ6PM6ZwzuRt4=;
-        b=ABqatW60FFeDhBVJw1JPDelpxnkhgzW+xIm4Xt4XSSTRQf7WzbdeLCWDxTaNj0uXNl
-         qxcyfcvH2OhfrDNhc2HP69W6N0TktQSmUMaspmj07yqtBllM1m9MwxcdDPKOyPArLQlt
-         VBEWy/UFdc6AegAtnuuGZB5ELcFsR31dW9PlTL9sMhFCvREoJpRtEsbDgyb6+wTdj2rf
-         Z+Cp9q1xlUbBwdi0fVtVOhC1jeAOPukN1KSW8EPfeKVs39vtWyBLCIV1UWotXp06+m7R
-         ITOjbeWTBsVnDnalOMSyc5EyM1oTI6tC9EmZibIyMah8aVzeBsGmpFKPy23w5t85WgbZ
-         NggQ==
-X-Gm-Message-State: ANhLgQ1Fad9Hk09hSvBBQkOaJ4Dt8pJ5P2IMHBUwYUiWMu/RwuF+WZ8K
-        YO0sXAiHk/Sj26feE+J+9NfWfYfGfSDIgVsl9XSu9x4Wf9FSyO3fweuYs+eeE+JoC7IvUhmSiDe
-        LzIDRLTy36H6GGQ1iSr0QMtthIszQdN+0Ff/8eQ7g
-X-Received: by 2002:a92:bb93:: with SMTP id x19mr4950275ilk.304.1583527748221;
-        Fri, 06 Mar 2020 12:49:08 -0800 (PST)
-X-Google-Smtp-Source: ADFU+vuvo2iGyk+ibtmVDUTdwqXvKVvixks2GLwbkE+VjCSp2qcV2nb/q6bheS6OfL3JOE3orHdl1mjXyKrLN9a056M=
-X-Received: by 2002:a92:bb93:: with SMTP id x19mr4950241ilk.304.1583527747749;
- Fri, 06 Mar 2020 12:49:07 -0800 (PST)
-MIME-Version: 1.0
-References: <20200306172010.1213899-1-ckuehl@redhat.com>
-In-Reply-To: <20200306172010.1213899-1-ckuehl@redhat.com>
-From:   Nathaniel McCallum <npmccallum@redhat.com>
-Date:   Fri, 6 Mar 2020 15:48:57 -0500
-Message-ID: <CAOASepNfDLFw_uxbB59hg7B8Rmfaroj9NB8Gw82SFrSOaPbtMQ@mail.gmail.com>
-Subject: Re: [PATCH 0/1] crypto: ccp: use file mode for sev ioctl permissions
-To:     Connor Kuehl <ckuehl@redhat.com>
-Cc:     "Lendacky, Thomas" <thomas.lendacky@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
-        "Hook, Gary" <gary.hook@amd.com>, erdemaktas@google.com,
-        rientjes@google.com, "Singh, Brijesh" <brijesh.singh@amd.com>,
-        Bandan Das <bsd@redhat.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+        Fri, 6 Mar 2020 19:28:28 -0500
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 0270Mwah067098;
+        Fri, 6 Mar 2020 19:28:02 -0500
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2yfkneu4rx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 06 Mar 2020 19:28:02 -0500
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 0270MxmA067186;
+        Fri, 6 Mar 2020 19:28:02 -0500
+Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 2yfkneu4rs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 06 Mar 2020 19:28:01 -0500
+Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
+        by ppma05wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 0270OZfo018804;
+        Sat, 7 Mar 2020 00:28:01 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com [9.57.198.24])
+        by ppma05wdc.us.ibm.com with ESMTP id 2yffk77bg9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sat, 07 Mar 2020 00:28:01 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 0270S0tX52298170
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Sat, 7 Mar 2020 00:28:00 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id DA867AC059;
+        Sat,  7 Mar 2020 00:28:00 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 3E735AC05B;
+        Sat,  7 Mar 2020 00:28:00 +0000 (GMT)
+Received: from [9.70.82.143] (unknown [9.70.82.143])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Sat,  7 Mar 2020 00:28:00 +0000 (GMT)
+Subject: [PATCH v3 0/9] crypto/nx: Enable GZIP engine and provide userpace
+ API
+From:   Haren Myneni <haren@linux.ibm.com>
+To:     herbert@gondor.apana.org.au, mpe@ellerman.id.au
+Cc:     mikey@neuling.org, sukadev@linux.vnet.ibm.com,
+        linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+        npiggin@gmail.com
 Content-Type: text/plain; charset="UTF-8"
+Date:   Fri, 06 Mar 2020 16:27:57 -0800
+Message-ID: <1583540877.9256.24.camel@hbabu-laptop>
+Mime-Version: 1.0
+X-Mailer: Evolution 2.28.3 
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.572
+ definitions=2020-03-06_09:2020-03-06,2020-03-06 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
+ mlxlogscore=999 lowpriorityscore=0 priorityscore=1501 bulkscore=0
+ adultscore=0 suspectscore=0 clxscore=1015 mlxscore=0 phishscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2001150001 definitions=main-2003070000
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Mar 6, 2020 at 12:20 PM Connor Kuehl <ckuehl@redhat.com> wrote:
->
-> Some background:
->
-> My team is working on a project that interacts very closely with
-> SEV so we have a layer of code that wraps around the SEV ioctl calls.
-> We have an automated test suite that ends up testing these ioctls
-> on our test machine.
->
-> We are in the process of adding this test machine as a dedicated test
-> runner in our continuous integration process. Any time someone opens a
-> pull request against our project, this test runner automatically checks
-> that code out and executes the tests.
->
-> Right now, the SEV ioctls that affect the state of the platform require
-> CAP_SYS_ADMIN to run. This is not a capability we can give to an
-> automated test runner, because it means that anyone who would like to
-> contribute to the project would be able to run any code they want (for
-> good or evil) as CAP_SYS_ADMIN on our machine.
->
-> This patch replaces the check for CAP_SYS_ADMIN with a check that can
-> still be easily controlled by an administrator with the file permissions
-> ACL. This way access to the device can still be controlled, but without
-> also assigning such broad system privileges at the same time.
->
-> Connor Kuehl (1):
->   crypto: ccp: use file mode for sev ioctl permissions
->
->  drivers/crypto/ccp/sev-dev.c | 33 +++++++++++++++++----------------
->  1 file changed, 17 insertions(+), 16 deletions(-)
->
-> --
-> 2.24.1
->
 
-One additional note is that this permission structure is more flexible
-for general SEV usage anyway, and isn't special-case for our usage.
-Currently, the SEV admin commands are mostly limited to public key
-certificate management. I would imagine that it would be desirable to
-have a sev-admin account which can automate the certificate management
-without having CAP_SYS_ADMIN for the rest of the system. So we believe
-this patch has broader applicability than just our corner case.
+Power9 processor supports Virtual Accelerator Switchboard (VAS) which
+allows kernel and userspace to send compression requests to Nest
+Accelerator (NX) directly. The NX unit comprises of 2 842 compression
+engines and 1 GZIP engine. Linux kernel already has 842 compression
+support on kernel. This patch series adds GZIP compression support
+from user space. The GZIP Compression engine implements the ZLIB and
+GZIP compression algorithms. No plans of adding NX-GZIP compression
+support in kernel right now.
+
+Applications can send requests to NX directly with COPY/PASTE
+instructions. But kernel has to establish channel / window on NX-GZIP
+device for the userspace. So userspace access to the GZIP engine is
+provided through /dev/crypto/nx-gzip device with several operations.
+
+An application must open the this device to obtain a file descriptor (fd).
+Using the fd, application should issue the VAS_TX_WIN_OPEN ioctl to
+establish a connection to the engine. Once window is opened, should use
+mmap() system call to map the hardware address of engine's request queue
+into the application's virtual address space. Then user space forms the
+request as co-processor Request Block (CRB) and paste this CRB on the
+mapped HW address using COPY/PASTE instructions. Application can poll
+on status flags (part of CRB) with timeout for request completion.
+
+For VAS_TX_WIN_OPEN ioctl, if user space passes vas_id = -1 (struct
+vas_tx_win_open_attr), kernel determines the VAS instance on the
+corresponding chip based on the CPU on which the process is executing.
+Otherwise, the specified VAS instance is used if application passes the
+proper VAS instance (vas_id listed in /proc/device-tree/vas@*/ibm,vas_id).
+
+Process can open multiple windows with different FDs or can send several
+requests to NX on the same window at the same time.
+
+A userspace library libnxz is available:
+        https://github.com/abalib/power-gzip
+
+Applications that use inflate/deflate calls can link with libNXz and use
+NX GZIP compression without any modification.
+
+Tested the available 842 compression on power8 and power9 system to make
+sure no regression and tested GZIP compression on power9 with tests
+available in the above link.
+
+Thanks to Bulent Abali for nxz library and tests development.
+
+Changelog:
+V2:
+  - Move user space API code to powerpc as suggested. Also this API
+    can be extended to any other coprocessor type that VAS can support
+    in future. Example: Fast thread wakeup feature from VAS
+  - Rebased to 5.6-rc3
+
+V3:
+  - Fix sparse warnings (patches 3&6)
+
+Haren Myneni (9):
+  powerpc/vas: Initialize window attributes for GZIP coprocessor type
+  powerpc/vas: Define VAS_TX_WIN_OPEN ioctl API
+  powerpc/vas: Add VAS user space API
+  crypto/nx: Initialize coproc entry with kzalloc
+  crypto/nx: Rename nx-842-powernv file name to nx-common-powernv
+  crypto/NX: Make enable code generic to add new GZIP compression type
+  crypto/nx: Enable and setup GZIP compresstion type
+  crypto/nx: Remove 'pid' in vas_tx_win_attr struct
+  Documentation/powerpc: VAS API
+
+ Documentation/powerpc/index.rst                    |    1 +
+ Documentation/powerpc/vas-api.rst                  |  246 +++++
+ Documentation/userspace-api/ioctl/ioctl-number.rst |    1 +
+ arch/powerpc/include/asm/vas.h                     |   12 +-
+ arch/powerpc/include/uapi/asm/vas-api.h            |   22 +
+ arch/powerpc/platforms/powernv/Makefile            |    2 +-
+ arch/powerpc/platforms/powernv/vas-api.c           |  290 +++++
+ arch/powerpc/platforms/powernv/vas-window.c        |   23 +-
+ arch/powerpc/platforms/powernv/vas.h               |    2 +
+ drivers/crypto/nx/Makefile                         |    2 +-
+ drivers/crypto/nx/nx-842-powernv.c                 | 1062 ------------------
+ drivers/crypto/nx/nx-common-powernv.c              | 1133 ++++++++++++++++++++
+ 12 files changed, 1723 insertions(+), 1073 deletions(-)
+ create mode 100644 Documentation/powerpc/vas-api.rst
+ create mode 100644 arch/powerpc/include/uapi/asm/vas-api.h
+ create mode 100644 arch/powerpc/platforms/powernv/vas-api.c
+ delete mode 100644 drivers/crypto/nx/nx-842-powernv.c
+ create mode 100644 drivers/crypto/nx/nx-common-powernv.c
+
+-- 
+1.8.3.1
+
+
 
