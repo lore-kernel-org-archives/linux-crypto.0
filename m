@@ -2,104 +2,108 @@ Return-Path: <SRS0=hwJD=4Z=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE93CC18E5B
-	for <linux-crypto@archiver.kernel.org>; Sun,  8 Mar 2020 06:01:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71614C10DCE
+	for <linux-crypto@archiver.kernel.org>; Sun,  8 Mar 2020 14:44:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 994822072A
-	for <linux-crypto@archiver.kernel.org>; Sun,  8 Mar 2020 06:01:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3EABE206D7
+	for <linux-crypto@archiver.kernel.org>; Sun,  8 Mar 2020 14:44:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ohLVqCZz"
+	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="MhmV/SgA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725842AbgCHGBB (ORCPT
+        id S1726292AbgCHOou (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 8 Mar 2020 01:01:01 -0500
-Received: from mail-pg1-f194.google.com ([209.85.215.194]:36000 "EHLO
-        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725306AbgCHGBB (ORCPT
+        Sun, 8 Mar 2020 10:44:50 -0400
+Received: from mail-vs1-f67.google.com ([209.85.217.67]:33108 "EHLO
+        mail-vs1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726291AbgCHOou (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 8 Mar 2020 01:01:01 -0500
-Received: by mail-pg1-f194.google.com with SMTP id d9so3189020pgu.3;
-        Sat, 07 Mar 2020 22:01:00 -0800 (PST)
+        Sun, 8 Mar 2020 10:44:50 -0400
+Received: by mail-vs1-f67.google.com with SMTP id n27so4516187vsa.0
+        for <linux-crypto@vger.kernel.org>; Sun, 08 Mar 2020 07:44:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id;
-        bh=Nj+26QvFCgpaOHrw23MsZ4NAuEdSFH7yEAjrK++Ph7Q=;
-        b=ohLVqCZz9ZojWIUPgcMSqQIPWwojo/6mzc71lhE48LHeFgJxOmmVwdgdPBpmL1iDQO
-         U9jROmGe8Yx5d35U5P4flLgvzyFNmAY6de6jbRaGf/hg4gERmcQUjcm6PstFd6WjRopj
-         POLd7iVt7NLAvjST3yvpJTAYsS31oGABAD6YRv12FXb7h7vsSUJeGfHddG0Imz3U5h3t
-         AqsaPoeSJpLcwBloOAGGsHdzb/e8rSnH0nE/sEtHCdTPzZqLtWcWJSmLq77sooRG9sEX
-         NRsym+L6Ju1OBB3JJVqslN6C7ZzlnFvZaXUr4TXulNYIAVv0n18tyq7OgztF4f+VPnnE
-         YO0g==
+        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=28FE7SwK8QUORdA0zvvH1bss8QJwZiB4WA4O6HOQ+lc=;
+        b=MhmV/SgASdvRuvx3CX7299dfWyEtdKexZgvAB1K+2YBdq67CMkN3lO7ILcj5R3XQkj
+         RWf4hWP62Kiu3jBsm+UeXmiEFS4dqvEO+sj5lhq9/FIirHuhL76WQyeVXBie+LG+9mwr
+         t5i2TQbgOqP8T9OYr19tTbWqHuAbICKKX/bgUpiL8lgCNsfjkNxK560IH6EqrTVz6U4D
+         A+0ERfbUE2pzDMovSHut2BiZc0WmDPBDQ2qV0mlAJVm5gmv+5VizcVp34jgUQb0DpuFY
+         0M81M1Bv9n8QIagW6yfhBmuoMKKkyGkjupJfjJC0fATuVklUntqRlj3of3W3KI+Bpwof
+         TLjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=Nj+26QvFCgpaOHrw23MsZ4NAuEdSFH7yEAjrK++Ph7Q=;
-        b=BtFvzhe9Atvrxc7Jw+ACTm08cun3MB61CF0S/DSHtDxZy3ocMXIctH7MpWXbRRtRM5
-         rGsyXsAgRWBm5ZMP3Eswf+U3mdGNIBEegJ3VX7La0zYn0OmrfjjWPmdEM6gsszWoTzEg
-         oHyQ0Jts+URR10ChG9d7z51V5lx69ilk30FQG9gxV1i0qSILP71qTE3ipOKpR4tZ+Cj3
-         H+0NcPlH2dQYTKxhLvgYkSENtqWHNyWwV8xvurf4DnuJz3t9q7ppMMChTq/GPFZeibGZ
-         +aQjlZenbNE2XnccMZBrbZk9EIDGQRjTo06SbCyceEbPl1L/AsgegiOf0PiOLuzdKegE
-         6Gfw==
-X-Gm-Message-State: ANhLgQ0y5jczMJdrGf3DwUP0KE/SeDaxSAObp7tCULCpuN/7vs+E8Kxd
-        fYNLqOI3qRB5kP+CTHQhqrQ=
-X-Google-Smtp-Source: ADFU+vt2Xz7+USz64L6//xelwLrvzVvwplLv4CLEaJIuDQbH02H0pJn7CyGnd6EjkOX4Ul/JTOO07g==
-X-Received: by 2002:a63:1044:: with SMTP id 4mr10987545pgq.412.1583647260210;
-        Sat, 07 Mar 2020 22:01:00 -0800 (PST)
-Received: from localhost.localdomain ([149.129.63.152])
-        by smtp.gmail.com with ESMTPSA id 185sm33483620pfv.104.2020.03.07.22.00.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 07 Mar 2020 22:00:59 -0800 (PST)
-From:   Jianhui Zhao <zhaojh329@gmail.com>
-To:     herbert@gondor.apana.org.au
-Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
-        alexandre.belloni@bootlin.com, ludovic.desroches@microchip.com,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, Jianhui Zhao <zhaojh329@gmail.com>
-Subject: [PATCH] crypto: atmel-i2c - Fix wakeup fail
-Date:   Sun,  8 Mar 2020 14:00:53 +0800
-Message-Id: <20200308060053.23515-1-zhaojh329@gmail.com>
-X-Mailer: git-send-email 2.17.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=28FE7SwK8QUORdA0zvvH1bss8QJwZiB4WA4O6HOQ+lc=;
+        b=W8gYOjryGmbxyRcwfyAcy82IrCuOGGnS0KcX3gxv6JDCe1bNxOp00XJNvLHP5K9gAE
+         8xq6z7UsggXa0RHzrF1Cs9yt/zMYa8KVaavJQcJWLvNpnLkPXzYmW+6o4SOuJsQrJENB
+         5PXRw/ucsReICmRYveGGMKjwoL+tBOn0whZ3plyB2Yn2z9z+l27iP1nyQaes4B1h3If0
+         w5rqkHJf3B9wz951txQhXqJ6lPA+scBsqtze9i4w5GI1PdtGdF8kWY92PBRwaQsehiag
+         8QxtCMJ9oOI3gRNB3LOhiWvl7b1ltGeEbz+DnCvGzjXE3XscMOX+ImkZWzYEkyPyJFYM
+         vGTw==
+X-Gm-Message-State: ANhLgQ33BABZSuYnh1TRjRTZf301O3ul7pf/CmPWQwCUiDKVVm87pAvi
+        oVcg7kpuWTPl5G/NawRD07PgsfG1RXnlY9H7H/fw5w==
+X-Google-Smtp-Source: ADFU+vscxkjHzRW80atkksLmIXO6QkdK1axMYerLnCQrNhGmaNFwFEhkX5Qpbn5Xhxrqu/PRwdCniqOkrdop6FSUGYU=
+X-Received: by 2002:a67:d06:: with SMTP id 6mr5127040vsn.11.1583678689023;
+ Sun, 08 Mar 2020 07:44:49 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200304224405.152829-1-ebiggers@kernel.org>
+In-Reply-To: <20200304224405.152829-1-ebiggers@kernel.org>
+From:   Gilad Ben-Yossef <gilad@benyossef.com>
+Date:   Sun, 8 Mar 2020 16:44:36 +0200
+Message-ID: <CAOtvUMejzz-B+NgdGNcHNcuRPPVd06EHQ85PSCp+YHukCdw_7A@mail.gmail.com>
+Subject: Re: [PATCH 0/3] crypto: AEAD fuzz tests and doc improvement
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The wake token cannot be sent without ignoring the nack for the
-device address
+On Thu, Mar 5, 2020 at 12:44 AM Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> - Make the AEAD fuzz tests avoid implementation-defined behavior for
+>   rfc4106, rfc4309, rfc4543, and rfc7539esp.  This replaces
+>   "[PATCH v2] crypto: testmgr - sync both RFC4106 IV copies"
+>
+> - Adjust the order of the AEAD fuzz tests to be more logical.
+>
+> - Improve the documentation for the AEAD scatterlist layout.
+>
+> (I was also going to add a patch that makes the inauthentic AEAD tests
+> start mutating the IVs, but it turns out that "ccm" needs special
+> handling so I've left that for later.)
 
-Signed-off-by: Jianhui Zhao <zhaojh329@gmail.com>
----
- drivers/crypto/atmel-i2c.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+For the whole series:
+Tested-by: Gilad Ben-Yossef <gilad@benyossef.com>
 
-diff --git a/drivers/crypto/atmel-i2c.c b/drivers/crypto/atmel-i2c.c
-index 1d3355913b40..13624cde67e8 100644
---- a/drivers/crypto/atmel-i2c.c
-+++ b/drivers/crypto/atmel-i2c.c
-@@ -3,6 +3,7 @@
-  * Microchip / Atmel ECC (I2C) driver.
-  *
-  * Copyright (c) 2017, Microchip Technology Inc.
-+ * Copyright (c) 2020 Jianhui Zhao <zhaojh329@gmail.com>
-  * Author: Tudor Ambarus <tudor.ambarus@microchip.com>
-  */
- 
-@@ -176,7 +177,8 @@ static int atmel_i2c_wakeup(struct i2c_client *client)
- 	 * device is idle, asleep or during waking up. Don't check for error
- 	 * when waking up the device.
- 	 */
--	i2c_master_send(client, i2c_priv->wake_token, i2c_priv->wake_token_sz);
-+	i2c_transfer_buffer_flags(client, i2c_priv->wake_token,
-+				i2c_priv->wake_token_sz, I2C_M_IGNORE_NAK);
- 
- 	/*
- 	 * Wait to wake the device. Typical execution times for ecdh and genkey
--- 
-2.17.1
+Thank you Eric!
+Gilad
 
+>
+> Eric Biggers (3):
+>   crypto: testmgr - use consistent IV copies for AEADs that need it
+>   crypto: testmgr - do comparison tests before inauthentic input tests
+>   crypto: aead - improve documentation for scatterlist layout
+>
+>  crypto/testmgr.c      | 28 +++++++++++++++----------
+>  include/crypto/aead.h | 48 ++++++++++++++++++++++++-------------------
+>  2 files changed, 44 insertions(+), 32 deletions(-)
+>
+> --
+> 2.25.1
+>
+
+
+--=20
+Gilad Ben-Yossef
+Chief Coffee Drinker
+
+values of =CE=B2 will give rise to dom!
