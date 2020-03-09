@@ -2,264 +2,203 @@ Return-Path: <SRS0=CB0V=42=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-13.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29F92C18E5A
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Mar 2020 14:03:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F6A7C18E5A
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Mar 2020 15:11:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E70BA20848
-	for <linux-crypto@archiver.kernel.org>; Mon,  9 Mar 2020 14:03:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 00B55208C3
+	for <linux-crypto@archiver.kernel.org>; Mon,  9 Mar 2020 15:11:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xxyk6Ue9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HJecWp6q"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726170AbgCIODm (ORCPT
+        id S1726920AbgCIPLd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 9 Mar 2020 10:03:42 -0400
-Received: from us-smtp-1.mimecast.com ([205.139.110.61]:37181 "EHLO
-        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726275AbgCIODm (ORCPT
+        Mon, 9 Mar 2020 11:11:33 -0400
+Received: from mail-pj1-f65.google.com ([209.85.216.65]:34816 "EHLO
+        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726825AbgCIPLc (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 9 Mar 2020 10:03:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1583762620;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=AAx8Db+fYqXMdq0yYrv0VdVkrDWQ8+roRtbZieuiPgc=;
-        b=Xxyk6Ue9j//wtRK9emVdjZp5UZ2FkTrCIyqObB9zWzfxeOu5CTyD4M5Y/GzoqS1O6mX074
-        AV2bSiOmii/+CgWmeynKmoZi3jsr1LIRKL3n9nxebMXInwQ1ivZbdz4N9x+JXIwtDvZwlL
-        36iF87X1lfo423x1f8Bl4mrfEsoJTAw=
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
- [209.85.166.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-158-sgM3Je6gPKOX3Gk_iOXrog-1; Mon, 09 Mar 2020 10:03:38 -0400
-X-MC-Unique: sgM3Je6gPKOX3Gk_iOXrog-1
-Received: by mail-io1-f69.google.com with SMTP id w16so6674896iot.2
-        for <linux-crypto@vger.kernel.org>; Mon, 09 Mar 2020 07:03:38 -0700 (PDT)
+        Mon, 9 Mar 2020 11:11:32 -0400
+Received: by mail-pj1-f65.google.com with SMTP id mq3so924138pjb.0
+        for <linux-crypto@vger.kernel.org>; Mon, 09 Mar 2020 08:11:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=KmA7BL+srj2+l3c7L/8DF7DGtL94PX+KpP96GTTm2NY=;
+        b=HJecWp6qMkGlJfIDth1jRi3nfW0k6jl6bPwx74XtKeJs0nrfSDTvxsIYrqdqjoYrB0
+         mC2JWkgTqx+B03oEBaUoSYJYXtA2l47bOzZR+g7zOt692Pz8+LA4k+fr0ObcdmKEX6Xt
+         gmegKpYs7lQM1NhIHtuwH+FtJ/8JIqwwXs8WvpclCrzQ850e9svqJil3uWS9VIM7PpED
+         MZTAQ+VFImsjboEgHG4/30nnC4D9FGksijAuIoYc7IMSEaILjsRN1YLOBgj9SkGRqpG1
+         eobFDOwNXJsoQM8JHsUlkaU5VhLhKAubtkPyPvCyV+uelSfXChtUWqLWqQcU6No0Zdg7
+         6DBQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=AAx8Db+fYqXMdq0yYrv0VdVkrDWQ8+roRtbZieuiPgc=;
-        b=L8DfL5EwbLc/ag3eE+007FBQnhtTnFPwA+5BqUD1RcyF0DibnaWnTsnTQzNn617DY3
-         5ofA3LZoJLRTh4eXpwdN1vh0EIYoX+j5vQW8I3iHJmNe5VeDEKXX93cEmc9ynIHSlawi
-         gF2npjBgz2JmSY7LIQ3o4+HO7Ar3e0HgjKdqM5tKC6YhJ+1PayeXx9jUzdsnzoBH6CEG
-         9u4e5ejG6qMK2Hfl2pMXE5RKxB7d3cOhmo78T8zLH+rlfM0kEMMukz2ymVvSYNRCyuot
-         DvBe9acAyZutAApgOkiu64XAJLfZLV78/hP5bn4CiuLe02V4xGICokes/tjh849WOisE
-         XwLw==
-X-Gm-Message-State: ANhLgQ1O/HSDk6dhJFJrIcyI3kQ3YFuBa80Tb3vkIK4VQaOF024nrwJA
-        KWHyFzzvwlWzq8QJ5FGHiBL517GXOTnhoVxe7+329Ylrewu46svb6dxsiH+SWvC7KL4gOBgpZwy
-        ffOh/gpk3D0ups7eoNXdarUBJwx2HQEvDz9FFhHwN
-X-Received: by 2002:a05:6e02:685:: with SMTP id o5mr4046399ils.86.1583762617980;
-        Mon, 09 Mar 2020 07:03:37 -0700 (PDT)
-X-Google-Smtp-Source: ADFU+vt4cIFMj9otyn2Lqt9XgikIkKQh0PPT/KVUuvAi53LPRuVm8CdzlLRfTdn1l0l6hV1m6QypDgnDQXaETWIm1zM=
-X-Received: by 2002:a05:6e02:685:: with SMTP id o5mr4046371ils.86.1583762617640;
- Mon, 09 Mar 2020 07:03:37 -0700 (PDT)
+        bh=KmA7BL+srj2+l3c7L/8DF7DGtL94PX+KpP96GTTm2NY=;
+        b=b/1NInPzDb1MmHH1hzcr5zTINCz1iGBR0/R1syypwZNSb6t4BUAU4xMECsEb4k+MFu
+         eK1HxbimrCapWemSjRrp1IRQLKuA7vB0dGN9UsuIViC9p74K0HEWr7AZkFUAPcFkza6I
+         C+6JHujWZRP301mbdTjAdUUEtjhNP6jzvjSIt/EY4odQPqvkiDjf3/II/YfRFXhFlhUB
+         iXHBocbZE1dtAeLjofqPV3O2+JsZoa1Z0vm6Q5onVD+Co8CVBDIkZeHGIqLfhTmwDRpP
+         KIjq1cFNgkKSevbpstVpUfnjqAuFpII92aGaZx4nMUr1GwD7Xe2ceeLmdES5tMes70xZ
+         2MTA==
+X-Gm-Message-State: ANhLgQ3m8mAhgiHZSURrnJxLcajvdEcDrsT8o/s8AnUKxWLJ5W2wXLg7
+        iVLhD1Ydh8mCNksODwxOp3DVhU7kfDJQOKZe7VUI+w==
+X-Google-Smtp-Source: ADFU+vvAQx3ODEl7ED4mitSfL2UB5jmdI4E9w2ll9tFEjKtYHc+X6onHB7zmij99sP2FKX/ULKj0IxV8GHCEuNK2HcY=
+X-Received: by 2002:a17:902:9889:: with SMTP id s9mr15193056plp.252.1583766691257;
+ Mon, 09 Mar 2020 08:11:31 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200306172010.1213899-1-ckuehl@redhat.com> <20200306172010.1213899-2-ckuehl@redhat.com>
- <alpine.DEB.2.21.2003081450450.58178@chino.kir.corp.google.com>
-In-Reply-To: <alpine.DEB.2.21.2003081450450.58178@chino.kir.corp.google.com>
-From:   Nathaniel McCallum <npmccallum@redhat.com>
-Date:   Mon, 9 Mar 2020 10:03:26 -0400
-Message-ID: <CAOASepNLcJSQn32xwszD3KDQro1TLWMoqXV5J0j=APUuJrRcoQ@mail.gmail.com>
-Subject: Re: [PATCH 1/1] crypto: ccp: use file mode for sev ioctl permissions
-To:     David Rientjes <rientjes@google.com>
-Cc:     Connor Kuehl <ckuehl@redhat.com>,
-        "Lendacky, Thomas" <thomas.lendacky@amd.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>, davem@davemloft.net,
-        "Hook, Gary" <gary.hook@amd.com>, erdemaktas@google.com,
-        "Singh, Brijesh" <brijesh.singh@amd.com>,
-        Bandan Das <bsd@redhat.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
+References: <000000000000996f3c059d46757a@google.com>
+In-Reply-To: <000000000000996f3c059d46757a@google.com>
+From:   Andrey Konovalov <andreyknvl@google.com>
+Date:   Mon, 9 Mar 2020 16:11:20 +0100
+Message-ID: <CAAeHK+xhfd-bAwO93WZpBHe=kg2a8urACf+uuAgiabXmW7uNDQ@mail.gmail.com>
+Subject: Re: KASAN: use-after-free Write in chaoskey_disconnect
+To:     syzbot <syzbot+73163a4458e7367880a0@syzkaller.appspotmail.com>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, LKML <linux-kernel@vger.kernel.org>,
+        USB list <linux-usb@vger.kernel.org>, lvivier@redhat.com,
+        mchehab+samsung@kernel.org, mpm@selenic.com, swboyd@chromium.org,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        "Theodore Ts'o" <tytso@mit.edu>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Mar 8, 2020 at 5:54 PM David Rientjes <rientjes@google.com> wrote:
+On Wed, Jan 29, 2020 at 1:27 PM syzbot
+<syzbot+73163a4458e7367880a0@syzkaller.appspotmail.com> wrote:
 >
-> On Fri, 6 Mar 2020, Connor Kuehl wrote:
+> Hello,
 >
-> > Instead of using CAP_SYS_ADMIN which is restricted to the root user,
-> > check the file mode for write permissions before executing commands that
-> > can affect the platform. This allows for more fine-grained access
-> > control to the SEV ioctl interface. This would allow a SEV-only user
-> > or group the ability to administer the platform without requiring them
-> > to be root or granting them overly powerful permissions.
-> >
-> > For example:
-> >
-> > chown root:root /dev/sev
-> > chmod 600 /dev/sev
+> syzbot found the following crash on:
 >
-> Hi Connor,
+> HEAD commit:    cd234325 usb: gadget: add raw-gadget interface
+> git tree:       https://github.com/google/kasan.git usb-fuzzer
+> console output: https://syzkaller.appspot.com/x/log.txt?x=140e49bee00000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=bb745005307bc641
+> dashboard link: https://syzkaller.appspot.com/bug?extid=73163a4458e7367880a0
+> compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
 >
-> I'm curious why do you need to do the two above commands?  It implies that
-> /dev/sev is either not owned by root or that it is not already restricted
-> to only being owner read and writable.
+> Unfortunately, I don't have any reproducer for this crash yet.
 >
-> Or perhaps these two commands were included only for clarity to explain
-> what the defaults should be?
-
-Correct. Those are just exemplary. They represent the existing permissions.
-
-> > setfacl -m g:sev:r /dev/sev
-> > setfacl -m g:sev-admin:rw /dev/sev
-> >
-> > In this instance, members of the "sev-admin" group have the ability to
-> > perform all ioctl calls (including the ones that modify platform state).
-> > Members of the "sev" group only have access to the ioctls that do not
-> > modify the platform state.
-> >
-> > This also makes opening "/dev/sev" more consistent with how file
-> > descriptors are usually handled. By only checking for CAP_SYS_ADMIN,
-> > the file descriptor could be opened read-only but could still execute
-> > ioctls that modify the platform state. This patch enforces that the file
-> > descriptor is opened with write privileges if it is going to be used to
-> > modify the platform state.
-> >
-> > This flexibility is completely opt-in, and if it is not desirable by
-> > the administrator then they do not need to give anyone else access to
-> > /dev/sev.
-> >
-> > Signed-off-by: Connor Kuehl <ckuehl@redhat.com>
-> > ---
-> >  drivers/crypto/ccp/sev-dev.c | 33 +++++++++++++++++----------------
-> >  1 file changed, 17 insertions(+), 16 deletions(-)
-> >
-> > diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-> > index e467860f797d..416b80938a3e 100644
-> > --- a/drivers/crypto/ccp/sev-dev.c
-> > +++ b/drivers/crypto/ccp/sev-dev.c
-> > @@ -283,11 +283,11 @@ static int sev_get_platform_state(int *state, int *error)
-> >       return rc;
-> >  }
-> >
-> > -static int sev_ioctl_do_reset(struct sev_issue_cmd *argp)
-> > +static int sev_ioctl_do_reset(struct sev_issue_cmd *argp, bool writable)
-> >  {
-> >       int state, rc;
-> >
-> > -     if (!capable(CAP_SYS_ADMIN))
-> > +     if (!writable)
-> >               return -EPERM;
-> >
-> >       /*
-> > @@ -331,12 +331,12 @@ static int sev_ioctl_do_platform_status(struct sev_issue_cmd *argp)
-> >       return ret;
-> >  }
-> >
-> > -static int sev_ioctl_do_pek_pdh_gen(int cmd, struct sev_issue_cmd *argp)
-> > +static int sev_ioctl_do_pek_pdh_gen(int cmd, struct sev_issue_cmd *argp, bool writable)
-> >  {
-> >       struct sev_device *sev = psp_master->sev_data;
-> >       int rc;
-> >
-> > -     if (!capable(CAP_SYS_ADMIN))
-> > +     if (!writable)
-> >               return -EPERM;
-> >
-> >       if (sev->state == SEV_STATE_UNINIT) {
-> > @@ -348,7 +348,7 @@ static int sev_ioctl_do_pek_pdh_gen(int cmd, struct sev_issue_cmd *argp)
-> >       return __sev_do_cmd_locked(cmd, NULL, &argp->error);
-> >  }
-> >
-> > -static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp)
-> > +static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp, bool writable)
-> >  {
-> >       struct sev_device *sev = psp_master->sev_data;
-> >       struct sev_user_data_pek_csr input;
-> > @@ -356,7 +356,7 @@ static int sev_ioctl_do_pek_csr(struct sev_issue_cmd *argp)
-> >       void *blob = NULL;
-> >       int ret;
-> >
-> > -     if (!capable(CAP_SYS_ADMIN))
-> > +     if (!writable)
-> >               return -EPERM;
-> >
-> >       if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
-> > @@ -539,7 +539,7 @@ static int sev_update_firmware(struct device *dev)
-> >       return ret;
-> >  }
-> >
-> > -static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp)
-> > +static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp, bool writable)
-> >  {
-> >       struct sev_device *sev = psp_master->sev_data;
-> >       struct sev_user_data_pek_cert_import input;
-> > @@ -547,7 +547,7 @@ static int sev_ioctl_do_pek_import(struct sev_issue_cmd *argp)
-> >       void *pek_blob, *oca_blob;
-> >       int ret;
-> >
-> > -     if (!capable(CAP_SYS_ADMIN))
-> > +     if (!writable)
-> >               return -EPERM;
-> >
-> >       if (copy_from_user(&input, (void __user *)argp->data, sizeof(input)))
-> > @@ -698,7 +698,7 @@ static int sev_ioctl_do_get_id(struct sev_issue_cmd *argp)
-> >       return ret;
-> >  }
-> >
-> > -static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp)
-> > +static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp, bool writable)
-> >  {
-> >       struct sev_device *sev = psp_master->sev_data;
-> >       struct sev_user_data_pdh_cert_export input;
-> > @@ -708,7 +708,7 @@ static int sev_ioctl_do_pdh_export(struct sev_issue_cmd *argp)
-> >
-> >       /* If platform is not in INIT state then transition it to INIT. */
-> >       if (sev->state != SEV_STATE_INIT) {
-> > -             if (!capable(CAP_SYS_ADMIN))
-> > +             if (!writable)
-> >                       return -EPERM;
-> >
-> >               ret = __sev_platform_init_locked(&argp->error);
-> > @@ -801,6 +801,7 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
-> >       void __user *argp = (void __user *)arg;
-> >       struct sev_issue_cmd input;
-> >       int ret = -EFAULT;
-> > +     bool writable = file->f_mode & FMODE_WRITE;
-> >
-> >       if (!psp_master || !psp_master->sev_data)
-> >               return -ENODEV;
-> > @@ -819,25 +820,25 @@ static long sev_ioctl(struct file *file, unsigned int ioctl, unsigned long arg)
-> >       switch (input.cmd) {
-> >
-> >       case SEV_FACTORY_RESET:
-> > -             ret = sev_ioctl_do_reset(&input);
-> > +             ret = sev_ioctl_do_reset(&input, writable);
-> >               break;
-> >       case SEV_PLATFORM_STATUS:
-> >               ret = sev_ioctl_do_platform_status(&input);
-> >               break;
-> >       case SEV_PEK_GEN:
-> > -             ret = sev_ioctl_do_pek_pdh_gen(SEV_CMD_PEK_GEN, &input);
-> > +             ret = sev_ioctl_do_pek_pdh_gen(SEV_CMD_PEK_GEN, &input, writable);
-> >               break;
-> >       case SEV_PDH_GEN:
-> > -             ret = sev_ioctl_do_pek_pdh_gen(SEV_CMD_PDH_GEN, &input);
-> > +             ret = sev_ioctl_do_pek_pdh_gen(SEV_CMD_PDH_GEN, &input, writable);
-> >               break;
-> >       case SEV_PEK_CSR:
-> > -             ret = sev_ioctl_do_pek_csr(&input);
-> > +             ret = sev_ioctl_do_pek_csr(&input, writable);
-> >               break;
-> >       case SEV_PEK_CERT_IMPORT:
-> > -             ret = sev_ioctl_do_pek_import(&input);
-> > +             ret = sev_ioctl_do_pek_import(&input, writable);
-> >               break;
-> >       case SEV_PDH_CERT_EXPORT:
-> > -             ret = sev_ioctl_do_pdh_export(&input);
-> > +             ret = sev_ioctl_do_pdh_export(&input, writable);
-> >               break;
-> >       case SEV_GET_ID:
-> >               pr_warn_once("SEV_GET_ID command is deprecated, use SEV_GET_ID2\n");
-> > --
-> > 2.24.1
-> >
-> >
+> IMPORTANT: if you fix the bug, please add the following tag to the commit:
+> Reported-by: syzbot+73163a4458e7367880a0@syzkaller.appspotmail.com
+>
+> usb 2-1: USB disconnect, device number 45
+> ==================================================================
+> BUG: KASAN: use-after-free in atomic_fetch_add include/asm-generic/atomic-instrumented.h:111 [inline]
+> BUG: KASAN: use-after-free in refcount_add include/linux/refcount.h:188 [inline]
+> BUG: KASAN: use-after-free in refcount_inc include/linux/refcount.h:228 [inline]
+> BUG: KASAN: use-after-free in get_task_struct include/linux/sched/task.h:113 [inline]
+> BUG: KASAN: use-after-free in kthread_stop+0x90/0x780 kernel/kthread.c:554
+> Write of size 4 at addr ffff8881ca88e220 by task kworker/0:10/18542
+>
+> CPU: 0 PID: 18542 Comm: kworker/0:10 Not tainted 5.5.0-rc7-syzkaller #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+> Workqueue: usb_hub_wq hub_event
+> Call Trace:
+>  __dump_stack lib/dump_stack.c:77 [inline]
+>  dump_stack+0xef/0x16e lib/dump_stack.c:118
+>  print_address_description.constprop.0.cold+0xd3/0x314 mm/kasan/report.c:374
+>  __kasan_report.cold+0x37/0x85 mm/kasan/report.c:506
+>  kasan_report+0xe/0x20 mm/kasan/common.c:639
+>  check_memory_region_inline mm/kasan/generic.c:185 [inline]
+>  check_memory_region+0x152/0x1c0 mm/kasan/generic.c:192
+>  atomic_fetch_add include/asm-generic/atomic-instrumented.h:111 [inline]
+>  refcount_add include/linux/refcount.h:188 [inline]
+>  refcount_inc include/linux/refcount.h:228 [inline]
+>  get_task_struct include/linux/sched/task.h:113 [inline]
+>  kthread_stop+0x90/0x780 kernel/kthread.c:554
+>  hwrng_unregister+0x24f/0x330 drivers/char/hw_random/core.c:556
+>  chaoskey_disconnect+0x216/0x290 drivers/usb/misc/chaoskey.c:232
+>  usb_unbind_interface+0x1bd/0x8a0 drivers/usb/core/driver.c:423
+>  __device_release_driver drivers/base/dd.c:1134 [inline]
+>  device_release_driver_internal+0x42f/0x500 drivers/base/dd.c:1165
+>  bus_remove_device+0x2eb/0x5a0 drivers/base/bus.c:532
+>  device_del+0x481/0xd30 drivers/base/core.c:2664
+>  usb_disable_device+0x23d/0x790 drivers/usb/core/message.c:1237
+>  usb_disconnect+0x293/0x900 drivers/usb/core/hub.c:2201
+>  hub_port_connect drivers/usb/core/hub.c:5036 [inline]
+>  hub_port_connect_change drivers/usb/core/hub.c:5325 [inline]
+>  port_event drivers/usb/core/hub.c:5471 [inline]
+>  hub_event+0x1a1d/0x4300 drivers/usb/core/hub.c:5553
+>  process_one_work+0x945/0x15c0 kernel/workqueue.c:2264
+>  worker_thread+0x96/0xe20 kernel/workqueue.c:2410
+>  kthread+0x318/0x420 kernel/kthread.c:255
+>  ret_from_fork+0x24/0x30 arch/x86/entry/entry_64.S:352
+>
+> Allocated by task 1824:
+>  save_stack+0x1b/0x80 mm/kasan/common.c:72
+>  set_track mm/kasan/common.c:80 [inline]
+>  __kasan_kmalloc mm/kasan/common.c:513 [inline]
+>  __kasan_kmalloc.constprop.0+0xbf/0xd0 mm/kasan/common.c:486
+>  slab_post_alloc_hook mm/slab.h:584 [inline]
+>  slab_alloc_node mm/slub.c:2759 [inline]
+>  kmem_cache_alloc_node+0xdc/0x330 mm/slub.c:2795
+>  alloc_task_struct_node kernel/fork.c:169 [inline]
+>  dup_task_struct kernel/fork.c:868 [inline]
+>  copy_process+0x43e3/0x6710 kernel/fork.c:1911
+>  _do_fork+0x12d/0xfd0 kernel/fork.c:2421
+>  __do_sys_clone kernel/fork.c:2576 [inline]
+>  __se_sys_clone kernel/fork.c:2557 [inline]
+>  __x64_sys_clone+0x182/0x210 kernel/fork.c:2557
+>  do_syscall_64+0xb6/0x5a0 arch/x86/entry/common.c:294
+>  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+>
+> Freed by task 1824:
+>  save_stack+0x1b/0x80 mm/kasan/common.c:72
+>  set_track mm/kasan/common.c:80 [inline]
+>  kasan_set_free_info mm/kasan/common.c:335 [inline]
+>  __kasan_slab_free+0x117/0x160 mm/kasan/common.c:474
+>  slab_free_hook mm/slub.c:1425 [inline]
+>  slab_free_freelist_hook mm/slub.c:1458 [inline]
+>  slab_free mm/slub.c:3005 [inline]
+>  kmem_cache_free+0x9b/0x360 mm/slub.c:3021
+>  __put_task_struct+0x220/0x510 kernel/fork.c:751
+>  put_task_struct include/linux/sched/task.h:122 [inline]
+>  delayed_put_task_struct+0x22a/0x370 kernel/exit.c:182
+>  __rcu_reclaim kernel/rcu/rcu.h:222 [inline]
+>  rcu_do_batch kernel/rcu/tree.c:2183 [inline]
+>  rcu_core+0x664/0x1e10 kernel/rcu/tree.c:2408
+>  __do_softirq+0x21e/0x950 kernel/softirq.c:292
+>
+> The buggy address belongs to the object at ffff8881ca88e200
+>  which belongs to the cache task_struct of size 6016
+> The buggy address is located 32 bytes inside of
+>  6016-byte region [ffff8881ca88e200, ffff8881ca88f980)
+> The buggy address belongs to the page:
+> page:ffffea00072a2200 refcount:1 mapcount:0 mapping:ffff8881da116000 index:0x0 compound_mapcount: 0
+> raw: 0200000000010200 dead000000000100 dead000000000122 ffff8881da116000
+> raw: 0000000000000000 0000000000050005 00000001ffffffff 0000000000000000
+> page dumped because: kasan: bad access detected
+>
+> Memory state around the buggy address:
+>  ffff8881ca88e100: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>  ffff8881ca88e180: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+> >ffff8881ca88e200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>                                ^
+>  ffff8881ca88e280: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>  ffff8881ca88e300: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> ==================================================================
+>
+>
+> ---
+> This bug is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
 >
 
+#syz dup: KASAN: use-after-free Read in chaoskey_disconnect
+
+https://syzkaller.appspot.com/bug?id=d39d574f73e4b96265c6af6deeaff32f9bbd5ede
+> syzbot will keep track of this bug report. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
