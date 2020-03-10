@@ -2,140 +2,96 @@ Return-Path: <SRS0=U1Ok=43=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EC87C18E5A
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Mar 2020 12:14:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB46EC10F27
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Mar 2020 12:26:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 052F8246A2
-	for <linux-crypto@archiver.kernel.org>; Tue, 10 Mar 2020 12:14:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1583842464;
-	bh=bEhWoDM7ps0zyNDOlrnx2a1ZEwiVCTIx3byAPh8nRh0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=KI1CxiDuwdK73VTveoexFxo7CPeCMphEGQoHEe61jO5TudP9tQeUFl9GHQ9nBiW/I
-	 id6gjgtc80oA/lu65FS/5xg5Dh3sSXOJuAfPBVmAxRWYbA6iQdHkdIkeUSWbD449b0
-	 MJYpsbt5uJbzKEAzie/QqLFnB8mpcs0xWOJ2Aqkg=
+	by mail.kernel.org (Postfix) with ESMTP id 8FDD42468E
+	for <linux-crypto@archiver.kernel.org>; Tue, 10 Mar 2020 12:26:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NRk29ZvL"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726271AbgCJMOX (ORCPT
+        id S1726331AbgCJM0Z (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 10 Mar 2020 08:14:23 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54150 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726224AbgCJMOX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 10 Mar 2020 08:14:23 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 00EC02468C;
-        Tue, 10 Mar 2020 12:14:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1583842462;
-        bh=bEhWoDM7ps0zyNDOlrnx2a1ZEwiVCTIx3byAPh8nRh0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=IoZsxsSaTjPdCjnPxr5oeJz7uBoT4nMSuMA7d7llQlDCFBw1FL4Oh+ZJu6oRNNDL4
-         3B+3uAMbcSWsPqcQNFsLs18Ms4O2v3Mdltiyvd+boWpscLgBlSpWYAB8X/I0rPL7MH
-         IGvbMI+CCFoi56mhDdL5Ipujjp0x2r01HQvzKdcc=
-Date:   Tue, 10 Mar 2020 13:14:20 +0100
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     yangerkun <yangerkun@huawei.com>
-Cc:     Sasha Levin <sashal@kernel.org>, herbert@gondor.apana.org.au,
-        stable@vger.kernel.org, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 4.4.y v2] crypto: algif_skcipher - use ZERO_OR_NULL_PTR
- in skcipher_recvmsg_async
-Message-ID: <20200310121420.GG3106483@kroah.com>
-References: <20200305085755.22730-1-yangerkun@huawei.com>
- <20200306133941.GQ21491@sasha-vm>
- <8bb5b0d7-4232-14cb-49c7-a3cc348645ae@huawei.com>
- <20200308001945.GT21491@sasha-vm>
- <f7baf844-f171-adcc-6ad9-70d631cb5f4b@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <f7baf844-f171-adcc-6ad9-70d631cb5f4b@huawei.com>
+        Tue, 10 Mar 2020 08:26:25 -0400
+Received: from mail-pf1-f196.google.com ([209.85.210.196]:38675 "EHLO
+        mail-pf1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726271AbgCJM0Z (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 10 Mar 2020 08:26:25 -0400
+Received: by mail-pf1-f196.google.com with SMTP id z5so1525330pfn.5;
+        Tue, 10 Mar 2020 05:26:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id;
+        bh=aqG1gpI3UojXGpXKG8hweJC7Y4rK/8MUyRGkcr9E4Og=;
+        b=NRk29ZvL9dXRWhydPFZ1MNK8u+VK026HEZdZ6QJrhG6+YwgQJuM7hPfBqK43y29Z/P
+         hWjhYn+xQYQ139crRXlL6FVPYINBUyzwkWupHkYDkopCT25pfhSL/C+lh7wspGkpamcO
+         HygLSE48s954ZazP/AOdt6BNis2UE2+oCV+23F2KC92SOkyyT8Z46DyqmlybGYQQPnoL
+         o3dP2LYSOlpEKs3G44b5dpHRWF0F4ZCaQHnnfQGsQqsZOFhA/MfKa2yp1KNWo5I5zPa4
+         0HoLFM9+y1dGU69VBRHAS+ULujVS+3wcyH+yKDkDERtzTPYeMQZcwWxvGf1bYoGtNIn6
+         ONnQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=aqG1gpI3UojXGpXKG8hweJC7Y4rK/8MUyRGkcr9E4Og=;
+        b=N+wQX3okNNEuTp5Cxo0wlLd5vmslArqxxOip7ljl2j/vNWNs1xSDDWd+9aMQ69DFwt
+         A8V9uBkq9XU9DqrfZ1NNBR9ewZtL622ZfjXZ3wXsw98ZR1XyenobfwkCEfhDut6QY3zs
+         2c8WSehBJhyu+jprfeMdRs7j2Iums85xob3MQ7rEg7WDcbkBgjwqJgBzk4Of9MF3HvWJ
+         nzHHSNPVcyv+oY7Vm/CNIvn85rcZsfYB6w7wvsyNetRQZ5UtkzOo10XK2OtGaAnwxyCX
+         XY37tR8bAFvyQnv8EBeCE04wWKCju8l9RF/Xe2hPXHgXkdZ0r0a/py1ScG68jgnO8g1V
+         s5aA==
+X-Gm-Message-State: ANhLgQ0wIVvjGslZr1PWQaf3B+rucsJ620Ff7DxBYWfSPXW7SZ81FetW
+        E9DF2zyoCjTsxYbDpoIpbfY=
+X-Google-Smtp-Source: ADFU+vsGROcltLUCt7lKgq5KZYHU57Q1LyZzFESKeWrFihj5+bJ1r/nBxQ+urASpaa7ZFtj7UtrrtA==
+X-Received: by 2002:a63:5864:: with SMTP id i36mr21841664pgm.426.1583843183996;
+        Tue, 10 Mar 2020 05:26:23 -0700 (PDT)
+Received: from localhost.localdomain ([149.129.63.152])
+        by smtp.gmail.com with ESMTPSA id w11sm47557396pfn.4.2020.03.10.05.26.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 Mar 2020 05:26:22 -0700 (PDT)
+From:   Jianhui Zhao <zhaojh329@gmail.com>
+To:     herbert@gondor.apana.org.au
+Cc:     davem@davemloft.net, nicolas.ferre@microchip.com,
+        alexandre.belloni@bootlin.com, ludovic.desroches@microchip.com,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-kernel@vger.kernel.org, Jianhui Zhao <zhaojh329@gmail.com>
+Subject: [PATCH v2] crypto: atmel-i2c - Fix wakeup fail
+Date:   Tue, 10 Mar 2020 20:25:51 +0800
+Message-Id: <20200310122551.27831-1-zhaojh329@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Mar 09, 2020 at 09:27:16AM +0800, yangerkun wrote:
-> 
-> 
-> On 2020/3/8 8:19, Sasha Levin wrote:
-> > On Sat, Mar 07, 2020 at 09:49:25AM +0800, yangerkun wrote:
-> > > 
-> > > 
-> > > On 2020/3/6 21:39, Sasha Levin wrote:
-> > > > On Thu, Mar 05, 2020 at 04:57:55PM +0800, yangerkun wrote:
-> > > > > Nowdays, we trigger a oops:
-> > > > > ...
-> > > > > kasan: GPF could be caused by NULL-ptr deref or user memory
-> > > > > accessgeneral protection fault: 0000 [#1] SMP KASAN
-> > > > > ...
-> > > > > Call Trace:
-> > > > > [<ffffffff81a26fb1>] skcipher_recvmsg_async+0x3f1/0x1400
-> > > > > x86/../crypto/algif_skcipher.c:543
-> > > > > [<ffffffff81a28053>] skcipher_recvmsg+0x93/0x7f0
-> > > > > x86/../crypto/algif_skcipher.c:723
-> > > > > [<ffffffff823e43a4>] sock_recvmsg_nosec
-> > > > > x86/../net/socket.c:702 [inline]
-> > > > > [<ffffffff823e43a4>] sock_recvmsg x86/../net/socket.c:710 [inline]
-> > > > > [<ffffffff823e43a4>] sock_recvmsg+0x94/0xc0 x86/../net/socket.c:705
-> > > > > [<ffffffff823e464b>] sock_read_iter+0x27b/0x3a0 x86/../net/socket.c:787
-> > > > > [<ffffffff817f479b>] aio_run_iocb+0x21b/0x7a0 x86/../fs/aio.c:1520
-> > > > > [<ffffffff817f57c9>] io_submit_one x86/../fs/aio.c:1630 [inline]
-> > > > > [<ffffffff817f57c9>] do_io_submit+0x6b9/0x10b0 x86/../fs/aio.c:1688
-> > > > > [<ffffffff817f902d>] SYSC_io_submit x86/../fs/aio.c:1713 [inline]
-> > > > > [<ffffffff817f902d>] SyS_io_submit+0x2d/0x40 x86/../fs/aio.c:1710
-> > > > > [<ffffffff828b33c3>] tracesys_phase2+0x90/0x95
-> > > > > 
-> > > > > In skcipher_recvmsg_async, we use '!sreq->tsg' to determine does we
-> > > > > calloc fail. However, kcalloc may return ZERO_SIZE_PTR, and with this,
-> > > > > the latter sg_init_table will trigger the bug. Fix it be use
-> > > > > ZERO_OF_NULL_PTR.
-> > > > > 
-> > > > > This function was introduced with ' commit a596999b7ddf ("crypto:
-> > > > > algif - change algif_skcipher to be asynchronous")', and has
-> > > > > been removed
-> > > > > with 'commit e870456d8e7c ("crypto: algif_skcipher - overhaul memory
-> > > > > management")'.
-> > > > > 
-> > > > > Reported-by: Hulk Robot <hulkci@huawei.com>
-> > > > > Signed-off-by: yangerkun <yangerkun@huawei.com>
-> > > > > ---
-> > > > > crypto/algif_skcipher.c | 2 +-
-> > > > > 1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > > 
-> > > > > v1->v2:
-> > > > > update the commit message
-> > > > > 
-> > > > > diff --git a/crypto/algif_skcipher.c b/crypto/algif_skcipher.c
-> > > > > index d12782dc9683..9bd4691cc5c5 100644
-> > > > > --- a/crypto/algif_skcipher.c
-> > > > > +++ b/crypto/algif_skcipher.c
-> > > > > @@ -538,7 +538,7 @@ static int skcipher_recvmsg_async(struct
-> > > > > socket *sock, struct msghdr *msg,
-> > > > >     lock_sock(sk);
-> > > > >     tx_nents = skcipher_all_sg_nents(ctx);
-> > > > >     sreq->tsg = kcalloc(tx_nents, sizeof(*sg), GFP_KERNEL);
-> > > > > -    if (unlikely(!sreq->tsg))
-> > > > > +    if (unlikely(ZERO_OR_NULL_PTR(sreq->tsg)))
-> > > > 
-> > > > I'm a bit confused: kcalloc() will return ZERO_SIZE_PTR for allocations
-> > > > that ask for 0 bytes, but here we ask for "sizeof(*sg)" bytes, which is
-> > > > guaranteed to be more than 0, no?
-> > > 
-> > > Actually, the size need to calloc is (tx_nents * sizeof(*sg)), and
-> > > tx_nents is 0.
-> > 
-> > Makes sense. This is also needed on 4.9, right?
-> 
-> Yes! Thanks for checking it!
+The wake token cannot be sent without ignoring the nack for the
+device address
 
-Now queued up,t hanks.
+Signed-off-by: Jianhui Zhao <zhaojh329@gmail.com>
+---
+ drivers/crypto/atmel-i2c.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-greg k-h
+diff --git a/drivers/crypto/atmel-i2c.c b/drivers/crypto/atmel-i2c.c
+index 1d3355913b40..e8e8281e027d 100644
+--- a/drivers/crypto/atmel-i2c.c
++++ b/drivers/crypto/atmel-i2c.c
+@@ -176,7 +176,8 @@ static int atmel_i2c_wakeup(struct i2c_client *client)
+ 	 * device is idle, asleep or during waking up. Don't check for error
+ 	 * when waking up the device.
+ 	 */
+-	i2c_master_send(client, i2c_priv->wake_token, i2c_priv->wake_token_sz);
++	i2c_transfer_buffer_flags(client, i2c_priv->wake_token,
++				i2c_priv->wake_token_sz, I2C_M_IGNORE_NAK);
+ 
+ 	/*
+ 	 * Wait to wake the device. Typical execution times for ecdh and genkey
+-- 
+2.17.1
+
