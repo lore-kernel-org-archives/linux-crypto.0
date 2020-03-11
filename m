@@ -2,87 +2,169 @@ Return-Path: <SRS0=jZ+Q=44=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BF8AC10F25
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Mar 2020 06:47:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FFB6C10F25
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Mar 2020 07:15:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 051F1208C4
-	for <linux-crypto@archiver.kernel.org>; Wed, 11 Mar 2020 06:47:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1583909266;
-	bh=09xRglgut9wsKNqhMN+lYAhB+2AmpWjTxiVBHIOfKJI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=r63lAAWilMhcDZSmI5Ajt8YlFuljyg25z4P8fhCW+oVbff0pD4RelvM2S4yv6yWcS
-	 d5xBQOLeObNoz24umzxj0R2656jcjuLIBLYu5Xsq0E10uq18aHB3kjekbr98EGiXSw
-	 Oroz/2+z6CerocTP+4604hzK9oorX8STJhet/LIQ=
+	by mail.kernel.org (Postfix) with ESMTP id E4B032192A
+	for <linux-crypto@archiver.kernel.org>; Wed, 11 Mar 2020 07:15:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728263AbgCKGrm (ORCPT
+        id S1726310AbgCKHPM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 11 Mar 2020 02:47:42 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57314 "EHLO mail.kernel.org"
+        Wed, 11 Mar 2020 03:15:12 -0400
+Received: from mx2.suse.de ([195.135.220.15]:37260 "EHLO mx2.suse.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726362AbgCKGrm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 11 Mar 2020 02:47:42 -0400
-Received: from dragon (80.251.214.228.16clouds.com [80.251.214.228])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 362F0208C4;
-        Wed, 11 Mar 2020 06:47:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1583909261;
-        bh=09xRglgut9wsKNqhMN+lYAhB+2AmpWjTxiVBHIOfKJI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=l82pKlcdyVMEuc3WGbjgIMBCw3Vn+rUtSL4GTkYbYXxjGOXkUtF/hrHUAqNXyi7pJ
-         1iUa70qTt5qftBq7k65jm86p6WQv2dKNqsbqj5VSi+Ek8PNJjW0A/chn3M5UbBEaOg
-         Trge2PdfCvVCsIN/4ouLov2FDc/T0gLjE23348b0=
-Date:   Wed, 11 Mar 2020 14:47:33 +0800
-From:   Shawn Guo <shawnguo@kernel.org>
-To:     =?iso-8859-1?Q?Andr=E9?= Draszik <git@andred.net>
-Cc:     linux-kernel@vger.kernel.org,
-        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Sascha Hauer <s.hauer@pengutronix.de>,
-        Pengutronix Kernel Team <kernel@pengutronix.de>,
-        Fabio Estevam <festevam@gmail.com>,
-        NXP Linux Team <linux-imx@nxp.com>,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Anson Huang <Anson.Huang@nxp.com>,
-        Robin Gong <yibin.gong@nxp.com>, linux-crypto@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-input@vger.kernel.org
-Subject: Re: [PATCH v2 4/6] arm64: dts: imx8mq: add snvs clock to pwrkey
-Message-ID: <20200311064733.GH29269@dragon>
-References: <20200225161201.1975-1-git@andred.net>
- <20200225161201.1975-4-git@andred.net>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200225161201.1975-4-git@andred.net>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+        id S1726160AbgCKHPM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 11 Mar 2020 03:15:12 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.220.254])
+        by mx2.suse.de (Postfix) with ESMTP id 33988AC51;
+        Wed, 11 Mar 2020 07:15:09 +0000 (UTC)
+From:   Takashi Iwai <tiwai@suse.de>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     linux-crypto@vger.kernel.org
+Subject: [PATCH] crypto: bcm: Use scnprintf() for avoiding potential buffer overflow
+Date:   Wed, 11 Mar 2020 08:15:06 +0100
+Message-Id: <20200311071506.4417-1-tiwai@suse.de>
+X-Mailer: git-send-email 2.16.4
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Feb 25, 2020 at 04:11:59PM +0000, André Draszik wrote:
-> On i.MX8MM, the SNVS requires a clock. This is similar to the clock
-> bound to the SNVS RTC node, but if the SNVS RTC driver isn't enabled,
-> then SNVS doesn't work, and as such the pwrkey driver doesn't
-> work (i.e. hangs the kernel, as the clock isn't enabled).
-> 
-> Also see commit ec2a844ef7c1
-> ("ARM: dts: imx7s: add snvs rtc clock")
-> for a similar fix.
-> 
-> Signed-off-by: André Draszik <git@andred.net>
+Since snprintf() returns the would-be-output size instead of the
+actual output size, the succeeding calls may go beyond the given
+buffer limit.  Fix it by replacing with scnprintf().
 
-Applied, thanks.
+Signed-off-by: Takashi Iwai <tiwai@suse.de>
+---
+ drivers/crypto/bcm/util.c | 40 ++++++++++++++++++++--------------------
+ 1 file changed, 20 insertions(+), 20 deletions(-)
+
+diff --git a/drivers/crypto/bcm/util.c b/drivers/crypto/bcm/util.c
+index cd7504101acd..2b304fc78059 100644
+--- a/drivers/crypto/bcm/util.c
++++ b/drivers/crypto/bcm/util.c
+@@ -366,88 +366,88 @@ static ssize_t spu_debugfs_read(struct file *filp, char __user *ubuf,
+ 
+ 	ipriv = filp->private_data;
+ 	out_offset = 0;
+-	out_offset += snprintf(buf + out_offset, out_count - out_offset,
++	out_offset += scnprintf(buf + out_offset, out_count - out_offset,
+ 			       "Number of SPUs.........%u\n",
+ 			       ipriv->spu.num_spu);
+-	out_offset += snprintf(buf + out_offset, out_count - out_offset,
++	out_offset += scnprintf(buf + out_offset, out_count - out_offset,
+ 			       "Current sessions.......%u\n",
+ 			       atomic_read(&ipriv->session_count));
+-	out_offset += snprintf(buf + out_offset, out_count - out_offset,
++	out_offset += scnprintf(buf + out_offset, out_count - out_offset,
+ 			       "Session count..........%u\n",
+ 			       atomic_read(&ipriv->stream_count));
+-	out_offset += snprintf(buf + out_offset, out_count - out_offset,
++	out_offset += scnprintf(buf + out_offset, out_count - out_offset,
+ 			       "Cipher setkey..........%u\n",
+ 			       atomic_read(&ipriv->setkey_cnt[SPU_OP_CIPHER]));
+-	out_offset += snprintf(buf + out_offset, out_count - out_offset,
++	out_offset += scnprintf(buf + out_offset, out_count - out_offset,
+ 			       "Cipher Ops.............%u\n",
+ 			       atomic_read(&ipriv->op_counts[SPU_OP_CIPHER]));
+ 	for (alg = 0; alg < CIPHER_ALG_LAST; alg++) {
+ 		for (mode = 0; mode < CIPHER_MODE_LAST; mode++) {
+ 			op_cnt = atomic_read(&ipriv->cipher_cnt[alg][mode]);
+ 			if (op_cnt) {
+-				out_offset += snprintf(buf + out_offset,
++				out_offset += scnprintf(buf + out_offset,
+ 						       out_count - out_offset,
+ 			       "  %-13s%11u\n",
+ 			       spu_alg_name(alg, mode), op_cnt);
+ 			}
+ 		}
+ 	}
+-	out_offset += snprintf(buf + out_offset, out_count - out_offset,
++	out_offset += scnprintf(buf + out_offset, out_count - out_offset,
+ 			       "Hash Ops...............%u\n",
+ 			       atomic_read(&ipriv->op_counts[SPU_OP_HASH]));
+ 	for (alg = 0; alg < HASH_ALG_LAST; alg++) {
+ 		op_cnt = atomic_read(&ipriv->hash_cnt[alg]);
+ 		if (op_cnt) {
+-			out_offset += snprintf(buf + out_offset,
++			out_offset += scnprintf(buf + out_offset,
+ 					       out_count - out_offset,
+ 		       "  %-13s%11u\n",
+ 		       hash_alg_name[alg], op_cnt);
+ 		}
+ 	}
+-	out_offset += snprintf(buf + out_offset, out_count - out_offset,
++	out_offset += scnprintf(buf + out_offset, out_count - out_offset,
+ 			       "HMAC setkey............%u\n",
+ 			       atomic_read(&ipriv->setkey_cnt[SPU_OP_HMAC]));
+-	out_offset += snprintf(buf + out_offset, out_count - out_offset,
++	out_offset += scnprintf(buf + out_offset, out_count - out_offset,
+ 			       "HMAC Ops...............%u\n",
+ 			       atomic_read(&ipriv->op_counts[SPU_OP_HMAC]));
+ 	for (alg = 0; alg < HASH_ALG_LAST; alg++) {
+ 		op_cnt = atomic_read(&ipriv->hmac_cnt[alg]);
+ 		if (op_cnt) {
+-			out_offset += snprintf(buf + out_offset,
++			out_offset += scnprintf(buf + out_offset,
+ 					       out_count - out_offset,
+ 		       "  %-13s%11u\n",
+ 		       hash_alg_name[alg], op_cnt);
+ 		}
+ 	}
+-	out_offset += snprintf(buf + out_offset, out_count - out_offset,
++	out_offset += scnprintf(buf + out_offset, out_count - out_offset,
+ 			       "AEAD setkey............%u\n",
+ 			       atomic_read(&ipriv->setkey_cnt[SPU_OP_AEAD]));
+ 
+-	out_offset += snprintf(buf + out_offset, out_count - out_offset,
++	out_offset += scnprintf(buf + out_offset, out_count - out_offset,
+ 			       "AEAD Ops...............%u\n",
+ 			       atomic_read(&ipriv->op_counts[SPU_OP_AEAD]));
+ 	for (alg = 0; alg < AEAD_TYPE_LAST; alg++) {
+ 		op_cnt = atomic_read(&ipriv->aead_cnt[alg]);
+ 		if (op_cnt) {
+-			out_offset += snprintf(buf + out_offset,
++			out_offset += scnprintf(buf + out_offset,
+ 					       out_count - out_offset,
+ 		       "  %-13s%11u\n",
+ 		       aead_alg_name[alg], op_cnt);
+ 		}
+ 	}
+-	out_offset += snprintf(buf + out_offset, out_count - out_offset,
++	out_offset += scnprintf(buf + out_offset, out_count - out_offset,
+ 			       "Bytes of req data......%llu\n",
+ 			       (u64)atomic64_read(&ipriv->bytes_out));
+-	out_offset += snprintf(buf + out_offset, out_count - out_offset,
++	out_offset += scnprintf(buf + out_offset, out_count - out_offset,
+ 			       "Bytes of resp data.....%llu\n",
+ 			       (u64)atomic64_read(&ipriv->bytes_in));
+-	out_offset += snprintf(buf + out_offset, out_count - out_offset,
++	out_offset += scnprintf(buf + out_offset, out_count - out_offset,
+ 			       "Mailbox full...........%u\n",
+ 			       atomic_read(&ipriv->mb_no_spc));
+-	out_offset += snprintf(buf + out_offset, out_count - out_offset,
++	out_offset += scnprintf(buf + out_offset, out_count - out_offset,
+ 			       "Mailbox send failures..%u\n",
+ 			       atomic_read(&ipriv->mb_send_fail));
+-	out_offset += snprintf(buf + out_offset, out_count - out_offset,
++	out_offset += scnprintf(buf + out_offset, out_count - out_offset,
+ 			       "Check ICV errors.......%u\n",
+ 			       atomic_read(&ipriv->bad_icv));
+ 	if (ipriv->spu.spu_type == SPU_TYPE_SPUM)
+@@ -455,7 +455,7 @@ static ssize_t spu_debugfs_read(struct file *filp, char __user *ubuf,
+ 			spu_ofifo_ctrl = ioread32(ipriv->spu.reg_vbase[i] +
+ 						  SPU_OFIFO_CTRL);
+ 			fifo_len = spu_ofifo_ctrl & SPU_FIFO_WATERMARK;
+-			out_offset += snprintf(buf + out_offset,
++			out_offset += scnprintf(buf + out_offset,
+ 					       out_count - out_offset,
+ 				       "SPU %d output FIFO high water.....%u\n",
+ 				       i, fifo_len);
+-- 
+2.16.4
+
