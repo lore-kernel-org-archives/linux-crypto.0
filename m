@@ -4,77 +4,80 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E5BEC0044D
-	for <linux-crypto@archiver.kernel.org>; Sun, 15 Mar 2020 02:36:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11743C0044D
+	for <linux-crypto@archiver.kernel.org>; Sun, 15 Mar 2020 02:38:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 07880205C9
-	for <linux-crypto@archiver.kernel.org>; Sun, 15 Mar 2020 02:36:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D8663205F4
+	for <linux-crypto@archiver.kernel.org>; Sun, 15 Mar 2020 02:38:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727080AbgCOCgs (ORCPT
+        id S1726857AbgCOCiv (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 14 Mar 2020 22:36:48 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:11695 "EHLO huawei.com"
+        Sat, 14 Mar 2020 22:38:51 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:11696 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726712AbgCOCgr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 14 Mar 2020 22:36:47 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 36F5E8A47D899E3BDB75;
-        Sat, 14 Mar 2020 18:51:31 +0800 (CST)
-Received: from localhost (10.173.223.234) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.487.0; Sat, 14 Mar 2020
- 18:51:23 +0800
+        id S1727066AbgCOCiv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 14 Mar 2020 22:38:51 -0400
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 350EFD0140A75CBEFE3F;
+        Sat, 14 Mar 2020 18:52:25 +0800 (CST)
+Received: from localhost.localdomain.localdomain (10.175.113.25) by
+ DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
+ 14.3.487.0; Sat, 14 Mar 2020 18:52:15 +0800
 From:   YueHaibing <yuehaibing@huawei.com>
-To:     <ayush.sawal@chelsio.com>, <vinay.yadav@chelsio.com>,
-        <rohitm@chelsio.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>
-CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <netdev@vger.kernel.org>, YueHaibing <yuehaibing@huawei.com>
-Subject: [PATCH net-next] chcr: remove set but not used variable 'status'
-Date:   Sat, 14 Mar 2020 18:51:20 +0800
-Message-ID: <20200314105120.20968-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.10.2.windows.1
+To:     Ayush Sawal <ayush.sawal@chelsio.com>,
+        Vinay Kumar Yadav <vinay.yadav@chelsio.com>,
+        Rohit Maheshwari <rohitm@chelsio.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>
+CC:     YueHaibing <yuehaibing@huawei.com>, <linux-crypto@vger.kernel.org>,
+        <kernel-janitors@vger.kernel.org>
+Subject: [PATCH -next] crypto: chelsio - remove set but not used variable 'adap'
+Date:   Sat, 14 Mar 2020 10:44:41 +0000
+Message-ID: <20200314104441.79953-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.173.223.234]
+Content-Type:   text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+X-Originating-IP: [10.175.113.25]
 X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-drivers/crypto/chelsio/chcr_ktls.c: In function chcr_ktls_cpl_set_tcb_rpl:
-drivers/crypto/chelsio/chcr_ktls.c:662:11: warning:
- variable status set but not used [-Wunused-but-set-variable]
+drivers/crypto/chelsio/chcr_algo.c: In function 'chcr_device_init':
+drivers/crypto/chelsio/chcr_algo.c:1440:18: warning:
+ variable 'adap' set but not used [-Wunused-but-set-variable]
+ 
+commit 567be3a5d227 ("crypto: chelsio - Use multiple txq/rxq per tfm
+to process the requests") involved this unused variable.
 
-commit 8a30923e1598 ("cxgb4/chcr: Save tx keys and handle HW response")
-involved this unused variable, remove it.
-
-Reported-by: Hulk Robot <hulkci@huawei.com>
 Signed-off-by: YueHaibing <yuehaibing@huawei.com>
 ---
- drivers/crypto/chelsio/chcr_ktls.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/crypto/chelsio/chcr_algo.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/drivers/crypto/chelsio/chcr_ktls.c b/drivers/crypto/chelsio/chcr_ktls.c
-index f0c3834eda4f..00099e793e63 100644
---- a/drivers/crypto/chelsio/chcr_ktls.c
-+++ b/drivers/crypto/chelsio/chcr_ktls.c
-@@ -659,10 +659,9 @@ int chcr_ktls_cpl_set_tcb_rpl(struct adapter *adap, unsigned char *input)
- 	const struct cpl_set_tcb_rpl *p = (void *)input;
- 	struct chcr_ktls_info *tx_info = NULL;
- 	struct tid_info *t;
--	u32 tid, status;
-+	u32 tid;
+diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
+index 8952732c0b7d..c29b80dd30d8 100644
+--- a/drivers/crypto/chelsio/chcr_algo.c
++++ b/drivers/crypto/chelsio/chcr_algo.c
+@@ -1437,7 +1437,6 @@ static int chcr_aes_decrypt(struct skcipher_request *req)
+ static int chcr_device_init(struct chcr_context *ctx)
+ {
+ 	struct uld_ctx *u_ctx = NULL;
+-	struct adapter *adap;
+ 	int txq_perchan, ntxq;
+ 	int err = 0, rxq_perchan;
  
- 	tid = GET_TID(p);
--	status = p->status;
- 
- 	t = &adap->tids;
- 	tx_info = lookup_tid(t, tid);
--- 
-2.20.1
+@@ -1448,7 +1447,6 @@ static int chcr_device_init(struct chcr_context *ctx)
+ 			goto out;
+ 		}
+ 		ctx->dev = &u_ctx->dev;
+-		adap = padap(ctx->dev);
+ 		ntxq = u_ctx->lldi.ntxq;
+ 		rxq_perchan = u_ctx->lldi.nrxq / u_ctx->lldi.nchan;
+ 		txq_perchan = ntxq / u_ctx->lldi.nchan;
+
 
 
