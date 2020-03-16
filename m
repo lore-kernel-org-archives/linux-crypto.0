@@ -2,61 +2,61 @@ Return-Path: <SRS0=DGAQ=5B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48B0FC0044D
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Mar 2020 15:01:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3946CC0044D
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Mar 2020 15:01:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 16C332073E
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Mar 2020 15:01:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F1BF82074D
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Mar 2020 15:01:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SCifVSsX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FVBmx9Jm"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731807AbgCPPBY (ORCPT
+        id S1731802AbgCPPBQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 16 Mar 2020 11:01:24 -0400
-Received: from mail-pf1-f193.google.com ([209.85.210.193]:39527 "EHLO
-        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731823AbgCPPBS (ORCPT
+        Mon, 16 Mar 2020 11:01:16 -0400
+Received: from mail-pg1-f194.google.com ([209.85.215.194]:46402 "EHLO
+        mail-pg1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731780AbgCPPBN (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 Mar 2020 11:01:18 -0400
-Received: by mail-pf1-f193.google.com with SMTP id d25so2081990pfn.6;
-        Mon, 16 Mar 2020 08:01:16 -0700 (PDT)
+        Mon, 16 Mar 2020 11:01:13 -0400
+Received: by mail-pg1-f194.google.com with SMTP id y30so9882351pga.13;
+        Mon, 16 Mar 2020 08:01:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=6FSGRqvWIrV1AnR+eNOcmfjvZaVEwGuCJbbdcQTrqeA=;
-        b=SCifVSsXYGYFePDAubNpRPpOOD5WkSnD9w88D/7K+mYZNxj+5Zwm4drhBTnVdWA8HV
-         Sh3abG8AvOaX/Vv5iLPRSXKGUxTKluBGEmJDmxCUNGkwyw0NZ1+LeGioYh2yD9wAwSAB
-         AQ4YzbGplhRBFA2AbhnwKXPq5eTLxmLYA0GvdIrPu3znAFa6qNIkEwelLFz/DwHDeQDf
-         zn8gRXC64aae5ZRQzJoonYy211eEXAOsKObw8cjTBSaW0ZVVMI+yQbx20+l2SRxjWM9S
-         TspP+r9pWqRmAjwKNfRsWvFwgwn6RrjRYs0fdZUD8glo3BBDaZy7ZLs2UCylLclDh2tr
-         KsUQ==
+        bh=5opG/WqdObFJY1MKCrS0UlWt4bpICiyw/uq+oIUzdY0=;
+        b=FVBmx9Jmsm+YpwdWdVoZeOF/ZCPAPTwl3AeNGg6Cpm+0cJQqmvEUKa1S/QnCyE6uq3
+         L87guLTV5m+OorNrQG27aX5eCpB4tkhjQX23P31P9Kf0z99xIXYle+fyolja7gSY1L9m
+         K9bP/BMFo3YTHb5nWF/R4iCbHPbMVJxhNYDf0WXiEcLeQHxf21dcP1/+LXX2HUCBVjPE
+         ESfwUihi03ePtuhav+QY66L48yJBYCewTEiYsUnUBD/xvCvDcj9foiIAonKNcx8IkmP2
+         LMpy96Em/cPXW/oP17GbJStjofcFMxRJaFg1Jjb9XuDl5MPz+UoNlOpzm4caa1LHQdCh
+         kuqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=6FSGRqvWIrV1AnR+eNOcmfjvZaVEwGuCJbbdcQTrqeA=;
-        b=R4xNfiMV2FFNEFUmhkYqkjgKT/Or17NWtUzZWgx+1Ro1/ugvpwG+2EghYBsCU8vA4O
-         9FYlTfcOI1NUz8i451LfXb0gSBJO5GKPJZDJIDwMtogcg64kMiLlTgluGWK+LM9PTqfd
-         K0pWhu1giQR53dBpxIHNlHaGYIYwG2KmQMPMTJFejbQXZKVosGHrOoNeMYzuH0FMYbXx
-         XsC+8xHgKvsgC92Cwj2aO9ZrpOuho6W2Shijpi6EeIrQtYl6QhFr7L3LNjR9LUi82l9c
-         AIwx2tuzRm3h36g3wuvDfz0Gs8yB1Iqvy+xqajGW33wHzO8NtnkUy9D+jnN4rJTmBN5+
-         3yBg==
-X-Gm-Message-State: ANhLgQ0buPVgFiROAAfIq87hmiaRsHFL8RqcpMaZrClK9cAySY55Ioec
-        CRrsv6VtcZ303DyK0mcB9t6mKgWm
-X-Google-Smtp-Source: ADFU+vtR0JV4vkxPY1U/B35BsEtpeY7gjYv1FzdAARr9vqVT1MatpZtC/avVrGNXXNOnr7h9qgQ1ag==
-X-Received: by 2002:a65:5181:: with SMTP id h1mr323912pgq.62.1584370875444;
-        Mon, 16 Mar 2020 08:01:15 -0700 (PDT)
+        bh=5opG/WqdObFJY1MKCrS0UlWt4bpICiyw/uq+oIUzdY0=;
+        b=hXcO+QBGblqwZGR+hO13LKeupkdqoPff7xfkeotHeZnbq2ze9zA4DHne243ZznBpwU
+         r/wryNNoJ5EIZgfSKShZJkdmO0jXuIQ4A9W8UIN9laSZf/bDZTUFxHU9bcqMdC1S1Zli
+         VZJ5mb35rCOPMXqG1rwbF7v/QoI8PCC/zgA3Pr0XxoxJboZK2QWocEivOjpHjPTsab8T
+         PQ1ZiAw+TdSzvpKfB5ZaLBxadYZHoNAUCzQtlQfC5x86waI3z3xCbLWQhSn89inPy9uF
+         DFEuG4SnX+dL8UoqAmfXFileCa48DruyoE2k3W+nmq9VMawvukEM6IOJE8yUfUIt2bi8
+         tQQQ==
+X-Gm-Message-State: ANhLgQ0WMzWL10stwsL0Hl+f6HQCa5xHS/aKzU5mLEbDjiL2NHRwuOCJ
+        baBl8VYAZ/eIOcoqThGq+g6HGmYH
+X-Google-Smtp-Source: ADFU+vuYj7BMkAbNu1vmKUlpMsBm9X90d78ksq6odhJxm9ffProKglFA4sXoOaTSfDcN4bSHbJQaKw==
+X-Received: by 2002:a62:a116:: with SMTP id b22mr82123pff.122.1584370870475;
+        Mon, 16 Mar 2020 08:01:10 -0700 (PDT)
 Received: from localhost.localdomain (c-67-165-113-11.hsd1.wa.comcast.net. [67.165.113.11])
-        by smtp.gmail.com with ESMTPSA id o128sm256354pfg.5.2020.03.16.08.01.14
+        by smtp.gmail.com with ESMTPSA id o128sm256354pfg.5.2020.03.16.08.01.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Mar 2020 08:01:14 -0700 (PDT)
+        Mon, 16 Mar 2020 08:01:09 -0700 (PDT)
 From:   Andrey Smirnov <andrew.smirnov@gmail.com>
 To:     linux-crypto@vger.kernel.org
 Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
@@ -66,9 +66,9 @@ Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Iuliana Prodan <iuliana.prodan@nxp.com>,
         linux-kernel@vger.kernel.org, linux-imx@nxp.com
-Subject: [PATCH v8 8/8] crypto: caam - limit single JD RNG output to maximum of 16 bytes
-Date:   Mon, 16 Mar 2020 08:00:47 -0700
-Message-Id: <20200316150047.30828-9-andrew.smirnov@gmail.com>
+Subject: [PATCH v8 5/8] crypto: caam - check if RNG job failed
+Date:   Mon, 16 Mar 2020 08:00:44 -0700
+Message-Id: <20200316150047.30828-6-andrew.smirnov@gmail.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20200316150047.30828-1-andrew.smirnov@gmail.com>
 References: <20200316150047.30828-1-andrew.smirnov@gmail.com>
@@ -80,14 +80,8 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In order to follow recommendation in SP800-90C (section "9.4 The
-Oversampling-NRBG Construction") limit the output of "generate" JD
-submitted to CAAM. See
-https://lore.kernel.org/linux-crypto/VI1PR0402MB3485EF10976A4A69F90E5B0F98580@VI1PR0402MB3485.eurprd04.prod.outlook.com/
-for more details.
-
-This change should make CAAM's hwrng driver good enough to have 1024
-quality rating.
+We shouldn't stay silent if RNG job fails. Add appropriate code to
+check for that case and propagate error code up appropriately.
 
 Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
 Cc: Chris Healy <cphealy@gmail.com>
@@ -99,88 +93,72 @@ Cc: linux-crypto@vger.kernel.org
 Cc: linux-kernel@vger.kernel.org
 Cc: linux-imx@nxp.com
 ---
- drivers/crypto/caam/caamrng.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+ drivers/crypto/caam/caamrng.c | 21 +++++++++++++++------
+ 1 file changed, 15 insertions(+), 6 deletions(-)
 
 diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
-index cffa6604f726..77d048dfe5d0 100644
+index b3b92e5944cd..ffbdc912f1be 100644
 --- a/drivers/crypto/caam/caamrng.c
 +++ b/drivers/crypto/caam/caamrng.c
-@@ -22,9 +22,7 @@
- #include "jr.h"
- #include "error.h"
+@@ -44,6 +44,11 @@ struct caam_rng_ctx {
+ 	struct kfifo fifo;
+ };
  
--#define CAAM_RNG_MAX_FIFO_STORE_SIZE	U16_MAX
--
--#define CAAM_RNG_FIFO_LEN		SZ_32K /* Must be a multiple of 2 */
-+#define CAAM_RNG_MAX_FIFO_STORE_SIZE	16
++struct caam_rng_job_ctx {
++	struct completion *done;
++	int *err;
++};
++
+ static struct caam_rng_ctx *to_caam_rng_ctx(struct hwrng *r)
+ {
+ 	return (struct caam_rng_ctx *)r->priv;
+@@ -52,12 +57,12 @@ static struct caam_rng_ctx *to_caam_rng_ctx(struct hwrng *r)
+ static void caam_rng_done(struct device *jrdev, u32 *desc, u32 err,
+ 			  void *context)
+ {
+-	struct completion *done = context;
++	struct caam_rng_job_ctx *jctx = context;
  
- /*
-  * Length of used descriptors, see caam_init_desc()
-@@ -65,14 +63,15 @@ static void caam_rng_done(struct device *jrdev, u32 *desc, u32 err,
- 	complete(jctx->done);
+ 	if (err)
+-		caam_jr_strstatus(jrdev, err);
++		*jctx->err = caam_jr_strstatus(jrdev, err);
+ 
+-	complete(done);
++	complete(jctx->done);
  }
  
--static u32 *caam_init_desc(u32 *desc, dma_addr_t dst_dma, int len)
-+static u32 *caam_init_desc(u32 *desc, dma_addr_t dst_dma)
+ static u32 *caam_init_desc(u32 *desc, dma_addr_t dst_dma, int len)
+@@ -80,7 +85,11 @@ static int caam_rng_read_one(struct device *jrdev,
+ 			     struct completion *done)
  {
- 	init_job_desc(desc, 0);	/* + 1 cmd_sz */
- 	/* Generate random bytes: + 1 cmd_sz */
- 	append_operation(desc, OP_ALG_ALGSEL_RNG | OP_TYPE_CLASS1_ALG |
- 			 OP_ALG_PR_ON);
- 	/* Store bytes: + 1 cmd_sz + caam_ptr_sz  */
--	append_fifo_store(desc, dst_dma, len, FIFOST_TYPE_RNGSTORE);
-+	append_fifo_store(desc, dst_dma,
-+			  CAAM_RNG_MAX_FIFO_STORE_SIZE, FIFOST_TYPE_RNGSTORE);
+ 	dma_addr_t dst_dma;
+-	int err;
++	int err, ret = 0;
++	struct caam_rng_job_ctx jctx = {
++		.done = done,
++		.err  = &ret,
++	};
  
- 	print_hex_dump_debug("rng job desc@: ", DUMP_PREFIX_ADDRESS,
- 			     16, 4, desc, desc_bytes(desc), 1);
-@@ -92,7 +91,7 @@ static int caam_rng_read_one(struct device *jrdev,
- 		.err  = &ret,
- 	};
+ 	len = min_t(int, len, CAAM_RNG_MAX_FIFO_STORE_SIZE);
  
--	len = min_t(int, len, CAAM_RNG_MAX_FIFO_STORE_SIZE);
-+	len = CAAM_RNG_MAX_FIFO_STORE_SIZE;
- 
- 	dst_dma = dma_map_single(jrdev, dst, len, DMA_FROM_DEVICE);
- 	if (dma_mapping_error(jrdev, dst_dma)) {
-@@ -102,7 +101,7 @@ static int caam_rng_read_one(struct device *jrdev,
- 
+@@ -93,7 +102,7 @@ static int caam_rng_read_one(struct device *jrdev,
  	init_completion(done);
  	err = caam_jr_enqueue(jrdev,
--			      caam_init_desc(desc, dst_dma, len),
-+			      caam_init_desc(desc, dst_dma),
- 			      caam_rng_done, &jctx);
+ 			      caam_init_desc(desc, dst_dma, len),
+-			      caam_rng_done, done);
++			      caam_rng_done, &jctx);
  	if (err == -EINPROGRESS) {
  		wait_for_completion(done);
-@@ -122,7 +121,7 @@ static void caam_rng_fill_async(struct caam_rng_ctx *ctx)
+ 		err = 0;
+@@ -101,7 +110,7 @@ static int caam_rng_read_one(struct device *jrdev,
  
- 	sg_init_table(sg, ARRAY_SIZE(sg));
- 	nents = kfifo_dma_in_prepare(&ctx->fifo, sg, ARRAY_SIZE(sg),
--				     CAAM_RNG_FIFO_LEN);
-+				     CAAM_RNG_MAX_FIFO_STORE_SIZE);
- 	if (!nents)
- 		return;
+ 	dma_unmap_single(jrdev, dst_dma, len, DMA_FROM_DEVICE);
  
-@@ -156,7 +155,7 @@ static int caam_read(struct hwrng *rng, void *dst, size_t max, bool wait)
- 	}
+-	return err ?: len;
++	return err ?: (ret ?: len);
+ }
  
- 	out = kfifo_out(&ctx->fifo, dst, max);
--	if (kfifo_len(&ctx->fifo) <= CAAM_RNG_FIFO_LEN / 2)
-+	if (kfifo_is_empty(&ctx->fifo))
- 		schedule_work(&ctx->worker);
- 
- 	return out;
-@@ -186,7 +185,8 @@ static int caam_init(struct hwrng *rng)
- 	if (!ctx->desc_async)
- 		return -ENOMEM;
- 
--	if (kfifo_alloc(&ctx->fifo, CAAM_RNG_FIFO_LEN, GFP_DMA | GFP_KERNEL))
-+	if (kfifo_alloc(&ctx->fifo, CAAM_RNG_MAX_FIFO_STORE_SIZE,
-+			GFP_DMA | GFP_KERNEL))
- 		return -ENOMEM;
- 
- 	INIT_WORK(&ctx->worker, caam_rng_worker);
+ static void caam_rng_fill_async(struct caam_rng_ctx *ctx)
 -- 
 2.21.0
 
