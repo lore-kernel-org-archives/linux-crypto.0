@@ -2,167 +2,106 @@ Return-Path: <SRS0=DGAQ=5B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96706C0044D
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Mar 2020 13:04:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5AADC0044D
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Mar 2020 13:53:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5D1C02076A
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Mar 2020 13:04:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B869C20663
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Mar 2020 13:53:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=axtens.net header.i=@axtens.net header.b="Kfy/sLZ2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OccARGXr"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731062AbgCPNEK (ORCPT
+        id S1731368AbgCPNxX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 16 Mar 2020 09:04:10 -0400
-Received: from mail-pl1-f194.google.com ([209.85.214.194]:37107 "EHLO
-        mail-pl1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730974AbgCPNEK (ORCPT
+        Mon, 16 Mar 2020 09:53:23 -0400
+Received: from mail-wr1-f65.google.com ([209.85.221.65]:46743 "EHLO
+        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731331AbgCPNxW (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 Mar 2020 09:04:10 -0400
-Received: by mail-pl1-f194.google.com with SMTP id f16so7987668plj.4
-        for <linux-crypto@vger.kernel.org>; Mon, 16 Mar 2020 06:04:07 -0700 (PDT)
+        Mon, 16 Mar 2020 09:53:22 -0400
+Received: by mail-wr1-f65.google.com with SMTP id w16so4911165wrv.13;
+        Mon, 16 Mar 2020 06:53:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=axtens.net; s=google;
-        h=from:to:cc:subject:in-reply-to:references:date:message-id
-         :mime-version;
-        bh=gm3nq+v+QGkPerUNlfinQphw8ITuvw6SnqWBKvCOlbs=;
-        b=Kfy/sLZ2EJ8aIHhCS04gM9F/jxgjFnksWPjtofT3qFbPgmsCJvVSILgnVnJ9JopX7r
-         /6iQbFuvpTGcks/S4vd7OboaCmKYRrF9fU54K8Ai/l5br9Ets4/O6n4IObJOV/PL6IDm
-         Z4uMmAhFuXiX+LLk4v/IQ+2isK6vhxak/HuMY=
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=zz+VUSWNCDs2sQPAELxMFVMHL5mAksbtoTViuL2HD+g=;
+        b=OccARGXrypOX9pQ0w3HKRvuuWLqJ++L0Dv2Tvn9pEsWij0cX2i3W+HKTs/fF5OC/KW
+         9sdXw+ZZqcTzq0eRCgb5RuIJjx6foLgVQTSarHfGTPawCDfVHCG3UPCELr8yrZXOF/Nt
+         YzK30be1UuTwUggKivog1qW4bCcOOAr0zP6qjBmFrSmtJcdgvDAjRmdBJfXLmqsyJLZl
+         fWFzH3Z6x+9/SwdzHV2aESQr2DUXNNyMEYqzVECq4OSS7BVgpbYt6y/QaVdHMgT55kKL
+         4F1arAIUc/zqHPJ6JzrlMZ6XDfII8rMNwhzrhlaE3LdNDmicC7FrmuRTnHKKT4oOl0T2
+         6tbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=gm3nq+v+QGkPerUNlfinQphw8ITuvw6SnqWBKvCOlbs=;
-        b=nPfOABttN9RkP46Op32SuG6NCOXt0QWPEqdo9uEmLXaTzkEAvZD+FXnyBgsI3OeYdw
-         K46869zSMA9J2b7GQgvyqWo7jeTD55QqzWX9mIMF9G6CmhtsTUuSvirie2JhFLnheJti
-         qsPJrSrO9p+2jfUhT55YCruxPuJBNGL6JX7mUqXaIBUavJwlPT9McDbjES3dHiNzmsm9
-         AxUzMdb+LFt7TqpcQYOcBLgbnXuPrFN9UI3m8YXCBwFjcBHOtsQ5ncx0iAR/5W70VYKT
-         wPGD71t9LFAi5aU9iqKbM2muz9dVKzAsE6JhUe9SCPHe5q3TSZwvEClxM1audGNPovzU
-         /FjQ==
-X-Gm-Message-State: ANhLgQ2ueM3h/FgqmwVb5ygPexD9Vj0Nq1H5hB2FbWXeWbrxl0wwusDm
-        Al70nSbsOxh5eWw0erw6dABoP1ROXIE=
-X-Google-Smtp-Source: ADFU+vskn1/3oxwY8FsGP4p1/BKcID7x94CYnVnY3jeAL5V0sf+PfLygADfeW6PK2s6r/iybZGCsmA==
-X-Received: by 2002:a17:90a:bf0b:: with SMTP id c11mr26426966pjs.28.1584363846927;
-        Mon, 16 Mar 2020 06:04:06 -0700 (PDT)
-Received: from localhost (2001-44b8-1113-6700-789d-cd2c-42e1-23af.static.ipv6.internode.on.net. [2001:44b8:1113:6700:789d:cd2c:42e1:23af])
-        by smtp.gmail.com with ESMTPSA id h22sm65481456pgn.57.2020.03.16.06.04.05
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to:user-agent;
+        bh=zz+VUSWNCDs2sQPAELxMFVMHL5mAksbtoTViuL2HD+g=;
+        b=MoOEuXXw9m/8lJxyFGR5X+tCyR1J/YbBejfjD5uyG91O1WpK14FdoCcNOyfK8xxu9V
+         La5/EEydrm8dtom4mHI1aFllCyZKAyAXp5CTF+3meRRzVr3bKGo2ZO4QCGiix0NsordL
+         Ea2z5kAuJqUGJIP9e3MPan+CMF1yKj9QlbfbPmRIr+54KUU62YbXh0s5GiRvrKEkeV+7
+         EfgsXeSBhtqncJjQX0hwrZalJt1z+DdgtPg92Ujlhta650ex2Fd5/FyFjfgZC49jgcfb
+         aMLZJfkKE5NemFU1DC4TbLUxeNVmeHZ/oXABV3URvv6e3fJqFPny/O3KQewJbkCfEum2
+         UIQg==
+X-Gm-Message-State: ANhLgQ2e8NcOg7QK6cfMm2YWsWYSWAj4Vga5dOe+zz4FeiVc7dtAoDcC
+        /fTIg4rGXPU4ASYYidlqp2q0402I
+X-Google-Smtp-Source: ADFU+vvwLSvB6JlHnivEFRq8ttan08vIgV77aIBH8Bz7u8qpc5GznHQ1xr/G5WW8OuWzwVqD4NbxHQ==
+X-Received: by 2002:adf:8023:: with SMTP id 32mr26014359wrk.189.1584366800438;
+        Mon, 16 Mar 2020 06:53:20 -0700 (PDT)
+Received: from Red ([2a01:cb1d:3d5:a100:2e56:dcff:fed2:c6d6])
+        by smtp.googlemail.com with ESMTPSA id z6sm24277216wrp.95.2020.03.16.06.53.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Mar 2020 06:04:05 -0700 (PDT)
-From:   Daniel Axtens <dja@axtens.net>
-To:     Haren Myneni <haren@linux.ibm.com>, herbert@gondor.apana.org.au,
-        mpe@ellerman.id.au
-Cc:     mikey@neuling.org, sukadev@linux.vnet.ibm.com,
-        linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
-        npiggin@gmail.com
-Subject: Re: [PATCH v3 0/9] crypto/nx: Enable GZIP engine and provide userpace API
-In-Reply-To: <1583540877.9256.24.camel@hbabu-laptop>
-References: <1583540877.9256.24.camel@hbabu-laptop>
-Date:   Tue, 17 Mar 2020 00:04:02 +1100
-Message-ID: <87y2s0o3i5.fsf@dja-thinkpad.axtens.net>
+        Mon, 16 Mar 2020 06:53:19 -0700 (PDT)
+Date:   Mon, 16 Mar 2020 14:53:18 +0100
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     peterz@infradead.org, herbert@gondor.apana.org.au,
+        viro@zeniv.linux.org.uk, mingo@redhat.com, dvhart@infradead.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: BUG: cryptsetup benchmark stuck
+Message-ID: <20200316135318.GA29789@Red>
+References: <20200315145214.GA9576@Red>
+ <877dzkem9z.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <877dzkem9z.fsf@nanos.tec.linutronix.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Haren,
+On Mon, Mar 16, 2020 at 09:28:40AM +0100, Thomas Gleixner wrote:
+> Corentin,
+> 
+> Corentin Labbe <clabbe.montjoie@gmail.com> writes:
+> > On next-20200313, running cryptsetup benchmark is stuck.
+> > I have bisected this problem twice and the result is the same:
+> >
+> > git bisect bad 8019ad13ef7f64be44d4f892af9c840179009254
+> > # first bad commit: [8019ad13ef7f64be44d4f892af9c840179009254] futex: Fix inode life-time issue
+> >
+> > Since the two bisect lead to the same commit, I think it should be
+> > right one even if I dont find anything related to my problem.
+> 
+> I'm as puzzled as you.
+> 
+> > But reverting this patch is impossible, so I cannot test to try
+> > without it.
+> 
+> You need to revert two:
+> 
+> 8d67743653dc ("futex: Unbreak futex hashing")
+> 8019ad13ef7f ("futex: Fix inode life-time issue")
+> 
 
-If I understand correctly, to test these, I need to apply both this
-series and your VAS userspace page fault handling series - is that
-right?
+On next-20200313, there are no "futex: Unbreak futex hashing".
+And it seems to fix my issue, I have updated to next-20200316 (which have it) and the issue is not present anymore.
 
-Kind regards,
-Daniel
-
-> Power9 processor supports Virtual Accelerator Switchboard (VAS) which
-> allows kernel and userspace to send compression requests to Nest
-> Accelerator (NX) directly. The NX unit comprises of 2 842 compression
-> engines and 1 GZIP engine. Linux kernel already has 842 compression
-> support on kernel. This patch series adds GZIP compression support
-> from user space. The GZIP Compression engine implements the ZLIB and
-> GZIP compression algorithms. No plans of adding NX-GZIP compression
-> support in kernel right now.
->
-> Applications can send requests to NX directly with COPY/PASTE
-> instructions. But kernel has to establish channel / window on NX-GZIP
-> device for the userspace. So userspace access to the GZIP engine is
-> provided through /dev/crypto/nx-gzip device with several operations.
->
-> An application must open the this device to obtain a file descriptor (fd).
-> Using the fd, application should issue the VAS_TX_WIN_OPEN ioctl to
-> establish a connection to the engine. Once window is opened, should use
-> mmap() system call to map the hardware address of engine's request queue
-> into the application's virtual address space. Then user space forms the
-> request as co-processor Request Block (CRB) and paste this CRB on the
-> mapped HW address using COPY/PASTE instructions. Application can poll
-> on status flags (part of CRB) with timeout for request completion.
->
-> For VAS_TX_WIN_OPEN ioctl, if user space passes vas_id = -1 (struct
-> vas_tx_win_open_attr), kernel determines the VAS instance on the
-> corresponding chip based on the CPU on which the process is executing.
-> Otherwise, the specified VAS instance is used if application passes the
-> proper VAS instance (vas_id listed in /proc/device-tree/vas@*/ibm,vas_id).
->
-> Process can open multiple windows with different FDs or can send several
-> requests to NX on the same window at the same time.
->
-> A userspace library libnxz is available:
->         https://github.com/abalib/power-gzip
->
-> Applications that use inflate/deflate calls can link with libNXz and use
-> NX GZIP compression without any modification.
->
-> Tested the available 842 compression on power8 and power9 system to make
-> sure no regression and tested GZIP compression on power9 with tests
-> available in the above link.
->
-> Thanks to Bulent Abali for nxz library and tests development.
->
-> Changelog:
-> V2:
->   - Move user space API code to powerpc as suggested. Also this API
->     can be extended to any other coprocessor type that VAS can support
->     in future. Example: Fast thread wakeup feature from VAS
->   - Rebased to 5.6-rc3
->
-> V3:
->   - Fix sparse warnings (patches 3&6)
->
-> Haren Myneni (9):
->   powerpc/vas: Initialize window attributes for GZIP coprocessor type
->   powerpc/vas: Define VAS_TX_WIN_OPEN ioctl API
->   powerpc/vas: Add VAS user space API
->   crypto/nx: Initialize coproc entry with kzalloc
->   crypto/nx: Rename nx-842-powernv file name to nx-common-powernv
->   crypto/NX: Make enable code generic to add new GZIP compression type
->   crypto/nx: Enable and setup GZIP compresstion type
->   crypto/nx: Remove 'pid' in vas_tx_win_attr struct
->   Documentation/powerpc: VAS API
->
->  Documentation/powerpc/index.rst                    |    1 +
->  Documentation/powerpc/vas-api.rst                  |  246 +++++
->  Documentation/userspace-api/ioctl/ioctl-number.rst |    1 +
->  arch/powerpc/include/asm/vas.h                     |   12 +-
->  arch/powerpc/include/uapi/asm/vas-api.h            |   22 +
->  arch/powerpc/platforms/powernv/Makefile            |    2 +-
->  arch/powerpc/platforms/powernv/vas-api.c           |  290 +++++
->  arch/powerpc/platforms/powernv/vas-window.c        |   23 +-
->  arch/powerpc/platforms/powernv/vas.h               |    2 +
->  drivers/crypto/nx/Makefile                         |    2 +-
->  drivers/crypto/nx/nx-842-powernv.c                 | 1062 ------------------
->  drivers/crypto/nx/nx-common-powernv.c              | 1133 ++++++++++++++++++++
->  12 files changed, 1723 insertions(+), 1073 deletions(-)
->  create mode 100644 Documentation/powerpc/vas-api.rst
->  create mode 100644 arch/powerpc/include/uapi/asm/vas-api.h
->  create mode 100644 arch/powerpc/platforms/powernv/vas-api.c
->  delete mode 100644 drivers/crypto/nx/nx-842-powernv.c
->  create mode 100644 drivers/crypto/nx/nx-common-powernv.c
->
-> -- 
-> 1.8.3.1
+Thanks
+Regards
