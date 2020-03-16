@@ -2,106 +2,122 @@ Return-Path: <SRS0=DGAQ=5B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5AADC0044D
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Mar 2020 13:53:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 631E6C0044D
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Mar 2020 15:01:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B869C20663
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Mar 2020 13:53:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 383402071C
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Mar 2020 15:01:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OccARGXr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hjPfR7YF"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731368AbgCPNxX (ORCPT
+        id S1731630AbgCPPBD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 16 Mar 2020 09:53:23 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:46743 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731331AbgCPNxW (ORCPT
+        Mon, 16 Mar 2020 11:01:03 -0400
+Received: from mail-pf1-f193.google.com ([209.85.210.193]:36290 "EHLO
+        mail-pf1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1731556AbgCPPBD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 Mar 2020 09:53:22 -0400
-Received: by mail-wr1-f65.google.com with SMTP id w16so4911165wrv.13;
-        Mon, 16 Mar 2020 06:53:21 -0700 (PDT)
+        Mon, 16 Mar 2020 11:01:03 -0400
+Received: by mail-pf1-f193.google.com with SMTP id i13so10096904pfe.3;
+        Mon, 16 Mar 2020 08:01:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to:user-agent;
-        bh=zz+VUSWNCDs2sQPAELxMFVMHL5mAksbtoTViuL2HD+g=;
-        b=OccARGXrypOX9pQ0w3HKRvuuWLqJ++L0Dv2Tvn9pEsWij0cX2i3W+HKTs/fF5OC/KW
-         9sdXw+ZZqcTzq0eRCgb5RuIJjx6foLgVQTSarHfGTPawCDfVHCG3UPCELr8yrZXOF/Nt
-         YzK30be1UuTwUggKivog1qW4bCcOOAr0zP6qjBmFrSmtJcdgvDAjRmdBJfXLmqsyJLZl
-         fWFzH3Z6x+9/SwdzHV2aESQr2DUXNNyMEYqzVECq4OSS7BVgpbYt6y/QaVdHMgT55kKL
-         4F1arAIUc/zqHPJ6JzrlMZ6XDfII8rMNwhzrhlaE3LdNDmicC7FrmuRTnHKKT4oOl0T2
-         6tbg==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=y0Kh2+LS4t0Gn18HgPrQ7Dx9B87FOQXhtsCkrbuPHSE=;
+        b=hjPfR7YFCSspiBssrhLO0118tojUGw3XN/gHbYr6h68xMxP1AIK3OzsjEW+WldfUmX
+         23ozeQ3xUQ12mypSaeK/7tATUdxjberBMjqtjiSEoDjTnvDzS9XOGlQpyrsuTEogEJlU
+         GzcW9h/CQiK+ryvFs7org0XtQO+tDklbU8HC8N7BskP2fNP9kSftiw4D+RtITDho0CYw
+         yvaxxXbqhDiUD2PBBOdlU3n/iqqiumNGmAgg2BaGFj0mHUxnAr/KpI00n9FhlI5P+a4i
+         HEArAtJqvx3t+8bRz9uj0tfYWPqi+VfYpx0TnkWbbVKISfa6KC9ywwGWlHWxuD4eHBub
+         dimA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=zz+VUSWNCDs2sQPAELxMFVMHL5mAksbtoTViuL2HD+g=;
-        b=MoOEuXXw9m/8lJxyFGR5X+tCyR1J/YbBejfjD5uyG91O1WpK14FdoCcNOyfK8xxu9V
-         La5/EEydrm8dtom4mHI1aFllCyZKAyAXp5CTF+3meRRzVr3bKGo2ZO4QCGiix0NsordL
-         Ea2z5kAuJqUGJIP9e3MPan+CMF1yKj9QlbfbPmRIr+54KUU62YbXh0s5GiRvrKEkeV+7
-         EfgsXeSBhtqncJjQX0hwrZalJt1z+DdgtPg92Ujlhta650ex2Fd5/FyFjfgZC49jgcfb
-         aMLZJfkKE5NemFU1DC4TbLUxeNVmeHZ/oXABV3URvv6e3fJqFPny/O3KQewJbkCfEum2
-         UIQg==
-X-Gm-Message-State: ANhLgQ2e8NcOg7QK6cfMm2YWsWYSWAj4Vga5dOe+zz4FeiVc7dtAoDcC
-        /fTIg4rGXPU4ASYYidlqp2q0402I
-X-Google-Smtp-Source: ADFU+vvwLSvB6JlHnivEFRq8ttan08vIgV77aIBH8Bz7u8qpc5GznHQ1xr/G5WW8OuWzwVqD4NbxHQ==
-X-Received: by 2002:adf:8023:: with SMTP id 32mr26014359wrk.189.1584366800438;
-        Mon, 16 Mar 2020 06:53:20 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id z6sm24277216wrp.95.2020.03.16.06.53.19
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=y0Kh2+LS4t0Gn18HgPrQ7Dx9B87FOQXhtsCkrbuPHSE=;
+        b=OaVh8hUmM5tPZXxB44RllmLGNA79cyNcVt1iBAz/pqXGkDkbVAor4yOhmkjhD7cv0f
+         6rlXHXwRYGchEbnUW5NvD6dZ7XwUub97cFeZeThiH2eh3CF4cf1G/UeYdV9apSjVOTNC
+         Dhg+2qXoH2XuMyU1cu7YSImWPrLVj8iGCflF+rrjIP+b1prUEoljj9CWqBfQ6MyQe5kl
+         5LCZjNbzmZCDDhCOITGtMWBD4+1Xc+sauEPhU3rswUe7lKoWH7UXd/XFOj8hbzWUhObN
+         mBZ2+UYt2xVM6j+zc994yVFnYwzHYO4ZzsYwRnB7iPiURzlH055m9HTEh1Y16mW9LBVX
+         OUXg==
+X-Gm-Message-State: ANhLgQ2jt2ROtkV3YjiEaboK6vBBPO1sI7+EbE0f1aNcdlA7bK9w+67k
+        v2Bg1zKCVKVuXmg+VUF5FSYJ8nDl
+X-Google-Smtp-Source: ADFU+vsTTtN/HPWOdFHcvalqUd9XsRBQ4rGiHfxHr+Mlsa53oZIthzk7icK6ml93nCkxEhv4+XNkYg==
+X-Received: by 2002:a62:5c07:: with SMTP id q7mr67445pfb.200.1584370861806;
+        Mon, 16 Mar 2020 08:01:01 -0700 (PDT)
+Received: from localhost.localdomain (c-67-165-113-11.hsd1.wa.comcast.net. [67.165.113.11])
+        by smtp.gmail.com with ESMTPSA id o128sm256354pfg.5.2020.03.16.08.01.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Mar 2020 06:53:19 -0700 (PDT)
-Date:   Mon, 16 Mar 2020 14:53:18 +0100
-From:   Corentin Labbe <clabbe.montjoie@gmail.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     peterz@infradead.org, herbert@gondor.apana.org.au,
-        viro@zeniv.linux.org.uk, mingo@redhat.com, dvhart@infradead.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: BUG: cryptsetup benchmark stuck
-Message-ID: <20200316135318.GA29789@Red>
-References: <20200315145214.GA9576@Red>
- <877dzkem9z.fsf@nanos.tec.linutronix.de>
+        Mon, 16 Mar 2020 08:01:00 -0700 (PDT)
+From:   Andrey Smirnov <andrew.smirnov@gmail.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
+        Chris Healy <cphealy@gmail.com>,
+        Lucas Stach <l.stach@pengutronix.de>,
+        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>, linux-imx@nxp.com,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v8 1/8] crypto: caam - allocate RNG instantiation descriptor with GFP_DMA
+Date:   Mon, 16 Mar 2020 08:00:40 -0700
+Message-Id: <20200316150047.30828-2-andrew.smirnov@gmail.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20200316150047.30828-1-andrew.smirnov@gmail.com>
+References: <20200316150047.30828-1-andrew.smirnov@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <877dzkem9z.fsf@nanos.tec.linutronix.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Mar 16, 2020 at 09:28:40AM +0100, Thomas Gleixner wrote:
-> Corentin,
-> 
-> Corentin Labbe <clabbe.montjoie@gmail.com> writes:
-> > On next-20200313, running cryptsetup benchmark is stuck.
-> > I have bisected this problem twice and the result is the same:
-> >
-> > git bisect bad 8019ad13ef7f64be44d4f892af9c840179009254
-> > # first bad commit: [8019ad13ef7f64be44d4f892af9c840179009254] futex: Fix inode life-time issue
-> >
-> > Since the two bisect lead to the same commit, I think it should be
-> > right one even if I dont find anything related to my problem.
-> 
-> I'm as puzzled as you.
-> 
-> > But reverting this patch is impossible, so I cannot test to try
-> > without it.
-> 
-> You need to revert two:
-> 
-> 8d67743653dc ("futex: Unbreak futex hashing")
-> 8019ad13ef7f ("futex: Fix inode life-time issue")
-> 
+Be consistent with the rest of the codebase and use GFP_DMA when
+allocating memory for a CAAM JR descriptor.
 
-On next-20200313, there are no "futex: Unbreak futex hashing".
-And it seems to fix my issue, I have updated to next-20200316 (which have it) and the issue is not present anymore.
+Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc: Chris Healy <cphealy@gmail.com>
+Cc: Lucas Stach <l.stach@pengutronix.de>
+Cc: Horia Geantă <horia.geanta@nxp.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Iuliana Prodan <iuliana.prodan@nxp.com>
+Cc: linux-imx@nxp.com
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+---
+ drivers/crypto/caam/ctrl.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thanks
-Regards
+diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
+index 7139366da016..7f7f2960b0cc 100644
+--- a/drivers/crypto/caam/ctrl.c
++++ b/drivers/crypto/caam/ctrl.c
+@@ -196,7 +196,7 @@ static int deinstantiate_rng(struct device *ctrldev, int state_handle_mask)
+ 	u32 *desc, status;
+ 	int sh_idx, ret = 0;
+ 
+-	desc = kmalloc(CAAM_CMD_SZ * 3, GFP_KERNEL);
++	desc = kmalloc(CAAM_CMD_SZ * 3, GFP_KERNEL | GFP_DMA);
+ 	if (!desc)
+ 		return -ENOMEM;
+ 
+@@ -273,7 +273,7 @@ static int instantiate_rng(struct device *ctrldev, int state_handle_mask,
+ 	int ret = 0, sh_idx;
+ 
+ 	ctrl = (struct caam_ctrl __iomem *)ctrlpriv->ctrl;
+-	desc = kmalloc(CAAM_CMD_SZ * 7, GFP_KERNEL);
++	desc = kmalloc(CAAM_CMD_SZ * 7, GFP_KERNEL | GFP_DMA);
+ 	if (!desc)
+ 		return -ENOMEM;
+ 
+-- 
+2.21.0
+
