@@ -2,212 +2,148 @@ Return-Path: <SRS0=DGAQ=5B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64E94C0044D
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Mar 2020 15:01:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8DE2C0044D
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Mar 2020 17:19:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3B1EB20767
-	for <linux-crypto@archiver.kernel.org>; Mon, 16 Mar 2020 15:01:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 787DC20409
+	for <linux-crypto@archiver.kernel.org>; Mon, 16 Mar 2020 17:19:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EHHqpAlE"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="VJHpRtjz";
+	dkim=pass (1024-bit key) header.d=marvell.onmicrosoft.com header.i=@marvell.onmicrosoft.com header.b="eQRpnd4h"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731712AbgCPPBH (ORCPT
+        id S1731548AbgCPRTH (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 16 Mar 2020 11:01:07 -0400
-Received: from mail-pj1-f66.google.com ([209.85.216.66]:54844 "EHLO
-        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1731539AbgCPPBH (ORCPT
+        Mon, 16 Mar 2020 13:19:07 -0400
+Received: from mx0b-0016f401.pphosted.com ([67.231.156.173]:35000 "EHLO
+        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1731507AbgCPRTG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 16 Mar 2020 11:01:07 -0400
-Received: by mail-pj1-f66.google.com with SMTP id np9so1839522pjb.4;
-        Mon, 16 Mar 2020 08:01:06 -0700 (PDT)
+        Mon, 16 Mar 2020 13:19:06 -0400
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+        by mx0b-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02GGoWnk030382;
+        Mon, 16 Mar 2020 10:18:59 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pfpt0818;
+ bh=OpKyZvx2M8jJPpOgPGzw8tjlb4exocLCYQV1Gqz9YH4=;
+ b=VJHpRtjzl1GaH3DqNgYJeUprABkMRTMsms4G4BkhlcTd17FVn2FNNvxJnQ3lOJ4SBJXv
+ 4jukz8zqvDU6Y+ksCvyVhMR//7GN/ME1rj0bQnGjbVemKeo5M91fSKq1Ir+wXnPI9GVJ
+ NCy3SPCsALiInDfaHQu98QEAIHgXTDgWWlFeTomGG8IWWaavXc2bxTJMUmQJ42EliWLG
+ rspzfjhPywx5JEsY7bnssryDBMqXmZlBrSFTGTNrp656Duk2KWkwEu4XZxnIH/Uvn0GV
+ ZW6PD+v81MxtL64mH+wU+V0/x9ktqmXcOA3QsYdtDNc+qncWts5CKbYeSidDk9FSIeyv NA== 
+Received: from sc-exch01.marvell.com ([199.233.58.181])
+        by mx0b-0016f401.pphosted.com with ESMTP id 2yrxsmfpqq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Mon, 16 Mar 2020 10:18:58 -0700
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by SC-EXCH01.marvell.com
+ (10.93.176.81) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 16 Mar
+ 2020 10:18:56 -0700
+Received: from SC-EXCH04.marvell.com (10.93.176.84) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Mon, 16 Mar
+ 2020 10:18:56 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.43) by
+ SC-EXCH04.marvell.com (10.93.176.84) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2 via Frontend Transport; Mon, 16 Mar 2020 10:18:55 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QEAPXAEy/jWoCFfbgMlaPj44EavqM6GM5189yNjWEdAb/lj5E3Ln1P6yJnPTJUCr+fmmjDIcISnoIZCU1UWmMqz9ZeJ5AeeAMHca+uXRa2MY4huKn91UTHxTZ6WgUy6Zkv6/6yAyDflrWfSkJSOn51Cp6yp2e3ZvGMb45xzd5PdtJSLTgOMRKZaTnxlOc4/vAaupGzyYqPvHY04FdM99n6pl87P9SMWf2XDURSNHTkXGtSf77GZ11qojFm6H+xWxHoZPT92BxPOg52M6k+P75/cq5339Y6eHRJaMhIclj8GwwYkuR5Ll08WMRy69eCi85CVbjZbeaKhyAf+vF20O7g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=OpKyZvx2M8jJPpOgPGzw8tjlb4exocLCYQV1Gqz9YH4=;
+ b=kJ/Z5aw86gVa0o2aD7X9XGz5kI3Vy5fOI/l2hD4bXNxeBJ12Q3QyagAZ9gdx3yHpYoFERPpfpoPZ/gs2nNCN9dHtd1aqvNrgICCAV/zNyb+7b0oNG69zancGrC9u9m44R+I9rYwIvONkKIh6+NXMqjXnzeDYv7WlRw02T/4OiJRFaGPtKeAnYH7s9R+TPIl/HeHkyg1PksSy3mcqWgSYxlTocJh1LGrq6iSKP5CKsUToc30iXaWL0l3zs0RoLi68WH47PKB300bKMLTK5rG8Q2wuTWz4Gvtxj7F29VHcdbNkZYI9JAH67vNzkuEkju3qN5ByXmprwYUgOzfpN5xITA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=2ATfd/evJNtMJU02hUmWNanYOGwfjBYhe+ZX93KVWo4=;
-        b=EHHqpAlEmQ7ZBI08E0QY+UdSchMBjEjbZ/EeZ9VgTLbhnT4rSOoVUwNNrROHDzTaF5
-         b8NY8rWQuAf7XUogvzvPfiQxNxkwbG78pXoEwGD3UrOraWrh2/I79Q4OHyzitn8KW422
-         pm0ZMTcDgmWDIn95qBD9ck4ym13DP5QUxk2LPJ8XVZjGETU25zRWUJsb71GuZrsxRcs+
-         5I9X7CHbe87+qq/LFDhfazz31iI9ITc52oX/j4vn/TV8Y2WOEmJ0fMW1nlD1VAIewf75
-         EX5V5yNeB9yiBa00T/HE+VC3cbzMGxYGnmELsLrWdxNOwkopFNBJPrdcRqlNQtkgoK/9
-         o63A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=2ATfd/evJNtMJU02hUmWNanYOGwfjBYhe+ZX93KVWo4=;
-        b=PmoutzMQG/CVOyXe10QRq2T9Jbz5GUmE324hRUqgEJBFx1yy8B3/QWEUdRtmRaLB4I
-         DyfQt3m3jWSQnH548PzU+86V4BsiU1vlvMi9RtVZlMDdkuGGhTjlfVqg+UxHui+1o1kL
-         JJ/f/UaQByNLmJXs7pI6bmnWAp3mrLALwKIWosX7O5iDL04BoB4LpFLBkHV+M6/57IKW
-         UXXxZlMTgQMji5Z9dA1w8dv0vrVJhTdq2QGjnzhkN1794oJH1JyX99krNUJQilihYiZ8
-         SZJxrtg+qaA49tdPDEDI5ovylCUp+K1yoiafmgo+YuEGoZcEBC8YlM3/G2OqBb5xtp/L
-         PsrA==
-X-Gm-Message-State: ANhLgQ3oKLN9I3vOs+z25Bhir1soz+TgwhFF4CRUusx4c6PCtdOd818j
-        W+3zfbISPBx4LS33RzOHYlT2Xpj1
-X-Google-Smtp-Source: ADFU+vsbml5LQOiFqBkGpU6oQqMxdzw8MA7Cwh5UvFvmAnkAxez1rnPnDhjPTgRm3/qNMtGsAqI+BQ==
-X-Received: by 2002:a17:902:8f8e:: with SMTP id z14mr27402067plo.195.1584370865206;
-        Mon, 16 Mar 2020 08:01:05 -0700 (PDT)
-Received: from localhost.localdomain (c-67-165-113-11.hsd1.wa.comcast.net. [67.165.113.11])
-        by smtp.gmail.com with ESMTPSA id o128sm256354pfg.5.2020.03.16.08.01.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Mar 2020 08:01:02 -0700 (PDT)
-From:   Andrey Smirnov <andrew.smirnov@gmail.com>
-To:     linux-crypto@vger.kernel.org
-Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Chris Healy <cphealy@gmail.com>,
-        Lucas Stach <l.stach@pengutronix.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>,
-        linux-kernel@vger.kernel.org, linux-imx@nxp.com
-Subject: [PATCH v8 2/8] crypto: caam - use struct hwrng's .init for initialization
-Date:   Mon, 16 Mar 2020 08:00:41 -0700
-Message-Id: <20200316150047.30828-3-andrew.smirnov@gmail.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20200316150047.30828-1-andrew.smirnov@gmail.com>
-References: <20200316150047.30828-1-andrew.smirnov@gmail.com>
+ d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=OpKyZvx2M8jJPpOgPGzw8tjlb4exocLCYQV1Gqz9YH4=;
+ b=eQRpnd4hvrGWgXeKlIFMYiszhc6QhJ/qdNNbgBIYKDlkN1MvKxcCfT3JuJkX7gUNd5pRRiS2qmEkcjTV7wJXbyDg0EmVt2i0h657cIrkuqE5RfIFTF1RDTJ9xbsbxmWApxlHBaOulUqozwTqDlcifXFybHVRKHPW8NKXSrBP1ck=
+Received: from DM5PR18MB2311.namprd18.prod.outlook.com (2603:10b6:4:b8::27) by
+ DM5PR18MB1289.namprd18.prod.outlook.com (2603:10b6:3:bf::15) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2814.14; Mon, 16 Mar 2020 17:18:53 +0000
+Received: from DM5PR18MB2311.namprd18.prod.outlook.com
+ ([fe80::e53e:45ba:197b:84cd]) by DM5PR18MB2311.namprd18.prod.outlook.com
+ ([fe80::e53e:45ba:197b:84cd%4]) with mapi id 15.20.2814.021; Mon, 16 Mar 2020
+ 17:18:53 +0000
+From:   Srujana Challa <schalla@marvell.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+CC:     "davem@davemloft.net" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "Narayana Prasad Raju Athreya" <pathreya@marvell.com>
+Subject: RE: [PATCH 0/4] Add Support for Marvell OcteonTX Cryptographic
+Thread-Topic: [PATCH 0/4] Add Support for Marvell OcteonTX Cryptographic
+Thread-Index: AQHV8iAAsM3DyeQzg0uALun/Ik6ELahE4uwAgAalBXA=
+Date:   Mon, 16 Mar 2020 17:18:53 +0000
+Message-ID: <DM5PR18MB23112454E88F6C411B3543E2A0F90@DM5PR18MB2311.namprd18.prod.outlook.com>
+References: <1583324716-23633-1-git-send-email-schalla@marvell.com>
+ <20200312114428.GB21315@gondor.apana.org.au>
+In-Reply-To: <20200312114428.GB21315@gondor.apana.org.au>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [103.70.131.10]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: fb64a8e9-5573-4223-bfa0-08d7c9ce1a19
+x-ms-traffictypediagnostic: DM5PR18MB1289:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <DM5PR18MB128941F77645302BDF787CB1A0F90@DM5PR18MB1289.namprd18.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:660;
+x-forefront-prvs: 03449D5DD1
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(396003)(376002)(39850400004)(346002)(136003)(366004)(199004)(19627235002)(66446008)(9686003)(64756008)(66556008)(66476007)(66946007)(55016002)(71200400001)(26005)(186003)(4744005)(316002)(6916009)(52536014)(33656002)(54906003)(2906002)(966005)(5660300002)(76116006)(478600001)(8936002)(81156014)(107886003)(86362001)(7696005)(81166006)(6506007)(4326008)(8676002);DIR:OUT;SFP:1101;SCL:1;SRVR:DM5PR18MB1289;H:DM5PR18MB2311.namprd18.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;
+received-spf: None (protection.outlook.com: marvell.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: L92wYkKPGgo4+Xkf/ZPAFEV6+O+teJZNCC5diC5ZEu/7kl5FJE8ik8tU/rnn4i803qRIBH0ycrxeaGUGxs5kK0sidNbkjRVXnjevb3mzpIqpnlo9v33AD42UfjkyhK7Y52oCZ26ilzOAZAi/Ibb4UPZSeaEUoCkT4mg4Ej9BSEqxvpSVUmX1jZ0spKHY5XbjXKaG9LNHwi+xmBdhZBckbZGbBxi/FH68iYg+XGxgXFCu1mtzWz3XNvwT3Hr1YjREIcEaog41a7MDx9HsEZt4SwjB5OqqIKo2yFZbH3ItyPUawejeoLGESXjSWsFwRcy4X7kPj8eiuec9aFUlPumX39hF00c3MLOhDYHaOxAYx1KWx53+HbytA3YrP7Sm3QTiHSR8fVhA9ReStLkVvo8Ha9L00E1++zAwJ4o2WJKjP3DMmnCycbLqU5gqlCKNuO15I8lN0aalceSRiIOtbNrb3ri1KloZ0/8tsQQchQ/IT4DU7dExojeMdak/Wscz2v6FlLT4vjvXmuJsBxWFsggG+w==
+x-ms-exchange-antispam-messagedata: XGA0nTTKCi3hJycAChvW3j288oiwFnUmPBrj/pP0gsSziQUfUWhhGTZHJcz8NWoNRLKPJLMYKKk1+gs7mkFcw2TnFn7X1VC6zGLgRkgg6XeTLMnXjcVI3MJXdfD07kjG1mQd1sjwuaDFLi5jKRLFRw==
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-Network-Message-Id: fb64a8e9-5573-4223-bfa0-08d7c9ce1a19
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Mar 2020 17:18:53.3406
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: guKoRd6tB5U1wBSChGu04jxuyd57DOvakZgGOPVg9tCRY3kNb116XD/cbW/JCenPszZtUnapOxCR4puwX1M+sg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR18MB1289
+X-OriginatorOrg: marvell.com
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
+ definitions=2020-03-16_07:2020-03-12,2020-03-16 signatures=0
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Make caamrng code a bit more symmetric by moving initialization code
-to .init hook of struct hwrng.
+>  On Wed, Mar 04, 2020 at 05:55:12PM +0530, Srujana Challa wrote:
+> > The following series adds support for Marvell Cryptographic Accelerario=
+n
+> > Unit (CPT) on OcteonTX CN83XX SoC.
+>=20
+> Does this driver pass all the crypto self-tests, including the
+> fuzz tests?
+>=20
+Yes, the crypto self-tests are passed and the patch series was tested with =
+kernel-ipsec.=20
 
-Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
-Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
-Cc: Chris Healy <cphealy@gmail.com>
-Cc: Lucas Stach <l.stach@pengutronix.de>
-Cc: Horia Geantă <horia.geanta@nxp.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Iuliana Prodan <iuliana.prodan@nxp.com>
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: linux-imx@nxp.com
----
- drivers/crypto/caam/caamrng.c | 47 ++++++++++++++++++-----------------
- 1 file changed, 24 insertions(+), 23 deletions(-)
-
-diff --git a/drivers/crypto/caam/caamrng.c b/drivers/crypto/caam/caamrng.c
-index 34cbb4a56f05..69a02ac5de54 100644
---- a/drivers/crypto/caam/caamrng.c
-+++ b/drivers/crypto/caam/caamrng.c
-@@ -256,6 +256,7 @@ static void caam_cleanup(struct hwrng *rng)
- 	}
- 
- 	rng_unmap_ctx(rng_ctx);
-+	caam_jr_free(rng_ctx->jrdev);
- }
- 
- static int caam_init_buf(struct caam_rng_ctx *ctx, int buf_id)
-@@ -274,28 +275,43 @@ static int caam_init_buf(struct caam_rng_ctx *ctx, int buf_id)
- 	return 0;
- }
- 
--static int caam_init_rng(struct caam_rng_ctx *ctx, struct device *jrdev)
-+static int caam_init(struct hwrng *rng)
- {
-+	struct caam_rng_ctx *ctx = rng_ctx;
- 	int err;
- 
--	ctx->jrdev = jrdev;
-+	ctx->jrdev = caam_jr_alloc();
-+	err = PTR_ERR_OR_ZERO(ctx->jrdev);
-+	if (err) {
-+		pr_err("Job Ring Device allocation for transform failed\n");
-+		return err;
-+	}
- 
- 	err = rng_create_sh_desc(ctx);
- 	if (err)
--		return err;
-+		goto free_jrdev;
- 
- 	ctx->current_buf = 0;
- 	ctx->cur_buf_idx = 0;
- 
- 	err = caam_init_buf(ctx, 0);
- 	if (err)
--		return err;
-+		goto free_jrdev;
-+
-+	err = caam_init_buf(ctx, 1);
-+	if (err)
-+		goto free_jrdev;
- 
--	return caam_init_buf(ctx, 1);
-+	return 0;
-+
-+free_jrdev:
-+	caam_jr_free(ctx->jrdev);
-+	return err;
- }
- 
- static struct hwrng caam_rng = {
- 	.name		= "rng-caam",
-+	.init           = caam_init,
- 	.cleanup	= caam_cleanup,
- 	.read		= caam_read,
- };
-@@ -305,14 +321,12 @@ void caam_rng_exit(void)
- 	if (!init_done)
- 		return;
- 
--	caam_jr_free(rng_ctx->jrdev);
- 	hwrng_unregister(&caam_rng);
- 	kfree(rng_ctx);
- }
- 
- int caam_rng_init(struct device *ctrldev)
- {
--	struct device *dev;
- 	u32 rng_inst;
- 	struct caam_drv_private *priv = dev_get_drvdata(ctrldev);
- 	int err;
-@@ -328,21 +342,11 @@ int caam_rng_init(struct device *ctrldev)
- 	if (!rng_inst)
- 		return 0;
- 
--	dev = caam_jr_alloc();
--	if (IS_ERR(dev)) {
--		pr_err("Job Ring Device allocation for transform failed\n");
--		return PTR_ERR(dev);
--	}
- 	rng_ctx = kmalloc(sizeof(*rng_ctx), GFP_DMA | GFP_KERNEL);
--	if (!rng_ctx) {
--		err = -ENOMEM;
--		goto free_caam_alloc;
--	}
--	err = caam_init_rng(rng_ctx, dev);
--	if (err)
--		goto free_rng_ctx;
-+	if (!rng_ctx)
-+		return -ENOMEM;
- 
--	dev_info(dev, "registering rng-caam\n");
-+	dev_info(ctrldev, "registering rng-caam\n");
- 
- 	err = hwrng_register(&caam_rng);
- 	if (!err) {
-@@ -350,9 +354,6 @@ int caam_rng_init(struct device *ctrldev)
- 		return err;
- 	}
- 
--free_rng_ctx:
- 	kfree(rng_ctx);
--free_caam_alloc:
--	caam_jr_free(dev);
- 	return err;
- }
--- 
-2.21.0
-
+> Thanks,
+> --
+> Email: Herbert Xu <herbert@gondor.apana.org.au>
+> Home Page: https://urldefense.proofpoint.com/v2/url?u=3Dhttp-
+> 3A__gondor.apana.org.au_-
+> 7Eherbert_&d=3DDwIBAg&c=3DnKjWec2b6R0mOyPaz7xtfQ&r=3DFj4OoD5hcKFpANhTW
+> dwQzjT1Jpf7veC5263T47JVpnc&m=3D9_yjiltEDSyBDoQbemHg3p7n3NVeM8e7tzRh
+> m0eO6F8&s=3DWfuMj4mtbzrUE1baI5puOt3hLjWNelbO5UjMeAoSWJ8&e=3D
+> PGP Key: https://urldefense.proofpoint.com/v2/url?u=3Dhttp-
+> 3A__gondor.apana.org.au_-
+> 7Eherbert_pubkey.txt&d=3DDwIBAg&c=3DnKjWec2b6R0mOyPaz7xtfQ&r=3DFj4OoD5hcK
+> FpANhTWdwQzjT1Jpf7veC5263T47JVpnc&m=3D9_yjiltEDSyBDoQbemHg3p7n3NVe
+> M8e7tzRhm0eO6F8&s=3D5ONhtHM3k3-
+> EGaVEi7lNjyYHY7xDWJXCW9uwJ0mpWqU&e=3D
