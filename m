@@ -2,220 +2,118 @@ Return-Path: <SRS0=I3Dt=5C=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C259C10F29
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Mar 2020 06:51:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73D7AC18E5B
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Mar 2020 11:16:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1128C205ED
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Mar 2020 06:51:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 09D6E205ED
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Mar 2020 11:16:11 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="Qh461vG+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725536AbgCQGvW (ORCPT
+        id S1726846AbgCQLQK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Mar 2020 02:51:22 -0400
-Received: from out30-130.freemail.mail.aliyun.com ([115.124.30.130]:33049 "EHLO
-        out30-130.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725928AbgCQGvW (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Mar 2020 02:51:22 -0400
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R721e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01f04391;MF=tianjia.zhang@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0TsrGYXe_1584427853;
-Received: from 30.27.116.176(mailfrom:tianjia.zhang@linux.alibaba.com fp:SMTPD_---0TsrGYXe_1584427853)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Tue, 17 Mar 2020 14:50:54 +0800
-Subject: Re: [PATCH 7/7] X.509: support OSCCA sm2-with-sm3 certificate
- verification
-To:     Gilad Ben-Yossef <gilad@benyossef.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        David Miller <davem@davemloft.net>,
-        Eric Biggers <ebiggers@kernel.org>,
-        "Van Leeuwen, Pascal" <pvanleeuwen@rambus.com>,
-        zohar@linux.ibm.com,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux kernel mailing list <linux-kernel@vger.kernel.org>
-References: <20200216085928.108838-1-tianjia.zhang@linux.alibaba.com>
- <20200216085928.108838-8-tianjia.zhang@linux.alibaba.com>
- <CAOtvUMdn+92vbEZ=V=e7PSuKwP3b1K==jFKjVWopVqJdfXzZxA@mail.gmail.com>
-From:   Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
-Message-ID: <40ed775a-064c-f483-4ab6-af2215e549e3@linux.alibaba.com>
-Date:   Tue, 17 Mar 2020 14:50:53 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-MIME-Version: 1.0
-In-Reply-To: <CAOtvUMdn+92vbEZ=V=e7PSuKwP3b1K==jFKjVWopVqJdfXzZxA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+        Tue, 17 Mar 2020 07:16:10 -0400
+Received: from mail-am6eur05on2086.outbound.protection.outlook.com ([40.107.22.86]:14145
+        "EHLO EUR05-AM6-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727972AbgCQLQJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 17 Mar 2020 07:16:09 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=W1cRa+d3TORftexyCHyPPzRQKgOxSBT3WNJFjAnwV9+dPbL8zurcyHKTupsPf6SKjf107XOxCJHJKXxCgW+ZKpMdrP5zj+BdGmxMhHOuq5UJ73yM5wzOY7e5xNhP7k6o52lp+MJtLaq0w/eKVRNsZeqpgJqB3Wn9sc8OFNr+RHq1xpf+OJE7WslL9Uxlv/aBOH8VLPmphfEH+7tuRlN2zfF7PPum5azB7PyhNLM0vJ3IkRKXHf53vcqL/WLgUiPJw+9ctcCBRRf6JBvfH+PvmTg+W56A1dGY0j61b4kv736kw5klEr3w9lOugWAbnQOzwMFY0lYjEd4UOE+S8c+5Hw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NmeRkQuCq9+A+TIda6mzShgBGTQl68Lo/ND2lXY/xhg=;
+ b=Imeav3lkBiFQxXl91Sn0S8UK5NPycL9KLKPjAHUP75rVEr0U6qrv0g3DoPoDA80iKU4HtPPT7+xhe/AmEwiU5bAmUMjEz3u4ATqPSZ9wDUvGt9nfExRkuZq7yXvkpSsdlVXbdkEO9cAgeCj/4Lb6vCZuESUAO35cV0Lw5JfD38mmFWTpFEYyJnJ/nNTUhPTUoyXVPO1kVUCm4tBf2uKDrK1LejcWZ5LJikAZ4gJAKqwK3Oyu8cS7sff0tMic1XMkXeWBUegw7blX5MnlrcqUCbRjUHxTfhEDaCPoJwNdJ3zLCfaZ0QkMkfiJPB/ew4OlE97uW/qAJrjPOTGsTKKWvw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NmeRkQuCq9+A+TIda6mzShgBGTQl68Lo/ND2lXY/xhg=;
+ b=Qh461vG+YsxPUH0CxSnr5gXHN+4LZWBgAEYb3OZ+C80QrXJCm1dNa6sg1H9+WIB3+KEbe+4/WEbrlrz1RXgIbUaoe8ASoDomAHemXrCwY7bDS1eLp9qlNzc9ElMU6JyrUQXjEEUS4s4QQA/LEGI9FWdVMES9JHgG0Vb1n6HuKKg=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=horia.geanta@nxp.com; 
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
+ VI1PR0402MB3373.eurprd04.prod.outlook.com (52.134.5.17) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2814.22; Tue, 17 Mar 2020 11:16:05 +0000
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::751e:7e8d:ed4:ef5f]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::751e:7e8d:ed4:ef5f%7]) with mapi id 15.20.2814.021; Tue, 17 Mar 2020
+ 11:16:04 +0000
+Subject: Re: [PATCH v8 0/8] enable CAAM's HWRNG as default
+To:     Andrey Smirnov <andrew.smirnov@gmail.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>
+Cc:     Chris Healy <cphealy@gmail.com>,
+        Lucas Stach <l.stach@pengutronix.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        dl-linux-imx <linux-imx@nxp.com>
+References: <20200316150047.30828-1-andrew.smirnov@gmail.com>
+From:   =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>
+Message-ID: <1a416e7c-3175-6e42-5034-1228e99b283f@nxp.com>
+Date:   Tue, 17 Mar 2020 13:16:01 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
+In-Reply-To: <20200316150047.30828-1-andrew.smirnov@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM0PR10CA0006.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:208:17c::16) To VI1PR0402MB3485.eurprd04.prod.outlook.com
+ (2603:10a6:803:7::25)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.0.129] (84.117.251.185) by AM0PR10CA0006.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:17c::16) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2814.18 via Frontend Transport; Tue, 17 Mar 2020 11:16:03 +0000
+X-Originating-IP: [84.117.251.185]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 3ebe45fb-bdcd-463e-9803-08d7ca649523
+X-MS-TrafficTypeDiagnostic: VI1PR0402MB3373:|VI1PR0402MB3373:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VI1PR0402MB337332CE74DDE6520D8F587498F60@VI1PR0402MB3373.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
+X-Forefront-PRVS: 0345CFD558
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(346002)(39860400002)(136003)(366004)(396003)(376002)(199004)(26005)(186003)(8936002)(16526019)(8676002)(81156014)(45080400002)(2906002)(81166006)(66476007)(5660300002)(31686004)(66946007)(66556008)(4744005)(6486002)(31696002)(53546011)(52116002)(966005)(478600001)(86362001)(316002)(54906003)(2616005)(4326008)(16576012)(956004)(36756003)(110136005);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3373;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;
+Received-SPF: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: vl0jT9wTDgfQd00hOnZwoZ2qr6rmm2dKDcwUssiWvpre000Hxd3pjjxbSvFhVXC1XYWMA2wSIsZXj+G3rVpCS6sj6bhTB0scfwhDoS/Lr/1G/VGblhv0AqmYYgxk3siA9MNJmFlBZnlc1SswwMmI86A2I0ESSBBNj1BdNDGNxL4mFWEjB06M1rOJVFAYWIl9GIMYc8Lz1S8SqTKClT4MkoehCgmqALzVV95A9YaTUtwmkIBv5Ep8wUkX3XldtsQtnxYA6Slss7UhpkX1gXyZaSdiqV9EY+sPdiMpV+aj3ZLRS5a2OLnY4JjM5pnpKjIZLCcFt15ay7X9qPMg7Fr7H5TKJzKasfpa/5T45JUIEvxXHj2mQd+iHyCrHqYceeTIIppvpQBiOssr+WBbbQl+x5sUyQKb9P1bbxmlhZd4tX5uMFGFLVtgPpP6neAKP1pg19kY/tx/HdXbPCvGK1CXDoLa8wq6qC4rIg4IwGrEAV1jbVd1XLer5sYcwo+JGRIiQRz8bsMvnFe7uNwbDd0i6g==
+X-MS-Exchange-AntiSpam-MessageData: AE6QyhJXZ6c+iizLrosSSlXpVq+AKSWPtBt97LlQJK29g5Nq4nuwLGyITdxMfXCwhsyXiEFy3rMLQbN7JcfwKFOPT3XxyWv++XNrAoAD3GeR2D6Eh3T4cyxM4o+//1+BvIXnrsSCBn0yzPM5b2+1GA==
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3ebe45fb-bdcd-463e-9803-08d7ca649523
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2020 11:16:04.7510
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qmyH0yxwAFvAjlhudT/U5PAp2CQbxCXbEsOH0EhM7bCrE9oOA7i+8vdCRi74vRpLtQLjSzBfEmDPca/Nm1RVUQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3373
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On 3/16/2020 5:01 PM, Andrey Smirnov wrote:
+> Feedback is welcome!
+> 
+The patch set does not compile.
 
+Patch "bus: fsl-mc: add api to retrieve mc version"
+https://patchwork.kernel.org/patch/11352493/
+was not applied, the plan being to merge it via cryptodev-2.6 tree,
+see my comment here:
+https://lore.kernel.org/linux-arm-kernel/VI1PR0402MB3485DB40CE1C1631D920EE7598040@VI1PR0402MB3485.eurprd04.prod.outlook.com/
 
-On 2020/3/17 14:31, Gilad Ben-Yossef wrote:
-> Hi,
-> 
-> On Sun, Feb 16, 2020 at 11:00 AM Tianjia Zhang
-> <tianjia.zhang@linux.alibaba.com> wrote:
->>
->> The digital certificate format based on SM2 crypto algorithm as
->> specified in GM/T 0015-2012. It was published by State Encryption
->> Management Bureau, China.
->>
->> The method of generating Other User Information is defined as
->> ZA=H256(ENTLA || IDA || a || b || xG || yG || xA || yA), it also
->> specified in https://tools.ietf.org/html/draft-shen-sm2-ecdsa-02.
->>
->> The x509 certificate supports sm2-with-sm3 type certificate
->> verification.  Because certificate verification requires ZA
->> in addition to tbs data, ZA also depends on elliptic curve
->> parameters and public key data, so you need to access tbs in sig
->> and calculate ZA. Finally calculate the digest of the
->> signature and complete the verification work. The calculation
->> process of ZA is declared in specifications GM/T 0009-2012
->> and GM/T 0003.2-2012.
->>
->> Signed-off-by: Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
->> ---
->>   crypto/asymmetric_keys/public_key.c      | 61 ++++++++++++++++++++++++
->>   crypto/asymmetric_keys/x509_public_key.c |  2 +
->>   include/crypto/public_key.h              |  1 +
->>   3 files changed, 64 insertions(+)
->>
->> diff --git a/crypto/asymmetric_keys/public_key.c b/crypto/asymmetric_keys/public_key.c
->> index d7f43d4ea925..a51b09ee484d 100644
->> --- a/crypto/asymmetric_keys/public_key.c
->> +++ b/crypto/asymmetric_keys/public_key.c
->> @@ -17,6 +17,11 @@
->>   #include <keys/asymmetric-subtype.h>
->>   #include <crypto/public_key.h>
->>   #include <crypto/akcipher.h>
-> 
-> hmmm... ifdefs like these are kind of ugly.
-> 
->> +#ifdef CONFIG_CRYPTO_SM2
->> +#include <crypto/sm3_base.h>
->> +#include <crypto/sm2.h>
->> +#include "x509_parser.h"
->> +#endif
->>
->>   MODULE_DESCRIPTION("In-software asymmetric public-key subtype");
->>   MODULE_AUTHOR("Red Hat, Inc.");
->> @@ -245,6 +250,54 @@ static int software_key_eds_op(struct kernel_pkey_params *params,
->>          return ret;
->>   }
->>
->> +#ifdef CONFIG_CRYPTO_SM2
->> +static int cert_sig_digest_update(const struct public_key_signature *sig,
->> +                               struct crypto_akcipher *tfm_pkey)
->> +{
->> +       struct x509_certificate *cert = sig->cert;
->> +       struct crypto_shash *tfm;
->> +       struct shash_desc *desc;
->> +       size_t desc_size;
->> +       unsigned char dgst[SM3_DIGEST_SIZE];
->> +       int ret;
->> +
->> +       if (!cert)
->> +               return -EINVAL;
->> +
->> +       ret = sm2_compute_z_digest(tfm_pkey, SM2_DEFAULT_USERID,
->> +                                       SM2_DEFAULT_USERID_LEN, dgst);
->> +       if (ret)
->> +               return ret;
->> +
->> +       tfm = crypto_alloc_shash(sig->hash_algo, 0, 0);
->> +       if (IS_ERR(tfm))
->> +               return PTR_ERR(tfm);
->> +
->> +       desc_size = crypto_shash_descsize(tfm) + sizeof(*desc);
->> +       desc = kzalloc(desc_size, GFP_KERNEL);
->> +       if (!desc)
->> +               goto error_free_tfm;
->> +
->> +       desc->tfm = tfm;
->> +
->> +       ret = crypto_shash_init(desc);
->> +       if (ret < 0)
->> +               goto error_free_desc;
->> +
->> +       ret = crypto_shash_update(desc, dgst, SM3_DIGEST_SIZE);
->> +       if (ret < 0)
->> +               goto error_free_desc;
->> +
->> +       ret = crypto_shash_finup(desc, cert->tbs, cert->tbs_size, sig->digest);
->> +
->> +error_free_desc:
->> +       kfree(desc);
->> +error_free_tfm:
->> +       crypto_free_shash(tfm);
->> +       return ret;
->> +}
->> +#endif
->> +
->>   /*
->>    * Verify a signature using a public key.
->>    */
->> @@ -298,6 +351,14 @@ int public_key_verify_signature(const struct public_key *pkey,
->>          if (ret)
->>                  goto error_free_key;
->>
-> 
-> OK, how about you put cert_sig_digest_update() in a separate file that
-> only gets compiled with  CONFIG_CRYPTO_SM2 and have a static inline
-> version that returns -ENOTSUPP otherwise?
-> or at least something in this spirit.
-> Done right it will allow you to drop the ifdefs and make for a much
-> cleaner code.
-> 
->> +#ifdef CONFIG_CRYPTO_SM2
->> +       if (strcmp(sig->pkey_algo, "sm2") == 0) {
->> +               ret = cert_sig_digest_update(sig, tfm);
->> +               if (ret)
->> +                       goto error_free_key;
->> +       }
->> +#endif
->> +
->>          sg_init_table(src_sg, 2);
->>          sg_set_buf(&src_sg[0], sig->s, sig->s_size);
->>          sg_set_buf(&src_sg[1], sig->digest, sig->digest_size);
->> diff --git a/crypto/asymmetric_keys/x509_public_key.c b/crypto/asymmetric_keys/x509_public_key.c
->> index d964cc82b69c..feccec08b244 100644
->> --- a/crypto/asymmetric_keys/x509_public_key.c
->> +++ b/crypto/asymmetric_keys/x509_public_key.c
->> @@ -30,6 +30,8 @@ int x509_get_sig_params(struct x509_certificate *cert)
->>
->>          pr_devel("==>%s()\n", __func__);
->>
->> +       sig->cert = cert;
->> +
->>          if (!cert->pub->pkey_algo)
->>                  cert->unsupported_key = true;
->>
->> diff --git a/include/crypto/public_key.h b/include/crypto/public_key.h
->> index 0588ef3bc6ff..27775e617e38 100644
->> --- a/include/crypto/public_key.h
->> +++ b/include/crypto/public_key.h
->> @@ -44,6 +44,7 @@ struct public_key_signature {
->>          const char *pkey_algo;
->>          const char *hash_algo;
->>          const char *encoding;
->> +       void *cert;             /* For certificate */
->>   };
->>
->>   extern void public_key_signature_free(struct public_key_signature *sig);
->> --
->> 2.17.1
->>
-> 
-> 
-
-Hi,
-
-Thanks for your suggestion, it is indeed appropriate to unify the SM2 
-implementation with the public code, I will implement it.
+I think it needs to be formally included in the patch set.
 
 Thanks,
-Tianjia
+Horia
