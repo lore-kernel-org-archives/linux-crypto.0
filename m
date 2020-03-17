@@ -2,258 +2,136 @@ Return-Path: <SRS0=I3Dt=5C=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74DFFC5ACC1
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Mar 2020 13:11:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1C31C10F29
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Mar 2020 15:20:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 3DF032076F
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Mar 2020 13:11:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1584450666;
-	bh=OpWwr+Km4TTAToy65wz5kahjfMtDK5MxnhQXtb2oJcY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=WIz0ruF+Fa0WDCaeJsgcq+2SAZGJSHH62OYm4hmofSZJDoBUTCrztoOM3iKND0bue
-	 QtVnNH/zWC8M7KuZij0G3gBHJdIVSii6fYS6N0IdjGurMQvg2uA4bE2DGFLVAT5sZM
-	 g4wTRCpt0iCDf/LIuQnITUiYr1v49fkDucM6fPCs=
+	by mail.kernel.org (Postfix) with ESMTP id B41F020753
+	for <linux-crypto@archiver.kernel.org>; Tue, 17 Mar 2020 15:20:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="EiYqybCP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726979AbgCQNLA (ORCPT
+        id S1726388AbgCQPUf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Mar 2020 09:11:00 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37864 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726845AbgCQNK5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Mar 2020 09:10:57 -0400
-Received: from mail.kernel.org (ip5f5ad4e9.dynamic.kabel-deutschland.de [95.90.212.233])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 246E92077B;
-        Tue, 17 Mar 2020 13:10:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1584450656;
-        bh=OpWwr+Km4TTAToy65wz5kahjfMtDK5MxnhQXtb2oJcY=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Kl8fBUmrp3OvNgwKJOtJt/PT90JpUEB3vX7kd/7VsSBVfsl3/xX/QrBIv2MNpFe4u
-         I3Wvx9p3nzZb9ODwkOjJsZvS+XdsCFRlvNkcuIogMe4dDffgLRo93z7hED6V6jcWqG
-         C3XcWYTUlKORwDI37Vf4lPT0g+r7O4HkCB9Zsn6Q=
-Received: from mchehab by mail.kernel.org with local (Exim 4.92.3)
-        (envelope-from <mchehab@kernel.org>)
-        id 1jEBzh-0006SO-RR; Tue, 17 Mar 2020 14:10:53 +0100
-From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>
-Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Sean Christopherson <sean.j.christopherson@intel.com>,
-        Vitaly Kuznetsov <vkuznets@redhat.com>,
-        Wanpeng Li <wanpengli@tencent.com>,
-        Jim Mattson <jmattson@google.com>,
-        Joerg Roedel <joro@8bytes.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
+        Tue, 17 Mar 2020 11:20:35 -0400
+Received: from mail-eopbgr30084.outbound.protection.outlook.com ([40.107.3.84]:54862
+        "EHLO EUR03-AM5-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726112AbgCQPUe (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 17 Mar 2020 11:20:34 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kWGhleVQKixQjRIlLP7Zl6xdKs700J+XwSIIj+bkTf2dwi3rrWVRZflhsUPMGRXVFeMjMhmeVoOf0munXwC568EZHrDQTqhy5bu74xsW3ZYG0Od/bE1SWd1LmqQOdK1FI9ETcTNIsNIeY6MXOMm+0dVNgYEHQu7HUn7Ff/DV4mRxi5y2KKKmmJxUGQApHFLAZWu5QWZy38Z/oGoKytXmTzP44yosszUoTfgH2eMEaRMhmK8t/03LWqZz0v5aG72azpcJk9Z+1gv7zr+nez/MXJTLZED1XIVsGH7dd1h/JaL6j9fKJjUmB92cWNjTl0bdx3fHE2oeHCps6lASTbU46A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FA+yvm5/VeCBm7iaBf9sK2VCaUk/AG6zRNlxLqGc0Tc=;
+ b=UkoOguopL82cwgiIpq0B8rMtJX/XnywrOY2Ofx2UjkRrpul9dmDlCpdJJtTgqnLiBmBYJXlcvPAj5+UvCoTKL5BxwyTFDQYknroz+S9cK5aKmJuqmZoiDc9Gi9IOUDGLtGSeYbr6Hi1BCDVhgBevm4vcC87c0aGpJLxFMYuUl6aVIiD4ghtTny2gPJN1R5I4geuO2o8lieuCSGY1oOprqbOxMlUaDMKOqplN/V/IcPrUJnT8tLhtBNsf/Lna7BWSz9pdFv9kDssI7ux7AUaGfHZ4ihb0J+awSBZqtrmVDrrdcP1eZvunbWxjvQFB20OZpFMoanc8+6qcnO+3U5wMEQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FA+yvm5/VeCBm7iaBf9sK2VCaUk/AG6zRNlxLqGc0Tc=;
+ b=EiYqybCPl9WCAwqjb+0HpI7QLLTzJbCKHvMyYBcnoTws66rv6BD5ypKHWpS9HGnz3wAKgnIN/OinHlICgA/3mB+GDCFEr+YCorm2dOQKkU3u3ytrLNEJS+4ZuPx/k+fgh3wl9zf5icYp+JtoH2lulq33GKg8HH/aYZXyJSNR0xk=
+Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=horia.geanta@nxp.com; 
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (52.134.3.153) by
+ VI1PR0402MB3582.eurprd04.prod.outlook.com (52.134.4.155) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2814.16; Tue, 17 Mar 2020 15:20:29 +0000
+Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::751e:7e8d:ed4:ef5f]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
+ ([fe80::751e:7e8d:ed4:ef5f%7]) with mapi id 15.20.2814.021; Tue, 17 Mar 2020
+ 15:20:29 +0000
+Subject: Re: [PATCH v7 1/9] crypto: caam - allocate RNG instantiation
+ descriptor with GFP_DMA
+To:     Andrey Smirnov <andrew.smirnov@gmail.com>
+Cc:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Chris Healy <cphealy@gmail.com>,
+        Lucas Stach <l.stach@pengutronix.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Maxime Ripard <mripard@kernel.org>,
-        Chen-Yu Tsai <wens@csie.org>, kvm@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: [PATCH 09/12] docs: fix broken references for ReST files that moved around
-Date:   Tue, 17 Mar 2020 14:10:48 +0100
-Message-Id: <6ea0adf72ae55935f3649f87e4b596830b616594.1584450500.git.mchehab+huawei@kernel.org>
-X-Mailer: git-send-email 2.24.1
-In-Reply-To: <cover.1584450500.git.mchehab+huawei@kernel.org>
-References: <cover.1584450500.git.mchehab+huawei@kernel.org>
+        Iuliana Prodan <iuliana.prodan@nxp.com>,
+        dl-linux-imx <linux-imx@nxp.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20200127165646.19806-1-andrew.smirnov@gmail.com>
+ <20200127165646.19806-2-andrew.smirnov@gmail.com>
+ <VI1PR0402MB3485FF5402B8C0FFF48FBF2298030@VI1PR0402MB3485.eurprd04.prod.outlook.com>
+ <CAHQ1cqGZP5RKTsc4+jikyPVggt-mGViRtKNvyOx9FGkYW9pgmg@mail.gmail.com>
+From:   =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>
+Message-ID: <ce541b0c-7ddb-ed4d-9529-c1d48a38b6a6@nxp.com>
+Date:   Tue, 17 Mar 2020 17:20:25 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
+In-Reply-To: <CAHQ1cqGZP5RKTsc4+jikyPVggt-mGViRtKNvyOx9FGkYW9pgmg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM0PR02CA0044.eurprd02.prod.outlook.com
+ (2603:10a6:208:d2::21) To VI1PR0402MB3485.eurprd04.prod.outlook.com
+ (2603:10a6:803:7::25)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.0.129] (84.117.251.185) by AM0PR02CA0044.eurprd02.prod.outlook.com (2603:10a6:208:d2::21) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2814.22 via Frontend Transport; Tue, 17 Mar 2020 15:20:27 +0000
+X-Originating-IP: [84.117.251.185]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 4acfeacd-3358-4a30-766f-08d7ca86b9c9
+X-MS-TrafficTypeDiagnostic: VI1PR0402MB3582:|VI1PR0402MB3582:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <VI1PR0402MB3582F0186EFF5FA0AE21290098F60@VI1PR0402MB3582.eurprd04.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-Forefront-PRVS: 0345CFD558
+X-Forefront-Antispam-Report: SFV:NSPM;SFS:(10009020)(4636009)(366004)(396003)(39860400002)(346002)(376002)(136003)(199004)(2906002)(31696002)(31686004)(8676002)(81166006)(5660300002)(52116002)(81156014)(86362001)(8936002)(53546011)(66556008)(36756003)(66476007)(316002)(66946007)(54906003)(6486002)(956004)(966005)(2616005)(6916009)(186003)(26005)(4326008)(478600001)(16526019)(16576012);DIR:OUT;SFP:1101;SCL:1;SRVR:VI1PR0402MB3582;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;
+Received-SPF: None (protection.outlook.com: nxp.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: XHJGji+0oO9jsz/EFsFluvHiYek4cMhYevOjbRDfCNs2PSir1wpaUcIfnBL3vEQG3x2mvJ6GVnAoAmWnZS04rKlv3EYL0jGSZac7F8BCSygFoKoxPiqJvIW8h+h7v+oZ7+xtYP83+14oSN66Inm4TdT2GPlnbTdbhkN1/YAq/JVCOwQ6KffDRYHa1X0Tg5J7ID6hegn6rt76+Blcife/vYSZPfUB/yk/GYeGY4VgnPdi11Rcap/1brE145qBRWZoRALfO325/BgByJQZ7cuSZ/ixWWHuXl3cAQ2fixXEo0l4fCIkvB68ReCX/DTc+2enFHSHln7BULKKMzG7ap+uReThWzTi6iTZU3dQJNT0HfATzEQ+fY/IB+G9JW781mc/5MPDLFny6e3ldsRDRLeqomrJ5cpugyLUEqlLs780xmxNhw62BORO+tvGWJz9ImANtFCMraaTLmDPubQ7/CoHCwTbbCsdyU8YZ4J8PTpvH/Db0HWowOSyl4eoUweeY80NM0dlDJlM70JWjnYDckcm1A==
+X-MS-Exchange-AntiSpam-MessageData: a3D6FVQzAYitnCb6XhI2/ltgMnh1UYCz1qcJsy77sr1UyruV9z8HLDYl8fzmqCwG/UHgy7TxpYj5+pqloX7347estsC+3ZEkR2f9XDaktsqV7GfXOO2qb9DpZfDjKqW8owDoxZySC2dH1wzWZId2oQ==
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4acfeacd-3358-4a30-766f-08d7ca86b9c9
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Mar 2020 15:20:29.3007
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: F3cqS6p3gBhmLKBtYui6fmQbdjqfpW7DCoCefUnutQafMyM0mqReTOMx7NqNeiyAlFOXDsLj2sw/2I6J4GqD6A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3582
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Some broken references happened due to shifting files around
-and ReST renames. Those can't be auto-fixed by the script,
-so let's fix them manually.
+On 3/16/2020 6:15 AM, Andrey Smirnov wrote:
+> On Tue, Feb 4, 2020 at 6:08 AM Horia Geanta <horia.geanta@nxp.com> wrote:
+>>
+>> On 1/27/2020 6:57 PM, Andrey Smirnov wrote:
+>>> Be consistent with the rest of the codebase and use GFP_DMA when
+>>> allocating memory for a CAAM JR descriptor.
+>>>
+>> Please use GFP_DMA32 instead.
+>> Device is not limited to less than 32 bits of addressing
+>> in any of its incarnations.
+>>
+>> s/GFP_DMA/GFP_DMA32 should be performed throughout caam driver.
+>> (But of course, I wouldn't include this change in current patch series).
+>>
+> 
+> Hmm, I am triggering
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/mm/slub.c?h=v5.6-rc6#n1721
+> by using GFP_DMA32. AFAICT, GFP_DMA32 can't be used in SLUB/SLAB
+> allocated memory:
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/mm/internal.h?h=v5.6-rc6#n32
+> 
+Indeed.
 
-Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
----
- Documentation/doc-guide/maintainer-profile.rst      | 2 +-
- Documentation/virt/kvm/mmu.rst                      | 2 +-
- Documentation/virt/kvm/review-checklist.rst         | 2 +-
- arch/x86/kvm/mmu/mmu.c                              | 2 +-
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 2 +-
- drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c   | 2 +-
- drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c | 2 +-
- drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c   | 2 +-
- drivers/media/v4l2-core/v4l2-fwnode.c               | 2 +-
- include/uapi/linux/kvm.h                            | 4 ++--
- tools/include/uapi/linux/kvm.h                      | 4 ++--
- 11 files changed, 13 insertions(+), 13 deletions(-)
+> I'll stick with GFP_DMA for now, unless you have a different preference.
+> 
+I'm ok with this, will deal with memory allocation separately.
 
-diff --git a/Documentation/doc-guide/maintainer-profile.rst b/Documentation/doc-guide/maintainer-profile.rst
-index 5afc0ddba40a..755d39f0d407 100644
---- a/Documentation/doc-guide/maintainer-profile.rst
-+++ b/Documentation/doc-guide/maintainer-profile.rst
-@@ -6,7 +6,7 @@ Documentation subsystem maintainer entry profile
- The documentation "subsystem" is the central coordinating point for the
- kernel's documentation and associated infrastructure.  It covers the
- hierarchy under Documentation/ (with the exception of
--Documentation/device-tree), various utilities under scripts/ and, at least
-+Documentation/devicetree), various utilities under scripts/ and, at least
- some of the time, LICENSES/.
- 
- It's worth noting, though, that the boundaries of this subsystem are rather
-diff --git a/Documentation/virt/kvm/mmu.rst b/Documentation/virt/kvm/mmu.rst
-index 60981887d20b..46126ecc70f7 100644
---- a/Documentation/virt/kvm/mmu.rst
-+++ b/Documentation/virt/kvm/mmu.rst
-@@ -319,7 +319,7 @@ Handling a page fault is performed as follows:
- 
-  - If both P bit and R/W bit of error code are set, this could possibly
-    be handled as a "fast page fault" (fixed without taking the MMU lock).  See
--   the description in Documentation/virt/kvm/locking.txt.
-+   the description in Documentation/virt/kvm/locking.rst.
- 
-  - if needed, walk the guest page tables to determine the guest translation
-    (gva->gpa or ngpa->gpa)
-diff --git a/Documentation/virt/kvm/review-checklist.rst b/Documentation/virt/kvm/review-checklist.rst
-index 1f86a9d3f705..dc01aea4057b 100644
---- a/Documentation/virt/kvm/review-checklist.rst
-+++ b/Documentation/virt/kvm/review-checklist.rst
-@@ -10,7 +10,7 @@ Review checklist for kvm patches
- 2.  Patches should be against kvm.git master branch.
- 
- 3.  If the patch introduces or modifies a new userspace API:
--    - the API must be documented in Documentation/virt/kvm/api.txt
-+    - the API must be documented in Documentation/virt/kvm/api.rst
-     - the API must be discoverable using KVM_CHECK_EXTENSION
- 
- 4.  New state must include support for save/restore.
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 560e85ebdf22..2bd9f35e9e91 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3586,7 +3586,7 @@ static bool fast_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 		/*
- 		 * Currently, fast page fault only works for direct mapping
- 		 * since the gfn is not stable for indirect shadow page. See
--		 * Documentation/virt/kvm/locking.txt to get more detail.
-+		 * Documentation/virt/kvm/locking.rst to get more detail.
- 		 */
- 		fault_handled = fast_pf_fix_direct_spte(vcpu, sp,
- 							iterator.sptep, spte,
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-index a5fd8975f3d3..a6abb701bfc6 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c
-@@ -8,7 +8,7 @@
-  * This file add support for AES cipher with 128,192,256 bits keysize in
-  * CBC and ECB mode.
-  *
-- * You could find a link for the datasheet in Documentation/arm/sunxi/README
-+ * You could find a link for the datasheet in Documentation/arm/sunxi.rst
-  */
- 
- #include <linux/crypto.h>
-diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-index 3e4e4bbda34c..b957061424a1 100644
---- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-+++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-@@ -7,7 +7,7 @@
-  *
-  * Core file which registers crypto algorithms supported by the CryptoEngine.
-  *
-- * You could find a link for the datasheet in Documentation/arm/sunxi/README
-+ * You could find a link for the datasheet in Documentation/arm/sunxi.rst
-  */
- #include <linux/clk.h>
- #include <linux/crypto.h>
-diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
-index 84d52fc3a2da..c89cb2ee2496 100644
---- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
-+++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c
-@@ -8,7 +8,7 @@
-  * This file add support for AES cipher with 128,192,256 bits keysize in
-  * CBC and ECB mode.
-  *
-- * You could find a link for the datasheet in Documentation/arm/sunxi/README
-+ * You could find a link for the datasheet in Documentation/arm/sunxi.rst
-  */
- 
- #include <linux/crypto.h>
-diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-index 6b301afffd11..8ba4f9c81dac 100644
---- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-+++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-@@ -7,7 +7,7 @@
-  *
-  * Core file which registers crypto algorithms supported by the SecuritySystem
-  *
-- * You could find a link for the datasheet in Documentation/arm/sunxi/README
-+ * You could find a link for the datasheet in Documentation/arm/sunxi.rst
-  */
- #include <linux/clk.h>
- #include <linux/crypto.h>
-diff --git a/drivers/media/v4l2-core/v4l2-fwnode.c b/drivers/media/v4l2-core/v4l2-fwnode.c
-index 97f0f8b23b5d..8a1e1b95b379 100644
---- a/drivers/media/v4l2-core/v4l2-fwnode.c
-+++ b/drivers/media/v4l2-core/v4l2-fwnode.c
-@@ -980,7 +980,7 @@ static int v4l2_fwnode_reference_parse(struct device *dev,
-  *
-  * THIS EXAMPLE EXISTS MERELY TO DOCUMENT THIS FUNCTION. DO NOT USE IT AS A
-  * REFERENCE IN HOW ACPI TABLES SHOULD BE WRITTEN!! See documentation under
-- * Documentation/acpi/dsd instead and especially graph.txt,
-+ * Documentation/firmware-guide/acpi/dsd/ instead and especially graph.txt,
-  * data-node-references.txt and leds.txt .
-  *
-  *	Scope (\_SB.PCI0.I2C2)
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 5e6234cb25a6..704bd4cd3689 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -116,7 +116,7 @@ struct kvm_irq_level {
- 	 * ACPI gsi notion of irq.
- 	 * For IA-64 (APIC model) IOAPIC0: irq 0-23; IOAPIC1: irq 24-47..
- 	 * For X86 (standard AT mode) PIC0/1: irq 0-15. IOAPIC0: 0-23..
--	 * For ARM: See Documentation/virt/kvm/api.txt
-+	 * For ARM: See Documentation/virt/kvm/api.rst
- 	 */
- 	union {
- 		__u32 irq;
-@@ -1106,7 +1106,7 @@ struct kvm_xen_hvm_config {
-  *
-  * KVM_IRQFD_FLAG_RESAMPLE indicates resamplefd is valid and specifies
-  * the irqfd to operate in resampling mode for level triggered interrupt
-- * emulation.  See Documentation/virt/kvm/api.txt.
-+ * emulation.  See Documentation/virt/kvm/api.rst.
-  */
- #define KVM_IRQFD_FLAG_RESAMPLE (1 << 1)
- 
-diff --git a/tools/include/uapi/linux/kvm.h b/tools/include/uapi/linux/kvm.h
-index 4b95f9a31a2f..e5f32fcec68f 100644
---- a/tools/include/uapi/linux/kvm.h
-+++ b/tools/include/uapi/linux/kvm.h
-@@ -116,7 +116,7 @@ struct kvm_irq_level {
- 	 * ACPI gsi notion of irq.
- 	 * For IA-64 (APIC model) IOAPIC0: irq 0-23; IOAPIC1: irq 24-47..
- 	 * For X86 (standard AT mode) PIC0/1: irq 0-15. IOAPIC0: 0-23..
--	 * For ARM: See Documentation/virt/kvm/api.txt
-+	 * For ARM: See Documentation/virt/kvm/api.rst
- 	 */
- 	union {
- 		__u32 irq;
-@@ -1100,7 +1100,7 @@ struct kvm_xen_hvm_config {
-  *
-  * KVM_IRQFD_FLAG_RESAMPLE indicates resamplefd is valid and specifies
-  * the irqfd to operate in resampling mode for level triggered interrupt
-- * emulation.  See Documentation/virt/kvm/api.txt.
-+ * emulation.  See Documentation/virt/kvm/api.rst.
-  */
- #define KVM_IRQFD_FLAG_RESAMPLE (1 << 1)
- 
--- 
-2.24.1
-
+Thanks,
+Horia
