@@ -1,105 +1,69 @@
-Return-Path: <SRS0=I3Dt=5C=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=FtFJ=5D=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 189E2C1975A
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Mar 2020 22:17:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E124C5ACD6
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Mar 2020 02:08:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CAD2420738
-	for <linux-crypto@archiver.kernel.org>; Tue, 17 Mar 2020 22:17:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1584483469;
-	bh=sY4cOhcMEMawFpaLftRkDuoAZYkzfT6Iq/pDMIVQ+QM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=Jk+0lnghDvfjl/nzGxFx7ENJQghzkFCHI5GRJEmdpQ43dsTncmYvVN+NQQdadLUwY
-	 PZOqApoi+6X1vveodqQQzYlhojNzCeQ1gP09LrzfTeP10NK0V/Gi1nx9kdmPVY0Hla
-	 vJseENEtMdKQQ5vG+bG/wmDIDWQzyELs3E6mZNDo=
+	by mail.kernel.org (Postfix) with ESMTP id 2EF7D20724
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Mar 2020 02:08:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726549AbgCQWRt (ORCPT
+        id S1726680AbgCRCIq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 17 Mar 2020 18:17:49 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33490 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726476AbgCQWRt (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 17 Mar 2020 18:17:49 -0400
-Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 15A73206EC;
-        Tue, 17 Mar 2020 22:17:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1584483468;
-        bh=sY4cOhcMEMawFpaLftRkDuoAZYkzfT6Iq/pDMIVQ+QM=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=0QGP7zI9fM58OdTLqDxjLIcR2NDM+WwQ4MBisE/1SCYXBDjdNnC+PTF/305E5GyST
-         kIqZVvbLlzYcUqBHggnCaCPlwSH7VtJqmiU8YuCYpkjEJG1LvNZnpjOCI11ZdmF4Ey
-         0175SzJkfPb8KuTVROY2dRPony8hRwWy9EPhI0ys=
-Date:   Tue, 17 Mar 2020 22:17:43 +0000
-From:   Will Deacon <will@kernel.org>
-To:     Torsten Duwe <duwe@lst.de>
-Cc:     Catalin Marinas <catalin.marinas@arm.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Russell King <linux@armlinux.org.uk>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, ardb@kernel.org
-Subject: Re: [Patch][Fix] crypto: arm{,64} neon: memzero_explicit aes-cbc key
-Message-ID: <20200317221743.GD20788@willie-the-truck>
-References: <20200313110258.94A0668C4E@verein.lst.de>
+        Tue, 17 Mar 2020 22:08:46 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:11714 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726229AbgCRCIp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 17 Mar 2020 22:08:45 -0400
+Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id AC76B3D0B051E3C9A6F8;
+        Wed, 18 Mar 2020 10:08:40 +0800 (CST)
+Received: from localhost.localdomain.localdomain (10.175.113.25) by
+ DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
+ 14.3.487.0; Wed, 18 Mar 2020 10:08:25 +0800
+From:   YueHaibing <yuehaibing@huawei.com>
+To:     Gilad Ben-Yossef <gilad@benyossef.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     YueHaibing <yuehaibing@huawei.com>, <linux-crypto@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <kernel-janitors@vger.kernel.org>
+Subject: [PATCH -next] crypto: ccree - remove duplicated include from cc_aead.c
+Date:   Wed, 18 Mar 2020 02:00:40 +0000
+Message-ID: <20200318020040.175704-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200313110258.94A0668C4E@verein.lst.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type:   text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7BIT
+X-Originating-IP: [10.175.113.25]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-[+Ard]
+Remove duplicated include.
 
-On Fri, Mar 13, 2020 at 12:02:58PM +0100, Torsten Duwe wrote:
-> From: Torsten Duwe <duwe@suse.de>
-> 
-> At function exit, do not leave the expanded key in the rk struct
-> which got allocated on the stack.
-> 
-> Signed-off-by: Torsten Duwe <duwe@suse.de>
-> ---
-> Another small fix from our FIPS evaluation. I hope you don't mind I merged
-> arm32 and arm64 into one patch -- this is really simple.
-> --- a/arch/arm/crypto/aes-neonbs-glue.c
-> +++ b/arch/arm/crypto/aes-neonbs-glue.c
-> @@ -138,6 +138,7 @@ static int aesbs_cbc_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
->  	kernel_neon_begin();
->  	aesbs_convert_key(ctx->key.rk, rk.key_enc, ctx->key.rounds);
->  	kernel_neon_end();
-> +	memzero_explicit(&rk, sizeof(rk));
->  
->  	return crypto_cipher_setkey(ctx->enc_tfm, in_key, key_len);
->  }
-> diff --git a/arch/arm64/crypto/aes-neonbs-glue.c b/arch/arm64/crypto/aes-neonbs-glue.c
-> index e3e27349a9fe..c0b980503643 100644
-> --- a/arch/arm64/crypto/aes-neonbs-glue.c
-> +++ b/arch/arm64/crypto/aes-neonbs-glue.c
-> @@ -151,6 +151,7 @@ static int aesbs_cbc_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
->  	kernel_neon_begin();
->  	aesbs_convert_key(ctx->key.rk, rk.key_enc, ctx->key.rounds);
->  	kernel_neon_end();
-> +	memzero_explicit(&rk, sizeof(rk));
->  
->  	return 0;
->  }
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
+---
+ drivers/crypto/ccree/cc_aead.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-I'm certainly not a crypto person, but this looks sensible to me and I
-couldn't find any other similar stack variable usage under
-arch/arm64/crypto/ at a quick glance.
+diff --git a/drivers/crypto/ccree/cc_aead.c b/drivers/crypto/ccree/cc_aead.c
+index 875fa79a03eb..1cf51edbc4b9 100644
+--- a/drivers/crypto/ccree/cc_aead.c
++++ b/drivers/crypto/ccree/cc_aead.c
+@@ -9,7 +9,6 @@
+ #include <crypto/gcm.h>
+ #include <linux/rtnetlink.h>
+ #include <crypto/internal/des.h>
+-#include <linux/rtnetlink.h>
+ #include "cc_driver.h"
+ #include "cc_buffer_mgr.h"
+ #include "cc_aead.h"
 
-Acked-by: Will Deacon <will@kernel.org>
 
-Will
+
