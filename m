@@ -2,57 +2,57 @@ Return-Path: <SRS0=FtFJ=5D=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-11.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8785C10DCE
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Mar 2020 04:31:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DDF8C10DCE
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Mar 2020 06:18:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 802722076D
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Mar 2020 04:31:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A9C0920663
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Mar 2020 06:18:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=axtens.net header.i=@axtens.net header.b="TKJw5fTx"
+	dkim=pass (1024-bit key) header.d=axtens.net header.i=@axtens.net header.b="JN2lcZK8"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726308AbgCREbO (ORCPT
+        id S1726871AbgCRGSi (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 18 Mar 2020 00:31:14 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:39369 "EHLO
-        mail-pg1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726550AbgCREbO (ORCPT
+        Wed, 18 Mar 2020 02:18:38 -0400
+Received: from mail-pl1-f193.google.com ([209.85.214.193]:36884 "EHLO
+        mail-pl1-f193.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726553AbgCRGSh (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 18 Mar 2020 00:31:14 -0400
-Received: by mail-pg1-f196.google.com with SMTP id b22so6956511pgb.6
-        for <linux-crypto@vger.kernel.org>; Tue, 17 Mar 2020 21:31:11 -0700 (PDT)
+        Wed, 18 Mar 2020 02:18:37 -0400
+Received: by mail-pl1-f193.google.com with SMTP id f16so10735411plj.4
+        for <linux-crypto@vger.kernel.org>; Tue, 17 Mar 2020 23:18:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=axtens.net; s=google;
         h=from:to:cc:subject:in-reply-to:references:date:message-id
          :mime-version;
-        bh=yt2r9vmydoX1TbUF47DKgYHPSZ3nGofvQMdOe2ML7ls=;
-        b=TKJw5fTxuTKlEtbKknrDzmAPqgrSYEh1sD0wGtZAovmvjiidPV7G5NNQn/9rKVgYSS
-         VCx2brKZKbeFg1mASduEzl3qb2q+mMDZtiVS1jcRzD1+qAQJJkZqBn1VStKQvRDaX07a
-         eCOKWsiZvq/m7FDTqSSus6l52LlSy9cRRbb44=
+        bh=rK0hZkTKVx76EEECSYyaEEZ50rQ8x/KfXEt2npuCiqs=;
+        b=JN2lcZK8dX/QUKNSd+IEuqnSbAV8++0Gweztiwyahi+osWl4REh5gg59r92YUzmy9L
+         ZYx6NZTBSxfeX0V2F+fuFhFv1T0ciOebCqXuNNW4XYqUqJTgD9iP9bVZPsdC1ydtjEFA
+         4dv2t+CpLE7Q5d2J8bZtfNAYcZVMod/N4z18s=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
          :message-id:mime-version;
-        bh=yt2r9vmydoX1TbUF47DKgYHPSZ3nGofvQMdOe2ML7ls=;
-        b=uVX7x321K1fzVZGBQ1g/UdPTSrI/o0Ic4x/mCf0Dp2VLxJVClrds6lkbVOs9nLh/QT
-         QwNg0KfayZNSqRNltui3xrI9F2Z+zt/z5P9l6LmSELyWFQYf0YqXwdIqpkxk3I9kqSBz
-         hFE0lEu22wmePIKDcDEunT1n6NZyUvdHawzF7er2D0yfWtNcCM9apQ8dOgtXaV6jKG9L
-         1vXJFiGlv3R8J5d/Us0o9BaK1ggxKNcJesszo3jgd/G9eDIl4YZJ4+RqylVSjjZb0q39
-         MEyQuaL/iRbRFp80nzAGIIunArEnLQtWoVDxfIralYcfU36jQEsDWag37DbH4HMdJ5Vf
-         smvA==
-X-Gm-Message-State: ANhLgQ01lm+W9fpa+K1PQhLtHXcxRpiOgW4xmxm+jA95ARj6QEENZobr
-        L1KWbJi/L+MzMyW8PFm8olr1HQ==
-X-Google-Smtp-Source: ADFU+vsgfCNTy++GhNfB/c0YhoPx+2T9yTdPzRuLm1lIRhwGFZwO0K0/vexAEJMYS1+uCpjkur+eAg==
-X-Received: by 2002:a62:1946:: with SMTP id 67mr2440876pfz.0.1584505870206;
-        Tue, 17 Mar 2020 21:31:10 -0700 (PDT)
+        bh=rK0hZkTKVx76EEECSYyaEEZ50rQ8x/KfXEt2npuCiqs=;
+        b=X20LOqMeaCuOfPd8G0CzZJ38dIdibb2efQjP5oLd+Qb3hd6+zkSgBpzNwpw448QiqC
+         cAIK6hYBqvyXFLceFPpyk5y0z+OHdG1zN0VuDgF9FpJMm00IdSh1rGohcs+itf6n19J9
+         Z8zI7mlBuy1/U4uHwC6mUQulfJJOG3/+LfCcedadRUBYRnWj9WMrEMgy8QpBiHKo1f1Q
+         e1bw2DZx1ZknTkieRWDwEEmXpq0GNTL5YcEnz9n76M3y/O3UqTzSxllrk8iyVMcmOSDz
+         a32bInBWsmT8CLAbfWMqs4ECGGjQlU29l8Jwt/b9/d88OwkCJsXwXJhXTt32JHyfTLW3
+         9jrg==
+X-Gm-Message-State: ANhLgQ2pT8+evhaIY/Q7YVVRlEAl/oY7NyAfpovFDQOOaAn/qULsdwI5
+        80uaLmtJyYOptjPJ5ohHB1/MWKiYHGs=
+X-Google-Smtp-Source: ADFU+vvv/SdiK193qk9z5f3vszFeLsiQsT7T5jDNl8mWNhMexutFUUvz+Cb8aAOQpTphRXmZE3cWSg==
+X-Received: by 2002:a17:902:a603:: with SMTP id u3mr2380719plq.105.1584512313352;
+        Tue, 17 Mar 2020 23:18:33 -0700 (PDT)
 Received: from localhost (2001-44b8-111e-5c00-11e1-e7cb-3c10-05d6.static.ipv6.internode.on.net. [2001:44b8:111e:5c00:11e1:e7cb:3c10:5d6])
-        by smtp.gmail.com with ESMTPSA id e184sm4640506pfh.219.2020.03.17.21.31.08
+        by smtp.gmail.com with ESMTPSA id d7sm5253614pfa.106.2020.03.17.23.18.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Mar 2020 21:31:09 -0700 (PDT)
+        Tue, 17 Mar 2020 23:18:31 -0700 (PDT)
 From:   Daniel Axtens <dja@axtens.net>
 To:     Raphael Moreira Zinsly <rzinsly@linux.ibm.com>,
         linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org
@@ -61,19 +61,382 @@ Cc:     Raphael Moreira Zinsly <rzinsly@linux.ibm.com>,
 Subject: Re: [PATCH 4/5] selftests/powerpc: Add NX-GZIP engine decompress testcase
 In-Reply-To: <20200316180714.18631-5-rzinsly@linux.ibm.com>
 References: <20200316180714.18631-1-rzinsly@linux.ibm.com> <20200316180714.18631-5-rzinsly@linux.ibm.com>
-Date:   Wed, 18 Mar 2020 15:31:05 +1100
-Message-ID: <87a74env1y.fsf@dja-thinkpad.axtens.net>
+Date:   Wed, 18 Mar 2020 17:18:27 +1100
+Message-ID: <877dzinq30.fsf@dja-thinkpad.axtens.net>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: multipart/mixed; boundary="=-=-="
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+--=-=-=
+Content-Type: text/plain
+
 Raphael Moreira Zinsly <rzinsly@linux.ibm.com> writes:
 
 > Include a decompression testcase for the powerpc NX-GZIP
 > engine.
+
+I compiled gzip with the AFL++ fuzzer and generated a corpus of tests to
+run against this decompressor. I also fuzzed the decompressor
+directly. I found a few issues. I _think_ they're just in the userspace
+but I'm a bit too early in the process to know.
+
+I realise this is self-test code but:
+a) it stops me testing more deeply, and
+b) it looks like some of this code is shared with https://github.com/libnxz/power-gzip/
+
+The issues I've found are:
+
+1) In the ERR_NX_DATA_LENGTH case, the decompressor doesn't check that
+   you're making forward progress, so you can provoke it into an
+   infinite loop.
+
+Here's an _extremely_ ugly fix:
+
+diff --git a/tools/testing/selftests/powerpc/nx-gzip/gunz_test.c b/tools/testing/selftests/powerpc/nx-gzip/gunz_test.c
+index 653de92698cc..236a1f567656 100644
+--- a/tools/testing/selftests/powerpc/nx-gzip/gunz_test.c
++++ b/tools/testing/selftests/powerpc/nx-gzip/gunz_test.c
+@@ -343,6 +343,8 @@ int decompress_file(int argc, char **argv, void *devhandle)
+        nx_dde_t dde_out[6] __attribute__((aligned (128)));
+        int pgfault_retries;
+ 
++       int last_first_used = 0;
++
+        /* when using mmap'ed files */
+        off_t input_file_offset;
+ 
+@@ -642,6 +644,11 @@ int decompress_file(int argc, char **argv, void *devhandle)
+        first_used = fifo_used_first_bytes(cur_in, used_in, fifo_in_len);
+        last_used = fifo_used_last_bytes(cur_in, used_in, fifo_in_len);
+ 
++       if (first_used > 0 && last_first_used > 0) {
++               assert(first_used != last_first_used);
++       }
++       last_first_used = first_used;
++
+        if (first_used > 0)
+                nx_append_dde(ddl_in, fifo_in + cur_in, first_used);
+ 
+
+2) It looks like you can provoke an out-of-bounds write. I've seen both
+infinte loops printing something that seems to come from the file
+content like:
+
+57201: Got signal 11 si_code 3, si_addr 0xcacacacacacacac8
+
+or a less bizzare address like
+
+19285: Got signal 11 si_code 1, si_addr 0x7fffcf1b0000
+
+Depending on the build I've also seen the stack smasher protection fire.
+
+I don't understand the code well enough to figure out how this comes to
+be just yet.
+
+I've included a few test cases as attachments. I've preconverted them
+with xxd to avoid anything that might flag suspicious gzip files!
+Decompress them then use `xxd -r attachment testcase.gz` to convert them
+back.
+
+Regards,
+Daniel
+
+
+--=-=-=
+Content-Type: application/octet-stream
+Content-Disposition: attachment; filename=infloop.bz2
+Content-Transfer-Encoding: base64
+
+QlpoOTFBWSZTWdzNDtIAAAxZAA4QQAFh0DUAoABUU0yMTADSep6mgGQncFomex2bYb1N7aOHRvWa
+jSBCBgvSyHjdHbngu5IpwoSG5mh2kA==
+--=-=-=
+Content-Type: application/octet-stream
+Content-Disposition: attachment; filename=sig1.bz2
+Content-Transfer-Encoding: base64
+
+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
+W0LaFtC2hbQtoW0LbDOc5znN3d3d3fPPPPPPOjeULaFtC2hbQtoW0LaFtC2hbQtoW0LaFtC2wznO
+c5zd3d3d3ve973vfeTeULaFtC2hbQtoW0LaFtC2hbQtoW0LaFtC2wznOc5zd3d3d3ve973vfeTeU
+LaFtC2hbQtoW0LaFtC2hbQtoW0LaFtC2wznOc5zd3d3d3ve973vfeTeULaFtC2hbQtoW0LaFtC2h
+bQtoW0LaFtC2wznOc5zd3d3d3ve973vfeTeULaFtC2hbQtoW0LaFtC2hbQtoW0LaFtkn5+ee++++
++1VVW222uAAAAA87u7uqqqttttcAAAAF+fnnvvvvvvtVVW222uAAAAA+e+++++1VVfffffffXAAA
+AAed3d3bVVVtttrgAAAAPO7u7qqqrbbbXAAAAAed3d3VVVW222uAAAAA87u7uqqqttttcAAfz+fg
+AHXXUVVVVZmZmZmYkkknoAAAAAAACKFV9fX19b3ve972AACqqqqlVVVVAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAFVVVVX7zMzMzMzMzMwAAAAAAAAAAAAAAAAAAG86666666666664zMzM2222/m2232uA
+AAAA87u79dVVVbbba4AAADx4P4e+++++1VVfffffffXAAAAAed3d3bbaqttttcAAAAB53d3dVVVb
+bba4AAAADzu7u6qqq2221wAAAAHnd3d1VVVtttrgAAAAPO7u7qqqrbbbXAAAAAed3d3VVVW222uA
+AAAA87u7uqqqttttcAAAAB53d3dVVVbbba4AAAADzu7u6qqq2221wAAePAAed3d3VVVW222uAAAA
+A47u7qqqrfffffX6AAAAA8u7u6qqq2221wAAAAe+efn55777777VVNtJJJPQFT10AAAAABT/PXq7
+u7ptttkgAAAAAAAAAAAAAAAAAAAAAAACqqqqoABVVVVUAAAFVVrWta1pVVe8AALAAAAAAAAAAAAA
+AAAAAD1b66666666666664H5AD3vMzM2uAAAAA87u7uqqqttttcAAAAB53d3dVVVbbba4AAAADzu
+7u6qqq2221wAAAAHnd3d1VVVtttrgAAAAPO7u7qqqrbbbXAAAAAed3d3VVVW222uAAAAA87u7uqq
+qttttcAAAAB53d3dVVVbbba4AAAADzu7u6qqq2221wAAAAHnd3d1VVVtttrgAAAAP6O7v6d1VVVt
+t99foAAAADz9fr9XdVVVbbba4AAAADzu7u6qqq2221wAAAe/4fn4B5777777VVVbbba4AAAAP4/P
+z9Pffffaq/tVfffbbXePAAAAAAB+V1VV+1TbbbZJJJJJJJJJIAAAAAAVVVVVAAAAAAAAAAAAKqqq
+qgAAAAAAAAAVVVVVe8zMzMzMzMKqqqrAAAAAAAAAAAAAAAAD4+dugAefffffffffffx/b77+bbbb
+XAAAAAed3d3VVVW222uAAAAA87u7uqqqttttcAAAAB53d3dVVVbbba4AAAADzu7u6qqq2221wAAA
+AHnd3d1VVVtttrgAAAAPO7u7qqqrbbbXAAAAAed3d3VVVW222uAAAAA87u7uqqqttttcAAAAB53d
+3dVVVbbba4AAAADzu7u6qqq2221wAAAAHnd3d1VVVtttrgAAAAPO7u7qqqrbbbXAAAAAed3d3VVV
+W222uAAAD+Pz8A8999999qr+1VtttrgAAAA7+evUXd3dttvzjbSSST0AAAAAAABQqvr6+vre973v
+ewAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACqqqqr3mZmZmZmZmZgAAAKqqqqgAAAAAAAAAAA
+H1t111111111111wDvvvvvvvvv5ttttcAAAAB53d3dVVVbbba4AAAADzu7u6rbbb7777776vQAAD
+x4A/HvvvvvtVVX3333331wAAAAHnd3d22qqttttcAAAAB53d3dVVVbbba4AAAADzu7u6qqq2221w
+AAAAHnd3d1VVVtttrgAAAAPO7u7qqqrbbbXAAAAAed3d3VVVW222uAAAAA87u7uqqqttttcAAAAB
+53d3dVVVbbba4PHgAAAPO7u7qqqrbbbXAAAAB7+fnnvvvvvtVVVtttrgAAAAPO7u7qqqrbbbXAAA
+AB/Xz8/PPfffffaquNtJJJPQAAAAAAAHr583+b3vdbbbfOMkAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAFVVVVS1rWtff39/f39/bXvAZmZmZmYAAAAAAAAAAAAAAAAAAG3XXXXXXXXXXXXAAB73mZmZ
+rgAAAAPO7u7qqqrbbbXAAAAAed3d3VVVW222uAAAAA87u7uqqqttttcAAAAB53d3dVVVbbba4AAA
+AD9vfffffaqqvvvvvvvrgAAAAPXvvvvvu22219999999cAAAAB/D333333bbba+++++++uAAAAA8
+7u7u22qq2221wAAAAHnd3d1VVVtttrgAAAAPO7u7qqqrbbbXAAAAAed3d3VVVW222uAAAAPfz8PP
+fffffaqqrbbbXAAAAAed3d3VVVW222uAAAD+vn5+fv8/A8/f7/f7/f7qq+q2221wAAAAf5+fn557
+77777VVfVtttrgAAAAAAA9fL9Xd3q22342SSSSSSSSQAAAAAAAAAAAAqqqqqAAAAAAAAAAAAAAAA
+AAAVVVVVe8zMzABVVgAAAAAAAAAAAAAAAAA38AB599999999999999/NtttrgAAAAPO7u7qqqrbb
+bXAAAAAed3d3VVVW222uAAAAA87u7uqqqttttcAAAAB53d3dVVVb77777XAAAAAefnd3dVVVbbba
+4AAAADzu7u6qqq2221wAAAAHnd3d1VVVtttrgAAAAPO7u7qqqrbbbXAAAAAed3d3VVVW222uAAAA
+A87u7uqqqttttcAAAAB53d3dVVVbbba4AAAADzu7u6qqq2221wAAAAHnd3d1VVVtttrgAAA/r+fg
+HnvvvvvtVX+lW222uAAAAAO5v16u7u7bbbLbSSSTmI6qqqq902229gAAAAAAAAAAAAAAAAAAAAAA
+AAAABVVVVUAAAqqqqqAVVVVVe8zMzMzMzMzMAAAAAAAVVVVVAAAAAAAAA/He+eQD+H6D3vMzMzN8
+8cfXrzznOc5zlVVUqq22325znOc5VVV3ve97222AAFVWpVVttgACqqqVVbbYAAqqqlVW22AAKqqp
+VVttgACqqqVVbbYAAqqqlVW22AAKqqpVVvPPPt65znOc5VVdpVVttgACqqqVVbbb6gAVVVXVVbbY
+AAqqqlVW22AAKqqpVVttgACqqqVVbzb49+/fv379+6t71vYAAAAAAAAAAAAAAAAAAAAAAAAACqqq
+qoAAAAAAAAVVVVVe8zMzMzMzMzMAAAAAAAAAAAAAAAAAADfHPzz1+QAaPewd7bbAACtVUqq22wAB
+VVVKqttsAAVVVSqrbbAAFVVUqq22wABVVVKqttsAAVVVSqrbbAAFVSve973va225znOc5VV+KlVW
+22AAKqqpVVttgACqqqVVbbYAAqqqlVW22AAKqqpVVttgACqqqVVbbYAAqqq3ve973uyTn/skkkkk
+lxJJJJP5/PX0z169evXr/H379+/fv37/Ekkk5iPLu7u7ttv42ySSSSSSAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAqqqqq/nMzMzMzMzMzAAAAAqqqqqAAAAAAAAAAAklzJJJJJJJJxpJJJxERrWta
+1pttt1KqttsAAVVVSqrbbAAFVVUqq22wABVVVKqttsAAVVVSqrbbAAFVVUqq22wABVVVKqttsAAV
+VVSqrbbAAFVVUqq22wABVVVKqttsAAVVVSqrbbAAFVVUqq22wABVVVKqttsAAVVVSqreeeXx9Pfv
+379+7ttt8baSSScxG6831ve972238bJJJJJFVVVVQAAAAAAAAAAAAAAAAKqqqrSqqqqAAAAAAAAA
+ABVVVVV7zMzMzMzMzMwAAAAAAAAAAAAAAAAACSSXMkkkkkkknGkkknERGta1rWm23VSqrbbAAFVV
+Uqq22wABVVVKqttsAAVVVSqrbbAAFVVUqq22wABVVVKqttsAAVVVS973rbbB+QBVVVKqttsAAVVV
+SqrbbAAFVVUqq22wABVVVKqttsAAVVVSqrbbAAFVU20kkk4ifBEVVVVU238bbaSSSczPd9Xd3d22
+22W2kkknMR+1VeqqqbbbbJJJAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKqqqqveZmZmZmZmZ
+mAAAAAAAAAAAKqqqqgAAAAb55AAHveZmZmb44448888888qqqlVW22AAKqqpVVttgD6/Wqqq73vZ
+fpbbAH/QqqqlVW22AAKqqpVVttgACqqqVVbbYAAqqqlVW22AAKqqpVVttvqegAqqqnve97REQ9a1
+rWm2222ykkk4mf8iKqqqqzMzMzPn5VVbbYAAqqqlVW22AAG22220kkk4ie/nU/nXV3d3q2235xtp
+JLvdknqJIkkkkZznOc5zd3d387u973ve916655369evXr169fW973tsAqqqqqAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAKqqqqv3mZmZmZmZmZgAAAAAAAAAAAAAAAAAAb55ADve978yqrbbAAFVVUq
+q22wABVVVKqt5558euc5znOVV96u973vS3Ez/B8G973ve8zMzOZmJJJJxER3VVVVTbqq73ve97bb
+egAFVarve971ttgACqqqVVbbb8c5znOcqqq73ve979vLbbnOc5zitX4qVVbbYAAqqqlVW22AAKqq
+pVVt558/H03v37u7vMzMzmZiSSSc9iYmqqqqm22+NtJJd7p6zGMmTMzMkkJJJJGZMyY78fHx8fHx
+bbb42ySSS4nuBMQIj86qqr9qk22+NtJJJOYjvut763ve9tttkkkkkkkkkkkkgAAAVVVVVAAAAAAA
+AAAAqqqqqAAAAAAAAAAAAAFVVVVX7zMzMzMzMzMwAACqqqqoAAAAAAAAAAAADfHx1zw73ve973ve
+9/HfmVVbbYAAqqqlVW22AAKqqpVVttgACqqbaSSSczPwVVVVU22/G20kkk5mfkDu7u7u223xtkkk
+lxM/yBFVVVVNttvMxJJJOJnB5Iu7u7vMzM8zMxJJJOIiNa1rWtN1VUqq22wABVVVKqt5558eqqqq
+qbbfjbaSSSczPwVVVVU22/G20l3ve6k/WfhJBEe+BJJPrgQhP6yREQPvgkJJ9MgiEe2SSSQT84iS
+JI9sgIkPMggJ7YgSSPjCCREe+RJEJ9skIQ9YSITEXvzzv35e8zCeY8xJJJZEYJgSJAAExMzEzMzM
+zAEevJ9e7u71eZmZ5mZhJSSzJmfJF3d3d5mZnmZmJJJJxM4OR5PXnffffffeZmcw57Ab544/W/Xr
+169evXre973bAAAAAAAAAAAAAAAAAAAAAqqqqqAAAAAAAAAAAAAD91VVVVnGAAAAAAAAAAAAAAAA
+AAAAAb5575znOc5znOc4sZJJJcREa1rWtaTbbbbSSS22wABVVVKqttsAAVVVSqrbbAAFVVUqq22w
+ABVVVKqt5558b1znOc5yqvvVKqttsAAVVVSqrbzHreegAKqqpVVttgACqqqVVbbbvOc5znKqqu97
+3ve22wAAtVVKqttsAAVVVSqrbbPOc5znKqqu9JJLiJ7ERu7u7u022zpskklzM//F3JFOFCQ0zoI7
+QA==
+--=-=-=
+Content-Type: application/octet-stream
+Content-Disposition: attachment; filename=sig676767.bz2
+Content-Transfer-Encoding: base64
+
+QlpoOTFBWSZTWWZd5rsAHdFfgH/0RAF/9AgAAhI/sMZoYAlfAAe4B6A24osqtRtSqqgW18YAGjQ0
+YRk0GjTQGJPU0/UflR7ftVUppoA0GTQwQVT2pNqbyN6k0iqf6oBMgZBphEfpKZTZNpNNVJgjQaGg
+MGNA0MJoNGmmmjQA0aCJTJKbRPJPUieBTag9T1NGmTfB5E4ERDiAqsMGABXBgwhiOIw+UDEeJcJI
+R4EVeUFeIgVFDugqHOABvFXeNQMxR2gOIItxeUFQuCGkVTeKvWKu3fsUp39KUVYIBBUIgDAYqixV
+inV8js+MPmoKnlDAyCAj9NBFU/n6Z+MfrPM9I+/Tp7EMxNYKiMi3EER2gAI8oSGm+BVBqCAjIACM
+iKg3gAEcQgSEkiyISFzSf1tj1P325T415agAoHWK6xRVOySKiHWIKNVghBUUxMQVFIAKkOXdwiiP
+zEzBVVPrARUr35fX1v2nfERU2/GPbmds8RQQZx20Cgg+4oIPF/Fyq8e3y8PLw89dZNfT09Ovrvvv
+vv1NttttsYxjGMYzm973vSmMRCSGCqSAAAr7HdwG4c2OG/Q9B6+Xl455+fj0cTiAAVVVVVFVVVVQ
+AAAAAFVVVVQAAVa1rW+++++7WtKoADhwAAAAADbbbbbYAAKqrWta1rSqqAAAAAAAAAAFVVVVQqqq
+qqAAAAAKqqqqgERERERDMzMzMzN6xje+8VvZCmEaPVd7NDQ+MRCAACqqqqoVVVVVAAAAAAAAAAAA
+AAFVVVVQAAAAAAAAAAAAAZznOc5znIAAAAACqqqqoAAYxjGMYxgAAAqqqoiK9dZAA7SQHKSb2pfN
+3kze/xUpHqIiN2tadW5551zEREFwAAACIve972mnjmpPM+aU8LVkznObALu7sXSGc5zavKZznNgF
+3d2AXd3YBVXdgGLu7ALu7tXaZznNgF3d2rJd3dgF3d2AXd3YHZFzl7p3zTOa7L809V8eLbWtrjWj
+SqtarrU60AapyAAAAGc9OnTp0004Xff5d1q3Jd3dzwiuM5zdBBe+ZrObX5xC85zYBVVQBVVQBVVQ
+BVVStSVVAFVVAFVVAGKqgDFVQBVVSu/Gm1rW28Up0u29uul66yqrWqv1110AHQAAAAZze973pTUp
+R52pSlDsxN3Uts02jjjgAAC7dO7gAAVZklCSAmDExvId3cPPMeYt3zytarog0AHIAAAARze9733t
+WYhETjbbZAAAAYAAAAAADpJVefPPFJ0bsM5y2cwq04zAQ7u7zAIAAAETe9733tWYgAC6SwkvLO7q
+7u4ACSQAAHCSA5AggG0QEFbu+MY446cbc99dTXXjfrxxvvvvHkRERERERERnV73vfik9Zz47u4Ds
+kqpJ2SrN5B7oKiNQEEdYPOAIjIICN74BUEddddVUERqq61VYxi6qudVWMYqsVoVirEFFTM59IKgi
+POPhrrrrt31XLTmn44pxxMwO7u+uagAAO74jTMzNvauZiEACqSqkgPTSlJmk0mkklZ3faSAASSRE
+REREX1SVta3mlZvMzOeFoqxMkABpyoBEREREZ1e9734pPWc8JIADzp3cB0lxJJOztNndwKJIAmQJ
+TCwlbQ+tetY1nnluedah5ADUxERERERERGWZmaLVeYREREREREREAAAAAAAAA7/ebNJmkzS/DdP6
+/v3VuZ6T1jCecbd99999vxxRl7O++wA/QAAAAIZma3dJ9Y1l0kA6SA9ySdJAcpIAB0kBVEqicV22
+T1KebTMzIq0VZmJyAGgAAAIjNrWtbuk8ayBVJAeQ7uBykgAAAARERESqI+V8777SnneVlZFWirM5
+l3d31IABWIiIjNrWtbuk8ayAB4kgEkgANJIAB0kAAB8NjuFapb3ve9xzy3re973jGMY1TGMxERHq
+IiIza1rd8TxrKEphVJAVSUwmAAAAAAAG8+uH4650/Fe85tWrV13nPfXWsZjx74tEPEcREWiIza3P
+bzxnQAAAAGUkAB9UkAABykgPl+W9tSlN66rxTje673rnn2Tt5PWegd8vjGMYxjLvkM3ve94s8wlU
+REqiIiW8UoqnbAAR7IId0VAEDTTT9C4iKLJnd0khgdJYSXSSAokiZ82ZpZnJmlKTS8YKKP2gqg/5
+99ftxpT/0K++P/6YT8dmFVB3cOMmRKXcs/F3JFOFCQZl3muw
+--=-=-=
+Content-Type: application/octet-stream
+Content-Disposition: attachment; filename=sigededed.bz2
+Content-Transfer-Encoding: base64
+
+QlpoOTFBWSZTWRTSMhwA6CH9gHU8EABAAX/wQQA/AqAAYD6+dACXgINTAAAAaAAAAAAAAAAAAAAA
+AzUwEAAA+AGAQAAe7gHAABAIAAEAgAAQCB0BSwDAABAN8AwDYC+4BnBWAbAr7gLA57vAO8onTgHM
+HCOAXAnhooiD95Keqn/lVSgYIA1Sm9Uqmb3+0lUfv/VVVU0BoxGElKn6nqUf5lHtVIfqUHpqYiD1
+TZTTe9H7VSVTVRgEGCpNVJppnpHqn6qlGAaQIVP//9VVP1T1KH/5VP1U2/9VSqUAaA/58+QBJPj/
+FkkklZk9okRH+MkkhH5hIiSZghnViayQAd0kkkSQwjfk1ZAhB+7CSAEvNkALuAAiYJISZCImSBE8
+IAJ9XsEkkGZJIQH+iEkMMxmTMmYOy3+cfWdvxe0/j/nbv9GZIZhmMySIJDMZkZjMzMyMmTMmYJEk
+PrISJJP94kiGZETtkTMkkR6yEIzCRB94ESO+CIE+sEEH85CST+ckBIdmTMTMZhmQQg/MCSEWZmZm
+MYySCR5yJCRO+RcgI+8gR3ySSSJO+ZkRIJ5xBEeMkSBHZCSRDMyMyfVrckgCHyc/Fj7skkkkkjp2
+QAAAfNhAAAB5AABB4skAAksfXv7/jr9Vd+3r337d+8RGta12AjxkgkSZmSb3v379+PHv3v58+fN7
+3ve973vewAAAGZmZmZmZgAAVVVVVAAAAAAAAAAAAAAAAAAAABmZmZmZmYAAAAACt73ve973ve1ve
+973ve973vcAAAAAHr169egAAAAAAb3ve97TEZiRDx48e++99t73ve973111rWteERPGAGYAZgBmA
+GYAZgBmQkkyG9739a121rWt73vfXXWta19pP3PuREnzCEkHWCSRG8iRBN5IBG8IJCe8efv88kkhJ
+D98+vWOc3555nnhtzMxEYEmrFm28a1fWtNttzMxGu4b3vfzv69fXr163ve961r169dw3vfz68+e3
+nz5+b3vdTMxEYAKqq6ZzfOc1VVVTMxEYSUWbbeIi8RENtuZmIjABVVXTOb5zmqqqqZmIjCS41rvv
+333vMzewAAAAAAAAAAAAAAAAAAAAAKqqqqgAAAAAAAAAAAKqqqqgAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAqqqqqAABVVVVUAAAAAAAKqqqqgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAfr9foAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AB+fH6/Pv83512z7+Xz9/nbrx+a9/PPy+Pr5+XL43338/Nda+a+M+dtefN+W++9b3AAAAAAAAKqq
+qqgAAAAAAAAAAAAAAKqqqqgAAAAAAAAAAAAAAAAABVVVVUAAAAqqqqqAAAAAAAAAAAAAAAAAAAAA
+AAAFve973ve973tAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACqqqqoAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACqqqqoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAACqqqqoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKqqqqgAAAAAAAAAAAAAAAAAAAAA
+AAVVVVVAAKqqqqgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAqqqre9qqqqAKqqqqgAKre
+973ve97VQAAAAAAAAAAKqqq3vaqqqgAqqqqqAAAAAKqqqqgAAAAAAACqqqqoAAAACqre973ve1VS
+qqqqoAAVVVVVAFVb3ve973tVQAAAABVVVVUAAAAAAAAAAAAAAAqqqqqAAAAAAAAAAAAAAAAAAAAA
+AAAAKqqqqgFVVVVQAAAAAAAAAAAAAAAAAAAAW973ve973ve0AAAAAAAAAAAACqqqqoAAAAAAAAAA
+AAAAAABVVVVUAAAAAABVVVVWta1rWta1rWqqqqqoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAH+oAA4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+BVVVVUAAAAAAAAAABVVVVUAA9+/fv37AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAqqq
+qqCqqqqoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAqqqqqAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+AAAAAAAAAAAAAAABVVVVUAAAAAa+n79fH5+fl6/a+aqqmuamZiIwAdm28a1fWtNttzMxEYSWbNtv
+EReIhvhtzMxEYEnYbb6a1fWtNttz11rWu4b3vf1589vPnzve973111rWu8k/M3ve/r167evXqqri
+qmZiIwAde3p6IG28RF4iG234fHHEzPVTnihbQtoW0LaFtC2hbQtsk5znz58+/Hv3z58+c5ve973v
+e973ve973vewABmZmZmZmYAAfvMzM95mZmACqqqqoAAAAAAAAAAAAAAAAGZmZmZmZgAAAAABVVVV
+UAACqqqqoAAHv379+/YAAAAAAAP/nXnlC2hbQtoW0LbJMy2w8+fO+/Oduc5znOc/j9661rXdPecw
+MtC2hbQtoW0LaFtC2hbQtoW0LaFtC2hbYc5znfWu2ta5znOc/ffv31119yc8ULaFtC2hbQtoW0La
+FtC2hbQtoW0LaFtC2w5znO+tdta1znOc5++/fvrrr7k54oW0LaFtC2hbQtoW0LaFtC2hbQtoW0La
+FthznOd9a7a1rnOc5z99+/fXXX3JzxQtoW0LaFtC2hbQtoW0LaFtC2hbQtoW0LbDnOc76121rXOc
+5zn779++uuvuTnihbQtoW0LaFtC2hbQtoW0LaFtC2hbQtoW2HOc531rtrWuc5znP33799ddfcnPF
+C2hbQtoW0LaFtC2hbQtoW0LaFtC2hbZJrO3aw5znNffV7dddc585zn77961rvJz7oW0LaFtC2hbQ
+toW0LaFtC2hbQtoW0fHz8/Px8fHx8/Pz8VV97zm7tVXrvd3bwAAAAD/fv379+/vec3d9+/fv3799
+7u778AAAA/v5+Qqr+ff59fX5+flX7X5+ZmXgAAAAFXr15nOZmevXqq73d28AAAAAqrzOczMqqu93
+dvAAAAAKq8znMzL169evX5+ZmV9gAAAAVV5vObu35VXe7u3gAAAfPz8gVV5nOZmVVXe7u3gAB7+f
+kAA9+/fv35vObu+/fv379++93dvAA6666668883vevvXnlXngAAAAAGZmZmZmZgABfGta1rWta1r
+TYAAAAAAAAAAAAAAAAAAAAZmZmZmZmAAAAAAre973ve973tX95znOc5znOc5znAAAAAA9+/fv37A
+AAAAAAVeOuuuuuugf1/X9fz+efvOfv7+/v769evd3u7t4AAAABVXmc5mZVVd7u7eAAAAAVV/n3n1
+9ZlVV+fnd28AAAAAqrzOczMqqu93dvAAAAAKq/fvfr63dqq/PzMy8AAAAAq9evM5zMz16qrvd3bw
+AAAACqvM5zMyqq73d28AAAAAqrPvnMzKqr87u7eAAAAAVV5nOZmVVXe7u3gAAAAFVeZzmZlVV3u7
+t4AB8PgAAVV5nOZmVVXe7u3gAAAAFVeZzmZlVV3u7t4AAAABVXfvfr63dqq/PzMy8AAAAA9ev39v
+M+vrMz169equ93dvAAAAPv5+Q/arzec3dqqu93dvAAA+HwAPv/Xx/r4+BQqqA66bbfs99klttt5h
+Jfu7+BQqqADtAIh27ZmZmZmZmduc9+/f5465z58+c5ve973sAAAAGZmZmZmZgAA7+ta+ta1rWtd6
+0AAAAAAAACqqqqoAAAAAAAAAzMzMzMzMAAAAAAKqqqqv85znOc5znOc5znAAAAAA9+/fv37ACqqq
+q2qqqqgPHXXXXXXXXXXXX39/de319AH+eb3mZ54AHwAAAqr7znMzKqrvd3fqAAAAAqr7znMzKqrv
+d3fqAAAAAqr7znMzKqrvd3fqAAAAAqr7znMzKqrvd3fqAAAAAqr7znMzKqrvd3fqAAAAAqr7znMz
+Kqrvd3fqAAAAAqr7znMzKqrvd3fqAAAAAqr+vX9755u1Vbv+f536gAAAAKvXr7znMzPVVXe7u/UA
+AAABVX3nOZmVVXe7u/UAAAABVX3nOZmVVXe7u/UAAAABVX3nOZmVVXe7u/UAAAABVXr+t+vrd2qr
+8/MzPqAAAD7/18/IFXr19/n59fX5+fnqqu/mZn1AAAAB/nz81evX3vObu+vXfXqu93d+o+/n5ddd
+ddddddddeeeb3v+fzXnlXngAAAAAGZmZmZmZgABv+b3ve/e973vewAAFVVVVQAAAAAAAAAAAAAAD
+MzMzMzMwKqqqqgKqqq3vaqqqv85znOc5znOc5znAAAAAA9+/fv37AAAAAAAC8666AH9f1/X8/n3+
+85+/v7+/v7+/vu73d36gAAAAKq+85zMyqq73d36gAAAAKq+85zMyqq73d36gAAAAKq7/W/X1u7VV
++fmZn1AAAAAVevX3nOZmevXr1V3u7v1AAAABz4/vnKq+95zc2q/a73d36gP9/Hz8gAAB79+/fv73
+nN3ffv379+/fe7u/UAAAABVX3nOZmVVXe7u/UAAAABVX3nOZmVVXe7u/UAAAABVX3nOZmVVXe7u/
+UAAAABVX3nOZmVVXe7u/UAAAABVX3nOZmVVXe7u3gAAAAFVeZzmZlVV3u7t4AAAABVXmc5mZVVd7
+u7eAAAAAVV5nOZmVVXe7u3gAAAAf58fPzVXm85u7V/Ku93dvAAArze96+9eeVeeAAAAAAZmZmZmZ
+mAAGu/fvXxr1rWta/PzWgAAAAAAAAAAAAAAABVVVVUqqq7d/n5+fn5+BpvaqlVVVVAFVVVVX95zn
+Oc5znOc5znAAAAAA9+/fv37AAAAAAAD48ddddddddddddff3938/fvnP39/f39/f399353d28AAA
+AAqrzOczMqqu93dvAAAAAKq8znMzKqrvd3bwAAAACqvM5zMyqq73d28AAAAAqrzOczMqqu93dvAA
+AAAKq8znMzKqrvd3bwAAAACqvM5zMyqq73d28AAAAAqrzOczMqqu93dvAAAAAKq/v7z6+syqq/Pz
+O7eAAAAAVV5nOZmVVXe7u3gAAAAFVeZzmZlVV3u7t4AAAABVXmc5mZVVd7u7eHw+AAAAFVeZzmZl
+VV3u7t4AHw+AAAVV5nOZmVVXe7u3gAAAf58/IFVebzm7tX8q73d28AAAADv+t+Ocqv683nN3a7Vd
+7u7eAABV3vfz+vyv5/P56/n8qqqq8CqqqqpmZmZmZmYAAfVv63ve973vN7xAAAqqqqqAAAAAAAAA
+AAAAAAZmZmZmZmAAAAAAFVVVve9/5wAOc5zgAAAAAe/fv379gAAAAAAB4666666666666+/v7r2+
+voA/zzvd3bwAAAACqvM5zMyqq73d28AAAAAqrzOczMqqu93dvAAAAAKq8znMzKqrvd3bwA78fPyA
+AAVX35nOZmVVXe7u3gAAAAFVeZzmZlVV3u7t4AH++uru7u7u7u7v111dyST8+F69LikkkS5zj93d
+gAAACr168znMzPXqqu93dvAAAAAKq8znMzKqrvd3bwAAAACqvM5zMyqq73d28Ph8AAAAKq8znMzK
+qrvd3bwAAAACqvM5zMyqq73d28AAAAD+/n5qrzec3dqv2u93dvAAAu7u7u7uDrq7kkns99kmSSSZ
+hJfu7u7u7AAP8znA8+fmqvPznPz/Pyu/yrvd3bwD38/J8/PyAAGnz8+/fv378/Oc/Pz89+8kkzCS
+/d3d3d3d3d3dtvMxfKb888b3d3dAAAAAzMzMzMzMAALPvX61rWv3rWtabAAAAAAAAAAAAAAAAAAA
+ADMzMzM777CqqgAAACqqqqr+85znOc5znOc5zgAAAAA9evXr0ABVVVVUAAA8ddddddddddddff39
+17fX0Af55veZl4AAAAf7+fk9+/fv35vObu+/fv379++93dvAAAAAKq8znMzKqrvd3bwAAAACqvM5
+zMyqq73d28AAAAAqrzOczMqqu93dvAAAAAKq8znMzKqrvd3bwAAAACqvM5zMyqq73d28AAAAAvXr
+1eZ9fWZlVV3u7t4AAAABeqvM5zMyqq73d28AAAAAqrzOczMqqu93dvAAAAAKq8znMzKqrvd3bwAA
+AACqvM5zMyqq73d28AAAAAqrzOczMqqu93dvPh8AAAACqvM5zMyqq73d28AAAAAqrzOczMqqu93d
+vAPh8AAAP8/p8c5VXn5zn5+flX8q73d28P8/Xz8ffXx555v97+/5rzyrzwABVVVVUA1rWta1rWta
+0AAer671r9a1rX5rXemwqqqqqAAAAAAAAAAAAFVVVVQADMzMzMzMwAAAAAAqqqqq/vOc5znOc5zn
+Oc4AAAAVVevXr16qqqAAAAAAPPn5/f7/e9nfe7u7u7HmElgANtvnO++c42228wksAQGZzmZgDvba
+kkBmc5mYA722pJAfq37+7aBu5mJJPff3+2Z9/eZnvvod7bUkn7DM5zMwB3ttSSAzOczMAd7bUkgM
+znMzAHe21JIDM5zMwB3tteeefx9At5y2h+zvbakkBmc5mYA722pJAZnOZmAO9tqSQGZzmZgDvbak
+kBmc5mY999993czDzzz8z4Dvec73r9P1+ze8zPPj318/Pnnm971/NeeVeeAACqqqqoGta1rWta1r
+WgAD9fx63+et739b973vW9lVVVAAAVVVVVAAAAKqqqraqqqqAAq3ve97/HffbMzMwAAAAAAqqqqq
+/znOc5znOc5znOcAAAAAHr169egAAAAAAAefPz+/38Zm733u7u7ux5hJYADbb5zvvnONttvMJqSQ
+GZzmZgDvbakkBmc5mYA722pJAfu37+7aBu5mJJB77mc5mZ76DvbakkBmc5mYA722pJAZnOZmAO9t
+qSR776zPv7zMAd7bUkj0ZnOZmAO9tqSQHtv3920DdzMSSfoHu79/e7oLfz8/Ekge+285bfQbuZjz
+zz/T6A/nectoG7mYwK+7AbbbS77STfjbS5zjqq+KAoVVAfxYQAkC9LCQhAvr5X303ve97bvdt73v
+e/eZ1rvz5+PjnOb3vWtc5VzwAAAAADWta1rWta1rQABret9b3ve973vZAAAAAAAAAAAAAAAAAAAA
+DMzMzMzMwK3ve973ve97UAAKqqqqv9Oc5znOc5znOc5wAAAABfX19PQAAAAAAAPPn5+/v7+97O+9
+3d3djS5zjAAbbbJ77JLbbaXOcYAH+ZJJPtL16XtSSSJc+4AA223znffGW221uZiSQC3nLaBu5mJJ
+ALectoG7mYkkAt5y2gbuZiSQDL9c5bQN/Pz8SSB77jnLaBu5mJJALectoG7mYkkAt5y2gbuZiSQC
+3nLaBu5mJJAPd316STbbJ+/v7YqpYkkbS77STkkiXOcYFfn1IBu85u6fobuZjzzy/QG7zm7unnnm
+td99+fH76+fnnOb3v71rnKueAAAAAAzMzMzMzMAAF9a1rWta1r81psAAAAAAAAAAAAAAAAAAAAd9
+999999999gAAAAACqqqqr+85znOc5znOc5zgAAAAA9evXr0AAAAAAADz5r5+fn5zN3vvd3d3Y0uc
+4wAG22ye+yS222tzMSSAW85bQN3MxJIBbzltA3czEkgFvOW0DdzMSSAd3fv73dBb+fn4kkD323nL
+b7776buZiSQC3nLaBu5mJJALectoG7mYkkAt5y2gbuZiSQC3nLaBu5mPPPM+gN3nN3XQ3czE88/p
+YkkkS77SUkkiXOcYADbbZPfZJbbb3czEkgFvOW0DdzMeeefn7/jh9jve3b37985vnOddevXrj7yT
+nOc+fPn57985ve+b3ve973ve9gAAAZmZmZmZmAAB9a1rWta1r81rQAAAAAAAAAAAAAAAAAAAAZmZ
+mZmZmVve973ve972oAAAqqqqq/vOc5znOc5znOc4AAAAAPXr169AAAAAAA3ve975J48ePHve7ve9
+73vf8c661rWuBznOc1q61rQG7bakkB/FvL92gbtzEkgMz5i0DdttSSAt+W2gbttqSQFvy20DdttS
+SAt+W2gbttqSQFvy20DdttSSAlttoFttqSQFvy20DdttSSAt+W2gbttqSQHu7zd3QW5nOOqrBbbb
+S6SSeNtpEksVX6FiSSJdJJSSSJEksCt+l2A37bzOszMeNtpEktJaSASElzYSEhLpYBJIASJskhKS
+SO2SQhEfXOc78/fnzt8+e/nN75zWvXr1648s+fnzzzy/flXgeAAAAAAZmZmZmZmAAD8/WZ9ZmZmZ
+3gAAAAAAAAAAAAAAAAAAAqqu+++2ZmZmKqqqqgCqqqq2qqqqv7znOc5znOc5znOAAAAAD169evQA
+AAAAAALz4+uvn4/n8/n8vt+t3d3fNjSJJYrlig229+sz1mZ8N62TznGJIHuZ8zM9999G7ba888z6
+Bu/N3dP0N221JIC35baBu22vPPLPo99bvaSTxttIkliq/VoXI5OZneesyZJIkecSSA/lmcxQLczN
+SSAt+W2gbttqSQFvy20DdttSSD1by20DdtteeTPryD235bb6fod7u7qCuCxLVySZnWZmSZskzEkn
+Q4LsWKuxYsNtk9Ektvxt5iSTA4Lq6u7q7ugAKoJDsyISIdYQiAZkREI1gqhVUBQr8sCgKoV7EvwX
+Pcm71u+bPzN/JMxJJgDlioLnfXUkS6SSknkkzEknQDb0V5VeVVVcAAAAMzMzMzMzAAB+fmZ9fWZm
+ZmYAAAAAAAAAAAAAAAAAAACqu+++++2ZmYAAAAAAKqqqqv7znOc5znOc5znOAAAAAD169evQAAAA
+AAAPPn4/XXx9/f3s/QD9fv/V3u7upJAzPmZmAO93d1JIGZ8zMwB3u7upJA/dvLbQN22155Xgttsn
+oklvG28xJJiq/ViSQnokmSSSZiSTFVLEkhPRJMkkkzEknVUauSSJdJJSeSSZiSUqqNttk9Ekt423
+mJJMVUsSSfiXaSUkkiRJLFVLEkZPRJLckkzEknVUbbbJ6JJbxtvMSSdVREkhCfWJJCJNZERHMkEJ
+HWII3iSISfmREkhGYSSQQ75EkkkPrAhE5kCR3wkkk3kIRmSJJEnvBEQXCQJO2CET1Bz5nx9b1vnm
+zzz8/JMxJJy7F2ALuxd1V2AAKFACqAu/jqSQ/HRJMkkkzEkpAKS6HdiSTM6zMyTdkmYkk6qvvs/d
++m2/PPO/PF435555rWZmefPx8eeeVVXA4AAAAABmZmZmZmYAAP58a1rWta1rWtCqAAAAAAAAAAAA
+AAAAAAAHffffffffffYAAAAAA/tb3ve973ve+crgAAAAAAA9evXr0AAAAAAAD78+fn6+vrN3rd3T
+u7seYkk6A/V1UkhPRJMkkk73d3UkgZnzMzAHe7u6kkD8z5mZgDe7u68nz688ge28twC3MxEkg9/M
++ZmZ6Bvd3dSefPqQMz5mfmAO93d1JIGZ8zMwB3u7up5P5fXkv0D+e83d10N221JIPfzPr5mZgDtt
+qSQe/j5mZgDvd3dSSBmfMzMAeYkkwAG2+c65znG223mJJMVUsSSE9EkySSTMSSYFEXXLbb8zO8zM
+b1/jSJMdhL829fb7N+bdfH/F3JFOFCQFNIyHAA==
+--=-=-=
+Content-Type: text/plain
+
+
+
 >
 > Signed-off-by: Bulent Abali <abali@us.ibm.com>
 > Signed-off-by: Raphael Moreira Zinsly <rzinsly@linux.ibm.com>
@@ -323,23 +686,6 @@ Raphael Moreira Zinsly <rzinsly@linux.ibm.com> writes:
 > +
 > +	NXPRT(fprintf(stderr, "nx_touch_pages_dde dde_count %d request len \
 > +			0x%lx\n", indirect_count, buf_sz));
-You use \ to break a string into multiple lines throughout this test
-case.
-
-It leads to things like this being printed:
-
-ERR_NX_DATA_LENGTH; not an error                              usually; stream may have trailing data
-
-Notice the big chunk of whitespace in the middle.
-
-Could you use this instead please:
-
-+	NXPRT(fprintf(stderr, "nx_touch_pages_dde dde_count %d request len "
-+			"0x%lx\n", indirect_count, buf_sz));
-
-Regards,
-Daniel
-
 > +
 > +	if (indirect_count == 0) {
 > +		/* Direct dde */
@@ -1191,3 +1537,5 @@ Daniel
 > +}
 > -- 
 > 2.21.0
+
+--=-=-=--
