@@ -7,61 +7,62 @@ X-Spam-Status: No, score=-11.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87858C4332B
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Mar 2020 22:19:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFB12C4332B
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Mar 2020 22:29:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 34B9A20714
-	for <linux-crypto@archiver.kernel.org>; Wed, 18 Mar 2020 22:19:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D1E420754
+	for <linux-crypto@archiver.kernel.org>; Wed, 18 Mar 2020 22:29:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=axtens.net header.i=@axtens.net header.b="cYSpoLnJ"
+	dkim=pass (1024-bit key) header.d=axtens.net header.i=@axtens.net header.b="SaOQY3Zi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726817AbgCRWTn (ORCPT
+        id S1726913AbgCRW3p (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 18 Mar 2020 18:19:43 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:41883 "EHLO
-        mail-pl1-f196.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726663AbgCRWTn (ORCPT
+        Wed, 18 Mar 2020 18:29:45 -0400
+Received: from mail-pj1-f66.google.com ([209.85.216.66]:51477 "EHLO
+        mail-pj1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726663AbgCRW3o (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 18 Mar 2020 18:19:43 -0400
-Received: by mail-pl1-f196.google.com with SMTP id t16so113865plr.8
-        for <linux-crypto@vger.kernel.org>; Wed, 18 Mar 2020 15:19:38 -0700 (PDT)
+        Wed, 18 Mar 2020 18:29:44 -0400
+Received: by mail-pj1-f66.google.com with SMTP id hg10so68814pjb.1
+        for <linux-crypto@vger.kernel.org>; Wed, 18 Mar 2020 15:29:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=axtens.net; s=google;
         h=from:to:cc:subject:in-reply-to:references:date:message-id
          :mime-version;
-        bh=MbdsyHZLo0xCPBbl37zduZvYpC+0bfTvLGPp8eHdNdQ=;
-        b=cYSpoLnJA97qeW0FacUOp5jdgbJHLl7RBjkY3FQd4M3jmhndJll66AQn1JjGn0z1wP
-         v+NmKOAlQDbigG2V5+LKddMqUSSPJzEStSKgJ6kXy/I9G926yye3xk8+1EtP7P8poQW1
-         IbG/rOS+OcZV4IYlcrVaw0RMpZOZKbTLE/kyM=
+        bh=MAzsdjmQhjaOVYcxw+UOykxk2qmTtErS2Jij0krbIJk=;
+        b=SaOQY3ZiKknnLmW8szYtiXVNA7Uo4g4d/EsH5gQvHKKmkHrEcpRt1KoB35hpFV0vrN
+         yYu7/AtNPs8gLsEXlRc9OeMmulSf2zKax73fLI0cy9w/14wmeS2TgtvFvKxpVB0JSrsr
+         m+YGIhNOwD49jw62KsBiu+3ZDIiWQnQ8LwuMQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
          :message-id:mime-version;
-        bh=MbdsyHZLo0xCPBbl37zduZvYpC+0bfTvLGPp8eHdNdQ=;
-        b=Jo9WBQRXUWD3N2i0Z2cP/lHlYbDnWqhJ/z+9iYkMxIGLWyXb+wPmRrQCTHhaQlRK7a
-         qlEm0A7DW2uL0tzqgmz6wAoa0+IQ42FQX5rkOQVusswFdxULQoec0A2AHq6faW502ZRD
-         Fun3e8mvzHHYM/8CTQPYsD16qQfRNBVKCeGzZGJhja5FsuQROBR58g3KE46jCoun30vi
-         FzbXP2eW0es4Ydg60438TOTLf1upgQid22d745wsKb8f9wtrbuHxof6xO30t6E2YtA/c
-         SNvj408ZFuIB1binLbYLCQJaV7OTk8oVCGaNJw+elqfySbb+wTQYKRUHGxfY/m5mBOXP
-         l0zA==
-X-Gm-Message-State: ANhLgQ1R9nRDm7COTeDDr4dGl74ikeCCDPtNUViGolol95Bh8Cf7IMSy
-        zybAE8HZS0yme3vk66bjsAy9Wg==
-X-Google-Smtp-Source: ADFU+vsaZBXPcCZJyK6M8ekObKFgIOd0LuUrp/P5AVMFoNstzuBp8b2o+EPPBPNOGEKzOzsZmikPxw==
-X-Received: by 2002:a17:902:9a98:: with SMTP id w24mr424124plp.40.1584569977767;
-        Wed, 18 Mar 2020 15:19:37 -0700 (PDT)
+        bh=MAzsdjmQhjaOVYcxw+UOykxk2qmTtErS2Jij0krbIJk=;
+        b=AqHGGkGXBKjrXthNzpX770fD9COcYS1u+Z7I7F6L7D7iCa+rG18dkRwzW4Poi8OtTm
+         3GbnECH9gfA82lQpdYhwU2HcU5AvnnsYhZTbIbb8ObOhTMZNK3BGbNtBHvDdF0U/MceL
+         nompZNgqNw/zIdQS1ITUcc6vRSlHxW0hjKmEBQT0u4M+BqA4Rp8RehmLAlwzaLqHYahW
+         2oNeTHPdYgpBteLbvtI6JIdduPfLtd0u8TyN4JeHG8wuZ2o3znhOdqSQWoqaue8aEyBe
+         urHfJ9Xiky8NHc42SonOIaS/bSyNFgUmKtm6zd3t3S8MkYNt0OS7YhtftPApzzOQIyu2
+         /HWg==
+X-Gm-Message-State: ANhLgQ0iZzF4qWISzZtvmFUl9WV4gLm2B+H1nAuAF0bCDLJ9G5sF8PDK
+        jPBkyLs8yOIAuK81Sr9D15h9aQ==
+X-Google-Smtp-Source: ADFU+vvPKZEzFEEbxUvDrDld238Rb2bBAXthSR2r5gIiN3R7/0Qc0rRdau697G/2EiCa4j3aCtDIFA==
+X-Received: by 2002:a17:902:8bc8:: with SMTP id r8mr449817plo.48.1584570581866;
+        Wed, 18 Mar 2020 15:29:41 -0700 (PDT)
 Received: from localhost (2001-44b8-111e-5c00-d960-12d9-4a9d-f47f.static.ipv6.internode.on.net. [2001:44b8:111e:5c00:d960:12d9:4a9d:f47f])
-        by smtp.gmail.com with ESMTPSA id f69sm50637pfa.124.2020.03.18.15.19.36
+        by smtp.gmail.com with ESMTPSA id g75sm22956pje.37.2020.03.18.15.29.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Mar 2020 15:19:36 -0700 (PDT)
+        Wed, 18 Mar 2020 15:29:41 -0700 (PDT)
 From:   Daniel Axtens <dja@axtens.net>
-To:     Raphael M Zinsly <rzinsly@linux.ibm.com>,
+To:     Raphael Moreira Zinsly <rzinsly@linux.ibm.com>,
         linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org
-Cc:     haren@linux.ibm.com, herbert@gondor.apana.org.au, abali@us.ibm.com
-Subject: Re: [PATCH 4/5] selftests/powerpc: Add NX-GZIP engine decompress testcase
-In-Reply-To: <016517d3-b341-172c-dc53-7c3351c93aa7@linux.ibm.com>
-References: <20200316180714.18631-1-rzinsly@linux.ibm.com> <20200316180714.18631-5-rzinsly@linux.ibm.com> <877dzinq30.fsf@dja-thinkpad.axtens.net> <016517d3-b341-172c-dc53-7c3351c93aa7@linux.ibm.com>
-Date:   Thu, 19 Mar 2020 09:19:33 +1100
-Message-ID: <87tv2lmhl6.fsf@dja-thinkpad.axtens.net>
+Cc:     Raphael Moreira Zinsly <rzinsly@linux.ibm.com>,
+        haren@linux.ibm.com, herbert@gondor.apana.org.au, abali@us.ibm.com
+Subject: Re: [PATCH 2/5] selftests/powerpc: Add header files for NX compresion/decompression
+In-Reply-To: <20200316180714.18631-3-rzinsly@linux.ibm.com>
+References: <20200316180714.18631-1-rzinsly@linux.ibm.com> <20200316180714.18631-3-rzinsly@linux.ibm.com>
+Date:   Thu, 19 Mar 2020 09:29:37 +1100
+Message-ID: <87r1xpmh4e.fsf@dja-thinkpad.axtens.net>
 MIME-Version: 1.0
 Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
@@ -69,1210 +70,847 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Raphael M Zinsly <rzinsly@linux.ibm.com> writes:
+Raphael Moreira Zinsly <rzinsly@linux.ibm.com> writes:
 
-> Thanks for the reviews Daniel, I'll use your testcases and address the 
-> issues you found, I still have some questions bellow:
+> Add files to be able to compress and decompress files using the
+> powerpc NX-GZIP engine.
 >
-> On 18/03/2020 03:18, Daniel Axtens wrote:
->> Raphael Moreira Zinsly <rzinsly@linux.ibm.com> writes:
->> 
->>> Include a decompression testcase for the powerpc NX-GZIP
->>> engine.
->> 
->> I compiled gzip with the AFL++ fuzzer and generated a corpus of tests to
->> run against this decompressor. I also fuzzed the decompressor
->> directly. I found a few issues. I _think_ they're just in the userspace
->> but I'm a bit too early in the process to know.
->> 
->> I realise this is self-test code but:
->> a) it stops me testing more deeply, and
-> I don't understand what do you mean by that, what did you couldn't test?
+> Signed-off-by: Bulent Abali <abali@us.ibm.com>
+> Signed-off-by: Raphael Moreira Zinsly <rzinsly@linux.ibm.com>
+> ---
+>  .../powerpc/nx-gzip/inc/copy-paste.h          |  54 ++
+>  .../selftests/powerpc/nx-gzip/inc/nx_dbg.h    |  95 +++
+>  .../selftests/powerpc/nx-gzip/inc/nxu.h       | 644 ++++++++++++++++++
+>  3 files changed, 793 insertions(+)
+>  create mode 100644 tools/testing/selftests/powerpc/nx-gzip/inc/copy-paste.h
+>  create mode 100644 tools/testing/selftests/powerpc/nx-gzip/inc/nx_dbg.h
+>  create mode 100644 tools/testing/selftests/powerpc/nx-gzip/inc/nxu.h
+>
+> diff --git a/tools/testing/selftests/powerpc/nx-gzip/inc/copy-paste.h b/tools/testing/selftests/powerpc/nx-gzip/inc/copy-paste.h
+> new file mode 100644
+> index 000000000000..107139b6c7df
+> --- /dev/null
+> +++ b/tools/testing/selftests/powerpc/nx-gzip/inc/copy-paste.h
+> @@ -0,0 +1,54 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later */
+> +
+> +#include "nx-helpers.h"
+> +
+> +/*
+> + * Macros taken from arch/powerpc/include/asm/ppc-opcode.h and other
+> + * header files.
+> + */
+> +#define ___PPC_RA(a)    (((a) & 0x1f) << 16)
+> +#define ___PPC_RB(b)    (((b) & 0x1f) << 11)
+> +
+> +#define PPC_INST_COPY                   0x7c20060c
+> +#define PPC_INST_PASTE                  0x7c20070d
+> +
+> +#define PPC_COPY(a, b)          stringify_in_c(.long PPC_INST_COPY | \
+> +						___PPC_RA(a) | ___PPC_RB(b))
+> +#define PPC_PASTE(a, b)         stringify_in_c(.long PPC_INST_PASTE | \
+> +						___PPC_RA(a) | ___PPC_RB(b))
+> +#define CR0_SHIFT	28
+> +#define CR0_MASK	0xF
+> +/*
+> + * Copy/paste instructions:
+> + *
+> + *	copy RA,RB
+> + *		Copy contents of address (RA) + effective_address(RB)
+> + *		to internal copy-buffer.
+> + *
+> + *	paste RA,RB
+> + *		Paste contents of internal copy-buffer to the address
+> + *		(RA) + effective_address(RB)
+> + */
+> +static inline int vas_copy(void *crb, int offset)
+> +{
+> +	asm volatile(PPC_COPY(%0, %1)";"
+> +		:
+> +		: "b" (offset), "b" (crb)
+> +		: "memory");
+> +
+> +	return 0;
+> +}
+> +
+> +static inline int vas_paste(void *paste_address, int offset)
+> +{
+> +	u32 cr;
+> +
+> +	cr = 0;
+> +	asm volatile(PPC_PASTE(%1, %2)";"
+> +		"mfocrf %0, 0x80;"
+> +		: "=r" (cr)
+> +		: "b" (offset), "b" (paste_address)
+> +		: "memory", "cr0");
+> +
+> +	return (cr >> CR0_SHIFT) & CR0_MASK;
+> +}
+> diff --git a/tools/testing/selftests/powerpc/nx-gzip/inc/nx_dbg.h b/tools/testing/selftests/powerpc/nx-gzip/inc/nx_dbg.h
+> new file mode 100644
+> index 000000000000..f2c0eee2317e
+> --- /dev/null
+> +++ b/tools/testing/selftests/powerpc/nx-gzip/inc/nx_dbg.h
+> @@ -0,0 +1,95 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later
+> + *
+> + * Copyright 2020 IBM Corporation
+> + *
+> + */
+> +
+> +#ifndef _NXU_DBG_H_
+> +#define _NXU_DBG_H_
+> +
+> +#include <sys/file.h>
+> +#include <stdint.h>
+> +#include <stdio.h>
+> +#include <time.h>
+> +#include <pthread.h>
+> +
+> +extern FILE * nx_gzip_log;
+> +extern int nx_gzip_trace;
+> +extern unsigned int nx_gzip_inflate_impl;
+> +extern unsigned int nx_gzip_deflate_impl;
+> +extern unsigned int nx_gzip_inflate_flags;
+> +extern unsigned int nx_gzip_deflate_flags;
+> +
+> +extern int nx_dbg;
+> +pthread_mutex_t mutex_log;
+> +
+> +#define nx_gzip_trace_enabled()       (nx_gzip_trace & 0x1)
+> +#define nx_gzip_hw_trace_enabled()    (nx_gzip_trace & 0x2)
+> +#define nx_gzip_sw_trace_enabled()    (nx_gzip_trace & 0x4)
+> +#define nx_gzip_gather_statistics()   (nx_gzip_trace & 0x8)
+> +#define nx_gzip_per_stream_stat()     (nx_gzip_trace & 0x10)
+> +
+> +#define prt(fmt, ...) do { \
+> +	pthread_mutex_lock(&mutex_log);					\
+> +	flock(nx_gzip_log->_fileno, LOCK_EX);				\
+> +	time_t t; struct tm *m; time(&t); m = localtime(&t);		\
+> +	fprintf(nx_gzip_log, "[%04d/%02d/%02d %02d:%02d:%02d] "		\
+> +		"pid %d: " fmt,	\
+> +		(int)m->tm_year + 1900, (int)m->tm_mon+1, (int)m->tm_mday, \
+> +		(int)m->tm_hour, (int)m->tm_min, (int)m->tm_sec,	\
+> +		(int)getpid(), ## __VA_ARGS__);				\
+> +	fflush(nx_gzip_log);						\
+> +	flock(nx_gzip_log->_fileno, LOCK_UN);				\
+> +	pthread_mutex_unlock(&mutex_log);				\
+> +} while (0)
+> +
+> +/* Use in case of an error */
+> +#define prt_err(fmt, ...) do { if (nx_dbg >= 0) {			\
+> +	prt("%s:%u: Error: "fmt,					\
+> +		__FILE__, __LINE__, ## __VA_ARGS__);			\
+> +}} while (0)
+> +
+> +/* Use in case of an warning */
+> +#define prt_warn(fmt, ...) do {	if (nx_dbg >= 1) {			\
+> +	prt("%s:%u: Warning: "fmt,					\
+> +		__FILE__, __LINE__, ## __VA_ARGS__);			\
+> +}} while (0)
+> +
+> +/* Informational printouts */
+> +#define prt_info(fmt, ...) do {	if (nx_dbg >= 2) {			\
+> +	prt("Info: "fmt, ## __VA_ARGS__);				\
+> +}} while (0)
+> +
+> +/* Trace zlib wrapper code */
+> +#define prt_trace(fmt, ...) do { if (nx_gzip_trace_enabled()) {		\
+> +	prt("### "fmt, ## __VA_ARGS__);					\
+> +}} while (0)
+> +
+> +/* Trace statistics */
+> +#define prt_stat(fmt, ...) do {	if (nx_gzip_gather_statistics()) {	\
+> +	prt("### "fmt, ## __VA_ARGS__);					\
+> +}} while (0)
+> +
+> +/* Trace zlib hardware implementation */
+> +#define hw_trace(fmt, ...) do {						\
+> +		if (nx_gzip_hw_trace_enabled())				\
+> +			fprintf(nx_gzip_log, "hhh " fmt, ## __VA_ARGS__); \
+> +	} while (0)
+> +
+> +/* Trace zlib software implementation */
+> +#define sw_trace(fmt, ...) do {						\
+> +		if (nx_gzip_sw_trace_enabled())				\
+> +			fprintf(nx_gzip_log, "sss " fmt, ## __VA_ARGS__); \
+> +	} while (0)
+> +
+> +
+> +/**
+> + * str_to_num - Convert string into number and copy with endings like
+> + *              KiB for kilobyte
+> + *              MiB for megabyte
+> + *              GiB for gigabyte
+> + */
+> +uint64_t str_to_num(char *str);
+> +void nx_lib_debug(int onoff);
+> +
+> +#endif	/* _NXU_DBG_H_ */
+> diff --git a/tools/testing/selftests/powerpc/nx-gzip/inc/nxu.h b/tools/testing/selftests/powerpc/nx-gzip/inc/nxu.h
+> new file mode 100644
+> index 000000000000..faa95ffc162a
+> --- /dev/null
+> +++ b/tools/testing/selftests/powerpc/nx-gzip/inc/nxu.h
+> @@ -0,0 +1,644 @@
+> +/* SPDX-License-Identifier: GPL-2.0-or-later
+> + *
+> + * Hardware interface of the NX-GZIP compression accelerator
+> + *
+> + * Copyright (C) IBM Corporation, 2020
+> + *
+> + * Author: Bulent Abali <abali@us.ibm.com>
+> + *
+> + */
+> +
+> +#ifndef _NXU_H
+> +#define _NXU_H
+> +
+> +#include <stdint.h>
+> +#include <endian.h>
+> +
+> +/* deflate */
+> +#define LLSZ   286
+> +#define DSZ    30
+> +
+> +/* nx */
+> +#define DHTSZ  18
+> +#define DHT_MAXSZ 288
+> +#define MAX_DDE_COUNT 256
+> +
+> +/* util */
+> +#ifdef NXDBG
+> +#define NXPRT(X) do { X; } while (0)
+> +#else
+> +#define NXPRT(X) do { ; } while (0)
+> +#endif
+> +
+> +#ifdef NXTIMER
+> +#include <sys/platform/ppc.h>
+> +#define NX_CLK(X)      do { X; } while (0)
+> +#define nx_get_time()  __ppc_get_timebase()
+> +#define nx_get_freq()  __ppc_get_timebase_freq()
+> +#else
+> +#define NX_CLK(X)      do { ; } while (0)
+> +#define nx_get_time()  (-1)
+> +#define nx_get_freq()  (-1)
+> +#endif
+> +
+> +/*
+> + * Definitions of acronyms used here. See
+> + * P9 NX Gzip Accelerator User's Manual for details
+> + *
 
-I'm trying to stress-test the accellerator by fuzzing it. If it hangs
-with an infinite loop rather than cleanly exiting, that inhibits my
-ability to stress-test it.
+If I google "P9 NX Gzip Accelerator User's Manual" I just find the
+POWER9 Processor User's Manual which seems to be a different
+thing... following the links in that document to a GitHub repo I think
+the document I'm looking for is
 
->> b) it looks like some of this code is shared with https://github.com/libnxz/power-gzip/
-> Is that an issue?
-> This selftest were develop by the same team that develop the userspace 
-> library, the first version of this tests were pushed there in order for
-> the team to review. It uses some of the headers of the library to access 
-> the accelerator and part of the code in the samples.
+https://github.com/abalib/power-gzip/blob/master/power_nx_gzip_um.pdf
 
-What I mean is that if there's a bug in code we copied, we should also
-report it to the developers of the library so that it gets fixed in both
-places.
+If that's right and the URL isstable, could you include a link in source
+code? (Should perhaps the power-gzip repository be moved from a personal
+github account to the open-power organisation?)
 
 Regards,
 Daniel
 
-> Regards,
-> Raphael
->
->> 
->> The issues I've found are:
->> 
->> 1) In the ERR_NX_DATA_LENGTH case, the decompressor doesn't check that
->>     you're making forward progress, so you can provoke it into an
->>     infinite loop.
->> 
->> Here's an _extremely_ ugly fix:
->> 
->> diff --git a/tools/testing/selftests/powerpc/nx-gzip/gunz_test.c b/tools/testing/selftests/powerpc/nx-gzip/gunz_test.c
->> index 653de92698cc..236a1f567656 100644
->> --- a/tools/testing/selftests/powerpc/nx-gzip/gunz_test.c
->> +++ b/tools/testing/selftests/powerpc/nx-gzip/gunz_test.c
->> @@ -343,6 +343,8 @@ int decompress_file(int argc, char **argv, void *devhandle)
->>          nx_dde_t dde_out[6] __attribute__((aligned (128)));
->>          int pgfault_retries;
->>   
->> +       int last_first_used = 0;
->> +
->>          /* when using mmap'ed files */
->>          off_t input_file_offset;
->>   
->> @@ -642,6 +644,11 @@ int decompress_file(int argc, char **argv, void *devhandle)
->>          first_used = fifo_used_first_bytes(cur_in, used_in, fifo_in_len);
->>          last_used = fifo_used_last_bytes(cur_in, used_in, fifo_in_len);
->>   
->> +       if (first_used > 0 && last_first_used > 0) {
->> +               assert(first_used != last_first_used);
->> +       }
->> +       last_first_used = first_used;
->> +
->>          if (first_used > 0)
->>                  nx_append_dde(ddl_in, fifo_in + cur_in, first_used);
->>   
->> 
->> 2) It looks like you can provoke an out-of-bounds write. I've seen both
->> infinte loops printing something that seems to come from the file
->> content like:
->> 
->> 57201: Got signal 11 si_code 3, si_addr 0xcacacacacacacac8
->> 
->> or a less bizzare address like
->> 
->> 19285: Got signal 11 si_code 1, si_addr 0x7fffcf1b0000
->> 
->> Depending on the build I've also seen the stack smasher protection fire.
->> 
->> I don't understand the code well enough to figure out how this comes to
->> be just yet.
->> 
->> I've included a few test cases as attachments. I've preconverted them
->> with xxd to avoid anything that might flag suspicious gzip files!
->> Decompress them then use `xxd -r attachment testcase.gz` to convert them
->> back.
->> 
->> Regards,
->> Daniel
->> 
->> 
->> 
->> 
->>>
->>> Signed-off-by: Bulent Abali <abali@us.ibm.com>
->>> Signed-off-by: Raphael Moreira Zinsly <rzinsly@linux.ibm.com>
->>> ---
->>>   .../selftests/powerpc/nx-gzip/Makefile        |    7 +-
->>>   .../selftests/powerpc/nx-gzip/gunz_test.c     | 1058 +++++++++++++++++
->>>   2 files changed, 1062 insertions(+), 3 deletions(-)
->>>   create mode 100644 tools/testing/selftests/powerpc/nx-gzip/gunz_test.c
->>>
->>> diff --git a/tools/testing/selftests/powerpc/nx-gzip/Makefile b/tools/testing/selftests/powerpc/nx-gzip/Makefile
->>> index ab903f63bbbd..82abc19a49a0 100644
->>> --- a/tools/testing/selftests/powerpc/nx-gzip/Makefile
->>> +++ b/tools/testing/selftests/powerpc/nx-gzip/Makefile
->>> @@ -1,9 +1,9 @@
->>>   CC = gcc
->>>   CFLAGS = -O3
->>>   INC = ./inc
->>> -SRC = gzfht_test.c
->>> +SRC = gzfht_test.c gunz_test.c
->>>   OBJ = $(SRC:.c=.o)
->>> -TESTS = gzfht_test
->>> +TESTS = gzfht_test gunz_test
->>>   EXTRA_SOURCES = gzip_vas.c
->>>   
->>>   all:	$(TESTS)
->>> @@ -16,6 +16,7 @@ $(TESTS): $(OBJ)
->>>   
->>>   run_tests: $(TESTS)
->>>   	./gzfht_test gzip_vas.c
->>> +	./gunz_test gzip_vas.c.nx.gz
->>>   
->>>   clean:
->>> -	rm -f $(TESTS) *.o *~ *.gz
->>> +	rm -f $(TESTS) *.o *~ *.gz *.gunzip
->>> diff --git a/tools/testing/selftests/powerpc/nx-gzip/gunz_test.c b/tools/testing/selftests/powerpc/nx-gzip/gunz_test.c
->>> new file mode 100644
->>> index 000000000000..653de92698cc
->>> --- /dev/null
->>> +++ b/tools/testing/selftests/powerpc/nx-gzip/gunz_test.c
->>> @@ -0,0 +1,1058 @@
->>> +/* SPDX-License-Identifier: GPL-2.0-or-later
->>> + *
->>> + * P9 gunzip sample code for demonstrating the P9 NX hardware
->>> + * interface.  Not intended for productive uses or for performance or
->>> + * compression ratio measurements.  Note also that /dev/crypto/gzip,
->>> + * VAS and skiboot support are required
->>> + *
->>> + * Copyright 2020 IBM Corp.
->>> + *
->>> + * Author: Bulent Abali <abali@us.ibm.com>
->>> + *
->>> + * https://github.com/libnxz/power-gzip for zlib api and other utils
->>> + * Definitions of acronyms used here.  See
->>> + * P9 NX Gzip Accelerator User's Manual for details
->>> + *
->>> + * adler/crc: 32 bit checksums appended to stream tail
->>> + * ce:       completion extension
->>> + * cpb:      coprocessor parameter block (metadata)
->>> + * crb:      coprocessor request block (command)
->>> + * csb:      coprocessor status block (status)
->>> + * dht:      dynamic huffman table
->>> + * dde:      data descriptor element (address, length)
->>> + * ddl:      list of ddes
->>> + * dh/fh:    dynamic and fixed huffman types
->>> + * fc:       coprocessor function code
->>> + * histlen:  history/dictionary length
->>> + * history:  sliding window of up to 32KB of data
->>> + * lzcount:  Deflate LZ symbol counts
->>> + * rembytecnt: remaining byte count
->>> + * sfbt:     source final block type; last block's type during decomp
->>> + * spbc:     source processed byte count
->>> + * subc:     source unprocessed bit count
->>> + * tebc:     target ending bit count; valid bits in the last byte
->>> + * tpbc:     target processed byte count
->>> + * vas:      virtual accelerator switch; the user mode interface
->>> + */
->>> +
->>> +#include <stdio.h>
->>> +#include <stdlib.h>
->>> +#include <string.h>
->>> +#include <unistd.h>
->>> +#include <stdint.h>
->>> +#include <sys/types.h>
->>> +#include <sys/stat.h>
->>> +#include <sys/time.h>
->>> +#include <sys/fcntl.h>
->>> +#include <sys/mman.h>
->>> +#include <endian.h>
->>> +#include <bits/endian.h>
->>> +#include <sys/ioctl.h>
->>> +#include <assert.h>
->>> +#include <errno.h>
->>> +#include <signal.h>
->>> +#include "nxu.h"
->>> +#include "nx.h"
->>> +
->>> +int nx_dbg = 0;
->>> +FILE *nx_gzip_log = NULL;
->>> +
->>> +#define NX_MIN(X, Y) (((X) < (Y))?(X):(Y))
->>> +#define NX_MAX(X, Y) (((X) > (Y))?(X):(Y))
->>> +
->>> +#define mb()     asm volatile("sync" ::: "memory")
->>> +#define rmb()    asm volatile("lwsync" ::: "memory")
->>> +#define wmb()    rmb()
->>> +
->>> +const int fifo_in_len = 1<<24;
->>> +const int fifo_out_len = 1<<24;
->>> +const int page_sz = 1<<16;
->>> +const int line_sz = 1<<7;
->>> +const int window_max = 1<<15;
->>> +const int retry_max = 50;
->>> +
->>> +extern void *nx_fault_storage_address;
->>> +extern void *nx_function_begin(int function, int pri);
->>> +extern int nx_function_end(void *handle);
->>> +
->>> +/*
->>> + * Fault in pages prior to NX job submission.  wr=1 may be required to
->>> + * touch writeable pages.  System zero pages do not fault-in the page as
->>> + * intended.  Typically set wr=1 for NX target pages and set wr=0 for
->>> + * NX source pages.
->>> + */
->>> +static int nx_touch_pages(void *buf, long buf_len, long page_len, int wr)
->>> +{
->>> +	char *begin = buf;
->>> +	char *end = (char *) buf + buf_len - 1;
->>> +	volatile char t;
->>> +
->>> +	assert(buf_len >= 0 && !!buf);
->>> +
->>> +	NXPRT(fprintf(stderr, "touch %p %p len 0x%lx wr=%d\n", buf,
->>> +			buf + buf_len, buf_len, wr));
->>> +
->>> +	if (buf_len <= 0 || buf == NULL)
->>> +		return -1;
->>> +
->>> +	do {
->>> +		t = *begin;
->>> +		if (wr)
->>> +			*begin = t;
->>> +		begin = begin + page_len;
->>> +	} while (begin < end);
->>> +
->>> +	/* When buf_sz is small or buf tail is in another page. */
->>> +	t = *end;
->>> +	if (wr)
->>> +		*end = t;
->>> +
->>> +	return 0;
->>> +}
->>> +
->>> +void sigsegv_handler(int sig, siginfo_t *info, void *ctx)
->>> +{
->>> +	fprintf(stderr, "%d: Got signal %d si_code %d, si_addr %p\n", getpid(),
->>> +	       sig, info->si_code, info->si_addr);
->>> +
->>> +	nx_fault_storage_address = info->si_addr;
->>> +}
->>> +
->>> +/*
->>> + * Adds an (address, len) pair to the list of ddes (ddl) and updates
->>> + * the base dde.  ddl[0] is the only dde in a direct dde which
->>> + * contains a single (addr,len) pair.  For more pairs, ddl[0] becomes
->>> + * the indirect (base) dde that points to a list of direct ddes.
->>> + * See Section 6.4 of the NX-gzip user manual for DDE description.
->>> + * Addr=NULL, len=0 clears the ddl[0].  Returns the total number of
->>> + * bytes in ddl.  Caller is responsible for allocting the array of
->>> + * nx_dde_t *ddl.  If N addresses are required in the scatter-gather
->>> + * list, the ddl array must have N+1 entries minimum.
->>> + */
->>> +static inline uint32_t nx_append_dde(nx_dde_t *ddl, void *addr, uint32_t len)
->>> +{
->>> +	uint32_t ddecnt;
->>> +	uint32_t bytes;
->>> +
->>> +	if (addr == NULL && len == 0) {
->>> +		clearp_dde(ddl);
->>> +		return 0;
->>> +	}
->>> +
->>> +	NXPRT(fprintf(stderr, "%d: nx_append_dde addr %p len %x\n", __LINE__,
->>> +			addr, len));
->>> +
->>> +	/* Number of ddes in the dde list ; == 0 when it is a direct dde */
->>> +	ddecnt = getpnn(ddl, dde_count);
->>> +	bytes = getp32(ddl, ddebc);
->>> +
->>> +	if (ddecnt == 0 && bytes == 0) {
->>> +		/* First dde is unused; make it a direct dde */
->>> +		bytes = len;
->>> +		putp32(ddl, ddebc, bytes);
->>> +		putp64(ddl, ddead, (uint64_t) addr);
->>> +	} else if (ddecnt == 0) {
->>> +		/* Converting direct to indirect dde
->>> +		 * ddl[0] becomes head dde of ddl
->>> +		 * copy direct to indirect first.
->>> +		 */
->>> +		ddl[1] = ddl[0];
->>> +
->>> +		/* Add the new dde next */
->>> +		clear_dde(ddl[2]);
->>> +		put32(ddl[2], ddebc, len);
->>> +		put64(ddl[2], ddead, (uint64_t) addr);
->>> +
->>> +		/* Ddl head points to 2 direct ddes */
->>> +		ddecnt = 2;
->>> +		putpnn(ddl, dde_count, ddecnt);
->>> +		bytes = bytes + len;
->>> +		putp32(ddl, ddebc, bytes);
->>> +		/* Pointer to the first direct dde */
->>> +		putp64(ddl, ddead, (uint64_t) &ddl[1]);
->>> +	} else {
->>> +		/* Append a dde to an existing indirect ddl */
->>> +		++ddecnt;
->>> +		clear_dde(ddl[ddecnt]);
->>> +		put64(ddl[ddecnt], ddead, (uint64_t) addr);
->>> +		put32(ddl[ddecnt], ddebc, len);
->>> +
->>> +		putpnn(ddl, dde_count, ddecnt);
->>> +		bytes = bytes + len;
->>> +		putp32(ddl, ddebc, bytes); /* byte sum of all dde */
->>> +	}
->>> +	return bytes;
->>> +}
->>> +
->>> +/*
->>> + * Touch specified number of pages represented in number bytes
->>> + * beginning from the first buffer in a dde list.
->>> + * Do not touch the pages past buf_sz-th byte's page.
->>> + *
->>> + * Set buf_sz = 0 to touch all pages described by the ddep.
->>> + */
->>> +static int nx_touch_pages_dde(nx_dde_t *ddep, long buf_sz, long page_sz,
->>> +				int wr)
->>> +{
->>> +	uint32_t indirect_count;
->>> +	uint32_t buf_len;
->>> +	long total;
->>> +	uint64_t buf_addr;
->>> +	nx_dde_t *dde_list;
->>> +	int i;
->>> +
->>> +	assert(!!ddep);
->>> +
->>> +	indirect_count = getpnn(ddep, dde_count);
->>> +
->>> +	NXPRT(fprintf(stderr, "nx_touch_pages_dde dde_count %d request len \
->>> +			0x%lx\n", indirect_count, buf_sz));
->>> +
->>> +	if (indirect_count == 0) {
->>> +		/* Direct dde */
->>> +		buf_len = getp32(ddep, ddebc);
->>> +		buf_addr = getp64(ddep, ddead);
->>> +
->>> +		NXPRT(fprintf(stderr, "touch direct ddebc 0x%x ddead %p\n",
->>> +				buf_len, (void *)buf_addr));
->>> +
->>> +		if (buf_sz == 0)
->>> +			nx_touch_pages((void *)buf_addr, buf_len, page_sz, wr);
->>> +		else
->>> +			nx_touch_pages((void *)buf_addr, NX_MIN(buf_len,
->>> +					buf_sz), page_sz, wr);
->>> +
->>> +		return ERR_NX_OK;
->>> +	}
->>> +
->>> +	/* Indirect dde */
->>> +	if (indirect_count > MAX_DDE_COUNT)
->>> +		return ERR_NX_EXCESSIVE_DDE;
->>> +
->>> +	/* First address of the list */
->>> +	dde_list = (nx_dde_t *) getp64(ddep, ddead);
->>> +
->>> +	if (buf_sz == 0)
->>> +		buf_sz = getp32(ddep, ddebc);
->>> +
->>> +	total = 0;
->>> +	for (i = 0; i < indirect_count; i++) {
->>> +		buf_len = get32(dde_list[i], ddebc);
->>> +		buf_addr = get64(dde_list[i], ddead);
->>> +		total += buf_len;
->>> +
->>> +		NXPRT(fprintf(stderr, "touch loop len 0x%x ddead %p total \
->>> +				0x%lx\n", buf_len, (void *)buf_addr, total));
->>> +
->>> +		/* Touching fewer pages than encoded in the ddebc */
->>> +		if (total > buf_sz) {
->>> +			buf_len = NX_MIN(buf_len, total - buf_sz);
->>> +			nx_touch_pages((void *)buf_addr, buf_len, page_sz, wr);
->>> +			NXPRT(fprintf(stderr, "touch loop break len 0x%x \
->>> +				      ddead %p\n", buf_len, (void *)buf_addr));
->>> +			break;
->>> +		}
->>> +		nx_touch_pages((void *)buf_addr, buf_len, page_sz, wr);
->>> +	}
->>> +	return ERR_NX_OK;
->>> +}
->>> +
->>> +/*
->>> + * Src and dst buffers are supplied in scatter gather lists.
->>> + * NX function code and other parameters supplied in cmdp.
->>> + */
->>> +static int nx_submit_job(nx_dde_t *src, nx_dde_t *dst, nx_gzip_crb_cpb_t *cmdp,
->>> +			 void *handle)
->>> +{
->>> +	int cc;
->>> +	uint64_t csbaddr;
->>> +
->>> +	memset((void *)&cmdp->crb.csb, 0, sizeof(cmdp->crb.csb));
->>> +
->>> +	cmdp->crb.source_dde = *src;
->>> +	cmdp->crb.target_dde = *dst;
->>> +
->>> +	/* Status, output byte count in tpbc */
->>> +	csbaddr = ((uint64_t) &cmdp->crb.csb) & csb_address_mask;
->>> +	put64(cmdp->crb, csb_address, csbaddr);
->>> +
->>> +	/* NX reports input bytes in spbc; cleared */
->>> +	cmdp->cpb.out_spbc_comp_wrap = 0;
->>> +	cmdp->cpb.out_spbc_comp_with_count = 0;
->>> +	cmdp->cpb.out_spbc_decomp = 0;
->>> +
->>> +	/* Clear output */
->>> +	put32(cmdp->cpb, out_crc, INIT_CRC);
->>> +	put32(cmdp->cpb, out_adler, INIT_ADLER);
->>> +
->>> +	cc = nxu_run_job(cmdp, handle);
->>> +
->>> +	if (!cc)
->>> +		cc = getnn(cmdp->crb.csb, csb_cc);	/* CC Table 6-8 */
->>> +
->>> +	return cc;
->>> +}
->>> +
->>> +/* fifo queue management */
->>> +#define fifo_used_bytes(used) (used)
->>> +#define fifo_free_bytes(used, len) ((len)-(used))
->>> +/* amount of free bytes in the first and last parts */
->>> +#define fifo_free_first_bytes(cur, used, len)  ((((cur)+(used)) <= (len)) \
->>> +						  ? (len)-((cur)+(used)) : 0)
->>> +#define fifo_free_last_bytes(cur, used, len)   ((((cur)+(used)) <= (len)) \
->>> +						  ? (cur) : (len)-(used))
->>> +/* amount of used bytes in the first and last parts */
->>> +#define fifo_used_first_bytes(cur, used, len)  ((((cur)+(used)) <= (len)) \
->>> +						  ? (used) : (len)-(cur))
->>> +#define fifo_used_last_bytes(cur, used, len)   ((((cur)+(used)) <= (len)) \
->>> +						  ? 0 : ((used)+(cur))-(len))
->>> +/* first and last free parts start here */
->>> +#define fifo_free_first_offset(cur, used)      ((cur)+(used))
->>> +#define fifo_free_last_offset(cur, used, len)  \
->>> +					   fifo_used_last_bytes(cur, used, len)
->>> +/* first and last used parts start here */
->>> +#define fifo_used_first_offset(cur)            (cur)
->>> +#define fifo_used_last_offset(cur)             (0)
->>> +
->>> +int decompress_file(int argc, char **argv, void *devhandle)
->>> +{
->>> +	FILE *inpf;
->>> +	FILE *outf;
->>> +
->>> +	int c, expect, i, cc, rc = 0;
->>> +	char gzfname[1024];
->>> +
->>> +	/* Queuing, file ops, byte counting */
->>> +	char *fifo_in, *fifo_out;
->>> +	int used_in, cur_in, used_out, cur_out, read_sz, n;
->>> +	int first_free, last_free, first_used, last_used;
->>> +	int first_offset, last_offset;
->>> +	int write_sz, free_space, source_sz;
->>> +	int source_sz_estimate, target_sz_estimate;
->>> +	uint64_t last_comp_ratio; /* 1000 max */
->>> +	uint64_t total_out;
->>> +	int is_final, is_eof;
->>> +
->>> +	/* nx hardware */
->>> +	int sfbt, subc, spbc, tpbc, nx_ce, fc, resuming = 0;
->>> +	int history_len = 0;
->>> +	nx_gzip_crb_cpb_t cmd, *cmdp;
->>> +	nx_dde_t *ddl_in;
->>> +	nx_dde_t dde_in[6] __attribute__((aligned (128)));
->>> +	nx_dde_t *ddl_out;
->>> +	nx_dde_t dde_out[6] __attribute__((aligned (128)));
->>> +	int pgfault_retries;
->>> +
->>> +	/* when using mmap'ed files */
->>> +	off_t input_file_offset;
->>> +
->>> +	if (argc > 2) {
->>> +		fprintf(stderr, "usage: %s <fname> or stdin\n", argv[0]);
->>> +		fprintf(stderr, "    writes to stdout or <fname>.nx.gunzip\n");
->>> +		return -1;
->>> +	}
->>> +
->>> +	if (argc == 1) {
->>> +		inpf = stdin;
->>> +		outf = stdout;
->>> +	} else if (argc == 2) {
->>> +		char w[1024];
->>> +		char *wp;
->>> +		inpf = fopen(argv[1], "r");
->>> +		if (inpf == NULL) {
->>> +			perror(argv[1]);
->>> +			return -1;
->>> +		}
->>> +
->>> +		/* Make a new file name to write to.  Ignoring '.gz' */
->>> +		wp = (NULL != (wp = strrchr(argv[1], '/'))) ? ++wp : argv[1];
->>> +		strcpy(w, wp);
->>> +		strcat(w, ".nx.gunzip");
->>> +
->>> +		outf = fopen(w, "w");
->>> +		if (outf == NULL) {
->>> +			perror(w);
->>> +			return -1;
->>> +		}
->>> +	}
->>> +
->>> +#define GETINPC(X) fgetc(X)
->>> +
->>> +	/* Decode the gzip header */
->>> +	c = GETINPC(inpf); expect = 0x1f; /* ID1 */
->>> +	if (c != expect)
->>> +		goto err1;
->>> +
->>> +	c = GETINPC(inpf); expect = 0x8b; /* ID2 */
->>> +	if (c != expect)
->>> +		goto err1;
->>> +
->>> +	c = GETINPC(inpf); expect = 0x08; /* CM */
->>> +	if (c != expect)
->>> +		goto err1;
->>> +
->>> +	int flg = GETINPC(inpf); /* FLG */
->>> +	if (flg & 0b11100000 || flg & 0b100)
->>> +		goto err2;
->>> +
->>> +	fprintf(stderr, "gzHeader FLG %x\n", flg);
->>> +
->>> +	/* Read 6 bytes; ignoring the MTIME, XFL, OS fields in this
->>> +	 * sample code.
->>> +	 */
->>> +	for (i = 0; i < 6; i++) {
->>> +		char tmp[10];
->>> +		if (EOF == (tmp[i] = GETINPC(inpf)))
->>> +			goto err3;
->>> +		fprintf(stderr, "%02x ", tmp[i]);
->>> +		if (i == 5)
->>> +			fprintf(stderr, "\n");
->>> +	}
->>> +	fprintf(stderr, "gzHeader MTIME, XFL, OS ignored\n");
->>> +
->>> +	/* FNAME */
->>> +	if (flg & 0b1000) {
->>> +		int k = 0;
->>> +		do {
->>> +			if (EOF == (c = GETINPC(inpf)))
->>> +				goto err3;
->>> +			gzfname[k++] = c;
->>> +		} while (c);
->>> +		fprintf(stderr, "gzHeader FNAME: %s\n", gzfname);
->>> +	}
->>> +
->>> +	/* FHCRC */
->>> +	if (flg & 0b10) {
->>> +		c = GETINPC(inpf); c = GETINPC(inpf);
->>> +		fprintf(stderr, "gzHeader FHCRC: ignored\n");
->>> +	}
->>> +
->>> +	used_in = cur_in = used_out = cur_out = 0;
->>> +	is_final = is_eof = 0;
->>> +
->>> +	/* Allocate one page larger to prevent page faults due to NX
->>> +	 * overfetching.
->>> +	 * Either do this (char*)(uintptr_t)aligned_alloc or use
->>> +	 * -std=c11 flag to make the int-to-pointer warning go away.
->>> +	 */
->>> +	assert((fifo_in  = (char *)(uintptr_t)aligned_alloc(line_sz,
->>> +				   fifo_in_len + page_sz)) != NULL);
->>> +	assert((fifo_out = (char *)(uintptr_t)aligned_alloc(line_sz,
->>> +				   fifo_out_len + page_sz + line_sz)) != NULL);
->>> +	/* Leave unused space due to history rounding rules */
->>> +	fifo_out = fifo_out + line_sz;
->>> +	nx_touch_pages(fifo_out, fifo_out_len, page_sz, 1);
->>> +
->>> +	ddl_in  = &dde_in[0];
->>> +	ddl_out = &dde_out[0];
->>> +	cmdp = &cmd;
->>> +	memset(&cmdp->crb, 0, sizeof(cmdp->crb));
->>> +
->>> +read_state:
->>> +
->>> +	/* Read from .gz file */
->>> +
->>> +	NXPRT(fprintf(stderr, "read_state:\n"));
->>> +
->>> +	if (is_eof != 0)
->>> +		goto write_state;
->>> +
->>> +	/* We read in to fifo_in in two steps: first: read in to from
->>> +	 * cur_in to the end of the buffer.  last: if free space wrapped
->>> +	 * around, read from fifo_in offset 0 to offset cur_in.
->>> +	 */
->>> +
->>> +	/* Reset fifo head to reduce unnecessary wrap arounds */
->>> +	cur_in = (used_in == 0) ? 0 : cur_in;
->>> +
->>> +	/* Free space total is reduced by a gap */
->>> +	free_space = NX_MAX(0, fifo_free_bytes(used_in, fifo_in_len)
->>> +			    - line_sz);
->>> +
->>> +	/* Free space may wrap around as first and last */
->>> +	first_free = fifo_free_first_bytes(cur_in, used_in, fifo_in_len);
->>> +	last_free  = fifo_free_last_bytes(cur_in, used_in, fifo_in_len);
->>> +
->>> +	/* Start offsets of the free memory */
->>> +	first_offset = fifo_free_first_offset(cur_in, used_in);
->>> +	last_offset  = fifo_free_last_offset(cur_in, used_in, fifo_in_len);
->>> +
->>> +	/* Reduce read_sz because of the line_sz gap */
->>> +	read_sz = NX_MIN(free_space, first_free);
->>> +	n = 0;
->>> +	if (read_sz > 0) {
->>> +		/* Read in to offset cur_in + used_in */
->>> +		n = fread(fifo_in + first_offset, 1, read_sz, inpf);
->>> +		used_in = used_in + n;
->>> +		free_space = free_space - n;
->>> +		assert(n <= read_sz);
->>> +		if (n != read_sz) {
->>> +			/* Either EOF or error; exit the read loop */
->>> +			is_eof = 1;
->>> +			goto write_state;
->>> +		}
->>> +	}
->>> +
->>> +	/* If free space wrapped around */
->>> +	if (last_free > 0) {
->>> +		/* Reduce read_sz because of the line_sz gap */
->>> +		read_sz = NX_MIN(free_space, last_free);
->>> +		n = 0;
->>> +		if (read_sz > 0) {
->>> +			n = fread(fifo_in + last_offset, 1, read_sz, inpf);
->>> +			used_in = used_in + n;       /* Increase used space */
->>> +			free_space = free_space - n; /* Decrease free space */
->>> +			assert(n <= read_sz);
->>> +			if (n != read_sz) {
->>> +				/* Either EOF or error; exit the read loop */
->>> +				is_eof = 1;
->>> +				goto write_state;
->>> +			}
->>> +		}
->>> +	}
->>> +
->>> +	/* At this point we have used_in bytes in fifo_in with the
->>> +	 * data head starting at cur_in and possibly wrapping around.
->>> +	 */
->>> +
->>> +write_state:
->>> +
->>> +	/* Write decompressed data to output file */
->>> +
->>> +	NXPRT(fprintf(stderr, "write_state:\n"));
->>> +
->>> +	if (used_out == 0)
->>> +		goto decomp_state;
->>> +
->>> +	/* If fifo_out has data waiting, write it out to the file to
->>> +	 * make free target space for the accelerator used bytes in
->>> +	 * the first and last parts of fifo_out.
->>> +	 */
->>> +
->>> +	first_used = fifo_used_first_bytes(cur_out, used_out, fifo_out_len);
->>> +	last_used  = fifo_used_last_bytes(cur_out, used_out, fifo_out_len);
->>> +
->>> +	write_sz = first_used;
->>> +
->>> +	n = 0;
->>> +	if (write_sz > 0) {
->>> +		n = fwrite(fifo_out + cur_out, 1, write_sz, outf);
->>> +		used_out = used_out - n;
->>> +		/* Move head of the fifo */
->>> +		cur_out = (cur_out + n) % fifo_out_len;
->>> +		assert(n <= write_sz);
->>> +		if (n != write_sz) {
->>> +			fprintf(stderr, "error: write\n");
->>> +			rc = -1;
->>> +			goto err5;
->>> +		}
->>> +	}
->>> +
->>> +	if (last_used > 0) { /* If more data available in the last part */
->>> +		write_sz = last_used; /* Keep it here for later */
->>> +		n = 0;
->>> +		if (write_sz > 0) {
->>> +			n = fwrite(fifo_out, 1, write_sz, outf);
->>> +			used_out = used_out - n;
->>> +			cur_out = (cur_out + n) % fifo_out_len;
->>> +			assert(n <= write_sz);
->>> +			if (n != write_sz) {
->>> +				fprintf(stderr, "error: write\n");
->>> +				rc = -1;
->>> +				goto err5;
->>> +			}
->>> +		}
->>> +	}
->>> +
->>> +decomp_state:
->>> +
->>> +	/* NX decompresses input data */
->>> +
->>> +	NXPRT(fprintf(stderr, "decomp_state:\n"));
->>> +
->>> +	if (is_final)
->>> +		goto finish_state;
->>> +
->>> +	/* Address/len lists */
->>> +	clearp_dde(ddl_in);
->>> +	clearp_dde(ddl_out);
->>> +
->>> +	/* FC, CRC, HistLen, Table 6-6 */
->>> +	if (resuming) {
->>> +		/* Resuming a partially decompressed input.
->>> +		 * The key to resume is supplying the 32KB
->>> +		 * dictionary (history) to NX, which is basically
->>> +		 * the last 32KB of output produced.
->>> +		 */
->>> +		fc = GZIP_FC_DECOMPRESS_RESUME;
->>> +
->>> +		cmdp->cpb.in_crc   = cmdp->cpb.out_crc;
->>> +		cmdp->cpb.in_adler = cmdp->cpb.out_adler;
->>> +
->>> +		/* Round up the history size to quadword.  Section 2.10 */
->>> +		history_len = (history_len + 15) / 16;
->>> +		putnn(cmdp->cpb, in_histlen, history_len);
->>> +		history_len = history_len * 16; /* bytes */
->>> +
->>> +		if (history_len > 0) {
->>> +			/* Chain in the history buffer to the DDE list */
->>> +			if (cur_out >= history_len) {
->>> +				nx_append_dde(ddl_in, fifo_out
->>> +					      + (cur_out - history_len),
->>> +					      history_len);
->>> +			} else {
->>> +				nx_append_dde(ddl_in, fifo_out
->>> +					      + ((fifo_out_len + cur_out)
->>> +					      - history_len),
->>> +					      history_len - cur_out);
->>> +				/* Up to 32KB history wraps around fifo_out */
->>> +				nx_append_dde(ddl_in, fifo_out, cur_out);
->>> +			}
->>> +
->>> +		}
->>> +	} else {
->>> +		/* First decompress job */
->>> +		fc = GZIP_FC_DECOMPRESS;
->>> +
->>> +		history_len = 0;
->>> +		/* Writing 0 clears out subc as well */
->>> +		cmdp->cpb.in_histlen = 0;
->>> +		total_out = 0;
->>> +
->>> +		put32(cmdp->cpb, in_crc, INIT_CRC);
->>> +		put32(cmdp->cpb, in_adler, INIT_ADLER);
->>> +		put32(cmdp->cpb, out_crc, INIT_CRC);
->>> +		put32(cmdp->cpb, out_adler, INIT_ADLER);
->>> +
->>> +		/* Assuming 10% compression ratio initially; use the
->>> +		 * most recently measured compression ratio as a
->>> +		 * heuristic to estimate the input and output
->>> +		 * sizes.  If we give too much input, the target buffer
->>> +		 * overflows and NX cycles are wasted, and then we
->>> +		 * must retry with smaller input size.  1000 is 100%.
->>> +		 */
->>> +		last_comp_ratio = 100UL;
->>> +	}
->>> +	cmdp->crb.gzip_fc = 0;
->>> +	putnn(cmdp->crb, gzip_fc, fc);
->>> +
->>> +	/*
->>> +	 * NX source buffers
->>> +	 */
->>> +	first_used = fifo_used_first_bytes(cur_in, used_in, fifo_in_len);
->>> +	last_used = fifo_used_last_bytes(cur_in, used_in, fifo_in_len);
->>> +
->>> +	if (first_used > 0)
->>> +		nx_append_dde(ddl_in, fifo_in + cur_in, first_used);
->>> +
->>> +	if (last_used > 0)
->>> +		nx_append_dde(ddl_in, fifo_in, last_used);
->>> +
->>> +	/*
->>> +	 * NX target buffers
->>> +	 */
->>> +	first_free = fifo_free_first_bytes(cur_out, used_out, fifo_out_len);
->>> +	last_free = fifo_free_last_bytes(cur_out, used_out, fifo_out_len);
->>> +
->>> +	/* Reduce output free space amount not to overwrite the history */
->>> +	int target_max = NX_MAX(0, fifo_free_bytes(used_out, fifo_out_len)
->>> +				- (1<<16));
->>> +
->>> +	NXPRT(fprintf(stderr, "target_max %d (0x%x)\n", target_max,
->>> +		      target_max));
->>> +
->>> +	first_free = NX_MIN(target_max, first_free);
->>> +	if (first_free > 0) {
->>> +		first_offset = fifo_free_first_offset(cur_out, used_out);
->>> +		nx_append_dde(ddl_out, fifo_out + first_offset, first_free);
->>> +	}
->>> +
->>> +	if (last_free > 0) {
->>> +		last_free = NX_MIN(target_max - first_free, last_free);
->>> +		if (last_free > 0) {
->>> +			last_offset = fifo_free_last_offset(cur_out, used_out,
->>> +							    fifo_out_len);
->>> +			nx_append_dde(ddl_out, fifo_out + last_offset,
->>> +				      last_free);
->>> +		}
->>> +	}
->>> +
->>> +	/* Target buffer size is used to limit the source data size
->>> +	 * based on previous measurements of compression ratio.
->>> +	 */
->>> +
->>> +	/* source_sz includes history */
->>> +	source_sz = getp32(ddl_in, ddebc);
->>> +	assert(source_sz > history_len);
->>> +	source_sz = source_sz - history_len;
->>> +
->>> +	/* Estimating how much source is needed to 3/4 fill a
->>> +	 * target_max size target buffer.  If we overshoot, then NX
->>> +	 * must repeat the job with smaller input and we waste
->>> +	 * bandwidth.  If we undershoot then we use more NX calls than
->>> +	 * necessary.
->>> +	 */
->>> +
->>> +	source_sz_estimate = ((uint64_t)target_max * last_comp_ratio * 3UL)
->>> +				/ 4000;
->>> +
->>> +	if (source_sz_estimate < source_sz) {
->>> +		/* Target might be small, therefore limiting the
->>> +		 * source data.
->>> +		 */
->>> +		source_sz = source_sz_estimate;
->>> +		target_sz_estimate = target_max;
->>> +	} else {
->>> +		/* Source file might be small, therefore limiting target
->>> +		 * touch pages to a smaller value to save processor cycles.
->>> +		 */
->>> +		target_sz_estimate = ((uint64_t)source_sz * 1000UL)
->>> +					/ (last_comp_ratio + 1);
->>> +		target_sz_estimate = NX_MIN(2 * target_sz_estimate,
->>> +					    target_max);
->>> +	}
->>> +
->>> +	source_sz = source_sz + history_len;
->>> +
->>> +	/* Some NX condition codes require submitting the NX job again.
->>> +	 * Kernel doesn't handle NX page faults. Expects user code to
->>> +	 * touch pages.
->>> +	 */
->>> +	pgfault_retries = retry_max;
->>> +
->>> +restart_nx:
->>> +
->>> +	putp32(ddl_in, ddebc, source_sz);
->>> +
->>> +	/* Fault in pages */
->>> +	nx_touch_pages_dde(ddl_in, 0, page_sz, 0);
->>> +	nx_touch_pages_dde(ddl_out, target_sz_estimate, page_sz, 1);
->>> +
->>> +	/* Send job to NX */
->>> +	cc = nx_submit_job(ddl_in, ddl_out, cmdp, devhandle);
->>> +
->>> +	switch (cc) {
->>> +
->>> +	case ERR_NX_TRANSLATION:
->>> +
->>> +		/* We touched the pages ahead of time.  In the most common case
->>> +		 * we shouldn't be here.  But may be some pages were paged out.
->>> +		 * Kernel should have placed the faulting address to fsaddr.
->>> +		 */
->>> +		NXPRT(fprintf(stderr, "ERR_NX_TRANSLATION %p\n",
->>> +			      (void *)cmdp->crb.csb.fsaddr));
->>> +
->>> +		/* Touch 1 byte, read-only  */
->>> +		nx_touch_pages((void *)cmdp->crb.csb.fsaddr, 1, page_sz, 0);
->>> +
->>> +		if (pgfault_retries == retry_max) {
->>> +			/* Try once with exact number of pages */
->>> +			--pgfault_retries;
->>> +			goto restart_nx;
->>> +		} else if (pgfault_retries > 0) {
->>> +			/* If still faulting try fewer input pages
->>> +			 * assuming memory outage
->>> +			 */
->>> +			if (source_sz > page_sz)
->>> +				source_sz = NX_MAX(source_sz / 2, page_sz);
->>> +			--pgfault_retries;
->>> +			goto restart_nx;
->>> +		} else {
->>> +			fprintf(stderr, "cannot make progress; too many page \
->>> +				fault retries cc= %d\n", cc);
->>> +			rc = -1;
->>> +			goto err5;
->>> +		}
->>> +
->>> +	case ERR_NX_DATA_LENGTH:
->>> +
->>> +		NXPRT(fprintf(stderr, "ERR_NX_DATA_LENGTH; not an error \
->>> +			      usually; stream may have trailing data\n"));
->>> +
->>> +		/* Not an error in the most common case; it just says
->>> +		 * there is trailing data that we must examine.
->>> +		 *
->>> +		 * CC=3 CE(1)=0 CE(0)=1 indicates partial completion
->>> +		 * Fig.6-7 and Table 6-8.
->>> +		 */
->>> +		nx_ce = get_csb_ce_ms3b(cmdp->crb.csb);
->>> +
->>> +		if (!csb_ce_termination(nx_ce) &&
->>> +		    csb_ce_partial_completion(nx_ce)) {
->>> +			/* Check CPB for more information
->>> +			 * spbc and tpbc are valid
->>> +			 */
->>> +			sfbt = getnn(cmdp->cpb, out_sfbt); /* Table 6-4 */
->>> +			subc = getnn(cmdp->cpb, out_subc); /* Table 6-4 */
->>> +			spbc = get32(cmdp->cpb, out_spbc_decomp);
->>> +			tpbc = get32(cmdp->crb.csb, tpbc);
->>> +			assert(target_max >= tpbc);
->>> +
->>> +			goto ok_cc3; /* not an error */
->>> +		} else {
->>> +			/* History length error when CE(1)=1 CE(0)=0. */
->>> +			rc = -1;
->>> +			fprintf(stderr, "history length error cc= %d\n", cc);
->>> +			goto err5;
->>> +		}
->>> +
->>> +	case ERR_NX_TARGET_SPACE:
->>> +
->>> +		/* Target buffer not large enough; retry smaller input
->>> +		 * data; give at least 1 byte.  SPBC/TPBC are not valid.
->>> +		 */
->>> +		assert(source_sz > history_len);
->>> +		source_sz = ((source_sz - history_len + 2) / 2) + history_len;
->>> +		NXPRT(fprintf(stderr, "ERR_NX_TARGET_SPACE; retry with \
->>> +			      smaller input data src %d hist %d\n", source_sz,
->>> +			      history_len));
->>> +		goto restart_nx;
->>> +
->>> +	case ERR_NX_OK:
->>> +
->>> +		/* This should not happen for gzip formatted data;
->>> +		 * we need trailing crc and isize
->>> +		 */
->>> +		fprintf(stderr, "ERR_NX_OK\n");
->>> +		spbc = get32(cmdp->cpb, out_spbc_decomp);
->>> +		tpbc = get32(cmdp->crb.csb, tpbc);
->>> +		assert(target_max >= tpbc);
->>> +		assert(spbc >= history_len);
->>> +		source_sz = spbc - history_len;
->>> +		goto offsets_state;
->>> +
->>> +	default:
->>> +		fprintf(stderr, "error: cc= %d\n", cc);
->>> +		rc = -1;
->>> +		goto err5;
->>> +	}
->>> +
->>> +ok_cc3:
->>> +
->>> +	NXPRT(fprintf(stderr, "cc3: sfbt: %x\n", sfbt));
->>> +
->>> +	assert(spbc > history_len);
->>> +	source_sz = spbc - history_len;
->>> +
->>> +	/* Table 6-4: Source Final Block Type (SFBT) describes the
->>> +	 * last processed deflate block and clues the software how to
->>> +	 * resume the next job.  SUBC indicates how many input bits NX
->>> +	 * consumed but did not process.  SPBC indicates how many
->>> +	 * bytes of source were given to the accelerator including
->>> +	 * history bytes.
->>> +	 */
->>> +
->>> +	switch (sfbt) {
->>> +		int dhtlen;
->>> +
->>> +	case 0b0000: /* Deflate final EOB received */
->>> +
->>> +		/* Calculating the checksum start position. */
->>> +
->>> +		source_sz = source_sz - subc / 8;
->>> +		is_final = 1;
->>> +		break;
->>> +
->>> +		/* Resume decompression cases are below. Basically
->>> +		 * indicates where NX has suspended and how to resume
->>> +		 * the input stream.
->>> +		 */
->>> +
->>> +	case 0b1000: /* Within a literal block; use rembytecount */
->>> +	case 0b1001: /* Within a literal block; use rembytecount; bfinal=1 */
->>> +
->>> +		/* Supply the partially processed source byte again */
->>> +		source_sz = source_sz - ((subc + 7) / 8);
->>> +
->>> +		/* SUBC LS 3bits: number of bits in the first source byte need
->>> +		 * to be processed.
->>> +		 * 000 means all 8 bits;  Table 6-3
->>> +		 * Clear subc, histlen, sfbt, rembytecnt, dhtlen
->>> +		 */
->>> +		cmdp->cpb.in_subc = 0;
->>> +		cmdp->cpb.in_sfbt = 0;
->>> +		putnn(cmdp->cpb, in_subc, subc % 8);
->>> +		putnn(cmdp->cpb, in_sfbt, sfbt);
->>> +		putnn(cmdp->cpb, in_rembytecnt, getnn(cmdp->cpb,
->>> +						      out_rembytecnt));
->>> +		break;
->>> +
->>> +	case 0b1010: /* Within a FH block; */
->>> +	case 0b1011: /* Within a FH block; bfinal=1 */
->>> +
->>> +		source_sz = source_sz - ((subc + 7) / 8);
->>> +
->>> +		/* Clear subc, histlen, sfbt, rembytecnt, dhtlen */
->>> +		cmdp->cpb.in_subc = 0;
->>> +		cmdp->cpb.in_sfbt = 0;
->>> +		putnn(cmdp->cpb, in_subc, subc % 8);
->>> +		putnn(cmdp->cpb, in_sfbt, sfbt);
->>> +		break;
->>> +
->>> +	case 0b1100: /* Within a DH block; */
->>> +	case 0b1101: /* Within a DH block; bfinal=1 */
->>> +
->>> +		source_sz = source_sz - ((subc + 7) / 8);
->>> +
->>> +		/* Clear subc, histlen, sfbt, rembytecnt, dhtlen */
->>> +		cmdp->cpb.in_subc = 0;
->>> +		cmdp->cpb.in_sfbt = 0;
->>> +		putnn(cmdp->cpb, in_subc, subc % 8);
->>> +		putnn(cmdp->cpb, in_sfbt, sfbt);
->>> +
->>> +		dhtlen = getnn(cmdp->cpb, out_dhtlen);
->>> +		putnn(cmdp->cpb, in_dhtlen, dhtlen);
->>> +		assert(dhtlen >= 42);
->>> +
->>> +		/* Round up to a qword */
->>> +		dhtlen = (dhtlen + 127) / 128;
->>> +
->>> +		while (dhtlen > 0) { /* Copy dht from cpb.out to cpb.in */
->>> +			--dhtlen;
->>> +			cmdp->cpb.in_dht[dhtlen] = cmdp->cpb.out_dht[dhtlen];
->>> +		}
->>> +		break;
->>> +
->>> +	case 0b1110: /* Within a block header; bfinal=0; */
->>> +		     /* Also given if source data exactly ends (SUBC=0) with
->>> +		      * EOB code with BFINAL=0.  Means the next byte will
->>> +		      * contain a block header.
->>> +		      */
->>> +	case 0b1111: /* within a block header with BFINAL=1. */
->>> +
->>> +		source_sz = source_sz - ((subc + 7) / 8);
->>> +
->>> +		/* Clear subc, histlen, sfbt, rembytecnt, dhtlen */
->>> +		cmdp->cpb.in_subc = 0;
->>> +		cmdp->cpb.in_sfbt = 0;
->>> +		putnn(cmdp->cpb, in_subc, subc % 8);
->>> +		putnn(cmdp->cpb, in_sfbt, sfbt);
->>> +	}
->>> +
->>> +offsets_state:
->>> +
->>> +	/* Adjust the source and target buffer offsets and lengths  */
->>> +
->>> +	NXPRT(fprintf(stderr, "offsets_state:\n"));
->>> +
->>> +	/* Delete input data from fifo_in */
->>> +	used_in = used_in - source_sz;
->>> +	cur_in = (cur_in + source_sz) % fifo_in_len;
->>> +	input_file_offset = input_file_offset + source_sz;
->>> +
->>> +	/* Add output data to fifo_out */
->>> +	used_out = used_out + tpbc;
->>> +
->>> +	assert(used_out <= fifo_out_len);
->>> +
->>> +	total_out = total_out + tpbc;
->>> +
->>> +	/* Deflate history is 32KB max.  No need to supply more
->>> +	 * than 32KB on a resume.
->>> +	 */
->>> +	history_len = (total_out > window_max) ? window_max : total_out;
->>> +
->>> +	/* To estimate expected expansion in the next NX job; 500 means 50%.
->>> +	 * Deflate best case is around 1 to 1000.
->>> +	 */
->>> +	last_comp_ratio = (1000UL * ((uint64_t)source_sz + 1))
->>> +			  / ((uint64_t)tpbc + 1);
->>> +	last_comp_ratio = NX_MAX(NX_MIN(1000UL, last_comp_ratio), 1);
->>> +	NXPRT(fprintf(stderr, "comp_ratio %ld source_sz %d spbc %d tpbc %d\n",
->>> +		      last_comp_ratio, source_sz, spbc, tpbc));
->>> +
->>> +	resuming = 1;
->>> +
->>> +finish_state:
->>> +
->>> +	NXPRT(fprintf(stderr, "finish_state:\n"));
->>> +
->>> +	if (is_final) {
->>> +		if (used_out)
->>> +			goto write_state; /* More data to write out */
->>> +		else if (used_in < 8) {
->>> +			/* Need at least 8 more bytes containing gzip crc
->>> +			 * and isize.
->>> +			 */
->>> +			rc = -1;
->>> +			goto err4;
->>> +		} else {
->>> +			/* Compare checksums and exit */
->>> +			int i;
->>> +			char tail[8];
->>> +			uint32_t cksum, isize;
->>> +			for (i = 0; i < 8; i++)
->>> +				tail[i] = fifo_in[(cur_in + i) % fifo_in_len];
->>> +			fprintf(stderr, "computed checksum %08x isize %08x\n",
->>> +				cmdp->cpb.out_crc, (uint32_t) (total_out
->>> +				% (1ULL<<32)));
->>> +			cksum = (tail[0] | tail[1]<<8 | tail[2]<<16
->>> +				| tail[3]<<24);
->>> +			isize = (tail[4] | tail[5]<<8 | tail[6]<<16
->>> +				| tail[7]<<24);
->>> +			fprintf(stderr, "stored   checksum %08x isize %08x\n",
->>> +				cksum, isize);
->>> +
->>> +			if (cksum == cmdp->cpb.out_crc && isize == (uint32_t)
->>> +			    (total_out % (1ULL<<32))) {
->>> +				rc = 0;	goto ok1;
->>> +			} else {
->>> +				rc = -1; goto err4;
->>> +			}
->>> +		}
->>> +	} else
->>> +		goto read_state;
->>> +
->>> +	return -1;
->>> +
->>> +err1:
->>> +	fprintf(stderr, "error: not a gzip file, expect %x, read %x\n",
->>> +		expect, c);
->>> +	return -1;
->>> +
->>> +err2:
->>> +	fprintf(stderr, "error: the FLG byte is wrong or not handled by this \
->>> +		code sample\n");
->>> +	return -1;
->>> +
->>> +err3:
->>> +	fprintf(stderr, "error: gzip header\n");
->>> +	return -1;
->>> +
->>> +err4:
->>> +	fprintf(stderr, "error: checksum\n");
->>> +
->>> +err5:
->>> +ok1:
->>> +	fprintf(stderr, "decomp is complete: fclose\n");
->>> +	fclose(outf);
->>> +
->>> +	return rc;
->>> +}
->>> +
->>> +
->>> +int main(int argc, char **argv)
->>> +{
->>> +	int rc;
->>> +	struct sigaction act;
->>> +	void *handle;
->>> +
->>> +	act.sa_handler = 0;
->>> +	act.sa_sigaction = sigsegv_handler;
->>> +	act.sa_flags = SA_SIGINFO;
->>> +	act.sa_restorer = 0;
->>> +	sigemptyset(&act.sa_mask);
->>> +	sigaction(SIGSEGV, &act, NULL);
->>> +
->>> +	handle = nx_function_begin(NX_FUNC_COMP_GZIP, 0);
->>> +	if (!handle) {
->>> +		fprintf(stderr, "Unable to init NX, errno %d\n", errno);
->>> +		exit(-1);
->>> +	}
->>> +
->>> +	rc = decompress_file(argc, argv, handle);
->>> +
->>> +	nx_function_end(handle);
->>> +
->>> +	return rc;
->>> +}
->>> -- 
->>> 2.21.0
->
+> + * adler/crc: 32 bit checksums appended to stream tail
+> + * ce:       completion extension
+> + * cpb:      coprocessor parameter block (metadata)
+> + * crb:      coprocessor request block (command)
+> + * csb:      coprocessor status block (status)
+> + * dht:      dynamic huffman table
+> + * dde:      data descriptor element (address, length)
+> + * ddl:      list of ddes
+> + * dh/fh:    dynamic and fixed huffman types
+> + * fc:       coprocessor function code
+> + * histlen:  history/dictionary length
+> + * history:  sliding window of up to 32KB of data
+> + * lzcount:  Deflate LZ symbol counts
+> + * rembytecnt: remaining byte count
+> + * sfbt:     source final block type; last block's type during decomp
+> + * spbc:     source processed byte count
+> + * subc:     source unprocessed bit count
+> + * tebc:     target ending bit count; valid bits in the last byte
+> + * tpbc:     target processed byte count
+> + * vas:      virtual accelerator switch; the user mode interface
+> + */
+> +
+> +typedef union {
+> +    uint32_t word[4];
+> +    uint64_t dword[2];
+> +} nx_qw_t __attribute__((aligned (16)));
+> +
+> +/*
+> + * Note: NX registers with fewer than 32 bits are declared by
+> + * convention as uint32_t variables in unions. If *_offset and *_mask
+> + * are defined for a variable, then use get_ put_ macros to
+> + * conveniently access the register fields for endian conversions.
+> + */
+> +
+> +typedef struct {
+> +    /* Data Descriptor Element, Section 6.4 */
+> +    union {
+> +	uint32_t dde_count;
+> +	/* When dde_count == 0 ddead is a pointer to a data buffer;
+> +	 * ddebc is the buffer length bytes.
+> +	 * When dde_count > 0 dde is an indirect dde; ddead is a pointer
+> +	 * to a contiguous list of direct ddes; ddebc is the total length
+> +	 * of all data pointed to by the list of direct ddes.
+> +	 * Note that only one level of indirection is permitted.
+> +	 * See Section 6.4 of the user manual for additional details
+> +	 */
+> +    };
+> +    uint32_t ddebc; /* dde byte count */
+> +    uint64_t ddead; /* dde address */
+> +} nx_dde_t __attribute__((aligned (16)));
+> +
+> +typedef struct {
+> +    /* Coprocessor Status Block, Section 6.6  */
+> +    union {
+> +	uint32_t csb_v;
+> +	/* Valid bit. v must be set to 0 by the program
+> +	 * before submitting the coprocessor command.
+> +	 * Software can poll for the v bit
+> +	 */
+> +
+> +	uint32_t csb_f;
+> +	/* 16B CSB size. Written to 0 by DMA when it writes the CPB */
+> +
+> +	uint32_t csb_cs;
+> +	/* cs completion sequence; unused */
+> +
+> +	uint32_t csb_cc;
+> +	/* cc completion code; cc != 0 exception occurred */
+> +
+> +	uint32_t csb_ce;
+> +	/* ce completion extension */
+> +
+> +    };
+> +    uint32_t tpbc;
+> +    /* target processed byte count TPBC */
+> +
+> +    uint64_t fsaddr;
+> +    /* Section 6.12.1 CSB NonZero error summary.  FSA Failing storage
+> +     * address.  Address where error occurred. When available, written
+> +     * to A field of CSB
+> +     */
+> +} nx_csb_t __attribute__((aligned (16)));
+> +
+> +typedef struct {
+> +    /* Coprocessor Completion Block, Section 6.7 */
+> +
+> +    uint32_t reserved[3];
+> +    union {
+> +	/* When crb.c==0 (no ccb defined) it is reserved;
+> +	 * When crb.c==1 (ccb defined) it is cm
+> +	 */
+> +
+> +	uint32_t ccb_cm;
+> +	/* Signal interrupt of crb.c==1 and cm==1 */
+> +
+> +	uint32_t word;
+> +	/* generic access to the 32bit word */
+> +    };
+> +} nx_ccb_t __attribute__((aligned (16)));
+> +
+> +typedef struct {
+> +    /*
+> +     * CRB operand of the paste coprocessor instruction is stamped
+> +     * in quadword 4 with the information shown here as its written
+> +     * in to the receive FIFO of the coprocessor
+> +     */
+> +
+> +    union {
+> +	uint32_t vas_buf_num;
+> +	/* Verification only vas buffer number which correlates to
+> +	 * the low order bits of the atag in the paste command
+> +	 */
+> +
+> +	uint32_t send_wc_id;
+> +	/* Pointer to Send Window Context that provides for NX address
+> +	 * translation information, such as MSR and LPCR bits, job completion
+> +	 * interrupt RA, PSWID, and job utilization counter.
+> +	 */
+> +
+> +    };
+> +    union {
+> +	uint32_t recv_wc_id;
+> +	/* Pointer to Receive Window Context. NX uses this to return
+> +	 * credits to a Receive FIFO as entries are dequeued.
+> +	 */
+> +
+> +    };
+> +    uint32_t reserved2;
+> +    union {
+> +	uint32_t vas_invalid;
+> +	/* Invalid bit. If this bit is 1 the CRB is discarded by
+> +	 * NX upon fetching from the receive FIFO. If this bit is 0
+> +	 * the CRB is processed normally. The bit is stamped to 0
+> +	 * by VAS and may be written to 1 by hypervisor while
+> +	 * the CRB is in the receive FIFO (in memory).
+> +	 */
+> +
+> +    };
+> +} vas_stamped_crb_t;
+> +
+> +typedef struct {
+> +    /*
+> +     * A CRB that has a translation fault is stamped by NX in quadword 4
+> +     * and pasted to the Fault Send Window in VAS.
+> +     */
+> +    uint64_t fsa;
+> +    union {
+> +	uint32_t nxsf_t;
+> +	uint32_t nxsf_fs;
+> +    };
+> +    uint32_t pswid;
+> +} nx_stamped_fault_crb_t;
+> +
+> +typedef union {
+> +    vas_stamped_crb_t      vas;
+> +    nx_stamped_fault_crb_t nx;
+> +} stamped_crb_t;
+> +
+> +typedef struct {
+> +    /*
+> +     * Coprocessor Parameter Block In/Out are used to pass metadata
+> +     * to/from accelerator.  Tables 6.5 and 6.6 of the user manual.
+> +     */
+> +
+> +    /* CPBInput */
+> +
+> +    struct {
+> +	union {
+> +	    nx_qw_t qw0;
+> +	    struct {
+> +		uint32_t in_adler;            /* bits 0:31    */
+> +		uint32_t in_crc;              /* bits 32:63   */
+> +		union {
+> +		    uint32_t in_histlen;      /* bits 64:75   */
+> +		    uint32_t in_subc;         /* bits 93:95   */
+> +		};
+> +		union {
+> +		    uint32_t in_sfbt;         /* bits 108:111 */
+> +		    uint32_t in_rembytecnt;   /* bits 112:127 */
+> +		    uint32_t in_dhtlen;       /* bits 116:127 */
+> +		};
+> +	    };
+> +	};
+> +	union {
+> +	    nx_qw_t  in_dht[DHTSZ];           /* qw[1:18]     */
+> +	    char     in_dht_char[DHT_MAXSZ];  /* byte access  */
+> +	};
+> +	nx_qw_t  reserved[5];                 /* qw[19:23]    */
+> +    };
+> +
+> +    /* CPBOutput */
+> +
+> +    volatile struct {
+> +	union {
+> +	    nx_qw_t qw24;
+> +	    struct {
+> +		uint32_t out_adler;           /* bits 0:31  qw[24]   */
+> +		uint32_t out_crc;             /* bits 32:63 qw[24]   */
+> +		union {
+> +		    uint32_t out_tebc;        /* bits 77:79 qw[24]   */
+> +		    uint32_t out_subc;        /* bits 80:95 qw[24]   */
+> +		};
+> +		union {
+> +		    uint32_t out_sfbt;        /* bits 108:111 qw[24] */
+> +		    uint32_t out_rembytecnt;  /* bits 112:127 qw[24] */
+> +		    uint32_t out_dhtlen;      /* bits 116:127 qw[24] */
+> +		};
+> +	    };
+> +	};
+> +	union {
+> +	    nx_qw_t  qw25[79];              /* qw[25:103] */
+> +	    /* qw[25] compress no lzcounts or wrap */
+> +	    uint32_t out_spbc_comp_wrap;
+> +	    uint32_t out_spbc_wrap;         /* qw[25] wrap */
+> +	    uint32_t out_spbc_comp;         /* qw[25] compress no lzcounts */
+> +	    uint32_t out_lzcount[LLSZ+DSZ]; /* 286 LL and 30 D symbol counts */
+> +	    struct {
+> +		nx_qw_t  out_dht[DHTSZ];    /* qw[25:42] */
+> +		uint32_t out_spbc_decomp;   /* qw[43] decompress */
+> +	    };
+> +	};
+> +	/* qw[104] compress with lzcounts */
+> +	uint32_t out_spbc_comp_with_count;
+> +    };
+> +} nx_gzip_cpb_t  __attribute__((aligned (128)));
+> +
+> +typedef struct {
+> +    union {                   /* byte[0:3]   */
+> +	uint32_t gzip_fc;     /* bits[24-31] */
+> +    };
+> +    uint32_t reserved1;       /* byte[4:7]   */
+> +    union {
+> +	uint64_t csb_address; /* byte[8:15]  */
+> +	struct {
+> +	    uint32_t reserved2;
+> +	    union {
+> +		uint32_t crb_c;
+> +		/* c==0 no ccb defined */
+> +
+> +		uint32_t crb_at;
+> +		/* at==0 address type is ignored;
+> +		 * all addrs effective assumed.
+> +		 */
+> +
+> +	    };
+> +	};
+> +    };
+> +    nx_dde_t source_dde;           /* byte[16:31] */
+> +    nx_dde_t target_dde;           /* byte[32:47] */
+> +    volatile nx_ccb_t ccb;         /* byte[48:63] */
+> +    volatile union {
+> +	/* byte[64:239] shift csb by 128 bytes out of the crb; csb was in crb
+> +	 * earlier; JReilly says csb written with partial inject.
+> +	 */
+> +	nx_qw_t reserved64[11];
+> +	stamped_crb_t stamp;       /* byte[64:79] */
+> +    };
+> +    volatile nx_csb_t csb;
+> +} nx_gzip_crb_t __attribute__((aligned (128)));
+> +
+> +
+> +typedef struct {
+> +    nx_gzip_crb_t crb;
+> +    nx_gzip_cpb_t cpb;
+> +} nx_gzip_crb_cpb_t __attribute__((aligned (2048)));
+> +
+> +
+> +/*
+> + * NX hardware convention has the msb bit on the left numbered 0.
+> + * The defines below has *_offset defined as the right most bit
+> + * position of a field.  x of size_mask(x) is the field width in bits.
+> + */
+> +
+> +#define size_mask(x)          ((1U<<(x))-1)
+> +
+> +/*
+> + * Offsets and Widths within the containing 32 bits of the various NX
+> + * gzip hardware registers.  Use the getnn/putnn macros to access
+> + * these regs
+> + */
+> +
+> +#define dde_count_mask        size_mask(8)
+> +#define dde_count_offset      23
+> +
+> +/* CSB */
+> +
+> +#define csb_v_mask            size_mask(1)
+> +#define csb_v_offset          0
+> +#define csb_f_mask            size_mask(1)
+> +#define csb_f_offset          6
+> +#define csb_cs_mask           size_mask(8)
+> +#define csb_cs_offset         15
+> +#define csb_cc_mask           size_mask(8)
+> +#define csb_cc_offset         23
+> +#define csb_ce_mask           size_mask(8)
+> +#define csb_ce_offset         31
+> +
+> +/* CCB */
+> +
+> +#define ccb_cm_mask           size_mask(3)
+> +#define ccb_cm_offset         31
+> +
+> +/* VAS stamped CRB fields */
+> +
+> +#define vas_buf_num_mask      size_mask(6)
+> +#define vas_buf_num_offset    5
+> +#define send_wc_id_mask       size_mask(16)
+> +#define send_wc_id_offset     31
+> +#define recv_wc_id_mask       size_mask(16)
+> +#define recv_wc_id_offset     31
+> +#define vas_invalid_mask      size_mask(1)
+> +#define vas_invalid_offset    31
+> +
+> +/* NX stamped fault CRB fields */
+> +
+> +#define nxsf_t_mask           size_mask(1)
+> +#define nxsf_t_offset         23
+> +#define nxsf_fs_mask          size_mask(8)
+> +#define nxsf_fs_offset        31
+> +
+> +/* CPB input */
+> +
+> +#define in_histlen_mask       size_mask(12)
+> +#define in_histlen_offset     11
+> +#define in_dhtlen_mask        size_mask(12)
+> +#define in_dhtlen_offset      31
+> +#define in_subc_mask          size_mask(3)
+> +#define in_subc_offset        31
+> +#define in_sfbt_mask          size_mask(4)
+> +#define in_sfbt_offset        15
+> +#define in_rembytecnt_mask    size_mask(16)
+> +#define in_rembytecnt_offset  31
+> +
+> +/* CPB output */
+> +
+> +#define out_tebc_mask         size_mask(3)
+> +#define out_tebc_offset       15
+> +#define out_subc_mask         size_mask(16)
+> +#define out_subc_offset       31
+> +#define out_sfbt_mask         size_mask(4)
+> +#define out_sfbt_offset       15
+> +#define out_rembytecnt_mask   size_mask(16)
+> +#define out_rembytecnt_offset 31
+> +#define out_dhtlen_mask       size_mask(12)
+> +#define out_dhtlen_offset     31
+> +
+> +/* CRB */
+> +
+> +#define gzip_fc_mask          size_mask(8)
+> +#define gzip_fc_offset        31
+> +#define crb_c_mask            size_mask(1)
+> +#define crb_c_offset          28
+> +#define crb_at_mask           size_mask(1)
+> +#define crb_at_offset         30
+> +#define csb_address_mask      ~(15UL) /* mask off bottom 4b */
+> +
+> +/*
+> + * Access macros for the registers.  Do not access registers directly
+> + * because of the endian conversion.  P9 processor may run either as
+> + * Little or Big endian. However the NX coprocessor regs are always
+> + * big endian.
+> + * Use the 32 and 64b macros to access respective
+> + * register sizes.
+> + * Use nn forms for the register fields shorter than 32 bits.
+> + */
+> +
+> +#define getnn(ST, REG)      ((be32toh(ST.REG) >> (31-REG##_offset)) \
+> +				 & REG##_mask)
+> +#define getpnn(ST, REG)     ((be32toh((ST)->REG) >> (31-REG##_offset)) \
+> +				 & REG##_mask)
+> +#define get32(ST, REG)      (be32toh(ST.REG))
+> +#define getp32(ST, REG)     (be32toh((ST)->REG))
+> +#define get64(ST, REG)      (be64toh(ST.REG))
+> +#define getp64(ST, REG)     (be64toh((ST)->REG))
+> +
+> +#define unget32(ST, REG)    (get32(ST, REG) & ~((REG##_mask) \
+> +				<< (31-REG##_offset)))
+> +/* get 32bits less the REG field */
+> +
+> +#define ungetp32(ST, REG)   (getp32(ST, REG) & ~((REG##_mask) \
+> +				<< (31-REG##_offset)))
+> +/* get 32bits less the REG field */
+> +
+> +#define clear_regs(ST)      do { memset((void *)(&(ST)), 0, sizeof(ST)); \
+> +				} while (0)
+> +#define clear_dde(ST)       do { ST.dde_count = ST.ddebc = 0; ST.ddead = 0; \
+> +				} while (0)
+> +#define clearp_dde(ST)      do { (ST)->dde_count = (ST)->ddebc = 0; \
+> +				 (ST)->ddead = 0; \
+> +				} while (0)
+> +#define clear_struct(ST)    do { memset((void *)(&(ST)), 0, sizeof(ST)); \
+> +				} while (0)
+> +
+> +#define putnn(ST, REG, X)   do { ST.REG = htobe32(unget32(ST, REG) | (((X) \
+> +				 & REG##_mask) << (31-REG##_offset))); \
+> +				} while (0)
+> +#define putpnn(ST, REG, X)  do { (ST)->REG = htobe32(ungetp32(ST, REG) \
+> +				| (((X) & REG##_mask) << (31-REG##_offset))); \
+> +				} while (0)
+> +
+> +#define put32(ST, REG, X)   do { ST.REG = htobe32(X); } while (0)
+> +#define putp32(ST, REG, X)  do { (ST)->REG = htobe32(X); } while (0)
+> +#define put64(ST, REG, X)   do { ST.REG = htobe64(X); } while (0)
+> +#define putp64(ST, REG, X)  do { (ST)->REG = htobe64(X); } while (0)
+> +
+> +/*
+> + * Completion extension ce(0) ce(1) ce(2).  Bits ce(3-7)
+> + * unused.  Section 6.6 Figure 6.7.
+> + */
+> +
+> +#define get_csb_ce(ST) ((uint32_t)getnn(ST, csb_ce))
+> +#define get_csb_ce_ms3b(ST) (get_csb_ce(ST) >> 5)
+> +#define put_csb_ce_ms3b(ST, X) do { putnn(ST, csb_ce, ((uint32_t)(X) << 5)); \
+> +				   } while (0)
+> +
+> +#define CSB_CE_PARTIAL         0x4
+> +#define CSB_CE_TERMINATE       0x2
+> +#define CSB_CE_TPBC_VALID      0x1
+> +
+> +#define csb_ce_termination(X)         (!!((X) & CSB_CE_TERMINATE))
+> +/* termination, output buffers may be modified, SPBC/TPBC invalid Fig.6-7 */
+> +
+> +#define csb_ce_check_completion(X)    (!csb_ce_termination(X))
+> +/* if not terminated then check full or partial completion */
+> +
+> +#define csb_ce_partial_completion(X)  (!!((X) & CSB_CE_PARTIAL))
+> +#define csb_ce_full_completion(X)     (!csb_ce_partial_completion(X))
+> +#define csb_ce_tpbc_valid(X)          (!!((X) & CSB_CE_TPBC_VALID))
+> +/* TPBC indicates successfully stored data count */
+> +
+> +#define csb_ce_default_err(X)         csb_ce_termination(X)
+> +/* most error CEs have CE(0)=0 and CE(1)=1 */
+> +
+> +#define csb_ce_cc3_partial(X)         csb_ce_partial_completion(X)
+> +/* some CC=3 are partially completed, Table 6-8 */
+> +
+> +#define csb_ce_cc64(X)                ((X)&(CSB_CE_PARTIAL \
+> +					| CSB_CE_TERMINATE) == 0)
+> +/* Compression: when TPBC>SPBC then CC=64 Table 6-8; target didn't
+> + * compress smaller than source.
+> + */
+> +
+> +/* Decompress SFBT combinations Tables 5-3, 6-4, 6-6 */
+> +
+> +#define SFBT_BFINAL 0x1
+> +#define SFBT_LIT    0x4
+> +#define SFBT_FHT    0x5
+> +#define SFBT_DHT    0x6
+> +#define SFBT_HDR    0x7
+> +
+> +/*
+> + * NX gzip function codes. Table 6.2.
+> + * Bits 0:4 are the FC. Bit 5 is used by the DMA controller to
+> + * select one of the two Byte Count Limits.
+> + */
+> +
+> +#define GZIP_FC_LIMIT_MASK                               0x01
+> +#define GZIP_FC_COMPRESS_FHT                             0x00
+> +#define GZIP_FC_COMPRESS_DHT                             0x02
+> +#define GZIP_FC_COMPRESS_FHT_COUNT                       0x04
+> +#define GZIP_FC_COMPRESS_DHT_COUNT                       0x06
+> +#define GZIP_FC_COMPRESS_RESUME_FHT                      0x08
+> +#define GZIP_FC_COMPRESS_RESUME_DHT                      0x0a
+> +#define GZIP_FC_COMPRESS_RESUME_FHT_COUNT                0x0c
+> +#define GZIP_FC_COMPRESS_RESUME_DHT_COUNT                0x0e
+> +#define GZIP_FC_DECOMPRESS                               0x10
+> +#define GZIP_FC_DECOMPRESS_SINGLE_BLK_N_SUSPEND          0x12
+> +#define GZIP_FC_DECOMPRESS_RESUME                        0x14
+> +#define GZIP_FC_DECOMPRESS_RESUME_SINGLE_BLK_N_SUSPEND   0x16
+> +#define GZIP_FC_WRAP                                     0x1e
+> +
+> +#define fc_is_compress(fc)  (((fc) & 0x10) == 0)
+> +#define fc_has_count(fc)    (fc_is_compress(fc) && (((fc) & 0x4) != 0))
+> +
+> +/* CSB.CC Error codes */
+> +
+> +#define ERR_NX_OK             0
+> +#define ERR_NX_ALIGNMENT      1
+> +#define ERR_NX_OPOVERLAP      2
+> +#define ERR_NX_DATA_LENGTH    3
+> +#define ERR_NX_TRANSLATION    5
+> +#define ERR_NX_PROTECTION     6
+> +#define ERR_NX_EXTERNAL_UE7   7
+> +#define ERR_NX_INVALID_OP     8
+> +#define ERR_NX_PRIVILEGE      9
+> +#define ERR_NX_INTERNAL_UE   10
+> +#define ERR_NX_EXTERN_UE_WR  12
+> +#define ERR_NX_TARGET_SPACE  13
+> +#define ERR_NX_EXCESSIVE_DDE 14
+> +#define ERR_NX_TRANSL_WR     15
+> +#define ERR_NX_PROTECT_WR    16
+> +#define ERR_NX_SUBFUNCTION   17
+> +#define ERR_NX_FUNC_ABORT    18
+> +#define ERR_NX_BYTE_MAX      19
+> +#define ERR_NX_CORRUPT_CRB   20
+> +#define ERR_NX_INVALID_CRB   21
+> +#define ERR_NX_INVALID_DDE   30
+> +#define ERR_NX_SEGMENTED_DDL 31
+> +#define ERR_NX_DDE_OVERFLOW  33
+> +#define ERR_NX_TPBC_GT_SPBC  64
+> +#define ERR_NX_MISSING_CODE  66
+> +#define ERR_NX_INVALID_DIST  67
+> +#define ERR_NX_INVALID_DHT   68
+> +#define ERR_NX_EXTERNAL_UE90 90
+> +#define ERR_NX_WDOG_TIMER   224
+> +#define ERR_NX_AT_FAULT     250
+> +#define ERR_NX_INTR_SERVER  252
+> +#define ERR_NX_UE253        253
+> +#define ERR_NX_NO_HW        254
+> +#define ERR_NX_HUNG_OP      255
+> +#define ERR_NX_END          256
+> +
+> +/* initial values for non-resume operations */
+> +#define INIT_CRC   0  /* crc32(0L, Z_NULL, 0) */
+> +#define INIT_ADLER 1  /* adler32(0L, Z_NULL, 0)  adler is initalized to 1 */
+> +
+> +/* prototypes */
+> +#ifdef NX_JOB_CALLBACK
+> +int nxu_run_job(nx_gzip_crb_cpb_t *c, void *handle,
+> +		int (*callback)(const void *));
+> +#else
+> +int nxu_run_job(nx_gzip_crb_cpb_t *c, void *handle);
+> +#endif
+> +
+> +
+> +/* caller supplies a print buffer 4*sizeof(crb) */
+> +
+> +char *nx_crb_str(nx_gzip_crb_t *crb, char *prbuf);
+> +char *nx_cpb_str(nx_gzip_cpb_t *cpb, char *prbuf);
+> +char *nx_prt_hex(void *cp, int sz, char *prbuf);
+> +char *nx_lzcount_str(nx_gzip_cpb_t *cpb, char *prbuf);
+> +char *nx_strerror(int e);
+> +
+> +#ifdef NX_SIM
+> +#include <stdio.h>
+> +int nx_sim_init(void *ctx);
+> +int nx_sim_end(void *ctx);
+> +int nxu_run_sim_job(nx_gzip_crb_cpb_t *c, void *ctx);
+> +#endif /* NX_SIM */
+> +
+> +/* Deflate stream manipulation */
+> +
+> +#define set_final_bit(x) do { x |= (unsigned char)1; } while (0)
+> +#define clr_final_bit(x) do { x &= ~(unsigned char)1; } while (0)
+> +
+> +#define append_empty_fh_blk(p, b) do { *(p) = (2 | (1&(b))); *((p)+1) = 0; \
+> +				    } while (0)
+> +/* append 10 bits 0000001b 00...... ;
+> + * assumes appending starts on a byte boundary; b is the final bit.
+> + */
+> +
+> +
+> +#ifdef NX_842
+> +
+> +/* 842 Engine */
+> +
+> +typedef struct {
+> +    union {                   /* byte[0:3]   */
+> +	uint32_t eft_fc;      /* bits[29-31] */
+> +    };
+> +    uint32_t reserved1;       /* byte[4:7]   */
+> +    union {
+> +	uint64_t csb_address; /* byte[8:15]  */
+> +	struct {
+> +	    uint32_t reserved2;
+> +	    union {
+> +		uint32_t crb_c;
+> +		/* c==0 no ccb defined */
+> +
+> +		uint32_t crb_at;
+> +		/* at==0 address type is ignored;
+> +		   all addrs effective assumed */
+> +
+> +	    };
+> +	};
+> +    };
+> +    nx_dde_t source_dde;           /* byte[16:31] */
+> +    nx_dde_t target_dde;           /* byte[32:47] */
+> +    nx_ccb_t ccb;                  /* byte[48:63] */
+> +    union {
+> +	nx_qw_t reserved64[3];     /* byte[64:96] */
+> +    };
+> +    nx_csb_t csb;
+> +} nx_eft_crb_t __attribute__((aligned (128)));
+> +
+> +/* 842 CRB */
+> +
+> +#define EFT_FC_MASK                 size_mask(3)
+> +#define EFT_FC_OFFSET               31
+> +#define EFT_FC_COMPRESS             0x0
+> +#define EFT_FC_COMPRESS_WITH_CRC    0x1
+> +#define EFT_FC_DECOMPRESS           0x2
+> +#define EFT_FC_DECOMPRESS_WITH_CRC  0x3
+> +#define EFT_FC_BLK_DATA_MOVE        0x4
+> +#endif /* NX_842 */
+> +
+> +#endif /* _NXU_H */
 > -- 
-> Raphael Moreira Zinsly
-> IBM
-> Linux on Power Toolchain
+> 2.21.0
