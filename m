@@ -2,167 +2,118 @@ Return-Path: <SRS0=HVQB=5E=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8447AC4332D
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Mar 2020 04:36:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C1D1C4332D
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Mar 2020 08:15:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 5866B20757
-	for <linux-crypto@archiver.kernel.org>; Thu, 19 Mar 2020 04:36:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="FK+oh8+k"
+	by mail.kernel.org (Postfix) with ESMTP id 0E1CD20724
+	for <linux-crypto@archiver.kernel.org>; Thu, 19 Mar 2020 08:15:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1584605744;
+	bh=LdJipUFyZBF+HWb06ft7tA5xx8pfQFU78elBxzYZlTM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=2M0shwmHCLDO+NWJrw/t/t3zh3Unz85KK0IEtEEoLxkAezwqVfzCByTzVNcwC2yr9
+	 s2UHO6w9cjOX79lFq+6W++gNaZSW16tFRquUopT0a5pfXL6jx0g+pq5VKvi9irVqg4
+	 cpNz8uVu2i10km0PA7hH3LV6pM4SzPg2hgbdplQM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725787AbgCSEg1 (ORCPT
+        id S1726151AbgCSIPn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Mar 2020 00:36:27 -0400
-Received: from frisell.zx2c4.com ([192.95.5.64]:41735 "EHLO frisell.zx2c4.com"
+        Thu, 19 Mar 2020 04:15:43 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47166 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725601AbgCSEg1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Mar 2020 00:36:27 -0400
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 925fe938;
-        Thu, 19 Mar 2020 04:30:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
-        :references:in-reply-to:from:date:message-id:subject:to:cc
-        :content-type; s=mail; bh=+s2FzirMB0tlloariI/IcCb8oyc=; b=FK+oh8
-        +kTiQrNR+RQf497KyPeLBun7Pt/xmB8nKb5wFXjc8Kh/FPxpHm/YcuY/c/UjWH5y
-        3RwUHzSHH7WfAuOtEPOdm9l4guCBxQ5l1w0m4GXFBNHFa8rgUCVRqa2YZx3zllOd
-        TSx2zq1nhSIFF/W4qXuxAYSDdZzK68VCuCIwY5gMKN2cbZFnf/uZio6kqcB9U6kC
-        4x9f0/wyIPraPCXYoaOPaYX2Z0qxiiMwKzegIrxxmS0elEmvjwM9VR6TSq2if66+
-        WBv1gokoNGJ4YYISvFdo2g/y7VEwXQfJCrk3XtTJ6razqIHUjF37tcMRz4UMFOzM
-        Lqj7Bh0uFPEU1dGw==
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id b03adda6 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
-        Thu, 19 Mar 2020 04:29:58 +0000 (UTC)
-Received: by mail-il1-f179.google.com with SMTP id p1so1018299ils.5;
-        Wed, 18 Mar 2020 21:36:24 -0700 (PDT)
-X-Gm-Message-State: ANhLgQ2vbqw8m/piboOdH9O/0iQSb2pEwr6jcGa21yR8bAdK7nWsEIY3
-        AWKQuYPY5U/Pujd9SGS4lVehCL4JLNQUaGAxqkw=
-X-Google-Smtp-Source: ADFU+vvf9AsZriRw4R+MQ2btVMLhM7//ex/Lj+zPbU7bBo6NKPrcPmpj5qASRSvJQHh9LZzrSUW12e6/1cVA23qNtZc=
-X-Received: by 2002:a92:358b:: with SMTP id c11mr1400687ilf.64.1584592584049;
- Wed, 18 Mar 2020 21:36:24 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAHmME9otcAe7H4Anan8Tv1KreTZtwt4XXEPMG--x2Ljr0M+o1Q@mail.gmail.com>
- <20200319022732.166085-1-Jason@zx2c4.com> <20200319032526.GH2334@sol.localdomain>
- <CAHmME9rV7rknXMmjhNj--ZWvya7ZG37tnKQB+vxuqok4nLJwTg@mail.gmail.com>
-In-Reply-To: <CAHmME9rV7rknXMmjhNj--ZWvya7ZG37tnKQB+vxuqok4nLJwTg@mail.gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 18 Mar 2020 22:36:13 -0600
-X-Gmail-Original-Message-ID: <CAHmME9qNfb6N4bg4j-Y+KOT-S9DMnUpUT3TB8KKHD2wB7yvukA@mail.gmail.com>
-Message-ID: <CAHmME9qNfb6N4bg4j-Y+KOT-S9DMnUpUT3TB8KKHD2wB7yvukA@mail.gmail.com>
-Subject: Re: [PATCH URGENT crypto v2] crypto: arm64/chacha - correctly walk
- through blocks
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        id S1726905AbgCSIPn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 19 Mar 2020 04:15:43 -0400
+Received: from willie-the-truck (236.31.169.217.in-addr.arpa [217.169.31.236])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id D66F420663;
+        Thu, 19 Mar 2020 08:15:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1584605742;
+        bh=LdJipUFyZBF+HWb06ft7tA5xx8pfQFU78elBxzYZlTM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=nGHgshCIeIYyjXviV1KXQzzgZIyEakQRG7TP5KXx+V4qOKEcRm3+dvc9WuVV0h+14
+         x36voC/EuAh3rl/mYHzUrxGeciPHqAiyi2/vt2Zx+wkp7/OoPosTm3hUWpYYe5tsz5
+         cdoU3/vyva6X37aZr3e2/j3RW8sI/VWfPKm4j/5c=
+Date:   Thu, 19 Mar 2020 08:15:37 +0000
+From:   Will Deacon <will@kernel.org>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     Torsten Duwe <duwe@lst.de>,
+        Catalin Marinas <catalin.marinas@arm.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Emil Renner Berthing <kernel@esmil.dk>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        stable <stable@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        "David S. Miller" <davem@davemloft.net>,
+        Russell King <linux@armlinux.org.uk>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Subject: Re: [Patch][Fix] crypto: arm{,64} neon: memzero_explicit aes-cbc key
+Message-ID: <20200319081536.GA20670@willie-the-truck>
+References: <20200313110258.94A0668C4E@verein.lst.de>
+ <20200317221743.GD20788@willie-the-truck>
+ <CAKv+Gu9_gV0aVwa2QG7jgaR71bTz12vs386R9uPjdQTtm0HcUw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKv+Gu9_gV0aVwa2QG7jgaR71bTz12vs386R9uPjdQTtm0HcUw@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Mar 18, 2020 at 10:25 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> On Wed, Mar 18, 2020 at 9:25 PM Eric Biggers <ebiggers@kernel.org> wrote:
+On Wed, Mar 18, 2020 at 04:13:33PM -0400, Ard Biesheuvel wrote:
+> On Tue, 17 Mar 2020 at 18:17, Will Deacon <will@kernel.org> wrote:
 > >
-> > On Wed, Mar 18, 2020 at 08:27:32PM -0600, Jason A. Donenfeld wrote:
-> > > It also fixes up a bug in the (optional, costly) stride test that
-> > > prevented it from running on arm64.
-> > [...]
-> > > diff --git a/lib/crypto/chacha20poly1305-selftest.c b/lib/crypto/chacha20poly1305-selftest.c
-> > > index c391a91364e9..fa43deda2660 100644
-> > > --- a/lib/crypto/chacha20poly1305-selftest.c
-> > > +++ b/lib/crypto/chacha20poly1305-selftest.c
-> > > @@ -9028,10 +9028,15 @@ bool __init chacha20poly1305_selftest(void)
-> > >            && total_len <= 1 << 10; ++total_len) {
-> > >               for (i = 0; i <= total_len; ++i) {
-> > >                       for (j = i; j <= total_len; ++j) {
-> > > +                             k = 0;
-> > >                               sg_init_table(sg_src, 3);
-> > > -                             sg_set_buf(&sg_src[0], input, i);
-> > > -                             sg_set_buf(&sg_src[1], input + i, j - i);
-> > > -                             sg_set_buf(&sg_src[2], input + j, total_len - j);
-> > > +                             if (i)
-> > > +                                     sg_set_buf(&sg_src[k++], input, i);
-> > > +                             if (j - i)
-> > > +                                     sg_set_buf(&sg_src[k++], input + i, j - i);
-> > > +                             if (total_len - j)
-> > > +                                     sg_set_buf(&sg_src[k++], input + j, total_len - j);
-> > > +                             sg_init_marker(sg_src, k);
-> > >                               memset(computed_output, 0, total_len);
-> > >                               memset(input, 0, total_len);
+> > [+Ard]
 > >
-> > So with this test fix, does this test find the bug?
->
-> Yes.
->
-> > Apparently the empty scatterlist elements caused some problem?  What was
-> > that problem exactly?  And what do you mean by this "prevented the test
-> > from running on arm64"?  If there is a problem it seems we should
-> > something else about about it, e.g. debug checks that work in consistent
-> > way on all architectures, documenting what the function expects, or make
-> > it just work properly with empty scatterlist elements.
->
-> Yea, my next plan was to look into what's going on there. In case
-> you're curious, here's what happens:
->
-> [    0.355761] [ffffffff041e9508] pgd=000000004ffe9003,
-> pud=000000004ffe9003, pmd=0000000000000000
-> [    0.356212] Internal error: Oops: 96000006 [#1] PREEMPT SMP
-> [    0.356587] CPU: 1 PID: 1 Comm: swapper/0 Not tainted 5.6.0-rc5+ #10
-> [    0.356695] Hardware name: linux,dummy-virt (DT)
-> [    0.356972] pstate: 20000005 (nzCv daif -PAN -UAO)
-> [    0.357158] pc : scatterwalk_copychunks+0x13c/0x1e0
-> [    0.357257] lr : scatterwalk_copychunks+0xe0/0x1e0
-> [    0.357379] sp : ffffff800f82f970
-> [    0.357450] x29: ffffff800f82f970 x28: ffffff800f838000
-> [    0.357607] x27: ffffff800f838000 x26: 0000000000000001
-> [    0.357725] x25: ffffff800f82faf0 x24: ffffff800f82fa10
-> [    0.357820] x23: 0000000000000010 x22: 0000000000000000
-> [    0.357898] x21: 0000000000000000 x20: 0000000100200000
-> [    0.357978] x19: ffffff8000000000 x18: 0000000000000014
-> [    0.358132] x17: 0000000000000000 x16: 0000000000000002
-> [    0.358214] x15: 00000000074c5755 x14: 0000000000000002
-> [    0.358310] x13: 074c57550311ac67 x12: 09579e470077af1a
-> [    0.358453] x11: 1d3f98018ec6f5bb x10: 3e6144a223343e11
-> [    0.358560] x9 : 0000000000000000 x8 : ffffff800f82fcc0
-> [    0.358638] x7 : 0000000000000000 x6 : ffffff800fa55000
-> [    0.358711] x5 : 0000000000001000 x4 : 0000000000000000
-> [    0.358781] x3 : ffffffff001e9540 x2 : ffffffff001e9540
-> [    0.358855] x1 : ffffffff041e9500 x0 : ffffff800f82fd60
-> [    0.359007] Call trace:
-> [    0.359177]  scatterwalk_copychunks+0x13c/0x1e0
-> [    0.359269]  scatterwalk_map_and_copy+0x50/0xa8
-> [    0.359339]  chacha20poly1305_crypt_sg_inplace+0x3f4/0x418
-> [    0.359418]  chacha20poly1305_encrypt_sg_inplace+0x10/0x18
-> [    0.359511]  chacha20poly1305_selftest+0x4dc/0x618
-> [    0.359581]  mod_init+0xc/0x2c
-> [    0.359630]  do_one_initcall+0x58/0x11c
-> [    0.359687]  kernel_init_freeable+0x174/0x1e0
-> [    0.359751]  kernel_init+0x10/0x100
-> [    0.359803]  ret_from_fork+0x10/0x18
-> [    0.360074] Code: f9400002 530c7c21 927ef442 8b011841 (f9400423)
-> [    0.360257] ---[ end trace 0b64264f8a25dbdf ]---
-> [    0.360453] Kernel panic - not syncing: Fatal exception
-> [    0.360597] SMP: stopping secondary CPUs
-> [    0.360835] Kernel Offset: disabled
-> [    0.360985] CPU features: 0x00002,00002000
-> [    0.361042] Memory Limit: none
+> > On Fri, Mar 13, 2020 at 12:02:58PM +0100, Torsten Duwe wrote:
+> > > From: Torsten Duwe <duwe@suse.de>
+> > >
+> > > At function exit, do not leave the expanded key in the rk struct
+> > > which got allocated on the stack.
+> > >
+> > > Signed-off-by: Torsten Duwe <duwe@suse.de>
+> > > ---
+> > > Another small fix from our FIPS evaluation. I hope you don't mind I merged
+> > > arm32 and arm64 into one patch -- this is really simple.
+> > > --- a/arch/arm/crypto/aes-neonbs-glue.c
+> > > +++ b/arch/arm/crypto/aes-neonbs-glue.c
+> > > @@ -138,6 +138,7 @@ static int aesbs_cbc_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
+> > >       kernel_neon_begin();
+> > >       aesbs_convert_key(ctx->key.rk, rk.key_enc, ctx->key.rounds);
+> > >       kernel_neon_end();
+> > > +     memzero_explicit(&rk, sizeof(rk));
+> > >
+> > >       return crypto_cipher_setkey(ctx->enc_tfm, in_key, key_len);
+> > >  }
+> > > diff --git a/arch/arm64/crypto/aes-neonbs-glue.c b/arch/arm64/crypto/aes-neonbs-glue.c
+> > > index e3e27349a9fe..c0b980503643 100644
+> > > --- a/arch/arm64/crypto/aes-neonbs-glue.c
+> > > +++ b/arch/arm64/crypto/aes-neonbs-glue.c
+> > > @@ -151,6 +151,7 @@ static int aesbs_cbc_setkey(struct crypto_skcipher *tfm, const u8 *in_key,
+> > >       kernel_neon_begin();
+> > >       aesbs_convert_key(ctx->key.rk, rk.key_enc, ctx->key.rounds);
+> > >       kernel_neon_end();
+> > > +     memzero_explicit(&rk, sizeof(rk));
+> > >
+> > >       return 0;
+> > >  }
+> >
+> > I'm certainly not a crypto person, but this looks sensible to me and I
+> > couldn't find any other similar stack variable usage under
+> > arch/arm64/crypto/ at a quick glance.
+> >
+> > Acked-by: Will Deacon <will@kernel.org>
+> >
+> 
+> Acked-by: Ard Biesheuvel <ardb@kernel.org>
 
-__read_once_size at include/linux/compiler.h:199
-(inlined by) compound_head at include/linux/page-flags.h:174
-(inlined by) PageSlab at include/linux/page-flags.h:325
-(inlined by) scatterwalk_pagedone at include/crypto/scatterwalk.h:88
-(inlined by) scatterwalk_copychunks at crypto/scatterwalk.c:50
+Cheers, Ard. I'm assuming that Herbert will pick this up via the crypto
+tree.
 
-Bug makes sense.
-
-scatterwalk_copychunks->scatterwalk_pagedone->PageSlab, but length
-zero page means we're looking at nonsense.
-
-So this v2 seems to be the correct fix.
+Will
