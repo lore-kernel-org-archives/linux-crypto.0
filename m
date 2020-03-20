@@ -6,59 +6,66 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DF76C4332D
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Mar 2020 03:39:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D9A5C4332D
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Mar 2020 03:48:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E416820724
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Mar 2020 03:39:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 17C2820722
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Mar 2020 03:48:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726847AbgCTDja (ORCPT
+        id S1726614AbgCTDsz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Mar 2020 23:39:30 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:33746 "EHLO fornost.hmeau.com"
+        Thu, 19 Mar 2020 23:48:55 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:33854 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726103AbgCTDja (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Mar 2020 23:39:30 -0400
+        id S1725884AbgCTDsz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 19 Mar 2020 23:48:55 -0400
 Received: from gwarestrin.me.apana.org.au ([192.168.0.7] helo=gwarestrin.arnor.me.apana.org.au)
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1jF8VJ-0001KJ-2M; Fri, 20 Mar 2020 14:39:26 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Mar 2020 14:39:24 +1100
-Date:   Fri, 20 Mar 2020 14:39:24 +1100
+        id 1jF8eA-0001To-MJ; Fri, 20 Mar 2020 14:48:35 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Mar 2020 14:48:34 +1100
+Date:   Fri, 20 Mar 2020 14:48:34 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Lothar Rubusch <l.rubusch@gmail.com>
-Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org
-Subject: Re: [PATCH] crypto: bool type cosmetics
-Message-ID: <20200320033924.GA22682@gondor.apana.org.au>
-References: <CAFXKEHahNKcjoU2Zd0XZBPvrSAW87xN5T5DR+rXzQ9uXH6zmPw@mail.gmail.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        gregkh@linuxfoundation.org, Emil Renner Berthing <kernel@esmil.dk>,
+        Ard Biesheuvel <ardb@kernel.org>, stable@vger.kernel.org
+Subject: Re: [PATCH URGENT crypto v2] crypto: arm64/chacha - correctly walk
+ through blocks
+Message-ID: <20200320034834.GA27372@gondor.apana.org.au>
+References: <CAHmME9otcAe7H4Anan8Tv1KreTZtwt4XXEPMG--x2Ljr0M+o1Q@mail.gmail.com>
+ <20200319022732.166085-1-Jason@zx2c4.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAFXKEHahNKcjoU2Zd0XZBPvrSAW87xN5T5DR+rXzQ9uXH6zmPw@mail.gmail.com>
+In-Reply-To: <20200319022732.166085-1-Jason@zx2c4.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, Mar 15, 2020 at 06:42:07PM +0100, Lothar Rubusch wrote:
-> >From d7e37962c530927952aa0f0601711fba75a3ddf2 Mon Sep 17 00:00:00 2001
-> From: Lothar Rubusch <l.rubusch@gmail.com>
-> Date: Sun, 15 Mar 2020 17:34:22 +0000
-> Subject: [PATCH] crypto: bool type cosmetics
+On Wed, Mar 18, 2020 at 08:27:32PM -0600, Jason A. Donenfeld wrote:
+> Prior, passing in chunks of 2, 3, or 4, followed by any additional
+> chunks would result in the chacha state counter getting out of sync,
+> resulting in incorrect encryption/decryption, which is a pretty nasty
+> crypto vuln: "why do images look weird on webpages?" WireGuard users
+> never experienced this prior, because we have always, out of tree, used
+> a different crypto library, until the recent Frankenzinc addition. This
+> commit fixes the issue by advancing the pointers and state counter by
+> the actual size processed. It also fixes up a bug in the (optional,
+> costly) stride test that prevented it from running on arm64.
 > 
-> When working with bool values the true and false definitions should be used
-> instead of 1 and 0.
-> 
-> Signed-off-by: Lothar Rubusch <l.rubusch@gmail.com>
+> Fixes: b3aad5bad26a ("crypto: arm64/chacha - expose arm64 ChaCha routine as library function")
+> Reported-and-tested-by: Emil Renner Berthing <kernel@esmil.dk>
+> Cc: Ard Biesheuvel <ardb@kernel.org>
+> Cc: stable@vger.kernel.org # v5.5+
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 > ---
->  crypto/af_alg.c     | 10 +++++-----
->  crypto/algif_hash.c |  6 +++---
->  2 files changed, 8 insertions(+), 8 deletions(-)
+>  arch/arm64/crypto/chacha-neon-glue.c   |  8 ++++----
+>  lib/crypto/chacha20poly1305-selftest.c | 11 ++++++++---
+>  2 files changed, 12 insertions(+), 7 deletions(-)
 
-Sorry but your patch is corrupted.  Please fix your mailer and
-resubmit.
-
-Thanks,
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
