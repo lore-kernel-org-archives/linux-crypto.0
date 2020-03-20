@@ -2,83 +2,56 @@ Return-Path: <SRS0=WfFd=5F=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E292C4332B
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Mar 2020 03:50:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EC1AC4332B
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Mar 2020 03:50:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6CC572072C
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Mar 2020 03:50:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B03E20722
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Mar 2020 03:50:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726603AbgCTDuj (ORCPT
+        id S1726834AbgCTDuw (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Mar 2020 23:50:39 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:33866 "EHLO fornost.hmeau.com"
+        Thu, 19 Mar 2020 23:50:52 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:33880 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726834AbgCTDui (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Mar 2020 23:50:38 -0400
+        id S1726789AbgCTDuw (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 19 Mar 2020 23:50:52 -0400
 Received: from gwarestrin.me.apana.org.au ([192.168.0.7] helo=gwarestrin.arnor.me.apana.org.au)
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1jF8fz-0001VH-AS; Fri, 20 Mar 2020 14:50:28 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Mar 2020 14:50:27 +1100
-Date:   Fri, 20 Mar 2020 14:50:27 +1100
+        id 1jF8gK-0001Vr-Kb; Fri, 20 Mar 2020 14:50:49 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Mar 2020 14:50:48 +1100
+Date:   Fri, 20 Mar 2020 14:50:48 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Shukun Tan <tanshukun1@huawei.com>
-Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
-        wangzhou1@hisilicon.com, xuzaibo@huawei.com
-Subject: Re: [PATCH v2 0/4] crypto: hisilicon - Refactor find device related
- code
-Message-ID: <20200320035027.GB27372@gondor.apana.org.au>
-References: <1583829772-53372-1-git-send-email-tanshukun1@huawei.com>
+To:     Takashi Iwai <tiwai@suse.de>
+Cc:     linux-crypto@vger.kernel.org
+Subject: Re: [PATCH] crypto: bcm: Use scnprintf() for avoiding potential
+ buffer overflow
+Message-ID: <20200320035048.GD27372@gondor.apana.org.au>
+References: <20200311071506.4417-1-tiwai@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1583829772-53372-1-git-send-email-tanshukun1@huawei.com>
+In-Reply-To: <20200311071506.4417-1-tiwai@suse.de>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Mar 10, 2020 at 04:42:48PM +0800, Shukun Tan wrote:
-> By binding device finding with create QP logic to fix the bug of creating
-> QP failure occasionally. Then, merge the find device related code into
-> qm.c to reduce redundancy.
+On Wed, Mar 11, 2020 at 08:15:06AM +0100, Takashi Iwai wrote:
+> Since snprintf() returns the would-be-output size instead of the
+> actual output size, the succeeding calls may go beyond the given
+> buffer limit.  Fix it by replacing with scnprintf().
 > 
-> This series depends upon this patchset:
-> https://lore.kernel.org/linux-crypto/1583373985-718-1-git-send-email-xuzaibo@huawei.com/
-> 
-> Changes v1 -> v2:
-> 	- Fix bug of compile when disable NUMA config.
-> 
-> Hui Tang (1):
->   crypto: hisilicon/hpre - Optimize finding hpre device process
-> 
-> Kai Ye (1):
->   crypto: hisilicon/sec2 - Add new create qp process
-> 
-> Shukun Tan (1):
->   crypto: hisilicon/zip - Use hisi_qm_alloc_qps_node() when init ctx
-> 
-> Weili Qian (1):
->   crypto: hisilicon/qm - Put device finding logic into QM
-> 
->  drivers/crypto/hisilicon/hpre/hpre.h        |   3 +-
->  drivers/crypto/hisilicon/hpre/hpre_crypto.c |  20 ++---
->  drivers/crypto/hisilicon/hpre/hpre_main.c   |  52 +++---------
->  drivers/crypto/hisilicon/qm.c               | 125 ++++++++++++++++++++++++++++
->  drivers/crypto/hisilicon/qm.h               |  31 +++++++
->  drivers/crypto/hisilicon/sec2/sec.h         |   5 +-
->  drivers/crypto/hisilicon/sec2/sec_crypto.c  |  17 ++--
->  drivers/crypto/hisilicon/sec2/sec_main.c    |  81 +++++++-----------
->  drivers/crypto/hisilicon/zip/zip.h          |   2 +-
->  drivers/crypto/hisilicon/zip/zip_crypto.c   |  54 ++++++------
->  drivers/crypto/hisilicon/zip/zip_main.c     |  92 ++------------------
->  11 files changed, 252 insertions(+), 230 deletions(-)
+> Signed-off-by: Takashi Iwai <tiwai@suse.de>
+> ---
+>  drivers/crypto/bcm/util.c | 40 ++++++++++++++++++++--------------------
+>  1 file changed, 20 insertions(+), 20 deletions(-)
 
-All applied.  Thanks.
+Patch applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
