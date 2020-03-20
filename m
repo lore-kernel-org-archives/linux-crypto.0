@@ -2,70 +2,83 @@ Return-Path: <SRS0=WfFd=5F=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D9A5C4332D
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Mar 2020 03:48:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E292C4332B
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Mar 2020 03:50:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 17C2820722
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Mar 2020 03:48:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6CC572072C
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Mar 2020 03:50:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726614AbgCTDsz (ORCPT
+        id S1726603AbgCTDuj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 19 Mar 2020 23:48:55 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:33854 "EHLO fornost.hmeau.com"
+        Thu, 19 Mar 2020 23:50:39 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:33866 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725884AbgCTDsz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 19 Mar 2020 23:48:55 -0400
+        id S1726834AbgCTDui (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 19 Mar 2020 23:50:38 -0400
 Received: from gwarestrin.me.apana.org.au ([192.168.0.7] helo=gwarestrin.arnor.me.apana.org.au)
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1jF8eA-0001To-MJ; Fri, 20 Mar 2020 14:48:35 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Mar 2020 14:48:34 +1100
-Date:   Fri, 20 Mar 2020 14:48:34 +1100
+        id 1jF8fz-0001VH-AS; Fri, 20 Mar 2020 14:50:28 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 20 Mar 2020 14:50:27 +1100
+Date:   Fri, 20 Mar 2020 14:50:27 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        gregkh@linuxfoundation.org, Emil Renner Berthing <kernel@esmil.dk>,
-        Ard Biesheuvel <ardb@kernel.org>, stable@vger.kernel.org
-Subject: Re: [PATCH URGENT crypto v2] crypto: arm64/chacha - correctly walk
- through blocks
-Message-ID: <20200320034834.GA27372@gondor.apana.org.au>
-References: <CAHmME9otcAe7H4Anan8Tv1KreTZtwt4XXEPMG--x2Ljr0M+o1Q@mail.gmail.com>
- <20200319022732.166085-1-Jason@zx2c4.com>
+To:     Shukun Tan <tanshukun1@huawei.com>
+Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
+        wangzhou1@hisilicon.com, xuzaibo@huawei.com
+Subject: Re: [PATCH v2 0/4] crypto: hisilicon - Refactor find device related
+ code
+Message-ID: <20200320035027.GB27372@gondor.apana.org.au>
+References: <1583829772-53372-1-git-send-email-tanshukun1@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200319022732.166085-1-Jason@zx2c4.com>
+In-Reply-To: <1583829772-53372-1-git-send-email-tanshukun1@huawei.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Mar 18, 2020 at 08:27:32PM -0600, Jason A. Donenfeld wrote:
-> Prior, passing in chunks of 2, 3, or 4, followed by any additional
-> chunks would result in the chacha state counter getting out of sync,
-> resulting in incorrect encryption/decryption, which is a pretty nasty
-> crypto vuln: "why do images look weird on webpages?" WireGuard users
-> never experienced this prior, because we have always, out of tree, used
-> a different crypto library, until the recent Frankenzinc addition. This
-> commit fixes the issue by advancing the pointers and state counter by
-> the actual size processed. It also fixes up a bug in the (optional,
-> costly) stride test that prevented it from running on arm64.
+On Tue, Mar 10, 2020 at 04:42:48PM +0800, Shukun Tan wrote:
+> By binding device finding with create QP logic to fix the bug of creating
+> QP failure occasionally. Then, merge the find device related code into
+> qm.c to reduce redundancy.
 > 
-> Fixes: b3aad5bad26a ("crypto: arm64/chacha - expose arm64 ChaCha routine as library function")
-> Reported-and-tested-by: Emil Renner Berthing <kernel@esmil.dk>
-> Cc: Ard Biesheuvel <ardb@kernel.org>
-> Cc: stable@vger.kernel.org # v5.5+
-> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> ---
->  arch/arm64/crypto/chacha-neon-glue.c   |  8 ++++----
->  lib/crypto/chacha20poly1305-selftest.c | 11 ++++++++---
->  2 files changed, 12 insertions(+), 7 deletions(-)
+> This series depends upon this patchset:
+> https://lore.kernel.org/linux-crypto/1583373985-718-1-git-send-email-xuzaibo@huawei.com/
+> 
+> Changes v1 -> v2:
+> 	- Fix bug of compile when disable NUMA config.
+> 
+> Hui Tang (1):
+>   crypto: hisilicon/hpre - Optimize finding hpre device process
+> 
+> Kai Ye (1):
+>   crypto: hisilicon/sec2 - Add new create qp process
+> 
+> Shukun Tan (1):
+>   crypto: hisilicon/zip - Use hisi_qm_alloc_qps_node() when init ctx
+> 
+> Weili Qian (1):
+>   crypto: hisilicon/qm - Put device finding logic into QM
+> 
+>  drivers/crypto/hisilicon/hpre/hpre.h        |   3 +-
+>  drivers/crypto/hisilicon/hpre/hpre_crypto.c |  20 ++---
+>  drivers/crypto/hisilicon/hpre/hpre_main.c   |  52 +++---------
+>  drivers/crypto/hisilicon/qm.c               | 125 ++++++++++++++++++++++++++++
+>  drivers/crypto/hisilicon/qm.h               |  31 +++++++
+>  drivers/crypto/hisilicon/sec2/sec.h         |   5 +-
+>  drivers/crypto/hisilicon/sec2/sec_crypto.c  |  17 ++--
+>  drivers/crypto/hisilicon/sec2/sec_main.c    |  81 +++++++-----------
+>  drivers/crypto/hisilicon/zip/zip.h          |   2 +-
+>  drivers/crypto/hisilicon/zip/zip_crypto.c   |  54 ++++++------
+>  drivers/crypto/hisilicon/zip/zip_main.c     |  92 ++------------------
+>  11 files changed, 252 insertions(+), 230 deletions(-)
 
-Patch applied.  Thanks.
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
