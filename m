@@ -2,88 +2,100 @@ Return-Path: <SRS0=WfFd=5F=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2C2AC4332D
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Mar 2020 16:18:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB511C4332E
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Mar 2020 20:25:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C55A320724
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Mar 2020 16:18:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1584721092;
-	bh=VITXHo0sHdLtyj6pXdOB5yREmxZwclBqfrqMV2mzXOQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=n6TJavhy58pADS49qJIT6JLVAdk2EI+lMQ7jwxdrWKI8axM4ajF26Gv9TmBysNv8v
-	 2LfWZP2SyAC72i/uvO58xxWrnWDjwNCIiwMaHdPJALnpEOje7ZqRRZ21wj5PEFE3dj
-	 KSq2vtnqA5KkzuF8ZHZYM6cbUg8EiK7GDeDCoYvU=
+	by mail.kernel.org (Postfix) with ESMTP id B9AF820781
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Mar 2020 20:25:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727092AbgCTQSM (ORCPT
+        id S1727163AbgCTUZQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Mar 2020 12:18:12 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49600 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726801AbgCTQSM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Mar 2020 12:18:12 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2BDC120739;
-        Fri, 20 Mar 2020 16:18:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1584721091;
-        bh=VITXHo0sHdLtyj6pXdOB5yREmxZwclBqfrqMV2mzXOQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=dliZ1UGBNJQVcgyrav8UrCNriV6EBlp6Ok7U/K0GNtcj8e2JZogie6BZNPVEEaHuo
-         oy5pWyifbExLOljoC0t0fLa8MklsTV3S59QQkbw129EKO+lWulDjMSZ0+stTffiUf9
-         ePx0w9xGT9QsGE4iWuQlekl4a+RHICTBMuFp+w2w=
-Date:   Fri, 20 Mar 2020 17:18:08 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>
-Cc:     Andrey Smirnov <andrew.smirnov@gmail.com>,
+        Fri, 20 Mar 2020 16:25:16 -0400
+Received: from Galois.linutronix.de ([193.142.43.55]:37039 "EHLO
+        Galois.linutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726666AbgCTUZQ (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 20 Mar 2020 16:25:16 -0400
+Received: from p5de0bf0b.dip0.t-ipconnect.de ([93.224.191.11] helo=nanos.tec.linutronix.de)
+        by Galois.linutronix.de with esmtpsa (TLS1.2:DHE_RSA_AES_256_CBC_SHA256:256)
+        (Exim 4.80)
+        (envelope-from <tglx@linutronix.de>)
+        id 1jFOCA-0003F1-0T; Fri, 20 Mar 2020 21:24:42 +0100
+Received: by nanos.tec.linutronix.de (Postfix, from userid 1000)
+        id 7019C1039FC; Fri, 20 Mar 2020 21:24:41 +0100 (CET)
+From:   Thomas Gleixner <tglx@linutronix.de>
+To:     Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        "maintainer\:X86 ARCHITECTURE \(32-BIT AND 64-BIT\)" <x86@kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Mark Gross <mgross@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Darren Hart <dvhart@infradead.org>,
+        Andy Shevchenko <andy@infradead.org>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <lenb@kernel.org>,
+        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        linux-edac@vger.kernel.org,
+        Platform Driver <platform-driver-x86@vger.kernel.org>,
+        Jean Delvare <jdelvare@suse.com>,
+        Guenter Roeck <linux@roeck-us.net>,
+        linux-hwmon@vger.kernel.org, Zhang Rui <rui.zhang@intel.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Amit Kucheria <amit.kucheria@verdurent.com>,
+        Chanwoo Choi <cw00.choi@samsung.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        linux-mmc <linux-mmc@vger.kernel.org>,
+        Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org,
+        Takashi Iwai <tiwai@suse.com>,
+        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org, Chris Healy <cphealy@gmail.com>,
-        Lucas Stach <l.stach@pengutronix.de>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>,
-        linux-kernel@vger.kernel.org, linux-imx@nxp.com,
-        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-        Stuart Yoder <stuyoder@gmail.com>,
-        Andrei Botila <andrei.botila@nxp.com>
-Subject: Re: [PATCH v9 0/9] enable CAAM's HWRNG as default
-Message-ID: <20200320161808.GB778529@kroah.com>
-References: <20200319161233.8134-1-andrew.smirnov@gmail.com>
- <fab6192d-d35b-b26e-5bdc-b52b7d0347b7@nxp.com>
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto <linux-crypto@vger.kernel.org>
+Subject: Re: [patch 01/22] x86/devicetable: Move x86 specific macro out of generic code
+In-Reply-To: <CAHp75Vca0j0=EB2qdvGgFOq2s_ohHUEzY4OeNrv-oynLBVYh1w@mail.gmail.com>
+References: <20200320131345.635023594@linutronix.de> <20200320131508.736205164@linutronix.de> <CAHp75Vca0j0=EB2qdvGgFOq2s_ohHUEzY4OeNrv-oynLBVYh1w@mail.gmail.com>
+Date:   Fri, 20 Mar 2020 21:24:41 +0100
+Message-ID: <87k13epyeu.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <fab6192d-d35b-b26e-5bdc-b52b7d0347b7@nxp.com>
+Content-Type: text/plain
+X-Linutronix-Spam-Score: -1.0
+X-Linutronix-Spam-Level: -
+X-Linutronix-Spam-Status: No , -1.0 points, 5.0 required,  ALL_TRUSTED=-1,SHORTCIRCUIT=-0.0001
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Mar 20, 2020 at 06:13:18PM +0200, Horia Geantă wrote:
-> On 3/19/2020 6:12 PM, Andrey Smirnov wrote:
-> > Everyone:
-> > 
-> > This series is a continuation of original [discussion]. I don't know
-> > if what's in the series is enough to use CAAMs HWRNG system wide, but
-> > I am hoping that with enough iterations and feedback it will be.
-> > 
-> Andrey, thanks for the effort!
-> 
-> Herbert, Greg,
-> 
-> I hope it's ok to go with the fsl-mc bus dependency
-> 	"bus: fsl-mc: add api to retrieve mc version"
-> 	https://patchwork.kernel.org/patch/11447637/
-> included in this series through cryptodev-2.6 tree.
-> 
-> It applies cleanly on latest linux-next (next-20200320),
-> and it has been Acked-by Laurențiu (one of the fsl-mc bus maintainers).
+Andy Shevchenko <andy.shevchenko@gmail.com> writes:
+> On Fri, Mar 20, 2020 at 3:17 PM Thomas Gleixner <tglx@linutronix.de> wrote:
+>> --- a/arch/x86/include/asm/cpu_device_id.h
+>> +++ b/arch/x86/include/asm/cpu_device_id.h
+>> @@ -6,10 +6,21 @@
+>>   * Declare drivers belonging to specific x86 CPUs
+>>   * Similar in spirit to pci_device_id and related PCI functions
+>>   */
+>
+>> -
+>
+> Seems you are going to remove below anyway in the next patches, so,
+> why not to do this also there?
+>
+>>  #include <linux/mod_devicetable.h>
 
-No objection from me.
+No it stays, but yes I could do that comment change right here.
 
-greg k-h
+Thanks,
+
+        tglx
+
+
