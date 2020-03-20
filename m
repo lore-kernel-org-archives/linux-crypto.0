@@ -2,96 +2,73 @@ Return-Path: <SRS0=WfFd=5F=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03D81C4332B
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Mar 2020 04:02:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 576FDC4332B
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Mar 2020 05:31:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CFE3E20773
-	for <linux-crypto@archiver.kernel.org>; Fri, 20 Mar 2020 04:02:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="uX7U8I3c"
+	by mail.kernel.org (Postfix) with ESMTP id 2CF0620772
+	for <linux-crypto@archiver.kernel.org>; Fri, 20 Mar 2020 05:31:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1584682312;
+	bh=zNNn2sMFi+NV3lbWyUonnbEAUt5r4OtIBHc7roBXYqI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=st7BS2BB39HylRoyK/gDLQxYQOfNRUjnV/AYERR7meM3gbL10D5cTBitDC2ik88fv
+	 1TNBBTLWJdadbdYcRkDqMo9c8FEw80fMNJvgWUjL1lAh2sZHFcXg8Vr7ZKrXWua8wY
+	 3EC5hJBhZ/xHSUntHLUu0LnSoUPArY1uSA2bPFj4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726829AbgCTECO (ORCPT
+        id S1726697AbgCTFbv (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 20 Mar 2020 00:02:14 -0400
-Received: from frisell.zx2c4.com ([192.95.5.64]:56749 "EHLO frisell.zx2c4.com"
+        Fri, 20 Mar 2020 01:31:51 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34790 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725446AbgCTECO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 20 Mar 2020 00:02:14 -0400
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 73fd51e5;
-        Fri, 20 Mar 2020 03:55:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
-        :references:in-reply-to:from:date:message-id:subject:to:cc
-        :content-type; s=mail; bh=DrZKHDCv3yVNJ1fZFCAEuj6SPfo=; b=uX7U8I
-        3cN4pBD9fWrWdby/qHhIo8nsgEAjKYehHPQd/Kk5+oHRGab2qYOyNHzu1sZE85c8
-        htQjla/nOP1XM7jHo7zwOSGCyTfeETvs+r2Wl7rTsC4PTh4Nks/LcOJ19VwvhoT5
-        FsHuGLzDoOjIMLzrwlbcuGPj8p/E4pZKO5pDYN2C9DOGRRJ1znA+kDkNeMvo7QOn
-        x4WlbNWrO/PjyG5IcRo/39uB7p7JYhvCtIoWd5kMHuT83+Wd8pru5vMaHmjAYwL6
-        L5YIc7UmNSqEKQFgeVKDa+fbJ+UwpT8FUITbYvuhPuZl6AeenGhD7CMl8MBt7ldE
-        2yX6nQc3pDdPPQmQ==
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 6b52123a (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
-        Fri, 20 Mar 2020 03:55:37 +0000 (UTC)
-Received: by mail-il1-f172.google.com with SMTP id h3so4408075ils.3;
-        Thu, 19 Mar 2020 21:02:10 -0700 (PDT)
-X-Gm-Message-State: ANhLgQ1bo2sPlAd+yY/4BBIa5uwvnQRxKtqKy1I1TWuGvUWOsUYkuNtz
-        OMRcFpcXChjsdqCvHDEGXQkqYsrAEz/XoaW1G5M=
-X-Google-Smtp-Source: ADFU+vvnk2NRup2tSSE6Ao36+jOkzoTN5V53qyuvaZ3b1S4VSAqqkaPekitrZcopfvJKgvJcTG6SU87tGVnF/0N1ghw=
-X-Received: by 2002:a92:cd4e:: with SMTP id v14mr6534247ilq.231.1584676929893;
- Thu, 19 Mar 2020 21:02:09 -0700 (PDT)
+        id S1725883AbgCTFbv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 20 Mar 2020 01:31:51 -0400
+Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 9EEAF2072D;
+        Fri, 20 Mar 2020 05:31:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1584682310;
+        bh=zNNn2sMFi+NV3lbWyUonnbEAUt5r4OtIBHc7roBXYqI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=e5tJJdQQ70wqZil/MYY/mJjiBc0WcmrwPlOCyC2c9kaf8IAa7gEEt/lNJIovG+I1p
+         JnZj+VOtvpC5YuKZJb94UGcXBjGf+jZ5iSFxueObw5FjN2SfheqvMkMJ6mlV5zM8kW
+         ykOyhCK15FH4ZRoFUc3kNXbj8mp+GFRjO6el3MbI=
+Date:   Thu, 19 Mar 2020 22:31:49 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Srujana Challa <schalla@marvell.com>
+Cc:     herbert@gondor.apana.org.au, davem@davemloft.net,
+        linux-crypto@vger.kernel.org, pathreya@marvell.com,
+        schandran@marvell.com, arno@natisbad.org, bbrezillon@kernel.org
+Subject: Re: [PATCH v2 0/4] Add Support for Marvell OcteonTX Cryptographic
+Message-ID: <20200320053149.GC1315@sol.localdomain>
+References: <1584100028-21279-1-git-send-email-schalla@marvell.com>
 MIME-Version: 1.0
-References: <CAHmME9otcAe7H4Anan8Tv1KreTZtwt4XXEPMG--x2Ljr0M+o1Q@mail.gmail.com>
- <20200319022732.166085-1-Jason@zx2c4.com> <20200320034834.GA27372@gondor.apana.org.au>
-In-Reply-To: <20200320034834.GA27372@gondor.apana.org.au>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Thu, 19 Mar 2020 22:01:58 -0600
-X-Gmail-Original-Message-ID: <CAHmME9qYnb10J+jnBhv3TAfjgvoPeY_3kb4-K+nvZir1YrqvgQ@mail.gmail.com>
-Message-ID: <CAHmME9qYnb10J+jnBhv3TAfjgvoPeY_3kb4-K+nvZir1YrqvgQ@mail.gmail.com>
-Subject: Re: [PATCH URGENT crypto v2] crypto: arm64/chacha - correctly walk
- through blocks
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Emil Renner Berthing <kernel@esmil.dk>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        stable <stable@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1584100028-21279-1-git-send-email-schalla@marvell.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Mar 19, 2020 at 9:48 PM Herbert Xu <herbert@gondor.apana.org.au> wrote:
->
-> On Wed, Mar 18, 2020 at 08:27:32PM -0600, Jason A. Donenfeld wrote:
-> > Prior, passing in chunks of 2, 3, or 4, followed by any additional
-> > chunks would result in the chacha state counter getting out of sync,
-> > resulting in incorrect encryption/decryption, which is a pretty nasty
-> > crypto vuln: "why do images look weird on webpages?" WireGuard users
-> > never experienced this prior, because we have always, out of tree, used
-> > a different crypto library, until the recent Frankenzinc addition. This
-> > commit fixes the issue by advancing the pointers and state counter by
-> > the actual size processed. It also fixes up a bug in the (optional,
-> > costly) stride test that prevented it from running on arm64.
-> >
-> > Fixes: b3aad5bad26a ("crypto: arm64/chacha - expose arm64 ChaCha routine as library function")
-> > Reported-and-tested-by: Emil Renner Berthing <kernel@esmil.dk>
-> > Cc: Ard Biesheuvel <ardb@kernel.org>
-> > Cc: stable@vger.kernel.org # v5.5+
-> > Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-> > ---
-> >  arch/arm64/crypto/chacha-neon-glue.c   |  8 ++++----
-> >  lib/crypto/chacha20poly1305-selftest.c | 11 ++++++++---
-> >  2 files changed, 12 insertions(+), 7 deletions(-)
->
-> Patch applied.  Thanks.
+On Fri, Mar 13, 2020 at 05:17:04PM +0530, Srujana Challa wrote:
+> The following series adds support for Marvell Cryptographic Accelerarion
+> Unit (CPT) on OcteonTX CN83XX SoC.
+> 
+> Changes since v1:
+> * Replaced CRYPTO_BLKCIPHER with CRYPTO_SKCIPHER in Kconfig.
+> 
+> Srujana Challa (4):
+>   drivers: crypto: create common Kconfig and Makefile for Marvell
+>   drivers: crypto: add support for OCTEON TX CPT engine
+>   drivers: crypto: add the Virtual Function driver for CPT
+>   crypto: marvell: enable OcteonTX cpt options for build
 
-Thanks! No idea whether Linus will skip a 5.6-rc7 with people not at
-work due to the quarantines, so given the gravity of this bug, it
-might be prudent to send a PR to him _now_, rather then waiting until
-next week.
+There's no mention of testing.  Did you try CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y?
 
-Jason
+- Eric
