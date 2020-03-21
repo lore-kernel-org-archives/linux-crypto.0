@@ -2,97 +2,111 @@ Return-Path: <SRS0=8vbj=5G=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9BF4C4332B
-	for <linux-crypto@archiver.kernel.org>; Sat, 21 Mar 2020 12:31:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3802C4332B
+	for <linux-crypto@archiver.kernel.org>; Sat, 21 Mar 2020 15:43:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6EFD120780
-	for <linux-crypto@archiver.kernel.org>; Sat, 21 Mar 2020 12:31:17 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FxDkBn0L"
+	by mail.kernel.org (Postfix) with ESMTP id AB97020776
+	for <linux-crypto@archiver.kernel.org>; Sat, 21 Mar 2020 15:43:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1584805427;
+	bh=rsgPusoppoGA9FjACWtOW9RDJE5WZe0r1xgblC5k9yI=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=l9BkQKwks8FBxhliidw4JQr43iHZNq/7uABML8tee5TohJqpGcxKWX+Hd4bZSL5+o
+	 VaXU3glJeL9X9YxsnFFGNgSyv1K648KP0elbF7Rx0rx2LmL7mnsZ8hTb4NGOT6LqLD
+	 /JRLlvcuze9/Ft8wCUm0tWJ32aRJU1VJZkiG/6xw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726592AbgCUMbQ (ORCPT
+        id S1726961AbgCUPnq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 21 Mar 2020 08:31:16 -0400
-Received: from mail-wr1-f65.google.com ([209.85.221.65]:40695 "EHLO
-        mail-wr1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726192AbgCUMbQ (ORCPT
+        Sat, 21 Mar 2020 11:43:46 -0400
+Received: from mail-lf1-f67.google.com ([209.85.167.67]:33359 "EHLO
+        mail-lf1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727056AbgCUPnq (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 21 Mar 2020 08:31:16 -0400
-Received: by mail-wr1-f65.google.com with SMTP id f3so10682407wrw.7
-        for <linux-crypto@vger.kernel.org>; Sat, 21 Mar 2020 05:31:15 -0700 (PDT)
+        Sat, 21 Mar 2020 11:43:46 -0400
+Received: by mail-lf1-f67.google.com with SMTP id c20so6866142lfb.0
+        for <linux-crypto@vger.kernel.org>; Sat, 21 Mar 2020 08:43:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
+        d=linux-foundation.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=xbtZjQMNQb/y6oMWok2fmAogGJpkRY2dtwNS/rxXLDc=;
-        b=FxDkBn0LxGmSnyk9fCZRGcAZoSiwCEUWg5a+nQtSOerjHcNFAPd8MxcVIsbNJjw0Ar
-         BvAJLCCFpzmATGIhszxfVTlBLKSkQSBPdfgEiwc9Sn4DP2Sg7SRLTsMPq71QYTw9rpfv
-         kuGWIXDXQWKTOceK7yTz5SR0pLl9yPwi8NfLt+5o4tf43LjDw9MD3a86F69izQBHB4Ti
-         XeglQa7A5myDDg1rhjjnkcHV2Hly+B1YBERtDJcwNMFomBLBkwu3qKz0oDae+foQsGQX
-         VpZgxpsvQ2O8fynd0z+yLH4usaFL6mywftTEbttOt9JQGJ6sIIHRuexFbsRZUkdQCx93
-         6GKg==
+        bh=6mvwA32asdU1LyqLjErxGo+uq/oR1vS7M/3Q5oXzKH4=;
+        b=VdNJMvCSSTsnq7g5CcQorBBg8/QNzPG0SI25ZC9mlA4yRDxSRin81KqSSwTGYigX13
+         s1UnVZb7biIxD4a9mpr69/OBuShp8JRKuf9UsbJn+aIgepCqiixt+2H9CXNvtRyDymLq
+         0lbZdf43mg+2qHlv8Iae19hCw9u/4EijQwtZU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=xbtZjQMNQb/y6oMWok2fmAogGJpkRY2dtwNS/rxXLDc=;
-        b=LfTyQcvPPGJ1rcNMlomjDKfVODbCVXxmDZ0AwsVKc8A35eO6CyGqLus+P6Y6NXkPuD
-         1g2OpfiUzT3gXv2XX60LRDMHNq4gC7gvHWnMFmySj7ipXgTcobRp2jktQQ/+PRPUOfNZ
-         MTwXEgYLng0FT3Gg7K5gveBF/ff8mtLZdE+Oj9fyNRPI80Fw9Fwfy0UoLqyNsyZ2r1GP
-         g89BewkGqy2GlRkDAj9OrrpaL7iKWO+fkYxNat+a2weMifAHQQVDyysiIhTJQCvIKu77
-         OfS6gNqPrLv+JMvGWOR1gnUJ2h36UNsIF1yRiPFJLLILlQJLpyeFqNcOo+vxgR6AWvDz
-         zJPg==
-X-Gm-Message-State: ANhLgQ1zbFEgP0P13cK7GKKm5QUZWpkajjSf1taz8cNlNQLvHfie/R6m
-        wCDAhviJnCAcdTk9Q74RiVs3driev784nHce9nBdyA==
-X-Google-Smtp-Source: ADFU+vv+k2p23kBpnyhIU03BQrf4V8Z6Thh0ZM8qQPeMtggKwiJSuJ2mPPLgUoUUT3CWXdoqiSZtF6fjViVsdvJ0FoM=
-X-Received: by 2002:a5d:4fcf:: with SMTP id h15mr11133455wrw.262.1584793874444;
- Sat, 21 Mar 2020 05:31:14 -0700 (PDT)
+        bh=6mvwA32asdU1LyqLjErxGo+uq/oR1vS7M/3Q5oXzKH4=;
+        b=CxF20ruwOM6ocJ3Wpmn8XS692RuY+nFvW6lruXDb9QDbaetSE4iIQij5lyOcZsHWXS
+         2yVVjiCXu0EDW9ACvprxfnWNr60L898N10XYfzzEijC7Mw0H+x0oX2Xmsb+ET0ZIj9FT
+         29znxVkElnfrZMrzHSbqiPzbT8VJ7srZZWwPnNlrOKQeZ0wdVf7dsSx5k0EJU2d78iia
+         PWVOutTgpMK1Y/DnzHLKU19EjPflZ9jgjFWH1pO+70xfH+uZYaEGY0ss/oKXkmGjOYPE
+         OQ3VTP7KJNKU0bnDLWK2ItoK7TwKuuqkaJKpNbxRCZS2Xw/KxopwZVtH1b+xhZXZXURX
+         h4CA==
+X-Gm-Message-State: ANhLgQ0Z+1Dbpiuy6RED0+VA1GBAmNoVOugEPrXECHJ8BsnItRvCUNMI
+        RCKx8dly643gDRq4I/lSEs8A53RVTgo=
+X-Google-Smtp-Source: ADFU+vvVkaa9WSihV+J+EXENmioESnTkQINmSO8p0FXYPv7yr5lC+RGSVpf3k6SVVI+HfXBQHmburg==
+X-Received: by 2002:a19:2353:: with SMTP id j80mr7926549lfj.4.1584805421655;
+        Sat, 21 Mar 2020 08:43:41 -0700 (PDT)
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com. [209.85.167.44])
+        by smtp.gmail.com with ESMTPSA id j21sm5438925lji.93.2020.03.21.08.43.40
+        for <linux-crypto@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 21 Mar 2020 08:43:40 -0700 (PDT)
+Received: by mail-lf1-f44.google.com with SMTP id a28so6827616lfr.13
+        for <linux-crypto@vger.kernel.org>; Sat, 21 Mar 2020 08:43:40 -0700 (PDT)
+X-Received: by 2002:ac2:5203:: with SMTP id a3mr8371335lfl.152.1584805419698;
+ Sat, 21 Mar 2020 08:43:39 -0700 (PDT)
 MIME-Version: 1.0
-References: <1584100028-21279-1-git-send-email-schalla@marvell.com>
- <20200320053149.GC1315@sol.localdomain> <DM5PR18MB231111CEBDCDF734FA8C670BA0F50@DM5PR18MB2311.namprd18.prod.outlook.com>
-In-Reply-To: <DM5PR18MB231111CEBDCDF734FA8C670BA0F50@DM5PR18MB2311.namprd18.prod.outlook.com>
-From:   Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Date:   Sat, 21 Mar 2020 08:31:02 -0400
-Message-ID: <CAKv+Gu_G4=Dn+6chjk1dQFMXm1aGU8QQZMmy94L5LicmR3itKQ@mail.gmail.com>
-Subject: Re: [EXT] Re: [PATCH v2 0/4] Add Support for Marvell OcteonTX Cryptographic
-To:     Srujana Challa <schalla@marvell.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Narayana Prasad Raju Athreya <pathreya@marvell.com>,
-        Suheil Chandran <schandran@marvell.com>,
-        "arno@natisbad.org" <arno@natisbad.org>,
-        "bbrezillon@kernel.org" <bbrezillon@kernel.org>
+References: <20190916084901.GA20338@gondor.apana.org.au> <20190923050515.GA6980@gondor.apana.org.au>
+ <20191202062017.ge4rz72ki3vczhgb@gondor.apana.org.au> <20191214084749.jt5ekav5o5pd2dcp@gondor.apana.org.au>
+ <20200115150812.mo2eycc53lbsgvue@gondor.apana.org.au> <20200213033231.xjwt6uf54nu26qm5@gondor.apana.org.au>
+ <20200224060042.GA26184@gondor.apana.org.au> <20200312115714.GA21470@gondor.apana.org.au>
+ <CAHk-=wjbTF2iw3EbKgfiRRq_keb4fHwLO8xJyRXbfK3Q7cscuQ@mail.gmail.com> <CAHmME9pME41uHvhu5f_JGZbUNCuG0YVgRkBUQF9wtTO6YnMijw@mail.gmail.com>
+In-Reply-To: <CAHmME9pME41uHvhu5f_JGZbUNCuG0YVgRkBUQF9wtTO6YnMijw@mail.gmail.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sat, 21 Mar 2020 08:43:23 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wjGaHhVKyxBYCcw41j84ic1GbyAuGfN7nA9zCJyHZTw2Q@mail.gmail.com>
+Message-ID: <CAHk-=wjGaHhVKyxBYCcw41j84ic1GbyAuGfN7nA9zCJyHZTw2Q@mail.gmail.com>
+Subject: Re: [GIT PULL] Crypto Fixes for 5.6
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Masahiro Yamada <yamada.masahiro@socionext.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 20 Mar 2020 at 06:47, Srujana Challa <schalla@marvell.com> wrote:
+On Fri, Mar 20, 2020 at 4:54 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
 >
-> > On Fri, Mar 13, 2020 at 05:17:04PM +0530, Srujana Challa wrote:
-> > > The following series adds support for Marvell Cryptographic Accelerarion
-> > > Unit (CPT) on OcteonTX CN83XX SoC.
-> > >
-> > > Changes since v1:
-> > > * Replaced CRYPTO_BLKCIPHER with CRYPTO_SKCIPHER in Kconfig.
-> > >
-> > > Srujana Challa (4):
-> > >   drivers: crypto: create common Kconfig and Makefile for Marvell
-> > >   drivers: crypto: add support for OCTEON TX CPT engine
-> > >   drivers: crypto: add the Virtual Function driver for CPT
-> > >   crypto: marvell: enable OcteonTX cpt options for build
-> >
-> > There's no mention of testing.  Did you try
-> > CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=y?
-> >
-> Yes, the crypto self-tests are passed.
+> Funny, I always thought it was like that "for a good reason" that I
+> just didn't know about -- assumedly something having to do with a
+> difference between config time and compile time.
 
-*which* selftests are passed? Please confirm that they all passed with
-that kconfig option set
+No, there _is_ a "good reason", but it is simply "hysterical raisins".
+
+All scripting used to be done in Makefiles, for the simple reason that
+GNU make supported all those shell escapes. The Kconfig language did
+not.
+
+The whole "shell escape in Kconfig" is relatively recent, and so we
+still have old code (and people) used to the build-time makefile rules
+rather than those newfangled Kconfig things.
+
+Of course "relatively recent" is about two years by now. It's not like
+we did it yesterday.
+
+Anyway, your conversion patches look fine to me. I'm obviously not
+taking them for 5.6, but if they go into -next and get some testing,
+I'd love to have that cleanup in 5.7.
+
+                 Linus
