@@ -2,115 +2,115 @@ Return-Path: <SRS0=HSjb=5I=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92C86C3F2CD
-	for <linux-crypto@archiver.kernel.org>; Mon, 23 Mar 2020 14:56:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0450C54FCE
+	for <linux-crypto@archiver.kernel.org>; Mon, 23 Mar 2020 16:38:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6EF7F2072E
-	for <linux-crypto@archiver.kernel.org>; Mon, 23 Mar 2020 14:56:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C1AC320753
+	for <linux-crypto@archiver.kernel.org>; Mon, 23 Mar 2020 16:38:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726141AbgCWO4u (ORCPT
+        id S1727411AbgCWQis (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 23 Mar 2020 10:56:50 -0400
-Received: from metis.ext.pengutronix.de ([85.220.165.71]:48127 "EHLO
-        metis.ext.pengutronix.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725912AbgCWO4t (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Mar 2020 10:56:49 -0400
-Received: from gallifrey.ext.pengutronix.de ([2001:67c:670:201:5054:ff:fe8d:eefb] helo=localhost.discworld.emantor.de)
-        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <r.czerwinski@pengutronix.de>)
-        id 1jGOV7-0006Sg-Pz; Mon, 23 Mar 2020 15:56:25 +0100
-Message-ID: <412a4da61063b8c8a72729f03c06480c5f1374fb.camel@pengutronix.de>
-Subject: Re: [PATCH v5 2/3] hw_random: cctrng: introduce Arm CryptoCell
- driver
-From:   Rouven Czerwinski <r.czerwinski@pengutronix.de>
-To:     Hadar Gat <hadar.gat@arm.com>, Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
+        Mon, 23 Mar 2020 12:38:48 -0400
+Received: from mga12.intel.com ([192.55.52.136]:30481 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727234AbgCWQis (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 23 Mar 2020 12:38:48 -0400
+IronPort-SDR: Rriv0Z8hJsGqsw3IoOkPAtgtiPO6JHB23PHs7p4zPBv+48a/GJlbM73vt8QMk6fMAwnqRW4mjh
+ p3JleAiIVMMg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2020 09:38:46 -0700
+IronPort-SDR: BNtv86v3w8JwvH4wJojnjAtNBR5zND3RBh/ddNAj1/0KWdAuOS7J1X36McxoHrFDWlrsVZa05+
+ xW30ri8rHyMA==
+X-IronPort-AV: E=Sophos;i="5.72,297,1580803200"; 
+   d="scan'208";a="269933222"
+Received: from smtp.ostc.intel.com ([10.54.29.231])
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2020 09:38:45 -0700
+Received: from localhost (mtg-dev.jf.intel.com [10.54.74.10])
+        by smtp.ostc.intel.com (Postfix) with ESMTP id E3150636B;
+        Mon, 23 Mar 2020 16:38:43 +0000 (UTC)
+Date:   Mon, 23 Mar 2020 09:38:44 -0700
+From:   mark gross <mgross@linux.intel.com>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Andy Shevchenko <andy.shevchenko@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Alexander Sverdlin <alexander.sverdlin@nokia.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Tomer Maimon <tmaimon77@gmail.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Zaibo Xu <xuzaibo@huawei.com>,
-        Daniel Thompson <daniel.thompson@linaro.org>,
-        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        Tony Luck <tony.luck@intel.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <lenb@kernel.org>,
+        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Darren Hart <dvhart@infradead.org>,
+        Andy Shevchenko <andy@infradead.org>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        linux-edac@vger.kernel.org,
+        Platform Driver <platform-driver-x86@vger.kernel.org>,
+        Jean Delvare <jdelvare@suse.com>,
+        Guenter Roeck <linux@roeck-us.net>,
+        linux-hwmon@vger.kernel.org, Zhang Rui <rui.zhang@intel.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Amit Kucheria <amit.kucheria@verdurent.com>,
+        Chanwoo Choi <cw00.choi@samsung.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        linux-mmc <linux-mmc@vger.kernel.org>,
+        Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org,
+        Takashi Iwai <tiwai@suse.com>,
+        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Cc:     linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Ofir Drang <ofir.drang@arm.com>
-Date:   Mon, 23 Mar 2020 15:56:19 +0100
-In-Reply-To: <1584891085-8963-3-git-send-email-hadar.gat@arm.com>
-References: <1584891085-8963-1-git-send-email-hadar.gat@arm.com>
-         <1584891085-8963-3-git-send-email-hadar.gat@arm.com>
-Organization: Pengutronix e.K.
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.0 
+        linux-crypto <linux-crypto@vger.kernel.org>
+Subject: Re: [patch 08/22] ACPI: Convert to new X86 CPU match macros
+Message-ID: <20200323163844.GB123290@mtg-dev.jf.intel.com>
+Reply-To: mgross@linux.intel.com
+References: <20200320131345.635023594@linutronix.de>
+ <20200320131509.467730627@linutronix.de>
+ <CAHp75VcK3tL0YayjF=CSkSkHiOpg2zOV3rdkXQWJmLZ9fmevpg@mail.gmail.com>
+ <87bloqpy1x.fsf@nanos.tec.linutronix.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 2001:67c:670:201:5054:ff:fe8d:eefb
-X-SA-Exim-Mail-From: r.czerwinski@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: linux-crypto@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87bloqpy1x.fsf@nanos.tec.linutronix.de>
+User-Agent: Mutt/1.9.4 (2018-02-28)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello Hadar,
-
-On Sun, 2020-03-22 at 17:31 +0200, Hadar Gat wrote:
-> Introduce low level Arm CryptoCell TRNG HW support.
+On Fri, Mar 20, 2020 at 09:32:26PM +0100, Thomas Gleixner wrote:
+> Andy Shevchenko <andy.shevchenko@gmail.com> writes:
 > 
-> Signed-off-by: Hadar Gat <hadar.gat@arm.com>
-> ---
->  drivers/char/hw_random/Kconfig  |  12 +
->  drivers/char/hw_random/Makefile |   1 +
->  drivers/char/hw_random/cctrng.c | 735
-> ++++++++++++++++++++++++++++++++++++++++
->  drivers/char/hw_random/cctrng.h |  69 ++++
->  4 files changed, 817 insertions(+)
->  create mode 100644 drivers/char/hw_random/cctrng.c
->  create mode 100644 drivers/char/hw_random/cctrng.h
+> > On Fri, Mar 20, 2020 at 3:19 PM Thomas Gleixner <tglx@linutronix.de> wrote:
+> >>
+> >> The new macro set has a consistent namespace and uses C99 initializers
+> >> instead of the grufty C89 ones.
+> >>
+> >> Rename the local macro wrapper to X86_MATCH for consistency. It stays for
+> >> readability sake.
+> >
+> >> +       X86_MATCH_INTEL_FAM6_MODEL(ATOM_SILVERMONT,     NULL),
+> >> +       X86_MATCH_INTEL_FAM6_MODEL(ATOM_AIRMONT,        NULL),
+> >
+> >> -#define ICPU(model)    { X86_VENDOR_INTEL, 6, model, X86_FEATURE_ANY, }
+> >> +#define X86_MATCH(model)       X86_MATCH_INTEL_FAM6_MODEL(model, NULL)
+> >
+> > Maybe we can do a generic macro to avoid all these ', NULL' repetitions?
 > 
-> [...]
-> +static int cctrng_probe(struct platform_device *pdev)
-> +{
-> +	struct resource *req_mem_cc_regs = NULL;
-> +	struct cctrng_drvdata *drvdata;
-> +	struct device *dev = &pdev->dev;
-> +	int rc = 0;
-> +	u32 val;
-> +	int irq;
-> +
-> +	drvdata = devm_kzalloc(dev, sizeof(*drvdata), GFP_KERNEL);
-> +	if (!drvdata)
-> +		return -ENOMEM;
-> +
-> +	drvdata->rng.name = devm_kstrdup(dev, dev_name(dev),
-> GFP_KERNEL);
-> +	if (!drvdata->rng.name)
-> +		return -ENOMEM;
-> +
-> +	drvdata->rng.read = cctrng_read;
-> +	drvdata->rng.priv = (unsigned long)drvdata;
+> I opted for having the data argument everywhere to keep the macro maze
+> small. And we have enough places where data is actually used.
++1
 
-You are not initializing drvdata->rng.quality to a default value, which
-results in the TRNG not being used by the kernel by default. If its a
-perfect TRNG this should be set to 1024, i.e. 1024 bits of entropy per
-1024 bits of input.
+--mark
 
-Regards,
-Rouven Czerwinski
-
+> Thanks,
+> 
+>         tglx
