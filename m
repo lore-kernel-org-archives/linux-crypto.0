@@ -2,495 +2,152 @@ Return-Path: <SRS0=HSjb=5I=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E222C1975A
-	for <linux-crypto@archiver.kernel.org>; Mon, 23 Mar 2020 02:23:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 326CBC1975A
+	for <linux-crypto@archiver.kernel.org>; Mon, 23 Mar 2020 03:21:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2DD01206F9
-	for <linux-crypto@archiver.kernel.org>; Mon, 23 Mar 2020 02:23:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1584930218;
-	bh=LJrWZ/Nrv4nVPJ+my5iL9xPNjPCDBip0wWBJM420dng=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=zgS6Xf31MUk7Bni8/zyOpRXBnY88qZ5UHSyG/aGfx55BCtUysDm1GrIcYcPgEw6D1
-	 VDqAAJxGVNBHN1B8MaKAdAl9VxRMSdif29HSZsmWfYqIW755LFxpepJQ3LA5T4Hhn1
-	 o5akEltRyOGSyWpEhqcNfVXGKtlYVGCPccJ1pmuM=
+	by mail.kernel.org (Postfix) with ESMTP id EEF0620724
+	for <linux-crypto@archiver.kernel.org>; Mon, 23 Mar 2020 03:20:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="kw5ce2rF";
+	dkim=pass (1024-bit key) header.d=marvell.onmicrosoft.com header.i=@marvell.onmicrosoft.com header.b="XUxDXv+s"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726946AbgCWCXh (ORCPT
+        id S1726983AbgCWDU7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 22 Mar 2020 22:23:37 -0400
-Received: from condef-05.nifty.com ([202.248.20.70]:43529 "EHLO
-        condef-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726951AbgCWCXh (ORCPT
+        Sun, 22 Mar 2020 23:20:59 -0400
+Received: from mx0a-0016f401.pphosted.com ([67.231.148.174]:41096 "EHLO
+        mx0b-0016f401.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726979AbgCWDU7 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 22 Mar 2020 22:23:37 -0400
-X-Greylist: delayed 312 seconds by postgrey-1.27 at vger.kernel.org; Sun, 22 Mar 2020 22:23:32 EDT
-Received: from conuserg-11.nifty.com ([10.126.8.74])by condef-05.nifty.com with ESMTP id 02N2BTlR001153
-        for <linux-crypto@vger.kernel.org>; Mon, 23 Mar 2020 11:11:29 +0900
-Received: from grover.flets-west.jp (softbank126093102113.bbtec.net [126.93.102.113]) (authenticated)
-        by conuserg-11.nifty.com with ESMTP id 02N28urX002941;
-        Mon, 23 Mar 2020 11:09:03 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 02N28urX002941
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1584929344;
-        bh=x0Vn7jC+h3tPLa9Y0ITQpQmflxvgQPhNSLCl+6TRaEI=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=b7GSC63SoLLvo3n8srGp99BjRM4gc0ufo44Vj7mcOu2+4bJTyrT9vgqB+kpSAXoY2
-         mb1bS2zn55L2ffzle1Szzyc8TF+idNqQH1ZG4SYNP2TLfgYxEs4IIiGyMFRTJgUNG9
-         18+GtlOwwPxXZjRJrmuCifuAn5HvpTznM32sg7waEhrKibXFmFT8KZG2QKH69b5VtF
-         O0JF+CXEcdzPMBNXi9j800QC+7aoFUdgVjABV2VqVWe+YUDHWIVK9/YZ5YztSgPrGc
-         73n96oOv1E5c4iVhRuoN4q5Df9xXL95+2nc7Us5ele6ZuxHpXnn4Zf/SDdCaNiOmDq
-         AVy5VZciNYpKg==
-X-Nifty-SrcIP: [126.93.102.113]
-From:   Masahiro Yamada <masahiroy@kernel.org>
-To:     x86@kernel.org, Ingo Molnar <mingo@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>
-Cc:     linux-kernel@vger.kernel.org,
-        "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Masahiro Yamada <masahiroy@kernel.org>,
-        Allison Randal <allison@lohutok.net>,
-        Armijn Hemel <armijn@tjaldur.nl>,
-        "David S. Miller" <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ingo Molnar <mingo@redhat.com>,
-        clang-built-linux@googlegroups.com, linux-crypto@vger.kernel.org
-Subject: [PATCH 6/7] x86: remove always-defined CONFIG_AS_AVX
-Date:   Mon, 23 Mar 2020 11:08:43 +0900
-Message-Id: <20200323020844.17064-7-masahiroy@kernel.org>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200323020844.17064-1-masahiroy@kernel.org>
-References: <20200323020844.17064-1-masahiroy@kernel.org>
+        Sun, 22 Mar 2020 23:20:59 -0400
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+        by mx0a-0016f401.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02N3Fd0q020314;
+        Sun, 22 Mar 2020 20:20:49 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pfpt0818;
+ bh=0DqpOqSJVg/wDchK7J3ORdiyBQc0vKnS+itOJ5AhdP4=;
+ b=kw5ce2rFYzPqXr3/1i5yeqgsNBT7EAe/1fnvSdTr9hsQpXe6vVEgB187Jh7H/IaJ9CHg
+ SvVDj3SpaLOtIA+bErF+0LIH59v+flA+ExV36uWgaLKfqmOCkQLQOCIEn4pzO5BRjG8C
+ Me91o3EQ1VqmuALIMXidpChB5nuh5SXybWMwioI5aj6ZRUfDgRUrVMrYYhc2zM97rraE
+ /3iraxGBxhmqa7q+uquKAy82W13QG2ypNEBl6XxhY9vIpMUmigEufEmT9nGRPQ4tBoqS
+ kE3bc5JfGQOwC4x/mFwUHlp4hvnGTqn38AsmRczsD3kUyEm8ukQuxOp1i6Uz4550JVf8 fA== 
+Received: from sc-exch02.marvell.com ([199.233.58.182])
+        by mx0a-0016f401.pphosted.com with ESMTP id 2ywg9ncyxh-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Sun, 22 Mar 2020 20:20:49 -0700
+Received: from SC-EXCH01.marvell.com (10.93.176.81) by SC-EXCH02.marvell.com
+ (10.93.176.82) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Sun, 22 Mar
+ 2020 20:20:47 -0700
+Received: from NAM04-SN1-obe.outbound.protection.outlook.com (104.47.44.57) by
+ SC-EXCH01.marvell.com (10.93.176.81) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2 via Frontend Transport; Sun, 22 Mar 2020 20:20:47 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MKY7RqF2SXjIkWT7vZI9cx9s5WuF3P26QhCe7Wx1oPCjq55HWbFJgeTr3q0fo24iiuKBvCygnbR/St0mT/x4o+bikXqqnI3Ey9Ue7+bJsh4SHX/8tOvxEy3JUr+hZnKMc1/dcNuioLaBufsj0BqNLj0aUpyzGFAc5W5C3mpHIvk2y6sVzTZvpaffa/wd0puAMn0JiixH0pmVL3rTH6rZL+9R2rhIZBQRYD8zuEXRZvYDFzBaAiE4MDmV2JfNUqFoTSTPUNzIDUuWuXyAoC/RYgbVXeEtNnfRi5uLlh+P2s3tGlLBggklFErIv0MQoHOpL2GaPKPU+Or+5gcxM456gg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0DqpOqSJVg/wDchK7J3ORdiyBQc0vKnS+itOJ5AhdP4=;
+ b=S4HIrgsXtFFTxrjZCQFaaTJnKE5EUx41btG5tfb9i1VlDFWE03LB69NStIPyXXZ//nZxnIZGD32Zu7M61pAzA/8dv3hDnmQrzuFTGIVpZ/vV4ajyqaOrSZ8SRb4Yss5TCzqS4QKn/PmXIWBy2L0U6NHgeJOGTGBNNC8PLsu4xly7O9UGc2u4P+93vpHR2YIR/n2es5VkdkGXgEScTe3qg4TT9Cqbdrrjgyf2klU22hs51NYSIdLYmKrpiSHVvM0AlTKMc2uDLfAHgazoSCWigSccaXnfoD4dIorMPe3f+zew4v73saFmZu4NXpmZYnYpMLA14h2pcIL83qHc0j5wTQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0DqpOqSJVg/wDchK7J3ORdiyBQc0vKnS+itOJ5AhdP4=;
+ b=XUxDXv+sEuE2AHFgkWTpqWUMtgs24GZjVvCF1J7+Y33n85b6zhHpDd8NleVZM4MKJckuSyIE0Uf1FI6mIwdZzQ0+YMXr5SL4kBQ55R2BQF08Pwd2IHZoTz6NBb9RPxc7/T+LI2Id4zeqkO59M4FFdKiLD1fCLFHD8IsUtguApfg=
+Received: from DM5PR18MB2311.namprd18.prod.outlook.com (2603:10b6:4:b8::27) by
+ DM5PR18MB1355.namprd18.prod.outlook.com (2603:10b6:3:14a::16) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2835.18; Mon, 23 Mar 2020 03:20:46 +0000
+Received: from DM5PR18MB2311.namprd18.prod.outlook.com
+ ([fe80::e53e:45ba:197b:84cd]) by DM5PR18MB2311.namprd18.prod.outlook.com
+ ([fe80::e53e:45ba:197b:84cd%4]) with mapi id 15.20.2835.021; Mon, 23 Mar 2020
+ 03:20:46 +0000
+From:   Srujana Challa <schalla@marvell.com>
+To:     Ard Biesheuvel <ard.biesheuvel@linaro.org>
+CC:     Eric Biggers <ebiggers@kernel.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "Narayana Prasad Raju Athreya" <pathreya@marvell.com>,
+        Suheil Chandran <schandran@marvell.com>,
+        "arno@natisbad.org" <arno@natisbad.org>,
+        "bbrezillon@kernel.org" <bbrezillon@kernel.org>
+Subject: RE: [EXT] Re: [PATCH v2 0/4] Add Support for Marvell OcteonTX
+ Cryptographic
+Thread-Topic: [EXT] Re: [PATCH v2 0/4] Add Support for Marvell OcteonTX
+ Cryptographic
+Thread-Index: AQHV+S05rH1l6PXlHEqfmA0xItJTK6hQ/1qAgABWxrCAAbCvAIACg6OA
+Date:   Mon, 23 Mar 2020 03:20:46 +0000
+Message-ID: <DM5PR18MB23111DB74B74BED1E08E0DD3A0F00@DM5PR18MB2311.namprd18.prod.outlook.com>
+References: <1584100028-21279-1-git-send-email-schalla@marvell.com>
+ <20200320053149.GC1315@sol.localdomain>
+ <DM5PR18MB231111CEBDCDF734FA8C670BA0F50@DM5PR18MB2311.namprd18.prod.outlook.com>
+ <CAKv+Gu_G4=Dn+6chjk1dQFMXm1aGU8QQZMmy94L5LicmR3itKQ@mail.gmail.com>
+In-Reply-To: <CAKv+Gu_G4=Dn+6chjk1dQFMXm1aGU8QQZMmy94L5LicmR3itKQ@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [115.113.156.3]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 98e87688-3a1a-4c08-9980-08d7ced92da5
+x-ms-traffictypediagnostic: DM5PR18MB1355:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <DM5PR18MB135595D07694CAE74EF74AD1A0F00@DM5PR18MB1355.namprd18.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6790;
+x-forefront-prvs: 0351D213B3
+x-forefront-antispam-report: SFV:NSPM;SFS:(10009020)(4636009)(346002)(376002)(366004)(396003)(136003)(39850400004)(199004)(52536014)(6916009)(81166006)(316002)(55236004)(54906003)(55016002)(9686003)(64756008)(66446008)(33656002)(66946007)(66476007)(76116006)(66556008)(7696005)(478600001)(8936002)(81156014)(8676002)(186003)(5660300002)(4326008)(86362001)(26005)(2906002)(71200400001)(6506007);DIR:OUT;SFP:1101;SCL:1;SRVR:DM5PR18MB1355;H:DM5PR18MB2311.namprd18.prod.outlook.com;FPR:;SPF:None;LANG:en;PTR:InfoNoRecords;A:1;
+received-spf: None (protection.outlook.com: marvell.com does not designate
+ permitted sender hosts)
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: hBmz9Sxg/JiBZds0clcTZH9KEbw90ZK0+XWRu1x4aXoXZNiFins8ysfwKb/U57o17IhRTFuA/Al2c0+2jSp5smBLQkyzjoAmolxKqy1adCOEWxgxjtrGmDOv6xOdMn+zfNoBh6FN/c8UvHlRS427MfrXwu/7eyr5gk4VO0cglGxRIjgeu1ek1UwhP/s5o0CJXojeutaFqaQTrehqPg8jrVrJ8zPuKDBjVHPBovy4YeCINJC7IVAVxZ/qjfz+ZRc26l6JpZa4vgixMD+L+n/SXoSFHka0er5ohA/eyRi4V+Ps4nWIjZU4VxYqEZbSt2TDLwYauIU5tgv/9loMK5GbgAmDFL3LR/o1btzvFILk4Cf2K48JA62VqybwBWCfHYa8zb56vow7eduyFLf9V8tXfPAvITMC/6jW5/O8Xo4stJgR5Zuu24P1sF6HNEy02myK
+x-ms-exchange-antispam-messagedata: 2iTvC6sYcwHySKjwzpx5mgc9ugIxh0NHXzvvQHLAvTSvtB4hnxTPR9noB4cYSES38vePg1a9/bMtcFms8/VhnP7SW/MLXy+UIsTxrHSu/WkDn6Nq8iH16BUdou9E28u7wO2dTYdyqi5FkdFRffDXiA==
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-Network-Message-Id: 98e87688-3a1a-4c08-9980-08d7ced92da5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Mar 2020 03:20:46.3588
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: RrCTm3mcGH6y813o4TxbnaKnECTsoZ//OrD4RlFuNtTspTg6y9AomUMIR6NzvI5/TIGdZXoMlLSVHF0KnSvqsA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR18MB1355
+X-OriginatorOrg: marvell.com
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
+ definitions=2020-03-22_08:2020-03-21,2020-03-22 signatures=0
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-CONFIG_AS_AVX was introduced by commit ea4d26ae24e5 ("raid5: add AVX
-optimized RAID5 checksumming").
-
-We raise the minimal supported binutils version from time to time.
-The last bump was commit 1fb12b35e5ff ("kbuild: Raise the minimum
-required binutils version to 2.21").
-
-I confirmed the code in $(call as-instr,...) can be assembled by the
-binutils 2.21 assembler and also by LLVM integrated assembler.
-
-Remove CONFIG_AS_AVX, which is always defined.
-
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
----
-
- arch/x86/Makefile                             |  5 ++-
- arch/x86/crypto/Makefile                      | 32 +++++++------------
- arch/x86/crypto/aesni-intel_avx-x86_64.S      |  3 --
- arch/x86/crypto/aesni-intel_glue.c            | 14 +-------
- arch/x86/crypto/poly1305-x86_64-cryptogams.pl |  8 -----
- arch/x86/crypto/poly1305_glue.c               |  6 ++--
- arch/x86/crypto/sha1_ssse3_asm.S              |  4 ---
- arch/x86/crypto/sha1_ssse3_glue.c             |  9 +-----
- arch/x86/crypto/sha256-avx-asm.S              |  3 --
- arch/x86/crypto/sha256_ssse3_glue.c           |  8 +----
- arch/x86/crypto/sha512-avx-asm.S              |  2 --
- arch/x86/crypto/sha512_ssse3_glue.c           |  7 +---
- arch/x86/include/asm/xor_avx.h                |  9 ------
- 13 files changed, 21 insertions(+), 89 deletions(-)
-
-diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-index 94f89612e024..f32ef7b8d5ca 100644
---- a/arch/x86/Makefile
-+++ b/arch/x86/Makefile
-@@ -178,15 +178,14 @@ ifeq ($(ACCUMULATE_OUTGOING_ARGS), 1)
- endif
- 
- # does binutils support specific instructions?
--avx_instr := $(call as-instr,vxorps %ymm0$(comma)%ymm1$(comma)%ymm2,-DCONFIG_AS_AVX=1)
- avx2_instr :=$(call as-instr,vpbroadcastb %xmm0$(comma)%ymm1,-DCONFIG_AS_AVX2=1)
- avx512_instr :=$(call as-instr,vpmovm2b %k1$(comma)%zmm5,-DCONFIG_AS_AVX512=1)
- sha1_ni_instr :=$(call as-instr,sha1msg1 %xmm0$(comma)%xmm1,-DCONFIG_AS_SHA1_NI=1)
- sha256_ni_instr :=$(call as-instr,sha256msg1 %xmm0$(comma)%xmm1,-DCONFIG_AS_SHA256_NI=1)
- adx_instr := $(call as-instr,adox %r10$(comma)%r10,-DCONFIG_AS_ADX=1)
- 
--KBUILD_AFLAGS += $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
--KBUILD_CFLAGS += $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
-+KBUILD_AFLAGS += $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
-+KBUILD_CFLAGS += $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
- 
- KBUILD_LDFLAGS := -m elf_$(UTS_MACHINE)
- 
-diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
-index 8c2e9eadee8a..1a044908d42d 100644
---- a/arch/x86/crypto/Makefile
-+++ b/arch/x86/crypto/Makefile
-@@ -5,7 +5,6 @@
- 
- OBJECT_FILES_NON_STANDARD := y
- 
--avx_supported := $(call as-instr,vpxor %xmm0$(comma)%xmm0$(comma)%xmm0,yes,no)
- avx2_supported := $(call as-instr,vpgatherdd %ymm0$(comma)(%eax$(comma)%ymm1\
- 				$(comma)4)$(comma)%ymm2,yes,no)
- avx512_supported :=$(call as-instr,vpmovm2b %k1$(comma)%zmm5,yes,no)
-@@ -47,15 +46,12 @@ ifeq ($(adx_supported),yes)
- endif
- 
- # These modules require assembler to support AVX.
--ifeq ($(avx_supported),yes)
--	obj-$(CONFIG_CRYPTO_CAMELLIA_AESNI_AVX_X86_64) += \
--						camellia-aesni-avx-x86_64.o
--	obj-$(CONFIG_CRYPTO_CAST5_AVX_X86_64) += cast5-avx-x86_64.o
--	obj-$(CONFIG_CRYPTO_CAST6_AVX_X86_64) += cast6-avx-x86_64.o
--	obj-$(CONFIG_CRYPTO_TWOFISH_AVX_X86_64) += twofish-avx-x86_64.o
--	obj-$(CONFIG_CRYPTO_SERPENT_AVX_X86_64) += serpent-avx-x86_64.o
--	obj-$(CONFIG_CRYPTO_BLAKE2S_X86) += blake2s-x86_64.o
--endif
-+obj-$(CONFIG_CRYPTO_CAMELLIA_AESNI_AVX_X86_64) += camellia-aesni-avx-x86_64.o
-+obj-$(CONFIG_CRYPTO_CAST5_AVX_X86_64) += cast5-avx-x86_64.o
-+obj-$(CONFIG_CRYPTO_CAST6_AVX_X86_64) += cast6-avx-x86_64.o
-+obj-$(CONFIG_CRYPTO_TWOFISH_AVX_X86_64) += twofish-avx-x86_64.o
-+obj-$(CONFIG_CRYPTO_SERPENT_AVX_X86_64) += serpent-avx-x86_64.o
-+obj-$(CONFIG_CRYPTO_BLAKE2S_X86) += blake2s-x86_64.o
- 
- # These modules require assembler to support AVX2.
- ifeq ($(avx2_supported),yes)
-@@ -83,16 +79,12 @@ ifneq ($(CONFIG_CRYPTO_POLY1305_X86_64),)
- targets += poly1305-x86_64-cryptogams.S
- endif
- 
--ifeq ($(avx_supported),yes)
--	camellia-aesni-avx-x86_64-y := camellia-aesni-avx-asm_64.o \
--					camellia_aesni_avx_glue.o
--	cast5-avx-x86_64-y := cast5-avx-x86_64-asm_64.o cast5_avx_glue.o
--	cast6-avx-x86_64-y := cast6-avx-x86_64-asm_64.o cast6_avx_glue.o
--	twofish-avx-x86_64-y := twofish-avx-x86_64-asm_64.o \
--				twofish_avx_glue.o
--	serpent-avx-x86_64-y := serpent-avx-x86_64-asm_64.o \
--				serpent_avx_glue.o
--endif
-+camellia-aesni-avx-x86_64-y := camellia-aesni-avx-asm_64.o \
-+				camellia_aesni_avx_glue.o
-+cast5-avx-x86_64-y := cast5-avx-x86_64-asm_64.o cast5_avx_glue.o
-+cast6-avx-x86_64-y := cast6-avx-x86_64-asm_64.o cast6_avx_glue.o
-+twofish-avx-x86_64-y := twofish-avx-x86_64-asm_64.o twofish_avx_glue.o
-+serpent-avx-x86_64-y := serpent-avx-x86_64-asm_64.o serpent_avx_glue.o
- 
- ifeq ($(avx2_supported),yes)
- 	camellia-aesni-avx2-y := camellia-aesni-avx2-asm_64.o camellia_aesni_avx2_glue.o
-diff --git a/arch/x86/crypto/aesni-intel_avx-x86_64.S b/arch/x86/crypto/aesni-intel_avx-x86_64.S
-index bfa1c0b3e5b4..cc56ee43238b 100644
---- a/arch/x86/crypto/aesni-intel_avx-x86_64.S
-+++ b/arch/x86/crypto/aesni-intel_avx-x86_64.S
-@@ -886,7 +886,6 @@ _less_than_8_bytes_left_\@:
- _partial_block_done_\@:
- .endm # PARTIAL_BLOCK
- 
--#ifdef CONFIG_AS_AVX
- ###############################################################################
- # GHASH_MUL MACRO to implement: Data*HashKey mod (128,127,126,121,0)
- # Input: A and B (128-bits each, bit-reflected)
-@@ -1869,8 +1868,6 @@ key_256_finalize:
-         ret
- SYM_FUNC_END(aesni_gcm_finalize_avx_gen2)
- 
--#endif /* CONFIG_AS_AVX */
--
- #ifdef CONFIG_AS_AVX2
- ###############################################################################
- # GHASH_MUL MACRO to implement: Data*HashKey mod (128,127,126,121,0)
-diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index bbbebbd35b5d..e0f54e00edfd 100644
---- a/arch/x86/crypto/aesni-intel_glue.c
-+++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -185,7 +185,6 @@ static const struct aesni_gcm_tfm_s aesni_gcm_tfm_sse = {
- 	.finalize = &aesni_gcm_finalize,
- };
- 
--#ifdef CONFIG_AS_AVX
- asmlinkage void aes_ctr_enc_128_avx_by8(const u8 *in, u8 *iv,
- 		void *keys, u8 *out, unsigned int num_bytes);
- asmlinkage void aes_ctr_enc_192_avx_by8(const u8 *in, u8 *iv,
-@@ -234,8 +233,6 @@ static const struct aesni_gcm_tfm_s aesni_gcm_tfm_avx_gen2 = {
- 	.finalize = &aesni_gcm_finalize_avx_gen2,
- };
- 
--#endif
--
- #ifdef CONFIG_AS_AVX2
- /*
-  * asmlinkage void aesni_gcm_init_avx_gen4()
-@@ -476,7 +473,6 @@ static void ctr_crypt_final(struct crypto_aes_ctx *ctx,
- 	crypto_inc(ctrblk, AES_BLOCK_SIZE);
- }
- 
--#ifdef CONFIG_AS_AVX
- static void aesni_ctr_enc_avx_tfm(struct crypto_aes_ctx *ctx, u8 *out,
- 			      const u8 *in, unsigned int len, u8 *iv)
- {
-@@ -493,7 +489,6 @@ static void aesni_ctr_enc_avx_tfm(struct crypto_aes_ctx *ctx, u8 *out,
- 	else
- 		aes_ctr_enc_256_avx_by8(in, iv, (void *)ctx, out, len);
- }
--#endif
- 
- static int ctr_crypt(struct skcipher_request *req)
- {
-@@ -715,10 +710,8 @@ static int gcmaes_crypt_by_sg(bool enc, struct aead_request *req,
- 	if (left < AVX_GEN4_OPTSIZE && gcm_tfm == &aesni_gcm_tfm_avx_gen4)
- 		gcm_tfm = &aesni_gcm_tfm_avx_gen2;
- #endif
--#ifdef CONFIG_AS_AVX
- 	if (left < AVX_GEN2_OPTSIZE && gcm_tfm == &aesni_gcm_tfm_avx_gen2)
- 		gcm_tfm = &aesni_gcm_tfm_sse;
--#endif
- 
- 	/* Linearize assoc, if not already linear */
- 	if (req->src->length >= assoclen && req->src->length &&
-@@ -1082,24 +1075,19 @@ static int __init aesni_init(void)
- 		aesni_gcm_tfm = &aesni_gcm_tfm_avx_gen4;
- 	} else
- #endif
--#ifdef CONFIG_AS_AVX
- 	if (boot_cpu_has(X86_FEATURE_AVX)) {
- 		pr_info("AVX version of gcm_enc/dec engaged.\n");
- 		aesni_gcm_tfm = &aesni_gcm_tfm_avx_gen2;
--	} else
--#endif
--	{
-+	} else {
- 		pr_info("SSE version of gcm_enc/dec engaged.\n");
- 		aesni_gcm_tfm = &aesni_gcm_tfm_sse;
- 	}
- 	aesni_ctr_enc_tfm = aesni_ctr_enc;
--#ifdef CONFIG_AS_AVX
- 	if (boot_cpu_has(X86_FEATURE_AVX)) {
- 		/* optimize performance of ctr mode encryption transform */
- 		aesni_ctr_enc_tfm = aesni_ctr_enc_avx_tfm;
- 		pr_info("AES CTR mode by8 optimization enabled\n");
- 	}
--#endif
- #endif
- 
- 	err = crypto_register_alg(&aesni_cipher_alg);
-diff --git a/arch/x86/crypto/poly1305-x86_64-cryptogams.pl b/arch/x86/crypto/poly1305-x86_64-cryptogams.pl
-index 7a6b5380a46f..5bac2d533104 100644
---- a/arch/x86/crypto/poly1305-x86_64-cryptogams.pl
-+++ b/arch/x86/crypto/poly1305-x86_64-cryptogams.pl
-@@ -404,10 +404,6 @@ ___
- &end_function("poly1305_emit_x86_64");
- if ($avx) {
- 
--if($kernel) {
--	$code .= "#ifdef CONFIG_AS_AVX\n";
--}
--
- ########################################################################
- # Layout of opaque area is following.
- #
-@@ -1516,10 +1512,6 @@ $code.=<<___;
- ___
- &end_function("poly1305_emit_avx");
- 
--if ($kernel) {
--	$code .= "#endif\n";
--}
--
- if ($avx>1) {
- 
- if ($kernel) {
-diff --git a/arch/x86/crypto/poly1305_glue.c b/arch/x86/crypto/poly1305_glue.c
-index 79bb58737d52..4a6226e1d15e 100644
---- a/arch/x86/crypto/poly1305_glue.c
-+++ b/arch/x86/crypto/poly1305_glue.c
-@@ -94,7 +94,7 @@ static void poly1305_simd_blocks(void *ctx, const u8 *inp, size_t len,
- 	BUILD_BUG_ON(PAGE_SIZE < POLY1305_BLOCK_SIZE ||
- 		     PAGE_SIZE % POLY1305_BLOCK_SIZE);
- 
--	if (!IS_ENABLED(CONFIG_AS_AVX) || !static_branch_likely(&poly1305_use_avx) ||
-+	if (!static_branch_likely(&poly1305_use_avx) ||
- 	    (len < (POLY1305_BLOCK_SIZE * 18) && !state->is_base2_26) ||
- 	    !crypto_simd_usable()) {
- 		convert_to_base2_64(ctx);
-@@ -123,7 +123,7 @@ static void poly1305_simd_blocks(void *ctx, const u8 *inp, size_t len,
- static void poly1305_simd_emit(void *ctx, u8 mac[POLY1305_DIGEST_SIZE],
- 			       const u32 nonce[4])
- {
--	if (!IS_ENABLED(CONFIG_AS_AVX) || !static_branch_likely(&poly1305_use_avx))
-+	if (!static_branch_likely(&poly1305_use_avx))
- 		poly1305_emit_x86_64(ctx, mac, nonce);
- 	else
- 		poly1305_emit_avx(ctx, mac, nonce);
-@@ -261,7 +261,7 @@ static struct shash_alg alg = {
- 
- static int __init poly1305_simd_mod_init(void)
- {
--	if (IS_ENABLED(CONFIG_AS_AVX) && boot_cpu_has(X86_FEATURE_AVX) &&
-+	if (boot_cpu_has(X86_FEATURE_AVX) &&
- 	    cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL))
- 		static_branch_enable(&poly1305_use_avx);
- 	if (IS_ENABLED(CONFIG_AS_AVX2) && boot_cpu_has(X86_FEATURE_AVX) &&
-diff --git a/arch/x86/crypto/sha1_ssse3_asm.S b/arch/x86/crypto/sha1_ssse3_asm.S
-index 12e2d19d7402..d25668d2a1e9 100644
---- a/arch/x86/crypto/sha1_ssse3_asm.S
-+++ b/arch/x86/crypto/sha1_ssse3_asm.S
-@@ -467,8 +467,6 @@ W_PRECALC_SSSE3
-  */
- SHA1_VECTOR_ASM     sha1_transform_ssse3
- 
--#ifdef CONFIG_AS_AVX
--
- .macro W_PRECALC_AVX
- 
- .purgem W_PRECALC_00_15
-@@ -553,5 +551,3 @@ W_PRECALC_AVX
-  *				       const u8 *data, int blocks);
-  */
- SHA1_VECTOR_ASM     sha1_transform_avx
--
--#endif
-diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
-index d70b40ad594c..275b65dd30c9 100644
---- a/arch/x86/crypto/sha1_ssse3_glue.c
-+++ b/arch/x86/crypto/sha1_ssse3_glue.c
-@@ -114,7 +114,6 @@ static void unregister_sha1_ssse3(void)
- 		crypto_unregister_shash(&sha1_ssse3_alg);
- }
- 
--#ifdef CONFIG_AS_AVX
- asmlinkage void sha1_transform_avx(struct sha1_state *state,
- 				   const u8 *data, int blocks);
- 
-@@ -175,13 +174,7 @@ static void unregister_sha1_avx(void)
- 		crypto_unregister_shash(&sha1_avx_alg);
- }
- 
--#else  /* CONFIG_AS_AVX */
--static inline int register_sha1_avx(void) { return 0; }
--static inline void unregister_sha1_avx(void) { }
--#endif /* CONFIG_AS_AVX */
--
--
--#if defined(CONFIG_AS_AVX2) && (CONFIG_AS_AVX)
-+#if defined(CONFIG_AS_AVX2)
- #define SHA1_AVX2_BLOCK_OPTSIZE	4	/* optimal 4*64 bytes of SHA1 blocks */
- 
- asmlinkage void sha1_transform_avx2(struct sha1_state *state,
-diff --git a/arch/x86/crypto/sha256-avx-asm.S b/arch/x86/crypto/sha256-avx-asm.S
-index fcbc30f58c38..4739cd31b9db 100644
---- a/arch/x86/crypto/sha256-avx-asm.S
-+++ b/arch/x86/crypto/sha256-avx-asm.S
-@@ -47,7 +47,6 @@
- # This code schedules 1 block at a time, with 4 lanes per block
- ########################################################################
- 
--#ifdef CONFIG_AS_AVX
- #include <linux/linkage.h>
- 
- ## assume buffers not aligned
-@@ -498,5 +497,3 @@ _SHUF_00BA:
- # shuffle xDxC -> DC00
- _SHUF_DC00:
- 	.octa 0x0b0a090803020100FFFFFFFFFFFFFFFF
--
--#endif
-diff --git a/arch/x86/crypto/sha256_ssse3_glue.c b/arch/x86/crypto/sha256_ssse3_glue.c
-index 03ad657c04bd..8bdc3be31f64 100644
---- a/arch/x86/crypto/sha256_ssse3_glue.c
-+++ b/arch/x86/crypto/sha256_ssse3_glue.c
-@@ -144,7 +144,6 @@ static void unregister_sha256_ssse3(void)
- 				ARRAY_SIZE(sha256_ssse3_algs));
- }
- 
--#ifdef CONFIG_AS_AVX
- asmlinkage void sha256_transform_avx(struct sha256_state *state,
- 				     const u8 *data, int blocks);
- 
-@@ -221,12 +220,7 @@ static void unregister_sha256_avx(void)
- 				ARRAY_SIZE(sha256_avx_algs));
- }
- 
--#else
--static inline int register_sha256_avx(void) { return 0; }
--static inline void unregister_sha256_avx(void) { }
--#endif
--
--#if defined(CONFIG_AS_AVX2) && defined(CONFIG_AS_AVX)
-+#if defined(CONFIG_AS_AVX2)
- asmlinkage void sha256_transform_rorx(struct sha256_state *state,
- 				      const u8 *data, int blocks);
- 
-diff --git a/arch/x86/crypto/sha512-avx-asm.S b/arch/x86/crypto/sha512-avx-asm.S
-index 90ea945ba5e6..63470fd6ae32 100644
---- a/arch/x86/crypto/sha512-avx-asm.S
-+++ b/arch/x86/crypto/sha512-avx-asm.S
-@@ -47,7 +47,6 @@
- #
- ########################################################################
- 
--#ifdef CONFIG_AS_AVX
- #include <linux/linkage.h>
- 
- .text
-@@ -424,4 +423,3 @@ K512:
- 	.quad 0x3c9ebe0a15c9bebc,0x431d67c49c100d4c
- 	.quad 0x4cc5d4becb3e42b6,0x597f299cfc657e2a
- 	.quad 0x5fcb6fab3ad6faec,0x6c44198c4a475817
--#endif
-diff --git a/arch/x86/crypto/sha512_ssse3_glue.c b/arch/x86/crypto/sha512_ssse3_glue.c
-index 1c444f41037c..75214982a633 100644
---- a/arch/x86/crypto/sha512_ssse3_glue.c
-+++ b/arch/x86/crypto/sha512_ssse3_glue.c
-@@ -142,7 +142,6 @@ static void unregister_sha512_ssse3(void)
- 			ARRAY_SIZE(sha512_ssse3_algs));
- }
- 
--#ifdef CONFIG_AS_AVX
- asmlinkage void sha512_transform_avx(struct sha512_state *state,
- 				     const u8 *data, int blocks);
- static bool avx_usable(void)
-@@ -218,12 +217,8 @@ static void unregister_sha512_avx(void)
- 		crypto_unregister_shashes(sha512_avx_algs,
- 			ARRAY_SIZE(sha512_avx_algs));
- }
--#else
--static inline int register_sha512_avx(void) { return 0; }
--static inline void unregister_sha512_avx(void) { }
--#endif
- 
--#if defined(CONFIG_AS_AVX2) && defined(CONFIG_AS_AVX)
-+#if defined(CONFIG_AS_AVX2)
- asmlinkage void sha512_transform_rorx(struct sha512_state *state,
- 				      const u8 *data, int blocks);
- 
-diff --git a/arch/x86/include/asm/xor_avx.h b/arch/x86/include/asm/xor_avx.h
-index d61ddf3d052b..0c4e5b5e3852 100644
---- a/arch/x86/include/asm/xor_avx.h
-+++ b/arch/x86/include/asm/xor_avx.h
-@@ -11,8 +11,6 @@
-  * Based on Ingo Molnar and Zach Brown's respective MMX and SSE routines
-  */
- 
--#ifdef CONFIG_AS_AVX
--
- #include <linux/compiler.h>
- #include <asm/fpu/api.h>
- 
-@@ -170,11 +168,4 @@ do { \
- #define AVX_SELECT(FASTEST) \
- 	(boot_cpu_has(X86_FEATURE_AVX) && boot_cpu_has(X86_FEATURE_OSXSAVE) ? &xor_block_avx : FASTEST)
- 
--#else
--
--#define AVX_XOR_SPEED {}
--
--#define AVX_SELECT(FASTEST) (FASTEST)
--
--#endif
- #endif
--- 
-2.17.1
-
+PiBPbiBGcmksIDIwIE1hciAyMDIwIGF0IDA2OjQ3LCBTcnVqYW5hIENoYWxsYSA8c2NoYWxsYUBt
+YXJ2ZWxsLmNvbT4gd3JvdGU6DQo+ID4NCj4gPiA+IE9uIEZyaSwgTWFyIDEzLCAyMDIwIGF0IDA1
+OjE3OjA0UE0gKzA1MzAsIFNydWphbmEgQ2hhbGxhIHdyb3RlOg0KPiA+ID4gPiBUaGUgZm9sbG93
+aW5nIHNlcmllcyBhZGRzIHN1cHBvcnQgZm9yIE1hcnZlbGwgQ3J5cHRvZ3JhcGhpYyBBY2NlbGVy
+YXJpb24NCj4gPiA+ID4gVW5pdCAoQ1BUKSBvbiBPY3Rlb25UWCBDTjgzWFggU29DLg0KPiA+ID4g
+Pg0KPiA+ID4gPiBDaGFuZ2VzIHNpbmNlIHYxOg0KPiA+ID4gPiAqIFJlcGxhY2VkIENSWVBUT19C
+TEtDSVBIRVIgd2l0aCBDUllQVE9fU0tDSVBIRVIgaW4gS2NvbmZpZy4NCj4gPiA+ID4NCj4gPiA+
+ID4gU3J1amFuYSBDaGFsbGEgKDQpOg0KPiA+ID4gPiAgIGRyaXZlcnM6IGNyeXB0bzogY3JlYXRl
+IGNvbW1vbiBLY29uZmlnIGFuZCBNYWtlZmlsZSBmb3IgTWFydmVsbA0KPiA+ID4gPiAgIGRyaXZl
+cnM6IGNyeXB0bzogYWRkIHN1cHBvcnQgZm9yIE9DVEVPTiBUWCBDUFQgZW5naW5lDQo+ID4gPiA+
+ICAgZHJpdmVyczogY3J5cHRvOiBhZGQgdGhlIFZpcnR1YWwgRnVuY3Rpb24gZHJpdmVyIGZvciBD
+UFQNCj4gPiA+ID4gICBjcnlwdG86IG1hcnZlbGw6IGVuYWJsZSBPY3Rlb25UWCBjcHQgb3B0aW9u
+cyBmb3IgYnVpbGQNCj4gPiA+DQo+ID4gPiBUaGVyZSdzIG5vIG1lbnRpb24gb2YgdGVzdGluZy4g
+IERpZCB5b3UgdHJ5DQo+ID4gPiBDT05GSUdfQ1JZUFRPX01BTkFHRVJfRVhUUkFfVEVTVFM9eT8N
+Cj4gPiA+DQo+ID4gWWVzLCB0aGUgY3J5cHRvIHNlbGYtdGVzdHMgYXJlIHBhc3NlZC4NCj4gDQo+
+ICp3aGljaCogc2VsZnRlc3RzIGFyZSBwYXNzZWQ/IFBsZWFzZSBjb25maXJtIHRoYXQgdGhleSBh
+bGwgcGFzc2VkIHdpdGgNCj4gdGhhdCBrY29uZmlnIG9wdGlvbiBzZXQNCkFwb2xvZ2llcy4gSSBo
+YXZlIG92ZXJsb29rZWQgdGhlIGNvbmZpZyBvcHRpb24sIEkgdGhvdWdodCBpdCB3YXMgQ09ORklH
+X0NSWVBUT19NQU5BR0VSX0RJU0FCTEVfVEVTVFMsIGFsbCBjcnlwdG8gc2VsZi10ZXN0cyBhcmUg
+cGFzc2VkIHdpdGggdGhpcyBvcHRpb24gZGlzYWJsZWQuIEkgaGF2ZSBzdGFydGVkIHZlcmlmeWlu
+ZyB3aXRoIENPTkZJR19DUllQVE9fTUFOQUdFUl9FWFRSQV9URVNUUz15LCBJIGFtIGdldHRpbmcg
+ZmV3IGVycm9ycyBmb3IgdW5zdXBwb3J0ZWQgaW5wdXQgbGVuZ3Rocywgd2lsbCBzdWJtaXQgdGhl
+IHBhdGNoIHdpdGggZml4ZXMuDQo=
