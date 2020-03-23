@@ -2,57 +2,64 @@ Return-Path: <SRS0=HSjb=5I=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3603DC4332B
-	for <linux-crypto@archiver.kernel.org>; Mon, 23 Mar 2020 21:01:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85D50C43331
+	for <linux-crypto@archiver.kernel.org>; Mon, 23 Mar 2020 22:04:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 064592076F
-	for <linux-crypto@archiver.kernel.org>; Mon, 23 Mar 2020 21:01:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ZlDyQMB3"
+	by mail.kernel.org (Postfix) with ESMTP id 55B4C20753
+	for <linux-crypto@archiver.kernel.org>; Mon, 23 Mar 2020 22:04:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1585001072;
+	bh=mUDxCrCIVFUi1cXQXpTp5QzjQ5KGrUdk1lH1SYe0K7M=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=hKFgss24/oZN7YR4qcG4RlJ1Hwugd//YAHDKZlDRGMMGs/v9ukAA77iuYEsxYauxV
+	 4EmtPckdAvuB1fjKAn4GpDz2WW8RwtGHZV9MsG7NsH3jSH5YJlXBm2cylFBYGX9rni
+	 8yu9OVNxkBbMPo1jsdm/rFptxYxd8Ot8gjr7QzVU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726143AbgCWVB4 (ORCPT
+        id S1725990AbgCWWEb (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 23 Mar 2020 17:01:56 -0400
-Received: from frisell.zx2c4.com ([192.95.5.64]:47999 "EHLO frisell.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726049AbgCWVB4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Mar 2020 17:01:56 -0400
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 05ec56f2;
-        Mon, 23 Mar 2020 20:54:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
-        :references:in-reply-to:from:date:message-id:subject:to:cc
-        :content-type; s=mail; bh=Dzejo8MYHCbr04lE7e7h/dcQGR0=; b=ZlDyQM
-        B3eLmIe4Lzb9S1fZKMuVz0p6YPU14Sh2RKRK9T5t69tI+QitT251cxSL7DCTD82Q
-        5UMSVeNjuCWIvg+UjKp6o8XxsdtuqFjGO+JytU+amWToRil3dy2zKWM38wa13Ek3
-        Dg1pRn7Zdt/7SrVwP2wLpZIgi2ur71Mp0mLeiEccJ20jyfYRXHhfE7OJR9IR7l5w
-        WqEXkJy3i7LfLeOXU5Xek1zGo+0K1ybvIAzAePfSxl9B63SOxKT1jczOOpsH8WfQ
-        PyejD1IloUSTh14VsAETuGlZmR9hCGZ2k2Rg1wBCawkClzZyqhIs6UqPWIJS1YOm
-        RM2flSbiCM/Vg+DQ==
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 0ed2ecef (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
-        Mon, 23 Mar 2020 20:54:50 +0000 (UTC)
-Received: by mail-il1-f169.google.com with SMTP id r5so10024782ilq.6;
-        Mon, 23 Mar 2020 14:01:53 -0700 (PDT)
-X-Gm-Message-State: ANhLgQ0CwfgEJJsfD2EfC78COOFnm7OD/pKysM0CkUJyU+KQh1O8yrUd
-        QefFExJ85mvcBmTu7FNgxca6a8evJAoTubHcfD4=
-X-Google-Smtp-Source: ADFU+vvDFPmC+Zf1SrdmYagNkhzoBtUhqADiRrdFYfBgB18+BfHzDxaVVBEO9t6ZtFAL6weZTY9YjQCJRXktPBoLtWI=
-X-Received: by 2002:a92:cece:: with SMTP id z14mr14770588ilq.38.1584997311836;
- Mon, 23 Mar 2020 14:01:51 -0700 (PDT)
+        Mon, 23 Mar 2020 18:04:31 -0400
+Received: from conssluserg-04.nifty.com ([210.131.2.83]:45673 "EHLO
+        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725897AbgCWWEb (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 23 Mar 2020 18:04:31 -0400
+Received: from mail-vs1-f41.google.com (mail-vs1-f41.google.com [209.85.217.41]) (authenticated)
+        by conssluserg-04.nifty.com with ESMTP id 02NM4RO3022840;
+        Tue, 24 Mar 2020 07:04:27 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-04.nifty.com 02NM4RO3022840
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1585001067;
+        bh=h6nm2Hiq/kZPXDtve+y+JyahA5CoO2EzrLNaMh8pB0U=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=0NvQzc9vpf3i4w59OBql2bUA3fFv02GNg4qxwWwcd9IH33rrIsUo08Z3wwnqVWojs
+         qTM2YaSHnKx5QmVLvDHW7wHshy511sa2W37eg8hjTC+XH/mA6Nnw8Ab//L20qZX7kv
+         Is0J5qix6D04C7G6B5Fp46SjOrayLGPZW9qNtAfWhSQ1Nhjz5ukCtsEB21lY1spOrq
+         bgcoKo0AB9CY9jXfZwVhqAchWtqq67aGINp+lg0IsRdbByJnGosJZkStVrmIBRuiNe
+         cfsjbzUZDvNRw3D9UPLnSlNxD2CbDAYoOv4WlrYzV6OcxSjuxWq+h1iksn2oeaPqfk
+         UHaI+ssapgr2w==
+X-Nifty-SrcIP: [209.85.217.41]
+Received: by mail-vs1-f41.google.com with SMTP id o3so9897821vsd.4;
+        Mon, 23 Mar 2020 15:04:27 -0700 (PDT)
+X-Gm-Message-State: ANhLgQ3VVysrzTdO4zJlR1dX2vFmRsl7kjBL85RNgPVwrYKm4tTs3IbY
+        QGOrY5ncEXFhoYgsGM6H0fXVjZnvNrJoFxlh+Vk=
+X-Google-Smtp-Source: ADFU+vtPNIJCULsC2ckgQesaum0yAU1a8tkGRLL3Tmcwq7vScG0ATcz09kWyiVeYSrqPbj0n0fZXgJPCEyMKTqIqwsg=
+X-Received: by 2002:a67:3201:: with SMTP id y1mr17991619vsy.54.1585001066297;
+ Mon, 23 Mar 2020 15:04:26 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200323020844.17064-1-masahiroy@kernel.org> <20200323020844.17064-6-masahiroy@kernel.org>
- <CAHmME9p3LAnrUMmcGPEUFqY5vOASe8MVk4=pzqFRj3E9C-bM+Q@mail.gmail.com>
- <CAK7LNATVAq_Wkv=K-ezwnG=o8a9OoKspZJYOyq+4OXX7EZHPnA@mail.gmail.com> <CAHmME9pg0_EAG_YkGJQ2AE0n=9EvP2CVoj+bT8cCuiDAdHzUCQ@mail.gmail.com>
-In-Reply-To: <CAHmME9pg0_EAG_YkGJQ2AE0n=9EvP2CVoj+bT8cCuiDAdHzUCQ@mail.gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Mon, 23 Mar 2020 15:01:40 -0600
-X-Gmail-Original-Message-ID: <CAHmME9o9AmwvD=SWmf=xtuOgQXgGi1D504tE6v3s4yqF2pR8ug@mail.gmail.com>
-Message-ID: <CAHmME9o9AmwvD=SWmf=xtuOgQXgGi1D504tE6v3s4yqF2pR8ug@mail.gmail.com>
-Subject: Re: [PATCH 5/7] x86: remove always-defined CONFIG_AS_SSSE3
-To:     Masahiro Yamada <masahiroy@kernel.org>,
-        Kees Cook <keescook@chromium.org>
+References: <20200323020844.17064-1-masahiroy@kernel.org> <CAHmME9p=ECJ15uyPH79bF0tuzEksdxoUsjGQSyz74FfdEJxTpQ@mail.gmail.com>
+ <CAHmME9q4egN7_KeYB-ZHCFPfXs-virgTv4iz9jW2SVOM7dTnLw@mail.gmail.com>
+ <CAK7LNAR07vZFzh1Bbpq4CoJ4zmsc+p5rxpkO1Zv8QVfqhfvr2w@mail.gmail.com> <CAHmME9qCjo4kOQM3Dw6PDjEebmb6rvXajqhK-m-=vKcHWqNhAw@mail.gmail.com>
+In-Reply-To: <CAHmME9qCjo4kOQM3Dw6PDjEebmb6rvXajqhK-m-=vKcHWqNhAw@mail.gmail.com>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Tue, 24 Mar 2020 07:03:50 +0900
+X-Gmail-Original-Message-ID: <CAK7LNAQgKgKgOpQ2bgHrB5h=LTffs2khbYRrBhrxFM44gS88KQ@mail.gmail.com>
+Message-ID: <CAK7LNAQgKgKgOpQ2bgHrB5h=LTffs2khbYRrBhrxFM44gS88KQ@mail.gmail.com>
+Subject: Re: [PATCH 0/7] x86: remove always-defined CONFIG_AS_* options
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
 Cc:     X86 ML <x86@kernel.org>, Ingo Molnar <mingo@kernel.org>,
         Thomas Gleixner <tglx@linutronix.de>,
         Borislav Petkov <bp@alien8.de>,
@@ -75,11 +82,66 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Mar 23, 2020 at 2:48 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> By the way, it looks like 5.7 will be raising the minimum binutils to
-> 2.23: https://lore.kernel.org/lkml/20200316160259.GN26126@zn.tnic/ In
-> light of this, I'll place another patch on top of my branch handling
-> that transition.
+Hi Jason,
 
-That now lives at the top of the usual branch:
-https://git.zx2c4.com/linux-dev/log/?h=jd/kconfig-assembler-support
+On Mon, Mar 23, 2020 at 3:53 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+>
+> On Mon, Mar 23, 2020 at 12:36 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
+> >
+> > Hi Jason,
+> >
+> > On Mon, Mar 23, 2020 at 1:28 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+> > >
+> > > Hi again,
+> > >
+> > > I've consolidated your patches and rebased mine on top, and
+> > > incorporated your useful binutils comments. The result lives here:
+> > >
+> > > https://git.zx2c4.com/linux-dev/log/?h=jd/kconfig-assembler-support
+> > >
+> > > I can submit all of those to the list, if you want, or maybe you can
+> > > just pull them out of there, include them in your v2, and put them in
+> > > your tree for 5.7? However you want is fine with me.
+> >
+> >
+> > Your series does not work correctly.
+> >
+> > I will comment why later.
+>
+> Bummer, okay. Looking forward to learning what's up. Also, if some
+> parts of it are useful (like the resorting and organizing of
+> arch/x86/crypto/Makefile), feel free to cannibalize it, keeping what's
+> useful and discarding what's not.
+>
+
+
+The answer is mostly in my previous reply to Linus:
+https://lkml.org/lkml/2020/3/13/27
+
+
+I think this problem would happen
+for CONFIG_AS_CFI and CONFIG_AS_ADX
+since the register in instruction code
+is machine-bit dependent.
+
+The former is OK wince we are planning to
+remove it.
+
+We need to handle -m64 for the latter.
+Otherwise, a problem like commit
+3a7c733165a4799fa1 would happen.
+
+
+So, I think we should merge this
+https://lore.kernel.org/patchwork/patch/1214332/
+then, fix-up CONFIG_AS_ADX on top of it.
+
+(Or, if we do not need to rush,
+we can delete CONFIG_AS_ADX entirely after
+we bump the binutils version to 2.23)
+
+Thanks.
+
+-- 
+Best Regards
+Masahiro Yamada
