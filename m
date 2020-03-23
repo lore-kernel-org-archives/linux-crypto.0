@@ -2,102 +2,448 @@ Return-Path: <SRS0=HSjb=5I=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95918C54EEB
-	for <linux-crypto@archiver.kernel.org>; Mon, 23 Mar 2020 06:53:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F469C10F26
+	for <linux-crypto@archiver.kernel.org>; Mon, 23 Mar 2020 07:43:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 59D362074D
-	for <linux-crypto@archiver.kernel.org>; Mon, 23 Mar 2020 06:53:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 29E6D20722
+	for <linux-crypto@archiver.kernel.org>; Mon, 23 Mar 2020 07:43:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="tuhwgUCA"
+	dkim=pass (1024-bit key) header.d=axtens.net header.i=@axtens.net header.b="fE6I+wew"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727369AbgCWGxX (ORCPT
+        id S1727437AbgCWHng (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 23 Mar 2020 02:53:23 -0400
-Received: from frisell.zx2c4.com ([192.95.5.64]:57655 "EHLO frisell.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727164AbgCWGxX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Mar 2020 02:53:23 -0400
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 4025283f;
-        Mon, 23 Mar 2020 06:46:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
-        :references:in-reply-to:from:date:message-id:subject:to:cc
-        :content-type; s=mail; bh=hhsjJ5nTbW/Bbc8zpStB0FYxsX4=; b=tuhwgU
-        CA3CliFET6ommFcdWnTY9HTFkBS8OxDwc7nsw3GhO5sx9aE5GBe5Ydojnok9nCw1
-        1vYdyFqJzC6IUQojzF0/FaGqmY5bFAP0IIv9SYipC3yMwn3j+di1WhG1goRr3VCW
-        P5cmkIKnazgNMzsqvfnWe6TVUvCuEqWD3um+ZYGPc/BpggtsnSpsmyIAX7/MCK+7
-        IuH9MvimzRnSwT0LjlX7USt92bcXJvxwX8NMrlSIfASPVrcc6GxFbzodBtZPbpNE
-        O0nmc2kSVca49dbX8zFc+js7wcC2h3zxcuvooAmt5gY5EDdSktMe/KXh2dnda38f
-        ZJnxrIA5yatRhvvg==
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 386d45d0 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
-        Mon, 23 Mar 2020 06:46:24 +0000 (UTC)
-Received: by mail-il1-f180.google.com with SMTP id a6so12115110ilc.4;
-        Sun, 22 Mar 2020 23:53:21 -0700 (PDT)
-X-Gm-Message-State: ANhLgQ0yBy7JeiyoYgx/saz1H31ggZeKBarL+VktwiAitKFsEKhxQbL/
-        Q/59bFvUpjwpWqY1unhQXXdEgIaCuSEVSMI7a98=
-X-Google-Smtp-Source: ADFU+vvErpWTeF+7DC+qPRKivjaXJFbfQ/Ox9xb4I/r/H5QniD3d2icAJTBOpd6e052DbBZKVfb+zvNoYRMiCNhl/jc=
-X-Received: by 2002:a92:cece:: with SMTP id z14mr11415751ilq.38.1584946400678;
- Sun, 22 Mar 2020 23:53:20 -0700 (PDT)
+        Mon, 23 Mar 2020 03:43:36 -0400
+Received: from mail-pj1-f65.google.com ([209.85.216.65]:35910 "EHLO
+        mail-pj1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727430AbgCWHng (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 23 Mar 2020 03:43:36 -0400
+Received: by mail-pj1-f65.google.com with SMTP id nu11so5715251pjb.1
+        for <linux-crypto@vger.kernel.org>; Mon, 23 Mar 2020 00:43:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=axtens.net; s=google;
+        h=from:to:cc:subject:in-reply-to:references:date:message-id
+         :mime-version;
+        bh=uCGq2qtmlaVwlSaudkxTDRAMTVDYk6bzNjinbA80GS0=;
+        b=fE6I+wewbmLmWOKOOwRdvflIe9fTce7+kGRgtG+nhK36avNnRNypxH5HKGFgqdVKzW
+         6C89wlDvuEi2ZPguE9Y25z76g/g/pMSBJM4abiu36TBv8IlpZ+4kpnEXITHC2jawEo68
+         XBnG4jEETS8ZK6vr/HPrGsDobb3C2XR8iFpoI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=uCGq2qtmlaVwlSaudkxTDRAMTVDYk6bzNjinbA80GS0=;
+        b=KwILUhu1e1V8Wi2vzFx/m9ICDirK79L4p+UpjjVmDDniEpYPldtzIVkv8nr12OG23M
+         UMrL3UUwOD/SsSXZm8BC9706hLFvoTKMowhD73h6vHZINdkTWNUXqz8RgKCgZiw/F6Uq
+         3lEXAB8H8Er7NlfcOdOTZuyliLCxNC88+zEeqcSXyJv4eLoDAtfj0KDtnz4VK2c7qEb7
+         bgHPzjXZVWLBjYw+vxbNV1ZOwGWsSgke097EBtt6jz+LfWitQKIh0Y5/PvcPRmP0J35K
+         3npvCkHq+ZkXCikRZBO6ejJOPp1Mr0XWj+AXyHYN25Klx5K8UMDwj7YxN2W1qV3NURv0
+         XgHg==
+X-Gm-Message-State: ANhLgQ21J9sJfqIkmD+zfOL/sINCwrRNPK6Jkg3dieM3OS6qcVaZb3NI
+        H2paL3EiI6kEGVsgacCLTUhk4w==
+X-Google-Smtp-Source: ADFU+vtaVNCUnCWQZ6/gQK/IAU7l33YYnkgkP6WnCnuC5IbxXvW+cqM0xVDBqYm/oohIEf5jZu/65g==
+X-Received: by 2002:a17:90b:4d0b:: with SMTP id mw11mr24194797pjb.45.1584949414709;
+        Mon, 23 Mar 2020 00:43:34 -0700 (PDT)
+Received: from localhost (2001-44b8-1113-6700-b01a-4ee1-5a87-afd3.static.ipv6.internode.on.net. [2001:44b8:1113:6700:b01a:4ee1:5a87:afd3])
+        by smtp.gmail.com with ESMTPSA id 11sm12429384pfz.91.2020.03.23.00.43.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 Mar 2020 00:43:33 -0700 (PDT)
+From:   Daniel Axtens <dja@axtens.net>
+To:     Haren Myneni <haren@linux.ibm.com>, herbert@gondor.apana.org.au
+Cc:     mpe@ellerman.id.au, mikey@neuling.org, sukadev@linux.vnet.ibm.com,
+        linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+        npiggin@gmail.com
+Subject: Re: [PATCH v4 3/9] powerpc/vas: Add VAS user space API
+In-Reply-To: <1584936142.9256.15325.camel@hbabu-laptop>
+References: <1584934879.9256.15321.camel@hbabu-laptop> <1584936142.9256.15325.camel@hbabu-laptop>
+Date:   Mon, 23 Mar 2020 18:43:29 +1100
+Message-ID: <878sjrwm72.fsf@dja-thinkpad.axtens.net>
 MIME-Version: 1.0
-References: <20200323020844.17064-1-masahiroy@kernel.org> <CAHmME9p=ECJ15uyPH79bF0tuzEksdxoUsjGQSyz74FfdEJxTpQ@mail.gmail.com>
- <CAHmME9q4egN7_KeYB-ZHCFPfXs-virgTv4iz9jW2SVOM7dTnLw@mail.gmail.com> <CAK7LNAR07vZFzh1Bbpq4CoJ4zmsc+p5rxpkO1Zv8QVfqhfvr2w@mail.gmail.com>
-In-Reply-To: <CAK7LNAR07vZFzh1Bbpq4CoJ4zmsc+p5rxpkO1Zv8QVfqhfvr2w@mail.gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Mon, 23 Mar 2020 00:53:09 -0600
-X-Gmail-Original-Message-ID: <CAHmME9qCjo4kOQM3Dw6PDjEebmb6rvXajqhK-m-=vKcHWqNhAw@mail.gmail.com>
-Message-ID: <CAHmME9qCjo4kOQM3Dw6PDjEebmb6rvXajqhK-m-=vKcHWqNhAw@mail.gmail.com>
-Subject: Re: [PATCH 0/7] x86: remove always-defined CONFIG_AS_* options
-To:     Masahiro Yamada <masahiroy@kernel.org>
-Cc:     X86 ML <x86@kernel.org>, Ingo Molnar <mingo@kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Allison Randal <allison@lohutok.net>,
-        Armijn Hemel <armijn@tjaldur.nl>,
-        "David S. Miller" <davem@davemloft.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Ingo Molnar <mingo@redhat.com>,
-        Kate Stewart <kstewart@linuxfoundation.org>,
-        Song Liu <songliubraving@fb.com>,
-        Zhengyuan Liu <liuzhengyuan@kylinos.cn>,
-        clang-built-linux <clang-built-linux@googlegroups.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Mar 23, 2020 at 12:36 AM Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> Hi Jason,
->
-> On Mon, Mar 23, 2020 at 1:28 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> >
-> > Hi again,
-> >
-> > I've consolidated your patches and rebased mine on top, and
-> > incorporated your useful binutils comments. The result lives here:
-> >
-> > https://git.zx2c4.com/linux-dev/log/?h=jd/kconfig-assembler-support
-> >
-> > I can submit all of those to the list, if you want, or maybe you can
-> > just pull them out of there, include them in your v2, and put them in
-> > your tree for 5.7? However you want is fine with me.
->
->
-> Your series does not work correctly.
->
-> I will comment why later.
+Haren Myneni <haren@linux.ibm.com> writes:
 
-Bummer, okay. Looking forward to learning what's up. Also, if some
-parts of it are useful (like the resorting and organizing of
-arch/x86/crypto/Makefile), feel free to cannibalize it, keeping what's
-useful and discarding what's not.
+> On power9, userspace can send GZIP compression requests directly to NX
+> once kernel establishes NX channel / window with VAS. This patch provides
+> user space API which allows user space to establish channel using open
+> VAS_TX_WIN_OPEN ioctl, mmap and close operations.
+>
+> Each window corresponds to file descriptor and application can open
+> multiple windows. After the window is opened, VAS_TX_WIN_OPEN icoctl to
+> open a window on specific VAS instance, mmap() system call to map
+> the hardware address of engine's request queue into the application's
+> virtual address space.
+>
+> Then the application can then submit one or more requests to the the
+> engine by using the copy/paste instructions and pasting the CRBs to
+> the virtual address (aka paste_address) returned by mmap().
+>
+> Only NX GZIP coprocessor type is supported right now and allow GZIP
+> engine access via /dev/crypto/nx-gzip device node.
+>
+> Signed-off-by: Sukadev Bhattiprolu <sukadev@linux.vnet.ibm.com>
+> Signed-off-by: Haren Myneni <haren@linux.ibm.com>
+> ---
+>  arch/powerpc/include/asm/vas.h              |  11 ++
+>  arch/powerpc/platforms/powernv/Makefile     |   2 +-
+>  arch/powerpc/platforms/powernv/vas-api.c    | 257 ++++++++++++++++++++++++++++
+>  arch/powerpc/platforms/powernv/vas-window.c |   6 +-
+>  arch/powerpc/platforms/powernv/vas.h        |   2 +
+>  5 files changed, 274 insertions(+), 4 deletions(-)
+>  create mode 100644 arch/powerpc/platforms/powernv/vas-api.c
+>
+> diff --git a/arch/powerpc/include/asm/vas.h b/arch/powerpc/include/asm/vas.h
+> index f93e6b0..e064953 100644
+> --- a/arch/powerpc/include/asm/vas.h
+> +++ b/arch/powerpc/include/asm/vas.h
+> @@ -163,4 +163,15 @@ struct vas_window *vas_tx_win_open(int vasid, enum vas_cop_type cop,
+>   */
+>  int vas_paste_crb(struct vas_window *win, int offset, bool re);
+>  
+> +/*
+> + * Register / unregister coprocessor type to VAS API which will be exported
+> + * to user space. Applications can use this API to open / close window
+> + * which can be used to send / receive requests directly to cooprcessor.
+> + *
+> + * Only NX GZIP coprocessor type is supported now, but this API can be
+> + * used for others in future.
+> + */
+> +int vas_register_coproc_api(struct module *mod);
+> +void vas_unregister_coproc_api(void);
+> +
+>  #endif /* __ASM_POWERPC_VAS_H */
+> diff --git a/arch/powerpc/platforms/powernv/Makefile b/arch/powerpc/platforms/powernv/Makefile
+> index 395789f..fe3f0fb 100644
+> --- a/arch/powerpc/platforms/powernv/Makefile
+> +++ b/arch/powerpc/platforms/powernv/Makefile
+> @@ -17,7 +17,7 @@ obj-$(CONFIG_MEMORY_FAILURE)	+= opal-memory-errors.o
+>  obj-$(CONFIG_OPAL_PRD)	+= opal-prd.o
+>  obj-$(CONFIG_PERF_EVENTS) += opal-imc.o
+>  obj-$(CONFIG_PPC_MEMTRACE)	+= memtrace.o
+> -obj-$(CONFIG_PPC_VAS)	+= vas.o vas-window.o vas-debug.o vas-fault.o
+> +obj-$(CONFIG_PPC_VAS)	+= vas.o vas-window.o vas-debug.o vas-fault.o vas-api.o
+>  obj-$(CONFIG_OCXL_BASE)	+= ocxl.o
+>  obj-$(CONFIG_SCOM_DEBUGFS) += opal-xscom.o
+>  obj-$(CONFIG_PPC_SECURE_BOOT) += opal-secvar.o
+> diff --git a/arch/powerpc/platforms/powernv/vas-api.c b/arch/powerpc/platforms/powernv/vas-api.c
+> new file mode 100644
+> index 0000000..7d049af
+> --- /dev/null
+> +++ b/arch/powerpc/platforms/powernv/vas-api.c
+> @@ -0,0 +1,257 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * VAS user space API for its accelerators (Only NX-GZIP is supported now)
+> + * Copyright (C) 2019 Haren Myneni, IBM Corp
+> + */
+> +
+> +#include <linux/kernel.h>
+> +#include <linux/device.h>
+> +#include <linux/cdev.h>
+> +#include <linux/fs.h>
+> +#include <linux/slab.h>
+> +#include <linux/uaccess.h>
+> +#include <asm/vas.h>
+> +#include <uapi/asm/vas-api.h>
+> +#include "vas.h"
+> +
+> +/*
+> + * The driver creates the device node that can be used as follows:
+> + * For NX-GZIP
+> + *
+> + *	fd = open("/dev/crypto/nx-gzip", O_RDWR);
+> + *	rc = ioctl(fd, VAS_TX_WIN_OPEN, &attr);
+> + *	paste_addr = mmap(NULL, PAGE_SIZE, prot, MAP_SHARED, fd, 0ULL).
+> + *	vas_copy(&crb, 0, 1);
+> + *	vas_paste(paste_addr, 0, 1);
+> + *	close(fd) or exit process to close window.
+> + *
+> + * where "vas_copy" and "vas_paste" are defined in copy-paste.h.
+> + * copy/paste returns to the user space directly. So refer NX hardware
+> + * documententation for exact copy/paste usage and completion / error
+> + * conditions.
+> + */
+> +
+> +static char	*coproc_dev_name = "nx-gzip";
+> +
+> +/*
+> + * Wrapper object for the nx-gzip device - there is just one instance of
+> + * this node for the whole system.
+> + */
+> +static struct coproc_dev {
+> +	struct cdev cdev;
+> +	struct device *device;
+> +	char *name;
+> +	dev_t devt;
+> +	struct class *class;
+> +} coproc_device;
+> +
+> +static char *coproc_devnode(struct device *dev, umode_t *mode)
+> +{
+> +	return kasprintf(GFP_KERNEL, "crypto/%s", dev_name(dev));
+> +}
+> +
+> +static int coproc_open(struct inode *inode, struct file *fp)
+> +{
+> +	/*
+> +	 * vas_window is allocated and assigned to fp->private_data
+> +	 * in ioctl. Nothing to do here for NX GZIP.
+> +	 */
+> +	return 0;
+> +}
+> +
+> +static int coproc_ioc_tx_win_open(struct file *fp, unsigned long arg)
+> +{
+> +	void __user *uptr = (void __user *)arg;
+> +	struct vas_tx_win_attr txattr = {};
+> +	struct vas_tx_win_open_attr uattr;
+> +	struct vas_window *txwin;
+> +	int rc, vasid;
+> +
+> +	/*
+> +	 * One window for file descriptor
+> +	 */
+> +	if (fp->private_data)
+> +		return -EEXIST;
+> +
+> +	rc = copy_from_user(&uattr, uptr, sizeof(uattr));
+> +	if (rc) {
+> +		pr_err("%s(): copy_from_user() returns %d\n", __func__, rc);
+> +		return -EFAULT;
+> +	}
+> +
+> +	if (uattr.version != 1) {
+> +		pr_err("Invalid version\n");
+> +		return -EINVAL;
+> +	}
+> +
+> +	vasid = uattr.vas_id;
+> +
+> +	vas_init_tx_win_attr(&txattr, VAS_COP_TYPE_GZIP);
+> +
+> +	txattr.lpid = mfspr(SPRN_LPID);
+> +	txattr.pidr = mfspr(SPRN_PID);
+> +	txattr.user_win = true;
+> +	txattr.rsvd_txbuf_count = false;
+> +	txattr.pswid = false;
+> +
+> +	pr_devel("Pid %d: Opening txwin, PIDR %ld\n", txattr.pidr,
+> +				mfspr(SPRN_PID));
+> +
+> +	txwin = vas_tx_win_open(vasid, VAS_COP_TYPE_GZIP, &txattr);
+> +	if (IS_ERR(txwin)) {
+> +		pr_err("%s() vas_tx_win_open() failed, %ld\n", __func__,
+> +					PTR_ERR(txwin));
+> +		return PTR_ERR(txwin);
+> +	}
+> +
+> +	fp->private_data = txwin;
+> +
+> +	return 0;
+> +}
+> +
+> +static int coproc_release(struct inode *inode, struct file *fp)
+> +{
+> +	struct vas_window *txwin = fp->private_data;
+> +
+> +	if (txwin) {
+> +		vas_win_close(txwin);
+> +		fp->private_data = NULL;
+> +	}
+> +
+> +	/*
+> +	 * We don't know here if user has other receive windows
+> +	 * open, so we can't really call clear_thread_tidr().
+> +	 * So, once the process calls set_thread_tidr(), the
+> +	 * TIDR value sticks around until process exits, resulting
+> +	 * in an extra copy in restore_sprs().
+> +	 */
+> +
+> +	return 0;
+> +}
+> +
+> +static int coproc_mmap(struct file *fp, struct vm_area_struct *vma)
+> +{
+> +	struct vas_window *txwin = fp->private_data;
+> +	unsigned long pfn;
+> +	u64 paste_addr;
+> +	pgprot_t prot;
+> +	int rc;
+> +
+> +	if ((vma->vm_end - vma->vm_start) > PAGE_SIZE) {
 
-Jason
+I think you said this should be 4096 rather than 64k, regardless of what
+PAGE_SIZE you are compiled with?
+
+> +		pr_debug("%s(): size 0x%zx, PAGE_SIZE 0x%zx\n", __func__,
+> +				(vma->vm_end - vma->vm_start), PAGE_SIZE);
+> +		return -EINVAL;
+> +	}
+> +
+> +	/* Ensure instance has an open send window */
+> +	if (!txwin) {
+> +		pr_err("%s(): No send window open?\n", __func__);
+> +		return -EINVAL;
+> +	}
+> +
+> +	vas_win_paste_addr(txwin, &paste_addr, NULL);
+> +	pfn = paste_addr >> PAGE_SHIFT;
+> +
+> +	/* flags, page_prot from cxl_mmap(), except we want cachable */
+> +	vma->vm_flags |= VM_IO | VM_PFNMAP;
+> +	vma->vm_page_prot = pgprot_cached(vma->vm_page_prot);
+> +
+> +	prot = __pgprot(pgprot_val(vma->vm_page_prot) | _PAGE_DIRTY);
+> +
+> +	rc = remap_pfn_range(vma, vma->vm_start, pfn + vma->vm_pgoff,
+> +			vma->vm_end - vma->vm_start, prot);
+> +
+> +	pr_devel("%s(): paste addr %llx at %lx, rc %d\n", __func__,
+> +			paste_addr, vma->vm_start, rc);
+> +
+> +	return rc;
+> +}
+> +
+> +static long coproc_ioctl(struct file *fp, unsigned int cmd, unsigned long arg)
+> +{
+> +	switch (cmd) {
+> +	case VAS_TX_WIN_OPEN:
+> +		return coproc_ioc_tx_win_open(fp, arg);
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +}
+> +
+> +static struct file_operations coproc_fops = {
+> +	.open = coproc_open,
+> +	.release = coproc_release,
+> +	.mmap = coproc_mmap,
+> +	.unlocked_ioctl = coproc_ioctl,
+> +};
+> +
+> +/*
+> + * Supporting only nx-gzip coprocessor type now, but this API code
+> + * extended to other coprocessor types later.
+> + */
+> +int vas_register_coproc_api(struct module *mod)
+> +{
+> +	int rc = -EINVAL;
+> +	dev_t devno;
+> +
+> +	rc = alloc_chrdev_region(&coproc_device.devt, 1, 1, coproc_dev_name);
+> +	if (rc) {
+> +		pr_err("Unable to allocate coproc major number: %i\n", rc);
+> +		return rc;
+> +	}
+> +
+> +	pr_devel("%s device allocated, dev [%i,%i]\n", coproc_dev_name,
+> +			MAJOR(coproc_device.devt), MINOR(coproc_device.devt));
+> +
+> +	coproc_device.class = class_create(mod, coproc_dev_name);
+> +	if (IS_ERR(coproc_device.class)) {
+> +		rc = PTR_ERR(coproc_device.class);
+> +		pr_err("Unable to create %s class %d\n", coproc_dev_name, rc);
+> +		goto err_class;
+> +	}
+> +	coproc_device.class->devnode = coproc_devnode;
+> +
+> +	coproc_fops.owner = mod;
+> +	cdev_init(&coproc_device.cdev, &coproc_fops);
+> +
+> +	devno = MKDEV(MAJOR(coproc_device.devt), 0);
+> +	rc = cdev_add(&coproc_device.cdev, devno, 1);
+> +	if (rc) {
+> +		pr_err("cdev_add() failed %d\n", rc);
+> +		goto err_cdev;
+> +	}
+> +
+> +	coproc_device.device = device_create(coproc_device.class, NULL,
+> +			devno, NULL, coproc_dev_name, MINOR(devno));
+> +	if (IS_ERR(coproc_device.device)) {
+> +		rc = PTR_ERR(coproc_device.device);
+> +		pr_err("Unable to create coproc-%d %d\n", MINOR(devno), rc);
+> +		goto err;
+> +	}
+> +
+> +	pr_devel("%s: Added dev [%d,%d]\n", __func__, MAJOR(devno),
+> +			MINOR(devno));
+> +
+> +	return 0;
+> +
+> +err:
+> +	cdev_del(&coproc_device.cdev);
+> +err_cdev:
+> +	class_destroy(coproc_device.class);
+> +err_class:
+> +	unregister_chrdev_region(coproc_device.devt, 1);
+> +	return rc;
+> +}
+> +EXPORT_SYMBOL_GPL(vas_register_coproc_api);
+> +
+> +void vas_unregister_coproc_api(void)
+> +{
+> +	dev_t devno;
+> +
+> +	cdev_del(&coproc_device.cdev);
+> +	devno = MKDEV(MAJOR(coproc_device.devt), 0);
+> +	device_destroy(coproc_device.class, devno);
+> +
+> +	class_destroy(coproc_device.class);
+> +	unregister_chrdev_region(coproc_device.devt, 1);
+> +}
+> +EXPORT_SYMBOL_GPL(vas_unregister_coproc_api);
+> diff --git a/arch/powerpc/platforms/powernv/vas-window.c b/arch/powerpc/platforms/powernv/vas-window.c
+> index 4ce421f..7b5187b 100644
+> --- a/arch/powerpc/platforms/powernv/vas-window.c
+> +++ b/arch/powerpc/platforms/powernv/vas-window.c
+> @@ -26,7 +26,7 @@
+>   * Compute the paste address region for the window @window using the
+>   * ->paste_base_addr and ->paste_win_id_shift we got from device tree.
+>   */
+> -static void compute_paste_address(struct vas_window *window, u64 *addr, int *len)
+> +void vas_win_paste_addr(struct vas_window *window, u64 *addr, int *len)
+>  {
+>  	int winid;
+>  	u64 base, shift;
+> @@ -80,7 +80,7 @@ static void *map_paste_region(struct vas_window *txwin)
+>  		goto free_name;
+>  
+>  	txwin->paste_addr_name = name;
+> -	compute_paste_address(txwin, &start, &len);
+> +	vas_win_paste_addr(txwin, &start, &len);
+>  
+>  	if (!request_mem_region(start, len, name)) {
+>  		pr_devel("%s(): request_mem_region(0x%llx, %d) failed\n",
+> @@ -138,7 +138,7 @@ static void unmap_paste_region(struct vas_window *window)
+>  	u64 busaddr_start;
+>  
+>  	if (window->paste_kaddr) {
+> -		compute_paste_address(window, &busaddr_start, &len);
+> +		vas_win_paste_addr(window, &busaddr_start, &len);
+>  		unmap_region(window->paste_kaddr, busaddr_start, len);
+>  		window->paste_kaddr = NULL;
+>  		kfree(window->paste_addr_name);
+> diff --git a/arch/powerpc/platforms/powernv/vas.h b/arch/powerpc/platforms/powernv/vas.h
+> index 8c39a7d..a10abed 100644
+> --- a/arch/powerpc/platforms/powernv/vas.h
+> +++ b/arch/powerpc/platforms/powernv/vas.h
+> @@ -431,6 +431,8 @@ struct vas_winctx {
+>  extern void vas_return_credit(struct vas_window *window, bool tx);
+>  extern struct vas_window *vas_pswid_to_window(struct vas_instance *vinst,
+>  						uint32_t pswid);
+> +extern void vas_win_paste_addr(struct vas_window *window, u64 *addr,
+> +					int *len);
+>  
+>  static inline int vas_window_pid(struct vas_window *window)
+>  {
+> -- 
+> 1.8.3.1
