@@ -2,115 +2,97 @@ Return-Path: <SRS0=HSjb=5I=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0450C54FCE
-	for <linux-crypto@archiver.kernel.org>; Mon, 23 Mar 2020 16:38:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0DBCC3F2CD
+	for <linux-crypto@archiver.kernel.org>; Mon, 23 Mar 2020 18:06:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id C1AC320753
-	for <linux-crypto@archiver.kernel.org>; Mon, 23 Mar 2020 16:38:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B7B1A2074D
+	for <linux-crypto@archiver.kernel.org>; Mon, 23 Mar 2020 18:06:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="kLckJLXz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727411AbgCWQis (ORCPT
+        id S1727609AbgCWSGi (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 23 Mar 2020 12:38:48 -0400
-Received: from mga12.intel.com ([192.55.52.136]:30481 "EHLO mga12.intel.com"
+        Mon, 23 Mar 2020 14:06:38 -0400
+Received: from frisell.zx2c4.com ([192.95.5.64]:58345 "EHLO frisell.zx2c4.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727234AbgCWQis (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Mar 2020 12:38:48 -0400
-IronPort-SDR: Rriv0Z8hJsGqsw3IoOkPAtgtiPO6JHB23PHs7p4zPBv+48a/GJlbM73vt8QMk6fMAwnqRW4mjh
- p3JleAiIVMMg==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2020 09:38:46 -0700
-IronPort-SDR: BNtv86v3w8JwvH4wJojnjAtNBR5zND3RBh/ddNAj1/0KWdAuOS7J1X36McxoHrFDWlrsVZa05+
- xW30ri8rHyMA==
-X-IronPort-AV: E=Sophos;i="5.72,297,1580803200"; 
-   d="scan'208";a="269933222"
-Received: from smtp.ostc.intel.com ([10.54.29.231])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Mar 2020 09:38:45 -0700
-Received: from localhost (mtg-dev.jf.intel.com [10.54.74.10])
-        by smtp.ostc.intel.com (Postfix) with ESMTP id E3150636B;
-        Mon, 23 Mar 2020 16:38:43 +0000 (UTC)
-Date:   Mon, 23 Mar 2020 09:38:44 -0700
-From:   mark gross <mgross@linux.intel.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Andy Shevchenko <andy.shevchenko@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Tony Luck <tony.luck@intel.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Len Brown <lenb@kernel.org>,
-        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Darren Hart <dvhart@infradead.org>,
-        Andy Shevchenko <andy@infradead.org>,
-        Viresh Kumar <viresh.kumar@linaro.org>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        linux-edac@vger.kernel.org,
-        Platform Driver <platform-driver-x86@vger.kernel.org>,
-        Jean Delvare <jdelvare@suse.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        linux-hwmon@vger.kernel.org, Zhang Rui <rui.zhang@intel.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Amit Kucheria <amit.kucheria@verdurent.com>,
-        Chanwoo Choi <cw00.choi@samsung.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
-        Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org,
-        Takashi Iwai <tiwai@suse.com>,
-        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto <linux-crypto@vger.kernel.org>
-Subject: Re: [patch 08/22] ACPI: Convert to new X86 CPU match macros
-Message-ID: <20200323163844.GB123290@mtg-dev.jf.intel.com>
-Reply-To: mgross@linux.intel.com
-References: <20200320131345.635023594@linutronix.de>
- <20200320131509.467730627@linutronix.de>
- <CAHp75VcK3tL0YayjF=CSkSkHiOpg2zOV3rdkXQWJmLZ9fmevpg@mail.gmail.com>
- <87bloqpy1x.fsf@nanos.tec.linutronix.de>
+        id S1726991AbgCWSGi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 23 Mar 2020 14:06:38 -0400
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id c8a2d632;
+        Mon, 23 Mar 2020 17:59:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
+        :references:in-reply-to:from:date:message-id:subject:to:cc
+        :content-type; s=mail; bh=FPZf4kVghzlSWSBHY6w3F8ZRqfw=; b=kLckJL
+        XzpdN8QraJS6PfLqt3cwASnfpFIbUg2dkAHu06/Qbrp8xKiNtUSjgRsiNWeyAAa0
+        MHwZ2Wi2iseZ9bbwDbGOMwIqaZgsfUFKJwRmBTlWklLiaY211PM+Y4sg2csYXxhc
+        2vJxrqGRSZ+RPa/Xo+SvlZpI/9XemAk++VZJVefs82EhAU9y+JwA8vgcXNq8VFLA
+        U8AyV8TtCPLqNknkbyc3yHVoZGvelUGXvfV2Za05MGF35DUOvF5OeV1Wl7bdxeen
+        ZgtyY5TyS32elN9JYzrUEi4ocyuHcYU2UdDu2rylUkk4FWOYqs50OWWfao18+YYH
+        YMpS4XX5+YPSMBUw==
+Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 7a32da01 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
+        Mon, 23 Mar 2020 17:59:33 +0000 (UTC)
+Received: by mail-io1-f45.google.com with SMTP id h8so15230879iob.2;
+        Mon, 23 Mar 2020 11:06:34 -0700 (PDT)
+X-Gm-Message-State: ANhLgQ04WlYE++ODZ1bQag63imAYhkVZYDxiL5l00GXx76VupkxMju/e
+        GrRqGC5KgQiA7Rjkm2JyUs8QCwRt8NaEn+4eKv4=
+X-Google-Smtp-Source: ADFU+vt+pDpeqWScbmvLs9OTr6OR3UtD7Q3r5qSpCUxhzqAWtqxjh7kbAn4P2ZYYhC5RjEDqPxVEXxLIypNeTI1dk9I=
+X-Received: by 2002:a05:6638:308:: with SMTP id w8mr20677307jap.108.1584986793763;
+ Mon, 23 Mar 2020 11:06:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87bloqpy1x.fsf@nanos.tec.linutronix.de>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+References: <20200323020844.17064-1-masahiroy@kernel.org> <20200323020844.17064-6-masahiroy@kernel.org>
+In-Reply-To: <20200323020844.17064-6-masahiroy@kernel.org>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Mon, 23 Mar 2020 12:06:22 -0600
+X-Gmail-Original-Message-ID: <CAHmME9p3LAnrUMmcGPEUFqY5vOASe8MVk4=pzqFRj3E9C-bM+Q@mail.gmail.com>
+Message-ID: <CAHmME9p3LAnrUMmcGPEUFqY5vOASe8MVk4=pzqFRj3E9C-bM+Q@mail.gmail.com>
+Subject: Re: [PATCH 5/7] x86: remove always-defined CONFIG_AS_SSSE3
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     X86 ML <x86@kernel.org>, Ingo Molnar <mingo@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Allison Randal <allison@lohutok.net>,
+        Armijn Hemel <armijn@tjaldur.nl>,
+        "David S. Miller" <davem@davemloft.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Ingo Molnar <mingo@redhat.com>,
+        Kate Stewart <kstewart@linuxfoundation.org>,
+        Song Liu <songliubraving@fb.com>,
+        Zhengyuan Liu <liuzhengyuan@kylinos.cn>,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Mar 20, 2020 at 09:32:26PM +0100, Thomas Gleixner wrote:
-> Andy Shevchenko <andy.shevchenko@gmail.com> writes:
-> 
-> > On Fri, Mar 20, 2020 at 3:19 PM Thomas Gleixner <tglx@linutronix.de> wrote:
-> >>
-> >> The new macro set has a consistent namespace and uses C99 initializers
-> >> instead of the grufty C89 ones.
-> >>
-> >> Rename the local macro wrapper to X86_MATCH for consistency. It stays for
-> >> readability sake.
-> >
-> >> +       X86_MATCH_INTEL_FAM6_MODEL(ATOM_SILVERMONT,     NULL),
-> >> +       X86_MATCH_INTEL_FAM6_MODEL(ATOM_AIRMONT,        NULL),
-> >
-> >> -#define ICPU(model)    { X86_VENDOR_INTEL, 6, model, X86_FEATURE_ANY, }
-> >> +#define X86_MATCH(model)       X86_MATCH_INTEL_FAM6_MODEL(model, NULL)
-> >
-> > Maybe we can do a generic macro to avoid all these ', NULL' repetitions?
-> 
-> I opted for having the data argument everywhere to keep the macro maze
-> small. And we have enough places where data is actually used.
-+1
+On Sun, Mar 22, 2020 at 8:10 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
+> diff --git a/lib/raid6/algos.c b/lib/raid6/algos.c
+> index bf1b4765c8f6..77457ea5a239 100644
+> --- a/lib/raid6/algos.c
+> +++ b/lib/raid6/algos.c
+> @@ -103,9 +103,7 @@ const struct raid6_recov_calls *const raid6_recov_algos[] = {
+>  #ifdef CONFIG_AS_AVX2
+>         &raid6_recov_avx2,
+>  #endif
+> -#ifdef CONFIG_AS_SSSE3
+>         &raid6_recov_ssse3,
+> -#endif
+>  #ifdef CONFIG_S390
+>         &raid6_recov_s390xc,
+>  #endif
 
---mark
+algos.c is compiled on all platforms, so you'll need to ifdef that x86
+section where SSSE3 is no longer guarding it. The pattern in the rest
+of the file, if you want to follow it, is "#if defined(__x86_64__) &&
+!defined(__arch_um__)". That seems ugly and like there are better
+ways, but in the interest of uniformity and a lack of desire to
+rewrite all the raid6 code, I went with that in this cleanup:
 
-> Thanks,
-> 
->         tglx
+https://git.zx2c4.com/linux-dev/commit/?h=jd/kconfig-assembler-support&id=512a00ddebbe5294a88487dcf1dc845cf56703d9
