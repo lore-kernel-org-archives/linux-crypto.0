@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44A35C4332B
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 08:51:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A96E2C54FCF
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 08:51:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0FF55208D5
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 08:51:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7EBB1208CA
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 08:51:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1585039882;
-	bh=Iv3Ytq8bh69ZiOc5Glx1Gv7cmvr5X7NaNRuGu5x/ZT4=;
+	s=default; t=1585039883;
+	bh=ZGQunMWG2zWvXeH8QdOHrss1nr5uCJXv+n5KXe2k6DI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=HtHwEy+enskycILFZ0P4uONEj4NdTb+wyo3wf0f1k7WgrMpxpDeJWt7IgOa7hOcrk
-	 39YiN0d/3j6FYQfv9M1161XBKvYEjcYI+WGQ40qShhbl30KdbdLHDt1HY0OKyDWwJI
-	 iXVnbdDe9FVKYekqa0veBYHgUCv8LD9UIWtTU7/8=
+	b=R+OMbs2F4Xu707soIXRcYrJa2EMKek+PWWIrEiPaxrVP2EujBBdeid9Nr4ysVqxPo
+	 sbamS4DIjX85NZuQicOpsDyYtntFH+JvTJTfuqjJjaj8k3105ykyCpE46mYSfg2TZW
+	 RGb77CIT9Ggzqc23hmIUEF2+65sOMioXLEGuI7ZQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727364AbgCXIvV (ORCPT
+        id S1727383AbgCXIvW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 24 Mar 2020 04:51:21 -0400
-Received: from conuserg-09.nifty.com ([210.131.2.76]:17233 "EHLO
+        Tue, 24 Mar 2020 04:51:22 -0400
+Received: from conuserg-09.nifty.com ([210.131.2.76]:17573 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727262AbgCXIvL (ORCPT
+        with ESMTP id S1727261AbgCXIvV (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Mar 2020 04:51:11 -0400
+        Tue, 24 Mar 2020 04:51:21 -0400
 Received: from pug.e01.socionext.com (p14092-ipngnfx01kyoto.kyoto.ocn.ne.jp [153.142.97.92]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 02O8mgsk011219;
-        Tue, 24 Mar 2020 17:49:00 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 02O8mgsk011219
+        by conuserg-09.nifty.com with ESMTP id 02O8mgsY011219;
+        Tue, 24 Mar 2020 17:48:44 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 02O8mgsY011219
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1585039740;
-        bh=+sBpYXedQh2YzVb03jkJMbz9JNuGcrw07RIglD9uxfI=;
+        s=dec2015msa; t=1585039725;
+        bh=Zh5UxR06uJCD24GzekHGCCPt3LyuPsfIaph9vVkw9LY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=n9RusmaBll+27qhYBFIXlTiemgqggu13Qa7n14wuVoCHAhETdtWLrtnjV8ZNRJXDS
-         NNBqD11dc85K2uijg50eldHcFAl4EqN4nul2gJlFo5Y2/88+9A2olIwEGfSUuJPSXQ
-         hfogxDr82ybyTUvuQPKwQBBtvfFTKWBfz2n379+xohHovrNGOQb0NZ7rPH8M8tQwqq
-         33VzRfCB4fI1MB3vhNeg6ngj2bcUFGcvctdVQXH50TFa7rqXox3sErAwLQ7CVpljc6
-         L558GI83D9EEIRVD1667yOhm4SBk0sOuN8uATfebq4SCi5oPL1pCsWZOGxEzn8XAyv
-         OwgbU8g1u+zhw==
+        b=L4sWk0ZSK1bL75s+iro4Oe0VKEyW1SvlGGCTKWdN1nBVsPxmYqwrxQfyjFxQaETHM
+         go03QH7hFsgQLyNun1Hz2mW/RPsnUeXbeweeUBW0foMKkvHNbVWyPT1gUjsPX3Ym4w
+         yoCNo1MgEG49wUjpbkm9r669Va9PeMEEWC9twGMDdT5wZdQTrEYY+fjO8mHKXpz3y9
+         Eh8xTWXNFDQM2txV7oyU/uNRFx1UAlJw68aPnpBwB7TJtn1mSaw8GKY44cp3u3cLP1
+         mgGQaGH7gF4qWq5cyw+LvzJjpbA8KA97NAGmwzXWt2KF3pqTbL5IkiP9uB9Tb5jVDQ
+         s3/1a5k0KcYDw==
 X-Nifty-SrcIP: [153.142.97.92]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kernel@vger.kernel.org
@@ -56,11 +56,13 @@ Cc:     "David S . Miller" <davem@davemloft.net>,
         Peter Zijlstra <peterz@infradead.org>,
         "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
         linux-kbuild@vger.kernel.org,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
-        Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 13/16] crypto: curve25519 - do not pollute dispatcher based on assembler
-Date:   Tue, 24 Mar 2020 17:48:18 +0900
-Message-Id: <20200324084821.29944-14-masahiroy@kernel.org>
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Jim Kukunas <james.t.kukunas@linux.intel.com>,
+        NeilBrown <neilb@suse.de>,
+        Yuanhan Liu <yuanhan.liu@linux.intel.com>
+Subject: [PATCH 01/16] lib/raid6/test: fix build on distros whose /bin/sh is not bash
+Date:   Tue, 24 Mar 2020 17:48:06 +0900
+Message-Id: <20200324084821.29944-2-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200324084821.29944-1-masahiroy@kernel.org>
 References: <20200324084821.29944-1-masahiroy@kernel.org>
@@ -69,47 +71,59 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+You can test raid6 library code from user-space, like this:
 
-Since we're doing a static inline dispatch here, we normally branch
-based on whether or not there's an arch implementation. That would have
-been fine in general, except the crypto Makefile prior used to turn
-things off -- despite the Kconfig -- resulting in us needing to also
-hard code various assembler things into the dispatcher too. The horror!
-Now that the assembler config options are done by Kconfig, we can get
-rid of the inconsistency.
+  $ cd lib/raid6/test
+  $ make
 
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+The command in $(shell ...) function is evaluated by /bin/sh by default.
+(or, you can change the default shell by setting 'SHELL' in Makefile)
+
+Currently '>&/dev/null' is used to sink both stdout and stderr. Because
+this code is bash-ism, it only works when /bin/sh is a symbolic link to
+bash (this is the case on RHEL etc.)
+
+This does not work on Ubuntu where /bin/sh is a symbolic link to dash.
+
+I see lots of
+
+  /bin/sh: 1: Syntax error: Bad fd number
+
+and
+
+  warning "your version of binutils lacks ... support"
+
+Replace it with portable '>/dev/null 2>&1'.
+
+Fixes: 4f8c55c5ad49 ("lib/raid6: build proper files on corresponding arch")
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Acked-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 ---
 
- include/crypto/curve25519.h | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ lib/raid6/test/Makefile | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/include/crypto/curve25519.h b/include/crypto/curve25519.h
-index 9ecb3c1f0f15..4e6dc840b159 100644
---- a/include/crypto/curve25519.h
-+++ b/include/crypto/curve25519.h
-@@ -33,8 +33,7 @@ bool __must_check curve25519(u8 mypublic[CURVE25519_KEY_SIZE],
- 			     const u8 secret[CURVE25519_KEY_SIZE],
- 			     const u8 basepoint[CURVE25519_KEY_SIZE])
- {
--	if (IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_CURVE25519) &&
--	    (!IS_ENABLED(CONFIG_CRYPTO_CURVE25519_X86) || IS_ENABLED(CONFIG_AS_ADX)))
-+	if (IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_CURVE25519))
- 		curve25519_arch(mypublic, secret, basepoint);
- 	else
- 		curve25519_generic(mypublic, secret, basepoint);
-@@ -50,8 +49,7 @@ __must_check curve25519_generate_public(u8 pub[CURVE25519_KEY_SIZE],
- 				    CURVE25519_KEY_SIZE)))
- 		return false;
- 
--	if (IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_CURVE25519) &&
--	    (!IS_ENABLED(CONFIG_CRYPTO_CURVE25519_X86) || IS_ENABLED(CONFIG_AS_ADX)))
-+	if (IS_ENABLED(CONFIG_CRYPTO_ARCH_HAVE_LIB_CURVE25519))
- 		curve25519_base_arch(pub, secret);
- 	else
- 		curve25519_generic(pub, secret, curve25519_base_point);
+diff --git a/lib/raid6/test/Makefile b/lib/raid6/test/Makefile
+index 3ab8720aa2f8..b9e6c3648be1 100644
+--- a/lib/raid6/test/Makefile
++++ b/lib/raid6/test/Makefile
+@@ -35,13 +35,13 @@ endif
+ ifeq ($(IS_X86),yes)
+         OBJS   += mmx.o sse1.o sse2.o avx2.o recov_ssse3.o recov_avx2.o avx512.o recov_avx512.o
+         CFLAGS += $(shell echo "pshufb %xmm0, %xmm0" |		\
+-                    gcc -c -x assembler - >&/dev/null &&	\
++                    gcc -c -x assembler - >/dev/null 2>&1 &&	\
+                     rm ./-.o && echo -DCONFIG_AS_SSSE3=1)
+         CFLAGS += $(shell echo "vpbroadcastb %xmm0, %ymm1" |	\
+-                    gcc -c -x assembler - >&/dev/null &&	\
++                    gcc -c -x assembler - >/dev/null 2>&1 &&	\
+                     rm ./-.o && echo -DCONFIG_AS_AVX2=1)
+ 	CFLAGS += $(shell echo "vpmovm2b %k1, %zmm5" |          \
+-		    gcc -c -x assembler - >&/dev/null &&        \
++		    gcc -c -x assembler - >/dev/null 2>&1 &&	\
+ 		    rm ./-.o && echo -DCONFIG_AS_AVX512=1)
+ else ifeq ($(HAS_NEON),yes)
+         OBJS   += neon.o neon1.o neon2.o neon4.o neon8.o recov_neon.o recov_neon_inner.o
 -- 
 2.17.1
 
