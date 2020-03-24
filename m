@@ -4,44 +4,44 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7975C10DCE
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 08:51:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC5ACC54EEB
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 08:51:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 78147208C3
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 08:51:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 937D4208C3
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 08:51:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1585039870;
-	bh=zwIub6HHnoSb9qEVBr7eVfzfICM9rys2HdM8mpRAjGE=;
+	s=default; t=1585039880;
+	bh=YVvmkCLCXCoqvAzyrM1aSW9D4XNZnwkyS3j34tdSHBc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=d3ANy99oPmdqJ348KngvUmM2KfSP6Kb3nZo2Hm/DgJ3udrlQ9h7FJFJirRKizkszJ
-	 7I2RjRpdUzzTYMqiYxSqWdLQ6Q8B+K0lVyA6SCeAMJTuvIoRQRF3Sp4I/CvK6qvhwR
-	 xmbedYX/ZCVoKDMKg7TCI3PoQ0TJUXSF60mM/jb8=
+	b=AvM9gLCADqu/0CPna/Ad4+1lncobgSBq5GcTyvWJHz1xE4CSj/HnN4QgWWvHMtViW
+	 OyelEkd3tfvoNQdq96/nx0ED1QfFn5zPsQ0m/LaEDsh1NcIZRdgtblf9Ps4zOutyk1
+	 7OE72zivcoahlYKedlBnM565klu0NkPjvNma6k6k=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727283AbgCXIvJ (ORCPT
+        id S1727316AbgCXIvN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 24 Mar 2020 04:51:09 -0400
-Received: from conuserg-09.nifty.com ([210.131.2.76]:17110 "EHLO
+        Tue, 24 Mar 2020 04:51:13 -0400
+Received: from conuserg-09.nifty.com ([210.131.2.76]:17232 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727119AbgCXIvI (ORCPT
+        with ESMTP id S1727261AbgCXIvL (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Mar 2020 04:51:08 -0400
+        Tue, 24 Mar 2020 04:51:11 -0400
 Received: from pug.e01.socionext.com (p14092-ipngnfx01kyoto.kyoto.ocn.ne.jp [153.142.97.92]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 02O8mgsd011219;
-        Tue, 24 Mar 2020 17:48:51 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 02O8mgsd011219
+        by conuserg-09.nifty.com with ESMTP id 02O8mgsg011219;
+        Tue, 24 Mar 2020 17:48:54 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 02O8mgsg011219
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1585039732;
-        bh=uHlP0H5KSWMnx8rYeC99bkG9lolI7OWMeHS6ySUM25g=;
+        s=dec2015msa; t=1585039735;
+        bh=/3RvcKd5y5/yj7b6stGrp33Eo6/OCU1GSvYDWjedZ6g=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=wVw9dw6dnNF+YfYjVj8EdFdJmRiJKozsxaOTnHg89+Mkw/dNnUcJNpEv5mFoaIV8/
-         LD2ce2R8b3jy9r76/EGMarViHW7VyigkTZIWtr57X+V4nPRmGUXppdz7f5Vq/Wvg6g
-         kGRSkvNpc1GMpIH3dgSCTx0NPYllK1DqWTxevGbSCctO2Ii97mzR/JKP8L3aSMCJ0+
-         qozVSO89Qn4pwrPhDH7kOFvUM2T44WkcJmneMh2t/xtHoqNIOUuN7IXPtYx54ahmjr
-         PzR2UfWGMAbawOshMUfN3V/W0vMYETE1CljQatRTLmAt1/1+zvPVXCfJp/XqFOwdY+
-         Vs8joUNzc/lKg==
+        b=yld4oUJzbJJ7DewjSP1zDEiAlz7eHKryqrjlmvRRkZlsD7LMv6C/90hrW5l/wZHyD
+         TRgXxX6a9pI+EJlsMIq9zx01zDWBCzWWZudXhw+PIWWTkOhwSz0wPebJb5vXrvvupB
+         KR//53lufr+YJbTzQdrK3dhurNLleVQrPmAdplR7S3ZIviDe3qX6iI5bfBOw2CwBiT
+         4HrM9aH15Sa0GUznoHphQCncADsxPwQ2ICtNaQOtjusKImYAAO8Yp/R5JDWKpgqFEw
+         Gu31V307o2pW7YJmcVrJRV3beOcbkisrCuH3iJ/kv/wxs1MbmiNtamS82VJ9BewsEb
+         P4mGQ2ZkSb7dQ==
 X-Nifty-SrcIP: [153.142.97.92]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kernel@vger.kernel.org
@@ -57,9 +57,9 @@ Cc:     "David S . Miller" <davem@davemloft.net>,
         "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
         linux-kbuild@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 06/16] x86: remove always-defined CONFIG_AS_SSSE3
-Date:   Tue, 24 Mar 2020 17:48:11 +0900
-Message-Id: <20200324084821.29944-7-masahiroy@kernel.org>
+Subject: [PATCH 09/16] x86: replace arch macros from compiler with CONFIG_X86_{32,64}
+Date:   Tue, 24 Mar 2020 17:48:14 +0900
+Message-Id: <20200324084821.29944-10-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200324084821.29944-1-masahiroy@kernel.org>
 References: <20200324084821.29944-1-masahiroy@kernel.org>
@@ -68,134 +68,59 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-CONFIG_AS_SSSE3 was introduced by commit 75aaf4c3e6a4 ("x86/raid6:
-correctly check for assembler capabilities").
+If the intention is to check i386/x86_64 excluding UML, testing
+CONFIG_X86_{32,64} is simpler.
 
-We raise the minimal supported binutils version from time to time.
-The last bump was commit 1fb12b35e5ff ("kbuild: Raise the minimum
-required binutils version to 2.21").
-
-I confirmed the code in $(call as-instr,...) can be assembled by the
-binutils 2.21 assembler and also by LLVM integrated assembler.
-
-Remove CONFIG_AS_SSSE3, which is always defined.
-
-I added ifdef CONFIG_X86 to lib/raid6/algos.c to avoid link errors
-on non-x86 architectures.
-
+The reason for checking __i386__ / __x86_64__ was perhaps because
 lib/raid6/algos.c is built not only for the kernel but also for
-testing the library code from userspace. I added -DCONFIG_X86 to
-lib/raid6/test/Makefile to cator to this usecase.
+testing the library code from userspace.
+
+However, lib/raid6/test/Makefile passes -DCONFIG_X86_{32,64} for
+this case. So, I do not see a reason to not use CONFIG option here.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Acked-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Acked-by: H. Peter Anvin (Intel) <hpa@zytor.com>
 ---
 
- arch/x86/Makefile              | 5 ++---
- arch/x86/crypto/blake2s-core.S | 2 --
- lib/raid6/algos.c              | 2 +-
- lib/raid6/recov_ssse3.c        | 6 ------
- lib/raid6/test/Makefile        | 4 +---
- 5 files changed, 4 insertions(+), 15 deletions(-)
+ kernel/signal.c   | 2 +-
+ lib/raid6/algos.c | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-index e4a062313bb0..94f89612e024 100644
---- a/arch/x86/Makefile
-+++ b/arch/x86/Makefile
-@@ -178,7 +178,6 @@ ifeq ($(ACCUMULATE_OUTGOING_ARGS), 1)
- endif
+diff --git a/kernel/signal.c b/kernel/signal.c
+index 5b2396350dd1..db557e1629e5 100644
+--- a/kernel/signal.c
++++ b/kernel/signal.c
+@@ -1246,7 +1246,7 @@ static void print_fatal_signal(int signr)
+ 	struct pt_regs *regs = signal_pt_regs();
+ 	pr_info("potentially unexpected fatal signal %d.\n", signr);
  
- # does binutils support specific instructions?
--asinstr += $(call as-instr,pshufb %xmm0$(comma)%xmm0,-DCONFIG_AS_SSSE3=1)
- avx_instr := $(call as-instr,vxorps %ymm0$(comma)%ymm1$(comma)%ymm2,-DCONFIG_AS_AVX=1)
- avx2_instr :=$(call as-instr,vpbroadcastb %xmm0$(comma)%ymm1,-DCONFIG_AS_AVX2=1)
- avx512_instr :=$(call as-instr,vpmovm2b %k1$(comma)%zmm5,-DCONFIG_AS_AVX512=1)
-@@ -186,8 +185,8 @@ sha1_ni_instr :=$(call as-instr,sha1msg1 %xmm0$(comma)%xmm1,-DCONFIG_AS_SHA1_NI=
- sha256_ni_instr :=$(call as-instr,sha256msg1 %xmm0$(comma)%xmm1,-DCONFIG_AS_SHA256_NI=1)
- adx_instr := $(call as-instr,adox %r10$(comma)%r10,-DCONFIG_AS_ADX=1)
- 
--KBUILD_AFLAGS += $(asinstr) $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
--KBUILD_CFLAGS += $(asinstr) $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
-+KBUILD_AFLAGS += $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
-+KBUILD_CFLAGS += $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
- 
- KBUILD_LDFLAGS := -m elf_$(UTS_MACHINE)
- 
-diff --git a/arch/x86/crypto/blake2s-core.S b/arch/x86/crypto/blake2s-core.S
-index 24910b766bdd..2ca79974f819 100644
---- a/arch/x86/crypto/blake2s-core.S
-+++ b/arch/x86/crypto/blake2s-core.S
-@@ -46,7 +46,6 @@ SIGMA2:
- #endif /* CONFIG_AS_AVX512 */
- 
- .text
--#ifdef CONFIG_AS_SSSE3
- SYM_FUNC_START(blake2s_compress_ssse3)
- 	testq		%rdx,%rdx
- 	je		.Lendofloop
-@@ -174,7 +173,6 @@ SYM_FUNC_START(blake2s_compress_ssse3)
- .Lendofloop:
- 	ret
- SYM_FUNC_END(blake2s_compress_ssse3)
--#endif /* CONFIG_AS_SSSE3 */
- 
- #ifdef CONFIG_AS_AVX512
- SYM_FUNC_START(blake2s_compress_avx512)
+-#if defined(__i386__) && !defined(__arch_um__)
++#ifdef CONFIG_X86_32
+ 	pr_info("code at %08lx: ", regs->ip);
+ 	{
+ 		int i;
 diff --git a/lib/raid6/algos.c b/lib/raid6/algos.c
-index bf1b4765c8f6..df08664d3432 100644
+index df08664d3432..b5a02326cfb7 100644
 --- a/lib/raid6/algos.c
 +++ b/lib/raid6/algos.c
-@@ -97,13 +97,13 @@ void (*raid6_datap_recov)(int, size_t, int, void **);
- EXPORT_SYMBOL_GPL(raid6_datap_recov);
+@@ -29,7 +29,7 @@ struct raid6_calls raid6_call;
+ EXPORT_SYMBOL_GPL(raid6_call);
  
- const struct raid6_recov_calls *const raid6_recov_algos[] = {
-+#ifdef CONFIG_X86
+ const struct raid6_calls * const raid6_algos[] = {
+-#if defined(__i386__) && !defined(__arch_um__)
++#ifdef CONFIG_X86_32
  #ifdef CONFIG_AS_AVX512
- 	&raid6_recov_avx512,
+ 	&raid6_avx512x2,
+ 	&raid6_avx512x1,
+@@ -45,7 +45,7 @@ const struct raid6_calls * const raid6_algos[] = {
+ 	&raid6_mmxx2,
+ 	&raid6_mmxx1,
  #endif
- #ifdef CONFIG_AS_AVX2
- 	&raid6_recov_avx2,
- #endif
--#ifdef CONFIG_AS_SSSE3
- 	&raid6_recov_ssse3,
- #endif
- #ifdef CONFIG_S390
-diff --git a/lib/raid6/recov_ssse3.c b/lib/raid6/recov_ssse3.c
-index 1de97d2405d0..4bfa3c6b60de 100644
---- a/lib/raid6/recov_ssse3.c
-+++ b/lib/raid6/recov_ssse3.c
-@@ -3,8 +3,6 @@
-  * Copyright (C) 2012 Intel Corporation
-  */
- 
--#ifdef CONFIG_AS_SSSE3
--
- #include <linux/raid/pq.h>
- #include "x86.h"
- 
-@@ -328,7 +326,3 @@ const struct raid6_recov_calls raid6_recov_ssse3 = {
- #endif
- 	.priority = 1,
- };
--
--#else
--#warning "your version of binutils lacks SSSE3 support"
--#endif
-diff --git a/lib/raid6/test/Makefile b/lib/raid6/test/Makefile
-index b9e6c3648be1..60021319ac78 100644
---- a/lib/raid6/test/Makefile
-+++ b/lib/raid6/test/Makefile
-@@ -34,9 +34,7 @@ endif
- 
- ifeq ($(IS_X86),yes)
-         OBJS   += mmx.o sse1.o sse2.o avx2.o recov_ssse3.o recov_avx2.o avx512.o recov_avx512.o
--        CFLAGS += $(shell echo "pshufb %xmm0, %xmm0" |		\
--                    gcc -c -x assembler - >/dev/null 2>&1 &&	\
--                    rm ./-.o && echo -DCONFIG_AS_SSSE3=1)
-+        CFLAGS += -DCONFIG_X86
-         CFLAGS += $(shell echo "vpbroadcastb %xmm0, %ymm1" |	\
-                     gcc -c -x assembler - >/dev/null 2>&1 &&	\
-                     rm ./-.o && echo -DCONFIG_AS_AVX2=1)
+-#if defined(__x86_64__) && !defined(__arch_um__)
++#ifdef CONFIG_X86_64
+ #ifdef CONFIG_AS_AVX512
+ 	&raid6_avx512x4,
+ 	&raid6_avx512x2,
 -- 
 2.17.1
 
