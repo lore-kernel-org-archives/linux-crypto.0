@@ -2,105 +2,139 @@ Return-Path: <SRS0=bmV3=5J=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54E53C41621
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 17:33:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7235BC2BAEE
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 18:58:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 30B702080C
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 17:33:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4E6A320775
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 18:58:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="l0XcA5O6"
+	dkim=pass (1024-bit key) header.d=alien8.de header.i=@alien8.de header.b="UbGUgZ69"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727502AbgCXRdq (ORCPT
+        id S1727907AbgCXS6p (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 24 Mar 2020 13:33:46 -0400
-Received: from mail-pf1-f194.google.com ([209.85.210.194]:38146 "EHLO
-        mail-pf1-f194.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727296AbgCXRdp (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Mar 2020 13:33:45 -0400
-Received: by mail-pf1-f194.google.com with SMTP id z25so5305406pfa.5
-        for <linux-crypto@vger.kernel.org>; Tue, 24 Mar 2020 10:33:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=l8i/jKNKGTUjyZgUaJ4Q4T57WgO4guK2uBJsY6uqpzo=;
-        b=l0XcA5O6RVgIo3bJA7443ZUE+xxIelr9CsIBjJs9tFuf9qQvm8YmOZt8DWsTdKo/jt
-         sf6cqFgG3gcJyXEhJ3ePjo3pC6ZAAM+xbyt9/I5qhMZ9FuzXkKM0WIP7gOWI8sw+NLQA
-         zAtSWXtA4kxu9BpkqHb5R3txEf1gF+QBmObPKWLw0F3APnCnlk5PpySxThMgKZIKReSH
-         fadhc5DQxGgoVOX3HaMJH9drsNkbknSNYEFKl2MNBLJ5uBPOj3p7LDZp2cEqaPDA4Agl
-         c9MVpbM6S6ehOpyntMODwdeLdDJgmqnKzxskXZqiSQ94M9H+5UROtxtEnf3Q5Nb5DiES
-         jvMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=l8i/jKNKGTUjyZgUaJ4Q4T57WgO4guK2uBJsY6uqpzo=;
-        b=gEMI8oCOGbKA7PS4+zdAj9fRQ8X6Hp5XDZkxTvuHGDXjBGikSAQvHpJiYGbKMpb53+
-         NV+x6Ly6KEbc2I0RoXCAcWbzKufjtIBHATkadq26ciD4shXLvTLBkwCI/tXrqxF3wfkj
-         qLpOAwJ2xuC0YVKZ/zMnysm+N3XuTUAiiiR2kajpFVvNY5qI3qF2FYr48Y3F/zhcnoD1
-         G1iSOM2vHfWpbAyK3Oz70DmCo75zoB87fRmUPzerBb9SATdknxw5Ptd+1dNQz8FUgO7j
-         htNuXzQVCc8qMo3jJvPH/GOmylce8O3S5Szi/WDhegCKWzQ5T2ldWqfmIrURPRBHOFWf
-         Jg+Q==
-X-Gm-Message-State: ANhLgQ1gbcfNF61jgK0pAXGQWTiAfuNLTqnxbSDhmqMAL9T7jUD9nmVq
-        eMG450p/5lj/aALxKFkWDH8xv4cQkgMiY3PBTGeKEA==
-X-Google-Smtp-Source: ADFU+vumwoGVKW5e7HNVBvJkvgDzk/FkczTUQunpToW6bcg/sTbgkxAIHKgmKJhQhPXrCtYgfRjNy6pDCfbW+x7s+k8=
-X-Received: by 2002:aa7:87ca:: with SMTP id i10mr30843931pfo.169.1585071224082;
- Tue, 24 Mar 2020 10:33:44 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200324084821.29944-1-masahiroy@kernel.org> <20200324084821.29944-12-masahiroy@kernel.org>
- <CAKwvOdkj3dDNcbY4hwyManfviPdFoBooJJmFOAKL2YJCZNuhtA@mail.gmail.com> <CAHmME9pV93Zey2=XghxzThTHbZarFrnxwnGatXHyQjevPf7R=g@mail.gmail.com>
-In-Reply-To: <CAHmME9pV93Zey2=XghxzThTHbZarFrnxwnGatXHyQjevPf7R=g@mail.gmail.com>
-From:   Nick Desaulniers <ndesaulniers@google.com>
-Date:   Tue, 24 Mar 2020 10:33:32 -0700
-Message-ID: <CAKwvOdmw5G+4F9eiZYK3JDHvnraDjGBPT+1hu=62Kc28PDa0Rw@mail.gmail.com>
-Subject: Re: [PATCH 11/16] x86: probe assembler capabilities via kconfig
- instead of makefile
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        clang-built-linux <clang-built-linux@googlegroups.com>,
+        Tue, 24 Mar 2020 14:58:45 -0400
+Received: from mail.skyhub.de ([5.9.137.197]:38154 "EHLO mail.skyhub.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727630AbgCXS6p (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 24 Mar 2020 14:58:45 -0400
+Received: from zn.tnic (p200300EC2F0BC80080B0BF5C4664F3C7.dip0.t-ipconnect.de [IPv6:2003:ec:2f0b:c800:80b0:bf5c:4664:f3c7])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.skyhub.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id 9A7121EC0CDC;
+        Tue, 24 Mar 2020 19:58:42 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=dkim;
+        t=1585076322;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:in-reply-to:in-reply-to:  references:references;
+        bh=lIsYy50HXEV0jz9brVxw6K/8V+POkTYJ1qZEO3jtQOg=;
+        b=UbGUgZ69w4Pss5KZcP0C5ESSPwJnCZ+xLrK8REFRMm8MOCwnwgNDcPNNugDTJ+7KIwZSFC
+        e/kJWtYxyIsXtyDUQzsUBRadkW8G4F6hrSbBvbtrMmiWK9xxBgpLZNe84h3kMcq6J81FTB
+        cG1Lotv4gFJ5JLaB6VJMHXCySgkcsMI=
+Date:   Tue, 24 Mar 2020 19:58:36 +0100
+From:   Borislav Petkov <bp@alien8.de>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     LKML <linux-kernel@vger.kernel.org>, x86@kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Mark Gross <mgross@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Darren Hart <dvhart@infradead.org>,
+        Andy Shevchenko <andy@infradead.org>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Len Brown <lenb@kernel.org>, linux-acpi@vger.kernel.org,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        linux-pm@vger.kernel.org,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        linux-edac@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+        Jean Delvare <jdelvare@suse.com>,
+        Guenter Roeck <linux@roeck-us.net>,
+        linux-hwmon@vger.kernel.org, Zhang Rui <rui.zhang@intel.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Amit Kucheria <amit.kucheria@verdurent.com>,
+        Chanwoo Choi <cw00.choi@samsung.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        linux-mmc@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
+        linux-pci@vger.kernel.org, Takashi Iwai <tiwai@suse.com>,
+        alsa-devel@alsa-project.org,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>, Ingo Molnar <mingo@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "H . Peter Anvin" <hpa@zytor.com>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH 23/22] x86/smpboot: Remove the last ICPU() macro
+Message-ID: <20200324185836.GI22931@zn.tnic>
+References: <20200320131345.635023594@linutronix.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200320131345.635023594@linutronix.de>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Mar 24, 2020 at 10:17 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> On Tue, Mar 24, 2020 at 11:01 AM Nick Desaulniers
-> <ndesaulniers@google.com> wrote:
-> >
-> > Can 11 just be rebased with 8 dropped?
->
-> 8 adds comments to one place. 11 moves them to another place, while
-> doing other things.
->
-> Your desire is to skip the first step? I guess there's no problem with
-> this, but I'm curious to learn why.
+---
+From: Borislav Petkov <bp@suse.de>
 
-Before this series, there's no comments. After, the comments are in
-arch/x86/Kconfig.assembler. Don't waste reviewers time by having other
-patches in the set that move them around for fun. Just add them to the
-final destination.
+Now all is using the shiny new macros.
+
+Signed-off-by: Borislav Petkov <bp@suse.de>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+---
+ arch/x86/kernel/smpboot.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
+diff --git a/arch/x86/kernel/smpboot.c b/arch/x86/kernel/smpboot.c
+index fe3ab9632f3b..3b9bf8c7e29d 100644
+--- a/arch/x86/kernel/smpboot.c
++++ b/arch/x86/kernel/smpboot.c
+@@ -1849,24 +1849,25 @@ static bool slv_set_max_freq_ratio(u64 *base_freq, u64 *turbo_freq)
+ #include <asm/cpu_device_id.h>
+ #include <asm/intel-family.h>
+ 
+-#define ICPU(model) \
+-	{X86_VENDOR_INTEL, 6, model, X86_FEATURE_APERFMPERF, 0}
++#define X86_MATCH(model)					\
++	X86_MATCH_VENDOR_FAM_MODEL_FEATURE(INTEL, 6,		\
++		INTEL_FAM6_##model, X86_FEATURE_APERFMPERF, NULL)
+ 
+ static const struct x86_cpu_id has_knl_turbo_ratio_limits[] = {
+-	ICPU(INTEL_FAM6_XEON_PHI_KNL),
+-	ICPU(INTEL_FAM6_XEON_PHI_KNM),
++	X86_MATCH(XEON_PHI_KNL),
++	X86_MATCH(XEON_PHI_KNM),
+ 	{}
+ };
+ 
+ static const struct x86_cpu_id has_skx_turbo_ratio_limits[] = {
+-	ICPU(INTEL_FAM6_SKYLAKE_X),
++	X86_MATCH(SKYLAKE_X),
+ 	{}
+ };
+ 
+ static const struct x86_cpu_id has_glm_turbo_ratio_limits[] = {
+-	ICPU(INTEL_FAM6_ATOM_GOLDMONT),
+-	ICPU(INTEL_FAM6_ATOM_GOLDMONT_D),
+-	ICPU(INTEL_FAM6_ATOM_GOLDMONT_PLUS),
++	X86_MATCH(ATOM_GOLDMONT),
++	X86_MATCH(ATOM_GOLDMONT_D),
++	X86_MATCH(ATOM_GOLDMONT_PLUS),
+ 	{}
+ };
+ 
+-- 
+2.21.0
+
 
 -- 
-Thanks,
-~Nick Desaulniers
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
