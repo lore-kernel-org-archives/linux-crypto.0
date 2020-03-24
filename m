@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 362ECC41621
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 08:51:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E88BC10DCE
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 08:51:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 0E8BA208CA
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 08:51:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 69D6920870
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 08:51:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1585039909;
-	bh=tLU3ZmLLsZhZPEPgbIaz014yDU2wtivSkjfS8HT9yJQ=;
+	s=default; t=1585039910;
+	bh=dC+UtIWPTIfE6gTzFrtwWs6FddaIep1P4cFyIVs6exQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=GDg/Xk0jKwyiCVwrxnD7LOKtkKLVx/vIXMntNl93NBc6gbLKf7KO7sm7Cn0QrAyXO
-	 fh5cwziOEqaAxA4wrPxDdccmZz8CubWSbq/at4vi9vEVP8gg8NQkQcv3t0a41cQphP
-	 nIEmRqdlFajo9gvC09eGqOGfaNCe4zm8jSGj59MU=
+	b=Txcs/TQXoQgoq2IIFKZp2oK0SVBuceScGW294hyj62JHQswaALC/pMSvl+Hawf5u7
+	 v4BBxggDtHeNCrajaQVr4bV/AxOxxrRX4+Mb5r5e+yVnN3g2Vfcn3WPPY4BZXuVU3f
+	 hHq6KnBSmKvnIH+mvWldmKRdAmOjJXNZWcJZZfns=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727495AbgCXIvh (ORCPT
+        id S1727431AbgCXIv1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 24 Mar 2020 04:51:37 -0400
-Received: from conuserg-09.nifty.com ([210.131.2.76]:17904 "EHLO
+        Tue, 24 Mar 2020 04:51:27 -0400
+Received: from conuserg-09.nifty.com ([210.131.2.76]:17668 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727388AbgCXIvc (ORCPT
+        with ESMTP id S1727388AbgCXIv0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Mar 2020 04:51:32 -0400
+        Tue, 24 Mar 2020 04:51:26 -0400
 Received: from pug.e01.socionext.com (p14092-ipngnfx01kyoto.kyoto.ocn.ne.jp [153.142.97.92]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 02O8mgsh011219;
-        Tue, 24 Mar 2020 17:48:56 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 02O8mgsh011219
+        by conuserg-09.nifty.com with ESMTP id 02O8mgsl011219;
+        Tue, 24 Mar 2020 17:49:01 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 02O8mgsl011219
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1585039737;
-        bh=EKZjb7DWYR4s7jGHGhFrynB+pQ1ESbu9YqfclUuLIXQ=;
+        s=dec2015msa; t=1585039742;
+        bh=s0I5SOuN4Cdii5q1Bnu+2uo8oY7Phl6nmh/yFk4bv3o=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=RaI62uUSi+TuYSdITao9E3pXoHm2kJAxRS4RfxbanuNPHrpbByYoL80qrDDy7sGwN
-         X90uq2aHoq+UrCHqF/zRPDNyc2wcAi7eGIP9Za62TV1/Qk5WmUs0sivkGCQYemyS41
-         DuGp3FECM267nLNoF2k25NF4L/hRred/vjOCXO2A0G6iYvj4uNJPZwCVgshLTUcXJE
-         n9bb49Yjr5vOBpd6ANIxTfyZw6+JEmzr6/m1RkcqgwljDqtKPzM3Zinl1epQbBWZpN
-         qZDG0Ji5Nhyv8Q6+miY/EJuJdt7GGFe4hxi2NcSwqPNsH19b/IriHr/RQC9Dve7o3m
-         o1UOYoQEjzHOQ==
+        b=db6hzkHI/NUH249ZqcRDYDfDe7GjyhgWCZVEEqEZfEZI3S6EwdYG1NtOgjiK171el
+         MjI3tcpwCT0daxXBK+R/TOqQzVneYQsbupnIcxgg2QCaB7ZzDGOzLCDxr8rMTUUFXa
+         B3UBz9H/dfpDiBg64mTb2KNZZOHa85gzYOvTQCyDQ2Yf8CEdnNfKhDbXMhXnTlme5T
+         /vwMJ9P7KSCRdM8GtxROlB105f7gzUPGdScoGbm6cf/CFMcios3IkyOf+f8QRAHZG+
+         NKByMqsLhIOfmKaV0z6CaT+GIjfDMUF/whvLdFouvk7Zjffqz5Aw24Sn/M5pdVEQMU
+         crRjI6Rw5wUNg==
 X-Nifty-SrcIP: [153.142.97.92]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kernel@vger.kernel.org
@@ -55,17 +55,12 @@ Cc:     "David S . Miller" <davem@davemloft.net>,
         Borislav Petkov <bp@alien8.de>,
         Peter Zijlstra <peterz@infradead.org>,
         "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
-        linux-kbuild@vger.kernel.org,
+        linux-kbuild@vger.kernel.org, Borislav Petkov <bp@suse.de>,
         Masahiro Yamada <masahiroy@kernel.org>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        David Airlie <airlied@linux.ie>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org
-Subject: [PATCH 10/16] drm/i915: remove always-defined CONFIG_AS_MOVNTDQA
-Date:   Tue, 24 Mar 2020 17:48:15 +0900
-Message-Id: <20200324084821.29944-11-masahiroy@kernel.org>
+        Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org
+Subject: [PATCH 14/16] Documentation/changes: Raise minimum supported binutils version to 2.23
+Date:   Tue, 24 Mar 2020 17:48:19 +0900
+Message-Id: <20200324084821.29944-15-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200324084821.29944-1-masahiroy@kernel.org>
 References: <20200324084821.29944-1-masahiroy@kernel.org>
@@ -74,63 +69,61 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-CONFIG_AS_MOVNTDQA was introduced by commit 0b1de5d58e19 ("drm/i915:
-Use SSE4.1 movntdqa to accelerate reads from WC memory").
+From: Borislav Petkov <bp@suse.de>
 
-We raise the minimal supported binutils version from time to time.
-The last bump was commit 1fb12b35e5ff ("kbuild: Raise the minimum
-required binutils version to 2.21").
+The currently minimum-supported binutils version 2.21 has the problem of
+promoting symbols which are defined outside of a section into absolute.
+According to Arvind:
 
-I confirmed the code in $(call as-instr,...) can be assembled by the
-binutils 2.21 assembler and also by LLVM integrated assembler.
+  binutils-2.21 and -2.22. An x86-64 defconfig will fail with
+          Invalid absolute R_X86_64_32S relocation: _etext
+  and after fixing that one, with
+          Invalid absolute R_X86_64_32S relocation: __end_of_kernel_reserve
 
-Remove CONFIG_AS_MOVNTDQA, which is always defined.
+Those two versions of binutils have a bug when it comes to handling
+symbols defined outside of a section and binutils 2.23 has the proper
+fix, see: https://sourceware.org/legacy-ml/binutils/2012-06/msg00155.html
 
+Therefore, up to the fixed version directly, skipping the broken ones.
+
+Currently shipping distros already have the fixed binutils version so
+there should be no breakage resulting from this.
+
+For more details about the whole thing, see the thread in Link.
+
+Signed-off-by: Borislav Petkov <bp@suse.de>
+Link: https://lkml.kernel.org/r/20200110202349.1881840-1-nivedita@alum.mit.edu
+Acked-by: Kees Cook <keescook@chromium.org>
+Acked-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Acked-by: Nick Desaulniers <ndesaulniers@google.com>
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 ---
 
- drivers/gpu/drm/i915/Makefile      | 3 ---
- drivers/gpu/drm/i915/i915_memcpy.c | 5 -----
- 2 files changed, 8 deletions(-)
+ Documentation/process/changes.rst | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/gpu/drm/i915/Makefile b/drivers/gpu/drm/i915/Makefile
-index a1f2411aa21b..e559e53fc634 100644
---- a/drivers/gpu/drm/i915/Makefile
-+++ b/drivers/gpu/drm/i915/Makefile
-@@ -28,9 +28,6 @@ subdir-ccflags-$(CONFIG_DRM_I915_WERROR) += -Werror
- CFLAGS_i915_pci.o = $(call cc-disable-warning, override-init)
- CFLAGS_display/intel_fbdev.o = $(call cc-disable-warning, override-init)
+diff --git a/Documentation/process/changes.rst b/Documentation/process/changes.rst
+index e47863575917..91c5ff8e161e 100644
+--- a/Documentation/process/changes.rst
++++ b/Documentation/process/changes.rst
+@@ -31,7 +31,7 @@ you probably needn't concern yourself with pcmciautils.
+ ====================== ===============  ========================================
+ GNU C                  4.6              gcc --version
+ GNU make               3.81             make --version
+-binutils               2.21             ld -v
++binutils               2.23             ld -v
+ flex                   2.5.35           flex --version
+ bison                  2.0              bison --version
+ util-linux             2.10o            fdformat --version
+@@ -76,7 +76,7 @@ You will need GNU make 3.81 or later to build the kernel.
+ Binutils
+ --------
  
--subdir-ccflags-y += \
--	$(call as-instr,movntdqa (%eax)$(comma)%xmm0,-DCONFIG_AS_MOVNTDQA)
--
- subdir-ccflags-y += -I$(srctree)/$(src)
+-Binutils 2.21 or newer is needed to build the kernel.
++Binutils 2.23 or newer is needed to build the kernel.
  
- # Please keep these build lists sorted!
-diff --git a/drivers/gpu/drm/i915/i915_memcpy.c b/drivers/gpu/drm/i915/i915_memcpy.c
-index fdd550405fd3..7b3b83bd5ab8 100644
---- a/drivers/gpu/drm/i915/i915_memcpy.c
-+++ b/drivers/gpu/drm/i915/i915_memcpy.c
-@@ -35,7 +35,6 @@
- 
- static DEFINE_STATIC_KEY_FALSE(has_movntdqa);
- 
--#ifdef CONFIG_AS_MOVNTDQA
- static void __memcpy_ntdqa(void *dst, const void *src, unsigned long len)
- {
- 	kernel_fpu_begin();
-@@ -93,10 +92,6 @@ static void __memcpy_ntdqu(void *dst, const void *src, unsigned long len)
- 
- 	kernel_fpu_end();
- }
--#else
--static void __memcpy_ntdqa(void *dst, const void *src, unsigned long len) {}
--static void __memcpy_ntdqu(void *dst, const void *src, unsigned long len) {}
--#endif
- 
- /**
-  * i915_memcpy_from_wc: perform an accelerated *aligned* read from WC
+ pkg-config
+ ----------
 -- 
 2.17.1
 
