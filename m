@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B511C10DCE
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 08:52:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65E5EC4332B
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 08:52:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DA83520936
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 08:52:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 36E9D208CA
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 08:52:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1585039922;
-	bh=XhGrz0KaH3A+sTBk/900ZFWQ6UAw62bQTFo4V+TOyrU=;
+	s=default; t=1585039924;
+	bh=m+am+kmwiawifnUnuxkCkvSvL5zjZ1qL8TV5YJi4c8g=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=tIzG+pX0FqpL/CfeGP2rtYxkyD3wkYHgDrXAPiJD+8df0Yb1jWb4IfIX4M1TdKO7X
-	 D7/1Im61/6nhpqhtMcL8kYCSqYNMT5kPNiTyH+w6SRik6N9nSFabQpdBLMvuD0Y+am
-	 02PvMM3DNe3XI5KeCc5KkaGuLHPxoeSK3iCvvoXo=
+	b=koda565PpO7USwAQx/UNiy3+ogVuPwxAKwn5USiX9HNme5By3AlOpU9uUhvJJ0Gfy
+	 DDJ+XFYJVD0vVPgxhr18IqVHsmpis9fbfmrhO+G1SUnTVnCcPeRcrbv8M82IJMWJh8
+	 heajpKeFp79dxL5MVOcf6W/PS2GGKAl7V06mqYnI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727054AbgCXIv5 (ORCPT
+        id S1727272AbgCXIvJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 24 Mar 2020 04:51:57 -0400
-Received: from conuserg-09.nifty.com ([210.131.2.76]:17199 "EHLO
+        Tue, 24 Mar 2020 04:51:09 -0400
+Received: from conuserg-09.nifty.com ([210.131.2.76]:17161 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727253AbgCXIvK (ORCPT
+        with ESMTP id S1727241AbgCXIvI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Mar 2020 04:51:10 -0400
+        Tue, 24 Mar 2020 04:51:08 -0400
 Received: from pug.e01.socionext.com (p14092-ipngnfx01kyoto.kyoto.ocn.ne.jp [153.142.97.92]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 02O8mgsn011219;
-        Tue, 24 Mar 2020 17:49:03 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 02O8mgsn011219
+        by conuserg-09.nifty.com with ESMTP id 02O8mgsZ011219;
+        Tue, 24 Mar 2020 17:48:45 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 02O8mgsZ011219
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1585039744;
-        bh=wo4v6sLSkF3zJEtLmurbhlkARw0fSZMgaGV3bKygv0s=;
+        s=dec2015msa; t=1585039726;
+        bh=FqNgRiTBfIYxlDlBeZgqdHunw+p1cDDhJa4wa3yG6eU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=xUZZ70B8uhAJkLWLusQssl/Vf5mJTcGCO61GcA9/TTu8hRi5i0D70gaZTmiStGjJ/
-         p5m7p3EOP/58XcO1P2/9mGMIpwwDtwtEeMtUbDgeRgWqKJCMEUbFqC6M1VXxBK3zNR
-         yjhA5WT8KXTH+yVkhjdeurlm1dmlTAXG8vptHguUWQXo4GysYZkCuAN8q7Om+M2R2Y
-         eb5M8ayg0Pj17XVwgad/CvVzUZGjohpFOAC5LhvQImZxgZ56f9m6Kt3LIYwvGLfwQS
-         LBqwzcnDZRWaot7GcgAPKezCYuoW4I69MukhJGM2Zm81Hv5kZhF+X9h0teLmLsJfJ2
-         cbI6TtQnac5AA==
+        b=dqipl7rHpgfewAF8qKP3Fx2de752MeQHBSlVcQf8AsK4S8FpDU3wZfcFuTlfByEqf
+         NjdRNvKg3Z8xkl2s60Q8konSwKXakg007f59kSEfIVNrmW2+gSnO5h9L4iEQNaO3yN
+         0C0lkCcavEgwL0Kff4oaDUOqdLN4+m0orKooREUi1IUWKY6H2/wP9UGmCkIPEUturd
+         ybuKXOrfa/y04z9D946j0BkioO2+BV63wx7mJpPZp1wCLdo1BZP4Rpxo9/RsHJxDzK
+         kYUwQ9JCZABcYPbvTl++NZxBU17Et0hgPRYnCR1DPN/9OEZQrWZfXZ7GCvMthpB9h2
+         0uXS583Fngn6Q==
 X-Nifty-SrcIP: [153.142.97.92]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kernel@vger.kernel.org
@@ -57,9 +57,9 @@ Cc:     "David S . Miller" <davem@davemloft.net>,
         "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
         linux-kbuild@vger.kernel.org,
         Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH 16/16] crypto: x86 - clean up poly1305-x86_64-cryptogams.S by 'make clean'
-Date:   Tue, 24 Mar 2020 17:48:21 +0900
-Message-Id: <20200324084821.29944-17-masahiroy@kernel.org>
+Subject: [PATCH 02/16] x86: remove unneeded defined(__ASSEMBLY__) check from asm/dwarf2.h
+Date:   Tue, 24 Mar 2020 17:48:07 +0900
+Message-Id: <20200324084821.29944-3-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200324084821.29944-1-masahiroy@kernel.org>
 References: <20200324084821.29944-1-masahiroy@kernel.org>
@@ -68,35 +68,34 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-poly1305-x86_64-cryptogams.S is a generated file, so it should be
-cleaned up by 'make clean'.
+This header file has the following check at the top:
 
-Assigning it to the variable 'targets' teaches Kbuild that it is a
-generated file. However, this line is not evaluated while cleaning
-because scripts/Makefile.clean does not include include/config/auto.conf.
+  #ifndef __ASSEMBLY__
+  #warning "asm/dwarf2.h should be only included in pure assembly files"
+  #endif
 
-Removing the ifneq-conditional, so this file is correctly cleaned up.
+So, we expect defined(__ASSEMBLY__) is always true.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Acked-by: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
 
- arch/x86/crypto/Makefile | 2 --
- 1 file changed, 2 deletions(-)
+ arch/x86/include/asm/dwarf2.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
-index 928aad453c72..a31de0c6ccde 100644
---- a/arch/x86/crypto/Makefile
-+++ b/arch/x86/crypto/Makefile
-@@ -83,9 +83,7 @@ crct10dif-pclmul-y := crct10dif-pcl-asm_64.o crct10dif-pclmul_glue.o
+diff --git a/arch/x86/include/asm/dwarf2.h b/arch/x86/include/asm/dwarf2.h
+index ae391f609840..5a0502212bc5 100644
+--- a/arch/x86/include/asm/dwarf2.h
++++ b/arch/x86/include/asm/dwarf2.h
+@@ -36,7 +36,7 @@
+ #define CFI_SIGNAL_FRAME
+ #endif
  
- obj-$(CONFIG_CRYPTO_POLY1305_X86_64) += poly1305-x86_64.o
- poly1305-x86_64-y := poly1305-x86_64-cryptogams.o poly1305_glue.o
--ifneq ($(CONFIG_CRYPTO_POLY1305_X86_64),)
- targets += poly1305-x86_64-cryptogams.S
--endif
- 
- obj-$(CONFIG_CRYPTO_NHPOLY1305_SSE2) += nhpoly1305-sse2.o
- nhpoly1305-sse2-y := nh-sse2-x86_64.o nhpoly1305-sse2-glue.o
+-#if defined(CONFIG_AS_CFI_SECTIONS) && defined(__ASSEMBLY__)
++#if defined(CONFIG_AS_CFI_SECTIONS)
+ #ifndef BUILD_VDSO
+ 	/*
+ 	 * Emit CFI data in .debug_frame sections, not .eh_frame sections.
 -- 
 2.17.1
 
