@@ -2,57 +2,65 @@ Return-Path: <SRS0=bmV3=5J=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21B6BC43331
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 17:17:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9D19C43331
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 17:22:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id ED0702076F
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 17:17:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="0sDFVo8R"
+	by mail.kernel.org (Postfix) with ESMTP id 94D542076F
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 17:22:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1585070541;
+	bh=rPZNWgIqDJSdIGBhxAarYEhP+ICwAfgI9o9ldX+Ii+Y=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=Nn/g6ggOVUuXa/vgZabyTgaU+sQo+sh07oBZPbwAdqa+6hvzzMkTqF9Z+CeglR6Y1
+	 U4OsW3yFEz70mlFQxVAKfyPtb4AFrA0mBhGeNDFFj7g23/skCqw7tTiYXLRvNZXEJF
+	 5W82FJM2ks1u4UYEsvypZ9+s+W0zD2CZX6fgHCe0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727354AbgCXRRS (ORCPT
+        id S1727267AbgCXRWS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 24 Mar 2020 13:17:18 -0400
-Received: from frisell.zx2c4.com ([192.95.5.64]:56245 "EHLO frisell.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727223AbgCXRRS (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Mar 2020 13:17:18 -0400
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 1c5cebc9;
-        Tue, 24 Mar 2020 17:10:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
-        :references:in-reply-to:from:date:message-id:subject:to:cc
-        :content-type; s=mail; bh=DhTaC0p0jO4cL4z/my6GjFo2Zwk=; b=0sDFVo
-        8RX/48dqq7bcu0DjCkiRd8uYMGVIbzVoBXlWvK9w2/3T8dPlf1E9VjNDahJvTyk4
-        HMhEzp13dN6iVASsVL9FVjQ1q1GmadB9/8ZQC7X5wOaOR8iiaxhHuf0s8ztV9c6p
-        CHrISGrikhpVv5wXP/yJsBz8LjXjnyr0hrGztN6T+T0EZKlyv7I3K94JzR3IJVVa
-        e0wPUHkQNtq++UwGPhvDf1F2o9uKHBE+oVWnpbuulMDgQjxpqxb6z/PcLZLpbK1f
-        aDY76FGmChvVX308/NKuSISxwOFlGA1N1pyo07KK7a9GBK/rmMPBRi5d7zOFzU6s
-        7J5M8CVXG/R0NpVw==
-Received: by frisell.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 63d78b98 (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384:256:NO);
-        Tue, 24 Mar 2020 17:10:05 +0000 (UTC)
-Received: by mail-il1-f171.google.com with SMTP id m7so13396645ilg.5;
-        Tue, 24 Mar 2020 10:17:14 -0700 (PDT)
-X-Gm-Message-State: ANhLgQ0rC39iqkMlvA1q40E+LDC/Mphv6gNR2gBVvwRd+TY31/Eu3l69
-        QSGyS/u46lVBu0Us671f6mZuiuIFY7p0qDWQCYE=
-X-Google-Smtp-Source: ADFU+vvq6QHYBsYQUIfTGwSCF2bT4P+yYt7YDtnQ2NvIIx1389odToJpAzQytqGAvEdM+gxfjq2azQWNorXcO8ZDt9Q=
-X-Received: by 2002:a92:cd4e:: with SMTP id v14mr28304232ilq.231.1585070233190;
- Tue, 24 Mar 2020 10:17:13 -0700 (PDT)
+        Tue, 24 Mar 2020 13:22:18 -0400
+Received: from conssluserg-05.nifty.com ([210.131.2.90]:51052 "EHLO
+        conssluserg-05.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727223AbgCXRWS (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 24 Mar 2020 13:22:18 -0400
+Received: from mail-vs1-f48.google.com (mail-vs1-f48.google.com [209.85.217.48]) (authenticated)
+        by conssluserg-05.nifty.com with ESMTP id 02OHM8hB027872;
+        Wed, 25 Mar 2020 02:22:08 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-05.nifty.com 02OHM8hB027872
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1585070529;
+        bh=bPCRwIwldAM4HwybdFdRYHiHqpgNqlDdX4WV8XKCpgQ=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=AAffemBMcj/pRI1GXSqDaRqeVNwXvSgGAJMx5lv0WUkBJKpxHMQEFBTQ0dSb77Th9
+         T/lQ+GowmCoBmXu38B/OVfdN0YCzrB3mzSJM3oGZa8d0WQjoGs70HLz8NIu2WXJZcs
+         E7W81ziHmBmRtUTjyDJ2qQVpf0aR8G3kQGjPxyZpxf7Buqhfkq9xH5p+VVCouwqSW3
+         JcxYssSq/v1DpR8KH3LS+FGPkl6DH+jKdw1xVaiPpLmu6GHcecjAn47x2SGZ3yJmvp
+         LMIpasWLGNKKsw5JHg5NblRyu1gd5qTxrZLTkxmoTX95kayf4As7oMIQ/99DjdU4Mh
+         WPjtDq4IqCNeQ==
+X-Nifty-SrcIP: [209.85.217.48]
+Received: by mail-vs1-f48.google.com with SMTP id s10so3220589vsi.9;
+        Tue, 24 Mar 2020 10:22:08 -0700 (PDT)
+X-Gm-Message-State: ANhLgQ3iI96xpUmSzkHLCOxQaJ1liDtLFrKe2XoX0rTcCieB70Grg8Eb
+        vbxIPgG9glyydn5w3ive4YoH+iE7SARCXmYKYNA=
+X-Google-Smtp-Source: ADFU+vtUc5X8HF0cd25yHwBLsXgCCmhP5dTghG8L4rR7TJM9y01vynxbjz5/o6OhEUXD89jZqGHaOyPYng8JpiRE1WA=
+X-Received: by 2002:a67:8745:: with SMTP id j66mr19305626vsd.181.1585070522434;
+ Tue, 24 Mar 2020 10:22:02 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200324084821.29944-1-masahiroy@kernel.org> <20200324084821.29944-12-masahiroy@kernel.org>
- <CAKwvOdkj3dDNcbY4hwyManfviPdFoBooJJmFOAKL2YJCZNuhtA@mail.gmail.com>
-In-Reply-To: <CAKwvOdkj3dDNcbY4hwyManfviPdFoBooJJmFOAKL2YJCZNuhtA@mail.gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Tue, 24 Mar 2020 11:17:02 -0600
-X-Gmail-Original-Message-ID: <CAHmME9pV93Zey2=XghxzThTHbZarFrnxwnGatXHyQjevPf7R=g@mail.gmail.com>
-Message-ID: <CAHmME9pV93Zey2=XghxzThTHbZarFrnxwnGatXHyQjevPf7R=g@mail.gmail.com>
+ <CAKwvOdkj3dDNcbY4hwyManfviPdFoBooJJmFOAKL2YJCZNuhtA@mail.gmail.com> <CAHmME9pV93Zey2=XghxzThTHbZarFrnxwnGatXHyQjevPf7R=g@mail.gmail.com>
+In-Reply-To: <CAHmME9pV93Zey2=XghxzThTHbZarFrnxwnGatXHyQjevPf7R=g@mail.gmail.com>
+From:   Masahiro Yamada <masahiroy@kernel.org>
+Date:   Wed, 25 Mar 2020 02:21:26 +0900
+X-Gmail-Original-Message-ID: <CAK7LNATV4GeDDYwecZWNH7xxikZjY2VFZ3EYgXAbnbbVsVM+MQ@mail.gmail.com>
+Message-ID: <CAK7LNATV4GeDDYwecZWNH7xxikZjY2VFZ3EYgXAbnbbVsVM+MQ@mail.gmail.com>
 Subject: Re: [PATCH 11/16] x86: probe assembler capabilities via kconfig
  instead of makefile
-To:     Nick Desaulniers <ndesaulniers@google.com>
-Cc:     Masahiro Yamada <masahiroy@kernel.org>,
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     Nick Desaulniers <ndesaulniers@google.com>,
         LKML <linux-kernel@vger.kernel.org>,
         "David S . Miller" <davem@davemloft.net>,
         Linus Torvalds <torvalds@linux-foundation.org>,
@@ -73,13 +81,22 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Mar 24, 2020 at 11:01 AM Nick Desaulniers
-<ndesaulniers@google.com> wrote:
+On Wed, Mar 25, 2020 at 2:17 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
 >
-> Can 11 just be rebased with 8 dropped?
+> On Tue, Mar 24, 2020 at 11:01 AM Nick Desaulniers
+> <ndesaulniers@google.com> wrote:
+> >
+> > Can 11 just be rebased with 8 dropped?
+>
+> 8 adds comments to one place. 11 moves them to another place, while
+> doing other things.
+>
+> Your desire is to skip the first step? I guess there's no problem with
+> this, but I'm curious to learn why.
 
-8 adds comments to one place. 11 moves them to another place, while
-doing other things.
+If desired, I will swap the order of 8 and 11.
 
-Your desire is to skip the first step? I guess there's no problem with
-this, but I'm curious to learn why.
+
+-- 
+Best Regards
+Masahiro Yamada
