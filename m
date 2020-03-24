@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EA47C4332B
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 00:15:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09817C4332B
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 00:15:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CB274206F9
-	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 00:15:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D6689206F9
+	for <linux-crypto@archiver.kernel.org>; Tue, 24 Mar 2020 00:15:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1585008944;
-	bh=FDoEBBs+HnI4gFuEm/Z1p13b6BibN0GLHt8TNDh+blI=;
+	s=default; t=1585008947;
+	bh=/t8E5mF7gLl3InIp7W2BY/pKTGVQfH//5zDOuzQasXQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=uemzl7aL67crJiraKs4hYBlEXVmcNJH5w4c0fr5I+8gjwwh/aXF0yL9Dc5lkw28al
-	 raN9bRDUNxgX8hnuwHAhfs+I9R2B8lWi16vtKf3rMSVhuzLYVmBxj98o4VEHKwsQ7P
-	 xukhGBreBtjg40NT/fftokTskF2CeuHSxbGs8+Ew=
+	b=A7DTjUwWKg3qL/aLL7Cf2pZ91Nv5k2DpAyNbPGNSAjx/z7pFWJJpuxm7YrT68G/ix
+	 htR5PWtOCM78zn7uqr97TCAg+u/eSDFVPwwMp3t9CpVD3Ue5M0o31ma7N6AROBtpGq
+	 iewk9iKpIknZVNH2jZPmNHVUD164p1yK993vPqrw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727402AbgCXAPo (ORCPT
+        id S1727474AbgCXAPr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 23 Mar 2020 20:15:44 -0400
-Received: from conuserg-09.nifty.com ([210.131.2.76]:29608 "EHLO
+        Mon, 23 Mar 2020 20:15:47 -0400
+Received: from conuserg-09.nifty.com ([210.131.2.76]:29705 "EHLO
         conuserg-09.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727395AbgCXAPo (ORCPT
+        with ESMTP id S1727467AbgCXAPr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 23 Mar 2020 20:15:44 -0400
+        Mon, 23 Mar 2020 20:15:47 -0400
 Received: from grover.flets-west.jp (softbank126093102113.bbtec.net [126.93.102.113]) (authenticated)
-        by conuserg-09.nifty.com with ESMTP id 02O0EHnw026701;
-        Tue, 24 Mar 2020 09:14:27 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 02O0EHnw026701
+        by conuserg-09.nifty.com with ESMTP id 02O0EHnp026701;
+        Tue, 24 Mar 2020 09:14:20 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-09.nifty.com 02O0EHnp026701
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1585008867;
-        bh=eQUmDsxcuakkVwkNBx9dyHAfCNiv3XqyWmjW773HKZg=;
+        s=dec2015msa; t=1585008860;
+        bh=w76PdnLBUJ71LHvA8T4MOfRPh/Z+7+i64nMxwKp/rWU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=KbYcN4ltycVuHSGlbZhSF02txyBiFZVaz8eVguMOcep4QSh8A03F2G1b05ffHSpZA
-         YqaLDRnQuQdI7sHagJb1nGRkEurleUcDVuPc1Qxgk1YNuvYWwCE/ftHPTrRW4NALzN
-         d+tGEJPRyZv6w+0Cs2jUI9URPe+CObQzjRBe6W+eKxxeB6zE8kS/fR/d3cZVgQGOPg
-         cBo8rogLmZn21vXUgH47JdRGXAZoITD+vcqLerWYdmVLFQrtlJitiIdIBC7fDPZ/jV
-         G2Y4LpH6OwZscN9zc6kKkqxocKkPOIegkYrdBbKw2OigB5JwSbjJV20+48kRgOTVuj
-         dJbEilZlPiwLg==
+        b=dL37O19aq5cHlCk6J0qsXuZHNPVvSsdRbW3xKUBbMxhvYTs7svhNT2REU6qk8LbCa
+         Qc8Hp8lGkbZaXqpNvajFhjA3MaxCl9oWxk/7WfM0HNiyLkoOjup6YElbSO26liMtv1
+         BHRS40hQCZ6KOlUPhvJVnOyAfH1GdGFXPbPDQmj6Jqn7EEgRhMC0miqp9cJiP4Wmq3
+         OAvNhdVzVmK8u1CT6xTgz5j+vWfVtVvEm5EkPcLrg/f3TMaYdYNXkZ1Ra5ECeHECRV
+         frcdJZxpBQSkxim19W9eOobt3mHmm3CrqKaEsf/DYncI5hPsQtWOOgapTibiQtXQng
+         c0PYQql0NhnXg==
 X-Nifty-SrcIP: [126.93.102.113]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     x86@kernel.org, Ingo Molnar <mingo@kernel.org>,
@@ -50,10 +50,11 @@ To:     x86@kernel.org, Ingo Molnar <mingo@kernel.org>,
         "H . Peter Anvin" <hpa@zytor.com>, linux-crypto@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
         "Jason A . Donenfeld" <Jason@zx2c4.com>,
-        Masahiro Yamada <masahiroy@kernel.org>
-Subject: [PATCH v2 9/9] x86: replace arch macros from compiler with CONFIG_X86_{32,64}
-Date:   Tue, 24 Mar 2020 09:13:58 +0900
-Message-Id: <20200324001358.4520-10-masahiroy@kernel.org>
+        Masahiro Yamada <masahiroy@kernel.org>,
+        Ingo Molnar <mingo@redhat.com>
+Subject: [PATCH v2 2/9] x86: remove unneeded defined(__ASSEMBLY__) check from asm/dwarf2.h
+Date:   Tue, 24 Mar 2020 09:13:51 +0900
+Message-Id: <20200324001358.4520-3-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200324001358.4520-1-masahiroy@kernel.org>
 References: <20200324001358.4520-1-masahiroy@kernel.org>
@@ -62,60 +63,36 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-If the intention is to check i386/x86_64 excluding UML,
-checking CONFIG_X86_{32,64} is simpler.
+This header file has the following check at the top:
 
-The reason for checking __i386__ / __x86_64__ was perhaps because
-lib/raid6/algos.c is built not only for the kernel but also for
-testing the library code from userspace.
+  #ifndef __ASSEMBLY__
+  #warning "asm/dwarf2.h should be only included in pure assembly files"
+  #endif
 
-However, lib/raid6/test/Makefile passes -DCONFIG_X86_{32,64} for
-this case. So, I do not see a reason to not use CONFIG option here.
+So, we expect defined(__ASSEMBLY__) is always true.
 
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Acked-by: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
 
 Changes in v2: None
 
- kernel/signal.c   | 2 +-
- lib/raid6/algos.c | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
+ arch/x86/include/asm/dwarf2.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/kernel/signal.c b/kernel/signal.c
-index 5b2396350dd1..db557e1629e5 100644
---- a/kernel/signal.c
-+++ b/kernel/signal.c
-@@ -1246,7 +1246,7 @@ static void print_fatal_signal(int signr)
- 	struct pt_regs *regs = signal_pt_regs();
- 	pr_info("potentially unexpected fatal signal %d.\n", signr);
- 
--#if defined(__i386__) && !defined(__arch_um__)
-+#ifdef CONFIG_X86_32
- 	pr_info("code at %08lx: ", regs->ip);
- 	{
- 		int i;
-diff --git a/lib/raid6/algos.c b/lib/raid6/algos.c
-index df08664d3432..b5a02326cfb7 100644
---- a/lib/raid6/algos.c
-+++ b/lib/raid6/algos.c
-@@ -29,7 +29,7 @@ struct raid6_calls raid6_call;
- EXPORT_SYMBOL_GPL(raid6_call);
- 
- const struct raid6_calls * const raid6_algos[] = {
--#if defined(__i386__) && !defined(__arch_um__)
-+#ifdef CONFIG_X86_32
- #ifdef CONFIG_AS_AVX512
- 	&raid6_avx512x2,
- 	&raid6_avx512x1,
-@@ -45,7 +45,7 @@ const struct raid6_calls * const raid6_algos[] = {
- 	&raid6_mmxx2,
- 	&raid6_mmxx1,
+diff --git a/arch/x86/include/asm/dwarf2.h b/arch/x86/include/asm/dwarf2.h
+index ae391f609840..5a0502212bc5 100644
+--- a/arch/x86/include/asm/dwarf2.h
++++ b/arch/x86/include/asm/dwarf2.h
+@@ -36,7 +36,7 @@
+ #define CFI_SIGNAL_FRAME
  #endif
--#if defined(__x86_64__) && !defined(__arch_um__)
-+#ifdef CONFIG_X86_64
- #ifdef CONFIG_AS_AVX512
- 	&raid6_avx512x4,
- 	&raid6_avx512x2,
+ 
+-#if defined(CONFIG_AS_CFI_SECTIONS) && defined(__ASSEMBLY__)
++#if defined(CONFIG_AS_CFI_SECTIONS)
+ #ifndef BUILD_VDSO
+ 	/*
+ 	 * Emit CFI data in .debug_frame sections, not .eh_frame sections.
 -- 
 2.17.1
 
