@@ -2,133 +2,152 @@ Return-Path: <SRS0=6fPk=5K=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE7EFC1975A
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Mar 2020 03:49:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CED32C54FD4
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Mar 2020 04:59:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id AA1AD206F6
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Mar 2020 03:49:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A04C020714
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Mar 2020 04:59:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1585112388;
+	bh=/Mk0dFPHDHocDZ62/2NyoV/qX/dQ7B2yj/zQUSNm3Ug=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=uJ4QZByY5v4QHmyWfH9AcMQqC+7rbOkdkIqV7EqC7iwRhJd/8X+kov1paPy70gXwy
+	 GpQl7D6msHGINrwB6/CxZZny624KnnrK0C12cl0prXW4YZ0ppva7gzupQmHnG6uU6r
+	 B9zBYGavlNjRgyFY4WMw6LFAwnrIcZWTMYsz1tv0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727297AbgCYDtP (ORCPT
+        id S1725832AbgCYE7s (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 24 Mar 2020 23:49:15 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:41972 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727259AbgCYDtO (ORCPT
+        Wed, 25 Mar 2020 00:59:48 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:45995 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725781AbgCYE7r (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 24 Mar 2020 23:49:14 -0400
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 02P3XqOJ101823;
-        Tue, 24 Mar 2020 23:49:00 -0400
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2ywf0pr2wh-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 Mar 2020 23:48:59 -0400
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 02P3jm0Y030763;
-        Tue, 24 Mar 2020 23:48:59 -0400
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 2ywf0pr2wb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 24 Mar 2020 23:48:59 -0400
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
-        by ppma04dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 02P3kl8d007174;
-        Wed, 25 Mar 2020 03:48:58 GMT
-Received: from b03cxnp08026.gho.boulder.ibm.com (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
-        by ppma04dal.us.ibm.com with ESMTP id 2ywawfwt9k-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 25 Mar 2020 03:48:58 +0000
-Received: from b03ledav003.gho.boulder.ibm.com (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
-        by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 02P3mvSB40239406
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 25 Mar 2020 03:48:57 GMT
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 292496A051;
-        Wed, 25 Mar 2020 03:48:57 +0000 (GMT)
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9B1616A04D;
-        Wed, 25 Mar 2020 03:48:56 +0000 (GMT)
-Received: from [9.70.82.143] (unknown [9.70.82.143])
-        by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Wed, 25 Mar 2020 03:48:56 +0000 (GMT)
-Subject: Re: [PATCH v4 3/9] powerpc/vas: Add VAS user space API
-From:   Haren Myneni <haren@linux.ibm.com>
-To:     Michael Ellerman <mpe@ellerman.id.au>
-Cc:     Daniel Axtens <dja@axtens.net>, herbert@gondor.apana.org.au,
-        mikey@neuling.org, sukadev@linux.vnet.ibm.com,
-        linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
-        npiggin@gmail.com
-In-Reply-To: <87zhc6xvuk.fsf@mpe.ellerman.id.au>
-References: <1584934879.9256.15321.camel@hbabu-laptop>
-         <1584936142.9256.15325.camel@hbabu-laptop>
-         <878sjrwm72.fsf@dja-thinkpad.axtens.net>
-         <878sjrclmz.fsf@mpe.ellerman.id.au>
-         <875zevw61j.fsf@dja-thinkpad.axtens.net>
-         <87zhc6xvuk.fsf@mpe.ellerman.id.au>
-Content-Type: text/plain; charset="UTF-8"
-Date:   Tue, 24 Mar 2020 20:48:23 -0700
-Message-ID: <1585108103.10664.391.camel@hbabu-laptop>
-Mime-Version: 1.0
-X-Mailer: Evolution 2.28.3 
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.645
- definitions=2020-03-24_10:2020-03-23,2020-03-24 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- phishscore=0 impostorscore=0 malwarescore=0 mlxlogscore=772 spamscore=0
- clxscore=1015 lowpriorityscore=0 adultscore=0 suspectscore=0 bulkscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2003250030
+        Wed, 25 Mar 2020 00:59:47 -0400
+Received: by mail-wr1-f68.google.com with SMTP id t7so1225604wrw.12;
+        Tue, 24 Mar 2020 21:59:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=h4KOauMe4v1I9pCuRQdOG97Qu/heRc/6J7SU7o8yNwE=;
+        b=eym7r4h8AfIsMrgo04iccRS6vIxpRq/GGv4kov4LTgdKGrwEQ7NH5p96msOECxq/Km
+         PFH2vIUzNv06GEqB6wtynYt0kuEoT8qZihcaMl24tj6Tk2AOfzlAwPrvl42qfw4f+4BA
+         mwcxhRe6qd2i16ficvpLPTPPUAmI6dbtwnpkduuMnFQJMWXpnkJIG2YpPdAjQzG+7JD2
+         /LEVW3fOt4bpK1vkzUH2I7xJO0pGRlO83VAENk6A01kvSi5QthsmEOPPw1IAF2Pn84tP
+         Nn4vjTJJXt8B1LyLl6/HuK93OxneZMzcfL27zwzGfymxQnQYiRkIQ5350pLXWmGqam49
+         sR4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=h4KOauMe4v1I9pCuRQdOG97Qu/heRc/6J7SU7o8yNwE=;
+        b=M9403Qg7/9u+WJ0e36iclVCRaE/wtgRqwkpwC5N1FgkC9FdqsP0Gv4JrHHGgoFJ+/h
+         vdcY8fXznlCSR939a65fVCwvX4PVFL42PXnzD79ge37sx+F5xK/0UT06DLEA138LNqDa
+         gGdvxI3JJSG9UWezvXts3TdqJtS0BQBUpNWRLiY4Wt680XUaQkc+mBfx+AIajSpxolRS
+         +OVJrhOjTkij9WjNoqqGzrkU3mlEoWvFyvbmSvCegFYWW5rMxCZ2El4WB0THwRC7IM9A
+         2lGBTPoXAdIIp4I7225+wydWEx9aPwZbH/6zEyZQl6X6z3nm+zW4gMzZ0+rRoGANVqR+
+         ctQQ==
+X-Gm-Message-State: ANhLgQ3zxtqAF+vn5GLpxl5IlsJUs6pyFdMCtanvD/+lfAiS5Iy6/O2i
+        jnIxdJAHr6HlyVdjkhDAoq4=
+X-Google-Smtp-Source: ADFU+vsMr8RTd3Hle0zy0eB1BsZBBUecnZChYZPKh6yx0k9aeumjW3wG1yR68IBbypixPwr4XlixZw==
+X-Received: by 2002:a5d:474b:: with SMTP id o11mr1225073wrs.4.1585112383933;
+        Tue, 24 Mar 2020 21:59:43 -0700 (PDT)
+Received: from gmail.com (54033286.catv.pool.telekom.hu. [84.3.50.134])
+        by smtp.gmail.com with ESMTPSA id p16sm7149295wmi.40.2020.03.24.21.59.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 24 Mar 2020 21:59:43 -0700 (PDT)
+Date:   Wed, 25 Mar 2020 05:59:40 +0100
+From:   Ingo Molnar <mingo@kernel.org>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     linux-kernel@vger.kernel.org,
+        "David S . Miller" <davem@davemloft.net>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        clang-built-linux@googlegroups.com,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        "H . Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+        linux-kbuild@vger.kernel.org, Daniel Vetter <daniel@ffwll.ch>,
+        David Airlie <airlied@linux.ie>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jim Kukunas <james.t.kukunas@linux.intel.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        NeilBrown <neilb@suse.de>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Yuanhan Liu <yuanhan.liu@linux.intel.com>,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        linux-doc@vger.kernel.org, Peter Zijlstra <a.p.zijlstra@chello.nl>
+Subject: Re: [PATCH 00/16] x86, crypto: remove always-defined CONFIG_AS_* and
+ cosolidate Kconfig/Makefiles
+Message-ID: <20200325045940.GA24974@gmail.com>
+References: <20200324084821.29944-1-masahiroy@kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200324084821.29944-1-masahiroy@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 2020-03-24 at 14:41 +1100, Michael Ellerman wrote:
-> Daniel Axtens <dja@axtens.net> writes:
-> > Michael Ellerman <mpe@ellerman.id.au> writes:
-> >> Daniel Axtens <dja@axtens.net> writes:
-> >>> Haren Myneni <haren@linux.ibm.com> writes:
-> >>>> diff --git a/arch/powerpc/platforms/powernv/vas-api.c b/arch/powerpc/platforms/powernv/vas-api.c
-> >>>> new file mode 100644
-> >>>> index 0000000..7d049af
-> >>>> --- /dev/null
-> >>>> +++ b/arch/powerpc/platforms/powernv/vas-api.c
-> >>>> @@ -0,0 +1,257 @@
-> >> ...
-> >>>> +
-> >>>> +static int coproc_mmap(struct file *fp, struct vm_area_struct *vma)
-> >>>> +{
-> >>>> +	struct vas_window *txwin = fp->private_data;
-> >>>> +	unsigned long pfn;
-> >>>> +	u64 paste_addr;
-> >>>> +	pgprot_t prot;
-> >>>> +	int rc;
-> >>>> +
-> >>>> +	if ((vma->vm_end - vma->vm_start) > PAGE_SIZE) {
-> >>>
-> >>> I think you said this should be 4096 rather than 64k, regardless of what
-> >>> PAGE_SIZE you are compiled with?
-> >>
-> >> You can't mmap less than a page, a page is PAGE_SIZE bytes.
-> >>
-> >> So if that checked for 4K explicitly it would prevent mmap on 64K
-> >> kernels always, which seems like not what you want?
-> >
-> > Ah. My bad. Carry on then :)
+
+* Masahiro Yamada <masahiroy@kernel.org> wrote:
+
+> This series of cleanups was prompted by Linus:
+> https://lkml.org/lkml/2020/3/12/726
 > 
-> Well you were just quoting something from Haren, so I think it's over to
-> him.
-
-Sorry my mistake. 
-
-I should change in documentation. vas_win_paste_addr() always returns 1
-page. Restriction should be PAGE_SIZE. 
-
+> First, this series drop always-on CONFIG_AS_* options.
+> Some of those options were introduced in old days.
+> For example, the check for CONFIG_AS_CFI dates back to 2006.
 > 
-> cheers
+> We raise the minimal tool versions from time to time.
+> Currently, we require binutils 2.21
+> (and we plan to bump it to 2.23 for v5.7-rc1).
+> 
+> After cleaning away the old checks,
+> as-instr calls are moved to Kconfig from Makefiles.
+> (patch 11)
+> 
+> This allows more Kconfig / Makefile cleanups.
+> Patch 12 is complex, but I double-checked it does the equivalent.
+> 
+> Patch 14 bumps the binutils version to 2.23,
+> and patch 15 removes more CONFIG_AS_* options.
+> 
+> I folded all relevanet patches into this series,
+> as suggested by Jason A. Donenfeld.
+> 
+> If x86 maintainers take care of this series, that's good.
+> 
+> If it is OK to queue this up to Kbuild tree,
+> I will send a pull request to Linus.
+> 
+> Thank you.
 
+LGTM. I've got these four from Jason A. Donenfeld queued up in 
+tip:WIP.x86/asm:
 
+ bd5b1283e41c: ("crypto: Curve25519 - do not pollute dispatcher based on assembler")
+ 829f32d78588: ("crypto: X86 - rework configuration, based on Kconfig")
+ 95ef9f80ed63: ("x86/build: Probe assembler from Kconfig instead of Kbuild")
+ 1651e700664b: ("x86: Fix bitops.h warning with a moved cast")
+
+I suppose these might interact (maybe even conflict), and are topically 
+related.
+
+Would you like to pull these into the kbuild tree? You can find them in:
+
+   git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git WIP.x86/asm
+
+Thanks,
+
+	Ingo
