@@ -2,89 +2,112 @@ Return-Path: <SRS0=6fPk=5K=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85683C54FCF
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Mar 2020 05:50:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A57AC54FD4
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Mar 2020 07:51:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6487420788
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Mar 2020 05:50:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0BE0120409
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Mar 2020 07:51:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727357AbgCYFum (ORCPT
+        id S1725907AbgCYHvR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 25 Mar 2020 01:50:42 -0400
-Received: from foss.arm.com ([217.140.110.172]:43762 "EHLO foss.arm.com"
+        Wed, 25 Mar 2020 03:51:17 -0400
+Received: from mga07.intel.com ([134.134.136.100]:12994 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725832AbgCYFum (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 25 Mar 2020 01:50:42 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DCA76FEC;
-        Tue, 24 Mar 2020 22:50:41 -0700 (PDT)
-Received: from localhost.localdomain (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 22E943F792;
-        Tue, 24 Mar 2020 22:54:41 -0700 (PDT)
-From:   Hadar Gat <hadar.gat@arm.com>
-To:     Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
+        id S1725832AbgCYHvR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 25 Mar 2020 03:51:17 -0400
+IronPort-SDR: E1Jz/oJzTtW6YHc/WTG3zsNThiE7rf0yCRPVhmn7mPkRYUeaTyRQVlcHVvUzG/seP6PvfXYM/j
+ F1ciKCs9ulnw==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2020 00:51:15 -0700
+IronPort-SDR: G7wxsgTkr9vkVTq86VoZiIsFMwRyn2djwraZZSJ87AUyU3GKX2805IK+Rv8hRb++qD9s2NF9th
+ YWKEyahXeNUQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,303,1580803200"; 
+   d="scan'208";a="238457638"
+Received: from shao2-debian.sh.intel.com (HELO [10.239.13.3]) ([10.239.13.3])
+  by fmsmga007.fm.intel.com with ESMTP; 25 Mar 2020 00:51:05 -0700
+Subject: Re: [cpufreq] 06c4d00466: will-it-scale.per_process_ops -53.4%
+ regression
+To:     Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        LKML <linux-kernel@vger.kernel.org>,
+        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Alexander Sverdlin <alexander.sverdlin@nokia.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Tomer Maimon <tmaimon77@gmail.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Zaibo Xu <xuzaibo@huawei.com>,
-        Daniel Thompson <daniel.thompson@linaro.org>,
-        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        Mark Gross <mgross@linux.intel.com>,
+        Tony Luck <tony.luck@intel.com>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Viresh Kumar <viresh.kumar@linaro.org>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        Len Brown <lenb@kernel.org>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Darren Hart <dvhart@infradead.org>,
+        Andy Shevchenko <andy@infradead.org>,
+        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
+        linux-edac@vger.kernel.org,
+        Platform Driver <platform-driver-x86@vger.kernel.org>,
+        Jean Delvare <jdelvare@suse.com>,
+        Guenter Roeck <linux@roeck-us.net>,
+        linux-hwmon@vger.kernel.org, Zhang Rui <rui.zhang@intel.com>,
+        Daniel Lezcano <daniel.lezcano@linaro.org>,
+        Amit Kucheria <amit.kucheria@verdurent.com>,
+        Chanwoo Choi <cw00.choi@samsung.com>,
+        Jacob Pan <jacob.jun.pan@linux.intel.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        linux-mmc <linux-mmc@vger.kernel.org>,
+        Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org,
+        Takashi Iwai <tiwai@suse.com>,
+        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Cc:     linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Ofir Drang <ofir.drang@arm.com>, Hadar Gat <hadar.gat@arm.com>
-Subject: [PATCH v6 3/3] MAINTAINERS: add HG as cctrng maintainer
-Date:   Wed, 25 Mar 2020 07:41:11 +0200
-Message-Id: <1585114871-6912-4-git-send-email-hadar.gat@arm.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1585114871-6912-1-git-send-email-hadar.gat@arm.com>
-References: <1585114871-6912-1-git-send-email-hadar.gat@arm.com>
+        linux-crypto <linux-crypto@vger.kernel.org>, lkp@lists.01.org
+References: <20200320131509.564059710@linutronix.de>
+ <20200324060124.GC11705@shao2-debian>
+ <CAHp75VeeKZLeZ8E3Py7LECN54SPFHaRgkxrMzBYQWXM8x+4JhA@mail.gmail.com>
+From:   Rong Chen <rong.a.chen@intel.com>
+Message-ID: <43a4189a-7153-18e8-4657-4a4400002c05@intel.com>
+Date:   Wed, 25 Mar 2020 15:50:44 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.6.1
+MIME-Version: 1.0
+In-Reply-To: <CAHp75VeeKZLeZ8E3Py7LECN54SPFHaRgkxrMzBYQWXM8x+4JhA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-I work for Arm on maintaining the TrustZone CryptoCell TRNG driver.
 
-Signed-off-by: Hadar Gat <hadar.gat@arm.com>
----
- MAINTAINERS | 9 +++++++++
- 1 file changed, 9 insertions(+)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index c312b65..3f27716 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3847,6 +3847,15 @@ S:	Supported
- F:	drivers/crypto/ccree/
- W:	https://developer.arm.com/products/system-ip/trustzone-cryptocell/cryptocell-700-family
- 
-+CCTRNG ARM TRUSTZONE CRYPTOCELL TRUE RANDOM NUMBER GENERATOR (TRNG) DRIVER
-+M:	Hadar Gat <hadar.gat@arm.com>
-+L:	linux-crypto@vger.kernel.org
-+S:	Supported
-+F:	drivers/char/hw_random/cctrng.c
-+F:	drivers/char/hw_random/cctrng.h
-+F:	Documentation/devicetree/bindings/rng/arm-cctrng.txt
-+W:	https://developer.arm.com/products/system-ip/trustzone-cryptocell/cryptocell-700-family
-+
- CEC FRAMEWORK
- M:	Hans Verkuil <hverkuil-cisco@xs4all.nl>
- L:	linux-media@vger.kernel.org
--- 
-2.7.4
+On 3/24/20 6:24 PM, Andy Shevchenko wrote:
+> On Tue, Mar 24, 2020 at 8:02 AM kernel test robot <rong.a.chen@intel.com> wrote:
+>> Greeting,
+>>
+>> FYI, we noticed a -53.4% regression of will-it-scale.per_process_ops due to commit:
+>> commit: 06c4d00466eb374841bc84c39af19b3161ff6917 ("[patch 09/22] cpufreq: Convert to new X86 CPU match macros")
+>> url: https://github.com/0day-ci/linux/commits/Thomas-Gleixner/x86-devicetable-Move-x86-specific-macro-out-of-generic-code/20200321-031729
+>> base: https://git.kernel.org/cgit/linux/kernel/git/rafael/linux-pm.git linux-next
+>>
+>> in testcase: will-it-scale
+>> on test machine: 4 threads Intel(R) Core(TM) i3-3220 CPU @ 3.30GHz with 8G memory
+>> with following parameters:
+>
+> drivers/cpufreq/speedstep-centrino.c change missed the terminator,
+> perhaps it's a culprit, because I don't believe removing dups and
+> reordering lines may affect this.
+> Can you restore terminator there and re-test?
+>
 
+I have retested with the change, but it has no effect on the performance.
+
+Best Regards,
+Rong Chen
