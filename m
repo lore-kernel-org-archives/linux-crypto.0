@@ -2,166 +2,92 @@ Return-Path: <SRS0=6fPk=5K=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 587E5C54FCF
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Mar 2020 05:10:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05386C54FCF
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Mar 2020 05:50:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 30BBE2074D
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Mar 2020 05:10:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1585113044;
-	bh=CEofRKgm4Ye5H1cnbE+nOcxxg32rFb+bxsw6TvF2B1o=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=ueph/Iq/0B63f0X5Xz6HE1/+RW4K92HDnZkb/D+RvQBes9YouY+KJ46FfbrDWSxNo
-	 N5k9EyAceeSCli+kQQmy55bDdsjgZ8lekA9vkZC4RAVbo9sYvXulAcVxSH9oYV17+4
-	 8KHk6ayRimusAOf8GBju6yjBqDEgQH/eNWGISINE=
+	by mail.kernel.org (Postfix) with ESMTP id DAF4E20775
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Mar 2020 05:50:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725832AbgCYFKn (ORCPT
+        id S1726225AbgCYFu0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 25 Mar 2020 01:10:43 -0400
-Received: from conssluserg-03.nifty.com ([210.131.2.82]:23447 "EHLO
-        conssluserg-03.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725263AbgCYFKn (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 25 Mar 2020 01:10:43 -0400
-Received: from mail-vs1-f46.google.com (mail-vs1-f46.google.com [209.85.217.46]) (authenticated)
-        by conssluserg-03.nifty.com with ESMTP id 02P5ABfc011337;
-        Wed, 25 Mar 2020 14:10:12 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-03.nifty.com 02P5ABfc011337
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1585113012;
-        bh=goHEK+Svl1j1CHZ8RGvjblzdAWdDcWxFnIuljEdud0o=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=DnT5KzDtk1VZ4bX5jz1F2rsdqsISqFkA3UcZ8xsfhN86oNs2j/XPmD5P0cCs/JhpC
-         4djo10x3J7e7VKuxZ6VaqctGHnlh7v8Y2a60Ld7EPdInTe+DqQnV3Yv2mMRbEtWync
-         MiWlzZhvtXqwbjoutaboaVOvFnOMo0MJcs+5uYk6RNu52LFYtiOci3i1kOmUu1RoBi
-         xhqivkrrBXMFOs8hfcQ/k+Do1CGoUI92UhBVNthIcvYQO4wcMswpJWLXGNNqUdh7Tw
-         n7tev83ZNX9rklVlt+woYh25RkzUKyFRAAw9ucZjUiaVa3CirJ/T2AZaRCO80gKTwU
-         bP6ZfZcCxvw5g==
-X-Nifty-SrcIP: [209.85.217.46]
-Received: by mail-vs1-f46.google.com with SMTP id u11so785408vsg.2;
-        Tue, 24 Mar 2020 22:10:11 -0700 (PDT)
-X-Gm-Message-State: ANhLgQ2vNbc2TrzjPxjgBIKbjx7jdeRQw5e6nOYp13rqZwpbzX8EPZmU
-        sPc59FID1rTdNjijqL5feN1mlNAWFqqvWJEvY4M=
-X-Google-Smtp-Source: ADFU+vu+bM6M5+X0alIJHo1ALDGfE82bX+MEHXukXjfTCtMpyx9j4+KKQCB6mj8BRZ3ztAMCXwbRLo3j/oOEZhFBzJo=
-X-Received: by 2002:a67:2d55:: with SMTP id t82mr1251970vst.215.1585113010953;
- Tue, 24 Mar 2020 22:10:10 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200324084821.29944-1-masahiroy@kernel.org> <20200325045940.GA24974@gmail.com>
-In-Reply-To: <20200325045940.GA24974@gmail.com>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Wed, 25 Mar 2020 14:09:34 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAQvgT=OWVuBVrvgdZ7AAkoaV_K_Y+w9bOFxRPw_1TOSUA@mail.gmail.com>
-Message-ID: <CAK7LNAQvgT=OWVuBVrvgdZ7AAkoaV_K_Y+w9bOFxRPw_1TOSUA@mail.gmail.com>
-Subject: Re: [PATCH 00/16] x86, crypto: remove always-defined CONFIG_AS_* and
- cosolidate Kconfig/Makefiles
-To:     Ingo Molnar <mingo@kernel.org>
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        Linus Torvalds <torvalds@linux-foundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        clang-built-linux <clang-built-linux@googlegroups.com>,
+        Wed, 25 Mar 2020 01:50:26 -0400
+Received: from foss.arm.com ([217.140.110.172]:43668 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725832AbgCYFu0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 25 Mar 2020 01:50:26 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C47E631B;
+        Tue, 24 Mar 2020 22:50:25 -0700 (PDT)
+Received: from localhost.localdomain (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0228D3F792;
+        Tue, 24 Mar 2020 22:54:25 -0700 (PDT)
+From:   Hadar Gat <hadar.gat@arm.com>
+To:     Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Alexander Sverdlin <alexander.sverdlin@nokia.com>,
         Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "H . Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        David Airlie <airlied@linux.ie>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jim Kukunas <james.t.kukunas@linux.intel.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        NeilBrown <neilb@suse.de>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Yuanhan Liu <yuanhan.liu@linux.intel.com>,
-        dri-devel <dri-devel@lists.freedesktop.org>,
-        intel-gfx@lists.freedesktop.org,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        Peter Zijlstra <a.p.zijlstra@chello.nl>
-Content-Type: text/plain; charset="UTF-8"
+        Tomer Maimon <tmaimon77@gmail.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Zaibo Xu <xuzaibo@huawei.com>,
+        Daniel Thompson <daniel.thompson@linaro.org>,
+        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Cc:     linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Ofir Drang <ofir.drang@arm.com>, Hadar Gat <hadar.gat@arm.com>
+Subject: [PATCH v6 0/3] hw_random: introduce Arm CryptoCell TRNG driver
+Date:   Wed, 25 Mar 2020 07:41:08 +0200
+Message-Id: <1585114871-6912-1-git-send-email-hadar.gat@arm.com>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Ingo,
+The Arm CryptoCell is a hardware security engine.
+This patch introduces driver for its TRNG (True Random Number Generator)
+engine.
 
-On Wed, Mar 25, 2020 at 1:59 PM Ingo Molnar <mingo@kernel.org> wrote:
->
->
-> * Masahiro Yamada <masahiroy@kernel.org> wrote:
->
-> > This series of cleanups was prompted by Linus:
-> > https://lkml.org/lkml/2020/3/12/726
-> >
-> > First, this series drop always-on CONFIG_AS_* options.
-> > Some of those options were introduced in old days.
-> > For example, the check for CONFIG_AS_CFI dates back to 2006.
-> >
-> > We raise the minimal tool versions from time to time.
-> > Currently, we require binutils 2.21
-> > (and we plan to bump it to 2.23 for v5.7-rc1).
-> >
-> > After cleaning away the old checks,
-> > as-instr calls are moved to Kconfig from Makefiles.
-> > (patch 11)
-> >
-> > This allows more Kconfig / Makefile cleanups.
-> > Patch 12 is complex, but I double-checked it does the equivalent.
-> >
-> > Patch 14 bumps the binutils version to 2.23,
-> > and patch 15 removes more CONFIG_AS_* options.
-> >
-> > I folded all relevanet patches into this series,
-> > as suggested by Jason A. Donenfeld.
-> >
-> > If x86 maintainers take care of this series, that's good.
-> >
-> > If it is OK to queue this up to Kbuild tree,
-> > I will send a pull request to Linus.
-> >
-> > Thank you.
->
-> LGTM. I've got these four from Jason A. Donenfeld queued up in
-> tip:WIP.x86/asm:
->
->  bd5b1283e41c: ("crypto: Curve25519 - do not pollute dispatcher based on assembler")
->  829f32d78588: ("crypto: X86 - rework configuration, based on Kconfig")
->  95ef9f80ed63: ("x86/build: Probe assembler from Kconfig instead of Kbuild")
->  1651e700664b: ("x86: Fix bitops.h warning with a moved cast")
->
-> I suppose these might interact (maybe even conflict), and are topically
-> related.
->
-> Would you like to pull these into the kbuild tree? You can find them in:
->
->    git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git WIP.x86/asm
->
-> Thanks,
->
->         Ingo
+v6 change: add missing initialization of hwrng quality.
 
+v5 changes:
+	1. in arm-cctrng.yaml, fixed error in 'make dt_binding_check'
+	2. in cctrng.c, clean up cctrng clock handling
 
-I did not know that these had already landed in tip tree.
+v4 changes: update arm-cctrng.yaml to conform with json-schema standard.
 
-They are immature version.
-(In fact CONFIG_AS_CFI and AS_ADX are false-negative
-if GCC that defaults to 32-bit is used.)
+v3 change: removed few unneeded "#ifdef CONFIG_PM" from the code.
 
-Can you simply discard the WIP.x86/asm branch,
-and only reapply
-1651e700664b: ("x86: Fix bitops.h warning with a moved cast")
+v2 changes: fixed 'make dt_bnding_check' errors.
 
-?
+Hadar Gat (3):
+  dt-bindings: add device tree binding for Arm CryptoCell trng engine
+  hw_random: cctrng: introduce Arm CryptoCell driver
+  MAINTAINERS: add HG as cctrng maintainer
 
+ .../devicetree/bindings/rng/arm-cctrng.yaml        |  55 ++
+ MAINTAINERS                                        |   9 +
+ drivers/char/hw_random/Kconfig                     |  12 +
+ drivers/char/hw_random/Makefile                    |   1 +
+ drivers/char/hw_random/cctrng.c                    | 736 +++++++++++++++++++++
+ drivers/char/hw_random/cctrng.h                    |  72 ++
+ 6 files changed, 885 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/rng/arm-cctrng.yaml
+ create mode 100644 drivers/char/hw_random/cctrng.c
+ create mode 100644 drivers/char/hw_random/cctrng.h
 
 -- 
-Best Regards
-Masahiro Yamada
+2.7.4
+
