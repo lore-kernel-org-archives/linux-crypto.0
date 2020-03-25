@@ -2,89 +2,67 @@ Return-Path: <SRS0=6fPk=5K=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B605C54FD0
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Mar 2020 13:30:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04040C54FD0
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Mar 2020 13:55:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D07102076A
-	for <linux-crypto@archiver.kernel.org>; Wed, 25 Mar 2020 13:30:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CFF4A2078A
+	for <linux-crypto@archiver.kernel.org>; Wed, 25 Mar 2020 13:55:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1585143058;
-	bh=SCkE5dLj3/SXFfvOdxKSyfxSEprqrnbYZIdjrePOVRU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=idijYuVv6oSQC3saCrU7gxeJ2l6bC0ixf1kbmqcAcIqYjqbcDwUuNeUbvPP7v9Jt5
-	 wzj34brHkylO7UUoGTGhsWef1/6f/Z2LgGPjcZDcugQbxVZ7GoeQyWLB+mFVbOB+FZ
-	 JHevKxknZ5N4LUWqKzC5JFMSl8RPA2IBil0UIeKY=
+	s=default; t=1585144528;
+	bh=6RlZyPXVuG0EpJVI1TSR9uGH3XHEFxDRjr6QIxALRys=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=1UwwDbGr1R/bbGa4vEQb/YJ3CCHtwEHfXoM7xvxMWNrS9915y9BJ4btH6SWxCDRfQ
+	 k3fibhGF3pdioZVeLfJe/BrhrDS76x0IOF51J05FbTWn1tz0O/wIFY/nZphA8N+WH3
+	 flSeXfpY8mXoGOO2uV6xfgmSBpvjpzMXUERzs32c=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726967AbgCYNa6 (ORCPT
+        id S1727473AbgCYNz1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 25 Mar 2020 09:30:58 -0400
-Received: from foss.arm.com ([217.140.110.172]:48444 "EHLO foss.arm.com"
+        Wed, 25 Mar 2020 09:55:27 -0400
+Received: from foss.arm.com ([217.140.110.172]:48796 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726842AbgCYNa6 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 25 Mar 2020 09:30:58 -0400
+        id S1727277AbgCYNz1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 25 Mar 2020 09:55:27 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B18CE31B;
-        Wed, 25 Mar 2020 06:30:57 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1C8921FB;
+        Wed, 25 Mar 2020 06:55:27 -0700 (PDT)
 Received: from localhost (unknown [10.37.6.21])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3488F3F71F;
-        Wed, 25 Mar 2020 06:30:57 -0700 (PDT)
-Date:   Wed, 25 Mar 2020 13:30:55 +0000
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 941983F71E;
+        Wed, 25 Mar 2020 06:55:26 -0700 (PDT)
 From:   Mark Brown <broonie@kernel.org>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     Mark Rutland <mark.rutland@arm.com>,
-        Catalin Marinas <catalin.marinas@arm.com>,
+To:     Catalin Marinas <catalin.marinas@arm.com>,
         Will Deacon <will@kernel.org>,
         Eric Biggers <ebiggers@google.com>,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH 0/3] arm64: Open code .arch_extension
-Message-ID: <20200325133055.GG4346@sirena.org.uk>
-References: <20200325114110.23491-1-broonie@kernel.org>
- <20200325123157.GA12236@lakrids.cambridge.arm.com>
- <CAMj1kXH1OC0hqnP5hWUVMK8Z5CrWp+XFfxAyufXY4bKwN2U2xw@mail.gmail.com>
+        Ard Biesheuvel <ardb@kernel.org>
+Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        Mark Brown <broonie@kernel.org>
+Subject: [PATCH 0/2] arm64: Make extension enablement consistent
+Date:   Wed, 25 Mar 2020 13:55:20 +0000
+Message-Id: <20200325135522.7782-1-broonie@kernel.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="9Iq5ULCa7nGtWwZS"
-Content-Disposition: inline
-In-Reply-To: <CAMj1kXH1OC0hqnP5hWUVMK8Z5CrWp+XFfxAyufXY4bKwN2U2xw@mail.gmail.com>
-X-Cookie: Many are called, few volunteer.
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+Currently we use a mix of .arch and .cpu to enable architecture
+extensions, make things consistent by converting the two instances of
+.cpu to .arch which is more common and a bit more idiomatic for our
+goal.
 
---9Iq5ULCa7nGtWwZS
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Mark Brown (2):
+  arm64: crypto: Consistently enable extension
+  arm64: lib: Consistently enable crc32 extension
 
-On Wed, Mar 25, 2020 at 02:26:49PM +0100, Ard Biesheuvel wrote:
+ arch/arm64/crypto/crct10dif-ce-core.S | 2 +-
+ arch/arm64/lib/crc32.S                | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-> I think using macros wrapping .inst directives is the most hassle free
-> way to achieve this, assuming there is no need to encode registers or
-> immediates (which makes it slightly messy - refer to
-> arch/arm64/crypto/sm3-ce-core.S for an example)
+-- 
+2.20.1
 
-There isn't - you just have to encode the four target classes, of which
-we only use one.
-
---9Iq5ULCa7nGtWwZS
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAl57XQ4ACgkQJNaLcl1U
-h9AgRgf+PuOD/PfRQNTSNziC+ioXPuc2pH15lOCN5KAAdbm0bKP1ojqjalUzKzw8
-hufMtyLux3sKdnbiWcw3wyNMUr5rZb6GCzo5HWTDG68a/elnrYnK4rQCqaOph6QI
-SlVFLqPerEXDNGtC3pCY7nypVj2yoDNuhKAVChEFFnkYN8g1BZJP8M4etku0Ke/R
-kwcUXl2M29a57GK221OCue2SJgK3/d/pQ71uHFjMrYoVCgGTDHh5sHsn+Yfe5nyR
-7vr2kv3Qodjg2JAhIWnZFqPTjzojDdmjtV4zVVbG9PtTcVn1w44uugiDbhemypts
-QJxTe1Fzp7trhU7VLifFmPeo5XxXwg==
-=6wKN
------END PGP SIGNATURE-----
-
---9Iq5ULCa7nGtWwZS--
