@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 117B9C2D0E8
-	for <linux-crypto@archiver.kernel.org>; Thu, 26 Mar 2020 08:04:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93CAEC43331
+	for <linux-crypto@archiver.kernel.org>; Thu, 26 Mar 2020 08:04:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D3F182078E
-	for <linux-crypto@archiver.kernel.org>; Thu, 26 Mar 2020 08:04:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6B56820772
+	for <linux-crypto@archiver.kernel.org>; Thu, 26 Mar 2020 08:04:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1585209868;
-	bh=LJtXWqAPJl99Rne6qX17Fm0y4C9QO5JYAAYjcpkrUZ0=;
+	s=default; t=1585209872;
+	bh=2W+1kPsy5QBsjCzNZ6arOx57/Bjw3nNlC1j32mPd/rQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=J2TgHjMiWOz0iNROhfZ7qNh6l6ikkrr3MjA1Z3Cm57jXSzjP8yRzfTJLDqQxoNjEs
-	 ykSqJBXQXDGvJxO0SGqHgJNGxbhhXvoc0insWkSt/zj7KsGIMULl0aT2SQhHLOxh8P
-	 8FdeUHX77n4OM7wWxhZIWhjxsH/cdn2A4WULewck=
+	b=TSroz7vQc1qJnF6fPFcoAVXgyAz4Oeswrjz1MoOoupygYxg95WY0kHyYjnDTOnqJD
+	 SqIf8BCWLoNsnZ9vAXH1TcFDQTMJ18j8K/kvGf59tVOOMNyGnNgMA7a3Z9PaT911N4
+	 AcHaHjSYBiLbDtws3dgIqdmguRud3bUTd1ihFk2c=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727934AbgCZIEO (ORCPT
+        id S1727890AbgCZIEM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 26 Mar 2020 04:04:14 -0400
-Received: from conuserg-11.nifty.com ([210.131.2.78]:19375 "EHLO
+        Thu, 26 Mar 2020 04:04:12 -0400
+Received: from conuserg-11.nifty.com ([210.131.2.78]:19339 "EHLO
         conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727900AbgCZIEO (ORCPT
+        with ESMTP id S1727773AbgCZIEM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 26 Mar 2020 04:04:14 -0400
+        Thu, 26 Mar 2020 04:04:12 -0400
 Received: from pug.e01.socionext.com (p14092-ipngnfx01kyoto.kyoto.ocn.ne.jp [153.142.97.92]) (authenticated)
-        by conuserg-11.nifty.com with ESMTP id 02Q81Wpf002183;
-        Thu, 26 Mar 2020 17:01:52 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 02Q81Wpf002183
+        by conuserg-11.nifty.com with ESMTP id 02Q81WpZ002183;
+        Thu, 26 Mar 2020 17:01:44 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 02Q81WpZ002183
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1585209713;
-        bh=cPIEThBc4Irm4nWA19YAjNO5mJ0+ArFJUQ9YsOY4Q5I=;
+        s=dec2015msa; t=1585209705;
+        bh=kjAsZXCjiHywP61qOSzAcHLQWlDx4t3Nswuo57yw6A4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=kOSooawtsEmwKO2JX/LVo8b76eQLIZDllzdeTJSIys1PEsgWuzrjRpRNa+zP0Ha/B
-         DueBZG6RKf3rIeP3QF84+KZ3GErO/26NjvxL4Kj7vococFT36coBU/YPaRCTGxIjaT
-         gBtXT8TYNVBQVclrWS7nt4rWvNHK8Ck9HeJO0WQ4Zh2qtP9JsNe+0MK6QpgNl/tXS2
-         LWVc+0VzmFlvDs356G2J3z9Umrm1cYCsiLhksPP5Tttr5q1Lu9YcKfVdCyvaKntDFY
-         qqT8SHMCT+RSu5IvqmaBnf2cI8R6L36dLD+64oBD0RjdJnRoUijlbSTnifags9YFYk
-         VlzGW1+ELY91Q==
+        b=qeE74kIsHYvE7EJsiXX+2bvW4GA8wH7aoeyxBtKpRrgqr7CJlb4GZE/W5YWXQmsGK
+         OD0ff2yYok+bxa2pbCk1er1JXwLphiRuiAahhEwSciLCPZokiLPe85VLlg6mFwiW9h
+         3uFMlswqcYep26rIXj3WolmwV+00w6mS6FxB2jompyRAmgujHRMDMHvJmY6DufkSWC
+         dPo7jk+F1AoY7O0bYBFpUH9wYFXvarrL/aPGqSJwj6zx+0mOBtCb1Xrp6h9//K2J73
+         Nw9gg/fsTpjLXTqQQK0bJjFWwYbRXmMCbGwuKjDg1BBmz90Euyoaucvp7xa8HXfbWy
+         xEQugyFVKqWqg==
 X-Nifty-SrcIP: [153.142.97.92]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -57,9 +57,9 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Ingo Molnar <mingo@redhat.com>, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 12/16] crypto: x86 - rework configuration based on Kconfig
-Date:   Thu, 26 Mar 2020 17:01:00 +0900
-Message-Id: <20200326080104.27286-13-masahiroy@kernel.org>
+Subject: [PATCH v2 06/16] x86: remove always-defined CONFIG_AS_SSSE3
+Date:   Thu, 26 Mar 2020 17:00:54 +0900
+Message-Id: <20200326080104.27286-7-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200326080104.27286-1-masahiroy@kernel.org>
 References: <20200326080104.27286-1-masahiroy@kernel.org>
@@ -68,255 +68,137 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+CONFIG_AS_SSSE3 was introduced by commit 75aaf4c3e6a4 ("x86/raid6:
+correctly check for assembler capabilities").
 
-Now that assembler capabilities are probed inside of Kconfig, we can set
-up proper Kconfig-based dependencies. We also take this opportunity to
-reorder the Makefile, so that items are grouped logically by primitive.
+We raise the minimal supported binutils version from time to time.
+The last bump was commit 1fb12b35e5ff ("kbuild: Raise the minimum
+required binutils version to 2.21").
 
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
+I confirmed the code in $(call as-instr,...) can be assembled by the
+binutils 2.21 assembler and also by LLVM integrated assembler.
+
+Remove CONFIG_AS_SSSE3, which is always defined.
+
+I added ifdef CONFIG_X86 to lib/raid6/algos.c to avoid link errors
+on non-x86 architectures.
+
+lib/raid6/algos.c is built not only for the kernel but also for
+testing the library code from userspace. I added -DCONFIG_X86 to
+lib/raid6/test/Makefile to cator to this usecase.
+
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Acked-by: Jason A. Donenfeld <Jason@zx2c4.com>
+Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
 ---
 
 Changes in v2: None
 
- arch/x86/crypto/Makefile | 152 +++++++++++++++++----------------------
- crypto/Kconfig           |   8 +--
- 2 files changed, 69 insertions(+), 91 deletions(-)
+ arch/x86/Makefile              | 5 ++---
+ arch/x86/crypto/blake2s-core.S | 2 --
+ lib/raid6/algos.c              | 2 +-
+ lib/raid6/recov_ssse3.c        | 6 ------
+ lib/raid6/test/Makefile        | 4 +---
+ 5 files changed, 4 insertions(+), 15 deletions(-)
 
-diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
-index 1a044908d42d..2f23f08fdd4b 100644
---- a/arch/x86/crypto/Makefile
-+++ b/arch/x86/crypto/Makefile
-@@ -1,122 +1,100 @@
- # SPDX-License-Identifier: GPL-2.0
- #
--# Arch-specific CryptoAPI modules.
--#
-+# x86 crypto algorithms
- 
- OBJECT_FILES_NON_STANDARD := y
- 
--avx2_supported := $(call as-instr,vpgatherdd %ymm0$(comma)(%eax$(comma)%ymm1\
--				$(comma)4)$(comma)%ymm2,yes,no)
--avx512_supported :=$(call as-instr,vpmovm2b %k1$(comma)%zmm5,yes,no)
--sha1_ni_supported :=$(call as-instr,sha1msg1 %xmm0$(comma)%xmm1,yes,no)
--sha256_ni_supported :=$(call as-instr,sha256msg1 %xmm0$(comma)%xmm1,yes,no)
--adx_supported := $(call as-instr,adox %r10$(comma)%r10,yes,no)
--
- obj-$(CONFIG_CRYPTO_GLUE_HELPER_X86) += glue_helper.o
- 
- obj-$(CONFIG_CRYPTO_TWOFISH_586) += twofish-i586.o
-+twofish-i586-y := twofish-i586-asm_32.o twofish_glue.o
-+obj-$(CONFIG_CRYPTO_TWOFISH_X86_64) += twofish-x86_64.o
-+twofish-x86_64-y := twofish-x86_64-asm_64.o twofish_glue.o
-+obj-$(CONFIG_CRYPTO_TWOFISH_X86_64_3WAY) += twofish-x86_64-3way.o
-+twofish-x86_64-3way-y := twofish-x86_64-asm_64-3way.o twofish_glue_3way.o
-+obj-$(CONFIG_CRYPTO_TWOFISH_AVX_X86_64) += twofish-avx-x86_64.o
-+twofish-avx-x86_64-y := twofish-avx-x86_64-asm_64.o twofish_avx_glue.o
-+
- obj-$(CONFIG_CRYPTO_SERPENT_SSE2_586) += serpent-sse2-i586.o
-+serpent-sse2-i586-y := serpent-sse2-i586-asm_32.o serpent_sse2_glue.o
-+obj-$(CONFIG_CRYPTO_SERPENT_SSE2_X86_64) += serpent-sse2-x86_64.o
-+serpent-sse2-x86_64-y := serpent-sse2-x86_64-asm_64.o serpent_sse2_glue.o
-+obj-$(CONFIG_CRYPTO_SERPENT_AVX_X86_64) += serpent-avx-x86_64.o
-+serpent-avx-x86_64-y := serpent-avx-x86_64-asm_64.o serpent_avx_glue.o
-+obj-$(CONFIG_CRYPTO_SERPENT_AVX2_X86_64) += serpent-avx2.o
-+serpent-avx2-y := serpent-avx2-asm_64.o serpent_avx2_glue.o
- 
- obj-$(CONFIG_CRYPTO_DES3_EDE_X86_64) += des3_ede-x86_64.o
-+des3_ede-x86_64-y := des3_ede-asm_64.o des3_ede_glue.o
-+
- obj-$(CONFIG_CRYPTO_CAMELLIA_X86_64) += camellia-x86_64.o
-+camellia-x86_64-y := camellia-x86_64-asm_64.o camellia_glue.o
-+obj-$(CONFIG_CRYPTO_CAMELLIA_AESNI_AVX_X86_64) += camellia-aesni-avx-x86_64.o
-+camellia-aesni-avx-x86_64-y := camellia-aesni-avx-asm_64.o camellia_aesni_avx_glue.o
-+obj-$(CONFIG_CRYPTO_CAMELLIA_AESNI_AVX2_X86_64) += camellia-aesni-avx2.o
-+camellia-aesni-avx2-y := camellia-aesni-avx2-asm_64.o camellia_aesni_avx2_glue.o
-+
- obj-$(CONFIG_CRYPTO_BLOWFISH_X86_64) += blowfish-x86_64.o
--obj-$(CONFIG_CRYPTO_TWOFISH_X86_64) += twofish-x86_64.o
--obj-$(CONFIG_CRYPTO_TWOFISH_X86_64_3WAY) += twofish-x86_64-3way.o
-+blowfish-x86_64-y := blowfish-x86_64-asm_64.o blowfish_glue.o
-+
-+obj-$(CONFIG_CRYPTO_CAST5_AVX_X86_64) += cast5-avx-x86_64.o
-+cast5-avx-x86_64-y := cast5-avx-x86_64-asm_64.o cast5_avx_glue.o
-+
-+obj-$(CONFIG_CRYPTO_CAST6_AVX_X86_64) += cast6-avx-x86_64.o
-+cast6-avx-x86_64-y := cast6-avx-x86_64-asm_64.o cast6_avx_glue.o
-+
-+obj-$(CONFIG_CRYPTO_AEGIS128_AESNI_SSE2) += aegis128-aesni.o
-+aegis128-aesni-y := aegis128-aesni-asm.o aegis128-aesni-glue.o
-+
- obj-$(CONFIG_CRYPTO_CHACHA20_X86_64) += chacha-x86_64.o
--obj-$(CONFIG_CRYPTO_SERPENT_SSE2_X86_64) += serpent-sse2-x86_64.o
-+chacha-x86_64-y := chacha-ssse3-x86_64.o chacha_glue.o
-+chacha-x86_64-$(CONFIG_AS_AVX2) += chacha-avx2-x86_64.o
-+chacha-x86_64-$(CONFIG_AS_AVX512) += chacha-avx512vl-x86_64.o
-+
- obj-$(CONFIG_CRYPTO_AES_NI_INTEL) += aesni-intel.o
--obj-$(CONFIG_CRYPTO_GHASH_CLMUL_NI_INTEL) += ghash-clmulni-intel.o
-+aesni-intel-y := aesni-intel_asm.o aesni-intel_glue.o
-+aesni-intel-$(CONFIG_64BIT) += aesni-intel_avx-x86_64.o aes_ctrby8_avx-x86_64.o
- 
--obj-$(CONFIG_CRYPTO_CRC32C_INTEL) += crc32c-intel.o
- obj-$(CONFIG_CRYPTO_SHA1_SSSE3) += sha1-ssse3.o
--obj-$(CONFIG_CRYPTO_CRC32_PCLMUL) += crc32-pclmul.o
--obj-$(CONFIG_CRYPTO_SHA256_SSSE3) += sha256-ssse3.o
--obj-$(CONFIG_CRYPTO_SHA512_SSSE3) += sha512-ssse3.o
--obj-$(CONFIG_CRYPTO_CRCT10DIF_PCLMUL) += crct10dif-pclmul.o
--obj-$(CONFIG_CRYPTO_POLY1305_X86_64) += poly1305-x86_64.o
--
--obj-$(CONFIG_CRYPTO_AEGIS128_AESNI_SSE2) += aegis128-aesni.o
-+sha1-ssse3-y := sha1_ssse3_asm.o sha1_ssse3_glue.o
-+sha1-ssse3-$(CONFIG_AS_AVX2) += sha1_avx2_x86_64_asm.o
-+sha1-ssse3-$(CONFIG_AS_SHA1_NI) += sha1_ni_asm.o
- 
--obj-$(CONFIG_CRYPTO_NHPOLY1305_SSE2) += nhpoly1305-sse2.o
--obj-$(CONFIG_CRYPTO_NHPOLY1305_AVX2) += nhpoly1305-avx2.o
-+obj-$(CONFIG_CRYPTO_SHA256_SSSE3) += sha256-ssse3.o
-+sha256-ssse3-y := sha256-ssse3-asm.o sha256-avx-asm.o sha256-avx2-asm.o sha256_ssse3_glue.o
-+sha256-ssse3-$(CONFIG_AS_SHA256_NI) += sha256_ni_asm.o
- 
--# These modules require the assembler to support ADX.
--ifeq ($(adx_supported),yes)
--	obj-$(CONFIG_CRYPTO_CURVE25519_X86) += curve25519-x86_64.o
--endif
-+obj-$(CONFIG_CRYPTO_SHA512_SSSE3) += sha512-ssse3.o
-+sha512-ssse3-y := sha512-ssse3-asm.o sha512-avx-asm.o sha512-avx2-asm.o sha512_ssse3_glue.o
- 
--# These modules require assembler to support AVX.
--obj-$(CONFIG_CRYPTO_CAMELLIA_AESNI_AVX_X86_64) += camellia-aesni-avx-x86_64.o
--obj-$(CONFIG_CRYPTO_CAST5_AVX_X86_64) += cast5-avx-x86_64.o
--obj-$(CONFIG_CRYPTO_CAST6_AVX_X86_64) += cast6-avx-x86_64.o
--obj-$(CONFIG_CRYPTO_TWOFISH_AVX_X86_64) += twofish-avx-x86_64.o
--obj-$(CONFIG_CRYPTO_SERPENT_AVX_X86_64) += serpent-avx-x86_64.o
- obj-$(CONFIG_CRYPTO_BLAKE2S_X86) += blake2s-x86_64.o
-+blake2s-x86_64-y := blake2s-core.o blake2s-glue.o
- 
--# These modules require assembler to support AVX2.
--ifeq ($(avx2_supported),yes)
--	obj-$(CONFIG_CRYPTO_CAMELLIA_AESNI_AVX2_X86_64) += camellia-aesni-avx2.o
--	obj-$(CONFIG_CRYPTO_SERPENT_AVX2_X86_64) += serpent-avx2.o
--endif
-+obj-$(CONFIG_CRYPTO_GHASH_CLMUL_NI_INTEL) += ghash-clmulni-intel.o
-+ghash-clmulni-intel-y := ghash-clmulni-intel_asm.o ghash-clmulni-intel_glue.o
- 
--twofish-i586-y := twofish-i586-asm_32.o twofish_glue.o
--serpent-sse2-i586-y := serpent-sse2-i586-asm_32.o serpent_sse2_glue.o
-+obj-$(CONFIG_CRYPTO_CRC32C_INTEL) += crc32c-intel.o
-+crc32c-intel-y := crc32c-intel_glue.o
-+crc32c-intel-$(CONFIG_64BIT) += crc32c-pcl-intel-asm_64.o
- 
--des3_ede-x86_64-y := des3_ede-asm_64.o des3_ede_glue.o
--camellia-x86_64-y := camellia-x86_64-asm_64.o camellia_glue.o
--blowfish-x86_64-y := blowfish-x86_64-asm_64.o blowfish_glue.o
--twofish-x86_64-y := twofish-x86_64-asm_64.o twofish_glue.o
--twofish-x86_64-3way-y := twofish-x86_64-asm_64-3way.o twofish_glue_3way.o
--chacha-x86_64-y := chacha-ssse3-x86_64.o chacha_glue.o
--serpent-sse2-x86_64-y := serpent-sse2-x86_64-asm_64.o serpent_sse2_glue.o
-+obj-$(CONFIG_CRYPTO_CRC32_PCLMUL) += crc32-pclmul.o
-+crc32-pclmul-y := crc32-pclmul_asm.o crc32-pclmul_glue.o
- 
--aegis128-aesni-y := aegis128-aesni-asm.o aegis128-aesni-glue.o
-+obj-$(CONFIG_CRYPTO_CRCT10DIF_PCLMUL) += crct10dif-pclmul.o
-+crct10dif-pclmul-y := crct10dif-pcl-asm_64.o crct10dif-pclmul_glue.o
- 
--nhpoly1305-sse2-y := nh-sse2-x86_64.o nhpoly1305-sse2-glue.o
--blake2s-x86_64-y := blake2s-core.o blake2s-glue.o
-+obj-$(CONFIG_CRYPTO_POLY1305_X86_64) += poly1305-x86_64.o
- poly1305-x86_64-y := poly1305-x86_64-cryptogams.o poly1305_glue.o
- ifneq ($(CONFIG_CRYPTO_POLY1305_X86_64),)
- targets += poly1305-x86_64-cryptogams.S
+diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+index e4a062313bb0..94f89612e024 100644
+--- a/arch/x86/Makefile
++++ b/arch/x86/Makefile
+@@ -178,7 +178,6 @@ ifeq ($(ACCUMULATE_OUTGOING_ARGS), 1)
  endif
  
--camellia-aesni-avx-x86_64-y := camellia-aesni-avx-asm_64.o \
--				camellia_aesni_avx_glue.o
--cast5-avx-x86_64-y := cast5-avx-x86_64-asm_64.o cast5_avx_glue.o
--cast6-avx-x86_64-y := cast6-avx-x86_64-asm_64.o cast6_avx_glue.o
--twofish-avx-x86_64-y := twofish-avx-x86_64-asm_64.o twofish_avx_glue.o
--serpent-avx-x86_64-y := serpent-avx-x86_64-asm_64.o serpent_avx_glue.o
+ # does binutils support specific instructions?
+-asinstr += $(call as-instr,pshufb %xmm0$(comma)%xmm0,-DCONFIG_AS_SSSE3=1)
+ avx_instr := $(call as-instr,vxorps %ymm0$(comma)%ymm1$(comma)%ymm2,-DCONFIG_AS_AVX=1)
+ avx2_instr :=$(call as-instr,vpbroadcastb %xmm0$(comma)%ymm1,-DCONFIG_AS_AVX2=1)
+ avx512_instr :=$(call as-instr,vpmovm2b %k1$(comma)%zmm5,-DCONFIG_AS_AVX512=1)
+@@ -186,8 +185,8 @@ sha1_ni_instr :=$(call as-instr,sha1msg1 %xmm0$(comma)%xmm1,-DCONFIG_AS_SHA1_NI=
+ sha256_ni_instr :=$(call as-instr,sha256msg1 %xmm0$(comma)%xmm1,-DCONFIG_AS_SHA256_NI=1)
+ adx_instr := $(call as-instr,adox %r10$(comma)%r10,-DCONFIG_AS_ADX=1)
+ 
+-KBUILD_AFLAGS += $(asinstr) $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
+-KBUILD_CFLAGS += $(asinstr) $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
++KBUILD_AFLAGS += $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
++KBUILD_CFLAGS += $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
+ 
+ KBUILD_LDFLAGS := -m elf_$(UTS_MACHINE)
+ 
+diff --git a/arch/x86/crypto/blake2s-core.S b/arch/x86/crypto/blake2s-core.S
+index 24910b766bdd..2ca79974f819 100644
+--- a/arch/x86/crypto/blake2s-core.S
++++ b/arch/x86/crypto/blake2s-core.S
+@@ -46,7 +46,6 @@ SIGMA2:
+ #endif /* CONFIG_AS_AVX512 */
+ 
+ .text
+-#ifdef CONFIG_AS_SSSE3
+ SYM_FUNC_START(blake2s_compress_ssse3)
+ 	testq		%rdx,%rdx
+ 	je		.Lendofloop
+@@ -174,7 +173,6 @@ SYM_FUNC_START(blake2s_compress_ssse3)
+ .Lendofloop:
+ 	ret
+ SYM_FUNC_END(blake2s_compress_ssse3)
+-#endif /* CONFIG_AS_SSSE3 */
+ 
+ #ifdef CONFIG_AS_AVX512
+ SYM_FUNC_START(blake2s_compress_avx512)
+diff --git a/lib/raid6/algos.c b/lib/raid6/algos.c
+index bf1b4765c8f6..df08664d3432 100644
+--- a/lib/raid6/algos.c
++++ b/lib/raid6/algos.c
+@@ -97,13 +97,13 @@ void (*raid6_datap_recov)(int, size_t, int, void **);
+ EXPORT_SYMBOL_GPL(raid6_datap_recov);
+ 
+ const struct raid6_recov_calls *const raid6_recov_algos[] = {
++#ifdef CONFIG_X86
+ #ifdef CONFIG_AS_AVX512
+ 	&raid6_recov_avx512,
+ #endif
+ #ifdef CONFIG_AS_AVX2
+ 	&raid6_recov_avx2,
+ #endif
+-#ifdef CONFIG_AS_SSSE3
+ 	&raid6_recov_ssse3,
+ #endif
+ #ifdef CONFIG_S390
+diff --git a/lib/raid6/recov_ssse3.c b/lib/raid6/recov_ssse3.c
+index 1de97d2405d0..4bfa3c6b60de 100644
+--- a/lib/raid6/recov_ssse3.c
++++ b/lib/raid6/recov_ssse3.c
+@@ -3,8 +3,6 @@
+  * Copyright (C) 2012 Intel Corporation
+  */
+ 
+-#ifdef CONFIG_AS_SSSE3
 -
--ifeq ($(avx2_supported),yes)
--	camellia-aesni-avx2-y := camellia-aesni-avx2-asm_64.o camellia_aesni_avx2_glue.o
--	chacha-x86_64-y += chacha-avx2-x86_64.o
--	serpent-avx2-y := serpent-avx2-asm_64.o serpent_avx2_glue.o
+ #include <linux/raid/pq.h>
+ #include "x86.h"
+ 
+@@ -328,7 +326,3 @@ const struct raid6_recov_calls raid6_recov_ssse3 = {
+ #endif
+ 	.priority = 1,
+ };
 -
--	nhpoly1305-avx2-y := nh-avx2-x86_64.o nhpoly1305-avx2-glue.o
--endif
--
--ifeq ($(avx512_supported),yes)
--	chacha-x86_64-y += chacha-avx512vl-x86_64.o
--endif
-+obj-$(CONFIG_CRYPTO_NHPOLY1305_SSE2) += nhpoly1305-sse2.o
-+nhpoly1305-sse2-y := nh-sse2-x86_64.o nhpoly1305-sse2-glue.o
-+obj-$(CONFIG_CRYPTO_NHPOLY1305_AVX2) += nhpoly1305-avx2.o
-+nhpoly1305-avx2-y := nh-avx2-x86_64.o nhpoly1305-avx2-glue.o
+-#else
+-#warning "your version of binutils lacks SSSE3 support"
+-#endif
+diff --git a/lib/raid6/test/Makefile b/lib/raid6/test/Makefile
+index b9e6c3648be1..60021319ac78 100644
+--- a/lib/raid6/test/Makefile
++++ b/lib/raid6/test/Makefile
+@@ -34,9 +34,7 @@ endif
  
--aesni-intel-y := aesni-intel_asm.o aesni-intel_glue.o
--aesni-intel-$(CONFIG_64BIT) += aesni-intel_avx-x86_64.o aes_ctrby8_avx-x86_64.o
--ghash-clmulni-intel-y := ghash-clmulni-intel_asm.o ghash-clmulni-intel_glue.o
--sha1-ssse3-y := sha1_ssse3_asm.o sha1_ssse3_glue.o
--ifeq ($(avx2_supported),yes)
--sha1-ssse3-y += sha1_avx2_x86_64_asm.o
--endif
--ifeq ($(sha1_ni_supported),yes)
--sha1-ssse3-y += sha1_ni_asm.o
--endif
--crc32c-intel-y := crc32c-intel_glue.o
--crc32c-intel-$(CONFIG_64BIT) += crc32c-pcl-intel-asm_64.o
--crc32-pclmul-y := crc32-pclmul_asm.o crc32-pclmul_glue.o
--sha256-ssse3-y := sha256-ssse3-asm.o sha256-avx-asm.o sha256-avx2-asm.o sha256_ssse3_glue.o
--ifeq ($(sha256_ni_supported),yes)
--sha256-ssse3-y += sha256_ni_asm.o
--endif
--sha512-ssse3-y := sha512-ssse3-asm.o sha512-avx-asm.o sha512-avx2-asm.o sha512_ssse3_glue.o
--crct10dif-pclmul-y := crct10dif-pcl-asm_64.o crct10dif-pclmul_glue.o
-+obj-$(CONFIG_CRYPTO_CURVE25519_X86) += curve25519-x86_64.o
- 
- quiet_cmd_perlasm = PERLASM $@
-       cmd_perlasm = $(PERL) $< > $@
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index c24a47406f8f..49aae167e75c 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -267,7 +267,7 @@ config CRYPTO_CURVE25519
- 
- config CRYPTO_CURVE25519_X86
- 	tristate "x86_64 accelerated Curve25519 scalar multiplication library"
--	depends on X86 && 64BIT
-+	depends on X86 && 64BIT && AS_ADX
- 	select CRYPTO_LIB_CURVE25519_GENERIC
- 	select CRYPTO_ARCH_HAVE_LIB_CURVE25519
- 
-@@ -465,7 +465,7 @@ config CRYPTO_NHPOLY1305_SSE2
- 
- config CRYPTO_NHPOLY1305_AVX2
- 	tristate "NHPoly1305 hash function (x86_64 AVX2 implementation)"
--	depends on X86 && 64BIT
-+	depends on X86 && 64BIT && AS_AVX2
- 	select CRYPTO_NHPOLY1305
- 	help
- 	  AVX2 optimized implementation of the hash function used by the
-@@ -1303,7 +1303,7 @@ config CRYPTO_CAMELLIA_AESNI_AVX_X86_64
- 
- config CRYPTO_CAMELLIA_AESNI_AVX2_X86_64
- 	tristate "Camellia cipher algorithm (x86_64/AES-NI/AVX2)"
--	depends on X86 && 64BIT
-+	depends on X86 && 64BIT && AS_AVX2
- 	depends on CRYPTO
- 	select CRYPTO_CAMELLIA_AESNI_AVX_X86_64
- 	help
-@@ -1573,7 +1573,7 @@ config CRYPTO_SERPENT_AVX_X86_64
- 
- config CRYPTO_SERPENT_AVX2_X86_64
- 	tristate "Serpent cipher algorithm (x86_64/AVX2)"
--	depends on X86 && 64BIT
-+	depends on X86 && 64BIT && AS_AVX2
- 	select CRYPTO_SERPENT_AVX_X86_64
- 	help
- 	  Serpent cipher algorithm, by Anderson, Biham & Knudsen.
+ ifeq ($(IS_X86),yes)
+         OBJS   += mmx.o sse1.o sse2.o avx2.o recov_ssse3.o recov_avx2.o avx512.o recov_avx512.o
+-        CFLAGS += $(shell echo "pshufb %xmm0, %xmm0" |		\
+-                    gcc -c -x assembler - >/dev/null 2>&1 &&	\
+-                    rm ./-.o && echo -DCONFIG_AS_SSSE3=1)
++        CFLAGS += -DCONFIG_X86
+         CFLAGS += $(shell echo "vpbroadcastb %xmm0, %ymm1" |	\
+                     gcc -c -x assembler - >/dev/null 2>&1 &&	\
+                     rm ./-.o && echo -DCONFIG_AS_AVX2=1)
 -- 
 2.17.1
 
