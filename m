@@ -4,44 +4,44 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20243C43331
-	for <linux-crypto@archiver.kernel.org>; Thu, 26 Mar 2020 08:04:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 065B3C2D0E7
+	for <linux-crypto@archiver.kernel.org>; Thu, 26 Mar 2020 08:04:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DAB1B208FE
-	for <linux-crypto@archiver.kernel.org>; Thu, 26 Mar 2020 08:04:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B94AE20772
+	for <linux-crypto@archiver.kernel.org>; Thu, 26 Mar 2020 08:04:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1585209861;
-	bh=gsPbVe72WYXrvQsw2v8jIfo9yCkKbgrw1eQ2O8FA11A=;
+	s=default; t=1585209867;
+	bh=t7ko9DQ/X+XU2eUzku5sqWEwtikNccOfaJhGci88NCk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=poNAwelF6WoPO88EfuxQWR+PSJKf0JprON8p1v/VFn0x2MtieszTfLEC61bLVFm1N
-	 7TPRrpWG8j5wfqltLzlm0YRlRniGPDnSa8pgr6T+k2fYKURB4Cm4gATfUq3fu1RoAO
-	 cbGMuV4sgvp/S1PCNEQQMBiDUaPb30SabKGoto7E=
+	b=2UPQ43HHZA21x2qCCkQ8T2LPyWTFZDkuSHRdemQHiHHUIv8ETfzzZJ8ndpFWp7g1O
+	 WsHqIWt5dFHsrEfo4/Iq7kTYh0nNsRtZLJU/tvcuvZAX7qmkG2hmL4N6G4glh+bO6U
+	 h+/9MwgPCDiJYJhuJIsp9edhvKw8sycRzX98K7Xs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726422AbgCZIET (ORCPT
+        id S1727953AbgCZIEV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 26 Mar 2020 04:04:19 -0400
-Received: from conuserg-11.nifty.com ([210.131.2.78]:19364 "EHLO
+        Thu, 26 Mar 2020 04:04:21 -0400
+Received: from conuserg-11.nifty.com ([210.131.2.78]:19384 "EHLO
         conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726332AbgCZIEP (ORCPT
+        with ESMTP id S1727832AbgCZIEO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 26 Mar 2020 04:04:15 -0400
+        Thu, 26 Mar 2020 04:04:14 -0400
 Received: from pug.e01.socionext.com (p14092-ipngnfx01kyoto.kyoto.ocn.ne.jp [153.142.97.92]) (authenticated)
-        by conuserg-11.nifty.com with ESMTP id 02Q81Wpi002183;
-        Thu, 26 Mar 2020 17:01:57 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 02Q81Wpi002183
+        by conuserg-11.nifty.com with ESMTP id 02Q81Wpa002183;
+        Thu, 26 Mar 2020 17:01:45 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 02Q81Wpa002183
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1585209718;
-        bh=oaby6gyHkKF7lTI3dGycakbdq8pMeu7q19ja4ir5xo8=;
+        s=dec2015msa; t=1585209707;
+        bh=ziCGk7IyAwhIqwLTxRxF1j9z6cpgCF4fpGIH28oIQJY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=gfrKThxJybrCI8WY2RniRWSn+bV8TpSV20Ktj6/bmGOXpNZ/TRiIdRMAblwyaNJXM
-         XxLRXB3qQmxy3ESjG/iwp2mqarPYwt30LnKXpM0tE3F920UJiKloQn7qPUr/x/n//1
-         eZ67Bo3+2AqHrQUzHhfwY3cYzVl379sEQE8x56n3SsuHkulrgzUUkTErQTfKcxsGuL
-         8QPI6T8Ema+wdFa9mJ9kOFWHR9kFQPykGNGUBjtsjKE3ulny0zIGcqIjB010zgHk41
-         yNa+0WkRYSlxylgG+JBCjEI1sEDbZmGtsNHva+Mz4SuNzsbm7gZRCWrJ3oBk/0XQaW
-         OSZTLqcNOn2bQ==
+        b=H/7PjWoZb6WwvRc+ssaTpb1bMblGWF3tx1+zB9PvLwT+XxFEG2+JRLCfwdrKoJz23
+         f00IbJFvLDF5ir5XIMNUF7Yip9kcznp4hpfoZ59lhPZn9k42xKMkz4lMFpb8hQ5KND
+         ic5W7yChlFDtQcPcxpXFpi14JDzOti4UvRY1EVsDXy8j9qmzTm9N0/5eMDQ2thDJQZ
+         /Vz+1UP+nWNwjQZs8DqaX8JCCECkesz9Os4g9RKpY6xogZxHR5sOWM/UCMjLmUjGD9
+         NNN3pbWII5lyVRrVS9f/G9K6nrortkW4Aw5RjRLW47xYe/V0QEC0qVeEjftLxLxooy
+         pHc8210scPkqQ==
 X-Nifty-SrcIP: [153.142.97.92]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -57,9 +57,9 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Ingo Molnar <mingo@redhat.com>, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 15/16] x86: update AS_* macros to binutils >=2.23, supporting ADX and AVX2
-Date:   Thu, 26 Mar 2020 17:01:03 +0900
-Message-Id: <20200326080104.27286-16-masahiroy@kernel.org>
+Subject: [PATCH v2 07/16] x86: remove always-defined CONFIG_AS_AVX
+Date:   Thu, 26 Mar 2020 17:00:55 +0900
+Message-Id: <20200326080104.27286-8-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200326080104.27286-1-masahiroy@kernel.org>
 References: <20200326080104.27286-1-masahiroy@kernel.org>
@@ -68,459 +68,428 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+CONFIG_AS_AVX was introduced by commit ea4d26ae24e5 ("raid5: add AVX
+optimized RAID5 checksumming").
 
-Now that the kernel specifies binutils 2.23 as the minimum version, we
-can remove ifdefs for AVX2 and ADX throughout.
+We raise the minimal supported binutils version from time to time.
+The last bump was commit 1fb12b35e5ff ("kbuild: Raise the minimum
+required binutils version to 2.21").
 
-Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+I confirmed the code in $(call as-instr,...) can be assembled by the
+binutils 2.21 assembler and also by LLVM integrated assembler.
+
+Remove CONFIG_AS_AVX, which is always defined.
+
 Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+Acked-by: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
 
 Changes in v2: None
 
- arch/x86/Kconfig.assembler                    | 10 ----------
- arch/x86/crypto/Makefile                      |  6 ++----
- arch/x86/crypto/aesni-intel_avx-x86_64.S      |  3 ---
- arch/x86/crypto/aesni-intel_glue.c            |  7 -------
- arch/x86/crypto/chacha_glue.c                 |  6 ++----
- arch/x86/crypto/poly1305-x86_64-cryptogams.pl |  8 --------
- arch/x86/crypto/poly1305_glue.c               |  5 ++---
- arch/x86/crypto/sha1_ssse3_glue.c             |  6 ------
- arch/x86/crypto/sha256-avx2-asm.S             |  3 ---
- arch/x86/crypto/sha256_ssse3_glue.c           |  6 ------
- arch/x86/crypto/sha512-avx2-asm.S             |  3 ---
- arch/x86/crypto/sha512_ssse3_glue.c           |  5 -----
- crypto/Kconfig                                |  8 ++++----
- lib/raid6/algos.c                             |  6 ------
- lib/raid6/avx2.c                              |  4 ----
- lib/raid6/recov_avx2.c                        |  6 ------
- lib/raid6/test/Makefile                       |  3 ---
- 17 files changed, 10 insertions(+), 85 deletions(-)
+ arch/x86/Makefile                             |  5 ++-
+ arch/x86/crypto/Makefile                      | 32 +++++++------------
+ arch/x86/crypto/aesni-intel_avx-x86_64.S      |  3 --
+ arch/x86/crypto/aesni-intel_glue.c            | 14 +-------
+ arch/x86/crypto/poly1305-x86_64-cryptogams.pl |  8 -----
+ arch/x86/crypto/poly1305_glue.c               |  6 ++--
+ arch/x86/crypto/sha1_ssse3_asm.S              |  4 ---
+ arch/x86/crypto/sha1_ssse3_glue.c             |  9 +-----
+ arch/x86/crypto/sha256-avx-asm.S              |  3 --
+ arch/x86/crypto/sha256_ssse3_glue.c           |  8 +----
+ arch/x86/crypto/sha512-avx-asm.S              |  2 --
+ arch/x86/crypto/sha512_ssse3_glue.c           |  7 +---
+ arch/x86/include/asm/xor_avx.h                |  9 ------
+ 13 files changed, 21 insertions(+), 89 deletions(-)
 
-diff --git a/arch/x86/Kconfig.assembler b/arch/x86/Kconfig.assembler
-index a5a1d2766b3a..13de0db38d4e 100644
---- a/arch/x86/Kconfig.assembler
-+++ b/arch/x86/Kconfig.assembler
-@@ -1,11 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
- # Copyright (C) 2020 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
+diff --git a/arch/x86/Makefile b/arch/x86/Makefile
+index 94f89612e024..f32ef7b8d5ca 100644
+--- a/arch/x86/Makefile
++++ b/arch/x86/Makefile
+@@ -178,15 +178,14 @@ ifeq ($(ACCUMULATE_OUTGOING_ARGS), 1)
+ endif
  
--config AS_AVX2
--	def_bool $(as-instr,vpbroadcastb %xmm0$(comma)%ymm1)
--	help
--	  Supported by binutils >= 2.22 and LLVM integrated assembler
--
- config AS_AVX512
- 	def_bool $(as-instr,vpmovm2b %k1$(comma)%zmm5)
- 	help
-@@ -20,8 +15,3 @@ config AS_SHA256_NI
- 	def_bool $(as-instr,sha256msg1 %xmm0$(comma)%xmm1)
- 	help
- 	  Supported by binutils >= 2.24 and LLVM integrated assembler
--
--config AS_ADX
--	def_bool $(as-instr,adox %eax$(comma)%eax)
--	help
--	  Supported by binutils >= 2.23 and LLVM integrated assembler
+ # does binutils support specific instructions?
+-avx_instr := $(call as-instr,vxorps %ymm0$(comma)%ymm1$(comma)%ymm2,-DCONFIG_AS_AVX=1)
+ avx2_instr :=$(call as-instr,vpbroadcastb %xmm0$(comma)%ymm1,-DCONFIG_AS_AVX2=1)
+ avx512_instr :=$(call as-instr,vpmovm2b %k1$(comma)%zmm5,-DCONFIG_AS_AVX512=1)
+ sha1_ni_instr :=$(call as-instr,sha1msg1 %xmm0$(comma)%xmm1,-DCONFIG_AS_SHA1_NI=1)
+ sha256_ni_instr :=$(call as-instr,sha256msg1 %xmm0$(comma)%xmm1,-DCONFIG_AS_SHA256_NI=1)
+ adx_instr := $(call as-instr,adox %r10$(comma)%r10,-DCONFIG_AS_ADX=1)
+ 
+-KBUILD_AFLAGS += $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
+-KBUILD_CFLAGS += $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
++KBUILD_AFLAGS += $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
++KBUILD_CFLAGS += $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
+ 
+ KBUILD_LDFLAGS := -m elf_$(UTS_MACHINE)
+ 
 diff --git a/arch/x86/crypto/Makefile b/arch/x86/crypto/Makefile
-index 2f23f08fdd4b..928aad453c72 100644
+index 8c2e9eadee8a..1a044908d42d 100644
 --- a/arch/x86/crypto/Makefile
 +++ b/arch/x86/crypto/Makefile
-@@ -47,8 +47,7 @@ obj-$(CONFIG_CRYPTO_AEGIS128_AESNI_SSE2) += aegis128-aesni.o
- aegis128-aesni-y := aegis128-aesni-asm.o aegis128-aesni-glue.o
+@@ -5,7 +5,6 @@
  
- obj-$(CONFIG_CRYPTO_CHACHA20_X86_64) += chacha-x86_64.o
--chacha-x86_64-y := chacha-ssse3-x86_64.o chacha_glue.o
--chacha-x86_64-$(CONFIG_AS_AVX2) += chacha-avx2-x86_64.o
-+chacha-x86_64-y := chacha-avx2-x86_64.o chacha-ssse3-x86_64.o chacha_glue.o
- chacha-x86_64-$(CONFIG_AS_AVX512) += chacha-avx512vl-x86_64.o
+ OBJECT_FILES_NON_STANDARD := y
  
- obj-$(CONFIG_CRYPTO_AES_NI_INTEL) += aesni-intel.o
-@@ -56,8 +55,7 @@ aesni-intel-y := aesni-intel_asm.o aesni-intel_glue.o
- aesni-intel-$(CONFIG_64BIT) += aesni-intel_avx-x86_64.o aes_ctrby8_avx-x86_64.o
+-avx_supported := $(call as-instr,vpxor %xmm0$(comma)%xmm0$(comma)%xmm0,yes,no)
+ avx2_supported := $(call as-instr,vpgatherdd %ymm0$(comma)(%eax$(comma)%ymm1\
+ 				$(comma)4)$(comma)%ymm2,yes,no)
+ avx512_supported :=$(call as-instr,vpmovm2b %k1$(comma)%zmm5,yes,no)
+@@ -47,15 +46,12 @@ ifeq ($(adx_supported),yes)
+ endif
  
- obj-$(CONFIG_CRYPTO_SHA1_SSSE3) += sha1-ssse3.o
--sha1-ssse3-y := sha1_ssse3_asm.o sha1_ssse3_glue.o
--sha1-ssse3-$(CONFIG_AS_AVX2) += sha1_avx2_x86_64_asm.o
-+sha1-ssse3-y := sha1_avx2_x86_64_asm.o sha1_ssse3_asm.o sha1_ssse3_glue.o
- sha1-ssse3-$(CONFIG_AS_SHA1_NI) += sha1_ni_asm.o
+ # These modules require assembler to support AVX.
+-ifeq ($(avx_supported),yes)
+-	obj-$(CONFIG_CRYPTO_CAMELLIA_AESNI_AVX_X86_64) += \
+-						camellia-aesni-avx-x86_64.o
+-	obj-$(CONFIG_CRYPTO_CAST5_AVX_X86_64) += cast5-avx-x86_64.o
+-	obj-$(CONFIG_CRYPTO_CAST6_AVX_X86_64) += cast6-avx-x86_64.o
+-	obj-$(CONFIG_CRYPTO_TWOFISH_AVX_X86_64) += twofish-avx-x86_64.o
+-	obj-$(CONFIG_CRYPTO_SERPENT_AVX_X86_64) += serpent-avx-x86_64.o
+-	obj-$(CONFIG_CRYPTO_BLAKE2S_X86) += blake2s-x86_64.o
+-endif
++obj-$(CONFIG_CRYPTO_CAMELLIA_AESNI_AVX_X86_64) += camellia-aesni-avx-x86_64.o
++obj-$(CONFIG_CRYPTO_CAST5_AVX_X86_64) += cast5-avx-x86_64.o
++obj-$(CONFIG_CRYPTO_CAST6_AVX_X86_64) += cast6-avx-x86_64.o
++obj-$(CONFIG_CRYPTO_TWOFISH_AVX_X86_64) += twofish-avx-x86_64.o
++obj-$(CONFIG_CRYPTO_SERPENT_AVX_X86_64) += serpent-avx-x86_64.o
++obj-$(CONFIG_CRYPTO_BLAKE2S_X86) += blake2s-x86_64.o
  
- obj-$(CONFIG_CRYPTO_SHA256_SSSE3) += sha256-ssse3.o
+ # These modules require assembler to support AVX2.
+ ifeq ($(avx2_supported),yes)
+@@ -83,16 +79,12 @@ ifneq ($(CONFIG_CRYPTO_POLY1305_X86_64),)
+ targets += poly1305-x86_64-cryptogams.S
+ endif
+ 
+-ifeq ($(avx_supported),yes)
+-	camellia-aesni-avx-x86_64-y := camellia-aesni-avx-asm_64.o \
+-					camellia_aesni_avx_glue.o
+-	cast5-avx-x86_64-y := cast5-avx-x86_64-asm_64.o cast5_avx_glue.o
+-	cast6-avx-x86_64-y := cast6-avx-x86_64-asm_64.o cast6_avx_glue.o
+-	twofish-avx-x86_64-y := twofish-avx-x86_64-asm_64.o \
+-				twofish_avx_glue.o
+-	serpent-avx-x86_64-y := serpent-avx-x86_64-asm_64.o \
+-				serpent_avx_glue.o
+-endif
++camellia-aesni-avx-x86_64-y := camellia-aesni-avx-asm_64.o \
++				camellia_aesni_avx_glue.o
++cast5-avx-x86_64-y := cast5-avx-x86_64-asm_64.o cast5_avx_glue.o
++cast6-avx-x86_64-y := cast6-avx-x86_64-asm_64.o cast6_avx_glue.o
++twofish-avx-x86_64-y := twofish-avx-x86_64-asm_64.o twofish_avx_glue.o
++serpent-avx-x86_64-y := serpent-avx-x86_64-asm_64.o serpent_avx_glue.o
+ 
+ ifeq ($(avx2_supported),yes)
+ 	camellia-aesni-avx2-y := camellia-aesni-avx2-asm_64.o camellia_aesni_avx2_glue.o
 diff --git a/arch/x86/crypto/aesni-intel_avx-x86_64.S b/arch/x86/crypto/aesni-intel_avx-x86_64.S
-index cc56ee43238b..0cea33295287 100644
+index bfa1c0b3e5b4..cc56ee43238b 100644
 --- a/arch/x86/crypto/aesni-intel_avx-x86_64.S
 +++ b/arch/x86/crypto/aesni-intel_avx-x86_64.S
-@@ -1868,7 +1868,6 @@ key_256_finalize:
-         ret
- SYM_FUNC_END(aesni_gcm_finalize_avx_gen2)
+@@ -886,7 +886,6 @@ _less_than_8_bytes_left_\@:
+ _partial_block_done_\@:
+ .endm # PARTIAL_BLOCK
  
--#ifdef CONFIG_AS_AVX2
+-#ifdef CONFIG_AS_AVX
  ###############################################################################
  # GHASH_MUL MACRO to implement: Data*HashKey mod (128,127,126,121,0)
  # Input: A and B (128-bits each, bit-reflected)
-@@ -2836,5 +2835,3 @@ key_256_finalize4:
-         FUNC_RESTORE
+@@ -1869,8 +1868,6 @@ key_256_finalize:
          ret
- SYM_FUNC_END(aesni_gcm_finalize_avx_gen4)
+ SYM_FUNC_END(aesni_gcm_finalize_avx_gen2)
+ 
+-#endif /* CONFIG_AS_AVX */
 -
--#endif /* CONFIG_AS_AVX2 */
+ #ifdef CONFIG_AS_AVX2
+ ###############################################################################
+ # GHASH_MUL MACRO to implement: Data*HashKey mod (128,127,126,121,0)
 diff --git a/arch/x86/crypto/aesni-intel_glue.c b/arch/x86/crypto/aesni-intel_glue.c
-index e0f54e00edfd..c7f8c4d7f670 100644
+index bbbebbd35b5d..e0f54e00edfd 100644
 --- a/arch/x86/crypto/aesni-intel_glue.c
 +++ b/arch/x86/crypto/aesni-intel_glue.c
-@@ -233,7 +233,6 @@ static const struct aesni_gcm_tfm_s aesni_gcm_tfm_avx_gen2 = {
+@@ -185,7 +185,6 @@ static const struct aesni_gcm_tfm_s aesni_gcm_tfm_sse = {
+ 	.finalize = &aesni_gcm_finalize,
+ };
+ 
+-#ifdef CONFIG_AS_AVX
+ asmlinkage void aes_ctr_enc_128_avx_by8(const u8 *in, u8 *iv,
+ 		void *keys, u8 *out, unsigned int num_bytes);
+ asmlinkage void aes_ctr_enc_192_avx_by8(const u8 *in, u8 *iv,
+@@ -234,8 +233,6 @@ static const struct aesni_gcm_tfm_s aesni_gcm_tfm_avx_gen2 = {
  	.finalize = &aesni_gcm_finalize_avx_gen2,
  };
  
--#ifdef CONFIG_AS_AVX2
- /*
-  * asmlinkage void aesni_gcm_init_avx_gen4()
-  * gcm_data *my_ctx_data, context data
-@@ -276,8 +275,6 @@ static const struct aesni_gcm_tfm_s aesni_gcm_tfm_avx_gen4 = {
- 	.finalize = &aesni_gcm_finalize_avx_gen4,
- };
- 
 -#endif
 -
- static inline struct
- aesni_rfc4106_gcm_ctx *aesni_rfc4106_gcm_ctx_get(struct crypto_aead *tfm)
- {
-@@ -706,10 +703,8 @@ static int gcmaes_crypt_by_sg(bool enc, struct aead_request *req,
- 	if (!enc)
- 		left -= auth_tag_len;
+ #ifdef CONFIG_AS_AVX2
+ /*
+  * asmlinkage void aesni_gcm_init_avx_gen4()
+@@ -476,7 +473,6 @@ static void ctr_crypt_final(struct crypto_aes_ctx *ctx,
+ 	crypto_inc(ctrblk, AES_BLOCK_SIZE);
+ }
  
--#ifdef CONFIG_AS_AVX2
+-#ifdef CONFIG_AS_AVX
+ static void aesni_ctr_enc_avx_tfm(struct crypto_aes_ctx *ctx, u8 *out,
+ 			      const u8 *in, unsigned int len, u8 *iv)
+ {
+@@ -493,7 +489,6 @@ static void aesni_ctr_enc_avx_tfm(struct crypto_aes_ctx *ctx, u8 *out,
+ 	else
+ 		aes_ctr_enc_256_avx_by8(in, iv, (void *)ctx, out, len);
+ }
+-#endif
+ 
+ static int ctr_crypt(struct skcipher_request *req)
+ {
+@@ -715,10 +710,8 @@ static int gcmaes_crypt_by_sg(bool enc, struct aead_request *req,
  	if (left < AVX_GEN4_OPTSIZE && gcm_tfm == &aesni_gcm_tfm_avx_gen4)
  		gcm_tfm = &aesni_gcm_tfm_avx_gen2;
--#endif
+ #endif
+-#ifdef CONFIG_AS_AVX
  	if (left < AVX_GEN2_OPTSIZE && gcm_tfm == &aesni_gcm_tfm_avx_gen2)
  		gcm_tfm = &aesni_gcm_tfm_sse;
+-#endif
  
-@@ -1069,12 +1064,10 @@ static int __init aesni_init(void)
- 	if (!x86_match_cpu(aesni_cpu_id))
- 		return -ENODEV;
- #ifdef CONFIG_X86_64
--#ifdef CONFIG_AS_AVX2
- 	if (boot_cpu_has(X86_FEATURE_AVX2)) {
- 		pr_info("AVX2 version of gcm_enc/dec engaged.\n");
+ 	/* Linearize assoc, if not already linear */
+ 	if (req->src->length >= assoclen && req->src->length &&
+@@ -1082,24 +1075,19 @@ static int __init aesni_init(void)
  		aesni_gcm_tfm = &aesni_gcm_tfm_avx_gen4;
  	} else
--#endif
+ #endif
+-#ifdef CONFIG_AS_AVX
  	if (boot_cpu_has(X86_FEATURE_AVX)) {
  		pr_info("AVX version of gcm_enc/dec engaged.\n");
  		aesni_gcm_tfm = &aesni_gcm_tfm_avx_gen2;
-diff --git a/arch/x86/crypto/chacha_glue.c b/arch/x86/crypto/chacha_glue.c
-index 68a74953efaf..b412c21ee06e 100644
---- a/arch/x86/crypto/chacha_glue.c
-+++ b/arch/x86/crypto/chacha_glue.c
-@@ -79,8 +79,7 @@ static void chacha_dosimd(u32 *state, u8 *dst, const u8 *src,
- 		}
+-	} else
+-#endif
+-	{
++	} else {
+ 		pr_info("SSE version of gcm_enc/dec engaged.\n");
+ 		aesni_gcm_tfm = &aesni_gcm_tfm_sse;
  	}
+ 	aesni_ctr_enc_tfm = aesni_ctr_enc;
+-#ifdef CONFIG_AS_AVX
+ 	if (boot_cpu_has(X86_FEATURE_AVX)) {
+ 		/* optimize performance of ctr mode encryption transform */
+ 		aesni_ctr_enc_tfm = aesni_ctr_enc_avx_tfm;
+ 		pr_info("AES CTR mode by8 optimization enabled\n");
+ 	}
+-#endif
+ #endif
  
--	if (IS_ENABLED(CONFIG_AS_AVX2) &&
--	    static_branch_likely(&chacha_use_avx2)) {
-+	if (static_branch_likely(&chacha_use_avx2)) {
- 		while (bytes >= CHACHA_BLOCK_SIZE * 8) {
- 			chacha_8block_xor_avx2(state, dst, src, bytes, nrounds);
- 			bytes -= CHACHA_BLOCK_SIZE * 8;
-@@ -288,8 +287,7 @@ static int __init chacha_simd_mod_init(void)
- 
- 	static_branch_enable(&chacha_use_simd);
- 
--	if (IS_ENABLED(CONFIG_AS_AVX2) &&
--	    boot_cpu_has(X86_FEATURE_AVX) &&
-+	if (boot_cpu_has(X86_FEATURE_AVX) &&
- 	    boot_cpu_has(X86_FEATURE_AVX2) &&
- 	    cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL)) {
- 		static_branch_enable(&chacha_use_avx2);
+ 	err = crypto_register_alg(&aesni_cipher_alg);
 diff --git a/arch/x86/crypto/poly1305-x86_64-cryptogams.pl b/arch/x86/crypto/poly1305-x86_64-cryptogams.pl
-index 5bac2d533104..137edcf038cb 100644
+index 7a6b5380a46f..5bac2d533104 100644
 --- a/arch/x86/crypto/poly1305-x86_64-cryptogams.pl
 +++ b/arch/x86/crypto/poly1305-x86_64-cryptogams.pl
-@@ -1514,10 +1514,6 @@ ___
- 
- if ($avx>1) {
- 
--if ($kernel) {
--	$code .= "#ifdef CONFIG_AS_AVX2\n";
--}
--
- my ($H0,$H1,$H2,$H3,$H4, $MASK, $T4,$T0,$T1,$T2,$T3, $D0,$D1,$D2,$D3,$D4) =
-     map("%ymm$_",(0..15));
- my $S4=$MASK;
-@@ -2808,10 +2804,6 @@ ___
- poly1305_blocks_avxN(0);
- &end_function("poly1305_blocks_avx2");
+@@ -404,10 +404,6 @@ ___
+ &end_function("poly1305_emit_x86_64");
+ if ($avx) {
  
 -if($kernel) {
+-	$code .= "#ifdef CONFIG_AS_AVX\n";
+-}
+-
+ ########################################################################
+ # Layout of opaque area is following.
+ #
+@@ -1516,10 +1512,6 @@ $code.=<<___;
+ ___
+ &end_function("poly1305_emit_avx");
+ 
+-if ($kernel) {
 -	$code .= "#endif\n";
 -}
 -
- #######################################################################
- if ($avx>2) {
- # On entry we have input length divisible by 64. But since inner loop
+ if ($avx>1) {
+ 
+ if ($kernel) {
 diff --git a/arch/x86/crypto/poly1305_glue.c b/arch/x86/crypto/poly1305_glue.c
-index 4a6226e1d15e..6dfec19f7d57 100644
+index 79bb58737d52..4a6226e1d15e 100644
 --- a/arch/x86/crypto/poly1305_glue.c
 +++ b/arch/x86/crypto/poly1305_glue.c
-@@ -108,7 +108,7 @@ static void poly1305_simd_blocks(void *ctx, const u8 *inp, size_t len,
- 		kernel_fpu_begin();
- 		if (IS_ENABLED(CONFIG_AS_AVX512) && static_branch_likely(&poly1305_use_avx512))
- 			poly1305_blocks_avx512(ctx, inp, bytes, padbit);
--		else if (IS_ENABLED(CONFIG_AS_AVX2) && static_branch_likely(&poly1305_use_avx2))
-+		else if (static_branch_likely(&poly1305_use_avx2))
- 			poly1305_blocks_avx2(ctx, inp, bytes, padbit);
- 		else
- 			poly1305_blocks_avx(ctx, inp, bytes, padbit);
-@@ -264,8 +264,7 @@ static int __init poly1305_simd_mod_init(void)
- 	if (boot_cpu_has(X86_FEATURE_AVX) &&
+@@ -94,7 +94,7 @@ static void poly1305_simd_blocks(void *ctx, const u8 *inp, size_t len,
+ 	BUILD_BUG_ON(PAGE_SIZE < POLY1305_BLOCK_SIZE ||
+ 		     PAGE_SIZE % POLY1305_BLOCK_SIZE);
+ 
+-	if (!IS_ENABLED(CONFIG_AS_AVX) || !static_branch_likely(&poly1305_use_avx) ||
++	if (!static_branch_likely(&poly1305_use_avx) ||
+ 	    (len < (POLY1305_BLOCK_SIZE * 18) && !state->is_base2_26) ||
+ 	    !crypto_simd_usable()) {
+ 		convert_to_base2_64(ctx);
+@@ -123,7 +123,7 @@ static void poly1305_simd_blocks(void *ctx, const u8 *inp, size_t len,
+ static void poly1305_simd_emit(void *ctx, u8 mac[POLY1305_DIGEST_SIZE],
+ 			       const u32 nonce[4])
+ {
+-	if (!IS_ENABLED(CONFIG_AS_AVX) || !static_branch_likely(&poly1305_use_avx))
++	if (!static_branch_likely(&poly1305_use_avx))
+ 		poly1305_emit_x86_64(ctx, mac, nonce);
+ 	else
+ 		poly1305_emit_avx(ctx, mac, nonce);
+@@ -261,7 +261,7 @@ static struct shash_alg alg = {
+ 
+ static int __init poly1305_simd_mod_init(void)
+ {
+-	if (IS_ENABLED(CONFIG_AS_AVX) && boot_cpu_has(X86_FEATURE_AVX) &&
++	if (boot_cpu_has(X86_FEATURE_AVX) &&
  	    cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL))
  		static_branch_enable(&poly1305_use_avx);
--	if (IS_ENABLED(CONFIG_AS_AVX2) && boot_cpu_has(X86_FEATURE_AVX) &&
--	    boot_cpu_has(X86_FEATURE_AVX2) &&
-+	if (boot_cpu_has(X86_FEATURE_AVX) && boot_cpu_has(X86_FEATURE_AVX2) &&
- 	    cpu_has_xfeatures(XFEATURE_MASK_SSE | XFEATURE_MASK_YMM, NULL))
- 		static_branch_enable(&poly1305_use_avx2);
- 	if (IS_ENABLED(CONFIG_AS_AVX512) && boot_cpu_has(X86_FEATURE_AVX) &&
+ 	if (IS_ENABLED(CONFIG_AS_AVX2) && boot_cpu_has(X86_FEATURE_AVX) &&
+diff --git a/arch/x86/crypto/sha1_ssse3_asm.S b/arch/x86/crypto/sha1_ssse3_asm.S
+index 12e2d19d7402..d25668d2a1e9 100644
+--- a/arch/x86/crypto/sha1_ssse3_asm.S
++++ b/arch/x86/crypto/sha1_ssse3_asm.S
+@@ -467,8 +467,6 @@ W_PRECALC_SSSE3
+  */
+ SHA1_VECTOR_ASM     sha1_transform_ssse3
+ 
+-#ifdef CONFIG_AS_AVX
+-
+ .macro W_PRECALC_AVX
+ 
+ .purgem W_PRECALC_00_15
+@@ -553,5 +551,3 @@ W_PRECALC_AVX
+  *				       const u8 *data, int blocks);
+  */
+ SHA1_VECTOR_ASM     sha1_transform_avx
+-
+-#endif
 diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
-index 275b65dd30c9..a801ffc10cbb 100644
+index d70b40ad594c..275b65dd30c9 100644
 --- a/arch/x86/crypto/sha1_ssse3_glue.c
 +++ b/arch/x86/crypto/sha1_ssse3_glue.c
-@@ -174,7 +174,6 @@ static void unregister_sha1_avx(void)
+@@ -114,7 +114,6 @@ static void unregister_sha1_ssse3(void)
+ 		crypto_unregister_shash(&sha1_ssse3_alg);
+ }
+ 
+-#ifdef CONFIG_AS_AVX
+ asmlinkage void sha1_transform_avx(struct sha1_state *state,
+ 				   const u8 *data, int blocks);
+ 
+@@ -175,13 +174,7 @@ static void unregister_sha1_avx(void)
  		crypto_unregister_shash(&sha1_avx_alg);
  }
  
--#if defined(CONFIG_AS_AVX2)
+-#else  /* CONFIG_AS_AVX */
+-static inline int register_sha1_avx(void) { return 0; }
+-static inline void unregister_sha1_avx(void) { }
+-#endif /* CONFIG_AS_AVX */
+-
+-
+-#if defined(CONFIG_AS_AVX2) && (CONFIG_AS_AVX)
++#if defined(CONFIG_AS_AVX2)
  #define SHA1_AVX2_BLOCK_OPTSIZE	4	/* optimal 4*64 bytes of SHA1 blocks */
  
  asmlinkage void sha1_transform_avx2(struct sha1_state *state,
-@@ -246,11 +245,6 @@ static void unregister_sha1_avx2(void)
- 		crypto_unregister_shash(&sha1_avx2_alg);
- }
- 
--#else
--static inline int register_sha1_avx2(void) { return 0; }
--static inline void unregister_sha1_avx2(void) { }
--#endif
--
- #ifdef CONFIG_AS_SHA1_NI
- asmlinkage void sha1_ni_transform(struct sha1_state *digest, const u8 *data,
- 				  int rounds);
-diff --git a/arch/x86/crypto/sha256-avx2-asm.S b/arch/x86/crypto/sha256-avx2-asm.S
-index 499d9ec129de..11ff60c29c8b 100644
---- a/arch/x86/crypto/sha256-avx2-asm.S
-+++ b/arch/x86/crypto/sha256-avx2-asm.S
-@@ -48,7 +48,6 @@
- # This code schedules 2 blocks at a time, with 4 lanes per block
+diff --git a/arch/x86/crypto/sha256-avx-asm.S b/arch/x86/crypto/sha256-avx-asm.S
+index fcbc30f58c38..4739cd31b9db 100644
+--- a/arch/x86/crypto/sha256-avx-asm.S
++++ b/arch/x86/crypto/sha256-avx-asm.S
+@@ -47,7 +47,6 @@
+ # This code schedules 1 block at a time, with 4 lanes per block
  ########################################################################
  
--#ifdef CONFIG_AS_AVX2
+-#ifdef CONFIG_AS_AVX
  #include <linux/linkage.h>
  
  ## assume buffers not aligned
-@@ -767,5 +766,3 @@ _SHUF_00BA:
- .align 32
+@@ -498,5 +497,3 @@ _SHUF_00BA:
+ # shuffle xDxC -> DC00
  _SHUF_DC00:
- 	.octa 0x0b0a090803020100FFFFFFFFFFFFFFFF,0x0b0a090803020100FFFFFFFFFFFFFFFF
+ 	.octa 0x0b0a090803020100FFFFFFFFFFFFFFFF
 -
 -#endif
 diff --git a/arch/x86/crypto/sha256_ssse3_glue.c b/arch/x86/crypto/sha256_ssse3_glue.c
-index 8bdc3be31f64..6394b5fe8db6 100644
+index 03ad657c04bd..8bdc3be31f64 100644
 --- a/arch/x86/crypto/sha256_ssse3_glue.c
 +++ b/arch/x86/crypto/sha256_ssse3_glue.c
-@@ -220,7 +220,6 @@ static void unregister_sha256_avx(void)
+@@ -144,7 +144,6 @@ static void unregister_sha256_ssse3(void)
+ 				ARRAY_SIZE(sha256_ssse3_algs));
+ }
+ 
+-#ifdef CONFIG_AS_AVX
+ asmlinkage void sha256_transform_avx(struct sha256_state *state,
+ 				     const u8 *data, int blocks);
+ 
+@@ -221,12 +220,7 @@ static void unregister_sha256_avx(void)
  				ARRAY_SIZE(sha256_avx_algs));
  }
  
--#if defined(CONFIG_AS_AVX2)
+-#else
+-static inline int register_sha256_avx(void) { return 0; }
+-static inline void unregister_sha256_avx(void) { }
+-#endif
+-
+-#if defined(CONFIG_AS_AVX2) && defined(CONFIG_AS_AVX)
++#if defined(CONFIG_AS_AVX2)
  asmlinkage void sha256_transform_rorx(struct sha256_state *state,
  				      const u8 *data, int blocks);
  
-@@ -295,11 +294,6 @@ static void unregister_sha256_avx2(void)
- 				ARRAY_SIZE(sha256_avx2_algs));
- }
- 
--#else
--static inline int register_sha256_avx2(void) { return 0; }
--static inline void unregister_sha256_avx2(void) { }
--#endif
--
- #ifdef CONFIG_AS_SHA256_NI
- asmlinkage void sha256_ni_transform(struct sha256_state *digest,
- 				    const u8 *data, int rounds);
-diff --git a/arch/x86/crypto/sha512-avx2-asm.S b/arch/x86/crypto/sha512-avx2-asm.S
-index 3dd886b14e7d..3a44bdcfd583 100644
---- a/arch/x86/crypto/sha512-avx2-asm.S
-+++ b/arch/x86/crypto/sha512-avx2-asm.S
-@@ -49,7 +49,6 @@
- # This code schedules 1 blocks at a time, with 4 lanes per block
+diff --git a/arch/x86/crypto/sha512-avx-asm.S b/arch/x86/crypto/sha512-avx-asm.S
+index 90ea945ba5e6..63470fd6ae32 100644
+--- a/arch/x86/crypto/sha512-avx-asm.S
++++ b/arch/x86/crypto/sha512-avx-asm.S
+@@ -47,7 +47,6 @@
+ #
  ########################################################################
  
--#ifdef CONFIG_AS_AVX2
+-#ifdef CONFIG_AS_AVX
  #include <linux/linkage.h>
  
  .text
-@@ -749,5 +748,3 @@ PSHUFFLE_BYTE_FLIP_MASK:
- MASK_YMM_LO:
- 	.octa 0x00000000000000000000000000000000
- 	.octa 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
--
+@@ -424,4 +423,3 @@ K512:
+ 	.quad 0x3c9ebe0a15c9bebc,0x431d67c49c100d4c
+ 	.quad 0x4cc5d4becb3e42b6,0x597f299cfc657e2a
+ 	.quad 0x5fcb6fab3ad6faec,0x6c44198c4a475817
 -#endif
 diff --git a/arch/x86/crypto/sha512_ssse3_glue.c b/arch/x86/crypto/sha512_ssse3_glue.c
-index 75214982a633..82cc1b3ced1d 100644
+index 1c444f41037c..75214982a633 100644
 --- a/arch/x86/crypto/sha512_ssse3_glue.c
 +++ b/arch/x86/crypto/sha512_ssse3_glue.c
-@@ -218,7 +218,6 @@ static void unregister_sha512_avx(void)
- 			ARRAY_SIZE(sha512_avx_algs));
+@@ -142,7 +142,6 @@ static void unregister_sha512_ssse3(void)
+ 			ARRAY_SIZE(sha512_ssse3_algs));
  }
  
--#if defined(CONFIG_AS_AVX2)
+-#ifdef CONFIG_AS_AVX
+ asmlinkage void sha512_transform_avx(struct sha512_state *state,
+ 				     const u8 *data, int blocks);
+ static bool avx_usable(void)
+@@ -218,12 +217,8 @@ static void unregister_sha512_avx(void)
+ 		crypto_unregister_shashes(sha512_avx_algs,
+ 			ARRAY_SIZE(sha512_avx_algs));
+ }
+-#else
+-static inline int register_sha512_avx(void) { return 0; }
+-static inline void unregister_sha512_avx(void) { }
+-#endif
+ 
+-#if defined(CONFIG_AS_AVX2) && defined(CONFIG_AS_AVX)
++#if defined(CONFIG_AS_AVX2)
  asmlinkage void sha512_transform_rorx(struct sha512_state *state,
  				      const u8 *data, int blocks);
  
-@@ -293,10 +292,6 @@ static void unregister_sha512_avx2(void)
- 		crypto_unregister_shashes(sha512_avx2_algs,
- 			ARRAY_SIZE(sha512_avx2_algs));
- }
--#else
--static inline int register_sha512_avx2(void) { return 0; }
--static inline void unregister_sha512_avx2(void) { }
--#endif
- 
- static int __init sha512_ssse3_mod_init(void)
- {
-diff --git a/crypto/Kconfig b/crypto/Kconfig
-index 49aae167e75c..c24a47406f8f 100644
---- a/crypto/Kconfig
-+++ b/crypto/Kconfig
-@@ -267,7 +267,7 @@ config CRYPTO_CURVE25519
- 
- config CRYPTO_CURVE25519_X86
- 	tristate "x86_64 accelerated Curve25519 scalar multiplication library"
--	depends on X86 && 64BIT && AS_ADX
-+	depends on X86 && 64BIT
- 	select CRYPTO_LIB_CURVE25519_GENERIC
- 	select CRYPTO_ARCH_HAVE_LIB_CURVE25519
- 
-@@ -465,7 +465,7 @@ config CRYPTO_NHPOLY1305_SSE2
- 
- config CRYPTO_NHPOLY1305_AVX2
- 	tristate "NHPoly1305 hash function (x86_64 AVX2 implementation)"
--	depends on X86 && 64BIT && AS_AVX2
-+	depends on X86 && 64BIT
- 	select CRYPTO_NHPOLY1305
- 	help
- 	  AVX2 optimized implementation of the hash function used by the
-@@ -1303,7 +1303,7 @@ config CRYPTO_CAMELLIA_AESNI_AVX_X86_64
- 
- config CRYPTO_CAMELLIA_AESNI_AVX2_X86_64
- 	tristate "Camellia cipher algorithm (x86_64/AES-NI/AVX2)"
--	depends on X86 && 64BIT && AS_AVX2
-+	depends on X86 && 64BIT
- 	depends on CRYPTO
- 	select CRYPTO_CAMELLIA_AESNI_AVX_X86_64
- 	help
-@@ -1573,7 +1573,7 @@ config CRYPTO_SERPENT_AVX_X86_64
- 
- config CRYPTO_SERPENT_AVX2_X86_64
- 	tristate "Serpent cipher algorithm (x86_64/AVX2)"
--	depends on X86 && 64BIT && AS_AVX2
-+	depends on X86 && 64BIT
- 	select CRYPTO_SERPENT_AVX_X86_64
- 	help
- 	  Serpent cipher algorithm, by Anderson, Biham & Knudsen.
-diff --git a/lib/raid6/algos.c b/lib/raid6/algos.c
-index b5a02326cfb7..2dc010be793e 100644
---- a/lib/raid6/algos.c
-+++ b/lib/raid6/algos.c
-@@ -34,10 +34,8 @@ const struct raid6_calls * const raid6_algos[] = {
- 	&raid6_avx512x2,
- 	&raid6_avx512x1,
- #endif
--#ifdef CONFIG_AS_AVX2
- 	&raid6_avx2x2,
- 	&raid6_avx2x1,
--#endif
- 	&raid6_sse2x2,
- 	&raid6_sse2x1,
- 	&raid6_sse1x2,
-@@ -51,11 +49,9 @@ const struct raid6_calls * const raid6_algos[] = {
- 	&raid6_avx512x2,
- 	&raid6_avx512x1,
- #endif
--#ifdef CONFIG_AS_AVX2
- 	&raid6_avx2x4,
- 	&raid6_avx2x2,
- 	&raid6_avx2x1,
--#endif
- 	&raid6_sse2x4,
- 	&raid6_sse2x2,
- 	&raid6_sse2x1,
-@@ -101,9 +97,7 @@ const struct raid6_recov_calls *const raid6_recov_algos[] = {
- #ifdef CONFIG_AS_AVX512
- 	&raid6_recov_avx512,
- #endif
--#ifdef CONFIG_AS_AVX2
- 	&raid6_recov_avx2,
--#endif
- 	&raid6_recov_ssse3,
- #endif
- #ifdef CONFIG_S390
-diff --git a/lib/raid6/avx2.c b/lib/raid6/avx2.c
-index 87184b6da28a..f299476e1d76 100644
---- a/lib/raid6/avx2.c
-+++ b/lib/raid6/avx2.c
-@@ -13,8 +13,6 @@
-  *
+diff --git a/arch/x86/include/asm/xor_avx.h b/arch/x86/include/asm/xor_avx.h
+index d61ddf3d052b..0c4e5b5e3852 100644
+--- a/arch/x86/include/asm/xor_avx.h
++++ b/arch/x86/include/asm/xor_avx.h
+@@ -11,8 +11,6 @@
+  * Based on Ingo Molnar and Zach Brown's respective MMX and SSE routines
   */
  
--#ifdef CONFIG_AS_AVX2
+-#ifdef CONFIG_AS_AVX
 -
- #include <linux/raid/pq.h>
- #include "x86.h"
+ #include <linux/compiler.h>
+ #include <asm/fpu/api.h>
  
-@@ -470,5 +468,3 @@ const struct raid6_calls raid6_avx2x4 = {
- 	1			/* Has cache hints */
- };
- #endif
--
--#endif /* CONFIG_AS_AVX2 */
-diff --git a/lib/raid6/recov_avx2.c b/lib/raid6/recov_avx2.c
-index 7a3b5e7f66ee..4e8095403ee2 100644
---- a/lib/raid6/recov_avx2.c
-+++ b/lib/raid6/recov_avx2.c
-@@ -4,8 +4,6 @@
-  * Author: Jim Kukunas <james.t.kukunas@linux.intel.com>
-  */
+@@ -170,11 +168,4 @@ do { \
+ #define AVX_SELECT(FASTEST) \
+ 	(boot_cpu_has(X86_FEATURE_AVX) && boot_cpu_has(X86_FEATURE_OSXSAVE) ? &xor_block_avx : FASTEST)
  
--#ifdef CONFIG_AS_AVX2
--
- #include <linux/raid/pq.h>
- #include "x86.h"
- 
-@@ -313,7 +311,3 @@ const struct raid6_recov_calls raid6_recov_avx2 = {
- #endif
- 	.priority = 2,
- };
--
 -#else
--#warning "your version of binutils lacks AVX2 support"
+-
+-#define AVX_XOR_SPEED {}
+-
+-#define AVX_SELECT(FASTEST) (FASTEST)
+-
 -#endif
-diff --git a/lib/raid6/test/Makefile b/lib/raid6/test/Makefile
-index 60021319ac78..a4c7cd74cff5 100644
---- a/lib/raid6/test/Makefile
-+++ b/lib/raid6/test/Makefile
-@@ -35,9 +35,6 @@ endif
- ifeq ($(IS_X86),yes)
-         OBJS   += mmx.o sse1.o sse2.o avx2.o recov_ssse3.o recov_avx2.o avx512.o recov_avx512.o
-         CFLAGS += -DCONFIG_X86
--        CFLAGS += $(shell echo "vpbroadcastb %xmm0, %ymm1" |	\
--                    gcc -c -x assembler - >/dev/null 2>&1 &&	\
--                    rm ./-.o && echo -DCONFIG_AS_AVX2=1)
- 	CFLAGS += $(shell echo "vpmovm2b %k1, %zmm5" |          \
- 		    gcc -c -x assembler - >/dev/null 2>&1 &&	\
- 		    rm ./-.o && echo -DCONFIG_AS_AVX512=1)
+ #endif
 -- 
 2.17.1
 
