@@ -2,46 +2,45 @@ Return-Path: <SRS0=nygc=5L=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93CAEC43331
-	for <linux-crypto@archiver.kernel.org>; Thu, 26 Mar 2020 08:04:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C143DC43331
+	for <linux-crypto@archiver.kernel.org>; Thu, 26 Mar 2020 08:04:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6B56820772
-	for <linux-crypto@archiver.kernel.org>; Thu, 26 Mar 2020 08:04:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9B087207FC
+	for <linux-crypto@archiver.kernel.org>; Thu, 26 Mar 2020 08:04:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1585209872;
-	bh=2W+1kPsy5QBsjCzNZ6arOx57/Bjw3nNlC1j32mPd/rQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=TSroz7vQc1qJnF6fPFcoAVXgyAz4Oeswrjz1MoOoupygYxg95WY0kHyYjnDTOnqJD
-	 SqIf8BCWLoNsnZ9vAXH1TcFDQTMJ18j8K/kvGf59tVOOMNyGnNgMA7a3Z9PaT911N4
-	 AcHaHjSYBiLbDtws3dgIqdmguRud3bUTd1ihFk2c=
+	s=default; t=1585209874;
+	bh=qHj7B3Kjl58IHhyZb0rEozXkHEBlUWSf7z/rdxAcge4=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=18CVt8Y9X0ukP2cIVJQgSkwGofvYUtQQpZW2A6dCEe3TzCPYo5lBGIjjqNtUuPGtU
+	 Aw91+rbma4Or53Bj7w+4fICHmhqkygeV1ZU2ljVshOqdRwsKx9+PNy6kuAgRxmS8A7
+	 uqZOjiiykhKdeTUdOUv6ynw/veE4FFI6Ug8jXPAE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727890AbgCZIEM (ORCPT
+        id S1727677AbgCZIEd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 26 Mar 2020 04:04:12 -0400
-Received: from conuserg-11.nifty.com ([210.131.2.78]:19339 "EHLO
+        Thu, 26 Mar 2020 04:04:33 -0400
+Received: from conuserg-11.nifty.com ([210.131.2.78]:20009 "EHLO
         conuserg-11.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727773AbgCZIEM (ORCPT
+        with ESMTP id S1727585AbgCZIEd (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 26 Mar 2020 04:04:12 -0400
+        Thu, 26 Mar 2020 04:04:33 -0400
 Received: from pug.e01.socionext.com (p14092-ipngnfx01kyoto.kyoto.ocn.ne.jp [153.142.97.92]) (authenticated)
-        by conuserg-11.nifty.com with ESMTP id 02Q81WpZ002183;
-        Thu, 26 Mar 2020 17:01:44 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 02Q81WpZ002183
+        by conuserg-11.nifty.com with ESMTP id 02Q81WpT002183;
+        Thu, 26 Mar 2020 17:01:32 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-11.nifty.com 02Q81WpT002183
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1585209705;
-        bh=kjAsZXCjiHywP61qOSzAcHLQWlDx4t3Nswuo57yw6A4=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qeE74kIsHYvE7EJsiXX+2bvW4GA8wH7aoeyxBtKpRrgqr7CJlb4GZE/W5YWXQmsGK
-         OD0ff2yYok+bxa2pbCk1er1JXwLphiRuiAahhEwSciLCPZokiLPe85VLlg6mFwiW9h
-         3uFMlswqcYep26rIXj3WolmwV+00w6mS6FxB2jompyRAmgujHRMDMHvJmY6DufkSWC
-         dPo7jk+F1AoY7O0bYBFpUH9wYFXvarrL/aPGqSJwj6zx+0mOBtCb1Xrp6h9//K2J73
-         Nw9gg/fsTpjLXTqQQK0bJjFWwYbRXmMCbGwuKjDg1BBmz90Euyoaucvp7xa8HXfbWy
-         xEQugyFVKqWqg==
+        s=dec2015msa; t=1585209694;
+        bh=pP2B3e2HIi5aiL8gQpMs8wNmwELktRFcv9my7u/AjTs=;
+        h=From:To:Cc:Subject:Date:From;
+        b=bzmVG4HAmlp7LgiUy5yPMNdC2iG1kMMwInKzoNZv1szrMcME6xMVXTR1XOUL1qzoZ
+         UXypNBLGmlWiyFbn8AGEg1DP67vhAiBAU9HRXNv1JINVe7WLdcTRF880YP/6P8P1+9
+         hxP3DnXfQ+AfCFeKc2l0PJ59q8E/XrbPagI9eW55k8R26xEu2vMzfSYDcnSuCE7Ekz
+         cNcbHs5t6C6XtBsfX9LVYo8kSbzcATH2qezUw8lKD/JPtQQxhcQ6uRYK5EQ4Ibf/5f
+         kIk+7YVoFx0fk4BpYs1xrJORYS45omf/l2ivmZpMddWLGj3TlGYyfrTvNHbrcuIME9
+         jBqXd0OeNAqFQ==
 X-Nifty-SrcIP: [153.142.97.92]
 From:   Masahiro Yamada <masahiroy@kernel.org>
 To:     linux-kbuild@vger.kernel.org
@@ -53,152 +52,110 @@ Cc:     Thomas Gleixner <tglx@linutronix.de>,
         "Jason A . Donenfeld" <Jason@zx2c4.com>,
         clang-built-linux@googlegroups.com,
         Masahiro Yamada <masahiroy@kernel.org>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        David Airlie <airlied@linux.ie>,
         "David S. Miller" <davem@davemloft.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Ingo Molnar <mingo@redhat.com>, linux-crypto@vger.kernel.org,
+        Ingo Molnar <mingo@redhat.com>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jim Kukunas <james.t.kukunas@linux.intel.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        NeilBrown <neilb@suse.de>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Yuanhan Liu <yuanhan.liu@linux.intel.com>,
+        dri-devel@lists.freedesktop.org, intel-gfx@lists.freedesktop.org,
+        linux-crypto@vger.kernel.org, linux-doc@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 06/16] x86: remove always-defined CONFIG_AS_SSSE3
-Date:   Thu, 26 Mar 2020 17:00:54 +0900
-Message-Id: <20200326080104.27286-7-masahiroy@kernel.org>
+Subject: [PATCH v2 00/16] x86, crypto: remove always-defined CONFIG_AS_* and cosolidate Kconfig/Makefiles
+Date:   Thu, 26 Mar 2020 17:00:48 +0900
+Message-Id: <20200326080104.27286-1-masahiroy@kernel.org>
 X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200326080104.27286-1-masahiroy@kernel.org>
-References: <20200326080104.27286-1-masahiroy@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-CONFIG_AS_SSSE3 was introduced by commit 75aaf4c3e6a4 ("x86/raid6:
-correctly check for assembler capabilities").
+This series of cleanups was prompted by Linus:
+https://lkml.org/lkml/2020/3/12/726
 
-We raise the minimal supported binutils version from time to time.
-The last bump was commit 1fb12b35e5ff ("kbuild: Raise the minimum
-required binutils version to 2.21").
+First, this series drop always-on CONFIG_AS_* options.
+Some of those options were introduced in old days.
+For example, the check for CONFIG_AS_CFI dates back to 2006.
 
-I confirmed the code in $(call as-instr,...) can be assembled by the
-binutils 2.21 assembler and also by LLVM integrated assembler.
+We raise the minimal tool versions from time to time.
+Currently, we require binutils 2.21
+(and we even plan to bump it to 2.23).
 
-Remove CONFIG_AS_SSSE3, which is always defined.
+After cleaning away the old checks,
+as-instr calls are moved to Kconfig from Makefiles,
+then more Kconfig / Makefile code is cleaned up.
 
-I added ifdef CONFIG_X86 to lib/raid6/algos.c to avoid link errors
-on non-x86 architectures.
+I folded all relevanet patches into this series,
+as suggested by Jason A. Donenfeld.
 
-lib/raid6/algos.c is built not only for the kernel but also for
-testing the library code from userspace. I added -DCONFIG_X86 to
-lib/raid6/test/Makefile to cator to this usecase.
+The update for v2 is quite small.
+I just swapped the patch order of patch 8 and 11
+instead of moving comments around files,
+which was addressed by Nick Desaulniers.
 
-Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
-Acked-by: Jason A. Donenfeld <Jason@zx2c4.com>
-Reviewed-by: Nick Desaulniers <ndesaulniers@google.com>
----
 
-Changes in v2: None
+Borislav Petkov (1):
+  Documentation/changes: Raise minimum supported binutils version to
+    2.23
 
- arch/x86/Makefile              | 5 ++---
- arch/x86/crypto/blake2s-core.S | 2 --
- lib/raid6/algos.c              | 2 +-
- lib/raid6/recov_ssse3.c        | 6 ------
- lib/raid6/test/Makefile        | 4 +---
- 5 files changed, 4 insertions(+), 15 deletions(-)
+Jason A. Donenfeld (4):
+  x86: probe assembler capabilities via kconfig instead of makefile
+  crypto: x86 - rework configuration based on Kconfig
+  crypto: curve25519 - do not pollute dispatcher based on assembler
+  x86: update AS_* macros to binutils >=2.23, supporting ADX and AVX2
 
-diff --git a/arch/x86/Makefile b/arch/x86/Makefile
-index e4a062313bb0..94f89612e024 100644
---- a/arch/x86/Makefile
-+++ b/arch/x86/Makefile
-@@ -178,7 +178,6 @@ ifeq ($(ACCUMULATE_OUTGOING_ARGS), 1)
- endif
- 
- # does binutils support specific instructions?
--asinstr += $(call as-instr,pshufb %xmm0$(comma)%xmm0,-DCONFIG_AS_SSSE3=1)
- avx_instr := $(call as-instr,vxorps %ymm0$(comma)%ymm1$(comma)%ymm2,-DCONFIG_AS_AVX=1)
- avx2_instr :=$(call as-instr,vpbroadcastb %xmm0$(comma)%ymm1,-DCONFIG_AS_AVX2=1)
- avx512_instr :=$(call as-instr,vpmovm2b %k1$(comma)%zmm5,-DCONFIG_AS_AVX512=1)
-@@ -186,8 +185,8 @@ sha1_ni_instr :=$(call as-instr,sha1msg1 %xmm0$(comma)%xmm1,-DCONFIG_AS_SHA1_NI=
- sha256_ni_instr :=$(call as-instr,sha256msg1 %xmm0$(comma)%xmm1,-DCONFIG_AS_SHA256_NI=1)
- adx_instr := $(call as-instr,adox %r10$(comma)%r10,-DCONFIG_AS_ADX=1)
- 
--KBUILD_AFLAGS += $(asinstr) $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
--KBUILD_CFLAGS += $(asinstr) $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
-+KBUILD_AFLAGS += $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
-+KBUILD_CFLAGS += $(avx_instr) $(avx2_instr) $(avx512_instr) $(sha1_ni_instr) $(sha256_ni_instr) $(adx_instr)
- 
- KBUILD_LDFLAGS := -m elf_$(UTS_MACHINE)
- 
-diff --git a/arch/x86/crypto/blake2s-core.S b/arch/x86/crypto/blake2s-core.S
-index 24910b766bdd..2ca79974f819 100644
---- a/arch/x86/crypto/blake2s-core.S
-+++ b/arch/x86/crypto/blake2s-core.S
-@@ -46,7 +46,6 @@ SIGMA2:
- #endif /* CONFIG_AS_AVX512 */
- 
- .text
--#ifdef CONFIG_AS_SSSE3
- SYM_FUNC_START(blake2s_compress_ssse3)
- 	testq		%rdx,%rdx
- 	je		.Lendofloop
-@@ -174,7 +173,6 @@ SYM_FUNC_START(blake2s_compress_ssse3)
- .Lendofloop:
- 	ret
- SYM_FUNC_END(blake2s_compress_ssse3)
--#endif /* CONFIG_AS_SSSE3 */
- 
- #ifdef CONFIG_AS_AVX512
- SYM_FUNC_START(blake2s_compress_avx512)
-diff --git a/lib/raid6/algos.c b/lib/raid6/algos.c
-index bf1b4765c8f6..df08664d3432 100644
---- a/lib/raid6/algos.c
-+++ b/lib/raid6/algos.c
-@@ -97,13 +97,13 @@ void (*raid6_datap_recov)(int, size_t, int, void **);
- EXPORT_SYMBOL_GPL(raid6_datap_recov);
- 
- const struct raid6_recov_calls *const raid6_recov_algos[] = {
-+#ifdef CONFIG_X86
- #ifdef CONFIG_AS_AVX512
- 	&raid6_recov_avx512,
- #endif
- #ifdef CONFIG_AS_AVX2
- 	&raid6_recov_avx2,
- #endif
--#ifdef CONFIG_AS_SSSE3
- 	&raid6_recov_ssse3,
- #endif
- #ifdef CONFIG_S390
-diff --git a/lib/raid6/recov_ssse3.c b/lib/raid6/recov_ssse3.c
-index 1de97d2405d0..4bfa3c6b60de 100644
---- a/lib/raid6/recov_ssse3.c
-+++ b/lib/raid6/recov_ssse3.c
-@@ -3,8 +3,6 @@
-  * Copyright (C) 2012 Intel Corporation
-  */
- 
--#ifdef CONFIG_AS_SSSE3
--
- #include <linux/raid/pq.h>
- #include "x86.h"
- 
-@@ -328,7 +326,3 @@ const struct raid6_recov_calls raid6_recov_ssse3 = {
- #endif
- 	.priority = 1,
- };
--
--#else
--#warning "your version of binutils lacks SSSE3 support"
--#endif
-diff --git a/lib/raid6/test/Makefile b/lib/raid6/test/Makefile
-index b9e6c3648be1..60021319ac78 100644
---- a/lib/raid6/test/Makefile
-+++ b/lib/raid6/test/Makefile
-@@ -34,9 +34,7 @@ endif
- 
- ifeq ($(IS_X86),yes)
-         OBJS   += mmx.o sse1.o sse2.o avx2.o recov_ssse3.o recov_avx2.o avx512.o recov_avx512.o
--        CFLAGS += $(shell echo "pshufb %xmm0, %xmm0" |		\
--                    gcc -c -x assembler - >/dev/null 2>&1 &&	\
--                    rm ./-.o && echo -DCONFIG_AS_SSSE3=1)
-+        CFLAGS += -DCONFIG_X86
-         CFLAGS += $(shell echo "vpbroadcastb %xmm0, %ymm1" |	\
-                     gcc -c -x assembler - >/dev/null 2>&1 &&	\
-                     rm ./-.o && echo -DCONFIG_AS_AVX2=1)
+Masahiro Yamada (11):
+  lib/raid6/test: fix build on distros whose /bin/sh is not bash
+  x86: remove unneeded defined(__ASSEMBLY__) check from asm/dwarf2.h
+  x86: remove always-defined CONFIG_AS_CFI
+  x86: remove unneeded (CONFIG_AS_)CFI_SIGNAL_FRAME
+  x86: remove always-defined CONFIG_AS_CFI_SECTIONS
+  x86: remove always-defined CONFIG_AS_SSSE3
+  x86: remove always-defined CONFIG_AS_AVX
+  x86: replace arch macros from compiler with CONFIG_X86_{32,64}
+  drm/i915: remove always-defined CONFIG_AS_MOVNTDQA
+  x86: add comments about the binutils version to support code in
+    as-instr
+  crypto: x86 - clean up poly1305-x86_64-cryptogams.S by 'make clean'
+
+ Documentation/process/changes.rst             |   4 +-
+ arch/x86/Kconfig                              |   2 +
+ arch/x86/Kconfig.assembler                    |  17 ++
+ arch/x86/Makefile                             |  22 ---
+ arch/x86/crypto/Makefile                      | 162 +++++++-----------
+ arch/x86/crypto/aesni-intel_avx-x86_64.S      |   6 -
+ arch/x86/crypto/aesni-intel_glue.c            |  21 +--
+ arch/x86/crypto/blake2s-core.S                |   2 -
+ arch/x86/crypto/chacha_glue.c                 |   6 +-
+ arch/x86/crypto/poly1305-x86_64-cryptogams.pl |  16 --
+ arch/x86/crypto/poly1305_glue.c               |  11 +-
+ arch/x86/crypto/sha1_ssse3_asm.S              |   4 -
+ arch/x86/crypto/sha1_ssse3_glue.c             |  13 --
+ arch/x86/crypto/sha256-avx-asm.S              |   3 -
+ arch/x86/crypto/sha256-avx2-asm.S             |   3 -
+ arch/x86/crypto/sha256_ssse3_glue.c           |  12 --
+ arch/x86/crypto/sha512-avx-asm.S              |   2 -
+ arch/x86/crypto/sha512-avx2-asm.S             |   3 -
+ arch/x86/crypto/sha512_ssse3_glue.c           |  10 --
+ arch/x86/include/asm/dwarf2.h                 |  44 -----
+ arch/x86/include/asm/xor_avx.h                |   9 -
+ drivers/gpu/drm/i915/Makefile                 |   3 -
+ drivers/gpu/drm/i915/i915_memcpy.c            |   5 -
+ include/crypto/curve25519.h                   |   6 +-
+ kernel/signal.c                               |   2 +-
+ lib/raid6/algos.c                             |  12 +-
+ lib/raid6/avx2.c                              |   4 -
+ lib/raid6/recov_avx2.c                        |   6 -
+ lib/raid6/recov_ssse3.c                       |   6 -
+ lib/raid6/test/Makefile                       |   9 +-
+ 30 files changed, 101 insertions(+), 324 deletions(-)
+ create mode 100644 arch/x86/Kconfig.assembler
+
 -- 
 2.17.1
 
