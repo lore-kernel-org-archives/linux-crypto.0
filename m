@@ -2,147 +2,150 @@ Return-Path: <SRS0=nygc=5L=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 476E3C2D0E8
-	for <linux-crypto@archiver.kernel.org>; Thu, 26 Mar 2020 08:34:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3AD4C2D0E7
+	for <linux-crypto@archiver.kernel.org>; Thu, 26 Mar 2020 09:20:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 2B0A0207FC
-	for <linux-crypto@archiver.kernel.org>; Thu, 26 Mar 2020 08:34:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AB8C920719
+	for <linux-crypto@archiver.kernel.org>; Thu, 26 Mar 2020 09:20:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1585214427;
+	bh=wL1jZg8S4ctlkUEx2PHFLxJesRX2RGiZ2xoKk6QxdfY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=eSftaRFkyePIvLddObdT+lu3Qd8+nl20Eh/P3JH/1NS7A5yAUPeiNq92e//C8MEk9
+	 AVBgPcAe1ooAoXL9TrpURRFc0BbGXU2k3cHOwdKoEd7wIZi7PlNNs9+WFho8Xy1+yv
+	 FLJMiQ7BjntLGSwEGDal/RPBJVMcUwqLnjl1e9y0=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727874AbgCZIeW (ORCPT
+        id S1726359AbgCZJU1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 26 Mar 2020 04:34:22 -0400
-Received: from mga04.intel.com ([192.55.52.120]:44735 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727866AbgCZIeV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 26 Mar 2020 04:34:21 -0400
-IronPort-SDR: RVr/sKGyhxIMdz6HpIaaMhZpfgGs268wiRdrLx+0F/vTNiomitmxvpQm9rcyLdfPmw+VnHiadS
- Pn7Gy77wADBw==
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2020 01:34:21 -0700
-IronPort-SDR: nly9xD30xpsmGWYFWXpCQfSK56dqJFIPOST3nuhEheHKExNfIQ5XgPc3HXfYowGvGJpdixXyaW
- B8k9bFVtCr9w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.72,307,1580803200"; 
-   d="scan'208";a="446919804"
-Received: from shao2-debian.sh.intel.com (HELO localhost) ([10.239.13.3])
-  by fmsmga005.fm.intel.com with ESMTP; 26 Mar 2020 01:34:13 -0700
-Date:   Thu, 26 Mar 2020 16:33:55 +0800
-From:   kernel test robot <rong.a.chen@intel.com>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Andy Shevchenko <andy.shevchenko@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "maintainer:X86 ARCHITECTURE (32-BIT AND 64-BIT)" <x86@kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Mark Gross <mgross@linux.intel.com>,
-        Tony Luck <tony.luck@intel.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Viresh Kumar <viresh.kumar@linaro.org>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        Len Brown <lenb@kernel.org>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Darren Hart <dvhart@infradead.org>,
-        Andy Shevchenko <andy@infradead.org>,
-        ACPI Devel Maling List <linux-acpi@vger.kernel.org>,
-        linux-edac@vger.kernel.org,
-        Platform Driver <platform-driver-x86@vger.kernel.org>,
-        Jean Delvare <jdelvare@suse.com>,
-        Guenter Roeck <linux@roeck-us.net>,
-        linux-hwmon@vger.kernel.org, Zhang Rui <rui.zhang@intel.com>,
-        Daniel Lezcano <daniel.lezcano@linaro.org>,
-        Amit Kucheria <amit.kucheria@verdurent.com>,
-        Chanwoo Choi <cw00.choi@samsung.com>,
-        Jacob Pan <jacob.jun.pan@linux.intel.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
-        Bjorn Helgaas <bhelgaas@google.com>, linux-pci@vger.kernel.org,
-        Takashi Iwai <tiwai@suse.com>,
-        ALSA Development Mailing List <alsa-devel@alsa-project.org>,
+        Thu, 26 Mar 2020 05:20:27 -0400
+Received: from mail-wm1-f67.google.com ([209.85.128.67]:50987 "EHLO
+        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726298AbgCZJU0 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 26 Mar 2020 05:20:26 -0400
+Received: by mail-wm1-f67.google.com with SMTP id d198so5664251wmd.0;
+        Thu, 26 Mar 2020 02:20:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to:user-agent;
+        bh=QMCowoi/JCe2v265QDbm4p0VWyPtNcTvLQEymboWLVk=;
+        b=RX5mdPiGXyfiPKfLphcwrDBi/peU3SRPc7ZGMrTb/Lqfw5UgtRSTdH91h+70066QSC
+         pP/ZHueo0A+c2VE90+X8dHKj3RlwOXug4g/YAbDWlmKY39FtPZUup4CBm3d3ZB4WSKjR
+         0Huosrm//+PuSEoUBMz87vDYm1X12Mc+oGDi7+6T1B67NT8uWqaZaiJ3FcOHvTmVvv6S
+         eZ2W1Tvhym1i2jFVx2NsZrf7q1CPuiwf72Cu0d8tW+Puw87y8oVvdM83FKXgxpa9mT7b
+         af7m9ubE+9gkC/qaffhOvx4OugsY5bB0Kao9ZPWQ8vc6qWAwB58n97v5dvbVrwPS6VaA
+         bR1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to:user-agent;
+        bh=QMCowoi/JCe2v265QDbm4p0VWyPtNcTvLQEymboWLVk=;
+        b=Mjqdzk9LlAj1wGKzOqFY2GMcEuCixWD4ZsMofPQRf1DzzErhIlDmeANYE47K5CWtmy
+         py7ncbwl5foNWDLzzUcoq/gXUSoEjlOjzzHUK+UVN7w+Q7MjvWnwcyf4/UVOkjwNEZgD
+         5I7PnpMitZhcxD4g/qlAQskDZ9WYGN4SPU/5jvttwmmLMFTACh0lfDcihdS4fFRMtcUD
+         Y+uxTA6ygk5jVTrta8yOYJj6OnkOWkDFcaSbC1ugRyHrE8N1mZ6M7e3ayDt3US1nC5YF
+         La/thjW9jqPcvuYkPvfvGrCQ6kBRS+Nvlv51AtxmWjL40D9jPOJiaxFuwzx4vDJhG7GG
+         Agmw==
+X-Gm-Message-State: ANhLgQ3JNh8buySiUi/LjCAno+VR4rQnNWQCNtxSOzPqZM/yZFTjz3z7
+        o3R+XSyyJkjx/C2VkwVzKMo=
+X-Google-Smtp-Source: ADFU+vuo5kkY6YJNmSthEGmulf1OSYWdFlZ4mkUhgBR28ala97SVa+B34f0Sizj5koNYygjLIKM3Ew==
+X-Received: by 2002:a1c:a950:: with SMTP id s77mr2082562wme.176.1585214422984;
+        Thu, 26 Mar 2020 02:20:22 -0700 (PDT)
+Received: from gmail.com (54033286.catv.pool.telekom.hu. [84.3.50.134])
+        by smtp.gmail.com with ESMTPSA id v26sm2742597wra.7.2020.03.26.02.20.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 Mar 2020 02:20:22 -0700 (PDT)
+Date:   Thu, 26 Mar 2020 10:20:19 +0100
+From:   Ingo Molnar <mingo@kernel.org>
+To:     Masahiro Yamada <masahiroy@kernel.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        "David S . Miller" <davem@davemloft.net>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        clang-built-linux <clang-built-linux@googlegroups.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto <linux-crypto@vger.kernel.org>, lkp@lists.01.org
-Subject: Re: [cpufreq] 06c4d00466: will-it-scale.per_process_ops -53.4%
- regression
-Message-ID: <20200326083355.GO11705@shao2-debian>
-References: <20200320131509.564059710@linutronix.de>
- <20200324060124.GC11705@shao2-debian>
- <CAHp75VeeKZLeZ8E3Py7LECN54SPFHaRgkxrMzBYQWXM8x+4JhA@mail.gmail.com>
- <43a4189a-7153-18e8-4657-4a4400002c05@intel.com>
- <87zhc4ybbt.fsf@nanos.tec.linutronix.de>
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        Peter Zijlstra <peterz@infradead.org>,
+        "H . Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>,
+        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        David Airlie <airlied@linux.ie>,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Jim Kukunas <james.t.kukunas@linux.intel.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
+        NeilBrown <neilb@suse.de>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
+        Yuanhan Liu <yuanhan.liu@linux.intel.com>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        intel-gfx@lists.freedesktop.org,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        Peter Zijlstra <a.p.zijlstra@chello.nl>
+Subject: Re: [PATCH 00/16] x86, crypto: remove always-defined CONFIG_AS_* and
+ cosolidate Kconfig/Makefiles
+Message-ID: <20200326092019.GA100058@gmail.com>
+References: <20200324084821.29944-1-masahiroy@kernel.org>
+ <20200325045940.GA24974@gmail.com>
+ <CAK7LNAQvgT=OWVuBVrvgdZ7AAkoaV_K_Y+w9bOFxRPw_1TOSUA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <87zhc4ybbt.fsf@nanos.tec.linutronix.de>
+In-Reply-To: <CAK7LNAQvgT=OWVuBVrvgdZ7AAkoaV_K_Y+w9bOFxRPw_1TOSUA@mail.gmail.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Mar 25, 2020 at 11:32:06AM +0100, Thomas Gleixner wrote:
-> Rong Chen <rong.a.chen@intel.com> writes:
-> > On 3/24/20 6:24 PM, Andy Shevchenko wrote:
-> >> On Tue, Mar 24, 2020 at 8:02 AM kernel test robot <rong.a.chen@intel.com> wrote:
-> >>> Greeting,
-> >>>
-> >>> FYI, we noticed a -53.4% regression of will-it-scale.per_process_ops due to commit:
-> >>> commit: 06c4d00466eb374841bc84c39af19b3161ff6917 ("[patch 09/22] cpufreq: Convert to new X86 CPU match macros")
-> >>> url: https://github.com/0day-ci/linux/commits/Thomas-Gleixner/x86-devicetable-Move-x86-specific-macro-out-of-generic-code/20200321-031729
-> >>> base: https://git.kernel.org/cgit/linux/kernel/git/rafael/linux-pm.git linux-next
-> >>>
-> >>> in testcase: will-it-scale
-> >>> on test machine: 4 threads Intel(R) Core(TM) i3-3220 CPU @ 3.30GHz with 8G memory
-> >>> with following parameters:
-> >>
-> >> drivers/cpufreq/speedstep-centrino.c change missed the terminator,
-> >> perhaps it's a culprit, because I don't believe removing dups and
-> >> reordering lines may affect this.
-> >> Can you restore terminator there and re-test?
-> >>
+
+* Masahiro Yamada <masahiroy@kernel.org> wrote:
+
+> > LGTM. I've got these four from Jason A. Donenfeld queued up in
+> > tip:WIP.x86/asm:
 > >
-> > I have retested with the change, but it has no effect on the performance.
+> >  bd5b1283e41c: ("crypto: Curve25519 - do not pollute dispatcher based on assembler")
+> >  829f32d78588: ("crypto: X86 - rework configuration, based on Kconfig")
+> >  95ef9f80ed63: ("x86/build: Probe assembler from Kconfig instead of Kbuild")
+> >  1651e700664b: ("x86: Fix bitops.h warning with a moved cast")
+> >
+> > I suppose these might interact (maybe even conflict), and are topically
+> > related.
+> >
+> > Would you like to pull these into the kbuild tree? You can find them in:
+> >
+> >    git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git WIP.x86/asm
+> >
+> > Thanks,
+> >
+> >         Ingo
 > 
-> Bah. The binary equivalence testing detected this, but I obvioulsy
-> missed it. Delta fix below.
 > 
-> Thanks,
+> I did not know that these had already landed in tip tree.
 > 
->         tglx
+> They are immature version.
+> (In fact CONFIG_AS_CFI and AS_ADX are false-negative
+> if GCC that defaults to 32-bit is used.)
 > 
-> 8<--------------
-> --- a/drivers/cpufreq/intel_pstate.c
-> +++ b/drivers/cpufreq/intel_pstate.c
-> @@ -2727,7 +2727,7 @@ static inline void intel_pstate_request_
->  
->  #define X86_MATCH_HWP(model, hwp_mode)					\
->  	X86_MATCH_VENDOR_FAM_MODEL_FEATURE(INTEL, 6, INTEL_FAM6_##model, \
-> -					   X86_FEATURE_APERFMPERF, hwp_mode)
-> +					   X86_FEATURE_HWP, hwp_mode)
->  
->  static const struct x86_cpu_id hwp_support_ids[] __initconst = {
->  	X86_MATCH_HWP(BROADWELL_X,	INTEL_PSTATE_HWP_BROADWELL),
+> Can you simply discard the WIP.x86/asm branch,
+> and only reapply
+> 1651e700664b: ("x86: Fix bitops.h warning with a moved cast")
+> 
+> ?
 
-Hi Thomas,
+Sure, done!
 
-The patch can fix the regression:
+In case you need any x86 maintainer acks for your series:
 
-commit: 
-  06c4d00466 ("cpufreq: Convert to new X86 CPU match macros")
-  d369f9be1a ("the fix patch")
+  Acked-by: Ingo Molnar <mingo@kernel.org>
 
-06c4d00466eb3748  d369f9be1ad1e22da4e8f03557  testcase/testparams/testbox
-----------------  --------------------------  ---------------------------
-         %stddev      change         %stddev
-             \          |                \  
-     93200             114%     199599        will-it-scale/performance-process-16-read2-ucode=0x21/lkp-ivb-d02
-     93200             114%     199599        GEO-MEAN will-it-scale.per_process_ops
+Thanks,
 
-Best Regards,
-Rong Chen
+	Ingo
