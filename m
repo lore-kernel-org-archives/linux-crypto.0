@@ -1,110 +1,167 @@
-Return-Path: <SRS0=nygc=5L=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=21Gj=5M=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8114EC43331
-	for <linux-crypto@archiver.kernel.org>; Thu, 26 Mar 2020 21:13:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B782C43331
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 Mar 2020 03:04:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 533DC2073E
-	for <linux-crypto@archiver.kernel.org>; Thu, 26 Mar 2020 21:13:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 727D32082D
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 Mar 2020 03:04:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1585257186;
-	bh=1HvFts9rQeuRzYxOlzyu9ed5O5MaRtckzVZ9rEw49+E=;
+	s=default; t=1585278264;
+	bh=1QaBX/TCVQartJ3XCSnS4hcC6ju0GnYBjA0EyGXhNwU=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=wcy2uANHyHbkGPR0Yjg9jOkz1wLNtVIuBX4AKtRpwjbiYrokQBu6DArPqCcqS+og1
-	 P/aHc5NJ7YLObp6RevC7VfMshj/eC0n+zsv4/GBIYLHlryRjqQv40VT1tHF9VQiELY
-	 64TdYa+ZTi2nyfD9g81cWHqfBvm6IV8gMQKgNwyM=
+	b=TQHRuSHYq5uQu0af1QfyyFOEM3otsARMswmGdqRSfhbqRfnwQdxPpBoCUY+eCY+6k
+	 Q4P3lODqopsVIcDeiYp3SYiJDZoB7RlezKvL3ZITDa3yt3NUXk1wJ/8NiZTprSUppl
+	 vE0+RhOUvI+cGGHCSVUAhVIyitrbfUH5k8Y4TmLI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727714AbgCZVNC (ORCPT
+        id S1727703AbgC0DEV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 26 Mar 2020 17:13:02 -0400
-Received: from conssluserg-04.nifty.com ([210.131.2.83]:20175 "EHLO
-        conssluserg-04.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727884AbgCZVNB (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 26 Mar 2020 17:13:01 -0400
-Received: from mail-ua1-f43.google.com (mail-ua1-f43.google.com [209.85.222.43]) (authenticated)
-        by conssluserg-04.nifty.com with ESMTP id 02QLCux3029921;
-        Fri, 27 Mar 2020 06:12:56 +0900
-DKIM-Filter: OpenDKIM Filter v2.10.3 conssluserg-04.nifty.com 02QLCux3029921
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
-        s=dec2015msa; t=1585257177;
-        bh=yUWTDQTSG+CELwmMJY3M4PyyjvvHxAi5WzaSE/lWqWs=;
+        Thu, 26 Mar 2020 23:04:21 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42534 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726496AbgC0DEU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 26 Mar 2020 23:04:20 -0400
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 57B8420A8B;
+        Fri, 27 Mar 2020 03:04:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1585278260;
+        bh=1QaBX/TCVQartJ3XCSnS4hcC6ju0GnYBjA0EyGXhNwU=;
         h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=02ax5uD7o97ywHVTM+BzqvV5KxZq7HYns7pOohZvn/H/gS5KFk5dbFbsxwdf2UO4S
-         1vqgsJtvu7G6cL6QxIOeeAfB7udsm/QfTFmvxTfuFM4wBO/O48Zk7DfzdkY6eJcLqZ
-         IYWMLO9qD356FZlV4oG/s8OoRqthhbrehJW26Vcszqfnjt/CzHVWfnd/4452UUWixv
-         BUNH6/d9yw/4kHTvTVnv/QzWGiv0H4p/k0G64hu8GCyt6Nv0WvyS4X5BxKhmC981/N
-         xLS1cNma8U/X2FiQX7Cf+UbsbUdRi74RlEOVV/aDPSaYzz5d/uHwb4vaz8fAJ8XJJ5
-         UsXN64bnn8b1A==
-X-Nifty-SrcIP: [209.85.222.43]
-Received: by mail-ua1-f43.google.com with SMTP id m18so2713958uap.9;
-        Thu, 26 Mar 2020 14:12:56 -0700 (PDT)
-X-Gm-Message-State: ANhLgQ1wJy6VNHDmUTF4zoy/Xjou+tK3TCuHIiyX+EJFSOELlH8aBnQ6
-        NSvXwmg20K8b+nlWxqc+Wf3RfcAIpcVyzrNXBhE=
-X-Google-Smtp-Source: ADFU+vt/pF+IMJk2I2eYB42/QwdxfxYfeO3mcmt/FNF9nUsRTsBXsBiH5xt4Zbky0X6BnYqInbOxR2tZvNrmVUvbcYI=
-X-Received: by 2002:a9f:28c5:: with SMTP id d63mr8552249uad.25.1585257175580;
- Thu, 26 Mar 2020 14:12:55 -0700 (PDT)
+        b=g3V4/S5yj0lkokrjq4rHn0YaOs5ktFQxGyBri6i9mLjh0c1xqkKhIao0TOazbBZSq
+         84E9NQfJ6lh/3VfY4GH7c4g9VxS8lbiPEUpO/xEZHNMYAlz9jR2eaDufUTrUFb89ap
+         E0Tlfdi5n3a+n5Qctfr8SHGWQZONpmPqCMGrQVYI=
+Received: by mail-qt1-f182.google.com with SMTP id m33so7502289qtb.3;
+        Thu, 26 Mar 2020 20:04:20 -0700 (PDT)
+X-Gm-Message-State: ANhLgQ2VxEIU5dlPF61a6ilq7N7voIXoaMD18r4RsryKpNUHE96d6N/u
+        /p48aB1klGYeGoGxnST56SbKYHubaDhMrWhEFA==
+X-Google-Smtp-Source: ADFU+vumdp+yoHmOndReHPe5KBTcIwfbcpwYm2SJv4vxq3LNPhVocpSd6D04SDQe+ewv6F3wC3JVyohcF8lQkB31Pr8=
+X-Received: by 2002:aed:3461:: with SMTP id w88mr12145077qtd.143.1585278259310;
+ Thu, 26 Mar 2020 20:04:19 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200326080104.27286-1-masahiroy@kernel.org> <CAHmME9pnAvgErYkcvvdakvfMY8ZGKfwHHNYzpVtJ913Tgp16CQ@mail.gmail.com>
- <20200326092213.GA100918@gmail.com> <CAK7LNAQ7-wpm+g=cXeJ01vGrO1nVjfP-ornKm=SXoDEn4x+DjQ@mail.gmail.com>
- <CAHmME9qnWWYV+eWVmx2yoADB9oecZKj=UgLkdSHe_=MnxedtSQ@mail.gmail.com>
-In-Reply-To: <CAHmME9qnWWYV+eWVmx2yoADB9oecZKj=UgLkdSHe_=MnxedtSQ@mail.gmail.com>
-From:   Masahiro Yamada <masahiroy@kernel.org>
-Date:   Fri, 27 Mar 2020 06:12:19 +0900
-X-Gmail-Original-Message-ID: <CAK7LNAQNx0TxWGCzNM-2JqfEJuyDKnLMcqJv8Be_9_Ty5wv5Lg@mail.gmail.com>
-Message-ID: <CAK7LNAQNx0TxWGCzNM-2JqfEJuyDKnLMcqJv8Be_9_Ty5wv5Lg@mail.gmail.com>
-Subject: Re: [PATCH v2 00/16] x86, crypto: remove always-defined CONFIG_AS_*
- and cosolidate Kconfig/Makefiles
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     Nick Desaulniers <ndesaulniers@google.com>,
-        Ingo Molnar <mingo@kernel.org>,
-        Linux Kbuild mailing list <linux-kbuild@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Borislav Petkov <bp@alien8.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        "H . Peter Anvin" <hpa@zytor.com>, X86 ML <x86@kernel.org>,
-        clang-built-linux <clang-built-linux@googlegroups.com>,
-        Daniel Vetter <daniel@ffwll.ch>,
-        David Airlie <airlied@linux.ie>,
-        "David S. Miller" <davem@davemloft.net>,
+References: <1585114871-6912-1-git-send-email-hadar.gat@arm.com>
+ <1585114871-6912-2-git-send-email-hadar.gat@arm.com> <20200326194104.GA4118@bogus>
+ <DB6PR0802MB25334E308B8D4B10D2562460E9CF0@DB6PR0802MB2533.eurprd08.prod.outlook.com>
+In-Reply-To: <DB6PR0802MB25334E308B8D4B10D2562460E9CF0@DB6PR0802MB2533.eurprd08.prod.outlook.com>
+From:   Rob Herring <robh@kernel.org>
+Date:   Thu, 26 Mar 2020 21:04:07 -0600
+X-Gmail-Original-Message-ID: <CAL_Jsq+KJyZLncOTB8CwgjvRQvkgc+8=hqHKA87aJ4LoYYXnvQ@mail.gmail.com>
+Message-ID: <CAL_Jsq+KJyZLncOTB8CwgjvRQvkgc+8=hqHKA87aJ4LoYYXnvQ@mail.gmail.com>
+Subject: Re: [PATCH v6 1/3] dt-bindings: add device tree binding for Arm
+ CryptoCell trng engine
+To:     Hadar Gat <Hadar.Gat@arm.com>
+Cc:     Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Ingo Molnar <mingo@redhat.com>,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Jim Kukunas <james.t.kukunas@linux.intel.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Joonas Lahtinen <joonas.lahtinen@linux.intel.com>,
-        NeilBrown <neilb@suse.de>, Rodrigo Vivi <rodrigo.vivi@intel.com>,
-        Yuanhan Liu <yuanhan.liu@linux.intel.com>,
-        dri-devel <dri-devel@lists.freedesktop.org>,
-        intel-gfx@lists.freedesktop.org,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+        Mark Rutland <Mark.Rutland@arm.com>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Alexander Sverdlin <alexander.sverdlin@nokia.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Tomer Maimon <tmaimon77@gmail.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Zaibo Xu <xuzaibo@huawei.com>,
+        Daniel Thompson <daniel.thompson@linaro.org>,
+        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Ofir Drang <Ofir.Drang@arm.com>, nd <nd@arm.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Mar 27, 2020 at 5:46 AM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
+On Thu, Mar 26, 2020 at 3:05 PM Hadar Gat <Hadar.Gat@arm.com> wrote:
 >
-> On Thu, Mar 26, 2020 at 2:44 PM Masahiro Yamada <masahiroy@kernel.org> wrote:
-> > I collected more Reviewed-by and Acked-by,
-> > then pushed this series to
+> Hi Rob,
+>
 > >
-> > git://git.kernel.org/pub/scm/linux/kernel/git/masahiroy/linux-kbuild.git
-> > kbuild-asinstr
->
-> But not the version of the penultimate patch that Nick ack'd....
+> > On Wed, Mar 25, 2020 at 07:41:09AM +0200, Hadar Gat wrote:
+> > > The Arm CryptoCell is a hardware security engine. This patch adds DT
+> > > bindings for its TRNG (True Random Number Generator) engine.
+> > >
+> > > Signed-off-by: Hadar Gat <hadar.gat@arm.com>
+> > > ---
+> > >  .../devicetree/bindings/rng/arm-cctrng.yaml        | 55
+> > ++++++++++++++++++++++
+> > >  1 file changed, 55 insertions(+)
+> > >  create mode 100644
+> > > Documentation/devicetree/bindings/rng/arm-cctrng.yaml
+> > >
+> > > diff --git a/Documentation/devicetree/bindings/rng/arm-cctrng.yaml
+> > > b/Documentation/devicetree/bindings/rng/arm-cctrng.yaml
+> > > new file mode 100644
+> > > index 0000000..7f70e4b
+> > > --- /dev/null
+> > > +++ b/Documentation/devicetree/bindings/rng/arm-cctrng.yaml
+> > > @@ -0,0 +1,55 @@
+> > > +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause) %YAML 1.2
+> > > +---
+> > > +$id: http://devicetree.org/schemas/rng/arm-cctrng.yaml#
+> > > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > > +
+> > > +title: Arm TrustZone CryptoCell TRNG engine
+> > > +
+> > > +maintainers:
+> > > +  - Hadar Gat <hadar.gat@arm.com>
+> > > +
+> > > +description: |+
+> > > +  Arm TrustZone CryptoCell TRNG (True Random Number Generator)
+> > engine.
+> > > +
+> > > +properties:
+> > > +  compatible:
+> > > +    enum:
+> > > +      - arm,cryptocell-713-trng
+> > > +      - arm,cryptocell-703-trng
+> > > +
+> > > +  interrupts:
+> > > +    maxItems: 1
+> > > +
+> > > +  reg:
+> > > +    maxItems: 1
+> > > +
+> > > +  arm,rosc-ratio:
+> > > +    description:
+> > > +      Arm TrustZone CryptoCell TRNG engine has 4 ring oscillators.
+> > > +      Sampling ratio values for these 4 ring oscillators. (from calibration)
+> > > +    allOf:
+> > > +      - $ref: /schemas/types.yaml#/definitions/uint32-array
+> > > +      - items:
+> > > +          minItems: 4
+> > > +          maxItems: 4
+> >
+> > Aren't there some constraints on the values?
+> >
+> > If not, then just this is enough:
+> >
+> > - maxItems: 4
+> >
+> The constraint is just on the array size and not on the values.
+> The array is of 4 elements for the CryptoCell 4 ring oscillators.
+> Isn't 'minitems:' is about the array min size? Isn't it the way to block less than 4 items? This is what I want to do.
+> I'm a bit confused if it is required or not..
 
-Dropped Nick's Reviewed-by.
+Essentially, we always require bounds on the array size, so if you
+only specify one of minItems or maxItems it's implied to be a fixed
+size. IOW, you only have to specify both if you have a variable number
+of items. Also, note that an 'items' list implies the exact size. Both
+of these are not the default behavior for json-schema.
 
+Hope that helps.
 
--- 
-Best Regards
-Masahiro Yamada
+Rob
