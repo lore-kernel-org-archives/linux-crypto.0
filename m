@@ -6,69 +6,53 @@ X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4432C2D0E7
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 Mar 2020 04:44:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6BA0C43331
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 Mar 2020 04:54:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 93BDF20675
-	for <linux-crypto@archiver.kernel.org>; Fri, 27 Mar 2020 04:44:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B9F32206DB
+	for <linux-crypto@archiver.kernel.org>; Fri, 27 Mar 2020 04:54:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726217AbgC0Eo1 (ORCPT
+        id S1726149AbgC0EyQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 27 Mar 2020 00:44:27 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:57000 "EHLO fornost.hmeau.com"
+        Fri, 27 Mar 2020 00:54:16 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:57054 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726071AbgC0Eo1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 27 Mar 2020 00:44:27 -0400
+        id S1726096AbgC0EyQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 27 Mar 2020 00:54:16 -0400
 Received: from gwarestrin.me.apana.org.au ([192.168.0.7] helo=gwarestrin.arnor.me.apana.org.au)
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1jHgqi-00004t-IG; Fri, 27 Mar 2020 15:44:05 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Mar 2020 15:44:04 +1100
-Date:   Fri, 27 Mar 2020 15:44:04 +1100
+        id 1jHh0T-0000BP-L3; Fri, 27 Mar 2020 15:54:10 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Fri, 27 Mar 2020 15:54:09 +1100
+Date:   Fri, 27 Mar 2020 15:54:09 +1100
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Iuliana Prodan <iuliana.prodan@nxp.com>
-Cc:     Baolin Wang <baolin.wang@linaro.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Silvano Di Ninno <silvano.dininno@nxp.com>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>
-Subject: Re: [PATCH v4 1/2] crypto: engine - support for parallel requests
-Message-ID: <20200327044404.GA12318@gondor.apana.org.au>
-References: <1583707893-23699-1-git-send-email-iuliana.prodan@nxp.com>
- <1583707893-23699-2-git-send-email-iuliana.prodan@nxp.com>
- <20200312032553.GB19920@gondor.apana.org.au>
- <AM0PR04MB71710B3535153286D9F31F8B8CFD0@AM0PR04MB7171.eurprd04.prod.outlook.com>
- <20200317032924.GB18743@gondor.apana.org.au>
- <VI1PR0402MB3712DC09FC02FBE215006C5B8CF60@VI1PR0402MB3712.eurprd04.prod.outlook.com>
+To:     Ayush Sawal <ayush.sawal@chelsio.com>
+Cc:     linux-crypto@vger.kernel.org, manojmalviya@chelsio.com
+Subject: Re: [PATCH Crypto 0/2] Fixes issues during driver registration
+Message-ID: <20200327045409.GA19912@gondor.apana.org.au>
+References: <20200316060318.20896-1-ayush.sawal@chelsio.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <VI1PR0402MB3712DC09FC02FBE215006C5B8CF60@VI1PR0402MB3712.eurprd04.prod.outlook.com>
+In-Reply-To: <20200316060318.20896-1-ayush.sawal@chelsio.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Mar 17, 2020 at 01:08:18PM +0000, Iuliana Prodan wrote:
+On Mon, Mar 16, 2020 at 11:33:16AM +0530, Ayush Sawal wrote:
+> Patch 1: Avoid the accessing of wrong u_ctx pointer.
+> Patch 2: Fixes a deadlock between rtnl_lock and uld_mutex.
 > 
-> This case can happen right now, also. I can't guarantee that all drivers 
-> send all requests via crypto-engine.
+> Ayush Sawal (2):
+>   chcr: Fixes a hang issue during driver registration
+>   chcr: Fixes a deadlock between rtnl_lock and uld_mutex
+> 
+>  drivers/crypto/chelsio/chcr_core.c  | 34 +++++++++++++++++++++++------
+>  drivers/crypto/chelsio/chcr_ipsec.c |  2 --
+>  2 files changed, 27 insertions(+), 9 deletions(-)
 
-I think this is something that we should address.  If a driver
-is going to use crypto_engine then really all requests should go
-through that.  IOW, we should have a one-to-one relationship between
-engines and hardware.
-
-Thanks,
+All applied.  Thanks.
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
