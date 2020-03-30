@@ -1,84 +1,146 @@
-Return-Path: <SRS0=ZwPv=5N=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=TSvm=5P=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.7 required=3.0 tests=DATE_IN_PAST_96_XX,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E24D8C2D0F2
-	for <linux-crypto@archiver.kernel.org>; Sat, 28 Mar 2020 16:43:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EF41C2D0E9
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Mar 2020 00:42:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B97B620748
-	for <linux-crypto@archiver.kernel.org>; Sat, 28 Mar 2020 16:43:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E6D5F208E4
+	for <linux-crypto@archiver.kernel.org>; Mon, 30 Mar 2020 00:42:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="FWuUrmSw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727582AbgC1QnX (ORCPT
+        id S1727755AbgC3AmQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 28 Mar 2020 12:43:23 -0400
-Received: from mx.sdf.org ([205.166.94.20]:50174 "EHLO mx.sdf.org"
+        Sun, 29 Mar 2020 20:42:16 -0400
+Received: from ozlabs.org ([203.11.71.1]:36583 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727486AbgC1QnV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 28 Mar 2020 12:43:21 -0400
-Received: from sdf.org (IDENT:lkml@sdf.lonestar.org [205.166.94.16])
-        by mx.sdf.org (8.15.2/8.14.5) with ESMTPS id 02SGhGwk005450
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits) verified NO);
-        Sat, 28 Mar 2020 16:43:16 GMT
-Received: (from lkml@localhost)
-        by sdf.org (8.15.2/8.12.8/Submit) id 02SGhGKO009144;
-        Sat, 28 Mar 2020 16:43:16 GMT
-Message-Id: <202003281643.02SGhGKO009144@sdf.org>
-From:   George Spelvin <lkml@sdf.org>
-Date:   Wed, 27 Mar 2019 07:56:49 -0400
-Subject: [RFC PATCH v1 24/50] crypto4xx_core: Use more appropriate seed for
- PRNG
-To:     linux-kernel@vger.kernel.org, lkml@sdf.org
-Cc:     James Hsiao <jhsiao@amcc.com>,
-        Christian Lamparter <chunkeey@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        linux-crypto@vger.kernel.org
+        id S1727612AbgC3AmP (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 29 Mar 2020 20:42:15 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 48rDDz6MhVz9sPR;
+        Mon, 30 Mar 2020 11:42:11 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1585528933;
+        bh=B8g4PRJs5T7Ukzd8/GATXCt5GgL5C9WTKDYNobskixI=;
+        h=Date:From:To:Cc:Subject:From;
+        b=FWuUrmSwHX8w33pVQE9Y7fCySl2ycaPHMXPTPSvXApgtRJY+gZ8NAYSy2FLeD6v+R
+         qiSRX6HB4u8bjYj/XDyj1MXHVco03AsqT9C/SQNPiE4n12wnUUu7kdfnPfV2tRtOa4
+         b+lBTzSLhwYdiCTKLIJ//ZIWrW9ZD+v4JHwlRj9vnMPRliFNCc9uJNaeHD8bmiNdA/
+         SjhKe5rx2B9FkXCpvLvIYzwaa6LC7Jf4D2H9xGMUOw3VB+6FhkA+mlXjvDgM1RDqLJ
+         tJ1yutxNGupoD+F9xe4soswNhcOb+ZB0GccMSyEUVxY0AVBva3Mss6xb24zS8n9WvU
+         CfA+L6bbFygQQ==
+Date:   Mon, 30 Mar 2020 11:42:09 +1100
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>,
+        David Miller <davem@davemloft.net>,
+        Networking <netdev@vger.kernel.org>
+Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Rohit Maheshwari <rohitm@chelsio.com>,
+        Ayush Sawal <ayush.sawal@chelsio.com>
+Subject: linux-next: manual merge of the crypto tree with the net-next tree
+Message-ID: <20200330114209.1c7d5d11@canb.auug.org.au>
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/qU/dK2yDyZMdgSQ7Jl4PJ7B";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-A PRNG doesn't need the full security guarantees of
-get_random_bytes() (and a 64-bit seed can be brute-forced
-anyway); get_random_u32() is quite sufficient.
+--Sig_/qU/dK2yDyZMdgSQ7Jl4PJ7B
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: George Spelvin <lkml@sdf.org>
-Cc: James Hsiao <jhsiao@amcc.com>
-Cc: Christian Lamparter <chunkeey@gmail.com>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: linux-crypto@vger.kernel.org
----
- drivers/crypto/amcc/crypto4xx_core.c | 7 ++-----
- 1 file changed, 2 insertions(+), 5 deletions(-)
+Hi all,
 
-diff --git a/drivers/crypto/amcc/crypto4xx_core.c b/drivers/crypto/amcc/crypto4xx_core.c
-index 7d6b695c4ab3f..0fc41ffe3ff9a 100644
---- a/drivers/crypto/amcc/crypto4xx_core.c
-+++ b/drivers/crypto/amcc/crypto4xx_core.c
-@@ -53,7 +53,6 @@ static void crypto4xx_hw_init(struct crypto4xx_device *dev)
- 	union ce_ring_control ring_ctrl;
- 	union ce_part_ring_size part_ring_size;
- 	union ce_io_threshold io_threshold;
--	u32 rand_num;
- 	union ce_pe_dma_cfg pe_dma_cfg;
- 	u32 device_ctrl;
- 
-@@ -79,10 +78,8 @@ static void crypto4xx_hw_init(struct crypto4xx_device *dev)
- 	writel(dev->pdr_pa, dev->ce_base + CRYPTO4XX_PDR_BASE);
- 	writel(dev->pdr_pa, dev->ce_base + CRYPTO4XX_RDR_BASE);
- 	writel(PPC4XX_PRNG_CTRL_AUTO_EN, dev->ce_base + CRYPTO4XX_PRNG_CTRL);
--	get_random_bytes(&rand_num, sizeof(rand_num));
--	writel(rand_num, dev->ce_base + CRYPTO4XX_PRNG_SEED_L);
--	get_random_bytes(&rand_num, sizeof(rand_num));
--	writel(rand_num, dev->ce_base + CRYPTO4XX_PRNG_SEED_H);
-+	writel(get_random_u32(), dev->ce_base + CRYPTO4XX_PRNG_SEED_L);
-+	writel(get_random_u32(), dev->ce_base + CRYPTO4XX_PRNG_SEED_H);
- 	ring_size.w = 0;
- 	ring_size.bf.ring_offset = PPC4XX_PD_SIZE;
- 	ring_size.bf.ring_size   = PPC4XX_NUM_PD;
--- 
-2.26.0
+Today's linux-next merge of the crypto tree got a conflict in:
 
+  drivers/crypto/chelsio/chcr_core.c
+
+between commit:
+
+  34aba2c45024 ("cxgb4/chcr : Register to tls add and del callback")
+
+from the net-next tree and commit:
+
+  53351bb96b6b ("crypto: chelsio/chcr - Fixes a deadlock between rtnl_lock =
+and uld_mutex")
+
+from the crypto tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc drivers/crypto/chelsio/chcr_core.c
+index 0015810214a9,7e24c4881c34..000000000000
+--- a/drivers/crypto/chelsio/chcr_core.c
++++ b/drivers/crypto/chelsio/chcr_core.c
+@@@ -35,12 -35,12 +35,16 @@@ static int chcr_uld_state_change(void *
+ =20
+  static chcr_handler_func work_handlers[NUM_CPL_CMDS] =3D {
+  	[CPL_FW6_PLD] =3D cpl_fw6_pld_handler,
+ +#ifdef CONFIG_CHELSIO_TLS_DEVICE
+ +	[CPL_ACT_OPEN_RPL] =3D chcr_ktls_cpl_act_open_rpl,
+ +	[CPL_SET_TCB_RPL] =3D chcr_ktls_cpl_set_tcb_rpl,
+ +#endif
+  };
+ =20
++ #ifdef CONFIG_CHELSIO_IPSEC_INLINE
++ static void update_netdev_features(void);
++ #endif /* CONFIG_CHELSIO_IPSEC_INLINE */
++=20
+  static struct cxgb4_uld_info chcr_uld_info =3D {
+  	.name =3D DRV_MODULE_NAME,
+  	.nrxq =3D MAX_ULD_QSETS,
+@@@ -204,15 -204,6 +207,11 @@@ static void *chcr_uld_add(const struct=20
+  	}
+  	u_ctx->lldi =3D *lld;
+  	chcr_dev_init(u_ctx);
+- #ifdef CONFIG_CHELSIO_IPSEC_INLINE
+- 	if (lld->crypto & ULP_CRYPTO_IPSEC_INLINE)
+- 		chcr_add_xfrmops(lld);
+- #endif /* CONFIG_CHELSIO_IPSEC_INLINE */
+ +
+ +#ifdef CONFIG_CHELSIO_TLS_DEVICE
+ +	if (lld->ulp_crypto & ULP_CRYPTO_KTLS_INLINE)
+ +		chcr_enable_ktls(padap(&u_ctx->dev));
+ +#endif
+  out:
+  	return u_ctx;
+  }
+
+--Sig_/qU/dK2yDyZMdgSQ7Jl4PJ7B
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl6BQGEACgkQAVBC80lX
+0Gy00Af7B/b3nw/o6e9EgWEMNQxR9lOCdBNHvqWAAJNvrfmCBzVywCrYNm+uhPav
+6n0SU54O7MdSkvL5pJZKjCMQmAYqZw54qzEwMo0JDddvTd5kvrIF/wIK8GFA0zBF
+5aVe7R+IIeRSALpt65TMCptq6h+mRruorPhii7ugeOvRLcwLeSoLis/3BgsqrJ7x
+S/9dDG9rivrKDudiXqLmkTvklRvhH+KcJM8TmtDXzN+b7bQzksa1SA2YcEv6rUNN
+fDUThDqFBQ/yxF9IeD90SiQlnr9cF8Ux0iP1oKyp0dNNNAUF+Pwfc6mOkemZrev1
+Pl8TJbuZl7IeIpSX/ftIgvUvqFVkcQ==
+=J2Dh
+-----END PGP SIGNATURE-----
+
+--Sig_/qU/dK2yDyZMdgSQ7Jl4PJ7B--
