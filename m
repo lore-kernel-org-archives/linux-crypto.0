@@ -2,126 +2,128 @@ Return-Path: <SRS0=uha7=5Q=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C34DC43331
-	for <linux-crypto@archiver.kernel.org>; Tue, 31 Mar 2020 12:54:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55DF4C2D0EF
+	for <linux-crypto@archiver.kernel.org>; Tue, 31 Mar 2020 19:35:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id BC37A208E4
-	for <linux-crypto@archiver.kernel.org>; Tue, 31 Mar 2020 12:54:21 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="datYa4by"
+	by mail.kernel.org (Postfix) with ESMTP id 3B6112080C
+	for <linux-crypto@archiver.kernel.org>; Tue, 31 Mar 2020 19:35:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730617AbgCaMyV (ORCPT
+        id S1728492AbgCaTfQ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 31 Mar 2020 08:54:21 -0400
-Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.160]:18283 "EHLO
-        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1730604AbgCaMyU (ORCPT
+        Tue, 31 Mar 2020 15:35:16 -0400
+Received: from mail-io1-f69.google.com ([209.85.166.69]:37487 "EHLO
+        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727830AbgCaTfP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 31 Mar 2020 08:54:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1585659259;
-        s=strato-dkim-0002; d=chronox.de;
-        h=Message-ID:Date:Subject:To:From:X-RZG-CLASS-ID:X-RZG-AUTH:From:
-        Subject:Sender;
-        bh=O+n33gjulUEA+3+JRW5G+8jein/qCQrpZR1NMDiokkg=;
-        b=datYa4byzIcKpOXGrPPzbJp7xupIybV55QO8qJXo1sFKQ67OYIVMDmqzjd27YbPh/i
-        DcOet3FJSo6K+z/Ly4Arp3GjvSUzm6hD0fo4PykoUuLiDglR+nnUOE23lrOntfg0/4NK
-        dhBYDuGTIgsSfI2FaeYIqImZmQHXcfh7tsMAZ2UjksIlkPqm7Wr//6XIDmIuxXCTchE6
-        1qS7gCrklJcUYdXqNLTtYwNzcXZVoqtDtA2H5nSXzEFY9aszQdlcmvxZtUWQDUGsvsLl
-        T7EbpdKnTIBQEp1riARqC+g3JMcU4BEL7YvScPTwWZ4aUSD/TUP59dCkNX+9qL8i9pnw
-        4Sag==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaJ/SfQ46x"
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-        by smtp.strato.de (RZmta 46.2.1 DYNA|AUTH)
-        with ESMTPSA id q0554fw2VCmGNAI
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate)
-        for <linux-crypto@vger.kernel.org>;
-        Tue, 31 Mar 2020 14:48:16 +0200 (CEST)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Linux Crypto List <linux-crypto@vger.kernel.org>
-Subject: POWER8 BE: NX crypto driver caused oops
-Date:   Tue, 31 Mar 2020 14:48:15 +0200
-Message-ID: <6610324.mVlmhZnPjZ@tauon.chronox.de>
+        Tue, 31 Mar 2020 15:35:15 -0400
+Received: by mail-io1-f69.google.com with SMTP id p4so20140057ioo.4
+        for <linux-crypto@vger.kernel.org>; Tue, 31 Mar 2020 12:35:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=2lew1a0pD6ctFtAcsbPWqwFLxKM5Fc4DIihP/2hJOgM=;
+        b=iJ/r9/41eVWtdpD8atavNjWCjaDzr3k7bdJC+X1VIhV+w+1nzaRShns/Y5JpmBtHxQ
+         2Qe8UXuAHb6me7cqaUmk2t2v8Uat41O7/Kpw3a7kiaeKwLJ+KKo4A+8bKWJ2v3KCqnxv
+         mCU/ow9UwAsPnSE5NXClJvi9jVCRRBjHaEiQv0ZvRT7kPyNoEz0MKK2kN8QBvwP9oZAY
+         F2wEmBgKNlS2ud4sfXMZqnPGFNPk39PJ/er2VMU610ZVJnnc7bUTsM1YCdgqLWb2mFmx
+         AX+mcfKFjzp6uBh1GsckZCuuxO7kLeizjtkk0p5JJC0mcad/QR4nyqMk7xEQRxD/5r/5
+         wWnQ==
+X-Gm-Message-State: ANhLgQ3V/YuOVNB6nTMtVrcVN5bCoX6eWnjQv+0qYtgRQeTpEV4SPiQb
+        yyvs4NKk+UFBeviEuAkGDb9WodlbrDjob79ajc5cpzePI95Z
+X-Google-Smtp-Source: ADFU+vtkND+tSDYyT9HIoKmY2lYsK3oP0SYPitgI/bMPIaOrmyf/BeUZRdmqTf4KEf7YXQRx5jYW3KzV4EPlQvZW1H505116gC8s
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+X-Received: by 2002:a02:9a18:: with SMTP id b24mr17919080jal.110.1585683313284;
+ Tue, 31 Mar 2020 12:35:13 -0700 (PDT)
+Date:   Tue, 31 Mar 2020 12:35:13 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000009d5cef05a22baa95@google.com>
+Subject: KCSAN: data-race in glue_cbc_decrypt_req_128bit / glue_cbc_decrypt_req_128bit
+From:   syzbot <syzbot+6a6bca8169ffda8ce77b@syzkaller.appspotmail.com>
+To:     bp@alien8.de, davem@davemloft.net, elver@google.com,
+        herbert@gondor.apana.org.au, hpa@zytor.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        mingo@redhat.com, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi,
+Hello,
 
-with a 5.5 vanilla kernel, I got the following crash in the NX crypto driver 
-on a POWER8 BE system.
+syzbot found the following crash on:
 
-When compiling out the NX driver, the boot is successful.
+HEAD commit:    b12d66a6 mm, kcsan: Instrument SLAB free with ASSERT_EXCLU..
+git tree:       https://github.com/google/ktsan.git kcsan
+console output: https://syzkaller.appspot.com/x/log.txt?x=111f0865e00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=10bc0131c4924ba9
+dashboard link: https://syzkaller.appspot.com/bug?extid=6a6bca8169ffda8ce77b
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
 
-[    5.233403] pseries_rng: Registering IBM pSeries RNG driver
-[    5.291347] BUG: Unable to handle kernel data access on read at 0x0488a000
-[    5.291360] Faulting instruction address: 0xc0000000000b3530
-[    5.291365] Oops: Kernel access of bad area, sig: 11 [#1]
-[    5.291370] BE PAGE_SIZE=64K MMU=Hash SMP NR_CPUS=2048 NUMA pSeries
-[    5.291375] Modules linked in: nx_crypto(+) pseries_rng
-vmx_crypto(+) ip_tables xfs libcrc32c sd_mod ibmvscsi ibmveth
-scsi_transport_srp dm_mirror dm_region_hash dm_log dm_mod
-[    5.291392] CPU: 2 PID: 933 Comm: cryptomgr_test Not tainted 5.5.0 #1
-[    5.291396] NIP:  c0000000000b3530 LR: c00000000036e84c CTR: 
-0000000000000200
-[    5.291401] REGS: c0000005f9bbb620 TRAP: 0380   Not tainted  (5.5.0)
-[    5.291405] MSR:  800000010280b032
-<SF,VEC,VSX,EE,FP,ME,IR,DR,RI,TM[E]>  CR: 44008420  XER: 20000010
-[    5.291415] CFAR: c0000000000b34ec IRQMASK: 0
-[    5.291415] GPR00: 0000000000000200 c0000005f9bbb8b0
-c0000000018e6c00 000000000488a000
-[    5.291415] GPR04: 0000000000000000 0000000000000000
-000000000488a000 0000000000000000
-[    5.291415] GPR08: 0000000000000000 c0000005f901d700
-0000000000000000 c008000001565f80
-[    5.291415] GPR12: c00000000036e810 c00000001ecad600
-c000000000170e10 c0000005f7331f00
-[    5.291415] GPR16: 0000000000000000 0000000000000000
-0000000000000000 0000000000000000
-[    5.291415] GPR20: 0000000000000000 0000000000000000
-c000000001896ec8 c00000000d0b9c00
-[    5.291415] GPR24: 0000000000000400 c000000000c2fec8
-0000000000000000 c00000000ce3da28
-[    5.291415] GPR28: c00000000d178800 c00000000ce3da00
-c00000000ce3da28 000000000488a000
-[    5.291461] NIP [c0000000000b3530] .memset+0x68/0x104
-[    5.291466] LR [c00000000036e84c] .kzfree+0x3c/0x60
-[    5.291469] Call Trace:
-[    5.291473] [c0000005f9bbb8b0] [c00000000036e83c] .kzfree+0x2c/0x60
-(unreliable)
-[    5.291482] [c0000005f9bbb930] [c008000001561a44]
-.nx_crypto_ctx_skcipher_exit+0x24/0x50 [nx_crypto]
-[    5.291490] [c0000005f9bbb9b0] [c0000000005b8e5c]
-.crypto_skcipher_exit_tfm+0x3c/0x60
-[    5.291496] [c0000005f9bbba30] [c0000000005b3424]
-.crypto_destroy_tfm+0x74/0x150
-[    5.291502] [c0000005f9bbbac0] [c0000000005c6724]
-.alg_test_skcipher+0xe4/0x1c0
-[    5.291508] [c0000005f9bbbb70] [c0000000005c36bc] .alg_test+0x49c/0x590
-[    5.291513] [c0000005f9bbbce0] [c0000000005c1df4] .cryptomgr_test+0x64/0x70
-[    5.291519] [c0000005f9bbbd60] [c000000000170f60] .kthread+0x150/0x190
-[    5.291526] [c0000005f9bbbe20] [c00000000000b644]
-.ret_from_kernel_thread+0x58/0x74
-[    5.291530] Instruction dump:
-[    5.291534] 409e000c b0860000 38c60002 409d000c 90860000 38c60004
-78a0d183 78a506a0
-[    5.291541] 7c0903a6 41820034 60000000 60000000 <f8860000> f8860008
-f8860010 f8860018
-[    5.291551] ---[ end trace 06547fcdb2cf5b98 ]---
-[    5.295565]
-[    5.306315] sd 0:0:1:0: Attached scsi generic sg0 type 0
-[    6.295575] Kernel panic - not syncing: Fatal exception
+Unfortunately, I don't have any reproducer for this crash yet.
 
-Ciao
-Stephan
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+6a6bca8169ffda8ce77b@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KCSAN: data-race in glue_cbc_decrypt_req_128bit / glue_cbc_decrypt_req_128bit
+
+write to 0xffff88809966e128 of 8 bytes by task 24119 on cpu 0:
+ u128_xor include/crypto/b128ops.h:67 [inline]
+ glue_cbc_decrypt_req_128bit+0x396/0x460 arch/x86/crypto/glue_helper.c:144
+ cbc_decrypt+0x26/0x40 arch/x86/crypto/serpent_avx2_glue.c:152
+ crypto_skcipher_decrypt+0x65/0x90 crypto/skcipher.c:652
+ _skcipher_recvmsg crypto/algif_skcipher.c:142 [inline]
+ skcipher_recvmsg+0x7fa/0x8c0 crypto/algif_skcipher.c:161
+ skcipher_recvmsg_nokey+0x5e/0x80 crypto/algif_skcipher.c:279
+ sock_recvmsg_nosec net/socket.c:886 [inline]
+ sock_recvmsg net/socket.c:904 [inline]
+ sock_recvmsg+0x92/0xb0 net/socket.c:900
+ ____sys_recvmsg+0x167/0x3a0 net/socket.c:2566
+ ___sys_recvmsg+0xb2/0x100 net/socket.c:2608
+ __sys_recvmsg+0x9d/0x160 net/socket.c:2642
+ __do_sys_recvmsg net/socket.c:2652 [inline]
+ __se_sys_recvmsg net/socket.c:2649 [inline]
+ __x64_sys_recvmsg+0x51/0x70 net/socket.c:2649
+ do_syscall_64+0xcc/0x3a0 arch/x86/entry/common.c:294
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+
+read to 0xffff88809966e128 of 8 bytes by task 24118 on cpu 1:
+ u128_xor include/crypto/b128ops.h:67 [inline]
+ glue_cbc_decrypt_req_128bit+0x37c/0x460 arch/x86/crypto/glue_helper.c:144
+ cbc_decrypt+0x26/0x40 arch/x86/crypto/serpent_avx2_glue.c:152
+ crypto_skcipher_decrypt+0x65/0x90 crypto/skcipher.c:652
+ _skcipher_recvmsg crypto/algif_skcipher.c:142 [inline]
+ skcipher_recvmsg+0x7fa/0x8c0 crypto/algif_skcipher.c:161
+ skcipher_recvmsg_nokey+0x5e/0x80 crypto/algif_skcipher.c:279
+ sock_recvmsg_nosec net/socket.c:886 [inline]
+ sock_recvmsg net/socket.c:904 [inline]
+ sock_recvmsg+0x92/0xb0 net/socket.c:900
+ ____sys_recvmsg+0x167/0x3a0 net/socket.c:2566
+ ___sys_recvmsg+0xb2/0x100 net/socket.c:2608
+ __sys_recvmsg+0x9d/0x160 net/socket.c:2642
+ __do_sys_recvmsg net/socket.c:2652 [inline]
+ __se_sys_recvmsg net/socket.c:2649 [inline]
+ __x64_sys_recvmsg+0x51/0x70 net/socket.c:2649
+ do_syscall_64+0xcc/0x3a0 arch/x86/entry/common.c:294
+ entry_SYSCALL_64_after_hwframe+0x44/0xa9
+
+Reported by Kernel Concurrency Sanitizer on:
+CPU: 1 PID: 24118 Comm: syz-executor.1 Not tainted 5.6.0-rc1-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+==================================================================
 
 
+---
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
