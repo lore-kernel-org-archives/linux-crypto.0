@@ -2,71 +2,101 @@ Return-Path: <SRS0=/HXT=5R=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2BFCC43331
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Apr 2020 22:54:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 217F2C43331
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Apr 2020 23:10:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A7DDA2071A
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Apr 2020 22:54:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 02FE0206F8
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Apr 2020 23:10:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2389588AbgDAWy1 (ORCPT
+        id S2387497AbgDAXKW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Apr 2020 18:54:27 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:42432 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389578AbgDAWy0 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Apr 2020 18:54:26 -0400
-Received: from gwarestrin.me.apana.org.au ([192.168.0.7] helo=gwarestrin.arnor.me.apana.org.au)
-        by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1jJmFM-0004QW-J5; Thu, 02 Apr 2020 09:54:09 +1100
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 02 Apr 2020 09:54:08 +1100
-Date:   Thu, 2 Apr 2020 09:54:08 +1100
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     YueHaibing <yuehaibing@huawei.com>
-Cc:     ayush.sawal@chelsio.com, vinay.yadav@chelsio.com,
-        rohitm@chelsio.com, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] crypto: chtls - Fix build error without IPV6
-Message-ID: <20200401225408.GB16019@gondor.apana.org.au>
-References: <20200401120909.8960-1-yuehaibing@huawei.com>
+        Wed, 1 Apr 2020 19:10:22 -0400
+Received: from youngberry.canonical.com ([91.189.89.112]:48304 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1732537AbgDAXKW (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 1 Apr 2020 19:10:22 -0400
+Received: from 1.general.cking.uk.vpn ([10.172.193.212] helo=localhost)
+        by youngberry.canonical.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.86_2)
+        (envelope-from <colin.king@canonical.com>)
+        id 1jJmUu-0006TV-Ta; Wed, 01 Apr 2020 23:10:13 +0000
+From:   Colin King <colin.king@canonical.com>
+To:     Boris Brezillon <bbrezillon@kernel.org>,
+        Arnaud Ebalard <arno@natisbad.org>,
+        Srujana Challa <schalla@marvell.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Lukasz Bartosik <lbartosik@marvell.com>,
+        linux-crypto@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH][next] crypto: marvell: fix double free of ptr
+Date:   Thu,  2 Apr 2020 00:10:12 +0100
+Message-Id: <20200401231012.407946-1-colin.king@canonical.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200401120909.8960-1-yuehaibing@huawei.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Apr 01, 2020 at 08:09:09PM +0800, YueHaibing wrote:
-> If IPV6 is not set, build fails:
-> 
-> drivers/crypto/chelsio/chcr_ktls.c: In function ‘chcr_ktls_act_open_req6’:
-> ./include/net/sock.h:380:37: error: ‘struct sock_common’ has no member named ‘skc_v6_rcv_saddr’; did you mean ‘skc_rcv_saddr’?
->  #define sk_v6_rcv_saddr __sk_common.skc_v6_rcv_saddr
->                                      ^
-> drivers/crypto/chelsio/chcr_ktls.c:258:37: note: in expansion of macro ‘sk_v6_rcv_saddr’
->   cpl->local_ip_hi = *(__be64 *)&sk->sk_v6_rcv_saddr.in6_u.u6_addr8[0];
->                                      ^~~~~~~~~~~~~~~
-> 
-> Add IPV6 dependency to fix this.
-> 
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Fixes: 62370a4f346d ("cxgb4/chcr: Add ipv6 support and statistics")
-> Signed-off-by: YueHaibing <yuehaibing@huawei.com>
-> ---
->  drivers/crypto/chelsio/Kconfig | 1 +
->  1 file changed, 1 insertion(+)
+From: Colin Ian King <colin.king@canonical.com>
 
-Please send these patches via netdev.
+Currently in the case where eq->src != req->ds, the allocation of
+ptr is kfree'd at the end of the code block. However later on in
+the case where enc is not null any of the error return paths that
+return via the error handling return path end up performing an
+erroneous second kfree of ptr.
 
-Thanks,
+Fix this by adding an error exit label error_free and only jump to
+this when ptr needs kfree'ing thus avoiding the double free issue.
+
+Addresses-Coverity: ("Double free")
+Fixes: 10b4f09491bf ("crypto: marvell - add the Virtual Function driver for CPT")
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ drivers/crypto/marvell/octeontx/otx_cptvf_algs.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/crypto/marvell/octeontx/otx_cptvf_algs.c b/drivers/crypto/marvell/octeontx/otx_cptvf_algs.c
+index 946fb62949b2..06202bcffb33 100644
+--- a/drivers/crypto/marvell/octeontx/otx_cptvf_algs.c
++++ b/drivers/crypto/marvell/octeontx/otx_cptvf_algs.c
+@@ -1161,13 +1161,13 @@ static inline u32 create_aead_null_output_list(struct aead_request *req,
+ 					   inputlen);
+ 		if (status != inputlen) {
+ 			status = -EINVAL;
+-			goto error;
++			goto error_free;
+ 		}
+ 		status = sg_copy_from_buffer(req->dst, sg_nents(req->dst), ptr,
+ 					     inputlen);
+ 		if (status != inputlen) {
+ 			status = -EINVAL;
+-			goto error;
++			goto error_free;
+ 		}
+ 		kfree(ptr);
+ 	}
+@@ -1209,8 +1209,10 @@ static inline u32 create_aead_null_output_list(struct aead_request *req,
+ 
+ 	req_info->outcnt = argcnt;
+ 	return 0;
+-error:
++
++error_free:
+ 	kfree(ptr);
++error:
+ 	return status;
+ }
+ 
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+2.25.1
+
