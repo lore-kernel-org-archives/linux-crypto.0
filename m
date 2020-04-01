@@ -2,207 +2,183 @@ Return-Path: <SRS0=/HXT=5R=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FSL_HELO_FAKE,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB863C43331
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Apr 2020 16:20:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F62CC43331
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Apr 2020 21:47:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 78ECD21556
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Apr 2020 16:20:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1585758036;
-	bh=8V5ySJp6dKmMDd4qsHqMtGhs0GOyBgG7cv8CBjvA5p0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=R6o376KAyNcbwlKAkCwGagoDHOnZFVdSFSA061f8rFJ3hJOs3d0HNqsgxsv9MloVX
-	 yGYGCeip35ir/jzG1g00AAYzXWy/0z+tXGHI2PwJMTXu5frgPuRvowd/3BFlx4r9NX
-	 mU0NQzcnmSw3Yvxv+jDANGqyhIWY3zHv+kBSv8G0=
+	by mail.kernel.org (Postfix) with ESMTP id 5D9042054F
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Apr 2020 21:47:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733034AbgDAQUc (ORCPT
+        id S1732385AbgDAVrf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Apr 2020 12:20:32 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43150 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1733018AbgDAQUb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Apr 2020 12:20:31 -0400
-Received: from gmail.com (unknown [104.132.1.76])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 2F72020658;
-        Wed,  1 Apr 2020 16:20:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1585758030;
-        bh=8V5ySJp6dKmMDd4qsHqMtGhs0GOyBgG7cv8CBjvA5p0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=hueEbZyr2b62S+jA7pZBn0YNOhGWyklG0QV4lQtMadslrE1yEzaiOrUCltN7ujRMN
-         M1t1aaaA4Wc2OVgk5/G4NKChua6T3CUJAI3iDU36sqkuIdcXBhGQPfkSU68knLQ2JT
-         ncj4zL9kYdqvdad6y2pYggEauqH6KuuXRgFlzKXU=
-Date:   Wed, 1 Apr 2020 09:20:28 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Marco Elver <elver@google.com>
-Cc:     Dmitry Vyukov <dvyukov@google.com>,
-        syzbot <syzbot+6a6bca8169ffda8ce77b@syzkaller.appspotmail.com>,
-        Borislav Petkov <bp@alien8.de>,
-        David Miller <davem@davemloft.net>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "H. Peter Anvin" <hpa@zytor.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ingo Molnar <mingo@redhat.com>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        the arch/x86 maintainers <x86@kernel.org>
-Subject: Re: KCSAN: data-race in glue_cbc_decrypt_req_128bit /
- glue_cbc_decrypt_req_128bit
-Message-ID: <20200401162028.GA201933@gmail.com>
-References: <0000000000009d5cef05a22baa95@google.com>
- <20200331202706.GA127606@gmail.com>
- <CACT4Y+ZSTjPmPmiL_1JEdroNZXYgaKewDBEH6RugnhsDVd+bUQ@mail.gmail.com>
- <CANpmjNPkzTSwtJhRXWE0DYi8mToDufuOztjE4h9KopZ11T+q+w@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANpmjNPkzTSwtJhRXWE0DYi8mToDufuOztjE4h9KopZ11T+q+w@mail.gmail.com>
+        Wed, 1 Apr 2020 17:47:35 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:39408 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1732357AbgDAVrf (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 1 Apr 2020 17:47:35 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 031LWpif080303;
+        Wed, 1 Apr 2020 17:47:21 -0400
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 303wrxsw8v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 01 Apr 2020 17:47:20 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 031LXQds082109;
+        Wed, 1 Apr 2020 17:47:20 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com [169.62.189.10])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 303wrxsw8e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 01 Apr 2020 17:47:20 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+        by ppma02dal.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 031LipBK019282;
+        Wed, 1 Apr 2020 21:47:19 GMT
+Received: from b03cxnp07029.gho.boulder.ibm.com (b03cxnp07029.gho.boulder.ibm.com [9.17.130.16])
+        by ppma02dal.us.ibm.com with ESMTP id 301x77d354-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 01 Apr 2020 21:47:19 +0000
+Received: from b03ledav001.gho.boulder.ibm.com (b03ledav001.gho.boulder.ibm.com [9.17.130.232])
+        by b03cxnp07029.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 031LlILg40829304
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 1 Apr 2020 21:47:18 GMT
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9464B6E058;
+        Wed,  1 Apr 2020 21:47:18 +0000 (GMT)
+Received: from b03ledav001.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 12E636E04E;
+        Wed,  1 Apr 2020 21:47:17 +0000 (GMT)
+Received: from [9.70.82.143] (unknown [9.70.82.143])
+        by b03ledav001.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Wed,  1 Apr 2020 21:47:17 +0000 (GMT)
+Subject: [PATCH v5 0/9] crypto/nx: Enable GZIP engine and provide userpace
+ API
+From:   Haren Myneni <haren@linux.ibm.com>
+To:     mpe@ellerman.id.au, herbert@gondor.apana.org.au
+Cc:     linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+        npiggin@gmail.com, dja@axtens.net, mikey@neuling.org,
+        sukadev@linux.vnet.ibm.com
+Content-Type: text/plain; charset="UTF-8"
+Date:   Wed, 01 Apr 2020 14:46:32 -0700
+Message-ID: <1585777592.10664.462.camel@hbabu-laptop>
+Mime-Version: 1.0
+X-Mailer: Evolution 2.28.3 
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-01_04:2020-03-31,2020-04-01 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
+ mlxlogscore=999 clxscore=1015 bulkscore=0 malwarescore=0 suspectscore=0
+ phishscore=0 priorityscore=1501 spamscore=0 adultscore=0 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004010179
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Apr 01, 2020 at 12:24:01PM +0200, Marco Elver wrote:
-> On Wed, 1 Apr 2020 at 09:04, Dmitry Vyukov <dvyukov@google.com> wrote:
-> >
-> > On Tue, Mar 31, 2020 at 10:27 PM Eric Biggers <ebiggers@kernel.org> wrote:
-> > >
-> > > On Tue, Mar 31, 2020 at 12:35:13PM -0700, syzbot wrote:
-> > > > Hello,
-> > > >
-> > > > syzbot found the following crash on:
-> > > >
-> > > > HEAD commit:    b12d66a6 mm, kcsan: Instrument SLAB free with ASSERT_EXCLU..
-> > > > git tree:       https://github.com/google/ktsan.git kcsan
-> > > > console output: https://syzkaller.appspot.com/x/log.txt?x=111f0865e00000
-> > > > kernel config:  https://syzkaller.appspot.com/x/.config?x=10bc0131c4924ba9
-> > > > dashboard link: https://syzkaller.appspot.com/bug?extid=6a6bca8169ffda8ce77b
-> > > > compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
-> > > >
-> > > > Unfortunately, I don't have any reproducer for this crash yet.
-> > > >
-> > > > IMPORTANT: if you fix the bug, please add the following tag to the commit:
-> > > > Reported-by: syzbot+6a6bca8169ffda8ce77b@syzkaller.appspotmail.com
-> > > >
-> > > > ==================================================================
-> > > > BUG: KCSAN: data-race in glue_cbc_decrypt_req_128bit / glue_cbc_decrypt_req_128bit
-> > > >
-> > > > write to 0xffff88809966e128 of 8 bytes by task 24119 on cpu 0:
-> > > >  u128_xor include/crypto/b128ops.h:67 [inline]
-> > > >  glue_cbc_decrypt_req_128bit+0x396/0x460 arch/x86/crypto/glue_helper.c:144
-> > > >  cbc_decrypt+0x26/0x40 arch/x86/crypto/serpent_avx2_glue.c:152
-> > > >  crypto_skcipher_decrypt+0x65/0x90 crypto/skcipher.c:652
-> > > >  _skcipher_recvmsg crypto/algif_skcipher.c:142 [inline]
-> > > >  skcipher_recvmsg+0x7fa/0x8c0 crypto/algif_skcipher.c:161
-> > > >  skcipher_recvmsg_nokey+0x5e/0x80 crypto/algif_skcipher.c:279
-> > > >  sock_recvmsg_nosec net/socket.c:886 [inline]
-> > > >  sock_recvmsg net/socket.c:904 [inline]
-> > > >  sock_recvmsg+0x92/0xb0 net/socket.c:900
-> > > >  ____sys_recvmsg+0x167/0x3a0 net/socket.c:2566
-> > > >  ___sys_recvmsg+0xb2/0x100 net/socket.c:2608
-> > > >  __sys_recvmsg+0x9d/0x160 net/socket.c:2642
-> > > >  __do_sys_recvmsg net/socket.c:2652 [inline]
-> > > >  __se_sys_recvmsg net/socket.c:2649 [inline]
-> > > >  __x64_sys_recvmsg+0x51/0x70 net/socket.c:2649
-> > > >  do_syscall_64+0xcc/0x3a0 arch/x86/entry/common.c:294
-> > > >  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> > > >
-> > > > read to 0xffff88809966e128 of 8 bytes by task 24118 on cpu 1:
-> > > >  u128_xor include/crypto/b128ops.h:67 [inline]
-> > > >  glue_cbc_decrypt_req_128bit+0x37c/0x460 arch/x86/crypto/glue_helper.c:144
-> > > >  cbc_decrypt+0x26/0x40 arch/x86/crypto/serpent_avx2_glue.c:152
-> > > >  crypto_skcipher_decrypt+0x65/0x90 crypto/skcipher.c:652
-> > > >  _skcipher_recvmsg crypto/algif_skcipher.c:142 [inline]
-> > > >  skcipher_recvmsg+0x7fa/0x8c0 crypto/algif_skcipher.c:161
-> > > >  skcipher_recvmsg_nokey+0x5e/0x80 crypto/algif_skcipher.c:279
-> > > >  sock_recvmsg_nosec net/socket.c:886 [inline]
-> > > >  sock_recvmsg net/socket.c:904 [inline]
-> > > >  sock_recvmsg+0x92/0xb0 net/socket.c:900
-> > > >  ____sys_recvmsg+0x167/0x3a0 net/socket.c:2566
-> > > >  ___sys_recvmsg+0xb2/0x100 net/socket.c:2608
-> > > >  __sys_recvmsg+0x9d/0x160 net/socket.c:2642
-> > > >  __do_sys_recvmsg net/socket.c:2652 [inline]
-> > > >  __se_sys_recvmsg net/socket.c:2649 [inline]
-> > > >  __x64_sys_recvmsg+0x51/0x70 net/socket.c:2649
-> > > >  do_syscall_64+0xcc/0x3a0 arch/x86/entry/common.c:294
-> > > >  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> > > >
-> > > > Reported by Kernel Concurrency Sanitizer on:
-> > > > CPU: 1 PID: 24118 Comm: syz-executor.1 Not tainted 5.6.0-rc1-syzkaller #0
-> > > > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-> > > > ==================================================================
-> > > >
-> > >
-> > > I think this is a problem for almost all the crypto code.  Due to AF_ALG, both
-> > > the source and destination buffers can be userspace pages that were gotten with
-> > > get_user_pages().  Such pages can be concurrently modified, not just by the
-> > > kernel but also by userspace.
-> > >
-> > > I'm not sure what can be done about this.
-> >
-> > Oh, I thought it's something more serious like a shared crypto object.
-> > Thanks for debugging.
-> > I think I've seen this before in another context (b/149818448):
-> >
-> > BUG: KCSAN: data-race in copyin / copyin
-> >
-> > write to 0xffff888103c8b000 of 4096 bytes by task 20917 on cpu 0:
-> >  instrument_copy_from_user include/linux/instrumented.h:106 [inline]
-> >  copyin+0xab/0xc0 lib/iov_iter.c:151
-> >  copy_page_from_iter_iovec lib/iov_iter.c:296 [inline]
-> >  copy_page_from_iter+0x23f/0x5f0 lib/iov_iter.c:942
-> >  process_vm_rw_pages mm/process_vm_access.c:46 [inline]
-> >  process_vm_rw_single_vec mm/process_vm_access.c:120 [inline]
-> >  process_vm_rw_core.isra.0+0x448/0x820 mm/process_vm_access.c:218
-> >  process_vm_rw+0x1c4/0x1e0 mm/process_vm_access.c:286
-> >  __do_sys_process_vm_writev mm/process_vm_access.c:308 [inline]
-> >  __se_sys_process_vm_writev mm/process_vm_access.c:303 [inline]
-> >  __x64_sys_process_vm_writev+0x8b/0xb0 mm/process_vm_access.c:303
-> >  do_syscall_64+0xcc/0x3a0 arch/x86/entry/common.c:294
-> >  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> >
-> > write to 0xffff888103c8b000 of 4096 bytes by task 20918 on cpu 1:
-> >  instrument_copy_from_user include/linux/instrumented.h:106 [inline]
-> >  copyin+0xab/0xc0 lib/iov_iter.c:151
-> >  copy_page_from_iter_iovec lib/iov_iter.c:296 [inline]
-> >  copy_page_from_iter+0x23f/0x5f0 lib/iov_iter.c:942
-> >  process_vm_rw_pages mm/process_vm_access.c:46 [inline]
-> >  process_vm_rw_single_vec mm/process_vm_access.c:120 [inline]
-> >  process_vm_rw_core.isra.0+0x448/0x820 mm/process_vm_access.c:218
-> >  process_vm_rw+0x1c4/0x1e0 mm/process_vm_access.c:286
-> >  __do_sys_process_vm_writev mm/process_vm_access.c:308 [inline]
-> >  __se_sys_process_vm_writev mm/process_vm_access.c:303 [inline]
-> >  __x64_sys_process_vm_writev+0x8b/0xb0 mm/process_vm_access.c:303
-> >  do_syscall_64+0xcc/0x3a0 arch/x86/entry/common.c:294
-> >  entry_SYSCALL_64_after_hwframe+0x44/0xa9
-> >
-> >
-> > Marco, I think we need to ignore all memory that comes from
-> > get_user_pages() somehow. Either not set watchpoints at all, or
-> > perhaps filter them out later if the check is not totally free.
-> 
-> Makes sense. We already have similar checks, and they're in the
-> slow-path, so it shouldn't be a problem. Let me investigate.
-> 
 
-I'm wondering whether you really should move so soon to ignoring these races?
-They are still races; the crypto code is doing standard unannotated reads/writes
-of memory that can be concurrently modified.
+Power9 processor supports Virtual Accelerator Switchboard (VAS) which
+allows kernel and userspace to send compression requests to Nest
+Accelerator (NX) directly. The NX unit comprises of 2 842 compression
+engines and 1 GZIP engine. Linux kernel already has 842 compression
+support on kernel. This patch series adds GZIP compression support
+from user space. The GZIP Compression engine implements the ZLIB and
+GZIP compression algorithms. No plans of adding NX-GZIP compression
+support in kernel right now.
 
-The issue is that fixing it would require adding READ_ONCE() / WRITE_ONCE() in
-hundreds of different places, affecting most crypto-related .c files.
+Applications can send requests to NX directly with COPY/PASTE
+instructions. But kernel has to establish channel / window on NX-GZIP
+device for the userspace. So userspace access to the GZIP engine is
+provided through /dev/crypto/nx-gzip device with several operations.
 
-Generally, since encryption and hash algorithms are designed to handle arbitrary
-data anyway, getting different values on each read won't crash the code.  So
-hopefully this isn't a "real" problem.  But it's still undefined behavior.
+An application must open the this device to obtain a file descriptor (fd).
+Using the fd, application should issue the VAS_TX_WIN_OPEN ioctl to
+establish a connection to the engine. Once window is opened, should use
+mmap() system call to map the hardware address of engine's request queue
+into the application's virtual address space. Then user space forms the
+request as co-processor Request Block (CRB) and paste this CRB on the
+mapped HW address using COPY/PASTE instructions. Application can poll
+on status flags (part of CRB) with timeout for request completion.
 
-- Eric
+For VAS_TX_WIN_OPEN ioctl, if user space passes vas_id = -1 (struct
+vas_tx_win_open_attr), kernel determines the VAS instance on the
+corresponding chip based on the CPU on which the process is executing.
+Otherwise, the specified VAS instance is used if application passes the
+proper VAS instance (vas_id listed in /proc/device-tree/vas@*/ibm,vas_id).
+
+Process can open multiple windows with different FDs or can send several
+requests to NX on the same window at the same time.
+
+A userspace library libnxz is available:
+        https://github.com/abalib/power-gzip
+
+Applications that use inflate/deflate calls can link with libNXz and use
+NX GZIP compression without any modification.
+
+Tested the available 842 compression on power8 and power9 system to make
+sure no regression and tested GZIP compression on power9 with tests
+available in the above link.
+
+Thanks to Bulent Abali for nxz library and tests development.
+
+Changelog:
+
+V2:
+  - Move user space API code to powerpc as suggested. Also this API
+    can be extended to any other coprocessor type that VAS can support
+    in future. Example: Fast thread wakeup feature from VAS
+  - Rebased to 5.6-rc3
+
+V3:
+  - Fix sparse warnings (patches 3&6)
+
+V4:
+  - Remove unused coproc_instid and add only window address in
+    fp->private_data.
+  - Add NX User's manual and Copy/paste links in VAS API documentation
+    in patch and other changes as Daniel Axtens suggested
+
+V5:
+  - Added "NX Fault handling" section in VAS API documentation as Nick
+    suggested.
+  - Dcoumentation: mmap size should be PAGE_SIZE as Daniel Axtens pointed.
+
+Haren Myneni (9):
+  powerpc/vas: Initialize window attributes for GZIP coprocessor type
+  powerpc/vas: Define VAS_TX_WIN_OPEN ioctl API
+  powerpc/vas: Add VAS user space API
+  crypto/nx: Initialize coproc entry with kzalloc
+  crypto/nx: Rename nx-842-powernv file name to nx-common-powernv
+  crypto/nx: Make enable code generic to add new GZIP compression type
+  crypto/nx: Enable and setup GZIP compresstion type
+  crypto/nx: Remove 'pid' in vas_tx_win_attr struct
+  Documentation/powerpc: VAS API
+
+ Documentation/powerpc/index.rst                    |    1 +
+ Documentation/powerpc/vas-api.rst                  |  292 +++++
+ Documentation/userspace-api/ioctl/ioctl-number.rst |    1 +
+ arch/powerpc/include/asm/vas.h                     |   12 +-
+ arch/powerpc/include/uapi/asm/vas-api.h            |   22 +
+ arch/powerpc/platforms/powernv/Makefile            |    2 +-
+ arch/powerpc/platforms/powernv/vas-api.c           |  257 +++++
+ arch/powerpc/platforms/powernv/vas-window.c        |   23 +-
+ arch/powerpc/platforms/powernv/vas.h               |    2 +
+ drivers/crypto/nx/Makefile                         |    2 +-
+ drivers/crypto/nx/nx-842-powernv.c                 | 1062 ------------------
+ drivers/crypto/nx/nx-common-powernv.c              | 1133 ++++++++++++++++++++
+ 12 files changed, 1736 insertions(+), 1073 deletions(-)
+ create mode 100644 Documentation/powerpc/vas-api.rst
+ create mode 100644 arch/powerpc/include/uapi/asm/vas-api.h
+ create mode 100644 arch/powerpc/platforms/powernv/vas-api.c
+ delete mode 100644 drivers/crypto/nx/nx-842-powernv.c
+ create mode 100644 drivers/crypto/nx/nx-common-powernv.c
+
+-- 
+1.8.3.1
+
+
+
