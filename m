@@ -2,72 +2,72 @@ Return-Path: <SRS0=/HXT=5R=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09D17C43331
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Apr 2020 22:35:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22B04C43331
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Apr 2020 22:53:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id D2F0B2082F
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Apr 2020 22:35:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1585780517;
-	bh=LRgdnLuJcS7/CWipB+tmFu5gtxtwhF87azfE0yMxQdA=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
-	b=EI5vbXlIpEoBsVkfYRYQhpTB8AIg8zPILe6HnYyqXSFkFbpDGg6G+kviR6nGOyaPt
-	 tjkJF+FZ9PivVRn8EjEOk6DCDiWB/aB8bw1HOuzbJuzZYyPDz4knWo57XCJtuwm3kT
-	 5+CIovJjA/3IPwjJhx5TEakZ5rrM3ox7OJOhBWCo=
+	by mail.kernel.org (Postfix) with ESMTP id E1DF5206E9
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Apr 2020 22:53:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1733178AbgDAWfR (ORCPT
+        id S2389481AbgDAWxi (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Apr 2020 18:35:17 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49860 "EHLO mail.kernel.org"
+        Wed, 1 Apr 2020 18:53:38 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:42412 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1733164AbgDAWfR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Apr 2020 18:35:17 -0400
-Subject: Re: [GIT PULL] Crypto Update for 5.7
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1585780516;
-        bh=LRgdnLuJcS7/CWipB+tmFu5gtxtwhF87azfE0yMxQdA=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=WXsbK81hcirKmkkpYGuh0ly2DBD4lRq/LDheRSqa53asa25Gz1hrqFNVySkIUF12U
-         YI/+QAReEmOn3Dyy0kAvjBjgJ4fO+Td6Dd1JOaQtODBz3BkwYsiooeT7Ntzw/5CED9
-         eF4hLivqgjcy8rpcYUlvW5S04ME1Bo4Flrx1jrwY=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20200401042720.GA12178@gondor.apana.org.au>
-References: <20190916084901.GA20338@gondor.apana.org.au>
- <20191125034536.wlgw25gpgn7y7vni@gondor.apana.org.au>
- <20200128050326.x3cfjz3rj7ep6xr2@gondor.apana.org.au>
- <20200401042720.GA12178@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20200401042720.GA12178@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-X-PR-Tracked-Commit-Id: fcb90d51c375d09a034993cda262b68499e233a4
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 72f35423e8a6a2451c202f52cb8adb92b08592ec
-Message-Id: <158578051648.24680.17707593369397670566.pr-tracker-bot@kernel.org>
-Date:   Wed, 01 Apr 2020 22:35:16 +0000
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        id S2389479AbgDAWxi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 1 Apr 2020 18:53:38 -0400
+Received: from gwarestrin.me.apana.org.au ([192.168.0.7] helo=gwarestrin.arnor.me.apana.org.au)
+        by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
+        id 1jJmEK-0004Od-Hj; Thu, 02 Apr 2020 09:53:05 +1100
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 02 Apr 2020 09:53:04 +1100
+Date:   Thu, 2 Apr 2020 09:53:04 +1100
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Marco Elver <elver@google.com>, Dmitry Vyukov <dvyukov@google.com>,
+        syzbot <syzbot+6a6bca8169ffda8ce77b@syzkaller.appspotmail.com>,
+        Borislav Petkov <bp@alien8.de>,
+        David Miller <davem@davemloft.net>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Ingo Molnar <mingo@redhat.com>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        the arch/x86 maintainers <x86@kernel.org>
+Subject: Re: KCSAN: data-race in glue_cbc_decrypt_req_128bit /
+ glue_cbc_decrypt_req_128bit
+Message-ID: <20200401225304.GA16019@gondor.apana.org.au>
+References: <0000000000009d5cef05a22baa95@google.com>
+ <20200331202706.GA127606@gmail.com>
+ <CACT4Y+ZSTjPmPmiL_1JEdroNZXYgaKewDBEH6RugnhsDVd+bUQ@mail.gmail.com>
+ <CANpmjNPkzTSwtJhRXWE0DYi8mToDufuOztjE4h9KopZ11T+q+w@mail.gmail.com>
+ <20200401162028.GA201933@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200401162028.GA201933@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pull request you sent on Wed, 1 Apr 2020 15:27:21 +1100:
+On Wed, Apr 01, 2020 at 09:20:28AM -0700, Eric Biggers wrote:
+>
+> The issue is that fixing it would require adding READ_ONCE() / WRITE_ONCE() in
+> hundreds of different places, affecting most crypto-related .c files.
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+I don't think we should be doing that.  This is exactly the same
+as using sendfile(2) and modifying the data during the send.  As
+long as you don't trigger behaviours such as crashes or uncontrolled
+execution then it's fine.  The output is simply undefined.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/72f35423e8a6a2451c202f52cb8adb92b08592ec
-
-Thank you!
-
+Cheers,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
