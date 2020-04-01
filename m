@@ -2,411 +2,444 @@ Return-Path: <SRS0=/HXT=5R=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0
-	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F1F2C43331
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Apr 2020 22:09:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E28C1C43331
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Apr 2020 22:16:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 1F3A02071A
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Apr 2020 22:09:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A70552071A
+	for <linux-crypto@archiver.kernel.org>; Wed,  1 Apr 2020 22:16:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1732637AbgDAWJA (ORCPT
+        id S1732537AbgDAWQj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Apr 2020 18:09:00 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:19326 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1732357AbgDAWJA (ORCPT
+        Wed, 1 Apr 2020 18:16:39 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:14176 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1732385AbgDAWQi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Apr 2020 18:09:00 -0400
-Received: from pps.filterd (m0098394.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 031M3vTZ061890;
-        Wed, 1 Apr 2020 18:08:48 -0400
+        Wed, 1 Apr 2020 18:16:38 -0400
+Received: from pps.filterd (m0127361.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 031M4Cb4043231;
+        Wed, 1 Apr 2020 18:16:22 -0400
 Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 304hjaqwu1-1
+        by mx0a-001b2d01.pphosted.com with ESMTP id 304mcbst7e-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 01 Apr 2020 18:08:47 -0400
-Received: from m0098394.ppops.net (m0098394.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 031M5k0E071196;
-        Wed, 1 Apr 2020 18:08:47 -0400
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 304hjaqwtn-1
+        Wed, 01 Apr 2020 18:16:22 -0400
+Received: from m0127361.ppops.net (m0127361.ppops.net [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 031MEu0F096447;
+        Wed, 1 Apr 2020 18:16:22 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 304mcbst79-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 01 Apr 2020 18:08:47 -0400
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 031M6kWE027661;
-        Wed, 1 Apr 2020 22:08:45 GMT
-Received: from b01cxnp23034.gho.pok.ibm.com (b01cxnp23034.gho.pok.ibm.com [9.57.198.29])
-        by ppma03wdc.us.ibm.com with ESMTP id 301x76v7qc-1
+        Wed, 01 Apr 2020 18:16:21 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 031MFcAC015436;
+        Wed, 1 Apr 2020 22:16:21 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+        by ppma02wdc.us.ibm.com with ESMTP id 301x7746mq-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 01 Apr 2020 22:08:45 +0000
-Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com [9.57.199.106])
-        by b01cxnp23034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 031M8jAm51052830
+        Wed, 01 Apr 2020 22:16:21 +0000
+Received: from b03ledav005.gho.boulder.ibm.com (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+        by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 031MGKL751184002
         (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 1 Apr 2020 22:08:45 GMT
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 416E228067;
-        Wed,  1 Apr 2020 22:08:45 +0000 (GMT)
-Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 62CEB2805E;
-        Wed,  1 Apr 2020 22:08:44 +0000 (GMT)
+        Wed, 1 Apr 2020 22:16:20 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 7F9C2BE058;
+        Wed,  1 Apr 2020 22:16:20 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id BD02BBE05D;
+        Wed,  1 Apr 2020 22:16:19 +0000 (GMT)
 Received: from [9.70.82.143] (unknown [9.70.82.143])
-        by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
-        Wed,  1 Apr 2020 22:08:44 +0000 (GMT)
-Subject: [PATCH v5 9/9] Documentation/powerpc: VAS API
+        by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+        Wed,  1 Apr 2020 22:16:19 +0000 (GMT)
+Subject: [PATCH v5 6/9] crypto/nx: Make enable code generic to add new GZIP
+ compression type
 From:   Haren Myneni <haren@linux.ibm.com>
 To:     mpe@ellerman.id.au
-Cc:     herbert@gondor.apana.org.au, mikey@neuling.org, npiggin@gmail.com,
+Cc:     mikey@neuling.org, herbert@gondor.apana.org.au, npiggin@gmail.com,
         linux-crypto@vger.kernel.org, sukadev@linux.vnet.ibm.com,
         linuxppc-dev@lists.ozlabs.org, dja@axtens.net
-In-Reply-To: <1585777592.10664.462.camel@hbabu-laptop>
+In-Reply-To: <1585778775.2275.2.camel@hbabu-laptop>
 References: <1585777592.10664.462.camel@hbabu-laptop>
+         <1585778775.2275.2.camel@hbabu-laptop>
 Content-Type: text/plain; charset="UTF-8"
-Date:   Wed, 01 Apr 2020 15:08:43 -0700
-Message-ID: <1585778923.2275.5.camel@hbabu-laptop>
+Date:   Wed, 01 Apr 2020 15:16:18 -0700
+Message-ID: <1585779378.2275.10.camel@hbabu-laptop>
 Mime-Version: 1.0
 X-Mailer: Evolution 2.28.3 
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
  definitions=2020-04-01_04:2020-03-31,2020-04-01 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
- suspectscore=0 adultscore=0 priorityscore=1501 mlxscore=0
- lowpriorityscore=0 clxscore=1015 spamscore=0 mlxlogscore=999
- malwarescore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004010179
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ suspectscore=1 bulkscore=0 mlxscore=0 adultscore=0 priorityscore=1501
+ clxscore=1015 lowpriorityscore=0 malwarescore=0 phishscore=0
+ mlxlogscore=999 spamscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2003020000 definitions=main-2004010179
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+(Sorry for reposting. version number is missed in subject)
 
-Power9 introduced Virtual Accelerator Switchboard (VAS) which allows
-user space to communicate with Nest Accelerator (NX) directly. But
-kernel has to establish channel to NX for user space. This document
-describes user space API that application can use to establish
-communication channel.
+Make setup and enable code generic to support new GZIP compression type.
+Changed nx842 reference to nx and moved some code to new functions.
+Functionality is not changed except sparse warning fix - setting NULL
+instead of 0 for per_cpu send window in nx_delete_coprocs().
 
-Signed-off-by: Sukadev Bhattiprolu <sukadev@linux.ibm.com>
 Signed-off-by: Haren Myneni <haren@linux.ibm.com>
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 ---
- Documentation/powerpc/index.rst   |   1 +
- Documentation/powerpc/vas-api.rst | 292 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 293 insertions(+)
- create mode 100644 Documentation/powerpc/vas-api.rst
+ drivers/crypto/nx/nx-common-powernv.c | 161 +++++++++++++++++++++-------------
+ 1 file changed, 101 insertions(+), 60 deletions(-)
 
-diff --git a/Documentation/powerpc/index.rst b/Documentation/powerpc/index.rst
-index 0d45f0f..afe2d5e 100644
---- a/Documentation/powerpc/index.rst
-+++ b/Documentation/powerpc/index.rst
-@@ -30,6 +30,7 @@ powerpc
-     syscall64-abi
-     transactional_memory
-     ultravisor
-+    vas-api
+diff --git a/drivers/crypto/nx/nx-common-powernv.c b/drivers/crypto/nx/nx-common-powernv.c
+index f42881f..82dfa60 100644
+--- a/drivers/crypto/nx/nx-common-powernv.c
++++ b/drivers/crypto/nx/nx-common-powernv.c
+@@ -40,9 +40,9 @@ struct nx842_workmem {
+ 	char padding[WORKMEM_ALIGN]; /* unused, to allow alignment */
+ } __packed __aligned(WORKMEM_ALIGN);
  
- .. only::  subproject and html
+-struct nx842_coproc {
++struct nx_coproc {
+ 	unsigned int chip_id;
+-	unsigned int ct;
++	unsigned int ct;	/* Can be 842 or GZIP high/normal*/
+ 	unsigned int ci;	/* Coprocessor instance, used with icswx */
+ 	struct {
+ 		struct vas_window *rxwin;
+@@ -58,9 +58,15 @@ struct nx842_coproc {
+ static DEFINE_PER_CPU(struct vas_window *, cpu_txwin);
  
-diff --git a/Documentation/powerpc/vas-api.rst b/Documentation/powerpc/vas-api.rst
-new file mode 100644
-index 0000000..1217c2f
---- /dev/null
-+++ b/Documentation/powerpc/vas-api.rst
-@@ -0,0 +1,292 @@
-+.. SPDX-License-Identifier: GPL-2.0
-+.. _VAS-API:
+ /* no cpu hotplug on powernv, so this list never changes after init */
+-static LIST_HEAD(nx842_coprocs);
++static LIST_HEAD(nx_coprocs);
+ static unsigned int nx842_ct;	/* used in icswx function */
+ 
++/*
++ * Using same values as in skiboot or coprocessor type representing
++ * in NX workbook.
++ */
++#define NX_CT_842	(3)
 +
-+===================================================
-+Virtual Accelerator Switchboard (VAS) userspace API
-+===================================================
+ static int (*nx842_powernv_exec)(const unsigned char *in,
+ 				unsigned int inlen, unsigned char *out,
+ 				unsigned int *outlenp, void *workmem, int fc);
+@@ -666,15 +672,15 @@ static int nx842_powernv_decompress(const unsigned char *in, unsigned int inlen,
+ 				      wmem, CCW_FC_842_DECOMP_CRC);
+ }
+ 
+-static inline void nx842_add_coprocs_list(struct nx842_coproc *coproc,
++static inline void nx_add_coprocs_list(struct nx_coproc *coproc,
+ 					int chipid)
+ {
+ 	coproc->chip_id = chipid;
+ 	INIT_LIST_HEAD(&coproc->list);
+-	list_add(&coproc->list, &nx842_coprocs);
++	list_add(&coproc->list, &nx_coprocs);
+ }
+ 
+-static struct vas_window *nx842_alloc_txwin(struct nx842_coproc *coproc)
++static struct vas_window *nx_alloc_txwin(struct nx_coproc *coproc)
+ {
+ 	struct vas_window *txwin = NULL;
+ 	struct vas_tx_win_attr txattr;
+@@ -704,9 +710,9 @@ static struct vas_window *nx842_alloc_txwin(struct nx842_coproc *coproc)
+  * cpu_txwin is used in copy/paste operation for each compression /
+  * decompression request.
+  */
+-static int nx842_open_percpu_txwins(void)
++static int nx_open_percpu_txwins(void)
+ {
+-	struct nx842_coproc *coproc, *n;
++	struct nx_coproc *coproc, *n;
+ 	unsigned int i, chip_id;
+ 
+ 	for_each_possible_cpu(i) {
+@@ -714,17 +720,18 @@ static int nx842_open_percpu_txwins(void)
+ 
+ 		chip_id = cpu_to_chip_id(i);
+ 
+-		list_for_each_entry_safe(coproc, n, &nx842_coprocs, list) {
++		list_for_each_entry_safe(coproc, n, &nx_coprocs, list) {
+ 			/*
+ 			 * Kernel requests use only high priority FIFOs. So
+ 			 * open send windows for these FIFOs.
++			 * GZIP is not supported in kernel right now.
+ 			 */
+ 
+ 			if (coproc->ct != VAS_COP_TYPE_842_HIPRI)
+ 				continue;
+ 
+ 			if (coproc->chip_id == chip_id) {
+-				txwin = nx842_alloc_txwin(coproc);
++				txwin = nx_alloc_txwin(coproc);
+ 				if (IS_ERR(txwin))
+ 					return PTR_ERR(txwin);
+ 
+@@ -743,13 +750,28 @@ static int nx842_open_percpu_txwins(void)
+ 	return 0;
+ }
+ 
++static int __init nx_set_ct(struct nx_coproc *coproc, const char *priority,
++				int high, int normal)
++{
++	if (!strcmp(priority, "High"))
++		coproc->ct = high;
++	else if (!strcmp(priority, "Normal"))
++		coproc->ct = normal;
++	else {
++		pr_err("Invalid RxFIFO priority value\n");
++		return -EINVAL;
++	}
 +
-+Introduction
-+============
++	return 0;
++}
 +
-+Power9 processor introduced Virtual Accelerator Switchboard (VAS) which
-+allows both userspace and kernel communicate to co-processor
-+(hardware accelerator) referred to as the Nest Accelerator (NX). The NX
-+unit comprises of one or more hardware engines or co-processor types
-+such as 842 compression, GZIP compression and encryption. On power9,
-+userspace applications will have access to only GZIP Compression engine
-+which supports ZLIB and GZIP compression algorithms in the hardware.
+ static int __init vas_cfg_coproc_info(struct device_node *dn, int chip_id,
+-					int vasid, int *ct)
++					int vasid, int type, int *ct)
+ {
+ 	struct vas_window *rxwin = NULL;
+ 	struct vas_rx_win_attr rxattr;
+-	struct nx842_coproc *coproc;
+ 	u32 lpid, pid, tid, fifo_size;
++	struct nx_coproc *coproc;
+ 	u64 rx_fifo;
+ 	const char *priority;
+ 	int ret;
+@@ -794,15 +816,12 @@ static int __init vas_cfg_coproc_info(struct device_node *dn, int chip_id,
+ 	if (!coproc)
+ 		return -ENOMEM;
+ 
+-	if (!strcmp(priority, "High"))
+-		coproc->ct = VAS_COP_TYPE_842_HIPRI;
+-	else if (!strcmp(priority, "Normal"))
+-		coproc->ct = VAS_COP_TYPE_842;
+-	else {
+-		pr_err("Invalid RxFIFO priority value\n");
+-		ret =  -EINVAL;
++	if (type == NX_CT_842)
++		ret = nx_set_ct(coproc, priority, VAS_COP_TYPE_842_HIPRI,
++			VAS_COP_TYPE_842);
 +
-+To communicate with NX, kernel has to establish a channel or window and
-+then requests can be submitted directly without kernel involvement.
-+Requests to the GZIP engine must be formatted as a co-processor Request
-+Block (CRB) and these CRBs must be submitted to the NX using COPY/PASTE
-+instructions to paste the CRB to hardware address that is associated with
-+the engine's request queue.
-+
-+The GZIP engine provides two priority levels of requests: Normal and
-+High. Only Normal requests are supported from userspace right now.
-+
-+This document explains userspace API that is used to interact with
-+kernel to setup channel / window which can be used to send compression
-+requests directly to NX accelerator.
-+
-+
-+Overview
-+========
-+
-+Application access to the GZIP engine is provided through
-+/dev/crypto/nx-gzip device node implemented by the VAS/NX device driver.
-+An application must open the /dev/crypto/nx-gzip device to obtain a file
-+descriptor (fd). Then should issue VAS_TX_WIN_OPEN ioctl with this fd to
-+establish connection to the engine. It means send window is opened on GZIP
-+engine for this process. Once a connection is established, the application
-+should use the mmap() system call to map the hardware address of engine's
-+request queue into the application's virtual address space.
-+
-+The application can then submit one or more requests to the the engine by
-+using copy/paste instructions and pasting the CRBs to the virtual address
-+(aka paste_address) returned by mmap(). User space can close the
-+established connection or send window by closing the file descriptior
-+(close(fd)) or upon the process exit.
-+
-+Note that applications can send several requests with the same window or
-+can establish multiple windows, but one window for each file descriptor.
-+
-+Following sections provide additional details and references about the
-+individual steps.
-+
-+NX-GZIP Device Node
-+===================
-+
-+There is one /dev/crypto/nx-gzip node in the system and it provides
-+access to all GZIP engines in the system. The only valid operations on
-+/dev/crypto/nx-gzip are:
-+
-+	* open() the device for read and write.
-+	* issue VAS_TX_WIN_OPEN ioctl
-+	* mmap() the engine's request queue into application's virtual
-+	  address space (i.e. get a paste_address for the co-processor
-+	  engine).
-+	* close the device node.
-+
-+Other file operations on this device node are undefined.
-+
-+Note that the copy and paste operations go directly to the hardware and
-+do not go through this device. Refer COPY/PASTE document for more
-+details.
-+
-+Although a system may have several instances of the NX co-processor
-+engines (typically, one per P9 chip) there is just one
-+/dev/crypto/nx-gzip device node in the system. When the nx-gzip device
-+node is opened, Kernel opens send window on a suitable instance of NX
-+accelerator. It finds CPU on which the user process is executing and
-+determine the NX instance for the corresponding chip on which this CPU
-+belongs.
-+
-+Applications may chose a specific instance of the NX co-processor using
-+the vas_id field in the VAS_TX_WIN_OPEN ioctl as detailed below.
-+
-+A userspace library libnxz is available here but still in development:
-+	 https://github.com/abalib/power-gzip
-+
-+Applications that use inflate / deflate calls can link with libnxz
-+instead of libz and use NX GZIP compression without any modification.
-+
-+Open /dev/crypto/nx-gzip
-+========================
-+
-+The nx-gzip device should be opened for read and write. No special
-+privileges are needed to open the device. Each window corresponds to one
-+file descriptor. So if the userspace process needs multiple windows,
-+several open calls have to be issued.
-+
-+See open(2) system call man pages for other details such as return values,
-+error codes and restrictions.
-+
-+VAS_TX_WIN_OPEN ioctl
-+=====================
-+
-+Applications should use the VAS_TX_WIN_OPEN ioctl as follows to establish
-+a connection with NX co-processor engine:
-+
-+	::
-+		struct vas_tx_win_open_attr {
-+			__u32   version;
-+			__s16   vas_id; /* specific instance of vas or -1
-+						for default */
-+			__u16   reserved1;
-+			__u64   flags;	/* For future use */
-+			__u64   reserved2[6];
-+		};
-+
-+	version: The version field must be currently set to 1.
-+	vas_id: If '-1' is passed, kernel will make a best-effort attempt
-+		to assign an optimal instance of NX for the process. To
-+		select the specific VAS instance, refer
-+		"Discovery of available VAS engines" section below.
-+
-+	flags, reserved1 and reserved2[6] fields are for future extension
-+	and must be set to 0.
-+
-+	The attributes attr for the VAS_TX_WIN_OPEN ioctl are defined as
-+	follows:
-+		#define VAS_MAGIC 'v'
-+		#define VAS_TX_WIN_OPEN _IOW(VAS_MAGIC, 1,
-+						struct vas_tx_win_open_attr)
-+
-+		struct vas_tx_win_open_attr attr;
-+		rc = ioctl(fd, VAS_TX_WIN_OPEN, &attr);
-+
-+	The VAS_TX_WIN_OPEN ioctl returns 0 on success. On errors, it
-+	returns -1 and sets the errno variable to indicate the error.
-+
-+	Error conditions:
-+		EINVAL	fd does not refer to a valid VAS device.
-+		EINVAL	Invalid vas ID
-+		EINVAL	version is not set with proper value
-+		EEXIST	Window is already opened for the given fd
-+		ENOMEM	Memory is not available to allocate window
-+		ENOSPC	System has too many active windows (connections)
-+			opened
-+		EINVAL	reserved fields are not set to 0.
-+
-+	See the ioctl(2) man page for more details, error codes and
-+	restrictions.
-+
-+mmap() NX-GZIP device
-+=====================
-+
-+The mmap() system call for a NX-GZIP device fd returns a paste_address
-+that the application can use to copy/paste its CRB to the hardware engines.
-+	::
-+
-+		paste_addr = mmap(addr, size, prot, flags, fd, offset);
-+
-+	Only restrictions on mmap for a NX-GZIP device fd are:
-+		* size should be PAGE_SIZE
-+		* offset parameter should be 0ULL
-+
-+	Refer to mmap(2) man page for additional details/restrictions.
-+	In addition to the error conditions listed on the mmap(2) man
-+	page, can also fail with one of the following error codes:
-+
-+		EINVAL	fd is not associated with an open window
-+			(i.e mmap() does not follow a successful call
-+			to the VAS_TX_WIN_OPEN ioctl).
-+		EINVAL	offset field is not 0ULL.
-+
-+Discovery of available VAS engines
-+==================================
-+
-+Each available VAS instance in the system will have a device tree node
-+like /proc/device-tree/vas@* or /proc/device-tree/xscom@*/vas@*.
-+Determine the chip or VAS instance and use the corresponding ibm,vas-id
-+property value in this node to select specific VAS instance.
-+
-+Copy/Paste operations
-+=====================
-+
-+Applications should use the copy and paste instructions to send CRB to NX.
-+Refer section 4.4 in PowerISA for Copy/Paste instructions:
-+https://openpowerfoundation.org/?resource_lib=power-isa-version-3-0
-+
-+CRB Specification and use NX
-+============================
-+
-+Applications should format requests to the co-processor using the
-+co-processor Request Block (CRBs). Refer NX-GZIP user's manual for the format
-+of CRB and use NX from userspace such as sending requests and checking
-+request status.
-+
-+NX Fault handling
-+=================
-+
-+Applications send requests to NX and wait for the status by polling on
-+co-processor Status Block (CSB) flags. NX updates status in CSB after each
-+request is processed. Refer NX-GZIP user's manual for the format of CSB and
-+status flags.
-+
-+In case if NX encounters translation error (called NX page fault) on CSB
-+address or any request buffer, raises an interrupt on the CPU to handle the
-+fault. Page fault can happen if an application passes invalid addresses or
-+request buffers are not in memory. The operating system handles the fault by
-+updating CSB with the following data:
-+
-+	csb.flags = CSB_V;
-+	csb.cc = CSB_CC_TRANSLATION;
-+	csb.ce = CSB_CE_TERMINATION;
-+	csb.address = fault_address;
-+
-+When an application receives translation error, it can touch or access
-+the page that has a fault address so that this page will be in memory. Then
-+the application can resend this request to NX.
-+
-+If the OS can not update CSB due to invalid CSB address, sends SEGV signal
-+to the process who opened the send window on which the original request was
-+issued. This signal returns with the following siginfo struct:
-+
-+	siginfo.si_signo = SIGSEGV;
-+	siginfo.si_errno = EFAULT;
-+	siginfo.si_code = SEGV_MAPERR;
-+	siginfo.si_addr = CSB adress;
-+
-+In the case of multi-thread applications, NX send windows can be shared
-+across all threads. For example, a child thread can open a send window,
-+but other threads can send requests to NX using this window. These
-+requests will be successful even in the case of OS handling faults as long
-+as CSB address is valid. If the NX request contains an invalid CSB address,
-+the signal will be sent to the child thread that opened the window. But if
-+the thread is exited without closing the window and the request is issued
-+using this window. the signal will be issued to the thread group leader
-+(tgid). It is up to the application whether to ignore or handle these
-+signals.
-+
-+NX-GZIP User's Manual:
-+https://github.com/libnxz/power-gzip/blob/master/power_nx_gzip_um.pdf
-+
-+Simple example
-+==============
-+
-+	::
-+		int use_nx_gzip()
-+		{
-+			int rc, fd;
-+			void *addr;
-+			struct vas_setup_attr txattr;
-+
-+			fd = open("/dev/crypto/nx-gzip", O_RDWR);
-+			if (fd < 0) {
-+				fprintf(stderr, "open nx-gzip failed\n");
-+				return -1;
-+			}
-+			memset(&txattr, 0, sizeof(txattr));
-+			txattr.version = 1;
-+			txattr.vas_id = -1
-+			rc = ioctl(fd, VAS_TX_WIN_OPEN,
-+					(unsigned long)&txattr);
-+			if (rc < 0) {
-+				fprintf(stderr, "ioctl() n %d, error %d\n",
-+						rc, errno);
-+				return rc;
-+			}
-+			addr = mmap(NULL, 4096, PROT_READ|PROT_WRITE,
-+					MAP_SHARED, fd, 0ULL);
-+			if (addr == MAP_FAILED) {
-+				fprintf(stderr, "mmap() failed, errno %d\n",
-+						errno);
-+				return -errno;
-+			}
-+			do {
-+				//Format CRB request with compression or
-+				//uncompression
-+				// Refer tests for vas_copy/vas_paste
-+				vas_copy((&crb, 0, 1);
-+				vas_paste(addr, 0, 1);
-+				// Poll on csb.flags with timeout
-+				// csb address is listed in CRB
-+			} while (true)
-+			close(fd) or window can be closed upon process exit
++	if (ret)
+ 		goto err_out;
+-	}
+ 
+ 	vas_init_rx_win_attr(&rxattr, coproc->ct);
+ 	rxattr.rx_fifo = (void *)rx_fifo;
+@@ -830,7 +849,7 @@ static int __init vas_cfg_coproc_info(struct device_node *dn, int chip_id,
+ 
+ 	coproc->vas.rxwin = rxwin;
+ 	coproc->vas.id = vasid;
+-	nx842_add_coprocs_list(coproc, chip_id);
++	nx_add_coprocs_list(coproc, chip_id);
+ 
+ 	/*
+ 	 * (lpid, pid, tid) combination has to be unique for each
+@@ -848,13 +867,43 @@ static int __init vas_cfg_coproc_info(struct device_node *dn, int chip_id,
+ 	return ret;
+ }
+ 
++static int __init nx_coproc_init(int chip_id, int ct_842)
++{
++	int ret = 0;
+ 
+-static int __init nx842_powernv_probe_vas(struct device_node *pn)
++	if (opal_check_token(OPAL_NX_COPROC_INIT)) {
++		ret = opal_nx_coproc_init(chip_id, ct_842);
++		if (ret) {
++			ret = opal_error_code(ret);
++			pr_err("Failed to initialize NX for chip(%d): %d\n",
++				chip_id, ret);
 +		}
++	} else
++		pr_warn("Firmware doesn't support NX initialization\n");
 +
-+	Refer https://github.com/abalib/power-gzip for tests or more
-+	use cases.
++	return ret;
++}
++
++static int __init find_nx_device_tree(struct device_node *dn, int chip_id,
++					int vasid, int type, char *devname,
++					int *ct)
++{
++	int ret = 0;
++
++	if (of_device_is_compatible(dn, devname)) {
++		ret  = vas_cfg_coproc_info(dn, chip_id, vasid, type, ct);
++		if (ret)
++			of_node_put(dn);
++	}
++
++	return ret;
++}
++
++static int __init nx_powernv_probe_vas(struct device_node *pn)
+ {
+-	struct device_node *dn;
+ 	int chip_id, vasid, ret = 0;
+-	int nx_fifo_found = 0;
+-	int uninitialized_var(ct);
++	struct device_node *dn;
++	int ct_842 = 0;
+ 
+ 	chip_id = of_get_ibm_chip_id(pn);
+ 	if (chip_id < 0) {
+@@ -869,17 +918,13 @@ static int __init nx842_powernv_probe_vas(struct device_node *pn)
+ 	}
+ 
+ 	for_each_child_of_node(pn, dn) {
+-		if (of_device_is_compatible(dn, "ibm,p9-nx-842")) {
+-			ret = vas_cfg_coproc_info(dn, chip_id, vasid, &ct);
+-			if (ret) {
+-				of_node_put(dn);
+-				return ret;
+-			}
+-			nx_fifo_found++;
+-		}
++		ret = find_nx_device_tree(dn, chip_id, vasid, NX_CT_842,
++					"ibm,p9-nx-842", &ct_842);
++		if (ret)
++			return ret;
+ 	}
+ 
+-	if (!nx_fifo_found) {
++	if (!ct_842) {
+ 		pr_err("NX842 FIFO nodes are missing\n");
+ 		return -EINVAL;
+ 	}
+@@ -887,22 +932,14 @@ static int __init nx842_powernv_probe_vas(struct device_node *pn)
+ 	/*
+ 	 * Initialize NX instance for both high and normal priority FIFOs.
+ 	 */
+-	if (opal_check_token(OPAL_NX_COPROC_INIT)) {
+-		ret = opal_nx_coproc_init(chip_id, ct);
+-		if (ret) {
+-			pr_err("Failed to initialize NX for chip(%d): %d\n",
+-				chip_id, ret);
+-			ret = opal_error_code(ret);
+-		}
+-	} else
+-		pr_warn("Firmware doesn't support NX initialization\n");
++	ret = nx_coproc_init(chip_id, ct_842);
+ 
+ 	return ret;
+ }
+ 
+ static int __init nx842_powernv_probe(struct device_node *dn)
+ {
+-	struct nx842_coproc *coproc;
++	struct nx_coproc *coproc;
+ 	unsigned int ct, ci;
+ 	int chip_id;
+ 
+@@ -928,7 +965,7 @@ static int __init nx842_powernv_probe(struct device_node *dn)
+ 
+ 	coproc->ct = ct;
+ 	coproc->ci = ci;
+-	nx842_add_coprocs_list(coproc, chip_id);
++	nx_add_coprocs_list(coproc, chip_id);
+ 
+ 	pr_info("coprocessor found on chip %d, CT %d CI %d\n", chip_id, ct, ci);
+ 
+@@ -941,9 +978,9 @@ static int __init nx842_powernv_probe(struct device_node *dn)
+ 	return 0;
+ }
+ 
+-static void nx842_delete_coprocs(void)
++static void nx_delete_coprocs(void)
+ {
+-	struct nx842_coproc *coproc, *n;
++	struct nx_coproc *coproc, *n;
+ 	struct vas_window *txwin;
+ 	int i;
+ 
+@@ -955,10 +992,10 @@ static void nx842_delete_coprocs(void)
+ 		if (txwin)
+ 			vas_win_close(txwin);
+ 
+-		per_cpu(cpu_txwin, i) = 0;
++		per_cpu(cpu_txwin, i) = NULL;
+ 	}
+ 
+-	list_for_each_entry_safe(coproc, n, &nx842_coprocs, list) {
++	list_for_each_entry_safe(coproc, n, &nx_coprocs, list) {
+ 		if (coproc->vas.rxwin)
+ 			vas_win_close(coproc->vas.rxwin);
+ 
+@@ -1002,7 +1039,7 @@ static int nx842_powernv_crypto_init(struct crypto_tfm *tfm)
+ 	.coa_decompress		= nx842_crypto_decompress } }
+ };
+ 
+-static __init int nx842_powernv_init(void)
++static __init int nx_compress_powernv_init(void)
+ {
+ 	struct device_node *dn;
+ 	int ret;
+@@ -1017,15 +1054,15 @@ static __init int nx842_powernv_init(void)
+ 	BUILD_BUG_ON(DDE_BUFFER_SIZE_MULT % DDE_BUFFER_LAST_MULT);
+ 
+ 	for_each_compatible_node(dn, NULL, "ibm,power9-nx") {
+-		ret = nx842_powernv_probe_vas(dn);
++		ret = nx_powernv_probe_vas(dn);
+ 		if (ret) {
+-			nx842_delete_coprocs();
++			nx_delete_coprocs();
+ 			of_node_put(dn);
+ 			return ret;
+ 		}
+ 	}
+ 
+-	if (list_empty(&nx842_coprocs)) {
++	if (list_empty(&nx_coprocs)) {
+ 		for_each_compatible_node(dn, NULL, "ibm,power-nx")
+ 			nx842_powernv_probe(dn);
+ 
+@@ -1034,9 +1071,13 @@ static __init int nx842_powernv_init(void)
+ 
+ 		nx842_powernv_exec = nx842_exec_icswx;
+ 	} else {
+-		ret = nx842_open_percpu_txwins();
++		/*
++		 * GZIP is not supported in kernel right now.
++		 * So open tx windows only for 842.
++		 */
++		ret = nx_open_percpu_txwins();
+ 		if (ret) {
+-			nx842_delete_coprocs();
++			nx_delete_coprocs();
+ 			return ret;
+ 		}
+ 
+@@ -1045,18 +1086,18 @@ static __init int nx842_powernv_init(void)
+ 
+ 	ret = crypto_register_alg(&nx842_powernv_alg);
+ 	if (ret) {
+-		nx842_delete_coprocs();
++		nx_delete_coprocs();
+ 		return ret;
+ 	}
+ 
+ 	return 0;
+ }
+-module_init(nx842_powernv_init);
++module_init(nx_compress_powernv_init);
+ 
+-static void __exit nx842_powernv_exit(void)
++static void __exit nx_compress_powernv_exit(void)
+ {
+ 	crypto_unregister_alg(&nx842_powernv_alg);
+ 
+-	nx842_delete_coprocs();
++	nx_delete_coprocs();
+ }
+-module_exit(nx842_powernv_exit);
++module_exit(nx_compress_powernv_exit);
 -- 
 1.8.3.1
 
