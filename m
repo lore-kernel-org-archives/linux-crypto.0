@@ -1,102 +1,82 @@
-Return-Path: <SRS0=/HXT=5R=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=UIra=5S=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 217F2C43331
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Apr 2020 23:10:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74FA1C43331
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Apr 2020 02:02:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 02FE0206F8
-	for <linux-crypto@archiver.kernel.org>; Wed,  1 Apr 2020 23:10:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 501CE2077D
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Apr 2020 02:02:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387497AbgDAXKW (ORCPT
+        id S1732498AbgDBCCV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 1 Apr 2020 19:10:22 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:48304 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732537AbgDAXKW (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 1 Apr 2020 19:10:22 -0400
-Received: from 1.general.cking.uk.vpn ([10.172.193.212] helo=localhost)
-        by youngberry.canonical.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.86_2)
-        (envelope-from <colin.king@canonical.com>)
-        id 1jJmUu-0006TV-Ta; Wed, 01 Apr 2020 23:10:13 +0000
-From:   Colin King <colin.king@canonical.com>
-To:     Boris Brezillon <bbrezillon@kernel.org>,
-        Arnaud Ebalard <arno@natisbad.org>,
-        Srujana Challa <schalla@marvell.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Lukasz Bartosik <lbartosik@marvell.com>,
-        linux-crypto@vger.kernel.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH][next] crypto: marvell: fix double free of ptr
-Date:   Thu,  2 Apr 2020 00:10:12 +0100
-Message-Id: <20200401231012.407946-1-colin.king@canonical.com>
-X-Mailer: git-send-email 2.25.1
+        Wed, 1 Apr 2020 22:02:21 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:12598 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1727135AbgDBCCV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 1 Apr 2020 22:02:21 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id 3FD3FC06D72E6BC5008D;
+        Thu,  2 Apr 2020 10:02:18 +0800 (CST)
+Received: from localhost (10.173.223.234) by DGGEMS408-HUB.china.huawei.com
+ (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Thu, 2 Apr 2020
+ 10:02:03 +0800
+From:   YueHaibing <yuehaibing@huawei.com>
+To:     <ayush.sawal@chelsio.com>, <vinay.yadav@chelsio.com>,
+        <rohitm@chelsio.com>, <herbert@gondor.apana.org.au>,
+        <davem@davemloft.net>
+CC:     <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, YueHaibing <yuehaibing@huawei.com>
+Subject: [PATCH net] crypto: chtls - Fix build error without IPV6
+Date:   Thu, 2 Apr 2020 09:43:23 +0800
+Message-ID: <20200402014323.36492-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.10.2.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.173.223.234]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Colin Ian King <colin.king@canonical.com>
+If IPV6 is not set, build fails:
 
-Currently in the case where eq->src != req->ds, the allocation of
-ptr is kfree'd at the end of the code block. However later on in
-the case where enc is not null any of the error return paths that
-return via the error handling return path end up performing an
-erroneous second kfree of ptr.
+drivers/crypto/chelsio/chcr_ktls.c: In function ‘chcr_ktls_act_open_req6’:
+./include/net/sock.h:380:37: error: ‘struct sock_common’ has no member named ‘skc_v6_rcv_saddr’; did you mean ‘skc_rcv_saddr’?
+ #define sk_v6_rcv_saddr __sk_common.skc_v6_rcv_saddr
+                                     ^
+drivers/crypto/chelsio/chcr_ktls.c:258:37: note: in expansion of macro ‘sk_v6_rcv_saddr’
+  cpl->local_ip_hi = *(__be64 *)&sk->sk_v6_rcv_saddr.in6_u.u6_addr8[0];
+                                     ^~~~~~~~~~~~~~~
 
-Fix this by adding an error exit label error_free and only jump to
-this when ptr needs kfree'ing thus avoiding the double free issue.
+Add IPV6 dependency to fix this.
 
-Addresses-Coverity: ("Double free")
-Fixes: 10b4f09491bf ("crypto: marvell - add the Virtual Function driver for CPT")
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Fixes: 62370a4f346d ("cxgb4/chcr: Add ipv6 support and statistics")
+Signed-off-by: YueHaibing <yuehaibing@huawei.com>
 ---
- drivers/crypto/marvell/octeontx/otx_cptvf_algs.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ drivers/crypto/chelsio/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/crypto/marvell/octeontx/otx_cptvf_algs.c b/drivers/crypto/marvell/octeontx/otx_cptvf_algs.c
-index 946fb62949b2..06202bcffb33 100644
---- a/drivers/crypto/marvell/octeontx/otx_cptvf_algs.c
-+++ b/drivers/crypto/marvell/octeontx/otx_cptvf_algs.c
-@@ -1161,13 +1161,13 @@ static inline u32 create_aead_null_output_list(struct aead_request *req,
- 					   inputlen);
- 		if (status != inputlen) {
- 			status = -EINVAL;
--			goto error;
-+			goto error_free;
- 		}
- 		status = sg_copy_from_buffer(req->dst, sg_nents(req->dst), ptr,
- 					     inputlen);
- 		if (status != inputlen) {
- 			status = -EINVAL;
--			goto error;
-+			goto error_free;
- 		}
- 		kfree(ptr);
- 	}
-@@ -1209,8 +1209,10 @@ static inline u32 create_aead_null_output_list(struct aead_request *req,
- 
- 	req_info->outcnt = argcnt;
- 	return 0;
--error:
-+
-+error_free:
- 	kfree(ptr);
-+error:
- 	return status;
- }
- 
+diff --git a/drivers/crypto/chelsio/Kconfig b/drivers/crypto/chelsio/Kconfig
+index f2756836093f..7bf1d8152a5d 100644
+--- a/drivers/crypto/chelsio/Kconfig
++++ b/drivers/crypto/chelsio/Kconfig
+@@ -47,6 +47,7 @@ config CHELSIO_TLS_DEVICE
+ 	bool "Chelsio Inline KTLS Offload"
+ 	depends on CHELSIO_T4
+ 	depends on TLS_DEVICE
++	depends on IPV6
+ 	select CRYPTO_DEV_CHELSIO
+ 	default y
+ 	help
 -- 
-2.25.1
+2.17.1
+
 
