@@ -2,38 +2,37 @@ Return-Path: <SRS0=UIra=5S=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0693DC2BA12
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Apr 2020 06:54:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A2C3C43331
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Apr 2020 06:54:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id DC1732078B
-	for <linux-crypto@archiver.kernel.org>; Thu,  2 Apr 2020 06:54:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 18F442078B
+	for <linux-crypto@archiver.kernel.org>; Thu,  2 Apr 2020 06:54:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387502AbgDBGyM (ORCPT
+        id S1728402AbgDBGyW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 2 Apr 2020 02:54:12 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:43212 "EHLO huawei.com"
+        Thu, 2 Apr 2020 02:54:22 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:12670 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728135AbgDBGyM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 2 Apr 2020 02:54:12 -0400
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id D14E530F1E965BA665F4;
-        Thu,  2 Apr 2020 14:54:08 +0800 (CST)
+        id S1728135AbgDBGyW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 2 Apr 2020 02:54:22 -0400
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
+        by Forcepoint Email with ESMTP id EAADC46B16608B6628F0;
+        Thu,  2 Apr 2020 14:54:03 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.56) by
  DGGEMS401-HUB.china.huawei.com (10.3.19.201) with Microsoft SMTP Server id
- 14.3.487.0; Thu, 2 Apr 2020 14:53:58 +0800
+ 14.3.487.0; Thu, 2 Apr 2020 14:53:54 +0800
 From:   Shukun Tan <tanshukun1@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
         <wangzhou1@hisilicon.com>, <fanghao11@huawei.com>,
         Shukun Tan <tanshukun1@huawei.com>
-Subject: [PATCH 3/3] crypto: hisilicon - add vfs_num module parameter for hpre/sec
-Date:   Thu, 2 Apr 2020 14:53:03 +0800
-Message-ID: <1585810383-49392-4-git-send-email-tanshukun1@huawei.com>
+Subject: [PATCH 1/3] crypto: hisilicon - put vfs_num into struct hisi_qm
+Date:   Thu, 2 Apr 2020 14:53:01 +0800
+Message-ID: <1585810383-49392-2-git-send-email-tanshukun1@huawei.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1585810383-49392-1-git-send-email-tanshukun1@huawei.com>
 References: <1585810383-49392-1-git-send-email-tanshukun1@huawei.com>
@@ -46,158 +45,252 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Hao Fang <fanghao11@huawei.com>
+We plan to move vfs_num related code into qm.c, put the param
+vfs_num into struct hisi_qm first.
 
-The vfs_num module parameter has been used in zip driver, this patch adds
-this for HPRE and SEC driver.
-
-Signed-off-by: Hao Fang <fanghao11@huawei.com>
 Signed-off-by: Shukun Tan <tanshukun1@huawei.com>
 Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
 Reviewed-by: Zaibo Xu <xuzaibo@huawei.com>
 ---
- drivers/crypto/hisilicon/hpre/hpre_main.c | 19 +++++++++++++++++++
- drivers/crypto/hisilicon/qm.h             | 20 ++++++++++++++++++++
- drivers/crypto/hisilicon/sec2/sec_main.c  | 18 ++++++++++++++++++
- drivers/crypto/hisilicon/zip/zip_main.c   |  9 +++++++--
- 4 files changed, 64 insertions(+), 2 deletions(-)
+ drivers/crypto/hisilicon/hpre/hpre.h      |  1 -
+ drivers/crypto/hisilicon/hpre/hpre_main.c | 12 +++++-------
+ drivers/crypto/hisilicon/qm.h             |  1 +
+ drivers/crypto/hisilicon/sec2/sec.h       |  1 -
+ drivers/crypto/hisilicon/sec2/sec_main.c  | 17 ++++++++---------
+ drivers/crypto/hisilicon/zip/zip_main.c   | 19 ++++++++-----------
+ 6 files changed, 22 insertions(+), 29 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-index 4e41d30..9cff5c1 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-@@ -195,6 +195,15 @@ static u32 hpre_pf_q_num = HPRE_PF_DEF_Q_NUM;
- module_param_cb(hpre_pf_q_num, &hpre_pf_q_num_ops, &hpre_pf_q_num, 0444);
- MODULE_PARM_DESC(hpre_pf_q_num, "Number of queues in PF of CS(1-1024)");
- 
-+static const struct kernel_param_ops vfs_num_ops = {
-+	.set = vfs_num_set,
-+	.get = param_get_int,
-+};
-+
-+static u32 vfs_num;
-+module_param_cb(vfs_num, &vfs_num_ops, &vfs_num, 0444);
-+MODULE_PARM_DESC(vfs_num, "Number of VFs to enable(1-63), 0(default)");
-+
- struct hisi_qp *hpre_create_qp(void)
- {
- 	int node = cpu_to_node(smp_processor_id());
-@@ -777,8 +786,18 @@ static int hpre_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 		pci_err(pdev, "fail to register algs to crypto!\n");
- 		goto err_with_qm_start;
- 	}
-+
-+	if (qm->fun_type == QM_HW_PF && vfs_num) {
-+		ret = hisi_qm_sriov_enable(pdev, vfs_num);
-+		if (ret < 0)
-+			goto err_with_crypto_register;
-+	}
-+
- 	return 0;
- 
-+err_with_crypto_register:
-+	hpre_algs_unregister();
-+
- err_with_qm_start:
- 	hisi_qm_del_from_list(qm, &hpre_devices);
- 	hisi_qm_stop(qm);
-diff --git a/drivers/crypto/hisilicon/qm.h b/drivers/crypto/hisilicon/qm.h
-index 665e53d..1b5171b 100644
---- a/drivers/crypto/hisilicon/qm.h
-+++ b/drivers/crypto/hisilicon/qm.h
-@@ -8,6 +8,8 @@
- #include <linux/module.h>
- #include <linux/pci.h>
- 
-+#define QM_MAX_VFS_NUM_V2		63
-+
- /* qm user domain */
- #define QM_ARUSER_M_CFG_1		0x100088
- #define AXUSER_SNOOP_ENABLE		BIT(30)
-@@ -235,6 +237,24 @@ struct hisi_qp {
- 	struct uacce_queue *uacce_q;
+diff --git a/drivers/crypto/hisilicon/hpre/hpre.h b/drivers/crypto/hisilicon/hpre/hpre.h
+index 03d512e..0a8ba46 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre.h
++++ b/drivers/crypto/hisilicon/hpre/hpre.h
+@@ -47,7 +47,6 @@ struct hpre_debug {
+ struct hpre {
+ 	struct hisi_qm qm;
+ 	struct hpre_debug debug;
+-	u32 num_vfs;
+ 	unsigned long status;
  };
  
-+static inline int vfs_num_set(const char *val, const struct kernel_param *kp)
-+{
-+	u32 n;
-+	int ret;
-+
-+	if (!val)
-+		return -EINVAL;
-+
-+	ret = kstrtou32(val, 10, &n);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (n > QM_MAX_VFS_NUM_V2)
-+		return -EINVAL;
-+
-+	return param_set_int(val, kp);
-+}
-+
- static inline void hisi_qm_init_list(struct hisi_qm_list *qm_list)
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+index 88be53b..5269e5b 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_main.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+@@ -354,9 +354,7 @@ static u32 hpre_current_qm_read(struct hpre_debugfs_file *file)
+ static int hpre_current_qm_write(struct hpre_debugfs_file *file, u32 val)
  {
- 	INIT_LIST_HEAD(&qm_list->list);
-diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-index 129648a..c76c49e 100644
---- a/drivers/crypto/hisilicon/sec2/sec_main.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-@@ -207,6 +207,15 @@ static u32 ctx_q_num = SEC_CTX_Q_NUM_DEF;
- module_param_cb(ctx_q_num, &sec_ctx_q_num_ops, &ctx_q_num, 0444);
- MODULE_PARM_DESC(ctx_q_num, "Queue num in ctx (24 default, 2, 4, ..., 32)");
+ 	struct hisi_qm *qm = hpre_file_to_qm(file);
+-	struct hpre_debug *debug = file->debug;
+-	struct hpre *hpre = container_of(debug, struct hpre, debug);
+-	u32 num_vfs = hpre->num_vfs;
++	u32 num_vfs = qm->vfs_num;
+ 	u32 vfq_num, tmp;
  
-+static const struct kernel_param_ops vfs_num_ops = {
-+	.set = vfs_num_set,
-+	.get = param_get_int,
-+};
-+
-+static u32 vfs_num;
-+module_param_cb(vfs_num, &vfs_num_ops, &vfs_num, 0444);
-+MODULE_PARM_DESC(vfs_num, "Number of VFs to enable(1-63), 0(default)");
-+
- void sec_destroy_qps(struct hisi_qp **qps, int qp_num)
+ 
+@@ -827,7 +825,7 @@ static int hpre_vf_q_assign(struct hpre *hpre, int num_vfs)
+ static int hpre_clear_vft_config(struct hpre *hpre)
  {
- 	hisi_qm_free_qps(qps, qp_num);
-@@ -876,8 +885,17 @@ static int sec_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 		goto err_remove_from_list;
+ 	struct hisi_qm *qm = &hpre->qm;
+-	u32 num_vfs = hpre->num_vfs;
++	u32 num_vfs = qm->vfs_num;
+ 	int ret;
+ 	u32 i;
+ 
+@@ -836,7 +834,7 @@ static int hpre_clear_vft_config(struct hpre *hpre)
+ 		if (ret)
+ 			return ret;
+ 	}
+-	hpre->num_vfs = 0;
++	qm->vfs_num = 0;
+ 
+ 	return 0;
+ }
+@@ -860,7 +858,7 @@ static int hpre_sriov_enable(struct pci_dev *pdev, int max_vfs)
+ 		return ret;
  	}
  
-+	if (qm->fun_type == QM_HW_PF && vfs_num) {
-+		ret = hisi_qm_sriov_enable(pdev, vfs_num);
-+		if (ret < 0)
-+			goto err_crypto_unregister;
-+	}
-+
- 	return 0;
+-	hpre->num_vfs = num_vfs;
++	hpre->qm.vfs_num = num_vfs;
  
-+err_crypto_unregister:
-+	sec_unregister_from_crypto();
-+
- err_remove_from_list:
+ 	ret = pci_enable_sriov(pdev, num_vfs);
+ 	if (ret) {
+@@ -903,7 +901,7 @@ static void hpre_remove(struct pci_dev *pdev)
+ 
+ 	hpre_algs_unregister();
+ 	hisi_qm_del_from_list(qm, &hpre_devices);
+-	if (qm->fun_type == QM_HW_PF && hpre->num_vfs != 0) {
++	if (qm->fun_type == QM_HW_PF && qm->vfs_num) {
+ 		ret = hpre_sriov_disable(pdev);
+ 		if (ret) {
+ 			pci_err(pdev, "Disable SRIOV fail!\n");
+diff --git a/drivers/crypto/hisilicon/qm.h b/drivers/crypto/hisilicon/qm.h
+index ec5b6f4..33c5a8e 100644
+--- a/drivers/crypto/hisilicon/qm.h
++++ b/drivers/crypto/hisilicon/qm.h
+@@ -161,6 +161,7 @@ struct hisi_qm {
+ 	u32 qp_num;
+ 	u32 qp_in_used;
+ 	u32 ctrl_qp_num;
++	u32 vfs_num;
+ 	struct list_head list;
+ 
+ 	struct qm_dma qdma;
+diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
+index 3598fa1..2326634 100644
+--- a/drivers/crypto/hisilicon/sec2/sec.h
++++ b/drivers/crypto/hisilicon/sec2/sec.h
+@@ -172,7 +172,6 @@ struct sec_dev {
+ 	struct sec_debug debug;
+ 	u32 ctx_q_num;
+ 	bool iommu_used;
+-	u32 num_vfs;
+ 	unsigned long status;
+ };
+ 
+diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+index 1f54ebe..ef26239 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_main.c
++++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+@@ -424,23 +424,22 @@ static u32 sec_current_qm_read(struct sec_debug_file *file)
+ static int sec_current_qm_write(struct sec_debug_file *file, u32 val)
+ {
+ 	struct hisi_qm *qm = file->qm;
+-	struct sec_dev *sec = container_of(qm, struct sec_dev, qm);
+ 	u32 vfq_num;
+ 	u32 tmp;
+ 
+-	if (val > sec->num_vfs)
++	if (val > qm->vfs_num)
+ 		return -EINVAL;
+ 
+ 	/* According PF or VF Dev ID to calculation curr_qm_qp_num and store */
+ 	if (!val) {
+ 		qm->debug.curr_qm_qp_num = qm->qp_num;
+ 	} else {
+-		vfq_num = (qm->ctrl_qp_num - qm->qp_num) / sec->num_vfs;
++		vfq_num = (qm->ctrl_qp_num - qm->qp_num) / qm->vfs_num;
+ 
+-		if (val == sec->num_vfs)
++		if (val == qm->vfs_num)
+ 			qm->debug.curr_qm_qp_num =
+ 				qm->ctrl_qp_num - qm->qp_num -
+-				(sec->num_vfs - 1) * vfq_num;
++				(qm->vfs_num - 1) * vfq_num;
+ 		else
+ 			qm->debug.curr_qm_qp_num = vfq_num;
+ 	}
+@@ -926,7 +925,7 @@ static int sec_vf_q_assign(struct sec_dev *sec, u32 num_vfs)
+ static int sec_clear_vft_config(struct sec_dev *sec)
+ {
+ 	struct hisi_qm *qm = &sec->qm;
+-	u32 num_vfs = sec->num_vfs;
++	u32 num_vfs = qm->vfs_num;
+ 	int ret;
+ 	u32 i;
+ 
+@@ -936,7 +935,7 @@ static int sec_clear_vft_config(struct sec_dev *sec)
+ 			return ret;
+ 	}
+ 
+-	sec->num_vfs = 0;
++	qm->vfs_num = 0;
+ 
+ 	return 0;
+ }
+@@ -962,7 +961,7 @@ static int sec_sriov_enable(struct pci_dev *pdev, int max_vfs)
+ 		return ret;
+ 	}
+ 
+-	sec->num_vfs = num_vfs;
++	sec->qm.vfs_num = num_vfs;
+ 
+ 	ret = pci_enable_sriov(pdev, num_vfs);
+ 	if (ret) {
+@@ -1006,7 +1005,7 @@ static void sec_remove(struct pci_dev *pdev)
+ 
  	hisi_qm_del_from_list(qm, &sec_devices);
+ 
+-	if (qm->fun_type == QM_HW_PF && sec->num_vfs)
++	if (qm->fun_type == QM_HW_PF && qm->vfs_num)
+ 		(void)sec_sriov_disable(pdev);
+ 
  	sec_debugfs_exit(sec);
 diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index 5dcda7b..fe9d6d2 100644
+index fcc85d2..f5ffa02 100644
 --- a/drivers/crypto/hisilicon/zip/zip_main.c
 +++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -231,9 +231,14 @@ static u32 pf_q_num = HZIP_PF_DEF_Q_NUM;
- module_param_cb(pf_q_num, &pf_q_num_ops, &pf_q_num, 0444);
- MODULE_PARM_DESC(pf_q_num, "Number of queues in PF(v1 1-4096, v2 1-1024)");
+@@ -134,7 +134,6 @@ struct ctrl_debug_file {
+  * Just relevant for PF.
+  */
+ struct hisi_zip_ctrl {
+-	u32 num_vfs;
+ 	struct hisi_zip *hisi_zip;
+ 	struct dentry *debug_root;
+ 	struct ctrl_debug_file files[HZIP_DEBUG_FILE_NUM];
+@@ -342,21 +341,20 @@ static u32 current_qm_read(struct ctrl_debug_file *file)
+ static int current_qm_write(struct ctrl_debug_file *file, u32 val)
+ {
+ 	struct hisi_qm *qm = file_to_qm(file);
+-	struct hisi_zip_ctrl *ctrl = file->ctrl;
+ 	u32 vfq_num;
+ 	u32 tmp;
  
-+static const struct kernel_param_ops vfs_num_ops = {
-+	.set = vfs_num_set,
-+	.get = param_get_int,
-+};
-+
- static u32 vfs_num;
--module_param(vfs_num, uint, 0444);
--MODULE_PARM_DESC(vfs_num, "Number of VFs to enable(1-63)");
-+module_param_cb(vfs_num, &vfs_num_ops, &vfs_num, 0444);
-+MODULE_PARM_DESC(vfs_num, "Number of VFs to enable(1-63), 0(default)");
+-	if (val > ctrl->num_vfs)
++	if (val > qm->vfs_num)
+ 		return -EINVAL;
  
- static const struct pci_device_id hisi_zip_dev_ids[] = {
- 	{ PCI_DEVICE(PCI_VENDOR_ID_HUAWEI, PCI_DEVICE_ID_ZIP_PF) },
+ 	/* Calculate curr_qm_qp_num and store */
+ 	if (val == 0) {
+ 		qm->debug.curr_qm_qp_num = qm->qp_num;
+ 	} else {
+-		vfq_num = (qm->ctrl_qp_num - qm->qp_num) / ctrl->num_vfs;
+-		if (val == ctrl->num_vfs)
++		vfq_num = (qm->ctrl_qp_num - qm->qp_num) / qm->vfs_num;
++		if (val == qm->vfs_num)
+ 			qm->debug.curr_qm_qp_num = qm->ctrl_qp_num -
+-				qm->qp_num - (ctrl->num_vfs - 1) * vfq_num;
++				qm->qp_num - (qm->vfs_num - 1) * vfq_num;
+ 		else
+ 			qm->debug.curr_qm_qp_num = vfq_num;
+ 	}
+@@ -686,9 +684,8 @@ static int hisi_zip_vf_q_assign(struct hisi_zip *hisi_zip, int num_vfs)
+ 
+ static int hisi_zip_clear_vft_config(struct hisi_zip *hisi_zip)
+ {
+-	struct hisi_zip_ctrl *ctrl = hisi_zip->ctrl;
+ 	struct hisi_qm *qm = &hisi_zip->qm;
+-	u32 i, num_vfs = ctrl->num_vfs;
++	u32 i, num_vfs = qm->vfs_num;
+ 	int ret;
+ 
+ 	for (i = 1; i <= num_vfs; i++) {
+@@ -697,7 +694,7 @@ static int hisi_zip_clear_vft_config(struct hisi_zip *hisi_zip)
+ 			return ret;
+ 	}
+ 
+-	ctrl->num_vfs = 0;
++	qm->vfs_num = 0;
+ 
+ 	return 0;
+ }
+@@ -723,7 +720,7 @@ static int hisi_zip_sriov_enable(struct pci_dev *pdev, int max_vfs)
+ 		return ret;
+ 	}
+ 
+-	hisi_zip->ctrl->num_vfs = num_vfs;
++	hisi_zip->qm.vfs_num = num_vfs;
+ 
+ 	ret = pci_enable_sriov(pdev, num_vfs);
+ 	if (ret) {
+@@ -852,7 +849,7 @@ static void hisi_zip_remove(struct pci_dev *pdev)
+ 	struct hisi_zip *hisi_zip = pci_get_drvdata(pdev);
+ 	struct hisi_qm *qm = &hisi_zip->qm;
+ 
+-	if (qm->fun_type == QM_HW_PF && hisi_zip->ctrl->num_vfs != 0)
++	if (qm->fun_type == QM_HW_PF && qm->vfs_num)
+ 		hisi_zip_sriov_disable(pdev);
+ 
+ 	hisi_zip_debugfs_exit(hisi_zip);
 -- 
 2.7.4
 
