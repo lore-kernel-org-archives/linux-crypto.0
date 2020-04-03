@@ -2,111 +2,96 @@ Return-Path: <SRS0=Ncaf=5T=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 982C9C2BA17
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Apr 2020 19:51:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BD1FC43331
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Apr 2020 22:06:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6AB7D206E9
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Apr 2020 19:51:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="oTC8E0fO"
+	by mail.kernel.org (Postfix) with ESMTP id 1CB922078C
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Apr 2020 22:06:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728060AbgDCTux (ORCPT
+        id S1727867AbgDCWGs (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 3 Apr 2020 15:50:53 -0400
-Received: from mail-wm1-f67.google.com ([209.85.128.67]:38047 "EHLO
-        mail-wm1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1727593AbgDCTuw (ORCPT
+        Fri, 3 Apr 2020 18:06:48 -0400
+Received: from cmccmta1.chinamobile.com ([221.176.66.79]:3381 "EHLO
+        cmccmta1.chinamobile.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727829AbgDCWGs (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Apr 2020 15:50:52 -0400
-Received: by mail-wm1-f67.google.com with SMTP id f6so9012349wmj.3
-        for <linux-crypto@vger.kernel.org>; Fri, 03 Apr 2020 12:50:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=JPGH//guNKXE+zw41mQiI9K56gZGeqLsPljirbPkDWA=;
-        b=oTC8E0fOGssBxycTlFxGc5xx1oGSLXbNDvBvKosjDidLGr48hSossWLYM0KZigOptZ
-         YAAtgwVJT3V6AW3KvWpvdSLfBe2WYYiAQ4pm3tqJNDw4SsjmCdubD2xam8FVAP2eSjrR
-         byJESroXjDP2Sj9enh9tZm/Je857QdVz6kJkA5qsFOhjIcGDtTAanvVWudXfqe9yIuB9
-         eB9SLG4ado0P2ITngZHDhfKb2ghxqlfk3m7sSlOO+CEpL/pSPsbIu+eSaBhWt6hWYoS6
-         JgqyDOhQvWYJU7Zj35xuD9AJCJ9qJREu0wA1ugn+NMW5Uo9e5Uj9Ti7YEQ/keW1fScl/
-         IuoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=JPGH//guNKXE+zw41mQiI9K56gZGeqLsPljirbPkDWA=;
-        b=caKs2bl6VE/6VlYqe6tYP1LjjVqzA3uywJSW5HLBq9G66fV8KuZH63MVFhh8ZSIVyx
-         eq83uh1WZrP5+dNkxnruBqpCXgEUsKhurujSEeek+tQVhAjzPh/T+OpryQQWhjQTC7eE
-         wOhN8/HKzlQFBLJcZ1P2gytIU0x85P/aCgRr2kKpa0zpWOdA1tCr/BdKer8truniyL1g
-         elXerO2tvk2AhSiN/C4HqrJq8lg/MEfYLa00IGMcCqcZbeyEk3yMgbFcqgi2jckE/FQX
-         /mtZced2zIwzwp2mCiZrfog+inGJdKLryNifbb1dmz/bRKihNE37xXSe1YEUuM4D1wqS
-         fivA==
-X-Gm-Message-State: AGi0PuYQ0bQMZLBSjGoYqzGPdAG41d56lW1gPF0ssc8U5ulqQhK1lwXK
-        R3aFgEzww1/PULO00uV+FTIDYg==
-X-Google-Smtp-Source: APiQypJEbUNkRzvYEwZksUdMc+GOiGb1oOeidTkof3qLE2rcJOLmNJKIfsDxMpHa2IfgnELMwfr6uQ==
-X-Received: by 2002:a05:600c:2c06:: with SMTP id q6mr10472251wmg.42.1585943448931;
-        Fri, 03 Apr 2020 12:50:48 -0700 (PDT)
-Received: from localhost.localdomain ([51.15.160.169])
-        by smtp.googlemail.com with ESMTPSA id c17sm8102448wrp.28.2020.04.03.12.50.48
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
-        Fri, 03 Apr 2020 12:50:48 -0700 (PDT)
-From:   Corentin Labbe <clabbe@baylibre.com>
-To:     davem@davemloft.net, herbert@gondor.apana.org.au,
-        mripard@kernel.org, wens@csie.org
-Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-sunxi@googlegroups.com,
-        Corentin Labbe <clabbe@baylibre.com>
-Subject: [PATCH 2/7] crypto: sun8i-ss: Add SS_START define
-Date:   Fri,  3 Apr 2020 19:50:33 +0000
-Message-Id: <1585943438-862-3-git-send-email-clabbe@baylibre.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1585943438-862-1-git-send-email-clabbe@baylibre.com>
-References: <1585943438-862-1-git-send-email-clabbe@baylibre.com>
+        Fri, 3 Apr 2020 18:06:48 -0400
+Received: from spf.mail.chinamobile.com (unknown[172.16.121.7]) by rmmx-syy-dmz-app02-12002 (RichMail) with SMTP id 2ee25e87b3617b4-7d944; Sat, 04 Apr 2020 06:06:25 +0800 (CST)
+X-RM-TRANSID: 2ee25e87b3617b4-7d944
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG: 00000000
+Received: from localhost.localdomain (unknown[112.3.208.73])
+        by rmsmtp-syy-appsvr04-12004 (RichMail) with SMTP id 2ee45e87b35f24a-49938;
+        Sat, 04 Apr 2020 06:06:25 +0800 (CST)
+X-RM-TRANSID: 2ee45e87b35f24a-49938
+From:   Tang Bin <tangbin@cmss.chinamobile.com>
+To:     narmstrong@baylibre.com, clabbe@baylibre.com,
+        herbert@gondor.apana.org.au, davem@davemloft.net
+Cc:     linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org,
+        linux-kernel@vger.kernel.org,
+        Tang Bin <tangbin@cmss.chinamobile.com>
+Subject: [PATCH v6]crypto: amlogic - Delete duplicate dev_err in meson_crypto_probe()
+Date:   Sat,  4 Apr 2020 06:07:54 +0800
+Message-Id: <20200403220754.7856-1-tangbin@cmss.chinamobile.com>
+X-Mailer: git-send-email 2.20.1.windows.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Instead of using an hardcoded value, let's use a defined value for
-SS_START.
+When something goes wrong, platform_get_irq() will print an error message,
+so in order to avoid the situation of repeat output，we should remove
+dev_err here.
 
-Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+Signed-off-by: Tang Bin <tangbin@cmss.chinamobile.com>
 ---
- drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c | 2 +-
- drivers/crypto/allwinner/sun8i-ss/sun8i-ss.h      | 2 ++
- 2 files changed, 3 insertions(+), 1 deletion(-)
+Changes from v5
+ - modify the commit message.
 
-diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-index 6b301afffd11..a5cea855e7d8 100644
---- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-+++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
-@@ -61,7 +61,7 @@ int sun8i_ss_run_task(struct sun8i_ss_dev *ss, struct sun8i_cipher_req_ctx *rctx
- 		      const char *name)
- {
- 	int flow = rctx->flow;
--	u32 v = 1;
-+	u32 v = SS_START;
- 	int i;
+Changes from v4:
+ - rewrite the code, because the code in v4 is wrong, sorry.
+
+Changes form v3:
+ - fix the theme writing error.
+
+Changes from v2:
+ - modify the theme format and content description.
+ - reformat the patch, it's the wrong way to resubmit a new patch that
+   should be modified on top of the original. The original piece is:
+   https://lore.kernel.org/patchwork/patch/1219611/
+
+Changes from v1:
+ - the title has changed, because the description is not very detailed.
+ - the code has been modified, because it needs to match the theme.
+
+ drivers/crypto/amlogic/amlogic-gxl-core.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
+
+diff --git a/drivers/crypto/amlogic/amlogic-gxl-core.c b/drivers/crypto/amlogic/amlogic-gxl-core.c
+index 9d4ead2f7..411857fad 100644
+--- a/drivers/crypto/amlogic/amlogic-gxl-core.c
++++ b/drivers/crypto/amlogic/amlogic-gxl-core.c
+@@ -253,10 +253,8 @@ static int meson_crypto_probe(struct platform_device *pdev)
+ 	mc->irqs = devm_kcalloc(mc->dev, MAXFLOW, sizeof(int), GFP_KERNEL);
+ 	for (i = 0; i < MAXFLOW; i++) {
+ 		mc->irqs[i] = platform_get_irq(pdev, i);
+-		if (mc->irqs[i] < 0) {
+-			dev_err(mc->dev, "Cannot get IRQ for flow %d\n", i);
++		if (mc->irqs[i] < 0)
+ 			return mc->irqs[i];
+-		}
  
- #ifdef CONFIG_CRYPTO_DEV_SUN8I_SS_DEBUG
-diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss.h b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss.h
-index 29c44f279112..f7a64033fc03 100644
---- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss.h
-+++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss.h
-@@ -13,6 +13,8 @@
- #include <linux/debugfs.h>
- #include <linux/crypto.h>
- 
-+#define SS_START	1
-+
- #define SS_ENCRYPTION		0
- #define SS_DECRYPTION		BIT(6)
- 
+ 		err = devm_request_irq(&pdev->dev, mc->irqs[i], meson_irq_handler, 0,
+ 				       "gxl-crypto", mc);
 -- 
-2.24.1
+2.20.1.windows.1
+
+
 
