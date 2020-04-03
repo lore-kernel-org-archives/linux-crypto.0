@@ -2,107 +2,98 @@ Return-Path: <SRS0=Ncaf=5T=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8360C43331
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Apr 2020 18:43:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26D3EC43331
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Apr 2020 19:50:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 74A0920737
-	for <linux-crypto@archiver.kernel.org>; Fri,  3 Apr 2020 18:43:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E8539206E9
+	for <linux-crypto@archiver.kernel.org>; Fri,  3 Apr 2020 19:50:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="UEzW/FmU"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="KUVQPcny"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728284AbgDCSnM (ORCPT
+        id S1727421AbgDCTut (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 3 Apr 2020 14:43:12 -0400
-Received: from mail-wr1-f67.google.com ([209.85.221.67]:42128 "EHLO
-        mail-wr1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728095AbgDCSnM (ORCPT
+        Fri, 3 Apr 2020 15:50:49 -0400
+Received: from mail-wr1-f66.google.com ([209.85.221.66]:36337 "EHLO
+        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726368AbgDCTut (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 3 Apr 2020 14:43:12 -0400
-Received: by mail-wr1-f67.google.com with SMTP id h15so9689718wrx.9
-        for <linux-crypto@vger.kernel.org>; Fri, 03 Apr 2020 11:43:11 -0700 (PDT)
+        Fri, 3 Apr 2020 15:50:49 -0400
+Received: by mail-wr1-f66.google.com with SMTP id k1so507291wrm.3
+        for <linux-crypto@vger.kernel.org>; Fri, 03 Apr 2020 12:50:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=baylibre-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=+GPTHnyl90NKm5LFkBR8XEvQYiiIQK4VWKFTWEH8l7Q=;
-        b=UEzW/FmUc6Y87LrNXHBdZVEXYR9PNYI3Hz7s5zu+DhV2oo6ILIw97n1TNuAaO8OO3V
-         cVuNsH0w8wMGwAmKWEYsnPD9jn3IfogOHz4yvf56FxctDpvYcn0oR5Hq2HbhH4rIEeQw
-         yaFUS+mxjBOHfBxSSg4RrJOrDHmYTb+dfyx/RFSmXQtL5HifxD07iIGZ1lfE5E2yin/L
-         CCJTFx8x5Yb5Cy2V0EwGswwtJoccb1jzeyeVangH/XLUsHJ0Ro0cVqBW4hjJwBYNTkUv
-         xSrcyWxjhz8KbemjeEimnC5rpu1qDamE8Etjcm9zhj4KnrEmMMj0XtPbfgQ3GyslLyre
-         yj0g==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=ZwalgJuNdjnU0AH+11/7zFoA2oqP3wkRvVgbyS9b41k=;
+        b=KUVQPcnyz2hl7SCVBDI+1XsXZwodz/A+BMq7RJInRs48OWppiuWfPyn3Z7e/O+9Ku+
+         3HlPHApGLzvMJs+0KFmGHj/6DUC23P9I2sSJDWPkk+YFZ2Q+B78IgzzUYzFLpc+dgn8r
+         PndzOOMEAbb8Kg0i01xjsBVBJ/NkY32OR8lgja1akb26BTK54snwotBHjQNvVC7GTLyh
+         T8md9A3jE00qFWhh1cLuTU9IBjwacoK0WRSxwOOpWinkGE+CQypkkEAp7Zr+vFheElVz
+         E7fXNgg+imGbrYqZWVqTnvq7MHOMaQ1+e19T7UUWL0wfWgjinehkX8CITwHPlCPscYeI
+         iVSg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=+GPTHnyl90NKm5LFkBR8XEvQYiiIQK4VWKFTWEH8l7Q=;
-        b=XER4H3Bvyom5OEP0u4MHFDk8HKaLkIBheexte7QNnbItS7HxJFg0a2PO++OHzrikyf
-         zkY4+qgVSWKS7UhMLkl1rGTFOZHGmGSNY2hulTUJr3/VDhhu98pZu2ZM85+T+Hm416L6
-         alEidbfAhtxix1z23oQKgagjvgDBG3ZA/z/T6TSofUV4KGvbuP89ZpALraaWRBm8M6F3
-         7bhc2KSRWmboPWRcSQxqexPtmyuXyu/zk/l/lV+jXfGNgSkcnVDhJ0fKeb1h/LHSoFQW
-         3bB+K33RALHpkyq/RJZWFCVvpMtK5djydKUrHdgXe8DpuRSsZ9lUuRukZOhmXjqEiFdl
-         cltg==
-X-Gm-Message-State: AGi0PuZL2Q4UqbTapyg2jidH0ijXJwTHQoucQ9ww7diP/BoutR+ep2Ig
-        a6YUXKWJjJIEZN4XgI7H8+ZPHw==
-X-Google-Smtp-Source: APiQypKiItekYd3SJpDys2lSSUlpMDrJD00tTpiCHgh4jCy85JaOxsj6rWEUzvyolaiXMgOAyByoYg==
-X-Received: by 2002:a5d:4d8c:: with SMTP id b12mr10236625wru.35.1585939390612;
-        Fri, 03 Apr 2020 11:43:10 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id p5sm13681907wrg.49.2020.04.03.11.43.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Apr 2020 11:43:09 -0700 (PDT)
-Date:   Fri, 3 Apr 2020 20:43:07 +0200
-From:   LABBE Corentin <clabbe@baylibre.com>
-To:     Tang Bin <tangbin@cmss.chinamobile.com>
-Cc:     narmstrong@baylibre.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-amlogic@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5]crypto: amlogic - Delete duplicate dev_err in
- meson_crypto_probe()
-Message-ID: <20200403184307.GB15205@Red>
-References: <20200403111429.11876-1-tangbin@cmss.chinamobile.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200403111429.11876-1-tangbin@cmss.chinamobile.com>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=ZwalgJuNdjnU0AH+11/7zFoA2oqP3wkRvVgbyS9b41k=;
+        b=alhEly2LocHCMbTsryAh8T3tpAVY/1RWL8HlvRkhtJRmeOTV0eDwnMAq9T+MpFPK2m
+         n+yT6xc6EyiOSDqgTOgnSwQA/UHL4PHvDCe64TtSGcA2Rjlje/RfT5FVlsIeTk0OAYR4
+         VOK5MqqhgDM7lGHYJWPbm4gqzV4w1TxZAOsRja7nuC7ryFNKw51DDq5zlLNiWJyzPtnS
+         +ecoWvhRpz7djBL3T7Bm+Kx0Jmz5Oqzr5Ld4nAJEPo0WKalQKrBu2JXem5fPIDUkNBxC
+         pvVmZBvLTvMtI8qz5FJd5Wx3siI5a6bDWgsegVXT97BZWQ50Up3eSB/tAy4BckwmMzn1
+         5wCw==
+X-Gm-Message-State: AGi0PuZF99KD77Sa/sUPVpJ7sZg5uSD5nkrcmrLZozqt3dwQc6CJ7kcg
+        qqV9Cys6cFsEZ/Jq4/WbzuDjHQ==
+X-Google-Smtp-Source: APiQypJPD3CP1v4p+ZE6U2Aywvu5WeATMjzlv5PMn28lxY1pqFnQhQh7N1RgKP5cr5vCmeFo5f3YRw==
+X-Received: by 2002:adf:9e08:: with SMTP id u8mr10686337wre.155.1585943448089;
+        Fri, 03 Apr 2020 12:50:48 -0700 (PDT)
+Received: from localhost.localdomain ([51.15.160.169])
+        by smtp.googlemail.com with ESMTPSA id c17sm8102448wrp.28.2020.04.03.12.50.47
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-SHA bits=128/128);
+        Fri, 03 Apr 2020 12:50:47 -0700 (PDT)
+From:   Corentin Labbe <clabbe@baylibre.com>
+To:     davem@davemloft.net, herbert@gondor.apana.org.au,
+        mripard@kernel.org, wens@csie.org
+Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-sunxi@googlegroups.com,
+        Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH 1/7] crypto: rng - add missing __crypto_rng_cast to the rng header
+Date:   Fri,  3 Apr 2020 19:50:32 +0000
+Message-Id: <1585943438-862-2-git-send-email-clabbe@baylibre.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1585943438-862-1-git-send-email-clabbe@baylibre.com>
+References: <1585943438-862-1-git-send-email-clabbe@baylibre.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Apr 03, 2020 at 07:14:29PM +0800, Tang Bin wrote:
-> When something goes wrong, platform_get_irq() will print an error message,
-> so in order to avoid the situation of repeat output，we should remove
-> dev_err here.
-> 
-> Changes from v4:
->  - rewrite the code, because the code in v4 is wrong, sorry.
-> 
-> Changes form v3:
->  - fix the theme writing error.
-> 
-> Changes from v2:
->  - modify the theme format and content description.
->  - reformat the patch, it's the wrong way to resubmit a new patch that
->    should be modified on top of the original. The original piece is:
->    https://lore.kernel.org/patchwork/patch/1219611/
-> 
-> Changes from v1:
->  - the title has changed, because the description is not very detailed.
->  - the code has been modified, because it needs to match the theme.
-> 
-> Signed-off-by: Tang Bin <tangbin@cmss.chinamobile.com>
-> ---
+This patch add __crypto_rng_cast() to the rng header like other
+__algo_cast functions.
 
-Hello
+Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
+---
+ include/crypto/rng.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-The changelog should not be in the commit message.
-You should set them after the "---" line
+diff --git a/include/crypto/rng.h b/include/crypto/rng.h
+index 8b4b844b4eef..0e140f132efe 100644
+--- a/include/crypto/rng.h
++++ b/include/crypto/rng.h
+@@ -198,4 +198,9 @@ static inline int crypto_rng_seedsize(struct crypto_rng *tfm)
+ 	return crypto_rng_alg(tfm)->seedsize;
+ }
+ 
++static inline struct crypto_rng *__crypto_rng_cast(struct crypto_tfm *tfm)
++{
++	return container_of(tfm, struct crypto_rng, base);
++}
++
+ #endif
+-- 
+2.24.1
 
-Thanks
