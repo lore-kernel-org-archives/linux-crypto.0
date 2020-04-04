@@ -2,47 +2,49 @@ Return-Path: <SRS0=TurE=5U=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0D03C2BA16
-	for <linux-crypto@archiver.kernel.org>; Sat,  4 Apr 2020 12:02:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E00BC2BA1A
+	for <linux-crypto@archiver.kernel.org>; Sat,  4 Apr 2020 14:57:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B5AEE206F5
-	for <linux-crypto@archiver.kernel.org>; Sat,  4 Apr 2020 12:02:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 48154206D4
+	for <linux-crypto@archiver.kernel.org>; Sat,  4 Apr 2020 14:57:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="LXo/U23F"
+	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="pV/4ZGEP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726039AbgDDMCE (ORCPT
+        id S1726410AbgDDO5X (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 4 Apr 2020 08:02:04 -0400
-Received: from mout.web.de ([217.72.192.78]:57061 "EHLO mout.web.de"
+        Sat, 4 Apr 2020 10:57:23 -0400
+Received: from mout.web.de ([212.227.17.11]:37347 "EHLO mout.web.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725916AbgDDMCE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 4 Apr 2020 08:02:04 -0400
+        id S1726314AbgDDO5X (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 4 Apr 2020 10:57:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
-        s=dbaedf251592; t=1586001647;
-        bh=2+t496lVX30o7xPopsLI94blHCVuADQCmQc1LISk3c8=;
-        h=X-UI-Sender-Class:Cc:Subject:To:From:Date;
-        b=LXo/U23FDhG3ApcaV27fZIIcEiunU45Hj8kI+pvUPYChw7apbvxIGUMV2bQfCxps6
-         xPf8LIwbNUxhzG5y8JOPhjQPyvmLMRkMEBbFUhGT5OPM+U8HxSDgXTST2DkjZOzWJx
-         4Dc8NAVsLFAwZS4awlEqnmWPSI3fGWpp0Lcsk7hY=
+        s=dbaedf251592; t=1586012220;
+        bh=C2KveFWKzUHHIjPTMkE7LjhJpUU2YKMSuSmnzYsVjWw=;
+        h=X-UI-Sender-Class:To:Cc:From:Subject:Date;
+        b=pV/4ZGEPFPYOpDMrLirSpicQAvAYwyBaWACxbD0KPyJMyRKX1qEUiu+B8M+dDf331
+         i49QqyWeRk3h79sqLnjU8ZnrnSXZU0f5ufDKd6fUeM2xVwx5jR6D0xoYZYTSMnRJay
+         ZcVn48JmgMa/Bafdtvq3bbhv13rM9jMJiBZObd6s=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
 Received: from [192.168.1.3] ([93.132.181.229]) by smtp.web.de (mrweb102
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0Lhvlm-1izKov0M5a-00n7D3; Sat, 04
- Apr 2020 14:00:47 +0200
-Cc:     linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        Corentin Labbe <clabbe@baylibre.com>,
-        "David S. Miller" <davem@davemloft.net>,
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0Lh6QF-1j0WYV2rWp-00oU5K; Sat, 04
+ Apr 2020 16:57:00 +0200
+To:     linux-crypto@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
+        Deepak Saxena <dsaxena@plexity.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Neil Armstrong <narmstrong@baylibre.com>
-Subject: Re: [PATCH v6] crypto: amlogic - Delete duplicate dev_err() in
- meson_crypto_probe()
-To:     Tang Bin <tangbin@cmss.chinamobile.com>,
-        linux-amlogic@lists.infradead.org, linux-crypto@vger.kernel.org
+        Matt Mackall <mpm@selenic.com>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org,
+        Tang Bin <tangbin@cmss.chinamobile.com>
 From:   Markus Elfring <Markus.Elfring@web.de>
+Subject: [PATCH] hwrng: omap - Delete an error message in
+ of_get_omap_rng_device_details()
 Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
  mQINBFg2+xABEADBJW2hoUoFXVFWTeKbqqif8VjszdMkriilx90WB5c0ddWQX14h6w5bT/A8
  +v43YoGpDNyhgA0w9CEhuwfZrE91GocMtjLO67TAc2i2nxMc/FJRDI0OemO4VJ9RwID6ltwt
@@ -86,60 +88,76 @@ Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
  Z/wsLiWTgKlih2QYULvW61XU+mWsK8+ZlYUrRMpkauN4CJ5yTpvp+Orcz5KixHQmc5tbkLWf
  x0n1QFc1xxJhbzN+r9djSGGN/5IBDfUqSANC8cWzHpWaHmSuU3JSAMB/N+yQjIad2ztTckZY
  pwT6oxng29LzZspTYUEzMz3wK2jQHw+U66qBFk8whA7B2uAU1QdGyPgahLYSOa4XAEGb6wbI FEE=
-Message-ID: <25715704-5648-77c9-96d5-0639280e796c@web.de>
-Date:   Sat, 4 Apr 2020 14:00:36 +0200
+Message-ID: <eae7170c-4371-4865-7b85-589c0ed2b5b6@web.de>
+Date:   Sat, 4 Apr 2020 16:56:57 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:eawbiwXdJyDCWAumDCQZk8FePH6h7au3Pj1TqcybVEw+59HRIZ0
- Y8ImAuzi9rWq50bkRYDOdRFw0MKWnMcZa/pXtqj/qtNXB4cLtlIGIZEoOLCAlG2kTeSki+a
- J/89bSpeo+Rj9jGbgSjFlcXX6Ny5+HsljeLKeCFNtrAO7f/Yww9OfzPlCJO7BBN/IjCQeR1
- roLLCHPbYfwIeTMM0a35w==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:gmctkTjB1cM=:Xof4a9d5BRoRn0f4oXRjnG
- tFXoS5k/De/lyeru9wPYRkk+F0vccvw5K3J61MKGna1fx6XykyFzoqzq0ssdSDKJCVeeqkFsY
- jfJ+G70FXKm+l9Ab1CiHl4b+xfULYn1TlbEQxYs1jPKNkD8OmjgLsIzaWbkc9JyIsZavJdUma
- xdUhN2aP2LXf+IBE6pEGXzxsZYPm+Ab6Owns+OCq7Qyj4ToWT9u88GNVb9JQSrMc1lCFI+tAv
- AOTLnCQ+lAwpbpk3YOFfdiWxTFK+tVqWHiZTsZQiSDO9f4s3ZF1UK4lpMlRMaRqRaqxvNzWTs
- uiwXoM5h7/WnACVJ7lKkC93vBHu/2FymEYo5Exb0NPQi+Z8OZB68VPYZw2f3yI2GWNjR0z9OE
- nbLbtxH9wAt1SQzby2OlpJbxeM8xT6NJs0Q9qezPhzypoLZt0kVY/n8NVnaEtbIzH6MkAwSz+
- ngD96IAC9rPovTGYPS0tk2mhiV8hbwqop8PIPNof1aVzBp3UBBVZS3osuA0nlQoIZgwVtZUP6
- CCxmrx3VFmpkAcEA/qYvhTwMXV2CkVE4j8bDW+78rbINONuf7G0fjV6/MTt3Sx8xMZyM3Ar2y
- 5qkEuyeccVfgSygj7be9Vv39My3aDGUA9fkqhK3ya/x3s1mGTztD3noTzhHArhgLPwyOx/jZj
- Dwr8erqefAw63crCWo+fNEhcd1nykhP7hajtrloHTG+vPsH+KPxIPCrTWE1J62DYg5u82u6ur
- fYi3+BVv7RJ1L3Lk9+ZR2aIN2WxKbX7M69JZYkrkpIlVZ7/1CtxlmQGwkqGIpAwCr90lpK0go
- UWbNj7A8McefYEiDJ2f85yI2PXmOUqye73Wa1FCqMEAlEoR9iwXBgDIhyhCwBOv5xkQQ/I3gB
- Fwm14mSsbFLgmW/eA5iF4kiu6ZAh/N3Wct1CL10BXC6WjBVouoASfDXDY5BrMBTdjaDbgWMOV
- F9IkplJDo6lz4d1wUJBEeiWCwMqSd42xt06zk0wd7mdRXNQFW+rkbbb5lLhtYSRZwxnUIcLf3
- EOZyLpfZNouP0wpniAC3FZnqV7wTcZoZjHsYH9BIDQrt4k70KAA728R6PBmR4kZ8s4Wr2kSWG
- Qt6xhpuef+T7kyFwsUp3+LKQyul5IECubqbM/X72XMEvWCtGT6oYpHYq3hdVhE4tVJbnH5HLK
- 8QtDOJkBcYOMul7yDlv+zKb14Hvd/C7oZdlA6J65F6LH0zdX7A4d01z+bFlGi1tWMKpIAvmOP
- 6IXs0vNy4pZTOPDJN
+X-Provags-ID: V03:K1:1mPM05PZGf5upbNmlHG8hg8fF92RQEBvmnzWQrYIkEaPD85ry/M
+ OaaBtZmMOttnAg7hdNThgh7MoUQC50mmeRC+5VGkP6ahJTkIadEJsYTawavxEy9w45Cacug
+ 0PjpH0ioVyCWfo1G7V4OfN6SAkkkgF5nvW4zx/kAaGEchlUXdnZZNOYosEhVWx68cbwjp4N
+ 5NRRzAWlGVcrd1pJAIvMw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:gvGdsMt4DYg=:FhU4m91UNfE5Wl3rFdrB2g
+ eNgBUC8hZTdYQ3ZeLTcMiiy6c/saA/8U/MvxiOtgZgLKbXW0N+w/gJee2wTh4oFABoh8GnkZQ
+ qOXdUsaZz83yFeXfkHneidHgjMRWsCp2r88ls2IITBMP4SAnL6KPgD5SK09wNQmTVJjyieqYr
+ 5XuB8mnET1GqVhwkIO3BnfeFnfYzTzgYTnRx69oeWzV102u09LpHMLcw989Tc7hGp1Vg+wph9
+ 0brzN4RAIQDOUEPkeErHd9nEecpqHJxhHrkmhcAG7XFo2SGX7OOqa0URNJ4umqkjFUVEvhdmi
+ X/zZZ0pPee6ZNpywNkfjg4I+20qpsliPq3PbpdYFNAN6St6dabHDmzSN345H1BM08mRlqoSpF
+ oqAkjD7mozkiHqshzUIsS2rAgAoVfxL2b+EGhqE7QSOXGA39P8T0C9k4trb1umC3x/Nkd7MeT
+ EQqCB1N1x1Vjh+vVxqxKO+PLU50jlX1/Sugk/wNHCVhIyrkr03GjlEHzwQY7EJt5SqAcWZ3Du
+ G0AgAPuZaOeFNPkazaUl+1cy0C0L2Xw37psx4yaKfkPTuOT2q/tn+zA1tUqQOSyXD3ltZuLAh
+ 3ogLFpBu5s+2uJfJ40ekvgmuQE0DVPN/v0DakYtNYf05Jy38+o6IWBxyKazXhRZnR4zqzgYHm
+ VUcTPr35HwANTGHn8HsnuDULXEsk7eW6/iSRJAYf9XZUi2cSSEN2CQFC01w5izIJDN3VpaIhw
+ t5xj3+W4X1YZpAnuin5FIf7kezU6iP96VgoxJc/JC5SovAXasxs5kcpeKIdZKWR/91lHCc6h3
+ xYOIi71PfvEN1i0pIYPGXgYP0izqinowbH5taDenBdxM3gP4hyXUo+cBK0L2chOsug6t0SSYK
+ Oos0il+5k620NH2MJuJCI0jaX9QnPdd6XjhUoFVjGMgx6wASUVliaIPyqC9e3oDI7pJs06ObJ
+ Lc3G0WRCNuWNnYdGcVX5CK1KH73QwZXc6N7c2vbIYdCXgDNj1ItqMpUymsAEFqxpB2Xwjo1Ks
+ Rmzkz9MUClyOorQRzIUq6Xlw1/A8VMbGKcxc1yenyxxEv8JKoPbHaR6DztbqnBIjPY/GMT/Wb
+ r/c/70Icp5NjSpk8Ycc+g4Sl5vGb4LmlqvmEDR6NlYOrnk4grAT4nyZwxuU0IEMBIabmn8NAZ
+ XdumufQjU/3BDI2dkfUMZPfm3mug1ML1j+T1lZdUeqWKFl+qek6ZxA60o+GxhJnijfCVfJT6W
+ OQyrugSeNEloQqnGW
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-> When something goes wrong, platform_get_irq() will print an error messag=
-e,
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Sat, 4 Apr 2020 16:45:57 +0200
 
-This information is reasonable.
+The function =E2=80=9Cplatform_get_irq=E2=80=9D can log an error already.
+Thus omit a redundant message for the exception handling in the
+calling function.
 
+This issue was detected by using the Coccinelle software.
 
-> so in order to avoid the situation of repeat output=EF=BC=8C
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+=2D--
+ drivers/char/hw_random/omap-rng.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-Possible adjustments:
-* Separate sentences
+diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/om=
+ap-rng.c
+index 65952393e1bb..7290c603fcb8 100644
+=2D-- a/drivers/char/hw_random/omap-rng.c
++++ b/drivers/char/hw_random/omap-rng.c
+@@ -392,11 +392,8 @@ static int of_get_omap_rng_device_details(struct omap=
+_rng_dev *priv,
+ 	if (of_device_is_compatible(dev->of_node, "ti,omap4-rng") ||
+ 	    of_device_is_compatible(dev->of_node, "inside-secure,safexcel-eip76"=
+)) {
+ 		irq =3D platform_get_irq(pdev, 0);
+-		if (irq < 0) {
+-			dev_err(dev, "%s: error getting IRQ resource - %d\n",
+-				__func__, irq);
++		if (irq < 0)
+ 			return irq;
+-		}
 
-* Avoid another typo: =E2=80=9Crepeated output=E2=80=9D
+ 		err =3D devm_request_irq(dev, irq, omap4_rng_irq,
+ 				       IRQF_TRIGGER_NONE, dev_name(dev), priv);
+=2D-
+2.26.0
 
-
-> we should remove dev_err here.
-
-Thus remove a redundant function call.
-(An imperative wording is usually preferred for Linux commit messages.)
-
-Regards,
-Markus
