@@ -8,43 +8,43 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E00BC2BA1A
-	for <linux-crypto@archiver.kernel.org>; Sat,  4 Apr 2020 14:57:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBF73C2BA15
+	for <linux-crypto@archiver.kernel.org>; Sat,  4 Apr 2020 15:18:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 48154206D4
-	for <linux-crypto@archiver.kernel.org>; Sat,  4 Apr 2020 14:57:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A6778206D4
+	for <linux-crypto@archiver.kernel.org>; Sat,  4 Apr 2020 15:18:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="pV/4ZGEP"
+	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="GqYW9/Vn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726410AbgDDO5X (ORCPT
+        id S1726283AbgDDPSP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 4 Apr 2020 10:57:23 -0400
-Received: from mout.web.de ([212.227.17.11]:37347 "EHLO mout.web.de"
+        Sat, 4 Apr 2020 11:18:15 -0400
+Received: from mout.web.de ([212.227.17.11]:40331 "EHLO mout.web.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726314AbgDDO5X (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 4 Apr 2020 10:57:23 -0400
+        id S1725837AbgDDPSO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 4 Apr 2020 11:18:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
-        s=dbaedf251592; t=1586012220;
-        bh=C2KveFWKzUHHIjPTMkE7LjhJpUU2YKMSuSmnzYsVjWw=;
-        h=X-UI-Sender-Class:To:Cc:From:Subject:Date;
-        b=pV/4ZGEPFPYOpDMrLirSpicQAvAYwyBaWACxbD0KPyJMyRKX1qEUiu+B8M+dDf331
-         i49QqyWeRk3h79sqLnjU8ZnrnSXZU0f5ufDKd6fUeM2xVwx5jR6D0xoYZYTSMnRJay
-         ZcVn48JmgMa/Bafdtvq3bbhv13rM9jMJiBZObd6s=
+        s=dbaedf251592; t=1586013443;
+        bh=9o5auQpdZ+ebmoPBCRpyWY8Ck41no0lRg9eca/cxAtg=;
+        h=X-UI-Sender-Class:To:From:Subject:Cc:Date;
+        b=GqYW9/VnkUj7uNWFUvTZXtNaqeLfxU4fE/huTvY6nzO6l0BQ5AmdrdwPKzZ5aWC1E
+         q4VkGK7Ez1luYCwwpNGfoNYgnpFJTdO2ckVeFdIMxfMveMdLYNlLoDhD+x0NCB7MAb
+         TX2q75KmfVeKkFWPkOsgR8SfyZ0LdzkBr6qF1ydE=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from [192.168.1.3] ([93.132.181.229]) by smtp.web.de (mrweb102
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0Lh6QF-1j0WYV2rWp-00oU5K; Sat, 04
- Apr 2020 16:57:00 +0200
+Received: from [192.168.1.3] ([93.132.181.229]) by smtp.web.de (mrweb101
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0MWAwH-1jngNO1qyf-00XLwT; Sat, 04
+ Apr 2020 17:17:23 +0200
 To:     linux-crypto@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
-        Deepak Saxena <dsaxena@plexity.net>,
+        Chuhong Yuan <hslester96@gmail.com>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Matt Mackall <mpm@selenic.com>
-Cc:     LKML <linux-kernel@vger.kernel.org>,
-        kernel-janitors@vger.kernel.org,
-        Tang Bin <tangbin@cmss.chinamobile.com>
+        Ludovic Desroches <ludovic.desroches@microchip.com>,
+        =?UTF-8?Q?=c5=81ukasz_Stelmach?= <l.stelmach@samsung.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        YueHaibing <yuehaibing@huawei.com>
 From:   Markus Elfring <Markus.Elfring@web.de>
-Subject: [PATCH] hwrng: omap - Delete an error message in
- of_get_omap_rng_device_details()
+Subject: [PATCH] hwrng: xgene - Delete an error message in xgene_rng_probe()
 Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
  mQINBFg2+xABEADBJW2hoUoFXVFWTeKbqqif8VjszdMkriilx90WB5c0ddWQX14h6w5bT/A8
  +v43YoGpDNyhgA0w9CEhuwfZrE91GocMtjLO67TAc2i2nxMc/FJRDI0OemO4VJ9RwID6ltwt
@@ -88,44 +88,47 @@ Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
  Z/wsLiWTgKlih2QYULvW61XU+mWsK8+ZlYUrRMpkauN4CJ5yTpvp+Orcz5KixHQmc5tbkLWf
  x0n1QFc1xxJhbzN+r9djSGGN/5IBDfUqSANC8cWzHpWaHmSuU3JSAMB/N+yQjIad2ztTckZY
  pwT6oxng29LzZspTYUEzMz3wK2jQHw+U66qBFk8whA7B2uAU1QdGyPgahLYSOa4XAEGb6wbI FEE=
-Message-ID: <eae7170c-4371-4865-7b85-589c0ed2b5b6@web.de>
-Date:   Sat, 4 Apr 2020 16:56:57 +0200
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org,
+        Tang Bin <tangbin@cmss.chinamobile.com>
+Message-ID: <45447185-d64f-027c-7bca-c59ea21e6021@web.de>
+Date:   Sat, 4 Apr 2020 17:17:19 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:1mPM05PZGf5upbNmlHG8hg8fF92RQEBvmnzWQrYIkEaPD85ry/M
- OaaBtZmMOttnAg7hdNThgh7MoUQC50mmeRC+5VGkP6ahJTkIadEJsYTawavxEy9w45Cacug
- 0PjpH0ioVyCWfo1G7V4OfN6SAkkkgF5nvW4zx/kAaGEchlUXdnZZNOYosEhVWx68cbwjp4N
- 5NRRzAWlGVcrd1pJAIvMw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:gvGdsMt4DYg=:FhU4m91UNfE5Wl3rFdrB2g
- eNgBUC8hZTdYQ3ZeLTcMiiy6c/saA/8U/MvxiOtgZgLKbXW0N+w/gJee2wTh4oFABoh8GnkZQ
- qOXdUsaZz83yFeXfkHneidHgjMRWsCp2r88ls2IITBMP4SAnL6KPgD5SK09wNQmTVJjyieqYr
- 5XuB8mnET1GqVhwkIO3BnfeFnfYzTzgYTnRx69oeWzV102u09LpHMLcw989Tc7hGp1Vg+wph9
- 0brzN4RAIQDOUEPkeErHd9nEecpqHJxhHrkmhcAG7XFo2SGX7OOqa0URNJ4umqkjFUVEvhdmi
- X/zZZ0pPee6ZNpywNkfjg4I+20qpsliPq3PbpdYFNAN6St6dabHDmzSN345H1BM08mRlqoSpF
- oqAkjD7mozkiHqshzUIsS2rAgAoVfxL2b+EGhqE7QSOXGA39P8T0C9k4trb1umC3x/Nkd7MeT
- EQqCB1N1x1Vjh+vVxqxKO+PLU50jlX1/Sugk/wNHCVhIyrkr03GjlEHzwQY7EJt5SqAcWZ3Du
- G0AgAPuZaOeFNPkazaUl+1cy0C0L2Xw37psx4yaKfkPTuOT2q/tn+zA1tUqQOSyXD3ltZuLAh
- 3ogLFpBu5s+2uJfJ40ekvgmuQE0DVPN/v0DakYtNYf05Jy38+o6IWBxyKazXhRZnR4zqzgYHm
- VUcTPr35HwANTGHn8HsnuDULXEsk7eW6/iSRJAYf9XZUi2cSSEN2CQFC01w5izIJDN3VpaIhw
- t5xj3+W4X1YZpAnuin5FIf7kezU6iP96VgoxJc/JC5SovAXasxs5kcpeKIdZKWR/91lHCc6h3
- xYOIi71PfvEN1i0pIYPGXgYP0izqinowbH5taDenBdxM3gP4hyXUo+cBK0L2chOsug6t0SSYK
- Oos0il+5k620NH2MJuJCI0jaX9QnPdd6XjhUoFVjGMgx6wASUVliaIPyqC9e3oDI7pJs06ObJ
- Lc3G0WRCNuWNnYdGcVX5CK1KH73QwZXc6N7c2vbIYdCXgDNj1ItqMpUymsAEFqxpB2Xwjo1Ks
- Rmzkz9MUClyOorQRzIUq6Xlw1/A8VMbGKcxc1yenyxxEv8JKoPbHaR6DztbqnBIjPY/GMT/Wb
- r/c/70Icp5NjSpk8Ycc+g4Sl5vGb4LmlqvmEDR6NlYOrnk4grAT4nyZwxuU0IEMBIabmn8NAZ
- XdumufQjU/3BDI2dkfUMZPfm3mug1ML1j+T1lZdUeqWKFl+qek6ZxA60o+GxhJnijfCVfJT6W
- OQyrugSeNEloQqnGW
+X-Provags-ID: V03:K1:ICiuDRervWvfHNDOGNrIJBPt2UeeahgtYMoQNGl/ppqs7kpIXV9
+ kTXSd/l+zkLv1+r+fXtvVmyId5GMp0DJqfkdnJ/M0qYFnsyadsuc/GswesTY+DCCSYVWIxA
+ odWARvWEKSKsgxUpWpGOUeBgzlj8M/hntphOjXhAkv1Fl0PUPEOqoH5fc+0EGX8bvJhmTrb
+ AVoQYqrOT4ersrYQck3Dw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:E/os88pyrlo=:bUAzhJ0jz4zVoP4Mdg19Ku
+ ogyjTEg/ylgfMMDuFiUVo8T6mkRyMZVIMo1EKm7cQWW9JH0olIU3JETB2bEDmNcoKj9+3V1Un
+ iXe2krYLGPEriOHVU49GZvDDovxaG45Wt3byRyStwgMziGJqphBw/AuhuGoFoJHvUH5xeHbzP
+ 9ToipsP/25hw6k511abQUlObdSnVwBKaqbosvUr4+6SNqfSvYACM88+Ww39jEw/fUuBktprHV
+ LeO3j8i9A5mXiAF/zQfAdDvkwkNHX6BXVtY4BV6YCsJ2wXv46T13NO+uus3cZv1O7LIJSJsTs
+ Ta60d3QvYUHG2Kz3+XT4XDBc8ytfo+fQ58uHJNHF9NL9xMvqRPZq8oZe/DmnnkOdZG3UbyXUW
+ Scxzc0lBmlLlAGvzrbCjdUCRY1kQYr4oRdNSvlLEfm6IeeGND09pFoLSYKk+gegFwj3NICjJr
+ FK/QnGGaWhAdQfxulax4QnEygsc12tQYtefHWbo+vv+AB1SGihKlLQBNF+0kdF5I8B5GUF7r3
+ BtzrqroK3zSR7FPlyGS0WOuqfh9wNWxn4MI2jnRkM+C/MRPG4JLCxpsy8M/BwgcDnMfh7jQ0U
+ o2bnLT+7EA71tstdZKWSKBrcoFgE0T5/oaynpZCIe/GihKqkJ4GP/MmujmCXjzo81hIfxbOzM
+ aVc/mCJZlI7oqj9NkZyMwpPZ5abks+c6hvr0+B5UeiHXpVOKZYTFzo3sRdjzF06p8xEpKkPwR
+ SJWN1HHt8pEBaMg76DyU8WWC4Zf+6hMDEsNHqjp4g2GIopee0oNlj9jICSM4wS211sgaF5I7z
+ MokglkGRCSZseOQoLmLhPW28k6fAWVakHZ4+BspSSJWSgdSanQH8h6rdRfGvTkIBTkVExYy9C
+ Nwbc2udgFWVzTktQXJp35qmq6/lIUWQUrvyt9an+apBk56dBKGqnaHZESB/SRalOS0JVyZroH
+ fJvV2S5+yy59VCASg3XV1AnSW6eyXDUChi5G++amf/Xp0wZpPyf50B/QyHypD3ur3J9MDAMyL
+ x8jCKFnj4Ot1LKVhUZksJkhHUkc5ARPQBW0hFugalVfUpjNYI7XEzet2tGY8s6lleTvfQyyhp
+ Aq96C24kkgHCB8zglVkY+7AprcLEIOsUUr6sEt0hq20W4Lr6wL6haybbW+duyj3apS440PMg5
+ rNj/FEiFhFPBdrOzes9nlG2e0O7rpiZihUdqwyOxQfmHUuLLEnfHMCnumB9Nle/Wznf1DdWwZ
+ YzhK9InsFeExI4K1v
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Sat, 4 Apr 2020 16:45:57 +0200
+Date: Sat, 4 Apr 2020 17:07:34 +0200
 
 The function =E2=80=9Cplatform_get_irq=E2=80=9D can log an error already.
 Thus omit a redundant message for the exception handling in the
@@ -135,29 +138,27 @@ This issue was detected by using the Coccinelle software.
 
 Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
 =2D--
- drivers/char/hw_random/omap-rng.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ drivers/char/hw_random/xgene-rng.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/drivers/char/hw_random/omap-rng.c b/drivers/char/hw_random/om=
-ap-rng.c
-index 65952393e1bb..7290c603fcb8 100644
-=2D-- a/drivers/char/hw_random/omap-rng.c
-+++ b/drivers/char/hw_random/omap-rng.c
-@@ -392,11 +392,8 @@ static int of_get_omap_rng_device_details(struct omap=
-_rng_dev *priv,
- 	if (of_device_is_compatible(dev->of_node, "ti,omap4-rng") ||
- 	    of_device_is_compatible(dev->of_node, "inside-secure,safexcel-eip76"=
-)) {
- 		irq =3D platform_get_irq(pdev, 0);
--		if (irq < 0) {
--			dev_err(dev, "%s: error getting IRQ resource - %d\n",
--				__func__, irq);
-+		if (irq < 0)
- 			return irq;
--		}
+diff --git a/drivers/char/hw_random/xgene-rng.c b/drivers/char/hw_random/x=
+gene-rng.c
+index d7516a446987..008e6db9ce01 100644
+=2D-- a/drivers/char/hw_random/xgene-rng.c
++++ b/drivers/char/hw_random/xgene-rng.c
+@@ -328,10 +328,8 @@ static int xgene_rng_probe(struct platform_device *pd=
+ev)
+ 		return PTR_ERR(ctx->csr_base);
 
- 		err =3D devm_request_irq(dev, irq, omap4_rng_irq,
- 				       IRQF_TRIGGER_NONE, dev_name(dev), priv);
+ 	rc =3D platform_get_irq(pdev, 0);
+-	if (rc < 0) {
+-		dev_err(&pdev->dev, "No IRQ resource\n");
++	if (rc < 0)
+ 		return rc;
+-	}
+ 	ctx->irq =3D rc;
+
+ 	dev_dbg(&pdev->dev, "APM X-Gene RNG BASE %p ALARM IRQ %d",
 =2D-
 2.26.0
 
