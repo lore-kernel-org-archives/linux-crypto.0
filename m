@@ -8,43 +8,42 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EBF73C2BA15
-	for <linux-crypto@archiver.kernel.org>; Sat,  4 Apr 2020 15:18:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D590C2BA15
+	for <linux-crypto@archiver.kernel.org>; Sat,  4 Apr 2020 15:46:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id A6778206D4
-	for <linux-crypto@archiver.kernel.org>; Sat,  4 Apr 2020 15:18:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 48B5B206C3
+	for <linux-crypto@archiver.kernel.org>; Sat,  4 Apr 2020 15:46:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="GqYW9/Vn"
+	dkim=pass (1024-bit key) header.d=web.de header.i=@web.de header.b="rv/r05mv"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726283AbgDDPSP (ORCPT
+        id S1726224AbgDDPqd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 4 Apr 2020 11:18:15 -0400
-Received: from mout.web.de ([212.227.17.11]:40331 "EHLO mout.web.de"
+        Sat, 4 Apr 2020 11:46:33 -0400
+Received: from mout.web.de ([212.227.17.12]:59571 "EHLO mout.web.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725837AbgDDPSO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 4 Apr 2020 11:18:14 -0400
+        id S1726039AbgDDPqd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 4 Apr 2020 11:46:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
-        s=dbaedf251592; t=1586013443;
-        bh=9o5auQpdZ+ebmoPBCRpyWY8Ck41no0lRg9eca/cxAtg=;
+        s=dbaedf251592; t=1586015133;
+        bh=KyZgrczXO1krNBmQKvyLbqtYplTFmZVQJf5tbfA9XAQ=;
         h=X-UI-Sender-Class:To:From:Subject:Cc:Date;
-        b=GqYW9/VnkUj7uNWFUvTZXtNaqeLfxU4fE/huTvY6nzO6l0BQ5AmdrdwPKzZ5aWC1E
-         q4VkGK7Ez1luYCwwpNGfoNYgnpFJTdO2ckVeFdIMxfMveMdLYNlLoDhD+x0NCB7MAb
-         TX2q75KmfVeKkFWPkOsgR8SfyZ0LdzkBr6qF1ydE=
+        b=rv/r05mv0bWQEBoppGvuBm7ghbmsMeciPx+aPne91DIO611O1oUD/TG8D0vALtTKw
+         2ns84eIp+dhVzT4zAF/bXkG+dWN+F57/KIrjIWLWLZlfiysHZpN8VVM+WpQmI6o+ts
+         XPPhd6BgiMz8EzCq+QV8MsjN7zFu6+YLZeQSLBnw=
 X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
-Received: from [192.168.1.3] ([93.132.181.229]) by smtp.web.de (mrweb101
- [213.165.67.124]) with ESMTPSA (Nemesis) id 0MWAwH-1jngNO1qyf-00XLwT; Sat, 04
- Apr 2020 17:17:23 +0200
-To:     linux-crypto@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
-        Chuhong Yuan <hslester96@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+Received: from [192.168.1.3] ([93.132.181.229]) by smtp.web.de (mrweb103
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 0LvjrE-1jFAOn0ImK-017RWz; Sat, 04
+ Apr 2020 17:45:33 +0200
+To:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        Chen-Yu Tsai <wens@csie.org>,
+        Colin Ian King <colin.king@canonical.com>,
+        Corentin Labbe <clabbe.montjoie@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Ludovic Desroches <ludovic.desroches@microchip.com>,
-        =?UTF-8?Q?=c5=81ukasz_Stelmach?= <l.stelmach@samsung.com>,
-        Matt Mackall <mpm@selenic.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        YueHaibing <yuehaibing@huawei.com>
+        Maxime Ripard <mripard@kernel.org>
 From:   Markus Elfring <Markus.Elfring@web.de>
-Subject: [PATCH] hwrng: xgene - Delete an error message in xgene_rng_probe()
+Subject: [PATCH] crypto: sun8i-ss - Delete an error message in
+ sun8i_ss_probe()
 Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
  mQINBFg2+xABEADBJW2hoUoFXVFWTeKbqqif8VjszdMkriilx90WB5c0ddWQX14h6w5bT/A8
  +v43YoGpDNyhgA0w9CEhuwfZrE91GocMtjLO67TAc2i2nxMc/FJRDI0OemO4VJ9RwID6ltwt
@@ -91,44 +90,44 @@ Autocrypt: addr=Markus.Elfring@web.de; prefer-encrypt=mutual; keydata=
 Cc:     LKML <linux-kernel@vger.kernel.org>,
         kernel-janitors@vger.kernel.org,
         Tang Bin <tangbin@cmss.chinamobile.com>
-Message-ID: <45447185-d64f-027c-7bca-c59ea21e6021@web.de>
-Date:   Sat, 4 Apr 2020 17:17:19 +0200
+Message-ID: <c7e1193f-7d8b-7da3-a2a8-e92ca0fd83b2@web.de>
+Date:   Sat, 4 Apr 2020 17:45:26 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:ICiuDRervWvfHNDOGNrIJBPt2UeeahgtYMoQNGl/ppqs7kpIXV9
- kTXSd/l+zkLv1+r+fXtvVmyId5GMp0DJqfkdnJ/M0qYFnsyadsuc/GswesTY+DCCSYVWIxA
- odWARvWEKSKsgxUpWpGOUeBgzlj8M/hntphOjXhAkv1Fl0PUPEOqoH5fc+0EGX8bvJhmTrb
- AVoQYqrOT4ersrYQck3Dw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:E/os88pyrlo=:bUAzhJ0jz4zVoP4Mdg19Ku
- ogyjTEg/ylgfMMDuFiUVo8T6mkRyMZVIMo1EKm7cQWW9JH0olIU3JETB2bEDmNcoKj9+3V1Un
- iXe2krYLGPEriOHVU49GZvDDovxaG45Wt3byRyStwgMziGJqphBw/AuhuGoFoJHvUH5xeHbzP
- 9ToipsP/25hw6k511abQUlObdSnVwBKaqbosvUr4+6SNqfSvYACM88+Ww39jEw/fUuBktprHV
- LeO3j8i9A5mXiAF/zQfAdDvkwkNHX6BXVtY4BV6YCsJ2wXv46T13NO+uus3cZv1O7LIJSJsTs
- Ta60d3QvYUHG2Kz3+XT4XDBc8ytfo+fQ58uHJNHF9NL9xMvqRPZq8oZe/DmnnkOdZG3UbyXUW
- Scxzc0lBmlLlAGvzrbCjdUCRY1kQYr4oRdNSvlLEfm6IeeGND09pFoLSYKk+gegFwj3NICjJr
- FK/QnGGaWhAdQfxulax4QnEygsc12tQYtefHWbo+vv+AB1SGihKlLQBNF+0kdF5I8B5GUF7r3
- BtzrqroK3zSR7FPlyGS0WOuqfh9wNWxn4MI2jnRkM+C/MRPG4JLCxpsy8M/BwgcDnMfh7jQ0U
- o2bnLT+7EA71tstdZKWSKBrcoFgE0T5/oaynpZCIe/GihKqkJ4GP/MmujmCXjzo81hIfxbOzM
- aVc/mCJZlI7oqj9NkZyMwpPZ5abks+c6hvr0+B5UeiHXpVOKZYTFzo3sRdjzF06p8xEpKkPwR
- SJWN1HHt8pEBaMg76DyU8WWC4Zf+6hMDEsNHqjp4g2GIopee0oNlj9jICSM4wS211sgaF5I7z
- MokglkGRCSZseOQoLmLhPW28k6fAWVakHZ4+BspSSJWSgdSanQH8h6rdRfGvTkIBTkVExYy9C
- Nwbc2udgFWVzTktQXJp35qmq6/lIUWQUrvyt9an+apBk56dBKGqnaHZESB/SRalOS0JVyZroH
- fJvV2S5+yy59VCASg3XV1AnSW6eyXDUChi5G++amf/Xp0wZpPyf50B/QyHypD3ur3J9MDAMyL
- x8jCKFnj4Ot1LKVhUZksJkhHUkc5ARPQBW0hFugalVfUpjNYI7XEzet2tGY8s6lleTvfQyyhp
- Aq96C24kkgHCB8zglVkY+7AprcLEIOsUUr6sEt0hq20W4Lr6wL6haybbW+duyj3apS440PMg5
- rNj/FEiFhFPBdrOzes9nlG2e0O7rpiZihUdqwyOxQfmHUuLLEnfHMCnumB9Nle/Wznf1DdWwZ
- YzhK9InsFeExI4K1v
+X-Provags-ID: V03:K1:5FpBcij+BqOT5cKfMWMBchVp2+6GIQ1CHyZL6N5QI8MkwA+O2Y/
+ p+TJVNMRqZYn1e7bnPMHnFMzKgN39KQhIJiEq7PKeT1pKnlSy/EX8Iddy9Didxe39peh21j
+ s/J4i9Uxd91JkSaS4pAM7JrhRUndYCix3Mn0PsQKzujGxemw0gtFswfvFa93GQsOUorpFsU
+ 7Ia7W6sahLiDignwC8gjQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:zQK96incmDI=:eomnBbkuIuiqgCU+A935Is
+ YmUsLZRJlPk7iguUUreebPM92qLvn/xDTrRj5V4L2c7ADdAY6KqATOyTgAxWxBrhjboWo+ur/
+ ejH60oYqgME00FUUqetvAxM3y8MDL0epgVcZDIFKxju0NxW07gOWFOhMkFFJibOghuM1FQKCD
+ y3fxDI2cO2EiXEbSWfE2HpjZ/UH/5CKPXj5yNNBGvm1YBKl/xtBD4+Kc9GEL5sb06gq4O8wGO
+ 2qvYGtbpzIfaUlXAYul4ugxrm28TtOx5spmbOhY5hUN3jwWMEFn8uCgoYy8xkN00l1UZzxMPa
+ wRKQkLe9607pG9nZ1mOjBJ/LxLy/1L2PZWWidYV3MlCHl/Tv9fzZJIYlqNdRB0vibxLf6+OdV
+ qk9BQOPjD/O7SScwCY+weXd/fxpLc9hcY9MQzqJj5JRxHkgWdFJpB5BjQd6Si/uHAquCn+cAB
+ Jrgw15d6egWJ/W8iSykIa+eZ67vt4PvoulS1TeGI0YBAs8GSfuG2L6JFkn1De9b0eFNphMzEF
+ 4JUXNZlTo26pDycPV2u6UmOUca1K70BUJwejRexC2YJHwlCLoNq94NlmE5zmtJRyd7qvPnvNa
+ EP1xiQtXkEe0YHY2uHDRtH9aBlRmgSAHLSGGkiW9GHtk3sH+ZUJK9HFwmqxIlG53JkHApH9Bj
+ vwXRoo2KBy0336qnKeTPdOqj+T7x7+dD/AgGEgA65XXB/Nz/Iq3aOOIHZCkMj/wmPylFmiScX
+ NeTzdZ919cMEWQpBjmMCirqr9HgtNg2snF3XSgxFC750qiSQeVLwqPKFXZRko5hOcukwzAISD
+ q75Fjg806E2uo+KF4Fo6uARGG5hxbQoMWV2by9F168i47PexgEmlitC+x64rVSU05qr3E2f1V
+ qAgSkfKBe89l4JEDVUI4IMBsQJM+4GAs9I/0JGPg3u758Jek7w3AkMBhrHtXm80wJbllvUuqq
+ FbOG4sKsCXZ9lYIH8+Kqw4sh+7Q7Qrj5mcLcpQkSoMfVw2IG7tT5It5YPLmJU97j7gNKHfm4I
+ MZx7cnVl03QqSxuBLCsRvbjrgYnLyW98UHkBZyymPx+Vj6yPfeIzG84x3oS4z35VKbeo69cgQ
+ JcXsgFmIEZtKnA3YnqtXkOCAX1GifcGJDKLHsaA77P4Fzonp4EETMciiFTPIney0En+FZdFTX
+ FiLSc4ygy5gJQZNP/QjCpQ7W5qgJwCxc4gZDdfrSSIqfC5Z2JatjN2b2DtQNCJDRK4Ldvkj55
+ C9cuyhZFlMQppOhXF
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Sat, 4 Apr 2020 17:07:34 +0200
+Date: Sat, 4 Apr 2020 17:34:53 +0200
 
 The function =E2=80=9Cplatform_get_irq=E2=80=9D can log an error already.
 Thus omit a redundant message for the exception handling in the
@@ -138,27 +137,27 @@ This issue was detected by using the Coccinelle software.
 
 Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
 =2D--
- drivers/char/hw_random/xgene-rng.c | 4 +---
+ drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c | 4 +---
  1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/drivers/char/hw_random/xgene-rng.c b/drivers/char/hw_random/x=
-gene-rng.c
-index d7516a446987..008e6db9ce01 100644
-=2D-- a/drivers/char/hw_random/xgene-rng.c
-+++ b/drivers/char/hw_random/xgene-rng.c
-@@ -328,10 +328,8 @@ static int xgene_rng_probe(struct platform_device *pd=
-ev)
- 		return PTR_ERR(ctx->csr_base);
+diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c b/drivers/c=
+rypto/allwinner/sun8i-ss/sun8i-ss-core.c
+index 6b301afffd11..a1fb2fbdbe7b 100644
+=2D-- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
++++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
+@@ -537,10 +537,8 @@ static int sun8i_ss_probe(struct platform_device *pde=
+v)
+ 		return err;
 
- 	rc =3D platform_get_irq(pdev, 0);
--	if (rc < 0) {
--		dev_err(&pdev->dev, "No IRQ resource\n");
-+	if (rc < 0)
- 		return rc;
+ 	irq =3D platform_get_irq(pdev, 0);
+-	if (irq < 0) {
+-		dev_err(ss->dev, "Cannot get SecuritySystem IRQ\n");
++	if (irq < 0)
+ 		return irq;
 -	}
- 	ctx->irq =3D rc;
 
- 	dev_dbg(&pdev->dev, "APM X-Gene RNG BASE %p ALARM IRQ %d",
+ 	ss->reset =3D devm_reset_control_get(&pdev->dev, NULL);
+ 	if (IS_ERR(ss->reset)) {
 =2D-
 2.26.0
 
