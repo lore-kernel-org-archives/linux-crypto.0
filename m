@@ -2,117 +2,124 @@ Return-Path: <SRS0=Egg7=5V=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D09D5C2BA2B
-	for <linux-crypto@archiver.kernel.org>; Sun,  5 Apr 2020 11:50:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B734AC2BA15
+	for <linux-crypto@archiver.kernel.org>; Sun,  5 Apr 2020 17:56:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B18EA20709
-	for <linux-crypto@archiver.kernel.org>; Sun,  5 Apr 2020 11:50:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 86014206F5
+	for <linux-crypto@archiver.kernel.org>; Sun,  5 Apr 2020 17:56:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ew9379n9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726550AbgDELuv (ORCPT
+        id S1727075AbgDER43 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 5 Apr 2020 07:50:51 -0400
-Received: from inva020.nxp.com ([92.121.34.13]:57866 "EHLO inva020.nxp.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726754AbgDELut (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 5 Apr 2020 07:50:49 -0400
-Received: from inva020.nxp.com (localhost [127.0.0.1])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id CCBC61A08FF;
-        Sun,  5 Apr 2020 13:50:47 +0200 (CEST)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id C06B71A08FE;
-        Sun,  5 Apr 2020 13:50:47 +0200 (CEST)
-Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 5AD8820466;
-        Sun,  5 Apr 2020 13:50:47 +0200 (CEST)
-From:   Iuliana Prodan <iuliana.prodan@nxp.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Silvano Di Ninno <silvano.dininno@nxp.com>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-imx <linux-imx@nxp.com>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>
-Subject: [PATCH 4/4] crypto: caam - fix use-after-free KASAN issue for RSA algorithms
-Date:   Sun,  5 Apr 2020 14:50:11 +0300
-Message-Id: <1586087411-8505-5-git-send-email-iuliana.prodan@nxp.com>
-X-Mailer: git-send-email 2.1.0
-In-Reply-To: <1586087411-8505-1-git-send-email-iuliana.prodan@nxp.com>
-References: <1586087411-8505-1-git-send-email-iuliana.prodan@nxp.com>
-X-Virus-Scanned: ClamAV using ClamSMTP
+        Sun, 5 Apr 2020 13:56:29 -0400
+Received: from mail-wr1-f68.google.com ([209.85.221.68]:44202 "EHLO
+        mail-wr1-f68.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727048AbgDER43 (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 5 Apr 2020 13:56:29 -0400
+Received: by mail-wr1-f68.google.com with SMTP id m17so14615388wrw.11;
+        Sun, 05 Apr 2020 10:56:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=baFiJWDIXcDbqRxwMJ7sjjGENTtWwfmj+QDEOMNAPIY=;
+        b=Ew9379n9xMZ0UhuAE44iezfeOMtFHGExzsbghmN1UPDmTEl1Jj4YPaBdyHT5H6dUPc
+         eEZRPy0AEPX0lV6IM8Q5ezPof/RucQeZcv3vG2+wsGI+vGGS9Z7kiRR5evCGLOrklapM
+         9XjMQn1dT+x3bRi4EWpwAXN9e3E275r/6d0BrxbO8jXFapcprOpsc1hrYwBDFKUX9q1/
+         Z2Lkcdt2nfRmPi2ZSl0Zs8p/kKfrGpXydSIlbItSID91AX/poOE4i2Qzi8ZUq6gFAYXf
+         57Pnf8j9KBduFhulx9aOm3MTA2swsxT9jVELk6LkTpgnM+Z18p+UbT3TZAqeLvZJC/DT
+         hF5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=baFiJWDIXcDbqRxwMJ7sjjGENTtWwfmj+QDEOMNAPIY=;
+        b=dUkFuyzFcSZfOhAupvDVQWwh6JOXMnnUrE3dHeqTEWBP7lI6S6+g/LaD6JJ4ISpd9v
+         rM1ZD4vdcctXFasppDoy1/ffcc5J4GqrR8LBe/MZZZHkgn38oSF7Zxkn8xdCrmZf4nXK
+         VMckqJHjc5fCmDoKLJSzDzmSewER2jcGC50KIPk+gBkxQ9msCgC4qZLb89SRHkIfy+9j
+         LEign8eu2ZwEddHXAafNT1rpWRpWXVqonQExfXXAP/pA8oU+Lf+W+xRjBcaxxD6eRj5R
+         GK+/5I3/pvD7pPmPMWooxIBwZgoBBaSjSjd23J4/NpqEyiUOuGhLxTzvTQOcL3fqwEsv
+         bGXw==
+X-Gm-Message-State: AGi0PuYEqzsSz2I78fB+4B+pyjUATWwhm9YigrNy+McZiwt8zc3qQOg6
+        Gjj5neD7QgFOc+IojrTF6s0=
+X-Google-Smtp-Source: APiQypJpoHPcVkTc7Sbv9+VocdPMbPRFiuZ9btg2WSmTqQlCTwA2Qnv4W2UYnjlw4Hcm90XWc/aQkA==
+X-Received: by 2002:adf:fdd2:: with SMTP id i18mr19348989wrs.165.1586109386897;
+        Sun, 05 Apr 2020 10:56:26 -0700 (PDT)
+Received: from Red ([2a01:cb1d:3d5:a100:2e56:dcff:fed2:c6d6])
+        by smtp.googlemail.com with ESMTPSA id r5sm21037015wmr.15.2020.04.05.10.56.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 05 Apr 2020 10:56:26 -0700 (PDT)
+Date:   Sun, 5 Apr 2020 19:56:24 +0200
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     Markus Elfring <Markus.Elfring@web.de>
+Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        Chen-Yu Tsai <wens@csie.org>,
+        Colin Ian King <colin.king@canonical.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Maxime Ripard <mripard@kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org,
+        Tang Bin <tangbin@cmss.chinamobile.com>
+Subject: Re: [PATCH] crypto: sun8i-ss - Delete an error message in
+ sun8i_ss_probe()
+Message-ID: <20200405175624.GA24925@Red>
+References: <c7e1193f-7d8b-7da3-a2a8-e92ca0fd83b2@web.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <c7e1193f-7d8b-7da3-a2a8-e92ca0fd83b2@web.de>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Here's the KASAN report:
-BUG: KASAN: use-after-free in rsa_pub_done+0x70/0xe8
-Read of size 1 at addr ffff00002267b614 by task swapper/0/0
+On Sat, Apr 04, 2020 at 05:45:26PM +0200, Markus Elfring wrote:
+> From: Markus Elfring <elfring@users.sourceforge.net>
+> Date: Sat, 4 Apr 2020 17:34:53 +0200
+> 
+> The function “platform_get_irq” can log an error already.
+> Thus omit a redundant message for the exception handling in the
+> calling function.
+> 
+> This issue was detected by using the Coccinelle software.
+> 
+> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+> ---
+>  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+> 
+> diff --git a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
+> index 6b301afffd11..a1fb2fbdbe7b 100644
+> --- a/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
+> +++ b/drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c
+> @@ -537,10 +537,8 @@ static int sun8i_ss_probe(struct platform_device *pdev)
+>  		return err;
+> 
+>  	irq = platform_get_irq(pdev, 0);
+> -	if (irq < 0) {
+> -		dev_err(ss->dev, "Cannot get SecuritySystem IRQ\n");
+> +	if (irq < 0)
+>  		return irq;
+> -	}
+> 
+>  	ss->reset = devm_reset_control_get(&pdev->dev, NULL);
+>  	if (IS_ERR(ss->reset)) {
+> --
+> 2.26.0
+> 
 
-CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.6.0-rc1-00165-ga85dda9-dirty #21
-Hardware name: LS1046A RDB Board (DT)
-Call trace:
- dump_backtrace+0x0/0x260
- show_stack+0x14/0x20
- dump_stack+0xe8/0x144
- print_address_description.isra.11+0x64/0x348
- __kasan_report+0x11c/0x230
- kasan_report+0xc/0x18
- __asan_load1+0x5c/0x68
- rsa_pub_done+0x70/0xe8
- caam_jr_dequeue+0x390/0x608
- tasklet_action_common.isra.13+0x1ec/0x230
-...
+Hello
 
-Fixes: bf53795025a2 ("crypto: caam - add crypto_engine support for RSA algorithms")
-Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
----
- drivers/crypto/caam/caampkc.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Acked-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 
-diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.c
-index 4fcae37..59cc7116 100644
---- a/drivers/crypto/caam/caampkc.c
-+++ b/drivers/crypto/caam/caampkc.c
-@@ -129,7 +129,6 @@ static void rsa_pub_done(struct device *dev, u32 *desc, u32 err, void *context)
- 
- 	rsa_pub_unmap(dev, edesc, req);
- 	rsa_io_unmap(dev, edesc, req);
--	kfree(edesc);
- 
- 	/*
- 	 * If no backlog flag, the completion of the request is done
-@@ -139,6 +138,8 @@ static void rsa_pub_done(struct device *dev, u32 *desc, u32 err, void *context)
- 		akcipher_request_complete(req, ecode);
- 	else
- 		crypto_finalize_akcipher_request(jrp->engine, req, ecode);
-+
-+	kfree(edesc);
- }
- 
- static void rsa_priv_f_done(struct device *dev, u32 *desc, u32 err,
-@@ -170,7 +171,6 @@ static void rsa_priv_f_done(struct device *dev, u32 *desc, u32 err,
- 	}
- 
- 	rsa_io_unmap(dev, edesc, req);
--	kfree(edesc);
- 
- 	/*
- 	 * If no backlog flag, the completion of the request is done
-@@ -180,6 +180,8 @@ static void rsa_priv_f_done(struct device *dev, u32 *desc, u32 err,
- 		akcipher_request_complete(req, ecode);
- 	else
- 		crypto_finalize_akcipher_request(jrp->engine, req, ecode);
-+
-+	kfree(edesc);
- }
- 
- /**
--- 
-2.1.0
-
+Thanks
