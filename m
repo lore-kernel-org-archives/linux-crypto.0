@@ -2,145 +2,159 @@ Return-Path: <SRS0=kLV/=5W=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 244F0C2BA19
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Apr 2020 14:43:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 964B8C2BA17
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Apr 2020 18:16:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id EA41124673
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Apr 2020 14:43:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="EWz72NLZ"
+	by mail.kernel.org (Postfix) with ESMTP id 8130C20753
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Apr 2020 18:16:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728684AbgDFOnW (ORCPT
+        id S1726890AbgDFSQP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 6 Apr 2020 10:43:22 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:34002 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728668AbgDFOnW (ORCPT
+        Mon, 6 Apr 2020 14:16:15 -0400
+Received: from mail-io1-f71.google.com ([209.85.166.71]:47365 "EHLO
+        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726680AbgDFSQO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Apr 2020 10:43:22 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 036Edpv9187576;
-        Mon, 6 Apr 2020 14:43:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
- bh=3JTK6B29U9Z8C+ffRU/KrPYw+PQqhMg60N6J9Q1RZuU=;
- b=EWz72NLZfBsbfOvQ/4H3R/QJCN3jDveo6LFdK9Txyn52WaV2A/x/DBtrbSVpgkkrxmBH
- oYTtp9z7+DUr9O6pOJoTDKnNs/lzqQxA3mDdouvmMh4b38CN8pbL2H3UjFKT10DkLjNs
- nJqfXv8t1BwfM2Con/NsVO9HEHWsVxMhMXcac2o9ibp0Kt7HKmQDeU4uTQzV5lecgtiu
- Ay3XnKIfYPiYERHK7XCRf2Hh7+xKyaG8wV0QyTBskCSnZUEj/x8+eW2OMB3cS1I5k2Hd
- NgfQc59vd2WFXY+GNxYc9w4CmZVzBg3I/nffZhKoLwdNy96I/VZsDslnaPE/dkjlN+cA VA== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 306hnqy9y2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 06 Apr 2020 14:43:19 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 036EhFOD088141;
-        Mon, 6 Apr 2020 14:43:19 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 3073qd91s2-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Mon, 06 Apr 2020 14:43:17 +0000
-Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 036Eh9NH013386;
-        Mon, 6 Apr 2020 14:43:09 GMT
-Received: from mwanda (/41.57.98.10)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Mon, 06 Apr 2020 07:43:09 -0700
-Date:   Mon, 6 Apr 2020 17:43:02 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     schalla@marvell.com
-Cc:     SrujanaChalla <schalla@marvell.com>, linux-crypto@vger.kernel.org
-Subject: [bug report] crypto: marvell - add support for OCTEON TX CPT engine
-Message-ID: <20200406144302.GC68494@mwanda>
+        Mon, 6 Apr 2020 14:16:14 -0400
+Received: by mail-io1-f71.google.com with SMTP id c2so589677iok.14
+        for <linux-crypto@vger.kernel.org>; Mon, 06 Apr 2020 11:16:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=zB2Pul4O3CZEdfX+FknGpoFpPmJ28DN3NmrYEX8GLIY=;
+        b=gSbxPNfD3xMSWV0jgsFtwD9AHAkhCSSRY0jB7vFflGPbtqFxplkFBo48vLnY3aU4LJ
+         Bbf6uJc5ef8EQhKBqIOiw8zltjxlaxQcuDI0WeSrq+BCQv6oGXwLo9jub34MEsAiftPB
+         7sikQcRzOvDBPTx3nQjdjUyrA6ipxEAUwrDJ2LApDyp5+D3LzIcnD8vUPnDkVasFbatn
+         uftL5xXMBopHBDs7NBfNSHCsbRYF6wjROyKTc52rfTNtem7AErl0mAP5HWRvNMxREB5h
+         12Gw7s+r4MISMzP/XHvFyjvdnN0mzCoP5u/QAvQ4ZARCAdZ2Lb4syEw+DWS/C2V0WfgQ
+         GWuQ==
+X-Gm-Message-State: AGi0PubRkIKlSZYUrWO8AhH8iDPhwTQI3Aia5HThUbwZNuTr1uK4tPNF
+        EyjKr+tzzxwn7ZClEqb22LLRxSq+9lr3tJ4fw29941iwNvkR
+X-Google-Smtp-Source: APiQypJ93U4Y/7M+URA5MQp73cNseNFmj41V0xx14yE9AAAt9D7ywvfR5mKxr0bACRwKYycHzC//moVWA6jhFaIB3vz6ZelBsTt3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9582 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 mlxscore=0 mlxlogscore=795
- spamscore=0 bulkscore=0 adultscore=0 malwarescore=0 suspectscore=3
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2004060122
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9582 signatures=668685
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 phishscore=0 adultscore=0
- priorityscore=1501 mlxscore=0 malwarescore=0 mlxlogscore=848
- lowpriorityscore=0 spamscore=0 impostorscore=0 suspectscore=3
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004060121
+X-Received: by 2002:a02:cac4:: with SMTP id f4mr566095jap.51.1586196973505;
+ Mon, 06 Apr 2020 11:16:13 -0700 (PDT)
+Date:   Mon, 06 Apr 2020 11:16:13 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000002656a605a2a34356@google.com>
+Subject: WARNING: refcount bug in crypto_destroy_tfm
+From:   syzbot <syzbot+fc0674cde00b66844470@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hello SrujanaChalla,
+Hello,
 
-This is a semi-automatic email about new static checker warnings.
+syzbot found the following crash on:
 
-The patch d9110b0b01ff: "crypto: marvell - add support for OCTEON TX 
-CPT engine" from Mar 13, 2020, leads to the following Smatch 
-complaint:
+HEAD commit:    468c2a10 mlxsw: spectrum_trap: fix unintention integer ove..
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=11089cb3e00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=8c1e98458335a7d1
+dashboard link: https://syzkaller.appspot.com/bug?extid=fc0674cde00b66844470
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=115f2a43e00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=141ea0ede00000
 
-    drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c:1300 create_engine_group()
-    error: we previously assumed 'mirrored_eng_grp' could be null (see line 1256)
+The bug was bisected to:
 
-drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
-  1255		mirrored_eng_grp = find_mirrored_eng_grp(eng_grp);
-  1256		if (mirrored_eng_grp) {
-                    ^^^^^^^^^^^^^^^^
-The patch adds a check
+commit 4f87ee118d16b4b2116a477229573ed5003b0d78
+Author: Herbert Xu <herbert@gondor.apana.org.au>
+Date:   Sat Dec 7 14:15:17 2019 +0000
 
-  1257			/* Setup mirroring */
-  1258			setup_eng_grp_mirroring(eng_grp, mirrored_eng_grp);
-  1259	
-  1260			/*
-  1261			 * Update count of requested engines because some
-  1262			 * of them might be shared with mirrored group
-  1263			 */
-  1264			update_requested_engs(mirrored_eng_grp, engs, engs_cnt);
-  1265		}
-  1266	
-  1267		/* Reserve engines */
-  1268		ret = reserve_engines(dev, eng_grp, engs, engs_cnt);
-  1269		if (ret)
-  1270			goto err_ucode_unload;
-  1271	
-  1272		/* Update ucode pointers used by engines */
-  1273		update_ucode_ptrs(eng_grp);
-  1274	
-  1275		/* Update engine masks used by this group */
-  1276		ret = eng_grp_update_masks(dev, eng_grp);
-  1277		if (ret)
-  1278			goto err_release_engs;
-  1279	
-  1280		/* Create sysfs entry for engine group info */
-  1281		ret = create_sysfs_eng_grps_info(dev, eng_grp);
-  1282		if (ret)
-  1283			goto err_release_engs;
-  1284	
-  1285		/* Enable engine group */
-  1286		ret = enable_eng_grp(eng_grp, eng_grps->obj);
-  1287		if (ret)
-  1288			goto err_release_engs;
-  1289	
-  1290		/*
-  1291		 * If this engine group mirrors another engine group
-  1292		 * then we need to unload ucode as we will use ucode
-  1293		 * from mirrored engine group
-  1294		 */
-  1295		if (eng_grp->mirror.is_ena)
-  1296			ucode_unload(dev, &eng_grp->ucode[0]);
-  1297	
-  1298		eng_grp->is_enabled = true;
-  1299		if (eng_grp->mirror.is_ena)
-  1300			dev_info(dev,
-  1301				 "Engine_group%d: reuse microcode %s from group %d",
-  1302				 eng_grp->idx, mirrored_eng_grp->ucode[0].ver_str,
-                                               ^^^^^^^^^^^^^^^^^^
-and an unchecked dereference.
+    crypto: api - Do not zap spawn->alg
 
-regards,
-dan carpenter
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10ffbc2be00000
+final crash:    https://syzkaller.appspot.com/x/report.txt?x=12ffbc2be00000
+console output: https://syzkaller.appspot.com/x/log.txt?x=14ffbc2be00000
+
+IMPORTANT: if you fix the bug, please add the following tag to the commit:
+Reported-by: syzbot+fc0674cde00b66844470@syzkaller.appspotmail.com
+Fixes: 4f87ee118d16 ("crypto: api - Do not zap spawn->alg")
+
+------------[ cut here ]------------
+refcount_t: underflow; use-after-free.
+WARNING: CPU: 0 PID: 7174 at lib/refcount.c:28 refcount_warn_saturate+0x1d1/0x1e0 lib/refcount.c:28
+Kernel panic - not syncing: panic_on_warn set ...
+CPU: 0 PID: 7174 Comm: syz-executor413 Not tainted 5.6.0-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ __dump_stack lib/dump_stack.c:77 [inline]
+ dump_stack+0x188/0x20d lib/dump_stack.c:118
+ panic+0x2e3/0x75c kernel/panic.c:221
+ __warn.cold+0x2f/0x35 kernel/panic.c:582
+ report_bug+0x27b/0x2f0 lib/bug.c:195
+ fixup_bug arch/x86/kernel/traps.c:175 [inline]
+ fixup_bug arch/x86/kernel/traps.c:170 [inline]
+ do_error_trap+0x12b/0x220 arch/x86/kernel/traps.c:267
+ do_invalid_op+0x32/0x40 arch/x86/kernel/traps.c:286
+ invalid_op+0x23/0x30 arch/x86/entry/entry_64.S:1027
+RIP: 0010:refcount_warn_saturate+0x1d1/0x1e0 lib/refcount.c:28
+Code: e9 db fe ff ff 48 89 df e8 2c 95 1e fe e9 8a fe ff ff e8 c2 81 e1 fd 48 c7 c7 40 c6 71 88 c6 05 82 bd f1 06 01 e8 17 f6 b2 fd <0f> 0b e9 af fe ff ff 0f 1f 84 00 00 00 00 00 41 56 41 55 41 54 55
+RSP: 0018:ffffc90001a17b18 EFLAGS: 00010282
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: ffffffff815ca861 RDI: fffff52000342f55
+RBP: 0000000000000003 R08: ffff8880949fe300 R09: ffffed1015cc66a1
+R10: ffffed1015cc66a0 R11: ffff8880ae633507 R12: ffff88809a6d187c
+R13: ffff8880a40eb000 R14: 0000000000000000 R15: ffff8880a40eb010
+ refcount_sub_and_test include/linux/refcount.h:261 [inline]
+ refcount_dec_and_test include/linux/refcount.h:281 [inline]
+ crypto_alg_put crypto/internal.h:93 [inline]
+ crypto_mod_put crypto/api.c:45 [inline]
+ crypto_destroy_tfm+0x2a1/0x310 crypto/api.c:566
+ crypto_exit_ops crypto/api.c:308 [inline]
+ crypto_destroy_tfm+0xb1/0x310 crypto/api.c:565
+ crypto_free_aead include/crypto/aead.h:185 [inline]
+ aead_release+0x2d/0x50 crypto/algif_aead.c:506
+ alg_do_release crypto/af_alg.c:114 [inline]
+ alg_sock_destruct+0x85/0xe0 crypto/af_alg.c:358
+ __sk_destruct+0x4b/0x7c0 net/core/sock.c:1696
+ sk_destruct+0xc6/0x100 net/core/sock.c:1740
+ __sk_free+0xef/0x3d0 net/core/sock.c:1751
+ sk_free+0x78/0xa0 net/core/sock.c:1762
+ sock_put include/net/sock.h:1778 [inline]
+ af_alg_release+0xdb/0x110 crypto/af_alg.c:121
+ __sock_release+0xcd/0x280 net/socket.c:605
+ sock_close+0x18/0x20 net/socket.c:1283
+ __fput+0x2e9/0x860 fs/file_table.c:280
+ task_work_run+0xf4/0x1b0 kernel/task_work.c:123
+ exit_task_work include/linux/task_work.h:22 [inline]
+ do_exit+0xb34/0x2dd0 kernel/exit.c:793
+ do_group_exit+0x125/0x340 kernel/exit.c:891
+ __do_sys_exit_group kernel/exit.c:902 [inline]
+ __se_sys_exit_group kernel/exit.c:900 [inline]
+ __x64_sys_exit_group+0x3a/0x50 kernel/exit.c:900
+ do_syscall_64+0xf6/0x7d0 arch/x86/entry/common.c:295
+ entry_SYSCALL_64_after_hwframe+0x49/0xb3
+RIP: 0033:0x43ff78
+Code: 00 00 be 3c 00 00 00 eb 19 66 0f 1f 84 00 00 00 00 00 48 89 d7 89 f0 0f 05 48 3d 00 f0 ff ff 77 21 f4 48 89 d7 44 89 c0 0f 05 <48> 3d 00 f0 ff ff 76 e0 f7 d8 64 41 89 01 eb d8 0f 1f 84 00 00 00
+RSP: 002b:00007ffe423e1db8 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 000000000043ff78
+RDX: 0000000000000000 RSI: 000000000000003c RDI: 0000000000000000
+RBP: 00000000004bf850 R08: 00000000000000e7 R09: ffffffffffffffd0
+R10: 00000000004002c8 R11: 0000000000000246 R12: 0000000000000001
+R13: 00000000006d1180 R14: 0000000000000000 R15: 0000000000000000
+Kernel Offset: disabled
+Rebooting in 86400 seconds..
+
+
+---
+This bug is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this bug report. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+syzbot can test patches for this bug, for details see:
+https://goo.gl/tpsmEJ#testing-patches
