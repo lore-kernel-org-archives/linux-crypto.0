@@ -6,28 +6,28 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA823C2BA80
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Apr 2020 22:47:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2992C2BA80
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Apr 2020 22:47:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8C03820787
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Apr 2020 22:47:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BA95B2072A
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Apr 2020 22:47:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726521AbgDFWrv (ORCPT
+        id S1726277AbgDFWr5 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 6 Apr 2020 18:47:51 -0400
-Received: from inva021.nxp.com ([92.121.34.21]:32876 "EHLO inva021.nxp.com"
+        Mon, 6 Apr 2020 18:47:57 -0400
+Received: from inva021.nxp.com ([92.121.34.21]:32970 "EHLO inva021.nxp.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726225AbgDFWrv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Apr 2020 18:47:51 -0400
+        id S1726225AbgDFWr4 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 6 Apr 2020 18:47:56 -0400
 Received: from inva021.nxp.com (localhost [127.0.0.1])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 2AA912002C9;
-        Tue,  7 Apr 2020 00:47:49 +0200 (CEST)
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 4017D20159F;
+        Tue,  7 Apr 2020 00:47:55 +0200 (CEST)
 Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 1D8BC200220;
-        Tue,  7 Apr 2020 00:47:49 +0200 (CEST)
+        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 3356F200EDA;
+        Tue,  7 Apr 2020 00:47:55 +0200 (CEST)
 Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 90272204B1;
-        Tue,  7 Apr 2020 00:47:48 +0200 (CEST)
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 99470205A5;
+        Tue,  7 Apr 2020 00:47:54 +0200 (CEST)
 From:   Iuliana Prodan <iuliana.prodan@nxp.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
         Horia Geanta <horia.geanta@nxp.com>,
@@ -38,9 +38,9 @@ Cc:     "David S. Miller" <davem@davemloft.net>,
         linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-imx <linux-imx@nxp.com>,
         Iuliana Prodan <iuliana.prodan@nxp.com>
-Subject: [PATCH v2 3/4] crypto: caam - fix use-after-free KASAN issue for HASH algorithms
-Date:   Tue,  7 Apr 2020 01:47:27 +0300
-Message-Id: <1586213248-4230-4-git-send-email-iuliana.prodan@nxp.com>
+Subject: [PATCH v2 4/4] crypto: caam - fix use-after-free KASAN issue for RSA algorithms
+Date:   Tue,  7 Apr 2020 01:47:28 +0300
+Message-Id: <1586213248-4230-5-git-send-email-iuliana.prodan@nxp.com>
 X-Mailer: git-send-email 2.1.0
 In-Reply-To: <1586213248-4230-1-git-send-email-iuliana.prodan@nxp.com>
 References: <1586213248-4230-1-git-send-email-iuliana.prodan@nxp.com>
@@ -51,10 +51,10 @@ List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
 Here's the KASAN report:
-BUG: KASAN: use-after-free in ahash_done+0xdc/0x3b8
-Read of size 1 at addr ffff00002303f010 by task swapper/0/0
+BUG: KASAN: use-after-free in rsa_pub_done+0x70/0xe8
+Read of size 1 at addr ffff000023082014 by task swapper/0/0
 
-CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.6.0-rc1-00162-gfcb90d5 #59
+CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.6.0-rc1-00162-gfcb90d5 #60
 Hardware name: LS1046A RDB Board (DT)
 Call trace:
  dump_backtrace+0x0/0x260
@@ -64,7 +64,7 @@ Call trace:
  __kasan_report+0x11c/0x230
  kasan_report+0xc/0x18
  __asan_load1+0x5c/0x68
- ahash_done+0xdc/0x3b8
+ rsa_pub_done+0x70/0xe8
  caam_jr_dequeue+0x390/0x608
  tasklet_action_common.isra.13+0x1ec/0x230
  tasklet_action+0x24/0x30
@@ -87,17 +87,10 @@ Allocated by task 263:
  __kasan_kmalloc.isra.10+0xc4/0xe0
  kasan_kmalloc+0xc/0x18
  __kmalloc+0x178/0x2b8
- ahash_edesc_alloc+0x58/0x1f8
- ahash_final_no_ctx+0x94/0x6e8
- ahash_final+0x24/0x30
- crypto_ahash_op+0x58/0xb0
- crypto_ahash_final+0x30/0x40
- do_ahash_op+0x2c/0xa0
- test_ahash_vec_cfg+0x894/0x9e0
- test_hash_vec_cfg+0x6c/0x88
- test_hash_vec+0xfc/0x1e0
- __alg_test_hash+0x1ac/0x368
- alg_test_hash+0xf8/0x1c8
+ rsa_edesc_alloc+0x2cc/0xe10
+ caam_rsa_enc+0x9c/0x5f0
+ test_akcipher_one+0x78c/0x968
+ alg_test_akcipher+0x78/0xf8
  alg_test.part.44+0x114/0x4a0
  alg_test+0x1c/0x60
  cryptomgr_test+0x34/0x58
@@ -109,86 +102,88 @@ Freed by task 0:
  __kasan_slab_free+0x10c/0x188
  kasan_slab_free+0x10/0x18
  kfree+0x7c/0x298
- ahash_done+0xd4/0x3b8
+ rsa_pub_done+0x68/0xe8
  caam_jr_dequeue+0x390/0x608
  tasklet_action_common.isra.13+0x1ec/0x230
  tasklet_action+0x24/0x30
  efi_header_end+0x1a4/0x370
 
-The buggy address belongs to the object at ffff00002303f000
- which belongs to the cache dma-kmalloc-128 of size 128
-The buggy address is located 16 bytes inside of
- 128-byte region [ffff00002303f000, ffff00002303f080)
+The buggy address belongs to the object at ffff000023082000
+ which belongs to the cache dma-kmalloc-256 of size 256
+The buggy address is located 20 bytes inside of
+ 256-byte region [ffff000023082000, ffff000023082100)
 The buggy address belongs to the page:
-page:fffffe00006c0fc0 refcount:1 mapcount:0 mapping:ffff00093200c000 index:0x0
-flags: 0xffff00000000200(slab)
-raw: 0ffff00000000200 dead000000000100 dead000000000122 ffff00093200c000
+page:fffffe00006c2080 refcount:1 mapcount:0 mapping:ffff00093200c200 index:0x0 compound_mapcount: 0
+flags: 0xffff00000010200(slab|head)
+raw: 0ffff00000010200 dead000000000100 dead000000000122 ffff00093200c200
 raw: 0000000000000000 0000000080100010 00000001ffffffff 0000000000000000
 page dumped because: kasan: bad access detected
 
 Memory state around the buggy address:
- ffff00002303ef00: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
- ffff00002303ef80: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
->ffff00002303f000: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff000023081f00: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+ ffff000023081f80: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+>ffff000023082000: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
                          ^
- ffff00002303f080: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff00002303f100: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff000023082080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff000023082100: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
 
-Fixes: 21b014f038d3 ("crypto: caam - add crypto_engine support for HASH algorithms")
+Fixes: bf53795025a2 ("crypto: caam - add crypto_engine support for RSA algorithms")
 Cc: <stable@vger.kernel.org> # v5.6
 Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
 ---
- drivers/crypto/caam/caamhash.c | 8 ++++++--
+ drivers/crypto/caam/caampkc.c | 8 ++++++--
  1 file changed, 6 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/caam/caamhash.c b/drivers/crypto/caam/caamhash.c
-index 943bc02..27ff4a3 100644
---- a/drivers/crypto/caam/caamhash.c
-+++ b/drivers/crypto/caam/caamhash.c
-@@ -583,10 +583,12 @@ static inline void ahash_done_cpy(struct device *jrdev, u32 *desc, u32 err,
- 	struct caam_hash_state *state = ahash_request_ctx(req);
- 	struct caam_hash_ctx *ctx = crypto_ahash_ctx(ahash);
+diff --git a/drivers/crypto/caam/caampkc.c b/drivers/crypto/caam/caampkc.c
+index 4fcae37..2e44d68 100644
+--- a/drivers/crypto/caam/caampkc.c
++++ b/drivers/crypto/caam/caampkc.c
+@@ -121,11 +121,13 @@ static void rsa_pub_done(struct device *dev, u32 *desc, u32 err, void *context)
+ 	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
+ 	struct rsa_edesc *edesc;
  	int ecode = 0;
 +	bool has_bklog;
  
- 	dev_dbg(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
+ 	if (err)
+ 		ecode = caam_jr_strstatus(dev, err);
  
- 	edesc = state->edesc;
+ 	edesc = req_ctx->edesc;
 +	has_bklog = edesc->bklog;
  
- 	if (err)
- 		ecode = caam_jr_strstatus(jrdev, err);
-@@ -603,7 +605,7 @@ static inline void ahash_done_cpy(struct device *jrdev, u32 *desc, u32 err,
+ 	rsa_pub_unmap(dev, edesc, req);
+ 	rsa_io_unmap(dev, edesc, req);
+@@ -135,7 +137,7 @@ static void rsa_pub_done(struct device *dev, u32 *desc, u32 err, void *context)
  	 * If no backlog flag, the completion of the request is done
  	 * by CAAM, not crypto engine.
  	 */
 -	if (!edesc->bklog)
 +	if (!has_bklog)
- 		req->base.complete(&req->base, ecode);
+ 		akcipher_request_complete(req, ecode);
  	else
- 		crypto_finalize_hash_request(jrp->engine, req, ecode);
-@@ -632,10 +634,12 @@ static inline void ahash_done_switch(struct device *jrdev, u32 *desc, u32 err,
- 	struct caam_hash_state *state = ahash_request_ctx(req);
- 	int digestsize = crypto_ahash_digestsize(ahash);
+ 		crypto_finalize_akcipher_request(jrp->engine, req, ecode);
+@@ -152,11 +154,13 @@ static void rsa_priv_f_done(struct device *dev, u32 *desc, u32 err,
+ 	struct caam_rsa_req_ctx *req_ctx = akcipher_request_ctx(req);
+ 	struct rsa_edesc *edesc;
  	int ecode = 0;
 +	bool has_bklog;
  
- 	dev_dbg(jrdev, "%s %d: err 0x%x\n", __func__, __LINE__, err);
- 
- 	edesc = state->edesc;
-+	has_bklog = edesc->bklog;
  	if (err)
- 		ecode = caam_jr_strstatus(jrdev, err);
+ 		ecode = caam_jr_strstatus(dev, err);
  
-@@ -663,7 +667,7 @@ static inline void ahash_done_switch(struct device *jrdev, u32 *desc, u32 err,
+ 	edesc = req_ctx->edesc;
++	has_bklog = edesc->bklog;
+ 
+ 	switch (key->priv_form) {
+ 	case FORM1:
+@@ -176,7 +180,7 @@ static void rsa_priv_f_done(struct device *dev, u32 *desc, u32 err,
  	 * If no backlog flag, the completion of the request is done
  	 * by CAAM, not crypto engine.
  	 */
 -	if (!edesc->bklog)
 +	if (!has_bklog)
- 		req->base.complete(&req->base, ecode);
+ 		akcipher_request_complete(req, ecode);
  	else
- 		crypto_finalize_hash_request(jrp->engine, req, ecode);
+ 		crypto_finalize_akcipher_request(jrp->engine, req, ecode);
 -- 
 2.1.0
 
