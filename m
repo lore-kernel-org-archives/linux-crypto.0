@@ -2,149 +2,145 @@ Return-Path: <SRS0=kLV/=5W=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5A2BC2BA19
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Apr 2020 11:04:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 244F0C2BA19
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Apr 2020 14:43:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 98CAE206F8
-	for <linux-crypto@archiver.kernel.org>; Mon,  6 Apr 2020 11:04:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA41124673
+	for <linux-crypto@archiver.kernel.org>; Mon,  6 Apr 2020 14:43:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="n2pNvVdF"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="EWz72NLZ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726996AbgDFLET (ORCPT
+        id S1728684AbgDFOnW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 6 Apr 2020 07:04:19 -0400
-Received: from mail-am6eur05on2069.outbound.protection.outlook.com ([40.107.22.69]:10593
-        "EHLO EUR05-AM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726883AbgDFLET (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 6 Apr 2020 07:04:19 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=anxb+w5Sui8S81+t/ryK2/+OAqZ5LkiGvw8WLtnfqqHT1EYT95CnPJGWnwb+64FElwAFbFTFvvSjhhzcI9irf71Ujr8GZhXUbpnn+XhmcnJn50t8hNo68ueVipIh3wXHEoFrFtYp1VnZBX83va5vOnQU2SFDQDG1rJCrtT4KLlpgGV9qvmAeDTqkKD+ugf0k2wRtBsadrQqzqnehDFS2YJ/y2zUXpHkKgTAYxCQ7ulRUSRbxWXF97dtM3WhgCTYFLRHiTUuMXMTXjqhExYVlyjVN617wHOjzdB5eZsarzSvZABZ5OPPWjH5Hb4mf7WIsOu0BqPNtWVFWipM7MnKyDw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QR5HZD632/QO+lCYPyrprEY/ApP686I1Ub6hrx63uuU=;
- b=CZSRu7SW4TRklkTmBTElk7h88siqncESHGYNNtp/PEwyAplJbRs+yjREBbjBy7f5f3ahFrmY+gawAtTs1nBCKXf74p+mcGt/vHfC2gITvvcZHmkhAknOZ8BEdHiVmRnsPw3eD4KnZnhZo732Zy+RoWg/QYsoVm40hrJ+u+k1zf7b9IyVWLhbIlXPHdnjf4y0Ok/fWYOEVHjDCcpZLWYjYrdeiR87tkKNHHWHXps0sY4PsELNMYvooe5Sq2XRieptBCwVPWCbVTavUdNv2JxwRAuNhreWpH/2TuWGKyV06oski4hfm92swrZ4NXlz9G+9V2/KJpjNu7mTznQ1p3Dwxw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QR5HZD632/QO+lCYPyrprEY/ApP686I1Ub6hrx63uuU=;
- b=n2pNvVdFD9rRMaqyVVqxEcbcmP9fNyR6ydjMOE9ltXWQww7l1Evn4rWxSI4emi/XNnvlcghEYFrjFw4alTuaZlM1PGmW6ZkiMcMvgdB+0U2MVVbuNYJ0SmjS2ffMgIalcPF7KEErPXE+dr3E086RLiKIJABf10NYVh+hjE6i2fU=
-Authentication-Results: spf=none (sender IP is )
- smtp.mailfrom=horia.geanta@nxp.com; 
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com (2603:10a6:803:7::25)
- by VI1PR0402MB3568.eurprd04.prod.outlook.com (2603:10a6:803:f::27) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2878.16; Mon, 6 Apr
- 2020 11:04:15 +0000
-Received: from VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::751e:7e8d:ed4:ef5f]) by VI1PR0402MB3485.eurprd04.prod.outlook.com
- ([fe80::751e:7e8d:ed4:ef5f%7]) with mapi id 15.20.2878.021; Mon, 6 Apr 2020
- 11:04:15 +0000
-Subject: Re: [PATCH 2/4] crypto: caam - fix use-after-free KASAN issue for
- AEAD algorithms
-To:     Iuliana Prodan <iuliana.prodan@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Silvano Di Ninno <silvano.dininno@nxp.com>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>
-References: <1586087411-8505-1-git-send-email-iuliana.prodan@nxp.com>
- <1586087411-8505-3-git-send-email-iuliana.prodan@nxp.com>
-From:   =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>
-Message-ID: <25cd577b-a690-0e7f-6c1e-6dc7430c7c69@nxp.com>
-Date:   Mon, 6 Apr 2020 14:04:11 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
-In-Reply-To: <1586087411-8505-3-git-send-email-iuliana.prodan@nxp.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM6P192CA0024.EURP192.PROD.OUTLOOK.COM
- (2603:10a6:209:83::37) To VI1PR0402MB3485.eurprd04.prod.outlook.com
- (2603:10a6:803:7::25)
+        Mon, 6 Apr 2020 10:43:22 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:34002 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728668AbgDFOnW (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 6 Apr 2020 10:43:22 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 036Edpv9187576;
+        Mon, 6 Apr 2020 14:43:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
+ bh=3JTK6B29U9Z8C+ffRU/KrPYw+PQqhMg60N6J9Q1RZuU=;
+ b=EWz72NLZfBsbfOvQ/4H3R/QJCN3jDveo6LFdK9Txyn52WaV2A/x/DBtrbSVpgkkrxmBH
+ oYTtp9z7+DUr9O6pOJoTDKnNs/lzqQxA3mDdouvmMh4b38CN8pbL2H3UjFKT10DkLjNs
+ nJqfXv8t1BwfM2Con/NsVO9HEHWsVxMhMXcac2o9ibp0Kt7HKmQDeU4uTQzV5lecgtiu
+ Ay3XnKIfYPiYERHK7XCRf2Hh7+xKyaG8wV0QyTBskCSnZUEj/x8+eW2OMB3cS1I5k2Hd
+ NgfQc59vd2WFXY+GNxYc9w4CmZVzBg3I/nffZhKoLwdNy96I/VZsDslnaPE/dkjlN+cA VA== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2130.oracle.com with ESMTP id 306hnqy9y2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 06 Apr 2020 14:43:19 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 036EhFOD088141;
+        Mon, 6 Apr 2020 14:43:19 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by userp3030.oracle.com with ESMTP id 3073qd91s2-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 06 Apr 2020 14:43:17 +0000
+Received: from abhmp0015.oracle.com (abhmp0015.oracle.com [141.146.116.21])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 036Eh9NH013386;
+        Mon, 6 Apr 2020 14:43:09 GMT
+Received: from mwanda (/41.57.98.10)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Mon, 06 Apr 2020 07:43:09 -0700
+Date:   Mon, 6 Apr 2020 17:43:02 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     schalla@marvell.com
+Cc:     SrujanaChalla <schalla@marvell.com>, linux-crypto@vger.kernel.org
+Subject: [bug report] crypto: marvell - add support for OCTEON TX CPT engine
+Message-ID: <20200406144302.GC68494@mwanda>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.0.129] (84.117.251.185) by AM6P192CA0024.EURP192.PROD.OUTLOOK.COM (2603:10a6:209:83::37) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2878.16 via Frontend Transport; Mon, 6 Apr 2020 11:04:14 +0000
-X-Originating-IP: [84.117.251.185]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 898e79a8-11bb-4a20-8a7e-08d7da1a3e81
-X-MS-TrafficTypeDiagnostic: VI1PR0402MB3568:|VI1PR0402MB3568:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <VI1PR0402MB3568FD3642150F73255A0C8998C20@VI1PR0402MB3568.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1417;
-X-Forefront-PRVS: 0365C0E14B
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VI1PR0402MB3485.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(10009020)(4636009)(39860400002)(396003)(346002)(136003)(376002)(366004)(956004)(16526019)(186003)(31696002)(66476007)(6486002)(66946007)(26005)(478600001)(81156014)(8676002)(81166006)(66556008)(5660300002)(31686004)(2616005)(86362001)(110136005)(4326008)(16576012)(6666004)(53546011)(6636002)(36756003)(52116002)(316002)(2906002)(8936002)(54906003);DIR:OUT;SFP:1101;
-Received-SPF: None (protection.outlook.com: nxp.com does not designate
- permitted sender hosts)
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: FHdz4gKkY3xWrIJNWx5/WNjJFPR/D7wDmSp331LbV++2/xiAyXcX3JVyHsVB3zE+DUTaJdLV86v33Yb6YepvSFp5G7vkUPvl6QrJg9gn1yQOqEOO8qZPquuQCzGwVA+bx+HyajaY7gu60kKbW4y/X+M5w0vVn7JseEK0MfMQ6OpL7fVfZcE3Om7jrYUQiic11MviuB45ojh4YXdQYOER3zC5a+oFwz/tawsYG4zlWiKpBoiW5iD8yswO5fgtuz2ybVQDB8g9KymBxrT+wFKgrRCJOjxMm4c0hy9EsM/9sF5R9OMm2jjA38oz1BfZUgSmcbqd9cehqe3HHi+PZLNtOsSTht4qGmRH0gGoKAlpfHuSI+ZL5zSTAFgqsLIKa/YnOQhuPG5W6iOeaEu1/0JRRhW7QMy8U+psklj+SnOsJTN+Qh6WQYka5p8UXhF2oiJl
-X-MS-Exchange-AntiSpam-MessageData: 1kwbsKHNKDRsCxPIFzayAmOK0mbZ6AcXHFEfrmmgmHsWiVqOUbzjI15F3d/zJrCnby+I2Kx53tC0E/KwX5otMbr6BZtJZk3TfXE8D28y2OLyvbu703GU3d4/3i08ckwKnIm0Av2NrXeRLKUsgcDbyA==
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 898e79a8-11bb-4a20-8a7e-08d7da1a3e81
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Apr 2020 11:04:15.1175
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rApnXehVZQQOe4Luxl7FukI9XhMIWgUgTP+rRu9hQsQWPQdFO0hAyJRTwyQ2UgHzRZulYcfvf1m0Yrj3MueStw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0402MB3568
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9582 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 mlxscore=0 mlxlogscore=795
+ spamscore=0 bulkscore=0 adultscore=0 malwarescore=0 suspectscore=3
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004060122
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9582 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 phishscore=0 adultscore=0
+ priorityscore=1501 mlxscore=0 malwarescore=0 mlxlogscore=848
+ lowpriorityscore=0 spamscore=0 impostorscore=0 suspectscore=3
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004060121
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 4/5/2020 2:50 PM, Iuliana Prodan wrote:
-> Here's the KASAN report:
-> BUG: KASAN: use-after-free in aead_crypt_done+0x60/0xd8
-> Read of size 1 at addr ffff00002303f014 by task swapper/0/0
-> 
-> CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.6.0-rc1-00163-gd88dd5c-dirty #18
-This is no a public SHA1, you are probably running with patch 1/4
-applied in the tree (and with a "dirty tree").
+Hello SrujanaChalla,
 
-> Hardware name: LS1046A RDB Board (DT)
-> Call trace:
->  dump_backtrace+0x0/0x260
->  show_stack+0x14/0x20
->  dump_stack+0xe8/0x144
->  print_address_description.isra.11+0x64/0x348
->  __kasan_report+0x11c/0x230
->  kasan_report+0xc/0x18
->  __asan_load1+0x5c/0x68
->  aead_crypt_done+0x60/0xd8
->  caam_jr_dequeue+0x390/0x608
-> ...
-You should provide full KASan log - shawdow bits etc.
+This is a semi-automatic email about new static checker warnings.
 
-> @@ -973,8 +973,6 @@ static void aead_crypt_done(struct device *jrdev, u32 *desc, u32 err,
->  
->  	aead_unmap(jrdev, edesc, req);
->  
-> -	kfree(edesc);
-> -
->  	/*
->  	 * If no backlog flag, the completion of the request is done
->  	 * by CAAM, not crypto engine.
-> @@ -983,6 +981,8 @@ static void aead_crypt_done(struct device *jrdev, u32 *desc, u32 err,
->  		aead_request_complete(req, ecode);
->  	else
->  		crypto_finalize_aead_request(jrp->engine, req, ecode);
-> +
-> +	kfree(edesc);
-I think it's better freeing all resources before calling
-the completion callback, to avoid unnecessary memory strains.
+The patch d9110b0b01ff: "crypto: marvell - add support for OCTEON TX 
+CPT engine" from Mar 13, 2020, leads to the following Smatch 
+complaint:
 
-Horia
+    drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c:1300 create_engine_group()
+    error: we previously assumed 'mirrored_eng_grp' could be null (see line 1256)
+
+drivers/crypto/marvell/octeontx/otx_cptpf_ucode.c
+  1255		mirrored_eng_grp = find_mirrored_eng_grp(eng_grp);
+  1256		if (mirrored_eng_grp) {
+                    ^^^^^^^^^^^^^^^^
+The patch adds a check
+
+  1257			/* Setup mirroring */
+  1258			setup_eng_grp_mirroring(eng_grp, mirrored_eng_grp);
+  1259	
+  1260			/*
+  1261			 * Update count of requested engines because some
+  1262			 * of them might be shared with mirrored group
+  1263			 */
+  1264			update_requested_engs(mirrored_eng_grp, engs, engs_cnt);
+  1265		}
+  1266	
+  1267		/* Reserve engines */
+  1268		ret = reserve_engines(dev, eng_grp, engs, engs_cnt);
+  1269		if (ret)
+  1270			goto err_ucode_unload;
+  1271	
+  1272		/* Update ucode pointers used by engines */
+  1273		update_ucode_ptrs(eng_grp);
+  1274	
+  1275		/* Update engine masks used by this group */
+  1276		ret = eng_grp_update_masks(dev, eng_grp);
+  1277		if (ret)
+  1278			goto err_release_engs;
+  1279	
+  1280		/* Create sysfs entry for engine group info */
+  1281		ret = create_sysfs_eng_grps_info(dev, eng_grp);
+  1282		if (ret)
+  1283			goto err_release_engs;
+  1284	
+  1285		/* Enable engine group */
+  1286		ret = enable_eng_grp(eng_grp, eng_grps->obj);
+  1287		if (ret)
+  1288			goto err_release_engs;
+  1289	
+  1290		/*
+  1291		 * If this engine group mirrors another engine group
+  1292		 * then we need to unload ucode as we will use ucode
+  1293		 * from mirrored engine group
+  1294		 */
+  1295		if (eng_grp->mirror.is_ena)
+  1296			ucode_unload(dev, &eng_grp->ucode[0]);
+  1297	
+  1298		eng_grp->is_enabled = true;
+  1299		if (eng_grp->mirror.is_ena)
+  1300			dev_info(dev,
+  1301				 "Engine_group%d: reuse microcode %s from group %d",
+  1302				 eng_grp->idx, mirrored_eng_grp->ucode[0].ver_str,
+                                               ^^^^^^^^^^^^^^^^^^
+and an unchecked dereference.
+
+regards,
+dan carpenter
