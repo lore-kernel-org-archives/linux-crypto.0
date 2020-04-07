@@ -2,147 +2,106 @@ Return-Path: <SRS0=R0fc=5X=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1694EC2BA80
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 Apr 2020 15:59:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25FF0C2BB55
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 Apr 2020 17:27:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E7B722075E
-	for <linux-crypto@archiver.kernel.org>; Tue,  7 Apr 2020 15:59:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F15D0206F7
+	for <linux-crypto@archiver.kernel.org>; Tue,  7 Apr 2020 17:27:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="S6ZVDuQl"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727924AbgDGP7C (ORCPT
+        id S1726403AbgDGR1D (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 7 Apr 2020 11:59:02 -0400
-Received: from inva021.nxp.com ([92.121.34.21]:36532 "EHLO inva021.nxp.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726937AbgDGP7C (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 7 Apr 2020 11:59:02 -0400
-Received: from inva021.nxp.com (localhost [127.0.0.1])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 8ED10201192;
-        Tue,  7 Apr 2020 17:58:59 +0200 (CEST)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 824E52003AC;
-        Tue,  7 Apr 2020 17:58:59 +0200 (CEST)
-Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 1C592204B1;
-        Tue,  7 Apr 2020 17:58:59 +0200 (CEST)
-From:   Iuliana Prodan <iuliana.prodan@nxp.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Silvano Di Ninno <silvano.dininno@nxp.com>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-imx <linux-imx@nxp.com>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>
-Subject: [PATCH] crypto: caam - fix the address of the last entry of S/G
-Date:   Tue,  7 Apr 2020 18:58:45 +0300
-Message-Id: <1586275125-20571-1-git-send-email-iuliana.prodan@nxp.com>
-X-Mailer: git-send-email 2.1.0
-X-Virus-Scanned: ClamAV using ClamSMTP
+        Tue, 7 Apr 2020 13:27:03 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:49434 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726395AbgDGR1D (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 7 Apr 2020 13:27:03 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 037HHtdY138304;
+        Tue, 7 Apr 2020 17:27:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : references : date : in-reply-to : message-id : mime-version :
+ content-type; s=corp-2020-01-29;
+ bh=Hflc8Yn6RVcTCzZL4j6A4FyU9U4e1ddTCKHWNRk5ZeE=;
+ b=S6ZVDuQlQ4OP+Sc8gny5SOHfgYEBK+yzAVnSTyR9xcjJTrqYZ6p7enQYySeKTCPoJbmU
+ ErTs46CMAq0EAFHw6xItKroZgEe81fnj0gx+rlrCAz5a3v+293aAivL2m5QyU9np4D3O
+ e557T2gfdro0QpPVNLWGiU6knKDhBvbhAzF65+KjVPEqM6eFYHFn36p6rZ54b0qvbmy3
+ R5detjtfP03IxKkTzBzZdwaNIukZ393UoQYK0WUASbQch3mXaLc3RHa6STU+qZq2Ngn7
+ XPVdQgCYMzrT5361POxew3fWfFZIF0lE/Ywv42xu+8cqFKjB+vpHn47GfUKWxnd0HX9v mA== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2130.oracle.com with ESMTP id 308ffdcemg-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 07 Apr 2020 17:27:00 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 037HHILR119991;
+        Tue, 7 Apr 2020 17:27:00 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3030.oracle.com with ESMTP id 3073qgpm7e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 07 Apr 2020 17:27:00 +0000
+Received: from abhmp0012.oracle.com (abhmp0012.oracle.com [141.146.116.18])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 037HQx10016269;
+        Tue, 7 Apr 2020 17:26:59 GMT
+Received: from ca-mkp.ca.oracle.com (/10.159.214.123)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 07 Apr 2020 10:26:58 -0700
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-crypto@vger.kernel.org, stable@vger.kernel.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH v2] crypto: algapi - Avoid spurious modprobe on LOADED
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle
+References: <20200407051744.GA13037@gondor.apana.org.au>
+        <20200407060240.175837-1-ebiggers@kernel.org>
+Date:   Tue, 07 Apr 2020 13:26:57 -0400
+In-Reply-To: <20200407060240.175837-1-ebiggers@kernel.org> (Eric Biggers's
+        message of "Mon, 6 Apr 2020 23:02:40 -0700")
+Message-ID: <yq1eesz2om6.fsf@oracle.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1.92 (gnu/linux)
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9584 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 mlxscore=0 mlxlogscore=999
+ spamscore=0 bulkscore=0 adultscore=0 malwarescore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004070141
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9584 signatures=668685
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 priorityscore=1501
+ impostorscore=0 malwarescore=0 mlxlogscore=999 lowpriorityscore=0
+ clxscore=1011 phishscore=0 mlxscore=0 bulkscore=0 adultscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004070141
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-For skcipher algorithms, the input, output HW S/G tables
-look like this: [IV, src][dst, IV]
-Now, we can have 2 conditions here:
-- there is no IV;
-- src and dst are equal (in-place encryption) and scattered
-and the error is an "off-by-one" in the HW S/G table.
 
-This issue was seen with KASAN:
-BUG: KASAN: slab-out-of-bounds in skcipher_edesc_alloc+0x95c/0x1018
+Eric,
 
-Read of size 4 at addr ffff000022a02958 by task cryptomgr_test/321
+> Currently after any algorithm is registered and tested, there's an
+> unnecessary request_module("cryptomgr") even if it's already loaded.
+> Also, CRYPTO_MSG_ALG_LOADED is sent twice, and thus if the algorithm
+> is "crct10dif", lib/crc-t10dif.c replaces the tfm twice rather than
+> once.
+>
+> This occurs because CRYPTO_MSG_ALG_LOADED is sent using
+> crypto_probing_notify(), which tries to load "cryptomgr" if the
+> notification is not handled (NOTIFY_DONE).  This doesn't make sense
+> because "cryptomgr" doesn't handle this notification.
+>
+> Fix this by using crypto_notify() instead of crypto_probing_notify().
 
-CPU: 2 PID: 321 Comm: cryptomgr_test Not tainted
-5.6.0-rc1-00165-ge4ef8383-dirty #4
-Hardware name: LS1046A RDB Board (DT)
-Call trace:
- dump_backtrace+0x0/0x260
- show_stack+0x14/0x20
- dump_stack+0xe8/0x144
- print_address_description.isra.11+0x64/0x348
- __kasan_report+0x11c/0x230
- kasan_report+0xc/0x18
- __asan_load4+0x90/0xb0
- skcipher_edesc_alloc+0x95c/0x1018
- skcipher_encrypt+0x84/0x150
- crypto_skcipher_encrypt+0x50/0x68
- test_skcipher_vec_cfg+0x4d4/0xc10
- test_skcipher_vec+0x178/0x1d8
- alg_test_skcipher+0xec/0x230
- alg_test.part.44+0x114/0x4a0
- alg_test+0x1c/0x60
- cryptomgr_test+0x34/0x58
- kthread+0x1b8/0x1c0
- ret_from_fork+0x10/0x18
+Looks good to me.
 
-Allocated by task 321:
- save_stack+0x24/0xb0
- __kasan_kmalloc.isra.10+0xc4/0xe0
- kasan_kmalloc+0xc/0x18
- __kmalloc+0x178/0x2b8
- skcipher_edesc_alloc+0x21c/0x1018
- skcipher_encrypt+0x84/0x150
- crypto_skcipher_encrypt+0x50/0x68
- test_skcipher_vec_cfg+0x4d4/0xc10
- test_skcipher_vec+0x178/0x1d8
- alg_test_skcipher+0xec/0x230
- alg_test.part.44+0x114/0x4a0
- alg_test+0x1c/0x60
- cryptomgr_test+0x34/0x58
- kthread+0x1b8/0x1c0
- ret_from_fork+0x10/0x18
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 
-Freed by task 0:
-(stack is not available)
-
-The buggy address belongs to the object at ffff000022a02800
- which belongs to the cache dma-kmalloc-512 of size 512
-The buggy address is located 344 bytes inside of
- 512-byte region [ffff000022a02800, ffff000022a02a00)
-The buggy address belongs to the page:
-page:fffffe00006a8000 refcount:1 mapcount:0 mapping:ffff00093200c400
-index:0x0 compound_mapcount: 0
-flags: 0xffff00000010200(slab|head)
-raw: 0ffff00000010200 dead000000000100 dead000000000122 ffff00093200c400
-raw: 0000000000000000 0000000080100010 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
- ffff000022a02800: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
- ffff000022a02880: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->ffff000022a02900: 00 00 00 00 00 00 00 00 00 00 fc fc fc fc fc fc
-                                                    ^
- ffff000022a02980: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff000022a02a00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-
-Fixes: 334d37c9e263 ("crypto: caam - update IV using HW support")
-Cc: <stable@vger.kernel.org> # v5.3+
-Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
----
- drivers/crypto/caam/caamalg.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/caam/caamalg.c b/drivers/crypto/caam/caamalg.c
-index b7bb7c3..eed41da 100644
---- a/drivers/crypto/caam/caamalg.c
-+++ b/drivers/crypto/caam/caamalg.c
-@@ -1711,7 +1711,7 @@ static struct skcipher_edesc *skcipher_edesc_alloc(struct skcipher_request *req,
- 
- 	if (ivsize || mapped_dst_nents > 1)
- 		sg_to_sec4_set_last(edesc->sec4_sg + dst_sg_idx +
--				    mapped_dst_nents);
-+				    mapped_dst_nents - 1 + !!ivsize);
- 
- 	if (sec4_sg_bytes) {
- 		edesc->sec4_sg_dma = dma_map_single(jrdev, edesc->sec4_sg,
 -- 
-2.1.0
-
+Martin K. Petersen	Oracle Linux Engineering
