@@ -2,125 +2,74 @@ Return-Path: <SRS0=EmbF=5Y=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F1BDC2D0EA
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Apr 2020 15:31:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DFDFC2D0EA
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Apr 2020 15:37:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id E7233206F7
-	for <linux-crypto@archiver.kernel.org>; Wed,  8 Apr 2020 15:31:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586359881;
-	bh=aW3ft5X9hZtu9qVkui3ULDsUUXgTBmC/IHq5RwHtdM0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=KP3UgyL+YlueQDwgOAJMQRwG0QmD87vtKqt2SOKkUY3UGbDMIemluDY0aOYqdaCV3
-	 H0vxiNC7hGMAYFZbbnRMfpjoQBzHN+jbzSrL/ZCiD7MMyOxC/kxoBZZU1/Hl6F2B49
-	 z1MbY8LFRvz4fzZaTaypjGgXR0EE2xZPye3Eukr0=
+	by mail.kernel.org (Postfix) with ESMTP id 6F4B720730
+	for <linux-crypto@archiver.kernel.org>; Wed,  8 Apr 2020 15:37:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728380AbgDHPbU (ORCPT
+        id S1729263AbgDHPhH (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 Apr 2020 11:31:20 -0400
-Received: from mail-wr1-f66.google.com ([209.85.221.66]:43908 "EHLO
-        mail-wr1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728157AbgDHPbU (ORCPT
+        Wed, 8 Apr 2020 11:37:07 -0400
+Received: from mail-io1-f70.google.com ([209.85.166.70]:50535 "EHLO
+        mail-io1-f70.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726924AbgDHPhG (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Apr 2020 11:31:20 -0400
-Received: by mail-wr1-f66.google.com with SMTP id i10so1987013wrv.10;
-        Wed, 08 Apr 2020 08:31:17 -0700 (PDT)
+        Wed, 8 Apr 2020 11:37:06 -0400
+Received: by mail-io1-f70.google.com with SMTP id a12so280575ioe.17
+        for <linux-crypto@vger.kernel.org>; Wed, 08 Apr 2020 08:37:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=7g2IDxoHI/17bb2lHkaR7jfy7fINZC4aLcy8p7mbFWU=;
-        b=inLFqxRMp0YUXZfzwpNTxO2qdvdCGGFSPg2/eu5X6Ekj4gon+Ye99IflNCRTgsSzzT
-         8qOf4l6Gv2wG7ik9Dm15p05SY25xKxuKwkyRcxJZUnkOpJ5Pk+ug/soR+ftYZCegFXUh
-         2BaQIheb0nefo0Jcw9RnV05Qc2/pk8C4jxsK4wpBWGjZxmLsoGdHLZ9liMdXngOZh6O/
-         OoUi6tBLTGAP1zgswOYshj1v6b+YcLl+Hja/jBlu9rMyEnlV3cFpYMptGoIwSvbwGbPh
-         Q6TshNfaAsWRp3U5GLSFgYN4YEas2PhMnPzqj43VO1K0jIOEcmdLRQFp7AvkRULA55LD
-         cABQ==
-X-Gm-Message-State: AGi0PuaFSVhNWYjkKIrd6HiiK4hJnGKTAQd3RzOqnAtaPHTMQyV070+R
-        aCrzq0dlPLcG6Uh53hbtYkM=
-X-Google-Smtp-Source: APiQypJ9O8BdKURufjoODCWj6Vu45474Vg3xaJGe9sn6hp0NQRyhqjbMB9htMUc2OA9BeOF5icQonw==
-X-Received: by 2002:adf:fe4b:: with SMTP id m11mr8866703wrs.20.1586359877175;
-        Wed, 08 Apr 2020 08:31:17 -0700 (PDT)
-Received: from localhost (ip-37-188-180-223.eurotel.cz. [37.188.180.223])
-        by smtp.gmail.com with ESMTPSA id a7sm7201481wmj.12.2020.04.08.08.31.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Apr 2020 08:31:16 -0700 (PDT)
-Date:   Wed, 8 Apr 2020 17:31:14 +0200
-From:   Michal Hocko <mhocko@kernel.org>
-To:     Peter Xu <peterx@redhat.com>
-Cc:     Hillf Danton <hdanton@sina.com>,
-        syzbot <syzbot+3be1a33f04dc782e9fd5@syzkaller.appspotmail.com>,
-        akpm@linux-foundation.org, bgeffon@google.com, davem@davemloft.net,
-        herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        torvalds@linux-foundation.org
-Subject: Re: WARNING in af_alg_make_sg
-Message-ID: <20200408153114.GB18914@dhcp22.suse.cz>
-References: <000000000000f2bc9505a2c2b808@google.com>
- <20200408095849.15236-1-hdanton@sina.com>
- <20200408151213.GE66033@xz-x1>
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=Sk/yJxNuEWZ2R900yOk1engj26s2zBpDSaCTxgbd3iw=;
+        b=S3zVy02FfMFWkBT7fY1DyjBnHIpwPb6g9x+S0VzcyWIxTYdUbGxDIiUO1CCx6jM+Kp
+         6ajVX2IMixntaXxwoU24bPz1f7UXH0nkxOoSin8HBvxP1JH/pdRB94yKb7yh285KW+jG
+         qfMQTdKqFKtYZWSAn2E4ojMXq8cNKsPvUNHuWUXNQgZc9qbySQIVvx2bbMOfNvCuEvyO
+         Na1n56sXoO8TfZu/aUUjrEHrFn+C+rF5R2qnPWRnsHlLnFsmyIm1S93Fptt594SjFc/Q
+         XS7vV/X7EvDk1SHYBjKwdhdGBj0V0aAH6yFEEM8G++BbFdomFfo15rxO2UQQapw4IOpT
+         rm0w==
+X-Gm-Message-State: AGi0PuZDzX/Uzwmmn+hH9V2btIbqfnyBPR3YwGoOHW47//V/N6VIQz0a
+        qEl9dhzo0FS12DfvFWtfDiI2wuOv2Gz5OLHcgyrA1rIlxvBy
+X-Google-Smtp-Source: APiQypJdvcrg+aR58S2FEowGROs10MppJcSNDVTGB35UmZY5ZA1bV17WnWZlHjZMwBB+AaHxZWu05S2h25UB/7vDqvwQJi6PzhCP
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200408151213.GE66033@xz-x1>
+X-Received: by 2002:a92:dcd1:: with SMTP id b17mr8371614ilr.80.1586360224353;
+ Wed, 08 Apr 2020 08:37:04 -0700 (PDT)
+Date:   Wed, 08 Apr 2020 08:37:04 -0700
+In-Reply-To: <20200408151815.GG66033@xz-x1>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000a89b5805a2c9450d@google.com>
+Subject: Re: WARNING in af_alg_make_sg
+From:   syzbot <syzbot+3be1a33f04dc782e9fd5@syzkaller.appspotmail.com>
+To:     akpm@linux-foundation.org, bgeffon@google.com, davem@davemloft.net,
+        hdanton@sina.com, herbert@gondor.apana.org.au,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        peterx@redhat.com, syzkaller-bugs@googlegroups.com,
+        tglx@linutronix.de, torvalds@linux-foundation.org
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed 08-04-20 11:12:13, Peter Xu wrote:
-> >From 380003a56efc125565143c91ee6cefd7b3eba869 Mon Sep 17 00:00:00 2001
-> From: Hillf Danton <hdanton@sina.com>
-> Date: Wed, 8 Apr 2020 11:01:25 -0400
-> Subject: [PATCH] mm/gup: Let __get_user_pages_locked() return -EINTR for fatal
->  signal
-> 
-> __get_user_pages_locked() will return 0 instead of -EINTR after commit
-> 4426e945df588 which added extra code to allow gup detect fatal signal
-> faster.  Restore that behavior.
-> 
-> CC: Thomas Gleixner <tglx@linutronix.de>
-> Signed-off-by: Hillf Danton <hdanton@sina.com>
-> [peterx: write commit message]
+Hello,
 
-Fixes: 4426e945df58 ("mm/gup: allow VM_FAULT_RETRY for multiple times")
-> Signed-off-by: Peter Xu <peterx@redhat.com>
+syzbot has tested the proposed patch and the reproducer did not trigger crash:
 
-Acked-by: Michal Hocko <mhocko@suse.com>
+Reported-and-tested-by: syzbot+3be1a33f04dc782e9fd5@syzkaller.appspotmail.com
 
-> ---
->  mm/gup.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/mm/gup.c b/mm/gup.c
-> index afce0bc47e70..6076df8e04a4 100644
-> --- a/mm/gup.c
-> +++ b/mm/gup.c
-> @@ -1326,8 +1326,11 @@ static __always_inline long __get_user_pages_locked(struct task_struct *tsk,
->  		 * start trying again otherwise it can loop forever.
->  		 */
->  
-> -		if (fatal_signal_pending(current))
-> +		if (fatal_signal_pending(current)) {
-> +			if (!pages_done)
-> +				pages_done = -EINTR;
->  			break;
-> +		}
->  
->  		ret = down_read_killable(&mm->mmap_sem);
->  		if (ret) {
-> -- 
-> 2.24.1
-> 
-> 
-> -- 
-> Peter Xu
-> 
+Tested on:
 
--- 
-Michal Hocko
-SUSE Labs
+commit:         f5e94d10 Merge tag 'drm-next-2020-04-08' of git://anongit...
+git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
+kernel config:  https://syzkaller.appspot.com/x/.config?x=ca75979eeebf06c2
+dashboard link: https://syzkaller.appspot.com/bug?extid=3be1a33f04dc782e9fd5
+compiler:       gcc (GCC) 9.0.0 20181231 (experimental)
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=1672dcede00000
+
+Note: testing is done by a robot and is best-effort only.
