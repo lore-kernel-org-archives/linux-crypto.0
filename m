@@ -2,75 +2,98 @@ Return-Path: <SRS0=VxYc=5Z=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBFF2C2D0EA
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Apr 2020 04:55:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDA91C2D0EA
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Apr 2020 09:30:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 9656F20757
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Apr 2020 04:55:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586408145;
-	bh=nJh3It1f33AWj6QKhfbCSxlUGc9AwMrcvBA8sSIJW7k=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
-	b=Q1AkX7mSQw2Q04LBiYYER/o1TZafMIbW4gn6Ce6zsLygRiZ+xYgJECCmEsjGGcdAW
-	 CKGWQIiRm+d5RiV/QdC9F/BTAbRPA6rLHWWY+4Rl5XighhT0IC5CHWbqYvWHYDTgi3
-	 73n9o+8USQkAsojaKmMgN/WPQktRl0kSKMv2VwoM=
+	by mail.kernel.org (Postfix) with ESMTP id 957C42087E
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Apr 2020 09:30:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726777AbgDIEzc (ORCPT
+        id S1725997AbgDIJaj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 Apr 2020 00:55:32 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44658 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726767AbgDIEzb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Apr 2020 00:55:31 -0400
-Subject: Re: [GIT PULL] Crypto Fixes for 5.7
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586408132;
-        bh=nJh3It1f33AWj6QKhfbCSxlUGc9AwMrcvBA8sSIJW7k=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=10A1/aZNGFEu1NTORAeA5I2qLzII3QrZOYEbj7Ss6loEniLFEX87L6T9+UBXLP5Vl
-         bAF741J9j/nk5k1pYhH7SaKwP954CPkW3OiKwq8I0I0fXdmuNQaD+zkYwEG5SByPh2
-         C0hkvlBeu6Va6rc5TIlv83hJmcfwRHlV/+vB8r2Q=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20200408061513.GA23636@gondor.apana.org.au>
-References: <20190916084901.GA20338@gondor.apana.org.au>
- <20190923050515.GA6980@gondor.apana.org.au>
- <20191202062017.ge4rz72ki3vczhgb@gondor.apana.org.au>
- <20191214084749.jt5ekav5o5pd2dcp@gondor.apana.org.au>
- <20200115150812.mo2eycc53lbsgvue@gondor.apana.org.au>
- <20200213033231.xjwt6uf54nu26qm5@gondor.apana.org.au>
- <20200408061513.GA23636@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20200408061513.GA23636@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-X-PR-Tracked-Commit-Id: 755bddd1e4eaf9178758bd554c60aaab46fc42ba
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: d8fc9cde85d829eed6ca050d86799cc4cfa6a048
-Message-Id: <158640813200.3202.15552752765181066219.pr-tracker-bot@kernel.org>
-Date:   Thu, 09 Apr 2020 04:55:32 +0000
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Thu, 9 Apr 2020 05:30:39 -0400
+Received: from mout.kundenserver.de ([212.227.126.131]:42561 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725783AbgDIJaj (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 9 Apr 2020 05:30:39 -0400
+Received: from mail-qt1-f177.google.com ([209.85.160.177]) by
+ mrelayeu.kundenserver.de (mreue010 [212.227.15.129]) with ESMTPSA (Nemesis)
+ id 1Mi2eP-1irpap1Lwv-00e4zx; Thu, 09 Apr 2020 11:30:38 +0200
+Received: by mail-qt1-f177.google.com with SMTP id 14so2252573qtp.1;
+        Thu, 09 Apr 2020 02:30:38 -0700 (PDT)
+X-Gm-Message-State: AGi0PuZ2b5Pb7xTzUT4FnAA6YSZFxp7FzTFlMgLv4RorS8vIQCwortg4
+        +e/Bb3u+WTEoBCcCAn3EKGODOqRqXJ9WfSXNpgI=
+X-Google-Smtp-Source: APiQypLeWInEsRV0WKrdMUsAMwL5UXK2NYRqfW/x4jIjhbwpXqQB+5nF1GJW4mtRdXGTaGysVemV3g16soBD0GqaIYQ=
+X-Received: by 2002:aed:3b4c:: with SMTP id q12mr10945684qte.18.1586424637129;
+ Thu, 09 Apr 2020 02:30:37 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200408162718.4004527-1-arnd@arndb.de> <5E8E7E0D.4090702@hisilicon.com>
+In-Reply-To: <5E8E7E0D.4090702@hisilicon.com>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Thu, 9 Apr 2020 11:30:21 +0200
+X-Gmail-Original-Message-ID: <CAK8P3a2U-fiDD34kKUVx-KCV3Vq9TtrA6nDkFc1tS_yVnMKa7Q@mail.gmail.com>
+Message-ID: <CAK8P3a2U-fiDD34kKUVx-KCV3Vq9TtrA6nDkFc1tS_yVnMKa7Q@mail.gmail.com>
+Subject: Re: [PATCH] crypto: hisilicon: add more dependencies
+To:     Zhou Wang <wangzhou1@hisilicon.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
         "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        Hongbo Yao <yaohongbo@huawei.com>,
+        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+        Zaibo Xu <xuzaibo@huawei.com>, Hao Fang <fanghao11@huawei.com>,
+        Eric Biggers <ebiggers@google.com>,
+        Mao Wenan <maowenan@huawei.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:ipoSbm2snF0HZUjDUsz1P2IdKQmaRjdB024Ocb/rGc9PdWCpxSn
+ DY5ofMqGhWn+jGdAhTZ2ljzOE0ar/JiP0xOqq8KUNsMtsPOl9f1tZ9narkDRYOS/KxGbKi1
+ Xjr1JjikPGZ8C9xc5Qd/+bA7MZRty9Vd1qUGnPmbhuM0NkeAu1oi2ItJauKiN/+Kt2ZJBmV
+ Y7hsJfegNEVWvob7OJEsw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:3XunXxijaSg=:Nq7s6FrVrWhZ+/i09uiiqn
+ 2PhFFHbwPb73ARUSRxckjXSCxYNs1rI81Ez2Xylxoath6D79mvPROFjpjXKqMn5gEoiCh34Uj
+ 10qUoKY40SxfjLOOlp97MYdc9l0+ZHYi0z06LZ/ZDEd+9ICJRqJ0MhxM+tomTWTNHxNmY6ky5
+ rSYEKrYo54LrsDo63gDoKcKpFEfrZ79wFTB0b5KmfEzA3/GMG+wpiwVoRGysINlXSbHXczglb
+ GL/vg/nESedypEeusS0ME+KHQbGwddFHyMrBsWk0VxyTUoVOVPe24fpncca26qpv47Hd8be0S
+ aZlcMXUxMTCdkxhe+3fgLRIwMVyTC7+mGMEE+cfMHCHFRz1HZc9rJVReh2Qe7puh6Q5wi76VS
+ wciUBm6FxiHGvpUF5PQkk0QRMYjsSLI8RpYP7K6OHVerAG5KLaPKjDR+sWU9PdoN3SiNnB7GQ
+ uU2+KQq0KG6Xf02ULdu0Ch5Erc6YyFyNGcD0kC9TSd8ixlYRsjb2lgAevfvuRHIkEW/5bvhGw
+ XJam54XQKxhQawRkP6l3FCeSQjFbS+RQTj+SIOA1zweur/Fed2+5ybHgx84KSNF2GT3h4DbcD
+ z2Ei3HaEHw6eXkhItan7trxwpa+8An+5GthYWyCec3mRwW7BDqYKkvZrN24fB7E/oQJPTqYPD
+ 0RS2Te/caxIz/mrSG5AstQ2KRWJaUqxkM4f0RyfuVrk9mjHg8KgZ3RtL3NtEl7LQhy5tM8NKH
+ oab/BN+QQ3cGnewHupi0VB9SYZrc5raElYsOWcRWStmr415+JPBSP505iukXnNuOGGoDQgff4
+ epNzbjPXSIfpH23cr7JInrfFI3XxcFzKiysUH7CHybmMEr3AbI=
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pull request you sent on Wed, 8 Apr 2020 16:15:13 +1000:
+On Thu, Apr 9, 2020 at 3:45 AM Zhou Wang <wangzhou1@hisilicon.com> wrote:
+>
+> On 2020/4/9 0:27, Arnd Bergmann wrote:
+> > The added dependencies must be applied recursively to
+> > other modules that select CRYPTO_DEV_HISI_QM, to avoid
+> > running into the same problem again:
+> >
+> > WARNING: unmet direct dependencies detected for CRYPTO_DEV_HISI_QM
+> >   Depends on [m]: CRYPTO [=y] && CRYPTO_HW [=y] && (ARM64 [=y] || COMPILE_TEST [=y]) && PCI [=y] && PCI_MSI [=y] && (UACCE [=m] || UACCE [=m]=n)
+> >   Selected by [y]:
+> >   - CRYPTO_DEV_HISI_SEC2 [=y] && CRYPTO [=y] && CRYPTO_HW [=y] && PCI [=y] && PCI_MSI [=y] && (ARM64 [=y] || COMPILE_TEST [=y] && 64BIT [=y])
+> >   - CRYPTO_DEV_HISI_HPRE [=y] && CRYPTO [=y] && CRYPTO_HW [=y] && PCI [=y] && PCI_MSI [=y] && (ARM64 [=y] || COMPILE_TEST [=y] && 64BIT [=y])
+> > ld: drivers/crypto/hisilicon/qm.o: in function `hisi_qm_uninit': qm.c:(.text+0x23b8): undefined reference to `uacce_remove'
+> >
+> > Fixes: 47c16b449921 ("crypto: hisilicon - qm depends on UACCE")
+> > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> > ---
+>
+> Seems we already have a fix: https://lkml.org/lkml/2020/3/30/173 with your reviewed-by :)
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+Ah, of course. I even remembered that patch when I saw the problem in mainline,
+but for some reason assumed it was yet another instance of the same bug, rather
+than a patch that had I was just missing in my tree.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/d8fc9cde85d829eed6ca050d86799cc4cfa6a048
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+      Arnd
