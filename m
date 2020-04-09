@@ -2,99 +2,75 @@ Return-Path: <SRS0=VxYc=5Z=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B3B2C2BA2B
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Apr 2020 02:31:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBFF2C2D0EA
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Apr 2020 04:55:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 256522074F
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Apr 2020 02:31:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9656F20757
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Apr 2020 04:55:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1586408145;
+	bh=nJh3It1f33AWj6QKhfbCSxlUGc9AwMrcvBA8sSIJW7k=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=Q1AkX7mSQw2Q04LBiYYER/o1TZafMIbW4gn6Ce6zsLygRiZ+xYgJECCmEsjGGcdAW
+	 CKGWQIiRm+d5RiV/QdC9F/BTAbRPA6rLHWWY+4Rl5XighhT0IC5CHWbqYvWHYDTgi3
+	 73n9o+8USQkAsojaKmMgN/WPQktRl0kSKMv2VwoM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726545AbgDICbf (ORCPT
+        id S1726777AbgDIEzc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 8 Apr 2020 22:31:35 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:38492 "EHLO fornost.hmeau.com"
+        Thu, 9 Apr 2020 00:55:32 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44658 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726523AbgDICbf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 8 Apr 2020 22:31:35 -0400
-Received: from gwarestrin.me.apana.org.au ([192.168.0.7] helo=gwarestrin.arnor.me.apana.org.au)
-        by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1jMMxf-0003kw-TV; Thu, 09 Apr 2020 12:30:37 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 09 Apr 2020 12:30:35 +1000
-Date:   Thu, 9 Apr 2020 12:30:35 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Ayush Sawal <ayush.sawal@chelsio.com>,
-        Vinay Kumar Yadav <vinay.yadav@chelsio.com>,
-        Rohit Maheshwari <rohitm@chelsio.com>,
+        id S1726767AbgDIEzb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 9 Apr 2020 00:55:31 -0400
+Subject: Re: [GIT PULL] Crypto Fixes for 5.7
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1586408132;
+        bh=nJh3It1f33AWj6QKhfbCSxlUGc9AwMrcvBA8sSIJW7k=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=10A1/aZNGFEu1NTORAeA5I2qLzII3QrZOYEbj7Ss6loEniLFEX87L6T9+UBXLP5Vl
+         bAF741J9j/nk5k1pYhH7SaKwP954CPkW3OiKwq8I0I0fXdmuNQaD+zkYwEG5SByPh2
+         C0hkvlBeu6Va6rc5TIlv83hJmcfwRHlV/+vB8r2Q=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20200408061513.GA23636@gondor.apana.org.au>
+References: <20190916084901.GA20338@gondor.apana.org.au>
+ <20190923050515.GA6980@gondor.apana.org.au>
+ <20191202062017.ge4rz72ki3vczhgb@gondor.apana.org.au>
+ <20191214084749.jt5ekav5o5pd2dcp@gondor.apana.org.au>
+ <20200115150812.mo2eycc53lbsgvue@gondor.apana.org.au>
+ <20200213033231.xjwt6uf54nu26qm5@gondor.apana.org.au>
+ <20200408061513.GA23636@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20200408061513.GA23636@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+X-PR-Tracked-Commit-Id: 755bddd1e4eaf9178758bd554c60aaab46fc42ba
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: d8fc9cde85d829eed6ca050d86799cc4cfa6a048
+Message-Id: <158640813200.3202.15552752765181066219.pr-tracker-bot@kernel.org>
+Date:   Thu, 09 Apr 2020 04:55:32 +0000
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
         "David S. Miller" <davem@davemloft.net>,
-        YueHaibing <yuehaibing@huawei.com>, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] cxgb4/chcr: fix building without IPv6
-Message-ID: <20200409023035.GA27525@gondor.apana.org.au>
-References: <20200408185330.190658-1-arnd@arndb.de>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200408185330.190658-1-arnd@arndb.de>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Apr 08, 2020 at 08:53:06PM +0200, Arnd Bergmann wrote:
-> When IPv6 support is completely disabled, the chelsio driver fails
-> to build with
-> 
-> drivers/crypto/chelsio/chcr_ktls.c: In function 'chcr_ktls_act_open_req6':
-> include/net/sock.h:380:37: error: 'struct sock_common' has no member named 'skc_v6_rcv_saddr'; did you mean 'skc_rcv_saddr'?
->   380 | #define sk_v6_rcv_saddr __sk_common.skc_v6_rcv_saddr
->       |                                     ^~~~~~~~~~~~~~~~
-> drivers/crypto/chelsio/chcr_ktls.c:258:37: note: in expansion of macro 'sk_v6_rcv_saddr'
->   258 |  cpl->local_ip_hi = *(__be64 *)&sk->sk_v6_rcv_saddr.in6_u.u6_addr8[0];
->       |                                     ^~~~~~~~~~~~~~~
-> drivers/crypto/chelsio/chcr_ktls.c:260:36: note: in expansion of macro 'sk_v6_daddr'
->   260 |  cpl->peer_ip_hi = *(__be64 *)&sk->sk_v6_daddr.in6_u.u6_addr8[0];
->       |                                    ^~~~~~~~~~~
-> drivers/crypto/chelsio/chcr_ktls.c:261:36: note: in expansion of macro 'sk_v6_daddr'
->   261 |  cpl->peer_ip_lo = *(__be64 *)&sk->sk_v6_daddr.in6_u.u6_addr8[8];
->       |                                    ^~~~~~~~~~~
-> drivers/crypto/chelsio/chcr_ktls.c:296:27: note: in expansion of macro 'sk_v6_daddr'
->   296 |       ipv6_addr_type(&sk->sk_v6_daddr) == IPV6_ADDR_MAPPED)) {
->       |                           ^~~~~~~~~~~
-> drivers/crypto/chelsio/chcr_ktls.c:303:29: note: in expansion of macro 'sk_v6_rcv_saddr'
->   303 |           (const u32 *)&sk->sk_v6_rcv_saddr.in6_u.u6_addr8,
->       |                             ^~~~~~~~~~~~~~~
-> drivers/crypto/chelsio/chcr_ktls.c: In function 'chcr_ktls_dev_del':
-> drivers/crypto/chelsio/chcr_ktls.c:401:26: note: in expansion of macro 'sk_v6_daddr'
->   401 |        (const u32 *)&sk->sk_v6_daddr.in6_u.u6_addr8,
->       |                          ^~~~~~~~~~~
-> drivers/crypto/chelsio/chcr_ktls.c: In function 'chcr_ktls_dev_add':
-> drivers/crypto/chelsio/chcr_ktls.c:495:27: note: in expansion of macro 'sk_v6_daddr'
->   495 |       ipv6_addr_type(&sk->sk_v6_daddr) == IPV6_ADDR_MAPPED)) {
->       |                           ^~~~~~~~~~~
-> drivers/crypto/chelsio/chcr_ktls.c:498:22: note: in expansion of macro 'sk_v6_daddr'
->   498 |   memcpy(daaddr, sk->sk_v6_daddr.in6_u.u6_addr8, 16);
->       |                      ^~~~~~~~~~~
-> 
-> There is probably a good way to fix it, but this patch just adds a
-> bunch of #if checks to get it to build again, which gets a bit
-> ugly.
-> 
-> Fixes: 62370a4f346d ("cxgb4/chcr: Add ipv6 support and statistics")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
-> If you have a better idea to fix it, please send a different patch
-> instead and treat this as a bug report. ;-)
-> ---
->  drivers/crypto/chelsio/chcr_ktls.c | 26 ++++++++++++++++++++------
->  1 file changed, 20 insertions(+), 6 deletions(-)
+The pull request you sent on Wed, 8 Apr 2020 16:15:13 +1000:
 
-Please send all chelsio patches via netdev.  Thanks!
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/d8fc9cde85d829eed6ca050d86799cc4cfa6a048
+
+Thank you!
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
