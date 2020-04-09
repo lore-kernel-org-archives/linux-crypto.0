@@ -2,98 +2,311 @@ Return-Path: <SRS0=VxYc=5Z=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDA91C2D0EA
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Apr 2020 09:30:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0845AC2BB85
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Apr 2020 20:25:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 957C42087E
-	for <linux-crypto@archiver.kernel.org>; Thu,  9 Apr 2020 09:30:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D22EB20A8B
+	for <linux-crypto@archiver.kernel.org>; Thu,  9 Apr 2020 20:25:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1586463903;
+	bh=Bk57BIRWMrHTJYHea5mx88md5Lv6nHKd/qUZK09U+f8=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=PQPZPJ374ByoQ1o36aAfrJpKMOQE1FgXtStqCWCeOq67Pt6RF31vihzI66/iD0hXw
+	 TORLOCfIONfPyQuNjNO0Ddx5GYz9IPLnM+fKZxfC08RM0IVGyhLmyzL8km6WTWhwxf
+	 gcgmKaSX50CCU7iRiCLJDPh3N87yXoSzJx36g72g=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725997AbgDIJaj (ORCPT
+        id S1726872AbgDIUZC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 9 Apr 2020 05:30:39 -0400
-Received: from mout.kundenserver.de ([212.227.126.131]:42561 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725783AbgDIJaj (ORCPT
+        Thu, 9 Apr 2020 16:25:02 -0400
+Received: from mail-io1-f65.google.com ([209.85.166.65]:33898 "EHLO
+        mail-io1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726623AbgDIUZC (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 9 Apr 2020 05:30:39 -0400
-Received: from mail-qt1-f177.google.com ([209.85.160.177]) by
- mrelayeu.kundenserver.de (mreue010 [212.227.15.129]) with ESMTPSA (Nemesis)
- id 1Mi2eP-1irpap1Lwv-00e4zx; Thu, 09 Apr 2020 11:30:38 +0200
-Received: by mail-qt1-f177.google.com with SMTP id 14so2252573qtp.1;
-        Thu, 09 Apr 2020 02:30:38 -0700 (PDT)
-X-Gm-Message-State: AGi0PuZ2b5Pb7xTzUT4FnAA6YSZFxp7FzTFlMgLv4RorS8vIQCwortg4
-        +e/Bb3u+WTEoBCcCAn3EKGODOqRqXJ9WfSXNpgI=
-X-Google-Smtp-Source: APiQypLeWInEsRV0WKrdMUsAMwL5UXK2NYRqfW/x4jIjhbwpXqQB+5nF1GJW4mtRdXGTaGysVemV3g16soBD0GqaIYQ=
-X-Received: by 2002:aed:3b4c:: with SMTP id q12mr10945684qte.18.1586424637129;
- Thu, 09 Apr 2020 02:30:37 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200408162718.4004527-1-arnd@arndb.de> <5E8E7E0D.4090702@hisilicon.com>
-In-Reply-To: <5E8E7E0D.4090702@hisilicon.com>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Thu, 9 Apr 2020 11:30:21 +0200
-X-Gmail-Original-Message-ID: <CAK8P3a2U-fiDD34kKUVx-KCV3Vq9TtrA6nDkFc1tS_yVnMKa7Q@mail.gmail.com>
-Message-ID: <CAK8P3a2U-fiDD34kKUVx-KCV3Vq9TtrA6nDkFc1tS_yVnMKa7Q@mail.gmail.com>
-Subject: Re: [PATCH] crypto: hisilicon: add more dependencies
-To:     Zhou Wang <wangzhou1@hisilicon.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Thu, 9 Apr 2020 16:25:02 -0400
+Received: by mail-io1-f65.google.com with SMTP id f3so965025ioj.1;
+        Thu, 09 Apr 2020 13:25:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=PYFXJu2v021QrExjLU89SWC+0SkjsxrrPKrOwguZdE0=;
+        b=btJLusidWGoUHhO2tNP2tWKTg8ZqgSsUBki4KbT/0av5PEUNnaw/VIPifJ/nffO6c4
+         d55wIG2s2QrWtWyLo6oYjeoPaQH8pUOzvkACDr58nr43EsJ8EWCV64BBXAg66hOpK5fX
+         5OGhaW9KjsbsHQ5uCXoeMuoIKyWICbU6LModQOlihDAcJInCqcTxDqIBIeRdMeGKDMmF
+         sChQ5TztlRCXWZcxcaLMT5+/GXNjKOfpRxdQ2aA9YWSsa9A/aPCm9tU36l31464qqS4E
+         j4HXUo1tL/5oKxoayelIL7PoYDyy2lWLNXM1CWmY/4pHel3kkBc3B1cdr8376vAYoj7/
+         7Nww==
+X-Gm-Message-State: AGi0PuYZiMNAwmbO+44dOYM3BpTMBSt9t/l5wIOUfsXl27iUzinSTlgj
+        Lm2npGPfCRKrV6blGZXX+hfA+Wg=
+X-Google-Smtp-Source: APiQypIQrMT7fNU323jRwRLQI78vWEj7QI6Y6DFJa09OnPdPf8iC29OVD5mExa7mQsfGsjdswhxBOg==
+X-Received: by 2002:a02:b897:: with SMTP id p23mr1294003jam.120.1586463900599;
+        Thu, 09 Apr 2020 13:25:00 -0700 (PDT)
+Received: from xps15.herring.priv ([64.188.179.248])
+        by smtp.googlemail.com with ESMTPSA id z17sm25408iln.34.2020.04.09.13.24.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Apr 2020 13:24:59 -0700 (PDT)
+From:   Rob Herring <robh@kernel.org>
+To:     devicetree@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, Maxime Ripard <mripard@kernel.org>,
+        Chen-Yu Tsai <wens@csie.org>,
+        =?UTF-8?q?Nuno=20S=C3=A1?= <nuno.sa@analog.com>,
+        Jean Delvare <jdelvare@suse.com>,
+        Guenter Roeck <linux@roeck-us.net>,
+        Thierry Reding <thierry.reding@gmail.com>,
+        Jonathan Hunter <jonathanh@nvidia.com>,
+        Lee Jones <lee.jones@linaro.org>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
         "David S. Miller" <davem@davemloft.net>,
-        Hongbo Yao <yaohongbo@huawei.com>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Zaibo Xu <xuzaibo@huawei.com>, Hao Fang <fanghao11@huawei.com>,
-        Eric Biggers <ebiggers@google.com>,
-        Mao Wenan <maowenan@huawei.com>,
-        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
-        <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Provags-ID: V03:K1:ipoSbm2snF0HZUjDUsz1P2IdKQmaRjdB024Ocb/rGc9PdWCpxSn
- DY5ofMqGhWn+jGdAhTZ2ljzOE0ar/JiP0xOqq8KUNsMtsPOl9f1tZ9narkDRYOS/KxGbKi1
- Xjr1JjikPGZ8C9xc5Qd/+bA7MZRty9Vd1qUGnPmbhuM0NkeAu1oi2ItJauKiN/+Kt2ZJBmV
- Y7hsJfegNEVWvob7OJEsw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:3XunXxijaSg=:Nq7s6FrVrWhZ+/i09uiiqn
- 2PhFFHbwPb73ARUSRxckjXSCxYNs1rI81Ez2Xylxoath6D79mvPROFjpjXKqMn5gEoiCh34Uj
- 10qUoKY40SxfjLOOlp97MYdc9l0+ZHYi0z06LZ/ZDEd+9ICJRqJ0MhxM+tomTWTNHxNmY6ky5
- rSYEKrYo54LrsDo63gDoKcKpFEfrZ79wFTB0b5KmfEzA3/GMG+wpiwVoRGysINlXSbHXczglb
- GL/vg/nESedypEeusS0ME+KHQbGwddFHyMrBsWk0VxyTUoVOVPe24fpncca26qpv47Hd8be0S
- aZlcMXUxMTCdkxhe+3fgLRIwMVyTC7+mGMEE+cfMHCHFRz1HZc9rJVReh2Qe7puh6Q5wi76VS
- wciUBm6FxiHGvpUF5PQkk0QRMYjsSLI8RpYP7K6OHVerAG5KLaPKjDR+sWU9PdoN3SiNnB7GQ
- uU2+KQq0KG6Xf02ULdu0Ch5Erc6YyFyNGcD0kC9TSd8ixlYRsjb2lgAevfvuRHIkEW/5bvhGw
- XJam54XQKxhQawRkP6l3FCeSQjFbS+RQTj+SIOA1zweur/Fed2+5ybHgx84KSNF2GT3h4DbcD
- z2Ei3HaEHw6eXkhItan7trxwpa+8An+5GthYWyCec3mRwW7BDqYKkvZrN24fB7E/oQJPTqYPD
- 0RS2Te/caxIz/mrSG5AstQ2KRWJaUqxkM4f0RyfuVrk9mjHg8KgZ3RtL3NtEl7LQhy5tM8NKH
- oab/BN+QQ3cGnewHupi0VB9SYZrc5raElYsOWcRWStmr415+JPBSP505iukXnNuOGGoDQgff4
- epNzbjPXSIfpH23cr7JInrfFI3XxcFzKiysUH7CHybmMEr3AbI=
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Nicolas Saenz Julienne <nsaenzjulienne@suse.de>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        bcm-kernel-feedback-list@broadcom.com,
+        Mark Brown <broonie@kernel.org>, linux-hwmon@vger.kernel.org,
+        linux-tegra@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+        netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-rpi-kernel@lists.infradead.org, linux-spi@vger.kernel.org,
+        linux-usb@vger.kernel.org
+Subject: [PATCH] dt-bindings: Fix dtc warnings on reg and ranges in examples
+Date:   Thu,  9 Apr 2020 14:24:58 -0600
+Message-Id: <20200409202458.24509-1-robh@kernel.org>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Apr 9, 2020 at 3:45 AM Zhou Wang <wangzhou1@hisilicon.com> wrote:
->
-> On 2020/4/9 0:27, Arnd Bergmann wrote:
-> > The added dependencies must be applied recursively to
-> > other modules that select CRYPTO_DEV_HISI_QM, to avoid
-> > running into the same problem again:
-> >
-> > WARNING: unmet direct dependencies detected for CRYPTO_DEV_HISI_QM
-> >   Depends on [m]: CRYPTO [=y] && CRYPTO_HW [=y] && (ARM64 [=y] || COMPILE_TEST [=y]) && PCI [=y] && PCI_MSI [=y] && (UACCE [=m] || UACCE [=m]=n)
-> >   Selected by [y]:
-> >   - CRYPTO_DEV_HISI_SEC2 [=y] && CRYPTO [=y] && CRYPTO_HW [=y] && PCI [=y] && PCI_MSI [=y] && (ARM64 [=y] || COMPILE_TEST [=y] && 64BIT [=y])
-> >   - CRYPTO_DEV_HISI_HPRE [=y] && CRYPTO [=y] && CRYPTO_HW [=y] && PCI [=y] && PCI_MSI [=y] && (ARM64 [=y] || COMPILE_TEST [=y] && 64BIT [=y])
-> > ld: drivers/crypto/hisilicon/qm.o: in function `hisi_qm_uninit': qm.c:(.text+0x23b8): undefined reference to `uacce_remove'
-> >
-> > Fixes: 47c16b449921 ("crypto: hisilicon - qm depends on UACCE")
-> > Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> > ---
->
-> Seems we already have a fix: https://lkml.org/lkml/2020/3/30/173 with your reviewed-by :)
+A recent update to dtc and changes to the default warnings introduced
+some new warnings in the DT binding examples:
 
-Ah, of course. I even remembered that patch when I saw the problem in mainline,
-but for some reason assumed it was yet another instance of the same bug, rather
-than a patch that had I was just missing in my tree.
+Documentation/devicetree/bindings/arm/sunxi/allwinner,sun4i-a10-mbus.example.dts:23.13-61:
+ Warning (dma_ranges_format): /example-0/dram-controller@1c01000:dma-ranges: "dma-ranges" property has invalid length (12 bytes) (parent #address-cells == 1, child #address-cells == 2, #size-cells == 1)
+Documentation/devicetree/bindings/hwmon/adi,axi-fan-control.example.dts:17.22-28.11:
+ Warning (unit_address_vs_reg): /example-0/fpga-axi@0: node has a unit name, but no reg or ranges property
+Documentation/devicetree/bindings/memory-controllers/nvidia,tegra186-mc.example.dts:34.13-54:
+ Warning (dma_ranges_format): /example-0/memory-controller@2c00000:dma-ranges: "dma-ranges" property has invalid length (24 bytes) (parent #address-cells == 1, child #address-cells == 2, #size-cells == 2)
+Documentation/devicetree/bindings/mfd/st,stpmic1.example.dts:19.15-79.11:
+ Warning (unit_address_vs_reg): /example-0/i2c@0: node has a unit name, but no reg or ranges property
+Documentation/devicetree/bindings/net/qcom,ipq8064-mdio.example.dts:28.23-31.15:
+ Warning (unit_address_vs_reg): /example-0/mdio@37000000/switch@10: node has a unit name, but no reg or ranges property
+Documentation/devicetree/bindings/rng/brcm,bcm2835.example.dts:17.5-21.11:
+ Warning (unit_address_vs_reg): /example-0/rng: node has a reg or ranges property, but no unit name
+Documentation/devicetree/bindings/spi/qcom,spi-qcom-qspi.example.dts:20.20-43.11:
+ Warning (unit_address_vs_reg): /example-0/soc@0: node has a unit name, but no reg or ranges property
+Documentation/devicetree/bindings/usb/ingenic,musb.example.dts:18.28-21.11:
+ Warning (unit_address_vs_reg): /example-0/usb-phy@0: node has a unit name, but no reg or ranges property
 
-      Arnd
+Cc: Maxime Ripard <mripard@kernel.org>
+Cc: Chen-Yu Tsai <wens@csie.org>
+Cc: "Nuno Sá" <nuno.sa@analog.com>
+Cc: Jean Delvare <jdelvare@suse.com>
+Cc: Guenter Roeck <linux@roeck-us.net>
+Cc: Thierry Reding <thierry.reding@gmail.com>
+Cc: Jonathan Hunter <jonathanh@nvidia.com>
+Cc: Lee Jones <lee.jones@linaro.org>
+Cc: Bjorn Andersson <bjorn.andersson@linaro.org>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Matt Mackall <mpm@selenic.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Nicolas Saenz Julienne <nsaenzjulienne@suse.de>
+Cc: Florian Fainelli <f.fainelli@gmail.com>
+Cc: Ray Jui <rjui@broadcom.com>
+Cc: Scott Branden <sbranden@broadcom.com>
+Cc: bcm-kernel-feedback-list@broadcom.com
+Cc: Mark Brown <broonie@kernel.org>
+Cc: linux-hwmon@vger.kernel.org
+Cc: linux-tegra@vger.kernel.org
+Cc: linux-arm-msm@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-rpi-kernel@lists.infradead.org
+Cc: linux-spi@vger.kernel.org
+Cc: linux-usb@vger.kernel.org
+Signed-off-by: Rob Herring <robh@kernel.org>
+---
+Will take this via the DT tree.
+
+Rob
+
+ .../arm/sunxi/allwinner,sun4i-a10-mbus.yaml   |  6 +++
+ .../bindings/hwmon/adi,axi-fan-control.yaml   |  2 +-
+ .../nvidia,tegra186-mc.yaml                   | 41 +++++++++++--------
+ .../devicetree/bindings/mfd/st,stpmic1.yaml   |  2 +-
+ .../bindings/net/qcom,ipq8064-mdio.yaml       |  1 +
+ .../devicetree/bindings/rng/brcm,bcm2835.yaml |  2 +-
+ .../bindings/spi/qcom,spi-qcom-qspi.yaml      |  2 +-
+ .../devicetree/bindings/usb/ingenic,musb.yaml |  2 +-
+ 8 files changed, 35 insertions(+), 23 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/arm/sunxi/allwinner,sun4i-a10-mbus.yaml b/Documentation/devicetree/bindings/arm/sunxi/allwinner,sun4i-a10-mbus.yaml
+index aa0738b4d534..e713a6fe4cf7 100644
+--- a/Documentation/devicetree/bindings/arm/sunxi/allwinner,sun4i-a10-mbus.yaml
++++ b/Documentation/devicetree/bindings/arm/sunxi/allwinner,sun4i-a10-mbus.yaml
+@@ -42,6 +42,10 @@ properties:
+     description:
+       See section 2.3.9 of the DeviceTree Specification.
+ 
++  '#address-cells': true
++
++  '#size-cells': true
++
+ required:
+   - "#interconnect-cells"
+   - compatible
+@@ -59,6 +63,8 @@ examples:
+         compatible = "allwinner,sun5i-a13-mbus";
+         reg = <0x01c01000 0x1000>;
+         clocks = <&ccu CLK_MBUS>;
++        #address-cells = <1>;
++        #size-cells = <1>;
+         dma-ranges = <0x00000000 0x40000000 0x20000000>;
+         #interconnect-cells = <1>;
+     };
+diff --git a/Documentation/devicetree/bindings/hwmon/adi,axi-fan-control.yaml b/Documentation/devicetree/bindings/hwmon/adi,axi-fan-control.yaml
+index 57a240d2d026..29bb2c778c59 100644
+--- a/Documentation/devicetree/bindings/hwmon/adi,axi-fan-control.yaml
++++ b/Documentation/devicetree/bindings/hwmon/adi,axi-fan-control.yaml
+@@ -47,7 +47,7 @@ required:
+ 
+ examples:
+   - |
+-    fpga_axi: fpga-axi@0 {
++    fpga_axi: fpga-axi {
+             #address-cells = <0x2>;
+             #size-cells = <0x1>;
+ 
+diff --git a/Documentation/devicetree/bindings/memory-controllers/nvidia,tegra186-mc.yaml b/Documentation/devicetree/bindings/memory-controllers/nvidia,tegra186-mc.yaml
+index 12516bd89cf9..611bda38d187 100644
+--- a/Documentation/devicetree/bindings/memory-controllers/nvidia,tegra186-mc.yaml
++++ b/Documentation/devicetree/bindings/memory-controllers/nvidia,tegra186-mc.yaml
+@@ -97,30 +97,35 @@ examples:
+     #include <dt-bindings/clock/tegra186-clock.h>
+     #include <dt-bindings/interrupt-controller/arm-gic.h>
+ 
+-    memory-controller@2c00000 {
+-        compatible = "nvidia,tegra186-mc";
+-        reg = <0x0 0x02c00000 0x0 0xb0000>;
+-        interrupts = <GIC_SPI 223 IRQ_TYPE_LEVEL_HIGH>;
+-
++    bus {
+         #address-cells = <2>;
+         #size-cells = <2>;
+ 
+-        ranges = <0x0 0x02c00000 0x02c00000 0x0 0xb0000>;
++        memory-controller@2c00000 {
++            compatible = "nvidia,tegra186-mc";
++            reg = <0x0 0x02c00000 0x0 0xb0000>;
++            interrupts = <GIC_SPI 223 IRQ_TYPE_LEVEL_HIGH>;
++
++            #address-cells = <2>;
++            #size-cells = <2>;
++
++            ranges = <0x0 0x02c00000 0x0 0x02c00000 0x0 0xb0000>;
+ 
+-        /*
+-         * Memory clients have access to all 40 bits that the memory
+-         * controller can address.
+-         */
+-        dma-ranges = <0x0 0x0 0x0 0x0 0x100 0x0>;
++            /*
++             * Memory clients have access to all 40 bits that the memory
++             * controller can address.
++             */
++            dma-ranges = <0x0 0x0 0x0 0x0 0x100 0x0>;
+ 
+-        external-memory-controller@2c60000 {
+-            compatible = "nvidia,tegra186-emc";
+-            reg = <0x0 0x02c60000 0x0 0x50000>;
+-            interrupts = <GIC_SPI 224 IRQ_TYPE_LEVEL_HIGH>;
+-            clocks = <&bpmp TEGRA186_CLK_EMC>;
+-            clock-names = "emc";
++            external-memory-controller@2c60000 {
++                compatible = "nvidia,tegra186-emc";
++                reg = <0x0 0x02c60000 0x0 0x50000>;
++                interrupts = <GIC_SPI 224 IRQ_TYPE_LEVEL_HIGH>;
++                clocks = <&bpmp TEGRA186_CLK_EMC>;
++                clock-names = "emc";
+ 
+-            nvidia,bpmp = <&bpmp>;
++                nvidia,bpmp = <&bpmp>;
++            };
+         };
+     };
+ 
+diff --git a/Documentation/devicetree/bindings/mfd/st,stpmic1.yaml b/Documentation/devicetree/bindings/mfd/st,stpmic1.yaml
+index d9ad9260e348..f88d13d70441 100644
+--- a/Documentation/devicetree/bindings/mfd/st,stpmic1.yaml
++++ b/Documentation/devicetree/bindings/mfd/st,stpmic1.yaml
+@@ -274,7 +274,7 @@ examples:
+   - |
+     #include <dt-bindings/mfd/st,stpmic1.h>
+     #include <dt-bindings/interrupt-controller/arm-gic.h>
+-    i2c@0 {
++    i2c {
+       #address-cells = <1>;
+       #size-cells = <0>;
+       pmic@33 {
+diff --git a/Documentation/devicetree/bindings/net/qcom,ipq8064-mdio.yaml b/Documentation/devicetree/bindings/net/qcom,ipq8064-mdio.yaml
+index b9f90081046f..67df3fe861ee 100644
+--- a/Documentation/devicetree/bindings/net/qcom,ipq8064-mdio.yaml
++++ b/Documentation/devicetree/bindings/net/qcom,ipq8064-mdio.yaml
+@@ -48,6 +48,7 @@ examples:
+ 
+         switch@10 {
+             compatible = "qca,qca8337";
++            reg = <0x10>;
+             /* ... */
+         };
+     };
+diff --git a/Documentation/devicetree/bindings/rng/brcm,bcm2835.yaml b/Documentation/devicetree/bindings/rng/brcm,bcm2835.yaml
+index 89ab67f20a7f..c147900f9041 100644
+--- a/Documentation/devicetree/bindings/rng/brcm,bcm2835.yaml
++++ b/Documentation/devicetree/bindings/rng/brcm,bcm2835.yaml
+@@ -39,7 +39,7 @@ additionalProperties: false
+ 
+ examples:
+   - |
+-    rng {
++    rng@7e104000 {
+         compatible = "brcm,bcm2835-rng";
+         reg = <0x7e104000 0x10>;
+         interrupts = <2 29>;
+diff --git a/Documentation/devicetree/bindings/spi/qcom,spi-qcom-qspi.yaml b/Documentation/devicetree/bindings/spi/qcom,spi-qcom-qspi.yaml
+index 0cf470eaf2a0..5c16cf59ca00 100644
+--- a/Documentation/devicetree/bindings/spi/qcom,spi-qcom-qspi.yaml
++++ b/Documentation/devicetree/bindings/spi/qcom,spi-qcom-qspi.yaml
+@@ -61,7 +61,7 @@ examples:
+     #include <dt-bindings/clock/qcom,gcc-sdm845.h>
+     #include <dt-bindings/interrupt-controller/arm-gic.h>
+ 
+-    soc: soc@0 {
++    soc: soc {
+         #address-cells = <2>;
+         #size-cells = <2>;
+ 
+diff --git a/Documentation/devicetree/bindings/usb/ingenic,musb.yaml b/Documentation/devicetree/bindings/usb/ingenic,musb.yaml
+index 1d6877875077..c2d2ee43ba67 100644
+--- a/Documentation/devicetree/bindings/usb/ingenic,musb.yaml
++++ b/Documentation/devicetree/bindings/usb/ingenic,musb.yaml
+@@ -56,7 +56,7 @@ additionalProperties: false
+ examples:
+   - |
+     #include <dt-bindings/clock/jz4740-cgu.h>
+-    usb_phy: usb-phy@0 {
++    usb_phy: usb-phy {
+       compatible = "usb-nop-xceiv";
+       #phy-cells = <0>;
+     };
+-- 
+2.20.1
+
