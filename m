@@ -4,41 +4,41 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 375B4C2BBC7
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Apr 2020 12:13:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E113C2BBFD
+	for <linux-crypto@archiver.kernel.org>; Sat, 11 Apr 2020 12:25:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 10201214D8
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Apr 2020 12:13:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 694B621556
+	for <linux-crypto@archiver.kernel.org>; Sat, 11 Apr 2020 12:25:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586607196;
-	bh=2145wxU7Lzlj8yfiAdrjxVbGzbrT4ceb89Q0fIioipw=;
+	s=default; t=1586607924;
+	bh=nBp8M//Wwkue4wWaCuCCtoO0nyJNfejoIKWOMt6EWGA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=B9YzU8wLTmKcFPfjOVTt1rxjJO6Y9R/268JmVlQur/dE4WPUMOF7eyHXEoRNipK6W
-	 suROXAPHZaeV8Av0vn9Uh05gXe+006Y/GBFV0Tjzhtj2n3tP39CPtmn4NmhcuEX/9d
-	 l9fUWIjc0GYgfLHIkkVtxDC87CPk73bXZ8p8Lt6g=
+	b=ppFkmgyoH6xxtjcQnCs9iQ2lE8vnibO4En7Qf/dvrfNwaxvF2Mu2D6cDIn/o/bwCU
+	 Rkl4Tv4wHPiYjDF0Gqbw+xSqTSNQ2M3ky6UolFnEGR6u/1TXHAMyw6p2qguaf6TEUB
+	 Lgf0N3aF40mgl3lM0ExkKcbUu9PNZ0kr1T//KK6g=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727696AbgDKMNO (ORCPT
+        id S1728285AbgDKMQp (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 11 Apr 2020 08:13:14 -0400
-Received: from mail.kernel.org ([198.145.29.99]:46092 "EHLO mail.kernel.org"
+        Sat, 11 Apr 2020 08:16:45 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51090 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727681AbgDKMNO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 11 Apr 2020 08:13:14 -0400
+        id S1726899AbgDKMQo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 11 Apr 2020 08:16:44 -0400
 Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 0046D2137B;
-        Sat, 11 Apr 2020 12:13:13 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 46C2920644;
+        Sat, 11 Apr 2020 12:16:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586607194;
-        bh=2145wxU7Lzlj8yfiAdrjxVbGzbrT4ceb89Q0fIioipw=;
+        s=default; t=1586607404;
+        bh=nBp8M//Wwkue4wWaCuCCtoO0nyJNfejoIKWOMt6EWGA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=cPBFhmu+DQZ6Eo0+pZI6PmQAVKCnJ7OuxncdZjUfrGefixQnlc8foXcXMf8jjdvlb
-         73Llr+aINjYkazch3aw6u3MWd8PAoAlyZwmCrRwJ5l9+BH6DP7SnwcQFxFCKxVNDla
-         jj8o5IUCIxEByE/dsDEj8LNmy0hOsdu22LD1y9Nw=
+        b=O7icK7Ib7lVZSe0+Kqjl0FMOa+zXDYCqx4r4nGd3PAf45c25Fi1uFTLWE53BrWoaq
+         N6/TivjyeTzvNPas2IQjP7faREsSVKkcMEysUY0sx9SQUWwzPVoX0ZND/WUYkvRXEK
+         P0Mi54RMTWDc/xiQLEtBm78SLf3URRauGGPx4/M4=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -47,12 +47,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Steffen Klassert <steffen.klassert@secunet.com>,
         linux-crypto@vger.kernel.org
-Subject: [PATCH 4.14 13/38] padata: always acquire cpu_hotplug_lock before pinst->lock
-Date:   Sat, 11 Apr 2020 14:08:57 +0200
-Message-Id: <20200411115439.325284669@linuxfoundation.org>
+Subject: [PATCH 4.19 24/54] padata: always acquire cpu_hotplug_lock before pinst->lock
+Date:   Sat, 11 Apr 2020 14:09:06 +0200
+Message-Id: <20200411115510.950406190@linuxfoundation.org>
 X-Mailer: git-send-email 2.26.0
-In-Reply-To: <20200411115437.795556138@linuxfoundation.org>
-References: <20200411115437.795556138@linuxfoundation.org>
+In-Reply-To: <20200411115508.284500414@linuxfoundation.org>
+References: <20200411115508.284500414@linuxfoundation.org>
 User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -104,7 +104,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/kernel/padata.c
 +++ b/kernel/padata.c
-@@ -605,8 +605,8 @@ int padata_set_cpumask(struct padata_ins
+@@ -671,8 +671,8 @@ int padata_set_cpumask(struct padata_ins
  	struct cpumask *serial_mask, *parallel_mask;
  	int err = -EINVAL;
  
@@ -114,7 +114,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
  
  	switch (cpumask_type) {
  	case PADATA_CPU_PARALLEL:
-@@ -624,8 +624,8 @@ int padata_set_cpumask(struct padata_ins
+@@ -690,8 +690,8 @@ int padata_set_cpumask(struct padata_ins
  	err =  __padata_set_cpumasks(pinst, parallel_mask, serial_mask);
  
  out:
