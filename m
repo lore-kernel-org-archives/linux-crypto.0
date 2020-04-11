@@ -4,52 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC57AC2BA19
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Apr 2020 23:30:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BB1BC2BB86
+	for <linux-crypto@archiver.kernel.org>; Sat, 11 Apr 2020 23:35:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 8B930206E9
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Apr 2020 23:30:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1158E20709
+	for <linux-crypto@archiver.kernel.org>; Sat, 11 Apr 2020 23:35:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586647826;
-	bh=7w3dD9EteRAzeMqpU2Hs9rF8DjjME7iEpW/3WzlUqQ4=;
+	s=default; t=1586648114;
+	bh=hHPZfCy20/ddSIEcwbHJISx27Bkvb5pkwUltPXI+ee0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=J+6nVq2ptCzB+E6TOKU+ejvlMNLeJ9RC8TdeIa3U5GTjtJqIA6MwnrEHTCjCWnCsI
-	 b2SJdkBg+qwzWIeCah6/ug6adI4CcnIq0e/1YEmzHCdRJQ9ZrqmZrBDKk63/+ibAUr
-	 0naR4LSTl7+b5M6O7/LcyiDRi9InmRJQq1902w2U=
+	b=ecGmynAU6mT6YqsV/B2xD3SWd6OMq5gAAsQgzO+4ieR42U6K1PXADu4h329ZcMs3a
+	 RsMyn9XJlROsli4Ods2uNWhX01FjKXLcH5rY9Yf0iwLwc+kCrn0fMUCjEI0OZRXPyo
+	 nQb/KckTO6Tnd7MjIm785Ih7g5GEw35AaAmfwZEM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728913AbgDKXKh (ORCPT
+        id S1729118AbgDKXfL (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 11 Apr 2020 19:10:37 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49292 "EHLO mail.kernel.org"
+        Sat, 11 Apr 2020 19:35:11 -0400
+Received: from mail.kernel.org ([198.145.29.99]:46596 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1729642AbgDKXKh (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 11 Apr 2020 19:10:37 -0400
+        id S1729099AbgDKXJF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 11 Apr 2020 19:09:05 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id CCBAD2173E;
-        Sat, 11 Apr 2020 23:10:36 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4524120787;
+        Sat, 11 Apr 2020 23:09:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586646637;
-        bh=7w3dD9EteRAzeMqpU2Hs9rF8DjjME7iEpW/3WzlUqQ4=;
+        s=default; t=1586646544;
+        bh=hHPZfCy20/ddSIEcwbHJISx27Bkvb5pkwUltPXI+ee0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=t5ltoN7F63C9Y3P7T0zOzCeUZm8ZgY65mfxl5dLbm03ebiSdHDSuU7rwT9PYRBRfc
-         MRwWYZEmMzz34VFbMmeujI1mWkKVxLANcvruWqbzkpfeRKX9zXO+6HSEgks28XIDBY
-         l/GxLxv78GQ/8DnW9/xy9QfYWosptPQXqv6Vg2Ek=
+        b=RjPTgigZWuBMwVoBQfu+lRxOFT6ZXcc9aQsL3wHonW5Z/fdndWK3pye3UN/xLe0Jz
+         a/hc2vIWoOFubxbT55j5y1lbcsPP6bSACKaJ8PA9+S66eLc657LKqmYTnGogT/SVjO
+         5jU6X+oHSZSqudJWBolmE6Nf5iZisURu9UXZwnv0=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Ayush Sawal <ayush.sawal@chelsio.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+Cc:     Rohit Maheshwari <rohitm@chelsio.com>,
+        "David S . Miller" <davem@davemloft.net>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 044/108] crypto: chelsio - This fixes the kernel panic which occurs during a libkcapi test
-Date:   Sat, 11 Apr 2020 19:08:39 -0400
-Message-Id: <20200411230943.24951-44-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.5 096/121] crypto/chtls: Fix chtls crash in connection cleanup
+Date:   Sat, 11 Apr 2020 19:06:41 -0400
+Message-Id: <20200411230706.23855-96-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200411230943.24951-1-sashal@kernel.org>
-References: <20200411230943.24951-1-sashal@kernel.org>
+In-Reply-To: <20200411230706.23855-1-sashal@kernel.org>
+References: <20200411230706.23855-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -59,44 +59,140 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Ayush Sawal <ayush.sawal@chelsio.com>
+From: Rohit Maheshwari <rohitm@chelsio.com>
 
-[ Upstream commit 9195189e00a7db55e7d448cee973cae87c5a3c71 ]
+[ Upstream commit 3a0a978389234995b64a8b8fbe343115bffb1551 ]
 
-The libkcapi test which causes kernel panic is
-aead asynchronous vmsplice multiple test.
+There is a possibility that cdev is removed before CPL_ABORT_REQ_RSS
+is fully processed, so it's better to save it in skb.
 
-./bin/kcapi  -v -d 4 -x 10   -c "ccm(aes)"
--q 4edb58e8d5eb6bc711c43a6f3693daebde2e5524f1b55297abb29f003236e43d
--t a7877c99 -n 674742abd0f5ba -k 2861fd0253705d7875c95ba8a53171b4
--a fb7bc304a3909e66e2e0c5ef952712dd884ce3e7324171369f2c5db1adc48c7d
+Added checks in handling the flow correctly, which suggests connection reset
+request is sent to HW, wait for HW to respond.
 
-This patch avoids dma_mapping of a zero length sg which causes the panic,
-by using sg_nents_for_len which maps only upto a specific length
-
-Signed-off-by: Ayush Sawal <ayush.sawal@chelsio.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Rohit Maheshwari <rohitm@chelsio.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/chelsio/chcr_algo.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/crypto/chelsio/chtls/chtls_cm.c | 29 +++++++++++++++++++++----
+ 1 file changed, 25 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index 44423a3be3094..138e6066611cc 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -2480,8 +2480,9 @@ int chcr_aead_dma_map(struct device *dev,
- 	else
- 		reqctx->b0_dma = 0;
- 	if (req->src == req->dst) {
--		error = dma_map_sg(dev, req->src, sg_nents(req->src),
--				   DMA_BIDIRECTIONAL);
-+		error = dma_map_sg(dev, req->src,
-+				sg_nents_for_len(req->src, dst_size),
-+					DMA_BIDIRECTIONAL);
- 		if (!error)
- 			goto err;
- 	} else {
+diff --git a/drivers/crypto/chelsio/chtls/chtls_cm.c b/drivers/crypto/chelsio/chtls/chtls_cm.c
+index dffa2aa855fdd..bcfe3a71a88b7 100644
+--- a/drivers/crypto/chelsio/chtls/chtls_cm.c
++++ b/drivers/crypto/chelsio/chtls/chtls_cm.c
+@@ -445,6 +445,7 @@ void chtls_destroy_sock(struct sock *sk)
+ 	chtls_purge_write_queue(sk);
+ 	free_tls_keyid(sk);
+ 	kref_put(&csk->kref, chtls_sock_release);
++	csk->cdev = NULL;
+ 	sk->sk_prot = &tcp_prot;
+ 	sk->sk_prot->destroy(sk);
+ }
+@@ -759,8 +760,10 @@ static void chtls_release_resources(struct sock *sk)
+ 		csk->l2t_entry = NULL;
+ 	}
+ 
+-	cxgb4_remove_tid(tids, csk->port_id, tid, sk->sk_family);
+-	sock_put(sk);
++	if (sk->sk_state != TCP_SYN_SENT) {
++		cxgb4_remove_tid(tids, csk->port_id, tid, sk->sk_family);
++		sock_put(sk);
++	}
+ }
+ 
+ static void chtls_conn_done(struct sock *sk)
+@@ -1716,6 +1719,9 @@ static void chtls_peer_close(struct sock *sk, struct sk_buff *skb)
+ {
+ 	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
+ 
++	if (csk_flag_nochk(csk, CSK_ABORT_RPL_PENDING))
++		goto out;
++
+ 	sk->sk_shutdown |= RCV_SHUTDOWN;
+ 	sock_set_flag(sk, SOCK_DONE);
+ 
+@@ -1748,6 +1754,7 @@ static void chtls_peer_close(struct sock *sk, struct sk_buff *skb)
+ 		else
+ 			sk_wake_async(sk, SOCK_WAKE_WAITD, POLL_IN);
+ 	}
++out:
+ 	kfree_skb(skb);
+ }
+ 
+@@ -1758,6 +1765,10 @@ static void chtls_close_con_rpl(struct sock *sk, struct sk_buff *skb)
+ 	struct tcp_sock *tp;
+ 
+ 	csk = rcu_dereference_sk_user_data(sk);
++
++	if (csk_flag_nochk(csk, CSK_ABORT_RPL_PENDING))
++		goto out;
++
+ 	tp = tcp_sk(sk);
+ 
+ 	tp->snd_una = ntohl(rpl->snd_nxt) - 1;  /* exclude FIN */
+@@ -1787,6 +1798,7 @@ static void chtls_close_con_rpl(struct sock *sk, struct sk_buff *skb)
+ 	default:
+ 		pr_info("close_con_rpl in bad state %d\n", sk->sk_state);
+ 	}
++out:
+ 	kfree_skb(skb);
+ }
+ 
+@@ -1896,6 +1908,7 @@ static void chtls_send_abort_rpl(struct sock *sk, struct sk_buff *skb,
+ 	}
+ 
+ 	set_abort_rpl_wr(reply_skb, tid, status);
++	kfree_skb(skb);
+ 	set_wr_txq(reply_skb, CPL_PRIORITY_DATA, queue);
+ 	if (csk_conn_inline(csk)) {
+ 		struct l2t_entry *e = csk->l2t_entry;
+@@ -1906,7 +1919,6 @@ static void chtls_send_abort_rpl(struct sock *sk, struct sk_buff *skb,
+ 		}
+ 	}
+ 	cxgb4_ofld_send(cdev->lldi->ports[0], reply_skb);
+-	kfree_skb(skb);
+ }
+ 
+ /*
+@@ -2008,7 +2020,8 @@ static void chtls_abort_req_rss(struct sock *sk, struct sk_buff *skb)
+ 		chtls_conn_done(sk);
+ 	}
+ 
+-	chtls_send_abort_rpl(sk, skb, csk->cdev, rst_status, queue);
++	chtls_send_abort_rpl(sk, skb, BLOG_SKB_CB(skb)->cdev,
++			     rst_status, queue);
+ }
+ 
+ static void chtls_abort_rpl_rss(struct sock *sk, struct sk_buff *skb)
+@@ -2042,6 +2055,7 @@ static int chtls_conn_cpl(struct chtls_dev *cdev, struct sk_buff *skb)
+ 	struct cpl_peer_close *req = cplhdr(skb) + RSS_HDR;
+ 	void (*fn)(struct sock *sk, struct sk_buff *skb);
+ 	unsigned int hwtid = GET_TID(req);
++	struct chtls_sock *csk;
+ 	struct sock *sk;
+ 	u8 opcode;
+ 
+@@ -2051,6 +2065,8 @@ static int chtls_conn_cpl(struct chtls_dev *cdev, struct sk_buff *skb)
+ 	if (!sk)
+ 		goto rel_skb;
+ 
++	csk = sk->sk_user_data;
++
+ 	switch (opcode) {
+ 	case CPL_PEER_CLOSE:
+ 		fn = chtls_peer_close;
+@@ -2059,6 +2075,11 @@ static int chtls_conn_cpl(struct chtls_dev *cdev, struct sk_buff *skb)
+ 		fn = chtls_close_con_rpl;
+ 		break;
+ 	case CPL_ABORT_REQ_RSS:
++		/*
++		 * Save the offload device in the skb, we may process this
++		 * message after the socket has closed.
++		 */
++		BLOG_SKB_CB(skb)->cdev = csk->cdev;
+ 		fn = chtls_abort_req_rss;
+ 		break;
+ 	case CPL_ABORT_RPL_RSS:
 -- 
 2.20.1
 
