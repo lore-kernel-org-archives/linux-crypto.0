@@ -7,46 +7,46 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F43DC2BA19
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Apr 2020 23:38:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C27B2C2BA19
+	for <linux-crypto@archiver.kernel.org>; Sat, 11 Apr 2020 23:39:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 6D513206E9
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Apr 2020 23:38:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 98D702051A
+	for <linux-crypto@archiver.kernel.org>; Sat, 11 Apr 2020 23:39:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586648285;
-	bh=5l0w7W6Vppg+zsOD/tCU/ntK/tpVKl6/+0rmFy3Je6w=;
+	s=default; t=1586648345;
+	bh=hCnvZ84boOgPb9HMfYgnBEhsYYC3gSCTcMowhsOYgMg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=jqEMHzkMLEfBtoqO8WO8ethPEGOIuaaeCKyekEVagXtEBWTsJXV0p/3pFRlcqYYzw
-	 jLCAC3bjJHEPihQYf3oe5BEd3ZHfVnOSZJmrQEEOakxpYhB9OCTzkB624wuIMUz0ZQ
-	 CxSB7pPM+BKv2CMeUP2ISxY9gSBJRyoyxgB/8r8k=
+	b=RAWbDQ2YpRzeUb364Kv4KNb6iAScscRYNqkG2oeYaGHbk4+VLIN/eLvmSjH5vgkKy
+	 UDhXF1p2wu0zRWcYpozyZzmqfGjvW4HFqn/F+7L4Mkds41vI3uLHaYy0HC5jUuFRIq
+	 6EknHS16ER4rbj/MAkfr80wJh/1eDqXvQFdZYv4U=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728865AbgDKXh6 (ORCPT
+        id S1728773AbgDKXi4 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 11 Apr 2020 19:37:58 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44666 "EHLO mail.kernel.org"
+        Sat, 11 Apr 2020 19:38:56 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44138 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727367AbgDKXII (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 11 Apr 2020 19:08:08 -0400
+        id S1728760AbgDKXHv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 11 Apr 2020 19:07:51 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D593F20708;
-        Sat, 11 Apr 2020 23:08:07 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 179C720787;
+        Sat, 11 Apr 2020 23:07:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586646488;
-        bh=5l0w7W6Vppg+zsOD/tCU/ntK/tpVKl6/+0rmFy3Je6w=;
+        s=default; t=1586646471;
+        bh=hCnvZ84boOgPb9HMfYgnBEhsYYC3gSCTcMowhsOYgMg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=YxbP7zJUtv7IIdvcKSr+DGhkEK7ns0cvAWsrdVX8Iz3pXPKi6G6YlqBjm9oQB2ozn
-         NKhbz56o+eajIHOpofKMRY8fbB0q/jaw32302kJ4IlYaVhZ2srdeIIfmiSfjitndbT
-         5dyLVbB6O5U6H3foF73lK6WTu3FQI4fltZa4JjT8=
+        b=R0ap2TmABYbD1iVSHxQb2j8XkR2Y46r0527LcnOoW56yjN8kugPIfIWz1DIuaGiZY
+         VTPBayQzPuwT0mLnbpdGgRNU3DWr1a7W37WO1NIqfldUWIJRpFSlQakam2x0oYIASP
+         lOXsFpSUtBLf8TfLT7d9tFH/dCY/zuz/5RHtVXx4=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Ayush Sawal <ayush.sawal@chelsio.com>,
+Cc:     Al Viro <viro@zeniv.linux.org.uk>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.5 052/121] crypto: chelsio - This fixes the kernel panic which occurs during a libkcapi test
-Date:   Sat, 11 Apr 2020 19:05:57 -0400
-Message-Id: <20200411230706.23855-52-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.5 038/121] crypto: chelsio - Endianess bug in create_authenc_wr
+Date:   Sat, 11 Apr 2020 19:05:43 -0400
+Message-Id: <20200411230706.23855-38-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200411230706.23855-1-sashal@kernel.org>
 References: <20200411230706.23855-1-sashal@kernel.org>
@@ -59,44 +59,70 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Ayush Sawal <ayush.sawal@chelsio.com>
+From: Al Viro <viro@zeniv.linux.org.uk>
 
-[ Upstream commit 9195189e00a7db55e7d448cee973cae87c5a3c71 ]
+[ Upstream commit ff462ddfd95b915345c3c7c037c3bfafdc58bae7 ]
 
-The libkcapi test which causes kernel panic is
-aead asynchronous vmsplice multiple test.
+kctx_len = (ntohl(KEY_CONTEXT_CTX_LEN_V(aeadctx->key_ctx_hdr)) << 4)
+                - sizeof(chcr_req->key_ctx);
+can't possibly be endian-safe.  Look: ->key_ctx_hdr is __be32.  And
+KEY_CONTEXT_CTX_LEN_V is "shift up by 24 bits".  On little-endian hosts it
+sees
+	b0 b1 b2 b3
+in memory, inteprets that into b0 + (b1 << 8) + (b2 << 16) + (b3 << 24),
+shifts up by 24, resulting in b0 << 24, does ntohl (byteswap on l-e),
+gets b0 and shifts that up by 4.  So we get b0 * 16 - sizeof(...).
 
-./bin/kcapi  -v -d 4 -x 10   -c "ccm(aes)"
--q 4edb58e8d5eb6bc711c43a6f3693daebde2e5524f1b55297abb29f003236e43d
--t a7877c99 -n 674742abd0f5ba -k 2861fd0253705d7875c95ba8a53171b4
--a fb7bc304a3909e66e2e0c5ef952712dd884ce3e7324171369f2c5db1adc48c7d
+Sounds reasonable, but on b-e we get
+b3 + (b2 << 8) + (b1 << 16) + (b0 << 24), shift up by 24,
+yielding b3 << 24, do ntohl (no-op on b-e) and then shift up by 4.
+Resulting in b3 << 28 - sizeof(...), i.e. slightly under b3 * 256M.
 
-This patch avoids dma_mapping of a zero length sg which causes the panic,
-by using sg_nents_for_len which maps only upto a specific length
+Then we increase it some more and pass to alloc_skb() as size.
+Somehow I doubt that we really want a quarter-gigabyte skb allocation
+here...
 
-Signed-off-by: Ayush Sawal <ayush.sawal@chelsio.com>
+Note that when you are building those values in
+#define  FILL_KEY_CTX_HDR(ck_size, mk_size, d_ck, opad, ctx_len) \
+                htonl(KEY_CONTEXT_VALID_V(1) | \
+                      KEY_CONTEXT_CK_SIZE_V((ck_size)) | \
+                      KEY_CONTEXT_MK_SIZE_V(mk_size) | \
+                      KEY_CONTEXT_DUAL_CK_V((d_ck)) | \
+                      KEY_CONTEXT_OPAD_PRESENT_V((opad)) | \
+                      KEY_CONTEXT_SALT_PRESENT_V(1) | \
+                      KEY_CONTEXT_CTX_LEN_V((ctx_len)))
+ctx_len ends up in the first octet (i.e. b0 in the above), which
+matches the current behaviour on l-e.  If that's the intent, this
+thing should've been
+        kctx_len = (KEY_CONTEXT_CTX_LEN_G(ntohl(aeadctx->key_ctx_hdr)) << 4)
+                - sizeof(chcr_req->key_ctx);
+instead - fetch after ntohl() we get (b0 << 24) + (b1 << 16) + (b2 << 8) + b3,
+shift it down by 24 (b0), resuling in b0 * 16 - sizeof(...) both on l-e and
+on b-e.
+
+PS: when sparse warns you about endianness problems, it might be worth checking
+if there really is something wrong.  And I don't mean "slap __force cast on it"...
+
+Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/chelsio/chcr_algo.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/crypto/chelsio/chcr_algo.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index 722c5f65b66b3..4ace6dfe3a688 100644
+index d483eed030eee..722c5f65b66b3 100644
 --- a/drivers/crypto/chelsio/chcr_algo.c
 +++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -2481,8 +2481,9 @@ int chcr_aead_dma_map(struct device *dev,
- 	else
- 		reqctx->b0_dma = 0;
- 	if (req->src == req->dst) {
--		error = dma_map_sg(dev, req->src, sg_nents(req->src),
--				   DMA_BIDIRECTIONAL);
-+		error = dma_map_sg(dev, req->src,
-+				sg_nents_for_len(req->src, dst_size),
-+					DMA_BIDIRECTIONAL);
- 		if (!error)
- 			goto err;
- 	} else {
+@@ -2361,7 +2361,7 @@ static struct sk_buff *create_authenc_wr(struct aead_request *req,
+ 	snents = sg_nents_xlen(req->src, req->assoclen + req->cryptlen,
+ 			       CHCR_SRC_SG_SIZE, 0);
+ 	dst_size = get_space_for_phys_dsgl(dnents);
+-	kctx_len = (ntohl(KEY_CONTEXT_CTX_LEN_V(aeadctx->key_ctx_hdr)) << 4)
++	kctx_len = (KEY_CONTEXT_CTX_LEN_G(ntohl(aeadctx->key_ctx_hdr)) << 4)
+ 		- sizeof(chcr_req->key_ctx);
+ 	transhdr_len = CIPHER_TRANSHDR_SIZE(kctx_len, dst_size);
+ 	reqctx->imm = (transhdr_len + req->assoclen + req->cryptlen) <
 -- 
 2.20.1
 
