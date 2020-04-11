@@ -4,52 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C27B2C2BA19
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Apr 2020 23:39:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98C58C2BBC7
+	for <linux-crypto@archiver.kernel.org>; Sat, 11 Apr 2020 23:43:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 98D702051A
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Apr 2020 23:39:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7489A20787
+	for <linux-crypto@archiver.kernel.org>; Sat, 11 Apr 2020 23:43:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586648345;
-	bh=hCnvZ84boOgPb9HMfYgnBEhsYYC3gSCTcMowhsOYgMg=;
+	s=default; t=1586648614;
+	bh=8YlxmXhqaYAD4a3m07ZqOuwuPg5n5IiQeuI6H483C5A=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=RAWbDQ2YpRzeUb364Kv4KNb6iAScscRYNqkG2oeYaGHbk4+VLIN/eLvmSjH5vgkKy
-	 UDhXF1p2wu0zRWcYpozyZzmqfGjvW4HFqn/F+7L4Mkds41vI3uLHaYy0HC5jUuFRIq
-	 6EknHS16ER4rbj/MAkfr80wJh/1eDqXvQFdZYv4U=
+	b=KuM1JxrFk1yzeVz7ldSzKhD2aedWTpR524THfMOdQQztKJ9LcyGkeKXFqr1Kdk+vL
+	 y6q5G1qOc75fJ/ARvGmckABCnsw041aYoYHsC8rqlLs9soRWQLM7+hfoCLGxQUptrW
+	 Pfjentl9J3+pMqLTDzwaSIiZl9wgIBA0set1lCvU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728773AbgDKXi4 (ORCPT
+        id S1727003AbgDKXnd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 11 Apr 2020 19:38:56 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44138 "EHLO mail.kernel.org"
+        Sat, 11 Apr 2020 19:43:33 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41434 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728760AbgDKXHv (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 11 Apr 2020 19:07:51 -0400
+        id S1728345AbgDKXGR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 11 Apr 2020 19:06:17 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 179C720787;
-        Sat, 11 Apr 2020 23:07:51 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 05CC8215A4;
+        Sat, 11 Apr 2020 23:06:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586646471;
-        bh=hCnvZ84boOgPb9HMfYgnBEhsYYC3gSCTcMowhsOYgMg=;
+        s=default; t=1586646376;
+        bh=8YlxmXhqaYAD4a3m07ZqOuwuPg5n5IiQeuI6H483C5A=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=R0ap2TmABYbD1iVSHxQb2j8XkR2Y46r0527LcnOoW56yjN8kugPIfIWz1DIuaGiZY
-         VTPBayQzPuwT0mLnbpdGgRNU3DWr1a7W37WO1NIqfldUWIJRpFSlQakam2x0oYIASP
-         lOXsFpSUtBLf8TfLT7d9tFH/dCY/zuz/5RHtVXx4=
+        b=lYsmKe/ygiYZqrGah3bzgFoc6l6CAEQsvIp07encInpgOG1rgE5YF8xhph4qpgg1c
+         NI/UUSxQqURnAQpiC4TPLptj4sRxgVrbtNFHNSK8SSmIoxp8ZdV4OxyH8TKipaDUwB
+         tjQqoqtNMDlDXjT4DisUdTWjyjZ8yiiaIKuKWLis=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
+Cc:     Rohit Maheshwari <rohitm@chelsio.com>,
+        "David S . Miller" <davem@davemloft.net>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.5 038/121] crypto: chelsio - Endianess bug in create_authenc_wr
-Date:   Sat, 11 Apr 2020 19:05:43 -0400
-Message-Id: <20200411230706.23855-38-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.6 118/149] crypto/chtls: Fix chtls crash in connection cleanup
+Date:   Sat, 11 Apr 2020 19:03:15 -0400
+Message-Id: <20200411230347.22371-118-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200411230706.23855-1-sashal@kernel.org>
-References: <20200411230706.23855-1-sashal@kernel.org>
+In-Reply-To: <20200411230347.22371-1-sashal@kernel.org>
+References: <20200411230347.22371-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -59,70 +59,140 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Al Viro <viro@zeniv.linux.org.uk>
+From: Rohit Maheshwari <rohitm@chelsio.com>
 
-[ Upstream commit ff462ddfd95b915345c3c7c037c3bfafdc58bae7 ]
+[ Upstream commit 3a0a978389234995b64a8b8fbe343115bffb1551 ]
 
-kctx_len = (ntohl(KEY_CONTEXT_CTX_LEN_V(aeadctx->key_ctx_hdr)) << 4)
-                - sizeof(chcr_req->key_ctx);
-can't possibly be endian-safe.  Look: ->key_ctx_hdr is __be32.  And
-KEY_CONTEXT_CTX_LEN_V is "shift up by 24 bits".  On little-endian hosts it
-sees
-	b0 b1 b2 b3
-in memory, inteprets that into b0 + (b1 << 8) + (b2 << 16) + (b3 << 24),
-shifts up by 24, resulting in b0 << 24, does ntohl (byteswap on l-e),
-gets b0 and shifts that up by 4.  So we get b0 * 16 - sizeof(...).
+There is a possibility that cdev is removed before CPL_ABORT_REQ_RSS
+is fully processed, so it's better to save it in skb.
 
-Sounds reasonable, but on b-e we get
-b3 + (b2 << 8) + (b1 << 16) + (b0 << 24), shift up by 24,
-yielding b3 << 24, do ntohl (no-op on b-e) and then shift up by 4.
-Resulting in b3 << 28 - sizeof(...), i.e. slightly under b3 * 256M.
+Added checks in handling the flow correctly, which suggests connection reset
+request is sent to HW, wait for HW to respond.
 
-Then we increase it some more and pass to alloc_skb() as size.
-Somehow I doubt that we really want a quarter-gigabyte skb allocation
-here...
-
-Note that when you are building those values in
-#define  FILL_KEY_CTX_HDR(ck_size, mk_size, d_ck, opad, ctx_len) \
-                htonl(KEY_CONTEXT_VALID_V(1) | \
-                      KEY_CONTEXT_CK_SIZE_V((ck_size)) | \
-                      KEY_CONTEXT_MK_SIZE_V(mk_size) | \
-                      KEY_CONTEXT_DUAL_CK_V((d_ck)) | \
-                      KEY_CONTEXT_OPAD_PRESENT_V((opad)) | \
-                      KEY_CONTEXT_SALT_PRESENT_V(1) | \
-                      KEY_CONTEXT_CTX_LEN_V((ctx_len)))
-ctx_len ends up in the first octet (i.e. b0 in the above), which
-matches the current behaviour on l-e.  If that's the intent, this
-thing should've been
-        kctx_len = (KEY_CONTEXT_CTX_LEN_G(ntohl(aeadctx->key_ctx_hdr)) << 4)
-                - sizeof(chcr_req->key_ctx);
-instead - fetch after ntohl() we get (b0 << 24) + (b1 << 16) + (b2 << 8) + b3,
-shift it down by 24 (b0), resuling in b0 * 16 - sizeof(...) both on l-e and
-on b-e.
-
-PS: when sparse warns you about endianness problems, it might be worth checking
-if there really is something wrong.  And I don't mean "slap __force cast on it"...
-
-Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Rohit Maheshwari <rohitm@chelsio.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/crypto/chelsio/chcr_algo.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/crypto/chelsio/chtls/chtls_cm.c | 29 +++++++++++++++++++++----
+ 1 file changed, 25 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index d483eed030eee..722c5f65b66b3 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -2361,7 +2361,7 @@ static struct sk_buff *create_authenc_wr(struct aead_request *req,
- 	snents = sg_nents_xlen(req->src, req->assoclen + req->cryptlen,
- 			       CHCR_SRC_SG_SIZE, 0);
- 	dst_size = get_space_for_phys_dsgl(dnents);
--	kctx_len = (ntohl(KEY_CONTEXT_CTX_LEN_V(aeadctx->key_ctx_hdr)) << 4)
-+	kctx_len = (KEY_CONTEXT_CTX_LEN_G(ntohl(aeadctx->key_ctx_hdr)) << 4)
- 		- sizeof(chcr_req->key_ctx);
- 	transhdr_len = CIPHER_TRANSHDR_SIZE(kctx_len, dst_size);
- 	reqctx->imm = (transhdr_len + req->assoclen + req->cryptlen) <
+diff --git a/drivers/crypto/chelsio/chtls/chtls_cm.c b/drivers/crypto/chelsio/chtls/chtls_cm.c
+index 9b2745ad9e380..d5720a8594435 100644
+--- a/drivers/crypto/chelsio/chtls/chtls_cm.c
++++ b/drivers/crypto/chelsio/chtls/chtls_cm.c
+@@ -445,6 +445,7 @@ void chtls_destroy_sock(struct sock *sk)
+ 	chtls_purge_write_queue(sk);
+ 	free_tls_keyid(sk);
+ 	kref_put(&csk->kref, chtls_sock_release);
++	csk->cdev = NULL;
+ 	sk->sk_prot = &tcp_prot;
+ 	sk->sk_prot->destroy(sk);
+ }
+@@ -759,8 +760,10 @@ static void chtls_release_resources(struct sock *sk)
+ 		csk->l2t_entry = NULL;
+ 	}
+ 
+-	cxgb4_remove_tid(tids, csk->port_id, tid, sk->sk_family);
+-	sock_put(sk);
++	if (sk->sk_state != TCP_SYN_SENT) {
++		cxgb4_remove_tid(tids, csk->port_id, tid, sk->sk_family);
++		sock_put(sk);
++	}
+ }
+ 
+ static void chtls_conn_done(struct sock *sk)
+@@ -1716,6 +1719,9 @@ static void chtls_peer_close(struct sock *sk, struct sk_buff *skb)
+ {
+ 	struct chtls_sock *csk = rcu_dereference_sk_user_data(sk);
+ 
++	if (csk_flag_nochk(csk, CSK_ABORT_RPL_PENDING))
++		goto out;
++
+ 	sk->sk_shutdown |= RCV_SHUTDOWN;
+ 	sock_set_flag(sk, SOCK_DONE);
+ 
+@@ -1748,6 +1754,7 @@ static void chtls_peer_close(struct sock *sk, struct sk_buff *skb)
+ 		else
+ 			sk_wake_async(sk, SOCK_WAKE_WAITD, POLL_IN);
+ 	}
++out:
+ 	kfree_skb(skb);
+ }
+ 
+@@ -1758,6 +1765,10 @@ static void chtls_close_con_rpl(struct sock *sk, struct sk_buff *skb)
+ 	struct tcp_sock *tp;
+ 
+ 	csk = rcu_dereference_sk_user_data(sk);
++
++	if (csk_flag_nochk(csk, CSK_ABORT_RPL_PENDING))
++		goto out;
++
+ 	tp = tcp_sk(sk);
+ 
+ 	tp->snd_una = ntohl(rpl->snd_nxt) - 1;  /* exclude FIN */
+@@ -1787,6 +1798,7 @@ static void chtls_close_con_rpl(struct sock *sk, struct sk_buff *skb)
+ 	default:
+ 		pr_info("close_con_rpl in bad state %d\n", sk->sk_state);
+ 	}
++out:
+ 	kfree_skb(skb);
+ }
+ 
+@@ -1896,6 +1908,7 @@ static void chtls_send_abort_rpl(struct sock *sk, struct sk_buff *skb,
+ 	}
+ 
+ 	set_abort_rpl_wr(reply_skb, tid, status);
++	kfree_skb(skb);
+ 	set_wr_txq(reply_skb, CPL_PRIORITY_DATA, queue);
+ 	if (csk_conn_inline(csk)) {
+ 		struct l2t_entry *e = csk->l2t_entry;
+@@ -1906,7 +1919,6 @@ static void chtls_send_abort_rpl(struct sock *sk, struct sk_buff *skb,
+ 		}
+ 	}
+ 	cxgb4_ofld_send(cdev->lldi->ports[0], reply_skb);
+-	kfree_skb(skb);
+ }
+ 
+ /*
+@@ -2008,7 +2020,8 @@ static void chtls_abort_req_rss(struct sock *sk, struct sk_buff *skb)
+ 		chtls_conn_done(sk);
+ 	}
+ 
+-	chtls_send_abort_rpl(sk, skb, csk->cdev, rst_status, queue);
++	chtls_send_abort_rpl(sk, skb, BLOG_SKB_CB(skb)->cdev,
++			     rst_status, queue);
+ }
+ 
+ static void chtls_abort_rpl_rss(struct sock *sk, struct sk_buff *skb)
+@@ -2042,6 +2055,7 @@ static int chtls_conn_cpl(struct chtls_dev *cdev, struct sk_buff *skb)
+ 	struct cpl_peer_close *req = cplhdr(skb) + RSS_HDR;
+ 	void (*fn)(struct sock *sk, struct sk_buff *skb);
+ 	unsigned int hwtid = GET_TID(req);
++	struct chtls_sock *csk;
+ 	struct sock *sk;
+ 	u8 opcode;
+ 
+@@ -2051,6 +2065,8 @@ static int chtls_conn_cpl(struct chtls_dev *cdev, struct sk_buff *skb)
+ 	if (!sk)
+ 		goto rel_skb;
+ 
++	csk = sk->sk_user_data;
++
+ 	switch (opcode) {
+ 	case CPL_PEER_CLOSE:
+ 		fn = chtls_peer_close;
+@@ -2059,6 +2075,11 @@ static int chtls_conn_cpl(struct chtls_dev *cdev, struct sk_buff *skb)
+ 		fn = chtls_close_con_rpl;
+ 		break;
+ 	case CPL_ABORT_REQ_RSS:
++		/*
++		 * Save the offload device in the skb, we may process this
++		 * message after the socket has closed.
++		 */
++		BLOG_SKB_CB(skb)->cdev = csk->cdev;
+ 		fn = chtls_abort_req_rss;
+ 		break;
+ 	case CPL_ABORT_RPL_RSS:
 -- 
 2.20.1
 
