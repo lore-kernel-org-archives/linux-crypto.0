@@ -7,51 +7,50 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C673C2BA19
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Apr 2020 23:37:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F43DC2BA19
+	for <linux-crypto@archiver.kernel.org>; Sat, 11 Apr 2020 23:38:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id CF798206E9
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Apr 2020 23:37:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D513206E9
+	for <linux-crypto@archiver.kernel.org>; Sat, 11 Apr 2020 23:38:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586648276;
-	bh=xQAW1GitvLQh6XJsKowD5jHl7RZkVULVUj2zrP3ZgkQ=;
+	s=default; t=1586648285;
+	bh=5l0w7W6Vppg+zsOD/tCU/ntK/tpVKl6/+0rmFy3Je6w=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=SNTcWkIwJQ+m12DQAEtoFBvRAfBzMjkpQimDizg4/DbV78ppoNmW5eDH1miUTIYo5
-	 wF2ZPRhT00UmilBnVm80zVlT2IxwWaNo8iAby8LCTozY5I1LNzmR04tOmiwWtu5w8V
-	 c6tn5qnVhmCVNLg0PeM8BHdJ33YwD4KWaPeF7h+c=
+	b=jqEMHzkMLEfBtoqO8WO8ethPEGOIuaaeCKyekEVagXtEBWTsJXV0p/3pFRlcqYYzw
+	 jLCAC3bjJHEPihQYf3oe5BEd3ZHfVnOSZJmrQEEOakxpYhB9OCTzkB624wuIMUz0ZQ
+	 CxSB7pPM+BKv2CMeUP2ISxY9gSBJRyoyxgB/8r8k=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728852AbgDKXIK (ORCPT
+        id S1728865AbgDKXh6 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 11 Apr 2020 19:08:10 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44712 "EHLO mail.kernel.org"
+        Sat, 11 Apr 2020 19:37:58 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44666 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727250AbgDKXIJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 11 Apr 2020 19:08:09 -0400
+        id S1727367AbgDKXII (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 11 Apr 2020 19:08:08 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id E6B27216FD;
-        Sat, 11 Apr 2020 23:08:08 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id D593F20708;
+        Sat, 11 Apr 2020 23:08:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586646489;
-        bh=xQAW1GitvLQh6XJsKowD5jHl7RZkVULVUj2zrP3ZgkQ=;
+        s=default; t=1586646488;
+        bh=5l0w7W6Vppg+zsOD/tCU/ntK/tpVKl6/+0rmFy3Je6w=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=R6qZeSzE5lAGR6+GP1oIpsgcd0xVoIkU427iQbSYRHp5y3+z1ZQ2hCCRmUAWmcma+
-         7nTA3jdHl6I6pWHTsijwyeheCOosXdUXwVAc+XXZhLPDTeDS8x3jdQNmqmdZ6I40uY
-         Wltn3j/Zv9FbBuVEP1Loqsd0lYR3Z5ResHzD2KC0=
+        b=YxbP7zJUtv7IIdvcKSr+DGhkEK7ns0cvAWsrdVX8Iz3pXPKi6G6YlqBjm9oQB2ozn
+         NKhbz56o+eajIHOpofKMRY8fbB0q/jaw32302kJ4IlYaVhZ2srdeIIfmiSfjitndbT
+         5dyLVbB6O5U6H3foF73lK6WTu3FQI4fltZa4JjT8=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
+Cc:     Ayush Sawal <ayush.sawal@chelsio.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.5 053/121] crypto: tcrypt - fix printed skcipher [a]sync mode
-Date:   Sat, 11 Apr 2020 19:05:58 -0400
-Message-Id: <20200411230706.23855-53-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.5 052/121] crypto: chelsio - This fixes the kernel panic which occurs during a libkcapi test
+Date:   Sat, 11 Apr 2020 19:05:57 -0400
+Message-Id: <20200411230706.23855-52-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20200411230706.23855-1-sashal@kernel.org>
 References: <20200411230706.23855-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -60,41 +59,44 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Horia Geantă <horia.geanta@nxp.com>
+From: Ayush Sawal <ayush.sawal@chelsio.com>
 
-[ Upstream commit 8e3b7fd7ea554ccb1bdc596bfbcdaf56f7ab017c ]
+[ Upstream commit 9195189e00a7db55e7d448cee973cae87c5a3c71 ]
 
-When running tcrypt skcipher speed tests, logs contain things like:
-testing speed of async ecb(des3_ede) (ecb(des3_ede-generic)) encryption
-or:
-testing speed of async ecb(aes) (ecb(aes-ce)) encryption
+The libkcapi test which causes kernel panic is
+aead asynchronous vmsplice multiple test.
 
-The algorithm implementations are sync, not async.
-Fix this inaccuracy.
+./bin/kcapi  -v -d 4 -x 10   -c "ccm(aes)"
+-q 4edb58e8d5eb6bc711c43a6f3693daebde2e5524f1b55297abb29f003236e43d
+-t a7877c99 -n 674742abd0f5ba -k 2861fd0253705d7875c95ba8a53171b4
+-a fb7bc304a3909e66e2e0c5ef952712dd884ce3e7324171369f2c5db1adc48c7d
 
-Fixes: 7166e589da5b6 ("crypto: tcrypt - Use skcipher")
-Signed-off-by: Horia Geantă <horia.geanta@nxp.com>
+This patch avoids dma_mapping of a zero length sg which causes the panic,
+by using sg_nents_for_len which maps only upto a specific length
+
+Signed-off-by: Ayush Sawal <ayush.sawal@chelsio.com>
 Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- crypto/tcrypt.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/crypto/chelsio/chcr_algo.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/crypto/tcrypt.c b/crypto/tcrypt.c
-index f42f486e90e8a..ba0b7702f2e91 100644
---- a/crypto/tcrypt.c
-+++ b/crypto/tcrypt.c
-@@ -1514,8 +1514,8 @@ static void test_skcipher_speed(const char *algo, int enc, unsigned int secs,
- 		return;
- 	}
- 
--	pr_info("\ntesting speed of async %s (%s) %s\n", algo,
--			get_driver_name(crypto_skcipher, tfm), e);
-+	pr_info("\ntesting speed of %s %s (%s) %s\n", async ? "async" : "sync",
-+		algo, get_driver_name(crypto_skcipher, tfm), e);
- 
- 	req = skcipher_request_alloc(tfm, GFP_KERNEL);
- 	if (!req) {
+diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
+index 722c5f65b66b3..4ace6dfe3a688 100644
+--- a/drivers/crypto/chelsio/chcr_algo.c
++++ b/drivers/crypto/chelsio/chcr_algo.c
+@@ -2481,8 +2481,9 @@ int chcr_aead_dma_map(struct device *dev,
+ 	else
+ 		reqctx->b0_dma = 0;
+ 	if (req->src == req->dst) {
+-		error = dma_map_sg(dev, req->src, sg_nents(req->src),
+-				   DMA_BIDIRECTIONAL);
++		error = dma_map_sg(dev, req->src,
++				sg_nents_for_len(req->src, dst_size),
++					DMA_BIDIRECTIONAL);
+ 		if (!error)
+ 			goto err;
+ 	} else {
 -- 
 2.20.1
 
