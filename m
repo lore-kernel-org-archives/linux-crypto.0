@@ -2,127 +2,86 @@ Return-Path: <SRS0=qmX+=53=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B615BC2BB85
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Apr 2020 12:29:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67485C2BA19
+	for <linux-crypto@archiver.kernel.org>; Sat, 11 Apr 2020 19:37:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id 904C120757
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Apr 2020 12:29:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586608154;
-	bh=TPs/zfXxgu5n1ahCUyC/YvqGIa4uQRBW16J8baoC9fM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=sfi32uiS8nN4UU3zxh/R4TSfHDYfoKu5/dO4daft93U8F+g+g5+jn//E1SXjGbU1Y
-	 L+SzMO7ExSjT9+3p4jXe7k6EahrKir1AA4xc6W2UrYrVQtFIlDzNzELh4q6El50qv4
-	 JheqIDS4pu1JBUd0GyPIomrz+SkG1uRtXXdat5J0=
+	by mail.kernel.org (Postfix) with ESMTP id 8BF2320787
+	for <linux-crypto@archiver.kernel.org>; Sat, 11 Apr 2020 19:37:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="BBqwUIN/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726877AbgDKM3K (ORCPT
+        id S1726155AbgDKThz (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 11 Apr 2020 08:29:10 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43478 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726945AbgDKMLZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 11 Apr 2020 08:11:25 -0400
-Received: from localhost (83-86-89-107.cable.dynamic.v4.ziggo.nl [83.86.89.107])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 033AA214D8;
-        Sat, 11 Apr 2020 12:11:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586607085;
-        bh=TPs/zfXxgu5n1ahCUyC/YvqGIa4uQRBW16J8baoC9fM=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=RX/2iTbL6PzCNVjAcGHwARTN5Rr218HkQmOLh3FE6jan2h7j8IKpZYJqDtb/A+SQE
-         xQ21c01+yGKIBO6g9TEpU7mKc+a2lgrgE+jpib6h9qpwXbRfo5bG0OD+TlcHQ107PN
-         IT5dFzE+bLpJ8evKLL1dLBchTXl2atbbcNiLBJN0=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org, Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-crypto@vger.kernel.org
-Subject: [PATCH 4.4 15/29] padata: always acquire cpu_hotplug_lock before pinst->lock
-Date:   Sat, 11 Apr 2020 14:08:45 +0200
-Message-Id: <20200411115410.319586680@linuxfoundation.org>
-X-Mailer: git-send-email 2.26.0
-In-Reply-To: <20200411115407.651296755@linuxfoundation.org>
-References: <20200411115407.651296755@linuxfoundation.org>
-User-Agent: quilt/0.66
+        Sat, 11 Apr 2020 15:37:55 -0400
+Received: from mo4-p00-ob.smtp.rzone.de ([85.215.255.21]:14791 "EHLO
+        mo4-p00-ob.smtp.rzone.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726182AbgDKThz (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 11 Apr 2020 15:37:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1586633871;
+        s=strato-dkim-0002; d=chronox.de;
+        h=Message-ID:Date:Subject:Cc:To:From:X-RZG-CLASS-ID:X-RZG-AUTH:From:
+        Subject:Sender;
+        bh=FzG0CM9MY4r1SKVF7hxcJIXCO2KFYmHS46Lr/6YTI+0=;
+        b=BBqwUIN/mb4ta4WVv0yoEAX6kZBqiv02Dw0lFSP2FrP6GIBVbFwdrQaBKL5V1nlCf3
+        4UlfYaZ/VHj2Ei+P+H2nSo4towCyn1Ni8PvY0Y70R0ni4qvUJuafeXAt10PfrQQm5k6m
+        OxsSkqVdFw/u1jM8k8q3xLLgFUh+5wvKjWKi1gXmkYQdbIIL8NLr6lIrw0nA1cAF0VwX
+        rp/85U0XVxoDUVqCB+RBtBMpe5Rk/JKbKTXdyG7W0/tKEJdcxqxNexJ2M/lxXfke+Q7y
+        JowAuWPuYxHSNiFMdMSbXqzayxjLnTOq+f0rNcmcK1DZaJQlPbAbwRhUi7Aza7b8bvqP
+        9bMw==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPZIPSfmHxF"
+X-RZG-CLASS-ID: mo00
+Received: from positron.chronox.de
+        by smtp.strato.de (RZmta 46.2.1 DYNA|AUTH)
+        with ESMTPSA id q0554fw3BJbeJt1
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+        Sat, 11 Apr 2020 21:37:40 +0200 (CEST)
+From:   Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+To:     linux-crypto@vger.kernel.org
+Cc:     herbert@gondor.apana.org.au
+Subject: [PATCH 0/2] crypto: Jitter RNG SP800-90B compliance
+Date:   Sat, 11 Apr 2020 21:34:30 +0200
+Message-ID: <16276478.9hrKPGv45q@positron.chronox.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Daniel Jordan <daniel.m.jordan@oracle.com>
+Hi,
 
-commit 38228e8848cd7dd86ccb90406af32de0cad24be3 upstream.
+This patch set adds SP800-90B compliance to the Jitter RNG. The
+SP800-90B patch is tested for more than half a year in user space
+with the Jitter RNG version 2.2.0.
 
-lockdep complains when padata's paths to update cpumasks via CPU hotplug
-and sysfs are both taken:
+The full SP800-90B assessment of the Jitter RNG is provided at [1].
 
-  # echo 0 > /sys/devices/system/cpu/cpu1/online
-  # echo ff > /sys/kernel/pcrypt/pencrypt/parallel_cpumask
+In addition, the DRBG implementation is updated to always be
+reseeded from the Jitter RNG. To ensure the DRBG is reseeded within
+an appropriate amount of time, the reseed threshold is lowered.
 
-  ======================================================
-  WARNING: possible circular locking dependency detected
-  5.4.0-rc8-padata-cpuhp-v3+ #1 Not tainted
-  ------------------------------------------------------
-  bash/205 is trying to acquire lock:
-  ffffffff8286bcd0 (cpu_hotplug_lock.rw_sem){++++}, at: padata_set_cpumask+0x2b/0x120
+[1] http://www.chronox.de/jent/doc/CPU-Jitter-NPTRNG.pdf
 
-  but task is already holding lock:
-  ffff8880001abfa0 (&pinst->lock){+.+.}, at: padata_set_cpumask+0x26/0x120
+Stephan Mueller (2):
+  crypto: Jitter RNG SP800-90B compliance
+  crypto: DRBG always seeded with SP800-90B compliant noise source
 
-  which lock already depends on the new lock.
+ crypto/drbg.c                |  26 ++-
+ crypto/jitterentropy-kcapi.c |  41 ++++
+ crypto/jitterentropy.c       | 389 ++++++++++++++++++++++++++---------
+ include/crypto/drbg.h        |   6 +-
+ 4 files changed, 349 insertions(+), 113 deletions(-)
 
-padata doesn't take cpu_hotplug_lock and pinst->lock in a consistent
-order.  Which should be first?  CPU hotplug calls into padata with
-cpu_hotplug_lock already held, so it should have priority.
+-- 
+2.25.2
 
-Fixes: 6751fb3c0e0c ("padata: Use get_online_cpus/put_online_cpus")
-Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc: Eric Biggers <ebiggers@kernel.org>
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
----
- kernel/padata.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
---- a/kernel/padata.c
-+++ b/kernel/padata.c
-@@ -640,8 +640,8 @@ int padata_set_cpumask(struct padata_ins
- 	struct cpumask *serial_mask, *parallel_mask;
- 	int err = -EINVAL;
- 
--	mutex_lock(&pinst->lock);
- 	get_online_cpus();
-+	mutex_lock(&pinst->lock);
- 
- 	switch (cpumask_type) {
- 	case PADATA_CPU_PARALLEL:
-@@ -659,8 +659,8 @@ int padata_set_cpumask(struct padata_ins
- 	err =  __padata_set_cpumasks(pinst, parallel_mask, serial_mask);
- 
- out:
--	put_online_cpus();
- 	mutex_unlock(&pinst->lock);
-+	put_online_cpus();
- 
- 	return err;
- }
 
 
