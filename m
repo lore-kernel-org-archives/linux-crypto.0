@@ -1,128 +1,114 @@
-Return-Path: <SRS0=qmX+=53=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=MzAP=55=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB04BC2BA19
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Apr 2020 23:48:07 +0000 (UTC)
-Received: from vger.kernel.org (vger.kernel.org [209.132.180.67])
-	by mail.kernel.org (Postfix) with ESMTP id B067E206F7
-	for <linux-crypto@archiver.kernel.org>; Sat, 11 Apr 2020 23:48:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586648887;
-	bh=8ptZVCFTIZ8LNWVXi9vx8vE/lsQ5Q5Q54zsB+Abm2dQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=F/GgSHhQrMBs6+dJhwNRml9zFR7GisctTi8Jw5Nsr4GUicYyNhmp6+RvOVk08wHsF
-	 WASMOO8qqYfpOEnWf74G3zYVe4+3vuu8hgJaFkwjdnzKM1Y1Iq0YX1xrF++h25dHje
-	 iLWPmmlOBf29u0XTbRxeu0sBXGkcasacduZOkBm4=
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57A94C352B6
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Apr 2020 10:04:45 +0000 (UTC)
+Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
+	by mail.kernel.org (Postfix) with ESMTP id 30FF4206E9
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Apr 2020 10:04:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="TVnoFVdP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726891AbgDKXsF (ORCPT
+        id S1728188AbgDMKEo (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 11 Apr 2020 19:48:05 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38380 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727455AbgDKXEr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 11 Apr 2020 19:04:47 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 612DB21841;
-        Sat, 11 Apr 2020 23:04:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586646287;
-        bh=8ptZVCFTIZ8LNWVXi9vx8vE/lsQ5Q5Q54zsB+Abm2dQ=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ACVPDwtsuZxv7EoBS8YtnI0lP2FMhSe0r+2py+qOzQSmw58GMRODk1l8gn6zXXalO
-         1RXyUimcs9Vt8Xu2FsMaKe5tv0adVUU3OTo/oCgdzYq95cNhL3zObF1481n4uQfguP
-         lnn+jwi0WsAKC7ge+UZPiuPODLDLXmcsFFACDLhI=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Al Viro <viro@zeniv.linux.org.uk>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.6 048/149] crypto: chelsio - Endianess bug in create_authenc_wr
-Date:   Sat, 11 Apr 2020 19:02:05 -0400
-Message-Id: <20200411230347.22371-48-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200411230347.22371-1-sashal@kernel.org>
-References: <20200411230347.22371-1-sashal@kernel.org>
-MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+        Mon, 13 Apr 2020 06:04:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42218 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728131AbgDMKEl (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 13 Apr 2020 06:04:41 -0400
+X-Greylist: delayed 382 seconds by postgrey-1.27 at vger.kernel.org; Mon, 13 Apr 2020 06:04:41 EDT
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AC84C008748
+        for <linux-crypto@vger.kernel.org>; Mon, 13 Apr 2020 02:58:18 -0700 (PDT)
+Received: by mail-wm1-x329.google.com with SMTP id x4so8844466wmj.1
+        for <linux-crypto@vger.kernel.org>; Mon, 13 Apr 2020 02:58:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id;
+        bh=KmcsA4T+S+WWzjH6BirzHHu1f070Cb4n75Vt4bzQ7mw=;
+        b=TVnoFVdP7i6NzzFLwMjWxM3xlqFbcIBq1o9J7E/bTBQ0uzOW8+UegM9N09q07Gb8Pt
+         MtHvv7jPmDm/EdqTc8LOg/VtKYICEGws/lMAkblH+kM813ZU0JoJaasghx3IwTGcKd0E
+         42OvmNEcHZQ5VCaiHTIO84mRy6CrDZH8EYAeCVp6AgaElvoo718tEt+wJ/84V0XUhhxN
+         f4duhfvRg/ia9fT3MeUk6BGznNj5Tixq/bRylfXGr/Iior1h1ImD3+qM5aYCgzxIx0Zi
+         yW2DdRaVcQZ3x6NikAgM+x5H/bYYq4FjWTKQPFlyunUiyUqYCPVn2Bmk98TFUkVTHkTB
+         0DAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=KmcsA4T+S+WWzjH6BirzHHu1f070Cb4n75Vt4bzQ7mw=;
+        b=X9MTEAkEFJz8HQ2oF19RETsXuLC5q7S87z/ADSBojUo/g+kn+LMtBhRq4TqoiT51h2
+         EM51CkbkRHdPsiuK71PjSPHpE1Cam1kQLb40GQbf3DmmqQl9/i78f0zdVyew9m+uguXI
+         +yAZ6fRpAX/On+GBby5p83znzbDEgMbAAhFjvHi6hrqYZ3ZafxsFX5DC9MPbbazCqB3N
+         1URl79KU8wzG6BxNZzHIgY8rAYASfvXXraWFWd/drFcGI9MyemTb5i9wMiXjl0nM/T01
+         kiA0HxsXf1ZP2/uJMVaG2uTbqLhfscXn6ncjObE8EC3YvjGYSe8C90Eq+tI1ySFdzPxS
+         LRmw==
+X-Gm-Message-State: AGi0Pua3Wqdj2Qf2fV6W33ET97gq53fkYVcjYBz2JSlHjB47fPy7wQV5
+        p+Wpd2LDYdpjD6D4GXqTGqFErw==
+X-Google-Smtp-Source: APiQypJWhZgB3lIgt3ffPi7fAbvHp4h7OWcPtzktkowmrfegct/r94XOEfrUl2q5rZ1a2eCTjGu2EA==
+X-Received: by 2002:a1c:7d15:: with SMTP id y21mr17172416wmc.57.1586771896214;
+        Mon, 13 Apr 2020 02:58:16 -0700 (PDT)
+Received: from localhost.localdomain ([51.15.160.169])
+        by smtp.googlemail.com with ESMTPSA id v21sm13594491wmj.8.2020.04.13.02.58.14
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 13 Apr 2020 02:58:15 -0700 (PDT)
+From:   Corentin Labbe <clabbe@baylibre.com>
+To:     davem@davemloft.net, herbert@gondor.apana.org.au,
+        mripard@kernel.org, wens@csie.org
+Cc:     linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-sunxi@googlegroups.com,
+        Corentin Labbe <clabbe@baylibre.com>
+Subject: [PATCH 0/9] crypto: sun8i-ce: support TRNG, PRNG and hashes
+Date:   Mon, 13 Apr 2020 09:58:00 +0000
+Message-Id: <1586771889-3299-1-git-send-email-clabbe@baylibre.com>
+X-Mailer: git-send-email 2.7.4
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Al Viro <viro@zeniv.linux.org.uk>
+Hello
 
-[ Upstream commit ff462ddfd95b915345c3c7c037c3bfafdc58bae7 ]
+The main goal of this serie is to add support for TRNG, PRNG and hashes
+to the sun8i-ce.
+The whole serie is tested with CRYPTO_EXTRA_TESTS enabled and loading
+tcrypt.
+The PRNG and TRNG are tested with rngtest.
 
-kctx_len = (ntohl(KEY_CONTEXT_CTX_LEN_V(aeadctx->key_ctx_hdr)) << 4)
-                - sizeof(chcr_req->key_ctx);
-can't possibly be endian-safe.  Look: ->key_ctx_hdr is __be32.  And
-KEY_CONTEXT_CTX_LEN_V is "shift up by 24 bits".  On little-endian hosts it
-sees
-	b0 b1 b2 b3
-in memory, inteprets that into b0 + (b1 << 8) + (b2 << 16) + (b3 << 24),
-shifts up by 24, resulting in b0 << 24, does ntohl (byteswap on l-e),
-gets b0 and shifts that up by 4.  So we get b0 * 16 - sizeof(...).
+Note that the first patch is common with the recent sun8i-ss PRNG+hashes serie.
 
-Sounds reasonable, but on b-e we get
-b3 + (b2 << 8) + (b1 << 16) + (b0 << 24), shift up by 24,
-yielding b3 << 24, do ntohl (no-op on b-e) and then shift up by 4.
-Resulting in b3 << 28 - sizeof(...), i.e. slightly under b3 * 256M.
+Regards
 
-Then we increase it some more and pass to alloc_skb() as size.
-Somehow I doubt that we really want a quarter-gigabyte skb allocation
-here...
+Corentin Labbe (9):
+  crypto: rng - add missing __crypto_rng_cast to the rng header
+  crypto: sun8i-ce: move iv data to request context
+  crypto: sun8i-ce: split into prepare/run/unprepare
+  crypto: sun8i-ce: handle different error registers
+  crypto: sun8i-ce: rename has_t_dlen_in_bytes to cipher_t_dlen_in_bytes
+  crypto: sun8i-ce: support hash algorithms
+  crypto: sun8i-ce: Add stat_bytes debugfs
+  crypto: sun8i-ce: Add support for the PRNG
+  crypto: sun8i-ce: Add support for the TRNG
 
-Note that when you are building those values in
-#define  FILL_KEY_CTX_HDR(ck_size, mk_size, d_ck, opad, ctx_len) \
-                htonl(KEY_CONTEXT_VALID_V(1) | \
-                      KEY_CONTEXT_CK_SIZE_V((ck_size)) | \
-                      KEY_CONTEXT_MK_SIZE_V(mk_size) | \
-                      KEY_CONTEXT_DUAL_CK_V((d_ck)) | \
-                      KEY_CONTEXT_OPAD_PRESENT_V((opad)) | \
-                      KEY_CONTEXT_SALT_PRESENT_V(1) | \
-                      KEY_CONTEXT_CTX_LEN_V((ctx_len)))
-ctx_len ends up in the first octet (i.e. b0 in the above), which
-matches the current behaviour on l-e.  If that's the intent, this
-thing should've been
-        kctx_len = (KEY_CONTEXT_CTX_LEN_G(ntohl(aeadctx->key_ctx_hdr)) << 4)
-                - sizeof(chcr_req->key_ctx);
-instead - fetch after ntohl() we get (b0 << 24) + (b1 << 16) + (b2 << 8) + b3,
-shift it down by 24 (b0), resuling in b0 * 16 - sizeof(...) both on l-e and
-on b-e.
+ drivers/crypto/allwinner/Kconfig              |  26 ++
+ drivers/crypto/allwinner/sun8i-ce/Makefile    |   3 +
+ .../allwinner/sun8i-ce/sun8i-ce-cipher.c      |  99 ++++-
+ .../crypto/allwinner/sun8i-ce/sun8i-ce-core.c | 365 ++++++++++++++-
+ .../crypto/allwinner/sun8i-ce/sun8i-ce-hash.c | 415 ++++++++++++++++++
+ .../crypto/allwinner/sun8i-ce/sun8i-ce-prng.c | 191 ++++++++
+ .../crypto/allwinner/sun8i-ce/sun8i-ce-trng.c | 123 ++++++
+ drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h  | 135 +++++-
+ include/crypto/rng.h                          |   5 +
+ 9 files changed, 1323 insertions(+), 39 deletions(-)
+ create mode 100644 drivers/crypto/allwinner/sun8i-ce/sun8i-ce-hash.c
+ create mode 100644 drivers/crypto/allwinner/sun8i-ce/sun8i-ce-prng.c
+ create mode 100644 drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
 
-PS: when sparse warns you about endianness problems, it might be worth checking
-if there really is something wrong.  And I don't mean "slap __force cast on it"...
-
-Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/crypto/chelsio/chcr_algo.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index b4b9b22125d17..ad18124d0acb1 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -2351,7 +2351,7 @@ static struct sk_buff *create_authenc_wr(struct aead_request *req,
- 	snents = sg_nents_xlen(req->src, req->assoclen + req->cryptlen,
- 			       CHCR_SRC_SG_SIZE, 0);
- 	dst_size = get_space_for_phys_dsgl(dnents);
--	kctx_len = (ntohl(KEY_CONTEXT_CTX_LEN_V(aeadctx->key_ctx_hdr)) << 4)
-+	kctx_len = (KEY_CONTEXT_CTX_LEN_G(ntohl(aeadctx->key_ctx_hdr)) << 4)
- 		- sizeof(chcr_req->key_ctx);
- 	transhdr_len = CIPHER_TRANSHDR_SIZE(kctx_len, dst_size);
- 	reqctx->imm = (transhdr_len + req->assoclen + req->cryptlen) <
 -- 
-2.20.1
+2.24.1
 
