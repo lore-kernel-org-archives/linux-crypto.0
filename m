@@ -2,120 +2,88 @@ Return-Path: <SRS0=MzAP=55=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8EA5C2BA19
-	for <linux-crypto@archiver.kernel.org>; Mon, 13 Apr 2020 13:47:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1164C2BBFD
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Apr 2020 15:59:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 836492075E
-	for <linux-crypto@archiver.kernel.org>; Mon, 13 Apr 2020 13:47:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586785678;
-	bh=ykz+oUdvZuqEeDitw3NKWogAtpy7iDFRDIavWOYwXsI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=toBaKcK8u5oSBMk7tJ7Nkx5YLRIv3vs3rPpyNY1RIccwRgtW0aaR0+4BdMg7AH/Yz
-	 Q3e1aqWjUjJYEAyKPCAmiB72egXSaB8Mz5CpY2AReY2bMGxyJcViaTJCKhcsZsSyf6
-	 Pn4t5Mbs+qlNHKF6JXxLVnrywdDpivcd3hlHHeCQ=
+	by mail.kernel.org (Postfix) with ESMTP id CA2FE2072D
+	for <linux-crypto@archiver.kernel.org>; Mon, 13 Apr 2020 15:59:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730079AbgDMNr5 (ORCPT
+        id S1731186AbgDMP7v (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 13 Apr 2020 09:47:57 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42648 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1730085AbgDMNr5 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 13 Apr 2020 09:47:57 -0400
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8BBA42078A
-        for <linux-crypto@vger.kernel.org>; Mon, 13 Apr 2020 13:47:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586785676;
-        bh=ykz+oUdvZuqEeDitw3NKWogAtpy7iDFRDIavWOYwXsI=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=qIb/BKe1WGVnyRqen+EPf0MJ6Jpw2bJ57cM9BPkLsTC7lJGw44gfhUIOYND6shFsL
-         kZfWb9msZ20sVNUnI7nRI7m6I+isWJ7hf00dg3AdAi3lulFjTETgdz6EZs3ufU+JzD
-         HE8PMTUEVCobpNs+Ag5yg5t9/My1MEtC5R6NIpus=
-Received: by mail-wr1-f51.google.com with SMTP id u13so9719763wrp.3
-        for <linux-crypto@vger.kernel.org>; Mon, 13 Apr 2020 06:47:56 -0700 (PDT)
-X-Gm-Message-State: AGi0PuZanKPa7aGEZBHi/VPqT8uEiyqGpL3w2yJz8yNOgp0bi0H/VGYS
-        akCuikKUuyDgF5rhPxciqCUkRhm2ZCbqryJP6cHHsQ==
-X-Google-Smtp-Source: APiQypIoARLMY5RnvaMFfuJaNJaMrPHezTtGXQYBwTc0kjNGFnP90d4JWD8hICfSQ6xcZhj9UYbFp85BePswakIZOdA=
-X-Received: by 2002:a5d:4fcf:: with SMTP id h15mr18483790wrw.262.1586785674798;
- Mon, 13 Apr 2020 06:47:54 -0700 (PDT)
+        Mon, 13 Apr 2020 11:59:51 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:4962 "EHLO
+        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1731168AbgDMP7v (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 13 Apr 2020 11:59:51 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 03DFY5OW051657;
+        Mon, 13 Apr 2020 11:59:37 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com [169.55.91.170])
+        by mx0a-001b2d01.pphosted.com with ESMTP id 30b9vthffk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 13 Apr 2020 11:59:37 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+        by ppma02wdc.us.ibm.com (8.16.0.27/8.16.0.27) with SMTP id 03DFuc0H025545;
+        Mon, 13 Apr 2020 15:59:36 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
+        by ppma02wdc.us.ibm.com with ESMTP id 30b5h61eky-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 13 Apr 2020 15:59:36 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 03DFxaqh16122652
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 13 Apr 2020 15:59:36 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1BE68AC059;
+        Mon, 13 Apr 2020 15:59:36 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id B06C9AC05B;
+        Mon, 13 Apr 2020 15:59:35 +0000 (GMT)
+Received: from localhost (unknown [9.85.151.130])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Mon, 13 Apr 2020 15:59:35 +0000 (GMT)
+From:   Raphael Moreira Zinsly <rzinsly@linux.ibm.com>
+To:     linuxppc-dev@lists.ozlabs.org, linux-crypto@vger.kernel.org,
+        dja@axtens.net
+Cc:     rzinsly@linux.ibm.com, herbert@gondor.apana.org.au,
+        mpe@ellerman.id.au, haren@linux.ibm.com, abali@us.ibm.com
+Subject: [PATCH V3 0/5] selftests/powerpc: Add NX-GZIP engine testcase 
+Date:   Mon, 13 Apr 2020 12:59:11 -0300
+Message-Id: <20200413155916.16900-1-rzinsly@linux.ibm.com>
+X-Mailer: git-send-email 2.21.0
 MIME-Version: 1.0
-References: <1584100028-21279-1-git-send-email-schalla@marvell.com>
- <20200320053149.GC1315@sol.localdomain> <DM5PR18MB231111CEBDCDF734FA8C670BA0F50@DM5PR18MB2311.namprd18.prod.outlook.com>
- <CAKv+Gu_G4=Dn+6chjk1dQFMXm1aGU8QQZMmy94L5LicmR3itKQ@mail.gmail.com>
- <DM5PR18MB23111DB74B74BED1E08E0DD3A0F00@DM5PR18MB2311.namprd18.prod.outlook.com>
- <DM5PR18MB2311BB76C6A1F5C90B5D6A86A0DD0@DM5PR18MB2311.namprd18.prod.outlook.com>
-In-Reply-To: <DM5PR18MB2311BB76C6A1F5C90B5D6A86A0DD0@DM5PR18MB2311.namprd18.prod.outlook.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Mon, 13 Apr 2020 15:47:43 +0200
-X-Gmail-Original-Message-ID: <CAKv+Gu9=bzFkDkFrkkmB-xM_Ff4ECR9Q5rPqmby6fijZsQmG0Q@mail.gmail.com>
-Message-ID: <CAKv+Gu9=bzFkDkFrkkmB-xM_Ff4ECR9Q5rPqmby6fijZsQmG0Q@mail.gmail.com>
-Subject: Re: [EXT] Re: [PATCH v2 0/4] Add Support for Marvell OcteonTX Cryptographic
-To:     Srujana Challa <schalla@marvell.com>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        Narayana Prasad Raju Athreya <pathreya@marvell.com>,
-        Suheil Chandran <schandran@marvell.com>,
-        "arno@natisbad.org" <arno@natisbad.org>,
-        "bbrezillon@kernel.org" <bbrezillon@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.138,18.0.676
+ definitions=2020-04-13_07:2020-04-13,2020-04-13 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 bulkscore=0
+ spamscore=0 impostorscore=0 adultscore=0 lowpriorityscore=0 suspectscore=0
+ malwarescore=0 priorityscore=1501 phishscore=0 mlxlogscore=862 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004130116
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, 13 Apr 2020 at 15:21, Srujana Challa <schalla@marvell.com> wrote:
->
-> > Subject: RE: [EXT] Re: [PATCH v2 0/4] Add Support for Marvell OcteonTX
-> > Cryptographic
-> >
-> > > On Fri, 20 Mar 2020 at 06:47, Srujana Challa <schalla@marvell.com> wr=
-ote:
-> > > >
-> > > > > On Fri, Mar 13, 2020 at 05:17:04PM +0530, Srujana Challa wrote:
-> > > > > > The following series adds support for Marvell Cryptographic Acc=
-elerarion
-> > > > > > Unit (CPT) on OcteonTX CN83XX SoC.
-> > > > > >
-> > > > > > Changes since v1:
-> > > > > > * Replaced CRYPTO_BLKCIPHER with CRYPTO_SKCIPHER in Kconfig.
-> > > > > >
-> > > > > > Srujana Challa (4):
-> > > > > >   drivers: crypto: create common Kconfig and Makefile for Marve=
-ll
-> > > > > >   drivers: crypto: add support for OCTEON TX CPT engine
-> > > > > >   drivers: crypto: add the Virtual Function driver for CPT
-> > > > > >   crypto: marvell: enable OcteonTX cpt options for build
-> > > > >
-> > > > > There's no mention of testing.  Did you try
-> > > > > CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=3Dy?
-> > > > >
-> > > > Yes, the crypto self-tests are passed.
-> > >
-> > > *which* selftests are passed? Please confirm that they all passed wit=
-h
-> > > that kconfig option set
-> > Apologies. I have overlooked the config option, I thought it was
-> > CONFIG_CRYPTO_MANAGER_DISABLE_TESTS, all crypto self-tests are passed
-> > with this option disabled. I have started verifying with
-> > CONFIG_CRYPTO_MANAGER_EXTRA_TESTS=3Dy, I am getting few errors for
-> > unsupported input lengths, will submit the patch with fixes.
->
-> We confirmed that the failures are with unsupported lengths on our hardwa=
-re, for some lengths we can resolve the issue by having validation checks i=
-n the driver but for some unsupported cases "testmgr.c" is excepting always=
- success, I am still unsure how to fix/prevent these kind of failures. Can =
-anyone please kindly help me out how to proceed on this issue.
-> Thanks for your help.
 
-You need to allocate fallbacks for the modes that your driver cannot
-support. There are plenty of examples of that in the kernel tree.
+This patch series are intended to test the POWER9 Nest
+Accelerator (NX) GZIP engine that is being introduced by
+https://lists.ozlabs.org/pipermail/linuxppc-dev/2020-March/205659.html
+More information about how to access the NX can be found in that patch, also a
+complete userspace library and more documentation can be found at:
+https://github.com/libnxz/power-gzip
+
+Changes in V3:
+	- Defined a macro and increased the number of retries for page faults
+	  to work in system with less memory, mentioning the issue on README.
+	- Returned to use volatile on the touch pages routine and a few structs
+	  on inc/nxu.h as they are handled by hardware and some compilers could
+	  optmize it wrongly.
+	- Moved common functions to gzip_vas.c.
+
