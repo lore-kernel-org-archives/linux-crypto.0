@@ -2,158 +2,68 @@ Return-Path: <SRS0=7EYG=57=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DATE_IN_PAST_24_48,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDBA3C2BA19
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 Apr 2020 13:23:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E166FC2BA19
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 Apr 2020 15:26:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9807A2137B
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 Apr 2020 13:23:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586957033;
-	bh=pTRJi42QLtD8XK1UmP7p1s0Jn8MlwflehEJVP2yAQXA=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=QK6ivHhgMMlaVjyAIBbV4nVauVjtxICuJK99TLR5AVAqbLhtMIoNqNFI77fhNR7jP
-	 h6Ow2R52H/zMENuRQRMu0tTAplJMH1d7mXe65jItA0QDhD4cTBQkWjsq6pZ6k5qL3p
-	 muDTVHPObTT6hyftTyJThUdIwF2nwbfEavBzcTJk=
+	by mail.kernel.org (Postfix) with ESMTP id CB9F42076A
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 Apr 2020 15:26:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2636041AbgDONXv (ORCPT
+        id S1414694AbgDOP0Z (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 15 Apr 2020 09:23:51 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54378 "EHLO mail.kernel.org"
+        Wed, 15 Apr 2020 11:26:25 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:36328 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2408866AbgDOLey (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 Apr 2020 07:34:54 -0400
-Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8B44820737;
-        Wed, 15 Apr 2020 11:34:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586950493;
-        bh=pTRJi42QLtD8XK1UmP7p1s0Jn8MlwflehEJVP2yAQXA=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=HcJRPp521puyS88Av9tFWxfBDXv8GEQmQdeH9gpAQU0MlNEzy+pIDojrJxn/Y6sUP
-         Y37qgQtVqAFrB0qdUntkgRwPAwbAEP27oL0PL15G5j7y/YZrRRZrqt0N4xGGIUHce3
-         m5+VO6PzqV/lb4hJp3pSygDE+B955WY68OSw9HDE=
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Eneas U de Queiroz <cotequeiroz@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.6 006/129] crypto: qce - use cryptlen when adding extra sgl
-Date:   Wed, 15 Apr 2020 07:32:41 -0400
-Message-Id: <20200415113445.11881-6-sashal@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200415113445.11881-1-sashal@kernel.org>
-References: <20200415113445.11881-1-sashal@kernel.org>
+        id S1414683AbgDOP0P (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 15 Apr 2020 11:26:15 -0400
+Received: from gwarestrin.me.apana.org.au ([192.168.0.7] helo=gwarestrin.arnor.me.apana.org.au)
+        by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
+        id 1jOjuy-0006EH-RF; Thu, 16 Apr 2020 01:25:37 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 16 Apr 2020 01:25:36 +1000
+Date:   Tue, 14 Apr 2020 23:57:31 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     Nathan Chancellor <natechancellor@gmail.com>
+Cc:     Michael Ellerman <mpe@ellerman.id.au>,
+        Benjamin Herrenschmidt <benh@kernel.crashing.org>,
+        Paul Mackerras <paulus@samba.org>,
+        linux-crypto@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com,
+        kbuild test robot <lkp@intel.com>
+Subject: Re: [PATCH] lib/mpi: Fix building for powerpc with clang
+Message-ID: <20200414135731.GA8766@gondor.apana.org.au>
+References: <20200413195041.24064-1-natechancellor@gmail.com>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200413195041.24064-1-natechancellor@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Eneas U de Queiroz <cotequeiroz@gmail.com>
+On Mon, Apr 13, 2020 at 12:50:42PM -0700, Nathan Chancellor wrote:
+> 0day reports over and over on an powerpc randconfig with clang:
+> 
+> lib/mpi/generic_mpih-mul1.c:37:13: error: invalid use of a cast in a
+> inline asm context requiring an l-value: remove the cast or build with
+> -fheinous-gnu-extensions
+> 
+> Remove the superfluous casts, which have been done previously for x86
+> and arm32 in commit dea632cadd12 ("lib/mpi: fix build with clang") and
+> commit 7b7c1df2883d ("lib/mpi/longlong.h: fix building with 32-bit
+> x86").
+> 
+> Reported-by: kbuild test robot <lkp@intel.com>
+> Link: https://github.com/ClangBuiltLinux/linux/issues/991
+> Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
 
-[ Upstream commit d6364b8128439a8c0e381f80c38667de9f15eef8 ]
-
-The qce crypto driver appends an extra entry to the dst sgl, to maintain
-private state information.
-
-When the gcm driver sends requests to the ctr skcipher, it passes the
-authentication tag after the actual crypto payload, but it must not be
-touched.
-
-Commit 1336c2221bee ("crypto: qce - save a sg table slot for result
-buf") limited the destination sgl to avoid overwriting the
-authentication tag but it assumed the tag would be in a separate sgl
-entry.
-
-This is not always the case, so it is better to limit the length of the
-destination buffer to req->cryptlen before appending the result buf.
-
-Signed-off-by: Eneas U de Queiroz <cotequeiroz@gmail.com>
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/crypto/qce/dma.c      | 11 ++++++-----
- drivers/crypto/qce/dma.h      |  2 +-
- drivers/crypto/qce/skcipher.c |  5 +++--
- 3 files changed, 10 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/crypto/qce/dma.c b/drivers/crypto/qce/dma.c
-index 7da893dc00e73..46db5bf366b44 100644
---- a/drivers/crypto/qce/dma.c
-+++ b/drivers/crypto/qce/dma.c
-@@ -48,9 +48,10 @@ void qce_dma_release(struct qce_dma_data *dma)
- 
- struct scatterlist *
- qce_sgtable_add(struct sg_table *sgt, struct scatterlist *new_sgl,
--		int max_ents)
-+		unsigned int max_len)
- {
- 	struct scatterlist *sg = sgt->sgl, *sg_last = NULL;
-+	unsigned int new_len;
- 
- 	while (sg) {
- 		if (!sg_page(sg))
-@@ -61,13 +62,13 @@ qce_sgtable_add(struct sg_table *sgt, struct scatterlist *new_sgl,
- 	if (!sg)
- 		return ERR_PTR(-EINVAL);
- 
--	while (new_sgl && sg && max_ents) {
--		sg_set_page(sg, sg_page(new_sgl), new_sgl->length,
--			    new_sgl->offset);
-+	while (new_sgl && sg && max_len) {
-+		new_len = new_sgl->length > max_len ? max_len : new_sgl->length;
-+		sg_set_page(sg, sg_page(new_sgl), new_len, new_sgl->offset);
- 		sg_last = sg;
- 		sg = sg_next(sg);
- 		new_sgl = sg_next(new_sgl);
--		max_ents--;
-+		max_len -= new_len;
- 	}
- 
- 	return sg_last;
-diff --git a/drivers/crypto/qce/dma.h b/drivers/crypto/qce/dma.h
-index ed25a0d9829e5..7864021693608 100644
---- a/drivers/crypto/qce/dma.h
-+++ b/drivers/crypto/qce/dma.h
-@@ -43,6 +43,6 @@ void qce_dma_issue_pending(struct qce_dma_data *dma);
- int qce_dma_terminate_all(struct qce_dma_data *dma);
- struct scatterlist *
- qce_sgtable_add(struct sg_table *sgt, struct scatterlist *sg_add,
--		int max_ents);
-+		unsigned int max_len);
- 
- #endif /* _DMA_H_ */
-diff --git a/drivers/crypto/qce/skcipher.c b/drivers/crypto/qce/skcipher.c
-index 4217b745f1242..63ae75809cb70 100644
---- a/drivers/crypto/qce/skcipher.c
-+++ b/drivers/crypto/qce/skcipher.c
-@@ -97,13 +97,14 @@ qce_skcipher_async_req_handle(struct crypto_async_request *async_req)
- 
- 	sg_init_one(&rctx->result_sg, qce->dma.result_buf, QCE_RESULT_BUF_SZ);
- 
--	sg = qce_sgtable_add(&rctx->dst_tbl, req->dst, rctx->dst_nents - 1);
-+	sg = qce_sgtable_add(&rctx->dst_tbl, req->dst, req->cryptlen);
- 	if (IS_ERR(sg)) {
- 		ret = PTR_ERR(sg);
- 		goto error_free;
- 	}
- 
--	sg = qce_sgtable_add(&rctx->dst_tbl, &rctx->result_sg, 1);
-+	sg = qce_sgtable_add(&rctx->dst_tbl, &rctx->result_sg,
-+			     QCE_RESULT_BUF_SZ);
- 	if (IS_ERR(sg)) {
- 		ret = PTR_ERR(sg);
- 		goto error_free;
+Acked-by: Herbert Xu <herbert@gondor.apana.org.au>
 -- 
-2.20.1
-
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
