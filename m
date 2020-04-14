@@ -2,85 +2,99 @@ Return-Path: <SRS0=2RfU=56=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58AF9C352BE
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Apr 2020 18:27:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CC78C352BE
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Apr 2020 19:30:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 387EC206A2
-	for <linux-crypto@archiver.kernel.org>; Tue, 14 Apr 2020 18:27:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586888875;
-	bh=II9cIOZWJLtVUfA3Wn84rFv20L4RhCPUPQs7AdZJdNw=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=E9zi3s+sGYQOVcQSrEtixk1G6j71GAbD2tNJ3FvHPQdhZJiRVl2Cmo5zPJaz7HFTV
-	 JMgLZUGrVZGl7+W2y8QZD3G8F1BnxJURl2seBlWSuufNQFFH5B/OmCQ0MKNnDwBlGZ
-	 /nS+BpgX5e1gNJynGG0kVmRTCJ0EERIf2DFNJjOs=
+	by mail.kernel.org (Postfix) with ESMTP id 333672074D
+	for <linux-crypto@archiver.kernel.org>; Tue, 14 Apr 2020 19:30:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TmBQD0Cn"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2503969AbgDNS1n (ORCPT
+        id S2504791AbgDNTaC (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 14 Apr 2020 14:27:43 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40112 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2503947AbgDNS1l (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 14 Apr 2020 14:27:41 -0400
-Received: from localhost (fw-tnat.cambridge.arm.com [217.140.96.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Tue, 14 Apr 2020 15:30:02 -0400
+Received: from us-smtp-1.mimecast.com ([205.139.110.61]:42102 "EHLO
+        us-smtp-delivery-1.mimecast.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S2504787AbgDNTaA (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 14 Apr 2020 15:30:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1586892599;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:in-reply-to:in-reply-to:references:references;
+        bh=4nt9rcH2RnKfJzDA58agnsCRn6rTIqNaptR/6NgozyU=;
+        b=TmBQD0Cnhi97wuS+XJSLFilq6/WfEO7bI3aZn9qaIu4O/EeUhBxspf5vauRN49iFGFwCmD
+        4h7uGVv1okTokBqdAtN6K5AXDEO1smBYNV/bRT9zYReBlHbMVTiIXbaUxJ0U4UcrT+lw1f
+        FhEBN8qvwhPNMgRij4sLmbch7IE9D5E=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-194-Xc2oPvfjP7mbYjWGtjiEGA-1; Tue, 14 Apr 2020 15:29:55 -0400
+X-MC-Unique: Xc2oPvfjP7mbYjWGtjiEGA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id B571720575;
-        Tue, 14 Apr 2020 18:27:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586888861;
-        bh=II9cIOZWJLtVUfA3Wn84rFv20L4RhCPUPQs7AdZJdNw=;
-        h=From:To:Cc:Subject:Date:From;
-        b=ynDT8kVAu4ibkwvAgPhVdwsIuPurL9Td552Zm9fQ3zO/drYH887WalclZKd8dK2/X
-         //4lfp/f7BDOXUZxp/ojwu9tEzu5vCK15r+zTypUsCEYN6CFYu33NIZ+Ld3HZmfVPR
-         cY64/B/gKfzH3krhFRmDHM2yPjFIsr/dgMEc2TgA=
-From:   Mark Brown <broonie@kernel.org>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Catalin Marinas <catalin.marinas@arm.com>,
-        Will Deacon <will@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        Mark Brown <broonie@kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>
-Subject: [PATCH] arm64: crypto: Consistently enable extension
-Date:   Tue, 14 Apr 2020 19:20:08 +0100
-Message-Id: <20200414182008.31417-1-broonie@kernel.org>
-X-Mailer: git-send-email 2.20.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6723C107ACC9;
+        Tue, 14 Apr 2020 19:29:52 +0000 (UTC)
+Received: from llong.com (ovpn-118-173.rdu2.redhat.com [10.10.118.173])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id F1F4419C70;
+        Tue, 14 Apr 2020 19:29:46 +0000 (UTC)
+From:   Waiman Long <longman@redhat.com>
+To:     Andrew Morton <akpm@linux-foundation.org>,
+        David Howells <dhowells@redhat.com>,
+        Jarkko Sakkinen <jarkko.sakkinen@linux.intel.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
+        Joe Perches <joe@perches.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        David Rientjes <rientjes@google.com>, Chris Mason <clm@fb.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>
+Cc:     linux-mm@kvack.org, keyrings@vger.kernel.org,
+        linux-kernel@vger.kernel.org, x86@kernel.org,
+        linux-crypto@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        Waiman Long <longman@redhat.com>
+Subject: [PATCH v2 3/3] btrfs: Use kfree() in btrfs_ioctl_get_subvol_info()
+Date:   Tue, 14 Apr 2020 15:29:33 -0400
+Message-Id: <20200414192933.26846-1-longman@redhat.com>
+In-Reply-To: <20200413211550.8307-1-longman@redhat.com>
+References: <20200413211550.8307-1-longman@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Currently most of the crypto files enable the crypto extension using the
-.arch directive but crct10dif-ce-core.S uses .cpu instead. Move that over
-to .arch for consistency.
+In btrfs_ioctl_get_subvol_info(), there is a classic case where kzalloc()
+was incorrectly paired with kzfree(). According to David Sterba, there
+isn't any sensitive information in the subvol_info that needs to be
+cleared before freeing. So kfree_sensitive() isn't really needed,
+use kfree() instead.
 
-Signed-off-by: Mark Brown <broonie@kernel.org>
-Acked-by: Ard Biesheuvel <ardb@kernel.org>
+Reported-by: David Sterba <dsterba@suse.cz>
+Signed-off-by: Waiman Long <longman@redhat.com>
 ---
- arch/arm64/crypto/crct10dif-ce-core.S | 2 +-
+ fs/btrfs/ioctl.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/crypto/crct10dif-ce-core.S b/arch/arm64/crypto/crct10dif-ce-core.S
-index 5a95c2628fbf..111d9c9abddd 100644
---- a/arch/arm64/crypto/crct10dif-ce-core.S
-+++ b/arch/arm64/crypto/crct10dif-ce-core.S
-@@ -66,7 +66,7 @@
- #include <asm/assembler.h>
+diff --git a/fs/btrfs/ioctl.c b/fs/btrfs/ioctl.c
+index eab3f8510426..5070bd2436b7 100644
+--- a/fs/btrfs/ioctl.c
++++ b/fs/btrfs/ioctl.c
+@@ -2691,7 +2691,7 @@ static int btrfs_ioctl_get_subvol_info(struct file *file, void __user *argp)
+ 	btrfs_put_root(root);
+ out_free:
+ 	btrfs_free_path(path);
+-	kfree_sensitive(subvol_info);
++	kfree(subvol_info);
+ 	return ret;
+ }
  
- 	.text
--	.cpu		generic+crypto
-+	.arch		armv8-a+crypto
- 
- 	init_crc	.req	w19
- 	buf		.req	x20
 -- 
-2.20.1
+2.18.1
 
