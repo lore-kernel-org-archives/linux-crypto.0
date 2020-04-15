@@ -7,38 +7,38 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11EAAC2BB55
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 Apr 2020 12:52:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBF0BC2BA19
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 Apr 2020 13:23:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DB29E20767
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 Apr 2020 12:52:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BD9D92137B
+	for <linux-crypto@archiver.kernel.org>; Wed, 15 Apr 2020 13:23:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1586955146;
-	bh=M8E/aNrFYn1/9bNSs0TvZi9Xc8SxJ8APXi7e1rp2YN0=;
+	s=default; t=1586957031;
+	bh=Isrih8rMZJRUmtk7ZuU2q84AJ4iMXZIZZshpIbEwdNY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=i6nzr8fliR2AKE657rpW+Sn0B+jOy1QM0IIittf7MMrK0jQQSnO4TGgXoYJ868ZUz
-	 g4/I08DsVZdFtFhS3Ezw/uIF+yJjNz/7U5Isg4flTy30iKbKVVCrhLitCLKD5IZtUZ
-	 fxbpffMtg1QMJ8P4RcB0ORxRnCRsNhK6Ftd/re54=
+	b=1kJAGUSi8RY+SgA4zUmr51kzNl1WFA0CK/qy6/T5UpoZkmHfpr/A1YV6gqzMHAoA2
+	 yBHPTBkF2VEvvI66UdpStpZ9sgTxHepfYlJBLQzqJ8BuXRe7es+HsPpJwC7ZSRhEea
+	 UzeRd+lPBWdr1a9F+dacCVm+JiLMOsPSIcos68/g=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2897480AbgDOLmh (ORCPT
+        id S2636005AbgDONXm (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 15 Apr 2020 07:42:37 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33840 "EHLO mail.kernel.org"
+        Wed, 15 Apr 2020 09:23:42 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54428 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2897472AbgDOLmf (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 Apr 2020 07:42:35 -0400
+        id S2408871AbgDOLez (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 15 Apr 2020 07:34:55 -0400
 Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 96885214D8;
-        Wed, 15 Apr 2020 11:42:34 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id B2F1B20936;
+        Wed, 15 Apr 2020 11:34:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1586950955;
-        bh=M8E/aNrFYn1/9bNSs0TvZi9Xc8SxJ8APXi7e1rp2YN0=;
+        s=default; t=1586950495;
+        bh=Isrih8rMZJRUmtk7ZuU2q84AJ4iMXZIZZshpIbEwdNY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=TqlTPf008TCQRVQXsanrxiyI+DhqnqmKTBgR15dLzYFqNr3gD0MH55digbU5XiKzZ
-         1CA1fv24EISlFcZbegWUzKj1upAO4l/wAzmv+YChafSDvgi/oemqF8o2qeiZGvuwWj
-         tuMvGrDChHA2xvZuKpwi2bQ/Vo+lhTvhIgysw8fI=
+        b=J7/0SHgEVxKEUh5cligVRowc3rhLOLZ0dRe/7KL95M/y698I7f9pzM4dcBZKPo7TY
+         5jimBIoC197qUFuYL8gn3qqc5C4kyXVpPrrkgWhHXhLWfNv3Nk/DdyLbVw1ZGC3txZ
+         UMD0sV2RWOJ7XBY2yVyhiO8OHirNXzPzCoK0Nbco=
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Torsten Duwe <duwe@suse.de>,
@@ -46,12 +46,12 @@ Cc:     Torsten Duwe <duwe@suse.de>,
         Vasily Gorbik <gor@linux.ibm.com>,
         Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org,
         linux-s390@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.5 007/106] s390/crypto: explicitly memzero stack key material in aes_s390.c
-Date:   Wed, 15 Apr 2020 07:40:47 -0400
-Message-Id: <20200415114226.13103-7-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.6 008/129] s390/crypto: explicitly memzero stack key material in aes_s390.c
+Date:   Wed, 15 Apr 2020 07:32:43 -0400
+Message-Id: <20200415113445.11881-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200415114226.13103-1-sashal@kernel.org>
-References: <20200415114226.13103-1-sashal@kernel.org>
+In-Reply-To: <20200415113445.11881-1-sashal@kernel.org>
+References: <20200415113445.11881-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -79,10 +79,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 3 insertions(+)
 
 diff --git a/arch/s390/crypto/aes_s390.c b/arch/s390/crypto/aes_s390.c
-index ead0b2c9881d1..14d006b424eb1 100644
+index 1c23d84a9097d..73044634d3427 100644
 --- a/arch/s390/crypto/aes_s390.c
 +++ b/arch/s390/crypto/aes_s390.c
-@@ -354,6 +354,7 @@ static int cbc_aes_crypt(struct skcipher_request *req, unsigned long modifier)
+@@ -342,6 +342,7 @@ static int cbc_aes_crypt(struct skcipher_request *req, unsigned long modifier)
  		memcpy(walk.iv, param.iv, AES_BLOCK_SIZE);
  		ret = skcipher_walk_done(&walk, nbytes - n);
  	}
@@ -90,7 +90,7 @@ index ead0b2c9881d1..14d006b424eb1 100644
  	return ret;
  }
  
-@@ -489,6 +490,8 @@ static int xts_aes_crypt(struct skcipher_request *req, unsigned long modifier)
+@@ -470,6 +471,8 @@ static int xts_aes_crypt(struct skcipher_request *req, unsigned long modifier)
  			 walk.dst.virt.addr, walk.src.virt.addr, n);
  		ret = skcipher_walk_done(&walk, nbytes - n);
  	}
