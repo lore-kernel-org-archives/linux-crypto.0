@@ -4,67 +4,77 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75E31C352BE
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Apr 2020 06:53:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFE55C2D0EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Apr 2020 06:53:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5618B21556
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Apr 2020 06:53:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C56AB21655
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Apr 2020 06:53:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437209AbgDPGxD (ORCPT
+        id S2437182AbgDPGxo (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Apr 2020 02:53:03 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:41506 "EHLO fornost.hmeau.com"
+        Thu, 16 Apr 2020 02:53:44 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:41528 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2437083AbgDPGws (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Apr 2020 02:52:48 -0400
+        id S2437503AbgDPGxl (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Apr 2020 02:53:41 -0400
 Received: from gwarestrin.me.apana.org.au ([192.168.0.7] helo=gwarestrin.arnor.me.apana.org.au)
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1jOyOA-0005NM-R2; Thu, 16 Apr 2020 16:52:44 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 16 Apr 2020 16:52:42 +1000
-Date:   Thu, 16 Apr 2020 16:52:42 +1000
+        id 1jOyOm-0005OM-En; Thu, 16 Apr 2020 16:53:21 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 16 Apr 2020 16:53:20 +1000
+Date:   Thu, 16 Apr 2020 16:53:20 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, stable@vger.kernel.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCH v2] crypto: algapi - Avoid spurious modprobe on LOADED
-Message-ID: <20200416065242.GA8061@gondor.apana.org.au>
-References: <20200407051744.GA13037@gondor.apana.org.au>
- <20200407060240.175837-1-ebiggers@kernel.org>
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     Tom Lendacky <thomas.lendacky@amd.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Gary R Hook <gary.hook@amd.com>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Eric Biggers <ebiggers@google.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] crypto: ccp -- don't "select" CONFIG_DMADEVICES
+Message-ID: <20200416065320.GJ7901@gondor.apana.org.au>
+References: <20200408162652.3987688-1-arnd@arndb.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200407060240.175837-1-ebiggers@kernel.org>
+In-Reply-To: <20200408162652.3987688-1-arnd@arndb.de>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Apr 06, 2020 at 11:02:40PM -0700, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+On Wed, Apr 08, 2020 at 06:26:48PM +0200, Arnd Bergmann wrote:
+> DMADEVICES is the top-level option for the slave DMA
+> subsystem, and should not be selected by device drivers,
+> as this can cause circular dependencies such as:
 > 
-> Currently after any algorithm is registered and tested, there's an
-> unnecessary request_module("cryptomgr") even if it's already loaded.
-> Also, CRYPTO_MSG_ALG_LOADED is sent twice, and thus if the algorithm is
-> "crct10dif", lib/crc-t10dif.c replaces the tfm twice rather than once.
+> drivers/net/ethernet/freescale/Kconfig:6:error: recursive dependency detected!
+> drivers/net/ethernet/freescale/Kconfig:6:	symbol NET_VENDOR_FREESCALE depends on PPC_BESTCOMM
+> drivers/dma/bestcomm/Kconfig:6:	symbol PPC_BESTCOMM depends on DMADEVICES
+> drivers/dma/Kconfig:6:	symbol DMADEVICES is selected by CRYPTO_DEV_SP_CCP
+> drivers/crypto/ccp/Kconfig:10:	symbol CRYPTO_DEV_SP_CCP depends on CRYPTO
+> crypto/Kconfig:16:	symbol CRYPTO is selected by LIBCRC32C
+> lib/Kconfig:222:	symbol LIBCRC32C is selected by LIQUIDIO
+> drivers/net/ethernet/cavium/Kconfig:65:	symbol LIQUIDIO depends on PTP_1588_CLOCK
+> drivers/ptp/Kconfig:8:	symbol PTP_1588_CLOCK is implied by FEC
+> drivers/net/ethernet/freescale/Kconfig:23:	symbol FEC depends on NET_VENDOR_FREESCALE
 > 
-> This occurs because CRYPTO_MSG_ALG_LOADED is sent using
-> crypto_probing_notify(), which tries to load "cryptomgr" if the
-> notification is not handled (NOTIFY_DONE).  This doesn't make sense
-> because "cryptomgr" doesn't handle this notification.
+> The LIQUIDIO driver causing this problem is addressed in a
+> separate patch, but this change is needed to prevent it from
+> happening again.
 > 
-> Fix this by using crypto_notify() instead of crypto_probing_notify().
+> Using "depends on DMADEVICES" is what we do for all other
+> implementations of slave DMA controllers as well.
 > 
-> Fixes: dd8b083f9a5e ("crypto: api - Introduce notifier for new crypto algorithms")
-> Cc: <stable@vger.kernel.org> # v4.20+
-> Cc: Martin K. Petersen <martin.petersen@oracle.com>
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+> Fixes: b3c2fee5d66b ("crypto: ccp - Ensure all dependencies are specified")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 > ---
->  crypto/algapi.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  drivers/crypto/ccp/Kconfig | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 
 Patch applied.  Thanks.
 -- 
