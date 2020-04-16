@@ -3,69 +3,78 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B66CC2BA19
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Apr 2020 02:42:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86D67C2D0EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Apr 2020 06:03:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0220A206F9
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Apr 2020 02:42:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 72533214AF
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Apr 2020 06:03:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387983AbgDPCml (ORCPT
+        id S2407272AbgDPGDE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 15 Apr 2020 22:42:41 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:40008 "EHLO fornost.hmeau.com"
+        Thu, 16 Apr 2020 02:03:04 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:41096 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1732153AbgDPCml (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 Apr 2020 22:42:41 -0400
+        id S2407219AbgDPGDD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Apr 2020 02:03:03 -0400
 Received: from gwarestrin.me.apana.org.au ([192.168.0.7] helo=gwarestrin.arnor.me.apana.org.au)
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1jOuTp-0002BK-4G; Thu, 16 Apr 2020 12:42:18 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 16 Apr 2020 12:42:16 +1000
-Date:   Thu, 16 Apr 2020 12:42:16 +1000
+        id 1jOxai-0004JT-Ro; Thu, 16 Apr 2020 16:01:37 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 16 Apr 2020 16:01:36 +1000
+Date:   Thu, 16 Apr 2020 16:01:36 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     syzbot <syzbot+fc0674cde00b66844470@syzkaller.appspotmail.com>,
-        davem@davemloft.net, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Subject: Re: crypto: api - Fix use-after-free and race in crypto_spawn_alg
-Message-ID: <20200416024216.GA18571@gondor.apana.org.au>
-References: <0000000000002656a605a2a34356@google.com>
- <20200410060942.GA4048@gondor.apana.org.au>
- <20200416021703.GD816@sol.localdomain>
- <20200416022502.GA18386@gondor.apana.org.au>
- <20200416023001.GE816@sol.localdomain>
+To:     Tianjia Zhang <tianjia.zhang@linux.alibaba.com>
+Cc:     davem@davemloft.net, ebiggers@kernel.org, ebiggers@google.com,
+        pvanleeuwen@rambus.com, zohar@linux.ibm.com, gilad@benyossef.com,
+        jarkko.sakkinen@linux.intel.com, dmitry.kasatkin@intel.com,
+        nicstange@gmail.com, tadeusz.struk@intel.com, jmorris@namei.org,
+        serge@hallyn.com, zhang.jia@linux.alibaba.com,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/7] crpyto: introduce OSCCA certificate and SM2
+ asymmetric algorithm
+Message-ID: <20200416060136.GA19149@gondor.apana.org.au>
+References: <20200402123504.84628-1-tianjia.zhang@linux.alibaba.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200416023001.GE816@sol.localdomain>
+In-Reply-To: <20200402123504.84628-1-tianjia.zhang@linux.alibaba.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Apr 15, 2020 at 07:30:01PM -0700, Eric Biggers wrote:
+On Thu, Apr 02, 2020 at 08:34:57PM +0800, Tianjia Zhang wrote:
+> Hello all,
 > 
-> I'm not sure what you mean here.  crypto_alg_get() is:
+> This new module implement the OSCCA certificate and SM2 public key
+> algorithm. It was published by State Encryption Management Bureau, China.
+> List of specifications for OSCCA certificate and SM2 elliptic curve
+> public key cryptography:
 > 
-> static inline struct crypto_alg *crypto_alg_get(struct crypto_alg *alg)
-> {
->         refcount_inc(&alg->cra_refcnt);
->         return alg;
-> }
+> * GM/T 0003.1-2012
+> * GM/T 0003.2-2012
+> * GM/T 0003.3-2012
+> * GM/T 0003.4-2012
+> * GM/T 0003.5-2012
+> * GM/T 0015-2012
+> * GM/T 0009-2012 
 > 
-> So given:
+> IETF: https://tools.ietf.org/html/draft-shen-sm2-ecdsa-02
+> oscca: http://www.oscca.gov.cn/sca/xxgk/2010-12/17/content_1002386.shtml
+> scctc: http://www.gmbz.org.cn/main/bzlb.html
 > 
-> 	target = crypto_alg_get(alg);
-> 
-> Both alg and target have to be non-NULL.
+> These patchs add the OID object identifier defined by OSCCA. The
+> x509 certificate supports sm2-with-sm3 type certificate parsing
+> and verification.
 
-Yes I know that we know that it can't be NULL, but gcc 8.3 doesn't.
+I don't have any objections to the crypto API bits, but obviously
+this is contingent on the x509 bits getting accepted since that's
+the only in-kernel user.  So can I see some acks on that please?
 
-Cheers,
+Thanks,
 -- 
 Email: Herbert Xu <herbert@gondor.apana.org.au>
 Home Page: http://gondor.apana.org.au/~herbert/
