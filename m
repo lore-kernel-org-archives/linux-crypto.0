@@ -6,72 +6,62 @@ X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 378E4C38A29
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Apr 2020 06:52:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8023C2BA2B
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Apr 2020 06:52:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1F0E121569
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Apr 2020 06:52:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CFF3221556
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Apr 2020 06:52:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2436959AbgDPGwQ (ORCPT
+        id S2437003AbgDPGwV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Apr 2020 02:52:16 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:41436 "EHLO fornost.hmeau.com"
+        Thu, 16 Apr 2020 02:52:21 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:41474 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2436852AbgDPGwI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Apr 2020 02:52:08 -0400
+        id S2436923AbgDPGwQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 16 Apr 2020 02:52:16 -0400
 Received: from gwarestrin.me.apana.org.au ([192.168.0.7] helo=gwarestrin.arnor.me.apana.org.au)
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1jOyNE-0005Ji-AF; Thu, 16 Apr 2020 16:51:45 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 16 Apr 2020 16:51:44 +1000
-Date:   Thu, 16 Apr 2020 16:51:44 +1000
+        id 1jOyNK-0005Jq-CU; Thu, 16 Apr 2020 16:51:51 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 16 Apr 2020 16:51:50 +1000
+Date:   Thu, 16 Apr 2020 16:51:50 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Tang Bin <tangbin@cmss.chinamobile.com>
-Cc:     narmstrong@baylibre.com, clabbe@baylibre.com, davem@davemloft.net,
-        linux-crypto@vger.kernel.org, linux-amlogic@lists.infradead.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v6]crypto: amlogic - Delete duplicate dev_err in
- meson_crypto_probe()
-Message-ID: <20200416065144.GF7901@gondor.apana.org.au>
-References: <20200403220754.7856-1-tangbin@cmss.chinamobile.com>
+To:     Markus Elfring <Markus.Elfring@web.de>
+Cc:     linux-crypto@vger.kernel.org, Arnd Bergmann <arnd@arndb.de>,
+        Deepak Saxena <dsaxena@plexity.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Matt Mackall <mpm@selenic.com>,
+        LKML <linux-kernel@vger.kernel.org>,
+        kernel-janitors@vger.kernel.org,
+        Tang Bin <tangbin@cmss.chinamobile.com>
+Subject: Re: [PATCH] hwrng: omap - Delete an error message in
+ of_get_omap_rng_device_details()
+Message-ID: <20200416065150.GG7901@gondor.apana.org.au>
+References: <eae7170c-4371-4865-7b85-589c0ed2b5b6@web.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20200403220754.7856-1-tangbin@cmss.chinamobile.com>
+In-Reply-To: <eae7170c-4371-4865-7b85-589c0ed2b5b6@web.de>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Apr 04, 2020 at 06:07:54AM +0800, Tang Bin wrote:
-> When something goes wrong, platform_get_irq() will print an error message,
-> so in order to avoid the situation of repeat output，we should remove
-> dev_err here.
+On Sat, Apr 04, 2020 at 04:56:57PM +0200, Markus Elfring wrote:
+> From: Markus Elfring <elfring@users.sourceforge.net>
+> Date: Sat, 4 Apr 2020 16:45:57 +0200
 > 
-> Signed-off-by: Tang Bin <tangbin@cmss.chinamobile.com>
+> The function “platform_get_irq” can log an error already.
+> Thus omit a redundant message for the exception handling in the
+> calling function.
+> 
+> This issue was detected by using the Coccinelle software.
+> 
+> Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
 > ---
-> Changes from v5
->  - modify the commit message.
-> 
-> Changes from v4:
->  - rewrite the code, because the code in v4 is wrong, sorry.
-> 
-> Changes form v3:
->  - fix the theme writing error.
-> 
-> Changes from v2:
->  - modify the theme format and content description.
->  - reformat the patch, it's the wrong way to resubmit a new patch that
->    should be modified on top of the original. The original piece is:
->    https://lore.kernel.org/patchwork/patch/1219611/
-> 
-> Changes from v1:
->  - the title has changed, because the description is not very detailed.
->  - the code has been modified, because it needs to match the theme.
-> 
->  drivers/crypto/amlogic/amlogic-gxl-core.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
+>  drivers/char/hw_random/omap-rng.c | 5 +----
+>  1 file changed, 1 insertion(+), 4 deletions(-)
 
 Patch applied.  Thanks.
 -- 
