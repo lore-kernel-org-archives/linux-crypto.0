@@ -1,72 +1,119 @@
-Return-Path: <SRS0=7EYG=57=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=NP+Z=6A=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D69E8C2BB55
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 Apr 2020 23:04:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2661EC2BA19
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Apr 2020 02:17:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BD38A20768
-	for <linux-crypto@archiver.kernel.org>; Wed, 15 Apr 2020 23:04:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E77D720656
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Apr 2020 02:17:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1587003435;
+	bh=7jbHIbkIv+g7KwSbl0G4SwQ+s3EbSDnsxuzrtjKoAkE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=ULVZ0ODDdUD/r7tK9LiTvwi9BCxcfvZZ1N9cotVUDiXtkjyw/lkqF9ilaG7ymjbUn
+	 R0rieyojSRUTnRO5+xPl97kPm5sbY6v8Yw7ohxRmg0ZPVgxexQzn7TYxhUzLOQcpok
+	 3oswe7UaHc2RQokE45Vg1WSFCqkNBeZrnnzPWNZQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2387864AbgDOXEE (ORCPT
+        id S1732044AbgDPCRN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 15 Apr 2020 19:04:04 -0400
-Received: from youngberry.canonical.com ([91.189.89.112]:53326 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729285AbgDOXED (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 15 Apr 2020 19:04:03 -0400
-Received: from 1.general.cking.uk.vpn ([10.172.193.212] helo=localhost)
-        by youngberry.canonical.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.86_2)
-        (envelope-from <colin.king@canonical.com>)
-        id 1jOr4Z-0004WB-2w; Wed, 15 Apr 2020 23:03:59 +0000
-From:   Colin King <colin.king@canonical.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org
-Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] crypto: algif_rng: remove redundant assignment to variable err
-Date:   Thu, 16 Apr 2020 00:03:58 +0100
-Message-Id: <20200415230358.1566912-1-colin.king@canonical.com>
-X-Mailer: git-send-email 2.25.1
+        Wed, 15 Apr 2020 22:17:13 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34308 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1732005AbgDPCRH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 15 Apr 2020 22:17:07 -0400
+Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6320A20656;
+        Thu, 16 Apr 2020 02:17:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1587003425;
+        bh=7jbHIbkIv+g7KwSbl0G4SwQ+s3EbSDnsxuzrtjKoAkE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=vuojUktZ+aZ0sgh2r1xUOcuxkaqXBRVoYIySFcbjU4d+99EUVZSMPiYl9Pp4ubLeg
+         CshgWl4eWJIRP0iC25Ks7DmXqGlZa7pJMJ8O3kIqhdm8BX8mRT2+W2Ui/DiAUTIn+U
+         +Q/jNYaLiSOPsTSjlwCcQnzgxcf7OdW602yH0vEE=
+Date:   Wed, 15 Apr 2020 19:17:03 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     syzbot <syzbot+fc0674cde00b66844470@syzkaller.appspotmail.com>,
+        davem@davemloft.net, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Subject: Re: crypto: api - Fix use-after-free and race in crypto_spawn_alg
+Message-ID: <20200416021703.GD816@sol.localdomain>
+References: <0000000000002656a605a2a34356@google.com>
+ <20200410060942.GA4048@gondor.apana.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200410060942.GA4048@gondor.apana.org.au>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Colin Ian King <colin.king@canonical.com>
+On Fri, Apr 10, 2020 at 04:09:42PM +1000, Herbert Xu wrote:
+> There are two problems in crypto_spawn_alg.  First of all it may
+> return spawn->alg even if spawn->dead is set.  This results in a
+> double-free as detected by syzbot.
+> 
+> Secondly the setting of the DYING flag is racy because we hold
+> the read-lock instead of the write-lock.  We should instead call
+> crypto_shoot_alg in a safe manner by gaining a refcount, dropping
+> the lock, and then releasing the refcount.
+> 
+> This patch fixes both problems.
+> 
+> Reported-by: syzbot+fc0674cde00b66844470@syzkaller.appspotmail.com
+> Fixes: 4f87ee118d16 ("crypto: api - Do not zap spawn->alg")
+> Fixes: 73669cc55646 ("crypto: api - Fix race condition in...")
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> 
+> diff --git a/crypto/algapi.c b/crypto/algapi.c
+> index 69605e21af92..f8b4dc161c02 100644
+> --- a/crypto/algapi.c
+> +++ b/crypto/algapi.c
+> @@ -716,17 +716,27 @@ EXPORT_SYMBOL_GPL(crypto_drop_spawn);
+>  
+>  static struct crypto_alg *crypto_spawn_alg(struct crypto_spawn *spawn)
+>  {
+> -	struct crypto_alg *alg;
+> +	struct crypto_alg *alg = ERR_PTR(-EAGAIN);
+> +	struct crypto_alg *target;
+> +	bool shoot = false;
+>  
+>  	down_read(&crypto_alg_sem);
+> -	alg = spawn->alg;
+> -	if (!spawn->dead && !crypto_mod_get(alg)) {
+> -		alg->cra_flags |= CRYPTO_ALG_DYING;
+> -		alg = NULL;
+> +	if (!spawn->dead) {
+> +		alg = spawn->alg;
+> +		if (!crypto_mod_get(alg)) {
+> +			target = crypto_alg_get(alg);
+> +			shoot = true;
+> +			alg = ERR_PTR(-EAGAIN);
+> +		}
+>  	}
+>  	up_read(&crypto_alg_sem);
+>  
+> -	return alg ?: ERR_PTR(-EAGAIN);
+> +	if (shoot) {
+> +		crypto_shoot_alg(target);
+> +		crypto_alg_put(target);
+> +	}
+> +
+> +	return alg;
+>  }
 
-The variable err is being initialized with a value that is never read
-and it is being updated later with a new value.  The initialization is
-redundant and can be removed.
+Wouldn't it be a bit simpler to set 'target = NULL', remove 'shoot',
+and use 'if (target)' instead of 'if (shoot)'?
 
-Addresses-Coverity: ("Unused value")
-Signed-off-by: Colin Ian King <colin.king@canonical.com>
----
- crypto/algif_rng.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/crypto/algif_rng.c b/crypto/algif_rng.c
-index 22df3799a17b..087c0ad09d38 100644
---- a/crypto/algif_rng.c
-+++ b/crypto/algif_rng.c
-@@ -61,7 +61,7 @@ static int rng_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
- 	struct sock *sk = sock->sk;
- 	struct alg_sock *ask = alg_sk(sk);
- 	struct rng_ctx *ctx = ask->private;
--	int err = -EFAULT;
-+	int err;
- 	int genlen = 0;
- 	u8 result[MAXSIZE];
- 
--- 
-2.25.1
-
+- Eric
