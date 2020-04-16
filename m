@@ -2,115 +2,118 @@ Return-Path: <SRS0=NP+Z=6A=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A1A2C2BA2B
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Apr 2020 06:56:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E12E6C2D0EF
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Apr 2020 08:31:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 652182087E
-	for <linux-crypto@archiver.kernel.org>; Thu, 16 Apr 2020 06:56:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B7C5D216FD
+	for <linux-crypto@archiver.kernel.org>; Thu, 16 Apr 2020 08:31:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="DTN2gq82"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CFbFjllO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2437288AbgDPG4q (ORCPT
+        id S2502213AbgDPIbx (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 16 Apr 2020 02:56:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50896 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S2436660AbgDPG4n (ORCPT
+        Thu, 16 Apr 2020 04:31:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37524 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S2502242AbgDPIbY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 16 Apr 2020 02:56:43 -0400
-Received: from mo6-p00-ob.smtp.rzone.de (mo6-p00-ob.smtp.rzone.de [IPv6:2a01:238:20a:202:5300::3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B077C061A0C
-        for <linux-crypto@vger.kernel.org>; Wed, 15 Apr 2020 23:56:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1587020199;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=eF+Fqq444WDO93t747NuGcGR1MIY3iJaKoZjDeiX99s=;
-        b=DTN2gq82kKEzQRDobOJg1pya4ZLeZ1d31WzBLi4kO4hTSZZmd5VZg+MWFTxuANy1u3
-        dcHuyop0VunAPoJQQpQUPN6cv/q9OieicWS5Gzcp9laBulSb6g6sv0pqYyaKZ5vWIgSw
-        IxvWWg4A3th374hQzjNg+Kh+Jf91tXKXyQgjhA93Tho+qAHC7OlIqmvu1z6yAU660/Yo
-        FC1QvMKVoPkeSfwvYLL7Z2BGnbex2zyvhPX8RHKTKLCAF/oSl+DiSVvIuHG1gc5aAGFe
-        wu37S5Mpn2hh65pY6KATX4CyKA1NeA7pQYtQ1/TO6E/r0VmXFjTMfkVFWH1kxDmGtPc6
-        PH9w==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPZIvSaiyU="
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-        by smtp.strato.de (RZmta 46.4.0 DYNA|AUTH)
-        with ESMTPSA id 404ef0w3G6ud57o
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-        Thu, 16 Apr 2020 08:56:39 +0200 (CEST)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org
-Subject: Re: [PATCH 1/2] crypto: Jitter RNG SP800-90B compliance
-Date:   Thu, 16 Apr 2020 08:56:38 +0200
-Message-ID: <2920846.pNu1SyRcjk@tauon.chronox.de>
-In-Reply-To: <20200416061529.GB19267@gondor.apana.org.au>
-References: <16276478.9hrKPGv45q@positron.chronox.de> <4128830.EzT7ouGoCQ@positron.chronox.de> <20200416061529.GB19267@gondor.apana.org.au>
+        Thu, 16 Apr 2020 04:31:24 -0400
+Received: from mail-wm1-x341.google.com (mail-wm1-x341.google.com [IPv6:2a00:1450:4864:20::341])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 355CAC03C1AB;
+        Thu, 16 Apr 2020 01:31:08 -0700 (PDT)
+Received: by mail-wm1-x341.google.com with SMTP id a81so3813139wmf.5;
+        Thu, 16 Apr 2020 01:31:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=jfrt17q5M4S5SAVVkdakw83Rj5cTfkomq3bpc03Lu9E=;
+        b=CFbFjllOBhKoFmAVsXkBQzBuRQAfDrmhFAfVIGB11rbD3zAjEQppK74PC9fnxFnMrl
+         sp2/EeMkEMZEPkJaKAPezTCzWxvNVCQxytUa+QkC+1t59d7i5I3Ft4/ciYIUyoPgOMmx
+         UiPK1SyxvMiF5/fQuHdgpj6dJ/kxBF7pqlJnwenUbEeoXzoXQDDOkD79QMrnqwADC91X
+         mAbhAkAD8NXfaYxauQUMXrLjqT8CjpZdwFVOxMjLk33tqqc1vixpmPBfeaEJadSe1cYi
+         RAtQlg/x50nnmchxxtr0K+qNEsQkfkEUxgrnt/DkUknFzWr3iZARx7zlhyFNK0Y/EZyB
+         KDIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=jfrt17q5M4S5SAVVkdakw83Rj5cTfkomq3bpc03Lu9E=;
+        b=TMKknxl0MUt8yAzI4Yj7SWsQOBt2760gCbZx3zime8sxteJ7ta+PVKDfFXgC6SSx0A
+         ihRY+rw5SrL7dtp7j7oLMhqDE6ZXQGTRExcXpXdBp/Zp6vh4LMZ4GAO3MgIqyVco8EhV
+         a0RpMrhAU0oQEzQ5pc/HPT4HXsuBP9sJF+tOWc36jQxyw8NRSfAclqG2IP+IskWyGgNk
+         kt+//SgoMkqpo9en2dxKjN35woWRIwRSS3IYx1tMQyYJZ3MzfHch+NYQKWezOCpY53tj
+         KKBFlzdH5Br8j4zTKbXH12h0BZQIMD+b+TMebzZB8UIPvJ1wj+CQX3y7GUxG8FS68gRm
+         JAIw==
+X-Gm-Message-State: AGi0PubsfTdJN36ve3YLYFf9dh7Enk0Sw4z3zitBVPpXHzCYG4+nYyFE
+        cdyFgvrKGj8kYeBdlZgw+4o=
+X-Google-Smtp-Source: APiQypKSKsq45oAa/3mvfDvpWfY2V+jAcrUeSZODmwOpRthGJy4sv8r2h7IKlE30zB7Jtv03++ti6Q==
+X-Received: by 2002:a05:600c:24cf:: with SMTP id 15mr3541839wmu.94.1587025866950;
+        Thu, 16 Apr 2020 01:31:06 -0700 (PDT)
+Received: from Red ([2a01:cb1d:3d5:a100:2e56:dcff:fed2:c6d6])
+        by smtp.googlemail.com with ESMTPSA id a9sm2611917wmm.38.2020.04.16.01.31.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Apr 2020 01:31:06 -0700 (PDT)
+Date:   Thu, 16 Apr 2020 10:31:04 +0200
+From:   Corentin Labbe <clabbe.montjoie@gmail.com>
+To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+Cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Sean Christopherson <sean.j.christopherson@intel.com>,
+        Vitaly Kuznetsov <vkuznets@redhat.com>,
+        Wanpeng Li <wanpengli@tencent.com>,
+        Jim Mattson <jmattson@google.com>,
+        Joerg Roedel <joro@8bytes.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+        x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        Maxime Ripard <mripard@kernel.org>,
+        Chen-Yu Tsai <wens@csie.org>, kvm@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH v2 10/33] docs: fix broken references for ReST files that
+ moved around
+Message-ID: <20200416083104.GA29148@Red>
+References: <cover.1586881715.git.mchehab+huawei@kernel.org>
+ <64773a12b4410aaf3e3be89e3ec7e34de2484eea.1586881715.git.mchehab+huawei@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="iso-8859-1"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <64773a12b4410aaf3e3be89e3ec7e34de2484eea.1586881715.git.mchehab+huawei@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Donnerstag, 16. April 2020, 08:15:29 CEST schrieb Herbert Xu:
+On Tue, Apr 14, 2020 at 06:48:36PM +0200, Mauro Carvalho Chehab wrote:
+> Some broken references happened due to shifting files around
+> and ReST renames. Those can't be auto-fixed by the script,
+> so let's fix them manually.
+> 
+> Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+> ---
+>  Documentation/doc-guide/maintainer-profile.rst      | 2 +-
+>  Documentation/virt/kvm/mmu.rst                      | 2 +-
+>  Documentation/virt/kvm/review-checklist.rst         | 2 +-
+>  arch/x86/kvm/mmu/mmu.c                              | 2 +-
+>  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-cipher.c | 2 +-
+>  drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c   | 2 +-
+>  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-cipher.c | 2 +-
+>  drivers/crypto/allwinner/sun8i-ss/sun8i-ss-core.c   | 2 +-
+>  drivers/media/v4l2-core/v4l2-fwnode.c               | 2 +-
+>  include/uapi/linux/kvm.h                            | 4 ++--
+>  tools/include/uapi/linux/kvm.h                      | 4 ++--
+>  11 files changed, 13 insertions(+), 13 deletions(-)
+> 
 
-Hi Herbert,
+For sun8i-ce
+Acked-by: Corentin Labbe <clabbe.montjoie@gmail.com>
 
-> On Sat, Apr 11, 2020 at 09:35:03PM +0200, Stephan M=FCller wrote:
-> > @@ -142,7 +143,47 @@ static int jent_kcapi_random(struct crypto_rng *tf=
-m,
-> >=20
-> >  	int ret =3D 0;
-> >  =09
-> >  	spin_lock(&rng->jent_lock);
-> >=20
-> > +
-> > +	/* Return a permanent error in case we had too many resets in a row.=
-=20
-*/
-> > +	if (rng->reset_cnt > (1<<10)) {
-> > +		ret =3D -EFAULT;
-> > +		goto out;
-> > +	}
-> > +
-> >=20
-> >  	ret =3D jent_read_entropy(rng->entropy_collector, rdata, dlen);
-> >=20
-> > +
-> > +	/* Reset RNG in case of health failures */
-> > +	if (ret < -1) {
-> > +		pr_warn_ratelimited("Reset Jitter RNG due to health test=20
-failure: %s
-> > failure\n", +				    (ret =3D=3D -2) ? "Repetition=20
-Count Test" :
-> > +						  "Adaptive Proportion Test");
-> > +
-> > +		rng->reset_cnt++;
-> > +
-> > +		ret =3D jent_entropy_init();
-> > +		if (ret) {
-> > +			pr_warn_ratelimited("Jitter RNG self-tests failed:=20
-%d\n",
-> > +					    ret);
-> > +			ret =3D -EFAULT;
-> > +			goto out;
-> > +		}
-> > +		jent_entropy_collector_free(rng->entropy_collector);
-> > +		rng->entropy_collector =3D jent_entropy_collector_alloc(1, 0);
->=20
-> You can't do a GFP_KERNEL allocation inside spin-locks.
-
-Of course, thanks for pointing that out. I will send an update shortly.
-
-Ciao
-Stephan
-
-
+Thanks
