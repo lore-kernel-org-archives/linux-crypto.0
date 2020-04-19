@@ -2,117 +2,126 @@ Return-Path: <SRS0=r6//=6D=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEBA5C38A30
-	for <linux-crypto@archiver.kernel.org>; Sun, 19 Apr 2020 09:52:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45A9EC38A30
+	for <linux-crypto@archiver.kernel.org>; Sun, 19 Apr 2020 11:47:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C403521D82
-	for <linux-crypto@archiver.kernel.org>; Sun, 19 Apr 2020 09:52:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FWRvVsQ1"
+	by mail.kernel.org (Postfix) with ESMTP id 2A820214D8
+	for <linux-crypto@archiver.kernel.org>; Sun, 19 Apr 2020 11:47:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726011AbgDSJwS (ORCPT
+        id S1725845AbgDSLrP (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 19 Apr 2020 05:52:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39592 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725923AbgDSJwR (ORCPT
+        Sun, 19 Apr 2020 07:47:15 -0400
+Received: from smtprelay0226.hostedemail.com ([216.40.44.226]:37892 "EHLO
+        smtprelay.hostedemail.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725841AbgDSLrP (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 19 Apr 2020 05:52:17 -0400
-Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6475C061A0C;
-        Sun, 19 Apr 2020 02:52:17 -0700 (PDT)
-Received: by mail-pg1-x543.google.com with SMTP id o15so2974452pgi.1;
-        Sun, 19 Apr 2020 02:52:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=+11ImWVoVHo1Abgo1KUvhS2FQIppsCfo6UH+T+/qzgs=;
-        b=FWRvVsQ1TN0ioGAeP+byZm1uP2+/Un1uA4Yij5mmCFDmuFOEH5LJ0Un71NJml3z2zS
-         RwqkhA8ucP14SMtr023/NLsNMRFzQOBlGsJXK6RccSIaGF9cuUsUqNGsCwhQCMZDm5kp
-         oPlT8jKmogxlORhe/7Mkirg4kuMV7n0tsmSiMCGWcgXsVxM72lnYMevctrLQ/PlyX4sR
-         NUBOqXht8yFnrc8C6Ng82pnF18qCTS7vFHYkwqDkJT61ZL2v1aYxm/F9hWPl5qOXCZma
-         Ikxgie+/qJyHPvrqviIVO5lfrbMLvejysrt61YFI7IJRsZJMgigQb9zUphubNm3Yw99N
-         ymnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=+11ImWVoVHo1Abgo1KUvhS2FQIppsCfo6UH+T+/qzgs=;
-        b=GHu+z26RdfTdvCM9VeP5bqbdK7jrlVJf+VYEMaQq1Sx+Dm7p61Zp/DGuxXnlb0cK4Z
-         DgZ0h4oMoVRjYWt83Md6HEYMYAaGLR4kvodwmirjrnb52DR4BEcLqFtIuSiHvFZrJ3oz
-         Gx5A5cNG+irKdgDYdfdbSNSMemEQ3pzncBG3J0BZOCFuMXFnya6bqA4ZX97s7fn5RAVv
-         HxCpsTv8giA0kN5VTNFe7I+KrtoO/fegq879WAVwIO+E+yUXPLN17HzSbH/1VkKpAu68
-         kNpdi9JSBrvpM+KiOxd8XvO1eQE3+0Oy59DUQVAAlhOSynXvGbMpmEsdRuU6Yaw/Deyn
-         XOeg==
-X-Gm-Message-State: AGi0PubJhaDQ9gGiZixeTXSFAya8ztzu+fjk+JkFBcnOSgrYNDStjc4d
-        eqxXi1Rn6OkSlvU55eHZn8c=
-X-Google-Smtp-Source: APiQypIV0Hhn3WvBrjTXwFhP/7vuLOvB5fDLVw64BVXPX8cdraufg3tgoyuc1aqBd6agwvtez4MFPg==
-X-Received: by 2002:aa7:8d52:: with SMTP id s18mr9868901pfe.72.1587289937219;
-        Sun, 19 Apr 2020 02:52:17 -0700 (PDT)
-Received: from CentOS76.localdomain.localdomain ([27.59.130.218])
-        by smtp.gmail.com with ESMTPSA id h193sm18745431pfe.30.2020.04.19.02.52.13
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 19 Apr 2020 02:52:16 -0700 (PDT)
-From:   jagdsh.linux@gmail.com
-To:     hadar.gat@arm.com, mpm@selenic.com, herbert@gondor.apana.org.au,
-        arnd@arndb.de, gregkh@linuxfoundation.org
+        Sun, 19 Apr 2020 07:47:15 -0400
+Received: from filter.hostedemail.com (clb03-v110.bra.tucows.net [216.40.38.60])
+        by smtprelay03.hostedemail.com (Postfix) with ESMTP id 8CEFC837F24A;
+        Sun, 19 Apr 2020 11:47:14 +0000 (UTC)
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-HE-Tag: grade37_79489634b3117
+X-Filterd-Recvd-Size: 3450
+Received: from XPS-9350.home (unknown [47.151.136.130])
+        (Authenticated sender: joe@perches.com)
+        by omf13.hostedemail.com (Postfix) with ESMTPA;
+        Sun, 19 Apr 2020 11:47:13 +0000 (UTC)
+Message-ID: <e4a2c1206cc8009f0e0881e2b9ec2e828c5d9e7c.camel@perches.com>
+Subject: Re: [PATCH] crypto: Delete redundant variable definition
+From:   Joe Perches <joe@perches.com>
+To:     Tang Bin <tangbin@cmss.chinamobile.com>, davem@davemloft.net,
+        herbert@gondor.apana.org.au
 Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jagadeesh Pagadala <jagdsh.linux@gmail.com>
-Subject: [PATCH] drivers/char/hw_random/cctrng.c: Compilation fix.
-Date:   Sun, 19 Apr 2020 15:21:18 +0530
-Message-Id: <1587289878-121900-1-git-send-email-jagdsh.linux@gmail.com>
-X-Mailer: git-send-email 1.8.3.1
+        Shengju Zhang <zhangshengju@cmss.chinamobile.com>
+Date:   Sun, 19 Apr 2020 04:44:58 -0700
+In-Reply-To: <20200419071245.3924-1-tangbin@cmss.chinamobile.com>
+References: <20200419071245.3924-1-tangbin@cmss.chinamobile.com>
+Content-Type: text/plain; charset="ISO-8859-1"
+User-Agent: Evolution 3.34.1-2 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Jagadeesh Pagadala <jagdsh.linux@gmail.com>
+On Sun, 2020-04-19 at 15:12 +0800, Tang Bin wrote:
+> The variable "i" is redundant to be assigned a value
+> of zero,because it's assigned in the for loop, so remove
+> redundant one here.
+> 
+> Signed-off-by: Shengju Zhang <zhangshengju@cmss.chinamobile.com>
+> Signed-off-by: Tang Bin <tangbin@cmss.chinamobile.com>
+> 
+> ---
+>  drivers/crypto/bcm/cipher.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
+> index c8b940854..5db23c18c 100644
+> --- a/drivers/crypto/bcm/cipher.c
+> +++ b/drivers/crypto/bcm/cipher.c
+> @@ -4724,7 +4724,6 @@ static int spu_dt_read(struct platform_device *pdev)
+>  	spu->spu_type = matched_spu_type->type;
+>  	spu->spu_subtype = matched_spu_type->subtype;
+>  
+> -	i = 0;
+>  	for (i = 0; (i < MAX_SPUS) && ((spu_ctrl_regs =
+>  		platform_get_resource(pdev, IORESOURCE_MEM, i)) != NULL); i++) {
 
-Adding the needed header <linux/fips.h> to fix following compilation error.
+Maybe the for loop could be simplified too by
+moving the assignment inside the loop.
 
-	CC      drivers/char/hw_random/cctrng.o
-	drivers/char/hw_random/cctrng.c: In function ‘cc_trng_compwork_handler’:
-	drivers/char/hw_random/cctrng.c:334:49: error: ‘fips_enabled’ undeclared (first use in this function)
-	  if (CC_REG_FLD_GET(RNG_ISR, CRNGT_ERR, isr) && fips_enabled) {
-							 ^
-	drivers/char/hw_random/cctrng.c:334:49: note: each undeclared identifier is reported only once for each function it appears in
-	drivers/char/hw_random/cctrng.c:335:3: error: implicit declaration of function ‘fips_fail_notify’ [-Werror=implicit-function-declaration]
-	   fips_fail_notify();
-	   ^
-	cc1: some warnings being treated as errors
-	make[4]: *** [drivers/char/hw_random/cctrng.o] Error 1
+Also, the %pe extension could be used.
 
-Signed-off-by: Jagadeesh Pagadala <jagdsh.linux@gmail.com>
+Perhaps:
 ---
- drivers/char/hw_random/cctrng.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/crypto/bcm/cipher.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/char/hw_random/cctrng.c b/drivers/char/hw_random/cctrng.c
-index bdcd562..3124269 100644
---- a/drivers/char/hw_random/cctrng.c
-+++ b/drivers/char/hw_random/cctrng.c
-@@ -18,6 +18,10 @@
+diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
+index c8b940..7d6afa4 100644
+--- a/drivers/crypto/bcm/cipher.c
++++ b/drivers/crypto/bcm/cipher.c
+@@ -4707,7 +4707,6 @@ static int spu_dt_read(struct platform_device *pdev)
+ {
+ 	struct device *dev = &pdev->dev;
+ 	struct spu_hw *spu = &iproc_priv.spu;
+-	struct resource *spu_ctrl_regs;
+ 	const struct spu_type_subtype *matched_spu_type;
+ 	struct device_node *dn = pdev->dev.of_node;
+ 	int err, i;
+@@ -4724,19 +4723,23 @@ static int spu_dt_read(struct platform_device *pdev)
+ 	spu->spu_type = matched_spu_type->type;
+ 	spu->spu_subtype = matched_spu_type->subtype;
  
- #include "cctrng.h"
- 
-+#ifdef CONFIG_CRYPTO_FIPS
-+#include <linux/fips.h>
-+#endif
+-	i = 0;
+-	for (i = 0; (i < MAX_SPUS) && ((spu_ctrl_regs =
+-		platform_get_resource(pdev, IORESOURCE_MEM, i)) != NULL); i++) {
++	for (i = 0; i < MAX_SPUS; i++) {
++		struct resource *spu_ctrl_regs;
 +
- #define CC_REG_LOW(name)  (name ## _BIT_SHIFT)
- #define CC_REG_HIGH(name) (CC_REG_LOW(name) + name ## _BIT_SIZE - 1)
- #define CC_GENMASK(name)  GENMASK(CC_REG_HIGH(name), CC_REG_LOW(name))
--- 
-1.8.3.1
++		spu_ctrl_regs = platform_get_resource(pdev, IORESOURCE_MEM, i);
++		if (!spu_ctrl_regs)
++			break;
+ 
+ 		spu->reg_vbase[i] = devm_ioremap_resource(dev, spu_ctrl_regs);
+ 		if (IS_ERR(spu->reg_vbase[i])) {
+ 			err = PTR_ERR(spu->reg_vbase[i]);
+-			dev_err(&pdev->dev, "Failed to map registers: %d\n",
+-				err);
++			dev_err(&pdev->dev, "Failed to map registers: %pe\n",
++				spu->reg_vbase[i]);
+ 			spu->reg_vbase[i] = NULL;
+ 			return err;
+ 		}
+ 	}
++
+ 	spu->num_spu = i;
+ 	dev_dbg(dev, "Device has %d SPUs", spu->num_spu);
+ 
 
