@@ -2,116 +2,117 @@ Return-Path: <SRS0=r6//=6D=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C9E2C2BA2B
-	for <linux-crypto@archiver.kernel.org>; Sun, 19 Apr 2020 08:55:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEBA5C38A30
+	for <linux-crypto@archiver.kernel.org>; Sun, 19 Apr 2020 09:52:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2920B214AF
-	for <linux-crypto@archiver.kernel.org>; Sun, 19 Apr 2020 08:55:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1587286514;
-	bh=B7vop3xwaQJ6PIjFyy41WJ6ZY2Cvtqgx45oek7lxwYc=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=vbLM2UOOFScLQSBPXDkv4KCPg3ag/Zpse7uSKS0z+5XBRthVkRBdURgc+OEm1sFXJ
-	 hFR7eDjA4M5IeJF/YUGzp9kBV+ESbjFFYEnRntjZLWnk/GseRqrBoyeh8FO9cyw3CC
-	 S/1+TkXGGmXZK+GLFSaL/UE6oMdLPC7vHzHV65zA=
+	by mail.kernel.org (Postfix) with ESMTP id C403521D82
+	for <linux-crypto@archiver.kernel.org>; Sun, 19 Apr 2020 09:52:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FWRvVsQ1"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725905AbgDSIzM (ORCPT
+        id S1726011AbgDSJwS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 19 Apr 2020 04:55:12 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40226 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725903AbgDSIzM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 19 Apr 2020 04:55:12 -0400
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id D3C0C214AF;
-        Sun, 19 Apr 2020 08:55:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587286511;
-        bh=B7vop3xwaQJ6PIjFyy41WJ6ZY2Cvtqgx45oek7lxwYc=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=IAD5rMFU6M6EG55Jl0GAqkoc1sbbxlbt7uqnKjRgl4VB6FbVyusUt2xjy8crsYFyV
-         YyjXwd79m1ZRSiMDkxIFtfg66929eWiKe6iWafn0MNJW3yBH1lMnFgDEutmux6+Nst
-         zoPf0gBihahJ8Xo4WTjVUNjQscu35xsEx1MDRQUg=
-Received: by mail-io1-f46.google.com with SMTP id f3so7408612ioj.1;
-        Sun, 19 Apr 2020 01:55:11 -0700 (PDT)
-X-Gm-Message-State: AGi0PubJW3tMa6nYE9Fbn/DOLAJvWWqf5NiUI9JyWThszyZdfmfOqn/t
-        p7EfcgIBxsvXXHbnqVmpfRoYu057dNl89qz4wrE=
-X-Google-Smtp-Source: APiQypKcQgkER4Paz90cO5JDq8rFKshjOC7P9sa9VdPg08yX5P11CegPcw2SrKkqWtvC8UcNZPYt6trYdGQIO8cBTiM=
-X-Received: by 2002:a02:969a:: with SMTP id w26mr10554759jai.71.1587286511272;
- Sun, 19 Apr 2020 01:55:11 -0700 (PDT)
+        Sun, 19 Apr 2020 05:52:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39592 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725923AbgDSJwR (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 19 Apr 2020 05:52:17 -0400
+Received: from mail-pg1-x543.google.com (mail-pg1-x543.google.com [IPv6:2607:f8b0:4864:20::543])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6475C061A0C;
+        Sun, 19 Apr 2020 02:52:17 -0700 (PDT)
+Received: by mail-pg1-x543.google.com with SMTP id o15so2974452pgi.1;
+        Sun, 19 Apr 2020 02:52:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=+11ImWVoVHo1Abgo1KUvhS2FQIppsCfo6UH+T+/qzgs=;
+        b=FWRvVsQ1TN0ioGAeP+byZm1uP2+/Un1uA4Yij5mmCFDmuFOEH5LJ0Un71NJml3z2zS
+         RwqkhA8ucP14SMtr023/NLsNMRFzQOBlGsJXK6RccSIaGF9cuUsUqNGsCwhQCMZDm5kp
+         oPlT8jKmogxlORhe/7Mkirg4kuMV7n0tsmSiMCGWcgXsVxM72lnYMevctrLQ/PlyX4sR
+         NUBOqXht8yFnrc8C6Ng82pnF18qCTS7vFHYkwqDkJT61ZL2v1aYxm/F9hWPl5qOXCZma
+         Ikxgie+/qJyHPvrqviIVO5lfrbMLvejysrt61YFI7IJRsZJMgigQb9zUphubNm3Yw99N
+         ymnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=+11ImWVoVHo1Abgo1KUvhS2FQIppsCfo6UH+T+/qzgs=;
+        b=GHu+z26RdfTdvCM9VeP5bqbdK7jrlVJf+VYEMaQq1Sx+Dm7p61Zp/DGuxXnlb0cK4Z
+         DgZ0h4oMoVRjYWt83Md6HEYMYAaGLR4kvodwmirjrnb52DR4BEcLqFtIuSiHvFZrJ3oz
+         Gx5A5cNG+irKdgDYdfdbSNSMemEQ3pzncBG3J0BZOCFuMXFnya6bqA4ZX97s7fn5RAVv
+         HxCpsTv8giA0kN5VTNFe7I+KrtoO/fegq879WAVwIO+E+yUXPLN17HzSbH/1VkKpAu68
+         kNpdi9JSBrvpM+KiOxd8XvO1eQE3+0Oy59DUQVAAlhOSynXvGbMpmEsdRuU6Yaw/Deyn
+         XOeg==
+X-Gm-Message-State: AGi0PubJhaDQ9gGiZixeTXSFAya8ztzu+fjk+JkFBcnOSgrYNDStjc4d
+        eqxXi1Rn6OkSlvU55eHZn8c=
+X-Google-Smtp-Source: APiQypIV0Hhn3WvBrjTXwFhP/7vuLOvB5fDLVw64BVXPX8cdraufg3tgoyuc1aqBd6agwvtez4MFPg==
+X-Received: by 2002:aa7:8d52:: with SMTP id s18mr9868901pfe.72.1587289937219;
+        Sun, 19 Apr 2020 02:52:17 -0700 (PDT)
+Received: from CentOS76.localdomain.localdomain ([27.59.130.218])
+        by smtp.gmail.com with ESMTPSA id h193sm18745431pfe.30.2020.04.19.02.52.13
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 19 Apr 2020 02:52:16 -0700 (PDT)
+From:   jagdsh.linux@gmail.com
+To:     hadar.gat@arm.com, mpm@selenic.com, herbert@gondor.apana.org.au,
+        arnd@arndb.de, gregkh@linuxfoundation.org
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jagadeesh Pagadala <jagdsh.linux@gmail.com>
+Subject: [PATCH] drivers/char/hw_random/cctrng.c: Compilation fix.
+Date:   Sun, 19 Apr 2020 15:21:18 +0530
+Message-Id: <1587289878-121900-1-git-send-email-jagdsh.linux@gmail.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-References: <20200418104343.GA5132@amd> <DB6PR0802MB2533670AFC1473E5C5EDAD28E9D60@DB6PR0802MB2533.eurprd08.prod.outlook.com>
- <VI1PR08MB3584451F0B0B21E00ACF56A7FED70@VI1PR08MB3584.eurprd08.prod.outlook.com>
- <CAOtvUMfNgdYZF5VaqgF-51b0+KtxqgUFD6njXFX7evz1yAJc9A@mail.gmail.com>
-In-Reply-To: <CAOtvUMfNgdYZF5VaqgF-51b0+KtxqgUFD6njXFX7evz1yAJc9A@mail.gmail.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Sun, 19 Apr 2020 10:55:00 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXEGSAD2Kkjg56UhMGgjuLBSOAKJ7ZMHdzfP2szGncu-4Q@mail.gmail.com>
-Message-ID: <CAMj1kXEGSAD2Kkjg56UhMGgjuLBSOAKJ7ZMHdzfP2szGncu-4Q@mail.gmail.com>
-Subject: Re: Fw: Arm CryptoCell driver -- default Y, even on machines where it
- is obviously useless
-To:     Gilad Ben-Yossef <gilad@benyossef.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Hadar Gat <hadar.gat@arm.com>,
-        kernel list <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sun, 19 Apr 2020 at 08:33, Gilad Ben-Yossef <gilad@benyossef.com> wrote:
->
-> > > -----Original Message-----
-> > > From: Pavel Machek <pavel@ucw.cz>
-> > > Sent: Saturday, 18 April 2020 13:44
-> > > To: kernel list <linux-kernel@vger.kernel.org>; Hadar Gat
-> > > <Hadar.Gat@arm.com>; herbert@gondor.apana.org.au
-> > > Subject: Arm CryptoCell driver -- default Y, even on machines where it is
-> > > obviously useless
-> > >
-> > > Hi!
-> > >
-> > > I'm configuring kernel for x86, and I get offered HW_RANDOM_CCTRNG with
-> > > default=Y, and help text suggesting I should enable it.
-> > >
-> > > That's... two wrong suggestions, right?
-> > >
-> > > Best regards,
-> > > Pavel
-> ...
-> > ________________________________________
-> > From: Hadar Gat <Hadar.Gat@arm.com>
-> > Sent: Saturday, April 18, 2020 11:31 PM
-> > To: Pavel Machek; kernel list; herbert@gondor.apana.org.au
-> > Cc: Ofir Drang; Gilad Ben Yossef; nd
-> > Subject: RE: Arm CryptoCell driver -- default Y, even on machines where it is obviously useless
-> >
-> > Hi Pavel,
-> > I think you got it right..
-> > Indeed, Arm CryptoCell CCTRNG driver couldn't be used and obviously useless if the Arm CryptoCell HW does not exist in the system.
->
-> There's a delicate point here though - CryptoCell is an independent
-> hardware block, it is not tied to a particular CPU architecture.
-> There are SoCs with none-Arm architecture CPU using it.
->
-> So I would say whatever the answer is, it should be the same for any
-> generic embedded style HW block.
->
-> And the help text is not architecture specific anyway, is it not..?
->
+From: Jagadeesh Pagadala <jagdsh.linux@gmail.com>
 
-Both the default y and and the help text are indeed incorrect. This
-should be fixed. We don't enable device drivers by default, and
-definitely not as as builtins. A conditional default m could be
-acceptable if the condition is sufficiently narrow.
+Adding the needed header <linux/fips.h> to fix following compilation error.
 
-While at it, could we add a depends on CONFIG_OF since this code is
-definitely unusable on non-DT systems.
+	CC      drivers/char/hw_random/cctrng.o
+	drivers/char/hw_random/cctrng.c: In function ‘cc_trng_compwork_handler’:
+	drivers/char/hw_random/cctrng.c:334:49: error: ‘fips_enabled’ undeclared (first use in this function)
+	  if (CC_REG_FLD_GET(RNG_ISR, CRNGT_ERR, isr) && fips_enabled) {
+							 ^
+	drivers/char/hw_random/cctrng.c:334:49: note: each undeclared identifier is reported only once for each function it appears in
+	drivers/char/hw_random/cctrng.c:335:3: error: implicit declaration of function ‘fips_fail_notify’ [-Werror=implicit-function-declaration]
+	   fips_fail_notify();
+	   ^
+	cc1: some warnings being treated as errors
+	make[4]: *** [drivers/char/hw_random/cctrng.o] Error 1
+
+Signed-off-by: Jagadeesh Pagadala <jagdsh.linux@gmail.com>
+---
+ drivers/char/hw_random/cctrng.c | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/drivers/char/hw_random/cctrng.c b/drivers/char/hw_random/cctrng.c
+index bdcd562..3124269 100644
+--- a/drivers/char/hw_random/cctrng.c
++++ b/drivers/char/hw_random/cctrng.c
+@@ -18,6 +18,10 @@
+ 
+ #include "cctrng.h"
+ 
++#ifdef CONFIG_CRYPTO_FIPS
++#include <linux/fips.h>
++#endif
++
+ #define CC_REG_LOW(name)  (name ## _BIT_SHIFT)
+ #define CC_REG_HIGH(name) (CC_REG_LOW(name) + name ## _BIT_SIZE - 1)
+ #define CC_GENMASK(name)  GENMASK(CC_REG_HIGH(name), CC_REG_LOW(name))
+-- 
+1.8.3.1
+
