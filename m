@@ -1,108 +1,127 @@
-Return-Path: <SRS0=HNf+=6C=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=r6//=6D=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5CCFC38A2C
-	for <linux-crypto@archiver.kernel.org>; Sat, 18 Apr 2020 10:21:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B9EAC2BA2B
+	for <linux-crypto@archiver.kernel.org>; Sun, 19 Apr 2020 06:33:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5599121D7E
-	for <linux-crypto@archiver.kernel.org>; Sat, 18 Apr 2020 10:21:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2503A21473
+	for <linux-crypto@archiver.kernel.org>; Sun, 19 Apr 2020 06:33:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=cs.com header.i=@cs.com header.b="UpPyuQ05"
+	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="qakdRyWA"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725869AbgDRKVx (ORCPT
+        id S1725963AbgDSGdk (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 18 Apr 2020 06:21:53 -0400
-Received: from sonic313-42.consmr.mail.bf2.yahoo.com ([74.6.133.216]:42549
-        "EHLO sonic313-42.consmr.mail.bf2.yahoo.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1725970AbgDRKVw (ORCPT
+        Sun, 19 Apr 2020 02:33:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37520 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725446AbgDSGdj (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 18 Apr 2020 06:21:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cs.com; s=a2048; t=1587205268; bh=CKfzb7eIuNco3koZ7Y2NU7Q5Dcsl/mvu6zCyT2Vk+tM=; h=From:Subject:Date:To:References:From:Subject; b=UpPyuQ050AGg2uJjFvu/615n9NTZxEkIpkgE2moPKl9ocu9+0X3B+SGPeD/rXN8fiMRpGY72Jc9A5NpB07zJ+6D8gBRsGdOYXyarX5gAWKP6gCcDu3ebt4Emzpa6dptrnrvd2D2OVFLgkXpmCt5zitpK5zfJRYwuEZHb/CgT13IdKSBCMfPGvc97qDaLVc7PVseXls/ihNsOiIY4EXSrp/x0zrdTmzul0ykrnS/+5oKS6oDfvTF2bY9e8zVPx3q7bkwuBRJFLHBGr+PIUHza8sz9ykDCGucFLo28kq3sSuF0sFlqSviG6uWu2mdIWRm7XzBXTCaycWXeV0xmApqejg==
-X-YMail-OSG: ZP68mSIVM1nN4FTC2OlGQTD96zW7g9dv3U70mCYQWt1cvgyvZv2SNy3GiGfUDmz
- Z9ln8BK8Kw5MPkPLapjCfWHjkfxhy9C7H2tvHR7CSmkRZy_mHP0KcvuDfkqu2oIVdk404yCZ32rb
- ThcNDSAVWCzuxXgI1nLu56v.5tZLLXFOw.K3ni_SBB9qcR84f1pcRofffh1T9NznHqUer9yQFnhA
- Y3m1bp2Yd_PVIJtQXehu.2___e7mQp2i0hT7VotYSjkhlKdUq4uWgUtwxTG9.5WOEfHiSeJWL9Jj
- uUqZUd9qMRqN_XoSO5zRH871levP51bPdJBQasG.9e405Na8Nli_o0Hd9qp0XsDrGMtC43klx068
- NOSpWH7aA9B7o089ggNC2jj1hIRFx3G0pLWxnCfNRrhY67YZUS6CjEY7u4kmPJ4P3tPj2tz0VZI_
- VxNGxidqMxSdpi4vZ9ajiksqk5q_D0ybIurEys.FUAO4oC_lCdJF9ms8JtRyIsIlDMXkl0MOzF3F
- 8JNGKKbCutUZVqgbY3HyDMY9jGn7aTee8sqrGkJDTeOcHEpJC248qdQeKemd4YNVsdeSHE6UryRV
- N0eh0QuVlc.wY5MkRfazWYGItKEfqM.bvCRXx4.J99u0l61zcwAkfNZ6nZlaMTBSca0Y1Lh4AMGU
- Abgb7oG6gkqYvQtOKt2ezy4V9O.nvzF6QxQsB5szcIHYnZ6d3eoSsAeUDT54He9yYP7NqbdaSNDq
- kl8ERmRiFWPeUjXutJm49cJxNaVHlS3PZycsZC2F.OsMKp1OKMbz9SCEmXyCIsMW3PNxRXa1FGoK
- 9oLOBQvuegBbdh4CxCr2sYvk3ZLKKWdKQR335Ns1pTn9NVQWKmWgjVQXVmK5FnMLDjsiFD6CnZJj
- bYuaCveS0uXyWKCPSvW_rRcPbHvMkdNp52uvbdnjVUnteSkgSJsszNbyU6BQoXi2EqjK5yoeZFKN
- ITjHTBAG6dsEY0_sXbIjNCf6T9nRNPlFPT2MyfzoSmE4XIxtqXNbV76Wgo4BAzd841aaHiloGu8P
- 7_0HdDgK4NNerQUwzcIfZhphCSvlQOTNrbacbehV6Q4j0USO84QG8SXr.AQr2pplBeQYt3Pm6KiU
- 5Fxrfnz_xWUL8pImReqip6OoMi90wPf7Zvpw5JfTn8gIYAmlkWI6zmn6CecCS5m_Aov1mQCVRw6g
- zmmaZuoQRUesdk7lB3PrnKP0dnvLKRDZxDpvcB88eTiwzUBPqqB3ikEb3lSuDuhZY0yDAkC174xL
- i2XORBHACfNj4gGsPOg2zqB43jBRJS.UJnNenvaBsXnECTLGsO1LzLKwjXUCrFSOC4j40sdBTCYi
- z_a0DGvXhJJeraSUF0IXu_F_3Yeq8heDAOKb8IrWBsGDsKB_zZHNKQFzyifiID9jXVxqb87MgtW0
- UStsqpTqzkCuD
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic313.consmr.mail.bf2.yahoo.com with HTTP; Sat, 18 Apr 2020 10:21:08 +0000
-Received: by smtp428.mail.sg3.yahoo.com (VZM Hermes SMTP Server) with ESMTPA ID 1947ab8000c7ff7a9349a49dabf40a9d;
-          Sat, 18 Apr 2020 10:19:06 +0000 (UTC)
-From:   R W van Schagen <vschagen@cs.com>
-Content-Type: text/plain;
-        charset=utf-8
+        Sun, 19 Apr 2020 02:33:39 -0400
+Received: from mail-vs1-xe44.google.com (mail-vs1-xe44.google.com [IPv6:2607:f8b0:4864:20::e44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42D68C061A0C
+        for <linux-crypto@vger.kernel.org>; Sat, 18 Apr 2020 23:33:39 -0700 (PDT)
+Received: by mail-vs1-xe44.google.com with SMTP id l25so1196853vso.6
+        for <linux-crypto@vger.kernel.org>; Sat, 18 Apr 2020 23:33:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=olj6unh6IYZuJdIs2F04EMuJOg0rJtmlozehjb/ljo4=;
+        b=qakdRyWAosXa2M8Dnt6NrNgssX4Mv+jtWt0D3fs/rm0IIjaMrkMu8DOW94Vlyc4EXs
+         HBbOWXb/ouVdhHAY97dK9AYHONKklSbOZapIi7CqYxYlHdgmanPnZ8BmJrZhJqyq9JM1
+         laESH5scPswVS2ZJDptWwCJeAGCOjh0MnIbEaQIfpPWMFHBBtKSl2A0rcyTUZ6aDMTs1
+         J+CjhOizqYKJgnCjnbHv/Fj38pHQSyuqxW9HhK/G7KTT5qZe8MiMf9XE/m6uzsHRViLQ
+         s99hIvNmf69mF4Mt7Ikj5WHLYFUmrIO3KUZfs1e1aaYw2NYINJ5F5oDP1sE6enQU60/e
+         zfQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=olj6unh6IYZuJdIs2F04EMuJOg0rJtmlozehjb/ljo4=;
+        b=ZKJ2c9ykz9VKf/PzRrYHPwTj0Hsr8hoi7IW/qXzehZkGc/AkncAauT1i0E3EuzoUKX
+         lHqPxRsGStz9jR2JqlV88bS464LxA8a2rIn4r+wCyXiS+EpsNvjZUPoTzIH6NXK/hvvi
+         afR6BN8pFPCJ+wbxCW+t7Qz5/p37ftDhN8fsR5rTH1qlkYvr/SgH8IGCUh4Xnewfqhv3
+         LnHRkKtzA7l172/xsD/lqhmNrrqrAJt9JxehN3TV03Blvyz6bdnCINjxBs1PJE65k7eV
+         553+/34KvurDu2oLwt3E1wfbFTowafJIPQchwS/RlslTWcJr8DYXaEt1sskboiq45x2H
+         Vx5A==
+X-Gm-Message-State: AGi0PuYM/IxpCQhRaSXyd7/pERllyuv3RQOl+hvt20q0n4DnlrPPbxGv
+        989jBfs8qy0m6SbOPaxBRclW0BHc/QHImWsPde/GIQ==
+X-Google-Smtp-Source: APiQypLLd9TBFMBrw30qYiOJQAHyqzFTi2q/XtAiUO90be53KPVwHYQ8gR58pUThHEtu56HBCMW5SjgyVyLbABMpJgM=
+X-Received: by 2002:a67:ebd6:: with SMTP id y22mr184815vso.193.1587278018514;
+ Sat, 18 Apr 2020 23:33:38 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200418104343.GA5132@amd> <DB6PR0802MB2533670AFC1473E5C5EDAD28E9D60@DB6PR0802MB2533.eurprd08.prod.outlook.com>
+ <VI1PR08MB3584451F0B0B21E00ACF56A7FED70@VI1PR08MB3584.eurprd08.prod.outlook.com>
+In-Reply-To: <VI1PR08MB3584451F0B0B21E00ACF56A7FED70@VI1PR08MB3584.eurprd08.prod.outlook.com>
+From:   Gilad Ben-Yossef <gilad@benyossef.com>
+Date:   Sun, 19 Apr 2020 09:33:26 +0300
+Message-ID: <CAOtvUMfNgdYZF5VaqgF-51b0+KtxqgUFD6njXFX7evz1yAJc9A@mail.gmail.com>
+Subject: Re: Fw: Arm CryptoCell driver -- default Y, even on machines where it
+ is obviously useless
+To:     Gilad Ben Yossef <Gilad.BenYossef@arm.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Hadar Gat <hadar.gat@arm.com>
+Cc:     kernel list <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Mime-Version: 1.0 (Mac OS X Mail 13.4 \(3608.80.23.2.2\))
-Subject: Question: IPSEC ping fails with new crypto driver how to debug?
-Message-Id: <BF4F5F95-4D34-48F4-9CD7-242D858806DC@cs.com>
-Date:   Sat, 18 Apr 2020 18:19:04 +0800
-To:     linux-crypto@vger.kernel.org
-X-Mailer: Apple Mail (2.3608.80.23.2.2)
-References: <BF4F5F95-4D34-48F4-9CD7-242D858806DC.ref@cs.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-My crypto driver (under development) is passing all the extended test =
-manager test (I=E2=80=99m on Kernel v5.4.31).
+> > -----Original Message-----
+> > From: Pavel Machek <pavel@ucw.cz>
+> > Sent: Saturday, 18 April 2020 13:44
+> > To: kernel list <linux-kernel@vger.kernel.org>; Hadar Gat
+> > <Hadar.Gat@arm.com>; herbert@gondor.apana.org.au
+> > Subject: Arm CryptoCell driver -- default Y, even on machines where it =
+is
+> > obviously useless
+> >
+> > Hi!
+> >
+> > I'm configuring kernel for x86, and I get offered HW_RANDOM_CCTRNG with
+> > default=3DY, and help text suggesting I should enable it.
+> >
+> > That's... two wrong suggestions, right?
+> >
+> > Best regards,
+> > Pavel
+...
+> ________________________________________
+> From: Hadar Gat <Hadar.Gat@arm.com>
+> Sent: Saturday, April 18, 2020 11:31 PM
+> To: Pavel Machek; kernel list; herbert@gondor.apana.org.au
+> Cc: Ofir Drang; Gilad Ben Yossef; nd
+> Subject: RE: Arm CryptoCell driver -- default Y, even on machines where i=
+t is obviously useless
+>
+> Hi Pavel,
+> I think you got it right..
+> Indeed, Arm CryptoCell CCTRNG driver couldn't be used and obviously usele=
+ss if the Arm CryptoCell HW does not exist in the system.
 
-For debugging purposes I can either only register =E2=80=9Ccbc(aes)=E2=80=9D=
- or the full =E2=80=9Cauthenc(hmac(256), cbc(aes))=E2=80=9D.
+There's a delicate point here though - CryptoCell is an independent
+hardware block, it is not tied to a particular CPU architecture.
+There are SoCs with none-Arm architecture CPU using it.
 
-For testing purposes I am only using two simple =E2=80=9Cip xfrm =
-state=E2=80=9D and =E2=80=9Cip xfrm policy=E2=80=9D plus additional =
-=E2=80=9Cip route=E2=80=9D.
-Without my driver the tunnel works as expected using the generic in-tree =
-software modules.
+So I would say whatever the answer is, it should be the same for any
+generic embedded style HW block.
 
-Whit the driver installed before setting up the tunnel the self-tests =
-are run. (No test for =E2=80=9Cechainiv(authenc=E2=80=A6=E2=80=9D)
-So incase I am only using the =E2=80=9Ccbc(aes)=E2=80=9D the =
-authenc(hham(sha256-generic), eip-cbc-aes) is created and tested (pass). =
-The echainiv(authenc=E2=80=A6) is also created.
+And the help text is not architecture specific anyway, is it not..?
 
-Even though all the extended tests were successful I can=E2=80=99t ping =
-from my device.
+Gilad
 
-I=E2=80=99m getting =E2=80=9Cping: send to: Out of memory=E2=80=9D.=20
 
-Pinging to the device works as expected. However: if I=E2=80=99m adding =
-a =E2=80=9Csize=E2=80=9D to the ping, it starts works:
 
-=E2=80=9Cping 10.0.0.2 -s1411=E2=80=9D works without any problem. =
-Anything less than 1411 fails =E2=80=9Cout of memory=E2=80=9D??
+--=20
+Gilad Ben-Yossef
+Chief Coffee Drinker
 
-I did hex_dumps of the source and destination scatterlists and well as =
-the IV, authentication TAG. They look the same for both and =E2=80=9Cinbou=
-nd - ping=E2=80=9D and an =E2=80=9Coutbound - ping=E2=80=9D, with the =
-exception that the encrypt/decrypt calls are reversed (obviously). This =
-also shows that the tunnel works otherwise I would get anything into the =
-driver.
-=E2=80=9Cip -s x s=E2=80=9D also confirms that packets are being send =
-and received.
-
-Again all else the same, except the driver not loaded, it works, so =
-firewall or routing problems can be eliminated.
-
-Any suggestions where to start looking for the =E2=80=9Cbug=E2=80=9D in =
-my driver?=
+values of =CE=B2 will give rise to dom!
