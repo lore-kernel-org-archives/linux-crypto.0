@@ -2,153 +2,193 @@ Return-Path: <SRS0=EVKT=6F=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F440C54FD0
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 16:27:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C3C0C54FC9
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 16:37:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 39AA8206E9
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 16:27:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0EC84206E9
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 16:37:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="TDWQTy1B"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726067AbgDUQ1K (ORCPT
+        id S1725963AbgDUQhN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Apr 2020 12:27:10 -0400
-Received: from mail-ot1-f67.google.com ([209.85.210.67]:42559 "EHLO
-        mail-ot1-f67.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725870AbgDUQ1J (ORCPT
+        Tue, 21 Apr 2020 12:37:13 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:42024 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725930AbgDUQhM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Apr 2020 12:27:09 -0400
-Received: by mail-ot1-f67.google.com with SMTP id m18so11642105otq.9;
-        Tue, 21 Apr 2020 09:27:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=z1ojXwNxr6fCrXSGTkvpXUDrRNbvPdHnN0pbWQDg8tI=;
-        b=Aa2d1pVkGDl9x3TnUJag2Vo6eoTDZoKpgQdpL0awnF7isiOL4vfLBAPNP54pvctNNT
-         3mO92ONefT+13qV2DyUcOGC0zQeO1KILzmtJotApa2aywxAjfOac20Bd8A6mrkSN8arp
-         3kch/yf9+JqGc7W8MafPXh+xZnY54ajTCcvTZa7H4VRDByJHJrw/3E7BStEKo3+flQ72
-         JLLrNoN587VACLbkeoC3UU0GTWLZwIsZt2XHUbkxpqaLXHZpInuyC9lBSVgmvLRYvwW1
-         xXY3VzhtgWpqw0F3UMtkssylhtX6P1c10B1RCAuBeXwRvJeA8mYnKRhPE0uRjY3wsZLq
-         srcw==
-X-Gm-Message-State: AGi0Pua/uV7hpIimDHxOjhgEobdQubTloaZW3fFnjJ0o+Ias1ED1WRWb
-        KNblCRk8q2L71lvfvIulg/0trV9ZES3cqYGIDsg=
-X-Google-Smtp-Source: APiQypIgjJPykdfEevGKb/2cffNOv+ps81j/7PYsnO1VUUkclaMSWdBbtbbqnNQUgCd31g2SXhEjkUxwnK7jaBN7I8o=
-X-Received: by 2002:a05:6830:3104:: with SMTP id b4mr10595518ots.250.1587486427362;
- Tue, 21 Apr 2020 09:27:07 -0700 (PDT)
+        Tue, 21 Apr 2020 12:37:12 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03LGYLjh065604;
+        Tue, 21 Apr 2020 16:37:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2020-01-29; bh=sKlZEENumxidy8zW0gTcKPlHQj/gVbQX4p/wtrhNzKM=;
+ b=TDWQTy1BSNU5OzuTPNDh3xuaHFDSwrCafaM8HhwNOqHMe0GD7zQ/IMT7h1dr232yO0zP
+ R/jnTKrRUcv43uvf97yd82N2uAd2kHad9XZWhp+U28Nj3fD1CP3mAFv4TjIa1UUFAyJE
+ 7fMiODhz7G4r7zs/7c57XXfffTKLmANlrHpR2Yag5x5IRW2hVld4YstPHUTpjkSOsIWD
+ nPPjzKwrK14UEkzsp7w2yEm5CAqeRoa2Fva2kFddzMjObUCgGkFvfrDYg5vOle79643e
+ rFOlwe2SUHMaWO/TDF9bZCDMqGWI78GcI2xwD/6Tv9I7ivOsqJlCgv8ynaPCzBlCo6nx mQ== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2130.oracle.com with ESMTP id 30grpgjhtq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 21 Apr 2020 16:37:04 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03LGWFW2031201;
+        Tue, 21 Apr 2020 16:35:04 GMT
+Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
+        by userp3030.oracle.com with ESMTP id 30gb1gfevs-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 21 Apr 2020 16:35:04 +0000
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 03LGZ1tI024746;
+        Tue, 21 Apr 2020 16:35:01 GMT
+Received: from localhost.localdomain (/98.229.125.203)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 21 Apr 2020 09:35:00 -0700
+From:   Daniel Jordan <daniel.m.jordan@oracle.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Steffen Klassert <steffen.klassert@secunet.com>
+Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        stable@vger.kernel.org
+Subject: [PATCH] padata: add separate cpuhp node for CPUHP_PADATA_DEAD
+Date:   Tue, 21 Apr 2020 12:34:55 -0400
+Message-Id: <20200421163455.2177998-1-daniel.m.jordan@oracle.com>
+X-Mailer: git-send-email 2.26.0
 MIME-Version: 1.0
-References: <1585289423-18440-1-git-send-email-hadar.gat@arm.com>
- <1585289423-18440-3-git-send-email-hadar.gat@arm.com> <CAMuHMdV6Uce79MPs7jfJfX3WOqAMH22vf2V_=Ui0zLHYqsJ+Xg@mail.gmail.com>
- <DB6PR0802MB25338BD19DD2F7E662BB1065E9D50@DB6PR0802MB2533.eurprd08.prod.outlook.com>
- <CAMuHMdWujabV8dr=EojXFBVD0TcUuZ2kCGjjo93u=PE-AmzVHA@mail.gmail.com> <DB6PR0802MB2533347A35A466B99ADD4D23E9D50@DB6PR0802MB2533.eurprd08.prod.outlook.com>
-In-Reply-To: <DB6PR0802MB2533347A35A466B99ADD4D23E9D50@DB6PR0802MB2533.eurprd08.prod.outlook.com>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Tue, 21 Apr 2020 18:26:56 +0200
-Message-ID: <CAMuHMdVGwLQxDj9dtF02L3P5MxBCZAiJ1_4OyK3Yomn9y-nPzQ@mail.gmail.com>
-Subject: Re: [PATCH v7 2/3] hw_random: cctrng: introduce Arm CryptoCell driver
-To:     Hadar Gat <Hadar.Gat@arm.com>
-Cc:     Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Rob Herring <robh+dt@kernel.org>,
-        Mark Rutland <Mark.Rutland@arm.com>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Krzysztof Kozlowski <krzk@kernel.org>,
-        Florian Fainelli <f.fainelli@gmail.com>,
-        Alexander Sverdlin <alexander.sverdlin@nokia.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Tomer Maimon <tmaimon77@gmail.com>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Zaibo Xu <xuzaibo@huawei.com>,
-        Daniel Thompson <daniel.thompson@linaro.org>,
-        Mauro Carvalho Chehab <mchehab+samsung@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
-        <devicetree@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Ofir Drang <Ofir.Drang@arm.com>, nd <nd@arm.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9598 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 suspectscore=2 spamscore=0
+ mlxlogscore=999 mlxscore=0 malwarescore=0 bulkscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004210127
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9598 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 mlxscore=0
+ lowpriorityscore=0 adultscore=0 suspectscore=2 bulkscore=0 clxscore=1011
+ malwarescore=0 phishscore=0 spamscore=0 priorityscore=1501 impostorscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2004210127
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi Hadar,
+Removing the pcrypt module triggers this:
 
-On Tue, Apr 21, 2020 at 5:13 PM Hadar Gat <Hadar.Gat@arm.com> wrote:
-> > From: Geert Uytterhoeven <geert@linux-m68k.org>
-> > On Tue, Apr 21, 2020 at 3:16 PM Hadar Gat <Hadar.Gat@arm.com> wrote:
-> > > > From: Geert Uytterhoeven <geert@linux-m68k.org>
-> > > > Sent: Monday, 20 April 2020 16:45
-> > > > On Fri, Mar 27, 2020 at 7:11 AM Hadar Gat <hadar.gat@arm.com> wrote:
-> > > > > Introduce low level Arm CryptoCell TRNG HW support.
-> > > > > --- /dev/null
-> > > > > +++ b/drivers/char/hw_random/cctrng.c
-> > > >
-> > > > > +static int cctrng_probe(struct platform_device *pdev) {
+  general protection fault, probably for non-canonical
+    address 0xdead000000000122
+  CPU: 5 PID: 264 Comm: modprobe Not tainted 5.6.0+ #2
+  Hardware name: QEMU Standard PC
+  RIP: 0010:__cpuhp_state_remove_instance+0xcc/0x120
+  Call Trace:
+   padata_sysfs_release+0x74/0xce
+   kobject_put+0x81/0xd0
+   padata_free+0x12/0x20
+   pcrypt_exit+0x43/0x8ee [pcrypt]
 
-> > > > > +       /* register the driver isr function */
-> > > > > +       rc = devm_request_irq(dev, irq, cc_isr, IRQF_SHARED,
-> > > > > + "cctrng", drvdata);
-> > > >
-> > > > Shoudn't this be done after clearing the pending interrupts below?
-> > >
-> > > I'm not sure what do you mean in your question...
-> > > I assume you're suggesting that the registration of the driver ISR function
-> > should be done only after clearing the pending interrupts?!
-> >
-> > Indeed.
-> >
-> > > Anyway, any pending interrupt that might exist is irrelevant to the
-> > > current cctrng driver which just started (we're in the probe function)
-> >
-> > If there is a pending interrupt, your interrupt handler (which returns
-> > IRQ_NONE in this case) will be called repeatedly, until the driver gets to
-> > clearing the pending interrupts below, or until the interrupt core decides to
-> > give up, and disable it for good.
->
-> Ok, I get your point now.
-> But note that when the cctrng HW boots, the default is that all interrupts are masked, hence the interrupt handler will not be called.
+padata instances wrongly use the same hlist node for the online and dead
+states, so __padata_free()'s second cpuhp remove call chokes on the node
+that the first poisoned.
 
-Is that also the case when booting into a new kernel using kexec?
+cpuhp multi-instance callbacks only walk forward in cpuhp_step->list and
+the same node is linked in both the online and dead lists, so the list
+corruption that results from padata_alloc() adding the node to a second
+list without removing it from the first doesn't cause problems as long
+as no instances are freed.
 
-> The unmask of the RNG interrupts is done afterwards and only then ISR may potentially be called.
+Avoid the issue by giving each state its own node.
 
-> > > > > +       if (rc) {
-> > > > > +               dev_err(dev, "Could not register to interrupt %d\n", irq);
-> > > > > +               goto post_clk_err;
-> > > > > +       }
-> > > > > +       dev_dbg(dev, "Registered to IRQ: %d\n", irq);
-> > > > > +
-> > > > > +       /* Clear all pending interrupts */
-> > > > > +       val = cc_ioread(drvdata, CC_HOST_RGF_IRR_REG_OFFSET);
-> > > > > +       dev_dbg(dev, "IRR=0x%08X\n", val);
-> > > > > +       cc_iowrite(drvdata, CC_HOST_RGF_ICR_REG_OFFSET, val);
-> > > >
-> > > > The above accesses the engine's registers...
-> > >
-> > > That is right.
-> > >
-> > > > > +
-> > > > > +       /* unmask HOST RNG interrupt */
-> > > > > +       cc_iowrite(drvdata, CC_HOST_RGF_IMR_REG_OFFSET,
-> > > > > +                  cc_ioread(drvdata, CC_HOST_RGF_IMR_REG_OFFSET) &
-> > > > > +                  ~CC_HOST_RNG_IRQ_MASK);
->
-> The above unmask the RNG interrupt.
+Fixes: 894c9ef9780c ("padata: validate cpumask without removed CPU during offline")
+Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: stable@vger.kernel.org # v5.4+
+---
+ include/linux/padata.h |  6 ++++--
+ kernel/padata.c        | 14 ++++++++------
+ 2 files changed, 12 insertions(+), 8 deletions(-)
 
-Gr{oetje,eeting}s,
+diff --git a/include/linux/padata.h b/include/linux/padata.h
+index a0d8b41850b2..693cae9bfe66 100644
+--- a/include/linux/padata.h
++++ b/include/linux/padata.h
+@@ -139,7 +139,8 @@ struct padata_shell {
+ /**
+  * struct padata_instance - The overall control structure.
+  *
+- * @node: Used by CPU hotplug.
++ * @cpu_online_node: Linkage for CPU online callback.
++ * @cpu_dead_node: Linkage for CPU offline callback.
+  * @parallel_wq: The workqueue used for parallel work.
+  * @serial_wq: The workqueue used for serial work.
+  * @pslist: List of padata_shell objects attached to this instance.
+@@ -150,7 +151,8 @@ struct padata_shell {
+  * @flags: padata flags.
+  */
+ struct padata_instance {
+-	struct hlist_node		 node;
++	struct hlist_node		cpu_online_node;
++	struct hlist_node		cpu_dead_node;
+ 	struct workqueue_struct		*parallel_wq;
+ 	struct workqueue_struct		*serial_wq;
+ 	struct list_head		pslist;
+diff --git a/kernel/padata.c b/kernel/padata.c
+index a6afa12fb75e..aae789896616 100644
+--- a/kernel/padata.c
++++ b/kernel/padata.c
+@@ -703,7 +703,7 @@ static int padata_cpu_online(unsigned int cpu, struct hlist_node *node)
+ 	struct padata_instance *pinst;
+ 	int ret;
+ 
+-	pinst = hlist_entry_safe(node, struct padata_instance, node);
++	pinst = hlist_entry_safe(node, struct padata_instance, cpu_online_node);
+ 	if (!pinst_has_cpu(pinst, cpu))
+ 		return 0;
+ 
+@@ -718,7 +718,7 @@ static int padata_cpu_dead(unsigned int cpu, struct hlist_node *node)
+ 	struct padata_instance *pinst;
+ 	int ret;
+ 
+-	pinst = hlist_entry_safe(node, struct padata_instance, node);
++	pinst = hlist_entry_safe(node, struct padata_instance, cpu_dead_node);
+ 	if (!pinst_has_cpu(pinst, cpu))
+ 		return 0;
+ 
+@@ -734,8 +734,9 @@ static enum cpuhp_state hp_online;
+ static void __padata_free(struct padata_instance *pinst)
+ {
+ #ifdef CONFIG_HOTPLUG_CPU
+-	cpuhp_state_remove_instance_nocalls(CPUHP_PADATA_DEAD, &pinst->node);
+-	cpuhp_state_remove_instance_nocalls(hp_online, &pinst->node);
++	cpuhp_state_remove_instance_nocalls(CPUHP_PADATA_DEAD,
++					    &pinst->cpu_dead_node);
++	cpuhp_state_remove_instance_nocalls(hp_online, &pinst->cpu_online_node);
+ #endif
+ 
+ 	WARN_ON(!list_empty(&pinst->pslist));
+@@ -939,9 +940,10 @@ static struct padata_instance *padata_alloc(const char *name,
+ 	mutex_init(&pinst->lock);
+ 
+ #ifdef CONFIG_HOTPLUG_CPU
+-	cpuhp_state_add_instance_nocalls_cpuslocked(hp_online, &pinst->node);
++	cpuhp_state_add_instance_nocalls_cpuslocked(hp_online,
++						    &pinst->cpu_online_node);
+ 	cpuhp_state_add_instance_nocalls_cpuslocked(CPUHP_PADATA_DEAD,
+-						    &pinst->node);
++						    &pinst->cpu_dead_node);
+ #endif
+ 
+ 	put_online_cpus();
 
-                        Geert
-
+base-commit: ae83d0b416db002fe95601e7f97f64b59514d936
 -- 
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+2.26.0
 
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
