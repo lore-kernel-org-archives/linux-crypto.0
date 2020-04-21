@@ -2,167 +2,89 @@ Return-Path: <SRS0=EVKT=6F=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0
+	tests=HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C1F0C2BA19
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 05:12:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5E57C54FC9
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 05:42:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 049E921D79
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 05:12:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="rd86yj9C"
+	by mail.kernel.org (Postfix) with ESMTP id A21562084D
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 05:42:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725902AbgDUFMr (ORCPT
+        id S1725881AbgDUFme (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Apr 2020 01:12:47 -0400
-Received: from ozlabs.org ([203.11.71.1]:54217 "EHLO ozlabs.org"
+        Tue, 21 Apr 2020 01:42:34 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:48748 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725795AbgDUFMr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Apr 2020 01:12:47 -0400
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mail.ozlabs.org (Postfix) with ESMTPSA id 495sBz2ljkz9sP7;
-        Tue, 21 Apr 2020 15:12:43 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
-        s=201702; t=1587445964;
-        bh=kRYwJ8+v3TDEL7Vf+kKyDQ72TRLTgSM6bWAyzSYbWWM=;
-        h=Date:From:To:Cc:Subject:From;
-        b=rd86yj9Co/DZxjkRu7cx1Y3kiPL9W0qnry1rD2m6G3SGX/Ujw/Nr999jKv4VS5iqp
-         o9F981Ymv2LgHcASgnX6pBTH+LsPC4HY41qSoF/rCmxnllhtKFYrSiamTv+tAasNxx
-         tiAEIR7yKNqZ1zAaKMUWdTCGADljAnlQsxWSAtCESwm03X6isBXH/b4/mE+f7W4kwa
-         b4ccBTUT1xcRv3sRGllAKYuNb1GBS2FxGaP2h+XNTafkr1GZTtBlTY+wA70cmFJSn9
-         xbq9EBsS4vHkESQoJ60Gn64Sw1BfT05+sX5nXcjuyI/DwnLt9bnekTJ2Mi+lAJ3qj4
-         32fvfeCSFdTGQ==
-Date:   Tue, 21 Apr 2020 15:12:40 +1000
-From:   Stephen Rothwell <sfr@canb.auug.org.au>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto List <linux-crypto@vger.kernel.org>
-Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Shukun Tan <tanshukun1@huawei.com>,
-        Zhou Wang <wangzhou1@hisilicon.com>,
-        Zaibo Xu <xuzaibo@huawei.com>
-Subject: linux-next: build failure after merge of the crypto tree
-Message-ID: <20200421151240.4dfc679a@canb.auug.org.au>
+        id S1725385AbgDUFme (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 21 Apr 2020 01:42:34 -0400
+Received: from gwarestrin.me.apana.org.au ([192.168.0.7] helo=gwarestrin.arnor.me.apana.org.au)
+        by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
+        id 1jQlfd-0001gy-FQ; Tue, 21 Apr 2020 15:42:10 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 21 Apr 2020 15:42:09 +1000
+Date:   Tue, 21 Apr 2020 15:42:09 +1000
+From:   Herbert Xu <herbert@gondor.apana.org.au>
+To:     kbuild test robot <lkp@intel.com>
+Cc:     Hadar Gat <hadar.gat@arm.com>, kbuild-all@lists.01.org,
+        linux-crypto@vger.kernel.org
+Subject: hwrng: cctrng - Add dependency on HAS_IOMEM
+Message-ID: <20200421054209.GB30356@gondor.apana.org.au>
+References: <202004202145.t2vRqPRr%lkp@intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/=Pp9gtCv0MP_l1TJCgowVDE";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202004202145.t2vRqPRr%lkp@intel.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
---Sig_/=Pp9gtCv0MP_l1TJCgowVDE
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On Mon, Apr 20, 2020 at 09:56:47PM +0800, kbuild test robot wrote:
+> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
+> head:   3357b61177a7f34267256098b29a7f4992af40f3
+> commit: a583ed310bb6b514e717c11a30b5a7bc3a65d1b1 [7/26] hwrng: cctrng - introduce Arm CryptoCell driver
+> config: um-kunit_defconfig (attached as .config)
+> compiler: gcc-7 (Ubuntu 7.5.0-6ubuntu2) 7.5.0
+> reproduce:
+>         git checkout a583ed310bb6b514e717c11a30b5a7bc3a65d1b1
+>         # save the attached .config to linux build tree
+>         make ARCH=um 
+> 
+> If you fix the issue, kindly add following tag as appropriate
+> Reported-by: kbuild test robot <lkp@intel.com>
+> 
+> All errors (new ones prefixed by >>):
+> 
+>    /usr/bin/ld: drivers/char/hw_random/cctrng.o: in function `cctrng_probe':
+> >> cctrng.c:(.text+0x36f): undefined reference to `devm_ioremap_resource'
+>    collect2: error: ld returned 1 exit status
 
-Hi all,
+This should fix the problem:
 
-After merging the crypto tree, today's linux-next build (powerpc
-allyesconfig) failed like this:
+---8<---
+The cctrng doesn't compile without HAS_IOMEM so we should depend
+on it.
 
-WARNING: unmet direct dependencies detected for CRYPTO_DEV_HISI_QM
-  Depends on [n]: CRYPTO [=3Dy] && CRYPTO_HW [=3Dy] && (ARM64 || COMPILE_TE=
-ST [=3Dy]) && PCI [=3Dy] && PCI_MSI [=3Dy] && (UACCE [=3Dy] || UACCE [=3Dy]=
-=3Dn) && ACPI
-  Selected by [y]:
-  - CRYPTO_DEV_HISI_SEC2 [=3Dy] && CRYPTO [=3Dy] && CRYPTO_HW [=3Dy] && PCI=
- [=3Dy] && PCI_MSI [=3Dy] && (UACCE [=3Dy] || UACCE [=3Dy]=3Dn) && (ARM64 |=
-| COMPILE_TEST [=3Dy] && 64BIT [=3Dy])
-  - CRYPTO_DEV_HISI_ZIP [=3Dy] && CRYPTO [=3Dy] && CRYPTO_HW [=3Dy] && PCI =
-[=3Dy] && PCI_MSI [=3Dy] && (ARM64 || COMPILE_TEST [=3Dy] && 64BIT [=3Dy]) =
-&& (!CPU_BIG_ENDIAN [=3Dy] || COMPILE_TEST [=3Dy]) && (UACCE [=3Dy] || UACC=
-E [=3Dy]=3Dn)
-  - CRYPTO_DEV_HISI_HPRE [=3Dy] && CRYPTO [=3Dy] && CRYPTO_HW [=3Dy] && PCI=
- [=3Dy] && PCI_MSI [=3Dy] && (UACCE [=3Dy] || UACCE [=3Dy]=3Dn) && (ARM64 |=
-| COMPILE_TEST [=3Dy] && 64BIT [=3Dy])
+Reported-by: kbuild test robot <lkp@intel.com>
+Fixes: a583ed310bb6 ("hwrng: cctrng - introduce Arm CryptoCell driver")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
 
-drivers/crypto/hisilicon/qm.c: In function 'qm_soft_reset':
-drivers/crypto/hisilicon/qm.c:2915:7: error: implicit declaration of functi=
-on 'acpi_evaluate_integer'; did you mean 'acpi_evaluate_object'? [-Werror=
-=3Dimplicit-function-declaration]
- 2915 |   s =3D acpi_evaluate_integer(ACPI_HANDLE(&pdev->dev),
-      |       ^~~~~~~~~~~~~~~~~~~~~
-      |       acpi_evaluate_object
-
-Caused by commit
-
-  6c6dd5802c2d ("crypto: hisilicon/qm - add controller reset interface")
-
-Unfortunately not fixed by commit
-
-  f88480e300ac ("crypto: hisilicon/qm - fix build failure with ACPI off")
-
-[the moral is "don't select symbols that have dependencies" :-( ]
-
-I have added the following patch for today
-
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-Date: Tue, 21 Apr 2020 14:56:49 +1000
-Subject: [PATCH] crypto: hisilicon/qm add more ACPI dependencies
-
-due to the selects of CRYPTO_DEV_HISI_QM which now depends on ACPI
-
-Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
----
- drivers/crypto/hisilicon/Kconfig | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kc=
-onfig
-index 99e962e39f36..9c3b3ca815e6 100644
---- a/drivers/crypto/hisilicon/Kconfig
-+++ b/drivers/crypto/hisilicon/Kconfig
-@@ -29,6 +29,7 @@ config CRYPTO_DEV_HISI_SEC2
- 	depends on PCI && PCI_MSI
- 	depends on UACCE || UACCE=3Dn
- 	depends on ARM64 || (COMPILE_TEST && 64BIT)
-+	depends on ACPI
+diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
+index 848f26f78dc1..0c99735df694 100644
+--- a/drivers/char/hw_random/Kconfig
++++ b/drivers/char/hw_random/Kconfig
+@@ -476,6 +476,7 @@ config HW_RANDOM_KEYSTONE
+ 
+ config HW_RANDOM_CCTRNG
+ 	tristate "Arm CryptoCell True Random Number Generator support"
++	depends on HAS_IOMEM
+ 	default HW_RANDOM
  	help
- 	  Support for HiSilicon SEC Engine of version 2 in crypto subsystem.
- 	  It provides AES, SM4, and 3DES algorithms with ECB
-@@ -53,6 +54,7 @@ config CRYPTO_DEV_HISI_ZIP
- 	depends on ARM64 || (COMPILE_TEST && 64BIT)
- 	depends on !CPU_BIG_ENDIAN || COMPILE_TEST
- 	depends on UACCE || UACCE=3Dn
-+	depends on ACPI
- 	select CRYPTO_DEV_HISI_QM
- 	help
- 	  Support for HiSilicon ZIP Driver
-@@ -62,6 +64,7 @@ config CRYPTO_DEV_HISI_HPRE
- 	depends on PCI && PCI_MSI
- 	depends on UACCE || UACCE=3Dn
- 	depends on ARM64 || (COMPILE_TEST && 64BIT)
-+	depends on ACPI
- 	select CRYPTO_DEV_HISI_QM
- 	select CRYPTO_DH
- 	select CRYPTO_RSA
---=20
-2.25.1
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/=Pp9gtCv0MP_l1TJCgowVDE
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl6egMgACgkQAVBC80lX
-0GwazQf+NqlysT+QiDaCEgZ5CUA0w4YxrqSamBOwyIY3d5uAqZ+2XOslwMzk47r3
-RndSM2lYlu5N1ykIz+VcdunWsYJlDg3MIU8lMmcfO87JIZYlqRH0I73nP2Wy6//k
-RSwUhy3evMt8GZJ3ZBYWhmVn+CjrFnCzqiUgp6+sm184n3pwHC9i+obRwlB76R0z
-CeLXn6GyqfsaU+VRAILooNJg6r8C5TaIWyunN9mI4BMRWGXDS70N7dfi6l6iKUho
-k3w7Rl0V6gAFxDYZJ6z9bzbRxN/zLxnw0UwFR7YnnrP8riZOna0GvgccdDXw1qoG
-+XRq+yZYbDye3XzCOU3fifNmFzreFQ==
-=eCj2
------END PGP SIGNATURE-----
-
---Sig_/=Pp9gtCv0MP_l1TJCgowVDE--
+ 	  This driver provides support for the True Random Number
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
