@@ -2,115 +2,119 @@ Return-Path: <SRS0=EVKT=6F=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE83CC2BA19
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 08:08:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A6B5C54FC9
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 08:18:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B90442071C
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 08:08:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qdVmv7Y2"
+	by mail.kernel.org (Postfix) with ESMTP id 733F12098B
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 08:18:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726106AbgDUII2 (ORCPT
+        id S1728248AbgDUISE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Apr 2020 04:08:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46160 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726052AbgDUII1 (ORCPT
+        Tue, 21 Apr 2020 04:18:04 -0400
+Received: from eu-smtp-delivery-151.mimecast.com ([146.101.78.151]:42029 "EHLO
+        eu-smtp-delivery-151.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1728497AbgDUISD (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Apr 2020 04:08:27 -0400
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D303DC061A0F
-        for <linux-crypto@vger.kernel.org>; Tue, 21 Apr 2020 01:08:26 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id gr25so10280083ejb.10
-        for <linux-crypto@vger.kernel.org>; Tue, 21 Apr 2020 01:08:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=6LylzXPDXZSt7bTECl5+HOg+eFcrgoekt+O0ZSKvfe4=;
-        b=qdVmv7Y2C5VNBiDNYgmMIusmQWw4+SlXv1ND68Wsc6n4l6AseAFHDdHhWsWAjGSuqr
-         qIsF6t9A4bpZIcVzkKaBEtCneHac/zBJtgvKKsPtnv0MNQsHEAZIdYwmeCatHJ6vqOWw
-         obCM3D9OhjTup2wyUtJlA/oluGg5GOYYh5tb+rkzlUwVaTN8xz+wLIHVlsLnaK/NX3wP
-         6aN+63k1ECqS60fkiS95e+UlWUMG4WiGtSxQNOM9pHhkPlIk6zRlc4D0U8tBGvP1F/FI
-         S9qCcgRm6XeOHt16B+R1Wg4/4J1zQRs5PeikanNUZPUVezLf6HKSHHDZewX+benuuRqY
-         bEVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=6LylzXPDXZSt7bTECl5+HOg+eFcrgoekt+O0ZSKvfe4=;
-        b=g2HYw7JakkOqt0ecsPTp0MfWcKsl065gzeMP/azB71PWn5Ad12gVMijLIY9MEED/it
-         qccC9sWKZfZAbcOt+Wq72OFdXxC5cXjBC/W1FATG2aQl4YhddySNecJwAwSXf7YvfPAG
-         9+BoDB3SYHtX/W50pnRqmf9FMxhxLkDvqjoYz+RwaOZrK3Au6pKIyrQJUYdapLP+wIji
-         q8PB/3S7YTqUCIlbr87qcAuHzARrE55qx3wvbC9FCx0TKRr/su+dgd8qafWpzgJ33mjQ
-         xNHUS53w0mcrQztBcBeBvzcZPw729nlgR/kxEhFW1vJDWl1IEX3nhVbwRUiVfGnRg0wT
-         bpjA==
-X-Gm-Message-State: AGi0PuazDj76XqkmhlADtY1cbFSl/NVTX4Xu02XVTrZ3dCrQ6J+HsQ7j
-        kRf9Xo2MLT3YuDoPtTphiDHWoWkYoHx97/5/gOWS/rZU
-X-Google-Smtp-Source: APiQypKQqMgNWcmUDetHFvRDXNqXgcFY6m4ydLSTSiJCc4uLkxz3MRKmc2GOxz16ZDMVBysYKVJRwd2GwtKmntPKZEg=
-X-Received: by 2002:a17:906:695:: with SMTP id u21mr19188987ejb.187.1587456505299;
- Tue, 21 Apr 2020 01:08:25 -0700 (PDT)
+        Tue, 21 Apr 2020 04:18:03 -0400
+Received: from AcuMS.aculab.com (156.67.243.126 [156.67.243.126]) (Using
+ TLS) by relay.mimecast.com with ESMTP id
+ uk-mta-45-R6erxUPxNwmDnj4dVoOApw-1; Tue, 21 Apr 2020 09:11:10 +0100
+X-MC-Unique: R6erxUPxNwmDnj4dVoOApw-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:43c:695e:880f:8750) with Microsoft SMTP
+ Server (TLS) id 15.0.1347.2; Tue, 21 Apr 2020 09:11:10 +0100
+Received: from AcuMS.Aculab.com ([fe80::43c:695e:880f:8750]) by
+ AcuMS.aculab.com ([fe80::43c:695e:880f:8750%12]) with mapi id 15.00.1347.000;
+ Tue, 21 Apr 2020 09:11:10 +0100
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     "'Jason A. Donenfeld'" <Jason@zx2c4.com>
+CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "ebiggers@google.com" <ebiggers@google.com>,
+        "ardb@kernel.org" <ardb@kernel.org>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: RE: FPU register granularity [Was: Re: [PATCH crypto-stable] crypto:
+ arch/lib - limit simd usage to PAGE_SIZE chunks]
+Thread-Topic: FPU register granularity [Was: Re: [PATCH crypto-stable] crypto:
+ arch/lib - limit simd usage to PAGE_SIZE chunks]
+Thread-Index: AQHWF5Nwrne9SiRX+kyNbDVRZjwXoqiDOD6g
+Date:   Tue, 21 Apr 2020 08:11:10 +0000
+Message-ID: <77009e0fb2fd442791fa192841a1ae16@AcuMS.aculab.com>
+References: <20200420075711.2385190-1-Jason@zx2c4.com>
+ <2cdb57f2cdbd49e9bb1034d01d054bb7@AcuMS.aculab.com>
+ <CAHmME9pq2Kdrp5C1+90PQyXsaG8xfdRwG-xGNs5U0ykVORrMbw@mail.gmail.com>
+In-Reply-To: <CAHmME9pq2Kdrp5C1+90PQyXsaG8xfdRwG-xGNs5U0ykVORrMbw@mail.gmail.com>
+Accept-Language: en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-From:   =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>
-Date:   Tue, 21 Apr 2020 10:08:14 +0200
-Message-ID: <CAAUqJDvZt7_j+eor1sXRg+QmrdXTjMiymFnji86PoatsYPUugA@mail.gmail.com>
-Subject: libkcapi tests are failing on kernels 5.5+
-To:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Stephan Mueller <smueller@chronox.de>
-Cc:     Sahana Prasad <saprasad@redhat.com>, Tomas Mraz <tmraz@redhat.com>,
-        Ard Biesheuvel <ardb@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Hi all,
+RnJvbTogSmFzb24gQS4gRG9uZW5mZWxkDQo+IFNlbnQ6IDIxIEFwcmlsIDIwMjAgMDU6MTUNCj4g
+DQo+IEhpIERhdmlkLA0KPiANCj4gT24gTW9uLCBBcHIgMjAsIDIwMjAgYXQgMjozMiBBTSBEYXZp
+ZCBMYWlnaHQgPERhdmlkLkxhaWdodEBhY3VsYWIuY29tPiB3cm90ZToNCj4gPiBNYXliZSBrZXJu
+ZWxfZnBfYmVnaW4oKSBzaG91bGQgYmUgcGFzc2VkIHRoZSBhZGRyZXNzIG9mIHNvbWV3aGVyZQ0K
+PiA+IHRoZSBhZGRyZXNzIG9mIGFuIGZwdSBzYXZlIGFyZWEgYnVmZmVyIGNhbiBiZSB3cml0dGVu
+IHRvLg0KPiA+IFRoZW4gdGhlIHByZS1lbXB0aW9uIGNvZGUgY2FuIGFsbG9jYXRlIHRoZSBidWZm
+ZXIgYW5kIHNhdmUgdGhlDQo+ID4gc3RhdGUgaW50byBpdC4NCj4gDQo+IEludGVyZXN0aW5nIGlk
+ZWEuIEl0IGxvb2tzIGxpa2UgYHN0cnVjdCB4cmVnc19zdGF0ZWAgaXMgb25seSA1NzYNCj4gYnl0
+ZXMuIFRoYXQncyBub3QgZXhhY3RseSBzbWFsbCwgYnV0IGl0J3Mgbm90IGluc2FuZWx5IGh1Z2Ug
+ZWl0aGVyLA0KPiBhbmQgbWF5YmUgd2UgY291bGQganVzdGlmaWFibHkgc3RpY2sgdGhhdCBvbiB0
+aGUgc3RhY2ssIG9yIGV2ZW4NCj4gcmVzZXJ2ZSBwYXJ0IG9mIHRoZSBzdGFjayBhbGxvY2F0aW9u
+IGZvciB0aGF0IHRoYXQgdGhlIGZ1bmN0aW9uIHdvdWxkDQo+IGtub3cgYWJvdXQsIHdpdGhvdXQg
+bmVlZGluZyB0byBzcGVjaWZ5IGFueSBhZGRyZXNzLg0KDQpBcyB5b3Ugc2FpZCB5b3Vyc2VsZiwg
+d2l0aCBBVlg1MTIgaXQgaXMgbXVjaCBsYXJnZXIuDQpXaGljaCBpcyB3aHkgSSBzdWdnZXN0ZWQg
+dGhlIHNhdmUgY29kZSBjb3VsZCBhbGxvY2F0ZSB0aGUgYXJlYS4NCk5vdGUgdGhhdCB0aGlzIHdv
+dWxkIG9ubHkgYmUgbmVlZGVkIGZvciBuZXN0ZWQgdXNlIChmb3IgYSBmdWxsIHNhdmUpLg0KDQo+
+ID4ga2VybmVsX2ZwdV9iZWdpbigpIG91Z2h0IGFsc28gYmUgcGFzc2VkIGEgcGFyYW1ldGVyIHNh
+eWluZyB3aGljaA0KPiA+IGZwdSBmZWF0dXJlcyBhcmUgcmVxdWlyZWQsIGFuZCByZXR1cm4gd2hp
+Y2ggYXJlIGFsbG9jYXRlZC4NCj4gPiBPbiB4ODYgdGhpcyBjb3VsZCBiZSB1c2VkIHRvIGNoZWNr
+IGZvciBBVlg1MTIgKGV0Yykgd2hpY2ggbWF5IGJlDQo+ID4gYXZhaWxhYmxlIGluIGFuIElTUiB1
+bmxlc3MgaXQgaW50ZXJydXB0ZWQgaW5zaWRlIGEga2VybmVsX2ZwdV9iZWdpbigpDQo+ID4gc2Vj
+dGlvbiAoZXRjKS4NCj4gPiBJdCB3b3VsZCBhbHNvIGFsbG93IG9wdGltaXNhdGlvbnMgaWYgb25s
+eSAxIG9yIDIgZnB1IHJlZ2lzdGVycyBhcmUNCj4gPiBuZWVkZWQgKGVnIGZvciBzb21lIG9mIHRo
+ZSBjcnlwdG8gZnVuY3Rpb25zKSByYXRoZXIgdGhhbiB0aGUgd2hvbGUNCj4gPiBmcHUgcmVnaXN0
+ZXIgc2V0Lg0KPiANCj4gRm9yIEFWWDUxMiB0aGlzIHByb2JhYmx5IG1ha2VzIHNlbnNlLCBJIHN1
+cHBvc2UuIEJ1dCBJJ20gbm90IHN1cmUgaWYNCj4gdGhlcmUgYXJlIHRvbyBtYW55IGJpdHMgb2Yg
+Y3J5cHRvIGNvZGUgdGhhdCBvbmx5IHVzZSBhIGZldyByZWdpc3RlcnMuDQo+IFRoZXJlIGFyZSB0
+aG9zZSBhY2NlbGVyYXRlZCBtZW1jcHkgcm91dGluZXMgaW4gaTkxNSB0aG91Z2ggLS0gZXZlciBz
+ZWUNCj4gZHJpdmVycy9ncHUvZHJtL2k5MTUvaTkxNV9tZW1jcHkuYz8gc29ydCBvZiB3aWxkLiBC
+dXQgaWYgd2UgZGlkIGdvDQo+IHRoaXMgd2F5LCBJIHdvbmRlciBpZiBpdCdkIG1ha2Ugc2Vuc2Ug
+dG8gdG90YWxseSBvdmVyZW5naW5lZXIgaXQgYW5kDQo+IHdyaXRlIGEgZ2NjL2FzIHBsdWdpbiB0
+byBjcmVhdGUgdGhlIHJlZ2lzdGVyIG1hc2sgZm9yIHVzLiBPciwgbWF5YmUNCj4gc29tZSBjaGVj
+a2VyIGluc2lkZSBvZiBvYmp0b29sIGNvdWxkIGhlbHAgaGVyZS4NCg0KSSBzdXNwZWN0IHNvbWUg
+b2YgdGhhdCBjb2RlIGlzIG92ZXJseSB1bnJvbGxlZC4NCg0KPiBBY3R1YWxseSwgdGhvdWdoLCB0
+aGUgdGhpbmcgSSd2ZSBiZWVuIHdvbmRlcmluZyBhYm91dCBpcyBhY3R1YWxseQ0KPiBtb3Zpbmcg
+aW4gdGhlIGNvbXBsZXRlIG9wcG9zaXRlIGRpcmVjdGlvbjogaXMgdGhlcmUgc29tZQ0KPiBlZmZp
+Y2llbnQtZW5vdWdoIHdheSB0aGF0IHdlIGNvdWxkIGFsbG93IEZQVSByZWdpc3RlcnMgaW4gYWxs
+IGNvbnRleHRzDQo+IGFsd2F5cywgd2l0aG91dCB0aGUgbmVlZCBmb3Iga2VybmVsX2ZwdV9iZWdp
+bi9lbmQ/IEkgd2FzIHJldmVyc2luZw0KPiBudG9za3JubC5leGUgYW5kIHdhcyBraW5kIG9mIGlt
+cHJlc3NlZCAobWF5YmUgbm90IHRoZSByaWdodCB3b3JkPykgYnkNCj4gdGhlaXIganVkaWNpb3Vz
+IHVzZSBvZiB2ZWN0b3Jpc2F0aW9uIGV2ZXJ5d2hlcmUuIEkgYXNzdW1lIGEgbG90IG9mDQo+IHRo
+YXQgaXMgYmVpbmcgZ2VuZXJhdGVkIGJ5IHRoZWlyIGNvbXBpbGVyLCB3aGljaCBvZiBjb3Vyc2Ug
+Z2NjIGNvdWxkDQo+IGRvIGZvciB1cyBpZiB3ZSBsZXQgaXQuIElzIHRoYXQgYW4gaW50ZXJlc3Rp
+bmcgYXZlbnVlIHRvIGNvbnNpZGVyPyBPcg0KPiBhcmUgeW91IHByZXR0eSBjZXJ0YWluIHRoYXQg
+aXQnZCBiZSBhIGh1Z2UgbWlzdGFrZSwgd2l0aCBhbg0KPiBpcnJldmVyc2libGUgc3BlZWQgaGl0
+Pw0KDQoNCkkgdGhpbmsgd2luZG93cyB0YWtlcyB0aGUgJ2hpdCcgb2Ygc2F2aW5nIHRoZSBlbnRp
+cmUgZnB1IHN0YXRlIG9uDQpldmVyeSBrZXJuZWwgZW50cnkuDQpOb3RlIHRoYXQgZm9yIHN5c3Rl
+bSBjYWxscyB0aGlzIGlzIGFjdHVhbGx5IG1pbmltYWwuDQpBbGwgdGhlICdjYWxsZWUgc2F2ZWQn
+IHJlZ2lzdGVycyAobW9zdCBvZiB0aGUgZnB1IG9uZXMpIGNhbiBiZQ0KdHJhc2hlZCAtIGllIHJl
+bG9hZGVkIHdpdGggemVyb3MuDQoNCglEYXZpZA0KDQotDQpSZWdpc3RlcmVkIEFkZHJlc3MgTGFr
+ZXNpZGUsIEJyYW1sZXkgUm9hZCwgTW91bnQgRmFybSwgTWlsdG9uIEtleW5lcywgTUsxIDFQVCwg
+VUsNClJlZ2lzdHJhdGlvbiBObzogMTM5NzM4NiAoV2FsZXMpDQo=
 
-the libkcapi [1] tests are failing on kernels 5.5-rc1 and above [2].
-All encryption/decryption tests that use 'ctr(aes)' and a message size
-that is not a multiple of 16 fail due to kcapi-enc returning different
-output than expected.
-
-It seems that it started with:
-commit 5b0fe9552336338acb52756daf65dd7a4eeca73f
-Author: Herbert Xu <herbert@gondor.apana.org.au>
-Date:   Tue Sep 10 11:42:05 2019 +1000
-
-    crypto: algif_skcipher - Use chunksize instead of blocksize
-
-Reverting the above commit makes the tests pass again.
-
-Here is a one-line reproducer:
-head -c 257 /dev/zero | kcapi-enc -vvv --pbkdfiter 1 -p "passwd" -s
-"123" -e -c "ctr(aes)" --iv "0123456789abcdef0123456789abcdef"
->/dev/null
-
-Output without revert:
-[...]
-libkcapi - Debug: AF_ALG: recvmsg syscall returned 256
-kcapi-enc - Verbose: Removal of padding disabled
-kcapi-enc - Verbose: 256 bytes of ciphertext created
-
-Output with the revert and on older kernels:
-[...]
-libkcapi - Debug: AF_ALG: recvmsg syscall returned 257
-kcapi-enc - Verbose: Removal of padding disabled
-kcapi-enc - Verbose: 257 bytes of ciphertext created
-
-I'm not familiar with the code in question, so I'm not sure if this is
-a kernel bug or whether the change just exposed a bug in libkcapi.
-
-Stephan, Herbert, can you please have a look?
-
-Thanks,
-
-Ondrej
-
-[1] https://github.com/smuellerDD/libkcapi
-[2] https://bugzilla.redhat.com/show_bug.cgi?id=1826022
