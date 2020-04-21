@@ -2,83 +2,167 @@ Return-Path: <SRS0=EVKT=6F=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E083C54FC9
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 04:25:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C1F0C2BA19
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 05:12:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2861820882
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 04:25:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 049E921D79
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 05:12:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="iGfkHhTK"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="rd86yj9C"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726341AbgDUEZu (ORCPT
+        id S1725902AbgDUFMr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Apr 2020 00:25:50 -0400
-Received: from mail.zx2c4.com ([192.95.5.64]:60443 "EHLO mail.zx2c4.com"
+        Tue, 21 Apr 2020 01:12:47 -0400
+Received: from ozlabs.org ([203.11.71.1]:54217 "EHLO ozlabs.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725904AbgDUEZu (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Apr 2020 00:25:50 -0400
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 92529dce;
-        Tue, 21 Apr 2020 04:15:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
-        :references:in-reply-to:from:date:message-id:subject:to:cc
-        :content-type; s=mail; bh=zvvCeZA2387aZ4dB2b02Y3gaNhg=; b=iGfkHh
-        TK6cMmmzXfYLKEjyScILROnwUjgF89rl6fdjES/ogbS3L+PnK8ab0yst1LqhK703
-        542twOi1u53Ps0B7FqIHPC6hum4W3CyBwfVpGxMSAcyVGq/5Jqvg2gM2dGWVEx3v
-        9mlajNhxsA+DJIW8JvLJG2eaCGvObr8fUE/YsuEzPGbCXjcg0qhpJAkdjhSh/5uD
-        stOXstkkQWcoThCiSOJLWv2t65urtX9VHFFR36nkAjWEpSCE7+Ylt2EF2eBeHhk1
-        fd/7QfZ0gzm5t/NP2SFTg3hMLvZdvnZsPU8lV3E1cXuJHyTpeb41jyOZXx62oICN
-        ypkg/8u3TbtpwDIg==
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 4f58fcca (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Tue, 21 Apr 2020 04:15:03 +0000 (UTC)
-Received: by mail-io1-f49.google.com with SMTP id u11so13670903iow.4;
-        Mon, 20 Apr 2020 21:25:44 -0700 (PDT)
-X-Gm-Message-State: AGi0PuYkSc4OhDd5ZPJU1sP9htCPrWtJGo9dIbnbNZUrqdV9RIevTquf
-        6Xfzc0rjw0QNB+IxtmWO8VY0JzWLYSKvRvUaF6E=
-X-Google-Smtp-Source: APiQypIyRj2PoMMuv4crd15eUsa84Ysc6zLCi+qX7meem+au7YS2pQ0yUhvSUith/HDjNeRf03EIoEMHv9xqqlNoiSU=
-X-Received: by 2002:a05:6602:21d3:: with SMTP id c19mr18687073ioc.29.1587443144218;
- Mon, 20 Apr 2020 21:25:44 -0700 (PDT)
+        id S1725795AbgDUFMr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 21 Apr 2020 01:12:47 -0400
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+        (No client certificate requested)
+        by mail.ozlabs.org (Postfix) with ESMTPSA id 495sBz2ljkz9sP7;
+        Tue, 21 Apr 2020 15:12:43 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=canb.auug.org.au;
+        s=201702; t=1587445964;
+        bh=kRYwJ8+v3TDEL7Vf+kKyDQ72TRLTgSM6bWAyzSYbWWM=;
+        h=Date:From:To:Cc:Subject:From;
+        b=rd86yj9Co/DZxjkRu7cx1Y3kiPL9W0qnry1rD2m6G3SGX/Ujw/Nr999jKv4VS5iqp
+         o9F981Ymv2LgHcASgnX6pBTH+LsPC4HY41qSoF/rCmxnllhtKFYrSiamTv+tAasNxx
+         tiAEIR7yKNqZ1zAaKMUWdTCGADljAnlQsxWSAtCESwm03X6isBXH/b4/mE+f7W4kwa
+         b4ccBTUT1xcRv3sRGllAKYuNb1GBS2FxGaP2h+XNTafkr1GZTtBlTY+wA70cmFJSn9
+         xbq9EBsS4vHkESQoJ60Gn64Sw1BfT05+sX5nXcjuyI/DwnLt9bnekTJ2Mi+lAJ3qj4
+         32fvfeCSFdTGQ==
+Date:   Tue, 21 Apr 2020 15:12:40 +1000
+From:   Stephen Rothwell <sfr@canb.auug.org.au>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>
+Cc:     Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Shukun Tan <tanshukun1@huawei.com>,
+        Zhou Wang <wangzhou1@hisilicon.com>,
+        Zaibo Xu <xuzaibo@huawei.com>
+Subject: linux-next: build failure after merge of the crypto tree
+Message-ID: <20200421151240.4dfc679a@canb.auug.org.au>
 MIME-Version: 1.0
-References: <20200420075711.2385190-1-Jason@zx2c4.com> <2cdb57f2cdbd49e9bb1034d01d054bb7@AcuMS.aculab.com>
- <CAHmME9pq2Kdrp5C1+90PQyXsaG8xfdRwG-xGNs5U0ykVORrMbw@mail.gmail.com>
-In-Reply-To: <CAHmME9pq2Kdrp5C1+90PQyXsaG8xfdRwG-xGNs5U0ykVORrMbw@mail.gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Mon, 20 Apr 2020 22:25:33 -0600
-X-Gmail-Original-Message-ID: <CAHmME9pRFGRi8oxazFrd05S+m=_s7=WF5x_jfUAE_Qt+c5-anA@mail.gmail.com>
-Message-ID: <CAHmME9pRFGRi8oxazFrd05S+m=_s7=WF5x_jfUAE_Qt+c5-anA@mail.gmail.com>
-Subject: Re: FPU register granularity [Was: Re: [PATCH crypto-stable] crypto:
- arch/lib - limit simd usage to PAGE_SIZE chunks]
-To:     David Laight <David.Laight@aculab.com>
-Cc:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "ebiggers@google.com" <ebiggers@google.com>,
-        "ardb@kernel.org" <ardb@kernel.org>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; boundary="Sig_/=Pp9gtCv0MP_l1TJCgowVDE";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, Apr 20, 2020 at 10:14 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> Hi David,
->
-> On Mon, Apr 20, 2020 at 2:32 AM David Laight <David.Laight@aculab.com> wrote:
-> > Maybe kernel_fp_begin() should be passed the address of somewhere
-> > the address of an fpu save area buffer can be written to.
-> > Then the pre-emption code can allocate the buffer and save the
-> > state into it.
->
-> Interesting idea. It looks like `struct xregs_state` is only 576
-> bytes. That's not exactly small, but it's not insanely huge either,
-> and maybe we could justifiably stick that on the stack, or even
-> reserve part of the stack allocation for that that the function would
-> know about, without needing to specify any address.
+--Sig_/=Pp9gtCv0MP_l1TJCgowVDE
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Hah-hah, nevermind here. extended_state_area is of course huge,
-bringing the whole structure to a whopping 3k with avx512. :)
+Hi all,
+
+After merging the crypto tree, today's linux-next build (powerpc
+allyesconfig) failed like this:
+
+WARNING: unmet direct dependencies detected for CRYPTO_DEV_HISI_QM
+  Depends on [n]: CRYPTO [=3Dy] && CRYPTO_HW [=3Dy] && (ARM64 || COMPILE_TE=
+ST [=3Dy]) && PCI [=3Dy] && PCI_MSI [=3Dy] && (UACCE [=3Dy] || UACCE [=3Dy]=
+=3Dn) && ACPI
+  Selected by [y]:
+  - CRYPTO_DEV_HISI_SEC2 [=3Dy] && CRYPTO [=3Dy] && CRYPTO_HW [=3Dy] && PCI=
+ [=3Dy] && PCI_MSI [=3Dy] && (UACCE [=3Dy] || UACCE [=3Dy]=3Dn) && (ARM64 |=
+| COMPILE_TEST [=3Dy] && 64BIT [=3Dy])
+  - CRYPTO_DEV_HISI_ZIP [=3Dy] && CRYPTO [=3Dy] && CRYPTO_HW [=3Dy] && PCI =
+[=3Dy] && PCI_MSI [=3Dy] && (ARM64 || COMPILE_TEST [=3Dy] && 64BIT [=3Dy]) =
+&& (!CPU_BIG_ENDIAN [=3Dy] || COMPILE_TEST [=3Dy]) && (UACCE [=3Dy] || UACC=
+E [=3Dy]=3Dn)
+  - CRYPTO_DEV_HISI_HPRE [=3Dy] && CRYPTO [=3Dy] && CRYPTO_HW [=3Dy] && PCI=
+ [=3Dy] && PCI_MSI [=3Dy] && (UACCE [=3Dy] || UACCE [=3Dy]=3Dn) && (ARM64 |=
+| COMPILE_TEST [=3Dy] && 64BIT [=3Dy])
+
+drivers/crypto/hisilicon/qm.c: In function 'qm_soft_reset':
+drivers/crypto/hisilicon/qm.c:2915:7: error: implicit declaration of functi=
+on 'acpi_evaluate_integer'; did you mean 'acpi_evaluate_object'? [-Werror=
+=3Dimplicit-function-declaration]
+ 2915 |   s =3D acpi_evaluate_integer(ACPI_HANDLE(&pdev->dev),
+      |       ^~~~~~~~~~~~~~~~~~~~~
+      |       acpi_evaluate_object
+
+Caused by commit
+
+  6c6dd5802c2d ("crypto: hisilicon/qm - add controller reset interface")
+
+Unfortunately not fixed by commit
+
+  f88480e300ac ("crypto: hisilicon/qm - fix build failure with ACPI off")
+
+[the moral is "don't select symbols that have dependencies" :-( ]
+
+I have added the following patch for today
+
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+Date: Tue, 21 Apr 2020 14:56:49 +1000
+Subject: [PATCH] crypto: hisilicon/qm add more ACPI dependencies
+
+due to the selects of CRYPTO_DEV_HISI_QM which now depends on ACPI
+
+Signed-off-by: Stephen Rothwell <sfr@canb.auug.org.au>
+---
+ drivers/crypto/hisilicon/Kconfig | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/drivers/crypto/hisilicon/Kconfig b/drivers/crypto/hisilicon/Kc=
+onfig
+index 99e962e39f36..9c3b3ca815e6 100644
+--- a/drivers/crypto/hisilicon/Kconfig
++++ b/drivers/crypto/hisilicon/Kconfig
+@@ -29,6 +29,7 @@ config CRYPTO_DEV_HISI_SEC2
+ 	depends on PCI && PCI_MSI
+ 	depends on UACCE || UACCE=3Dn
+ 	depends on ARM64 || (COMPILE_TEST && 64BIT)
++	depends on ACPI
+ 	help
+ 	  Support for HiSilicon SEC Engine of version 2 in crypto subsystem.
+ 	  It provides AES, SM4, and 3DES algorithms with ECB
+@@ -53,6 +54,7 @@ config CRYPTO_DEV_HISI_ZIP
+ 	depends on ARM64 || (COMPILE_TEST && 64BIT)
+ 	depends on !CPU_BIG_ENDIAN || COMPILE_TEST
+ 	depends on UACCE || UACCE=3Dn
++	depends on ACPI
+ 	select CRYPTO_DEV_HISI_QM
+ 	help
+ 	  Support for HiSilicon ZIP Driver
+@@ -62,6 +64,7 @@ config CRYPTO_DEV_HISI_HPRE
+ 	depends on PCI && PCI_MSI
+ 	depends on UACCE || UACCE=3Dn
+ 	depends on ARM64 || (COMPILE_TEST && 64BIT)
++	depends on ACPI
+ 	select CRYPTO_DEV_HISI_QM
+ 	select CRYPTO_DH
+ 	select CRYPTO_RSA
+--=20
+2.25.1
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/=Pp9gtCv0MP_l1TJCgowVDE
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAl6egMgACgkQAVBC80lX
+0GwazQf+NqlysT+QiDaCEgZ5CUA0w4YxrqSamBOwyIY3d5uAqZ+2XOslwMzk47r3
+RndSM2lYlu5N1ykIz+VcdunWsYJlDg3MIU8lMmcfO87JIZYlqRH0I73nP2Wy6//k
+RSwUhy3evMt8GZJ3ZBYWhmVn+CjrFnCzqiUgp6+sm184n3pwHC9i+obRwlB76R0z
+CeLXn6GyqfsaU+VRAILooNJg6r8C5TaIWyunN9mI4BMRWGXDS70N7dfi6l6iKUho
+k3w7Rl0V6gAFxDYZJ6z9bzbRxN/zLxnw0UwFR7YnnrP8riZOna0GvgccdDXw1qoG
++XRq+yZYbDye3XzCOU3fifNmFzreFQ==
+=eCj2
+-----END PGP SIGNATURE-----
+
+--Sig_/=Pp9gtCv0MP_l1TJCgowVDE--
