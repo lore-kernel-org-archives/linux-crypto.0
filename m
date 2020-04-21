@@ -1,100 +1,91 @@
-Return-Path: <SRS0=BVES=6E=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=EVKT=6F=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30CAAC55181
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Apr 2020 21:43:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31ED1C54FCC
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 04:02:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 19B0D20722
-	for <linux-crypto@archiver.kernel.org>; Mon, 20 Apr 2020 21:43:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0575C214AF
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 04:02:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="PyxDIlH9"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727815AbgDTVnU (ORCPT
+        id S1725730AbgDUECr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 20 Apr 2020 17:43:20 -0400
-Received: from ms.lwn.net ([45.79.88.28]:53958 "EHLO ms.lwn.net"
+        Tue, 21 Apr 2020 00:02:47 -0400
+Received: from mail.zx2c4.com ([192.95.5.64]:33661 "EHLO mail.zx2c4.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725989AbgDTVnT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 20 Apr 2020 17:43:19 -0400
-Received: from lwn.net (localhost [127.0.0.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ms.lwn.net (Postfix) with ESMTPSA id 632E4823;
-        Mon, 20 Apr 2020 21:43:17 +0000 (UTC)
-Date:   Mon, 20 Apr 2020 15:43:16 -0600
-From:   Jonathan Corbet <corbet@lwn.net>
-To:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-Cc:     Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, Rob Herring <robh@kernel.org>,
-        Maxime Ripard <maxime@cerno.tech>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        Kishon Vijay Abraham I <kishon@ti.com>,
-        Yuti Amonkar <yamonkar@cadence.com>,
-        devicetree@vger.kernel.org, linux-arch@vger.kernel.org,
-        kvm@vger.kernel.org, kvm-ppc@vger.kernel.org,
-        linuxppc-dev@lists.ozlabs.org, dri-devel@lists.freedesktop.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-unionfs@vger.kernel.org,
-        linux-mm@kvack.org, linux-rdma@vger.kernel.org,
-        kvmarm@lists.cs.columbia.edu, linux-crypto@vger.kernel.org,
-        linux-media@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        freedreno@lists.freedesktop.org, linux-afs@lists.infradead.org,
-        ecryptfs@vger.kernel.org, linux-ntfs-dev@lists.sourceforge.net,
-        ocfs2-devel@oss.oracle.com, linux-pci@vger.kernel.org,
-        linux-edac@vger.kernel.org, linux-spi@vger.kernel.org,
-        Sandeep Maheswaram <sanm@codeaurora.org>,
-        Stephen Boyd <swboyd@chromium.org>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        linux-usb@vger.kernel.org,
-        Geert Uytterhoeven <geert+renesas@glider.be>,
-        Matthias Brugger <mbrugger@suse.com>, netdev@vger.kernel.org,
-        linux-i2c@vger.kernel.org, linux-rockchip@lists.infradead.org,
-        linux-ide@vger.kernel.org, linux1394-devel@lists.sourceforge.net
-Subject: Re: [PATCH v2 00/33] Documentation fixes for Kernel 5.8
-Message-ID: <20200420154316.28e42905@lwn.net>
-In-Reply-To: <cover.1586881715.git.mchehab+huawei@kernel.org>
-References: <cover.1586881715.git.mchehab+huawei@kernel.org>
-Organization: LWN.net
+        id S1725283AbgDUECr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 21 Apr 2020 00:02:47 -0400
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 9ffef1c0;
+        Tue, 21 Apr 2020 03:52:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
+        :references:in-reply-to:from:date:message-id:subject:to:cc
+        :content-type; s=mail; bh=b5Yc33rjro0LOJft6o7awVjkTZ0=; b=PyxDIl
+        H9MWbDtDahbXjBBAyWJvpmLpmvikrFMo2CjFcCKoL+dLt1lHmcBzm7vhC5ZzJxqM
+        v3xJbgeszgVR8hoCwoXK0iLKqjiQIvgvt9Z3R62+3wMIrNt8/HycnK9eJOrg8K5C
+        P/KPeB633xgi/qzzOA7p+IpQprCNegFkxASMfyfEjDzLfWGbHr+U40lCcWV5GlUR
+        gt44UgCYhgb8YuwPxrVF6wSPXMPtyQG8/UlbTcydAWxqziKN4cmBhtVQcMXpuDvA
+        5ajoUGB/IdDPbzdHLbLXxbnfTLqxbRwx5zJun4KvjgbYnVyMZMlRqqGIRP0+JKkF
+        3pj/dSLYtJ7JlOiQ==
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id f07f93df (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Tue, 21 Apr 2020 03:52:01 +0000 (UTC)
+Received: by mail-io1-f47.google.com with SMTP id f3so13647296ioj.1;
+        Mon, 20 Apr 2020 21:02:42 -0700 (PDT)
+X-Gm-Message-State: AGi0PubU/q1Dff67GrvbKvvHPEiwJbzNHCqoTtlsbTamX4ww3Snr5XFv
+        Miw9LgIVI3uxSeiaO3NnHaNOdv1XpjmR7a2epHM=
+X-Google-Smtp-Source: APiQypJdNT8UItWFDKtAKDekJkgZ+KtTzn8bv/h9qcNsTyes4y9VnE4cLcMW9yqKJGy8Pyrq8to9I3nqyEWXr9nt7CI=
+X-Received: by 2002:a05:6602:21d3:: with SMTP id c19mr18626695ioc.29.1587441762080;
+ Mon, 20 Apr 2020 21:02:42 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
+References: <20200420075711.2385190-1-Jason@zx2c4.com> <2cdb57f2cdbd49e9bb1034d01d054bb7@AcuMS.aculab.com>
+In-Reply-To: <2cdb57f2cdbd49e9bb1034d01d054bb7@AcuMS.aculab.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Mon, 20 Apr 2020 22:02:31 -0600
+X-Gmail-Original-Message-ID: <CAHmME9qfrHVQ+-4HjqCO2TaGF6DNTHmS1max1KcVaP5_QjUDRQ@mail.gmail.com>
+Message-ID: <CAHmME9qfrHVQ+-4HjqCO2TaGF6DNTHmS1max1KcVaP5_QjUDRQ@mail.gmail.com>
+Subject: Re: [PATCH crypto-stable] crypto: arch/lib - limit simd usage to
+ PAGE_SIZE chunks
+To:     David Laight <David.Laight@aculab.com>
+Cc:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "ebiggers@google.com" <ebiggers@google.com>,
+        "ardb@kernel.org" <ardb@kernel.org>,
+        "stable@vger.kernel.org" <stable@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 14 Apr 2020 18:48:26 +0200
-Mauro Carvalho Chehab <mchehab+huawei@kernel.org> wrote:
+On Mon, Apr 20, 2020 at 2:32 AM David Laight <David.Laight@aculab.com> wrote:
+> Maybe kernel_fp_begin() should be passed the address of somewhere
+> the address of an fpu save area buffer can be written to.
+> Then the pre-emption code can allocate the buffer and save the
+> state into it.
+>
+> However that doesn't solve the problem for non-preemptive kernels.
+> The may need a cond_resched() in the loop if it might take 1ms (or so).
+>
+> kernel_fpu_begin() ought also be passed a parameter saying which
+> fpu features are required, and return which are allocated.
+> On x86 this could be used to check for AVX512 (etc) which may be
+> available in an ISR unless it interrupted inside a kernel_fpu_begin()
+> section (etc).
+> It would also allow optimisations if only 1 or 2 fpu registers are
+> needed (eg for some of the crypto functions) rather than the whole
+> fpu register set.
 
-> Patches 1 to 5 contain changes to the documentation toolset:
-> 
-> - The first 3 patches help to reduce a lot the number of reported
->   kernel-doc issues, by making the tool more smart.
-> 
-> - Patches 4 and 5 are meant to partially address the PDF
->   build, with now requires Sphinx version 2.4 or upper.
-> 
-> The remaining patches fix broken references detected by
-> this tool:
-> 
->         ./scripts/documentation-file-ref-check
-> 
-> and address other random errors due to tags being mis-interpreted
-> or mis-used.
-> 
-> They are independent each other, but some may depend on
-> the kernel-doc improvements.
-> 
-> PS.: Due to the large number of C/C, I opted to keep a smaller
-> set of C/C at this first e-mail (only e-mails with "L:" tag from
-> MAINTAINERS file).
+There might be ways to improve lots of FPU things, indeed. This patch
+here is just a patch to Herbert's branch in order to make uniform
+usage of our existing solution for this, fixing the existing bug. I
+wouldn't mind seeing more involved and better solutions in a patchset
+for crypto-next.
 
-OK, I've applied this set, minus #17 which was applied elsewhere.
-
-Thanks,
-
-jon
+Will follow up with your suggestion in a different thread, so as not
+to block this one.
