@@ -2,111 +2,93 @@ Return-Path: <SRS0=EVKT=6F=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FF7AC2BA19
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 09:20:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31925C55181
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 11:20:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C728220857
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 09:20:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="ccuBKtj8"
+	by mail.kernel.org (Postfix) with ESMTP id 174642076B
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 11:20:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726741AbgDUJUL (ORCPT
+        id S1728597AbgDULUj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Apr 2020 05:20:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57210 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726600AbgDUJUK (ORCPT
+        Tue, 21 Apr 2020 07:20:39 -0400
+Received: from cmccmta1.chinamobile.com ([221.176.66.79]:13042 "EHLO
+        cmccmta1.chinamobile.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726691AbgDULUi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Apr 2020 05:20:10 -0400
-Received: from mo6-p00-ob.smtp.rzone.de (mo6-p00-ob.smtp.rzone.de [IPv6:2a01:238:20a:202:5300::10])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66EDCC061A0F
-        for <linux-crypto@vger.kernel.org>; Tue, 21 Apr 2020 02:20:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1587460806;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=E9BJAvjzMhCklazXBZPYBfbuu7B+KuXrP8zNnSdB9RE=;
-        b=ccuBKtj8J+wPD6HqtBK0lrHYVvwtapkbWBbRDGDh/X+1O6MeSksOf3hdmbAwhVteyB
-        BrtU6hqE5DTbDUOmSbk9h9+JbTsFl19p2DhNHXxCEmdYg/Ante9SgpfW+0PnG72JeyM6
-        oSWdwaeAZuU00KEOMhx1Re/FuHFWEBygcfUafdnQL7j5m3e6hxlcLxWo8ItLk5IWmWMT
-        /AiTNEeKNcMKMSw0MqBp66f2ek7PWBhRe7L+74eHTWErOKwIRje1xWlm07ADjNnShJzF
-        9/YB3i3yf4BnuJd6WbJfedeVdqjiM86KObEyF6GsJP5Y5364WXiArrCB39dHB8SUDmzJ
-        aAHw==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPbJPSfZtvO"
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-        by smtp.strato.de (RZmta 46.5.0 DYNA|AUTH)
-        with ESMTPSA id c09283w3L9JbLgh
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-        Tue, 21 Apr 2020 11:19:37 +0200 (CEST)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Ondrej =?utf-8?B?TW9zbsOhxI1law==?= <omosnacek@gmail.com>
-Cc:     linux-crypto@vger.kernel.org,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Sahana Prasad <saprasad@redhat.com>,
-        Tomas Mraz <tmraz@redhat.com>, Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: libkcapi tests are failing on kernels 5.5+
-Date:   Tue, 21 Apr 2020 11:19:36 +0200
-Message-ID: <7154254.Uj1dk3xSE7@tauon.chronox.de>
-In-Reply-To: <CAAUqJDvZt7_j+eor1sXRg+QmrdXTjMiymFnji86PoatsYPUugA@mail.gmail.com>
-References: <CAAUqJDvZt7_j+eor1sXRg+QmrdXTjMiymFnji86PoatsYPUugA@mail.gmail.com>
+        Tue, 21 Apr 2020 07:20:38 -0400
+Received: from spf.mail.chinamobile.com (unknown[172.16.121.11]) by rmmx-syy-dmz-app04-12004 (RichMail) with SMTP id 2ee45e9ed6f055e-ee89b; Tue, 21 Apr 2020 19:20:20 +0800 (CST)
+X-RM-TRANSID: 2ee45e9ed6f055e-ee89b
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG: 00000000
+Received: from [172.20.146.166] (unknown[112.25.154.146])
+        by rmsmtp-syy-appsvr06-12006 (RichMail) with SMTP id 2ee65e9ed6f215c-ede35;
+        Tue, 21 Apr 2020 19:20:20 +0800 (CST)
+X-RM-TRANSID: 2ee65e9ed6f215c-ede35
+Subject: Re: [PATCH] crypto: Delete redundant variable definition
+To:     Joe Perches <joe@perches.com>, davem@davemloft.net,
+        herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Shengju Zhang <zhangshengju@cmss.chinamobile.com>
+References: <20200419071245.3924-1-tangbin@cmss.chinamobile.com>
+ <e4a2c1206cc8009f0e0881e2b9ec2e828c5d9e7c.camel@perches.com>
+From:   Tang Bin <tangbin@cmss.chinamobile.com>
+Message-ID: <74fa3578-b62f-4618-4af1-d8105e561800@cmss.chinamobile.com>
+Date:   Tue, 21 Apr 2020 19:22:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <e4a2c1206cc8009f0e0881e2b9ec2e828c5d9e7c.camel@perches.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Dienstag, 21. April 2020, 10:08:14 CEST schrieb Ondrej Mosn=C3=A1=C4=8De=
-k:
+Hi, Joe:
 
-Hi Ondrej,
+On 2020/4/19 19:44, Joe Perches wrote:
+> On Sun, 2020-04-19 at 15:12 +0800, Tang Bin wrote:
+>> The variable "i" is redundant to be assigned a value
+>> of zero,because it's assigned in the for loop, so remove
+>> redundant one here.
+>>
+>> Signed-off-by: Shengju Zhang <zhangshengju@cmss.chinamobile.com>
+>> Signed-off-by: Tang Bin <tangbin@cmss.chinamobile.com>
+>>
+>> ---
+>>   drivers/crypto/bcm/cipher.c | 1 -
+>>   1 file changed, 1 deletion(-)
+>>
+>> diff --git a/drivers/crypto/bcm/cipher.c b/drivers/crypto/bcm/cipher.c
+>> index c8b940854..5db23c18c 100644
+>> --- a/drivers/crypto/bcm/cipher.c
+>> +++ b/drivers/crypto/bcm/cipher.c
+>> @@ -4724,7 +4724,6 @@ static int spu_dt_read(struct platform_device *pdev)
+>>   	spu->spu_type = matched_spu_type->type;
+>>   	spu->spu_subtype = matched_spu_type->subtype;
+>>   
+>> -	i = 0;
+>>   	for (i = 0; (i < MAX_SPUS) && ((spu_ctrl_regs =
+>>   		platform_get_resource(pdev, IORESOURCE_MEM, i)) != NULL); i++) {
+> Maybe the for loop could be simplified too by
+> moving the assignment inside the loop.
+>
+> Also, the %pe extension could be used.
 
-> Hi all,
->=20
-> the libkcapi [1] tests are failing on kernels 5.5-rc1 and above [2].
-> All encryption/decryption tests that use 'ctr(aes)' and a message size
-> that is not a multiple of 16 fail due to kcapi-enc returning different
-> output than expected.
+Sorry for the delay. Thank you for your advice, I was already thinking 
+about optimizing this place.
 
-Confirmed.
+Thanks,
 
-On the recent kernels, the data generated by kcapi-enc contains trailing ze=
-ro=20
-bytes for data that is a fraction of the block size.
-
-I think the issue is in the following kernel code in _skcipher_recvmsg:
-
-        unsigned int bs =3D crypto_skcipher_chunksize(tfm);
-
-        /*
-         * If more buffers are to be expected to be processed, process only
-         * full block size buffers.
-         */
-        if (ctx->more || len < ctx->used)
-                len -=3D len % bs;
+Tang Bin
 
 
-The kernel truncates the size to be processed to the chunk size. As the=20
-chunksize returns the block size of the underlying cipher (e.g. AES -> 16),=
-=20
-the kernel code will not process non-aligned data.
-
-Herbert, could you help me identifying what exactly was the root cause for =
-the=20
-patch 5b0fe9552336338acb52756daf65dd7a4eeca73f ? I.e. it seems that stream=
-=20
-ciphers made out of a block cipher would not generate the data part that is=
- a=20
-fraction of the block size (e.g. CTR, CTS).
-
-Ciao
-Stephan
+>
 
 
