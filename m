@@ -2,137 +2,143 @@ Return-Path: <SRS0=EVKT=6F=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64E83C2BA19
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 07:02:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9493C2BA19
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 07:41:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4539D22244
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 07:02:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8A6022073A
+	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 07:41:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1587452550;
-	bh=yvErlf1ujCEjMuZ1HZhQNIJgQdLtBuEUCgoQdnqZWIc=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=0TZkBOS7LABr+WdKzQTnjmLjkIyGfpyIAM97MXBkYzzIfN3Mf11a2T/1SR99qTjy9
-	 QwsZG7RKL8cas8CXuPHod3ML+KeMmLFCkG2LrSnz94OLXjnITlFxD0+qgYoas31QoG
-	 b1d6G6yxL2QPp2UTQpmzXXAKoTc0SPlqT6zQDx9Q=
+	s=default; t=1587454896;
+	bh=zh2H7DRySG6m96/3f26C5OxmbKDqup5V8vk5fUcSMS0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=O/g9r3LOppV8M3mI+FcP1QNdk69wDFA9PQbf7b7DZO2kTpWcJccLbW3h3y0FjH8n+
+	 67D49DZcCja3jErR0j/QDKHbTfxyD3zW3aPcvMOv1B1zlxK0wjQIm5+/DYE+XqDk+h
+	 kFF/I3P0uRWJ57Bie1kN39+ic8rJsLPlhO73pmzo=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726931AbgDUHC3 (ORCPT
+        id S1726931AbgDUHlg (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Apr 2020 03:02:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58400 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725926AbgDUHC3 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Apr 2020 03:02:29 -0400
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 518F22087E;
-        Tue, 21 Apr 2020 07:02:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1587452548;
-        bh=yvErlf1ujCEjMuZ1HZhQNIJgQdLtBuEUCgoQdnqZWIc=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=Y0ypIU01zjeTlzT53B8egS3zgE+CoGdF87n9WorvBDR9TlY51Nnqz5sevwJSayFWQ
-         VAM6zmWgjEbe5QWMAgg5I0qToX2KyMmlIQgFDTszV1NpT4s+lkqG8dPcLP+20AAOUw
-         WHp8QwbOG7cfkhHP3wXHd6wt+qi+dZIahIfrK2J8=
-Received: by mail-io1-f51.google.com with SMTP id n10so13915387iom.3;
-        Tue, 21 Apr 2020 00:02:28 -0700 (PDT)
-X-Gm-Message-State: AGi0PuZlU27pKRX19Wy7aHiQ9KeKvJX3RNPSSNZWRJeC/sI6btFXzDQD
-        8l8tn7uK7IFoUc3PO2rH2ELHOHZHhqKbDVUFAaM=
-X-Google-Smtp-Source: APiQypJ7U9stCkpY+B3uQDUazOYm7Gv5hkpH/DE6YibToZivYDs+sA9EjIN2vouOcJjK6KTOFzro6D3C6jpn/y7lRBQ=
-X-Received: by 2002:a02:8247:: with SMTP id q7mr17940310jag.68.1587452547702;
- Tue, 21 Apr 2020 00:02:27 -0700 (PDT)
+        Tue, 21 Apr 2020 03:41:36 -0400
+Received: from conuserg-08.nifty.com ([210.131.2.75]:30981 "EHLO
+        conuserg-08.nifty.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725992AbgDUHlf (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 21 Apr 2020 03:41:35 -0400
+Received: from oscar.flets-west.jp (softbank126090202047.bbtec.net [126.90.202.47]) (authenticated)
+        by conuserg-08.nifty.com with ESMTP id 03L7dstU022941;
+        Tue, 21 Apr 2020 16:39:56 +0900
+DKIM-Filter: OpenDKIM Filter v2.10.3 conuserg-08.nifty.com 03L7dstU022941
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nifty.com;
+        s=dec2015msa; t=1587454796;
+        bh=hDth+M9ZwaPqBRV2FRAMHf1NN8+Bjd7sx4+asoEQ3Z8=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=1pOuLkiIr2qBPM7IIf4OwT/D3ZBko3CDnFRxbu/c707moGDSsxMYC5RJV0yRQJcwg
+         mzgohE2T51XMqWv3YTiYa3CdCt06kW2f1DvdI+8c+BSI3pxjaLAaaHxwaXndJaV3Kq
+         NLF9vKCBXhVttQg17c9NaRdA++jny+U951ZKqNhggU6asiERorX26VaGny51LAsP0f
+         e+OhCRAeln38aZKlleLG5r0+/VXvH0rT/iqSSZHgS9Ym5LY8dAwBUDvZz6Oc4EPytV
+         RIAiEURY8NPwSslZuc8LI9iNoBFP/pIZuu3OlBo7tG5iuMZIxzLZWsbd9muMfzvq31
+         qqsObdt9Ycecg==
+X-Nifty-SrcIP: [126.90.202.47]
+From:   Masahiro Yamada <masahiroy@kernel.org>
+To:     x86@kernel.org, Ingo Molnar <mingo@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Borislav Petkov <bp@alien8.de>,
+        "H . Peter Anvin" <hpa@zytor.com>
+Cc:     "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        linux-crypto@vger.kernel.org,
+        Masahiro Yamada <masahiroy@kernel.org>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 2/2] raid6/algos.c: refactor raid6_algos array for x86
+Date:   Tue, 21 Apr 2020 16:39:47 +0900
+Message-Id: <20200421073947.586662-2-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20200421073947.586662-1-masahiroy@kernel.org>
+References: <20200421073947.586662-1-masahiroy@kernel.org>
 MIME-Version: 1.0
-References: <20200420075711.2385190-1-Jason@zx2c4.com> <2cdb57f2cdbd49e9bb1034d01d054bb7@AcuMS.aculab.com>
- <CAHmME9pq2Kdrp5C1+90PQyXsaG8xfdRwG-xGNs5U0ykVORrMbw@mail.gmail.com>
-In-Reply-To: <CAHmME9pq2Kdrp5C1+90PQyXsaG8xfdRwG-xGNs5U0ykVORrMbw@mail.gmail.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Tue, 21 Apr 2020 09:02:16 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXEdWu1v0tGT2Co0oMqWDJS_FNx97qZJmp3GPrrj8MrnrQ@mail.gmail.com>
-Message-ID: <CAMj1kXEdWu1v0tGT2Co0oMqWDJS_FNx97qZJmp3GPrrj8MrnrQ@mail.gmail.com>
-Subject: Re: FPU register granularity [Was: Re: [PATCH crypto-stable] crypto:
- arch/lib - limit simd usage to PAGE_SIZE chunks]
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     David Laight <David.Laight@aculab.com>,
-        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "ebiggers@google.com" <ebiggers@google.com>,
-        "stable@vger.kernel.org" <stable@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 21 Apr 2020 at 06:15, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> Hi David,
->
-> On Mon, Apr 20, 2020 at 2:32 AM David Laight <David.Laight@aculab.com> wrote:
-> > Maybe kernel_fp_begin() should be passed the address of somewhere
-> > the address of an fpu save area buffer can be written to.
-> > Then the pre-emption code can allocate the buffer and save the
-> > state into it.
->
-> Interesting idea. It looks like `struct xregs_state` is only 576
-> bytes. That's not exactly small, but it's not insanely huge either,
-> and maybe we could justifiably stick that on the stack, or even
-> reserve part of the stack allocation for that that the function would
-> know about, without needing to specify any address.
->
-> > kernel_fpu_begin() ought also be passed a parameter saying which
-> > fpu features are required, and return which are allocated.
-> > On x86 this could be used to check for AVX512 (etc) which may be
-> > available in an ISR unless it interrupted inside a kernel_fpu_begin()
-> > section (etc).
-> > It would also allow optimisations if only 1 or 2 fpu registers are
-> > needed (eg for some of the crypto functions) rather than the whole
-> > fpu register set.
->
-> For AVX512 this probably makes sense, I suppose. But I'm not sure if
-> there are too many bits of crypto code that only use a few registers.
-> There are those accelerated memcpy routines in i915 though -- ever see
-> drivers/gpu/drm/i915/i915_memcpy.c? sort of wild. But if we did go
-> this way, I wonder if it'd make sense to totally overengineer it and
-> write a gcc/as plugin to create the register mask for us. Or, maybe
-> some checker inside of objtool could help here.
->
-> Actually, though, the thing I've been wondering about is actually
-> moving in the complete opposite direction: is there some
-> efficient-enough way that we could allow FPU registers in all contexts
-> always, without the need for kernel_fpu_begin/end? I was reversing
-> ntoskrnl.exe and was kind of impressed (maybe not the right word?) by
-> their judicious use of vectorisation everywhere. I assume a lot of
-> that is being generated by their compiler, which of course gcc could
-> do for us if we let it. Is that an interesting avenue to consider? Or
-> are you pretty certain that it'd be a huge mistake, with an
-> irreversible speed hit?
->
+Factor out the common pointer references.
 
-When I added support for kernel mode SIMD to arm64 originally, there
-was a kernel_neon_begin_partial() that took an int to specify how many
-registers were being used, the reason being that NEON preserve/store
-was fully eager at this point, and arm64 has 32 SIMD registers, many
-of which weren't really used, e.g., in the basic implementation of AES
-based on special instructions.
+Common for i386 and x86_64:
+  raid6_avx512x2
+  raid6_avx512x1
+  raid6_avx2x2
+  raid6_avx2x1
+  raid6_sse2x2
+  raid6_sse2x1
+  raid6_sse1x2
 
-With the introduction of lazy restore, and SVE handling for userspace,
-we decided to remove this because it didn't really help anymore, and
-made the code more difficult to manage.
+Only for i386:
+  raid6_sse1x1
+  raid6_mmxx2
+  raid6_mmxx1
 
-However, I think it would make sense to have something like this in
-the general case. I.e., NEON registers 0-3 are always preserved when
-an exception or interrupt (or syscall) is taken, and so they can be
-used anywhere in the kernel. If you want the whole set, you will have
-to use begin/end as before. This would already unlock a few
-interesting case, like memcpy, xor, and sequences that can easily be
-implemented with only a few registers such as instructio based AES.
+Only for x86_64:
+  raid6_avx512x4
+  raid6_avx2x4
+  raid6_sse2x4
 
-Unfortunately, the compiler needs to be taught about this to be
-completely useful, which means lots of prototyping and benchmarking
-upfront, as the contract will be set in stone once the compilers get
-on board.
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
+
+ lib/raid6/algos.c | 24 ++++++++++--------------
+ 1 file changed, 10 insertions(+), 14 deletions(-)
+
+diff --git a/lib/raid6/algos.c b/lib/raid6/algos.c
+index 978fa19efbbf..c0f2fd6e0621 100644
+--- a/lib/raid6/algos.c
++++ b/lib/raid6/algos.c
+@@ -30,32 +30,28 @@ EXPORT_SYMBOL_GPL(raid6_call);
+ 
+ const struct raid6_calls * const raid6_algos[] = {
+ #ifdef CONFIG_X86
+-#if defined(CONFIG_X86_32)
+ #ifdef CONFIG_AS_AVX512
+-	&raid6_avx512x2,
+-	&raid6_avx512x1,
+-#endif
+-	&raid6_avx2x2,
+-	&raid6_avx2x1,
+-	&raid6_sse2x2,
+-	&raid6_sse2x1,
+-	&raid6_sse1x2,
+-	&raid6_sse1x1,
+-	&raid6_mmxx2,
+-	&raid6_mmxx1,
+-#endif
+ #if defined(CONFIG_X86_64)
+-#ifdef CONFIG_AS_AVX512
+ 	&raid6_avx512x4,
++#endif
+ 	&raid6_avx512x2,
+ 	&raid6_avx512x1,
+ #endif
++#ifdef CONFIG_X86_64
+ 	&raid6_avx2x4,
++#endif
+ 	&raid6_avx2x2,
+ 	&raid6_avx2x1,
++#ifdef CONFIG_X86_64
+ 	&raid6_sse2x4,
++#endif
+ 	&raid6_sse2x2,
+ 	&raid6_sse2x1,
++	&raid6_sse1x2,
++#ifdef CONFIG_X86_32
++	&raid6_sse1x1,
++	&raid6_mmxx2,
++	&raid6_mmxx1,
+ #endif
+ #endif /* CONFIG_X86 */
+ #ifdef CONFIG_ALTIVEC
+-- 
+2.25.1
+
