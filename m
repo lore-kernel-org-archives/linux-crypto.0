@@ -2,78 +2,78 @@ Return-Path: <SRS0=sRio=6G=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D49DC55185
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Apr 2020 11:28:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3308C5518A
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Apr 2020 12:58:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 577A220781
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Apr 2020 11:28:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CBE6620857
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Apr 2020 12:58:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726117AbgDVL2g (ORCPT
+        id S1726834AbgDVM62 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Apr 2020 07:28:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45638 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725808AbgDVL2g (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Apr 2020 07:28:36 -0400
-Received: from Galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7697AC03C1A8;
-        Wed, 22 Apr 2020 04:28:36 -0700 (PDT)
-Received: from bigeasy by Galois.linutronix.de with local (Exim 4.80)
-        (envelope-from <bigeasy@linutronix.de>)
-        id 1jRDYN-0006fw-5o; Wed, 22 Apr 2020 13:28:31 +0200
-Date:   Wed, 22 Apr 2020 13:28:31 +0200
-From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     Eric Biggers <ebiggers@kernel.org>, linux-rt-users@vger.kernel.org,
-        "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Wed, 22 Apr 2020 08:58:28 -0400
+Received: from mga17.intel.com ([192.55.52.151]:56500 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726818AbgDVM61 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 22 Apr 2020 08:58:27 -0400
+IronPort-SDR: Yf32zr61Tcpm3rYalfORguacY0oO9CezhpMcp6BXtWjkpIGOqsTl9W3jn2nObujxyhGNIufqe0
+ y1aryWZaMoTg==
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Apr 2020 05:58:27 -0700
+IronPort-SDR: 0DXt+2aQneNWPvZhB68PySp4KS95cknotsuqDKdDXRNPXsRV+tM+WY/PMMEjXdPBaVB06FTBRP
+ 8Hi9kPxjgj1Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.72,414,1580803200"; 
+   d="scan'208";a="273874484"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by orsmga002.jf.intel.com with ESMTP; 22 Apr 2020 05:58:10 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1003)
+        id 6967958F; Wed, 22 Apr 2020 15:58:09 +0300 (EEST)
+From:   Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To:     Sumit Garg <sumit.garg@linaro.org>, tee-dev@lists.linaro.org,
+        Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH crypto-stable] crypto: arch/lib - limit simd usage to
- PAGE_SIZE chunks
-Message-ID: <20200422112831.5352gcpo42jgz2dj@linutronix.de>
-References: <20200420075711.2385190-1-Jason@zx2c4.com>
- <20200422040415.GA2881@sol.localdomain>
- <CAMj1kXGRNCEkTFPGM03h1N+HtOiLVMcm89UJYMZcuWjyFAp5Ag@mail.gmail.com>
+        linux-crypto@vger.kernel.org
+Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Subject: [PATCH v1] hwrng: Use UUID API for exporting the UUID
+Date:   Wed, 22 Apr 2020 15:58:08 +0300
+Message-Id: <20200422125808.38278-1-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.26.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CAMj1kXGRNCEkTFPGM03h1N+HtOiLVMcm89UJYMZcuWjyFAp5Ag@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2020-04-22 09:23:34 [+0200], Ard Biesheuvel wrote:
-> My memory is a bit fuzzy here. I remember talking to the linux-rt guys
-> about what delay is actually acceptable, which was a lot higher than I
-> had thought based on their initial reports about scheduling blackouts
-> on arm64 due to preemption remaining disabled for too long. I intended
-> to revisit this with more accurate bounds but then I apparently
-> forgot.
-> 
-> So SIMD chacha20 and SIMD poly1305 both run in <5 cycles per bytes,
-> both on x86 and ARM. If we take 20 microseconds as a ballpark upper
-> bound for how long preemption may be disabled, that gives us ~4000
-> bytes of ChaCha20 or Poly1305 on a hypothetical 1 GHz core.
-> 
-> So I think 4 KB is indeed a reasonable quantum of work here. Only
-> PAGE_SIZE is not necessarily equal to 4 KB on arm64, so we should use
-> SZ_4K instead.
-> 
-> *However*, at the time, the report was triggered by the fact that we
-> were keeping SIMD enabled across calls into the scatterwalk API, which
-> may call kmalloc()/kfree() etc. There is no need for that anymore, now
-> that the FPU begin/end routines all have been optimized to restore the
-> userland SIMD state lazily.
+There is export_uuid() function which exports uuid_t to the u8 array.
+Use it instead of open coding variant.
 
-The 20usec sound reasonable. The other concern was memory allocation
-within the preempt-disable section. If this is no longer the case,
-perfect.
+This allows to hide the uuid_t internals.
 
-Sebastian
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ drivers/char/hw_random/optee-rng.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/char/hw_random/optee-rng.c b/drivers/char/hw_random/optee-rng.c
+index ddfbabaa5f8f6..49b2e02537ddb 100644
+--- a/drivers/char/hw_random/optee-rng.c
++++ b/drivers/char/hw_random/optee-rng.c
+@@ -226,7 +226,7 @@ static int optee_rng_probe(struct device *dev)
+ 		return -ENODEV;
+ 
+ 	/* Open session with hwrng Trusted App */
+-	memcpy(sess_arg.uuid, rng_device->id.uuid.b, TEE_IOCTL_UUID_LEN);
++	export_uuid(sess_arg.uuid, &rng_device->id.uuid);
+ 	sess_arg.clnt_login = TEE_IOCTL_LOGIN_PUBLIC;
+ 	sess_arg.num_params = 0;
+ 
+-- 
+2.26.1
+
