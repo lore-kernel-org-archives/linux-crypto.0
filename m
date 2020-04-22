@@ -2,111 +2,118 @@ Return-Path: <SRS0=sRio=6G=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F0F7C54FCB
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Apr 2020 20:17:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF2B4C55185
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Apr 2020 22:39:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 10B452074B
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Apr 2020 20:17:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="g6cvQ0mB"
+	by mail.kernel.org (Postfix) with ESMTP id 8C6B62076E
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Apr 2020 22:39:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1587595171;
+	bh=B1OMz7UfF+OAm1f+P6P94nyMDSYUzhidt60KZJsSkwY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=0FAh2ObIx4Gxr3ShtOxslTqKdZyRpW0pit0TTDCo7jUvO6wxxmswNys14gfvoiPz3
+	 lLb5LY63b5r2IitK4LMfBduIHZhHiWHID4X19qW4zT0T8Yg9xdi/qD45MOdVBJej8f
+	 C4A3frYE7LX/xGvKDIATmz6FhXiEPIPkMWFOU6xE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726512AbgDVURo (ORCPT
+        id S1726054AbgDVWj1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Apr 2020 16:17:44 -0400
-Received: from mail.zx2c4.com ([192.95.5.64]:34387 "EHLO mail.zx2c4.com"
+        Wed, 22 Apr 2020 18:39:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:51388 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725779AbgDVURn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Apr 2020 16:17:43 -0400
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 5d86e8b1;
-        Wed, 22 Apr 2020 20:06:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
-        :references:in-reply-to:from:date:message-id:subject:to:cc
-        :content-type; s=mail; bh=zcAqlsS6cbJG+9ZYLKubSmS1+4E=; b=g6cvQ0
-        mBzP+iPykSyvY4aC9vay4EW/eOKh++k2StorKsZG8KSB6v5eFkQlIg2+ebDfyg7i
-        KGISl+E9XBYJ0QU4/x8BZ376+rbdgF6Vo33zoCc/5ZyAghtXhswLRm6MmW42iUaC
-        i7mNpDBcfVymXJUGUH/NqiJgT/V6y1yi6qqtR2huKeF/7pYsS4wtmC320tZG7kSA
-        2a1PzDcQhWSanXwNVMC7Rmb1sym+sjCygvZnGIjEBOAlkY/s+FWdV7c1U2PYB+ci
-        KbzyJUL62dRxT45/JPY/Zau6c0jukMD6PYDap/6FCcSXpsO9chNDuOPNlirZaL4f
-        IAyim/Uu747aoWLA==
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 850def34 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Wed, 22 Apr 2020 20:06:45 +0000 (UTC)
-Received: by mail-io1-f48.google.com with SMTP id 19so3880811ioz.10;
-        Wed, 22 Apr 2020 13:17:39 -0700 (PDT)
-X-Gm-Message-State: AGi0PuYlG+XLCi2JR3fVxl+cskGrZ2NrfOB8eNUfhVX310Fj6hMqp0DE
-        aXQFJNm3hKtHxNTRzW3ZBzv1a8BpAS+lIjKuJwQ=
-X-Google-Smtp-Source: APiQypLeAfwZfIEvq8SjW1sawfpEIZjTTCkUn7CnS7yPa/RT9YO6yz9/p22sOOAYPD7ud6+ZqfrnecelDN4vSeaLASo=
-X-Received: by 2002:a05:6638:4e:: with SMTP id a14mr171449jap.108.1587586659063;
- Wed, 22 Apr 2020 13:17:39 -0700 (PDT)
+        id S1725968AbgDVWj1 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 22 Apr 2020 18:39:27 -0400
+Received: from gmail.com (unknown [104.132.1.76])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8BE0B2074B;
+        Wed, 22 Apr 2020 22:39:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1587595166;
+        bh=B1OMz7UfF+OAm1f+P6P94nyMDSYUzhidt60KZJsSkwY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=2ej6Ofj79uPkck7o02D/ClisI64VURrJUQ7lx87XI4EuhjurRaq88cM8IwT+JQ6Mf
+         t0YGDNMsLjXX1JjKnIpjkz5gFz0fELWKOOLN9JNrtsTWzKT3Xl6zYwXcYUfAeVaN2n
+         sriGlQW9SGPIrH1Lmwc+4Nkfqbovrf7e/hy8hzuw=
+Date:   Wed, 22 Apr 2020 15:39:25 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-rt-users@vger.kernel.org,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        stable@vger.kernel.org
+Subject: Re: [PATCH crypto-stable v2] crypto: arch - limit simd usage to 4k
+ chunks
+Message-ID: <20200422223925.GA96474@gmail.com>
+References: <20200420075711.2385190-1-Jason@zx2c4.com>
+ <20200422200344.239462-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-References: <20200420075711.2385190-1-Jason@zx2c4.com> <20200422040415.GA2881@sol.localdomain>
- <CAHmME9q=hMRjBG=SBX8gCC3qx-t1wdEwMOYx952m9HkByjiofA@mail.gmail.com>
- <CAMj1kXE-UZxw0C3WRVh7RfuWE0BNDT4bt4qJa1SyOH3K-qBBcQ@mail.gmail.com> <CAHmME9qXy4X3GtCtt5_1+KTxTXd6+nfhvE_c8Xn6_iJdRWhQmA@mail.gmail.com>
-In-Reply-To: <CAHmME9qXy4X3GtCtt5_1+KTxTXd6+nfhvE_c8Xn6_iJdRWhQmA@mail.gmail.com>
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 22 Apr 2020 14:17:28 -0600
-X-Gmail-Original-Message-ID: <CAHmME9rqG56i+TfOhY-yt52XZrFRRTv0Vwr27qn5yL0=OpQa-A@mail.gmail.com>
-Message-ID: <CAHmME9rqG56i+TfOhY-yt52XZrFRRTv0Vwr27qn5yL0=OpQa-A@mail.gmail.com>
-Subject: Re: [PATCH crypto-stable] crypto: arch/lib - limit simd usage to
- PAGE_SIZE chunks
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200422200344.239462-1-Jason@zx2c4.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Apr 22, 2020 at 1:51 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> On Wed, Apr 22, 2020 at 1:39 AM Ard Biesheuvel <ardb@kernel.org> wrote:
-> >
-> > On Wed, 22 Apr 2020 at 09:32, Jason A. Donenfeld <Jason@zx2c4.com> wrote:
-> > >
-> > > On Tue, Apr 21, 2020 at 10:04 PM Eric Biggers <ebiggers@kernel.org> wrote:
-> > > > Seems this should just be a 'while' loop?
-> > > >
-> > > >         while (bytes) {
-> > > >                 unsigned int todo = min_t(unsigned int, PAGE_SIZE, bytes);
-> > > >
-> > > >                 kernel_neon_begin();
-> > > >                 chacha_doneon(state, dst, src, todo, nrounds);
-> > > >                 kernel_neon_end();
-> > > >
-> > > >                 bytes -= todo;
-> > > >                 src += todo;
-> > > >                 dst += todo;
-> > > >         }
-> > >
-> > > The for(;;) is how it's done elsewhere in the kernel (that this patch
-> > > doesn't touch), because then we can break out of the loop before
-> > > having to increment src and dst unnecessarily. Likely a pointless
-> > > optimization as probably the compiler can figure out how to avoid
-> > > that. But maybe it can't. If you have a strong preference, I can
-> > > reactor everything to use `while (bytes)`, but if you don't care,
-> > > let's keep this as-is. Opinion?
-> > >
-> >
-> > Since we're bikeshedding, I'd prefer 'do { } while (bytes);' here,
-> > given that bytes is guaranteed to be non-zero before we enter the
-> > loop. But in any case, I'd prefer avoiding for(;;) or while(1) where
-> > we can.
->
-> Okay, will do-while it up for v2.
+On Wed, Apr 22, 2020 at 02:03:44PM -0600, Jason A. Donenfeld wrote:
+> The initial Zinc patchset, after some mailing list discussion, contained
+> code to ensure that kernel_fpu_enable would not be kept on for more than
+> a 4k chunk, since it disables preemption. The choice of 4k isn't totally
+> scientific, but it's not a bad guess either, and it's what's used in
+> both the x86 poly1305, blake2s, and nhpoly1305 code already (in the form
+> of PAGE_SIZE, which this commit corrects to be explicitly 4k).
+> 
+> Ard did some back of the envelope calculations and found that
+> at 5 cycles/byte (overestimate) on a 1ghz processor (pretty slow), 4k
+> means we have a maximum preemption disabling of 20us, which Sebastian
+> confirmed was probably a good limit.
+> 
+> Unfortunately the chunking appears to have been left out of the final
+> patchset that added the glue code. So, this commit adds it back in.
+> 
+> Fixes: 84e03fa39fbe ("crypto: x86/chacha - expose SIMD ChaCha routine as library function")
+> Fixes: b3aad5bad26a ("crypto: arm64/chacha - expose arm64 ChaCha routine as library function")
+> Fixes: a44a3430d71b ("crypto: arm/chacha - expose ARM ChaCha routine as library function")
+> Fixes: d7d7b8535662 ("crypto: x86/poly1305 - wire up faster implementations for kernel")
+> Fixes: f569ca164751 ("crypto: arm64/poly1305 - incorporate OpenSSL/CRYPTOGAMS NEON implementation")
+> Fixes: a6b803b3ddc7 ("crypto: arm/poly1305 - incorporate OpenSSL/CRYPTOGAMS NEON implementation")
+> Fixes: 0f961f9f670e ("crypto: x86/nhpoly1305 - add AVX2 accelerated NHPoly1305")
+> Fixes: 012c82388c03 ("crypto: x86/nhpoly1305 - add SSE2 accelerated NHPoly1305")
+> Fixes: a00fa0c88774 ("crypto: arm64/nhpoly1305 - add NEON-accelerated NHPoly1305")
+> Fixes: 16aae3595a9d ("crypto: arm/nhpoly1305 - add NEON-accelerated NHPoly1305")
+> Fixes: ed0356eda153 ("crypto: blake2s - x86_64 SIMD implementation")
+> Cc: Eric Biggers <ebiggers@google.com>
+> Cc: Ard Biesheuvel <ardb@kernel.org>
+> Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+> Changes v1->v2:
+>  - [Ard] Use explicit 4k chunks instead of PAGE_SIZE.
+>  - [Eric] Prefer do-while over for (;;).
+> 
+>  arch/arm/crypto/chacha-glue.c            | 14 +++++++++++---
+>  arch/arm/crypto/nhpoly1305-neon-glue.c   |  2 +-
+>  arch/arm/crypto/poly1305-glue.c          | 15 +++++++++++----
+>  arch/arm64/crypto/chacha-neon-glue.c     | 14 +++++++++++---
+>  arch/arm64/crypto/nhpoly1305-neon-glue.c |  2 +-
+>  arch/arm64/crypto/poly1305-glue.c        | 15 +++++++++++----
+>  arch/x86/crypto/blake2s-glue.c           | 10 ++++------
+>  arch/x86/crypto/chacha_glue.c            | 14 +++++++++++---
+>  arch/x86/crypto/nhpoly1305-avx2-glue.c   |  2 +-
+>  arch/x86/crypto/nhpoly1305-sse2-glue.c   |  2 +-
+>  arch/x86/crypto/poly1305_glue.c          | 13 ++++++-------
+>  11 files changed, 69 insertions(+), 34 deletions(-)
 
-I just sent v2 containing do-while, and I'm fine with that going in
-that way. But just in the interest of curiosity in the pan-tone
-palette, check this out:
+Can you split the nhpoly1305 changes into a separate patch?  They're a bit
+different from the rest of this patch, which is fixing up the crypto library
+interface that's new in v5.5.  The nhpoly1305 changes apply to v5.0 and don't
+have anything to do with the crypto library interface, and they're also a bit
+different since they replace PAGE_SIZE with 4K rather than unlimited with 4K.
 
-https://godbolt.org/z/VxXien
-
-It looks like on mine, the compiler avoids unnecessarily calling those
-adds on the last iteration, but on the other hand, it results in an
-otherwise unnecessary unconditional jump for the < 4096 case. Sort of
-interesting. Arm64 code is more or less the same difference too.
+- Eric
