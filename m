@@ -2,76 +2,128 @@ Return-Path: <SRS0=sRio=6G=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61E98C55185
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Apr 2020 23:09:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 738D7C55186
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Apr 2020 23:19:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2FF7F2076E
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Apr 2020 23:09:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 511CE2076C
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Apr 2020 23:19:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="pqGPYYI6"
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="NuulK9Hi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726077AbgDVXJo (ORCPT
+        id S1726303AbgDVXTK (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Apr 2020 19:09:44 -0400
-Received: from mail.zx2c4.com ([192.95.5.64]:44301 "EHLO mail.zx2c4.com"
+        Wed, 22 Apr 2020 19:19:10 -0400
+Received: from mail.zx2c4.com ([192.95.5.64]:43125 "EHLO mail.zx2c4.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725839AbgDVXJo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Apr 2020 19:09:44 -0400
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 5ed688f5;
-        Wed, 22 Apr 2020 22:58:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
-        :references:in-reply-to:from:date:message-id:subject:to:cc
-        :content-type; s=mail; bh=OZjfePK0HjGa7K40j3VsVBNVeW8=; b=pqGPYY
-        I6OfH9mtLpwBzieGqQLl5mWJ5oYrOyRdSfepMvLVLZJcKB03nJlST6tuTqdGjOId
-        nYD6iUk+MtVnyEeJBsycLkELMFep7VUnldTCipZJyPjnYuqCJSojHxbSx/XqTntb
-        H0Ze9QMgIkz7rS63WXeB2papPpPr5zNl+6+4cmGoewuMM+x2O7QZtPYwh6TfmSb7
-        h21KdBIR+emjEZXInBgRRPuiJlqX+uj70iZVWBP38Bgp4s/Gf3couQN2ED5/EONC
-        XGxGnb71rQZPuIUdHAQShjAQsdN+RpdamZem0hOmaDbe4S+iaAJEqRmx1Xry8xu4
-        NU+pmYwF9DZoUg1Q==
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id caee6694 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Wed, 22 Apr 2020 22:58:45 +0000 (UTC)
-Received: by mail-io1-f50.google.com with SMTP id z2so4358104iol.11;
-        Wed, 22 Apr 2020 16:09:40 -0700 (PDT)
-X-Gm-Message-State: AGi0PuZOz0mJmPoABOjBkqz9XsdQLXj5sQ16cNw9Ua/3Kt1+7gGYKFHb
-        3miO10PtbB5UgAqQSk3/OMc8xCF1Hr150Wm353k=
-X-Google-Smtp-Source: APiQypJXmmE/5uCkig09fHm1CEMbQRCNqkZvWR+p7JrW4J4CdSWRYWSdK8h/04PbRd7vzbEJL5Wh2LnLdC3VVxp8o/Q=
-X-Received: by 2002:a02:b88e:: with SMTP id p14mr744905jam.36.1587596980023;
- Wed, 22 Apr 2020 16:09:40 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200420075711.2385190-1-Jason@zx2c4.com> <20200422200344.239462-1-Jason@zx2c4.com>
- <20200422223925.GA96474@gmail.com>
-In-Reply-To: <20200422223925.GA96474@gmail.com>
+        id S1726077AbgDVXTI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 22 Apr 2020 19:19:08 -0400
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 54d56bd2;
+        Wed, 22 Apr 2020 23:08:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=from:to:cc
+        :subject:date:message-id:in-reply-to:references:mime-version
+        :content-transfer-encoding; s=mail; bh=2ctCQDriktgX2OaH1HEUsyi2w
+        ic=; b=NuulK9HiXMmy6kNr2uzQyrPQg8BHVUPmbQOivtEo76JyahCeZWNiRI+vG
+        ymYG1Smy1G8Sf9zsbsdrJVgw50+H2CubF/9hJEr4e/z1VXfbVbvK/yQ3tXZUwj6N
+        zazAqt2NfbmZ5kX2C9tMGYy4VLXOnzk0q/t0YgesaAoFywx3EZ2COX7ltDAvpDEK
+        Fl/tkKA/UyuZC7mGWCgY5em4ZaLMlDOJmKvYvbkTqmE4W/ZMPjxCjO0BrmMP4F3K
+        XTi2UKj+gTyibrwNTZX4C22pOGmAXVK80QFtofx0K71eCKaaNsOZy8JIgrVPUtJ6
+        kMVJbnKypyHjB9uPQyStkU1x770sA==
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 97c28892 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Wed, 22 Apr 2020 23:08:08 +0000 (UTC)
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 22 Apr 2020 17:09:29 -0600
-X-Gmail-Original-Message-ID: <CAHmME9q4qyUiR5o4BiCKYrOvfpBbOpag+m2+dE+dSPqm0M5Jhw@mail.gmail.com>
-Message-ID: <CAHmME9q4qyUiR5o4BiCKYrOvfpBbOpag+m2+dE+dSPqm0M5Jhw@mail.gmail.com>
-Subject: Re: [PATCH crypto-stable v2] crypto: arch - limit simd usage to 4k chunks
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        linux-rt-users@vger.kernel.org, Ard Biesheuvel <ardb@kernel.org>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        stable <stable@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-rt-users@vger.kernel.org
+Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Eric Biggers <ebiggers@google.com>, stable@vger.kernel.org
+Subject: [PATCH crypto-stable v3 2/2] crypto: arch/nhpoly1305 - process in explicit 4k chunks
+Date:   Wed, 22 Apr 2020 17:18:54 -0600
+Message-Id: <20200422231854.675965-2-Jason@zx2c4.com>
+In-Reply-To: <20200422231854.675965-1-Jason@zx2c4.com>
+References: <20200422200344.239462-1-Jason@zx2c4.com>
+ <20200422231854.675965-1-Jason@zx2c4.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Apr 22, 2020 at 4:39 PM Eric Biggers <ebiggers@kernel.org> wrote:
-> Can you split the nhpoly1305 changes into a separate patch?  They're a bit
-> different from the rest of this patch, which is fixing up the crypto library
-> interface that's new in v5.5.  The nhpoly1305 changes apply to v5.0 and don't
-> have anything to do with the crypto library interface, and they're also a bit
-> different since they replace PAGE_SIZE with 4K rather than unlimited with 4K.
+Rather than chunking via PAGE_SIZE, this commit changes the arch
+implementations to chunk in explicit 4k parts, so that calculations on
+maximum acceptable latency don't suddenly become invalid on platforms
+where PAGE_SIZE isn't 4k, such as arm64.
 
-Good point about the nhpoly change not being part of the library
-interface and thus backportable differently. I'll split that out and
-send a v3 shortly.
+Fixes: 0f961f9f670e ("crypto: x86/nhpoly1305 - add AVX2 accelerated NHPoly1305")
+Fixes: 012c82388c03 ("crypto: x86/nhpoly1305 - add SSE2 accelerated NHPoly1305")
+Fixes: a00fa0c88774 ("crypto: arm64/nhpoly1305 - add NEON-accelerated NHPoly1305")
+Fixes: 16aae3595a9d ("crypto: arm/nhpoly1305 - add NEON-accelerated NHPoly1305")
+Cc: Eric Biggers <ebiggers@google.com>
+Cc: stable@vger.kernel.org
+Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+---
+ arch/arm/crypto/nhpoly1305-neon-glue.c   | 2 +-
+ arch/arm64/crypto/nhpoly1305-neon-glue.c | 2 +-
+ arch/x86/crypto/nhpoly1305-avx2-glue.c   | 2 +-
+ arch/x86/crypto/nhpoly1305-sse2-glue.c   | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
 
-Jason
+diff --git a/arch/arm/crypto/nhpoly1305-neon-glue.c b/arch/arm/crypto/nhpoly1305-neon-glue.c
+index ae5aefc44a4d..ffa8d73fe722 100644
+--- a/arch/arm/crypto/nhpoly1305-neon-glue.c
++++ b/arch/arm/crypto/nhpoly1305-neon-glue.c
+@@ -30,7 +30,7 @@ static int nhpoly1305_neon_update(struct shash_desc *desc,
+ 		return crypto_nhpoly1305_update(desc, src, srclen);
+ 
+ 	do {
+-		unsigned int n = min_t(unsigned int, srclen, PAGE_SIZE);
++		unsigned int n = min_t(unsigned int, srclen, SZ_4K);
+ 
+ 		kernel_neon_begin();
+ 		crypto_nhpoly1305_update_helper(desc, src, n, _nh_neon);
+diff --git a/arch/arm64/crypto/nhpoly1305-neon-glue.c b/arch/arm64/crypto/nhpoly1305-neon-glue.c
+index 895d3727c1fb..c5405e6a6db7 100644
+--- a/arch/arm64/crypto/nhpoly1305-neon-glue.c
++++ b/arch/arm64/crypto/nhpoly1305-neon-glue.c
+@@ -30,7 +30,7 @@ static int nhpoly1305_neon_update(struct shash_desc *desc,
+ 		return crypto_nhpoly1305_update(desc, src, srclen);
+ 
+ 	do {
+-		unsigned int n = min_t(unsigned int, srclen, PAGE_SIZE);
++		unsigned int n = min_t(unsigned int, srclen, SZ_4K);
+ 
+ 		kernel_neon_begin();
+ 		crypto_nhpoly1305_update_helper(desc, src, n, _nh_neon);
+diff --git a/arch/x86/crypto/nhpoly1305-avx2-glue.c b/arch/x86/crypto/nhpoly1305-avx2-glue.c
+index f7567cbd35b6..80fcb85736e1 100644
+--- a/arch/x86/crypto/nhpoly1305-avx2-glue.c
++++ b/arch/x86/crypto/nhpoly1305-avx2-glue.c
+@@ -29,7 +29,7 @@ static int nhpoly1305_avx2_update(struct shash_desc *desc,
+ 		return crypto_nhpoly1305_update(desc, src, srclen);
+ 
+ 	do {
+-		unsigned int n = min_t(unsigned int, srclen, PAGE_SIZE);
++		unsigned int n = min_t(unsigned int, srclen, SZ_4K);
+ 
+ 		kernel_fpu_begin();
+ 		crypto_nhpoly1305_update_helper(desc, src, n, _nh_avx2);
+diff --git a/arch/x86/crypto/nhpoly1305-sse2-glue.c b/arch/x86/crypto/nhpoly1305-sse2-glue.c
+index a661ede3b5cf..cc6b7c1a2705 100644
+--- a/arch/x86/crypto/nhpoly1305-sse2-glue.c
++++ b/arch/x86/crypto/nhpoly1305-sse2-glue.c
+@@ -29,7 +29,7 @@ static int nhpoly1305_sse2_update(struct shash_desc *desc,
+ 		return crypto_nhpoly1305_update(desc, src, srclen);
+ 
+ 	do {
+-		unsigned int n = min_t(unsigned int, srclen, PAGE_SIZE);
++		unsigned int n = min_t(unsigned int, srclen, SZ_4K);
+ 
+ 		kernel_fpu_begin();
+ 		crypto_nhpoly1305_update_helper(desc, src, n, _nh_sse2);
+-- 
+2.26.2
+
