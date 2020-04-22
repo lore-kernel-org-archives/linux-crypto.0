@@ -6,83 +6,77 @@ X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D562C5518A
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Apr 2020 07:32:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20697C55189
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Apr 2020 07:38:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D1E16206A1
-	for <linux-crypto@archiver.kernel.org>; Wed, 22 Apr 2020 07:32:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E3752206E9
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Apr 2020 07:38:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="XgO2ynLV"
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="2cM/3ayz"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725842AbgDVHcr (ORCPT
+        id S1725810AbgDVHiy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 22 Apr 2020 03:32:47 -0400
-Received: from mail.zx2c4.com ([192.95.5.64]:45093 "EHLO mail.zx2c4.com"
+        Wed, 22 Apr 2020 03:38:54 -0400
+Received: from mail.zx2c4.com ([192.95.5.64]:58799 "EHLO mail.zx2c4.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725786AbgDVHcr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 22 Apr 2020 03:32:47 -0400
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 37916823;
-        Wed, 22 Apr 2020 07:21:55 +0000 (UTC)
+        id S1725786AbgDVHiy (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 22 Apr 2020 03:38:54 -0400
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTP id aa0d615f;
+        Wed, 22 Apr 2020 07:28:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
         :references:in-reply-to:from:date:message-id:subject:to:cc
-        :content-type; s=mail; bh=HtEBqmnfU1w2LdS6v9LHbppmOJ0=; b=XgO2yn
-        LVXAM5e/KoTuTKiRiXzANPY+GuIkh1P8P/9li5KpgUrSXO8weDb+jHtiHjY6CI1v
-        y0FDLJhiHv01Z5+ehnGdTeE/RkrFN/hb02Up781Z4839KcC+F/KR3aC4WJJ+gHIc
-        034yiYyEwZ/7+aGFqBo8p6wmP7gTPL+rJaafmm/nPxNfJ467xYSs5afmE3n+y7bJ
-        f8MFSjkzbe9jb4Zu1hlZrTafpvQauihAEn2eM4LIgwlE+irRldFk72JjgR34GNcP
-        sazuknFarjO6jn+nXo1emK2UhcX52tx96aTUliqPcSYyOhJ6XwWYWcLCh3h7k5sE
-        7K5BV5gX+UXOFcBQ==
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id fe767e4e (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Wed, 22 Apr 2020 07:21:55 +0000 (UTC)
-Received: by mail-io1-f50.google.com with SMTP id i19so1267969ioh.12;
-        Wed, 22 Apr 2020 00:32:45 -0700 (PDT)
-X-Gm-Message-State: AGi0PubIV8xiCRT5FeRXXp51ADZuoE/i+EgAqDoRz9LaUuSAbC7UDK7b
-        bpZmhq0dHasEv0eFjeT3bDQC6Xp4zbehbQifwMk=
-X-Google-Smtp-Source: APiQypKSHM1wFrVmucwCB0xnkocR4Y9qBsk20ipyD+/uvm3y3k7K4TRcTifVEIgKJhZZ/TiFbttLKE3sJmBUlMbvOts=
-X-Received: by 2002:a5d:9c02:: with SMTP id 2mr24375333ioe.67.1587540764605;
- Wed, 22 Apr 2020 00:32:44 -0700 (PDT)
+        :content-type; s=mail; bh=/sg8GZPKwFtmJRFpacBo1cf/OgI=; b=2cM/3a
+        yz8IvpwnuEqoqbbkvRLBLcWqtHUcAdVxzlKYl0UKYPgfJGksZQclryc+Gq6hnEsN
+        /SUy54gs4FfYaHCIFYqk/eyrPTw4mVNlI45sfjxn04BMGq3sHWL3jQjU7TjERqJ2
+        /OpA6dkjWLCV75Ez/50e/A1h0raPy656P+JZw2gnl/lbbA4d0SyMcysFFJ/tKwXx
+        hCqu93Bibdwyq6YSdi9T9hSqteq6qdFOLJX4aF7/+DcQomBVrGalXvOCYYCvuxh4
+        65L+FTc6Fe5wokQN4/l0VH37J4Pa/fZhDlodXype6u+WujJ+EbU+S51/rZpecNWA
+        3s/wTvIttHLz/xdA==
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 684cb763 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Wed, 22 Apr 2020 07:28:02 +0000 (UTC)
+Received: by mail-il1-f178.google.com with SMTP id f82so922965ilh.8;
+        Wed, 22 Apr 2020 00:38:52 -0700 (PDT)
+X-Gm-Message-State: AGi0Pubkt8TsqluhG9prKhqcn/iwJ29IYSseAeqMbVcSMkVaTwKYCHhN
+        e1d1rmneQ3noGZUl7ZOgAO+rRwS+uzc5X12k8cs=
+X-Google-Smtp-Source: APiQypLTtpTIRljCgyNakNz/zRP4C8vI82xsF2BjTAYEiN/4S1KV/Cc2xjZaNymJWJMjKaZ/6lHCQwvSaS71tFjtaME=
+X-Received: by 2002:a92:bf0b:: with SMTP id z11mr22557664ilh.207.1587541131618;
+ Wed, 22 Apr 2020 00:38:51 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200420075711.2385190-1-Jason@zx2c4.com> <20200422040415.GA2881@sol.localdomain>
-In-Reply-To: <20200422040415.GA2881@sol.localdomain>
+ <CAMj1kXGRNCEkTFPGM03h1N+HtOiLVMcm89UJYMZcuWjyFAp5Ag@mail.gmail.com>
+In-Reply-To: <CAMj1kXGRNCEkTFPGM03h1N+HtOiLVMcm89UJYMZcuWjyFAp5Ag@mail.gmail.com>
 From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date:   Wed, 22 Apr 2020 01:32:33 -0600
-X-Gmail-Original-Message-ID: <CAHmME9q=hMRjBG=SBX8gCC3qx-t1wdEwMOYx952m9HkByjiofA@mail.gmail.com>
-Message-ID: <CAHmME9q=hMRjBG=SBX8gCC3qx-t1wdEwMOYx952m9HkByjiofA@mail.gmail.com>
+Date:   Wed, 22 Apr 2020 01:38:40 -0600
+X-Gmail-Original-Message-ID: <CAHmME9oZUO4=uV8EsKwQf_TJ20EL62fn=-UiyZW-we5TukqxGQ@mail.gmail.com>
+Message-ID: <CAHmME9oZUO4=uV8EsKwQf_TJ20EL62fn=-UiyZW-we5TukqxGQ@mail.gmail.com>
 Subject: Re: [PATCH crypto-stable] crypto: arch/lib - limit simd usage to
  PAGE_SIZE chunks
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        Sebastian Siewior <bigeasy@linutronix.de>,
+        linux-rt-users@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
         Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Ard Biesheuvel <ardb@kernel.org>,
-        stable <stable@vger.kernel.org>
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Apr 21, 2020 at 10:04 PM Eric Biggers <ebiggers@kernel.org> wrote:
-> Seems this should just be a 'while' loop?
->
->         while (bytes) {
->                 unsigned int todo = min_t(unsigned int, PAGE_SIZE, bytes);
->
->                 kernel_neon_begin();
->                 chacha_doneon(state, dst, src, todo, nrounds);
->                 kernel_neon_end();
->
->                 bytes -= todo;
->                 src += todo;
->                 dst += todo;
->         }
+On Wed, Apr 22, 2020 at 1:23 AM Ard Biesheuvel <ardb@kernel.org> wrote:
+> So I think 4 KB is indeed a reasonable quantum of work here. Only
+> PAGE_SIZE is not necessarily equal to 4 KB on arm64, so we should use
+> SZ_4K instead.
 
-The for(;;) is how it's done elsewhere in the kernel (that this patch
-doesn't touch), because then we can break out of the loop before
-having to increment src and dst unnecessarily. Likely a pointless
-optimization as probably the compiler can figure out how to avoid
-that. But maybe it can't. If you have a strong preference, I can
-reactor everything to use `while (bytes)`, but if you don't care,
-let's keep this as-is. Opinion?
+Will wait to hear the rt guys' opinion, but sure, we can do SZ_4K
+explicitly. If we go with that in the end, v2 will adjust the other
+places that are already using PAGE_SIZE.
 
-Jason
+> So do we have any callers that are likely to pass more than 4 KB of
+> input at a time?
+
+Network packets can be big -- ethernet jumbo packets are 9k, for
+example -- so that means this could potentially ipsec, wireguard, and
+maybe wifi too. (Crypto api users might go through another layer of
+indirection that splits things up smaller, maybe.)
