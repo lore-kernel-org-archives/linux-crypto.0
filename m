@@ -1,140 +1,144 @@
-Return-Path: <SRS0=EVKT=6F=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=sRio=6G=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AA9EC54FCC
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 21:47:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 638FAC38A30
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Apr 2020 04:04:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 229AC20724
-	for <linux-crypto@archiver.kernel.org>; Tue, 21 Apr 2020 21:47:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gs/3/cWE"
+	by mail.kernel.org (Postfix) with ESMTP id 441CC206EC
+	for <linux-crypto@archiver.kernel.org>; Wed, 22 Apr 2020 04:04:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1587528262;
+	bh=R50vllRGiQsBJ4Aew3sRKSSCruehTtz3DQqv/n93hNM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=NyfzrTJDLsgYL5ySvu+bO6PVNreR9CFcMgbf7dEPTEerBx1CtFWW/1iebpFTCIWtZ
+	 ghHFxxD2fkVT5GJceT2LjtwSKVA6S3R1aLVrPRtCjBFfOGOqfN+9I2RHZO0AI06lxY
+	 jNn61UpMTqlvqm1/IgrLBZaZslsJYxqb+pc3YOXk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726055AbgDUVr2 (ORCPT
+        id S1725808AbgDVEES (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 21 Apr 2020 17:47:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60136 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726112AbgDUVr1 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 21 Apr 2020 17:47:27 -0400
-Received: from mail-oi1-x244.google.com (mail-oi1-x244.google.com [IPv6:2607:f8b0:4864:20::244])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A9FAC0610D5;
-        Tue, 21 Apr 2020 14:47:27 -0700 (PDT)
-Received: by mail-oi1-x244.google.com with SMTP id r25so114046oij.4;
-        Tue, 21 Apr 2020 14:47:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=ciFxuebc3h6Mj9upZD+rKZQRQtufTSVOmAvk3Fhrb+8=;
-        b=Gs/3/cWErnL1HK8vIip6HFCoT7YMdHo0kk2KUYaTPGJky+4xtFirvwaHEqkI2HtIlI
-         wdq6VA7psR1fXgv6wI1orD4p2STd+anwQuQW5O9+FdTxMBI06LLpWvehmvNIEUNO1k8q
-         f9PJKl3I1ELE0rCVmxNstw09SGrK3JBX8bG/K80JrHUp9CfMSB5S0UTwaRUVol14eQDV
-         Qsd30+PKtlCSprW6IlVcZTCs7UFzEFXizN/N40nehfoPEI1FNm0ldX22Ywk/vI/Wsqrs
-         oOmuqbCmlq0ydX+1pgVmuu9PnpUQJsy7oUlUnxhmzaedwnAL2fq9ZGOQvwXDDokabntb
-         qdwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=ciFxuebc3h6Mj9upZD+rKZQRQtufTSVOmAvk3Fhrb+8=;
-        b=Hx4hUEVLYcIEs4SRgPiNRh0A95hHe2VgG+lLMf9y9DBJx8rPbb6f2FLeZCiA05oYUb
-         1cJ4kVSv6TqMJC6uOyeJAAlQc+OQPc9EjxTEkbDBmpLlOFXkbes0ACn6YJvuK9BYz9l9
-         fWAREtCDIeQdtAtZuo78+WpsysdPjt7FJ+TwA8vMEnv/WTlk7xpoF/NUL76YrlmLD5gr
-         LOwu4AJATpGwpFV831ENS4vIlUm/7W83GvACgCPDCg7+JECWPgBNbHq/Tz3EbqIma7i6
-         Dh2qdwBGySttFUeZor6HHtaglBkWjuUm/o7OzgywDfiAUPe4khXHmE6rJzBT/YMqo3M7
-         CCuQ==
-X-Gm-Message-State: AGi0PuYsaSlu/2m9v3abhWhJzKhqOXCKEfw1Qz88K0TjNzxoadvPQiFr
-        LlpijQxEav9o+GP+Wz1y+xY=
-X-Google-Smtp-Source: APiQypLih2QqVaNUU4RcIddRD2JnsowfGXCnT47rR8H2Zr7F15q8n/3P7JuWAH36ltMiMagM66Im9Q==
-X-Received: by 2002:aca:b104:: with SMTP id a4mr4908325oif.103.1587505646764;
-        Tue, 21 Apr 2020 14:47:26 -0700 (PDT)
-Received: from localhost.localdomain ([2604:1380:4111:8b00::1])
-        by smtp.gmail.com with ESMTPSA id l187sm1042137oig.0.2020.04.21.14.47.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Apr 2020 14:47:26 -0700 (PDT)
-From:   Nathan Chancellor <natechancellor@gmail.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        clang-built-linux@googlegroups.com,
-        Nathan Chancellor <natechancellor@gmail.com>,
-        Dmitry Golovin <dima@golovin.in>
-Subject: [PATCH] lib/mpi: Fix 64-bit MIPS build with Clang
-Date:   Tue, 21 Apr 2020 14:47:04 -0700
-Message-Id: <20200421214703.47883-1-natechancellor@gmail.com>
-X-Mailer: git-send-email 2.26.2
+        Wed, 22 Apr 2020 00:04:18 -0400
+Received: from mail.kernel.org ([198.145.29.99]:36458 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725786AbgDVEES (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 22 Apr 2020 00:04:18 -0400
+Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 626AF206EC;
+        Wed, 22 Apr 2020 04:04:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1587528257;
+        bh=R50vllRGiQsBJ4Aew3sRKSSCruehTtz3DQqv/n93hNM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=oLnolN4n3W0qfa33jBbew2yBYuAnakUYs7omwV98FryoaPMJV7me5S/It2jiD/eod
+         VneXTzDyJl1rkZ4eRKvebq4EwhkN0QceSOCed0MRqQ2FcUpDXFvcc6C8Qz92n+Gwox
+         nFX6Tk0k8zatHLfutLngG+aNV9NaJclM54FwYUbo=
+Date:   Tue, 21 Apr 2020 21:04:15 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, ardb@kernel.org,
+        stable@vger.kernel.org
+Subject: Re: [PATCH crypto-stable] crypto: arch/lib - limit simd usage to
+ PAGE_SIZE chunks
+Message-ID: <20200422040415.GA2881@sol.localdomain>
+References: <20200420075711.2385190-1-Jason@zx2c4.com>
 MIME-Version: 1.0
-X-Patchwork-Bot: notify
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200420075711.2385190-1-Jason@zx2c4.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When building 64r6_defconfig with CONFIG_MIPS32_O32 disabled and
-CONFIG_CRYPTO_RSA enabled:
+On Mon, Apr 20, 2020 at 01:57:11AM -0600, Jason A. Donenfeld wrote:
+> The initial Zinc patchset, after some mailing list discussion, contained
+> code to ensure that kernel_fpu_enable would not be kept on for more than
+> a PAGE_SIZE chunk, since it disables preemption. The choice of PAGE_SIZE
+> isn't totally scientific, but it's not a bad guess either, and it's
+> what's used in both the x86 poly1305 and blake2s library code already.
+> Unfortunately it appears to have been left out of the final patchset
+> that actually added the glue code. So, this commit adds back the
+> PAGE_SIZE chunking.
+> 
+> Fixes: 84e03fa39fbe ("crypto: x86/chacha - expose SIMD ChaCha routine as library function")
+> Fixes: b3aad5bad26a ("crypto: arm64/chacha - expose arm64 ChaCha routine as library function")
+> Fixes: a44a3430d71b ("crypto: arm/chacha - expose ARM ChaCha routine as library function")
+> Fixes: f569ca164751 ("crypto: arm64/poly1305 - incorporate OpenSSL/CRYPTOGAMS NEON implementation")
+> Fixes: a6b803b3ddc7 ("crypto: arm/poly1305 - incorporate OpenSSL/CRYPTOGAMS NEON implementation")
+> Cc: Eric Biggers <ebiggers@google.com>
+> Cc: Ard Biesheuvel <ardb@kernel.org>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
+> ---
+> Eric, Ard - I'm wondering if this was in fact just an oversight in Ard's
+> patches, or if there was actually some later discussion in which we
+> concluded that the PAGE_SIZE chunking wasn't required, perhaps because
+> of FPU changes. If that's the case, please do let me know, in which case
+> I'll submit a _different_ patch that removes the chunking from x86 poly
+> and blake. I can't find any emails that would indicate that, but I might
+> be mistaken.
+> 
+>  arch/arm/crypto/chacha-glue.c        | 16 +++++++++++++---
+>  arch/arm/crypto/poly1305-glue.c      | 17 +++++++++++++----
+>  arch/arm64/crypto/chacha-neon-glue.c | 16 +++++++++++++---
+>  arch/arm64/crypto/poly1305-glue.c    | 17 +++++++++++++----
+>  arch/x86/crypto/chacha_glue.c        | 16 +++++++++++++---
+>  5 files changed, 65 insertions(+), 17 deletions(-)
 
-lib/mpi/generic_mpih-mul1.c:37:24: error: invalid use of a cast in a
-inline asm context requiring an l-value: remove the cast
-or build with -fheinous-gnu-extensions
-                umul_ppmm(prod_high, prod_low, s1_ptr[j], s2_limb);
-                ~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-lib/mpi/longlong.h:664:22: note: expanded from macro 'umul_ppmm'
-                 : "=d" ((UDItype)(w0))
-                         ~~~~~~~~~~^~~
-lib/mpi/generic_mpih-mul1.c:37:13: error: invalid use of a cast in a
-inline asm context requiring an l-value: remove the cast
-or build with -fheinous-gnu-extensions
-                umul_ppmm(prod_high, prod_low, s1_ptr[j], s2_limb);
-                ~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-lib/mpi/longlong.h:668:22: note: expanded from macro 'umul_ppmm'
-                 : "=d" ((UDItype)(w1))
-                         ~~~~~~~~~~^~~
-2 errors generated.
+I don't think you're missing anything.  On x86, kernel_fpu_begin() and
+kernel_fpu_end() did get optimized in v5.2.  But they still disable preemption,
+which is the concern here.
 
-This special case for umul_ppmm for MIPS64r6 was added in
-commit bbc25bee37d2b ("lib/mpi: Fix umul_ppmm() for MIPS64r6"), due to
-GCC being inefficient and emitting a __multi3 intrinsic.
+> 
+> diff --git a/arch/arm/crypto/chacha-glue.c b/arch/arm/crypto/chacha-glue.c
+> index 6fdb0ac62b3d..0e29ebac95fd 100644
+> --- a/arch/arm/crypto/chacha-glue.c
+> +++ b/arch/arm/crypto/chacha-glue.c
+> @@ -91,9 +91,19 @@ void chacha_crypt_arch(u32 *state, u8 *dst, const u8 *src, unsigned int bytes,
+>  		return;
+>  	}
+>  
+> -	kernel_neon_begin();
+> -	chacha_doneon(state, dst, src, bytes, nrounds);
+> -	kernel_neon_end();
+> +	for (;;) {
+> +		unsigned int todo = min_t(unsigned int, PAGE_SIZE, bytes);
+> +
+> +		kernel_neon_begin();
+> +		chacha_doneon(state, dst, src, todo, nrounds);
+> +		kernel_neon_end();
+> +
+> +		bytes -= todo;
+> +		if (!bytes)
+> +			break;
+> +		src += todo;
+> +		dst += todo;
+> +	}
+>  }
+>  EXPORT_SYMBOL(chacha_crypt_arch);
 
-There is no such issue with clang; with this patch applied, I can build
-this configuration without any problems and there are no link errors
-like mentioned in the commit above (which I can still reproduce with
-GCC 9.3.0 when that commit is reverted). Only use this definition when
-GCC is being used.
+Seems this should just be a 'while' loop?
 
-This really should have been caught by commit b0c091ae04f67 ("lib/mpi:
-Eliminate unused umul_ppmm definitions for MIPS") when I was messing
-around in this area but I was not testing 64-bit MIPS at the time.
+	while (bytes) {
+		unsigned int todo = min_t(unsigned int, PAGE_SIZE, bytes);
 
-Link: https://github.com/ClangBuiltLinux/linux/issues/885
-Reported-by: Dmitry Golovin <dima@golovin.in>
-Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
----
- lib/mpi/longlong.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+		kernel_neon_begin();
+		chacha_doneon(state, dst, src, todo, nrounds);
+		kernel_neon_end();
 
-diff --git a/lib/mpi/longlong.h b/lib/mpi/longlong.h
-index 2dceaca27489c..bfff2e398ffed 100644
---- a/lib/mpi/longlong.h
-+++ b/lib/mpi/longlong.h
-@@ -653,7 +653,7 @@ do {						\
- 	**************  MIPS/64  **************
- 	***************************************/
- #if (defined(__mips) && __mips >= 3) && W_TYPE_SIZE == 64
--#if defined(__mips_isa_rev) && __mips_isa_rev >= 6
-+#if defined(__mips_isa_rev) && __mips_isa_rev >= 6 && defined(CONFIG_CC_IS_GCC)
- /*
-  * GCC ends up emitting a __multi3 intrinsic call for MIPS64r6 with the plain C
-  * code below, so we special case MIPS64r6 until the compiler can do better.
+		bytes -= todo;
+		src += todo;
+		dst += todo;
+	}
 
-base-commit: ae83d0b416db002fe95601e7f97f64b59514d936
--- 
-2.26.2
+Likewise elsewhere in this patch.  (For Poly1305, len >= POLY1305_BLOCK_SIZE at
+the beginning, so that could use a 'do' loop.)
 
+- Eric
