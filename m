@@ -2,91 +2,103 @@ Return-Path: <SRS0=jAnl=6H=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E694BC54FCB
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Apr 2020 11:47:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21D8BC54FCB
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Apr 2020 11:59:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B8C552084D
-	for <linux-crypto@archiver.kernel.org>; Thu, 23 Apr 2020 11:47:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 075BA20857
+	for <linux-crypto@archiver.kernel.org>; Thu, 23 Apr 2020 11:59:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728146AbgDWLrJ (ORCPT
+        id S1727014AbgDWL7N (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 23 Apr 2020 07:47:09 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:37446 "EHLO fornost.hmeau.com"
+        Thu, 23 Apr 2020 07:59:13 -0400
+Received: from foss.arm.com ([217.140.110.172]:38452 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728017AbgDWLrJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 23 Apr 2020 07:47:09 -0400
-Received: from gwarestrin.me.apana.org.au ([192.168.0.7] helo=gwarestrin.arnor.me.apana.org.au)
-        by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1jRaJU-0001c8-A7; Thu, 23 Apr 2020 21:46:41 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 23 Apr 2020 21:46:40 +1000
-Date:   Thu, 23 Apr 2020 21:46:40 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Iuliana Prodan <iuliana.prodan@nxp.com>
-Cc:     Baolin Wang <baolin.wang@linaro.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        Maxime Ripard <mripard@kernel.org>,
-        Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Silvano Di Ninno <silvano.dininno@nxp.com>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-imx <linux-imx@nxp.com>
-Subject: Re: [PATCH v5 2/3] crypto: engine - support for parallel requests
- based on retry mechanism
-Message-ID: <20200423114640.GA14399@gondor.apana.org.au>
-References: <1586982375-18710-1-git-send-email-iuliana.prodan@nxp.com>
- <1586982375-18710-3-git-send-email-iuliana.prodan@nxp.com>
+        id S1726002AbgDWL7N (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 23 Apr 2020 07:59:13 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B77CD31B;
+        Thu, 23 Apr 2020 04:59:12 -0700 (PDT)
+Received: from gaia (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id C4D003F6CF;
+        Thu, 23 Apr 2020 04:59:11 -0700 (PDT)
+Date:   Thu, 23 Apr 2020 12:59:05 +0100
+From:   Catalin Marinas <catalin.marinas@arm.com>
+To:     Mark Brown <broonie@kernel.org>
+Cc:     Ard Biesheuvel <ardb@kernel.org>, Will Deacon <will@kernel.org>,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        Eric Biggers <ebiggers@google.com>
+Subject: Re: [PATCH 0/3] arm64: Open code .arch_extension
+Message-ID: <20200423115905.GE4963@gaia>
+References: <20200325114110.23491-1-broonie@kernel.org>
+ <CAMj1kXH=g5N4ZtnZeX5N8hf9cnWVam4Htnov6qAmQwD58Wp73Q@mail.gmail.com>
+ <20200325115038.GD4346@sirena.org.uk>
+ <20200422180027.GH3585@gaia>
+ <20200423111803.GG4808@sirena.org.uk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1586982375-18710-3-git-send-email-iuliana.prodan@nxp.com>
+In-Reply-To: <20200423111803.GG4808@sirena.org.uk>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Wed, Apr 15, 2020 at 11:26:14PM +0300, Iuliana Prodan wrote:
-> Added support for executing multiple requests, in parallel,
-> for crypto engine based on a retry mechanism.
-> If hardware was unable to execute a backlog request, enqueue it
-> back in front of crypto-engine queue, to keep the order
-> of requests.
+On Thu, Apr 23, 2020 at 12:18:03PM +0100, Mark Brown wrote:
+> On Wed, Apr 22, 2020 at 07:00:28PM +0100, Catalin Marinas wrote:
+> > On Wed, Mar 25, 2020 at 11:50:38AM +0000, Mark Brown wrote:
+> > > Since BTI is a mandatory feature of v8.5 there is no BTI arch_extension,
+> > > you can only enable it by moving the base architecture to v8.5.  You'd
+> > > need to use .arch and that feels likely to find us sharp edges to run
+> > > into.
 > 
-> A new variable is added, retry_support (this is to keep the
-> backward compatibility of crypto-engine) , which keeps track
-> whether the hardware has support for retry mechanism and,
-> also, if can run multiple requests.
+> > For MTE, .arch armv8-a+memtag won't work since this is only available
+> > with armv8.5-a. My preference would be to have the highest arch version
+> > supported by the kernel in the assembler.h file, i.e. ".arch armv8.5-a"
+> > followed by .arch_extension in each .S file, as needed.
 > 
-> If do_one_request() returns:
-> >= 0: hardware executed the request successfully;
-> < 0: this is the old error path. If hardware has support for retry
-> mechanism, the request is put back in front of crypto-engine queue.
-> For backwards compatibility, if the retry support is not available,
-> the crypto-engine will work as before.
-> Only MAY_BACKLOG requests are enqueued back into
-> crypto-engine's queue, since the others can be dropped.
+> I think we decided that .arch_extension was too new to be used for
+> things like the crypto stuff where we still support older toolchains?
 
-This looks a lot nicer!
+.arch_extension would be issued conditionally only for features like
+CONFIG_ARM64_MTE which already have a dependency on a newer toolchain.
 
-However, I do have one little issue with the error case.  I think
-we should not lump all errors together.  For queueing errors, we
-should requeue regardless of MAY_BACKLOG.  After all, we don't
-want to have random packet loss just becayse the queue was full.
+However, '.arch_extension memtag' is not sufficient for MTE, it needs a
+prior '.arch armv8.5-a'.
 
-For other errors (e.g., a kmalloc error), we should requeue the
-MAY_BACKLOG requests and drop everythin else.
+> > Forcing .S files to armv8.5 would not cause any problems with
+> > the base armv8.0 that the kernel image support since it shouldn't change
+> > the opcodes gas generates. The .S files would use alternatives anyway
+> > (or simply have code not called).
+> 
+> We do loose the checking that the assembler does that nobody used a
+> newer feature by mistake but yeah, shouldn't affect the output.
 
-Thanks,
+We may need some push/pop_arch macros to contain the supported features.
+
+The gas documentation says that .arch_extension may be used multiple
+times to add or remove extensions. However, I couldn't find a way to
+remove memtag after adding it (tried -memtag, !memtag, empty string). So
+I may go with a '.arch armv8.0-a' as a base, followed by temporary
+setting of '.arch armv8.5-a+memtag' (and hope we don't need combinations
+of such extensions).
+
+> > The inline asm is slightly more problematic, especially with the clang
+> > builtin assembler which goes in a single pass. But we could do something
+> > similar to what we did with the LSE atomics and raising the base of the
+> > inline asm to armv8.5 (or 8.6 etc., whatever we need in the future).
+> 
+> FWIW I did something different to this for BTI so I wasn't using the
+> instructions directly so I was going to abandon this series.
+
+I can't work around this easily for MTE, there are more instructions
+with register encoding. I'll see if the push/pop idea works or just
+leave it to whoever does the next feature, figure out how it interacts
+with MTE ;).
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Catalin
