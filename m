@@ -7,53 +7,54 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABEEFC54FCB
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 Apr 2020 16:45:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 792D8C5519A
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 Apr 2020 16:45:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8CFC920728
-	for <linux-crypto@archiver.kernel.org>; Fri, 24 Apr 2020 16:45:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 58D662075A
+	for <linux-crypto@archiver.kernel.org>; Fri, 24 Apr 2020 16:45:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="PKStFdgl"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="nPEx+Gsd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728297AbgDXQpH (ORCPT
+        id S1728435AbgDXQpI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 24 Apr 2020 12:45:07 -0400
-Received: from fllv0016.ext.ti.com ([198.47.19.142]:36514 "EHLO
-        fllv0016.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728119AbgDXQpG (ORCPT
+        Fri, 24 Apr 2020 12:45:08 -0400
+Received: from lelv0142.ext.ti.com ([198.47.23.249]:52028 "EHLO
+        lelv0142.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728119AbgDXQpI (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 24 Apr 2020 12:45:06 -0400
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 03OGj0Y6125934;
-        Fri, 24 Apr 2020 11:45:00 -0500
+        Fri, 24 Apr 2020 12:45:08 -0400
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+        by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 03OGj2OJ067904;
+        Fri, 24 Apr 2020 11:45:02 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1587746700;
-        bh=5OyXkewc+Kn9FLREBcSoDlBcSAoQbLaJSLz2ZT75tfg=;
+        s=ti-com-17Q1; t=1587746702;
+        bh=a3YbnQzPP/EyIcZogb3ZBNHJfeBLiWbazbKGTNmqw9Y=;
         h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=PKStFdgl/MTkS/xuu7FaM1xD4lEELLfZKJgn6lxspiKyf5T+RYuttz1DITAHM5/i4
-         ZahY/S/nOq4Gspl5leNxr6Mc8V1Hw9XZo1XYQ6DvGetZikS4Gzl28iy0+Pd02wtkCc
-         GWq0PeVcOrFE8hPjEuyxIy4OHeal3ttjyfS2D1TE=
-Received: from DLEE100.ent.ti.com (dlee100.ent.ti.com [157.170.170.30])
-        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTP id 03OGj021044847;
-        Fri, 24 Apr 2020 11:45:00 -0500
-Received: from DLEE113.ent.ti.com (157.170.170.24) by DLEE100.ent.ti.com
- (157.170.170.30) with Microsoft SMTP Server (version=TLS1_2,
+        b=nPEx+GsdCR5kJsY25OzqcDwLD4QQNRUua2vwkMV+9OksBo+kebxI6cdeot+FBrzUs
+         0cL1xpkEkJDkLe/JqnIN5z0RL30lOgyf/U3YNoj7kyd0BMzHhiMVv1uhAYLBbwLiKy
+         pmQbq7Q+Hlnk5v1Je9JUiHYxoVn8RP/OaL3kLW0c=
+Received: from DLEE106.ent.ti.com (dlee106.ent.ti.com [157.170.170.36])
+        by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 03OGj2WD103117
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Fri, 24 Apr 2020 11:45:02 -0500
+Received: from DLEE106.ent.ti.com (157.170.170.36) by DLEE106.ent.ti.com
+ (157.170.170.36) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3; Fri, 24
- Apr 2020 11:45:00 -0500
-Received: from fllv0039.itg.ti.com (10.64.41.19) by DLEE113.ent.ti.com
- (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
+ Apr 2020 11:45:01 -0500
+Received: from fllv0039.itg.ti.com (10.64.41.19) by DLEE106.ent.ti.com
+ (157.170.170.36) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3 via
- Frontend Transport; Fri, 24 Apr 2020 11:45:00 -0500
+ Frontend Transport; Fri, 24 Apr 2020 11:45:01 -0500
 Received: from sokoban.ti.com (ileax41-snat.itg.ti.com [10.172.224.153])
-        by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 03OGinTB033554;
-        Fri, 24 Apr 2020 11:44:59 -0500
+        by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 03OGinTC033554;
+        Fri, 24 Apr 2020 11:45:00 -0500
 From:   Tero Kristo <t-kristo@ti.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
         <linux-crypto@vger.kernel.org>
 CC:     Keerthy <j-keerthy@ti.com>
-Subject: [PATCHv2 6/7] arm64: dts: ti: k3-am6: Add crypto accelarator node
-Date:   Fri, 24 Apr 2020 19:44:29 +0300
-Message-ID: <20200424164430.3288-7-t-kristo@ti.com>
+Subject: [PATCHv2 7/7] arm64: dts: ti: k3-j721e-main: Add crypto accelerator node
+Date:   Fri, 24 Apr 2020 19:44:30 +0300
+Message-ID: <20200424164430.3288-8-t-kristo@ti.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200424164430.3288-1-t-kristo@ti.com>
 References: <20200424164430.3288-1-t-kristo@ti.com>
@@ -74,24 +75,25 @@ Signed-off-by: Keerthy <j-keerthy@ti.com>
 [t-kristo@ti.com: Modifications based on introduction of yaml binding]
 Signed-off-by: Tero Kristo <t-kristo@ti.com>
 ---
- arch/arm64/boot/dts/ti/k3-am65-main.dtsi | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ arch/arm64/boot/dts/ti/k3-j721e-main.dtsi | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-diff --git a/arch/arm64/boot/dts/ti/k3-am65-main.dtsi b/arch/arm64/boot/dts/ti/k3-am65-main.dtsi
-index 11887c72f23a..4602ca8e2392 100644
---- a/arch/arm64/boot/dts/ti/k3-am65-main.dtsi
-+++ b/arch/arm64/boot/dts/ti/k3-am65-main.dtsi
-@@ -112,6 +112,28 @@
- 		power-domains = <&k3_pds 148 TI_SCI_PD_EXCLUSIVE>;
+diff --git a/arch/arm64/boot/dts/ti/k3-j721e-main.dtsi b/arch/arm64/boot/dts/ti/k3-j721e-main.dtsi
+index 0b9d14b838a1..f41bd22ebac8 100644
+--- a/arch/arm64/boot/dts/ti/k3-j721e-main.dtsi
++++ b/arch/arm64/boot/dts/ti/k3-j721e-main.dtsi
+@@ -256,6 +256,29 @@
+ 		};
  	};
  
-+	crypto: crypto@4E00000 {
-+		compatible = "ti,am654-sa2ul";
++	main_crypto: crypto@4E00000 {
++		compatible = "ti,j721e-sa2ul";
 +		reg = <0x0 0x4E00000 0x0 0x1200>;
-+		power-domains = <&k3_pds 136 TI_SCI_PD_EXCLUSIVE>;
++		power-domains = <&k3_pds 264 TI_SCI_PD_EXCLUSIVE>;
 +		#address-cells = <2>;
 +		#size-cells = <2>;
 +		ranges = <0x0 0x04E00000 0x00 0x04E00000 0x0 0x30000>;
++
 +		status = "okay";
 +
 +		dmas = <&main_udmap 0xc000>, <&main_udmap 0x4000>,
@@ -102,14 +104,14 @@ index 11887c72f23a..4602ca8e2392 100644
 +		rng: rng@4e10000 {
 +			compatible = "inside-secure,safexcel-eip76";
 +			reg = <0x0 0x4e10000 0x0 0x7d>;
-+			interrupts = <GIC_SPI 24 IRQ_TYPE_LEVEL_HIGH>;
-+			clocks = <&k3_clks 136 1>;
++			interrupts = <GIC_SPI 11 IRQ_TYPE_LEVEL_HIGH>;
++			clocks = <&k3_clks 264 1>;
 +		};
 +	};
 +
  	main_pmx0: pinmux@11c000 {
  		compatible = "pinctrl-single";
- 		reg = <0x0 0x11c000 0x0 0x2e4>;
+ 		/* Proxy 0 addressing */
 -- 
 2.17.1
 
