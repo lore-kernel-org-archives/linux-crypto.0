@@ -4,27 +4,27 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 681ABC55199
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Apr 2020 05:42:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 516CDC5519A
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Apr 2020 05:42:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 54671206B6
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Apr 2020 05:42:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3A3402084D
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Apr 2020 05:42:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726429AbgD0FmE (ORCPT
+        id S1726590AbgD0FmI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Apr 2020 01:42:04 -0400
-Received: from foss.arm.com ([217.140.110.172]:56616 "EHLO foss.arm.com"
+        Mon, 27 Apr 2020 01:42:08 -0400
+Received: from foss.arm.com ([217.140.110.172]:56640 "EHLO foss.arm.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726172AbgD0FmD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Apr 2020 01:42:03 -0400
+        id S1726172AbgD0FmH (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 27 Apr 2020 01:42:07 -0400
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3A7A81063;
-        Sun, 26 Apr 2020 22:42:03 -0700 (PDT)
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 935CE113E;
+        Sun, 26 Apr 2020 22:42:06 -0700 (PDT)
 Received: from ssg-dev-vb.arm.com (E111385.Arm.com [10.50.65.54])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0DEB93F73D;
-        Sun, 26 Apr 2020 22:41:59 -0700 (PDT)
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 968A23F73D;
+        Sun, 26 Apr 2020 22:42:03 -0700 (PDT)
 From:   Hadar Gat <hadar.gat@arm.com>
 To:     Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -39,9 +39,9 @@ To:     Matt Mackall <mpm@selenic.com>,
 Cc:     linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
         Gilad Ben-Yossef <gilad@benyossef.com>,
         Ofir Drang <ofir.drang@arm.com>
-Subject: [PATCH 1/3] hwrng: cctrng - Add dependency on OF
-Date:   Mon, 27 Apr 2020 08:41:37 +0300
-Message-Id: <1587966099-28139-2-git-send-email-hadar.gat@arm.com>
+Subject: [PATCH 2/3] hwrng: cctrng - change default to n
+Date:   Mon, 27 Apr 2020 08:41:38 +0300
+Message-Id: <1587966099-28139-3-git-send-email-hadar.gat@arm.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1587966099-28139-1-git-send-email-hadar.gat@arm.com>
 References: <1587966099-28139-1-git-send-email-hadar.gat@arm.com>
@@ -50,27 +50,29 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The cctrng is unusable on non-DT systems so we should depend
-on it.
+For many users, the Arm CryptoCell HW is not available, so the
+default for HW_RANDOM_CCTRNG changed to n.
 
 Signed-off-by: Hadar Gat <hadar.gat@arm.com>
 ---
- drivers/char/hw_random/Kconfig | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/char/hw_random/Kconfig | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/char/hw_random/Kconfig b/drivers/char/hw_random/Kconfig
-index 0c99735..df2d001 100644
+index df2d001..0938d3d 100644
 --- a/drivers/char/hw_random/Kconfig
 +++ b/drivers/char/hw_random/Kconfig
-@@ -476,7 +476,7 @@ config HW_RANDOM_KEYSTONE
+@@ -476,8 +476,8 @@ config HW_RANDOM_KEYSTONE
  
  config HW_RANDOM_CCTRNG
  	tristate "Arm CryptoCell True Random Number Generator support"
--	depends on HAS_IOMEM
-+	depends on HAS_IOMEM & OF
- 	default HW_RANDOM
+-	depends on HAS_IOMEM & OF
+-	default HW_RANDOM
++	depends on HW_RANDOM & HAS_IOMEM & OF
++	default n
  	help
  	  This driver provides support for the True Random Number
+ 	  Generator available in Arm TrustZone CryptoCell.
 -- 
 2.7.4
 
