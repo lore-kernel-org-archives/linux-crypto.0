@@ -2,327 +2,174 @@ Return-Path: <SRS0=Oy//=6L=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E8A0C5519A
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Apr 2020 08:42:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D446C5519A
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Apr 2020 08:56:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 027252080C
-	for <linux-crypto@archiver.kernel.org>; Mon, 27 Apr 2020 08:42:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 408BC2080C
+	for <linux-crypto@archiver.kernel.org>; Mon, 27 Apr 2020 08:56:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20150623.gappssmtp.com header.i=@baylibre-com.20150623.gappssmtp.com header.b="n1DX+gEv"
+	dkim=pass (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b="y/RAHKLi";
+	dkim=pass (1024-bit key) header.d=armh.onmicrosoft.com header.i=@armh.onmicrosoft.com header.b="y/RAHKLi"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726243AbgD0Iml (ORCPT
+        id S1726769AbgD0I4u (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 27 Apr 2020 04:42:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36422 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726183AbgD0Imk (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 27 Apr 2020 04:42:40 -0400
-Received: from mail-wm1-x342.google.com (mail-wm1-x342.google.com [IPv6:2a00:1450:4864:20::342])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1ABFC061A10
-        for <linux-crypto@vger.kernel.org>; Mon, 27 Apr 2020 01:42:38 -0700 (PDT)
-Received: by mail-wm1-x342.google.com with SMTP id 188so18572124wmc.2
-        for <linux-crypto@vger.kernel.org>; Mon, 27 Apr 2020 01:42:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=3OJ7zI5D/+o9PAallEctJqNG+ojY+//gD77qJQ0kIFM=;
-        b=n1DX+gEvh24yHFjrn3QLssQv3ijVfIFIlGJUqwi2poGOnb8R9LuTNilUKt2z4PtmaB
-         k+7nnBnv/1VHahFFTeGhcw+q+VAG6L33jnv0FdarpYF2fubsCLOHWtT/RG79D1BErI0h
-         Fg1ZvXrg+EE6aTFZAizH38VLRdYRuJUS3DnqM/bJp3WL+c94prK3xPkhT4h+fWUjZXM+
-         YvhyHSBdbft0ytSSQkG+ijNYNd5y9pQAKeUy2tijFJX6+fuWvsUA0OjKhxgsZuDYvPyA
-         8Sz1UuO1/iDdyOTFW2kxkh1ykmq9IXxkOY5T4waGTNvA1jKWEQzy1sbG2YzGd3J4A+p6
-         m9gg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=3OJ7zI5D/+o9PAallEctJqNG+ojY+//gD77qJQ0kIFM=;
-        b=cQ657M/5fYk26JBtXddCVUNNB6UdnL2V0Mx2gVgu9QRZD198qW3hgE2RcDeMV9C+RD
-         h3M9kIO/ALRaMEsuv4W2GfjK8lW/sRW32Ufoznp4bpjYdw9lsY9wOkKiIN86vroUtxtO
-         a2VzLCM1YINNEhMncYuZFe94RznGWDOGYRrEUm6WMoC2w65Iq2oAUK1aNp+0b+ptnmUi
-         xyxc5ltUBfcDwc2rJ1G66sZo5dKc5GUVnYV+KICG7GrX0JtBs7yWAw9MIeGuME88nmJk
-         xG4ZtjgXajhp3MC3bXIfrz0GOOie+D/rxjXzmSQ8gAsHqddqTC+9EqZ4TJF7+qg7uWil
-         BHYA==
-X-Gm-Message-State: AGi0PuZb+u9v3BJCnvyl4f/d55MEQaXcCCAB4YVdFH6ka1hjfd/cfEwf
-        TaA3sc845j0kmBT5QU5kw3QeUQ==
-X-Google-Smtp-Source: APiQypJrmRJxl+LFnFg2EFvUIMNK4tDN3pemq89DtMppLTkVHPD2h3aVOBLY2yibIMA36EC/SbpXgQ==
-X-Received: by 2002:a1c:7c10:: with SMTP id x16mr24340968wmc.74.1587976957587;
-        Mon, 27 Apr 2020 01:42:37 -0700 (PDT)
-Received: from Red ([2a01:cb1d:3d5:a100:2e56:dcff:fed2:c6d6])
-        by smtp.googlemail.com with ESMTPSA id r18sm17101839wrj.70.2020.04.27.01.42.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Apr 2020 01:42:37 -0700 (PDT)
-Date:   Mon, 27 Apr 2020 10:42:35 +0200
-From:   LABBE Corentin <clabbe@baylibre.com>
-To:     Stephan Mueller <stephan.mueller@atsec.com>
-Cc:     davem@davemloft.net, herbert@gondor.apana.org.au,
-        mripard@kernel.org, wens@csie.org,
-        linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-sunxi@googlegroups.com
-Subject: Re: [PATCH v2 14/14] crypto: sun8i-ce: Add support for the TRNG
-Message-ID: <20200427084235.GB8787@Red>
-References: <1587736934-22801-1-git-send-email-clabbe@baylibre.com>
- <1587736934-22801-15-git-send-email-clabbe@baylibre.com>
- <3693153.CBanSm0cUG@tauon.chronox.de>
+        Mon, 27 Apr 2020 04:56:50 -0400
+Received: from mail-eopbgr80040.outbound.protection.outlook.com ([40.107.8.40]:56034
+        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726183AbgD0I4u (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 27 Apr 2020 04:56:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Q/YZoOdwy5jCiN8Mt0R1TmvByv4dO8rZl0CoMDE4Bcc=;
+ b=y/RAHKLisesysXnZFtHtERczXoMUFfS76+rd+cZJ/pQroiBIzVtbtU82P1tVzVu513B3YhxMFE3EJYLwzZXtmDFICcRARsVh2PleW3kBOmCpRbHeVjguDSCscuPhdgDxPH9X3NB8FbkGOwWHbLzgH+c1DBk6OaybcHBAulyc5fE=
+Received: from AM6P193CA0065.EURP193.PROD.OUTLOOK.COM (2603:10a6:209:8e::42)
+ by AM6PR08MB3318.eurprd08.prod.outlook.com (2603:10a6:209:45::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13; Mon, 27 Apr
+ 2020 08:56:46 +0000
+Received: from AM5EUR03FT003.eop-EUR03.prod.protection.outlook.com
+ (2603:10a6:209:8e:cafe::b0) by AM6P193CA0065.outlook.office365.com
+ (2603:10a6:209:8e::42) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13 via Frontend
+ Transport; Mon, 27 Apr 2020 08:56:46 +0000
+Authentication-Results: spf=pass (sender IP is 63.35.35.123)
+ smtp.mailfrom=arm.com; vger.kernel.org; dkim=pass (signature was verified)
+ header.d=armh.onmicrosoft.com;vger.kernel.org; dmarc=bestguesspass
+ action=none header.from=arm.com;
+Received-SPF: Pass (protection.outlook.com: domain of arm.com designates
+ 63.35.35.123 as permitted sender) receiver=protection.outlook.com;
+ client-ip=63.35.35.123; helo=64aa7808-outbound-1.mta.getcheckrecipient.com;
+Received: from 64aa7808-outbound-1.mta.getcheckrecipient.com (63.35.35.123) by
+ AM5EUR03FT003.mail.protection.outlook.com (10.152.16.149) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2937.19 via Frontend Transport; Mon, 27 Apr 2020 08:56:46 +0000
+Received: ("Tessian outbound ff098c684b24:v54"); Mon, 27 Apr 2020 08:56:45 +0000
+X-CR-MTA-TID: 64aa7808
+Received: from 5fa8be9958cd.2
+        by 64aa7808-outbound-1.mta.getcheckrecipient.com id 76DC682B-A967-47A0-8B58-7A986A9C8E46.1;
+        Mon, 27 Apr 2020 08:56:40 +0000
+Received: from EUR01-DB5-obe.outbound.protection.outlook.com
+    by 64aa7808-outbound-1.mta.getcheckrecipient.com with ESMTPS id 5fa8be9958cd.2
+    (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384);
+    Mon, 27 Apr 2020 08:56:40 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=USobUby+qeHNqSJEBLiPkxF58FOPthlCj4xnFBNY+v0feFXcgITk1mD7r63exGVou312twsPwILyEI+To90ws/j8N/WtDkkzQ1RJ8/4dVHkCQnRkmbmvZLe0BtTDabA/95OdugAgXyi8mMkvqMTEEabJafVR300C8m/S1qvYwexn2XTobLTCXcwqv6GnJhs0HBS1RWMAvrqhW4uIXHu3jg39H2KfseU1VWWjGCkODWIjaH3TYzxYRlDToulGjdYTLvuJjvJBweP+Dnbcro2dc+Fa9L/dJ96jXex0eHqWej2JHMUYeRSpSdK/nRIQWVeUnIDMRMlp+WNtMB7tOwG5mA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Q/YZoOdwy5jCiN8Mt0R1TmvByv4dO8rZl0CoMDE4Bcc=;
+ b=WpXIaj9KizzKVPlB/DcsEKPujP7epPCxSJetkxicblywTqd848h60DBfmAyQShur+3dDP+kuqSVwv9h46EHGlbP+i1dNZtUZO7+xzzTlrVicZZXUMR91+qED7rqwnYvHl4pvE7vj7rsSVrq1DJ2JX3VDo3aNRdBCyf7k3qNnujl7jP7v1/VbeLY8J9hPcVrvZ+rflk472v5krONWoXpM6NNQsGZIAL/hFtLekzOIvOTmvHdTFbdPFZvePwb1BWjN1Uz/+0gJOftV1qmiEP8uUQtU+HbJkTVo7BEqsWYTxigrYhc+WBAiKx5tUr5FFneO++uPal6V8JcsPBxWplHjgw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=arm.com; dmarc=pass action=none header.from=arm.com; dkim=pass
+ header.d=arm.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=armh.onmicrosoft.com;
+ s=selector2-armh-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Q/YZoOdwy5jCiN8Mt0R1TmvByv4dO8rZl0CoMDE4Bcc=;
+ b=y/RAHKLisesysXnZFtHtERczXoMUFfS76+rd+cZJ/pQroiBIzVtbtU82P1tVzVu513B3YhxMFE3EJYLwzZXtmDFICcRARsVh2PleW3kBOmCpRbHeVjguDSCscuPhdgDxPH9X3NB8FbkGOwWHbLzgH+c1DBk6OaybcHBAulyc5fE=
+Received: from DB6PR0802MB2533.eurprd08.prod.outlook.com (2603:10a6:4:a0::12)
+ by DB6PR0802MB2597.eurprd08.prod.outlook.com (2603:10a6:4:99::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2937.13; Mon, 27 Apr
+ 2020 08:56:39 +0000
+Received: from DB6PR0802MB2533.eurprd08.prod.outlook.com
+ ([fe80::b959:1879:c050:3117]) by DB6PR0802MB2533.eurprd08.prod.outlook.com
+ ([fe80::b959:1879:c050:3117%8]) with mapi id 15.20.2937.020; Mon, 27 Apr 2020
+ 08:56:39 +0000
+From:   Hadar Gat <Hadar.Gat@arm.com>
+To:     Arnd Bergmann <arnd@arndb.de>
+CC:     Ard Biesheuvel <ardb@kernel.org>, Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Stefan Wahren <wahrenst@gmx.net>,
+        Zaibo Xu <xuzaibo@huawei.com>,
+        Tomer Maimon <tmaimon77@gmail.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Ofir Drang <Ofir.Drang@arm.com>, nd <nd@arm.com>
+Subject: RE: [PATCH 2/3] hwrng: cctrng - change default to n
+Thread-Topic: [PATCH 2/3] hwrng: cctrng - change default to n
+Thread-Index: AQHWHFaa2ILie1hr/Ua7OdXaSVzplaiMigqAgAAGr1CAAA+9AIAACb9A
+Date:   Mon, 27 Apr 2020 08:56:38 +0000
+Message-ID: <DB6PR0802MB253351027A5B3236E31D1E9AE9AF0@DB6PR0802MB2533.eurprd08.prod.outlook.com>
+References: <1587966099-28139-1-git-send-email-hadar.gat@arm.com>
+ <1587966099-28139-3-git-send-email-hadar.gat@arm.com>
+ <CAMj1kXGwVZiGbsT2NwWTyka0FVZnQcmfMSeoBKD03PdC=fRZeA@mail.gmail.com>
+ <DB6PR0802MB25334429B7DD333780E7BABBE9AF0@DB6PR0802MB2533.eurprd08.prod.outlook.com>
+ <CAK8P3a1LYAESnePbwbn7x7x=2MCTWUNZVmmoiuv+_-J2ntFGmA@mail.gmail.com>
+In-Reply-To: <CAK8P3a1LYAESnePbwbn7x7x=2MCTWUNZVmmoiuv+_-J2ntFGmA@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ts-tracking-id: 3f622335-76be-4668-a357-22837c7fece5.1
+x-checkrecipientchecked: true
+Authentication-Results-Original: spf=none (sender IP is )
+ smtp.mailfrom=Hadar.Gat@arm.com; 
+x-originating-ip: [84.109.179.203]
+x-ms-publictraffictype: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 7f80681c-a13f-4905-9a43-08d7ea88ea34
+x-ms-traffictypediagnostic: DB6PR0802MB2597:|DB6PR0802MB2597:|AM6PR08MB3318:
+x-ms-exchange-transport-forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB33182685B0D1E45706007FA4E9AF0@AM6PR08MB3318.eurprd08.prod.outlook.com>
+x-checkrecipientrouted: true
+nodisclaimer: true
+x-ms-oob-tlc-oobclassifiers: OLM:7219;OLM:7219;
+x-forefront-prvs: 0386B406AA
+X-Forefront-Antispam-Report-Untrusted: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB6PR0802MB2533.eurprd08.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(366004)(376002)(136003)(346002)(39860400002)(396003)(316002)(2906002)(6506007)(4326008)(7696005)(81156014)(8676002)(8936002)(71200400001)(54906003)(33656002)(53546011)(9686003)(52536014)(66946007)(478600001)(186003)(64756008)(76116006)(66446008)(7416002)(55016002)(86362001)(4744005)(6916009)(26005)(66556008)(66476007)(5660300002)(129723003);DIR:OUT;SFP:1101;
+received-spf: None (protection.outlook.com: arm.com does not designate
+ permitted sender hosts)
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam-Untrusted: BCL:0;
+X-Microsoft-Antispam-Message-Info-Original: SinEI4uUlDiLO03NcVKprf0KcQGTc5f2FX/vR4dH4oZo6d+lMEn4YnG8MDK5ohpa1GwxeTkLmh7evsJQZerig+oU4x9ENAZSvKU4NTA7bjdjV/D27F3MpfSbIOBfQVUuETTsNdDVnmV2Vr9oEcU34Ot0pbbsJVtkPF4ILPJZN0EOU9fzejsYaUWD+QI2gTorPlMb6d7KA5+rPrAG36t1PDRmWiGweeVktIYvLtcCgPJJkbKNzYDVfU4o18FVP/rRra/h7Ccagkfh8ISiTzXlSMcnj62o27Ss6jEVFASFdbfr2LqWcsms2IhDcNPKrHOtnTJW7/7UbyIk+8C7dcNtM52JR47G34q0tsiTHKuza0WQYLodjFwWaGrU6FhXv1c94hs8QFXBy3y1czAgVDdZ9d3JqpyykWm85CqSmEULiFaureReu+1LH9zGnQAsmUyhagqFjqJ68yHsopr/BmyXEbqmw2EuCBlyD7Y54Y+CBfcGGm+DlN3d+yaTQlNIeGKh
+x-ms-exchange-antispam-messagedata: 8th/Z0gJ4oIeHUh3pFo3YPwi3Icxf9V9L5YeVh8wDFjWdIm51Ofr3ANLzKtrasTVxCJ3SzznyXtqIxqFa3oplwpC/XYf1pTLy9tVZveB3814IVa7K7Qxoql86a7QGZP8/WncpfJyGWz1050Y6MPfIeUiJa8GMJrPXy+NxPMV2451RCOJIZtdjd1pVjcvpoSaFJQKwSjy3Xhm/TFcmE7cl9CRFGXd1mT28GklwuG4O1NqwFJw+sNztNNTMTW1Chm63nhA3E/yc4srmCUw7+k6hbDy/UcBGRmBiqIN019c5oMCXgod46tpCt9fdso7j8aOpTLaOOd1By4VLTYOqj7FDwwQ63hyIhywmj3eZQGMJaetAUGJkAusPH4vJEK25/Bg/1NHt3GIrN4Exn+eLjamkYYXiYu02Kp0cD5gHrDWT+k5toA15nh7am+Z+QjzVXxJDAKr+7nbTp6KyLUSPwi9uUj8G6cigdvVAB7oLOc8mnO0ljmfJRsD4lVR3iNxmF00dbCQMGhN/irX5RTX6QFjcCCI1ApiH7WLLSK8mlXnvbooCTVVr43Y0avRsHxsdaZlVg6TquvoWunOd3R/s/W8tbNqIws0s6ik83Pe69ZNRtW2zidB/I4qcYiIrkgXE2bIWT6aN+5DNuccJvFlWWBXaR15UhgzUkCxHLKM3jYeItu3cIjN//9QublbU8ibgxLjhVjHWWfJRnp04IDMQW46iVsHyo4aXT7EX3j02N7Vy0WMp5iUQbPS60san5PWD1pLLAtnz6nGucjWPtA2TOb4KUpLIsODCPtBurzUpC2ejgc=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3693153.CBanSm0cUG@tauon.chronox.de>
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB6PR0802MB2597
+Original-Authentication-Results: spf=none (sender IP is )
+ smtp.mailfrom=Hadar.Gat@arm.com; 
+X-EOPAttributedMessage: 0
+X-MS-Exchange-Transport-CrossTenantHeadersStripped: AM5EUR03FT003.eop-EUR03.prod.protection.outlook.com
+X-Forefront-Antispam-Report: CIP:63.35.35.123;CTRY:IE;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:64aa7808-outbound-1.mta.getcheckrecipient.com;PTR:ec2-63-35-35-123.eu-west-1.compute.amazonaws.com;CAT:NONE;SFTY:;SFS:(4636009)(346002)(136003)(376002)(39860400002)(396003)(46966005)(4326008)(450100002)(33656002)(2906002)(82740400003)(6862004)(47076004)(81156014)(8676002)(70586007)(8936002)(86362001)(6506007)(53546011)(316002)(36906005)(4744005)(70206006)(52536014)(55016002)(336012)(5660300002)(356005)(81166007)(82310400002)(186003)(9686003)(7696005)(54906003)(478600001)(26005)(129723003);DIR:OUT;SFP:1101;
+X-MS-Office365-Filtering-Correlation-Id-Prvs: 0fbf4a9b-1860-4e50-4a13-08d7ea88e606
+X-Forefront-PRVS: 0386B406AA
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: kEuHYoGCF5vNHRIGeiA5GsLG8V1VW5PyfuvzVwKqinHDNt0ELdq2lek4ylS5wXY0TIYi86+KBvJ2/IG9lD1XN5Axnu1K5pq23TVH3Sp1vlXJVch+ZK14DVy+n0/eH7P/zfstg/EG7GOHvYHWo9NpeV8sLss+mk/xFvhd0sw9Y+jxUNGZQNyyqp3QoLkY6aAiGtsYTzDpNk1E+yE9Y5MdrfRsfjWJCPFJHTB9ZgVlx7ASJSIsClOdlsQeiuRzpSSM9cJH97IfWl+hXnsr20FNqsj8Ok0ZmNDyjrPYOxerKjzXM+DiapbV7cvS41mDzgmPU26r23l8+Zl9NopAzYwHbaJY7kkCzWsmh/8kZvclIPJlZiwtDpXcz3mSPlKDq2UQbSD551pEqShknaH5itFpgWaSwlsMFYPN9+sXa/JVzt1r1u5pmDneUwOSKpfY+eU2wt+IZybdmOrtR2UDwYJAcdP6OGzTGAVZFNL4o/FJq8M4lddMJjRoQiIfgggGzStsvRhpeNAvVhJZJ6tF0emZJ9oZyT0P2z2KoiqwG9QLEVA=
+X-OriginatorOrg: arm.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Apr 2020 08:56:46.0902
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7f80681c-a13f-4905-9a43-08d7ea88ea34
+X-MS-Exchange-CrossTenant-Id: f34e5979-57d9-4aaa-ad4d-b122a662184d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=f34e5979-57d9-4aaa-ad4d-b122a662184d;Ip=[63.35.35.123];Helo=[64aa7808-outbound-1.mta.getcheckrecipient.com]
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3318
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, Apr 24, 2020 at 04:34:40PM +0200, Stephan Mueller wrote:
-> Am Freitag, 24. April 2020, 16:02:14 CEST schrieb Corentin Labbe:
-> 
-> Hi Corentin,
-> 
-> > This patch had support for the TRNG present in the CE.
-> > Note that according to the algorithm ID, 2 version of the TRNG exists,
-> > the first present in H3/H5/R40/A64 and the second present in H6.
-> > This patch adds support for both, but only the second is working
-> > reliabily accoridng to rngtest.
-> > 
-> > Signed-off-by: Corentin Labbe <clabbe@baylibre.com>
-> > ---
-> >  drivers/crypto/allwinner/Kconfig              |   8 ++
-> >  drivers/crypto/allwinner/sun8i-ce/Makefile    |   1 +
-> >  .../crypto/allwinner/sun8i-ce/sun8i-ce-core.c |  18 +++
-> >  .../crypto/allwinner/sun8i-ce/sun8i-ce-trng.c | 123 ++++++++++++++++++
-> >  drivers/crypto/allwinner/sun8i-ce/sun8i-ce.h  |  18 +++
-> >  5 files changed, 168 insertions(+)
-> >  create mode 100644 drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
-> > 
-> > diff --git a/drivers/crypto/allwinner/Kconfig
-> > b/drivers/crypto/allwinner/Kconfig index 223a5823867c..6aec31f7d2be 100644
-> > --- a/drivers/crypto/allwinner/Kconfig
-> > +++ b/drivers/crypto/allwinner/Kconfig
-> > @@ -87,6 +87,14 @@ config CRYPTO_DEV_SUN8I_CE_PRNG
-> >  	  Select this option if you want to provide kernel-side support for
-> >  	  the Pseudo-Random Number Generator found in the Crypto Engine.
-> > 
-> > +config CRYPTO_DEV_SUN8I_CE_TRNG
-> > +	bool "Support for Allwinner Crypto Engine TRNG"
-> > +	depends on CRYPTO_DEV_SUN8I_CE
-> > +	select HW_RANDOM
-> > +	help
-> > +	  Select this option if you want to provide kernel-side support for
-> > +	  the True Random Number Generator found in the Crypto Engine.
-> > +
-> >  config CRYPTO_DEV_SUN8I_SS
-> >  	tristate "Support for Allwinner Security System cryptographic 
-> offloader"
-> >  	select CRYPTO_SKCIPHER
-> > diff --git a/drivers/crypto/allwinner/sun8i-ce/Makefile
-> > b/drivers/crypto/allwinner/sun8i-ce/Makefile index
-> > c0ea81da2c7d..0842eb2d9408 100644
-> > --- a/drivers/crypto/allwinner/sun8i-ce/Makefile
-> > +++ b/drivers/crypto/allwinner/sun8i-ce/Makefile
-> > @@ -2,3 +2,4 @@ obj-$(CONFIG_CRYPTO_DEV_SUN8I_CE) += sun8i-ce.o
-> >  sun8i-ce-y += sun8i-ce-core.o sun8i-ce-cipher.o
-> >  sun8i-ce-$(CONFIG_CRYPTO_DEV_SUN8I_CE_HASH) += sun8i-ce-hash.o
-> >  sun8i-ce-$(CONFIG_CRYPTO_DEV_SUN8I_CE_PRNG) += sun8i-ce-prng.o
-> > +sun8i-ce-$(CONFIG_CRYPTO_DEV_SUN8I_CE_TRNG) += sun8i-ce-trng.o
-> > diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-> > b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c index
-> > 23b9fc67d7ea..86d75789811f 100644
-> > --- a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-> > +++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-core.c
-> > @@ -47,6 +47,7 @@ static const struct ce_variant ce_h3_variant = {
-> >  		},
-> >  	.esr = ESR_H3,
-> >  	.prng = CE_ALG_PRNG,
-> > +	.trng = CE_ID_NOTSUPP,
-> >  };
-> > 
-> >  static const struct ce_variant ce_h5_variant = {
-> > @@ -63,6 +64,7 @@ static const struct ce_variant ce_h5_variant = {
-> >  		},
-> >  	.esr = ESR_H5,
-> >  	.prng = CE_ALG_PRNG,
-> > +	.trng = CE_ID_NOTSUPP,
-> >  };
-> > 
-> >  static const struct ce_variant ce_h6_variant = {
-> > @@ -76,6 +78,7 @@ static const struct ce_variant ce_h6_variant = {
-> >  	.cipher_t_dlen_in_bytes = true,
-> >  	.hash_t_dlen_in_bits = true,
-> >  	.prng_t_dlen_in_bytes = true,
-> > +	.trng_t_dlen_in_bytes = true,
-> >  	.ce_clks = {
-> >  		{ "bus", 0, 200000000 },
-> >  		{ "mod", 300000000, 0 },
-> > @@ -83,6 +86,7 @@ static const struct ce_variant ce_h6_variant = {
-> >  		},
-> >  	.esr = ESR_H6,
-> >  	.prng = CE_ALG_PRNG_V2,
-> > +	.trng = CE_ALG_TRNG_V2,
-> >  };
-> > 
-> >  static const struct ce_variant ce_a64_variant = {
-> > @@ -99,6 +103,7 @@ static const struct ce_variant ce_a64_variant = {
-> >  		},
-> >  	.esr = ESR_A64,
-> >  	.prng = CE_ALG_PRNG,
-> > +	.trng = CE_ID_NOTSUPP,
-> >  };
-> > 
-> >  static const struct ce_variant ce_r40_variant = {
-> > @@ -115,6 +120,7 @@ static const struct ce_variant ce_r40_variant = {
-> >  		},
-> >  	.esr = ESR_R40,
-> >  	.prng = CE_ALG_PRNG,
-> > +	.trng = CE_ID_NOTSUPP,
-> >  };
-> > 
-> >  /*
-> > @@ -579,6 +585,10 @@ static int sun8i_ce_dbgfs_read(struct seq_file *seq,
-> > void *v) break;
-> >  		}
-> >  	}
-> > +#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_TRNG
-> > +	seq_printf(seq, "HWRNG %lu %lu\n",
-> > +		   ce->hwrng_stat_req, ce->hwrng_stat_bytes);
-> > +#endif
-> >  	return 0;
-> >  }
-> > 
-> > @@ -928,6 +938,10 @@ static int sun8i_ce_probe(struct platform_device *pdev)
-> > if (err < 0)
-> >  		goto error_alg;
-> > 
-> > +#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_TRNG
-> > +	sun8i_ce_hwrng_register(ce);
-> > +#endif
-> > +
-> >  	v = readl(ce->base + CE_CTR);
-> >  	v >>= CE_DIE_ID_SHIFT;
-> >  	v &= CE_DIE_ID_MASK;
-> > @@ -957,6 +971,10 @@ static int sun8i_ce_remove(struct platform_device
-> > *pdev) {
-> >  	struct sun8i_ce_dev *ce = platform_get_drvdata(pdev);
-> > 
-> > +#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_TRNG
-> > +	sun8i_ce_hwrng_unregister(ce);
-> > +#endif
-> > +
-> >  	sun8i_ce_unregister_algs(ce);
-> > 
-> >  #ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
-> > diff --git a/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
-> > b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c new file mode 100644
-> > index 000000000000..5e4effe29ed3
-> > --- /dev/null
-> > +++ b/drivers/crypto/allwinner/sun8i-ce/sun8i-ce-trng.c
-> > @@ -0,0 +1,123 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * sun8i-ce-trng.c - hardware cryptographic offloader for
-> > + * Allwinner H3/A64/H5/H2+/H6/R40 SoC
-> > + *
-> > + * Copyright (C) 2015-2020 Corentin Labbe <clabbe@baylibre.com>
-> > + *
-> > + * This file handle the TRNG
-> > + *
-> > + * You could find a link for the datasheet in
-> > Documentation/arm/sunxi/README + */
-> > +#include "sun8i-ce.h"
-> > +#include <linux/pm_runtime.h>
-> > +#include <linux/hw_random.h>
-> > +/*
-> > + * Note that according to the algorithm ID, 2 versions of the TRNG exists,
-> > + * The first present in H3/H5/R40/A64 and the second present in H6.
-> > + * This file adds support for both, but only the second is working
-> > + * reliabily according to rngtest.
-> > + **/
-> > +
-> > +int sun8i_ce_trng_read(struct hwrng *rng, void *data, size_t max, bool
-> > wait) +{
-> > +	struct sun8i_ce_dev *ce;
-> > +	dma_addr_t dma_dst;
-> > +	int err = 0;
-> > +	int flow = 3;
-> > +	unsigned int todo;
-> > +	struct sun8i_ce_flow *chan;
-> > +	struct ce_task *cet;
-> > +	u32 common;
-> > +	void *d;
-> > +
-> > +	ce = container_of(rng, struct sun8i_ce_dev, trng);
-> > +
-> > +	todo = max + 32;
-> > +	todo -= todo % 32;
-> > +
-> > +	d = kzalloc(todo, GFP_KERNEL | GFP_DMA);
-> > +	if (!d)
-> > +		return -ENOMEM;
-> > +
-> > +#ifdef CONFIG_CRYPTO_DEV_SUN8I_CE_DEBUG
-> > +	ce->hwrng_stat_req++;
-> > +	ce->hwrng_stat_bytes += todo;
-> > +#endif
-> > +
-> > +	dma_dst = dma_map_single(ce->dev, d, todo, DMA_FROM_DEVICE);
-> > +	if (dma_mapping_error(ce->dev, dma_dst)) {
-> > +		dev_err(ce->dev, "Cannot DMA MAP DST\n");
-> > +		err = -EFAULT;
-> > +		goto err_dst;
-> > +	}
-> > +
-> > +	err = pm_runtime_get_sync(ce->dev);
-> > +	if (err < 0)
-> > +		goto err_pm;
-> > +
-> > +	mutex_lock(&ce->rnglock);
-> > +	chan = &ce->chanlist[flow];
-> > +
-> > +	cet = &chan->tl[0];
-> > +	memset(cet, 0, sizeof(struct ce_task));
-> > +
-> > +	cet->t_id = cpu_to_le32(flow);
-> > +	common = ce->variant->trng | CE_COMM_INT;
-> > +	cet->t_common_ctl = cpu_to_le32(common);
-> > +
-> > +	/* recent CE (H6) need length in bytes, in word otherwise */
-> > +	if (ce->variant->trng_t_dlen_in_bytes)
-> > +		cet->t_dlen = cpu_to_le32(todo);
-> > +	else
-> > +		cet->t_dlen = cpu_to_le32(todo / 4);
-> > +
-> > +	cet->t_sym_ctl = 0;
-> > +	cet->t_asym_ctl = 0;
-> > +
-> > +	cet->t_dst[0].addr = cpu_to_le32(dma_dst);
-> > +	cet->t_dst[0].len = cpu_to_le32(todo / 4);
-> > +	ce->chanlist[flow].timeout = 2000;
-> > +
-> > +	err = sun8i_ce_run_task(ce, 3, "TRNG");
-> > +	mutex_unlock(&ce->rnglock);
-> > +
-> > +	pm_runtime_put(ce->dev);
-> > +
-> > +err_pm:
-> > +	dma_unmap_single(ce->dev, dma_dst, todo, DMA_FROM_DEVICE);
-> > +
-> > +	if (!err) {
-> > +		memcpy(data, d, max);
-> > +		err = max;
-> > +	}
-> > +
-> > +err_dst:
-> > +	kfree(d);
-> 
-> kzfree? I would assume d contains sensitive data, no?
-> 
-
-Like sun8i-ce, yes.
-I will fix that
-
-Thanks
+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IEFybmQgQmVyZ21hbm4gPGFy
+bmRAYXJuZGIuZGU+DQo+IA0KPiBPbiBNb24sIEFwciAyNywgMjAyMCBhdCA5OjI2IEFNIEhhZGFy
+IEdhdCA8SGFkYXIuR2F0QGFybS5jb20+IHdyb3RlOg0KPiA+ID4gLS0tLS1PcmlnaW5hbCBNZXNz
+YWdlLS0tLS0NCj4gPiA+IEZyb206IEFyZCBCaWVzaGV1dmVsIDxhcmRiQGtlcm5lbC5vcmc+DQo+
+ID4gPiA+ICsgICAgICAgZGVmYXVsdCBuDQo+ID4gPg0KPiA+ID4gJ2RlZmF1bHQgbicgaXMgdGhl
+IGRlZmF1bHQgc28geW91IGNhbiBqdXN0IHJlbW92ZSB0aGUgbGluZQ0KPiA+DQo+ID4gSXMgdGhp
+cyBhIGd1aWRlbGluZSBvciBqdXN0IG9wdGlvbmFsPw0KPiA+IFBlcnNvbmFsbHkgSSBsaWtlIHRo
+aW5ncyB0byBiZSBleHBsaWNpdCBhbmQgaWYgYWxsb3dlZCBJIHByZWZlciB0byBrZWVwIHRoaXMg
+bGluZS4NCj4gDQo+IEl0J3MgYSBjb21tb24gY29udmVudGlvbiwgYW5kIHdlIGhhdmUgaGFkIHBh
+dGNoZXMgaW4gdGhlIHBhc3QgdGhhdCBtYXNzLQ0KPiByZW1vdmVkIHRob3NlIGxpbmVzLiBJJ2Qg
+YWxzbyBqdXN0IGxlYXZlIGl0IG91dC4gSXQgaXMgZ2VuZXJhbGx5IHdlbGwgdW5kZXJzdG9vZA0K
+PiB0aGF0IGFsbCBvcHRpb25zIGRlZmF1bHQgdG8gJ24nIHVubGVzcyBzcGVjaWZpZWQgb3RoZXJ3
+aXNlLg0KDQpPaywgSSdsbCByZW1vdmUgaXQuDQpUaGFua3MgZm9yIHRoZSBleHBsYW5hdGlvbi4N
+Cg0KPiANCj4gICAgICAgICBBcm5kDQo=
