@@ -2,104 +2,92 @@ Return-Path: <SRS0=WjNG=6M=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 956B5C83000
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Apr 2020 08:19:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDF80C83000
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Apr 2020 10:10:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7539A206B9
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Apr 2020 08:19:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9EB3B206D6
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Apr 2020 10:10:02 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BJLlb8pG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726618AbgD1ITX convert rfc822-to-8bit (ORCPT
+        id S1727112AbgD1KKB (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Apr 2020 04:19:23 -0400
-Received: from mail1.atsec.com ([138.201.47.228]:8820 "EHLO mail1.atsec.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726377AbgD1ITX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Apr 2020 04:19:23 -0400
-Received: from localhost (localhost [127.0.0.1])
-        by mail1.atsec.com (Postfix) with ESMTP id C2619D92;
-        Tue, 28 Apr 2020 10:19:21 +0200 (CEST)
-Received: from mail1.atsec.com ([127.0.0.1])
-        by localhost (mail1.atsec.com [127.0.0.1]) (amavisd-new, port 10024)
-        with LMTP id XRswVXkWLCf5; Tue, 28 Apr 2020 10:19:19 +0200 (CEST)
-From:   Stephan Mueller <stephan.mueller@atsec.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Ondrej =?utf-8?B?TW9zbsOhxI1law==?= <omosnacek@gmail.com>,
-        linux-crypto@vger.kernel.org, Sahana Prasad <saprasad@redhat.com>,
-        Tomas Mraz <tmraz@redhat.com>, Ard Biesheuvel <ardb@kernel.org>
-Subject: Re: libkcapi tests are failing on kernels 5.5+
-Date:   Tue, 28 Apr 2020 10:19:19 +0200
-Message-ID: <2055037.HuOjPaZDMi@tauon.chronox.de>
-Organization: atsec information security GmbH
-In-Reply-To: <7154254.Uj1dk3xSE7@tauon.chronox.de>
-References: <CAAUqJDvZt7_j+eor1sXRg+QmrdXTjMiymFnji86PoatsYPUugA@mail.gmail.com> <7154254.Uj1dk3xSE7@tauon.chronox.de>
+        Tue, 28 Apr 2020 06:10:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49808 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726932AbgD1KKB (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 28 Apr 2020 06:10:01 -0400
+Received: from mail-lj1-x244.google.com (mail-lj1-x244.google.com [IPv6:2a00:1450:4864:20::244])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C84EC03C1A9;
+        Tue, 28 Apr 2020 03:10:01 -0700 (PDT)
+Received: by mail-lj1-x244.google.com with SMTP id l19so20827704lje.10;
+        Tue, 28 Apr 2020 03:10:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=19uFzSxLeuYQo/dKtnMC70gpecW9P25YRkIG/IdYFis=;
+        b=BJLlb8pGzYfEp6GzCKqh5hyRb9Z+CFHu82/QjzKSLTRBmYUaEzwgh0qywfT0Sblbp1
+         omsHg2O5c7shROC3AUhKXNpufAPD5s+ItTFajDZQBJkaT6+HjvfMzn2r9547lElYxoT+
+         gDIrVOfSQnJTs3hlqn5534veK7YCvfZ0QAyYstsR48rq6bYRM5WDFTB7k6X3i90OiQih
+         hTZzRtKcAYdNVbw8q6eTgiNIjd6cRs2StGDirAjC0hmbQjN85xMB4CNayu6CiBkRE+dO
+         CygZEHFQ7LtOVzcPxnHBuG0HSQ7Xl2p64VntOXCWtUgX94zMzb+VVvvxhRHLzpBfiD6x
+         Mc/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=19uFzSxLeuYQo/dKtnMC70gpecW9P25YRkIG/IdYFis=;
+        b=SYjyLGto8fN7Moeiw6SjTpS9NWPsB9ZDou824L1Dq2wZywQqq4bk4u61SUrGwn+5GJ
+         42AXzj0Z4bxzV+JWWySfxcFtJxuEfqtcElLkBdLx0GSqBzHfkDxJvjpxxyYOgmasyUnT
+         q3opn+T6Jwn5Umw8ELsHEVZoRmlrHxZ5WKS455Tnt/sCXqH0LFXFB8bET/BScgEKt80F
+         8qsNaHGw/9m+z9lYL3hYm2WvxiuaQx79fU7bMQcTyujpuimaUmJPFrMH6JzyNNkMXYKw
+         c3pl7PbKRWp5ab3GlVTkqCo/v57VTfrEllYHe0Y3AmHSVLpHDv7je0vTeCt7VRYhbPMO
+         udlA==
+X-Gm-Message-State: AGi0Puavw3WIsuFIxPGCrlHXzLiRMeA4MP1QvlSdl+1XwNKIDeKbRSMV
+        C5VtEZJ4nyUJZmOA2J+pQfeb+W3eo1pyi8RhgjO1rw==
+X-Google-Smtp-Source: APiQypJe2PkJOFZo9zF8z5P0O73Y7zbxiut5ZHV8HfaSyjKy7JscKmMYL/c5BV3VIprd7rb3JSoj0nmvvew7v+yHzQI=
+X-Received: by 2002:a2e:9c9a:: with SMTP id x26mr17471735lji.44.1588068599776;
+ Tue, 28 Apr 2020 03:09:59 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
+References: <20200428051427.508-1-zhenzhong.duan@gmail.com> <VI1PR0402MB3712A2A328540479261ACCA68CAC0@VI1PR0402MB3712.eurprd04.prod.outlook.com>
+In-Reply-To: <VI1PR0402MB3712A2A328540479261ACCA68CAC0@VI1PR0402MB3712.eurprd04.prod.outlook.com>
+From:   Zhenzhong Duan <zhenzhong.duan@gmail.com>
+Date:   Tue, 28 Apr 2020 18:09:48 +0800
+Message-ID: <CAFH1YnMW8YSyiBg6+A8QxYfroVEZr_KELpXcogPemvM=aNFD0Q@mail.gmail.com>
+Subject: Re: [PATCH] crypto: caam - fix use after free issue in *_crypt_done
+To:     Iuliana Prodan <iuliana.prodan@nxp.com>
+Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Horia Geanta <horia.geanta@nxp.com>,
+        Aymen Sghaier <aymen.sghaier@nxp.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Dienstag, 21. April 2020, 11:19:36 CEST schrieb Stephan Mueller:
+On Tue, Apr 28, 2020 at 3:48 PM Iuliana Prodan <iuliana.prodan@nxp.com> wrote:
+>
+> On 4/28/2020 8:14 AM, Zhenzhong Duan wrote:
+> > In both aead_crypt_done and skcipher_crypt_done, edesc->bklog is
+> > referenced after the structure pointed by edesc is freed.
+> >
+> > Fix them by moving kfree(edesc) to the end of function call.
+> >
+> > Signed-off-by: Zhenzhong Duan <zhenzhong.duan@gmail.com>
+>
+> These issues were already fixed, and applied on cryptodev, by this
+> series: https://patchwork.kernel.org/cover/11476799/
 
-Hi Herbert,
+I see, thanks
 
-could you please help us with the answer to the question below?
-
-> Am Dienstag, 21. April 2020, 10:08:14 CEST schrieb Ondrej Mosnáček:
-> 
-> Hi Ondrej,
-> 
-> > Hi all,
-> > 
-> > the libkcapi [1] tests are failing on kernels 5.5-rc1 and above [2].
-> > All encryption/decryption tests that use 'ctr(aes)' and a message size
-> > that is not a multiple of 16 fail due to kcapi-enc returning different
-> > output than expected.
-> 
-> Confirmed.
-> 
-> On the recent kernels, the data generated by kcapi-enc contains trailing
-> zero bytes for data that is a fraction of the block size.
-> 
-> I think the issue is in the following kernel code in _skcipher_recvmsg:
-> 
->         unsigned int bs = crypto_skcipher_chunksize(tfm);
-> 
->         /*
->          * If more buffers are to be expected to be processed, process only
->          * full block size buffers.
->          */
->         if (ctx->more || len < ctx->used)
->                 len -= len % bs;
-> 
-> 
-> The kernel truncates the size to be processed to the chunk size. As the
-> chunksize returns the block size of the underlying cipher (e.g. AES -> 16),
-> the kernel code will not process non-aligned data.
-> 
-> Herbert, could you help me identifying what exactly was the root cause for
-> the patch 5b0fe9552336338acb52756daf65dd7a4eeca73f ? I.e. it seems that
-> stream ciphers made out of a block cipher would not generate the data part
-> that is a fraction of the block size (e.g. CTR, CTS).
-> 
-> Ciao
-> Stephan
-
-
-Ciao
-Stephan
--- 
-atsec information security GmbH, Steinstraße 70, 81667 München, Germany
-Phone:     +49 89 442 49 830 - Fax:       +49 89 442 49 831
-Mobile DE: +49 172 216 55 78 - Mobile US: +1 737 346 1613
-HRB: 129439 (Amtsgericht München)
-GF: Salvatore la Pietra, Staffan Persson, Manuela Gambarotto
-atsec it security news blog - atsec-information-security.blogspot.com
-
-
-
+Zhenzhong
