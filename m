@@ -2,174 +2,75 @@ Return-Path: <SRS0=WjNG=6M=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E8C0C83000
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Apr 2020 15:49:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B84B2C83000
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Apr 2020 23:10:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 76724206D8
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Apr 2020 15:49:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 88D0A20730
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Apr 2020 23:10:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="qlxGJYWG"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728404AbgD1Pta (ORCPT
+        id S1726284AbgD1XKD (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Apr 2020 11:49:30 -0400
-Received: from inva021.nxp.com ([92.121.34.21]:44736 "EHLO inva021.nxp.com"
+        Tue, 28 Apr 2020 19:10:03 -0400
+Received: from mail.zx2c4.com ([192.95.5.64]:41199 "EHLO mail.zx2c4.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728297AbgD1Pta (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Apr 2020 11:49:30 -0400
-Received: from inva021.nxp.com (localhost [127.0.0.1])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 1AA1C20002A;
-        Tue, 28 Apr 2020 17:49:28 +0200 (CEST)
-Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
-        by inva021.eu-rdc02.nxp.com (Postfix) with ESMTP id 0CEF9200019;
-        Tue, 28 Apr 2020 17:49:28 +0200 (CEST)
-Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
-        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id 240892030C;
-        Tue, 28 Apr 2020 17:49:27 +0200 (CEST)
-From:   Iuliana Prodan <iuliana.prodan@nxp.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Baolin Wang <baolin.wang@linaro.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Corentin Labbe <clabbe.montjoie@gmail.com>,
-        Horia Geanta <horia.geanta@nxp.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>,
-        Maxime Ripard <mripard@kernel.org>
-Cc:     Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Silvano Di Ninno <silvano.dininno@nxp.com>,
-        Franck Lenormand <franck.lenormand@nxp.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-imx <linux-imx@nxp.com>,
-        Iuliana Prodan <iuliana.prodan@nxp.com>
-Subject: [PATCH v6 3/3] crypto: engine - support for batch requests
-Date:   Tue, 28 Apr 2020 18:49:05 +0300
-Message-Id: <1588088945-9067-4-git-send-email-iuliana.prodan@nxp.com>
-X-Mailer: git-send-email 2.1.0
-In-Reply-To: <1588088945-9067-1-git-send-email-iuliana.prodan@nxp.com>
-References: <1588088945-9067-1-git-send-email-iuliana.prodan@nxp.com>
-X-Virus-Scanned: ClamAV using ClamSMTP
+        id S1726044AbgD1XKD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 28 Apr 2020 19:10:03 -0400
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTP id 078fe6c1;
+        Tue, 28 Apr 2020 22:58:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=mime-version
+        :references:in-reply-to:from:date:message-id:subject:to:cc
+        :content-type; s=mail; bh=+pPISQMqFxTrP0qCf0FuggC3lus=; b=qlxGJY
+        WGjse5gcNmibU1zg7WYgXb0/RjibCS2lWFDFwOItuz2ICRpA6pP0XgSMX4oSK2zI
+        lPDjZtg1823vzUmS/wNxKGv/1AW1mgsNsKRHlvMhIStABHh00tHR2SVgwtN80vGU
+        nTeqnfescZsyFbCOg+ghbdROG++vJYRIR0fX2SC4pgsMdb0GiHkbMLiDjuNTqwIy
+        bjKMFdkfiPCSAt2Wfek/OUSww8nGcOyXtJHZUIHP0zXxYF3WOMjoU0EHmCPBoCV+
+        1W3q4C6nw8oRFR+jMXRPySL+F1bAhZdoZQYkLhsZgUUZjBxaYYIFcdSf0mx29lqb
+        a1FRnbEGywcJKFbQ==
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 55194e36 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Tue, 28 Apr 2020 22:58:16 +0000 (UTC)
+Received: by mail-il1-f178.google.com with SMTP id q10so662516ile.0;
+        Tue, 28 Apr 2020 16:09:57 -0700 (PDT)
+X-Gm-Message-State: AGi0Pua390tvs2fRci/PorK/38awMqBJvIVnTHB8PX0V5j6ORUhcPMMT
+        O/1dWJH64BVmphlZIUgnfllkg++9dMaP8xVEaHA=
+X-Google-Smtp-Source: APiQypLFBTEqzIsMWL5IIDmD+RjrMKuT2Kwxq90aLIbknJdICxwCpdyDqftd7SMlsayBnczg1Do3aTutqcTKnU4j77Y=
+X-Received: by 2002:a92:d98c:: with SMTP id r12mr29411687iln.224.1588115397226;
+ Tue, 28 Apr 2020 16:09:57 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200422200344.239462-1-Jason@zx2c4.com> <20200422231854.675965-1-Jason@zx2c4.com>
+ <CAMj1kXHV=ryaFmj0jhQVGBd31nfHs7q5RtSyu7dY6GdEJJsr7A@mail.gmail.com>
+ <20200423184219.GA80650@kroah.com> <CAMj1kXF9uLUE3=rX1i_yYoigB7j-nLMZpGc35ve2KV+NxjRhVQ@mail.gmail.com>
+ <20200423202348.GA2796@gmail.com> <CAMj1kXGAUQ3DT-9roymODC20+GPFv4R280r1BrN=juHtYhnq7g@mail.gmail.com>
+In-Reply-To: <CAMj1kXGAUQ3DT-9roymODC20+GPFv4R280r1BrN=juHtYhnq7g@mail.gmail.com>
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+Date:   Tue, 28 Apr 2020 17:09:46 -0600
+X-Gmail-Original-Message-ID: <CAHmME9oS5L0GXAUvBAuz7a2WtRT=nBQk6H7-iHKnspao4ckgjA@mail.gmail.com>
+Message-ID: <CAHmME9oS5L0GXAUvBAuz7a2WtRT=nBQk6H7-iHKnspao4ckgjA@mail.gmail.com>
+Subject: Re: [PATCH crypto-stable v3 1/2] crypto: arch/lib - limit simd usage
+ to 4k chunks
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-rt-users@vger.kernel.org,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Added support for batch requests, per crypto engine.
-A new callback is added, do_batch_requests, which executes a
-batch of requests. This has the crypto_engine structure as argument
-(for cases when more than one crypto-engine is used).
-The crypto_engine_alloc_init_and_set function, initializes
-crypto-engine, but also, sets the do_batch_requests callback.
-On crypto_pump_requests, if do_batch_requests callback is
-implemented in a driver, this will be executed. The link between
-the requests will be done in driver, if possible.
-do_batch_requests is available only if the hardware has support
-for multiple request.
+Hi Herbert,
 
-Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
----
- crypto/crypto_engine.c  | 27 ++++++++++++++++++++++++++-
- include/crypto/engine.h |  5 +++++
- 2 files changed, 31 insertions(+), 1 deletion(-)
+This v3 patchset has a Reviewed-by from Ard for 1/2 and from Eric for
+2/2, from last week. Could you submit this to Linus for rc4?
 
-diff --git a/crypto/crypto_engine.c b/crypto/crypto_engine.c
-index ee19273..412149e 100644
---- a/crypto/crypto_engine.c
-+++ b/crypto/crypto_engine.c
-@@ -227,6 +227,18 @@ static void crypto_pump_requests(struct crypto_engine *engine,
- 
- out:
- 	spin_unlock_irqrestore(&engine->queue_lock, flags);
-+
-+	/*
-+	 * Batch requests is possible only if
-+	 * hardware can enqueue multiple requests
-+	 */
-+	if (engine->do_batch_requests) {
-+		ret = engine->do_batch_requests(engine);
-+		if (ret)
-+			dev_err(engine->dev, "failed to do batch requests: %d\n",
-+				ret);
-+	}
-+
- 	return;
- }
- 
-@@ -456,6 +468,12 @@ EXPORT_SYMBOL_GPL(crypto_engine_stop);
-  * crypto-engine queue.
-  * @dev: the device attached with one hardware engine
-  * @retry_support: whether hardware has support for retry mechanism
-+ * @cbk_do_batch: pointer to a callback function to be invoked when executing a
-+ *                a batch of requests.
-+ *                This has the form:
-+ *                callback(struct crypto_engine *engine)
-+ *                where:
-+ *                @engine: the crypto engine structure.
-  * @rt: whether this queue is set to run as a realtime task
-  * @qlen: maximum size of the crypto-engine queue
-  *
-@@ -464,6 +482,7 @@ EXPORT_SYMBOL_GPL(crypto_engine_stop);
-  */
- struct crypto_engine *crypto_engine_alloc_init_and_set(struct device *dev,
- 						       bool retry_support,
-+						       int (*cbk_do_batch)(struct crypto_engine *engine),
- 						       bool rt, int qlen)
- {
- 	struct sched_param param = { .sched_priority = MAX_RT_PRIO / 2 };
-@@ -483,6 +502,12 @@ struct crypto_engine *crypto_engine_alloc_init_and_set(struct device *dev,
- 	engine->idling = false;
- 	engine->retry_support = retry_support;
- 	engine->priv_data = dev;
-+	/*
-+	 * Batch requests is possible only if
-+	 * hardware has support for retry mechanism.
-+	 */
-+	engine->do_batch_requests = retry_support ? cbk_do_batch : NULL;
-+
- 	snprintf(engine->name, sizeof(engine->name),
- 		 "%s-engine", dev_name(dev));
- 
-@@ -516,7 +541,7 @@ EXPORT_SYMBOL_GPL(crypto_engine_alloc_init_and_set);
-  */
- struct crypto_engine *crypto_engine_alloc_init(struct device *dev, bool rt)
- {
--	return crypto_engine_alloc_init_and_set(dev, false, rt,
-+	return crypto_engine_alloc_init_and_set(dev, false, NULL, rt,
- 						CRYPTO_ENGINE_MAX_QLEN);
- }
- EXPORT_SYMBOL_GPL(crypto_engine_alloc_init);
-diff --git a/include/crypto/engine.h b/include/crypto/engine.h
-index b92d7ff..3f06e40 100644
---- a/include/crypto/engine.h
-+++ b/include/crypto/engine.h
-@@ -37,6 +37,8 @@
-  * @unprepare_crypt_hardware: there are currently no more requests on the
-  * queue so the subsystem notifies the driver that it may relax the
-  * hardware by issuing this call
-+ * @do_batch_requests: execute a batch of requests. Depends on multiple
-+ * requests support.
-  * @kworker: kthread worker struct for request pump
-  * @pump_requests: work struct for scheduling work to the request pump
-  * @priv_data: the engine private data
-@@ -59,6 +61,8 @@ struct crypto_engine {
- 
- 	int (*prepare_crypt_hardware)(struct crypto_engine *engine);
- 	int (*unprepare_crypt_hardware)(struct crypto_engine *engine);
-+	int (*do_batch_requests)(struct crypto_engine *engine);
-+
- 
- 	struct kthread_worker           *kworker;
- 	struct kthread_work             pump_requests;
-@@ -107,6 +111,7 @@ int crypto_engine_stop(struct crypto_engine *engine);
- struct crypto_engine *crypto_engine_alloc_init(struct device *dev, bool rt);
- struct crypto_engine *crypto_engine_alloc_init_and_set(struct device *dev,
- 						       bool retry_support,
-+						       int (*cbk_do_batch)(struct crypto_engine *engine),
- 						       bool rt, int qlen);
- int crypto_engine_exit(struct crypto_engine *engine);
- 
--- 
-2.1.0
-
+Thanks,
+Jason
