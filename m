@@ -2,67 +2,86 @@ Return-Path: <SRS0=WjNG=6M=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1286AC83000
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Apr 2020 12:30:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91B60C83000
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Apr 2020 15:31:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EA8EC2072A
-	for <linux-crypto@archiver.kernel.org>; Tue, 28 Apr 2020 12:30:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6D6F72075E
+	for <linux-crypto@archiver.kernel.org>; Tue, 28 Apr 2020 15:31:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726620AbgD1Mav (ORCPT
+        id S1727981AbgD1Pbj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 28 Apr 2020 08:30:51 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:47296 "EHLO fornost.hmeau.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726361AbgD1Mav (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 28 Apr 2020 08:30:51 -0400
-Received: from gwarestrin.me.apana.org.au ([192.168.0.7] helo=gwarestrin.arnor.me.apana.org.au)
-        by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1jTPKU-0001RT-DK; Tue, 28 Apr 2020 22:27:15 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 28 Apr 2020 22:30:07 +1000
-Date:   Tue, 28 Apr 2020 22:30:07 +1000
-From:   Herbert Xu <herbert@gondor.apana.org.au>
-To:     Hadar Gat <Hadar.Gat@arm.com>
-Cc:     Matt Mackall <mpm@selenic.com>, Arnd Bergmann <arnd@arndb.de>,
+        Tue, 28 Apr 2020 11:31:39 -0400
+Received: from mail-ot1-f65.google.com ([209.85.210.65]:45675 "EHLO
+        mail-ot1-f65.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727917AbgD1Pbj (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 28 Apr 2020 11:31:39 -0400
+Received: by mail-ot1-f65.google.com with SMTP id e20so33291189otk.12;
+        Tue, 28 Apr 2020 08:31:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=H0LOD7XbNY8f26IcdF+mTtRkvNc/cLKM59So7aS3RUw=;
+        b=Kh4h/h4ROTQqDh64ylfpPGzS3za/yVYdFZeoCZxjL3yGkQXvlwvtNpURUK1+ORePif
+         FkgMwjMxG5nmKPLcAjbrGMOrbSCUKJvztugDgxSCw95QFpzH+Nprzjt9iU+pG1w6Rqm1
+         g0ROcLt4kN7c923mEgQKQY7VV+H1Fxrm6L0UF4ym/y4+8HQQrydr51L3xUqGda2C/O4F
+         E/bAqqPWO/K49lG7sxmsHoOB9+ZzP0D2iy5oh154/50qzbGpf5FMCSbOSV1vVLOXrPFb
+         TO5oJSMciPYaXxzyfXWBWK0bRul4ZkeSCrzQtgsKclWFXk7cFl3OIm9qFGQPrXPsWGOc
+         pmAg==
+X-Gm-Message-State: AGi0PuZv1ZHZAXM48nUJoXo3HXMFm0JbV745xWMHdMjoQb/5vvE904/5
+        wRVBhgt/GvnKjuRuqnE0C6ZSQabUn7V6MT42UbI=
+X-Google-Smtp-Source: APiQypKmPPMRmFDEpK+pbxelea00daQWJAo2cqKdKqvVtb9z1shjQduzXoV/x4KObl7etnUGy2BDWPAjQyNgmtVAs6E=
+X-Received: by 2002:a9d:7d85:: with SMTP id j5mr21717225otn.107.1588087898648;
+ Tue, 28 Apr 2020 08:31:38 -0700 (PDT)
+MIME-Version: 1.0
+References: <1587987364-4566-1-git-send-email-hadar.gat@arm.com> <1587987364-4566-3-git-send-email-hadar.gat@arm.com>
+In-Reply-To: <1587987364-4566-3-git-send-email-hadar.gat@arm.com>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Tue, 28 Apr 2020 17:31:25 +0200
+Message-ID: <CAMuHMdWdgnqAp8rHyMj9gCXD2WBweeB6g38OV6S2MJ5KFLyvcw@mail.gmail.com>
+Subject: Re: [PATCH v3 2/3] hwrng: cctrng - change default to n
+To:     Hadar Gat <hadar.gat@arm.com>
+Cc:     Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Arnd Bergmann <arnd@arndb.de>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Krzysztof Kozlowski <krzk@kernel.org>,
         Stefan Wahren <wahrenst@gmx.net>,
         Zaibo Xu <xuzaibo@huawei.com>,
         Tomer Maimon <tmaimon77@gmail.com>,
         Randy Dunlap <rdunlap@infradead.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Gilad Ben-Yossef <gilad@benyossef.com>,
-        Ofir Drang <Ofir.Drang@arm.com>, nd <nd@arm.com>
-Subject: Re: [PATCH v3 1/3] hwrng: cctrng - Add dependency on OF
-Message-ID: <20200428123007.GA3969@gondor.apana.org.au>
-References: <1587987364-4566-1-git-send-email-hadar.gat@arm.com>
- <1587987364-4566-2-git-send-email-hadar.gat@arm.com>
- <20200427150658.GA26305@gondor.apana.org.au>
- <DB7PR08MB3003E1459755B853B41490D6E9AC0@DB7PR08MB3003.eurprd08.prod.outlook.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DB7PR08MB3003E1459755B853B41490D6E9AC0@DB7PR08MB3003.eurprd08.prod.outlook.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        Ofir Drang <ofir.drang@arm.com>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, Apr 28, 2020 at 12:26:31PM +0000, Hadar Gat wrote:
+On Mon, Apr 27, 2020 at 1:39 PM Hadar Gat <hadar.gat@arm.com> wrote:
+> For many users, the Arm CryptoCell HW is not available, so the default for
+> HW_RANDOM_CCTRNG should to n.
+> Remove the line to follow the convention - 'n' is the default anyway so no
+> need to state it explicitly.
 >
-> I've set COMPILE_TEST but couldn't see any problem.
-> Would you share what doesn't work?
+> Signed-off-by: Hadar Gat <hadar.gat@arm.com>
 
-I don't have OF in my config.  This driver builds just fine without
-OF.
+Acked-by: Geert Uytterhoeven <geert+renesas@glider.be>
 
-Cheers,
+Gr{oetje,eeting}s,
+
+                        Geert
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
