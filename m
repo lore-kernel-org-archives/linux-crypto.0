@@ -2,105 +2,76 @@ Return-Path: <SRS0=SZPK=6N=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6037CC8300B
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Apr 2020 14:42:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FFBAC83000
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Apr 2020 16:50:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 357B121D7B
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Apr 2020 14:42:35 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="UqK22JWW"
+	by mail.kernel.org (Postfix) with ESMTP id 673E9214AF
+	for <linux-crypto@archiver.kernel.org>; Wed, 29 Apr 2020 16:50:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1588179013;
+	bh=JiQTaWVwC63SkuV2FBWui7b1YBsjH7ezXzl5EPROEi4=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
+	b=HRfVAG1fguPHbcRkxvrkm6mk2YgkrQAT4+AsDygCUWcMUwvb/1PlJJPw3+wK6nZno
+	 S/Nf61W+otlD7Jo6F6+v9uJutu/Hp5ZnPIzqHTQkDqbDqUVNALq2OxGqyuXl7qZAhn
+	 x+bOn1BS9qbAtmb54c7SojunBtd0uFIavzt610Hw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726808AbgD2Ome (ORCPT
+        id S1726618AbgD2QuM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 29 Apr 2020 10:42:34 -0400
-Received: from lelv0142.ext.ti.com ([198.47.23.249]:55344 "EHLO
-        lelv0142.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726348AbgD2Ome (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Apr 2020 10:42:34 -0400
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-        by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 03TEgRqQ101686;
-        Wed, 29 Apr 2020 09:42:27 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1588171347;
-        bh=ri+/lIeSNOTM3l+FNff6gZorR0Kh5OVSvczQZBkHThk=;
-        h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=UqK22JWWrlA2aOJc7U9UqwD4vGTMHLikpFgdmyFz3FCCi9KBRNMHAq42jzT0H0dRo
-         bJxru1BLo3QM4R2s7QkRrWNjnTx1KDLmRVMw7sZ4zYGE/CMaKWvRA89gosJJjB6SXw
-         Bsc6iWfe0uQZ95dvPhWNNs4w8rbgt7A4GwqnMJLc=
-Received: from DLEE102.ent.ti.com (dlee102.ent.ti.com [157.170.170.32])
-        by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTP id 03TEgRRr009946;
-        Wed, 29 Apr 2020 09:42:27 -0500
-Received: from DLEE110.ent.ti.com (157.170.170.21) by DLEE102.ent.ti.com
- (157.170.170.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3; Wed, 29
- Apr 2020 09:42:27 -0500
-Received: from fllv0039.itg.ti.com (10.64.41.19) by DLEE110.ent.ti.com
- (157.170.170.21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3 via
- Frontend Transport; Wed, 29 Apr 2020 09:42:27 -0500
-Received: from sokoban.ti.com (ileax41-snat.itg.ti.com [10.172.224.153])
-        by fllv0039.itg.ti.com (8.15.2/8.15.2) with ESMTP id 03TEgHjQ103561;
-        Wed, 29 Apr 2020 09:42:26 -0500
-From:   Tero Kristo <t-kristo@ti.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>
-CC:     <linux-omap@vger.kernel.org>
-Subject: [PATCH 6/6] crypto: omap-aes: prevent unregistering algorithms twice
-Date:   Wed, 29 Apr 2020 17:42:05 +0300
-Message-ID: <20200429144205.5291-7-t-kristo@ti.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20200429144205.5291-1-t-kristo@ti.com>
-References: <20200429144205.5291-1-t-kristo@ti.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+        Wed, 29 Apr 2020 12:50:12 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59872 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726558AbgD2QuM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 29 Apr 2020 12:50:12 -0400
+Subject: Re: [GIT PULL] Crypto Fixes for 5.7
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1588179012;
+        bh=JiQTaWVwC63SkuV2FBWui7b1YBsjH7ezXzl5EPROEi4=;
+        h=From:In-Reply-To:References:Date:To:Cc:From;
+        b=fSw5jXxAGJccqkxbT6sOjDi3Lc9LVJ7ghgu9ccO4L+h9II+CMG1R5FAUwS7n62Iyt
+         vDL5JbEMruYBOxxCkwi8FM6v2TMpQcW2cDTuSwvDSr2a1wpieaLn8A7bnOznUEieYW
+         crfb1S6Cd3mZd9ysvpdC6ft6AStjOEhFxu9O7Whs=
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <20200429055420.GA26381@gondor.apana.org.au>
+References: <20190916084901.GA20338@gondor.apana.org.au>
+ <20190923050515.GA6980@gondor.apana.org.au>
+ <20191202062017.ge4rz72ki3vczhgb@gondor.apana.org.au>
+ <20191214084749.jt5ekav5o5pd2dcp@gondor.apana.org.au>
+ <20200115150812.mo2eycc53lbsgvue@gondor.apana.org.au>
+ <20200213033231.xjwt6uf54nu26qm5@gondor.apana.org.au>
+ <20200408061513.GA23636@gondor.apana.org.au>
+ <20200429055420.GA26381@gondor.apana.org.au>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20200429055420.GA26381@gondor.apana.org.au>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+X-PR-Tracked-Commit-Id: 55b3209acbb01cb02b1ee6b1afe80d83b1aab36d
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 6c3efdc911b67816285719bd610152232cf5e8e4
+Message-Id: <158817901233.22148.11028199197664884191.pr-tracker-bot@kernel.org>
+Date:   Wed, 29 Apr 2020 16:50:12 +0000
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Most of the OMAP family SoCs contain two instances for AES core, which
-causes the remove callbacks to be also done twice when driver is
-removed. Fix the algorithm unregister callbacks to take into account the
-number of algorithms still registered to avoid removing these twice.
+The pull request you sent on Wed, 29 Apr 2020 15:54:20 +1000:
 
-Signed-off-by: Tero Kristo <t-kristo@ti.com>
----
- drivers/crypto/omap-aes.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
 
-diff --git a/drivers/crypto/omap-aes.c b/drivers/crypto/omap-aes.c
-index 824ddf2a66ff..b5aff20c5900 100644
---- a/drivers/crypto/omap-aes.c
-+++ b/drivers/crypto/omap-aes.c
-@@ -1269,13 +1269,17 @@ static int omap_aes_remove(struct platform_device *pdev)
- 	spin_unlock(&list_lock);
- 
- 	for (i = dd->pdata->algs_info_size - 1; i >= 0; i--)
--		for (j = dd->pdata->algs_info[i].registered - 1; j >= 0; j--)
-+		for (j = dd->pdata->algs_info[i].registered - 1; j >= 0; j--) {
- 			crypto_unregister_skcipher(
- 					&dd->pdata->algs_info[i].algs_list[j]);
-+			dd->pdata->algs_info[i].registered--;
-+		}
- 
--	for (i = dd->pdata->aead_algs_info->size - 1; i >= 0; i--) {
-+	for (i = dd->pdata->aead_algs_info->registered - 1; i >= 0; i--) {
- 		aalg = &dd->pdata->aead_algs_info->algs_list[i];
- 		crypto_unregister_aead(aalg);
-+		dd->pdata->aead_algs_info->registered--;
-+
- 	}
- 
- 	crypto_engine_exit(dd->engine);
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/6c3efdc911b67816285719bd610152232cf5e8e4
+
+Thank you!
+
 -- 
-2.17.1
-
---
-Texas Instruments Finland Oy, Porkkalankatu 22, 00180 Helsinki. Y-tunnus/Business ID: 0615521-4. Kotipaikka/Domicile: Helsinki
+Deet-doot-dot, I am a bot.
+https://korg.wiki.kernel.org/userdoc/prtracker
