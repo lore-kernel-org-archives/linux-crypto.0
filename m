@@ -7,51 +7,51 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
 	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADD49C47254
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Apr 2020 20:12:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 743C3C47247
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Apr 2020 20:12:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8840A207DD
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Apr 2020 20:12:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C1FB207DD
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Apr 2020 20:12:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="fUyqySXD"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="ln2bq8S+"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726524AbgD3UMZ (ORCPT
+        id S1726917AbgD3UMZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Thu, 30 Apr 2020 16:12:25 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:53714 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726760AbgD3UMY (ORCPT
+Received: from aserp2120.oracle.com ([141.146.126.78]:41468 "EHLO
+        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726486AbgD3UMY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Thu, 30 Apr 2020 16:12:24 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03UK9RpK005992;
-        Thu, 30 Apr 2020 20:11:48 GMT
+Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
+        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03UK9F0k084676;
+        Thu, 30 Apr 2020 20:11:46 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
  subject : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=corp-2020-01-29;
- bh=+I5DK1bpDxPp17bxmkq3TLU7ktjAi9yJhHWfSrepooM=;
- b=fUyqySXDeLDsctdyoiziddJfcj8mcTOQxSfQWSYjilj7uE73/HfZauZY2u5i3Uvnv5tG
- KAp31PWGtBoS4N9epLF82hU53mniZOA/7lEKUmGjH9KQ+H8nH1Cv4EpFkW6aOiLQYMoX
- C+k0eWTaXn4nJZt4GHwStEs5HC9LqEeghzxIIbxp3ejHUWBFXbT7/tq5dR1lXdmCGGJ1
- l+UQocYxc5AJd89VOHMDkMnZiIFb1tj2e3zzxxVqrjAbyCo4wTz8IntLONqd/e7Dypen
- biFbKfiOp/Jdby2w/mf18RluKSLiAmDV3u+b0FlU7mTnkhhI8TC+riHLkuTMqfVSGna9 QQ== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2120.oracle.com with ESMTP id 30p2p0k2ps-1
+ bh=r/CbKeQi8OFEvnMJbjndCS8xkwaSl+iaVTADntYBC8Q=;
+ b=ln2bq8S+L02pSxT8jCNrNLjs4Bi3HNfuXnoKvEChwDRq8KBEr26cjs6vzBV5rAYQWQ2b
+ LRgn06oLtaj7RwYrrnQE6EPPoNAm9DbqSe869iaJl0aMFk3OgeYjZcV76NQFu4Qug8z4
+ evGp/vVBNqHksrwbm549blgLVXueqjTSU79PmPkbw+Wv7fBfBErGk8wUkDIUmSlJ6WzY
+ UGAAyO2lbbJjQibs8qWhglQMnPVubtP7nIi7lsUmTsu70yvIfh7GR8Tje2l5gpMuWpFj
+ bgw2JRBbWq8zlVX6WKKGZkG43ljRU4SGIDlNARPpuDfU7cZSYJfhVZokgZDXyJd0mxoS sA== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by aserp2120.oracle.com with ESMTP id 30nucgdkq2-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 30 Apr 2020 20:11:48 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03UK7Qbg096026;
-        Thu, 30 Apr 2020 20:11:48 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by userp3030.oracle.com with ESMTP id 30qtjy23v9-1
+        Thu, 30 Apr 2020 20:11:46 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 03UK6YlR140654;
+        Thu, 30 Apr 2020 20:11:46 GMT
+Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
+        by aserp3030.oracle.com with ESMTP id 30qtkx5a93-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 30 Apr 2020 20:11:48 +0000
+        Thu, 30 Apr 2020 20:11:46 +0000
 Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 03UKBlCt024136;
-        Thu, 30 Apr 2020 20:11:47 GMT
+        by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 03UKBiuP026717;
+        Thu, 30 Apr 2020 20:11:44 GMT
 Received: from localhost.localdomain (/98.229.125.203)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 30 Apr 2020 13:11:45 -0700
+        with ESMTP ; Thu, 30 Apr 2020 13:11:43 -0700
 From:   Daniel Jordan <daniel.m.jordan@oracle.com>
 To:     Andrew Morton <akpm@linux-foundation.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
@@ -74,103 +74,218 @@ Cc:     Alex Williamson <alex.williamson@redhat.com>,
         linux-crypto@vger.kernel.org, linux-mm@kvack.org,
         linux-kernel@vger.kernel.org,
         Daniel Jordan <daniel.m.jordan@oracle.com>
-Subject: [PATCH 7/7] padata: document multithreaded jobs
-Date:   Thu, 30 Apr 2020 16:11:25 -0400
-Message-Id: <20200430201125.532129-8-daniel.m.jordan@oracle.com>
+Subject: [PATCH 6/7] mm: parallelize deferred_init_memmap()
+Date:   Thu, 30 Apr 2020 16:11:24 -0400
+Message-Id: <20200430201125.532129-7-daniel.m.jordan@oracle.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200430201125.532129-1-daniel.m.jordan@oracle.com>
 References: <20200430201125.532129-1-daniel.m.jordan@oracle.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9607 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 suspectscore=0
- malwarescore=0 bulkscore=0 phishscore=0 mlxlogscore=999 mlxscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2004300150
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9607 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 phishscore=0 clxscore=1015
- bulkscore=0 adultscore=0 lowpriorityscore=0 impostorscore=0 malwarescore=0
- mlxscore=0 suspectscore=0 mlxlogscore=999 priorityscore=1501
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 suspectscore=2 mlxscore=0
+ phishscore=0 mlxlogscore=999 adultscore=0 malwarescore=0 spamscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
  definitions=main-2004300150
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9607 signatures=668687
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1015 priorityscore=1501
+ mlxlogscore=999 impostorscore=0 suspectscore=2 malwarescore=0
+ lowpriorityscore=0 mlxscore=0 spamscore=0 adultscore=0 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2003020000 definitions=main-2004300150
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add Documentation for multithreaded jobs.
+Deferred struct page init uses one thread per node, which is a
+significant bottleneck at boot for big machines--often the largest.
+Parallelize to reduce system downtime.
+
+The maximum number of threads is capped at the number of CPUs on the
+node because speedups always improve with additional threads on every
+system tested, and at this phase of boot, the system is otherwise idle
+and waiting on page init to finish.
+
+Helper threads operate on MAX_ORDER_NR_PAGES-aligned ranges to avoid
+accessing uninitialized buddy pages, so set the job's alignment
+accordingly.
+
+The minimum chunk size is also MAX_ORDER_NR_PAGES because there was
+benefit to using multiple threads even on relatively small memory (1G)
+systems.
+
+    Intel(R) Xeon(R) Platinum 8167M CPU @ 2.00GHz (Skylake, bare metal)
+      2 nodes * 26 cores * 2 threads = 104 CPUs
+      384G/node = 768G memory
+
+                   kernel boot                 deferred init
+                   ------------------------    ------------------------
+                   speedup  time_ms (stdev)    speedup  time_ms (stdev)
+         base           --   4056.7 (  5.5)         --   1763.3 (  4.2)
+         test        39.9%   2436.7 (  2.1)      91.8%    144.3 (  5.9)
+
+    Intel(R) Xeon(R) CPU E5-2699C v4 @ 2.20GHz (Broadwell, bare metal)
+      1 node * 16 cores * 2 threads = 32 CPUs
+      192G/node = 192G memory
+
+                   kernel boot                 deferred init
+                   ------------------------    ------------------------
+                   speedup  time_ms (stdev)    speedup  time_ms (stdev)
+         base           --   1957.3 ( 14.0)         --   1093.7 ( 12.9)
+         test        49.1%    996.0 (  7.2)      88.4%    127.3 (  5.1)
+
+    Intel(R) Xeon(R) CPU E5-2699 v3 @ 2.30GHz (Haswell, bare metal)
+      2 nodes * 18 cores * 2 threads = 72 CPUs
+      128G/node = 256G memory
+
+                   kernel boot                 deferred init
+                   ------------------------    ------------------------
+                   speedup  time_ms (stdev)    speedup  time_ms (stdev)
+         base           --   1666.0 (  3.5)         --    618.0 (  3.5)
+         test        31.3%   1145.3 (  1.5)      85.6%     89.0 (  1.7)
+
+    AMD EPYC 7551 32-Core Processor (Zen, kvm guest)
+      1 node * 8 cores * 2 threads = 16 CPUs
+      64G/node = 64G memory
+
+                   kernel boot                 deferred init
+                   ------------------------    ------------------------
+                   speedup  time_ms (stdev)    speedup  time_ms (stdev)
+         base           --   1029.7 ( 42.3)         --    253.7 (  3.1)
+         test        23.3%    789.3 ( 15.0)      76.3%     60.0 (  5.6)
+
+Server-oriented distros that enable deferred page init sometimes run in
+small VMs, and they still benefit even though the fraction of boot time
+saved is smaller:
+
+    AMD EPYC 7551 32-Core Processor (Zen, kvm guest)
+      1 node * 2 cores * 2 threads = 4 CPUs
+      16G/node = 16G memory
+
+                   kernel boot                 deferred init
+                   ------------------------    ------------------------
+                   speedup  time_ms (stdev)    speedup  time_ms (stdev)
+         base           --    757.7 ( 17.1)         --     57.0 (  0.0)
+         test         6.2%    710.3 ( 15.0)      63.2%     21.0 (  0.0)
+
+    Intel(R) Xeon(R) CPU E5-2699 v3 @ 2.30GHz (Haswell, kvm guest)
+      1 node * 2 cores * 2 threads = 4 CPUs
+      14G/node = 14G memory
+
+                   kernel boot                 deferred init
+                   ------------------------    ------------------------
+                   speedup  time_ms (stdev)    speedup  time_ms (stdev)
+         base           --    656.3 (  7.1)         --     57.3 (  1.5)
+         test         8.6%    599.7 (  5.9)      62.8%     21.3 (  1.2)
 
 Signed-off-by: Daniel Jordan <daniel.m.jordan@oracle.com>
 ---
- Documentation/core-api/padata.rst | 41 +++++++++++++++++++++++--------
- 1 file changed, 31 insertions(+), 10 deletions(-)
+ mm/Kconfig      |  6 +++---
+ mm/page_alloc.c | 46 ++++++++++++++++++++++++++++++++++++++--------
+ 2 files changed, 41 insertions(+), 11 deletions(-)
 
-diff --git a/Documentation/core-api/padata.rst b/Documentation/core-api/padata.rst
-index 9a24c111781d9..b7e047af993e8 100644
---- a/Documentation/core-api/padata.rst
-+++ b/Documentation/core-api/padata.rst
-@@ -4,23 +4,26 @@
- The padata parallel execution mechanism
- =======================================
+diff --git a/mm/Kconfig b/mm/Kconfig
+index ab80933be65ff..e5007206c7601 100644
+--- a/mm/Kconfig
++++ b/mm/Kconfig
+@@ -622,13 +622,13 @@ config DEFERRED_STRUCT_PAGE_INIT
+ 	depends on SPARSEMEM
+ 	depends on !NEED_PER_CPU_KM
+ 	depends on 64BIT
++	select PADATA
+ 	help
+ 	  Ordinarily all struct pages are initialised during early boot in a
+ 	  single thread. On very large machines this can take a considerable
+ 	  amount of time. If this option is set, large machines will bring up
+-	  a subset of memmap at boot and then initialise the rest in parallel
+-	  by starting one-off "pgdatinitX" kernel thread for each node X. This
+-	  has a potential performance impact on processes running early in the
++	  a subset of memmap at boot and then initialise the rest in parallel.
++	  This has a potential performance impact on tasks running early in the
+ 	  lifetime of the system until these kthreads finish the
+ 	  initialisation.
  
--:Date: December 2019
-+:Date: April 2020
+diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+index 990514d8f0d94..96d6d0d920c27 100644
+--- a/mm/page_alloc.c
++++ b/mm/page_alloc.c
+@@ -68,6 +68,7 @@
+ #include <linux/lockdep.h>
+ #include <linux/nmi.h>
+ #include <linux/psi.h>
++#include <linux/padata.h>
  
- Padata is a mechanism by which the kernel can farm jobs out to be done in
--parallel on multiple CPUs while retaining their ordering.  It was developed for
--use with the IPsec code, which needs to be able to perform encryption and
--decryption on large numbers of packets without reordering those packets.  The
--crypto developers made a point of writing padata in a sufficiently general
--fashion that it could be put to other uses as well.
-+parallel on multiple CPUs while optionally retaining their ordering.
+ #include <asm/sections.h>
+ #include <asm/tlbflush.h>
+@@ -1729,6 +1730,25 @@ deferred_init_maxorder(struct zone *zone, unsigned long *start_pfn,
+ 	return nr_pages;
+ }
  
--Usage
--=====
-+It was originally developed for IPsec, which needs to perform encryption and
-+decryption on large numbers of packets without reordering those packets.  This
-+is currently the sole consumer of padata's serialized job support.
++struct def_init_args {
++	struct zone *zone;
++	atomic_long_t nr_pages;
++};
 +
-+Padata also supports multithreaded jobs, splitting up the job evenly while load
-+balancing and coordinating between threads.
++static void __init deferred_init_memmap_chunk(unsigned long spfn,
++					      unsigned long epfn, void *arg)
++{
++	struct def_init_args *args = arg;
++	unsigned long nr_pages = 0;
 +
-+Running Serialized Jobs
-+=======================
- 
- Initializing
- ------------
- 
--The first step in using padata is to set up a padata_instance structure for
--overall control of how jobs are to be run::
-+The first step in using padata to run parallel jobs is to set up a
-+padata_instance structure for overall control of how jobs are to be run::
- 
-     #include <linux/padata.h>
- 
-@@ -162,6 +165,24 @@ functions that correspond to the allocation in reverse::
- It is the user's responsibility to ensure all outstanding jobs are complete
- before any of the above are called.
- 
-+Running Multithreaded Jobs
-+==========================
++	while (spfn < epfn) {
++		nr_pages += deferred_init_maxorder(args->zone, &spfn, epfn);
++		cond_resched();
++	}
 +
-+A multithreaded job has a main thread and zero or more helper threads, with the
-+main thread participating in the job and then waiting until all helpers have
-+finished.  padata splits the job into units called chunks, where a chunk is a
-+piece of the job that one thread completes in one call to the thread function.
++	atomic_long_add(nr_pages, &args->nr_pages);
++}
 +
-+A user has to do three things to run a multithreaded job.  First, describe the
-+job by defining a padata_mt_job structure, which is explained in the Interface
-+section.  This includes a pointer to the thread function, which padata will
-+call each time it assigns a job chunk to a thread.  Then, define the thread
-+function, which accepts three arguments, ``start``, ``end``, and ``arg``, where
-+the first two delimit the range that the thread operates on and the last is a
-+pointer to the job's shared state, if any.  Prepare the shared state, which is
-+typically a stack-allocated structure that wraps the required data.  Last, call
-+padata_do_multithreaded(), which will return once the job is finished.
-+
- Interface
- =========
+ /* Initialise remaining memory on a node */
+ static int __init deferred_init_memmap(void *data)
+ {
+@@ -1738,7 +1758,7 @@ static int __init deferred_init_memmap(void *data)
+ 	unsigned long first_init_pfn, flags;
+ 	unsigned long start = jiffies;
+ 	struct zone *zone;
+-	int zid;
++	int zid, max_threads;
+ 	u64 i;
  
+ 	/* Bind memory initialisation thread to a local node if possible */
+@@ -1778,15 +1798,25 @@ static int __init deferred_init_memmap(void *data)
+ 		goto zone_empty;
+ 
+ 	/*
+-	 * Initialize and free pages in MAX_ORDER sized increments so
+-	 * that we can avoid introducing any issues with the buddy
+-	 * allocator.
++	 * More CPUs always led to greater speedups on tested systems, up to
++	 * all the nodes' CPUs.  Use all since the system is otherwise idle now.
+ 	 */
++	max_threads = max(cpumask_weight(cpumask), 1u);
++
+ 	for_each_free_mem_pfn_range_in_zone_from(i, zone, &spfn, &epfn) {
+-		while (spfn < epfn) {
+-			nr_pages += deferred_init_maxorder(zone, &spfn, epfn);
+-			cond_resched();
+-		}
++		struct def_init_args args = { zone, ATOMIC_LONG_INIT(0) };
++		struct padata_mt_job job = {
++			.thread_fn   = deferred_init_memmap_chunk,
++			.fn_arg      = &args,
++			.start       = spfn,
++			.size	     = epfn - spfn,
++			.align	     = MAX_ORDER_NR_PAGES,
++			.min_chunk   = MAX_ORDER_NR_PAGES,
++			.max_threads = max_threads,
++		};
++
++		padata_do_multithreaded(&job);
++		nr_pages += atomic_long_read(&args.nr_pages);
+ 	}
+ zone_empty:
+ 	/* Sanity check that the next zone really is unpopulated */
 -- 
 2.26.2
 
