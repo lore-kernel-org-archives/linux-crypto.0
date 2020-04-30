@@ -2,147 +2,179 @@ Return-Path: <SRS0=3pbX=6O=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DEA3C4724C
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Apr 2020 21:31:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5723C47257
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Apr 2020 21:33:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1476A208C3
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Apr 2020 21:31:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BDC2720873
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Apr 2020 21:33:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726752AbgD3Vbs (ORCPT
+        id S1727975AbgD3Vda (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 Apr 2020 17:31:48 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:38147 "EHLO
+        Thu, 30 Apr 2020 17:33:30 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:45197 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726336AbgD3Vbs (ORCPT
+        with ESMTP id S1726909AbgD3Vd3 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Apr 2020 17:31:48 -0400
+        Thu, 30 Apr 2020 17:33:29 -0400
 Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
  (mreue010 [212.227.15.129]) with ESMTPA (Nemesis) id
- 1MtO06-1jB6Ge1DyQ-00upFR; Thu, 30 Apr 2020 23:31:34 +0200
+ 1MmlCY-1imznH36yU-00jrwf; Thu, 30 Apr 2020 23:31:17 +0200
 From:   Arnd Bergmann <arnd@arndb.de>
-To:     linux-kernel@vger.kernel.org,
+To:     linux-kernel@vger.kernel.org
+Cc:     Arnd Bergmann <arnd@arndb.de>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>
-Cc:     Arnd Bergmann <arnd@arndb.de>, Eric Biggers <ebiggers@google.com>,
-        Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org
-Subject: [PATCH 01/15] crypto - Avoid free() namespace collision
-Date:   Thu, 30 Apr 2020 23:30:43 +0200
-Message-Id: <20200430213101.135134-2-arnd@arndb.de>
+        "David S. Miller" <davem@davemloft.net>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Johannes Berg <johannes.berg@intel.com>,
+        Intel Linux Wireless <linuxwifi@intel.com>,
+        Amitkumar Karwar <amitkarwar@gmail.com>,
+        James Smart <james.smart@broadcom.com>,
+        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
+        Bob Copeland <me@bobcopeland.com>, Jan Kara <jack@suse.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Florian Westphal <fw@strlen.de>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Neil Horman <nhorman@tuxdriver.com>,
+        linux-crypto@vger.kernel.org, linux-media@vger.kernel.org,
+        ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
+        netdev@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org,
+        linux-karma-devel@lists.sourceforge.net, bpf@vger.kernel.org,
+        linux-usb@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org
+Subject: [PATCH 00/15] gcc-10 warning fixes
+Date:   Thu, 30 Apr 2020 23:30:42 +0200
+Message-Id: <20200430213101.135134-1-arnd@arndb.de>
 X-Mailer: git-send-email 2.26.0
-In-Reply-To: <20200430213101.135134-1-arnd@arndb.de>
-References: <20200430213101.135134-1-arnd@arndb.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:noS1A6Il77uJCdtGIYMZsJck2JXiveiOZSUU5gHZOHPp0AFDTnW
- 9BCHOGqOI/yBx5RXfvWRKtYRNyKnpp68SRNe0h2ZYgnKxkFGXPnuHgRgJEc2UGiWM1yLkrz
- xjXPO8iHxtBMWllSKb7JEAeiZkyyjVXq4tHGoHz+gNfvrkNqqKM6/q5A2nBAFqx5g9kd/Ll
- eErk/7Bn10CsNpdrXig3A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:p2C9HxJm+L0=:55xdeEk+6o+d7sn4iF5aNM
- WX4slNCr3MDcqpD29KX/r/SlH3Kr97Ch0/dChnheCMKdIwK0V/wszQIAIUF0QZvi8luTGAu9e
- W6T3DUF/nagJnIfqQW8KlSyAF6kAN7OWOS7GACZoR4H+BAfl8UkRIcYVXddw/jVW1W8to/6dJ
- 46zj+1M7sEFtgsAxSjkysZQjbYKWkfKGmf1aUrLlx8MHgyEpvgEwPnqUmmaJeT3p+5rIYm8cA
- Ifee+aDak4AXOzu/dw74j/HxZ+JxmEueA96dUbew6nzc10LyrUIzI5PmDC7DVGaSw2eDvCb/a
- LqMrKYZfi1M34LwUGspwwSrmuBP1QweRvhzr9Pq76+6AuS6C+wbFaXKf4tAItjqMBZELk0F8v
- 1sfzreBAGDdiB8P3vrUZRoBHAmiu6HRIURxmQoRaePPhfTa9bh2ID2KlXyTZOc5Tz+DJqMVaJ
- gn7433rGebUp4czo9n9JxAGNbpAZnZMHd6ZBc86EO76fMDkIFMGTapT0nRDFDZO7Efl05WHTx
- 59tByoLcrs+YV3WA73Aohwl5Y6RMazRwWflLZ/Qa38yjTPEN24EJCfCfdKaUrpTZMJnd1RhJ3
- nimvoI58oT3txz3u2RL75cenfR0/lVzci9Xn8YM2aDRi6Q52ChU5ndS0gfXcKnFQcYVEaEBhQ
- aIGlyWKHAG0zJXFVXjR1YuRijZmFcJaEi0+P5AKu5rL8+9BrCCmig89HX/3oAlkPsysMTwr/Z
- vRnjNBz0ddQqhs5MMHaWgdk/vx0J1CnnUPCt4X0tv70ApEMRFx+aGR82RPZvn8Woy6AuwRtHt
- gKSBJlrdpj3tbwDFhMaavcMz1aIN5pBzaImRtjSGLW7cym3QW0=
+X-Provags-ID: V03:K1:d0r1T0atJ0fP6VC0lsoU2Nb50uVHm7+C7HFBKxo5Oh9FT7cjF4F
+ 56LFacsuF89qNSNIhAKt16YSLWAlWssvN8MtPe8NN45LaPwc/cCelzxDkHr4+0tFL6+Sa9G
+ a57V34rwqixwafD6sE/njElSMiK55+3n3WBVw4f5PpMdpEy2CNFI8yBkDaQox92MxOq478P
+ ATheht8WQuHpTQRLL5ZEQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:qtjOffXScL0=:Yde/YTTIyDLV71HcVFV/g8
+ 5aCgJ4X4xNzxI3sDnVHzb+4x1iuaUyj/FDU6axm1cC5dNjOHg+8xAyvhGoryNPJJFdXCQ9E8u
+ /vBjaVgpQi6NvTWJp+z0wFIoWkqjlRGR2wCLBCvG5ImhRZo6H4jl5uiqg/TUea1BRC5KOAUug
+ NLH3+1SoQ96QZaVVmYPbql6nsHgFb4uZYdjCp8JTVI2L30Rp4+0Uw3uwnSsZJuLBGqAnsFaeh
+ k7gAnZ02jIaJcsH2V+TwomCcLBG4OX9P3yetdeZWPtDSychl7RC+/gMGRpPt2beTcJXb7Sr4/
+ wgqf3CYR6/N2vUz2MhXS9Sl+HtdkF3gKvKsNTp2mw9draDW6IVxA+E16ianBs3s2/Jj86Cp4d
+ ehuoj5P2KJYrz+9tZ+et7SchBa5i/iGqThgNGHpUmVXaAI8nZHkjO7rEce0Ctm42WVr0HLTd4
+ o1jt4fwG8tpZvziYdVKKK9x4WQWsYAq2xx0LoedsVxg8abX+ql1c1UVSezkM6FJvLsBYSOqLC
+ Wl2wmpwXK3rQEhxxX4Sh0+p7vR68f1MiX8v4GGJjHzQvAfDgNp//3vXmnFa9OfQMY1+J5Oamt
+ RKC21TWUo81CDfLbGJUutjWh36LNJfa+N4p4bSAvqbx+J8urAAoBgP4lL7BwvnjawPWVT3bQ7
+ nx782MGIljH805ldEh/1deDsyPsEUVqES3Wx9pJakt2RNm+5lKUyzj8TLjsuKM9bM+MwiaVGP
+ y3sVYv2Jji3wkCZuDo3KR4124HQta8GSeSFOnIEeWuWxcaFbOJf9loaB0IyqLaH/bv1s0C1At
+ ctEvneGxLk11FkM6cOL//qiBQ4ws+UB1hR0Fmjp4sHdhGtlvK4=
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-gcc-10 complains about using the name of a standard library
-function in the kernel, as we are not building with -ffreestanding:
+Here are a couple of fixes for warnings introduced with gcc-10.
+If you wish to reproduce these, you can find the compiler I used
+at [1].
 
-crypto/xts.c:325:13: error: conflicting types for built-in function 'free'; expected 'void(void *)' [-Werror=builtin-declaration-mismatch]
-  325 | static void free(struct skcipher_instance *inst)
-      |             ^~~~
-crypto/lrw.c:290:13: error: conflicting types for built-in function 'free'; expected 'void(void *)' [-Werror=builtin-declaration-mismatch]
-  290 | static void free(struct skcipher_instance *inst)
-      |             ^~~~
-crypto/lrw.c:27:1: note: 'free' is declared in header '<stdlib.h>'
+If you like the fixes, please apply them directly into maintainer
+trees. I expect that we will also need them to be backported
+into stable kernels later.
 
-The xts and lrw cipher implementations run into this because they do
-not use the conventional namespaced function names.
+I disabled -Wrestrict on gcc in my local test tree, but with
+the patches from this series and the ones I have already sent,
+I see no gcc-10 specific warnings in linux-next when doing
+many randconfig builds for arm/arm64/x86.
 
-It might be better to rename all local functions in those files to
-help with things like 'ctags' and 'grep', but just renaming these two
-avoids the build issue. I picked the more verbose crypto_xts_free()
-and crypto_lrw_free() names for consistency with several other drivers
-that do use namespaced function names.
+      Arnd
 
-Fixes: f1c131b45410 ("crypto: xts - Convert to skcipher")
-Fixes: 700cb3f5fe75 ("crypto: lrw - Convert to skcipher")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- crypto/lrw.c | 6 +++---
- crypto/xts.c | 6 +++---
- 2 files changed, 6 insertions(+), 6 deletions(-)
+Arnd Bergmann (15):
+  crypto - Avoid free() namespace collision
+  iwlwifi: mvm: fix gcc-10 zero-length-bounds warning
+  mwifiex: avoid -Wstringop-overflow warning
+  ath10k: fix gcc-10 zero-length-bounds warnings
+  bpf: avoid gcc-10 stringop-overflow warning
+  netfilter: conntrack: avoid gcc-10 zero-length-bounds warning
+  drop_monitor: work around gcc-10 stringop-overflow warning
+  usb: ehci: avoid gcc-10 zero-length-bounds warning
+  udf: avoid gcc-10 zero-length-bounds warnings
+  hpfs: avoid gcc-10 zero-length-bounds warning
+  omfs: avoid gcc-10 stringop-overflow warning
+  media: s5k5baf: avoid gcc-10 zero-length-bounds warning
+  scsi: sas: avoid gcc-10 zero-length-bounds warning
+  isci: avoid gcc-10 zero-length-bounds warning
+  nvme: avoid gcc-10 zero-length-bounds warning
 
-diff --git a/crypto/lrw.c b/crypto/lrw.c
-index 376d7ed3f1f8..5b07a7c09296 100644
---- a/crypto/lrw.c
-+++ b/crypto/lrw.c
-@@ -287,7 +287,7 @@ static void exit_tfm(struct crypto_skcipher *tfm)
- 	crypto_free_skcipher(ctx->child);
- }
- 
--static void free(struct skcipher_instance *inst)
-+static void crypto_lrw_free(struct skcipher_instance *inst)
- {
- 	crypto_drop_skcipher(skcipher_instance_ctx(inst));
- 	kfree(inst);
-@@ -400,12 +400,12 @@ static int create(struct crypto_template *tmpl, struct rtattr **tb)
- 	inst->alg.encrypt = encrypt;
- 	inst->alg.decrypt = decrypt;
- 
--	inst->free = free;
-+	inst->free = crypto_lrw_free;
- 
- 	err = skcipher_register_instance(tmpl, inst);
- 	if (err) {
- err_free_inst:
--		free(inst);
-+		crypto_lrw_free(inst);
- 	}
- 	return err;
- }
-diff --git a/crypto/xts.c b/crypto/xts.c
-index dbdd8af629e6..3565f3b863a6 100644
---- a/crypto/xts.c
-+++ b/crypto/xts.c
-@@ -322,7 +322,7 @@ static void exit_tfm(struct crypto_skcipher *tfm)
- 	crypto_free_cipher(ctx->tweak);
- }
- 
--static void free(struct skcipher_instance *inst)
-+static void crypto_xts_free(struct skcipher_instance *inst)
- {
- 	crypto_drop_skcipher(skcipher_instance_ctx(inst));
- 	kfree(inst);
-@@ -434,12 +434,12 @@ static int create(struct crypto_template *tmpl, struct rtattr **tb)
- 	inst->alg.encrypt = encrypt;
- 	inst->alg.decrypt = decrypt;
- 
--	inst->free = free;
-+	inst->free = crypto_xts_free;
- 
- 	err = skcipher_register_instance(tmpl, inst);
- 	if (err) {
- err_free_inst:
--		free(inst);
-+		crypto_xts_free(inst);
- 	}
- 	return err;
- }
+ crypto/lrw.c                                  |  6 +--
+ crypto/xts.c                                  |  6 +--
+ drivers/media/i2c/s5k5baf.c                   |  4 +-
+ drivers/net/wireless/ath/ath10k/htt.h         |  4 +-
+ .../net/wireless/intel/iwlwifi/fw/api/tx.h    | 14 +++----
+ .../net/wireless/marvell/mwifiex/sta_cmd.c    | 39 ++++++++-----------
+ drivers/nvme/host/fc.c                        |  2 +-
+ drivers/scsi/aic94xx/aic94xx_tmf.c            |  4 +-
+ drivers/scsi/isci/task.h                      |  7 ++--
+ drivers/scsi/libsas/sas_task.c                |  3 +-
+ fs/hpfs/anode.c                               |  7 +++-
+ fs/omfs/file.c                                | 12 +++---
+ fs/omfs/omfs_fs.h                             |  2 +-
+ fs/udf/ecma_167.h                             |  2 +-
+ fs/udf/super.c                                |  2 +-
+ include/linux/filter.h                        |  6 +--
+ include/linux/usb/ehci_def.h                  | 12 ++++--
+ include/net/netfilter/nf_conntrack.h          |  2 +-
+ net/core/drop_monitor.c                       | 11 ++++--
+ net/netfilter/nf_conntrack_core.c             |  4 +-
+ 20 files changed, 76 insertions(+), 73 deletions(-)
+
+[1] https://mirrors.edge.kernel.org/pub/tools/crosstool/files/bin/x86_64/10.0.20200413/
+
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
+Cc: Kalle Valo <kvalo@codeaurora.org>
+Cc: Johannes Berg <johannes.berg@intel.com>
+Cc: Intel Linux Wireless <linuxwifi@intel.com>
+Cc: Amitkumar Karwar <amitkarwar@gmail.com>
+Cc: James Smart <james.smart@broadcom.com>
+Cc: Jens Axboe <axboe@fb.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: "James E.J. Bottomley" <jejb@linux.ibm.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>
+Cc: Bob Copeland <me@bobcopeland.com>
+Cc: Jan Kara <jack@suse.com>
+Cc: Alexei Starovoitov <ast@kernel.org>
+Cc: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Florian Westphal <fw@strlen.de>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Neil Horman <nhorman@tuxdriver.com>
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-media@vger.kernel.org
+Cc: ath10k@lists.infradead.org
+Cc: linux-wireless@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Cc: linux-nvme@lists.infradead.org
+Cc: linux-scsi@vger.kernel.org
+Cc: linux-karma-devel@lists.sourceforge.net
+Cc: bpf@vger.kernel.org
+Cc: linux-usb@vger.kernel.org
+Cc: netfilter-devel@vger.kernel.org
+Cc: coreteam@netfilter.org
+
+
+
 -- 
 2.26.0
 
