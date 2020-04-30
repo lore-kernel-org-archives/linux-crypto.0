@@ -2,108 +2,147 @@ Return-Path: <SRS0=3pbX=6O=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6588BC47247
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Apr 2020 21:31:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DEA3C4724C
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Apr 2020 21:31:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 391BB206D6
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Apr 2020 21:31:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1588282294;
-	bh=Bkl834xA9CcEf8hJwN2hSps66VvWfQ0obMpJUC2DhsI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
-	b=YhwwtobOtalMBOOYg8jJ+TPmF3PnQT5g63b/UU+RyeetaxIDkRZzjuIFc+xOvwZm7
-	 wSAr+MYiQBF+bhB9NH++Sst05aCuFqaHYGHGt/iarSEnHZ1Cfl8LOgjdh4krbIKYrY
-	 02LhSXfLf8rOI1i04iBvTE0akEwVckulYzp2w1xo=
+	by mail.kernel.org (Postfix) with ESMTP id 1476A208C3
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Apr 2020 21:31:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726447AbgD3Vbd (ORCPT
+        id S1726752AbgD3Vbs (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 Apr 2020 17:31:33 -0400
-Received: from mail.kernel.org ([198.145.29.99]:44490 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726336AbgD3Vbd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Apr 2020 17:31:33 -0400
-Received: from localhost.localdomain (c-73-231-172-41.hsd1.ca.comcast.net [73.231.172.41])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 07C8820870;
-        Thu, 30 Apr 2020 21:31:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1588282292;
-        bh=Bkl834xA9CcEf8hJwN2hSps66VvWfQ0obMpJUC2DhsI=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=n3v24GDLU0OAacwQ8azR4ZyAH5L3zSqPATNrbvEhpRTC9Q9/nuG17Q0Cck8wscapG
-         Y1g5a4dTXh/93Ig5fF8vwETzF+pKorxdKNJqO2MqxYSJq/wQZy7YVk8PNlgT7rWxht
-         JJU7Zj83UBZFTuWnzZGeHq02EE6uLPPSRoKVL7Qg=
-Date:   Thu, 30 Apr 2020 14:31:31 -0700
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Kirill Tkhai <ktkhai@virtuozzo.com>,
-        Michal Hocko <mhocko@kernel.org>, Pavel Machek <pavel@ucw.cz>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Shile Zhang <shile.zhang@linux.alibaba.com>,
-        Tejun Heo <tj@kernel.org>, Zi Yan <ziy@nvidia.com>,
-        linux-crypto@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/7] padata: parallelize deferred page init
-Message-Id: <20200430143131.7b8ff07f022ed879305de82f@linux-foundation.org>
-In-Reply-To: <20200430201125.532129-1-daniel.m.jordan@oracle.com>
-References: <20200430201125.532129-1-daniel.m.jordan@oracle.com>
-X-Mailer: Sylpheed 3.5.1 (GTK+ 2.24.31; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        Thu, 30 Apr 2020 17:31:48 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:38147 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726336AbgD3Vbs (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 30 Apr 2020 17:31:48 -0400
+Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
+ (mreue010 [212.227.15.129]) with ESMTPA (Nemesis) id
+ 1MtO06-1jB6Ge1DyQ-00upFR; Thu, 30 Apr 2020 23:31:34 +0200
+From:   Arnd Bergmann <arnd@arndb.de>
+To:     linux-kernel@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     Arnd Bergmann <arnd@arndb.de>, Eric Biggers <ebiggers@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org
+Subject: [PATCH 01/15] crypto - Avoid free() namespace collision
+Date:   Thu, 30 Apr 2020 23:30:43 +0200
+Message-Id: <20200430213101.135134-2-arnd@arndb.de>
+X-Mailer: git-send-email 2.26.0
+In-Reply-To: <20200430213101.135134-1-arnd@arndb.de>
+References: <20200430213101.135134-1-arnd@arndb.de>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:noS1A6Il77uJCdtGIYMZsJck2JXiveiOZSUU5gHZOHPp0AFDTnW
+ 9BCHOGqOI/yBx5RXfvWRKtYRNyKnpp68SRNe0h2ZYgnKxkFGXPnuHgRgJEc2UGiWM1yLkrz
+ xjXPO8iHxtBMWllSKb7JEAeiZkyyjVXq4tHGoHz+gNfvrkNqqKM6/q5A2nBAFqx5g9kd/Ll
+ eErk/7Bn10CsNpdrXig3A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:p2C9HxJm+L0=:55xdeEk+6o+d7sn4iF5aNM
+ WX4slNCr3MDcqpD29KX/r/SlH3Kr97Ch0/dChnheCMKdIwK0V/wszQIAIUF0QZvi8luTGAu9e
+ W6T3DUF/nagJnIfqQW8KlSyAF6kAN7OWOS7GACZoR4H+BAfl8UkRIcYVXddw/jVW1W8to/6dJ
+ 46zj+1M7sEFtgsAxSjkysZQjbYKWkfKGmf1aUrLlx8MHgyEpvgEwPnqUmmaJeT3p+5rIYm8cA
+ Ifee+aDak4AXOzu/dw74j/HxZ+JxmEueA96dUbew6nzc10LyrUIzI5PmDC7DVGaSw2eDvCb/a
+ LqMrKYZfi1M34LwUGspwwSrmuBP1QweRvhzr9Pq76+6AuS6C+wbFaXKf4tAItjqMBZELk0F8v
+ 1sfzreBAGDdiB8P3vrUZRoBHAmiu6HRIURxmQoRaePPhfTa9bh2ID2KlXyTZOc5Tz+DJqMVaJ
+ gn7433rGebUp4czo9n9JxAGNbpAZnZMHd6ZBc86EO76fMDkIFMGTapT0nRDFDZO7Efl05WHTx
+ 59tByoLcrs+YV3WA73Aohwl5Y6RMazRwWflLZ/Qa38yjTPEN24EJCfCfdKaUrpTZMJnd1RhJ3
+ nimvoI58oT3txz3u2RL75cenfR0/lVzci9Xn8YM2aDRi6Q52ChU5ndS0gfXcKnFQcYVEaEBhQ
+ aIGlyWKHAG0zJXFVXjR1YuRijZmFcJaEi0+P5AKu5rL8+9BrCCmig89HX/3oAlkPsysMTwr/Z
+ vRnjNBz0ddQqhs5MMHaWgdk/vx0J1CnnUPCt4X0tv70ApEMRFx+aGR82RPZvn8Woy6AuwRtHt
+ gKSBJlrdpj3tbwDFhMaavcMz1aIN5pBzaImRtjSGLW7cym3QW0=
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, 30 Apr 2020 16:11:18 -0400 Daniel Jordan <daniel.m.jordan@oracle.com> wrote:
+gcc-10 complains about using the name of a standard library
+function in the kernel, as we are not building with -ffreestanding:
 
-> Sometimes the kernel doesn't take full advantage of system memory
-> bandwidth, leading to a single CPU spending excessive time in
-> initialization paths where the data scales with memory size.
-> 
-> Multithreading naturally addresses this problem, and this series is the
-> first step.
-> 
-> It extends padata, a framework that handles many parallel singlethreaded
-> jobs, to handle multithreaded jobs as well by adding support for
-> splitting up the work evenly, specifying a minimum amount of work that's
-> appropriate for one helper thread to do, load balancing between helpers,
-> and coordinating them.  More documentation in patches 4 and 7.
-> 
-> The first user is deferred struct page init, a large bottleneck in
-> kernel boot--actually the largest for us and likely others too.  This
-> path doesn't require concurrency limits, resource control, or priority
-> adjustments like future users will (vfio, hugetlb fallocate, munmap)
-> because it happens during boot when the system is otherwise idle and
-> waiting on page init to finish.
-> 
-> This has been tested on a variety of x86 systems and speeds up kernel
-> boot by 6% to 49% by making deferred init 63% to 91% faster.
+crypto/xts.c:325:13: error: conflicting types for built-in function 'free'; expected 'void(void *)' [-Werror=builtin-declaration-mismatch]
+  325 | static void free(struct skcipher_instance *inst)
+      |             ^~~~
+crypto/lrw.c:290:13: error: conflicting types for built-in function 'free'; expected 'void(void *)' [-Werror=builtin-declaration-mismatch]
+  290 | static void free(struct skcipher_instance *inst)
+      |             ^~~~
+crypto/lrw.c:27:1: note: 'free' is declared in header '<stdlib.h>'
 
-How long is this up-to-91% in seconds?  If it's 91% of a millisecond
-then not impressed.  If it's 91% of two weeks then better :)
+The xts and lrw cipher implementations run into this because they do
+not use the conventional namespaced function names.
 
-Relatedly, how important is boot time on these large machines anyway? 
-They presumably have lengthy uptimes so boot time is relatively
-unimportant?
+It might be better to rename all local functions in those files to
+help with things like 'ctags' and 'grep', but just renaming these two
+avoids the build issue. I picked the more verbose crypto_xts_free()
+and crypto_lrw_free() names for consistency with several other drivers
+that do use namespaced function names.
 
-IOW, can you please explain more fully why this patchset is valuable to
-our users?
+Fixes: f1c131b45410 ("crypto: xts - Convert to skcipher")
+Fixes: 700cb3f5fe75 ("crypto: lrw - Convert to skcipher")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ crypto/lrw.c | 6 +++---
+ crypto/xts.c | 6 +++---
+ 2 files changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/crypto/lrw.c b/crypto/lrw.c
+index 376d7ed3f1f8..5b07a7c09296 100644
+--- a/crypto/lrw.c
++++ b/crypto/lrw.c
+@@ -287,7 +287,7 @@ static void exit_tfm(struct crypto_skcipher *tfm)
+ 	crypto_free_skcipher(ctx->child);
+ }
+ 
+-static void free(struct skcipher_instance *inst)
++static void crypto_lrw_free(struct skcipher_instance *inst)
+ {
+ 	crypto_drop_skcipher(skcipher_instance_ctx(inst));
+ 	kfree(inst);
+@@ -400,12 +400,12 @@ static int create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	inst->alg.encrypt = encrypt;
+ 	inst->alg.decrypt = decrypt;
+ 
+-	inst->free = free;
++	inst->free = crypto_lrw_free;
+ 
+ 	err = skcipher_register_instance(tmpl, inst);
+ 	if (err) {
+ err_free_inst:
+-		free(inst);
++		crypto_lrw_free(inst);
+ 	}
+ 	return err;
+ }
+diff --git a/crypto/xts.c b/crypto/xts.c
+index dbdd8af629e6..3565f3b863a6 100644
+--- a/crypto/xts.c
++++ b/crypto/xts.c
+@@ -322,7 +322,7 @@ static void exit_tfm(struct crypto_skcipher *tfm)
+ 	crypto_free_cipher(ctx->tweak);
+ }
+ 
+-static void free(struct skcipher_instance *inst)
++static void crypto_xts_free(struct skcipher_instance *inst)
+ {
+ 	crypto_drop_skcipher(skcipher_instance_ctx(inst));
+ 	kfree(inst);
+@@ -434,12 +434,12 @@ static int create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	inst->alg.encrypt = encrypt;
+ 	inst->alg.decrypt = decrypt;
+ 
+-	inst->free = free;
++	inst->free = crypto_xts_free;
+ 
+ 	err = skcipher_register_instance(tmpl, inst);
+ 	if (err) {
+ err_free_inst:
+-		free(inst);
++		crypto_xts_free(inst);
+ 	}
+ 	return err;
+ }
+-- 
+2.26.0
+
