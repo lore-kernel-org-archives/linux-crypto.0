@@ -2,179 +2,130 @@ Return-Path: <SRS0=3pbX=6O=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5723C47257
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Apr 2020 21:33:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10406C47254
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Apr 2020 21:41:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BDC2720873
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Apr 2020 21:33:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E402420870
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Apr 2020 21:41:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=soleen.com header.i=@soleen.com header.b="ejzlSjOS"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727975AbgD3Vda (ORCPT
+        id S1726697AbgD3Vli (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 Apr 2020 17:33:30 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:45197 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726909AbgD3Vd3 (ORCPT
+        Thu, 30 Apr 2020 17:41:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44280 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1726447AbgD3Vli (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Apr 2020 17:33:29 -0400
-Received: from threadripper.lan ([149.172.19.189]) by mrelayeu.kundenserver.de
- (mreue010 [212.227.15.129]) with ESMTPA (Nemesis) id
- 1MmlCY-1imznH36yU-00jrwf; Thu, 30 Apr 2020 23:31:17 +0200
-From:   Arnd Bergmann <arnd@arndb.de>
-To:     linux-kernel@vger.kernel.org
-Cc:     Arnd Bergmann <arnd@arndb.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        Johannes Berg <johannes.berg@intel.com>,
-        Intel Linux Wireless <linuxwifi@intel.com>,
-        Amitkumar Karwar <amitkarwar@gmail.com>,
-        James Smart <james.smart@broadcom.com>,
-        Jens Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
-        Bob Copeland <me@bobcopeland.com>, Jan Kara <jack@suse.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Florian Westphal <fw@strlen.de>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Neil Horman <nhorman@tuxdriver.com>,
-        linux-crypto@vger.kernel.org, linux-media@vger.kernel.org,
-        ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org,
-        linux-karma-devel@lists.sourceforge.net, bpf@vger.kernel.org,
-        linux-usb@vger.kernel.org, netfilter-devel@vger.kernel.org,
-        coreteam@netfilter.org
-Subject: [PATCH 00/15] gcc-10 warning fixes
-Date:   Thu, 30 Apr 2020 23:30:42 +0200
-Message-Id: <20200430213101.135134-1-arnd@arndb.de>
-X-Mailer: git-send-email 2.26.0
+        Thu, 30 Apr 2020 17:41:38 -0400
+Received: from mail-ed1-x542.google.com (mail-ed1-x542.google.com [IPv6:2a00:1450:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D839C035495
+        for <linux-crypto@vger.kernel.org>; Thu, 30 Apr 2020 14:41:36 -0700 (PDT)
+Received: by mail-ed1-x542.google.com with SMTP id p16so5771027edm.10
+        for <linux-crypto@vger.kernel.org>; Thu, 30 Apr 2020 14:41:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=soleen.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=hkpaJwE+XdImJwiRCGmMrHpnH9Do497AqONxguPuLh4=;
+        b=ejzlSjOSQT9fOgnWL9BlmOywT9YUrObwmrAsjURuygWHxwV8OQVp72xlXJtZ02/TVw
+         DIT/agnijUbVoAX7BK86VAyjiWzMyGXM2KTuZI6UNemsiX1Cq2rx0pT3HwreM1CaOKlk
+         g255rxIrtopXIP8n5gl+jKtXRgHpDyi++7rWe+DxBDgBZCFAwnPQpsWVH19peAeY9FzY
+         yaIFdv6+/raAyg7urd5JvKL/fqOUW4UB7EqADLBzSUJ+f8Aahl2Zz0zKvpxAEb37wx7V
+         DTqNs130Y7jUegFidoOJ9vnmbx17b9H5MOSZ5HwfoY9hpRUnZWiWdAn+WzCJoM0ygalG
+         kz4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=hkpaJwE+XdImJwiRCGmMrHpnH9Do497AqONxguPuLh4=;
+        b=qKn3QmgB0f7h6JSk5TC0Vz+miwdDyeO5IAfuQ82JpP9LD/8ksYDuvWcXiuG/mRVo24
+         +14o5IQMH08bp08N/fjOV1Ns/ndEA8KADl5F8vQAEIyP1EKp9GWD/8xoH4VkYUAAAmfR
+         1SuJdn+wJuTNblzvr5JHc1TLxRWv3YgR8AadaDDs20bbtK0FY7JPmyMz11Ug5LXrwudP
+         SCzSuryAa6f3/ZDmqexVzbnwziRRzR8mB7bVa1mzsciWZBtY/FCBkRqQ35aOnQaDqjeu
+         Ly+7s1Ql18R+klxLWn4wVfWkkgDLM7OobDyTwKInA8ulGVLi2OWuCFzLTfisyntUo0Cq
+         rQwA==
+X-Gm-Message-State: AGi0PuZWqgoqVRXCkjm8rZh2pvtXVudnfTONaUBWWefTJ7EFwbBUzg7R
+        pw9BPulW8eJ7OBYyVx6f5g6vu1y8O9Q50I8McUtG6g==
+X-Google-Smtp-Source: APiQypJ/NZIDe1nyo+ttBHz9E+jzzV+NreYGwdIKd9gp9L17jS4zp63ur9u6iJDTRLJh3/QP04vldfbKOZe8y5H1q9E=
+X-Received: by 2002:a50:c28a:: with SMTP id o10mr979777edf.85.1588282895115;
+ Thu, 30 Apr 2020 14:41:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:d0r1T0atJ0fP6VC0lsoU2Nb50uVHm7+C7HFBKxo5Oh9FT7cjF4F
- 56LFacsuF89qNSNIhAKt16YSLWAlWssvN8MtPe8NN45LaPwc/cCelzxDkHr4+0tFL6+Sa9G
- a57V34rwqixwafD6sE/njElSMiK55+3n3WBVw4f5PpMdpEy2CNFI8yBkDaQox92MxOq478P
- ATheht8WQuHpTQRLL5ZEQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:qtjOffXScL0=:Yde/YTTIyDLV71HcVFV/g8
- 5aCgJ4X4xNzxI3sDnVHzb+4x1iuaUyj/FDU6axm1cC5dNjOHg+8xAyvhGoryNPJJFdXCQ9E8u
- /vBjaVgpQi6NvTWJp+z0wFIoWkqjlRGR2wCLBCvG5ImhRZo6H4jl5uiqg/TUea1BRC5KOAUug
- NLH3+1SoQ96QZaVVmYPbql6nsHgFb4uZYdjCp8JTVI2L30Rp4+0Uw3uwnSsZJuLBGqAnsFaeh
- k7gAnZ02jIaJcsH2V+TwomCcLBG4OX9P3yetdeZWPtDSychl7RC+/gMGRpPt2beTcJXb7Sr4/
- wgqf3CYR6/N2vUz2MhXS9Sl+HtdkF3gKvKsNTp2mw9draDW6IVxA+E16ianBs3s2/Jj86Cp4d
- ehuoj5P2KJYrz+9tZ+et7SchBa5i/iGqThgNGHpUmVXaAI8nZHkjO7rEce0Ctm42WVr0HLTd4
- o1jt4fwG8tpZvziYdVKKK9x4WQWsYAq2xx0LoedsVxg8abX+ql1c1UVSezkM6FJvLsBYSOqLC
- Wl2wmpwXK3rQEhxxX4Sh0+p7vR68f1MiX8v4GGJjHzQvAfDgNp//3vXmnFa9OfQMY1+J5Oamt
- RKC21TWUo81CDfLbGJUutjWh36LNJfa+N4p4bSAvqbx+J8urAAoBgP4lL7BwvnjawPWVT3bQ7
- nx782MGIljH805ldEh/1deDsyPsEUVqES3Wx9pJakt2RNm+5lKUyzj8TLjsuKM9bM+MwiaVGP
- y3sVYv2Jji3wkCZuDo3KR4124HQta8GSeSFOnIEeWuWxcaFbOJf9loaB0IyqLaH/bv1s0C1At
- ctEvneGxLk11FkM6cOL//qiBQ4ws+UB1hR0Fmjp4sHdhGtlvK4=
+References: <20200430201125.532129-1-daniel.m.jordan@oracle.com> <20200430143131.7b8ff07f022ed879305de82f@linux-foundation.org>
+In-Reply-To: <20200430143131.7b8ff07f022ed879305de82f@linux-foundation.org>
+From:   Pavel Tatashin <pasha.tatashin@soleen.com>
+Date:   Thu, 30 Apr 2020 17:40:59 -0400
+Message-ID: <CA+CK2bDwg=s6RbTCirm4U5gvRsnCMred-pnrW=WzN9hfGuBsiQ@mail.gmail.com>
+Subject: Re: [PATCH 0/7] padata: parallelize deferred page init
+To:     Andrew Morton <akpm@linux-foundation.org>
+Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        Alex Williamson <alex.williamson@redhat.com>,
+        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        David Hildenbrand <david@redhat.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Josh Triplett <josh@joshtriplett.org>,
+        Kirill Tkhai <ktkhai@virtuozzo.com>,
+        Michal Hocko <mhocko@kernel.org>, Pavel Machek <pavel@ucw.cz>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Shile Zhang <shile.zhang@linux.alibaba.com>,
+        Tejun Heo <tj@kernel.org>, Zi Yan <ziy@nvidia.com>,
+        linux-crypto@vger.kernel.org, linux-mm <linux-mm@kvack.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Here are a couple of fixes for warnings introduced with gcc-10.
-If you wish to reproduce these, you can find the compiler I used
-at [1].
+On Thu, Apr 30, 2020 at 5:31 PM Andrew Morton <akpm@linux-foundation.org> wrote:
+>
+> On Thu, 30 Apr 2020 16:11:18 -0400 Daniel Jordan <daniel.m.jordan@oracle.com> wrote:
+>
+> > Sometimes the kernel doesn't take full advantage of system memory
+> > bandwidth, leading to a single CPU spending excessive time in
+> > initialization paths where the data scales with memory size.
+> >
+> > Multithreading naturally addresses this problem, and this series is the
+> > first step.
+> >
+> > It extends padata, a framework that handles many parallel singlethreaded
+> > jobs, to handle multithreaded jobs as well by adding support for
+> > splitting up the work evenly, specifying a minimum amount of work that's
+> > appropriate for one helper thread to do, load balancing between helpers,
+> > and coordinating them.  More documentation in patches 4 and 7.
+> >
+> > The first user is deferred struct page init, a large bottleneck in
+> > kernel boot--actually the largest for us and likely others too.  This
+> > path doesn't require concurrency limits, resource control, or priority
+> > adjustments like future users will (vfio, hugetlb fallocate, munmap)
+> > because it happens during boot when the system is otherwise idle and
+> > waiting on page init to finish.
+> >
+> > This has been tested on a variety of x86 systems and speeds up kernel
+> > boot by 6% to 49% by making deferred init 63% to 91% faster.
+>
+> How long is this up-to-91% in seconds?  If it's 91% of a millisecond
+> then not impressed.  If it's 91% of two weeks then better :)
+>
+> Relatedly, how important is boot time on these large machines anyway?
+> They presumably have lengthy uptimes so boot time is relatively
+> unimportant?
 
-If you like the fixes, please apply them directly into maintainer
-trees. I expect that we will also need them to be backported
-into stable kernels later.
+Large machines indeed have a lengthy uptime, but they also can host a
+large number of VMs meaning that downtime of the host increases the
+downtime of VMs in cloud environments. Some VMs might be very sensible
+to downtime: game servers, traders, etc.
 
-I disabled -Wrestrict on gcc in my local test tree, but with
-the patches from this series and the ones I have already sent,
-I see no gcc-10 specific warnings in linux-next when doing
-many randconfig builds for arm/arm64/x86.
-
-      Arnd
-
-Arnd Bergmann (15):
-  crypto - Avoid free() namespace collision
-  iwlwifi: mvm: fix gcc-10 zero-length-bounds warning
-  mwifiex: avoid -Wstringop-overflow warning
-  ath10k: fix gcc-10 zero-length-bounds warnings
-  bpf: avoid gcc-10 stringop-overflow warning
-  netfilter: conntrack: avoid gcc-10 zero-length-bounds warning
-  drop_monitor: work around gcc-10 stringop-overflow warning
-  usb: ehci: avoid gcc-10 zero-length-bounds warning
-  udf: avoid gcc-10 zero-length-bounds warnings
-  hpfs: avoid gcc-10 zero-length-bounds warning
-  omfs: avoid gcc-10 stringop-overflow warning
-  media: s5k5baf: avoid gcc-10 zero-length-bounds warning
-  scsi: sas: avoid gcc-10 zero-length-bounds warning
-  isci: avoid gcc-10 zero-length-bounds warning
-  nvme: avoid gcc-10 zero-length-bounds warning
-
- crypto/lrw.c                                  |  6 +--
- crypto/xts.c                                  |  6 +--
- drivers/media/i2c/s5k5baf.c                   |  4 +-
- drivers/net/wireless/ath/ath10k/htt.h         |  4 +-
- .../net/wireless/intel/iwlwifi/fw/api/tx.h    | 14 +++----
- .../net/wireless/marvell/mwifiex/sta_cmd.c    | 39 ++++++++-----------
- drivers/nvme/host/fc.c                        |  2 +-
- drivers/scsi/aic94xx/aic94xx_tmf.c            |  4 +-
- drivers/scsi/isci/task.h                      |  7 ++--
- drivers/scsi/libsas/sas_task.c                |  3 +-
- fs/hpfs/anode.c                               |  7 +++-
- fs/omfs/file.c                                | 12 +++---
- fs/omfs/omfs_fs.h                             |  2 +-
- fs/udf/ecma_167.h                             |  2 +-
- fs/udf/super.c                                |  2 +-
- include/linux/filter.h                        |  6 +--
- include/linux/usb/ehci_def.h                  | 12 ++++--
- include/net/netfilter/nf_conntrack.h          |  2 +-
- net/core/drop_monitor.c                       | 11 ++++--
- net/netfilter/nf_conntrack_core.c             |  4 +-
- 20 files changed, 76 insertions(+), 73 deletions(-)
-
-[1] https://mirrors.edge.kernel.org/pub/tools/crosstool/files/bin/x86_64/10.0.20200413/
-
-Cc: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Mauro Carvalho Chehab <mchehab@kernel.org>
-Cc: Kalle Valo <kvalo@codeaurora.org>
-Cc: Johannes Berg <johannes.berg@intel.com>
-Cc: Intel Linux Wireless <linuxwifi@intel.com>
-Cc: Amitkumar Karwar <amitkarwar@gmail.com>
-Cc: James Smart <james.smart@broadcom.com>
-Cc: Jens Axboe <axboe@fb.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: "James E.J. Bottomley" <jejb@linux.ibm.com>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>
-Cc: Bob Copeland <me@bobcopeland.com>
-Cc: Jan Kara <jack@suse.com>
-Cc: Alexei Starovoitov <ast@kernel.org>
-Cc: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Florian Westphal <fw@strlen.de>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Neil Horman <nhorman@tuxdriver.com>
-Cc: linux-crypto@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Cc: linux-media@vger.kernel.org
-Cc: ath10k@lists.infradead.org
-Cc: linux-wireless@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Cc: linux-nvme@lists.infradead.org
-Cc: linux-scsi@vger.kernel.org
-Cc: linux-karma-devel@lists.sourceforge.net
-Cc: bpf@vger.kernel.org
-Cc: linux-usb@vger.kernel.org
-Cc: netfilter-devel@vger.kernel.org
-Cc: coreteam@netfilter.org
-
-
-
--- 
-2.26.0
-
+>
+> IOW, can you please explain more fully why this patchset is valuable to
+> our users?
