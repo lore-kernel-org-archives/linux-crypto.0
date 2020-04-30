@@ -1,77 +1,76 @@
-Return-Path: <SRS0=SZPK=6N=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=3pbX=6O=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FFBAC83000
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Apr 2020 16:50:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0F04C83007
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Apr 2020 00:48:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 673E9214AF
-	for <linux-crypto@archiver.kernel.org>; Wed, 29 Apr 2020 16:50:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1588179013;
-	bh=JiQTaWVwC63SkuV2FBWui7b1YBsjH7ezXzl5EPROEi4=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
-	b=HRfVAG1fguPHbcRkxvrkm6mk2YgkrQAT4+AsDygCUWcMUwvb/1PlJJPw3+wK6nZno
-	 S/Nf61W+otlD7Jo6F6+v9uJutu/Hp5ZnPIzqHTQkDqbDqUVNALq2OxGqyuXl7qZAhn
-	 x+bOn1BS9qbAtmb54c7SojunBtd0uFIavzt610Hw=
+	by mail.kernel.org (Postfix) with ESMTP id CBC612083B
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Apr 2020 00:48:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726618AbgD2QuM (ORCPT
+        id S1726486AbgD3AsO (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 29 Apr 2020 12:50:12 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59872 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726558AbgD2QuM (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 29 Apr 2020 12:50:12 -0400
-Subject: Re: [GIT PULL] Crypto Fixes for 5.7
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1588179012;
-        bh=JiQTaWVwC63SkuV2FBWui7b1YBsjH7ezXzl5EPROEi4=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=fSw5jXxAGJccqkxbT6sOjDi3Lc9LVJ7ghgu9ccO4L+h9II+CMG1R5FAUwS7n62Iyt
-         vDL5JbEMruYBOxxCkwi8FM6v2TMpQcW2cDTuSwvDSr2a1wpieaLn8A7bnOznUEieYW
-         crfb1S6Cd3mZd9ysvpdC6ft6AStjOEhFxu9O7Whs=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20200429055420.GA26381@gondor.apana.org.au>
-References: <20190916084901.GA20338@gondor.apana.org.au>
- <20190923050515.GA6980@gondor.apana.org.au>
- <20191202062017.ge4rz72ki3vczhgb@gondor.apana.org.au>
- <20191214084749.jt5ekav5o5pd2dcp@gondor.apana.org.au>
- <20200115150812.mo2eycc53lbsgvue@gondor.apana.org.au>
- <20200213033231.xjwt6uf54nu26qm5@gondor.apana.org.au>
- <20200408061513.GA23636@gondor.apana.org.au>
- <20200429055420.GA26381@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20200429055420.GA26381@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-X-PR-Tracked-Commit-Id: 55b3209acbb01cb02b1ee6b1afe80d83b1aab36d
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 6c3efdc911b67816285719bd610152232cf5e8e4
-Message-Id: <158817901233.22148.11028199197664884191.pr-tracker-bot@kernel.org>
-Date:   Wed, 29 Apr 2020 16:50:12 +0000
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        Wed, 29 Apr 2020 20:48:14 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:3386 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726309AbgD3AsO (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 29 Apr 2020 20:48:14 -0400
+Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 4B90C99083E5249DB887;
+        Thu, 30 Apr 2020 08:48:12 +0800 (CST)
+Received: from SWX921481.china.huawei.com (10.126.201.159) by
+ DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
+ 14.3.487.0; Thu, 30 Apr 2020 08:48:03 +0800
+From:   Barry Song <song.bao.hua@hisilicon.com>
+To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
+CC:     <linux-crypto@vger.kernel.org>, <linuxarm@huawei.com>,
+        Barry Song <song.bao.hua@hisilicon.com>
+Subject: [PATCH] crypto: acomp - search acomp with scomp backend in crypto_has_acomp
+Date:   Thu, 30 Apr 2020 12:47:32 +1200
+Message-ID: <20200430004732.24092-1-song.bao.hua@hisilicon.com>
+X-Mailer: git-send-email 2.21.0.windows.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.126.201.159]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pull request you sent on Wed, 29 Apr 2020 15:54:20 +1000:
+users may call crypto_has_acomp to confirm the existence of acomp before using
+crypto_acomp APIs. Right now, many of acomp have scomp backend, for example,
+lz4, lzo, deflate etc. crypto_has_acomp will return false for them even though
+they support acomp APIs.
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+One possible way to make has_acomp true for them is calling this APIs like
+crypto_has_acomp("xxx", CRYPTO_ALG_TYPE_SCOMPRESS, 0);
+But it looks quite weird.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/6c3efdc911b67816285719bd610152232cf5e8e4
+Signed-off-by: Barry Song <song.bao.hua@hisilicon.com>
+---
+ include/crypto/acompress.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thank you!
-
+diff --git a/include/crypto/acompress.h b/include/crypto/acompress.h
+index d873f999b334..a7170848e6c2 100644
+--- a/include/crypto/acompress.h
++++ b/include/crypto/acompress.h
+@@ -156,7 +156,7 @@ static inline void crypto_free_acomp(struct crypto_acomp *tfm)
+ static inline int crypto_has_acomp(const char *alg_name, u32 type, u32 mask)
+ {
+ 	type &= ~CRYPTO_ALG_TYPE_MASK;
+-	type |= CRYPTO_ALG_TYPE_ACOMPRESS;
++	type |= CRYPTO_ALG_TYPE_ACOMPRESS | CRYPTO_ALG_TYPE_SCOMPRESS;
+ 	mask |= CRYPTO_ALG_TYPE_MASK;
+ 
+ 	return crypto_has_alg(alg_name, type, mask);
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+2.23.0
+
+
