@@ -2,59 +2,59 @@ Return-Path: <SRS0=3pbX=6O=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33232C47247
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Apr 2020 16:18:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6D3FC4725A
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Apr 2020 16:18:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 10E4C2173E
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Apr 2020 16:18:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B7A5A208DB
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Apr 2020 16:18:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1588263521;
-	bh=ugCY3y9aPneko9xp0OW8Y5PqnnRdwIA6ZnhjiQw0pbg=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=Ys5B3SFBOzirnOuG05uaYNP3Q448kd/Yb01QHpCSR4YfPldFjBmIyMlOZBjoWV3bV
-	 oHGYXARp1i/8InUX3H6sSuJjXHHlJOQje9zzpT4u0SqbRIiBLCLctd4WSQsnl2KwqG
-	 1VWSRzjoLi3GhllnKi+nQ4bBS4OpJrLEtyVvnxQQ=
+	s=default; t=1588263523;
+	bh=86FBZ/o/74//Z9rtzkpcPDOWTqMZ84B8l6RhI+cNJP0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=H9PbczY6js4vxQRr1XgI7I/eAfeXYLObPnrvwNLEzLBoUPahh+INl3cGAregc5IYv
+	 Yu9ofcxJkr6C5Z52prgcn+MCdlEkJYgsSN+zjYWQt+G1yimM75TRk+/uszrELkO+0W
+	 i+VuFZxxGnIUBKu+DbG9qIz+nbli/oeYYJx1ZFg4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728145AbgD3QSj (ORCPT
+        id S1728198AbgD3QSm (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 Apr 2020 12:18:39 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58600 "EHLO mail.kernel.org"
+        Thu, 30 Apr 2020 12:18:42 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58754 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726431AbgD3QSi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Apr 2020 12:18:38 -0400
+        id S1728120AbgD3QSk (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 30 Apr 2020 12:18:40 -0400
 Received: from mail.kernel.org (ip5f5ad5c5.dynamic.kabel-deutschland.de [95.90.213.197])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A7673208D5;
+        by mail.kernel.org (Postfix) with ESMTPSA id C4EC124954;
         Thu, 30 Apr 2020 16:18:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1588263517;
-        bh=ugCY3y9aPneko9xp0OW8Y5PqnnRdwIA6ZnhjiQw0pbg=;
-        h=From:To:Cc:Subject:Date:From;
-        b=jkbiKuotKQWoJifXoYaYKWd4u1OUCkFJTCeaJ2hFfc8Mmzm6hL99xXi+5i8oLaR6e
-         GJ1b6u5OLXCuKZdQPYYbqcEoGl4qcjUVxJHvEaPOc1nGKIjtw42GlkxhXUFJCRfzBO
-         IWB28xT442895dIcuie8By96F883CyyppOigyJ4o=
+        s=default; t=1588263518;
+        bh=86FBZ/o/74//Z9rtzkpcPDOWTqMZ84B8l6RhI+cNJP0=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=uwfYgUY6A8sXcwWCUXNCVK3l3WnohKtRPuDZXNwn5p3EkmoS1LnGMFJndot/XSDvP
+         2jwSdl+SXI0Qf8CBByeMBgQQsCSSFBHllJZCuzvE+CsH1rkB3fwQ5uECv0EvzUjauT
+         SyUZ/iKDxHd2GGx7kn92hfURCJ5GuTfCeM4l7nZM=
 Received: from mchehab by mail.kernel.org with local (Exim 4.92.3)
         (envelope-from <mchehab@kernel.org>)
-        id 1jUBtT-00Axgb-Pl; Thu, 30 Apr 2020 18:18:35 +0200
+        id 1jUBtT-00Axgy-W2; Thu, 30 Apr 2020 18:18:35 +0200
 From:   Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
 To:     Linux Doc Mailing List <linux-doc@vger.kernel.org>
 Cc:     Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
         linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
-        linux-pm@vger.kernel.org, keyrings@vger.kernel.org,
-        linux-crypto@vger.kernel.org, dmaengine@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linuxppc-dev@lists.ozlabs.org, linux-sh@vger.kernel.org,
-        kvm@vger.kernel.org
-Subject: [PATCH v4 00/19] Manually convert  thermal, crypto and misc devices to ReST
-Date:   Thu, 30 Apr 2020 18:18:14 +0200
-Message-Id: <cover.1588263270.git.mchehab+huawei@kernel.org>
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org
+Subject: [PATCH v4 05/19] docs: crypto: descore-readme.txt: convert to ReST format
+Date:   Thu, 30 Apr 2020 18:18:19 +0200
+Message-Id: <af20b2b19f6833e151ee239c8de4a997426c5eca.1588263270.git.mchehab+huawei@kernel.org>
 X-Mailer: git-send-email 2.25.4
+In-Reply-To: <cover.1588263270.git.mchehab+huawei@kernel.org>
+References: <cover.1588263270.git.mchehab+huawei@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
@@ -62,126 +62,439 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Manually convert some files from thermal, crypto and misc-devices
-to ReST format.
+Convert this readme file to ReST file format, preserving its
+contents as-is as much as possible. The only changes are:
 
-This series is against linux-next 20200430 tag (as I rebased it, in order
-to check if some patch were already merged via some other tree),
-but it should very likely merge fine against docs-next.
+- Added chapter and title markups;
+- Added blank lines where needed;
+- Added list markups where needed;
+- Use a table markup;
+- replace markups like `foo' to ``foo``;
+- add one extra literal markup to avoid warnings.
 
-The full series (including those ones) are at:
-
-	https://git.linuxtv.org/mchehab/experimental.git/log/?h=misc-docs
-
-The documents touched on this patch, converted to HTML via the 
-building system are at (together with patches from other series):
-
-	https://www.infradead.org/~mchehab/kernel_docs/
-
-
-v4:
-
-- added some acks.
-
-v3:
-
-- removed the cpu-freq patches from this series, as Rafael should
-  be applying it on his tree.
-
-v2: 
-
-- a small change at patch 2 to avoid uneeded whitespace changes;
-- added 13 new patches at the end
-
-
-Mauro Carvalho Chehab (19):
-  docs: thermal: convert cpu-idle-cooling.rst to ReST
-  docs: crypto: convert asymmetric-keys.txt to ReST
-  docs: crypto: convert api-intro.txt to ReST format
-  docs: crypto: convert async-tx-api.txt to ReST format
-  docs: crypto: descore-readme.txt: convert to ReST format
-  docs: misc-devices/spear-pcie-gadget.txt: convert to ReST
-  docs: misc-devices/pci-endpoint-test.txt: convert to ReST
-  docs: misc-devices/pci-endpoint-test.txt: convert to ReST
-  docs: misc-devices/c2port.txt: convert to ReST format
-  docs: misc-devices/bh1770glc.txt: convert to ReST
-  docs: misc-devices/apds990x.txt: convert to ReST format
-  docs: pci: endpoint/function/binding/pci-test.txt convert to ReST
-  docs: arm64: convert perf.txt to ReST format
-  docs: powerpc: convert vcpudispatch_stats.txt to ReST
-  docs: sh: convert new-machine.txt to ReST
-  docs: sh: convert register-banks.txt to ReST
-  docs: trace: ring-buffer-design.txt: convert to ReST format
-  docs: kvm: get read of devices/README
-  docs: misc-devices: add uacce to the index.rst
-
- .../endpoint/function/binding/pci-test.rst    |  26 +
- .../endpoint/function/binding/pci-test.txt    |  19 -
- Documentation/PCI/endpoint/index.rst          |   2 +
- Documentation/arm64/index.rst                 |   1 +
- Documentation/arm64/{perf.txt => perf.rst}    |   7 +-
- .../crypto/{api-intro.txt => api-intro.rst}   | 186 ++--
- ...symmetric-keys.txt => asymmetric-keys.rst} |  91 +-
- .../{async-tx-api.txt => async-tx-api.rst}    | 253 +++---
- ...{descore-readme.txt => descore-readme.rst} | 152 +++-
- Documentation/crypto/index.rst                |   5 +
- Documentation/driver-api/dmaengine/client.rst |   2 +-
- .../driver-api/dmaengine/provider.rst         |   2 +-
- .../driver-api/thermal/cpu-idle-cooling.rst   |  18 +-
- Documentation/driver-api/thermal/index.rst    |   1 +
- .../{ad525x_dpot.txt => ad525x_dpot.rst}      |  24 +-
- .../{apds990x.txt => apds990x.rst}            |  31 +-
- .../{bh1770glc.txt => bh1770glc.rst}          |  45 +-
- .../misc-devices/{c2port.txt => c2port.rst}   |  58 +-
- Documentation/misc-devices/index.rst          |   7 +
- .../misc-devices/pci-endpoint-test.rst        |  56 ++
- .../misc-devices/pci-endpoint-test.txt        |  41 -
- .../misc-devices/spear-pcie-gadget.rst        | 170 ++++
- .../misc-devices/spear-pcie-gadget.txt        | 130 ---
- Documentation/powerpc/index.rst               |   1 +
- ...patch_stats.txt => vcpudispatch_stats.rst} |  17 +-
- Documentation/security/keys/core.rst          |   2 +-
- Documentation/sh/index.rst                    |   6 +
- .../sh/{new-machine.txt => new-machine.rst}   | 195 +++--
- ...{register-banks.txt => register-banks.rst} |  13 +-
- Documentation/trace/index.rst                 |   1 +
- ...ffer-design.txt => ring-buffer-design.rst} | 802 ++++++++++--------
- Documentation/virt/kvm/devices/README         |   1 -
- Documentation/virt/kvm/devices/index.rst      |   3 +
- MAINTAINERS                                   |   4 +-
- arch/sh/Kconfig.cpu                           |   2 +-
- crypto/asymmetric_keys/asymmetric_type.c      |   2 +-
- crypto/asymmetric_keys/public_key.c           |   2 +-
- crypto/asymmetric_keys/signature.c            |   2 +-
- drivers/misc/Kconfig                          |   2 +-
- drivers/misc/ad525x_dpot.c                    |   2 +-
- include/crypto/public_key.h                   |   2 +-
- include/keys/asymmetric-parser.h              |   2 +-
- include/keys/asymmetric-subtype.h             |   2 +-
- include/keys/asymmetric-type.h                |   2 +-
- 44 files changed, 1358 insertions(+), 1034 deletions(-)
- create mode 100644 Documentation/PCI/endpoint/function/binding/pci-test.rst
- delete mode 100644 Documentation/PCI/endpoint/function/binding/pci-test.txt
- rename Documentation/arm64/{perf.txt => perf.rst} (95%)
- rename Documentation/crypto/{api-intro.txt => api-intro.rst} (70%)
- rename Documentation/crypto/{asymmetric-keys.txt => asymmetric-keys.rst} (91%)
- rename Documentation/crypto/{async-tx-api.txt => async-tx-api.rst} (55%)
+Signed-off-by: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+---
+ ...{descore-readme.txt => descore-readme.rst} | 152 ++++++++++++------
+ Documentation/crypto/index.rst                |   1 +
+ 2 files changed, 108 insertions(+), 45 deletions(-)
  rename Documentation/crypto/{descore-readme.txt => descore-readme.rst} (81%)
- rename Documentation/misc-devices/{ad525x_dpot.txt => ad525x_dpot.rst} (85%)
- rename Documentation/misc-devices/{apds990x.txt => apds990x.rst} (86%)
- rename Documentation/misc-devices/{bh1770glc.txt => bh1770glc.rst} (83%)
- rename Documentation/misc-devices/{c2port.txt => c2port.rst} (59%)
- create mode 100644 Documentation/misc-devices/pci-endpoint-test.rst
- delete mode 100644 Documentation/misc-devices/pci-endpoint-test.txt
- create mode 100644 Documentation/misc-devices/spear-pcie-gadget.rst
- delete mode 100644 Documentation/misc-devices/spear-pcie-gadget.txt
- rename Documentation/powerpc/{vcpudispatch_stats.txt => vcpudispatch_stats.rst} (94%)
- rename Documentation/sh/{new-machine.txt => new-machine.rst} (73%)
- rename Documentation/sh/{register-banks.txt => register-banks.rst} (88%)
- rename Documentation/trace/{ring-buffer-design.txt => ring-buffer-design.rst} (55%)
- delete mode 100644 Documentation/virt/kvm/devices/README
 
+diff --git a/Documentation/crypto/descore-readme.txt b/Documentation/crypto/descore-readme.rst
+similarity index 81%
+rename from Documentation/crypto/descore-readme.txt
+rename to Documentation/crypto/descore-readme.rst
+index 16e9e6350755..45bd9c8babf4 100644
+--- a/Documentation/crypto/descore-readme.txt
++++ b/Documentation/crypto/descore-readme.rst
+@@ -1,8 +1,20 @@
+-Below is the original README file from the descore.shar package.
++.. SPDX-License-Identifier: GPL-2.0
++.. include:: <isonum.txt>
++
++===========================================
++Fast & Portable DES encryption & decryption
++===========================================
++
++.. note::
++
++   Below is the original README file from the descore.shar package,
++   converted to ReST format.
++
+ ------------------------------------------------------------------------------
+ 
+ des - fast & portable DES encryption & decryption.
+-Copyright (C) 1992  Dana L. How
++
++Copyright |copy| 1992  Dana L. How
+ 
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU Library General Public License as published by
+@@ -20,13 +32,12 @@ Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ 
+ Author's address: how@isl.stanford.edu
+ 
+-$Id: README,v 1.15 1992/05/20 00:25:32 how E $
+-
+-
+-==>> To compile after untarring/unsharring, just `make' <<==
++.. README,v 1.15 1992/05/20 00:25:32 how E
+ 
++==>> To compile after untarring/unsharring, just ``make`` <<==
+ 
+ This package was designed with the following goals:
++
+ 1.	Highest possible encryption/decryption PERFORMANCE.
+ 2.	PORTABILITY to any byte-addressable host with a 32bit unsigned C type
+ 3.	Plug-compatible replacement for KERBEROS's low-level routines.
+@@ -36,7 +47,7 @@ register-starved machines.  My discussions with Richard Outerbridge,
+ 71755.204@compuserve.com, sparked a number of these enhancements.
+ 
+ To more rapidly understand the code in this package, inspect desSmallFips.i
+-(created by typing `make') BEFORE you tackle desCode.h.  The latter is set
++(created by typing ``make``) BEFORE you tackle desCode.h.  The latter is set
+ up in a parameterized fashion so it can easily be modified by speed-daemon
+ hackers in pursuit of that last microsecond.  You will find it more
+ illuminating to inspect one specific implementation,
+@@ -47,11 +58,13 @@ performance comparison to other available des code which i could
+ compile on a SPARCStation 1 (cc -O4, gcc -O2):
+ 
+ this code (byte-order independent):
+-   30us per encryption (options: 64k tables, no IP/FP)
+-   33us per encryption (options: 64k tables, FIPS standard bit ordering)
+-   45us per encryption (options:  2k tables, no IP/FP)
+-   48us per encryption (options:  2k tables, FIPS standard bit ordering)
+-  275us to set a new key (uses 1k of key tables)
++
++  - 30us per encryption (options: 64k tables, no IP/FP)
++  - 33us per encryption (options: 64k tables, FIPS standard bit ordering)
++  - 45us per encryption (options:  2k tables, no IP/FP)
++  - 48us per encryption (options:  2k tables, FIPS standard bit ordering)
++  - 275us to set a new key (uses 1k of key tables)
++
+ 	this has the quickest encryption/decryption routines i've seen.
+ 	since i was interested in fast des filters rather than crypt(3)
+ 	and password cracking, i haven't really bothered yet to speed up
+@@ -63,15 +76,20 @@ this code (byte-order independent):
+ 	are highly variable because of cache effects).
+ 
+ kerberos des replacement from australia (version 1.95):
+-   53us per encryption (uses 2k of tables)
+-   96us to set a new key (uses 2.25k of key tables)
++
++  - 53us per encryption (uses 2k of tables)
++  - 96us to set a new key (uses 2.25k of key tables)
++
+ 	so despite the author's inclusion of some of the performance
+ 	improvements i had suggested to him, this package's
+ 	encryption/decryption is still slower on the sparc and 68000.
+ 	more specifically, 19-40% slower on the 68020 and 11-35% slower
+ 	on the sparc,  depending on the compiler;
+ 	in full gory detail (ALT_ECB is a libdes variant):
++
++	===============	==============	===============	=================
+ 	compiler   	machine		desCore	libdes	ALT_ECB	slower by
++	===============	==============	===============	=================
+ 	gcc 2.1 -O2	Sun 3/110	304  uS	369.5uS	461.8uS	 22%
+ 	cc      -O1	Sun 3/110	336  uS	436.6uS	399.3uS	 19%
+ 	cc      -O2	Sun 3/110	360  uS	532.4uS	505.1uS	 40%
+@@ -79,10 +97,15 @@ kerberos des replacement from australia (version 1.95):
+ 	gcc 2.1 -O2	Sun 4/50	 48  uS	 53.4uS	 57.5uS	 11%
+ 	cc      -O2	Sun 4/50	 48  uS	 64.6uS	 64.7uS	 35%
+ 	cc      -O4	Sun 4/50	 48  uS	 64.7uS	 64.9uS	 35%
++	===============	==============	===============	=================
++
+ 	(my time measurements are not as accurate as his).
++
+    the comments in my first release of desCore on version 1.92:
+-   68us per encryption (uses 2k of tables)
+-   96us to set a new key (uses 2.25k of key tables)
++
++   - 68us per encryption (uses 2k of tables)
++   - 96us to set a new key (uses 2.25k of key tables)
++
+ 	this is a very nice package which implements the most important
+ 	of the optimizations which i did in my encryption routines.
+ 	it's a bit weak on common low-level optimizations which is why
+@@ -91,48 +114,60 @@ kerberos des replacement from australia (version 1.95):
+ 	speed up the key-setting routines with impressive results.
+ 	(at some point i may do the same in my package).  he also implements
+ 	the rest of the mit des library.
++
+ 	(code from eay@psych.psy.uq.oz.au via comp.sources.misc)
+ 
+ fast crypt(3) package from denmark:
++
+ 	the des routine here is buried inside a loop to do the
+ 	crypt function and i didn't feel like ripping it out and measuring
+ 	performance. his code takes 26 sparc instructions to compute one
+ 	des iteration; above, Quick (64k) takes 21 and Small (2k) takes 37.
+ 	he claims to use 280k of tables but the iteration calculation seems
+ 	to use only 128k.  his tables and code are machine independent.
++
+ 	(code from glad@daimi.aau.dk via alt.sources or comp.sources.misc)
+ 
+ swedish reimplementation of Kerberos des library
+-  108us per encryption (uses 34k worth of tables)
+-  134us to set a new key (uses 32k of key tables to get this speed!)
++
++  - 108us per encryption (uses 34k worth of tables)
++  - 134us to set a new key (uses 32k of key tables to get this speed!)
++
+ 	the tables used seem to be machine-independent;
+ 	he seems to have included a lot of special case code
+-	so that, e.g., `long' loads can be used instead of 4 `char' loads
++	so that, e.g., ``long`` loads can be used instead of 4 ``char`` loads
+ 	when the machine's architecture allows it.
++
+ 	(code obtained from chalmers.se:pub/des)
+ 
+ crack 3.3c package from england:
++
+ 	as in crypt above, the des routine is buried in a loop. it's
+ 	also very modified for crypt.  his iteration code uses 16k
+ 	of tables and appears to be slow.
++
+ 	(code obtained from aem@aber.ac.uk via alt.sources or comp.sources.misc)
+ 
+-``highly optimized'' and tweaked Kerberos/Athena code (byte-order dependent):
+-  165us per encryption (uses 6k worth of tables)
+-  478us to set a new key (uses <1k of key tables)
++``highly optimized`` and tweaked Kerberos/Athena code (byte-order dependent):
++
++  - 165us per encryption (uses 6k worth of tables)
++  - 478us to set a new key (uses <1k of key tables)
++
+ 	so despite the comments in this code, it was possible to get
+ 	faster code AND smaller tables, as well as making the tables
+ 	machine-independent.
+ 	(code obtained from prep.ai.mit.edu)
+ 
+ UC Berkeley code (depends on machine-endedness):
+-  226us per encryption
+-10848us to set a new key
++  -  226us per encryption
++  - 10848us to set a new key
++
+ 	table sizes are unclear, but they don't look very small
+ 	(code obtained from wuarchive.wustl.edu)
+ 
+ 
+ motivation and history
++======================
+ 
+ a while ago i wanted some des routines and the routines documented on sun's
+ man pages either didn't exist or dumped core.  i had heard of kerberos,
+@@ -142,10 +177,10 @@ it was too convoluted, the code had been written without taking
+ advantage of the regular structure of operations such as IP, E, and FP
+ (i.e. the author didn't sit down and think before coding),
+ it was excessively slow,  the author had attempted to clarify the code
+-by adding MORE statements to make the data movement more `consistent'
++by adding MORE statements to make the data movement more ``consistent``
+ instead of simplifying his implementation and cutting down on all data
+ movement (in particular, his use of L1, R1, L2, R2), and it was full of
+-idiotic `tweaks' for particular machines which failed to deliver significant
++idiotic ``tweaks`` for particular machines which failed to deliver significant
+ speedups but which did obfuscate everything.  so i took the test data
+ from his verification program and rewrote everything else.
+ 
+@@ -167,12 +202,13 @@ than versions hand-written in assembly for the sparc!
+ 
+ 
+ porting notes
++=============
+ 
+ one thing i did not want to do was write an enormous mess
+ which depended on endedness and other machine quirks,
+ and which necessarily produced different code and different lookup tables
+ for different machines.  see the kerberos code for an example
+-of what i didn't want to do; all their endedness-specific `optimizations'
++of what i didn't want to do; all their endedness-specific ``optimizations``
+ obfuscate the code and in the end were slower than a simpler machine
+ independent approach.  however, there are always some portability
+ considerations of some kind, and i have included some options
+@@ -184,8 +220,8 @@ perhaps some will still regard the result as a mess!
+    i assume word pointers can be freely cast to and from char pointers.
+    note that 99% of C programs make these assumptions.
+    i always use unsigned char's if the high bit could be set.
+-2) the typedef `word' means a 32 bit unsigned integral type.
+-   if `unsigned long' is not 32 bits, change the typedef in desCore.h.
++2) the typedef ``word`` means a 32 bit unsigned integral type.
++   if ``unsigned long`` is not 32 bits, change the typedef in desCore.h.
+    i assume sizeof(word) == 4 EVERYWHERE.
+ 
+ the (worst-case) cost of my NOT doing endedness-specific optimizations
+@@ -195,40 +231,46 @@ the input and output work areas do not need to be word-aligned.
+ 
+ 
+ OPTIONAL performance optimizations
++==================================
+ 
+-1) you should define one of `i386,' `vax,' `mc68000,' or `sparc,'
++1) you should define one of ``i386,`` ``vax,`` ``mc68000,`` or ``sparc,``
+    whichever one is closest to the capabilities of your machine.
+    see the start of desCode.h to see exactly what this selection implies.
+    note that if you select the wrong one, the des code will still work;
+    these are just performance tweaks.
+-2) for those with functional `asm' keywords: you should change the
++2) for those with functional ``asm`` keywords: you should change the
+    ROR and ROL macros to use machine rotate instructions if you have them.
+    this will save 2 instructions and a temporary per use,
+    or about 32 to 40 instructions per en/decryption.
++
+    note that gcc is smart enough to translate the ROL/R macros into
+    machine rotates!
+ 
+ these optimizations are all rather persnickety, yet with them you should
+ be able to get performance equal to assembly-coding, except that:
++
+ 1) with the lack of a bit rotate operator in C, rotates have to be synthesized
+-   from shifts.  so access to `asm' will speed things up if your machine
++   from shifts.  so access to ``asm`` will speed things up if your machine
+    has rotates, as explained above in (3) (not necessary if you use gcc).
+ 2) if your machine has less than 12 32-bit registers i doubt your compiler will
+    generate good code.
+-   `i386' tries to configure the code for a 386 by only declaring 3 registers
++
++   ``i386`` tries to configure the code for a 386 by only declaring 3 registers
+    (it appears that gcc can use ebx, esi and edi to hold register variables).
+    however, if you like assembly coding, the 386 does have 7 32-bit registers,
+-   and if you use ALL of them, use `scaled by 8' address modes with displacement
++   and if you use ALL of them, use ``scaled by 8`` address modes with displacement
+    and other tricks, you can get reasonable routines for DesQuickCore... with
+    about 250 instructions apiece.  For DesSmall... it will help to rearrange
+    des_keymap, i.e., now the sbox # is the high part of the index and
+    the 6 bits of data is the low part; it helps to exchange these.
++
+    since i have no way to conveniently test it i have not provided my
+    shoehorned 386 version.  note that with this release of desCore, gcc is able
+    to put everything in registers(!), and generate about 370 instructions apiece
+    for the DesQuickCore... routines!
+ 
+ coding notes
++============
+ 
+ the en/decryption routines each use 6 necessary register variables,
+ with 4 being actively used at once during the inner iterations.
+@@ -236,15 +278,18 @@ if you don't have 4 register variables get a new machine.
+ up to 8 more registers are used to hold constants in some configurations.
+ 
+ i assume that the use of a constant is more expensive than using a register:
++
+ a) additionally, i have tried to put the larger constants in registers.
+    registering priority was by the following:
+-	anything more than 12 bits (bad for RISC and CISC)
+-	greater than 127 in value (can't use movq or byte immediate on CISC)
+-	9-127 (may not be able to use CISC shift immediate or add/sub quick),
+-	1-8 were never registered, being the cheapest constants.
++
++	- anything more than 12 bits (bad for RISC and CISC)
++	- greater than 127 in value (can't use movq or byte immediate on CISC)
++	- 9-127 (may not be able to use CISC shift immediate or add/sub quick),
++	- 1-8 were never registered, being the cheapest constants.
++
+ b) the compiler may be too stupid to realize table and table+256 should
+    be assigned to different constant registers and instead repetitively
+-   do the arithmetic, so i assign these to explicit `m' register variables
++   do the arithmetic, so i assign these to explicit ``m`` register variables
+    when possible and helpful.
+ 
+ i assume that indexing is cheaper or equivalent to auto increment/decrement,
+@@ -253,25 +298,31 @@ this assumption is reversed for 68k and vax.
+ 
+ i assume that addresses can be cheaply formed from two registers,
+ or from a register and a small constant.
+-for the 68000, the `two registers and small offset' form is used sparingly.
++for the 68000, the ``two registers and small offset`` form is used sparingly.
+ all index scaling is done explicitly - no hidden shifts by log2(sizeof).
+ 
+ the code is written so that even a dumb compiler
+ should never need more than one hidden temporary,
+ increasing the chance that everything will fit in the registers.
+ KEEP THIS MORE SUBTLE POINT IN MIND IF YOU REWRITE ANYTHING.
++
+ (actually, there are some code fragments now which do require two temps,
+ but fixing it would either break the structure of the macros or
+ require declaring another temporary).
+ 
+ 
+ special efficient data format
++==============================
++
++bits are manipulated in this arrangement most of the time (S7 S5 S3 S1)::
+ 
+-bits are manipulated in this arrangement most of the time (S7 S5 S3 S1):
+ 	003130292827xxxx242322212019xxxx161514131211xxxx080706050403xxxx
++
+ (the x bits are still there, i'm just emphasizing where the S boxes are).
+-bits are rotated left 4 when computing S6 S4 S2 S0:
++bits are rotated left 4 when computing S6 S4 S2 S0::
++
+ 	282726252423xxxx201918171615xxxx121110090807xxxx040302010031xxxx
++
+ the rightmost two bits are usually cleared so the lower byte can be used
+ as an index into an sbox mapping table. the next two x'd bits are set
+ to various values to access different parts of the tables.
+@@ -288,7 +339,7 @@ datatypes:
+ 	must be long-aligned.
+ 
+ DesQuickInit()
+-	call this before using any other routine with `Quick' in its name.
++	call this before using any other routine with ``Quick`` in its name.
+ 	it generates the special 64k table these routines need.
+ DesQuickDone()
+ 	frees this table
+@@ -298,6 +349,7 @@ DesMethod(m, k)
+ 	which must have odd parity (or -1 is returned) and which must
+ 	not be a (semi-)weak key (or -2 is returned).
+ 	normally DesMethod() returns 0.
++
+ 	m is filled in from k so that when one of the routines below
+ 	is called with m, the routine will act like standard des
+ 	en/decryption with the key k. if you use DesMethod,
+@@ -308,19 +360,26 @@ DesMethod(m, k)
+ 	will be set to magic constants which speed up the encryption/decryption
+ 	on some machines.  and yes, each byte controls
+ 	a specific sbox during a specific iteration.
++
+ 	you really shouldn't use the 768bit format directly;  i should
+ 	provide a routine that converts 128 6-bit bytes (specified in
+ 	S-box mapping order or something) into the right format for you.
+ 	this would entail some byte concatenation and rotation.
+ 
+ Des{Small|Quick}{Fips|Core}{Encrypt|Decrypt}(d, m, s)
+-	performs des on the 8 bytes at s into the 8 bytes at d. (d,s: char *).
++	performs des on the 8 bytes at s into the 8 bytes at
++	``d. (d,s: char *)``.
++
+ 	uses m as a 768bit key as explained above.
++
+ 	the Encrypt|Decrypt choice is obvious.
++
+ 	Fips|Core determines whether a completely standard FIPS initial
+ 	and final permutation is done; if not, then the data is loaded
+ 	and stored in a nonstandard bit order (FIPS w/o IP/FP).
++
+ 	Fips slows down Quick by 10%, Small by 9%.
++
+ 	Small|Quick determines whether you use the normal routine
+ 	or the crazy quick one which gobbles up 64k more of memory.
+ 	Small is 50% slower then Quick, but Quick needs 32 times as much
+@@ -329,15 +388,17 @@ Des{Small|Quick}{Fips|Core}{Encrypt|Decrypt}(d, m, s)
+ 
+ 
+ Getting it to compile on your machine
++=====================================
+ 
+ there are no machine-dependencies in the code (see porting),
+-except perhaps the `now()' macro in desTest.c.
++except perhaps the ``now()`` macro in desTest.c.
+ ALL generated tables are machine independent.
+ you should edit the Makefile with the appropriate optimization flags
+ for your compiler (MAX optimization).
+ 
+ 
+ Speeding up kerberos (and/or its des library)
++=============================================
+ 
+ note that i have included a kerberos-compatible interface in desUtil.c
+ through the functions des_key_sched() and des_ecb_encrypt().
+@@ -347,6 +408,7 @@ you should not need to #include desCore.h;  just include the header
+ file provided with the kerberos library.
+ 
+ Other uses
++==========
+ 
+ the macros in desCode.h would be very useful for putting inline des
+ functions in more complicated encryption routines.
+diff --git a/Documentation/crypto/index.rst b/Documentation/crypto/index.rst
+index 22a6870bf356..21338fa92642 100644
+--- a/Documentation/crypto/index.rst
++++ b/Documentation/crypto/index.rst
+@@ -27,3 +27,4 @@ for cryptographic use cases, as well as programming examples.
+    crypto_engine
+    api
+    api-samples
++   descore-readme
 -- 
 2.25.4
-
 
