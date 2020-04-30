@@ -4,52 +4,52 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-5.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7C2EC83001
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Apr 2020 05:33:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5035FC83001
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Apr 2020 05:33:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C05922073E
-	for <linux-crypto@archiver.kernel.org>; Thu, 30 Apr 2020 05:33:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 33B912073E
+	for <linux-crypto@archiver.kernel.org>; Thu, 30 Apr 2020 05:33:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726501AbgD3FdR (ORCPT
+        id S1726433AbgD3Fde (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 Apr 2020 01:33:17 -0400
-Received: from helcar.hmeau.com ([216.24.177.18]:60404 "EHLO fornost.hmeau.com"
+        Thu, 30 Apr 2020 01:33:34 -0400
+Received: from helcar.hmeau.com ([216.24.177.18]:60412 "EHLO fornost.hmeau.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726180AbgD3FdQ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Apr 2020 01:33:16 -0400
+        id S1726180AbgD3Fde (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 30 Apr 2020 01:33:34 -0400
 Received: from gwarestrin.me.apana.org.au ([192.168.0.7] helo=gwarestrin.arnor.me.apana.org.au)
         by fornost.hmeau.com with smtp (Exim 4.89 #2 (Debian))
-        id 1jU1o3-0005Tj-D7; Thu, 30 Apr 2020 15:32:20 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 30 Apr 2020 15:33:12 +1000
-Date:   Thu, 30 Apr 2020 15:33:12 +1000
+        id 1jU1o8-0005UE-U0; Thu, 30 Apr 2020 15:32:26 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Thu, 30 Apr 2020 15:33:18 +1000
+Date:   Thu, 30 Apr 2020 15:33:18 +1000
 From:   Herbert Xu <herbert@gondor.apana.org.au>
 To:     Tang Bin <tangbin@cmss.chinamobile.com>
 Cc:     davem@davemloft.net, linux-crypto@vger.kernel.org,
         linux-kernel@vger.kernel.org,
         Zhang Shengju <zhangshengju@cmss.chinamobile.com>
-Subject: Re: [PATCH] crypto: bcm - Remove the unnecessary cast for PTR_ERR().
-Message-ID: <20200430053312.GG11738@gondor.apana.org.au>
-References: <20200425142258.9052-1-tangbin@cmss.chinamobile.com>
+Subject: Re: [PATCH] crypto: bcm - Fix unused assignment
+Message-ID: <20200430053318.GH11738@gondor.apana.org.au>
+References: <20200425142414.12264-1-tangbin@cmss.chinamobile.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200425142258.9052-1-tangbin@cmss.chinamobile.com>
+In-Reply-To: <20200425142414.12264-1-tangbin@cmss.chinamobile.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, Apr 25, 2020 at 10:22:58PM +0800, Tang Bin wrote:
-> It's not necessary to specify 'int' casting for PTR_ERR().
+On Sat, Apr 25, 2020 at 10:24:14PM +0800, Tang Bin wrote:
+> Delete unused initialized value in cipher.c file.
 > 
 > Signed-off-by: Zhang Shengju <zhangshengju@cmss.chinamobile.com>
 > Signed-off-by: Tang Bin <tangbin@cmss.chinamobile.com>
 > ---
->  drivers/crypto/bcm/cipher.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  drivers/crypto/bcm/cipher.c | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
 
 Patch applied.  Thanks.
 -- 
