@@ -2,144 +2,61 @@ Return-Path: <SRS0=G1bP=6P=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5477C4724C
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 May 2020 19:04:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D2F7C35280
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 May 2020 21:40:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B20552184D
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 May 2020 19:04:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 68C6821775
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 May 2020 21:40:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MI+zjTgl"
+	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ykPh+dJQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730503AbgEATEJ (ORCPT
+        id S1726318AbgEAVkd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 1 May 2020 15:04:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46956 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1729839AbgEATEI (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 1 May 2020 15:04:08 -0400
-Received: from mail-qv1-xf42.google.com (mail-qv1-xf42.google.com [IPv6:2607:f8b0:4864:20::f42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E61DC061A0C;
-        Fri,  1 May 2020 12:04:08 -0700 (PDT)
-Received: by mail-qv1-xf42.google.com with SMTP id ep1so5218423qvb.0;
-        Fri, 01 May 2020 12:04:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=sender:subject:from:to:date:message-id:in-reply-to:references
-         :user-agent:mime-version:content-transfer-encoding;
-        bh=96QSejN1XjBz5VbtJDX6HxKzPqbLYh9wojk8iWHqLno=;
-        b=MI+zjTglh3QnVcwW0brnjedn+laYrJJuSNbxiYnKzoh09rTfENcuFFmwo7VpxdmHwc
-         f9QO33giWqcvpLqGew+yysKEKAlq5FyDCaY6z4FAIYeJTNcd19PUKu2AK5MEeDY8S7tU
-         r6x8eBPy+G01ix3lhkgxraQO/RrSPQOw+sWYp2r5dl/r782tVvWnQfDZetVl/xMOkQ93
-         mixRIu8bfjtjAjEvy64MbsdoNeTkMX5glunvzcmc1F0EeyGBqaWc0OLy5evB4tu+dAX0
-         NnAfnGUkxpqz9Nd0P7Wuet3lkAvLkekAchxAPE5OICjjTLkgpzWa3B64bYqsrXyZ2RZy
-         EzxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:subject:from:to:date:message-id
-         :in-reply-to:references:user-agent:mime-version
-         :content-transfer-encoding;
-        bh=96QSejN1XjBz5VbtJDX6HxKzPqbLYh9wojk8iWHqLno=;
-        b=NKVHWSesUiAnNKkbaXNC6ISJA6F073GXd72LDplZzqGtQ1lSX9rxMleFCFbQi7JatT
-         d3Pzdimvckw+ZtkNH8Ye0q8QVfcMgXMlVB9FLLoD96fVASA2JwVyvKdyOfjhvBT02P8B
-         ra9T1gceoPHpIec0DRHy3OXcXnroDeTCnii1P4o6/Bj9SFiufJRXgRS1uLxp7tHSi/Td
-         QYYkzFYblrQGeJyEdABR/pvI6zXJHDB8SU4A4pYX3Kb/C1gH3Ayqyfor4X2KwYE8MDsy
-         6IQPVQa1/G1oNYwAPr9cdbgUMnz572mY8URUOdppFb10ukf/DZwyjSsJiBEdQtaRKD7V
-         LilA==
-X-Gm-Message-State: AGi0Pua5+7S8+K2mnngL8aLGWE9ksOQcVqLOsZxQWEt8l9icp/HtkV0M
-        UcpeCKrFVmgi25FwoD0FW3y+JEZk
-X-Google-Smtp-Source: APiQypKCCqgHkqrg06aLIKuVkScXSBXvW87TYSiB7WpvGUMoYl7PEWKtk4K4UFrlh74lym20CDc39A==
-X-Received: by 2002:a05:6214:a14:: with SMTP id dw20mr5356066qvb.179.1588359847374;
-        Fri, 01 May 2020 12:04:07 -0700 (PDT)
-Received: from gateway.1015granger.net (c-68-61-232-219.hsd1.mi.comcast.net. [68.61.232.219])
-        by smtp.gmail.com with ESMTPSA id g8sm3295927qkb.30.2020.05.01.12.04.06
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 01 May 2020 12:04:06 -0700 (PDT)
-Received: from klimt.1015granger.net (klimt.1015granger.net [192.168.1.55])
-        by gateway.1015granger.net (8.14.7/8.14.7) with ESMTP id 041J45Ua026984;
-        Fri, 1 May 2020 19:04:05 GMT
-Subject: [PATCH RFC] SUNRPC: crypto calls should never schedule
-From:   Chuck Lever <chuck.lever@oracle.com>
-To:     linux-nfs@vger.kernel.org, linux-crypto@vger.kernel.org
-Date:   Fri, 01 May 2020 15:04:05 -0400
-Message-ID: <20200501190405.2324.25423.stgit@klimt.1015granger.net>
-In-Reply-To: <20200501184301.2324.22719.stgit@klimt.1015granger.net>
-References: <20200501184301.2324.22719.stgit@klimt.1015granger.net>
-User-Agent: StGit/0.22-20-geafe
+        Fri, 1 May 2020 17:40:33 -0400
+Received: from mail.zx2c4.com ([192.95.5.64]:35255 "EHLO mail.zx2c4.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726045AbgEAVkd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 1 May 2020 17:40:33 -0400
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTP id ebce33ea;
+        Fri, 1 May 2020 21:28:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=date:from:to
+        :cc:subject:message-id:references:mime-version:content-type
+        :in-reply-to; s=mail; bh=mfANb4NLGTbGs+1tPQehX2mYl+M=; b=ykPh+dJ
+        QDLWKaw2Uecg3ANW27v3xaMCzgsHcOIduNrQbo+NghqTyQWGe7nWl6C2ouuqocEh
+        Uw2DKmDQJq7Uguh6cMrugK2p8mFNB5JFllYegFR3ydaOyPZYOOjZkTHUALQF6YxB
+        3hvi3TvNe48hBTG4p+h+Vc2JJLPuUSNJEwtWscqrnXnU0cxv8kYcY6uvC6KpHFSf
+        57yJNe98ssuT7BdWh/D7yKfga/ycaR2SjmA6W0sk5+aTfceSgNpPg85/FIAuFBU1
+        +lyDhNhcr/Rt8FmKS6+oozcma9h4ecRDw5ZgaOihsumPAUgsghIiolLc+SCc+qA8
+        a2YmQRV2leV/42g==
+Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 76a5f6fa (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+        Fri, 1 May 2020 21:28:27 +0000 (UTC)
+Date:   Fri, 1 May 2020 15:40:30 -0600
+From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-crypto@vger.kernel.org
+Subject: Re: [PATCH v2] crypto: lib/sha256 - return void
+Message-ID: <20200501214030.GA522402@zx2c4.com>
+References: <20200501164229.24952-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20200501164229.24952-1-ebiggers@kernel.org>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Do not allow the crypto core to reschedule while processing RPC
-requests. gss_krb5_crypto.c does make crypto API calls in process
-context. However:
+On Fri, May 01, 2020 at 09:42:29AM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> The SHA-256 / SHA-224 library functions can't fail, so remove the
+> useless return value.
 
-- When handling a received Call, rescheduling can introduce
-latencies that result in processing delays causing a request to
-fall outside the GSS sequence number window. When that occurs,
-the server is required to drop that request and the connection on
-which it arrived.
+Looks good to me, and also matches the signatures of the blake2s library
+functions, which return null.
 
-- On the client side, ostensibly RPC tasks are not supposed to sleep
-or reschedule outside the RPC scheduler. Otherwise there is a risk
-of deadlock.
-
-Generally speaking, the risk of removing the cond_resched() is low.
-A block of data handled in these paths will not exceed 1MB + a
-little a overhead, and processing a single RPC is already
-appropriately interleaved amongst both processes and CPUs.
-
-Signed-off-by: Chuck Lever <chuck.lever@oracle.com>
----
- net/sunrpc/auth_gss/gss_krb5_crypto.c |    8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
-diff --git a/net/sunrpc/auth_gss/gss_krb5_crypto.c b/net/sunrpc/auth_gss/gss_krb5_crypto.c
-index e7180da1fc6a..083438f73e52 100644
---- a/net/sunrpc/auth_gss/gss_krb5_crypto.c
-+++ b/net/sunrpc/auth_gss/gss_krb5_crypto.c
-@@ -209,7 +209,7 @@ make_checksum_hmac_md5(struct krb5_ctx *kctx, char *header, int hdrlen,
- 	if (!req)
- 		goto out_free_hmac_md5;
- 
--	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
-+	ahash_request_set_callback(req, 0, NULL, NULL);
- 
- 	err = crypto_ahash_init(req);
- 	if (err)
-@@ -239,7 +239,7 @@ make_checksum_hmac_md5(struct krb5_ctx *kctx, char *header, int hdrlen,
- 	if (!req)
- 		goto out_free_hmac_md5;
- 
--	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
-+	ahash_request_set_callback(req, 0, NULL, NULL);
- 
- 	err = crypto_ahash_setkey(hmac_md5, cksumkey, kctx->gk5e->keylength);
- 	if (err)
-@@ -307,7 +307,7 @@ make_checksum(struct krb5_ctx *kctx, char *header, int hdrlen,
- 	if (!req)
- 		goto out_free_ahash;
- 
--	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
-+	ahash_request_set_callback(req, 0, NULL, NULL);
- 
- 	checksumlen = crypto_ahash_digestsize(tfm);
- 
-@@ -403,7 +403,7 @@ make_checksum_v2(struct krb5_ctx *kctx, char *header, int hdrlen,
- 	if (!req)
- 		goto out_free_ahash;
- 
--	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
-+	ahash_request_set_callback(req, 0, NULL, NULL);
- 
- 	err = crypto_ahash_setkey(tfm, cksumkey, kctx->gk5e->keylength);
- 	if (err)
-
+Reviewed-by: Jason A. Donenfeld <Jason@zx2c4.com>
