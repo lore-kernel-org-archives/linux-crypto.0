@@ -3,142 +3,241 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.3 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C7B8C28CBC
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 May 2020 02:53:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53152C4724C
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 May 2020 07:16:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DEC5820643
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 May 2020 02:53:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="DW6PsvJP"
+	by mail.kernel.org (Postfix) with ESMTP id 2A5B2208C3
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 May 2020 07:16:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1588317367;
+	bh=2WWABLAfQSHAtiABhm1NCd+qVC4oltSEqvQN2dWmToA=;
+	h=From:To:Subject:Date:List-ID:From;
+	b=AIzhL46a+ESoX3SQ8SKe9haValxY/q2E8DR4rydBcE9Kj90lqQFGLVXFNVdj87f36
+	 p+A/T/KzDRq3A2X4ZfgccK3sQ3wrMkN13n1pT7tZhp29E2yqcpwdiKXL6jp1QXZ+dw
+	 aycqgKlfvr7Mu7fVnjFyi6+N2QW5baT5CSz7NB9s=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728073AbgEACxu (ORCPT
+        id S1728253AbgEAHQG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 30 Apr 2020 22:53:50 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:47346 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728024AbgEACxu (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 30 Apr 2020 22:53:50 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0412lURJ022728;
-        Fri, 1 May 2020 02:48:21 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2020-01-29;
- bh=9hCESYezdDlcZa6EJ0bZ7R2X2D3XTfEQtgE9cbLshLo=;
- b=DW6PsvJPZdoLRUxLRT6UOMpxSVF6O4c9DAqPCt/SXTNcmH7o5gQ6sg2y016f1nXBGzvh
- bDpxuwQxYrsP8s4vI5IYDtjfEjRqXpA107pVEr/DQc72QXWTFIoNtPywxJjAuIytPvMC
- REobS2qkJgYklILgdm4LLd3c314XuYQdW6X4BqnS2nD8QDtXFThWzFpwUiSedyHUTHAB
- f2vp2QfMuw7qNpQU/zE0Nicagq7dSdoH2lVA4o3qwrVZfDA3zZbMY72BPiGYPDRoLi9j
- h5ejMuR/BzUaE0iFqcggngb7naEeKMavXsz+RtP6gWcmIIjlpMMpD3ufVT9A1yKXES3a DQ== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
-        by userp2130.oracle.com with ESMTP id 30r7f80j7r-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 01 May 2020 02:48:20 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
-        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 0412kv2p129174;
-        Fri, 1 May 2020 02:48:20 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3020.oracle.com with ESMTP id 30r7f8wusn-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 01 May 2020 02:48:19 +0000
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 0412mIq4021967;
-        Fri, 1 May 2020 02:48:18 GMT
-Received: from ca-dmjordan1.us.oracle.com (/10.211.9.48)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Thu, 30 Apr 2020 19:48:18 -0700
-Date:   Thu, 30 Apr 2020 22:48:40 -0400
-From:   Daniel Jordan <daniel.m.jordan@oracle.com>
-To:     Josh Triplett <josh@joshtriplett.org>
-Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Kirill Tkhai <ktkhai@virtuozzo.com>,
-        Michal Hocko <mhocko@kernel.org>, Pavel Machek <pavel@ucw.cz>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Shile Zhang <shile.zhang@linux.alibaba.com>,
-        Tejun Heo <tj@kernel.org>, Zi Yan <ziy@nvidia.com>,
-        linux-crypto@vger.kernel.org, linux-mm@kvack.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 0/7] padata: parallelize deferred page init
-Message-ID: <20200501024840.eofsy3av5bwcdpw2@ca-dmjordan1.us.oracle.com>
-References: <20200430201125.532129-1-daniel.m.jordan@oracle.com>
- <20200501010935.GB104377@localhost>
+        Fri, 1 May 2020 03:16:06 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34540 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728212AbgEAHQG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 1 May 2020 03:16:06 -0400
+Received: from sol.hsd1.ca.comcast.net (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id A1DF5208C3
+        for <linux-crypto@vger.kernel.org>; Fri,  1 May 2020 07:16:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1588317365;
+        bh=2WWABLAfQSHAtiABhm1NCd+qVC4oltSEqvQN2dWmToA=;
+        h=From:To:Subject:Date:From;
+        b=Gi71XfK4MdDg/YlTePf2gjCYFIai8OW/2Ll5lQUoZbjqtZPq+oqpOxZO7ThLgtsHW
+         74DxVNr1Y9Cy9kgx4hPGQM9cjvufYRF79tgDn6LVi7bMJ1b86/qkdV6D8lxTnWFZyD
+         xfQwFSj3VoiXmO55lX0PI5o0nraHv40TC6CORW9A=
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Subject: [PATCH] crypto: lib/sha256 - return void
+Date:   Fri,  1 May 2020 00:13:38 -0700
+Message-Id: <20200501071338.777352-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200501010935.GB104377@localhost>
-User-Agent: NeoMutt/20180716
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9607 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 suspectscore=0
- phishscore=0 malwarescore=0 mlxscore=0 spamscore=0 mlxlogscore=999
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2005010019
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9607 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 impostorscore=0 mlxlogscore=999
- spamscore=0 malwarescore=0 clxscore=1015 phishscore=0 mlxscore=0
- lowpriorityscore=0 suspectscore=0 adultscore=0 priorityscore=1501
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2005010018
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, Apr 30, 2020 at 06:09:35PM -0700, Josh Triplett wrote:
-> On Thu, Apr 30, 2020 at 04:11:18PM -0400, Daniel Jordan wrote:
-> > Sometimes the kernel doesn't take full advantage of system memory
-> > bandwidth, leading to a single CPU spending excessive time in
-> > initialization paths where the data scales with memory size.
-> > 
-> > Multithreading naturally addresses this problem, and this series is the
-> > first step.
-> > 
-> > It extends padata, a framework that handles many parallel singlethreaded
-> > jobs, to handle multithreaded jobs as well by adding support for
-> > splitting up the work evenly, specifying a minimum amount of work that's
-> > appropriate for one helper thread to do, load balancing between helpers,
-> > and coordinating them.  More documentation in patches 4 and 7.
-> > 
-> > The first user is deferred struct page init, a large bottleneck in
-> > kernel boot--actually the largest for us and likely others too.  This
-> > path doesn't require concurrency limits, resource control, or priority
-> > adjustments like future users will (vfio, hugetlb fallocate, munmap)
-> > because it happens during boot when the system is otherwise idle and
-> > waiting on page init to finish.
-> > 
-> > This has been tested on a variety of x86 systems and speeds up kernel
-> > boot by 6% to 49% by making deferred init 63% to 91% faster.  Patch 6
-> > has detailed numbers.  Test results from other systems appreciated.
-> > 
-> > This series is based on v5.6 plus these three from mmotm:
-> > 
-> >   mm-call-touch_nmi_watchdog-on-max-order-boundaries-in-deferred-init.patch
-> >   mm-initialize-deferred-pages-with-interrupts-enabled.patch
-> >   mm-call-cond_resched-from-deferred_init_memmap.patch
-> > 
-> > All of the above can be found in this branch:
-> > 
-> >   git://oss.oracle.com/git/linux-dmjordan.git padata-mt-definit-v1
-> >   https://oss.oracle.com/git/gitweb.cgi?p=linux-dmjordan.git;a=shortlog;h=refs/heads/padata-mt-definit-v1
-> 
-> For the series (and the three prerequisite patches):
-> 
-> Tested-by: Josh Triplett <josh@joshtriplett.org>
+From: Eric Biggers <ebiggers@google.com>
 
-Appreciate the runs, Josh, thanks.
+The SHA-256 / SHA-224 library functions can't fail, so remove the
+useless return value.
+
+Also long as the declarations are being changed anyway, also fix some
+parameter names in the declarations to match the definitions.
+
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ crypto/sha256_generic.c      | 14 +++++++++-----
+ include/crypto/sha.h         | 20 ++++++++------------
+ include/crypto/sha256_base.h |  6 ++++--
+ lib/crypto/sha256.c          | 20 ++++++++------------
+ 4 files changed, 29 insertions(+), 31 deletions(-)
+
+diff --git a/crypto/sha256_generic.c b/crypto/sha256_generic.c
+index f2d7095d4f2d64..88156e3e2a33e0 100644
+--- a/crypto/sha256_generic.c
++++ b/crypto/sha256_generic.c
+@@ -35,27 +35,31 @@ EXPORT_SYMBOL_GPL(sha256_zero_message_hash);
+ 
+ static int crypto_sha256_init(struct shash_desc *desc)
+ {
+-	return sha256_init(shash_desc_ctx(desc));
++	sha256_init(shash_desc_ctx(desc));
++	return 0;
+ }
+ 
+ static int crypto_sha224_init(struct shash_desc *desc)
+ {
+-	return sha224_init(shash_desc_ctx(desc));
++	sha224_init(shash_desc_ctx(desc));
++	return 0;
+ }
+ 
+ int crypto_sha256_update(struct shash_desc *desc, const u8 *data,
+ 			  unsigned int len)
+ {
+-	return sha256_update(shash_desc_ctx(desc), data, len);
++	sha256_update(shash_desc_ctx(desc), data, len);
++	return 0;
+ }
+ EXPORT_SYMBOL(crypto_sha256_update);
+ 
+ static int crypto_sha256_final(struct shash_desc *desc, u8 *out)
+ {
+ 	if (crypto_shash_digestsize(desc->tfm) == SHA224_DIGEST_SIZE)
+-		return sha224_final(shash_desc_ctx(desc), out);
++		sha224_final(shash_desc_ctx(desc), out);
+ 	else
+-		return sha256_final(shash_desc_ctx(desc), out);
++		sha256_final(shash_desc_ctx(desc), out);
++	return 0;
+ }
+ 
+ int crypto_sha256_finup(struct shash_desc *desc, const u8 *data,
+diff --git a/include/crypto/sha.h b/include/crypto/sha.h
+index 5c2132c7190095..8db9e1a3eb0cf6 100644
+--- a/include/crypto/sha.h
++++ b/include/crypto/sha.h
+@@ -123,7 +123,7 @@ extern int crypto_sha512_finup(struct shash_desc *desc, const u8 *data,
+  * For details see lib/crypto/sha256.c
+  */
+ 
+-static inline int sha256_init(struct sha256_state *sctx)
++static inline void sha256_init(struct sha256_state *sctx)
+ {
+ 	sctx->state[0] = SHA256_H0;
+ 	sctx->state[1] = SHA256_H1;
+@@ -134,14 +134,12 @@ static inline int sha256_init(struct sha256_state *sctx)
+ 	sctx->state[6] = SHA256_H6;
+ 	sctx->state[7] = SHA256_H7;
+ 	sctx->count = 0;
+-
+-	return 0;
+ }
+-extern int sha256_update(struct sha256_state *sctx, const u8 *input,
+-			 unsigned int length);
+-extern int sha256_final(struct sha256_state *sctx, u8 *hash);
++extern void sha256_update(struct sha256_state *sctx, const u8 *data,
++			  unsigned int len);
++extern void sha256_final(struct sha256_state *sctx, u8 *out);
+ 
+-static inline int sha224_init(struct sha256_state *sctx)
++static inline void sha224_init(struct sha256_state *sctx)
+ {
+ 	sctx->state[0] = SHA224_H0;
+ 	sctx->state[1] = SHA224_H1;
+@@ -152,11 +150,9 @@ static inline int sha224_init(struct sha256_state *sctx)
+ 	sctx->state[6] = SHA224_H6;
+ 	sctx->state[7] = SHA224_H7;
+ 	sctx->count = 0;
+-
+-	return 0;
+ }
+-extern int sha224_update(struct sha256_state *sctx, const u8 *input,
+-			 unsigned int length);
+-extern int sha224_final(struct sha256_state *sctx, u8 *hash);
++extern void sha224_update(struct sha256_state *sctx, const u8 *data,
++			  unsigned int len);
++extern void sha224_final(struct sha256_state *sctx, u8 *out);
+ 
+ #endif
+diff --git a/include/crypto/sha256_base.h b/include/crypto/sha256_base.h
+index cea60cff80bd87..6ded110783ae87 100644
+--- a/include/crypto/sha256_base.h
++++ b/include/crypto/sha256_base.h
+@@ -22,14 +22,16 @@ static inline int sha224_base_init(struct shash_desc *desc)
+ {
+ 	struct sha256_state *sctx = shash_desc_ctx(desc);
+ 
+-	return sha224_init(sctx);
++	sha224_init(sctx);
++	return 0;
+ }
+ 
+ static inline int sha256_base_init(struct shash_desc *desc)
+ {
+ 	struct sha256_state *sctx = shash_desc_ctx(desc);
+ 
+-	return sha256_init(sctx);
++	sha256_init(sctx);
++	return 0;
+ }
+ 
+ static inline int sha256_base_do_update(struct shash_desc *desc,
+diff --git a/lib/crypto/sha256.c b/lib/crypto/sha256.c
+index 66cb04b0cf4e7e..2e621697c5c35c 100644
+--- a/lib/crypto/sha256.c
++++ b/lib/crypto/sha256.c
+@@ -206,7 +206,7 @@ static void sha256_transform(u32 *state, const u8 *input)
+ 	memzero_explicit(W, 64 * sizeof(u32));
+ }
+ 
+-int sha256_update(struct sha256_state *sctx, const u8 *data, unsigned int len)
++void sha256_update(struct sha256_state *sctx, const u8 *data, unsigned int len)
+ {
+ 	unsigned int partial, done;
+ 	const u8 *src;
+@@ -232,18 +232,16 @@ int sha256_update(struct sha256_state *sctx, const u8 *data, unsigned int len)
+ 		partial = 0;
+ 	}
+ 	memcpy(sctx->buf + partial, src, len - done);
+-
+-	return 0;
+ }
+ EXPORT_SYMBOL(sha256_update);
+ 
+-int sha224_update(struct sha256_state *sctx, const u8 *data, unsigned int len)
++void sha224_update(struct sha256_state *sctx, const u8 *data, unsigned int len)
+ {
+-	return sha256_update(sctx, data, len);
++	sha256_update(sctx, data, len);
+ }
+ EXPORT_SYMBOL(sha224_update);
+ 
+-static int __sha256_final(struct sha256_state *sctx, u8 *out, int digest_words)
++static void __sha256_final(struct sha256_state *sctx, u8 *out, int digest_words)
+ {
+ 	__be32 *dst = (__be32 *)out;
+ 	__be64 bits;
+@@ -268,19 +266,17 @@ static int __sha256_final(struct sha256_state *sctx, u8 *out, int digest_words)
+ 
+ 	/* Zeroize sensitive information. */
+ 	memset(sctx, 0, sizeof(*sctx));
+-
+-	return 0;
+ }
+ 
+-int sha256_final(struct sha256_state *sctx, u8 *out)
++void sha256_final(struct sha256_state *sctx, u8 *out)
+ {
+-	return __sha256_final(sctx, out, 8);
++	__sha256_final(sctx, out, 8);
+ }
+ EXPORT_SYMBOL(sha256_final);
+ 
+-int sha224_final(struct sha256_state *sctx, u8 *out)
++void sha224_final(struct sha256_state *sctx, u8 *out)
+ {
+-	return __sha256_final(sctx, out, 7);
++	__sha256_final(sctx, out, 7);
+ }
+ EXPORT_SYMBOL(sha224_final);
+ 
+-- 
+2.26.2
+
