@@ -2,165 +2,149 @@ Return-Path: <SRS0=G1bP=6P=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25B96C4724C
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 May 2020 10:52:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58781C47253
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 May 2020 10:54:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F38F02071C
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 May 2020 10:52:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 30BD12076D
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 May 2020 10:54:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="djTYzpjj"
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="HR5OYLGI"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728352AbgEAKwr (ORCPT
+        id S1728485AbgEAKyj (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 1 May 2020 06:52:47 -0400
-Received: from mail-mw2nam10on2042.outbound.protection.outlook.com ([40.107.94.42]:6117
-        "EHLO NAM10-MW2-obe.outbound.protection.outlook.com"
+        Fri, 1 May 2020 06:54:39 -0400
+Received: from mail-dm6nam12on2089.outbound.protection.outlook.com ([40.107.243.89]:24540
+        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728268AbgEAKwr (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 1 May 2020 06:52:47 -0400
+        id S1728352AbgEAKyi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 1 May 2020 06:54:38 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XfTQpHXkiDMUiExoWtLJm6Pvd34DxXUvyfunZnePYR7E4aLHzgakvxakPEYWoFyXc93uXrIVMSmzyK1K7JREG93hJ2ByuFGZKBTSCDv+QesfSwz9qv2PdUt2SIPsrcd1+LE+g211dTHFNwJsEfC1ktFUpNXqTnQ/njkMDMhFjYac1RR35X8LqBHSA5aR0web/mYg1rwVdhh+hQHsEczg2DfK3x+jQZx7ndwz3I0mKISnzBbUPUvC/HvrS55Cg/GSt8vdSr5ZmRkymTJt6P+SoSEB9C3btWtFE/yDOqVC9L0rHK+BBNLKavCm3lHp/6rKPt3Uv4kGgPFlyZuCUyxaTg==
+ b=cs8fXTZDAtaBpzqGN+Se7Ht4bG9a9aoAObSn3zTHHcnU0O7iOikxDQdojXUCJkr2egGRcYHn1GE61LiiUkGmHfFc/HchN350WxTzgOM5E3KDPh3F4P7KYUrAKfdfdIS7my6y9jhqnkgFJRolRY3Y60iDrQwPelJLI0ni7myJTpNd04aOSqFL0vNpFMfz4ss7JHweGKELl2F+B7MY7oPp9zxVYGuqCiY+v4waHWX7RrJ70K5Fsyey/Axt1QIEBt3m38otucVSJOuC1rEDlBrNASJ4dJRcQTiRCz6GJqhu9gAcQ6pE63ZLKRvkN71E5JKY4aPZ6qckIjngla0hUAzeaA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Thw+s4qdYO8SQXU9N7HA0sRw/J0et2+3mdtKo82XHdw=;
- b=BFv/eeizNQXuOPJcBf95rjRYqirfcrPBlxVIfNhIXqIgIdlSn0QbrjrOyUEFQMQc8paBvtmmobfnHHKO45YvwwoYn91pOKXx8d5JUFnwN20j9VjuKtUYDsp1itSY5XIURjk/NEEaPO0bX0MGFEHArlq6e6i4vRosvOASi6R1Hzo6Lqu79h5BcIajUilxIISqNZifMaf1hhNGlb7gxrFPLK8P65K7oap+j0wwPTQZxx5h3eOZ5mEf3/j5oi2FIBpL7W3DGbL2SiHO+7f+KIDwtTK4S6Ekd2VWoBD/LsHVjBcfNHOJdHwmi4mTxk8FZrRardd+1rk4Mg74myVvcejOlA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 149.199.60.83) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=xilinx.com;
- dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
- not signed); arc=none
+ bh=skGwslQs9ZwCwYlK6qeFkutpOtuCKA28v4//bcjGlmE=;
+ b=KT59P2u1QBjVgTvA/ylx+zF5tgEafLbSaPfPrObZ/qJhsug9c2jjf6aHYnL9dbBaiftJN8ZzBHmOPZYAHPsG3Fh6/uWvHoE0hN137cv0Fe09CH4G8bbpat5C8IosJe0FYKOvxYKNT7Z3zkCNg77NYC3JdHjUTXz4JmDYZEIsBFWWE636EgnWe4eI0dhJFgtHfkj+PiZ634UddBBoJVguh4m67/El+MpTSofb7hG8wIbNtZVU3fNb+Pz/86rpxUhDkxPn+nDseTPh1HVHRPz42FNLUIxZRZCXm95d8ePrLEcwp0dP0YLwCzKpoVCHwvbOdsVe3ZT7QD2x4F8ImbVOhg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=xilinx.com; dmarc=pass action=none header.from=xilinx.com;
+ dkim=pass header.d=xilinx.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Thw+s4qdYO8SQXU9N7HA0sRw/J0et2+3mdtKo82XHdw=;
- b=djTYzpjjX2yKUVKNmAvMPTBhcnNnq6a/1zyDc2r/nxZaPCLPQCJ38jFvRXHLa89zzqQE7QJpAkgodl+dGPD5xt9a6rtYPsCbdREc0Lm9nJprPRvZqWJLn+cmr8iZNsgRt58cfPum/y2SGbsAjpBBSJSAB6ALlQ8fls2aphQWQRM=
-Received: from DM5PR13CA0050.namprd13.prod.outlook.com (2603:10b6:3:117::12)
- by BN7PR02MB4131.namprd02.prod.outlook.com (2603:10b6:406:f6::23) with
+ bh=skGwslQs9ZwCwYlK6qeFkutpOtuCKA28v4//bcjGlmE=;
+ b=HR5OYLGIcQJejFcLML/79Q/n13otfk86EZIGoPOknwwPOoNdd5oIoifmRtDEkqnZBgMEKyBa9t6ycMogjvJnBXvo6Z5CXnXXCwhKGM1jmSRy6e+q1HmZ0I1vc8jYqumQiqm2PKmshpCEAXzm6zgcuLdf9QC+36n+rDojUu/AMBQ=
+Received: from BYAPR02MB3941.namprd02.prod.outlook.com (2603:10b6:a02:f8::18)
+ by BYAPR02MB5734.namprd02.prod.outlook.com (2603:10b6:a03:11c::30) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.21; Fri, 1 May
- 2020 10:52:44 +0000
-Received: from CY1NAM02FT032.eop-nam02.prod.protection.outlook.com
- (2603:10b6:3:117:cafe::d9) by DM5PR13CA0050.outlook.office365.com
- (2603:10b6:3:117::12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.14 via Frontend
- Transport; Fri, 1 May 2020 10:52:44 +0000
-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
- smtp.mailfrom=xilinx.com; vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=bestguesspass action=none
- header.from=xilinx.com;
-Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
- 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
- client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
-Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- CY1NAM02FT032.mail.protection.outlook.com (10.152.75.184) with Microsoft SMTP
- Server id 15.20.2937.19 via Frontend Transport; Fri, 1 May 2020 10:52:43
- +0000
-Received: from [149.199.38.66] (port=50830 helo=xsj-pvapsmtp01)
-        by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
-        (envelope-from <rajan.vaja@xilinx.com>)
-        id 1jUTHd-00005o-Rf; Fri, 01 May 2020 03:52:41 -0700
-Received: from [127.0.0.1] (helo=localhost)
-        by xsj-pvapsmtp01 with smtp (Exim 4.63)
-        (envelope-from <rajan.vaja@xilinx.com>)
-        id 1jUTHf-00043h-DE; Fri, 01 May 2020 03:52:43 -0700
-Received: from xsj-pvapsmtp01 (mailman.xilinx.com [149.199.38.66])
-        by xsj-smtp-dlp1.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 041Aqep5019321;
-        Fri, 1 May 2020 03:52:40 -0700
-Received: from [172.19.2.91] (helo=xsjjollys50.xilinx.com)
-        by xsj-pvapsmtp01 with esmtp (Exim 4.63)
-        (envelope-from <rajan.vaja@xilinx.com>)
-        id 1jUTHc-00043E-NE; Fri, 01 May 2020 03:52:40 -0700
-From:   Rajan Vaja <rajan.vaja@xilinx.com>
-To:     herbert@gondor.apana.org.au, davem@davemloft.net,
-        gregkh@linuxfoundation.org, kalyani.akula@xilinx.com
-Cc:     michal.simek@xilinx.com, jolly.shah@xilinx.com,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-kernel@vger.kernel.org, Rajan Vaja <rajan.vaja@xilinx.com>
-Subject: [PATCH char-misc-next v2] crypto: xilinx: Handle AES PM API return status
-Date:   Fri,  1 May 2020 03:52:34 -0700
-Message-Id: <1588330354-27942-1-git-send-email-rajan.vaja@xilinx.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1588328091-16368-1-git-send-email-rajan.vaja@xilinx.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.19; Fri, 1 May
+ 2020 10:54:36 +0000
+Received: from BYAPR02MB3941.namprd02.prod.outlook.com
+ ([fe80::10b5:a33c:e9c7:6c0a]) by BYAPR02MB3941.namprd02.prod.outlook.com
+ ([fe80::10b5:a33c:e9c7:6c0a%7]) with mapi id 15.20.2958.027; Fri, 1 May 2020
+ 10:54:36 +0000
+From:   Rajan Vaja <RAJANV@xilinx.com>
+To:     Greg KH <gregkh@linuxfoundation.org>
+CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        Kalyani Akula <kalyania@xilinx.com>,
+        Michal Simek <michals@xilinx.com>,
+        Jolly Shah <JOLLYS@xilinx.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH char-misc-next] crypto: xilinx: Handle AES PM API return
+ status
+Thread-Topic: [PATCH char-misc-next] crypto: xilinx: Handle AES PM API return
+ status
+Thread-Index: AQHWH6FwO0uDx7272EWw1r+zokOZdaiTB8WAgAAGjuA=
+Date:   Fri, 1 May 2020 10:54:36 +0000
+Message-ID: <BYAPR02MB3941AE74C305FD0452E2B868B7AB0@BYAPR02MB3941.namprd02.prod.outlook.com>
 References: <1588328091-16368-1-git-send-email-rajan.vaja@xilinx.com>
-X-RCIS-Action: ALLOW
-X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
-X-TM-AS-User-Approved-Sender: Yes;Yes
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-Forefront-Antispam-Report: CIP:149.199.60.83;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:xsj-pvapsmtpgw01;PTR:unknown-60-83.xilinx.com;CAT:NONE;SFTY:;SFS:(4636009)(376002)(396003)(39860400002)(136003)(346002)(46966005)(81166007)(4326008)(70206006)(70586007)(186003)(26005)(36756003)(6666004)(7696005)(316002)(9786002)(426003)(336012)(5660300002)(47076004)(8936002)(356005)(82310400002)(82740400003)(2616005)(44832011)(2906002)(8676002)(107886003)(6636002)(478600001);DIR:OUT;SFP:1101;
-MIME-Version: 1.0
-Content-Type: text/plain
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 6bad77a4-de7e-4653-5667-08d7edbdc6d5
-X-MS-TrafficTypeDiagnostic: BN7PR02MB4131:
-X-Microsoft-Antispam-PRVS: <BN7PR02MB41318C2BFD6D3D13B1CF25B3B7AB0@BN7PR02MB4131.namprd02.prod.outlook.com>
+ <20200501103021.GA1416784@kroah.com>
+In-Reply-To: <20200501103021.GA1416784@kroah.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
 X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:4303;
-X-Forefront-PRVS: 0390DB4BDA
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: L4+cXY+FA7xIty/vqSUUf8o1gueGiZnP53hQM6mbLi5NokBvXCASK70n/2hv3p4yvnu3WuvP8pmSyvl2XokzbpIbKBYRvoe3c3gwNcftG+MhxEGE6Pjtxcli058ZVAZS7LK/hTTngM+Y1dlhvlcKQeDCTXIBlGBcFNduiY7W9Xsgv8H3FNcWF5xDzuJBFTZebzOM4Dx8IY2MwY9PH4qeUMo1ySOMy+JmOzg9hO81ACnknPNlilNalT2Mb5f6J/dgFk1VeUAAE3a7oiIcRc2sSb1oajeGCsm7shN77C095ePhfZOQruSAmIIHi3Z2iBpvctXT4kdVwjGCR1rJ71VAXDAM9Tlj+nyMZKSBt4PcCTuakJgiCAWTErPB4o9vHL1djBpzWCpTseFLcOTUaIjz0gWeSxbmdL4QAtL+3plusD4FHgu5pYKLlLELwk76Vu6OWrZUDR+TgJdkbEnU5P0sswm9DH5H9uBnfVFbrA4p7SlSlrGg0jfUF1IC9TOWp5ZiPosaMvKVLzUPKRSD9gqKQw==
+X-MS-TNEF-Correlator: 
+authentication-results: linuxfoundation.org; dkim=none (message not signed)
+ header.d=none;linuxfoundation.org; dmarc=none action=none
+ header.from=xilinx.com;
+x-originating-ip: [149.199.50.133]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: 6dc03efb-f4c0-43ab-5ab9-08d7edbe0a04
+x-ms-traffictypediagnostic: BYAPR02MB5734:|BYAPR02MB5734:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <BYAPR02MB57343C1AD4CF307C1AF8568EB7AB0@BYAPR02MB5734.namprd02.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:7691;
+x-forefront-prvs: 0390DB4BDA
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: JfWMaBE7hdWcWvrGWMbP9j3vbKHJXOuwS45crumNhlAPG4xLw/NYRk/s07TQ95eAE/pyw8OxZWzgPwHn8N2iu7vx2hdDLz0R/W08INDUW3APVEEUbkv3haMWxCgAST3MXXel9VPepDdx9YOutJU0ou5ne9bHXOeg+1KTPzljgCJMRJKI4S25nMh06Xn4662SSL0dABAk5X1czuFg4HT3jaAniZ/hGcNTBF+10rVvZxYlme1YyqYgyV/qY0m46i+rYVn41lfkm74+CJx+hAMYPHFXPsHkdwYQYvtJQE4DLKQqdKYd80RcrX2kOGuujQOR/Ix99U6Mj/3KlrkyK6JoudCj8yS2USugadU9LNqVuD5N9K6IyXiGUFxBA4vP5GQW+Dmhpy0ivSToNJx+hr2vZo15Rt/K3GU59I+JxwjE35ppoYOfubv2tnO8b9ZRkmJR
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR02MB3941.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(396003)(376002)(366004)(346002)(39860400002)(136003)(53546011)(316002)(71200400001)(9686003)(6506007)(478600001)(8936002)(52536014)(66946007)(26005)(5660300002)(6916009)(55016002)(66556008)(66476007)(64756008)(66446008)(76116006)(33656002)(7696005)(86362001)(4326008)(186003)(8676002)(2906002)(54906003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata: dhEN5tpHCtQgiWtl5vv7sC2lSOlrkT4Hzzf9oFxA33/TXsRdfCWh9/HPFi+On7upRnl55pPFTH6F+aj/ztg561NB+B8E7TNiWXLbGLgricqtcXJ6AWN5GtjrF1f1sl0aLH5gPv2fTpEDSMyqXOTtAAlJXVIph7Oe4o3NJWJoTxPvhPuxVGz2XcfYK1BgD5gJoivzGlExp7P1+fNJcUQeATcEu7EmDbhYnE0uCDz4kyRga6Bveb9XSzcGeGiG6rgu3Wujv2wo+FrmbJybIQuyWNbx1C7/dMDAQXt5lXNKD9zt0bDxEQOs5TN+lrJGl0EFkD3ugGY6LKdDOk2l1ourmtRxn43BrHlU7SrS/dTpJJTrVDySYi16qrs47yYmXLVN1uv04s07oCiSr7rcX0uCVPT56Qnkl12JB5wYnY6a1fwLdI26WQuyout9uwoAfsM/SqhoLoEft2cAZK/2mKp7wC7qNqorm1sVV2aqv57TFi+7qaCHs2WAoITg7mWeDvRDrQerZYJ62CbG/b3nBTWVDqu6jGWyRRIqpo6k72PP+JGOMPbqXHOWPQjAUiAc3QpU1QrYH5E9GjG5/aXLnQOCYrnmLKSA2hNrsDiLVdurnNbDmEKF3hKtHSHw2hBSof57/SFfP19zOZTUTzmYZ4nYlvEjP8EfRiVAyOWLnPxs1t1GyZV7ss+dGNDf2nZgwX+XQDuZtly0cCJBW2MevuoQ1+ZP4eaGjMw/r/xnM8WEAqgWKljwg8qgJAnSbomO47jVz6DyVz64h4cxsb9STXsHpYRDIWsbiX57a6ax+9LA7mQ=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
 X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 May 2020 10:52:43.6586
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6dc03efb-f4c0-43ab-5ab9-08d7edbe0a04
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 May 2020 10:54:36.2621
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6bad77a4-de7e-4653-5667-08d7edbdc6d5
-X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c;Ip=[149.199.60.83];Helo=[xsj-pvapsmtpgw01]
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7PR02MB4131
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: YjEbF8dwDe/zBt12sfKyzJGARs23U6h72FEmzQ0Ib9bwjZ0w9igu1IOZRt24M+9WqTjLga0r0EhPFtVuGZv0PQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR02MB5734
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Return value of AES PM API is not handled which may result in
-unexpected value of "status" in zynqmp_pm_aes_engine().
+Thanks Gerg for review.
 
-Consider "status" value as valid only if AES PM API is successful.
+I have updated reported by and fixes tag properly now. Sent v2.
 
-Fixes: bc86f9c54616 ("firmware: xilinx: Remove eemi ops for aes engine")
-Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-Signed-off-by: Rajan Vaja <rajan.vaja@xilinx.com>
----
-Changes in v2:
-- Add fixes tag above s-o-b section
-- Add reported-by
----
- drivers/crypto/xilinx/zynqmp-aes-gcm.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+Thanks
+Rajan
 
-diff --git a/drivers/crypto/xilinx/zynqmp-aes-gcm.c b/drivers/crypto/xilinx/zynqmp-aes-gcm.c
-index d0a0daf..a27e3550 100644
---- a/drivers/crypto/xilinx/zynqmp-aes-gcm.c
-+++ b/drivers/crypto/xilinx/zynqmp-aes-gcm.c
-@@ -85,6 +85,7 @@ static int zynqmp_aes_aead_cipher(struct aead_request *req)
- 	dma_addr_t dma_addr_data, dma_addr_hw_req;
- 	unsigned int data_size;
- 	unsigned int status;
-+	int ret;
- 	size_t dma_size;
- 	char *kbuf;
- 	int err;
-@@ -132,9 +133,12 @@ static int zynqmp_aes_aead_cipher(struct aead_request *req)
- 		hwreq->key = 0;
- 	}
- 
--	zynqmp_pm_aes_engine(dma_addr_hw_req, &status);
-+	ret = zynqmp_pm_aes_engine(dma_addr_hw_req, &status);
- 
--	if (status) {
-+	if (ret) {
-+		dev_err(dev, "ERROR: AES PM API failed\n");
-+		err = ret;
-+	} else if (status) {
- 		switch (status) {
- 		case ZYNQMP_AES_GCM_TAG_MISMATCH_ERR:
- 			dev_err(dev, "ERROR: Gcm Tag mismatch\n");
--- 
-2.7.4
-
+> -----Original Message-----
+> From: Greg KH <gregkh@linuxfoundation.org>
+> Sent: Friday, May 1, 2020 4:00 PM
+> To: Rajan Vaja <RAJANV@xilinx.com>
+> Cc: herbert@gondor.apana.org.au; davem@davemloft.net; Kalyani Akula
+> <kalyania@xilinx.com>; Michal Simek <michals@xilinx.com>; Jolly Shah
+> <JOLLYS@xilinx.com>; linux-crypto@vger.kernel.org; linux-arm-
+> kernel@lists.infradead.org; linux-kernel@vger.kernel.org
+> Subject: Re: [PATCH char-misc-next] crypto: xilinx: Handle AES PM API ret=
+urn
+> status
+>=20
+> CAUTION: This message has originated from an External Source. Please use
+> proper judgment and caution when opening attachments, clicking links, or
+> responding to this email.
+>=20
+>=20
+> On Fri, May 01, 2020 at 03:14:51AM -0700, Rajan Vaja wrote:
+> > Fixes: bc86f9c54616 ("firmware: xilinx: Remove eemi ops for aes
+> > engine")
+> >
+> > Return value of AES PM API is not handled which may result in
+> > unexpected value of "status" in zynqmp_pm_aes_engine().
+> >
+> > Consider "status" value as valid only if AES PM API is successful.
+> >
+> > Signed-off-by: Rajan Vaja <rajan.vaja@xilinx.com>
+>=20
+> No "Reported-by:" line?
+>=20
+> And put the "Fixes:" line down in the s-o-b area please.
+>=20
+> thanks,
+>=20
+> greg k-h
