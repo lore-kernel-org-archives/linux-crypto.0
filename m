@@ -2,149 +2,271 @@ Return-Path: <SRS0=G1bP=6P=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58781C47253
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 May 2020 10:54:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66A1BC47253
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 May 2020 12:28:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 30BD12076D
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 May 2020 10:54:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 38402206F0
+	for <linux-crypto@archiver.kernel.org>; Fri,  1 May 2020 12:28:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="HR5OYLGI"
+	dkim=pass (1024-bit key) header.d=c-s.fr header.i=@c-s.fr header.b="Tp8xseUQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728485AbgEAKyj (ORCPT
+        id S1728639AbgEAM20 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 1 May 2020 06:54:39 -0400
-Received: from mail-dm6nam12on2089.outbound.protection.outlook.com ([40.107.243.89]:24540
-        "EHLO NAM12-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728352AbgEAKyi (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 1 May 2020 06:54:38 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cs8fXTZDAtaBpzqGN+Se7Ht4bG9a9aoAObSn3zTHHcnU0O7iOikxDQdojXUCJkr2egGRcYHn1GE61LiiUkGmHfFc/HchN350WxTzgOM5E3KDPh3F4P7KYUrAKfdfdIS7my6y9jhqnkgFJRolRY3Y60iDrQwPelJLI0ni7myJTpNd04aOSqFL0vNpFMfz4ss7JHweGKELl2F+B7MY7oPp9zxVYGuqCiY+v4waHWX7RrJ70K5Fsyey/Axt1QIEBt3m38otucVSJOuC1rEDlBrNASJ4dJRcQTiRCz6GJqhu9gAcQ6pE63ZLKRvkN71E5JKY4aPZ6qckIjngla0hUAzeaA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=skGwslQs9ZwCwYlK6qeFkutpOtuCKA28v4//bcjGlmE=;
- b=KT59P2u1QBjVgTvA/ylx+zF5tgEafLbSaPfPrObZ/qJhsug9c2jjf6aHYnL9dbBaiftJN8ZzBHmOPZYAHPsG3Fh6/uWvHoE0hN137cv0Fe09CH4G8bbpat5C8IosJe0FYKOvxYKNT7Z3zkCNg77NYC3JdHjUTXz4JmDYZEIsBFWWE636EgnWe4eI0dhJFgtHfkj+PiZ634UddBBoJVguh4m67/El+MpTSofb7hG8wIbNtZVU3fNb+Pz/86rpxUhDkxPn+nDseTPh1HVHRPz42FNLUIxZRZCXm95d8ePrLEcwp0dP0YLwCzKpoVCHwvbOdsVe3ZT7QD2x4F8ImbVOhg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=xilinx.com; dmarc=pass action=none header.from=xilinx.com;
- dkim=pass header.d=xilinx.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=skGwslQs9ZwCwYlK6qeFkutpOtuCKA28v4//bcjGlmE=;
- b=HR5OYLGIcQJejFcLML/79Q/n13otfk86EZIGoPOknwwPOoNdd5oIoifmRtDEkqnZBgMEKyBa9t6ycMogjvJnBXvo6Z5CXnXXCwhKGM1jmSRy6e+q1HmZ0I1vc8jYqumQiqm2PKmshpCEAXzm6zgcuLdf9QC+36n+rDojUu/AMBQ=
-Received: from BYAPR02MB3941.namprd02.prod.outlook.com (2603:10b6:a02:f8::18)
- by BYAPR02MB5734.namprd02.prod.outlook.com (2603:10b6:a03:11c::30) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2958.19; Fri, 1 May
- 2020 10:54:36 +0000
-Received: from BYAPR02MB3941.namprd02.prod.outlook.com
- ([fe80::10b5:a33c:e9c7:6c0a]) by BYAPR02MB3941.namprd02.prod.outlook.com
- ([fe80::10b5:a33c:e9c7:6c0a%7]) with mapi id 15.20.2958.027; Fri, 1 May 2020
- 10:54:36 +0000
-From:   Rajan Vaja <RAJANV@xilinx.com>
-To:     Greg KH <gregkh@linuxfoundation.org>
-CC:     "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        Kalyani Akula <kalyania@xilinx.com>,
-        Michal Simek <michals@xilinx.com>,
-        Jolly Shah <JOLLYS@xilinx.com>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-arm-kernel@lists.infradead.org" 
-        <linux-arm-kernel@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH char-misc-next] crypto: xilinx: Handle AES PM API return
- status
-Thread-Topic: [PATCH char-misc-next] crypto: xilinx: Handle AES PM API return
- status
-Thread-Index: AQHWH6FwO0uDx7272EWw1r+zokOZdaiTB8WAgAAGjuA=
-Date:   Fri, 1 May 2020 10:54:36 +0000
-Message-ID: <BYAPR02MB3941AE74C305FD0452E2B868B7AB0@BYAPR02MB3941.namprd02.prod.outlook.com>
-References: <1588328091-16368-1-git-send-email-rajan.vaja@xilinx.com>
- <20200501103021.GA1416784@kroah.com>
-In-Reply-To: <20200501103021.GA1416784@kroah.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-TNEF-Correlator: 
-authentication-results: linuxfoundation.org; dkim=none (message not signed)
- header.d=none;linuxfoundation.org; dmarc=none action=none
- header.from=xilinx.com;
-x-originating-ip: [149.199.50.133]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-ht: Tenant
-x-ms-office365-filtering-correlation-id: 6dc03efb-f4c0-43ab-5ab9-08d7edbe0a04
-x-ms-traffictypediagnostic: BYAPR02MB5734:|BYAPR02MB5734:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <BYAPR02MB57343C1AD4CF307C1AF8568EB7AB0@BYAPR02MB5734.namprd02.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7691;
-x-forefront-prvs: 0390DB4BDA
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: JfWMaBE7hdWcWvrGWMbP9j3vbKHJXOuwS45crumNhlAPG4xLw/NYRk/s07TQ95eAE/pyw8OxZWzgPwHn8N2iu7vx2hdDLz0R/W08INDUW3APVEEUbkv3haMWxCgAST3MXXel9VPepDdx9YOutJU0ou5ne9bHXOeg+1KTPzljgCJMRJKI4S25nMh06Xn4662SSL0dABAk5X1czuFg4HT3jaAniZ/hGcNTBF+10rVvZxYlme1YyqYgyV/qY0m46i+rYVn41lfkm74+CJx+hAMYPHFXPsHkdwYQYvtJQE4DLKQqdKYd80RcrX2kOGuujQOR/Ix99U6Mj/3KlrkyK6JoudCj8yS2USugadU9LNqVuD5N9K6IyXiGUFxBA4vP5GQW+Dmhpy0ivSToNJx+hr2vZo15Rt/K3GU59I+JxwjE35ppoYOfubv2tnO8b9ZRkmJR
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR02MB3941.namprd02.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(396003)(376002)(366004)(346002)(39860400002)(136003)(53546011)(316002)(71200400001)(9686003)(6506007)(478600001)(8936002)(52536014)(66946007)(26005)(5660300002)(6916009)(55016002)(66556008)(66476007)(64756008)(66446008)(76116006)(33656002)(7696005)(86362001)(4326008)(186003)(8676002)(2906002)(54906003);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata: dhEN5tpHCtQgiWtl5vv7sC2lSOlrkT4Hzzf9oFxA33/TXsRdfCWh9/HPFi+On7upRnl55pPFTH6F+aj/ztg561NB+B8E7TNiWXLbGLgricqtcXJ6AWN5GtjrF1f1sl0aLH5gPv2fTpEDSMyqXOTtAAlJXVIph7Oe4o3NJWJoTxPvhPuxVGz2XcfYK1BgD5gJoivzGlExp7P1+fNJcUQeATcEu7EmDbhYnE0uCDz4kyRga6Bveb9XSzcGeGiG6rgu3Wujv2wo+FrmbJybIQuyWNbx1C7/dMDAQXt5lXNKD9zt0bDxEQOs5TN+lrJGl0EFkD3ugGY6LKdDOk2l1ourmtRxn43BrHlU7SrS/dTpJJTrVDySYi16qrs47yYmXLVN1uv04s07oCiSr7rcX0uCVPT56Qnkl12JB5wYnY6a1fwLdI26WQuyout9uwoAfsM/SqhoLoEft2cAZK/2mKp7wC7qNqorm1sVV2aqv57TFi+7qaCHs2WAoITg7mWeDvRDrQerZYJ62CbG/b3nBTWVDqu6jGWyRRIqpo6k72PP+JGOMPbqXHOWPQjAUiAc3QpU1QrYH5E9GjG5/aXLnQOCYrnmLKSA2hNrsDiLVdurnNbDmEKF3hKtHSHw2hBSof57/SFfP19zOZTUTzmYZ4nYlvEjP8EfRiVAyOWLnPxs1t1GyZV7ss+dGNDf2nZgwX+XQDuZtly0cCJBW2MevuoQ1+ZP4eaGjMw/r/xnM8WEAqgWKljwg8qgJAnSbomO47jVz6DyVz64h4cxsb9STXsHpYRDIWsbiX57a6ax+9LA7mQ=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Fri, 1 May 2020 08:28:26 -0400
+Received: from pegase1.c-s.fr ([93.17.236.30]:26943 "EHLO pegase1.c-s.fr"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726131AbgEAM2Z (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 1 May 2020 08:28:25 -0400
+Received: from localhost (mailhub1-int [192.168.12.234])
+        by localhost (Postfix) with ESMTP id 49DBP20c2xz9txNG;
+        Fri,  1 May 2020 14:28:22 +0200 (CEST)
+Authentication-Results: localhost; dkim=pass
+        reason="1024-bit key; insecure key"
+        header.d=c-s.fr header.i=@c-s.fr header.b=Tp8xseUQ; dkim-adsp=pass;
+        dkim-atps=neutral
+X-Virus-Scanned: Debian amavisd-new at c-s.fr
+Received: from pegase1.c-s.fr ([192.168.12.234])
+        by localhost (pegase1.c-s.fr [192.168.12.234]) (amavisd-new, port 10024)
+        with ESMTP id 84j98byPuBUK; Fri,  1 May 2020 14:28:22 +0200 (CEST)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+        by pegase1.c-s.fr (Postfix) with ESMTP id 49DBP15CN1z9txNF;
+        Fri,  1 May 2020 14:28:21 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=c-s.fr; s=mail;
+        t=1588336101; bh=XlApbvGOz8/OYrkITFPCwcdCBwZhKBqS6j6tWRgOa6Y=;
+        h=Subject:To:References:From:Date:In-Reply-To:From;
+        b=Tp8xseUQlEH9kn2Gozne2FNci2pLwkLx9v9Eu6eOJx5uxBfqmtNn7wQ8QCIXYq+Dg
+         TaHeu05jGUNXa66utNH814kp2egcDIHlv3khCY+Bn9VSuobx9X31N5NLW3YklXTM1N
+         Mn6G4RBaLBkF0OzcP2ndAEqvf8V/tagDyL9+TNUE=
+Received: from localhost (localhost [127.0.0.1])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 39EAC8B923;
+        Fri,  1 May 2020 14:28:23 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+        by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+        with ESMTP id OYHinAPzGiTU; Fri,  1 May 2020 14:28:23 +0200 (CEST)
+Received: from [192.168.4.90] (unknown [192.168.4.90])
+        by messagerie.si.c-s.fr (Postfix) with ESMTP id 419268B774;
+        Fri,  1 May 2020 14:28:22 +0200 (CEST)
+Subject: Re: [PATCH] crypto: lib/sha256 - return void
+To:     Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
+References: <20200501071338.777352-1-ebiggers@kernel.org>
+From:   Christophe Leroy <christophe.leroy@c-s.fr>
+Message-ID: <3ba66f39-e84f-43c6-a36b-17cd231f55db@c-s.fr>
+Date:   Fri, 1 May 2020 14:28:12 +0200
+User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6dc03efb-f4c0-43ab-5ab9-08d7edbe0a04
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 May 2020 10:54:36.2621
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: YjEbF8dwDe/zBt12sfKyzJGARs23U6h72FEmzQ0Ib9bwjZ0w9igu1IOZRt24M+9WqTjLga0r0EhPFtVuGZv0PQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR02MB5734
+In-Reply-To: <20200501071338.777352-1-ebiggers@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Thanks Gerg for review.
 
-I have updated reported by and fixes tag properly now. Sent v2.
 
-Thanks
-Rajan
+Le 01/05/2020 à 09:13, Eric Biggers a écrit :
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> The SHA-256 / SHA-224 library functions can't fail, so remove the
+> useless return value.
+> 
+> Also long as the declarations are being changed anyway, also fix some
+> parameter names in the declarations to match the definitions.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>   crypto/sha256_generic.c      | 14 +++++++++-----
+>   include/crypto/sha.h         | 20 ++++++++------------
+>   include/crypto/sha256_base.h |  6 ++++--
+>   lib/crypto/sha256.c          | 20 ++++++++------------
+>   4 files changed, 29 insertions(+), 31 deletions(-)
+> 
+> diff --git a/crypto/sha256_generic.c b/crypto/sha256_generic.c
+> index f2d7095d4f2d64..88156e3e2a33e0 100644
+> --- a/crypto/sha256_generic.c
+> +++ b/crypto/sha256_generic.c
+> @@ -35,27 +35,31 @@ EXPORT_SYMBOL_GPL(sha256_zero_message_hash);
+>   
+>   static int crypto_sha256_init(struct shash_desc *desc)
+>   {
+> -	return sha256_init(shash_desc_ctx(desc));
+> +	sha256_init(shash_desc_ctx(desc));
+> +	return 0;
+>   }
+>   
+>   static int crypto_sha224_init(struct shash_desc *desc)
+>   {
+> -	return sha224_init(shash_desc_ctx(desc));
+> +	sha224_init(shash_desc_ctx(desc));
+> +	return 0;
+>   }
+>   
+>   int crypto_sha256_update(struct shash_desc *desc, const u8 *data,
+>   			  unsigned int len)
+>   {
+> -	return sha256_update(shash_desc_ctx(desc), data, len);
+> +	sha256_update(shash_desc_ctx(desc), data, len);
+> +	return 0;
+>   }
+>   EXPORT_SYMBOL(crypto_sha256_update);
+>   
+>   static int crypto_sha256_final(struct shash_desc *desc, u8 *out)
+>   {
+>   	if (crypto_shash_digestsize(desc->tfm) == SHA224_DIGEST_SIZE)
+> -		return sha224_final(shash_desc_ctx(desc), out);
+> +		sha224_final(shash_desc_ctx(desc), out);
+>   	else
+> -		return sha256_final(shash_desc_ctx(desc), out);
+> +		sha256_final(shash_desc_ctx(desc), out);
+> +	return 0;
+>   }
+>   
+>   int crypto_sha256_finup(struct shash_desc *desc, const u8 *data,
+> diff --git a/include/crypto/sha.h b/include/crypto/sha.h
+> index 5c2132c7190095..8db9e1a3eb0cf6 100644
+> --- a/include/crypto/sha.h
+> +++ b/include/crypto/sha.h
+> @@ -123,7 +123,7 @@ extern int crypto_sha512_finup(struct shash_desc *desc, const u8 *data,
+>    * For details see lib/crypto/sha256.c
+>    */
+>   
+> -static inline int sha256_init(struct sha256_state *sctx)
+> +static inline void sha256_init(struct sha256_state *sctx)
+>   {
+>   	sctx->state[0] = SHA256_H0;
+>   	sctx->state[1] = SHA256_H1;
+> @@ -134,14 +134,12 @@ static inline int sha256_init(struct sha256_state *sctx)
+>   	sctx->state[6] = SHA256_H6;
+>   	sctx->state[7] = SHA256_H7;
+>   	sctx->count = 0;
+> -
+> -	return 0;
+>   }
+> -extern int sha256_update(struct sha256_state *sctx, const u8 *input,
+> -			 unsigned int length);
+> -extern int sha256_final(struct sha256_state *sctx, u8 *hash);
+> +extern void sha256_update(struct sha256_state *sctx, const u8 *data,
+> +			  unsigned int len);
+> +extern void sha256_final(struct sha256_state *sctx, u8 *out);
 
-> -----Original Message-----
-> From: Greg KH <gregkh@linuxfoundation.org>
-> Sent: Friday, May 1, 2020 4:00 PM
-> To: Rajan Vaja <RAJANV@xilinx.com>
-> Cc: herbert@gondor.apana.org.au; davem@davemloft.net; Kalyani Akula
-> <kalyania@xilinx.com>; Michal Simek <michals@xilinx.com>; Jolly Shah
-> <JOLLYS@xilinx.com>; linux-crypto@vger.kernel.org; linux-arm-
-> kernel@lists.infradead.org; linux-kernel@vger.kernel.org
-> Subject: Re: [PATCH char-misc-next] crypto: xilinx: Handle AES PM API ret=
-urn
-> status
->=20
-> CAUTION: This message has originated from an External Source. Please use
-> proper judgment and caution when opening attachments, clicking links, or
-> responding to this email.
->=20
->=20
-> On Fri, May 01, 2020 at 03:14:51AM -0700, Rajan Vaja wrote:
-> > Fixes: bc86f9c54616 ("firmware: xilinx: Remove eemi ops for aes
-> > engine")
-> >
-> > Return value of AES PM API is not handled which may result in
-> > unexpected value of "status" in zynqmp_pm_aes_engine().
-> >
-> > Consider "status" value as valid only if AES PM API is successful.
-> >
-> > Signed-off-by: Rajan Vaja <rajan.vaja@xilinx.com>
->=20
-> No "Reported-by:" line?
->=20
-> And put the "Fixes:" line down in the s-o-b area please.
->=20
-> thanks,
->=20
-> greg k-h
+The 'extern' keywork is useless in a function declaration. It should be 
+removed, as recommended by 'checkpatch --strict'.
+
+>   
+> -static inline int sha224_init(struct sha256_state *sctx)
+> +static inline void sha224_init(struct sha256_state *sctx)
+>   {
+>   	sctx->state[0] = SHA224_H0;
+>   	sctx->state[1] = SHA224_H1;
+> @@ -152,11 +150,9 @@ static inline int sha224_init(struct sha256_state *sctx)
+>   	sctx->state[6] = SHA224_H6;
+>   	sctx->state[7] = SHA224_H7;
+>   	sctx->count = 0;
+> -
+> -	return 0;
+>   }
+> -extern int sha224_update(struct sha256_state *sctx, const u8 *input,
+> -			 unsigned int length);
+> -extern int sha224_final(struct sha256_state *sctx, u8 *hash);
+> +extern void sha224_update(struct sha256_state *sctx, const u8 *data,
+> +			  unsigned int len);
+> +extern void sha224_final(struct sha256_state *sctx, u8 *out);
+
+The 'extern' keywork is useless in a function declaration. It should be 
+removed, as recommended by 'checkpatch --strict'.
+
+>   
+>   #endif
+> diff --git a/include/crypto/sha256_base.h b/include/crypto/sha256_base.h
+> index cea60cff80bd87..6ded110783ae87 100644
+> --- a/include/crypto/sha256_base.h
+> +++ b/include/crypto/sha256_base.h
+> @@ -22,14 +22,16 @@ static inline int sha224_base_init(struct shash_desc *desc)
+>   {
+>   	struct sha256_state *sctx = shash_desc_ctx(desc);
+>   
+> -	return sha224_init(sctx);
+> +	sha224_init(sctx);
+> +	return 0;
+>   }
+>   
+>   static inline int sha256_base_init(struct shash_desc *desc)
+>   {
+>   	struct sha256_state *sctx = shash_desc_ctx(desc);
+>   
+> -	return sha256_init(sctx);
+> +	sha256_init(sctx);
+> +	return 0;
+>   }
+>   
+>   static inline int sha256_base_do_update(struct shash_desc *desc,
+> diff --git a/lib/crypto/sha256.c b/lib/crypto/sha256.c
+> index 66cb04b0cf4e7e..2e621697c5c35c 100644
+> --- a/lib/crypto/sha256.c
+> +++ b/lib/crypto/sha256.c
+> @@ -206,7 +206,7 @@ static void sha256_transform(u32 *state, const u8 *input)
+>   	memzero_explicit(W, 64 * sizeof(u32));
+>   }
+>   
+> -int sha256_update(struct sha256_state *sctx, const u8 *data, unsigned int len)
+> +void sha256_update(struct sha256_state *sctx, const u8 *data, unsigned int len)
+>   {
+>   	unsigned int partial, done;
+>   	const u8 *src;
+> @@ -232,18 +232,16 @@ int sha256_update(struct sha256_state *sctx, const u8 *data, unsigned int len)
+>   		partial = 0;
+>   	}
+>   	memcpy(sctx->buf + partial, src, len - done);
+> -
+> -	return 0;
+>   }
+>   EXPORT_SYMBOL(sha256_update);
+>   
+> -int sha224_update(struct sha256_state *sctx, const u8 *data, unsigned int len)
+> +void sha224_update(struct sha256_state *sctx, const u8 *data, unsigned int len)
+>   {
+> -	return sha256_update(sctx, data, len);
+> +	sha256_update(sctx, data, len);
+>   }
+>   EXPORT_SYMBOL(sha224_update);
+>   
+> -static int __sha256_final(struct sha256_state *sctx, u8 *out, int digest_words)
+> +static void __sha256_final(struct sha256_state *sctx, u8 *out, int digest_words)
+>   {
+>   	__be32 *dst = (__be32 *)out;
+>   	__be64 bits;
+> @@ -268,19 +266,17 @@ static int __sha256_final(struct sha256_state *sctx, u8 *out, int digest_words)
+>   
+>   	/* Zeroize sensitive information. */
+>   	memset(sctx, 0, sizeof(*sctx));
+> -
+> -	return 0;
+>   }
+>   
+> -int sha256_final(struct sha256_state *sctx, u8 *out)
+> +void sha256_final(struct sha256_state *sctx, u8 *out)
+>   {
+> -	return __sha256_final(sctx, out, 8);
+> +	__sha256_final(sctx, out, 8);
+>   }
+>   EXPORT_SYMBOL(sha256_final);
+>   
+> -int sha224_final(struct sha256_state *sctx, u8 *out)
+> +void sha224_final(struct sha256_state *sctx, u8 *out)
+>   {
+> -	return __sha256_final(sctx, out, 7);
+> +	__sha256_final(sctx, out, 7);
+>   }
+>   EXPORT_SYMBOL(sha224_final);
+>   
+> 
+
+Christophe
