@@ -2,63 +2,51 @@ Return-Path: <SRS0=ou8b=6Q=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E386C3A5A9
-	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 05:33:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBA08C4725A
+	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 05:33:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 552CE2184D
-	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 05:33:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C93B220643
+	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 05:33:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1588397609;
-	bh=MYhkXQ8M6ehjcKnUAHPgBXgoMFSmViXmlsVaKB/2/iE=;
-	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=J4EPN2rmx7ZmbjVM8wTIP8D+xmctW4+2yYgBurzxTEfz5zaqSWCPFCc4LZpgapzQz
-	 XjoKupTu2vt+URjpi4raBTzYbDCh3uwrBtScuBc9O1UcQbuMlTH/JlZuNPSozKH7kY
-	 IDoNppClT7PDKEcq+af5SnVhvbBbxvyg4WRKZPXg=
+	s=default; t=1588397614;
+	bh=oBgtRZJ95t0RPE1PvPURSgv/NWE/2cwO3eTdsW65i6s=;
+	h=From:To:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=XAwvv+VEvYk/NmTwjIRc2j59+gtXbL8NdvhsuCIfxl1mv8RP3nGyxRIjo3bsQ5Asx
+	 O+MGCeLnMztRHYCltT9fQsKr++PxdpBLW4JmgLqVBrc07Oqfp57xFrBhRtkjV/r93B
+	 Z7Bdgcrd8fWhO+V+5y1j5aP69gBQUSc8Y8HmF1bY=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726790AbgEBFd2 (ORCPT
+        id S1727101AbgEBFde (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 2 May 2020 01:33:28 -0400
-Received: from mail.kernel.org ([198.145.29.99]:38976 "EHLO mail.kernel.org"
+        Sat, 2 May 2020 01:33:34 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39100 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726058AbgEBFd2 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 2 May 2020 01:33:28 -0400
+        id S1726058AbgEBFdd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 2 May 2020 01:33:33 -0400
 Received: from sol.hsd1.ca.comcast.net (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id F0D5D208DB;
-        Sat,  2 May 2020 05:33:26 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7D9D5206D9
+        for <linux-crypto@vger.kernel.org>; Sat,  2 May 2020 05:33:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1588397607;
-        bh=MYhkXQ8M6ehjcKnUAHPgBXgoMFSmViXmlsVaKB/2/iE=;
-        h=From:To:Cc:Subject:Date:From;
-        b=EuFRJQF7AGrZKvzyKctf8/XBXbFdmS7XU+HXEDsVj1Uiclh02NaQ+LErt1Tlyg7nq
-         wxqZntoSP2TMAzTR92QeFiKii2Pyrj26p5GQzuQv4F3MuyWA7XqVLcGGdg36Y16fux
-         LWOXU+/+qXQZC3nDixS7relR/AF8g3aPbd7kM2D8=
+        s=default; t=1588397613;
+        bh=oBgtRZJ95t0RPE1PvPURSgv/NWE/2cwO3eTdsW65i6s=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=HijCSXk8llDX/K/Vs+fKG49fcNVvd9NOD3xrUuspSRiIBahSQK+zg7EdrvJADX3Ao
+         EsTtBrzJxplkDfa430wjy4lLofANPnPH0Q2KpYyc7vuvalnwUf6vQB7OXY9GAsEgR8
+         9S7nL/DV1Q9kW6VwOxoTajwI09PodSJYkJxeCX+E=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Cc:     Cheng-Yi Chiang <cychiang@chromium.org>, ecryptfs@vger.kernel.org,
-        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
-        Gilad Ben-Yossef <gilad@benyossef.com>,
-        Guenter Roeck <groeck@chromium.org>,
-        Jesper Nilsson <jesper.nilsson@axis.com>,
-        Kamil Konieczny <k.konieczny@samsung.com>,
-        keyrings@vger.kernel.org, Krzysztof Kozlowski <krzk@kernel.org>,
-        Krzysztof Opasiak <k.opasiak@samsung.com>,
-        Lars Persson <lars.persson@axis.com>,
-        linux-bluetooth@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-nfs@vger.kernel.org, linux-sctp@vger.kernel.org,
-        Robert Baldyga <r.baldyga@samsung.com>,
-        Tom Lendacky <thomas.lendacky@amd.com>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        Zaibo Xu <xuzaibo@huawei.com>
-Subject: [PATCH 00/20] crypto: introduce crypto_shash_tfm_digest()
-Date:   Fri,  1 May 2020 22:31:02 -0700
-Message-Id: <20200502053122.995648-1-ebiggers@kernel.org>
+Subject: [PATCH 02/20] crypto: arm64/aes-glue - use crypto_shash_tfm_digest()
+Date:   Fri,  1 May 2020 22:31:04 -0700
+Message-Id: <20200502053122.995648-3-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20200502053122.995648-1-ebiggers@kernel.org>
+References: <20200502053122.995648-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
@@ -66,80 +54,39 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This series introduces a helper function crypto_shash_tfm_digest() which
-replaces the following common pattern:
+From: Eric Biggers <ebiggers@google.com>
 
-	{
-		SHASH_DESC_ON_STACK(desc, tfm);
-		int err;
+Instead of manually allocating a 'struct shash_desc' on the stack and
+calling crypto_shash_digest(), switch to using the new helper function
+crypto_shash_tfm_digest() which does this for us.
 
-		desc->tfm = tfm;
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ arch/arm64/crypto/aes-glue.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-		err = crypto_shash_digest(desc, data, len, out);
-
-		shash_desc_zero(desc);
-	}
-
-with:
-
-	err = crypto_shash_tfm_digest(tfm, data, len, out);
-
-Patch 1 introduces this helper function, and patches 2-20 convert all
-relevant users to use it.
-
-IMO, it would be easiest to take all these patches through the crypto
-tree.  But taking just the "crypto:" ones and then me trying to get the
-rest merged later via subsystem trees is also an option.
-
-Eric Biggers (20):
-  crypto: hash - introduce crypto_shash_tfm_digest()
-  crypto: arm64/aes-glue - use crypto_shash_tfm_digest()
-  crypto: essiv - use crypto_shash_tfm_digest()
-  crypto: artpec6 - use crypto_shash_tfm_digest()
-  crypto: ccp - use crypto_shash_tfm_digest()
-  crypto: ccree - use crypto_shash_tfm_digest()
-  crypto: hisilicon/sec2 - use crypto_shash_tfm_digest()
-  crypto: mediatek - use crypto_shash_tfm_digest()
-  crypto: n2 - use crypto_shash_tfm_digest()
-  crypto: omap-sham - use crypto_shash_tfm_digest()
-  crypto: s5p-sss - use crypto_shash_tfm_digest()
-  nfc: s3fwrn5: use crypto_shash_tfm_digest()
-  fscrypt: use crypto_shash_tfm_digest()
-  ecryptfs: use crypto_shash_tfm_digest()
-  nfsd: use crypto_shash_tfm_digest()
-  ubifs: use crypto_shash_tfm_digest()
-  Bluetooth: use crypto_shash_tfm_digest()
-  sctp: use crypto_shash_tfm_digest()
-  KEYS: encrypted: use crypto_shash_tfm_digest()
-  ASoC: cros_ec_codec: use crypto_shash_tfm_digest()
-
- arch/arm64/crypto/aes-glue.c               |  4 +--
- crypto/essiv.c                             |  4 +--
- crypto/shash.c                             | 16 +++++++++
- drivers/crypto/axis/artpec6_crypto.c       | 10 ++----
- drivers/crypto/ccp/ccp-crypto-sha.c        |  9 ++---
- drivers/crypto/ccree/cc_cipher.c           |  9 ++---
- drivers/crypto/hisilicon/sec2/sec_crypto.c |  5 ++-
- drivers/crypto/mediatek/mtk-sha.c          |  7 ++--
- drivers/crypto/n2_core.c                   |  7 ++--
- drivers/crypto/omap-sham.c                 | 20 +++--------
- drivers/crypto/s5p-sss.c                   | 39 ++++------------------
- drivers/nfc/s3fwrn5/firmware.c             | 10 +-----
- fs/crypto/fname.c                          |  7 +---
- fs/crypto/hkdf.c                           |  6 +---
- fs/ecryptfs/crypto.c                       | 17 +---------
- fs/nfsd/nfs4recover.c                      | 26 ++++-----------
- fs/ubifs/auth.c                            | 20 ++---------
- fs/ubifs/master.c                          |  9 ++---
- fs/ubifs/replay.c                          | 14 ++------
- include/crypto/hash.h                      | 19 +++++++++++
- net/bluetooth/smp.c                        |  6 +---
- net/sctp/auth.c                            | 10 ++----
- net/sctp/sm_make_chunk.c                   | 23 +++++--------
- security/keys/encrypted-keys/encrypted.c   | 18 ++--------
- sound/soc/codecs/cros_ec_codec.c           |  9 +----
- 25 files changed, 95 insertions(+), 229 deletions(-)
-
+diff --git a/arch/arm64/crypto/aes-glue.c b/arch/arm64/crypto/aes-glue.c
+index ed5409c6abf4e9..395bbf64b2abb3 100644
+--- a/arch/arm64/crypto/aes-glue.c
++++ b/arch/arm64/crypto/aes-glue.c
+@@ -158,7 +158,6 @@ static int __maybe_unused essiv_cbc_set_key(struct crypto_skcipher *tfm,
+ 					    unsigned int key_len)
+ {
+ 	struct crypto_aes_essiv_cbc_ctx *ctx = crypto_skcipher_ctx(tfm);
+-	SHASH_DESC_ON_STACK(desc, ctx->hash);
+ 	u8 digest[SHA256_DIGEST_SIZE];
+ 	int ret;
+ 
+@@ -166,8 +165,7 @@ static int __maybe_unused essiv_cbc_set_key(struct crypto_skcipher *tfm,
+ 	if (ret)
+ 		return ret;
+ 
+-	desc->tfm = ctx->hash;
+-	crypto_shash_digest(desc, in_key, key_len, digest);
++	crypto_shash_tfm_digest(ctx->hash, in_key, key_len, digest);
+ 
+ 	return aes_expandkey(&ctx->key2, digest, sizeof(digest));
+ }
 -- 
 2.26.2
 
