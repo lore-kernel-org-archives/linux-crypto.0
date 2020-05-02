@@ -2,198 +2,108 @@ Return-Path: <SRS0=ou8b=6Q=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1246CC47256
-	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 18:55:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 827A4C3A5A9
+	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 18:56:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E8A1F2075B
-	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 18:55:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1588445703;
-	bh=qlx6o6YnRpjQRhLXhponshi87759SwhpBDJZ2YbFKmM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=AIEhaPA92Ec60XaGePjH+Ak8C9zjAV8HNzzsevlNV0y1r70zNgELnGgICY89qHJxx
-	 3Mqaeybxkl7RImkUtGv2yPUvFCkzoYMsAU7wJJm1Va2+qUBTRbimVfy5+Nt1kCE4ye
-	 LN0GDKOqFm/F06qu5QUuCdDQLoeDj74WaElZQk+Y=
+	by mail.kernel.org (Postfix) with ESMTP id 5E87E20731
+	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 18:56:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=tessares-net.20150623.gappssmtp.com header.i=@tessares-net.20150623.gappssmtp.com header.b="Irh8N5dQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728435AbgEBSzD (ORCPT
+        id S1728450AbgEBS4l (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 2 May 2020 14:55:03 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39106 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728343AbgEBSzD (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 2 May 2020 14:55:03 -0400
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 42C61206CD;
-        Sat,  2 May 2020 18:55:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1588445702;
-        bh=qlx6o6YnRpjQRhLXhponshi87759SwhpBDJZ2YbFKmM=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=Tz3htpDVODHTmaRNANvzbsrKZRho7Z9BycIG4UWvU4LGj8YRWUtsBWGSzciECjcWx
-         J0tt6bT9d6CxKMILAjzljZzYESSM4uf3PfRry2WWrsBpXRxdUuFO622JSciVzTvajs
-         +03kqTuoI8iE42gts4CMjlQjW1lqhbc0y7X7x0OU=
-Received: by mail-il1-f181.google.com with SMTP id b18so7449357ilf.2;
-        Sat, 02 May 2020 11:55:02 -0700 (PDT)
-X-Gm-Message-State: AGi0PuYSRBlQkG9IFalmIYmIjkZOVJkyPYdvk3dgWsQC0wS5/XiUPSVD
-        GqfhKffGM7QP+UfAIV5bMNsTG1/XhGlLGY4aewY=
-X-Google-Smtp-Source: APiQypKPVuN03rxQcpgWyQxj+pjAWwt3RGE0SfQMzOCdMom7E+PS6ZAi/6lONypKnF4iiYJZ88Gg8yZKF+60c/Tq0cw=
-X-Received: by 2002:a92:607:: with SMTP id x7mr8522212ilg.218.1588445701655;
- Sat, 02 May 2020 11:55:01 -0700 (PDT)
+        Sat, 2 May 2020 14:56:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43302 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728343AbgEBS4l (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 2 May 2020 14:56:41 -0400
+Received: from mail-wr1-x443.google.com (mail-wr1-x443.google.com [IPv6:2a00:1450:4864:20::443])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D457C061A0C
+        for <linux-crypto@vger.kernel.org>; Sat,  2 May 2020 11:56:41 -0700 (PDT)
+Received: by mail-wr1-x443.google.com with SMTP id d15so15939941wrx.3
+        for <linux-crypto@vger.kernel.org>; Sat, 02 May 2020 11:56:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tessares-net.20150623.gappssmtp.com; s=20150623;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=z0MfvGDD4YkFw60+Ps16ZYHcvLXoiQilDNUVAcRo53Y=;
+        b=Irh8N5dQpWro1LlVadiznKhrd6dm7ic0bj//+XJqPEthN+j4X6GJeLD7l+kuy/qybe
+         T3hI4DYpaV2J0QLolmFr6o4iGgaWVVFbho6d7YbsX4eVbONwSHztjogFGcON26Vr80f3
+         1suQjumRJDtYKY4tsIH/mzwkrij2DhGUEv9n6tgAuWRz2Gfhdd5ykd/ad9Hwmdn24tsT
+         ey411x2eh0BlE0pKMhljCp1QSrEwKdM04G3eFwztbxh5KkLBkmQKdWSwWfIu3xk5aWJN
+         nYmJgbdOSyBa2fd5CoxInkv4ZaI7Lq8EY++tPGVTOjQe9cthSqNhUldSBiORch1j8yKK
+         hBcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=z0MfvGDD4YkFw60+Ps16ZYHcvLXoiQilDNUVAcRo53Y=;
+        b=npk5Xn6ZtxBRAWz3UN99ekLJI4O7nUnXqoF6CaFKYM/IpeYI0fydGAYhu4e+GjOLmu
+         MmCV38axcVnr11rMZZ3EUZo5wQbuECABXg8h2ZNpn+V7vpBMKbPyXzzOrx5HYdksBZJN
+         xHNYIuL2QUB8sGJwDA3yfciSvyHlxJL25bIG3joqQlsBpwHgfdNhj64dpoW+FPeGaYHx
+         1W37PMxBdBM8MavmoWtknrd6Z/R0K2gkh6U6Y2gsRh27f+OClWQbnHQAhqPHSJ6sjJ/n
+         gFCW3vN5DHieWyHEayMYFbg3JKZ5n+v2QPsOqWa+R44M4LL3TSB4cefNo/5pQ45scVG/
+         Ef6Q==
+X-Gm-Message-State: AGi0PuaN4PZtOpkh4QXjg3201CScO7A0V/pFD5ycXAz7e3vzz2v7B/Wu
+        f6ztPIevDOrTF1ifdVd7qEQCaw==
+X-Google-Smtp-Source: APiQypLHeatZbob+JOGRdFpn7hrsx6IXwJ4KdbOhv8SZvibLjcqwXaw58bK8WFMlanza3Z6ZSzhu1Q==
+X-Received: by 2002:adf:ee0c:: with SMTP id y12mr11425646wrn.0.1588445799673;
+        Sat, 02 May 2020 11:56:39 -0700 (PDT)
+Received: from tsr-lap-08.nix.tessares.net ([213.211.144.192])
+        by smtp.gmail.com with ESMTPSA id 2sm5955884wre.25.2020.05.02.11.56.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 02 May 2020 11:56:39 -0700 (PDT)
+Subject: Re: [MPTCP] [PATCH 1/7] mptcp: use SHA256_BLOCK_SIZE, not
+ SHA_MESSAGE_BYTES
+To:     Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org,
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Theodore Ts'o <tytso@mit.edu>, mptcp@lists.01.org,
+        Paolo Abeni <pabeni@redhat.com>
+References: <20200502182427.104383-1-ebiggers@kernel.org>
+ <20200502182427.104383-2-ebiggers@kernel.org>
+From:   Matthieu Baerts <matthieu.baerts@tessares.net>
+Message-ID: <22ea2039-18f3-12f0-cdc3-99b49c413f77@tessares.net>
+Date:   Sat, 2 May 2020 20:56:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 MIME-Version: 1.0
-References: <20200502184449.139964-1-ebiggers@kernel.org>
-In-Reply-To: <20200502184449.139964-1-ebiggers@kernel.org>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Sat, 2 May 2020 20:54:50 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXEZbUbyhHTF9i=q7eRXXf6iLoDuU0NHwbj5giDXex6WoQ@mail.gmail.com>
-Message-ID: <CAMj1kXEZbUbyhHTF9i=q7eRXXf6iLoDuU0NHwbj5giDXex6WoQ@mail.gmail.com>
-Subject: Re: [PATCH] crypto: lib/aes - move IRQ disabling into AES library
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        "# 3.4.x" <stable@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20200502182427.104383-2-ebiggers@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, 2 May 2020 at 20:44, Eric Biggers <ebiggers@kernel.org> wrote:
->
+Hi Eric,
+
+On 02/05/2020 20:24, Eric Biggers wrote:
 > From: Eric Biggers <ebiggers@google.com>
->
-> The AES library code (which originally came from crypto/aes_ti.c) is
-> supposed to be constant-time, to the extent possible for a C
-> implementation.  But the hardening measure of disabling interrupts while
-> the S-box is loaded into cache was not included in the library version;
-> it was left only in the crypto API wrapper in crypto/aes_ti.c.
->
-> Move this logic into the library version so that everyone gets it.
->
+> 
+> In preparation for naming the SHA-1 stuff in <linux/cryptohash.h>
+> properly and moving it to a more appropriate header, fix the HMAC-SHA256
+> code in mptcp_crypto_hmac_sha() to use SHA256_BLOCK_SIZE instead of
+> "SHA_MESSAGE_BYTES" which is actually the SHA-1 block size.
+> (Fortunately these are both 64 bytes, so this wasn't a "real" bug...)
 
-I don't think we should fiddle with interrupts in a general purpose
-crypto library.
+Good catch! I guess it was left when switching from SHA-1 to SHA-256 in 
+65492c5a6ab5 (mptcp: move from sha1 (v0) to sha256 (v1)).
 
-We /could/ add a variant aes_encrypt_irq_off() if you really want, but
-this is not something you should get without asking explicitly imo.
+For MPTCP related code, it looks good to me, thank you for this!
 
+Reviewed-by: Matthieu Baerts <matthieu.baerts@tessares.net>
 
-
-> Fixes: e59c1c987456 ("crypto: aes - create AES library based on the fixed time AES code")
-> Cc: <stable@vger.kernel.org> # v5.4+
-> Cc: Ard Biesheuvel <ardb@kernel.org>
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->  crypto/aes_ti.c  | 18 ------------------
->  lib/crypto/aes.c | 18 ++++++++++++++++++
->  2 files changed, 18 insertions(+), 18 deletions(-)
->
-> diff --git a/crypto/aes_ti.c b/crypto/aes_ti.c
-> index 205c2c257d4926..121f36621d6dcf 100644
-> --- a/crypto/aes_ti.c
-> +++ b/crypto/aes_ti.c
-> @@ -20,33 +20,15 @@ static int aesti_set_key(struct crypto_tfm *tfm, const u8 *in_key,
->  static void aesti_encrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
->  {
->         const struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
-> -       unsigned long flags;
-> -
-> -       /*
-> -        * Temporarily disable interrupts to avoid races where cachelines are
-> -        * evicted when the CPU is interrupted to do something else.
-> -        */
-> -       local_irq_save(flags);
->
->         aes_encrypt(ctx, out, in);
-> -
-> -       local_irq_restore(flags);
->  }
->
->  static void aesti_decrypt(struct crypto_tfm *tfm, u8 *out, const u8 *in)
->  {
->         const struct crypto_aes_ctx *ctx = crypto_tfm_ctx(tfm);
-> -       unsigned long flags;
-> -
-> -       /*
-> -        * Temporarily disable interrupts to avoid races where cachelines are
-> -        * evicted when the CPU is interrupted to do something else.
-> -        */
-> -       local_irq_save(flags);
->
->         aes_decrypt(ctx, out, in);
-> -
-> -       local_irq_restore(flags);
->  }
->
->  static struct crypto_alg aes_alg = {
-> diff --git a/lib/crypto/aes.c b/lib/crypto/aes.c
-> index 827fe89922fff0..029d8d0eac1f6e 100644
-> --- a/lib/crypto/aes.c
-> +++ b/lib/crypto/aes.c
-> @@ -260,6 +260,7 @@ void aes_encrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in)
->         const u32 *rkp = ctx->key_enc + 4;
->         int rounds = 6 + ctx->key_length / 4;
->         u32 st0[4], st1[4];
-> +       unsigned long flags;
->         int round;
->
->         st0[0] = ctx->key_enc[0] ^ get_unaligned_le32(in);
-> @@ -267,6 +268,12 @@ void aes_encrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in)
->         st0[2] = ctx->key_enc[2] ^ get_unaligned_le32(in + 8);
->         st0[3] = ctx->key_enc[3] ^ get_unaligned_le32(in + 12);
->
-> +       /*
-> +        * Temporarily disable interrupts to avoid races where cachelines are
-> +        * evicted when the CPU is interrupted to do something else.
-> +        */
-> +       local_irq_save(flags);
-> +
->         /*
->          * Force the compiler to emit data independent Sbox references,
->          * by xoring the input with Sbox values that are known to add up
-> @@ -297,6 +304,8 @@ void aes_encrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in)
->         put_unaligned_le32(subshift(st1, 1) ^ rkp[5], out + 4);
->         put_unaligned_le32(subshift(st1, 2) ^ rkp[6], out + 8);
->         put_unaligned_le32(subshift(st1, 3) ^ rkp[7], out + 12);
-> +
-> +       local_irq_restore(flags);
->  }
->  EXPORT_SYMBOL(aes_encrypt);
->
-> @@ -311,6 +320,7 @@ void aes_decrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in)
->         const u32 *rkp = ctx->key_dec + 4;
->         int rounds = 6 + ctx->key_length / 4;
->         u32 st0[4], st1[4];
-> +       unsigned long flags;
->         int round;
->
->         st0[0] = ctx->key_dec[0] ^ get_unaligned_le32(in);
-> @@ -318,6 +328,12 @@ void aes_decrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in)
->         st0[2] = ctx->key_dec[2] ^ get_unaligned_le32(in + 8);
->         st0[3] = ctx->key_dec[3] ^ get_unaligned_le32(in + 12);
->
-> +       /*
-> +        * Temporarily disable interrupts to avoid races where cachelines are
-> +        * evicted when the CPU is interrupted to do something else.
-> +        */
-> +       local_irq_save(flags);
-> +
->         /*
->          * Force the compiler to emit data independent Sbox references,
->          * by xoring the input with Sbox values that are known to add up
-> @@ -348,6 +364,8 @@ void aes_decrypt(const struct crypto_aes_ctx *ctx, u8 *out, const u8 *in)
->         put_unaligned_le32(inv_subshift(st1, 1) ^ rkp[5], out + 4);
->         put_unaligned_le32(inv_subshift(st1, 2) ^ rkp[6], out + 8);
->         put_unaligned_le32(inv_subshift(st1, 3) ^ rkp[7], out + 12);
-> +
-> +       local_irq_restore(flags);
->  }
->  EXPORT_SYMBOL(aes_decrypt);
->
-> --
-> 2.26.2
->
+-- 
+Matthieu Baerts | R&D Engineer
+matthieu.baerts@tessares.net
+Tessares SA | Hybrid Access Solutions
+www.tessares.net
+1 Avenue Jean Monnet, 1348 Louvain-la-Neuve, Belgium
