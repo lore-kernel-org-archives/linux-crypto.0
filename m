@@ -4,49 +4,49 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F21B1C3A5A9
-	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 18:28:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFD8BC47254
+	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 18:28:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BE4392080C
-	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 18:28:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C0062084D
+	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 18:28:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1588444095;
-	bh=FtjmAlBkPtJdiMHAY6s14xRKTrL6TZzRiq8QruBwhtU=;
+	s=default; t=1588444102;
+	bh=RK8WSLvwLE/+KQXv3uzmAZJ21l9CkoopTGz625NL01I=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=LZtNUqzrYnXfUqikv47LevwuF95xG/0SMbLqDNKRDsTZLONXcK4GB8g3o//q+PHeG
-	 PcbGEZJCtF3+Dd8sfwtfdcaT1wG8/6Y+w170ObFVHb4+uzhNs2lSMcXoe5N1gjhhe5
-	 TOyuzR+o+O2Gcrko6taZSUw01qTHFBn/uz64FW+s=
+	b=cFf/QoDAR0yzFn+/QhzhxZgQHhvyybNUt7+tpww7vZnGfrt74/PPuBVyLJrRn54sk
+	 bSmNceIXbhw2H8kNTFRzf1ISAfkAd1YzHIfLsYJL52l90IuswGbATFapNZLL+SETMb
+	 KAhYb7rkjAIxLydvjm+pwOJoPWz2InKd+ppm2bCs=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728485AbgEBS2P (ORCPT
+        id S1728483AbgEBS2O (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 2 May 2020 14:28:15 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54626 "EHLO mail.kernel.org"
+        Sat, 2 May 2020 14:28:14 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54680 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1728461AbgEBS2J (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1728454AbgEBS2J (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Sat, 2 May 2020 14:28:09 -0400
 Received: from sol.hsd1.ca.comcast.net (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 753092098B;
+        by mail.kernel.org (Postfix) with ESMTPSA id 24F4F2078E;
         Sat,  2 May 2020 18:28:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=default; t=1588444089;
-        bh=FtjmAlBkPtJdiMHAY6s14xRKTrL6TZzRiq8QruBwhtU=;
+        bh=RK8WSLvwLE/+KQXv3uzmAZJ21l9CkoopTGz625NL01I=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=C/6drDTuFZeNjlr9pb1860QT0Zoz29b0jQpCtPEJwHAVwTcK8SpD1iVUF02GqRNUw
-         tzs8ZeTyZ3wr3GBy5msKRI6D5Em7aZgbvgzMvq7kjJD5bxOkh4jf4M+cvu9ujbDhig
-         M5S5RerKV8/6JLiSsk3e57+gAMPyiAabpdRQEsq4=
+        b=qlLEXs2ze59RmCShsIDrcsLA18LHPKKDT9wIPx8qLa8/OAI9erh5ztSmoToapDeSH
+         6STNYcBV29ppsBeOD6EgKO79U2QABo6qzDYKIBsktmFyBNK8vj2c1hX3DGJYr1uRzg
+         sZrJ77Q5s+C5JNvyvvzaF8OLLPhTIMtrEHQYYOLg=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
 Cc:     linux-kernel@vger.kernel.org,
         "Jason A . Donenfeld" <Jason@zx2c4.com>,
         Theodore Ts'o <tytso@mit.edu>
-Subject: [PATCH 6/7] crypto: lib/sha1 - remove unnecessary includes of linux/cryptohash.h
-Date:   Sat,  2 May 2020 11:24:26 -0700
-Message-Id: <20200502182427.104383-7-ebiggers@kernel.org>
+Subject: [PATCH 5/7] crypto: lib/sha1 - rename "sha" to "sha1"
+Date:   Sat,  2 May 2020 11:24:25 -0700
+Message-Id: <20200502182427.104383-6-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200502182427.104383-1-ebiggers@kernel.org>
 References: <20200502182427.104383-1-ebiggers@kernel.org>
@@ -59,397 +59,281 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-<linux/cryptohash.h> sounds very generic and important, like it's the
-header to include if you're doing cryptographic hashing in the kernel.
-But actually it only includes the library implementation of the SHA-1
-compression function (not even the full SHA-1).  This should basically
-never be used anymore; SHA-1 is no longer considered secure, and there
-are much better ways to do cryptographic hashing in the kernel.
+The library implementation of the SHA-1 compression function is
+confusingly called just "sha_transform()".  Alongside it are some "SHA_"
+constants and "sha_init()".  Presumably these are left over from a time
+when SHA just meant SHA-1.  But now there are also SHA-2 and SHA-3, and
+moreover SHA-1 is now considered insecure and thus shouldn't be used.
 
-Most files that include this header don't actually need it.  So in
-preparation for removing it, remove all these unneeded includes of it.
+Therefore, rename these functions and constants to make it very clear
+that they are for SHA-1.  Also add a comment to make it clear that these
+shouldn't be used.
+
+For the extra-misleadingly named "SHA_MESSAGE_BYTES", rename it to
+SHA1_BLOCK_SIZE and define it to just '64' rather than '(512/8)' so that
+it matches the same definition in <crypto/sha.h>.  This prepares for
+merging <linux/cryptohash.h> into <crypto/sha.h>.
 
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- arch/arm/crypto/sha1_glue.c                 | 1 -
- arch/arm/crypto/sha1_neon_glue.c            | 1 -
- arch/arm/crypto/sha256_glue.c               | 1 -
- arch/arm/crypto/sha256_neon_glue.c          | 1 -
- arch/arm/kernel/armksyms.c                  | 1 -
- arch/arm64/crypto/sha256-glue.c             | 1 -
- arch/arm64/crypto/sha512-glue.c             | 1 -
- arch/microblaze/kernel/microblaze_ksyms.c   | 1 -
- arch/mips/cavium-octeon/crypto/octeon-md5.c | 1 -
- arch/powerpc/crypto/md5-glue.c              | 1 -
- arch/powerpc/crypto/sha1-spe-glue.c         | 1 -
- arch/powerpc/crypto/sha256-spe-glue.c       | 1 -
- arch/sparc/crypto/md5_glue.c                | 1 -
- arch/sparc/crypto/sha1_glue.c               | 1 -
- arch/sparc/crypto/sha256_glue.c             | 1 -
- arch/sparc/crypto/sha512_glue.c             | 1 -
- arch/unicore32/kernel/ksyms.c               | 1 -
- arch/x86/crypto/sha1_ssse3_glue.c           | 1 -
- arch/x86/crypto/sha256_ssse3_glue.c         | 1 -
- arch/x86/crypto/sha512_ssse3_glue.c         | 1 -
- drivers/crypto/atmel-sha.c                  | 1 -
- drivers/crypto/chelsio/chcr_algo.c          | 1 -
- drivers/crypto/chelsio/chcr_ipsec.c         | 1 -
- drivers/crypto/omap-sham.c                  | 1 -
- fs/f2fs/hash.c                              | 1 -
- include/net/tcp.h                           | 1 -
- lib/crypto/chacha.c                         | 1 -
- net/core/secure_seq.c                       | 1 -
- net/ipv6/seg6_hmac.c                        | 1 -
- 29 files changed, 29 deletions(-)
+ Documentation/security/siphash.rst |  2 +-
+ crypto/sha1_generic.c              |  4 ++--
+ drivers/char/random.c              |  6 +++---
+ include/linux/cryptohash.h         | 16 ++++++++++------
+ include/linux/filter.h             |  2 +-
+ kernel/bpf/core.c                  | 18 +++++++++---------
+ lib/sha1.c                         | 22 ++++++++++++----------
+ net/ipv6/addrconf.c                | 10 +++++-----
+ 8 files changed, 43 insertions(+), 37 deletions(-)
 
-diff --git a/arch/arm/crypto/sha1_glue.c b/arch/arm/crypto/sha1_glue.c
-index c80b0ebfd02ff6..4e954b3f7ecd5d 100644
---- a/arch/arm/crypto/sha1_glue.c
-+++ b/arch/arm/crypto/sha1_glue.c
-@@ -14,7 +14,6 @@
- #include <crypto/internal/hash.h>
- #include <linux/init.h>
- #include <linux/module.h>
--#include <linux/cryptohash.h>
- #include <linux/types.h>
- #include <crypto/sha.h>
- #include <crypto/sha1_base.h>
-diff --git a/arch/arm/crypto/sha1_neon_glue.c b/arch/arm/crypto/sha1_neon_glue.c
-index 2c3627334335df..0071e5e4411a24 100644
---- a/arch/arm/crypto/sha1_neon_glue.c
-+++ b/arch/arm/crypto/sha1_neon_glue.c
-@@ -18,7 +18,6 @@
- #include <linux/init.h>
- #include <linux/module.h>
- #include <linux/mm.h>
--#include <linux/cryptohash.h>
- #include <linux/types.h>
- #include <crypto/sha.h>
- #include <crypto/sha1_base.h>
-diff --git a/arch/arm/crypto/sha256_glue.c b/arch/arm/crypto/sha256_glue.c
-index 215497f011f239..b8a4f79020cf8a 100644
---- a/arch/arm/crypto/sha256_glue.c
-+++ b/arch/arm/crypto/sha256_glue.c
-@@ -15,7 +15,6 @@
- #include <linux/init.h>
- #include <linux/module.h>
- #include <linux/mm.h>
--#include <linux/cryptohash.h>
- #include <linux/types.h>
- #include <linux/string.h>
- #include <crypto/sha.h>
-diff --git a/arch/arm/crypto/sha256_neon_glue.c b/arch/arm/crypto/sha256_neon_glue.c
-index 38645e415196e6..79820b9e2541de 100644
---- a/arch/arm/crypto/sha256_neon_glue.c
-+++ b/arch/arm/crypto/sha256_neon_glue.c
-@@ -11,7 +11,6 @@
+diff --git a/Documentation/security/siphash.rst b/Documentation/security/siphash.rst
+index 4eba68cdf0a120..bd9363025fcbc1 100644
+--- a/Documentation/security/siphash.rst
++++ b/Documentation/security/siphash.rst
+@@ -7,7 +7,7 @@ SipHash - a short input PRF
+ SipHash is a cryptographically secure PRF -- a keyed hash function -- that
+ performs very well for short inputs, hence the name. It was designed by
+ cryptographers Daniel J. Bernstein and Jean-Philippe Aumasson. It is intended
+-as a replacement for some uses of: `jhash`, `md5_transform`, `sha_transform`,
++as a replacement for some uses of: `jhash`, `md5_transform`, `sha1_transform`,
+ and so forth.
  
- #include <crypto/internal/hash.h>
- #include <crypto/internal/simd.h>
--#include <linux/cryptohash.h>
- #include <linux/types.h>
- #include <linux/string.h>
- #include <crypto/sha.h>
-diff --git a/arch/arm/kernel/armksyms.c b/arch/arm/kernel/armksyms.c
-index 98bdea51089d59..82e96ac836849c 100644
---- a/arch/arm/kernel/armksyms.c
-+++ b/arch/arm/kernel/armksyms.c
-@@ -7,7 +7,6 @@
- #include <linux/export.h>
- #include <linux/sched.h>
- #include <linux/string.h>
--#include <linux/cryptohash.h>
- #include <linux/delay.h>
- #include <linux/in6.h>
- #include <linux/syscalls.h>
-diff --git a/arch/arm64/crypto/sha256-glue.c b/arch/arm64/crypto/sha256-glue.c
-index ddf4a0d85c1c20..77bc6e72abae94 100644
---- a/arch/arm64/crypto/sha256-glue.c
-+++ b/arch/arm64/crypto/sha256-glue.c
-@@ -12,7 +12,6 @@
- #include <crypto/internal/simd.h>
- #include <crypto/sha.h>
- #include <crypto/sha256_base.h>
--#include <linux/cryptohash.h>
- #include <linux/types.h>
- #include <linux/string.h>
+ SipHash takes a secret key filled with randomly generated numbers and either
+diff --git a/crypto/sha1_generic.c b/crypto/sha1_generic.c
+index 7c57b844c38275..a16d9787dcd2c1 100644
+--- a/crypto/sha1_generic.c
++++ b/crypto/sha1_generic.c
+@@ -31,10 +31,10 @@ EXPORT_SYMBOL_GPL(sha1_zero_message_hash);
+ static void sha1_generic_block_fn(struct sha1_state *sst, u8 const *src,
+ 				  int blocks)
+ {
+-	u32 temp[SHA_WORKSPACE_WORDS];
++	u32 temp[SHA1_WORKSPACE_WORDS];
  
-diff --git a/arch/arm64/crypto/sha512-glue.c b/arch/arm64/crypto/sha512-glue.c
-index 78d3083de6b733..370ccb29602fda 100644
---- a/arch/arm64/crypto/sha512-glue.c
-+++ b/arch/arm64/crypto/sha512-glue.c
-@@ -6,7 +6,6 @@
+ 	while (blocks--) {
+-		sha_transform(sst->state, src, temp);
++		sha1_transform(sst->state, src, temp);
+ 		src += SHA1_BLOCK_SIZE;
+ 	}
+ 	memzero_explicit(temp, sizeof(temp));
+diff --git a/drivers/char/random.c b/drivers/char/random.c
+index 0d10e31fd342f5..a19a8984741b60 100644
+--- a/drivers/char/random.c
++++ b/drivers/char/random.c
+@@ -1397,14 +1397,14 @@ static void extract_buf(struct entropy_store *r, __u8 *out)
+ 		__u32 w[5];
+ 		unsigned long l[LONGS(20)];
+ 	} hash;
+-	__u32 workspace[SHA_WORKSPACE_WORDS];
++	__u32 workspace[SHA1_WORKSPACE_WORDS];
+ 	unsigned long flags;
+ 
+ 	/*
+ 	 * If we have an architectural hardware random number
+ 	 * generator, use it for SHA's initial vector
+ 	 */
+-	sha_init(hash.w);
++	sha1_init(hash.w);
+ 	for (i = 0; i < LONGS(20); i++) {
+ 		unsigned long v;
+ 		if (!arch_get_random_long(&v))
+@@ -1415,7 +1415,7 @@ static void extract_buf(struct entropy_store *r, __u8 *out)
+ 	/* Generate a hash across the pool, 16 words (512 bits) at a time */
+ 	spin_lock_irqsave(&r->lock, flags);
+ 	for (i = 0; i < r->poolinfo->poolwords; i += 16)
+-		sha_transform(hash.w, (__u8 *)(r->pool + i), workspace);
++		sha1_transform(hash.w, (__u8 *)(r->pool + i), workspace);
+ 
+ 	/*
+ 	 * We mix the hash back into the pool to prevent backtracking
+diff --git a/include/linux/cryptohash.h b/include/linux/cryptohash.h
+index f6ba4c3e60d793..c324ffca96e0d5 100644
+--- a/include/linux/cryptohash.h
++++ b/include/linux/cryptohash.h
+@@ -4,11 +4,15 @@
+ 
+ #include <uapi/linux/types.h>
+ 
+-#define SHA_DIGEST_WORDS 5
+-#define SHA_MESSAGE_BYTES (512 /*bits*/ / 8)
+-#define SHA_WORKSPACE_WORDS 16
+-
+-void sha_init(__u32 *buf);
+-void sha_transform(__u32 *digest, const char *data, __u32 *W);
++/*
++ * An implementation of SHA-1's compression function.  Don't use in new code!
++ * You shouldn't be using SHA-1, and even if you *have* to use SHA-1, this isn't
++ * the correct way to hash something with SHA-1 (use crypto_shash instead).
++ */
++#define SHA1_DIGEST_WORDS 5
++#define SHA1_BLOCK_SIZE 64
++#define SHA1_WORKSPACE_WORDS 16
++void sha1_init(__u32 *buf);
++void sha1_transform(__u32 *digest, const char *data, __u32 *W);
+ 
+ #endif
+diff --git a/include/linux/filter.h b/include/linux/filter.h
+index 9b5aa5c483ccb5..f42662adffe47f 100644
+--- a/include/linux/filter.h
++++ b/include/linux/filter.h
+@@ -746,7 +746,7 @@ static inline u32 bpf_prog_insn_size(const struct bpf_prog *prog)
+ static inline u32 bpf_prog_tag_scratch_size(const struct bpf_prog *prog)
+ {
+ 	return round_up(bpf_prog_insn_size(prog) +
+-			sizeof(__be64) + 1, SHA_MESSAGE_BYTES);
++			sizeof(__be64) + 1, SHA1_BLOCK_SIZE);
+ }
+ 
+ static inline unsigned int bpf_prog_size(unsigned int proglen)
+diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
+index 916f5132a9848d..14aa1f74dd10dc 100644
+--- a/kernel/bpf/core.c
++++ b/kernel/bpf/core.c
+@@ -262,10 +262,10 @@ void __bpf_prog_free(struct bpf_prog *fp)
+ 
+ int bpf_prog_calc_tag(struct bpf_prog *fp)
+ {
+-	const u32 bits_offset = SHA_MESSAGE_BYTES - sizeof(__be64);
++	const u32 bits_offset = SHA1_BLOCK_SIZE - sizeof(__be64);
+ 	u32 raw_size = bpf_prog_tag_scratch_size(fp);
+-	u32 digest[SHA_DIGEST_WORDS];
+-	u32 ws[SHA_WORKSPACE_WORDS];
++	u32 digest[SHA1_DIGEST_WORDS];
++	u32 ws[SHA1_WORKSPACE_WORDS];
+ 	u32 i, bsize, psize, blocks;
+ 	struct bpf_insn *dst;
+ 	bool was_ld_map;
+@@ -277,7 +277,7 @@ int bpf_prog_calc_tag(struct bpf_prog *fp)
+ 	if (!raw)
+ 		return -ENOMEM;
+ 
+-	sha_init(digest);
++	sha1_init(digest);
+ 	memset(ws, 0, sizeof(ws));
+ 
+ 	/* We need to take out the map fd for the digest calculation
+@@ -308,8 +308,8 @@ int bpf_prog_calc_tag(struct bpf_prog *fp)
+ 	memset(&raw[psize], 0, raw_size - psize);
+ 	raw[psize++] = 0x80;
+ 
+-	bsize  = round_up(psize, SHA_MESSAGE_BYTES);
+-	blocks = bsize / SHA_MESSAGE_BYTES;
++	bsize  = round_up(psize, SHA1_BLOCK_SIZE);
++	blocks = bsize / SHA1_BLOCK_SIZE;
+ 	todo   = raw;
+ 	if (bsize - psize >= sizeof(__be64)) {
+ 		bits = (__be64 *)(todo + bsize - sizeof(__be64));
+@@ -320,12 +320,12 @@ int bpf_prog_calc_tag(struct bpf_prog *fp)
+ 	*bits = cpu_to_be64((psize - 1) << 3);
+ 
+ 	while (blocks--) {
+-		sha_transform(digest, todo, ws);
+-		todo += SHA_MESSAGE_BYTES;
++		sha1_transform(digest, todo, ws);
++		todo += SHA1_BLOCK_SIZE;
+ 	}
+ 
+ 	result = (__force __be32 *)digest;
+-	for (i = 0; i < SHA_DIGEST_WORDS; i++)
++	for (i = 0; i < SHA1_DIGEST_WORDS; i++)
+ 		result[i] = cpu_to_be32(digest[i]);
+ 	memcpy(fp->tag, result, sizeof(fp->tag));
+ 
+diff --git a/lib/sha1.c b/lib/sha1.c
+index 1d96d2c02b8269..b381e8cd4fe447 100644
+--- a/lib/sha1.c
++++ b/lib/sha1.c
+@@ -64,22 +64,24 @@
+ #define T_60_79(t, A, B, C, D, E) SHA_ROUND(t, SHA_MIX, (B^C^D) ,  0xca62c1d6, A, B, C, D, E )
+ 
+ /**
+- * sha_transform - single block SHA1 transform
++ * sha1_transform - single block SHA1 transform (deprecated)
+  *
+  * @digest: 160 bit digest to update
+  * @data:   512 bits of data to hash
+  * @array:  16 words of workspace (see note)
+  *
+- * This function generates a SHA1 digest for a single 512-bit block.
+- * Be warned, it does not handle padding and message digest, do not
+- * confuse it with the full FIPS 180-1 digest algorithm for variable
+- * length messages.
++ * This function executes SHA-1's internal compression function.  It updates the
++ * 160-bit internal state (@digest) with a single 512-bit data block (@data).
++ *
++ * Don't use this function.  SHA-1 is no longer considered secure.  And even if
++ * you do have to use SHA-1, this isn't the correct way to hash something with
++ * SHA-1 as this doesn't handle padding and finalization.
+  *
+  * Note: If the hash is security sensitive, the caller should be sure
+  * to clear the workspace. This is left to the caller to avoid
+  * unnecessary clears between chained hashing operations.
   */
+-void sha_transform(__u32 *digest, const char *data, __u32 *array)
++void sha1_transform(__u32 *digest, const char *data, __u32 *array)
+ {
+ 	__u32 A, B, C, D, E;
  
- #include <crypto/internal/hash.h>
--#include <linux/cryptohash.h>
- #include <linux/types.h>
- #include <linux/string.h>
- #include <crypto/sha.h>
-diff --git a/arch/microblaze/kernel/microblaze_ksyms.c b/arch/microblaze/kernel/microblaze_ksyms.c
-index 92e12c2c2ec1f7..51c43ee5e380bb 100644
---- a/arch/microblaze/kernel/microblaze_ksyms.c
-+++ b/arch/microblaze/kernel/microblaze_ksyms.c
-@@ -6,7 +6,6 @@
+@@ -185,13 +187,13 @@ void sha_transform(__u32 *digest, const char *data, __u32 *array)
+ 	digest[3] += D;
+ 	digest[4] += E;
+ }
+-EXPORT_SYMBOL(sha_transform);
++EXPORT_SYMBOL(sha1_transform);
  
- #include <linux/export.h>
- #include <linux/string.h>
--#include <linux/cryptohash.h>
- #include <linux/delay.h>
- #include <linux/in6.h>
- #include <linux/syscalls.h>
-diff --git a/arch/mips/cavium-octeon/crypto/octeon-md5.c b/arch/mips/cavium-octeon/crypto/octeon-md5.c
-index d1ed066e1a1779..8c8ea139653ed3 100644
---- a/arch/mips/cavium-octeon/crypto/octeon-md5.c
-+++ b/arch/mips/cavium-octeon/crypto/octeon-md5.c
-@@ -25,7 +25,6 @@
- #include <linux/module.h>
- #include <linux/string.h>
- #include <asm/byteorder.h>
--#include <linux/cryptohash.h>
- #include <asm/octeon/octeon.h>
- #include <crypto/internal/hash.h>
+ /**
+- * sha_init - initialize the vectors for a SHA1 digest
++ * sha1_init - initialize the vectors for a SHA1 digest
+  * @buf: vector to initialize
+  */
+-void sha_init(__u32 *buf)
++void sha1_init(__u32 *buf)
+ {
+ 	buf[0] = 0x67452301;
+ 	buf[1] = 0xefcdab89;
+@@ -199,4 +201,4 @@ void sha_init(__u32 *buf)
+ 	buf[3] = 0x10325476;
+ 	buf[4] = 0xc3d2e1f0;
+ }
+-EXPORT_SYMBOL(sha_init);
++EXPORT_SYMBOL(sha1_init);
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index 24e319dfb5103d..f131cedf5ba677 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -3222,11 +3222,11 @@ static int ipv6_generate_stable_address(struct in6_addr *address,
+ 					const struct inet6_dev *idev)
+ {
+ 	static DEFINE_SPINLOCK(lock);
+-	static __u32 digest[SHA_DIGEST_WORDS];
+-	static __u32 workspace[SHA_WORKSPACE_WORDS];
++	static __u32 digest[SHA1_DIGEST_WORDS];
++	static __u32 workspace[SHA1_WORKSPACE_WORDS];
  
-diff --git a/arch/powerpc/crypto/md5-glue.c b/arch/powerpc/crypto/md5-glue.c
-index 7d1bf2fcf66896..c24f605033bdb3 100644
---- a/arch/powerpc/crypto/md5-glue.c
-+++ b/arch/powerpc/crypto/md5-glue.c
-@@ -11,7 +11,6 @@
- #include <linux/init.h>
- #include <linux/module.h>
- #include <linux/mm.h>
--#include <linux/cryptohash.h>
- #include <linux/types.h>
- #include <crypto/md5.h>
- #include <asm/byteorder.h>
-diff --git a/arch/powerpc/crypto/sha1-spe-glue.c b/arch/powerpc/crypto/sha1-spe-glue.c
-index 6379990bd6044e..cb57be4ada61cd 100644
---- a/arch/powerpc/crypto/sha1-spe-glue.c
-+++ b/arch/powerpc/crypto/sha1-spe-glue.c
-@@ -11,7 +11,6 @@
- #include <linux/init.h>
- #include <linux/module.h>
- #include <linux/mm.h>
--#include <linux/cryptohash.h>
- #include <linux/types.h>
- #include <crypto/sha.h>
- #include <asm/byteorder.h>
-diff --git a/arch/powerpc/crypto/sha256-spe-glue.c b/arch/powerpc/crypto/sha256-spe-glue.c
-index 84939e563b817e..ceb0b6c980b3bb 100644
---- a/arch/powerpc/crypto/sha256-spe-glue.c
-+++ b/arch/powerpc/crypto/sha256-spe-glue.c
-@@ -12,7 +12,6 @@
- #include <linux/init.h>
- #include <linux/module.h>
- #include <linux/mm.h>
--#include <linux/cryptohash.h>
- #include <linux/types.h>
- #include <crypto/sha.h>
- #include <asm/byteorder.h>
-diff --git a/arch/sparc/crypto/md5_glue.c b/arch/sparc/crypto/md5_glue.c
-index 14f6c15be6aecd..111283fe837e8d 100644
---- a/arch/sparc/crypto/md5_glue.c
-+++ b/arch/sparc/crypto/md5_glue.c
-@@ -18,7 +18,6 @@
- #include <linux/init.h>
- #include <linux/module.h>
- #include <linux/mm.h>
--#include <linux/cryptohash.h>
- #include <linux/types.h>
- #include <crypto/md5.h>
+ 	static union {
+-		char __data[SHA_MESSAGE_BYTES];
++		char __data[SHA1_BLOCK_SIZE];
+ 		struct {
+ 			struct in6_addr secret;
+ 			__be32 prefix[2];
+@@ -3251,7 +3251,7 @@ static int ipv6_generate_stable_address(struct in6_addr *address,
+ retry:
+ 	spin_lock_bh(&lock);
  
-diff --git a/arch/sparc/crypto/sha1_glue.c b/arch/sparc/crypto/sha1_glue.c
-index 7c16663044417c..dc017782be523d 100644
---- a/arch/sparc/crypto/sha1_glue.c
-+++ b/arch/sparc/crypto/sha1_glue.c
-@@ -15,7 +15,6 @@
- #include <linux/init.h>
- #include <linux/module.h>
- #include <linux/mm.h>
--#include <linux/cryptohash.h>
- #include <linux/types.h>
- #include <crypto/sha.h>
+-	sha_init(digest);
++	sha1_init(digest);
+ 	memset(&data, 0, sizeof(data));
+ 	memset(workspace, 0, sizeof(workspace));
+ 	memcpy(data.hwaddr, idev->dev->perm_addr, idev->dev->addr_len);
+@@ -3260,7 +3260,7 @@ static int ipv6_generate_stable_address(struct in6_addr *address,
+ 	data.secret = secret;
+ 	data.dad_count = dad_count;
  
-diff --git a/arch/sparc/crypto/sha256_glue.c b/arch/sparc/crypto/sha256_glue.c
-index f403ce9ba6e4f3..286bc8ecf15b6f 100644
---- a/arch/sparc/crypto/sha256_glue.c
-+++ b/arch/sparc/crypto/sha256_glue.c
-@@ -15,7 +15,6 @@
- #include <linux/init.h>
- #include <linux/module.h>
- #include <linux/mm.h>
--#include <linux/cryptohash.h>
- #include <linux/types.h>
- #include <crypto/sha.h>
+-	sha_transform(digest, data.__data, workspace);
++	sha1_transform(digest, data.__data, workspace);
  
-diff --git a/arch/sparc/crypto/sha512_glue.c b/arch/sparc/crypto/sha512_glue.c
-index a3b532e43c074e..3b2ca732ff7a5a 100644
---- a/arch/sparc/crypto/sha512_glue.c
-+++ b/arch/sparc/crypto/sha512_glue.c
-@@ -14,7 +14,6 @@
- #include <linux/init.h>
- #include <linux/module.h>
- #include <linux/mm.h>
--#include <linux/cryptohash.h>
- #include <linux/types.h>
- #include <crypto/sha.h>
- 
-diff --git a/arch/unicore32/kernel/ksyms.c b/arch/unicore32/kernel/ksyms.c
-index f4b84872d64034..7314450089320a 100644
---- a/arch/unicore32/kernel/ksyms.c
-+++ b/arch/unicore32/kernel/ksyms.c
-@@ -9,7 +9,6 @@
- #include <linux/module.h>
- #include <linux/sched.h>
- #include <linux/string.h>
--#include <linux/cryptohash.h>
- #include <linux/delay.h>
- #include <linux/in6.h>
- #include <linux/syscalls.h>
-diff --git a/arch/x86/crypto/sha1_ssse3_glue.c b/arch/x86/crypto/sha1_ssse3_glue.c
-index a801ffc10cbbf7..18200135603fc9 100644
---- a/arch/x86/crypto/sha1_ssse3_glue.c
-+++ b/arch/x86/crypto/sha1_ssse3_glue.c
-@@ -21,7 +21,6 @@
- #include <linux/init.h>
- #include <linux/module.h>
- #include <linux/mm.h>
--#include <linux/cryptohash.h>
- #include <linux/types.h>
- #include <crypto/sha.h>
- #include <crypto/sha1_base.h>
-diff --git a/arch/x86/crypto/sha256_ssse3_glue.c b/arch/x86/crypto/sha256_ssse3_glue.c
-index 6394b5fe8db6da..dd06249229e169 100644
---- a/arch/x86/crypto/sha256_ssse3_glue.c
-+++ b/arch/x86/crypto/sha256_ssse3_glue.c
-@@ -34,7 +34,6 @@
- #include <linux/init.h>
- #include <linux/module.h>
- #include <linux/mm.h>
--#include <linux/cryptohash.h>
- #include <linux/types.h>
- #include <crypto/sha.h>
- #include <crypto/sha256_base.h>
-diff --git a/arch/x86/crypto/sha512_ssse3_glue.c b/arch/x86/crypto/sha512_ssse3_glue.c
-index 82cc1b3ced1dbe..b0b05c93409e16 100644
---- a/arch/x86/crypto/sha512_ssse3_glue.c
-+++ b/arch/x86/crypto/sha512_ssse3_glue.c
-@@ -32,7 +32,6 @@
- #include <linux/init.h>
- #include <linux/module.h>
- #include <linux/mm.h>
--#include <linux/cryptohash.h>
- #include <linux/string.h>
- #include <linux/types.h>
- #include <crypto/sha.h>
-diff --git a/drivers/crypto/atmel-sha.c b/drivers/crypto/atmel-sha.c
-index e536e2a6bbd853..75ccf41a7cb97a 100644
---- a/drivers/crypto/atmel-sha.c
-+++ b/drivers/crypto/atmel-sha.c
-@@ -31,7 +31,6 @@
- #include <linux/of_device.h>
- #include <linux/delay.h>
- #include <linux/crypto.h>
--#include <linux/cryptohash.h>
- #include <crypto/scatterwalk.h>
- #include <crypto/algapi.h>
- #include <crypto/sha.h>
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index 5d3000fdd5f44c..caf1136e7ef98b 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -44,7 +44,6 @@
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/crypto.h>
--#include <linux/cryptohash.h>
- #include <linux/skbuff.h>
- #include <linux/rtnetlink.h>
- #include <linux/highmem.h>
-diff --git a/drivers/crypto/chelsio/chcr_ipsec.c b/drivers/crypto/chelsio/chcr_ipsec.c
-index 9fd3b9d1ec2f5d..25bf6d963066d1 100644
---- a/drivers/crypto/chelsio/chcr_ipsec.c
-+++ b/drivers/crypto/chelsio/chcr_ipsec.c
-@@ -40,7 +40,6 @@
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/crypto.h>
--#include <linux/cryptohash.h>
- #include <linux/skbuff.h>
- #include <linux/rtnetlink.h>
- #include <linux/highmem.h>
-diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index e4072cd385857c..bab6d1afd85b90 100644
---- a/drivers/crypto/omap-sham.c
-+++ b/drivers/crypto/omap-sham.c
-@@ -33,7 +33,6 @@
- #include <linux/of_irq.h>
- #include <linux/delay.h>
- #include <linux/crypto.h>
--#include <linux/cryptohash.h>
- #include <crypto/scatterwalk.h>
- #include <crypto/algapi.h>
- #include <crypto/sha.h>
-diff --git a/fs/f2fs/hash.c b/fs/f2fs/hash.c
-index 5bc4dcd8fc03fb..8c4ea5003ef8cb 100644
---- a/fs/f2fs/hash.c
-+++ b/fs/f2fs/hash.c
-@@ -12,7 +12,6 @@
- #include <linux/types.h>
- #include <linux/fs.h>
- #include <linux/f2fs_fs.h>
--#include <linux/cryptohash.h>
- #include <linux/pagemap.h>
- #include <linux/unicode.h>
- 
-diff --git a/include/net/tcp.h b/include/net/tcp.h
-index 5fa9eacd965a4a..5948c8e4c9e133 100644
---- a/include/net/tcp.h
-+++ b/include/net/tcp.h
-@@ -23,7 +23,6 @@
- #include <linux/cache.h>
- #include <linux/percpu.h>
- #include <linux/skbuff.h>
--#include <linux/cryptohash.h>
- #include <linux/kref.h>
- #include <linux/ktime.h>
- 
-diff --git a/lib/crypto/chacha.c b/lib/crypto/chacha.c
-index 65ead6b0c7e000..4ccbec442469c3 100644
---- a/lib/crypto/chacha.c
-+++ b/lib/crypto/chacha.c
-@@ -10,7 +10,6 @@
- #include <linux/export.h>
- #include <linux/bitops.h>
- #include <linux/string.h>
--#include <linux/cryptohash.h>
- #include <asm/unaligned.h>
- #include <crypto/chacha.h>
- 
-diff --git a/net/core/secure_seq.c b/net/core/secure_seq.c
-index 7b6b1d2c3d1091..b5bc680d475536 100644
---- a/net/core/secure_seq.c
-+++ b/net/core/secure_seq.c
-@@ -5,7 +5,6 @@
- 
- #include <linux/kernel.h>
- #include <linux/init.h>
--#include <linux/cryptohash.h>
- #include <linux/module.h>
- #include <linux/cache.h>
- #include <linux/random.h>
-diff --git a/net/ipv6/seg6_hmac.c b/net/ipv6/seg6_hmac.c
-index ffcfcd2b128f3a..85dddfe3a2c6ed 100644
---- a/net/ipv6/seg6_hmac.c
-+++ b/net/ipv6/seg6_hmac.c
-@@ -34,7 +34,6 @@
- #include <net/addrconf.h>
- #include <net/xfrm.h>
- 
--#include <linux/cryptohash.h>
- #include <crypto/hash.h>
- #include <crypto/sha.h>
- #include <net/seg6.h>
+ 	temp = *address;
+ 	temp.s6_addr32[2] = (__force __be32)digest[0];
 -- 
 2.26.2
 
