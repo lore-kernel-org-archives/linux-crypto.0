@@ -4,47 +4,47 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04B63C3A5A9
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29836C47247
 	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 05:33:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D8AC5208DB
-	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 05:33:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 02C8D21974
+	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 05:33:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1588397630;
-	bh=aRnhsnypAWsWXKVWbib/6Chk6PgcC0D+Q1jEbEW+EEA=;
+	s=default; t=1588397631;
+	bh=m9tJRaC/xdkq2x9xEKERQDzme5WlAEgGO8kez0ERpKg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=b2c3VTJlijeJq9rHS9pssAcosoClZ3dRjrEopZ7iIpsx2BOmybeHPmrspWkencH6+
-	 ON5FrDgz0SMEujHbed8nVe0DdNJFYEpl5JtjtS+zLcHFA4KNsXLYwnOB94szp/48/9
-	 RreEJJ+AfvhqFgVbD+MsciEq6rIu+e5SBLF445hk=
+	b=Lr/jEQxx4kRP5n10qxGbDgYowYN+k03lagURL8UymHd1OM2C6GmWadvFCIrKekKxv
+	 yjgaDGdqGbI2KqE152atkqfLGzWwIB8YTcYjMVcU111v++K9Gow5PC6PPoQpjbAqmF
+	 7zIp13y78lTcJ9kolVePAMTpX2p7kPzwlsDHNTC4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727832AbgEBFdu (ORCPT
+        id S1727835AbgEBFdt (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 2 May 2020 01:33:50 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39294 "EHLO mail.kernel.org"
+        Sat, 2 May 2020 01:33:49 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39220 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727828AbgEBFdq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1727832AbgEBFdq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Sat, 2 May 2020 01:33:46 -0400
 Received: from sol.hsd1.ca.comcast.net (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id A0C6924956;
-        Sat,  2 May 2020 05:33:45 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2451C2495B;
+        Sat,  2 May 2020 05:33:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1588397625;
-        bh=aRnhsnypAWsWXKVWbib/6Chk6PgcC0D+Q1jEbEW+EEA=;
+        s=default; t=1588397626;
+        bh=m9tJRaC/xdkq2x9xEKERQDzme5WlAEgGO8kez0ERpKg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=PTGKbB6CEORZGYYUIt9JxkJSWjc4AMdJy/Ebcqg1ZEvcjNV7zjU8yAoCxLfvgP6p/
-         GpQs4ja/Otvda6MMGOV78JogJg2t6gr+50RB3vkM0+xAL3oIxIeqJdhj0Hb1ot5mo0
-         /x72PV9ExK8jtq2rF5WYPlnNqYV+DnwY/s5p22iA=
+        b=SElL3uHFWuIiPX2XYV1j5cAPwHYTomeoDZNdTWNxvO1T6CViwnDRIzlHoC8yYzrKo
+         9vTCU8q8hXm55jXssqRx3kGe3C557tQ6glI3+mdiHo7/f+SYT+yNj5rfM8n+knD9qE
+         F2U+IrJH3LqLvKMPwfctO6NrzAGdULBWAaXsY69s=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 17/20] Bluetooth: use crypto_shash_tfm_digest()
-Date:   Fri,  1 May 2020 22:31:19 -0700
-Message-Id: <20200502053122.995648-18-ebiggers@kernel.org>
+Cc:     keyrings@vger.kernel.org
+Subject: [PATCH 19/20] KEYS: encrypted: use crypto_shash_tfm_digest()
+Date:   Fri,  1 May 2020 22:31:21 -0700
+Message-Id: <20200502053122.995648-20-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200502053122.995648-1-ebiggers@kernel.org>
 References: <20200502053122.995648-1-ebiggers@kernel.org>
@@ -61,43 +61,55 @@ Instead of manually allocating a 'struct shash_desc' on the stack and
 calling crypto_shash_digest(), switch to using the new helper function
 crypto_shash_tfm_digest() which does this for us.
 
-Cc: linux-bluetooth@vger.kernel.org
+Cc: keyrings@vger.kernel.org
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- net/bluetooth/smp.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+ security/keys/encrypted-keys/encrypted.c | 18 +++---------------
+ 1 file changed, 3 insertions(+), 15 deletions(-)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 1476a91ce93572..d022f126eb026b 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -170,7 +170,6 @@ static int aes_cmac(struct crypto_shash *tfm, const u8 k[16], const u8 *m,
- 		    size_t len, u8 mac[16])
- {
- 	uint8_t tmp[16], mac_msb[16], msg_msb[CMAC_MSG_MAX];
+diff --git a/security/keys/encrypted-keys/encrypted.c b/security/keys/encrypted-keys/encrypted.c
+index f6797ba44bf716..14cf81d1a30b14 100644
+--- a/security/keys/encrypted-keys/encrypted.c
++++ b/security/keys/encrypted-keys/encrypted.c
+@@ -323,19 +323,6 @@ static struct key *request_user_key(const char *master_desc, const u8 **master_k
+ 	return ukey;
+ }
+ 
+-static int calc_hash(struct crypto_shash *tfm, u8 *digest,
+-		     const u8 *buf, unsigned int buflen)
+-{
 -	SHASH_DESC_ON_STACK(desc, tfm);
- 	int err;
- 
- 	if (len > CMAC_MSG_MAX)
-@@ -181,8 +180,6 @@ static int aes_cmac(struct crypto_shash *tfm, const u8 k[16], const u8 *m,
- 		return -EINVAL;
- 	}
- 
+-	int err;
+-
 -	desc->tfm = tfm;
 -
- 	/* Swap key and message from LSB to MSB */
- 	swap_buf(k, tmp, 16);
- 	swap_buf(m, msg_msb, len);
-@@ -196,8 +193,7 @@ static int aes_cmac(struct crypto_shash *tfm, const u8 k[16], const u8 *m,
- 		return err;
- 	}
- 
--	err = crypto_shash_digest(desc, msg_msb, len, mac_msb);
+-	err = crypto_shash_digest(desc, buf, buflen, digest);
 -	shash_desc_zero(desc);
-+	err = crypto_shash_tfm_digest(tfm, msg_msb, len, mac_msb);
- 	if (err) {
- 		BT_ERR("Hash computation error %d", err);
- 		return err;
+-	return err;
+-}
+-
+ static int calc_hmac(u8 *digest, const u8 *key, unsigned int keylen,
+ 		     const u8 *buf, unsigned int buflen)
+ {
+@@ -351,7 +338,7 @@ static int calc_hmac(u8 *digest, const u8 *key, unsigned int keylen,
+ 
+ 	err = crypto_shash_setkey(tfm, key, keylen);
+ 	if (!err)
+-		err = calc_hash(tfm, digest, buf, buflen);
++		err = crypto_shash_tfm_digest(tfm, buf, buflen, digest);
+ 	crypto_free_shash(tfm);
+ 	return err;
+ }
+@@ -381,7 +368,8 @@ static int get_derived_key(u8 *derived_key, enum derived_key_type key_type,
+ 
+ 	memcpy(derived_buf + strlen(derived_buf) + 1, master_key,
+ 	       master_keylen);
+-	ret = calc_hash(hash_tfm, derived_key, derived_buf, derived_buf_len);
++	ret = crypto_shash_tfm_digest(hash_tfm, derived_buf, derived_buf_len,
++				      derived_key);
+ 	kzfree(derived_buf);
+ 	return ret;
+ }
 -- 
 2.26.2
 
