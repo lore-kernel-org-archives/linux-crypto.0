@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79213C3A5A9
-	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 05:33:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27F82C4725A
+	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 05:33:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 57FF12071E
-	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 05:33:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 040B62071E
+	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 05:33:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1588397628;
-	bh=kOMqG1wtcM/8YN6jSEEZv709OU3+6XUMoquaqptfu2s=;
+	s=default; t=1588397629;
+	bh=jq54d1r7a1DdG4P2T20EFr5Sm0y5npMj6hm6FZVE7ZI=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=TuR04fIGyUMLBBnaGpUVi8DpeLe/dNWc5o0bvHAilJX5l/hXlJlO7jU4Cs4uOJMi6
-	 az3wz1MoVEJMeJhUnBJN9m//JuNAByTXhjA1hYz6Oc0J2+E0ULbiDyjBc7oq0gBdnV
-	 wX+GqjjC7td4VJjy/q3Fsx32SQpt8NIpRwwqmkxQ=
+	b=UiFdQPAiuxs3wMi+qw5nzlPleDJqC88HQXlC1c/8ek5w13qRTp3BTQz/TzdtWsAnT
+	 3TL5VFRtbKCLZiFE2hBlVsHrByMU2dzLebI0rjiY8rP9cK8OxD0WminchJCzTihkgE
+	 p/nkgeMoNZcVZPMgXgsonDf4cPFBhCKC8HtZZSvM=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727029AbgEBFdr (ORCPT
+        id S1727121AbgEBFdq (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 2 May 2020 01:33:47 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39222 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727818AbgEBFdq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Sat, 2 May 2020 01:33:46 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39282 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1727815AbgEBFdp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 2 May 2020 01:33:45 -0400
 Received: from sol.hsd1.ca.comcast.net (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 661EE2495D;
-        Sat,  2 May 2020 05:33:45 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id E349F2495C;
+        Sat,  2 May 2020 05:33:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
         s=default; t=1588397625;
-        bh=kOMqG1wtcM/8YN6jSEEZv709OU3+6XUMoquaqptfu2s=;
+        bh=jq54d1r7a1DdG4P2T20EFr5Sm0y5npMj6hm6FZVE7ZI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=WbitR2DwVVwOWkySkljOEG/ucIKi+bm30pIbzgqiXGrRmv5Agsz4+gDE2PyJ2XGP5
-         hhbxw/S3PrKwMsH7ZljNFyZT82r60jVBqSrxq65SozFZIpba/6j68Twg8Z78OFNI2l
-         rD0CuVnKuxRqanbc/T4P4ClIy6Q2O97jGc1g8cY4=
+        b=2q6VFgcDhqwTtPax6sj8y89VG0iWV50ASfANjIUKqdiQlWQslRXxpIP5hjar2RQR7
+         pjbYI270igk5GthJXu0s9yRVJ8n4/82LISYSr6/FUJdb2a95BsW9/MlbW+SwMRjtdZ
+         0snNb9uDEhbSbPbos+mhz855MmDWZk8xrn/ELw0Q=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Cc:     linux-mtd@lists.infradead.org
-Subject: [PATCH 16/20] ubifs: use crypto_shash_tfm_digest()
-Date:   Fri,  1 May 2020 22:31:18 -0700
-Message-Id: <20200502053122.995648-17-ebiggers@kernel.org>
+Cc:     ecryptfs@vger.kernel.org
+Subject: [PATCH 14/20] ecryptfs: use crypto_shash_tfm_digest()
+Date:   Fri,  1 May 2020 22:31:16 -0700
+Message-Id: <20200502053122.995648-15-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200502053122.995648-1-ebiggers@kernel.org>
 References: <20200502053122.995648-1-ebiggers@kernel.org>
@@ -61,112 +61,48 @@ Instead of manually allocating a 'struct shash_desc' on the stack and
 calling crypto_shash_digest(), switch to using the new helper function
 crypto_shash_tfm_digest() which does this for us.
 
-Cc: linux-mtd@lists.infradead.org
+Cc: ecryptfs@vger.kernel.org
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- fs/ubifs/auth.c   | 20 +++-----------------
- fs/ubifs/master.c |  9 +++------
- fs/ubifs/replay.c | 14 +++-----------
- 3 files changed, 9 insertions(+), 34 deletions(-)
+ fs/ecryptfs/crypto.c | 17 +----------------
+ 1 file changed, 1 insertion(+), 16 deletions(-)
 
-diff --git a/fs/ubifs/auth.c b/fs/ubifs/auth.c
-index 8cdbd53d780ca7..1e374baafc5255 100644
---- a/fs/ubifs/auth.c
-+++ b/fs/ubifs/auth.c
-@@ -31,15 +31,9 @@ int __ubifs_node_calc_hash(const struct ubifs_info *c, const void *node,
- 			    u8 *hash)
- {
- 	const struct ubifs_ch *ch = node;
--	SHASH_DESC_ON_STACK(shash, c->hash_tfm);
--	int err;
--
--	shash->tfm = c->hash_tfm;
- 
--	err = crypto_shash_digest(shash, node, le32_to_cpu(ch->len), hash);
--	if (err < 0)
--		return err;
--	return 0;
-+	return crypto_shash_tfm_digest(c->hash_tfm, node, le32_to_cpu(ch->len),
-+				       hash);
+diff --git a/fs/ecryptfs/crypto.c b/fs/ecryptfs/crypto.c
+index 2c449aed1b9209..0681540c48d985 100644
+--- a/fs/ecryptfs/crypto.c
++++ b/fs/ecryptfs/crypto.c
+@@ -48,18 +48,6 @@ void ecryptfs_from_hex(char *dst, char *src, int dst_size)
+ 	}
  }
  
- /**
-@@ -53,15 +47,7 @@ int __ubifs_node_calc_hash(const struct ubifs_info *c, const void *node,
- static int ubifs_hash_calc_hmac(const struct ubifs_info *c, const u8 *hash,
- 				 u8 *hmac)
- {
--	SHASH_DESC_ON_STACK(shash, c->hmac_tfm);
--	int err;
--
--	shash->tfm = c->hmac_tfm;
--
--	err = crypto_shash_digest(shash, hash, c->hash_len, hmac);
--	if (err < 0)
--		return err;
--	return 0;
-+	return crypto_shash_tfm_digest(c->hmac_tfm, hash, c->hash_len, hmac);
- }
- 
- /**
-diff --git a/fs/ubifs/master.c b/fs/ubifs/master.c
-index 52a85c01397ef9..911d0555b9f2b1 100644
---- a/fs/ubifs/master.c
-+++ b/fs/ubifs/master.c
-@@ -68,12 +68,9 @@ static int mst_node_check_hash(const struct ubifs_info *c,
- 	u8 calc[UBIFS_MAX_HASH_LEN];
- 	const void *node = mst;
- 
--	SHASH_DESC_ON_STACK(shash, c->hash_tfm);
--
--	shash->tfm = c->hash_tfm;
--
--	crypto_shash_digest(shash, node + sizeof(struct ubifs_ch),
--			    UBIFS_MST_NODE_SZ - sizeof(struct ubifs_ch), calc);
-+	crypto_shash_tfm_digest(c->hash_tfm, node + sizeof(struct ubifs_ch),
-+				UBIFS_MST_NODE_SZ - sizeof(struct ubifs_ch),
-+				calc);
- 
- 	if (ubifs_check_hash(c, expected, calc))
- 		return -EPERM;
-diff --git a/fs/ubifs/replay.c b/fs/ubifs/replay.c
-index b28ac4dfb4070a..c4047a8f641077 100644
---- a/fs/ubifs/replay.c
-+++ b/fs/ubifs/replay.c
-@@ -558,7 +558,7 @@ static int is_last_bud(struct ubifs_info *c, struct ubifs_bud *bud)
- 	return data == 0xFFFFFFFF;
- }
- 
--/* authenticate_sleb_hash and authenticate_sleb_hmac are split out for stack usage */
-+/* authenticate_sleb_hash is split out for stack usage */
- static int authenticate_sleb_hash(struct ubifs_info *c, struct shash_desc *log_hash, u8 *hash)
- {
- 	SHASH_DESC_ON_STACK(hash_desc, c->hash_tfm);
-@@ -569,15 +569,6 @@ static int authenticate_sleb_hash(struct ubifs_info *c, struct shash_desc *log_h
- 	return crypto_shash_final(hash_desc, hash);
- }
- 
--static int authenticate_sleb_hmac(struct ubifs_info *c, u8 *hash, u8 *hmac)
+-static int ecryptfs_hash_digest(struct crypto_shash *tfm,
+-				char *src, int len, char *dst)
 -{
--	SHASH_DESC_ON_STACK(hmac_desc, c->hmac_tfm);
+-	SHASH_DESC_ON_STACK(desc, tfm);
+-	int err;
 -
--	hmac_desc->tfm = c->hmac_tfm;
--
--	return crypto_shash_digest(hmac_desc, hash, c->hash_len, hmac);
+-	desc->tfm = tfm;
+-	err = crypto_shash_digest(desc, src, len, dst);
+-	shash_desc_zero(desc);
+-	return err;
 -}
 -
  /**
-  * authenticate_sleb - authenticate one scan LEB
-  * @c: UBIFS file-system description object
-@@ -624,7 +615,8 @@ static int authenticate_sleb(struct ubifs_info *c, struct ubifs_scan_leb *sleb,
- 			if (err)
- 				goto out;
+  * ecryptfs_calculate_md5 - calculates the md5 of @src
+  * @dst: Pointer to 16 bytes of allocated memory
+@@ -74,11 +62,8 @@ static int ecryptfs_calculate_md5(char *dst,
+ 				  struct ecryptfs_crypt_stat *crypt_stat,
+ 				  char *src, int len)
+ {
+-	struct crypto_shash *tfm;
+-	int rc = 0;
++	int rc = crypto_shash_tfm_digest(crypt_stat->hash_tfm, src, len, dst);
  
--			err = authenticate_sleb_hmac(c, hash, hmac);
-+			err = crypto_shash_tfm_digest(c->hmac_tfm, hash,
-+						      c->hash_len, hmac);
- 			if (err)
- 				goto out;
- 
+-	tfm = crypt_stat->hash_tfm;
+-	rc = ecryptfs_hash_digest(tfm, src, len, dst);
+ 	if (rc) {
+ 		printk(KERN_ERR
+ 		       "%s: Error computing crypto hash; rc = [%d]\n",
 -- 
 2.26.2
 
