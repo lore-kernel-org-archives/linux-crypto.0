@@ -1,62 +1,90 @@
-Return-Path: <SRS0=G1bP=6P=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=ou8b=6Q=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D2F7C35280
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 May 2020 21:40:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE3E1C47254
+	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 02:05:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 68C6821775
-	for <linux-crypto@archiver.kernel.org>; Fri,  1 May 2020 21:40:34 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="ykPh+dJQ"
+	by mail.kernel.org (Postfix) with ESMTP id BF5D621775
+	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 02:05:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726318AbgEAVkd (ORCPT
+        id S1726437AbgEBCFI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 1 May 2020 17:40:33 -0400
-Received: from mail.zx2c4.com ([192.95.5.64]:35255 "EHLO mail.zx2c4.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726045AbgEAVkd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 1 May 2020 17:40:33 -0400
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTP id ebce33ea;
-        Fri, 1 May 2020 21:28:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=zx2c4.com; h=date:from:to
-        :cc:subject:message-id:references:mime-version:content-type
-        :in-reply-to; s=mail; bh=mfANb4NLGTbGs+1tPQehX2mYl+M=; b=ykPh+dJ
-        QDLWKaw2Uecg3ANW27v3xaMCzgsHcOIduNrQbo+NghqTyQWGe7nWl6C2ouuqocEh
-        Uw2DKmDQJq7Uguh6cMrugK2p8mFNB5JFllYegFR3ydaOyPZYOOjZkTHUALQF6YxB
-        3hvi3TvNe48hBTG4p+h+Vc2JJLPuUSNJEwtWscqrnXnU0cxv8kYcY6uvC6KpHFSf
-        57yJNe98ssuT7BdWh/D7yKfga/ycaR2SjmA6W0sk5+aTfceSgNpPg85/FIAuFBU1
-        +lyDhNhcr/Rt8FmKS6+oozcma9h4ecRDw5ZgaOihsumPAUgsghIiolLc+SCc+qA8
-        a2YmQRV2leV/42g==
-Received: by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 76a5f6fa (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-        Fri, 1 May 2020 21:28:27 +0000 (UTC)
-Date:   Fri, 1 May 2020 15:40:30 -0600
-From:   "Jason A. Donenfeld" <Jason@zx2c4.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-crypto@vger.kernel.org
-Subject: Re: [PATCH v2] crypto: lib/sha256 - return void
-Message-ID: <20200501214030.GA522402@zx2c4.com>
-References: <20200501164229.24952-1-ebiggers@kernel.org>
+        Fri, 1 May 2020 22:05:08 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:41198 "EHLO huawei.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726381AbgEBCFI (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 1 May 2020 22:05:08 -0400
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
+        by Forcepoint Email with ESMTP id BDCA7CF23728FDA7E433;
+        Sat,  2 May 2020 10:05:06 +0800 (CST)
+Received: from SWX921481.china.huawei.com (10.126.201.216) by
+ DGGEMS404-HUB.china.huawei.com (10.3.19.204) with Microsoft SMTP Server id
+ 14.3.487.0; Sat, 2 May 2020 10:04:59 +0800
+From:   Barry Song <song.bao.hua@hisilicon.com>
+To:     <herbert@gondor.apana.org.au>, <sjenning@redhat.com>,
+        <ddstreet@ieee.org>, <vitaly.wool@konsulko.com>
+CC:     <mahipalreddy2006@gmail.com>, <linux-mm@kvack.org>,
+        <linux-crypto@vger.kernel.org>, <linuxarm@huawei.com>,
+        Barry Song <song.bao.hua@hisilicon.com>
+Subject: [PATCH 0/1] mm/zswap: move to use crypto_acomp APIs
+Date:   Sat, 2 May 2020 14:04:18 +1200
+Message-ID: <20200502020419.11616-1-song.bao.hua@hisilicon.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200501164229.24952-1-ebiggers@kernel.org>
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.126.201.216]
+X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, May 01, 2020 at 09:42:29AM -0700, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> The SHA-256 / SHA-224 library functions can't fail, so remove the
-> useless return value.
+Hi Seth, Dan, Vitaly, Herbert,
 
-Looks good to me, and also matches the signatures of the blake2s library
-functions, which return null.
+Using crypto_comp APIs, zswap is not able to use the hardware accelators which
+are only ported to cryto_acomp nowadays. So Mahipal Challa tried to solve this
+problem by the below patch a long time ago:
+mm: zswap - Add crypto acomp/scomp framework support [1]
 
-Reviewed-by: Jason A. Donenfeld <Jason@zx2c4.com>
+At that time, the test was based on acomp with scomp backend. It was not a real
+async platform. On a platform with real acomp support like hisilicon-zip, the
+patch will lead to serious "sleep on atomic" issues.
+
+To leverage the power of hardware accelerator, right now, I am sending a new patch
+which will remove the atomic context and permit crypto to sleep in zswap.
+
+Literally, using an async compressor, people can dynamically allocate acomp_req and
+queue those requests to acrytp drivers, and finally use the callback to notify
+the completion of compression/decompression. but this will require dynamic memory
+allocation and various synchronizations in zswap, and it is too complex.
+
+Alternatively, this patch pre-allocates the acomp_req with the same number of CPUs.
+For each acomp_req, one mutex and one wait are bound with it. The mutex is used
+for the race protection of the acomp_req and other percpu resources. Even though
+the preempt-disabled atomic context is replaced by sleepable context, threads
+might migrate, but the mutex can still protect the race between CPUs for same
+resources.
+
+Tested on hisilicon zip driver on a SMP enviorment and on lz4 scomp-based acomp
+as well. To use scomp-based acomp, another patch I sent before is needed:
+crypto: acomp - search acomp with scomp backend in crypto_has_acomp [2]
+
+[1] https://www.spinics.net/lists/linux-mm/msg122455.html
+[2] https://marc.info/?l=linux-crypto-vger&m=158822346227760&w=2
+
+Barry Song (1):
+  mm/zswap: move to use crypto_acomp API for hardware acceleration
+
+ mm/zswap.c | 150 ++++++++++++++++++++++++++++++++++++++---------------
+ 1 file changed, 108 insertions(+), 42 deletions(-)
+
+-- 
+2.23.0
+
+
