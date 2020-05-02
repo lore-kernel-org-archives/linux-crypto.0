@@ -4,48 +4,47 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7C39C47254
-	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 06:00:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92B96C3A5A9
+	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 06:35:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8F6FB21974
-	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 06:00:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6824F208DB
+	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 06:35:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1588399220;
-	bh=2TZcArf1YUgKkcv3Pow2cc7A9wlRsm3LVNfkjMQvDIU=;
+	s=default; t=1588401309;
+	bh=KEgCnu6QyCC/5zlYR9dkUf5lWxIoJKj2MCz88qiaa/E=;
 	h=From:To:Cc:Subject:Date:List-ID:From;
-	b=sZvQPxHJ4kgIMdf6wKZd9HZFQlaBBmw/hDyGXQKhhTwf4k5cjYdtfrXlf7/YeCSB2
-	 /SGYQyA6IDjdtQhXXbjGOqScvGLnHShByEyH/rsDI/xbJadBcfyMH2JvMFNViPkBNy
-	 pr/SGIAlDPtGNumCUPqqUpO0t0z2B+bo5AqPoZyU=
+	b=CJL7/y0P+xeLOvuacvZbIdQeBTzzfZ5IAyHCP+YbpsxbTaMjDGW1AF9l6gEUVH8zp
+	 kXjStVu4LlMAjc5LvN4ITK1owZv/A/GIJaVuDglsk3CIndPEzfheZqHAhO8rAYDyC+
+	 Ky4hNXDHqwALFKir6Z2FiRAcMoIajK5evjJ2X1Ak=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726654AbgEBGAU (ORCPT
+        id S1726562AbgEBGfI (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 2 May 2020 02:00:20 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47450 "EHLO mail.kernel.org"
+        Sat, 2 May 2020 02:35:08 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56896 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726468AbgEBGAT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 2 May 2020 02:00:19 -0400
+        id S1726520AbgEBGfG (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 2 May 2020 02:35:06 -0400
 Received: from sol.hsd1.ca.comcast.net (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 174842137B;
-        Sat,  2 May 2020 06:00:19 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 05961208DB;
+        Sat,  2 May 2020 06:35:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1588399219;
-        bh=2TZcArf1YUgKkcv3Pow2cc7A9wlRsm3LVNfkjMQvDIU=;
+        s=default; t=1588401304;
+        bh=KEgCnu6QyCC/5zlYR9dkUf5lWxIoJKj2MCz88qiaa/E=;
         h=From:To:Cc:Subject:Date:From;
-        b=bpBNP+z008ubNPNLGe/0RCLG7aa5tXFBEaeDeae+BOeIyPxQXhlYoOExsrpJrAMdj
-         8gLIYcsEn7tdNql0i07dnM5qJPf3DjDoG0pxAP/zOhW/Ank0Oaeydi0qZ0eoQXXN5H
-         9j7lW3scMPF/mW9KsDJ93WP+zRzOCEAJc6N1j0v8=
+        b=Vb6niibUTcJXGEnoXuVUpmm/EHXP6ZqInsH2HRchqHe3EZz26c8wjKbw79DHnJtO1
+         TA4IY4+6edRpJD6QqkjS08OgqBuDsQJcZUAxPo3rdGYp6Oq+sfit3L5/vrx8QhnHKw
+         mxcXkmBZpoW9jqGnnLpqv0zrWHnc6+RsJ2hdjfsE=
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Richard Weinberger <richard@nod.at>, linux-mtd@lists.infradead.org
-Cc:     linux-crypto@vger.kernel.org, stable@vger.kernel.org,
-        Sascha Hauer <s.hauer@pengutronix.de>
-Subject: [PATCH] ubifs: fix wrong use of crypto_shash_descsize()
-Date:   Fri,  1 May 2020 22:59:45 -0700
-Message-Id: <20200502055945.1008194-1-ebiggers@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     Nikolay Borisov <nborisov@suse.com>
+Subject: [PATCH] lib/xxhash: make xxh{32,64}_update() return void
+Date:   Fri,  1 May 2020 23:34:23 -0700
+Message-Id: <20200502063423.1052614-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -56,101 +55,124 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-crypto_shash_descsize() returns the size of the shash_desc context
-needed to compute the hash, not the size of the hash itself.
+The return value of xxh64_update() is pointless and confusing, since an
+error is only returned for input==NULL.  But the callers must ignore
+this error because they might pass input=NULL, length=0.
 
-crypto_shash_digestsize() would be correct, or alternatively using
-c->hash_len and c->hmac_desc_len which already store the correct values.
-But actually it's simpler to just use stack arrays, so do that instead.
+Likewise for xxh32_update().
 
-Fixes: 49525e5eecca ("ubifs: Add helper functions for authentication support")
-Fixes: da8ef65f9573 ("ubifs: Authenticate replayed journal")
-Cc: <stable@vger.kernel.org> # v4.20+
-Cc: Sascha Hauer <s.hauer@pengutronix.de>
+Just make these functions return void.
+
+Cc: Nikolay Borisov <nborisov@suse.com>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- fs/ubifs/auth.c   | 17 ++++-------------
- fs/ubifs/replay.c | 13 ++-----------
- 2 files changed, 6 insertions(+), 24 deletions(-)
 
-diff --git a/fs/ubifs/auth.c b/fs/ubifs/auth.c
-index 8cdbd53d780ca7..f985a3fbbb36a1 100644
---- a/fs/ubifs/auth.c
-+++ b/fs/ubifs/auth.c
-@@ -79,13 +79,9 @@ int ubifs_prepare_auth_node(struct ubifs_info *c, void *node,
- 			     struct shash_desc *inhash)
+lib/xxhash.c doesn't actually have a maintainer, but probably it makes
+sense to take this through the crypto tree, alongside the other patch I
+sent to return void in lib/crypto/sha256.c.
+
+ include/linux/xxhash.h |  8 ++------
+ lib/xxhash.c           | 20 ++++++--------------
+ 2 files changed, 8 insertions(+), 20 deletions(-)
+
+diff --git a/include/linux/xxhash.h b/include/linux/xxhash.h
+index 52b073fea17fe4..e1c469802ebdba 100644
+--- a/include/linux/xxhash.h
++++ b/include/linux/xxhash.h
+@@ -185,10 +185,8 @@ void xxh32_reset(struct xxh32_state *state, uint32_t seed);
+  * @length: The length of the data to hash.
+  *
+  * After calling xxh32_reset() call xxh32_update() as many times as necessary.
+- *
+- * Return:  Zero on success, otherwise an error code.
+  */
+-int xxh32_update(struct xxh32_state *state, const void *input, size_t length);
++void xxh32_update(struct xxh32_state *state, const void *input, size_t length);
+ 
+ /**
+  * xxh32_digest() - produce the current xxh32 hash
+@@ -218,10 +216,8 @@ void xxh64_reset(struct xxh64_state *state, uint64_t seed);
+  * @length: The length of the data to hash.
+  *
+  * After calling xxh64_reset() call xxh64_update() as many times as necessary.
+- *
+- * Return:  Zero on success, otherwise an error code.
+  */
+-int xxh64_update(struct xxh64_state *state, const void *input, size_t length);
++void xxh64_update(struct xxh64_state *state, const void *input, size_t length);
+ 
+ /**
+  * xxh64_digest() - produce the current xxh64 hash
+diff --git a/lib/xxhash.c b/lib/xxhash.c
+index aa61e2a3802f0a..64bb68a9621ed1 100644
+--- a/lib/xxhash.c
++++ b/lib/xxhash.c
+@@ -267,21 +267,19 @@ void xxh64_reset(struct xxh64_state *statePtr, const uint64_t seed)
+ }
+ EXPORT_SYMBOL(xxh64_reset);
+ 
+-int xxh32_update(struct xxh32_state *state, const void *input, const size_t len)
++void xxh32_update(struct xxh32_state *state, const void *input,
++		  const size_t len)
  {
- 	struct ubifs_auth_node *auth = node;
--	u8 *hash;
-+	u8 hash[UBIFS_HASH_ARR_SZ];
- 	int err;
+ 	const uint8_t *p = (const uint8_t *)input;
+ 	const uint8_t *const b_end = p + len;
  
--	hash = kmalloc(crypto_shash_descsize(c->hash_tfm), GFP_NOFS);
--	if (!hash)
--		return -ENOMEM;
+-	if (input == NULL)
+-		return -EINVAL;
 -
- 	{
- 		SHASH_DESC_ON_STACK(hash_desc, c->hash_tfm);
+ 	state->total_len_32 += (uint32_t)len;
+ 	state->large_len |= (len >= 16) | (state->total_len_32 >= 16);
  
-@@ -94,21 +90,16 @@ int ubifs_prepare_auth_node(struct ubifs_info *c, void *node,
- 
- 		err = crypto_shash_final(hash_desc, hash);
- 		if (err)
--			goto out;
-+			return err;
+ 	if (state->memsize + len < 16) { /* fill in tmp buffer */
+ 		memcpy((uint8_t *)(state->mem32) + state->memsize, input, len);
+ 		state->memsize += (uint32_t)len;
+-		return 0;
++		return;
  	}
  
- 	err = ubifs_hash_calc_hmac(c, hash, auth->hmac);
- 	if (err)
--		goto out;
-+		return err;
- 
- 	auth->ch.node_type = UBIFS_AUTH_NODE;
- 	ubifs_prepare_node(c, auth, ubifs_auth_node_sz(c), 0);
--
--	err = 0;
--out:
--	kfree(hash);
--
--	return err;
-+	return 0;
- }
- 
- static struct shash_desc *ubifs_get_desc(const struct ubifs_info *c,
-diff --git a/fs/ubifs/replay.c b/fs/ubifs/replay.c
-index b28ac4dfb4070a..01fcf79750472b 100644
---- a/fs/ubifs/replay.c
-+++ b/fs/ubifs/replay.c
-@@ -601,18 +601,12 @@ static int authenticate_sleb(struct ubifs_info *c, struct ubifs_scan_leb *sleb,
- 	struct ubifs_scan_node *snod;
- 	int n_nodes = 0;
- 	int err;
--	u8 *hash, *hmac;
-+	u8 hash[UBIFS_HASH_ARR_SZ];
-+	u8 hmac[UBIFS_HMAC_ARR_SZ];
- 
- 	if (!ubifs_authenticated(c))
- 		return sleb->nodes_cnt;
- 
--	hash = kmalloc(crypto_shash_descsize(c->hash_tfm), GFP_NOFS);
--	hmac = kmalloc(c->hmac_desc_len, GFP_NOFS);
--	if (!hash || !hmac) {
--		err = -ENOMEM;
--		goto out;
--	}
--
- 	list_for_each_entry(snod, &sleb->nodes, list) {
- 
- 		n_nodes++;
-@@ -662,9 +656,6 @@ static int authenticate_sleb(struct ubifs_info *c, struct ubifs_scan_leb *sleb,
- 		err = 0;
+ 	if (state->memsize) { /* some data left from previous update */
+@@ -331,8 +329,6 @@ int xxh32_update(struct xxh32_state *state, const void *input, const size_t len)
+ 		memcpy(state->mem32, p, (size_t)(b_end-p));
+ 		state->memsize = (uint32_t)(b_end-p);
  	}
- out:
--	kfree(hash);
--	kfree(hmac);
 -
- 	return err ? err : n_nodes - n_not_auth;
+-	return 0;
  }
+ EXPORT_SYMBOL(xxh32_update);
+ 
+@@ -374,20 +370,18 @@ uint32_t xxh32_digest(const struct xxh32_state *state)
+ }
+ EXPORT_SYMBOL(xxh32_digest);
+ 
+-int xxh64_update(struct xxh64_state *state, const void *input, const size_t len)
++void xxh64_update(struct xxh64_state *state, const void *input,
++		  const size_t len)
+ {
+ 	const uint8_t *p = (const uint8_t *)input;
+ 	const uint8_t *const b_end = p + len;
+ 
+-	if (input == NULL)
+-		return -EINVAL;
+-
+ 	state->total_len += len;
+ 
+ 	if (state->memsize + len < 32) { /* fill in tmp buffer */
+ 		memcpy(((uint8_t *)state->mem64) + state->memsize, input, len);
+ 		state->memsize += (uint32_t)len;
+-		return 0;
++		return;
+ 	}
+ 
+ 	if (state->memsize) { /* tmp buffer is full */
+@@ -436,8 +430,6 @@ int xxh64_update(struct xxh64_state *state, const void *input, const size_t len)
+ 		memcpy(state->mem64, p, (size_t)(b_end-p));
+ 		state->memsize = (uint32_t)(b_end - p);
+ 	}
+-
+-	return 0;
+ }
+ EXPORT_SYMBOL(xxh64_update);
  
 -- 
 2.26.2
