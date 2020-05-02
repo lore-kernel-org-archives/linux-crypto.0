@@ -4,52 +4,49 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19376C4725A
-	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 05:33:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7C39C47254
+	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 06:00:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E96112184D
-	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 05:33:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8F6FB21974
+	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 06:00:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1588397631;
-	bh=yP0ei9eeyV64D7gyzyKJiWXxmKwgWffX6x3jaj5oYJ0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=gBhhwxkrLKABIaUKqefXCb5FUAsQ056eFsdDs+cLZYmtCPEfHJ6FS6cHZ439aX2nx
-	 sBAJPEiOSaALXyiI2kA7SRRWsTHeSk5I42nn0o2m758ijmq0zL/v/EwW4XW5ZRytcm
-	 oLxBgwkftYAtDQLm382NyyffHVZaZ8pjRduqdV30=
+	s=default; t=1588399220;
+	bh=2TZcArf1YUgKkcv3Pow2cc7A9wlRsm3LVNfkjMQvDIU=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=sZvQPxHJ4kgIMdf6wKZd9HZFQlaBBmw/hDyGXQKhhTwf4k5cjYdtfrXlf7/YeCSB2
+	 /SGYQyA6IDjdtQhXXbjGOqScvGLnHShByEyH/rsDI/xbJadBcfyMH2JvMFNViPkBNy
+	 pr/SGIAlDPtGNumCUPqqUpO0t0z2B+bo5AqPoZyU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727808AbgEBFdu (ORCPT
+        id S1726654AbgEBGAU (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 2 May 2020 01:33:50 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39230 "EHLO mail.kernel.org"
+        Sat, 2 May 2020 02:00:20 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47450 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727114AbgEBFdo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 2 May 2020 01:33:44 -0400
+        id S1726468AbgEBGAT (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 2 May 2020 02:00:19 -0400
 Received: from sol.hsd1.ca.comcast.net (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 21EC821974;
-        Sat,  2 May 2020 05:33:44 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 174842137B;
+        Sat,  2 May 2020 06:00:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1588397624;
-        bh=yP0ei9eeyV64D7gyzyKJiWXxmKwgWffX6x3jaj5oYJ0=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qBUQzoNQj4V13fMB1Vpahw0ccNQnb3jfpta6w3juUullhJDNAFWq38H2RetXCjjTT
-         +MC6q0hNSHRUf8qtr1HloK+AOvl95VtwjoIZNnWizGzV6hJsuwF2q4u0SvWr3xYcb6
-         M90cy9XT2wYZFnnkEJe2Dg6FZz5+NSLZgrP6yJVU=
+        s=default; t=1588399219;
+        bh=2TZcArf1YUgKkcv3Pow2cc7A9wlRsm3LVNfkjMQvDIU=;
+        h=From:To:Cc:Subject:Date:From;
+        b=bpBNP+z008ubNPNLGe/0RCLG7aa5tXFBEaeDeae+BOeIyPxQXhlYoOExsrpJrAMdj
+         8gLIYcsEn7tdNql0i07dnM5qJPf3DjDoG0pxAP/zOhW/Ank0Oaeydi0qZ0eoQXXN5H
+         9j7lW3scMPF/mW9KsDJ93WP+zRzOCEAJc6N1j0v8=
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     Krzysztof Kozlowski <krzk@kernel.org>,
-        Vladimir Zapolskiy <vz@mleia.com>,
-        Kamil Konieczny <k.konieczny@samsung.com>
-Subject: [PATCH 11/20] crypto: s5p-sss - use crypto_shash_tfm_digest()
-Date:   Fri,  1 May 2020 22:31:13 -0700
-Message-Id: <20200502053122.995648-12-ebiggers@kernel.org>
+To:     Richard Weinberger <richard@nod.at>, linux-mtd@lists.infradead.org
+Cc:     linux-crypto@vger.kernel.org, stable@vger.kernel.org,
+        Sascha Hauer <s.hauer@pengutronix.de>
+Subject: [PATCH] ubifs: fix wrong use of crypto_shash_descsize()
+Date:   Fri,  1 May 2020 22:59:45 -0700
+Message-Id: <20200502055945.1008194-1-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20200502053122.995648-1-ebiggers@kernel.org>
-References: <20200502053122.995648-1-ebiggers@kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
@@ -59,75 +56,102 @@ X-Mailing-List: linux-crypto@vger.kernel.org
 
 From: Eric Biggers <ebiggers@google.com>
 
-Instead of manually allocating a 'struct shash_desc' on the stack and
-calling crypto_shash_digest(), switch to using the new helper function
-crypto_shash_tfm_digest() which does this for us.
+crypto_shash_descsize() returns the size of the shash_desc context
+needed to compute the hash, not the size of the hash itself.
 
-Cc: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Vladimir Zapolskiy <vz@mleia.com>
-Cc: Kamil Konieczny <k.konieczny@samsung.com>
+crypto_shash_digestsize() would be correct, or alternatively using
+c->hash_len and c->hmac_desc_len which already store the correct values.
+But actually it's simpler to just use stack arrays, so do that instead.
+
+Fixes: 49525e5eecca ("ubifs: Add helper functions for authentication support")
+Fixes: da8ef65f9573 ("ubifs: Authenticate replayed journal")
+Cc: <stable@vger.kernel.org> # v4.20+
+Cc: Sascha Hauer <s.hauer@pengutronix.de>
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- drivers/crypto/s5p-sss.c | 39 ++++++---------------------------------
- 1 file changed, 6 insertions(+), 33 deletions(-)
+ fs/ubifs/auth.c   | 17 ++++-------------
+ fs/ubifs/replay.c | 13 ++-----------
+ 2 files changed, 6 insertions(+), 24 deletions(-)
 
-diff --git a/drivers/crypto/s5p-sss.c b/drivers/crypto/s5p-sss.c
-index 2a16800d257954..341433fbcc4a8b 100644
---- a/drivers/crypto/s5p-sss.c
-+++ b/drivers/crypto/s5p-sss.c
-@@ -1520,37 +1520,6 @@ static int s5p_hash_update(struct ahash_request *req)
- 	return s5p_hash_enqueue(req, true); /* HASH_OP_UPDATE */
+diff --git a/fs/ubifs/auth.c b/fs/ubifs/auth.c
+index 8cdbd53d780ca7..f985a3fbbb36a1 100644
+--- a/fs/ubifs/auth.c
++++ b/fs/ubifs/auth.c
+@@ -79,13 +79,9 @@ int ubifs_prepare_auth_node(struct ubifs_info *c, void *node,
+ 			     struct shash_desc *inhash)
+ {
+ 	struct ubifs_auth_node *auth = node;
+-	u8 *hash;
++	u8 hash[UBIFS_HASH_ARR_SZ];
+ 	int err;
+ 
+-	hash = kmalloc(crypto_shash_descsize(c->hash_tfm), GFP_NOFS);
+-	if (!hash)
+-		return -ENOMEM;
+-
+ 	{
+ 		SHASH_DESC_ON_STACK(hash_desc, c->hash_tfm);
+ 
+@@ -94,21 +90,16 @@ int ubifs_prepare_auth_node(struct ubifs_info *c, void *node,
+ 
+ 		err = crypto_shash_final(hash_desc, hash);
+ 		if (err)
+-			goto out;
++			return err;
+ 	}
+ 
+ 	err = ubifs_hash_calc_hmac(c, hash, auth->hmac);
+ 	if (err)
+-		goto out;
++		return err;
+ 
+ 	auth->ch.node_type = UBIFS_AUTH_NODE;
+ 	ubifs_prepare_node(c, auth, ubifs_auth_node_sz(c), 0);
+-
+-	err = 0;
+-out:
+-	kfree(hash);
+-
+-	return err;
++	return 0;
  }
  
--/**
-- * s5p_hash_shash_digest() - calculate shash digest
-- * @tfm:	crypto transformation
-- * @flags:	tfm flags
-- * @data:	input data
-- * @len:	length of data
-- * @out:	output buffer
-- */
--static int s5p_hash_shash_digest(struct crypto_shash *tfm, u32 flags,
--				 const u8 *data, unsigned int len, u8 *out)
--{
--	SHASH_DESC_ON_STACK(shash, tfm);
--
--	shash->tfm = tfm;
--
--	return crypto_shash_digest(shash, data, len, out);
--}
--
--/**
-- * s5p_hash_final_shash() - calculate shash digest
-- * @req:	AHASH request
-- */
--static int s5p_hash_final_shash(struct ahash_request *req)
--{
--	struct s5p_hash_ctx *tctx = crypto_tfm_ctx(req->base.tfm);
--	struct s5p_hash_reqctx *ctx = ahash_request_ctx(req);
--
--	return s5p_hash_shash_digest(tctx->fallback, req->base.flags,
--				     ctx->buffer, ctx->bufcnt, req->result);
--}
--
- /**
-  * s5p_hash_final() - close up hash and calculate digest
-  * @req:	AHASH request
-@@ -1582,8 +1551,12 @@ static int s5p_hash_final(struct ahash_request *req)
- 	if (ctx->error)
- 		return -EINVAL; /* uncompleted hash is not needed */
+ static struct shash_desc *ubifs_get_desc(const struct ubifs_info *c,
+diff --git a/fs/ubifs/replay.c b/fs/ubifs/replay.c
+index b28ac4dfb4070a..01fcf79750472b 100644
+--- a/fs/ubifs/replay.c
++++ b/fs/ubifs/replay.c
+@@ -601,18 +601,12 @@ static int authenticate_sleb(struct ubifs_info *c, struct ubifs_scan_leb *sleb,
+ 	struct ubifs_scan_node *snod;
+ 	int n_nodes = 0;
+ 	int err;
+-	u8 *hash, *hmac;
++	u8 hash[UBIFS_HASH_ARR_SZ];
++	u8 hmac[UBIFS_HMAC_ARR_SZ];
  
--	if (!ctx->digcnt && ctx->bufcnt < BUFLEN)
--		return s5p_hash_final_shash(req);
-+	if (!ctx->digcnt && ctx->bufcnt < BUFLEN) {
-+		struct s5p_hash_ctx *tctx = crypto_tfm_ctx(req->base.tfm);
-+
-+		return crypto_shash_tfm_digest(tctx->fallback, ctx->buffer,
-+					       ctx->bufcnt, req->result);
-+	}
+ 	if (!ubifs_authenticated(c))
+ 		return sleb->nodes_cnt;
  
- 	return s5p_hash_enqueue(req, false); /* HASH_OP_FINAL */
+-	hash = kmalloc(crypto_shash_descsize(c->hash_tfm), GFP_NOFS);
+-	hmac = kmalloc(c->hmac_desc_len, GFP_NOFS);
+-	if (!hash || !hmac) {
+-		err = -ENOMEM;
+-		goto out;
+-	}
+-
+ 	list_for_each_entry(snod, &sleb->nodes, list) {
+ 
+ 		n_nodes++;
+@@ -662,9 +656,6 @@ static int authenticate_sleb(struct ubifs_info *c, struct ubifs_scan_leb *sleb,
+ 		err = 0;
+ 	}
+ out:
+-	kfree(hash);
+-	kfree(hmac);
+-
+ 	return err ? err : n_nodes - n_not_auth;
  }
+ 
 -- 
 2.26.2
 
