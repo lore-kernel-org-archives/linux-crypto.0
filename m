@@ -4,48 +4,47 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BF6EC47256
-	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 05:33:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BDA0C47247
+	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 05:33:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 62EC22192A
-	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 05:33:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0B57C2071E
+	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 05:33:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1588397627;
-	bh=cxfqhmomB4B2lqaurFr3tfvzNEiRkFVJs96YPeGZ6PM=;
+	s=default; t=1588397628;
+	bh=D5XW6cZpsJwZ7D6M28ztCkO8mBJw30MPkBRR8dbGTwQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=ckz98zouu/vChxjR2aeBcREAcyoa+rNbLkeWr8o33bDpRk1nnWHsIrjsn1P5HABsf
-	 Ym+Rbs5FX82AO/PtNu8Au8mCoO/SdnVD/6RuZdKE45sA1k47ouy49dD0AmMGDvQ9DT
-	 V4IOjRsS022zmfRPieSOlXkxp0kMdY/WD1GuPQqA=
+	b=jer/pGm1Jez1kpV1bah3tTVKRuzW+oRG8C139cVhgv2O0iNfFiJjRFs9c2b63g+La
+	 J3U4AcHyHctc9JEsykeMfTILGoUYXPpSzKD0+y+PofnOaf9GWrDaGyfhMa4Z/vYwSL
+	 VEGkSBwSAjf+PgGhkAnlZ6oARF2meCwVpg1JiJ7s=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727778AbgEBFdq (ORCPT
+        id S1727815AbgEBFdr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 2 May 2020 01:33:46 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39220 "EHLO mail.kernel.org"
+        Sat, 2 May 2020 01:33:47 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39284 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727121AbgEBFdo (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 2 May 2020 01:33:44 -0400
+        id S1727776AbgEBFdp (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 2 May 2020 01:33:45 -0400
 Received: from sol.hsd1.ca.comcast.net (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 6B90424954;
-        Sat,  2 May 2020 05:33:44 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 2B6DC208DB;
+        Sat,  2 May 2020 05:33:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1588397624;
-        bh=cxfqhmomB4B2lqaurFr3tfvzNEiRkFVJs96YPeGZ6PM=;
+        s=default; t=1588397625;
+        bh=D5XW6cZpsJwZ7D6M28ztCkO8mBJw30MPkBRR8dbGTwQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=aVixZg8eo4EcfgOXeA6K8AM0jaE+sVtiEisgo+HET65KuVgG76JYJvoOqNslPenhF
-         vSKrsKQA5pNpBsCre1dtt6n7JXzIW1yAZETtJC6mx2VQc6UaZtsEfr4GmQaxCyBXVB
-         Oq1PMUKvPffJBYL7bKggTTLaUa8d0+PX3UElQVEo=
+        b=aTIMQVl6HdIeINBbS+bh94aY/URMxXAIm5FeH8NT4QtQ2e0rLKrraXahmsRIShFWt
+         aRE6zCqwmeA8G9OFtTVqRIbTV3f/GLhFNwcve20yI7ZmBycn7XiSCwl1yo7eOAGw6G
+         BOuEKV5AX+qzZHZePQ8PfSZmRJz5VoZMvB2agScI=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Cc:     Robert Baldyga <r.baldyga@samsung.com>,
-        Krzysztof Opasiak <k.opasiak@samsung.com>
-Subject: [PATCH 12/20] nfc: s3fwrn5: use crypto_shash_tfm_digest()
-Date:   Fri,  1 May 2020 22:31:14 -0700
-Message-Id: <20200502053122.995648-13-ebiggers@kernel.org>
+Cc:     linux-nfs@vger.kernel.org
+Subject: [PATCH 15/20] nfsd: use crypto_shash_tfm_digest()
+Date:   Fri,  1 May 2020 22:31:17 -0700
+Message-Id: <20200502053122.995648-16-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200502053122.995648-1-ebiggers@kernel.org>
 References: <20200502053122.995648-1-ebiggers@kernel.org>
@@ -62,19 +61,18 @@ Instead of manually allocating a 'struct shash_desc' on the stack and
 calling crypto_shash_digest(), switch to using the new helper function
 crypto_shash_tfm_digest() which does this for us.
 
-Cc: Robert Baldyga <r.baldyga@samsung.com>
-Cc: Krzysztof Opasiak <k.opasiak@samsung.com>
+Cc: linux-nfs@vger.kernel.org
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- drivers/nfc/s3fwrn5/firmware.c | 10 +---------
- 1 file changed, 1 insertion(+), 9 deletions(-)
+ fs/nfsd/nfs4recover.c | 26 ++++++--------------------
+ 1 file changed, 6 insertions(+), 20 deletions(-)
 
-diff --git a/drivers/nfc/s3fwrn5/firmware.c b/drivers/nfc/s3fwrn5/firmware.c
-index de613c623a2cf0..69857f0807040c 100644
---- a/drivers/nfc/s3fwrn5/firmware.c
-+++ b/drivers/nfc/s3fwrn5/firmware.c
-@@ -434,15 +434,7 @@ int s3fwrn5_fw_download(struct s3fwrn5_fw_info *fw_info)
- 		goto out;
+diff --git a/fs/nfsd/nfs4recover.c b/fs/nfsd/nfs4recover.c
+index a8fb18609146a2..9e40dfecf1b1a6 100644
+--- a/fs/nfsd/nfs4recover.c
++++ b/fs/nfsd/nfs4recover.c
+@@ -127,16 +127,8 @@ nfs4_make_rec_clidname(char *dname, const struct xdr_netobj *clname)
+  		goto out;
  	}
  
 -	{
@@ -82,14 +80,68 @@ index de613c623a2cf0..69857f0807040c 100644
 -
 -		desc->tfm = tfm;
 -
--		ret = crypto_shash_digest(desc, fw->image, image_size,
--					  hash_data);
+-		status = crypto_shash_digest(desc, clname->data, clname->len,
+-					     cksum.data);
 -		shash_desc_zero(desc);
 -	}
-+	ret = crypto_shash_tfm_digest(tfm, fw->image, image_size, hash_data);
+-
++	status = crypto_shash_tfm_digest(tfm, clname->data, clname->len,
++					 cksum.data);
+ 	if (status)
+ 		goto out;
  
- 	crypto_free_shash(tfm);
- 	if (ret) {
+@@ -1148,7 +1140,6 @@ nfsd4_cld_create_v2(struct nfs4_client *clp)
+ 	struct crypto_shash *tfm = cn->cn_tfm;
+ 	struct xdr_netobj cksum;
+ 	char *principal = NULL;
+-	SHASH_DESC_ON_STACK(desc, tfm);
+ 
+ 	/* Don't upcall if it's already stored */
+ 	if (test_bit(NFSD4_CLIENT_STABLE, &clp->cl_flags))
+@@ -1170,16 +1161,14 @@ nfsd4_cld_create_v2(struct nfs4_client *clp)
+ 	else if (clp->cl_cred.cr_principal)
+ 		principal = clp->cl_cred.cr_principal;
+ 	if (principal) {
+-		desc->tfm = tfm;
+ 		cksum.len = crypto_shash_digestsize(tfm);
+ 		cksum.data = kmalloc(cksum.len, GFP_KERNEL);
+ 		if (cksum.data == NULL) {
+ 			ret = -ENOMEM;
+ 			goto out;
+ 		}
+-		ret = crypto_shash_digest(desc, principal, strlen(principal),
+-					  cksum.data);
+-		shash_desc_zero(desc);
++		ret = crypto_shash_tfm_digest(tfm, principal, strlen(principal),
++					      cksum.data);
+ 		if (ret) {
+ 			kfree(cksum.data);
+ 			goto out;
+@@ -1343,7 +1332,6 @@ nfsd4_cld_check_v2(struct nfs4_client *clp)
+ 	struct crypto_shash *tfm = cn->cn_tfm;
+ 	struct xdr_netobj cksum;
+ 	char *principal = NULL;
+-	SHASH_DESC_ON_STACK(desc, tfm);
+ 
+ 	/* did we already find that this client is stable? */
+ 	if (test_bit(NFSD4_CLIENT_STABLE, &clp->cl_flags))
+@@ -1381,14 +1369,12 @@ nfsd4_cld_check_v2(struct nfs4_client *clp)
+ 			principal = clp->cl_cred.cr_principal;
+ 		if (principal == NULL)
+ 			return -ENOENT;
+-		desc->tfm = tfm;
+ 		cksum.len = crypto_shash_digestsize(tfm);
+ 		cksum.data = kmalloc(cksum.len, GFP_KERNEL);
+ 		if (cksum.data == NULL)
+ 			return -ENOENT;
+-		status = crypto_shash_digest(desc, principal, strlen(principal),
+-					     cksum.data);
+-		shash_desc_zero(desc);
++		status = crypto_shash_tfm_digest(tfm, principal,
++						 strlen(principal), cksum.data);
+ 		if (status) {
+ 			kfree(cksum.data);
+ 			return -ENOENT;
 -- 
 2.26.2
 
