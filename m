@@ -4,47 +4,47 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 408F0C47254
-	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 05:33:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 04B63C3A5A9
+	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 05:33:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 209DB2192A
-	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 05:33:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D8AC5208DB
+	for <linux-crypto@archiver.kernel.org>; Sat,  2 May 2020 05:33:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1588397629;
-	bh=DNH8HL7hR1z4xDcsrk0vwGxoghDmgXVHhKNAUdwhCMU=;
+	s=default; t=1588397630;
+	bh=aRnhsnypAWsWXKVWbib/6Chk6PgcC0D+Q1jEbEW+EEA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=qEKiQ4cWBTfJgMsPMspBVFsL8jVCs794e7qYsLqqv1xzFFFPRgJmbHpeif8FjJ+bH
-	 MiQD59Jt2sZimCev0MdIOrQaLpxJu3DHnuem4hj8dBgO9TlxXkWVajuoD8a/C7Ydgj
-	 XD7D5GC12G36pJgfOtf4hWEB6vcWZHuTFg4yKRkE=
+	b=b2c3VTJlijeJq9rHS9pssAcosoClZ3dRjrEopZ7iIpsx2BOmybeHPmrspWkencH6+
+	 ON5FrDgz0SMEujHbed8nVe0DdNJFYEpl5JtjtS+zLcHFA4KNsXLYwnOB94szp/48/9
+	 RreEJJ+AfvhqFgVbD+MsciEq6rIu+e5SBLF445hk=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727776AbgEBFdr (ORCPT
+        id S1727832AbgEBFdu (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 2 May 2020 01:33:47 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39230 "EHLO mail.kernel.org"
+        Sat, 2 May 2020 01:33:50 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39294 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727829AbgEBFdq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1727828AbgEBFdq (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Sat, 2 May 2020 01:33:46 -0400
 Received: from sol.hsd1.ca.comcast.net (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id DD4E52071E;
+        by mail.kernel.org (Postfix) with ESMTPSA id A0C6924956;
         Sat,  2 May 2020 05:33:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1588397626;
-        bh=DNH8HL7hR1z4xDcsrk0vwGxoghDmgXVHhKNAUdwhCMU=;
+        s=default; t=1588397625;
+        bh=aRnhsnypAWsWXKVWbib/6Chk6PgcC0D+Q1jEbEW+EEA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ioPw0U6l6P5ers4ni090dUqsLG8mEYUwGrMBCkQbXNyCcm+gedmvM9881pYACQla+
-         rpcv3YLfWJYN7wmTj+UPkHKCsTPa15qpS5mwMtCS6n1nOQoSW8lC4nt+jTingAGfDX
-         rvM0jjIRXCRHlS+EmS/yhY6Fc/8H+KS2KCSX5FQ0=
+        b=PTGKbB6CEORZGYYUIt9JxkJSWjc4AMdJy/Ebcqg1ZEvcjNV7zjU8yAoCxLfvgP6p/
+         GpQs4ja/Otvda6MMGOV78JogJg2t6gr+50RB3vkM0+xAL3oIxIeqJdhj0Hb1ot5mo0
+         /x72PV9ExK8jtq2rF5WYPlnNqYV+DnwY/s5p22iA=
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     linux-crypto@vger.kernel.org
-Cc:     linux-sctp@vger.kernel.org
-Subject: [PATCH 18/20] sctp: use crypto_shash_tfm_digest()
-Date:   Fri,  1 May 2020 22:31:20 -0700
-Message-Id: <20200502053122.995648-19-ebiggers@kernel.org>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH 17/20] Bluetooth: use crypto_shash_tfm_digest()
+Date:   Fri,  1 May 2020 22:31:19 -0700
+Message-Id: <20200502053122.995648-18-ebiggers@kernel.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20200502053122.995648-1-ebiggers@kernel.org>
 References: <20200502053122.995648-1-ebiggers@kernel.org>
@@ -61,82 +61,43 @@ Instead of manually allocating a 'struct shash_desc' on the stack and
 calling crypto_shash_digest(), switch to using the new helper function
 crypto_shash_tfm_digest() which does this for us.
 
-Cc: linux-sctp@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org
 Signed-off-by: Eric Biggers <ebiggers@google.com>
 ---
- net/sctp/auth.c          | 10 ++--------
- net/sctp/sm_make_chunk.c | 23 ++++++++---------------
- 2 files changed, 10 insertions(+), 23 deletions(-)
+ net/bluetooth/smp.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/net/sctp/auth.c b/net/sctp/auth.c
-index 4278764d82b827..83e97e8892e05a 100644
---- a/net/sctp/auth.c
-+++ b/net/sctp/auth.c
-@@ -741,14 +741,8 @@ void sctp_auth_calculate_hmac(const struct sctp_association *asoc,
- 	if (crypto_shash_setkey(tfm, &asoc_key->data[0], asoc_key->len))
- 		goto free;
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 1476a91ce93572..d022f126eb026b 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -170,7 +170,6 @@ static int aes_cmac(struct crypto_shash *tfm, const u8 k[16], const u8 *m,
+ 		    size_t len, u8 mac[16])
+ {
+ 	uint8_t tmp[16], mac_msb[16], msg_msb[CMAC_MSG_MAX];
+-	SHASH_DESC_ON_STACK(desc, tfm);
+ 	int err;
  
--	{
--		SHASH_DESC_ON_STACK(desc, tfm);
--
--		desc->tfm = tfm;
--		crypto_shash_digest(desc, (u8 *)auth,
--				    end - (unsigned char *)auth, digest);
--		shash_desc_zero(desc);
--	}
-+	crypto_shash_tfm_digest(tfm, (u8 *)auth, end - (unsigned char *)auth,
-+				digest);
- 
- free:
- 	if (free_key)
-diff --git a/net/sctp/sm_make_chunk.c b/net/sctp/sm_make_chunk.c
-index 09050c1d5517e7..c786215ba69a54 100644
---- a/net/sctp/sm_make_chunk.c
-+++ b/net/sctp/sm_make_chunk.c
-@@ -1666,17 +1666,14 @@ static struct sctp_cookie_param *sctp_pack_cookie(
- 	       ntohs(init_chunk->chunk_hdr->length), raw_addrs, addrs_len);
- 
- 	if (sctp_sk(ep->base.sk)->hmac) {
--		SHASH_DESC_ON_STACK(desc, sctp_sk(ep->base.sk)->hmac);
-+		struct crypto_shash *tfm = sctp_sk(ep->base.sk)->hmac;
- 		int err;
- 
- 		/* Sign the message.  */
--		desc->tfm = sctp_sk(ep->base.sk)->hmac;
--
--		err = crypto_shash_setkey(desc->tfm, ep->secret_key,
-+		err = crypto_shash_setkey(tfm, ep->secret_key,
- 					  sizeof(ep->secret_key)) ?:
--		      crypto_shash_digest(desc, (u8 *)&cookie->c, bodysize,
--					  cookie->signature);
--		shash_desc_zero(desc);
-+		      crypto_shash_tfm_digest(tfm, (u8 *)&cookie->c, bodysize,
-+					      cookie->signature);
- 		if (err)
- 			goto free_cookie;
+ 	if (len > CMAC_MSG_MAX)
+@@ -181,8 +180,6 @@ static int aes_cmac(struct crypto_shash *tfm, const u8 k[16], const u8 *m,
+ 		return -EINVAL;
  	}
-@@ -1737,17 +1734,13 @@ struct sctp_association *sctp_unpack_cookie(
  
- 	/* Check the signature.  */
- 	{
--		SHASH_DESC_ON_STACK(desc, sctp_sk(ep->base.sk)->hmac);
-+		struct crypto_shash *tfm = sctp_sk(ep->base.sk)->hmac;
- 		int err;
+-	desc->tfm = tfm;
+-
+ 	/* Swap key and message from LSB to MSB */
+ 	swap_buf(k, tmp, 16);
+ 	swap_buf(m, msg_msb, len);
+@@ -196,8 +193,7 @@ static int aes_cmac(struct crypto_shash *tfm, const u8 k[16], const u8 *m,
+ 		return err;
+ 	}
  
--		desc->tfm = sctp_sk(ep->base.sk)->hmac;
--
--		err = crypto_shash_setkey(desc->tfm, ep->secret_key,
-+		err = crypto_shash_setkey(tfm, ep->secret_key,
- 					  sizeof(ep->secret_key)) ?:
--		      crypto_shash_digest(desc, (u8 *)bear_cookie, bodysize,
--					  digest);
--		shash_desc_zero(desc);
--
-+		      crypto_shash_tfm_digest(tfm, (u8 *)bear_cookie, bodysize,
-+					      digest);
- 		if (err) {
- 			*error = -SCTP_IERROR_NOMEM;
- 			goto fail;
+-	err = crypto_shash_digest(desc, msg_msb, len, mac_msb);
+-	shash_desc_zero(desc);
++	err = crypto_shash_tfm_digest(tfm, msg_msb, len, mac_msb);
+ 	if (err) {
+ 		BT_ERR("Hash computation error %d", err);
+ 		return err;
 -- 
 2.26.2
 
