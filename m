@@ -2,123 +2,163 @@ Return-Path: <SRS0=ZKCq=6R=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29705C28CBC
-	for <linux-crypto@archiver.kernel.org>; Sun,  3 May 2020 14:02:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94CA7C28CBC
+	for <linux-crypto@archiver.kernel.org>; Sun,  3 May 2020 16:13:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E4FB92075B
-	for <linux-crypto@archiver.kernel.org>; Sun,  3 May 2020 14:02:12 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=benyossef-com.20150623.gappssmtp.com header.i=@benyossef-com.20150623.gappssmtp.com header.b="lEkmCnyC"
+	by mail.kernel.org (Postfix) with ESMTP id 6C18320836
+	for <linux-crypto@archiver.kernel.org>; Sun,  3 May 2020 16:13:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1588522412;
+	bh=e6r2Z72h7hrcZe1FEJD+LSdrn+Cl58pNFQIvjPxoo2M=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=uEgl/HHIa5mLrqsbKZs1pX/Wel7BDb0rQq5xby8YInPi2BtypYVUTfdqcwUg9Gnso
+	 kTJdr8W9fxQzTWQ607hdPWKl5kFQCGs4h5knWT3gLmvO22ukmSoZkg4R/P+pxZJxA6
+	 nc5JM+sgdGVl+HIroxdh3mTqX0l8J4iMR6m5uiPU=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728522AbgECOCM (ORCPT
+        id S1728813AbgECQNb (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 3 May 2020 10:02:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50928 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1728239AbgECOCM (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 3 May 2020 10:02:12 -0400
-Received: from mail-vk1-xa42.google.com (mail-vk1-xa42.google.com [IPv6:2607:f8b0:4864:20::a42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B4B2C061A0E
-        for <linux-crypto@vger.kernel.org>; Sun,  3 May 2020 07:02:11 -0700 (PDT)
-Received: by mail-vk1-xa42.google.com with SMTP id u203so3936738vkb.11
-        for <linux-crypto@vger.kernel.org>; Sun, 03 May 2020 07:02:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=benyossef-com.20150623.gappssmtp.com; s=20150623;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=9RvjLqM4GX3NRQ8lbi4uMCC4ITiyZWS4YVBknGPLOfQ=;
-        b=lEkmCnyCQS6yho8pHyOVj8AaMr2yuDfPMuZ4gNovPiCt0QX1iZgac/5P6hbR2PemyV
-         3ErtHs9s65XIXgY1egIV+rtkjUd+UgD+56OBk//Kcy5GggWJY1YHzJQnTwP1zI8RpqQh
-         hseUvDrwaELhk6JSTVNDJODPAdbSzGgmHMZ4azOd+LAoBJjiin+acT5GCtx3TfpdO4Im
-         xH27rKTNcPoa09T61EM/Ft7wXE1ROKWRoBk+3B1eZR/YBykpOx0Tw41ykKIl4TM3ucB0
-         uNQS62PumvayikRnb+GAnss4lXYrs+Vs1HI2rq4P4LLmyD4CKzefTFeJxEjB0qOhxtyI
-         Qiuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=9RvjLqM4GX3NRQ8lbi4uMCC4ITiyZWS4YVBknGPLOfQ=;
-        b=iCQBkIQbFMjKPtF7gxkjB8lTyfxA71Aoc2NN1W55pQVZGelrn8gYCIDBFJ87L7Tchn
-         gWFUVIoqHx+fk2zEqZi5hqGWUU7OHd9A6wBk5YZPQGaPrTyyPPp4Mk0ijptOz+3wbWd7
-         y3gihPVs2HVM5SfihqdLAyyoy8mDxlos9hVDfrtFvSjU7CQ1bhJMSUsB5DWXqFyU1kFp
-         a/1XLMy9glPw1T9T9ph4VJWNM2L9Bf5JTw/yeYETygpBUggFsxMs9zGqdzzFhAKoxStx
-         /9KGmeh6Y0PLF2018hRUOWHGprOWlEHp8XpmOTY2je32KTnIgJ2xdXtavddGDFgrgESA
-         olYw==
-X-Gm-Message-State: AGi0PuYEOEHF+lsahHLd/+ior8urPgqfKKddrA0GVfvfO+IOICgjakZv
-        z7WcJTdQlKcJwilhQBUT7in1mtGJAmlcoEV9SDQ9h4rK/Ec=
-X-Google-Smtp-Source: APiQypLDJpnWc18Dq+FkU4DW1kWsd/4MQgOCNhtPZVa2Ayc0JX5ISktE+WsBQ7iKf2PiDpbX4s7vTphPXpjxT9o9p6s=
-X-Received: by 2002:a1f:c1:: with SMTP id 184mr7797378vka.62.1588514530283;
- Sun, 03 May 2020 07:02:10 -0700 (PDT)
+        Sun, 3 May 2020 12:13:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:41136 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728665AbgECQNb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sun, 3 May 2020 12:13:31 -0400
+Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 6096A21973;
+        Sun,  3 May 2020 16:13:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1588522410;
+        bh=e6r2Z72h7hrcZe1FEJD+LSdrn+Cl58pNFQIvjPxoo2M=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=V8qtkFP37pelp3XQoW9bGwWGkgu5Kz3XzIxErbVnu3G8HsLuAndHmhHo1NBShv4m7
+         nNsogNOBrvbfT8TDxtrJsGXnjbwN+E7njDwepvGDR6/ufPefsD4zY6srKh6ETByRvQ
+         OMeM2HbrCm8B3m6HChhV5YmVghbNF7XaiwDaH6G4=
+Received: by mail-io1-f46.google.com with SMTP id k18so9841861ion.0;
+        Sun, 03 May 2020 09:13:30 -0700 (PDT)
+X-Gm-Message-State: AGi0PuZQJKN5Ji5MB1+PY7st7xTLCdYjbUSoWwQPEV0kpZh02D8M3fau
+        Vzh4q5mQaUHiNWkT1i5Mj+utgycbMgFl7hSJMhs=
+X-Google-Smtp-Source: APiQypLhY9++881yFhc1aV+hz5b6ucbeJlKQ6tWViPFt3Ctm6mc2jiEci1yn1OxgzY22xIRCzNrubZForogPxDE10r0=
+X-Received: by 2002:a6b:5904:: with SMTP id n4mr12406558iob.142.1588522409725;
+ Sun, 03 May 2020 09:13:29 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200502053122.995648-1-ebiggers@kernel.org> <20200502053122.995648-7-ebiggers@kernel.org>
-In-Reply-To: <20200502053122.995648-7-ebiggers@kernel.org>
-From:   Gilad Ben-Yossef <gilad@benyossef.com>
-Date:   Sun, 3 May 2020 17:01:59 +0300
-Message-ID: <CAOtvUMemET3bkh0-sL-o=pSEEWYEs2ZVD1pGYW7RCpC=TR1i6g@mail.gmail.com>
-Subject: Re: [PATCH 06/20] crypto: ccree - use crypto_shash_tfm_digest()
+References: <20200502053122.995648-1-ebiggers@kernel.org>
+In-Reply-To: <20200502053122.995648-1-ebiggers@kernel.org>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Sun, 3 May 2020 18:13:18 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXG9Cubj9zO4paGd94cAvG1h21Z0X3CmyNr-orD7WC1=vw@mail.gmail.com>
+Message-ID: <CAMj1kXG9Cubj9zO4paGd94cAvG1h21Z0X3CmyNr-orD7WC1=vw@mail.gmail.com>
+Subject: Re: [PATCH 00/20] crypto: introduce crypto_shash_tfm_digest()
 To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Cc:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Cheng-Yi Chiang <cychiang@chromium.org>,
+        ecryptfs@vger.kernel.org,
+        Enric Balletbo i Serra <enric.balletbo@collabora.com>,
+        Gilad Ben-Yossef <gilad@benyossef.com>,
+        Guenter Roeck <groeck@chromium.org>,
+        Jesper Nilsson <jesper.nilsson@axis.com>,
+        Kamil Konieczny <k.konieczny@samsung.com>,
+        keyrings@vger.kernel.org, Krzysztof Kozlowski <krzk@kernel.org>,
+        Krzysztof Opasiak <k.opasiak@samsung.com>,
+        Lars Persson <lars.persson@axis.com>,
+        linux-bluetooth@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-nfs@vger.kernel.org, linux-sctp@vger.kernel.org,
+        Robert Baldyga <r.baldyga@samsung.com>,
+        Tom Lendacky <thomas.lendacky@amd.com>,
+        Vladimir Zapolskiy <vz@mleia.com>,
+        Zaibo Xu <xuzaibo@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Sat, May 2, 2020 at 8:33 AM Eric Biggers <ebiggers@kernel.org> wrote:
+On Sat, 2 May 2020 at 07:33, Eric Biggers <ebiggers@kernel.org> wrote:
 >
-> From: Eric Biggers <ebiggers@google.com>
+> This series introduces a helper function crypto_shash_tfm_digest() which
+> replaces the following common pattern:
 >
-> Instead of manually allocating a 'struct shash_desc' on the stack and
-> calling crypto_shash_digest(), switch to using the new helper function
-> crypto_shash_tfm_digest() which does this for us.
->
-> Cc: Gilad Ben-Yossef <gilad@benyossef.com>
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->  drivers/crypto/ccree/cc_cipher.c | 9 +++------
->  1 file changed, 3 insertions(+), 6 deletions(-)
->
-> diff --git a/drivers/crypto/ccree/cc_cipher.c b/drivers/crypto/ccree/cc_c=
-ipher.c
-> index a84335328f371c..872ea3ff1c6ba7 100644
-> --- a/drivers/crypto/ccree/cc_cipher.c
-> +++ b/drivers/crypto/ccree/cc_cipher.c
-> @@ -427,12 +427,9 @@ static int cc_cipher_setkey(struct crypto_skcipher *=
-sktfm, const u8 *key,
->                 int key_len =3D keylen >> 1;
+>         {
+>                 SHASH_DESC_ON_STACK(desc, tfm);
 >                 int err;
 >
-> -               SHASH_DESC_ON_STACK(desc, ctx_p->shash_tfm);
-> -
-> -               desc->tfm =3D ctx_p->shash_tfm;
-> -
-> -               err =3D crypto_shash_digest(desc, ctx_p->user.key, key_le=
-n,
-> -                                         ctx_p->user.key + key_len);
-> +               err =3D crypto_shash_tfm_digest(ctx_p->shash_tfm,
-> +                                             ctx_p->user.key, key_len,
-> +                                             ctx_p->user.key + key_len);
->                 if (err) {
->                         dev_err(dev, "Failed to hash ESSIV key.\n");
->                         return err;
+>                 desc->tfm = tfm;
+>
+>                 err = crypto_shash_digest(desc, data, len, out);
+>
+>                 shash_desc_zero(desc);
+>         }
+>
+> with:
+>
+>         err = crypto_shash_tfm_digest(tfm, data, len, out);
+>
+> Patch 1 introduces this helper function, and patches 2-20 convert all
+> relevant users to use it.
+>
+> IMO, it would be easiest to take all these patches through the crypto
+> tree.  But taking just the "crypto:" ones and then me trying to get the
+> rest merged later via subsystem trees is also an option.
+>
+> Eric Biggers (20):
+>   crypto: hash - introduce crypto_shash_tfm_digest()
+>   crypto: arm64/aes-glue - use crypto_shash_tfm_digest()
+>   crypto: essiv - use crypto_shash_tfm_digest()
+>   crypto: artpec6 - use crypto_shash_tfm_digest()
+>   crypto: ccp - use crypto_shash_tfm_digest()
+>   crypto: ccree - use crypto_shash_tfm_digest()
+>   crypto: hisilicon/sec2 - use crypto_shash_tfm_digest()
+>   crypto: mediatek - use crypto_shash_tfm_digest()
+>   crypto: n2 - use crypto_shash_tfm_digest()
+>   crypto: omap-sham - use crypto_shash_tfm_digest()
+>   crypto: s5p-sss - use crypto_shash_tfm_digest()
+>   nfc: s3fwrn5: use crypto_shash_tfm_digest()
+>   fscrypt: use crypto_shash_tfm_digest()
+>   ecryptfs: use crypto_shash_tfm_digest()
+>   nfsd: use crypto_shash_tfm_digest()
+>   ubifs: use crypto_shash_tfm_digest()
+>   Bluetooth: use crypto_shash_tfm_digest()
+>   sctp: use crypto_shash_tfm_digest()
+>   KEYS: encrypted: use crypto_shash_tfm_digest()
+>   ASoC: cros_ec_codec: use crypto_shash_tfm_digest()
+>
+
+For the series,
+
+Acked-by: Ard Biesheuvel <ardb@kernel.org>
+
+
+>  arch/arm64/crypto/aes-glue.c               |  4 +--
+>  crypto/essiv.c                             |  4 +--
+>  crypto/shash.c                             | 16 +++++++++
+>  drivers/crypto/axis/artpec6_crypto.c       | 10 ++----
+>  drivers/crypto/ccp/ccp-crypto-sha.c        |  9 ++---
+>  drivers/crypto/ccree/cc_cipher.c           |  9 ++---
+>  drivers/crypto/hisilicon/sec2/sec_crypto.c |  5 ++-
+>  drivers/crypto/mediatek/mtk-sha.c          |  7 ++--
+>  drivers/crypto/n2_core.c                   |  7 ++--
+>  drivers/crypto/omap-sham.c                 | 20 +++--------
+>  drivers/crypto/s5p-sss.c                   | 39 ++++------------------
+>  drivers/nfc/s3fwrn5/firmware.c             | 10 +-----
+>  fs/crypto/fname.c                          |  7 +---
+>  fs/crypto/hkdf.c                           |  6 +---
+>  fs/ecryptfs/crypto.c                       | 17 +---------
+>  fs/nfsd/nfs4recover.c                      | 26 ++++-----------
+>  fs/ubifs/auth.c                            | 20 ++---------
+>  fs/ubifs/master.c                          |  9 ++---
+>  fs/ubifs/replay.c                          | 14 ++------
+>  include/crypto/hash.h                      | 19 +++++++++++
+>  net/bluetooth/smp.c                        |  6 +---
+>  net/sctp/auth.c                            | 10 ++----
+>  net/sctp/sm_make_chunk.c                   | 23 +++++--------
+>  security/keys/encrypted-keys/encrypted.c   | 18 ++--------
+>  sound/soc/codecs/cros_ec_codec.c           |  9 +----
+>  25 files changed, 95 insertions(+), 229 deletions(-)
+>
 > --
 > 2.26.2
 >
-
-Acked-by: Gilad Ben-Yossef <gilad@benyossef.com>
-
-Thanks,
-Gilad
-
-
---=20
-Gilad Ben-Yossef
-Chief Coffee Drinker
-
-values of =CE=B2 will give rise to dom!
