@@ -2,74 +2,150 @@ Return-Path: <SRS0=Dybx=6S=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-2.3 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA25BC3A5A9
-	for <linux-crypto@archiver.kernel.org>; Mon,  4 May 2020 18:48:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 656E6C47247
+	for <linux-crypto@archiver.kernel.org>; Mon,  4 May 2020 19:07:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B8B722073E
-	for <linux-crypto@archiver.kernel.org>; Mon,  4 May 2020 18:48:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 53E4A206C0
+	for <linux-crypto@archiver.kernel.org>; Mon,  4 May 2020 19:07:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726744AbgEDSsJ (ORCPT
+        id S1726469AbgEDTHU (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 4 May 2020 14:48:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36288 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726641AbgEDSsJ (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 4 May 2020 14:48:09 -0400
-Received: from shards.monkeyblade.net (shards.monkeyblade.net [IPv6:2620:137:e000::1:9])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9378C061A0E;
-        Mon,  4 May 2020 11:48:08 -0700 (PDT)
-Received: from localhost (unknown [IPv6:2601:601:9f00:477::3d5])
-        (using TLSv1 with cipher AES256-SHA (256/256 bits))
-        (Client did not present a certificate)
-        (Authenticated sender: davem-davemloft)
-        by shards.monkeyblade.net (Postfix) with ESMTPSA id F1B0D11F5F61A;
-        Mon,  4 May 2020 11:48:06 -0700 (PDT)
-Date:   Mon, 04 May 2020 11:48:06 -0700 (PDT)
-Message-Id: <20200504.114806.529418018451997120.davem@davemloft.net>
-To:     arnd@arndb.de
-Cc:     ayush.sawal@chelsio.com, vinay.yadav@chelsio.com,
-        rohitm@chelsio.com, herbert@gondor.apana.org.au,
-        netdev@vger.kernel.org, yuehaibing@huawei.com,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] cxgb4/chcr: avoid -Wreturn-local-addr warning
-From:   David Miller <davem@davemloft.net>
-In-Reply-To: <20200430103912.1170231-1-arnd@arndb.de>
-References: <20200430103912.1170231-1-arnd@arndb.de>
-X-Mailer: Mew version 6.8 on Emacs 26.1
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.5.12 (shards.monkeyblade.net [149.20.54.216]); Mon, 04 May 2020 11:48:07 -0700 (PDT)
+        Mon, 4 May 2020 15:07:20 -0400
+Received: from fieldses.org ([173.255.197.46]:45372 "EHLO fieldses.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725956AbgEDTHU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Mon, 4 May 2020 15:07:20 -0400
+Received: by fieldses.org (Postfix, from userid 2815)
+        id 16564ABE; Mon,  4 May 2020 15:07:19 -0400 (EDT)
+Date:   Mon, 4 May 2020 15:07:19 -0400
+To:     Chuck Lever <chuck.lever@oracle.com>
+Cc:     linux-nfs@vger.kernel.org, linux-crypto@vger.kernel.org
+Subject: Re: [PATCH RFC] Frequent connection loss using krb5[ip] NFS mounts
+Message-ID: <20200504190719.GB2757@fieldses.org>
+References: <20200501184301.2324.22719.stgit@klimt.1015granger.net>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200501184301.2324.22719.stgit@klimt.1015granger.net>
+User-Agent: Mutt/1.5.21 (2010-09-15)
+From:   bfields@fieldses.org (J. Bruce Fields)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Arnd Bergmann <arnd@arndb.de>
-Date: Thu, 30 Apr 2020 12:39:02 +0200
+On Fri, May 01, 2020 at 03:04:00PM -0400, Chuck Lever wrote:
+> Over the past year or so I've observed that using sec=krb5i or
+> sec=krb5p with NFS/RDMA while testing my Linux NFS client and server
+> results in frequent connection loss. I've been able to pin this down
+> a bit.
+> 
+> The problem is that SUNRPC's calls into the kernel crypto functions
+> can sometimes reschedule. If that happens between the time the
+> server receives an RPC Call and the time it has unwrapped the Call's
+> GSS sequence number, the number is very likely to have fallen
+> outside the GSS context's sequence number window. When that happens,
+> the server is required to drop the Call, and therefore also the
+> connection.
 
-> gcc-10 warns about functions that return a pointer to a stack
-> variable. In chcr_write_cpl_set_tcb_ulp(), this does not actually
-> happen, but it's too hard to see for the compiler:
-> 
-> drivers/crypto/chelsio/chcr_ktls.c: In function 'chcr_write_cpl_set_tcb_ulp.constprop':
-> drivers/crypto/chelsio/chcr_ktls.c:760:9: error: function may return address of local variable [-Werror=return-local-addr]
->   760 |  return pos;
->       |         ^~~
-> drivers/crypto/chelsio/chcr_ktls.c:712:5: note: declared here
->   712 |  u8 buf[48] = {0};
->       |     ^~~
-> 
-> Split the middle part of the function out into a helper to make
-> it easier to understand by both humans and compilers, which avoids
-> the warning.
-> 
-> Fixes: 5a4b9fe7fece ("cxgb4/chcr: complete record tx handling")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+Does it help to increase GSS_SEQ_WIN?  I think you could even increase
+it by a couple orders of magnitudes without getting into higher-order
+allocations.
 
-Applied, thanks Arnd.
+--b.
+
+> 
+> I've tested this observation by applying the following naive patch to
+> both my client and server, and got the following results.
+> 
+> I. Is this an effective fix?
+> 
+> With sec=krb5p,proto=rdma, I ran a 12-thread git regression test
+> (cd git/; make -j12 test).
+> 
+> Without this patch on the server, over 3,000 connection loss events
+> are observed. With it, the test runs on a single connection. Clearly
+> the server needs to have some kind of mitigation in this area.
+> 
+> 
+> II. Does the fix cause a performance regression?
+> 
+> Because this patch affects both the client and server paths, I
+> tested the performance differences between applying the patch in
+> various combinations and with both sec=krb5 (which checksums just
+> the RPC message header) and krb5i (which checksums the whole RPC
+> message.
+> 
+> fio 8KiB 70% read, 30% write for 30 seconds, NFSv3 on RDMA.
+> 
+> -- krb5 --
+> 
+> unpatched client and server:
+> Connect count: 3
+> read: IOPS=84.3k, 50.00th=[ 1467], 99.99th=[10028] 
+> write: IOPS=36.1k, 50.00th=[ 1565], 99.99th=[20579]
+> 
+> patched client, unpatched server:
+> Connect count: 2
+> read: IOPS=75.4k, 50.00th=[ 1647], 99.99th=[ 7111]
+> write: IOPS=32.3k, 50.00th=[ 1745], 99.99th=[ 7439]
+> 
+> unpatched client, patched server:
+> Connect count: 1
+> read: IOPS=84.1k, 50.00th=[ 1467], 99.99th=[ 8717]
+> write: IOPS=36.1k, 50.00th=[ 1582], 99.99th=[ 9241]
+> 
+> patched client and server:
+> Connect count: 1
+> read: IOPS=74.9k, 50.00th=[ 1663], 99.99th=[ 7046]
+> write: IOPS=31.0k, 50.00th=[ 1762], 99.99th=[ 7242]
+> 
+> -- krb5i --
+> 
+> unpatched client and server:
+> Connect count: 6
+> read: IOPS=35.8k, 50.00th=[ 3228], 99.99th=[49546]
+> write: IOPS=15.4k, 50.00th=[ 3294], 99.99th=[50594]
+> 
+> patched client, unpatched server:
+> Connect count: 5
+> read: IOPS=36.3k, 50.00th=[ 3228], 99.99th=[14877]
+> write: IOPS=15.5k, 50.00th=[ 3294], 99.99th=[15139]
+> 
+> unpatched client, patched server:
+> Connect count: 3
+> read: IOPS=35.7k, 50.00th=[ 3228], 99.99th=[15926]
+> write: IOPS=15.2k, 50.00th=[ 3294], 99.99th=[15926]
+> 
+> patched client and server:
+> Connect count: 3
+> read: IOPS=36.3k, 50.00th=[ 3195], 99.99th=[15139]
+> write: IOPS=15.5k, 50.00th=[ 3261], 99.99th=[15270]
+> 
+> 
+> The good news:
+> Both results show that I/O tail latency improves significantly when
+> either the client or the server has this patch applied.
+> 
+> The bad news:
+> The krb5 performance result shows an IOPS regression when the client
+> has this patch applied.
+> 
+> 
+> So now I'm trying to understand how to come up with a solution that
+> prevents the rescheduling/connection loss issue without also
+> causing a performance regression.
+> 
+> Any thoughts/comments/advice appreciated.
+> 
+> ---
+> 
+> Chuck Lever (1):
+>       SUNRPC: crypto calls should never schedule
+> 
+> --
+> Chuck Lever
