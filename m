@@ -2,90 +2,144 @@ Return-Path: <SRS0=vF1r=6T=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82DD8C47257
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 May 2020 14:19:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 484F9C47254
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 May 2020 14:24:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 627C920675
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 May 2020 14:19:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1588688369;
-	bh=cANn+yfynoapB4bx15gNl+Teq2Q4AoGfjt3dkMML+YA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
-	b=dz2y+wPsR5Y4AVvkGKH1pneuaXruexqxpnVibzrBbGt4npWguvKIEFqlMqVz31CLG
-	 UqYtWfdXCimzb2kyIVyFkGBSTONoitbPhscigMzqZfe/yG/B94LZGwaopYbMIPgkhX
-	 z3l0wxOq9EZMCJ22x63V8IECMUfTN9GabfVYYEBE=
+	by mail.kernel.org (Postfix) with ESMTP id 2CE0520746
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 May 2020 14:24:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729830AbgEEOT2 (ORCPT
+        id S1729335AbgEEONs (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 May 2020 10:19:28 -0400
-Received: from mail-ed1-f66.google.com ([209.85.208.66]:45028 "EHLO
-        mail-ed1-f66.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729961AbgEEOTN (ORCPT
+        Tue, 5 May 2020 10:13:48 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:36933 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729146AbgEEONr (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 May 2020 10:19:13 -0400
-Received: by mail-ed1-f66.google.com with SMTP id r7so1899707edo.11
-        for <linux-crypto@vger.kernel.org>; Tue, 05 May 2020 07:19:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to:user-agent;
-        bh=tH8Jy39F3Mdtkz9Csx4sb5utsxMmdHj9M8JrCE26sBc=;
-        b=IneCuK60nCuTY6gfGXHdCRTKRCM37KPJKT0KLF3tFkRLIdgr+b5GNKTttkm7pOV0RS
-         SGBTcSg5zC0CZmBy/f/hOZPjKxRtOLAlXXcRbQXymUEcNvuw8sJe+DnrWZIZAySdu3c0
-         yNHmIX4dioG9dQr/g0DJoSSc/8n4q6lJmN4pHkmx/vTcMtVeUQ8GLdATYHc6dzeDU4mU
-         D0fOD3GSuSfp1QXA0GReka/UDb3FDyOCxpH5czrM9QsfbceTK9KKgXf0fap0CE1FFBVB
-         bjVzqPzUcz7pBPNHOPlp0j3mg8llNTDK7cwzRqlbZusMRJJ5c4AcHMc8UR6HUeHBBpXe
-         iZ8Q==
-X-Gm-Message-State: AGi0PuYptDBOUHAA2ob/+SFHIpxDZj+okBo9P/T/0FphshtvTodzozqo
-        dzkWf69AbvCtnSiDkNLfpj8=
-X-Google-Smtp-Source: APiQypJ2CNSRzy1yuJBTVg6cPPmCKdViExCblrx20dO9wvPntaLlDO/JzKht2tWlolO1DBPBgfSlpw==
-X-Received: by 2002:aa7:de0b:: with SMTP id h11mr2871264edv.133.1588688351173;
-        Tue, 05 May 2020 07:19:11 -0700 (PDT)
-Received: from kozik-lap ([194.230.155.237])
-        by smtp.googlemail.com with ESMTPSA id a5sm30748edn.14.2020.05.05.07.19.10
-        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
-        Tue, 05 May 2020 07:19:10 -0700 (PDT)
-Date:   Tue, 5 May 2020 16:19:08 +0200
-From:   Krzysztof Kozlowski <krzk@kernel.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-crypto@vger.kernel.org, Vladimir Zapolskiy <vz@mleia.com>,
-        Kamil Konieczny <k.konieczny@samsung.com>
-Subject: Re: [PATCH 11/20] crypto: s5p-sss - use crypto_shash_tfm_digest()
-Message-ID: <20200505141908.GA2874@kozik-lap>
-References: <20200502053122.995648-1-ebiggers@kernel.org>
- <20200502053122.995648-12-ebiggers@kernel.org>
+        Tue, 5 May 2020 10:13:47 -0400
+Received: from localhost.localdomain ([149.172.19.189]) by
+ mrelayeu.kundenserver.de (mreue010 [212.227.15.129]) with ESMTPA (Nemesis) id
+ 1M9WeC-1jSePQ0bES-005d0q; Tue, 05 May 2020 16:13:32 +0200
+From:   Arnd Bergmann <arnd@arndb.de>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        "David S. Miller" <davem@davemloft.net>
+Cc:     Arnd Bergmann <arnd@arndb.de>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, wireguard@lists.zx2c4.com,
+        clang-built-linux@googlegroups.com
+Subject: [PATCH] net: wireguard: avoid unused variable warning
+Date:   Tue,  5 May 2020 16:13:17 +0200
+Message-Id: <20200505141327.746184-1-arnd@arndb.de>
+X-Mailer: git-send-email 2.26.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20200502053122.995648-12-ebiggers@kernel.org>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:j5rBKEs2EZ2wBWucgw3jP/snV64xmxjwf5JSJRK1981/0aQIMOW
+ fEF0VkodfzvUsiuEQUDo7kxlEFs3xdtHubS7l8i8Gk1lEj/6nOgXOAI7UbeAobG1OrqBrcG
+ GVJlqLnzIGLXPiv/nvBYUAcfTh4xKECz/6lRIBaCKcqauCArBacxGzmbeG17O3z256yLxp7
+ bPL+EwTM3HZElCMzzbHdg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Dk/GUQ/t1Bc=:yEMm/AYZhCfPtA9HWgU3/6
+ NpaeDf8tJN2PXbUfTPSlKnW7zxCFyXGgCxtknT8672D1Ri8glQ0ejXiFdUI0VLfBoZxCu5ZDq
+ Clbq9XIaw4vcoS70Z2oe1OASZcipm0xIj+Zd/sSDeKE8gTibGvA7lKu5AMxc3kJh2lauU4eO0
+ 2VZryiFexozDS0SJoW6iZ6r2J2I7RNXCG9q5S3XNMZEHyPZxOUTh7XKocmbX2dBzzUCYOYkob
+ ImIbtdgQxuidwLOPtuVokmY/B19rUsAtrBJQavK1pXZUX9zUsmDM1rl6/9jg9JmEWtZYQdHJj
+ +3AnWXN2FG9EqRAhc3HC73C63I/UyhuLDh2+lBinSTdkgGdPQ1TNh58+2id0y4BPR06U8R23C
+ CAB8mOJeJI1VXb2BGa7qb8GxLRBTBqGJotvhWYSel4/A+YrG7hjLIlsAvodsTEb0dEV61D5l5
+ INqNgLWCH3tuiIYBOTpfgiCSB8qU83C9eMU5oClxOZAEpyJjjsLdxi+qSrpIUixWyJbMjM25b
+ NjnrlxnZUtn2Z3CAdaNw786GgKxn3jw80kwrk6Onysd02XylVd4HeN6QAUsczkoyc1CD4L9zK
+ 2ktIYnX4devlUErlwVSGJzrPp+U9YNrHIcGTuM/KMRD3KzIH9+zjoDIVQ3AtpjcnZnuR4NQnt
+ oYRKBcLtwnw/1EJFvNfQsdavWNOOzKnjXIa8BXi8RM980R6bmIOG3PRpoR/waCc+FYsBccfA6
+ xLLw98YqKlcnpnG0+v8pwD98Lv0jX+sbOtb4b3JZeVJm0LO7sik3VgKCtlEjzeXI8AbKWOwCk
+ bvmJu2G6jNC4yXyi8EScJuTfM7t46CimQURKtQRg4qvTNma43E=
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, May 01, 2020 at 10:31:13PM -0700, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> Instead of manually allocating a 'struct shash_desc' on the stack and
-> calling crypto_shash_digest(), switch to using the new helper function
-> crypto_shash_tfm_digest() which does this for us.
-> 
-> Cc: Krzysztof Kozlowski <krzk@kernel.org>
-> Cc: Vladimir Zapolskiy <vz@mleia.com>
-> Cc: Kamil Konieczny <k.konieczny@samsung.com>
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->  drivers/crypto/s5p-sss.c | 39 ++++++---------------------------------
->  1 file changed, 6 insertions(+), 33 deletions(-)
+clang points out a harmless use of uninitialized variables that
+get passed into a local function but are ignored there:
 
-Acked-by: Krzysztof Kozlowski <krzk@kernel.org>
+In file included from drivers/net/wireguard/ratelimiter.c:223:
+drivers/net/wireguard/selftest/ratelimiter.c:173:34: error: variable 'skb6' is uninitialized when used here [-Werror,-Wuninitialized]
+                ret = timings_test(skb4, hdr4, skb6, hdr6, &test_count);
+                                               ^~~~
+drivers/net/wireguard/selftest/ratelimiter.c:123:29: note: initialize the variable 'skb6' to silence this warning
+        struct sk_buff *skb4, *skb6;
+                                   ^
+                                    = NULL
+drivers/net/wireguard/selftest/ratelimiter.c:173:40: error: variable 'hdr6' is uninitialized when used here [-Werror,-Wuninitialized]
+                ret = timings_test(skb4, hdr4, skb6, hdr6, &test_count);
+                                                     ^~~~
+drivers/net/wireguard/selftest/ratelimiter.c:125:22: note: initialize the variable 'hdr6' to silence this warning
+        struct ipv6hdr *hdr6;
+                            ^
 
-Best regards,
-Krzysztof
+Shut up the warning by ensuring the variables are always initialized,
+and make up for the loss of readability by changing the "#if IS_ENABLED()"
+checks to regular "if (IS_ENABLED())".
+
+Fixes: e7096c131e51 ("net: WireGuard secure network tunnel")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ drivers/net/wireguard/selftest/ratelimiter.c | 32 +++++++++++---------
+ 1 file changed, 17 insertions(+), 15 deletions(-)
+
+diff --git a/drivers/net/wireguard/selftest/ratelimiter.c b/drivers/net/wireguard/selftest/ratelimiter.c
+index bcd6462e4540..f408b936e224 100644
+--- a/drivers/net/wireguard/selftest/ratelimiter.c
++++ b/drivers/net/wireguard/selftest/ratelimiter.c
+@@ -153,19 +153,22 @@ bool __init wg_ratelimiter_selftest(void)
+ 	skb_reset_network_header(skb4);
+ 	++test;
+ 
+-#if IS_ENABLED(CONFIG_IPV6)
+-	skb6 = alloc_skb(sizeof(struct ipv6hdr), GFP_KERNEL);
+-	if (unlikely(!skb6)) {
+-		kfree_skb(skb4);
+-		goto err_nofree;
++	if (IS_ENABLED(CONFIG_IPV6)) {
++		skb6 = alloc_skb(sizeof(struct ipv6hdr), GFP_KERNEL);
++		if (unlikely(!skb6)) {
++			kfree_skb(skb4);
++			goto err_nofree;
++		}
++		skb6->protocol = htons(ETH_P_IPV6);
++		hdr6 = (struct ipv6hdr *)skb_put(skb6, sizeof(*hdr6));
++		hdr6->saddr.in6_u.u6_addr32[0] = htonl(1212);
++		hdr6->saddr.in6_u.u6_addr32[1] = htonl(289188);
++		skb_reset_network_header(skb6);
++		++test;
++	} else {
++		skb6 = NULL;
++		hdr6 = NULL;
+ 	}
+-	skb6->protocol = htons(ETH_P_IPV6);
+-	hdr6 = (struct ipv6hdr *)skb_put(skb6, sizeof(*hdr6));
+-	hdr6->saddr.in6_u.u6_addr32[0] = htonl(1212);
+-	hdr6->saddr.in6_u.u6_addr32[1] = htonl(289188);
+-	skb_reset_network_header(skb6);
+-	++test;
+-#endif
+ 
+ 	for (trials = TRIALS_BEFORE_GIVING_UP;;) {
+ 		int test_count = 0, ret;
+@@ -206,9 +209,8 @@ bool __init wg_ratelimiter_selftest(void)
+ 
+ err:
+ 	kfree_skb(skb4);
+-#if IS_ENABLED(CONFIG_IPV6)
+-	kfree_skb(skb6);
+-#endif
++	if (IS_ENABLED(CONFIG_IPV6))
++		kfree_skb(skb6);
+ err_nofree:
+ 	wg_ratelimiter_uninit();
+ 	wg_ratelimiter_uninit();
+-- 
+2.26.0
 
