@@ -4,79 +4,79 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E17A0C47254
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 May 2020 14:55:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 388B9C47247
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 May 2020 15:28:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B4EC8206B9
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 May 2020 14:55:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1189E2078D
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 May 2020 15:28:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MASQ4qXl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ns9BAO8Y"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729150AbgEEOz4 (ORCPT
+        id S1729404AbgEEP2E (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 May 2020 10:55:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55432 "EHLO
+        Tue, 5 May 2020 11:28:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1727857AbgEEOzz (ORCPT
+        by vger.kernel.org with ESMTP id S1729403AbgEEP2E (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 May 2020 10:55:55 -0400
-Received: from mail-il1-x142.google.com (mail-il1-x142.google.com [IPv6:2607:f8b0:4864:20::142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AFA4C061A0F;
-        Tue,  5 May 2020 07:55:55 -0700 (PDT)
-Received: by mail-il1-x142.google.com with SMTP id c16so2548066ilr.3;
-        Tue, 05 May 2020 07:55:55 -0700 (PDT)
+        Tue, 5 May 2020 11:28:04 -0400
+Received: from mail-io1-xd43.google.com (mail-io1-xd43.google.com [IPv6:2607:f8b0:4864:20::d43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E036C061A0F;
+        Tue,  5 May 2020 08:28:04 -0700 (PDT)
+Received: by mail-io1-xd43.google.com with SMTP id w4so2363324ioc.6;
+        Tue, 05 May 2020 08:28:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=NS/Er7IwWIFbzDl21PFz+7Gm89txLKeh/GpsaYNLu/8=;
-        b=MASQ4qXlT2eIHPvFrXugI0zcu+DRET4XmbvoUi2Ju7BXVrYwoFayqf8JrrpIOwk9eC
-         8GJYfZP1auWX5ho8tdQtPy8dKNC+05FajiP+JH+yVZIFonzC3V3Pg2i9SH0vUw8ZK5Dm
-         /hhgo8RnHq4wmp+ebifVMCs8SstI10KfzLTb5A0xa74N5s+y2M/gG+hQHmuPYxNHTYrq
-         5ZIXvVWgpe6HytRSYhYeg1V4lENm4NxPY9zhfjY/Tsi4BAJR7uEubg7HN0P1hkteU/l1
-         ZtEVOh+UtMbRTkKRFwILRQ6DS+QUA7McGrBgFfKM1p25twMwiO7ZBCHPADaKdKGTh6XS
-         vj5A==
+        bh=b//WyoKMoOWyknzMDwAntqpnlFg9r6X0WW+350J/1yI=;
+        b=ns9BAO8YqpS1sAuldx8uWARkY5qyrGWrAOpg6uCV3k+MLyCqop9mCBaHHj89E4v0N+
+         6XSAEH4CgAV1naXoyGmgRPnxurfKpXb/oGlkGKHWtS6WxFdqDtU8owmyzzgtUhO9crJ0
+         Wah7omW86KzoFYxgbiKJ182JNj0OCAtEq2lVQ8QPzqSIMbygjkwBUz8whHphk66EsyTH
+         gc5mBj7UyJ+8nCBrHdLB+g0RkeC4aVOADiHCHBp0CvmjYghZ1QESa61mOfNSD1Htw3NG
+         HLZtaCh0qTka3kXfeEW2Qq+rFyxqOIjYpx4bn9xl6ld0OY9X7Pb8H47piuNFQUa5bDYG
+         /jVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=NS/Er7IwWIFbzDl21PFz+7Gm89txLKeh/GpsaYNLu/8=;
-        b=ocvCv4wn/0SBjX65WRMgll0DVVzPQ11NquKRcKVlApQY8i7P/Q7//YYx2HQG5RB7Kb
-         72pYjiwYqyq2eOvdZzNqx8EC+Z1kQgPNF/vFEMMqRillVONC1Uq7e3nh7nuIY/3wpILJ
-         wNLNoAgSgE0lm7EPxFhrARCndosYABNPJFmElZtUUxFoXE9Aln6wL7Qd8i3WcRPU8qnG
-         9vVhL+764PFUC9lbnfupt5tCXbR/nUsk7Z+PN+zSxFKsco4SufygFZ9LKNHO48+yKkH1
-         y8EYJPH1mOHS+czN6kzXfzUmJQg6ckuQGrXsWVo1j56kYfNhxZKf432pALflPHcJvfx4
-         GOAA==
-X-Gm-Message-State: AGi0Pub1onli2ba6eLCDstL2Si4EfHpWCRjoYk5mV3EAQ++lg1ZHm1/F
-        QrLI0jnmXxtko0IEjjDjDy7p1qQH1zhHOTPD8F4=
-X-Google-Smtp-Source: APiQypKZDkvZEoUsnmz58MqpVMx474ZJ0f6dVp/7meZiwf5sp2yDk/zovIWKo1xxBl8RhBEJzUAlaSxGinuIbGdC9+Q=
-X-Received: by 2002:a92:3dd5:: with SMTP id k82mr4122003ilf.237.1588690554407;
- Tue, 05 May 2020 07:55:54 -0700 (PDT)
+        bh=b//WyoKMoOWyknzMDwAntqpnlFg9r6X0WW+350J/1yI=;
+        b=MrFrDXujMdIZ8m/ZdWrUZKrHsmEmoNKvjDI9p2FXen80Py2DpprJUphibC34+MY0FF
+         bKMj6siwBCWJMRAqH5IDIO52sZq4UzXsux9IePJ52X7ft/vYswEAJv4TKngTMDQlxd/R
+         AE2OluSbliROxQKXVHMaOKvmGFjAEWu+IKoJ9+vrREzW7oY5Hm458Y9LK1xdwiccvdvF
+         RDjbf0v/Zu3XbBMC0ALa54KmCd864Ru7HTCi2GXNeXrZrLPM9fuHEESDEueNGxlfsh1+
+         MAhsporBIB5fbUM9osRsql4HNNvJ0QU8VCV2JvJo8yp+boH5YH3zeZzbUDDilraZr80O
+         svmA==
+X-Gm-Message-State: AGi0PubsaTz4GqZMA8FE0i87N8FBlMtuYuLAA/ekEpFi7iBMQRzd89e2
+        fpJBAMUITyLnJzOd+Q1gUG8jfGddtIqWdAakyWg=
+X-Google-Smtp-Source: APiQypICZLOIAWPDMlYJr/jbilaov2atkz+fIoCy6F3ev9oqNozYB3WFgJcfcMdbAQytemQqFANXBtFhBCKd5m+hzUA=
+X-Received: by 2002:a6b:b9d5:: with SMTP id j204mr3962700iof.38.1588692483399;
+ Tue, 05 May 2020 08:28:03 -0700 (PDT)
 MIME-Version: 1.0
 References: <20200430201125.532129-1-daniel.m.jordan@oracle.com>
- <20200430201125.532129-7-daniel.m.jordan@oracle.com> <CAKgT0Uf7e5514SOi8dmkB5oXUK9bwqD_z-5KJ_F3MUn3CAQyPQ@mail.gmail.com>
- <3C3C62BE-6363-41C3-834C-C3124EB3FFAB@joshtriplett.org> <CAKgT0UdBv-Wj98P2wMFGDSihPLKWFsqpu77ZmO+eA51uteZ-Ag@mail.gmail.com>
- <20200505014844.ulp4rtih7adtcicm@ca-dmjordan1.us.oracle.com> <20200505020916.mve4ijrg4z5h7eh5@ca-dmjordan1.us.oracle.com>
-In-Reply-To: <20200505020916.mve4ijrg4z5h7eh5@ca-dmjordan1.us.oracle.com>
+ <20200430201125.532129-6-daniel.m.jordan@oracle.com> <deadac9a-fbef-6c66-207c-83d251d2ef50@linux.intel.com>
+ <20200501024539.tnjuybydwe3r4u2x@ca-dmjordan1.us.oracle.com>
+ <CAKgT0Uctro3+PWeJTi=O3Yc2qUF8Oy+HrypzCUzkaCt=XH0Lkg@mail.gmail.com> <20200505005432.bohmaa6zeffhdkgn@ca-dmjordan1.us.oracle.com>
+In-Reply-To: <20200505005432.bohmaa6zeffhdkgn@ca-dmjordan1.us.oracle.com>
 From:   Alexander Duyck <alexander.duyck@gmail.com>
-Date:   Tue, 5 May 2020 07:55:43 -0700
-Message-ID: <CAKgT0UdE1ex_aAyMeR3PWtVcmXL8cUtjqy0J8hLpnFm42yn82w@mail.gmail.com>
-Subject: Re: [PATCH 6/7] mm: parallelize deferred_init_memmap()
+Date:   Tue, 5 May 2020 08:27:52 -0700
+Message-ID: <CAKgT0Uegw2vFSCOcsCMATfDu0Q8NP2ZVi-2Fgm8P2RwU_B2c3A@mail.gmail.com>
+Subject: Re: [PATCH 5/7] mm: move zone iterator outside of deferred_init_maxorder()
 To:     Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc:     Josh Triplett <josh@joshtriplett.org>,
+Cc:     Alexander Duyck <alexander.h.duyck@linux.intel.com>,
         Andrew Morton <akpm@linux-foundation.org>,
         Herbert Xu <herbert@gondor.apana.org.au>,
         Steffen Klassert <steffen.klassert@secunet.com>,
         Alex Williamson <alex.williamson@redhat.com>,
-        Alexander Duyck <alexander.h.duyck@linux.intel.com>,
         Dan Williams <dan.j.williams@intel.com>,
         Dave Hansen <dave.hansen@linux.intel.com>,
         David Hildenbrand <david@redhat.com>,
         Jason Gunthorpe <jgg@ziepe.ca>,
         Jonathan Corbet <corbet@lwn.net>,
+        Josh Triplett <josh@joshtriplett.org>,
         Kirill Tkhai <ktkhai@virtuozzo.com>,
         Michal Hocko <mhocko@kernel.org>, Pavel Machek <pavel@ucw.cz>,
         Pavel Tatashin <pasha.tatashin@soleen.com>,
@@ -92,138 +92,65 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, May 4, 2020 at 7:11 PM Daniel Jordan <daniel.m.jordan@oracle.com> wrote:
+On Mon, May 4, 2020 at 5:54 PM Daniel Jordan <daniel.m.jordan@oracle.com> wrote:
 >
-> On Mon, May 04, 2020 at 09:48:44PM -0400, Daniel Jordan wrote:
-> > On Mon, May 04, 2020 at 05:40:19PM -0700, Alexander Duyck wrote:
-> > > On Mon, May 4, 2020 at 4:44 PM Josh Triplett <josh@joshtriplett.org> wrote:
-> > > >
-> > > > On May 4, 2020 3:33:58 PM PDT, Alexander Duyck <alexander.duyck@gmail.com> wrote:
-> > > > >On Thu, Apr 30, 2020 at 1:12 PM Daniel Jordan
-> > > > ><daniel.m.jordan@oracle.com> wrote:
-> > > > >>         /*
-> > > > >> -        * Initialize and free pages in MAX_ORDER sized increments so
-> > > > >> -        * that we can avoid introducing any issues with the buddy
-> > > > >> -        * allocator.
-> > > > >> +        * More CPUs always led to greater speedups on tested
-> > > > >systems, up to
-> > > > >> +        * all the nodes' CPUs.  Use all since the system is
-> > > > >otherwise idle now.
-> > > > >>          */
-> > > > >
-> > > > >I would be curious about your data. That isn't what I have seen in the
-> > > > >past. Typically only up to about 8 or 10 CPUs gives you any benefit,
-> > > > >beyond that I was usually cache/memory bandwidth bound.
+> On Mon, May 04, 2020 at 03:10:46PM -0700, Alexander Duyck wrote:
+> > So we cannot stop in the middle of a max order block. That shouldn't
+> > be possible as part of the issue is that the buddy allocator will
+> > attempt to access the buddy for the page which could cause issues if
+> > it tries to merge the page with one that is not initialized. So if
+> > your code supports that then it is definitely broken. That was one of
+> > the reasons for all of the variable weirdness in
+> > deferred_init_maxorder. I was going through and making certain that
+> > while we were initializing the range we were freeing the pages in
+> > MAX_ORDER aligned blocks and skipping over whatever reserved blocks
+> > were there. Basically it was handling the case where a single
+> > MAX_ORDER block could span multiple ranges.
 > >
-> > On Skylake it took more than 8 or 10 CPUs, though on other machines the benefit
-> > of using all versus half or 3/4 of the CPUs is less significant.
-> >
-> > Given that the rest of the system is idle at this point, my main concern is
-> > whether other archs regress past a certain thread count.
+> > On x86 this was all pretty straightforward and I don't believe we
+> > needed the code, but I seem to recall there were some other
+> > architectures that had more complex memory layouts at the time and
+> > that was one of the reasons why I had to be careful to wait until I
+> > had processed the full MAX_ORDER block before I could start freeing
+> > the pages, otherwise it would start triggering memory corruptions.
 >
-> Reposting the data to be consistent with the way the percentages are reported
-> in the changelog.
->
->
->     Intel(R) Xeon(R) Platinum 8167M CPU @ 2.00GHz (Skylake, bare metal)
->       2 nodes * 26 cores * 2 threads = 104 CPUs
->       384G/node = 768G memory
->
->                    kernel boot                 deferred init
->                    ------------------------    ------------------------
->     node% (thr)    speedup  time_ms (stdev)    speedup  time_ms (stdev)
->           (  0)         --   4056.7 (  5.5)         --   1763.3 (  4.2)
->        2% (  1)      -2.4%   4153.3 (  2.5)      -5.6%   1861.7 (  5.5)
->       12% (  6)      35.0%   2637.7 ( 38.7)      80.3%    346.7 ( 37.5)
->       25% ( 13)      38.4%   2497.3 ( 38.5)      88.1%    210.0 ( 41.8)
->       37% ( 19)      38.9%   2477.0 ( 19.0)      89.5%    185.3 ( 21.5)
->       50% ( 26)      39.1%   2471.7 ( 21.4)      89.8%    179.7 ( 25.8)
->       75% ( 39)      39.5%   2455.7 ( 33.2)      90.8%    161.7 ( 29.3)
->      100% ( 52)      39.9%   2436.7 (  2.1)      91.8%    144.3 (  5.9)
->
->
->     Intel(R) Xeon(R) CPU E5-2699C v4 @ 2.20GHz (Broadwell, bare metal)
->       1 node * 16 cores * 2 threads = 32 CPUs
->       192G/node = 192G memory
->
->                    kernel boot                 deferred init
->                    ------------------------    ------------------------
->     node% (thr)    speedup  time_ms (stdev)    speedup  time_ms (stdev)
->           (  0)         --   1957.3 ( 14.0)         --   1093.7 ( 12.9)
->        3% (  1)       1.4%   1930.7 ( 10.0)       3.7%   1053.3 (  7.6)
->       12% (  4)      41.2%   1151.7 (  9.0)      74.5%    278.7 (  0.6)
->       25% (  8)      46.3%   1051.0 (  7.8)      83.7%    178.0 (  2.6)
->       38% ( 12)      48.7%   1003.3 (  7.6)      87.0%    141.7 (  3.8)
->       50% ( 16)      48.2%   1014.3 ( 20.0)      87.8%    133.3 (  3.2)
->       75% ( 24)      49.5%    989.3 (  6.7)      88.4%    126.3 (  1.5)
->      100% ( 32)      49.1%    996.0 (  7.2)      88.4%    127.3 (  5.1)
->
->
->     Intel(R) Xeon(R) CPU E5-2699 v3 @ 2.30GHz (Haswell, bare metal)
->       2 nodes * 18 cores * 2 threads = 72 CPUs
->       128G/node = 256G memory
->
->                    kernel boot                 deferred init
->                    ------------------------    ------------------------
->     node% (thr)    speedup  time_ms (stdev)    speedup  time_ms (stdev)
->           (  0)         --   1666.0 (  3.5)         --    618.0 (  3.5)
->        3% (  1)       1.0%   1649.7 (  1.5)       2.9%    600.0 (  1.0)
->       11% (  4)      25.9%   1234.7 ( 21.4)      70.4%    183.0 ( 22.5)
->       25% (  9)      29.6%   1173.0 ( 10.0)      80.7%    119.3 (  9.6)
->       36% ( 13)      30.8%   1153.7 ( 17.0)      84.0%     99.0 ( 15.6)
->       50% ( 18)      31.0%   1150.3 ( 15.5)      84.3%     97.3 ( 16.2)
->       75% ( 27)      31.0%   1150.3 (  2.5)      84.6%     95.0 (  5.6)
->      100% ( 36)      31.3%   1145.3 (  1.5)      85.6%     89.0 (  1.7)
->
->
->     AMD EPYC 7551 32-Core Processor (Zen, kvm guest)
->       1 node * 8 cores * 2 threads = 16 CPUs
->       64G/node = 64G memory
->
->                    kernel boot                 deferred init
->                    ------------------------    ------------------------
->     node% (thr)    speedup  time_ms (stdev)    speedup  time_ms (stdev)
->           (  0)         --   1029.7 ( 42.3)         --    253.7 (  3.1)
->        6% (  1)       3.3%    995.3 ( 21.4)       4.3%    242.7 (  5.5)
->       12% (  2)      14.0%    885.7 ( 24.4)      46.4%    136.0 (  5.2)
->       25% (  4)      18.9%    835.0 ( 21.5)      66.1%     86.0 (  1.7)
->       38% (  6)      21.9%    804.7 ( 15.7)      71.4%     72.7 (  2.1)
->       50% (  8)      20.8%    815.3 ( 11.7)      74.4%     65.0 (  3.5)
->       75% ( 12)      23.5%    787.7 (  2.1)      74.0%     66.0 (  3.6)
->      100% ( 16)      23.3%    789.3 ( 15.0)      76.3%     60.0 (  5.6)
->
->
->     AMD EPYC 7551 32-Core Processor (Zen, kvm guest)
->       1 node * 2 cores * 2 threads = 4 CPUs
->       16G/node = 16G memory
->
->                    kernel boot                 deferred init
->                    ------------------------    ------------------------
->     node% (thr)    speedup  time_ms (stdev)    speedup  time_ms (stdev)
->           (  0)         --    757.7 ( 17.1)         --     57.0 (  0.0)
->       25% (  1)      -1.0%    765.3 (  5.5)       3.5%     55.0 (  0.0)
->       50% (  2)       4.7%    722.3 ( 21.5)      42.7%     32.7 (  4.6)
->       75% (  3)       3.7%    729.7 (  4.9)      54.4%     26.0 (  0.0)
->      100% (  4)       6.2%    710.3 ( 15.0)      63.2%     21.0 (  0.0)
->
->
->     Intel(R) Xeon(R) CPU E5-2699 v3 @ 2.30GHz (Haswell, kvm guest)
->       1 node * 2 cores * 2 threads = 4 CPUs
->       14G/node = 14G memory
->
->                    kernel boot                 deferred init
->                    ------------------------    ------------------------
->     node% (thr)    speedup  time_ms (stdev)    speedup  time_ms (stdev)
->           (  0)         --    656.3 (  7.1)         --     57.3 (  1.5)
->       25% (  1)       1.8%    644.7 (  3.1)       0.6%     57.0 (  0.0)
->       50% (  2)       6.5%    613.7 (  5.1)      40.7%     34.0 (  5.3)
->       75% (  3)       6.9%    611.3 (  6.7)      57.6%     24.3 (  0.6)
->      100% (  4)       8.6%    599.7 (  5.9)      62.8%     21.3 (  1.2)
+> Yes, thanks, I missed the case where deferred_grow_zone could stop
+> mid-max-order-block.
 
-One question about this data. What is the power management
-configuration on the systems when you are running these tests? I'm
-just curious if CPU frequency scaling, C states, and turbo are
-enabled? I ask because that is what I have seen usually make the
-difference in these kind of workloads as the throughput starts
-dropping off as you start seeing the core frequency lower and more
-cores become active.
+As it turns out that deferred_free_range will be setting the
+migratetype for the page. In a sparse config the migratetype bits are
+stored in the section bitmap. So to avoid cacheline bouncing it would
+make sense to section align the tasks so that they only have one
+thread touching one section rather than having the pageblock_flags
+getting bounced between threads. It should also reduce the overhead
+for having to parallelize the work in the first place since a section
+is several times larger than a MAX_ORDER page and allows for more
+batching of the work.
+
+> Maybe it's better to leave deferred_init_maxorder alone and adapt the
+> multithreading to the existing implementation.  That'd mean dealing with the
+> pesky opaque index somehow, so deferred_init_mem_pfn_range_in_zone() could be
+> generalized to find it in the thread function based on the start/end range, or
+> it could be maintained as part of the range that padata passes to the thread
+> function.
+
+You may be better off just implementing your threads to operate like
+deferred_grow_zone does. All your worker thread really needs then is
+to know where to start performing the page initialization and then it
+could go through and process an entire section worth of pages. The
+other bit that would have to be changed is patch 6 so that you combine
+any ranges that might span a single section instead of just splitting
+the work up based on the ranges.
+
+If you are referring to the mo_pfn you shouldn't even need to think
+about it. All it is doing is guaranteeing you are processing at least
+a full max order worth of pages. Without that the logic before was
+either process a whole section, or just process all of memory
+initializing it before it started freeing it. I found it made things
+much more efficient to process only up to MAX_ORDER at a time as you
+could squeeze that into the L2 cache for most x86 processors at least
+and it reduced the memory bandwidth by quite a bit. If you update the
+code to only provide section aligned/sized ranges of of PFNs to
+initialize then it can pretty much be ignored since all it is doing is
+defining the break point for single MAX_ORDER chunks which would be
+smaller than a section anyway.
