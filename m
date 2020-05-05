@@ -2,93 +2,96 @@ Return-Path: <SRS0=vF1r=6T=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24547C47247
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 May 2020 13:54:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB135C47247
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 May 2020 14:00:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 04EA920735
-	for <linux-crypto@archiver.kernel.org>; Tue,  5 May 2020 13:54:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BCF892078C
+	for <linux-crypto@archiver.kernel.org>; Tue,  5 May 2020 14:00:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728965AbgEENym (ORCPT
+        id S1729159AbgEEOAS (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 5 May 2020 09:54:42 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:38735 "EHLO
+        Tue, 5 May 2020 10:00:18 -0400
+Received: from mout.kundenserver.de ([212.227.17.13]:35333 "EHLO
         mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728180AbgEENym (ORCPT
+        with ESMTP id S1728076AbgEEOAR (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 5 May 2020 09:54:42 -0400
+        Tue, 5 May 2020 10:00:17 -0400
 Received: from localhost.localdomain ([149.172.19.189]) by
  mrelayeu.kundenserver.de (mreue106 [212.227.15.145]) with ESMTPA (Nemesis) id
- 1N8nnU-1j2qMm3NRe-015q6x; Tue, 05 May 2020 15:54:10 +0200
+ 1Mgf4k-1ivnwQ1PHY-00h8U6; Tue, 05 May 2020 15:59:58 +0200
 From:   Arnd Bergmann <arnd@arndb.de>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        David Sterba <dsterba@suse.com>
+        "David S. Miller" <davem@davemloft.net>
 Cc:     Arnd Bergmann <arnd@arndb.de>,
-        =?UTF-8?q?Horia=20Geant=C4=83?= <horia.geanta@nxp.com>,
-        Eric Biggers <ebiggers@google.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        clang-built-linux@googlegroups.com
-Subject: [PATCH] crypto: blake2b - Fix clang optimization for ARMv7-M
-Date:   Tue,  5 May 2020 15:53:45 +0200
-Message-Id: <20200505135402.29356-1-arnd@arndb.de>
+        "Jason A . Donenfeld" <Jason@zx2c4.com>,
+        Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
+        linux-kernel@vger.kernel.org, clang-built-linux@googlegroups.com
+Subject: [PATCH] crypto: curve25519-hacl64 - Disable fortify-source for clang-10
+Date:   Tue,  5 May 2020 15:59:34 +0200
+Message-Id: <20200505135947.216022-1-arnd@arndb.de>
 X-Mailer: git-send-email 2.26.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:Jcy6N4TaUxzCTLGwDtoilz/VHBm8v5Cw2d3wSP9VaYY8DkkSDHc
- IjwbOhFL9N5vR7J3y8bL/HUgEQnv+/SEY1R6u5YlCOKSjKCeyDhZKQbc7NIMiMLvgLL9X0M
- ss0Dt2APwE1Lac9XpGyvrEmmt3SkvzgIZ/aqUw7TCW6ToUqhFuq0wwYhBIdXnNsP3ZbzwWV
- MVb8xIdXIzPH3B8jw2rpQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:FPPapW6OwyU=:sEXclkv4xPKGjOnt9Uta2g
- hkqp13EKC3+UOv0CEpd3Yxb8ku6UzK4m/CBCOryA8h19RJPscvHigxY6u5s5trj+X6OTpBzLa
- cP8nvCiII6HHi0fqR1tmrDAakapg24SczjInVPUkWOfxrq7ZU0Yjg81RcahSuenhO3KcF3U24
- RZ1NIKhkiRTxshPT8cfU2ILWholcmBtT6T5BDpgyyojL1hEsXgNpMGqR8vqnRwNDIUMucnN+h
- UG75soVBhGog7nkc3POBjgMMoJAFQGxcANnsv5GQcfZDied5/ov7luD5kLiXinGakUi+SnXK8
- CXKhlNDmNUktwMj2ezTPm/iQbfEtXGDqK8sW7ugqUaNl7hXZSp8tNq651fyewNk3HWpsnOgUm
- C27a/IyGBQPFe/lLgnPoX9kGhjENlTLLbESf+ebr2K0XgLzNWVttSPSd4qsoZtJsSivrrWfkG
- UAuoQBzqlWibuGEXAtw8LhI0l63m5vMK+H9EF5eSeEKJDkI3pWMKdbigaeHJOeFBddyLfxmbZ
- Wlz7q2qXPuFk9xBv2mUJNoW5MBehuyGwWv34y89Qqm1aKVPHOqX8olmTVGoE+sotqmwxYDayE
- SEvRyDZiepoEOehh078W3aoVC5KuTJuxUJSyjOdbQDnihCDCXN2pmSoDXA/gq11JjURDzDZCn
- gAk9emAk/PGP+pV2hPQ0mq2kel2UmqjsB3Gssfa6YjWyIZas/gy9PsqjCuys6bStZLbzOyiuL
- sFxp2GRdvXm60XuBgRprUAFyWZ2L7+2ujJSYBl4W/AY7uqSrl7jsj76o+DM/KV9HedOjLoARp
- zB0ISZaI95xb6BoxaptJWDjFl03AaYhkaWDVOezyZF5/FLzwWg=
+X-Provags-ID: V03:K1:lga6gFSMOtoE9mutrLnQJE7st0bQNAzIeIYfftcfMNCL7iZsqJQ
+ JviJeYnETa8FS6wxzULcnVU5pwk6XzwEeQNgc1N9Zegd0vSPT8udDcc/dLNdT+kFJKuKRhM
+ pCcuCgkqdQkZFnO25/DxLaQCMQ9xi7obGLLAOWZgLjMS9hGQdNJ+zq/WfLkzEqkfVOICGQT
+ dOi7yOzxKWdNBMS3D/ruA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:lziD+9ryinA=:tNSwIO9eiImUWcWzM7o7Yw
+ /IXnoW8Wn+JMx/zGIvnc/9jMRhHbe0jJvaWE3XWRWvQtv640zle7dGxD3ITwoBIKvW8BglR/+
+ X6n8DodtwVEVn50jJLaLfZSLxYycqL20C2qB2AQxsI7F9V2yeNz1H1v2Q/9RJXUq+8KH1dEko
+ GuIrjHzNHIq4QKluBgnGKugirOutwiQttifk76ghCblvVoXxNGQw81DJ/WUvQJLo6XxXo0sIR
+ 6VF4O/d5ptPzv8X9kEYKwH5N6uLU5lxy1a4sNEVR2gHUp0CE0tZAH/hl+KGOVcV0M1XptQeDa
+ LP9PsmsHPf4GLCZcdvq4uuEP9fifieYr885wEuGI6oxz/ahfDHiiiRKTkS3Yls22ToNXvUU5L
+ +3ulrQra3lWiD7+TMQQvBk+EsfGWUHm2Eofm1W1UfmN8Mbr+k7QU729dOwRikSeMMFHohhBgs
+ LVoKGzng6dhFRgv12dCPWqeI6+WqqAr+G0r09Wq0g1chqjpKSRWFvHWemnqxGcgP1NGR7fmIs
+ F29a/PH3VNORl+cIdUV1dwJCNfT8OzlhtcjEy1NDmZ/QxWysfw/pwXbwhTEGQK8yXEh21DrGM
+ FOxC3ng9GNHpNbCnD0hhVedW36jqeZlEQw4O/0Q737f8slLpdvm5YoUGdWdmEAb421gfGCvS9
+ HD3530hLbMvGA7rDUtaZQD6A8SvsyQf9opZ3Vf1l9WbIJdiwHHDwV+DxnbUhRESVc29pJfvLM
+ sPUHiRo21hMwdp89LUGuxi2WBvbVJckmIpTZuyYpTD5oMvwNc0nZto4P1b5V+hFrnwYzIqq/V
+ YbKjFtohfywfJwXSOcPghR1tlLnCszKHERi7dzhkCX0JeTCnMY=
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-When building for ARMv7-M, clang-9 or higher tries to unroll some loops,
-which ends up confusing the register allocator to the point of generating
-rather bad code and using more than the warning limit for stack frames:
+clang-10 produces a warning about excessive stack usage, as well
+as rather unoptimized object code when CONFIG_FORTIFY_SOURCE is
+set:
 
-warning: stack frame size of 1200 bytes in function 'blake2b_compress' [-Wframe-larger-than=]
+lib/crypto/curve25519-hacl64.c:759:6: error: stack frame size of 2400 bytes in function 'curve25519_generic' [-Werror,-Wframe-larger-than=]
 
-Forcing it to not unroll the final loop avoids this problem.
+Jason Donenfeld managed to track this down to the usage of
+CONFIG_FORTIFY_SOURCE, and I found a minimal test case that illustrates
+this happening on clang-10 but not clang-9 or clang-11.
 
-Fixes: 91d689337fe8 ("crypto: blake2b - add blake2b generic implementation")
+To work around this, turn off fortification in this file.
+
+Link: https://bugs.llvm.org/show_bug.cgi?id=45802
+Cc: Jason A. Donenfeld <Jason@zx2c4.com>
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- crypto/blake2b_generic.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ lib/crypto/curve25519-hacl64.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/crypto/blake2b_generic.c b/crypto/blake2b_generic.c
-index 1d262374fa4e..0ffd8d92e308 100644
---- a/crypto/blake2b_generic.c
-+++ b/crypto/blake2b_generic.c
-@@ -129,7 +129,9 @@ static void blake2b_compress(struct blake2b_state *S,
- 	ROUND(9);
- 	ROUND(10);
- 	ROUND(11);
--
-+#ifdef CONFIG_CC_IS_CLANG
-+#pragma nounroll /* https://bugs.llvm.org/show_bug.cgi?id=45803 */
+diff --git a/lib/crypto/curve25519-hacl64.c b/lib/crypto/curve25519-hacl64.c
+index c7de61829a66..87adeb4f9276 100644
+--- a/lib/crypto/curve25519-hacl64.c
++++ b/lib/crypto/curve25519-hacl64.c
+@@ -10,6 +10,10 @@
+  * integer types.
+  */
+ 
++#if (CONFIG_CLANG_VERSION >= 100000) && (CONFIG_CLANG_VERSION < 110000)
++#define __NO_FORTIFY /* https://bugs.llvm.org/show_bug.cgi?id=45802 */
 +#endif
- 	for (i = 0; i < 8; ++i)
- 		S->h[i] = S->h[i] ^ v[i] ^ v[i + 8];
- }
++
+ #include <asm/unaligned.h>
+ #include <crypto/curve25519.h>
+ #include <linux/string.h>
 -- 
 2.26.0
 
