@@ -2,77 +2,79 @@ Return-Path: <SRS0=2pnx=6U=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4813CC28CBC
-	for <linux-crypto@archiver.kernel.org>; Wed,  6 May 2020 17:25:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5F75C28CBC
+	for <linux-crypto@archiver.kernel.org>; Wed,  6 May 2020 21:52:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2AD1120B1F
-	for <linux-crypto@archiver.kernel.org>; Wed,  6 May 2020 17:25:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1588785906;
-	bh=fzGRweKFnYuQE7I3wU8pkgj10jd6dGKsb34NwyeKaG4=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:List-ID:From;
-	b=vUqlH1h/cYo0UGSjQZaywsMFVYWKOCs1EFPlbzDqgMBtEScZ9G9o8ECaGoSdPxJfp
-	 YwNTySaEZUT8f2YFjfNxcVfUXWkUHyOLY8AXeFTCTA68yfkAWgUf9SDd8gMn6ahv5p
-	 7PW7AmXMiZvImT/pUIqkpzpN9/lm0V0FdJfXHIOk=
+	by mail.kernel.org (Postfix) with ESMTP id 9BA4B207DD
+	for <linux-crypto@archiver.kernel.org>; Wed,  6 May 2020 21:52:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728960AbgEFRZF (ORCPT
+        id S1729911AbgEFVwW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 6 May 2020 13:25:05 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43680 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725799AbgEFRZF (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 6 May 2020 13:25:05 -0400
-Subject: Re: [GIT PULL] Crypto Fixes for 5.7
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1588785905;
-        bh=fzGRweKFnYuQE7I3wU8pkgj10jd6dGKsb34NwyeKaG4=;
-        h=From:In-Reply-To:References:Date:To:Cc:From;
-        b=lEkB+PyhWmv7E6ttaj5djWYiSzNm2PxcyuRLfLR00sGzZDBag9cgZtUg4wJXMTWVH
-         9e5bRd2FsQAow+1jPQB9GFm3rk/e/0GcB/n4Qaom2TS3R9ftVhUeQOR2Ha4a+mI6tM
-         +x6kKU8nE5j2wPPlLLLyXbpYFmXXd+ce/wx9Bo7M=
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <20200506051006.GA6537@gondor.apana.org.au>
-References: <20190916084901.GA20338@gondor.apana.org.au>
- <20190923050515.GA6980@gondor.apana.org.au>
- <20191202062017.ge4rz72ki3vczhgb@gondor.apana.org.au>
- <20191214084749.jt5ekav5o5pd2dcp@gondor.apana.org.au>
- <20200115150812.mo2eycc53lbsgvue@gondor.apana.org.au>
- <20200213033231.xjwt6uf54nu26qm5@gondor.apana.org.au>
- <20200408061513.GA23636@gondor.apana.org.au>
- <20200429055420.GA26381@gondor.apana.org.au>
- <20200506051006.GA6537@gondor.apana.org.au>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20200506051006.GA6537@gondor.apana.org.au>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
-X-PR-Tracked-Commit-Id: a9a8ba90fa5857c2c8a0e32eef2159cec717da11
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 3c40cdb0e93ec166f1fa4fee1eb62d45b5451515
-Message-Id: <158878590501.22676.15892210612217775226.pr-tracker-bot@kernel.org>
-Date:   Wed, 06 May 2020 17:25:05 +0000
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+        Wed, 6 May 2020 17:52:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34930 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728621AbgEFVwV (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 6 May 2020 17:52:21 -0400
+Received: from shards.monkeyblade.net (shards.monkeyblade.net [IPv6:2620:137:e000::1:9])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C29D1C061A0F;
+        Wed,  6 May 2020 14:52:21 -0700 (PDT)
+Received: from localhost (unknown [IPv6:2601:601:9f00:477::d71])
+        (using TLSv1 with cipher AES256-SHA (256/256 bits))
+        (Client did not present a certificate)
+        (Authenticated sender: davem-davemloft)
+        by shards.monkeyblade.net (Postfix) with ESMTPSA id 3F66D1273D95E;
+        Wed,  6 May 2020 14:52:21 -0700 (PDT)
+Date:   Wed, 06 May 2020 14:52:20 -0700 (PDT)
+Message-Id: <20200506.145220.1567628861970386108.davem@davemloft.net>
+To:     ayush.sawal@chelsio.com
+Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
+        netdev@vger.kernel.org, manojmalaviya@chelsio.com
+Subject: Re: [PATCH net-next] Revert "crypto: chelsio - Inline single pdu
+ only"
+From:   David Miller <davem@davemloft.net>
+In-Reply-To: <20200506144719.3725-1-ayush.sawal@chelsio.com>
+References: <20200506144719.3725-1-ayush.sawal@chelsio.com>
+X-Mailer: Mew version 6.8 on Emacs 26.3
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
+X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.5.12 (shards.monkeyblade.net [149.20.54.216]); Wed, 06 May 2020 14:52:21 -0700 (PDT)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The pull request you sent on Wed, 6 May 2020 15:10:06 +1000:
+From: Ayush Sawal <ayush.sawal@chelsio.com>
+Date: Wed,  6 May 2020 20:17:19 +0530
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/herbert/crypto-2.6.git linus
+> This reverts commit 27c6feb0fb33a665a746346e76714826a5be5d10.
+> 
+> For ipsec offload the chelsio's ethernet driver expects a single mtu
+> sized packet.
+> 
+> But when ipsec traffic is running using iperf, most of the packets in
+> that traffic are gso packets(large sized skbs) because GSO is enabled by
+> default in TCP, due to this commit 0a6b2a1dc2a2 ("tcp: switch to GSO
+> being always on"), so chcr_ipsec_offload_ok() receives a gso
+> skb(with gso_size non zero).
+> 
+> Due to the check in chcr_ipsec_offload_ok(), this function returns false
+> for most of the packet, then ipsec offload is skipped and the skb goes
+> out taking the coprocessor path which reduces the bandwidth for inline
+> ipsec.
+> 
+> If this check is removed then for most of the packets(large sized skbs)
+> the chcr_ipsec_offload_ok() returns true and then as GSO is on, the
+> segmentation of the packet happens in the kernel and then finally the
+> driver_xmit is called, which receives a segmented mtu sized packet which
+> is what the driver expects for ipsec offload. So this case becomes
+> unnecessary here, therefore removing it.
+> 
+> Signed-off-by: Ayush Sawal <ayush.sawal@chelsio.com>
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/3c40cdb0e93ec166f1fa4fee1eb62d45b5451515
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.wiki.kernel.org/userdoc/prtracker
+Applied.
