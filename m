@@ -2,123 +2,84 @@ Return-Path: <SRS0=2pnx=6U=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14D08C28CBC
-	for <linux-crypto@archiver.kernel.org>; Wed,  6 May 2020 05:12:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19E7EC28CBC
+	for <linux-crypto@archiver.kernel.org>; Wed,  6 May 2020 14:48:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DFB06206E6
-	for <linux-crypto@archiver.kernel.org>; Wed,  6 May 2020 05:12:03 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PWmLLBCe"
+	by mail.kernel.org (Postfix) with ESMTP id ECF12206DB
+	for <linux-crypto@archiver.kernel.org>; Wed,  6 May 2020 14:48:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726778AbgEFFMD (ORCPT
+        id S1729108AbgEFOsy (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 6 May 2020 01:12:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47810 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725821AbgEFFMD (ORCPT
+        Wed, 6 May 2020 10:48:54 -0400
+Received: from stargate.chelsio.com ([12.32.117.8]:43439 "EHLO
+        stargate.chelsio.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726114AbgEFOsy (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 6 May 2020 01:12:03 -0400
-Received: from mail-ot1-x341.google.com (mail-ot1-x341.google.com [IPv6:2607:f8b0:4864:20::341])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC12CC061A0F;
-        Tue,  5 May 2020 22:12:02 -0700 (PDT)
-Received: by mail-ot1-x341.google.com with SMTP id k110so407652otc.2;
-        Tue, 05 May 2020 22:12:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=3pa+z5yRoZ1c8FaD2cxTuWWdNrsrhZtS7/bufcqIM2A=;
-        b=PWmLLBCe1epja7NdbWvKWCpCXb8eV2jAMIITdDD8EYvfA9prDmV4zALNL+a1M/Tcor
-         MtrliG3sZwaHrFJd6MXwH23/50juTqWDiuDKmpgaQ+eBmyNzWC/2U+Qx+lSm1vzXy3dB
-         Xo8lbSStne+aDK9/L6QOl5IDItGdPLQlWFuKCPVBtgLVgYBatm46hccMVrnTkiLzykbY
-         5/ZcM+y+MtRD0iwIWdO/ZB3F1VARlwNtJyJgxqLmX4ld0AACUgrwrm/+jPqj3ghpx+Jv
-         BfrXOx5N5y9wgncsdi6QmRh5EAe2djh/2BEiTon28M4XftzwF8cocMzGA/iwPZmmokne
-         8gOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=3pa+z5yRoZ1c8FaD2cxTuWWdNrsrhZtS7/bufcqIM2A=;
-        b=Xt/HKuXaNhMW8LpV5GFrqQ/2mREXedCqUSqFfHGuX2QQ4J2THVXiVavmsSXo1XO/Dj
-         gOiYRWwGUg8FA+kjLX9Z9Qunupw5QPmDDE5HzIkVv57EIp0berII/BT/JHJja7eOq4Zd
-         gPUV41Tz/zi366s199fUuSzgzQV2ILVFvoiQFHV4jH0isIodxweDgpAPbBxWj880Xk3p
-         uIn6awK/eUA3TFkZOzCLAkH09iwu7iAc6lDol/rHaenx4XTLKalDP4XxVd2g1ie23jQ+
-         1SoJWo909bM0Cw1Vq2CIhYwof8o3JPlCjDk8+LhoLBJMmOxN2EEGXpuF05Szv8BARgi2
-         f7OQ==
-X-Gm-Message-State: AGi0Pua7uey/ziaEmAYKhItw4VJ1p7fZaS39qAVN8Jc1Zc4jz+kDxNKN
-        T5zl8u5M35WRgHD598mcKIU=
-X-Google-Smtp-Source: APiQypL6DCRhQ+E6SYpUR7ZBDm8fdazSrL/wFlCv9H93Q0uTCBdjfpcS5A+FbZcjfN3/U3did81qqA==
-X-Received: by 2002:a05:6830:225d:: with SMTP id t29mr4881623otd.125.1588741922299;
-        Tue, 05 May 2020 22:12:02 -0700 (PDT)
-Received: from ubuntu-s3-xlarge-x86 ([2604:1380:4111:8b00::1])
-        by smtp.gmail.com with ESMTPSA id h65sm298950oth.34.2020.05.05.22.12.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 May 2020 22:12:01 -0700 (PDT)
-Date:   Tue, 5 May 2020 22:12:00 -0700
-From:   Nathan Chancellor <natechancellor@gmail.com>
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        David Sterba <dsterba@suse.com>,
-        Horia =?utf-8?Q?Geant=C4=83?= <horia.geanta@nxp.com>,
-        Eric Biggers <ebiggers@google.com>,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-        clang-built-linux@googlegroups.com
-Subject: Re: [PATCH] crypto: blake2b - Fix clang optimization for ARMv7-M
-Message-ID: <20200506051200.GA831492@ubuntu-s3-xlarge-x86>
-References: <20200505135402.29356-1-arnd@arndb.de>
+        Wed, 6 May 2020 10:48:54 -0400
+Received: from chumthang.blr.asicdesigners.com (chumthang.blr.asicdesigners.com [10.193.186.96])
+        by stargate.chelsio.com (8.13.8/8.13.8) with ESMTP id 046EmaCK024883;
+        Wed, 6 May 2020 07:48:37 -0700
+From:   Ayush Sawal <ayush.sawal@chelsio.com>
+To:     davem@davemloft.net, herbert@gondor.apana.org.au
+Cc:     linux-crypto@vger.kernel.org, netdev@vger.kernel.org,
+        manojmalaviya@chelsio.com, Ayush Sawal <ayush.sawal@chelsio.com>
+Subject: [PATCH net-next] Revert "crypto: chelsio - Inline single pdu only"
+Date:   Wed,  6 May 2020 20:17:19 +0530
+Message-Id: <20200506144719.3725-1-ayush.sawal@chelsio.com>
+X-Mailer: git-send-email 2.26.0.rc1.11.g30e9940
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200505135402.29356-1-arnd@arndb.de>
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, May 05, 2020 at 03:53:45PM +0200, Arnd Bergmann wrote:
-> When building for ARMv7-M, clang-9 or higher tries to unroll some loops,
-> which ends up confusing the register allocator to the point of generating
-> rather bad code and using more than the warning limit for stack frames:
-> 
-> warning: stack frame size of 1200 bytes in function 'blake2b_compress' [-Wframe-larger-than=]
-> 
-> Forcing it to not unroll the final loop avoids this problem.
-> 
-> Fixes: 91d689337fe8 ("crypto: blake2b - add blake2b generic implementation")
-> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
-> ---
->  crypto/blake2b_generic.c | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> diff --git a/crypto/blake2b_generic.c b/crypto/blake2b_generic.c
-> index 1d262374fa4e..0ffd8d92e308 100644
-> --- a/crypto/blake2b_generic.c
-> +++ b/crypto/blake2b_generic.c
-> @@ -129,7 +129,9 @@ static void blake2b_compress(struct blake2b_state *S,
->  	ROUND(9);
->  	ROUND(10);
->  	ROUND(11);
-> -
-> +#ifdef CONFIG_CC_IS_CLANG
+This reverts commit 27c6feb0fb33a665a746346e76714826a5be5d10.
 
-Given your comment in the bug:
+For ipsec offload the chelsio's ethernet driver expects a single mtu
+sized packet.
 
-"The code is written to assume no loops are unrolled"
+But when ipsec traffic is running using iperf, most of the packets in
+that traffic are gso packets(large sized skbs) because GSO is enabled by
+default in TCP, due to this commit 0a6b2a1dc2a2 ("tcp: switch to GSO
+being always on"), so chcr_ipsec_offload_ok() receives a gso
+skb(with gso_size non zero).
 
-Does it make sense to make this unconditional and take compiler
-heuristics out of it?
+Due to the check in chcr_ipsec_offload_ok(), this function returns false
+for most of the packet, then ipsec offload is skipped and the skb goes
+out taking the coprocessor path which reduces the bandwidth for inline
+ipsec.
 
-> +#pragma nounroll /* https://bugs.llvm.org/show_bug.cgi?id=45803 */
-> +#endif
->  	for (i = 0; i < 8; ++i)
->  		S->h[i] = S->h[i] ^ v[i] ^ v[i + 8];
->  }
-> -- 
-> 2.26.0
-> 
+If this check is removed then for most of the packets(large sized skbs)
+the chcr_ipsec_offload_ok() returns true and then as GSO is on, the
+segmentation of the packet happens in the kernel and then finally the
+driver_xmit is called, which receives a segmented mtu sized packet which
+is what the driver expects for ipsec offload. So this case becomes
+unnecessary here, therefore removing it.
+
+Signed-off-by: Ayush Sawal <ayush.sawal@chelsio.com>
+---
+ drivers/crypto/chelsio/chcr_ipsec.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/drivers/crypto/chelsio/chcr_ipsec.c b/drivers/crypto/chelsio/chcr_ipsec.c
+index 9fd3b9d1ec2f..d25689837b26 100644
+--- a/drivers/crypto/chelsio/chcr_ipsec.c
++++ b/drivers/crypto/chelsio/chcr_ipsec.c
+@@ -294,9 +294,6 @@ static bool chcr_ipsec_offload_ok(struct sk_buff *skb, struct xfrm_state *x)
+ 		if (ipv6_ext_hdr(ipv6_hdr(skb)->nexthdr))
+ 			return false;
+ 	}
+-	/* Inline single pdu */
+-	if (skb_shinfo(skb)->gso_size)
+-		return false;
+ 	return true;
+ }
+ 
+-- 
+2.26.0.rc1.11.g30e9940
+
