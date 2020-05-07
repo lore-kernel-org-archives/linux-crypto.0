@@ -2,197 +2,139 @@ Return-Path: <SRS0=BxOx=6V=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.2 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8A91C38A2A
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 May 2020 21:18:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18C27C38A2A
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 May 2020 21:23:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9D3AE206B9
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 May 2020 21:18:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D5EFC20731
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 May 2020 21:23:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E5Fue3Ni"
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="TiJ2Dop/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726480AbgEGVSz (ORCPT
+        id S1726480AbgEGVXo (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 7 May 2020 17:18:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56668 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726218AbgEGVSy (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 7 May 2020 17:18:54 -0400
-Received: from mail-io1-xd42.google.com (mail-io1-xd42.google.com [IPv6:2607:f8b0:4864:20::d42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7D55C05BD43;
-        Thu,  7 May 2020 14:18:54 -0700 (PDT)
-Received: by mail-io1-xd42.google.com with SMTP id u11so7834730iow.4;
-        Thu, 07 May 2020 14:18:54 -0700 (PDT)
+        Thu, 7 May 2020 17:23:44 -0400
+Received: from mail-eopbgr770071.outbound.protection.outlook.com ([40.107.77.71]:41028
+        "EHLO NAM02-SN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726218AbgEGVXn (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 7 May 2020 17:23:43 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WArxMQHtrgfXQ575bq3Dv+x4vkYwafuvrulUQ8N8evx7A6ipQMcOlWNQuAOLCYGYJINy4oDA4rOiPfY+h6yONE0Mcm/Nxu32E2sy7iIIGJtrK2Z4x9iOo9UwokM10ybj4pVWasl8CDFiHuT89I5Ly8XtzXtSSUFsE357BG4WqZWWBjHrXDi4gIfwloxn9KYVcBYRRQxDpWdmbN2ZQ1K7BVNAM22eAfGMZB6sfYGyt8SQUxlVTv5phCQeWshy9MrDdhvqA492KRNeQcsRpjw7juTD7h6zkbgWUTz+h1XMw+uVZ60Yu3cvuvZwb2dSqmKOIhIuclzwAjF8HW/DcF71Pg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WfqOd1K1bbFy4Pa12Qi+50lepj7drpO6osIcJGt2TWs=;
+ b=OtoKCbSnktSSBQZLcycE/H6od1IQRhDmfkjt1/DpHpAo8oIi/wIhUeveMmi8Osa84ZWm1rndf0gRiCUitkKfoOGTIn4nm8H95j40dqbjsYsRhrTm91VRsatSwuNROZifXzrmWm9GWg2pOOCT9FEotowrIEfrVYLSdCOprhtC1qTMNfjgahKXa5FOsQykS6fpyo9V9DF9zuCBEdIMLB0Hrrq9tR4LaJPXuNfym+w9+KYlQYYOcHIMP0SImW00QBuf1rFRueTb3DZWJMScL8oGT5ETTqjQ2nBWiBGAs/rqqLXa8XwK7DUOXxObc+IQGD7bZ3IlnIDU1O8nnpK+iaWXpg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=udO4Sb82iCWsNZhiezA2rH8QwvtS7hZNZpECyrxMEYE=;
-        b=E5Fue3NiV2Sa0bwhkKtkBZ9EYlKC7jO2UA/TxR0Zzp55rChM4VBoqpN3G3WNwgvOK4
-         Etth1kwTOdArqEbbDidyJc6e4L7QCUEp0Q2nP31E5RJshu3IFOnSVDISfhHq6usDA85Q
-         P7T0zdeP3tvJ6r+kG6GJo1q0h5z5hAXjMndAfupyJpca65jhqbplqqzmdDBgC/0LagZD
-         NnUSSYasRKbYA7z+5OSCaO3A6vMBdwxdG4GD+tu3DGRBlGCm+fyM7EKFjJFKlixGQ+AP
-         QAMhRFhTJ8be3yscgEezwnbI41F8Hiytde7gIur6AV8MyEgHiQzUU48KZV3U9+wC9sgb
-         51Ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=udO4Sb82iCWsNZhiezA2rH8QwvtS7hZNZpECyrxMEYE=;
-        b=jjBwiK6TUkLcdYdwxFBlh7iHSigCnvjv9/JHUalIBRG1TgMWL5DANbFxQSyo44kwVw
-         yJnSPrWNqz49ix9YbvTcj6KFvKQpMz9GlUsJbzCc4wV6L4bHlOiB2JfoKVh0SRxrHazy
-         SabVdKZ3nqMjqCbzCbLccZr72xnvUlxsSYbO1vvwn4gwL6Z5nsupM8iqO+8Prmn036/i
-         fvnhmcNSaLUgt0M5wjRq0XQCNRZHkvB5M5S0gRRxNz4XBmw2e2TIlSMwJOkTqsWVIJ3Q
-         FoNWJxrYaXf7dSF4PkUlOFfegwT4umiTSS21MGwHMNI0HElW327o5ebDPuOS88amecdK
-         4uZA==
-X-Gm-Message-State: AGi0PuZLOrkXZGEfBizCMz4UezqewcN3yabY+6WnZBxDJbG6Dou0nG0q
-        y9FwUKXW+z4UFhVTZ/gDwzkSrkMbiVkIpIMypj8=
-X-Google-Smtp-Source: APiQypKQsVa+3Ac0kuybFuEjMpbu1Gw6QPdVSV4WuxOxFqaW50OT+aUHTdCjy6GEhr5eAj4kF4MyLtQupFfg3RKGXCs=
-X-Received: by 2002:a6b:b9d5:: with SMTP id j204mr16292120iof.38.1588886333619;
- Thu, 07 May 2020 14:18:53 -0700 (PDT)
+ d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=WfqOd1K1bbFy4Pa12Qi+50lepj7drpO6osIcJGt2TWs=;
+ b=TiJ2Dop/BJ49quodrSTkuR7kLA2j0f/NdC8w668qG7K6/YPVx8lOkaGr4Pk1fKCjiWFxhu89LkbItcr2qO03xU+o/I+F/twjCDFb+e4yDYWzhFWGVr0yvwBFcJAxWmJWHq6sQ/4odwn4mO7MsBob1rJM7slzHcBNrEy62tYWmqk=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=amd.com;
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com (2603:10b6:3:6e::7) by
+ DM5PR12MB1177.namprd12.prod.outlook.com (2603:10b6:3:6d::20) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.2958.27; Thu, 7 May 2020 21:23:41 +0000
+Received: from DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::4ce1:9947:9681:c8b1]) by DM5PR12MB1355.namprd12.prod.outlook.com
+ ([fe80::4ce1:9947:9681:c8b1%10]) with mapi id 15.20.2958.034; Thu, 7 May 2020
+ 21:23:41 +0000
+Subject: Re: [PATCH 05/20] crypto: ccp - use crypto_shash_tfm_digest()
+To:     Eric Biggers <ebiggers@kernel.org>, linux-crypto@vger.kernel.org
+References: <20200502053122.995648-1-ebiggers@kernel.org>
+ <20200502053122.995648-6-ebiggers@kernel.org>
+From:   Tom Lendacky <thomas.lendacky@amd.com>
+Message-ID: <2306b736-91df-3f76-0eb2-fe0308d144f2@amd.com>
+Date:   Thu, 7 May 2020 16:23:29 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
+In-Reply-To: <20200502053122.995648-6-ebiggers@kernel.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SN1PR12CA0098.namprd12.prod.outlook.com
+ (2603:10b6:802:21::33) To DM5PR12MB1355.namprd12.prod.outlook.com
+ (2603:10b6:3:6e::7)
 MIME-Version: 1.0
-References: <20200430201125.532129-1-daniel.m.jordan@oracle.com>
- <20200430201125.532129-6-daniel.m.jordan@oracle.com> <deadac9a-fbef-6c66-207c-83d251d2ef50@linux.intel.com>
- <20200501024539.tnjuybydwe3r4u2x@ca-dmjordan1.us.oracle.com>
- <CAKgT0Uctro3+PWeJTi=O3Yc2qUF8Oy+HrypzCUzkaCt=XH0Lkg@mail.gmail.com>
- <20200505005432.bohmaa6zeffhdkgn@ca-dmjordan1.us.oracle.com>
- <CAKgT0Uegw2vFSCOcsCMATfDu0Q8NP2ZVi-2Fgm8P2RwU_B2c3A@mail.gmail.com>
- <20200506223923.z6cbixg2mhtjjlfo@ca-dmjordan1.us.oracle.com>
- <CAKgT0UdDcq_PL1hbvkhBvo9tQN1YA9YDQ6hECHL3TnWA-ytPhw@mail.gmail.com> <20200507202058.4mskqbt3vci3xy4k@ca-dmjordan1.us.oracle.com>
-In-Reply-To: <20200507202058.4mskqbt3vci3xy4k@ca-dmjordan1.us.oracle.com>
-From:   Alexander Duyck <alexander.duyck@gmail.com>
-Date:   Thu, 7 May 2020 14:18:42 -0700
-Message-ID: <CAKgT0UeELxfuzKes9FyYD_j1X72-xXjEgGdprNmy9so18zMJUQ@mail.gmail.com>
-Subject: Re: [PATCH 5/7] mm: move zone iterator outside of deferred_init_maxorder()
-To:     Daniel Jordan <daniel.m.jordan@oracle.com>
-Cc:     Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        Alex Williamson <alex.williamson@redhat.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        David Hildenbrand <david@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Josh Triplett <josh@joshtriplett.org>,
-        Kirill Tkhai <ktkhai@virtuozzo.com>,
-        Michal Hocko <mhocko@kernel.org>, Pavel Machek <pavel@ucw.cz>,
-        Pavel Tatashin <pasha.tatashin@soleen.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Randy Dunlap <rdunlap@infradead.org>,
-        Shile Zhang <shile.zhang@linux.alibaba.com>,
-        Tejun Heo <tj@kernel.org>, Zi Yan <ziy@nvidia.com>,
-        linux-crypto@vger.kernel.org, linux-mm <linux-mm@kvack.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from office-linux.texastahm.com (67.79.209.213) by SN1PR12CA0098.namprd12.prod.outlook.com (2603:10b6:802:21::33) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.2979.27 via Frontend Transport; Thu, 7 May 2020 21:23:41 +0000
+X-Originating-IP: [67.79.209.213]
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-Office365-Filtering-Correlation-Id: 64cde6eb-43b9-4bad-0ba5-08d7f2ccea3a
+X-MS-TrafficTypeDiagnostic: DM5PR12MB1177:
+X-Microsoft-Antispam-PRVS: <DM5PR12MB117741DFF15FEA8A881DC902ECA50@DM5PR12MB1177.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:506;
+X-Forefront-PRVS: 03965EFC76
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 5zX5Pr5gwIO2086dG3CiZsImC05V4ppOHdLeEILn0mcSx82xBQm4Y33axaFZI3HCAdCjXjumShkzMdNJAPVCmyaIHMIoRHZObe6T02xEi8xmeUIMOKfBVfxQOWAK1wQX5gfdPmrGxEJsPnyT3zsIOXGXBPz2XOkj1fhnsFH33Fo0tLtNne+fC4XJnMHhyZLMTZuxfPSh6CoVG+dMAPs4YV6hKl/oIDg9NXC1MTzlpuvAJMV5s7L5WTemsDvFJ2DiBjuUbOWCLUjl9nVOSvfAx9P4v36uTRZxvjcvT5FgJWY1H3rru/6JGFp9obTCtbpJourtpAcWU/PaOQl23ttSqLaOAaSN4Ks+cDkdAr4Elms/ZumVq6vZzgFUG1qH5ZWr8wZxfdUtRY4mzqyt6XcYDZ4cLEkPX5coATZdBXhMLiuIJHEHMxtJlxpx7yQ+MjFcrFoD4GKy6o6akXas5OUwAHjHMyoR1+OxlKs3wEEkqGVKZCnTtRoQf3vhw2h8zGByUQZxjgblh0fMACUW4W5OMEbldRo82YKvD7nQ/gb4QeTOSEuUiVOdX4HHqJ2Ru7Ad
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR12MB1355.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(366004)(396003)(136003)(39860400002)(376002)(346002)(33430700001)(478600001)(31686004)(31696002)(956004)(6512007)(53546011)(8676002)(6486002)(5660300002)(66946007)(33440700001)(66556008)(6506007)(66476007)(316002)(16526019)(2906002)(52116002)(6666004)(186003)(2616005)(86362001)(36756003)(8936002)(83280400001)(83320400001)(26005)(83290400001)(83310400001)(83300400001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData: sfRZmgHh+yBoJRHSVlP19DI4YPkNRC8mnw9UpfuQMZUTqmFAUcRUytql9NBx7zTgnqubWn6YQRlhGbyL2MYbdWBI6wBamiIAF0feQX6+viN4lL8KU1bkHOOUdG0+GVAMVKUpclagK9a+V4iwnrnDxgNO/P7trhiTYogbHhky4rURSxUcH5k3lvQJWxUxMQYEyYp2c9tETJNE9mLhu3bAL99t+yEVMUnC83h+TdUkrbdO0aoUvCnG7LRbVTFqWv7UdNoPbzMYelPnWdYYQR8VCsYqQTsXX8SQtqWKm6VZbWuTEHW0vh7kASv2ppkQ3dHSGNOfOT3ZiVecdsSb3zuY7SMF2cQ+NakHkS/Yfyx6wSi5FE0sRFC9FsBJJWgJi4SCBraitRwi2salh0BrykOTxzHaVkC3PlRTgHq01HhNX+Ry+g3OkxTnuc1n3GS89vf2XGKIyKG/MxpVF7RZlRAgLDfC1T8Nu8TbZAdkfmA27PYumKBSPzLEIGktCzkwc1yyVBfLUl22WLc4m0nxy7XNVIRJN5kIuQh6V17pFr3paQwbszU+yaTbJ+kcjr+vkbkU8CKBNcTEYJVSSvEu7b/C+ekPkacKDj+krJ97FvTvuYe9KfBfCp/BxB79NY2oXrtliLiTh0W3hvNpcMjNBvdtljWJZirXVO9sD0ydxK1ybna9j2ZBBy4aYXyZM8REaJV3O3V/nsiOWBPq6xuCV3StxacU1dop/ONvfqSN8yKH2mkZ8TYwgTHiTkJ0eAoQ37tvVRy7ZkUliZ03HaiaEHv864lkeJl5v89mFQVJgiQnLf8=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 64cde6eb-43b9-4bad-0ba5-08d7f2ccea3a
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 May 2020 21:23:41.5316
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vcpx77pEe4rGsIc7zDYXs6yI3ezkSrCdppJlNKsfyS+H20KOQqwwa7nOrsGwjX6LTfSV7f+QHQTd5JceEb9yrw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1177
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Thu, May 7, 2020 at 1:20 PM Daniel Jordan <daniel.m.jordan@oracle.com> wrote:
->
-> On Thu, May 07, 2020 at 08:26:26AM -0700, Alexander Duyck wrote:
-> > On Wed, May 6, 2020 at 3:39 PM Daniel Jordan <daniel.m.jordan@oracle.com> wrote:
-> > > On Tue, May 05, 2020 at 08:27:52AM -0700, Alexander Duyck wrote:
-> > > > > Maybe it's better to leave deferred_init_maxorder alone and adapt the
-> > > > > multithreading to the existing implementation.  That'd mean dealing with the
-> > > > > pesky opaque index somehow, so deferred_init_mem_pfn_range_in_zone() could be
-> > >
-> > > I should have been explicit, was thinking of @i from
-> > > () when mentioning the opaque index.
-> >
-> > Okay, that makes sense. However in reality you don't need to split
-> > that piece out. All you really are doing is splitting up the
-> > first_init_pfn value over multiple threads so you just need to make
-> > use of deferred_init_mem_pfn_range_in_zone() to initialize it.
->
-> Ok, I assume you mean that each thread should use
-> deferred_init_mem_pfn_range_in_zone.  Yes, that's what I meant when saying that
-> function could be generalized, though not sure we should opt for this.
+On 5/2/20 12:31 AM, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Instead of manually allocating a 'struct shash_desc' on the stack and
+> calling crypto_shash_digest(), switch to using the new helper function
+> crypto_shash_tfm_digest() which does this for us.
+> 
+> Cc: Tom Lendacky <thomas.lendacky@amd.com>
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-Yes that is what I meant.
+Acked-by: Tom Lendacky <thomas.lendacky@amd.com>
 
-> > > > > generalized to find it in the thread function based on the start/end range, or
-> > > > > it could be maintained as part of the range that padata passes to the thread
-> > > > > function.
-> > > >
-> > > > You may be better off just implementing your threads to operate like
-> > > > deferred_grow_zone does. All your worker thread really needs then is
-> > > > to know where to start performing the page initialization and then it
-> > > > could go through and process an entire section worth of pages. The
-> > > > other bit that would have to be changed is patch 6 so that you combine
-> > > > any ranges that might span a single section instead of just splitting
-> > > > the work up based on the ranges.
-> > >
-> > > How are you thinking of combining them?  I don't see a way to do it without
-> > > storing an arbitrary number of ranges somewhere for each thread.
-> >
-> > So when you are putting together your data you are storing a starting
-> > value and a length. All you end up having to do is make certain that
-> > the size + start pfn is section aligned. Then if you jump to a new
-> > section you have the option of either adding to the size of your
-> > current section or submitting the range and starting with a new start
-> > pfn in a new section. All you are really doing is breaking up the
-> > first_deferred_pfn over multiple sections. What I would do is section
-> > align end_pfn, and then check the next range from the zone. If the
-> > start_pfn of the next range is less than end_pfn you merge the two
-> > ranges by just increasing the size, otherwise you could start a new
-> > range.
-> >
-> > The idea is that you just want to define what the valid range of PFNs
-> > are, and if there are sizable holes you skip over them. You would
-> > leave most of the lifting for identifying exactly what PFNs to
-> > initialize to the pfn_range_in_zone iterators since they would all be
-> > read-only accesses anyway.
->
-> Ok, I follow you.  My assumption is that there are generally few free pfn
-> ranges relative to the total number of pfns being initialized so that it's
-> efficient to parallelize over a single pfn range from the zone iterator.  On
-> the systems I tested, there were about 20 tiny ranges and one enormous range
-> per node so that firing off a job per range kept things simple without
-> affecting performance.  If that assumption holds, I'm not sure it's worth it to
-> merge ranges.
-
-The idea behind merging ranges it to address possible cases where a
-range is broken up such that there is a hole in a max order block as a
-result. By combining the ranges if they both span the same section we
-can guarantee that the entire section will be initialized as a block
-and not potentially have partially initialized sections floating
-around. Without that mo_pfn logic I had in there I was getting panics
-every so often when booting up one of my systems as I recall.
-
-Also the iterator itself is cheap. It is basically just walking a
-read-only list so it scales efficiently as well. One of the reasons
-why I arranged the code the way I did is that it also allowed me to
-get rid of an extra check in the code as the previous code was having
-to verify if the pfn belonged to the node. That is all handled
-directly through the for_each_free_mem_pfn_range_in_zone[_from] call
-now.
-
-> With the series as it stands plus leaving in the section alignment check in
-> deferred_grow_zone (which I think could be relaxed to a maxorder alignment
-> check) so it doesn't stop mid-max-order-block, threads simply deal with a
-> start/end range and deferred_init_maxorder becomes shorter and simpler too.
-
-I still think we are better off initializing complete sections since
-the pageblock_flags are fully initialized that way as well. What
-guarantee do you have that all of the memory ranges will be max order
-aligned? The problem is we have to guarantee all pages are initialized
-before we start freeing the pages in a max order page. If we just
-process each block as-is I believe we can end up with some
-architectures trying to access uninitialized memory in the buddy
-allocator as a result. That is why the deferred_init_maxorder function
-will walk through the iterator, using the _from version to avoid
-unnecessary iteration, the first time initializing the pages it needs
-to cross that max order boundary, and then again to free the max order
-block of pages that have been initialized. The iterator itself is
-farily cheap and only has to get you through the smaller ranges before
-you end up at the one big range that it just kind of sits at while it
-is working on getting it processed.
+> ---
+>   drivers/crypto/ccp/ccp-crypto-sha.c | 9 ++-------
+>   1 file changed, 2 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/crypto/ccp/ccp-crypto-sha.c b/drivers/crypto/ccp/ccp-crypto-sha.c
+> index 474e6f1a6a84ec..b0cc2bd73af804 100644
+> --- a/drivers/crypto/ccp/ccp-crypto-sha.c
+> +++ b/drivers/crypto/ccp/ccp-crypto-sha.c
+> @@ -272,9 +272,6 @@ static int ccp_sha_setkey(struct crypto_ahash *tfm, const u8 *key,
+>   {
+>   	struct ccp_ctx *ctx = crypto_tfm_ctx(crypto_ahash_tfm(tfm));
+>   	struct crypto_shash *shash = ctx->u.sha.hmac_tfm;
+> -
+> -	SHASH_DESC_ON_STACK(sdesc, shash);
+> -
+>   	unsigned int block_size = crypto_shash_blocksize(shash);
+>   	unsigned int digest_size = crypto_shash_digestsize(shash);
+>   	int i, ret;
+> @@ -289,10 +286,8 @@ static int ccp_sha_setkey(struct crypto_ahash *tfm, const u8 *key,
+>   
+>   	if (key_len > block_size) {
+>   		/* Must hash the input key */
+> -		sdesc->tfm = shash;
+> -
+> -		ret = crypto_shash_digest(sdesc, key, key_len,
+> -					  ctx->u.sha.key);
+> +		ret = crypto_shash_tfm_digest(shash, key, key_len,
+> +					      ctx->u.sha.key);
+>   		if (ret)
+>   			return -EINVAL;
+>   
+> 
