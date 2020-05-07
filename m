@@ -2,63 +2,197 @@ Return-Path: <SRS0=BxOx=6V=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CDE4C47257
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 May 2020 00:44:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A539AC47247
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 May 2020 07:07:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 356FA2064A
-	for <linux-crypto@archiver.kernel.org>; Thu,  7 May 2020 00:44:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 83737208CA
+	for <linux-crypto@archiver.kernel.org>; Thu,  7 May 2020 07:07:32 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HuBe5N6X"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728007AbgEGAo1 (ORCPT
+        id S1725857AbgEGHHc (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 6 May 2020 20:44:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33586 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728427AbgEGAo0 (ORCPT
+        Thu, 7 May 2020 03:07:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36420 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1725783AbgEGHHb (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 6 May 2020 20:44:26 -0400
-Received: from shards.monkeyblade.net (shards.monkeyblade.net [IPv6:2620:137:e000::1:9])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02258C061A0F;
-        Wed,  6 May 2020 17:44:25 -0700 (PDT)
-Received: from localhost (unknown [IPv6:2601:601:9f00:477::d71])
-        (using TLSv1 with cipher AES256-SHA (256/256 bits))
-        (Client did not present a certificate)
-        (Authenticated sender: davem-davemloft)
-        by shards.monkeyblade.net (Postfix) with ESMTPSA id 58FB9127813B4;
-        Wed,  6 May 2020 17:44:25 -0700 (PDT)
-Date:   Wed, 06 May 2020 17:44:24 -0700 (PDT)
-Message-Id: <20200506.174424.138140249817623255.davem@davemloft.net>
-To:     shiva@chelsio.com
-Cc:     herbert@gondor.apana.org.au, linux-crypto@vger.kernel.org,
-        netdev@vger.kernel.org, secdev@chelsio.com
-Subject: Re: [PATCH net-next 0/5] Crypto/chcr: Fix issues regarding
- algorithm implementation in driver
-From:   David Miller <davem@davemloft.net>
-In-Reply-To: <20200505031257.9153-1-shiva@chelsio.com>
-References: <20200505031257.9153-1-shiva@chelsio.com>
-X-Mailer: Mew version 6.8 on Emacs 26.3
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.5.12 (shards.monkeyblade.net [149.20.54.216]); Wed, 06 May 2020 17:44:25 -0700 (PDT)
+        Thu, 7 May 2020 03:07:31 -0400
+Received: from mail-ed1-x542.google.com (mail-ed1-x542.google.com [IPv6:2a00:1450:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 287B2C061A10;
+        Thu,  7 May 2020 00:07:31 -0700 (PDT)
+Received: by mail-ed1-x542.google.com with SMTP id p16so4425056edm.10;
+        Thu, 07 May 2020 00:07:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=RQbMvC1ag/SPzt3A0iv4z8R55U/VKwxU9VmHI0/FJRU=;
+        b=HuBe5N6XnGvBabUFlomvKFuULmswvV6IlY50t+tlQh3qqFeVo5mlJMIvc7M96A6QjC
+         j3LZOLKTSOkTavRzmk9QLDOed90qTi8J5m3bCK/GvzbOX5+fQnqzZ2lrFFlL9zSBb7bK
+         XAFcn2P2vqnrYdpevPVAct9mZB7yGVFNe7rfbteS1bSoApWNTeI58mDIb5AlotWlL2pa
+         f6sensKTOJeJLEEFoM777CUpUg8U1KZPaHrhXNqS+3kVcZqWfT9/i1vrGvq/wP09QPjM
+         JTwRcQ3BaHtmTWAgaJUkpGH6Yyk3vceaghoSvRuvmphb3vT0EJ+OnF4YC8Ni9cgd0/t6
+         EkYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=RQbMvC1ag/SPzt3A0iv4z8R55U/VKwxU9VmHI0/FJRU=;
+        b=JYeLO9dHPTzWxV9rikm52SnOuuYoqMEldFpJ+gg6ZLxz+tvlAvCX8NaMjwEmUo72Gx
+         n3IwQFLcYTinN5PyuM1JAmUapM2H9nAkEOZXQnomgHsgbjNhVAVk2PKOri57lwrpgqhI
+         fZQx3hE+0PY0t6DBO+vElxTFLQr3z8mg+j2hJnaNynMTKuSHNcW4Ck8QOsf3XJgJs6m7
+         G64im3xAYzUgEpS8ifFlAvT+9vUkr8Yfyde4u2Hv/XLh82U8vHHstEC7De2l4cz+FftN
+         UNtHZlyHr6QWOMBwM8LVUYFVjNMrZVDVOGmB04aBX1h9JHjCn7vuHWVf2ponHMcz9zCU
+         fZ3Q==
+X-Gm-Message-State: AGi0PuYpW/7u6VPnOyxQmZbuk5qXyzbdq+8jseb14Hp3LrbzKDBq2n07
+        XMmBWAjw18oPjF0INRW9VPqAlApOOHvd2zoOSRfgriNAQIlCRw==
+X-Google-Smtp-Source: APiQypL8AC7ZUZnP0qgOLELJh2mB0qf4DRtMwN4Iryo60fDs4rqEG8PDwXDJX033RYCz1rFZGBj6H05V6VK++Hv+CxM=
+X-Received: by 2002:aa7:c2d2:: with SMTP id m18mr10709938edp.142.1588835249498;
+ Thu, 07 May 2020 00:07:29 -0700 (PDT)
+MIME-Version: 1.0
+References: <alpine.LRH.2.21.2002041054320.12768@namei.org> <CALrft9_tam87oevNC6LDG_bZoH+BgfrD4Or3yQudDoVqTqBdvg@mail.gmail.com>
+In-Reply-To: <CALrft9_tam87oevNC6LDG_bZoH+BgfrD4Or3yQudDoVqTqBdvg@mail.gmail.com>
+From:   Elena Reshetova <elena.reshetova@gmail.com>
+Date:   Thu, 7 May 2020 10:07:18 +0300
+Message-ID: <CALrft98SzLkw3M0shurUsNxsNSuSR3qN236rX4mEvC8GsrnnWQ@mail.gmail.com>
+Subject: [ANNOUNCE][CFP] Linux Security Summit Europe 2020
+To:     linux-security-module@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, lwn@lwn.net,
+        fedora-selinux-list@redhat.com, linux-crypto@vger.kernel.org,
+        kernel-hardening@lists.openwall.com,
+        linux-integrity@vger.kernel.org, selinux@vger.kernel.org,
+        Audit-ML <linux-audit@redhat.com>, gentoo-hardened@gentoo.org,
+        keyrings@linux-nfs.org, tpmdd-devel@lists.sourceforge.net,
+        Linux Security Summit Program Committee 
+        <lss-pc@lists.linuxfoundation.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Devulapally Shiva Krishna <shiva@chelsio.com>
-Date: Tue,  5 May 2020 08:42:52 +0530
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
+                   ANNOUNCEMENT AND CALL FOR PARTICIPATION
 
-> The following series of patches fixes the issues which came during
-> self-tests with CONFIG_CRYPTO_MANAGER_EXTRA_TESTS enabled.
-> 
-> Patch 1: Fixes gcm(aes) hang issue and rfc4106-gcm encryption issue.
-> Patch 2: Fixes ctr, cbc, xts and rfc3686-ctr extra test failures.
-> Patch 3: Fixes ccm(aes) extra test failures.
-> Patch 4: Added support for 48 byte-key_len in aes_xts.
-> Patch 5: fix for hmac(sha) extra test failure.
+                        LINUX SECURITY SUMMIT EUROPE 2020
 
-Series applied, thank you.
+                                     29-30 OCTOBER
+                                    DUBLIN, IRELAND
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D
+
+DESCRIPTION
+
+Linux Security Summit Europe (LSS-EU) is a technical forum for
+collaboration between Linux developers, researchers, and end-users.  Its
+primary aim is to foster community efforts in analyzing and solving Linux
+security challenges.
+
+ The program committee currently seeks proposals for:
+
+   * Refereed Presentations:
+     45 minutes in length.
+
+   * Panel Discussion Topics:
+     45 minutes in length.
+
+   * Short Topics:
+     30 minutes in total, including at least 10 minutes discussion.
+
+   * Tutorials
+     90 minutes in length.
+
+Tutorial sessions should be focused on advanced Linux security defense
+topics within areas such as the kernel, compiler, and security-related
+libraries.  Priority will be given to tutorials created for this conference=
+,
+and those where the presenter a leading subject matter expert on the topic.
+
+Topic areas include, but are not limited to:
+
+   * Kernel self-protection
+   * Access control
+   * Cryptography and key management
+   * Integrity policy and enforcement
+   * Hardware Security
+   * IoT and embedded security
+   * Virtualization and containers
+   * System-specific system hardening
+   * Case studies
+   * Security tools
+   * Security UX
+   * Emerging technologies, threats & techniques
+
+  Proposals should be submitted via:
+
+   https://events.linuxfoundation.org/linux-security-summit-europe/program/=
+cfp/
+
+DATES
+
+  * CFP close:            July 31
+  * CFP notifications:    August 10
+  * Schedule announced:   September 1
+  * Event:                October 29-30
+
+COVID-19 SITUATION
+
+Currently LSS-EU is planned as in-person event, however this would be
+re-evaluated closer to the event itself and if the situation in Europe does
+not permit such events, it would be switched to a virtual event, similarly
+as this year=E2=80=99s LSS-NA.
+
+WHO SHOULD ATTEND
+
+We're seeking a diverse range of attendees and welcome participation by
+people involved in Linux security development, operations, and research.
+
+LSS-EU is a unique global event that provides the opportunity to present an=
+d
+discuss your work or research with key Linux security community members and
+maintainers.  It=E2=80=99s also useful for those who wish to keep up with t=
+he latest
+in Linux security development and to provide input to the development
+process.
+
+WEB SITE
+
+    https://events.linuxfoundation.org/linux-security-summit-europe/
+
+TWITTER
+
+  For event updates and announcements, follow:
+
+    https://twitter.com/LinuxSecSummit
+
+    #linuxsecuritysummit
+
+PROGRAM COMMITTEE
+
+  The program committee for LSS 2020 is:
+
+    * James Morris, Microsoft
+    * Serge Hallyn, Cisco
+    * Paul Moore, Cisco
+    * Stephen Smalley, NSA
+    * Elena Reshetova, Intel
+    * John Johansen, Canonical
+    * Kees Cook, Google
+    * Casey Schaufler, Intel
+    * Mimi Zohar, IBM
+    * David A. Wheeler, Institute for Defense Analyses
+
+  The program committee may be contacted as a group via email:
+    lss-pc () lists.linuxfoundation.org
