@@ -6,32 +6,32 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07D76C38A2A
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 May 2020 06:59:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92BF7C38A2A
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 May 2020 06:59:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E943C20735
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 May 2020 06:59:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7B1F920735
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 May 2020 06:59:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726598AbgEHG7L (ORCPT
+        id S1726761AbgEHG7i (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 8 May 2020 02:59:11 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:42788 "EHLO huawei.com"
+        Fri, 8 May 2020 02:59:38 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:42846 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726809AbgEHG7K (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 May 2020 02:59:10 -0400
+        id S1726817AbgEHG7h (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 8 May 2020 02:59:37 -0400
 Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 1E3CD8E5A9B88D988B16;
-        Fri,  8 May 2020 14:59:00 +0800 (CST)
+        by Forcepoint Email with ESMTP id 20F69C91943D8BBAFF13;
+        Fri,  8 May 2020 14:59:05 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.56) by
  DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
- 14.3.487.0; Fri, 8 May 2020 14:58:53 +0800
+ 14.3.487.0; Fri, 8 May 2020 14:58:54 +0800
 From:   Shukun Tan <tanshukun1@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
         <wangzhou1@hisilicon.com>
-Subject: [PATCH 07/13] crypto: hisilicon - remove use_dma_api related codes
-Date:   Fri, 8 May 2020 14:57:42 +0800
-Message-ID: <1588921068-20739-8-git-send-email-tanshukun1@huawei.com>
+Subject: [PATCH 12/13] crypto: hisilicon/zip - Use temporary sqe when doing work
+Date:   Fri, 8 May 2020 14:57:47 +0800
+Message-ID: <1588921068-20739-13-git-send-email-tanshukun1@huawei.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1588921068-20739-1-git-send-email-tanshukun1@huawei.com>
 References: <1588921068-20739-1-git-send-email-tanshukun1@huawei.com>
@@ -44,140 +44,63 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The codes related use_dma_api is useless which should be removed.
+From: Zhou Wang <wangzhou1@hisilicon.com>
 
+Currently zip sqe is stored in hisi_zip_qp_ctx, which will bring corruption
+with multiple parallel users of the crypto tfm.
+
+This patch removes the zip_sqe in hisi_zip_qp_ctx and uses a temporary sqe
+instead.
+
+Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
+Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
 Signed-off-by: Shukun Tan <tanshukun1@huawei.com>
-Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
 ---
- drivers/crypto/hisilicon/hpre/hpre_main.c |  1 -
- drivers/crypto/hisilicon/qm.c             | 34 ++++++++++++-------------------
- drivers/crypto/hisilicon/qm.h             |  1 -
- drivers/crypto/hisilicon/sec2/sec_main.c  |  1 -
- drivers/crypto/hisilicon/zip/zip_main.c   |  1 -
- 5 files changed, 13 insertions(+), 25 deletions(-)
+ drivers/crypto/hisilicon/zip/zip_crypto.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-index 1948fd3..7662a8f 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-@@ -679,7 +679,6 @@ static int hpre_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
- 		qm->qp_base = HPRE_PF_DEF_Q_BASE;
- 		qm->qp_num = pf_q_num;
+diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
+index 369ec32..5fb9d4b 100644
+--- a/drivers/crypto/hisilicon/zip/zip_crypto.c
++++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
+@@ -64,7 +64,6 @@ struct hisi_zip_req_q {
+ 
+ struct hisi_zip_qp_ctx {
+ 	struct hisi_qp *qp;
+-	struct hisi_zip_sqe zip_sqe;
+ 	struct hisi_zip_req_q req_q;
+ 	struct hisi_acc_sgl_pool *sgl_pool;
+ 	struct hisi_zip *zip_dev;
+@@ -484,11 +483,11 @@ static struct hisi_zip_req *hisi_zip_create_req(struct acomp_req *req,
+ static int hisi_zip_do_work(struct hisi_zip_req *req,
+ 			    struct hisi_zip_qp_ctx *qp_ctx)
+ {
+-	struct hisi_zip_sqe *zip_sqe = &qp_ctx->zip_sqe;
+ 	struct acomp_req *a_req = req->req;
+ 	struct hisi_qp *qp = qp_ctx->qp;
+ 	struct device *dev = &qp->qm->pdev->dev;
+ 	struct hisi_acc_sgl_pool *pool = qp_ctx->sgl_pool;
++	struct hisi_zip_sqe zip_sqe;
+ 	dma_addr_t input;
+ 	dma_addr_t output;
+ 	int ret;
+@@ -511,13 +510,13 @@ static int hisi_zip_do_work(struct hisi_zip_req *req,
  	}
--	qm->use_dma_api = true;
+ 	req->dma_dst = output;
  
- 	return hisi_qm_init(qm);
- }
-diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index c30df08..800beef 100644
---- a/drivers/crypto/hisilicon/qm.c
-+++ b/drivers/crypto/hisilicon/qm.c
-@@ -1267,20 +1267,18 @@ static struct hisi_qp *qm_create_qp_nolock(struct hisi_qm *qm, u8 alg_type)
- 	qm->qp_in_used++;
- 	qp->qm = qm;
+-	hisi_zip_fill_sqe(zip_sqe, qp->req_type, input, output, a_req->slen,
++	hisi_zip_fill_sqe(&zip_sqe, qp->req_type, input, output, a_req->slen,
+ 			  a_req->dlen, req->sskip, req->dskip);
+-	hisi_zip_config_buf_type(zip_sqe, HZIP_SGL);
+-	hisi_zip_config_tag(zip_sqe, req->req_id);
++	hisi_zip_config_buf_type(&zip_sqe, HZIP_SGL);
++	hisi_zip_config_tag(&zip_sqe, req->req_id);
  
--	if (qm->use_dma_api) {
--		qp->qdma.size = qm->sqe_size * QM_Q_DEPTH +
--				sizeof(struct qm_cqe) * QM_Q_DEPTH;
--		qp->qdma.va = dma_alloc_coherent(dev, qp->qdma.size,
--						 &qp->qdma.dma, GFP_KERNEL);
--		if (!qp->qdma.va) {
--			ret = -ENOMEM;
--			goto err_clear_bit;
--		}
--
--		dev_dbg(dev, "allocate qp dma buf(va=%pK, dma=%pad, size=%zx)\n",
--			qp->qdma.va, &qp->qdma.dma, qp->qdma.size);
-+	qp->qdma.size = qm->sqe_size * QM_Q_DEPTH +
-+			sizeof(struct qm_cqe) * QM_Q_DEPTH;
-+	qp->qdma.va = dma_alloc_coherent(dev, qp->qdma.size,
-+					 &qp->qdma.dma, GFP_KERNEL);
-+	if (!qp->qdma.va) {
-+		ret = -ENOMEM;
-+		goto err_clear_bit;
- 	}
- 
-+	dev_dbg(dev, "allocate qp dma buf(va=%pK, dma=%pad, size=%zx)\n",
-+		qp->qdma.va, &qp->qdma.dma, qp->qdma.size);
-+
- 	qp->qp_id = qp_id;
- 	qp->alg_type = alg_type;
- 	atomic_set(&qp->qp_status.flags, QP_INIT);
-@@ -1334,7 +1332,7 @@ void hisi_qm_release_qp(struct hisi_qp *qp)
- 		return;
- 	}
- 
--	if (qm->use_dma_api && qdma->va)
-+	if (qdma->va)
- 		dma_free_coherent(dev, qdma->size, qdma->va, qdma->dma);
- 
- 	qm->qp_array[qp->qp_id] = NULL;
-@@ -1992,8 +1990,6 @@ int hisi_qm_init(struct hisi_qm *qm)
- 	INIT_WORK(&qm->work, qm_work_process);
- 
- 	atomic_set(&qm->status.flags, QM_INIT);
--	dev_dbg(dev, "init qm %s with %s\n", pdev->is_physfn ? "pf" : "vf",
--		qm->use_dma_api ? "dma api" : "iommu api");
- 
- 	return 0;
- 
-@@ -2034,7 +2030,7 @@ void hisi_qm_uninit(struct hisi_qm *qm)
- 	uacce_remove(qm->uacce);
- 	qm->uacce = NULL;
- 
--	if (qm->use_dma_api && qm->qdma.va) {
-+	if (qm->qdma.va) {
- 		hisi_qm_cache_wb(qm);
- 		dma_free_coherent(dev, qm->qdma.size,
- 				  qm->qdma.va, qm->qdma.dma);
-@@ -2259,11 +2255,7 @@ int hisi_qm_start(struct hisi_qm *qm)
- 		}
- 	}
- 
--	if (!qm->use_dma_api) {
--		dev_dbg(&qm->pdev->dev, "qm delay start\n");
--		up_write(&qm->qps_lock);
--		return 0;
--	} else if (!qm->qdma.va) {
-+	if (!qm->qdma.va) {
- 		qm->qdma.size = QMC_ALIGN(sizeof(struct qm_eqe) * QM_Q_DEPTH) +
- 				QMC_ALIGN(sizeof(struct qm_aeqe) * QM_Q_DEPTH) +
- 				QMC_ALIGN(sizeof(struct qm_sqc) * qm->qp_num) +
-diff --git a/drivers/crypto/hisilicon/qm.h b/drivers/crypto/hisilicon/qm.h
-index 25934e3..743cb63 100644
---- a/drivers/crypto/hisilicon/qm.h
-+++ b/drivers/crypto/hisilicon/qm.h
-@@ -230,7 +230,6 @@ struct hisi_qm {
- 	struct work_struct work;
- 
- 	const char *algs;
--	bool use_dma_api;
- 	bool use_sva;
- 	resource_size_t phys_base;
- 	resource_size_t phys_size;
-diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-index 437e8788..499c554 100644
---- a/drivers/crypto/hisilicon/sec2/sec_main.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-@@ -749,7 +749,6 @@ static int sec_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
- 		qm->qp_base = SEC_PF_DEF_Q_NUM;
- 		qm->qp_num = SEC_QUEUE_NUM_V1 - SEC_PF_DEF_Q_NUM;
- 	}
--	qm->use_dma_api = true;
- 
- 	return hisi_qm_init(qm);
- }
-diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index a7f0c6a..6a1a824 100644
---- a/drivers/crypto/hisilicon/zip/zip_main.c
-+++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -692,7 +692,6 @@ static int hisi_zip_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
- 	if (rev_id == QM_HW_UNKNOWN)
- 		return -EINVAL;
- 
--	qm->use_dma_api = true;
- 	qm->pdev = pdev;
- 	qm->ver = rev_id;
+ 	/* send command to start a task */
+-	ret = hisi_qp_send(qp, zip_sqe);
++	ret = hisi_qp_send(qp, &zip_sqe);
+ 	if (ret < 0)
+ 		goto err_unmap_output;
  
 -- 
 2.7.4
