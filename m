@@ -2,96 +2,92 @@ Return-Path: <SRS0=XJfk=6W=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.5 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99649C38A2A
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 May 2020 12:30:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CE4FC47255
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 May 2020 21:31:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F097E215A4
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 May 2020 12:30:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="df3F939/"
+	by mail.kernel.org (Postfix) with ESMTP id 74C90218AC
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 May 2020 21:31:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726616AbgEHMau (ORCPT
+        id S1726950AbgEHVb1 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 8 May 2020 08:30:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57524 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1726863AbgEHMau (ORCPT
+        Fri, 8 May 2020 17:31:27 -0400
+Received: from mout.kundenserver.de ([217.72.192.73]:56509 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1727774AbgEHVb0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 May 2020 08:30:50 -0400
-Received: from mo6-p01-ob.smtp.rzone.de (mo6-p01-ob.smtp.rzone.de [IPv6:2a01:238:20a:202:5301::11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92AE3C05BD43
-        for <linux-crypto@vger.kernel.org>; Fri,  8 May 2020 05:30:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1588941047;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=qlLfPHVlrCRGCHJwPAmHIg3OIWLDKZ6MsIUQoaaBUx8=;
-        b=df3F939/NGJVRpHonDW/SjHx7sPjhrnY/UEbibXS+SuaZM11y6+IbDhutffpbZqTSh
-        3fNwB5r2xAnBc5Hz/9iHrZ9xOLz9CIFcxyWfryS3+/BMjGZUwhPFT+hX1q+4d0+UmxCN
-        N1mvh55b+RMX0uZYbVAgp0SYVLGZ6VJIgO3JkY42kXF1c7zsPEmb6hiWCGmYYBJeVmgA
-        HXRkg+VCVaOjtqbW3o4m23fNmsTebyVOZ07NgsGbnkyb4YVKRBU7JxwtLabLnI6n3VMr
-        3HfAXkHXiH787ALXtftzRo9WrIx7x/osvbesFpEilgJljQwu8yIxdX+x4GwvPebct8BE
-        vMcQ==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPaJfSfJdtJ"
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-        by smtp.strato.de (RZmta 46.6.2 DYNA|AUTH)
-        with ESMTPSA id u08bf3w48CUlQh9
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-        Fri, 8 May 2020 14:30:47 +0200 (CEST)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Alexander Dahl <ada@thorsis.com>
-Cc:     linux-crypto@vger.kernel.org
-Subject: Re: jitterentropy_rng on armv5 embedded target
-Date:   Fri, 08 May 2020 14:30:47 +0200
-Message-ID: <6708214.Ppv1U3N1OP@tauon.chronox.de>
-In-Reply-To: <2904279.2zIEgBPu8l@ada>
-References: <2567555.LKkejuagh6@ada> <8028774.qcRHhbuxM6@tauon.chronox.de> <2904279.2zIEgBPu8l@ada>
+        Fri, 8 May 2020 17:31:26 -0400
+Received: from mail-lj1-f173.google.com ([209.85.208.173]) by
+ mrelayeu.kundenserver.de (mreue109 [212.227.15.145]) with ESMTPSA (Nemesis)
+ id 1MuDPf-1jGAvx2wCD-00uWaB; Fri, 08 May 2020 23:31:24 +0200
+Received: by mail-lj1-f173.google.com with SMTP id w20so3211984ljj.0;
+        Fri, 08 May 2020 14:31:24 -0700 (PDT)
+X-Gm-Message-State: AOAM5314kEMRbua6F9Dp298D9kLMnoxisOhK8qdBfJg6X3LJml7hJrx9
+        0TKfCMJurVnxnmj8uofZClrSpOqTCCOjouz5lds=
+X-Google-Smtp-Source: ABdhPJyHg8MtU3S0jmVPS8JYIXj9GjAxbHvNtdVIUL9iInah4pcLMe5RRVXMZsvDNN4rp4NQeWT9GblGkhSDIDK95LU=
+X-Received: by 2002:a2e:8999:: with SMTP id c25mr3009771lji.73.1588973484186;
+ Fri, 08 May 2020 14:31:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+References: <20200505135402.29356-1-arnd@arndb.de> <20200506051200.GA831492@ubuntu-s3-xlarge-x86>
+In-Reply-To: <20200506051200.GA831492@ubuntu-s3-xlarge-x86>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Fri, 8 May 2020 23:31:07 +0200
+X-Gmail-Original-Message-ID: <CAK8P3a2LAgEG7epWFtUZrcgk9OwpVJd+ji9Ru_rq4L-Qk_dYbg@mail.gmail.com>
+Message-ID: <CAK8P3a2LAgEG7epWFtUZrcgk9OwpVJd+ji9Ru_rq4L-Qk_dYbg@mail.gmail.com>
+Subject: Re: [PATCH] crypto: blake2b - Fix clang optimization for ARMv7-M
+To:     Nathan Chancellor <natechancellor@gmail.com>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S. Miller" <davem@davemloft.net>,
+        David Sterba <dsterba@suse.com>,
+        =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
+        Eric Biggers <ebiggers@google.com>,
+        "open list:HARDWARE RANDOM NUMBER GENERATOR CORE" 
+        <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        clang-built-linux <clang-built-linux@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:EmKph5npPCxYfI9u4L95ryvsW+6lyiFtMKlS8HVYY6z+rUBPWtI
+ zui8CXtU1O92hlJJqkdTxouXBaNmOqBP5OIyJ/njdbWSGYVecC0kSFyAU05+OZwJt58Nvl/
+ 6RctLkG0SyoYWaoLNoDwk83tsZHxvsD2mWfKmK6np9aeLAhDb50pQEq95yCBvNdNC4FRFI7
+ NYT82E0GHY8rrdpkyV8Yg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:fFsY7uQ7Lyw=:zgU2rXSehQPUjvUaH3nmrV
+ aQb3NESTf2Sruw/FeQ4G812+gCyNxLauSPrZu8I3iCCxLIUiF2GPwjShfTDZJNdRpXiFaMas9
+ 6lySvC6ISiUVAJdGPlQw747S44XVPZ13AarzMkFzu9RA0qwdXOSootwbZUNVDJB6lIQ0ATSld
+ gAFUTSco0dpcaWnylPrWCfWSj3v8F41m1nlsnqQJfmh8PlhUS2dQA7nBw4bSLdfl8abUZWDcG
+ ryoYXGXhWjnBSy65UInouNcLhGW1ViWsqV8vIYlAalwp6au1hkeyPTRJnvZO43T9koDmw/PLt
+ fycDE6gQVByhbDmE33L7hDqBPzwye0sTYod/4ZvqvNODYYr7107D7ThMBIy5ceg0FbqwN6fky
+ 0G//oiRguIWlQsnLqxUUZ0VMbf/irE+xlVnpJfyZrCV4pzO7D6guxVCf21RJFt9L0t9q/0Gu+
+ 4aTECpe2tDo35oh7EgjE4xFL1bRYwZZl0RcBjc8c1kX0TXn0v6t7fiERhFA5MBBkc9a6tjzYZ
+ PwwJrgAjx9VTh5suWxSl8uSJXsCuADDKm0DCLn4GfYBo88EWJD2+CXmAQe8cx0MUBEsHUFrxh
+ IlYFSrWVRef5Lzm0++VLN/lZWhYVztN+mReCq6rpZKOTU14FwiMaYHQGwuDgwBS1BJLF1ulA2
+ p/a+6WChYnqp45PjNwA+PU+FtvmDka0kb00lKz3+OtU4QcnovnsXVZwG2zDDsof5aqEpp7vVK
+ eoWdIwIPY+hI8AREc4SqlsKCP9Tys+FR5P714R2wUQMHVHY34A+Hty6invFtHYGHtg1VCi1ZW
+ 2GBUb4zQNQBdE467UVK48XNyz2OcT68Zwcik/u9pvqa9L/+zIs=
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Freitag, 8. Mai 2020, 14:26:41 CEST schrieb Alexander Dahl:
+On Wed, May 6, 2020 at 7:12 AM Nathan Chancellor
+<natechancellor@gmail.com> wrote:
+> > -
+> > +#ifdef CONFIG_CC_IS_CLANG
+>
+> Given your comment in the bug:
+>
+> "The code is written to assume no loops are unrolled"
+>
+> Does it make sense to make this unconditional and take compiler
+> heuristics out of it?
+>
+> > +#pragma nounroll /* https://bugs.llvm.org/show_bug.cgi?id=45803 */
+> > +#endif
+> >       for (i = 0; i < 8; ++i)
+> >               S->h[i] = S->h[i] ^ v[i] ^ v[i + 8];
 
-Hi Alexander,
+No, that would not work, as gcc does not support this pragma.
 
-> Hello,
-> 
-> Am Freitag, 8. Mai 2020, 14:22:02 CEST schrieb Stephan Mueller:
-> > Am Freitag, 8. Mai 2020, 14:17:25 CEST schrieb Alexander Dahl:
-> > > Okay and DRBG has nothing to do with /dev/random ?
-> > 
-> > Nope, it is used as part of the kernel crypto API and its use cases.
-> > 
-> > > Then where do the random
-> > > numbers for that come from (in the current or previous kernels without
-> > > your
-> > > new lrng)?
-> > 
-> > The DRBG is seeded from get_random_bytes and the Jitter RNG.
-> 
-> Oh, I was not precise enough. I wanted to know where /dev/random gets its
-> numbers from. As far as I understood now: not from DRBG? (Which is
-> sufficient knowledge for my current problem.)
-
-Interrupts, HID events, block device events, external sources.
-
-For a full analysis, see [1]
-
-[1] https://bsi.bund.de/SharedDocs/Downloads/EN/BSI/Publications/Studies/
-LinuxRNG/LinuxRNG_EN.pdf
-
-
-Ciao
-Stephan
-
-
+        Arnd
