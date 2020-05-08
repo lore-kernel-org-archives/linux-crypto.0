@@ -2,106 +2,75 @@ Return-Path: <SRS0=XJfk=6W=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.7 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92BF7C38A2A
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 May 2020 06:59:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E624C38A2A
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 May 2020 11:49:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7B1F920735
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 May 2020 06:59:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E092C2145D
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 May 2020 11:49:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726761AbgEHG7i (ORCPT
+        id S1726636AbgEHLtm (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 8 May 2020 02:59:38 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:42846 "EHLO huawei.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726817AbgEHG7h (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 May 2020 02:59:37 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 20F69C91943D8BBAFF13;
-        Fri,  8 May 2020 14:59:05 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
- 14.3.487.0; Fri, 8 May 2020 14:58:54 +0800
-From:   Shukun Tan <tanshukun1@huawei.com>
-To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
-CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
-        <wangzhou1@hisilicon.com>
-Subject: [PATCH 12/13] crypto: hisilicon/zip - Use temporary sqe when doing work
-Date:   Fri, 8 May 2020 14:57:47 +0800
-Message-ID: <1588921068-20739-13-git-send-email-tanshukun1@huawei.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1588921068-20739-1-git-send-email-tanshukun1@huawei.com>
-References: <1588921068-20739-1-git-send-email-tanshukun1@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.56]
-X-CFilter-Loop: Reflected
+        Fri, 8 May 2020 07:49:42 -0400
+Received: from mail.thorsis.com ([92.198.35.195]:59647 "EHLO mail.thorsis.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726618AbgEHLtm (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 8 May 2020 07:49:42 -0400
+X-Greylist: delayed 563 seconds by postgrey-1.27 at vger.kernel.org; Fri, 08 May 2020 07:49:41 EDT
+Received: from localhost (localhost [127.0.0.1])
+        by mail.thorsis.com (Postfix) with ESMTP id CA36D2A4F
+        for <linux-crypto@vger.kernel.org>; Fri,  8 May 2020 13:40:16 +0200 (CEST)
+X-Virus-Scanned: Debian amavisd-new at mail.thorsis.com
+Received: from mail.thorsis.com ([127.0.0.1])
+        by localhost (mail.thorsis.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id wqVJSZUIiQHo for <linux-crypto@vger.kernel.org>;
+        Fri,  8 May 2020 13:40:12 +0200 (CEST)
+Received: by mail.thorsis.com (Postfix, from userid 109)
+        id A1BDD29B3; Fri,  8 May 2020 13:40:12 +0200 (CEST)
+From:   Alexander Dahl <ada@thorsis.com>
+To:     linux-crypto@vger.kernel.org
+Cc:     Stephan =?ISO-8859-1?Q?M=FCller?= <smueller@chronox.de>
+Subject: jitterentropy_rng on armv5 embedded target
+Date:   Fri, 08 May 2020 13:40:08 +0200
+Message-ID: <2567555.LKkejuagh6@ada>
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="iso-8859-1"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Zhou Wang <wangzhou1@hisilicon.com>
+Hello,
 
-Currently zip sqe is stored in hisi_zip_qp_ctx, which will bring corruption
-with multiple parallel users of the crypto tfm.
+after upgrading OpenSSL to 1.1.1g on an armv5 based embedded target I had a=
+=20
+deeper look into entropy generation for that device and stumbled over the i=
+n=20
+kernel 'jitterentropy_rng' module.
 
-This patch removes the zip_sqe in hisi_zip_qp_ctx and uses a temporary sqe
-instead.
+As far as I understood it's supposed to do the same as the well known=20
+'haveged' or the userspace daemon 'jitterentropy-rngd' by Stephan M=FCller =
+[1],=20
+right? (Although those daemons would solve my problem, I currently try to=20
+avoid them, because memory on my platform is very restricted and every=20
+additional running userspace process costs at least around 1 MB.)
 
-Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
-Signed-off-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Signed-off-by: Shukun Tan <tanshukun1@huawei.com>
----
- drivers/crypto/hisilicon/zip/zip_crypto.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+If so, then how is it supposed to be set up? I built it for 4.9.x LTS, but=
+=20
+after loading it with 'modprobe' I see nothing in the kernel log and there'=
+s=20
+no significant change in /proc/sys/kernel/random/entropy_avail (stays well=
+=20
+below 100 most of the time). Isn't that module supposed to gather entropy f=
+rom=20
+cpu timing jitter?
 
-diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
-index 369ec32..5fb9d4b 100644
---- a/drivers/crypto/hisilicon/zip/zip_crypto.c
-+++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
-@@ -64,7 +64,6 @@ struct hisi_zip_req_q {
- 
- struct hisi_zip_qp_ctx {
- 	struct hisi_qp *qp;
--	struct hisi_zip_sqe zip_sqe;
- 	struct hisi_zip_req_q req_q;
- 	struct hisi_acc_sgl_pool *sgl_pool;
- 	struct hisi_zip *zip_dev;
-@@ -484,11 +483,11 @@ static struct hisi_zip_req *hisi_zip_create_req(struct acomp_req *req,
- static int hisi_zip_do_work(struct hisi_zip_req *req,
- 			    struct hisi_zip_qp_ctx *qp_ctx)
- {
--	struct hisi_zip_sqe *zip_sqe = &qp_ctx->zip_sqe;
- 	struct acomp_req *a_req = req->req;
- 	struct hisi_qp *qp = qp_ctx->qp;
- 	struct device *dev = &qp->qm->pdev->dev;
- 	struct hisi_acc_sgl_pool *pool = qp_ctx->sgl_pool;
-+	struct hisi_zip_sqe zip_sqe;
- 	dma_addr_t input;
- 	dma_addr_t output;
- 	int ret;
-@@ -511,13 +510,13 @@ static int hisi_zip_do_work(struct hisi_zip_req *req,
- 	}
- 	req->dma_dst = output;
- 
--	hisi_zip_fill_sqe(zip_sqe, qp->req_type, input, output, a_req->slen,
-+	hisi_zip_fill_sqe(&zip_sqe, qp->req_type, input, output, a_req->slen,
- 			  a_req->dlen, req->sskip, req->dskip);
--	hisi_zip_config_buf_type(zip_sqe, HZIP_SGL);
--	hisi_zip_config_tag(zip_sqe, req->req_id);
-+	hisi_zip_config_buf_type(&zip_sqe, HZIP_SGL);
-+	hisi_zip_config_tag(&zip_sqe, req->req_id);
- 
- 	/* send command to start a task */
--	ret = hisi_qp_send(qp, zip_sqe);
-+	ret = hisi_qp_send(qp, &zip_sqe);
- 	if (ret < 0)
- 		goto err_unmap_output;
- 
--- 
-2.7.4
+Puzzled
+Alex
+
+[1] https://www.chronox.de/jent.html
+
 
