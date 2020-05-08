@@ -6,32 +6,32 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4D1FC47247
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 May 2020 06:59:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BF63C54E7E
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 May 2020 06:59:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9145A21582
-	for <linux-crypto@archiver.kernel.org>; Fri,  8 May 2020 06:59:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 64DF220735
+	for <linux-crypto@archiver.kernel.org>; Fri,  8 May 2020 06:59:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726792AbgEHG7E (ORCPT
+        id S1726746AbgEHG7G (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 8 May 2020 02:59:04 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:42666 "EHLO huawei.com"
+        Fri, 8 May 2020 02:59:06 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:42654 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726761AbgEHG7E (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 May 2020 02:59:04 -0400
+        id S1726771AbgEHG7F (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 8 May 2020 02:59:05 -0400
 Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id 0BC4FF1ED91C217B38DD;
+        by Forcepoint Email with ESMTP id 06A23AA4FB1D2D762366;
         Fri,  8 May 2020 14:59:00 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.56) by
  DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
- 14.3.487.0; Fri, 8 May 2020 14:58:52 +0800
+ 14.3.487.0; Fri, 8 May 2020 14:58:53 +0800
 From:   Shukun Tan <tanshukun1@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
         <wangzhou1@hisilicon.com>
-Subject: [PATCH 04/13] crypto: hisilicon - refactor module parameter pf_q_num related code
-Date:   Fri, 8 May 2020 14:57:39 +0800
-Message-ID: <1588921068-20739-5-git-send-email-tanshukun1@huawei.com>
+Subject: [PATCH 06/13] crypto: hisilicon - add FLR support
+Date:   Fri, 8 May 2020 14:57:41 +0800
+Message-ID: <1588921068-20739-7-git-send-email-tanshukun1@huawei.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1588921068-20739-1-git-send-email-tanshukun1@huawei.com>
 References: <1588921068-20739-1-git-send-email-tanshukun1@huawei.com>
@@ -44,234 +44,317 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-put q_num_set similar code into qm to reduce the redundancy.
+Add callback reset_prepare and reset_done in QM, The callback
+reset_prepare will uninit device error configuration and stop
+the QM, the callback reset_done will init the device error
+configuration and restart the QM.
+
+Uninit the error configuration will disable device block master OOO
+when Multi-bit ECC error occurs to avoid the request of FLR will not
+return.
 
 Signed-off-by: Shukun Tan <tanshukun1@huawei.com>
 Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
 ---
- drivers/crypto/hisilicon/hpre/hpre_main.c | 39 ++++++-------------------------
- drivers/crypto/hisilicon/qm.h             | 39 +++++++++++++++++++++++++++++++
- drivers/crypto/hisilicon/sec2/sec_main.c  | 35 ++-------------------------
- drivers/crypto/hisilicon/zip/zip_main.c   | 33 +-------------------------
- 4 files changed, 49 insertions(+), 97 deletions(-)
+ drivers/crypto/hisilicon/hpre/hpre_main.c |  16 ++++
+ drivers/crypto/hisilicon/qm.c             | 133 +++++++++++++++++++++++++++++-
+ drivers/crypto/hisilicon/qm.h             |   2 +
+ drivers/crypto/hisilicon/sec2/sec_main.c  |   2 +
+ drivers/crypto/hisilicon/zip/zip_main.c   |  16 ++++
+ 5 files changed, 165 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-index f3859de..f1bb626 100644
+index f1bb626..1948fd3 100644
 --- a/drivers/crypto/hisilicon/hpre/hpre_main.c
 +++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-@@ -159,44 +159,19 @@ static struct debugfs_reg32 hpre_com_dfx_regs[] = {
- 	{"INT_STATUS               ",  HPRE_INT_STATUS},
- };
+@@ -310,12 +310,21 @@ static void hpre_cnt_regs_clear(struct hisi_qm *qm)
  
--static int hpre_pf_q_num_set(const char *val, const struct kernel_param *kp)
-+static int pf_q_num_set(const char *val, const struct kernel_param *kp)
+ static void hpre_hw_error_disable(struct hisi_qm *qm)
  {
--	struct pci_dev *pdev;
--	u32 n, q_num;
--	u8 rev_id;
--	int ret;
--
--	if (!val)
--		return -EINVAL;
--
--	pdev = pci_get_device(PCI_VENDOR_ID_HUAWEI, HPRE_PCI_DEVICE_ID, NULL);
--	if (!pdev) {
--		q_num = HPRE_QUEUE_NUM_V2;
--		pr_info("No device found currently, suppose queue number is %d\n",
--			q_num);
--	} else {
--		rev_id = pdev->revision;
--		if (rev_id != QM_HW_V2)
--			return -EINVAL;
--
--		q_num = HPRE_QUEUE_NUM_V2;
--	}
--
--	ret = kstrtou32(val, 10, &n);
--	if (ret != 0 || n == 0 || n > q_num)
--		return -EINVAL;
--
--	return param_set_int(val, kp);
-+	return q_num_set(val, kp, HPRE_PCI_DEVICE_ID);
++	u32 val;
++
+ 	/* disable hpre hw error interrupts */
+ 	writel(HPRE_CORE_INT_DISABLE, qm->io_base + HPRE_INT_MASK);
++
++	/* disable HPRE block master OOO when m-bit error occur */
++	val = readl(qm->io_base + HPRE_AM_OOO_SHUTDOWN_ENB);
++	val &= ~HPRE_AM_OOO_SHUTDOWN_ENABLE;
++	writel(val, qm->io_base + HPRE_AM_OOO_SHUTDOWN_ENB);
  }
  
- static const struct kernel_param_ops hpre_pf_q_num_ops = {
--	.set = hpre_pf_q_num_set,
-+	.set = pf_q_num_set,
- 	.get = param_get_int,
+ static void hpre_hw_error_enable(struct hisi_qm *qm)
+ {
++	u32 val;
++
+ 	/* clear HPRE hw error source if having */
+ 	writel(HPRE_CORE_INT_DISABLE, qm->io_base + HPRE_HAC_SOURCE_INT);
+ 
+@@ -324,6 +333,11 @@ static void hpre_hw_error_enable(struct hisi_qm *qm)
+ 	writel(HPRE_HAC_RAS_CE_ENABLE, qm->io_base + HPRE_RAS_CE_ENB);
+ 	writel(HPRE_HAC_RAS_NFE_ENABLE, qm->io_base + HPRE_RAS_NFE_ENB);
+ 	writel(HPRE_HAC_RAS_FE_ENABLE, qm->io_base + HPRE_RAS_FE_ENB);
++
++	/* enable HPRE block master OOO when m-bit error occur */
++	val = readl(qm->io_base + HPRE_AM_OOO_SHUTDOWN_ENB);
++	val |= HPRE_AM_OOO_SHUTDOWN_ENABLE;
++	writel(val, qm->io_base + HPRE_AM_OOO_SHUTDOWN_ENB);
+ }
+ 
+ static inline struct hisi_qm *hpre_file_to_qm(struct hpre_debugfs_file *file)
+@@ -851,6 +865,8 @@ static void hpre_remove(struct pci_dev *pdev)
+ static const struct pci_error_handlers hpre_err_handler = {
+ 	.error_detected		= hisi_qm_dev_err_detected,
+ 	.slot_reset		= hisi_qm_dev_slot_reset,
++	.reset_prepare		= hisi_qm_reset_prepare,
++	.reset_done		= hisi_qm_reset_done,
  };
  
--static u32 hpre_pf_q_num = HPRE_PF_DEF_Q_NUM;
--module_param_cb(hpre_pf_q_num, &hpre_pf_q_num_ops, &hpre_pf_q_num, 0444);
--MODULE_PARM_DESC(hpre_pf_q_num, "Number of queues in PF of CS(1-1024)");
-+static u32 pf_q_num = HPRE_PF_DEF_Q_NUM;
-+module_param_cb(pf_q_num, &hpre_pf_q_num_ops, &pf_q_num, 0444);
-+MODULE_PARM_DESC(pf_q_num, "Number of queues in PF of CS(1-1024)");
+ static struct pci_driver hpre_pci_driver = {
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index e42097e..c30df08 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -175,6 +175,7 @@
+ #define QMC_ALIGN(sz)			ALIGN(sz, 32)
  
- static const struct kernel_param_ops vfs_num_ops = {
- 	.set = vfs_num_set,
-@@ -688,7 +663,7 @@ static int hpre_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
+ #define QM_DBG_TMP_BUF_LEN		22
++#define QM_PCI_COMMAND_INVALID		~0
  
- 	if (pdev->is_physfn) {
- 		qm->qp_base = HPRE_PF_DEF_Q_BASE;
--		qm->qp_num = hpre_pf_q_num;
-+		qm->qp_num = pf_q_num;
- 	}
- 	qm->use_dma_api = true;
+ #define QM_MK_CQC_DW3_V1(hop_num, pg_sz, buf_sz, cqe_sz) \
+ 	(((hop_num) << QM_CQ_HOP_NUM_SHIFT)	| \
+@@ -2874,6 +2875,11 @@ pci_ers_result_t hisi_qm_dev_err_detected(struct pci_dev *pdev,
+ }
+ EXPORT_SYMBOL_GPL(hisi_qm_dev_err_detected);
  
-diff --git a/drivers/crypto/hisilicon/qm.h b/drivers/crypto/hisilicon/qm.h
-index 9d17167..d1be8cd 100644
---- a/drivers/crypto/hisilicon/qm.h
-+++ b/drivers/crypto/hisilicon/qm.h
-@@ -8,6 +8,8 @@
- #include <linux/module.h>
- #include <linux/pci.h>
- 
-+#define QM_QNUM_V1			4096
-+#define QM_QNUM_V2			1024
- #define QM_MAX_VFS_NUM_V2		63
- 
- /* qm user domain */
-@@ -252,6 +254,43 @@ struct hisi_qp {
- 	struct uacce_queue *uacce_q;
- };
- 
-+static inline int q_num_set(const char *val, const struct kernel_param *kp,
-+			    unsigned int device)
++static int qm_get_hw_error_status(struct hisi_qm *qm)
 +{
-+	struct pci_dev *pdev = pci_get_device(PCI_VENDOR_ID_HUAWEI,
-+					      device, NULL);
-+	u32 n, q_num;
-+	u8 rev_id;
++	return readl(qm->io_base + QM_ABNORMAL_INT_STATUS);
++}
++
+ static int qm_check_req_recv(struct hisi_qm *qm)
+ {
+ 	struct pci_dev *pdev = qm->pdev;
+@@ -3166,9 +3172,7 @@ static int qm_vf_reset_done(struct hisi_qm *qm)
+ 
+ static int qm_get_dev_err_status(struct hisi_qm *qm)
+ {
+-
+-	return(qm->err_ini->get_dev_hw_err_status(qm) &
+-	       qm->err_ini->err_info.ecc_2bits_mask);
++	return qm->err_ini->get_dev_hw_err_status(qm);
+ }
+ 
+ static int qm_dev_hw_init(struct hisi_qm *qm)
+@@ -3190,7 +3194,8 @@ static void qm_restart_prepare(struct hisi_qm *qm)
+ 	       qm->io_base + ACC_AM_CFG_PORT_WR_EN);
+ 
+ 	/* clear dev ecc 2bit error source if having */
+-	value = qm_get_dev_err_status(qm);
++	value = qm_get_dev_err_status(qm) &
++		qm->err_ini->err_info.ecc_2bits_mask;
+ 	if (value && qm->err_ini->clear_dev_hw_err_status)
+ 		qm->err_ini->clear_dev_hw_err_status(qm, value);
+ 
+@@ -3336,6 +3341,126 @@ pci_ers_result_t hisi_qm_dev_slot_reset(struct pci_dev *pdev)
+ }
+ EXPORT_SYMBOL_GPL(hisi_qm_dev_slot_reset);
+ 
++/* check the interrupt is ecc-mbit error or not */
++static int qm_check_dev_error(struct hisi_qm *qm)
++{
 +	int ret;
 +
-+	if (!val)
-+		return -EINVAL;
++	if (qm->fun_type == QM_HW_VF)
++		return 0;
 +
-+	if (!pdev) {
-+		q_num = min_t(u32, QM_QNUM_V1, QM_QNUM_V2);
-+		pr_info("No device found currently, suppose queue number is %d\n",
-+			q_num);
-+	} else {
-+		rev_id = pdev->revision;
-+		switch (rev_id) {
-+		case QM_HW_V1:
-+			q_num = QM_QNUM_V1;
-+			break;
-+		case QM_HW_V2:
-+			q_num = QM_QNUM_V2;
-+			break;
-+		default:
-+			return -EINVAL;
++	ret = qm_get_hw_error_status(qm) & QM_ECC_MBIT;
++	if (ret)
++		return ret;
++
++	return (qm_get_dev_err_status(qm) &
++		qm->err_ini->err_info.ecc_2bits_mask);
++}
++
++void hisi_qm_reset_prepare(struct pci_dev *pdev)
++{
++	struct hisi_qm *pf_qm = pci_get_drvdata(pci_physfn(pdev));
++	struct hisi_qm *qm = pci_get_drvdata(pdev);
++	u32 delay = 0;
++	int ret;
++
++	hisi_qm_dev_err_uninit(pf_qm);
++
++	/*
++	 * Check whether there is an ECC mbit error, If it occurs, need to
++	 * wait for soft reset to fix it.
++	 */
++	while (qm_check_dev_error(pf_qm)) {
++		msleep(++delay);
++		if (delay > QM_RESET_WAIT_TIMEOUT)
++			return;
++	}
++
++	ret = qm_reset_prepare_ready(qm);
++	if (ret) {
++		pci_err(pdev, "FLR not ready!\n");
++		return;
++	}
++
++	if (qm->vfs_num) {
++		ret = qm_vf_reset_prepare(qm);
++		if (ret) {
++			pci_err(pdev, "Failed to prepare reset, ret = %d.\n",
++				ret);
++			return;
 +		}
 +	}
 +
-+	ret = kstrtou32(val, 10, &n);
-+	if (ret || !n || n > q_num)
-+		return -EINVAL;
++	ret = hisi_qm_stop(qm);
++	if (ret) {
++		pci_err(pdev, "Failed to stop QM, ret = %d.\n", ret);
++		return;
++	}
 +
-+	return param_set_int(val, kp);
++	pci_info(pdev, "FLR resetting...\n");
++}
++EXPORT_SYMBOL_GPL(hisi_qm_reset_prepare);
++
++static bool qm_flr_reset_complete(struct pci_dev *pdev)
++{
++	struct pci_dev *pf_pdev = pci_physfn(pdev);
++	struct hisi_qm *qm = pci_get_drvdata(pf_pdev);
++	u32 id;
++
++	pci_read_config_dword(qm->pdev, PCI_COMMAND, &id);
++	if (id == QM_PCI_COMMAND_INVALID) {
++		pci_err(pdev, "Device can not be used!\n");
++		return false;
++	}
++
++	clear_bit(QM_DEV_RESET_FLAG, &qm->reset_flag);
++
++	return true;
 +}
 +
- static inline int vfs_num_set(const char *val, const struct kernel_param *kp)
- {
- 	u32 n;
++void hisi_qm_reset_done(struct pci_dev *pdev)
++{
++	struct hisi_qm *pf_qm = pci_get_drvdata(pci_physfn(pdev));
++	struct hisi_qm *qm = pci_get_drvdata(pdev);
++	int ret;
++
++	hisi_qm_dev_err_init(pf_qm);
++
++	ret = qm_restart(qm);
++	if (ret) {
++		pci_err(pdev, "Failed to start QM, ret = %d.\n", ret);
++		goto flr_done;
++	}
++
++	if (qm->fun_type == QM_HW_PF) {
++		ret = qm_dev_hw_init(qm);
++		if (ret) {
++			pci_err(pdev, "Failed to init PF, ret = %d.\n", ret);
++			goto flr_done;
++		}
++
++		if (!qm->vfs_num)
++			goto flr_done;
++
++		ret = qm_vf_q_assign(qm, qm->vfs_num);
++		if (ret) {
++			pci_err(pdev, "Failed to assign VFs, ret = %d.\n", ret);
++			goto flr_done;
++		}
++
++		ret = qm_vf_reset_done(qm);
++		if (ret) {
++			pci_err(pdev, "Failed to start VFs, ret = %d.\n", ret);
++			goto flr_done;
++		}
++	}
++
++flr_done:
++	if (qm_flr_reset_complete(pdev))
++		pci_info(pdev, "FLR reset complete\n");
++}
++EXPORT_SYMBOL_GPL(hisi_qm_reset_done);
++
+ MODULE_LICENSE("GPL v2");
+ MODULE_AUTHOR("Zhou Wang <wangzhou1@hisilicon.com>");
+ MODULE_DESCRIPTION("HiSilicon Accelerator queue manager driver");
+diff --git a/drivers/crypto/hisilicon/qm.h b/drivers/crypto/hisilicon/qm.h
+index eff156a..25934e3 100644
+--- a/drivers/crypto/hisilicon/qm.h
++++ b/drivers/crypto/hisilicon/qm.h
+@@ -371,6 +371,8 @@ void hisi_qm_dev_err_uninit(struct hisi_qm *qm);
+ pci_ers_result_t hisi_qm_dev_err_detected(struct pci_dev *pdev,
+ 					  pci_channel_state_t state);
+ pci_ers_result_t hisi_qm_dev_slot_reset(struct pci_dev *pdev);
++void hisi_qm_reset_prepare(struct pci_dev *pdev);
++void hisi_qm_reset_done(struct pci_dev *pdev);
+ 
+ struct hisi_acc_sgl_pool;
+ struct hisi_acc_hw_sgl *hisi_acc_sg_buf_map_to_hw_sgl(struct device *dev,
 diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-index ea029e3..5aba775 100644
+index 5aba775..437e8788 100644
 --- a/drivers/crypto/hisilicon/sec2/sec_main.c
 +++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-@@ -136,45 +136,14 @@ static struct debugfs_reg32 sec_dfx_regs[] = {
- 
- static int sec_pf_q_num_set(const char *val, const struct kernel_param *kp)
- {
--	struct pci_dev *pdev;
--	u32 n, q_num;
--	u8 rev_id;
--	int ret;
--
--	if (!val)
--		return -EINVAL;
--
--	pdev = pci_get_device(PCI_VENDOR_ID_HUAWEI,
--			      SEC_PF_PCI_DEVICE_ID, NULL);
--	if (!pdev) {
--		q_num = min_t(u32, SEC_QUEUE_NUM_V1, SEC_QUEUE_NUM_V2);
--		pr_info("No device, suppose queue number is %d!\n", q_num);
--	} else {
--		rev_id = pdev->revision;
--
--		switch (rev_id) {
--		case QM_HW_V1:
--			q_num = SEC_QUEUE_NUM_V1;
--			break;
--		case QM_HW_V2:
--			q_num = SEC_QUEUE_NUM_V2;
--			break;
--		default:
--			return -EINVAL;
--		}
--	}
--
--	ret = kstrtou32(val, 10, &n);
--	if (ret || !n || n > q_num)
--		return -EINVAL;
--
--	return param_set_int(val, kp);
-+	return q_num_set(val, kp, SEC_PF_PCI_DEVICE_ID);
- }
- 
- static const struct kernel_param_ops sec_pf_q_num_ops = {
- 	.set = sec_pf_q_num_set,
- 	.get = param_get_int,
+@@ -914,6 +914,8 @@ static void sec_remove(struct pci_dev *pdev)
+ static const struct pci_error_handlers sec_err_handler = {
+ 	.error_detected = hisi_qm_dev_err_detected,
+ 	.slot_reset =  hisi_qm_dev_slot_reset,
++	.reset_prepare		= hisi_qm_reset_prepare,
++	.reset_done		= hisi_qm_reset_done,
  };
-+
- static u32 pf_q_num = SEC_PF_DEF_Q_NUM;
- module_param_cb(pf_q_num, &sec_pf_q_num_ops, &pf_q_num, 0444);
- MODULE_PARM_DESC(pf_q_num, "Number of queues in PF(v1 0-4096, v2 0-1024)");
+ 
+ static struct pci_driver sec_pci_driver = {
 diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index 4672eaa..3c838e2 100644
+index 3c838e2..a7f0c6a 100644
 --- a/drivers/crypto/hisilicon/zip/zip_main.c
 +++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -192,38 +192,7 @@ static struct debugfs_reg32 hzip_dfx_regs[] = {
+@@ -278,6 +278,8 @@ static int hisi_zip_set_user_domain_and_cache(struct hisi_qm *qm)
  
- static int pf_q_num_set(const char *val, const struct kernel_param *kp)
+ static void hisi_zip_hw_error_enable(struct hisi_qm *qm)
  {
--	struct pci_dev *pdev = pci_get_device(PCI_VENDOR_ID_HUAWEI,
--					      PCI_DEVICE_ID_ZIP_PF, NULL);
--	u32 n, q_num;
--	u8 rev_id;
--	int ret;
--
--	if (!val)
--		return -EINVAL;
--
--	if (!pdev) {
--		q_num = min_t(u32, HZIP_QUEUE_NUM_V1, HZIP_QUEUE_NUM_V2);
--		pr_info("No device found currently, suppose queue number is %d\n",
--			q_num);
--	} else {
--		rev_id = pdev->revision;
--		switch (rev_id) {
--		case QM_HW_V1:
--			q_num = HZIP_QUEUE_NUM_V1;
--			break;
--		case QM_HW_V2:
--			q_num = HZIP_QUEUE_NUM_V2;
--			break;
--		default:
--			return -EINVAL;
--		}
--	}
--
--	ret = kstrtou32(val, 10, &n);
--	if (ret != 0 || n > q_num || n == 0)
--		return -EINVAL;
--
--	return param_set_int(val, kp);
-+	return q_num_set(val, kp, PCI_DEVICE_ID_ZIP_PF);
++	u32 val;
++
+ 	if (qm->ver == QM_HW_V1) {
+ 		writel(HZIP_CORE_INT_MASK_ALL,
+ 		       qm->io_base + HZIP_CORE_INT_MASK_REG);
+@@ -296,12 +298,24 @@ static void hisi_zip_hw_error_enable(struct hisi_qm *qm)
+ 
+ 	/* enable ZIP hw error interrupts */
+ 	writel(0, qm->io_base + HZIP_CORE_INT_MASK_REG);
++
++	/* enable ZIP block master OOO when m-bit error occur */
++	val = readl(qm->io_base + HZIP_SOFT_CTRL_ZIP_CONTROL);
++	val = val | HZIP_AXI_SHUTDOWN_ENABLE;
++	writel(val, qm->io_base + HZIP_SOFT_CTRL_ZIP_CONTROL);
  }
  
- static const struct kernel_param_ops pf_q_num_ops = {
+ static void hisi_zip_hw_error_disable(struct hisi_qm *qm)
+ {
++	u32 val;
++
+ 	/* disable ZIP hw error interrupts */
+ 	writel(HZIP_CORE_INT_MASK_ALL, qm->io_base + HZIP_CORE_INT_MASK_REG);
++
++	/* disable ZIP block master OOO when m-bit error occur */
++	val = readl(qm->io_base + HZIP_SOFT_CTRL_ZIP_CONTROL);
++	val = val & ~HZIP_AXI_SHUTDOWN_ENABLE;
++	writel(val, qm->io_base + HZIP_SOFT_CTRL_ZIP_CONTROL);
+ }
+ 
+ static inline struct hisi_qm *file_to_qm(struct ctrl_debug_file *file)
+@@ -802,6 +816,8 @@ static void hisi_zip_remove(struct pci_dev *pdev)
+ static const struct pci_error_handlers hisi_zip_err_handler = {
+ 	.error_detected	= hisi_qm_dev_err_detected,
+ 	.slot_reset	= hisi_qm_dev_slot_reset,
++	.reset_prepare	= hisi_qm_reset_prepare,
++	.reset_done	= hisi_qm_reset_done,
+ };
+ 
+ static struct pci_driver hisi_zip_pci_driver = {
 -- 
 2.7.4
 
