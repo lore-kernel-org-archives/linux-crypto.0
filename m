@@ -6,21 +6,21 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22A25C54E4A
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DCCCC54E49
 	for <linux-crypto@archiver.kernel.org>; Sat,  9 May 2020 09:45:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 07E5D214D8
+	by mail.kernel.org (Postfix) with ESMTP id 22AEE24955
 	for <linux-crypto@archiver.kernel.org>; Sat,  9 May 2020 09:45:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728190AbgEIJpZ (ORCPT
+        id S1728152AbgEIJpZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Sat, 9 May 2020 05:45:25 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:58058 "EHLO huawei.com"
+Received: from szxga06-in.huawei.com ([45.249.212.32]:58104 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728152AbgEIJpX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        id S1728187AbgEIJpX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
         Sat, 9 May 2020 05:45:23 -0400
 Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 47F3DC810F93C1D99C5F;
+        by Forcepoint Email with ESMTP id 5F895E332B1AC6C09B78;
         Sat,  9 May 2020 17:45:19 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.56) by
  DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
@@ -29,9 +29,9 @@ From:   Shukun Tan <tanshukun1@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
         <wangzhou1@hisilicon.com>
-Subject: [PATCH v2 04/12] crypto: hisilicon - refactor module parameter pf_q_num related code
-Date:   Sat, 9 May 2020 17:43:57 +0800
-Message-ID: <1589017445-15514-5-git-send-email-tanshukun1@huawei.com>
+Subject: [PATCH v2 02/12] crypto: hisilicon/hpre - modify the HPRE probe process
+Date:   Sat, 9 May 2020 17:43:55 +0800
+Message-ID: <1589017445-15514-3-git-send-email-tanshukun1@huawei.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1589017445-15514-1-git-send-email-tanshukun1@huawei.com>
 References: <1589017445-15514-1-git-send-email-tanshukun1@huawei.com>
@@ -44,234 +44,101 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-put q_num_set similar code into qm to reduce the redundancy.
+From: Longfang Liu <liulongfang@huawei.com>
 
+Misc fixes on coding style:
+1.Merge pre-initialization and initialization of QM
+2.Package the initialization of QM's PF and VF into a function
+
+Signed-off-by: Longfang Liu <liulongfang@huawei.com>
+Signed-off-by: Zaibo Xu <xuzaibo@huawei.com>
 Signed-off-by: Shukun Tan <tanshukun1@huawei.com>
-Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
 ---
- drivers/crypto/hisilicon/hpre/hpre_main.c | 39 ++++++-------------------------
- drivers/crypto/hisilicon/qm.h             | 39 +++++++++++++++++++++++++++++++
- drivers/crypto/hisilicon/sec2/sec_main.c  | 35 ++-------------------------
- drivers/crypto/hisilicon/zip/zip_main.c   | 33 +-------------------------
- 4 files changed, 49 insertions(+), 97 deletions(-)
+ drivers/crypto/hisilicon/hpre/hpre_main.c | 42 ++++++++++++++++++-------------
+ 1 file changed, 25 insertions(+), 17 deletions(-)
 
 diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-index f3859de..f1bb626 100644
+index 0d63666..f3859de 100644
 --- a/drivers/crypto/hisilicon/hpre/hpre_main.c
 +++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-@@ -159,44 +159,19 @@ static struct debugfs_reg32 hpre_com_dfx_regs[] = {
- 	{"INT_STATUS               ",  HPRE_INT_STATUS},
- };
- 
--static int hpre_pf_q_num_set(const char *val, const struct kernel_param *kp)
-+static int pf_q_num_set(const char *val, const struct kernel_param *kp)
- {
--	struct pci_dev *pdev;
--	u32 n, q_num;
--	u8 rev_id;
--	int ret;
--
--	if (!val)
--		return -EINVAL;
--
--	pdev = pci_get_device(PCI_VENDOR_ID_HUAWEI, HPRE_PCI_DEVICE_ID, NULL);
--	if (!pdev) {
--		q_num = HPRE_QUEUE_NUM_V2;
--		pr_info("No device found currently, suppose queue number is %d\n",
--			q_num);
--	} else {
--		rev_id = pdev->revision;
--		if (rev_id != QM_HW_V2)
--			return -EINVAL;
--
--		q_num = HPRE_QUEUE_NUM_V2;
--	}
--
--	ret = kstrtou32(val, 10, &n);
--	if (ret != 0 || n == 0 || n > q_num)
--		return -EINVAL;
--
--	return param_set_int(val, kp);
-+	return q_num_set(val, kp, HPRE_PCI_DEVICE_ID);
+@@ -666,7 +666,7 @@ static void hpre_debugfs_exit(struct hpre *hpre)
+ 	debugfs_remove_recursive(qm->debug.debug_root);
  }
  
- static const struct kernel_param_ops hpre_pf_q_num_ops = {
--	.set = hpre_pf_q_num_set,
-+	.set = pf_q_num_set,
- 	.get = param_get_int,
- };
+-static int hpre_qm_pre_init(struct hisi_qm *qm, struct pci_dev *pdev)
++static int hpre_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
+ {
+ 	enum qm_hw_ver rev_id;
  
--static u32 hpre_pf_q_num = HPRE_PF_DEF_Q_NUM;
--module_param_cb(hpre_pf_q_num, &hpre_pf_q_num_ops, &hpre_pf_q_num, 0444);
--MODULE_PARM_DESC(hpre_pf_q_num, "Number of queues in PF of CS(1-1024)");
-+static u32 pf_q_num = HPRE_PF_DEF_Q_NUM;
-+module_param_cb(pf_q_num, &hpre_pf_q_num_ops, &pf_q_num, 0444);
-+MODULE_PARM_DESC(pf_q_num, "Number of queues in PF of CS(1-1024)");
- 
- static const struct kernel_param_ops vfs_num_ops = {
- 	.set = vfs_num_set,
-@@ -688,7 +663,7 @@ static int hpre_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
- 
+@@ -685,13 +685,14 @@ static int hpre_qm_pre_init(struct hisi_qm *qm, struct pci_dev *pdev)
+ 	qm->dev_name = hpre_name;
+ 	qm->fun_type = (pdev->device == HPRE_PCI_DEVICE_ID) ?
+ 		       QM_HW_PF : QM_HW_VF;
++
  	if (pdev->is_physfn) {
  		qm->qp_base = HPRE_PF_DEF_Q_BASE;
--		qm->qp_num = hpre_pf_q_num;
-+		qm->qp_num = pf_q_num;
+ 		qm->qp_num = hpre_pf_q_num;
  	}
  	qm->use_dma_api = true;
  
-diff --git a/drivers/crypto/hisilicon/qm.h b/drivers/crypto/hisilicon/qm.h
-index 9d17167..d1be8cd 100644
---- a/drivers/crypto/hisilicon/qm.h
-+++ b/drivers/crypto/hisilicon/qm.h
-@@ -8,6 +8,8 @@
- #include <linux/module.h>
- #include <linux/pci.h>
+-	return 0;
++	return hisi_qm_init(qm);
+ }
  
-+#define QM_QNUM_V1			4096
-+#define QM_QNUM_V2			1024
- #define QM_MAX_VFS_NUM_V2		63
+ static void hpre_log_hw_error(struct hisi_qm *qm, u32 err_sts)
+@@ -766,6 +767,20 @@ static int hpre_pf_probe_init(struct hpre *hpre)
+ 	return 0;
+ }
  
- /* qm user domain */
-@@ -252,6 +254,43 @@ struct hisi_qp {
- 	struct uacce_queue *uacce_q;
- };
- 
-+static inline int q_num_set(const char *val, const struct kernel_param *kp,
-+			    unsigned int device)
++static int hpre_probe_init(struct hpre *hpre)
 +{
-+	struct pci_dev *pdev = pci_get_device(PCI_VENDOR_ID_HUAWEI,
-+					      device, NULL);
-+	u32 n, q_num;
-+	u8 rev_id;
-+	int ret;
++	struct hisi_qm *qm = &hpre->qm;
++	int ret = -ENODEV;
 +
-+	if (!val)
-+		return -EINVAL;
++	if (qm->fun_type == QM_HW_PF)
++		ret = hpre_pf_probe_init(hpre);
++	else if (qm->fun_type == QM_HW_VF && qm->ver == QM_HW_V2)
++		/* v2 starts to support get vft by mailbox */
++		ret = hisi_qm_get_vft(qm, &qm->qp_base, &qm->qp_num);
 +
-+	if (!pdev) {
-+		q_num = min_t(u32, QM_QNUM_V1, QM_QNUM_V2);
-+		pr_info("No device found currently, suppose queue number is %d\n",
-+			q_num);
-+	} else {
-+		rev_id = pdev->revision;
-+		switch (rev_id) {
-+		case QM_HW_V1:
-+			q_num = QM_QNUM_V1;
-+			break;
-+		case QM_HW_V2:
-+			q_num = QM_QNUM_V2;
-+			break;
-+		default:
-+			return -EINVAL;
-+		}
-+	}
-+
-+	ret = kstrtou32(val, 10, &n);
-+	if (ret || !n || n > q_num)
-+		return -EINVAL;
-+
-+	return param_set_int(val, kp);
++	return ret;
 +}
 +
- static inline int vfs_num_set(const char *val, const struct kernel_param *kp)
+ static int hpre_probe(struct pci_dev *pdev, const struct pci_device_id *id)
  {
- 	u32 n;
-diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-index ea029e3..5aba775 100644
---- a/drivers/crypto/hisilicon/sec2/sec_main.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-@@ -136,45 +136,14 @@ static struct debugfs_reg32 sec_dfx_regs[] = {
+ 	struct hisi_qm *qm;
+@@ -779,23 +794,16 @@ static int hpre_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 	pci_set_drvdata(pdev, hpre);
  
- static int sec_pf_q_num_set(const char *val, const struct kernel_param *kp)
- {
--	struct pci_dev *pdev;
--	u32 n, q_num;
--	u8 rev_id;
--	int ret;
+ 	qm = &hpre->qm;
+-	ret = hpre_qm_pre_init(qm, pdev);
+-	if (ret)
+-		return ret;
 -
--	if (!val)
--		return -EINVAL;
--
--	pdev = pci_get_device(PCI_VENDOR_ID_HUAWEI,
--			      SEC_PF_PCI_DEVICE_ID, NULL);
--	if (!pdev) {
--		q_num = min_t(u32, SEC_QUEUE_NUM_V1, SEC_QUEUE_NUM_V2);
--		pr_info("No device, suppose queue number is %d!\n", q_num);
--	} else {
--		rev_id = pdev->revision;
--
--		switch (rev_id) {
--		case QM_HW_V1:
--			q_num = SEC_QUEUE_NUM_V1;
--			break;
--		case QM_HW_V2:
--			q_num = SEC_QUEUE_NUM_V2;
--			break;
--		default:
--			return -EINVAL;
--		}
--	}
--
--	ret = kstrtou32(val, 10, &n);
--	if (ret || !n || n > q_num)
--		return -EINVAL;
--
--	return param_set_int(val, kp);
-+	return q_num_set(val, kp, SEC_PF_PCI_DEVICE_ID);
- }
+-	ret = hisi_qm_init(qm);
+-	if (ret)
++	ret = hpre_qm_init(qm, pdev);
++	if (ret) {
++		pci_err(pdev, "Failed to init HPRE QM (%d)!\n", ret);
+ 		return ret;
++	}
  
- static const struct kernel_param_ops sec_pf_q_num_ops = {
- 	.set = sec_pf_q_num_set,
- 	.get = param_get_int,
- };
-+
- static u32 pf_q_num = SEC_PF_DEF_Q_NUM;
- module_param_cb(pf_q_num, &sec_pf_q_num_ops, &pf_q_num, 0444);
- MODULE_PARM_DESC(pf_q_num, "Number of queues in PF(v1 0-4096, v2 0-1024)");
-diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-index 4672eaa..3c838e2 100644
---- a/drivers/crypto/hisilicon/zip/zip_main.c
-+++ b/drivers/crypto/hisilicon/zip/zip_main.c
-@@ -192,38 +192,7 @@ static struct debugfs_reg32 hzip_dfx_regs[] = {
+-	if (pdev->is_physfn) {
+-		ret = hpre_pf_probe_init(hpre);
+-		if (ret)
+-			goto err_with_qm_init;
+-	} else if (qm->fun_type == QM_HW_VF && qm->ver == QM_HW_V2) {
+-		/* v2 starts to support get vft by mailbox */
+-		ret = hisi_qm_get_vft(qm, &qm->qp_base, &qm->qp_num);
+-		if (ret)
+-			goto err_with_qm_init;
++	ret = hpre_probe_init(hpre);
++	if (ret) {
++		pci_err(pdev, "Failed to probe (%d)!\n", ret);
++		goto err_with_qm_init;
+ 	}
  
- static int pf_q_num_set(const char *val, const struct kernel_param *kp)
- {
--	struct pci_dev *pdev = pci_get_device(PCI_VENDOR_ID_HUAWEI,
--					      PCI_DEVICE_ID_ZIP_PF, NULL);
--	u32 n, q_num;
--	u8 rev_id;
--	int ret;
--
--	if (!val)
--		return -EINVAL;
--
--	if (!pdev) {
--		q_num = min_t(u32, HZIP_QUEUE_NUM_V1, HZIP_QUEUE_NUM_V2);
--		pr_info("No device found currently, suppose queue number is %d\n",
--			q_num);
--	} else {
--		rev_id = pdev->revision;
--		switch (rev_id) {
--		case QM_HW_V1:
--			q_num = HZIP_QUEUE_NUM_V1;
--			break;
--		case QM_HW_V2:
--			q_num = HZIP_QUEUE_NUM_V2;
--			break;
--		default:
--			return -EINVAL;
--		}
--	}
--
--	ret = kstrtou32(val, 10, &n);
--	if (ret != 0 || n > q_num || n == 0)
--		return -EINVAL;
--
--	return param_set_int(val, kp);
-+	return q_num_set(val, kp, PCI_DEVICE_ID_ZIP_PF);
- }
- 
- static const struct kernel_param_ops pf_q_num_ops = {
+ 	ret = hisi_qm_start(qm);
 -- 
 2.7.4
 
