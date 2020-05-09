@@ -2,86 +2,98 @@ Return-Path: <SRS0=jzkg=6X=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D97EC38A2A
-	for <linux-crypto@archiver.kernel.org>; Sat,  9 May 2020 01:49:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 522EEC38A2A
+	for <linux-crypto@archiver.kernel.org>; Sat,  9 May 2020 03:26:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6FFB421974
-	for <linux-crypto@archiver.kernel.org>; Sat,  9 May 2020 01:49:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C744217BA
+	for <linux-crypto@archiver.kernel.org>; Sat,  9 May 2020 03:26:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728305AbgEIBtz (ORCPT
+        id S1728540AbgEID0A convert rfc822-to-8bit (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 8 May 2020 21:49:55 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4359 "EHLO huawei.com"
+        Fri, 8 May 2020 23:26:00 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2067 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727828AbgEIBtz (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 8 May 2020 21:49:55 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id ACEE65FB9EFAEC69915B;
-        Sat,  9 May 2020 09:49:49 +0800 (CST)
-Received: from [10.63.139.185] (10.63.139.185) by
- DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
- 14.3.487.0; Sat, 9 May 2020 09:49:48 +0800
-Subject: Re: [PATCH 3/4] crypto: hisilicon/zip - constify struct debugfs_reg32
-To:     Rikard Falkeborn <rikard.falkeborn@gmail.com>
-References: <20200508223502.7258-1-rikard.falkeborn@gmail.com>
- <20200508223502.7258-4-rikard.falkeborn@gmail.com>
-CC:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-From:   Zhou Wang <wangzhou1@hisilicon.com>
-Message-ID: <5EB60C26.8050205@hisilicon.com>
-Date:   Sat, 9 May 2020 09:49:26 +0800
-User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:38.0) Gecko/20100101
- Thunderbird/38.5.1
+        id S1728355AbgEID0A (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 8 May 2020 23:26:00 -0400
+Received: from dggemi405-hub.china.huawei.com (unknown [172.30.72.56])
+        by Forcepoint Email with ESMTP id 53DBE46CF9C47DD79D22;
+        Sat,  9 May 2020 11:25:57 +0800 (CST)
+Received: from DGGEMI423-HUB.china.huawei.com (10.1.199.152) by
+ dggemi405-hub.china.huawei.com (10.3.17.143) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Sat, 9 May 2020 11:25:56 +0800
+Received: from DGGEMI525-MBS.china.huawei.com ([169.254.6.251]) by
+ dggemi423-hub.china.huawei.com ([10.1.199.152]) with mapi id 14.03.0487.000;
+ Sat, 9 May 2020 11:25:49 +0800
+From:   Song Bao Hua <song.bao.hua@hisilicon.com>
+To:     "tanshukun (A)" <tanshukun1@huawei.com>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>
+CC:     "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        Xu Zaibo <xuzaibo@huawei.com>,
+        "Wangzhou (B)" <wangzhou1@hisilicon.com>
+Subject: RE: [PATCH 13/13] crypto: hisilicon/zip - Make negative compression
+ not an error
+Thread-Topic: [PATCH 13/13] crypto: hisilicon/zip - Make negative
+ compression not an error
+Thread-Index: AQHWJQYuugrMzbLYXUa2JUSNbpkAvKifF3kA
+Date:   Sat, 9 May 2020 03:25:48 +0000
+Message-ID: <B926444035E5E2439431908E3842AFD249C8DC@DGGEMI525-MBS.china.huawei.com>
+References: <1588921068-20739-1-git-send-email-tanshukun1@huawei.com>
+ <1588921068-20739-14-git-send-email-tanshukun1@huawei.com>
+In-Reply-To: <1588921068-20739-14-git-send-email-tanshukun1@huawei.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.126.201.87]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-In-Reply-To: <20200508223502.7258-4-rikard.falkeborn@gmail.com>
-Content-Type: text/plain; charset="windows-1252"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.63.139.185]
 X-CFilter-Loop: Reflected
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 2020/5/9 6:35, Rikard Falkeborn wrote:
-> hzip_dfx_regs is never changed and can be made const.
-> 
-> This allows the compiler to put it in the text section instead of the
-> data section.
-> 
-> Before:
->    text    data     bss     dec     hex filename
->   15236    6160     480   21876    5574 drivers/crypto/hisilicon/zip/zip_main.o
-> 
-> After:
->    text    data     bss     dec     hex filename
->   15620    5776     480   21876    5574 drivers/crypto/hisilicon/zip/zip_main.o
-> 
-> Signed-off-by: Rikard Falkeborn <rikard.falkeborn@gmail.com>
+> -----Original Message-----
+> From: linux-crypto-owner@vger.kernel.org [mailto:linux-crypto-owner@vger.kernel.org] On Behalf Of Shukun Tan
+> Sent: Friday, May 8, 2020 6:58 PM
+> To: herbert@gondor.apana.org.au; davem@davemloft.net
+> Cc: linux-crypto@vger.kernel.org; Xu Zaibo <xuzaibo@huawei.com>; Wangzhou (B) <wangzhou1@hisilicon.com>
+> Subject: [PATCH 13/13] crypto: hisilicon/zip - Make negative compression not an error
 
-Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
+> From: Zhou Wang <wangzhou1@hisilicon.com>
 
-Thanks for fixing this.
+> Users can decide whether to use negative compression result, so it should not be reported as an error by driver.
 
+> Signed-off-by: Zhou Wang <wangzhou1@hisilicon.com>
+> Signed-off-by: Shukun Tan <tanshukun1@huawei.com>
 > ---
->  drivers/crypto/hisilicon/zip/zip_main.c | 2 +-
+>  drivers/crypto/hisilicon/zip/zip_crypto.c | 2 +-
 >  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
-> index 37db11f96fab..6934a03d21e1 100644
-> --- a/drivers/crypto/hisilicon/zip/zip_main.c
-> +++ b/drivers/crypto/hisilicon/zip/zip_main.c
-> @@ -165,7 +165,7 @@ static const u64 core_offsets[] = {
->  	[HZIP_DECOMP_CORE5] = 0x309000,
->  };
->  
-> -static struct debugfs_reg32 hzip_dfx_regs[] = {
-> +static const struct debugfs_reg32 hzip_dfx_regs[] = {
->  	{"HZIP_GET_BD_NUM                ",  0x00ull},
->  	{"HZIP_GET_RIGHT_BD              ",  0x04ull},
->  	{"HZIP_GET_ERROR_BD              ",  0x08ull},
-> 
+
+> diff --git a/drivers/crypto/hisilicon/zip/zip_crypto.c b/drivers/crypto/hisilicon/zip/zip_crypto.c
+> index 5fb9d4b..0f158d4 100644
+> --- a/drivers/crypto/hisilicon/zip/zip_crypto.c
+> +++ b/drivers/crypto/hisilicon/zip/zip_crypto.c
+@@ -341,7 +341,7 @@ static void hisi_zip_acomp_cb(struct hisi_qp *qp, void *data)
+ 
+>  	status = sqe->dw3 & HZIP_BD_STATUS_M;
+ 
+> -	if (status != 0 && status != HZIP_NC_ERR) {
+> +	if (status != 0) {
+
+Hi Zhou, it seems your comment is saying we won't report errors for some cases. But the code seems to report more errors by removing the "&&" as the condition becomes weaker.
+Anything have I lost?
+
+>  		dev_err(dev, "%scompress fail in qp%u: %u, output: %u\n",
+>  			(qp->alg_type == 0) ? "" : "de", qp->qp_id, status,
+>  			sqe->produced);
+
+Best Regards
+Barry
+
