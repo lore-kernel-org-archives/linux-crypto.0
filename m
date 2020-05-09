@@ -2,39 +2,37 @@ Return-Path: <SRS0=jzkg=6X=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E335C54E4B
-	for <linux-crypto@archiver.kernel.org>; Sat,  9 May 2020 09:45:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91061C54E8A
+	for <linux-crypto@archiver.kernel.org>; Sat,  9 May 2020 09:45:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F376E214D8
-	for <linux-crypto@archiver.kernel.org>; Sat,  9 May 2020 09:45:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 730E4214D8
+	for <linux-crypto@archiver.kernel.org>; Sat,  9 May 2020 09:45:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728108AbgEIJpZ (ORCPT
+        id S1728172AbgEIJpZ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Sat, 9 May 2020 05:45:25 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:4316 "EHLO huawei.com"
+Received: from szxga06-in.huawei.com ([45.249.212.32]:58118 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728182AbgEIJpW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 9 May 2020 05:45:22 -0400
-Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
-        by Forcepoint Email with ESMTP id 72102D5E54DF7FC4B3B1;
+        id S1728190AbgEIJpX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 9 May 2020 05:45:23 -0400
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
+        by Forcepoint Email with ESMTP id 636F61FCF1C5B9EC1DB2;
         Sat,  9 May 2020 17:45:19 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.56) by
  DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
- 14.3.487.0; Sat, 9 May 2020 17:45:10 +0800
+ 14.3.487.0; Sat, 9 May 2020 17:45:09 +0800
 From:   Shukun Tan <tanshukun1@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
         <wangzhou1@hisilicon.com>
-Subject: [PATCH v2 01/12] crypto: hisilicon/sec2 - modify the SEC probe process
-Date:   Sat, 9 May 2020 17:43:54 +0800
-Message-ID: <1589017445-15514-2-git-send-email-tanshukun1@huawei.com>
+Subject: [PATCH v2 00/12] crypto: hisilicon - misc cleanup and optimizations
+Date:   Sat, 9 May 2020 17:43:53 +0800
+Message-ID: <1589017445-15514-1-git-send-email-tanshukun1@huawei.com>
 X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1589017445-15514-1-git-send-email-tanshukun1@huawei.com>
-References: <1589017445-15514-1-git-send-email-tanshukun1@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.69.192.56]
@@ -44,129 +42,44 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Longfang Liu <liulongfang@huawei.com>
+This patchset includes some misc updates.
+patch 1-3: modify the accelerator probe process.
+patch 4: refactor module parameter pf_q_num.
+patch 5-6: add state machine and FLR support.
+patch 7: remove use_dma_api related useless codes.
+patch 8-9: QM initialization process and memory management optimization.
+patch 10-11: add device error report through abnormal irq.
+patch 12: tiny change of zip driver.
 
-Adjust the position of SMMU status check and
-SEC queue initialization in SEC probe
+Longfang Liu (3):
+  crypto: hisilicon/sec2 - modify the SEC probe process
+  crypto: hisilicon/hpre - modify the HPRE probe process
+  crypto: hisilicon/zip - modify the ZIP probe process
 
-Signed-off-by: Longfang Liu <liulongfang@huawei.com>
-Signed-off-by: Zaibo Xu <xuzaibo@huawei.com>
-Signed-off-by: Shukun Tan <tanshukun1@huawei.com>
-Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
----
- drivers/crypto/hisilicon/sec2/sec_main.c | 67 ++++++++++++++------------------
- 1 file changed, 30 insertions(+), 37 deletions(-)
+Shukun Tan (5):
+  crypto: hisilicon - refactor module parameter pf_q_num related code
+  crypto: hisilicon - add FLR support
+  crypto: hisilicon - remove use_dma_api related codes
+  crypto: hisilicon - remove codes of directly report device errors
+    through MSI
+  crypto: hisilicon - add device error report through abnormal irq
 
-diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-index 07a5f4e..ea029e3 100644
---- a/drivers/crypto/hisilicon/sec2/sec_main.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-@@ -765,6 +765,21 @@ static int sec_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
- 	qm->dev_name = sec_name;
- 	qm->fun_type = (pdev->device == SEC_PF_PCI_DEVICE_ID) ?
- 			QM_HW_PF : QM_HW_VF;
-+	if (qm->fun_type == QM_HW_PF) {
-+		qm->qp_base = SEC_PF_DEF_Q_BASE;
-+		qm->qp_num = pf_q_num;
-+		qm->debug.curr_qm_qp_num = pf_q_num;
-+		qm->qm_list = &sec_devices;
-+	} else if (qm->fun_type == QM_HW_VF && qm->ver == QM_HW_V1) {
-+		/*
-+		 * have no way to get qm configure in VM in v1 hardware,
-+		 * so currently force PF to uses SEC_PF_DEF_Q_NUM, and force
-+		 * to trigger only one VF in v1 hardware.
-+		 * v2 hardware has no such problem.
-+		 */
-+		qm->qp_base = SEC_PF_DEF_Q_NUM;
-+		qm->qp_num = SEC_QUEUE_NUM_V1 - SEC_PF_DEF_Q_NUM;
-+	}
- 	qm->use_dma_api = true;
- 
- 	return hisi_qm_init(qm);
-@@ -775,8 +790,9 @@ static void sec_qm_uninit(struct hisi_qm *qm)
- 	hisi_qm_uninit(qm);
- }
- 
--static int sec_probe_init(struct hisi_qm *qm, struct sec_dev *sec)
-+static int sec_probe_init(struct sec_dev *sec)
- {
-+	struct hisi_qm *qm = &sec->qm;
- 	int ret;
- 
- 	/*
-@@ -793,40 +809,18 @@ static int sec_probe_init(struct hisi_qm *qm, struct sec_dev *sec)
- 		return -ENOMEM;
- 	}
- 
--	if (qm->fun_type == QM_HW_PF) {
--		qm->qp_base = SEC_PF_DEF_Q_BASE;
--		qm->qp_num = pf_q_num;
--		qm->debug.curr_qm_qp_num = pf_q_num;
--		qm->qm_list = &sec_devices;
--
-+	if (qm->fun_type == QM_HW_PF)
- 		ret = sec_pf_probe_init(sec);
--		if (ret)
--			goto err_probe_uninit;
--	} else if (qm->fun_type == QM_HW_VF) {
--		/*
--		 * have no way to get qm configure in VM in v1 hardware,
--		 * so currently force PF to uses SEC_PF_DEF_Q_NUM, and force
--		 * to trigger only one VF in v1 hardware.
--		 * v2 hardware has no such problem.
--		 */
--		if (qm->ver == QM_HW_V1) {
--			qm->qp_base = SEC_PF_DEF_Q_NUM;
--			qm->qp_num = SEC_QUEUE_NUM_V1 - SEC_PF_DEF_Q_NUM;
--		} else if (qm->ver == QM_HW_V2) {
--			/* v2 starts to support get vft by mailbox */
--			ret = hisi_qm_get_vft(qm, &qm->qp_base, &qm->qp_num);
--			if (ret)
--				goto err_probe_uninit;
--		}
--	} else {
--		ret = -ENODEV;
--		goto err_probe_uninit;
-+	else if (qm->fun_type == QM_HW_VF && qm->ver == QM_HW_V2)
-+		/* v2 starts to support get vft by mailbox */
-+		ret = hisi_qm_get_vft(qm, &qm->qp_base, &qm->qp_num);
-+
-+	if (ret) {
-+		destroy_workqueue(qm->wq);
-+		return ret;
- 	}
- 
- 	return 0;
--err_probe_uninit:
--	destroy_workqueue(qm->wq);
--	return ret;
- }
- 
- static void sec_probe_uninit(struct hisi_qm *qm)
-@@ -865,18 +859,17 @@ static int sec_probe(struct pci_dev *pdev, const struct pci_device_id *id)
- 
- 	pci_set_drvdata(pdev, sec);
- 
--	sec->ctx_q_num = ctx_q_num;
--	sec_iommu_used_check(sec);
--
- 	qm = &sec->qm;
--
- 	ret = sec_qm_init(qm, pdev);
- 	if (ret) {
--		pci_err(pdev, "Failed to pre init qm!\n");
-+		pci_err(pdev, "Failed to init SEC QM (%d)!\n", ret);
- 		return ret;
- 	}
- 
--	ret = sec_probe_init(qm, sec);
-+	sec->ctx_q_num = ctx_q_num;
-+	sec_iommu_used_check(sec);
-+
-+	ret = sec_probe_init(sec);
- 	if (ret) {
- 		pci_err(pdev, "Failed to probe!\n");
- 		goto err_qm_uninit;
+Weili Qian (2):
+  crypto: hisilicon - unify initial value assignment into QM
+  crypto: hisilicon - QM memory management optimization
+
+Zhou Wang (2):
+  crypto: hisilicon/qm - add state machine for QM
+  crypto: hisilicon/zip - Use temporary sqe when doing work
+
+ drivers/crypto/hisilicon/hpre/hpre_main.c |  107 ++-
+ drivers/crypto/hisilicon/qm.c             | 1101 +++++++++++++++++++----------
+ drivers/crypto/hisilicon/qm.h             |   75 +-
+ drivers/crypto/hisilicon/sec2/sec_main.c  |  134 ++--
+ drivers/crypto/hisilicon/zip/zip_crypto.c |   11 +-
+ drivers/crypto/hisilicon/zip/zip_main.c   |  128 ++--
+ 6 files changed, 950 insertions(+), 606 deletions(-)
+
 -- 
 2.7.4
 
