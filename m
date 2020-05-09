@@ -6,21 +6,21 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D4F5C28CBC
-	for <linux-crypto@archiver.kernel.org>; Sat,  9 May 2020 09:45:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21CCAC47254
+	for <linux-crypto@archiver.kernel.org>; Sat,  9 May 2020 09:45:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 67397214D8
-	for <linux-crypto@archiver.kernel.org>; Sat,  9 May 2020 09:45:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 08ECA214D8
+	for <linux-crypto@archiver.kernel.org>; Sat,  9 May 2020 09:45:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728114AbgEIJpc (ORCPT
+        id S1728137AbgEIJpd (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 9 May 2020 05:45:32 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:58146 "EHLO huawei.com"
+        Sat, 9 May 2020 05:45:33 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:58116 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1728182AbgEIJpb (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 9 May 2020 05:45:31 -0400
+        id S1728206AbgEIJpd (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Sat, 9 May 2020 05:45:33 -0400
 Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.59])
-        by Forcepoint Email with ESMTP id 66D73129F6F098DB95AB;
+        by Forcepoint Email with ESMTP id 5B13076F1C539BCEBC77;
         Sat,  9 May 2020 17:45:19 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.56) by
  DGGEMS412-HUB.china.huawei.com (10.3.19.212) with Microsoft SMTP Server id
@@ -29,9 +29,9 @@ From:   Shukun Tan <tanshukun1@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
         <wangzhou1@hisilicon.com>
-Subject: [PATCH v2 11/12] crypto: hisilicon - add device error report through abnormal irq
-Date:   Sat, 9 May 2020 17:44:04 +0800
-Message-ID: <1589017445-15514-12-git-send-email-tanshukun1@huawei.com>
+Subject: [PATCH v2 10/12] crypto: hisilicon - remove codes of directly report device errors through MSI
+Date:   Sat, 9 May 2020 17:44:03 +0800
+Message-ID: <1589017445-15514-11-git-send-email-tanshukun1@huawei.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1589017445-15514-1-git-send-email-tanshukun1@huawei.com>
 References: <1589017445-15514-1-git-send-email-tanshukun1@huawei.com>
@@ -44,482 +44,194 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-By configuring the device error in firmware to report through abnormal
-interruption, process all NFE errors in irq handler.
+The hardware device can be configured to report directly through MSI, but
+this method will not go through RAS, configure all hardware errors that
+should be processed by driver to NFE.
 
 Signed-off-by: Shukun Tan <tanshukun1@huawei.com>
-Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
 ---
- drivers/crypto/hisilicon/qm.c | 339 +++++++++++++++++++++++-------------------
- drivers/crypto/hisilicon/qm.h |   1 +
- 2 files changed, 187 insertions(+), 153 deletions(-)
+ drivers/crypto/hisilicon/hpre/hpre_main.c |  1 -
+ drivers/crypto/hisilicon/qm.c             | 54 +++++++------------------------
+ drivers/crypto/hisilicon/qm.h             |  4 +--
+ drivers/crypto/hisilicon/sec2/sec_main.c  |  1 -
+ drivers/crypto/hisilicon/zip/zip_main.c   |  1 -
+ 5 files changed, 13 insertions(+), 48 deletions(-)
 
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+index 93df31a..5eedd3c 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_main.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+@@ -730,7 +730,6 @@ static const struct hisi_qm_err_ini hpre_err_ini = {
+ 		.ce			= QM_BASE_CE,
+ 		.nfe			= QM_BASE_NFE | QM_ACC_DO_TASK_TIMEOUT,
+ 		.fe			= 0,
+-		.msi			= QM_DB_RANDOM_INVALID,
+ 		.ecc_2bits_mask		= HPRE_CORE_ECC_2BIT_ERR |
+ 					  HPRE_OOO_ECC_2BIT_ERR,
+ 		.msi_wr_port		= HPRE_WR_MSI_PORT,
 diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 80935d6..6365f93 100644
+index e988124..80935d6 100644
 --- a/drivers/crypto/hisilicon/qm.c
 +++ b/drivers/crypto/hisilicon/qm.c
-@@ -219,6 +219,12 @@ enum vft_type {
- 	CQC_VFT,
- };
- 
-+enum acc_err_result {
-+	ACC_ERR_NONE,
-+	ACC_ERR_NEED_RESET,
-+	ACC_ERR_RECOVERED,
-+};
-+
- struct qm_cqe {
- 	__le32 rsvd0;
- 	__le16 cmd_id;
-@@ -315,7 +321,7 @@ struct hisi_qm_hw_ops {
+@@ -313,8 +313,7 @@ struct hisi_qm_hw_ops {
+ 		      u8 cmd, u16 index, u8 priority);
+ 	u32 (*get_irq_num)(struct hisi_qm *qm);
  	int (*debug_init)(struct hisi_qm *qm);
- 	void (*hw_error_init)(struct hisi_qm *qm, u32 ce, u32 nfe, u32 fe);
+-	void (*hw_error_init)(struct hisi_qm *qm, u32 ce, u32 nfe, u32 fe,
+-			      u32 msi);
++	void (*hw_error_init)(struct hisi_qm *qm, u32 ce, u32 nfe, u32 fe);
  	void (*hw_error_uninit)(struct hisi_qm *qm);
--	pci_ers_result_t (*hw_error_handle)(struct hisi_qm *qm);
-+	enum acc_err_result (*hw_error_handle)(struct hisi_qm *qm);
+ 	pci_ers_result_t (*hw_error_handle)(struct hisi_qm *qm);
  };
+@@ -707,26 +706,6 @@ static irqreturn_t qm_aeq_irq(int irq, void *data)
  
- static const char * const qm_debug_file_name[] = {
-@@ -704,46 +710,6 @@ static irqreturn_t qm_aeq_irq(int irq, void *data)
+ static irqreturn_t qm_abnormal_irq(int irq, void *data)
+ {
+-	const struct hisi_qm_hw_error *err = qm_hw_error;
+-	struct hisi_qm *qm = data;
+-	struct device *dev = &qm->pdev->dev;
+-	u32 error_status, tmp;
+-
+-	/* read err sts */
+-	tmp = readl(qm->io_base + QM_ABNORMAL_INT_STATUS);
+-	error_status = qm->msi_mask & tmp;
+-
+-	while (err->msg) {
+-		if (err->int_msk & error_status)
+-			dev_err(dev, "%s [error status=0x%x] found\n",
+-				err->msg, err->int_msk);
+-
+-		err++;
+-	}
+-
+-	/* clear err sts */
+-	writel(error_status, qm->io_base + QM_ABNORMAL_INT_SOURCE);
+-
  	return IRQ_HANDLED;
  }
  
--static irqreturn_t qm_abnormal_irq(int irq, void *data)
--{
--	return IRQ_HANDLED;
--}
--
--static int qm_irq_register(struct hisi_qm *qm)
--{
--	struct pci_dev *pdev = qm->pdev;
--	int ret;
--
--	ret = request_irq(pci_irq_vector(pdev, QM_EQ_EVENT_IRQ_VECTOR),
--			  qm_irq, IRQF_SHARED, qm->dev_name, qm);
--	if (ret)
--		return ret;
--
--	if (qm->ver == QM_HW_V2) {
--		ret = request_irq(pci_irq_vector(pdev, QM_AEQ_EVENT_IRQ_VECTOR),
--				  qm_aeq_irq, IRQF_SHARED, qm->dev_name, qm);
--		if (ret)
--			goto err_aeq_irq;
--
--		if (qm->fun_type == QM_HW_PF) {
--			ret = request_irq(pci_irq_vector(pdev,
--					  QM_ABNORMAL_EVENT_IRQ_VECTOR),
--					  qm_abnormal_irq, IRQF_SHARED,
--					  qm->dev_name, qm);
--			if (ret)
--				goto err_abonormal_irq;
--		}
--	}
--
--	return 0;
--
--err_abonormal_irq:
--	free_irq(pci_irq_vector(pdev, QM_AEQ_EVENT_IRQ_VECTOR), qm);
--err_aeq_irq:
--	free_irq(pci_irq_vector(pdev, QM_EQ_EVENT_IRQ_VECTOR), qm);
--	return ret;
--}
--
- static void qm_irq_unregister(struct hisi_qm *qm)
+@@ -1116,28 +1095,21 @@ static int qm_create_debugfs_file(struct hisi_qm *qm, enum qm_debug_file index)
+ 	return 0;
+ }
+ 
+-static void qm_hw_error_init_v1(struct hisi_qm *qm, u32 ce, u32 nfe, u32 fe,
+-				u32 msi)
++static void qm_hw_error_init_v1(struct hisi_qm *qm, u32 ce, u32 nfe, u32 fe)
  {
- 	struct pci_dev *pdev = qm->pdev;
-@@ -1163,7 +1129,7 @@ static void qm_log_hw_error(struct hisi_qm *qm, u32 error_status)
- 	}
+ 	writel(QM_ABNORMAL_INT_MASK_VALUE, qm->io_base + QM_ABNORMAL_INT_MASK);
  }
  
--static pci_ers_result_t qm_hw_error_handle_v2(struct hisi_qm *qm)
-+static enum acc_err_result qm_hw_error_handle_v2(struct hisi_qm *qm)
+-static void qm_hw_error_init_v2(struct hisi_qm *qm, u32 ce, u32 nfe, u32 fe,
+-				u32 msi)
++static void qm_hw_error_init_v2(struct hisi_qm *qm, u32 ce, u32 nfe, u32 fe)
  {
- 	u32 error_status, tmp;
+-	u32 irq_enable = ce | nfe | fe | msi;
++	u32 irq_enable = ce | nfe | fe;
+ 	u32 irq_unmask = ~irq_enable;
+-	u32 error_status;
  
-@@ -1179,13 +1145,13 @@ static pci_ers_result_t qm_hw_error_handle_v2(struct hisi_qm *qm)
- 		if (error_status == QM_DB_RANDOM_INVALID) {
- 			writel(error_status, qm->io_base +
- 			       QM_ABNORMAL_INT_SOURCE);
--			return PCI_ERS_RESULT_RECOVERED;
-+			return ACC_ERR_RECOVERED;
- 		}
+ 	qm->error_mask = ce | nfe | fe;
+-	qm->msi_mask = msi;
  
--		return PCI_ERS_RESULT_NEED_RESET;
-+		return ACC_ERR_NEED_RESET;
- 	}
- 
--	return PCI_ERS_RESULT_RECOVERED;
-+	return ACC_ERR_RECOVERED;
- }
- 
- static const struct hisi_qm_hw_ops qm_hw_ops_v1 = {
-@@ -1943,100 +1909,6 @@ static void hisi_qm_pre_init(struct hisi_qm *qm)
- }
- 
- /**
-- * hisi_qm_init() - Initialize configures about qm.
-- * @qm: The qm needing init.
-- *
-- * This function init qm, then we can call hisi_qm_start to put qm into work.
-- */
--int hisi_qm_init(struct hisi_qm *qm)
--{
--	struct pci_dev *pdev = qm->pdev;
--	struct device *dev = &pdev->dev;
--	unsigned int num_vec;
--	int ret;
--
--	hisi_qm_pre_init(qm);
--
--	ret = qm_alloc_uacce(qm);
--	if (ret < 0)
--		dev_warn(&pdev->dev, "fail to alloc uacce (%d)\n", ret);
--
--	ret = pci_enable_device_mem(pdev);
--	if (ret < 0) {
--		dev_err(&pdev->dev, "Failed to enable device mem!\n");
--		goto err_remove_uacce;
+ 	/* clear QM hw residual error source */
+-	error_status = readl(qm->io_base + QM_ABNORMAL_INT_STATUS);
+-	if (error_status) {
+-		error_status &= qm->error_mask;
+-		writel(error_status, qm->io_base + QM_ABNORMAL_INT_SOURCE);
 -	}
++	writel(QM_ABNORMAL_INT_SOURCE_CLR,
++	       qm->io_base + QM_ABNORMAL_INT_SOURCE);
+ 
+ 	/* configure error type */
+ 	writel(ce, qm->io_base + QM_RAS_CE_ENABLE);
+@@ -1145,9 +1117,6 @@ static void qm_hw_error_init_v2(struct hisi_qm *qm, u32 ce, u32 nfe, u32 fe,
+ 	writel(nfe, qm->io_base + QM_RAS_NFE_ENABLE);
+ 	writel(fe, qm->io_base + QM_RAS_FE_ENABLE);
+ 
+-	/* use RAS irq default, so only set QM_RAS_MSI_INT_SEL for MSI */
+-	writel(msi, qm->io_base + QM_RAS_MSI_INT_SEL);
 -
--	ret = pci_request_mem_regions(pdev, qm->dev_name);
--	if (ret < 0) {
--		dev_err(&pdev->dev, "Failed to request mem regions!\n");
--		goto err_disable_pcidev;
--	}
--
--	qm->phys_base = pci_resource_start(pdev, PCI_BAR_2);
--	qm->phys_size = pci_resource_len(qm->pdev, PCI_BAR_2);
--	qm->io_base = ioremap(qm->phys_base, qm->phys_size);
--	if (!qm->io_base) {
--		ret = -EIO;
--		goto err_release_mem_regions;
--	}
--
--	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
--	if (ret < 0)
--		goto err_iounmap;
--	pci_set_master(pdev);
--
--	if (!qm->ops->get_irq_num) {
--		ret = -EOPNOTSUPP;
--		goto err_iounmap;
--	}
--	num_vec = qm->ops->get_irq_num(qm);
--	ret = pci_alloc_irq_vectors(pdev, num_vec, num_vec, PCI_IRQ_MSI);
--	if (ret < 0) {
--		dev_err(dev, "Failed to enable MSI vectors!\n");
--		goto err_iounmap;
--	}
--
--	ret = qm_irq_register(qm);
--	if (ret)
--		goto err_free_irq_vectors;
--
--	if (qm->fun_type == QM_HW_VF && qm->ver == QM_HW_V2) {
--		/* v2 starts to support get vft by mailbox */
--		ret = hisi_qm_get_vft(qm, &qm->qp_base, &qm->qp_num);
--		if (ret)
--			goto err_irq_unregister;
--	}
--
--	ret = hisi_qm_memory_init(qm);
--	if (ret)
--		goto err_irq_unregister;
--
--	INIT_WORK(&qm->work, qm_work_process);
--
--	atomic_set(&qm->status.flags, QM_INIT);
--
--	return 0;
--
--err_irq_unregister:
--	qm_irq_unregister(qm);
--err_free_irq_vectors:
--	pci_free_irq_vectors(pdev);
--err_iounmap:
--	iounmap(qm->io_base);
--err_release_mem_regions:
--	pci_release_mem_regions(pdev);
--err_disable_pcidev:
--	pci_disable_device(pdev);
--err_remove_uacce:
--	uacce_remove(qm->uacce);
--	qm->uacce = NULL;
--
--	return ret;
--}
--EXPORT_SYMBOL_GPL(hisi_qm_init);
--
--/**
-  * hisi_qm_uninit() - Uninitialize qm.
-  * @qm: The qm needed uninit.
-  *
-@@ -2460,11 +2332,11 @@ static void qm_hw_error_uninit(struct hisi_qm *qm)
- 	qm->ops->hw_error_uninit(qm);
+ 	irq_unmask &= readl(qm->io_base + QM_ABNORMAL_INT_MASK);
+ 	writel(irq_unmask, qm->io_base + QM_ABNORMAL_INT_MASK);
  }
+@@ -1207,9 +1176,11 @@ static pci_ers_result_t qm_hw_error_handle_v2(struct hisi_qm *qm)
+ 			qm->err_status.is_qm_ecc_mbit = true;
  
--static pci_ers_result_t qm_hw_error_handle(struct hisi_qm *qm)
-+static enum acc_err_result qm_hw_error_handle(struct hisi_qm *qm)
- {
- 	if (!qm->ops->hw_error_handle) {
- 		dev_err(&qm->pdev->dev, "QM doesn't support hw error report!\n");
--		return PCI_ERS_RESULT_NONE;
-+		return ACC_ERR_NONE;
- 	}
- 
- 	return qm->ops->hw_error_handle(qm);
-@@ -2777,13 +2649,13 @@ int hisi_qm_sriov_configure(struct pci_dev *pdev, int num_vfs)
- }
- EXPORT_SYMBOL_GPL(hisi_qm_sriov_configure);
- 
--static pci_ers_result_t qm_dev_err_handle(struct hisi_qm *qm)
-+static enum acc_err_result qm_dev_err_handle(struct hisi_qm *qm)
- {
- 	u32 err_sts;
- 
- 	if (!qm->err_ini->get_dev_hw_err_status) {
- 		dev_err(&qm->pdev->dev, "Device doesn't support get hw error status!\n");
--		return PCI_ERS_RESULT_NONE;
-+		return ACC_ERR_NONE;
- 	}
- 
- 	/* get device hardware error status */
-@@ -2794,20 +2666,19 @@ static pci_ers_result_t qm_dev_err_handle(struct hisi_qm *qm)
- 
- 		if (!qm->err_ini->log_dev_hw_err) {
- 			dev_err(&qm->pdev->dev, "Device doesn't support log hw error!\n");
--			return PCI_ERS_RESULT_NEED_RESET;
-+			return ACC_ERR_NEED_RESET;
- 		}
- 
- 		qm->err_ini->log_dev_hw_err(qm, err_sts);
--		return PCI_ERS_RESULT_NEED_RESET;
-+		return ACC_ERR_NEED_RESET;
- 	}
- 
--	return PCI_ERS_RESULT_RECOVERED;
-+	return ACC_ERR_RECOVERED;
- }
- 
--static pci_ers_result_t qm_process_dev_error(struct pci_dev *pdev)
-+static enum acc_err_result qm_process_dev_error(struct hisi_qm *qm)
- {
--	struct hisi_qm *qm = pci_get_drvdata(pdev);
--	pci_ers_result_t qm_ret, dev_ret;
-+	enum acc_err_result qm_ret, dev_ret;
- 
- 	/* log qm error */
- 	qm_ret = qm_hw_error_handle(qm);
-@@ -2815,9 +2686,9 @@ static pci_ers_result_t qm_process_dev_error(struct pci_dev *pdev)
- 	/* log device error */
- 	dev_ret = qm_dev_err_handle(qm);
- 
--	return (qm_ret == PCI_ERS_RESULT_NEED_RESET ||
--		dev_ret == PCI_ERS_RESULT_NEED_RESET) ?
--		PCI_ERS_RESULT_NEED_RESET : PCI_ERS_RESULT_RECOVERED;
-+	return (qm_ret == ACC_ERR_NEED_RESET ||
-+		dev_ret == ACC_ERR_NEED_RESET) ?
-+		ACC_ERR_NEED_RESET : ACC_ERR_RECOVERED;
- }
- 
- /**
-@@ -2831,6 +2702,9 @@ static pci_ers_result_t qm_process_dev_error(struct pci_dev *pdev)
- pci_ers_result_t hisi_qm_dev_err_detected(struct pci_dev *pdev,
- 					  pci_channel_state_t state)
- {
-+	struct hisi_qm *qm = pci_get_drvdata(pdev);
-+	enum acc_err_result ret;
-+
- 	if (pdev->is_virtfn)
- 		return PCI_ERS_RESULT_NONE;
- 
-@@ -2838,7 +2712,11 @@ pci_ers_result_t hisi_qm_dev_err_detected(struct pci_dev *pdev,
- 	if (state == pci_channel_io_perm_failure)
- 		return PCI_ERS_RESULT_DISCONNECT;
- 
--	return qm_process_dev_error(pdev);
-+	ret = qm_process_dev_error(qm);
-+	if (ret == ACC_ERR_NEED_RESET)
-+		return PCI_ERS_RESULT_NEED_RESET;
-+
-+	return PCI_ERS_RESULT_RECOVERED;
- }
- EXPORT_SYMBOL_GPL(hisi_qm_dev_err_detected);
- 
-@@ -3428,6 +3306,161 @@ void hisi_qm_reset_done(struct pci_dev *pdev)
- }
- EXPORT_SYMBOL_GPL(hisi_qm_reset_done);
- 
-+static irqreturn_t qm_abnormal_irq(int irq, void *data)
-+{
-+	struct hisi_qm *qm = data;
-+	enum acc_err_result ret;
-+
-+	ret = qm_process_dev_error(qm);
-+	if (ret == ACC_ERR_NEED_RESET)
-+		schedule_work(&qm->rst_work);
-+
-+	return IRQ_HANDLED;
-+}
-+
-+static int qm_irq_register(struct hisi_qm *qm)
-+{
-+	struct pci_dev *pdev = qm->pdev;
-+	int ret;
-+
-+	ret = request_irq(pci_irq_vector(pdev, QM_EQ_EVENT_IRQ_VECTOR),
-+			  qm_irq, IRQF_SHARED, qm->dev_name, qm);
-+	if (ret)
-+		return ret;
-+
-+	if (qm->ver == QM_HW_V2) {
-+		ret = request_irq(pci_irq_vector(pdev, QM_AEQ_EVENT_IRQ_VECTOR),
-+				  qm_aeq_irq, IRQF_SHARED, qm->dev_name, qm);
-+		if (ret)
-+			goto err_aeq_irq;
-+
-+		if (qm->fun_type == QM_HW_PF) {
-+			ret = request_irq(pci_irq_vector(pdev,
-+					  QM_ABNORMAL_EVENT_IRQ_VECTOR),
-+					  qm_abnormal_irq, IRQF_SHARED,
-+					  qm->dev_name, qm);
-+			if (ret)
-+				goto err_abonormal_irq;
+ 		qm_log_hw_error(qm, error_status);
+-
+-		/* clear err sts */
+-		writel(error_status, qm->io_base + QM_ABNORMAL_INT_SOURCE);
++		if (error_status == QM_DB_RANDOM_INVALID) {
++			writel(error_status, qm->io_base +
++			       QM_ABNORMAL_INT_SOURCE);
++			return PCI_ERS_RESULT_RECOVERED;
 +		}
-+	}
-+
-+	return 0;
-+
-+err_abonormal_irq:
-+	free_irq(pci_irq_vector(pdev, QM_AEQ_EVENT_IRQ_VECTOR), qm);
-+err_aeq_irq:
-+	free_irq(pci_irq_vector(pdev, QM_EQ_EVENT_IRQ_VECTOR), qm);
-+	return ret;
-+}
-+
-+static void hisi_qm_controller_reset(struct work_struct *rst_work)
-+{
-+	struct hisi_qm *qm = container_of(rst_work, struct hisi_qm, rst_work);
-+	int ret;
-+
-+	/* reset pcie device controller */
-+	ret = qm_controller_reset(qm);
-+	if (ret)
-+		dev_err(&qm->pdev->dev, "controller reset failed (%d)\n", ret);
-+
-+}
-+
-+/**
-+ * hisi_qm_init() - Initialize configures about qm.
-+ * @qm: The qm needing init.
-+ *
-+ * This function init qm, then we can call hisi_qm_start to put qm into work.
-+ */
-+int hisi_qm_init(struct hisi_qm *qm)
-+{
-+	struct pci_dev *pdev = qm->pdev;
-+	struct device *dev = &pdev->dev;
-+	unsigned int num_vec;
-+	int ret;
-+
-+	hisi_qm_pre_init(qm);
-+
-+	ret = qm_alloc_uacce(qm);
-+	if (ret < 0)
-+		dev_warn(&pdev->dev, "fail to alloc uacce (%d)\n", ret);
-+
-+	ret = pci_enable_device_mem(pdev);
-+	if (ret < 0) {
-+		dev_err(&pdev->dev, "Failed to enable device mem!\n");
-+		goto err_remove_uacce;
-+	}
-+
-+	ret = pci_request_mem_regions(pdev, qm->dev_name);
-+	if (ret < 0) {
-+		dev_err(&pdev->dev, "Failed to request mem regions!\n");
-+		goto err_disable_pcidev;
-+	}
-+
-+	qm->phys_base = pci_resource_start(pdev, PCI_BAR_2);
-+	qm->phys_size = pci_resource_len(qm->pdev, PCI_BAR_2);
-+	qm->io_base = ioremap(qm->phys_base, qm->phys_size);
-+	if (!qm->io_base) {
-+		ret = -EIO;
-+		goto err_release_mem_regions;
-+	}
-+
-+	ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
-+	if (ret < 0)
-+		goto err_iounmap;
-+	pci_set_master(pdev);
-+
-+	if (!qm->ops->get_irq_num) {
-+		ret = -EOPNOTSUPP;
-+		goto err_iounmap;
-+	}
-+	num_vec = qm->ops->get_irq_num(qm);
-+	ret = pci_alloc_irq_vectors(pdev, num_vec, num_vec, PCI_IRQ_MSI);
-+	if (ret < 0) {
-+		dev_err(dev, "Failed to enable MSI vectors!\n");
-+		goto err_iounmap;
-+	}
-+
-+	ret = qm_irq_register(qm);
-+	if (ret)
-+		goto err_free_irq_vectors;
-+
-+	if (qm->fun_type == QM_HW_VF && qm->ver == QM_HW_V2) {
-+		/* v2 starts to support get vft by mailbox */
-+		ret = hisi_qm_get_vft(qm, &qm->qp_base, &qm->qp_num);
-+		if (ret)
-+			goto err_irq_unregister;
-+	}
-+
-+	ret = hisi_qm_memory_init(qm);
-+	if (ret)
-+		goto err_irq_unregister;
-+
-+	INIT_WORK(&qm->work, qm_work_process);
-+	if (qm->fun_type == QM_HW_PF)
-+		INIT_WORK(&qm->rst_work, hisi_qm_controller_reset);
-+
-+	atomic_set(&qm->status.flags, QM_INIT);
-+
-+	return 0;
-+
-+err_irq_unregister:
-+	qm_irq_unregister(qm);
-+err_free_irq_vectors:
-+	pci_free_irq_vectors(pdev);
-+err_iounmap:
-+	iounmap(qm->io_base);
-+err_release_mem_regions:
-+	pci_release_mem_regions(pdev);
-+err_disable_pcidev:
-+	pci_disable_device(pdev);
-+err_remove_uacce:
-+	uacce_remove(qm->uacce);
-+	qm->uacce = NULL;
-+	return ret;
-+}
-+EXPORT_SYMBOL_GPL(hisi_qm_init);
-+
-+
- MODULE_LICENSE("GPL v2");
- MODULE_AUTHOR("Zhou Wang <wangzhou1@hisilicon.com>");
- MODULE_DESCRIPTION("HiSilicon Accelerator queue manager driver");
+ 
+ 		return PCI_ERS_RESULT_NEED_RESET;
+ 	}
+@@ -2476,8 +2447,7 @@ static void qm_hw_error_init(struct hisi_qm *qm)
+ 		return;
+ 	}
+ 
+-	qm->ops->hw_error_init(qm, err_info->ce, err_info->nfe,
+-			       err_info->fe, err_info->msi);
++	qm->ops->hw_error_init(qm, err_info->ce, err_info->nfe, err_info->fe);
+ }
+ 
+ static void qm_hw_error_uninit(struct hisi_qm *qm)
 diff --git a/drivers/crypto/hisilicon/qm.h b/drivers/crypto/hisilicon/qm.h
-index fc5e96a..a431ff2 100644
+index 80b9746..fc5e96a 100644
 --- a/drivers/crypto/hisilicon/qm.h
 +++ b/drivers/crypto/hisilicon/qm.h
-@@ -226,6 +226,7 @@ struct hisi_qm {
+@@ -74,7 +74,7 @@
+ 
+ #define QM_BASE_NFE	(QM_AXI_RRESP | QM_AXI_BRESP | QM_ECC_MBIT | \
+ 			 QM_ACC_GET_TASK_TIMEOUT | QM_DB_TIMEOUT | \
+-			 QM_OF_FIFO_OF)
++			 QM_OF_FIFO_OF | QM_DB_RANDOM_INVALID)
+ #define QM_BASE_CE			QM_ECC_1BIT
+ 
+ #define QM_Q_DEPTH			1024
+@@ -158,7 +158,6 @@ struct hisi_qm_err_info {
+ 	u32 ce;
+ 	u32 nfe;
+ 	u32 fe;
+-	u32 msi;
+ };
+ 
+ struct hisi_qm_err_status {
+@@ -224,7 +223,6 @@ struct hisi_qm {
+ 	struct qm_debug debug;
+ 
+ 	u32 error_mask;
+-	u32 msi_mask;
  
  	struct workqueue_struct *wq;
  	struct work_struct work;
-+	struct work_struct rst_work;
- 
- 	const char *algs;
- 	bool use_sva;
+diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+index 703b8b1..28c73bb 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_main.c
++++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+@@ -682,7 +682,6 @@ static const struct hisi_qm_err_ini sec_err_ini = {
+ 		.nfe			= QM_BASE_NFE | QM_ACC_DO_TASK_TIMEOUT |
+ 					  QM_ACC_WB_NOT_READY_TIMEOUT,
+ 		.fe			= 0,
+-		.msi			= QM_DB_RANDOM_INVALID,
+ 		.ecc_2bits_mask		= SEC_CORE_INT_STATUS_M_ECC,
+ 		.msi_wr_port		= BIT(0),
+ 		.acpi_rst		= "SRST",
+diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+index 1a5a6e3..226d398 100644
+--- a/drivers/crypto/hisilicon/zip/zip_main.c
++++ b/drivers/crypto/hisilicon/zip/zip_main.c
+@@ -643,7 +643,6 @@ static const struct hisi_qm_err_ini hisi_zip_err_ini = {
+ 		.nfe			= QM_BASE_NFE |
+ 					  QM_ACC_WB_NOT_READY_TIMEOUT,
+ 		.fe			= 0,
+-		.msi			= QM_DB_RANDOM_INVALID,
+ 		.ecc_2bits_mask		= HZIP_CORE_INT_STATUS_M_ECC,
+ 		.msi_wr_port		= HZIP_WR_PORT,
+ 		.acpi_rst		= "ZRST",
 -- 
 2.7.4
 
