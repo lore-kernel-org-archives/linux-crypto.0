@@ -7,54 +7,54 @@ X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3626C54E8F
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 May 2020 11:19:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B5A1C54E8D
+	for <linux-crypto@archiver.kernel.org>; Mon, 11 May 2020 11:19:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BDBC520736
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 May 2020 11:19:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0A8A9208DB
+	for <linux-crypto@archiver.kernel.org>; Mon, 11 May 2020 11:19:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="k7SqLLlC"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="EDxwPPYJ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729264AbgEKLTm (ORCPT
+        id S1729369AbgEKLTr (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Mon, 11 May 2020 07:19:42 -0400
-Received: from lelv0142.ext.ti.com ([198.47.23.249]:52254 "EHLO
-        lelv0142.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729260AbgEKLTk (ORCPT
+        Mon, 11 May 2020 07:19:47 -0400
+Received: from fllv0016.ext.ti.com ([198.47.19.142]:34780 "EHLO
+        fllv0016.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1729333AbgEKLTp (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 May 2020 07:19:40 -0400
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-        by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 04BBJSah099239;
-        Mon, 11 May 2020 06:19:28 -0500
+        Mon, 11 May 2020 07:19:45 -0400
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+        by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 04BBJXb3039243;
+        Mon, 11 May 2020 06:19:33 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1589195968;
-        bh=D+FkBTnlxhFt8rwKSbgbew41pOYqmQRAEPiRqzTmXOQ=;
+        s=ti-com-17Q1; t=1589195973;
+        bh=DmuTt/oLL9bLxYzTZA57/askvQvzJwvHmWkkULIzNXk=;
         h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=k7SqLLlClB8ZEFDGzF/pEUjn9BCGo8CrPPLntbI3b+zIRIG5Y5f+HFEkqF/iHxxmM
-         rptNWFqR9e5RqifD7oSS0UxIFqrIPgD+VXAzz9u9Uz7HBCgqRoZbashL7sLX+DNUEF
-         u59A9G19vHup5sEpc5STyVYuRMfsE9RvYj5S1cvQ=
-Received: from DLEE104.ent.ti.com (dlee104.ent.ti.com [157.170.170.34])
-        by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 04BBJSUk003413
+        b=EDxwPPYJNjz2kfVxwGA9jZ/2Wa2LfWYXXknYGxxwBBtPgOh3l+9anre/0WWeK3CwF
+         bSPLcuUv/LM5af3RS62hPwS85pLEeL/DNvyHOwpAn4Kbw4V2paEp6lcoz3lBUOPGRG
+         yeERgCejDKIsBxm8DS5X4/Xq9rIdp5NqtstORs9s=
+Received: from DLEE115.ent.ti.com (dlee115.ent.ti.com [157.170.170.26])
+        by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 04BBJX3E061692
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Mon, 11 May 2020 06:19:28 -0500
-Received: from DLEE104.ent.ti.com (157.170.170.34) by DLEE104.ent.ti.com
- (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
+        Mon, 11 May 2020 06:19:33 -0500
+Received: from DLEE112.ent.ti.com (157.170.170.23) by DLEE115.ent.ti.com
+ (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3; Mon, 11
- May 2020 06:19:28 -0500
-Received: from lelv0326.itg.ti.com (10.180.67.84) by DLEE104.ent.ti.com
- (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
+ May 2020 06:19:32 -0500
+Received: from lelv0326.itg.ti.com (10.180.67.84) by DLEE112.ent.ti.com
+ (157.170.170.23) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3 via
- Frontend Transport; Mon, 11 May 2020 06:19:28 -0500
+ Frontend Transport; Mon, 11 May 2020 06:19:32 -0500
 Received: from sokoban.ti.com (ileax41-snat.itg.ti.com [10.172.224.153])
-        by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 04BBJKOY004306;
-        Mon, 11 May 2020 06:19:27 -0500
+        by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 04BBJKOb004306;
+        Mon, 11 May 2020 06:19:31 -0500
 From:   Tero Kristo <t-kristo@ti.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
         <linux-crypto@vger.kernel.org>
 CC:     <linux-omap@vger.kernel.org>
-Subject: [PATCHv2 4/7] crypto: omap-sham: huge buffer access fixes
-Date:   Mon, 11 May 2020 14:19:10 +0300
-Message-ID: <20200511111913.26541-5-t-kristo@ti.com>
+Subject: [PATCHv2 7/7] crypto: omap-sham: add proper load balancing support for multicore
+Date:   Mon, 11 May 2020 14:19:13 +0300
+Message-ID: <20200511111913.26541-8-t-kristo@ti.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200511111913.26541-1-t-kristo@ti.com>
 References: <20200511111913.26541-1-t-kristo@ti.com>
@@ -66,46 +66,161 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-The ctx internal buffer can only hold buflen amount of data, don't try
-to copy over more than that. Also, initialize the context sg pointer
-if we only have data in the context internal buffer, this can happen
-when closing a hash with certain data amounts.
+The current implementation of the multiple accelerator core support for
+OMAP SHA does not work properly. It always picks up the first probed
+accelerator core if this is available, and rest of the book keeping also
+gets confused if there are two cores available. Add proper load
+balancing support for SHA, and also fix any bugs related to the
+multicore support while doing it.
 
 Signed-off-by: Tero Kristo <t-kristo@ti.com>
 ---
- drivers/crypto/omap-sham.c | 11 +++++++++--
- 1 file changed, 9 insertions(+), 2 deletions(-)
+ drivers/crypto/omap-sham.c | 64 ++++++++++++++++++--------------------
+ 1 file changed, 31 insertions(+), 33 deletions(-)
 
 diff --git a/drivers/crypto/omap-sham.c b/drivers/crypto/omap-sham.c
-index 0c837bbd8f0c..9823d7dfca9c 100644
+index 86949f1ac6a7..0651604161ea 100644
 --- a/drivers/crypto/omap-sham.c
 +++ b/drivers/crypto/omap-sham.c
-@@ -751,8 +751,15 @@ static int omap_sham_align_sgs(struct scatterlist *sg,
- 	int offset = rctx->offset;
- 	int bufcnt = rctx->bufcnt;
+@@ -169,8 +169,6 @@ struct omap_sham_hmac_ctx {
+ };
  
--	if (!sg || !sg->length || !nbytes)
-+	if (!sg || !sg->length || !nbytes) {
-+		if (bufcnt) {
-+			sg_init_table(rctx->sgl, 1);
-+			sg_set_buf(rctx->sgl, rctx->dd->xmit_buf, bufcnt);
-+			rctx->sg = rctx->sgl;
-+		}
+ struct omap_sham_ctx {
+-	struct omap_sham_dev	*dd;
+-
+ 	unsigned long		flags;
+ 
+ 	/* fallback stuff */
+@@ -935,27 +933,35 @@ static int omap_sham_update_dma_stop(struct omap_sham_dev *dd)
+ 	return 0;
+ }
+ 
++struct omap_sham_dev *omap_sham_find_dev(struct omap_sham_reqctx *ctx)
++{
++	struct omap_sham_dev *dd;
 +
++	if (ctx->dd)
++		return ctx->dd;
++
++	spin_lock_bh(&sham.lock);
++	dd = list_first_entry(&sham.dev_list, struct omap_sham_dev, list);
++	list_move_tail(&dd->list, &sham.dev_list);
++	ctx->dd = dd;
++	spin_unlock_bh(&sham.lock);
++
++	return dd;
++}
++
+ static int omap_sham_init(struct ahash_request *req)
+ {
+ 	struct crypto_ahash *tfm = crypto_ahash_reqtfm(req);
+ 	struct omap_sham_ctx *tctx = crypto_ahash_ctx(tfm);
+ 	struct omap_sham_reqctx *ctx = ahash_request_ctx(req);
+-	struct omap_sham_dev *dd = NULL, *tmp;
++	struct omap_sham_dev *dd;
+ 	int bs = 0;
+ 
+-	spin_lock_bh(&sham.lock);
+-	if (!tctx->dd) {
+-		list_for_each_entry(tmp, &sham.dev_list, list) {
+-			dd = tmp;
+-			break;
+-		}
+-		tctx->dd = dd;
+-	} else {
+-		dd = tctx->dd;
+-	}
+-	spin_unlock_bh(&sham.lock);
++	ctx->dd = NULL;
+ 
+-	ctx->dd = dd;
++	dd = omap_sham_find_dev(ctx);
++	if (!dd)
++		return -ENODEV;
+ 
+ 	ctx->flags = 0;
+ 
+@@ -1225,8 +1231,7 @@ static int omap_sham_handle_queue(struct omap_sham_dev *dd,
+ static int omap_sham_enqueue(struct ahash_request *req, unsigned int op)
+ {
+ 	struct omap_sham_reqctx *ctx = ahash_request_ctx(req);
+-	struct omap_sham_ctx *tctx = crypto_tfm_ctx(req->base.tfm);
+-	struct omap_sham_dev *dd = tctx->dd;
++	struct omap_sham_dev *dd = ctx->dd;
+ 
+ 	ctx->op = op;
+ 
+@@ -1236,7 +1241,7 @@ static int omap_sham_enqueue(struct ahash_request *req, unsigned int op)
+ static int omap_sham_update(struct ahash_request *req)
+ {
+ 	struct omap_sham_reqctx *ctx = ahash_request_ctx(req);
+-	struct omap_sham_dev *dd = ctx->dd;
++	struct omap_sham_dev *dd = omap_sham_find_dev(ctx);
+ 
+ 	if (!req->nbytes)
  		return 0;
-+	}
+@@ -1340,21 +1345,8 @@ static int omap_sham_setkey(struct crypto_ahash *tfm, const u8 *key,
+ 	struct omap_sham_hmac_ctx *bctx = tctx->base;
+ 	int bs = crypto_shash_blocksize(bctx->shash);
+ 	int ds = crypto_shash_digestsize(bctx->shash);
+-	struct omap_sham_dev *dd = NULL, *tmp;
+ 	int err, i;
  
- 	new_len = nbytes;
+-	spin_lock_bh(&sham.lock);
+-	if (!tctx->dd) {
+-		list_for_each_entry(tmp, &sham.dev_list, list) {
+-			dd = tmp;
+-			break;
+-		}
+-		tctx->dd = dd;
+-	} else {
+-		dd = tctx->dd;
+-	}
+-	spin_unlock_bh(&sham.lock);
+-
+ 	err = crypto_shash_setkey(tctx->fallback, key, keylen);
+ 	if (err)
+ 		return err;
+@@ -1372,7 +1364,7 @@ static int omap_sham_setkey(struct crypto_ahash *tfm, const u8 *key,
  
-@@ -896,7 +903,7 @@ static int omap_sham_prepare_request(struct ahash_request *req, bool update)
- 	if (hash_later < 0)
- 		hash_later = 0;
+ 	memset(bctx->ipad + keylen, 0, bs - keylen);
  
--	if (hash_later) {
-+	if (hash_later && hash_later <= rctx->buflen) {
- 		scatterwalk_map_and_copy(rctx->buffer,
- 					 req->src,
- 					 req->nbytes - hash_later,
+-	if (!test_bit(FLAGS_AUTO_XOR, &dd->flags)) {
++	if (!test_bit(FLAGS_AUTO_XOR, &sham.flags)) {
+ 		memcpy(bctx->opad, bctx->ipad, bs);
+ 
+ 		for (i = 0; i < bs; i++) {
+@@ -2184,6 +2176,7 @@ static int omap_sham_probe(struct platform_device *pdev)
+ 	}
+ 
+ 	dd->flags |= dd->pdata->flags;
++	sham.flags |= dd->pdata->flags;
+ 
+ 	pm_runtime_use_autosuspend(dev);
+ 	pm_runtime_set_autosuspend_delay(dev, DEFAULT_AUTOSUSPEND_DELAY);
+@@ -2211,6 +2204,9 @@ static int omap_sham_probe(struct platform_device *pdev)
+ 	spin_unlock(&sham.lock);
+ 
+ 	for (i = 0; i < dd->pdata->algs_info_size; i++) {
++		if (dd->pdata->algs_info[i].registered)
++			break;
++
+ 		for (j = 0; j < dd->pdata->algs_info[i].size; j++) {
+ 			struct ahash_alg *alg;
+ 
+@@ -2262,9 +2258,11 @@ static int omap_sham_remove(struct platform_device *pdev)
+ 	list_del(&dd->list);
+ 	spin_unlock(&sham.lock);
+ 	for (i = dd->pdata->algs_info_size - 1; i >= 0; i--)
+-		for (j = dd->pdata->algs_info[i].registered - 1; j >= 0; j--)
++		for (j = dd->pdata->algs_info[i].registered - 1; j >= 0; j--) {
+ 			crypto_unregister_ahash(
+ 					&dd->pdata->algs_info[i].algs_list[j]);
++			dd->pdata->algs_info[i].registered--;
++		}
+ 	tasklet_kill(&dd->done_task);
+ 	pm_runtime_disable(&pdev->dev);
+ 
 -- 
 2.17.1
 
