@@ -5,56 +5,56 @@ X-Spam-Level:
 X-Spam-Status: No, score=-10.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7454DC54E92
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 May 2020 11:19:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FB67C54E95
+	for <linux-crypto@archiver.kernel.org>; Mon, 11 May 2020 11:19:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 51FD22082E
-	for <linux-crypto@archiver.kernel.org>; Mon, 11 May 2020 11:19:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 06B9620722
+	for <linux-crypto@archiver.kernel.org>; Mon, 11 May 2020 11:19:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="mHsWzWs7"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="M7mlmUld"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729131AbgEKLTi (ORCPT
+        id S1726438AbgEKLTi (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Mon, 11 May 2020 07:19:38 -0400
-Received: from lelv0142.ext.ti.com ([198.47.23.249]:52250 "EHLO
-        lelv0142.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726438AbgEKLTh (ORCPT
+Received: from lelv0143.ext.ti.com ([198.47.23.248]:40270 "EHLO
+        lelv0143.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725993AbgEKLTi (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Mon, 11 May 2020 07:19:37 -0400
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-        by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 04BBJOXN099223;
-        Mon, 11 May 2020 06:19:24 -0500
+        Mon, 11 May 2020 07:19:38 -0400
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+        by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 04BBJRrO094029;
+        Mon, 11 May 2020 06:19:27 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1589195964;
-        bh=r/Z289ziuLekskSoAOTc4KuAcsPT8zHSmf/vDtvcIms=;
+        s=ti-com-17Q1; t=1589195967;
+        bh=gF2PqYNCTqam+pfCLXYK/QDdEYuZIM7FQDpr83pvKsA=;
         h=From:To:CC:Subject:Date:In-Reply-To:References;
-        b=mHsWzWs7Lk5GIGNMwXZ5PH7M5+jB7PLtYLpnf1nld2OKxJt1HfivDE1xKHUrodikk
-         WzgkTXdNhTXP4rinHohAN7KKPV5YVbMi0JG5lD8Yq8oXdO+bkE6GxBRRjoaJov85K5
-         R+2sabiR5cQenorn4PFkL3UZdL8fVsJZ2z5JV9Ck=
-Received: from DFLE108.ent.ti.com (dfle108.ent.ti.com [10.64.6.29])
-        by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 04BBJOOZ061628
+        b=M7mlmUldok5B0XtYgXZLUXbdyy10v69rfzgZMFdgVX3BP8EBntzmUxTcLX2jAbRyE
+         zgvT3QhyEZyrpHW+PpE2qJQuqsXGsNPdt8yDfNRq0Z4bQTLUilp3y5vATm/z+JWcXh
+         mNSPGNH5wFjcsY4Zx6aZN+hpVl1zoY9C0c58xOJ4=
+Received: from DLEE103.ent.ti.com (dlee103.ent.ti.com [157.170.170.33])
+        by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 04BBJRUW053856
         (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Mon, 11 May 2020 06:19:24 -0500
-Received: from DFLE112.ent.ti.com (10.64.6.33) by DFLE108.ent.ti.com
- (10.64.6.29) with Microsoft SMTP Server (version=TLS1_2,
+        Mon, 11 May 2020 06:19:27 -0500
+Received: from DLEE115.ent.ti.com (157.170.170.26) by DLEE103.ent.ti.com
+ (157.170.170.33) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3; Mon, 11
- May 2020 06:19:23 -0500
-Received: from lelv0326.itg.ti.com (10.180.67.84) by DFLE112.ent.ti.com
- (10.64.6.33) with Microsoft SMTP Server (version=TLS1_2,
+ May 2020 06:19:26 -0500
+Received: from lelv0326.itg.ti.com (10.180.67.84) by DLEE115.ent.ti.com
+ (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3 via
- Frontend Transport; Mon, 11 May 2020 06:19:23 -0500
+ Frontend Transport; Mon, 11 May 2020 06:19:26 -0500
 Received: from sokoban.ti.com (ileax41-snat.itg.ti.com [10.172.224.153])
-        by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 04BBJKOV004306;
-        Mon, 11 May 2020 06:19:22 -0500
+        by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 04BBJKOX004306;
+        Mon, 11 May 2020 06:19:25 -0500
 From:   Tero Kristo <t-kristo@ti.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
         <linux-crypto@vger.kernel.org>
 CC:     <linux-omap@vger.kernel.org>
-Subject: [PATCHv2 1/7] crypto: omap-aes: avoid spamming console with self tests
-Date:   Mon, 11 May 2020 14:19:07 +0300
-Message-ID: <20200511111913.26541-2-t-kristo@ti.com>
+Subject: [PATCHv2 3/7] crypto: omap-crypto: fix userspace copied buffer access
+Date:   Mon, 11 May 2020 14:19:09 +0300
+Message-ID: <20200511111913.26541-4-t-kristo@ti.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200511111913.26541-1-t-kristo@ti.com>
 References: <20200511111913.26541-1-t-kristo@ti.com>
@@ -66,29 +66,39 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Running the self test suite for omap-aes with extra tests enabled causes
-huge spam with the tag message wrong indicators. With self tests, this
-is fine as there are some tests that purposedly pass bad data to the
-driver. Also, returning -EBADMSG from the driver is enough, so remove the
-dev_err message completely.
+In case buffers are copied from userspace, directly accessing the page
+will most likely fail because it hasn't been mapped into the kernel
+memory space. Fix the issue by forcing a kmap / kunmap within the
+cleanup functionality.
 
 Signed-off-by: Tero Kristo <t-kristo@ti.com>
 ---
- drivers/crypto/omap-aes-gcm.c | 1 -
- 1 file changed, 1 deletion(-)
+ drivers/crypto/omap-crypto.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/crypto/omap-aes-gcm.c b/drivers/crypto/omap-aes-gcm.c
-index 32dc00dc570b..9f937bdc53a7 100644
---- a/drivers/crypto/omap-aes-gcm.c
-+++ b/drivers/crypto/omap-aes-gcm.c
-@@ -77,7 +77,6 @@ static void omap_aes_gcm_done_task(struct omap_aes_dev *dd)
- 		tag = (u8 *)rctx->auth_tag;
- 		for (i = 0; i < dd->authsize; i++) {
- 			if (tag[i]) {
--				dev_err(dd->dev, "GCM decryption: Tag Message is wrong\n");
- 				ret = -EBADMSG;
- 			}
- 		}
+diff --git a/drivers/crypto/omap-crypto.c b/drivers/crypto/omap-crypto.c
+index cc88b7362bc2..31bdb1d76d11 100644
+--- a/drivers/crypto/omap-crypto.c
++++ b/drivers/crypto/omap-crypto.c
+@@ -178,11 +178,16 @@ static void omap_crypto_copy_data(struct scatterlist *src,
+ 		amt = min(src->length - srco, dst->length - dsto);
+ 		amt = min(len, amt);
+ 
+-		srcb = sg_virt(src) + srco;
+-		dstb = sg_virt(dst) + dsto;
++		srcb = kmap_atomic(sg_page(src)) + srco + src->offset;
++		dstb = kmap_atomic(sg_page(dst)) + dsto + dst->offset;
+ 
+ 		memcpy(dstb, srcb, amt);
+ 
++		flush_dcache_page(sg_page(dst));
++
++		kunmap_atomic(srcb);
++		kunmap_atomic(dstb);
++
+ 		srco += amt;
+ 		dsto += amt;
+ 		len -= amt;
 -- 
 2.17.1
 
