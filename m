@@ -2,102 +2,117 @@ Return-Path: <SRS0=GLFy=62=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3947FC54E4A
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 May 2020 14:13:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F9FDCA90AF
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 May 2020 16:22:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 19AC6206F5
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 May 2020 14:13:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=st.com header.i=@st.com header.b="KTiDZr5b"
+	by mail.kernel.org (Postfix) with ESMTP id 6D999206B8
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 May 2020 16:22:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1589300530;
+	bh=auWCmjjq3v0fWHq4aHnc4pBsHWKq4S/upZDC+grvgio=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=s2I4k8SR+vMdatO+UEOvxKD7++g5TFDRWqj+PT+tRl/Pt9p5JBGNrSkT5kMRYhNM2
+	 8YWPTgsQKB48a0LI1ZW5/XD0UfTDaLEu/T55BMEyLf/Bsv0yPOUiwiCFovQeSEdrLK
+	 CKTUp5lA7y9k6BDR9UJCCM6lUUsuKz/BK1cnALHw=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730003AbgELONe (ORCPT
+        id S1726031AbgELQWJ (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 May 2020 10:13:34 -0400
-Received: from mx08-00178001.pphosted.com ([91.207.212.93]:2330 "EHLO
-        mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1730282AbgELONY (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 May 2020 10:13:24 -0400
-Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04CEC6Nl020352;
-        Tue, 12 May 2020 16:12:06 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=st.com; h=from : to : cc : subject
- : date : message-id : mime-version : content-type; s=STMicroelectronics;
- bh=/cK62abs1ZOEPd483Fs6vDPdjcVo6tdi3F8yjd7dwk0=;
- b=KTiDZr5bXPQ1ht4Sn0aTqssoSiATVAB6OvUCqHuvtHDJWH/2ga4oo/VQn6vj/L8sIbUx
- E4Honl7oWMa8wczDu+Httq4wd6aiUXW7acBRNFc/ZyyeVwlpmfo5QSrhvhRfgkXr1zHD
- GPJow8LcS3EWe4JrFtdfwI/9xYuQaRtPnnTT2NFLqVyuaYs7VnSf/0Je0tDOsEEae20l
- WI0TLo0dqictsY16T419hWRkJRqiRWswe8q/B0z3GBUVLpmaBbmd0MbeCbNY/l1dxwo/
- lQYob5ZuDSCPkUQsCIMW2lfNetp0Lqy3//gfqPgIYZXveiFUb7HBjo7hSBvWvRNn2NvC 3A== 
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com with ESMTP id 30whn9gw5a-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 12 May 2020 16:12:06 +0200
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 4D5E810002A;
-        Tue, 12 May 2020 16:11:56 +0200 (CEST)
-Received: from Webmail-eu.st.com (sfhdag6node1.st.com [10.75.127.16])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id F2EB22AA608;
-        Tue, 12 May 2020 16:11:55 +0200 (CEST)
-Received: from localhost (10.75.127.47) by SFHDAG6NODE1.st.com (10.75.127.16)
- with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 12 May 2020 16:11:55
- +0200
-From:   Nicolas Toromanoff <nicolas.toromanoff@st.com>
-To:     Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S . Miller" <davem@davemloft.net>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@st.com>
-CC:     Nicolas Toromanoff <nicolas.toromanoff@st.com>,
-        <linux-crypto@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH 0/5] STM32 CRC update
-Date:   Tue, 12 May 2020 16:11:08 +0200
-Message-ID: <20200512141113.18972-1-nicolas.toromanoff@st.com>
-X-Mailer: git-send-email 2.17.1
+        Tue, 12 May 2020 12:22:09 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55470 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1725950AbgELQWJ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 12 May 2020 12:22:09 -0400
+Received: from localhost (fw-tnat.cambridge.arm.com [217.140.96.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 66C9E206B7;
+        Tue, 12 May 2020 16:22:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1589300529;
+        bh=auWCmjjq3v0fWHq4aHnc4pBsHWKq4S/upZDC+grvgio=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=R8+yeHyBqPrFn/brY4mLXlGh1Ues0feVlECxgDmBIupsxQYCN/uEzyG9huMyWmAnv
+         kBntTGIHC+lSsumb/pWrZudHTyjdUbwbx00WiOZbR5FCrAC/s+Jb+9o1rx/A9MZF+V
+         ON1ESwWgxDiBZJ+tiIQae9pCwK4nGt/Hz6A2JoBg=
+Date:   Tue, 12 May 2020 17:22:05 +0100
+From:   Mark Brown <broonie@kernel.org>
+To:     Stephen Rothwell <sfr@canb.auug.org.au>
+Cc:     Liam Girdwood <lgirdwood@gmail.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Eric Biggers <ebiggers@google.com>,
+        Arnd Bergmann <arnd@arndb.de>
+Subject: Re: linux-next: manual merge of the sound-asoc tree with the crypto
+ tree
+Message-ID: <20200512162205.GI5110@sirena.org.uk>
+References: <20200512144949.4f933eca@canb.auug.org.au>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.75.127.47]
-X-ClientProxiedBy: SFHDAG8NODE2.st.com (10.75.127.23) To SFHDAG6NODE1.st.com
- (10.75.127.16)
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.676
- definitions=2020-05-12_04:2020-05-11,2020-05-12 signatures=0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="X+nYw8KZ/oNxZ8JS"
+Content-Disposition: inline
+In-Reply-To: <20200512144949.4f933eca@canb.auug.org.au>
+X-Cookie: The only perfect science is hind-sight.
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-This set of patches update the STM32 CRC driver.
-It contains bug fix.
 
-First fixes issue if we enable STM32 CRC32 hardware accelerator with
-ext4 (with metadata-chksum enable) and other fs that use same direct
-access to update crc32 API without previous init.
-Second fixes some issues raise by the extra self-test.
-Third fixes wrong hw usage if there is multiple IP on the SOC.
-Forth fixes "sleep while atomic" in tcrypt test, and some other places
-(ext4)
-Last fixes concurrent accesses. As state is saved in the hardware cell
-and not in stack as other CRC32 drivers, we need to create atomic
-section to protect concurrent CRC32 calculus.
+--X+nYw8KZ/oNxZ8JS
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This patch series applies to cryptodev/master.
+On Tue, May 12, 2020 at 02:49:49PM +1000, Stephen Rothwell wrote:
+> Hi all,
+>=20
+> Today's linux-next merge of the sound-asoc tree got a conflict in:
+>=20
+>   sound/soc/codecs/cros_ec_codec.c
+>=20
+> between commit:
+>=20
+>   85fc78b80f15 ("ASoC: cros_ec_codec: use crypto_shash_tfm_digest()")
+>=20
 
-Nicolas Toromanoff (5):
-  crypto: stm32/crc: fix ext4 chksum BUG_ON()
-  crypto: stm32/crc: fix run-time self test issue.
-  crypto: stm32/crc: fix multi-instance
-  crypto: stm32/crc: don't sleep in runtime pm
-  crypto: stm32/crc: protect from concurrent accesses
+Oh, this is the first I've heard of that patch :(
 
- drivers/crypto/stm32/stm32-crc32.c | 230 ++++++++++++++++++++---------
- 1 file changed, 161 insertions(+), 69 deletions(-)
+> from the crypto tree and commit:
 
--- 
-2.17.1
+>   a1304cba816e ("ASoC: cros_ec_codec: allocate shash_desc dynamically")
 
+> from the sound-asoc tree.
+
+> I fixed it up (I just used the former) and can carry the fix as
+> necessary. This is now fixed as far as linux-next is concerned, but any
+> non trivial conflicts should be mentioned to your upstream maintainer
+> when your tree is submitted for merging.  You may also want to consider
+> cooperating with the maintainer of the conflicting tree to minimise any
+> particularly complex conflicts.
+
+That doesn't seem ideal - Eric, Herbert can we get a branch with the
+crypto patches in them to pull into the ASoC tree or something?
+
+--X+nYw8KZ/oNxZ8JS
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAl66zSwACgkQJNaLcl1U
+h9BIJwf/d+OLV0SpxeplooUGiuxQ8kkocjrS4gtv/7z7NlC0QeQzM6ZVMFNqzH1J
+zpYTRpqNlwcE7FhRvVmstx9LJSk70PA1lokGLSfEj2bncItEFe0DEVOuxXChQCNe
+XwSpNSWBRtYojsQkrwvdScpkq2PPFTKv2tnGePHCGki9bfGPAUJPReuYAeLXdJ00
+QK/MwLFqJFIvWN1DpU5tt81ZcKu/aOZ6sVTs7geeplcGb/eBRx2FzP3Zsumsf7dx
+5ww7Hx4a1MAjShkMbaKkXE/IWd1f6hDXQB/hmC4k5DaAc2z2pPWRT92JbxOFzbX+
+ORws7FBcKLJgVVTbIFW4zok6Arl7+Q==
+=unIm
+-----END PGP SIGNATURE-----
+
+--X+nYw8KZ/oNxZ8JS--
