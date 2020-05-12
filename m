@@ -7,164 +7,101 @@ X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B0EBC54E4A
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 May 2020 08:08:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DF3FC54E4A
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 May 2020 08:37:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0413B206A3
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 May 2020 08:08:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 691A6206A3
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 May 2020 08:37:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="fzHZs4jN"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="fPrfMPs/"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729119AbgELIIg (ORCPT
+        id S1725987AbgELIhn (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 May 2020 04:08:36 -0400
-Received: from userp2130.oracle.com ([156.151.31.86]:52784 "EHLO
-        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725889AbgELIIg (ORCPT
+        Tue, 12 May 2020 04:37:43 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:45450 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725868AbgELIhn (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 May 2020 04:08:36 -0400
-Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
-        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04C82FKR141578;
-        Tue, 12 May 2020 08:06:47 GMT
+        Tue, 12 May 2020 04:37:43 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04C8X2D0177219;
+        Tue, 12 May 2020 08:37:33 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : mime-version : content-type : in-reply-to;
- s=corp-2020-01-29; bh=Oa8J6zinMCa7UnQSKo6wOi+seluNKXvx9yPIBfVSmuk=;
- b=fzHZs4jNmYVcDfM4CtDYCWiHiPyCuDbnq1GTsDfjIJrTTFQAWpGpu5Uh/M8VTiezlerL
- F3cU3TQCGujHVT7EycoqAiqSsuaFqHDpOfnNu0zHz8XDFVPYsyqomyTVP4qwMJMMXAzE
- QrhJjbjjAJ960nfzkQltn9S3ge1Zd8oG+jiZBXx+JpJAwBQnpd51qb5Ggg7XsPxgxDhH
- Tpaz25u/Jm8I0wqDiLQ6OjYFN+8TLg/7HnAOvbJ2+vK7vADllUH3x0Rialbzib555XHn
- vhDg7SO1KOMv9RKltWLb1X54ygCjkYCZNPNzdIs30Fy1sMz0Jbb+O7D5fQDRaJuU0c0T NQ== 
+ : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
+ bh=GTB4Q2paPqx2Xm+TrvAKydqxyrSyjHliAb7/1eK0uKE=;
+ b=fPrfMPs/EyLR3u5GoePWmIfdYI8gZNwA8PAyAGjbsZ+doAuzBcryOLZQzSAqOw7/ENOg
+ Ewx+aB6QlzH/boQwWVg1ysGMaY0gPUQ4J5DmyrUKD9hD7tk0yUTMMebyFMFtxIBtC0Y5
+ 0obEpDg4HXi1KbJEshkxhoLWXk5mouHkIfStuBBcBr4Oz23TmsMZO3cYGmotFbDSmB+q
+ 8o2OKaF/3KW7t5+pDMPn7kgKCvwPZKzjNsNpqSlAtGsQpAlWy8KVmnRA9fKeQ1IyD2th
+ iKY/s2keadtkLCwxcG63GYpDz38b9PEumR1E01j9RiP0K5BtIWZ/CG81hzKFc/nMFz6S kQ== 
 Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2130.oracle.com with ESMTP id 30x3gmhfbb-1
+        by userp2120.oracle.com with ESMTP id 30x3mbsjx5-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 12 May 2020 08:06:47 +0000
+        Tue, 12 May 2020 08:37:32 +0000
 Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04C83usG095425;
-        Tue, 12 May 2020 08:04:47 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by userp3030.oracle.com with ESMTP id 30ydspxp67-1
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04C8Ze5R005527;
+        Tue, 12 May 2020 08:37:32 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3030.oracle.com with ESMTP id 30ydsq06fj-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 12 May 2020 08:04:47 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 04C84imh004935;
-        Tue, 12 May 2020 08:04:44 GMT
-Received: from mwanda (/10.175.212.140)
+        Tue, 12 May 2020 08:37:32 +0000
+Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 04C8bUF7011268;
+        Tue, 12 May 2020 08:37:30 GMT
+Received: from mwanda (/41.57.98.10)
         by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 12 May 2020 01:04:44 -0700
-Date:   Tue, 12 May 2020 11:04:36 +0300
+        with ESMTP ; Tue, 12 May 2020 01:37:30 -0700
+Date:   Tue, 12 May 2020 11:37:23 +0300
 From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Wei Yongjun <weiyongjun1@huawei.com>,
-        Rohit Maheshwari <rohitm@chelsio.com>
-Cc:     Ayush Sawal <ayush.sawal@chelsio.com>,
-        Vinay Kumar Yadav <vinay.yadav@chelsio.com>,
+To:     Ayush Sawal <ayush.sawal@chelsio.com>,
+        Devulapally Shiva Krishna <shiva@chelsio.com>
+Cc:     Vinay Kumar Yadav <vinay.yadav@chelsio.com>,
+        Rohit Maheshwari <rohitm@chelsio.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Wei Yongjun <weiyongjun1@huawei.com>,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        Hulk Robot <hulkci@huawei.com>
-Subject: [PATCH] cxgb4/chcr: Fix a leak in chcr_ktls_dev_add()
-Message-ID: <20200512080436.GA247819@mwanda>
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH] Crypto/chcr: drop refcount on error path in chcr_aead_op()
+Message-ID: <20200512083723.GB251760@mwanda>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20200509080548.118667-1-weiyongjun1@huawei.com>
 X-Mailer: git-send-email haha only kidding
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9618 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 suspectscore=2 mlxscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 suspectscore=0 mlxscore=0
  adultscore=0 mlxlogscore=999 malwarescore=0 bulkscore=0 spamscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2005120068
+ definitions=main-2005120071
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9618 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999
- clxscore=1011 spamscore=0 lowpriorityscore=0 phishscore=0 bulkscore=0
- malwarescore=0 priorityscore=1501 mlxscore=0 suspectscore=2
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2003020000 definitions=main-2005120068
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 impostorscore=0
+ mlxscore=0 suspectscore=0 bulkscore=0 mlxlogscore=999 phishscore=0
+ malwarescore=0 lowpriorityscore=0 spamscore=0 adultscore=0 clxscore=1011
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
+ definitions=main-2005120071
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-We need to free "tx_info->l2te" if chcr_setup_connection() fails.  My
-other concern was that if we free "tx_info" then "tx_ctx->chcr_info"
-points to a freed variable.  I don't think this causes a problem but
-it's cleaner to reset it back to NULL.  Also I renamed the labels to
-say what the gotos do instead of using numbered labels.
+We need to drop inflight counter before returning on this error path.
 
-Fixes: 34aba2c45024 ("cxgb4/chcr : Register to tls add and del callback")
+Fixes: d91a3159e8d9 ("Crypto/chcr: fix gcm-aes and rfc4106-gcm failed tests")
 Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 ---
-Applies on top of Wei Yongjun's patch.
+ drivers/crypto/chelsio/chcr_algo.c | 1 +
+ 1 file changed, 1 insertion(+)
 
- drivers/crypto/chelsio/chcr_ktls.c | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/crypto/chelsio/chcr_ktls.c b/drivers/crypto/chelsio/chcr_ktls.c
-index baaea8ce40806..3173ac3099bc6 100644
---- a/drivers/crypto/chelsio/chcr_ktls.c
-+++ b/drivers/crypto/chelsio/chcr_ktls.c
-@@ -478,7 +478,7 @@ static int chcr_ktls_dev_add(struct net_device *netdev, struct sock *sk,
- 
- 	tx_info->rx_qid = chcr_get_first_rx_qid(adap);
- 	if (unlikely(tx_info->rx_qid < 0))
--		goto out2;
-+		goto free_tx_info;
- 
- 	tx_info->prev_seq = start_offload_tcp_sn;
- 	tx_info->tcp_start_seq_number = start_offload_tcp_sn;
-@@ -486,7 +486,7 @@ static int chcr_ktls_dev_add(struct net_device *netdev, struct sock *sk,
- 	/* save crypto keys */
- 	ret = chcr_ktls_save_keys(tx_info, crypto_info, direction);
- 	if (ret < 0)
--		goto out2;
-+		goto free_tx_info;
- 
- 	/* get peer ip */
- 	if (sk->sk_family == AF_INET ||
-@@ -502,14 +502,14 @@ static int chcr_ktls_dev_add(struct net_device *netdev, struct sock *sk,
- 	if (!dst) {
- 		pr_err("DST entry not found\n");
- 		ret = -ENOENT;
--		goto out2;
-+		goto free_tx_info;
- 	}
- 	n = dst_neigh_lookup(dst, daaddr);
- 	if (!n || !n->dev) {
- 		pr_err("neighbour not found\n");
- 		dst_release(dst);
- 		ret = -ENOENT;
--		goto out2;
-+		goto free_tx_info;
- 	}
- 	tx_info->l2te  = cxgb4_l2t_get(adap->l2t, n, n->dev, 0);
- 
-@@ -519,7 +519,7 @@ static int chcr_ktls_dev_add(struct net_device *netdev, struct sock *sk,
- 	if (!tx_info->l2te) {
- 		pr_err("l2t entry not found\n");
- 		ret = -ENOENT;
--		goto out2;
-+		goto free_tx_info;
+diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
+index 83ddc2b39490e..e05998a1c0148 100644
+--- a/drivers/crypto/chelsio/chcr_algo.c
++++ b/drivers/crypto/chelsio/chcr_algo.c
+@@ -3744,6 +3744,7 @@ static int chcr_aead_op(struct aead_request *req,
+ 	    crypto_ipsec_check_assoclen(req->assoclen) != 0) {
+ 		pr_err("RFC4106: Invalid value of assoclen %d\n",
+ 		       req->assoclen);
++		chcr_dec_wrcount(cdev);
+ 		return -EINVAL;
  	}
  
- 	tx_ctx->chcr_info = tx_info;
-@@ -529,12 +529,16 @@ static int chcr_ktls_dev_add(struct net_device *netdev, struct sock *sk,
- 	 */
- 	ret = chcr_setup_connection(sk, tx_info);
- 	if (ret)
--		goto out2;
-+		goto free_l2te;
- 
- 	atomic64_inc(&adap->chcr_stats.ktls_tx_connection_open);
- 	return 0;
--out2:
-+
-+free_l2te:
-+	cxgb4_l2t_release(tx_info->l2te);
-+free_tx_info:
- 	kvfree(tx_info);
-+	tx_ctx->chcr_info = NULL;
- out:
- 	atomic64_inc(&adap->chcr_stats.ktls_tx_connection_fail);
- 	return ret;
 -- 
 2.26.2
 
