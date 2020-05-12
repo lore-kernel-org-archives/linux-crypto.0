@@ -7,46 +7,46 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 450FAC54E8E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AA31C54E4A
 	for <linux-crypto@archiver.kernel.org>; Tue, 12 May 2020 14:13:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1D5AD20746
+	by mail.kernel.org (Postfix) with ESMTP id 75CD020722
 	for <linux-crypto@archiver.kernel.org>; Tue, 12 May 2020 14:13:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=st.com header.i=@st.com header.b="GtlFKoXj"
+	dkim=pass (2048-bit key) header.d=st.com header.i=@st.com header.b="czBxOxQw"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1730294AbgELONZ (ORCPT
+        id S1730286AbgELONY (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 May 2020 10:13:25 -0400
-Received: from mx07-00178001.pphosted.com ([62.209.51.94]:26774 "EHLO
+        Tue, 12 May 2020 10:13:24 -0400
+Received: from mx07-00178001.pphosted.com ([62.209.51.94]:55252 "EHLO
         mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1730183AbgELONY (ORCPT
+        by vger.kernel.org with ESMTP id S1730170AbgELONY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
         Tue, 12 May 2020 10:13:24 -0400
-Received: from pps.filterd (m0046037.ppops.net [127.0.0.1])
-        by mx07-00178001.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04CE2CvQ020028;
-        Tue, 12 May 2020 16:11:59 +0200
+Received: from pps.filterd (m0046668.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04CEA4KT023888;
+        Tue, 12 May 2020 16:11:58 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=st.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-type; s=STMicroelectronics;
- bh=de8DH4LiaffmmWtTVyqpc6yqQovYM+Xegj25cuzjLL4=;
- b=GtlFKoXjBkm/nAmGEUgN68TD4K3F0/REqiBwzS9nz8Bq0F50L9+RuHhHktaANFJinOxr
- zgl0Vrz1kOM4ccadNonFYbvcybuLG0XfkRYwHWk3FXk+j9KaRvUnXnVfJ6m4AaaHYtPD
- cKqQKX9iWQCyWa9Q5qTReV2OgmTLzhGSer2PcGwchp9578VkkszFEmkJFoqyy0x1EFlO
- Tugx4VEU+q4A0b9s8omTP0HKRkATtTIMkiMv5iTjyQGlifbd1c0OmQaqZls4rDPxC/tU
- KpBYtK8ftj2PLLxDU0SWNDOjAghSCJEvnZD3n0xPc9tQSowY0YqqegDYSrEyAgcWJqx3 MA== 
+ bh=cLOcXVTJTl2YdjnAoAVjct3Ud4S1kdOOPT3HLYuoqxs=;
+ b=czBxOxQwxr7dHfdSo5n5GxzJagQrBEzxxTH06rqVx9wpyqg3NWRwlR2ylgWYT0pVh0FR
+ FPemvNNVefANHNvMVhATmYUA9QnW9WkbDb6ogQl+EmhrMhQO7uYinjBu5Yr1ZedUkqMH
+ yLkdjG+gcyhtFm7WDdym9LEmGgEPeq+OcPp5l05wEVSgA/uNmqBtfwSFOaAGZ8RxwmB7
+ tZ75tjjHrn9BtOXqbOIWn7gFbRw6i6uCM8b/xbO3DcCUeQOAz7xWLPUvTTRrlHGte23z
+ mOggxvuwGW+QW62gPlTqnfX/q+ipncDFxI3IQst/wLFnUSeU68JXczwUxeoEjbFCjnGb 2Q== 
 Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-        by mx07-00178001.pphosted.com with ESMTP id 30wj9wh0k7-1
+        by mx07-00178001.pphosted.com with ESMTP id 30wj021236-1
         (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 12 May 2020 16:11:59 +0200
+        Tue, 12 May 2020 16:11:58 +0200
 Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id D93C1100034;
-        Tue, 12 May 2020 16:11:58 +0200 (CEST)
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 79EBF100038;
+        Tue, 12 May 2020 16:11:56 +0200 (CEST)
 Received: from Webmail-eu.st.com (sfhdag6node1.st.com [10.75.127.16])
-        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id CD2D52BAE54;
-        Tue, 12 May 2020 16:11:58 +0200 (CEST)
-Received: from localhost (10.75.127.44) by SFHDAG6NODE1.st.com (10.75.127.16)
- with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 12 May 2020 16:11:58
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 6C7562BAE54;
+        Tue, 12 May 2020 16:11:56 +0200 (CEST)
+Received: from localhost (10.75.127.46) by SFHDAG6NODE1.st.com (10.75.127.16)
+ with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 12 May 2020 16:11:56
  +0200
 From:   Nicolas Toromanoff <nicolas.toromanoff@st.com>
 To:     Herbert Xu <herbert@gondor.apana.org.au>,
@@ -58,16 +58,16 @@ CC:     Nicolas Toromanoff <nicolas.toromanoff@st.com>,
         <linux-stm32@st-md-mailman.stormreply.com>,
         <linux-arm-kernel@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>
-Subject: [PATCH 4/5] crypto: stm32/crc: don't sleep in runtime pm
-Date:   Tue, 12 May 2020 16:11:12 +0200
-Message-ID: <20200512141113.18972-5-nicolas.toromanoff@st.com>
+Subject: [PATCH 1/5] crypto: stm32/crc: fix ext4 chksum BUG_ON()
+Date:   Tue, 12 May 2020 16:11:09 +0200
+Message-ID: <20200512141113.18972-2-nicolas.toromanoff@st.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20200512141113.18972-1-nicolas.toromanoff@st.com>
 References: <20200512141113.18972-1-nicolas.toromanoff@st.com>
 MIME-Version: 1.0
 Content-Type: text/plain
-X-Originating-IP: [10.75.127.44]
-X-ClientProxiedBy: SFHDAG3NODE1.st.com (10.75.127.7) To SFHDAG6NODE1.st.com
+X-Originating-IP: [10.75.127.46]
+X-ClientProxiedBy: SFHDAG7NODE3.st.com (10.75.127.21) To SFHDAG6NODE1.st.com
  (10.75.127.16)
 X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.676
  definitions=2020-05-12_03:2020-05-11,2020-05-12 signatures=0
@@ -76,101 +76,175 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Ensure stm32_crc_update() and stm32_crc_init() can be called
-in atomic context and can't sleep.
+Allow use of crc_update without prior call to crc_init.
+And change (and fix) driver to use CRC device even on unaligned buffers.
 
-Add pm_runtime_irq_safe() to make pm_runtime_get_sync() atomic.
-Change runtime pm to call clk_enable()/clk_disable() and change
-system pm to unprepare/prepare the clock and force runtime pm
-suspend/resume.
+Fixes: b51dbe90912a ("crypto: stm32 - Support for STM32 CRC32 crypto module")
 
 Signed-off-by: Nicolas Toromanoff <nicolas.toromanoff@st.com>
 ---
- drivers/crypto/stm32/stm32-crc32.c | 45 ++++++++++++++++++++++++------
- 1 file changed, 36 insertions(+), 9 deletions(-)
+ drivers/crypto/stm32/stm32-crc32.c | 98 +++++++++++++++---------------
+ 1 file changed, 48 insertions(+), 50 deletions(-)
 
 diff --git a/drivers/crypto/stm32/stm32-crc32.c b/drivers/crypto/stm32/stm32-crc32.c
-index 10304511f9b4..413415c216ef 100644
+index 8e92e4ac79f1..c6156bf6c603 100644
 --- a/drivers/crypto/stm32/stm32-crc32.c
 +++ b/drivers/crypto/stm32/stm32-crc32.c
-@@ -297,6 +297,7 @@ static int stm32_crc_probe(struct platform_device *pdev)
+@@ -28,8 +28,10 @@
  
- 	pm_runtime_get_noresume(dev);
- 	pm_runtime_set_active(dev);
-+	pm_runtime_irq_safe(dev);
- 	pm_runtime_enable(dev);
+ /* Registers values */
+ #define CRC_CR_RESET            BIT(0)
+-#define CRC_CR_REVERSE          (BIT(7) | BIT(6) | BIT(5))
+ #define CRC_INIT_DEFAULT        0xFFFFFFFF
++#define CRC_CR_REV_IN_WORD      (BIT(6) | BIT(5))
++#define CRC_CR_REV_IN_BYTE      BIT(5)
++#define CRC_CR_REV_OUT          BIT(7)
  
- 	platform_set_drvdata(pdev, crc);
-@@ -350,34 +351,60 @@ static int stm32_crc_remove(struct platform_device *pdev)
+ #define CRC_AUTOSUSPEND_DELAY	50
+ 
+@@ -38,8 +40,6 @@ struct stm32_crc {
+ 	struct device    *dev;
+ 	void __iomem     *regs;
+ 	struct clk       *clk;
+-	u8               pending_data[sizeof(u32)];
+-	size_t           nb_pending_bytes;
+ };
+ 
+ struct stm32_crc_list {
+@@ -59,7 +59,6 @@ struct stm32_crc_ctx {
+ 
+ struct stm32_crc_desc_ctx {
+ 	u32    partial; /* crc32c: partial in first 4 bytes of that struct */
+-	struct stm32_crc *crc;
+ };
+ 
+ static int stm32_crc32_cra_init(struct crypto_tfm *tfm)
+@@ -99,25 +98,22 @@ static int stm32_crc_init(struct shash_desc *desc)
+ 	struct stm32_crc *crc;
+ 
+ 	spin_lock_bh(&crc_list.lock);
+-	list_for_each_entry(crc, &crc_list.dev_list, list) {
+-		ctx->crc = crc;
+-		break;
+-	}
++	crc = list_first_entry(&crc_list.dev_list, struct stm32_crc, list);
+ 	spin_unlock_bh(&crc_list.lock);
+ 
+-	pm_runtime_get_sync(ctx->crc->dev);
++	pm_runtime_get_sync(crc->dev);
+ 
+ 	/* Reset, set key, poly and configure in bit reverse mode */
+-	writel_relaxed(bitrev32(mctx->key), ctx->crc->regs + CRC_INIT);
+-	writel_relaxed(bitrev32(mctx->poly), ctx->crc->regs + CRC_POL);
+-	writel_relaxed(CRC_CR_RESET | CRC_CR_REVERSE, ctx->crc->regs + CRC_CR);
++	writel_relaxed(bitrev32(mctx->key), crc->regs + CRC_INIT);
++	writel_relaxed(bitrev32(mctx->poly), crc->regs + CRC_POL);
++	writel_relaxed(CRC_CR_RESET | CRC_CR_REV_IN_WORD | CRC_CR_REV_OUT,
++		       crc->regs + CRC_CR);
+ 
+ 	/* Store partial result */
+-	ctx->partial = readl_relaxed(ctx->crc->regs + CRC_DR);
+-	ctx->crc->nb_pending_bytes = 0;
++	ctx->partial = readl_relaxed(crc->regs + CRC_DR);
+ 
+-	pm_runtime_mark_last_busy(ctx->crc->dev);
+-	pm_runtime_put_autosuspend(ctx->crc->dev);
++	pm_runtime_mark_last_busy(crc->dev);
++	pm_runtime_put_autosuspend(crc->dev);
+ 
  	return 0;
  }
- 
--#ifdef CONFIG_PM
--static int stm32_crc_runtime_suspend(struct device *dev)
-+static int __maybe_unused stm32_crc_suspend(struct device *dev)
+@@ -126,31 +122,49 @@ static int stm32_crc_update(struct shash_desc *desc, const u8 *d8,
+ 			    unsigned int length)
  {
- 	struct stm32_crc *crc = dev_get_drvdata(dev);
-+	int ret;
+ 	struct stm32_crc_desc_ctx *ctx = shash_desc_ctx(desc);
+-	struct stm32_crc *crc = ctx->crc;
+-	u32 *d32;
+-	unsigned int i;
++	struct stm32_crc_ctx *mctx = crypto_shash_ctx(desc->tfm);
++	struct stm32_crc *crc;
++
++	spin_lock_bh(&crc_list.lock);
++	crc = list_first_entry(&crc_list.dev_list, struct stm32_crc, list);
++	spin_unlock_bh(&crc_list.lock);
  
--	clk_disable_unprepare(crc->clk);
-+	ret = pm_runtime_force_suspend(dev);
-+	if (ret)
-+		return ret;
-+
-+	clk_unprepare(crc->clk);
+ 	pm_runtime_get_sync(crc->dev);
  
- 	return 0;
- }
- 
--static int stm32_crc_runtime_resume(struct device *dev)
-+static int __maybe_unused stm32_crc_resume(struct device *dev)
- {
- 	struct stm32_crc *crc = dev_get_drvdata(dev);
- 	int ret;
- 
--	ret = clk_prepare_enable(crc->clk);
-+	ret = clk_prepare(crc->clk);
- 	if (ret) {
--		dev_err(crc->dev, "Failed to prepare_enable clock\n");
-+		dev_err(crc->dev, "Failed to prepare clock\n");
-+		return ret;
-+	}
+-	if (unlikely(crc->nb_pending_bytes)) {
+-		while (crc->nb_pending_bytes != sizeof(u32) && length) {
+-			/* Fill in pending data */
+-			crc->pending_data[crc->nb_pending_bytes++] = *(d8++);
++	/*
++	 * Restore previously calculated CRC for this context as init value
++	 * Restore polynomial configuration
++	 * Configure in register for word input data,
++	 * Configure out register in reversed bit mode data.
++	 */
++	writel_relaxed(bitrev32(ctx->partial), crc->regs + CRC_INIT);
++	writel_relaxed(bitrev32(mctx->poly), crc->regs + CRC_POL);
++	writel_relaxed(CRC_CR_RESET | CRC_CR_REV_IN_WORD | CRC_CR_REV_OUT,
++		       crc->regs + CRC_CR);
 +
-+	return pm_runtime_force_resume(dev);
-+}
-+
-+static int __maybe_unused stm32_crc_runtime_suspend(struct device *dev)
-+{
-+	struct stm32_crc *crc = dev_get_drvdata(dev);
-+
-+	clk_disable(crc->clk);
-+
-+	return 0;
-+}
-+
-+static int __maybe_unused stm32_crc_runtime_resume(struct device *dev)
-+{
-+	struct stm32_crc *crc = dev_get_drvdata(dev);
-+	int ret;
-+
-+	ret = clk_enable(crc->clk);
-+	if (ret) {
-+		dev_err(crc->dev, "Failed to enable clock\n");
- 		return ret;
++	if (d8 != PTR_ALIGN(d8, sizeof(u32))) {
++		/* Configure for byte data */
++		writel_relaxed(CRC_CR_REV_IN_BYTE | CRC_CR_REV_OUT,
++			       crc->regs + CRC_CR);
++		while (d8 != PTR_ALIGN(d8, sizeof(u32)) && length) {
++			writeb_relaxed(*d8++, crc->regs + CRC_DR);
+ 			length--;
+ 		}
+-
+-		if (crc->nb_pending_bytes == sizeof(u32)) {
+-			/* Process completed pending data */
+-			writel_relaxed(*(u32 *)crc->pending_data,
+-				       crc->regs + CRC_DR);
+-			crc->nb_pending_bytes = 0;
+-		}
++		/* Configure for word data */
++		writel_relaxed(CRC_CR_REV_IN_WORD | CRC_CR_REV_OUT,
++			       crc->regs + CRC_CR);
  	}
  
+-	d32 = (u32 *)d8;
+-	for (i = 0; i < length >> 2; i++)
+-		/* Process 32 bits data */
+-		writel_relaxed(*(d32++), crc->regs + CRC_DR);
++	for (; length >= sizeof(u32); d8 += sizeof(u32), length -= sizeof(u32))
++		writel_relaxed(*((u32 *)d8), crc->regs + CRC_DR);
++
++	if (length) {
++		/* Configure for byte data */
++		writel_relaxed(CRC_CR_REV_IN_BYTE | CRC_CR_REV_OUT,
++			       crc->regs + CRC_CR);
++		while (length--)
++			writeb_relaxed(*d8++, crc->regs + CRC_DR);
++	}
+ 
+ 	/* Store partial result */
+ 	ctx->partial = readl_relaxed(crc->regs + CRC_DR);
+@@ -158,22 +172,6 @@ static int stm32_crc_update(struct shash_desc *desc, const u8 *d8,
+ 	pm_runtime_mark_last_busy(crc->dev);
+ 	pm_runtime_put_autosuspend(crc->dev);
+ 
+-	/* Check for pending data (non 32 bits) */
+-	length &= 3;
+-	if (likely(!length))
+-		return 0;
+-
+-	if ((crc->nb_pending_bytes + length) >= sizeof(u32)) {
+-		/* Shall not happen */
+-		dev_err(crc->dev, "Pending data overflow\n");
+-		return -EINVAL;
+-	}
+-
+-	d8 = (const u8 *)d32;
+-	for (i = 0; i < length; i++)
+-		/* Store pending data */
+-		crc->pending_data[crc->nb_pending_bytes++] = *(d8++);
+-
  	return 0;
  }
--#endif
  
- static const struct dev_pm_ops stm32_crc_pm_ops = {
--	SET_SYSTEM_SLEEP_PM_OPS(pm_runtime_force_suspend,
--				pm_runtime_force_resume)
-+	SET_SYSTEM_SLEEP_PM_OPS(stm32_crc_suspend,
-+				stm32_crc_resume)
- 	SET_RUNTIME_PM_OPS(stm32_crc_runtime_suspend,
- 			   stm32_crc_runtime_resume, NULL)
- };
 -- 
 2.17.1
 
