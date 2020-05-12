@@ -2,106 +2,127 @@ Return-Path: <SRS0=GLFy=62=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DF3FC54E4A
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 May 2020 08:37:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63897C54E8D
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 May 2020 14:12:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 691A6206A3
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 May 2020 08:37:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D7E3206F5
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 May 2020 14:12:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="fPrfMPs/"
+	dkim=pass (2048-bit key) header.d=st.com header.i=@st.com header.b="m5xQdrY6"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725987AbgELIhn (ORCPT
+        id S1730158AbgELOMY (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 May 2020 04:37:43 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:45450 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725868AbgELIhn (ORCPT
+        Tue, 12 May 2020 10:12:24 -0400
+Received: from mx08-00178001.pphosted.com ([91.207.212.93]:2080 "EHLO
+        mx07-00178001.pphosted.com" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S1728283AbgELOMY (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 May 2020 04:37:43 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04C8X2D0177219;
-        Tue, 12 May 2020 08:37:33 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
- bh=GTB4Q2paPqx2Xm+TrvAKydqxyrSyjHliAb7/1eK0uKE=;
- b=fPrfMPs/EyLR3u5GoePWmIfdYI8gZNwA8PAyAGjbsZ+doAuzBcryOLZQzSAqOw7/ENOg
- Ewx+aB6QlzH/boQwWVg1ysGMaY0gPUQ4J5DmyrUKD9hD7tk0yUTMMebyFMFtxIBtC0Y5
- 0obEpDg4HXi1KbJEshkxhoLWXk5mouHkIfStuBBcBr4Oz23TmsMZO3cYGmotFbDSmB+q
- 8o2OKaF/3KW7t5+pDMPn7kgKCvwPZKzjNsNpqSlAtGsQpAlWy8KVmnRA9fKeQ1IyD2th
- iKY/s2keadtkLCwxcG63GYpDz38b9PEumR1E01j9RiP0K5BtIWZ/CG81hzKFc/nMFz6S kQ== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
-        by userp2120.oracle.com with ESMTP id 30x3mbsjx5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Tue, 12 May 2020 08:37:32 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
-        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04C8Ze5R005527;
-        Tue, 12 May 2020 08:37:32 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by userp3030.oracle.com with ESMTP id 30ydsq06fj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 12 May 2020 08:37:32 +0000
-Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 04C8bUF7011268;
-        Tue, 12 May 2020 08:37:30 GMT
-Received: from mwanda (/41.57.98.10)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 12 May 2020 01:37:30 -0700
-Date:   Tue, 12 May 2020 11:37:23 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Ayush Sawal <ayush.sawal@chelsio.com>,
-        Devulapally Shiva Krishna <shiva@chelsio.com>
-Cc:     Vinay Kumar Yadav <vinay.yadav@chelsio.com>,
-        Rohit Maheshwari <rohitm@chelsio.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "David S. Miller" <davem@davemloft.net>,
-        linux-crypto@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: [PATCH] Crypto/chcr: drop refcount on error path in chcr_aead_op()
-Message-ID: <20200512083723.GB251760@mwanda>
+        Tue, 12 May 2020 10:12:24 -0400
+Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
+        by mx07-00178001.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id 04CE8Cki015056;
+        Tue, 12 May 2020 16:11:58 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=st.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-type; s=STMicroelectronics;
+ bh=4pNmSi5ml3tKByzebGX13JwE22RuftEAKg4WQdiHZi8=;
+ b=m5xQdrY6vIezXFH13dESAUkJiiQlF952to5ae7R1g2DVWORiFhg5oY57gZnYLACJI+3C
+ bIBwxDe+6P2Yd/VIA3vQ+RxAnypwLEhhU+QrAUgYbRsjby4j6R7Ahq/L8OL0aymsHQCr
+ JIh3OiIef6gXX+w4pGYi9jKw0f96qs1/jZF428ZjKFkkzHnCeU+/rNp0/CcNfvJqO8is
+ jzi9XmPFqFsU9Mu0Z6eka4yBkeQAeB4PTS1beOcskuBIWd57pecwcSdkiJyvhmmnZti0
+ oBZa3QP8Hb+rgKee0NUE3IEHQ0wH3NCR/SAIVWsLaaS4osUbnT+Cq4ZkV0y6K1jp+QuR bw== 
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+        by mx07-00178001.pphosted.com with ESMTP id 30whn9gw57-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 12 May 2020 16:11:58 +0200
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+        by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 8B9E9100034;
+        Tue, 12 May 2020 16:11:57 +0200 (CEST)
+Received: from Webmail-eu.st.com (sfhdag6node1.st.com [10.75.127.16])
+        by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 7CBBE2BC7A1;
+        Tue, 12 May 2020 16:11:57 +0200 (CEST)
+Received: from localhost (10.75.127.47) by SFHDAG6NODE1.st.com (10.75.127.16)
+ with Microsoft SMTP Server (TLS) id 15.0.1473.3; Tue, 12 May 2020 16:11:56
+ +0200
+From:   Nicolas Toromanoff <nicolas.toromanoff@st.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        "David S . Miller" <davem@davemloft.net>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue <alexandre.torgue@st.com>
+CC:     Nicolas Toromanoff <nicolas.toromanoff@st.com>,
+        <linux-crypto@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH 2/5] crypto: stm32/crc: fix run-time self test issue.
+Date:   Tue, 12 May 2020 16:11:10 +0200
+Message-ID: <20200512141113.18972-3-nicolas.toromanoff@st.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20200512141113.18972-1-nicolas.toromanoff@st.com>
+References: <20200512141113.18972-1-nicolas.toromanoff@st.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mailer: git-send-email haha only kidding
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9618 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 suspectscore=0 mlxscore=0
- adultscore=0 mlxlogscore=999 malwarescore=0 bulkscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2005120071
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9618 signatures=668687
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 priorityscore=1501 impostorscore=0
- mlxscore=0 suspectscore=0 bulkscore=0 mlxlogscore=999 phishscore=0
- malwarescore=0 lowpriorityscore=0 spamscore=0 adultscore=0 clxscore=1011
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2003020000
- definitions=main-2005120071
+Content-Type: text/plain
+X-Originating-IP: [10.75.127.47]
+X-ClientProxiedBy: SFHDAG3NODE1.st.com (10.75.127.7) To SFHDAG6NODE1.st.com
+ (10.75.127.16)
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.216,18.0.676
+ definitions=2020-05-12_03:2020-05-11,2020-05-12 signatures=0
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-We need to drop inflight counter before returning on this error path.
+Fix wrong crc32 initialisation value:
+"alg: shash: stm32_crc32 test failed (wrong result) on test vector 0,
+cfg="init+update+final aligned buffer"
+cra_name="crc32c" expects an init value of 0XFFFFFFFF,
+cra_name="crc32" expects an init value of 0.
 
-Fixes: d91a3159e8d9 ("Crypto/chcr: fix gcm-aes and rfc4106-gcm failed tests")
-Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+Fixes: b51dbe90912a ("crypto: stm32 - Support for STM32 CRC32 crypto module")
+
+Signed-off-by: Nicolas Toromanoff <nicolas.toromanoff@st.com>
 ---
- drivers/crypto/chelsio/chcr_algo.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/crypto/stm32/stm32-crc32.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/crypto/chelsio/chcr_algo.c b/drivers/crypto/chelsio/chcr_algo.c
-index 83ddc2b39490e..e05998a1c0148 100644
---- a/drivers/crypto/chelsio/chcr_algo.c
-+++ b/drivers/crypto/chelsio/chcr_algo.c
-@@ -3744,6 +3744,7 @@ static int chcr_aead_op(struct aead_request *req,
- 	    crypto_ipsec_check_assoclen(req->assoclen) != 0) {
- 		pr_err("RFC4106: Invalid value of assoclen %d\n",
- 		       req->assoclen);
-+		chcr_dec_wrcount(cdev);
- 		return -EINVAL;
- 	}
+diff --git a/drivers/crypto/stm32/stm32-crc32.c b/drivers/crypto/stm32/stm32-crc32.c
+index c6156bf6c603..1c3e411b7acb 100644
+--- a/drivers/crypto/stm32/stm32-crc32.c
++++ b/drivers/crypto/stm32/stm32-crc32.c
+@@ -28,10 +28,10 @@
  
+ /* Registers values */
+ #define CRC_CR_RESET            BIT(0)
+-#define CRC_INIT_DEFAULT        0xFFFFFFFF
+ #define CRC_CR_REV_IN_WORD      (BIT(6) | BIT(5))
+ #define CRC_CR_REV_IN_BYTE      BIT(5)
+ #define CRC_CR_REV_OUT          BIT(7)
++#define CRC32C_INIT_DEFAULT     0xFFFFFFFF
+ 
+ #define CRC_AUTOSUSPEND_DELAY	50
+ 
+@@ -65,7 +65,7 @@ static int stm32_crc32_cra_init(struct crypto_tfm *tfm)
+ {
+ 	struct stm32_crc_ctx *mctx = crypto_tfm_ctx(tfm);
+ 
+-	mctx->key = CRC_INIT_DEFAULT;
++	mctx->key = 0;
+ 	mctx->poly = CRC32_POLY_LE;
+ 	return 0;
+ }
+@@ -74,7 +74,7 @@ static int stm32_crc32c_cra_init(struct crypto_tfm *tfm)
+ {
+ 	struct stm32_crc_ctx *mctx = crypto_tfm_ctx(tfm);
+ 
+-	mctx->key = CRC_INIT_DEFAULT;
++	mctx->key = CRC32C_INIT_DEFAULT;
+ 	mctx->poly = CRC32C_POLY_LE;
+ 	return 0;
+ }
 -- 
-2.26.2
+2.17.1
 
