@@ -2,111 +2,206 @@ Return-Path: <SRS0=GLFy=62=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.5 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4548BC54E4B
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 May 2020 04:09:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2B77C54E8D
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 May 2020 04:47:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 12C0320733
-	for <linux-crypto@archiver.kernel.org>; Tue, 12 May 2020 04:09:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7C7C12072B
+	for <linux-crypto@archiver.kernel.org>; Tue, 12 May 2020 04:47:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zKPMo9Vx"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="UW+7t1lQ"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726668AbgELEJi (ORCPT
+        id S1725816AbgELErO (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 12 May 2020 00:09:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54276 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-FAIL-OK-FAIL)
-        by vger.kernel.org with ESMTP id S1725776AbgELEJh (ORCPT
+        Tue, 12 May 2020 00:47:14 -0400
+Received: from lelv0142.ext.ti.com ([198.47.23.249]:50348 "EHLO
+        lelv0142.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1725814AbgELErO (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 12 May 2020 00:09:37 -0400
-Received: from mail-pl1-x643.google.com (mail-pl1-x643.google.com [IPv6:2607:f8b0:4864:20::643])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D672FC061A0E
-        for <linux-crypto@vger.kernel.org>; Mon, 11 May 2020 21:09:37 -0700 (PDT)
-Received: by mail-pl1-x643.google.com with SMTP id k19so4814172pll.9
-        for <linux-crypto@vger.kernel.org>; Mon, 11 May 2020 21:09:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references;
-        bh=6S28BNiWmQ/hEXUnU1MTnqXBi18kA3ePoZOYdtU1cwQ=;
-        b=zKPMo9VxVy3jMqZvbDFZzd0rfMvjK8sIRqKU+RRM8fhiK3BsQbxVPPqNYrdq3CNlJp
-         srwFwGJmFE53BiW8OELV7eGESL1CDt3+K4ya4VOcLbsiDUEhRhJL5Hsx5wYQmr4/a1ha
-         npM2phtb/qYoGwQEx97t6GacPM8Z7YAe5eoPRlt84htL5JM81zMsdpd3BUasJ+/8QsnH
-         dkV7TQ2UOgKSRXuw2IGL0NHMPpGwN/hPYlde9jC+uvFu5gspfztR7vKX+YVtfvubS0Zb
-         /IgWuGFfL2eesthQolXE8F1dD/HdpBfJqLHJnovOiJQqYzfmg/aL8KblwwEQlXwQIPtH
-         rPJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references;
-        bh=6S28BNiWmQ/hEXUnU1MTnqXBi18kA3ePoZOYdtU1cwQ=;
-        b=cVeX2dabuy5AgoPkXdvk2GOYhd1tZYHA/Tcfv7aJqamiB/Roo+9DdQonbximV5R3Qi
-         OoBKPcUv1FoVBt8dNK/pdeQpjnHz5AtMBUD7Q07Ymp8wJpkzjWqsSrldrI0Uy/5DMeLW
-         uzOuYGA9t731+cpSbVn+ey+nRIy/8+N5pRqTKMu8kBThmi2gIxibnp2iTmxQs7TGEtCU
-         bqOqXidHjzZ898Bz7IldM78c/BWax9iFq+LRIiBwFMdPve4exw+LdfhMAusDnBj3kb1N
-         Nbe7wBl0suXvkQWkAsyam5zSUXK8itZLm549u3uqoYWPALAALNc142EW/hOoy9ZAkaSW
-         M3kg==
-X-Gm-Message-State: AGi0Pub3/PpbBmOHKxLCk/0qy92WyblBYOuFWZkfCvJ4Z3lgEEuNPKJT
-        jDGPJNvdlDW+lzCAvsZcz6YWmQ==
-X-Google-Smtp-Source: APiQypIz5wcptWAsZSR4zFqLILzJ6EQ/AyMRL3bPtWuTsky6Bgy54mQMi2/qmxe6ZV1FPbWCHDML+A==
-X-Received: by 2002:a17:902:728e:: with SMTP id d14mr18153543pll.107.1589256577364;
-        Mon, 11 May 2020 21:09:37 -0700 (PDT)
-Received: from localhost.localdomain ([240e:362:443:6f00:91af:f25c:441c:7ba4])
-        by smtp.gmail.com with ESMTPSA id e4sm9471527pge.45.2020.05.11.21.09.24
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 11 May 2020 21:09:36 -0700 (PDT)
-From:   Zhangfei Gao <zhangfei.gao@linaro.org>
-To:     Joerg Roedel <joro@8bytes.org>,
-        Lorenzo Pieralisi <lorenzo.pieralisi@arm.com>,
-        Hanjun Guo <guohanjun@huawei.com>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-        Len Brown <lenb@kernel.org>,
-        jean-philippe <jean-philippe@linaro.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        kenneth-lee-2012@foxmail.com, Wangzhou <wangzhou1@hisilicon.com>
-Cc:     linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        iommu@lists.linux-foundation.org, linux-acpi@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        Zhangfei Gao <zhangfei.gao@linaro.org>
-Subject: [PATCH 2/2] ACPI/IORT: Let pci_fixup_final access iommu_fwnode
-Date:   Tue, 12 May 2020 12:08:31 +0800
-Message-Id: <1589256511-12446-3-git-send-email-zhangfei.gao@linaro.org>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1589256511-12446-1-git-send-email-zhangfei.gao@linaro.org>
-References: <1589256511-12446-1-git-send-email-zhangfei.gao@linaro.org>
+        Tue, 12 May 2020 00:47:14 -0400
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+        by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 04C4l64K097041;
+        Mon, 11 May 2020 23:47:06 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+        s=ti-com-17Q1; t=1589258826;
+        bh=F2po6cA8J2YoKFQUHOGkUFydfctsX1xseR/bWF+m5+k=;
+        h=Subject:To:CC:References:From:Date:In-Reply-To;
+        b=UW+7t1lQMZmzsTZ/Rg2C8DGHJkg9uCRI3zwSxB4mSbIpavbbpJXXX3R6Ny6ETM8lf
+         qhcpaKhQb9X+k0a5gXAxh3wY8fy/98Pdg7AaHuTID3p5bZPomCQ+eFafCJBahNV6X8
+         o2DJXs8DcAmuGNxjJy7X7557i8HyQBWZjl4TXltw=
+Received: from DLEE102.ent.ti.com (dlee102.ent.ti.com [157.170.170.32])
+        by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 04C4l5rU082372
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Mon, 11 May 2020 23:47:05 -0500
+Received: from DLEE111.ent.ti.com (157.170.170.22) by DLEE102.ent.ti.com
+ (157.170.170.32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3; Mon, 11
+ May 2020 23:47:05 -0500
+Received: from lelv0326.itg.ti.com (10.180.67.84) by DLEE111.ent.ti.com
+ (157.170.170.22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3 via
+ Frontend Transport; Mon, 11 May 2020 23:47:05 -0500
+Received: from [127.0.0.1] (ileax41-snat.itg.ti.com [10.172.224.153])
+        by lelv0326.itg.ti.com (8.15.2/8.15.2) with ESMTP id 04C4l2YK121221;
+        Mon, 11 May 2020 23:47:04 -0500
+Subject: Re: [PATCHv2 1/7] dt-bindings: crypto: Add TI SA2UL crypto
+ accelerator documentation
+To:     Rob Herring <robh@kernel.org>
+CC:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <linux-crypto@vger.kernel.org>, Keerthy <j-keerthy@ti.com>,
+        <devicetree@vger.kernel.org>
+References: <20200424164430.3288-1-t-kristo@ti.com>
+ <20200424164430.3288-2-t-kristo@ti.com> <20200511215343.GA10123@bogus>
+From:   Tero Kristo <t-kristo@ti.com>
+Message-ID: <53c7c7db-9357-c2fa-c792-64261489d32c@ti.com>
+Date:   Tue, 12 May 2020 07:47:02 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
+MIME-Version: 1.0
+In-Reply-To: <20200511215343.GA10123@bogus>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Calling pci_fixup_final after iommu_fwspec_init, which alloc
-iommu_fwnode. Some platform devices appear as PCI but are
-actually on the AMBA bus, and they need fixup in
-drivers/pci/quirks.c handling iommu_fwnode.
-So calling pci_fixup_final after iommu_fwnode is allocated.
+On 12/05/2020 00:53, Rob Herring wrote:
+> On Fri, Apr 24, 2020 at 07:44:24PM +0300, Tero Kristo wrote:
+>> From: Keerthy <j-keerthy@ti.com>
+>>
+>> The Security Accelerator Ultra Lite (SA2UL) subsystem provides hardware
+>> cryptographic acceleration for the following use cases:
+>>
+>> * Encryption and authentication for secure boot
+>> * Encryption and authentication of content in applications
+>>    requiring DRM (digital rights management) and
+>>    content/asset protection
+>>
+>> SA2UL provides support for number of different cryptographic algorithms
+>> including SHA1, SHA256, SHA512, AES, 3DES, and various combinations of
+>> the previous for AEAD use.
+>>
+>> Cc: Rob Herring <robh@kernel.org>
+>> Cc: devicetree@vger.kernel.org
+>> Signed-off-by: Keerthy <j-keerthy@ti.com>
+>> [t-kristo@ti.com: converted documentation to yaml]
+>> Signed-off-by: Tero Kristo <t-kristo@ti.com>
+>> ---
+>>   .../devicetree/bindings/crypto/ti,sa2ul.yaml  | 76 +++++++++++++++++++
+>>   1 file changed, 76 insertions(+)
+>>   create mode 100644 Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml
+>>
+>> diff --git a/Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml b/Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml
+>> new file mode 100644
+>> index 000000000000..27bb3a7e2b87
+>> --- /dev/null
+>> +++ b/Documentation/devicetree/bindings/crypto/ti,sa2ul.yaml
+>> @@ -0,0 +1,76 @@
+>> +# SPDX-License-Identifier: (GPL-2.0-only or BSD-2-Clause)
+>> +%YAML 1.2
+>> +---
+>> +$id: http://devicetree.org/schemas/crypto/ti,sa2ul.yaml#
+>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>> +
+>> +title: K3 SoC SA2UL crypto module
+>> +
+>> +maintainers:
+>> +  - Tero Kristo <t-kristo@ti.com>
+>> +
+>> +properties:
+>> +  compatible:
+>> +    enum:
+>> +      - ti,j721e-sa2ul
+>> +      - ti,am654-sa2ul
+>> +
+>> +  reg:
+>> +    maxItems: 1
+>> +
+>> +  power-domains:
+>> +    maxItems: 1
+>> +
+>> +  dmas:
+>> +    items:
+>> +      - description: TX DMA Channel
+>> +      - description: RX DMA Channel #1
+>> +      - description: RX DMA Channel #2
+>> +
+>> +  dma-names:
+>> +    items:
+>> +      - const: tx
+>> +      - const: rx1
+>> +      - const: rx2
+>> +
+>> +  dma-coherent: true
+>> +
+>> +  "#address-cells":
+>> +    const: 2
+>> +
+>> +  "#size-cells":
+>> +    const: 2
+>> +
+>> +  ranges:
+>> +    description:
+>> +      Address translation for the possible RNG child node for SA2UL
+>> +
+>> +patternProperties:
+>> +  "^rng@[a-lf0-9]+$":
+> 
+> a-l?
 
-Signed-off-by: Zhangfei Gao <zhangfei.gao@linaro.org>
----
- drivers/acpi/arm64/iort.c | 1 +
- 1 file changed, 1 insertion(+)
+Ooops, thats a typo right here. Will fix that.
 
-diff --git a/drivers/acpi/arm64/iort.c b/drivers/acpi/arm64/iort.c
-index 7d04424..02e361d 100644
---- a/drivers/acpi/arm64/iort.c
-+++ b/drivers/acpi/arm64/iort.c
-@@ -1027,6 +1027,7 @@ const struct iommu_ops *iort_iommu_configure(struct device *dev)
- 		info.node = node;
- 		err = pci_for_each_dma_alias(to_pci_dev(dev),
- 					     iort_pci_iommu_init, &info);
-+		pci_fixup_device(pci_fixup_final, to_pci_dev(dev));
- 
- 		fwspec = dev_iommu_fwspec_get(dev);
- 		if (fwspec && iort_pci_rc_supports_ats(node))
--- 
-2.7.4
+> 
+>> +    type: object
+>> +    description:
+>> +      Child RNG node for SA2UL
+> 
+> Does this child node have a binding?
 
+Yes, it is here:
+
+Documentation/devicetree/bindings/rng/omap_rng.txt.
+
+It is an old one so not converted to yaml yet though.
+
+-Tero
+
+> 
+>> +
+>> +required:
+>> +  - compatible
+>> +  - reg
+>> +  - power-domains
+>> +  - dmas
+>> +  - dma-names
+>> +  - dma-coherent
+>> +
+>> +additionalProperties: false
+>> +
+>> +examples:
+>> +  - |
+>> +    #include <dt-bindings/soc/ti,sci_pm_domain.h>
+>> +
+>> +    main_crypto: crypto@4e00000 {
+>> +        compatible = "ti,j721-sa2ul";
+>> +        reg = <0x0 0x4e00000 0x0 0x1200>;
+>> +        power-domains = <&k3_pds 264 TI_SCI_PD_EXCLUSIVE>;
+>> +        dmas = <&main_udmap 0xc000>, <&main_udmap 0x4000>,
+>> +               <&main_udmap 0x4001>;
+>> +        dma-names = "tx", "rx1", "rx2";
+>> +        dma-coherent;
+>> +    };
+>> -- 
+>> 2.17.1
+>>
+>> --
+
+--
+Texas Instruments Finland Oy, Porkkalankatu 22, 00180 Helsinki. Y-tunnus/Business ID: 0615521-4. Kotipaikka/Domicile: Helsinki
