@@ -2,207 +2,109 @@ Return-Path: <SRS0=peSz=64=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 424DFC433E1
-	for <linux-crypto@archiver.kernel.org>; Thu, 14 May 2020 13:20:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B407DC433DF
+	for <linux-crypto@archiver.kernel.org>; Thu, 14 May 2020 13:21:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1760420728
-	for <linux-crypto@archiver.kernel.org>; Thu, 14 May 2020 13:20:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="JSAcLnGN"
+	by mail.kernel.org (Postfix) with ESMTP id 817F92073E
+	for <linux-crypto@archiver.kernel.org>; Thu, 14 May 2020 13:21:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1589462490;
+	bh=NPCFOYKBuixpacg9mBP6x+YT3849Zm5W+6nvvtaInns=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=CoAZiiSaBmKHhFCfLKOv7CpucXn/vGl7Wum2W5S9wWHht3UK3xrTfH4l5jceHGPG2
+	 nBsMETNFt5Y310N419HMVpCUDvDMYGdQqOR31IWlHfPtg6dRT4dk1p1MCA9MmLg1RD
+	 x+PLest5B2PQQp+bWn4dVcqrYqChuk4bmD3lv/N8=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726124AbgENNUO (ORCPT
+        id S1726142AbgENNV0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 14 May 2020 09:20:14 -0400
-Received: from fllv0015.ext.ti.com ([198.47.19.141]:59872 "EHLO
-        fllv0015.ext.ti.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726050AbgENNUO (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 May 2020 09:20:14 -0400
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-        by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 04EDJoRa003750;
-        Thu, 14 May 2020 08:19:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-        s=ti-com-17Q1; t=1589462390;
-        bh=dUj5luPHu1YhkdbBoiYQztRz+qbnT9MuBcFThH036h8=;
-        h=From:To:CC:Subject:Date;
-        b=JSAcLnGN6B3gF7j/k2fuXUpxgxjlvjFGMeJSnlDxUew7ebr4Zcrz9NauxFnlsiHG1
-         C/S9d/j22oLiFOXaqu8wnupqCipMOegC5Ykae59u4ZKQRbHQAhA3v9TuHVNqi2MEEj
-         BbPKQ9d52i16k+vNCLjKl0dgoP9gOgfFdfibr9Ok=
-Received: from DLEE110.ent.ti.com (dlee110.ent.ti.com [157.170.170.21])
-        by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 04EDJo1t045219
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-        Thu, 14 May 2020 08:19:50 -0500
-Received: from DLEE112.ent.ti.com (157.170.170.23) by DLEE110.ent.ti.com
- (157.170.170.21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3; Thu, 14
- May 2020 08:19:50 -0500
-Received: from lelv0327.itg.ti.com (10.180.67.183) by DLEE112.ent.ti.com
- (157.170.170.23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.1979.3 via
- Frontend Transport; Thu, 14 May 2020 08:19:50 -0500
-Received: from sokoban.ti.com (ileax41-snat.itg.ti.com [10.172.224.153])
-        by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 04EDJmDV032816;
-        Thu, 14 May 2020 08:19:48 -0500
-From:   Tero Kristo <t-kristo@ti.com>
-To:     <robh+dt@kernel.org>, <devicetree@vger.kernel.org>
-CC:     <linux-crypto@vger.kernel.org>, <herbert@gondor.apana.org.au>,
-        <mpm@selenic.com>
-Subject: [PATCH 1/1] dt-bindings: rng: Convert OMAP RNG to schema
-Date:   Thu, 14 May 2020 16:19:47 +0300
-Message-ID: <20200514131947.28094-1-t-kristo@ti.com>
-X-Mailer: git-send-email 2.17.1
+        Thu, 14 May 2020 09:21:26 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34914 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726011AbgENNVZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 14 May 2020 09:21:25 -0400
+Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 8D98620748;
+        Thu, 14 May 2020 13:21:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1589462484;
+        bh=NPCFOYKBuixpacg9mBP6x+YT3849Zm5W+6nvvtaInns=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=g1Qbodw5lhgSs16AFT0cVg5vXT6fIrJRAhu2YrXY/Cix3tICjAi7/YnJqTajr6Yb4
+         0L+Rwluit5yJFJMBE9ndA1T8rlcy7qSJ9o9kAnkd+oMv5qJNxk71ll7xg3FAP//zKT
+         KaCLtJNqFAkC5+1hLgeLOgl9fhQOfr/AsCoXj2ps=
+Received: by mail-io1-f47.google.com with SMTP id k18so285774ion.0;
+        Thu, 14 May 2020 06:21:24 -0700 (PDT)
+X-Gm-Message-State: AOAM531mGbTzfU44Izqz2XAoJa05YRyQmcxCw4U/8zT2gR4CKEdhmmv1
+        nk+RAdQ/9oi7khE+yqQKqQfNlmCZtHiys6L+CWI=
+X-Google-Smtp-Source: ABdhPJyiu+K63MGl+EPSA7G+DKJxZn+mdZxhqUbhlq+A7hkIT3xsdbxmzRZbYfhilFS9AiVcsRLm9N42O9sHzLvzjW0=
+X-Received: by 2002:a5e:8705:: with SMTP id y5mr4092694ioj.142.1589462483836;
+ Thu, 14 May 2020 06:21:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+References: <20200512144949.4f933eca@canb.auug.org.au> <20200512162205.GI5110@sirena.org.uk>
+ <20200512163632.GA916@sol.localdomain> <20200512170801.GK5110@sirena.org.uk>
+ <20200512200805.GA175421@gmail.com> <CAK8P3a2C-91vCNv8NV6ut8GDu2z9Yt6VwX+P2WggWnuCcMjcvg@mail.gmail.com>
+In-Reply-To: <CAK8P3a2C-91vCNv8NV6ut8GDu2z9Yt6VwX+P2WggWnuCcMjcvg@mail.gmail.com>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Thu, 14 May 2020 15:21:12 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXHjWiXRU=-vHECF5FMDNiW-CRADP6RMLBAoMJUgZczWDQ@mail.gmail.com>
+Message-ID: <CAMj1kXHjWiXRU=-vHECF5FMDNiW-CRADP6RMLBAoMJUgZczWDQ@mail.gmail.com>
+Subject: Re: linux-next: manual merge of the sound-asoc tree with the crypto tree
+To:     Arnd Bergmann <arnd@arndb.de>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        Mark Brown <broonie@kernel.org>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Liam Girdwood <lgirdwood@gmail.com>,
+        Linux Crypto List <linux-crypto@vger.kernel.org>,
+        Linux Next Mailing List <linux-next@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Convert TI OMAP Random number generator bindings to DT schema.
+On Tue, 12 May 2020 at 22:31, Arnd Bergmann <arnd@arndb.de> wrote:
+>
+> On Tue, May 12, 2020 at 10:08 PM Eric Biggers <ebiggers@kernel.org> wrote:
+> > On Tue, May 12, 2020 at 06:08:01PM +0100, Mark Brown wrote:
+> >
+> > For later: if SHASH_DESC_ON_STACK is causing problems, we really ought to find a
+> > better solution, since lots of users are using this macro.  A version of
+> > crypto_shash_tfm_digest() that falls back to heap allocation if the descsize is
+> > too large would be possible, but that wouldn't fully solve the problem since
+> > some users do incremental hashing.
+>
+> It's hard to know how many of the users of SHASH_DESC_ON_STACK() are
+> likely to cause problems, as multiple factors are involved:
+>
+> - this one triggered the warning because it was on the stack of a function
+>   that got inlined into another that has other large variables. Whether it
+>   got inlined makes little difference to the stack usage, but does make a
+>   difference to warning about it.
+>
+> - generally the structure is larger than we like it, especially on architectures
+>   with 128 byte CRYPTO_MINALIGN like ARM. This actually got worse
+>   because of b68a7ec1e9a3 ("crypto: hash - Remove VLA usage"), as
+>   the stack usage is now always the maximum of all hashes where it used
+>   to be specific to the hash that was actually used and could be smaller
+>
+> - the specific instance in calculate_sha256() feels a bit silly, as this
+>   function allocates a tfm and a descriptor, runs the digest and then
+>   frees both again. I don't know how common this pattern is, but
+>   it seems a higher-level abstraction might be helpful anyway.
+>
 
-Signed-off-by: Tero Kristo <t-kristo@ti.com>
----
- .../devicetree/bindings/rng/omap_rng.txt      | 38 ---------
- .../devicetree/bindings/rng/ti,omap-rng.yaml  | 77 +++++++++++++++++++
- 2 files changed, 77 insertions(+), 38 deletions(-)
- delete mode 100644 Documentation/devicetree/bindings/rng/omap_rng.txt
- create mode 100644 Documentation/devicetree/bindings/rng/ti,omap-rng.yaml
+We are trying to move to crypto library interfaces for non-performance
+critical uses of hashes where the algorithm is known at compile time,
+and this is a good example of that pattern.
 
-diff --git a/Documentation/devicetree/bindings/rng/omap_rng.txt b/Documentation/devicetree/bindings/rng/omap_rng.txt
-deleted file mode 100644
-index ea434ce50f36..000000000000
---- a/Documentation/devicetree/bindings/rng/omap_rng.txt
-+++ /dev/null
-@@ -1,38 +0,0 @@
--OMAP SoC and Inside-Secure HWRNG Module
--
--Required properties:
--
--- compatible : Should contain entries for this and backward compatible
--  RNG versions:
--  - "ti,omap2-rng" for OMAP2.
--  - "ti,omap4-rng" for OMAP4, OMAP5 and AM33XX.
--  - "inside-secure,safexcel-eip76" for SoCs with EIP76 IP block
--  Note that these two versions are incompatible.
--- ti,hwmods: Name of the hwmod associated with the RNG module
--- reg : Offset and length of the register set for the module
--- interrupts : the interrupt number for the RNG module.
--		Used for "ti,omap4-rng" and "inside-secure,safexcel-eip76"
--- clocks: the trng clock source. Only mandatory for the
--  "inside-secure,safexcel-eip76" compatible, the second clock is
--  needed for the Armada 7K/8K SoCs
--- clock-names: mandatory if there is a second clock, in this case the
--  name must be "core" for the first clock and "reg" for the second
--  one
--
--
--Example:
--/* AM335x */
--rng: rng@48310000 {
--	compatible = "ti,omap4-rng";
--	ti,hwmods = "rng";
--	reg = <0x48310000 0x2000>;
--	interrupts = <111>;
--};
--
--/* SafeXcel IP-76 */
--trng: rng@f2760000 {
--	compatible = "inside-secure,safexcel-eip76";
--	reg = <0xf2760000 0x7d>;
--	interrupts = <GIC_SPI 59 IRQ_TYPE_LEVEL_HIGH>;
--	clocks = <&cpm_syscon0 1 25>;
--};
-diff --git a/Documentation/devicetree/bindings/rng/ti,omap-rng.yaml b/Documentation/devicetree/bindings/rng/ti,omap-rng.yaml
-new file mode 100644
-index 000000000000..b37d73295e9f
---- /dev/null
-+++ b/Documentation/devicetree/bindings/rng/ti,omap-rng.yaml
-@@ -0,0 +1,77 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/rng/ti,omap-rng.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: OMAP SoC and Inside-Secure HWRNG Module
-+
-+maintainers:
-+  - Tero Kristo <t-kristo@ti.com>
-+
-+properties:
-+  compatible:
-+    enum:
-+      - ti,omap2-rng
-+      - ti,omap4-rng
-+      - inside-secure,safexcel-eip76
-+
-+  reg:
-+    maxItems: 1
-+
-+  interrupts:
-+    maxItems: 1
-+
-+  clocks:
-+    description:
-+      The TRNG clock source. Only mandatory for the
-+      "inside-secure,safexcel-eip76" compatible, the second clock is needed
-+      for the Armada 7K/8K SoCs
-+    minItems: 1
-+    maxItems: 2
-+
-+  clock-names:
-+    items:
-+      - const: core
-+      - const: reg
-+
-+  ti,hwmods:
-+    description: TI hwmod name
-+    deprecated: true
-+    $ref: /schemas/types.yaml#/definitions/string-array
-+    items:
-+      const: rng
-+
-+required:
-+  - compatible
-+  - reg
-+
-+if:
-+  properties:
-+    compatible:
-+      enum:
-+        - inside-secure,safexcel-eip76
-+then:
-+  required:
-+    - clocks
-+
-+examples:
-+  - |
-+    /* AM335x */
-+    rng: rng@48310000 {
-+      compatible = "ti,omap4-rng";
-+      ti,hwmods = "rng";
-+      reg = <0x48310000 0x2000>;
-+      interrupts = <111>;
-+    };
-+
-+  - |+
-+    #include <dt-bindings/interrupt-controller/arm-gic.h>
-+    /* SafeXcel IP-76 */
-+    trng: rng@f2760000 {
-+      compatible = "inside-secure,safexcel-eip76";
-+      reg = <0xf2760000 0x7d>;
-+      interrupts = <GIC_SPI 59 IRQ_TYPE_LEVEL_HIGH>;
-+      clocks = <&cpm_syscon0 1 25>;
-+    };
-+...
--- 
-2.17.1
+IOW, this code should just call the sha256_init/update/final routines directly.
 
---
-Texas Instruments Finland Oy, Porkkalankatu 22, 00180 Helsinki. Y-tunnus/Business ID: 0615521-4. Kotipaikka/Domicile: Helsinki
+I'll send out a patch.
