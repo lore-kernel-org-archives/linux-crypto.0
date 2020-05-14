@@ -2,109 +2,148 @@ Return-Path: <SRS0=peSz=64=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B407DC433DF
-	for <linux-crypto@archiver.kernel.org>; Thu, 14 May 2020 13:21:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 671D2C433E1
+	for <linux-crypto@archiver.kernel.org>; Thu, 14 May 2020 19:00:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 817F92073E
-	for <linux-crypto@archiver.kernel.org>; Thu, 14 May 2020 13:21:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3AEAC20675
+	for <linux-crypto@archiver.kernel.org>; Thu, 14 May 2020 19:00:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1589462490;
-	bh=NPCFOYKBuixpacg9mBP6x+YT3849Zm5W+6nvvtaInns=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=CoAZiiSaBmKHhFCfLKOv7CpucXn/vGl7Wum2W5S9wWHht3UK3xrTfH4l5jceHGPG2
-	 nBsMETNFt5Y310N419HMVpCUDvDMYGdQqOR31IWlHfPtg6dRT4dk1p1MCA9MmLg1RD
-	 x+PLest5B2PQQp+bWn4dVcqrYqChuk4bmD3lv/N8=
+	s=default; t=1589482822;
+	bh=bHdvG3V+cRt4VsuuMeScm5UtgDdc/bM/8nMMg9log5w=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
+	b=QCq2Foo+yKAkwLU4Xi6ei6jwfCCH5IaHlXeU/DTJX8qGo7/BocefpyTgdszwQvVVI
+	 0aa6ETYkRCtCQDRjDQgu5KfzDVR4Qd7H0AsDqP5DeLrnFGplp5iK23ZahsAbQfM1a+
+	 dooi1XEfl81DmnPBlD7dJbVy/hAQrmWgRbhGZ/fI=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726142AbgENNV0 (ORCPT
+        id S1728483AbgENTAV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Thu, 14 May 2020 09:21:26 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34914 "EHLO mail.kernel.org"
+        Thu, 14 May 2020 15:00:21 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56470 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726011AbgENNVZ (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Thu, 14 May 2020 09:21:25 -0400
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
+        id S1729495AbgENSzs (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Thu, 14 May 2020 14:55:48 -0400
+Received: from sasha-vm.mshome.net (c-73-47-72-35.hsd1.nh.comcast.net [73.47.72.35])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 8D98620748;
-        Thu, 14 May 2020 13:21:24 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 623AE206DC;
+        Thu, 14 May 2020 18:55:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1589462484;
-        bh=NPCFOYKBuixpacg9mBP6x+YT3849Zm5W+6nvvtaInns=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=g1Qbodw5lhgSs16AFT0cVg5vXT6fIrJRAhu2YrXY/Cix3tICjAi7/YnJqTajr6Yb4
-         0L+Rwluit5yJFJMBE9ndA1T8rlcy7qSJ9o9kAnkd+oMv5qJNxk71ll7xg3FAP//zKT
-         KaCLtJNqFAkC5+1hLgeLOgl9fhQOfr/AsCoXj2ps=
-Received: by mail-io1-f47.google.com with SMTP id k18so285774ion.0;
-        Thu, 14 May 2020 06:21:24 -0700 (PDT)
-X-Gm-Message-State: AOAM531mGbTzfU44Izqz2XAoJa05YRyQmcxCw4U/8zT2gR4CKEdhmmv1
-        nk+RAdQ/9oi7khE+yqQKqQfNlmCZtHiys6L+CWI=
-X-Google-Smtp-Source: ABdhPJyiu+K63MGl+EPSA7G+DKJxZn+mdZxhqUbhlq+A7hkIT3xsdbxmzRZbYfhilFS9AiVcsRLm9N42O9sHzLvzjW0=
-X-Received: by 2002:a5e:8705:: with SMTP id y5mr4092694ioj.142.1589462483836;
- Thu, 14 May 2020 06:21:23 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200512144949.4f933eca@canb.auug.org.au> <20200512162205.GI5110@sirena.org.uk>
- <20200512163632.GA916@sol.localdomain> <20200512170801.GK5110@sirena.org.uk>
- <20200512200805.GA175421@gmail.com> <CAK8P3a2C-91vCNv8NV6ut8GDu2z9Yt6VwX+P2WggWnuCcMjcvg@mail.gmail.com>
-In-Reply-To: <CAK8P3a2C-91vCNv8NV6ut8GDu2z9Yt6VwX+P2WggWnuCcMjcvg@mail.gmail.com>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Thu, 14 May 2020 15:21:12 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXHjWiXRU=-vHECF5FMDNiW-CRADP6RMLBAoMJUgZczWDQ@mail.gmail.com>
-Message-ID: <CAMj1kXHjWiXRU=-vHECF5FMDNiW-CRADP6RMLBAoMJUgZczWDQ@mail.gmail.com>
-Subject: Re: linux-next: manual merge of the sound-asoc tree with the crypto tree
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        Mark Brown <broonie@kernel.org>,
+        s=default; t=1589482548;
+        bh=bHdvG3V+cRt4VsuuMeScm5UtgDdc/bM/8nMMg9log5w=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=fvGD8EZD5czHaGF7wtjfIb2gotMsaqAEeoEdSknAv8jntH77aR8ZKNf9SX3i+qGXD
+         4d2qd8UkODduYnGQxyaLqltb07p1wAhnR0HZfhIjt61vjKVvExw1slcH5GhzhapgE7
+         ARKzWe6eHrhA2EBd0JFRMzCnVKWk+nJa1jFNu0zg=
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Eric Biggers <ebiggers@google.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Liam Girdwood <lgirdwood@gmail.com>,
-        Linux Crypto List <linux-crypto@vger.kernel.org>,
-        Linux Next Mailing List <linux-next@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Sasha Levin <sashal@kernel.org>, linux-crypto@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.14 39/39] crypto: xts - simplify error handling in ->create()
+Date:   Thu, 14 May 2020 14:54:56 -0400
+Message-Id: <20200514185456.21060-39-sashal@kernel.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20200514185456.21060-1-sashal@kernel.org>
+References: <20200514185456.21060-1-sashal@kernel.org>
+MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 12 May 2020 at 22:31, Arnd Bergmann <arnd@arndb.de> wrote:
->
-> On Tue, May 12, 2020 at 10:08 PM Eric Biggers <ebiggers@kernel.org> wrote:
-> > On Tue, May 12, 2020 at 06:08:01PM +0100, Mark Brown wrote:
-> >
-> > For later: if SHASH_DESC_ON_STACK is causing problems, we really ought to find a
-> > better solution, since lots of users are using this macro.  A version of
-> > crypto_shash_tfm_digest() that falls back to heap allocation if the descsize is
-> > too large would be possible, but that wouldn't fully solve the problem since
-> > some users do incremental hashing.
->
-> It's hard to know how many of the users of SHASH_DESC_ON_STACK() are
-> likely to cause problems, as multiple factors are involved:
->
-> - this one triggered the warning because it was on the stack of a function
->   that got inlined into another that has other large variables. Whether it
->   got inlined makes little difference to the stack usage, but does make a
->   difference to warning about it.
->
-> - generally the structure is larger than we like it, especially on architectures
->   with 128 byte CRYPTO_MINALIGN like ARM. This actually got worse
->   because of b68a7ec1e9a3 ("crypto: hash - Remove VLA usage"), as
->   the stack usage is now always the maximum of all hashes where it used
->   to be specific to the hash that was actually used and could be smaller
->
-> - the specific instance in calculate_sha256() feels a bit silly, as this
->   function allocates a tfm and a descriptor, runs the digest and then
->   frees both again. I don't know how common this pattern is, but
->   it seems a higher-level abstraction might be helpful anyway.
->
+From: Eric Biggers <ebiggers@google.com>
 
-We are trying to move to crypto library interfaces for non-performance
-critical uses of hashes where the algorithm is known at compile time,
-and this is a good example of that pattern.
+[ Upstream commit 732e540953477083082e999ff553622c59cffd5f ]
 
-IOW, this code should just call the sha256_init/update/final routines directly.
+Simplify the error handling in the XTS template's ->create() function by
+taking advantage of crypto_drop_skcipher() now accepting (as a no-op) a
+spawn that hasn't been grabbed yet.
 
-I'll send out a patch.
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ crypto/xts.c | 28 +++++++++++-----------------
+ 1 file changed, 11 insertions(+), 17 deletions(-)
+
+diff --git a/crypto/xts.c b/crypto/xts.c
+index e31828ed00466..c8ab2e0cda47c 100644
+--- a/crypto/xts.c
++++ b/crypto/xts.c
+@@ -525,15 +525,15 @@ static int create(struct crypto_template *tmpl, struct rtattr **tb)
+ 
+ 	err = -EINVAL;
+ 	if (alg->base.cra_blocksize != XTS_BLOCK_SIZE)
+-		goto err_drop_spawn;
++		goto err_free_inst;
+ 
+ 	if (crypto_skcipher_alg_ivsize(alg))
+-		goto err_drop_spawn;
++		goto err_free_inst;
+ 
+ 	err = crypto_inst_setname(skcipher_crypto_instance(inst), "xts",
+ 				  &alg->base);
+ 	if (err)
+-		goto err_drop_spawn;
++		goto err_free_inst;
+ 
+ 	err = -EINVAL;
+ 	cipher_name = alg->base.cra_name;
+@@ -546,20 +546,20 @@ static int create(struct crypto_template *tmpl, struct rtattr **tb)
+ 
+ 		len = strlcpy(ctx->name, cipher_name + 4, sizeof(ctx->name));
+ 		if (len < 2 || len >= sizeof(ctx->name))
+-			goto err_drop_spawn;
++			goto err_free_inst;
+ 
+ 		if (ctx->name[len - 1] != ')')
+-			goto err_drop_spawn;
++			goto err_free_inst;
+ 
+ 		ctx->name[len - 1] = 0;
+ 
+ 		if (snprintf(inst->alg.base.cra_name, CRYPTO_MAX_ALG_NAME,
+ 			     "xts(%s)", ctx->name) >= CRYPTO_MAX_ALG_NAME) {
+ 			err = -ENAMETOOLONG;
+-			goto err_drop_spawn;
++			goto err_free_inst;
+ 		}
+ 	} else
+-		goto err_drop_spawn;
++		goto err_free_inst;
+ 
+ 	inst->alg.base.cra_flags = alg->base.cra_flags & CRYPTO_ALG_ASYNC;
+ 	inst->alg.base.cra_priority = alg->base.cra_priority;
+@@ -583,17 +583,11 @@ static int create(struct crypto_template *tmpl, struct rtattr **tb)
+ 	inst->free = free;
+ 
+ 	err = skcipher_register_instance(tmpl, inst);
+-	if (err)
+-		goto err_drop_spawn;
+-
+-out:
+-	return err;
+-
+-err_drop_spawn:
+-	crypto_drop_skcipher(&ctx->spawn);
++	if (err) {
+ err_free_inst:
+-	kfree(inst);
+-	goto out;
++		free(inst);
++	}
++	return err;
+ }
+ 
+ static struct crypto_template crypto_tmpl = {
+-- 
+2.20.1
+
