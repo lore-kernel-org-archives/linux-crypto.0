@@ -6,32 +6,32 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E2E3C433E1
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 May 2020 09:15:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A96F2C433E4
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 May 2020 09:15:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4EFCE2065C
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 May 2020 09:15:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8ED9A2065C
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 May 2020 09:15:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727896AbgEOJPW (ORCPT
+        id S1727882AbgEOJPX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 May 2020 05:15:22 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:58010 "EHLO huawei.com"
+        Fri, 15 May 2020 05:15:23 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:58098 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727858AbgEOJPW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 May 2020 05:15:22 -0400
+        id S1727837AbgEOJPX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 15 May 2020 05:15:23 -0400
 Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id B3847196B0CAB809318F;
+        by Forcepoint Email with ESMTP id BDE2870292547AE91ECD;
         Fri, 15 May 2020 17:15:18 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.56) by
  DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
- 14.3.487.0; Fri, 15 May 2020 17:15:08 +0800
+ 14.3.487.0; Fri, 15 May 2020 17:15:10 +0800
 From:   Shukun Tan <tanshukun1@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
         <wangzhou1@hisilicon.com>
-Subject: [PATCH 1/7] crypto: hisilicon/qm - add debugfs for QM
-Date:   Fri, 15 May 2020 17:13:54 +0800
-Message-ID: <1589534040-50725-2-git-send-email-tanshukun1@huawei.com>
+Subject: [PATCH 7/7] crypto: hisilicon/qm - change debugfs file name from qm_regs to regs
+Date:   Fri, 15 May 2020 17:14:00 +0800
+Message-ID: <1589534040-50725-8-git-send-email-tanshukun1@huawei.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1589534040-50725-1-git-send-email-tanshukun1@huawei.com>
 References: <1589534040-50725-1-git-send-email-tanshukun1@huawei.com>
@@ -44,293 +44,102 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Longfang Liu <liulongfang@huawei.com>
+The debugfs qm_regs file is already in the qm directory, so no qm_ prefix
+is required.
 
-Add DebugFS method to get the information of IRQ/Requests/QP .etc of QM
-for HPRE/ZIP/SEC drivers.
-
-Signed-off-by: Longfang Liu <liulongfang@huawei.com>
 Signed-off-by: Shukun Tan <tanshukun1@huawei.com>
-Reviewed-by: Zaibo Xu <xuzaibo@huawei.com>
 Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
 ---
- Documentation/ABI/testing/debugfs-hisi-hpre | 31 ++++++++++++++++++
- Documentation/ABI/testing/debugfs-hisi-sec  | 31 ++++++++++++++++++
- Documentation/ABI/testing/debugfs-hisi-zip  | 31 ++++++++++++++++++
- drivers/crypto/hisilicon/qm.c               | 51 +++++++++++++++++++++++++++++
- drivers/crypto/hisilicon/qm.h               |  9 +++++
- 5 files changed, 153 insertions(+)
+ Documentation/ABI/testing/debugfs-hisi-hpre | 6 +++---
+ Documentation/ABI/testing/debugfs-hisi-sec  | 2 +-
+ Documentation/ABI/testing/debugfs-hisi-zip  | 6 +++---
+ drivers/crypto/hisilicon/qm.c               | 2 +-
+ 4 files changed, 8 insertions(+), 8 deletions(-)
 
 diff --git a/Documentation/ABI/testing/debugfs-hisi-hpre b/Documentation/ABI/testing/debugfs-hisi-hpre
-index ec4a79e..1f96665 100644
+index 1fe3eae..b4be5f1 100644
 --- a/Documentation/ABI/testing/debugfs-hisi-hpre
 +++ b/Documentation/ABI/testing/debugfs-hisi-hpre
-@@ -55,3 +55,34 @@ Description:    QM debug registers(qm_regs) read clear control. 1 means enable
+@@ -33,7 +33,7 @@ Contact:        linux-crypto@vger.kernel.org
+ Description:    Dump debug registers from the HPRE.
+ 		Only available for PF.
+ 
+-What:           /sys/kernel/debug/hisi_hpre/<bdf>/qm/qm_regs
++What:           /sys/kernel/debug/hisi_hpre/<bdf>/qm/regs
+ Date:           Sep 2019
+ Contact:        linux-crypto@vger.kernel.org
+ Description:    Dump debug registers from the QM.
+@@ -44,13 +44,13 @@ What:           /sys/kernel/debug/hisi_hpre/<bdf>/qm/current_q
+ Date:           Sep 2019
+ Contact:        linux-crypto@vger.kernel.org
+ Description:    One QM may contain multiple queues. Select specific queue to
+-		show its debug registers in above qm_regs.
++		show its debug registers in above regs.
+ 		Only available for PF.
+ 
+ What:           /sys/kernel/debug/hisi_hpre/<bdf>/qm/clear_enable
+ Date:           Sep 2019
+ Contact:        linux-crypto@vger.kernel.org
+-Description:    QM debug registers(qm_regs) read clear control. 1 means enable
++Description:    QM debug registers(regs) read clear control. 1 means enable
+ 		register read clear, otherwise 0.
  		Writing to this file has no functional effect, only enable or
  		disable counters clear after reading of these registers.
- 		Only available for PF.
-+
-+What:           /sys/kernel/debug/hisi_hpre/<bdf>/qm/err_irq
-+Date:           Apr 2020
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump the number of invalid interrupts for
-+		QM task completion.
-+		Available for both PF and VF, and take no other effect on HPRE.
-+
-+What:           /sys/kernel/debug/hisi_hpre/<bdf>/qm/aeq_irq
-+Date:           Apr 2020
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump the number of QM async event queue interrupts.
-+		Available for both PF and VF, and take no other effect on HPRE.
-+
-+What:           /sys/kernel/debug/hisi_hpre/<bdf>/qm/abnormal_irq
-+Date:           Apr 2020
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump the number of interrupts for QM abnormal event.
-+		Available for both PF and VF, and take no other effect on HPRE.
-+
-+What:           /sys/kernel/debug/hisi_hpre/<bdf>/qm/create_qp_err
-+Date:           Apr 2020
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump the number of queue allocation errors.
-+		Available for both PF and VF, and take no other effect on HPRE.
-+
-+What:           /sys/kernel/debug/hisi_hpre/<bdf>/qm/mb_err
-+Date:           Apr 2020
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump the number of failed QM mailbox commands.
-+		Available for both PF and VF, and take no other effect on HPRE.
 diff --git a/Documentation/ABI/testing/debugfs-hisi-sec b/Documentation/ABI/testing/debugfs-hisi-sec
-index 06adb89..c3ba09c 100644
+index 725c780..85feb44 100644
 --- a/Documentation/ABI/testing/debugfs-hisi-sec
 +++ b/Documentation/ABI/testing/debugfs-hisi-sec
-@@ -41,3 +41,34 @@ Description:    Enabling/disabling of clear action after reading
- 		the SEC's QM debug registers.
- 		0: disable, 1: enable.
- 		Only available for PF, and take no other effect on SEC.
-+
-+What:           /sys/kernel/debug/hisi_sec2/<bdf>/qm/err_irq
-+Date:           Apr 2020
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump the number of invalid interrupts for
-+		QM task completion.
-+		Available for both PF and VF, and take no other effect on SEC.
-+
-+What:           /sys/kernel/debug/hisi_sec2/<bdf>/qm/aeq_irq
-+Date:           Apr 2020
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump the number of QM async event queue interrupts.
-+		Available for both PF and VF, and take no other effect on SEC.
-+
-+What:           /sys/kernel/debug/hisi_sec2/<bdf>/qm/abnormal_irq
-+Date:           Apr 2020
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump the number of interrupts for QM abnormal event.
-+		Available for both PF and VF, and take no other effect on SEC.
-+
-+What:           /sys/kernel/debug/hisi_sec2/<bdf>/qm/create_qp_err
-+Date:           Apr 2020
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump the number of queue allocation errors.
-+		Available for both PF and VF, and take no other effect on SEC.
-+
-+What:           /sys/kernel/debug/hisi_sec2/<bdf>/qm/mb_err
-+Date:           Apr 2020
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump the number of failed QM mailbox commands.
-+		Available for both PF and VF, and take no other effect on SEC.
+@@ -25,7 +25,7 @@ What:           /sys/kernel/debug/hisi_sec2/<bdf>/qm/current_q
+ Date:           Oct 2019
+ Contact:        linux-crypto@vger.kernel.org
+ Description:    One QM of SEC may contain multiple queues. Select specific
+-		queue to show its debug registers in above 'qm_regs'.
++		queue to show its debug registers in above 'regs'.
+ 		Only available for PF.
+ 
+ What:           /sys/kernel/debug/hisi_sec2/<bdf>/qm/clear_enable
 diff --git a/Documentation/ABI/testing/debugfs-hisi-zip b/Documentation/ABI/testing/debugfs-hisi-zip
-index a7c63e6..cc568fd 100644
+index 4832ba0..3034a2b 100644
 --- a/Documentation/ABI/testing/debugfs-hisi-zip
 +++ b/Documentation/ABI/testing/debugfs-hisi-zip
-@@ -48,3 +48,34 @@ Description:    QM debug registers(qm_regs) read clear control. 1 means enable
+@@ -26,7 +26,7 @@ Description:    One ZIP controller has one PF and multiple VFs, each function
+ 		has a QM. Select the QM which below qm refers to.
+ 		Only available for PF.
+ 
+-What:           /sys/kernel/debug/hisi_zip/<bdf>/qm/qm_regs
++What:           /sys/kernel/debug/hisi_zip/<bdf>/qm/regs
+ Date:           Nov 2018
+ Contact:        linux-crypto@vger.kernel.org
+ Description:    Dump of QM related debug registers.
+@@ -37,13 +37,13 @@ What:           /sys/kernel/debug/hisi_zip/<bdf>/qm/current_q
+ Date:           Nov 2018
+ Contact:        linux-crypto@vger.kernel.org
+ Description:    One QM may contain multiple queues. Select specific queue to
+-		show its debug registers in above qm_regs.
++		show its debug registers in above regs.
+ 		Only available for PF.
+ 
+ What:           /sys/kernel/debug/hisi_zip/<bdf>/qm/clear_enable
+ Date:           Nov 2018
+ Contact:        linux-crypto@vger.kernel.org
+-Description:    QM debug registers(qm_regs) read clear control. 1 means enable
++Description:    QM debug registers(regs) read clear control. 1 means enable
+ 		register read clear, otherwise 0.
  		Writing to this file has no functional effect, only enable or
  		disable counters clear after reading of these registers.
- 		Only available for PF.
-+
-+What:           /sys/kernel/debug/hisi_zip/<bdf>/qm/err_irq
-+Date:           Apr 2020
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump the number of invalid interrupts for
-+		QM task completion.
-+		Available for both PF and VF, and take no other effect on ZIP.
-+
-+What:           /sys/kernel/debug/hisi_zip/<bdf>/qm/aeq_irq
-+Date:           Apr 2020
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump the number of QM async event queue interrupts.
-+		Available for both PF and VF, and take no other effect on ZIP.
-+
-+What:           /sys/kernel/debug/hisi_zip/<bdf>/qm/abnormal_irq
-+Date:           Apr 2020
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump the number of interrupts for QM abnormal event.
-+		Available for both PF and VF, and take no other effect on ZIP.
-+
-+What:           /sys/kernel/debug/hisi_zip/<bdf>/qm/create_qp_err
-+Date:           Apr 2020
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump the number of queue allocation errors.
-+		Available for both PF and VF, and take no other effect on ZIP.
-+
-+What:           /sys/kernel/debug/hisi_zip/<bdf>/qm/mb_err
-+Date:           Apr 2020
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump the number of failed QM mailbox commands.
-+		Available for both PF and VF, and take no other effect on ZIP.
 diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
-index 6365f93..744d131 100644
+index 57ad131..a781c02 100644
 --- a/drivers/crypto/hisilicon/qm.c
 +++ b/drivers/crypto/hisilicon/qm.c
-@@ -324,6 +324,19 @@ struct hisi_qm_hw_ops {
- 	enum acc_err_result (*hw_error_handle)(struct hisi_qm *qm);
- };
+@@ -2775,7 +2775,7 @@ int hisi_qm_debug_init(struct hisi_qm *qm)
+ 				goto failed_to_create;
+ 			}
  
-+struct qm_dfx_item {
-+	const char *name;
-+	u32 offset;
-+};
-+
-+static struct qm_dfx_item qm_dfx_files[] = {
-+	{"err_irq", offsetof(struct qm_dfx, err_irq_cnt)},
-+	{"aeq_irq", offsetof(struct qm_dfx, aeq_irq_cnt)},
-+	{"abnormal_irq", offsetof(struct qm_dfx, abnormal_irq_cnt)},
-+	{"create_qp_err", offsetof(struct qm_dfx, create_qp_err_cnt)},
-+	{"mb_err", offsetof(struct qm_dfx, mb_err_cnt)},
-+};
-+
- static const char * const qm_debug_file_name[] = {
- 	[CURRENT_Q]    = "current_q",
- 	[CLEAR_ENABLE] = "clear_enable",
-@@ -514,6 +527,8 @@ static int qm_mb(struct hisi_qm *qm, u8 cmd, dma_addr_t dma_addr, u16 queue,
- busy_unlock:
- 	mutex_unlock(&qm->mailbox_lock);
+-	debugfs_create_file("qm_regs", 0444, qm->debug.qm_d, qm, &qm_regs_fops);
++	debugfs_create_file("regs", 0444, qm->debug.qm_d, qm, &qm_regs_fops);
  
-+	if (ret)
-+		atomic64_inc(&qm->debug.dfx.mb_err_cnt);
- 	return ret;
- }
+ 	debugfs_create_file("cmd", 0444, qm->debug.qm_d, qm, &qm_cmd_fops);
  
-@@ -671,6 +686,7 @@ static irqreturn_t qm_irq(int irq, void *data)
- 	if (readl(qm->io_base + QM_VF_EQ_INT_SOURCE))
- 		return do_qm_irq(irq, data);
- 
-+	atomic64_inc(&qm->debug.dfx.err_irq_cnt);
- 	dev_err(&qm->pdev->dev, "invalid int source\n");
- 	qm_db(qm, 0, QM_DOORBELL_CMD_EQ, qm->status.eq_head, 0);
- 
-@@ -683,6 +699,7 @@ static irqreturn_t qm_aeq_irq(int irq, void *data)
- 	struct qm_aeqe *aeqe = qm->aeqe + qm->status.aeq_head;
- 	u32 type;
- 
-+	atomic64_inc(&qm->debug.dfx.aeq_irq_cnt);
- 	if (!readl(qm->io_base + QM_VF_AEQ_INT_SOURCE))
- 		return IRQ_NONE;
- 
-@@ -1192,6 +1209,7 @@ static struct hisi_qp *qm_create_qp_nolock(struct hisi_qm *qm, u8 alg_type)
- 	if (qm->qp_in_used == qm->qp_num) {
- 		dev_info_ratelimited(dev, "All %u queues of QM are busy!\n",
- 				     qm->qp_num);
-+		atomic64_inc(&qm->debug.dfx.create_qp_err_cnt);
- 		return ERR_PTR(-EBUSY);
- 	}
- 
-@@ -1199,6 +1217,7 @@ static struct hisi_qp *qm_create_qp_nolock(struct hisi_qm *qm, u8 alg_type)
- 	if (qp_id < 0) {
- 		dev_info_ratelimited(dev, "All %u queues of QM are busy!\n",
- 				    qm->qp_num);
-+		atomic64_inc(&qm->debug.dfx.create_qp_err_cnt);
- 		return ERR_PTR(-EBUSY);
- 	}
- 
-@@ -2249,6 +2268,26 @@ int hisi_qm_stop(struct hisi_qm *qm)
- }
- EXPORT_SYMBOL_GPL(hisi_qm_stop);
- 
-+static int qm_debugfs_atomic64_set(void *data, u64 val)
-+{
-+	if (val)
-+		return -EINVAL;
-+
-+	atomic64_set((atomic64_t *)data, 0);
-+
-+	return 0;
-+}
-+
-+static int qm_debugfs_atomic64_get(void *data, u64 *val)
-+{
-+	*val = atomic64_read((atomic64_t *)data);
-+
-+	return 0;
-+}
-+
-+DEFINE_DEBUGFS_ATTRIBUTE(qm_atomic64_ops, qm_debugfs_atomic64_get,
-+			 qm_debugfs_atomic64_set, "%llu\n");
-+
- /**
-  * hisi_qm_debug_init() - Initialize qm related debugfs files.
-  * @qm: The qm for which we want to add debugfs files.
-@@ -2257,7 +2296,9 @@ EXPORT_SYMBOL_GPL(hisi_qm_stop);
-  */
- int hisi_qm_debug_init(struct hisi_qm *qm)
- {
-+	struct qm_dfx *dfx = &qm->debug.dfx;
- 	struct dentry *qm_d;
-+	void *data;
- 	int i, ret;
- 
- 	qm_d = debugfs_create_dir("qm", qm->debug.debug_root);
-@@ -2273,6 +2314,15 @@ int hisi_qm_debug_init(struct hisi_qm *qm)
- 
- 	debugfs_create_file("qm_regs", 0444, qm->debug.qm_d, qm, &qm_regs_fops);
- 
-+	for (i = 0; i < ARRAY_SIZE(qm_dfx_files); i++) {
-+		data = (atomic64_t *)((uintptr_t)dfx + qm_dfx_files[i].offset);
-+		debugfs_create_file(qm_dfx_files[i].name,
-+			0644,
-+			qm_d,
-+			data,
-+			&qm_atomic64_ops);
-+	}
-+
- 	return 0;
- 
- failed_to_create:
-@@ -3311,6 +3361,7 @@ static irqreturn_t qm_abnormal_irq(int irq, void *data)
- 	struct hisi_qm *qm = data;
- 	enum acc_err_result ret;
- 
-+	atomic64_inc(&qm->debug.dfx.abnormal_irq_cnt);
- 	ret = qm_process_dev_error(qm);
- 	if (ret == ACC_ERR_NEED_RESET)
- 		schedule_work(&qm->rst_work);
-diff --git a/drivers/crypto/hisilicon/qm.h b/drivers/crypto/hisilicon/qm.h
-index a431ff2..e4b46a7 100644
---- a/drivers/crypto/hisilicon/qm.h
-+++ b/drivers/crypto/hisilicon/qm.h
-@@ -121,6 +121,14 @@ enum qm_debug_file {
- 	DEBUG_FILE_NUM,
- };
- 
-+struct qm_dfx {
-+	atomic64_t err_irq_cnt;
-+	atomic64_t aeq_irq_cnt;
-+	atomic64_t abnormal_irq_cnt;
-+	atomic64_t create_qp_err_cnt;
-+	atomic64_t mb_err_cnt;
-+};
-+
- struct debugfs_file {
- 	enum qm_debug_file index;
- 	struct mutex lock;
-@@ -129,6 +137,7 @@ struct debugfs_file {
- 
- struct qm_debug {
- 	u32 curr_qm_qp_num;
-+	struct qm_dfx dfx;
- 	struct dentry *debug_root;
- 	struct dentry *qm_d;
- 	struct debugfs_file files[DEBUG_FILE_NUM];
 -- 
 2.7.4
 
