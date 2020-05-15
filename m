@@ -6,32 +6,32 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0AA1C433E0
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 May 2020 09:15:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E2E3C433E1
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 May 2020 09:15:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8A86B206F1
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 May 2020 09:15:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4EFCE2065C
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 May 2020 09:15:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727785AbgEOJPV (ORCPT
+        id S1727896AbgEOJPW (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 May 2020 05:15:21 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:57972 "EHLO huawei.com"
+        Fri, 15 May 2020 05:15:22 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:58010 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727837AbgEOJPV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 May 2020 05:15:21 -0400
+        id S1727858AbgEOJPW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 15 May 2020 05:15:22 -0400
 Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id A0DC2ED3F5066C9426B4;
+        by Forcepoint Email with ESMTP id B3847196B0CAB809318F;
         Fri, 15 May 2020 17:15:18 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.56) by
  DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
- 14.3.487.0; Fri, 15 May 2020 17:15:09 +0800
+ 14.3.487.0; Fri, 15 May 2020 17:15:08 +0800
 From:   Shukun Tan <tanshukun1@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
         <wangzhou1@hisilicon.com>
-Subject: [PATCH 4/7] crypto: hisilicon/hpre - add debugfs for Hisilicon HPRE
-Date:   Fri, 15 May 2020 17:13:57 +0800
-Message-ID: <1589534040-50725-5-git-send-email-tanshukun1@huawei.com>
+Subject: [PATCH 1/7] crypto: hisilicon/qm - add debugfs for QM
+Date:   Fri, 15 May 2020 17:13:54 +0800
+Message-ID: <1589534040-50725-2-git-send-email-tanshukun1@huawei.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1589534040-50725-1-git-send-email-tanshukun1@huawei.com>
 References: <1589534040-50725-1-git-send-email-tanshukun1@huawei.com>
@@ -44,455 +44,293 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Hui Tang <tanghui20@huawei.com>
+From: Longfang Liu <liulongfang@huawei.com>
 
-Add debugfs to provides IO operation debug information
-and add BD processing timeout count function
+Add DebugFS method to get the information of IRQ/Requests/QP .etc of QM
+for HPRE/ZIP/SEC drivers.
 
-Signed-off-by: Hui Tang <tanghui20@huawei.com>
 Signed-off-by: Longfang Liu <liulongfang@huawei.com>
 Signed-off-by: Shukun Tan <tanshukun1@huawei.com>
 Reviewed-by: Zaibo Xu <xuzaibo@huawei.com>
 Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
 ---
- Documentation/ABI/testing/debugfs-hisi-hpre | 45 +++++++++++++
- drivers/crypto/hisilicon/hpre/hpre.h        | 17 +++++
- drivers/crypto/hisilicon/hpre/hpre_crypto.c | 99 ++++++++++++++++++++++++-----
- drivers/crypto/hisilicon/hpre/hpre_main.c   | 56 ++++++++++++++++
- 4 files changed, 202 insertions(+), 15 deletions(-)
+ Documentation/ABI/testing/debugfs-hisi-hpre | 31 ++++++++++++++++++
+ Documentation/ABI/testing/debugfs-hisi-sec  | 31 ++++++++++++++++++
+ Documentation/ABI/testing/debugfs-hisi-zip  | 31 ++++++++++++++++++
+ drivers/crypto/hisilicon/qm.c               | 51 +++++++++++++++++++++++++++++
+ drivers/crypto/hisilicon/qm.h               |  9 +++++
+ 5 files changed, 153 insertions(+)
 
 diff --git a/Documentation/ABI/testing/debugfs-hisi-hpre b/Documentation/ABI/testing/debugfs-hisi-hpre
-index 093cf46..1fe3eae 100644
+index ec4a79e..1f96665 100644
 --- a/Documentation/ABI/testing/debugfs-hisi-hpre
 +++ b/Documentation/ABI/testing/debugfs-hisi-hpre
-@@ -93,3 +93,48 @@ Contact:        linux-crypto@vger.kernel.org
- Description:    Dump the status of the QM.
- 		Four states: initiated, started, stopped and closed.
- 		Available for both PF and VF, and take no other effect on HPRE.
+@@ -55,3 +55,34 @@ Description:    QM debug registers(qm_regs) read clear control. 1 means enable
+ 		Writing to this file has no functional effect, only enable or
+ 		disable counters clear after reading of these registers.
+ 		Only available for PF.
 +
-+What:           /sys/kernel/debug/hisi_hpre/<bdf>/hpre_dfx/send_cnt
++What:           /sys/kernel/debug/hisi_hpre/<bdf>/qm/err_irq
 +Date:           Apr 2020
 +Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump the total number of sent requests.
++Description:    Dump the number of invalid interrupts for
++		QM task completion.
 +		Available for both PF and VF, and take no other effect on HPRE.
 +
-+What:           /sys/kernel/debug/hisi_hpre/<bdf>/hpre_dfx/recv_cnt
++What:           /sys/kernel/debug/hisi_hpre/<bdf>/qm/aeq_irq
 +Date:           Apr 2020
 +Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump the total number of received requests.
++Description:    Dump the number of QM async event queue interrupts.
 +		Available for both PF and VF, and take no other effect on HPRE.
 +
-+What:           /sys/kernel/debug/hisi_hpre/<bdf>/hpre_dfx/send_busy_cnt
++What:           /sys/kernel/debug/hisi_hpre/<bdf>/qm/abnormal_irq
 +Date:           Apr 2020
 +Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump the total number of requests sent
-+		with returning busy.
++Description:    Dump the number of interrupts for QM abnormal event.
 +		Available for both PF and VF, and take no other effect on HPRE.
 +
-+What:           /sys/kernel/debug/hisi_hpre/<bdf>/hpre_dfx/send_fail_cnt
++What:           /sys/kernel/debug/hisi_hpre/<bdf>/qm/create_qp_err
 +Date:           Apr 2020
 +Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump the total number of completed but error requests.
++Description:    Dump the number of queue allocation errors.
 +		Available for both PF and VF, and take no other effect on HPRE.
 +
-+What:           /sys/kernel/debug/hisi_hpre/<bdf>/hpre_dfx/invalid_req_cnt
++What:           /sys/kernel/debug/hisi_hpre/<bdf>/qm/mb_err
 +Date:           Apr 2020
 +Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump the total number of invalid requests being received.
++Description:    Dump the number of failed QM mailbox commands.
 +		Available for both PF and VF, and take no other effect on HPRE.
+diff --git a/Documentation/ABI/testing/debugfs-hisi-sec b/Documentation/ABI/testing/debugfs-hisi-sec
+index 06adb89..c3ba09c 100644
+--- a/Documentation/ABI/testing/debugfs-hisi-sec
++++ b/Documentation/ABI/testing/debugfs-hisi-sec
+@@ -41,3 +41,34 @@ Description:    Enabling/disabling of clear action after reading
+ 		the SEC's QM debug registers.
+ 		0: disable, 1: enable.
+ 		Only available for PF, and take no other effect on SEC.
 +
-+What:           /sys/kernel/debug/hisi_hpre/<bdf>/hpre_dfx/overtime_thrhld
++What:           /sys/kernel/debug/hisi_sec2/<bdf>/qm/err_irq
 +Date:           Apr 2020
 +Contact:        linux-crypto@vger.kernel.org
-+Description:    Set the threshold time for counting the request which is
-+		processed longer than the threshold.
-+		0: disable(default), 1: 1 microsecond.
-+		Available for both PF and VF, and take no other effect on HPRE.
++Description:    Dump the number of invalid interrupts for
++		QM task completion.
++		Available for both PF and VF, and take no other effect on SEC.
 +
-+What:           /sys/kernel/debug/hisi_hpre/<bdf>/hpre_dfx/over_thrhld_cnt
++What:           /sys/kernel/debug/hisi_sec2/<bdf>/qm/aeq_irq
 +Date:           Apr 2020
 +Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump the total number of time out requests.
-+		Available for both PF and VF, and take no other effect on HPRE.
-diff --git a/drivers/crypto/hisilicon/hpre/hpre.h b/drivers/crypto/hisilicon/hpre/hpre.h
-index 0a8ba46..ed730d1 100644
---- a/drivers/crypto/hisilicon/hpre/hpre.h
-+++ b/drivers/crypto/hisilicon/hpre/hpre.h
-@@ -25,6 +25,17 @@ enum hpre_ctrl_dbgfs_file {
- 	HPRE_DEBUG_FILE_NUM,
++Description:    Dump the number of QM async event queue interrupts.
++		Available for both PF and VF, and take no other effect on SEC.
++
++What:           /sys/kernel/debug/hisi_sec2/<bdf>/qm/abnormal_irq
++Date:           Apr 2020
++Contact:        linux-crypto@vger.kernel.org
++Description:    Dump the number of interrupts for QM abnormal event.
++		Available for both PF and VF, and take no other effect on SEC.
++
++What:           /sys/kernel/debug/hisi_sec2/<bdf>/qm/create_qp_err
++Date:           Apr 2020
++Contact:        linux-crypto@vger.kernel.org
++Description:    Dump the number of queue allocation errors.
++		Available for both PF and VF, and take no other effect on SEC.
++
++What:           /sys/kernel/debug/hisi_sec2/<bdf>/qm/mb_err
++Date:           Apr 2020
++Contact:        linux-crypto@vger.kernel.org
++Description:    Dump the number of failed QM mailbox commands.
++		Available for both PF and VF, and take no other effect on SEC.
+diff --git a/Documentation/ABI/testing/debugfs-hisi-zip b/Documentation/ABI/testing/debugfs-hisi-zip
+index a7c63e6..cc568fd 100644
+--- a/Documentation/ABI/testing/debugfs-hisi-zip
++++ b/Documentation/ABI/testing/debugfs-hisi-zip
+@@ -48,3 +48,34 @@ Description:    QM debug registers(qm_regs) read clear control. 1 means enable
+ 		Writing to this file has no functional effect, only enable or
+ 		disable counters clear after reading of these registers.
+ 		Only available for PF.
++
++What:           /sys/kernel/debug/hisi_zip/<bdf>/qm/err_irq
++Date:           Apr 2020
++Contact:        linux-crypto@vger.kernel.org
++Description:    Dump the number of invalid interrupts for
++		QM task completion.
++		Available for both PF and VF, and take no other effect on ZIP.
++
++What:           /sys/kernel/debug/hisi_zip/<bdf>/qm/aeq_irq
++Date:           Apr 2020
++Contact:        linux-crypto@vger.kernel.org
++Description:    Dump the number of QM async event queue interrupts.
++		Available for both PF and VF, and take no other effect on ZIP.
++
++What:           /sys/kernel/debug/hisi_zip/<bdf>/qm/abnormal_irq
++Date:           Apr 2020
++Contact:        linux-crypto@vger.kernel.org
++Description:    Dump the number of interrupts for QM abnormal event.
++		Available for both PF and VF, and take no other effect on ZIP.
++
++What:           /sys/kernel/debug/hisi_zip/<bdf>/qm/create_qp_err
++Date:           Apr 2020
++Contact:        linux-crypto@vger.kernel.org
++Description:    Dump the number of queue allocation errors.
++		Available for both PF and VF, and take no other effect on ZIP.
++
++What:           /sys/kernel/debug/hisi_zip/<bdf>/qm/mb_err
++Date:           Apr 2020
++Contact:        linux-crypto@vger.kernel.org
++Description:    Dump the number of failed QM mailbox commands.
++		Available for both PF and VF, and take no other effect on ZIP.
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index 6365f93..744d131 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -324,6 +324,19 @@ struct hisi_qm_hw_ops {
+ 	enum acc_err_result (*hw_error_handle)(struct hisi_qm *qm);
  };
  
-+enum hpre_dfx_dbgfs_file {
-+	HPRE_SEND_CNT,
-+	HPRE_RECV_CNT,
-+	HPRE_SEND_FAIL_CNT,
-+	HPRE_SEND_BUSY_CNT,
-+	HPRE_OVER_THRHLD_CNT,
-+	HPRE_OVERTIME_THRHLD,
-+	HPRE_INVALID_REQ_CNT,
-+	HPRE_DFX_FILE_NUM
++struct qm_dfx_item {
++	const char *name;
++	u32 offset;
 +};
 +
- #define HPRE_DEBUGFS_FILE_NUM    (HPRE_DEBUG_FILE_NUM + HPRE_CLUSTERS_NUM - 1)
- 
- struct hpre_debugfs_file {
-@@ -34,6 +45,11 @@ struct hpre_debugfs_file {
- 	struct hpre_debug *debug;
- };
- 
-+struct hpre_dfx {
-+	atomic64_t value;
-+	enum hpre_dfx_dbgfs_file type;
++static struct qm_dfx_item qm_dfx_files[] = {
++	{"err_irq", offsetof(struct qm_dfx, err_irq_cnt)},
++	{"aeq_irq", offsetof(struct qm_dfx, aeq_irq_cnt)},
++	{"abnormal_irq", offsetof(struct qm_dfx, abnormal_irq_cnt)},
++	{"create_qp_err", offsetof(struct qm_dfx, create_qp_err_cnt)},
++	{"mb_err", offsetof(struct qm_dfx, mb_err_cnt)},
 +};
 +
- /*
-  * One HPRE controller has one PF and multiple VFs, some global configurations
-  * which PF has need this structure.
-@@ -41,6 +57,7 @@ struct hpre_debugfs_file {
-  */
- struct hpre_debug {
- 	struct dentry *debug_root;
-+	struct hpre_dfx dfx[HPRE_DFX_FILE_NUM];
- 	struct hpre_debugfs_file files[HPRE_DEBUGFS_FILE_NUM];
- };
+ static const char * const qm_debug_file_name[] = {
+ 	[CURRENT_Q]    = "current_q",
+ 	[CLEAR_ENABLE] = "clear_enable",
+@@ -514,6 +527,8 @@ static int qm_mb(struct hisi_qm *qm, u8 cmd, dma_addr_t dma_addr, u16 queue,
+ busy_unlock:
+ 	mutex_unlock(&qm->mailbox_lock);
  
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_crypto.c b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-index 6542525..7b5cb27 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_crypto.c
-@@ -10,6 +10,7 @@
- #include <linux/dma-mapping.h>
- #include <linux/fips.h>
- #include <linux/module.h>
-+#include <linux/time.h>
- #include "hpre.h"
- 
- struct hpre_ctx;
-@@ -32,6 +33,9 @@ struct hpre_ctx;
- #define HPRE_SQE_DONE_SHIFT	30
- #define HPRE_DH_MAX_P_SZ	512
- 
-+#define HPRE_DFX_SEC_TO_US	1000000
-+#define HPRE_DFX_US_TO_NS	1000
-+
- typedef void (*hpre_cb)(struct hpre_ctx *ctx, void *sqe);
- 
- struct hpre_rsa_ctx {
-@@ -68,6 +72,7 @@ struct hpre_dh_ctx {
- struct hpre_ctx {
- 	struct hisi_qp *qp;
- 	struct hpre_asym_request **req_list;
-+	struct hpre *hpre;
- 	spinlock_t req_lock;
- 	unsigned int key_sz;
- 	bool crt_g2_mode;
-@@ -90,6 +95,7 @@ struct hpre_asym_request {
- 	int err;
- 	int req_id;
- 	hpre_cb cb;
-+	struct timespec64 req_time;
- };
- 
- static DEFINE_MUTEX(hpre_alg_lock);
-@@ -119,6 +125,7 @@ static void hpre_free_req_id(struct hpre_ctx *ctx, int req_id)
- static int hpre_add_req_to_ctx(struct hpre_asym_request *hpre_req)
- {
- 	struct hpre_ctx *ctx;
-+	struct hpre_dfx *dfx;
- 	int id;
- 
- 	ctx = hpre_req->ctx;
-@@ -129,6 +136,10 @@ static int hpre_add_req_to_ctx(struct hpre_asym_request *hpre_req)
- 	ctx->req_list[id] = hpre_req;
- 	hpre_req->req_id = id;
- 
-+	dfx = ctx->hpre->debug.dfx;
-+	if (atomic64_read(&dfx[HPRE_OVERTIME_THRHLD].value))
-+		ktime_get_ts64(&hpre_req->req_time);
-+
- 	return id;
++	if (ret)
++		atomic64_inc(&qm->debug.dfx.mb_err_cnt);
+ 	return ret;
  }
  
-@@ -309,12 +320,16 @@ static int hpre_alg_res_post_hf(struct hpre_ctx *ctx, struct hpre_sqe *sqe,
+@@ -671,6 +686,7 @@ static irqreturn_t qm_irq(int irq, void *data)
+ 	if (readl(qm->io_base + QM_VF_EQ_INT_SOURCE))
+ 		return do_qm_irq(irq, data);
  
- static int hpre_ctx_set(struct hpre_ctx *ctx, struct hisi_qp *qp, int qlen)
- {
-+	struct hpre *hpre;
-+
- 	if (!ctx || !qp || qlen < 0)
- 		return -EINVAL;
++	atomic64_inc(&qm->debug.dfx.err_irq_cnt);
+ 	dev_err(&qm->pdev->dev, "invalid int source\n");
+ 	qm_db(qm, 0, QM_DOORBELL_CMD_EQ, qm->status.eq_head, 0);
  
- 	spin_lock_init(&ctx->req_lock);
- 	ctx->qp = qp;
+@@ -683,6 +699,7 @@ static irqreturn_t qm_aeq_irq(int irq, void *data)
+ 	struct qm_aeqe *aeqe = qm->aeqe + qm->status.aeq_head;
+ 	u32 type;
  
-+	hpre = container_of(ctx->qp->qm, struct hpre, qm);
-+	ctx->hpre = hpre;
- 	ctx->req_list = kcalloc(qlen, sizeof(void *), GFP_KERNEL);
- 	if (!ctx->req_list)
- 		return -ENOMEM;
-@@ -337,38 +352,80 @@ static void hpre_ctx_clear(struct hpre_ctx *ctx, bool is_clear_all)
- 	ctx->key_sz = 0;
++	atomic64_inc(&qm->debug.dfx.aeq_irq_cnt);
+ 	if (!readl(qm->io_base + QM_VF_AEQ_INT_SOURCE))
+ 		return IRQ_NONE;
+ 
+@@ -1192,6 +1209,7 @@ static struct hisi_qp *qm_create_qp_nolock(struct hisi_qm *qm, u8 alg_type)
+ 	if (qm->qp_in_used == qm->qp_num) {
+ 		dev_info_ratelimited(dev, "All %u queues of QM are busy!\n",
+ 				     qm->qp_num);
++		atomic64_inc(&qm->debug.dfx.create_qp_err_cnt);
+ 		return ERR_PTR(-EBUSY);
+ 	}
+ 
+@@ -1199,6 +1217,7 @@ static struct hisi_qp *qm_create_qp_nolock(struct hisi_qm *qm, u8 alg_type)
+ 	if (qp_id < 0) {
+ 		dev_info_ratelimited(dev, "All %u queues of QM are busy!\n",
+ 				    qm->qp_num);
++		atomic64_inc(&qm->debug.dfx.create_qp_err_cnt);
+ 		return ERR_PTR(-EBUSY);
+ 	}
+ 
+@@ -2249,6 +2268,26 @@ int hisi_qm_stop(struct hisi_qm *qm)
  }
+ EXPORT_SYMBOL_GPL(hisi_qm_stop);
  
-+static bool hpre_is_bd_timeout(struct hpre_asym_request *req,
-+			       u64 overtime_thrhld)
++static int qm_debugfs_atomic64_set(void *data, u64 val)
 +{
-+	struct timespec64 reply_time;
-+	u64 time_use_us;
-+
-+	ktime_get_ts64(&reply_time);
-+	time_use_us = (reply_time.tv_sec - req->req_time.tv_sec) *
-+		HPRE_DFX_SEC_TO_US +
-+		(reply_time.tv_nsec - req->req_time.tv_nsec) /
-+		HPRE_DFX_US_TO_NS;
-+
-+	if (time_use_us <= overtime_thrhld)
-+		return false;
-+
-+	return true;
-+}
-+
- static void hpre_dh_cb(struct hpre_ctx *ctx, void *resp)
- {
-+	struct hpre_dfx *dfx = ctx->hpre->debug.dfx;
- 	struct hpre_asym_request *req;
- 	struct kpp_request *areq;
-+	u64 overtime_thrhld;
- 	int ret;
- 
- 	ret = hpre_alg_res_post_hf(ctx, resp, (void **)&req);
- 	areq = req->areq.dh;
- 	areq->dst_len = ctx->key_sz;
-+
-+	overtime_thrhld = atomic64_read(&dfx[HPRE_OVERTIME_THRHLD].value);
-+	if (overtime_thrhld && hpre_is_bd_timeout(req, overtime_thrhld))
-+		atomic64_inc(&dfx[HPRE_OVER_THRHLD_CNT].value);
-+
- 	hpre_hw_data_clr_all(ctx, req, areq->dst, areq->src);
- 	kpp_request_complete(areq, ret);
-+	atomic64_inc(&dfx[HPRE_RECV_CNT].value);
- }
- 
- static void hpre_rsa_cb(struct hpre_ctx *ctx, void *resp)
- {
-+	struct hpre_dfx *dfx = ctx->hpre->debug.dfx;
- 	struct hpre_asym_request *req;
- 	struct akcipher_request *areq;
-+	u64 overtime_thrhld;
- 	int ret;
- 
- 	ret = hpre_alg_res_post_hf(ctx, resp, (void **)&req);
-+
-+	overtime_thrhld = atomic64_read(&dfx[HPRE_OVERTIME_THRHLD].value);
-+	if (overtime_thrhld && hpre_is_bd_timeout(req, overtime_thrhld))
-+		atomic64_inc(&dfx[HPRE_OVER_THRHLD_CNT].value);
-+
- 	areq = req->areq.rsa;
- 	areq->dst_len = ctx->key_sz;
- 	hpre_hw_data_clr_all(ctx, req, areq->dst, areq->src);
- 	akcipher_request_complete(areq, ret);
-+	atomic64_inc(&dfx[HPRE_RECV_CNT].value);
- }
- 
- static void hpre_alg_cb(struct hisi_qp *qp, void *resp)
- {
- 	struct hpre_ctx *ctx = qp->qp_ctx;
-+	struct hpre_dfx *dfx = ctx->hpre->debug.dfx;
- 	struct hpre_sqe *sqe = resp;
-+	struct hpre_asym_request *req = ctx->req_list[le16_to_cpu(sqe->tag)];
- 
--	ctx->req_list[le16_to_cpu(sqe->tag)]->cb(ctx, resp);
-+
-+	if (unlikely(!req)) {
-+		atomic64_inc(&dfx[HPRE_INVALID_REQ_CNT].value);
-+		return;
-+	}
-+
-+	req->cb(ctx, resp);
- }
- 
- static int hpre_ctx_init(struct hpre_ctx *ctx)
-@@ -436,6 +493,29 @@ static int hpre_msg_request_set(struct hpre_ctx *ctx, void *req, bool is_rsa)
- 	return 0;
- }
- 
-+static int hpre_send(struct hpre_ctx *ctx, struct hpre_sqe *msg)
-+{
-+	struct hpre_dfx *dfx = ctx->hpre->debug.dfx;
-+	int ctr = 0;
-+	int ret;
-+
-+	do {
-+		atomic64_inc(&dfx[HPRE_SEND_CNT].value);
-+		ret = hisi_qp_send(ctx->qp, msg);
-+		if (ret != -EBUSY)
-+			break;
-+		atomic64_inc(&dfx[HPRE_SEND_BUSY_CNT].value);
-+	} while (ctr++ < HPRE_TRY_SEND_TIMES);
-+
-+	if (likely(!ret))
-+		return ret;
-+
-+	if (ret != -EBUSY)
-+		atomic64_inc(&dfx[HPRE_SEND_FAIL_CNT].value);
-+
-+	return ret;
-+}
-+
- #ifdef CONFIG_CRYPTO_DH
- static int hpre_dh_compute_value(struct kpp_request *req)
- {
-@@ -444,7 +524,6 @@ static int hpre_dh_compute_value(struct kpp_request *req)
- 	void *tmp = kpp_request_ctx(req);
- 	struct hpre_asym_request *hpre_req = PTR_ALIGN(tmp, HPRE_ALIGN_SZ);
- 	struct hpre_sqe *msg = &hpre_req->req;
--	int ctr = 0;
- 	int ret;
- 
- 	ret = hpre_msg_request_set(ctx, req, false);
-@@ -465,11 +544,9 @@ static int hpre_dh_compute_value(struct kpp_request *req)
- 		msg->dw0 = cpu_to_le32(le32_to_cpu(msg->dw0) | HPRE_ALG_DH_G2);
- 	else
- 		msg->dw0 = cpu_to_le32(le32_to_cpu(msg->dw0) | HPRE_ALG_DH);
--	do {
--		ret = hisi_qp_send(ctx->qp, msg);
--	} while (ret == -EBUSY && ctr++ < HPRE_TRY_SEND_TIMES);
- 
- 	/* success */
-+	ret = hpre_send(ctx, msg);
- 	if (likely(!ret))
- 		return -EINPROGRESS;
- 
-@@ -647,7 +724,6 @@ static int hpre_rsa_enc(struct akcipher_request *req)
- 	void *tmp = akcipher_request_ctx(req);
- 	struct hpre_asym_request *hpre_req = PTR_ALIGN(tmp, HPRE_ALIGN_SZ);
- 	struct hpre_sqe *msg = &hpre_req->req;
--	int ctr = 0;
- 	int ret;
- 
- 	/* For 512 and 1536 bits key size, use soft tfm instead */
-@@ -677,11 +753,8 @@ static int hpre_rsa_enc(struct akcipher_request *req)
- 	if (unlikely(ret))
- 		goto clear_all;
- 
--	do {
--		ret = hisi_qp_send(ctx->qp, msg);
--	} while (ret == -EBUSY && ctr++ < HPRE_TRY_SEND_TIMES);
--
- 	/* success */
-+	ret = hpre_send(ctx, msg);
- 	if (likely(!ret))
- 		return -EINPROGRESS;
- 
-@@ -699,7 +772,6 @@ static int hpre_rsa_dec(struct akcipher_request *req)
- 	void *tmp = akcipher_request_ctx(req);
- 	struct hpre_asym_request *hpre_req = PTR_ALIGN(tmp, HPRE_ALIGN_SZ);
- 	struct hpre_sqe *msg = &hpre_req->req;
--	int ctr = 0;
- 	int ret;
- 
- 	/* For 512 and 1536 bits key size, use soft tfm instead */
-@@ -736,11 +808,8 @@ static int hpre_rsa_dec(struct akcipher_request *req)
- 	if (unlikely(ret))
- 		goto clear_all;
- 
--	do {
--		ret = hisi_qp_send(ctx->qp, msg);
--	} while (ret == -EBUSY && ctr++ < HPRE_TRY_SEND_TIMES);
--
- 	/* success */
-+	ret = hpre_send(ctx, msg);
- 	if (likely(!ret))
- 		return -EINPROGRESS;
- 
-diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
-index c5ddd3a..fb3988f 100644
---- a/drivers/crypto/hisilicon/hpre/hpre_main.c
-+++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
-@@ -159,6 +159,16 @@ static const struct debugfs_reg32 hpre_com_dfx_regs[] = {
- 	{"INT_STATUS               ",  HPRE_INT_STATUS},
- };
- 
-+static const char *hpre_dfx_files[HPRE_DFX_FILE_NUM] = {
-+	"send_cnt",
-+	"recv_cnt",
-+	"send_fail_cnt",
-+	"send_busy_cnt",
-+	"over_thrhld_cnt",
-+	"overtime_thrhld",
-+	"invalid_req_cnt"
-+};
-+
- static int pf_q_num_set(const char *val, const struct kernel_param *kp)
- {
- 	return q_num_set(val, kp, HPRE_PCI_DEVICE_ID);
-@@ -524,6 +534,33 @@ static const struct file_operations hpre_ctrl_debug_fops = {
- 	.write = hpre_ctrl_debug_write,
- };
- 
-+static int hpre_debugfs_atomic64_get(void *data, u64 *val)
-+{
-+	struct hpre_dfx *dfx_item = data;
-+
-+	*val = atomic64_read(&dfx_item->value);
-+
-+	return 0;
-+}
-+
-+static int hpre_debugfs_atomic64_set(void *data, u64 val)
-+{
-+	struct hpre_dfx *dfx_item = data;
-+	struct hpre_dfx *hpre_dfx = dfx_item - HPRE_OVERTIME_THRHLD;
-+
 +	if (val)
 +		return -EINVAL;
 +
-+	if (dfx_item->type == HPRE_OVERTIME_THRHLD)
-+		atomic64_set(&hpre_dfx[HPRE_OVER_THRHLD_CNT].value, 0);
-+	atomic64_set(&dfx_item->value, val);
++	atomic64_set((atomic64_t *)data, 0);
 +
 +	return 0;
 +}
 +
-+DEFINE_DEBUGFS_ATTRIBUTE(hpre_atomic64_ops, hpre_debugfs_atomic64_get,
-+			 hpre_debugfs_atomic64_set, "%llu\n");
-+
- static int hpre_create_debugfs_file(struct hpre_debug *dbg, struct dentry *dir,
- 				    enum hpre_ctrl_dbgfs_file type, int indx)
- {
-@@ -621,6 +658,22 @@ static int hpre_ctrl_debug_init(struct hpre_debug *debug)
- 	return hpre_cluster_debugfs_init(debug);
- }
- 
-+static void hpre_dfx_debug_init(struct hpre_debug *debug)
++static int qm_debugfs_atomic64_get(void *data, u64 *val)
 +{
-+	struct hpre *hpre = container_of(debug, struct hpre, debug);
-+	struct hpre_dfx *dfx = hpre->debug.dfx;
-+	struct hisi_qm *qm = &hpre->qm;
-+	struct dentry *parent;
-+	int i;
++	*val = atomic64_read((atomic64_t *)data);
 +
-+	parent = debugfs_create_dir("hpre_dfx", qm->debug.debug_root);
-+	for (i = 0; i < HPRE_DFX_FILE_NUM; i++) {
-+		dfx[i].type = i;
-+		debugfs_create_file(hpre_dfx_files[i], 0644, parent, &dfx[i],
-+				    &hpre_atomic64_ops);
-+	}
++	return 0;
 +}
 +
- static int hpre_debugfs_init(struct hpre *hpre)
- {
- 	struct hisi_qm *qm = &hpre->qm;
-@@ -641,6 +694,9 @@ static int hpre_debugfs_init(struct hpre *hpre)
- 		if (ret)
- 			goto failed_to_create;
- 	}
++DEFINE_DEBUGFS_ATTRIBUTE(qm_atomic64_ops, qm_debugfs_atomic64_get,
++			 qm_debugfs_atomic64_set, "%llu\n");
 +
-+	hpre_dfx_debug_init(&hpre->debug);
+ /**
+  * hisi_qm_debug_init() - Initialize qm related debugfs files.
+  * @qm: The qm for which we want to add debugfs files.
+@@ -2257,7 +2296,9 @@ EXPORT_SYMBOL_GPL(hisi_qm_stop);
+  */
+ int hisi_qm_debug_init(struct hisi_qm *qm)
+ {
++	struct qm_dfx *dfx = &qm->debug.dfx;
+ 	struct dentry *qm_d;
++	void *data;
+ 	int i, ret;
+ 
+ 	qm_d = debugfs_create_dir("qm", qm->debug.debug_root);
+@@ -2273,6 +2314,15 @@ int hisi_qm_debug_init(struct hisi_qm *qm)
+ 
+ 	debugfs_create_file("qm_regs", 0444, qm->debug.qm_d, qm, &qm_regs_fops);
+ 
++	for (i = 0; i < ARRAY_SIZE(qm_dfx_files); i++) {
++		data = (atomic64_t *)((uintptr_t)dfx + qm_dfx_files[i].offset);
++		debugfs_create_file(qm_dfx_files[i].name,
++			0644,
++			qm_d,
++			data,
++			&qm_atomic64_ops);
++	}
 +
  	return 0;
  
  failed_to_create:
+@@ -3311,6 +3361,7 @@ static irqreturn_t qm_abnormal_irq(int irq, void *data)
+ 	struct hisi_qm *qm = data;
+ 	enum acc_err_result ret;
+ 
++	atomic64_inc(&qm->debug.dfx.abnormal_irq_cnt);
+ 	ret = qm_process_dev_error(qm);
+ 	if (ret == ACC_ERR_NEED_RESET)
+ 		schedule_work(&qm->rst_work);
+diff --git a/drivers/crypto/hisilicon/qm.h b/drivers/crypto/hisilicon/qm.h
+index a431ff2..e4b46a7 100644
+--- a/drivers/crypto/hisilicon/qm.h
++++ b/drivers/crypto/hisilicon/qm.h
+@@ -121,6 +121,14 @@ enum qm_debug_file {
+ 	DEBUG_FILE_NUM,
+ };
+ 
++struct qm_dfx {
++	atomic64_t err_irq_cnt;
++	atomic64_t aeq_irq_cnt;
++	atomic64_t abnormal_irq_cnt;
++	atomic64_t create_qp_err_cnt;
++	atomic64_t mb_err_cnt;
++};
++
+ struct debugfs_file {
+ 	enum qm_debug_file index;
+ 	struct mutex lock;
+@@ -129,6 +137,7 @@ struct debugfs_file {
+ 
+ struct qm_debug {
+ 	u32 curr_qm_qp_num;
++	struct qm_dfx dfx;
+ 	struct dentry *debug_root;
+ 	struct dentry *qm_d;
+ 	struct debugfs_file files[DEBUG_FILE_NUM];
 -- 
 2.7.4
 
