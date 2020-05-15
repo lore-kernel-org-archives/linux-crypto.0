@@ -6,21 +6,21 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9222C433DF
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 May 2020 09:15:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF03CC433E3
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 May 2020 09:15:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CA1B32065C
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 May 2020 09:15:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A2A01206F1
+	for <linux-crypto@archiver.kernel.org>; Fri, 15 May 2020 09:15:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727858AbgEOJPX (ORCPT
+        id S1727861AbgEOJPX (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
         Fri, 15 May 2020 05:15:23 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:58012 "EHLO huawei.com"
+Received: from szxga07-in.huawei.com ([45.249.212.35]:58104 "EHLO huawei.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1727861AbgEOJPW (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 May 2020 05:15:22 -0400
+        id S1727882AbgEOJPX (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 15 May 2020 05:15:23 -0400
 Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.58])
-        by Forcepoint Email with ESMTP id AE982551CDF53B306D4F;
+        by Forcepoint Email with ESMTP id B877FC5E5C58780133AB;
         Fri, 15 May 2020 17:15:18 +0800 (CST)
 Received: from localhost.localdomain (10.69.192.56) by
  DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
@@ -29,9 +29,9 @@ From:   Shukun Tan <tanshukun1@huawei.com>
 To:     <herbert@gondor.apana.org.au>, <davem@davemloft.net>
 CC:     <linux-crypto@vger.kernel.org>, <xuzaibo@huawei.com>,
         <wangzhou1@hisilicon.com>
-Subject: [PATCH 3/7] crypto: hisilicon/sec2 - add debugfs for Hisilicon SEC
-Date:   Fri, 15 May 2020 17:13:56 +0800
-Message-ID: <1589534040-50725-4-git-send-email-tanshukun1@huawei.com>
+Subject: [PATCH 6/7] crypto: hisilicon/qm - add DebugFS for xQC and xQE dump
+Date:   Fri, 15 May 2020 17:13:59 +0800
+Message-ID: <1589534040-50725-7-git-send-email-tanshukun1@huawei.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1589534040-50725-1-git-send-email-tanshukun1@huawei.com>
 References: <1589534040-50725-1-git-send-email-tanshukun1@huawei.com>
@@ -44,274 +44,645 @@ Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-From: Kai Ye <yekai13@huawei.com>
+Add dump information of SQC/CQC/EQC/AEQC/SQE/CQE/EQE/AEQE.
 
-Hisilicon SEC engine driver uses debugfs
-to provides IO operation debug information
-
-Signed-off-by: Kai Ye <yekai13@huawei.com>
-Signed-off-by: Longfang Liu <liulongfang@huawei.com>
 Signed-off-by: Shukun Tan <tanshukun1@huawei.com>
 Reviewed-by: Zhou Wang <wangzhou1@hisilicon.com>
 ---
- Documentation/ABI/testing/debugfs-hisi-sec | 54 ++++++++++++++++++++++++------
- drivers/crypto/hisilicon/sec2/sec.h        |  4 +++
- drivers/crypto/hisilicon/sec2/sec_crypto.c | 15 +++++++--
- drivers/crypto/hisilicon/sec2/sec_main.c   | 43 ++++++++++++++++++++----
- 4 files changed, 95 insertions(+), 21 deletions(-)
+ drivers/crypto/hisilicon/hpre/hpre_main.c |   4 +
+ drivers/crypto/hisilicon/qm.c             | 511 +++++++++++++++++++++++++++---
+ drivers/crypto/hisilicon/qm.h             |   2 +
+ drivers/crypto/hisilicon/sec2/sec_main.c  |   6 +
+ drivers/crypto/hisilicon/zip/zip_main.c   |   4 +
+ 5 files changed, 488 insertions(+), 39 deletions(-)
 
-diff --git a/Documentation/ABI/testing/debugfs-hisi-sec b/Documentation/ABI/testing/debugfs-hisi-sec
-index 54699a1..725c780 100644
---- a/Documentation/ABI/testing/debugfs-hisi-sec
-+++ b/Documentation/ABI/testing/debugfs-hisi-sec
-@@ -1,10 +1,4 @@
--What:           /sys/kernel/debug/hisi_sec/<bdf>/sec_dfx
--Date:           Oct 2019
--Contact:        linux-crypto@vger.kernel.org
--Description:    Dump the debug registers of SEC cores.
--		Only available for PF.
--
--What:           /sys/kernel/debug/hisi_sec/<bdf>/clear_enable
-+What:           /sys/kernel/debug/hisi_sec2/<bdf>/clear_enable
- Date:           Oct 2019
- Contact:        linux-crypto@vger.kernel.org
- Description:    Enabling/disabling of clear action after reading
-@@ -12,7 +6,7 @@ Description:    Enabling/disabling of clear action after reading
- 		0: disable, 1: enable.
- 		Only available for PF, and take no other effect on SEC.
+diff --git a/drivers/crypto/hisilicon/hpre/hpre_main.c b/drivers/crypto/hisilicon/hpre/hpre_main.c
+index fb3988f..38405b5 100644
+--- a/drivers/crypto/hisilicon/hpre/hpre_main.c
++++ b/drivers/crypto/hisilicon/hpre/hpre_main.c
+@@ -84,6 +84,8 @@
+ #define HPRE_OOO_ECC_2BIT_ERR		BIT(5)
  
--What:           /sys/kernel/debug/hisi_sec/<bdf>/current_qm
-+What:           /sys/kernel/debug/hisi_sec2/<bdf>/current_qm
- Date:           Oct 2019
- Contact:        linux-crypto@vger.kernel.org
- Description:    One SEC controller has one PF and multiple VFs, each function
-@@ -20,21 +14,21 @@ Description:    One SEC controller has one PF and multiple VFs, each function
- 		qm refers to.
- 		Only available for PF.
+ #define HPRE_VIA_MSI_DSM		1
++#define HPRE_SQE_MASK_OFFSET		8
++#define HPRE_SQE_MASK_LEN		24
  
--What:           /sys/kernel/debug/hisi_sec/<bdf>/qm/qm_regs
-+What:           /sys/kernel/debug/hisi_sec2/<bdf>/qm/qm_regs
- Date:           Oct 2019
- Contact:        linux-crypto@vger.kernel.org
- Description:    Dump of QM related debug registers.
- 		Available for PF and VF in host. VF in guest currently only
- 		has one debug register.
+ static struct hisi_qm_list hpre_devices;
+ static const char hpre_name[] = "hisi_hpre";
+@@ -683,6 +685,8 @@ static int hpre_debugfs_init(struct hpre *hpre)
  
--What:           /sys/kernel/debug/hisi_sec/<bdf>/qm/current_q
-+What:           /sys/kernel/debug/hisi_sec2/<bdf>/qm/current_q
- Date:           Oct 2019
- Contact:        linux-crypto@vger.kernel.org
- Description:    One QM of SEC may contain multiple queues. Select specific
- 		queue to show its debug registers in above 'qm_regs'.
- 		Only available for PF.
+ 	dir = debugfs_create_dir(dev_name(dev), hpre_debugfs_root);
+ 	qm->debug.debug_root = dir;
++	qm->debug.sqe_mask_offset = HPRE_SQE_MASK_OFFSET;
++	qm->debug.sqe_mask_len = HPRE_SQE_MASK_LEN;
  
--What:           /sys/kernel/debug/hisi_sec/<bdf>/qm/clear_enable
-+What:           /sys/kernel/debug/hisi_sec2/<bdf>/qm/clear_enable
- Date:           Oct 2019
- Contact:        linux-crypto@vger.kernel.org
- Description:    Enabling/disabling of clear action after reading
-@@ -79,3 +73,41 @@ Contact:        linux-crypto@vger.kernel.org
- Description:    Dump the status of the QM.
- 		Four states: initiated, started, stopped and closed.
- 		Available for both PF and VF, and take no other effect on SEC.
+ 	ret = hisi_qm_debug_init(qm);
+ 	if (ret)
+diff --git a/drivers/crypto/hisilicon/qm.c b/drivers/crypto/hisilicon/qm.c
+index 7c1982f..57ad131 100644
+--- a/drivers/crypto/hisilicon/qm.c
++++ b/drivers/crypto/hisilicon/qm.c
+@@ -176,9 +176,12 @@
+ #define QMC_ALIGN(sz)			ALIGN(sz, 32)
+ 
+ #define QM_DBG_READ_LEN		256
++#define QM_DBG_WRITE_LEN		1024
+ #define QM_DBG_TMP_BUF_LEN		22
+ #define QM_PCI_COMMAND_INVALID		~0
+ 
++#define QM_SQE_ADDR_MASK		GENMASK(7, 0)
 +
-+What:           /sys/kernel/debug/hisi_sec2/<bdf>/sec_dfx/send_cnt
-+Date:           Apr 2020
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump the total number of sent requests.
-+		Available for both PF and VF, and take no other effect on SEC.
-+
-+What:           /sys/kernel/debug/hisi_sec2/<bdf>/sec_dfx/recv_cnt
-+Date:           Apr 2020
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump the total number of received requests.
-+		Available for both PF and VF, and take no other effect on SEC.
-+
-+What:           /sys/kernel/debug/hisi_sec2/<bdf>/sec_dfx/send_busy_cnt
-+Date:           Apr 2020
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump the total number of requests sent with returning busy.
-+		Available for both PF and VF, and take no other effect on SEC.
-+
-+What:           /sys/kernel/debug/hisi_sec2/<bdf>/sec_dfx/err_bd_cnt
-+Date:           Apr 2020
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump the total number of BD type error requests
-+		to be received.
-+		Available for both PF and VF, and take no other effect on SEC.
-+
-+What:           /sys/kernel/debug/hisi_sec2/<bdf>/sec_dfx/invalid_req_cnt
-+Date:           Apr 2020
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump the total number of invalid requests being received.
-+		Available for both PF and VF, and take no other effect on SEC.
-+
-+What:           /sys/kernel/debug/hisi_sec2/<bdf>/sec_dfx/done_flag_cnt
-+Date:           Apr 2020
-+Contact:        linux-crypto@vger.kernel.org
-+Description:    Dump the total number of completed but marked error requests
-+		to be received.
-+		Available for both PF and VF, and take no other effect on SEC.
-diff --git a/drivers/crypto/hisilicon/sec2/sec.h b/drivers/crypto/hisilicon/sec2/sec.h
-index 2326634..7b64aca 100644
---- a/drivers/crypto/hisilicon/sec2/sec.h
-+++ b/drivers/crypto/hisilicon/sec2/sec.h
-@@ -160,6 +160,10 @@ struct sec_debug_file {
- struct sec_dfx {
- 	atomic64_t send_cnt;
- 	atomic64_t recv_cnt;
-+	atomic64_t send_busy_cnt;
-+	atomic64_t err_bd_cnt;
-+	atomic64_t invalid_req_cnt;
-+	atomic64_t done_flag_cnt;
+ #define QM_MK_CQC_DW3_V1(hop_num, pg_sz, buf_sz, cqe_sz) \
+ 	(((hop_num) << QM_CQ_HOP_NUM_SHIFT)	| \
+ 	((pg_sz) << QM_CQ_PAGE_SIZE_SHIFT)	| \
+@@ -1064,6 +1067,473 @@ static const struct file_operations qm_regs_fops = {
+ 	.release = single_release,
  };
  
- struct sec_debug {
-diff --git a/drivers/crypto/hisilicon/sec2/sec_crypto.c b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-index 848ab49..64614a9 100644
---- a/drivers/crypto/hisilicon/sec2/sec_crypto.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_crypto.c
-@@ -148,6 +148,7 @@ static int sec_aead_verify(struct sec_req *req)
- static void sec_req_cb(struct hisi_qp *qp, void *resp)
- {
- 	struct sec_qp_ctx *qp_ctx = qp->qp_ctx;
-+	struct sec_dfx *dfx = &qp_ctx->ctx->sec->debug.dfx;
- 	struct sec_sqe *bd = resp;
- 	struct sec_ctx *ctx;
- 	struct sec_req *req;
-@@ -157,11 +158,16 @@ static void sec_req_cb(struct hisi_qp *qp, void *resp)
- 
- 	type = bd->type_cipher_auth & SEC_TYPE_MASK;
- 	if (unlikely(type != SEC_BD_TYPE2)) {
-+		atomic64_inc(&dfx->err_bd_cnt);
- 		pr_err("err bd type [%d]\n", type);
- 		return;
- 	}
- 
- 	req = qp_ctx->req_list[le16_to_cpu(bd->type2.tag)];
-+	if (unlikely(!req)) {
-+		atomic64_inc(&dfx->invalid_req_cnt);
-+		return;
++static ssize_t qm_cmd_read(struct file *filp, char __user *buffer,
++			   size_t count, loff_t *pos)
++{
++	char buf[QM_DBG_READ_LEN];
++	int len;
++
++	if (*pos)
++		return 0;
++
++	if (count < QM_DBG_READ_LEN)
++		return -ENOSPC;
++
++	len = snprintf(buf, QM_DBG_READ_LEN, "%s\n",
++		       "Please echo help to cmd to get help information");
++
++	if (copy_to_user(buffer, buf, len))
++		return -EFAULT;
++
++	return (*pos = len);
++}
++
++static void *qm_ctx_alloc(struct hisi_qm *qm, size_t ctx_size,
++			  dma_addr_t *dma_addr)
++{
++	struct device *dev = &qm->pdev->dev;
++	void *ctx_addr;
++
++	ctx_addr = kzalloc(ctx_size, GFP_KERNEL);
++	if (!ctx_addr)
++		return ERR_PTR(-ENOMEM);
++
++	*dma_addr = dma_map_single(dev, ctx_addr, ctx_size, DMA_FROM_DEVICE);
++	if (dma_mapping_error(dev, *dma_addr)) {
++		dev_err(dev, "DMA mapping error!\n");
++		kfree(ctx_addr);
++		return ERR_PTR(-ENOMEM);
 +	}
- 	req->err_type = bd->type2.error_type;
- 	ctx = req->ctx;
- 	done = le16_to_cpu(bd->type2.done_flag) & SEC_DONE_MASK;
-@@ -174,12 +180,13 @@ static void sec_req_cb(struct hisi_qp *qp, void *resp)
- 			"err_type[%d],done[%d],flag[%d]\n",
- 			req->err_type, done, flag);
- 		err = -EIO;
-+		atomic64_inc(&dfx->done_flag_cnt);
- 	}
- 
- 	if (ctx->alg_type == SEC_AEAD && !req->c_req.encrypt)
- 		err = sec_aead_verify(req);
- 
--	atomic64_inc(&ctx->sec->debug.dfx.recv_cnt);
-+	atomic64_inc(&dfx->recv_cnt);
- 
- 	ctx->req_op->buf_unmap(ctx, req);
- 
-@@ -200,10 +207,12 @@ static int sec_bd_send(struct sec_ctx *ctx, struct sec_req *req)
- 		return -ENOBUFS;
- 
- 	if (!ret) {
--		if (req->fake_busy)
-+		if (req->fake_busy) {
-+			atomic64_inc(&ctx->sec->debug.dfx.send_busy_cnt);
- 			ret = -EBUSY;
--		else
-+		} else {
- 			ret = -EINPROGRESS;
-+		}
- 	}
- 
- 	return ret;
-diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
-index c3381f2..5ea44ad 100644
---- a/drivers/crypto/hisilicon/sec2/sec_main.c
-+++ b/drivers/crypto/hisilicon/sec2/sec_main.c
-@@ -88,6 +88,11 @@ struct sec_hw_error {
- 	const char *msg;
- };
- 
-+struct sec_dfx_item {
-+	const char *name;
-+	u32 offset;
-+};
 +
- static const char sec_name[] = "hisi_sec2";
- static struct dentry *sec_debugfs_root;
- static struct hisi_qm_list sec_devices;
-@@ -110,6 +115,15 @@ static const char * const sec_dbg_file_name[] = {
- 	[SEC_CLEAR_ENABLE] = "clear_enable",
- };
- 
-+static struct sec_dfx_item sec_dfx_labels[] = {
-+	{"send_cnt", offsetof(struct sec_dfx, send_cnt)},
-+	{"recv_cnt", offsetof(struct sec_dfx, recv_cnt)},
-+	{"send_busy_cnt", offsetof(struct sec_dfx, send_busy_cnt)},
-+	{"err_bd_cnt", offsetof(struct sec_dfx, err_bd_cnt)},
-+	{"invalid_req_cnt", offsetof(struct sec_dfx, invalid_req_cnt)},
-+	{"done_flag_cnt", offsetof(struct sec_dfx, done_flag_cnt)},
-+};
++	return ctx_addr;
++}
 +
- static const struct debugfs_reg32 sec_dfx_regs[] = {
- 	{"SEC_PF_ABNORMAL_INT_SOURCE    ",  0x301010},
- 	{"SEC_SAA_EN                    ",  0x301270},
-@@ -543,10 +557,22 @@ static const struct file_operations sec_dbg_fops = {
- static int sec_debugfs_atomic64_get(void *data, u64 *val)
- {
- 	*val = atomic64_read((atomic64_t *)data);
++static void qm_ctx_free(struct hisi_qm *qm, size_t ctx_size,
++			const void *ctx_addr, dma_addr_t *dma_addr)
++{
++	struct device *dev = &qm->pdev->dev;
++
++	dma_unmap_single(dev, *dma_addr, ctx_size, DMA_FROM_DEVICE);
++	kfree(ctx_addr);
++}
++
++static int dump_show(struct hisi_qm *qm, void *info,
++		     unsigned int info_size, char *info_name)
++{
++	struct device *dev = &qm->pdev->dev;
++	u8 *info_buf, *info_curr = info;
++	u32 i;
++#define BYTE_PER_DW	4
++
++	info_buf = kzalloc(info_size, GFP_KERNEL);
++	if (!info_buf)
++		return -ENOMEM;
++
++	for (i = 0; i < info_size; i++, info_curr++) {
++		if (i % BYTE_PER_DW == 0)
++			info_buf[i + 3UL] = *info_curr;
++		else if (i % BYTE_PER_DW == 1)
++			info_buf[i + 1UL] = *info_curr;
++		else if (i % BYTE_PER_DW == 2)
++			info_buf[i - 1] = *info_curr;
++		else if (i % BYTE_PER_DW == 3)
++			info_buf[i - 3] = *info_curr;
++	}
++
++	dev_info(dev, "%s DUMP\n", info_name);
++	for (i = 0; i < info_size; i += BYTE_PER_DW) {
++		pr_info("DW%d: %02X%02X %02X%02X\n", i / BYTE_PER_DW,
++			info_buf[i], info_buf[i + 1UL],
++			info_buf[i + 2UL], info_buf[i + 3UL]);
++	}
++
++	kfree(info_buf);
 +
 +	return 0;
 +}
 +
-+static int sec_debugfs_atomic64_set(void *data, u64 val)
++static int qm_dump_sqc_raw(struct hisi_qm *qm, dma_addr_t dma_addr, u16 qp_id)
 +{
-+	if (val)
++	return qm_mb(qm, QM_MB_CMD_SQC, dma_addr, qp_id, 1);
++}
++
++static int qm_dump_cqc_raw(struct hisi_qm *qm, dma_addr_t dma_addr, u16 qp_id)
++{
++	return qm_mb(qm, QM_MB_CMD_CQC, dma_addr, qp_id, 1);
++}
++
++static int qm_sqc_dump(struct hisi_qm *qm, const char *s)
++{
++	struct device *dev = &qm->pdev->dev;
++	struct qm_sqc *sqc, *sqc_curr;
++	dma_addr_t sqc_dma;
++	u32 qp_id;
++	int ret;
++
++	if (!s)
 +		return -EINVAL;
 +
-+	atomic64_set((atomic64_t *)data, 0);
-+
- 	return 0;
- }
-+
- DEFINE_DEBUGFS_ATTRIBUTE(sec_atomic64_ops, sec_debugfs_atomic64_get,
--			 NULL, "%lld\n");
-+			 sec_debugfs_atomic64_set, "%lld\n");
- 
- static int sec_core_debug_init(struct sec_dev *sec)
- {
-@@ -555,6 +581,7 @@ static int sec_core_debug_init(struct sec_dev *sec)
- 	struct sec_dfx *dfx = &sec->debug.dfx;
- 	struct debugfs_regset32 *regset;
- 	struct dentry *tmp_d;
-+	int i;
- 
- 	tmp_d = debugfs_create_dir("sec_dfx", sec->qm.debug.debug_root);
- 
-@@ -566,13 +593,15 @@ static int sec_core_debug_init(struct sec_dev *sec)
- 	regset->nregs = ARRAY_SIZE(sec_dfx_regs);
- 	regset->base = qm->io_base;
- 
--	debugfs_create_regset32("regs", 0444, tmp_d, regset);
-+	if (qm->pdev->device == SEC_PF_PCI_DEVICE_ID)
-+		debugfs_create_regset32("regs", 0444, tmp_d, regset);
- 
--	debugfs_create_file("send_cnt", 0444, tmp_d,
--			    &dfx->send_cnt, &sec_atomic64_ops);
--
--	debugfs_create_file("recv_cnt", 0444, tmp_d,
--			    &dfx->recv_cnt, &sec_atomic64_ops);
-+	for (i = 0; i < ARRAY_SIZE(sec_dfx_labels); i++) {
-+		atomic64_t *data = (atomic64_t *)((uintptr_t)dfx +
-+					sec_dfx_labels[i].offset);
-+		debugfs_create_file(sec_dfx_labels[i].name, 0644,
-+				   tmp_d, data, &sec_atomic64_ops);
++	ret = kstrtou32(s, 0, &qp_id);
++	if (ret || qp_id >= qm->qp_num) {
++		dev_err(dev, "Please input qp num (0-%d)", qm->qp_num - 1);
++		return -EINVAL;
 +	}
- 
- 	return 0;
++
++	sqc = qm_ctx_alloc(qm, sizeof(*sqc), &sqc_dma);
++	if (IS_ERR(sqc))
++		return PTR_ERR(sqc);
++
++	ret = qm_dump_sqc_raw(qm, sqc_dma, qp_id);
++	if (ret) {
++		down_read(&qm->qps_lock);
++		if (qm->sqc) {
++			sqc_curr = qm->sqc + qp_id;
++
++			ret = dump_show(qm, sqc_curr, sizeof(*sqc),
++					"SOFT SQC");
++			if (ret)
++				dev_info(dev, "Show soft sqc failed!\n");
++		}
++		up_read(&qm->qps_lock);
++
++		goto err_free_ctx;
++	}
++
++	ret = dump_show(qm, sqc, sizeof(*sqc), "SQC");
++	if (ret)
++		dev_info(dev, "Show hw sqc failed!\n");
++
++err_free_ctx:
++	qm_ctx_free(qm, sizeof(*sqc), sqc, &sqc_dma);
++	return ret;
++}
++
++static int qm_cqc_dump(struct hisi_qm *qm, const char *s)
++{
++	struct device *dev = &qm->pdev->dev;
++	struct qm_cqc *cqc, *cqc_curr;
++	dma_addr_t cqc_dma;
++	u32 qp_id;
++	int ret;
++
++	if (!s)
++		return -EINVAL;
++
++	ret = kstrtou32(s, 0, &qp_id);
++	if (ret || qp_id >= qm->qp_num) {
++		dev_err(dev, "Please input qp num (0-%d)", qm->qp_num - 1);
++		return -EINVAL;
++	}
++
++	cqc = qm_ctx_alloc(qm, sizeof(*cqc), &cqc_dma);
++	if (IS_ERR(cqc))
++		return PTR_ERR(cqc);
++
++	ret = qm_dump_cqc_raw(qm, cqc_dma, qp_id);
++	if (ret) {
++		down_read(&qm->qps_lock);
++		if (qm->cqc) {
++			cqc_curr = qm->cqc + qp_id;
++
++			ret = dump_show(qm, cqc_curr, sizeof(*cqc),
++					"SOFT CQC");
++			if (ret)
++				dev_info(dev, "Show soft cqc failed!\n");
++		}
++		up_read(&qm->qps_lock);
++
++		goto err_free_ctx;
++	}
++
++	ret = dump_show(qm, cqc, sizeof(*cqc), "CQC");
++	if (ret)
++		dev_info(dev, "Show hw cqc failed!\n");
++
++err_free_ctx:
++	qm_ctx_free(qm, sizeof(*cqc), cqc, &cqc_dma);
++	return ret;
++}
++
++static int qm_eqc_aeqc_dump(struct hisi_qm *qm, char *s, size_t size,
++			    int cmd, char *name)
++{
++	struct device *dev = &qm->pdev->dev;
++	dma_addr_t xeqc_dma;
++	void *xeqc;
++	int ret;
++
++	if (strsep(&s, " ")) {
++		dev_err(dev, "Please do not input extra characters!\n");
++		return -EINVAL;
++	}
++
++	xeqc = qm_ctx_alloc(qm, size, &xeqc_dma);
++	if (IS_ERR(xeqc))
++		return PTR_ERR(xeqc);
++
++	ret = qm_mb(qm, cmd, xeqc_dma, 0, 1);
++	if (ret)
++		goto err_free_ctx;
++
++	ret = dump_show(qm, xeqc, size, name);
++	if (ret)
++		dev_info(dev, "Show hw %s failed!\n", name);
++
++err_free_ctx:
++	qm_ctx_free(qm, size, xeqc, &xeqc_dma);
++	return ret;
++}
++
++static int q_dump_param_parse(struct hisi_qm *qm, char *s,
++			      u32 *e_id, u32 *q_id)
++{
++	struct device *dev = &qm->pdev->dev;
++	unsigned int qp_num = qm->qp_num;
++	char *presult;
++	int ret;
++
++	presult = strsep(&s, " ");
++	if (!presult) {
++		dev_err(dev, "Please input qp number!\n");
++		return -EINVAL;
++	}
++
++	ret = kstrtou32(presult, 0, q_id);
++	if (ret || *q_id >= qp_num) {
++		dev_err(dev, "Please input qp num (0-%d)", qp_num - 1);
++		return -EINVAL;
++	}
++
++	presult = strsep(&s, " ");
++	if (!presult) {
++		dev_err(dev, "Please input sqe number!\n");
++		return -EINVAL;
++	}
++
++	ret = kstrtou32(presult, 0, e_id);
++	if (ret || *e_id >= QM_Q_DEPTH) {
++		dev_err(dev, "Please input sqe num (0-%d)", QM_Q_DEPTH - 1);
++		return -EINVAL;
++	}
++
++	if (strsep(&s, " ")) {
++		dev_err(dev, "Please do not input extra characters!\n");
++		return -EINVAL;
++	}
++
++	return 0;
++}
++
++static int qm_sq_dump(struct hisi_qm *qm, char *s)
++{
++	struct device *dev = &qm->pdev->dev;
++	void *sqe, *sqe_curr;
++	struct hisi_qp *qp;
++	u32 qp_id, sqe_id;
++	int ret;
++
++	ret = q_dump_param_parse(qm, s, &sqe_id, &qp_id);
++	if (ret)
++		return ret;
++
++	sqe = kzalloc(qm->sqe_size * QM_Q_DEPTH, GFP_KERNEL);
++	if (!sqe)
++		return -ENOMEM;
++
++	qp = &qm->qp_array[qp_id];
++	memcpy(sqe, qp->sqe, qm->sqe_size * QM_Q_DEPTH);
++	sqe_curr = sqe + (u32)(sqe_id * qm->sqe_size);
++	memset(sqe_curr + qm->debug.sqe_mask_offset, QM_SQE_ADDR_MASK,
++	       qm->debug.sqe_mask_len);
++
++	ret = dump_show(qm, sqe_curr, qm->sqe_size, "SQE");
++	if (ret)
++		dev_info(dev, "Show sqe failed!\n");
++
++	kfree(sqe);
++
++	return ret;
++}
++
++static int qm_cq_dump(struct hisi_qm *qm, char *s)
++{
++	struct device *dev = &qm->pdev->dev;
++	struct qm_cqe *cqe_curr;
++	struct hisi_qp *qp;
++	u32 qp_id, cqe_id;
++	int ret;
++
++	ret = q_dump_param_parse(qm, s, &cqe_id, &qp_id);
++	if (ret)
++		return ret;
++
++	qp = &qm->qp_array[qp_id];
++	cqe_curr = qp->cqe + cqe_id;
++	ret = dump_show(qm, cqe_curr, sizeof(struct qm_cqe), "CQE");
++	if (ret)
++		dev_info(dev, "Show cqe failed!\n");
++
++	return ret;
++}
++
++static int qm_eq_aeq_dump(struct hisi_qm *qm, const char *s,
++			  size_t size, char *name)
++{
++	struct device *dev = &qm->pdev->dev;
++	void *xeqe;
++	u32 xeqe_id;
++	int ret;
++
++	if (!s)
++		return -EINVAL;
++
++	ret = kstrtou32(s, 0, &xeqe_id);
++	if (ret || xeqe_id >= QM_Q_DEPTH) {
++		dev_err(dev, "Please input aeqe num (0-%d)", QM_Q_DEPTH - 1);
++		return -EINVAL;
++	}
++
++	down_read(&qm->qps_lock);
++
++	if (qm->eqe && !strcmp(name, "EQE")) {
++		xeqe = qm->eqe + xeqe_id;
++	} else if (qm->aeqe && !strcmp(name, "AEQE")) {
++		xeqe = qm->aeqe + xeqe_id;
++	} else {
++		ret = -EINVAL;
++		goto err_unlock;
++	}
++
++	ret = dump_show(qm, xeqe, size, name);
++	if (ret)
++		dev_info(dev, "Show %s failed!\n", name);
++
++err_unlock:
++	up_read(&qm->qps_lock);
++	return ret;
++}
++
++static int qm_dbg_help(struct hisi_qm *qm, char *s)
++{
++	struct device *dev = &qm->pdev->dev;
++
++	if (strsep(&s, " ")) {
++		dev_err(dev, "Please do not input extra characters!\n");
++		return -EINVAL;
++	}
++
++	dev_info(dev, "available commands:\n");
++	dev_info(dev, "sqc <num>\n");
++	dev_info(dev, "cqc <num>\n");
++	dev_info(dev, "eqc\n");
++	dev_info(dev, "aeqc\n");
++	dev_info(dev, "sq <num> <e>\n");
++	dev_info(dev, "cq <num> <e>\n");
++	dev_info(dev, "eq <e>\n");
++	dev_info(dev, "aeq <e>\n");
++
++	return 0;
++}
++
++static int qm_cmd_write_dump(struct hisi_qm *qm, const char *cmd_buf)
++{
++	struct device *dev = &qm->pdev->dev;
++	char *presult, *s;
++	int ret;
++
++	s = kstrdup(cmd_buf, GFP_KERNEL);
++	if (!s)
++		return -ENOMEM;
++
++	presult = strsep(&s, " ");
++	if (!presult) {
++		kfree(s);
++		return -EINVAL;
++	}
++
++	if (!strcmp(presult, "sqc"))
++		ret = qm_sqc_dump(qm, s);
++	else if (!strcmp(presult, "cqc"))
++		ret = qm_cqc_dump(qm, s);
++	else if (!strcmp(presult, "eqc"))
++		ret = qm_eqc_aeqc_dump(qm, s, sizeof(struct qm_eqc),
++				       QM_MB_CMD_EQC, "EQC");
++	else if (!strcmp(presult, "aeqc"))
++		ret = qm_eqc_aeqc_dump(qm, s, sizeof(struct qm_aeqc),
++				       QM_MB_CMD_AEQC, "AEQC");
++	else if (!strcmp(presult, "sq"))
++		ret = qm_sq_dump(qm, s);
++	else if (!strcmp(presult, "cq"))
++		ret = qm_cq_dump(qm, s);
++	else if (!strcmp(presult, "eq"))
++		ret = qm_eq_aeq_dump(qm, s, sizeof(struct qm_eqe), "EQE");
++	else if (!strcmp(presult, "aeq"))
++		ret = qm_eq_aeq_dump(qm, s, sizeof(struct qm_aeqe), "AEQE");
++	else if (!strcmp(presult, "help"))
++		ret = qm_dbg_help(qm, s);
++	else
++		ret = -EINVAL;
++
++	if (ret)
++		dev_info(dev, "Please echo help\n");
++
++	kfree(s);
++
++	return ret;
++}
++
++static ssize_t qm_cmd_write(struct file *filp, const char __user *buffer,
++			    size_t count, loff_t *pos)
++{
++	struct hisi_qm *qm = filp->private_data;
++	char *cmd_buf, *cmd_buf_tmp;
++	int ret;
++
++	if (*pos)
++		return 0;
++
++	/* Judge if the instance is being reset. */
++	if (unlikely(atomic_read(&qm->status.flags) == QM_STOP))
++		return 0;
++
++	if (count > QM_DBG_WRITE_LEN)
++		return -ENOSPC;
++
++	cmd_buf = kzalloc(count + 1, GFP_KERNEL);
++	if (!cmd_buf)
++		return -ENOMEM;
++
++	if (copy_from_user(cmd_buf, buffer, count)) {
++		kfree(cmd_buf);
++		return -EFAULT;
++	}
++
++	cmd_buf[count] = '\0';
++
++	cmd_buf_tmp = strchr(cmd_buf, '\n');
++	if (cmd_buf_tmp) {
++		*cmd_buf_tmp = '\0';
++		count = cmd_buf_tmp - cmd_buf + 1;
++	}
++
++	ret = qm_cmd_write_dump(qm, cmd_buf);
++	if (ret) {
++		kfree(cmd_buf);
++		return ret;
++	}
++
++	kfree(cmd_buf);
++
++	return count;
++}
++
++static const struct file_operations qm_cmd_fops = {
++	.owner = THIS_MODULE,
++	.open = simple_open,
++	.read = qm_cmd_read,
++	.write = qm_cmd_write,
++};
++
+ static int qm_create_debugfs_file(struct hisi_qm *qm, enum qm_debug_file index)
+ {
+ 	struct dentry *qm_d = qm->debug.qm_d;
+@@ -1389,45 +1859,6 @@ int hisi_qm_start_qp(struct hisi_qp *qp, unsigned long arg)
  }
+ EXPORT_SYMBOL_GPL(hisi_qm_start_qp);
+ 
+-static void *qm_ctx_alloc(struct hisi_qm *qm, size_t ctx_size,
+-			  dma_addr_t *dma_addr)
+-{
+-	struct device *dev = &qm->pdev->dev;
+-	void *ctx_addr;
+-
+-	ctx_addr = kzalloc(ctx_size, GFP_KERNEL);
+-	if (!ctx_addr)
+-		return ERR_PTR(-ENOMEM);
+-
+-	*dma_addr = dma_map_single(dev, ctx_addr, ctx_size, DMA_FROM_DEVICE);
+-	if (dma_mapping_error(dev, *dma_addr)) {
+-		dev_err(dev, "DMA mapping error!\n");
+-		kfree(ctx_addr);
+-		return ERR_PTR(-ENOMEM);
+-	}
+-
+-	return ctx_addr;
+-}
+-
+-static void qm_ctx_free(struct hisi_qm *qm, size_t ctx_size,
+-			const void *ctx_addr, dma_addr_t *dma_addr)
+-{
+-	struct device *dev = &qm->pdev->dev;
+-
+-	dma_unmap_single(dev, *dma_addr, ctx_size, DMA_FROM_DEVICE);
+-	kfree(ctx_addr);
+-}
+-
+-static int qm_dump_sqc_raw(struct hisi_qm *qm, dma_addr_t dma_addr, u16 qp_id)
+-{
+-	return qm_mb(qm, QM_MB_CMD_SQC, dma_addr, qp_id, 1);
+-}
+-
+-static int qm_dump_cqc_raw(struct hisi_qm *qm, dma_addr_t dma_addr, u16 qp_id)
+-{
+-	return qm_mb(qm, QM_MB_CMD_CQC, dma_addr, qp_id, 1);
+-}
+-
+ /**
+  * Determine whether the queue is cleared by judging the tail pointers of
+  * sq and cq.
+@@ -2346,6 +2777,8 @@ int hisi_qm_debug_init(struct hisi_qm *qm)
+ 
+ 	debugfs_create_file("qm_regs", 0444, qm->debug.qm_d, qm, &qm_regs_fops);
+ 
++	debugfs_create_file("cmd", 0444, qm->debug.qm_d, qm, &qm_cmd_fops);
++
+ 	debugfs_create_file("status", 0444, qm->debug.qm_d, qm,
+ 			&qm_status_fops);
+ 	for (i = 0; i < ARRAY_SIZE(qm_dfx_files); i++) {
+diff --git a/drivers/crypto/hisilicon/qm.h b/drivers/crypto/hisilicon/qm.h
+index e4b46a7..6326744 100644
+--- a/drivers/crypto/hisilicon/qm.h
++++ b/drivers/crypto/hisilicon/qm.h
+@@ -137,6 +137,8 @@ struct debugfs_file {
+ 
+ struct qm_debug {
+ 	u32 curr_qm_qp_num;
++	u32 sqe_mask_offset;
++	u32 sqe_mask_len;
+ 	struct qm_dfx dfx;
+ 	struct dentry *debug_root;
+ 	struct dentry *qm_d;
+diff --git a/drivers/crypto/hisilicon/sec2/sec_main.c b/drivers/crypto/hisilicon/sec2/sec_main.c
+index 5ea44ad..829959b 100644
+--- a/drivers/crypto/hisilicon/sec2/sec_main.c
++++ b/drivers/crypto/hisilicon/sec2/sec_main.c
+@@ -80,6 +80,9 @@
+ #define SEC_VF_CNT_MASK			0xffffffc0
+ #define SEC_DBGFS_VAL_MAX_LEN		20
+ 
++#define SEC_SQE_MASK_OFFSET		64
++#define SEC_SQE_MASK_LEN		48
++
+ #define SEC_ADDR(qm, offset) ((qm)->io_base + (offset) + \
+ 			     SEC_ENGINE_PF_CFG_OFF + SEC_ACC_COMMON_REG_OFF)
+ 
+@@ -632,6 +635,9 @@ static int sec_debugfs_init(struct sec_dev *sec)
+ 
+ 	qm->debug.debug_root = debugfs_create_dir(dev_name(dev),
+ 						  sec_debugfs_root);
++
++	qm->debug.sqe_mask_offset = SEC_SQE_MASK_OFFSET;
++	qm->debug.sqe_mask_len = SEC_SQE_MASK_LEN;
+ 	ret = hisi_qm_debug_init(qm);
+ 	if (ret)
+ 		goto failed_to_create;
+diff --git a/drivers/crypto/hisilicon/zip/zip_main.c b/drivers/crypto/hisilicon/zip/zip_main.c
+index cb3ed6b..87db2e1 100644
+--- a/drivers/crypto/hisilicon/zip/zip_main.c
++++ b/drivers/crypto/hisilicon/zip/zip_main.c
+@@ -89,6 +89,8 @@
+ #define HZIP_WR_PORT			BIT(11)
+ 
+ #define HZIP_BUF_SIZE			22
++#define HZIP_SQE_MASK_OFFSET		64
++#define HZIP_SQE_MASK_LEN		48
+ 
+ static const char hisi_zip_name[] = "hisi_zip";
+ static struct dentry *hzip_debugfs_root;
+@@ -578,6 +580,8 @@ static int hisi_zip_debugfs_init(struct hisi_zip *hisi_zip)
+ 
+ 	dev_d = debugfs_create_dir(dev_name(dev), hzip_debugfs_root);
+ 
++	qm->debug.sqe_mask_offset = HZIP_SQE_MASK_OFFSET;
++	qm->debug.sqe_mask_len = HZIP_SQE_MASK_LEN;
+ 	qm->debug.debug_root = dev_d;
+ 	ret = hisi_qm_debug_init(qm);
+ 	if (ret)
 -- 
 2.7.4
 
