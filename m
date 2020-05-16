@@ -1,98 +1,92 @@
-Return-Path: <SRS0=Yf/g=65=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=7V1w=66=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12A2BC433E0
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 May 2020 20:59:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2E01C433DF
+	for <linux-crypto@archiver.kernel.org>; Sat, 16 May 2020 01:35:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DA29C2065C
-	for <linux-crypto@archiver.kernel.org>; Fri, 15 May 2020 20:59:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 841932076A
+	for <linux-crypto@archiver.kernel.org>; Sat, 16 May 2020 01:35:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1589592914;
+	bh=A/YvaDksaFu99ghPmbMTUGhjLsi3EZ2qYC3LCwM1LwA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=J2QRUCNtwujU8J61AnA6JXSsVw8+/P8PyMQ9oQTsZ70RlBhW0xWt83kCY0mBJPmA9
+	 F5dUjstU6YQzqs38q7bCJPNprZKKERrt0SMnpYO6Ly9GppLRnQoePsHozxQTbPAJ8f
+	 vJLXLtSLK+KSJgPqaDL5pY35qYczKEW+PdYPAdhc=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726226AbgEOU7A convert rfc822-to-8bit (ORCPT
+        id S1726231AbgEPBfL (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Fri, 15 May 2020 16:59:00 -0400
-Received: from lithops.sigma-star.at ([195.201.40.130]:35322 "EHLO
-        lithops.sigma-star.at" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726188AbgEOU7A (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Fri, 15 May 2020 16:59:00 -0400
-X-Greylist: delayed 522 seconds by postgrey-1.27 at vger.kernel.org; Fri, 15 May 2020 16:58:58 EDT
-Received: from localhost (localhost [127.0.0.1])
-        by lithops.sigma-star.at (Postfix) with ESMTP id 9190D6224FDF;
-        Fri, 15 May 2020 22:50:15 +0200 (CEST)
-Received: from lithops.sigma-star.at ([127.0.0.1])
-        by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10032)
-        with ESMTP id AdrSYIIR5X19; Fri, 15 May 2020 22:50:15 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
-        by lithops.sigma-star.at (Postfix) with ESMTP id 2F4F160CEF22;
-        Fri, 15 May 2020 22:50:15 +0200 (CEST)
-Received: from lithops.sigma-star.at ([127.0.0.1])
-        by localhost (lithops.sigma-star.at [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id DHwh6sPgqHHu; Fri, 15 May 2020 22:50:15 +0200 (CEST)
-Received: from lithops.sigma-star.at (lithops.sigma-star.at [195.201.40.130])
-        by lithops.sigma-star.at (Postfix) with ESMTP id 0B2AC6224FDF;
-        Fri, 15 May 2020 22:50:15 +0200 (CEST)
-Date:   Fri, 15 May 2020 22:50:14 +0200 (CEST)
-From:   Richard Weinberger <richard@nod.at>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Sascha Hauer <s.hauer@pengutronix.de>,
-        linux-mtd <linux-mtd@lists.infradead.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        stable <stable@vger.kernel.org>
-Message-ID: <568077266.223149.1589575814867.JavaMail.zimbra@nod.at>
-In-Reply-To: <20200515191704.GE1009@sol.localdomain>
-References: <20200502055945.1008194-1-ebiggers@kernel.org> <20200504071644.GS5877@pengutronix.de> <20200515191704.GE1009@sol.localdomain>
-Subject: Re: [PATCH] ubifs: fix wrong use of crypto_shash_descsize()
+        Fri, 15 May 2020 21:35:11 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57576 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726204AbgEPBfL (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Fri, 15 May 2020 21:35:11 -0400
+Received: from gmail.com (unknown [104.132.1.76])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 7DC8520671;
+        Sat, 16 May 2020 01:35:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1589592910;
+        bh=A/YvaDksaFu99ghPmbMTUGhjLsi3EZ2qYC3LCwM1LwA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=FCMPtDYJZcw2/loDgsY3buAEdq4MaFDRI7UZDPxP5gepuaSB8WfcULS3g2o24Y1TS
+         9mdJZvt0luVlxpROTQO7XI0TaX07kifa9ZQhWc3EaWqTS08KEjCd1DFoj1uEOcRoUA
+         yhKwDQLo3fV9GeVMpsSciRYU3i9zSMLQQDvVPm+0=
+Date:   Fri, 15 May 2020 18:35:09 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Sasha Levin <sashal@kernel.org>
+Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        linux-crypto@vger.kernel.org
+Subject: Re: [PATCH AUTOSEL 4.14 39/39] crypto: xts - simplify error handling
+ in ->create()
+Message-ID: <20200516013509.GA118329@gmail.com>
+References: <20200514185456.21060-1-sashal@kernel.org>
+ <20200514185456.21060-39-sashal@kernel.org>
+ <20200514190843.GA187179@gmail.com>
+ <20200515005530.GD29995@sasha-vm>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8BIT
-X-Originating-IP: [195.201.40.130]
-X-Mailer: Zimbra 8.8.12_GA_3807 (ZimbraWebClient - FF68 (Linux)/8.8.12_GA_3809)
-Thread-Topic: ubifs: fix wrong use of crypto_shash_descsize()
-Thread-Index: z+OnJhSOitcsTV8I0Jz25cDAthIH9w==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200515005530.GD29995@sasha-vm>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
------ Ursprüngliche Mail -----
-> Von: "Eric Biggers" <ebiggers@kernel.org>
-> An: "Sascha Hauer" <s.hauer@pengutronix.de>, "richard" <richard@nod.at>
-> CC: "linux-mtd" <linux-mtd@lists.infradead.org>, "Linux Crypto Mailing List" <linux-crypto@vger.kernel.org>, "stable"
-> <stable@vger.kernel.org>
-> Gesendet: Freitag, 15. Mai 2020 21:17:04
-> Betreff: Re: [PATCH] ubifs: fix wrong use of crypto_shash_descsize()
-
-> On Mon, May 04, 2020 at 09:16:44AM +0200, Sascha Hauer wrote:
->> On Fri, May 01, 2020 at 10:59:45PM -0700, Eric Biggers wrote:
->> > From: Eric Biggers <ebiggers@google.com>
->> > 
->> > crypto_shash_descsize() returns the size of the shash_desc context
->> > needed to compute the hash, not the size of the hash itself.
->> > 
->> > crypto_shash_digestsize() would be correct, or alternatively using
->> > c->hash_len and c->hmac_desc_len which already store the correct values.
->> > But actually it's simpler to just use stack arrays, so do that instead.
->> > 
->> > Fixes: 49525e5eecca ("ubifs: Add helper functions for authentication support")
->> > Fixes: da8ef65f9573 ("ubifs: Authenticate replayed journal")
->> > Cc: <stable@vger.kernel.org> # v4.20+
->> > Cc: Sascha Hauer <s.hauer@pengutronix.de>
->> > Signed-off-by: Eric Biggers <ebiggers@google.com>
->> 
->> Looks better that way, thanks.
->> 
->> Acked-by: Sascha Hauer <s.hauer@pengutronix.de>
->> 
+On Thu, May 14, 2020 at 08:55:30PM -0400, Sasha Levin wrote:
+> On Thu, May 14, 2020 at 12:08:43PM -0700, Eric Biggers wrote:
+> > On Thu, May 14, 2020 at 02:54:56PM -0400, Sasha Levin wrote:
+> > > From: Eric Biggers <ebiggers@google.com>
+> > > 
+> > > [ Upstream commit 732e540953477083082e999ff553622c59cffd5f ]
+> > > 
+> > > Simplify the error handling in the XTS template's ->create() function by
+> > > taking advantage of crypto_drop_skcipher() now accepting (as a no-op) a
+> > > spawn that hasn't been grabbed yet.
+> > > 
+> > > Signed-off-by: Eric Biggers <ebiggers@google.com>
+> > > Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+> > > Signed-off-by: Sasha Levin <sashal@kernel.org>
+> > 
+> > Please don't backport this patch.  It's a cleanup (not a fix) that depends on
+> > patches in 5.6, which you don't seem to be backporting.
 > 
-> Richard, could you take this through the ubifs tree for 5.8?
+> For 5.6-4.19 I grabbed these to take:
+> 
+> 	1a263ae60b04 ("gcc-10: avoid shadowing standard library 'free()' in crypto")
+> 
+> cleanly. I'll drop it as it's mostly to avoid silly gcc10 warnings, but
+> I just wanted to let you know the reason they ended up here.
+> 
 
-Sure. I actually will send a PR with various MTD related fixes
-for 5.7.
+If the gcc 10 warning fix is needed, then you should just backport it on its
+own.  It just renames a function, so it seems it's trivial to fix the conflict?
 
-Thanks,
-//richard
+- Eric
