@@ -1,123 +1,116 @@
-Return-Path: <SRS0=7V1w=66=vger.kernel.org=linux-crypto-owner@kernel.org>
+Return-Path: <SRS0=OkDs=67=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77E5BC433E0
-	for <linux-crypto@archiver.kernel.org>; Sat, 16 May 2020 16:43:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9863C433E0
+	for <linux-crypto@archiver.kernel.org>; Sun, 17 May 2020 16:26:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4337D206D8
-	for <linux-crypto@archiver.kernel.org>; Sat, 16 May 2020 16:43:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B050220671
+	for <linux-crypto@archiver.kernel.org>; Sun, 17 May 2020 16:26:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M1kduRrm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YZDTup9s"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726257AbgEPQnG (ORCPT
+        id S1728038AbgEQQ0q (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sat, 16 May 2020 12:43:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55454 "EHLO
+        Sun, 17 May 2020 12:26:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726226AbgEPQnG (ORCPT
+        with ESMTP id S1728035AbgEQQ0p (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sat, 16 May 2020 12:43:06 -0400
-Received: from mail-io1-xd44.google.com (mail-io1-xd44.google.com [IPv6:2607:f8b0:4864:20::d44])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A957C061A0C;
-        Sat, 16 May 2020 09:43:06 -0700 (PDT)
-Received: by mail-io1-xd44.google.com with SMTP id j8so5953916iog.13;
-        Sat, 16 May 2020 09:43:06 -0700 (PDT)
+        Sun, 17 May 2020 12:26:45 -0400
+Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FC6BC061A0C;
+        Sun, 17 May 2020 09:26:45 -0700 (PDT)
+Received: by mail-pf1-x441.google.com with SMTP id y18so3685843pfl.9;
+        Sun, 17 May 2020 09:26:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=es9nL54eWtZHft09jub95D9GHT1PJmvu2Z8TIUZE1HE=;
-        b=M1kduRrmNJ2LfBxzdNYtGyJIwFzAT8zQ07ft97xpD7bINmJeTahKoii+pK8MSBuefX
-         jTNWAKUldm4hLlI4GQAox/u0GNKJg1Jy+PeFq9IcrjhZd9G1gtqJzJDdtYar8DmV+9X5
-         2JYcRhXv455Hp8H/VI9+SgmLsccCrRiTizqJmVU53PGnO7ghr2hyyy/eSERlASO6QYq4
-         AhiTJ25AR/74KnKmYpT05UZmPcrduy9yWJLEJMgYLw09yfoBz0adOZCl9kpW4PDVHXx7
-         SMQoJ51RzgphlHzkts7N9X0wVhnBeeN/KjjSJTbb69LFzZHet7JJxtlwYu2A/MENSg1u
-         Nxvg==
+        h=from:to:subject:date:message-id;
+        bh=toOqvUbCN7k/hG3JfrukVmhVyaeJAC9TE9an1UW3f1w=;
+        b=YZDTup9sT48PKu+YMlGqQ1jWO8Bs8ez3oRhaX+XXTrcYN7loMY071r6nM5hpzU/HwB
+         ljkjpKPB4w/JK0Adey6IDlFI026eX9dQBVmeFuOIj4AW0kEpRusatb8fJlz9JDedkWE8
+         PPIjJrfK3KAjx6imA6GlndDW2PPPRPtVHAvYJVur5+gBiyUBbwG0qnMqLhKFBSqgOrHE
+         NF7Cj0XIRTbZHRfxnLqotwWEczwHS9moyWQXXVOFi+Up+Xf+9Xq+qcnoKzXIg0aszhbC
+         EC1vzUoZcHe6N+SITOcPGg/dpNWDwA0QEkVorEseU/Y72f/3zTaLuW/XtFg3fy99uLHh
+         VdzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=es9nL54eWtZHft09jub95D9GHT1PJmvu2Z8TIUZE1HE=;
-        b=G39ej229Rbh/agbeGxMvo5taCRZMXmcriDlwRxc1k6hXgav1gvOvILt2A7rJ7vgA6O
-         Gpn5QCn8PXi4c70WD9YOaEqPQnrj15IY6qiaMLHl+RKc2q4jPqjFzfOto2pdLEiVmPoy
-         L2aC2UN56VJ1eIX9idEo77NJQS+rYkoA/kNqrSH03gjvsl/sB5thw6mCdMkubm7YBE2L
-         Yz4CgEnBo2qNIU7bDKpIFj1c2HQxjMmRtSXn6N6z7fpAeJa8pl7PYxArsQDp33+f3Ea0
-         BpJf2WJAvmU672f+0SrTYwu75WTENmzLedKsQHNqop01D4n9onYrwl5yp1/NL4EXpp6/
-         a0nw==
-X-Gm-Message-State: AOAM533OCCGLOLw4xFsjuzGLOWGzSMATY5bkQQ6mgG7R6cQYVeh9sPk8
-        V48+l/DWAiKKprlHVldFQmD6/TQog6S2wUrAUY4=
-X-Google-Smtp-Source: ABdhPJyWt1i35sqAOn9/rO23bWin4il7OPHMsfMMrRANxiNO7OJknI3O+Ga/dVCgUlPGa/if769CICudAjNGcHdWOyk=
-X-Received: by 2002:a5e:8717:: with SMTP id y23mr7822272ioj.172.1589647385473;
- Sat, 16 May 2020 09:43:05 -0700 (PDT)
-MIME-Version: 1.0
-References: <20200516042303.6070-1-andrew.smirnov@gmail.com>
-In-Reply-To: <20200516042303.6070-1-andrew.smirnov@gmail.com>
-From:   Chris Healy <cphealy@gmail.com>
-Date:   Sat, 16 May 2020 09:42:51 -0700
-Message-ID: <CAFXsbZoZWzD5deLfCS=rMcw80-gBcm30_3CSMm--Cc-fPSq=BA@mail.gmail.com>
-Subject: Re: [PATCH] crypto: caam - make soc match data optional
-To:     Andrey Smirnov <andrew.smirnov@gmail.com>
-Cc:     linux-crypto@vger.kernel.org,
-        =?UTF-8?Q?Horia_Geant=C4=83?= <horia.geanta@nxp.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Fabio Estevam <festevam@gmail.com>, linux-imx@nxp.com,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        h=x-gm-message-state:from:to:subject:date:message-id;
+        bh=toOqvUbCN7k/hG3JfrukVmhVyaeJAC9TE9an1UW3f1w=;
+        b=NbTuHTqyHBcqVRoDRDYmjKwVFiaNyNHPT4SgzpBlwi9foUHRCZBdCD+BDknEMJlg2Q
+         NEPD0gJr8rK7s0WnegrnMbSF1vj+96/mqu9M+xMVvE7dTMWNXkQNRuMwXXEfvmcjS7NB
+         0yKCxwS9oSHtf6IHOOq9PwuKGZ2FuXsL3GGImMm+0Y/npes7ESuqRTMV0HqfAwlKdd6M
+         4weKlyXoWuWSuSELOFDQGwFVGgqzpArG45w7dpkQZ0jvH1PYjnZwFEn90rVGH4le7NvO
+         OHN6ZXO86mX8KnLunYSbVgaKPMbGocvc7FkDkAaDszFneZSbzh2/xCwQqQATcm+dOoQJ
+         KmGg==
+X-Gm-Message-State: AOAM531XfJMzLLIGPeaeVVR/EUB4x3j4i3FDScm3ufp2RjohUY78uS3S
+        DAsRkjou04A7aX5JaEcx0DQ=
+X-Google-Smtp-Source: ABdhPJy05fCRkBkeLZ1evHFbk5VrmPe1BMHIi42uxsLJ0wurt1UNVvK1xB1TcwcqdI8/Ss6Q2978mw==
+X-Received: by 2002:a62:ddd6:: with SMTP id w205mr12981004pff.291.1589732805093;
+        Sun, 17 May 2020 09:26:45 -0700 (PDT)
+Received: from kvmhost.ch.hwng.net (kvmhost.ch.hwng.net. [69.16.191.151])
+        by smtp.gmail.com with ESMTPSA id y5sm943517pff.150.2020.05.17.09.26.43
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 17 May 2020 09:26:44 -0700 (PDT)
+From:   Pooja Trivedi <poojatrivedi@gmail.com>
+X-Google-Original-From: Pooja Trivedi <pooja.trivedi@stackpath.com>
+To:     borisp@mellanox.com, aviadye@mellanox.com,
+        john.fastabend@gmail.com, daniel@iogearbox.net, kuba@kernel.org,
+        davem@davemloft.net, vakul.garg@nxp.com, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        mallesham.jatharkonda@oneconvergence.com, josh.tway@stackpath.com,
+        pooja.trivedi@stackpath.com
+Subject: [PATCH net] net/tls(TLS_SW): Fix integrity issue with non-blocking sw KTLS request
+Date:   Sun, 17 May 2020 16:26:36 +0000
+Message-Id: <1589732796-22839-1-git-send-email-pooja.trivedi@stackpath.com>
+X-Mailer: git-send-email 1.8.3.1
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-With all four of Vybrid VF610, i.MX6q, i.MX6qp, and i.MX8M, this patch
-caused no regressions for me.  Additionally, with the VF610 and a
-follow on devicetree patch, the CAAM is detected and works.
+In pure sw ktls(AES-NI), -EAGAIN from tcp layer (do_tcp_sendpages for
+encrypted record) gets treated as error, subtracts the offset, and
+returns to application. Because of this, application sends data from
+subtracted offset, which leads to data integrity issue. Since record is
+already encrypted, ktls module marks it as partially sent and pushes the
+packet to tcp layer in the following iterations (either from bottom half
+or when pushing next chunk). So returning success in case of EAGAIN
+will fix the issue.
 
-Tested by: Chris Healy <cphealy@gmail.com>
+Fixes: a42055e8d2c3 ("net/tls: Add support for async encryption")
+Signed-off-by: Pooja Trivedi <pooja.trivedi@stackpath.com>
+Reviewed-by: Mallesham Jatharkonda <mallesham.jatharkonda@oneconvergence.com>
+Reviewed-by: Josh Tway <josh.tway@stackpath.com>
+---
+ net/tls/tls_sw.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-On Fri, May 15, 2020 at 9:23 PM Andrey Smirnov <andrew.smirnov@gmail.com> w=
-rote:
->
-> Vyrbrid devices don't have any clock that need to be taken care of, so
-> make clock data optional on i.MX.
->
-> Signed-off-by: Andrey Smirnov <andrew.smirnov@gmail.com>
-> Cc: Chris Healy <cphealy@gmail.com>
-> Cc: Horia Geant=C4=83 <horia.geanta@nxp.com>
-> Cc: Herbert Xu <herbert@gondor.apana.org.au>
-> Cc: Fabio Estevam <festevam@gmail.com>
-> Cc: linux-imx@nxp.com
-> Cc: linux-crypto@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
-> ---
->  drivers/crypto/caam/ctrl.c | 7 +------
->  1 file changed, 1 insertion(+), 6 deletions(-)
->
-> diff --git a/drivers/crypto/caam/ctrl.c b/drivers/crypto/caam/ctrl.c
-> index 4fcdd262e581..6aba430793cc 100644
-> --- a/drivers/crypto/caam/ctrl.c
-> +++ b/drivers/crypto/caam/ctrl.c
-> @@ -630,12 +630,7 @@ static int caam_probe(struct platform_device *pdev)
->         imx_soc_match =3D soc_device_match(caam_imx_soc_table);
->         caam_imx =3D (bool)imx_soc_match;
->
-> -       if (imx_soc_match) {
-> -               if (!imx_soc_match->data) {
-> -                       dev_err(dev, "No clock data provided for i.MX SoC=
-");
-> -                       return -EINVAL;
-> -               }
-> -
-> +       if (imx_soc_match && imx_soc_match->data) {
->                 ret =3D init_clocks(dev, imx_soc_match->data);
->                 if (ret)
->                         return ret;
-> --
-> 2.21.3
+diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+index e23f94a..d8ebdfc 100644
+--- a/net/tls/tls_sw.c
++++ b/net/tls/tls_sw.c
+@@ -415,10 +415,12 @@ int tls_tx_records(struct sock *sk, int flags)
+ 	}
+ 
+ tx_err:
+-	if (rc < 0 && rc != -EAGAIN)
++	if (rc < 0 && rc != -EAGAIN) {
+ 		tls_err_abort(sk, EBADMSG);
++		return rc;
++	}
+ 
+-	return rc;
++	return 0;
+ }
+ 
+ static void tls_encrypt_done(struct crypto_async_request *req, int err)
+-- 
+1.8.3.1
+
