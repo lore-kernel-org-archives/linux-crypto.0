@@ -2,115 +2,123 @@ Return-Path: <SRS0=OkDs=67=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
+X-Spam-Status: No, score=-3.6 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
 	DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9863C433E0
-	for <linux-crypto@archiver.kernel.org>; Sun, 17 May 2020 16:26:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B2F7C433DF
+	for <linux-crypto@archiver.kernel.org>; Sun, 17 May 2020 21:39:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B050220671
-	for <linux-crypto@archiver.kernel.org>; Sun, 17 May 2020 16:26:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 09496207F9
+	for <linux-crypto@archiver.kernel.org>; Sun, 17 May 2020 21:39:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YZDTup9s"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QjJqxMSO"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1728038AbgEQQ0q (ORCPT
+        id S1726537AbgEQVjN (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Sun, 17 May 2020 12:26:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49778 "EHLO
+        Sun, 17 May 2020 17:39:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1728035AbgEQQ0p (ORCPT
+        with ESMTP id S1726444AbgEQVjM (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Sun, 17 May 2020 12:26:45 -0400
-Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FC6BC061A0C;
-        Sun, 17 May 2020 09:26:45 -0700 (PDT)
-Received: by mail-pf1-x441.google.com with SMTP id y18so3685843pfl.9;
-        Sun, 17 May 2020 09:26:45 -0700 (PDT)
+        Sun, 17 May 2020 17:39:12 -0400
+Received: from mail-qv1-xf43.google.com (mail-qv1-xf43.google.com [IPv6:2607:f8b0:4864:20::f43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6B74C061A0C;
+        Sun, 17 May 2020 14:39:12 -0700 (PDT)
+Received: by mail-qv1-xf43.google.com with SMTP id r3so3840061qve.1;
+        Sun, 17 May 2020 14:39:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id;
-        bh=toOqvUbCN7k/hG3JfrukVmhVyaeJAC9TE9an1UW3f1w=;
-        b=YZDTup9sT48PKu+YMlGqQ1jWO8Bs8ez3oRhaX+XXTrcYN7loMY071r6nM5hpzU/HwB
-         ljkjpKPB4w/JK0Adey6IDlFI026eX9dQBVmeFuOIj4AW0kEpRusatb8fJlz9JDedkWE8
-         PPIjJrfK3KAjx6imA6GlndDW2PPPRPtVHAvYJVur5+gBiyUBbwG0qnMqLhKFBSqgOrHE
-         NF7Cj0XIRTbZHRfxnLqotwWEczwHS9moyWQXXVOFi+Up+Xf+9Xq+qcnoKzXIg0aszhbC
-         EC1vzUoZcHe6N+SITOcPGg/dpNWDwA0QEkVorEseU/Y72f/3zTaLuW/XtFg3fy99uLHh
-         VdzQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=AM7Zd0MxslnqLot1MzBGMFBYbuX//qg2mFKMsl+GXdA=;
+        b=QjJqxMSOxa+7rNqpVlN4ka8WO8uz2g8FKzSZ+7XQfrl4ZnMxnOCCWdP1dFasAdmuAj
+         awGpC25Wv5I1Q3I3HRkRt5VCkCiNqKnbhdHWV/nqs/lUWXjrir9BS7bTixIzCdbfMdXU
+         dO6rAkUj+l84sTt77Y/YQB1BOnpuM+2z5oNYUqplwQ3rHy3q6YWXHUaFCIO78+8mvAHd
+         FieT0fHdqcH40CPzghUmrpHkGeRjx0dQ7f6KmtYBZEO5Ks9gmRDbrLFQ/r84WW7HyrFA
+         +r3kXoq6aGe7po0s9z5ywqq8Eh81N+aKXSr9bP9PtBzsjkIA7qmXYvXgMaK3nF/Vogtw
+         vOQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id;
-        bh=toOqvUbCN7k/hG3JfrukVmhVyaeJAC9TE9an1UW3f1w=;
-        b=NbTuHTqyHBcqVRoDRDYmjKwVFiaNyNHPT4SgzpBlwi9foUHRCZBdCD+BDknEMJlg2Q
-         NEPD0gJr8rK7s0WnegrnMbSF1vj+96/mqu9M+xMVvE7dTMWNXkQNRuMwXXEfvmcjS7NB
-         0yKCxwS9oSHtf6IHOOq9PwuKGZ2FuXsL3GGImMm+0Y/npes7ESuqRTMV0HqfAwlKdd6M
-         4weKlyXoWuWSuSELOFDQGwFVGgqzpArG45w7dpkQZ0jvH1PYjnZwFEn90rVGH4le7NvO
-         OHN6ZXO86mX8KnLunYSbVgaKPMbGocvc7FkDkAaDszFneZSbzh2/xCwQqQATcm+dOoQJ
-         KmGg==
-X-Gm-Message-State: AOAM531XfJMzLLIGPeaeVVR/EUB4x3j4i3FDScm3ufp2RjohUY78uS3S
-        DAsRkjou04A7aX5JaEcx0DQ=
-X-Google-Smtp-Source: ABdhPJy05fCRkBkeLZ1evHFbk5VrmPe1BMHIi42uxsLJ0wurt1UNVvK1xB1TcwcqdI8/Ss6Q2978mw==
-X-Received: by 2002:a62:ddd6:: with SMTP id w205mr12981004pff.291.1589732805093;
-        Sun, 17 May 2020 09:26:45 -0700 (PDT)
-Received: from kvmhost.ch.hwng.net (kvmhost.ch.hwng.net. [69.16.191.151])
-        by smtp.gmail.com with ESMTPSA id y5sm943517pff.150.2020.05.17.09.26.43
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 17 May 2020 09:26:44 -0700 (PDT)
-From:   Pooja Trivedi <poojatrivedi@gmail.com>
-X-Google-Original-From: Pooja Trivedi <pooja.trivedi@stackpath.com>
-To:     borisp@mellanox.com, aviadye@mellanox.com,
-        john.fastabend@gmail.com, daniel@iogearbox.net, kuba@kernel.org,
-        davem@davemloft.net, vakul.garg@nxp.com, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
-        mallesham.jatharkonda@oneconvergence.com, josh.tway@stackpath.com,
-        pooja.trivedi@stackpath.com
-Subject: [PATCH net] net/tls(TLS_SW): Fix integrity issue with non-blocking sw KTLS request
-Date:   Sun, 17 May 2020 16:26:36 +0000
-Message-Id: <1589732796-22839-1-git-send-email-pooja.trivedi@stackpath.com>
-X-Mailer: git-send-email 1.8.3.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=AM7Zd0MxslnqLot1MzBGMFBYbuX//qg2mFKMsl+GXdA=;
+        b=aXc2qLlKgFKaXZLQGU8t01uDViEcDOH0WGCGyC6ym4PUkDPOLra0le+lQcaIBKyJqy
+         TKxINhKfwSNUjdixSo2kMXwXHA6YvbHF/jcDMFlKDHAdFSwq7n0glsY0RcjrRV8iTiqb
+         buoDrZNukMdDlj4qZicUCCW3YAaf8PWPZAg+EM4g//SLYIQIWJpr85RakocAxcyFvWot
+         VPeqFF4zhq6rKHa2NbFWsvunsL43ZlAUwqJr9xHq0BFqP10pZmzr76+T+8yWA4tbz6V6
+         MEm4dBjkF4d0ktHS6JidH/s2cUWdHDEnsXsDm5sSFZbN8uJ2ogNLFHGvIPJ+oRpyxYIi
+         Up/w==
+X-Gm-Message-State: AOAM5320wAWwDo+ZZi/+sgpEnREMsyv4W8vVMLiD3JGJD97H+7/xGz80
+        cfKi0CfRxnI7FZDL/HZLV29OrVkqvtL9fyr0IYI=
+X-Google-Smtp-Source: ABdhPJwXU3h/f9ui36v++p/oav/xwWq3PX9W7HxRFV2aCFQvbfAIK+zN/BwaFzJKPXEcoif4EM3Cv2MplC67ZDb1eP8=
+X-Received: by 2002:a05:6214:7cd:: with SMTP id bb13mr13270302qvb.17.1589751551767;
+ Sun, 17 May 2020 14:39:11 -0700 (PDT)
+MIME-Version: 1.0
+References: <20200502055945.1008194-1-ebiggers@kernel.org> <20200504071644.GS5877@pengutronix.de>
+ <20200515191704.GE1009@sol.localdomain> <568077266.223149.1589575814867.JavaMail.zimbra@nod.at>
+In-Reply-To: <568077266.223149.1589575814867.JavaMail.zimbra@nod.at>
+From:   Richard Weinberger <richard.weinberger@gmail.com>
+Date:   Sun, 17 May 2020 23:39:00 +0200
+Message-ID: <CAFLxGvx3-QvXnjhdfrqvv3a46opdcN6fyQ2Yc2QJ57TetBwfiA@mail.gmail.com>
+Subject: Re: [PATCH] ubifs: fix wrong use of crypto_shash_descsize()
+To:     Richard Weinberger <richard@nod.at>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        Sascha Hauer <s.hauer@pengutronix.de>,
+        linux-mtd <linux-mtd@lists.infradead.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        stable <stable@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-In pure sw ktls(AES-NI), -EAGAIN from tcp layer (do_tcp_sendpages for
-encrypted record) gets treated as error, subtracts the offset, and
-returns to application. Because of this, application sends data from
-subtracted offset, which leads to data integrity issue. Since record is
-already encrypted, ktls module marks it as partially sent and pushes the
-packet to tcp layer in the following iterations (either from bottom half
-or when pushing next chunk). So returning success in case of EAGAIN
-will fix the issue.
+On Fri, May 15, 2020 at 10:50 PM Richard Weinberger <richard@nod.at> wrote:
+>
+> ----- Urspr=C3=BCngliche Mail -----
+> > Von: "Eric Biggers" <ebiggers@kernel.org>
+> > An: "Sascha Hauer" <s.hauer@pengutronix.de>, "richard" <richard@nod.at>
+> > CC: "linux-mtd" <linux-mtd@lists.infradead.org>, "Linux Crypto Mailing =
+List" <linux-crypto@vger.kernel.org>, "stable"
+> > <stable@vger.kernel.org>
+> > Gesendet: Freitag, 15. Mai 2020 21:17:04
+> > Betreff: Re: [PATCH] ubifs: fix wrong use of crypto_shash_descsize()
+>
+> > On Mon, May 04, 2020 at 09:16:44AM +0200, Sascha Hauer wrote:
+> >> On Fri, May 01, 2020 at 10:59:45PM -0700, Eric Biggers wrote:
+> >> > From: Eric Biggers <ebiggers@google.com>
+> >> >
+> >> > crypto_shash_descsize() returns the size of the shash_desc context
+> >> > needed to compute the hash, not the size of the hash itself.
+> >> >
+> >> > crypto_shash_digestsize() would be correct, or alternatively using
+> >> > c->hash_len and c->hmac_desc_len which already store the correct val=
+ues.
+> >> > But actually it's simpler to just use stack arrays, so do that inste=
+ad.
+> >> >
+> >> > Fixes: 49525e5eecca ("ubifs: Add helper functions for authentication=
+ support")
+> >> > Fixes: da8ef65f9573 ("ubifs: Authenticate replayed journal")
+> >> > Cc: <stable@vger.kernel.org> # v4.20+
+> >> > Cc: Sascha Hauer <s.hauer@pengutronix.de>
+> >> > Signed-off-by: Eric Biggers <ebiggers@google.com>
+> >>
+> >> Looks better that way, thanks.
+> >>
+> >> Acked-by: Sascha Hauer <s.hauer@pengutronix.de>
+> >>
+> >
+> > Richard, could you take this through the ubifs tree for 5.8?
+>
+> Sure. I actually will send a PR with various MTD related fixes
+> for 5.7.
 
-Fixes: a42055e8d2c3 ("net/tls: Add support for async encryption")
-Signed-off-by: Pooja Trivedi <pooja.trivedi@stackpath.com>
-Reviewed-by: Mallesham Jatharkonda <mallesham.jatharkonda@oneconvergence.com>
-Reviewed-by: Josh Tway <josh.tway@stackpath.com>
----
- net/tls/tls_sw.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Applied. Thanks for fixing!
 
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index e23f94a..d8ebdfc 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -415,10 +415,12 @@ int tls_tx_records(struct sock *sk, int flags)
- 	}
- 
- tx_err:
--	if (rc < 0 && rc != -EAGAIN)
-+	if (rc < 0 && rc != -EAGAIN) {
- 		tls_err_abort(sk, EBADMSG);
-+		return rc;
-+	}
- 
--	return rc;
-+	return 0;
- }
- 
- static void tls_encrypt_done(struct crypto_async_request *req, int err)
--- 
-1.8.3.1
-
+--=20
+Thanks,
+//richard
