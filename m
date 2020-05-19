@@ -2,125 +2,76 @@ Return-Path: <SRS0=SwA+=7B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DB10C433E0
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 18:11:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C75ADC433DF
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 19:02:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B7A1D20674
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 18:11:36 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="jpBMnXcI"
+	by mail.kernel.org (Postfix) with ESMTP id AECFD20873
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 19:02:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1589914938;
+	bh=p2x2LclJ0xI5fOs4bKaK0KKKNU41HHkLK1/dnIsHhbo=;
+	h=From:To:Cc:Subject:Date:List-ID:From;
+	b=P4VYHtOgg9JTlQSVggIuIZXkpUJ5gTS8v7c1wTOBhL0YOfW0kbcx/FsnKKf8JTWjH
+	 d+Yt951dKxzdOtFr1MkRkAXOuLBSGdZO3aMrvkmddgPQhPjGGvavbLC/VlLm5j84wA
+	 aULwjC4aF/34JKZqhXUBQ5QScBaKDg7ByijXpgEE=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1727911AbgESSLg (ORCPT
+        id S1727839AbgESTCR (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 May 2020 14:11:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35014 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726510AbgESSLf (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 May 2020 14:11:35 -0400
-Received: from mo6-p01-ob.smtp.rzone.de (mo6-p01-ob.smtp.rzone.de [IPv6:2a01:238:20a:202:5301::10])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 772AAC08C5C0
-        for <linux-crypto@vger.kernel.org>; Tue, 19 May 2020 11:11:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1589911893;
-        s=strato-dkim-0002; d=chronox.de;
-        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
-        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
-        bh=BVJ986S46z5eMMgU9ShpvE8/hjf/iG5QeOVuCq4HVNM=;
-        b=jpBMnXcIVdTzZg7oSXTuoS+rMVfcmU5JvaG/MxSq+q7aiCOhOn/3gJM1SMQ5uG3mQ/
-        7lbVc96ZA7n+jdo3RFWEE8v7erJrmMkUkwPzxBvsw0HknqYMARWQdezl5BOZjmkPQBOq
-        hzUMkdNRlCvB1TVAs4iQFLpc42xC2iAA7B1KmyOS2mb0IsDF3+x7HIuGDsAeZtUXtZSR
-        mFdfqE/P8hUWX/9ELClQsLAzTSVxj6QBN/9DjrWuSE36CESCWOc0aKiGd7/GAJGtF0Ha
-        ASfcNFo3/Npm4P6brkpNdhTIQb5fO/Ocd2NKuwG8tfOiadaHNbbfVd8CaqYBGji8QsYl
-        2ZnA==
-X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPbI/Sc5g=="
-X-RZG-CLASS-ID: mo00
-Received: from tauon.chronox.de
-        by smtp.strato.de (RZmta 46.7.0 DYNA|AUTH)
-        with ESMTPSA id k09005w4JIBX127
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
-        (Client did not present a certificate);
-        Tue, 19 May 2020 20:11:33 +0200 (CEST)
-From:   Stephan Mueller <smueller@chronox.de>
-To:     Ard Biesheuvel <ardb@kernel.org>
-Cc:     Eric Biggers <ebiggers@kernel.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
-Subject: Re: ARM CE: CTS IV handling
-Date:   Tue, 19 May 2020 20:11:33 +0200
-Message-ID: <1997915.ptA6GT1cFu@tauon.chronox.de>
-In-Reply-To: <CAMj1kXEiijbgq=P53+qKjEzuneiinDbwyBacpMWtcN2YwEKWKA@mail.gmail.com>
-References: <4311723.JCXmkh6OgN@tauon.chronox.de> <CAMj1kXFfY+1LcJPGw7P8RPAN+Rts2ZJQwO6++WZSTFm3qbwaww@mail.gmail.com> <CAMj1kXEiijbgq=P53+qKjEzuneiinDbwyBacpMWtcN2YwEKWKA@mail.gmail.com>
+        Tue, 19 May 2020 15:02:17 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56034 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1726059AbgESTCR (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 19 May 2020 15:02:17 -0400
+Received: from localhost.localdomain (laubervilliers-657-1-83-120.w92-154.abo.wanadoo.fr [92.154.90.120])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id 0E025207E8;
+        Tue, 19 May 2020 19:02:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1589914937;
+        bh=p2x2LclJ0xI5fOs4bKaK0KKKNU41HHkLK1/dnIsHhbo=;
+        h=From:To:Cc:Subject:Date:From;
+        b=ed4rYd06KgneWuTtKnnW/R+djaWb82I8QTBhJc0jZJlJ0rzytKbNy+1RtJlXBofD1
+         4brbfdRk+QiBYQNEfFB8eZdX4hEzXS7eGt2YhLnfNCZkBWNU+kPSapCxJ5YW9kBvRu
+         cR5tu2Ri5IFMPTwexevC84whByKeQ+IAON2s07GQ=
+From:   Ard Biesheuvel <ardb@kernel.org>
+To:     linux-crypto@vger.kernel.org
+Cc:     linux-arm-kernel@lists.infradead.org, ebiggers@kernel.org,
+        Ard Biesheuvel <ardb@kernel.org>,
+        Stephan Mueller <smueller@chronox.de>
+Subject: [RFC/RFT PATCH 0/2] crypto: add CTS output IVs for arm64 and testmgr
+Date:   Tue, 19 May 2020 21:02:09 +0200
+Message-Id: <20200519190211.76855-1-ardb@kernel.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8bit
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Am Dienstag, 19. Mai 2020, 19:53:57 CEST schrieb Ard Biesheuvel:
+Stephan reports that the arm64 implementation of cts(cbc(aes)) deviates
+from the generic implementation in what it returns as the output IV. So
+fix this, and add some test vectors to catch other non-compliant
+implementations.
 
-Hi Ard,
+Stephan, could you provide a reference for the NIST validation tool and
+how it flags this behaviour as non-compliant? Thanks.
 
-> On Tue, 19 May 2020 at 19:50, Ard Biesheuvel <ardb@kernel.org> wrote:
-> > On Tue, 19 May 2020 at 19:35, Stephan Mueller <smueller@chronox.de> wrote:
-> > > Am Dienstag, 19. Mai 2020, 18:21:01 CEST schrieb Ard Biesheuvel:
-> > > 
-> > > Hi Ard,
-> > > 
-> > > > To be honest, this looks like the API is being used incorrectly. Is
-> > > > this a similar issue to the one Herbert spotted recently with the CTR
-> > > > code?
-> > > > 
-> > > > When you say 'leaving the TFM untouched' do you mean the skcipher
-> > > > request? The TFM should not retain any per-request state in the first
-> > > > place.
-> > > > 
-> > > > The skcipher request struct is not meant to retain any state either -
-> > > > the API simply does not support incremental encryption if the input is
-> > > > not a multiple of the chunksize.
-> > > > 
-> > > > Could you give some sample code on how you are using the API in this
-> > > > case?
-> > > 
-> > > What I am doing technically is to allocate a new tfm and request at the
-> > > beginning and then reuse the TFM and request. In that sense, I think I
-> > > violate that constraint.
-> > > 
-> > > But in order to implement such repetition, I can surely clear / allocate
-> > > a new TFM. But in order to get that right, I need the resulting IV
-> > > after the cipher operation.
-> > > 
-> > > This IV that I get after the cipher operation completes is different
-> > > between C and CE.
-> > 
-> > So is the expected output IV simply the last block of ciphertext that
-> > was generated (as usual), but located before the truncated block in
-> > the output?
-> 
-> If so, does the below fix the encrypt case?
+Cc: Stephan Mueller <smueller@chronox.de>
 
-I think it is.
+Ard Biesheuvel (2):
+  crypto: arm64/aes - align output IV with generic CBC-CTS driver
+  crypto: testmgr - add output IVs for AES-CBC with ciphertext stealing
 
-But, allow me to take that patch to my test system for verification.
-> 
-> index cf618d8f6cec..22f190a44689 100644
-> --- a/arch/arm64/crypto/aes-modes.S
-> +++ b/arch/arm64/crypto/aes-modes.S
-> @@ -275,6 +275,7 @@ AES_FUNC_START(aes_cbc_cts_encrypt)
->         add             x4, x0, x4
->         st1             {v0.16b}, [x4]                  /* overlapping
-> stores */ st1             {v1.16b}, [x0]
-> +       st1             {v1.16b}, [x5]
->         ret
->  AES_FUNC_END(aes_cbc_cts_encrypt)
+ arch/arm64/crypto/aes-modes.S |  2 ++
+ crypto/testmgr.h              | 12 ++++++++++++
+ 2 files changed, 14 insertions(+)
 
-
-Ciao
-Stephan
-
+-- 
+2.20.1
 
