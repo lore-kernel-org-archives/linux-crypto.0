@@ -2,88 +2,91 @@ Return-Path: <SRS0=SwA+=7B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 411D7C433E1
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 11:13:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2005C433DF
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 13:53:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2916D20708
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 11:13:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D16F12081A
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 13:53:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726157AbgESLNm (ORCPT
+        id S1729000AbgESNxT (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 May 2020 07:13:42 -0400
-Received: from outgoing-auth-1.mit.edu ([18.9.28.11]:49137 "EHLO
-        outgoing.mit.edu" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1726505AbgESLNm (ORCPT
+        Tue, 19 May 2020 09:53:19 -0400
+Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:55466 "EHLO
+        shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1727086AbgESNxT (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 May 2020 07:13:42 -0400
-Received: from callcc.thunk.org (pool-100-0-195-244.bstnma.fios.verizon.net [100.0.195.244])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 04JBDLpS006587
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 19 May 2020 07:13:22 -0400
-Received: by callcc.thunk.org (Postfix, from userid 15806)
-        id 5513F420304; Tue, 19 May 2020 07:13:21 -0400 (EDT)
-Date:   Tue, 19 May 2020 07:13:21 -0400
-From:   "Theodore Y. Ts'o" <tytso@mit.edu>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-fscrypt@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-mmc@vger.kernel.org, Satya Tangirala <satyat@google.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>,
-        Paul Crowley <paulcrowley@google.com>
-Subject: Re: [PATCH] fscrypt: add support for IV_INO_LBLK_32 policies
-Message-ID: <20200519111321.GE2396055@mit.edu>
-References: <20200515204141.251098-1-ebiggers@kernel.org>
+        Tue, 19 May 2020 09:53:19 -0400
+Received: from [192.168.4.242] (helo=deadeye)
+        by shadbolt.decadent.org.uk with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.89)
+        (envelope-from <ben@decadent.org.uk>)
+        id 1jb2gA-0000Ym-T6; Tue, 19 May 2020 14:53:10 +0100
+Received: from ben by deadeye with local (Exim 4.93)
+        (envelope-from <ben@decadent.org.uk>)
+        id 1jb2gA-000uKi-GB; Tue, 19 May 2020 14:53:10 +0100
+Message-ID: <0b158b60fe621552c327e9d822bc3245591a4bd6.camel@decadent.org.uk>
+Subject: Backporting "padata: Remove broken queue flushing"
+From:   Ben Hutchings <ben@decadent.org.uk>
+To:     Herbert Xu <herbert@gondor.apana.org.au>
+Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-crypto@vger.kernel.org, stable <stable@vger.kernel.org>
+Date:   Tue, 19 May 2020 14:53:05 +0100
+Content-Type: multipart/signed; micalg="pgp-sha512";
+        protocol="application/pgp-signature"; boundary="=-8aSYj/hllzzIHLdFqU8o"
+User-Agent: Evolution 3.36.2-1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20200515204141.251098-1-ebiggers@kernel.org>
+X-SA-Exim-Connect-IP: 192.168.4.242
+X-SA-Exim-Mail-From: ben@decadent.org.uk
+X-SA-Exim-Scanned: No (on shadbolt.decadent.org.uk); SAEximRunCond expanded to false
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, May 15, 2020 at 01:41:41PM -0700, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> The eMMC inline crypto standard will only specify 32 DUN bits (a.k.a. IV
-> bits), unlike UFS's 64.  IV_INO_LBLK_64 is therefore not applicable, but
-> an encryption format which uses one key per policy and permits the
-> moving of encrypted file contents (as f2fs's garbage collector requires)
-> is still desirable.
-> 
-> To support such hardware, add a new encryption format IV_INO_LBLK_32
-> that makes the best use of the 32 bits: the IV is set to
-> 'SipHash-2-4(inode_number) + file_logical_block_number mod 2^32', where
-> the SipHash key is derived from the fscrypt master key.  We hash only
-> the inode number and not also the block number, because we need to
-> maintain contiguity of DUNs to merge bios.
-> 
-> Unlike with IV_INO_LBLK_64, with this format IV reuse is possible; this
-> is unavoidable given the size of the DUN.  This means this format should
-> only be used where the requirements of the first paragraph apply.
-> However, the hash spreads out the IVs in the whole usable range, and the
-> use of a keyed hash makes it difficult for an attacker to determine
-> which files use which IVs.
-> 
-> Besides the above differences, this flag works like IV_INO_LBLK_64 in
-> that on ext4 it is only allowed if the stable_inodes feature has been
-> enabled to prevent inode numbers and the filesystem UUID from changing.
-> 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
 
-Reviewed-by: Theodore Ts'o <tytso@mit.edu>
+--=-8aSYj/hllzzIHLdFqU8o
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I kind of wish we had Kunit tests with test vectors, but that's for
-another commit I think.
+I noticed that commit 07928d9bfc81 "padata: Remove broken queue
+flushing" has been backported to most stable branches, but commit
+6fc4dbcf0276 "padata: Replace delayed timer with immediate workqueue in
+padata_reorder" has not.
 
-					- Ted
+Is this correct?  What prevents the parallel_data ref-count from
+dropping to 0 while the timer is scheduled?
+
+Ben.
+
+--=20
+Ben Hutchings
+Larkinson's Law: All laws are basically false.
 
 
+--=-8aSYj/hllzzIHLdFqU8o
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
 
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAl7D5MEACgkQ57/I7JWG
+EQm9Bg//QAhe9WehPg50caN5e9YGyXbSJjYPJueqpnQhCSf0m6fXXcCJQyxBe9mY
+4gONFO6eYPCRCZnrEpyq31ZjsQJap6h/u603Rb9F1Awus9ILHxL2L3gBktf4zEcS
+1DtBUPWE75KXHIQxZC0c2APgO+ay3zQ7Qh3X0SJNB7ahELJ4PQX5AIFAxoHLQADq
+Vatu+BFlmzSqbivrb1i92+d1Guhq+ELyX0ZgYjVJJkfb4tlPrsAaOS7JJFsCCqCh
+8ZH9ailNkNLhTi9unMISOypGMdrHVdCf0BeXZTrirOwBtlBluEE19OS/djMgbwS3
+Z0LXWh5HoWPSS6UuzpptycB3sW33xXjW+Xr30Ze1/SPb1ztOFUrWdLr1jbxawF4y
+HuMfWcTYmnMu3DwvcMN3rqik7ghyUV+mWJtuJ9gwHKJ5KILIa116bpct+mqFP270
+kqiFF0/FUlJezRD115ywzL+nwxoIpoOzXzWZpxG/7BTMD+559Lb8ad15RJZOX14Q
+wJFiMfZRGXl0Bbwr9XtCOVHIhRlh3SjY0sHSRLfn1UPqBOlfOIHvF6dvenvyIbpZ
+lkAqVB//CT3WqMWvm70EJC5vhbawl88r08hwFUUx2I647gm4lbQdWLqhU3mTWuS+
+D4iWNS8KxGb4au8JiaBa939kpTbLrC7KLc3LDPSw16RLtcvJtL8=
+=t2oh
+-----END PGP SIGNATURE-----
+
+--=-8aSYj/hllzzIHLdFqU8o--
