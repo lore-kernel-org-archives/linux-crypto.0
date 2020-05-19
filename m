@@ -2,96 +2,125 @@ Return-Path: <SRS0=SwA+=7B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=DKIMWL_WL_MED,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_BL,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5719C433E0
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 16:33:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFD5CC433E1
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 17:22:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 814CF207FB
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 16:33:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BEED82075F
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 17:22:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OuDq+uZ2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MQLQi/vs"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729478AbgESQdn (ORCPT
+        id S1729210AbgESRWG (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 May 2020 12:33:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47828 "EHLO
+        Tue, 19 May 2020 13:22:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729438AbgESQdZ (ORCPT
+        with ESMTP id S1729053AbgESRWF (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 May 2020 12:33:25 -0400
-Received: from mail-lj1-x242.google.com (mail-lj1-x242.google.com [IPv6:2a00:1450:4864:20::242])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACAA1C08C5C4
-        for <linux-crypto@vger.kernel.org>; Tue, 19 May 2020 09:33:24 -0700 (PDT)
-Received: by mail-lj1-x242.google.com with SMTP id w10so449237ljo.0
-        for <linux-crypto@vger.kernel.org>; Tue, 19 May 2020 09:33:24 -0700 (PDT)
+        Tue, 19 May 2020 13:22:05 -0400
+Received: from mail-ua1-x943.google.com (mail-ua1-x943.google.com [IPv6:2607:f8b0:4864:20::943])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB0E4C08C5C0;
+        Tue, 19 May 2020 10:22:05 -0700 (PDT)
+Received: by mail-ua1-x943.google.com with SMTP id i89so203503uad.5;
+        Tue, 19 May 2020 10:22:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
+        d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=2FsHvUk8dZh0ajzB3TiumDfxSGd35hr/R1OCXsEMaZA=;
-        b=OuDq+uZ2QpYJRvb/GeO+A1uwQ5ZGVdYpPQNakARsRaC0tVz+Y2WhHx7QO92kh4zmEo
-         hat1wqnZozmWrQqBpNGDXrYSjHetfvdRerSP00yzpoJpdWsHDdybi1TPyV469jMT2/Bw
-         w//6XEQgmwhX2rpK8Bf14xhWiiSsMzArs41dJIB6inPZ7k1okxBmAkm0cZzYn+8s0AtU
-         ISUd/6VByWUaIMiDlQ9ds+3/hneGNiP/6Ef4pq7a7WYas/7HaOxqm7ITPmJ30VyOO4SE
-         4cgiZVpPS9Y9QZcQhRloXVF0GMXP0p/5dX55Zve9rXXG/f4/yxiZvpTshzXuKEgWJSTA
-         +jNQ==
+        bh=R37GX8lcfHvrhVqcl+Q4iNaBYXnBxyCSRN5ixg5QveI=;
+        b=MQLQi/vs5EIJuOIYYEgBjyY2ogMmqVHcUvY/iQc9n8ebdzBHDGZT1q2sByAaIEVFOP
+         z9NAIRf3c5BblcP6pgONx6UQDeZPlQIslBs42spIU5pspQ5hZNTOJaQrw/zyXRKGFk7g
+         tVYwSqCfgIv88Fdk2pgdTIG6+Ss3Lik4SLtnyEJ6fNMV/GCn1wwl9/zzWvQ7ihqIWfsO
+         tJuB6oqoRNipFj5h7jXI/uOJEBft+2TGXSnz4lZiMTrG85nzAMaVeOh2cKr3yRUiUhtH
+         QAztJ2BfdhnbGTGZ/i/k448GJBWeG7SG5kDwRH54fWbMTLLOzsOkA2y29dXmHIko9w0O
+         OE2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=2FsHvUk8dZh0ajzB3TiumDfxSGd35hr/R1OCXsEMaZA=;
-        b=H0KG8a1kDV8vN+K2swdu6KMt/ANvVF0ZwVOxQ5F0ltqeNHJlHh3etqRah3fUaKR5k0
-         KbggYssAw9dxkQM4Nz5n5SBKxw6azi2b76WvRucNH7ctcYogp35XFlADzpgB5xSAHuPl
-         Skqk03HAVgR44FyUwjYibVIio9bKI/qkS4DiwikHLJdstX5rUMP+XVflezChVeqnuefx
-         YgVges8X3lO/lRvPLcl0p03WjiEM0Q7/3eSl+/GI24pu72eViDPo6VJjLdb27FGtGc7+
-         K03h6j8+c/qBNkg1cGk2Bvf+A9DLvV+X7xUQV/yqbx8Mc5QTpNXIYu2k1kVONDqdPvVo
-         TXWA==
-X-Gm-Message-State: AOAM530D/k1KXhOYGvFCOFSUnRxAA28Ywol/tmiLi0Zw1cQd4SsEh4+J
-        KSq0I9CUzn0chyo00ZFWO0lEuMKEoeQ/0RxZcAZQGQ==
-X-Google-Smtp-Source: ABdhPJwPMZ+B//q1l+gspCxSvYAD5mGiFN9/ycCKeAsnEVod6dS23lZ1SlsTQnf1ToCfRRMuXDUo8D2W9i0it03SfwM=
-X-Received: by 2002:a05:651c:3c6:: with SMTP id f6mr179097ljp.138.1589906002547;
- Tue, 19 May 2020 09:33:22 -0700 (PDT)
+        bh=R37GX8lcfHvrhVqcl+Q4iNaBYXnBxyCSRN5ixg5QveI=;
+        b=Md7eU/1gDHvWWcmUEuYiKuwB1ZK2mVlfVk2V8QJgNmbiPiECKux3yBZQNzEzU6kx4v
+         PW0i94C/OGIz/BKimFWJwBMfLmy+ihcwxJxi9itOOKKwyrxiGOEIiHtGOR+pWyFwPdjd
+         XkhqOGirXHl15sMWcPLS6p6UhDeB1/DidtGOC3bG0WnnaO4oqWq6pLtP6OhvcKAi6gb8
+         lkhlJNK5gaFzyukrLdx1Y2mQPqBY/BC6ILoIv202hZqbItI1vVZeERz2ep+GeAtANyCY
+         IuOW+1bjJi80HYkEopopQRskMR/F7NxtJ8zZTpuOAPSFW265IYZ22oEV/nDz7phiFI6o
+         nYRg==
+X-Gm-Message-State: AOAM5307ZQNoZULGUvqr48yTmumPmRaGu3+4u7CaWroi3gvFxD/3Ly+U
+        d4nlEOWNInxGobntW6hXlqnM+MpcdlFnrIejWnI=
+X-Google-Smtp-Source: ABdhPJw+v0Oiz1+AW3tGSdhibKk15suMY2wZnLoiTtvEQ26Sa0zcYpVOfhvxg2aok455yRTiNwA1kyX0yn1oggB1MmU=
+X-Received: by 2002:ab0:5fd3:: with SMTP id g19mr405396uaj.28.1589908924917;
+ Tue, 19 May 2020 10:22:04 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200515204141.251098-1-ebiggers@kernel.org>
-In-Reply-To: <20200515204141.251098-1-ebiggers@kernel.org>
-From:   Paul Crowley <paulcrowley@google.com>
-Date:   Tue, 19 May 2020 09:33:11 -0700
-Message-ID: <CA+_SqcB09GJJoTBm-U7ZwyTjuumyp4QwhLyxj8wbObd47qJOWw@mail.gmail.com>
-Subject: Re: [PATCH] fscrypt: add support for IV_INO_LBLK_32 policies
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-fscrypt@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-mmc@vger.kernel.org, "Theodore Y . Ts'o" <tytso@mit.edu>,
-        Satya Tangirala <satyat@google.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>
+References: <1589732796-22839-1-git-send-email-pooja.trivedi@stackpath.com> <20200518155016.75be3663@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+In-Reply-To: <20200518155016.75be3663@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+From:   Pooja Trivedi <poojatrivedi@gmail.com>
+Date:   Tue, 19 May 2020 13:21:56 -0400
+Message-ID: <CAOrEds=Mo4YHm1CPrgVmPhsJagUAQ0PzyDPk9Cq3URq-7vfCWA@mail.gmail.com>
+Subject: Re: [PATCH net] net/tls(TLS_SW): Fix integrity issue with
+ non-blocking sw KTLS request
+To:     Jakub Kicinski <kuba@kernel.org>
+Cc:     borisp@mellanox.com, aviadye@mellanox.com,
+        john.fastabend@gmail.com, daniel@iogearbox.net,
+        davem@davemloft.net, vakul.garg@nxp.com, netdev@vger.kernel.org,
+        linux-crypto@vger.kernel.org,
+        mallesham.jatharkonda@oneconvergence.com, josh.tway@stackpath.com,
+        Pooja Trivedi <pooja.trivedi@stackpath.com>
 Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Fri, 15 May 2020 at 13:50, Eric Biggers <ebiggers@kernel.org> wrote:
+On Mon, May 18, 2020 at 6:50 PM Jakub Kicinski <kuba@kernel.org> wrote:
 >
-> From: Eric Biggers <ebiggers@google.com>
+> On Sun, 17 May 2020 16:26:36 +0000 Pooja Trivedi wrote:
+> > In pure sw ktls(AES-NI), -EAGAIN from tcp layer (do_tcp_sendpages for
+> > encrypted record) gets treated as error, subtracts the offset, and
+> > returns to application. Because of this, application sends data from
+> > subtracted offset, which leads to data integrity issue. Since record is
+> > already encrypted, ktls module marks it as partially sent and pushes the
+> > packet to tcp layer in the following iterations (either from bottom half
+> > or when pushing next chunk). So returning success in case of EAGAIN
+> > will fix the issue.
+> >
+> > Fixes: a42055e8d2c3 ("net/tls: Add support for async encryption")
+> > Signed-off-by: Pooja Trivedi <pooja.trivedi@stackpath.com>
+> > Reviewed-by: Mallesham Jatharkonda <mallesham.jatharkonda@oneconvergence.com>
+> > Reviewed-by: Josh Tway <josh.tway@stackpath.com>
 >
-> The eMMC inline crypto standard will only specify 32 DUN bits (a.k.a. IV
-> bits), unlike UFS's 64.  IV_INO_LBLK_64 is therefore not applicable, but
-> an encryption format which uses one key per policy and permits the
-> moving of encrypted file contents (as f2fs's garbage collector requires)
-> is still desirable.
+> This looks reasonable, I think. Next time user space calls if no new
+> buffer space was made available it will get a -EAGAIN, right?
 >
-> To support such hardware, add a new encryption format IV_INO_LBLK_32
-> that makes the best use of the 32 bits: the IV is set to
-> 'SipHash-2-4(inode_number) + file_logical_block_number mod 2^32', where
-> the SipHash key is derived from the fscrypt master key.  We hash only
-> the inode number and not also the block number, because we need to
-> maintain contiguity of DUNs to merge bios.
 
-Reviewed-by: Paul Crowley <paulcrowley@google.com>
+Yes, this fix should only affect encrypted record. Plain text calls from
+user space should be unaffected.
 
-This is the best that can be done cryptographically on such hardware.
+>
+> Two questions - is there any particular application or use case that
+> runs into this?
+>
+
+We are running into this case when we hit our kTLS-enabled homegrown
+webserver with a 'pipeline' test tool, also homegrown. The issue basically
+happens whenever the send buffer on the server gets full and TCP layer
+returns EAGAIN when attempting to TX the encrypted record. In fact, we
+are also able to reproduce the issue by using a simple wget with a large
+file, if/when sndbuf fills up.
+
+> Seems a bit surprising to see a patch from Vadim and
+> you guys come at the same time.
+>
+
+Not familiar with Vadim or her/his patch. Could you please point me to it?
+
+>
+> Could you also add test for this bug?
+> In tools/testing/selftests/net/tls.c
+>
+
+Sure, yes. Let me look into this.
