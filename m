@@ -2,125 +2,97 @@ Return-Path: <SRS0=SwA+=7B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.6 required=3.0 tests=DKIMWL_BL,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=DKIM_INVALID,DKIM_SIGNED,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFD5CC433E1
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 17:22:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88C3FC433DF
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 17:35:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BEED82075F
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 17:22:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC02D206C3
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 17:35:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MQLQi/vs"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=chronox.de header.i=@chronox.de header.b="CDv9RkUP"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729210AbgESRWG (ORCPT
+        id S1729258AbgESRf0 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 May 2020 13:22:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55412 "EHLO
+        Tue, 19 May 2020 13:35:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57486 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1729053AbgESRWF (ORCPT
+        with ESMTP id S1729001AbgESRf0 (ORCPT
         <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 May 2020 13:22:05 -0400
-Received: from mail-ua1-x943.google.com (mail-ua1-x943.google.com [IPv6:2607:f8b0:4864:20::943])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB0E4C08C5C0;
-        Tue, 19 May 2020 10:22:05 -0700 (PDT)
-Received: by mail-ua1-x943.google.com with SMTP id i89so203503uad.5;
-        Tue, 19 May 2020 10:22:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=R37GX8lcfHvrhVqcl+Q4iNaBYXnBxyCSRN5ixg5QveI=;
-        b=MQLQi/vs5EIJuOIYYEgBjyY2ogMmqVHcUvY/iQc9n8ebdzBHDGZT1q2sByAaIEVFOP
-         z9NAIRf3c5BblcP6pgONx6UQDeZPlQIslBs42spIU5pspQ5hZNTOJaQrw/zyXRKGFk7g
-         tVYwSqCfgIv88Fdk2pgdTIG6+Ss3Lik4SLtnyEJ6fNMV/GCn1wwl9/zzWvQ7ihqIWfsO
-         tJuB6oqoRNipFj5h7jXI/uOJEBft+2TGXSnz4lZiMTrG85nzAMaVeOh2cKr3yRUiUhtH
-         QAztJ2BfdhnbGTGZ/i/k448GJBWeG7SG5kDwRH54fWbMTLLOzsOkA2y29dXmHIko9w0O
-         OE2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=R37GX8lcfHvrhVqcl+Q4iNaBYXnBxyCSRN5ixg5QveI=;
-        b=Md7eU/1gDHvWWcmUEuYiKuwB1ZK2mVlfVk2V8QJgNmbiPiECKux3yBZQNzEzU6kx4v
-         PW0i94C/OGIz/BKimFWJwBMfLmy+ihcwxJxi9itOOKKwyrxiGOEIiHtGOR+pWyFwPdjd
-         XkhqOGirXHl15sMWcPLS6p6UhDeB1/DidtGOC3bG0WnnaO4oqWq6pLtP6OhvcKAi6gb8
-         lkhlJNK5gaFzyukrLdx1Y2mQPqBY/BC6ILoIv202hZqbItI1vVZeERz2ep+GeAtANyCY
-         IuOW+1bjJi80HYkEopopQRskMR/F7NxtJ8zZTpuOAPSFW265IYZ22oEV/nDz7phiFI6o
-         nYRg==
-X-Gm-Message-State: AOAM5307ZQNoZULGUvqr48yTmumPmRaGu3+4u7CaWroi3gvFxD/3Ly+U
-        d4nlEOWNInxGobntW6hXlqnM+MpcdlFnrIejWnI=
-X-Google-Smtp-Source: ABdhPJw+v0Oiz1+AW3tGSdhibKk15suMY2wZnLoiTtvEQ26Sa0zcYpVOfhvxg2aok455yRTiNwA1kyX0yn1oggB1MmU=
-X-Received: by 2002:ab0:5fd3:: with SMTP id g19mr405396uaj.28.1589908924917;
- Tue, 19 May 2020 10:22:04 -0700 (PDT)
+        Tue, 19 May 2020 13:35:26 -0400
+Received: from mo6-p01-ob.smtp.rzone.de (mo6-p01-ob.smtp.rzone.de [IPv6:2a01:238:20a:202:5301::7])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5304C08C5C0
+        for <linux-crypto@vger.kernel.org>; Tue, 19 May 2020 10:35:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1589909722;
+        s=strato-dkim-0002; d=chronox.de;
+        h=References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+        X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+        bh=wmPnuRb8wgLctMH02vVbbie34eu8rrlWcgiQCxWFX7M=;
+        b=CDv9RkUPD6+j1oJIQz9/5PVSQsYcOAc/NuDaDH1DgnL3eLyb54ezBJbjLH4GccsLGe
+        9s8zFH0sPB891CTMzRcKk6wPOtLmUTOIx+wlXyS6g0abBf7Skne/6tetAY4ThwE1/zUl
+        0+dBV32XUFMmh/F42J5qUHfWNmCoLZkbn8taB7ZI8XzmNObM44R68dEaxsHAx596WAiP
+        CSKtHgxycKlYHkDG1ooK783TVhkOeNHkHpvygw8mhKricCb4OQNFhdLHXs3BTmJBanfb
+        YywYPGE+DPzL4XZCvU0kfgLgEfQV9ZD1sGIm481DtizOiZ4ymzfNQN0dEtzPFaXaQz2D
+        o26g==
+X-RZG-AUTH: ":P2ERcEykfu11Y98lp/T7+hdri+uKZK8TKWEqNyiHySGSa9k9xmwdNnzGHXPbI/Sc5g=="
+X-RZG-CLASS-ID: mo00
+Received: from tauon.chronox.de
+        by smtp.strato.de (RZmta 46.7.0 DYNA|AUTH)
+        with ESMTPSA id k09005w4JHZM0wa
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+        (Client did not present a certificate);
+        Tue, 19 May 2020 19:35:22 +0200 (CEST)
+From:   Stephan Mueller <smueller@chronox.de>
+To:     Ard Biesheuvel <ardb@kernel.org>
+Cc:     Eric Biggers <ebiggers@kernel.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>
+Subject: Re: ARM CE: CTS IV handling
+Date:   Tue, 19 May 2020 19:35:22 +0200
+Message-ID: <8691076.XE7dyB1q2z@tauon.chronox.de>
+In-Reply-To: <CAMj1kXHscmtLq=tA7zUgiNqZYgTFjfREL5EK6ZnoDCFp52GWGw@mail.gmail.com>
+References: <4311723.JCXmkh6OgN@tauon.chronox.de> <CAMj1kXHscmtLq=tA7zUgiNqZYgTFjfREL5EK6ZnoDCFp52GWGw@mail.gmail.com>
 MIME-Version: 1.0
-References: <1589732796-22839-1-git-send-email-pooja.trivedi@stackpath.com> <20200518155016.75be3663@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-In-Reply-To: <20200518155016.75be3663@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-From:   Pooja Trivedi <poojatrivedi@gmail.com>
-Date:   Tue, 19 May 2020 13:21:56 -0400
-Message-ID: <CAOrEds=Mo4YHm1CPrgVmPhsJagUAQ0PzyDPk9Cq3URq-7vfCWA@mail.gmail.com>
-Subject: Re: [PATCH net] net/tls(TLS_SW): Fix integrity issue with
- non-blocking sw KTLS request
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     borisp@mellanox.com, aviadye@mellanox.com,
-        john.fastabend@gmail.com, daniel@iogearbox.net,
-        davem@davemloft.net, vakul.garg@nxp.com, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
-        mallesham.jatharkonda@oneconvergence.com, josh.tway@stackpath.com,
-        Pooja Trivedi <pooja.trivedi@stackpath.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Mon, May 18, 2020 at 6:50 PM Jakub Kicinski <kuba@kernel.org> wrote:
->
-> On Sun, 17 May 2020 16:26:36 +0000 Pooja Trivedi wrote:
-> > In pure sw ktls(AES-NI), -EAGAIN from tcp layer (do_tcp_sendpages for
-> > encrypted record) gets treated as error, subtracts the offset, and
-> > returns to application. Because of this, application sends data from
-> > subtracted offset, which leads to data integrity issue. Since record is
-> > already encrypted, ktls module marks it as partially sent and pushes the
-> > packet to tcp layer in the following iterations (either from bottom half
-> > or when pushing next chunk). So returning success in case of EAGAIN
-> > will fix the issue.
-> >
-> > Fixes: a42055e8d2c3 ("net/tls: Add support for async encryption")
-> > Signed-off-by: Pooja Trivedi <pooja.trivedi@stackpath.com>
-> > Reviewed-by: Mallesham Jatharkonda <mallesham.jatharkonda@oneconvergence.com>
-> > Reviewed-by: Josh Tway <josh.tway@stackpath.com>
->
-> This looks reasonable, I think. Next time user space calls if no new
-> buffer space was made available it will get a -EAGAIN, right?
->
+Am Dienstag, 19. Mai 2020, 18:21:01 CEST schrieb Ard Biesheuvel:
 
-Yes, this fix should only affect encrypted record. Plain text calls from
-user space should be unaffected.
+Hi Ard,
 
->
-> Two questions - is there any particular application or use case that
-> runs into this?
->
+> 
+> To be honest, this looks like the API is being used incorrectly. Is
+> this a similar issue to the one Herbert spotted recently with the CTR
+> code?
+> 
+> When you say 'leaving the TFM untouched' do you mean the skcipher
+> request? The TFM should not retain any per-request state in the first
+> place.
+> 
+> The skcipher request struct is not meant to retain any state either -
+> the API simply does not support incremental encryption if the input is
+> not a multiple of the chunksize.
+> 
+> Could you give some sample code on how you are using the API in this case?
 
-We are running into this case when we hit our kTLS-enabled homegrown
-webserver with a 'pipeline' test tool, also homegrown. The issue basically
-happens whenever the send buffer on the server gets full and TCP layer
-returns EAGAIN when attempting to TX the encrypted record. In fact, we
-are also able to reproduce the issue by using a simple wget with a large
-file, if/when sndbuf fills up.
+What I am doing technically is to allocate a new tfm and request at the 
+beginning and then reuse the TFM and request. In that sense, I think I violate 
+that constraint.
 
-> Seems a bit surprising to see a patch from Vadim and
-> you guys come at the same time.
->
+But in order to implement such repetition, I can surely clear / allocate a new 
+TFM. But in order to get that right, I need the resulting IV after the cipher 
+operation.
 
-Not familiar with Vadim or her/his patch. Could you please point me to it?
+This IV that I get after the cipher operation completes is different between C 
+and CE.
 
->
-> Could you also add test for this bug?
-> In tools/testing/selftests/net/tls.c
->
+Ciao
+Stephan
 
-Sure, yes. Let me look into this.
+
