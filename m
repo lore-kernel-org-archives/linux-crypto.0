@@ -2,116 +2,92 @@ Return-Path: <SRS0=SwA+=7B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7313C433DF
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 21:43:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF507C433DF
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 22:17:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8F02E20E65
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 21:43:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1589924585;
-	bh=BeIMsQvyRiSEijaf9rj6Gp/weYuIoBWcbTERVgekK9Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:List-ID:From;
-	b=RWGY8PrWHn3iwYTHoqyyNTCBDoNMLf2BhqfNQHCj8uv8NjzEYw88Gw8JAuiSnI9cE
-	 Ib8SD7V+N5uaoY+dfh16/ruKyAD68T13O553DJgMWqBS+Z5v72N4yooRn7MzY6hXUN
-	 GJEJqjXjFL3zwhCymr7hY1+EBxqKkmZRFWwrufi8=
+	by mail.kernel.org (Postfix) with ESMTP id 9C6B12075F
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 22:17:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726030AbgESVnF (ORCPT
+        id S1726318AbgESWRh (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 May 2020 17:43:05 -0400
-Received: from mail.kernel.org ([198.145.29.99]:43172 "EHLO mail.kernel.org"
+        Tue, 19 May 2020 18:17:37 -0400
+Received: from inva020.nxp.com ([92.121.34.13]:51048 "EHLO inva020.nxp.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1725885AbgESVnE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 May 2020 17:43:04 -0400
-Received: from kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com (unknown [163.114.132.5])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 1CB6120C09;
-        Tue, 19 May 2020 21:43:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1589924584;
-        bh=BeIMsQvyRiSEijaf9rj6Gp/weYuIoBWcbTERVgekK9Q=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=NRaREweqN4zMFSIyjE4ypan2weM8v04bLAAPL1j07PfVWWQgF29BB4fWWA4kM7ZKE
-         dFS87OprHQ77L0MjBWQCsT1luugSCIZ9K55YyBGgbSNxe+qTDX5yvilVzSeGSy089c
-         DKo0nYbO3sqHKZdrc8Wz4T3aSMuWg6kEi5UhsVzk=
-Date:   Tue, 19 May 2020 14:42:55 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Pooja Trivedi <poojatrivedi@gmail.com>
-Cc:     borisp@mellanox.com, aviadye@mellanox.com,
-        john.fastabend@gmail.com, daniel@iogearbox.net,
-        davem@davemloft.net, vakul.garg@nxp.com, netdev@vger.kernel.org,
-        linux-crypto@vger.kernel.org,
-        mallesham.jatharkonda@oneconvergence.com, josh.tway@stackpath.com,
-        Pooja Trivedi <pooja.trivedi@stackpath.com>
-Subject: Re: [PATCH net] net/tls(TLS_SW): Fix integrity issue with
- non-blocking sw KTLS request
-Message-ID: <20200519144255.3a7416c4@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-In-Reply-To: <CAOrEds=Mo4YHm1CPrgVmPhsJagUAQ0PzyDPk9Cq3URq-7vfCWA@mail.gmail.com>
-References: <1589732796-22839-1-git-send-email-pooja.trivedi@stackpath.com>
-        <20200518155016.75be3663@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-        <CAOrEds=Mo4YHm1CPrgVmPhsJagUAQ0PzyDPk9Cq3URq-7vfCWA@mail.gmail.com>
+        id S1725998AbgESWRg (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 19 May 2020 18:17:36 -0400
+Received: from inva020.nxp.com (localhost [127.0.0.1])
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 8BC8E1A011F;
+        Wed, 20 May 2020 00:17:34 +0200 (CEST)
+Received: from inva024.eu-rdc02.nxp.com (inva024.eu-rdc02.nxp.com [134.27.226.22])
+        by inva020.eu-rdc02.nxp.com (Postfix) with ESMTP id 7CCC11A021B;
+        Wed, 20 May 2020 00:17:34 +0200 (CEST)
+Received: from lorenz.ea.freescale.net (lorenz.ea.freescale.net [10.171.71.5])
+        by inva024.eu-rdc02.nxp.com (Postfix) with ESMTP id C76B320564;
+        Wed, 20 May 2020 00:17:33 +0200 (CEST)
+From:   Iuliana Prodan <iuliana.prodan@nxp.com>
+To:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Baolin Wang <baolin.wang@linaro.org>,
+        Ard Biesheuvel <ard.biesheuvel@linaro.org>,
+        Horia Geanta <horia.geanta@nxp.com>
+Cc:     Aymen Sghaier <aymen.sghaier@nxp.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-imx <linux-imx@nxp.com>,
+        Iuliana Prodan <iuliana.prodan@nxp.com>
+Subject: [PATCH] crypto: engine - do not requeue in case of fatal error
+Date:   Wed, 20 May 2020 01:17:25 +0300
+Message-Id: <1589926645-32686-1-git-send-email-iuliana.prodan@nxp.com>
+X-Mailer: git-send-email 2.1.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: ClamAV using ClamSMTP
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On Tue, 19 May 2020 13:21:56 -0400 Pooja Trivedi wrote:
-> On Mon, May 18, 2020 at 6:50 PM Jakub Kicinski <kuba@kernel.org> wrote:
-> > On Sun, 17 May 2020 16:26:36 +0000 Pooja Trivedi wrote:  
-> > > In pure sw ktls(AES-NI), -EAGAIN from tcp layer (do_tcp_sendpages for
-> > > encrypted record) gets treated as error, subtracts the offset, and
-> > > returns to application. Because of this, application sends data from
-> > > subtracted offset, which leads to data integrity issue. Since record is
-> > > already encrypted, ktls module marks it as partially sent and pushes the
-> > > packet to tcp layer in the following iterations (either from bottom half
-> > > or when pushing next chunk). So returning success in case of EAGAIN
-> > > will fix the issue.
-> > >
-> > > Fixes: a42055e8d2c3 ("net/tls: Add support for async encryption")
-> > > Signed-off-by: Pooja Trivedi <pooja.trivedi@stackpath.com>
-> > > Reviewed-by: Mallesham Jatharkonda <mallesham.jatharkonda@oneconvergence.com>
-> > > Reviewed-by: Josh Tway <josh.tway@stackpath.com>  
-> >
-> > This looks reasonable, I think. Next time user space calls if no new
-> > buffer space was made available it will get a -EAGAIN, right?
-> 
-> Yes, this fix should only affect encrypted record. Plain text calls from
-> user space should be unaffected.
+Now, in crypto-engine, if hardware queue is full (-ENOSPC),
+requeue request regardless of MAY_BACKLOG flag.
+If hardware throws any other error code (like -EIO, -EINVAL,
+-ENOMEM, etc.) only MAY_BACKLOG requests are enqueued back into
+crypto-engine's queue, since the others can be dropped.
+The latter case can be fatal error, so those cannot be recovered from.
+For example, in CAAM driver, -EIO is returned in case the job descriptor
+is broken, so there is no possibility to fix the job descriptor.
+Therefore, these errors might be fatal error, so we shouldn’t
+requeue the request. This will just be pass back and forth between
+crypto-engine and hardware.
 
-AFAICS if TCP layer is full next call from user space should hit
-sk_stream_wait_memory() immediately and if it has MSG_DONTWAIT set 
-exit with EAGAIN. Which I believe to be correct behavior.
+Fixes: 6a89f492f8e5 ("crypto: engine - support for parallel requests based on retry mechanism")
+Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
+---
+ crypto/crypto_engine.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
 
-> > Two questions - is there any particular application or use case that
-> > runs into this?
-> 
-> We are running into this case when we hit our kTLS-enabled homegrown
-> webserver with a 'pipeline' test tool, also homegrown. The issue basically
-> happens whenever the send buffer on the server gets full and TCP layer
-> returns EAGAIN when attempting to TX the encrypted record. In fact, we
-> are also able to reproduce the issue by using a simple wget with a large
-> file, if/when sndbuf fills up.
+diff --git a/crypto/crypto_engine.c b/crypto/crypto_engine.c
+index 412149e..3655d9d 100644
+--- a/crypto/crypto_engine.c
++++ b/crypto/crypto_engine.c
+@@ -169,13 +169,10 @@ static void crypto_pump_requests(struct crypto_engine *engine,
+ 		/*
+ 		 * If hardware queue is full (-ENOSPC), requeue request
+ 		 * regardless of backlog flag.
+-		 * If hardware throws any other error code,
+-		 * requeue only backlog requests.
+ 		 * Otherwise, unprepare and complete the request.
+ 		 */
+ 		if (!engine->retry_support ||
+-		    ((ret != -ENOSPC) &&
+-		    !(async_req->flags & CRYPTO_TFM_REQ_MAY_BACKLOG))) {
++		    (ret != -ENOSPC)) {
+ 			dev_err(engine->dev,
+ 				"Failed to do one request from queue: %d\n",
+ 				ret);
+-- 
+2.1.0
 
-I see just a coincidence, then, no worries.
-
-> > Seems a bit surprising to see a patch from Vadim and
-> > you guys come at the same time.
-> 
-> Not familiar with Vadim or her/his patch. Could you please point me to it?
-
-http://patchwork.ozlabs.org/project/netdev/patch/20200517014451.954F05026DE@novek.ru/
-
-> > Could you also add test for this bug?
-> > In tools/testing/selftests/net/tls.c
-> >  
-> 
-> Sure, yes. Let me look into this.
-
-Thanks!
