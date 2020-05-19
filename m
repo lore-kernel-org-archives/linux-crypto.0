@@ -2,91 +2,120 @@ Return-Path: <SRS0=SwA+=7B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2005C433DF
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 13:53:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9694C433E0
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 14:45:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D16F12081A
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 13:53:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C8465207FB
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 14:45:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=default; t=1589899505;
+	bh=IaVjtUjZRfD5n9+imvde6GZIZTX/UXJ/zi0G9EtqwY8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:List-ID:From;
+	b=SZ03ft2je5j78qeY3LpB0QDNWz/1ABoUqKABzB26I42bfnzD7TUFn/I79TMnFQ/oY
+	 5LoZZnEMFjjvU6NZaseUepAUQWVpIM/+Q88emLJYHrdq2W7bIdduut47VOQ53BuNn/
+	 aNie7/rahdUOdDJx5jth8uO9wezgsiUYufyEEGhQ=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1729000AbgESNxT (ORCPT
+        id S1729134AbgESOpE (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 May 2020 09:53:19 -0400
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:55466 "EHLO
-        shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1727086AbgESNxT (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 May 2020 09:53:19 -0400
-Received: from [192.168.4.242] (helo=deadeye)
-        by shadbolt.decadent.org.uk with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.89)
-        (envelope-from <ben@decadent.org.uk>)
-        id 1jb2gA-0000Ym-T6; Tue, 19 May 2020 14:53:10 +0100
-Received: from ben by deadeye with local (Exim 4.93)
-        (envelope-from <ben@decadent.org.uk>)
-        id 1jb2gA-000uKi-GB; Tue, 19 May 2020 14:53:10 +0100
-Message-ID: <0b158b60fe621552c327e9d822bc3245591a4bd6.camel@decadent.org.uk>
-Subject: Backporting "padata: Remove broken queue flushing"
-From:   Ben Hutchings <ben@decadent.org.uk>
-To:     Herbert Xu <herbert@gondor.apana.org.au>
-Cc:     Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-crypto@vger.kernel.org, stable <stable@vger.kernel.org>
-Date:   Tue, 19 May 2020 14:53:05 +0100
-Content-Type: multipart/signed; micalg="pgp-sha512";
-        protocol="application/pgp-signature"; boundary="=-8aSYj/hllzzIHLdFqU8o"
-User-Agent: Evolution 3.36.2-1 
+        Tue, 19 May 2020 10:45:04 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44100 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1728647AbgESOpE (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 19 May 2020 10:45:04 -0400
+Received: from sol.localdomain (c-107-3-166-239.hsd1.ca.comcast.net [107.3.166.239])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mail.kernel.org (Postfix) with ESMTPSA id BB3C920825;
+        Tue, 19 May 2020 14:45:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=default; t=1589899503;
+        bh=IaVjtUjZRfD5n9+imvde6GZIZTX/UXJ/zi0G9EtqwY8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=mJzQ71AZohKqnmu/hIb1vJojWlq7pnCYd6ePvm+HoHwhRH6gnFUNWLJbDW6vXlxy+
+         Sjjoqco6E4dO0ac3gZYa7/CYDGb5rG1spEg7Ug7kjnlZETQtiS4HugobFC8VDghAls
+         srvR1sb43gH1vlDywH6XqoHrdvbMx4qhRYGcQXCE=
+Date:   Tue, 19 May 2020 07:45:01 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     "Theodore Y. Ts'o" <tytso@mit.edu>
+Cc:     linux-fscrypt@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-ext4@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-mmc@vger.kernel.org, Satya Tangirala <satyat@google.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Paul Crowley <paulcrowley@google.com>
+Subject: Re: [PATCH] fscrypt: add support for IV_INO_LBLK_32 policies
+Message-ID: <20200519144501.GA857@sol.localdomain>
+References: <20200515204141.251098-1-ebiggers@kernel.org>
+ <20200519111321.GE2396055@mit.edu>
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 192.168.4.242
-X-SA-Exim-Mail-From: ben@decadent.org.uk
-X-SA-Exim-Scanned: No (on shadbolt.decadent.org.uk); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200519111321.GE2396055@mit.edu>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
+On Tue, May 19, 2020 at 07:13:21AM -0400, Theodore Y. Ts'o wrote:
+> On Fri, May 15, 2020 at 01:41:41PM -0700, Eric Biggers wrote:
+> > From: Eric Biggers <ebiggers@google.com>
+> > 
+> > The eMMC inline crypto standard will only specify 32 DUN bits (a.k.a. IV
+> > bits), unlike UFS's 64.  IV_INO_LBLK_64 is therefore not applicable, but
+> > an encryption format which uses one key per policy and permits the
+> > moving of encrypted file contents (as f2fs's garbage collector requires)
+> > is still desirable.
+> > 
+> > To support such hardware, add a new encryption format IV_INO_LBLK_32
+> > that makes the best use of the 32 bits: the IV is set to
+> > 'SipHash-2-4(inode_number) + file_logical_block_number mod 2^32', where
+> > the SipHash key is derived from the fscrypt master key.  We hash only
+> > the inode number and not also the block number, because we need to
+> > maintain contiguity of DUNs to merge bios.
+> > 
+> > Unlike with IV_INO_LBLK_64, with this format IV reuse is possible; this
+> > is unavoidable given the size of the DUN.  This means this format should
+> > only be used where the requirements of the first paragraph apply.
+> > However, the hash spreads out the IVs in the whole usable range, and the
+> > use of a keyed hash makes it difficult for an attacker to determine
+> > which files use which IVs.
+> > 
+> > Besides the above differences, this flag works like IV_INO_LBLK_64 in
+> > that on ext4 it is only allowed if the stable_inodes feature has been
+> > enabled to prevent inode numbers and the filesystem UUID from changing.
+> > 
+> > Signed-off-by: Eric Biggers <ebiggers@google.com>
+> 
+> Reviewed-by: Theodore Ts'o <tytso@mit.edu>
+> 
+> I kind of wish we had Kunit tests with test vectors, but that's for
+> another commit I think.
+> 
 
---=-8aSYj/hllzzIHLdFqU8o
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+We do have ciphertext verification tests in xfstests for all the existing
+fscrypt options.  Actually, I had hacked one together for IV_INO_LBLK_32 before
+sending this patch
+(https://git.kernel.org/pub/scm/linux/kernel/git/ebiggers/xfstests-dev.git/commit/?id=55153ceee2948269c0359bd97fc0d58a26139c87).
+I'll be sending it for review after I've looked over it again.
 
-I noticed that commit 07928d9bfc81 "padata: Remove broken queue
-flushing" has been backported to most stable branches, but commit
-6fc4dbcf0276 "padata: Replace delayed timer with immediate workqueue in
-padata_reorder" has not.
+Similarly, since earlier this year, we now also have ciphertext verification
+tests in Android's VTS (Vendor Test Suite)
+(https://android.googlesource.com/platform/test/vts-testcase/kernel/+/refs/heads/master/encryption/).
+I'll be adding one for this new flag.
 
-Is this correct?  What prevents the parallel_data ref-count from
-dropping to 0 while the timer is scheduled?
+These ciphertext verification tests test the round-trip from the key added by
+userspace to the data on-disk -- even if the data is encrypted by inline crypto
+hardware rather than the kernel itself.  So they're better than Kunit tests.
 
-Ben.
+The thing I'm struggling with a bit is actually that when inline crypto is used,
+IV_INO_LBLK_32 introduces a case where the DUN can wrap from 0xffffffff to 0,
+and that case is new/special in that blocks can't be merged over that boundary
+even if they are both logically and physically contiguous.  So, we could also
+use a test that tests doing I/O around this boundary where the DUN wraps around.
 
---=20
-Ben Hutchings
-Larkinson's Law: All laws are basically false.
-
-
---=-8aSYj/hllzzIHLdFqU8o
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAl7D5MEACgkQ57/I7JWG
-EQm9Bg//QAhe9WehPg50caN5e9YGyXbSJjYPJueqpnQhCSf0m6fXXcCJQyxBe9mY
-4gONFO6eYPCRCZnrEpyq31ZjsQJap6h/u603Rb9F1Awus9ILHxL2L3gBktf4zEcS
-1DtBUPWE75KXHIQxZC0c2APgO+ay3zQ7Qh3X0SJNB7ahELJ4PQX5AIFAxoHLQADq
-Vatu+BFlmzSqbivrb1i92+d1Guhq+ELyX0ZgYjVJJkfb4tlPrsAaOS7JJFsCCqCh
-8ZH9ailNkNLhTi9unMISOypGMdrHVdCf0BeXZTrirOwBtlBluEE19OS/djMgbwS3
-Z0LXWh5HoWPSS6UuzpptycB3sW33xXjW+Xr30Ze1/SPb1ztOFUrWdLr1jbxawF4y
-HuMfWcTYmnMu3DwvcMN3rqik7ghyUV+mWJtuJ9gwHKJ5KILIa116bpct+mqFP270
-kqiFF0/FUlJezRD115ywzL+nwxoIpoOzXzWZpxG/7BTMD+559Lb8ad15RJZOX14Q
-wJFiMfZRGXl0Bbwr9XtCOVHIhRlh3SjY0sHSRLfn1UPqBOlfOIHvF6dvenvyIbpZ
-lkAqVB//CT3WqMWvm70EJC5vhbawl88r08hwFUUx2I647gm4lbQdWLqhU3mTWuS+
-D4iWNS8KxGb4au8JiaBa939kpTbLrC7KLc3LDPSw16RLtcvJtL8=
-=t2oh
------END PGP SIGNATURE-----
-
---=-8aSYj/hllzzIHLdFqU8o--
+- Eric
