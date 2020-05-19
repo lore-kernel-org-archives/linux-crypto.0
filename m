@@ -2,127 +2,90 @@ Return-Path: <SRS0=SwA+=7B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71469C433DF
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 19:02:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 758CEC433DF
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 19:05:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 576FB206C3
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 19:02:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5370F206C3
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 19:05:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1589914941;
-	bh=v7efvTu5talMRkBl/oTTM5IxNW02Zbh7QqxiZtAVavI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:List-ID:From;
-	b=hRn+SpNX4GUEdlpQIFt54CKvPjU0hHcBrqDKzSmuvvh6RAfGl7fGEedM3UJtrk5iq
-	 KlBxs9AAH6umNf9GCzdMoWwpmVs/uJSkJWYyXXfU2v6OKCcIC1y3U0+4e9oJtn9iqB
-	 /+vUCrNNjnHOP6vlJWjZOIRzbFs0JGUQsfSqZr28=
+	s=default; t=1589915100;
+	bh=5wUA2kw9gi9NGUOPlTqxvEngtjEwdS/z9ZQ0DwPRQKI=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
+	b=I/YYsXq69bra7ngkl2eMm94yYvS0AdH9BVxcXT6lsRv5vGhkhkofS40a5/bgAkEDS
+	 QyF+AEDes1+rnrid/hGCV8YUEvJgMfPBhTHjtaDQgZ3DbCwq8mahMKMYfKTNh6qvgW
+	 Op/xvIUvjhHlYna2oETPnkyYpf40iP3x0C2oqrs4=
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726732AbgESTCU (ORCPT
+        id S1726059AbgESTE7 (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 May 2020 15:02:20 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56082 "EHLO mail.kernel.org"
+        Tue, 19 May 2020 15:04:59 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57458 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726059AbgESTCU (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 May 2020 15:02:20 -0400
-Received: from localhost.localdomain (laubervilliers-657-1-83-120.w92-154.abo.wanadoo.fr [92.154.90.120])
+        id S1726290AbgESTE7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 19 May 2020 15:04:59 -0400
+Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id EC62A20823;
-        Tue, 19 May 2020 19:02:18 +0000 (UTC)
+        by mail.kernel.org (Postfix) with ESMTPSA id 4F262206C3
+        for <linux-crypto@vger.kernel.org>; Tue, 19 May 2020 19:04:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1589914940;
-        bh=v7efvTu5talMRkBl/oTTM5IxNW02Zbh7QqxiZtAVavI=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=WhS89Qeu7ptX2jdVKD4tcmN3g/CYlVXoYJdb0drZVjoYXiey5TOAOhJQMmRdNOWKt
-         B9hfiCjQB2FsiIJ2RFxNDZ1Wsint6i1o8GrHBwqrR6rEYIjWhEJa3nt64BYpGL8n5P
-         mJqipMEAg86LrSHk3Y15DHcEbzXYiyY3+/Ls668E=
-From:   Ard Biesheuvel <ardb@kernel.org>
-To:     linux-crypto@vger.kernel.org
-Cc:     linux-arm-kernel@lists.infradead.org, ebiggers@kernel.org,
-        Ard Biesheuvel <ardb@kernel.org>,
-        Stephan Mueller <smueller@chronox.de>
-Subject: [RFC/RFT PATCH 2/2] crypto: testmgr - add output IVs for AES-CBC with ciphertext stealing
-Date:   Tue, 19 May 2020 21:02:11 +0200
-Message-Id: <20200519190211.76855-3-ardb@kernel.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20200519190211.76855-1-ardb@kernel.org>
-References: <20200519190211.76855-1-ardb@kernel.org>
+        s=default; t=1589915099;
+        bh=5wUA2kw9gi9NGUOPlTqxvEngtjEwdS/z9ZQ0DwPRQKI=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=Wo9CiWmYQaEpKbvJnXiL/gkwQUMPuCIuKSj3bjAm3313ObpQcUOq6yvBt6Eo6Cdxo
+         MUhqJZHd3dI1dEAYXgiXsmg7eilLcrDdEf69gy8QEFEFzIxRZMFwfzGbLVTgja9JJl
+         STRJpV8ZJPZPBeWoPPwsgS9ozKlcQmv2Z0+5N+tM=
+Received: by mail-io1-f52.google.com with SMTP id k18so406771ion.0
+        for <linux-crypto@vger.kernel.org>; Tue, 19 May 2020 12:04:59 -0700 (PDT)
+X-Gm-Message-State: AOAM530B+iIORrEmMNjprfc7SccP+uXoQQ9v3BIcBm35k+DXoc8uHBFk
+        Aeajfn3Gdsc2NqVOctfqXvPXhL9+8WNsLuu9D5U=
+X-Google-Smtp-Source: ABdhPJzdM446lwy+w5EhFYeIWCa0NRFUvx+N+9/U7j7zeiwe+oc/IRDmuMyfOTUmB2GjrXJLbgkmr91t/kyBQcTEzRo=
+X-Received: by 2002:a05:6638:41b:: with SMTP id q27mr1094617jap.68.1589915098721;
+ Tue, 19 May 2020 12:04:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20200519190211.76855-1-ardb@kernel.org>
+In-Reply-To: <20200519190211.76855-1-ardb@kernel.org>
+From:   Ard Biesheuvel <ardb@kernel.org>
+Date:   Tue, 19 May 2020 21:04:47 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXE-e8VatDyVW-ptRtpk81FTrXbLyJgHXojbyFMAi_WF0w@mail.gmail.com>
+Message-ID: <CAMj1kXE-e8VatDyVW-ptRtpk81FTrXbLyJgHXojbyFMAi_WF0w@mail.gmail.com>
+Subject: Re: [RFC/RFT PATCH 0/2] crypto: add CTS output IVs for arm64 and testmgr
+To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        Gilad Ben-Yossef <gilad@benyossef.com>
+Cc:     Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        Eric Biggers <ebiggers@kernel.org>,
+        Stephan Mueller <smueller@chronox.de>
+Content-Type: text/plain; charset="UTF-8"
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-Add some test vectors to get coverage for the IV that is output by CTS
-implementations.
+(add Gilad for cc-ree)
 
-Signed-off-by: Ard Biesheuvel <ardb@kernel.org>
----
- crypto/testmgr.h | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index d29983908c38..d45fa1ad91ee 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -31041,6 +31041,8 @@ static const struct cipher_testvec cts_mode_tv_template[] = {
- 		.ctext	= "\xc6\x35\x35\x68\xf2\xbf\x8c\xb4"
- 			  "\xd8\xa5\x80\x36\x2d\xa7\xff\x7f"
- 			  "\x97",
-+		.iv_out	= "\xc6\x35\x35\x68\xf2\xbf\x8c\xb4"
-+			  "\xd8\xa5\x80\x36\x2d\xa7\xff\x7f",
- 	}, {
- 		.klen	= 16,
- 		.key    = "\x63\x68\x69\x63\x6b\x65\x6e\x20"
-@@ -31054,6 +31056,8 @@ static const struct cipher_testvec cts_mode_tv_template[] = {
- 			  "\xd4\x45\xd4\xc8\xef\xf7\xed\x22"
- 			  "\x97\x68\x72\x68\xd6\xec\xcc\xc0"
- 			  "\xc0\x7b\x25\xe2\x5e\xcf\xe5",
-+		.iv_out	= "\xfc\x00\x78\x3e\x0e\xfd\xb2\xc1"
-+			  "\xd4\x45\xd4\xc8\xef\xf7\xed\x22",
- 	}, {
- 		.klen	= 16,
- 		.key    = "\x63\x68\x69\x63\x6b\x65\x6e\x20"
-@@ -31067,6 +31071,8 @@ static const struct cipher_testvec cts_mode_tv_template[] = {
- 			  "\xbe\x7f\xcb\xcc\x98\xeb\xf5\xa8"
- 			  "\x97\x68\x72\x68\xd6\xec\xcc\xc0"
- 			  "\xc0\x7b\x25\xe2\x5e\xcf\xe5\x84",
-+		.iv_out	= "\x39\x31\x25\x23\xa7\x86\x62\xd5"
-+			  "\xbe\x7f\xcb\xcc\x98\xeb\xf5\xa8",
- 	}, {
- 		.klen	= 16,
- 		.key    = "\x63\x68\x69\x63\x6b\x65\x6e\x20"
-@@ -31084,6 +31090,8 @@ static const struct cipher_testvec cts_mode_tv_template[] = {
- 			  "\x1b\x55\x49\xd2\xf8\x38\x02\x9e"
- 			  "\x39\x31\x25\x23\xa7\x86\x62\xd5"
- 			  "\xbe\x7f\xcb\xcc\x98\xeb\xf5",
-+		.iv_out	= "\xb3\xff\xfd\x94\x0c\x16\xa1\x8c"
-+			  "\x1b\x55\x49\xd2\xf8\x38\x02\x9e",
- 	}, {
- 		.klen	= 16,
- 		.key    = "\x63\x68\x69\x63\x6b\x65\x6e\x20"
-@@ -31101,6 +31109,8 @@ static const struct cipher_testvec cts_mode_tv_template[] = {
- 			  "\x3b\xc1\x03\xe1\xa1\x94\xbb\xd8"
- 			  "\x39\x31\x25\x23\xa7\x86\x62\xd5"
- 			  "\xbe\x7f\xcb\xcc\x98\xeb\xf5\xa8",
-+		.iv_out	= "\x9d\xad\x8b\xbb\x96\xc4\xcd\xc0"
-+			  "\x3b\xc1\x03\xe1\xa1\x94\xbb\xd8",
- 	}, {
- 		.klen	= 16,
- 		.key    = "\x63\x68\x69\x63\x6b\x65\x6e\x20"
-@@ -31122,6 +31132,8 @@ static const struct cipher_testvec cts_mode_tv_template[] = {
- 			  "\x26\x73\x0d\xbc\x2f\x7b\xc8\x40"
- 			  "\x9d\xad\x8b\xbb\x96\xc4\xcd\xc0"
- 			  "\x3b\xc1\x03\xe1\xa1\x94\xbb\xd8",
-+		.iv_out	= "\x48\x07\xef\xe8\x36\xee\x89\xa5"
-+			  "\x26\x73\x0d\xbc\x2f\x7b\xc8\x40",
- 	}
- };
- 
--- 
-2.20.1
-
+On Tue, 19 May 2020 at 21:02, Ard Biesheuvel <ardb@kernel.org> wrote:
+>
+> Stephan reports that the arm64 implementation of cts(cbc(aes)) deviates
+> from the generic implementation in what it returns as the output IV. So
+> fix this, and add some test vectors to catch other non-compliant
+> implementations.
+>
+> Stephan, could you provide a reference for the NIST validation tool and
+> how it flags this behaviour as non-compliant? Thanks.
+>
+> Cc: Stephan Mueller <smueller@chronox.de>
+>
+> Ard Biesheuvel (2):
+>   crypto: arm64/aes - align output IV with generic CBC-CTS driver
+>   crypto: testmgr - add output IVs for AES-CBC with ciphertext stealing
+>
+>  arch/arm64/crypto/aes-modes.S |  2 ++
+>  crypto/testmgr.h              | 12 ++++++++++++
+>  2 files changed, 14 insertions(+)
+>
+> --
+> 2.20.1
+>
