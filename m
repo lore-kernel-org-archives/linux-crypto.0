@@ -2,90 +2,132 @@ Return-Path: <SRS0=SwA+=7B=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-1.1 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 758CEC433DF
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 19:05:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F506C433DF
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 20:00:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5370F206C3
-	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 19:05:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=default; t=1589915100;
-	bh=5wUA2kw9gi9NGUOPlTqxvEngtjEwdS/z9ZQ0DwPRQKI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:List-ID:From;
-	b=I/YYsXq69bra7ngkl2eMm94yYvS0AdH9BVxcXT6lsRv5vGhkhkofS40a5/bgAkEDS
-	 QyF+AEDes1+rnrid/hGCV8YUEvJgMfPBhTHjtaDQgZ3DbCwq8mahMKMYfKTNh6qvgW
-	 Op/xvIUvjhHlYna2oETPnkyYpf40iP3x0C2oqrs4=
+	by mail.kernel.org (Postfix) with ESMTP id 4CAC82065F
+	for <linux-crypto@archiver.kernel.org>; Tue, 19 May 2020 20:00:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="m5Pfir0j"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726059AbgESTE7 (ORCPT
+        id S1727796AbgESUAM (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Tue, 19 May 2020 15:04:59 -0400
-Received: from mail.kernel.org ([198.145.29.99]:57458 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1726290AbgESTE7 (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Tue, 19 May 2020 15:04:59 -0400
-Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        by mail.kernel.org (Postfix) with ESMTPSA id 4F262206C3
-        for <linux-crypto@vger.kernel.org>; Tue, 19 May 2020 19:04:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=default; t=1589915099;
-        bh=5wUA2kw9gi9NGUOPlTqxvEngtjEwdS/z9ZQ0DwPRQKI=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=Wo9CiWmYQaEpKbvJnXiL/gkwQUMPuCIuKSj3bjAm3313ObpQcUOq6yvBt6Eo6Cdxo
-         MUhqJZHd3dI1dEAYXgiXsmg7eilLcrDdEf69gy8QEFEFzIxRZMFwfzGbLVTgja9JJl
-         STRJpV8ZJPZPBeWoPPwsgS9ozKlcQmv2Z0+5N+tM=
-Received: by mail-io1-f52.google.com with SMTP id k18so406771ion.0
-        for <linux-crypto@vger.kernel.org>; Tue, 19 May 2020 12:04:59 -0700 (PDT)
-X-Gm-Message-State: AOAM530B+iIORrEmMNjprfc7SccP+uXoQQ9v3BIcBm35k+DXoc8uHBFk
-        Aeajfn3Gdsc2NqVOctfqXvPXhL9+8WNsLuu9D5U=
-X-Google-Smtp-Source: ABdhPJzdM446lwy+w5EhFYeIWCa0NRFUvx+N+9/U7j7zeiwe+oc/IRDmuMyfOTUmB2GjrXJLbgkmr91t/kyBQcTEzRo=
-X-Received: by 2002:a05:6638:41b:: with SMTP id q27mr1094617jap.68.1589915098721;
- Tue, 19 May 2020 12:04:58 -0700 (PDT)
+        Tue, 19 May 2020 16:00:12 -0400
+Received: from userp2120.oracle.com ([156.151.31.85]:35822 "EHLO
+        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728396AbgESUAK (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Tue, 19 May 2020 16:00:10 -0400
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04JJvO3X163391;
+        Tue, 19 May 2020 19:59:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=KFT7il4oQYnxSD//NHfbPGAV55evT6o96B02J2kbkZc=;
+ b=m5Pfir0j+8jvBAJNVLO6/UwXRLk5AYrLZOIA3N/vmvP6+bYmnxX096KKmNhNUMSf/5x4
+ 0V2v6IPkBJ9bHq2Tyr+WvMy6gIsRiBdLXV3TYjQLdogQlzLzC+AdEuOoRFsbxPKzQR5U
+ r8N/tvlD/nj3Ke3YWsbbWKXxwTRrW/+HG1G9hN5z3uBVpvsyzapUZ0f++Sx/ZtbgMdUw
+ KtYmSlx1NAJ53rZPD+B1O4oNyPFZLDO5W9pI8f5wFn1NwQqa3fcb+0kdH61esQrH+6v8
+ jmxxmkvDJg4gbvcqpeUsJcCWWtILAUgjwitg4uVVVcVwz3l6Ihph5dShOfG/xHnf4gcF ZQ== 
+Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
+        by userp2120.oracle.com with ESMTP id 3128tnffh0-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Tue, 19 May 2020 19:59:57 +0000
+Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
+        by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 04JJx1AG115652;
+        Tue, 19 May 2020 19:59:56 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by aserp3020.oracle.com with ESMTP id 312t3586n7-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 19 May 2020 19:59:56 +0000
+Received: from abhmp0003.oracle.com (abhmp0003.oracle.com [141.146.116.9])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 04JJxsP2028706;
+        Tue, 19 May 2020 19:59:55 GMT
+Received: from ca-dmjordan1.us.oracle.com (/10.211.9.48)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 19 May 2020 12:59:54 -0700
+Date:   Tue, 19 May 2020 16:00:18 -0400
+From:   Daniel Jordan <daniel.m.jordan@oracle.com>
+To:     Ben Hutchings <ben@decadent.org.uk>
+Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
+        Daniel Jordan <daniel.m.jordan@oracle.com>,
+        Steffen Klassert <steffen.klassert@secunet.com>,
+        linux-crypto@vger.kernel.org, stable <stable@vger.kernel.org>
+Subject: Re: Backporting "padata: Remove broken queue flushing"
+Message-ID: <20200519200018.5vuyuxmjy5ypgi3w@ca-dmjordan1.us.oracle.com>
+References: <0b158b60fe621552c327e9d822bc3245591a4bd6.camel@decadent.org.uk>
 MIME-Version: 1.0
-References: <20200519190211.76855-1-ardb@kernel.org>
-In-Reply-To: <20200519190211.76855-1-ardb@kernel.org>
-From:   Ard Biesheuvel <ardb@kernel.org>
-Date:   Tue, 19 May 2020 21:04:47 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXE-e8VatDyVW-ptRtpk81FTrXbLyJgHXojbyFMAi_WF0w@mail.gmail.com>
-Message-ID: <CAMj1kXE-e8VatDyVW-ptRtpk81FTrXbLyJgHXojbyFMAi_WF0w@mail.gmail.com>
-Subject: Re: [RFC/RFT PATCH 0/2] crypto: add CTS output IVs for arm64 and testmgr
-To:     Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        Gilad Ben-Yossef <gilad@benyossef.com>
-Cc:     Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Stephan Mueller <smueller@chronox.de>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0b158b60fe621552c327e9d822bc3245591a4bd6.camel@decadent.org.uk>
+User-Agent: NeoMutt/20180716
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9626 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 spamscore=0 mlxlogscore=968
+ phishscore=0 mlxscore=0 malwarescore=0 suspectscore=2 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2004280000
+ definitions=main-2005190170
+X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9626 signatures=668686
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 impostorscore=0 bulkscore=0 spamscore=0
+ clxscore=1011 cotscore=-2147483648 suspectscore=2 lowpriorityscore=0
+ adultscore=0 phishscore=0 mlxlogscore=990 mlxscore=0 priorityscore=1501
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2004280000 definitions=main-2005190170
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-(add Gilad for cc-ree)
+Hello Ben,
 
-On Tue, 19 May 2020 at 21:02, Ard Biesheuvel <ardb@kernel.org> wrote:
+On Tue, May 19, 2020 at 02:53:05PM +0100, Ben Hutchings wrote:
+> I noticed that commit 07928d9bfc81 "padata: Remove broken queue
+> flushing" has been backported to most stable branches, but commit
+> 6fc4dbcf0276 "padata: Replace delayed timer with immediate workqueue in
+> padata_reorder" has not.
 >
-> Stephan reports that the arm64 implementation of cts(cbc(aes)) deviates
-> from the generic implementation in what it returns as the output IV. So
-> fix this, and add some test vectors to catch other non-compliant
-> implementations.
->
-> Stephan, could you provide a reference for the NIST validation tool and
-> how it flags this behaviour as non-compliant? Thanks.
->
-> Cc: Stephan Mueller <smueller@chronox.de>
->
-> Ard Biesheuvel (2):
->   crypto: arm64/aes - align output IV with generic CBC-CTS driver
->   crypto: testmgr - add output IVs for AES-CBC with ciphertext stealing
->
->  arch/arm64/crypto/aes-modes.S |  2 ++
->  crypto/testmgr.h              | 12 ++++++++++++
->  2 files changed, 14 insertions(+)
->
-> --
-> 2.20.1
->
+> Is this correct?  What prevents the parallel_data ref-count from
+> dropping to 0 while the timer is scheduled?
+
+Doesn't seem like anything does, looking at 4.19.
+
+I can see a race where the timer function uses a parallel_data after free
+whether or not the refcount goes to 0.  Don't think it's likely to happen in
+practice because of how small the window is between the serial callback
+finishing and the timer being deactivated.
+
+
+   task1:
+   padata_reorder
+                                      task2:
+                                      padata_do_serial
+                                        // object arrives in reorder queue
+     // sees reorder_objects > 0,
+     //   set timer for 1 second
+     mod_timer
+     return
+                                        padata_reorder
+                                          // queue serial work, which finishes
+                                          //   (now possibly no more objects
+                                          //    left)
+                                          |
+   task1:                                 |
+   // pd is freed one of two ways:        |
+   //   1) pcrypt is unloaded             |
+   //   2) padata_replace triggered       |
+   //      from userspace                 | (small window)
+                                          |
+   task3:                                 |
+   padata_reorder_timer                   |
+     // uses pd after free                |
+                                          |
+                                          del_timer  // too late
+
+
+If I got this right we might want to backport the commit you mentioned to be on
+the safe side.
