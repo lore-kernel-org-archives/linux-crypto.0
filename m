@@ -2,157 +2,133 @@ Return-Path: <SRS0=Eyne=7C=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.8 required=3.0 tests=HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6555C433E1
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 May 2020 14:34:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E62CC433E0
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 May 2020 15:42:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D00F420874
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 May 2020 14:34:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D64A20708
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 May 2020 15:42:22 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=nokia.onmicrosoft.com header.i=@nokia.onmicrosoft.com header.b="K193NDNd"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726938AbgETOeA (ORCPT
+        id S1726844AbgETPmV (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 May 2020 10:34:00 -0400
-Received: from shadbolt.e.decadent.org.uk ([88.96.1.126]:34138 "EHLO
-        shadbolt.e.decadent.org.uk" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1726943AbgETOd7 (ORCPT
-        <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 May 2020 10:33:59 -0400
-Received: from [192.168.4.242] (helo=deadeye)
-        by shadbolt.decadent.org.uk with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.89)
-        (envelope-from <ben@decadent.org.uk>)
-        id 1jbPn8-0003vS-VC; Wed, 20 May 2020 15:33:55 +0100
-Received: from ben by deadeye with local (Exim 4.93)
-        (envelope-from <ben@decadent.org.uk>)
-        id 1jbPn8-007E8U-Ip; Wed, 20 May 2020 15:33:54 +0100
-Message-ID: <87267d7217e4a3d58440079c16d313e411eab004.camel@decadent.org.uk>
-Subject: Re: Backporting "padata: Remove broken queue flushing"
-From:   Ben Hutchings <ben@decadent.org.uk>
-To:     Daniel Jordan <daniel.m.jordan@oracle.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Sasha Levin <sashal@kernel.org>
-Cc:     Herbert Xu <herbert@gondor.apana.org.au>,
-        Steffen Klassert <steffen.klassert@secunet.com>,
-        linux-crypto@vger.kernel.org, stable <stable@vger.kernel.org>
-Date:   Wed, 20 May 2020 15:33:44 +0100
-In-Reply-To: <20200519200018.5vuyuxmjy5ypgi3w@ca-dmjordan1.us.oracle.com>
-References: <0b158b60fe621552c327e9d822bc3245591a4bd6.camel@decadent.org.uk>
-         <20200519200018.5vuyuxmjy5ypgi3w@ca-dmjordan1.us.oracle.com>
-Content-Type: multipart/signed; micalg="pgp-sha512";
-        protocol="application/pgp-signature"; boundary="=-m2IaeLpxmCsA51lvJPJZ"
-User-Agent: Evolution 3.36.2-1 
+        Wed, 20 May 2020 11:42:21 -0400
+Received: from mail-db8eur05on2106.outbound.protection.outlook.com ([40.107.20.106]:51767
+        "EHLO EUR05-DB8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1726510AbgETPmV (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 May 2020 11:42:21 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Xk6YGNCtIZQc06q3HAiv9UshFxNQJXQi/cV+GszszEnJqrD7xAYb+jtmshfEiZ4r9kJ2ycxECZS2bNN3ApVYdeYo/6WBtBgY6skPzzNRwwNWqzmIlOnzk09Q0tk9MD8cOsokfmlkKt7Iyd3FIRv6nSUxt6ZK4C45L1FpTWyTX1/0I/azUz4lnpb8hlZFUB5/hZHL2gma/xUKIvyYd5gL2aFFxHAJ9ypQ59smQeWJq4Rb8xr1o6xj4yb9TojIFGf7Etpqn55ExXhBaUWrFgMziweHSokhcQur5FCBEAZn2NBAYJuBBW9mXU5K+uZ0DomLzW1Cdu9OplDzQ3FELCqNLQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IQUkz8x58t4OhVKcHEhH3U7e1KDD6eGusT0wHZXHnd8=;
+ b=ULTN+Jg2Q3RKfTHOFpEJ68z+s5YZCjAaPFoqgd/rXw5sCCR9AdmJJyWKad/wiTBIf5ZRMhjXb+KarxIIxu1dn0AmfZVlvWVcv0vx4FpeJ3S7FmbzosjultF14J6K34pxbZbWdyskoCURSs5gxTjZykvH6cd6JpcC1AmAjX6p7pwceHd0PayGMk+VRdktx4xZ9kHkYg6nbmCu1tHlzRdlCNcWh7L6GYo1tXq/bBgUdt96LI7loOmyo8/7nrHZGNYn3amgkI/9HHq9mwIvvIUBMRGi7le+HaYN4MbP+wbZNROdhEFIADM+uLLSfW3M0hR6mRd8ngnaS8zu8e3J88xmOw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nokia.com; dmarc=pass action=none header.from=nokia.com;
+ dkim=pass header.d=nokia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia.onmicrosoft.com;
+ s=selector1-nokia-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=IQUkz8x58t4OhVKcHEhH3U7e1KDD6eGusT0wHZXHnd8=;
+ b=K193NDNdsuaJQHBtol1IkyNJHaEd8S8pIvKi8TEyRFbq86FMenqtFx9zcf0IZVDZnBqfpSk1r4Sw26OdgRESYEIYeVw+lO4nnywH5bGzVPl56qcj6hH+J8bJuyFPbxh80NukexMAmnKm4ZKdDkjB1fJhrve8Rgf9kThQcZKZWmc=
+Received: from AM0PR07MB3937.eurprd07.prod.outlook.com (2603:10a6:208:4c::20)
+ by AM0PR07MB6260.eurprd07.prod.outlook.com (2603:10a6:20b:15a::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.12; Wed, 20 May
+ 2020 15:42:17 +0000
+Received: from AM0PR07MB3937.eurprd07.prod.outlook.com
+ ([fe80::6958:35d6:fc84:49db]) by AM0PR07MB3937.eurprd07.prod.outlook.com
+ ([fe80::6958:35d6:fc84:49db%7]) with mapi id 15.20.3021.019; Wed, 20 May 2020
+ 15:42:17 +0000
+From:   "Sverdlin, Alexander (Nokia - DE/Ulm)" <alexander.sverdlin@nokia.com>
+To:     "stern@rowland.harvard.edu" <stern@rowland.harvard.edu>,
+        "dinghao.liu@zju.edu.cn" <dinghao.liu@zju.edu.cn>,
+        "kjlu@umn.edu" <kjlu@umn.edu>
+CC:     "mpm@selenic.com" <mpm@selenic.com>,
+        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "ben.dooks@codethink.co.uk" <ben.dooks@codethink.co.uk>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "arnd@arndb.de" <arnd@arndb.de>,
+        "allison@lohutok.net" <allison@lohutok.net>,
+        "yuehaibing@huawei.com" <yuehaibing@huawei.com>,
+        "rfontana@redhat.com" <rfontana@redhat.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>
+Subject: Re: [PATCH] hwrng: ks-sa - fix runtime pm imbalance on error
+Thread-Topic: [PATCH] hwrng: ks-sa - fix runtime pm imbalance on error
+Thread-Index: AQHWLqrc5p0U1ZS6x0GMW4HdJHCe3aixHSWA
+Date:   Wed, 20 May 2020 15:42:17 +0000
+Message-ID: <ab400cba7523e69b15360b0928cb8fa8b9432d86.camel@nokia.com>
+References: <20200520132957.18776-1-dinghao.liu@zju.edu.cn>
+In-Reply-To: <20200520132957.18776-1-dinghao.liu@zju.edu.cn>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.36.2 
+authentication-results: rowland.harvard.edu; dkim=none (message not signed)
+ header.d=none;rowland.harvard.edu; dmarc=none action=none
+ header.from=nokia.com;
+x-originating-ip: [131.228.2.9]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-ht: Tenant
+x-ms-office365-filtering-correlation-id: dc38129e-8166-45ec-e135-08d7fcd46067
+x-ms-traffictypediagnostic: AM0PR07MB6260:
+x-microsoft-antispam-prvs: <AM0PR07MB6260FC377AECCE53D99AFC6B88B60@AM0PR07MB6260.eurprd07.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:8882;
+x-forefront-prvs: 04097B7F7F
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: S5/KZdiGEkzl8qTqBUeQq8In2XURDkhuxyU1JcfeiTGhfNrKIdnmbXd7J8bfzSKEm7jq7SjHTJVVf5tWmzgD9h1VxetRgvq8XSCperfF53lzRdjuZ7W+7w4rdJymzmN/N6Rsr5yvlsWZUcz50izivqIQnL80y9e+wzAMSU8xNjkO50bIk4geXS+61Q8fXmWBeZkK33Q5ZgaqwJkNEGrs0T0RRPRgVsTQmw4AWBVOd6Wy71XC4+DA29EXmt1z7GlL4xBL1EMlpvCLBPAaWLWFPwjGNY7SbLLmDFI4BPqGNckZh6JRaaB2fA2fesMPh2u715JFy2TQutqMUsldlA26Lw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR07MB3937.eurprd07.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(366004)(376002)(346002)(136003)(39860400002)(396003)(66446008)(36756003)(8676002)(6512007)(76116006)(64756008)(86362001)(66556008)(8936002)(7416002)(66946007)(66476007)(91956017)(478600001)(316002)(5660300002)(26005)(6486002)(6506007)(2616005)(54906003)(4326008)(2906002)(71200400001)(186003)(110136005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: FWsn7Bdpjy1JK9PpkSat+A8PnsFXqt/FESF6kZbG+8wzxGn9NawGqneayTMrKvMgPuz99QMT1HZAsWYn/mHlZJ/TGoJkx2NkFRSRS5feA1zk5Y+A59SfxNw+66vLeRkx3dEBBxCZr06rQ/9xCcrJn3KpfXGXIbsRUrPnYi4FswmTULVqa6iAv7Ll4GKHx5KK96Y6XGHdXcxWgda07YI2XeBcFV4YqqYuT1opeASiZrDS98lU2JyCh9JZQz0VufVYwm8y3sumXElP714vbD7BjBb4zRZgu3Em9bEniu9decbCiMMwmX3hTaamsxBwtzrrAegKLWGJPLQ3mYfIA7WSzhw6k8rsI345MnbsEktdbgfVh1Wui783+IAXhd32bWP/f1DIbbSRsr2xOBUcgJHWbsblkAogwXak/3PU3EhQOp5AZ0TNCy3kiGcL2iLroW5kNR8R7teNlUoJMClWUxX9VLC9Q8srEJSLrllXPfXStqY=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <BCD2A50CC19AFE479D3DF980CBF50299@eurprd07.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-X-SA-Exim-Connect-IP: 192.168.4.242
-X-SA-Exim-Mail-From: ben@decadent.org.uk
-X-SA-Exim-Scanned: No (on shadbolt.decadent.org.uk); SAEximRunCond expanded to false
+X-OriginatorOrg: nokia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dc38129e-8166-45ec-e135-08d7fcd46067
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 May 2020 15:42:17.5792
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 5d471751-9675-428d-917b-70f44f9630b0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ODD24Uc/XI8l/YjAuUMkkQbJoccz3N0NElKdYIbMvoMq+kSQnNmEilZGRyu6e7oKwuZfpyBWgIjrcHWw1Yi3G4K5J59ji9gV3uoHom+DvZU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR07MB6260
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-
---=-m2IaeLpxmCsA51lvJPJZ
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, 2020-05-19 at 16:00 -0400, Daniel Jordan wrote:
-> Hello Ben,
->=20
-> On Tue, May 19, 2020 at 02:53:05PM +0100, Ben Hutchings wrote:
-> > I noticed that commit 07928d9bfc81 "padata: Remove broken queue
-> > flushing" has been backported to most stable branches, but commit
-> > 6fc4dbcf0276 "padata: Replace delayed timer with immediate workqueue in
-> > padata_reorder" has not.
-> >=20
-> > Is this correct?  What prevents the parallel_data ref-count from
-> > dropping to 0 while the timer is scheduled?
->=20
-> Doesn't seem like anything does, looking at 4.19.
-
-OK, so it looks like the following commits should be backported:
-
-[3.16-4.9]  119a0798dc42 padata: Remove unused but set variables
-[3.16]      de5540d088fe padata: avoid race in reordering
-[3.16-4.9]  69b348449bda padata: get_next is never NULL
-[3.16-4.14] cf5868c8a22d padata: ensure the reorder timer callback runs on =
-the correct CPU
-[3.16-4.14] 350ef88e7e92 padata: ensure padata_do_serial() runs on the corr=
-ect CPU
-[3.16-4.19] 6fc4dbcf0276 padata: Replace delayed timer with immediate workq=
-ueue in padata_reorder
-[3.16-4.19] ec9c7d19336e padata: initialize pd->cpu with effective cpumask
-[3.16-4.19] 065cf577135a padata: purge get_cpu and reorder_via_wq from pada=
-ta_do_serial
-
-Ben.
-
-> I can see a race where the timer function uses a parallel_data after free
-> whether or not the refcount goes to 0.  Don't think it's likely to happen=
- in
-> practice because of how small the window is between the serial callback
-> finishing and the timer being deactivated.
->=20
->=20
->    task1:
->    padata_reorder
->                                       task2:
->                                       padata_do_serial
->                                         // object arrives in reorder queu=
-e
->      // sees reorder_objects > 0,
->      //   set timer for 1 second
->      mod_timer
->      return
->                                         padata_reorder
->                                           // queue serial work, which fin=
-ishes
->                                           //   (now possibly no more obje=
-cts
->                                           //    left)
->                                           |
->    task1:                                 |
->    // pd is freed one of two ways:        |
->    //   1) pcrypt is unloaded             |
->    //   2) padata_replace triggered       |
->    //      from userspace                 | (small window)
->                                           |
->    task3:                                 |
->    padata_reorder_timer                   |
->      // uses pd after free                |
->                                           |
->                                           del_timer  // too late
->=20
->=20
-> If I got this right we might want to backport the commit you mentioned to=
- be on
-> the safe side.
---=20
-Ben Hutchings
-All the simple programs have been written, and all the good names taken
-
-
---=-m2IaeLpxmCsA51lvJPJZ
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEErCspvTSmr92z9o8157/I7JWGEQkFAl7FP8gACgkQ57/I7JWG
-EQn6PQ/7B6DuS4mLpMfbLThku0x4T3b4Mhh+LNlKYqNNrY/InGKhOrRt0b+m/UBV
-V8Q2VLfdJTXLcQ4W2i9AK0hSdRMx6RuFCrtqDdKdhsICPqyLTIvqOQB0/2ZID1c8
-Eo1gykwtj8ixN29MjszIJB7YciQETIaXMG/qMpJ1Q6jFLyyaGF83obf4WoTzhJ6U
-/PfHzh0P1oXwtX2OelIPif4qVRko06o+oCioZAldCyAD4Cdp6z+iIvPTNlGFduiy
-cB9WMdL733hCHnevGgn9XLAOK4yhtxS7GCmvCiGF4i9AWbEgzwkNg3kXmPGixW5x
-Imrj1ZTUN42jAtwScnyKcBFcYriG3Q0SeHArR1SJOZIToOZzgJIKMdvS7NJcyE0d
-Vwno/paJOgQx7hEU8aI3Hu8Q9YCF4u2k59tUNK+Agx+MzTtJlYPuFqyoIJCzJ+tZ
-l8UyQt0dZvpGQ19Hku8NrKfqo+4biX/hUdDS+vbMPutMHNVY0mvZHz1+5c/j2OvN
-/6p84DU+ipJP347Lr9SjtfqMCG6Uy9hooMaIbpdS1tFldBgYGggGgvY8fTXwsnDm
-Ly7RPkbNf61qqaGkCPGkktnBqkjienwxo7xE39eeF+wy63g2G+beE7WEV7H4S67N
-dYNxplOEWP8pfLThv61n9wj4BWGDcXD+UNmSewFpj039h30d1Ek=
-=GHff
------END PGP SIGNATURE-----
-
---=-m2IaeLpxmCsA51lvJPJZ--
+SGVsbG8gRGluZ2hhbywNCg0KT24gV2VkLCAyMDIwLTA1LTIwIGF0IDIxOjI5ICswODAwLCBEaW5n
+aGFvIExpdSB3cm90ZToNCj4gcG1fcnVudGltZV9nZXRfc3luYygpIGluY3JlbWVudHMgdGhlIHJ1
+bnRpbWUgUE0gdXNhZ2UgY291bnRlciBldmVuDQo+IHRoZSBjYWxsIHJldHVybnMgYW4gZXJyb3Ig
+Y29kZS4gVGh1cyBhIHBhaXJpbmcgZGVjcmVtZW50IGlzIG5lZWRlZA0KPiBvbiB0aGUgZXJyb3Ig
+aGFuZGxpbmcgcGF0aCB0byBrZWVwIHRoZSBjb3VudGVyIGJhbGFuY2VkLg0KDQpJIGJlbGlldmUs
+IHRoaXMgaXMgdGhlIHdyb25nIHBsYWNlIGZvciBzdWNoIGtpbmQgb2YgZml4Lg0KcG1fcnVudGlt
+ZV9nZXRfc3luYygpIGhhcyBvYnZpb3VzbHkgYSBicm9rZW4gc2VtYW50aWNzIHdpdGggcmVnYXJk
+cyB0bw0KeW91ciBvYnNlcnZhdGlvbiBidXQgbm8gb3RoZXIgZHJpdmVyIGRvZXMgd2hhdCB5b3Ug
+cHJvcG9zZS4NCkkgdGhpbmsgdGhlIHByb3BlciBmaXggYmVsb25nIGludG8gUE0gc3Vic3lzdGVt
+LCBwbGVhc2UgdGFrZSBhIGxvb2sNCm9udG8gY29tbWl0IDE1YmNiOTFkN2U2MCAiUE0gLyBSdW50
+aW1lOiBJbXBsZW1lbnQgYXV0b3N1c3BlbmQgc3VwcG9ydCIuDQoNCj4gU2lnbmVkLW9mZi1ieTog
+RGluZ2hhbyBMaXUgPGRpbmdoYW8ubGl1QHpqdS5lZHUuY24+DQo+IC0tLQ0KPiAgZHJpdmVycy9j
+aGFyL2h3X3JhbmRvbS9rcy1zYS1ybmcuYyB8IDEgKw0KPiAgMSBmaWxlIGNoYW5nZWQsIDEgaW5z
+ZXJ0aW9uKCspDQo+IA0KPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9jaGFyL2h3X3JhbmRvbS9rcy1z
+YS1ybmcuYyBiL2RyaXZlcnMvY2hhci9od19yYW5kb20va3Mtc2Etcm5nLmMNCj4gaW5kZXggZTIz
+MzBlNzU3ZjFmLi44NWM4MWRhNGE4YWYgMTAwNjQ0DQo+IC0tLSBhL2RyaXZlcnMvY2hhci9od19y
+YW5kb20va3Mtc2Etcm5nLmMNCj4gKysrIGIvZHJpdmVycy9jaGFyL2h3X3JhbmRvbS9rcy1zYS1y
+bmcuYw0KPiBAQCAtMjQ0LDYgKzI0NCw3IEBAIHN0YXRpYyBpbnQga3Nfc2Ffcm5nX3Byb2JlKHN0
+cnVjdCBwbGF0Zm9ybV9kZXZpY2UgKnBkZXYpDQo+ICAJcmV0ID0gcG1fcnVudGltZV9nZXRfc3lu
+YyhkZXYpOw0KPiAgCWlmIChyZXQgPCAwKSB7DQo+ICAJCWRldl9lcnIoZGV2LCAiRmFpbGVkIHRv
+IGVuYWJsZSBTQSBwb3dlci1kb21haW5cbiIpOw0KPiArCQlwbV9ydW50aW1lX3B1dF9zeW5jKGRl
+dik7DQo+ICAJCXBtX3J1bnRpbWVfZGlzYWJsZShkZXYpOw0KPiAgCQlyZXR1cm4gcmV0Ow0KPiAg
+CX0NCi0tIA0KQWxleGFuZGVyIFN2ZXJkbGluLg0KDQo=
