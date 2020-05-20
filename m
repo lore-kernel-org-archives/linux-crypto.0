@@ -2,123 +2,172 @@ Return-Path: <SRS0=Eyne=7C=vger.kernel.org=linux-crypto-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=DKIM_SIGNED,DKIM_VALID,
-	DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.4 required=3.0 tests=DKIMWL_WL_HIGH,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14975C433E0
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 May 2020 08:17:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B939FC433E2
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 May 2020 08:18:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E17542065F
-	for <linux-crypto@archiver.kernel.org>; Wed, 20 May 2020 08:17:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8B3762072C
+	for <linux-crypto@archiver.kernel.org>; Wed, 20 May 2020 08:18:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="GvRsV3Un"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="YvT6s8mK"
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726403AbgETIRy (ORCPT
+        id S1726436AbgETISf (ORCPT
         <rfc822;linux-crypto@archiver.kernel.org>);
-        Wed, 20 May 2020 04:17:54 -0400
-Received: from mail-eopbgr00062.outbound.protection.outlook.com ([40.107.0.62]:3583
-        "EHLO EUR02-AM5-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1726425AbgETIRx (ORCPT <rfc822;linux-crypto@vger.kernel.org>);
-        Wed, 20 May 2020 04:17:53 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ntLUXTA6n6ndgFJ2FNaTYsORCeW0nvSmzeYmfDIkvxcwq+l4lEcqy5YlRA84Xgt8xLVv8TZ0ZUoZCzNl8a5oLevnbAhiM8J2NvEniUryj+Q+qGc9JW8hBun2Wx+Pi145ECqYd5WBjPPgGjpgOskN3OuxxSnSoDJ76gsMcms96N1of8blYlCROFYFDbo1k1scB7M9z/FfcflThKIPrgnEWZ1azmcpq1MKM5Yd4j46Rs2RpSbfzs9YCvEvi7NOglI3+twYwmxAfy9hmniCpuZQ927nsI4f5kDiygGU+y0yFadUp+02PM2Ipk+1ubA2449WSBv4WTMQ1A8QndW1z3Mztw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QgQ4W8a5enBsXawiIyDQaeEEweUOE+ZzsYGBSLSmaeA=;
- b=lyZ3F3AbBshpmhZ9RxpD7wwNOEyYL8Ph60lLrNXZthx2ITWMU1bWyLhzYkCL8BiPZNQMPN0HyeH1+A+Tf3w8jiozU0HUFUQgWi2Gq7Ic7+Jjl2E+MZ9xtLwvH4RNEYqB/7RfVKlDI5EwhtDRsb44jSNDCSeKyU3MAlcW9vPjGn6wAB78CDCNH0W/p0MlQrWdxeZxSRvCkxN5VpTvHOeL4J8yaDrYfeU3emZmiybA62MNrl+eIURHQq04b5BTMdxdukmtn+0APYtflJqcFnHXLeRgXHu2+gDgEDv7FdN8zBFT9IN5vprlJsjPOUqQbgLdYmvAJhoKDiUi2jZeH7urCA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QgQ4W8a5enBsXawiIyDQaeEEweUOE+ZzsYGBSLSmaeA=;
- b=GvRsV3UnU9eBrkBUErR+XRfAAsyGQZc07vXYMOCfPF0UHBloAYjS1uOOx0PAENcFMAu7jDz1PizgJnZU7v30WqidxtzSrtkbwmjwEYnMv+WELUuNKhkT8Dj6RebRig+hwVbeCemNP1bCIQjhjWoma/ehupZBDmrQaz07Dq/JDE8=
-Authentication-Results: nxp.com; dkim=none (message not signed)
- header.d=none;nxp.com; dmarc=none action=none header.from=nxp.com;
-Received: from AM6PR04MB4038.eurprd04.prod.outlook.com (2603:10a6:209:44::24)
- by AM6PR04MB6600.eurprd04.prod.outlook.com (2603:10a6:20b:fa::29) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3021.23; Wed, 20 May
- 2020 08:17:49 +0000
-Received: from AM6PR04MB4038.eurprd04.prod.outlook.com
- ([fe80::a915:1f41:6468:75ea]) by AM6PR04MB4038.eurprd04.prod.outlook.com
- ([fe80::a915:1f41:6468:75ea%7]) with mapi id 15.20.3021.020; Wed, 20 May 2020
- 08:17:49 +0000
-Subject: Re: [PATCH] crypto: engine - do not requeue in case of fatal error
-To:     Iuliana Prodan <iuliana.prodan@nxp.com>,
+        Wed, 20 May 2020 04:18:35 -0400
+Received: from mailout2.w1.samsung.com ([210.118.77.12]:56053 "EHLO
+        mailout2.w1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1726425AbgETISf (ORCPT
+        <rfc822;linux-crypto@vger.kernel.org>);
+        Wed, 20 May 2020 04:18:35 -0400
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20200520081832euoutp02d46899f6d9941e2581509da47d9b1a62~QrqmqdVs_2998929989euoutp02R
+        for <linux-crypto@vger.kernel.org>; Wed, 20 May 2020 08:18:32 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20200520081832euoutp02d46899f6d9941e2581509da47d9b1a62~QrqmqdVs_2998929989euoutp02R
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1589962712;
+        bh=ofqge9eLurcw12bkh9bRZU2bEi4+BPAAQ1dx+dpIZQI=;
+        h=Subject:To:Cc:From:Date:In-Reply-To:References:From;
+        b=YvT6s8mKd0OKIQJfx84xXHF7ZsyXKEG7LHQ1XVrITcieAmJq97kZdCZNM5F/2iarM
+         4qBPwRF5VnDvvT5qy1Xgh0wBTxXZoGHuOg0zakNUZdGLtQk29L5kywf0vcpLkq0J/j
+         qB4RQHFVCeJb5mPPGKefcmkOCPomRmBl9upI8Uk8=
+Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20200520081831eucas1p106cf83e4f00015b72f80e760a0eceee4~QrqmQw4uq2188421884eucas1p1i;
+        Wed, 20 May 2020 08:18:31 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges3new.samsung.com (EUCPMTA) with SMTP id 53.2B.60698.7D7E4CE5; Wed, 20
+        May 2020 09:18:31 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20200520081831eucas1p2fef65ce5e9847e051f0c9d13e03c1892~QrqlzlBHK1468714687eucas1p21;
+        Wed, 20 May 2020 08:18:31 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20200520081831eusmtrp2e900a7aed40971e6833b817be2124e31~QrqlysWqC0267902679eusmtrp2j;
+        Wed, 20 May 2020 08:18:31 +0000 (GMT)
+X-AuditID: cbfec7f5-a0fff7000001ed1a-09-5ec4e7d7ab51
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id C8.D1.08375.7D7E4CE5; Wed, 20
+        May 2020 09:18:31 +0100 (BST)
+Received: from [106.120.51.18] (unknown [106.120.51.18]) by
+        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20200520081830eusmtip20b394f0405bf25bf73ffaca23c8ea528~Qrqk4AggG2560225602eusmtip2h;
+        Wed, 20 May 2020 08:18:30 +0000 (GMT)
+Subject: Re: [PATCH v2 1/2] hwrng: iproc-rng200 - Set the quality value
+To:     =?UTF-8?Q?=c5=81ukasz_Stelmach?= <l.stelmach@samsung.com>,
+        Matt Mackall <mpm@selenic.com>,
         Herbert Xu <herbert@gondor.apana.org.au>,
-        Baolin Wang <baolin.wang@linaro.org>,
-        Ard Biesheuvel <ard.biesheuvel@linaro.org>
-Cc:     Aymen Sghaier <aymen.sghaier@nxp.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        dl-linux-imx <linux-imx@nxp.com>
-References: <1589926645-32686-1-git-send-email-iuliana.prodan@nxp.com>
-From:   =?UTF-8?Q?Horia_Geant=c4=83?= <horia.geanta@nxp.com>
-Message-ID: <98058a95-ce97-4d3b-a2b5-acfe750ce3c7@nxp.com>
-Date:   Wed, 20 May 2020 11:17:33 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.8.0
-In-Reply-To: <1589926645-32686-1-git-send-email-iuliana.prodan@nxp.com>
-Content-Type: text/plain; charset=utf-8
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Ray Jui <rjui@broadcom.com>,
+        Scott Branden <sbranden@broadcom.com>,
+        bcm-kernel-feedback-list@broadcom.com,
+        Kukjin Kim <kgene@kernel.org>,
+        Krzysztof Kozlowski <krzk@kernel.org>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        Markus Elfring <elfring@users.sourceforge.net>,
+        Matthias Brugger <mbrugger@suse.com>,
+        Stefan Wahren <wahrenst@gmx.net>, linux-crypto@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-samsung-soc@vger.kernel.org,
+        Stephan Mueller <smueller@chronox.de>
+Cc:     Bartlomiej Zolnierkiewicz <b.zolnierkie@samsung.com>
+From:   Kamil Konieczny <k.konieczny@samsung.com>
+Message-ID: <a257d9fe-0a6d-8dd5-cdaf-5b3e7fdf3391@samsung.com>
+Date:   Wed, 20 May 2020 10:18:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+        Thunderbird/68.7.0
+MIME-Version: 1.0
+In-Reply-To: <20200519212552.11671-2-l.stelmach@samsung.com>
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: AM6PR0202CA0055.eurprd02.prod.outlook.com
- (2603:10a6:20b:3a::32) To AM6PR04MB4038.eurprd04.prod.outlook.com
- (2603:10a6:209:44::24)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.0.129] (84.117.251.185) by AM6PR0202CA0055.eurprd02.prod.outlook.com (2603:10a6:20b:3a::32) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3000.25 via Frontend Transport; Wed, 20 May 2020 08:17:48 +0000
-X-Originating-IP: [84.117.251.185]
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 4a302e84-8aac-4f22-e162-08d7fc964890
-X-MS-TrafficTypeDiagnostic: AM6PR04MB6600:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR04MB66005D1C8936F3633AB6EC5398B60@AM6PR04MB6600.eurprd04.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-Forefront-PRVS: 04097B7F7F
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: xwamilyUFIlzJ8pyJr7gtQ+5QZ/JHXfinSOUiXnot7WBGNfXglqUpznbgZeqg2fjXlFpWm8ushelaMLRfDCk6pf/KYH8ShljSBKbbOojw5WMHwt1vvdMsD9hbmP1yw8mouD2hUmp87jqLOD1qwJDxbgJkkk9dj4wbZzOUyyr/8Nxdev/LUyhvrReitwNIAWGqaYtigFY6+v7/LLh43LpJ3FmnKuwxa3NnFtbjQVLzQzB+2L0dFaUGWAMNxWtFdIQtTKXl2N7NnbPy1YkS+jYkeCvujgfxau/gHGIyFOyP+NWlOJndtb96aWHWqATXAGVhvOA1wwhyApduh4OJgLMTzIu05My9d3n4IUbBBrZur/RU9PSs1CEJLJcw1xDggg4
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM6PR04MB4038.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFTY:;SFS:(4636009)(39860400002)(346002)(376002)(136003)(396003)(366004)(16526019)(4326008)(52116002)(66946007)(186003)(31686004)(4744005)(26005)(478600001)(6486002)(5660300002)(36756003)(6666004)(16576012)(8936002)(316002)(54906003)(110136005)(66556008)(66476007)(2616005)(31696002)(8676002)(86362001)(2906002)(956004)(53546011)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData: OkBvWfFEFopGBW6ObtRbeJVii0vM0iI8sJ2BWqP3HNlmpDywqeosOS/4ZgprBWV7kFVt1CGVI/rSjVIeF1V817KYiZiNvPvDMMZ8KVsDOxLsCpXa/UyEmOzgBvbHXF5g+LwUvuOIwKX0s56QAER+nY/kpodiHewKO+XufGhcJVfzrL8VsCow3zWt3I/fxpRnOIGuDD3a4510p8pFdHWNMVeB2klVMjDoMCb/Z/oDdJdlxi7XGW9JbuW/06oQSwK2p6ODoVIe9pAvdKoAhANJ5eGWgsCBVblxqeVLZNYz30z2XEUphMrau5o+0IWO0zEhMyIalSCT0z8G1pDyrDMyW15sy0NiXH37xhS9YEA/OfSFI+5slPLR6K/2QPSkx0qcnOI0VkCtwUZ3eZiux0H1H4G9n7AToZ2zGLs15Z4RMsR2dbp9a1mmsr9Hvnh1bebmjt2JUG6KUEQxNEvKGpEyTH59McuK5bDCiBHCz8tfepOBrPrShsnlKvfg+T0l/vlZ
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4a302e84-8aac-4f22-e162-08d7fc964890
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 May 2020 08:17:49.0681
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VMAnpKl8tw7aMH9QiEiBHMn046ZQZeNCfGRWvQ29pFWET/w092tiUIl9QZzJcq2LlpspWijYWrbc9izpTSr0uQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR04MB6600
+X-Brightmail-Tracker: H4sIAAAAAAAAA01Sf0zMYRzee9+fF9e+neizamy3RTFCmXfH/C7fjT/848dY5eiroiu7k59/
+        aFJcl7RLo6M5+l1yue5uYirnCKkbwmFpdpFYNv1Ahbj7Mv33vM/zed7n87x7WUJeRAezKWn7
+        BE2aKlVB+5H2eyOuuS96nfHzq4vn4J+Gewy+ds5M4bpTd0ns0lUSePSzk8FZpWYa6z+G4tOe
+        TwR2ueoZ/NJRhbDF85zC3W9GJPjpjQs0PudqkmBTYQ+FTfZ8hN8VN9D4c20PwkVtdSRuva8j
+        VgTyY6MGxBu722l+oLNTwjcauxi+1NJM8/aWMN5So6P55pIrDN9QdpTPt9YgPr+vHvFm6zOS
+        P/bwBMUPWqZv8N/qtzRRSE3ZL2gil233S7Z1Wai9lZMOdpTqUSZqk+YiKQtcNDQP32RykR8r
+        56oQ5D2rJr2CnBtCkD2cLAqDCB4d7/gjsD5HdkWCyFci6MhppsRDP4JftlHa657CrYVL7grS
+        KwRyfRTUl1/3CQSHwWarZbyY5iLhdvsDX5yMWwZu02sfT3JhcEk/4sNTuS0wbvD8nQmAB8U9
+        vi2k3FIw6JTilUHwqueiRMQzIMt2nvDmAtfJQvWXJlLsuQYsDU6JiKfAx1YrI+JQGG/0mr2G
+        LARtmUWMeMhDcGvISotTS2DwSwvtTSa4CDDfiBTpleAceEyLz+IP7v4AcQl/MNjPEiItg5M5
+        cnE6DHof5v1dIQRyx69SBUhhnNDMOKGOcUId4/9cEyJrUJCQoVUnCdqoNOHAPK1Krc1IS5q3
+        M11tQX8+a9uv1uHrqOnHDgfiWKSYLHM33omXU6r92kNqBwKWUATKCj444uWyRNWhw4ImPUGT
+        kSpoHSiEJRVBsqjLfXFyLkm1T9gjCHsFzT9VwkqDM1HxrIGxEiVrlTO7aj2eb+bu8YtSXbJm
+        29vhmNZFm9/bo1ULXhNPlNsG+BhWMmMwMJipyywv2hSr7zJt3L163eL6XXX5oZ15eHF6hDM6
+        /IrBvGF50211b5x+5xD1Jqns+7Sase2rFimPuHPKrdXlH7jCnFPhQseaM5fXz1xofPk1VkFq
+        k1ULZhMareo3HdwD56gDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA02Sa0hTcRjG+++cnU1rdZwz/5ldPCCS4OY03V8xqQ/ioQ92QyordehBLbfF
+        OVO0L2oiOiVvEeiy1Czvpc5NKipzecnmDTNvZQYqlppBBuGlTB2B3x6e5/m9vC+8QkxczXcS
+        xqm1DKtWxlOELW752/XZY2S2PdxzpU6E/hR2ClBTUQMfPb7VgaN+XRWGVhbbBSi9ooFAOXPO
+        KG9qHkP9/Y0CNGauBsgwNcxHk5+Xeej98xICFfW/4qGy29N8VNaSC9BMcTOBFuumAbpjeYyj
+        rrc67LiEXl0pBLR+spegfw4N8ehn+gkBXWFoJeiW1660oVZH0K336gV088MUOtdYC+jcb42A
+        bjB+wOmb7zL59JLh4OndYdIAVpOgZQ7HajjtMeqSHHlJ5X5I6nXUTyr3Vlzx9/KhZIEB0Ux8
+        XCLDygIjpbGmCQP/etXOpL6KHJAKLDbZQCiE5FGYURmRDWyFYvIRgB8XBohsYLPh74dpljqe
+        VdvDteFswlqaB3B0bGGrZE8Gw/LRSnwzkJDf+XCu0IhvBhiJoMlUJ7ASSwDOWFoFmwFBymBb
+        b/dWSUQGwtGyj1s+TrrC8pzlLe1AXoBLbe2EtWMHu4un8c1VbcgAWKjzt853g2v3BzGrdoTj
+        06U8qz4E0013sXwg1m+j9dsQ/TZEvw0pA3gtkDAJnCpGxcmlnFLFJahjpFEalQFsfElL53Lz
+        UzDYdM4MSCGgdok8X7wJF/OViVyyygygEKMkovyv5nCxKFqZfINhNRFsQjzDmYHPxm0FmJND
+        lGbj59TaCLmPXIH85ApvhbcvohxFWWTbZTEZo9Qy1xjmOsP+53hCG6dUcHXyx5eePSnEjvPe
+        QTWueoeOLA9Hg0tvZtSUOvhAdOXAvi7qlDHHfjFswr2nL+R3zUXpmdV10/qsNtYtFNYPjWae
+        oEM70jJd9LqlI+TeT6kDIbpxNsMOeb3Me5K0crbE+UGkMSTIF8kkySPl9ePnWZl4NeRgyqpk
+        rfTXyQIFReFcrFLujrGc8h84CK51OwMAAA==
+X-CMS-MailID: 20200520081831eucas1p2fef65ce5e9847e051f0c9d13e03c1892
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-RootMTR: 20200519212619eucas1p22fa5d3db2521096dc4b79f6e53016d17
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20200519212619eucas1p22fa5d3db2521096dc4b79f6e53016d17
+References: <20200514190734.32746-1-l.stelmach@samsung.com>
+        <20200519212552.11671-1-l.stelmach@samsung.com>
+        <CGME20200519212619eucas1p22fa5d3db2521096dc4b79f6e53016d17@eucas1p2.samsung.com>
+        <20200519212552.11671-2-l.stelmach@samsung.com>
 Sender: linux-crypto-owner@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-crypto.vger.kernel.org>
 X-Mailing-List: linux-crypto@vger.kernel.org
 
-On 5/20/2020 1:17 AM, Iuliana Prodan wrote:
-> Now, in crypto-engine, if hardware queue is full (-ENOSPC),
-> requeue request regardless of MAY_BACKLOG flag.
-> If hardware throws any other error code (like -EIO, -EINVAL,
-> -ENOMEM, etc.) only MAY_BACKLOG requests are enqueued back into
-> crypto-engine's queue, since the others can be dropped.
-> The latter case can be fatal error, so those cannot be recovered from.
-> For example, in CAAM driver, -EIO is returned in case the job descriptor
-> is broken, so there is no possibility to fix the job descriptor.
-> Therefore, these errors might be fatal error, so we shouldn’t
-> requeue the request. This will just be pass back and forth between
-> crypto-engine and hardware.
-> 
-> Fixes: 6a89f492f8e5 ("crypto: engine - support for parallel requests based on retry mechanism")
-> Signed-off-by: Iuliana Prodan <iuliana.prodan@nxp.com>
-Reported-by: Horia Geantă <horia.geanta@nxp.com>
-Reviewed-by: Horia Geantă <horia.geanta@nxp.com>
+Hi,
 
-Thanks,
-Horia
+On 19.05.2020 23:25, Łukasz Stelmach wrote:
+> The value was estimaded with ea_iid[1] using on 10485760 bytes read from
+> the RNG via /dev/hwrng. The min-entropy value calculated using the most
+> common value estimate (NIST SP 800-90P[2], section 6.3.1) was 7.964464.
+> 
+> [1] https://protect2.fireeye.com/url?k=316f3d79-6cf9840e-316eb636-0cc47a312ab0-5f119f729b3ddc11&q=1&u=https%3A%2F%2Fgithub.com%2Fusnistgov%2FSP800-90B_EntropyAssessment
+
+This link looks ugly and do not protect anything.
+Can you just cut out that "protect2" thing and put proper direct link to github ?
+
+> [2] https://csrc.nist.gov/publications/detail/sp/800-90b/final
+> 
+> Signed-off-by: Łukasz Stelmach <l.stelmach@samsung.com>
+> ---
+>  drivers/char/hw_random/iproc-rng200.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/drivers/char/hw_random/iproc-rng200.c b/drivers/char/hw_random/iproc-rng200.c
+> index 32d9fe61a225..95669ece050f 100644
+> --- a/drivers/char/hw_random/iproc-rng200.c
+> +++ b/drivers/char/hw_random/iproc-rng200.c
+> @@ -199,6 +199,7 @@ static int iproc_rng200_probe(struct platform_device *pdev)
+>  	priv->rng.read = iproc_rng200_read,
+>  	priv->rng.init = iproc_rng200_init,
+>  	priv->rng.cleanup = iproc_rng200_cleanup,
+> +	priv->rng.quality = 1000,
+>  
+>  	/* Register driver */
+>  	ret = devm_hwrng_register(dev, &priv->rng);
+> 
+
+-- 
+Best regards,
+Kamil Konieczny
+Samsung R&D Institute Poland
+
